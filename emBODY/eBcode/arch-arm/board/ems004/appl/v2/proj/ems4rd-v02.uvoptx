@@ -206,57 +206,9 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>207</LineNumber>
+          <LineNumber>282</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134383438</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\src\eoappservices\EOtheEMSapplBody.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\ems004\../src/eoappservices/EOtheEMSapplBody.c\207</Expression>
-        </Bp>
-        <Bp>
-          <Number>1</Number>
-          <Type>0</Type>
-          <LineNumber>548</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134386632</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\src\eoappservices\EOtheInertial.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\ems004\../src/eoappservices/EOtheInertial.c\548</Expression>
-        </Bp>
-        <Bp>
-          <Number>2</Number>
-          <Type>0</Type>
-          <LineNumber>414</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134418678</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\cfg\eoemsappl\overridden_appl.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\ems004\../cfg/eoemsappl/overridden_appl.c\414</Expression>
-        </Bp>
-        <Bp>
-          <Number>3</Number>
-          <Type>0</Type>
-          <LineNumber>263</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134371688</Address>
+          <Address>134368196</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -265,30 +217,56 @@
           <BreakIfRCount>1</BreakIfRCount>
           <Filename>..\src\eoappservices\EOtheCANdiscovery2.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\ems004\../src/eoappservices/EOtheCANdiscovery2.c\263</Expression>
+          <Expression>\\ems004\../src/eoappservices/EOtheCANdiscovery2.c\282</Expression>
         </Bp>
         <Bp>
-          <Number>4</Number>
+          <Number>1</Number>
           <Type>0</Type>
-          <LineNumber>211</LineNumber>
+          <LineNumber>802</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
+          <Address>134490782</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
-          <Filename>..\src\eoappservices\EOtheEMSapplBody.c</Filename>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>..\cfg\eoemsappl\overridden_appl.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression></Expression>
+          <Expression>\\ems004\../cfg/eoemsappl/overridden_appl.c\802</Expression>
+        </Bp>
+        <Bp>
+          <Number>2</Number>
+          <Type>0</Type>
+          <LineNumber>819</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134490864</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>..\cfg\eoemsappl\overridden_appl.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\ems004\../cfg/eoemsappl/overridden_appl.c\819</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
         <Ww>
           <count>0</count>
           <WinNumber>1</WinNumber>
-          <ItemText>target</ItemText>
+          <ItemText>fullscale</ItemText>
+        </Ww>
+        <Ww>
+          <count>1</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>strain-&gt;status.fullscale</ItemText>
+        </Ww>
+        <Ww>
+          <count>2</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>calibvalues,0x0A</ItemText>
         </Ww>
       </WatchWindow1>
       <WatchWindow2>
@@ -1232,6 +1210,118 @@
           <ExecCommand></ExecCommand>
           <Expression></Expression>
         </Bp>
+        <Bp>
+          <Number>43</Number>
+          <Type>0</Type>
+          <LineNumber>824</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>0</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>0</BreakIfRCount>
+          <Filename>..\cfg\eoemsappl\overridden_appl.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
+        <Bp>
+          <Number>44</Number>
+          <Type>0</Type>
+          <LineNumber>837</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>0</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>0</BreakIfRCount>
+          <Filename>..\cfg\eoemsappl\overridden_appl.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
+        <Bp>
+          <Number>45</Number>
+          <Type>0</Type>
+          <LineNumber>290</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>0</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>0</BreakIfRCount>
+          <Filename>..\src\eoappservices\EOtheSTRAIN.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
+        <Bp>
+          <Number>46</Number>
+          <Type>0</Type>
+          <LineNumber>200</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>0</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>0</BreakIfRCount>
+          <Filename>..\..\..\..\..\embobj\plus\can\config-can-protocol\EoCANprotASperiodic.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
+        <Bp>
+          <Number>47</Number>
+          <Type>0</Type>
+          <LineNumber>802</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>0</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>0</BreakIfRCount>
+          <Filename>..\cfg\eoemsappl\overridden_appl.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
+        <Bp>
+          <Number>48</Number>
+          <Type>0</Type>
+          <LineNumber>819</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>0</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>0</BreakIfRCount>
+          <Filename>..\cfg\eoemsappl\overridden_appl.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
+        <Bp>
+          <Number>49</Number>
+          <Type>0</Type>
+          <LineNumber>282</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>0</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>0</BreakIfRCount>
+          <Filename>..\src\eoappservices\EOtheCANdiscovery2.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
       </Breakpoint>
       <WatchWindow1>
         <Ww>
@@ -2041,7 +2131,7 @@
 
   <Group>
     <GroupName>eo-emsappl</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -2205,7 +2295,7 @@
 
   <Group>
     <GroupName>eo-emsappl-cfg</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -2338,7 +2428,7 @@
 
   <Group>
     <GroupName>appl-services</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -2346,7 +2436,7 @@
       <GroupNumber>13</GroupNumber>
       <FileNumber>73</FileNumber>
       <FileType>1</FileType>
-      <tvExp>1</tvExp>
+      <tvExp>0</tvExp>
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
@@ -3153,7 +3243,7 @@
 
   <Group>
     <GroupName>embody-robot</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
