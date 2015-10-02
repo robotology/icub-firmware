@@ -47,11 +47,11 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 // it contains a pair {value, configuration}
-typedef struct // 2B+12*4B = 50B
+typedef struct // 2B+12*8B = 98B
 {
     uint16_t                value;
     eOmcconfig_jomo_cfg_t   jomos[eomcconfig_jomo_maxnumberof];
-} eomcconfig_codeconfig_t;  EO_VERIFYsizeof(eomcconfig_codeconfig_t, 50);
+} eomcconfig_codeconfig_t;  EO_VERIFYsizeof(eomcconfig_codeconfig_t, 98);
 
 // it contains a pair {string, value}
 typedef struct // 4B+2B = 6B
@@ -133,15 +133,12 @@ const eomcconfig_codeconfig_t eomcconfig_codeconfig_MC4PLUS[] =
     {EO_INIT(.value) eOmcconfig_value_MC4PLUS_unspecified},
     /* experimental configurations */
     {EO_INIT(.value) eOmcconfig_value_MC4PLUS_experimental,
-        EO_INIT(.jomos[0].actuator.local.type)  1, EO_INIT(.jomos[0].actuator.local.index) 2, EO_INIT(.jomos[0].encoder.etype)  2, EO_INIT(.jomos[0].encoder.index)  2
+        EO_INIT(.jomos[0].actuator.local.type)  1, EO_INIT(.jomos[0].actuator.local.index) 2, EO_INIT(.jomos[0].encoder.isthere)       1 ,EO_INIT(.jomos[0].encoder.etype)        2, EO_INIT(.jomos[0].encoder.index)        3, EO_INIT(.jomos[0].encoder.pos_type)       0,
+                                                                                              EO_INIT(.jomos[0].extra_encoder.isthere) 1, EO_INIT(.jomos[0].extra_encoder.etype)  1, EO_INIT(.jomos[0].extra_encoder.index)  0, EO_INIT(.jomos[0].extra_encoder.pos_type) 1,
     },
-    {EO_INIT(.value) eOmcconfig_value_MC4PLUS_experimental_aea1joint,
-        EO_INIT(.jomos[0].actuator.local.type)  1, EO_INIT(.jomos[0].actuator.local.index) 2, EO_INIT(.jomos[0].encoder.etype)  0, EO_INIT(.jomos[0].encoder.index)  0
-    },
-    {EO_INIT(.value) eOmcconfig_value_MC4PLUS_experimental_inc2joint,
-        EO_INIT(.jomos[1].actuator.local.type)  1, EO_INIT(.jomos[1].actuator.local.index) 0, EO_INIT(.jomos[1].encoder.etype)  2, EO_INIT(.jomos[1].encoder.index)  0,
-        EO_INIT(.jomos[0].actuator.local.type)  1, EO_INIT(.jomos[0].actuator.local.index) 2, EO_INIT(.jomos[0].encoder.etype)  2, EO_INIT(.jomos[0].encoder.index)  2,
-
+    {EO_INIT(.value) eOmcconfig_value_MC4PLUS_experimental_2joints,
+        EO_INIT(.jomos[0].actuator.local.type)  1, EO_INIT(.jomos[0].actuator.local.index) 2, EO_INIT(.jomos[0].encoder.isthere) 1, EO_INIT(.jomos[0].encoder.etype)  1, EO_INIT(.jomos[0].encoder.index)  0, EO_INIT(.jomos[0].encoder.pos_type)       0,
+        EO_INIT(.jomos[1].actuator.local.type)  1, EO_INIT(.jomos[1].actuator.local.index) 3, EO_INIT(.jomos[1].encoder.isthere) 1, EO_INIT(.jomos[1].encoder.etype)  2, EO_INIT(.jomos[1].encoder.index)  3, EO_INIT(.jomos[1].encoder.pos_type)       0,
     },
     
     /* v3 icub head configs */
@@ -198,14 +195,13 @@ const eomcconfig_codeconfig_t eomcconfig_codeconfig_MC4PLUS[] =
         EO_INIT(.jomos[3].actuator.local.type)  1, EO_INIT(.jomos[3].actuator.local.index) 3, EO_INIT(.jomos[3].encoder.etype)  4, EO_INIT(.jomos[3].encoder.index)  0  // j3-> little-fingers,     motor3, mais
     },
     
-}; EO_VERIFYsizeof(eomcconfig_codeconfig_MC4PLUS, eOmcconfig_value_MC4PLUS_numberof*sizeof(const eomcconfig_codeconfig_t)); 
+}; EO_VERIFYsizeof(eomcconfig_codeconfig_MC4PLUS, eOmcconfig_value_MC4PLUS_numberof*sizeof(const eomcconfig_codeconfig_t));
 
 const eomcconfig_valuestring_t eomcconfig_valuestring_MC4PLUS[] =
 {
     {EO_INIT(.value) eOmcconfig_value_MC4PLUS_unspecified,              EO_INIT(.string) "Unspecified configuration"},
     {EO_INIT(.value) eOmcconfig_value_MC4PLUS_experimental,             EO_INIT(.string) "MC4Plus_experimental_jig"},
-    {EO_INIT(.value) eOmcconfig_value_MC4PLUS_experimental_aea1joint,   EO_INIT(.string) "MC4Plus_experimental_jig_aea1joint"},
-    {EO_INIT(.value) eOmcconfig_value_MC4PLUS_experimental_inc2joint,   EO_INIT(.string) "MC4Plus_experimental_jig_inc2joint"},
+    {EO_INIT(.value) eOmcconfig_value_MC4PLUS_experimental_2joints,     EO_INIT(.string) "MC4Plus_experimental_jig_2joints"},
     {EO_INIT(.value) eOmcconfig_value_MC4PLUS_b0,                       EO_INIT(.string) "MC4plus_b0"},
     {EO_INIT(.value) eOmcconfig_value_MC4PLUS_b1,                       EO_INIT(.string) "MC4plus_b1"},
     {EO_INIT(.value) eOmcconfig_value_MC4PLUS_b7,                       EO_INIT(.string) "MC4plus_b7"},
@@ -242,7 +238,7 @@ const eomcconfig_boardjomos_t eomcconfig_boardjomos_MC4PLUS[] =
 const eomcconfig_boardcode_t eomcconfig_boardcode_MC4PLUS[] =
 {
     /* experimentals */
-    {EO_INIT(.board_num) 97,  EO_INIT (.value) eOmcconfig_value_MC4PLUS_experimental_inc2joint}, // experimental board
+    {EO_INIT(.board_num) 97,  EO_INIT (.value) eOmcconfig_value_MC4PLUS_experimental_2joints}, // experimental board
     {EO_INIT(.board_num) 98,  EO_INIT (.value) eOmcconfig_value_MC4PLUS_experimental}, // experimental board
     
     /* v3 icub head boards */

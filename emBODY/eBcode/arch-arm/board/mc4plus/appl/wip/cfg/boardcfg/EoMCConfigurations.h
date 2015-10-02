@@ -131,20 +131,19 @@ enum { eOmcconfig_value_MC4CAN_numberof = 1 };
  **/
 typedef enum
 {
-    eOmcconfig_value_MC4PLUS_unspecified	= 0,
-    eOmcconfig_value_MC4PLUS_experimental   = 1,
-    eOmcconfig_value_MC4PLUS_experimental_aea1joint = 2,
-    eOmcconfig_value_MC4PLUS_experimental_inc2joint = 3,
+    eOmcconfig_value_MC4PLUS_unspecified	       = 0,
+    eOmcconfig_value_MC4PLUS_experimental          = 1,
+    eOmcconfig_value_MC4PLUS_experimental_2joints  = 2,
     //only v3 head boards inserted at the moment (change the name later on...)
-    eOmcconfig_value_MC4PLUS_b0	            = 4,
-    eOmcconfig_value_MC4PLUS_b1	            = 5, 
-    eOmcconfig_value_MC4PLUS_b7	            = 6,
-    eOmcconfig_value_MC4PLUS_b9	            = 7,
-    eOmcconfig_value_MC4PLUS_1b4            = 8
+    eOmcconfig_value_MC4PLUS_b0	                   = 3,
+    eOmcconfig_value_MC4PLUS_b1	                   = 4, 
+    eOmcconfig_value_MC4PLUS_b7	                   = 5,
+    eOmcconfig_value_MC4PLUS_b9	                   = 6,
+    eOmcconfig_value_MC4PLUS_1b4                   = 7
 	
 } eOmcconfig_value_MC4PLUS_t;
 
-enum { eOmcconfig_value_MC4PLUS_numberof = 9 };
+enum { eOmcconfig_value_MC4PLUS_numberof = 8 };
 /*
 typedef enum
 {
@@ -203,7 +202,9 @@ typedef struct
     uint8_t     etype       : 4;      // 0 aea, 1 amo, 2 incr, 3 adc, 4 mais, etc. 
     uint8_t     index       : 4;      // 0, 1, 2, 3, 4, etc where the number is referred to the hal enum specified by the type.
     uint8_t     enc_joint   : 3;      // 0...6 joint index referred to the joints list inside the eoappencodersreader
-    uint8_t     dummy       : 5;
+    uint8_t     pos_type    : 2;      // 0...3 detected position type : 0 joint, 1 rotor, 2 unspecified...
+    uint8_t     isthere     : 1;      // 0 not, 1 is there
+    uint8_t     dummy       : 2;
     // example: aea encoder on port p6 or the ems is etype=0, index=0
 } eOmcconfig_enc_mapping_t;
 //we'll need also an external mapping (encoder on CAN, e.g MAIS) but we'll resolve it later on
@@ -213,10 +214,11 @@ typedef struct
 /* joint/motor complete config */
 typedef struct
 {
-    eOmcconfig_enc_mapping_t      encoder;   
-    eOmcconfig_act_mapping_t      actuator;
-    uint8_t                       dummy;
-} eOmcconfig_jomo_cfg_t;          EO_VERIFYsizeof(eOmcconfig_jomo_cfg_t, 4);
+    eOmcconfig_enc_mapping_t    encoder;
+    eOmcconfig_enc_mapping_t    extra_encoder;  
+    eOmcconfig_act_mapping_t    actuator;
+    uint8_t                     dummy[3];
+} eOmcconfig_jomo_cfg_t;        EO_VERIFYsizeof(eOmcconfig_jomo_cfg_t, 8);
 
 enum { eomcconfig_jomo_maxnumberof = 12 };
 
