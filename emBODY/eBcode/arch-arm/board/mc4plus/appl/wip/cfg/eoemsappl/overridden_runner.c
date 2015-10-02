@@ -102,7 +102,7 @@ void userDef_hwErrCntr(void){}
 // --------------------------------------------------------------------------------------------------------------------
 
 static void    s_overriden_runner_CheckAndUpdateExtFaults(void);
-static void    s_overriden_runner_UpdateMotorsCurrents(void);
+static void    s_overriden_runner_UpdateMotorsStatus(void);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -126,8 +126,8 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(EO
 {
   //here we could update some of the values which are updated via CAN callback for the EMS with mc 2foc-based (e.g. currents of the motors OR rotor position etc...)
     
-  //update motors currents
-  s_overriden_runner_UpdateMotorsCurrents();
+  //update motors status
+  s_overriden_runner_UpdateMotorsStatus();
   
 }
 
@@ -269,22 +269,50 @@ static void s_overriden_runner_CheckAndUpdateExtFaults(void)
     return;
 }
 
-static void s_overriden_runner_UpdateMotorsCurrents(void)
+static void s_overriden_runner_UpdateMotorsStatus(void)
 {
-  eOmc_motor_t* mot;  
-  int16_t mot_curr = 0;  
+  eOmc_motor_t* mot;
+  eOmc_joint_t* jnt;    
+  int16_t  mot_curr = 0;
+  uint32_t mot_pos  = 0;    
       
   uint8_t numofjomos = eo_entities_NumOfJoints(eo_entities_GetHandle());  
   for (uint8_t i = 0; i < numofjomos; i++)
   {       
-    if(NULL == (mot = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, i)))
+    if(NULL == (jnt = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, i)) ||
+      (NULL == (mot = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, i)))) 
     {
         continue;        
     }
-    mot_curr = eo_mcserv_GetMotorCurrent(eo_mcserv_GetHandle(), i);
-  
-    //does it worth to update the rotor encoder position+velocity too?
-    eo_emsController_AcquireMotorEncoder(i, mot_curr, 0,0);    
+    
+    //Get values using MCService interfaces
+    mot_curr = eo_mcserv_GetMotorCurrent (eo_mcserv_GetHandle(), i);
+    
+    //rotor position update inside the control loop, reading using the EOappEncodersReader 
+    /*
+    //mot_pos  = eo_mcserv_GetMotorPositionRaw(eo_mcserv_GetHandle(), i);
+    //converting in iCub degrees the rotorposition
+    float divider = mot->config.rotorEncoderResolution;
+    if(0.0f == divider)
+    {
+        mot_pos = 0;       
+    }
+    else
+    {
+        if(divider < 0)
+        {
+            divider = -divider;
+        }
+    
+        mot_pos  = (float) (mot_pos * 65535.0) / mot->config.rotorEncoderResolution;
+    }
+    */
+    
+    
+   
+    //update structure which will be broadcasted
+    //eo_emsController_AcquireMotorEncoder(i, mot_curr, 0, (int32_t) mot_pos);
+    eo_emsController_AcquireMotorCurrent(i, mot_curr);
   }
 }
 // --------------------------------------------------------------------------------------------------------------------
