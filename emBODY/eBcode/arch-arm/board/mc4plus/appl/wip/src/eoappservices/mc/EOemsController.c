@@ -218,6 +218,27 @@ extern void eo_emsController_AcquireMotorEncoder(uint8_t motor, int16_t current,
     }
 }
 
+extern void eo_emsController_AcquireMotorPosition(uint8_t motor, int32_t position)
+{
+    eo_motors_reset_wdog(ems->motors, motor);
+    
+    ems->motor_position[motor] = position;
+    //change the sign of motor position according to the sign of rotorencoder
+    if (ems->rotorencoder[motor]<0)
+    {
+       ems->motor_position[motor]     = - ems->motor_position[motor];
+    }
+}
+
+extern void eo_emsController_AcquireMotorCurrent(uint8_t motor, int16_t current)
+{
+    eo_motors_reset_wdog(ems->motors, motor);
+    
+    ems->motor_current [motor] = (2*current)/3; // Iq = sqrt(3)/2*Imeas, 32768 = 25000 mA ==> 0.66 scale factor
+}
+
+
+
 extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t error_mask)
 {
 #if defined(USE_2FOC_FAST_ENCODER)    
