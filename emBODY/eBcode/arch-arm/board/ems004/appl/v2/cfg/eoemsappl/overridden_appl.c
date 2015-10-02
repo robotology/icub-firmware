@@ -56,6 +56,15 @@
 #include "EOVtheEnvironment.h"
 #include "EOtheARMenvironment.h"
 
+
+#include "EOconstvector_hid.h"
+
+#include "EOtimer.h"
+
+#include "EOVtheCallbackManager.h"
+
+#include "EOconstarray.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -287,8 +296,17 @@ extern eObool_t eoprot_b02_b04_mc_isproxied(eOnvID32_t id)
 // marco.accame: this function is called inside eom_emsappl_Initialise() just before to run the state machine
 // which enters in the CFG state. it is the place where to launch new services
 
+static void s_overridden_appl_initialise2(EOMtheEMSappl* p);
+
 extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
 {  
+    
+    s_overridden_appl_initialise2(p);
+    
+    return;
+    
+#if 0
+    
     EOMtheEMSapplCfg* emsapplcfg = eom_emsapplcfg_GetHandle();
     // the led-pulser is initted as first thing
      
@@ -464,6 +482,8 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
 #endif // defined(TEST_NUM_2)
 
 #endif
+
+#endif
 }
 
 
@@ -539,7 +559,8 @@ extern void eom_emsappl_hid_userdef_on_exit_RUN(EOMtheEMSappl* p)
     }
     
     // stop tx of strain, if present
-    eo_strain_DisableTX(eo_strain_GetHandle());    
+    eo_strain_TXstop(eo_strain_GetHandle()); 
+    //eo_strain_DisableTX(eo_strain_GetHandle());    
 
     // stop tx of inertial. the check whether to stop skin or not is done internally.
     eo_inertial_Stop(eo_inertial_GetHandle());
@@ -578,6 +599,301 @@ static void overridden_appl_led_error_init(void)
     hal_led_off(hal_led3);
     hal_led_off(hal_led4);
     hal_led_off(hal_led5);   
+}
+
+
+
+// -----------------------------------------------------------------------------------------------------------------
+
+static const eOprot_EPcfg_t s_theEPcfgsOthersMAX[] =
+{  
+    {           
+        .endpoint           = eoprot_endpoint_motioncontrol,
+        .numberofentities   = {12, 12, 1, 0, 0, 0, 0}     
+    },     
+    {        
+        .endpoint           = eoprot_endpoint_analogsensors,
+        .numberofentities   = {1, 1, 1, 1, 0, 0, 0}        
+    },
+    {        
+        .endpoint           = eoprot_endpoint_skin,
+        .numberofentities   = {2, 0, 0, 0, 0, 0, 0}        
+    }     
+};
+
+const EOconstvector s_eo_vectorof_EPcfg_max = 
+{
+    .capacity       = sizeof(s_theEPcfgsOthersMAX)/sizeof(eOprot_EPcfg_t),
+    .size           = sizeof(s_theEPcfgsOthersMAX)/sizeof(eOprot_EPcfg_t),
+    .item_size      = sizeof(eOprot_EPcfg_t),
+    .dummy          = 0,
+    .stored_items   = (void*)s_theEPcfgsOthersMAX,
+    .functions      = NULL   
+};
+
+const EOconstvector * s_the_vectorof_EPcfgs = &s_eo_vectorof_EPcfg_max;
+
+static void s_can_cbkonrx(void *arg)
+{
+    EOMtask *task = (EOMtask *)arg;
+    eom_task_isrSetEvent(task, emsconfigurator_evt_userdef00);
+}
+
+
+static void s_debug(void);
+
+
+static void s_overridden_appl_initialise2(EOMtheEMSappl* p)
+{
+    
+    // pulse led3 forever at 20 hz.
+    eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_three, EOK_reltime1sec/20, 0);    
+    
+    // board is eb1
+    s_boardnum = 0;
+    
+    // initialise all basic objects
+    
+    {   // eth-protocol-1: the nvset   
+        // marco.accame on 30 sept 2015: i initialise at max capabilities
+        
+        EOnvSet* nvset = eom_emstransceiver_GetNVset(eom_emstransceiver_GetHandle()); 
+        uint8_t i = 0;
+        // 1. set the board number. the value of the generic board is 99. 
+        //    the correct value is used only for retrieving it later on and perform specific actions based on the board number
+        eo_nvset_BRDlocalsetnumber(nvset, s_boardnum);
+                
+        // 2. load all the endpoints specific to this board. the generic board loads only management
+        uint16_t numofepcfgs = eo_constvector_Size(s_the_vectorof_EPcfgs);
+        for(i=0; i<numofepcfgs; i++)
+        {
+            eOprot_EPcfg_t* epcfg = (eOprot_EPcfg_t*) eo_constvector_At(s_the_vectorof_EPcfgs, i);
+            if(eobool_true == eoprot_EPcfg_isvalid(epcfg))
+            {
+                eo_nvset_LoadEP(nvset, epcfg, eobool_true);
+            }                        
+        }
+    }
+    {   // eth-protocol-2: the callbacks
+        // marco.accame on 30 sept 2015: so far i define all the callbacks. however:
+        // 1. we may decide to define EOPROT_CFG_OVERRIDE_CALLBACKS_IN_RUNTIME and thus we must later on to load a proper callback. 
+        //    BUT maybe better not.
+        // 2. if not, i MUST later on re-write the callbacks, so that:
+        //    a. we can understand if a service is configured (use proper object) and we something only if it configured.
+        //    b. make sure that when we use a get entity, we use EOtheEntities which does not address joints beyond those configured
+         
+    }    
+
+    {   // entities   
+        // marco.accame on 30 sept 2015: i initialise at max capabilities. however, so far we have 0 entities.
+        // when we need to init a service, we call a proper eo_entities_SetNumOf...(num) method
+        // to unit we can call a eo_entities_Reset() for all or a proper eo_entities_SetNumOf...(0)  
+        eo_entities_Initialise();        
+    }
+    
+    {   // can-mapping
+        // marco.accame on 30 sept 2015: so far it is empty. i will load it later on with boards and with entities.
+        // i must write a eo_canmap_LoadEntity() with can boards and info about how the can boards.
+        // i also MUST write a eo_canmap_UnloadEntity()
+        eo_canmap_Initialise(NULL);
+    }
+    
+    {   // can-protocol
+        // marco.accame on 30 sept 2015: i init it in a complete way. we dont have a load method for service ...
+        // we may add it, so that if we dont init we dont allow it.
+        eo_canprot_Initialise(NULL);        
+    }
+    
+    {   // other services: I dont init anything. however i should avoid automatic initialisation for:
+        // EOtheMAIS, EOtheSTRAIN, EOtheSKIN, EOtheInertial, EOtheMotionControl     
+
+        // changed idea: i initialise them.
+        eo_strain_Initialise();        
+    }
+    
+    {   // i init a service handler. for instance to be called EOtheServices
+        // so far i do in here what i need without any container
+             
+        // can-services
+        eOcanserv_cfg_t config = {.mode = eocanserv_mode_straight};   
+        
+        config.mode                 = eocanserv_mode_straight;
+        config.canstabilizationtime = 7*OSAL_reltime1sec;
+        config.rxqueuesize[0]       = 64;
+        config.rxqueuesize[1]       = 64;
+        config.txqueuesize[0]       = 64;
+        config.txqueuesize[1]       = 64;  
+        config.onrxcallback[0]      = s_can_cbkonrx; 
+        config.onrxargument[0]      = eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle());    
+        config.onrxcallback[1]      = s_can_cbkonrx; 
+        config.onrxargument[1]      = eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()); 
+            
+        // attenzione alla mc4cplus che ha 1 solo can ... potrei cambiare il eo_canserv_Initialise() in modo che
+        // se hal_can_supported_is(canx) e' falso allora non retsituisco errore ma semplicemente non inizializzo.
+        eo_canserv_Initialise(&config);   
+        
+        // can-discovery
+        eo_candiscovery2_Initialise(NULL);        
+    }
+    
+    
+    // ok, nothing else now .....
+    
+    
+    // for debug: 
+    
+    // A. start a timer of 20 seconds w/ a callback which:
+    // 1. discover the strain,
+    // 2. init EOtheStrain (eo_strain_Load()), which in turn will call EOtheEnetities etc. 
+    // 3. ask the full-scales,
+    // 4. when they are all retrieved, init the strain and start it, and start the control-loop.
+    
+    // B. start a timer of 60 seconds w/ callback which:
+    // 1. stop the strain, deinit the EOtheStrain ((eo_strain_Unload())
+    
+    // C. start a timer of 70 seconds whcih send the eapplication in run mode.
+    
+   s_debug();
+    
+    
+}
+
+static eOresult_t s_onfullscaleready(EOtheSTRAIN* p, eObool_t operationisok);
+static eOresult_t s_on_strain_verify(EOtheSTRAIN* p, eObool_t verifyisok);
+static eOresult_t onstop_search4strain(void *par, EOtheCANdiscovery2* p, eObool_t searchisok);
+static void callback1(void *p);
+
+
+
+static eOresult_t onstop_search4strain(void *par, EOtheCANdiscovery2* p, eObool_t searchisok)
+{
+    if(eobool_true == searchisok)
+    {
+        const eOmn_serv_configuration_t * strainserv = (const eOmn_serv_configuration_t *)par;
+        eo_strain_Activate(eo_strain_GetHandle(), strainserv);        
+    }
+    
+    return(eores_OK);
+}
+
+
+static eOresult_t s_on_strain_verify(EOtheSTRAIN* p, eObool_t verifyisok)
+{
+    uint8_t rr = 0;
+    
+    if(eobool_true == verifyisok)
+    {
+        eo_strain_GetFullScale(eo_strain_GetHandle(), s_onfullscaleready); 
+    }
+    else
+    {
+        rr = 0;
+    }
+    
+    rr = rr;
+    
+    return(eores_OK);
+}
+
+static eOresult_t s_onfullscaleready(EOtheSTRAIN* p, eObool_t operationisok)
+{
+    eOresult_t res = eores_OK;
+    
+    if(eobool_false == operationisok)
+    {
+        // send diagnostics
+        return(eores_NOK_generic);
+    }
+    
+    eOas_strain_t *strain = eo_entities_GetStrain(eo_entities_GetHandle(), 0);
+    eOas_arrayofupto12bytes_t *fullscale = &strain->status.fullscale;
+    EOconstarray *c = eo_constarray_Load((EOarray*)fullscale);
+    uint8_t size = eo_constarray_Size(c);
+    size = size;
+    uint8_t i=0;
+    uint16_t calibvalues[6] = {1};
+    for(i=0; i<size; i++)
+    {
+        calibvalues[i] = * ((uint16_t*)eo_constarray_At(c, i));        
+    }
+    size = size;
+    
+    
+    return(res);    
+}
+
+static void callback1(void *p)
+{
+    static uint8_t tick = 0;
+    
+    const eOmn_serv_configuration_t * strainserv = NULL; 
+    
+    eObool_t stoptimer = eobool_false;
+    
+    if(NULL == strainserv)
+    {
+        strainserv = eoboardconfig_code2strain_serv_configuration(0);
+    }
+    
+    if(0 == tick)
+    {   // i enter in run mode.
+        eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STrun);        
+    }
+    else if(1 == tick)
+    {
+        // start discovery of the strain
+        
+        //eo_strain_TXstart(eo_strain_GetHandle(), 10, eoas_strainmode_txcalibrateddatacontinuously); 
+        
+        eo_strain_Verify(eo_strain_GetHandle(), strainserv, s_on_strain_verify, eobool_true);       
+    }
+    else if(2 == tick)
+    {       
+        //eo_strain_Activate(eo_strain_GetHandle(), strainserv);  
+        //eo_strain_Verify(eo_strain_GetHandle(), strainserv, s_on_strain_verify, eobool_false);      
+
+        //eo_strain_TXstart(eo_strain_GetHandle(), 10, eoas_strainmode_txcalibrateddatacontinuously);  
+        
+//        eOas_strain_t *strain = eo_entities_GetStrain(eo_entities_GetHandle(), 0);
+//        eOas_arrayofupto12bytes_t *fullscale = &strain->status.fullscale;
+//        eo_strain_TXstart(eo_strain_GetHandle(), 10, eoas_strainmode_acquirebutdonttx);
+//        eo_strain_GetFullScale(eo_strain_GetHandle(), s_onfullscaleready);        
+    }
+    else if(3 == tick)
+    {
+        eo_strain_Deactivate(eo_strain_GetHandle());          
+    }
+    else if(4 == tick)
+    {
+        eo_strain_Activate(eo_strain_GetHandle(), strainserv);
+        eo_strain_TXstart(eo_strain_GetHandle(), 10, eoas_strainmode_txcalibrateddatacontinuously);         
+    }
+   
+    tick++;
+   
+   
+    if(tick >= 8)
+    {
+        stoptimer = eobool_true;
+    }
+   
+    if(eobool_true == stoptimer)
+    {
+        eo_timer_Stop((EOtimer*)p);
+    }   
+}
+
+
+static void s_debug(void)  
+{
+    EOtimer *tmrA = eo_timer_New();    
+    
+    EOaction_strg astrg = {0};
+    EOaction *act = (EOaction*)&astrg;
+    
+    eo_action_SetCallback(act, callback1, tmrA, eov_callbackman_GetTask(eov_callbackman_GetHandle())); 
+    
+    eo_timer_Start(tmrA, eok_abstimeNOW, 10*eok_reltime1sec, eo_tmrmode_FOREVER, act);   
 }
 
 

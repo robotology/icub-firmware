@@ -62,6 +62,8 @@
 
 #include "EOtheInertial.h"
 
+#include "EOtheCANdiscovery2.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -148,18 +150,29 @@ static uint8_t event_view = 0;
 
 extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(EOMtheEMSrunner *p)
 {
-    #if defined(EVIEWER_ENABLED)   
-    if(0 == event_view)
-    {   
-        eventviewer_load(EVIEWER_userDef_hwErrCntr, userDef_hwErrCntr);
-        event_view = 1;
-    }
-    #endif    
+    static uint32_t iter = 0;
+
+    iter ++;    
+  
 }
 
 
 extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOMtheEMSrunner *p)
 {
+    // i tick the can-discovery. 
+    // this function does something only if a discovery is active and if the search timer period has expired.
+    eo_candiscovery2_Tick(eo_candiscovery2_GetHandle());
+    
+    // i manage the can-bus reception. so far i dont care about skin, thus i parse everything
+    eo_canserv_ParseAll(eo_canserv_GetHandle());
+    
+    
+    
+#if !defined(DEBUG_REMOVE_OLD_SERVICES)    
+    
+    rimosso
+    // other stuff.
+    
     uint8_t                         numofRXcanframe = 0;
     uint8_t                         port;
     
@@ -190,6 +203,10 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOM
         
         eo_canserv_Parse(eo_canserv_GetHandle(), (eOcanport_t)port, numofRXcanframe, NULL);
     }
+    
+#endif //!defined(DEBUG_REMOVE_OLD_SERVICES)
+    
+
 }
 
 
@@ -198,6 +215,10 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOM
 
 extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
 {
+    
+    
+#if !defined(DEBUG_REMOVE_OLD_SERVICES)
+    
 #if !defined(TEST_EB2_EB4_WITHOUT_MC)
     EOtheEMSapplBody* emsappbody_ptr = eo_emsapplBody_GetHandle();
     eOmn_appl_runMode_t runmode = eo_emsapplBody_GetAppRunMode(emsappbody_ptr);
@@ -227,19 +248,39 @@ extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
         } break;
     }
 #endif
+    
+#endif //!defined(DEBUG_REMOVE_OLD_SERVICES)
 }
 
 
 extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission(EOMtheEMSrunner *p)
-{   
+{  
+    
+    eo_canserv_TXstartAll(eo_canserv_GetHandle());
+
+#if !defined(DEBUG_REMOVE_OLD_SERVICES)    
     eo_canserv_TXstart(eo_canserv_GetHandle(), eOcanport1, NULL);
     eo_canserv_TXstart(eo_canserv_GetHandle(), eOcanport2, NULL);
+#endif //!defined(DEBUG_REMOVE_OLD_SERVICES)    
 }
 
 
 
 extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(EOMtheEMSrunner *p)
-{        
+{  
+    // do things ...
+
+
+    
+    // KEEP IT LAST: wait until can tx is all done
+    const uint32_t timeout = 3*osal_reltime1ms;
+    eo_canserv_TXwaitAllUntilDone(eo_canserv_GetHandle(), timeout);   
+
+    return;
+    
+
+#if !defined(DEBUG_REMOVE_OLD_SERVICES)
+    
     // if we have skin and we have just transmitted the regulars, then we must reset the status->array containing the
     // can frames, so that at the rx cycle we can put some more canframes inside.
     uint8_t port = 0;
@@ -268,7 +309,9 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(
     // diagnostics about tx failure within the specified timeout is managed internally 
     const uint32_t timeout = 3*osal_reltime1ms;
     eo_canserv_TXwaituntildone(eo_canserv_GetHandle(), eOcanport1, timeout);
-    eo_canserv_TXwaituntildone(eo_canserv_GetHandle(), eOcanport2, timeout);       
+    eo_canserv_TXwaituntildone(eo_canserv_GetHandle(), eOcanport2, timeout);   
+
+#endif // #if !defined(DEBUG_REMOVE_OLD_SERVICES)    
 }
 
 
