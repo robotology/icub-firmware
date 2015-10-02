@@ -185,8 +185,13 @@ extern eOresult_t eocanprotASpolling_parser_POL_AS_CMD__GET_FULL_SCALES(eOcanfra
     
     // now i get the channel and the data to be put inside the strain.
     uint8_t channel = frame->data[1];
+#if defined(USE_OLD_BUGGY_MODE_TO_SEND_UP_FULLSCALE_WITH_INVERTED_BYTES)    
     uint16_t *data = (uint16_t *)&(frame->data[2]);
-    
+#else
+    // MSB is in data[2], LSB in data[3]
+    uint16_t value = (uint16_t)(frame->data[3]) + (uint16_t)(frame->data[2] << 8);
+    uint16_t *data = &value;
+#endif    
     // i put data into the array at the specified location. the check vs channel being lower than capacity 6 of array is done inside
     EOarray* array = (EOarray*)&strain->status.fullscale;
     eo_array_Assign(array, channel, data, 1);
