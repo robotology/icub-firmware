@@ -106,147 +106,6 @@ static eOresult_t s_translate_eOmcControlMode2icubCanProtoControlMode(eOmc_contr
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-const eOmc_joint_t joint_default_value =
-{
-    .config =             
-    {
-        .pidposition =
-        {
-            .kp =                    0,
-            .ki =                    0,
-            .kd =                    0,
-            .limitonintegral =       0,
-            .limitonoutput =         0,
-            .scale =                 0,
-            .offset =                0,
-            .kff =                   0,
-            .stiction_up_val =       0,
-            .stiction_down_val =     0,
-            .filler =                {0xf1, 0xf2, 0xf3}
-        },
-        .pidvelocity =
-        {
-            .kp =                    0,
-            .ki =                    0,
-            .kd =                    0,
-            .limitonintegral =       0,
-            .limitonoutput =         0,
-            .scale =                 0,
-            .offset =                0,
-            .kff =                   0,
-            .stiction_up_val =       0,
-            .stiction_down_val =     0,
-            .filler =                {0xf1, 0xf2, 0xf3}
-        },
-        .pidtorque =
-        {
-            .kp =                    0,
-            .ki =                    0,
-            .kd =                    0,
-            .limitonintegral =       0,
-            .limitonoutput =         0,
-            .scale =                 0,
-            .offset =                0,
-            .kff =                   0,
-            .stiction_up_val =       0,
-            .stiction_down_val =     0,
-            .filler =                {0xf1, 0xf2, 0xf3}
-        }, 
-        .limitsofjoint =
-        {
-            .min =                   0,
-            .max =                   0
-        },
-        .impedance =
-        {
-            .stiffness =             0,
-            .damping =               0,
-            .offset =                0,
-            .filler02 =              {0xf1, 0xf2}           
-        },        
-        
-        .velocitysetpointtimeout =   0,
-       
-        .motionmonitormode =         eomc_motionmonitormode_dontmonitor,
-        .filler01 =                  0xe0,
-        .maxvelocityofjoint =        0,
-        .motor_params =
-        {
-            .bemf_value =            0,
-            .ktau_value =            0,
-            .bemf_scale =            0,
-            .ktau_scale =            0,
-            .filler02 =              {0xf1, 0xf2}
-        },
-        .tcfiltertype =              0,
-        .jntEncoderType =            0,
-        .filler02 =                  {0xf1, 0xf2}
-    },
-    .status =                       
-    {
-        .basic =
-        {
-            .jnt_position =          0,
-            .jnt_velocity =          0,
-            .jnt_acceleration =      0,
-            .jnt_torque =            0,
-            .motionmonitorstatus =   eomc_motionmonitorstatus_notmonitored,
-            .controlmodestatus =     eomc_controlmode_idle,
-        },
-        .ofpid =                     {0},
-        .interactionmodestatus =     eomc_imodeval_stiff,
-        .chamaleon03 =               {0} //{0xd1, 0xd2, 0xd3}
-    },
-    .inputs =                        {0},
-    .cmmnds =                       
-    {
-        .calibration =               {0},
-        .setpoint =                  {0},
-        .stoptrajectory =            0,
-        .controlmode =                 eomc_controlmode_cmd_switch_everything_off,
-        .interactionmode =           eomc_imodeval_stiff,
-        .filler01 =                  0        
-    }
-}; 
-
-const eOmc_motor_t motor_default_value =
-{
-    .config =             
-    {
-        .pidcurrent =
-        {
-            .kp =                    0,
-            .ki =                    0,
-            .kd =                    0,
-            .limitonintegral =       0,
-            .limitonoutput =         0,
-            .scale =                 0,
-            .offset =                0,
-            .kff =                   0,
-            .stiction_up_val =       0,
-            .stiction_down_val =     0,
-            .filler =                {0xf1, 0xf2, 0xf3}
-        },
-        .gearboxratio =              0,
-        .rotorEncoderResolution =    0,
-        .filler01 =                  0,
-        .maxvelocityofmotor =        0,
-        .maxcurrentofmotor =         0,
-        .rotorIndexOffset =          0,
-        .motorPoles =                0,
-        .hasHallSensor =             eobool_false,
-        .hasTempSensor =             eobool_false,
-        .hasRotorEncoder =           eobool_false,
-        .hasRotorEncoderIndex =      eobool_false,
-        .rotorEncoderType =          0,
-        .limitsofrotor =
-        {
-            .max = 0,
-            .min = 0
-        }
-    },
-    .status =                       {0}
-}; 
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -263,17 +122,6 @@ const eOmc_motor_t motor_default_value =
 
 // -- entity joint
 
-extern void eoprot_fun_INIT_mc_joint_config(const EOnv* nv)
-{
-    eOmc_joint_config_t *cfg = (eOmc_joint_config_t*)eo_nv_RAM(nv);
-    memcpy(cfg, &joint_default_value.config, sizeof(eOmc_joint_config_t));
-}
-
-extern void eoprot_fun_INIT_mc_joint_status(const EOnv* nv)
-{
-    eOmc_joint_status_t *sta = (eOmc_joint_status_t*)eo_nv_RAM(nv);
-    memcpy(sta, &joint_default_value.status, sizeof(eOmc_joint_status_t));
-}
 
 extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescriptor_t* rd)
 {
@@ -1280,18 +1128,6 @@ extern void eoprot_fun_UPDT_mc_controller_config_jointcoupling(const EOnv* nv, c
 
 
 // -- entity motor
-
-extern void eoprot_fun_INIT_mc_motor_config(const EOnv* nv)
-{
-    eOmc_motor_config_t *cfg = (eOmc_motor_config_t*)eo_nv_RAM(nv);
-    memcpy(cfg, &motor_default_value.config, sizeof(eOmc_motor_config_t));
-}
-
-extern void eoprot_fun_INIT_mc_motor_status(const EOnv* nv)
-{
-    eOmc_motor_status_t *sta = (eOmc_motor_status_t*)eo_nv_RAM(nv);
-    memcpy(sta, &motor_default_value.status, sizeof(eOmc_motor_status_t));
-}
 
 
 extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescriptor_t* rd)
