@@ -663,6 +663,12 @@ static eOresult_t s_eo_mcserv_init_jomo(EOmcService *p)
         p->thelocalcontroller = NULL;
     }
     
+    // actuator
+    // reserve some memory for pwm values
+    p->valuespwm = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_auto, sizeof(int16_t), p->config.jomosnumber);
+   
+    //low level init for motors and adc
+    s_eo_mcserv_init_motors_adc_feedbacks();
    
     // encoder reader
     if((eOmcconfig_type_2foc == p->config.type) || (eOmcconfig_type_mc4plus == p->config.type))
@@ -750,7 +756,6 @@ static eOresult_t s_eo_mcserv_init_jomo(EOmcService *p)
                     
                     //store the encoder joint value --> use it when you get the value
                     p->config.jomos[jm].extra_encoder.enc_joint = enc_joint_index;
-                    enc_joint_index++;
                     
                     //only for SPI encoders
                     if (SPI_ENCODER(etype_extra))
@@ -789,13 +794,6 @@ static eOresult_t s_eo_mcserv_init_jomo(EOmcService *p)
         p->valuesencoder_extra   = NULL;
         p->valuespwm             = NULL;
     }
-    
-    // actuator
-    // reserve some memory for pwm values
-    p->valuespwm = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_auto, sizeof(int16_t), p->config.jomosnumber);
-   
-    //low level init for motors and adc
-    s_eo_mcserv_init_motors_adc_feedbacks();
     
     return(res);
 }
