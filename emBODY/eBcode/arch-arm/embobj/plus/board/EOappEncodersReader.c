@@ -166,6 +166,11 @@ static const uint32_t encoders_fullscales [eo_appEncReader_enc_type_numberof] =
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
+extern EOappEncReader* eo_appEncReader_Initialise(void)
+{
+    return(eo_appEncReader_New(NULL));
+}
+
 extern EOappEncReader* eo_appEncReader_New(eOappEncReader_cfg_t *cfg)
 {
     EOappEncReader *retptr = NULL;
