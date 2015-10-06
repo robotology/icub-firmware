@@ -65,6 +65,8 @@
 
 #include "EOconstarray.h"
 
+#include "EOtheMotionController.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -492,11 +494,12 @@ extern void eom_emsappl_hid_userdef_on_entry_CFG(EOMtheEMSappl* p)
     // pulse led3 forever at 0.50 hz.       
     eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_three, 2*EOK_reltime1sec, 0);
 
-    // set the EOtheCANservice to be straigth and force parsing of all packets in the RX queues.
+    // EOtheCANservice: set straight mode and force parsing of all packets in the RX queues.
     eo_canserv_SetMode(eo_canserv_GetHandle(), eocanserv_mode_straight);
-    const uint8_t maxframes2read = 255; // 255 is the max number possible. the function however exits when all canframes are 
-    eo_canserv_Parse(eo_canserv_GetHandle(), eOcanport1, maxframes2read, NULL);    
-    eo_canserv_Parse(eo_canserv_GetHandle(), eOcanport2, maxframes2read, NULL);
+    eo_canserv_ParseAll(eo_canserv_GetHandle());
+//    const uint8_t maxframes2read = 255; // 255 is the max number possible. the function however exits when all canframes are 
+//    eo_canserv_Parse(eo_canserv_GetHandle(), eOcanport1, maxframes2read, NULL);    
+//    eo_canserv_Parse(eo_canserv_GetHandle(), eOcanport2, maxframes2read, NULL);
  
 }
 
@@ -509,6 +512,17 @@ extern void eom_emsappl_hid_userdef_on_entry_RUN(EOMtheEMSappl* p)
 {
     eOresult_t res = eores_NOK_generic;
     
+    // pulse led3 forever at 1 hz.
+    eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_three, EOK_reltime1sec/1, 0);  
+    
+    // EOtheCANservice: set on demand mode. then tx all canframes remained in the tx queues
+    eo_canserv_SetMode(eo_canserv_GetHandle(), eocanserv_mode_ondemand);    
+    eo_canserv_TXstartAll(eo_canserv_GetHandle());
+    eo_canserv_TXwaitAllUntilDone(eo_canserv_GetHandle(), 5*eok_reltime1ms);
+    
+    
+    
+#if 0    
     // enable joints
     res = eo_emsapplBody_EnableTxAllJointOnCan(eo_emsapplBody_GetHandle());
     if (eores_NOK_generic == res)
@@ -519,8 +533,7 @@ extern void eom_emsappl_hid_userdef_on_entry_RUN(EOMtheEMSappl* p)
     // enable the tx mode of strain, if present and as configured
     eo_strain_SendTXmode(eo_strain_GetHandle());
     
-    // pulse led3 forever at 1 hz.
-    eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_three, EOK_reltime1sec/1, 0); 
+     
      
     // set mode on demand. then tx all canframes remained in the tx queue
     eo_canserv_SetMode(eo_canserv_GetHandle(), eocanserv_mode_ondemand);
@@ -533,6 +546,7 @@ extern void eom_emsappl_hid_userdef_on_entry_RUN(EOMtheEMSappl* p)
 
     // Start reading the encoders
     eo_appEncReader_StartRead(eo_emsapplBody_GetEncoderReader(eo_emsapplBody_GetHandle()));
+#endif
 }
 
 
@@ -540,12 +554,19 @@ extern void eom_emsappl_hid_userdef_on_exit_RUN(EOMtheEMSappl* p)
 {
     eOresult_t res = eores_NOK_generic;
     
-    // set run mode straigth. then read all can frames received
+    
+    // EOtheCANservice: set straigth mode and force parsing of all packets in the RX queues.
     eo_canserv_SetMode(eo_canserv_GetHandle(), eocanserv_mode_straight);
-    const uint8_t maxframes2read = 255; // 255 is the max number possible. the function however exits when all canframes are 
-    eo_canserv_Parse(eo_canserv_GetHandle(), eOcanport1, maxframes2read, NULL);    
-    eo_canserv_Parse(eo_canserv_GetHandle(), eOcanport2, maxframes2read, NULL);
+    eo_canserv_ParseAll(eo_canserv_GetHandle());  
   
+    
+    // deactivate services
+    
+    eo_strain_Deactivate(eo_strain_GetHandle());
+    
+    
+    
+#if 0  
     
     // stop skin. the check whether to stop skin or not is done internally.
     eo_skin_DisableTX(eo_skin_GetHandle());
@@ -564,6 +585,8 @@ extern void eom_emsappl_hid_userdef_on_exit_RUN(EOMtheEMSappl* p)
 
     // stop tx of inertial. the check whether to stop skin or not is done internally.
     eo_inertial_Stop(eo_inertial_GetHandle());
+#endif
+    
 }
 
 extern void eom_emsappl_hid_userdef_on_entry_ERR(EOMtheEMSappl* p)
@@ -571,10 +594,15 @@ extern void eom_emsappl_hid_userdef_on_entry_ERR(EOMtheEMSappl* p)
     // pulse led3 forever at 4 hz.
     eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_three, EOK_reltime1sec/4, 0);
    
+
+    // EOtheCANservice: set straigth mode and force parsing of all packets in the RX queues.
     eo_canserv_SetMode(eo_canserv_GetHandle(), eocanserv_mode_straight);
-    const uint8_t maxframes2read = 255; // 255 is the max number possible. the function however exits when all canframes are 
-    eo_canserv_Parse(eo_canserv_GetHandle(), eOcanport1, maxframes2read, NULL);    
-    eo_canserv_Parse(eo_canserv_GetHandle(), eOcanport2, maxframes2read, NULL);
+    eo_canserv_ParseAll(eo_canserv_GetHandle());  
+    
+//    eo_canserv_SetMode(eo_canserv_GetHandle(), eocanserv_mode_straight);
+//    const uint8_t maxframes2read = 255; // 255 is the max number possible. the function however exits when all canframes are 
+//    eo_canserv_Parse(eo_canserv_GetHandle(), eOcanport1, maxframes2read, NULL);    
+//    eo_canserv_Parse(eo_canserv_GetHandle(), eOcanport2, maxframes2read, NULL);
 }
 
 
@@ -705,10 +733,11 @@ static void s_overridden_appl_initialise2(EOMtheEMSappl* p)
     }
     
     {   // other services: I dont init anything. however i should avoid automatic initialisation for:
-        // EOtheMAIS, EOtheSTRAIN, EOtheSKIN, EOtheInertial, EOtheMotionControl     
+        // EOtheMAIS, EOtheSTRAIN, EOtheSKIN, EOtheInertial, EOtheMotionController     
 
         // changed idea: i initialise them.
         eo_strain_Initialise();        
+        eo_motioncontrol_Initialise();        
     }
     
     {   // i init a service handler. for instance to be called EOtheServices

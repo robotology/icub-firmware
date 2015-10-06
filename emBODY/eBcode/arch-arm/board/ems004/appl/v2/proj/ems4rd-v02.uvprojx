@@ -886,6 +886,16 @@
               <FileType>1</FileType>
               <FilePath>..\src\eoappservices\EOtheCANdiscovery2.c</FilePath>
             </File>
+            <File>
+              <FileName>EOtheMotionController.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\eoappservices\EOtheMotionController.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOtheEncoderReader.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\eoappservices\EOtheEncoderReader.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2247,6 +2257,16 @@
               <FileName>EOtheCANdiscovery2.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\eoappservices\EOtheCANdiscovery2.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOtheMotionController.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\eoappservices\EOtheMotionController.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOtheEncoderReader.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\eoappservices\EOtheEncoderReader.c</FilePath>
             </File>
           </Files>
         </Group>
