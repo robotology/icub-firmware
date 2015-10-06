@@ -38,7 +38,6 @@
 
 #include "EoCommon.h"
 #include "EoProtocol.h"
-#include "EOtheCANdiscovery2.h"
 
 
 // - public #define  --------------------------------------------------------------------------------------------------

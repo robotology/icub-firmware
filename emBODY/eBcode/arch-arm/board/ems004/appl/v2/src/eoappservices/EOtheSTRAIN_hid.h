@@ -30,6 +30,8 @@
 #include "EoCommon.h"
 #include "EOtheCANprotocol.h"
 
+#include "EOtheCANdiscovery2.h"
+
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
 
