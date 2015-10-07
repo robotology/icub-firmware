@@ -907,12 +907,14 @@ const eOmn_serv_configuration_t serv_config_mc[] =
                         .sensor         =
                         {
                             .type   = eomn_serv_mc_sensor_encoder_aea,
-                            .port   = 0 // hal_encoder1                          
+                            .port   = eomn_serv_mc_port_ems_spiP6, // hal_encoder1   
+                            .pos    = eomn_serv_mc_sensor_pos_atjoint
                         },
                         .extrasensor    =
                         {
                             .type   = eomn_serv_mc_sensor_none,
-                            .port   = 0      
+                            .port   = eomn_serv_mc_port_none,
+                            .pos    = eomn_serv_mc_sensor_pos_none
                         }
                     },
                     { // joint 1
@@ -925,12 +927,14 @@ const eOmn_serv_configuration_t serv_config_mc[] =
                         .sensor         =
                         {
                             .type   = eomn_serv_mc_sensor_encoder_aea,
-                            .port   = 3 // hal_encoder4                          
+                            .port   = eomn_serv_mc_port_ems_spiP7, // hal_encoder4
+                            .pos    = eomn_serv_mc_sensor_pos_atjoint                            
                         },
                         .extrasensor    =
                         {
                             .type   = eomn_serv_mc_sensor_none,
-                            .port   = 0      
+                            .port   = eomn_serv_mc_port_none,
+                            .pos    = eomn_serv_mc_sensor_pos_none
                         }
                     },                    
                     { // joint 2
@@ -943,12 +947,14 @@ const eOmn_serv_configuration_t serv_config_mc[] =
                         .sensor         =
                         {
                             .type   = eomn_serv_mc_sensor_encoder_aea,
-                            .port   = 1 // hal_encoder2                          
+                            .port   = eomn_serv_mc_port_ems_spiP8, // hal_encoder2  
+                            .pos    = eomn_serv_mc_sensor_pos_atjoint
                         },
                         .extrasensor    =
                         {
                             .type   = eomn_serv_mc_sensor_none,
-                            .port   = 0      
+                            .port   = eomn_serv_mc_port_none,
+                            .pos    = eomn_serv_mc_sensor_pos_none
                         }
                     },               
                     { // joint 3
@@ -961,12 +967,14 @@ const eOmn_serv_configuration_t serv_config_mc[] =
                         .sensor         =
                         {
                             .type   = eomn_serv_mc_sensor_encoder_aea,
-                            .port   = 4 // hal_encoder5                          
+                            .port   = eomn_serv_mc_port_ems_spiP9,    // hal_encoder5 
+                            .pos    = eomn_serv_mc_sensor_pos_atjoint
                         },
                         .extrasensor    =
                         {
                             .type   = eomn_serv_mc_sensor_none,
-                            .port   = 0      
+                            .port   = eomn_serv_mc_port_none,
+                            .pos    = eomn_serv_mc_sensor_pos_none
                         }
                     }                    
                 }
