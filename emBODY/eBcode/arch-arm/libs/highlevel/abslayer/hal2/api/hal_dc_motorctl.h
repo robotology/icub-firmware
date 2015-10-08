@@ -82,15 +82,14 @@
                         *(unsigned long long)DEADTIME_NS/1000000000uL)  
 						
 /** @typedef    typedef enum hal_motor_t 
-    @brief      hal_pwm_status_t contains the states of the pwm peripheral.
+    @brief      hal_motor_t contains the port name of the pwm peripheral.
  **/ 
 typedef enum  
 { 
     motor1       = 0,        /**< motor 1 */
     motor2       = 1,        /**< motor 2 */  
 	motor3       = 2,        /**< motor 3 */
-    motor4       = 3,        /**< motor 4 */   
-
+    motor4       = 3         /**< motor 4 */   
 } hal_motor_t;
 
 

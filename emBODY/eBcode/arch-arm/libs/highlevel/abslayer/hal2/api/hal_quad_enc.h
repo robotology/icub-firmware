@@ -30,6 +30,17 @@
 
 #include "hal_common.h"
 
+/** @typedef    typedef enum hal_quad_enc_t 
+    @brief      hal_quad_enc_t contains the port to use.
+ **/ 
+typedef enum  
+{ 
+    hal_quad_enc1       = 0,        
+    hal_quad_enc2       = 1,          
+	hal_quad_enc3       = 2,        
+    hal_quad_enc4       = 3       
+} hal_quad_enc_t;
+
 // - declaration of extern public functions ---------------------------------------------------------------------------
 /** @fn         extern void hal_quad_enc_Init(void)
     @brief      This function initialize all the quadrature encoders for the MC4 plus boards.
