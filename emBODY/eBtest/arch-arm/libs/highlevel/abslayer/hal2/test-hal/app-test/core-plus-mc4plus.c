@@ -121,7 +121,6 @@
 #define EXECUTE_TEST_CAN_TX1
 
 //#define EXECUTE_TEST_CAN_TX1_RX2
-//#define EXECUTE_TEST_ETH_UDP_RECEIVEANDREPLY
 #endif//EXECUTE_TEST_CAN
 
 #undef EXECUTE_TEST_SWITCH
@@ -139,7 +138,6 @@
 #ifdef EXECUTE_TEST_ETH
 //#define EXECUTE_TEST_ETH_PING
 #define EXECUTE_TEST_ETH_UDP_RECEIVEANDREPLY
-//#define EXECUTE_TEST_ETH_UDP_RECEIVEANDREPLY
 #endif
 
 
@@ -1261,8 +1259,8 @@ static void test_timer_callback_blink3(void* p)
 
 static const hal_timer_t haltimer_ontest = hal_timer6;
 
-static const hal_timer_t haltimer_blink1 = hal_timer9;
-static const hal_timer_t haltimer_blink2 = hal_timer10;
+static const hal_timer_t haltimer_blink1 = hal_timer6;
+static const hal_timer_t haltimer_blink2 = hal_timer7;
 static const hal_timer_t haltimer_blink3 = hal_timer11;
 
 static const hal_timer_cfg_t test_timer_config =
@@ -1332,17 +1330,17 @@ static void test_periph_timer2(void)
 	test_is_beginning("timer: check conflict test");
 
 	hal_result_t res = hal_res_OK;
-    //res += hal_timer_init(haltimer_blink1, &test_timer_config_blink, NULL);
+    res += hal_timer_init(haltimer_blink1, &test_timer_config_blink, NULL);
     
     test_timer_config_blink.callback_on_exp = test_timer_callback_blink2;
 	res += hal_timer_init(haltimer_blink2, &test_timer_config_blink, NULL);
     
-    //test_timer_config_blink.callback_on_exp = test_timer_callback_blink3;
-	//res += hal_timer_init(haltimer_blink3, &test_timer_config_blink, NULL);
+    test_timer_config_blink.callback_on_exp = test_timer_callback_blink3;
+	res += hal_timer_init(haltimer_blink3, &test_timer_config_blink, NULL);
 
-    //res += hal_timer_start(haltimer_blink1);
+    res += hal_timer_start(haltimer_blink1);
 	res += hal_timer_start(haltimer_blink2);
-	//res += hal_timer_start(haltimer_blink3);
+	res += hal_timer_start(haltimer_blink3);
 
     if(hal_res_OK != res)
     {
