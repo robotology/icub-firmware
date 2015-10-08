@@ -469,10 +469,10 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
 
 extern void eom_emsappl_hid_userdef_on_entry_CFG(EOMtheEMSappl* p)
 {    
-    // pulse led3 forever at 0.50 hz.
+    // pulse led3 forever at 0.50 hz.       
     eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_three, 2*EOK_reltime1sec, 0);
 
-    // set the EOtheCANservice to be on event and force parsing of all packets in the RX queues.
+    // set the EOtheCANservice to be straigth and force parsing of all packets in the RX queues.
     eo_canserv_SetMode(eo_canserv_GetHandle(), eocanserv_mode_straight);
     const uint8_t maxframes2read = 255; // 255 is the max number possible. the function however exits when all canframes are 
     eo_canserv_Parse(eo_canserv_GetHandle(), eOcanport1, maxframes2read, NULL);    
