@@ -55,7 +55,12 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+// i clip in bounf [-INTxx_MAX, +INTxx_MAX] rather than [INTxx_MIN, INTxx_MAX] because we have a symmetic range and if we invert
+// teh clip we still have a valid positive/negative value. reason is that INTxx_MIN is -2^xx and INTxx_MAX is 2^xx-1 ...
+#define EOMC4BOARDS_CLIP_INT32(i32)             ( ((i32)>INT32_MAX) ? (INT32_MAX) : ( ((i32)<(-INT32_MAX)) ? (-INT32_MAX) : (i32) )  )
+#define EOMC4BOARDS_CLIP_INT16(i16)             ( ((i16)>INT16_MAX) ? (INT16_MAX) : ( ((i16)<(-INT16_MAX)) ? (-INT16_MAX) : (i16) )  )
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -84,7 +89,7 @@ static const eOmc4boards_config_t s_eo_mc4boards_defaultconfig =
 {
     .broadcastpolicy    =
     {
-        .values   = 
+        .values     = 
         { 
             ICUBCANPROTO_PER_MC_MSG__POSITION, 
             ICUBCANPROTO_PER_MC_MSG__STATUS, 
@@ -92,16 +97,15 @@ static const eOmc4boards_config_t s_eo_mc4boards_defaultconfig =
             ICUBCANPROTO_PER_MC_MSG__PID_VAL        
         }   
     },
-    .shiftvalues        =
-    {
-        .velshift                           = 8,            // it is jointVelocityShift
+    .shiftvalues    =
+    {    // these values could in future be transmitted by robotInterface. so far they are the correct values in the xml files of eth robots. they are equal for all joints
+        .velshift                           = 8,        //  param VELOCITY.Shifts               
         .estimshifts  =
         {
-            .estimShiftJointVel             = 8,            // always 8, with: can ICUBCANPROTO_POL_MC_CMD__SET_SPEED_ESTIM_SHIFT and measureconverter            
-            .estimShiftJointAcc             = 5,            // on can with ICUBCANPROTO_POL_MC_CMD__SET_SPEED_ESTIM_SHIFT it tx 0, on measureconverter eo_measconv_hid_GetAccEstimShift() is it used 5
-                                                            // this latter is used only on eocanprotMCperiodic_parser_PER_MC_MSG__VELOCITY() VERY STRANGE: VERIFY
-            .estimShiftMotorVel             = 0,            // on can ... it is tx 0
-            .estimShiftMotorAcc             = 0             // on can ... it is tx 0       
+            .estimShiftJointVel             = 5,        // param VELOCITY.JNT_speed_estimation           
+            .estimShiftJointAcc             = 5,        // param VELOCITY.JNT_accel_estimation             
+            .estimShiftMotorVel             = 1,        // param VELOCITY.MOT_speed_estimation      
+            .estimShiftMotorAcc             = 1         // param VELOCITY.MOT_accer_estimation    
         }
     }
 };
@@ -268,19 +272,22 @@ extern eOresult_t eo_mc4boards_BroadcastStop(EOtheMC4boards *p)
 
 extern void eo_mc4boards_Convert_maxPos_Set(EOtheMC4boards *p, uint8_t joint, icubCanProto_position_t max)
 {
-  p->convencoder[joint].max_mc4_pos=max;
+    p->convencoder[joint].max_mc4_pos = max;
 }
+
 extern void eo_mc4boards_Convert_minPos_Set(EOtheMC4boards *p, uint8_t joint, icubCanProto_position_t min)
 {
-  p->convencoder[joint].min_mc4_pos=min;
+    p->convencoder[joint].min_mc4_pos = min;
 }
+
 extern icubCanProto_position_t eo_mc4boards_Convert_maxPos_Get(EOtheMC4boards *p, uint8_t joint)
 {
-  return p->convencoder[joint].max_mc4_pos;
+    return p->convencoder[joint].max_mc4_pos;
 }
+
 extern icubCanProto_position_t eo_mc4boards_Convert_minPos_Get(EOtheMC4boards *p, uint8_t joint)
 {
-  return p->convencoder[joint].min_mc4_pos;
+    return p->convencoder[joint].min_mc4_pos;
 }
 
 extern eOresult_t eo_mc4boards_Config(EOtheMC4boards *p)
@@ -302,27 +309,24 @@ extern eOresult_t eo_mc4boards_Config(EOtheMC4boards *p)
 
           
     // now, i do things. 
-    
-    // send ICUBCANPROTO_POL_MC_CMD__SET_VEL_SHIFT and ICUBCANPROTO_POL_MC_CMD__SET_SPEED_ESTIM_SHIFT
     s_eo_themc4boards.command.class = eocanprot_msgclass_pollingMotorControl;    
     uint8_t i = 0;
-    //icubCanProto_estimShift_t estimshift = {0};
-    //estimshift.estimShiftJointVel = s_eo_themc4boards.config2use.shiftvalues.estimshifts.estimShiftJointVel;
-    // all others are zero .... very strange, and what about estimShiftJointAcc ???
+
     for(i=0; i<s_eo_themc4boards.numofjomos; i++)
     {
         eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, i, 0);
     
+        // 1. velocity shift
         s_eo_themc4boards.command.type  = ICUBCANPROTO_POL_MC_CMD__SET_VEL_SHIFT;
         s_eo_themc4boards.command.value = &s_eo_themc4boards.config2use.shiftvalues.velshift;    
         // ok, now i send the value to the relevant address
         eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &s_eo_themc4boards.command, id32);
 
+        // 2. speed estim shifts
         s_eo_themc4boards.command.type  = ICUBCANPROTO_POL_MC_CMD__SET_SPEED_ESTIM_SHIFT;
         //s_eo_themc4boards.command.value = &estimshift;    
         s_eo_themc4boards.command.value = &s_eo_themc4boards.config2use.shiftvalues.estimshifts; 
-        // ok, now i send the value to the relevant address
-        eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &s_eo_themc4boards.command, id32);               
+        eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &s_eo_themc4boards.command, id32);     
     }
     
     s_eo_themc4boards.configured = eobool_true;
@@ -353,6 +357,7 @@ extern eOresult_t eo_mc4boards_Convert_encoderfactor_Set(EOtheMC4boards *p, uint
     return(eores_OK);    
 }
 
+
 extern eOresult_t eo_mc4boards_Convert_encoderoffset_Set(EOtheMC4boards *p, uint8_t joint, eOmc4boards_conv_encoder_offset_t offset)
 {
     if(NULL == p)
@@ -376,121 +381,177 @@ extern eOresult_t eo_mc4boards_Convert_encoderoffset_Set(EOtheMC4boards *p, uint
 
 }
 
+// revised by accame&randazzo on 8oct15
 extern eOmeas_position_t eo_mc4boards_Convert_Position_fromCAN(EOtheMC4boards *p, uint8_t joint, icubCanProto_position_t pos)
 {
     if(joint >= s_eo_themc4boards.numofjomos)
     {   
         return(0);
     }
-    return((eOmeas_position_t)((pos / s_eo_themc4boards.convencoder[joint].factor) - s_eo_themc4boards.convencoder[joint].offset));
+    
+    float temp = (((float)pos / s_eo_themc4boards.convencoder[joint].factor) - s_eo_themc4boards.convencoder[joint].offset);
+    temp = EOMC4BOARDS_CLIP_INT32(temp);
+    
+    return((eOmeas_position_t)temp);
 }
 
+// revised by accame&randazzo on 8oct15
 extern icubCanProto_position_t eo_mc4boards_Convert_Position_toCAN(EOtheMC4boards *p, uint8_t joint, eOmeas_position_t pos)
 {
     if(joint >= s_eo_themc4boards.numofjomos)
     {   
         return(0);
     }
-    return((icubCanProto_position_t)((pos + s_eo_themc4boards.convencoder[joint].offset) * s_eo_themc4boards.convencoder[joint].factor)); 
+    
+    float temp = (((float)pos + s_eo_themc4boards.convencoder[joint].offset) * s_eo_themc4boards.convencoder[joint].factor);
+    temp = EOMC4BOARDS_CLIP_INT32(temp);
+    
+    return((icubCanProto_position_t)temp); 
 }
 
 
-extern eOmeas_velocity_t eo_mc4boards_Convert_Velocity_fromCAN_abs(EOtheMC4boards *p, uint8_t joint, icubCanProto_velocity_t vel)
+// revised by accame&randazzo on 8 oct 2015
+extern icubCanProto_velocity_t eo_mc4boards_Convert_Velocity_toCAN(EOtheMC4boards *p, uint8_t joint, eOmeas_velocity_t vel, eOmc4boards_velocitycontext_t context)
 {
     if(joint >= s_eo_themc4boards.numofjomos)
     {   
         return(0);
     }
-    return((eOmeas_velocity_t)(vel/__fabs(s_eo_themc4boards.convencoder[joint].factor)));    
-}
-
-extern icubCanProto_velocity_t eo_mc4boards_Convert_Velocity_toCAN_abs(EOtheMC4boards *p, uint8_t joint, eOmeas_velocity_t vel)
-{
-    if(joint >= s_eo_themc4boards.numofjomos)
-    {   
-        return(0);
-    }
-
      
-    //NEW VERSION:
-    /*the velocity is dived by 10, because the reuslt of followiong moltiplication
-    (vel * __fabs(s_eo_themc4boards.convencoder[joint].factor))
-    can be bigger then 32767 (max value of int16)
-    so the result is divieded by 10.
-    Note thet velocity is used to get the needed time to reach the setpoint, so in mc4 fw it is enogth to moltiply by 100 ensted of 1000 (1ms)
-    This operation was already done by CanBusMotionControl
-    */
+    float temp = (float)vel * s_eo_themc4boards.convencoder[joint].factor;    // from icubdeg/sec to ticks/sec. it keeps the sign
+    
+    switch(context)
+    {
+        case eomc4_velocitycontext_toTICKS:
+        {
+            temp = temp;           
+        } break;
+        
+        case eomc4_velocitycontext_toCAN_signed:
+        {   // it is a normal conversion: we convert to ticks/ms and the we apply the shift fatcor
+            temp /= 1000.0f;                                                    // from ticks/sec to ticks/ms
+            temp *= (1 << s_eo_themc4boards.config2use.shiftvalues.velshift);   // apply the shift for canbus;
+        } break;
+        
+        case eomc4_velocitycontext_toCAN_unsigned:
+        {   // it is a normal conversion: we convert to ticks/ms and the we apply the shift fatcor
+            temp /= 1000.0f;                                                    // from ticks/sec to ticks/ms
+            temp *= (1 << s_eo_themc4boards.config2use.shiftvalues.velshift);   // apply the shift for canbus;
+            temp = __fabs(temp);
+        } break;        
 
-    int32_t temp = (vel * __fabs(s_eo_themc4boards.convencoder[joint].factor));
-    return((icubCanProto_velocity_t)(temp/10));    
+        case eomc4_velocitycontext_toCAN_positionsetpoint:
+        {   // it is a special case
+            // revised accame&randazzo on 8oct15: it is ok to divide by 10 ... see function canBusMotionControl::setRefSpeedsraw()
+            // the value is absolute because the direction of movement is given by the sign of position setpoint
+            temp = __fabs(temp) / 10.0;        
+        } break;
+        
+        default:
+        {
+            temp = 0;
+        } break;
+        
+    }
+    
+    temp = EOMC4BOARDS_CLIP_INT16(temp);
+    
+    return((icubCanProto_velocity_t)temp);    
 }
 
 
+// revised by accame&randazzo on 8 oct 2015
 extern eOmeas_velocity_t eo_mc4boards_Convert_Velocity_fromCAN(EOtheMC4boards *p, uint8_t joint, icubCanProto_velocity_t vel)
 {
     if(joint >= s_eo_themc4boards.numofjomos)
     {   
         return(0);
     }
-    return(vel/s_eo_themc4boards.convencoder[joint].factor);
-}
-
-extern icubCanProto_velocity_t eo_mc4boards_Convert_Velocity_toCAN(EOtheMC4boards *p, uint8_t joint, eOmeas_velocity_t vel)
-{
-    if(joint >= s_eo_themc4boards.numofjomos)
-    {   
-        return(0);
-    }
     
-    //in order to send velocity to mc4 like setpoint i need to convert it in encoderticks/ms and after shift in order to obtain a small value
-    int32_t tmp = vel * s_eo_themc4boards.convencoder[joint].factor;
-    tmp = tmp *(1 << s_eo_themc4boards.config2use.shiftvalues.estimshifts.estimShiftJointVel); //eo_measconv_hid_GetVelEstimShift(p, jId)); //here i can't use shift because i_vel can be negative.
-    tmp = tmp + 500;  //round to nearest integer
-    tmp = tmp/1000; //convert from sec to ms
-    return((icubCanProto_velocity_t)tmp);
+    float temp = 1000.0f * (float) vel;     // from ticks/ms to ticks/sec
+    temp /= (1 << s_eo_themc4boards.config2use.shiftvalues.estimshifts.estimShiftJointVel); // now we divide by (1 << estim shift vel joint)
+    temp /= s_eo_themc4boards.convencoder[joint].factor; // now we transform into icubdeg/sec
+
+
+    temp = EOMC4BOARDS_CLIP_INT32(temp);
+    
+    return((eOmeas_velocity_t) temp);
 }
 
 
-extern eOmeas_acceleration_t       eo_mc4boards_Convert_Acceleration_fromCAN(EOtheMC4boards *p, uint8_t joint, icubCanProto_acceleration_t acc)
+
+// 
+// revised by accame&randazzo on 8 oct 2015: it is OK
+//extern icubCanProto_velocity_t eo_mc4boards_Convert_Velocity_toCAN_OLD(EOtheMC4boards *p, uint8_t joint, eOmeas_velocity_t vel)
+//{
+//    if(joint >= s_eo_themc4boards.numofjomos)
+//    {   
+//        return(0);
+//    }
+//#if 0    
+//    //in order to send velocity to mc4 like setpoint i need to convert it in encoderticks/ms and after shift in order to obtain a small value
+//    int32_t tmp = vel * s_eo_themc4boards.convencoder[joint].factor;
+//    tmp = tmp *(1 << s_eo_themc4boards.config2use.shiftvalues.velshift); //eo_measconv_hid_GetVelEstimShift(p, jId)); //here i can't use shift because i_vel can be negative.
+//    tmp = tmp + 500;  //round to nearest integer
+//    tmp = tmp/1000; //convert from sec to ms
+//    return((icubCanProto_velocity_t)tmp);
+//#else
+
+//    #warning --> test it: we believe that we dont need the __fabs()
+//    
+//    float impVel = (float)vel * (s_eo_themc4boards.convencoder[joint].factor); // transform from icubdeg/sec to imp/sec
+//    impVel /= (1000.0f); // transform from imp/sec to imp/ms
+//    impVel *= (1 << s_eo_themc4boards.config2use.shiftvalues.velshift); // apply the shift for canbus
+//    return((icubCanProto_velocity_t)impVel);
+//   
+//#endif    
+//}
+
+
+
+// revised by accame&randazzo on 8 oct 2015        
+extern eOmeas_acceleration_t eo_mc4boards_Convert_Acceleration_fromCAN(EOtheMC4boards *p, uint8_t joint, icubCanProto_acceleration_t acc)
 {
     if(joint >= s_eo_themc4boards.numofjomos)
     {   
         return(0);
     }
-    return((eOmeas_acceleration_t)acc / s_eo_themc4boards.convencoder[joint].factor);
+    // it is OK to divide by the 2^(estimShiftJointVel + estimShiftJointAcc). The MC4 shifts left by this sum of terms.
+    float temp = 1000000.0f * (float)acc;   // from ticks/ms^2 to ticks/sec^2
+    temp /= (1 << (s_eo_themc4boards.config2use.shiftvalues.estimshifts.estimShiftJointVel + s_eo_themc4boards.config2use.shiftvalues.estimshifts.estimShiftJointAcc)); // now we divide by (1 << estim shift vel + acc)
+    temp /= s_eo_themc4boards.convencoder[joint].factor; // now we transform into icubdeg/sec^2
+
+    temp = EOMC4BOARDS_CLIP_INT32(temp);
+    
+    return((eOmeas_acceleration_t)temp);
 }
 
+
+
+
+
+// revised by accame&randazzo on 8 oct 2015
 extern icubCanProto_acceleration_t eo_mc4boards_Convert_Acceleration_toCAN(EOtheMC4boards *p, uint8_t joint, eOmeas_acceleration_t acc)
 {
     if(joint >= s_eo_themc4boards.numofjomos)
     {   
         return(0);
     }
-    return((icubCanProto_acceleration_t)(acc * s_eo_themc4boards.convencoder[joint].factor));    
+
+    float temp = (float)acc * (s_eo_themc4boards.convencoder[joint].factor); // transform from icubdeg/sec^2 to ticks/sec^2
+    temp /= (1000000.0f); // transform from ticks/sec^2 to ticks/ms^2
+    temp *= (1 << s_eo_themc4boards.config2use.shiftvalues.velshift); // apply the shift for canbus  
+    
+    temp = EOMC4BOARDS_CLIP_INT16(temp);   
+    
+    return((icubCanProto_acceleration_t)temp);       
 }
 
-extern eOmeas_acceleration_t       eo_mc4boards_Convert_Acceleration_fromCAN_abs(EOtheMC4boards *p, uint8_t joint, icubCanProto_acceleration_t acc)
-{
-    if(joint >= s_eo_themc4boards.numofjomos)
-    {   
-        return(0);
-    }
-    return((eOmeas_acceleration_t)(acc / __fabs(s_eo_themc4boards.convencoder[joint].factor)));
-}
 
-extern icubCanProto_acceleration_t eo_mc4boards_Convert_Acceleration_toCAN_abs(EOtheMC4boards *p, uint8_t joint, eOmeas_acceleration_t acc)
-{
-    if(joint >= s_eo_themc4boards.numofjomos)
-    {   
-        return(0);
-    }
-    int32_t tmp = acc << s_eo_themc4boards.config2use.shiftvalues.estimshifts.estimShiftJointVel;
-    tmp = tmp * __fabs(s_eo_themc4boards.convencoder[joint].factor);
-    tmp = tmp + 500000; //round to nearest integer
-    tmp = tmp/1000000; // conver from sec^2 to millsec^2 
-    return((icubCanProto_acceleration_t)tmp);    
-}
-
+// revised by accame&randazzo on 8 oct 2015: stiffness and damping are to be analysed in details. 
+// on can robots the stiffness sent to CAN is NOT divided by 1000 and the damping IS divided by 1000. in here there is the contrary.
+// however, embObjMotionControl does not send the values as they are. it applies a 1000 factor in some cases.
+// maybe everything is ok, but someone should see it in more details.
 
 extern icubCanProto_stiffness_t eo_mc4boards_Convert_impedanceStiffness_I2S(EOtheMC4boards *p, uint8_t joint, eOmeas_stiffness_t stiff)
 {
@@ -571,6 +632,7 @@ extern icubCanProto_torque_t eo_mc4boards_Convert_torque_I2S(EOtheMC4boards *p, 
     return(torque);   
 }
 
+// revides: it is ok
 extern eOmeas_torque_t       eo_mc4boards_Convert_torque_S2I(EOtheMC4boards *p, uint8_t joint, icubCanProto_torque_t torque)
 {
 //    if(joint >= s_eo_themc4boards.numofjomos)
@@ -581,15 +643,7 @@ extern eOmeas_torque_t       eo_mc4boards_Convert_torque_S2I(EOtheMC4boards *p, 
 }
 
 
-extern uint8_t eo_mc4boards_VelocityEstimationShift_Get(EOtheMC4boards *p, uint8_t joint)
-{
-    return(s_eo_themc4boards.config2use.shiftvalues.estimshifts.estimShiftJointVel);
-}
 
-extern uint8_t eo_mc4boards_AccelerationEstimationShift_Get(EOtheMC4boards *p, uint8_t joint)
-{
-    return(s_eo_themc4boards.config2use.shiftvalues.estimshifts.estimShiftJointAcc);
-}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
@@ -621,7 +675,8 @@ static eObool_t s_eo_mc4boards_foundone(void)
     }  
 
     return(found);
-}        
+}   
+
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------
