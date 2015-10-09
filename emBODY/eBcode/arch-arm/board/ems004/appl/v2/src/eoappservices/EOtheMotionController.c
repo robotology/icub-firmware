@@ -516,8 +516,7 @@ static const eOmc_joint_t s_joint_default_value =
        
         .motionmonitormode =         eomc_motionmonitormode_dontmonitor,
         .filler01 =                  0xe0,
-        .DEPRECATED_encoderconversionfactor =   EOUTIL_EMULFLOAT32_ONE,
-        .DEPRECATED_encoderconversionoffset =   EOUTIL_EMULFLOAT32_ZERO,
+        .maxvelocityofjoint =        0,
         .motor_params =
         {
             .bemf_value =            0,
