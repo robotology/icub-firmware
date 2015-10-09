@@ -169,8 +169,7 @@ const eOmc_joint_t joint_default_value =
        
         .motionmonitormode =         eomc_motionmonitormode_dontmonitor,
         .filler01 =                  0xe0,
-        .DEPRECATED_encoderconversionfactor =   EOUTIL_EMULFLOAT32_ONE,
-        .DEPRECATED_encoderconversionoffset =   EOUTIL_EMULFLOAT32_ZERO,
+        .maxvelocityofjoint =        0,
         .motor_params =
         {
             .bemf_value =            0,
@@ -403,6 +402,13 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
         
         command.type  = ICUBCANPROTO_POL_MC_CMD__SET_IMPEDANCE_OFFSET;
         command.value = &impedence_icubCanProtValues.offset;
+        eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);   
+
+
+        // max velocity of joint. it MUST be positive
+        icubCanProto_velocity_t vel_ticks = eo_mc4boards_Convert_Velocity_toCAN(eo_mc4boards_GetHandle(), jxx, cfg->maxvelocityofjoint, eomc4_velocitycontext_toCAN_unsigned); 
+        command.type  = ICUBCANPROTO_POL_MC_CMD__SET_MAX_VELOCITY;
+        command.value = &vel_ticks; 
         eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);         
     }
     
@@ -655,47 +661,6 @@ extern void eoprot_fun_UPDT_mc_joint_config_motionmonitormode(const EOnv* nv, co
     }
 }
 
-// marco.accame: the following two functions are not used because there not such tags as:
-// eoprot_tag_mc_joint_config_encoderconversionfactor or eoprot_tag_mc_joint_config_encoderconversionoffset
-// thus i can remove them.
-#if 0
-extern void eoprot_fun_UPDT_mc_joint_config_encoderconversionfactor(const EOnv* nv, const eOropdescriptor_t* rd)
-{   // mc4can only     
-    if(eobool_true == s_motorcontrol_is2foc_based())
-    {
-        return;
-    }
-    
-    eOresult_t res = eores_NOK_generic;    
-    eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
-    eOutil_emulfloat32_t *encfactor = (eOutil_emulfloat32_t*)rd->data;
-
-    res = eo_mc4boards_Convert_encoderfactor_Set(eo_mc4boards_GetHandle(), jxx, (eOmc4boards_conv_encoder_factor_t)eo_common_Q17_14_to_float(*encfactor));
-    if(eores_OK != res)
-    {
-        return; //error 
-    }
-}
-
-extern void eoprot_fun_UPDT_mc_joint_config_encoderconversionoffset(const EOnv* nv, const eOropdescriptor_t* rd)
-{   // mc4can only     
-    if(eobool_true == s_motorcontrol_is2foc_based())
-    {
-        return;
-    }
-    
-    eOresult_t res = eores_NOK_generic;     
-    eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
-    eOutil_emulfloat32_t *encoffset = (eOutil_emulfloat32_t*)rd->data;
-
-    res = eo_mc4boards_Convert_encoderoffset_Set(eo_mc4boards_GetHandle(), jxx, (eOmc4boards_conv_encoder_offset_t)eo_common_Q17_14_to_float(*encoffset));
-    if(eores_OK != res)
-    {
-        return; //error 
-    }
-}
-#endif
-
 
 extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOropdescriptor_t* rd)
 {
@@ -779,8 +744,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
             case eomc_setpoint_position:
             {                
                 setpoint_pos.value = eo_mc4boards_Convert_Position_toCAN(mc4boards, jxx, setpoint->to.position.value);
-                //reference velocity of position set point must be always >0, so here absolute func is used.
-                setpoint_pos.withvelocity = eo_mc4boards_Convert_Velocity_toCAN_abs(mc4boards, jxx, setpoint->to.position.withvelocity);
+                setpoint_pos.withvelocity = eo_mc4boards_Convert_Velocity_toCAN(mc4boards, jxx, setpoint->to.position.withvelocity, eomc4_velocitycontext_toCAN_positionsetpoint);
                 
                 command.type  = ICUBCANPROTO_POL_MC_CMD__POSITION_MOVE; 
                 command.value =  &setpoint_pos; 
@@ -788,16 +752,57 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
 
             case eomc_setpoint_velocity:
             {   
-                setpoint_vel.withacceleration = eo_mc4boards_Convert_Acceleration_toCAN_abs(mc4boards, jxx, setpoint->to.velocity.withacceleration);           
-                setpoint_vel.value = eo_mc4boards_Convert_Velocity_toCAN(mc4boards, jxx, setpoint->to.velocity.value);
-                
+                setpoint_vel.value = eo_mc4boards_Convert_Velocity_toCAN(mc4boards, jxx, setpoint->to.velocity.value, eomc4_velocitycontext_toCAN_signed);
+                setpoint_vel.withacceleration = eo_mc4boards_Convert_Acceleration_toCAN(mc4boards, jxx, setpoint->to.velocity.withacceleration);                          
+                // acceleration in velocity setpoint must be positive, as it is the velocity which has the sign. moreover: it must be higher that 1 tick/ms^2
                 if (setpoint_vel.withacceleration < 1)
                 {
                     setpoint_vel.withacceleration = 1;
-                }            
-
+                } 
+                
                 command.type  = ICUBCANPROTO_POL_MC_CMD__VELOCITY_MOVE; 
-                command.value =  &setpoint_vel;                                  
+                command.value =  &setpoint_vel;   
+                
+//#undef DEBUG_SETPOINT_VELOCITY
+//#if defined(DEBUG_SETPOINT_VELOCITY) 
+//                
+//                eOerrmanDescriptor_t errdes = {0};
+//                static eOmeas_acceleration_t prevAcc = -1;
+//                static eOmeas_velocity_t prevVel = -1;
+//                
+//                eObool_t print = eobool_false;
+//                
+//                if((prevAcc != setpoint->to.velocity.withacceleration) || (prevVel != setpoint->to.velocity.value))
+//                {
+//                    print = eobool_true;   
+//                }
+//                prevAcc = setpoint->to.velocity.withacceleration;
+//                prevVel = setpoint->to.velocity.value;
+//                
+//                if(eobool_true == print)
+//                {
+//                    // original
+//                    errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag00);
+//                    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+//                    errdes.sourceaddress    = jxx;
+//                    errdes.par16            = 0xfff1;
+//                    errdes.par64            = (setpoint->to.velocity.value) | ((uint64_t)(setpoint->to.velocity.withacceleration)<<32);
+//                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &errdes);
+//                }  
+//    
+//                if(eobool_true == print)
+//                {
+//                    // conversion
+//                    errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag00);
+//                    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+//                    errdes.sourceaddress    = jxx;
+//                    errdes.par16            = 0xfff2;
+//                    errdes.par64            = (setpoint_vel.value) | ((uint64_t)(setpoint_vel.withacceleration)<<32);
+//                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &errdes);  
+//                }                    
+//                
+//#endif //defined(DEBUG_SETPOINT_VELOCITY) 
+                                               
             } break;
 
             case eomc_setpoint_torque:
@@ -1143,7 +1148,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_controlmode(const EOnv* nv, const eO
         command.class = eocanprot_msgclass_pollingMotorControl;    
         command.type  = ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE;
         command.value = &icubcanProto_controlmode;   
-                   
+        
         eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);
     }    
 }
@@ -1316,12 +1321,13 @@ extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescripto
         //command.value = &cfg_ptr->pidcurrent;
         //eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);             
     }
-    
-    // set max velocity      
-    icubCanProto_velocity_t vel_icubCanProtValue = eo_mc4boards_Convert_Velocity_toCAN(eo_mc4boards_GetHandle(), mxx, cfg_ptr->maxvelocityofmotor);           
-    command.type  = ICUBCANPROTO_POL_MC_CMD__SET_MAX_VELOCITY;
-    command.value = &vel_icubCanProtValue;
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32); 
+
+// marco.accame on 8oct2015: removed because it is wrong. message ICUBCANPROTO_POL_MC_CMD__SET_MAX_VELOCITY must be used with max velocity of JOINT !!!    
+//    // set max velocity      
+//    icubCanProto_velocity_t vel_icubCanProtValue = eo_mc4boards_Convert_Velocity_toCAN(eo_mc4boards_GetHandle(), mxx, cfg_ptr->maxvelocityofmotor);           
+//    command.type  = ICUBCANPROTO_POL_MC_CMD__SET_MAX_VELOCITY;
+//    command.value = &vel_icubCanProtValue;
+//    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32); 
 
     // set current limit  
     command.type  = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT;
@@ -1356,20 +1362,21 @@ extern void eoprot_fun_UPDT_mc_motor_config_pidcurrent(const EOnv* nv, const eOr
 }
 
 
-extern void eoprot_fun_UPDT_mc_motor_config_maxvelocityofmotor(const EOnv* nv, const eOropdescriptor_t* rd)
-{
-    eOmeas_velocity_t *vel = (eOmeas_velocity_t*)rd->data;
-    eOmc_motorId_t mxx = eoprot_ID2index(rd->id32);
-    
-    eOcanprot_command_t command = {0};
-    command.class = eocanprot_msgclass_pollingMotorControl;
-    
-    // set max velocity  
-    icubCanProto_velocity_t vel_icubCanProtValue = eo_mc4boards_Convert_Velocity_toCAN(eo_mc4boards_GetHandle(), mxx, *vel);           
-    command.type  = ICUBCANPROTO_POL_MC_CMD__SET_MAX_VELOCITY;
-    command.value = &vel_icubCanProtValue;
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32); 
-}
+// marco.accame on 8oct2015: removed because it is wrong. message ICUBCANPROTO_POL_MC_CMD__SET_MAX_VELOCITY must be used with max velocity of JOINT !!!    
+//extern void eoprot_fun_UPDT_mc_motor_config_maxvelocityofmotor(const EOnv* nv, const eOropdescriptor_t* rd)
+//{
+//    eOmeas_velocity_t *vel = (eOmeas_velocity_t*)rd->data;
+//    eOmc_motorId_t mxx = eoprot_ID2index(rd->id32);
+//    
+//    eOcanprot_command_t command = {0};
+//    command.class = eocanprot_msgclass_pollingMotorControl;
+//    
+//    // set max velocity  
+//    icubCanProto_velocity_t vel_icubCanProtValue = eo_mc4boards_Convert_Velocity_toCAN(eo_mc4boards_GetHandle(), mxx, *vel);           
+//    command.type  = ICUBCANPROTO_POL_MC_CMD__SET_MAX_VELOCITY;
+//    command.value = &vel_icubCanProtValue;
+//    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32); 
+//}
 
 
 extern void eoprot_fun_UPDT_mc_motor_config_maxcurrentofmotor(const EOnv* nv, const eOropdescriptor_t* rd)
