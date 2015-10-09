@@ -350,10 +350,8 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__VELOCITY(eOcanframe_t *
         vel_icubCanProtValue = *((icubCanProto_velocity_t*)&(frame->data[offsetvelocity[j]]));
         acc_icubCanProtValue = *((icubCanProto_acceleration_t*)&(frame->data[offsetacceleration[j]]));
         
-        vel_icubCanProtValue = (vel_icubCanProtValue*1000) >> eo_mc4boards_VelocityEstimationShift_Get(eo_mc4boards_GetHandle(), jointindex);
         joint->status.basic.jnt_velocity = eo_mc4boards_Convert_Velocity_fromCAN(eo_mc4boards_GetHandle(), jointindex, vel_icubCanProtValue);
     
-        acc_icubCanProtValue = (acc_icubCanProtValue * 1000000) >> (eo_mc4boards_VelocityEstimationShift_Get(eo_mc4boards_GetHandle(), jointindex) + eo_mc4boards_AccelerationEstimationShift_Get(eo_mc4boards_GetHandle(), jointindex));
         joint->status.basic.jnt_acceleration = eo_mc4boards_Convert_Acceleration_fromCAN(eo_mc4boards_GetHandle(), jointindex, acc_icubCanProtValue);               
     }
    
