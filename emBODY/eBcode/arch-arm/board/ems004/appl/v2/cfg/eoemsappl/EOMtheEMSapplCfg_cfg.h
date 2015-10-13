@@ -79,7 +79,7 @@ extern "C" {
 
 //  <h> version
 //  <o> major           <0-255> 
-#define EOMTHEEMSAPPLCFG_VERSION_MAJOR          2
+#define EOMTHEEMSAPPLCFG_VERSION_MAJOR          22
 //  <o> minor           <0-255> 
 #define EOMTHEEMSAPPLCFG_VERSION_MINOR          10
 //  </h>version
@@ -153,7 +153,7 @@ extern "C" {
 
 //  <o> task stack size <256-1024:128>
 //  <i> default: 512
-#define TMRMAN_TMP_STACK   512
+#define TMRMAN_TMP_STACK   1024
 
 //  <o> task message queue size <1-16>
 //  <i> default: 8
@@ -164,7 +164,7 @@ extern "C" {
 
 #if (1 == TMRMAN_USEDEFAULT)
     #define EOMTHEEMSAPPLCFG_TMRMAN_TASK_PRIORITYof                 240
-    #define EOMTHEEMSAPPLCFG_TMRMAN_TASK_STACKSIZEof                512
+    #define EOMTHEEMSAPPLCFG_TMRMAN_TASK_STACKSIZEof                1024
     #define EOMTHEEMSAPPLCFG_TMRMAN_TASK_QUEUESIZEof                8
 #else
     #define EOMTHEEMSAPPLCFG_TMRMAN_TASK_PRIORITYof                 TMRMAN_TMP_PRIO
@@ -190,7 +190,7 @@ extern "C" {
 
 //  <o> task stack size <256-1024:128>
 //  <i> default: 512
-#define CBKMAN_TMP_STACK   512
+#define CBKMAN_TMP_STACK   1024
 
 //  <o> task message queue size <1-16>
 //  <i> default: 8
@@ -201,7 +201,7 @@ extern "C" {
 
 #if (1 == CBKMAN_USEDEFAULT)
     #define EOMTHEEMSAPPLCFG_CBKMAN_TASK_PRIORITYof                 202
-    #define EOMTHEEMSAPPLCFG_CBKMAN_TASK_STACKSIZEof                512
+    #define EOMTHEEMSAPPLCFG_CBKMAN_TASK_STACKSIZEof                1024
     #define EOMTHEEMSAPPLCFG_CBKMAN_TASK_QUEUESIZEof                8
 #else
     #define EOMTHEEMSAPPLCFG_CBKMAN_TASK_PRIORITYof                 CBKMAN_TMP_PRIO
