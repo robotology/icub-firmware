@@ -67,6 +67,9 @@
 
 #include "EOtheMotionController.h"
 
+#include "EoError.h"
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -167,6 +170,12 @@ const EOVtheEMSapplCfgBody theapplbodyconfig =
 // --------------------------------------------------------------------------------------------------------------------
 
 static void overridden_appl_led_error_init(void);
+
+static void s_overridden_appl_initialise_eb1(EOMtheEMSappl* p);
+static void s_debug_eb1(void);
+static void callback_eb1(void *p);
+static eOresult_t s_on_strain_verify_eb1(EOtheSTRAIN* p, eObool_t verifyisok);
+static eOresult_t s_on_mcfoc_verify_eb1(EOtheMotionController* p, eObool_t verifyisok);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -300,10 +309,16 @@ extern eObool_t eoprot_b02_b04_mc_isproxied(eOnvID32_t id)
 
 static void s_overridden_appl_initialise2(EOMtheEMSappl* p);
 
+static void s_overridden_appl_initialise3(EOMtheEMSappl* p);
+
 extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
 {  
     
-    s_overridden_appl_initialise2(p);
+    s_overridden_appl_initialise_eb1(p);
+    
+    //s_overridden_appl_initialise2(p);
+    
+    //s_overridden_appl_initialise3(p);
     
     return;
     
@@ -497,15 +512,10 @@ extern void eom_emsappl_hid_userdef_on_entry_CFG(EOMtheEMSappl* p)
     // EOtheCANservice: set straight mode and force parsing of all packets in the RX queues.
     eo_canserv_SetMode(eo_canserv_GetHandle(), eocanserv_mode_straight);
     eo_canserv_ParseAll(eo_canserv_GetHandle());
-//    const uint8_t maxframes2read = 255; // 255 is the max number possible. the function however exits when all canframes are 
-//    eo_canserv_Parse(eo_canserv_GetHandle(), eOcanport1, maxframes2read, NULL);    
-//    eo_canserv_Parse(eo_canserv_GetHandle(), eOcanport2, maxframes2read, NULL);
- 
 }
 
 extern void eom_emsappl_hid_userdef_on_exit_CFG(EOMtheEMSappl* p)
 {
-//    #warning -> marco.accame: we enable the tx on can for all joints not on exit-cfg but on enytry-run (i may go to err).
 }
 
 extern void eom_emsappl_hid_userdef_on_entry_RUN(EOMtheEMSappl* p)
@@ -520,6 +530,9 @@ extern void eom_emsappl_hid_userdef_on_entry_RUN(EOMtheEMSappl* p)
     eo_canserv_TXstartAll(eo_canserv_GetHandle());
     eo_canserv_TXwaitAllUntilDone(eo_canserv_GetHandle(), 5*eok_reltime1ms);
     
+    
+    // motion-control:
+    eo_motioncontrol_Start(eo_motioncontrol_GetHandle());
     
     
 #if 0    
@@ -560,9 +573,15 @@ extern void eom_emsappl_hid_userdef_on_exit_RUN(EOMtheEMSappl* p)
     eo_canserv_ParseAll(eo_canserv_GetHandle());  
   
     
-    // deactivate services
+    // deactivate services ... not correct to deactivate. maybe we just stop them
     
-    eo_strain_Deactivate(eo_strain_GetHandle());
+    // strain
+    eo_strain_TXstop(eo_strain_GetHandle());
+    
+    // motion-control
+    eo_motioncontrol_Stop(eo_motioncontrol_GetHandle());
+    
+    //eo_strain_Deactivate(eo_strain_GetHandle());
     
     
     
@@ -598,11 +617,15 @@ extern void eom_emsappl_hid_userdef_on_entry_ERR(EOMtheEMSappl* p)
     // EOtheCANservice: set straigth mode and force parsing of all packets in the RX queues.
     eo_canserv_SetMode(eo_canserv_GetHandle(), eocanserv_mode_straight);
     eo_canserv_ParseAll(eo_canserv_GetHandle());  
+
     
-//    eo_canserv_SetMode(eo_canserv_GetHandle(), eocanserv_mode_straight);
-//    const uint8_t maxframes2read = 255; // 255 is the max number possible. the function however exits when all canframes are 
-//    eo_canserv_Parse(eo_canserv_GetHandle(), eOcanport1, maxframes2read, NULL);    
-//    eo_canserv_Parse(eo_canserv_GetHandle(), eOcanport2, maxframes2read, NULL);
+    // deactivate services ... not correct to deactivate. maybe we just stop them
+    
+    // strain
+    eo_strain_TXstop(eo_strain_GetHandle());
+    
+    // motion-control
+    eo_motioncontrol_Stop(eo_motioncontrol_GetHandle());
 }
 
 
@@ -812,10 +835,12 @@ static eOresult_t s_on_strain_verify(EOtheSTRAIN* p, eObool_t verifyisok)
     
     if(eobool_true == verifyisok)
     {
+        hal_trace_puts("s_on_strain_verify(p, OK)");
         eo_strain_GetFullScale(eo_strain_GetHandle(), s_onfullscaleready); 
     }
     else
     {
+        hal_trace_puts("s_on_strain_verify(p, KO)");
         rr = 0;
     }
     
@@ -830,9 +855,11 @@ static eOresult_t s_onfullscaleready(EOtheSTRAIN* p, eObool_t operationisok)
     
     if(eobool_false == operationisok)
     {
+        hal_trace_puts("s_onfullscaleready(p, KO)");
         // send diagnostics
         return(eores_NOK_generic);
     }
+    hal_trace_puts("s_onfullscaleready(p, OK)");
     
     eOas_strain_t *strain = eo_entities_GetStrain(eo_entities_GetHandle(), 0);
     eOas_arrayofupto12bytes_t *fullscale = &strain->status.fullscale;
@@ -923,6 +950,459 @@ static void s_debug(void)
     eo_action_SetCallback(act, callback1, tmrA, eov_callbackman_GetTask(eov_callbackman_GetHandle())); 
     
     eo_timer_Start(tmrA, eok_abstimeNOW, 10*eok_reltime1sec, eo_tmrmode_FOREVER, act);   
+}
+
+
+
+static void s_debug3(void);
+
+static void s_overridden_appl_initialise3(EOMtheEMSappl* p)
+{
+    
+    // pulse led3 forever at 20 hz.
+    eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_three, EOK_reltime1sec/20, 0);    
+    
+    // board is eb1
+    s_boardnum = 0;
+    
+    // initialise all basic objects
+    
+    {   // eth-protocol-1: the nvset   
+        // marco.accame on 30 sept 2015: i initialise at max capabilities
+        
+        EOnvSet* nvset = eom_emstransceiver_GetNVset(eom_emstransceiver_GetHandle()); 
+        uint8_t i = 0;
+        // 1. set the board number. the value of the generic board is 99. 
+        //    the correct value is used only for retrieving it later on and perform specific actions based on the board number
+        eo_nvset_BRDlocalsetnumber(nvset, s_boardnum);
+                
+        // 2. load all the endpoints specific to this board. the generic board loads only management
+        uint16_t numofepcfgs = eo_constvector_Size(s_the_vectorof_EPcfgs);
+        for(i=0; i<numofepcfgs; i++)
+        {
+            eOprot_EPcfg_t* epcfg = (eOprot_EPcfg_t*) eo_constvector_At(s_the_vectorof_EPcfgs, i);
+            if(eobool_true == eoprot_EPcfg_isvalid(epcfg))
+            {
+                eo_nvset_LoadEP(nvset, epcfg, eobool_true);
+            }                        
+        }
+    }
+    {   // eth-protocol-2: the callbacks
+        // marco.accame on 30 sept 2015: so far i define all the callbacks. however:
+        // 1. we may decide to define EOPROT_CFG_OVERRIDE_CALLBACKS_IN_RUNTIME and thus we must later on to load a proper callback. 
+        //    BUT maybe better not.
+        // 2. if not, i MUST later on re-write the callbacks, so that:
+        //    a. we can understand if a service is configured (use proper object) and we something only if it configured.
+        //    b. make sure that when we use a get entity, we use EOtheEntities which does not address joints beyond those configured
+         
+    }    
+
+    {   // entities   
+        // marco.accame on 30 sept 2015: i initialise at max capabilities. however, so far we have 0 entities.
+        // when we need to init a service, we call a proper eo_entities_SetNumOf...(num) method
+        // to unit we can call a eo_entities_Reset() for all or a proper eo_entities_SetNumOf...(0)  
+        eo_entities_Initialise();        
+    }
+    
+    {   // can-mapping
+        // marco.accame on 30 sept 2015: so far it is empty. i will load it later on with boards and with entities.
+        // i must write a eo_canmap_LoadEntity() with can boards and info about how the can boards.
+        // i also MUST write a eo_canmap_UnloadEntity()
+        eo_canmap_Initialise(NULL);
+    }
+    
+    {   // can-protocol
+        // marco.accame on 30 sept 2015: i init it in a complete way. we dont have a load method for service ...
+        // we may add it, so that if we dont init we dont allow it.
+        eo_canprot_Initialise(NULL);        
+    }
+    
+    {   // other services: I dont init anything. however i should avoid automatic initialisation for:
+        // EOtheMAIS, EOtheSTRAIN, EOtheSKIN, EOtheInertial, EOtheMotionController     
+
+        // changed idea: i initialise them.
+        eo_strain_Initialise();        
+        eo_motioncontrol_Initialise();        
+    }
+    
+    {   // i init a service handler. for instance to be called EOtheServices
+        // so far i do in here what i need without any container
+             
+        // can-services
+        eOcanserv_cfg_t config = {.mode = eocanserv_mode_straight};   
+        
+        config.mode                 = eocanserv_mode_straight;
+        config.canstabilizationtime = 7*OSAL_reltime1sec;
+        config.rxqueuesize[0]       = 64;
+        config.rxqueuesize[1]       = 64;
+        config.txqueuesize[0]       = 64;
+        config.txqueuesize[1]       = 64;  
+        config.onrxcallback[0]      = s_can_cbkonrx; 
+        config.onrxargument[0]      = eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle());    
+        config.onrxcallback[1]      = s_can_cbkonrx; 
+        config.onrxargument[1]      = eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()); 
+            
+        // attenzione alla mc4cplus che ha 1 solo can ... potrei cambiare il eo_canserv_Initialise() in modo che
+        // se hal_can_supported_is(canx) e' falso allora non retsituisco errore ma semplicemente non inizializzo.
+        eo_canserv_Initialise(&config);   
+        
+        // can-discovery
+        eo_candiscovery2_Initialise(NULL);        
+    }
+    
+    
+    // ok, nothing else now .....
+    
+    
+    // for debug: 
+    
+    // A. start a timer of 10 seconds w/ a callback which:
+    // 1. discover the strain,
+    // 2. init EOtheStrain (eo_strain_Load()), which in turn will call EOtheEnetities etc. 
+    // 3. ask the full-scales,
+
+    
+    // B. start a timer of 15 seconds w/ callback which:
+    // 1. start then motioncontrol
+    
+    
+   s_debug3();
+    
+    
+}
+
+
+static eOresult_t s_on_mcfoc_verify(EOtheMotionController* p, eObool_t verifyisok)
+{
+    uint8_t rr = 0;
+    
+    if(eobool_true == verifyisok)
+    {
+        hal_trace_puts("s_on_mcfoc_verify(p, OK)");
+        rr++;
+        rr = rr;
+    }
+    else
+    {
+        hal_trace_puts("s_on_mcfoc_verify(p, KO)");
+        rr = 0;
+    }
+    
+    rr = rr;
+    
+    return(eores_OK);
+}
+
+static void callback3(void *p)
+{
+    static uint8_t tick = 0;
+    
+    const eOmn_serv_configuration_t * strainserv = NULL; 
+    const eOmn_serv_configuration_t * mcfocserv = NULL; 
+    
+    eObool_t stoptimer = eobool_false;
+    
+    if(NULL == strainserv)
+    {
+        strainserv = eoboardconfig_code2strain_serv_configuration(14);
+    }
+    
+    if(NULL == mcfocserv)
+    {
+        mcfocserv = eoboardconfig_code2motion_serv_configuration(14);
+    }
+    
+    if(0 == tick)
+    {   // i enter in run mode.
+        //eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STrun);        
+    }
+    else if(1 == tick)
+    {
+        // start discovery of the strain. at the end the strain is activated     
+        hal_trace_puts("verify strain");         
+        eo_strain_Verify(eo_strain_GetHandle(), strainserv, s_on_strain_verify, eobool_true);       
+    }
+    else if(2 == tick)
+    { 
+        hal_trace_puts("verify motion control");                
+        eo_motioncontrol_Verify(eo_motioncontrol_GetHandle(), mcfocserv, s_on_mcfoc_verify, eobool_true);   
+    }
+    else if(3 == tick)
+    {
+        hal_trace_puts("entering run mode");
+        eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STrun);         
+    }
+    else if(4 == tick)
+    {
+     
+    }
+   
+    tick++;
+   
+   
+    if(tick >= 8)
+    {
+        stoptimer = eobool_true;
+    }
+   
+    if(eobool_true == stoptimer)
+    {
+        eo_timer_Stop((EOtimer*)p);
+    }   
+}
+
+
+static void s_debug3(void)  
+{
+    EOtimer *tmrA = eo_timer_New();    
+    
+    EOaction_strg astrg = {0};
+    EOaction *act = (EOaction*)&astrg;
+    
+    eo_action_SetCallback(act, callback3, tmrA, eov_callbackman_GetTask(eov_callbackman_GetHandle())); 
+    
+    eo_timer_Start(tmrA, eok_abstimeNOW, 5*eok_reltime1sec, eo_tmrmode_FOREVER, act);   
+}
+
+
+static void s_overridden_appl_initialise_eb1(EOMtheEMSappl* p)
+{
+    
+    // pulse led3 forever at 20 hz.
+    eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_three, EOK_reltime1sec/20, 0);    
+    
+    // board is eb1
+    s_boardnum = 0;
+    
+    // initialise all basic objects
+    
+    {   // eth-protocol-1: the nvset   
+        // marco.accame on 30 sept 2015: i initialise at max capabilities
+        
+        EOnvSet* nvset = eom_emstransceiver_GetNVset(eom_emstransceiver_GetHandle()); 
+        uint8_t i = 0;
+        // 1. set the board number. the value of the generic board is 99. 
+        //    the correct value is used only for retrieving it later on and perform specific actions based on the board number
+        eo_nvset_BRDlocalsetnumber(nvset, s_boardnum);
+                
+        // 2. load all the endpoints specific to this board. the generic board loads only management
+        uint16_t numofepcfgs = eo_constvector_Size(s_the_vectorof_EPcfgs);
+        for(i=0; i<numofepcfgs; i++)
+        {
+            eOprot_EPcfg_t* epcfg = (eOprot_EPcfg_t*) eo_constvector_At(s_the_vectorof_EPcfgs, i);
+            if(eobool_true == eoprot_EPcfg_isvalid(epcfg))
+            {
+                eo_nvset_LoadEP(nvset, epcfg, eobool_true);
+            }                        
+        }
+    }
+    {   // eth-protocol-2: the callbacks
+        // marco.accame on 30 sept 2015: so far i define all the callbacks. however:
+        // 1. we may decide to define EOPROT_CFG_OVERRIDE_CALLBACKS_IN_RUNTIME and thus we must later on to load a proper callback. 
+        //    BUT maybe better not.
+        // 2. if not, i MUST later on re-write the callbacks, so that:
+        //    a. we can understand if a service is configured (use proper object) and we something only if it configured.
+        //    b. make sure that when we use a get entity, we use EOtheEntities which does not address joints beyond those configured
+         
+    }    
+
+    {   // entities   
+        // marco.accame on 30 sept 2015: i initialise at max capabilities. however, so far we have 0 entities.
+        // when we need to init a service, we call a proper eo_entities_SetNumOf...(num) method
+        // to unit we can call a eo_entities_Reset() for all or a proper eo_entities_SetNumOf...(0)  
+        eo_entities_Initialise();        
+    }
+    
+    {   // can-mapping
+        // marco.accame on 30 sept 2015: so far it is empty. i will load it later on with boards and with entities.
+        // i must write a eo_canmap_LoadEntity() with can boards and info about how the can boards.
+        // i also MUST write a eo_canmap_UnloadEntity()
+        eo_canmap_Initialise(NULL);
+    }
+    
+    {   // can-protocol
+        // marco.accame on 30 sept 2015: i init it in a complete way. we dont have a load method for service ...
+        // we may add it, so that if we dont init we dont allow it.
+        eo_canprot_Initialise(NULL);        
+    }
+    
+    {   // other services: I dont init anything. however i should avoid automatic initialisation for:
+        // EOtheMAIS, EOtheSTRAIN, EOtheSKIN, EOtheInertial, EOtheMotionController     
+
+        // changed idea: i initialise them.
+        eo_strain_Initialise();        
+        eo_motioncontrol_Initialise();        
+    }
+    
+    {   // i init a service handler. for instance to be called EOtheServices
+        // so far i do in here what i need without any container
+             
+        // can-services
+        eOcanserv_cfg_t config = {.mode = eocanserv_mode_straight};   
+        
+        config.mode                 = eocanserv_mode_straight;
+        config.canstabilizationtime = 7*OSAL_reltime1sec;
+        config.rxqueuesize[0]       = 64;
+        config.rxqueuesize[1]       = 64;
+        config.txqueuesize[0]       = 64;
+        config.txqueuesize[1]       = 64;  
+        config.onrxcallback[0]      = s_can_cbkonrx; 
+        config.onrxargument[0]      = eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle());    
+        config.onrxcallback[1]      = s_can_cbkonrx; 
+        config.onrxargument[1]      = eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()); 
+            
+        // attenzione alla mc4cplus che ha 1 solo can ... potrei cambiare il eo_canserv_Initialise() in modo che
+        // se hal_can_supported_is(canx) e' falso allora non retsituisco errore ma semplicemente non inizializzo.
+        eo_canserv_Initialise(&config);   
+        
+        // can-discovery
+        eo_candiscovery2_Initialise(NULL);        
+    }
+    
+    
+    // ok, nothing else now .....
+    
+    
+    // for debug: 
+    
+    // A. start a timer of 10 seconds w/ a callback which:
+    // 1. discover the strain,
+    // 2. init EOtheStrain (eo_strain_Load()), which in turn will call EOtheEnetities etc. 
+    // 3. ask the full-scales,
+
+    
+    // B. start a timer of 5 seconds w/ callback which:
+
+       
+   s_debug_eb1();
+       
+}
+
+static void s_debug_eb1(void)  
+{
+    EOtimer *tmrA = eo_timer_New();    
+    
+    EOaction_strg astrg = {0};
+    EOaction *act = (EOaction*)&astrg;
+    
+    eo_action_SetCallback(act, callback_eb1, tmrA, eov_callbackman_GetTask(eov_callbackman_GetHandle())); 
+    
+    eo_timer_Start(tmrA, eok_abstimeNOW, 5*eok_reltime1sec, eo_tmrmode_FOREVER, act);   
+}
+
+static void callback_eb1(void *p)
+{
+    static uint8_t tick = 0;
+    
+    const eOmn_serv_configuration_t * strainserv = NULL; 
+    const eOmn_serv_configuration_t * mcfocserv = NULL; 
+    
+    eObool_t stoptimer = eobool_false;
+    
+    if(NULL == strainserv)
+    {
+        strainserv = eoboardconfig_code2strain_serv_configuration(0);
+    }
+    
+    if(NULL == mcfocserv)
+    {
+        mcfocserv = eoboardconfig_code2motion_serv_configuration(0);
+    }
+    
+    if(0 == tick)
+    {   
+        eo_strain_Verify(eo_strain_GetHandle(), strainserv, s_on_strain_verify_eb1, eobool_true);              
+    }
+    else if(1 == tick)
+    { 
+        eo_motioncontrol_Verify(eo_motioncontrol_GetHandle(), mcfocserv, s_on_mcfoc_verify_eb1, eobool_true);      
+    }
+    else if(2 == tick)
+    { 
+
+    }
+    else if(3 == tick)
+    {
+                
+    }
+    else if(4 == tick)
+    {
+     
+    }
+   
+    tick++;
+   
+   
+    if(tick >= 8)
+    {
+        stoptimer = eobool_true;
+    }
+   
+    if(eobool_true == stoptimer)
+    {
+        eo_timer_Stop((EOtimer*)p);
+    }   
+}
+
+static eOerrmanDescriptor_t errdes = {0};
+
+static eOresult_t s_on_mcfoc_verify_eb1(EOtheMotionController* p, eObool_t verifyisok)
+{
+    uint8_t rr = 0;
+    
+    
+    errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag00);
+    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+    errdes.sourceaddress    = 0;
+    errdes.par16            = 0xf2f2;
+    
+       
+    
+    if(eobool_true == verifyisok)
+    {
+        errdes.par64            = 0xffffffffffffffff;       
+        rr++;
+        rr = rr;
+    }
+    else
+    {
+        errdes.par64            = 0;
+        rr = 0;
+    }
+    
+    rr = rr;
+    
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, NULL, &errdes); 
+    
+    return(eores_OK);
+}
+
+static eOresult_t s_on_strain_verify_eb1(EOtheSTRAIN* p, eObool_t verifyisok)
+{    
+    uint8_t rr = 0;
+    
+    errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag00);
+    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+    errdes.sourceaddress    = 0;
+    errdes.par16            = 0xf1f1;
+    
+    if(eobool_true == verifyisok)
+    {
+        errdes.par64            = 0xffffffffffffffff;
+        rr++;
+        rr = rr;
+    }
+    else
+    {
+        errdes.par64            = 0;
+        rr = 0;
+    }
+    
+    rr = rr;
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, NULL, &errdes);
+    
+    return(eores_OK);    
+    
 }
 
 
