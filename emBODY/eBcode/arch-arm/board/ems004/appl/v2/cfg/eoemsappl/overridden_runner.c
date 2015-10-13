@@ -64,6 +64,8 @@
 
 #include "EOtheCANdiscovery2.h"
 
+#include "EOtheMotionController.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -216,6 +218,8 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOM
 extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
 {
     
+    eo_motioncontrol_Tick(eo_motioncontrol_GetHandle());
+    
     
 #if !defined(DEBUG_REMOVE_OLD_SERVICES)
     
@@ -254,14 +258,8 @@ extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
 
 
 extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission(EOMtheEMSrunner *p)
-{  
-    
+{      
     eo_canserv_TXstartAll(eo_canserv_GetHandle());
-
-#if !defined(DEBUG_REMOVE_OLD_SERVICES)    
-    eo_canserv_TXstart(eo_canserv_GetHandle(), eOcanport1, NULL);
-    eo_canserv_TXstart(eo_canserv_GetHandle(), eOcanport2, NULL);
-#endif //!defined(DEBUG_REMOVE_OLD_SERVICES)    
 }
 
 
