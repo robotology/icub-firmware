@@ -32,9 +32,7 @@
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "hal_common.h"
-
 #include "hal_mux.h"
-#include "hal_spi.h"
 
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
