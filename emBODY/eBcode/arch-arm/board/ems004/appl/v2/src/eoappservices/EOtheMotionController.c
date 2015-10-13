@@ -82,6 +82,7 @@
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
+static eOresult_t s_eo_motioncontrol_onendofverify_encoder(EOtheEncoderReader* p, eObool_t operationisok);
 
 static eOresult_t s_eo_motioncontrol_onstop_search4focs(void *par, EOtheCANdiscovery2* p, eObool_t searchisok);
 
@@ -105,7 +106,11 @@ static EOtheMotionController s_eo_themotcon =
     .servconfig             = { .type = eomn_serv_NONE },
     .candiscoverytarget     = {0},
     .onverify               = NULL,
-    .activateafterverify    = eobool_false
+    .activateafterverify    = eobool_false,    
+    .controller             = NULL,
+    .encoderreader          = NULL,
+    .numofjomos             = 0,
+    .ondiscoverystop        = {0}
 };
 
 //static const char s_eobj_ownname[] = "EOtheMotionController";
@@ -172,11 +177,10 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
 //        eo_motioncontrol_Deactivate(p);        
 //    }   
     
-    #warning EOtheMotionController MUST: verify also the encoders ...
+
 
     s_eo_themotcon.onverify = onverify;
     s_eo_themotcon.activateafterverify = activateafterverify;
-
 
     memset(&s_eo_themotcon.candiscoverytarget, 0, sizeof(s_eo_themotcon.candiscoverytarget));
     s_eo_themotcon.candiscoverytarget.boardtype = eobrd_cantype_1foc;
@@ -194,15 +198,16 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
         const eOmn_serv_jomo_descriptor_t *jomodes = (eOmn_serv_jomo_descriptor_t*) eo_constarray_At(carray, i);
         eo_common_hlfword_bitset(&s_eo_themotcon.candiscoverytarget.canmap[jomodes->actuator.foc.canloc.port], jomodes->actuator.foc.canloc.addr);         
     }
-       
-
-    eOcandiscovery_onstop_t onstop = 
-    {
-        .function   = s_eo_motioncontrol_onstop_search4focs,
-        .parameter  = (void*)servcfg
-    };
-        
-    eo_candiscovery2_Start(eo_candiscovery2_GetHandle(), &s_eo_themotcon.candiscoverytarget, &onstop);   
+    
+    
+    s_eo_themotcon.ondiscoverystop.function = s_eo_motioncontrol_onstop_search4focs;
+    s_eo_themotcon.ondiscoverystop.parameter = (void*)servcfg;
+    
+    // at first i verify the encoders
+     eo_encoderreader_Verify(eo_encoderreader_GetHandle(), &servcfg->data.mc.foc_based.arrayofjomodescriptors, s_eo_motioncontrol_onendofverify_encoder, eobool_true);
+    
+    // i defer it after the verification of the encoders
+    //eo_candiscovery2_Start(eo_candiscovery2_GetHandle(), &s_eo_themotcon.candiscoverytarget, &s_eo_themotcon.ondiscoverystop);   
 
     
     return(eores_OK);   
@@ -344,6 +349,30 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
     return(eores_OK);   
 }
 
+extern eOresult_t eo_motioncontrol_Start(EOtheMotionController *p)
+{    
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }    
+    
+    if(eobool_false == s_eo_themotcon.active)
+    {   // nothing to do because we dont have a strain board
+        return(eores_OK);
+    } 
+        
+    
+    // mc4based: enable broadcast etc
+    // focbased: just init a read of the encoder
+    if(eomn_serv_MC_foc == p->servconfig.type)
+    {   
+        // just start a reading of encoders        
+        eo_encoderreader_StartReading(p->encoderreader);
+
+    }        
+    
+    return(eores_OK);    
+}
 
 
 extern eOresult_t eo_motioncontrol_Tick(EOtheMotionController *p)
@@ -421,6 +450,33 @@ extern eOresult_t eo_motioncontrol_Tick(EOtheMotionController *p)
   
     }
 
+    return(eores_OK);    
+}
+
+
+extern eOresult_t eo_motioncontrol_Stop(EOtheMotionController *p)
+{    
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }    
+    
+    if(eobool_false == s_eo_themotcon.active)
+    {   // nothing to do because we dont have a strain board
+        return(eores_OK);
+    } 
+    
+    // mc4based: disable broadcast etc
+    // focbased: put controller in idle mode
+    if(eomn_serv_MC_foc == p->servconfig.type)
+    {   
+        // just put controller in idle mode        
+        eo_emsMotorController_GoIdle();
+
+    }      
+    
+         
+    
     return(eores_OK);    
 }
 
@@ -641,6 +697,44 @@ static eOresult_t s_eo_motioncontrol_onstop_search4focs(void *par, EOtheCANdisco
     
     return(eores_OK);   
 }
+
+static eOresult_t s_eo_motioncontrol_onendofverify_encoder(EOtheEncoderReader* p, eObool_t operationisok)
+{
+    
+    if(eobool_true == operationisok)
+    {
+        eo_candiscovery2_Start(eo_candiscovery2_GetHandle(), &s_eo_themotcon.candiscoverytarget, &s_eo_themotcon.ondiscoverystop);        
+    }    
+    else
+    {   // must call the service callback with false.
+        if(NULL != s_eo_themotcon.ondiscoverystop.function)
+        {
+            s_eo_themotcon.ondiscoverystop.function(s_eo_themotcon.ondiscoverystop.parameter, eo_candiscovery2_GetHandle(), eobool_false);
+        }
+            
+    }
+   
+    
+    return(eores_OK);    
+}
+
+
+//static eOresult_t s_eo_motioncontrol_onstop_search4focs(void *par, EOtheCANdiscovery2* p, eObool_t searchisok)
+//{
+//    
+//    if(eobool_true == searchisok)
+//    {
+//        // verify the encoder now
+//        const eOmn_serv_configuration_t * mcserv = (const eOmn_serv_configuration_t *)par;
+//        eo_encoderreader_Verify(eo_encoderreader_GetHandle(), &mcserv->data.mc.foc_based.arrayofjomodescriptors, onendofverify_encoder, eobool_true);       
+//    }   
+//    else if(NULL != s_eo_themotcon.onverify)
+//    {
+//        s_eo_themotcon.onverify(&s_eo_themotcon, searchisok); 
+//    }    
+//    
+//    return(eores_OK);   
+//}
 
 
 

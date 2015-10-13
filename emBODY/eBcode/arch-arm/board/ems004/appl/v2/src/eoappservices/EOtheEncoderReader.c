@@ -44,6 +44,8 @@
 
 #include "EOemsController.h"
 
+#include "EOVtheCallbackManager.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -87,6 +89,10 @@ static eo_appEncReader_enc_type_t s_eo_encoderreader_GetEncoderType(uint8_t sens
 
 static eo_appEncReader_encoder_position_t s_eo_encoderreader_GetEncoderPosition(uint8_t sensorport);
 
+static void s_eo_encoderreader_create_ereader(const eOmn_serv_arrayof_4jomodescriptors_t * jomodes, eOcallback_t callback, void* arg);
+
+static void readencoder(void* p);
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -100,7 +106,9 @@ static EOtheEncoderReader s_eo_theencoderreader =
     .reader                 = NULL,
     .readerconfig           = {0},    
     .onverify               = NULL,
-    .activateafterverify    = eobool_false
+    .activateafterverify    = eobool_false,
+    .waitreadtimer          = NULL,
+    .numofjomos             = 0
 };
 
 //static const char s_eobj_ownname[] = "EOtheEncoderReader";
@@ -122,6 +130,7 @@ extern EOtheEncoderReader* eo_encoderreader_Initialise(void)
 
 
 
+    s_eo_theencoderreader.waitreadtimer = eo_timer_New();
     
     s_eo_theencoderreader.reader = eo_appEncReader_Initialise();
         
@@ -141,7 +150,7 @@ extern EOtheEncoderReader* eo_encoderreader_GetHandle(void)
     return(NULL);
 }
 
-//eOmn_serv_arrayof_4jomodescriptors_t arrayofjomodescriptors;
+
 extern eOresult_t eo_encoderreader_Verify(EOtheEncoderReader *p, const eOmn_serv_arrayof_4jomodescriptors_t * jomodes, eOencoderreader_onendofoperation_fun_t onverify, eObool_t activateafterverify)
 {
     if((NULL == p) || (NULL == jomodes))
@@ -158,12 +167,21 @@ extern eOresult_t eo_encoderreader_Verify(EOtheEncoderReader *p, const eOmn_serv
 
     s_eo_theencoderreader.onverify = onverify;
     s_eo_theencoderreader.activateafterverify = activateafterverify;
-
-    // one should: eo_appEncReader_Load(readerconfig) and eo_appEncReader_Start() and then read ...something. if ok, then ...
+                    
+    s_eo_encoderreader_create_ereader(jomodes, NULL, NULL);
     
-    eObool_t readingisok = eobool_true;
-    s_eo_encoderreader_onstop_verifyreading((void*)jomodes, readingisok);
+    eo_appEncReader_StartRead(s_eo_theencoderreader.reader);
     
+    EOaction_strg astrg = {0};
+    EOaction *act = (EOaction*)&astrg;
+    
+    // now i start a timer of 2 ms. and at its expiry i exec s_eo_encoderreader_read_after.    
+    eo_action_SetCallback(act, readencoder, (void*)jomodes, eov_callbackman_GetTask(eov_callbackman_GetHandle()));     
+    eo_timer_Start(s_eo_theencoderreader.waitreadtimer, eok_abstimeNOW, 2*eok_reltime1sec, eo_tmrmode_ONESHOT, act);   
+     
+//    eObool_t readingisok = eobool_true;
+//    s_eo_encoderreader_onstop_verifyreading((void*)jomodes, readingisok);
+//    
     return(eores_OK);   
 }
 
@@ -179,6 +197,9 @@ extern eOresult_t eo_encoderreader_Deactivate(EOtheEncoderReader *p)
     {
         return(eores_OK);        
     } 
+    
+    
+    
     
 //    // send stop messages to strain, unload the entity-can-mapping and the board-can-mapping, reset all things inside this object
 //    // what else .... ?
@@ -222,58 +243,13 @@ extern eOresult_t eo_encoderreader_Activate(EOtheEncoderReader *p, const eOmn_se
     {
         eo_encoderreader_Deactivate(p);        
     }   
-
  
              
-    memcpy(&s_eo_theencoderreader.arrayofjomodes, jomodes, sizeof(eOmn_serv_arrayof_4jomodescriptors_t));
-            
-        
-    // now... use the servcfg
-    uint8_t i = 0;
-    
-    EOconstarray* carray = eo_constarray_Load((EOarray*)&s_eo_theencoderreader.arrayofjomodes);
-
-    uint8_t numofjomos = eo_constarray_Size(carray);
-
-    #warning ----> i must convert from eOmn_serv_jomo_descriptor_t to encoder-reading values ...
-    
-    // create a .... 
-    eOappEncReader_cfg_t config = {0};
-    config.SPI_callbackOnLastRead = NULL;
-    config.SPI_callback_arg = NULL;
-    for(i=0; i<eOappEncReader_joint_numberof; i++)
-    {
-        const eOmn_serv_jomo_descriptor_t *jomodes = (eOmn_serv_jomo_descriptor_t*) eo_constarray_At(carray, i);
-        
-        if(NULL == jomodes)
-        {   // i am beyond the number of jomos
-            config.joints[i].primary_encoder = config.joints[i].extra_encoder = eo_appEncReader_enc_type_NONE;
-            config.joints[i].primary_enc_position = config.joints[i].extra_enc_position = eo_appEncReader_encoder_positionNONE;
-        }
-        else 
-        {
-            // must convert things 
-            config.joints[i].primary_encoder = s_eo_encoderreader_GetEncoderType(jomodes->sensor.type);
-            config.joints[i].primary_enc_position = s_eo_encoderreader_GetEncoderPosition(jomodes->sensor.port);
-            config.joints[i].extra_encoder = s_eo_encoderreader_GetEncoderType(jomodes->extrasensor.type);
-            config.joints[i].extra_enc_position = s_eo_encoderreader_GetEncoderPosition(jomodes->extrasensor.port);        
-
-            if(eo_appEncReader_enc_type_NONE != config.joints[i].primary_encoder)
-            {
-                config.SPI_streams[config.joints[i].primary_enc_position%2].numberof++;
-                config.SPI_streams[config.joints[i].primary_enc_position%2].type = hal_encoder_t1;
-            }
-
-            if(eo_appEncReader_enc_type_NONE != config.joints[i].extra_encoder)
-            {
-                config.SPI_streams[config.joints[i].extra_enc_position%2].numberof++;
-                config.SPI_streams[config.joints[i].extra_enc_position%2].type = hal_encoder_t1;
-            } 
-        }        
-    }
-    
-    s_eo_theencoderreader.reader = eo_appEncReader_New(&config);
-    
+//    memcpy(&s_eo_theencoderreader.arrayofjomodes, jomodes, sizeof(eOmn_serv_arrayof_4jomodescriptors_t));
+//                    
+//    s_eo_encoderreader_create_ereader(NULL, NULL);
+//    
+//
     eo_appEncReader_StartRead(s_eo_theencoderreader.reader);
                      
     s_eo_theencoderreader.active = eobool_true;        
@@ -421,6 +397,85 @@ static eo_appEncReader_encoder_position_t s_eo_encoderreader_GetEncoderPosition(
     }
     
     return(pos);    
+}
+
+
+
+static void s_eo_encoderreader_create_ereader(const eOmn_serv_arrayof_4jomodescriptors_t * jomodes, eOcallback_t callback, void* arg)
+{
+    memcpy(&s_eo_theencoderreader.arrayofjomodes, jomodes, sizeof(eOmn_serv_arrayof_4jomodescriptors_t));
+    
+    // now... use the servcfg
+    uint8_t i = 0;
+    
+    EOconstarray* carray = eo_constarray_Load((EOarray*)&s_eo_theencoderreader.arrayofjomodes);
+
+    uint8_t numofjomos = eo_constarray_Size(carray);
+    s_eo_theencoderreader.numofjomos = numofjomos;
+
+    #warning ----> i must convert from eOmn_serv_jomo_descriptor_t to encoder-reading values ...
+    
+    
+    eOappEncReader_cfg_t config = {0};
+    config.SPI_callbackOnLastRead = callback;
+    config.SPI_callback_arg = arg;
+    
+    for(i=0; i<eOappEncReader_joint_numberof; i++)
+    {
+        const eOmn_serv_jomo_descriptor_t *jomodes = (eOmn_serv_jomo_descriptor_t*) eo_constarray_At(carray, i);
+        
+        if(NULL == jomodes)
+        {   // i am beyond the number of jomos
+            config.joints[i].primary_encoder = config.joints[i].extra_encoder = eo_appEncReader_enc_type_NONE;
+            config.joints[i].primary_enc_position = config.joints[i].extra_enc_position = eo_appEncReader_encoder_positionNONE;
+        }
+        else 
+        {
+            // must convert things 
+            config.joints[i].primary_encoder = s_eo_encoderreader_GetEncoderType(jomodes->sensor.type);
+            config.joints[i].primary_enc_position = s_eo_encoderreader_GetEncoderPosition(jomodes->sensor.port);
+            config.joints[i].extra_encoder = s_eo_encoderreader_GetEncoderType(jomodes->extrasensor.type);
+            config.joints[i].extra_enc_position = s_eo_encoderreader_GetEncoderPosition(jomodes->extrasensor.port);        
+
+            if(eo_appEncReader_enc_type_NONE != config.joints[i].primary_encoder)
+            {
+                config.SPI_streams[config.joints[i].primary_enc_position%2].numberof++;
+                config.SPI_streams[config.joints[i].primary_enc_position%2].type = hal_encoder_t1;
+            }
+
+            if(eo_appEncReader_enc_type_NONE != config.joints[i].extra_encoder)
+            {
+                config.SPI_streams[config.joints[i].extra_enc_position%2].numberof++;
+                config.SPI_streams[config.joints[i].extra_enc_position%2].type = hal_encoder_t1;
+            } 
+        }        
+    }
+    
+    s_eo_theencoderreader.reader = eo_appEncReader_New(&config);
+    
+}
+
+
+static void readencoder(void* p)
+{
+    eObool_t readingisok = eobool_true;
+    
+    uint8_t i = 0;
+    
+    for(i=0; i< s_eo_theencoderreader.numofjomos; i++)
+    {
+        uint32_t primary = 0;
+        uint32_t secondary = 0;
+        hal_encoder_errors_flags errors = {0};
+        eo_appEncReader_GetJointValue(s_eo_theencoderreader.reader, i, &primary, &secondary, &errors);
+        if((0 != errors.chip_error) || (0 != errors.data_error) || (0 != errors.data_notready) || (0 != errors.tx_error))
+        {
+            readingisok = eobool_false;
+        }            
+    }
+    
+    
+    s_eo_encoderreader_onstop_verifyreading((void*)p, readingisok);   
 }
 
 

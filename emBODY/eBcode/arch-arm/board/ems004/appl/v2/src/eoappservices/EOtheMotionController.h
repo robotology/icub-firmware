@@ -78,10 +78,13 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
 extern eOresult_t eo_motioncontrol_Deactivate(EOtheMotionController *p);
 
 
+// to be called once before to be ticked
+extern eOresult_t eo_motioncontrol_Start(EOtheMotionController *p);
+
 // it ticks every ms of the control-loop
 extern eOresult_t eo_motioncontrol_Tick(EOtheMotionController *p);
 
-
+extern eOresult_t eo_motioncontrol_Stop(EOtheMotionController *p);
 
 /** @}            
     end of group eo_EOtheMotionController

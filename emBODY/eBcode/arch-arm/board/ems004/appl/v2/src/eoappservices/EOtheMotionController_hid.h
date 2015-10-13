@@ -58,6 +58,7 @@ struct EOtheMotionController_hid
     EOemsController*            controller;
     EOtheEncoderReader*         encoderreader;
     uint8_t                     numofjomos;
+    eOcandiscovery_onstop_t     ondiscoverystop;
 }; 
 
 

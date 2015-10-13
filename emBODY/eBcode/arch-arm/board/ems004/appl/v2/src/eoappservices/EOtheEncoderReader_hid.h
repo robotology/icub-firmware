@@ -31,6 +31,8 @@
 
 #include "EOappEncodersReader.h"
 
+#include "EOtimer.h"
+
 
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
@@ -43,13 +45,15 @@
 
 struct EOtheEncoderReader_hid
 {
-    eObool_t                    initted;
-    eObool_t                    active;
-    eOmn_serv_arrayof_4jomodescriptors_t   arrayofjomodes;
-    EOappEncReader*             reader;
-    eOappEncReader_cfg_t        readerconfig;
+    eObool_t                                initted;
+    eObool_t                                active;
+    eOmn_serv_arrayof_4jomodescriptors_t    arrayofjomodes;
+    EOappEncReader*                         reader;
+    eOappEncReader_cfg_t                    readerconfig;
     eOencoderreader_onendofoperation_fun_t  onverify;
-    eObool_t                    activateafterverify;
+    eObool_t                                activateafterverify;
+    EOtimer*                                waitreadtimer;
+    uint8_t                                 numofjomos;
 }; 
 
 
