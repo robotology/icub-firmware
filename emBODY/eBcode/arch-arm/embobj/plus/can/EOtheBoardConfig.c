@@ -1003,6 +1003,84 @@ const eOmn_serv_configuration_t serv_config_mc[] =
  
 };
 
+const eOmn_serv_configuration_t serv_config_mc_eb15[] =
+{
+    
+    {   // eb15
+        .type       = eomn_serv_MC_foc,
+        .filler     = {0},
+        .data.mc.foc_based = 
+        {
+            .boardtype4mccontroller = emscontroller_board_SHOULDER,
+            .filler                 = {0},
+            .versionoffoc    =
+            {
+                .firmware   = {0, 0},
+                .protocol   = {1, 3}
+            },
+            .arrayofjomodescriptors =
+            {
+                .head   = 
+                {
+                    .capacity       = 4,
+                    .itemsize       = 3,
+                    .size           = 1,
+                    .internalmem    = 0                    
+                },
+                .data   =
+                {
+                    { // joint 0
+                        .actuator.foc.canloc    =
+                        {
+                            .port           = eOcanport1,
+                            .addr           = 1,
+                            .insideindex    = eomn_serv_caninsideindex_first                             
+                        },
+                        .sensor         =
+                        {
+                            .type   = eomn_serv_mc_sensor_encoder_aea,
+                            .port   = eomn_serv_mc_port_ems_spiP6, // hal_encoder1   
+                            .pos    = eomn_serv_mc_sensor_pos_atjoint
+                        },
+                        .extrasensor    =
+                        {
+                            .type   = eomn_serv_mc_sensor_none,
+                            .port   = eomn_serv_mc_port_none,
+                            .pos    = eomn_serv_mc_sensor_pos_none
+                        }
+                    }
+ 
+//                    { // joint none
+//                        .actuator.foc.canloc    =
+//                        {
+//                            .port           = eOcanport1,
+//                            .addr           = 0,
+//                            .insideindex    = eomn_serv_caninsideindex_none                             
+//                        },
+//                        .sensor         =
+//                        {
+//                            .type   = eomn_serv_mc_sensor_none,
+//                            .port   = eomn_serv_mc_port_none, 
+//                            .pos    = eomn_serv_mc_sensor_pos_none
+//                        },
+//                        .extrasensor    =
+//                        {
+//                            .type   = eomn_serv_mc_sensor_none,
+//                            .port   = eomn_serv_mc_port_none,
+//                            .pos    = eomn_serv_mc_sensor_pos_none
+//                        }
+//                    }
+                    
+                    
+                }
+                
+                
+            }
+        }
+    }
+ 
+};
+
 
 extern const eOmn_serv_configuration_t * eoboardconfig_code2motion_serv_configuration(uint32_t code)
 {
@@ -1015,7 +1093,11 @@ extern const eOmn_serv_configuration_t * eoboardconfig_code2motion_serv_configur
             ret = &serv_config_mc[0]; 
         } break;  
 
-      
+        case 14:
+        {   // board eb15   
+            ret = &serv_config_mc_eb15[0]; 
+        } break;  
+        
         default:    
         {   // all the others
             ret = NULL;
@@ -1038,7 +1120,11 @@ extern const eOmn_serv_configuration_t * eoboardconfig_code2strain_serv_configur
             ret = &serv_config_as_strain[0]; 
         } break;  
 
-      
+        case 14:
+        {   // board eb15   
+            ret = &serv_config_as_strain[0]; 
+        } break;  
+        
         default:    
         {   // all the others
             ret = NULL;
@@ -1048,6 +1134,7 @@ extern const eOmn_serv_configuration_t * eoboardconfig_code2strain_serv_configur
 
     return(ret);        
 }
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
