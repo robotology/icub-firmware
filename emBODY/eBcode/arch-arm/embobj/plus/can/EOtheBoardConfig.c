@@ -823,7 +823,7 @@ const eOmn_serv_configuration_t serv_config_as_strain[] =
         .filler     = {0},
         .data.as.strain = 
         {
-            .versionofstrain    =
+            .version    =
             {
                 .firmware   = {0, 0},
                 .protocol   = {1, 0}
@@ -848,7 +848,7 @@ const eOmn_serv_configuration_t serv_config_as_strain[] =
         .filler     = {0},
         .data.as.strain = 
         {
-            .versionofstrain    =
+            .version    =
             {
                 .firmware   = {0, 0},
                 .protocol   = {1, 0}
@@ -881,7 +881,7 @@ const eOmn_serv_configuration_t serv_config_mc[] =
         {
             .boardtype4mccontroller = emscontroller_board_SHOULDER,
             .filler                 = {0},
-            .versionoffoc    =
+            .version   =
             {
                 .firmware   = {0, 0},
                 .protocol   = {1, 3}
@@ -1013,7 +1013,7 @@ const eOmn_serv_configuration_t serv_config_mc_eb15[] =
         {
             .boardtype4mccontroller = emscontroller_board_SHOULDER,
             .filler                 = {0},
-            .versionoffoc    =
+            .version    =
             {
                 .firmware   = {0, 0},
                 .protocol   = {1, 3}
