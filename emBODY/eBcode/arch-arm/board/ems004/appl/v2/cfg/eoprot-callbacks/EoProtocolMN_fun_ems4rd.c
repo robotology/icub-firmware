@@ -40,8 +40,8 @@
 
 // - for ems 
 #include "EOMtheEMSappl.h"
-#include "EOtheEMSapplBody.h"
-//#include "EOtheEMSapplDiagnostics.h"
+//#include "EOtheEMSapplBody.h"
+
 #include "EOtheErrorManager.h"
 
 #include "EoError.h"
@@ -441,7 +441,8 @@ static void s_eoprot_ep_mn_fun_querynumofcommand(eOmn_command_t* command)
             ropdesc.ropcode = eo_ropcode_sig;
             ropdesc.id32    = eoprot_ID_get(eoprot_endpoint_management, eoprot_entity_mn_comm, 0, eoprot_tag_mn_comm_cmmnds_command_replynumof);
             ropdesc.data    = NULL; // so that dat from teh EOnv is retrieved.
-            eo_transceiver_OccasionalROP_Load(theems00transceiver, &ropdesc);            
+            //eo_transceiver_OccasionalROP_Load(theems00transceiver, &ropdesc);    
+            eom_emsappl_Transmit_OccasionalROP(eom_emsappl_GetHandle(), &ropdesc);    // it also alert someone to send the rop        
         } break;
               
 
@@ -463,7 +464,8 @@ static void s_eoprot_ep_mn_fun_querynumofcommand(eOmn_command_t* command)
             ropdesc.ropcode = eo_ropcode_sig;
             ropdesc.id32    = eoprot_ID_get(eoprot_endpoint_management, eoprot_entity_mn_comm, 0, eoprot_tag_mn_comm_cmmnds_command_replynumof);
             ropdesc.data    = NULL; // so that dat from teh EOnv is retrieved.
-            eo_transceiver_OccasionalROP_Load(theems00transceiver, &ropdesc);            
+            //eo_transceiver_OccasionalROP_Load(theems00transceiver, &ropdesc);   
+            eom_emsappl_Transmit_OccasionalROP(eom_emsappl_GetHandle(), &ropdesc);            
         } break;
        
         
@@ -486,7 +488,8 @@ static void s_eoprot_ep_mn_fun_querynumofcommand(eOmn_command_t* command)
             ropdesc.ropcode = eo_ropcode_sig;
             ropdesc.id32    = eoprot_ID_get(eoprot_endpoint_management, eoprot_entity_mn_comm, 0, eoprot_tag_mn_comm_cmmnds_command_replynumof);
             ropdesc.data    = NULL; // so that data from the EOnv is retrieved.
-            eo_transceiver_OccasionalROP_Load(theems00transceiver, &ropdesc);
+            //eo_transceiver_OccasionalROP_Load(theems00transceiver, &ropdesc);
+            eom_emsappl_Transmit_OccasionalROP(eom_emsappl_GetHandle(), &ropdesc);
            
         } break;
  
@@ -552,7 +555,8 @@ static void s_eoprot_ep_mn_fun_queryarraycommand(eOmn_command_t* command)
             cmdreplyarray->opcpar.setnumber = setnumber;
             cmdreplyarray->opcpar.setsize   = setsize;
             eoprot_endpoints_array_get(eoprot_board_localboard, ep08array, setnumber*setsize);                      
-            eo_transceiver_OccasionalROP_Load(theems00transceiver, &ropdesc); 
+            //eo_transceiver_OccasionalROP_Load(theems00transceiver, &ropdesc); 
+            eom_emsappl_Transmit_OccasionalROP(eom_emsappl_GetHandle(), &ropdesc);
            
         } break;      
 
@@ -580,7 +584,8 @@ static void s_eoprot_ep_mn_fun_queryarraycommand(eOmn_command_t* command)
             cmdreplyarray->opcpar.setnumber = setnumber;
             cmdreplyarray->opcpar.setsize   = setsize;
             eoprot_endpoints_arrayofdescriptors_get(eoprot_board_localboard, epdesarray, setnumber*setsize);                      
-            eo_transceiver_OccasionalROP_Load(theems00transceiver, &ropdesc); 
+            //eo_transceiver_OccasionalROP_Load(theems00transceiver, &ropdesc); 
+            eom_emsappl_Transmit_OccasionalROP(eom_emsappl_GetHandle(), &ropdesc);
            
         } break;           
 
@@ -617,7 +622,8 @@ static void s_eoprot_ep_mn_fun_queryarraycommand(eOmn_command_t* command)
                 eoprot_entities_in_endpoint_arrayofdescriptors_get(eoprot_board_localboard, endpoint, endesarray, setnumber*setsize);
             }
             
-            eo_transceiver_OccasionalROP_Load(theems00transceiver, &ropdesc); 
+            //eo_transceiver_OccasionalROP_Load(theems00transceiver, &ropdesc); 
+            eom_emsappl_Transmit_OccasionalROP(eom_emsappl_GetHandle(), &ropdesc);
 
            
         } break;  
@@ -658,7 +664,8 @@ static void s_eoprot_ep_mn_fun_queryarraycommand(eOmn_command_t* command)
                 eo_transceiver_RegularROP_ArrayID32GetWithEP(theems00transceiver, endpoint, setnumber*setsize, id32array);
             }
             
-            eo_transceiver_OccasionalROP_Load(theems00transceiver, &ropdesc); 
+            //eo_transceiver_OccasionalROP_Load(theems00transceiver, &ropdesc); 
+            eom_emsappl_Transmit_OccasionalROP(eom_emsappl_GetHandle(), &ropdesc);
            
         } break;         
         
