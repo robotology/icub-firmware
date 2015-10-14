@@ -135,8 +135,11 @@ static void s_eom_emsrunner_update_diagnosticsinfo_error_timing(void);
 static void s_eom_emsrunner_update_diagnosticsinfo_exeoverflows(eOemsrunner_taskid_t taskid);
 static void s_eom_emsrunner_update_diagnosticsinfo_txfailure(void);
 static void s_eom_emsrunner_update_diagnosticsinfo_check_overflows(eOemsrunner_taskid_t taskid);
+
+#ifdef SEND_STATISTICS_INFO
 static void s_eom_emsrunner_send_diagnosticsinfo_average_timing(void);
 static void s_eom_emsrunner_send_diagnosticsinfo_maxmin_timing(void);
+#endif
 
 static eObool_t s_eom_emsrunner_timing_is_compatible(const eOemsrunner_cfg_t *cfg);
 
@@ -252,7 +255,7 @@ extern EOMtheEMSrunner * eom_emsrunner_Initialise(const eOemsrunner_cfg_t *cfg)
     memcpy(&s_theemsrunner.haltimer_start, cfg->haltimerstart, sizeof(s_theemsrunner.haltimer_start));
     memcpy(&s_theemsrunner.haltimer_alert, cfg->haltimeralert, sizeof(s_theemsrunner.haltimer_alert));
     // verify that they are all different
-    #warning TODO: in eom_emsrunner_Initialise() you may write code to check that all 6 hal timers are different
+    //#warning TODO: in eom_emsrunner_Initialise() you may write code to check that all 6 hal timers are different
     
     s_theemsrunner.cycleisrunning = eobool_false; 
     
@@ -790,7 +793,7 @@ __weak extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransm
 
 __weak extern void eom_emsrunner_hid_userdef_onexecutionoverflow(EOMtheEMSrunner *p, eOemsrunner_taskid_t taskid, uint64_t starttime, uint64_t nowtime)
 {
-    const char * tskname[] = {"tskRX", "tskDO", "tskTX"};
+//    const char * tskname[] = {"tskRX", "tskDO", "tskTX"};
     const uint32_t errcode[] = {eo_errman_code_sys_ctrloop_execoverflowRX, eo_errman_code_sys_ctrloop_execoverflowDO, eo_errman_code_sys_ctrloop_execoverflowTX};
     //char str[64];
     eOerrmanErrorType_t errortype = (eo_emsrunner_mode_hardrealtime == p->mode) ? (eo_errortype_error) : (eo_errortype_warning);
@@ -800,7 +803,7 @@ __weak extern void eom_emsrunner_hid_userdef_onexecutionoverflow(EOMtheEMSrunner
     errdes.code             = errcode[taskid];
     errdes.par16            = (delta > 0xffff) ? (0xffff) : (delta);
     errdes.par64            = 0;
-    #warning marco.accame: think about putting in par64 also other timings ... 
+//    #warning marco.accame: think about putting in par64 also other timings ... 
     errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
     errdes.sourceaddress    = 0;    
     //eo_errman_Error(eo_errman_GetHandle(), errortype, str, s_eobj_ownname, &errdes); 
@@ -1307,7 +1310,7 @@ static void s_eom_emsrunner_6HALTIMERS_start_rxdotx_cycle_ultrabasic(osal_timer_
 static void s_eom_emsrunner_6HALTIMERS_start_task_ultrabasic(void *arg)
 {
     eOemsrunner_taskid_t currtaskid = (eOemsrunner_taskid_t) (int32_t)arg;
-    eOemsrunner_taskid_t prevtaskid = (eo_emsrunner_taskid_runRX == currtaskid) ? (eo_emsrunner_taskid_runTX) : ((eOemsrunner_taskid_t)((uint8_t)currtaskid-1));
+//    eOemsrunner_taskid_t prevtaskid = (eo_emsrunner_taskid_runRX == currtaskid) ? (eo_emsrunner_taskid_runTX) : ((eOemsrunner_taskid_t)((uint8_t)currtaskid-1));
 #if defined(EVIEWER_ENABLED)    
     evEntityId_t preventityid = eventviewer_switch_to(EVIEWER_IDofTSKstart(currtaskid));
 #endif
@@ -1453,6 +1456,7 @@ static void s_eom_emsrunner_update_diagnosticsinfo_txfailure(void)
      s_eom_emsrunner_diagnosticsinfo.datagrams_failed_to_go_in_txsocket ++;
 }
 
+#ifdef SEND_STATISTICS_INFO
 static void s_eom_emsrunner_send_diagnosticsinfo_average_timing(void)
 {
 	eOerrmanDescriptor_t errdes = {0};
@@ -1479,8 +1483,10 @@ static void s_eom_emsrunner_send_diagnosticsinfo_average_timing(void)
 	eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);
 		
 	s_eom_emsrunner_diagnosticsinfo.average_et[eo_emsrunner_taskid_runRX] = 0, s_eom_emsrunner_diagnosticsinfo.average_et[eo_emsrunner_taskid_runDO] = 0, s_eom_emsrunner_diagnosticsinfo.average_et[eo_emsrunner_taskid_runTX] = 0;
-	}
+}
+#endif
 
+#ifdef SEND_STATISTICS_INFO
 static void s_eom_emsrunner_send_diagnosticsinfo_maxmin_timing(void)
 {
 	eOerrmanDescriptor_t errdes = {0};
@@ -1531,7 +1537,8 @@ static void s_eom_emsrunner_send_diagnosticsinfo_maxmin_timing(void)
 	
 	//reset the iteration counter
 	s_theemsrunner.iterationnumber = 0;
-	}
+}
+#endif
 
 static void s_eom_emsrunner_update_diagnosticsinfo_check_overflows(eOemsrunner_taskid_t taskid)
 {

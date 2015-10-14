@@ -180,7 +180,7 @@ extern eOresult_t eom_emserror_SetFatalError(EOMtheEMSerror *p, const eOerrmanDe
     
     s_emserror_singleton.errordescriptor.par16 = s_emserror_singleton.numberoffatalerrors;
     s_emserror_singleton.errordescriptor.par64 = 0;
-    #warning marco.accame: we could use a par64 to send to robotinterface some more info about the fatal error. think of it
+    //#warning marco.accame: we could use a par64 to send to robotinterface some more info about the fatal error. think of it
     // send fatal error event.
    
     return(eores_OK);    
