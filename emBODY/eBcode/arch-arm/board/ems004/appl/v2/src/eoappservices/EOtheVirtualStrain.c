@@ -32,7 +32,7 @@
 #include "EOtheCANmapping.h"
 #include "EOtheCANprotocol.h"
 
-#include "EOtheEMSapplBody.h"
+//#include "EOtheEMSapplBody.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -84,7 +84,7 @@
 static EOtheVirtualStrain s_eo_thevirtualstrain = 
 {
     .initted                    = eobool_false,
-    .itismc4can                 = eobool_false,
+//    .itismc4can                 = eobool_false,
     .location                   = {0},
     .torques                    = {0},
     .thereisanewvalueoftorque   = eobool_false,
@@ -109,17 +109,17 @@ extern EOtheVirtualStrain* eo_virtualstrain_Initialise(void)
         return(&s_eo_thevirtualstrain);
     }
         
-    EOtheEMSapplBody* emsappbody_ptr = eo_emsapplBody_GetHandle();
-    eOmn_appl_runMode_t runmode = eo_emsapplBody_GetAppRunMode(emsappbody_ptr);
+//    EOtheEMSapplBody* emsappbody_ptr = eo_emsapplBody_GetHandle();
+//    eOmn_appl_runMode_t runmode = eo_emsapplBody_GetAppRunMode(emsappbody_ptr);
     
-    if((applrunMode__mc4Only == runmode) || (applrunMode__skinAndMc4 == runmode))
-    {
-        s_eo_thevirtualstrain.itismc4can = eobool_true;
-    }
-    else
-    {
-        s_eo_thevirtualstrain.itismc4can = eobool_false;
-    }
+//    if((applrunMode__mc4Only == runmode) || (applrunMode__skinAndMc4 == runmode))
+//    {
+//        s_eo_thevirtualstrain.itismc4can = eobool_true;
+//    }
+//    else
+//    {
+//        s_eo_thevirtualstrain.itismc4can = eobool_false;
+//    }
     
 
     s_eo_thevirtualstrain.location.port = eOcanport1;   // or one can read the location of the first joint ... as in next two lines
@@ -163,10 +163,10 @@ extern eOresult_t eo_virtualstrain_SetTorque(EOtheVirtualStrain *p, eOprotIndex_
         return(eores_NOK_nullpointer);
     }
 
-    if(eobool_false == s_eo_thevirtualstrain.itismc4can)
-    {   // nothing to do because we dont have a mc4can board
-        return(eores_OK);
-    }
+//    if(eobool_false == s_eo_thevirtualstrain.itismc4can)
+//    {   // nothing to do because we dont have a mc4can board
+//        return(eores_OK);
+//    }
      
     if(jindex >= 3)
     {
@@ -186,10 +186,10 @@ extern eOresult_t eo_virtualstrain_Tick(EOtheVirtualStrain *p)
         return(eores_NOK_nullpointer);
     }
 
-    if(eobool_false == s_eo_thevirtualstrain.itismc4can)
-    {   // nothing to do because we dont have a mc4can board
-        return(eores_OK);
-    }
+//    if(eobool_false == s_eo_thevirtualstrain.itismc4can)
+//    {   // nothing to do because we dont have a mc4can board
+//        return(eores_OK);
+//    }
     
     
     // we impose not to tx the torques, unless ... see further
