@@ -842,11 +842,6 @@
               <FilePath>..\..\..\..\..\embobj\plus\can\EOtheBoardConfig.c</FilePath>
             </File>
             <File>
-              <FileName>EOtheEMSapplBody.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\eoappservices\EOtheEMSapplBody.c</FilePath>
-            </File>
-            <File>
               <FileName>EOtheMotionDone.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\eoappservices\EOtheMotionDone.c</FilePath>
@@ -2212,11 +2207,6 @@
               <FileName>EOtheBoardConfig.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\embobj\plus\can\EOtheBoardConfig.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOtheEMSapplBody.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\eoappservices\EOtheEMSapplBody.c</FilePath>
             </File>
             <File>
               <FileName>EOtheMotionDone.c</FileName>
