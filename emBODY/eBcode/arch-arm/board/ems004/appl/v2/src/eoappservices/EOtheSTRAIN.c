@@ -173,10 +173,10 @@ extern eOresult_t eo_strain_Verify(EOtheSTRAIN *p, const eOmn_serv_configuration
 
 
     s_eo_thestrain.candiscoverytarget.boardtype = eobrd_cantype_strain;
-    s_eo_thestrain.candiscoverytarget.protocolversion.major = servcfg->data.as.strain.versionofstrain.protocol.major; 
-    s_eo_thestrain.candiscoverytarget.protocolversion.minor = servcfg->data.as.strain.versionofstrain.protocol.minor;
-    s_eo_thestrain.candiscoverytarget.firmwareversion.major = servcfg->data.as.strain.versionofstrain.firmware.major; 
-    s_eo_thestrain.candiscoverytarget.firmwareversion.minor = servcfg->data.as.strain.versionofstrain.firmware.minor;    
+    s_eo_thestrain.candiscoverytarget.protocolversion.major = servcfg->data.as.strain.version.protocol.major; 
+    s_eo_thestrain.candiscoverytarget.protocolversion.minor = servcfg->data.as.strain.version.protocol.minor;
+    s_eo_thestrain.candiscoverytarget.firmwareversion.major = servcfg->data.as.strain.version.firmware.major; 
+    s_eo_thestrain.candiscoverytarget.firmwareversion.minor = servcfg->data.as.strain.version.firmware.minor;    
     s_eo_thestrain.candiscoverytarget.canmap[servcfg->data.as.strain.canloc.port] = 0x0001 << servcfg->data.as.strain.canloc.addr; 
         
 
@@ -271,7 +271,7 @@ extern eOresult_t eo_strain_Activate(EOtheSTRAIN *p, const eOmn_serv_configurati
         {
             .type               = eobrd_cantype_strain, 
             .location           = { .port = servcfg->data.as.strain.canloc.port, .addr = servcfg->data.as.strain.canloc.addr, .insideindex = eocanmap_insideindex_none },
-            .requiredprotocol   = { .major = servcfg->data.as.strain.versionofstrain.protocol.major, .minor = servcfg->data.as.strain.versionofstrain.protocol.minor }
+            .requiredprotocol   = { .major = servcfg->data.as.strain.version.protocol.major, .minor = servcfg->data.as.strain.version.protocol.minor }
         };       
         eo_vector_PushBack(s_eo_thestrain.canboardproperties, &prop);
         
@@ -436,7 +436,7 @@ extern eOresult_t eo_strain_SetMode(EOtheSTRAIN *p, eOas_strainmode_t mode)
           
     // now, i do things. 
 
-    eOsmStatesEMSappl_t currentstate = eo_sm_emsappl_STerr;
+//    eOsmStatesEMSappl_t currentstate = eo_sm_emsappl_STerr;
 
     //eOcanprot_command_t s_eo_thestrain.command = {0};
     s_eo_thestrain.command.class = eocanprot_msgclass_pollingAnalogSensor;
