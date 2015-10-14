@@ -62,6 +62,8 @@
 #include "EoProtocol.h"
 #include "EoProtocolMN.h"
 
+#include "EOMtheEMStransceiver.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -405,6 +407,23 @@ extern eOresult_t eom_emsappl_SendTXRequest(EOMtheEMSappl *p)
         } break;
 
     }
+    return(res);
+}
+
+
+extern eOresult_t eom_emsappl_Transmit_OccasionalROP(EOMtheEMSappl *p, eOropdescriptor_t *ropdes)
+{
+    if((NULL == p) || (NULL == ropdes))
+    {
+        return(eores_NOK_nullpointer);
+    } 
+
+    eOresult_t res = eores_NOK_generic;   
+
+    res = eo_transceiver_OccasionalROP_Load(eom_emstransceiver_GetTransceiver(eom_emstransceiver_GetHandle()), ropdes); 
+    
+    eom_emsappl_SendTXRequest(p);
+    
     return(res);
 }
 
