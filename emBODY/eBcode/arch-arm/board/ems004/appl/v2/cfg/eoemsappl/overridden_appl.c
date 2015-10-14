@@ -29,7 +29,7 @@
 #include "EOMtheEMSappl_hid.h"
 #include "EOMtheEMSapplCfg.h"
 
-#include "EOtheEMSapplBody.h"
+//#include "EOtheEMSapplBody.h"
 
 #include "EOaction.h"
 #include "hl_bits.h"
@@ -94,69 +94,69 @@
 // --------------------------------------------------------------------------------------------------------------------
    
 
-static const eOemsapplbody_cfg_t theemsapplbodycfg =
-{
-    .encoderreaderconfig    =
-    {
-        .joints = 
-        {   // at most 6 joints can be managed. one with an encoder each 
-            {   // pos 0
-                .primary_encoder        = eo_appEncReader_enc_type_NONE,
-                .primary_enc_position   = eo_appEncReader_encoder_positionNONE,
-                .extra_encoder          = eo_appEncReader_enc_type_NONE,
-                .extra_enc_position     = eo_appEncReader_encoder_positionNONE                
-            },
-            {   // pos 1
-                .primary_encoder        = eo_appEncReader_enc_type_NONE,
-                .primary_enc_position   = eo_appEncReader_encoder_positionNONE,
-                .extra_encoder          = eo_appEncReader_enc_type_NONE,
-                .extra_enc_position     = eo_appEncReader_encoder_positionNONE                
-            },
-            {   // pos 2
-                .primary_encoder        = eo_appEncReader_enc_type_NONE,
-                .primary_enc_position   = eo_appEncReader_encoder_positionNONE,
-                .extra_encoder          = eo_appEncReader_enc_type_NONE,
-                .extra_enc_position     = eo_appEncReader_encoder_positionNONE                
-            },
-            {   // pos 3
-                .primary_encoder        = eo_appEncReader_enc_type_NONE,
-                .primary_enc_position   = eo_appEncReader_encoder_positionNONE,
-                .extra_encoder          = eo_appEncReader_enc_type_NONE,
-                .extra_enc_position     = eo_appEncReader_encoder_positionNONE                
-            }, 
-            {   // pos 4
-                .primary_encoder        = eo_appEncReader_enc_type_NONE,
-                .primary_enc_position   = eo_appEncReader_encoder_positionNONE,
-                .extra_encoder          = eo_appEncReader_enc_type_NONE,
-                .extra_enc_position     = eo_appEncReader_encoder_positionNONE                
-            },
-            {   // pos 5
-                .primary_encoder        = eo_appEncReader_enc_type_NONE,
-                .primary_enc_position   = eo_appEncReader_encoder_positionNONE,
-                .extra_encoder          = eo_appEncReader_enc_type_NONE,
-                .extra_enc_position     = eo_appEncReader_encoder_positionNONE                
-            }            
-        },
-        .SPI_streams    =
-        {   // at most 2 streams: one over spix and one over spiy
-            {
-                .type       = hal_encoder_tundefined, // or hal_encoder_t1 for aea
-                .numberof   = 0
-            },
-            {
-                .type       = hal_encoder_tundefined, // or hal_encoder_t1 for aea
-                .numberof   = 0
-            }
-        },
-        .SPI_callbackOnLastRead = NULL,
-        .SPI_callback_arg       = NULL       
-    }
-};
+//static const eOemsapplbody_cfg_t theemsapplbodycfg =
+//{
+//    .encoderreaderconfig    =
+//    {
+//        .joints = 
+//        {   // at most 6 joints can be managed. one with an encoder each 
+//            {   // pos 0
+//                .primary_encoder        = eo_appEncReader_enc_type_NONE,
+//                .primary_enc_position   = eo_appEncReader_encoder_positionNONE,
+//                .extra_encoder          = eo_appEncReader_enc_type_NONE,
+//                .extra_enc_position     = eo_appEncReader_encoder_positionNONE                
+//            },
+//            {   // pos 1
+//                .primary_encoder        = eo_appEncReader_enc_type_NONE,
+//                .primary_enc_position   = eo_appEncReader_encoder_positionNONE,
+//                .extra_encoder          = eo_appEncReader_enc_type_NONE,
+//                .extra_enc_position     = eo_appEncReader_encoder_positionNONE                
+//            },
+//            {   // pos 2
+//                .primary_encoder        = eo_appEncReader_enc_type_NONE,
+//                .primary_enc_position   = eo_appEncReader_encoder_positionNONE,
+//                .extra_encoder          = eo_appEncReader_enc_type_NONE,
+//                .extra_enc_position     = eo_appEncReader_encoder_positionNONE                
+//            },
+//            {   // pos 3
+//                .primary_encoder        = eo_appEncReader_enc_type_NONE,
+//                .primary_enc_position   = eo_appEncReader_encoder_positionNONE,
+//                .extra_encoder          = eo_appEncReader_enc_type_NONE,
+//                .extra_enc_position     = eo_appEncReader_encoder_positionNONE                
+//            }, 
+//            {   // pos 4
+//                .primary_encoder        = eo_appEncReader_enc_type_NONE,
+//                .primary_enc_position   = eo_appEncReader_encoder_positionNONE,
+//                .extra_encoder          = eo_appEncReader_enc_type_NONE,
+//                .extra_enc_position     = eo_appEncReader_encoder_positionNONE                
+//            },
+//            {   // pos 5
+//                .primary_encoder        = eo_appEncReader_enc_type_NONE,
+//                .primary_enc_position   = eo_appEncReader_encoder_positionNONE,
+//                .extra_encoder          = eo_appEncReader_enc_type_NONE,
+//                .extra_enc_position     = eo_appEncReader_encoder_positionNONE                
+//            }            
+//        },
+//        .SPI_streams    =
+//        {   // at most 2 streams: one over spix and one over spiy
+//            {
+//                .type       = hal_encoder_tundefined, // or hal_encoder_t1 for aea
+//                .numberof   = 0
+//            },
+//            {
+//                .type       = hal_encoder_tundefined, // or hal_encoder_t1 for aea
+//                .numberof   = 0
+//            }
+//        },
+//        .SPI_callbackOnLastRead = NULL,
+//        .SPI_callback_arg       = NULL       
+//    }
+//};
 
 const EOVtheEMSapplCfgBody theapplbodyconfig = 
 {
     .type               =   0,
-    .thetrueconfig      =   (void*) &theemsapplbodycfg
+    .thetrueconfig      =   NULL
 };
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -520,8 +520,6 @@ extern void eom_emsappl_hid_userdef_on_exit_CFG(EOMtheEMSappl* p)
 
 extern void eom_emsappl_hid_userdef_on_entry_RUN(EOMtheEMSappl* p)
 {
-    eOresult_t res = eores_NOK_generic;
-    
     // pulse led3 forever at 1 hz.
     eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_three, EOK_reltime1sec/1, 0);  
     
@@ -535,7 +533,8 @@ extern void eom_emsappl_hid_userdef_on_entry_RUN(EOMtheEMSappl* p)
     eo_motioncontrol_Start(eo_motioncontrol_GetHandle());
     
     
-#if 0    
+#if 0  
+    eOresult_t res = eores_NOK_generic;    
     // enable joints
     res = eo_emsapplBody_EnableTxAllJointOnCan(eo_emsapplBody_GetHandle());
     if (eores_NOK_generic == res)
