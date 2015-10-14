@@ -41,11 +41,20 @@
 
 struct EOtheMAIS_hid
 {
-    eObool_t            initted;
-    eObool_t            thereismais;
-    uint8_t             protindex;
-    eOprotID32_t        id32;
-    eOcanprot_command_t command;
+    eObool_t                        initted;
+    eObool_t                        active;
+    eObool_t                        thereismais;
+    uint8_t                         protindex;
+    eOprotID32_t                    id32;
+    eOcanprot_command_t             command;
+    EOvector*                       canboardproperties;
+    EOvector*                       canentitydescriptor;
+    eOmn_serv_configuration_t       servconfig;
+    eOcandiscovery_target_t         candiscoverytarget;
+    eOmais_onendofoperation_fun_t   onverify;
+    eObool_t                        activateafterverify;
+    eObool_t                        itistransmitting;
+    eOas_mais_t*                    mais;    
 }; 
 
 

@@ -49,6 +49,9 @@
 typedef struct EOtheMAIS_hid EOtheMAIS;
 
 
+typedef eOresult_t (*eOmais_onendofoperation_fun_t) (EOtheMAIS* p, eObool_t operationisok);
+
+
    
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------
 // empty-section
@@ -59,20 +62,30 @@ extern EOtheMAIS* eo_mais_Initialise(void);
 
 extern EOtheMAIS* eo_mais_GetHandle(void);
 
-// so far only the start is implemented
+extern eOresult_t eo_mais_Verify(EOtheMAIS *p, const eOmn_serv_configuration_t * servcfg, eOmais_onendofoperation_fun_t onverify, eObool_t activateafterverify);
+
+// it activates the mais service by loading the service configuration
+extern eOresult_t eo_mais_Activate(EOtheMAIS *p, const eOmn_serv_configuration_t * servcfg);
+
+// it deactivates service.
+extern eOresult_t eo_mais_Deactivate(EOtheMAIS *p);
+
+
+// Start() take
 extern eOresult_t eo_mais_Start(EOtheMAIS *p);
 
+extern eOresult_t eo_mais_TXstart(EOtheMAIS *p, uint8_t datarate, eOas_maismode_t mode, eOas_maisresolution_t resolution);
 
-extern eOresult_t eo_mais_Config(EOtheMAIS *p, eOas_mais_config_t* maiscfg);
+extern eOresult_t eo_mais_TXstop(EOtheMAIS *p);
 
-extern eOresult_t eo_mais_ConfigMode(EOtheMAIS *p, eOas_maismode_t mode);
+extern eOresult_t eo_mais_Set(EOtheMAIS *p, eOas_mais_config_t* maiscfg);
 
-extern eOresult_t eo_mais_ConfigDataRate(EOtheMAIS *p, uint8_t datarate);
+extern eOresult_t eo_mais_SetMode(EOtheMAIS *p, eOas_maismode_t mode);
 
-extern eOresult_t eo_mais_ConfigResolution(EOtheMAIS *p, eOas_maisresolution_t resolution);
+extern eOresult_t eo_mais_SetDataRate(EOtheMAIS *p, uint8_t datarate);
 
+extern eOresult_t eo_mais_SetResolution(EOtheMAIS *p, eOas_maisresolution_t resolution);
 
-extern eOresult_t eo_mais_OnDiscoveryStop(EOtheMAIS *p, EOtheCANdiscovery2 *discovery2, eObool_t searchisok);
 
 
 /** @}            
