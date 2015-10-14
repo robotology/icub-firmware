@@ -49,7 +49,7 @@ struct EOtheEncoderReader_hid
     eObool_t                                active;
     eOmn_serv_arrayof_4jomodescriptors_t    arrayofjomodes;
     EOappEncReader*                         reader;
-    eOappEncReader_cfg_t                    readerconfig;
+    //eOappEncReader_cfg_t                    readerconfig;
     eOencoderreader_onendofoperation_fun_t  onverify;
     eObool_t                                activateafterverify;
     EOtimer*                                waitreadtimer;
