@@ -16,6 +16,7 @@
  * Public License for more details
 */
 
+#error dont use it in this build
 
 // - include guard ----------------------------------------------------------------------------------------------------
 #ifndef _EOTHEEMASAPPLBODY_H_
