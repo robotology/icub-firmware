@@ -88,6 +88,7 @@ __weak extern eObool_t eocanprotSKperiodic_redefinable_SkipParsingOf_ANY_PERIODI
     return(eobool_false);
 }
 
+#warning TODO: marco.accame: let the parser give the skin can frame to EOtheSKIN. it will put them inside a suitable buffer. if overflow it will tell.
 extern eOresult_t eocanprotSKperiodic_parser_ANY_PERIODIC_SKIN_MSG(eOcanframe_t *frame, eOcanport_t port)
 {   
     // this can frame is from skin only ... i dont do the check that the board must be a skin
