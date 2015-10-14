@@ -51,7 +51,17 @@ typedef struct EOtheMotionController_hid EOtheMotionController;
 
 typedef eOresult_t (*eOmotcon_onendofoperation_fun_t) (EOtheMotionController* p, eObool_t operationisok);
 
-enum { eo_motcon_maxCANboards = 13, eo_motcon_maxENTITIES = 12 };
+enum { eo_motcon_maxCANboards = 13, eo_motcon_maxJOMOs = 12 };
+
+
+typedef enum
+{
+    eo_motcon_mode_NONE         = eomn_serv_NONE,
+    eo_motcon_mode_foc          = eomn_serv_MC_foc,
+    eo_motcon_mode_mc4          = eomn_serv_MC_mc4,
+    eo_motcon_mode_mc4plsu      = eomn_serv_MC_mc4plus,
+    eo_motcon_mode_mc4plusmais  = eomn_serv_MC_mc4plusmais   
+} eOmotioncontroller_mode_t;
    
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------
 // empty-section
@@ -64,6 +74,9 @@ enum { eo_motcon_maxCANboards = 13, eo_motcon_maxENTITIES = 12 };
 extern EOtheMotionController* eo_motioncontrol_Initialise(void);
 
 extern EOtheMotionController* eo_motioncontrol_GetHandle(void);
+
+
+extern eOmotioncontroller_mode_t eo_motioncontrol_GetMode(EOtheMotionController *p);
 
 
 

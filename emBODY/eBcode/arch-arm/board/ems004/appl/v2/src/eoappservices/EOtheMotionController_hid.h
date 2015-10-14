@@ -30,8 +30,14 @@
 #include "EoCommon.h"
 #include "EOtheCANprotocol.h"
 #include "EOtheCANdiscovery2.h"
+
 #include "EOemsController.h"
 #include "EOtheEncoderReader.h"
+
+#include "EOtheMAIS.h"
+#include "EOtheMC4boards.h"
+#include "EOtheMotionDone.h"
+#include "EOtheVirtualStrain.h"
 
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
@@ -44,21 +50,26 @@
 
 struct EOtheMotionController_hid
 {
-    eObool_t                    initted;
-    eObool_t                    active;
-    uint8_t                     protindex;
-    eOprotID32_t                id32;
-    eOcanprot_command_t         command;
-    EOvector*                   canboardproperties;
-    EOvector*                   canentitydescriptor;
-    eOmn_serv_configuration_t   servconfig;
-    eOcandiscovery_target_t     candiscoverytarget;
-    eOmotcon_onendofoperation_fun_t     onverify;
-    eObool_t                    activateafterverify;
-    EOemsController*            controller;
-    EOtheEncoderReader*         encoderreader;
-    uint8_t                     numofjomos;
-    eOcandiscovery_onstop_t     ondiscoverystop;
+    eObool_t                        initted;
+    eObool_t                        active;
+    eObool_t                        started;
+    uint8_t                         numofjomos;
+    eOmn_serv_configuration_t       servconfig;
+    
+    // they are for mc (foc or mc4 boards)
+    EOvector*                       canboardproperties;
+    EOvector*                       canentitydescriptor;
+    eOcandiscovery_target_t         candiscoverytarget;
+    eOmotcon_onendofoperation_fun_t onverify;
+    eObool_t                        activateafterverify;
+    eOcandiscovery_onstop_t         ondiscoverystop;
+    // they are for foc-based mc only
+    EOemsController*                controller;
+    EOtheEncoderReader*             encoderreader;
+    // they are for mc4-based mc only
+    EOtheMAIS*                      mais;  
+    eOmn_serv_configuration_t       servconfigmais;
+    EOtheMC4boards*                 mc4boards;
 }; 
 
 
