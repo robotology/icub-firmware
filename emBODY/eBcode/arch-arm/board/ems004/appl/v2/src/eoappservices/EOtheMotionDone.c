@@ -32,7 +32,7 @@
 #include "EOtheCANmapping.h"
 #include "EOtheCANprotocol.h"
 
-#include "EOtheEMSapplBody.h"
+//#include "EOtheEMSapplBody.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -79,7 +79,7 @@
 static EOtheMotionDone s_eo_themotiondone = 
 {
     .initted            = eobool_false,
-    .itismc4can         = eobool_false,
+//    .itismc4can         = eobool_false,
     .currjoint          = 0,
     .numofjoints        = 0,
     .motiondonecommand  = {0}
@@ -104,17 +104,17 @@ extern EOtheMotionDone* eo_motiondone_Initialise(void)
     s_eo_themotiondone.currjoint = 0;
     s_eo_themotiondone.numofjoints = eo_entities_NumOfJoints(eo_entities_GetHandle());
     
-    EOtheEMSapplBody* emsappbody_ptr = eo_emsapplBody_GetHandle();
-    eOmn_appl_runMode_t runmode = eo_emsapplBody_GetAppRunMode(emsappbody_ptr);
-    
-    if((applrunMode__mc4Only == runmode) || (applrunMode__skinAndMc4 == runmode))
-    {
-        s_eo_themotiondone.itismc4can = eobool_true;
-    }
-    else
-    {
-        s_eo_themotiondone.itismc4can = eobool_false;
-    }
+//    EOtheEMSapplBody* emsappbody_ptr = eo_emsapplBody_GetHandle();
+//    eOmn_appl_runMode_t runmode = eo_emsapplBody_GetAppRunMode(emsappbody_ptr);
+//    
+//    if((applrunMode__mc4Only == runmode) || (applrunMode__skinAndMc4 == runmode))
+//    {
+//        s_eo_themotiondone.itismc4can = eobool_true;
+//    }
+//    else
+//    {
+//        s_eo_themotiondone.itismc4can = eobool_false;
+//    }
     
     s_eo_themotiondone.motiondonecommand.class = eocanprot_msgclass_pollingMotorControl;    
     s_eo_themotiondone.motiondonecommand.type  = ICUBCANPROTO_POL_MC_CMD__MOTION_DONE;
@@ -138,10 +138,10 @@ extern eOresult_t eo_motiondone_Tick(EOtheMotionDone *p)
         return(eores_NOK_nullpointer);
     }
     
-    if(eobool_false == s_eo_themotiondone.itismc4can)
-    {   // nothing to do because we dont have a mc4can board
-        return(eores_OK);
-    }
+//    if(eobool_false == s_eo_themotiondone.itismc4can)
+//    {   // nothing to do because we dont have a mc4can board
+//        return(eores_OK);
+//    }
     
     // now, i do things. 
     // i cycle all the joints, one at a time. and in some cases i send a can frame to the relevant board

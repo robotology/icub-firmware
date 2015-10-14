@@ -42,7 +42,7 @@
 struct EOtheMotionDone_hid
 {
     eObool_t            initted;
-    eObool_t            itismc4can;
+//    eObool_t            itismc4can;
     uint8_t             currjoint;
     uint8_t             numofjoints;
     eOcanprot_command_t motiondonecommand;   
