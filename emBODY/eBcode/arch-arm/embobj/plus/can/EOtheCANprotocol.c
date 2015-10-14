@@ -75,6 +75,8 @@ const eOcanprot_cfg_t eo_canprot_DefaultCfg =
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
+static eObool_t s_eo_canprot_filter_sourceaddress(eOcanframe_t *frame);
+
 static eOresult_t s_eo_canprot_parse0length(eOcanframe_t *frame, eOcanport_t port);
 
 //static eOresult_t s_eo_canprot_search4exceptions(eOcanframe_t *frame, eOcanport_t port);
@@ -1259,6 +1261,12 @@ extern eOresult_t eo_canprot_Parse(EOtheCANprotocol *p, eOcanframe_t *frame, eOc
         return(eores_NOK_nullpointer);
     }
     
+    // discard messages from some addresses
+    if(eobool_true == s_eo_canprot_filter_sourceaddress(frame))
+    {
+        return(eores_OK);
+    }     
+    
     if(eobool_true == s_eo_canprot_isit_exception(frame, port, &res))
     {   // in here we manage for instance the mais error.
         return(res);
@@ -1273,7 +1281,7 @@ extern eOresult_t eo_canprot_Parse(EOtheCANprotocol *p, eOcanframe_t *frame, eOc
     {
         return(s_eo_canprot_parse0length(frame, port));
     }
-       
+          
     
     if(eores_OK != s_eo_canprot_get_indices(frame, NULL, &index0, &index1))
     {
@@ -1366,6 +1374,18 @@ static eOresult_t s_eo_canprot_parse0length(eOcanframe_t *frame, eOcanport_t por
 //    // if we find an exception, then found is 
 //    return(eores_OK);
 //}
+
+
+static eObool_t s_eo_canprot_filter_sourceaddress(eOcanframe_t *frame)
+{    
+    if(0 == EOCANPROT_FRAME_GET_SOURCE(frame))
+    {
+        return(eobool_true);
+    }
+
+    return(eobool_false);   
+}
+
 
 static eObool_t s_eo_canprot_isit_exception(eOcanframe_t *frame, eOcanport_t port, eOresult_t *res)
 {
