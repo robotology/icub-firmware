@@ -37,13 +37,13 @@ extern "C" {
 #elif   defined(ICUB_MEC_V2) | defined(ICUB_DARMSTADT01)
     #define V2_MECHANICS
     #define USE_2FOC_FAST_ENCODER
+#elif defined(ICUB_MEC_V3)
+    #define V3_MECHANICS
+    #undef  USE_2FOC_FAST_ENCODER
 #else
-    #error -> specify either ICUB_MEC_V1 or ICUB_MEC_V2
+    #error -> specify either ICUB_MEC_V1 or ICUB_MEC_V2 or V3_MECHANICS
 #endif
 
-#if defined(HEAD_V3)
-    #undef USE_2FOC_FAST_ENCODER
-#endif
 //#warning in v3 fare in modo che NON venga definito USE_2FOC_FAST_ENCODER 
 
 #ifdef USE_2FOC_FAST_ENCODER

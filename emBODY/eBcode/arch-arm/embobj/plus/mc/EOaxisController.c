@@ -121,9 +121,26 @@ extern EOaxisController* eo_axisController_New(uint8_t id)
         
         o->state_mask = AC_NOT_READY;
         o->calibration_zero = 0;
+        o->calibration_type = eomc_calibration_typeUndefined;
+        o->pwm_limit_calib = 0;
+        o->calib_count = 0;
+        o->calib_stable = 0;
+        o->old_pos = o->pos_max;
+        o->pos_to_reach = 0;
+        o->offset = 0;
+        o->isvirtuallycoupled = 0;
+        o->hardwarelimitisreached = 0;
     }
 
     return o;
+}
+
+extern void eo_axisController_SetItIsVirtuallyCoupled(EOaxisController* o)
+{   // imposes that this axis is virtually coupled (on the head v3 only rigth and left eyes are virtually coupled)
+    if (!o) return;
+    
+    o->isvirtuallycoupled = 1;    
+    
 }
 
 extern eObool_t eo_axisController_IsOk(EOaxisController* o)
@@ -149,10 +166,10 @@ extern void eo_axisController_StartCalibration_type3(EOaxisController *o)
     }
     
     SET_BITS(o->state_mask, AC_NOT_CALIBRATED);
-    //o->control_mode = eomc_controlmode_calib;
+    //ale disabled this...but it seems clearer to me for the high-level user...discuss
+    o->control_mode = eomc_controlmode_calib;
 }
-
-extern void eo_axisController_StartCalibration_type0(EOaxisController *o, int16_t pwmlimit, int16_t vel)
+extern void eo_axisController_StartCalibration_type6(EOaxisController *o, int32_t position, int32_t velocity, int32_t maxencoder)
 {
     if (!o) return;
     
@@ -164,10 +181,47 @@ extern void eo_axisController_StartCalibration_type0(EOaxisController *o, int16_
     
     SET_BITS(o->state_mask, AC_NOT_CALIBRATED);
     
-    //set the value to start procedure
-    o->pwm_limit_calib = pwmlimit;
-    //what about velocity? is it useful?
+    /*
+    //init the traj object
+    eo_trajectory_Init(o->trajectory, GET_AXIS_POSITION(), GET_AXIS_VELOCITY(), 0);
+    eo_trajectory_Stop(o->trajectory, GET_AXIS_POSITION());
+    
+    //new trajectory using params1 and params2
+    eo_axisController_SetPosRef(o, position, velocity);
+    
+    //what should I do with param3???
+    
     o->control_mode = eomc_controlmode_calib;
+    */
+}
+
+extern void eo_axisController_StartCalibration_type5(EOaxisController *o, int32_t pwmlimit, int32_t final_position)
+{
+    if (!o) return;
+    
+    if (NOT_READY() && (o->state_mask !=  AC_NOT_CALIBRATED))
+    {
+        o->control_mode = eomc_controlmode_hwFault;
+        return;
+    }
+    
+    SET_BITS(o->state_mask, AC_NOT_CALIBRATED);
+    
+    //set the values to start procedure
+    o->pwm_limit_calib = pwmlimit;
+    
+    if (o->pwm_limit_calib > 0)
+        o->pos_to_reach = final_position;
+    else
+        o->pos_to_reach = -final_position;
+ 
+    //reset the offset
+    o->offset = 0;
+    
+    o->control_mode = eomc_controlmode_calib;
+    
+    // reset hwlimit reached
+    o->hardwarelimitisreached =0;
 }
 
 extern void eo_axisController_SetCalibrated(EOaxisController *o)
@@ -175,6 +229,14 @@ extern void eo_axisController_SetCalibrated(EOaxisController *o)
     if (!o) return;
     
     RST_BITS(o->state_mask, AC_NOT_CALIBRATED);
+}
+
+extern void eo_axisController_ResetCalibration(EOaxisController *o)
+{
+    if (!o) return;
+    
+    axisMotionReset(o);
+    SET_BITS(o->state_mask, AC_NOT_CALIBRATED);
 }
 
 extern eObool_t eo_axisController_IsCalibrated(EOaxisController *o)
@@ -323,9 +385,30 @@ extern void eo_axisController_GetImpedance(EOaxisController *o, int32_t *stiffne
     }
 }
 
+extern int32_t eo_axisController_GetAxisPos (EOaxisController *o)
+{
+    if (o) 
+        return o->position;
+    else 
+        return 0;
+}
+
+extern int32_t eo_axisController_GetAxisVel (EOaxisController *o)
+{
+    if (o) 
+        return o->velocity;
+    else 
+        return 0;
+}
+
 extern void eo_axisController_SetEncPos(EOaxisController *o, int32_t pos)
 {
-    if (o) o->position = pos - eo_axisController_GetAxisCalibrationZero(o);
+    if (!o) return;
+    
+    if((o->calibration_type == eomc_calibration_type5_hard_stops_mc4plus) && !(eo_axisController_IsCalibrated(o)))
+        o->position = pos;
+    else 
+        o->position = pos - eo_axisController_GetAxisCalibrationZero(o);
 } 
 
 extern void eo_axisController_SetEncVel(EOaxisController *o, int32_t vel)
@@ -484,8 +567,26 @@ extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, eOmc_contr
     
     if (NOT_READY())
     {
-        //o->control_mode = eomc_controlmode_notConfigured;
-        
+        //if the AXIS is not calibrated (not configured or in calib phase), I go back (or remain in) to notConfigured (safe) state (probably an EXTfault has occurred)
+        //N.B. at the moment only for calibration5 cause calibration3 applies only an offset to the encoder raw values (no risks)
+        if ((!IS_CALIBRATED()))
+        {    
+            if (o->calibration_type == eomc_calibration_type5_hard_stops_mc4plus)
+            {
+                //if the joint was calibrating, I reset its calibration values
+                if (o->control_mode == eomc_controlmode_calib)
+                {
+                    eo_emsController_ResetCalibrationValues(o->axisID);
+                }
+                o->control_mode = eomc_controlmode_notConfigured;
+            }
+            
+            else if (o->calibration_type == eomc_calibration_type3_abs_sens_digital)
+            {
+                o->control_mode = eomc_controlmode_idle;
+            }
+            
+        }
         return eobool_false;
     }
     
@@ -624,25 +725,67 @@ extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
         
         case eomc_controlmode_calib:
         {
-            //calib type 0
-            if (o->calibration_type == eomc_calibration_type0_hard_stops)
+            //calib type 5
+            if (o->calibration_type == eomc_calibration_type5_hard_stops_mc4plus)
             {
+                if(/*(1 == o->isvirtuallycoupled) && */(1 == o->hardwarelimitisreached))
+                {   
+                    // if in here, then it means that the calibration for one eye is terminated but the calib for the
+                    // other eye is not terminated yet.
+                    // TAG-XXX
+                    return 0;                    
+                }
+                
                 if (s_eo_axisController_isHardwareLimitReached(o))
                 {
+                    // here I should only set the final position (the one in which the hardware limit is reached) to the value indicated in param3 of the calib
+                    // the setting of this offset should be done only once!                  
                     eo_pid_Reset(o->pidP);
-                    eo_trajectory_Init(o->trajectory, pos, vel, 0);
-                    eo_trajectory_Stop(o->trajectory, GET_AXIS_POSITION());
                     
-                    eo_axisController_SetCalibrated (o);
-                    o->control_mode = eomc_controlmode_position;
-                    // acemor: define how to go back                    
-                    //Set position reference and return
-                    eo_axisController_SetPosRef(o, 0, (pos-0)/2); //how to know the right return position and velocity?
-                    return 0;
+                    o->offset = pos - o->pos_to_reach;
                     
+                    int32_t new_pos = pos - o->offset;
+                    
+                    //out of bound protection (redundant, but protect from typo inside XML)
+                    if ( new_pos < (o->pos_min - TICKS_PER_HALF_REVOLUTION))
+                        new_pos += TICKS_PER_REVOLUTION;
+                    else if (new_pos > (o->pos_max + TICKS_PER_HALF_REVOLUTION))
+                        new_pos -= TICKS_PER_REVOLUTION;
+                    
+                    //update axis, trajectory pos
+                    //eo_axisController_SetEncPos(o, new_pos);
+                    o->position = new_pos -  o->calibration_zero;
+                    eo_axisController_SetEncVel(o, vel);
+                
+                    eo_trajectory_Init(o->trajectory, new_pos - o->calibration_zero, vel, 0);
+                    eo_trajectory_Stop(o->trajectory, new_pos - o->calibration_zero);
+                    o->err = 0;
+                    
+                    // we set true this flag, so that for teh case of virtually coupled joint 
+                    // the next time we call the function we just return 0 (see above in TAG-XXX)
+                    // even if we stay in calibration control mode.
+
+                    o->hardwarelimitisreached = 1;
+                    
+                    //not setting the axis as calibrated and going to position...eo_emsController_CheckCalibrations is doing this now
+                    /*
+                    if(0 == o->isvirtuallycoupled)
+                    {   // we finish the calibration only if there is no virtual coupling (i.e.: if the axis is NOT rigth or left eye).
+                        eo_axisController_SetCalibrated (o);
+                        o->control_mode = eomc_controlmode_position;
+                    }
+                    */
+                    
+                    //but the first time also RobotInterface try to set the pos to 0... (it does not seem to be a problem)
+                    #if defined(CALIB5_GOTO_ZERO)
+                    eo_axisController_SetPosRef(o, 0, vel); // go to 0 with velocity from calib param2   
+                    #endif                    
+                          
+                    return 0;                    
                 }
                 //if still not calibrated I need to continue my search for the hardware limit
-                if (!eo_axisController_IsCalibrated(o))
+                //important! need to do that only if the encoder has been already initialized
+                if (!eo_axisController_IsCalibrated(o)) 
                 {
                     o->interact_mode = eOmc_interactionmode_stiff;
                     *stiff = eobool_true;
@@ -650,7 +793,41 @@ extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
                     return o->pwm_limit_calib;
                 }
             }
-            /*
+            // calib type 6
+            else if (o->calibration_type == eomc_calibration_type6_mais_mc4plus)
+            {
+                if (IS_CALIBRATED())
+                {
+                    eo_pid_Reset(o->pidP);
+                    eo_trajectory_Init(o->trajectory, pos - o->calibration_zero, vel, 0);
+                    eo_trajectory_Stop(o->trajectory, pos - o->calibration_zero); 
+                    o->control_mode = eomc_controlmode_position;
+                    
+                    o->err = 0;
+                    
+                    return 0;
+                }
+                o->interact_mode = eOmc_interactionmode_stiff;
+                *stiff = eobool_true;
+                
+                float pos_ref;
+                float vel_ref;
+                float acc_ref;
+                eo_trajectory_Step(o->trajectory, &pos_ref, &vel_ref, &acc_ref);
+            
+                int32_t err = pos_ref - pos;
+
+                o->err = err;
+                
+                //when the trajectory is ended I can can safely set the axis as calibrated
+                if (eo_trajectory_IsDone(o->trajectory))
+                {
+                    //Set the axis calibrated cause the calibration procedure has ended
+                    eo_axisController_SetCalibrated (o);
+                }
+                return eo_pid_PWM_pid(o->pidP, o->err);
+            }
+            // calib type 3
             else if (o->calibration_type == eomc_calibration_type3_abs_sens_digital)
             {
                 if (IS_CALIBRATED())
@@ -665,8 +842,6 @@ extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
                 o->err = 0;
                 return 0;
             }
-            */
-            return 0;
         }
         case eomc_controlmode_idle:
         {
@@ -851,6 +1026,11 @@ extern void eo_axisController_Stop(EOaxisController *o)
     if (o) eo_trajectory_Stop(o->trajectory, GET_AXIS_POSITION());
 }
 
+extern EOtrajectory* eo_axisController_GetTraj (EOaxisController *o)
+{
+    if (o) return o->trajectory;
+}
+
 extern EOpid* eo_axisController_GetPosPidPtr(EOaxisController *o)
 {
     return o ? o->pidP : NULL;
@@ -966,6 +1146,71 @@ extern void eo_axisController_GetActivePidStatus(EOaxisController *o, eOmc_joint
     eo_pid_GetStatusInt32(o->pidP, &(pidStatus->output), &(pidStatus->error));    
 }
 
+extern void eo_axisController_RescaleAxisPosition(EOaxisController *o, int32_t current_pos)
+{
+    if (!o) return;
+    
+    int32_t pos = current_pos - o->offset;
+    
+    // out of bound protections
+    if (pos < (o->pos_min - TICKS_PER_HALF_REVOLUTION))
+        pos += TICKS_PER_REVOLUTION;
+    else if (pos > (o->pos_max + TICKS_PER_HALF_REVOLUTION))
+        pos -= TICKS_PER_REVOLUTION;
+
+    //update axis pos
+    o->position = pos - eo_axisController_GetAxisCalibrationZero(o);
+    return;
+}
+
+
+extern void eo_axisController_RescaleAxisPositionToVersionVergence(EOaxisController *o2, EOaxisController *o3, int32_t current_pos2, int32_t current_pos3, int joint)
+{    
+    //    joint can be 2 or 3.
+    // marco.accame: this matrix maps independent position of eyes into version and vergence as follows:
+    // ( o )( o ) into vers = 0, verg = 0
+    // (  o)(o  ) into vers = 0, verg = 45 deg
+    // (o  )(o  ) into vers = 45 deg, verg = 0
+    // given that independent position of eyes is measured as follows:
+    // ( o ) gives 0 deg
+    // (o  ) gives 45 deg
+    // (  o) gives -45 deg
+    const float eyesDirectMatrix[] = {+0.500, +0.500, -0.500, +0.500};
+    // const float eyesInverseMatrix[] = {+1.000, -1.000, +1.000, +1.000};
+    
+    // apply the offset, so that we are in range [-45, +45]
+    int32_t pos2 = current_pos2 - o2->offset;
+    int32_t pos3 = current_pos3 - o3->offset;
+    
+    
+    // now apply the transformation which maps pos2 and pos3 into virtual joints version and vergence        
+    int32_t pos = 0; // pos is the virtual position of teh joint
+    EOaxisController *o = NULL;
+    
+    if(2 == joint)
+    {   
+        // version: i apply ...
+        pos = (eyesDirectMatrix[0])*pos2 + (eyesDirectMatrix[1])*pos3;    
+        o = o2;
+    }
+    else
+    {   // vergence: i apply ...
+        pos = (eyesDirectMatrix[2])*pos2 + (eyesDirectMatrix[3])*pos3; 
+        o = o3;
+    }
+    
+    
+    if (pos < (o->pos_min - TICKS_PER_HALF_REVOLUTION))
+        pos += TICKS_PER_REVOLUTION;
+    else if (pos > (o->pos_max + TICKS_PER_HALF_REVOLUTION))
+        pos -= TICKS_PER_REVOLUTION;     
+    
+    //update axis pos
+    o->position = pos - eo_axisController_GetAxisCalibrationZero(o);    
+    
+    return;
+}
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
@@ -991,27 +1236,26 @@ static void axisMotionReset(EOaxisController *o)
 
 static eObool_t s_eo_axisController_isHardwareLimitReached(EOaxisController *o)
 {
-    static int32_t current_pos = 0, veryold_pos = 0;
-    static uint16_t count_equal = 0, count_calib = 0;
-    
-    count_calib++;
-    current_pos = GET_AXIS_POSITION();
-    if (current_pos == veryold_pos)
+    //if for 20 consecutive times (~20ms) I'm in the same position (but let the calibration start before...), it means that I reached the hardware limit
+    o->calib_count += 1;
+    if (o->calib_count > 1200)
     {
-        count_equal++;
-        //if for 20 consecutive times (~20ms) I'm in the same position (but let the calibration start before...), it means that I reached the hardware limit
-        if ((count_equal == 20) && (count_calib > 1200))
+        if (GET_AXIS_POSITION() == o->old_pos)
         {
-            count_equal = 0;
-            count_calib = 0;
-            return eobool_true;
+            o->calib_stable += 1;
+            if (o->calib_stable == 20)
+            {
+                o->calib_stable = 0;
+                o->calib_count = 0;
+                return eobool_true;
+            }
+        }
+        else
+        {
+            o->calib_stable = 0;
         }
     }
-    else
-    {
-        count_equal = 0;
-    }
-    veryold_pos = current_pos;
+    o->old_pos = GET_AXIS_POSITION();
     return eobool_false;
 }
 

@@ -38,7 +38,8 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define FAST_ENC_UNINIT 0x80000000
+#define FAST_ENC_UNINIT           0x80000000
+#define SPIKES_DELTA_THRESHOLD    (int32_t)TICKS_PER_REVOLUTION/30
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -94,6 +95,8 @@ extern EOabsCalibratedEncoder* eo_absCalibratedEncoder_New(uint8_t ID)
         o->first_valid_data = 0;
         
         o->state_mask = SM_NOT_READY;
+        
+        o->spikes_count = 0;
     }
 
     return o;
@@ -139,6 +142,14 @@ extern void eo_absCalibratedEncoder_ClearFaults(EOabsCalibratedEncoder* o)
     RST_BITS(o->state_mask,SM_HARDWARE_FAULT);
 }
 
+extern void eo_absCalibratedEncoder_ResetCalibration(EOabsCalibratedEncoder* o)
+{
+    //o->offset = 0; --> dangerous, cause the axis position sharply change (even if I'm in position ctrl mode)
+    SET_BITS(o->state_mask, SM_NOT_CALIBRATED);
+    RST_BITS(o->state_mask, SM_NOT_INITIALIZED);
+    //should I clear the faults too?
+    RST_BITS(o->state_mask,SM_HARDWARE_FAULT);
+}
 extern void eo_absCalibratedEncoder_Calibrate(EOabsCalibratedEncoder* o, int32_t offset)
 {
     o->offset = offset;
@@ -255,10 +266,9 @@ extern int32_t eo_absCalibratedEncoder_Acquire(EOabsCalibratedEncoder* o, int32_
         }
         else
         {
-            static uint16_t count = 0;
-            count++;
+            o->spikes_count++;
             //we don't want to send up too many messages...
-            if (count == 100)
+            if (o->spikes_count == 200)
             {
                 //message "spike encoder error"
                 eOerrmanDescriptor_t descriptor = {0};
@@ -269,8 +279,9 @@ extern int32_t eo_absCalibratedEncoder_Acquire(EOabsCalibratedEncoder* o, int32_
                 descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_aea_abs_enc_spikes);
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, NULL, &descriptor);
                 
-                count = 0;
-            }  
+                o->spikes_count = 0;
+            }
+            
             #ifndef USE_2FOC_FAST_ENCODER
             o->velocity = (7*o->velocity) >> 3;
             #endif
@@ -373,18 +384,6 @@ static void encoder_init(EOabsCalibratedEncoder* o, int32_t position, uint8_t er
         return;
     }
     
-	// check if it's working now...
-    // for incremental encoders this function has only to set a flag in a bit mask
-    // how can I detect that the encoder is incremental?
-    
-    //old method using function encoder type dependent
-    /*
-    if (joint2encodertype(o->ID) == 2)
-    {
-        RST_BITS(o->state_mask, SM_NOT_INITIALIZED);
-    }
-    */
-    // nb: for inc encoders, this part is never executed 
     if (++o->first_valid_data >= 3)
     {
         //o->time = 0;

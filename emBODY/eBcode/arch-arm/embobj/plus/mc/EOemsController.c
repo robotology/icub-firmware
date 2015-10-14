@@ -34,7 +34,8 @@
 #include "EoError.h"
 #include "EOtheErrorManager.h"
 
-#if !defined(V1_MECHANICS) && !defined(V2_MECHANICS)
+
+#if !defined(V1_MECHANICS) && !defined(V2_MECHANICS) && !defined(V3_MECHANICS)
 #error mechanics is undefined
 #endif
 
@@ -102,6 +103,8 @@ void set_2FOC_idle(uint8_t joint);
 void force_2FOC_idle(uint8_t motor);
 void set_2FOC_running(uint8_t joint);
 void sendErrorMessage(uint8_t j, uint32_t ems_fault_mask_new_j, uint32_t motor_fault_mask_j);
+static void s_eo_emsController_ResetCalibrationCoupledJoints(uint8_t joint);
+static void s_eo_emsController_InitTrajectoryVersionVergence(uint8_t j);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -164,6 +167,22 @@ extern EOemsController* eo_emsController_Init(eOemscontroller_board_t board, eOe
     return ems;
 }
 
+extern uint8_t eo_emsController_IsVirtualCalibrationInProgress(void)
+{   
+    if(emscontroller_board_HEAD_neckyaw_eyes != ems->board)
+    {
+        return 0;
+    }
+    
+    
+    if((eomc_controlmode_calib == ems->axis_controller[2]->control_mode) || (eomc_controlmode_calib == ems->axis_controller[3]->control_mode))
+    {
+        return 1;
+    }
+    
+    return 0;
+}
+
 extern void eo_emsController_set_Jacobian(int32_t **Ji32)
 {
     eo_motors_set_Jacobian(ems->motors, Ji32);
@@ -216,6 +235,203 @@ extern void eo_emsController_AcquireMotorEncoder(uint8_t motor, int16_t current,
     //   ems->motor_position[motor]     = - ems->motor_position[motor];
     //}
 }
+
+extern void eo_emsController_AcquireMotorPosition(uint8_t motor, int32_t position)
+{
+    //don't need to rearm here cause this function is used for local actuators
+    //eo_motors_rearm_wdog(ems->motors, motor);
+    
+    ems->motor_position[motor] = position;
+    //change the sign of motor position according to the sign of rotorencoder
+    //if (ems->motor_config_rotorencoder[motor]<0)
+    //{
+    //  ems->motor_position[motor]     = - ems->motor_position[motor];
+    //}
+}
+
+extern void eo_emsController_AcquireMotorCurrent(uint8_t motor, int16_t current)
+{
+    //don't need to rearm here cause this function is used for local actuators
+    //eo_motors_rearm_wdog(ems->motors, motor);
+    
+    ems->motor_current [motor] = current; //(2*current)/3; // Iq = sqrt(3)/2*Imeas, 32768 = 25000 mA ==> 0.66 scale factor
+}
+
+extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t error_mask)
+{   
+    int32_t axle_abs_pos[MAX_NAXLES];
+    #ifndef USE_2FOC_FAST_ENCODER
+    int32_t axle_abs_vel[MAX_NAXLES];
+    #endif
+    
+    ENCODERS(e)
+    {
+        axle_abs_pos[e] = eo_absCalibratedEncoder_Acquire(ems->abs_calib_encoder[e], abs_enc_pos[e], 0x03 & (error_mask>>(e<<1)));
+        #ifndef USE_2FOC_FAST_ENCODER
+        axle_abs_vel[e] = eo_absCalibratedEncoder_GetVel(ems->abs_calib_encoder[e]);
+        #endif
+    }
+         
+    #if defined(V1_MECHANICS)
+    if (ems->board == emscontroller_board_SHOULDER)
+    {
+        // |J0|   |  1     0    0   |   |E0|     
+        // |J1| = |  0     1    0   | * |E1|
+        // |J2|   |  1    -1  40/65 |   |E2|
+        axle_abs_pos[2] = axle_abs_pos[0]-axle_abs_pos[1]+(40*axle_abs_pos[2])/65;
+        #ifndef USE_2FOC_FAST_ENCODER
+        axle_abs_vel[2] = axle_abs_vel[0]-axle_abs_vel[1]+(40*axle_abs_vel[2])/65;
+        #endif
+    }
+    #endif
+    
+#ifdef USE_2FOC_FAST_ENCODER
+    
+    int32_t axle_virt_vel[MAX_NAXLES];
+    int32_t axle_virt_pos[MAX_NAXLES];
+    
+    #if defined(USE_JACOBIAN)
+    
+    JOINTS(j)
+    {
+        axle_virt_pos[j] = 0;
+        axle_virt_vel[j] = 0;
+        
+        MOTORS(m)
+        {
+            axle_virt_pos[j] += ems->motors->J[j][m]*ems->motor_position[m];
+            axle_virt_vel[j] += ems->motors->J[j][m]*ems->motor_velocity_gbx[m];
+        }
+            
+        axle_virt_pos[j] >>= 14;
+        axle_virt_vel[j] >>= 14;
+        axle_virt_vel[j] *= FOC_2_EMS_SPEED;
+    }
+    
+    #else // USE_JACOBIAN
+    if (ems->board == emscontroller_board_SHOULDER)
+    {
+        //             | 1     0       0    0 |
+        // J = dq/dm = | 1   40/65     0    0 |
+        //             | 0  -40/65   40/65  0 |
+        //             | 0     0       0    1 |
+
+        axle_virt_vel[0] = ems->motor_velocity_gbx[0];
+        axle_virt_vel[1] = (ems->motor_velocity_gbx[0]+(40*ems->motor_velocity_gbx[1])/65);
+        axle_virt_vel[2] = ((40*(-ems->motor_velocity_gbx[1]+ems->motor_velocity_gbx[2]))/65);
+        axle_virt_vel[3] = ems->motor_velocity_gbx[3];
+
+        axle_virt_pos[0] = ems->motor_position[0];
+        axle_virt_pos[1] = ems->motor_position[0]+(40*ems->motor_position[1])/65;
+        axle_virt_pos[2] = (40*(-ems->motor_position[1]+ems->motor_position[2]))/65;
+        axle_virt_pos[3] = ems->motor_position[3];
+    }
+    else if (ems->board == emscontroller_board_WAIST)
+    {
+        //beware: this matrix is valid inside the firmare only
+        //             |   0.5   0.5    0   |
+        // J = dq/dm = |  -0.5   0.5    0   |
+        //             | 22/80 22/80  22/40 |
+    
+        //at the user level, torso joints are swapped (0 1 2 -> 2 0 1) and the matrix is:
+        //             | 22/40 22/80 22/80  |
+        // J = dq/dm = |     0   0.5   0.5  |
+        //             |     0  -0.5   0.5  |
+    
+        axle_virt_vel[0] = (    ems->motor_velocity_gbx[0] + ems->motor_velocity_gbx[1]) * 0.5;
+        axle_virt_vel[1] = (   -ems->motor_velocity_gbx[0] + ems->motor_velocity_gbx[1]) * 0.5;
+        axle_virt_vel[2] =      ems->motor_velocity_gbx[0]*0.022/0.08 + ems->motor_velocity_gbx[1]*0.022/0.08 + ems->motor_velocity_gbx[2]*0.022/0.04;
+    
+        axle_virt_pos[0] = (    ems->motor_position[0] + ems->motor_position[1]) * 0.5;
+        axle_virt_pos[1] = (   -ems->motor_position[0] + ems->motor_position[1]) * 0.5;
+        axle_virt_pos[2] =      ems->motor_position[0]*0.022/0.08 + ems->motor_position[1]*0.022/0.08 + ems->motor_position[2]*0.022/0.04;
+    }
+    else if (ems->board == emscontroller_board_UPPERLEG)
+    {
+        axle_virt_vel[0] = (50*ems->motor_velocity_gbx[0])/75;
+        axle_virt_vel[1] =     ems->motor_velocity_gbx[1]    ;
+        axle_virt_vel[2] =     ems->motor_velocity_gbx[2]    ;
+        axle_virt_vel[3] =     ems->motor_velocity_gbx[3]    ;
+    
+        axle_virt_pos[0] = (50*ems->motor_position[0])/75;
+        axle_virt_pos[1] =     ems->motor_position[1]    ;
+        axle_virt_pos[2] =     ems->motor_position[2]    ;
+        axle_virt_pos[3] =     ems->motor_position[3]    ;
+    }
+    else if (ems->board == emscontroller_board_ANKLE)
+    {
+        axle_virt_vel[0] = ems->motor_velocity_gbx[0];
+        axle_virt_vel[1] = ems->motor_velocity_gbx[1];
+    
+        axle_virt_pos[0] = ems->motor_position[0];
+        axle_virt_pos[1] = ems->motor_position[1];
+    }
+    #endif // USE_JACOBIAN
+#endif //USE_2FOC_FAST_ENCODER
+    
+    JOINTS(j)
+    {
+        #ifdef USE_2FOC_FAST_ENCODER
+            eo_axleVirtualEncoder_Acquire(ems->motor_config_gearbox_ratio[j], ems->axle_virt_encoder[j], axle_abs_pos[j], axle_virt_pos[j], axle_virt_vel[j]);
+            eo_axisController_SetEncPos(ems->axis_controller[j], eo_axleVirtualEncoder_GetPos(ems->axle_virt_encoder[j]));
+            eo_axisController_SetEncVel(ems->axis_controller[j], eo_axleVirtualEncoder_GetVel(ems->axle_virt_encoder[j]));
+        #else
+            if ((ems->axis_controller[j]->calibration_type == eomc_calibration_type5_hard_stops_mc4plus) && eo_axisController_IsCalibrated(ems->axis_controller[j]))  
+            { 
+                if((emscontroller_board_HEAD_neckyaw_eyes == ems->board) && ((2==j)||(3==j)))
+                {
+                    // j0 and j1 are independent, j2 and j3 are not
+                    
+                    // in herr i do things for j2 and j3 ...
+                    
+                    // use following formula:
+                    // m2: motor position of left eye (as read by encoder)              (L)
+                    // m3: motor position of rigth eye (as read by encoder)             (R)
+                    // e2: version of eyes                                              (Vs)
+                    // e3: vergence of eyes                                             (Vg)
+                    // e2 = 0.5*m2 + 0.5*m3             (we must move the motors in the same directions to move eyes to follow a direction)
+                    // e3 = 1.0*m2 - 1.0*m3             (we must move the motors in the opposite directions to do convergence or divergence)
+                    // or:
+                    // E = A * M, E = [e2, e3], M = {m2, m3], A = [0.5, +0.5], [1.0, -1.0]]
+                    // hence M = E * A^-1, where A^-1 = [[1, 0.5,], [1, -0.5]].
+                    // m2 = +e2 + e3
+                    // m3 = e2 - 0.5 * e3
+                    
+
+                    // i should use the direct matrix A, not the inverse.
+                    //axle_abs_pos[2] = 0.333f * ( +p2 +p3 );
+                    //axle_abs_pos[3] = 0.500f * ( -p2 +p3 );
+                    
+                    
+                    // i must rescale the positions read by encoders into the version-vergence space.
+                    // i do it inside following function. at first i apply an offset, so that both positions of eyes are in the range [+45, -45],
+                    // where the correct mapping is: rigth eye -> [+45, -45], nose, [+45, -45] <- left eye (the +45 is toward the direction of motor and goes towards the rigth).
+                    // then i must apply the transformation into values of version = [-30, +30] and vergence = [0, 45] (on the gui is 50, but for now i prefer to keep it smaller)
+                    // the transformation matrix is M = [[+0.333, +0.333], [-0.500, +0.500]] (and its inverse is  M^1 = [[+1.500, -1.000], [+1.500, +1.000]]).                
+                    
+                    eo_axisController_RescaleAxisPositionToVersionVergence(ems->axis_controller[2], ems->axis_controller[3], axle_abs_pos[2], axle_abs_pos[3], j);                    
+                }
+                else
+                {                
+                    eo_axisController_RescaleAxisPosition(ems->axis_controller[j], axle_abs_pos[j]);
+                }
+            }
+            else    
+            {
+                eo_axisController_SetEncPos(ems->axis_controller[j], axle_abs_pos[j]);
+            }
+            
+            eo_axisController_SetEncVel(ems->axis_controller[j], axle_abs_vel[j]);
+        #endif
+    }
+    
+    if (ems->n_calibrated != ems->naxles)
+    {
+        eo_emsController_CheckCalibrations();
+    }
+}
+
+
 
 extern void eo_emsController_CheckFaults()
 {
@@ -314,17 +530,36 @@ extern void eo_emsController_CheckFaults()
                         eo_axisController_SetControlMode(ems->axis_controller[2], eomc_controlmode_cmd_idle);                             
                     }
                 }
-                /*
-                else if((emscontroller_board_HEAD_neckpitch_neckroll == ems->board) || (emscontroller_board_HEAD_neckyaw_eyes == ems->board))
-                {
-                    #warning TODO: for head v3
-                    // marco.accame: questo e' un placeholder per mettere le azioni specifiche riguardanti la scheda della head-v3.
-                    // ovviamente si deve sviluppare gli if-else (o un bel switch-case) per tutte le board head v3. 
-                    // qui se la scheda NON presenta coupled joints, allora si procede come nel caso del emscontroller_board_UPPERLEG.  
-                    // altrimenti si procede come nel caso del emscontroller_board_WAIST.
-                    // attenzione al caso di solo alcuni coupled joints (vedi emscontroller_board_SHOULDER)  
+                if (ems->board == emscontroller_board_HEAD_neckpitch_neckroll)
+                {   //coupled joints (0,1) handling
+                    set_2FOC_idle(0);
+                    set_2FOC_idle(1);
+                    if (ems_fault_mask_new[j] & ~MOTOR_EXTERNAL_FAULT)
+                    {
+                        eo_axisController_SetHardwareFault(ems->axis_controller[0]);
+                        eo_axisController_SetHardwareFault(ems->axis_controller[1]);
+                    }
+                    else
+                    {
+                        eo_axisController_SetControlMode(ems->axis_controller[0], eomc_controlmode_cmd_idle);
+                        eo_axisController_SetControlMode(ems->axis_controller[1], eomc_controlmode_cmd_idle);                              
+                    }
                 }
-                */
+                if ((j > 1) && (ems->board == emscontroller_board_HEAD_neckyaw_eyes))
+                {   //coupled joints (2,3) handling
+                    set_2FOC_idle(2);
+                    set_2FOC_idle(3);
+                    if (ems_fault_mask_new[j] & ~MOTOR_EXTERNAL_FAULT)
+                    {
+                        eo_axisController_SetHardwareFault(ems->axis_controller[2]);
+                        eo_axisController_SetHardwareFault(ems->axis_controller[3]);
+                    }
+                    else
+                    {
+                        eo_axisController_SetControlMode(ems->axis_controller[2], eomc_controlmode_cmd_idle);
+                        eo_axisController_SetControlMode(ems->axis_controller[3], eomc_controlmode_cmd_idle);                              
+                    }
+                }
                 else
                 {
                     set_2FOC_idle(j);
@@ -345,146 +580,7 @@ extern void eo_emsController_CheckFaults()
     }
 }
 
-extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t error_mask)
-{   
-    int32_t axle_abs_pos[MAX_NAXLES];
-    #ifndef USE_2FOC_FAST_ENCODER
-    int32_t axle_abs_vel[MAX_NAXLES];
-    #endif
-    
-    ENCODERS(e)
-    {
-        axle_abs_pos[e] = eo_absCalibratedEncoder_Acquire(ems->abs_calib_encoder[e], abs_enc_pos[e], 0x03 & (error_mask>>(e<<1)));
-        #ifndef USE_2FOC_FAST_ENCODER
-        axle_abs_vel[e] = eo_absCalibratedEncoder_GetVel(ems->abs_calib_encoder[e]);
-        #endif
-    }
-         
-    #if defined(V1_MECHANICS)
-    if (ems->board == emscontroller_board_SHOULDER)
-    {
-        // |J0|   |  1     0    0   |   |E0|     
-        // |J1| = |  0     1    0   | * |E1|
-        // |J2|   |  1    -1  40/65 |   |E2|
-        axle_abs_pos[2] = axle_abs_pos[0]-axle_abs_pos[1]+(40*axle_abs_pos[2])/65;
-        #ifndef USE_2FOC_FAST_ENCODER
-        axle_abs_vel[2] = axle_abs_vel[0]-axle_abs_vel[1]+(40*axle_abs_vel[2])/65;
-        #endif
-    }
-    #endif
-    
-#ifdef USE_2FOC_FAST_ENCODER
-    
-    int32_t axle_virt_vel[MAX_NAXLES];
-    int32_t axle_virt_pos[MAX_NAXLES];
-    
-    #if defined(USE_JACOBIAN)
-    
-        JOINTS(j)
-        {
-            axle_virt_pos[j] = 0;
-            axle_virt_vel[j] = 0;
-            
-            MOTORS(m)
-            {
-                axle_virt_pos[j] += ems->motors->J[j][m]*ems->motor_position[m];
-                axle_virt_vel[j] += ems->motors->J[j][m]*ems->motor_velocity_gbx[m];
-            }
-                
-            axle_virt_pos[j] >>= 14;
-            axle_virt_vel[j] >>= 14;
-            axle_virt_vel[j] *= FOC_2_EMS_SPEED;
-        }
-    
-    #else // USE_JACOBIAN
-        if (ems->board == emscontroller_board_SHOULDER)
-        {
-            //             | 1     0       0    0 |
-            // J = dq/dm = | 1   40/65     0    0 |
-            //             | 0  -40/65   40/65  0 |
-            //             | 0     0       0    1 |
-    
-            axle_virt_vel[0] = ems->motor_velocity_gbx[0];
-            axle_virt_vel[1] = (ems->motor_velocity_gbx[0]+(40*ems->motor_velocity_gbx[1])/65);
-            axle_virt_vel[2] = ((40*(-ems->motor_velocity_gbx[1]+ems->motor_velocity_gbx[2]))/65);
-            axle_virt_vel[3] = ems->motor_velocity_gbx[3];
-    
-            axle_virt_pos[0] = ems->motor_position[0];
-            axle_virt_pos[1] = ems->motor_position[0]+(40*ems->motor_position[1])/65;
-            axle_virt_pos[2] = (40*(-ems->motor_position[1]+ems->motor_position[2]))/65;
-            axle_virt_pos[3] = ems->motor_position[3];
-        }
-        else if (ems->board == emscontroller_board_WAIST)
-        {
-            //beware: this matrix is valid inside the firmare only
-            //             |   0.5   0.5    0   |
-            // J = dq/dm = |  -0.5   0.5    0   |
-            //             | 22/80 22/80  22/40 |
-        
-            //at the user level, torso joints are swapped (0 1 2 -> 2 0 1) and the matrix is:
-            //             | 22/40 22/80 22/80  |
-            // J = dq/dm = |     0   0.5   0.5  |
-            //             |     0  -0.5   0.5  |
-        
-            axle_virt_vel[0] = (    ems->motor_velocity_gbx[0] + ems->motor_velocity_gbx[1]) * 0.5;
-            axle_virt_vel[1] = (   -ems->motor_velocity_gbx[0] + ems->motor_velocity_gbx[1]) * 0.5;
-            axle_virt_vel[2] =      ems->motor_velocity_gbx[0]*0.022/0.08 + ems->motor_velocity_gbx[1]*0.022/0.08 + ems->motor_velocity_gbx[2]*0.022/0.04;
-        
-            axle_virt_pos[0] = (    ems->motor_position[0] + ems->motor_position[1]) * 0.5;
-            axle_virt_pos[1] = (   -ems->motor_position[0] + ems->motor_position[1]) * 0.5;
-            axle_virt_pos[2] =      ems->motor_position[0]*0.022/0.08 + ems->motor_position[1]*0.022/0.08 + ems->motor_position[2]*0.022/0.04;
-        }
-        else if (ems->board == emscontroller_board_UPPERLEG)
-        {
-            axle_virt_vel[0] = (50*ems->motor_velocity_gbx[0])/75;
-            axle_virt_vel[1] =     ems->motor_velocity_gbx[1]    ;
-            axle_virt_vel[2] =     ems->motor_velocity_gbx[2]    ;
-            axle_virt_vel[3] =     ems->motor_velocity_gbx[3]    ;
-        
-            axle_virt_pos[0] = (50*ems->motor_position[0])/75;
-            axle_virt_pos[1] =     ems->motor_position[1]    ;
-            axle_virt_pos[2] =     ems->motor_position[2]    ;
-            axle_virt_pos[3] =     ems->motor_position[3]    ;
-        }
-        else if (ems->board == emscontroller_board_ANKLE)
-        {
-            axle_virt_vel[0] = ems->motor_velocity_gbx[0];
-            axle_virt_vel[1] = ems->motor_velocity_gbx[1];
-        
-            axle_virt_pos[0] = ems->motor_position[0];
-            axle_virt_pos[1] = ems->motor_position[1];
-        }
-        /*
-        else if((emscontroller_board_HEAD_neckpitch_neckroll == ems->board) || (emscontroller_board_HEAD_neckyaw_eyes == ems->board))
-        {
-            #warning TODO: for head v3
-            // marco.accame: questo e' un placeholder per mettere le azioni specifiche riguardanti la scheda della head-v3.
-            // ovviamente si deve sviluppare gli if-else (o un bel switch-case) per tutte le board head v3. 
-            // qui se la scheda NON presenta coupled joints, allora si procede come nel caso del emscontroller_board_UPPERLEG.  
-            // altrimenti si procede come nel caso del emscontroller_board_WAIST.
-            // attenzione al caso di solo alcuni coupled joints (vedi emscontroller_board_SHOULDER)  
-         }
-         */
-    
-#endif //USE_2FOC_FAST_ENCODER
-    
-    JOINTS(j)
-    {
-        #ifdef USE_2FOC_FAST_ENCODER
-            eo_axleVirtualEncoder_Acquire(ems->motor_config_gearbox_ratio[j], ems->axle_virt_encoder[j], axle_abs_pos[j], axle_virt_pos[j], axle_virt_vel[j]);
-            eo_axisController_SetEncPos(ems->axis_controller[j], eo_axleVirtualEncoder_GetPos(ems->axle_virt_encoder[j]));
-            eo_axisController_SetEncVel(ems->axis_controller[j], eo_axleVirtualEncoder_GetVel(ems->axle_virt_encoder[j]));
-        #else
-            eo_axisController_SetEncPos(ems->axis_controller[j], axle_abs_pos[j]);
-            eo_axisController_SetEncVel(ems->axis_controller[j], axle_abs_vel[j]);
-        #endif
-    }
-    
-    if (ems->n_calibrated != ems->naxles)
-    {
-        eo_emsController_CheckCalibrations();
-    }
-}
+
 
 extern void eo_emsController_ReadTorque(uint8_t joint, eOmeas_torque_t trq_measure)
 {
@@ -507,14 +603,50 @@ extern void eo_emsController_PWM(int16_t* pwm_motor_16)
     eObool_t torque_protection[MAX_NAXLES];
     eObool_t stiffness[MAX_NAXLES];
     
-    eo_motors_check_wdog(ems->motors);
+    //check watchdog only if not local actuation
+    if(emscontroller_actuation_LOCAL != ems->act)
+    {
+        eo_motors_check_wdog(ems->motors);
+    }
     
     //PWM computation (PID ecc)
     JOINTS(j)
     {
         torque_protection[j] = eobool_false;
-        pwm_joint[j] = eo_axisController_PWM(ems->axis_controller[j], &stiffness[j]);
+        // davide: don'tcompute the PWM if the encoder is not calibrated, for calibration type 5
+        // this should let to initialize the encoder (encoder_init() inside the speedmeter during the first cycles of the loop)
+        if((!eo_absCalibratedEncoder_IsOk(ems->abs_calib_encoder[j])) && (ems->axis_controller[j]->calibration_type == eomc_calibration_type5_hard_stops_mc4plus))
+        {
+            pwm_joint[j] = 0;
+        }
+        else
+        {
+            pwm_joint[j] = eo_axisController_PWM(ems->axis_controller[j], &stiffness[j]);
+        }
     }
+    
+    //moved to CheckCalibration
+    /*
+    if(emscontroller_board_HEAD_neckyaw_eyes == ems->board)        
+    {
+        // this board has two joints whcih are virtually coupled, thus we maust manage operations in a special way.
+        // after the loop on all the joints in which eo_axisController_PWM() performs calibration and may set hardwarelimitisreached to 1 (in case hw limit is reached)
+        // we check if both rigth and left eyes have reached the hw limits. in such a case, we may set both axis as calibrated
+        // and set them in control mode position
+        if((1 == ems->axis_controller[2]->hardwarelimitisreached) && (1 == ems->axis_controller[3]->hardwarelimitisreached))
+        {
+            ems->axis_controller[2]->hardwarelimitisreached = 0;
+            ems->axis_controller[3]->hardwarelimitisreached = 0;
+            eo_axisController_SetCalibrated (ems->axis_controller[2]);       
+            eo_axisController_SetCalibrated (ems->axis_controller[3]);
+            eo_axisController_SetControlMode(ems->axis_controller[2], eomc_controlmode_cmd_position);
+            eo_axisController_SetControlMode(ems->axis_controller[3], eomc_controlmode_cmd_position);
+
+            s_eo_emsController_InitTrajectoryVersionVergence(2);
+            s_eo_emsController_InitTrajectoryVersionVergence(3);
+        }            
+    }
+    */
  
     //torque control limits protection mechanism
     JOINTS(j)
@@ -633,22 +765,12 @@ extern void eo_emsController_GetDecoupledMeasuredTorque(uint8_t joint_id, int32_
           if (joint_id==0) {*torque_motor=ems->axis_controller[0]->torque_meas_jnt; return;}
           if (joint_id==1) {*torque_motor=ems->axis_controller[1]->torque_meas_jnt; return;}
     }
-    /*
-    else if((emscontroller_board_HEAD_neckpitch_neckroll == ems->board) || (emscontroller_board_HEAD_neckyaw_eyes == ems->board))
+    else    
     {
-        #warning TODO: for head v3
-        // marco.accame: questo e' un placeholder per mettere le azioni specifiche riguardanti la scheda della head-v3.
-        // ovviamente si deve sviluppare gli if-else (o un bel switch-case) per tutte le board head v3. 
-        // qui se la scheda NON presenta coupled joints, allora si procede come nel caso del emscontroller_board_UPPERLEG.  
-        // altrimenti si procede come nel caso del emscontroller_board_WAIST.
-        // attenzione al caso di solo alcuni coupled joints (vedi emscontroller_board_SHOULDER)  
+        // marco.accame: for head-v3 this case is ok. no need to differentiate according to used board
+        // the reason is that ... there is no torque control
+        *torque_motor=ems->axis_controller[joint_id]->torque_meas_jnt;
     }
-    */
-    else
-    {
-          *torque_motor=ems->axis_controller[joint_id]->torque_meas_jnt;
-    }
-    #endif  
 }
 
 extern void eo_emsController_GetDecoupledReferenceTorque(uint8_t joint_id, int32_t * torque_motor)
@@ -680,20 +802,11 @@ extern void eo_emsController_GetDecoupledReferenceTorque(uint8_t joint_id, int32
         if (joint_id==0) {*torque_motor=ems->axis_controller[0]->torque_ref_jnt; return;}
         if (joint_id==1) {*torque_motor=ems->axis_controller[1]->torque_ref_jnt; return;}
     }
-    /*
-    else if((emscontroller_board_HEAD_neckpitch_neckroll == ems->board) || (emscontroller_board_HEAD_neckyaw_eyes == ems->board))
-    {
-        #warning TODO: for head v3
-        // marco.accame: questo e' un placeholder per mettere le azioni specifiche riguardanti la scheda della head-v3.
-        // ovviamente si deve sviluppare gli if-else (o un bel switch-case) per tutte le board head v3. 
-        // qui se la scheda NON presenta coupled joints, allora si procede come nel caso del emscontroller_board_UPPERLEG.  
-        // altrimenti si procede come nel caso del emscontroller_board_WAIST.
-        // attenzione al caso di solo alcuni coupled joints (vedi emscontroller_board_SHOULDER)  
-    }
-    */
-    else
-    {
-        *torque_motor=ems->axis_controller[joint_id]->torque_ref_jnt;
+    else 
+    {       
+        // marco.accame: for head-v3 this case is ok. no need to differentiate according to used board
+        // the reason is that ... there is no torque control       
+        *torque_motor=ems->axis_controller[joint_id]->torque_ref_jnt; 
     }
 }
 
@@ -710,17 +823,18 @@ extern eObool_t eo_emsController_SetInteractionModeGroupJoints(uint8_t joint, eO
         eo_emsController_SetInteractionMode(1, mode);
         eo_emsController_SetInteractionMode(2, mode);
     }
-    /*
-    else if((emscontroller_board_HEAD_neckpitch_neckroll == ems->board) || (emscontroller_board_HEAD_neckyaw_eyes == ems->board))
+    else if(emscontroller_board_HEAD_neckpitch_neckroll == ems->board)  
     {
-        #warning TODO: for head v3
-        // marco.accame: questo e' un placeholder per mettere le azioni specifiche riguardanti la scheda della head-v3.
-        // ovviamente si deve sviluppare gli if-else (o un bel switch-case) per tutte le board head v3. 
-        // qui se la scheda NON presenta coupled joints, allora si procede come nel caso del emscontroller_board_UPPERLEG.  
-        // altrimenti si procede come nel caso del emscontroller_board_WAIST.
-        // attenzione al caso di solo alcuni coupled joints (vedi emscontroller_board_SHOULDER)  
+        // j0 and j1 are coupled
+        eo_emsController_SetInteractionMode(0, mode);
+        eo_emsController_SetInteractionMode(1, mode);
     }
-    */
+    else if((joint > 1) && (emscontroller_board_HEAD_neckyaw_eyes == ems->board))
+    {
+        // j2 and j3 are coupled
+        eo_emsController_SetInteractionMode(2, mode);
+        eo_emsController_SetInteractionMode(3, mode);
+    }
     else
     {
         eo_emsController_SetInteractionMode(joint, mode);
@@ -774,17 +888,27 @@ extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_comm
             eo_absCalibratedEncoder_ClearFaults(ems->abs_calib_encoder[2]);
             eo_axisController_SetControlMode(ems->axis_controller[2], eomc_controlmode_cmd_force_idle);
         }
-        /*
-        else if((emscontroller_board_HEAD_neckpitch_neckroll == ems->board) || (emscontroller_board_HEAD_neckyaw_eyes == ems->board))
-        {
-            #warning TODO: for head v3
-            // marco.accame: questo e' un placeholder per mettere le azioni specifiche riguardanti la scheda della head-v3.
-            // ovviamente si deve sviluppare gli if-else (o un bel switch-case) per tutte le board head v3. 
-            // qui se la scheda NON presenta coupled joints, allora si procede come nel caso del emscontroller_board_UPPERLEG.  
-            // altrimenti si procede come nel caso del emscontroller_board_WAIST.
-            // attenzione al caso di solo alcuni coupled joints (vedi emscontroller_board_SHOULDER)  
-        }
-        */
+		else if(emscontroller_board_HEAD_neckpitch_neckroll == ems->board)  
+  		{	
+			force_2FOC_idle(0);
+            eo_absCalibratedEncoder_ClearFaults(ems->abs_calib_encoder[0]);
+            eo_axisController_SetControlMode(ems->axis_controller[0], eomc_controlmode_cmd_force_idle);
+            
+            force_2FOC_idle(1);
+            eo_absCalibratedEncoder_ClearFaults(ems->abs_calib_encoder[1]);
+            eo_axisController_SetControlMode(ems->axis_controller[1], eomc_controlmode_cmd_force_idle);
+
+		}
+        else if((joint > 1) && (emscontroller_board_HEAD_neckyaw_eyes == ems->board))
+		{
+			force_2FOC_idle(2);                
+            eo_absCalibratedEncoder_ClearFaults(ems->abs_calib_encoder[2]);
+            eo_axisController_SetControlMode(ems->axis_controller[2], eomc_controlmode_cmd_force_idle);
+		
+			force_2FOC_idle(3);                
+            eo_absCalibratedEncoder_ClearFaults(ems->abs_calib_encoder[3]);
+            eo_axisController_SetControlMode(ems->axis_controller[3], eomc_controlmode_cmd_force_idle);
+		}
         else
         {
             force_2FOC_idle(joint);
@@ -812,17 +936,22 @@ extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_comm
             eo_axisController_SetControlMode(ems->axis_controller[1], eomc_controlmode_cmd_idle);
             eo_axisController_SetControlMode(ems->axis_controller[2], eomc_controlmode_cmd_idle);
         }
-        /*
-        else if((emscontroller_board_HEAD_neckpitch_neckroll == ems->board) || (emscontroller_board_HEAD_neckyaw_eyes == ems->board))
-        {
-            #warning TODO: for head v3
-            // marco.accame: questo e' un placeholder per mettere le azioni specifiche riguardanti la scheda della head-v3.
-            // ovviamente si deve sviluppare gli if-else (o un bel switch-case) per tutte le board head v3. 
-            // qui se la scheda NON presenta coupled joints, allora si procede come nel caso del emscontroller_board_UPPERLEG.  
-            // altrimenti si procede come nel caso del emscontroller_board_WAIST.
-            // attenzione al caso di solo alcuni coupled joints (vedi emscontroller_board_SHOULDER)  
+		else if((emscontroller_board_HEAD_neckpitch_neckroll == ems->board))
+        {	
+            set_2FOC_idle(0);
+            set_2FOC_idle(1);
+
+            eo_axisController_SetControlMode(ems->axis_controller[0], eomc_controlmode_cmd_idle);
+            eo_axisController_SetControlMode(ems->axis_controller[1], eomc_controlmode_cmd_idle);	
+		}
+		else if((joint > 1) && (emscontroller_board_HEAD_neckyaw_eyes == ems->board))
+        {   
+            set_2FOC_idle(2);
+            set_2FOC_idle(3);
+
+            eo_axisController_SetControlMode(ems->axis_controller[2], eomc_controlmode_cmd_idle);
+            eo_axisController_SetControlMode(ems->axis_controller[3], eomc_controlmode_cmd_idle);               
         }
-        */
         else
         {
             set_2FOC_idle(joint);
@@ -864,17 +993,35 @@ extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_comm
             set_2FOC_running(1);
             set_2FOC_running(2);
         }
-        /*
-        else if((emscontroller_board_HEAD_neckpitch_neckroll == ems->board) || (emscontroller_board_HEAD_neckyaw_eyes == ems->board))
+
+		else if((emscontroller_board_HEAD_neckpitch_neckroll == ems->board))
         {
-            #warning TODO: for head v3
-            // marco.accame: questo e' un placeholder per mettere le azioni specifiche riguardanti la scheda della head-v3.
-            // ovviamente si deve sviluppare gli if-else (o un bel switch-case) per tutte le board head v3. 
-            // qui se la scheda NON presenta coupled joints, allora si procede come nel caso del emscontroller_board_UPPERLEG.  
-            // altrimenti si procede come nel caso del emscontroller_board_WAIST.
-            // attenzione al caso di solo alcuni coupled joints (vedi emscontroller_board_SHOULDER)  
+			if (eo_axisController_IsHardwareFault(ems->axis_controller[0])) return;
+            if (eo_axisController_IsHardwareFault(ems->axis_controller[1])) return;
+
+            if (eo_is_motor_ext_fault(ems->motors, 0)) return;
+            if (eo_is_motor_ext_fault(ems->motors, 1)) return;
+
+			if (!eo_axisController_SetControlMode(ems->axis_controller[0], mode)) return;
+            if (!eo_axisController_SetControlMode(ems->axis_controller[1], mode)) return;
+        
+            set_2FOC_running(0);
+            set_2FOC_running(1);
         }
-        */
+		else if((joint > 1) && (emscontroller_board_HEAD_neckyaw_eyes == ems->board))
+        {
+            if (eo_axisController_IsHardwareFault(ems->axis_controller[2])) return;
+            if (eo_axisController_IsHardwareFault(ems->axis_controller[3])) return;
+
+            if (eo_is_motor_ext_fault(ems->motors, 2)) return;
+            if (eo_is_motor_ext_fault(ems->motors, 3)) return;
+
+            if (!eo_axisController_SetControlMode(ems->axis_controller[2], mode)) return;
+            if (!eo_axisController_SetControlMode(ems->axis_controller[3], mode)) return;
+        
+            set_2FOC_running(2);
+            set_2FOC_running(3);                        
+        }
         else
         {
             if (eo_axisController_IsHardwareFault(ems->axis_controller[joint])) return;
@@ -918,12 +1065,42 @@ extern void eo_emsController_StartCalibration_type3(uint8_t joint, int32_t pos, 
         
     ems->axis_controller[joint] ->calibration_type = eomc_calibration_type3_abs_sens_digital;
     
+    //in case of coupled joints, I reset the calibration state of the others...they must always change their state together
+    s_eo_emsController_ResetCalibrationCoupledJoints(joint);
+    
     eo_absCalibratedEncoder_Calibrate(ems->abs_calib_encoder[joint], offset);
     
     eo_axisController_StartCalibration_type3(ems->axis_controller[joint]);
 }
 
-extern void eo_emsController_StartCalibration_type0(uint8_t joint, int16_t pwmlimit, int16_t vel)
+extern void eo_emsController_StartCalibration_type6(uint8_t joint, int32_t pos, int32_t vel, int32_t maxencoder)
+{
+    if (!ems) return;
+    
+    ems->n_calibrated = 0;
+        
+    //Set the right calibration type
+    ems->axis_controller[joint] ->calibration_type = eomc_calibration_type6_mais_mc4plus;
+    
+    /*
+    //in case of coupled joints, I reset the calibration state of the others...they must always change their state together
+    s_eo_emsController_ResetCalibrationCoupledJoints(joint);
+    
+    //zero offset for this calib? maybe I could change it later, when the calib procedure is ended
+    eo_absCalibratedEncoder_Calibrate(ems->abs_calib_encoder[joint], 0);
+    
+    //I should convert the position and velocity in iCubDegrees? probably yes
+    eOmc_joint_t *joint_ref = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, joint);
+    float divider = joint_ref->config.jntEncoderResolution;
+    if(divider < 0)
+        divider = -divider;
+    
+    uint32_t pos_icubdeg = (float) pos * 65535.0 / divider; //icub degrees are always unsigned (0-65535)
+    uint32_t vel_icubdeg = (float) vel * 65535.0 / divider;
+    eo_axisController_StartCalibration_type6(ems->axis_controller[joint], pos_icubdeg, vel_icubdeg, maxencoder);
+    */
+}
+extern void eo_emsController_StartCalibration_type5(uint8_t joint, int32_t pwmlimit, int32_t final_position)
 {
     if (!ems) return;
     
@@ -932,17 +1109,15 @@ extern void eo_emsController_StartCalibration_type0(uint8_t joint, int16_t pwmli
     //calibrating procedure
     //comments:
     //we don't need to set an offset to the encoder in this case! at the startup, the value is 0
-    //how to implement the procedure of setting a constant PWM to the motor until it reaches the hardware limit?
-    //nice solution -> do an incremental procedure modifying the PWM and CheckCalibration functions...a flag will notify the end of the procedure
-    
-    //Just for test...try to move the motor using the incremental encoder using it's initial raw position (it should be 0)
-    
+  
     //Set the right calibration type
-    ems->axis_controller[joint] ->calibration_type = eomc_calibration_type0_hard_stops;
+    ems->axis_controller[joint] ->calibration_type = eomc_calibration_type5_hard_stops_mc4plus;
     
+    //in case of coupled joints, I reset the calibration state of the others...they must always change their state together
+    s_eo_emsController_ResetCalibrationCoupledJoints(joint);
     //offset is 0 in this case
     eo_absCalibratedEncoder_Calibrate(ems->abs_calib_encoder[joint], 0);
-    eo_axisController_StartCalibration_type0(ems->axis_controller[joint], pwmlimit, vel);
+    eo_axisController_StartCalibration_type5(ems->axis_controller[joint], pwmlimit,final_position);
     
 }
 
@@ -962,14 +1137,15 @@ extern void eo_emsController_CheckCalibrations(void)
         
         ENCODERS(e)
         {
-            if (eo_motors_are_coupled(ems->motors, j, e))
+       
+          if (eo_motors_are_coupled(ems->motors, j, e))
+          {
+            if (!eo_absCalibratedEncoder_IsOk(ems->abs_calib_encoder[e]))
             {
-                if (!eo_absCalibratedEncoder_IsOk(ems->abs_calib_encoder[e]))
-                {
-                    joint_ok[j] = eobool_false;
-                    break;
-                }
+                joint_ok[j] = eobool_false;
+                break;
             }
+           }
         }
     }
     
@@ -977,14 +1153,25 @@ extern void eo_emsController_CheckCalibrations(void)
     {
         if (joint_ok[j])
         {
-            eo_axisController_SetCalibrated(ems->axis_controller[j]);
-            ems->n_calibrated++;
+            if( (ems->axis_controller[j]->calibration_type == eomc_calibration_type3_abs_sens_digital)
+                ||
+                (ems->axis_controller[j]->calibration_type == eomc_calibration_type5_hard_stops_mc4plus && ems->axis_controller[j]->hardwarelimitisreached))
+            {  
+                ems->n_calibrated++;
+                eo_axisController_SetCalibrated(ems->axis_controller[j]);
+ 
+                set_2FOC_running(j);
+                
+                eo_axisController_SetControlMode(ems->axis_controller[j], eomc_controlmode_cmd_position);
+                eo_axisController_SetInteractionMode(ems->axis_controller[j], eOmc_interactionmode_stiff);
+            }
         }
     }
     
     #else // ! USE_JACOBIAN
     
-    if (ems->board == emscontroller_board_UPPERLEG || ems->board == emscontroller_board_ANKLE)
+    if (ems->board == emscontroller_board_UPPERLEG || ems->board == emscontroller_board_ANKLE ||
+        emscontroller_board_FACE_eyelids_jaw == ems->board || emscontroller_board_FACE_lips == ems->board)
     {
         JOINTS(j)
         {
@@ -993,13 +1180,19 @@ extern void eo_emsController_CheckCalibrations(void)
                 ems->n_calibrated++;
             }
             else if (eo_absCalibratedEncoder_IsOk(ems->abs_calib_encoder[j]))
-            {    
-                ems->n_calibrated++;
-                eo_axisController_SetCalibrated(ems->axis_controller[j]);
+            {
+                if((ems->axis_controller[j]->calibration_type == eomc_calibration_type3_abs_sens_digital)
+                    ||
+                    (ems->axis_controller[j]->calibration_type == eomc_calibration_type5_hard_stops_mc4plus && ems->axis_controller[j]->hardwarelimitisreached))
+                {    
+                    ems->n_calibrated++;
+                    eo_axisController_SetCalibrated(ems->axis_controller[j]);
                 
-                set_2FOC_running(j);
-                eo_axisController_SetControlMode(ems->axis_controller[j], eomc_controlmode_cmd_position);
-                eo_axisController_SetInteractionMode(ems->axis_controller[j], eOmc_interactionmode_stiff);
+                    set_2FOC_running(j);
+                
+                    eo_axisController_SetControlMode(ems->axis_controller[j], eomc_controlmode_cmd_position);
+                    eo_axisController_SetInteractionMode(ems->axis_controller[j], eOmc_interactionmode_stiff);
+                }
             }
         }
     }
@@ -1011,26 +1204,32 @@ extern void eo_emsController_CheckCalibrations(void)
         {
             ems->n_calibrated+=3;
         }
-        else if (eo_absCalibratedEncoder_IsOk(ems->abs_calib_encoder[0]) && 
-                 eo_absCalibratedEncoder_IsOk(ems->abs_calib_encoder[1]) &&
-                 eo_absCalibratedEncoder_IsOk(ems->abs_calib_encoder[2]))
-        {
-            ems->n_calibrated+=3;
-            
-            eo_axisController_SetCalibrated(ems->axis_controller[0]);
-            eo_axisController_SetCalibrated(ems->axis_controller[1]);
-            eo_axisController_SetCalibrated(ems->axis_controller[2]);
-            
-            set_2FOC_running(0);
-            set_2FOC_running(1);
-            set_2FOC_running(2);
-            
-            eo_axisController_SetControlMode(ems->axis_controller[0], eomc_controlmode_cmd_position);
-            eo_axisController_SetInteractionMode(ems->axis_controller[0], eOmc_interactionmode_stiff);
-            eo_axisController_SetControlMode(ems->axis_controller[1], eomc_controlmode_cmd_position);
-            eo_axisController_SetInteractionMode(ems->axis_controller[1], eOmc_interactionmode_stiff);
-            eo_axisController_SetControlMode(ems->axis_controller[2], eomc_controlmode_cmd_position);
-            eo_axisController_SetInteractionMode(ems->axis_controller[2], eOmc_interactionmode_stiff);
+        else if ((eo_absCalibratedEncoder_IsOk(ems->abs_calib_encoder[0]))  && (eo_absCalibratedEncoder_IsOk(ems->abs_calib_encoder[1])) && (eo_absCalibratedEncoder_IsOk(ems->abs_calib_encoder[2])))
+        {            
+            if((    (ems->axis_controller[0]->calibration_type == eomc_calibration_type3_abs_sens_digital)
+                &&  (ems->axis_controller[1]->calibration_type == eomc_calibration_type3_abs_sens_digital)
+                &&  (ems->axis_controller[2]->calibration_type == eomc_calibration_type3_abs_sens_digital))
+                ||
+                (   (ems->axis_controller[0]->calibration_type == eomc_calibration_type5_hard_stops_mc4plus && ems->axis_controller[0]->hardwarelimitisreached)
+                &&  (ems->axis_controller[1]->calibration_type == eomc_calibration_type5_hard_stops_mc4plus && ems->axis_controller[1]->hardwarelimitisreached)
+                &&  (ems->axis_controller[2]->calibration_type == eomc_calibration_type5_hard_stops_mc4plus && ems->axis_controller[2]->hardwarelimitisreached)))   
+            {
+                ems->n_calibrated+=3;
+                eo_axisController_SetCalibrated(ems->axis_controller[0]);
+                eo_axisController_SetCalibrated(ems->axis_controller[1]);
+                eo_axisController_SetCalibrated(ems->axis_controller[2]);
+                
+                set_2FOC_running(0);
+                set_2FOC_running(1);
+                set_2FOC_running(2);
+                
+                eo_axisController_SetControlMode(ems->axis_controller[0], eomc_controlmode_cmd_position);
+                eo_axisController_SetInteractionMode(ems->axis_controller[0], eOmc_interactionmode_stiff);
+                eo_axisController_SetControlMode(ems->axis_controller[1], eomc_controlmode_cmd_position);
+                eo_axisController_SetInteractionMode(ems->axis_controller[1], eOmc_interactionmode_stiff);
+                eo_axisController_SetControlMode(ems->axis_controller[2], eomc_controlmode_cmd_position);
+                eo_axisController_SetInteractionMode(ems->axis_controller[2], eOmc_interactionmode_stiff);
+            }
         }
   
         if (ems->board == emscontroller_board_SHOULDER)
@@ -1041,28 +1240,122 @@ extern void eo_emsController_CheckCalibrations(void)
             }
             else if (eo_absCalibratedEncoder_IsOk(ems->abs_calib_encoder[3]))
             {    
-                ems->n_calibrated++;
-                
-                set_2FOC_running(3);
-                
-                eo_axisController_SetCalibrated(ems->axis_controller[3]);
-                eo_axisController_SetControlMode(ems->axis_controller[3], eomc_controlmode_cmd_position);
-                eo_axisController_SetInteractionMode(ems->axis_controller[3], eOmc_interactionmode_stiff);
+                if((ems->axis_controller[3]->calibration_type == eomc_calibration_type3_abs_sens_digital)
+                    ||
+                   (ems->axis_controller[3]->calibration_type == eomc_calibration_type5_hard_stops_mc4plus && ems->axis_controller[3]->hardwarelimitisreached))
+                { 
+                    ems->n_calibrated++;
+                    eo_axisController_SetCalibrated(ems->axis_controller[3]);
+                    
+                    set_2FOC_running(3);
+                    
+                    eo_axisController_SetControlMode(ems->axis_controller[3], eomc_controlmode_cmd_position);
+                    eo_axisController_SetInteractionMode(ems->axis_controller[3], eOmc_interactionmode_stiff);
+                }
             }
         }
     }
-    /*
-    else if((emscontroller_board_HEAD_neckpitch_neckroll == ems->board) || (emscontroller_board_HEAD_neckyaw_eyes == ems->board))
+   	else if(emscontroller_board_HEAD_neckpitch_neckroll == ems->board)
     {
-        #warning TODO: for head v3
-        // marco.accame: questo e' un placeholder per mettere le azioni specifiche riguardanti la scheda della head-v3.
-        // ovviamente si deve sviluppare gli if-else (o un bel switch-case) per tutte le board head v3. 
-        // qui se la scheda NON presenta coupled joints, allora si procede come nel caso del emscontroller_board_UPPERLEG.  
-        // altrimenti si procede come nel caso del emscontroller_board_WAIST.
-        // attenzione al caso di solo alcuni coupled joints (vedi emscontroller_board_SHOULDER)  
+        if (eo_axisController_IsCalibrated(ems->axis_controller[0]) &&
+            eo_axisController_IsCalibrated(ems->axis_controller[1]) )
+        {
+            ems->n_calibrated+=2;
+        }
+        else if (eo_absCalibratedEncoder_IsOk(ems->abs_calib_encoder[0]) && eo_absCalibratedEncoder_IsOk(ems->abs_calib_encoder[1]))
+        {
+            if ((  (ems->axis_controller[0]->calibration_type == eomc_calibration_type3_abs_sens_digital)
+                && (ems->axis_controller[1]->calibration_type == eomc_calibration_type3_abs_sens_digital))
+                ||
+                (  (ems->axis_controller[0]->calibration_type == eomc_calibration_type5_hard_stops_mc4plus && ems->axis_controller[0]->hardwarelimitisreached)
+                && (ems->axis_controller[1]->calibration_type == eomc_calibration_type5_hard_stops_mc4plus && ems->axis_controller[1]->hardwarelimitisreached)))
+            {
+                ems->n_calibrated+=2;
+                eo_axisController_SetCalibrated(ems->axis_controller[0]);
+                eo_axisController_SetCalibrated(ems->axis_controller[1]);
+
+                set_2FOC_running(0);
+                set_2FOC_running(1);
+
+                eo_axisController_SetControlMode(ems->axis_controller[0], eomc_controlmode_cmd_position);
+                eo_axisController_SetInteractionMode(ems->axis_controller[0], eOmc_interactionmode_stiff);
+                eo_axisController_SetControlMode(ems->axis_controller[1], eomc_controlmode_cmd_position);
+                eo_axisController_SetInteractionMode(ems->axis_controller[1], eOmc_interactionmode_stiff);	
+            }
+        }            
     }
-    */
-    #endif // ! USE_JACOBIAN        
+	else if(emscontroller_board_HEAD_neckyaw_eyes == ems->board)
+    {
+        //independent joints -> 0,1
+        JOINTS(j)
+        {
+            if ( j > 1 )
+                break;
+            if (eo_axisController_IsCalibrated(ems->axis_controller[j]))
+            {
+                ems->n_calibrated++;
+            }
+            else if (eo_absCalibratedEncoder_IsOk(ems->abs_calib_encoder[j]))
+            {
+                if  ((ems->axis_controller[j]->calibration_type == eomc_calibration_type3_abs_sens_digital)
+                    ||
+                    (ems->axis_controller[j]->calibration_type == eomc_calibration_type5_hard_stops_mc4plus && ems->axis_controller[j]->hardwarelimitisreached))
+                {
+                    ems->n_calibrated++;
+                    eo_axisController_SetCalibrated(ems->axis_controller[j]);
+                    
+                    set_2FOC_running(j);
+                    
+                    eo_axisController_SetControlMode(ems->axis_controller[j], eomc_controlmode_cmd_position);
+                    eo_axisController_SetInteractionMode(ems->axis_controller[j], eOmc_interactionmode_stiff);
+                }
+            }
+        }
+        
+        //coupled joints -> 2,3
+        if (eo_axisController_IsCalibrated(ems->axis_controller[2]) &&
+            eo_axisController_IsCalibrated(ems->axis_controller[3]))
+        {
+            ems->n_calibrated+=2;
+        }
+        else if ( eo_absCalibratedEncoder_IsOk(ems->abs_calib_encoder[2]) && eo_absCalibratedEncoder_IsOk(ems->abs_calib_encoder[3]))
+        {
+            if ((  (ems->axis_controller[2]->calibration_type == eomc_calibration_type3_abs_sens_digital)
+                && (ems->axis_controller[3]->calibration_type == eomc_calibration_type3_abs_sens_digital))
+                ||
+                (  (ems->axis_controller[2]->calibration_type == eomc_calibration_type5_hard_stops_mc4plus && ems->axis_controller[2]->hardwarelimitisreached)
+                && (ems->axis_controller[3]->calibration_type == eomc_calibration_type5_hard_stops_mc4plus && ems->axis_controller[3]->hardwarelimitisreached)))
+            {
+                ems->n_calibrated+=2; 
+                eo_axisController_SetCalibrated(ems->axis_controller[2]);
+                eo_axisController_SetCalibrated(ems->axis_controller[3]);
+               
+                set_2FOC_running(2);
+                set_2FOC_running(3);
+
+                eo_axisController_SetControlMode(ems->axis_controller[2], eomc_controlmode_cmd_position);
+                eo_axisController_SetInteractionMode(ems->axis_controller[2], eOmc_interactionmode_stiff);
+                eo_axisController_SetControlMode(ems->axis_controller[3], eomc_controlmode_cmd_position);
+                eo_axisController_SetInteractionMode(ems->axis_controller[3], eOmc_interactionmode_stiff);
+                
+                //eyes are virtually coupled, need to reset trajectory
+                s_eo_emsController_InitTrajectoryVersionVergence(2);
+                s_eo_emsController_InitTrajectoryVersionVergence(3);
+            }                
+       }
+   }
+   #endif // ! USE_JACOBIAN        
+}
+
+extern void eo_emsController_ResetCalibrationValues(uint8_t joint)
+{
+    if(ems)
+    {
+        eo_axisController_ResetCalibration(ems->axis_controller[joint]);
+        eo_absCalibratedEncoder_ResetCalibration(ems->abs_calib_encoder[joint]);
+    }
+    
+    return;
 }
 
 extern void eo_emsController_Stop(uint8_t joint)
@@ -1261,10 +1554,6 @@ extern void eo_emsMotorController_GoIdle(void)
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-// --------------------------------------------------------------------------------------------------------------------
-// - definition of extern hidden functions 
-// --------------------------------------------------------------------------------------------------------------------
-
 __weak extern void eo_emsController_hid_userdef_config_motor(EOemsController* ctrl,uint8_t motor)
 {
 
@@ -1315,6 +1604,79 @@ void set_2FOC_running(uint8_t motor)
 
 //#define MOTOR_QENCODER_FAULT     0x00100000
     
+static void s_eo_emsController_ResetCalibrationCoupledJoints(uint8_t joint)
+{
+    uint8_t i;
+    
+    //check coupled joints
+    if((emscontroller_board_SHOULDER == ems->board) || (emscontroller_board_WAIST == ems->board))    
+    {
+      if (joint < 3)
+      {
+          for(i = 0; i < 3; i++)
+          {
+              if ((joint != i) && (eo_axisController_IsCalibrated(ems->axis_controller[i])))
+              {
+                  eo_emsController_ResetCalibrationValues(i);
+              }   
+          }
+      }
+    }
+    else if(emscontroller_board_HEAD_neckpitch_neckroll == ems->board)  
+    {
+      for(i = 0; i < 2; i++)
+      {
+          if ((joint != i) && (eo_axisController_IsCalibrated(ems->axis_controller[i])))
+          {
+               eo_emsController_ResetCalibrationValues(i);
+          }   
+      }
+    }
+    else if(emscontroller_board_HEAD_neckyaw_eyes == ems->board) 
+    {
+      if ((joint == 2) || (joint == 3))
+      {
+          for(i = 2; i < 4; i++)
+          {
+              if ((joint != i) && (eo_axisController_IsCalibrated(ems->axis_controller[i])))
+              {
+                  eo_emsController_ResetCalibrationValues(i);
+              }   
+          }
+      }
+    }
+    return;
+}
+
+static void s_eo_emsController_InitTrajectoryVersionVergence(uint8_t j)
+{
+    int32_t axis_pos2 = eo_axisController_GetAxisPos(ems->axis_controller[2]);
+    int32_t axis_pos3 = eo_axisController_GetAxisPos(ems->axis_controller[3]);
+    
+    //version --> (pos3 + pos2)/2
+    if (j == 2)   
+    {
+         eo_trajectory_Init(eo_axisController_GetTraj (ems->axis_controller[2]), (axis_pos3 + axis_pos2)/2, eo_axisController_GetAxisVel(ems->axis_controller[2]), 0);
+         eo_trajectory_Stop(eo_axisController_GetTraj (ems->axis_controller[2]), (axis_pos3 + axis_pos2)/2);
+         //set reference point to mantain --> it's the actual position! this seems to resolve the issue related to the eyes calibration
+         eo_axisController_SetPosRef(ems->axis_controller[2],  (axis_pos3 + axis_pos2)/2,  eo_axisController_GetAxisVel(ems->axis_controller[2]));
+         return;
+    }
+    
+    //vergence --> (pos3 - pos2)/2
+    if (j == 3)   
+    {
+         eo_trajectory_Init(eo_axisController_GetTraj (ems->axis_controller[3]), (axis_pos3 - axis_pos2)/2, eo_axisController_GetAxisVel(ems->axis_controller[3]), 0);
+         eo_trajectory_Stop(eo_axisController_GetTraj (ems->axis_controller[3]), (axis_pos3 - axis_pos2)/2); // /2 or not?
+         //set reference point to mantain --> it's the actual position! this seems to resolve the issue related to the eyes calibration
+         eo_axisController_SetPosRef(ems->axis_controller[3], (axis_pos3 - axis_pos2)/2, eo_axisController_GetAxisVel(ems->axis_controller[3]));
+         return;
+    }
+    
+    #warning does it worth to put the virtually coupled joints in 0? it's a choice, discuss it 
+}
+
+
 /*
     BYTE 0
 
@@ -1374,8 +1736,8 @@ void set_2FOC_running(uint8_t motor)
         b7  unsigned PositionLimitLower:1; 
 */
 
- void sendErrorMessage(uint8_t j, uint32_t ems_fault_mask_j, uint32_t motor_fault_mask_j)
- {
+void sendErrorMessage(uint8_t j, uint32_t ems_fault_mask_j, uint32_t motor_fault_mask_j)
+{
     //eObool_t managed = eobool_false;
     uint64_t par64 = (((uint64_t)ems_fault_mask_j)<<32)|(uint64_t)motor_fault_mask_j;
      
