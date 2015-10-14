@@ -101,7 +101,7 @@ extern eObool_t eo_mcserv_AreMotorsExtFaulted(EOmcService *p);
 
 extern eOresult_t eo_mcserv_SetMotorFaultMask(EOmcService *p, uint8_t motor, uint8_t* fault_mask);
 
-extern uint16_t eo_mcserv_GetMotorFaultMask(EOmcService *p, uint8_t motor);
+extern uint32_t eo_mcserv_GetMotorFaultMask(EOmcService *p, uint8_t motor);
 
 extern int16_t eo_mcserv_GetMotorCurrent(EOmcService *p, uint8_t joint);
 

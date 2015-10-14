@@ -170,6 +170,9 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOM
         eo_canserv_Parse(eo_canserv_GetHandle(), (eOcanport_t)port, numofRXcanframe, NULL);
     }
     */
+    
+    //check and update faults mask for the motor
+    s_overriden_runner_CheckAndUpdateExtFaults();
 }
 
 
@@ -179,7 +182,7 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOM
 extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
 {  
     //check and update faults mask for the motor
-    s_overriden_runner_CheckAndUpdateExtFaults();
+    //s_overriden_runner_CheckAndUpdateExtFaults();
     
     eo_mcserv_Actuate(eo_mcserv_GetHandle());    
 }
@@ -258,10 +261,11 @@ static void s_overriden_runner_CheckAndUpdateExtFaults(void)
         //set the fault mask for ALL the motors
         for (uint8_t i = 0; i < numofjomos; i++)
         {
-            uint16_t state = eo_mcserv_GetMotorFaultMask(eo_mcserv_GetHandle(),i);
-            if((state & MOTOR_EXTERNAL_FAULT) == 0) //external fault bit
+            uint32_t state = eo_mcserv_GetMotorFaultMask(eo_mcserv_GetHandle(),i);
+            if((state & MOTOR_EXTERNAL_FAULT) == 0) //external fault bit not set
             {
-                uint8_t fault_mask[6] = {0x4, 0x0, 0x0, 0x0, 0x0, 0x0}; //setting only the external fault bit
+                //uint8_t fault_mask[6] = {0x4, 0x0, 0x0, 0x0, 0x0, 0x0}; //setting only the external fault bit
+                uint8_t fault_mask[6] = {0x0, 0x4, 0x0, 0x0, 0x0, 0x0}; //byte0 -> idle state for the joint, byte1 -> ext fault
                 eo_motor_set_motor_status(eo_motors_GetHandle(),i, fault_mask);
             }
         }
@@ -279,8 +283,8 @@ static void s_overriden_runner_UpdateMotorsStatus(void)
   uint8_t numofjomos = eo_entities_NumOfJoints(eo_entities_GetHandle());  
   for (uint8_t i = 0; i < numofjomos; i++)
   {       
-    if(NULL == (jnt = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, i)) ||
-      (NULL == (mot = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, i)))) 
+    if((NULL == (jnt = eo_mcserv_GetJoint(eo_mcserv_GetHandle(), i))) ||
+       (NULL == (mot = eo_mcserv_GetMotor(eo_mcserv_GetHandle(), i)))) 
     {
         continue;        
     }

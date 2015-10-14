@@ -453,7 +453,7 @@ extern eOresult_t eo_mcserv_SetMotorFaultMask(EOmcService *p, uint8_t motor, uin
     return eores_OK;
 }
 
-extern uint16_t eo_mcserv_GetMotorFaultMask(EOmcService *p, uint8_t motor)
+extern uint32_t eo_mcserv_GetMotorFaultMask(EOmcService *p, uint8_t motor)
 {
     if(NULL == p)
     {
@@ -461,7 +461,7 @@ extern uint16_t eo_mcserv_GetMotorFaultMask(EOmcService *p, uint8_t motor)
     }
     
     // don't need to use p->config.jomos[motor].actuator.local.index, cause the emsController (and related objs) use the same indexing of the highlevel
-    uint16_t state_mask = eo_get_motor_fault_mask(eo_motors_GetHandle(), motor);
+    uint32_t state_mask = eo_get_motor_fault_mask(eo_motors_GetHandle(), motor);
     return state_mask;
 }
 
@@ -875,7 +875,7 @@ static void s_eo_mcserv_pwm_set(uint8_t i, int16_t v)
         return;
     
     #warning hal set the pwm taking as the argument a int32_t...should we change this parameter or the pwmvalues type?
-    hal_motor_pwmset(i, v);
+    hal_motor_pwmset((hal_motor_t)i, v);
 }
 
 static void s_eo_mcserv_pwm_enable(uint8_t i)
@@ -884,7 +884,7 @@ static void s_eo_mcserv_pwm_enable(uint8_t i)
     if (i > 3)
         return;
     
-    hal_motor_enable(i);
+    hal_motor_enable((hal_motor_t)i);
 }
 
 static void s_eo_mcserv_pwm_disable(uint8_t i)
@@ -893,7 +893,7 @@ static void s_eo_mcserv_pwm_disable(uint8_t i)
     if (i > 3)
         return;
     
-    hal_motor_disable(i);
+    hal_motor_disable((hal_motor_t)i);
 }
 
 
@@ -923,18 +923,7 @@ extern eOresult_t s_eo_mcserv_do_mc4plus(EOmcService *p)
     hal_encoder_errors_flags fl = {0};
     EOappEncReader *app_enc_reader = p->thelocalencoderreader;
     
-    #warning TBD: add what is missing for do phase
-      
-    // 1. wait some time until encoders are ready. if not ready by a timeout, then issue a diagnostics message and ... quit or continue?
-    /*
-    while(!eo_appEncReader_isReady(app_enc_reader))
-    {
-        //do nothing
-    }
-    //determine if the timeout is expired
-    */
-    
-    
+    #warning maybe we could add a timeout here, instead of trying to read tot times...the behaviour coded below it's the one used for ems control loop       
     uint8_t spi_stream0 = 0, spi_stream1 = 0;
     for(uint8_t i=0; i<30; ++i)
     {
@@ -1006,8 +995,9 @@ extern eOresult_t s_eo_mcserv_do_mc4plus(EOmcService *p)
     // 3. restart a new reading of the encoders 
     eo_appEncReader_StartRead(app_enc_reader);
     
-    // 4. apply the readings (primary encoder) to localcontroller
+    // 4. apply the readings (primary encoder) to localcontroller and check for possible faults
     eo_emsController_AcquireAbsEncoders((int32_t*)p->valuesencoder, errormask);
+    eo_emsController_CheckFaults();
     
     // (for MAIS-controlled joints...do a check on the limits (see MC4 firmware) before entering here or inside the controller?)
     // 5. compute the pwm using pid
@@ -1026,6 +1016,10 @@ extern eOresult_t s_eo_mcserv_do_mc4plus(EOmcService *p)
         {
             // joint ...
             eOmc_joint_status_t *jstatus = &(p->thejoints[jm]->status);
+            if (jstatus == NULL)
+            {
+                continue;
+            }
             
             eo_emsController_GetJointStatus(jm, jstatus);
             eo_emsController_GetActivePidStatus(jm, &(jstatus->ofpid)); 
@@ -1052,6 +1046,10 @@ extern eOresult_t s_eo_mcserv_do_mc4plus(EOmcService *p)
             
             // motor ...
             eOmc_motor_status_t *mstatus = &(p->themotors[jm]->status);
+            if (mstatus == NULL)
+            {
+                continue;
+            }
             
             eo_emsController_GetMotorStatus(jm, mstatus);
   
@@ -1180,7 +1178,8 @@ static eOresult_t s_eo_mcserv_MaisValues2Pos(eOprotID32_t maisID, uint8_t motor,
 {
     //how can I follow a rule based on the joint number? it seems that the rule is hardware-cabled
     
-    eOmc_joint_t *joint_ref = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, joint);
+    //eOmc_joint_t *joint_ref = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, joint);
+    eOmc_joint_t *joint_ref = eo_mcserv_GetJoint(eo_mcserv_GetHandle(), joint);
     float divider = joint_ref->config.jntEncoderResolution;
     if(divider < 0)
         divider = -divider;
