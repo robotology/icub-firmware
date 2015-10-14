@@ -32,7 +32,7 @@
 #include "EOtheCANmapping.h"
 #include "EOMtheEMSappl.h"
 
-#include "EOMtheEMSconfigurator.h"
+//#include "EOMtheEMSconfigurator.h"
 
 #include "EOtheCANservice.h"
 #if defined (USE_MC4PLUS)
@@ -92,7 +92,6 @@ static void* s_eocanprotASpolling_get_entity(eOprotEndpoint_t endpoint, eOprot_e
 static void s_eocanprotASpolling_getfullscale_nextstep(uint8_t channel, eOas_strain_t *strain, uint8_t index);
 static eOresult_t s_loadFullscalelikeoccasionalrop(eOas_strainId_t sId);
 
-static eObool_t s_eocanprotASpolling_is_the_other_eth_board(eOcanframe_t *frame);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -220,13 +219,7 @@ extern eOresult_t eocanprotASpolling_former_POL_AS_CMD__GET_FIRMWARE_VERSION(eOc
 }
 
 extern eOresult_t eocanprotASpolling_parser_POL_AS_CMD__GET_FIRMWARE_VERSION(eOcanframe_t *frame, eOcanport_t port)
-{
-    //N.B. in the upper arm V3, we have two MC4plus (eth) connected on the same CAN bus
-    //Since the ID of the reply of the MAIS is the same of the ID of the message (GET_FIRMWARE_VERSION) sent by the other board,
-    //I need to discard those messages, cause I'm only interested on the real mais replies
-    if (s_eocanprotASpolling_is_the_other_eth_board(frame))
-        return eores_OK;
-    
+{   
     eOcanmap_location_t loc = {0};
     loc.port                = port;
     loc.addr                = EOCANPROT_FRAME_GET_SOURCE(frame);
@@ -419,14 +412,15 @@ static void s_eocanprotASpolling_getfullscale_nextstep(uint8_t channel, eOas_str
             // diagnostics
             return;
         }
-        eOsmStatesEMSappl_t status;
-        eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &status);
-        
-        // if application is in cfg state, then we send a request to configurator to send ropframe out
-        if(eo_sm_emsappl_STcfg == status)
-        {
-            eom_task_SetEvent(eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()), emsconfigurator_evt_ropframeTx); 
-        }
+//        eom_emsappl_SendTXRequest(eom_emsappl_GetHandle());
+//        eOsmStatesEMSappl_t status;
+//        eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &status);
+//        
+//        // if application is in cfg state, then we send a request to configurator to send ropframe out
+//        if(eo_sm_emsappl_STcfg == status)
+//        {
+//            eom_task_SetEvent(eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()), emsconfigurator_evt_ropframeTx); 
+//        }
     }
     else
     {   // send request for next channel
@@ -457,34 +451,27 @@ static eOresult_t s_loadFullscalelikeoccasionalrop(eOas_strainId_t sId)
     ropdesc.id32                    = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_strain, sId, eoprot_tag_as_strain_status_fullscale); 
     ropdesc.data                    = NULL;
 
+    res = eom_emsappl_Transmit_OccasionalROP(eom_emsappl_GetHandle(), &ropdesc);
    
-    res = eo_transceiver_OccasionalROP_Load( eom_emstransceiver_GetTransceiver(eom_emstransceiver_GetHandle()), &ropdesc); 
-    if(eores_OK != res)
-    {
-        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, "cannot sig<strain.fullscale>", NULL, &eo_errman_DescrRuntimeErrorLocal);
-    }
-    else
-    {
-        //eOerrmanDescriptor_t des = {0};
-        //des.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag03);
-        //des.param = 0x1111;
-        //des.sourceaddress = 0;
-        //des.sourcedevice = eo_errman_sourcedevice_localboard;
-        //eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &des);
-    }
+//    res = eo_transceiver_OccasionalROP_Load( eom_emstransceiver_GetTransceiver(eom_emstransceiver_GetHandle()), &ropdesc); 
+//    if(eores_OK != res)
+//    {
+//        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, "cannot sig<strain.fullscale>", NULL, &eo_errman_DescrRuntimeErrorLocal);
+//    }
+//    else
+//    {
+//        //eOerrmanDescriptor_t des = {0};
+//        //des.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag03);
+//        //des.param = 0x1111;
+//        //des.sourceaddress = 0;
+//        //des.sourcedevice = eo_errman_sourcedevice_localboard;
+//        //eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &des);
+//    }
 
 
     return(res);
 }
 
-static eObool_t s_eocanprotASpolling_is_the_other_eth_board(eOcanframe_t *frame)
-{
-    if (frame->id == 0x20E)
-        return eobool_true;
-    else
-        return eobool_false;
-    
-}
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------
