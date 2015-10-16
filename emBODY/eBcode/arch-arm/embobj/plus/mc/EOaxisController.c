@@ -107,6 +107,7 @@ extern EOaxisController* eo_axisController_New(uint8_t id)
         ///////////////////////////
         
         o->openloop_out = 0;
+        o->openloop_limitreached = 0;
         o->controller_output = 0;
 
         o->control_mode  = eomc_controlmode_notConfigured;
@@ -682,7 +683,18 @@ extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
             
             if (pos <= o->pos_min || o->pos_max <= pos)
             {
-                return 0;
+                //limit reached, store the PWMvalue
+                if (o->openloop_limitreached == 0)
+                    o->openloop_limitreached = o->openloop_out;
+                   
+                //check if the last PWM output has the same sign of the last openloop
+                if ((o->openloop_limitreached >= 0) ^ (o->openloop_out < 0))
+                    return 0;
+            }
+            //inside safe band, reset value
+            else
+            {
+                o->openloop_limitreached = 0;
             }
             
             return o->openloop_out;
