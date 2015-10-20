@@ -303,7 +303,7 @@ extern void eoprot_fun_UPDT_mn_appl_config(const EOnv* nv, const eOropdescriptor
     if(1000 != cfg->cycletime)
     {
         cfg->cycletime = 1000;
-        #warning marco.accame: send up a warning about unsuppported feature
+        //#warning marco.accame: send up a warning about unsuppported feature
     }
     
     if(0 == cfg->txratedivider)
@@ -733,9 +733,13 @@ static void s_eoprot_ep_mn_fun_configcommand(eOmn_command_t* command)
                 res = res;
                 if(eores_OK != res)
                 {
-                    #warning marco.accame: TODO: put diagnostics
-//                    eo_theEMSdgn_UpdateApplCore(eo_theEMSdgn_GetHandle());
-//                    eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsapplcommon , 1000);
+                    eOerrmanDescriptor_t errdes = {0};
+                    errdes.sourcedevice = eo_errman_sourcedevice_localboard;
+                    errdes.sourceaddress = 0;
+                    errdes.par16 = 0;
+                    errdes.par64 = sigcfg->id32; 
+                    errdes.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_comm_cannotloadaregularrop);              
+                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
                 }
             }        
         } break;
@@ -760,9 +764,13 @@ static void s_eoprot_ep_mn_fun_configcommand(eOmn_command_t* command)
                 res = res;
                 if(eores_OK != res)
                 {
-                    #warning marco.accame: TODO: put diagnostics
-//                    eo_theEMSdgn_UpdateApplCore(eo_theEMSdgn_GetHandle());
-//                    eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsapplcommon , 1000);
+                    eOerrmanDescriptor_t errdes = {0};
+                    errdes.sourcedevice = eo_errman_sourcedevice_localboard;
+                    errdes.sourceaddress = 0;
+                    errdes.par16 = 0;
+                    errdes.par64 = sigcfg->id32; 
+                    errdes.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_comm_cannotloadaregularrop);              
+                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
                 }
             }         
         } break;        
