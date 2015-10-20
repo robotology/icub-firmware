@@ -193,7 +193,8 @@ static EOMtheEMSrunner s_theemsrunner =
     .iterationnumber        = 0,
     .usedTXdecimationfactor = 1,
     .itisaTXcycle           = eobool_true,
-    .txropsnumberincycle    = {0, 0, 0}
+    .txropsnumberincycle    = {0, 0, 0},
+    .prevTXactiviySentRegularROPs   = eobool_false   
 };
 
 
@@ -365,9 +366,7 @@ extern eObool_t eom_emsrunner_CycleHasJustTransmittedRegulars(EOMtheEMSrunner *p
         return(eobool_false);
     } 
     
-    eObool_t ret = (0 == p->txropsnumberincycle.numberofregulars) ? (eobool_false) : (eobool_true);
-
-    return(ret);   
+    return(p->prevTXactiviySentRegularROPs);     
 }
 
 extern eOresult_t eom_emsrunner_Start(EOMtheEMSrunner *p)
@@ -729,6 +728,9 @@ __weak extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtrans
 //        }
 //    }
     
+    
+    p->prevTXactiviySentRegularROPs = eobool_false;
+    
         
     // the transmission section
     if(eobool_true == processtransmission)
@@ -739,8 +741,9 @@ __weak extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtrans
         processedpkts++;   
         
         // 1.1 call the former to retrieve a tx packet (even if it is an empty ropframe)        
-        resformer = eom_emstransceiver_Form(eom_emstransceiver_GetHandle(), &txpkt, &numberoftxrops, &s_theemsrunner.txropsnumberincycle);
+        resformer = eom_emstransceiver_Form(eom_emstransceiver_GetHandle(), &txpkt, &numberoftxrops, &p->txropsnumberincycle);
         
+       
         // 1.2  send a packet back. but only if the former gave us a good one and if we have at least 1 rop inside
         if(eores_OK == resformer)
         {
@@ -752,6 +755,8 @@ __weak extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtrans
                     p->numoftxrops += numberoftxrops;
                     p->numoftxpackets++;
                     p->numofpacketsinsidesocket++;
+                    // update this state variable
+                    p->prevTXactiviySentRegularROPs = (0 == p->txropsnumberincycle.numberofregulars) ? (eobool_false) : (eobool_true);
                 }
                 else
                 {
@@ -1110,6 +1115,9 @@ static void s_eom_emsrunner_taskTX_run(EOMtask *p, uint32_t t)
         // stop the tx timers ...
         hal_timer_stop(s_theemsrunner.haltimer_start[eo_emsrunner_taskid_runTX]);        
         hal_timer_stop(s_theemsrunner.haltimer_alert[eo_emsrunner_taskid_runTX]);
+        
+        // clear the value
+        s_theemsrunner.prevTXactiviySentRegularROPs = eobool_false;
         
         // and now ... finally we sent the state machine into the new state
         // reset the event to the dummy value.

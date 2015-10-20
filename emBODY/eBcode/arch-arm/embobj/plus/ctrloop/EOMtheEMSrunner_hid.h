@@ -82,6 +82,7 @@ struct EOMtheEMSrunner_hid
     uint8_t             usedTXdecimationfactor;
     eObool_t            itisaTXcycle;
     eOtransmitter_ropsnumber_t  txropsnumberincycle;
+    eObool_t            prevTXactiviySentRegularROPs;
 };
 
 
