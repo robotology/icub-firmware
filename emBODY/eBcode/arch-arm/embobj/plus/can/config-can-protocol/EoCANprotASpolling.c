@@ -32,7 +32,6 @@
 #include "EOtheCANmapping.h"
 #include "EOMtheEMSappl.h"
 
-//#include "EOMtheEMSconfigurator.h"
 
 #include "EOtheCANservice.h"
 #if defined (USE_MC4PLUS)
@@ -89,8 +88,8 @@ static void s_former_POL_AS_prepare_frame(eOcanprot_descriptor_t *descriptor, eO
 static void* s_eocanprotASpolling_get_entity(eOprotEndpoint_t endpoint, eOprot_entity_t entity, eOcanframe_t *frame, eOcanport_t port, uint8_t *index);
 
 
-static void s_eocanprotASpolling_getfullscale_nextstep(uint8_t channel, eOas_strain_t *strain, uint8_t index);
-static eOresult_t s_loadFullscalelikeoccasionalrop(eOas_strainId_t sId);
+//static void s_eocanprotASpolling_getfullscale_nextstep(uint8_t channel, eOas_strain_t *strain, uint8_t index);
+//static eOresult_t s_loadFullscalelikeoccasionalrop(eOas_strainId_t sId);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -162,15 +161,14 @@ extern eOresult_t eocanprotASpolling_former_POL_AS_CMD__GET_FULL_SCALES(eOcanpro
 
 __weak extern eObool_t eocanprotASpolling_redefinable_alert_reception_of_POL_AS_CMD__GET_FULL_SCALES(uint8_t channel,  uint16_t *data, eOas_strain_t* strain)
 {
-    // if anybody wnats to redefine this, it must make retrun eobool_true
+    // if anybody wants to redefine this, it must make return eobool_true, so the caller knows it has been redefined
     return(eobool_false);
 }
 
-// this funtion receives the full scale of a channel, stores it into the strain entity and then:
-// - if eocanprotASpolling_redefinable_alert_reception_of_POL_AS_CMD__GET_FULL_SCALES() return false it 
-//   triggers a new request for the next channel. eventually it stops and sends a rop to robotinterface.
-// - if eocanprotASpolling_redefinable_alert_reception_of_POL_AS_CMD__GET_FULL_SCALES() returns true, meaning that
-//   someone has redefined it, then it does nothing else
+// this funtion receives the full scale of a channel, stores it into the strain entity and then 
+// it calls fucntion eocanprotASpolling_redefinable_alert_reception_of_POL_AS_CMD__GET_FULL_SCALES()
+// the default eocanprotASpolling_redefinable_alert_reception_of_POL_AS_CMD__GET_FULL_SCALES() does nothing.
+// the procedure of asking the next full scale until compeltion must be done inside the redefined function.
 extern eOresult_t eocanprotASpolling_parser_POL_AS_CMD__GET_FULL_SCALES(eOcanframe_t *frame, eOcanport_t port)
 {
     // get the strain
@@ -197,12 +195,8 @@ extern eOresult_t eocanprotASpolling_parser_POL_AS_CMD__GET_FULL_SCALES(eOcanfra
     
     // ok ... done the basic stuff. i have put inside the array the data it arrives in the correct position.
     
-    // now we do some more ... or not
-    #warning marco.accame: much better redefining eocanprotASpolling_redefinable_alert_reception_of_POL_AS_CMD__GET_FULL_SCALES() so that everything is done in here
-    if(eobool_false == eocanprotASpolling_redefinable_alert_reception_of_POL_AS_CMD__GET_FULL_SCALES(channel, data, strain))
-    {   
-        s_eocanprotASpolling_getfullscale_nextstep(channel, strain, index);        
-    }
+    // now we alert someone that the message has arrived for the given channel. 
+    eocanprotASpolling_redefinable_alert_reception_of_POL_AS_CMD__GET_FULL_SCALES(channel, data, strain);
     
     return(eores_OK);
 }
@@ -398,79 +392,56 @@ static void* s_eocanprotASpolling_get_entity(eOprotEndpoint_t endpoint, eOprot_e
     return(ret);   
 }
 
-static void s_eocanprotASpolling_getfullscale_nextstep(uint8_t channel, eOas_strain_t *strain, uint8_t index)
-{
-    eOresult_t res = eores_OK;
-    
-    if(5 == channel)
-    {   // received the last channel
-        
-        // prepare occasional rop to send
-        res = s_loadFullscalelikeoccasionalrop(index);
-        if(eores_OK != res)
-        {
-            // diagnostics
-            return;
-        }
-//        eom_emsappl_SendTXRequest(eom_emsappl_GetHandle());
-//        eOsmStatesEMSappl_t status;
-//        eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &status);
+
+//static void s_eocanprotASpolling_getfullscale_nextstep(uint8_t channel, eOas_strain_t *strain, uint8_t index)
+//{
+//    eOresult_t res = eores_OK;
+//    
+//    if(5 == channel)
+//    {   // received the last channel
 //        
-//        // if application is in cfg state, then we send a request to configurator to send ropframe out
-//        if(eo_sm_emsappl_STcfg == status)
-//        {
-//            eom_task_SetEvent(eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()), emsconfigurator_evt_ropframeTx); 
-//        }
-    }
-    else
-    {   // send request for next channel
-        channel++;
-        
-        eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_strain, index, 0);
-        eOcanprot_command_t command = {0};
-        command.class = eocanprot_msgclass_pollingAnalogSensor;
-        command.type  = ICUBCANPROTO_POL_AS_CMD__GET_FULL_SCALES;
-        command.value = &channel;
-        
-        eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);
-    }
-}    
-
-
-static eOresult_t s_loadFullscalelikeoccasionalrop(eOas_strainId_t sId)
-{
-    eOresult_t res;
-    eOropdescriptor_t ropdesc;
-
-    // marco.accame on 3 feb 15: better using the eok_ropdesc_basic instead of all 0s.
-    // memset(&ropdesc, 0, sizeof(eOropdescriptor_t));
-    memcpy(&ropdesc, &eok_ropdesc_basic, sizeof(eok_ropdesc_basic));
-
-    ropdesc.ropcode                 = eo_ropcode_sig;
-    ropdesc.size                    = sizeof(eOas_arrayofupto12bytes_t);
-    ropdesc.id32                    = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_strain, sId, eoprot_tag_as_strain_status_fullscale); 
-    ropdesc.data                    = NULL;
-
-    res = eom_emsappl_Transmit_OccasionalROP(eom_emsappl_GetHandle(), &ropdesc);
-   
-//    res = eo_transceiver_OccasionalROP_Load( eom_emstransceiver_GetTransceiver(eom_emstransceiver_GetHandle()), &ropdesc); 
-//    if(eores_OK != res)
-//    {
-//        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, "cannot sig<strain.fullscale>", NULL, &eo_errman_DescrRuntimeErrorLocal);
+////        // prepare occasional rop to send
+////        res = s_loadFullscalelikeoccasionalrop(index);
+////        if(eores_OK != res)
+////        {
+////            // diagnostics
+////            return;
+////        }
 //    }
 //    else
-//    {
-//        //eOerrmanDescriptor_t des = {0};
-//        //des.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag03);
-//        //des.param = 0x1111;
-//        //des.sourceaddress = 0;
-//        //des.sourcedevice = eo_errman_sourcedevice_localboard;
-//        //eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &des);
+//    {   // send request for next channel
+//        channel++;
+//        
+//        eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_strain, index, 0);
+//        eOcanprot_command_t command = {0};
+//        command.class = eocanprot_msgclass_pollingAnalogSensor;
+//        command.type  = ICUBCANPROTO_POL_AS_CMD__GET_FULL_SCALES;
+//        command.value = &channel;
+//        
+//        eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);
 //    }
+//}    
 
+// marco.accame: removed because ... it is the redefined function eocanprotASpolling_redefinable_alert_reception_of_POL_AS_CMD__GET_FULL_SCALES() which
+// will transmit the status to robotInterface. in this file we just do nothing.
+//static eOresult_t s_loadFullscalelikeoccasionalrop(eOas_strainId_t sId)
+//{
+//    eOresult_t res;
+//    eOropdescriptor_t ropdesc;
 
-    return(res);
-}
+//    // marco.accame on 3 feb 15: better using the eok_ropdesc_basic instead of all 0s.
+//    // memset(&ropdesc, 0, sizeof(eOropdescriptor_t));
+//    memcpy(&ropdesc, &eok_ropdesc_basic, sizeof(eok_ropdesc_basic));
+
+//    ropdesc.ropcode                 = eo_ropcode_sig;
+//    ropdesc.size                    = sizeof(eOas_arrayofupto12bytes_t);
+//    ropdesc.id32                    = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_strain, sId, eoprot_tag_as_strain_status_fullscale); 
+//    ropdesc.data                    = NULL;
+
+//    res = eom_emsappl_Transmit_OccasionalROP(eom_emsappl_GetHandle(), &ropdesc);
+//   
+//    return(res);
+//}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
