@@ -29,17 +29,15 @@
 #include "EOMtheEMSappl_hid.h"
 #include "EOMtheEMSapplCfg.h"
 
-//#include "EOtheEMSapplBody.h"
 
 #include "EOaction.h"
-#include "hl_bits.h"
+
 
 #include "EOMtheEMSapplCfg_cfg.h"
 
 #include "EOnvSet.h"
 #include "EoProtocolMC.h"
 
-#include "iCubCanProto_motorControlMessages.h"
 
 #include "EOtheCANservice.h"
 #include "EOtheCANprotocol.h"
@@ -51,10 +49,6 @@
 #include "EOtheInertial.h"
 
 #include "EOtheBoardConfig.h"
-
-
-#include "EOVtheEnvironment.h"
-#include "EOtheARMenvironment.h"
 
 
 #include "EOconstvector_hid.h"
@@ -153,6 +147,7 @@
 //    }
 //};
 
+// we need to define it ... even if it is useless. we shall remove it later on
 const EOVtheEMSapplCfgBody theapplbodyconfig = 
 {
     .type               =   0,
@@ -171,12 +166,30 @@ const EOVtheEMSapplCfgBody theapplbodyconfig =
 
 static void overridden_appl_led_error_init(void);
 
+
+static void s_overridden_appl_initialise_eb9(EOMtheEMSappl* p);
+static void s_debug_eb9(void);
+static void callback_eb9(void *p);
+static eOresult_t s_on_strain_verify_eb9(EOtheSTRAIN* p, eObool_t verifyisok);
+static eOresult_t s_on_mcfoc_verify_eb9(EOtheMotionController* p, eObool_t verifyisok);
+
+
+
 static void s_overridden_appl_initialise_eb1(EOMtheEMSappl* p);
 static void s_debug_eb1(void);
 static void callback_eb1(void *p);
 static eOresult_t s_on_strain_verify_eb1(EOtheSTRAIN* p, eObool_t verifyisok);
 static eOresult_t s_on_mcfoc_verify_eb1(EOtheMotionController* p, eObool_t verifyisok);
 
+
+
+
+static void s_overridden_appl_initialise_eb2(EOMtheEMSappl* p);
+static void s_debug_eb2(void);
+static void callback_eb2(void *p);
+static eOresult_t s_on_skin_verify_eb2(EOtheSKIN* p, eObool_t verifyisok);
+static eOresult_t s_on_mc4_verify_eb2(EOtheMotionController* p, eObool_t verifyisok);
+static eOresult_t s_on_mais_verify_eb2(EOtheMAIS* p, eObool_t verifyisok);
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
@@ -216,7 +229,11 @@ extern void eom_emsapplcfg_hid_userdef_OnError(eOerrmanErrorType_t errtype, cons
 
     if(emsapplcfg->errmng_haltrace_enabled)
     {
-        snprintf(str, sizeof(str), "[%s] %s in tsk %d: %s", err, eobjstr, taskid, info);
+        uint64_t tt = eov_sys_LifeTimeGet(eov_sys_GetHandle());
+        uint32_t sec = tt/(1000*1000);
+        uint32_t msec = tt%(1000*1000);
+        msec /= 1000;
+        snprintf(str, sizeof(str), "[%s] at s%d m%d %s in tsk %d: %s", err, sec, msec, eobjstr, taskid, info);
         hal_trace_puts(str);
     }
     if(errtype <= eo_errortype_error)
@@ -235,15 +252,15 @@ extern void eom_emsapplcfg_hid_userdef_OnError(eOerrmanErrorType_t errtype, cons
     {
         if(0 == strcmp(caller->eobjstr, "HAL"))
         {
-            hl_bits_byte_bitclear(&ledmask, 0);           
+            eo_common_byte_bitclear(&ledmask, 0);           
         }
         else if(0 == strcmp(caller->eobjstr, "OSAL"))
         {
-            hl_bits_byte_bitclear(&ledmask, 1);  
+            eo_common_byte_bitclear(&ledmask, 1);  
         }
         else if(0 == strcmp(caller->eobjstr, "IPAL"))
         {
-            hl_bits_byte_bitclear(&ledmask, 2);  
+            eo_common_byte_bitclear(&ledmask, 2);  
         }
     }
 
@@ -251,15 +268,15 @@ extern void eom_emsapplcfg_hid_userdef_OnError(eOerrmanErrorType_t errtype, cons
     {
         hal_sys_delay(100);
         
-        if(hl_true == hl_bits_byte_bitcheck(ledmask, 0))
+        if(eobool_true == eo_common_byte_bitcheck(ledmask, 0))
         {
             hal_led_toggle(hal_led0);
         }
-        if(hl_true == hl_bits_byte_bitcheck(ledmask, 1))
+        if(eobool_true == eo_common_byte_bitcheck(ledmask, 1))
         {
             hal_led_toggle(hal_led1);
         }
-        if(hl_true == hl_bits_byte_bitcheck(ledmask, 2))
+        if(eobool_true == eo_common_byte_bitcheck(ledmask, 2))
         {            
             hal_led_toggle(hal_led2);
         }
@@ -314,7 +331,9 @@ static void s_overridden_appl_initialise3(EOMtheEMSappl* p);
 extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
 {  
     
-    s_overridden_appl_initialise_eb1(p);
+    s_overridden_appl_initialise_eb2(p);
+    
+    //s_overridden_appl_initialise_eb1(p);
     
     //s_overridden_appl_initialise2(p);
     
@@ -572,16 +591,23 @@ extern void eom_emsappl_hid_userdef_on_exit_RUN(EOMtheEMSappl* p)
     eo_canserv_ParseAll(eo_canserv_GetHandle());  
   
     
-    // deactivate services ... not correct to deactivate. maybe we just stop them
-    
-    // strain
-    eo_strain_TXstop(eo_strain_GetHandle());
+    // stop services which were started in on_entry_RUN()
     
     // motion-control
     eo_motioncontrol_Stop(eo_motioncontrol_GetHandle());
     
-    //eo_strain_Deactivate(eo_strain_GetHandle());
     
+    // stop tx activity of services that may have been started by callback function
+    
+    // strain
+    eo_strain_TXstop(eo_strain_GetHandle());
+        
+    // skin
+    eo_skin_TXstop(eo_skin_GetHandle());
+        
+    // mais
+    // we prefer NOT to stop it
+    //eo_mais_TXstop(eo_mais_GetHandle());
     
     
 #if 0  
@@ -601,7 +627,7 @@ extern void eom_emsappl_hid_userdef_on_exit_RUN(EOMtheEMSappl* p)
     eo_strain_TXstop(eo_strain_GetHandle()); 
     //eo_strain_DisableTX(eo_strain_GetHandle());    
 
-    // stop tx of inertial. the check whether to stop skin or not is done internally.
+    // stop tx of inertial. the check whether to stop mtb boards or not is done internally.
     eo_inertial_Stop(eo_inertial_GetHandle());
 #endif
     
@@ -618,13 +644,23 @@ extern void eom_emsappl_hid_userdef_on_entry_ERR(EOMtheEMSappl* p)
     eo_canserv_ParseAll(eo_canserv_GetHandle());  
 
     
-    // deactivate services ... not correct to deactivate. maybe we just stop them
     
-    // strain
-    eo_strain_TXstop(eo_strain_GetHandle());
+    // stop services which may have been started 
     
     // motion-control
     eo_motioncontrol_Stop(eo_motioncontrol_GetHandle());
+        
+    // stop tx activity of services that may have been started by callback function
+    
+    // strain
+    eo_strain_TXstop(eo_strain_GetHandle());
+        
+    // skin
+    eo_skin_TXstop(eo_skin_GetHandle());
+        
+    // mais
+    // we prefer NOT to stop it
+    //eo_mais_TXstop(eo_mais_GetHandle());
 }
 
 
@@ -1229,8 +1265,10 @@ static void s_overridden_appl_initialise_eb1(EOMtheEMSappl* p)
         // EOtheMAIS, EOtheSTRAIN, EOtheSKIN, EOtheInertial, EOtheMotionController     
 
         // changed idea: i initialise them.
-        eo_strain_Initialise();        
-        eo_motioncontrol_Initialise();        
+        eo_strain_Initialise();  
+        eo_mais_Initialise();        
+        eo_motioncontrol_Initialise();    
+        eo_skin_Initialise();          
     }
     
     {   // i init a service handler. for instance to be called EOtheServices
@@ -1402,6 +1440,567 @@ static eOresult_t s_on_strain_verify_eb1(EOtheSTRAIN* p, eObool_t verifyisok)
     
     return(eores_OK);    
     
+}
+
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - eb9 section
+// --------------------------------------------------------------------------------------------------------------------
+
+
+static void s_overridden_appl_initialise_eb9(EOMtheEMSappl* p)
+{
+    
+    // pulse led3 forever at 20 hz.
+    eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_three, EOK_reltime1sec/20, 0);    
+    
+    // board is eb9
+    s_boardnum = 8;
+    
+    // initialise all basic objects
+    
+    {   // eth-protocol-1: the nvset   
+        // marco.accame on 30 sept 2015: i initialise at max capabilities
+        
+        EOnvSet* nvset = eom_emstransceiver_GetNVset(eom_emstransceiver_GetHandle()); 
+        uint8_t i = 0;
+        // 1. set the board number. the value of the generic board is 99. 
+        //    the correct value is used only for retrieving it later on and perform specific actions based on the board number
+        eo_nvset_BRDlocalsetnumber(nvset, s_boardnum);
+                
+        // 2. load all the endpoints specific to this board. the generic board loads only management
+        uint16_t numofepcfgs = eo_constvector_Size(s_the_vectorof_EPcfgs);
+        for(i=0; i<numofepcfgs; i++)
+        {
+            eOprot_EPcfg_t* epcfg = (eOprot_EPcfg_t*) eo_constvector_At(s_the_vectorof_EPcfgs, i);
+            if(eobool_true == eoprot_EPcfg_isvalid(epcfg))
+            {
+                eo_nvset_LoadEP(nvset, epcfg, eobool_true);
+            }                        
+        }
+    }
+    {   // eth-protocol-2: the callbacks
+        // marco.accame on 30 sept 2015: so far i define all the callbacks. however:
+        // 1. we may decide to define EOPROT_CFG_OVERRIDE_CALLBACKS_IN_RUNTIME and thus we must later on to load a proper callback. 
+        //    BUT maybe better not.
+        // 2. if not, i MUST later on re-write the callbacks, so that:
+        //    a. we can understand if a service is configured (use proper object) and we something only if it configured.
+        //    b. make sure that when we use a get entity, we use EOtheEntities which does not address joints beyond those configured
+         
+    }    
+
+    {   // entities   
+        // marco.accame on 30 sept 2015: i initialise at max capabilities. however, so far we have 0 entities.
+        // when we need to init a service, we call a proper eo_entities_SetNumOf...(num) method
+        // to unit we can call a eo_entities_Reset() for all or a proper eo_entities_SetNumOf...(0)  
+        eo_entities_Initialise();        
+    }
+    
+    {   // can-mapping
+        // marco.accame on 30 sept 2015: so far it is empty. i will load it later on with boards and with entities.
+        // i must write a eo_canmap_LoadEntity() with can boards and info about how the can boards.
+        // i also MUST write a eo_canmap_UnloadEntity()
+        eo_canmap_Initialise(NULL);
+    }
+    
+    {   // can-protocol
+        // marco.accame on 30 sept 2015: i init it in a complete way. we dont have a load method for service ...
+        // we may add it, so that if we dont init we dont allow it.
+        eo_canprot_Initialise(NULL);        
+    }
+    
+    {   // other services: I dont init anything. however i should avoid automatic initialisation for:
+        // EOtheMAIS, EOtheSTRAIN, EOtheSKIN, EOtheInertial, EOtheMotionController     
+
+        // changed idea: i initialise them.
+        eo_strain_Initialise();  
+        //eo_mais_Initialise();        
+        eo_motioncontrol_Initialise();    
+        //eo_skin_Initialise();          
+    }
+    
+    {   // i init a service handler. for instance to be called EOtheServices
+        // so far i do in here what i need without any container
+             
+        // can-services
+        eOcanserv_cfg_t config = {.mode = eocanserv_mode_straight};   
+        
+        config.mode                 = eocanserv_mode_straight;
+        config.canstabilizationtime = 7*OSAL_reltime1sec;
+        config.rxqueuesize[0]       = 64;
+        config.rxqueuesize[1]       = 64;
+        config.txqueuesize[0]       = 64;
+        config.txqueuesize[1]       = 64;  
+        config.onrxcallback[0]      = s_can_cbkonrx; 
+        config.onrxargument[0]      = eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle());    
+        config.onrxcallback[1]      = s_can_cbkonrx; 
+        config.onrxargument[1]      = eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()); 
+            
+        // attenzione alla mc4cplus che ha 1 solo can ... potrei cambiare il eo_canserv_Initialise() in modo che
+        // se hal_can_supported_is(canx) e' falso allora non retsituisco errore ma semplicemente non inizializzo.
+        eo_canserv_Initialise(&config);   
+        
+        // can-discovery
+        eo_candiscovery2_Initialise(NULL);        
+    }
+    
+    
+    // B. start a timer of 5 seconds w/ callback which:
+
+       
+   s_debug_eb9();
+       
+}
+
+
+static eObool_t eb9verified = eobool_false;
+static eOerrmanDescriptor_t errdes_mc_eb9 = {0};
+static eOerrmanDescriptor_t errdes_st_eb9 = {0};
+
+static void s_debug_eb9(void)  
+{
+    EOtimer *tmrA = eo_timer_New();    
+    
+    errdes_st_eb9.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag00);
+    errdes_st_eb9.sourcedevice     = eo_errman_sourcedevice_localboard;
+    errdes_st_eb9.sourceaddress    = 0;
+    errdes_st_eb9.par16            = 0x0000;
+    errdes_st_eb9.par64            = 0xffff000000000000;        
+    
+    errdes_mc_eb9.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
+    errdes_mc_eb9.sourcedevice     = eo_errman_sourcedevice_localboard;
+    errdes_mc_eb9.sourceaddress    = 0;
+    errdes_mc_eb9.par16            = 0x0000;
+    errdes_mc_eb9.par64            = 0xffff000000000000;
+    
+    
+    
+    EOaction_strg astrg = {0};
+    EOaction *act = (EOaction*)&astrg;
+    
+    eo_action_SetCallback(act, callback_eb9, tmrA, eov_callbackman_GetTask(eov_callbackman_GetHandle())); 
+    
+    eo_timer_Start(tmrA, eok_abstimeNOW, 5*eok_reltime1sec, eo_tmrmode_FOREVER, act);   
+}
+
+
+static void callback_eb9(void *p)
+{
+    static uint8_t tick = 0;
+    uint8_t boardnumber = 8;
+    
+    static const eOmn_serv_configuration_t * mcfocserv = NULL; 
+    
+    static const eOmn_serv_configuration_t * strainserv = NULL; 
+    
+    eObool_t stoptimer = eobool_false;
+    
+    
+    if(NULL == mcfocserv)
+    {
+        mcfocserv = eoboardconfig_code2motion_serv_configuration(boardnumber);
+    }
+    
+    if(NULL == strainserv)
+    {
+        strainserv = eoboardconfig_code2strain_serv_configuration(boardnumber);
+    }    
+    
+    if(0 == tick)
+    {  
+        eo_strain_Verify(eo_strain_GetHandle(), strainserv, s_on_strain_verify_eb9, eobool_true);                    
+    }
+    else if(1 == tick)
+    { 
+        eo_motioncontrol_Verify(eo_motioncontrol_GetHandle(), mcfocserv, s_on_mcfoc_verify_eb9, eobool_true);  
+    }
+//    else if(2 == tick)
+//    { 
+//        errdes_mc_eb9.par64            = 0xffff000000000000 | tick;
+//        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, NULL, &errdes_mc_eb9);
+//    }
+//    else if(3 == tick)
+//    {
+//        errdes_mc_eb9.par64            = 0xffff000000000000 | tick;
+//        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, NULL, &errdes_mc_eb9);
+//    }
+//    else if(4 == tick)
+//    {
+//        errdes_mc_eb9.par64            = 0xffff000000000000 | tick;
+//        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, NULL, &errdes_mc_eb9);
+//    }
+//    else if(5 == tick)
+//    {
+//        errdes_mc_eb9.par64            = 0xffff000000000000 | tick;
+//        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, NULL, &errdes_mc_eb9);
+//    }
+    else
+    {
+        errdes_st_eb9.par64            = 0xffff000000000000 | tick;
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, NULL, &errdes_st_eb9);  
+        
+        errdes_mc_eb9.par64            = 0xffff000000000000 | tick;
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, NULL, &errdes_mc_eb9);         
+    }
+   
+    tick++;
+   
+   
+    if(tick >= 8)
+    {
+        stoptimer = eobool_true;
+    }
+   
+    if(eobool_true == stoptimer)
+    {
+        eo_timer_Stop((EOtimer*)p);
+    }   
+}
+
+
+
+static eOresult_t s_on_strain_verify_eb9(EOtheSTRAIN* p, eObool_t verifyisok)
+{    
+    uint8_t rr = 0;
+    
+    
+    if(eobool_true == verifyisok)
+    {
+        errdes_st_eb9.par16            = 0xffff; 
+        rr++;
+        rr = rr;
+    }
+    else
+    {
+        errdes_st_eb9.par16            = 0xff00;
+        rr = 0;
+    }
+    
+    rr = rr;
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, NULL, &errdes_st_eb9);
+    
+    return(eores_OK);    
+    
+}
+
+
+static eOresult_t s_on_mcfoc_verify_eb9(EOtheMotionController* p, eObool_t verifyisok)
+{
+    uint8_t rr = 0;
+          
+    
+    if(eobool_true == verifyisok)
+    {
+        
+        eb9verified = eobool_true;
+        errdes_mc_eb9.par16            = 0xffff;       
+        rr++;
+        rr = rr;
+    }
+    else
+    {
+        errdes_mc_eb9.par16            = 0xff00;
+    }
+    
+    
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, NULL, &errdes_mc_eb9); 
+    
+    return(eores_OK);
+}
+
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - eb2 section
+// --------------------------------------------------------------------------------------------------------------------
+
+
+static void s_overridden_appl_initialise_eb2(EOMtheEMSappl* p)
+{
+    
+    // pulse led3 forever at 20 hz.
+    eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_three, EOK_reltime1sec/20, 0);    
+    
+    // board is eb1
+    s_boardnum = 1;
+    
+    // initialise all basic objects
+    
+    {   // eth-protocol-1: the nvset   
+        // marco.accame on 30 sept 2015: i initialise at max capabilities
+        
+        EOnvSet* nvset = eom_emstransceiver_GetNVset(eom_emstransceiver_GetHandle()); 
+        uint8_t i = 0;
+        // 1. set the board number. the value of the generic board is 99. 
+        //    the correct value is used only for retrieving it later on and perform specific actions based on the board number
+        eo_nvset_BRDlocalsetnumber(nvset, s_boardnum);
+                
+        // 2. load all the endpoints specific to this board. the generic board loads only management
+        uint16_t numofepcfgs = eo_constvector_Size(s_the_vectorof_EPcfgs);
+        for(i=0; i<numofepcfgs; i++)
+        {
+            eOprot_EPcfg_t* epcfg = (eOprot_EPcfg_t*) eo_constvector_At(s_the_vectorof_EPcfgs, i);
+            if(eobool_true == eoprot_EPcfg_isvalid(epcfg))
+            {
+                eo_nvset_LoadEP(nvset, epcfg, eobool_true);
+            }                        
+        }
+    }
+    {   // eth-protocol-2: the callbacks
+        // marco.accame on 30 sept 2015: so far i define all the callbacks. however:
+        // 1. we may decide to define EOPROT_CFG_OVERRIDE_CALLBACKS_IN_RUNTIME and thus we must later on to load a proper callback. 
+        //    BUT maybe better not.
+        // 2. if not, i MUST later on re-write the callbacks, so that:
+        //    a. we can understand if a service is configured (use proper object) and we something only if it configured.
+        //    b. make sure that when we use a get entity, we use EOtheEntities which does not address joints beyond those configured
+         
+    }    
+
+    {   // entities   
+        // marco.accame on 30 sept 2015: i initialise at max capabilities. however, so far we have 0 entities.
+        // when we need to init a service, we call a proper eo_entities_SetNumOf...(num) method
+        // to unit we can call a eo_entities_Reset() for all or a proper eo_entities_SetNumOf...(0)  
+        eo_entities_Initialise();        
+    }
+    
+    {   // can-mapping
+        // marco.accame on 30 sept 2015: so far it is empty. i will load it later on with boards and with entities.
+        // i must write a eo_canmap_LoadEntity() with can boards and info about how the can boards.
+        // i also MUST write a eo_canmap_UnloadEntity()
+        eo_canmap_Initialise(NULL);
+    }
+    
+    {   // can-protocol
+        // marco.accame on 30 sept 2015: i init it in a complete way. we dont have a load method for service ...
+        // we may add it, so that if we dont init we dont allow it.
+        eo_canprot_Initialise(NULL);        
+    }
+    
+    {   // other services: I dont init anything. however i should avoid automatic initialisation for:
+        // EOtheMAIS, EOtheSTRAIN, EOtheSKIN, EOtheInertial, EOtheMotionController     
+
+        // changed idea: i initialise them.
+        eo_strain_Initialise();  
+        eo_mais_Initialise();        
+        eo_motioncontrol_Initialise();    
+        eo_skin_Initialise();          
+    }
+    
+    {   // i init a service handler. for instance to be called EOtheServices
+        // so far i do in here what i need without any container
+             
+        // can-services
+        eOcanserv_cfg_t config = {.mode = eocanserv_mode_straight};   
+        
+        config.mode                 = eocanserv_mode_straight;
+        config.canstabilizationtime = 7*OSAL_reltime1sec;
+        config.rxqueuesize[0]       = 64;
+        config.rxqueuesize[1]       = 64;
+        config.txqueuesize[0]       = 64;
+        config.txqueuesize[1]       = 64;  
+        config.onrxcallback[0]      = s_can_cbkonrx; 
+        config.onrxargument[0]      = eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle());    
+        config.onrxcallback[1]      = s_can_cbkonrx; 
+        config.onrxargument[1]      = eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()); 
+            
+        // attenzione alla mc4cplus che ha 1 solo can ... potrei cambiare il eo_canserv_Initialise() in modo che
+        // se hal_can_supported_is(canx) e' falso allora non retsituisco errore ma semplicemente non inizializzo.
+        eo_canserv_Initialise(&config);   
+        
+        // can-discovery
+        eo_candiscovery2_Initialise(NULL);        
+    }
+    
+    
+    // B. start a timer of 5 seconds w/ callback which:
+
+       
+   s_debug_eb2();
+       
+}
+
+
+
+static void s_debug_eb2(void)  
+{
+    EOtimer *tmrA = eo_timer_New();    
+    
+//    errdes_st_eb9.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag00);
+//    errdes_st_eb9.sourcedevice     = eo_errman_sourcedevice_localboard;
+//    errdes_st_eb9.sourceaddress    = 0;
+//    errdes_st_eb9.par16            = 0x0000;
+//    errdes_st_eb9.par64            = 0xffff000000000000;        
+//    
+//    errdes_mc_eb9.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
+//    errdes_mc_eb9.sourcedevice     = eo_errman_sourcedevice_localboard;
+//    errdes_mc_eb9.sourceaddress    = 0;
+//    errdes_mc_eb9.par16            = 0x0000;
+//    errdes_mc_eb9.par64            = 0xffff000000000000;
+    
+    
+    
+    EOaction_strg astrg = {0};
+    EOaction *act = (EOaction*)&astrg;
+    
+    eo_action_SetCallback(act, callback_eb2, tmrA, eov_callbackman_GetTask(eov_callbackman_GetHandle())); 
+    
+    eo_timer_Start(tmrA, eok_abstimeNOW, 10*eok_reltime1sec, eo_tmrmode_FOREVER, act);   
+}
+
+
+static void callback_eb2(void *p)
+{
+    static uint8_t tick = 0;
+    uint8_t boardnumber = 1;
+    
+    static const eOmn_serv_configuration_t * mc4serv = NULL; 
+    
+    static const eOmn_serv_configuration_t * maisserv = NULL; 
+    
+    static const eOmn_serv_configuration_t * skinserv = NULL; 
+    
+    eObool_t stoptimer = eobool_false;
+    
+    
+    if(NULL == mc4serv)
+    {
+        mc4serv = eoboardconfig_code2motion_serv_configuration(boardnumber);
+    }
+    
+    if(NULL == maisserv)
+    {
+        maisserv = eoboardconfig_code2mais_serv_configuration(boardnumber);
+    }    
+
+
+    if(NULL == skinserv)
+    {
+        skinserv = eoboardconfig_code2skin_serv_configuration(boardnumber);
+    }    
+    
+    if(0 == tick)
+    {  
+//        hal_trace_puts("eo_mais_Verify() is called"); 
+        eo_mais_Verify(eo_mais_GetHandle(), maisserv, s_on_mais_verify_eb2, eobool_true);                    
+    }
+    else if(1 == tick)
+    { 
+//        hal_trace_puts("eo_motioncontrol_Verify() is called");
+        eo_motioncontrol_Verify(eo_motioncontrol_GetHandle(), mc4serv, s_on_mc4_verify_eb2, eobool_true);  
+    }
+    else if(2 == tick)
+    { 
+        eo_skin_Verify(eo_skin_GetHandle(), skinserv, s_on_skin_verify_eb2, eobool_true);  
+    }
+//    else if(2 == tick)
+//    { 
+//        errdes_mc_eb9.par64            = 0xffff000000000000 | tick;
+//        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, NULL, &errdes_mc_eb9);
+//    }
+//    else if(3 == tick)
+//    {
+//        errdes_mc_eb9.par64            = 0xffff000000000000 | tick;
+//        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, NULL, &errdes_mc_eb9);
+//    }
+//    else if(4 == tick)
+//    {
+//        errdes_mc_eb9.par64            = 0xffff000000000000 | tick;
+//        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, NULL, &errdes_mc_eb9);
+//    }
+//    else if(5 == tick)
+//    {
+//        errdes_mc_eb9.par64            = 0xffff000000000000 | tick;
+//        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, NULL, &errdes_mc_eb9);
+//    }
+    else
+    {
+//        errdes_st_eb9.par64            = 0xffff000000000000 | tick;
+//        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, NULL, &errdes_st_eb9);  
+//        
+//        errdes_mc_eb9.par64            = 0xffff000000000000 | tick;
+//        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, NULL, &errdes_mc_eb9);         
+    }
+   
+    tick++;
+   
+   
+    if(tick >= 8)
+    {
+        stoptimer = eobool_true;
+    }
+   
+    if(eobool_true == stoptimer)
+    {
+        eo_timer_Stop((EOtimer*)p);
+    }   
+}
+
+
+
+static eOresult_t s_on_skin_verify_eb2(EOtheSKIN* p, eObool_t verifyisok)
+{    
+    uint8_t rr = 0;
+    
+    
+    if(eobool_true == verifyisok)
+    {
+        rr++;
+        rr = rr;
+    }
+    else
+    {
+        rr = 0;
+    }
+    
+    rr = rr;
+    //eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, NULL, &errdes_st_eb9);
+    
+    return(eores_OK);    
+    
+}
+
+
+static eOresult_t s_on_mc4_verify_eb2(EOtheMotionController* p, eObool_t verifyisok)
+{
+    uint8_t rr = 0;
+          
+    
+    if(eobool_true == verifyisok)
+    {
+        
+        eb9verified = eobool_true;     
+        rr++;
+        rr = rr;
+    }
+    else
+    {
+
+    }
+    
+  
+    return(eores_OK);
+}
+
+static eOresult_t s_on_mais_verify_eb2(EOtheMAIS* p, eObool_t verifyisok)
+{
+    uint8_t rr = 0;
+          
+    
+    if(eobool_true == verifyisok)
+    {
+        
+        eb9verified = eobool_true;     
+        rr++;
+        rr = rr;
+    }
+    else
+    {
+
+    }
+    
+  
+    return(eores_OK);
 }
 
 
