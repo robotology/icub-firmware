@@ -51,7 +51,7 @@ typedef struct EOtheMotionController_hid EOtheMotionController;
 
 typedef eOresult_t (*eOmotcon_onendofoperation_fun_t) (EOtheMotionController* p, eObool_t operationisok);
 
-enum { eo_motcon_maxCANboards = 13, eo_motcon_maxJOMOs = 12 };
+enum { eo_motcon_maxJOMOs = 12 };
 
 
 typedef enum
@@ -59,7 +59,7 @@ typedef enum
     eo_motcon_mode_NONE         = eomn_serv_NONE,
     eo_motcon_mode_foc          = eomn_serv_MC_foc,
     eo_motcon_mode_mc4          = eomn_serv_MC_mc4,
-    eo_motcon_mode_mc4plsu      = eomn_serv_MC_mc4plus,
+    eo_motcon_mode_mc4plus      = eomn_serv_MC_mc4plus,
     eo_motcon_mode_mc4plusmais  = eomn_serv_MC_mc4plusmais   
 } eOmotioncontroller_mode_t;
    
@@ -68,8 +68,6 @@ typedef enum
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-
-// so far only foc-based ...
 
 extern EOtheMotionController* eo_motioncontrol_Initialise(void);
 
@@ -80,14 +78,12 @@ extern eOmotioncontroller_mode_t eo_motioncontrol_GetMode(EOtheMotionController 
 
 
 
-// it verifies if the service as defined in te configuration is possible (is there a good strain board or not?), it executes a callback
-// (which may send a confirmation to the entity which asked fot verification), and then it may activate the strain service by calling  eo_motioncontrol_Activate().
+// so far we support only eo_motcon_mode_foc and eo_motcon_mode_mc4
+
 extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_serv_configuration_t * servcfg, eOmotcon_onendofoperation_fun_t onverify, eObool_t activateafterverify);
 
-// it activates the strain service by loading the service configuration
 extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn_serv_configuration_t * servcfg);
 
-// it deactivates service.
 extern eOresult_t eo_motioncontrol_Deactivate(EOtheMotionController *p);
 
 
