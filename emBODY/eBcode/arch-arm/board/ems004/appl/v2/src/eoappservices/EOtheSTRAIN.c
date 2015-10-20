@@ -26,6 +26,7 @@
 
 #include "EoCommon.h"
 #include "EOtheErrorManager.h"
+#include "EoError.h"
 #include "EOtheEntities.h"
 
 #include "EOtheCANservice.h"
@@ -38,9 +39,7 @@
 
 #include "EOtheCANprotocol_functions.h"
 
-#include "EOMtheEMSconfigurator.h"
-
-#include "EOMtheEMStransceiver.h"
+#include "EOVtheCallbackManager.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -80,11 +79,11 @@
 
 static void s_eo_thestrain_startGetFullScales(void);
 
-//static eOresult_t s_eo_thestrain_loadFullscalelikeoccasionalrop(void);
-
 static eOresult_t s_eo_strain_onstop_search4strain(void *par, EOtheCANdiscovery2* p, eObool_t searchisok);
 
+static void s_eo_strain_send_periodic_error_report(void *p);
 
+static eOresult_t s_eo_thestrain_on_fullscale_ready(EOtheSTRAIN* p, eObool_t operationisok);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -92,23 +91,28 @@ static eOresult_t s_eo_strain_onstop_search4strain(void *par, EOtheCANdiscovery2
 
 static EOtheSTRAIN s_eo_thestrain = 
 {
-    .initted                = eobool_false,
-    .active                 = eobool_false,
-    .thereisstrain          = eobool_false,
-    .protindex              = 0,
-    .id32                   = eo_prot_ID32dummy,
-    .command                = {0},
-    .canboardproperties     = NULL,
-    .canentitydescriptor    = NULL,
-    .servconfig             = { .type = eomn_serv_NONE },
-    .candiscoverytarget     = {0},
-    .onverify               = NULL,
-    .activateafterverify    = eobool_false,
-    .itistransmitting       = eobool_false,
-    .onfullscaleready       = NULL
+    .initted                    = eobool_false,
+    .active                     = eobool_false,
+    .protindex                  = 0,
+    .id32                       = eo_prot_ID32dummy,
+    .command                    = {0},
+    .canboardproperties         = NULL,
+    .canentitydescriptor        = NULL,
+    .servconfig                 = { .type = eomn_serv_NONE },
+    .candiscoverytarget         = {0},
+    .onverify                   = NULL,
+    .activateafterverify        = eobool_false,
+    .itistransmitting           = eobool_false,
+    .overrideonfullscaleready   = NULL,
+    .errorReportTimer           = NULL,
+    .errorDescriptor            = {0},
+    .errorType                  = eo_errortype_info,
+    .errorCallbackCount         = 0,
+    .repetitionOKcase           = 10,
+    .reportPeriod               = 10*EOK_reltime1sec
 };
 
-//static const char s_eobj_ownname[] = "EOtheSTRAIN";
+static const char s_eobj_ownname[] = "EOtheSTRAIN";
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -124,7 +128,6 @@ extern EOtheSTRAIN* eo_strain_Initialise(void)
     }
     
     s_eo_thestrain.active = eobool_false;
-    s_eo_thestrain.thereisstrain = eobool_false;
     
     s_eo_thestrain.protindex = 0;
     s_eo_thestrain.id32 = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_strain, s_eo_thestrain.protindex, eoprot_tag_none);
@@ -137,6 +140,10 @@ extern EOtheSTRAIN* eo_strain_Initialise(void)
     s_eo_thestrain.canentitydescriptor = eo_vector_New(sizeof(eOcanmap_entitydescriptor_t), 1, NULL, NULL, NULL, NULL);
     
     s_eo_thestrain.strain = NULL;
+    
+    s_eo_thestrain.overrideonfullscaleready = NULL;
+    
+    s_eo_thestrain.errorReportTimer = eo_timer_New();
         
     s_eo_thestrain.initted = eobool_true;
     
@@ -178,7 +185,9 @@ extern eOresult_t eo_strain_Verify(EOtheSTRAIN *p, const eOmn_serv_configuration
     s_eo_thestrain.candiscoverytarget.firmwareversion.major = servcfg->data.as.strain.version.firmware.major; 
     s_eo_thestrain.candiscoverytarget.firmwareversion.minor = servcfg->data.as.strain.version.firmware.minor;    
     s_eo_thestrain.candiscoverytarget.canmap[servcfg->data.as.strain.canloc.port] = 0x0001 << servcfg->data.as.strain.canloc.addr; 
-        
+     
+    // make sure the timer is not running
+    eo_timer_Stop(s_eo_thestrain.errorReportTimer);    
 
     eOcandiscovery_onstop_t onstop = 
     {
@@ -206,9 +215,7 @@ extern eOresult_t eo_strain_Deactivate(EOtheSTRAIN *p)
     } 
     
     // send stop messages to strain, unload the entity-can-mapping and the board-can-mapping, reset all things inside this object
-    // what else .... ?
-    
-        
+
     if(eobool_true == s_eo_thestrain.itistransmitting)
     {
         eo_strain_TXstop(&s_eo_thestrain);
@@ -229,6 +236,8 @@ extern eOresult_t eo_strain_Deactivate(EOtheSTRAIN *p)
     eo_vector_Clear(s_eo_thestrain.canboardproperties);
     eo_vector_Clear(s_eo_thestrain.canentitydescriptor);
     
+    // make sure the timer is not running
+    eo_timer_Stop(s_eo_thestrain.errorReportTimer);    
     
     s_eo_thestrain.active = eobool_false;
     
@@ -253,14 +262,11 @@ extern eOresult_t eo_strain_Activate(EOtheSTRAIN *p, const eOmn_serv_configurati
 
     if(0 == eo_entities_NumOfStrains(eo_entities_GetHandle()))
     {
-        s_eo_thestrain.thereisstrain = eobool_false;
         s_eo_thestrain.active = eobool_false;
         return(eores_NOK_generic);
     }
     else
-    {
-        s_eo_thestrain.thereisstrain = eobool_true;
-        
+    {   
         s_eo_thestrain.strain = eo_entities_GetStrain(eo_entities_GetHandle(), s_eo_thestrain.protindex);
         
         memcpy(&s_eo_thestrain.servconfig, servcfg, sizeof(eOmn_serv_configuration_t));
@@ -304,15 +310,14 @@ extern eOresult_t eo_strain_TXstart(EOtheSTRAIN *p, uint8_t datarate, eOas_strai
         return(eores_NOK_nullpointer);
     }
     
-    if((eobool_false == s_eo_thestrain.thereisstrain) || (eobool_false == s_eo_thestrain.active))
-    {   // nothing to do because we dont have a strain board
+    if((eobool_false == s_eo_thestrain.active))
+    {   // nothing to do because we dont have an active strain board
         return(eores_OK);
     }   
 
     eo_strain_SetDataRate(&s_eo_thestrain, datarate);  
     
     // set txmode
-    //eOcanprot_command_t s_eo_thestrain.command = {0};
     s_eo_thestrain.command.class = eocanprot_msgclass_pollingAnalogSensor;    
     s_eo_thestrain.command.type  = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;
     s_eo_thestrain.command.value = &mode;                       
@@ -339,8 +344,8 @@ extern eOresult_t eo_strain_SendTXmode(EOtheSTRAIN *p)
         return(eores_NOK_nullpointer);
     }
     
-    if((eobool_false == s_eo_thestrain.thereisstrain) || (eobool_false == s_eo_thestrain.active))
-    {   // nothing to do because we dont have a strain board
+    if((eobool_false == s_eo_thestrain.active))
+    {   // nothing to do because we dont have an active strain board
         return(eores_OK);
     }
           
@@ -375,8 +380,8 @@ extern eOresult_t eo_strain_TXstop(EOtheSTRAIN *p)
         return(eores_NOK_nullpointer);
     }
     
-    if((eobool_false == s_eo_thestrain.thereisstrain) || (eobool_false == s_eo_thestrain.active))
-    {   // nothing to do because we dont have a strain board
+    if((eobool_false == s_eo_thestrain.active))
+    {   // nothing to do because we dont have an active strain board
         return(eores_OK);
     }
           
@@ -395,15 +400,15 @@ extern eOresult_t eo_strain_TXstop(EOtheSTRAIN *p)
 }
 
 
-extern eOresult_t eo_strain_Set(EOtheSTRAIN *p, eOas_strain_config_t *cfg, eOstrain_onendofoperation_fun_t onfullscaleready)
+extern eOresult_t eo_strain_Set(EOtheSTRAIN *p, eOas_strain_config_t *cfg)
 {
     if((NULL == p) || (NULL == cfg))
     {
         return(eores_NOK_nullpointer);
     }
     
-    if((eobool_false == s_eo_thestrain.thereisstrain) || (eobool_false == s_eo_thestrain.active))
-    {   // nothing to do because we dont have a strain board
+    if((eobool_false == s_eo_thestrain.active))
+    {   // nothing to do because we dont have an active strain board
         return(eores_OK);
     }
           
@@ -415,7 +420,7 @@ extern eOresult_t eo_strain_Set(EOtheSTRAIN *p, eOas_strain_config_t *cfg, eOstr
     
     if(eobool_true == cfg->signaloncefullscale)
     {
-        eo_strain_GetFullScale(p, onfullscaleready);
+        eo_strain_GetFullScale(p, NULL);
     }
 
     return(eores_OK);
@@ -429,16 +434,13 @@ extern eOresult_t eo_strain_SetMode(EOtheSTRAIN *p, eOas_strainmode_t mode)
         return(eores_NOK_nullpointer);
     }
     
-    if((eobool_false == s_eo_thestrain.thereisstrain) || (eobool_false == s_eo_thestrain.active))
-    {   // nothing to do because we dont have a strain board
+    if((eobool_false == s_eo_thestrain.active))
+    {   // nothing to do because we dont have an active strain board
         return(eores_OK);
     }
           
     // now, i do things. 
 
-//    eOsmStatesEMSappl_t currentstate = eo_sm_emsappl_STerr;
-
-    //eOcanprot_command_t s_eo_thestrain.command = {0};
     s_eo_thestrain.command.class = eocanprot_msgclass_pollingAnalogSensor;
     s_eo_thestrain.command.type  = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;
     s_eo_thestrain.command.value = &mode;
@@ -451,13 +453,8 @@ extern eOresult_t eo_strain_SetMode(EOtheSTRAIN *p, eOas_strainmode_t mode)
     }
     else // if it configures strain mode to send data
     {
-//        // only if the appl is in RUN state enable tx
-//        eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &currentstate);
-//        if(eo_sm_emsappl_STrun == currentstate)
-        {
-            eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &s_eo_thestrain.command, s_eo_thestrain.id32);
-            s_eo_thestrain.itistransmitting = eobool_true;
-        }
+        eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &s_eo_thestrain.command, s_eo_thestrain.id32);
+        s_eo_thestrain.itistransmitting = eobool_true;
     }   
 
     return(eores_OK); 
@@ -471,14 +468,13 @@ extern eOresult_t eo_strain_SetDataRate(EOtheSTRAIN *p, uint8_t datarate)
         return(eores_NOK_nullpointer);
     }
     
-    if((eobool_false == s_eo_thestrain.thereisstrain) || (eobool_false == s_eo_thestrain.active))
-    {   // nothing to do because we dont have a strain board
+    if((eobool_false == s_eo_thestrain.active))
+    {   // nothing to do because we dont have an active strain board
         return(eores_OK);
     }
           
     // now, i do things. 
 
-    //eOcanprot_command_t s_eo_thestrain.command = {0};
     s_eo_thestrain.command.class = eocanprot_msgclass_pollingAnalogSensor;
     s_eo_thestrain.command.type  = ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE;
     s_eo_thestrain.command.value = &datarate;
@@ -489,56 +485,35 @@ extern eOresult_t eo_strain_SetDataRate(EOtheSTRAIN *p, uint8_t datarate)
 }
 
 
-extern eOprotID32_t eo_strain_GetID32(EOtheSTRAIN *p, eOprotTag_t tag)
-{
-    return(eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_strain, s_eo_thestrain.protindex, tag));
-}
 
-
-extern eOresult_t eo_strain_GetFullScale(EOtheSTRAIN *p, eOstrain_onendofoperation_fun_t onfullscaleready)
+extern eOresult_t eo_strain_GetFullScale(EOtheSTRAIN *p, eOstrain_onendofoperation_fun_t overrideonfullscaleready)
 {   
     if(NULL == p)
     {
         return(eores_NOK_nullpointer);
     }
     
-    if((eobool_false == s_eo_thestrain.thereisstrain) || (eobool_false == s_eo_thestrain.active))
-    {   // nothing to do because we dont have a strain board
-        if(NULL != onfullscaleready)
+  
+    if((eobool_false == s_eo_thestrain.active))
+    {   // nothing to do because we dont have an active strain board
+        if(NULL != overrideonfullscaleready)
         {
-            onfullscaleready(p, eobool_false);
+            overrideonfullscaleready(p, eobool_false);
+        }
+        else
+        {
+            s_eo_thestrain_on_fullscale_ready(p, eobool_false);
         }
         return(eores_OK);
     }
     
-    s_eo_thestrain.onfullscaleready = onfullscaleready;
-          
+    s_eo_thestrain.overrideonfullscaleready = overrideonfullscaleready;
+    
     // now, i do things. 
     s_eo_thestrain_startGetFullScales();
 
     return(eores_OK); 
 }
-
-//extern eOresult_t eo_strain_OnDiscoveryStop(EOtheSTRAIN *p, EOtheCANdiscovery2 *discovery2, eObool_t searchisok)
-//{   
-//    if(NULL == p)
-//    {
-//        return(eores_NOK_nullpointer);
-//    }
-//    
-//    // wip part. we should: 
-//    // 1. send up a ok result about the strain ...
-//    // 2. call eo_strain_Initialise()
-//    // 3. return OK
-//    
-//    
-//    if(NULL == p)
-//    {
-//        eo_strain_Initialise();
-//    }
-
-//    return(eores_OK); 
-//}
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -593,6 +568,7 @@ extern void eoprot_fun_INIT_as_strain_status(const EOnv* nv)
 
 // this function is called by the parser of message ICUBCANPROTO_POL_AS_CMD__GET_FULL_SCALES after it has added the
 // value of the specified channel inside the relevant position of strain->status.fullscale.
+// in this function is implemented the chain of requests from channel 0 up to 5 with successive signalling to robotinterface
 // VERY IMPORTANT: the function must return eobool_true
 extern eObool_t eocanprotASpolling_redefinable_alert_reception_of_POL_AS_CMD__GET_FULL_SCALES(uint8_t channel, uint16_t *value, eOas_strain_t* strain)
 {
@@ -602,7 +578,6 @@ extern eObool_t eocanprotASpolling_redefinable_alert_reception_of_POL_AS_CMD__GE
     {   // send a request for next channel
         channel++;
         
-        //eOcanprot_command_t s_eo_thestrain.command = {0};
         s_eo_thestrain.command.class = eocanprot_msgclass_pollingAnalogSensor;
         s_eo_thestrain.command.type  = ICUBCANPROTO_POL_AS_CMD__GET_FULL_SCALES;
         s_eo_thestrain.command.value = &channel;
@@ -612,34 +587,17 @@ extern eObool_t eocanprotASpolling_redefinable_alert_reception_of_POL_AS_CMD__GE
         return(ret);
     }
     
-    // received the last channel: call s_eo_thestrain.onfullscaleready()
+    // received the last channel: call s_eo_thestrain_on_fullscale_ready() or s_eo_thestrain.overrideonfullscaleready()
     
-    if(NULL != s_eo_thestrain.onfullscaleready)
+    if(NULL != s_eo_thestrain.overrideonfullscaleready)
     {
-        s_eo_thestrain.onfullscaleready(&s_eo_thestrain, eobool_true);
+        s_eo_thestrain.overrideonfullscaleready(&s_eo_thestrain, eobool_true);
+    }
+    else
+    {
+          s_eo_thestrain_on_fullscale_ready(&s_eo_thestrain, eobool_true);
     }
     
-//#if 0
-//    // received the last channel: load a rop to tx and then alert someone to tx the ropframe
-//        
-//    // prepare occasional rop to send
-//    eOresult_t res = s_eo_thestrain_loadFullscalelikeoccasionalrop();
-//    
-//    if(eores_OK != res)
-//    {
-//        // diagnostics
-//        return(res);
-//    }
-//    
-//    eOsmStatesEMSappl_t status;
-//    eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &status);
-//    
-//    // if application is in cfg state, then we send a request to configurator to send ropframe out
-//    if(eo_sm_emsappl_STcfg == status)
-//    {
-//        eom_task_SetEvent(eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()), emsconfigurator_evt_ropframeTx); 
-//    }
-//#endif
     
     return(ret);    
 }
@@ -669,7 +627,6 @@ static void s_eo_thestrain_startGetFullScales(void)
     // at the end of that, the full scale is signalled to  robotInterface
     
     uint8_t channel = 0;
-    //eOcanprot_command_t s_eo_thestrain.command = {0};
     s_eo_thestrain.command.class = eocanprot_msgclass_pollingAnalogSensor;
     s_eo_thestrain.command.type  = ICUBCANPROTO_POL_AS_CMD__GET_FULL_SCALES;
     s_eo_thestrain.command.value = &channel;
@@ -677,55 +634,114 @@ static void s_eo_thestrain_startGetFullScales(void)
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &s_eo_thestrain.command, s_eo_thestrain.id32);                  
 }
 
-//static eOresult_t s_eo_thestrain_loadFullscalelikeoccasionalrop(void)
-//{
-//    eOresult_t res;
-//    eOropdescriptor_t ropdesc;
+static eOresult_t s_eo_thestrain_on_fullscale_ready(EOtheSTRAIN* p, eObool_t operationisok)
+{
+    eOresult_t res = eores_OK;
+    
+    if(eobool_false == operationisok)
+    {
+        return(eores_NOK_generic);
+    }
 
-//    memcpy(&ropdesc, &eok_ropdesc_basic, sizeof(eok_ropdesc_basic));
+    eOropdescriptor_t ropdesc = {0};
 
-//    ropdesc.ropcode                 = eo_ropcode_sig;
-//    ropdesc.size                    = sizeof(eOas_arrayofupto12bytes_t);
-//    ropdesc.id32                    = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_strain, s_eo_thestrain.protindex, eoprot_tag_as_strain_status_fullscale); 
-//    ropdesc.data                    = NULL;
+    memcpy(&ropdesc, &eok_ropdesc_basic, sizeof(eok_ropdesc_basic));
 
-//   
-//    res = eo_transceiver_OccasionalROP_Load(eom_emstransceiver_GetTransceiver(eom_emstransceiver_GetHandle()), &ropdesc); 
-//    if(eores_OK != res)
-//    {
-//        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, "cannot sig<strain.fullscale>", NULL, &eo_errman_DescrRuntimeErrorLocal);
-//    }
-//    else
-//    {
-//        //eOerrmanDescriptor_t des = {0};
-//        //des.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag03);
-//        //des.param = 0x1111;
-//        //des.sourceaddress = 0;
-//        //des.sourcedevice = eo_errman_sourcedevice_localboard;
-//        //eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &des);
-//    }
+    ropdesc.ropcode                 = eo_ropcode_sig;
+    ropdesc.size                    = sizeof(eOas_arrayofupto12bytes_t);
+    ropdesc.id32                    = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_strain, s_eo_thestrain.protindex, eoprot_tag_as_strain_status_fullscale); //eo_strain_GetID32(eo_strain_GetHandle(), eoprot_tag_as_strain_status_fullscale); 
+    ropdesc.data                    = NULL;
+
+   
+    res = eom_emsappl_Transmit_OccasionalROP(eom_emsappl_GetHandle(), &ropdesc);
+    if(eores_OK != res)
+    {
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, "cannot sig<strain.fullscale>", NULL, &eo_errman_DescrRuntimeErrorLocal);        
+        return(res);
+    }
+    else
+    {
+        //eOerrmanDescriptor_t des = {0};
+        //des.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag03);
+        //des.param = 0x1111;
+        //des.sourceaddress = 0;
+        //des.sourcedevice = eo_errman_sourcedevice_localboard;
+        //eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &des);
+    }
+
+    return(eores_OK);
+}
 
 
-//    return(res);
-//}
 
 static eOresult_t s_eo_strain_onstop_search4strain(void *par, EOtheCANdiscovery2* p, eObool_t searchisok)
-{
+{   
+    const eOmn_serv_configuration_t * servcfg = (const eOmn_serv_configuration_t *)par;
     
     if((eobool_true == searchisok) && (eobool_true == s_eo_thestrain.activateafterverify))
     {
-        const eOmn_serv_configuration_t * strainserv = (const eOmn_serv_configuration_t *)par;
-        eo_strain_Activate(&s_eo_thestrain, strainserv);        
+        eo_strain_Activate(&s_eo_thestrain, servcfg);        
     }
+    
+    s_eo_thestrain.errorDescriptor.sourcedevice     = eo_errman_sourcedevice_localboard;
+    s_eo_thestrain.errorDescriptor.sourceaddress    = 0;
+    s_eo_thestrain.errorDescriptor.par16            = (servcfg->data.as.strain.canloc.addr) | (servcfg->data.as.strain.canloc.port << 8);
+    s_eo_thestrain.errorDescriptor.par64            = (servcfg->data.as.strain.version.firmware.minor)       | (servcfg->data.as.strain.version.firmware.major << 8) |
+                                                      (servcfg->data.as.strain.version.protocol.minor << 16) | (servcfg->data.as.strain.version.protocol.major << 24);    
+    EOaction_strg astrg = {0};
+    EOaction *act = (EOaction*)&astrg;
+    eo_action_SetCallback(act, s_eo_strain_send_periodic_error_report, NULL, eov_callbackman_GetTask(eov_callbackman_GetHandle()));
+        
+    if(eobool_true == searchisok)
+    {        
+        s_eo_thestrain.errorType = eo_errortype_debug;
+        s_eo_thestrain.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_strain_ok);
+        eo_errman_Error(eo_errman_GetHandle(), s_eo_thestrain.errorType, NULL, s_eobj_ownname, &s_eo_thestrain.errorDescriptor);
+        
+        if((0 != s_eo_thestrain.repetitionOKcase) && (0 != s_eo_thestrain.reportPeriod))
+        {
+            s_eo_thestrain.errorCallbackCount = s_eo_thestrain.repetitionOKcase;        
+            eo_timer_Start(s_eo_thestrain.errorReportTimer, eok_abstimeNOW, s_eo_thestrain.reportPeriod, eo_tmrmode_FOREVER, act);
+        }
+    }
+    
+    if(eobool_false == searchisok)
+    {   
+        s_eo_thestrain.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_strain_failed_candiscovery);
+        s_eo_thestrain.errorType = eo_errortype_error;                
+        eo_errman_Error(eo_errman_GetHandle(), s_eo_thestrain.errorType, NULL, s_eobj_ownname, &s_eo_thestrain.errorDescriptor);
+        
+        if(0 != s_eo_thestrain.reportPeriod)
+        {
+            s_eo_thestrain.errorCallbackCount = EOK_int08dummy;
+            eo_timer_Start(s_eo_thestrain.errorReportTimer, eok_abstimeNOW, s_eo_thestrain.reportPeriod, eo_tmrmode_FOREVER, act);
+        }
+    }    
     
     if(NULL != s_eo_thestrain.onverify)
     {
         s_eo_thestrain.onverify(&s_eo_thestrain, searchisok); 
     }    
     
-    return(eores_OK);
-    
+    return(eores_OK);   
 }
+
+
+static void s_eo_strain_send_periodic_error_report(void *p)
+{
+    eo_errman_Error(eo_errman_GetHandle(), s_eo_thestrain.errorType, NULL, s_eobj_ownname, &s_eo_thestrain.errorDescriptor);
+    
+    if(EOK_int08dummy != s_eo_thestrain.errorCallbackCount)
+    {
+        s_eo_thestrain.errorCallbackCount--;
+    }
+    if(0 == s_eo_thestrain.errorCallbackCount)
+    {
+        eo_timer_Stop(s_eo_thestrain.errorReportTimer);
+    }
+}
+
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

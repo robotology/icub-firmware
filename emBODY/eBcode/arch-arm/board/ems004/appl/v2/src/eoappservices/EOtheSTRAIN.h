@@ -61,8 +61,6 @@ extern EOtheSTRAIN* eo_strain_Initialise(void);
 
 extern EOtheSTRAIN* eo_strain_GetHandle(void);
 
-extern eOprotID32_t eo_strain_GetID32(EOtheSTRAIN *p, eOprotTag_t tag);
-
 
 // it verifies if the service as defined in te configuration is possible (is there a good strain board or not?), it executes a callback
 // (which may send a confirmation to the entity which asked fot verification), and then it may activate the strain service by calling  eo_strain_Activate().
@@ -82,11 +80,9 @@ extern eOresult_t eo_strain_TXstart(EOtheSTRAIN *p, uint8_t datarate, eOas_strai
 extern eOresult_t eo_strain_TXstop(EOtheSTRAIN *p);
 
 
-// DOES eo_strain_GetFullScale() works if the strain is in not in tx mode? I try it.
-// IT DOES send back values but teh fullscales are all zero.
-// the object ask to teh strain board the fullscales. after all values are received it executes the callback.
-// put in thei callback any transmission back to robotInterface
-extern eOresult_t eo_strain_GetFullScale(EOtheSTRAIN *p, eOstrain_onendofoperation_fun_t onfullscaleready);
+// if overrideonfullscaleready is NULL the function eo_strain_GetFullScale() signals the fullscale to robotInterface ....
+// if overrideonfullscaleready is not NULL the function eo_strain_GetFullScale() just calls it
+extern eOresult_t eo_strain_GetFullScale(EOtheSTRAIN *p, eOstrain_onendofoperation_fun_t overrideonfullscaleready);
 
 
 // the following are more tricky funtions .... shall we keep tehm?
@@ -98,14 +94,12 @@ extern eOresult_t eo_strain_SendTXmode(EOtheSTRAIN *p);
 
 
 // following funtions apply the settings in argument by sending proper messages to the strain board
-extern eOresult_t eo_strain_Set(EOtheSTRAIN *p, eOas_strain_config_t *cfg, eOstrain_onendofoperation_fun_t onfullscaleready);
+extern eOresult_t eo_strain_Set(EOtheSTRAIN *p, eOas_strain_config_t *cfg);
 
 extern eOresult_t eo_strain_SetMode(EOtheSTRAIN *p, eOas_strainmode_t mode);
 
 extern eOresult_t eo_strain_SetDataRate(EOtheSTRAIN *p, uint8_t datarate);
 
-
-//extern eOresult_t eo_strain_OnDiscoveryStop(EOtheSTRAIN *p, EOtheCANdiscovery2 *discovery2, eObool_t searchisok);
 
 
 /** @}            
