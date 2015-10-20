@@ -378,7 +378,7 @@ static void* s_eocanprotASpolling_get_entity(eOprotEndpoint_t endpoint, eOprot_e
     
     if(EOK_uint08dummy == ii)
     {     
-        #warning -> TODO: add diagnostics about not found board as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
+        //#warning -> TODO: add diagnostics about not found board as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
         return(NULL);
     }
     

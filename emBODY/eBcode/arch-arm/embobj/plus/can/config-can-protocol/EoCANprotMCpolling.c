@@ -179,7 +179,7 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__CALIBRATE_ENCODER(eOcanp
         
         default:
         {
-            #warning --> TODO error about unknown param ...
+            //#warning --> TODO error about unknown param ...
         } break;
     }
        
@@ -206,7 +206,7 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__GET_CONTROL_MODE(eOcanpr
 
 extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_CONTROL_MODE(eOcanframe_t *frame, eOcanport_t port)
 {
-    #warning -> i am not sure it is still in use, thus i just put an error return
+    //#warning -> i am not sure it is still in use, thus i just put an error return
     return(eores_NOK_generic);
 }
 
@@ -587,7 +587,7 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_CURRENT_PID(eOcanpro
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_CURRENT_PIDLIMITS(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
-    #warning marco.accame: see if ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PIDLIMITS has len 7 or 8 as some other SET_xxx_PIDLIMITS 
+    #warning marco.accame CHECK: see if ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PIDLIMITS has len 7 or 8 as some other SET_xxx_PIDLIMITS 
     s_former_POL_MC_CMD_setpid_limits_7(descriptor, frame, ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PIDLIMITS);
     return(eores_OK);      
 }
@@ -596,7 +596,7 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_CURRENT_PIDLIMITS(eO
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_VELOCITY_PID(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
     // ... apparently s_former_POL_MC_CMD_setpid uses len 8 and not len 7 and has pid->scale
-    #warning marco.accame: see if ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID has len 7 or 8 as some other SET_xxx_PID 
+    #warning marco.accame CHECK: see if ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID has len 7 or 8 as some other SET_xxx_PID 
     s_former_POL_MC_CMD_setpid_7(descriptor, frame, ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID);
     return(eores_OK);      
 }
@@ -604,7 +604,7 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_VELOCITY_PID(eOcanpr
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_VELOCITY_PIDLIMITS(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
     // ... apparently s_former_POL_MC_CMD_setpid_limits uses len 8 and not len 7 
-    #warning marco.accame: see if ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PIDLIMITS has len 7 or 8 as some other SET_xxx_PIDLIMITS 
+    #warning marco.accame CHECK: see if ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PIDLIMITS has len 7 or 8 as some other SET_xxx_PIDLIMITS 
     s_former_POL_MC_CMD_setpid_limits_7(descriptor, frame, ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PIDLIMITS);
     return(eores_OK);      
 }
@@ -646,18 +646,14 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__GET_OPENLOOP_PARAMS(eOca
 
 
 extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_OPENLOOP_PARAMS(eOcanframe_t *frame, eOcanport_t port)
-{
-    eOresult_t res = eores_OK; 
-    
+{    
     eOmc_joint_t *joint = NULL;
     
     if(NULL == (joint = s_eocanprotMCpolling_get_entity(eoprot_entity_mc_joint, frame, port, NULL)))
     {
         return(eores_OK);        
     }
-    
-
-   
+      
     joint->status.ofpid.positionreference = *((int16_t*)&frame->data[1]);    
     
     return(eores_OK);    
@@ -706,7 +702,7 @@ static void* s_eocanprotMCpolling_get_entity(eOprot_entity_t entity, eOcanframe_
     
     if(EOK_uint08dummy == ii)
     {     
-        #warning -> TODO: add diagnostics about not found board as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
+        //#warning -> TODO: add diagnostics about not found board as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
         return(NULL);
     }
     
@@ -936,7 +932,7 @@ static eOresult_t s_parser_POL_MC_CMD_getpid_etc(eOcanframe_t *frame, eOcanport_
     if(param->p08_1 == param->p08_2)
     {
         // send back response
-        #warning marco.accame -> can eo_proxy_ReplyROP_Load() use the same memory as the nv? much be better using NULL. think of using memmove.
+        //marco.accame -> can eo_proxy_ReplyROP_Load() use the same memory as the nv? much be better using NULL. think of using memmove.
         eOresult_t res = eo_proxy_ReplyROP_Load(proxy, id32, NULL);  // if NULL it does not copy dat into the nv and uses ram inside the netvar
         eom_emsappl_SendTXRequest(eom_emsappl_GetHandle());        
     }

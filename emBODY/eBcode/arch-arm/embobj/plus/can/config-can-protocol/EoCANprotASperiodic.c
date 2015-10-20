@@ -263,7 +263,7 @@ static void* s_eocanprotASperiodic_get_entity(eOprotEndpoint_t endpoint, eOprot_
     
     if(EOK_uint08dummy == ii)
     {     
-        #warning -> TODO: add diagnostics about not found board as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
+        //#warning -> TODO: add diagnostics about not found board as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
         return(NULL);
     }
     
@@ -313,7 +313,7 @@ static eOresult_t s_eocanprotASperiodic_parser_process_forcetorque(eOcanframe_t 
         default:
         {
             //i must never be here
-            #warning -> TODO: add diagnostics about unknown mode as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
+            //#warning -> TODO: add diagnostics about unknown mode as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
         }
     }
     
