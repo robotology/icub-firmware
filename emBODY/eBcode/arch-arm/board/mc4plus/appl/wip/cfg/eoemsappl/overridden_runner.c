@@ -264,8 +264,8 @@ static void s_overriden_runner_CheckAndUpdateExtFaults(void)
             uint32_t state = eo_mcserv_GetMotorFaultMask(eo_mcserv_GetHandle(),i);
             if((state & MOTOR_EXTERNAL_FAULT) == 0) //external fault bit not set
             {
-                //uint8_t fault_mask[6] = {0x4, 0x0, 0x0, 0x0, 0x0, 0x0}; //setting only the external fault bit
-                uint8_t fault_mask[6] = {0x0, 0x4, 0x0, 0x0, 0x0, 0x0}; //byte0 -> idle state for the joint, byte1 -> ext fault
+                //simulate the CANframe used by 2FOC to signal the status
+                uint8_t fault_mask[8] = {0x0, 0x0, 0x0, 0x0, 0x4, 0x0, 0x0, 0x0}; //setting only the external fault bit
                 eo_motor_set_motor_status(eo_motors_GetHandle(),i, fault_mask);
             }
         }

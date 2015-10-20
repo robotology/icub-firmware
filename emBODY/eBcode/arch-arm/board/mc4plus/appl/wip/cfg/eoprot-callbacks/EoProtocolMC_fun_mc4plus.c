@@ -729,8 +729,9 @@ static void s_eoprot_ep_mc_fun_MotorReactivationAttempt(uint8_t motor)
 {
      eo_mcserv_EnableMotor(eo_mcserv_GetHandle(), motor);
      eo_mcserv_EnableFaultDetection(eo_mcserv_GetHandle());
-        
-     uint8_t fault_mask[6] = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0}; //clear all the faults
+     
+	 //simulate the CANframe used by 2FOC to signal the status   
+     uint8_t fault_mask[8] = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}; //clear all the faults
      eo_mcserv_SetMotorFaultMask(eo_mcserv_GetHandle(), motor, fault_mask);
      
      //reports to emscontroller the changed mask

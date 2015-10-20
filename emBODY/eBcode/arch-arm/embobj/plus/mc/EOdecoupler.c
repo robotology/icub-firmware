@@ -166,18 +166,9 @@ extern void eo_motor_set_motor_status(EOmotors *o, uint8_t m, uint8_t *state)
 {   
     if (!state) return;
 
-    //old
-    /*
-    o->motor_run_state[m] = state[0];
-    o->motor_fault_mask[m] = ((uint32_t*)state)[1];
-    o->motor_qe_error[m] = (((uint32_t)(((uint16_t*)state)[1]))<<16) | (uint32_t)state[1];
-    */
-    
-    o->motor_run_state[m]  = state[0]; //1byte
-    o->motor_fault_mask[m] = *(uint32_t*)&(state[1]); //4 bytes
-    o->motor_qe_error[m]   = state[5]; //1byte (don't know if it's right)
-    
-    o->motor_qe_error[m] = o->motor_qe_error[m];
+    o->motor_run_state[m] = state[0]; //1byte
+    o->motor_qe_error[m] = (((uint32_t)(((uint16_t*)state)[1]))<<16) | (uint32_t)state[1]; //1byte
+    o->motor_fault_mask[m] = ((uint32_t*)state)[1]; //4bytes
 }
 
 #include "EoError.h"
@@ -247,6 +238,8 @@ extern void eo_motors_decouple_PWM(EOmotors *o, float *pwm_joint, float *pwm_mot
         
         pwm_motor[m] >>= 14;
         
+        #warning: be careful when the jacobian will be enabled...dont think the limit is useful here
+		//here should give an error as a reminder
         LIMIT(pwm_motor[m], NOMINAL_CURRENT);
     }
 }
