@@ -108,6 +108,7 @@ static char s_eom_task_count = 0;
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
+#undef PRINT_TASK_ADDITIONAL_INFO
 
 extern EOMtask * eom_task_New(eOmtaskType_t type, uint8_t priority, uint16_t stacksize,
                                        void (*startup_fn)(EOMtask *tsk, uint32_t zero),
@@ -120,9 +121,9 @@ extern EOMtask * eom_task_New(eOmtaskType_t type, uint8_t priority, uint16_t sta
 
 {
     EOMtask *retptr = NULL;
-    //char str[64];
-    //char typestr[10];
-    //uint8_t id = 0;
+#if defined(PRINT_TASK_ADDITIONAL_INFO)
+    char typestr[10];
+#endif
 
     // verify that we have at least a forever-fn
     eo_errman_Assert(eo_errman_GetHandle(), (NULL != run_fn), "eom_task_New(): NULL run_fn", s_eobj_ownname, &eo_errman_DescrWrongParamLocal);
@@ -161,8 +162,9 @@ extern EOMtask * eom_task_New(eOmtaskType_t type, uint8_t priority, uint16_t sta
                                     NULL, NULL,
                                     s_eom_task_get_id
                                   );
-
-            //snprintf(typestr, sizeof(typestr), "%s", "user-def");
+#if defined(PRINT_TASK_ADDITIONAL_INFO)
+            snprintf(typestr, sizeof(typestr), "%s", "user-def");
+#endif
         } break;
 
         case eom_mtask_EventDriven:
@@ -184,8 +186,9 @@ extern EOMtask * eom_task_New(eOmtaskType_t type, uint8_t priority, uint16_t sta
                                     NULL, NULL,
                                     s_eom_task_get_id
                                   );
-
-            //snprintf(typestr, sizeof(typestr), "%s", "evt-drvn");
+#if defined(PRINT_TASK_ADDITIONAL_INFO)
+            snprintf(typestr, sizeof(typestr), "%s", "evt-drvn");
+#endif
         } break;
 
         case eom_mtask_OnAllEventsDriven:
@@ -207,8 +210,9 @@ extern EOMtask * eom_task_New(eOmtaskType_t type, uint8_t priority, uint16_t sta
                                     NULL, NULL,
                                     s_eom_task_get_id
                                   );
-
-            //snprintf(typestr, sizeof(typestr), "%s", "evt-drvn");
+#if defined(PRINT_TASK_ADDITIONAL_INFO)
+            snprintf(typestr, sizeof(typestr), "%s", "evt-drvn");
+#endif
         } break;
 
         case eom_mtask_MessageDriven:
@@ -233,8 +237,9 @@ extern EOMtask * eom_task_New(eOmtaskType_t type, uint8_t priority, uint16_t sta
                                     NULL, NULL,
                                     s_eom_task_get_id
                                   );
-
-            //snprintf(typestr, sizeof(typestr), "%s", "msg-drvn");
+#if defined(PRINT_TASK_ADDITIONAL_INFO)
+            snprintf(typestr, sizeof(typestr), "%s", "msg-drvn");
+#endif
         } break;
 
         case eom_mtask_CallbackDriven:
@@ -260,8 +265,9 @@ extern EOMtask * eom_task_New(eOmtaskType_t type, uint8_t priority, uint16_t sta
                                     s_eom_task_isr_exec_callback, s_eom_task_tsk_exec_callback,
                                     s_eom_task_get_id
                                   );
-
-            //snprintf(typestr, sizeof(typestr), "%s", "actv-drvn");
+#if defined(PRINT_TASK_ADDITIONAL_INFO)
+            snprintf(typestr, sizeof(typestr), "%s", "actv-drvn");
+#endif
         } break;
 
         case eom_mtask_Periodic:
@@ -283,8 +289,9 @@ extern EOMtask * eom_task_New(eOmtaskType_t type, uint8_t priority, uint16_t sta
                                     NULL, NULL,
                                     s_eom_task_get_id
                                   );
-
-            //snprintf(typestr, sizeof(typestr), "%s", "periodic");
+#if defined(PRINT_TASK_ADDITIONAL_INFO)
+            snprintf(typestr, sizeof(typestr), "%s", "periodic");
+#endif
         } break;
 
                 
@@ -329,11 +336,13 @@ extern EOMtask * eom_task_New(eOmtaskType_t type, uint8_t priority, uint16_t sta
     eo_errman_Assert(eo_errman_GetHandle(), (NULL != retptr->osaltask), "eom_task_New(): osal gives NULL osaltask", s_eobj_ownname, &eo_errman_DescrRuntimeErrorLocal);
 
     s_eom_task_count ++;
-
-    //osal_task_id_get(retptr->osaltask, &id);
-    //snprintf(str, sizeof(str), "#%d: %s, id %d, pr %d, %s", s_eom_task_count, name, id, priority, typestr);
-    //eo_errman_Info(eo_errman_GetHandle(), str, s_eobj_ownname, NULL);
-   
+#if defined(PRINT_TASK_ADDITIONAL_INFO)
+    char str[128] = {0};
+    osal_task_id_t id = 0;
+    osal_task_id_get(retptr->osaltask, &id);
+    snprintf(str, sizeof(str), "#%d: %s, id %d, pr %d, %s", s_eom_task_count, name, id, priority, typestr);
+    eo_errman_Info(eo_errman_GetHandle(), str, s_eobj_ownname, NULL);
+#endif
     // ok. everything is done. when the rtos will start, then the run function of the task will be executed
     
     return(retptr);
