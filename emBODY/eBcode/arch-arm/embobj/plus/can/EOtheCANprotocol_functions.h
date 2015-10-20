@@ -63,6 +63,8 @@ extern "C" {
 
 // - analog sensors: polling
 
+// this function is weakly defined. it must be redefined to implement the chain of requests from channel 0 up to channel 5
+// with successive action of ... for instance informing robotinterface.
 extern eObool_t eocanprotASpolling_redefinable_alert_reception_of_POL_AS_CMD__GET_FULL_SCALES(uint8_t channel,  uint16_t *data, eOas_strain_t* strain);
 
 extern eOresult_t eocanprotASpolling_former_POL_AS_CMD__SET_TXMODE(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame);
@@ -312,7 +314,7 @@ extern eOresult_t eocanprotMCperiodic_former_PER_MC_MSG__EMSTO2FOC_DESIRED_CURRE
 // - skin: periodic
 
 // weakly defined
-extern eObool_t eocanprotSKperiodic_redefinable_SkipParsingOf_ANY_PERIODIC_SKIN_MSG(eOsk_skin_t *skin);
+//extern eObool_t eocanprotSKperiodic_redefinable_SkipParsingOf_ANY_PERIODIC_SKIN_MSG(eOsk_skin_t *skin);
 
 extern eOresult_t eocanprotSKperiodic_parser_ANY_PERIODIC_SKIN_MSG(eOcanframe_t *frame, eOcanport_t port);
 
