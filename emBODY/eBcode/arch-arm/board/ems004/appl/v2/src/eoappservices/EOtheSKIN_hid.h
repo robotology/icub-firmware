@@ -29,7 +29,10 @@
 
 #include "EoCommon.h"
 #include "EOtheCANprotocol.h"
-
+#include "EOtheCANdiscovery2.h"
+#include "EOtimer.h"
+#include "EOtheErrorManager.h"
+#include "EOvector.h"
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
 
@@ -41,10 +44,28 @@
 
 struct EOtheSKIN_hid
 {
-    eObool_t            initted;
-    eObool_t            thereisskin;
-    uint8_t             numofskins;
-    eOcanprot_command_t command;
+    eObool_t                                initted;
+    eObool_t                                active;
+    uint8_t                                 numofskinpatches;    
+    uint8_t                                 numofmtbs;
+    eOcanprot_command_t                     command;
+    EOvector*                               canboardproperties;
+    EOvector*                               canentitydescriptor;
+    eOmn_serv_configuration_t               servconfig;
+    eOcandiscovery_target_t                 candiscoverytarget;
+    eOskin_onendofoperation_fun_t           onverify;
+    eObool_t                                activateafterverify;
+    eObool_t                                itistransmitting;
+    eObool_t                                patchistransmitting[eomn_serv_skin_maxpatches];
+    eOsk_skin_t*                            skinpatches[eomn_serv_skin_maxpatches];
+    EOvector*                               rxdata[eomn_serv_skin_maxpatches]; // of eOsk_candata_t
+    // this part if for error (diagnostics) reporting: if something is OK or NOT OK. we use a timer to repeat for some time the messages
+    EOtimer*                                errorReportTimer;
+    eOerrmanDescriptor_t                    errorDescriptor;
+    eOerrmanErrorType_t                     errorType;
+    uint8_t                                 errorCallbackCount;
+    uint8_t                                 repetitionOKcase;
+    eOreltime_t                             reportPeriod;         
 }; 
 
 

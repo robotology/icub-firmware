@@ -48,25 +48,41 @@
 typedef struct EOtheSKIN_hid EOtheSKIN;
 
 
+typedef eOresult_t (*eOskin_onendofoperation_fun_t) (EOtheSKIN* p, eObool_t operationisok);
+
+enum { eo_skin_maxnumberofMTBboards = 15 }; // even if they can be up to 28 (the number of allowed can IDs on the two buses).
    
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------
 // empty-section
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
+// the skin is a singleton but can have 1 or 2 patches (actually up to 4 are supported) which must be configured all together
+
 extern EOtheSKIN* eo_skin_Initialise(void);
 
 extern EOtheSKIN* eo_skin_GetHandle(void);
 
-// it disables the tx mode ..
-extern eOresult_t eo_skin_DisableTX(EOtheSKIN *p);
+
+extern eOresult_t eo_skin_Verify(EOtheSKIN *p, const eOmn_serv_configuration_t * servcfg, eOskin_onendofoperation_fun_t onverify, eObool_t activateafterverify);
+
+extern eOresult_t eo_skin_Activate(EOtheSKIN *p, const eOmn_serv_configuration_t * servcfg);
+
+extern eOresult_t eo_skin_Deactivate(EOtheSKIN *p);
+
+extern eOresult_t eo_skin_TXstop(EOtheSKIN *p);
 
 
-extern eOresult_t eo_skin_ConfigTXMode(EOtheSKIN *p, uint8_t skinindex, eOsk_sigmode_t mode);
+extern eOresult_t eo_skin_SetMode(EOtheSKIN *p, uint8_t patchindex, eOsk_sigmode_t mode);
 
-extern eOresult_t eo_skin_ConfigBoards(EOtheSKIN *p, uint8_t skinindex, eOsk_cmd_boardsCfg_t *brdcfg);
+extern eOresult_t eo_skin_SetBoardsConfig(EOtheSKIN *p, uint8_t patchindex, eOsk_cmd_boardsCfg_t *brdcfg);
 
-extern eOresult_t eo_skin_ConfigTriangles(EOtheSKIN *p, uint8_t skinindex, eOsk_cmd_trianglesCfg_t *trgcfg);
+extern eOresult_t eo_skin_SetTrianglesConfig(EOtheSKIN *p, uint8_t patchindex, eOsk_cmd_trianglesCfg_t *trgcfg);
+
+extern eOresult_t eo_skin_AcceptCANframe(EOtheSKIN *p, eOcanframe_t *frame, eOcanport_t port);
+
+// use regularROPSjustTransmitted = eom_emsrunner_CycleHasJustTransmittedRegulars(eom_emsrunner_GetHandle())
+extern eOresult_t eo_skin_Tick(EOtheSKIN *p, eObool_t regularROPSjustTransmitted);
 
 
 
