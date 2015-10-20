@@ -870,6 +870,29 @@ const eOmn_serv_configuration_t serv_config_as_strain[] =
  
 };
 
+const eOmn_serv_configuration_t serv_config_as_strain_eb9[] =
+{
+    
+    {   // eb1
+        .type       = eomn_serv_AS_strain,
+        .filler     = {0},
+        .data.as.strain = 
+        {
+            .version    =
+            {
+                .firmware   = {0, 0},
+                .protocol   = {1, 0}
+            },
+            .canloc         =
+            {
+                .port           = eOcanport2,
+                .addr           = 1,
+                .insideindex    = eomn_serv_caninsideindex_none                   
+            }
+        }    
+    }
+};
+
 
 const eOmn_serv_configuration_t serv_config_mc[] =
 {
@@ -985,10 +1008,101 @@ const eOmn_serv_configuration_t serv_config_mc[] =
     },
     
     {   // eb2
-        .type       = eomn_serv_NONE,
+        .type       = eomn_serv_MC_mc4,
         .filler     = {0},
-        .data       = {0}        
+        .data.mc.mc4_based  = 
+        {
+            .mc4version =
+            {
+                .firmware   = {0, 0},
+                .protocol   = {1, 2}                 
+            },
+            .mc4shifts =
+            {
+                0  
+            },
+            .mc4joints =
+            {
+                {   // jomo 0   
+                    .port           = eOcanport1,
+                    .addr           = 3,
+                    .insideindex    = eocanmap_insideindex_first
+                },      
+                {   // jomo 1
+                    .port           = eOcanport1,
+                    .addr           = 3,
+                    .insideindex    = eocanmap_insideindex_second
+                },
+                {   // jomo 2
+                    .port           = eOcanport1,
+                    .addr           = 4,
+                    .insideindex    = eocanmap_insideindex_first
+                },
+                {   // jomo 3
+                    .port           = eOcanport1,
+                    .addr           = 4,
+                    .insideindex    = eocanmap_insideindex_second
+                },
+                {   // jomo 4   
+                    .port           = eOcanport1,
+                    .addr           = 5,
+                    .insideindex    = eocanmap_insideindex_first
+                },
+                {   // jomo 
+                    .port           = eOcanport1,
+                    .addr           = 5,
+                    .insideindex    = eocanmap_insideindex_second
+                },
+                {   // jomo 6
+                    .port           = eOcanport1,
+                    .addr           = 6,
+                    .insideindex    = eocanmap_insideindex_first
+                },
+                {   // jomo 7
+                    .port           = eOcanport1,
+                    .addr           = 6,
+                    .insideindex    = eocanmap_insideindex_second
+                },
+                {   // jomo 8   
+                    .port           = eOcanport1,
+                    .addr           = 7,
+                    .insideindex    = eocanmap_insideindex_first
+                },
+                {   // jomo 9
+                    .port           = eOcanport1,
+                    .addr           = 7,
+                    .insideindex    = eocanmap_insideindex_second
+                },
+                {   // jomo 10
+                    .port           = eOcanport1,
+                    .addr           = 8,
+                    .insideindex    = eocanmap_insideindex_first
+                },
+                {   // jomo 11
+                    .port           = eOcanport1,
+                    .addr           = 8,
+                    .insideindex    = eocanmap_insideindex_second
+                }
+            },
+            .mais = 
+            {
+                .version    =
+                {
+                    .firmware   = {0, 0},
+                    .protocol   = {1, 0}    
+                },
+                .canloc = 
+                {
+                    .port           = eOcanport1,
+                    .addr           = 14,
+                    .insideindex    = eocanmap_insideindex_none                    
+                }              
+            }
+        }    
     },
+    
+    
+    
     
     {   // eb3
         .type       = eomn_serv_NONE,
@@ -1082,6 +1196,135 @@ const eOmn_serv_configuration_t serv_config_mc_eb15[] =
 };
 
 
+const eOmn_serv_configuration_t serv_config_mc_eb9[] =
+{
+    
+    {   // eb9
+        .type       = eomn_serv_MC_foc,
+        .filler     = {0},
+        .data.mc.foc_based = 
+        {
+            .boardtype4mccontroller = emscontroller_board_ANKLE,
+            .filler                 = {0},
+            .version    =
+            {
+                .firmware   = {0, 0},
+                .protocol   = {1, 3}
+            },
+            .arrayofjomodescriptors =
+            {
+                .head   = 
+                {
+                    .capacity       = 4,
+                    .itemsize       = 3,
+                    .size           = 2,
+                    .internalmem    = 0                    
+                },
+                .data   =
+                {
+                    { // joint 0
+                        .actuator.foc.canloc    =
+                        {
+                            .port           = eOcanport1,
+                            .addr           = 1,
+                            .insideindex    = eomn_serv_caninsideindex_first                             
+                        },
+                        .sensor         =
+                        {
+                            .type   = eomn_serv_mc_sensor_encoder_aea,
+                            .port   = eomn_serv_mc_port_ems_spiP6, // hal_encoder1   
+                            .pos    = eomn_serv_mc_sensor_pos_atjoint
+                        },
+                        .extrasensor    =
+                        {
+                            .type   = eomn_serv_mc_sensor_none,
+                            .port   = eomn_serv_mc_port_none,
+                            .pos    = eomn_serv_mc_sensor_pos_none
+                        }
+                    },
+ 
+                    { // joint 1
+                        .actuator.foc.canloc    =
+                        {
+                            .port           = eOcanport1,
+                            .addr           = 2,
+                            .insideindex    = eomn_serv_caninsideindex_first                             
+                        },
+                        .sensor         =
+                        {
+                            .type   = eomn_serv_mc_sensor_encoder_aea,
+                            .port   = eomn_serv_mc_port_ems_spiP7, // hal_encoder4   
+                            .pos    = eomn_serv_mc_sensor_pos_atjoint
+                        },
+                        .extrasensor    =
+                        {
+                            .type   = eomn_serv_mc_sensor_none,
+                            .port   = eomn_serv_mc_port_none,
+                            .pos    = eomn_serv_mc_sensor_pos_none
+                        }
+                    }
+                    
+                    
+                }
+                
+                
+            }
+        }
+    }
+ 
+};
+
+const eOmn_serv_configuration_t serv_config_as_mais[] =
+{
+    
+    {   // eb2/2b4
+        .type       = eomn_serv_AS_mais,
+        .filler     = {0},
+        .data.as.mais = 
+        {
+            .version    =
+            {
+                .firmware   = {0, 0},
+                .protocol   = {1, 0}    
+            },
+            .canloc = 
+            {
+                .port           = eOcanport1,
+                .addr           = 14,
+                .insideindex    = eocanmap_insideindex_none                    
+            }
+        }    
+    }
+ 
+};
+
+
+const eOmn_serv_configuration_t serv_config_sk_skin[] =
+{
+    
+    {   // eb2/2b4
+        .type       = eomn_serv_SK_skin,
+        .filler     = {0},
+        .data.sk.skin = 
+        {
+            .version    =
+            {
+                .firmware   = {0, 0},
+                .protocol   = {1, 0}    
+            },
+            .numofpatches   = 1,
+            .canmapskin[0] = { 0x0000, 0x7f00 },
+            .canmapskin[1] = {0},
+            .canmapskin[2] = {0},
+            .canmapskin[3] = {0}
+        }    
+    }
+ 
+};
+
+
+
+
 extern const eOmn_serv_configuration_t * eoboardconfig_code2motion_serv_configuration(uint32_t code)
 {
     const eOmn_serv_configuration_t * ret = NULL;
@@ -1092,11 +1335,20 @@ extern const eOmn_serv_configuration_t * eoboardconfig_code2motion_serv_configur
         {   // board eb1   
             ret = &serv_config_mc[0]; 
         } break;  
-
+        
+        case 1:
+        {   // board eb1   
+            ret = &serv_config_mc[1]; 
+        } break;  
         case 14:
         {   // board eb15   
             ret = &serv_config_mc_eb15[0]; 
         } break;  
+        
+        case 8:
+        {   // board eb9   
+            ret = &serv_config_mc_eb9[0]; 
+        } break;          
         
         default:    
         {   // all the others
@@ -1125,6 +1377,11 @@ extern const eOmn_serv_configuration_t * eoboardconfig_code2strain_serv_configur
             ret = &serv_config_as_strain[0]; 
         } break;  
         
+        case 8:
+        {   // board eb9   
+            ret = &serv_config_as_strain_eb9[0]; 
+        } break;          
+        
         default:    
         {   // all the others
             ret = NULL;
@@ -1135,6 +1392,51 @@ extern const eOmn_serv_configuration_t * eoboardconfig_code2strain_serv_configur
     return(ret);        
 }
 
+
+extern const eOmn_serv_configuration_t * eoboardconfig_code2mais_serv_configuration(uint32_t code)
+{
+    const eOmn_serv_configuration_t * ret = NULL;
+    
+    switch(code)
+    {
+        case 1:
+        case 3:
+        {   // board eb2 eb4   
+            ret = &serv_config_as_mais[0]; 
+        } break;  
+
+        default:    
+        {   // all the others
+            ret = NULL;
+        } break;
+    
+    }
+
+    return(ret);        
+}
+
+
+extern const eOmn_serv_configuration_t * eoboardconfig_code2skin_serv_configuration(uint32_t code)
+{
+    const eOmn_serv_configuration_t * ret = NULL;
+    
+    switch(code)
+    {
+        case 1:
+        case 3:
+        {   // board eb2 eb4   
+            ret = &serv_config_sk_skin[0]; 
+        } break;  
+
+        default:    
+        {   // all the others
+            ret = NULL;
+        } break;
+    
+    }
+
+    return(ret);        
+}
 
 
 // --------------------------------------------------------------------------------------------------------------------

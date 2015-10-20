@@ -93,6 +93,10 @@ extern const eOmn_serv_configuration_t * eoboardconfig_code2motion_serv_configur
 
 extern const eOmn_serv_configuration_t * eoboardconfig_code2strain_serv_configuration(uint32_t code);
 
+extern const eOmn_serv_configuration_t * eoboardconfig_code2mais_serv_configuration(uint32_t code);
+
+extern const eOmn_serv_configuration_t * eoboardconfig_code2skin_serv_configuration(uint32_t code);
+
 
 /** @}            
     end of group eo_EOtheBoardConfig  
