@@ -26,6 +26,7 @@
 
 #include "EoCommon.h"
 #include "EOtheErrorManager.h"
+#include "EoError.h"
 #include "EOtheEntities.h"
 
 #include "EOtheCANservice.h"
@@ -84,6 +85,7 @@
 
 static eOresult_t s_eo_encoderreader_onstop_verifyreading(void *par, eObool_t readingisok);
 
+static void s_eo_encodereader_send_periodic_error_report(void *p);
 
 static eo_appEncReader_enc_type_t s_eo_encoderreader_GetEncoderType(uint8_t sensortype);
 
@@ -91,7 +93,7 @@ static eo_appEncReader_encoder_position_t s_eo_encoderreader_GetEncoderPosition(
 
 static void s_eo_encoderreader_config_ereader(const eOmn_serv_arrayof_4jomodescriptors_t * jomodes, eOcallback_t callback, void* arg);
 
-static void readencoder(void* p);
+static void s_eo_encoderreader_read_encoders(void* p);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -100,18 +102,25 @@ static void readencoder(void* p);
 
 static EOtheEncoderReader s_eo_theencoderreader = 
 {
-    .initted                = eobool_false,
-    .active                 = eobool_false,
-    .arrayofjomodes         = { 0 },
-    .reader                 = NULL,
-    //.readerconfig           = {0},    
-    .onverify               = NULL,
-    .activateafterverify    = eobool_false,
-    .waitreadtimer          = NULL,
-    .numofjomos             = 0
+    .initted                    = eobool_false,
+    .active                     = eobool_false,
+    .arrayofjomodes             = { 0 },
+    .reader                     = NULL,   
+    .onverify                   = NULL,
+    .activateafterverify        = eobool_false,
+    .waitreadtimer              = NULL,
+    .numofjomos                 = 0,
+    .numofencoders              = 0,
+    .errorflags                 = {0},
+    .errorReportTimer           = NULL,
+    .errorDescriptor            = {0},
+    .errorType                  = eo_errortype_info,
+    .errorCallbackCount         = 0,
+    .repetitionOKcase           = 10,
+    .reportPeriod               = 10*EOK_reltime1sec 
 };
 
-//static const char s_eobj_ownname[] = "EOtheEncoderReader";
+static const char s_eobj_ownname[] = "EOtheEncoderReader";
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -133,6 +142,8 @@ extern EOtheEncoderReader* eo_encoderreader_Initialise(void)
     s_eo_theencoderreader.waitreadtimer = eo_timer_New();
     
     s_eo_theencoderreader.reader = NULL; // in future use: Initialise() 
+    
+    s_eo_theencoderreader.errorReportTimer = eo_timer_New();
         
     s_eo_theencoderreader.initted = eobool_true;
     
@@ -164,7 +175,10 @@ extern eOresult_t eo_encoderreader_Verify(EOtheEncoderReader *p, const eOmn_serv
 //        eo_encoderreader_Deactivate(p);        
 //    }   
     
-
+    // make sure the timer is not running
+    eo_timer_Stop(s_eo_theencoderreader.errorReportTimer);   
+    
+    
     s_eo_theencoderreader.onverify = onverify;
     s_eo_theencoderreader.activateafterverify = activateafterverify;
                     
@@ -175,13 +189,10 @@ extern eOresult_t eo_encoderreader_Verify(EOtheEncoderReader *p, const eOmn_serv
     EOaction_strg astrg = {0};
     EOaction *act = (EOaction*)&astrg;
     
-    // now i start a timer of 2 ms. and at its expiry i exec s_eo_encoderreader_read_after.    
-    eo_action_SetCallback(act, readencoder, (void*)jomodes, eov_callbackman_GetTask(eov_callbackman_GetHandle()));     
-    eo_timer_Start(s_eo_theencoderreader.waitreadtimer, eok_abstimeNOW, 2*eok_reltime1sec, eo_tmrmode_ONESHOT, act);   
+    // now i start a timer of 2 ms. and at its expiry i exec s_eo_encoderreader_read_encoders().    
+    eo_action_SetCallback(act, s_eo_encoderreader_read_encoders, (void*)jomodes, eov_callbackman_GetTask(eov_callbackman_GetHandle()));     
+    eo_timer_Start(s_eo_theencoderreader.waitreadtimer, eok_abstimeNOW, 2*eok_reltime1ms, eo_tmrmode_ONESHOT, act);   
      
-//    eObool_t readingisok = eobool_true;
-//    s_eo_encoderreader_onstop_verifyreading((void*)jomodes, readingisok);
-//    
     return(eores_OK);   
 }
 
@@ -198,35 +209,19 @@ extern eOresult_t eo_encoderreader_Deactivate(EOtheEncoderReader *p)
         return(eores_OK);        
     } 
     
+    #warning TODO: eo_encoderreader_Deactivate() must be terminated. see comments below
     
+    // in order to do this function we should change EOappEncReader so that it can be de-initted. 
     
-    
-//    // send stop messages to strain, unload the entity-can-mapping and the board-can-mapping, reset all things inside this object
-//    // what else .... ?
-//    
-//        
-//    if(eobool_true == s_eo_theencoderreader.itistransmitting)
-//    {
-//        eo_encoderreader_TXstop(&s_eo_theencoderreader);
-//    }
-//    
-//    eo_canmap_DeconfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_analogsensors, eoprot_entity_as_strain, s_eo_theencoderreader.canentitydescriptor); 
-//    
-//    eo_canmap_UnloadBoards(eo_canmap_GetHandle(), s_eo_theencoderreader.canboardproperties);
-//     
-//    
-//    eo_entities_SetNumOfStrains(eo_entities_GetHandle(), 0);
-//    
-//    s_eo_theencoderreader.strain = NULL;
-//    
-//    memset(&s_eo_theencoderreader.arrayofjomodes, 0, sizeof(eOmn_serv_arrayof_4jomodescriptors_t));
-//    s_eo_theencoderreader.servconfig.type = eomn_serv_NONE;
-//    
-//    eo_vector_Clear(s_eo_theencoderreader.canboardproperties);
-//    eo_vector_Clear(s_eo_theencoderreader.canentitydescriptor);
-//    
+    // to do: 
+    // deinit EOappEncReader, undo what in s_eo_encoderreader_config_ereader()
+
 //    
 //    s_eo_theencoderreader.active = eobool_false;
+
+
+    // make sure the timer is not running
+    eo_timer_Stop(s_eo_theencoderreader.errorReportTimer);  
     
     return(eores_OK);
 }
@@ -244,7 +239,10 @@ extern eOresult_t eo_encoderreader_Activate(EOtheEncoderReader *p, const eOmn_se
         eo_encoderreader_Deactivate(p);        
     }   
  
-             
+    #warning TODO: eo_encoderreader_Activate() should be changed. see comments below.
+    // since EOappEncReader can only be crated, but not initted or de-inittedd, we must change it so that it can do that.
+    
+
 //    memcpy(&s_eo_theencoderreader.arrayofjomodes, jomodes, sizeof(eOmn_serv_arrayof_4jomodescriptors_t));
 //                    
 //    s_eo_encoderreader_config_ereader(NULL, NULL);
@@ -267,7 +265,7 @@ extern eOresult_t eo_encoderreader_StartReading(EOtheEncoderReader *p)
     }
     
     if(eobool_false == s_eo_theencoderreader.active)
-    {   // nothing to do because we dont have a strain board
+    {   // nothing to do because we dont have it
         return(eores_OK);
     }   
 
@@ -277,6 +275,7 @@ extern eOresult_t eo_encoderreader_StartReading(EOtheEncoderReader *p)
     return(eores_OK);
 }
 
+
 extern eObool_t eo_encoderreader_IsReadingAvailable(EOtheEncoderReader *p)
 {
     if(NULL == p)
@@ -285,7 +284,7 @@ extern eObool_t eo_encoderreader_IsReadingAvailable(EOtheEncoderReader *p)
     }
     
     if(eobool_false == s_eo_theencoderreader.active)
-    {   // nothing to do because we dont have a strain board
+    {   // nothing to do because we dont have it
         return(eobool_false);
     }   
 
@@ -304,7 +303,7 @@ extern eOresult_t eo_encoderreader_Read(EOtheEncoderReader *p, uint8_t position,
     }
     
     if(eobool_false == s_eo_theencoderreader.active)
-    {   // nothing to do because we dont have a strain board
+    {   // nothing to do because we dont have it
         return(eores_OK);
     }   
 
@@ -320,27 +319,6 @@ extern eOresult_t eo_encoderreader_Read(EOtheEncoderReader *p, uint8_t position,
 }
 
 
-
-//extern eOresult_t eo_encoderreader_OnDiscoveryStop(EOtheEncoderReader *p, EOtheCANdiscovery2 *discovery2, eObool_t searchisok)
-//{   
-//    if(NULL == p)
-//    {
-//        return(eores_NOK_nullpointer);
-//    }
-//    
-//    // wip part. we should: 
-//    // 1. send up a ok result about the strain ...
-//    // 2. call eo_encoderreader_Initialise()
-//    // 3. return OK
-//    
-//    
-//    if(NULL == p)
-//    {
-//        eo_encoderreader_Initialise();
-//    }
-
-//    return(eores_OK); 
-//}
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -358,12 +336,46 @@ extern eOresult_t eo_encoderreader_Read(EOtheEncoderReader *p, uint8_t position,
 
 static eOresult_t s_eo_encoderreader_onstop_verifyreading(void *par, eObool_t readingisok)
 {
-    
+    const eOmn_serv_arrayof_4jomodescriptors_t * jomodes = (const eOmn_serv_arrayof_4jomodescriptors_t *)par;
+        
     if((eobool_true == readingisok) && (eobool_true == s_eo_theencoderreader.activateafterverify))
     {
-        const eOmn_serv_arrayof_4jomodescriptors_t * jomodes = (const eOmn_serv_arrayof_4jomodescriptors_t *)par;
         eo_encoderreader_Activate(&s_eo_theencoderreader, jomodes);        
     }
+
+    s_eo_theencoderreader.errorDescriptor.sourcedevice     = eo_errman_sourcedevice_localboard;
+    s_eo_theencoderreader.errorDescriptor.sourceaddress    = 0;
+    s_eo_theencoderreader.errorDescriptor.par16            = s_eo_theencoderreader.numofjomos | (s_eo_theencoderreader.numofencoders << 8);
+    memcpy(&s_eo_theencoderreader.errorDescriptor.par64, &s_eo_theencoderreader.errorflags[0], sizeof(s_eo_theencoderreader.errorflags));    
+    EOaction_strg astrg = {0};
+    EOaction *act = (EOaction*)&astrg;
+    eo_action_SetCallback(act, s_eo_encodereader_send_periodic_error_report, NULL, eov_callbackman_GetTask(eov_callbackman_GetHandle()));
+        
+    if(eobool_true == readingisok)
+    {        
+        s_eo_theencoderreader.errorType = eo_errortype_debug;
+        s_eo_theencoderreader.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_encoders_ok);
+        eo_errman_Error(eo_errman_GetHandle(), s_eo_theencoderreader.errorType, NULL, s_eobj_ownname, &s_eo_theencoderreader.errorDescriptor);
+        
+        if((0 != s_eo_theencoderreader.repetitionOKcase) && (0 != s_eo_theencoderreader.reportPeriod))
+        {
+            s_eo_theencoderreader.errorCallbackCount = 20;        
+            eo_timer_Start(s_eo_theencoderreader.errorReportTimer, eok_abstimeNOW, s_eo_theencoderreader.reportPeriod, eo_tmrmode_FOREVER, act);
+        }
+    }    
+       
+    if(eobool_false == readingisok)
+    {
+        s_eo_theencoderreader.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_encoders_failed_verify);
+        s_eo_theencoderreader.errorType = eo_errortype_error;                
+        eo_errman_Error(eo_errman_GetHandle(), s_eo_theencoderreader.errorType, NULL, s_eobj_ownname, &s_eo_theencoderreader.errorDescriptor);
+        
+        if(0 != s_eo_theencoderreader.reportPeriod)
+        {
+            s_eo_theencoderreader.errorCallbackCount = EOK_int08dummy;
+            eo_timer_Start(s_eo_theencoderreader.errorReportTimer, eok_abstimeNOW, s_eo_theencoderreader.reportPeriod, eo_tmrmode_FOREVER, act);
+        }
+    }    
     
     if(NULL != s_eo_theencoderreader.onverify)
     {
@@ -373,6 +385,20 @@ static eOresult_t s_eo_encoderreader_onstop_verifyreading(void *par, eObool_t re
     return(eores_OK);   
 }
 
+
+static void s_eo_encodereader_send_periodic_error_report(void *p)
+{
+    eo_errman_Error(eo_errman_GetHandle(), s_eo_theencoderreader.errorType, NULL, s_eobj_ownname, &s_eo_theencoderreader.errorDescriptor);
+    
+    if(EOK_int08dummy != s_eo_theencoderreader.errorCallbackCount)
+    {
+        s_eo_theencoderreader.errorCallbackCount--;
+    }
+    if(0 == s_eo_theencoderreader.errorCallbackCount)
+    {
+        eo_timer_Stop(s_eo_theencoderreader.errorReportTimer);
+    }
+}
 
 static eo_appEncReader_enc_type_t s_eo_encoderreader_GetEncoderType(uint8_t sensortype)
 {
@@ -430,7 +456,7 @@ static void s_eo_encoderreader_config_ereader(const eOmn_serv_arrayof_4jomodescr
     
     config.SPI_callbackOnLastRead = callback;
     config.SPI_callback_arg = arg;
-    
+    uint8_t numberofencoders = 0;
     for(i=0; i<eOappEncReader_joint_numberof; i++)
     {
         const eOmn_serv_jomo_descriptor_t *jomodes = (eOmn_serv_jomo_descriptor_t*) eo_constarray_At(carray, i);
@@ -450,36 +476,42 @@ static void s_eo_encoderreader_config_ereader(const eOmn_serv_arrayof_4jomodescr
 
             if(eo_appEncReader_enc_type_NONE != config.joints[i].primary_encoder)
             {
+                numberofencoders++;
                 config.SPI_streams[config.joints[i].primary_enc_position%2].numberof++;
                 config.SPI_streams[config.joints[i].primary_enc_position%2].type = hal_encoder_t1;
             }
 
             if(eo_appEncReader_enc_type_NONE != config.joints[i].extra_encoder)
             {
+                numberofencoders++;
                 config.SPI_streams[config.joints[i].extra_enc_position%2].numberof++;
                 config.SPI_streams[config.joints[i].extra_enc_position%2].type = hal_encoder_t1;
             } 
         }        
     }
     
+    s_eo_theencoderreader.numofencoders = numberofencoders;
     s_eo_theencoderreader.reader = eo_appEncReader_New(&config);
     
 }
 
 
-static void readencoder(void* p)
+static void s_eo_encoderreader_read_encoders(void* p)
 {
     eObool_t readingisok = eobool_true;
     
     uint8_t i = 0;
     
+    memset(&s_eo_theencoderreader.errorflags, 0, sizeof(s_eo_theencoderreader.errorflags));
+    
     for(i=0; i< s_eo_theencoderreader.numofjomos; i++)
     {
         uint32_t primary = 0;
         uint32_t secondary = 0;
-        hal_encoder_errors_flags errors = {0};
-        eo_appEncReader_GetJointValue(s_eo_theencoderreader.reader, (eo_appEncReader_joint_position_t)i, &primary, &secondary, &errors);
-        if((0 != errors.chip_error) || (0 != errors.data_error) || (0 != errors.data_notready) || (0 != errors.tx_error))
+
+        eo_appEncReader_GetJointValue(s_eo_theencoderreader.reader, (eo_appEncReader_joint_position_t)i, &primary, &secondary, &s_eo_theencoderreader.errorflags[i]);
+        if((0 != s_eo_theencoderreader.errorflags[i].chip_error) || (0 != s_eo_theencoderreader.errorflags[i].data_error) || 
+           (0 != s_eo_theencoderreader.errorflags[i].data_notready) || (0 != s_eo_theencoderreader.errorflags[i].tx_error) )
         {
             readingisok = eobool_false;
         }            

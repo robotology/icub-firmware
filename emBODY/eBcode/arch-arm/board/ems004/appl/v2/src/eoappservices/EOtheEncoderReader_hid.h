@@ -32,6 +32,7 @@
 #include "EOappEncodersReader.h"
 
 #include "EOtimer.h"
+#include "EOtheErrorManager.h"
 
 
 
@@ -54,6 +55,15 @@ struct EOtheEncoderReader_hid
     eObool_t                                activateafterverify;
     EOtimer*                                waitreadtimer;
     uint8_t                                 numofjomos;
+    uint8_t                                 numofencoders;
+    hal_encoder_errors_flags                errorflags[eOappEncReader_joint_numberof];
+    // this part if for error (diagnostics) reporting: if something is OK or NOT OK. we use a timer to repeat for some time the messages
+    EOtimer*                                errorReportTimer;
+    eOerrmanDescriptor_t                    errorDescriptor;
+    eOerrmanErrorType_t                     errorType;
+    uint8_t                                 errorCallbackCount;
+    uint8_t                                 repetitionOKcase;
+    eOreltime_t                             reportPeriod;   
 }; 
 
 
