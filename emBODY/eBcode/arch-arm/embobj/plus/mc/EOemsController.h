@@ -139,6 +139,7 @@ extern void eo_emsController_SetVelTimeout(uint8_t joint, int32_t vel_timeout);
 extern void eo_emsController_SetGearboxRatio(uint8_t joint, int32_t gearboxratio);
 extern void eo_emsController_GetDecoupledMeasuredTorque (uint8_t joint, int32_t * Trq);
 extern void eo_emsController_GetDecoupledReferenceTorque (uint8_t joint, int32_t * Trq);
+extern uint16_t eo_emsController_GetActuationLimit(void);
 extern void eo_emsMotorController_GoIdle(void);
 
 /** @}            

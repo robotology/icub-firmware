@@ -58,6 +58,7 @@ struct EOemsController_hid
 {
     eOemscontroller_board_t board;
     eOemscontroller_actuation_t act;
+    uint16_t actuation_limit;
     
     uint8_t n_calibrated;
     

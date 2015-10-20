@@ -63,7 +63,8 @@ extern "C" {
 #define TORQUE_SENSOR_TIMEOUT     100 // cycles
 #define ENCODER_TIMEOUT            50 // cycles
 
-#define NOMINAL_CURRENT     10000
+//#define NOMINAL_CURRENT     10000
+#define PWM_OUTPUT_LIMIT      0x7FFF //32767 
 
 #define MAX_NAXLES 4
 
@@ -111,6 +112,7 @@ extern "C" {
 #define CHK_BITS(mask,bits) (((mask) & (bits)) == (bits))
 #define LIMIT(x,L) { if (x>(L)) x=(L); else if (x<-(L)) x=-(L); }
 #define LIMIT2(min, x, max) { if (x < (min)) x = (min); else if (x > (max)) x = (max); }
+#define RESCALE2PWMLIMITS(x, hw_limit) (int16_t)((int32_t)(PWM_OUTPUT_LIMIT * (x + hw_limit))/hw_limit - PWM_OUTPUT_LIMIT) //linear rescaling
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 /* NOT USED

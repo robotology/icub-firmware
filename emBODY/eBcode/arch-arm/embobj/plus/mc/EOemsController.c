@@ -133,7 +133,8 @@ extern EOemsController* eo_emsController_Init(eOemscontroller_board_t board, eOe
     if (!ems) return NULL;
     
     ems->board = board;
-    ems->act = act;    
+    ems->act = act;
+    ems->actuation_limit = eo_emsController_GetActuationLimit(); 
     ems->naxles = nax;
     ems->n_calibrated = 0;
         
@@ -693,10 +694,14 @@ extern void eo_emsController_PWM(int16_t* pwm_motor_16)
             pwm_motor[m] = eo_axisController_FrictionCompensation(ems->axis_controller[m],pwm_motor[m],ems->motor_velocity[m]);
     }
     
-    MOTORS(m) LIMIT(pwm_motor[m], NOMINAL_CURRENT);
+    //hardware limit
+    MOTORS(m) LIMIT(pwm_motor[m], ems->actuation_limit);
     
-    //save the pwm data after the decoupling
-    MOTORS(m)  ems->axis_controller[m]->controller_output=pwm_motor[m];
+    //save the pwm data after the decoupling   
+    //the output should be between -PWM_OUTPUT_LIMIT and +PWM_OUTPUT_LIMIT, indipendently from the hardware
+    //int16_t pwm_rescaled[MAX_NAXLES] = {0};
+    //MOTORS(m) pwm_rescaled[m] = RESCALE2PWMLIMITS(pwm_motor[m], ems->actuation_limit);
+    MOTORS(m) ems->axis_controller[m]->controller_output = RESCALE2PWMLIMITS(pwm_motor[m], ems->actuation_limit);//pwm_rescaled[m];
     
     MOTORS(m) pwm_motor_16[m] = (int16_t)pwm_motor[m];
 }
@@ -1537,6 +1542,20 @@ extern void eo_emsController_SetMotorConfig(uint8_t joint, eOmc_motor_config_t m
     }
 }
 
+extern uint16_t eo_emsController_GetActuationLimit(void)
+{
+    if (!ems) return 0;
+    
+    //2FOC is internally limited
+    if (ems->act == emscontroller_actuation_2FOC)
+        //return PWM_OUTPUT_LIMIT;
+        return 32000; //input limit of the the CAN command containing the PWM applied to motors
+    //MC4plus, hw-limited to 3360
+    else if (ems->act == emscontroller_actuation_LOCAL)
+        return 3360;
+    
+    return 0;
+}
 extern void eo_emsMotorController_GoIdle(void)
 {
     if (ems)
@@ -1753,6 +1772,7 @@ void sendErrorMessage(uint8_t j, uint32_t ems_fault_mask_j, uint32_t motor_fault
         descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_motor_external_fault);
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, NULL, &descriptor);
         motor_fault_mask_j &= ~MOTOR_EXTERNAL_FAULT;
+        ems_fault_mask_j &= ~MOTOR_EXTERNAL_FAULT;
     }
         
     if (motor_fault_mask_j & MOTOR_OVERCURRENT_FAULT)
