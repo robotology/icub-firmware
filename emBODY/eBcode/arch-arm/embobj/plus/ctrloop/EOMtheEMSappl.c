@@ -702,7 +702,11 @@ static void s_eom_emsappl_OnError(eOerrmanErrorType_t errtype, const char *info,
         }
         else
         {
-            snprintf(str, sizeof(str), "EOMtheEMSerror: [eobj: %s, tsk: %d] %s %s: no info", eobjstr, taskid, err, strdes);  
+            uint64_t tt = eov_sys_LifeTimeGet(eov_sys_GetHandle());
+            uint32_t sec = tt/(1000*1000);
+            uint32_t msec = tt%(1000*1000);
+            msec /= 1000;
+            snprintf(str, sizeof(str), "EOMtheEMSerror: [eobj: %s, tsk: %d @s%dm%d] %s %s: no info", eobjstr, taskid, sec, msec, err, strdes);  
         }
         hal_trace_puts(str);
     }
