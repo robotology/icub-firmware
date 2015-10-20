@@ -37,6 +37,8 @@
 
 #include "EOMtheEMSappl.h"
 
+#include "EOVtheCallbackManager.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -77,6 +79,8 @@ static void s_eo_mais_process_mais_resolution(eOas_maisresolution_t resolution, 
 
 static eOresult_t s_eo_mais_onstop_search4mais(void *par, EOtheCANdiscovery2* p, eObool_t searchisok);
 
+static void s_eo_mais_send_periodic_error_report(void *p);
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -84,15 +88,27 @@ static eOresult_t s_eo_mais_onstop_search4mais(void *par, EOtheCANdiscovery2* p,
 
 static EOtheMAIS s_eo_themais = 
 {
-    .initted                = eobool_false,
-    .active                 = eobool_false,
-    .thereismais            = eobool_false,
-    .protindex              = 0,
-    .id32                   = eo_prot_ID32dummy,
-    .command                = {0}
+    .initted                    = eobool_false,
+    .active                     = eobool_false,
+    .protindex                  = 0,
+    .id32                       = eo_prot_ID32dummy,
+    .command                    = {0},
+    .canboardproperties         = NULL,
+    .canentitydescriptor        = NULL,
+    .servconfig                 = { .type = eomn_serv_NONE },
+    .candiscoverytarget         = {0},
+    .onverify                   = NULL,
+    .activateafterverify        = eobool_false,
+    .itistransmitting           = eobool_false,    
+    .errorReportTimer           = NULL,
+    .errorDescriptor            = {0},
+    .errorType                  = eo_errortype_info,
+    .errorCallbackCount         = 0,
+    .repetitionOKcase           = 10,
+    .reportPeriod               = 10*EOK_reltime1sec
 };
 
-//static const char s_eobj_ownname[] = "EOtheMAIS";
+static const char s_eobj_ownname[] = "EOtheMAIS";
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -108,7 +124,6 @@ extern EOtheMAIS* eo_mais_Initialise(void)
     }
     
     s_eo_themais.active = eobool_false;
-    s_eo_themais.thereismais = eobool_false;
     
     s_eo_themais.protindex = 0;
     s_eo_themais.id32 = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_mais, s_eo_themais.protindex, eoprot_tag_none);
@@ -121,6 +136,8 @@ extern EOtheMAIS* eo_mais_Initialise(void)
     s_eo_themais.canentitydescriptor = eo_vector_New(sizeof(eOcanmap_entitydescriptor_t), 1, NULL, NULL, NULL, NULL);
     
     s_eo_themais.mais = NULL;
+    
+    s_eo_themais.errorReportTimer = eo_timer_New();
         
     s_eo_themais.initted = eobool_true;    
        
@@ -163,7 +180,9 @@ extern eOresult_t eo_mais_Verify(EOtheMAIS *p, const eOmn_serv_configuration_t *
     s_eo_themais.candiscoverytarget.firmwareversion.minor = servcfg->data.as.mais.version.firmware.minor;    
     s_eo_themais.candiscoverytarget.canmap[servcfg->data.as.mais.canloc.port] = 0x0001 << servcfg->data.as.mais.canloc.addr; 
         
-
+    // make sure the timer is not running
+    eo_timer_Stop(s_eo_themais.errorReportTimer); 
+    
     eOcandiscovery_onstop_t onstop = 
     {
         .function   = s_eo_mais_onstop_search4mais,
@@ -175,43 +194,6 @@ extern eOresult_t eo_mais_Verify(EOtheMAIS *p, const eOmn_serv_configuration_t *
     
     return(eores_OK);   
 }
-
-//extern eOresult_t eo_mais_Verify2(EOtheMAIS *p, const eOmn_serv_config_data_as_mais_t * prop, eOmais_onendofoperation_fun_t onverify, eObool_t activateafterverify)
-//{
-//    if((NULL == p) || (NULL == prop))
-//    {
-//        return(eores_NOK_nullpointer);
-//    }  
-// 
-//// DONT Deactivate ... we may want just to check again ....    
-////    if(eobool_true == s_eo_themais.active)
-////    {
-////        eo_mais_Deactivate(p);        
-////    }   
-
-//    s_eo_themais.onverify = onverify;
-//    s_eo_themais.activateafterverify = activateafterverify;
-
-
-//    s_eo_themais.candiscoverytarget.boardtype = eobrd_cantype_mais;
-//    s_eo_themais.candiscoverytarget.protocolversion.major = prop->version.protocol.major; 
-//    s_eo_themais.candiscoverytarget.protocolversion.minor = prop->version.protocol.minor;
-//    s_eo_themais.candiscoverytarget.firmwareversion.major = prop->version.firmware.major; 
-//    s_eo_themais.candiscoverytarget.firmwareversion.minor = prop->version.firmware.minor;    
-//    s_eo_themais.candiscoverytarget.canmap[prop->canloc.port] = 0x0001 << prop->canloc.addr; 
-//        
-
-//    eOcandiscovery_onstop_t onstop = 
-//    {
-//        .function   = s_eo_mais_onstop_search4mais,
-//        .parameter  = (void*)prop
-//    };
-//        
-//    eo_candiscovery2_Start(eo_candiscovery2_GetHandle(), &s_eo_themais.candiscoverytarget, &onstop);   
-
-//    
-//    return(eores_OK);   
-//}
 
 
 extern eOresult_t eo_mais_Deactivate(EOtheMAIS *p)
@@ -227,9 +209,7 @@ extern eOresult_t eo_mais_Deactivate(EOtheMAIS *p)
     } 
     
     // send stop messages to mais, unload the entity-can-mapping and the board-can-mapping, reset all things inside this object
-    // what else .... ?
-    
-        
+       
     if(eobool_true == s_eo_themais.itistransmitting)
     {
         eo_mais_TXstop(&s_eo_themais);
@@ -250,12 +230,13 @@ extern eOresult_t eo_mais_Deactivate(EOtheMAIS *p)
     eo_vector_Clear(s_eo_themais.canboardproperties);
     eo_vector_Clear(s_eo_themais.canentitydescriptor);
     
+    // make sure the timer is not running
+    eo_timer_Stop(s_eo_themais.errorReportTimer); 
     
     s_eo_themais.active = eobool_false;
     
     return(eores_OK);
 }
-
 
 
 extern eOresult_t eo_mais_Activate(EOtheMAIS *p, const eOmn_serv_configuration_t * servcfg)
@@ -275,13 +256,11 @@ extern eOresult_t eo_mais_Activate(EOtheMAIS *p, const eOmn_serv_configuration_t
 
     if(0 == eo_entities_NumOfMaises(eo_entities_GetHandle()))
     {
-        s_eo_themais.thereismais = eobool_false;
         s_eo_themais.active = eobool_false;
         return(eores_NOK_generic);
     }
     else
     {
-        s_eo_themais.thereismais = eobool_true;
         
         s_eo_themais.mais = eo_entities_GetMais(eo_entities_GetHandle(), s_eo_themais.protindex);
         
@@ -319,44 +298,6 @@ extern eOresult_t eo_mais_Activate(EOtheMAIS *p, const eOmn_serv_configuration_t
 }
 
 
-//extern eOresult_t eo_mais_TXstart(EOtheMAIS *p, uint8_t datarate, eOas_maismode_t mode)
-//{
-//    if(NULL == p)
-//    {
-//        return(eores_NOK_nullpointer);
-//    }
-//    
-//    if((eobool_false == s_eo_themais.thereismais) || (eobool_false == s_eo_themais.active))
-//    {   // nothing to do because we dont have a mais board
-//        return(eores_OK);
-//    }   
-
-//    
-//    s_eo_themais.command.class = eocanprot_msgclass_pollingAnalogSensor;    
-//    
-//    // set txmode
-//    s_eo_themais.command.type  = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;
-//    s_eo_themais.command.value = &mode;                       
-//    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &s_eo_themais.command, s_eo_themais.id32);
-//    
-//    // set datarate
-//    s_eo_themais.command.type  = ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE;
-//    s_eo_themais.command.value = &datarate;                       
-//    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &s_eo_themais.command, s_eo_themais.id32);        
-//    
-//        
-//    if(eoas_maismode_txdatacontinuously == mode)
-//    {
-//        s_eo_themais.itistransmitting = eobool_true;
-//    }
-//    else
-//    {
-//        s_eo_themais.itistransmitting = eobool_false;
-//    }
-
-//    return(eores_OK);
-// 
-//}
 
 extern eOresult_t eo_mais_Start(EOtheMAIS *p)
 {
@@ -365,7 +306,7 @@ extern eOresult_t eo_mais_Start(EOtheMAIS *p)
         return(eores_NOK_nullpointer);
     }
     
-    if((eobool_false == s_eo_themais.thereismais) || (eobool_false == s_eo_themais.active))
+    if(eobool_false == s_eo_themais.active)
     {   // nothing to do because we dont have a mais board
         return(eores_OK);
     }  
@@ -381,7 +322,7 @@ extern eOresult_t eo_mais_TXstart(EOtheMAIS *p, uint8_t datarate, eOas_maismode_
         return(eores_NOK_nullpointer);
     }
     
-    if((eobool_false == s_eo_themais.thereismais) || (eobool_false == s_eo_themais.active))
+    if(eobool_false == s_eo_themais.active)
     {   // nothing to do because we dont have a mais board
         return(eores_OK);
     }   
@@ -402,7 +343,7 @@ extern eOresult_t eo_mais_TXstop(EOtheMAIS *p)
         return(eores_NOK_nullpointer);
     }
     
-    if((eobool_false == s_eo_themais.thereismais) || (eobool_false == s_eo_themais.active))
+    if(eobool_false == s_eo_themais.active)
     {   // nothing to do because we dont have a mais board
         return(eores_OK);
     }   
@@ -429,7 +370,7 @@ extern eOresult_t eo_mais_Set(EOtheMAIS *p, eOas_mais_config_t* maiscfg)
         return(eores_NOK_nullpointer);
     }
         
-    if((eobool_false == s_eo_themais.thereismais) || (eobool_false == s_eo_themais.active))
+    if(eobool_false == s_eo_themais.active)
     {   // nothing to do because we dont have a mais board
         return(eores_OK);
     }  
@@ -464,7 +405,7 @@ extern eOresult_t eo_mais_SetMode(EOtheMAIS *p, eOas_maismode_t mode)
         return(eores_NOK_nullpointer);
     }
     
-    if((eobool_false == s_eo_themais.thereismais) || (eobool_false == s_eo_themais.active))
+    if(eobool_false == s_eo_themais.active)
     {   // nothing to do because we dont have a mais board
         return(eores_OK);
     }  
@@ -498,14 +439,13 @@ extern eOresult_t eo_mais_SetDataRate(EOtheMAIS *p, uint8_t datarate)
         return(eores_NOK_nullpointer);
     }
     
-    if((eobool_false == s_eo_themais.thereismais) || (eobool_false == s_eo_themais.active))
+    if(eobool_false == s_eo_themais.active)
     {   // nothing to do because we dont have a mais board
         return(eores_OK);
     }   
 
     // ok, now we do something.     
  
-
     s_eo_themais.command.class = eocanprot_msgclass_pollingAnalogSensor;
     s_eo_themais.command.type  = ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE;
     s_eo_themais.command.value = &datarate;
@@ -524,7 +464,7 @@ extern eOresult_t eo_mais_SetResolution(EOtheMAIS *p, eOas_maisresolution_t reso
         return(eores_NOK_nullpointer);
     }
     
-    if((eobool_false == s_eo_themais.thereismais) || (eobool_false == s_eo_themais.active))
+    if(eobool_false == s_eo_themais.active)
     {   // nothing to do because we dont have a mais board
         return(eores_OK);
     }    
@@ -608,23 +548,71 @@ static void s_eo_mais_process_mais_resolution(eOas_maisresolution_t resolution, 
 
 
 static eOresult_t s_eo_mais_onstop_search4mais(void *par, EOtheCANdiscovery2* p, eObool_t searchisok)
-{
+{    
+    const eOmn_serv_configuration_t * servcfg = (const eOmn_serv_configuration_t *)par;
     
     if((eobool_true == searchisok) && (eobool_true == s_eo_themais.activateafterverify))
     {
-        const eOmn_serv_configuration_t * maisserv = (const eOmn_serv_configuration_t *)par;
-        eo_mais_Activate(&s_eo_themais, maisserv);        
+        eo_mais_Activate(&s_eo_themais, servcfg);        
     }
+    
+    s_eo_themais.errorDescriptor.sourcedevice     = eo_errman_sourcedevice_localboard;
+    s_eo_themais.errorDescriptor.sourceaddress    = 0;
+    s_eo_themais.errorDescriptor.par16            = (servcfg->data.as.mais.canloc.addr) | (servcfg->data.as.mais.canloc.port << 8);
+    s_eo_themais.errorDescriptor.par64            = (servcfg->data.as.mais.version.firmware.minor)       | (servcfg->data.as.mais.version.firmware.major << 8) |
+                                                    (servcfg->data.as.mais.version.protocol.minor << 16) | (servcfg->data.as.mais.version.protocol.major << 24);    
+    EOaction_strg astrg = {0};
+    EOaction *act = (EOaction*)&astrg;
+    eo_action_SetCallback(act, s_eo_mais_send_periodic_error_report, NULL, eov_callbackman_GetTask(eov_callbackman_GetHandle()));    
+    
+    if(eobool_true == searchisok)
+    {           
+        s_eo_themais.errorType = eo_errortype_debug;
+        s_eo_themais.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_mais_ok);
+        eo_errman_Error(eo_errman_GetHandle(), s_eo_themais.errorType, NULL, s_eobj_ownname, &s_eo_themais.errorDescriptor);
+        
+        if((0 != s_eo_themais.repetitionOKcase) && (0 != s_eo_themais.reportPeriod))
+        {
+            s_eo_themais.errorCallbackCount = s_eo_themais.repetitionOKcase;        
+            eo_timer_Start(s_eo_themais.errorReportTimer, eok_abstimeNOW, s_eo_themais.reportPeriod, eo_tmrmode_FOREVER, act);
+        }
+    }    
+    
+    if(eobool_false == searchisok)
+    {
+        s_eo_themais.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_mais_failed_candiscovery);
+        s_eo_themais.errorType = eo_errortype_error;                
+        eo_errman_Error(eo_errman_GetHandle(), s_eo_themais.errorType, NULL, s_eobj_ownname, &s_eo_themais.errorDescriptor);
+        
+        if(0 != s_eo_themais.reportPeriod)
+        {
+            s_eo_themais.errorCallbackCount = EOK_int08dummy;
+            eo_timer_Start(s_eo_themais.errorReportTimer, eok_abstimeNOW, s_eo_themais.reportPeriod, eo_tmrmode_FOREVER, act);  
+        }
+    }      
     
     if(NULL != s_eo_themais.onverify)
     {
         s_eo_themais.onverify(&s_eo_themais, searchisok); 
     }    
     
-    return(eores_OK);
-    
+    return(eores_OK);   
 }
 
+
+static void s_eo_mais_send_periodic_error_report(void *p)
+{
+    eo_errman_Error(eo_errman_GetHandle(), s_eo_themais.errorType, NULL, s_eobj_ownname, &s_eo_themais.errorDescriptor);
+    
+    if(EOK_int08dummy != s_eo_themais.errorCallbackCount)
+    {
+        s_eo_themais.errorCallbackCount--;
+    }
+    if(0 == s_eo_themais.errorCallbackCount)
+    {
+        eo_timer_Stop(s_eo_themais.errorReportTimer);
+    }
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
