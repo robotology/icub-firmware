@@ -89,11 +89,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
-
-static eOresult_t s_on_fullscaleofstrain_received(EOtheSTRAIN* p, eObool_t operationisok);
-    
-// useful for any debug activity. comment it out if not used
-//static void s_send_diagnostics(eOerrmanErrorType_t type, uint32_t code, uint16_t param, uint64_t par64);
+// empty-section
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -146,7 +142,7 @@ extern void eoprot_fun_UPDT_as_mais_config_resolution(const EOnv* nv, const eOro
 extern void eoprot_fun_UPDT_as_strain_config(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOas_strain_config_t *cfg = (eOas_strain_config_t*)rd->data;
-    eo_strain_Set(eo_strain_GetHandle(), cfg, s_on_fullscaleofstrain_received);       
+    eo_strain_Set(eo_strain_GetHandle(), cfg);       
 }
 
 extern void eoprot_fun_UPDT_as_strain_config_mode(const EOnv* nv, const eOropdescriptor_t* rd)
@@ -168,7 +164,7 @@ extern void eoprot_fun_UPDT_as_strain_config_signaloncefullscale(const EOnv* nv,
     eObool_t *signaloncefullscale = (eObool_t*)rd->data;
     if(eobool_true == *signaloncefullscale)
     {
-        eo_strain_GetFullScale(eo_strain_GetHandle(), s_on_fullscaleofstrain_received);
+        eo_strain_GetFullScale(eo_strain_GetHandle(), NULL);
     }
 }
 
@@ -211,113 +207,9 @@ extern void eoprot_fun_UPDT_as_inertial_cmmnds_enable(const EOnv* nv, const eOro
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
-
-//static eOresult_t s_eo_thestrain_loadFullscalelikeoccasionalrop(void)
-//{
-//    eOresult_t res;
-//    eOropdescriptor_t ropdesc;
-
-//    memcpy(&ropdesc, &eok_ropdesc_basic, sizeof(eok_ropdesc_basic));
-
-//    ropdesc.ropcode                 = eo_ropcode_sig;
-//    ropdesc.size                    = sizeof(eOas_arrayofupto12bytes_t);
-//    ropdesc.id32                    = eo_strain_GetID32(eo_strain_GetHandle(), eoprot_tag_as_strain_status_fullscale); 
-//    ropdesc.data                    = NULL;
-
-//   
-//    res = eo_transceiver_OccasionalROP_Load(eom_emstransceiver_GetTransceiver(eom_emstransceiver_GetHandle()), &ropdesc); 
-//    if(eores_OK != res)
-//    {
-//        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, "cannot sig<strain.fullscale>", NULL, &eo_errman_DescrRuntimeErrorLocal);
-//    }
-//    else
-//    {
-//        //eOerrmanDescriptor_t des = {0};
-//        //des.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag03);
-//        //des.param = 0x1111;
-//        //des.sourceaddress = 0;
-//        //des.sourcedevice = eo_errman_sourcedevice_localboard;
-//        //eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &des);
-//    }
+// empty section
 
 
-//    return(res);
-//}
-
-
-static eOresult_t s_on_fullscaleofstrain_received(EOtheSTRAIN* p, eObool_t operationisok)
-{
-    eOresult_t res = eores_OK;
-    
-    if(eobool_false == operationisok)
-    {
-        // send diagnostics
-        return(eores_NOK_generic);
-    }
-    
-    // signal the fullscale only once.
-    
-    // load a rop to tx and then alert someone to tx the ropframe
-        
-    // 1. prepare occasional rop to send    
-    
-    eOropdescriptor_t ropdesc = {0};
-
-    memcpy(&ropdesc, &eok_ropdesc_basic, sizeof(eok_ropdesc_basic));
-
-    ropdesc.ropcode                 = eo_ropcode_sig;
-    ropdesc.size                    = sizeof(eOas_arrayofupto12bytes_t);
-    ropdesc.id32                    = eo_strain_GetID32(eo_strain_GetHandle(), eoprot_tag_as_strain_status_fullscale); 
-    ropdesc.data                    = NULL;
-
-   
-   
-//    res = eo_transceiver_OccasionalROP_Load(eom_emstransceiver_GetTransceiver(eom_emstransceiver_GetHandle()), &ropdesc); 
-    res = eom_emsappl_Transmit_OccasionalROP(eom_emsappl_GetHandle(), &ropdesc);
-    if(eores_OK != res)
-    {
-        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, "cannot sig<strain.fullscale>", NULL, &eo_errman_DescrRuntimeErrorLocal);        
-        return(res);
-    }
-    else
-    {
-        //eOerrmanDescriptor_t des = {0};
-        //des.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag03);
-        //des.param = 0x1111;
-        //des.sourceaddress = 0;
-        //des.sourcedevice = eo_errman_sourcedevice_localboard;
-        //eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &des);
-    }
-//    
-
-//    // 2. now i alert someone to transmit it   
-//    eom_emsappl_SendTXRequest(eom_emsappl_GetHandle());
-    
-//    eOsmStatesEMSappl_t status;
-//    eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &status);
-//    
-//    // if application is in cfg state, then we send a request to configurator to send ropframe out. otherwise, if in RUN mode, the control-loop will send it 
-//    if(eo_sm_emsappl_STcfg == status)
-//    {
-//        eom_task_SetEvent(eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()), emsconfigurator_evt_ropframeTx); 
-//    }
-    
-    return(eores_OK);
-}
-
-
-// useful for any debug activity. comment it out if not used
-//static void s_send_diagnostics(eOerrmanErrorType_t type, uint32_t code, uint16_t param, uint64_t par64)
-//{
-//    eOerrmanDescriptor_t des = {0};
-//    des.code = code;
-//    des.param = param;
-//    des.par64 = par64; 
-//    des.sourceaddress = 0;
-//    des.sourcedevice = eo_errman_sourcedevice_localboard;
-
-//    eo_errman_Error(eo_errman_GetHandle(), type, NULL, NULL, &des);
-//}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
