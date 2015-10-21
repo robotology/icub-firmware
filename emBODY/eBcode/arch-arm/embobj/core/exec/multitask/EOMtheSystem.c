@@ -28,6 +28,7 @@
 
 #include "osal.h"
 #include "hal.h"
+#include "hal_5v.h"
 
 #include "EOtheErrorManager.h"
 #include "EOVtheSystem_hid.h" 
@@ -156,6 +157,11 @@ extern EOMtheSystem * eom_sys_Initialise(const eOmsystem_cfg_t *syscfg,
 
     hal_core_init(syscfg->halcfg);
     hal_core_start();
+    #warning I think that (for MC4plus) we should init the 5V enable GPIO (with hal_5v) here...just to make phisical stuff (voltage is there at the beginning) coherent to GPIO status
+#if defined (USE_MC4PLUS)
+    hal_5v_init(NULL);
+    hal_5v_on();
+#endif
 
     if(0 != syscfg->codespaceoffset)
     {
