@@ -36,6 +36,8 @@
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
+#include "EOtheServices.h"
+
 #include "EoCommon.h"
 #include "EoProtocol.h"
 
@@ -49,7 +51,7 @@ typedef struct EOtheSTRAIN_hid EOtheSTRAIN;
 
 
 
-typedef eOresult_t (*eOstrain_onendofoperation_fun_t) (EOtheSTRAIN* p, eObool_t operationisok);
+//typedef eOresult_t (*eOstrain_onendofoperation_fun_t) (EOtheSTRAIN* p, eObool_t operationisok);
    
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------
 // empty-section
@@ -64,13 +66,20 @@ extern EOtheSTRAIN* eo_strain_GetHandle(void);
 
 // it verifies if the service as defined in te configuration is possible (is there a good strain board or not?), it executes a callback
 // (which may send a confirmation to the entity which asked fot verification), and then it may activate the strain service by calling  eo_strain_Activate().
-extern eOresult_t eo_strain_Verify(EOtheSTRAIN *p, const eOmn_serv_configuration_t * servcfg, eOstrain_onendofoperation_fun_t onverify, eObool_t activateafterverify);
+extern eOresult_t eo_strain_Verify(EOtheSTRAIN *p, const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify);
 
 // it activates the strain service by loading the service configuration
 extern eOresult_t eo_strain_Activate(EOtheSTRAIN *p, const eOmn_serv_configuration_t * servcfg);
 
 // it deactivates service.
 extern eOresult_t eo_strain_Deactivate(EOtheSTRAIN *p);
+
+
+extern eOresult_t eo_strain_Start(EOtheSTRAIN *p);
+
+extern eOresult_t eo_strain_Tick(EOtheSTRAIN *p);
+
+extern eOresult_t eo_strain_Stop(EOtheSTRAIN *p);
 
 
 // i can call the following only if ... service is activated.
@@ -82,7 +91,7 @@ extern eOresult_t eo_strain_TXstop(EOtheSTRAIN *p);
 
 // if overrideonfullscaleready is NULL the function eo_strain_GetFullScale() signals the fullscale to robotInterface ....
 // if overrideonfullscaleready is not NULL the function eo_strain_GetFullScale() just calls it
-extern eOresult_t eo_strain_GetFullScale(EOtheSTRAIN *p, eOstrain_onendofoperation_fun_t overrideonfullscaleready);
+extern eOresult_t eo_strain_GetFullScale(EOtheSTRAIN *p, eOservice_onendofoperation_fun_t overrideonfullscaleready);
 
 
 // the following are more tricky funtions .... shall we keep tehm?

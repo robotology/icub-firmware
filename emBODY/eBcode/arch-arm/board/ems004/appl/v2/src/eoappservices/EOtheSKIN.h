@@ -39,6 +39,7 @@
 #include "EoCommon.h"
 #include "EoProtocol.h"
 
+#include "EOtheServices.h"
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
@@ -48,7 +49,7 @@
 typedef struct EOtheSKIN_hid EOtheSKIN;
 
 
-typedef eOresult_t (*eOskin_onendofoperation_fun_t) (EOtheSKIN* p, eObool_t operationisok);
+//typedef eOresult_t (*eOskin_onendofoperation_fun_t) (EOtheSKIN* p, eObool_t operationisok);
 
 enum { eo_skin_maxnumberofMTBboards = 15 }; // even if they can be up to 28 (the number of allowed can IDs on the two buses).
    
@@ -64,11 +65,19 @@ extern EOtheSKIN* eo_skin_Initialise(void);
 extern EOtheSKIN* eo_skin_GetHandle(void);
 
 
-extern eOresult_t eo_skin_Verify(EOtheSKIN *p, const eOmn_serv_configuration_t * servcfg, eOskin_onendofoperation_fun_t onverify, eObool_t activateafterverify);
+extern eOresult_t eo_skin_Verify(EOtheSKIN *p, const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify);
 
 extern eOresult_t eo_skin_Activate(EOtheSKIN *p, const eOmn_serv_configuration_t * servcfg);
 
 extern eOresult_t eo_skin_Deactivate(EOtheSKIN *p);
+
+extern eOresult_t eo_skin_Start(EOtheSKIN *p);
+
+// use regularROPSjustTransmitted = eom_emsrunner_CycleHasJustTransmittedRegulars(eom_emsrunner_GetHandle())
+extern eOresult_t eo_skin_Tick(EOtheSKIN *p, eObool_t regularROPSjustTransmitted);
+
+extern eOresult_t eo_skin_Stop(EOtheSKIN *p);
+
 
 extern eOresult_t eo_skin_TXstop(EOtheSKIN *p);
 
@@ -81,8 +90,7 @@ extern eOresult_t eo_skin_SetTrianglesConfig(EOtheSKIN *p, uint8_t patchindex, e
 
 extern eOresult_t eo_skin_AcceptCANframe(EOtheSKIN *p, eOcanframe_t *frame, eOcanport_t port);
 
-// use regularROPSjustTransmitted = eom_emsrunner_CycleHasJustTransmittedRegulars(eom_emsrunner_GetHandle())
-extern eOresult_t eo_skin_Tick(EOtheSKIN *p, eObool_t regularROPSjustTransmitted);
+
 
 
 

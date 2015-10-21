@@ -39,6 +39,8 @@
 #include "EoCommon.h"
 #include "EoProtocol.h"
 
+#include "EOtheServices.h"
+
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
@@ -49,7 +51,7 @@ typedef struct EOtheMotionController_hid EOtheMotionController;
 
 
 
-typedef eOresult_t (*eOmotcon_onendofoperation_fun_t) (EOtheMotionController* p, eObool_t operationisok);
+//typedef eOresult_t (*eOmotcon_onendofoperation_fun_t) (EOtheMotionController* p, eObool_t operationisok);
 
 enum { eo_motcon_maxJOMOs = 12 };
 
@@ -80,7 +82,7 @@ extern eOmotioncontroller_mode_t eo_motioncontrol_GetMode(EOtheMotionController 
 
 // so far we support only eo_motcon_mode_foc and eo_motcon_mode_mc4
 
-extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_serv_configuration_t * servcfg, eOmotcon_onendofoperation_fun_t onverify, eObool_t activateafterverify);
+extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify);
 
 extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn_serv_configuration_t * servcfg);
 

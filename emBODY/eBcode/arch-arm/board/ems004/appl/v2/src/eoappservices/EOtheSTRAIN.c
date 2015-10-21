@@ -111,9 +111,9 @@ static EOtheSTRAIN s_eo_thestrain =
     },     
     .sharedcan =
     {
-        .boardproperties     = NULL,
-        .entitydescriptor    = NULL,
-        .discoverytarget     = {0},
+        .boardproperties        = NULL,
+        .entitydescriptor       = NULL,
+        .discoverytarget        = {0},
         .ondiscoverystop        = {0},
         .command                = {0}, 
     },
@@ -171,7 +171,7 @@ extern EOtheSTRAIN* eo_strain_GetHandle(void)
 }
 
 
-extern eOresult_t eo_strain_Verify(EOtheSTRAIN *p, const eOmn_serv_configuration_t * servcfg, eOstrain_onendofoperation_fun_t onverify, eObool_t activateafterverify)
+extern eOresult_t eo_strain_Verify(EOtheSTRAIN *p, const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify)
 {
     if((NULL == p) || (NULL == servcfg))
     {
@@ -307,6 +307,54 @@ extern eOresult_t eo_strain_Activate(EOtheSTRAIN *p, const eOmn_serv_configurati
 
     
     return(eores_OK);   
+}
+
+
+extern eOresult_t eo_strain_Start(EOtheSTRAIN *p)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    if(eobool_false == s_eo_thestrain.service.active)
+    {   // nothing to do because we dont have a strain board
+        return(eores_OK);
+    }  
+    
+    return(eo_strain_SendTXmode(p));   
+}
+
+
+extern eOresult_t eo_strain_Stop(EOtheSTRAIN *p)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    if(eobool_false == s_eo_thestrain.service.active)
+    {   // nothing to do because we dont have a strain board
+        return(eores_OK);
+    }  
+    
+    return(eo_strain_TXstop(p));        
+}
+
+
+extern eOresult_t eo_strain_Tick(EOtheSTRAIN *p)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    if(eobool_false == s_eo_thestrain.service.active)
+    {   // nothing to do because we dont have a strain board
+        return(eores_OK);
+    }  
+    
+    return(eores_OK);         
 }
 
 
@@ -493,7 +541,7 @@ extern eOresult_t eo_strain_SetDataRate(EOtheSTRAIN *p, uint8_t datarate)
 
 
 
-extern eOresult_t eo_strain_GetFullScale(EOtheSTRAIN *p, eOstrain_onendofoperation_fun_t overrideonfullscaleready)
+extern eOresult_t eo_strain_GetFullScale(EOtheSTRAIN *p, eOservice_onendofoperation_fun_t overrideonfullscaleready)
 {   
     if(NULL == p)
     {

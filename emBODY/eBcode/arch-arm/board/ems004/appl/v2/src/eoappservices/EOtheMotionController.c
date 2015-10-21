@@ -81,13 +81,13 @@
 
 static void s_eo_motioncontrol_send_periodic_error_report(void *p);
 
-static eOresult_t s_eo_motioncontrol_onendofverify_encoder(EOtheEncoderReader* p, eObool_t operationisok);
+static eOresult_t s_eo_motioncontrol_onendofverify_encoder(EOaService* s, eObool_t operationisok);
 
 static eOresult_t s_eo_motioncontrol_onstop_search4focs(void *par, EOtheCANdiscovery2* p, eObool_t searchisok);
 
 static eOresult_t s_eo_motioncontrol_SetCurrentSetpoint(EOtheMotionController *p, int16_t *pwmList, uint8_t size);
 
-static eOresult_t s_eo_motioncontrol_onendofverify_mais(EOtheMAIS* p, eObool_t operationisok);
+static eOresult_t s_eo_motioncontrol_onendofverify_mais(EOaService* s, eObool_t operationisok);
 
 static eOresult_t s_eo_motioncontrol_onstop_search4mc4s(void *par, EOtheCANdiscovery2* p, eObool_t searchisok);
     
@@ -120,9 +120,9 @@ static EOtheMotionController s_eo_themotcon =
     },     
     .sharedcan =
     {
-        .boardproperties     = NULL,
-        .entitydescriptor    = NULL,
-        .discoverytarget     = {0},
+        .boardproperties        = NULL,
+        .entitydescriptor       = NULL,
+        .discoverytarget        = {0},
         .ondiscoverystop        = {0},
         .command                = {0}, 
     },
@@ -206,7 +206,7 @@ extern eOmotioncontroller_mode_t eo_motioncontrol_GetMode(EOtheMotionController 
 }
 
 
-extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_serv_configuration_t * servcfg, eOmotcon_onendofoperation_fun_t onverify, eObool_t activateafterverify)
+extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify)
 {
     if((NULL == p) || (NULL == servcfg))
     {
@@ -976,7 +976,7 @@ static eOresult_t s_eo_motioncontrol_onstop_search4focs(void *par, EOtheCANdisco
     return(eores_OK);   
 }
 
-static eOresult_t s_eo_motioncontrol_onendofverify_encoder(EOtheEncoderReader* p, eObool_t operationisok)
+static eOresult_t s_eo_motioncontrol_onendofverify_encoder(EOaService* s, eObool_t operationisok)
 {    
     if(eobool_true == operationisok)
     {
@@ -1020,7 +1020,7 @@ static eOresult_t s_eo_motioncontrol_onendofverify_encoder(EOtheEncoderReader* p
 
 
 
-static eOresult_t s_eo_motioncontrol_onendofverify_mais(EOtheMAIS* p, eObool_t operationisok)
+static eOresult_t s_eo_motioncontrol_onendofverify_mais(EOaService* s, eObool_t operationisok)
 {
     if(eobool_true == operationisok)
     {

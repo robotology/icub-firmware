@@ -837,6 +837,11 @@
           <GroupName>appl-services</GroupName>
           <Files>
             <File>
+              <FileName>EOtheServices.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\eoappservices\EOtheServices.c</FilePath>
+            </File>
+            <File>
               <FileName>EOtheBoardConfig.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\embobj\plus\can\EOtheBoardConfig.c</FilePath>
@@ -2203,6 +2208,11 @@
         <Group>
           <GroupName>appl-services</GroupName>
           <Files>
+            <File>
+              <FileName>EOtheServices.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\eoappservices\EOtheServices.c</FilePath>
+            </File>
             <File>
               <FileName>EOtheBoardConfig.c</FileName>
               <FileType>1</FileType>

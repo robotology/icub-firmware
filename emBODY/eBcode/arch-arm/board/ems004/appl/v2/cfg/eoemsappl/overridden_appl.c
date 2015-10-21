@@ -170,16 +170,16 @@ static void overridden_appl_led_error_init(void);
 static void s_overridden_appl_initialise_eb9(EOMtheEMSappl* p);
 static void s_debug_eb9(void);
 static void callback_eb9(void *p);
-static eOresult_t s_on_strain_verify_eb9(EOtheSTRAIN* p, eObool_t verifyisok);
-static eOresult_t s_on_mcfoc_verify_eb9(EOtheMotionController* p, eObool_t verifyisok);
+static eOresult_t s_on_strain_verify_eb9(EOaService* p, eObool_t verifyisok);
+static eOresult_t s_on_mcfoc_verify_eb9(EOaService* p, eObool_t verifyisok);
 
 
 
 static void s_overridden_appl_initialise_eb1(EOMtheEMSappl* p);
 static void s_debug_eb1(void);
 static void callback_eb1(void *p);
-static eOresult_t s_on_strain_verify_eb1(EOtheSTRAIN* p, eObool_t verifyisok);
-static eOresult_t s_on_mcfoc_verify_eb1(EOtheMotionController* p, eObool_t verifyisok);
+static eOresult_t s_on_strain_verify_eb1(EOaService* p, eObool_t verifyisok);
+static eOresult_t s_on_mcfoc_verify_eb1(EOaService* p, eObool_t verifyisok);
 
 
 
@@ -187,9 +187,9 @@ static eOresult_t s_on_mcfoc_verify_eb1(EOtheMotionController* p, eObool_t verif
 static void s_overridden_appl_initialise_eb2(EOMtheEMSappl* p);
 static void s_debug_eb2(void);
 static void callback_eb2(void *p);
-static eOresult_t s_on_skin_verify_eb2(EOtheSKIN* p, eObool_t verifyisok);
-static eOresult_t s_on_mc4_verify_eb2(EOtheMotionController* p, eObool_t verifyisok);
-static eOresult_t s_on_mais_verify_eb2(EOtheMAIS* p, eObool_t verifyisok);
+static eOresult_t s_on_skin_verify_eb2(EOaService* p, eObool_t verifyisok);
+static eOresult_t s_on_mc4_verify_eb2(EOaService* p, eObool_t verifyisok);
+static eOresult_t s_on_mais_verify_eb2(EOaService* p, eObool_t verifyisok);
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
@@ -845,8 +845,8 @@ static void s_overridden_appl_initialise2(EOMtheEMSappl* p)
     
 }
 
-static eOresult_t s_onfullscaleready(EOtheSTRAIN* p, eObool_t operationisok);
-static eOresult_t s_on_strain_verify(EOtheSTRAIN* p, eObool_t verifyisok);
+static eOresult_t s_onfullscaleready(EOaService* p, eObool_t operationisok);
+static eOresult_t s_on_strain_verify(EOaService* p, eObool_t verifyisok);
 static eOresult_t onstop_search4strain(void *par, EOtheCANdiscovery2* p, eObool_t searchisok);
 static void callback1(void *p);
 
@@ -864,7 +864,7 @@ static eOresult_t onstop_search4strain(void *par, EOtheCANdiscovery2* p, eObool_
 }
 
 
-static eOresult_t s_on_strain_verify(EOtheSTRAIN* p, eObool_t verifyisok)
+static eOresult_t s_on_strain_verify(EOaService* p, eObool_t verifyisok)
 {
     uint8_t rr = 0;
     
@@ -884,7 +884,7 @@ static eOresult_t s_on_strain_verify(EOtheSTRAIN* p, eObool_t verifyisok)
     return(eores_OK);
 }
 
-static eOresult_t s_onfullscaleready(EOtheSTRAIN* p, eObool_t operationisok)
+static eOresult_t s_onfullscaleready(EOaService* p, eObool_t operationisok)
 {
     eOresult_t res = eores_OK;
     
@@ -1107,7 +1107,7 @@ static void s_overridden_appl_initialise3(EOMtheEMSappl* p)
 }
 
 
-static eOresult_t s_on_mcfoc_verify(EOtheMotionController* p, eObool_t verifyisok)
+static eOresult_t s_on_mcfoc_verify(EOaService* p, eObool_t verifyisok)
 {
     uint8_t rr = 0;
     
@@ -1383,7 +1383,7 @@ static void callback_eb1(void *p)
 
 static eOerrmanDescriptor_t errdes = {0};
 
-static eOresult_t s_on_mcfoc_verify_eb1(EOtheMotionController* p, eObool_t verifyisok)
+static eOresult_t s_on_mcfoc_verify_eb1(EOaService* p, eObool_t verifyisok)
 {
     uint8_t rr = 0;
     
@@ -1414,7 +1414,7 @@ static eOresult_t s_on_mcfoc_verify_eb1(EOtheMotionController* p, eObool_t verif
     return(eores_OK);
 }
 
-static eOresult_t s_on_strain_verify_eb1(EOtheSTRAIN* p, eObool_t verifyisok)
+static eOresult_t s_on_strain_verify_eb1(EOaService* p, eObool_t verifyisok)
 {    
     uint8_t rr = 0;
     
@@ -1660,7 +1660,7 @@ static void callback_eb9(void *p)
 
 
 
-static eOresult_t s_on_strain_verify_eb9(EOtheSTRAIN* p, eObool_t verifyisok)
+static eOresult_t s_on_strain_verify_eb9(EOaService* p, eObool_t verifyisok)
 {    
     uint8_t rr = 0;
     
@@ -1685,7 +1685,7 @@ static eOresult_t s_on_strain_verify_eb9(EOtheSTRAIN* p, eObool_t verifyisok)
 }
 
 
-static eOresult_t s_on_mcfoc_verify_eb9(EOtheMotionController* p, eObool_t verifyisok)
+static eOresult_t s_on_mcfoc_verify_eb9(EOaService* p, eObool_t verifyisok)
 {
     uint8_t rr = 0;
           
@@ -1938,7 +1938,7 @@ static void callback_eb2(void *p)
 
 
 
-static eOresult_t s_on_skin_verify_eb2(EOtheSKIN* p, eObool_t verifyisok)
+static eOresult_t s_on_skin_verify_eb2(EOaService* p, eObool_t verifyisok)
 {    
     uint8_t rr = 0;
     
@@ -1961,7 +1961,7 @@ static eOresult_t s_on_skin_verify_eb2(EOtheSKIN* p, eObool_t verifyisok)
 }
 
 
-static eOresult_t s_on_mc4_verify_eb2(EOtheMotionController* p, eObool_t verifyisok)
+static eOresult_t s_on_mc4_verify_eb2(EOaService* p, eObool_t verifyisok)
 {
     uint8_t rr = 0;
           
@@ -1982,7 +1982,7 @@ static eOresult_t s_on_mc4_verify_eb2(EOtheMotionController* p, eObool_t verifyi
     return(eores_OK);
 }
 
-static eOresult_t s_on_mais_verify_eb2(EOtheMAIS* p, eObool_t verifyisok)
+static eOresult_t s_on_mais_verify_eb2(EOaService* p, eObool_t verifyisok)
 {
     uint8_t rr = 0;
           

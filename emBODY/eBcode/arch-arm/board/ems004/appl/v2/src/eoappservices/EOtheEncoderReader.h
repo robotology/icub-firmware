@@ -41,6 +41,8 @@
 
 #include "hal_encoder.h"
 
+#include "EOtheServices.h"
+
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
@@ -51,7 +53,7 @@ typedef struct EOtheEncoderReader_hid EOtheEncoderReader;
 
 
 
-typedef eOresult_t (*eOencoderreader_onendofoperation_fun_t) (EOtheEncoderReader* p, eObool_t operationisok);
+//typedef eOresult_t (*eOencoderreader_onendofoperation_fun_t) (EOtheEncoderReader* p, eObool_t operationisok);
 
 
    
@@ -69,7 +71,7 @@ extern EOtheEncoderReader* eo_encoderreader_GetHandle(void);
 
 // it verifies if the service as defined in te configuration is possible (is there a good strain board or not?), it executes a callback
 // (which may send a confirmation to the entity which asked fot verification), and then it may activate the strain service by calling  eo_encoderreader_Activate().
-extern eOresult_t eo_encoderreader_Verify(EOtheEncoderReader *p, const eOmn_serv_arrayof_4jomodescriptors_t * jomodes, eOencoderreader_onendofoperation_fun_t onverify, eObool_t activateafterverify);
+extern eOresult_t eo_encoderreader_Verify(EOtheEncoderReader *p, const eOmn_serv_arrayof_4jomodescriptors_t * jomodes, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify);
 
 // it activates the strain service by loading the service configuration
 extern eOresult_t eo_encoderreader_Activate(EOtheEncoderReader *p, const eOmn_serv_arrayof_4jomodescriptors_t * jomodes);

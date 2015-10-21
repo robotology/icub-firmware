@@ -108,9 +108,9 @@ static EOtheMAIS s_eo_themais =
     },     
     .sharedcan =
     {
-        .boardproperties     = NULL,
-        .entitydescriptor    = NULL,
-        .discoverytarget     = {0},
+        .boardproperties        = NULL,
+        .entitydescriptor       = NULL,
+        .discoverytarget        = {0},
         .ondiscoverystop        = {0},
         .command                = {0}, 
     },    
@@ -167,7 +167,7 @@ extern EOtheMAIS* eo_mais_GetHandle(void)
 }
 
 
-extern eOresult_t eo_mais_Verify(EOtheMAIS *p, const eOmn_serv_configuration_t * servcfg, eOmais_onendofoperation_fun_t onverify, eObool_t activateafterverify)
+extern eOresult_t eo_mais_Verify(EOtheMAIS *p, const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify)
 {
     if((NULL == p) || (NULL == servcfg))
     {
@@ -320,7 +320,38 @@ extern eOresult_t eo_mais_Start(EOtheMAIS *p)
         return(eores_OK);
     }  
     
-    return(eo_mais_TXstart(p, p->mais->config.datarate, (eOas_maismode_t)p->mais->config.mode, (eOas_maisresolution_t)p->mais->config.resolution));   
+    return(eo_mais_TXstart(p, p->mais->config.datarate, eoas_maismode_txdatacontinuously, (eOas_maisresolution_t)p->mais->config.resolution));   
+}
+
+extern eOresult_t eo_mais_Stop(EOtheMAIS *p)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    if(eobool_false == s_eo_themais.service.active)
+    {   // nothing to do because we dont have a mais board
+        return(eores_OK);
+    }  
+    
+    return(eo_mais_TXstop(p));        
+}
+
+
+extern eOresult_t eo_mais_Tick(EOtheMAIS *p)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    if(eobool_false == s_eo_themais.service.active)
+    {   // nothing to do because we dont have a mais board
+        return(eores_OK);
+    }  
+    
+    return(eores_OK);       
 }
 
 

@@ -36,6 +36,8 @@
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
+#include "EOtheServices.h"
+
 #include "EoCommon.h"
 #include "EoProtocol.h"
 #include "EOtheCANdiscovery2.h"
@@ -49,7 +51,7 @@
 typedef struct EOtheMAIS_hid EOtheMAIS;
 
 
-typedef eOresult_t (*eOmais_onendofoperation_fun_t) (EOtheMAIS* p, eObool_t operationisok);
+//typedef eOresult_t (*eOmais_onendofoperation_fun_t) (EOtheMAIS* p, eObool_t operationisok);
 
 
    
@@ -62,7 +64,7 @@ extern EOtheMAIS* eo_mais_Initialise(void);
 
 extern EOtheMAIS* eo_mais_GetHandle(void);
 
-extern eOresult_t eo_mais_Verify(EOtheMAIS *p, const eOmn_serv_configuration_t * servcfg, eOmais_onendofoperation_fun_t onverify, eObool_t activateafterverify);
+extern eOresult_t eo_mais_Verify(EOtheMAIS *p, const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify);
 
 // it activates the mais service by loading the service configuration
 extern eOresult_t eo_mais_Activate(EOtheMAIS *p, const eOmn_serv_configuration_t * servcfg);
@@ -73,6 +75,12 @@ extern eOresult_t eo_mais_Deactivate(EOtheMAIS *p);
 
 // Start() take
 extern eOresult_t eo_mais_Start(EOtheMAIS *p);
+
+extern eOresult_t eo_mais_Tick(EOtheMAIS *p);
+
+extern eOresult_t eo_mais_Stop(EOtheMAIS *p);
+
+
 
 extern eOresult_t eo_mais_TXstart(EOtheMAIS *p, uint8_t datarate, eOas_maismode_t mode, eOas_maisresolution_t resolution);
 

@@ -28,8 +28,7 @@
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "EoCommon.h"
-#include "EOtheCANprotocol.h"
-#include "EOtheCANdiscovery2.h"
+#include "EoProtocol.h"
 
 #include "EOemsController.h"
 #include "EOtheEncoderReader.h"
@@ -38,8 +37,9 @@
 #include "EOtheMC4boards.h"
 #include "EOtheMotionDone.h"
 #include "EOtheVirtualStrain.h"
-#include "EOtimer.h"
-#include "EOtheErrorManager.h"
+
+
+#include "EOtheServices_hid.h"
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
 
@@ -48,24 +48,6 @@
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
-typedef struct
-{
-    eOmn_serv_configuration_t               servconfig; 
-    eObool_t                                initted;
-    eObool_t                                active;  
-    eObool_t                                activateafterverify;
-    eObool_t                                running;
-    eOmotcon_onendofoperation_fun_t         onverify;
-} eOmotioncontroller_objs_service_t;
-
-typedef struct
-{
-    EOvector*                               boardproperties;
-    EOvector*                               entitydescriptor;
-    eOcandiscovery_target_t                 discoverytarget;
-    eOcandiscovery_onstop_t                 ondiscoverystop;   
-    eOcanprot_command_t                     command;
-} eOmotioncontroller_objs_sharedcan_t;
 
 typedef struct
 {
@@ -87,22 +69,13 @@ typedef struct
     // anything else? add it in here. or maybe we use the one from foc ... 
 } eOmotioncontroller_objs_mc4plus_t;
 
-typedef struct
-{
-    EOtimer*                                reportTimer;
-    eOreltime_t                             reportPeriod;  
-    eOerrmanDescriptor_t                    errorDescriptor;
-    eOerrmanErrorType_t                     errorType;
-    uint8_t                                 errorCallbackCount;
-    uint8_t                                 repetitionOKcase;
-} eOmotioncontroller_objs_diagnostics_t;
 
 
 struct EOtheMotionController_hid
 {
-    eOmotioncontroller_objs_service_t       service;
-    eOmotioncontroller_objs_diagnostics_t   diagnostics;    
-    eOmotioncontroller_objs_sharedcan_t     sharedcan;   
+    eOservice_core_t                        service;
+    eOservice_diagnostics_t                 diagnostics;
+    eOservice_cantools_t                    sharedcan;  
     
     uint8_t                                 numofjomos;
          

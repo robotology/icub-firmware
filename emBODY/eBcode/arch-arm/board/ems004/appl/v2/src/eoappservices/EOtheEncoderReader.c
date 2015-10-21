@@ -170,7 +170,7 @@ extern EOtheEncoderReader* eo_encoderreader_GetHandle(void)
 }
 
 
-extern eOresult_t eo_encoderreader_Verify(EOtheEncoderReader *p, const eOmn_serv_arrayof_4jomodescriptors_t * jomodes, eOencoderreader_onendofoperation_fun_t onverify, eObool_t activateafterverify)
+extern eOresult_t eo_encoderreader_Verify(EOtheEncoderReader *p, const eOmn_serv_arrayof_4jomodescriptors_t * jomodes, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify)
 {
     if((NULL == p) || (NULL == jomodes))
     {

@@ -35,6 +35,8 @@
 #include "EOtheErrorManager.h"
 
 
+#include "EOtheServices_hid.h"
+
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
 
@@ -43,30 +45,11 @@
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
-typedef struct
-{
-    eOmn_serv_configuration_t               servconfig; // not really used because there is not a specific service
-    eObool_t                                initted;
-    eObool_t                                active;  
-    eObool_t                                activateafterverify;
-    eObool_t                                running;
-    eOencoderreader_onendofoperation_fun_t  onverify;
-} eOencoderreader_objs_service_t;
-
-typedef struct
-{
-    EOtimer*                                reportTimer;
-    eOreltime_t                             reportPeriod;  
-    eOerrmanDescriptor_t                    errorDescriptor;
-    eOerrmanErrorType_t                     errorType;
-    uint8_t                                 errorCallbackCount;
-    uint8_t                                 repetitionOKcase;
-} eOencoderreader_objs_diagnostics_t;
 
 struct EOtheEncoderReader_hid
 {
-    eOencoderreader_objs_service_t          service;
-    eOencoderreader_objs_diagnostics_t      diagnostics;
+    eOservice_core_t                        service;
+    eOservice_diagnostics_t                 diagnostics;
     
     eOmn_serv_arrayof_4jomodescriptors_t    arrayofjomodes;
 

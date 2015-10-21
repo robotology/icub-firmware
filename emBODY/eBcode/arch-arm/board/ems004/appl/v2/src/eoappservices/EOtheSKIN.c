@@ -113,9 +113,9 @@ static EOtheSKIN s_eo_theskin =
     },     
     .sharedcan =
     {
-        .boardproperties     = NULL,
-        .entitydescriptor    = NULL,
-        .discoverytarget     = {0},
+        .boardproperties        = NULL,
+        .entitydescriptor       = NULL,
+        .discoverytarget        = {0},
         .ondiscoverystop        = {0},
         .command                = {0}, 
     },
@@ -182,7 +182,7 @@ extern EOtheSKIN* eo_skin_GetHandle(void)
 
 
 
-extern eOresult_t eo_skin_Verify(EOtheSKIN *p, const eOmn_serv_configuration_t * servcfg, eOskin_onendofoperation_fun_t onverify, eObool_t activateafterverify)
+extern eOresult_t eo_skin_Verify(EOtheSKIN *p, const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify)
 {
     if((NULL == p) || (NULL == servcfg))
     {
@@ -715,6 +715,43 @@ extern eOresult_t eo_skin_AcceptCANframe(EOtheSKIN *p, eOcanframe_t *frame, eOca
     }
 
     return(eores_OK);
+}
+
+extern eOresult_t eo_skin_Start(EOtheSKIN *p)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    if(eobool_false == s_eo_theskin.service.active)
+    {   // nothing to do because we dont have a skin
+        return(eores_OK);
+    }  
+    
+    uint8_t i = 0;
+    for(i=0; i<s_eo_theskin.numofskinpatches; i++)
+    {
+        eo_skin_SetMode(p, i, eosk_sigmode_signal);
+    }
+    
+    return(eores_OK);   
+}
+
+
+extern eOresult_t eo_skin_Stop(EOtheSKIN *p)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    if(eobool_false == s_eo_theskin.service.active)
+    {   // nothing to do because we dont have a skin board
+        return(eores_OK);
+    }  
+    
+    return(eo_skin_TXstop(p));        
 }
 
 
