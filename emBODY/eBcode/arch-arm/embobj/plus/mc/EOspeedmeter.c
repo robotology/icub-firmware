@@ -263,12 +263,15 @@ extern int32_t eo_absCalibratedEncoder_Acquire(EOabsCalibratedEncoder* o, int32_
                 o->velocity = (7*o->velocity) >> 3;
             }
             #endif
+            
+            if (o->spikes_count > 0 )
+                o->spikes_count--;
         }
         else
         {
             o->spikes_count++;
             //we don't want to send up too many messages...
-            if (o->spikes_count == 200)
+            if ((o->spikes_count % 200) == 0)
             {
                 //message "spike encoder error"
                 eOerrmanDescriptor_t descriptor = {0};
@@ -279,7 +282,7 @@ extern int32_t eo_absCalibratedEncoder_Acquire(EOabsCalibratedEncoder* o, int32_
                 descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_aea_abs_enc_spikes);
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, NULL, &descriptor);
                 
-                o->spikes_count = 0;
+                //o->spikes_count = 0;
             }
             
             #ifndef USE_2FOC_FAST_ENCODER
@@ -291,6 +294,21 @@ extern int32_t eo_absCalibratedEncoder_Acquire(EOabsCalibratedEncoder* o, int32_
     return o->sign*o->distance;
 }
 
+extern eObool_t eo_absCalibratedEncoder_AreThereTooManySpikes(EOabsCalibratedEncoder* o)
+{
+    if (!o) return eobool_false;
+    
+    // ~1seconds of consecutive spikes...we should put in hw fault
+    if (o->spikes_count == 1000)
+    {
+        o->spikes_count = 0;
+        SET_BITS(o->state_mask, SM_INVALID_FAULT); //not using another code, just considering invalid value
+        return eobool_true;
+
+    }
+    
+    return eobool_false;
+}
 #ifndef USE_2FOC_FAST_ENCODER
 extern int32_t eo_absCalibratedEncoder_GetVel(EOabsCalibratedEncoder* o)
 {

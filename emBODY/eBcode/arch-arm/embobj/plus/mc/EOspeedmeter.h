@@ -55,6 +55,7 @@ typedef struct EOaxleVirtualEncoder_hid EOaxleVirtualEncoder;
 extern EOabsCalibratedEncoder* eo_absCalibratedEncoder_New(uint8_t ID);
 extern void eo_absCalibratedEncoder_SetSign(EOabsCalibratedEncoder*, int32_t sign);
 extern int32_t eo_absCalibratedEncoder_Acquire(EOabsCalibratedEncoder*, int32_t pos, uint8_t error_mask);
+extern eObool_t eo_absCalibratedEncoder_AreThereTooManySpikes(EOabsCalibratedEncoder* o);
 extern uint16_t eo_absCalibratedEncoder_IsHardFault(EOabsCalibratedEncoder*);
 extern uint16_t eo_absCalibratedEncoder_IsTimeoutFault(EOabsCalibratedEncoder*);
 extern uint16_t eo_absCalibratedEncoder_IsInvalidFault(EOabsCalibratedEncoder*);
