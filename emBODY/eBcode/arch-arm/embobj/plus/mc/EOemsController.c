@@ -377,9 +377,9 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
             eo_axisController_SetEncPos(ems->axis_controller[j], eo_axleVirtualEncoder_GetPos(ems->axle_virt_encoder[j]));
             eo_axisController_SetEncVel(ems->axis_controller[j], eo_axleVirtualEncoder_GetVel(ems->axle_virt_encoder[j]));
         #else
-            if ((ems->axis_controller[j]->calibration_type == eomc_calibration_type5_hard_stops_mc4plus) && eo_axisController_IsCalibrated(ems->axis_controller[j]))  
+            if (ems->axis_controller[j]->calibration_type == eomc_calibration_type5_hard_stops_mc4plus)  
             { 
-                if((emscontroller_board_HEAD_neckyaw_eyes == ems->board) && ((2==j)||(3==j)))
+                if((emscontroller_board_HEAD_neckyaw_eyes == ems->board) && ((2==j)||(3==j))  && eo_axisController_IsCalibrated(ems->axis_controller[j]))
                 {
                     // j0 and j1 are independent, j2 and j3 are not
                     
@@ -462,7 +462,7 @@ extern void eo_emsController_CheckFaults()
             ems_fault_mask_new[j] |= MOTOR_CAN_NOT_RESPONDING;
         }
         
-        if (eo_absCalibratedEncoder_IsHardFault(ems->abs_calib_encoder[j]))
+        if ((eo_absCalibratedEncoder_IsHardFault(ems->abs_calib_encoder[j])) || (eo_absCalibratedEncoder_AreThereTooManySpikes(ems->abs_calib_encoder[j])))
         {
             ems_fault_mask_new[j] |= eo_absCalibratedEncoder_IsHardFault(ems->abs_calib_encoder[j]);
         }
