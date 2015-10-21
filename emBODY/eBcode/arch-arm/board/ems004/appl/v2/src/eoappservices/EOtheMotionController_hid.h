@@ -48,39 +48,68 @@
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
-
-struct EOtheMotionController_hid
+typedef struct
 {
+    eOmn_serv_configuration_t               servconfig; 
     eObool_t                                initted;
-    eObool_t                                active;
-    eObool_t                                started;
-    uint8_t                                 numofjomos;
-    eOmn_serv_configuration_t               servconfig;
-    
-    // they are for mc (foc or mc4 boards)
-    EOvector*                               canboardproperties;
-    EOvector*                               canentitydescriptor;
-    eOcandiscovery_target_t                 candiscoverytarget;
-    eOmotcon_onendofoperation_fun_t         onverify;
+    eObool_t                                active;  
     eObool_t                                activateafterverify;
-    eOcandiscovery_onstop_t                 ondiscoverystop;
-    
-    // they are for foc-based mc only
-    EOemsController*                        controller;
-    EOtheEncoderReader*                     encoderreader;
-    
-    // they are for mc4-based mc only
-    EOtheMAIS*                              mais;  
+    eObool_t                                running;
+    eOmotcon_onendofoperation_fun_t         onverify;
+} eOmotioncontroller_objs_service_t;
+
+typedef struct
+{
+    EOvector*                               boardproperties;
+    EOvector*                               entitydescriptor;
+    eOcandiscovery_target_t                 discoverytarget;
+    eOcandiscovery_onstop_t                 ondiscoverystop;   
+    eOcanprot_command_t                     command;
+} eOmotioncontroller_objs_sharedcan_t;
+
+typedef struct
+{
+    EOemsController*                        thecontroller;
+    EOtheEncoderReader*                     theencoderreader;    
+} eOmotioncontroller_objs_foc_t;
+
+typedef struct
+{
     eOmn_serv_configuration_t               servconfigmais;
-    EOtheMC4boards*                         mc4boards;
-    
-    // this part if for error (diagnostics) reporting: if something is OK or NOT OK. we use a timer to repeat for some time the messages
-    EOtimer*                                errorReportTimer;
+    EOtheMAIS*                              themais;  
+    EOtheMC4boards*                         themc4boards;    
+} eOmotioncontroller_objs_mc4_t;
+
+typedef struct
+{
+    EOemsController*                        thecontroller;
+    EOtheEncoderReader*                     theencoderreader;  
+    // anything else? add it in here. or maybe we use the one from foc ... 
+} eOmotioncontroller_objs_mc4plus_t;
+
+typedef struct
+{
+    EOtimer*                                reportTimer;
+    eOreltime_t                             reportPeriod;  
     eOerrmanDescriptor_t                    errorDescriptor;
     eOerrmanErrorType_t                     errorType;
     uint8_t                                 errorCallbackCount;
     uint8_t                                 repetitionOKcase;
-    eOreltime_t                             reportPeriod;  
+} eOmotioncontroller_objs_diagnostics_t;
+
+
+struct EOtheMotionController_hid
+{
+    eOmotioncontroller_objs_service_t       service;
+    eOmotioncontroller_objs_diagnostics_t   diagnostics;    
+    eOmotioncontroller_objs_sharedcan_t     sharedcan;   
+    
+    uint8_t                                 numofjomos;
+         
+    // they are for foc-based mc only
+    eOmotioncontroller_objs_foc_t           mcfoc;    
+    // they are for mc4-based mc only
+    eOmotioncontroller_objs_mc4_t           mcmc4;    
 }; 
 
 

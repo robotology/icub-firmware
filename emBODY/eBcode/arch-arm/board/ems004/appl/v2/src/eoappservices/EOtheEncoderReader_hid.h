@@ -43,27 +43,38 @@
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
-
-struct EOtheEncoderReader_hid
+typedef struct
 {
+    eOmn_serv_configuration_t               servconfig; // not really used because there is not a specific service
     eObool_t                                initted;
-    eObool_t                                active;
-    eOmn_serv_arrayof_4jomodescriptors_t    arrayofjomodes;
-    EOappEncReader*                         reader;
-    //eOappEncReader_cfg_t                    readerconfig;
-    eOencoderreader_onendofoperation_fun_t  onverify;
+    eObool_t                                active;  
     eObool_t                                activateafterverify;
-    EOtimer*                                waitreadtimer;
-    uint8_t                                 numofjomos;
-    uint8_t                                 numofencoders;
-    hal_encoder_errors_flags                errorflags[eOappEncReader_joint_numberof];
-    // this part if for error (diagnostics) reporting: if something is OK or NOT OK. we use a timer to repeat for some time the messages
-    EOtimer*                                errorReportTimer;
+    eObool_t                                running;
+    eOencoderreader_onendofoperation_fun_t  onverify;
+} eOencoderreader_objs_service_t;
+
+typedef struct
+{
+    EOtimer*                                reportTimer;
+    eOreltime_t                             reportPeriod;  
     eOerrmanDescriptor_t                    errorDescriptor;
     eOerrmanErrorType_t                     errorType;
     uint8_t                                 errorCallbackCount;
     uint8_t                                 repetitionOKcase;
-    eOreltime_t                             reportPeriod;   
+} eOencoderreader_objs_diagnostics_t;
+
+struct EOtheEncoderReader_hid
+{
+    eOencoderreader_objs_service_t          service;
+    eOencoderreader_objs_diagnostics_t      diagnostics;
+    
+    eOmn_serv_arrayof_4jomodescriptors_t    arrayofjomodes;
+
+    EOtimer*                                waitreadtimer;
+    uint8_t                                 numofjomos;
+    uint8_t                                 numofencoders;
+    hal_encoder_errors_flags                errorflags[eOappEncReader_joint_numberof];
+    EOappEncReader*                         reader;
 }; 
 
 

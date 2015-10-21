@@ -102,22 +102,30 @@ static void s_eo_encoderreader_read_encoders(void* p);
 
 static EOtheEncoderReader s_eo_theencoderreader = 
 {
-    .initted                    = eobool_false,
-    .active                     = eobool_false,
-    .arrayofjomodes             = { 0 },
-    .reader                     = NULL,   
-    .onverify                   = NULL,
-    .activateafterverify        = eobool_false,
+    .service = 
+    {
+        .servconfig             = { .type = eomn_serv_NONE },
+        .initted                = eobool_false,
+        .active                 = eobool_false,
+        .activateafterverify    = eobool_false,
+        .running                = eobool_false,
+        .onverify               = NULL             
+    },
+    .diagnostics = 
+    {
+        .reportTimer            = NULL,
+        .reportPeriod           = 10*EOK_reltime1sec,
+        .errorDescriptor        = {0},
+        .errorType              = eo_errortype_info,
+        .errorCallbackCount     = 0,
+        .repetitionOKcase       = 10
+    },     
+    .arrayofjomodes             = { 0 },   
     .waitreadtimer              = NULL,
     .numofjomos                 = 0,
     .numofencoders              = 0,
     .errorflags                 = {0},
-    .errorReportTimer           = NULL,
-    .errorDescriptor            = {0},
-    .errorType                  = eo_errortype_info,
-    .errorCallbackCount         = 0,
-    .repetitionOKcase           = 10,
-    .reportPeriod               = 10*EOK_reltime1sec 
+    .reader                     = NULL
 };
 
 static const char s_eobj_ownname[] = "EOtheEncoderReader";
@@ -130,12 +138,12 @@ static const char s_eobj_ownname[] = "EOtheEncoderReader";
 
 extern EOtheEncoderReader* eo_encoderreader_Initialise(void)
 {
-    if(eobool_true == s_eo_theencoderreader.initted)
+    if(eobool_true == s_eo_theencoderreader.service.initted)
     {
         return(&s_eo_theencoderreader);
     }
     
-    s_eo_theencoderreader.active = eobool_false;
+    s_eo_theencoderreader.service.active = eobool_false;
 
 
 
@@ -143,9 +151,9 @@ extern EOtheEncoderReader* eo_encoderreader_Initialise(void)
     
     s_eo_theencoderreader.reader = NULL; // in future use: Initialise() 
     
-    s_eo_theencoderreader.errorReportTimer = eo_timer_New();
+    s_eo_theencoderreader.diagnostics.reportTimer = eo_timer_New();
         
-    s_eo_theencoderreader.initted = eobool_true;
+    s_eo_theencoderreader.service.initted = eobool_true;
     
     return(&s_eo_theencoderreader);   
 }
@@ -153,7 +161,7 @@ extern EOtheEncoderReader* eo_encoderreader_Initialise(void)
 
 extern EOtheEncoderReader* eo_encoderreader_GetHandle(void)
 {
-    if(eobool_true == s_eo_theencoderreader.initted)
+    if(eobool_true == s_eo_theencoderreader.service.initted)
     {
         return(&s_eo_theencoderreader);
     }
@@ -170,17 +178,17 @@ extern eOresult_t eo_encoderreader_Verify(EOtheEncoderReader *p, const eOmn_serv
     }  
  
 // DONT Deactivate ... we may want just to check again ....    
-//    if(eobool_true == s_eo_theencoderreader.active)
+//    if(eobool_true == s_eo_theencoderreader.service.active)
 //    {
 //        eo_encoderreader_Deactivate(p);        
 //    }   
     
     // make sure the timer is not running
-    eo_timer_Stop(s_eo_theencoderreader.errorReportTimer);   
+    eo_timer_Stop(s_eo_theencoderreader.diagnostics.reportTimer);   
     
     
-    s_eo_theencoderreader.onverify = onverify;
-    s_eo_theencoderreader.activateafterverify = activateafterverify;
+    s_eo_theencoderreader.service.onverify = onverify;
+    s_eo_theencoderreader.service.activateafterverify = activateafterverify;
                     
     s_eo_encoderreader_config_ereader(jomodes, NULL, NULL);
     
@@ -204,7 +212,7 @@ extern eOresult_t eo_encoderreader_Deactivate(EOtheEncoderReader *p)
         return(eores_NOK_nullpointer);
     }
 
-    if(eobool_false == s_eo_theencoderreader.active)
+    if(eobool_false == s_eo_theencoderreader.service.active)
     {
         return(eores_OK);        
     } 
@@ -217,11 +225,11 @@ extern eOresult_t eo_encoderreader_Deactivate(EOtheEncoderReader *p)
     // deinit EOappEncReader, undo what in s_eo_encoderreader_config_ereader()
 
 //    
-//    s_eo_theencoderreader.active = eobool_false;
+//    s_eo_theencoderreader.service.active = eobool_false;
 
 
     // make sure the timer is not running
-    eo_timer_Stop(s_eo_theencoderreader.errorReportTimer);  
+    eo_timer_Stop(s_eo_theencoderreader.diagnostics.reportTimer);  
     
     return(eores_OK);
 }
@@ -234,7 +242,7 @@ extern eOresult_t eo_encoderreader_Activate(EOtheEncoderReader *p, const eOmn_se
         return(eores_NOK_nullpointer);
     }    
     
-    if(eobool_true == s_eo_theencoderreader.active)
+    if(eobool_true == s_eo_theencoderreader.service.active)
     {
         eo_encoderreader_Deactivate(p);        
     }   
@@ -250,7 +258,7 @@ extern eOresult_t eo_encoderreader_Activate(EOtheEncoderReader *p, const eOmn_se
 //
     eo_appEncReader_StartRead(s_eo_theencoderreader.reader);
                      
-    s_eo_theencoderreader.active = eobool_true;        
+    s_eo_theencoderreader.service.active = eobool_true;        
     
     return(eores_OK);   
 }
@@ -264,7 +272,7 @@ extern eOresult_t eo_encoderreader_StartReading(EOtheEncoderReader *p)
         return(eores_NOK_nullpointer);
     }
     
-    if(eobool_false == s_eo_theencoderreader.active)
+    if(eobool_false == s_eo_theencoderreader.service.active)
     {   // nothing to do because we dont have it
         return(eores_OK);
     }   
@@ -283,7 +291,7 @@ extern eObool_t eo_encoderreader_IsReadingAvailable(EOtheEncoderReader *p)
         return(eobool_false);
     }
     
-    if(eobool_false == s_eo_theencoderreader.active)
+    if(eobool_false == s_eo_theencoderreader.service.active)
     {   // nothing to do because we dont have it
         return(eobool_false);
     }   
@@ -302,7 +310,7 @@ extern eOresult_t eo_encoderreader_Read(EOtheEncoderReader *p, uint8_t position,
         return(eores_NOK_nullpointer);
     }
     
-    if(eobool_false == s_eo_theencoderreader.active)
+    if(eobool_false == s_eo_theencoderreader.service.active)
     {   // nothing to do because we dont have it
         return(eores_OK);
     }   
@@ -338,48 +346,48 @@ static eOresult_t s_eo_encoderreader_onstop_verifyreading(void *par, eObool_t re
 {
     const eOmn_serv_arrayof_4jomodescriptors_t * jomodes = (const eOmn_serv_arrayof_4jomodescriptors_t *)par;
         
-    if((eobool_true == readingisok) && (eobool_true == s_eo_theencoderreader.activateafterverify))
+    if((eobool_true == readingisok) && (eobool_true == s_eo_theencoderreader.service.activateafterverify))
     {
         eo_encoderreader_Activate(&s_eo_theencoderreader, jomodes);        
     }
 
-    s_eo_theencoderreader.errorDescriptor.sourcedevice     = eo_errman_sourcedevice_localboard;
-    s_eo_theencoderreader.errorDescriptor.sourceaddress    = 0;
-    s_eo_theencoderreader.errorDescriptor.par16            = s_eo_theencoderreader.numofjomos | (s_eo_theencoderreader.numofencoders << 8);
-    memcpy(&s_eo_theencoderreader.errorDescriptor.par64, &s_eo_theencoderreader.errorflags[0], sizeof(s_eo_theencoderreader.errorflags));    
+    s_eo_theencoderreader.diagnostics.errorDescriptor.sourcedevice     = eo_errman_sourcedevice_localboard;
+    s_eo_theencoderreader.diagnostics.errorDescriptor.sourceaddress    = 0;
+    s_eo_theencoderreader.diagnostics.errorDescriptor.par16            = s_eo_theencoderreader.numofjomos | (s_eo_theencoderreader.numofencoders << 8);
+    memcpy(&s_eo_theencoderreader.diagnostics.errorDescriptor.par64, &s_eo_theencoderreader.errorflags[0], sizeof(s_eo_theencoderreader.errorflags));    
     EOaction_strg astrg = {0};
     EOaction *act = (EOaction*)&astrg;
     eo_action_SetCallback(act, s_eo_encodereader_send_periodic_error_report, NULL, eov_callbackman_GetTask(eov_callbackman_GetHandle()));
         
     if(eobool_true == readingisok)
     {        
-        s_eo_theencoderreader.errorType = eo_errortype_debug;
-        s_eo_theencoderreader.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_encoders_ok);
-        eo_errman_Error(eo_errman_GetHandle(), s_eo_theencoderreader.errorType, NULL, s_eobj_ownname, &s_eo_theencoderreader.errorDescriptor);
+        s_eo_theencoderreader.diagnostics.errorType = eo_errortype_debug;
+        s_eo_theencoderreader.diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_encoders_ok);
+        eo_errman_Error(eo_errman_GetHandle(), s_eo_theencoderreader.diagnostics.errorType, NULL, s_eobj_ownname, &s_eo_theencoderreader.diagnostics.errorDescriptor);
         
-        if((0 != s_eo_theencoderreader.repetitionOKcase) && (0 != s_eo_theencoderreader.reportPeriod))
+        if((0 != s_eo_theencoderreader.diagnostics.repetitionOKcase) && (0 != s_eo_theencoderreader.diagnostics.reportPeriod))
         {
-            s_eo_theencoderreader.errorCallbackCount = 20;        
-            eo_timer_Start(s_eo_theencoderreader.errorReportTimer, eok_abstimeNOW, s_eo_theencoderreader.reportPeriod, eo_tmrmode_FOREVER, act);
+            s_eo_theencoderreader.diagnostics.errorCallbackCount = 20;        
+            eo_timer_Start(s_eo_theencoderreader.diagnostics.reportTimer, eok_abstimeNOW, s_eo_theencoderreader.diagnostics.reportPeriod, eo_tmrmode_FOREVER, act);
         }
     }    
        
     if(eobool_false == readingisok)
     {
-        s_eo_theencoderreader.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_encoders_failed_verify);
-        s_eo_theencoderreader.errorType = eo_errortype_error;                
-        eo_errman_Error(eo_errman_GetHandle(), s_eo_theencoderreader.errorType, NULL, s_eobj_ownname, &s_eo_theencoderreader.errorDescriptor);
+        s_eo_theencoderreader.diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_encoders_failed_verify);
+        s_eo_theencoderreader.diagnostics.errorType = eo_errortype_error;                
+        eo_errman_Error(eo_errman_GetHandle(), s_eo_theencoderreader.diagnostics.errorType, NULL, s_eobj_ownname, &s_eo_theencoderreader.diagnostics.errorDescriptor);
         
-        if(0 != s_eo_theencoderreader.reportPeriod)
+        if(0 != s_eo_theencoderreader.diagnostics.reportPeriod)
         {
-            s_eo_theencoderreader.errorCallbackCount = EOK_int08dummy;
-            eo_timer_Start(s_eo_theencoderreader.errorReportTimer, eok_abstimeNOW, s_eo_theencoderreader.reportPeriod, eo_tmrmode_FOREVER, act);
+            s_eo_theencoderreader.diagnostics.errorCallbackCount = EOK_int08dummy;
+            eo_timer_Start(s_eo_theencoderreader.diagnostics.reportTimer, eok_abstimeNOW, s_eo_theencoderreader.diagnostics.reportPeriod, eo_tmrmode_FOREVER, act);
         }
     }    
     
-    if(NULL != s_eo_theencoderreader.onverify)
+    if(NULL != s_eo_theencoderreader.service.onverify)
     {
-        s_eo_theencoderreader.onverify(&s_eo_theencoderreader, readingisok); 
+        s_eo_theencoderreader.service.onverify(&s_eo_theencoderreader, readingisok); 
     }    
     
     return(eores_OK);   
@@ -388,15 +396,15 @@ static eOresult_t s_eo_encoderreader_onstop_verifyreading(void *par, eObool_t re
 
 static void s_eo_encodereader_send_periodic_error_report(void *p)
 {
-    eo_errman_Error(eo_errman_GetHandle(), s_eo_theencoderreader.errorType, NULL, s_eobj_ownname, &s_eo_theencoderreader.errorDescriptor);
+    eo_errman_Error(eo_errman_GetHandle(), s_eo_theencoderreader.diagnostics.errorType, NULL, s_eobj_ownname, &s_eo_theencoderreader.diagnostics.errorDescriptor);
     
-    if(EOK_int08dummy != s_eo_theencoderreader.errorCallbackCount)
+    if(EOK_int08dummy != s_eo_theencoderreader.diagnostics.errorCallbackCount)
     {
-        s_eo_theencoderreader.errorCallbackCount--;
+        s_eo_theencoderreader.diagnostics.errorCallbackCount--;
     }
-    if(0 == s_eo_theencoderreader.errorCallbackCount)
+    if(0 == s_eo_theencoderreader.diagnostics.errorCallbackCount)
     {
-        eo_timer_Stop(s_eo_theencoderreader.errorReportTimer);
+        eo_timer_Stop(s_eo_theencoderreader.diagnostics.reportTimer);
     }
 }
 

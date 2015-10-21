@@ -90,29 +90,40 @@ static eObool_t s_eo_skin_activeskin_can_accept_canframe(void);
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
+        
 static EOtheSKIN s_eo_theskin = 
 {
-    .initted                    = eobool_false,
-    .active                     = eobool_false,
+    .service = 
+    {
+        .servconfig             = { .type = eomn_serv_NONE },
+        .initted                = eobool_false,
+        .active                 = eobool_false,
+        .activateafterverify    = eobool_false,
+        .running                = eobool_false,
+        .onverify               = NULL          
+    },
+    .diagnostics = 
+    {
+        .reportTimer            = NULL,
+        .reportPeriod           = 10*EOK_reltime1sec,
+        .errorDescriptor        = {0},
+        .errorType              = eo_errortype_info,
+        .errorCallbackCount     = 0,
+        .repetitionOKcase       = 10
+    },     
+    .sharedcan =
+    {
+        .boardproperties     = NULL,
+        .entitydescriptor    = NULL,
+        .discoverytarget     = {0},
+        .ondiscoverystop        = {0},
+        .command                = {0}, 
+    },
+    .patchisrunning             = { eobool_false },    
     .numofskinpatches           = 0,
-    .numofmtbs                  = 0,
-    .command                    = {0},
-    .canboardproperties         = NULL,
-    .canentitydescriptor        = NULL,
-    .servconfig                 = { .type = eomn_serv_NONE },
-    .candiscoverytarget         = {0},
-    .onverify                   = NULL,
-    .activateafterverify        = eobool_false,
-    .itistransmitting           = eobool_false, 
-    .patchistransmitting        = { eobool_false },    
-    .skinpatches                = { NULL },
+    .numofmtbs                  = 0,    
     .rxdata                     = { NULL },
-    .errorReportTimer           = NULL,
-    .errorDescriptor            = {0},
-    .errorType                  = eo_errortype_info,
-    .errorCallbackCount         = 0,
-    .repetitionOKcase           = 10,
-    .reportPeriod               = 10*EOK_reltime1sec  
+    .skinpatches                = { NULL }
 };
 
 static const char s_eobj_ownname[] = "EOtheSKIN";
@@ -125,34 +136,34 @@ static const char s_eobj_ownname[] = "EOtheSKIN";
 
 extern EOtheSKIN* eo_skin_Initialise(void)
 {
-    if(eobool_true == s_eo_theskin.initted)
+    if(eobool_true == s_eo_theskin.service.initted)
     {
         return(&s_eo_theskin);
     }
     
-    s_eo_theskin.active = eobool_false;
+    s_eo_theskin.service.active = eobool_false;
         
     s_eo_theskin.numofskinpatches = 0;
     s_eo_theskin.numofmtbs = 0;
-    s_eo_theskin.servconfig.type = eomn_serv_NONE;
+    s_eo_theskin.service.servconfig.type = eomn_serv_NONE;
     
     
-    s_eo_theskin.canboardproperties = eo_vector_New(sizeof(eOcanmap_board_properties_t), eo_skin_maxnumberofMTBboards, NULL, NULL, NULL, NULL);
+    s_eo_theskin.sharedcan.boardproperties = eo_vector_New(sizeof(eOcanmap_board_properties_t), eo_skin_maxnumberofMTBboards, NULL, NULL, NULL, NULL);
     
-    s_eo_theskin.canentitydescriptor = eo_vector_New(sizeof(eOcanmap_entitydescriptor_t), eo_skin_maxnumberofMTBboards, NULL, NULL, NULL, NULL);
+    s_eo_theskin.sharedcan.entitydescriptor = eo_vector_New(sizeof(eOcanmap_entitydescriptor_t), eo_skin_maxnumberofMTBboards, NULL, NULL, NULL, NULL);
     
     uint8_t i=0;
     for(i=0; i<eomn_serv_skin_maxpatches; i++)
     {
         s_eo_theskin.skinpatches[i] = NULL;
-        s_eo_theskin.patchistransmitting[i] = eobool_false;
+        s_eo_theskin.patchisrunning[i] = eobool_false;
         
         s_eo_theskin.rxdata[i] = eo_vector_New(sizeof(eOsk_candata_t), 64, NULL, NULL, NULL, NULL); 
     }
     
-    s_eo_theskin.errorReportTimer = eo_timer_New();
+    s_eo_theskin.diagnostics.reportTimer = eo_timer_New();
         
-    s_eo_theskin.initted = eobool_true;
+    s_eo_theskin.service.initted = eobool_true;
     
     return(&s_eo_theskin);   
 }
@@ -161,7 +172,7 @@ extern EOtheSKIN* eo_skin_Initialise(void)
     
 extern EOtheSKIN* eo_skin_GetHandle(void)
 {
-    if(eobool_true == s_eo_theskin.initted)
+    if(eobool_true == s_eo_theskin.service.initted)
     {
         return(&s_eo_theskin);
     }
@@ -185,72 +196,70 @@ extern eOresult_t eo_skin_Verify(EOtheSKIN *p, const eOmn_serv_configuration_t *
     
  
 // DONT Deactivate ... we may want just to check again ....    
-//    if(eobool_true == s_eo_theskin.active)
+//    if(eobool_true == s_eo_theskin.service.active)
 //    {
 //        eo_skin_Deactivate(p);        
 //    }   
     
     // make sure the timer is not running
-    eo_timer_Stop(s_eo_theskin.errorReportTimer);    
+    eo_timer_Stop(s_eo_theskin.diagnostics.reportTimer);    
 
-    s_eo_theskin.onverify = onverify;
-    s_eo_theskin.activateafterverify = activateafterverify;
+    s_eo_theskin.service.onverify = onverify;
+    s_eo_theskin.service.activateafterverify = activateafterverify;
 
 
-    s_eo_theskin.candiscoverytarget.boardtype = eobrd_cantype_mtb;
-    s_eo_theskin.candiscoverytarget.protocolversion.major = servcfg->data.sk.skin.version.protocol.major; 
-    s_eo_theskin.candiscoverytarget.protocolversion.minor = servcfg->data.sk.skin.version.protocol.minor;
-    s_eo_theskin.candiscoverytarget.firmwareversion.major = servcfg->data.sk.skin.version.firmware.major; 
-    s_eo_theskin.candiscoverytarget.firmwareversion.minor = servcfg->data.sk.skin.version.firmware.minor;    
+    s_eo_theskin.sharedcan.discoverytarget.boardtype = eobrd_cantype_mtb;
+    s_eo_theskin.sharedcan.discoverytarget.protocolversion.major = servcfg->data.sk.skin.version.protocol.major; 
+    s_eo_theskin.sharedcan.discoverytarget.protocolversion.minor = servcfg->data.sk.skin.version.protocol.minor;
+    s_eo_theskin.sharedcan.discoverytarget.firmwareversion.major = servcfg->data.sk.skin.version.firmware.major; 
+    s_eo_theskin.sharedcan.discoverytarget.firmwareversion.minor = servcfg->data.sk.skin.version.firmware.minor;    
     
     // now i must do discovery of the patches. all patches can be at most on the two can buses ...
     // moreover, we cannot have more than .... eo_skin_maxnumberofMTBboards boards
 
-    s_eo_theskin.candiscoverytarget.canmap[eOcanport1] = s_eo_theskin.candiscoverytarget.canmap[eOcanport2] = 0x0000;
+    s_eo_theskin.sharedcan.discoverytarget.canmap[eOcanport1] = s_eo_theskin.sharedcan.discoverytarget.canmap[eOcanport2] = 0x0000;
     uint8_t i=0;
     for(i=0; i<servcfg->data.sk.skin.numofpatches; i++)
     {
-        s_eo_theskin.candiscoverytarget.canmap[eOcanport1] |= servcfg->data.sk.skin.canmapskin[i][eOcanport1];
-        s_eo_theskin.candiscoverytarget.canmap[eOcanport2] |= servcfg->data.sk.skin.canmapskin[i][eOcanport2];
+        s_eo_theskin.sharedcan.discoverytarget.canmap[eOcanport1] |= servcfg->data.sk.skin.canmapskin[i][eOcanport1];
+        s_eo_theskin.sharedcan.discoverytarget.canmap[eOcanport2] |= servcfg->data.sk.skin.canmapskin[i][eOcanport2];
     }
     
-    uint8_t numofboards = eo_common_hlfword_bitsetcount(s_eo_theskin.candiscoverytarget.canmap[eOcanport1]) +
-                          eo_common_hlfword_bitsetcount(s_eo_theskin.candiscoverytarget.canmap[eOcanport2]);
+    uint8_t numofboards = eo_common_hlfword_bitsetcount(s_eo_theskin.sharedcan.discoverytarget.canmap[eOcanport1]) +
+                          eo_common_hlfword_bitsetcount(s_eo_theskin.sharedcan.discoverytarget.canmap[eOcanport2]);
     
     if(numofboards > eo_skin_maxnumberofMTBboards)
     {
         
-        s_eo_theskin.errorDescriptor.sourcedevice       = eo_errman_sourcedevice_localboard;
-        s_eo_theskin.errorDescriptor.sourceaddress      = 0;
-        s_eo_theskin.errorDescriptor.par16              = (numofboards << 8) | (eo_skin_maxnumberofMTBboards & 0x00ff);
-        s_eo_theskin.errorDescriptor.par64              = (s_eo_theskin.candiscoverytarget.canmap[eOcanport2] << 16) | (s_eo_theskin.candiscoverytarget.canmap[eOcanport1]);
+        s_eo_theskin.diagnostics.errorDescriptor.sourcedevice       = eo_errman_sourcedevice_localboard;
+        s_eo_theskin.diagnostics.errorDescriptor.sourceaddress      = 0;
+        s_eo_theskin.diagnostics.errorDescriptor.par16              = (numofboards << 8) | (eo_skin_maxnumberofMTBboards & 0x00ff);
+        s_eo_theskin.diagnostics.errorDescriptor.par64              = (s_eo_theskin.sharedcan.discoverytarget.canmap[eOcanport2] << 16) | (s_eo_theskin.sharedcan.discoverytarget.canmap[eOcanport1]);
        
         EOaction_strg astrg = {0};
         EOaction *act = (EOaction*)&astrg;
         eo_action_SetCallback(act, s_eo_skin_send_periodic_error_report, NULL, eov_callbackman_GetTask(eov_callbackman_GetHandle()));        
         
-        s_eo_theskin.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_skin_failed_toomanyboards);
-        s_eo_theskin.errorType = eo_errortype_error;                
-        eo_errman_Error(eo_errman_GetHandle(), s_eo_theskin.errorType, NULL, s_eobj_ownname, &s_eo_theskin.errorDescriptor);
+        s_eo_theskin.diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_skin_failed_toomanyboards);
+        s_eo_theskin.diagnostics.errorType = eo_errortype_error;                
+        eo_errman_Error(eo_errman_GetHandle(), s_eo_theskin.diagnostics.errorType, NULL, s_eobj_ownname, &s_eo_theskin.diagnostics.errorDescriptor);
         
-        if(0 != s_eo_theskin.reportPeriod)
+        if(0 != s_eo_theskin.diagnostics.reportPeriod)
         {
-            s_eo_theskin.errorCallbackCount = EOK_int08dummy;
-            eo_timer_Start(s_eo_theskin.errorReportTimer, eok_abstimeNOW, s_eo_theskin.reportPeriod, eo_tmrmode_FOREVER, act);   
+            s_eo_theskin.diagnostics.errorCallbackCount = EOK_int08dummy;
+            eo_timer_Start(s_eo_theskin.diagnostics.reportTimer, eok_abstimeNOW, s_eo_theskin.diagnostics.reportPeriod, eo_tmrmode_FOREVER, act);   
         }            
         
         return(eores_NOK_generic); 
     }
               
     
-    eOcandiscovery_onstop_t onstop = 
-    {
-        .function   = s_eo_skin_onstop_search4mtbs,
-        .parameter  = (void*)servcfg
-    };
+
+    s_eo_theskin.sharedcan.ondiscoverystop.function = s_eo_skin_onstop_search4mtbs;
+    s_eo_theskin.sharedcan.ondiscoverystop.parameter = (void*)servcfg;
     
-        
-    eo_candiscovery2_Start(eo_candiscovery2_GetHandle(), &s_eo_theskin.candiscoverytarget, &onstop);   
+    // start discovery   
+    eo_candiscovery2_Start(eo_candiscovery2_GetHandle(), &s_eo_theskin.sharedcan.discoverytarget, &s_eo_theskin.sharedcan.ondiscoverystop);   
    
     return(eores_OK);   
 }
@@ -263,7 +272,7 @@ extern eOresult_t eo_skin_Deactivate(EOtheSKIN *p)
         return(eores_NOK_nullpointer);
     }
 
-    if(eobool_false == s_eo_theskin.active)
+    if(eobool_false == s_eo_theskin.service.active)
     {
         return(eores_OK);        
     } 
@@ -272,9 +281,9 @@ extern eOresult_t eo_skin_Deactivate(EOtheSKIN *p)
     eo_skin_TXstop(&s_eo_theskin);
 
         
-    eo_canmap_DeconfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_skin, eoprot_entity_sk_skin, s_eo_theskin.canentitydescriptor); 
+    eo_canmap_DeconfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_skin, eoprot_entity_sk_skin, s_eo_theskin.sharedcan.entitydescriptor); 
     
-    eo_canmap_UnloadBoards(eo_canmap_GetHandle(), s_eo_theskin.canboardproperties);
+    eo_canmap_UnloadBoards(eo_canmap_GetHandle(), s_eo_theskin.sharedcan.boardproperties);
      
     
     eo_entities_SetNumOfSkins(eo_entities_GetHandle(), 0);
@@ -285,21 +294,21 @@ extern eOresult_t eo_skin_Deactivate(EOtheSKIN *p)
     for(i=0; i<eomn_serv_skin_maxpatches; i++)
     {
         s_eo_theskin.skinpatches[i] = NULL;
-        s_eo_theskin.patchistransmitting[i] = eobool_false;
+        s_eo_theskin.patchisrunning[i] = eobool_false;
         
         eo_vector_Clear(s_eo_theskin.rxdata[i]);
     }
     
-    memset(&s_eo_theskin.servconfig, 0, sizeof(eOmn_serv_configuration_t));
-    s_eo_theskin.servconfig.type = eomn_serv_NONE;
+    memset(&s_eo_theskin.service.servconfig, 0, sizeof(eOmn_serv_configuration_t));
+    s_eo_theskin.service.servconfig.type = eomn_serv_NONE;
     
-    eo_vector_Clear(s_eo_theskin.canboardproperties);
-    eo_vector_Clear(s_eo_theskin.canentitydescriptor);
+    eo_vector_Clear(s_eo_theskin.sharedcan.boardproperties);
+    eo_vector_Clear(s_eo_theskin.sharedcan.entitydescriptor);
     
     // make sure the timer is not running
-    eo_timer_Stop(s_eo_theskin.errorReportTimer);  
+    eo_timer_Stop(s_eo_theskin.diagnostics.reportTimer);  
     
-    s_eo_theskin.active = eobool_false;
+    s_eo_theskin.service.active = eobool_false;
     
     return(eores_OK);
 }
@@ -317,7 +326,7 @@ extern eOresult_t eo_skin_Activate(EOtheSKIN *p, const eOmn_serv_configuration_t
         return(eores_NOK_generic);
     }
     
-    if(eobool_true == s_eo_theskin.active)
+    if(eobool_true == s_eo_theskin.service.active)
     {
         eo_skin_Deactivate(p);        
     }   
@@ -327,12 +336,12 @@ extern eOresult_t eo_skin_Activate(EOtheSKIN *p, const eOmn_serv_configuration_t
 
     if(0 == eo_entities_NumOfSkins(eo_entities_GetHandle()))
     {
-        s_eo_theskin.active = eobool_false;
+        s_eo_theskin.service.active = eobool_false;
         return(eores_NOK_generic);
     }
     else
     {         
-        memcpy(&s_eo_theskin.servconfig, servcfg, sizeof(eOmn_serv_configuration_t));
+        memcpy(&s_eo_theskin.service.servconfig, servcfg, sizeof(eOmn_serv_configuration_t));
 
         s_eo_theskin.numofskinpatches = servcfg->data.sk.skin.numofpatches;
         
@@ -372,12 +381,12 @@ extern eOresult_t eo_skin_Activate(EOtheSKIN *p, const eOmn_serv_configuration_t
                     {   // i pushback. i dont verify vs teh capacity of the vector because eo_skin_Verify() has already done it
                         prop.location.port = j;
                         prop.location.addr = k;
-                        eo_vector_PushBack(s_eo_theskin.canboardproperties, &prop);
+                        eo_vector_PushBack(s_eo_theskin.sharedcan.boardproperties, &prop);
                         
                         des.location.port = j;
                         des.location.addr = k;
                         des.index = (eOcanmap_entityindex_t)i;                        
-                        eo_vector_PushBack(s_eo_theskin.canentitydescriptor, &des);
+                        eo_vector_PushBack(s_eo_theskin.sharedcan.entitydescriptor, &des);
                         
                         s_eo_theskin.numofmtbs++;
                     }
@@ -386,12 +395,12 @@ extern eOresult_t eo_skin_Activate(EOtheSKIN *p, const eOmn_serv_configuration_t
         }
         
         // load the can mapping 
-        eo_canmap_LoadBoards(eo_canmap_GetHandle(), s_eo_theskin.canboardproperties); 
+        eo_canmap_LoadBoards(eo_canmap_GetHandle(), s_eo_theskin.sharedcan.boardproperties); 
         
         // load the entity mapping.
-        eo_canmap_ConfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_skin, eoprot_entity_sk_skin, s_eo_theskin.canentitydescriptor);   
+        eo_canmap_ConfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_skin, eoprot_entity_sk_skin, s_eo_theskin.sharedcan.entitydescriptor);   
 
-        s_eo_theskin.active = eobool_true;        
+        s_eo_theskin.service.active = eobool_true;        
     }
     
     return(eores_OK);   
@@ -406,8 +415,8 @@ extern eOresult_t eo_skin_TXstop(EOtheSKIN *p)
         return(eores_NOK_nullpointer);
     }
     
-    if((eobool_false == s_eo_theskin.active))
-    {   // nothing to do because we dont have skin active
+    if((eobool_false == s_eo_theskin.service.active))
+    {   // nothing to do because we dont have skin service.active
         return(eores_OK);
     }
     
@@ -415,9 +424,9 @@ extern eOresult_t eo_skin_TXstop(EOtheSKIN *p)
     // now, i do things. 
     
     icubCanProto_as_sigmode_t sigmode = icubCanProto_as_sigmode_dontsignal;
-    s_eo_theskin.command.class = eocanprot_msgclass_pollingSkin;
-    s_eo_theskin.command.type  = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;       
-    s_eo_theskin.command.value = &sigmode;
+    s_eo_theskin.sharedcan.command.class = eocanprot_msgclass_pollingSkin;
+    s_eo_theskin.sharedcan.command.type  = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;       
+    s_eo_theskin.sharedcan.command.value = &sigmode;
 
     uint8_t i=0;
     eOsk_skin_t *skin = NULL;
@@ -430,7 +439,7 @@ extern eOresult_t eo_skin_TXstop(EOtheSKIN *p)
         }
         
         // i stop this skin only if it was started before
-        if(s_eo_theskin.patchistransmitting[i] == eobool_false)
+        if(s_eo_theskin.patchisrunning[i] == eobool_false)
         {
             continue;
         }
@@ -454,11 +463,11 @@ extern eOresult_t eo_skin_TXstop(EOtheSKIN *p)
        
         // i get the addresses of the can boards of the i-th skin.
         // the simplification we use is that they all are on the same CAN bus and all have consecutive addresses.
-        // we send the same s_eo_theskin.command to all of them
+        // we send the same s_eo_theskin.sharedcan.command to all of them
         eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_skin, eoprot_entity_sk_skin, i, 0);
-        eo_canserv_SendCommandToAllBoardsInEntity(eo_canserv_GetHandle(), &s_eo_theskin.command, id32);    
+        eo_canserv_SendCommandToAllBoardsInEntity(eo_canserv_GetHandle(), &s_eo_theskin.sharedcan.command, id32);    
         
-        s_eo_theskin.patchistransmitting[i] = eobool_false;
+        s_eo_theskin.patchisrunning[i] = eobool_false;
     }
         
     return(eores_OK);
@@ -473,8 +482,8 @@ extern eOresult_t eo_skin_SetMode(EOtheSKIN *p, uint8_t patchindex, eOsk_sigmode
         return(eores_NOK_nullpointer);
     }
     
-    if(eobool_false == s_eo_theskin.active)
-    {   // nothing to do because we dont have skin active
+    if(eobool_false == s_eo_theskin.service.active)
+    {   // nothing to do because we dont have skin service.active
         return(eores_OK);
     } 
 
@@ -483,9 +492,9 @@ extern eOresult_t eo_skin_SetMode(EOtheSKIN *p, uint8_t patchindex, eOsk_sigmode
         return(eores_NOK_generic);
     }
         
-    s_eo_theskin.command.class = eocanprot_msgclass_pollingSkin;    
-    s_eo_theskin.command.type  = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;
-    s_eo_theskin.command.value = NULL;   
+    s_eo_theskin.sharedcan.command.class = eocanprot_msgclass_pollingSkin;    
+    s_eo_theskin.sharedcan.command.type  = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;
+    s_eo_theskin.sharedcan.command.value = NULL;   
 
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_skin, eoprot_entity_sk_skin, patchindex, eoprot_tag_none);
     
@@ -496,35 +505,35 @@ extern eOresult_t eo_skin_SetMode(EOtheSKIN *p, uint8_t patchindex, eOsk_sigmode
             // in old way it does not exist
             // in new way:
             icubCanProto_as_sigmode_t sigmode2use = icubCanProto_as_sigmode_dontsignal;
-            s_eo_theskin.command.value = &sigmode2use;
+            s_eo_theskin.sharedcan.command.value = &sigmode2use;
             // and now we send the command to all the skin boards
-            eo_canserv_SendCommandToAllBoardsInEntity(eo_canserv_GetHandle(), &s_eo_theskin.command, id32);
+            eo_canserv_SendCommandToAllBoardsInEntity(eo_canserv_GetHandle(), &s_eo_theskin.sharedcan.command, id32);
             // and we set this patch as not tx
-            s_eo_theskin.patchistransmitting[patchindex] = eobool_false;
+            s_eo_theskin.patchisrunning[patchindex] = eobool_false;
             
         } break;
         
         case eosk_sigmode_signal:
         {
             icubCanProto_as_sigmode_t sigmode2use = icubCanProto_as_sigmode_signal;
-            s_eo_theskin.command.value = &sigmode2use;
+            s_eo_theskin.sharedcan.command.value = &sigmode2use;
             // and now we send the command to all the skin boards
-            eo_canserv_SendCommandToAllBoardsInEntity(eo_canserv_GetHandle(), &s_eo_theskin.command, id32);
+            eo_canserv_SendCommandToAllBoardsInEntity(eo_canserv_GetHandle(), &s_eo_theskin.sharedcan.command, id32);
             // and we set this patch as tx
-            s_eo_theskin.patchistransmitting[patchindex] = eobool_true;
+            s_eo_theskin.patchisrunning[patchindex] = eobool_true;
 
         } break;
 
         case eosk_sigmode_signal_oldway:
         {
             // we need to change the class and type as well
-            s_eo_theskin.command.class = eocanprot_msgclass_pollingSkin;    
-            s_eo_theskin.command.type  = ICUBCANPROTO_POL_SK_CMD__TACT_SETUP;
-            s_eo_theskin.command.value = NULL;     
+            s_eo_theskin.sharedcan.command.class = eocanprot_msgclass_pollingSkin;    
+            s_eo_theskin.sharedcan.command.type  = ICUBCANPROTO_POL_SK_CMD__TACT_SETUP;
+            s_eo_theskin.sharedcan.command.value = NULL;     
             // and now we send the command to all the skin boards
-            eo_canserv_SendCommandToAllBoardsInEntity(eo_canserv_GetHandle(), &s_eo_theskin.command, id32);
+            eo_canserv_SendCommandToAllBoardsInEntity(eo_canserv_GetHandle(), &s_eo_theskin.sharedcan.command, id32);
             // and we set this patch as tx
-            s_eo_theskin.patchistransmitting[patchindex] = eobool_true;
+            s_eo_theskin.patchisrunning[patchindex] = eobool_true;
                        
             
             eOerrmanDescriptor_t errdes = {0};
@@ -581,8 +590,8 @@ extern eOresult_t eo_skin_SetBoardsConfig(EOtheSKIN *p, uint8_t patchindex, eOsk
         return(eores_NOK_nullpointer);
     }
     
-    if(eobool_false == s_eo_theskin.active)
-    {   // nothing to do because we dont have skin active
+    if(eobool_false == s_eo_theskin.service.active)
+    {   // nothing to do because we dont have skin service.active
         return(eores_OK);
     } 
 
@@ -598,12 +607,12 @@ extern eOresult_t eo_skin_SetBoardsConfig(EOtheSKIN *p, uint8_t patchindex, eOsk
     canProto_skcfg.period   = brdcfg->cfg.period;
     canProto_skcfg.noload   = brdcfg->cfg.noload;
     
-    s_eo_theskin.command.class = eocanprot_msgclass_pollingSkin;    
-    s_eo_theskin.command.type  = ICUBCANPROTO_POL_SK_CMD__SET_BRD_CFG;
-    s_eo_theskin.command.value = &canProto_skcfg; 
+    s_eo_theskin.sharedcan.command.class = eocanprot_msgclass_pollingSkin;    
+    s_eo_theskin.sharedcan.command.type  = ICUBCANPROTO_POL_SK_CMD__SET_BRD_CFG;
+    s_eo_theskin.sharedcan.command.value = &canProto_skcfg; 
     
-    // and now we send the s_eo_theskin.command to all the skin boards
-    eo_canserv_SendCommandToAllBoardsInEntity(eo_canserv_GetHandle(), &s_eo_theskin.command, id32); 
+    // and now we send the s_eo_theskin.sharedcan.command to all the skin boards
+    eo_canserv_SendCommandToAllBoardsInEntity(eo_canserv_GetHandle(), &s_eo_theskin.sharedcan.command, id32); 
     
     return(eores_OK);          
 }
@@ -616,7 +625,7 @@ extern eOresult_t eo_skin_SetTrianglesConfig(EOtheSKIN *p, uint8_t patchindex, e
         return(eores_NOK_nullpointer);
     }
     
-    if(eobool_false == s_eo_theskin.active)
+    if(eobool_false == s_eo_theskin.service.active)
     {   // nothing to do because we dont have a skin board
         return(eores_OK);
     } 
@@ -636,9 +645,9 @@ extern eOresult_t eo_skin_SetTrianglesConfig(EOtheSKIN *p, uint8_t patchindex, e
     canProto_trgscfg.CDCoffset = trgcfg->cfg.CDCoffset;
     
     
-    s_eo_theskin.command.class = eocanprot_msgclass_pollingSkin;    
-    s_eo_theskin.command.type  = ICUBCANPROTO_POL_SK_CMD__SET_TRIANG_CFG;
-    s_eo_theskin.command.value = &canProto_trgscfg; 
+    s_eo_theskin.sharedcan.command.class = eocanprot_msgclass_pollingSkin;    
+    s_eo_theskin.sharedcan.command.type  = ICUBCANPROTO_POL_SK_CMD__SET_TRIANG_CFG;
+    s_eo_theskin.sharedcan.command.value = &canProto_trgscfg; 
     
     eOcanmap_location_t location = {0};
     eo_canmap_GetEntityLocation(eo_canmap_GetHandle(), id32, &location, NULL, NULL);
@@ -647,7 +656,7 @@ extern eOresult_t eo_skin_SetTrianglesConfig(EOtheSKIN *p, uint8_t patchindex, e
     // then, as we already have the address in trgcfg->boardaddr, we copy it in location.addr.
     // if eOsk_cmd_trianglesCfg_t contained also port, we would not need to do that.... 
     location.addr = trgcfg->boardaddr;
-    eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), &s_eo_theskin.command, location);    
+    eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), &s_eo_theskin.sharedcan.command, location);    
    
     return(eores_OK);          
 }
@@ -660,8 +669,8 @@ extern eOresult_t eo_skin_AcceptCANframe(EOtheSKIN *p, eOcanframe_t *frame, eOca
         return(eores_NOK_nullpointer);
     }
     
-    if(eobool_false == s_eo_theskin.active)
-    {   // nothing to do because we dont have skin active
+    if(eobool_false == s_eo_theskin.service.active)
+    {   // nothing to do because we dont have skin service.active
         return(eores_OK);
     } 
     
@@ -716,8 +725,8 @@ extern eOresult_t eo_skin_Tick(EOtheSKIN *p, eObool_t regularROPSjustTransmitted
         return(eores_NOK_nullpointer);
     }
     
-    if(eobool_false == s_eo_theskin.active)
-    {   // nothing to do because we dont have skin active
+    if(eobool_false == s_eo_theskin.service.active)
+    {   // nothing to do because we dont have skin service.active
         return(eores_OK);
     } 
     
@@ -830,11 +839,11 @@ extern eObool_t eocanprotSKperiodic_redefinable_SkipParsingOf_ANY_PERIODIC_SKIN_
 static eObool_t s_eo_skin_activeskin_can_accept_canframe(void)
 {
 #if     defined(EOSKIN_ALWAYS_ACCEPT_CANFRAMES_IN_ACTIVE_MODE)
-    // in this case the active skin always accepts can frames, even if the run mode is not.
+    // in this case the service.active skin always accepts can frames, even if the run mode is not.
     // it is up to robotInterface to put system in run mode, so that the overflow of fifo is avoided
     return(eobool_true);
 #else
-    // in this mode the active skin accepts can frames only if we are in run mode, thus the fifo can be emptied.    
+    // in this mode the service.active skin accepts can frames only if we are in run mode, thus the fifo can be emptied.    
     eOsmStatesEMSappl_t applstate = eo_sm_emsappl_STerr;
     eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &applstate);   
     if(eo_sm_emsappl_STrun == applstate)
@@ -877,17 +886,17 @@ static eOresult_t s_eo_skin_onstop_search4mtbs(void *par, EOtheCANdiscovery2* p,
 {
     const eOmn_serv_configuration_t * servcfg = (const eOmn_serv_configuration_t *)par;
     
-    if((eobool_true == searchisok) && (eobool_true == s_eo_theskin.activateafterverify))
+    if((eobool_true == searchisok) && (eobool_true == s_eo_theskin.service.activateafterverify))
     {
         eo_skin_Activate(&s_eo_theskin, servcfg);        
     }
 
-    s_eo_theskin.errorDescriptor.sourcedevice       = eo_errman_sourcedevice_localboard;
-    s_eo_theskin.errorDescriptor.sourceaddress      = 0;
-    s_eo_theskin.errorDescriptor.par16              = servcfg->data.sk.skin.numofpatches;
-    s_eo_theskin.errorDescriptor.par64              = (servcfg->data.sk.skin.version.firmware.minor)       | (servcfg->data.sk.skin.version.firmware.major << 8) |
+    s_eo_theskin.diagnostics.errorDescriptor.sourcedevice       = eo_errman_sourcedevice_localboard;
+    s_eo_theskin.diagnostics.errorDescriptor.sourceaddress      = 0;
+    s_eo_theskin.diagnostics.errorDescriptor.par16              = servcfg->data.sk.skin.numofpatches;
+    s_eo_theskin.diagnostics.errorDescriptor.par64              = (servcfg->data.sk.skin.version.firmware.minor)       | (servcfg->data.sk.skin.version.firmware.major << 8) |
                                                       (servcfg->data.sk.skin.version.protocol.minor << 16) | (servcfg->data.sk.skin.version.protocol.major << 24) |
-                                                      ((uint64_t)s_eo_theskin.candiscoverytarget.canmap[eOcanport1] << 32) | ((uint64_t)s_eo_theskin.candiscoverytarget.canmap[eOcanport2] << 48);
+                                                      ((uint64_t)s_eo_theskin.sharedcan.discoverytarget.canmap[eOcanport1] << 32) | ((uint64_t)s_eo_theskin.sharedcan.discoverytarget.canmap[eOcanport2] << 48);
    
     EOaction_strg astrg = {0};
     EOaction *act = (EOaction*)&astrg;
@@ -895,14 +904,14 @@ static eOresult_t s_eo_skin_onstop_search4mtbs(void *par, EOtheCANdiscovery2* p,
 
     if(eobool_true == searchisok)
     {        
-        s_eo_theskin.errorType = eo_errortype_debug;
-        s_eo_theskin.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_skin_ok);
-        eo_errman_Error(eo_errman_GetHandle(), s_eo_theskin.errorType, NULL, s_eobj_ownname, &s_eo_theskin.errorDescriptor);
+        s_eo_theskin.diagnostics.errorType = eo_errortype_debug;
+        s_eo_theskin.diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_skin_ok);
+        eo_errman_Error(eo_errman_GetHandle(), s_eo_theskin.diagnostics.errorType, NULL, s_eobj_ownname, &s_eo_theskin.diagnostics.errorDescriptor);
         
-        if((0 != s_eo_theskin.repetitionOKcase) && (0 != s_eo_theskin.reportPeriod))
+        if((0 != s_eo_theskin.diagnostics.repetitionOKcase) && (0 != s_eo_theskin.diagnostics.reportPeriod))
         {
-            s_eo_theskin.errorCallbackCount = s_eo_theskin.repetitionOKcase;        
-            eo_timer_Start(s_eo_theskin.errorReportTimer, eok_abstimeNOW, s_eo_theskin.reportPeriod, eo_tmrmode_FOREVER, act);
+            s_eo_theskin.diagnostics.errorCallbackCount = s_eo_theskin.diagnostics.repetitionOKcase;        
+            eo_timer_Start(s_eo_theskin.diagnostics.reportTimer, eok_abstimeNOW, s_eo_theskin.diagnostics.reportPeriod, eo_tmrmode_FOREVER, act);
         }
     }
     
@@ -914,27 +923,27 @@ static eOresult_t s_eo_skin_onstop_search4mtbs(void *par, EOtheCANdiscovery2* p,
         
         const eOcandiscovery_detection_t* detection = eo_candiscovery2_GetDetection(eo_candiscovery2_GetHandle());
                 
-        uint16_t maskofmissingCAN1 = s_eo_theskin.candiscoverytarget.canmap[0] & (~detection->replies[0]);
-        uint16_t maskofmissingCAN2 = s_eo_theskin.candiscoverytarget.canmap[1] & (~detection->replies[1]);
+        uint16_t maskofmissingCAN1 = s_eo_theskin.sharedcan.discoverytarget.canmap[0] & (~detection->replies[0]);
+        uint16_t maskofmissingCAN2 = s_eo_theskin.sharedcan.discoverytarget.canmap[1] & (~detection->replies[1]);
         uint16_t maskofincompatibleCAN1 = detection->incompatibilities[0]; 
         uint16_t maskofincompatibleCAN2 = detection->incompatibilities[1]; 
         
-        s_eo_theskin.errorDescriptor.par64 = ((uint64_t)maskofmissingCAN1) | ((uint64_t)maskofmissingCAN2<<16) | ((uint64_t)maskofincompatibleCAN1<<32) | ((uint64_t)maskofincompatibleCAN2<<32);
+        s_eo_theskin.diagnostics.errorDescriptor.par64 = ((uint64_t)maskofmissingCAN1) | ((uint64_t)maskofmissingCAN2<<16) | ((uint64_t)maskofincompatibleCAN1<<32) | ((uint64_t)maskofincompatibleCAN2<<32);
         
-        s_eo_theskin.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_skin_failed_candiscovery);
-        s_eo_theskin.errorType = eo_errortype_error;                
-        eo_errman_Error(eo_errman_GetHandle(), s_eo_theskin.errorType, NULL, s_eobj_ownname, &s_eo_theskin.errorDescriptor);
+        s_eo_theskin.diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_skin_failed_candiscovery);
+        s_eo_theskin.diagnostics.errorType = eo_errortype_error;                
+        eo_errman_Error(eo_errman_GetHandle(), s_eo_theskin.diagnostics.errorType, NULL, s_eobj_ownname, &s_eo_theskin.diagnostics.errorDescriptor);
         
-        if(0 != s_eo_theskin.reportPeriod)
+        if(0 != s_eo_theskin.diagnostics.reportPeriod)
         {
-            s_eo_theskin.errorCallbackCount = EOK_int08dummy;
-            eo_timer_Start(s_eo_theskin.errorReportTimer, eok_abstimeNOW, s_eo_theskin.reportPeriod, eo_tmrmode_FOREVER, act);
+            s_eo_theskin.diagnostics.errorCallbackCount = EOK_int08dummy;
+            eo_timer_Start(s_eo_theskin.diagnostics.reportTimer, eok_abstimeNOW, s_eo_theskin.diagnostics.reportPeriod, eo_tmrmode_FOREVER, act);
         }
     }  
     
-    if(NULL != s_eo_theskin.onverify)
+    if(NULL != s_eo_theskin.service.onverify)
     {
-        s_eo_theskin.onverify(&s_eo_theskin, searchisok); 
+        s_eo_theskin.service.onverify(&s_eo_theskin, searchisok); 
     }    
     
     return(eores_OK);
@@ -944,15 +953,15 @@ static eOresult_t s_eo_skin_onstop_search4mtbs(void *par, EOtheCANdiscovery2* p,
 
 static void s_eo_skin_send_periodic_error_report(void *p)
 {
-    eo_errman_Error(eo_errman_GetHandle(), s_eo_theskin.errorType, NULL, s_eobj_ownname, &s_eo_theskin.errorDescriptor);
+    eo_errman_Error(eo_errman_GetHandle(), s_eo_theskin.diagnostics.errorType, NULL, s_eobj_ownname, &s_eo_theskin.diagnostics.errorDescriptor);
     
-    if(EOK_int08dummy != s_eo_theskin.errorCallbackCount)
+    if(EOK_int08dummy != s_eo_theskin.diagnostics.errorCallbackCount)
     {
-        s_eo_theskin.errorCallbackCount--;
+        s_eo_theskin.diagnostics.errorCallbackCount--;
     }
-    if(0 == s_eo_theskin.errorCallbackCount)
+    if(0 == s_eo_theskin.diagnostics.errorCallbackCount)
     {
-        eo_timer_Stop(s_eo_theskin.errorReportTimer);
+        eo_timer_Stop(s_eo_theskin.diagnostics.reportTimer);
     }
 }
 

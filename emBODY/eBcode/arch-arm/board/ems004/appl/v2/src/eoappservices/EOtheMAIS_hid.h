@@ -42,28 +42,43 @@
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
 
-struct EOtheMAIS_hid
+typedef struct
 {
-    eObool_t                                initted;
-    eObool_t                                active;
-    uint8_t                                 protindex;
-    eOprotID32_t                            id32;
-    eOcanprot_command_t                     command;
-    EOvector*                               canboardproperties;
-    EOvector*                               canentitydescriptor;
     eOmn_serv_configuration_t               servconfig;
-    eOcandiscovery_target_t                 candiscoverytarget;
-    eOmais_onendofoperation_fun_t           onverify;
+    eObool_t                                initted;
+    eObool_t                                active;  
     eObool_t                                activateafterverify;
-    eObool_t                                itistransmitting;
-    eOas_mais_t*                            mais;  
-    // this part if for error (diagnostics) reporting: if something is OK or NOT OK. we use a timer to repeat for some time the messages
-    EOtimer*                                errorReportTimer;
+    eObool_t                                running;
+    eOmais_onendofoperation_fun_t           onverify;
+} eOmais_objs_service_t;    
+
+typedef struct
+{
+    EOvector*                               boardproperties;
+    EOvector*                               entitydescriptor;
+    eOcandiscovery_target_t                 discoverytarget;
+    eOcandiscovery_onstop_t                 ondiscoverystop; 
+    eOcanprot_command_t                     command;    
+} eOmais_objs_sharedcan_t; // poi rinomina in objs_can_t
+
+typedef struct
+{
+    EOtimer*                                reportTimer;
+    eOreltime_t                             reportPeriod;  
     eOerrmanDescriptor_t                    errorDescriptor;
     eOerrmanErrorType_t                     errorType;
     uint8_t                                 errorCallbackCount;
     uint8_t                                 repetitionOKcase;
-    eOreltime_t                             reportPeriod;
+} eOmais_objs_diagnostics_t;
+
+struct EOtheMAIS_hid
+{
+    eOmais_objs_service_t                   service;
+    eOmais_objs_diagnostics_t               diagnostics;
+    eOmais_objs_sharedcan_t                 sharedcan;
+    
+    eOprotID32_t                            id32;  
+    eOas_mais_t*                            mais;    
 }; 
 
 

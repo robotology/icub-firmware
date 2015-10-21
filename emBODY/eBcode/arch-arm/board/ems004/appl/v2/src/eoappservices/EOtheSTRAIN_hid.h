@@ -42,30 +42,45 @@
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
-
-struct EOtheSTRAIN_hid
+typedef struct
 {
-    eObool_t                                initted;
-    eObool_t                                active;
-    uint8_t                                 protindex;
-    eOprotID32_t                            id32;
-    eOcanprot_command_t                     command;
-    EOvector*                               canboardproperties;
-    EOvector*                               canentitydescriptor;
     eOmn_serv_configuration_t               servconfig;
-    eOcandiscovery_target_t                 candiscoverytarget;
-    eOstrain_onendofoperation_fun_t         onverify;
+    eObool_t                                initted;
+    eObool_t                                active;  
     eObool_t                                activateafterverify;
-    eObool_t                                itistransmitting;
-    eOas_strain_t*                          strain;
-    eOstrain_onendofoperation_fun_t         overrideonfullscaleready;
-    // this part if for error (diagnostics) reporting: if something is OK or NOT OK. we use a timer to repeat for some time the messages
-    EOtimer*                                errorReportTimer;
+    eObool_t                                running;
+    eOstrain_onendofoperation_fun_t         onverify;
+} eOstrain_objs_service_t;
+
+typedef struct
+{
+    EOvector*                               boardproperties;
+    EOvector*                               entitydescriptor;
+    eOcandiscovery_target_t                 discoverytarget;
+    eOcandiscovery_onstop_t                 ondiscoverystop;   
+    eOcanprot_command_t                     command;
+} eOstrain_objs_sharedcan_t;
+
+typedef struct
+{
+    EOtimer*                                reportTimer;
+    eOreltime_t                             reportPeriod;  
     eOerrmanDescriptor_t                    errorDescriptor;
     eOerrmanErrorType_t                     errorType;
     uint8_t                                 errorCallbackCount;
     uint8_t                                 repetitionOKcase;
-    eOreltime_t                             reportPeriod;
+} eOstrain_objs_diagnostics_t;
+
+
+struct EOtheSTRAIN_hid
+{
+    eOstrain_objs_service_t                 service;
+    eOstrain_objs_diagnostics_t             diagnostics;
+    eOstrain_objs_sharedcan_t               sharedcan;
+    
+    eOprotID32_t                            id32;
+    eOstrain_onendofoperation_fun_t         overrideonfullscaleready; 
+    eOas_strain_t*                          strain;       
 }; 
 
 
