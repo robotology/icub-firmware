@@ -210,7 +210,7 @@ extern void eo_axisController_StartCalibration_type5(EOaxisController *o, int32_
     //set the values to start procedure
     o->pwm_limit_calib = pwmlimit;
     
-    if (o->pwm_limit_calib > 0)
+    if (o->pwm_limit_calib >= 0)
         o->pos_to_reach = final_position;
     else
         o->pos_to_reach = -final_position;
@@ -404,11 +404,7 @@ extern int32_t eo_axisController_GetAxisVel (EOaxisController *o)
 extern void eo_axisController_SetEncPos(EOaxisController *o, int32_t pos)
 {
     if (!o) return;
-    
-    if((o->calibration_type == eomc_calibration_type5_hard_stops_mc4plus) && !(eo_axisController_IsCalibrated(o)))
-        o->position = pos;
-    else 
-        o->position = pos - eo_axisController_GetAxisCalibrationZero(o);
+    o->position = pos - eo_axisController_GetAxisCalibrationZero(o);
 } 
 
 extern void eo_axisController_SetEncVel(EOaxisController *o, int32_t vel)
@@ -740,39 +736,47 @@ extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
                 {
                     // here I should only set the final position (the one in which the hardware limit is reached) to the value indicated in param3 of the calib
                     // the setting of this offset should be done only once!                  
-                    eo_pid_Reset(o->pidP);
+                    //eo_pid_Reset(o->pidP);
                     
                     o->offset = pos - o->pos_to_reach;
                     
+                    o->hardwarelimitisreached = 1;
+                    
+                    //validation check disabled at the moment
+                    /*
                     int32_t new_pos = pos - o->offset;
+                    //if offset is taking the joint out of limits, I change it
+                    int32_t workrange = o->pos_max - o->pos_min;
+                    if (new_pos < o->pos_min)
+                        o->offset -= workrange;
+                    else if (new_pos > o->pos_max)
+                        o->offset += workrange;
+                    */ 
                     
                     //out of bound protection (redundant, but protect from typo inside XML)
-                    if ( new_pos < (o->pos_min - TICKS_PER_HALF_REVOLUTION))
-                        new_pos += TICKS_PER_REVOLUTION;
-                    else if (new_pos > (o->pos_max + TICKS_PER_HALF_REVOLUTION))
-                        new_pos -= TICKS_PER_REVOLUTION;
+                    //if ( new_pos < (o->pos_min - TICKS_PER_HALF_REVOLUTION))
+                    //    new_pos += TICKS_PER_REVOLUTION;
+                    //else if (new_pos > (o->pos_max + TICKS_PER_HALF_REVOLUTION))
+                    //    new_pos -= TICKS_PER_REVOLUTION;
                     
+                    //done in eo_emsController_CheckCalibrations now
+                    /*
                     //update axis, trajectory pos
                     //eo_axisController_SetEncPos(o, new_pos);
-                    o->position = new_pos -  o->calibration_zero;
-                    eo_axisController_SetEncVel(o, vel);
+                    //o->position = new_pos -  o->calibration_zero;
+                    //eo_axisController_SetEncVel(o, vel);
                 
-                    eo_trajectory_Init(o->trajectory, new_pos - o->calibration_zero, vel, 0);
-                    eo_trajectory_Stop(o->trajectory, new_pos - o->calibration_zero);
-                    o->err = 0;
+                    //eo_trajectory_Init(o->trajectory, new_pos - o->calibration_zero, vel, 0);
+                    //eo_trajectory_Stop(o->trajectory, new_pos - o->calibration_zero);
+                    //o->err = 0;
                     
                     // we set true this flag, so that for teh case of virtually coupled joint 
                     // the next time we call the function we just return 0 (see above in TAG-XXX)
                     // even if we stay in calibration control mode.
 
-                    o->hardwarelimitisreached = 1;
-                    
-                    //not setting the axis as calibrated and going to position...eo_emsController_CheckCalibrations is doing this now
-                    /*
                     if(0 == o->isvirtuallycoupled)
                     {   // we finish the calibration only if there is no virtual coupling (i.e.: if the axis is NOT rigth or left eye).
                         eo_axisController_SetCalibrated (o);
-                        o->control_mode = eomc_controlmode_position;
                     }
                     */
                     
@@ -787,9 +791,11 @@ extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
                 //important! need to do that only if the encoder has been already initialized
                 if (!eo_axisController_IsCalibrated(o)) 
                 {
+                    /*
                     o->interact_mode = eOmc_interactionmode_stiff;
                     *stiff = eobool_true;
                     o->err = 0;
+                    */
                     return o->pwm_limit_calib;
                 }
             }
@@ -830,6 +836,8 @@ extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
             // calib type 3
             else if (o->calibration_type == eomc_calibration_type3_abs_sens_digital)
             {
+                //done in eo_emsController_CheckCalibrations now
+                /*
                 if (IS_CALIBRATED())
                 {
                     eo_pid_Reset(o->pidP);
@@ -840,6 +848,7 @@ extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
                 o->interact_mode = eOmc_interactionmode_stiff;
                 *stiff = eobool_true;
                 o->err = 0;
+                */
                 return 0;
             }
         }
@@ -1152,12 +1161,14 @@ extern void eo_axisController_RescaleAxisPosition(EOaxisController *o, int32_t c
     
     int32_t pos = current_pos - o->offset;
     
-    // out of bound protections
-    if (pos < (o->pos_min - TICKS_PER_HALF_REVOLUTION))
-        pos += TICKS_PER_REVOLUTION;
-    else if (pos > (o->pos_max + TICKS_PER_HALF_REVOLUTION))
-        pos -= TICKS_PER_REVOLUTION;
-
+    // out of bound protections (active only if I'm not calibrating)
+    if (o->control_mode != eomc_controlmode_calib)
+    {
+        if (pos < (o->pos_min - TICKS_PER_HALF_REVOLUTION))
+            pos += TICKS_PER_REVOLUTION;
+        else if (pos > (o->pos_max + TICKS_PER_HALF_REVOLUTION))
+            pos -= TICKS_PER_REVOLUTION;
+    }
     //update axis pos
     o->position = pos - eo_axisController_GetAxisCalibrationZero(o);
     return;
