@@ -626,7 +626,7 @@ extern void eo_emsController_PWM(int16_t* pwm_motor_16)
         }
     }
     
-    //moved to CheckCalibration
+    //done in eo_emsController_CheckCalibrations now
     /*
     if(emscontroller_board_HEAD_neckyaw_eyes == ems->board)        
     {

@@ -738,7 +738,7 @@ extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
                     // the setting of this offset should be done only once!                  
                     //eo_pid_Reset(o->pidP);
                     
-                    o->offset = pos - o->pos_to_reach;
+                    o->offset = pos - o->pos_to_reach + o->calibration_zero; //adding calib zero, so that the offset is computed only from the real axis position
                     
                     o->hardwarelimitisreached = 1;
                     
@@ -802,6 +802,8 @@ extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
             // calib type 6
             else if (o->calibration_type == eomc_calibration_type6_mais_mc4plus)
             {
+                #warning TBD: MAIS CALIBRATION
+                /*
                 if (IS_CALIBRATED())
                 {
                     eo_pid_Reset(o->pidP);
@@ -832,6 +834,7 @@ extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
                     eo_axisController_SetCalibrated (o);
                 }
                 return eo_pid_PWM_pid(o->pidP, o->err);
+                */
             }
             // calib type 3
             else if (o->calibration_type == eomc_calibration_type3_abs_sens_digital)
@@ -1161,15 +1164,18 @@ extern void eo_axisController_RescaleAxisPosition(EOaxisController *o, int32_t c
     
     int32_t pos = current_pos - o->offset;
     
-    // out of bound protections (active only if I'm not calibrating)
-    if (o->control_mode != eomc_controlmode_calib)
+    /* disabled */
+    // out of bound protections (active only if I'm not calibrating or not configured)
+    /*
+    if ((o->control_mode != eomc_controlmode_calib) && (o->control_mode != eomc_controlmode_notConfigured))
     {
         if (pos < (o->pos_min - TICKS_PER_HALF_REVOLUTION))
             pos += TICKS_PER_REVOLUTION;
         else if (pos > (o->pos_max + TICKS_PER_HALF_REVOLUTION))
             pos -= TICKS_PER_REVOLUTION;
     }
-    //update axis pos
+    */
+    //update axis pos and subtract calibration zero
     o->position = pos - eo_axisController_GetAxisCalibrationZero(o);
     return;
 }
@@ -1210,11 +1216,14 @@ extern void eo_axisController_RescaleAxisPositionToVersionVergence(EOaxisControl
         o = o3;
     }
     
-    
+    /* disabled */
+    //out of bound protection
+    /*
     if (pos < (o->pos_min - TICKS_PER_HALF_REVOLUTION))
         pos += TICKS_PER_REVOLUTION;
     else if (pos > (o->pos_max + TICKS_PER_HALF_REVOLUTION))
         pos -= TICKS_PER_REVOLUTION;     
+    */
     
     //update axis pos
     o->position = pos - eo_axisController_GetAxisCalibrationZero(o);    
