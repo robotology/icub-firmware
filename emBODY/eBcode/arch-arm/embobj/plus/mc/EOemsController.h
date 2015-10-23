@@ -104,6 +104,7 @@ extern eObool_t eo_emsController_SetInteractionMode(uint8_t joint, eOmc_interact
 
 extern void eo_emsController_SetMotorConfig(uint8_t joint, eOmc_motor_config_t motorconfig);
 extern void eo_emsController_SetRotorEncoder(uint8_t joint, int32_t rotorencoder);
+extern void eo_emsController_SetRotorEncoderSign(uint8_t motor, int32_t sign);
 extern void eo_emsController_ReadMotorstatus(uint8_t motor, uint8_t* state);
 extern void eo_emsController_GetMotorStatus(uint8_t mId, eOmc_motor_status_t* motor_status);
 

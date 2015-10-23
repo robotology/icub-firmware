@@ -78,6 +78,8 @@ struct EOemsController_hid
     int32_t motor_velocity[MAX_NAXLES];
     int32_t motor_velocity_gbx[MAX_NAXLES];
     int32_t motor_position[MAX_NAXLES];
+    int32_t motor_position_last[MAX_NAXLES];
+    int8_t motor_position_sign[MAX_NAXLES];
   
     int32_t           motor_config_gearbox_ratio[MAX_NAXLES];
     int32_t           motor_config_rotorencoder[MAX_NAXLES];

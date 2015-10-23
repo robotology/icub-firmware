@@ -677,7 +677,9 @@ extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescripto
     eOmc_motor_config_t *cfg_ptr = (eOmc_motor_config_t*)rd->data;
     eOmc_motorId_t mxx = eoprot_ID2index(rd->id32);
 
-
+    //set rotor encoder sign
+    eo_emsController_SetRotorEncoderSign((uint8_t)mxx, (int32_t)cfg_ptr->rotorEncoderResolution);
+    
     cfg_ptr = cfg_ptr;
     #warning -> in here the 2foc-based control does config the can board with ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID, ICUBCANPROTO_POL_MC_CMD__SET_MAX_VELOCITY and ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT. what about mc4plus?
 }

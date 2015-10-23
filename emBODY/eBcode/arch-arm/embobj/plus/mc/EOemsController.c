@@ -150,6 +150,8 @@ extern EOemsController* eo_emsController_Init(eOemscontroller_board_t board, eOe
         ems->motor_velocity_gbx[j] = 0;
         ems->motor_acceleration[j] = 0;
         ems->motor_position[j] = 0;
+        ems->motor_position_last[j] = 0;
+        ems->motor_position_sign[j] = 0;
         ems->motor_config_gearbox_ratio[j]  = 1;
         ems->motor_config_rotorencoder[j]  = 1;
         ems->motor_config_hasHallSensor[j] = eobool_false;
@@ -242,7 +244,22 @@ extern void eo_emsController_AcquireMotorPosition(uint8_t motor, int32_t positio
     //don't need to rearm here cause this function is used for local actuators
     //eo_motors_rearm_wdog(ems->motors, motor);
     
-    ems->motor_position[motor] = position;
+    //valid for init
+    if ((ems->motor_position[motor] == 0) && (ems->motor_position_last[motor] == 0))
+    {
+        ems->motor_position[motor] = position;
+        ems->motor_position_last[motor] = position;
+        return;
+    }
+    
+    //direction of movement changes depending on the sign
+    int32_t delta = position - ems->motor_position_last[motor];
+    ems->motor_position[motor] += ems->motor_position_sign[motor]*delta;
+    
+    ems->motor_position_last[motor] = position;
+    
+    
+    //ems->motor_position[motor] = position;
     //change the sign of motor position according to the sign of rotorencoder
     //if (ems->motor_config_rotorencoder[motor]<0)
     //{
@@ -1502,6 +1519,27 @@ extern void eo_emsController_SetGearboxRatio(uint8_t joint, int32_t gearboxratio
 extern void eo_emsController_SetRotorEncoder(uint8_t joint, int32_t rotorencoder)
 {
     if (ems) ems->motor_config_rotorencoder[joint]=rotorencoder;
+}
+extern void eo_emsController_SetRotorEncoderSign(uint8_t motor, int32_t sign)
+{
+    if (!ems) return;
+    
+    if (ems->act == emscontroller_actuation_LOCAL)
+    {        
+        if ( sign > 0) 
+            ems->motor_position_sign[motor] =  1; 
+        else if (sign < 0)
+            ems->motor_position_sign[motor] = -1; 
+        else 
+            ems->motor_position_sign[motor] =  0;
+    }
+    //retro compatibility
+    else
+    {
+        ems->motor_position_sign[motor] =  1; 
+    }
+    
+    return;
 }
 
 extern void eo_emsController_ReadMotorstatus(uint8_t motor, uint8_t* state)
