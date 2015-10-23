@@ -135,7 +135,7 @@ const eomcconfig_codeconfig_t eomcconfig_codeconfig_MC4PLUS[] =
     /* Modify these values as needed to run your own experimental configuration. If you are using a setup with more than 2 joints, add a new entry properly */
     {EO_INIT(.value) eOmcconfig_value_MC4PLUS_experimental,
         EO_INIT(.jomos[0].actuator.local.type)  1, EO_INIT(.jomos[0].actuator.local.index) 2, EO_INIT(.jomos[0].encoder.isthere)       1 ,EO_INIT(.jomos[0].encoder.etype)        2, EO_INIT(.jomos[0].encoder.index)        2, EO_INIT(.jomos[0].encoder.pos_type)       0,
-                                                                                              //EO_INIT(.jomos[0].extra_encoder.isthere) 1, EO_INIT(.jomos[0].extra_encoder.etype)  1, EO_INIT(.jomos[0].extra_encoder.index)  0, EO_INIT(.jomos[0].extra_encoder.pos_type) 1,
+                                                                                              EO_INIT(.jomos[0].extra_encoder.isthere) 1, EO_INIT(.jomos[0].extra_encoder.etype)  2, EO_INIT(.jomos[0].extra_encoder.index)  2, EO_INIT(.jomos[0].extra_encoder.pos_type) 1,
     },
     {EO_INIT(.value) eOmcconfig_value_MC4PLUS_experimental_2joints,
         EO_INIT(.jomos[0].actuator.local.type)  1, EO_INIT(.jomos[0].actuator.local.index) 2, EO_INIT(.jomos[0].encoder.isthere)       1, EO_INIT(.jomos[0].encoder.etype)        2, EO_INIT(.jomos[0].encoder.index)        2, EO_INIT(.jomos[0].encoder.pos_type)       0,
