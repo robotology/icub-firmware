@@ -124,7 +124,7 @@ extern EOaxisController* eo_axisController_New(uint8_t id)
         o->calibration_type = eomc_calibration_typeUndefined;
         o->pwm_limit_calib = 0;
         o->calib_count = 0;
-        o->calib_stable = 0;
+        o->pos_stable = 0;
         o->old_pos = o->pos_max;
         o->pos_to_reach = 0;
         o->offset = 0;
@@ -677,6 +677,8 @@ extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, eOmc_contr
         o->torque_ref_jnt = 0;
         o->torque_ref_mot = 0;
         o->err = 0;
+        o->old_pos = 0;
+        o->pos_stable = 0;
         return eobool_true;
     }
     
@@ -878,10 +880,26 @@ extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
                 if ((o->openloop_limitreached >= 0) ^ (o->openloop_out < 0))
                     return 0;
             }
-            //inside safe band, reset value
             else
             {
+                /*
+                if (o->old_pos == pos && o->openloop_out != 0)
+                {
+                    o->pos_stable++;
+                    //cannot reach the set limit, but it's safer to stop the PWM
+                    if (o->pos_stable == 20)
+                        o->openloop_limitreached = o->openloop_out;
+                    
+                    if ((o->openloop_limitreached >= 0) ^ (o->openloop_out < 0))
+                    return 0;                    
+                    
+                }
+                */
+                
+                //inside safe band, reset values
                 o->openloop_limitreached = 0;
+                o->pos_stable = 0;
+                o->old_pos = pos;
             }
             
             return o->openloop_out;
@@ -1122,7 +1140,7 @@ extern void eo_axisController_GetActivePidStatus(EOaxisController *o, eOmc_joint
     
     if (o->control_mode == eomc_controlmode_openloop)
     {
-        pidStatus->positionreference = 0;
+        pidStatus->positionreference = o->openloop_out;
         pidStatus->torquereference = 0;
         pidStatus->output    = o->openloop_out;
         pidStatus->error     = 0;
@@ -1262,17 +1280,17 @@ static eObool_t s_eo_axisController_isHardwareLimitReached(EOaxisController *o)
     {
         if (GET_AXIS_POSITION() == o->old_pos)
         {
-            o->calib_stable += 1;
-            if (o->calib_stable == 20)
+            o->pos_stable += 1;
+            if (o->pos_stable == 20)
             {
-                o->calib_stable = 0;
+                o->pos_stable = 0;
                 o->calib_count = 0;
                 return eobool_true;
             }
         }
         else
         {
-            o->calib_stable = 0;
+            o->pos_stable = 0;
         }
     }
     o->old_pos = GET_AXIS_POSITION();

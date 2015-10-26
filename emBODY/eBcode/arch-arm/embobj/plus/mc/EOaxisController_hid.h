@@ -118,7 +118,7 @@ struct EOaxisController_hid
     eOmc_calibration_type_t calibration_type;
     float pwm_limit_calib;
     uint16_t calib_count;
-    uint16_t calib_stable;
+    uint16_t pos_stable;
     int32_t old_pos;
     int32_t pos_to_reach;
     int32_t offset;
