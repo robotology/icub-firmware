@@ -254,8 +254,14 @@ extern void eo_emsController_AcquireMotorPosition(uint8_t motor, int32_t positio
     
     //direction of movement changes depending on the sign
     int32_t delta = position - ems->motor_position_last[motor];
+    
+    //normalize delta to avoid discontinuities
+    while (delta < -TICKS_PER_HALF_REVOLUTION) delta += TICKS_PER_REVOLUTION;
+    while (delta >  TICKS_PER_HALF_REVOLUTION) delta -= TICKS_PER_REVOLUTION;
+        
     ems->motor_position[motor] += ems->motor_position_sign[motor]*delta;
     
+    //update last position for next iteration
     ems->motor_position_last[motor] = position;
     
     
@@ -718,7 +724,8 @@ extern void eo_emsController_PWM(int16_t* pwm_motor_16)
     //the output should be between -PWM_OUTPUT_LIMIT and +PWM_OUTPUT_LIMIT, indipendently from the hardware
     //int16_t pwm_rescaled[MAX_NAXLES] = {0};
     //MOTORS(m) pwm_rescaled[m] = RESCALE2PWMLIMITS(pwm_motor[m], ems->actuation_limit);
-    MOTORS(m) ems->axis_controller[m]->controller_output = RESCALE2PWMLIMITS(pwm_motor[m], ems->actuation_limit);//pwm_rescaled[m];
+    //MOTORS(m) ems->axis_controller[m]->controller_output = RESCALE2PWMLIMITS(pwm_motor[m], ems->actuation_limit);//pwm_rescaled[m];
+    MOTORS(m) ems->axis_controller[m]->controller_output = pwm_motor[m]; //no more rescaled
     
     MOTORS(m) pwm_motor_16[m] = (int16_t)pwm_motor[m];
 }
