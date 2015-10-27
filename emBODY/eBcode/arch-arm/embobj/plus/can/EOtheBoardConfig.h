@@ -49,7 +49,7 @@ extern "C" {
 #include "EOconstvector.h"
 #include "EoProtocol.h"
 #include "EOappEncodersReader.h"
-#include "EOtheInertial.h"
+#include "EOtheInertials.h"
 
 #include "EOtheCANdiscovery2.h"
 
@@ -96,6 +96,8 @@ extern const eOmn_serv_configuration_t * eoboardconfig_code2strain_serv_configur
 extern const eOmn_serv_configuration_t * eoboardconfig_code2mais_serv_configuration(uint32_t code);
 
 extern const eOmn_serv_configuration_t * eoboardconfig_code2skin_serv_configuration(uint32_t code);
+
+extern const eOmn_serv_configuration_t * eoboardconfig_code2inertials_serv_configuration(uint32_t code);
 
 
 /** @}            

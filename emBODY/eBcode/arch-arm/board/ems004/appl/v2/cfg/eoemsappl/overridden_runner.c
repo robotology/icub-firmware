@@ -28,7 +28,7 @@
 
 
 #include "EOtheCANservice.h"
-#include "EOtheInertial.h"
+#include "EOtheInertials.h"
 #include "EOtheCANdiscovery2.h"
 #include "EOtheMotionController.h"
 #include "EOtheSKIN.h"
@@ -138,12 +138,14 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(
     // because eom_emsrunner_CycleHasJustTransmittedRegulars() keeps memory of previous tx cycle.
     eo_skin_Tick(eo_skin_GetHandle(), prevTXhadRegulars); 
     
+    eo_inertials_Tick(eo_inertials_GetHandle(), prevTXhadRegulars); 
+    
    
-    #warning TODO: add a eo_inertial_Tick() in here which ...
+    //#warning TODO: add a eo_inertials_Tick() in here which ...
 //    // we could refresh status in here ... but only if we have just sent to robotinterface the previous status
 //    if(eobool_true == eom_emsrunner_CycleHasJustTransmittedRegulars(eom_emsrunner_GetHandle()))
 //    {
-//        eo_inertial_RefreshStatusOfEntity(eo_inertial_GetHandle());
+//        eo_inertials_RefreshStatusOfEntity(eo_inertials_GetHandle());
 //    }
 
     

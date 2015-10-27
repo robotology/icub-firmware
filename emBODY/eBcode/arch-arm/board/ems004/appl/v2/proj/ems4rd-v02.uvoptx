@@ -1162,7 +1162,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>0</BreakIfRCount>
-          <Filename>..\src\eoappservices\EOtheInertial.c</Filename>
+          <Filename>C:\Users\maccame\acemor\acemorising\004-branch\icub-firmware\emBODY\eBcode\arch-arm\board\ems004\appl\v2\src\eoappservices\EOtheInertial.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression></Expression>
         </Bp>
@@ -2363,7 +2363,7 @@
 
   <Group>
     <GroupName>eo-emsappl-cfg</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -2496,7 +2496,7 @@
 
   <Group>
     <GroupName>appl-services</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -2612,8 +2612,8 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\eoappservices\EOtheInertial.c</PathWithFileName>
-      <FilenameWithoutPath>EOtheInertial.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\eoappservices\EOtheInertials.c</PathWithFileName>
+      <FilenameWithoutPath>EOtheInertials.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

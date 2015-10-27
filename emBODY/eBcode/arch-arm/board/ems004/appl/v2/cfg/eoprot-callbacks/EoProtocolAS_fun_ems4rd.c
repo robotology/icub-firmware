@@ -55,7 +55,7 @@
 
 #include "EOtheMAIS.h"
 #include "EOtheSTRAIN.h"
-#include "EOtheInertial.h"
+#include "EOtheInertials.h"
 
 //#include "EOMtheEMSconfigurator.h"
 
@@ -171,14 +171,14 @@ extern void eoprot_fun_UPDT_as_strain_config_signaloncefullscale(const EOnv* nv,
 extern void eoprot_fun_UPDT_as_inertial_config_service(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOas_inertial_serviceconfig_t *cfg = (eOas_inertial_serviceconfig_t*)rd->data;    
-    eo_inertial_ServiceConfig(eo_inertial_GetHandle(), cfg);    
+    eo_inertials_ServiceConfig(eo_inertials_GetHandle(), cfg);    
 }
 
 
 extern void eoprot_fun_UPDT_as_inertial_config_sensors(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOas_inertial_sensorsconfig_t *cfg = (eOas_inertial_sensorsconfig_t*)rd->data;    
-    eo_inertial_SensorsConfig(eo_inertial_GetHandle(), cfg);    
+    eo_inertials_SensorsConfig(eo_inertials_GetHandle(), cfg);    
 }
 
 
@@ -188,11 +188,11 @@ extern void eoprot_fun_UPDT_as_inertial_cmmnds_enable(const EOnv* nv, const eOro
 
     if(0 == cmd->enable)
     {
-        eo_inertial_Stop(eo_inertial_GetHandle());    
+        eo_inertials_Stop(eo_inertials_GetHandle());    
     }
     else
     {
-        eo_inertial_Start(eo_inertial_GetHandle());    
+        eo_inertials_Start(eo_inertials_GetHandle());    
     }
 }
 

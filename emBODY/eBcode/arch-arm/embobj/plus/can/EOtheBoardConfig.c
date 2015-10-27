@@ -784,23 +784,23 @@ extern const eOas_inertial_serviceconfig_t * eoboardconfig_code2inertialCFG(uint
     {
         case 1:
         {
-            ret = &eo_inertial_cfg_eb2;
+            ret = &eo_inertials_cfg_eb2;
         } break;
         
         case 3: 
         {     
-            ret = &eo_inertial_cfg_eb4;
+            ret = &eo_inertials_cfg_eb4;
         } break;  
 
 
         case 9:
         {
-            ret = &eo_inertial_cfg_eb10;
+            ret = &eo_inertials_cfg_eb10;
         } break;
         
         case 10: 
         {     
-            ret = &eo_inertial_cfg_eb11;
+            ret = &eo_inertials_cfg_eb11;
         } break; 
         
         default:    
@@ -1324,6 +1324,25 @@ const eOmn_serv_configuration_t serv_config_sk_skin[] =
 
 
 
+const eOmn_serv_configuration_t serv_config_as_inertial[] =
+{
+    
+    {   // eb2/2b4
+        .type       = eomn_serv_AS_inertial,
+        .filler     = {0},
+        .data.as.inertial = 
+        {
+            .version    =
+            {
+                .firmware   = {0, 0},
+                .protocol   = {1, 0}    
+            },
+            .canmap = { 0x0000, 0x7f00 }
+        }    
+    }
+ 
+};
+
 
 extern const eOmn_serv_configuration_t * eoboardconfig_code2motion_serv_configuration(uint32_t code)
 {
@@ -1426,6 +1445,28 @@ extern const eOmn_serv_configuration_t * eoboardconfig_code2skin_serv_configurat
         case 3:
         {   // board eb2 eb4   
             ret = &serv_config_sk_skin[0]; 
+        } break;  
+
+        default:    
+        {   // all the others
+            ret = NULL;
+        } break;
+    
+    }
+
+    return(ret);        
+}
+
+extern const eOmn_serv_configuration_t * eoboardconfig_code2inertials_serv_configuration(uint32_t code)
+{
+    const eOmn_serv_configuration_t * ret = NULL;
+    
+    switch(code)
+    {
+        case 1:
+        case 3:
+        {   // board eb2 eb4   
+            ret = &serv_config_as_inertial[0]; 
         } break;  
 
         default:    

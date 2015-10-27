@@ -46,7 +46,7 @@
 #include "EOtheSTRAIN.h"
 #include "EOtheMAIS.h"
 #include "EOtheSKIN.h"
-#include "EOtheInertial.h"
+#include "EOtheInertials.h"
 
 #include "EOtheBoardConfig.h"
 
@@ -187,6 +187,7 @@ static eOresult_t s_on_mcfoc_verify_eb1(EOaService* p, eObool_t verifyisok);
 static void s_overridden_appl_initialise_eb2(EOMtheEMSappl* p);
 static void s_debug_eb2(void);
 static void callback_eb2(void *p);
+static eOresult_t s_on_inertials_verify_eb2(EOaService* p, eObool_t verifyisok);
 static eOresult_t s_on_skin_verify_eb2(EOaService* p, eObool_t verifyisok);
 static eOresult_t s_on_mc4_verify_eb2(EOaService* p, eObool_t verifyisok);
 static eOresult_t s_on_mais_verify_eb2(EOaService* p, eObool_t verifyisok);
@@ -451,9 +452,9 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
     eo_mais_Initialise();
     eo_skin_Initialise();
     // the inertial is initted but does not know yet which can network it supports
-    eo_inertial_Initialise();
+    eo_inertials_Initialise();
     // the can network is loaded in runtime. we need 2x15 values, which for now are taken from its ip address. later on they will be taken from a UDP message
-    //eo_inertial_ServiceConfig(eo_inertial_GetHandle(), eoboardconfig_code2inertialCFG(s_boardnum));
+    //eo_inertials_ServiceConfig(eo_inertials_GetHandle(), eoboardconfig_code2inertialCFG(s_boardnum));
     
     // start the application body   
     eOemsapplbody_cfg_t applbodyconfig;
@@ -483,20 +484,20 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
     
     inertialconfig.datarate = 50;
     inertialconfig.enabled = EOAS_ENABLEPOS(eoas_inertial_pos_l_hand);
-    eo_inertial_Config(eo_inertial_GetHandle(), &inertialconfig);
+    eo_inertials_Config(eo_inertials_GetHandle(), &inertialconfig);
 
     inertialconfig.datarate = 9;
     inertialconfig.enabled = EOAS_ENABLEPOS(eoas_inertial_pos_l_hand) | EOAS_ENABLEPOS(eoas_inertial_pos_l_forearm_1);    
-    eo_inertial_SensorsConfig(eo_inertial_GetHandle(), &inertialconfig);
+    eo_inertials_SensorsConfig(eo_inertials_GetHandle(), &inertialconfig);
     
-    eo_inertial_Stop(eo_inertial_GetHandle());
+    eo_inertials_Stop(eo_inertials_GetHandle());
     
     
     inertialconfig.datarate = 50;
     inertialconfig.enabled = EOAS_ENABLEPOS(eoas_inertial_pos_l_hand);
    
-    eo_inertial_SensorsConfig(eo_inertial_GetHandle(), &inertialconfig);   
-    eo_inertial_Start(eo_inertial_GetHandle());
+    eo_inertials_SensorsConfig(eo_inertials_GetHandle(), &inertialconfig);   
+    eo_inertials_Start(eo_inertials_GetHandle());
     
 #endif // defined(TEST_NUM_1)
 
@@ -506,9 +507,9 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
 
     inertialconfig.datarate = 250;
     inertialconfig.enabled = EOAS_ENABLEPOS(eoas_inertial_pos_l_hand);
-    eo_inertial_SensorsConfig(eo_inertial_GetHandle(), &inertialconfig);
+    eo_inertials_SensorsConfig(eo_inertials_GetHandle(), &inertialconfig);
     
-    eo_inertial_Start(eo_inertial_GetHandle());  
+    eo_inertials_Start(eo_inertials_GetHandle());  
     
     
     
@@ -628,7 +629,7 @@ extern void eom_emsappl_hid_userdef_on_exit_RUN(EOMtheEMSappl* p)
     //eo_strain_DisableTX(eo_strain_GetHandle());    
 
     // stop tx of inertial. the check whether to stop mtb boards or not is done internally.
-    eo_inertial_Stop(eo_inertial_GetHandle());
+    eo_inertials_Stop(eo_inertials_GetHandle());
 #endif
     
 }
@@ -1784,7 +1785,8 @@ static void s_overridden_appl_initialise_eb2(EOMtheEMSappl* p)
         eo_strain_Initialise();  
         eo_mais_Initialise();        
         eo_motioncontrol_Initialise();    
-        eo_skin_Initialise();          
+        eo_skin_Initialise(); 
+        eo_inertials_Initialise();        
     }
     
     {   // i init a service handler. for instance to be called EOtheServices
@@ -1860,6 +1862,8 @@ static void callback_eb2(void *p)
     
     static const eOmn_serv_configuration_t * skinserv = NULL; 
     
+    static const eOmn_serv_configuration_t * inertialserv = NULL; 
+    
     eObool_t stoptimer = eobool_false;
     
     
@@ -1878,6 +1882,12 @@ static void callback_eb2(void *p)
     {
         skinserv = eoboardconfig_code2skin_serv_configuration(boardnumber);
     }    
+
+
+    if(NULL == inertialserv)
+    {
+        inertialserv = eoboardconfig_code2inertials_serv_configuration(boardnumber);
+    } 
     
     if(0 == tick)
     {  
@@ -1893,6 +1903,10 @@ static void callback_eb2(void *p)
     { 
         eo_skin_Verify(eo_skin_GetHandle(), skinserv, s_on_skin_verify_eb2, eobool_true);  
     }
+    else if(3 == tick)
+    {
+        eo_inertials_Verify(eo_inertials_GetHandle(), skinserv, s_on_inertials_verify_eb2, eobool_true);
+    }    
 //    else if(2 == tick)
 //    { 
 //        errdes_mc_eb9.par64            = 0xffff000000000000 | tick;
@@ -1955,6 +1969,28 @@ static eOresult_t s_on_skin_verify_eb2(EOaService* p, eObool_t verifyisok)
     
     rr = rr;
     //eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, NULL, &errdes_st_eb9);
+    
+    return(eores_OK);    
+    
+}
+
+
+static eOresult_t s_on_inertials_verify_eb2(EOaService* p, eObool_t verifyisok)
+{    
+    uint8_t rr = 0;
+    
+    
+    if(eobool_true == verifyisok)
+    {
+        // so far i also MUST load 
+    }
+    else
+    {
+        rr = 0;
+    }
+    
+    rr = rr;
+
     
     return(eores_OK);    
     

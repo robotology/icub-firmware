@@ -877,9 +877,9 @@
               <FilePath>..\src\eoappservices\EOtheMC4boards.c</FilePath>
             </File>
             <File>
-              <FileName>EOtheInertial.c</FileName>
+              <FileName>EOtheInertials.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\eoappservices\EOtheInertial.c</FilePath>
+              <FilePath>..\src\eoappservices\EOtheInertials.c</FilePath>
             </File>
             <File>
               <FileName>EOtheCANdiscovery2.c</FileName>
@@ -2249,9 +2249,9 @@
               <FilePath>..\src\eoappservices\EOtheMC4boards.c</FilePath>
             </File>
             <File>
-              <FileName>EOtheInertial.c</FileName>
+              <FileName>EOtheInertials.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\eoappservices\EOtheInertial.c</FilePath>
+              <FilePath>..\src\eoappservices\EOtheInertials.c</FilePath>
             </File>
             <File>
               <FileName>EOtheCANdiscovery2.c</FileName>
