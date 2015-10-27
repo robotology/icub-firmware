@@ -34,6 +34,7 @@
 #include "EOtheCANprotocol.h"
 
 #include "EoProtocolAS.h"
+#include "EoProtocolMC.h"
 
 #include "EOMtheEMSappl.h"
 
@@ -92,6 +93,11 @@ static eOresult_t s_eo_motioncontrol_onendofverify_mais(EOaService* s, eObool_t 
 static eOresult_t s_eo_motioncontrol_onstop_search4mc4s(void *par, EOtheCANdiscovery2* p, eObool_t searchisok);
     
 static void s_eo_motioncontrol_UpdateJointStatus(EOtheMotionController *p);
+
+
+static void s_eo_motioncontrol_proxy_config(eObool_t on);
+
+static eObool_t s_eo_motioncontrol_mc4based_variableisproxied(eOnvID32_t id);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -335,7 +341,10 @@ extern eOresult_t eo_motioncontrol_Deactivate(EOtheMotionController *p)
         
         // now i reset 
         eo_vector_Clear(s_eo_themotcon.sharedcan.entitydescriptor);
-        eo_vector_Clear(s_eo_themotcon.sharedcan.boardproperties);               
+        eo_vector_Clear(s_eo_themotcon.sharedcan.boardproperties);     
+
+        // proxy deconfig
+        s_eo_motioncontrol_proxy_config(eobool_false);        
     
     }
     else if(eomn_serv_MC_mc4 == s_eo_themotcon.service.servconfig.type)
@@ -354,7 +363,10 @@ extern eOresult_t eo_motioncontrol_Deactivate(EOtheMotionController *p)
         eo_vector_Clear(s_eo_themotcon.sharedcan.boardproperties);
         
         eo_mais_Deactivate(p->mcmc4.themais);        
-        memset(&s_eo_themotcon.mcmc4.servconfigmais, 0, sizeof(s_eo_themotcon.mcmc4.servconfigmais));        
+        memset(&s_eo_themotcon.mcmc4.servconfigmais, 0, sizeof(s_eo_themotcon.mcmc4.servconfigmais));   
+
+        // proxy deconfig
+        s_eo_motioncontrol_proxy_config(eobool_false); 
 
     }    
     
@@ -475,6 +487,10 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
                 s_eo_themotcon.mcfoc.thecontroller = eo_emsController_Init((eOemscontroller_board_t)servcfg->data.mc.foc_based.boardtype4mccontroller, emscontroller_actuation_2FOC, numofjomos);   
             }
             
+            
+            // proxy config
+            s_eo_motioncontrol_proxy_config(eobool_true);
+            
             s_eo_themotcon.service.active = eobool_true;        
         }
     
@@ -555,6 +571,10 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
             // init others
             eo_virtualstrain_Initialise();
             eo_motiondone_Initialise();
+            
+            
+            // proxy config
+            s_eo_motioncontrol_proxy_config(eobool_true);
                     
             s_eo_themotcon.service.active = eobool_true;         
         }            
@@ -1208,6 +1228,61 @@ static void s_eo_motioncontrol_UpdateJointStatus(EOtheMotionController *p)
             eo_emsController_GetMotorStatus(jId, mstatus);
         }
     }
+}
+
+
+static void s_eo_motioncontrol_proxy_config(eObool_t on)
+{    
+    if(eomn_serv_MC_mc4 == s_eo_themotcon.service.servconfig.type)
+    {
+        if(eobool_true == on)
+        {
+            eoprot_config_proxied_variables(eoprot_board_localboard, eoprot_endpoint_motioncontrol, s_eo_motioncontrol_mc4based_variableisproxied);
+        }
+        else
+        {
+            eoprot_config_proxied_variables(eoprot_board_localboard, eoprot_endpoint_motioncontrol, NULL);
+        }       
+    }
+    else
+    {   // no proxied variables
+        eoprot_config_proxied_variables(eoprot_board_localboard, eoprot_endpoint_motioncontrol, NULL); 
+    }
+          
+}
+
+
+// review it ....
+static eObool_t s_eo_motioncontrol_mc4based_variableisproxied(eOnvID32_t id)
+{    
+    eOprotEndpoint_t ep = eoprot_ID2endpoint(id);
+    
+    eOprotEntity_t ent = eoprot_ID2entity(id);
+    if(eoprot_entity_mc_joint != ent)
+    {
+        return(eobool_false);
+    }
+    
+    eOprotTag_t tag = eoprot_ID2tag(id);
+    
+    switch(tag)
+    {
+        //VALE get velocity pid not implemented!!!
+        case eoprot_tag_mc_joint_config_pidposition:
+        // case eoprot_tag_mc_joint_config_pidvelocity:     // marco.accame on 03mar15: the pidvelocity propagation to mc4 is is not implemented, thus i must remove from proxy.
+        case eoprot_tag_mc_joint_config_pidtorque:
+        case eoprot_tag_mc_joint_config_limitsofjoint:
+        case eoprot_tag_mc_joint_config_impedance:
+        case eoprot_tag_mc_joint_cmmnds_setpoint:           // marco.accame on 03mar15: the setpoint should not be asked, thus why in here? i may just remove the handler so that no reply is obtained if wrongly used
+        {
+            return(eobool_true);
+        }
+        
+        default:
+        {
+            return(eobool_false);
+        }
+     }
 }
 
 
