@@ -104,17 +104,6 @@ extern EOtheMotionDone* eo_motiondone_Initialise(void)
     s_eo_themotiondone.currjoint = 0;
     s_eo_themotiondone.numofjoints = eo_entities_NumOfJoints(eo_entities_GetHandle());
     
-//    EOtheEMSapplBody* emsappbody_ptr = eo_emsapplBody_GetHandle();
-//    eOmn_appl_runMode_t runmode = eo_emsapplBody_GetAppRunMode(emsappbody_ptr);
-//    
-//    if((applrunMode__mc4Only == runmode) || (applrunMode__skinAndMc4 == runmode))
-//    {
-//        s_eo_themotiondone.itismc4can = eobool_true;
-//    }
-//    else
-//    {
-//        s_eo_themotiondone.itismc4can = eobool_false;
-//    }
     
     s_eo_themotiondone.motiondonecommand.class = eocanprot_msgclass_pollingMotorControl;    
     s_eo_themotiondone.motiondonecommand.type  = ICUBCANPROTO_POL_MC_CMD__MOTION_DONE;
@@ -138,10 +127,6 @@ extern eOresult_t eo_motiondone_Tick(EOtheMotionDone *p)
         return(eores_NOK_nullpointer);
     }
     
-//    if(eobool_false == s_eo_themotiondone.itismc4can)
-//    {   // nothing to do because we dont have a mc4can board
-//        return(eores_OK);
-//    }
     
     // now, i do things. 
     // i cycle all the joints, one at a time. and in some cases i send a can frame to the relevant board
@@ -159,6 +144,11 @@ extern eOresult_t eo_motiondone_Tick(EOtheMotionDone *p)
     // my proposal is to group in some functions called eomotiondone_* what is in here and in can rx handlers and
     // in eth-protocol callbacks so that we have everything in only one place.
     // it can be the EOtheMotionDone object ....
+    //
+    // marco.accame on 27 oct 2015: ok, we already have the object EOtheMotionDone. we are instead now thinking of managing the
+    // motion done differently. robotinterface now asks to the eth board the value of motion done w/ a ask<>. in case of mc4-based mc 
+    // this request will be proxied to the ... mc4 directly.
+    // 
     if( (eomc_controlmode_position == joint->status.basic.controlmodestatus) ||
         (eomc_controlmode_mixed    == joint->status.basic.controlmodestatus) ||
         (eomc_controlmode_calib    == joint->status.basic.controlmodestatus) )
