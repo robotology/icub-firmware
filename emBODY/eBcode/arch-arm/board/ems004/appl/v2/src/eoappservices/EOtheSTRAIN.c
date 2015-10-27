@@ -155,6 +155,8 @@ extern EOtheSTRAIN* eo_strain_Initialise(void)
     s_eo_thestrain.diagnostics.reportTimer = eo_timer_New();
         
     s_eo_thestrain.service.initted = eobool_true;
+    s_eo_thestrain.service.active = eobool_false;
+    s_eo_thestrain.service.running = eobool_false;
     
     return(&s_eo_thestrain);   
 }

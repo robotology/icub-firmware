@@ -164,6 +164,8 @@ extern EOtheSKIN* eo_skin_Initialise(void)
     s_eo_theskin.diagnostics.reportTimer = eo_timer_New();
         
     s_eo_theskin.service.initted = eobool_true;
+    s_eo_theskin.service.active = eobool_false;
+    s_eo_theskin.service.running = eobool_false;
     
     return(&s_eo_theskin);   
 }
@@ -372,7 +374,7 @@ extern eOresult_t eo_skin_Activate(EOtheSKIN *p, const eOmn_serv_configuration_t
         uint8_t k = 0;
         for(i=0; i<s_eo_theskin.numofskinpatches; i++)
         {
-            for(j=0; j<2; j++)
+            for(j=0; j<eOcanports_number; j++)
             {
                 uint16_t canbusmapping = servcfg->data.sk.skin.canmapskin[i][j];
                 for(k=1; k<15; k++)
