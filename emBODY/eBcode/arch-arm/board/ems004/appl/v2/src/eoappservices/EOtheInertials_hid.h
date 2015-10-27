@@ -19,8 +19,8 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef _EOTHEInertial_HID_H_
-#define _EOTHEInertial_HID_H_
+#ifndef _EOTHEINERTIALS_HID_H_
+#define _EOTHEINERTIALS_HID_H_
 
 
 
@@ -28,32 +28,37 @@
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "EoCommon.h"
-#include "EOtheCANprotocol.h"
-#include "EOvector.h"
+#include "EoProtocol.h"
+#include "EOtheServices_hid.h"
 
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
 
-#include "EOtheInertial.h"
+#include "EOtheInertials.h"
 
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
 
 
-struct EOtheInertial_hid
+struct EOtheInertials_hid
 {
-    eObool_t                        initted;
-    eObool_t                        configured;
-    eObool_t                        thereisinertial;
-    uint8_t                         protindex;
-    eObool_t                        istransmitting;
-    eOas_inertial_sensorsconfig_t   sensorsconfig;
-    eOcanprot_command_t             command;
-    eOas_inertial_serviceconfig_t   serviceconfig;
-    uint64_t                        supportedmask64;
-    eOas_inertial_t                 *inertial2;
-    EOvector                        *fifo;
+    eOservice_core_t                        service;
+    eOservice_diagnostics_t                 diagnostics;
+    eOservice_cantools_t                    sharedcan;
+
+    uint8_t                                 numofmtbs;
+    
+    // now the old ones
+    eOas_inertial_sensorsconfig_t           sensorsconfig;
+    eOas_inertial_serviceconfig_t           serviceconfig;
+    uint64_t                                supportedmask64;
+    EOvector*                               fifoofinertialdata;    
+    
+    eObool_t                                configured;
+
+    // the inertial at the end
+    eOas_inertial_t*                        inertial2;  
 }; 
 
 
