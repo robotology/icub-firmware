@@ -1140,7 +1140,7 @@ extern void eo_axisController_GetActivePidStatus(EOaxisController *o, eOmc_joint
     
     if (o->control_mode == eomc_controlmode_openloop)
     {
-        pidStatus->positionreference = o->openloop_out;
+        pidStatus->positionreference = 0;
         pidStatus->torquereference = 0;
         pidStatus->output    = o->openloop_out;
         pidStatus->error     = 0;

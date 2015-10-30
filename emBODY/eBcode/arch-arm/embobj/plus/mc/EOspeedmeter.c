@@ -38,8 +38,7 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define FAST_ENC_UNINIT           0x80000000
-#define SPIKES_DELTA_THRESHOLD    (int32_t)TICKS_PER_REVOLUTION/30
+#define FAST_ENC_UNINIT 0x80000000
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 

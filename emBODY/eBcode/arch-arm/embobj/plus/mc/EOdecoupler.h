@@ -32,9 +32,6 @@ extern "C" {
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
-//#define MOTOR_HARDWARE_FAULT     0xFFFE
-#define MOTOR_EXTERNAL_FAULT     0x00000004
-
 /* @typedef    typedef struct EOtrajectory_hid EOtrajectory
     @brief      EOtrajectory is an opaque struct. It is used to implement data abstraction for the 
                 object so that the user cannot see its private fields and he/she is forced to manipulate the
