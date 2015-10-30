@@ -32,6 +32,27 @@ extern "C" {
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
+//must be public cause used to set the right flag in MC4plus application
+#define MOTOR_HARD_FAULT         0x0001
+#define MOTOR_CAN_NOT_RESPONDING 0x0080
+#define MOTOR_WRONG_STATE        0x0002
+
+#define AXIS_TORQUE_SENS_FAULT   0x0100
+#define AEA_ABS_ENC_INVALID_DATA 0x4000
+#define AEA_ABS_ENC_TIMEOUT      0x8000
+
+//#define SM_INVALID_FAULT       0x4000
+//#define SM_TIMEOUT_FAULT       0x8000
+//#define SM_HARDWARE_FAULT      0xC000
+
+#define MOTOR_EXTERNAL_FAULT     0x00000004
+#define MOTOR_OVERCURRENT_FAULT  0x00000008
+#define MOTOR_I2T_LIMIT_FAULT    0x00020000
+#define MOTOR_HALLSENSORS_FAULT  0x00000040
+#define MOTOR_QENCODER_FAULT     0x00100000
+#define MOTOR_CAN_INVALID_PROT   0x00000080
+#define MOTOR_CAN_GENERIC_FAULT  0x00003D00
+
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
 

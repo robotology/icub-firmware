@@ -62,7 +62,7 @@
 #define ENCODERS(e) SCAN(e)
 
 #define GET_COUPLED(joint,j) JOINTS(j) if (eo_motors_are_coupled(ems->motors, joint, j))
-
+/*
 #define MOTOR_HARD_FAULT         0x0001
 #define MOTOR_CAN_NOT_RESPONDING 0x0080
 #define MOTOR_WRONG_STATE        0x0002
@@ -82,7 +82,7 @@
 #define MOTOR_QENCODER_FAULT     0x00100000
 #define MOTOR_CAN_INVALID_PROT   0x00000080
 #define MOTOR_CAN_GENERIC_FAULT  0x00003D00
-
+*/
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
@@ -260,6 +260,9 @@ extern void eo_emsController_AcquireMotorPosition(uint8_t motor, int32_t positio
     while (delta >  TICKS_PER_HALF_REVOLUTION) delta -= TICKS_PER_REVOLUTION;
         
     ems->motor_position[motor] += ems->motor_position_sign[motor]*delta;
+    
+    //update velocity
+    ems->motor_velocity[motor] = (ems->motor_position_sign[motor] * delta)* 1000;
     
     //update last position for next iteration
     ems->motor_position_last[motor] = position;
