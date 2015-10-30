@@ -46,6 +46,7 @@
 #include "EOtheMAIS.h"
 #include "EOtheCANservice.h"
 #include "EOtheCANdiscovery.h"
+#include "EOCurrentsWatchdog.h"
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
@@ -73,6 +74,8 @@ extern EOtheServices* eo_serv_Initialise(eOserv_cfg_t *cfg);
 extern EOtheServices* eo_serv_GetHandle(void);
 
 extern eOresult_t eo_serv_ConfigMC(EOtheServices *p, eOmcconfig_cfg_t *mccfg);
+
+extern eOresult_t eo_serv_InitializeCurrentsWatchdog(EOtheServices *p);
 
 extern eOresult_t eo_serv_ConfigCAN(EOtheServices *p, eOcanserv_cfg_t *cancfg);
 

@@ -127,6 +127,19 @@ extern eOresult_t eo_serv_ConfigMC(EOtheServices *p, eOmcconfig_cfg_t *mccfg)
 }
 
 
+
+extern eOresult_t eo_serv_InitializeCurrentsWatchdog(EOtheServices *p)
+{    
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    eo_currents_watchdog_Initialise();
+    
+    return(eores_OK);
+}
+
 extern eOresult_t eo_serv_ConfigCAN(EOtheServices *p, eOcanserv_cfg_t *cancfg)
 {
 //    eOresult_t res = eores_OK;

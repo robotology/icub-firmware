@@ -102,7 +102,6 @@ void userDef_hwErrCntr(void){}
 // --------------------------------------------------------------------------------------------------------------------
 
 static void    s_overriden_runner_CheckAndUpdateExtFaults(void);
-static void    s_overriden_runner_UpdateMotorsStatus(void);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -126,9 +125,8 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(EO
 {
   //here we could update some of the values which are updated via CAN callback for the EMS with mc 2foc-based (e.g. currents of the motors OR rotor position etc...)
     
-  //update motors status
-  s_overriden_runner_UpdateMotorsStatus();
-  
+  //tick of currents watchdog  
+  eo_currents_watchdog_Tick(eo_currents_watchdog_GetHandle());
 }
 
 extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOMtheEMSrunner *p)
@@ -181,9 +179,6 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOM
 
 extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
 {  
-    //check and update faults mask for the motor
-    //s_overriden_runner_CheckAndUpdateExtFaults();
-    
     eo_mcserv_Actuate(eo_mcserv_GetHandle());    
 }
 
@@ -258,66 +253,20 @@ static void s_overriden_runner_CheckAndUpdateExtFaults(void)
     if (eo_mcserv_AreMotorsExtFaulted(eo_mcserv_GetHandle()))
     {
         uint8_t numofjomos = eo_entities_NumOfJoints(eo_entities_GetHandle());
+        uint32_t state = 0;
         //set the fault mask for ALL the motors
         for (uint8_t i = 0; i < numofjomos; i++)
         {
-            uint32_t state = eo_mcserv_GetMotorFaultMask(eo_mcserv_GetHandle(),i);
+            state = eo_mcserv_GetMotorFaultMask(eo_mcserv_GetHandle(),i);
             if((state & MOTOR_EXTERNAL_FAULT) == 0) //external fault bit not set
             {
                 //simulate the CANframe used by 2FOC to signal the status
-                uint8_t fault_mask[8] = {0x0, 0x0, 0x0, 0x0, 0x4, 0x0, 0x0, 0x0}; //setting only the external fault bit
-                eo_motor_set_motor_status(eo_motors_GetHandle(),i, fault_mask);
+                uint64_t fault_mask = (((uint64_t)(state | MOTOR_EXTERNAL_FAULT)) << 32) & 0xFFFFFFFF00000000; //adding the error to the current state
+                eo_motor_set_motor_status(eo_motors_GetHandle(),i, (uint8_t*)&fault_mask);
             }
         }
     }
     return;
-}
-
-static void s_overriden_runner_UpdateMotorsStatus(void)
-{
-  eOmc_motor_t* mot;
-  eOmc_joint_t* jnt;    
-  int16_t  mot_curr = 0;
-  uint32_t mot_pos  = 0;    
-      
-  uint8_t numofjomos = eo_entities_NumOfJoints(eo_entities_GetHandle());  
-  for (uint8_t i = 0; i < numofjomos; i++)
-  {       
-    if((NULL == (jnt = eo_mcserv_GetJoint(eo_mcserv_GetHandle(), i))) ||
-       (NULL == (mot = eo_mcserv_GetMotor(eo_mcserv_GetHandle(), i)))) 
-    {
-        continue;        
-    }
-    
-    //Get values using MCService interfaces
-    mot_curr = eo_mcserv_GetMotorCurrent (eo_mcserv_GetHandle(), i);
-    
-    //rotor position update inside the control loop, reading using the EOappEncodersReader 
-    /*
-    //mot_pos  = eo_mcserv_GetMotorPositionRaw(eo_mcserv_GetHandle(), i);
-    //converting in iCub degrees the rotorposition
-    float divider = mot->config.rotorEncoderResolution;
-    if(0.0f == divider)
-    {
-        mot_pos = 0;       
-    }
-    else
-    {
-        if(divider < 0)
-        {
-            divider = -divider;
-        }
-    
-        mot_pos  = (float) (mot_pos * 65535.0) / mot->config.rotorEncoderResolution;
-    }
-    */
-    
-    
-   
-    //update structure which will be broadcasted
-    //eo_emsController_AcquireMotorEncoder(i, mot_curr, 0, (int32_t) mot_pos);
-    eo_emsController_AcquireMotorCurrent(i, mot_curr);
-  }
 }
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
