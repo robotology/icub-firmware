@@ -308,7 +308,6 @@ extern eOresult_t eom_emstransceiver_Form(EOMtheEMStransceiver* p, EOpacket** tx
         *numberofrops = numofrops;
     }
     
-    //even if numofrops is equal to zero, i send a rop because it is used by pc104 to see the ems.
     // we now retrieve the out packet only if we have at least one rop to tx. it is the transmitter inside
     // the transceiver that decides which rops to tx. even if we call every ms we can tx only when needed
     // and we reduce tx rate.
