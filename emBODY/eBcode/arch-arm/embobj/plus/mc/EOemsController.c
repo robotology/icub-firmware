@@ -62,6 +62,7 @@
 #define ENCODERS(e) SCAN(e)
 
 #define GET_COUPLED(joint,j) JOINTS(j) if (eo_motors_are_coupled(ems->motors, joint, j))
+//the MACROS below are now public (EOemsController.h), so that the application can set the error masks from other services (e.g. MC4plus application)
 /*
 #define MOTOR_HARD_FAULT         0x0001
 #define MOTOR_CAN_NOT_RESPONDING 0x0080
@@ -651,29 +652,6 @@ extern void eo_emsController_PWM(int16_t* pwm_motor_16)
             pwm_joint[j] = eo_axisController_PWM(ems->axis_controller[j], &stiffness[j]);
         }
     }
-    
-    //done in eo_emsController_CheckCalibrations now
-    /*
-    if(emscontroller_board_HEAD_neckyaw_eyes == ems->board)        
-    {
-        // this board has two joints whcih are virtually coupled, thus we maust manage operations in a special way.
-        // after the loop on all the joints in which eo_axisController_PWM() performs calibration and may set hardwarelimitisreached to 1 (in case hw limit is reached)
-        // we check if both rigth and left eyes have reached the hw limits. in such a case, we may set both axis as calibrated
-        // and set them in control mode position
-        if((1 == ems->axis_controller[2]->hardwarelimitisreached) && (1 == ems->axis_controller[3]->hardwarelimitisreached))
-        {
-            ems->axis_controller[2]->hardwarelimitisreached = 0;
-            ems->axis_controller[3]->hardwarelimitisreached = 0;
-            eo_axisController_SetCalibrated (ems->axis_controller[2]);       
-            eo_axisController_SetCalibrated (ems->axis_controller[3]);
-            eo_axisController_SetControlMode(ems->axis_controller[2], eomc_controlmode_cmd_position);
-            eo_axisController_SetControlMode(ems->axis_controller[3], eomc_controlmode_cmd_position);
-
-            s_eo_emsController_InitTrajectoryVersionVergence(2);
-            s_eo_emsController_InitTrajectoryVersionVergence(3);
-        }            
-    }
-    */
  
     //torque control limits protection mechanism
     JOINTS(j)

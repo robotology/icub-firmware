@@ -726,7 +726,7 @@ extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
             //calib type 5
             if (o->calibration_type == eomc_calibration_type5_hard_stops_mc4plus)
             {
-                if(/*(1 == o->isvirtuallycoupled) && */(1 == o->hardwarelimitisreached))
+                if(1 == o->hardwarelimitisreached)
                 {   
                     // if in here, then it means that the calibration for one eye is terminated but the calib for the
                     // other eye is not terminated yet.
@@ -753,39 +753,7 @@ extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
                         o->offset -= workrange;
                     else if (new_pos > o->pos_max)
                         o->offset += workrange;
-                    */ 
-                    
-                    //out of bound protection (redundant, but protect from typo inside XML)
-                    //if ( new_pos < (o->pos_min - TICKS_PER_HALF_REVOLUTION))
-                    //    new_pos += TICKS_PER_REVOLUTION;
-                    //else if (new_pos > (o->pos_max + TICKS_PER_HALF_REVOLUTION))
-                    //    new_pos -= TICKS_PER_REVOLUTION;
-                    
-                    //done in eo_emsController_CheckCalibrations now
-                    /*
-                    //update axis, trajectory pos
-                    //eo_axisController_SetEncPos(o, new_pos);
-                    //o->position = new_pos -  o->calibration_zero;
-                    //eo_axisController_SetEncVel(o, vel);
-                
-                    //eo_trajectory_Init(o->trajectory, new_pos - o->calibration_zero, vel, 0);
-                    //eo_trajectory_Stop(o->trajectory, new_pos - o->calibration_zero);
-                    //o->err = 0;
-                    
-                    // we set true this flag, so that for teh case of virtually coupled joint 
-                    // the next time we call the function we just return 0 (see above in TAG-XXX)
-                    // even if we stay in calibration control mode.
-
-                    if(0 == o->isvirtuallycoupled)
-                    {   // we finish the calibration only if there is no virtual coupling (i.e.: if the axis is NOT rigth or left eye).
-                        eo_axisController_SetCalibrated (o);
-                    }
-                    */
-                    
-                    //but the first time also RobotInterface try to set the pos to 0... (it does not seem to be a problem)
-                    #if defined(CALIB5_GOTO_ZERO)
-                    eo_axisController_SetPosRef(o, 0, vel); // go to 0 with velocity from calib param2   
-                    #endif                    
+                    */        
                           
                     return 0;                    
                 }
@@ -793,11 +761,7 @@ extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
                 //important! need to do that only if the encoder has been already initialized
                 if (!eo_axisController_IsCalibrated(o)) 
                 {
-                    /*
-                    o->interact_mode = eOmc_interactionmode_stiff;
-                    *stiff = eobool_true;
-                    o->err = 0;
-                    */
+
                     return o->pwm_limit_calib;
                 }
             }
@@ -841,19 +805,6 @@ extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
             // calib type 3
             else if (o->calibration_type == eomc_calibration_type3_abs_sens_digital)
             {
-                //done in eo_emsController_CheckCalibrations now
-                /*
-                if (IS_CALIBRATED())
-                {
-                    eo_pid_Reset(o->pidP);
-                    eo_trajectory_Init(o->trajectory, pos, vel, 0);
-                    eo_trajectory_Stop(o->trajectory, GET_AXIS_POSITION()); 
-                    o->control_mode = eomc_controlmode_position;
-                }
-                o->interact_mode = eOmc_interactionmode_stiff;
-                *stiff = eobool_true;
-                o->err = 0;
-                */
                 return 0;
             }
         }
@@ -882,7 +833,8 @@ extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
             }
             else
             {
-                /*
+                //to be discussed
+				/*
                 if (o->old_pos == pos && o->openloop_out != 0)
                 {
                     o->pos_stable++;
