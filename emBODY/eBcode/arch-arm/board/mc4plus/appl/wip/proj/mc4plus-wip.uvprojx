@@ -364,9 +364,9 @@
             <useXO>0</useXO>
             <VariousControls>
               <MiscControls>-DUSE_MC4PLUS</MiscControls>
-              <Define>ICUB_HEAD_V3</Define>
+              <Define>ICUB_MEC_V3 USE_CANCOMM_V2</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\libs\highlevel\services\embenv\api;..\cfg\eoemsappl;..\cfg\abslayer;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\protocol\api;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\protocol\src;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\transport;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\utils;.;..\cfg\eoprot-callbacks;..\src\eoappservices;..\cfg\eoappservices\icub-can-proto;..\cfg\eoappservices\icub-can-net;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\backdoor;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\opcprot;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\ems004\env\cfg;..\cfg\eoemsappl;..\..\..\..\..\libs\highlevel\services\embodyrobot;..\..\..\..\..\libs\midware\hl-plus\api;..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\embobj\plus\board\ems001;..\..\..\..\..\embobj\plus\ctrloop;..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\embobj\plus\ipnet;..\..\..\..\..\embobj\plus\board;..\..\..\..\..\embobj\plus\can;..\..\..\..\..\embobj\plus\can\config-can-protocol;..\src\eoappservices\mc;..\..\..\..\ems004\appl\v2\src\eoappservices;..\cfg\boardcfg</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\libs\highlevel\services\embenv\api;..\cfg\eoemsappl;..\cfg\abslayer;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\protocol\api;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\protocol\src;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\transport;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\utils;.;..\cfg\eoprot-callbacks;..\src\eoappservices;..\cfg\eoappservices\icub-can-proto;..\cfg\eoappservices\icub-can-net;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\backdoor;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\opcprot;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\ems004\env\cfg;..\cfg\eoemsappl;..\..\..\..\..\libs\highlevel\services\embodyrobot;..\..\..\..\..\libs\midware\hl-plus\api;..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\embobj\plus\board\ems001;..\..\..\..\..\embobj\plus\ctrloop;..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\embobj\plus\ipnet;..\..\..\..\..\embobj\plus\board;..\..\..\..\..\embobj\plus\can;..\..\..\..\..\embobj\plus\can\config-can-protocol;..\..\..\..\..\embobj\plus\mc;..\..\..\..\ems004\appl\v2\src\eoappservices;..\cfg\boardcfg</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -849,6 +849,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheInertial.c</FilePath>
             </File>
+            <File>
+              <FileName>EOCurrentsWatchdog.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\eoappservices\EOCurrentsWatchdog.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -870,7 +875,7 @@
               <RVCTZI>0</RVCTZI>
               <RVCTOtherData>0</RVCTOtherData>
               <ModuleSelection>0</ModuleSelection>
-              <IncludeInBuild>2</IncludeInBuild>
+              <IncludeInBuild>1</IncludeInBuild>
               <AlwaysBuild>2</AlwaysBuild>
               <GenerateAssemblyFile>2</GenerateAssemblyFile>
               <AssembleAssemblyFile>2</AssembleAssemblyFile>
@@ -883,7 +888,7 @@
             <GroupArmAds>
               <Cads>
                 <interw>2</interw>
-                <Optim>1</Optim>
+                <Optim>0</Optim>
                 <oTime>0</oTime>
                 <SplitLS>2</SplitLS>
                 <OneElfS>2</OneElfS>
@@ -927,32 +932,32 @@
             <File>
               <FileName>EOaxisController.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\eoappservices\mc\EOaxisController.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\mc\EOaxisController.c</FilePath>
             </File>
             <File>
               <FileName>EOdecoupler.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\eoappservices\mc\EOdecoupler.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\mc\EOdecoupler.c</FilePath>
             </File>
             <File>
               <FileName>EOemsController.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\eoappservices\mc\EOemsController.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\mc\EOemsController.c</FilePath>
             </File>
             <File>
               <FileName>EOpid.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\eoappservices\mc\EOpid.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\mc\EOpid.c</FilePath>
             </File>
             <File>
               <FileName>EOspeedmeter.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\eoappservices\mc\EOspeedmeter.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\mc\EOspeedmeter.c</FilePath>
             </File>
             <File>
               <FileName>EOtrajectory.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\eoappservices\mc\EOtrajectory.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\mc\EOtrajectory.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2094,6 +2099,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheInertial.c</FilePath>
             </File>
+            <File>
+              <FileName>EOCurrentsWatchdog.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\eoappservices\EOCurrentsWatchdog.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2108,96 +2118,36 @@
         </Group>
         <Group>
           <GroupName>eo-motor-controller</GroupName>
-          <GroupOption>
-            <CommonProperty>
-              <UseCPPCompiler>0</UseCPPCompiler>
-              <RVCTCodeConst>0</RVCTCodeConst>
-              <RVCTZI>0</RVCTZI>
-              <RVCTOtherData>0</RVCTOtherData>
-              <ModuleSelection>0</ModuleSelection>
-              <IncludeInBuild>2</IncludeInBuild>
-              <AlwaysBuild>2</AlwaysBuild>
-              <GenerateAssemblyFile>2</GenerateAssemblyFile>
-              <AssembleAssemblyFile>2</AssembleAssemblyFile>
-              <PublicsOnly>2</PublicsOnly>
-              <StopOnExitCode>11</StopOnExitCode>
-              <CustomArgument></CustomArgument>
-              <IncludeLibraryModules></IncludeLibraryModules>
-              <ComprImg>1</ComprImg>
-            </CommonProperty>
-            <GroupArmAds>
-              <Cads>
-                <interw>2</interw>
-                <Optim>0</Optim>
-                <oTime>0</oTime>
-                <SplitLS>2</SplitLS>
-                <OneElfS>2</OneElfS>
-                <Strict>2</Strict>
-                <EnumInt>2</EnumInt>
-                <PlainCh>2</PlainCh>
-                <Ropi>2</Ropi>
-                <Rwpi>2</Rwpi>
-                <wLevel>2</wLevel>
-                <uThumb>2</uThumb>
-                <uSurpInc>2</uSurpInc>
-                <uC99>2</uC99>
-                <useXO>2</useXO>
-                <VariousControls>
-                  <MiscControls></MiscControls>
-                  <Define></Define>
-                  <Undefine></Undefine>
-                  <IncludePath></IncludePath>
-                </VariousControls>
-              </Cads>
-              <Aads>
-                <interw>2</interw>
-                <Ropi>2</Ropi>
-                <Rwpi>2</Rwpi>
-                <thumb>2</thumb>
-                <SplitLS>2</SplitLS>
-                <SwStkChk>2</SwStkChk>
-                <NoWarn>2</NoWarn>
-                <uSurpInc>2</uSurpInc>
-                <useXO>2</useXO>
-                <VariousControls>
-                  <MiscControls></MiscControls>
-                  <Define></Define>
-                  <Undefine></Undefine>
-                  <IncludePath></IncludePath>
-                </VariousControls>
-              </Aads>
-            </GroupArmAds>
-          </GroupOption>
           <Files>
             <File>
               <FileName>EOaxisController.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\eoappservices\mc\EOaxisController.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\mc\EOaxisController.c</FilePath>
             </File>
             <File>
               <FileName>EOdecoupler.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\eoappservices\mc\EOdecoupler.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\mc\EOdecoupler.c</FilePath>
             </File>
             <File>
               <FileName>EOemsController.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\eoappservices\mc\EOemsController.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\mc\EOemsController.c</FilePath>
             </File>
             <File>
               <FileName>EOpid.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\eoappservices\mc\EOpid.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\mc\EOpid.c</FilePath>
             </File>
             <File>
               <FileName>EOspeedmeter.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\eoappservices\mc\EOspeedmeter.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\mc\EOspeedmeter.c</FilePath>
             </File>
             <File>
               <FileName>EOtrajectory.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\eoappservices\mc\EOtrajectory.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\mc\EOtrajectory.c</FilePath>
             </File>
           </Files>
         </Group>
