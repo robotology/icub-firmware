@@ -55,11 +55,13 @@ typedef struct EOaxleVirtualEncoder_hid EOaxleVirtualEncoder;
 extern EOabsCalibratedEncoder* eo_absCalibratedEncoder_New(uint8_t ID);
 extern void eo_absCalibratedEncoder_SetSign(EOabsCalibratedEncoder*, int32_t sign);
 extern int32_t eo_absCalibratedEncoder_Acquire(EOabsCalibratedEncoder*, int32_t pos, uint8_t error_mask);
+extern eObool_t eo_absCalibratedEncoder_AreThereTooManySpikes(EOabsCalibratedEncoder* o);
 extern uint16_t eo_absCalibratedEncoder_IsHardFault(EOabsCalibratedEncoder*);
 extern uint16_t eo_absCalibratedEncoder_IsTimeoutFault(EOabsCalibratedEncoder*);
 extern uint16_t eo_absCalibratedEncoder_IsInvalidFault(EOabsCalibratedEncoder*);
 extern void eo_absCalibratedEncoder_ClearFaults(EOabsCalibratedEncoder* o);
 extern eObool_t eo_absCalibratedEncoder_IsOk(EOabsCalibratedEncoder*);
+extern void eo_absCalibratedEncoder_ResetCalibration(EOabsCalibratedEncoder* o);
 extern void eo_absCalibratedEncoder_Calibrate(EOabsCalibratedEncoder*, int32_t offset);
 #ifndef USE_2FOC_FAST_ENCODER
 extern int32_t eo_absCalibratedEncoder_GetVel(EOabsCalibratedEncoder* o);

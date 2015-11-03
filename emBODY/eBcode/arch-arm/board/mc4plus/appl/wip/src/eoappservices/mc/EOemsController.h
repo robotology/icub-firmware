@@ -75,6 +75,8 @@ extern void eo_emsController_SetAxisCalibrationZero(uint8_t joint, int32_t sign)
 extern int32_t eo_emsController_GetAxisCalibrationZero(uint8_t joint);
 extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t error_mask);
 extern void eo_emsController_AcquireMotorEncoder(uint8_t motor, int16_t current, int32_t velocity, int32_t position);
+extern void eo_emsController_AcquireMotorPosition(uint8_t motor, int32_t position);
+extern void eo_emsController_AcquireMotorCurrent(uint8_t motor, int16_t current);
 
 extern uint8_t eo_emsController_IsVirtualCalibrationInProgress(void);
 
@@ -104,6 +106,7 @@ extern void eo_emsController_GetMotorStatus(uint8_t mId, eOmc_motor_status_t* mo
 extern void eo_emsController_CheckCalibrations(void);
 extern void eo_emsController_ResetCalibrationValues(uint8_t joint);
 extern void eo_emsController_StartCalibration_type3(uint8_t joint, int32_t pos, int32_t vel, int32_t offset);
+extern void eo_emsController_StartCalibration_type6(uint8_t joint, int32_t pos, int32_t vel, int32_t maxencoder);
 extern void eo_emsController_StartCalibration_type5(uint8_t joint, int32_t pwmlimit, int32_t final_position);
 
 extern void eo_emsController_ResetPosPid(uint8_t joint);

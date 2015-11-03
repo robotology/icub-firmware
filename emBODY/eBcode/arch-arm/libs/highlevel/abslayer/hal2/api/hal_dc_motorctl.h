@@ -157,7 +157,7 @@ typedef struct
   */
 extern hal_result_t hal_motor_init(hal_motor_t id, const hal_pwm_cfg_t *cfg);
 
-/** @fn			extern hal_result_t hal_motor_and_adc_init(hal_motor_t id, const hal_pwm_cfg_t *cfg, hal_reltime_t *error)
+/** @fn			extern hal_result_t hal_motor_extfault_handling_init(hal_motor_t id, const hal_pwm_cfg_t *cfg, hal_reltime_t *error)
     @brief  	This function initializes all the motors and the adc. 
 				 
     @details    On ARM-STM32 architecture, the registers of the timers are 16 bits, and holds bot the counter and the prescaler.
@@ -171,7 +171,7 @@ extern hal_result_t hal_motor_init(hal_motor_t id, const hal_pwm_cfg_t *cfg);
                 hal_res_NOK_nullpointer if @e cfg is NULL
                 hal_res_OK otherwise
   */
-extern hal_result_t hal_motor_and_adc_init(hal_motor_t id, const hal_pwm_cfg_t *cfg);
+extern hal_result_t hal_motors_extfault_handling_init(void);
 
 
 /** @fn         extern hal_result_t hal_motor_start(hal_motor_t id);

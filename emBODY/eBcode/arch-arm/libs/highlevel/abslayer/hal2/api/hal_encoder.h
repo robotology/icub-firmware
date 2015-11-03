@@ -43,7 +43,7 @@
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "hal_common.h"
-
+#include "hal_spi.h"
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
@@ -178,6 +178,13 @@ extern hal_result_t hal_encoder_get_value_t2(hal_encoder_t id, uint32_t* pos, ha
     @return 	hal_res_NOK_generic on error else hal_res_OK
   */
 extern hal_result_t hal_encoder_get_frame(hal_encoder_t id, uint8_t* bytes);
+
+/** @fn	        hal_spi_t hal_encoder_get_spi(hal_encoder_t id);
+    @brief  	This function returns the SPI peripheral associated to the reading of the hal_encoder_t given as a parameter.
+    @param  	encoder 	    the encoder
+    @return 	hal_res_NOK_generic if encoder not supported for the board else hal_res_OK;
+  */
+extern hal_result_t hal_encoder_get_spi(hal_encoder_t id, hal_spi_t* spiid);
 
 
 /** @fn		    extern hal_result_t hal_encoder_deinit(hal_encoder_t id)

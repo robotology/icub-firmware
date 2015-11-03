@@ -98,6 +98,13 @@ extern void eo_emsController_hid_userdef_set_motor_idle(EOemsController* ctrl,ui
     
 }
 
+extern void eo_emsController_hid_userdef_force_motor_idle(EOemsController* ctrl,uint8_t motor)
+{
+    // this is used by the EMS application to set the 2FOC in force idle state
+    
+    // for MC4plus: we could disable the specified motor
+}
+
 
 extern void eo_emsController_hid_userdef_set_motor_running(EOemsController* ctrl,uint8_t motor)
 {

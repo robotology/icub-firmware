@@ -33,8 +33,11 @@
 // --------------------------------------------------------------------------------------------------------------------
 #include "stdlib.h"
 #include "string.h"
-#include "hal.h"
+#include "hal_encoder.h"
+#if     defined(USE_MC4PLUS)
 #include "hal_quad_enc.h"
+#include "hal_adc.h"
+#endif
 
 #include "EOtheMemoryPool.h"
 
@@ -94,7 +97,7 @@ static void s_eo_appEncReader_configure_initSPIConnectedEncoders(EOappEncReader 
 static eObool_t s_eo_appEncReader_IsValidValue_AEA(uint32_t *valueraw, eOappEncReader_errortype_t *error);
 static void s_eo_appEncReader_configureOtherEncoders(EOappEncReader *p);
 
-static uint32_t s_eo_appEncReader_rescale2icubdegrees(uint32_t val_raw, uint8_t joint_number);
+static uint32_t s_eo_appEncReader_rescale2icubdegrees(uint32_t val_raw, uint8_t joint_number, eo_appEncReader_detected_position_t pos_type);
 
 //static void s_eo_appEncReader_check(EOappEncReader *p);
 
@@ -280,8 +283,8 @@ extern eOresult_t  eo_appEncReader_GetJointValue(EOappEncReader *p, eo_appEncRea
                 //val_raw >>= 6;
                 //*value = (val_raw & 0x0FFF);
                 //*value <<= 4; // 65536 ticks/revolution normalization;
-                val_raw = (val_raw>>2) & 0xFFF0;
-                *primary_value = RESCALE_IN_ICUB_DEGREES(val_raw, encoders_fullscales[eo_appEncReader_enc_type_AEA]);
+                //val_raw = (val_raw>>2) & 0xFFF0;
+                //*primary_value = RESCALE_IN_ICUB_DEGREES(val_raw, encoders_fullscales[eo_appEncReader_enc_type_AEA]);
                 // marco.accame: hal_encoder_get_value() gives back a value in uint32_t with only 18 bits of information (internally masked with 0x03FFFF).
                 // only the 12 most significant bits contain a position reading. to obtain the ticks we should do:
                 // ticks = (val_raw >> 6) & 0x0FFF;
@@ -293,8 +296,8 @@ extern eOresult_t  eo_appEncReader_GetJointValue(EOappEncReader *p, eo_appEncRea
                 // val_raw = (val_raw>>2) & 0xFFF0;
                 
                 #warning: marco.accame: if we want to rescale the aea reading using the GENERAL:Encoders factor, then instead of the RESCALE_IN...  macro we use the following:
-                //val_raw = (val_raw >> 6) & 0x0FFF;
-                //*primary_value = s_eo_appEncReader_rescale2icubdegrees(val_raw, joint_number);                
+                val_raw = (val_raw >> 6) & 0x0FFF;
+                *primary_value = s_eo_appEncReader_rescale2icubdegrees(val_raw, joint_number, this_joint.primary_encoder_pos_type);                
                 break;
             }   			
 
@@ -325,7 +328,8 @@ extern eOresult_t  eo_appEncReader_GetJointValue(EOappEncReader *p, eo_appEncRea
                 }
             
                 val_raw = (val_raw>>4) & 0xFFFF;
-                *primary_value = RESCALE_IN_ICUB_DEGREES(val_raw, encoders_fullscales[eo_appEncReader_enc_type_AMO]);
+                //*primary_value = RESCALE_IN_ICUB_DEGREES(val_raw, encoders_fullscales[eo_appEncReader_enc_type_AMO]);
+                *primary_value = s_eo_appEncReader_rescale2icubdegrees(val_raw, joint_number, this_joint.primary_encoder_pos_type);
                 break;
             }
             case eo_appEncReader_enc_type_INC:
@@ -337,11 +341,29 @@ extern eOresult_t  eo_appEncReader_GetJointValue(EOappEncReader *p, eo_appEncRea
                 //val_raw = val_raw & 0xFFFF;
                 //*primary_value = RESCALE_IN_ICUB_DEGREES(val_raw, encoders_fullscales[eo_appEncReader_enc_type_INC]);
                 // marco.accame: by this we use the encoder ticks and rescale them in icubdegrees usin the factor in GENERAL:Encoders
-                *primary_value = s_eo_appEncReader_rescale2icubdegrees(val_raw, joint_number);
+                *primary_value = s_eo_appEncReader_rescale2icubdegrees(val_raw, joint_number, this_joint.primary_encoder_pos_type);
                 #endif
                 res1 = eores_OK;
                 break;
             }
+            case eo_appEncReader_enc_type_ADH:
+            {
+                #if defined(USE_MC4PLUS)
+                //get the voltage from the motor port (0 - 3300mV)
+                val_raw = hal_adc_get_hall_sensor_analog_input_mV(this_joint.primary_enc_position);
+                
+                //convert to iCubDegrees
+                *primary_value = s_eo_appEncReader_rescale2icubdegrees(val_raw, joint_number, this_joint.primary_encoder_pos_type);
+                
+                if(val_raw != 0)
+                    res1 = eores_OK;
+                #elif defined (USE_EMS4RD)
+                *primary_value = ENCODER_VALUE_NOT_SUPPORTED;
+                res1 = eores_NOK_generic;
+                #endif
+                break;
+            }
+                
             default:
             {
                 *primary_value = ENCODER_VALUE_NOT_SUPPORTED;
@@ -396,8 +418,10 @@ extern eOresult_t  eo_appEncReader_GetJointValue(EOappEncReader *p, eo_appEncRea
                 //val_raw >>= 6;
                 //*value = (val_raw & 0x0FFF);
                 //*value <<= 4; // 65536 ticks/revolution normalization;
-                val_raw = (val_raw>>2) & 0xFFF0;
-                *extra_value = RESCALE_IN_ICUB_DEGREES(val_raw, encoders_fullscales[eo_appEncReader_enc_type_AEA]);
+                //val_raw = (val_raw>>2) & 0xFFF0;
+                //*extra_value = RESCALE_IN_ICUB_DEGREES(val_raw, encoders_fullscales[eo_appEncReader_enc_type_AEA]);
+                val_raw = (val_raw >> 6) & 0x0FFF;
+                *extra_value = s_eo_appEncReader_rescale2icubdegrees(val_raw, joint_number, this_joint.extra_encoder_pos_type);  
                 break;
             }   			
 
@@ -427,7 +451,8 @@ extern eOresult_t  eo_appEncReader_GetJointValue(EOappEncReader *p, eo_appEncRea
                 }
             
                 val_raw = (val_raw>>4) & 0xFFFF;
-                *extra_value = RESCALE_IN_ICUB_DEGREES(val_raw, encoders_fullscales[eo_appEncReader_enc_type_AMO]);
+                //*extra_value = RESCALE_IN_ICUB_DEGREES(val_raw, encoders_fullscales[eo_appEncReader_enc_type_AMO]);
+                *extra_value = s_eo_appEncReader_rescale2icubdegrees( val_raw, joint_number, this_joint.extra_encoder_pos_type);
                 break;
             }
             case eo_appEncReader_enc_type_INC:
@@ -436,9 +461,26 @@ extern eOresult_t  eo_appEncReader_GetJointValue(EOappEncReader *p, eo_appEncRea
                 *extra_value = 0;
                 #else
                 val_raw = hal_quad_enc_getCounter(this_joint.extra_enc_position);
-                *extra_value = RESCALE_IN_ICUB_DEGREES(val_raw, encoders_fullscales[eo_appEncReader_enc_type_INC]);
+                *extra_value = s_eo_appEncReader_rescale2icubdegrees(val_raw, joint_number, this_joint.extra_encoder_pos_type);
                 #endif
                 res2 = eores_OK;
+                break;
+            }
+            case eo_appEncReader_enc_type_ADH:
+            {
+                #if     defined(USE_MC4PLUS)
+                 //get the voltage from the motor port (0 - 3300mV)
+                val_raw = hal_adc_get_hall_sensor_analog_input_mV(this_joint.extra_enc_position);
+                
+                //convert to iCubDegrees
+                *extra_value = s_eo_appEncReader_rescale2icubdegrees(val_raw, joint_number, this_joint.extra_encoder_pos_type);
+                
+                if(val_raw != 0)
+                    res2 = eores_OK;
+                #elif defined (USE_EMS4RD)
+                *extra_value = ENCODER_VALUE_NOT_SUPPORTED;
+                res2 = eores_NOK_generic;
+                #endif
                 break;
             }
             default:
@@ -628,13 +670,18 @@ static void s_eo_appEncReader_prepareSPIEncodersList(EOappEncReader *p,  EOappEn
     cfgSPIX->st = eOEncReader_readSt__idle;
     cfgSPIX->enc_type = (eo_appEncReader_enc_type_t)p->cfg.SPI_streams[stream_number].type;
     cfgSPIX->enc_numbers = p->cfg.SPI_streams[stream_number].numberof;
+#if defined (USE_MC4PLUS)
+    cfgSPIX->enc_number_supported = 1;
+#elif defined (USE_EMS4RD)
+    cfgSPIX->enc_number_supported = 3;
+#endif
      
     //cycle for all the joints
     for (uint8_t i = 0; i<eOappEncReader_joint_numberof; i++)
     {
         current_joint = p->cfg.joints[i];
         
-        //if it's an SPI encoders (currently considering only the primaries...)
+        //if the primary encoder is on SPI
         if (CHECK_ENC_IS_ON_SPI(current_joint.primary_encoder))
         {
             // check if stream is correct, otherwise do nothing
@@ -645,9 +692,29 @@ static void s_eo_appEncReader_prepareSPIEncodersList(EOappEncReader *p,  EOappEn
                     cfgSPIX->readSeq.first     = current_joint.primary_enc_position;
                     cfgSPIX->readSeq.list[0]   = current_joint.primary_enc_position;
                 }
-                else
+                //if out of bound, discard it
+                else if (SPIstreams_positioning[current_joint.primary_enc_position] < cfgSPIX->enc_number_supported)
                 {
                     cfgSPIX->readSeq.list[SPIstreams_positioning[current_joint.primary_enc_position]] = current_joint.primary_enc_position;
+                }
+            }
+        }
+        
+        //if the extra encoder is on SPI
+        if (CHECK_ENC_IS_ON_SPI(current_joint.extra_encoder))
+        {
+            // check if stream is correct, otherwise do nothing
+            if (SPIencodersMap[current_joint.extra_enc_position] == stream_number)
+            {
+                if (cfgSPIX->readSeq.first == ENCODER_NULL)
+                {
+                    cfgSPIX->readSeq.first     = current_joint.extra_enc_position;
+                    cfgSPIX->readSeq.list[0]   = current_joint.extra_enc_position;
+                }
+                //if out of bound, discard it
+                else if (SPIstreams_positioning[current_joint.extra_enc_position] < cfgSPIX->enc_number_supported)
+                {
+                    cfgSPIX->readSeq.list[SPIstreams_positioning[current_joint.extra_enc_position]] = current_joint.extra_enc_position;
                 }
             }
         }
@@ -817,7 +884,7 @@ static void s_eo_appEncReader_configureOtherEncoders(EOappEncReader *p)
 
 #undef TEST_THE_RESCALE
 
-static uint32_t s_eo_appEncReader_rescale2icubdegrees(uint32_t val_raw, uint8_t joint_number)
+static uint32_t s_eo_appEncReader_rescale2icubdegrees(uint32_t val_raw, uint8_t joint_number, eo_appEncReader_detected_position_t pos_type)
 {
 #if defined(TEST_THE_RESCALE)
 
@@ -864,18 +931,33 @@ static uint32_t s_eo_appEncReader_rescale2icubdegrees(uint32_t val_raw, uint8_t 
 
 
     uint32_t retval = val_raw;
-    
-    eOmc_joint_t *joint = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, joint_number);
-    
     float divider = 1.0f;
-    
-    if(NULL == joint)
+
+    if (pos_type == eo_appEncReader_detected_position_joint)
     {
-        return(2000);
+        eOmc_joint_t *joint = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, joint_number);
+                
+        if(NULL == joint)
+        {
+            return(2000);
+        }
+        
+        /*divider = eo_common_Q17_14_to_float(joint->config.DEPRECATED_encoderconversionfactor); NO MORE NEEDED */
+        divider = joint->config.jntEncoderResolution;
+    }
+    else if (pos_type == eo_appEncReader_detected_position_rotor)
+    {
+        eOmc_motor_t *motor = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, joint_number);
+                
+        if(NULL == motor)
+        {
+            return(2000);
+        }
+        
+        divider = motor->config.rotorEncoderResolution;
     }
     
-    /*divider = eo_common_Q17_14_to_float(joint->config.DEPRECATED_encoderconversionfactor); NO MORE NEEDED */
-    divider = joint->config.jntEncoderResolution;
+    //check divider validity
     if(0.0f == divider)
     {
         return(3000);       

@@ -84,7 +84,7 @@
 
 #define SAMPLING_TIME_CK_ADC2       ADC_SampleTime_480Cycles
 #define SAMPLING_TIME_CK 		    ADC_SampleTime_15Cycles 
-#define NB_CALIBRATION_CONVERSIONS              32
+#define NB_CALIBRATION_CONVERSIONS  32
 #define ADC_CHANNEL_RESOLUTION      4096
 
 #define VOLTAGE_FULLSCALE           (float) 3.3
@@ -1012,6 +1012,7 @@ extern hal_result_t hal_adc_init(hal_adc_t id, const hal_adc_cfg_t *cfg)
 static void s_hal_adc_current_OffsetCalibration(void)
 {
   uint8_t conv_index;
+  static uint8_t attempts = 0;
   
   //I want EOC flag only at the end of the all the group of conversions, for both ADCs    
   ADC_EOCOnEachRegularChannelCmd(ADC1, DISABLE);
@@ -1026,8 +1027,8 @@ static void s_hal_adc_current_OffsetCalibration(void)
     //while ((DMA_GetFIFOStatus(DMA_STREAM0) != DMA_FIFOStatus_Full ) ||  (DMA_GetFIFOStatus(DMA_STREAM0) !=  DMA_FIFOStatus_Full)) { };
       
     //don't really know if this is the right way to do that
-    while (!ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC)) { } 
-    
+    while (!ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC)) { attempts ++; if (attempts>=100) break;} 
+    attempts = 0;
     // no more dividing directly by 32, because this was causing a loss of precision
     // now: - 1) dividing (32 times) by 2, adding the values every iteration - 2) Dividing by 16 before setting the final offset
     // this preserves precision and find the right offset
@@ -1036,7 +1037,8 @@ static void s_hal_adc_current_OffsetCalibration(void)
     
     ADC_ClearFlag(ADC1, ADC_FLAG_EOC);
     
-    while (!ADC_GetFlagStatus(ADC3, ADC_FLAG_EOC)) { } 
+    while (!ADC_GetFlagStatus(ADC3, ADC_FLAG_EOC)) { attempts ++; if (attempts>=100) break;}
+    attempts = 0;
     
     hCurOffset[2] +=  AnalogMotorsInput[5] >> 1;
     hCurOffset[3] +=  AnalogMotorsInput[7] >> 1;

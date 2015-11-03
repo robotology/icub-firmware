@@ -419,6 +419,9 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
     eo_serv_ConfigMC(eo_serv_GetHandle(), &mc_config); 
     eo_mcserv_CheckResources(eo_mcserv_GetHandle());
     
+    //init the CurrentsWatchdog
+    eo_serv_InitializeCurrentsWatchdog(eo_serv_GetHandle());
+    
     //init the CANService    
     //CAN must be activated only for boards: 16,17 (left_lower_arm) 19,20 (right_lower_arm) (skin is still not considered at the moment)
     if ((s_boardnum == 15) || (s_boardnum == 16) || (s_boardnum == 18) || (s_boardnum == 19))

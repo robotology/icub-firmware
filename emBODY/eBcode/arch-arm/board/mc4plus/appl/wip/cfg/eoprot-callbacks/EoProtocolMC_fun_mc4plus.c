@@ -78,7 +78,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
-static void s_eoprot_ep_mc_fun_MotorReactivationAttempt(uint8_t motor);
+static void s_eoprot_ep_mc_fun_MotorReactivationAttempt(uint8_t motor, uint32_t current_state);
 
 
 
@@ -508,14 +508,31 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
     // commento: la calib tipo 3 ha solo offset (in xml e' il calibration3. il calibration2 etc non viene usato).
     // per calib 3: viene usato solo il calibration3.
     
-    uint16_t state = eo_mcserv_GetMotorFaultMask(eo_mcserv_GetHandle(),jxx);
+    uint32_t state = eo_mcserv_GetMotorFaultMask(eo_mcserv_GetHandle(),jxx);
     if ((eo_mcserv_AreMotorsExtFaulted(eo_mcserv_GetHandle())) || (state & MOTOR_EXTERNAL_FAULT)) //or motors still faulted OR state (and so PWM) still need to be enabled
     {
-        s_eoprot_ep_mc_fun_MotorReactivationAttempt(jxx);
+        s_eoprot_ep_mc_fun_MotorReactivationAttempt(jxx, state);
     }
 
     //check for the type of calibration required
 
+    if(calibrator->type == eomc_calibration_type6_mais_mc4plus)
+    {
+        // calibration for joint controlled with MAIS
+        
+        //params for the calib still need to be discussed
+        /*
+        eo_emsController_SetAxisCalibrationZero (jxx, calibrator->params.type6.calibrationZero);
+        // the StartCalib for type6 should:
+        // 1 - (set the params of position, velocity) and maxencoder
+        // 2 - SetTrajectory with final position and velocity (p1,p2)
+         eo_emsController_StartCalibration_type6 (jxx,
+                                                 calibrator->params.type6.position,
+                                                 calibrator->params.type6.velocity,
+                                                 calibrator->params.type6.maxencoder);
+        */
+    }
+    
     if(calibrator->type == eomc_calibration_type5_hard_stops_mc4plus)
     {
         // calibration for joint with incremental encoders
@@ -551,10 +568,10 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_controlmode(const EOnv* nv, const eO
     eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
 
     //if this joint was in external fault or the state (and so PWM) is not updated, reenable it
-    uint16_t state = eo_mcserv_GetMotorFaultMask(eo_mcserv_GetHandle(),jxx);
+    uint32_t state = eo_mcserv_GetMotorFaultMask(eo_mcserv_GetHandle(),jxx);
     if ((eo_mcserv_AreMotorsExtFaulted(eo_mcserv_GetHandle())) || (state & MOTOR_EXTERNAL_FAULT))
     {
-       s_eoprot_ep_mc_fun_MotorReactivationAttempt(jxx);
+       s_eoprot_ep_mc_fun_MotorReactivationAttempt(jxx, state);
     }
         
     eo_emsController_SetControlModeGroupJoints(jxx, (eOmc_controlmode_command_t)(*controlmode));       
@@ -660,7 +677,9 @@ extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescripto
     eOmc_motor_config_t *cfg_ptr = (eOmc_motor_config_t*)rd->data;
     eOmc_motorId_t mxx = eoprot_ID2index(rd->id32);
 
-
+    //set rotor encoder sign
+    eo_emsController_SetRotorEncoderSign((uint8_t)mxx, (int32_t)cfg_ptr->rotorEncoderResolution);
+    
     cfg_ptr = cfg_ptr;
     #warning -> in here the 2foc-based control does config the can board with ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID, ICUBCANPROTO_POL_MC_CMD__SET_MAX_VELOCITY and ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT. what about mc4plus?
 }
@@ -708,13 +727,19 @@ extern void eoprot_fun_UPDT_mc_motor_config_maxcurrentofmotor(const EOnv* nv, co
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
-static void s_eoprot_ep_mc_fun_MotorReactivationAttempt(uint8_t motor)
+static void s_eoprot_ep_mc_fun_MotorReactivationAttempt(uint8_t motor, uint32_t current_state)
 {
      eo_mcserv_EnableMotor(eo_mcserv_GetHandle(), motor);
      eo_mcserv_EnableFaultDetection(eo_mcserv_GetHandle());
-        
-     uint8_t fault_mask[6] = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0}; //clear all the faults
-     eo_mcserv_SetMotorFaultMask(eo_mcserv_GetHandle(), motor, fault_mask);
+     
+     //simulate the CANframe used by 2FOC to signal the status
+     //uint8_t fault_mask[8] = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}; //clear all the faults
+     uint64_t fault_mask = (((uint64_t)(current_state & ~MOTOR_EXTERNAL_FAULT)) << 32) & 0xFFFFFFFF00000000; //adding the error to the current state
+    
+     eo_mcserv_SetMotorFaultMask(eo_mcserv_GetHandle(), motor, (uint8_t*)&fault_mask);
+     
+     //reports to emscontroller the changed mask
+     eo_emsController_CheckFaults();
 }
 
 

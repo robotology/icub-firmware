@@ -74,38 +74,50 @@ const eOappEncReader_cfg_t encoder_reader_config_eb7 =
         {   // pos 0
             .primary_encoder        = eo_appEncReader_enc_type_AEA,
             .primary_enc_position   = (eo_appEncReader_encoder_position_t)hal_encoder1,
+            .primary_encoder_pos_type = eo_appEncReader_detected_position_joint,
             .extra_encoder          = eo_appEncReader_enc_type_NONE,
-            .extra_enc_position     = eo_appEncReader_encoder_positionNONE                
+            .extra_enc_position     = eo_appEncReader_encoder_positionNONE,
+            .extra_encoder_pos_type = eo_appEncReader_detected_positionNONE
         },
         {   // pos 1
             .primary_encoder        = eo_appEncReader_enc_type_AEA,
             .primary_enc_position   = (eo_appEncReader_encoder_position_t)hal_encoder4,
+            .primary_encoder_pos_type = eo_appEncReader_detected_position_joint,
             .extra_encoder          = eo_appEncReader_enc_type_NONE,
-            .extra_enc_position     = eo_appEncReader_encoder_positionNONE                
+            .extra_enc_position     = eo_appEncReader_encoder_positionNONE,
+            .extra_encoder_pos_type = eo_appEncReader_detected_positionNONE
         },
         {   // pos 2
             .primary_encoder        = eo_appEncReader_enc_type_NONE,
             .primary_enc_position   = eo_appEncReader_encoder_positionNONE,
+            .primary_encoder_pos_type = eo_appEncReader_detected_positionNONE,
             .extra_encoder          = eo_appEncReader_enc_type_NONE,
-            .extra_enc_position     = eo_appEncReader_encoder_positionNONE                
+            .extra_enc_position     = eo_appEncReader_encoder_positionNONE,
+            .extra_encoder_pos_type = eo_appEncReader_detected_positionNONE
         },
         {   // pos 3
             .primary_encoder        = eo_appEncReader_enc_type_NONE,
             .primary_enc_position   = eo_appEncReader_encoder_positionNONE,
+            .primary_encoder_pos_type = eo_appEncReader_detected_positionNONE,
             .extra_encoder          = eo_appEncReader_enc_type_NONE,
-            .extra_enc_position     = eo_appEncReader_encoder_positionNONE                 
+            .extra_enc_position     = eo_appEncReader_encoder_positionNONE,
+            .extra_encoder_pos_type = eo_appEncReader_detected_positionNONE
         }, 
         {   // pos 4
             .primary_encoder        = eo_appEncReader_enc_type_NONE,
             .primary_enc_position   = eo_appEncReader_encoder_positionNONE,
+            .primary_encoder_pos_type = eo_appEncReader_detected_positionNONE,
             .extra_encoder          = eo_appEncReader_enc_type_NONE,
-            .extra_enc_position     = eo_appEncReader_encoder_positionNONE                
+            .extra_enc_position     = eo_appEncReader_encoder_positionNONE,
+            .extra_encoder_pos_type = eo_appEncReader_detected_positionNONE
         },
         {   // pos 5
             .primary_encoder        = eo_appEncReader_enc_type_NONE,
             .primary_enc_position   = eo_appEncReader_encoder_positionNONE,
+            .primary_encoder_pos_type = eo_appEncReader_detected_positionNONE,
             .extra_encoder          = eo_appEncReader_enc_type_NONE,
-            .extra_enc_position     = eo_appEncReader_encoder_positionNONE                
+            .extra_enc_position     = eo_appEncReader_encoder_positionNONE,
+            .extra_encoder_pos_type = eo_appEncReader_detected_positionNONE
         }            
     },
     .SPI_streams    =

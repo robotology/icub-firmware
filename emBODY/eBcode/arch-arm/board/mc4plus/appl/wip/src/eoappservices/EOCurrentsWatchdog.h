@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2015 iCub Facility - Istituto Italiano di Tecnologia
- * Author:  Marco Accame
- * email:   marco.accame@iit.it
+ * Author:  Davide Pollarolo
+ * email:   davide.pollarolo@iit.it
  * website: www.robotcub.org
  * Permission is granted to copy, distribute, and/or modify this program
  * under the terms of the GNU General Public License, version 2 or any
@@ -18,50 +18,39 @@
 
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _EOTHESERVICES_H_
-#define _EOTHESERVICES_H_
+#ifndef _EOCURRENTSWATCHDOG_H_
+#define _EOCURRENTSWATCHDOG_H_
 
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
-/** @file       EOtheServices.h
-    @brief      This file ...                
-    @author     marco.accame@iit.it
-    @date       01/09/2015
+/** @file       EOCurrentsWatchdog.h
+    @brief      This file provides interfaces to the watchdog of the currents                
+    @author     davide.pollarolo@iit.it
+    @date       27/10/2015
 **/
 
-/** @defgroup eo_EOtheServices Object EOtheServices
+/** @defgroup eo_EOCurrentsWatchdog Object EOCurrentsWatchdog
     ...... 
     @{        
  **/
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
-#include "eOcommon.h"
-#include "EoProtocol.h"
-#include "EoMotionControl.h"
-#include "EoAnalogSensors.h"
-#include "EoSkin.h"
-
-#include "EOmcService.h"
-#include "EOtheMAIS.h"
-#include "EOtheCANservice.h"
-#include "EOtheCANdiscovery.h"
-#include "EOCurrentsWatchdog.h"
+#include "EoCommon.h"
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
  
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
-typedef struct EOtheServices_hid EOtheServices;
-
+typedef struct EOCurrentsWatchdog_hid EOCurrentsWatchdog;
 
 
 typedef struct
 {
-    uint8_t     whatever;
-} eOserv_cfg_t;
-
+    uint16_t*     i2t_thresh;
+	uint16_t*     spike_thresh;
+} eOcurrents_watchdog_cfg_t;
 
    
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------
@@ -69,22 +58,21 @@ typedef struct
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-extern EOtheServices* eo_serv_Initialise(eOserv_cfg_t *cfg);
+extern EOCurrentsWatchdog* eo_currents_watchdog_Initialise(void);
 
-extern EOtheServices* eo_serv_GetHandle(void);
+extern EOCurrentsWatchdog* eo_currents_watchdog_GetHandle(void);
 
-extern eOresult_t eo_serv_ConfigMC(EOtheServices *p, eOmcconfig_cfg_t *mccfg);
+extern eOresult_t eo_currents_watchdog_Configure(EOCurrentsWatchdog* p, eOcurrents_watchdog_cfg_t* cfg);
 
-extern eOresult_t eo_serv_InitializeCurrentsWatchdog(EOtheServices *p);
+extern eOresult_t eo_currents_watchdog_SetSpikeThreshold(EOCurrentsWatchdog* p, uint8_t joint, uint16_t threshold);
 
-extern eOresult_t eo_serv_ConfigCAN(EOtheServices *p, eOcanserv_cfg_t *cancfg);
+extern eOresult_t eo_currents_watchdog_SetI2TThreshold(EOCurrentsWatchdog* p, uint8_t joint, uint16_t threshold);
 
-extern eOresult_t eo_serv_StartCANdiscovery(EOtheServices *p);
-
+void eo_currents_watchdog_Tick(EOCurrentsWatchdog* p);
 
 
 /** @}            
-    end of group eo_EOtheServices
+    end of group eo_EOCurrentsWatchdog
  **/
 
 #endif  // include-guard

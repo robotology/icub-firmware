@@ -32,6 +32,27 @@ extern "C" {
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
+//must be public cause used to set the right flag in MC4plus application
+#define MOTOR_HARD_FAULT         0x0001
+#define MOTOR_CAN_NOT_RESPONDING 0x0080
+#define MOTOR_WRONG_STATE        0x0002
+
+#define AXIS_TORQUE_SENS_FAULT   0x0100
+#define AEA_ABS_ENC_INVALID_DATA 0x4000
+#define AEA_ABS_ENC_TIMEOUT      0x8000
+
+//#define SM_INVALID_FAULT       0x4000
+//#define SM_TIMEOUT_FAULT       0x8000
+//#define SM_HARDWARE_FAULT      0xC000
+
+#define MOTOR_EXTERNAL_FAULT     0x00000004
+#define MOTOR_OVERCURRENT_FAULT  0x00000008
+#define MOTOR_I2T_LIMIT_FAULT    0x00020000
+#define MOTOR_HALLSENSORS_FAULT  0x00000040
+#define MOTOR_QENCODER_FAULT     0x00100000
+#define MOTOR_CAN_INVALID_PROT   0x00000080
+#define MOTOR_CAN_GENERIC_FAULT  0x00003D00
+
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
 
@@ -75,7 +96,10 @@ extern void eo_emsController_SetAxisCalibrationZero(uint8_t joint, int32_t sign)
 extern int32_t eo_emsController_GetAxisCalibrationZero(uint8_t joint);
 extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t error_mask);
 extern void eo_emsController_AcquireMotorEncoder(uint8_t motor, int16_t current, int32_t velocity, int32_t position);
+extern void eo_emsController_AcquireMotorPosition(uint8_t motor, int32_t position);
+extern void eo_emsController_AcquireMotorCurrent(uint8_t motor, int16_t current);
 
+extern uint8_t eo_emsController_IsVirtualCalibrationInProgress(void);
 extern void set_2FOC_idle(uint8_t joint);
 extern void set_2FOC_running(uint8_t joint);
 
@@ -101,12 +125,15 @@ extern eObool_t eo_emsController_SetInteractionMode(uint8_t joint, eOmc_interact
 
 extern void eo_emsController_SetMotorConfig(uint8_t joint, eOmc_motor_config_t motorconfig);
 extern void eo_emsController_SetRotorEncoder(uint8_t joint, int32_t rotorencoder);
+extern void eo_emsController_SetRotorEncoderSign(uint8_t motor, int32_t sign);
 extern void eo_emsController_ReadMotorstatus(uint8_t motor, uint8_t* state);
 extern void eo_emsController_GetMotorStatus(uint8_t mId, eOmc_motor_status_t* motor_status);
 
 extern void eo_emsController_CheckCalibrations(void);
+extern void eo_emsController_ResetCalibrationValues(uint8_t joint);
 extern void eo_emsController_StartCalibration_type3(uint8_t joint, int32_t pos, int32_t vel, int32_t offset);
-extern void eo_emsController_StartCalibration_type0(uint8_t joint, int16_t pwmlimit, int16_t vel);
+extern void eo_emsController_StartCalibration_type6(uint8_t joint, int32_t pos, int32_t vel, int32_t maxencoder);
+extern void eo_emsController_StartCalibration_type5(uint8_t joint, int32_t pwmlimit, int32_t final_position);
 
 extern void eo_emsController_ResetPosPid(uint8_t joint);
 extern void eo_emsController_ResetTrqPid(uint8_t joint);
@@ -134,6 +161,7 @@ extern void eo_emsController_SetVelTimeout(uint8_t joint, int32_t vel_timeout);
 extern void eo_emsController_SetGearboxRatio(uint8_t joint, int32_t gearboxratio);
 extern void eo_emsController_GetDecoupledMeasuredTorque (uint8_t joint, int32_t * Trq);
 extern void eo_emsController_GetDecoupledReferenceTorque (uint8_t joint, int32_t * Trq);
+extern uint16_t eo_emsController_GetActuationLimit(void);
 extern void eo_emsMotorController_GoIdle(void);
 
 /** @}            

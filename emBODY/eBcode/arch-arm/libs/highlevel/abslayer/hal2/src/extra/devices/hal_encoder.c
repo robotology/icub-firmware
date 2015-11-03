@@ -487,6 +487,20 @@ extern hal_result_t hal_encoder_get_frame(hal_encoder_t id, uint8_t* bytes)
     return(hal_res_OK);
 }
 
+extern hal_result_t hal_encoder_get_spi(hal_encoder_t id, hal_spi_t* spiid)
+{
+    //returns the spiid even if the encoder is not initialized...it's a static information, always valid
+ 
+    if(hal_false == s_hal_encoder_supported_is(id))
+    {
+        return(hal_res_NOK_generic);
+    }
+    
+    //if supported, copy the info
+    *spiid = hal_encoder__theboardconfig.spimap[HAL_encoder_id2index(id)].spiid;        
+    return(hal_res_OK);
+}
+
 extern hal_result_t hal_encoder_deinit(hal_encoder_t id)
 {
     // Here I should remove everything connected to the specified encoder
