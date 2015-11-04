@@ -524,7 +524,7 @@ extern eOresult_t eo_mcserv_Actuate(EOmcService *p)
     {
         case eOmcconfig_type_mc4plus:
         {
-            #warning TBD: read all the encoders, compute pwm, send pwm to hal peripheral, update joint-motor status
+            //read all the encoders, compute pwm, send pwm to hal peripheral, update joint-motor status
             res = s_eo_mcserv_do_mc4plus(p);      
         } break;
         case eOmcconfig_type_mc4can:
@@ -564,7 +564,7 @@ extern eOresult_t eo_mcserv_Stop(EOmcService *p)
     {
         case eOmcconfig_type_mc4plus:
         {
-            #warning TBD: maybe stop pwm , disable teh joints and ??? see what 2foc does
+            // disable PWM for all the motors
             s_eo_mcserv_disable_all_motors(p);
             res = eores_OK;        
         } break;
@@ -678,19 +678,6 @@ static eOresult_t s_eo_mcserv_init_jomo(EOmcService *p)
         p->valuesencoder_extra = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_auto, sizeof(uint32_t), p->config.jomosnumber);
         
         // encoder-reader (so far we only have encoders supported by the encoder reader object).
-        #warning TBD: init the encoder-reader
-        // here occurs the problem of the remapping between the EOappEncodersReader numbering (local joints: 0...5)
-        // and the EomcService numbering (all the joints: 0...11)
-        /*
-        for(jm=0; jm<p->config.jomosnumber; jm++)
-        {
-            // in here we prepare the config array
-            // p->config.jomos[jm].encoder.etype ... 0 is aea
-            // p->config.jomos[jm].encoder.index ... is index strating from 0
-        }
-        */
-        
-        //test to fill the configuration using the jomos data
         //init enc config
         eOappEncReader_cfg_t encoder_reader_cfg;
         memset(&encoder_reader_cfg, 0xFF, sizeof(eOappEncReader_cfg_t)); //0xFF is the invalid value
@@ -874,7 +861,6 @@ static void s_eo_mcserv_pwm_set(uint8_t i, int16_t v)
     if (i > 3)
         return;
     
-    #warning hal set the pwm taking as the argument a int32_t...should we change this parameter or the pwmvalues type?
     hal_motor_pwmset((hal_motor_t)i, v);
 }
 
