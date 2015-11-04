@@ -58,6 +58,10 @@ extern EOtheSKIN* eo_skin_Initialise(void);
 
 extern EOtheSKIN* eo_skin_GetHandle(void);
 
+extern eOresult_t eo_skin_AcceptCANframe(EOtheSKIN *p, eOcanframe_t *frame, eOcanport_t port);
+
+extern eOresult_t eo_skin_Tick(EOtheSKIN *p, eObool_t regularROPSjustTransmitted);
+
 // it disables the tx mode ..
 extern eOresult_t eo_skin_DisableTX(EOtheSKIN *p);
 

@@ -37,6 +37,7 @@
 
 #include "EOMtheEMSappl.h"
 
+#include "EOarray.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -74,7 +75,10 @@
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static void* s_eo_skin_get_entity(eOprotEndpoint_t endpoint, eOprot_entity_t entity, eOcanframe_t *frame, eOcanport_t port, uint8_t *index);
+
+static eObool_t s_eo_skin_activeskin_can_accept_canframe(void);
+
+static eOsk_skin_t* s_eo_skin_get_entity(eOcanframe_t *frame, eOcanport_t port, uint8_t *index);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -86,7 +90,9 @@ static EOtheSKIN s_eo_theskin =
     .initted            = eobool_false,
     .thereisskin        = eobool_false,
     .numofskins         = 0,
-    .command            = {0}
+    .command            = {0},
+    .rxdata             = {NULL, NULL},
+    .skinpatches        = {NULL, NULL}
 };
 
 //static const char s_eobj_ownname[] = "EOtheSKIN";
@@ -113,6 +119,12 @@ extern EOtheSKIN* eo_skin_Initialise(void)
     else
     {
         s_eo_theskin.thereisskin = eobool_true;
+        uint8_t i = 0;
+        for(i=0; i<s_eo_theskin.numofskins; i++)
+        {
+            s_eo_theskin.skinpatches[i] = eo_entities_GetSkin(eo_entities_GetHandle(), i);
+            s_eo_theskin.rxdata[i] = eo_vector_New(sizeof(eOsk_candata_t), 64, NULL, NULL, NULL, NULL);             
+        }
     }
 
     s_eo_theskin.initted = eobool_true;
@@ -124,6 +136,117 @@ extern EOtheSKIN* eo_skin_Initialise(void)
 extern EOtheSKIN* eo_skin_GetHandle(void)
 {
     return(eo_skin_Initialise());
+}
+
+
+
+extern eOresult_t eo_skin_AcceptCANframe(EOtheSKIN *p, eOcanframe_t *frame, eOcanport_t port)
+{
+    if((NULL == p) || (NULL == frame))
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    if(eobool_false == s_eo_theskin.thereisskin)
+    {   // nothing to do because we dont have skin service.active
+        return(eores_OK);
+    } 
+    
+    if(eobool_false == s_eo_skin_activeskin_can_accept_canframe())
+    {
+        return(eores_OK);
+    }
+
+ 
+    uint8_t index = 0;    
+    eOsk_skin_t *skin = s_eo_skin_get_entity(frame, port, &index);
+
+    if(index >= s_eo_theskin.numofskins)
+    {
+        return(eores_NOK_generic);
+    }
+    
+    eOsk_candata_t candata = {0};
+    uint16_t info = EOSK_CANDATA_INFO(frame->size, frame->id);
+    candata.info = info;    
+    memcpy(candata.data, frame->data, sizeof(candata.data));  
+    
+    EOarray *array = (EOarray*)(&skin->status.arrayofcandata);
+    
+    if(eobool_false == eo_array_Full(array))
+    {   // put it inside the status array
+        eo_array_PushBack(array, &candata);        
+    }
+    else if(eobool_false == eo_vector_Full(s_eo_theskin.rxdata[index]))
+    {   // put it inside the vector
+        eo_vector_PushBack(s_eo_theskin.rxdata[index], &candata);
+    }
+    else
+    {   // damn... a loss of can frames
+        eOerrmanDescriptor_t des = {0};
+        des.code            = eoerror_code_get(eoerror_category_Skin, eoerror_value_SK_arrayofcandataoverflow);
+        des.par16           = (frame->id & 0x0fff) | ((frame->size & 0x000f) << 12);
+        des.par64           = eo_common_canframe_data2u64((eOcanframe_t*)frame);
+        des.sourceaddress   = EOCANPROT_FRAME_GET_SOURCE(frame);
+        des.sourcedevice    = (eOcanport1 == port) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, NULL, &des);         
+    }
+
+    return(eores_OK);
+}
+
+
+extern eOresult_t eo_skin_Tick(EOtheSKIN *p, eObool_t regularROPSjustTransmitted)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    if(eobool_false == s_eo_theskin.thereisskin)
+    {   // nothing to do because we dont have skin 
+        return(eores_OK);
+    } 
+    
+    uint8_t i = 0;
+    
+    
+    for(i=0; i<s_eo_theskin.numofskins; i++)
+    {
+        EOarray *array = (EOarray*) (&s_eo_theskin.skinpatches[i]->status.arrayofcandata);
+        EOvector *vector = (EOvector*) s_eo_theskin.rxdata[i];
+        
+        if(eobool_true == regularROPSjustTransmitted)
+        {
+            eo_array_Reset(array);            
+        }
+        
+        if(eobool_true == eo_array_Full(array))
+        {
+            continue;
+        }
+        
+        if(eobool_true == eo_vector_Empty(vector))
+        {
+            continue;
+        }
+        
+        // load all what i can from vector into array.
+        
+        uint8_t availabledestination = eo_array_Available(array);
+        uint8_t sizesource = eo_vector_Size(vector);
+        uint8_t numofitems2move = EO_MIN(availabledestination, sizesource);
+        uint8_t j = 0;
+        for(j=0; j<numofitems2move; j++)
+        {
+            eOsk_candata_t *candata = (eOsk_candata_t*)eo_vector_Front(vector);
+            eo_array_PushBack(array, candata);
+            eo_vector_PopFront(vector);            
+        }               
+    }
+
+    
+    return(eores_OK);
 }
 
 
@@ -415,9 +538,9 @@ extern eObool_t eocanprotSKperiodic_redefinable_SkipParsingOf_ANY_PERIODIC_SKIN_
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-static void* s_eo_skin_get_entity(eOprotEndpoint_t endpoint, eOprot_entity_t entity, eOcanframe_t *frame, eOcanport_t port, uint8_t *index)
+static eOsk_skin_t* s_eo_skin_get_entity(eOcanframe_t *frame, eOcanport_t port, uint8_t *index)
 {
-    void * ret = NULL;
+    eOsk_skin_t * ret = NULL;
     uint8_t ii = 0;
     eOcanmap_location_t loc = {0};
     
@@ -425,22 +548,39 @@ static void* s_eo_skin_get_entity(eOprotEndpoint_t endpoint, eOprot_entity_t ent
     loc.addr = EOCANPROT_FRAME_GET_SOURCE(frame);    
     loc.insideindex = eocanmap_insideindex_none;
     
-    ii = eo_canmap_GetEntityIndexExtraCheck(eo_canmap_GetHandle(), loc, endpoint, entity);
+    ii = eo_canmap_GetEntityIndexExtraCheck(eo_canmap_GetHandle(), loc, eoprot_endpoint_skin, eoprot_entity_sk_skin);
     
     if(EOK_uint08dummy == ii)
-    {     
-        #warning -> TODO: add diagnostics about not found board as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
+    {  
+        *index = ii;
         return(NULL);
     }
     
-    ret = eoprot_entity_ramof_get(eoprot_board_localboard, endpoint, entity, ii);
+    ret = s_eo_theskin.skinpatches[ii];
     
-    if(NULL != index)
-    {
-        *index = ii;        
-    }  
+    *index = ii;        
 
     return(ret);   
+}
+
+
+//#define EOSKIN_ALWAYS_ACCEPT_CANFRAMES_IN_ACTIVE_MODE
+static eObool_t s_eo_skin_activeskin_can_accept_canframe(void)
+{
+#if     defined(EOSKIN_ALWAYS_ACCEPT_CANFRAMES_IN_ACTIVE_MODE)
+    // in this case the service.active skin always accepts can frames, even if the run mode is not.
+    // it is up to robotInterface to put system in run mode, so that the overflow of fifo is avoided
+    return(eobool_true);
+#else
+    // in this mode the service.active skin accepts can frames only if we are in run mode, thus the fifo can be emptied.    
+    eOsmStatesEMSappl_t applstate = eo_sm_emsappl_STerr;
+    eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &applstate);   
+    if(eo_sm_emsappl_STrun == applstate)
+    {
+        return(eobool_true);
+    }    
+    return(eobool_false);    
+#endif       
 }
 
 // -- oldies

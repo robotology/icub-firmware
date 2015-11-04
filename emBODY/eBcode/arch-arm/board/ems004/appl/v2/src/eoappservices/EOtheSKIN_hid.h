@@ -45,6 +45,8 @@ struct EOtheSKIN_hid
     eObool_t            thereisskin;
     uint8_t             numofskins;
     eOcanprot_command_t command;
+    EOvector*           rxdata[2]; // of eOsk_candata_t 
+    eOsk_skin_t*        skinpatches[2];
 }; 
 
 
