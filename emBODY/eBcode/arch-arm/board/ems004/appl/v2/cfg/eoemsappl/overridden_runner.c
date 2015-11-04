@@ -62,6 +62,8 @@
 
 #include "EOtheInertial.h"
 
+#include "EOtheSkin.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -110,9 +112,6 @@ void userDef_hwErrCntr(void){}
 // --------------------------------------------------------------------------------------------------------------------
     
 
-
-static EOarray* s_getSkinDataArray(eOcanport_t port);
-
 //DO
 static void s_taskDO_activity_2foc(EOMtheEMSrunner *p);
 
@@ -160,36 +159,20 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(EO
 
 extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOMtheEMSrunner *p)
 {
-    uint8_t                         numofRXcanframe = 0;
-    uint8_t                         port;
+    
+    // i parse every can frame. in branch runtime_ems_config we use eo_canserv_ParseAll() with code as below.
+    
+    uint8_t port = eOcanport1;
+    uint8_t rxframes = 0;
     
     for(port=eOcanport1; port<eOcanports_number; port++)
-    {
-        // marco.accame: the following strategy is ok if the bus containing skin does not contain any other board type
-        // the bus has only skin? then i read at most a number of canframes equal to what the skin-data buffer can host
-        // else i read all the content of the rx can buffer.
-        
-        // step 1: decide the max number of can frames to read
-        
-        EOarray *arrayofcandata = s_getSkinDataArray((eOcanport_t)port);
-        if(NULL != arrayofcandata)
-        {   // ok, in this can bus we have a skin 
-
-            // i read from bus at most the number of can frame that the array can host. 
-            // that does not depend on the fact that in this cycle we transmit the regulars.
-            // the array is emptied only after the regulars are transmitted, so that no can frame is lost.
-            // this operation is done in function eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission()
-            numofRXcanframe = eo_array_Available(arrayofcandata);
+    {   
+        if(0 != (rxframes = eo_canserv_NumberOfFramesInRXqueue(eo_canserv_GetHandle(), (eOcanport_t)port)))
+        {
+            eo_canserv_Parse(eo_canserv_GetHandle(), (eOcanport_t)port, rxframes, NULL);
         }
-        else
-        {   // in this can bus we dont have skin, thus ... i read everything in the rx can buffer
-            numofRXcanframe = eo_canserv_NumberOfFramesInRXqueue(eo_canserv_GetHandle(), (eOcanport_t)port);
-        }
+    }    
 
-        // step 2: read the can frames. this function also parses them and triggers associated action ...
-        
-        eo_canserv_Parse(eo_canserv_GetHandle(), (eOcanport_t)port, numofRXcanframe, NULL);
-    }
 }
 
 
@@ -240,25 +223,13 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission
 
 extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(EOMtheEMSrunner *p)
 {        
-    // if we have skin and we have just transmitted the regulars, then we must reset the status->array containing the
-    // can frames, so that at the rx cycle we can put some more canframes inside.
-    uint8_t port = 0;
-    EOarray *arrayofcandata = NULL;
-    for(port=eOcanport1; port<eOcanports_number; port++)
-    {
-        if(NULL != (arrayofcandata = s_getSkinDataArray((eOcanport_t)port)))
-        {   // ok, in this can bus we have a skin   
-            if(eobool_true == eom_emsrunner_CycleHasJustTransmittedRegulars(eom_emsrunner_GetHandle()))
-            {   // ok, we can reset the array of can data
-                eo_array_Reset(arrayofcandata);
-            }            
-        }
-    }
+    eObool_t prevTXhadRegulars = eom_emsrunner_CycleHasJustTransmittedRegulars(eom_emsrunner_GetHandle());
+    // we tick skin as we do in branch runtime_ems_config. we move can frames from internal buffer of EOtheSkin to status of skin inside this function
+    eo_skin_Tick(eo_skin_GetHandle(), prevTXhadRegulars); 
     
-    
-    
+
     // we could refresh status in here ... but only if we have just sent to robotinterface the previous status
-    if(eobool_true == eom_emsrunner_CycleHasJustTransmittedRegulars(eom_emsrunner_GetHandle()))
+    if(eobool_true == prevTXhadRegulars)
     {
         eo_inertial_RefreshStatusOfEntity(eo_inertial_GetHandle());
     }
@@ -297,48 +268,6 @@ extern void eom_emsrunner_hid_userdef_onemstransceivererror(EOMtheEMStransceiver
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
-
-static EOarray* s_getSkinDataArray(eOcanport_t port)
-{   // tells if the can port has a skin entity in it 
-    static EOarray* arraysofcandata[2] = {NULL, NULL};
-    static eObool_t evaluated[2] = {eobool_false, eobool_false};
-    
-
-    if(eobool_false == evaluated[port])
-    {
-        evaluated[port] = eobool_true;       
-        eOcanmap_location_t loc = {0};
-        
-        // is the first skin with index 0 or with index 1 on this can bus? 
-        
-        if(eores_OK == eo_canmap_GetEntityLocation(eo_canmap_GetHandle(), eoprot_ID_get(eoprot_endpoint_skin, eoprot_entity_sk_skin, 0, 0), &loc, NULL, NULL))
-        {   // found a skin-0
-            if(port == loc.port)
-            {   // and it is on the same can port passed as function argument
-                eOsk_status_t * skinstatus = eo_entities_GetSkinStatus(eo_entities_GetHandle(), 0);
-                if(NULL != skinstatus)
-                {
-                    arraysofcandata[port] = (EOarray*)(&skinstatus->arrayofcandata);
-                }                
-            }
-            
-        }
-        else if(eores_OK == eo_canmap_GetEntityLocation(eo_canmap_GetHandle(), eoprot_ID_get(eoprot_endpoint_skin, eoprot_entity_sk_skin, 1, 0), &loc, NULL, NULL))
-        {   // found a skin-1
-            if(port == loc.port)
-            {   // and it is on the same can port passed as function argument
-                eOsk_status_t * skinstatus = eo_entities_GetSkinStatus(eo_entities_GetHandle(), 1);
-                if(NULL != skinstatus)
-                {
-                    arraysofcandata[port] = (EOarray*)(&skinstatus->arrayofcandata);
-                }                
-            }            
-        }
-    }
-        
-    return(arraysofcandata[port]);    
-}
-
 
 
 
