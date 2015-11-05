@@ -1949,7 +1949,7 @@ void sendErrorMessage(uint8_t j, uint32_t ems_fault_mask_j, uint32_t motor_fault
         ems_fault_mask_j &= ~MOTOR_WRONG_STATE;
     }
     
-    if (ems_fault_mask_j || motor_fault_mask_j)
+    if ((ems_fault_mask_j & ~MOTOR_HARD_FAULT) || motor_fault_mask_j)
     {
         eOerrmanDescriptor_t descriptor = {0};
         descriptor.par16 = j; // unless required
