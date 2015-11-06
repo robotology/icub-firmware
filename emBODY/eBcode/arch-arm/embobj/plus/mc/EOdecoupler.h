@@ -70,6 +70,8 @@ extern eObool_t eo_motors_CableLimitAlarm(int32_t j0, int32_t j1, int32_t j2);
 extern void eo_motor_set_motor_status(EOmotors *o, uint8_t m, uint8_t* state);
 //extern uint8_t eo_motor_are_motors_in_fault(EOmotors *o, uint8_t mask);
 
+extern eObool_t eo_motors_isEncCalibrated(EOmotors *o, uint8_t motor);
+
 extern uint32_t eo_get_motor_fault_mask(EOmotors *o, uint8_t m);
 extern eObool_t eo_is_motor_hard_fault(EOmotors *o, uint8_t m);
 extern eObool_t eo_is_motor_ext_fault(EOmotors *o, uint8_t m);

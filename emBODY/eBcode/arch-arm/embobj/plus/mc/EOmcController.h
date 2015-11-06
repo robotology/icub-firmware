@@ -46,7 +46,8 @@ typedef enum
     emscontroller_board_FACE_lips               = 8,
     emscontroller_board_HAND_1                  = 9,
     emscontroller_board_HAND_2                  = 10,
-    emscontroller_board_FOREARM                 = 11
+    emscontroller_board_FOREARM                 = 11,
+	emscontroller_board_CER_WAIST               = 15
 } eOemscontroller_board_t;
 
 

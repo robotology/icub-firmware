@@ -42,6 +42,8 @@
 #define MOTORS(m) for (uint8_t m=0; m<o->nMotors; ++m)
 #define JOINTS(j) MOTORS(j) 
 
+//#define MOTOR_EXTERNAL_FAULT     0x00000004
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
@@ -92,6 +94,7 @@ extern EOmotors* eo_motors_New(uint8_t nMotors, eOemscontroller_board_t board)
             o->motor_run_state_req_wdog[m] = 100;
             o->motor_fault_mask[m] = 0;
             o->motor_qe_error[m] = 0;
+            o->motor_enc_not_calibrated[m] = 0xFF;
             
             JOINTS(j)
             {
@@ -114,6 +117,11 @@ extern EOmotors* eo_motors_GetHandle()
 extern uint32_t eo_motors_getQEError(EOmotors *o, uint8_t motor)
 {
     return o->motor_qe_error[motor];
+}
+
+extern eObool_t eo_motors_isEncCalibrated(EOmotors *o, uint8_t motor)
+{
+    return !o->motor_enc_not_calibrated[motor];
 }
 
 extern void eo_motors_new_state_req(EOmotors *o, uint8_t motor, uint8_t control_mode)
@@ -167,8 +175,9 @@ extern void eo_motor_set_motor_status(EOmotors *o, uint8_t m, uint8_t *state)
     if (!state) return;
 
     o->motor_run_state[m] = state[0]; //1byte
-    o->motor_qe_error[m] = (((uint32_t)(((uint16_t*)state)[1]))<<16) | (uint32_t)state[1]; //1byte
-    o->motor_fault_mask[m] = ((uint32_t*)state)[1]; //4bytes
+	o->motor_fault_mask[m] = ((uint32_t*)state)[1]; //4bytes    
+	o->motor_qe_error[m] = (((uint32_t)(((uint16_t*)state)[1]))<<16) | (uint32_t)state[1]; //1byte
+    o->motor_enc_not_calibrated[m] = state[1] & 0x10;
 }
 
 #include "EoError.h"
@@ -333,7 +342,7 @@ extern void eo_motors_decouple_PWM(EOmotors *o, float *pwm_joint, float *pwm_mot
         if (stiff[1]) {pwm_motor[1] = (pwm_joint[0]+pwm_joint[1])/2;} else {pwm_motor[1] = pwm_joint[1];}
         if (stiff[2]) {pwm_motor[2] =  pwm_joint[2];                } else {pwm_motor[2] = pwm_joint[2];}
     }        
-    else if ((emscontroller_board_UPPERLEG == o->board) || (emscontroller_board_FACE_lips == o->board))
+    else if ((emscontroller_board_UPPERLEG == o->board) || (emscontroller_board_CER_WAIST == o->board) || (emscontroller_board_FACE_lips == o->board))
     {    
         pwm_motor[0] = pwm_joint[0];
         pwm_motor[1] = pwm_joint[1];

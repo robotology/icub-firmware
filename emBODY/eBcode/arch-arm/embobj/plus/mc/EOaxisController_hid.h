@@ -86,6 +86,8 @@ struct EOaxisController_hid
     int8_t  rot_sign;
     
     int32_t err;
+    int32_t vel_raw;
+    int16_t time_raw;
     
     // measures (read only)
     int32_t torque_meas_jnt;

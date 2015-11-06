@@ -177,6 +177,14 @@
     };
     
 
+    static const eOprot_EPcfg_t s_theEPcfgsOthersEB15[] =
+    {  
+        {           
+            .endpoint           = eoprot_endpoint_motioncontrol,
+            .numberofentities  = {4, 4, 1, 0, 0, 0, 0}     
+        }   
+    };
+
 
 EOconstvector s_eo_vectorof_EPcfg_eb1eb3 = 
 {
@@ -235,6 +243,16 @@ EOconstvector s_eo_vectorof_EPcfg_eb10eb11 =
     .item_size      = sizeof(eOprot_EPcfg_t),
     .dummy          = 0,
     .stored_items   = (void*)s_theEPcfgsOthersEB10EB11,
+    .functions      = NULL   
+};
+
+EOconstvector s_eo_vectorof_EPcfg_eb15 = 
+{
+    .capacity       = sizeof(s_theEPcfgsOthersEB15)/sizeof(eOprot_EPcfg_t),
+    .size           = sizeof(s_theEPcfgsOthersEB15)/sizeof(eOprot_EPcfg_t),
+    .item_size      = sizeof(eOprot_EPcfg_t),
+    .dummy          = 0,
+    .stored_items   = (void*)s_theEPcfgsOthersEB15,
     .functions      = NULL   
 };
 

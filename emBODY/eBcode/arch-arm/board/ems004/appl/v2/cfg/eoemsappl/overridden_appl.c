@@ -56,6 +56,8 @@
 #include "EOVtheEnvironment.h"
 #include "EOtheARMenvironment.h"
 
+#include "EOemsControllerCfg.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -512,7 +514,9 @@ extern void eom_emsappl_hid_userdef_on_entry_RUN(EOMtheEMSappl* p)
     eo_canserv_TXwaituntildone(eo_canserv_GetHandle(), eOcanport2, 5*eok_reltime1ms);
 
     // Start reading the encoders
+    #ifndef USE_ONLY_QE
     eo_appEncReader_StartRead(eo_emsapplBody_GetEncoderReader(eo_emsapplBody_GetHandle()));
+    #endif
 }
 
 

@@ -64,17 +64,13 @@
 #define GET_COUPLED(joint,j) JOINTS(j) if (eo_motors_are_coupled(ems->motors, joint, j))
 //the MACROS below are now public (EOemsController.h), so that the application can set the error masks from other services (e.g. MC4plus application)
 /*
-#define MOTOR_HARD_FAULT         0x0001
-#define MOTOR_CAN_NOT_RESPONDING 0x0080
-#define MOTOR_WRONG_STATE        0x0002
+#define MOTOR_HARD_FAULT         0x00000001
+#define MOTOR_CAN_NOT_RESPONDING 0x00000080
+#define MOTOR_WRONG_STATE        0x00000002
 
-#define AXIS_TORQUE_SENS_FAULT   0x0100
-#define AEA_ABS_ENC_INVALID_DATA 0x4000
-#define AEA_ABS_ENC_TIMEOUT      0x8000
-
-//#define SM_INVALID_FAULT       0x4000
-//#define SM_TIMEOUT_FAULT       0x8000
-//#define SM_HARDWARE_FAULT      0xC000
+#define AXIS_TORQUE_SENS_FAULT   0x00000100
+#define AEA_ABS_ENC_INVALID_DATA 0x00004000
+#define AEA_ABS_ENC_TIMEOUT      0x00008000
 
 #define MOTOR_EXTERNAL_FAULT     0x00000004
 #define MOTOR_OVERCURRENT_FAULT  0x00000008
@@ -239,7 +235,6 @@ extern void eo_emsController_AcquireMotorEncoder(uint8_t motor, int16_t current,
     //   ems->motor_position[motor]     = - ems->motor_position[motor];
     //}
 }
-
 extern void eo_emsController_AcquireMotorPosition(uint8_t motor, int32_t position)
 {
     //don't need to rearm here cause this function is used for local actuators
@@ -318,7 +313,7 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
     int32_t axle_virt_vel[MAX_NAXLES];
     int32_t axle_virt_pos[MAX_NAXLES];
     
-    #if defined(USE_JACOBIAN)
+    #ifdef USE_JACOBIAN
     
     JOINTS(j)
     {
@@ -386,6 +381,18 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
         axle_virt_pos[2] =     ems->motor_position[2]    ;
         axle_virt_pos[3] =     ems->motor_position[3]    ;
     }
+    else if (ems->board == emscontroller_board_CER_WAIST)
+    {
+        axle_virt_vel[0] = ems->motor_velocity_gbx[0];
+        axle_virt_vel[1] = ems->motor_velocity_gbx[1];
+        axle_virt_vel[2] = ems->motor_velocity_gbx[2];
+        axle_virt_vel[3] = ems->motor_velocity_gbx[3];
+
+        axle_virt_pos[0] = ems->motor_position[0];
+        axle_virt_pos[1] = ems->motor_position[1];
+        axle_virt_pos[2] = ems->motor_position[2];
+        axle_virt_pos[3] = ems->motor_position[3];
+    }
     else if (ems->board == emscontroller_board_ANKLE)
     {
         axle_virt_vel[0] = ems->motor_velocity_gbx[0];
@@ -395,12 +402,17 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
         axle_virt_pos[1] = ems->motor_position[1];
     }
     #endif // USE_JACOBIAN
+
 #endif //USE_2FOC_FAST_ENCODER
     
     JOINTS(j)
     {
         #ifdef USE_2FOC_FAST_ENCODER
+            #ifdef EXPERIMENTAL_SPEED_CONTROL
+            eo_axleVirtualEncoder_Acquire(ems->motor_config_gearbox_ratio[j], ems->axle_virt_encoder[j], axle_abs_pos[j], axle_virt_pos[0], axle_virt_vel[j]);
+            #else
             eo_axleVirtualEncoder_Acquire(ems->motor_config_gearbox_ratio[j], ems->axle_virt_encoder[j], axle_abs_pos[j], axle_virt_pos[j], axle_virt_vel[j]);
+            #endif
             eo_axisController_SetEncPos(ems->axis_controller[j], eo_axleVirtualEncoder_GetPos(ems->axle_virt_encoder[j]));
             eo_axisController_SetEncVel(ems->axis_controller[j], eo_axleVirtualEncoder_GetVel(ems->axle_virt_encoder[j]));
         #else
@@ -458,8 +470,6 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
         eo_emsController_CheckCalibrations();
     }
 }
-
-
 
 extern void eo_emsController_CheckFaults()
 {
@@ -540,7 +550,9 @@ extern void eo_emsController_CheckFaults()
                         }
                     }
                 #else // USE_JACOBIAN
-                if (j<3 && ((ems->board == emscontroller_board_SHOULDER) || (ems->board == emscontroller_board_WAIST)))
+                if (j<3 && (ems->board == emscontroller_board_SHOULDER 
+                         || ems->board == emscontroller_board_WAIST 
+                         || ems->board == emscontroller_board_CER_WAIST))
                 {
                     set_2FOC_idle(0);
                     set_2FOC_idle(1);
@@ -607,9 +619,6 @@ extern void eo_emsController_CheckFaults()
         }
     }
 }
-
-
-
 extern void eo_emsController_ReadTorque(uint8_t joint, eOmeas_torque_t trq_measure)
 {
 #ifndef EXPERIMENTAL_MOTOR_TORQUE
@@ -653,6 +662,57 @@ extern void eo_emsController_PWM(int16_t* pwm_motor_16)
         }
     }
  
+    if (ems->board == emscontroller_board_CER_WAIST)
+    {
+        int32_t rho0= ems->axis_controller[0]->position;
+        int32_t rho1= ems->axis_controller[1]->position;
+        int32_t rho2= ems->axis_controller[2]->position;
+        
+        static char stuck0 = 0;
+        static char stuck1 = 0;
+        static char stuck2 = 0;
+        
+        if (rho0*rho0+rho1*rho1+rho2*rho2-rho0*rho1-rho1*rho2-rho2*rho0>400000) // 25 deg limit
+        {
+            if ( !(rho0 <= rho1 && rho0 <= rho2 && pwm_joint[0]>=0.f) && !(rho0 >= rho1 && rho0 >= rho2 && pwm_joint[0]<=0.f))
+            {
+                pwm_joint[0] = 0.f;
+                
+                if (!stuck0)
+                {
+                    stuck0 = 1;
+                    eo_axisController_Stop(ems->axis_controller[0]);
+                }
+            }
+            
+            if ( !(rho1 <= rho2 && rho1 <= rho0 && pwm_joint[1]>=0.f) && !(rho1 >= rho2 && rho1 >= rho0 && pwm_joint[1]<=0.f))
+            {
+                pwm_joint[1] = 0.f;
+                
+                if (!stuck1)
+                {
+                    stuck1 = 1;
+                    eo_axisController_Stop(ems->axis_controller[1]);
+                }
+            }
+            
+            if ( !(rho2 <= rho0 && rho2 <= rho1 && pwm_joint[2]>=0.f) && !(rho2 >= rho0 && rho2 >= rho1 && pwm_joint[2]<=0.f))
+            {
+                pwm_joint[2] = 0.f;
+                
+                if (!stuck2)
+                {
+                    stuck2 = 1;
+                    eo_axisController_Stop(ems->axis_controller[2]);
+                }
+            }
+        }
+        else
+        {
+            stuck0 = stuck1 = stuck2 = 0;
+        }
+    }
+
     //torque control limits protection mechanism
     JOINTS(j)
     {
@@ -666,6 +726,11 @@ extern void eo_emsController_PWM(int16_t* pwm_motor_16)
         int32_t pos = ems->axis_controller[j]->position;
         if (pos <  ems->axis_controller[j]->pos_min)
         {
+            #ifdef EXPERIMENTAL_SPEED_CONTROL
+            
+                if (pwm_joint[j]<0) pwm_joint[j] = 0;
+            
+            #else
             float pwm_lim = eo_pid_PWM_p( ems->axis_controller[j]->pidP, ems->axis_controller[j]->pos_min - pos);
             if ((pwm_lim > 0) ^ (pwm_joint[j] > pwm_lim)) 
             {
@@ -673,9 +738,15 @@ extern void eo_emsController_PWM(int16_t* pwm_motor_16)
                for (int8_t k; k<ems->naxles; k++)
                    torque_protection[k] = eobool_true; //put in protection all motors
             }
+            #endif
         }
         else if (pos >  ems->axis_controller[j]->pos_max)
         {
+            #ifdef EXPERIMENTAL_SPEED_CONTROL
+            
+                if (pwm_joint[j]>0) pwm_joint[j] = 0;
+            
+            #else
             float pwm_lim = eo_pid_PWM_p( ems->axis_controller[j]->pidP,  ems->axis_controller[j]->pos_max - pos);
             if ((pwm_lim > 0) ^ (pwm_joint[j] > pwm_lim))
             {
@@ -683,6 +754,7 @@ extern void eo_emsController_PWM(int16_t* pwm_motor_16)
                for (int8_t k; k<ems->naxles; k++)
                    torque_protection[k] = eobool_true; //put in protection all motors
             }
+            #endif
         }
       }
     }
@@ -691,13 +763,15 @@ extern void eo_emsController_PWM(int16_t* pwm_motor_16)
     float pwm_motor[MAX_NAXLES];
     eo_motors_decouple_PWM(ems->motors, pwm_joint, pwm_motor, stiffness);
     
+    #ifndef EXPERIMENTAL_SPEED_CONTROL
     //Friction compensation after joints decoupling
     MOTORS(m)
     {
         if (!torque_protection[m])
             pwm_motor[m] = eo_axisController_FrictionCompensation(ems->axis_controller[m],pwm_motor[m],ems->motor_velocity[m]);
     }
-    
+    #endif
+
     //hardware limit
     MOTORS(m) LIMIT(pwm_motor[m], ems->actuation_limit);
     
@@ -763,7 +837,7 @@ extern void eo_emsController_GetDecoupledMeasuredTorque(uint8_t joint_id, int32_
           if (joint_id==1) {*torque_motor=(ems->axis_controller[0]->torque_meas_jnt + ems->axis_controller[1]->torque_meas_jnt)*0.5 + ems->axis_controller[2]->torque_meas_jnt*0.275; return;}
           if (joint_id==2) {*torque_motor= ems->axis_controller[2]->torque_meas_jnt*0.55; return;}
     }
-    else if (ems->board == emscontroller_board_UPPERLEG)
+    else if (ems->board == emscontroller_board_UPPERLEG || ems->board == emscontroller_board_CER_WAIST)
     {
           if (joint_id==0) {*torque_motor=ems->axis_controller[0]->torque_meas_jnt; return;}
           if (joint_id==1) {*torque_motor=ems->axis_controller[1]->torque_meas_jnt; return;}
@@ -800,7 +874,7 @@ extern void eo_emsController_GetDecoupledReferenceTorque(uint8_t joint_id, int32
         if (joint_id==1) {*torque_motor=(ems->axis_controller[0]->torque_ref_jnt + ems->axis_controller[1]->torque_ref_jnt)*0.5 + ems->axis_controller[2]->torque_ref_jnt*0.275; return;}
         if (joint_id==2) {*torque_motor= ems->axis_controller[2]->torque_ref_jnt*0.55; return;}
     }
-    else if (ems->board == emscontroller_board_UPPERLEG)
+    else if (ems->board == emscontroller_board_UPPERLEG || ems->board == emscontroller_board_CER_WAIST)
     {
         if (joint_id==0) {*torque_motor=ems->axis_controller[0]->torque_ref_jnt; return;}
         if (joint_id==1) {*torque_motor=ems->axis_controller[1]->torque_ref_jnt; return;}
@@ -827,7 +901,9 @@ extern void eo_emsController_SetControlModeGroupJoints(uint8_t joint, eOmc_contr
 
 extern eObool_t eo_emsController_SetInteractionModeGroupJoints(uint8_t joint, eOmc_interactionmode_t mode)
 {
-    if (joint<3 && (ems->board == emscontroller_board_SHOULDER || ems->board == emscontroller_board_WAIST)) 
+    if (joint<3 && (ems->board == emscontroller_board_SHOULDER 
+                 || ems->board == emscontroller_board_WAIST 
+                 || ems->board == emscontroller_board_CER_WAIST)) 
     {
         eo_emsController_SetInteractionMode(0, mode);
         eo_emsController_SetInteractionMode(1, mode);
@@ -884,7 +960,9 @@ extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_comm
             eo_axisController_SetControlMode(ems->axis_controller[j], eomc_controlmode_cmd_force_idle);
         }
         #else // USE_JACOBIAN
-        if (joint<3 && ((ems->board == emscontroller_board_SHOULDER) || (ems->board == emscontroller_board_WAIST)))
+        if (joint<3 && (ems->board == emscontroller_board_SHOULDER 
+                     || ems->board == emscontroller_board_WAIST 
+                     || ems->board == emscontroller_board_CER_WAIST))
         {
             force_2FOC_idle(0);
             eo_absCalibratedEncoder_ClearFaults(ems->abs_calib_encoder[0]);
@@ -936,7 +1014,9 @@ extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_comm
             eo_axisController_SetControlMode(ems->axis_controller[j], eomc_controlmode_cmd_idle);
         }
         #else
-        if (joint<3 && ((ems->board == emscontroller_board_SHOULDER) || (ems->board == emscontroller_board_WAIST)))
+        if (joint<3 && (ems->board == emscontroller_board_SHOULDER 
+                     || ems->board == emscontroller_board_WAIST 
+                     || ems->board == emscontroller_board_CER_WAIST))
         {
             set_2FOC_idle(0);
             set_2FOC_idle(1);
@@ -985,7 +1065,9 @@ extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_comm
         
         #else
         
-        if (joint<3 && ((ems->board == emscontroller_board_SHOULDER) || (ems->board == emscontroller_board_WAIST)))
+        if (joint<3 && (ems->board == emscontroller_board_SHOULDER 
+                     || ems->board == emscontroller_board_WAIST 
+                     || ems->board == emscontroller_board_CER_WAIST))
         {
             if (eo_axisController_IsHardwareFault(ems->axis_controller[0])) return;
             if (eo_axisController_IsHardwareFault(ems->axis_controller[1])) return;
@@ -1065,6 +1147,13 @@ extern eOmc_interactionmode_t eo_emsController_GetInteractionMode(uint8_t joint)
 extern void eo_emsController_ResetPosPid(uint8_t joint)
 {
     if (ems) eo_pid_Reset(eo_axisController_GetPosPidPtr(ems->axis_controller[joint]));
+}
+
+extern eObool_t eo_emsMotorController_isMotorEncoderCalibrated(uint8_t motor)
+{
+    if (!ems) return eobool_false;
+    
+    return eo_motors_isEncCalibrated(ems->motors, motor);
 }
 
 extern void eo_emsController_StartCalibration_type3(uint8_t joint, int32_t pos, int32_t vel, int32_t offset)
@@ -1147,7 +1236,6 @@ extern void eo_emsController_CheckCalibrations(void)
         
         ENCODERS(e)
         {
-       
           if (eo_motors_are_coupled(ems->motors, j, e))
           {
             if (!eo_absCalibratedEncoder_IsOk(ems->abs_calib_encoder[e]))
@@ -1164,8 +1252,11 @@ extern void eo_emsController_CheckCalibrations(void)
         if (joint_ok[j])
         {
             if( (ems->axis_controller[j]->calibration_type == eomc_calibration_type3_abs_sens_digital)
-                ||
-                (ems->axis_controller[j]->calibration_type == eomc_calibration_type5_hard_stops_mc4plus && ems->axis_controller[j]->hardwarelimitisreached))
+            {
+                ems->n_calibrated++;
+                eo_axisController_SetCalibrated(ems->axis_controller[j]);
+            }
+            else if (ems->axis_controller[j]->calibration_type == eomc_calibration_type5_hard_stops_mc4plus && ems->axis_controller[j]->hardwarelimitisreached)
             {  
                 ems->n_calibrated++;
                 eo_axisController_SetCalibrated(ems->axis_controller[j]);
@@ -1179,9 +1270,38 @@ extern void eo_emsController_CheckCalibrations(void)
     }
     
     #else // ! USE_JACOBIAN
-    
-    if (ems->board == emscontroller_board_UPPERLEG || ems->board == emscontroller_board_ANKLE ||
-        emscontroller_board_FACE_eyelids_jaw == ems->board || emscontroller_board_FACE_lips == ems->board)
+
+    if (ems->board == emscontroller_board_UPPERLEG || ems->board == emscontroller_board_ANKLE)
+    {
+        JOINTS(j)
+        {
+            if (eo_axisController_IsCalibrated(ems->axis_controller[j]))
+            {
+                ems->n_calibrated++;
+            }
+            else if (eo_absCalibratedEncoder_IsOk(ems->abs_calib_encoder[j]))
+            {                    
+                static eObool_t foc_running[MAX_NAXLES] = {eobool_false, eobool_false, eobool_false, eobool_false};
+            
+                if (!foc_running[j])
+                {
+                    foc_running[j] = eobool_true;
+                
+                    set_2FOC_running(j);
+                }
+                
+                if (eo_motors_isEncCalibrated(ems->motors, j))
+                {
+                    ems->n_calibrated++;
+            
+                    eo_axisController_SetCalibrated(ems->axis_controller[j]);
+                
+                    foc_running[j] = eobool_false;
+                }
+            }
+        }
+    }
+    else if (emscontroller_board_FACE_eyelids_jaw == ems->board || emscontroller_board_FACE_lips == ems->board)
     {
         JOINTS(j)
         {
@@ -1206,7 +1326,9 @@ extern void eo_emsController_CheckCalibrations(void)
             }
         }
     }
-    else if (ems->board == emscontroller_board_SHOULDER || ems->board == emscontroller_board_WAIST)
+    else if (ems->board == emscontroller_board_SHOULDER 
+          || ems->board == emscontroller_board_WAIST 
+          || ems->board == emscontroller_board_CER_WAIST)
     {
         if (eo_axisController_IsCalibrated(ems->axis_controller[0]) &&
             eo_axisController_IsCalibrated(ems->axis_controller[1]) &&
@@ -1214,35 +1336,36 @@ extern void eo_emsController_CheckCalibrations(void)
         {
             ems->n_calibrated+=3;
         }
-        else if ((eo_absCalibratedEncoder_IsOk(ems->abs_calib_encoder[0]))  && (eo_absCalibratedEncoder_IsOk(ems->abs_calib_encoder[1])) && (eo_absCalibratedEncoder_IsOk(ems->abs_calib_encoder[2])))
-        {            
-            if((    (ems->axis_controller[0]->calibration_type == eomc_calibration_type3_abs_sens_digital)
-                &&  (ems->axis_controller[1]->calibration_type == eomc_calibration_type3_abs_sens_digital)
-                &&  (ems->axis_controller[2]->calibration_type == eomc_calibration_type3_abs_sens_digital))
-                ||
-                (   (ems->axis_controller[0]->calibration_type == eomc_calibration_type5_hard_stops_mc4plus && ems->axis_controller[0]->hardwarelimitisreached)
-                &&  (ems->axis_controller[1]->calibration_type == eomc_calibration_type5_hard_stops_mc4plus && ems->axis_controller[1]->hardwarelimitisreached)
-                &&  (ems->axis_controller[2]->calibration_type == eomc_calibration_type5_hard_stops_mc4plus && ems->axis_controller[2]->hardwarelimitisreached)))   
+        else if (eo_absCalibratedEncoder_IsOk(ems->abs_calib_encoder[0]) && 
+                 eo_absCalibratedEncoder_IsOk(ems->abs_calib_encoder[1]) &&
+                 eo_absCalibratedEncoder_IsOk(ems->abs_calib_encoder[2]))
+        {
+            static eObool_t foc_running = eobool_false;
+            
+            if (!foc_running)
             {
-                ems->n_calibrated+=3;
-                eo_axisController_SetCalibrated(ems->axis_controller[0]);
-                eo_axisController_SetCalibrated(ems->axis_controller[1]);
-                eo_axisController_SetCalibrated(ems->axis_controller[2]);
+                foc_running = eobool_true;
                 
                 set_2FOC_running(0);
                 set_2FOC_running(1);
                 set_2FOC_running(2);
+            }
+            
+            if (eo_motors_isEncCalibrated(ems->motors, 0) 
+             && eo_motors_isEncCalibrated(ems->motors, 1) 
+             && eo_motors_isEncCalibrated(ems->motors, 2))
+            {
+                ems->n_calibrated+=3;
+            
+                eo_axisController_SetCalibrated(ems->axis_controller[0]);
+                eo_axisController_SetCalibrated(ems->axis_controller[1]);
+                eo_axisController_SetCalibrated(ems->axis_controller[2]);
                 
-                eo_axisController_SetControlMode(ems->axis_controller[0], eomc_controlmode_cmd_position);
-                eo_axisController_SetInteractionMode(ems->axis_controller[0], eOmc_interactionmode_stiff);
-                eo_axisController_SetControlMode(ems->axis_controller[1], eomc_controlmode_cmd_position);
-                eo_axisController_SetInteractionMode(ems->axis_controller[1], eOmc_interactionmode_stiff);
-                eo_axisController_SetControlMode(ems->axis_controller[2], eomc_controlmode_cmd_position);
-                eo_axisController_SetInteractionMode(ems->axis_controller[2], eOmc_interactionmode_stiff);
+                foc_running = eobool_false;
             }
         }
   
-        if (ems->board == emscontroller_board_SHOULDER)
+        if (ems->board == emscontroller_board_SHOULDER || ems->board == emscontroller_board_CER_WAIST)
         {
             if (eo_axisController_IsCalibrated(ems->axis_controller[3]))
             {
@@ -1250,21 +1373,27 @@ extern void eo_emsController_CheckCalibrations(void)
             }
             else if (eo_absCalibratedEncoder_IsOk(ems->abs_calib_encoder[3]))
             {    
-                if((ems->axis_controller[3]->calibration_type == eomc_calibration_type3_abs_sens_digital)
-                    ||
-                   (ems->axis_controller[3]->calibration_type == eomc_calibration_type5_hard_stops_mc4plus && ems->axis_controller[3]->hardwarelimitisreached))
-                { 
-                    ems->n_calibrated++;
-                    eo_axisController_SetCalibrated(ems->axis_controller[3]);
-                    
+                static eObool_t foc_running = eobool_false;
+            
+                if (!foc_running)
+                {
+                    foc_running = eobool_true;
+                
                     set_2FOC_running(3);
-                    
-                    eo_axisController_SetControlMode(ems->axis_controller[3], eomc_controlmode_cmd_position);
-                    eo_axisController_SetInteractionMode(ems->axis_controller[3], eOmc_interactionmode_stiff);
+                }
+                
+                if (eo_motors_isEncCalibrated(ems->motors, 3))
+                {
+                    ems->n_calibrated++;
+            
+                    eo_axisController_SetCalibrated(ems->axis_controller[3]);
+                
+                    foc_running = eobool_false;
                 }
             }
         }
     }
+
    	else if(emscontroller_board_HEAD_neckpitch_neckroll == ems->board)
     {
         if (eo_axisController_IsCalibrated(ems->axis_controller[0]) &&
@@ -1575,7 +1704,8 @@ extern uint16_t eo_emsController_GetActuationLimit(void)
     //2FOC is internally limited
     if (ems->act == emscontroller_actuation_2FOC)
         //return PWM_OUTPUT_LIMIT;
-        return 32000; //input limit of the the CAN command containing the PWM applied to motors
+        return PWM_OUTPUT_LIMIT_2FOC;
+        //return 32000; //input limit of the the CAN command containing the PWM applied to motors
     //MC4plus, hw-limited to 3360
     else if (ems->act == emscontroller_actuation_LOCAL)
         return 3360;
@@ -1648,13 +1778,15 @@ void set_2FOC_running(uint8_t motor)
 }
 
 //#define MOTOR_QENCODER_FAULT     0x00100000
-    
+
 static void s_eo_emsController_ResetCalibrationCoupledJoints(uint8_t joint)
 {
     uint8_t i;
     
     //check coupled joints
-    if((emscontroller_board_SHOULDER == ems->board) || (emscontroller_board_WAIST == ems->board))    
+    if((emscontroller_board_SHOULDER == ems->board) 
+    || (emscontroller_board_WAIST == ems->board) 
+    || (ems->board == emscontroller_board_CER_WAIST))   
     {
       if (joint < 3)
       {

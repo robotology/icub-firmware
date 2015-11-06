@@ -33,17 +33,14 @@ extern "C" {
 // - public #define  --------------------------------------------------------------------------------------------------
 
 //must be public cause used to set the right flag in MC4plus application
-#define MOTOR_HARD_FAULT         0x0001
-#define MOTOR_CAN_NOT_RESPONDING 0x0080
-#define MOTOR_WRONG_STATE        0x0002
 
-#define AXIS_TORQUE_SENS_FAULT   0x0100
-#define AEA_ABS_ENC_INVALID_DATA 0x4000
-#define AEA_ABS_ENC_TIMEOUT      0x8000
+#define MOTOR_HARD_FAULT         0x00000001
+#define MOTOR_CAN_NOT_RESPONDING 0x00000080
+#define MOTOR_WRONG_STATE        0x00000002
 
-//#define SM_INVALID_FAULT       0x4000
-//#define SM_TIMEOUT_FAULT       0x8000
-//#define SM_HARDWARE_FAULT      0xC000
+#define AXIS_TORQUE_SENS_FAULT   0x00000100
+#define AEA_ABS_ENC_INVALID_DATA 0x00004000
+#define AEA_ABS_ENC_TIMEOUT      0x00008000
 
 #define MOTOR_EXTERNAL_FAULT     0x00000004
 #define MOTOR_OVERCURRENT_FAULT  0x00000008
@@ -163,6 +160,8 @@ extern void eo_emsController_GetDecoupledMeasuredTorque (uint8_t joint, int32_t 
 extern void eo_emsController_GetDecoupledReferenceTorque (uint8_t joint, int32_t * Trq);
 extern uint16_t eo_emsController_GetActuationLimit(void);
 extern void eo_emsMotorController_GoIdle(void);
+
+extern eObool_t eo_emsMotorController_isMotorEncoderCalibrated(uint8_t motor);    
 
 /** @}            
     end of group eo_emsController  

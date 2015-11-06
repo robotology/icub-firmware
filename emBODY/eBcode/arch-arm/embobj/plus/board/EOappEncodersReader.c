@@ -236,6 +236,12 @@ extern eOresult_t eo_appEncReader_StartRead(EOappEncReader *p)
 extern eOresult_t  eo_appEncReader_GetJointValue(EOappEncReader *p, eo_appEncReader_joint_position_t joint_number, uint32_t *primary_value,
                                             uint32_t *extra_value, hal_encoder_errors_flags *flags)
 {
+    
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
     uint32_t val_raw = 0;;
     eOresult_t res1 = eores_NOK_generic;
     eOresult_t res2 = eores_NOK_generic;
@@ -502,6 +508,12 @@ extern eOresult_t  eo_appEncReader_GetJointValue(EOappEncReader *p, eo_appEncRea
 
 extern eOresult_t  eo_appEncReader_GetValue(EOappEncReader *p, eOappEncReader_encoder_t enc, uint32_t *value, hal_encoder_errors_flags *flags)
 {
+    
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
     uint32_t val_raw;
     eOresult_t res = eores_NOK_generic;
     eOappEncReader_errortype_t errortype;
@@ -578,28 +590,49 @@ extern eOresult_t  eo_appEncReader_GetValue(EOappEncReader *p, eOappEncReader_en
 
 extern uint64_t eo_appEncReader_startSPI_stream0(EOappEncReader *p)
 {
+    if(NULL == p)
+    {
+        return(0);
+    }
+    
     return p->times[0][0];
 }
 
 extern uint64_t eo_appEncReader_startSPI_stream1(EOappEncReader *p)
 {
+    if(NULL == p)
+    {
+        return(0);
+    }
     return p->times[1][0];
 }
 
 extern uint32_t eo_appEncReader_deltaSPI_stream0(EOappEncReader *p)
 {
+    if(NULL == p)
+    {
+        return(0);
+    }
     uint64_t d = p->times[0][3] - p->times[0][0];
     return((uint32_t)d);
 }
 
 extern uint32_t eo_appEncReader_deltaSPI_stream1(EOappEncReader *p)
 {
+    if(NULL == p)
+    {
+        return(0);
+    }
     uint64_t d = p->times[1][3] - p->times[1][0];
     return((uint32_t)d);    
 }
 
 __inline extern eObool_t eo_appEncReader_isReady(EOappEncReader *p)
 {
+    if(NULL == p)
+    {
+        return(eobool_true);
+    }
     // no SPI encoders
     if((p->configuredEnc_SPI_stream0.readSeq.first == ENCODER_NULL) && (p->configuredEnc_SPI_stream1.readSeq.first == ENCODER_NULL))
     {
@@ -629,6 +662,10 @@ __inline extern eObool_t eo_appEncReader_isReady(EOappEncReader *p)
 
 __inline extern eObool_t eo_appEncReader_isReadySPI_stream0(EOappEncReader *p)
 {
+    if(NULL == p)
+    {
+        return(eobool_true);
+    }
     if((eOEncReader_readSt__finished == p->configuredEnc_SPI_stream0.st))
     {
         return(eobool_true);
@@ -638,6 +675,10 @@ __inline extern eObool_t eo_appEncReader_isReadySPI_stream0(EOappEncReader *p)
 
 __inline extern eObool_t eo_appEncReader_isReadySPI_stream1(EOappEncReader *p)
 {
+    if(NULL == p)
+    {
+        return(eobool_false);
+    }
     if((eOEncReader_readSt__finished == p->configuredEnc_SPI_stream1.st))
     {
         return(eobool_true);
