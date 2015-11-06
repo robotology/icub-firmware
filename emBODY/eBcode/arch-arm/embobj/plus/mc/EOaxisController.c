@@ -1081,7 +1081,7 @@ extern void eo_axisController_Stop(EOaxisController *o)
 
 extern EOtrajectory* eo_axisController_GetTraj (EOaxisController *o)
 {
-    if (o) return o->trajectory;
+    return o ? o->trajectory : NULL;
 }
 
 extern EOpid* eo_axisController_GetPosPidPtr(EOaxisController *o)
@@ -1137,16 +1137,15 @@ extern void eo_axisController_GetJointStatus(EOaxisController *o, eOmc_joint_sta
 {
     if (!o) return;
     
-    jointStatus->interactionmodestatus =  o->interact_mode;
-    
-    jointStatus->basic.controlmodestatus   = o->control_mode;
-    jointStatus->basic.jnt_position        = GET_AXIS_POSITION();           
-    jointStatus->basic.jnt_velocity        = GET_AXIS_VELOCITY();        
-    
+    jointStatus->interactionmodestatus      =  o->interact_mode;
+    jointStatus->controlmodestatus          = o->control_mode;
+    jointStatus->basic.jnt_position         = GET_AXIS_POSITION();           
+    jointStatus->basic.jnt_velocity         = GET_AXIS_VELOCITY();        
+    jointStatus->ismotiondone               = eo_axisController_GetMotionDone(o);
     #warning acceleration to be implemented
-    jointStatus->basic.jnt_acceleration    = 0; //eo_speedometer_GetAcceleration(o->speedmeter);       
+    jointStatus->basic.jnt_acceleration     = 0; //eo_speedometer_GetAcceleration(o->speedmeter);       
     
-    jointStatus->basic.jnt_torque          = o->torque_meas_jnt;
+    jointStatus->basic.jnt_torque           = o->torque_meas_jnt;
 }
 
 extern void eo_axisController_GetActivePidStatus(EOaxisController *o, eOmc_joint_status_ofpid_t* pidStatus)

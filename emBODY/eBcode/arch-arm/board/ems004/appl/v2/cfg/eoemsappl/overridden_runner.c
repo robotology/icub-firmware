@@ -419,22 +419,24 @@ static void s_UpdateJointstatus(EOMtheEMSrunner *p)
             //this functions is used to get the motor PWM after the decoupling matrix
             eo_emsController_GetPWMOutput(jId, &jstatus->ofpid.output);
         }
+
+        jstatus->ismotiondone = eo_emsController_GetMotionDone(jId);
         
-        if(eomc_motionmonitorstatus_setpointnotreachedyet == jstatus->basic.motionmonitorstatus)
-        {
-            /* if motionmonitorstatus is equal to _setpointnotreachedyet, i send motion done message. 
-            - if (motionmonitorstatus == eomc_motionmonitorstatus_setpointisreached), i don't send
-            message because the setpoint is alredy reached. this means that:
-                - if monitormode is forever, no new set point has been configured 
-                - if monitormode is _untilreached, the joint reached the setpoint already.
-            - if (motionmonitorstatus == eomc_motionmonitorstatus_notmonitored), i don't send
-            message because pc104 is not interested in getting motion done.
-            */
-            if(eo_emsController_GetMotionDone(jId))
-            {
-                jstatus->basic.motionmonitorstatus = eomc_motionmonitorstatus_setpointisreached;
-            }
-        }
+//        if(eomc_motionmonitorstatus_setpointnotreachedyet == jstatus->basic.motionmonitorstatus)
+//        {
+//            /* if motionmonitorstatus is equal to _setpointnotreachedyet, i send motion done message. 
+//            - if (motionmonitorstatus == eomc_motionmonitorstatus_setpointisreached), i don't send
+//            message because the setpoint is alredy reached. this means that:
+//                - if monitormode is forever, no new set point has been configured 
+//                - if monitormode is _untilreached, the joint reached the setpoint already.
+//            - if (motionmonitorstatus == eomc_motionmonitorstatus_notmonitored), i don't send
+//            message because pc104 is not interested in getting motion done.
+//            */
+//            if(eo_emsController_GetMotionDone(jId))
+//            {
+//                jstatus->ismotiondone = eo_emsController_GetMotionDone(jId);
+//            }
+//        }
         
         
     }

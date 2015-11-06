@@ -142,6 +142,9 @@ extern eOresult_t eo_motiondone_Tick(EOtheMotionDone *p)
     {   // nothing to do because we dont have a mc4can board
         return(eores_OK);
     }
+
+#if 0
+    // we manage motion done differently .... with the proxy
     
     // now, i do things. 
     // i cycle all the joints, one at a time. and in some cases i send a can frame to the relevant board
@@ -183,6 +186,8 @@ extern eOresult_t eo_motiondone_Tick(EOtheMotionDone *p)
     // now i prepare for the next joint. i must cycle 0, 1, 2, (s_eo_themotiondone.numofjoints
     s_eo_themotiondone.currjoint ++;
     s_eo_themotiondone.currjoint %= s_eo_themotiondone.numofjoints;
+
+#endif
     
     return(eores_OK); 
 }

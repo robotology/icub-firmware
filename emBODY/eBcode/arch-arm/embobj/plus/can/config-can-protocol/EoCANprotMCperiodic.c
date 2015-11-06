@@ -269,7 +269,7 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__STATUS(eOcanframe_t *fr
                 return(eores_OK);    
             }
             
-            joint->status.basic.controlmodestatus = eomc_controlmode;
+            joint->status.controlmodestatus = eomc_controlmode;
             
             if(eomc_controlmode_hwFault == eomc_controlmode)
             {        
@@ -385,7 +385,7 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__PID_ERROR(eOcanframe_t 
         pidpos_error = *((uint16_t*)&(frame->data[offsetpos[j]]));
         pidtrq_error = *((uint16_t*)&(frame->data[offsettrq[j]]));
         
-        if(eomc_controlmode_torque == joint->status.basic.controlmodestatus)
+        if(eomc_controlmode_torque == joint->status.controlmodestatus)
         {
             joint->status.ofpid.error = pidtrq_error;
         }
