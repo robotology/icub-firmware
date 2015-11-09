@@ -828,19 +828,6 @@ extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
             // calib type 3
             else if (o->calibration_type == eomc_calibration_type3_abs_sens_digital)
             {
-                o->interact_mode = eOmc_interactionmode_stiff;
-                *stiff = eobool_true;
-                o->err = 0;
-                
-                if (IS_CALIBRATED())
-                {
-                    eo_pid_Reset(o->pidP);
-                    eo_trajectory_Init(o->trajectory, pos, vel, 0);
-                    eo_trajectory_Stop(o->trajectory, GET_AXIS_POSITION()); 
-                    eo_axisController_SetControlMode(o, eomc_controlmode_cmd_position);
-                    eo_axisController_SetInteractionMode(o, eOmc_interactionmode_stiff);
-                }
-             
                 return 0;
             }
             

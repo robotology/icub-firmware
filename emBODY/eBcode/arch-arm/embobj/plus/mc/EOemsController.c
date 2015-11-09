@@ -1251,20 +1251,41 @@ extern void eo_emsController_CheckCalibrations(void)
     {
         if (joint_ok[j])
         {
-            if( (ems->axis_controller[j]->calibration_type == eomc_calibration_type3_abs_sens_digital)
+            //2FOC-based control
+            if (ems->act == emscontroller_actuation_2FOC)
             {
-                ems->n_calibrated++;
-                eo_axisController_SetCalibrated(ems->axis_controller[j]);
-            }
-            else if (ems->axis_controller[j]->calibration_type == eomc_calibration_type5_hard_stops_mc4plus && ems->axis_controller[j]->hardwarelimitisreached)
-            {  
-                ems->n_calibrated++;
-                eo_axisController_SetCalibrated(ems->axis_controller[j]);
- 
-                set_2FOC_running(j);
+                static eObool_t foc_running[MAX_NAXLES] = {eobool_false, eobool_false, eobool_false, eobool_false};
+                if (!foc_running[j])
+                {
+                    foc_running[j] = eobool_true;
+        
+                    set_2FOC_running(j);
+                }
                 
-                eo_axisController_SetControlMode(ems->axis_controller[j], eomc_controlmode_cmd_position);
-                eo_axisController_SetInteractionMode(ems->axis_controller[j], eOmc_interactionmode_stiff);
+                if (eo_motors_isEncCalibrated(ems->motors, j))
+                {
+                    ems->n_calibrated++;
+                    eo_axisController_SetCalibrated(ems->axis_controller[j]);
+        
+                    foc_running[j] = eobool_false;
+                    
+                    eo_axisController_SetControlMode(ems->axis_controller[j], eomc_controlmode_cmd_position);
+                    eo_axisController_SetInteractionMode(ems->axis_controller[j], eOmc_interactionmode_stiff);
+                }	
+            }
+            //MC4plus-based control
+            else if (ems->act == emscontroller_actuation_LOCAL)
+            {
+                if( (ems->axis_controller[j]->calibration_type == eomc_calibration_type3_abs_sens_digital)
+                    ||
+                    (ems->axis_controller[j]->calibration_type == eomc_calibration_type5_hard_stops_mc4plus && ems->axis_controller[j]->hardwarelimitisreached))
+                {
+                    ems->n_calibrated++;
+                    eo_axisController_SetCalibrated(ems->axis_controller[j]);
+              
+                    eo_axisController_SetControlMode(ems->axis_controller[j], eomc_controlmode_cmd_position);
+                    eo_axisController_SetInteractionMode(ems->axis_controller[j], eOmc_interactionmode_stiff);
+                }
             }
         }
     }
@@ -1295,6 +1316,8 @@ extern void eo_emsController_CheckCalibrations(void)
                     ems->n_calibrated++;
             
                     eo_axisController_SetCalibrated(ems->axis_controller[j]);
+                    eo_axisController_SetControlMode(ems->axis_controller[j], eomc_controlmode_cmd_position);
+                    eo_axisController_SetInteractionMode(ems->axis_controller[j], eOmc_interactionmode_stiff);
                 
                     foc_running[j] = eobool_false;
                 }
@@ -1361,6 +1384,13 @@ extern void eo_emsController_CheckCalibrations(void)
                 eo_axisController_SetCalibrated(ems->axis_controller[1]);
                 eo_axisController_SetCalibrated(ems->axis_controller[2]);
                 
+                eo_axisController_SetControlMode(ems->axis_controller[0], eomc_controlmode_cmd_position);
+                eo_axisController_SetInteractionMode(ems->axis_controller[0], eOmc_interactionmode_stiff);
+                eo_axisController_SetControlMode(ems->axis_controller[1], eomc_controlmode_cmd_position);
+                eo_axisController_SetInteractionMode(ems->axis_controller[1], eOmc_interactionmode_stiff);
+                eo_axisController_SetControlMode(ems->axis_controller[2], eomc_controlmode_cmd_position);
+                eo_axisController_SetInteractionMode(ems->axis_controller[2], eOmc_interactionmode_stiff);
+                
                 foc_running = eobool_false;
             }
         }
@@ -1387,6 +1417,9 @@ extern void eo_emsController_CheckCalibrations(void)
                     ems->n_calibrated++;
             
                     eo_axisController_SetCalibrated(ems->axis_controller[3]);
+                    
+                    eo_axisController_SetControlMode(ems->axis_controller[3], eomc_controlmode_cmd_position);
+                    eo_axisController_SetInteractionMode(ems->axis_controller[3], eOmc_interactionmode_stiff);
                 
                     foc_running = eobool_false;
                 }
