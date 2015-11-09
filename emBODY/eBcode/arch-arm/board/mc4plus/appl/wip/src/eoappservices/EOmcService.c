@@ -1141,12 +1141,12 @@ static eOemscontroller_board_t s_eo_mcserv_getboardcontrol(void)
         /* experimental boards control */
         case 97:
         {
-            //type = emscontroller_board_HEAD_neckpitch_neckroll;   //2 coupled joints
-            type = emscontroller_board_ANKLE;                       //2 indipendent joints
+            //type = emscontroller_board_HEAD_neckpitch_neckroll;   //2 coupled joints-mc4plus
+            type = emscontroller_board_FACE_eyelids_jaw;            //indipendent joints-mc4plus
         } break;
         case 98:
         {
-            type = emscontroller_board_ANKLE;
+            type = emscontroller_board_FACE_eyelids_jaw;			//indipendent joints-mc4plus
         } break;
         
         
