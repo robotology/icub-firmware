@@ -30,6 +30,8 @@
 #include "EoProtocolAS.h"
 
 // but also to retrieve information of other things ...
+#include "EOtheErrorManager.h"
+#include "EoError.h"
 
 #include "EOtheCANmapping.h"
 
@@ -316,6 +318,38 @@ static eOresult_t s_eocanprotASperiodic_parser_process_forcetorque(eOcanframe_t 
             #warning -> TODO: add diagnostics about unknown mode as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
         }
     }
+    
+    //check saturation
+    
+    static uint16_t count_message = 0;
+    if (frame->size == 7)
+    {
+        //check 7th byte, which should include the saturation bit
+        if (frame->data[6] == 0x01)
+        //send dedicated diagnostics
+        {
+            if ((count_message == 0) || (count_message == 300)) //if it's the first time or every 300ms, if it's continuosly saturating
+            {              
+                eOerrmanDescriptor_t errdes = {0};
+                errdes.sourcedevice         = (eOcanport1 == port) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
+                errdes.sourceaddress        = EOCANPROT_FRAME_GET_SOURCE(frame);                
+                errdes.code                 = eoerror_code_get(eoerror_category_HardWare, eoerror_value_HW_strain_saturation);
+                errdes.par16                = frame->size;
+                errdes.par64                = eo_common_canframe_data2u64((eOcanframe_t*)frame);
+                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, NULL, &errdes);
+            }
+            
+            if (count_message == 300)
+                count_message = 0;
+            
+            count_message++;
+        }
+    }
+    else
+    {
+       count_message = 0; 
+    }
+        
     
     return(eores_OK);
 }
