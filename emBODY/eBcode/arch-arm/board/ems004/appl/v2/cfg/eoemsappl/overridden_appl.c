@@ -273,6 +273,7 @@ extern eObool_t eoprot_b02_b04_mc_isproxied(eOnvID32_t id)
         case eoprot_tag_mc_joint_config_pidtorque:
         case eoprot_tag_mc_joint_config_limitsofjoint:
         case eoprot_tag_mc_joint_config_impedance:
+        case eoprot_tag_mc_joint_status_ismotiondone:
         case eoprot_tag_mc_joint_cmmnds_setpoint:           // marco.accame on 03mar15: the setpoint should not be asked, thus why in here? i may just remove the handler so that no reply is obtained if wrongly used
         {
             return(eobool_true);
