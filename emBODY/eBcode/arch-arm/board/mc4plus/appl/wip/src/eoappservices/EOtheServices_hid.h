@@ -39,6 +39,8 @@
 struct EOtheServices_hid
 {
     eObool_t    initted;
+    eObool_t    isASmais_ready;
+    eObool_t    BOARDisreadyforcontrolloop;
 }; 
 
 

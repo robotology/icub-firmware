@@ -45,7 +45,7 @@
 #include "EOmcService.h"
 #include "EOtheMAIS.h"
 #include "EOtheCANservice.h"
-#include "EOtheCANdiscovery.h"
+#include "EOtheCANdiscovery2.h"
 #include "EOCurrentsWatchdog.h"
 
 // - public #define  --------------------------------------------------------------------------------------------------
@@ -81,6 +81,9 @@ extern eOresult_t eo_serv_ConfigCAN(EOtheServices *p, eOcanserv_cfg_t *cancfg);
 
 extern eOresult_t eo_serv_StartCANdiscovery(EOtheServices *p);
 
+extern eObool_t eo_serv_IsBoardReadyForControlLoop(EOtheServices *p);
+
+extern eOresult_t eo_serv_SendDiscoveryFailureReport(EOtheServices *p);
 
 
 /** @}            

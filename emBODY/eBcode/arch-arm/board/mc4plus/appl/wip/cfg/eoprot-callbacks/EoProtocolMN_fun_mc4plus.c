@@ -350,51 +350,14 @@ extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropd
 
         case applstate_running:
         {
-            //if it's not initted at this point, it means that no CANdiscovery is needed
-            if (eo_candiscovery_GetHandle() != NULL)
+            if(eobool_false == eo_serv_IsBoardReadyForControlLoop(eo_serv_GetHandle()))
             {
-                eo_candiscovery_SendDiagnosticsAboutBoardsWithIssues(eo_candiscovery_GetHandle()); //if everything is ok, it does nothing
-                
-                if (!((eo_candiscovery_isMCReady(eo_candiscovery_GetHandle()) == eobool_true) && (eo_candiscovery_isMAISReady(eo_candiscovery_GetHandle()) == eobool_true)))
-                {
-                    return;
-                }
-                else
-                {
-                    eo_candiscovery_SignalDetectedCANboards(eo_candiscovery_GetHandle());
-                }
-            }
-            
-            res = eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STrun);
-                        
-            //old version
-            /*
-            uint32_t canBoardsReady = 0;
-            uint32_t canBoardsChecked = 0;
-            char str[60];
-            //if(eobool_false == eo_appTheDB_areConnectedCanBoardsReady(eo_emsapplBody_GetDataBaseHandle(eo_emsapplBody_GetHandle()), &canBoardsReady, &canBoardsChecked))
-            
-            #warning -----------> add verification of entering the ctrl loop not only for mc but also for other
-            if(eobool_false == eo_mcserv_AreResourcesReady(eo_mcserv_GetHandle(), NULL))
-            {
-                #warning marco.accame: put a dedicated diagnostics message with list of missing can boards
-                snprintf(str, sizeof(str), "only 0x%x of of 0x%x.", canBoardsReady, canBoardsChecked);
-                
-                 
-                // the new currstate is set inside the on-entry of the state machine               
-                //status->currstate = applstate_error;
-                // it MUST NOT be fatal error because we want to give the ems time to find the boards ready
-                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, str, "eoprot_fun_UPDT_mn_appl_cmmnds_go2state", &eo_errman_DescrUnspecified);
+                eo_serv_SendDiscoveryFailureReport(eo_serv_GetHandle());
                 return;
             }
-            else
-            {
-                // marco.accame: it would be nice sending info diagnostics messages about the found resources 
-            }
-            
+               
             res = eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STrun);
-            // the new currstate is set inside the relevant on-entry of the state machine
-            */
+                        
         } break;
         
         case applstate_error:
