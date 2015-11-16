@@ -159,7 +159,7 @@ const version_srcCode_info_t strain_srcCode_info =
 	{
 		0x3, //version
 		0x0, //release
-		0x2  //build
+		0x3  //build
 	},
 	//canProtocol
 	{

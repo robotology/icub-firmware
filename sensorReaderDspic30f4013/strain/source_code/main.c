@@ -124,6 +124,9 @@ int8_t eeprom_status = 1;
 int8_t trasmission_counter=0;
 uint8_t canProtocol_compatibility_ack = 0;
 
+#define SATURATION_THRESHOLD_HIGH       64000
+#define SATURATION_THRESHOLD_LOW        1000
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -139,6 +142,7 @@ static void s_parse_can_loaderMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *da
 static void s_parse_can_msg(void);
 static void s_calculate_and_send_data(void);
 static void s_timer1_callback(void);
+static icubCanProto_strain_saturationInfo_t getSaturationInfo(uint16_t value);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -314,8 +318,16 @@ static void s_parse_can_msg(void)
 	  }
    }
 
-
-
+static icubCanProto_strain_saturationInfo_t getSaturationInfo(uint16_t value)
+{
+    if (value > SATURATION_THRESHOLD_HIGH )
+        return (saturationHIGH);
+    else if (value <  SATURATION_THRESHOLD_LOW)
+        return(saturationLOW);
+    else 
+        return saturationNONE;
+}
+ 
 static void s_calculate_and_send_data(void)
 {    
   uint16_t SID; //adc;
@@ -329,17 +341,26 @@ static void s_calculate_and_send_data(void)
   uint8_t ForceDataUncalib[8], TorqueDataUncalib[8]; 
   static uint8_t ChToTransmit=1; 
   uint8_t saturation = 0;
-  uint8_t i=0;
   uint8_t length=6;
- 
-  for (i=0; i<6; i++)
-  {
-	if ((uint16_t)(strain_cfg.ee_data.EE_AN_ChannelValue[i]+HEX_VALC) > 64000 ||
-	    (uint16_t)(strain_cfg.ee_data.EE_AN_ChannelValue[i]+HEX_VALC) <  1000)
-		saturation=1; 
-  }
+  
 
-
+   icubCanProto_strain_forceSaturationInfo_t forceSaturationInfo = {0};
+   icubCanProto_strain_torqueSaturationInfo_t torqueSaturationInfo = {0};
+   
+   
+  
+   
+   forceSaturationInfo.saturationInChannel_0 = getSaturationInfo((uint16_t)(strain_cfg.ee_data.EE_AN_ChannelValue[0]+HEX_VALC) );
+   forceSaturationInfo.saturationInChannel_1 = getSaturationInfo((uint16_t)(strain_cfg.ee_data.EE_AN_ChannelValue[1]+HEX_VALC) );
+   forceSaturationInfo.saturationInChannel_2 = getSaturationInfo((uint16_t)(strain_cfg.ee_data.EE_AN_ChannelValue[2]+HEX_VALC) );
+   
+   torqueSaturationInfo.saturationInChannel_3 = getSaturationInfo((uint16_t)(strain_cfg.ee_data.EE_AN_ChannelValue[3]+HEX_VALC) );
+   torqueSaturationInfo.saturationInChannel_4 = getSaturationInfo((uint16_t)(strain_cfg.ee_data.EE_AN_ChannelValue[4]+HEX_VALC) );
+   torqueSaturationInfo.saturationInChannel_5 = getSaturationInfo((uint16_t)(strain_cfg.ee_data.EE_AN_ChannelValue[5]+HEX_VALC) );
+  
+    
+    if(( *((uint8_t*)&forceSaturationInfo) + *((uint8_t*)&torqueSaturationInfo) ) > 0 )
+        saturation=1; 
 
   VectorAdd (6,(fractional*) strain_cfg.ee_data.EE_AN_ChannelValue, (fractional*)strain_cfg.ee_data.EE_AN_ChannelValue, strain_cfg.ee_data.EE_CalibrationTare); // ChannelValue = ChannelValue + CalibrationTare 
 
@@ -397,10 +418,10 @@ Ovviamente i due array devono essere salvati su memoria contigua.
 	 TorqueDataCalib[3]=TorqueDataCalibSafe[3];
 	 TorqueDataCalib[4]=TorqueDataCalibSafe[4];
 	 TorqueDataCalib[5]=TorqueDataCalibSafe[5];
-	 ForceDataCalib[6]=1;
-	 TorqueDataCalib[6]=1;	
-	 ForceDataUncalib[6]=1;
-	 TorqueDataUncalib[6]=1;
+	 ForceDataCalib[6]=*((uint8_t*)&forceSaturationInfo);
+	 TorqueDataCalib[6]=*((uint8_t*)&torqueSaturationInfo);
+	 ForceDataUncalib[6]=*((uint8_t*)&forceSaturationInfo);
+	 TorqueDataUncalib[6]=*((uint8_t*)&torqueSaturationInfo);	
   }
   else
   {
