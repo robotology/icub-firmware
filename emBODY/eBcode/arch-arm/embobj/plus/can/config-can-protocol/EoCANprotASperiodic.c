@@ -456,6 +456,8 @@ static void s_eocanprotASperiodic_strain_saturation_handler(eOcanframe_t *frame,
         else
         {
             // send diag message about malformed message
+            // uncomment if you need it for debugging
+            /*
             eOerrmanDescriptor_t errdes = {0};
             errdes.sourcedevice         = (eOcanport1 == port) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
             errdes.sourceaddress        = EOCANPROT_FRAME_GET_SOURCE(frame);                
@@ -463,6 +465,7 @@ static void s_eocanprotASperiodic_strain_saturation_handler(eOcanframe_t *frame,
             errdes.par16                = 0; //channel involved
             errdes.par64                = 0;
             eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, "strain saturation byte 7 (if sent) should be different from 0!", NULL, &errdes);
+            */
         }    
     
     }
