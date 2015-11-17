@@ -142,7 +142,7 @@ static void s_parse_can_loaderMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *da
 static void s_parse_can_msg(void);
 static void s_calculate_and_send_data(void);
 static void s_timer1_callback(void);
-static icubCanProto_strain_saturationInfo_t getSaturationInfo(uint16_t value);
+inline icubCanProto_strain_saturationInfo_t getSaturationInfo(uint16_t value);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -318,7 +318,7 @@ static void s_parse_can_msg(void)
 	  }
    }
 
-static icubCanProto_strain_saturationInfo_t getSaturationInfo(uint16_t value)
+inline icubCanProto_strain_saturationInfo_t getSaturationInfo(uint16_t value)
 {
     if (value > SATURATION_THRESHOLD_HIGH )
         return (saturationHIGH);
@@ -406,6 +406,8 @@ Ovviamente i due array devono essere salvati su memoria contigua.
   if (saturation!=0)
   {
 	 length=7;
+ 	 forceSaturationInfo.thereIsSaturationInAtLeastOneChannel = 1;
+     torqueSaturationInfo.thereIsSaturationInAtLeastOneChannel = 1;
 	 ForceDataCalib[0]=ForceDataCalibSafe[0];
 	 ForceDataCalib[1]=ForceDataCalibSafe[1];
 	 ForceDataCalib[2]=ForceDataCalibSafe[2];
