@@ -55,6 +55,8 @@
 
 #include "EOtheVirtualStrain.h"
 
+//#include "EOtheMotionDone.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -644,13 +646,14 @@ extern void eoprot_fun_UPDT_mc_joint_status_ismotiondone(const EOnv* nv, const e
 {
     eOmc_impedance_t *impedance = (eOmc_impedance_t*)rd->data;
     eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
-    
+   
     if(eobool_true == s_motorcontrol_is2foc_based())
     {
         // do nothing
     }
     else // mc4can
-    {   
+    {          
+//#if defined(EOMOTIONDONE_USEPROXY)        
         if(eo_ropcode_ask == rd->ropcode)
         {   
             // must send a get motion done request to the mc4 board and then ... activate the proxy for the reply to robotInterface            
@@ -674,15 +677,14 @@ extern void eoprot_fun_UPDT_mc_joint_status_ismotiondone(const EOnv* nv, const e
             }
             param->p08_1 = 1;       // we expect one can frame
             param->p08_2 = 0;       // and we havent received any yet
-                   
+              
             eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);        
                       
             return;
-        }     
+        }
+   
+//#endif        
     }    
-    
-    
-    
 
 }
 

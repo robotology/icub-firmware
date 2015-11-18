@@ -50,6 +50,8 @@
 
 #include "EOtheMC4boards.h"
 
+//#include "EOtheMotionDone.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -218,6 +220,7 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__MOTION_DONE(eOcanprot_de
 }
 
 
+//#if !defined(EOMOTIONDONE_USEPROXY)
 //extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__MOTION_DONE(eOcanframe_t *frame, eOcanport_t port)
 //{
 //    eOmc_joint_t *joint = NULL;
@@ -229,11 +232,12 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__MOTION_DONE(eOcanprot_de
 //    }   
 //    
 //    // in byte data[1] there is: 0/1 
-//    joint->status.basic.ismotiondone = (eObool_t)frame->data[1];    
+//    joint->status.ismotiondone = (eObool_t)frame->data[1];    
 //    
 //    return(eores_OK);
 //}
-
+// 
+//#else
 
 extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__MOTION_DONE(eOcanframe_t *frame, eOcanport_t port)
 {
@@ -248,7 +252,7 @@ extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__MOTION_DONE(eOcanframe_t
     
     // in byte data[1] there is: 0/1 
     joint->status.ismotiondone = (eObool_t)frame->data[1];    
-    
+   
     // and now let's manage the proxy
     
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, index, eoprot_tag_mc_joint_status_ismotiondone);
@@ -272,12 +276,13 @@ extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__MOTION_DONE(eOcanframe_t
     if(param->p08_1 == param->p08_2)
     {
         eOresult_t res = eo_proxy_ReplyROP_Load(proxy, id32, NULL);  
-        eom_emsappl_SendTXRequest(eom_emsappl_GetHandle());   
+        eom_emsappl_SendTXRequest(eom_emsappl_GetHandle());       
     }        
     
     return(eores_OK);
 }
 
+//#endif
 
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_CONTROL_MODE(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)

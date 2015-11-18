@@ -48,11 +48,12 @@
 #include "EOtheSTRAIN.h"
 #include "EOtheMAIS.h"
 #include "EOtheSKIN.h"
+//#include "EOtheMotionDone.h"
 #include "EOtheInertial.h"
 
 #include "EOtheBoardConfig.h"
 
-
+#include "EoError.h"
 #include "EOVtheEnvironment.h"
 #include "EOtheARMenvironment.h"
 
@@ -267,14 +268,14 @@ extern eObool_t eoprot_b02_b04_mc_isproxied(eOnvID32_t id)
     
     switch(tag)
     {
-        //VALE get velocity pid not implemented!!!
         case eoprot_tag_mc_joint_config_pidposition:
         // case eoprot_tag_mc_joint_config_pidvelocity:     // marco.accame on 03mar15: the pidvelocity propagation to mc4 is is not implemented, thus i must remove from proxy.
         case eoprot_tag_mc_joint_config_pidtorque:
         case eoprot_tag_mc_joint_config_limitsofjoint:
         case eoprot_tag_mc_joint_config_impedance:
+//#if defined(EOMOTIONDONE_USEPROXY)
         case eoprot_tag_mc_joint_status_ismotiondone:
-        case eoprot_tag_mc_joint_cmmnds_setpoint:           // marco.accame on 03mar15: the setpoint should not be asked, thus why in here? i may just remove the handler so that no reply is obtained if wrongly used
+//#endif
         {
             return(eobool_true);
         }
@@ -301,7 +302,7 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
     {   // board number is from IP address
         s_boardnum = 0;
         eOipv4addr_t ipaddress = eom_ipnet_GetIPaddress(eom_ipnet_GetHandle());
-        s_boardnum = ipaddress >> 24;  
+        s_boardnum = ipaddress >> 24; 
         s_boardnum --;
         if(s_boardnum > 16)
         {
