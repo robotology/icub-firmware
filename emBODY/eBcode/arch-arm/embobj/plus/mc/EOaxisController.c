@@ -1180,7 +1180,7 @@ extern void eo_axisController_GetActivePidStatus(EOaxisController *o, eOmc_joint
         #warning marco.accame: see what to use in here
         memset(pidStatus, 0, sizeof(eOmc_joint_status_ofpid_t)); 
         pidStatus->complpos.refpos = eo_trajectory_GetPos(o->trajectory);
-        pidStatus->complpos.reftrq = o->torque_ref_jnt;
+        //pidStatus->complpos.reftrq = o->torque_ref_jnt;
         #warning marco.randazzo: pidStatus->output is wrongly obtained before joints decoupling, fixed in s_eom_emsrunner_hid_UpdateJointstatus()
         eo_pid_GetStatusInt32(o->pidT, &(pidStatus->complpos.output), &(pidStatus->complpos.errpos));
 
