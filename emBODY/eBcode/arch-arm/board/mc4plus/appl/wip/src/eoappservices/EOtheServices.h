@@ -83,6 +83,8 @@ extern eOresult_t eo_serv_StartCANdiscovery(EOtheServices *p);
 
 extern eObool_t eo_serv_IsBoardReadyForControlLoop(EOtheServices *p);
 
+extern eOresult_t eo_serv_SetBoardReadyForControlLoop(EOtheServices *p);
+
 extern eOresult_t eo_serv_SendDiscoveryFailureReport(EOtheServices *p);
 
 

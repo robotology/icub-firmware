@@ -76,7 +76,7 @@ static EOtheServices s_eo_theserv =
 {
     .initted                    = eobool_false,
     .isASmais_ready             = eobool_false,
-    .BOARDisreadyforcontrolloop = eobool_true
+    .BOARDisreadyforcontrolloop = eobool_false
 };
 
 static eOcanserv_cfg_t eo_canserv_DefaultCfgMc4plus = 
@@ -186,9 +186,6 @@ extern eOresult_t eo_serv_StartCANdiscovery(EOtheServices *p)
     //Init and start the discovery
     eo_candiscovery2_Initialise(NULL);
     
-    //reset the variable used to go in RUN, which is true by default (for boards without CAN boards)
-    p->BOARDisreadyforcontrolloop = eobool_false;
-    
     //start mais discovery
     const eOcandiscovery_target_t *mais_t = &s_candiscoverytarget_mais_mc4plus;
     eOcandiscovery_onstop_t onstop = {0};
@@ -207,6 +204,18 @@ extern eObool_t eo_serv_IsBoardReadyForControlLoop(EOtheServices *p)
     }
     
     return(p->BOARDisreadyforcontrolloop);    
+}
+
+extern eOresult_t eo_serv_SetBoardReadyForControlLoop(EOtheServices *p)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+         
+    p->BOARDisreadyforcontrolloop = eobool_true;
+        
+    return eores_OK;
 }
 
 extern eOresult_t eo_serv_SendDiscoveryFailureReport(EOtheServices *p)
@@ -239,7 +248,7 @@ static eOresult_t s_eo_theservices_onstop_search4mais(void* par, EOtheCANdiscove
     if(eobool_true == searchisok)
     {
         s_eo_theserv.isASmais_ready = eobool_true;
-        s_eo_theserv.BOARDisreadyforcontrolloop = eobool_true;
+        eo_serv_SetBoardReadyForControlLoop(&s_eo_theserv);
         
         eo_mais_Initialise();
         
