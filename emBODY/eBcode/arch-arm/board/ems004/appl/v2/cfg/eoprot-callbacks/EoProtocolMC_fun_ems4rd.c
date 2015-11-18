@@ -124,7 +124,7 @@ const eOmc_joint_t joint_default_value =
             .kff =                   0,
             .stiction_up_val =       0,
             .stiction_down_val =     0,
-            .filler =                {0xf1, 0xf2, 0xf3}
+            .filler =                {0}
         },
         .pidvelocity =
         {
@@ -138,7 +138,7 @@ const eOmc_joint_t joint_default_value =
             .kff =                   0,
             .stiction_up_val =       0,
             .stiction_down_val =     0,
-            .filler =                {0xf1, 0xf2, 0xf3}
+            .filler =                {0}
         },
         .pidtorque =
         {
@@ -152,7 +152,7 @@ const eOmc_joint_t joint_default_value =
             .kff =                   0,
             .stiction_up_val =       0,
             .stiction_down_val =     0,
-            .filler =                {0xf1, 0xf2, 0xf3}
+            .filler =                {0}
         }, 
         .limitsofjoint =
         {
@@ -164,7 +164,7 @@ const eOmc_joint_t joint_default_value =
             .stiffness =             0,
             .damping =               0,
             .offset =                0,
-            .filler02 =              {0xf1, 0xf2}           
+            .filler02 =              {0}           
         },               
         .maxvelocityofjoint =        0,
         .motor_params =
@@ -173,12 +173,12 @@ const eOmc_joint_t joint_default_value =
             .ktau_value =            0,
             .bemf_scale =            0,
             .ktau_scale =            0,
-            .filler02 =              {0xf1, 0xf2}
+            .filler02 =              {0}
         },
         .velocitysetpointtimeout =   0,
         .tcfiltertype =              0,
         .jntEncoderType =            0,
-        .filler04 =                  {0xf1, 0xf2, 0xf2, 0xf3}
+        .filler04 =                  {0}
     },
     .status =                       
     {
@@ -191,10 +191,13 @@ const eOmc_joint_t joint_default_value =
             .filler =                {0},
         },
         .ofpid =                     {0},
-        .controlmodestatus =         eomc_controlmode_idle,
-        .interactionmodestatus =     eOmc_interactionmode_stiff,
-        .ismotiondone =              eobool_false,       
-        .filler =                    {0}
+        .modes = 
+        {
+            .controlmodestatus =        eomc_controlmode_idle,
+            .interactionmodestatus =    eOmc_interactionmode_stiff,
+            .ismotiondone =             eobool_false,
+            .filler =                   {0}
+        }
     },
     .inputs =                        {0},
     .cmmnds =                       
@@ -204,7 +207,7 @@ const eOmc_joint_t joint_default_value =
         .stoptrajectory =            0,
         .controlmode =               eomc_controlmode_cmd_switch_everything_off,
         .interactionmode =           eOmc_interactionmode_stiff,
-        .filler01 =                  0        
+        .filler =                    {0}        
     }
 }; 
 
@@ -224,11 +227,10 @@ const eOmc_motor_t motor_default_value =
             .kff =                   0,
             .stiction_up_val =       0,
             .stiction_down_val =     0,
-            .filler =                {0xf1, 0xf2, 0xf3}
+            .filler =                {0}
         },
         .gearboxratio =              0,
         .rotorEncoderResolution =    0,
-        .filler01 =                  0,
         .maxvelocityofmotor =        0,
         .maxcurrentofmotor =         0,
         .rotorIndexOffset =          0,
@@ -238,6 +240,7 @@ const eOmc_motor_t motor_default_value =
         .hasRotorEncoder =           eobool_false,
         .hasRotorEncoderIndex =      eobool_false,
         .rotorEncoderType =          0,
+        .filler02 =                  {0},
         .limitsofrotor =
         {
             .max = 0,
@@ -642,7 +645,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_velocitysetpointtimeout(const EOnv* 
 
 
 
-extern void eoprot_fun_UPDT_mc_joint_status_ismotiondone(const EOnv* nv, const eOropdescriptor_t* rd)
+extern void eoprot_fun_UPDT_mc_joint_status_modes_ismotiondone(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOmc_impedance_t *impedance = (eOmc_impedance_t*)rd->data;
     eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
@@ -729,7 +732,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
 //    }    
 
 
-    joint->status.ismotiondone = eobool_false;
+    joint->status.modes.ismotiondone = eobool_false;
 
     if(eobool_true == s_motorcontrol_is2foc_based())   
     {        

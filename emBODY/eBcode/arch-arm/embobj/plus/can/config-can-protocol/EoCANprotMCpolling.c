@@ -251,11 +251,11 @@ extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__MOTION_DONE(eOcanframe_t
     }   
     
     // in byte data[1] there is: 0/1 
-    joint->status.ismotiondone = (eObool_t)frame->data[1];    
+    joint->status.modes.ismotiondone = (eObool_t)frame->data[1];    
    
     // and now let's manage the proxy
     
-    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, index, eoprot_tag_mc_joint_status_ismotiondone);
+    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, index, eoprot_tag_mc_joint_status_modes_ismotiondone);
     
     EOproxy * proxy = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
     eOproxy_params_t *param = eo_proxy_Params_Get(proxy, id32);
@@ -697,7 +697,7 @@ extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_OPENLOOP_PARAMS(eOca
     
 
    
-    joint->status.ofpid.positionreference = *((int16_t*)&frame->data[1]);    
+    joint->status.ofpid.openloop.refolo = *((int16_t*)&frame->data[1]);    
     
     return(eores_OK);    
 }

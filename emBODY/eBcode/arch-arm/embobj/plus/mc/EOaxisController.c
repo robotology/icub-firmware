@@ -1137,65 +1137,63 @@ extern void eo_axisController_GetJointStatus(EOaxisController *o, eOmc_joint_sta
 {
     if (!o) return;
     
-    jointStatus->interactionmodestatus      =  o->interact_mode;
-    jointStatus->controlmodestatus          = o->control_mode;
-    jointStatus->basic.jnt_position         = GET_AXIS_POSITION();           
-    jointStatus->basic.jnt_velocity         = GET_AXIS_VELOCITY();        
-    jointStatus->ismotiondone               = eo_axisController_GetMotionDone(o);
+    jointStatus->modes.interactionmodestatus    =  o->interact_mode;
+    jointStatus->modes.controlmodestatus        = o->control_mode;
+    jointStatus->modes.ismotiondone             = eo_axisController_GetMotionDone(o);
+    jointStatus->basic.jnt_position             = GET_AXIS_POSITION();           
+    jointStatus->basic.jnt_velocity             = GET_AXIS_VELOCITY();        
     #warning acceleration to be implemented
-    jointStatus->basic.jnt_acceleration     = 0; //eo_speedometer_GetAcceleration(o->speedmeter);       
-    
-    jointStatus->basic.jnt_torque           = o->torque_meas_jnt;
+    jointStatus->basic.jnt_acceleration         = 0; //eo_speedometer_GetAcceleration(o->speedmeter);       
+    jointStatus->basic.jnt_torque               = o->torque_meas_jnt;
 }
 
 extern void eo_axisController_GetActivePidStatus(EOaxisController *o, eOmc_joint_status_ofpid_t* pidStatus)
 {
     if (o->control_mode == eomc_controlmode_idle)
     {
-        pidStatus->positionreference = 0;
-        pidStatus->torquereference = 0;
-        pidStatus->output    = 0;
-        pidStatus->error     = 0;
-        
+        memset(pidStatus, 0, sizeof(eOmc_joint_status_ofpid_t)); 
         return;
     }
     
     if (o->control_mode == eomc_controlmode_openloop)
     {
-        pidStatus->positionreference = 0;
-        pidStatus->torquereference = 0;
-        pidStatus->output    = o->openloop_out;
-        pidStatus->error     = 0;
+        memset(pidStatus, 0, sizeof(eOmc_joint_status_ofpid_t)); 
+        pidStatus->openloop.output = o->openloop_out;            
+        #warning marco.accame bigger_mc_status: ok the output, but what about the reference? i believe it should also be assigned and not reset.
         
         return;
     }
     
     if (o->control_mode == eomc_controlmode_torque)
     {
-        pidStatus->positionreference = 0;
-        pidStatus->torquereference = o->torque_ref_jnt;
+        memset(pidStatus, 0, sizeof(eOmc_joint_status_ofpid_t)); 
+        pidStatus->torque.reftrq = o->torque_ref_jnt;
         #warning marco.randazzo: pidStatus->output is wrongly obtained before joints decoupling, fixed in s_eom_emsrunner_hid_UpdateJointstatus()
-        eo_pid_GetStatusInt32(o->pidT, &(pidStatus->output), &(pidStatus->error));
+        #warning marco.accame fatter_mc_status: shall i use errtrq or errpos ? errtrq! then: do we need managing refpos and errpos?
+        eo_pid_GetStatusInt32(o->pidT, &(pidStatus->torque.output), &(pidStatus->torque.errtrq));
         
         return;
     }
     
     if (o->interact_mode == eOmc_interactionmode_compliant)
     {
-        pidStatus->positionreference = eo_trajectory_GetPos(o->trajectory);
-        pidStatus->torquereference = o->torque_ref_jnt;
+        #warning marco.accame: see what to use in here
+        memset(pidStatus, 0, sizeof(eOmc_joint_status_ofpid_t)); 
+        pidStatus->complpos.refpos = eo_trajectory_GetPos(o->trajectory);
+        pidStatus->complpos.reftrq = o->torque_ref_jnt;
         #warning marco.randazzo: pidStatus->output is wrongly obtained before joints decoupling, fixed in s_eom_emsrunner_hid_UpdateJointstatus()
-        eo_pid_GetStatusInt32(o->pidT, &(pidStatus->output), &(pidStatus->error));
-        
+        eo_pid_GetStatusInt32(o->pidT, &(pidStatus->complpos.output), &(pidStatus->complpos.errpos));
+
         return;
     }
     
-    // stiff position modes
-    
-    pidStatus->positionreference = eo_trajectory_GetPos(o->trajectory);
-    pidStatus->torquereference = 0;
+    // stiff position modes 
+    // marco.accame: shall i use stiffpos ??
+    memset(pidStatus, 0, sizeof(eOmc_joint_status_ofpid_t));
+    pidStatus->stiffpos.refpos = eo_trajectory_GetPos(o->trajectory);
+    pidStatus->stiffpos.dummyref2 = 0;
     #warning marco.randazzo: pidStatus->output is wrongly obtained before joints decoupling, fixed in s_eom_emsrunner_hid_UpdateJointstatus()
-    eo_pid_GetStatusInt32(o->pidP, &(pidStatus->output), &(pidStatus->error));    
+    eo_pid_GetStatusInt32(o->pidP, &(pidStatus->stiffpos.output), &(pidStatus->stiffpos.errpos));   
 }
 
 extern void eo_axisController_RescaleAxisPosition(EOaxisController *o, int32_t current_pos)

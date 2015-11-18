@@ -1556,10 +1556,7 @@ extern void eo_emsController_GetActivePidStatus(uint8_t joint, eOmc_joint_status
     }
     else
     {
-        pidStatus->error     = 0;
-        pidStatus->output    = 0;
-        pidStatus->positionreference = 0;
-        pidStatus->torquereference = 0;
+        memset(pidStatus, 0, sizeof(eOmc_joint_status_ofpid_t)); 
     }
 }
 
@@ -1569,14 +1566,10 @@ extern void eo_emsController_GetJointStatus(uint8_t joint, eOmc_joint_status_t* 
     {
         eo_axisController_GetJointStatus(ems->axis_controller[joint], jointStatus);
     }
-    else
     {
-        jointStatus->basic.jnt_position         = 0;  // the position of the joint           
-        jointStatus->basic.jnt_velocity         = 0;  // the velocity of the joint          
-        jointStatus->basic.jnt_acceleration     = 0;  // the acceleration of the joint       
-        jointStatus->basic.jnt_torque           = 0;  // the torque of the joint when locally measured
-        jointStatus->controlmodestatus          = eomc_controlmode_idle;  // use eOmc_controlmode_t. it is a readonly shadow copy of jconfig.controlmode used to remind the host of teh current controlmode
-        jointStatus->ismotiondone               = eobool_false;  
+        memset(&jointStatus->basic, 0, sizeof(eOmc_joint_status_basic_t)); 
+        jointStatus->modes.controlmodestatus    = eomc_controlmode_idle;  // use eOmc_controlmode_t. it is a readonly shadow copy of jconfig.controlmode used to remind the host of the current controlmode
+        jointStatus->modes.ismotiondone         = eobool_false;  
     }
 }
 

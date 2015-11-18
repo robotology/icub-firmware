@@ -274,7 +274,7 @@ extern eObool_t eoprot_b02_b04_mc_isproxied(eOnvID32_t id)
         case eoprot_tag_mc_joint_config_limitsofjoint:
         case eoprot_tag_mc_joint_config_impedance:
 //#if defined(EOMOTIONDONE_USEPROXY)
-        case eoprot_tag_mc_joint_status_ismotiondone:
+        case eoprot_tag_mc_joint_status_modes_ismotiondone:
 //#endif
         {
             return(eobool_true);
