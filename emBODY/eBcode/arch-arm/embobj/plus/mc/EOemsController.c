@@ -1570,6 +1570,7 @@ extern void eo_emsController_GetJointStatus(uint8_t joint, eOmc_joint_status_t* 
     {
         eo_axisController_GetJointStatus(ems->axis_controller[joint], jointStatus);
     }
+    else
     {
         memset(&jointStatus->basic, 0, sizeof(eOmc_joint_status_basic_t)); 
         jointStatus->modes.controlmodestatus    = eomc_controlmode_idle;  // use eOmc_controlmode_t. it is a readonly shadow copy of jconfig.controlmode used to remind the host of the current controlmode
