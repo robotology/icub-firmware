@@ -41,8 +41,9 @@
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
-// empty-section
- 
+
+//#define EOMOTIONDONE_USEPROXY
+
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
 typedef struct EOtheMotionDone_hid EOtheMotionDone;
