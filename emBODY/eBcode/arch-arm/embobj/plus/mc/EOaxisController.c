@@ -1151,49 +1151,51 @@ extern void eo_axisController_GetActivePidStatus(EOaxisController *o, eOmc_joint
 {
     if (o->control_mode == eomc_controlmode_idle)
     {
-        memset(pidStatus, 0, sizeof(eOmc_joint_status_ofpid_t)); 
+        pidStatus->legacy.positionreference = 0;
+        pidStatus->legacy.torquereference = 0;
+        pidStatus->legacy.output    = 0;
+        pidStatus->legacy.error     = 0;        
+        
         return;
     }
     
     if (o->control_mode == eomc_controlmode_openloop)
     {
-        memset(pidStatus, 0, sizeof(eOmc_joint_status_ofpid_t)); 
-        pidStatus->openloop.output = o->openloop_out;            
-        #warning marco.accame bigger_mc_status: ok the output, but what about the reference? i believe it should also be assigned and not reset.
+        pidStatus->legacy.positionreference = 0;
+        pidStatus->legacy.torquereference = 0;
+        pidStatus->legacy.output    = o->openloop_out;
+        pidStatus->legacy.error     = 0;   
         
         return;
     }
     
     if (o->control_mode == eomc_controlmode_torque)
     {
-        memset(pidStatus, 0, sizeof(eOmc_joint_status_ofpid_t)); 
-        pidStatus->torque.reftrq = o->torque_ref_jnt;
+        pidStatus->legacy.positionreference = 0;
+        pidStatus->legacy.torquereference = o->torque_ref_jnt;
         #warning marco.randazzo: pidStatus->output is wrongly obtained before joints decoupling, fixed in s_eom_emsrunner_hid_UpdateJointstatus()
-        #warning marco.accame fatter_mc_status: shall i use errtrq or errpos ? errtrq! then: do we need managing refpos and errpos?
-        eo_pid_GetStatusInt32(o->pidT, &(pidStatus->torque.output), &(pidStatus->torque.errtrq));
+        eo_pid_GetStatusInt32(o->pidT, &(pidStatus->legacy.output), &(pidStatus->legacy.error));
         
         return;
     }
     
     if (o->interact_mode == eOmc_interactionmode_compliant)
     {
-        #warning marco.accame: see what to use in here
-        memset(pidStatus, 0, sizeof(eOmc_joint_status_ofpid_t)); 
-        pidStatus->complpos.refpos = eo_trajectory_GetPos(o->trajectory);
-        //pidStatus->complpos.reftrq = o->torque_ref_jnt;
+        pidStatus->legacy.positionreference = eo_trajectory_GetPos(o->trajectory);
+        pidStatus->legacy.torquereference = o->torque_ref_jnt;
         #warning marco.randazzo: pidStatus->output is wrongly obtained before joints decoupling, fixed in s_eom_emsrunner_hid_UpdateJointstatus()
-        eo_pid_GetStatusInt32(o->pidT, &(pidStatus->complpos.output), &(pidStatus->complpos.errpos));
-
+        eo_pid_GetStatusInt32(o->pidT, &(pidStatus->legacy.output), &(pidStatus->legacy.error));
+        
         return;
     }
     
     // stiff position modes 
-    // marco.accame: shall i use stiffpos ??
-    memset(pidStatus, 0, sizeof(eOmc_joint_status_ofpid_t));
-    pidStatus->stiffpos.refpos = eo_trajectory_GetPos(o->trajectory);
-    pidStatus->stiffpos.dummyref2 = 0;
+    
+    pidStatus->legacy.positionreference = eo_trajectory_GetPos(o->trajectory);
+    pidStatus->legacy.torquereference = 0;
     #warning marco.randazzo: pidStatus->output is wrongly obtained before joints decoupling, fixed in s_eom_emsrunner_hid_UpdateJointstatus()
-    eo_pid_GetStatusInt32(o->pidP, &(pidStatus->stiffpos.output), &(pidStatus->stiffpos.errpos));   
+    eo_pid_GetStatusInt32(o->pidP, &(pidStatus->legacy.output), &(pidStatus->legacy.error));    
+    
 }
 
 extern void eo_axisController_RescaleAxisPosition(EOaxisController *o, int32_t current_pos)

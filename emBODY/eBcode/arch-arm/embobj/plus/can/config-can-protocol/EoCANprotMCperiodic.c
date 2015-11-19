@@ -182,14 +182,14 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__PID_VAL(eOcanframe_t *f
             #warning CAVEAT: jstatus->ofpid.output is now an int16_t and the can frame should have a int16_t ... however it works like that
             // marco.accame on 02apr15: i ahve seen together with marco.randazzo that the mc4 send uint16, thus in here there is a double error which make things work 
             // see s_eo_icubCanProto_parser_per_mb_cmd__pidVal() in ems4rd-v01.uvproj
-            joint->status.ofpid.generic.output = *((uint16_t*)&(frame->data[offset[j]]));
+            joint->status.ofpid.legacy.output = *((uint16_t*)&(frame->data[offset[j]]));
         #else
         {
             // marco.accame on 02apr15: this is the ways it should be after we have changed the type of jstatus->ofpid.output
             // ... and if we consider the content of the can frame as a signed int int16_t .... however the can frame contains a uint16 (as checked in mc4 code)
             int16_t value = 0;
             value = *((int16_t*)&(frame->data[offset[j]]));
-            joint->status.ofpid.generic.output = value;
+            joint->status.ofpid.legacy.output = value;
         }
         #endif                
     }
@@ -387,11 +387,11 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__PID_ERROR(eOcanframe_t 
         
         if(eomc_controlmode_torque == joint->status.modes.controlmodestatus)
         {
-            joint->status.ofpid.torque.errtrq = pidtrq_error;
+            joint->status.ofpid.legacy.error = pidtrq_error;
         }
         else
         {
-            joint->status.ofpid.stiffpos.errpos = pidpos_error;
+            joint->status.ofpid.legacy.error = pidpos_error;
         }            
     }
    

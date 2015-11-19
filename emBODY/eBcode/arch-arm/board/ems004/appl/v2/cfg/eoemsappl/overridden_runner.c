@@ -417,7 +417,7 @@ static void s_UpdateJointstatus(EOMtheEMSrunner *p)
         if (transmit_decoupled_pwms) 
         {  
             //this functions is used to get the motor PWM after the decoupling matrix
-            eo_emsController_GetPWMOutput(jId, &jstatus->ofpid.generic.output);
+            eo_emsController_GetPWMOutput(jId, &jstatus->ofpid.legacy.output);
         }
 
         jstatus->modes.ismotiondone = eo_emsController_GetMotionDone(jId);
