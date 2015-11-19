@@ -462,7 +462,7 @@ static void s_eocanprotASperiodic_strain_saturation_handler(eOcanframe_t *frame,
             errdes.sourcedevice         = (eOcanport1 == port) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
             errdes.sourceaddress        = EOCANPROT_FRAME_GET_SOURCE(frame);                
             errdes.code                 = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
-            errdes.par16                = 0; //channel involved
+            errdes.par16                = 0;
             errdes.par64                = 0;
             eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, "strain saturation byte 7 (if sent) should be different from 0!", NULL, &errdes);
             */
@@ -481,7 +481,7 @@ static void s_eocanprotASperiodic_strain_saturation_handler(eOcanframe_t *frame,
                 errdes.sourcedevice         = (eOcanport1 == port) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
                 errdes.sourceaddress        = EOCANPROT_FRAME_GET_SOURCE(frame);                
                 errdes.code                 = eoerror_code_get(eoerror_category_HardWare, eoerror_value_HW_strain_saturation);
-                errdes.par16                = i+1; //channel involved
+                errdes.par16                = i; //channel involved
                 errdes.par64                = (uint64_t) (upper_saturations[i]) << 32 | (uint64_t) lower_saturations[i]; //LSW->lower_sat, MSW->upper_sat
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, NULL, &errdes);
                 
