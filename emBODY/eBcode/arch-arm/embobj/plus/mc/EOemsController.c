@@ -1556,11 +1556,13 @@ extern void eo_emsController_GetActivePidStatus(uint8_t joint, eOmc_joint_status
     }
     else
     {
-        // but i would use: memset(pidStatus, 0, sizeof(eOmc_joint_status_ofpid_t)); 
-        pidStatus->legacy.error     = 0;
-        pidStatus->legacy.output    = 0;
-        pidStatus->legacy.positionreference = 0;
-        pidStatus->legacy.torquereference = 0;
+        // but i would use: memset(pidStatus, 0, sizeof(eOmc_joint_status_ofpid_t));
+        pidStatus->generic.reference1   = 0;
+        pidStatus->generic.reference2   = 0;
+        pidStatus->generic.error1       = 0;
+        pidStatus->generic.error2       = 0;
+        pidStatus->generic.output       = 0;
+       
     }
 }
 

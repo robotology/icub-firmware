@@ -1151,50 +1151,51 @@ extern void eo_axisController_GetActivePidStatus(EOaxisController *o, eOmc_joint
 {
     if (o->control_mode == eomc_controlmode_idle)
     {
-        pidStatus->legacy.positionreference = 0;
-        pidStatus->legacy.torquereference = 0;
-        pidStatus->legacy.output    = 0;
-        pidStatus->legacy.error     = 0;        
+        pidStatus->generic.reference1   = 0;
+        pidStatus->generic.reference2   = 0;
+        pidStatus->generic.error1       = 0;
+        pidStatus->generic.error2       = 0;
+        pidStatus->generic.output       = 0;
         
         return;
     }
     
     if (o->control_mode == eomc_controlmode_openloop)
     {
-        pidStatus->legacy.positionreference = 0;
-        pidStatus->legacy.torquereference = 0;
-        pidStatus->legacy.output    = o->openloop_out;
-        pidStatus->legacy.error     = 0;   
-        
+        //to be reviewed
+        pidStatus->openloop.refolo      = o->openloop_out;
+        pidStatus->openloop.dummyref2   = 0;
+        pidStatus->openloop.dummyerr1   = 0;
+        pidStatus->openloop.dummyerr2   = 0;
+        pidStatus->openloop.output      = o->openloop_out; //could be updated inside control loop in case of exception
+
         return;
     }
     
     if (o->control_mode == eomc_controlmode_torque)
     {
-        pidStatus->legacy.positionreference = 0;
-        pidStatus->legacy.torquereference = o->torque_ref_jnt;
-        #warning marco.randazzo: pidStatus->output is wrongly obtained before joints decoupling, fixed in s_eom_emsrunner_hid_UpdateJointstatus()
-        eo_pid_GetStatusInt32(o->pidT, &(pidStatus->legacy.output), &(pidStatus->legacy.error));
-        
+        pidStatus->torque.dummyref1 = 0;
+        pidStatus->torque.reftrq    = o->torque_ref_jnt;
+        pidStatus->torque.dummyerr1 = 0;
+        eo_pid_GetStatusInt32(o->pidT, &(pidStatus->torque.output), &(pidStatus->torque.errtrq));
         return;
     }
     
     if (o->interact_mode == eOmc_interactionmode_compliant)
     {
-        pidStatus->legacy.positionreference = eo_trajectory_GetPos(o->trajectory);
-        pidStatus->legacy.torquereference = o->torque_ref_jnt;
-        #warning marco.randazzo: pidStatus->output is wrongly obtained before joints decoupling, fixed in s_eom_emsrunner_hid_UpdateJointstatus()
-        eo_pid_GetStatusInt32(o->pidT, &(pidStatus->legacy.output), &(pidStatus->legacy.error));
-        
+        pidStatus->complpos.refpos = eo_trajectory_GetPos(o->trajectory);
+        pidStatus->complpos.reftrq = o->torque_ref_jnt;
+        pidStatus->complpos.errpos = 0; //ask alessandro if it's needed or not      
+        eo_pid_GetStatusInt32(o->pidT, &(pidStatus->complpos.output), &(pidStatus->complpos.errtrq));
         return;
     }
     
     // stiff position modes 
-    
-    pidStatus->legacy.positionreference = eo_trajectory_GetPos(o->trajectory);
-    pidStatus->legacy.torquereference = 0;
-    #warning marco.randazzo: pidStatus->output is wrongly obtained before joints decoupling, fixed in s_eom_emsrunner_hid_UpdateJointstatus()
-    eo_pid_GetStatusInt32(o->pidP, &(pidStatus->legacy.output), &(pidStatus->legacy.error));    
+ 
+    pidStatus->stiffpos.refpos = eo_trajectory_GetPos(o->trajectory);
+    pidStatus->stiffpos.dummyref2 = 0;
+    pidStatus->stiffpos.dummyerr2 = 0;
+    eo_pid_GetStatusInt32(o->pidP, &(pidStatus->stiffpos.output), &(pidStatus->stiffpos.errpos));    
     
 }
 

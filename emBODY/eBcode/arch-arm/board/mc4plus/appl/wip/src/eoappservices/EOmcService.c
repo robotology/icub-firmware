@@ -1011,7 +1011,7 @@ extern eOresult_t s_eo_mcserv_do_mc4plus(EOmcService *p)
             eo_emsController_GetActivePidStatus(jm, &(jstatus->ofpid)); 
             if(transmit_decoupled_pwms) 
             {   //this functions is used to get the motor PWM after the decoupling matrix
-                eo_emsController_GetPWMOutput(jm, &(jstatus->ofpid.legacy.output));
+                eo_emsController_GetPWMOutput(jm, &(jstatus->ofpid.generic.output));
             }
             
             jstatus->modes.ismotiondone = eo_emsController_GetMotionDone(jm);
