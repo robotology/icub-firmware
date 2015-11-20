@@ -102,7 +102,7 @@ const eOmc_joint_t joint_default_value =
             .kff =                   0,
             .stiction_up_val =       0,
             .stiction_down_val =     0,
-            .filler =                {0xf1, 0xf2, 0xf3}
+            .filler =                {0}
         },
         .pidvelocity =
         {
@@ -116,7 +116,7 @@ const eOmc_joint_t joint_default_value =
             .kff =                   0,
             .stiction_up_val =       0,
             .stiction_down_val =     0,
-            .filler =                {0xf1, 0xf2, 0xf3}
+            .filler =                {0}
         },
         .pidtorque =
         {
@@ -130,7 +130,7 @@ const eOmc_joint_t joint_default_value =
             .kff =                   0,
             .stiction_up_val =       0,
             .stiction_down_val =     0,
-            .filler =                {0xf1, 0xf2, 0xf3}
+            .filler =                {0}
         }, 
         .limitsofjoint =
         {
@@ -142,26 +142,21 @@ const eOmc_joint_t joint_default_value =
             .stiffness =             0,
             .damping =               0,
             .offset =                0,
-            .filler02 =              {0xf1, 0xf2}           
-        },        
-        
-        .velocitysetpointtimeout =   0,
-       
-        .motionmonitormode =         eomc_motionmonitormode_dontmonitor,
-        .filler01 =                  0xe0,
+            .filler02 =              {0}           
+        },               
         .maxvelocityofjoint =        0,
-		.jntEncoderResolution =		 0,
         .motor_params =
         {
             .bemf_value =            0,
             .ktau_value =            0,
             .bemf_scale =            0,
             .ktau_scale =            0,
-            .filler02 =              {0xf1, 0xf2}
+            .filler02 =              {0}
         },
+        .velocitysetpointtimeout =   0,
         .tcfiltertype =              0,
         .jntEncoderType =            0,
-        .filler02 =                  {0xf1, 0xf2}
+        .filler04 =                  {0}
     },
     .status =                       
     {
@@ -171,12 +166,16 @@ const eOmc_joint_t joint_default_value =
             .jnt_velocity =          0,
             .jnt_acceleration =      0,
             .jnt_torque =            0,
-            .motionmonitorstatus =   eomc_motionmonitorstatus_notmonitored,
-            .controlmodestatus =     eomc_controlmode_idle,
+            .filler =                {0},
         },
         .ofpid =                     {0},
-        .interactionmodestatus =     eomc_imodeval_stiff,
-        .chamaleon03 =               {0} //{0xd1, 0xd2, 0xd3}
+        .modes = 
+        {
+            .controlmodestatus =        eomc_controlmode_idle,
+            .interactionmodestatus =    eOmc_interactionmode_stiff,
+            .ismotiondone =             eobool_false,
+            .filler =                   {0}
+        }
     },
     .inputs =                        {0},
     .cmmnds =                       
@@ -184,9 +183,9 @@ const eOmc_joint_t joint_default_value =
         .calibration =               {0},
         .setpoint =                  {0},
         .stoptrajectory =            0,
-        .controlmode =                 eomc_controlmode_cmd_switch_everything_off,
-        .interactionmode =           eomc_imodeval_stiff,
-        .filler01 =                  0        
+        .controlmode =               eomc_controlmode_cmd_switch_everything_off,
+        .interactionmode =           eOmc_interactionmode_stiff,
+        .filler =                    {0}        
     }
 }; 
 
@@ -206,11 +205,10 @@ const eOmc_motor_t motor_default_value =
             .kff =                   0,
             .stiction_up_val =       0,
             .stiction_down_val =     0,
-            .filler =                {0xf1, 0xf2, 0xf3}
+            .filler =                {0}
         },
         .gearboxratio =              0,
         .rotorEncoderResolution =    0,
-        .filler01 =                  0,
         .maxvelocityofmotor =        0,
         .maxcurrentofmotor =         0,
         .rotorIndexOffset =          0,
@@ -220,6 +218,7 @@ const eOmc_motor_t motor_default_value =
         .hasRotorEncoder =           eobool_false,
         .hasRotorEncoderIndex =      eobool_false,
         .rotorEncoderType =          0,
+        .filler02 =                  {0},
         .limitsofrotor =
         {
             .max = 0,
@@ -318,16 +317,6 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
         
     // 7) set impedance 
     eo_emsController_SetImpedance(jxx, cfg->impedance.stiffness, cfg->impedance.damping, cfg->impedance.offset);
-    
-    // 8) set monitormode status    
-    if(eomc_motionmonitormode_dontmonitor == cfg->motionmonitormode)
-    {
-        jstatus->basic.motionmonitorstatus = eomc_motionmonitorstatus_notmonitored;  
-    }
-    else
-    {
-        jstatus->basic.motionmonitorstatus = eomc_motionmonitorstatus_setpointnotreachedyet;
-    }
 
 }
 
@@ -347,7 +336,6 @@ extern void eoprot_fun_UPDT_mc_joint_config_pidposition(const EOnv* nv, const eO
                                     pid_ptr->stiction_up_val*rescaler,
                                     pid_ptr->stiction_down_val*rescaler);
 }
-
 
 extern void eoprot_fun_UPDT_mc_joint_config_pidtorque(const EOnv* nv, const eOropdescriptor_t* rd)
 {
@@ -401,7 +389,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_velocitysetpointtimeout(const EOnv* 
     eo_emsController_SetVelTimeout(jxx, *time);
 }
 
-
+/*
 extern void eoprot_fun_UPDT_mc_joint_config_motionmonitormode(const EOnv* nv, const eOropdescriptor_t* rd)
 {   // 2foc or mc4plus or mc4can is equal
     eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
@@ -425,29 +413,20 @@ extern void eoprot_fun_UPDT_mc_joint_config_motionmonitormode(const EOnv* nv, co
         jstatus->basic.motionmonitorstatus = eomc_motionmonitorstatus_setpointnotreachedyet;
     }
 }
-
+*/
 
 extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOmc_setpoint_t *setpoint = (eOmc_setpoint_t*)rd->data;
     eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
-    eOmc_joint_t *joint = eo_entities_GetJoint(eo_entities_GetHandle(), jxx); 
+    eOmc_joint_t *joint = eo_entities_GetJoint(eo_entities_GetHandle(), jxx);
 
     if(NULL == joint)
     {
         return; //error
     }
 
-    // set monitor status = notreachedyet if monitormode is forever    
-    if(eomc_motionmonitormode_forever == joint->config.motionmonitormode)
-    {
-        /* if monitorstatus values setpointreached means this is a new set point, 
-        so i need to start to check is set point is reached because i'm in monitormode = forever */
-        if(eomc_motionmonitorstatus_setpointisreached == joint->status.basic.motionmonitorstatus)
-        {
-            joint->status.basic.motionmonitorstatus = eomc_motionmonitorstatus_setpointnotreachedyet;
-        }
-    }
+    joint->status.modes.ismotiondone = eobool_false;
     
     switch(setpoint->type)
     { 
@@ -489,9 +468,8 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_stoptrajectory(const EOnv* nv, const
 }
 
 
-
 extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eOropdescriptor_t* rd)
-{
+{   
     eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
     eOmc_calibrator_t *calibrator = (eOmc_calibrator_t*)rd->data;
 
@@ -652,7 +630,6 @@ extern void eoprot_fun_UPDT_mc_controller_config_jointcoupling(const EOnv* nv, c
 
 // -- entity motor
 
-
 extern void eoprot_fun_INIT_mc_motor_config(const EOnv* nv)
 {
     eOmc_motor_config_t *cfg = (eOmc_motor_config_t*)eo_nv_RAM(nv);
@@ -714,8 +691,6 @@ extern void eoprot_fun_UPDT_mc_motor_config_maxcurrentofmotor(const EOnv* nv, co
     curr_ptr = curr_ptr;
     #warning TBD: marco.accame -> in eoprot_fun_UPDT_mc_motor_config_maxcurrentofmotor() i have removed messages sent to CAN. how do we do that for mc4plus ???   
 }
-
-
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 

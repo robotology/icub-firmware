@@ -1011,24 +1011,27 @@ extern eOresult_t s_eo_mcserv_do_mc4plus(EOmcService *p)
             eo_emsController_GetActivePidStatus(jm, &(jstatus->ofpid)); 
             if(transmit_decoupled_pwms) 
             {   //this functions is used to get the motor PWM after the decoupling matrix
-                eo_emsController_GetPWMOutput(jm, &(jstatus->ofpid.output));
+                eo_emsController_GetPWMOutput(jm, &(jstatus->ofpid.legacy.output));
             }
-            if(eomc_motionmonitorstatus_setpointnotreachedyet == jstatus->basic.motionmonitorstatus)
-            {
-                #warning TBD: see how we manage the motion done for the case of mc4plus
-                /* if motionmonitorstatus is equal to _setpointnotreachedyet, i send motion done message. 
-                - if (motionmonitorstatus == eomc_motionmonitorstatus_setpointisreached), i don't send
-                message because the setpoint is alredy reached. this means that:
-                    - if monitormode is forever, no new set point has been configured 
-                    - if monitormode is _untilreached, the joint reached the setpoint already.
-                - if (motionmonitorstatus == eomc_motionmonitorstatus_notmonitored), i don't send
-                message because pc104 is not interested in getting motion done.
-                */
-                if(eo_emsController_GetMotionDone(jm))
-                {
-                    jstatus->basic.motionmonitorstatus = eomc_motionmonitorstatus_setpointisreached;
-                }
-            }
+            
+            jstatus->modes.ismotiondone = eo_emsController_GetMotionDone(jm);
+
+//            if(eomc_motionmonitorstatus_setpointnotreachedyet == jstatus->modes.ismotiondone)
+//            {
+//                #warning TBD: see how we manage the motion done for the case of mc4plus
+//                /* if motionmonitorstatus is equal to _setpointnotreachedyet, i send motion done message. 
+//                - if (motionmonitorstatus == eomc_motionmonitorstatus_setpointisreached), i don't send
+//                message because the setpoint is alredy reached. this means that:
+//                    - if monitormode is forever, no new set point has been configured 
+//                    - if monitormode is _untilreached, the joint reached the setpoint already.
+//                - if (motionmonitorstatus == eomc_motionmonitorstatus_notmonitored), i don't send
+//                message because pc104 is not interested in getting motion done.
+//                */
+//                if(eo_emsController_GetMotionDone(jm))
+//                {
+//                    jstatus->basic.motionmonitorstatus = eomc_motionmonitorstatus_setpointisreached;
+//                }
+//            }
             
             // motor ...
             eOmc_motor_status_t *mstatus = &(p->themotors[jm]->status);
