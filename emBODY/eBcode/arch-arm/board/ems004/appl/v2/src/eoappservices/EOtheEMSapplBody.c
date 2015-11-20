@@ -699,6 +699,11 @@ static eOemscontroller_board_t s_emscontroller_getboard(void)
         {
             type = emscontroller_board_CER_WAIST;
         } break;
+ 
+        case 20:
+        {
+            type = emscontroller_board_UPPERLEG;
+        } break;
         
         default:
         {

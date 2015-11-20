@@ -185,7 +185,15 @@
         }   
     };
 
-
+    static const eOprot_EPcfg_t s_theEPcfgsOthersEB21[] =
+    {  
+        {           
+            .endpoint           = eoprot_endpoint_motioncontrol,
+            .numberofentities  = {4, 4, 1, 0, 0, 0, 0}     
+        }     
+    };
+    
+    
 EOconstvector s_eo_vectorof_EPcfg_eb1eb3 = 
 {
     .capacity       = sizeof(s_theEPcfgsOthersEB1EB3)/sizeof(eOprot_EPcfg_t),
@@ -253,6 +261,17 @@ EOconstvector s_eo_vectorof_EPcfg_eb15 =
     .item_size      = sizeof(eOprot_EPcfg_t),
     .dummy          = 0,
     .stored_items   = (void*)s_theEPcfgsOthersEB15,
+    .functions      = NULL   
+};
+
+
+EOconstvector s_eo_vectorof_EPcfg_eb21 = 
+{
+    .capacity       = sizeof(s_theEPcfgsOthersEB21)/sizeof(eOprot_EPcfg_t),
+    .size           = sizeof(s_theEPcfgsOthersEB21)/sizeof(eOprot_EPcfg_t),
+    .item_size      = sizeof(eOprot_EPcfg_t),
+    .dummy          = 0,
+    .stored_items   = (void*)s_theEPcfgsOthersEB21,
     .functions      = NULL   
 };
 
