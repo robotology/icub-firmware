@@ -303,12 +303,13 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
         s_boardnum = 0;
         eOipv4addr_t ipaddress = eom_ipnet_GetIPaddress(eom_ipnet_GetHandle());
         s_boardnum = ipaddress >> 24; 
-        s_boardnum --;
-        if(s_boardnum > 16)
+        if((0 == s_boardnum) || (s_boardnum > 32))
         {
-            //return;
-            s_boardnum = 0;
+            s_boardnum = 1;
         }
+        
+        s_boardnum --;
+
 #if defined(DEBUG_INERTIAL)        
         s_boardnum = 1; //it imposes that the board is the eb2
 #endif
