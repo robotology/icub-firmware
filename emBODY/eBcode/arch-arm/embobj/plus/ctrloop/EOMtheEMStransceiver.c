@@ -164,6 +164,7 @@ extern EOMtheEMStransceiver * eom_emstransceiver_Initialise(const eOemstransceiv
     brdtransceiver_cfg.proxycfg                 = (eOproxy_cfg_t*)&cfg->proxycfg;
     memset(&brdtransceiver_cfg.extfn, 0, sizeof(eOtransceiver_extfn_t));
     brdtransceiver_cfg.extfn.onerrorseqnumber   = eom_emstransceiver_callback_incaseoferror_in_sequencenumberReceived;
+    brdtransceiver_cfg.extfn.onerrorinvalidframe = eom_emstransceiver_callback_incaseoferror_invalidframe;
     eo_boardtransceiver_Initialise(&brdtransceiver_cfg);
     s_emstransceiver_singleton.transceiver = eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle());
     
@@ -346,9 +347,14 @@ extern eOemstransceiver_diagnosticsinfo_t* eom_emstransceiver_GetDiagnosticsInfo
 }
 
 
-EO_weak extern void eom_emstransceiver_callback_incaseoferror_in_sequencenumberReceived(eOipv4addr_t remipv4addr, uint64_t rec_seqnum, uint64_t exp_seqnum)
+EO_weak extern void eom_emstransceiver_callback_incaseoferror_in_sequencenumberReceived(EOreceiver *receiver)
 { 
     // nothing: if needed an action please redefine the function
+}
+
+EO_weak extern void eom_emstransceiver_callback_incaseoferror_invalidframe(EOreceiver *receiver)
+{
+    
 }
 
 extern void eo_receiver_callback_incaseoferror_in_sequencenumberReceived(eOipv4addr_t remipv4addr, uint64_t rec_seqnum, uint64_t exp_seqnum)
