@@ -117,7 +117,7 @@ int main(void)
 
 
 
-extern void eom_emstransceiver_callback_incaseoferror_in_sequencenumberReceived(eOipv4addr_t remipv4addr, uint64_t rec_seqnum, uint64_t expected_seqnum)
+extern void eom_emstransceiver_callback_incaseoferror_in_sequencenumberReceived(EOreceiver *receiver)
 {   // the only reason of using the following two variables as static is: to reduce the use of stack.
     static int64_t delta = 0;
     static eOerrmanDescriptor_t errdes = 
@@ -129,12 +129,23 @@ extern void eom_emstransceiver_callback_incaseoferror_in_sequencenumberReceived(
         .par64          = 0
     };
     
-    if(1 == rec_seqnum)
+    const eOreceiver_seqnum_error_t *err = eo_receiver_GetSequenceNumberError(receiver); 
+    
+    if(NULL == err)
+    {
+        errdes.code  = EOERRORCODE(eoerror_category_System, eoerror_value_SYS_runtimeerror);
+        errdes.par64 = 0x123467fabc222;
+        errdes.par16 = 1;       
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, NULL, &errdes);   
+        return;        
+    }
+    
+    if(1 == err->rec_seqnum)
     {
         // it is the first packet received from a remote transmitter freshly initted (i.e., robotInterface has just re-started bu this board was alive well before)
         // thus, we dont issue an error but an info: 
         errdes.code  = EOERRORCODE(eoerror_category_System, eoerror_value_SYS_transceiver_rxseqnumber_restarted);
-        errdes.par64 = expected_seqnum;
+        errdes.par64 = err->exp_seqnum;
         errdes.par16 = 1;       
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, NULL, &errdes);   
         
@@ -143,16 +154,31 @@ extern void eom_emstransceiver_callback_incaseoferror_in_sequencenumberReceived(
     }  
     else
     {    
-        delta = rec_seqnum - expected_seqnum;
+        delta = err->rec_seqnum - err->exp_seqnum;
         if(delta > INT16_MAX)       delta = INT16_MAX;  //32767
         else if(delta < INT16_MIN)  delta = INT16_MIN;  //-32768;
         
+        errdes.code             = EOERRORCODE(eoerror_category_System, eoerror_value_SYS_transceiver_rxseqnumber_error);
         errdes.par16            = (int16_t)delta; 
-        errdes.par64            = expected_seqnum; 
+        errdes.par64            = err->exp_seqnum; 
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
     }
 }
 
+
+extern void eom_emstransceiver_callback_incaseoferror_invalidframe(EOreceiver *receiver)
+{  
+    static eOerrmanDescriptor_t errdesinvframe = 
+    {
+        .code           = EOERRORCODE(eoerror_category_System, eoerror_value_SYS_transceiver_rxinvalidframe_error),
+        .sourcedevice   = eo_errman_sourcedevice_localboard,
+        .sourceaddress  = 0,
+        .par16          = 0,
+        .par64          = 0
+    };
+
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdesinvframe);
+}
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
