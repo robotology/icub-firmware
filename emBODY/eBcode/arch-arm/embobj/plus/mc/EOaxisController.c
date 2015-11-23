@@ -414,7 +414,7 @@ extern void eo_axisController_SetEncVel(EOaxisController *o, int32_t vel)
     if (o) o->velocity = vel;
 } 
 
-extern void eo_axisController_SetTorque(EOaxisController *o, int16_t trq)
+extern void eo_axisController_SetTorque(EOaxisController *o, int32_t trq)
 {
     if (o)
     {

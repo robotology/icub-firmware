@@ -80,6 +80,11 @@
 #define MOTOR_CAN_INVALID_PROT   0x00000080
 #define MOTOR_CAN_GENERIC_FAULT  0x00003D00
 */
+
+#define ENCODER_DIRTY           0x01
+#define ENCODER_INDEX_BROKEN    0x04
+#define ENCODER_PHASE_BROKEN    0x08
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
@@ -2005,19 +2010,6 @@ void sendErrorMessage(uint8_t j, uint32_t ems_fault_mask_j, uint32_t motor_fault
         motor_fault_mask_j &= ~MOTOR_HALLSENSORS_FAULT;
     }
     
-    if (motor_fault_mask_j & MOTOR_QENCODER_FAULT)
-    {
-        //managed = eobool_true;
-        eOerrmanDescriptor_t descriptor = {0};
-        descriptor.par16 = j; // unless required
-        descriptor.par64 = eo_motors_getQEError(ems->motors, j);
-        descriptor.sourcedevice = eo_errman_sourcedevice_canbus1; // 0 e' board, 1 can1, 2 can2
-        descriptor.sourceaddress = j+1; // oppure l'id del can che ha dato errore
-        descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_motor_qencoder);
-        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
-        motor_fault_mask_j &= ~MOTOR_QENCODER_FAULT;
-    }
-    
     if (motor_fault_mask_j & MOTOR_CAN_GENERIC_FAULT)
     {
         //managed = eobool_true;
@@ -2107,11 +2099,44 @@ void sendErrorMessage(uint8_t j, uint32_t ems_fault_mask_j, uint32_t motor_fault
         uint8_t state_req;
         eo_motor_get_motor_status(ems->motors, j, &state, &state_req);
         descriptor.par64 = ((((uint64_t)MOTOR_WRONG_STATE))<<32)|(((uint64_t)state_req)<<8)|((uint64_t)state);
-        descriptor.sourcedevice = 1; // 0 e' board, 1 can1, 2 can2
-        descriptor.sourceaddress = 0; // oppure l'id del can che ha dato errore
-        descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_generic_error);
+        descriptor.sourcedevice = eo_errman_sourcedevice_canbus1; // 0 e' board, 1 can1, 2 can2
+        descriptor.sourceaddress = j+1; // oppure l'id del can che ha dato errore
+        descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_motor_wrong_state);
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
         ems_fault_mask_j &= ~MOTOR_WRONG_STATE;
+    }
+    
+    if (motor_fault_mask_j & MOTOR_QENCODER_FAULT)
+    {
+        uint32_t qe_errors = eo_motors_getQEError(ems->motors, j);
+        //managed = eobool_true;
+        eOerrmanDescriptor_t descriptor = {0};
+        descriptor.par16 = j; // unless required
+        descriptor.par64 = qe_errors;
+        descriptor.sourcedevice = eo_errman_sourcedevice_canbus1; // 0 e' board, 1 can1, 2 can2
+        descriptor.sourceaddress = j+1; // oppure l'id del can che ha dato errore
+        
+        if (qe_errors & ENCODER_DIRTY)
+        {
+            descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_motor_qencoder_dirty);
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
+        }
+        
+        if (qe_errors & ENCODER_INDEX_BROKEN)
+        {
+            descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_motor_qencoder_index);
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
+        }
+        
+        if (qe_errors & ENCODER_PHASE_BROKEN)
+        {
+            descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_motor_qencoder_phase);
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
+        }
+        
+        descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_motor_qencoder_dirty);
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
+        motor_fault_mask_j &= ~MOTOR_QENCODER_FAULT;
     }
     
     if ((ems_fault_mask_j & ~MOTOR_HARD_FAULT) || motor_fault_mask_j)
