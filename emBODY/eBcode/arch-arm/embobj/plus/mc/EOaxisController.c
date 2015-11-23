@@ -20,6 +20,7 @@
 //#include "hal_led.h"
 #include "EoError.h"
 #include "EoemsController.h"
+#include "EOmcService.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -156,8 +157,7 @@ extern eObool_t eo_axisController_IsTorqueSensorFault(EOaxisController* o)
 {
     return (o->state_mask & AC_TORQUE_SENS_FAULT) != 0;
 }
-
-extern void eo_axisController_StartCalibration_type3(EOaxisController *o)
+extern void eo_axisController_StartCalibration(EOaxisController *o, uint32_t* params)
 {
     if (!o) return;
     
@@ -169,62 +169,41 @@ extern void eo_axisController_StartCalibration_type3(EOaxisController *o)
     
     SET_BITS(o->state_mask, AC_NOT_CALIBRATED);
     
-    o->control_mode = eomc_controlmode_calib;
-}
-
-extern void eo_axisController_StartCalibration_type6(EOaxisController *o, int32_t position, int32_t velocity, int32_t maxencoder)
-{
-    if (!o) return;
-    
-    if (NOT_READY() && (o->state_mask !=  AC_NOT_CALIBRATED))
+    switch (o->calibration_type)
     {
-        o->control_mode = eomc_controlmode_hwFault;
-        return;
-    }
+        case eomc_calibration_type3_abs_sens_digital:
+        {
+            eOmc_calibrator_params_type3_abs_sens_digital_t* p_type3 = (eOmc_calibrator_params_type3_abs_sens_digital_t*) params;
+            
+            o->control_mode = eomc_controlmode_calib;
+            
+        } break;
+        case eomc_calibration_type5_hard_stops_mc4plus:
+        case eomc_calibration_type8_adc_and_incr_mc4plus: //same params
+        {
+            eOmc_calibrator_params_type5_hard_stops_mc4plus_t* p_type5 = (eOmc_calibrator_params_type5_hard_stops_mc4plus_t*) params;
     
-    SET_BITS(o->state_mask, AC_NOT_CALIBRATED);
+            //set the values to start procedure
+            o->pwm_limit_calib = p_type5->pwmlimit;
     
-    /*
-    //init the traj object
-    eo_trajectory_Init(o->trajectory, GET_AXIS_POSITION(), GET_AXIS_VELOCITY(), 0);
-    eo_trajectory_Stop(o->trajectory, GET_AXIS_POSITION());
-    
-    //new trajectory using params1 and params2
-    eo_axisController_SetPosRef(o, position, velocity);
-    
-    //what should I do with param3???
-    
-    o->control_mode = eomc_controlmode_calib;
-    */
-}
-
-extern void eo_axisController_StartCalibration_type5(EOaxisController *o, int32_t pwmlimit, int32_t final_position)
-{
-    if (!o) return;
-    
-    if (NOT_READY() && (o->state_mask !=  AC_NOT_CALIBRATED))
-    {
-        o->control_mode = eomc_controlmode_hwFault;
-        return;
-    }
-    
-    SET_BITS(o->state_mask, AC_NOT_CALIBRATED);
-    
-    //set the values to start procedure
-    o->pwm_limit_calib = pwmlimit;
-    
-    if (o->pwm_limit_calib >= 0)
-        o->pos_to_reach = final_position;
-    else
-        o->pos_to_reach = -final_position;
+            if (o->pwm_limit_calib >= 0)
+                o->pos_to_reach = p_type5->final_pos;
+            else
+                o->pos_to_reach = -p_type5->final_pos;
  
-    //reset the offset
-    o->offset = 0;
+            //reset the offset
+            o->offset = 0;
     
-    o->control_mode = eomc_controlmode_calib;
+            o->control_mode = eomc_controlmode_calib;
     
-    // reset hwlimit reached
-    o->hardwarelimitisreached =0;
+            // reset hwlimit reached
+            o->hardwarelimitisreached =0;
+              
+        } break; 
+        default:
+            break;
+    }
+    
 }
 
 extern void eo_axisController_SetCalibrated(EOaxisController *o)
@@ -773,8 +752,8 @@ extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
         
         case eomc_controlmode_calib:
         {
-            //calib type 5
-            if (o->calibration_type == eomc_calibration_type5_hard_stops_mc4plus)
+            //calib type 5 and calib type 8
+            if ((o->calibration_type == eomc_calibration_type5_hard_stops_mc4plus) || (o->calibration_type == eomc_calibration_type8_adc_and_incr_mc4plus))
             {
                 if(1 == o->hardwarelimitisreached)
                 {   
@@ -1297,27 +1276,59 @@ static void axisMotionReset(EOaxisController *o)
 
 static eObool_t s_eo_axisController_isHardwareLimitReached(EOaxisController *o)
 {
-    //if for 20 consecutive times (~20ms) I'm in the same position (but let the calibration start before...), it means that I reached the hardware limit
-    o->calib_count += 1;
-    if (o->calib_count > 1200)
+    if (o->calibration_type == eomc_calibration_type5_hard_stops_mc4plus)
     {
-        if (GET_AXIS_POSITION() == o->old_pos)
+        //if for 20 consecutive times (~20ms) I'm in the same position (but let the calibration start before...), it means that I reached the hardware limit
+        o->calib_count += 1;
+        if (o->calib_count > 1200)
         {
-            o->pos_stable += 1;
-            if (o->pos_stable == 20)
+            if (GET_AXIS_POSITION() == o->old_pos)
+            {
+                o->pos_stable += 1;
+                if (o->pos_stable == 20)
+                {
+                    o->pos_stable = 0;
+                    o->calib_count = 0;
+                    return eobool_true;
+                }
+            }
+            else
             {
                 o->pos_stable = 0;
-                o->calib_count = 0;
-                return eobool_true;
             }
         }
-        else
-        {
-            o->pos_stable = 0;
-        }
+        o->old_pos = GET_AXIS_POSITION();
+        return eobool_false;
     }
-    o->old_pos = GET_AXIS_POSITION();
-    return eobool_false;
+    else if (o->calibration_type == eomc_calibration_type8_adc_and_incr_mc4plus)
+    {
+        //DEBUG PRINTING
+        /*
+        static uint16_t count_deb = 0;
+        count_deb++;
+        
+        if (count_deb == 500)
+        {
+            uint32_t deb_voltage = eo_mcserv_GetMotorAnalogSensor(eo_mcserv_GetHandle(), o->axisID);
+            eOerrmanDescriptor_t errdes = {0};
+            errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
+            errdes.par16            = deb_voltage;
+            errdes.par64            = 0;
+            errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+            errdes.sourceaddress    = o->axisID;     
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &errdes);
+            
+            count_deb = 0;
+        }
+        */
+        
+        //must be 0 or a value close to 0?
+        #warning voltage threshold to set hardware-limit reached is hardcoded, but it could become a calib param
+        if (eo_mcserv_GetMotorAnalogSensor(eo_mcserv_GetHandle(), o->axisID) < 500) 
+            return eobool_true;
+        else
+            return eobool_false;
+    }
 }
 
 // --------------------------------------------------------------------------------------------------------------------

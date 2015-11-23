@@ -471,69 +471,13 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
     eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
     eOmc_calibrator_t *calibrator = (eOmc_calibrator_t*)rd->data;
 
-
-
-#warning -> see comment.
-    // abilitare la perif pwm, mettere il emscontrl in controlmode che dipende dal joint e da calib type (chiedere a randaz), 
-    // per il tipo 3 e': position...?
-    
-    // la StartCalibration deve esser edificata in modo da poter gestire anche altri tipi di calibrazione.
-    // alessandro: aiutera'
-    // usare joint index per identificare quali devono avere calibrazione 1,2,3...etc ?
-    
-    // commento: la calib tipo 3 ha solo offset (in xml e' il calibration3. il calibration2 etc non viene usato).
-    // per calib 3: viene usato solo il calibration3.
-    
     uint32_t state = eo_mcserv_GetMotorFaultMask(eo_mcserv_GetHandle(),jxx);
     if ((eo_mcserv_AreMotorsExtFaulted(eo_mcserv_GetHandle())) || (state & MOTOR_EXTERNAL_FAULT)) //or motors still faulted OR state (and so PWM) still need to be enabled
     {
         s_eoprot_ep_mc_fun_MotorReactivationAttempt(jxx, state);
     }
 
-    //check for the type of calibration required
-
-    if(calibrator->type == eomc_calibration_type6_mais_mc4plus)
-    {
-        // calibration for joint controlled with MAIS
-        
-        //params for the calib still need to be discussed
-        /*
-        eo_emsController_SetAxisCalibrationZero (jxx, calibrator->params.type6.calibrationZero);
-        // the StartCalib for type6 should:
-        // 1 - (set the params of position, velocity) and maxencoder
-        // 2 - SetTrajectory with final position and velocity (p1,p2)
-         eo_emsController_StartCalibration_type6 (jxx,
-                                                 calibrator->params.type6.position,
-                                                 calibrator->params.type6.velocity,
-                                                 calibrator->params.type6.maxencoder);
-        */
-    }
-    
-    if(calibrator->type == eomc_calibration_type5_hard_stops_mc4plus)
-    {
-        // calibration for joint with incremental encoders
-        eo_emsController_SetAxisCalibrationZero (jxx, calibrator->params.type5.calibrationZero);
-        eo_emsController_StartCalibration_type5 (jxx,
-                                                 calibrator->params.type5.pwmlimit,
-                                                 calibrator->params.type5.final_pos);
-    }
-    else if(calibrator->type == eomc_calibration_type3_abs_sens_digital)
-    {
-        // calibration for joint with abs encoders
-        eo_emsController_SetAxisCalibrationZero (jxx, calibrator->params.type3.calibrationZero);
-        eo_emsController_StartCalibration_type3 (jxx, 
-                                                calibrator->params.type3.position, 
-                                                calibrator->params.type3.velocity,
-                                                calibrator->params.type3.offset);
-    }                             
-    // davide:
-    /*
-     probably I shouldn't set the control mode in here...
-     1) with the StartCalibration it's set to eomc_controlmode_cmd_calib
-     2) after the calibration there's a control inside the axis controller --> if all the coupled joints are calibrated, then the control mode is set to position
-    
-    //eo_emsController_SetControlModeGroupJoints(jxx, (eOmc_controlmode_command_t) eomc_controlmode_cmd_position);
-    */
+    eo_emsController_StartCalibration(jxx, calibrator->type, calibrator->params.any);                          
 }
 
 

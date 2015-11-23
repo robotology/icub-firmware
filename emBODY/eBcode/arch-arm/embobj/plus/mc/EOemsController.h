@@ -128,9 +128,7 @@ extern void eo_emsController_GetMotorStatus(uint8_t mId, eOmc_motor_status_t* mo
 
 extern void eo_emsController_CheckCalibrations(void);
 extern void eo_emsController_ResetCalibrationValues(uint8_t joint);
-extern void eo_emsController_StartCalibration_type3(uint8_t joint, int32_t pos, int32_t vel, int32_t offset);
-extern void eo_emsController_StartCalibration_type6(uint8_t joint, int32_t pos, int32_t vel, int32_t maxencoder);
-extern void eo_emsController_StartCalibration_type5(uint8_t joint, int32_t pwmlimit, int32_t final_position);
+extern void eo_emsController_StartCalibration(uint8_t joint, eOmc_calibration_type_t type, uint32_t* params);
 
 extern void eo_emsController_ResetPosPid(uint8_t joint);
 extern void eo_emsController_ResetTrqPid(uint8_t joint);

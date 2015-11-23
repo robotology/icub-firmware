@@ -140,9 +140,7 @@ extern void eo_axisController_SetTcFilterType(EOaxisController *o, uint8_t filte
 extern void eo_axisController_SetPosPid(EOaxisController *o, float K, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff, float stiction_up, float stiction_down);
 extern void eo_axisController_SetTrqPid(EOaxisController *o, float K, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff, float Kff, float stiction_up, float stiction_down);
 
-extern void eo_axisController_StartCalibration_type3(EOaxisController *o);
-extern void eo_axisController_StartCalibration_type6(EOaxisController *o, int32_t position, int32_t velocity, int32_t maxencoder);
-extern void eo_axisController_StartCalibration_type5(EOaxisController *o, int32_t pwmlimit, int32_t final_position);
+extern void eo_axisController_StartCalibration(EOaxisController *o, uint32_t* params);
 extern void eo_axisController_SetCalibrated(EOaxisController *o);
 extern void eo_axisController_ResetCalibration(EOaxisController *o);
 extern eObool_t eo_axisController_IsCalibrated(EOaxisController *o);

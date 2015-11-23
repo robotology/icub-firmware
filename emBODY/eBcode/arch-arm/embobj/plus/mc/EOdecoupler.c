@@ -422,11 +422,16 @@ extern void eo_motors_decouple_PWM(EOmotors *o, float *pwm_joint, float *pwm_mot
             }
         }  
     }
+    else if (emscontroller_board_CER_WRIST == o->board)
+    {
+        MOTORS(m) pwm_motor[m] = pwm_joint[m];
+    }
     else    // marco.accame: this board does not have coupled joints
             // davide: to me seems more like that your trying to compute the PWM of an undefined board
     {    
         MOTORS(m) pwm_motor[m] = 0;
     }
+    
     //#endif
 }
 

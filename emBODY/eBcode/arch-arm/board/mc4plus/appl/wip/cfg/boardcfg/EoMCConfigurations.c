@@ -215,6 +215,12 @@ const eomcconfig_codeconfig_t eomcconfig_codeconfig_MC4PLUS[] =
                                                                                               EO_INIT(.jomos[3].extra_encoder.isthere) 1, EO_INIT(.jomos[3].extra_encoder.etype)  1, EO_INIT(.jomos[3].extra_encoder.index)  0, EO_INIT(.jomos[3].extra_encoder.pos_type) 1,
     },
     
+    /* CER-wrist board */
+    {EO_INIT(.value) eOmcconfig_value_MC4PLUS_CER_wrist,
+        EO_INIT(.jomos[0].actuator.local.type)  1, EO_INIT(.jomos[0].actuator.local.index) 0, EO_INIT(.jomos[0].encoder.isthere)       1, EO_INIT(.jomos[0].encoder.etype)        2, EO_INIT(.jomos[0].encoder.index)        0, EO_INIT(.jomos[0].encoder.pos_type)       0, // j0-> index-distal, motor0, mais, 0 stands for 1st mais entity
+                                                                                              EO_INIT(.jomos[0].extra_encoder.isthere) 1, EO_INIT(.jomos[0].extra_encoder.etype)  2, EO_INIT(.jomos[0].extra_encoder.index)  0, EO_INIT(.jomos[0].extra_encoder.pos_type) 1,
+    }
+    
 }; EO_VERIFYsizeof(eomcconfig_codeconfig_MC4PLUS, eOmcconfig_value_MC4PLUS_numberof*sizeof(const eomcconfig_codeconfig_t));
 
 const eomcconfig_valuestring_t eomcconfig_valuestring_MC4PLUS[] =
@@ -226,13 +232,14 @@ const eomcconfig_valuestring_t eomcconfig_valuestring_MC4PLUS[] =
     {EO_INIT(.value) eOmcconfig_value_MC4PLUS_b1,                       EO_INIT(.string) "MC4plus_b1"},
     {EO_INIT(.value) eOmcconfig_value_MC4PLUS_b7,                       EO_INIT(.string) "MC4plus_b7"},
     {EO_INIT(.value) eOmcconfig_value_MC4PLUS_b9,                       EO_INIT(.string) "MC4plus_b9"},
-    {EO_INIT(.value) eOmcconfig_value_MC4PLUS_1b4,                      EO_INIT(.string) "MC4plus_1b4"}
+    {EO_INIT(.value) eOmcconfig_value_MC4PLUS_1b4,                      EO_INIT(.string) "MC4plus_1b4"},
+    {EO_INIT(.value) eOmcconfig_value_MC4PLUS_CER_wrist,                EO_INIT(.string) "MC4plus_CER_wrist"}
 };
 
 
 
 //MC config for boards
-enum { eOmcconfig_boardjomosnumberof = 9 };
+enum { eOmcconfig_boardjomosnumberof = 10 };
 const eomcconfig_boardjomos_t eomcconfig_boardjomos_MC4PLUS[] =
 {
     /* experimentals */
@@ -253,6 +260,9 @@ const eomcconfig_boardjomos_t eomcconfig_boardjomos_MC4PLUS[] =
     
     /* v3 icub right-forearm boards */
     //TBA
+    
+    /* CER-wrist board */
+    {EO_INIT(.board_num) 21,  EO_INIT (.joints) 1}  // board 19, CER-wrist (4 joints!)
 
 }; EO_VERIFYsizeof(eomcconfig_boardjomos_MC4PLUS, eOmcconfig_boardjomosnumberof*sizeof(eomcconfig_boardjomos_t));
 
@@ -277,7 +287,10 @@ const eomcconfig_boardcode_t eomcconfig_boardcode_MC4PLUS[] =
     
     /* v3 icub right-forearm boards */
     //TBA
-
+    
+    /* CER-wrist board */
+    {EO_INIT(.board_num) 21,  EO_INIT (.value) eOmcconfig_value_MC4PLUS_CER_wrist}
+    
 }; EO_VERIFYsizeof(eomcconfig_boardcode_MC4PLUS, eOmcconfig_boardjomosnumberof*sizeof(eomcconfig_boardcode_t));
 
 //const pointer reference to const structures

@@ -105,6 +105,8 @@ extern uint32_t eo_mcserv_GetMotorFaultMask(EOmcService *p, uint8_t motor);
 
 extern int16_t eo_mcserv_GetMotorCurrent(EOmcService *p, uint8_t joint);
 
+extern uint32_t eo_mcserv_GetMotorAnalogSensor(EOmcService *p, uint8_t joint);
+
 extern uint32_t eo_mcserv_GetMotorPositionRaw(EOmcService *p, uint8_t joint);
 
 // call it inside the DO step of run mode

@@ -433,7 +433,7 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
             eo_axisController_SetEncPos(ems->axis_controller[j], eo_axleVirtualEncoder_GetPos(ems->axle_virt_encoder[j]));
             eo_axisController_SetEncVel(ems->axis_controller[j], eo_axleVirtualEncoder_GetVel(ems->axle_virt_encoder[j]));
         #else
-            if (ems->axis_controller[j]->calibration_type == eomc_calibration_type5_hard_stops_mc4plus)  
+            if ((ems->axis_controller[j]->calibration_type == eomc_calibration_type5_hard_stops_mc4plus) || (ems->axis_controller[j]->calibration_type == eomc_calibration_type8_adc_and_incr_mc4plus))  
             { 
                 if((emscontroller_board_HEAD_neckyaw_eyes == ems->board) && ((2==j)||(3==j))  && eo_axisController_IsCalibrated(ems->axis_controller[j]))
                 {
@@ -1186,71 +1186,57 @@ extern eObool_t eo_emsMotorController_isMotorEncoderCalibrated(uint8_t motor)
     
     return eo_motors_isEncCalibrated(ems->motors, motor);
 }
-
-extern void eo_emsController_StartCalibration_type3(uint8_t joint, int32_t pos, int32_t vel, int32_t offset)
+extern void eo_emsController_StartCalibration(uint8_t joint, eOmc_calibration_type_t type, uint32_t* params)
 {
     if (!ems) return;
     
     ems->n_calibrated = 0;
-        
-    ems->axis_controller[joint] ->calibration_type = eomc_calibration_type3_abs_sens_digital;
-    
-    //in case of coupled joints, I reset the calibration state of the others...they must always change their state together
-    s_eo_emsController_ResetCalibrationCoupledJoints(joint);
-    
-    eo_absCalibratedEncoder_Calibrate(ems->abs_calib_encoder[joint], offset);
-    
-    eo_axisController_StartCalibration_type3(ems->axis_controller[joint]);
-}
-
-extern void eo_emsController_StartCalibration_type6(uint8_t joint, int32_t pos, int32_t vel, int32_t maxencoder)
-{
-    if (!ems) return;
-    
-    ems->n_calibrated = 0;
-        
-    //Set the right calibration type
-    ems->axis_controller[joint] ->calibration_type = eomc_calibration_type6_mais_mc4plus;
-    
-    /*
-    //in case of coupled joints, I reset the calibration state of the others...they must always change their state together
-    s_eo_emsController_ResetCalibrationCoupledJoints(joint);
-    
-    //zero offset for this calib? maybe I could change it later, when the calib procedure is ended
-    eo_absCalibratedEncoder_Calibrate(ems->abs_calib_encoder[joint], 0);
-    
-    //I should convert the position and velocity in iCubDegrees? probably yes
-    eOmc_joint_t *joint_ref = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, joint);
-    float divider = joint_ref->config.jntEncoderResolution;
-    if(divider < 0)
-        divider = -divider;
-    
-    uint32_t pos_icubdeg = (float) pos * 65535.0 / divider; //icub degrees are always unsigned (0-65535)
-    uint32_t vel_icubdeg = (float) vel * 65535.0 / divider;
-    eo_axisController_StartCalibration_type6(ems->axis_controller[joint], pos_icubdeg, vel_icubdeg, maxencoder);
-    */
-}
-extern void eo_emsController_StartCalibration_type5(uint8_t joint, int32_t pwmlimit, int32_t final_position)
-{
-    if (!ems) return;
-    
-    ems->n_calibrated = 0;
-        
-    //calibrating procedure
-    //comments:
-    //we don't need to set an offset to the encoder in this case! at the startup, the value is 0
   
-    //Set the right calibration type
-    ems->axis_controller[joint] ->calibration_type = eomc_calibration_type5_hard_stops_mc4plus;
+    switch (type)
+    {
+        case eomc_calibration_type3_abs_sens_digital:
+        {
+            eOmc_calibrator_params_type3_abs_sens_digital_t* p_type3 = (eOmc_calibrator_params_type3_abs_sens_digital_t*) params;
     
-    //in case of coupled joints, I reset the calibration state of the others...they must always change their state together
-    s_eo_emsController_ResetCalibrationCoupledJoints(joint);
-    //offset is 0 in this case
-    eo_absCalibratedEncoder_Calibrate(ems->abs_calib_encoder[joint], 0);
-    eo_axisController_StartCalibration_type5(ems->axis_controller[joint], pwmlimit,final_position);
+            eo_emsController_SetAxisCalibrationZero(joint, p_type3->calibrationZero);
+            
+            ems->axis_controller[joint] ->calibration_type = eomc_calibration_type3_abs_sens_digital; 
+            s_eo_emsController_ResetCalibrationCoupledJoints(joint);
+            eo_absCalibratedEncoder_Calibrate(ems->abs_calib_encoder[joint], p_type3->offset);
+            
+            
+        } break;
+        
+        case eomc_calibration_type5_hard_stops_mc4plus:
+        {
+            eOmc_calibrator_params_type5_hard_stops_mc4plus_t* p_type5 = (eOmc_calibrator_params_type5_hard_stops_mc4plus_t*) params;
+    
+            eo_emsController_SetAxisCalibrationZero(joint, p_type5->calibrationZero);
+            
+            ems->axis_controller[joint] ->calibration_type = eomc_calibration_type5_hard_stops_mc4plus;
+            s_eo_emsController_ResetCalibrationCoupledJoints(joint);
+            eo_absCalibratedEncoder_Calibrate(ems->abs_calib_encoder[joint], 0);            
+        } break;
+        
+        case eomc_calibration_type8_adc_and_incr_mc4plus:
+        {
+            eomc_calibration_type8_adc_and_incr_mc4plus_t* p_type8 = (eomc_calibration_type8_adc_and_incr_mc4plus_t*) params;
+    
+            eo_emsController_SetAxisCalibrationZero(joint, p_type8->calibrationZero);
+            
+            ems->axis_controller[joint] ->calibration_type = eomc_calibration_type8_adc_and_incr_mc4plus;
+            s_eo_emsController_ResetCalibrationCoupledJoints(joint);
+            eo_absCalibratedEncoder_Calibrate(ems->abs_calib_encoder[joint], 0);
+        } break;
+        
+        default:
+            break;
+        
+    }
+    
+    eo_axisController_StartCalibration(ems->axis_controller[joint], params);
     
 }
-
 extern void eo_emsController_CheckCalibrations(void)
 {
     if (!ems) return;
@@ -1547,6 +1533,30 @@ extern void eo_emsController_CheckCalibrations(void)
             }                
        }
    }
+    
+    else if (emscontroller_board_CER_WRIST == ems->board)
+    {
+        JOINTS(j)
+        {
+            if (eo_axisController_IsCalibrated(ems->axis_controller[j]))
+            {
+                ems->n_calibrated++;
+            }
+            else if (eo_absCalibratedEncoder_IsOk(ems->abs_calib_encoder[j]))
+            {
+                if(ems->axis_controller[j]->calibration_type == eomc_calibration_type8_adc_and_incr_mc4plus && ems->axis_controller[j]->hardwarelimitisreached)
+                {    
+                    ems->n_calibrated++;
+                    eo_axisController_SetCalibrated(ems->axis_controller[j]);
+                
+                    set_2FOC_running(j);
+                
+                    eo_axisController_SetControlMode(ems->axis_controller[j], eomc_controlmode_cmd_position);
+                    eo_axisController_SetInteractionMode(ems->axis_controller[j], eOmc_interactionmode_stiff);
+                }
+            }
+        }
+    }
    #endif // ! USE_JACOBIAN        
 }
 

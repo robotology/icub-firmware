@@ -85,6 +85,8 @@ static void s_eo_mcserv_init_motors_adc_feedbacks(void);
 
 static int16_t s_eo_mcserv_get_current_adc(uint8_t motor);
 
+static uint32_t s_eo_mcserv_get_analog_sensor_adc(uint8_t motor);
+
 static uint32_t s_eo_mcserv_get_quad_enc (uint8_t motor);
 
 static void s_eo_mcserv_enable_all_motors(EOmcService *p);
@@ -488,6 +490,24 @@ extern int16_t eo_mcserv_GetMotorCurrent(EOmcService *p, uint8_t joint)
     return curr_val;
 }
 
+extern uint32_t eo_mcserv_GetMotorAnalogSensor(EOmcService *p, uint8_t joint)
+{
+    if(NULL == p)
+    {
+        return(NULL);
+    }
+   
+    uint32_t voltage = 0;
+    
+    // if local motor (MC4plus)
+    if(1 == p->config.jomos[joint].actuator.local.type)
+    {
+        voltage = s_eo_mcserv_get_analog_sensor_adc (p->config.jomos[joint].actuator.local.index);
+    }
+   
+    return voltage;
+}
+
 extern uint32_t eo_mcserv_GetMotorPositionRaw(EOmcService *p, uint8_t joint)
 {
     if(NULL == p)
@@ -801,6 +821,11 @@ static void s_eo_mcserv_init_motors_adc_feedbacks(void)
 static int16_t s_eo_mcserv_get_current_adc(uint8_t motor)
 {
     return hal_adc_get_current_motor_mA(motor);
+}
+
+static uint32_t s_eo_mcserv_get_analog_sensor_adc(uint8_t motor)
+{
+    return hal_adc_get_hall_sensor_analog_input_mV(motor);
 }
 
 static uint32_t s_eo_mcserv_get_quad_enc(uint8_t motor)
@@ -1134,10 +1159,16 @@ static eOemscontroller_board_t s_eo_mcserv_getboardcontrol(void)
         } break;
         
        
-        // board 17 --> ForeArmV3: wrist (differential coupling, pronosupination), finger abduction
+        // board 18 --> ForeArmV3: wrist (differential coupling, pronosupination), finger abduction
         case 17:
         {
             type = emscontroller_board_FOREARM;
+        } break;
+        
+        // board 22 --> CER_wrist
+        case 21:
+        {
+            type = emscontroller_board_CER_WRIST;
         } break;
         
         
