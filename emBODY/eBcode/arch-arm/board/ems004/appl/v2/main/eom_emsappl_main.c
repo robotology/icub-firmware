@@ -163,11 +163,28 @@ extern void eom_emstransceiver_callback_incaseoferror_in_sequencenumberReceived(
         if(delta > INT16_MAX)       delta = INT16_MAX;  //32767
         else if(delta < INT16_MIN)  delta = INT16_MIN;  //-32768;
         
+        errdes.code             = EOERRORCODE(eoerror_category_System, eoerror_value_SYS_transceiver_rxseqnumber_error);
         errdes.par16            = (int16_t)delta; 
         errdes.par64            = err->exp_seqnum; 
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
     }
 }
+
+
+extern void eom_emstransceiver_callback_incaseoferror_invalidframe(EOreceiver *receiver)
+{  
+    static eOerrmanDescriptor_t errdesinvframe = 
+    {
+        .code           = EOERRORCODE(eoerror_category_System, eoerror_value_SYS_transceiver_rxinvalidframe_error),
+        .sourcedevice   = eo_errman_sourcedevice_localboard,
+        .sourceaddress  = 0,
+        .par16          = 0,
+        .par64          = 0
+    };
+
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdesinvframe);
+}
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
