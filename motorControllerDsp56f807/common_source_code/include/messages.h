@@ -321,6 +321,11 @@
 		if (_control_mode[axis]==MODE_DIRECT) \
 		{ \
 			_desired[axis] = BYTE_C(CAN_DATA[1], CAN_DATA[2], CAN_DATA[3], CAN_DATA[4]); \
+			if (_desired[axis] < _min_position[axis]) \
+				_desired[axis] = _min_position[axis]; \
+			else \
+			if (_desired[axis] > _max_position[axis]) \
+				_desired[axis] = _max_position[axis]; \
 			abort_trajectory (axis, _desired[axis]); \
 		} \
 	} \
@@ -334,6 +339,11 @@
 		if (1) \
 		{ \
 			_set_point[axis] = BYTE_C(CAN_DATA[1], CAN_DATA[2], CAN_DATA[3], CAN_DATA[4]); \
+			if (_set_point[axis] < _min_position[axis]) \
+				_set_point[axis] = _min_position[axis]; \
+			else \
+			if (_set_point[axis] > _max_position[axis]) \
+				_set_point[axis] = _max_position[axis]; \
 		} \
 	} \
 }

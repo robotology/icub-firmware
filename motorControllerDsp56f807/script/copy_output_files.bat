@@ -65,7 +65,7 @@ goto end
 :cpy_build
 if '%MY_BOARD%' == 'ALL' goto copy_all_build else
 ECHO copio da %MY_BOARD% in build
-copy /Y ..\%MY_BOARD%\output\*.out.S ..\..\build\
+copy /Y ..\%MY_BOARD%\output\*.out.S ..\..\..\icub-firmware-build\
 goto end
 
 
@@ -78,16 +78,16 @@ goto end
 
 :copy_all_build
 ECHO copio da 2BLL a build
-copy /Y ..\2BLL\output\*.out.S ..\..\build\
+copy /Y ..\2BLL\output\*.out.S ..\..\..\icub-firmware-build\
 ECHO.
 ECHO copio da \2BLLDC a build
-copy /Y ..\2BLLDC\output\*.out.S ..\..\build\
+copy /Y ..\2BLLDC\output\*.out.S ..\..\..\icub-firmware-build\
 ECHO.
 ECHO copio da \4DC a build
-copy /Y ..\4DC\output\*.out.S ..\..\build\
+copy /Y ..\4DC\output\*.out.S ..\..\..\icub-firmware-build\
 ECHO.
 ECHO copio da \2BLL_IE a build
-copy /Y ..\2BLL_IE\output\*.out.S ..\..\build\
+copy /Y ..\2BLL_IE\output\*.out.S ..\..\..\icub-firmware-build\
 goto end
 
 
