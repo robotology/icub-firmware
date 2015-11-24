@@ -76,4 +76,20 @@ extern uint32_t hal_quad_enc_getCounter(uint8_t encoder_number);
    @retval      none
   */
 extern void hal_quad_enc_reset_counter(uint8_t encoder_number);
+
+/** @fn         hal_quad_enc_init_indexes_flags(void)
+    @brief      This function initialize the interrupt line (which is not mandatory) of the index for the quadrature encoder 
+   @param       none
+   @retval      none
+  */
+extern void hal_quad_enc_init_indexes_flags(void);
+
+/** @fn         hal_quad_is_index_found(uint8_t encoder_number)
+    @brief      This function checks if the encoder has reached (no matter when in the past) the index. If it returns true, it also clears the
+                flag set by the interrupt line, so that it will be set again only when the index will be reached again 
+   @param       encoder_number  encoder flag to be read
+   @retval      none
+  */
+extern hal_bool_t hal_quad_is_index_found(uint8_t encoder_number);
+
 #endif
