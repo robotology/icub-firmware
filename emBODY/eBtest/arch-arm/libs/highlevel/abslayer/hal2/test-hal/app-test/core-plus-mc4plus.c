@@ -108,6 +108,8 @@
 #undef EXECUTE_TEST_ENCODER_SPI
 //#define EXECUTE_TEST_ENCODER_SPI
 
+#undef EXECUTE_TEST_QUAD_ENC
+//#define EXECUTE_TEST_QUAD_ENC
 
 #define haLcAn1    hal_can1
 //#define haLcAn2    hal_can2
@@ -237,9 +239,11 @@ static int16_t current[4]={0,0,0,0};
 
 #if     defined(EXECUTE_TEST_ENCODER_SPI)    
 static void test_encoder_spi(void);
-static void test_quad_enc(void);
 #endif//defined(EXECUTE_TEST_ENCODER_SPI) 
-
+#if     defined(EXECUTE_TEST_QUAD_ENC)
+static void test_quad_enc_real_motor(void);
+static void test_quad_enc_jig_encoders(void);
+#endif//defined(EXECUTE_TEST_QUAD_ENC)
 
 #if     defined(EXECUTE_TEST_ADC)    
 static void test_periph_adc(void);
@@ -457,14 +461,20 @@ int main(void)
     //test_periph_adc_new_api();
     test_periph_adc_motors();
     hal_sys_delay(2*hal_RELTIME_1second);
-		
+#endif//defined(EXECUTE_TEST_ADC) 
+
 #if     defined(EXECUTE_TEST_ENCODER_SPI)
-	//test_encoder_spi();
-    test_quad_enc();
+	test_encoder_spi();
     hal_sys_delay(2*hal_RELTIME_1second);
 #endif//defined(EXECUTE_TEST_ENCODER_SPI)
+
+#if     defined(EXECUTE_TEST_QUAD_ENC)
+    //test_quad_enc_real_motor();
+    test_quad_enc_jig_encoders();
+    hal_sys_delay(2*hal_RELTIME_1second);
+#endif//defined(EXECUTE_TEST_QUAD_ENC)
  
-#endif//defined(EXECUTE_TEST_ADC) 
+
 
 #if     defined(EXECUTE_TEST_DEVICE_MOTORCTL)    
     //test_device_motorctl_1();
@@ -1080,19 +1090,24 @@ static void test_encoder_spi(void)
   test_was_successful("encoder as5048-as5055"); 
 	    
 }
+#endif//defined(EXECUTE_TEST_ENCODER_SPI)  
 
-static void test_quad_enc(void)
+#if     defined(EXECUTE_TEST_QUAD_ENC)
+
+static void test_quad_enc_real_motor(void)
 {
-    test_is_beginning("quad_enc:");
+    test_is_beginning("quad_enc: motors");
     
-    //hal_quad_enc_Init();
     hal_quad_enc_single_init(0);
-    hal_quad_enc_single_init(1);
+    //hal_quad_enc_single_init(1);
     hal_quad_enc_single_init(2);
     hal_quad_enc_single_init(3);
     
-    //fake init, it should return doing nothing
-    hal_quad_enc_single_init(10);
+    //activate interrupt on indexes
+    hal_quad_enc_init_indexes_flags();
+  
+    //initialize motors
+    hal_motors_extfault_handling_init();
     
     char str_quad_enc[64];
     for(uint8_t i = 0; i< 50; i++)
@@ -1101,13 +1116,13 @@ static void test_quad_enc(void)
         static uint16_t step = 0;
         step++;
         //Test to reset 
-        if (step == 100)
-        {
-            hal_quad_enc_reset_counter(0);
-            hal_quad_enc_reset_counter(1);
-            hal_quad_enc_reset_counter(2);
-            hal_quad_enc_reset_counter(3);
-        }
+//        if (step == 100)
+//        {
+//            hal_quad_enc_reset_counter(0);
+//            hal_quad_enc_reset_counter(1);
+//            hal_quad_enc_reset_counter(2);
+//            hal_quad_enc_reset_counter(3);
+//        }
         for(uint8_t i = 0; i<4; i++)
         {
             hal_sys_delay(10*hal_RELTIME_1millisec);
@@ -1115,14 +1130,43 @@ static void test_quad_enc(void)
             snprintf(str_quad_enc, sizeof(str_quad_enc), "Encoder %d counter value: %d", i+1, cnt);
             test_message(str_quad_enc);
             //print_tag_utility("QUADRATURE ENC", str_quad_enc);
+            hal_motor_pwmset(0, 300);
         }
         test_message("\n");
         hal_sys_delay(500*hal_RELTIME_1millisec);
     }
 }
-#endif//defined(EXECUTE_TEST_ENCODER_SPI)  
 
-
+static void test_quad_enc_jig_encoders(void)
+{
+    test_is_beginning("quad_enc: jig-setup");
+    
+    hal_quad_enc_single_init(0);
+    //hal_quad_enc_single_init(1);
+    hal_quad_enc_single_init(2);
+    hal_quad_enc_single_init(3);
+    
+    //activate interrupt on indexes
+    hal_quad_enc_init_indexes_flags();
+      
+    char str_quad_enc[64];
+    for(uint8_t i = 0; i< 200; i++)
+    {
+        uint32_t cnt =  0;
+        hal_bool_t isindxfnd =  hal_false;
+        for(uint8_t i = 0; i<4; i++)
+        {
+            hal_sys_delay(10*hal_RELTIME_1millisec);
+            cnt = hal_quad_enc_getCounter(i);
+            isindxfnd = hal_quad_is_index_found(i);
+            snprintf(str_quad_enc, sizeof(str_quad_enc), "Encoder %d counter value: %d, indexfound: %d", i+1, cnt, isindxfnd);
+            test_message(str_quad_enc);
+        }
+        test_message("\n");
+        hal_sys_delay(500*hal_RELTIME_1millisec);
+    }
+}
+#endif//defined(EXECUTE_TEST_QUAD_ENC)
 
 #if     defined(EXECUTE_TEST_EEPROM)
 
