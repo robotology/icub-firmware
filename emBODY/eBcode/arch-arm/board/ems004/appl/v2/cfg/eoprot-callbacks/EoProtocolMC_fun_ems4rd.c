@@ -163,8 +163,7 @@ const eOmc_joint_t joint_default_value =
         {
             .stiffness =             0,
             .damping =               0,
-            .offset =                0,
-            .filler02 =              {0}           
+            .offset =                0          
         },               
         .maxvelocityofjoint =        0,
         .motor_params =
@@ -187,8 +186,7 @@ const eOmc_joint_t joint_default_value =
             .jnt_position =          0,
             .jnt_velocity =          0,
             .jnt_acceleration =      0,
-            .jnt_torque =            0,
-            .filler =                {0},
+            .jnt_torque =            0
         },
         .ofpid =                     {0},
         .modes = 
@@ -1250,7 +1248,8 @@ extern void eoprot_fun_UPDT_mc_joint_inputs_externallymeasuredtorque(const EOnv*
     }
     else // mc4can
     {
-        icubCanProto_torque_t icub_torque = *torque + 0x8000;
+        eOmeas_torque_t trq = EO_CLIP_INT16(*torque);
+        icubCanProto_torque_t icub_torque = trq + 0x8000;
         eo_virtualstrain_SetTorque(eo_virtualstrain_GetHandle(), jxx, icub_torque);        
     }
 }
