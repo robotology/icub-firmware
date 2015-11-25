@@ -280,10 +280,10 @@ extern int32_t eo_absCalibratedEncoder_Acquire(EOabsCalibratedEncoder* o, int32_
             {                
                 //message "spike encoder error"
                 eOerrmanDescriptor_t descriptor = {0};
-                descriptor.par16 = 0;           
+                descriptor.par16 = o->ID;           
                 descriptor.par64 = o->spikes_count;
                 descriptor.sourcedevice = eo_errman_sourcedevice_localboard;
-                descriptor.sourceaddress = o->ID;
+                descriptor.sourceaddress = 0;
                 descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_aea_abs_enc_spikes);
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, NULL, &descriptor);
                 
