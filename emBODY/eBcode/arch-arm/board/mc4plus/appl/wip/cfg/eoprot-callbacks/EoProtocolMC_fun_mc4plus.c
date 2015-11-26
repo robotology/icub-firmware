@@ -141,8 +141,7 @@ const eOmc_joint_t joint_default_value =
         {
             .stiffness =             0,
             .damping =               0,
-            .offset =                0,
-            .filler02 =              {0}           
+            .offset =                0          
         },               
         .maxvelocityofjoint =        0,
         .motor_params =
@@ -165,8 +164,7 @@ const eOmc_joint_t joint_default_value =
             .jnt_position =          0,
             .jnt_velocity =          0,
             .jnt_acceleration =      0,
-            .jnt_torque =            0,
-            .filler =                {0},
+            .jnt_torque =            0
         },
         .ofpid =                     {0},
         .modes = 
