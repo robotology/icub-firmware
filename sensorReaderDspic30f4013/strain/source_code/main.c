@@ -367,15 +367,8 @@ static void s_calculate_and_send_data(void)
     VectorAdd (6,(fractional*) u_resultval, (fractional*)strain_cfg.ee_data.EE_AN_ChannelValue, strain_cfg.ee_data.EE_CalibrationTare); // ChannelValue = ChannelValue + CalibrationTare 
 
     //MatrixMultiply (int numRows1,int numCols1Rows2,int numCols2,fractional* dstM,fractional* srcM1,fractional* srcM2, torque_value = Tmatrix * channel value)
-    if (UseCalibration==0 || UseCalibration>=4)
-        MatrixMultiply(6,6,1,&s_resultval[0],&strain_cfg.ee_data.EE_TF_TMatrix_A[0][0],(int*) &u_resultval[0]);
-    else if (UseCalibration==1)
-        MatrixMultiply(6,6,1,&s_resultval[0],&strain_cfg.ee_data.EE_TF_TMatrix_A[0][0],(int*) &u_resultval[0]);
-    else if (UseCalibration==2)
-        MatrixMultiply(6,6,1,&s_resultval[0],&strain_cfg.ee_data.EE_TF_TMatrix_B[0][0],(int*) &u_resultval[0]);
-    else if (UseCalibration==3)
-        MatrixMultiply(6,6,1,&s_resultval[0],&strain_cfg.ee_data.EE_TF_TMatrix_C[0][0],(int*) &u_resultval[0]);
-
+    MatrixMultiply(6,6,1,&s_resultval[0],&strain_cfg.ee_data.EE_TF_TMatrix[0][0],(int*) &u_resultval[0]);
+    
 	VectorAdd (6, (fractional*)s_resultval, (fractional*)s_resultval, CurrentTare); //torque value += CurrentTare
 	
     for (i=0; i<6; i++)
@@ -549,33 +542,12 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 			{
 				if(msg->CAN_Per_Msg_PayLoad[2] < 6)
 				{
-                    if (msg->CAN_Per_Msg_PayLoad[3]==0)
-                    {
-                        Txdata[0] = ICUBCANPROTO_POL_AS_CMD__GET_MATRIX_RC; 
-                        Txdata[1] = msg->CAN_Per_Msg_PayLoad[1]; 
-                        Txdata[2] = msg->CAN_Per_Msg_PayLoad[2]; 
-                        Txdata[3] = strain_cfg.ee_data.EE_TF_TMatrix_A[msg->CAN_Per_Msg_PayLoad[1]][msg->CAN_Per_Msg_PayLoad[2]] >> 8; 
-                        Txdata[4] = strain_cfg.ee_data.EE_TF_TMatrix_A[msg->CAN_Per_Msg_PayLoad[1]][msg->CAN_Per_Msg_PayLoad[2]] & 0xFF;  
-                        *datalen=5;	            
-                    }
-                    else if (msg->CAN_Per_Msg_PayLoad[3]==1)
-                    {
-                        Txdata[0] = ICUBCANPROTO_POL_AS_CMD__GET_MATRIX_RC; 
-                        Txdata[1] = msg->CAN_Per_Msg_PayLoad[1]; 
-                        Txdata[2] = msg->CAN_Per_Msg_PayLoad[2]; 
-                        Txdata[3] = strain_cfg.ee_data.EE_TF_TMatrix_B[msg->CAN_Per_Msg_PayLoad[1]][msg->CAN_Per_Msg_PayLoad[2]] >> 8; 
-                        Txdata[4] = strain_cfg.ee_data.EE_TF_TMatrix_B[msg->CAN_Per_Msg_PayLoad[1]][msg->CAN_Per_Msg_PayLoad[2]] & 0xFF;  
-                        *datalen=5;	            
-                    }
-                    else if (msg->CAN_Per_Msg_PayLoad[3]==2)
-                    {
-                        Txdata[0] = ICUBCANPROTO_POL_AS_CMD__GET_MATRIX_RC; 
-                        Txdata[1] = msg->CAN_Per_Msg_PayLoad[1]; 
-                        Txdata[2] = msg->CAN_Per_Msg_PayLoad[2]; 
-                        Txdata[3] = strain_cfg.ee_data.EE_TF_TMatrix_C[msg->CAN_Per_Msg_PayLoad[1]][msg->CAN_Per_Msg_PayLoad[2]] >> 8; 
-                        Txdata[4] = strain_cfg.ee_data.EE_TF_TMatrix_C[msg->CAN_Per_Msg_PayLoad[1]][msg->CAN_Per_Msg_PayLoad[2]] & 0xFF;  
-                        *datalen=5;	            
-                    }
+                    Txdata[0] = ICUBCANPROTO_POL_AS_CMD__GET_MATRIX_RC; 
+                    Txdata[1] = msg->CAN_Per_Msg_PayLoad[1]; 
+                    Txdata[2] = msg->CAN_Per_Msg_PayLoad[2]; 
+                    Txdata[3] = strain_cfg.ee_data.EE_TF_TMatrix[msg->CAN_Per_Msg_PayLoad[1]][msg->CAN_Per_Msg_PayLoad[2]] >> 8; 
+                    Txdata[4] = strain_cfg.ee_data.EE_TF_TMatrix[msg->CAN_Per_Msg_PayLoad[1]][msg->CAN_Per_Msg_PayLoad[2]] & 0xFF;  
+                    *datalen=5;	            
 				}
 			}
 		break;			
@@ -602,7 +574,7 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 			{
                 hal_timer_interrupt_disa(hal_timerT1);// stop timer to avoid rece condition on strain_cfg.ee_data.EE_AN_ChannelValue
                 hal_timer_stop(hal_timerT1);
-				if(msg->CAN_Per_Msg_PayLoad[2] == 0 || msg->CAN_Per_Msg_PayLoad[2]>=4)
+				if(msg->CAN_Per_Msg_PayLoad[2] == 0)
 				{
 					Txdata[0] = ICUBCANPROTO_POL_AS_CMD__GET_CH_ADC; 
 					Txdata[1] = msg->CAN_Per_Msg_PayLoad[1];  
@@ -619,14 +591,9 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 					Txdata[2] = msg->CAN_Per_Msg_PayLoad[2];
 					
 					VectorAdd (6, (fractional*)strain_cfg.ee_data.EE_AN_ChannelValue, (fractional*)strain_cfg.ee_data.EE_AN_ChannelValue, strain_cfg.ee_data.EE_CalibrationTare);
-				
-			        if(msg->CAN_Per_Msg_PayLoad[2]==1)
-					    MatrixMultiply(6,6,1,&strain_cfg.ee_data.EE_TF_TorqueValue[0],&strain_cfg.ee_data.EE_TF_TMatrix_A[0][0],(int*) &strain_cfg.ee_data.EE_AN_ChannelValue[0]); // fractional* srcM2 
-			        else if(msg->CAN_Per_Msg_PayLoad[2]==2)
-					    MatrixMultiply(6,6,1,&strain_cfg.ee_data.EE_TF_TorqueValue[0],&strain_cfg.ee_data.EE_TF_TMatrix_B[0][0],(int*) &strain_cfg.ee_data.EE_AN_ChannelValue[0]); // fractional* srcM2 
-			        else if(msg->CAN_Per_Msg_PayLoad[2]==3)
-					    MatrixMultiply(6,6,1,&strain_cfg.ee_data.EE_TF_TorqueValue[0],&strain_cfg.ee_data.EE_TF_TMatrix_C[0][0],(int*) &strain_cfg.ee_data.EE_AN_ChannelValue[0]); // fractional* srcM2 
 
+					MatrixMultiply(6,6,1,&strain_cfg.ee_data.EE_TF_TorqueValue[0],&strain_cfg.ee_data.EE_TF_TMatrix[0][0],(int*) &strain_cfg.ee_data.EE_AN_ChannelValue[0]); // fractional* srcM2 
+			        
 					VectorAdd (6, (fractional*)strain_cfg.ee_data.EE_TF_TorqueValue, (fractional*)strain_cfg.ee_data.EE_TF_TorqueValue, CurrentTare);
 					Txdata[3] = (strain_cfg.ee_data.EE_TF_TorqueValue[msg->CAN_Per_Msg_PayLoad[1]]+HEX_VALC) >> 8; 
 					Txdata[4] = (strain_cfg.ee_data.EE_TF_TorqueValue[msg->CAN_Per_Msg_PayLoad[1]]+HEX_VALC) & 0xFF; 
@@ -795,16 +762,9 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
                 memcpy((uint8_t*)value, strain_cfg.ee_data.EE_AN_ChannelValue, 2*6);
 
 				VectorAdd (6, (fractional*)value, (fractional*)value, strain_cfg.ee_data.EE_CalibrationTare);
-			    
-                if (UseCalibration==0 || UseCalibration==1)
-				    MatrixMultiply(6,6,1,&result[0],&strain_cfg.ee_data.EE_TF_TMatrix_A[0][0],(int*) &value[0]); // fractional* srcM2 
-			    else if (UseCalibration==2)
-				    MatrixMultiply(6,6,1,&result[0],&strain_cfg.ee_data.EE_TF_TMatrix_B[0][0],(int*) &value[0]); // fractional* srcM2 
-			    else if (UseCalibration==3)
-				    MatrixMultiply(6,6,1,&result[0],&strain_cfg.ee_data.EE_TF_TMatrix_C[0][0],(int*) &value[0]); // fractional* srcM2 
-                else
-  				    MatrixMultiply(6,6,1,&result[0],&strain_cfg.ee_data.EE_TF_TMatrix_A[0][0],(int*) &value[0]); // fractional* srcM2 
-              
+
+				MatrixMultiply(6,6,1,&result[0],&strain_cfg.ee_data.EE_TF_TMatrix[0][0],(int*) &value[0]); // fractional* srcM2 
+
 				for (i=0; i<6; i++)
 				{
 					CurrentTare[i]=-(result[i]);
@@ -832,20 +792,7 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 			{
 				if(msg->CAN_Per_Msg_PayLoad[2] < 6)
 				{
-                    if      (msg->CAN_Per_Msg_PayLoad[5] == 0)
-                    {
-					   strain_cfg.ee_data.EE_TF_TMatrix_A[msg->CAN_Per_Msg_PayLoad[1]][msg->CAN_Per_Msg_PayLoad[2]] = msg->CAN_Per_Msg_PayLoad[3]<<8 | msg->CAN_Per_Msg_PayLoad[4];
-                    }
-                    else if (msg->CAN_Per_Msg_PayLoad[5] == 1)
-                    {
-					   strain_cfg.ee_data.EE_TF_TMatrix_B[msg->CAN_Per_Msg_PayLoad[1]][msg->CAN_Per_Msg_PayLoad[2]] = msg->CAN_Per_Msg_PayLoad[3]<<8 | msg->CAN_Per_Msg_PayLoad[4];
-                    }                   
-                    else if (msg->CAN_Per_Msg_PayLoad[5] == 2)
-                    {
-					   strain_cfg.ee_data.EE_TF_TMatrix_C[msg->CAN_Per_Msg_PayLoad[1]][msg->CAN_Per_Msg_PayLoad[2]] = msg->CAN_Per_Msg_PayLoad[3]<<8 | msg->CAN_Per_Msg_PayLoad[4];
-                    }                    
-                    else
-                       hal_error_manage(ERR_CAN_MATRIX_INDEXING);
+                    strain_cfg.ee_data.EE_TF_TMatrix[msg->CAN_Per_Msg_PayLoad[1]][msg->CAN_Per_Msg_PayLoad[2]] = msg->CAN_Per_Msg_PayLoad[3]<<8 | msg->CAN_Per_Msg_PayLoad[4];
 				}
 			}
 			else 
@@ -877,7 +824,7 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 		
 		case ICUBCANPROTO_POL_AS_CMD__SET_TXMODE: // set continuous or on demand tx  0x205 len 2  data 7 0/1
 		{
-			if(msg->CAN_Per_Msg_PayLoad[1]==0)//Transmit calibrated data continuosly with matrix A
+			if(msg->CAN_Per_Msg_PayLoad[1]==0)//Transmit calibrated data continuously
 			{ 
 				UseCalibration=1;
 				DebugCalibration=0;
@@ -886,33 +833,18 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 			}
 			else if (msg->CAN_Per_Msg_PayLoad[1]==1) //Do acquisition but do not transmit
 			{
-				UseCalibration=1;
 				DebugCalibration=0;
 				can_enable=0; 
 				hal_timer_interrupt_ena(hal_timerT1);
 			}
-			else if (msg->CAN_Per_Msg_PayLoad[1]==3) //Transmit NOT calibrated data continuosly
+			else if (msg->CAN_Per_Msg_PayLoad[1]==3) //Transmit NOT calibrated data continuously
 			{
+				can_enable=1;
 				UseCalibration=0;
 				DebugCalibration=0;
-				can_enable=1;
 				hal_timer_interrupt_ena(hal_timerT1);
 			}
-			else if (msg->CAN_Per_Msg_PayLoad[1]==4) //Transmit calibrated data continuosly with matrix B
-			{
-				UseCalibration=1;
-				DebugCalibration=0;
-				can_enable=1;
-				hal_timer_interrupt_ena(hal_timerT1);
-			}
-			else if (msg->CAN_Per_Msg_PayLoad[1]==5) //Transmit calibrated data continuosly with matrix C
-			{
-				UseCalibration=2;
-				DebugCalibration=0;
-				can_enable=1;
-				hal_timer_interrupt_ena(hal_timerT1);
-			}
-			else if(msg->CAN_Per_Msg_PayLoad[1]==100) //Transmit calibrated (A) and NOT calibrated data continuosly
+			else if(msg->CAN_Per_Msg_PayLoad[1]==4) //Transmit calibrated and NOT calibrated data continuously
 			{ 
 				UseCalibration=1;
 				DebugCalibration=1;
@@ -921,8 +853,6 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 			}
 			else //Stop acquisition
 			{
-				UseCalibration=0;
-				DebugCalibration=0;
 				can_enable=0;
 				hal_timer_interrupt_disa(hal_timerT1);
 			}
