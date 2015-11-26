@@ -702,7 +702,7 @@ static eOemscontroller_board_t s_emscontroller_getboard(void)
  
         case 20:
         {
-            type = emscontroller_board_UPPERLEG;
+            type = emscontroller_board_CER_BASE;
         } break;
         
         default:

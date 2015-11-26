@@ -398,6 +398,18 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
         axle_virt_pos[2] = ems->motor_position[2];
         axle_virt_pos[3] = ems->motor_position[3];
     }
+    else if (ems->board == emscontroller_board_CER_BASE)
+    {
+        axle_virt_vel[0] = ems->motor_velocity_gbx[0];
+        axle_virt_vel[1] = ems->motor_velocity_gbx[1];
+        axle_virt_vel[2] = ems->motor_velocity_gbx[2];
+        axle_virt_vel[3] = ems->motor_velocity_gbx[3];
+
+        axle_virt_pos[0] = ems->motor_position[0];
+        axle_virt_pos[1] = ems->motor_position[1];
+        axle_virt_pos[2] = ems->motor_position[2];
+        axle_virt_pos[3] = ems->motor_position[3];
+    }
     else if (ems->board == emscontroller_board_ANKLE)
     {
         axle_virt_vel[0] = ems->motor_velocity_gbx[0];
@@ -849,6 +861,13 @@ extern void eo_emsController_GetDecoupledMeasuredTorque(uint8_t joint_id, int32_
           if (joint_id==2) {*torque_motor=ems->axis_controller[2]->torque_meas_jnt; return;}
           if (joint_id==3) {*torque_motor=ems->axis_controller[3]->torque_meas_jnt; return;}
     }
+    else if (ems->board == emscontroller_board_CER_BASE)
+    {
+          if (joint_id==0) {*torque_motor=0; return;}
+          if (joint_id==1) {*torque_motor=0; return;}
+          if (joint_id==2) {*torque_motor=0; return;}
+          if (joint_id==3) {*torque_motor=0; return;}
+    }
     else if (ems->board == emscontroller_board_ANKLE)
     {
           if (joint_id==0) {*torque_motor=ems->axis_controller[0]->torque_meas_jnt; return;}
@@ -885,6 +904,13 @@ extern void eo_emsController_GetDecoupledReferenceTorque(uint8_t joint_id, int32
         if (joint_id==1) {*torque_motor=ems->axis_controller[1]->torque_ref_jnt; return;}
         if (joint_id==2) {*torque_motor=ems->axis_controller[2]->torque_ref_jnt; return;}
         if (joint_id==3) {*torque_motor=ems->axis_controller[3]->torque_ref_jnt; return;}
+    }
+    else if (ems->board == emscontroller_board_CER_BASE)
+    {
+        if (joint_id==0) {*torque_motor=0; return;}
+        if (joint_id==1) {*torque_motor=0; return;}
+        if (joint_id==2) {*torque_motor=0; return;}
+        if (joint_id==3) {*torque_motor=0; return;}
     }
     else if (ems->board == emscontroller_board_ANKLE)
     {
@@ -1119,7 +1145,7 @@ extern void eo_emsController_SetControlMode(uint8_t joint, eOmc_controlmode_comm
             set_2FOC_running(2);
             set_2FOC_running(3);                        
         }
-        else
+    else
         {
             if (eo_axisController_IsHardwareFault(ems->axis_controller[joint])) return;
             if (eo_is_motor_ext_fault(ems->motors, joint)) return;
@@ -1297,7 +1323,7 @@ extern void eo_emsController_CheckCalibrations(void)
     
     #else // ! USE_JACOBIAN
 
-    if (ems->board == emscontroller_board_UPPERLEG || ems->board == emscontroller_board_ANKLE)
+    if (ems->board == emscontroller_board_UPPERLEG || ems->board == emscontroller_board_ANKLE || ems->board == emscontroller_board_CER_BASE)
     {
         JOINTS(j)
         {

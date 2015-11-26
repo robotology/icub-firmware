@@ -342,7 +342,7 @@ extern void eo_motors_decouple_PWM(EOmotors *o, float *pwm_joint, float *pwm_mot
         if (stiff[1]) {pwm_motor[1] = (pwm_joint[0]+pwm_joint[1])/2;} else {pwm_motor[1] = pwm_joint[1];}
         if (stiff[2]) {pwm_motor[2] =  pwm_joint[2];                } else {pwm_motor[2] = pwm_joint[2];}
     }        
-    else if ((emscontroller_board_UPPERLEG == o->board) || (emscontroller_board_CER_WAIST == o->board) || (emscontroller_board_FACE_lips == o->board))
+    else if ((emscontroller_board_UPPERLEG == o->board) || (emscontroller_board_CER_WAIST == o->board) || (emscontroller_board_FACE_lips == o->board) || (emscontroller_board_CER_BASE == o->board))
     {    
         pwm_motor[0] = pwm_joint[0];
         pwm_motor[1] = pwm_joint[1];
