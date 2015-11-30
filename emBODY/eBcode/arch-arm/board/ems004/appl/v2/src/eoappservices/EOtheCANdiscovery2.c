@@ -490,7 +490,7 @@ static void s_eo_candiscovery2_sendDiagnosticsToHost(eObool_t allboardsfound, eO
                 errdes.code             = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_candiscovery_ok);
                 errdes.sourcedevice     = (eOcanport1 == i) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
                 errdes.sourceaddress    = 0;
-                errdes.par16            = (s_eo_thecandiscovery2.target.boardtype << 8) | (numofboards & 0x000f);
+                errdes.par16            = (s_eo_thecandiscovery2.target.boardtype << 8) | (numofboards & 0x00ff);
                 errdes.par64            = (s_eo_thecandiscovery2.target.firmwareversion.minor) | (s_eo_thecandiscovery2.target.firmwareversion.major << 8) |
                                           (s_eo_thecandiscovery2.target.protocolversion.minor << 16) | (s_eo_thecandiscovery2.target.protocolversion.major << 24) |
                                           (((uint64_t)s_eo_thecandiscovery2.detection.duration) << 48);
@@ -520,7 +520,7 @@ static void s_eo_candiscovery2_sendDiagnosticsToHost(eObool_t allboardsfound, eO
                     errdes.code             = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_candiscovery_boardsmissing);
                     errdes.sourcedevice     = (eOcanport1 == i) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
                     errdes.sourceaddress    = 0;
-                    errdes.par16            = (s_eo_thecandiscovery2.target.boardtype << 8) | (numofmissing & 0x000f);
+                    errdes.par16            = (s_eo_thecandiscovery2.target.boardtype << 8) | (numofmissing & 0x00ff);
                     errdes.par64            = maskofmissing | (((uint64_t)s_eo_thecandiscovery2.detection.duration) << 48);
                     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);
                 }
@@ -575,7 +575,7 @@ static void s_eo_candiscovery2_sendDiagnosticsToHost(eObool_t allboardsfound, eO
                     errdes.code             = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_candiscovery_boardsinvalid);
                     errdes.sourcedevice     = (eOcanport1 == i) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
                     errdes.sourceaddress    = 0;
-                    errdes.par16            = (s_eo_thecandiscovery2.target.boardtype << 8) | (numofinvalid & 0x000f);
+                    errdes.par16            = (s_eo_thecandiscovery2.target.boardtype << 8) | (numofinvalid & 0x00ff);
                     errdes.par64            = nibbles64;
                     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);
                 }
