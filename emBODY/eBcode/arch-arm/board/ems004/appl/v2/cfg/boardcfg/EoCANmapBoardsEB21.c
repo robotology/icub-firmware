@@ -130,7 +130,7 @@ static const eOcanmap_entitydescriptor_t s_des_jomo[] =
         .location   =
         {   
             .port           = eOcanport1,
-            .addr           = 3,
+            .addr           = 4,
             .insideindex    = eocanmap_insideindex_first
         },
         .index      = entindex00
@@ -139,7 +139,7 @@ static const eOcanmap_entitydescriptor_t s_des_jomo[] =
         .location   =
         {
             .port           = eOcanport1,
-            .addr           = 4,
+            .addr           = 2,
             .insideindex    = eocanmap_insideindex_first
         },
         .index      = entindex01,        
@@ -148,7 +148,7 @@ static const eOcanmap_entitydescriptor_t s_des_jomo[] =
         .location   =
         {
             .port           = eOcanport1,
-            .addr           = 1,
+            .addr           = 3,
             .insideindex    = eocanmap_insideindex_first
         },
         .index      = entindex02
@@ -157,7 +157,7 @@ static const eOcanmap_entitydescriptor_t s_des_jomo[] =
         .location   =
         {
             .port           = eOcanport1,
-            .addr           = 2,
+            .addr           = 1,
             .insideindex    = eocanmap_insideindex_first
         },
         .index      = entindex03
