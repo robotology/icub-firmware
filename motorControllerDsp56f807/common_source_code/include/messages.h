@@ -113,6 +113,14 @@
 }
 
 //-------------------------------------------------------------------
+#define CAN_GET_TCFILTER_TYPE_HANDLER(x) \
+{ \
+	PREPARE_HEADER; \
+	CAN_LEN = 2; \
+	CAN_DATA[1] = BYTE_H(_useFilter[axis]); \
+}
+
+//-------------------------------------------------------------------
 #define CAN_SET_VEL_TIMEOUT_HANDLER(x) \
 { \
 	byte value = 0; \
