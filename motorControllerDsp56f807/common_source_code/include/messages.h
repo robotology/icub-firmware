@@ -517,6 +517,18 @@
 }
 
 //-------------------------------------------------------------------
+#define CAN_GET_POSITION_MOVE_REF_HANDLER(x) \
+{ \
+	PREPARE_HEADER; \
+	CAN_LEN = 5; \
+	CAN_DATA[1] = BYTE_4(_desired[axis]); \
+	CAN_DATA[2] = BYTE_3(_desired[axis]); \
+	CAN_DATA[3] = BYTE_2(_desired[axis]); \
+	CAN_DATA[4] = BYTE_1(_desired[axis]); \
+	CAN1_send ( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
+}
+
+//-------------------------------------------------------------------
 #define CAN_VELOCITY_MOVE_HANDLER(x) \
 { \
 	if (mode_is_idle(axis)) \
@@ -537,6 +549,16 @@
 			_set_acc[axis] = BYTE_W(CAN_DATA[3], CAN_DATA[4]); \
 		} \
 	} \
+}
+
+//-------------------------------------------------------------------
+#define CAN_GET_VELOCITY_MOVE_REF_HANDLER(x) \
+{ \
+	PREPARE_HEADER; \
+		CAN_LEN = 3; \
+		CAN_DATA[1] = BYTE_H(_set_vel[axis]); \
+		CAN_DATA[2] = BYTE_L(_set_vel[axis]); \
+		CAN1_send ( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
 }
 
 //-------------------------------------------------------------------
