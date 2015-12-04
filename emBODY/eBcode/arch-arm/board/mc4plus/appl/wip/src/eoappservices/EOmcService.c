@@ -87,7 +87,13 @@ static int16_t s_eo_mcserv_get_current_adc(uint8_t motor);
 
 static uint32_t s_eo_mcserv_get_analog_sensor_adc(uint8_t motor);
 
+static void s_eo_mcserv_init_quad_enc_indexes_interrupt(void);
+
 static uint32_t s_eo_mcserv_get_quad_enc (uint8_t motor);
+
+static eObool_t s_eo_mcserv_is_quad_enc_index_reached (uint8_t motor);
+
+static void s_eo_mcserv_reset_quad_enc(uint8_t motor);
 
 static void s_eo_mcserv_enable_all_motors(EOmcService *p);
 
@@ -531,6 +537,40 @@ extern uint32_t eo_mcserv_GetMotorPositionRaw(EOmcService *p, uint8_t joint)
     return pos_val;
 }
 
+extern void eo_mcserv_ResetQuadEncCounter(EOmcService *p, uint8_t joint)
+{
+    if(NULL == p)
+    {
+        return;
+    }
+      
+    // if local motor (MC4plus)
+    if(1 == p->config.jomos[joint].actuator.local.type)
+    {
+        s_eo_mcserv_reset_quad_enc (p->config.jomos[joint].actuator.local.index);
+    }
+     
+}
+
+extern eObool_t eo_mcserv_IsMotorEncoderIndexReached(EOmcService *p, uint8_t joint)
+{
+    if(NULL == p)
+    {
+        return(NULL);
+    }
+   
+    eObool_t indx_reached = eobool_false;
+    
+    // if local motor (MC4plus)
+    if(1 == p->config.jomos[joint].actuator.local.type)
+    {
+        indx_reached = s_eo_mcserv_is_quad_enc_index_reached (p->config.jomos[joint].actuator.local.index);
+    }
+    
+    return indx_reached;
+}
+
+
 extern eOresult_t eo_mcserv_Actuate(EOmcService *p)
 {
     eOresult_t res = eores_NOK_generic;
@@ -802,6 +842,9 @@ static eOresult_t s_eo_mcserv_init_jomo(EOmcService *p)
         p->valuespwm             = NULL;
     }
     
+    //activate interupt line for quad_enc indexes check
+    s_eo_mcserv_init_quad_enc_indexes_interrupt();
+    
     return(res);
 }
 
@@ -828,9 +871,25 @@ static uint32_t s_eo_mcserv_get_analog_sensor_adc(uint8_t motor)
     return hal_adc_get_hall_sensor_analog_input_mV(motor);
 }
 
+static void s_eo_mcserv_init_quad_enc_indexes_interrupt(void)
+{
+    hal_quad_enc_init_indexes_flags();
+}
 static uint32_t s_eo_mcserv_get_quad_enc(uint8_t motor)
 {
     return hal_quad_enc_getCounter(motor);
+}
+
+static void s_eo_mcserv_reset_quad_enc(uint8_t motor)
+{
+    hal_quad_enc_reset_counter(motor);
+    
+    return;
+}
+
+static eObool_t s_eo_mcserv_is_quad_enc_index_reached(uint8_t motor)
+{
+    return (eObool_t) hal_quad_is_index_found(motor);
 }
 
 static eOresult_t s_eo_mcserv_can_discovery_start(EOmcService *p)
