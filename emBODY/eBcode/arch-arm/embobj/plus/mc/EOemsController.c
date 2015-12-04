@@ -107,6 +107,9 @@ void set_2FOC_running(uint8_t joint);
 void sendErrorMessage(uint8_t j, uint32_t ems_fault_mask_new_j, uint32_t motor_fault_mask_j);
 static void s_eo_emsController_ResetCalibrationCoupledJoints(uint8_t joint);
 static void s_eo_emsController_InitTrajectoryVersionVergence(uint8_t j);
+static float s_eo_emsController_PWM_SafeCalibration(float base_pwm, int32_t mean_distance, int32_t jdistance );
+static eObool_t s_eo_emsController_AreMechanicalConstraintsRespected(void);
+static void s_eo_emsController_AdjustPWM(float *pwm);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -678,56 +681,10 @@ extern void eo_emsController_PWM(int16_t* pwm_motor_16)
             pwm_joint[j] = eo_axisController_PWM(ems->axis_controller[j], &stiffness[j]);
         }
     }
- 
-    if (ems->board == emscontroller_board_CER_WAIST)
+   
+    if (s_eo_emsController_AreMechanicalConstraintsRespected() == eobool_false)
     {
-        int32_t rho0= ems->axis_controller[0]->position;
-        int32_t rho1= ems->axis_controller[1]->position;
-        int32_t rho2= ems->axis_controller[2]->position;
-        
-        static char stuck0 = 0;
-        static char stuck1 = 0;
-        static char stuck2 = 0;
-        
-        if (rho0*rho0+rho1*rho1+rho2*rho2-rho0*rho1-rho1*rho2-rho2*rho0>400000) // 25 deg limit
-        {
-            if ( !(rho0 <= rho1 && rho0 <= rho2 && pwm_joint[0]>=0.f) && !(rho0 >= rho1 && rho0 >= rho2 && pwm_joint[0]<=0.f))
-            {
-                pwm_joint[0] = 0.f;
-                
-                if (!stuck0)
-                {
-                    stuck0 = 1;
-                    eo_axisController_Stop(ems->axis_controller[0]);
-                }
-            }
-            
-            if ( !(rho1 <= rho2 && rho1 <= rho0 && pwm_joint[1]>=0.f) && !(rho1 >= rho2 && rho1 >= rho0 && pwm_joint[1]<=0.f))
-            {
-                pwm_joint[1] = 0.f;
-                
-                if (!stuck1)
-                {
-                    stuck1 = 1;
-                    eo_axisController_Stop(ems->axis_controller[1]);
-                }
-            }
-            
-            if ( !(rho2 <= rho0 && rho2 <= rho1 && pwm_joint[2]>=0.f) && !(rho2 >= rho0 && rho2 >= rho1 && pwm_joint[2]<=0.f))
-            {
-                pwm_joint[2] = 0.f;
-                
-                if (!stuck2)
-                {
-                    stuck2 = 1;
-                    eo_axisController_Stop(ems->axis_controller[2]);
-                }
-            }
-        }
-        else
-        {
-            stuck0 = stuck1 = stuck2 = 0;
-        }
+        s_eo_emsController_AdjustPWM(pwm_joint);
     }
 
     //torque control limits protection mechanism
@@ -1295,7 +1252,7 @@ extern void eo_emsController_CheckCalibrations(void)
             {
                 if( (ems->axis_controller[j]->calibration_type == eomc_calibration_type3_abs_sens_digital)
                     ||
-                    (ems->axis_controller[j]->calibration_type == eomc_calibration_type5_hard_stops_mc4plus && ems->axis_controller[j]->hardwarelimitisreached))
+                    (ems->axis_controller[j]->calibration_type == eomc_calibration_type5_hard_stops_mc4plus && ems->axis_controller[j]->calibration_finished))
                 {
                     ems->n_calibrated++;
                     eo_axisController_SetCalibrated(ems->axis_controller[j]);
@@ -1353,7 +1310,7 @@ extern void eo_emsController_CheckCalibrations(void)
             {
                 if((ems->axis_controller[j]->calibration_type == eomc_calibration_type3_abs_sens_digital)
                     ||
-                    (ems->axis_controller[j]->calibration_type == eomc_calibration_type5_hard_stops_mc4plus && ems->axis_controller[j]->hardwarelimitisreached))
+                    (ems->axis_controller[j]->calibration_type == eomc_calibration_type5_hard_stops_mc4plus && ems->axis_controller[j]->calibration_finished))
                 {    
                     ems->n_calibrated++;
                     eo_axisController_SetCalibrated(ems->axis_controller[j]);
@@ -1456,8 +1413,8 @@ extern void eo_emsController_CheckCalibrations(void)
             if ((  (ems->axis_controller[0]->calibration_type == eomc_calibration_type3_abs_sens_digital)
                 && (ems->axis_controller[1]->calibration_type == eomc_calibration_type3_abs_sens_digital))
                 ||
-                (  (ems->axis_controller[0]->calibration_type == eomc_calibration_type5_hard_stops_mc4plus && ems->axis_controller[0]->hardwarelimitisreached)
-                && (ems->axis_controller[1]->calibration_type == eomc_calibration_type5_hard_stops_mc4plus && ems->axis_controller[1]->hardwarelimitisreached)))
+                (  (ems->axis_controller[0]->calibration_type == eomc_calibration_type5_hard_stops_mc4plus && ems->axis_controller[0]->calibration_finished)
+                && (ems->axis_controller[1]->calibration_type == eomc_calibration_type5_hard_stops_mc4plus && ems->axis_controller[1]->calibration_finished)))
             {
                 ems->n_calibrated+=2;
                 eo_axisController_SetCalibrated(ems->axis_controller[0]);
@@ -1488,7 +1445,7 @@ extern void eo_emsController_CheckCalibrations(void)
             {
                 if  ((ems->axis_controller[j]->calibration_type == eomc_calibration_type3_abs_sens_digital)
                     ||
-                    (ems->axis_controller[j]->calibration_type == eomc_calibration_type5_hard_stops_mc4plus && ems->axis_controller[j]->hardwarelimitisreached))
+                    (ems->axis_controller[j]->calibration_type == eomc_calibration_type5_hard_stops_mc4plus && ems->axis_controller[j]->calibration_finished))
                 {
                     ems->n_calibrated++;
                     eo_axisController_SetCalibrated(ems->axis_controller[j]);
@@ -1512,8 +1469,8 @@ extern void eo_emsController_CheckCalibrations(void)
             if ((  (ems->axis_controller[2]->calibration_type == eomc_calibration_type3_abs_sens_digital)
                 && (ems->axis_controller[3]->calibration_type == eomc_calibration_type3_abs_sens_digital))
                 ||
-                (  (ems->axis_controller[2]->calibration_type == eomc_calibration_type5_hard_stops_mc4plus && ems->axis_controller[2]->hardwarelimitisreached)
-                && (ems->axis_controller[3]->calibration_type == eomc_calibration_type5_hard_stops_mc4plus && ems->axis_controller[3]->hardwarelimitisreached)))
+                (  (ems->axis_controller[2]->calibration_type == eomc_calibration_type5_hard_stops_mc4plus && ems->axis_controller[2]->calibration_finished)
+                && (ems->axis_controller[3]->calibration_type == eomc_calibration_type5_hard_stops_mc4plus && ems->axis_controller[3]->calibration_finished)))
             {
                 ems->n_calibrated+=2; 
                 eo_axisController_SetCalibrated(ems->axis_controller[2]);
@@ -1544,7 +1501,7 @@ extern void eo_emsController_CheckCalibrations(void)
             }
             else if (eo_absCalibratedEncoder_IsOk(ems->abs_calib_encoder[j]))
             {
-                if(ems->axis_controller[j]->calibration_type == eomc_calibration_type8_adc_and_incr_mc4plus && ems->axis_controller[j]->hardwarelimitisreached)
+                if(ems->axis_controller[j]->calibration_type == eomc_calibration_type8_adc_and_incr_mc4plus && ems->axis_controller[j]->calibration_finished)
                 {    
                     ems->n_calibrated++;
                     eo_axisController_SetCalibrated(ems->axis_controller[j]);
@@ -1924,9 +1881,142 @@ static void s_eo_emsController_InitTrajectoryVersionVergence(uint8_t j)
          return;
     }
     
-    #warning does it worth to put the virtually coupled joints in 0? it's a choice, discuss it 
+    #warning does it worth to put the virtually coupled joints in 0? its a choice, discuss it 
+}
+static eObool_t s_eo_emsController_AreMechanicalConstraintsRespected(void)
+{
+    if (ems->board == emscontroller_board_CER_WAIST)
+    {
+        int32_t rho0= ems->axis_controller[0]->position;
+        int32_t rho1= ems->axis_controller[1]->position;
+        int32_t rho2= ems->axis_controller[2]->position;
+              
+        if (rho0*rho0+rho1*rho1+rho2*rho2-rho0*rho1-rho1*rho2-rho2*rho0>400000) // 25 deg limit
+        {
+            return eobool_false;
+        }
+    
+    }
+    
+    else if (ems->board == emscontroller_board_CER_WRIST)
+    {
+        // if in calib, I need to adjust the PWM anyway...
+        if       (ems->axis_controller[0]->control_mode == eomc_controlmode_calib)
+            // &&(ems->axis_controller[1]->control_mode == eomc_controlmode_calib)
+            // &&(ems->axis_controller[2]->control_mode == eomc_controlmode_calib))
+        {
+            return eobool_false;
+        }
+    }
+    
+    return eobool_true;
 }
 
+static void s_eo_emsController_AdjustPWM(float *pwm)
+{
+    if (ems->board == emscontroller_board_CER_WAIST)
+    {
+        int32_t rho0= ems->axis_controller[0]->position;
+        int32_t rho1= ems->axis_controller[1]->position;
+        int32_t rho2= ems->axis_controller[2]->position;
+        
+        static eObool_t stuck0 = eobool_false;
+        static eObool_t stuck1 = eobool_false;
+        static eObool_t stuck2 = eobool_false;
+        
+        if ( !(rho0 <= rho1 && rho0 <= rho2 && pwm[0]>=0.f) && !(rho0 >= rho1 && rho0 >= rho2 && pwm[0] <=0.f))
+        {
+            pwm[0] = 0.f;
+            
+            if (!stuck0)
+            {
+                stuck0 = eobool_true;
+                eo_axisController_Stop(ems->axis_controller[0]);
+            }
+        }
+            
+        if ( !(rho1 <= rho2 && rho1 <= rho0 && pwm[1] >=0.f) && !(rho1 >= rho2 && rho1 >= rho0 && pwm[1] <=0.f))
+        {
+            pwm[1]  = 0.f;
+            
+            if (!stuck1)
+            {
+                stuck1 = eobool_true;
+                eo_axisController_Stop(ems->axis_controller[1]);
+            }
+        }
+            
+        if ( !(rho2 <= rho0 && rho2 <= rho1 && pwm[2] >=0.f) && !(rho2 >= rho0 && rho2 >= rho1 && pwm[2] <=0.f))
+        {
+            pwm[2]  = 0.f;
+            
+            if (!stuck2)
+            {
+                stuck2 = eobool_true;
+                eo_axisController_Stop(ems->axis_controller[2]);
+            }
+        }
+    }
+    
+    else if (ems->board == emscontroller_board_CER_WRIST)
+    {
+        // - in calib:                      I should check the speed of the joints
+        // - for the other control modes:   I should check the relative position of the joints (see CER-WAIST)
+        
+        if       (ems->axis_controller[0]->control_mode == eomc_controlmode_calib)
+            //&& (ems->axis_controller[1]->control_mode == eomc_controlmode_calib)
+            // &&(ems->axis_controller[2]->control_mode == eomc_controlmode_calib))
+        {
+            static float dm;
+            
+            //update mean distance
+            /*
+            dm = ((float)(eo_axisController_GetAxisPos(ems->axis_controller[0])
+                        + eo_axisController_GetAxisPos(ems->axis_controller[1]) 
+                        + eo_axisController_GetAxisPos(ems->axis_controller[2])))/3.0f;
+            */
+            
+            //test to check the behaviour when two joints are stopped
+            int32_t pos0 = ems->motor_position[0];
+            dm = ((float) (pos0
+                        +  2048000.0 
+                        +  2048000.0))/3.0f;
+            
+            /*pwm[0] = */ s_eo_emsController_PWM_SafeCalibration(pwm[0],(int32_t)dm, pos0);
+            //s_eo_emsController_PWM_SafeCalibration(pwm_joint[1], (int32_t)dm, d[1]);
+            //s_eo_emsController_PWM_SafeCalibration(pwm_joint[2], (int32_t)dm, d[2]);
+          
+        }
+        else
+        {
+            // do something similar of CER-WAIST:
+            // - check relative position of the three joint (find the rule that must be respected)
+            // - if the situation is dangerous (I need to stop one or maybe two of the set of joints for 1 or more cycles)
+        }
+    }
+    
+    return;
+}
+
+//this function should compute a safe PWM to make sure the all the joints of the board are moving with the same speed
+static float s_eo_emsController_PWM_SafeCalibration(float base_pwm, int32_t mean_distance, int32_t jdistance)
+{
+    float safe_pwm;
+    
+    //could be used for different boards
+    if (ems->board == emscontroller_board_CER_WRIST)
+    {
+        float k = 0.2f; // K coefficient should come from XML as param2 
+        float err = (float) k*(jdistance - mean_distance); 
+        safe_pwm = base_pwm - err; 
+                
+        if (!((safe_pwm >=0) ^ (base_pwm < 0))) //if sign is different from PWM_base, don't move the joint
+            safe_pwm = 0;
+       
+    }
+    
+    return safe_pwm;
+}
 
 /*
     BYTE 0

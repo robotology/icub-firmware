@@ -28,6 +28,7 @@ extern "C" {
 #include "EOdecoupler.h"
 #include "EOaxisController.h"
 #include "EoMotionControl.h"
+#include "EomcService.h"
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
