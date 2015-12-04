@@ -20,7 +20,6 @@
 //#include "hal_led.h"
 #include "EoError.h"
 #include "EoemsController.h"
-#include "EOmcService.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -62,7 +61,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 static void axisMotionReset(EOaxisController *o);
-static eObool_t s_eo_axisController_isHardwareLimitReached(EOaxisController *o);
+static void s_eo_axisController_CheckHardwareLimitReached(EOaxisController *o);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -132,7 +131,8 @@ extern EOaxisController* eo_axisController_New(uint8_t id)
         o->pos_to_reach = 0;
         o->offset = 0;
         o->isvirtuallycoupled = 0;
-        o->hardwarelimitisreached = 0;
+        o->calibration_finished = 0;
+        o->hardwarelimitreached = 0;
     }
 
     return o;
@@ -196,9 +196,10 @@ extern void eo_axisController_StartCalibration(EOaxisController *o, uint32_t* pa
     
             o->control_mode = eomc_controlmode_calib;
     
-            // reset hwlimit reached
-            o->hardwarelimitisreached =0;
-              
+            // reset calibration procedure variables
+            o->calibration_finished = 0;
+            o->hardwarelimitreached = 0;
+                                    
         } break; 
         default:
             break;
@@ -755,23 +756,32 @@ extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
             //calib type 5 and calib type 8
             if ((o->calibration_type == eomc_calibration_type5_hard_stops_mc4plus) || (o->calibration_type == eomc_calibration_type8_adc_and_incr_mc4plus))
             {
-                if(1 == o->hardwarelimitisreached)
+                //inside here only with coupled joints (some already calibrated, the others not)
+                if(1 == o->calibration_finished)
                 {   
-                    // if in here, then it means that the calibration for one eye is terminated but the calib for the
-                    // other eye is not terminated yet.
-                    // TAG-XXX
-                    return 0;                    
+                    return 0;                        
                 }
                 
-                if (s_eo_axisController_isHardwareLimitReached(o))
+                if (o->hardwarelimitreached == 0)
+                    s_eo_axisController_CheckHardwareLimitReached(o);
+                else
                 {
+                    
+                    //calibration type 8 now ends (as type 5) when the limit is reached, without searching for the index (more precise). 
+                    /*
+                    if ((o->calibration_type == eomc_calibration_type8_adc_and_incr_mc4plus) && (eo_mcserv_IsMotorEncoderIndexReached(eo_mcserv_GetHandle(), o->axisID) == eobool_false))
+                    {
+                        //still need to find the index of quad_enc (search in the opposite direction)
+                        return -(o->pwm_limit_calib); 
+                    }
+                    */
+                    
                     // here I should only set the final position (the one in which the hardware limit is reached) to the value indicated in param3 of the calib
                     // the setting of this offset should be done only once!                  
-                    //eo_pid_Reset(o->pidP);
-                    
+
                     o->offset = pos - o->pos_to_reach + o->calibration_zero; //adding calib zero, so that the offset is computed only from the real axis position
                     
-                    o->hardwarelimitisreached = 1;
+                    o->calibration_finished = 1;
                     
                     //validation check disabled at the moment
                     /*
@@ -784,13 +794,12 @@ extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
                         o->offset += workrange;
                     */        
                           
-                    return 0;                    
+                    return 0;
                 }
                 //if still not calibrated I need to continue my search for the hardware limit
                 //important! need to do that only if the encoder has been already initialized
                 if (!eo_axisController_IsCalibrated(o)) 
                 {
-
                     return o->pwm_limit_calib;
                 }
             }
@@ -1274,7 +1283,7 @@ static void axisMotionReset(EOaxisController *o)
         o->err = 0;
 }
 
-static eObool_t s_eo_axisController_isHardwareLimitReached(EOaxisController *o)
+static void s_eo_axisController_CheckHardwareLimitReached(EOaxisController *o)
 {
     if (o->calibration_type == eomc_calibration_type5_hard_stops_mc4plus)
     {
@@ -1289,7 +1298,7 @@ static eObool_t s_eo_axisController_isHardwareLimitReached(EOaxisController *o)
                 {
                     o->pos_stable = 0;
                     o->calib_count = 0;
-                    return eobool_true;
+                    o->hardwarelimitreached = 1;
                 }
             }
             else
@@ -1298,7 +1307,6 @@ static eObool_t s_eo_axisController_isHardwareLimitReached(EOaxisController *o)
             }
         }
         o->old_pos = GET_AXIS_POSITION();
-        return eobool_false;
     }
     else if (o->calibration_type == eomc_calibration_type8_adc_and_incr_mc4plus)
     {
@@ -1324,11 +1332,15 @@ static eObool_t s_eo_axisController_isHardwareLimitReached(EOaxisController *o)
         
         //must be 0 or a value close to 0?
         #warning voltage threshold to set hardware-limit reached is hardcoded, but it could become a calib param
-        if (eo_mcserv_GetMotorAnalogSensor(eo_mcserv_GetHandle(), o->axisID) < 500) 
-            return eobool_true;
-        else
-            return eobool_false;
+        if (eo_mcserv_GetMotorAnalogSensor(eo_mcserv_GetHandle(), o->axisID) < 500)
+        {       
+            //reset the flag associated to quad_enc index reached
+            eo_mcserv_IsMotorEncoderIndexReached(eo_mcserv_GetHandle(), o->axisID);
+            o->hardwarelimitreached = 1;
+        }
     }
+    
+    return;
 }
 
 // --------------------------------------------------------------------------------------------------------------------
