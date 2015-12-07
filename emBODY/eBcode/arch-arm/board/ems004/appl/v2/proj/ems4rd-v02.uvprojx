@@ -886,6 +886,11 @@
               <FileType>1</FileType>
               <FilePath>..\src\eoappservices\EOtheCANdiscovery2.c</FilePath>
             </File>
+            <File>
+              <FileName>EOtheETHmonitor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\eoappservices\EOtheETHmonitor.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2257,6 +2262,11 @@
               <FileName>EOtheCANdiscovery2.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\eoappservices\EOtheCANdiscovery2.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOtheETHmonitor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\eoappservices\EOtheETHmonitor.c</FilePath>
             </File>
           </Files>
         </Group>
