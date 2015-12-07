@@ -53,6 +53,9 @@ extern "C" {
 
 #include "EOtheCANdiscovery2.h"
 
+#include "EOMtheEMSrunner.h"
+
+
 // - public #define  --------------------------------------------------------------------------------------------------
 
 
@@ -88,6 +91,8 @@ extern EOconstvector * eoboardconfig_code2EPcfg(uint32_t code);
 //extern eOas_inertialidentifier_t eoboardconfig_code2inertialID(uint32_t code);
 
 extern const eOas_inertial_serviceconfig_t * eoboardconfig_code2inertialCFG(uint32_t code);
+
+extern const eOemsrunner_timing_t * eoboardconfig_code2ctrlooptiming(uint32_t code);
 
 
 /** @}            

@@ -946,6 +946,49 @@ extern const eOas_inertial_serviceconfig_t * eoboardconfig_code2inertialCFG(uint
 
     return(ret);   
 }
+
+
+extern const eOemsrunner_timing_t * eoboardconfig_code2ctrlooptiming(uint32_t code)
+{
+    static const eOemsrunner_timing_t normal = 
+    {   // 400-300-300, but maybe better doing 400-250-350 or even 400-200-400
+        .period         = 1000,
+        .rxstartafter   = 0,
+        .dostartafter   = 400,
+        .txstartafter   = 700,
+        .safetygap      = 50          
+    };
+    
+    static const eOemsrunner_timing_t gateway = 
+    {   // 450-050-500 .... or even we dont wait the can tx end in the tx phase.
+        .period         = 1000,
+        .rxstartafter   = 0,
+        .dostartafter   = 450,
+        .txstartafter   = 500,
+        .safetygap      = 25          
+    };
+    
+    const eOemsrunner_timing_t *ret = &normal;
+ 
+    switch(code)
+    {
+        case 1:
+        case 3:
+        case 9:
+        case 10:            
+        {   // eb1, eb2, eb10, eb11
+            ret = &gateway;
+        } break;
+         
+        default:    
+        {   // all the others
+            ret = &normal;
+        } break;
+    
+    }
+
+    return(ret);   
+}
     
 
 // --------------------------------------------------------------------------------------------------------------------

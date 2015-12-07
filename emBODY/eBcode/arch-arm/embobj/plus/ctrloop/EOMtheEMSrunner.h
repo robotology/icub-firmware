@@ -97,7 +97,7 @@ typedef struct
     uint16_t            taskstacksize[eo_emsrunner_task_numberof];  
     hal_timer_t         haltimerstart[eo_emsrunner_task_numberof];    
     hal_timer_t         haltimeralert[eo_emsrunner_task_numberof]; 
-    eOreltime_t         period;                 /**< The period of the cycle rx-do-tx. The rx task receive the execute evt at beginning of the cycle.*/
+    eOreltime_t         period;                 /**< The period of the cycle rx-do-tx. The rx task receives the execute evt at beginning of the cycle.*/
     eOreltime_t         execRXafter;            /**< time of execution of RX task, measured in usec after beginning of period  */            
     eOreltime_t         safeRXexecutiontime;    /**< safe execution time for RX task. If the task is not completed at execRXafter+safeRXexecutiontime it is issued a safe duration expired flag  */
     eOreltime_t         execDOafter;            /**< time of execution of DO task, measured in usec after beginning of period  */
@@ -109,6 +109,15 @@ typedef struct
     eOemsrunner_mode_t  modeatstartup;
     uint8_t             defaultTXdecimationfactor;
 } eOemsrunner_cfg_t;
+
+typedef struct
+{
+    eOreltime_t         period;
+    eOreltime_t         rxstartafter;
+    eOreltime_t         dostartafter;
+    eOreltime_t         txstartafter;
+    eOreltime_t         safetygap;
+} eOemsrunner_timing_t;
 
 typedef struct
 {
@@ -155,6 +164,8 @@ extern EOMtheEMSrunner * eom_emsrunner_GetHandle(void);
 extern eOresult_t eom_emsrunner_Set_TXdecimationFactor(EOMtheEMSrunner *p, uint8_t txdecimationfactor);
 
 extern eObool_t eom_emsrunner_CycleHasJustTransmittedRegulars(EOMtheEMSrunner *p);
+
+extern eOresult_t eom_emsrunner_SetTiming(EOMtheEMSrunner *p, const eOemsrunner_timing_t *timing);
 
 // start 
 extern eOresult_t eom_emsrunner_Start(EOMtheEMSrunner *p);
