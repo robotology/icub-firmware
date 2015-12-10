@@ -59,6 +59,8 @@
 
 #include "EOemsControllerCfg.h"
 
+#include "EOtheETHmonitor.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -353,7 +355,7 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
 
         // sk-skin
         entitydes = eoboardconfig_code2entitydescriptors(s_boardnum, eoprot_endpoint_skin, eoprot_entity_sk_skin);
-        eo_canmap_ConfigEntity(canmap, eoprot_endpoint_skin, eoprot_entity_sk_skin, entitydes);      
+        eo_canmap_ConfigEntity(canmap, eoprot_endpoint_skin, eoprot_entity_sk_skin, entitydes);   
     }
     
     {   // CAN-PROTOCOL
@@ -383,7 +385,8 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
                 eo_nvset_LoadEP(nvset, epcfg, eobool_true);
             }                        
         }
-        
+
+#if !defined(TEST_EB2_EB4_WITHOUT_MC)          
         // now we must define the .... proxy rules
         // if we have board number equal to 1 or 3 ... (eb2 or eb4) then we set it for mc only
         eOprotBRD_t localboard = eoprot_board_local_get();
@@ -391,6 +394,8 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
         {
             eoprot_config_proxied_variables(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_b02_b04_mc_isproxied);
         }
+#endif
+        
     }   
 
 
@@ -409,7 +414,12 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
     
     // before we go in run mode we can set different timing for the control loop:    
     eom_emsrunner_SetTiming(eom_emsrunner_GetHandle(), eoboardconfig_code2ctrlooptiming(s_boardnum));
+    
+    
+    // start the eth-monitor
        
+    eo_ethmonitor_Initialise(NULL);
+    eo_ethmonitor_Start(eo_ethmonitor_GetHandle());
     
     // start the application body   
     eOemsapplbody_cfg_t applbodyconfig;
@@ -487,12 +497,13 @@ extern void eom_emsappl_hid_userdef_on_entry_CFG(EOMtheEMSappl* p)
     const uint8_t maxframes2read = 255; // 255 is the max number possible. the function however exits when all canframes are 
     eo_canserv_Parse(eo_canserv_GetHandle(), eOcanport1, maxframes2read, NULL);    
     eo_canserv_Parse(eo_canserv_GetHandle(), eOcanport2, maxframes2read, NULL);
- 
+    
+    eo_ethmonitor_SetAlert(eo_ethmonitor_GetHandle(), eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()), emsconfigurator_evt_userdef02);
 }
 
 extern void eom_emsappl_hid_userdef_on_exit_CFG(EOMtheEMSappl* p)
 {
-//    #warning -> marco.accame: we enable the tx on can for all joints not on exit-cfg but on enytry-run (i may go to err).
+    eo_ethmonitor_SetAlert(eo_ethmonitor_GetHandle(), NULL, 0);
 }
 
 extern void eom_emsappl_hid_userdef_on_entry_RUN(EOMtheEMSappl* p)
@@ -556,6 +567,7 @@ extern void eom_emsappl_hid_userdef_on_exit_RUN(EOMtheEMSappl* p)
     // stop tx of inertial. the check whether to stop skin or not is done internally.
     eo_inertial_Stop(eo_inertial_GetHandle());
 }
+
 
 extern void eom_emsappl_hid_userdef_on_entry_ERR(EOMtheEMSappl* p)
 {

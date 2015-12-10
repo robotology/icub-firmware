@@ -67,6 +67,8 @@
 
 #include "EOtheSkin.h"
 
+#include "EOtheETHmonitor.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -212,14 +214,23 @@ extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
 
         } break;
     }
+    
 #endif
+    
+    // eo_ethmonitor_Tick(eo_ethmonitor_GetHandle());
+    
 }
 
 
 extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission(EOMtheEMSrunner *p)
 {   
-    eo_canserv_TXstart(eo_canserv_GetHandle(), eOcanport1, NULL);
-    eo_canserv_TXstart(eo_canserv_GetHandle(), eOcanport2, NULL);
+    uint8_t txcan1frames = 0;
+    uint8_t txcan2frames = 0;
+    
+    eo_canserv_TXstart(eo_canserv_GetHandle(), eOcanport1, &txcan1frames);
+    eo_canserv_TXstart(eo_canserv_GetHandle(), eOcanport2, &txcan1frames);
+    
+    eom_emsrunner_Set_TXcanframes(eom_emsrunner_GetHandle(), txcan1frames, txcan2frames);
 }
 
 
@@ -236,6 +247,8 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(
     {
         eo_inertial_RefreshStatusOfEntity(eo_inertial_GetHandle());
     }
+    
+    eo_ethmonitor_Tick(eo_ethmonitor_GetHandle());
     
     
     // now we wait for the can tx to finish. 
