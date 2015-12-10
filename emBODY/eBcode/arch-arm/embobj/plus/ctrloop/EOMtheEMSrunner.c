@@ -190,7 +190,9 @@ static EOMtheEMSrunner s_theemsrunner =
     .iterationnumber        = 0,
     .usedTXdecimationfactor = 1,
     .itisaTXcycle           = eobool_true,
-    .txropsnumberincycle    = {0, 0, 0}
+    .txropsnumberincycle    = {0, 0, 0},
+    .txcan1frames           = 0,
+    .txcan2frames           = 0
 };
 
 
@@ -352,6 +354,19 @@ extern eOresult_t eom_emsrunner_Set_TXdecimationFactor(EOMtheEMSrunner *p, uint8
     }
     p->usedTXdecimationfactor = txdecimationfactor;
 
+    return(eores_OK);    
+}
+
+extern eOresult_t eom_emsrunner_Set_TXcanframes(EOMtheEMSrunner *p, uint8_t txcan1, uint8_t txcan2)
+{  
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }   
+
+    p->txcan1frames = txcan1;
+    p->txcan2frames = txcan2;
+    
     return(eores_OK);    
 }
 
@@ -1615,7 +1630,8 @@ static void s_eom_emsrunner_update_diagnosticsinfo_check_overflows(eOemsrunner_t
 				s_eom_emsrunner_update_diagnosticsinfo_exeoverflows(eo_emsrunner_taskid_runTX);
 				errdes.code             = eoerror_code_get(eoerror_category_System,eoerror_value_SYS_ctrloop_execoverflowTX);
 				errdes.par16            = eom_emsrunner_txduration;
-                errdes.par64            = last4durations; 
+                uint64_t canframes = s_theemsrunner.txcan1frames | (s_theemsrunner.txcan2frames << 8);
+                errdes.par64            = (last4durations & 0x0000ffffffffffff) | (canframes << 48); 
 				eo_errman_Error(eo_errman_GetHandle(), errortype, NULL, s_eobj_ownname, &errdes);
 			}
 			else
