@@ -82,7 +82,8 @@ typedef enum
     emsconfigurator_evt_go2runner       =   0x00000008,
     emsconfigurator_evt_tick            =   0x00000010,
     emsconfigurator_evt_userdef00       =   0x00000020,
-    emsconfigurator_evt_userdef01       =   0x00000040
+    emsconfigurator_evt_userdef01       =   0x00000040,
+    emsconfigurator_evt_userdef02       =   0x00000080
 } eOemsconfigurator_event_t;
 
 

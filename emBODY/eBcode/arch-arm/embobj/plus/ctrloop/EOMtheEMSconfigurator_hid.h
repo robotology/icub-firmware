@@ -69,6 +69,8 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdef00Event(EOMtheEMSconfi
 
 extern void eom_emsconfigurator_hid_userdef_ProcessUserdef01Event(EOMtheEMSconfigurator* p);
 
+extern void eom_emsconfigurator_hid_userdef_ProcessUserdef02Event(EOMtheEMSconfigurator* p);
+
 
 #ifdef __cplusplus
 }       // closing brace for extern "C"

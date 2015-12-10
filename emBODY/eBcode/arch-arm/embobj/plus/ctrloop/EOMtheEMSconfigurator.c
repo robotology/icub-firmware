@@ -227,6 +227,11 @@ __weak extern void eom_emsconfigurator_hid_userdef_ProcessUserdef01Event(EOMtheE
 
 } 
 
+__weak extern void eom_emsconfigurator_hid_userdef_ProcessUserdef02Event(EOMtheEMSconfigurator* p)
+{
+
+} 
+
 __weak extern void eom_emsconfigurator_hid_userdef_onemstransceivererror(EOMtheEMStransceiver* p)
 {
 
@@ -374,11 +379,17 @@ static void s_eom_emsconfigurator_task_run(EOMtask *p, uint32_t t)
         eom_emsconfigurator_hid_userdef_ProcessUserdef00Event(&s_emsconfigurator_singleton);
     }
     
-    // we can process a user-defined event1
+    // we can process a user-defined event01
     if(eobool_true == eo_common_event_check(evt, emsconfigurator_evt_userdef01))
     {
         eom_emsconfigurator_hid_userdef_ProcessUserdef01Event(&s_emsconfigurator_singleton);
     }
+    
+    // we can process a user-defined event02
+    if(eobool_true == eo_common_event_check(evt, emsconfigurator_evt_userdef02))
+    {
+        eom_emsconfigurator_hid_userdef_ProcessUserdef02Event(&s_emsconfigurator_singleton);
+    }    
     
 }
 
