@@ -30,6 +30,7 @@
 #include "EoCommon.h"
 #include "EOMtask.h"
 #include "osal_semaphore.h"
+#include "hal_ethtransceiver.h"
 
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
@@ -39,14 +40,28 @@
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
+typedef struct
+{
+    eObool_t                            on;
+    eObool_t                            previouson;
+    hal_ethtransceiver_phystatus_t      phy;
+    hal_ethtransceiver_phyerrorinfo_t   rxcrc;    
+} eOethmonitor_port_status_t;
+
+enum { eOethmonitor_numberofports = 2 };
 
 struct EOtheETHmonitor_hid
 {
-    eObool_t            initted;
-    eObool_t            started;
-    eObool_t            newresultsavailable;
-    EOMtask*            taskworker;
-    osal_semaphore_t*   semaphoreworker;
+    eObool_t                    initted;
+    eObool_t                    enabled;
+    eObool_t                    newresultsavailable;
+    EOMtask*                    taskworker;
+    osal_semaphore_t*           semaphoreworker;
+    osal_semaphore_t*           alertsemaphore;
+    EOMtask*                    task2alert;
+    eOevent_t                   alertevent;
+    uint8_t                     upmask;
+    eOethmonitor_port_status_t  portstatus[eOethmonitor_numberofports];  // for hal_ethtransceiver_phy0 (P2) and hal_ethtransceiver_phy1 (P3)
 }; 
 
 

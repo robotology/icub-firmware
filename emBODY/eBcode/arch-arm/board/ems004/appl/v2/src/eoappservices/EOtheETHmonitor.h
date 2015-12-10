@@ -26,7 +26,7 @@
 /** @file       EOtheETHmonitor.h
     @brief      this object implements what is required for managing the SKIN.                
     @author     marco.accame@iit.it
-    @date       05/28/2015
+    @date       12/12/2015
 **/
 
 /** @defgroup eo_EOtheETHmonitor Object EOtheETHmonitor
@@ -37,6 +37,7 @@
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "EoCommon.h"
+#include "EOMtask.h"
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
@@ -64,6 +65,8 @@ extern EOtheETHmonitor* eo_ethmonitor_Initialise(const eOethmonitor_cfg_t *cfg);
 extern EOtheETHmonitor* eo_ethmonitor_GetHandle(void);
 
 extern eOresult_t eo_ethmonitor_Start(EOtheETHmonitor *p);
+
+extern eOresult_t eo_ethmonitor_SetAlert(EOtheETHmonitor *p, EOMtask *task, eOevent_t event);
 
 extern eOresult_t eo_ethmonitor_Tick(EOtheETHmonitor *p);
 
