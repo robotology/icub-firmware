@@ -217,8 +217,14 @@ const eomcconfig_codeconfig_t eomcconfig_codeconfig_MC4PLUS[] =
     
     /* CER-wrist board */
     {EO_INIT(.value) eOmcconfig_value_MC4PLUS_CER_wrist,
-        EO_INIT(.jomos[0].actuator.local.type)  1, EO_INIT(.jomos[0].actuator.local.index) 0, EO_INIT(.jomos[0].encoder.isthere)       1, EO_INIT(.jomos[0].encoder.etype)        2, EO_INIT(.jomos[0].encoder.index)        0, EO_INIT(.jomos[0].encoder.pos_type)       0, // j0-> index-distal, motor0, mais, 0 stands for 1st mais entity
+        EO_INIT(.jomos[0].actuator.local.type)  1, EO_INIT(.jomos[0].actuator.local.index) 0, EO_INIT(.jomos[0].encoder.isthere)       0, /*EO_INIT(.jomos[0].encoder.etype)        2, EO_INIT(.jomos[0].encoder.index)        0, EO_INIT(.jomos[0].encoder.pos_type)       0,*/
                                                                                               EO_INIT(.jomos[0].extra_encoder.isthere) 1, EO_INIT(.jomos[0].extra_encoder.etype)  2, EO_INIT(.jomos[0].extra_encoder.index)  0, EO_INIT(.jomos[0].extra_encoder.pos_type) 1,
+        EO_INIT(.jomos[1].actuator.local.type)  1, EO_INIT(.jomos[1].actuator.local.index) 1, EO_INIT(.jomos[1].encoder.isthere)       0,
+                                                                                              EO_INIT(.jomos[1].extra_encoder.isthere) 1, EO_INIT(.jomos[1].extra_encoder.etype)  2, EO_INIT(.jomos[1].extra_encoder.index)  1, EO_INIT(.jomos[1].extra_encoder.pos_type) 1,
+        EO_INIT(.jomos[2].actuator.local.type)  1, EO_INIT(.jomos[2].actuator.local.index) 2, EO_INIT(.jomos[2].encoder.isthere)       0, 
+                                                                                              EO_INIT(.jomos[2].extra_encoder.isthere) 1, EO_INIT(.jomos[2].extra_encoder.etype)  2, EO_INIT(.jomos[2].extra_encoder.index)  2, EO_INIT(.jomos[2].extra_encoder.pos_type) 1,
+        /*EO_INIT(.jomos[0].actuator.local.type)  1, EO_INIT(.jomos[0].actuator.local.index) 0, EO_INIT(.jomos[0].encoder.isthere)       0,
+                                                                                              EO_INIT(.jomos[0].extra_encoder.isthere) 1, EO_INIT(.jomos[0].extra_encoder.etype)  2, EO_INIT(.jomos[0].extra_encoder.index)  0, EO_INIT(.jomos[0].extra_encoder.pos_type) 1, */
     }
     
 }; EO_VERIFYsizeof(eomcconfig_codeconfig_MC4PLUS, eOmcconfig_value_MC4PLUS_numberof*sizeof(const eomcconfig_codeconfig_t));
@@ -262,7 +268,7 @@ const eomcconfig_boardjomos_t eomcconfig_boardjomos_MC4PLUS[] =
     //TBA
     
     /* CER-wrist board */
-    {EO_INIT(.board_num) 21,  EO_INIT (.joints) 1}  // board 19, CER-wrist (4 joints!)
+    {EO_INIT(.board_num) 21,  EO_INIT (.joints) 3}  // board 19, CER-wrist (4 joints! --> 3 for tripod and 1 for rotation)
 
 }; EO_VERIFYsizeof(eomcconfig_boardjomos_MC4PLUS, eOmcconfig_boardjomosnumberof*sizeof(eomcconfig_boardjomos_t));
 
