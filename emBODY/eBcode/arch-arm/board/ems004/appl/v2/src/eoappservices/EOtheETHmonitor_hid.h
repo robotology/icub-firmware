@@ -61,6 +61,8 @@ struct EOtheETHmonitor_hid
     EOMtask*                    task2alert;
     eOevent_t                   alertevent;
     uint8_t                     upmask;
+    uint64_t                    lastsequencenumbererror;
+    uint16_t                    lastnumberofseqnumbererrors;
     eOethmonitor_port_status_t  portstatus[eOethmonitor_numberofports];  // for hal_ethtransceiver_phy0 (P2) and hal_ethtransceiver_phy1 (P3)
 }; 
 

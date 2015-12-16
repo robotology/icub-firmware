@@ -30,6 +30,8 @@
 #include "EOVtheSystem.h"
 #include "hal_trace.h"
 
+#include "hl_eth.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -66,7 +68,43 @@ const eOethmonitor_cfg_t eo_ethmonitor_DefaultCfg =
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+typedef struct
+{
+    // ethertype-header: begin
+    uint8_t     destinationmac[6];
+    uint8_t     sourcemac[6];
+    uint16_t    ethertype;           // ipv4 is 0x0800, arp is 0x0806
+    // ethertype-header: end (then there is the payload). in case of ipv4: ipv4-header + ipv4-payload
+    
+    // ipv4-header: begin
+    uint8_t     version4_ihl4;  // is 0x45 because: version is 0x4, number of 32bitwords is 0x5 (hence header len is 20 bytes)  
+    uint8_t     dscp6_ecn2;     // is 0x3c: dscp is 001111b (15 = unknown), ecn is 00b
+    
+    // offset 16
+    uint16_t    totallength;    // this packets is 0x98 = 152 (attetion to network order which is big-endian!!!!).
+    uint16_t    identification; // is mapped into 0007 and must be 0x0007 (attention to be)
+    uint16_t    flags3_fragmentoffset13; // 0x0000
+    uint8_t     timetolive; // 128 (0x80)
+    uint8_t     protocol;       // udp is 0x11
+    uint16_t    headerchecksum;
+    
+    // offset 26
+    uint8_t    sourceipaddress[4];
+    uint8_t    destinationipaddress[4];
+    // ipv4-header: end
+    
+    // udp-header: begin offset 34
+    uint16_t    sourceport;         // source port is 0x3039 (endianesssssss)
+    uint16_t    destinationport;    // destination port
+    uint16_t    length;             // of udp header and data: 8+sizeof(payload)     [in an example here we have 132]
+    uint16_t    checksum;           // ok, but validation is disabled
+    // udp-header: end
+    
+    uint8_t     data[4];            // it offset as measured is .... 42.   for ropframe we have 78 56 34 12 (it must be 0x12345678)
+
+    
+} eth_udp_pkt_t;
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -83,6 +121,10 @@ static void s_eo_ethmonitor_process_resultsofquery(void);
 static void s_eo_ethmonitor_print_delta(const char *prefix, uint32_t delta);
 
 static void s_eo_ethmonitor_print_timeoflife(const char *prefix);
+
+static void s_eo_ethmonitor_verifyTXropframe(hl_eth_frame_t* frame);
+
+static void s_eo_ethmonitor_send_error_sequencenumber(void);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -149,6 +191,10 @@ extern EOtheETHmonitor* eo_ethmonitor_Initialise(const eOethmonitor_cfg_t *cfg)
     memset(&s_eo_theethmonitor.portstatus, 0, sizeof(s_eo_theethmonitor.portstatus));
     
     
+    s_eo_theethmonitor.lastnumberofseqnumbererrors = 0;
+    s_eo_theethmonitor.lastsequencenumbererror = 0;
+    hl_eth_set_callback_on_sendframe(NULL);
+    
     s_eo_theethmonitor.initted = eobool_true;
     
     return(&s_eo_theethmonitor);   
@@ -170,6 +216,17 @@ extern eOresult_t eo_ethmonitor_Tick(EOtheETHmonitor *p)
     if(NULL == p)
     {
         return(eores_NOK_nullpointer);
+    }
+    
+    if(eobool_false == s_eo_theethmonitor.enabled)
+    {   // nothing to do because it is not enabled
+        return(eores_OK);
+    }
+    
+    if(0 != s_eo_theethmonitor.lastsequencenumbererror)
+    {
+        // there is a sequence number error in tx
+        s_eo_ethmonitor_send_error_sequencenumber();
     }
     
     // we decrement a semaphore w/ zero timeout. 
@@ -231,6 +288,10 @@ extern eOresult_t eo_ethmonitor_Start(EOtheETHmonitor *p)
         return(eores_OK);
     }
     
+    s_eo_theethmonitor.lastnumberofseqnumbererrors = 0;
+    s_eo_theethmonitor.lastsequencenumbererror = 0;
+    hl_eth_set_callback_on_sendframe(s_eo_ethmonitor_verifyTXropframe);
+    
     s_eo_theethmonitor.enabled = eobool_true;
           
     
@@ -249,6 +310,11 @@ extern eOresult_t eo_ethmonitor_Stop(EOtheETHmonitor *p)
     {   // nothing to do because it is already stopped
         return(eores_OK);
     }
+    
+    
+    hl_eth_set_callback_on_sendframe(NULL);
+    s_eo_theethmonitor.lastsequencenumbererror = 0;
+    s_eo_theethmonitor.lastnumberofseqnumbererrors = 0;
     
     s_eo_theethmonitor.enabled = eobool_false;
           
@@ -450,6 +516,66 @@ static void s_eo_ethmonitor_print_timeoflife(const char *prefix)
 
     snprintf(strrr, sizeof(strrr), "%s @ %ds %dm %du", prefix, sec, ms, us);    
     hal_trace_puts(strrr);    
+}
+
+
+
+static void s_eo_ethmonitor_verifyTXropframe(hl_eth_frame_t* frame)
+{    
+    eth_udp_pkt_t *udp = (eth_udp_pkt_t*)&frame->datafirstbyte[0];
+    static uint64_t prevsequencenumber = 0xffffffffffffffff;
+    
+    if(0x0008 != udp->ethertype)
+    {   // only ipv4
+        return;
+    }
+    
+    if(0x11 != udp->protocol)
+    {   // only udp
+        return;
+    }
+    
+    if(udp->length <= (8+24))
+    {   // only meaningful length for a ropframe
+        return;        
+    }
+    
+    volatile uint8_t *data = udp->data;
+    volatile uint64_t sequencenumber = 0;
+    
+    
+    if((0x78 == data[0]) && (0x56 == data[1]) && (0x34 == data[2]) && (0x12 == data[3]))
+    {   // only if i can recognise a ropframe
+        sequencenumber = ((uint64_t)data[16])       | ((uint64_t)data[17] << 8)     | ((uint64_t)data[18] << 16)    | ((uint64_t)data[19] << 24) | 
+                         ((uint64_t)data[20] << 32) | ((uint64_t)data[21] << 40)    | ((uint64_t)data[22] << 48)    | ((uint64_t)data[23] << 56);
+        
+        if(0xffffffffffffffff != prevsequencenumber)
+        {
+            if((prevsequencenumber+1) != sequencenumber)
+            {
+                s_eo_theethmonitor.lastsequencenumbererror = prevsequencenumber+1;
+                s_eo_theethmonitor.lastnumberofseqnumbererrors ++;
+            }                 
+        }
+        
+        prevsequencenumber = sequencenumber;    
+    }
+          
+}
+
+static void s_eo_ethmonitor_send_error_sequencenumber(void)
+{    
+    eOerrmanDescriptor_t errdes = {0};
+
+    errdes.code             = eoerror_code_get(eoerror_category_ETHmonitor, eoerror_value_ETHMON_txseqnumbermissing);
+    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+    errdes.sourceaddress    = 0;
+    errdes.par16            = s_eo_theethmonitor.lastnumberofseqnumbererrors;
+    errdes.par64            = s_eo_theethmonitor.lastsequencenumbererror;
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);
+    
+    s_eo_theethmonitor.lastnumberofseqnumbererrors = 0;
+    s_eo_theethmonitor.lastsequencenumbererror = 0;
 }
 
 
