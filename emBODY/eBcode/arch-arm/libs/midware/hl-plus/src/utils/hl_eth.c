@@ -376,6 +376,9 @@ typedef struct
 */
 void (*hal_eth_lowLevelUsePacket_ptr)(uint8_t* pkt_ptr, uint32_t size) = NULL;
 
+
+hl_eth_fp_onsendframe_t hl_eth_on_send_frame = NULL;
+
 #if defined(HL_ETH_EXTRA_DEBUG)
 void hal_parse_arp(uint8_t* pkt_ptr, uint32_t size);
 #endif
@@ -449,7 +452,7 @@ static void s_hl_eth_mac_init(const hl_eth_cfg_t *cfg, hl_ethtrans_phymode_t phy
 
 static void s_hl_eth_rmii_prepare(void);
 static void s_hl_eth_rmii_rx_init(void);
-extern void s_hl_eth_rmii_tx_init(void);
+static void s_hl_eth_rmii_tx_init(void);
 
 
 
@@ -874,6 +877,14 @@ extern hl_result_t hl_eth_sendframe(hl_eth_genericframe_t *genframe)
 
 }
 #else
+
+extern hl_result_t hl_eth_set_callback_on_sendframe(hl_eth_fp_onsendframe_t onsendframe)
+{
+    hl_eth_on_send_frame = onsendframe;
+ 
+    return(hl_res_OK);    
+}
+
 extern hl_result_t hl_eth_sendframe(hl_eth_frame_t *frame)
 {
     // called by tcpnet's send_frame(OS_FRAME *frame)
@@ -915,6 +926,12 @@ extern hl_result_t hl_eth_sendframe(hl_eth_frame_t *frame)
         eventviewer_switch_to(pr);        
     }
 #endif
+    
+    if(NULL != hl_eth_on_send_frame)
+    {
+        hl_eth_on_send_frame(frame);
+    }
+
     
     j = intitem->txbufindex; 
     /* Wait until previous packet transmitted. */

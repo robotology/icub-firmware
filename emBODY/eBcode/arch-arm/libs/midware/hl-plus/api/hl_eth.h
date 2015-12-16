@@ -175,7 +175,11 @@ typedef struct
     uint16_t index;                 /**< index to the used byte */
     uint8_t  datafirstbyte[1];    
 } hl_eth_frame_t;
+
+typedef void (*hl_eth_fp_onsendframe_t) (hl_eth_frame_t*);
+
 #endif 
+
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
 // it must be externally declared.
@@ -242,6 +246,9 @@ extern void hl_eth_on_frame_received(hl_eth_frame_t* frame);
 
 
 extern hl_result_t hl_eth_sendframe(hl_eth_frame_t *frame);
+
+extern hl_result_t hl_eth_set_callback_on_sendframe(hl_eth_fp_onsendframe_t onsendframe);
+
 #endif
 
 extern void hl_eth_alert(void);
