@@ -688,16 +688,16 @@ extern void hal_quad_enc_reset_counter(uint8_t encoder_number)
     switch (encoder_number)
     {
         case 0:
-            TIM_SetCounter(ENCODER1_TIMER,0x0);
+            TIM_SetCounter(ENCODER1_TIMER,ENCODER_START_VAL);
             break;
         case 1:
-            TIM_SetCounter(ENCODER2_TIMER,0x0);
+            TIM_SetCounter(ENCODER2_TIMER,ENCODER_START_VAL);
             break;
         case 2:
-            TIM_SetCounter(ENCODER3_TIMER,0x0);
+            TIM_SetCounter(ENCODER3_TIMER,ENCODER_START_VAL);
             break;
         case 3:
-            TIM_SetCounter(ENCODER4_TIMER,0x0);
+            TIM_SetCounter(ENCODER4_TIMER,ENCODER_START_VAL);
             break;
         default:
             break;
