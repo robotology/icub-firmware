@@ -1332,7 +1332,7 @@ static void s_eo_axisController_CheckHardwareLimitReached(EOaxisController *o)
         
         //must be 0 or a value close to 0?
         #warning voltage threshold to set hardware-limit reached is hardcoded, but it could become a calib param
-        if (eo_mcserv_GetMotorAnalogSensor(eo_mcserv_GetHandle(), o->axisID) < 500)
+        if (eo_mcserv_GetMotorAnalogSensor(eo_mcserv_GetHandle(), o->axisID) < 500) //1/10 of the nominal value
         {       
             //reset the flag associated to quad_enc index reached
             eo_mcserv_IsMotorEncoderIndexReached(eo_mcserv_GetHandle(), o->axisID);

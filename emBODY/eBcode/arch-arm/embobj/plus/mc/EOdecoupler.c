@@ -176,8 +176,8 @@ extern void eo_motor_set_motor_status(EOmotors *o, uint8_t m, uint8_t *state)
 
     o->motor_run_state[m] = state[0]; //1byte
 	o->motor_fault_mask[m] = ((uint32_t*)state)[1]; //4bytes    
-	o->motor_qe_error[m] = (((uint32_t)(((uint16_t*)state)[1]))<<16) | (uint32_t)state[1]; //1byte
-    o->motor_enc_not_calibrated[m] = state[1] & 0x10;
+	o->motor_qe_error[m] = (((uint32_t)(((uint16_t*)state)[1]))<<16) | (uint32_t)state[1]; //4bytes
+    o->motor_enc_not_calibrated[m] = state[1] & 0x10; //1byte
 }
 
 #include "EoError.h"
@@ -342,7 +342,11 @@ extern void eo_motors_decouple_PWM(EOmotors *o, float *pwm_joint, float *pwm_mot
         if (stiff[1]) {pwm_motor[1] = (pwm_joint[0]+pwm_joint[1])/2;} else {pwm_motor[1] = pwm_joint[1];}
         if (stiff[2]) {pwm_motor[2] =  pwm_joint[2];                } else {pwm_motor[2] = pwm_joint[2];}
     }        
-    else if ((emscontroller_board_UPPERLEG == o->board) || (emscontroller_board_CER_WAIST == o->board) || (emscontroller_board_FACE_lips == o->board) || (emscontroller_board_CER_BASE == o->board))
+    else if (   (emscontroller_board_UPPERLEG == o->board)
+            ||  (emscontroller_board_CER_WAIST == o->board)
+            ||  (emscontroller_board_FACE_lips == o->board)
+            ||  (emscontroller_board_CER_BASE == o->board)
+            ||  (emscontroller_board_CER_WRIST == o->board))
     {    
         pwm_motor[0] = pwm_joint[0];
         pwm_motor[1] = pwm_joint[1];
@@ -421,10 +425,6 @@ extern void eo_motors_decouple_PWM(EOmotors *o, float *pwm_joint, float *pwm_mot
                 if (stiff[3]) {pwm_motor[3] = ( (+1.000f)*pwm2jo + (+1.000f)*pwm3jo);} else {pwm_motor[3] = pwm_joint[3];}                 
             }
         }  
-    }
-    else if (emscontroller_board_CER_WRIST == o->board)
-    {
-        MOTORS(m) pwm_motor[m] = pwm_joint[m];
     }
     else    // marco.accame: this board does not have coupled joints
             // davide: to me seems more like that your trying to compute the PWM of an undefined board

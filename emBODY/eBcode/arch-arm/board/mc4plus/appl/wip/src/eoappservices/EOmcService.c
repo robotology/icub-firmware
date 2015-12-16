@@ -352,7 +352,7 @@ extern eOresult_t eo_mcserv_EnableMotor(EOmcService *p, uint8_t joint_index)
     eOemscontroller_board_t board_control = s_eo_mcserv_getboardcontrol();
     
     //check coupled joints
-    if((emscontroller_board_SHOULDER == board_control) || (emscontroller_board_WAIST == board_control))    
+    if((emscontroller_board_SHOULDER == board_control) || (emscontroller_board_WAIST == board_control) || (emscontroller_board_CER_WRIST == board_control))    
     {
       if (joint_index <3) 
       {
@@ -422,7 +422,7 @@ extern eOresult_t eo_mcserv_SetMotorFaultMask(EOmcService *p, uint8_t motor, uin
     eOemscontroller_board_t board_control = s_eo_mcserv_getboardcontrol();
     
     //check coupled joints
-    if((emscontroller_board_SHOULDER == board_control) || (emscontroller_board_WAIST == board_control))    
+    if((emscontroller_board_SHOULDER == board_control) || (emscontroller_board_WAIST == board_control) || (emscontroller_board_CER_WRIST == board_control))    
     {
       if (motor <3) 
       {
@@ -803,7 +803,12 @@ static eOresult_t s_eo_mcserv_init_jomo(EOmcService *p)
                     
                     //store the encoder joint value --> use it when you get the value
                     p->config.jomos[jm].extra_encoder.enc_joint = enc_joint_index;
-                    
+                    if (!p->config.jomos[jm].encoder.isthere)
+                    {
+                        p->config.jomos[jm].encoder.enc_joint = p->config.jomos[jm].extra_encoder.enc_joint;
+                        enc_joint_index++;
+                    }
+                  
                     //only for SPI encoders
                     if (SPI_ENCODER(etype_extra))
                     {
@@ -1069,9 +1074,10 @@ extern eOresult_t s_eo_mcserv_do_mc4plus(EOmcService *p)
     eo_emsController_AcquireAbsEncoders((int32_t*)p->valuesencoder, errormask);
     eo_emsController_CheckFaults();
     
-    // (for MAIS-controlled joints...do a check on the limits (see MC4 firmware) before entering here or inside the controller?)
     // 5. compute the pwm using pid
     eo_emsController_PWM(p->valuespwm);
+    
+    #warning: for MAIS-controlled joints...do a check on the limits (see MC4 firmware) before physically applying PWM
     
     // 6. apply the pwm. for the case of mc4plus we call hal_pwm();
     for(jm=0; jm<p->config.jomosnumber; jm++)
