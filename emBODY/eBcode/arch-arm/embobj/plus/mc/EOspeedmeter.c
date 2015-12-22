@@ -82,7 +82,7 @@ extern EOabsCalibratedEncoder* eo_absCalibratedEncoder_New(uint8_t ID)
         o->position_last = 0;
         o->position_sure = 0;
         
-        #ifndef USE_2FOC_FAST_ENCODER
+        #if !defined (USE_2FOC_FAST_ENCODER) && !defined(CER_TICKS_CONTROL)
         o->velocity = 0;
         #endif
         
@@ -223,7 +223,7 @@ extern int32_t eo_absCalibratedEncoder_Acquire(EOabsCalibratedEncoder* o, int32_
     {
         encoder_init(o, position, error_mask);
         
-        #ifndef USE_2FOC_FAST_ENCODER
+        #if !defined (USE_2FOC_FAST_ENCODER) && !defined(CER_TICKS_CONTROL)
         o->velocity = 0;
         #endif
         
@@ -252,12 +252,12 @@ extern int32_t eo_absCalibratedEncoder_Acquire(EOabsCalibratedEncoder* o, int32_
                 o->distance += delta;
                 //    o->distance += inc;
                 
-                #ifndef USE_2FOC_FAST_ENCODER
+                #if !defined (USE_2FOC_FAST_ENCODER) && !defined(CER_TICKS_CONTROL)
                 //o->velocity = (7*o->velocity + o->sign*EMS_FREQUENCY_INT32*inc) >> 3;
                 o->velocity = (7*o->velocity + o->sign*EMS_FREQUENCY_INT32*delta) >> 3;
                 #endif
             }
-            #ifndef USE_2FOC_FAST_ENCODER
+            #if !defined (USE_2FOC_FAST_ENCODER) && !defined(CER_TICKS_CONTROL)
             else
             {
                 o->velocity = (7*o->velocity) >> 3;
@@ -268,7 +268,7 @@ extern int32_t eo_absCalibratedEncoder_Acquire(EOabsCalibratedEncoder* o, int32_
         {
             o->spikes_count++;
        
-            #ifndef USE_2FOC_FAST_ENCODER
+            #if !defined (USE_2FOC_FAST_ENCODER) && !defined(CER_TICKS_CONTROL)
             o->velocity = (7*o->velocity) >> 3;
             #endif
         }
@@ -310,7 +310,7 @@ extern eObool_t eo_absCalibratedEncoder_AreThereTooManySpikes(EOabsCalibratedEnc
     
     return eobool_false;
 }
-#ifndef USE_2FOC_FAST_ENCODER
+#if !defined (USE_2FOC_FAST_ENCODER) && !defined(CER_TICKS_CONTROL)
 extern int32_t eo_absCalibratedEncoder_GetVel(EOabsCalibratedEncoder* o)
 {
     return o->velocity;
@@ -323,7 +323,7 @@ extern int32_t eo_absCalibratedEncoder_GetVel(EOabsCalibratedEncoder* o)
 
 
 
-#ifdef USE_2FOC_FAST_ENCODER
+#if defined (USE_2FOC_FAST_ENCODER) || defined (CER_TICKS_CONTROL)
 
 extern EOaxleVirtualEncoder* eo_axleVirtualEncoder_New(void)
 {
@@ -353,7 +353,7 @@ extern void eo_axleVirtualEncoder_Acquire(int32_t gearbox_reduction, EOaxleVirtu
                         
     LIMIT(o->axle_inc_pos, N_BITS_PRECISION_BOUND);
     
-    #ifdef USE_ONLY_QE
+    #if defined (USE_ONLY_QE) || defined(CER_TICKS_CONTROL)
     o->position = axle_virt_pos/gearbox_reduction;
     #else
     //o->position = axle_abs_pos + o->axle_inc_pos/gearbox_reduction;
@@ -409,7 +409,7 @@ static void encoder_init(EOabsCalibratedEncoder* o, int32_t position, uint8_t er
 
         o->distance = position;
         
-        #ifndef USE_2FOC_FAST_ENCODER
+        #if !defined (USE_2FOC_FAST_ENCODER) && !defined(CER_TICKS_CONTROL)
         o->velocity = 0;
         #endif
         

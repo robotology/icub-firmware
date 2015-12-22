@@ -125,7 +125,8 @@ struct EOaxisController_hid
     int32_t pos_to_reach;
     int32_t offset;
     uint8_t isvirtuallycoupled;
-    uint8_t hardwarelimitisreached;
+    uint8_t hardwarelimitreached;
+    uint8_t calibration_finished;
     
     int32_t calibration_zero;
 }; 

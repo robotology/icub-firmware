@@ -243,8 +243,8 @@ extern eOresult_t  eo_appEncReader_GetJointValue(EOappEncReader *p, eo_appEncRea
     }
     
     uint32_t val_raw = 0;;
-    eOresult_t res1 = eores_NOK_generic;
-    eOresult_t res2 = eores_NOK_generic;
+    eOresult_t res1 = eores_OK;
+    eOresult_t res2 = eores_OK;
     eOappEncReader_errortype_t errortype;
     eOappEncReader_joint_t this_joint = p->cfg.joints[joint_number];
 	 

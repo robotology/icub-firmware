@@ -29,6 +29,14 @@ extern "C" {
 #include "EOaxisController.h"
 #include "EoMotionControl.h"
 
+# warning: read commment about ifdef specialization for MC4plus inside the EOemsController
+// the definition of the MACRO is used to call some functions which are included only inside MC4plus project (to read ADC or reset the quadrature encoders).
+// In the future something similar to EOmcService will be included in both applications, and so the handling of the return values will be done from that service;
+// anyway the functions will be visible from both application, making useless these ifdef checks.
+#ifdef USE_MC4PLUS
+#include "EomcService.h"
+#endif
+
 
 // - public #define  --------------------------------------------------------------------------------------------------
 
@@ -128,9 +136,7 @@ extern void eo_emsController_GetMotorStatus(uint8_t mId, eOmc_motor_status_t* mo
 
 extern void eo_emsController_CheckCalibrations(void);
 extern void eo_emsController_ResetCalibrationValues(uint8_t joint);
-extern void eo_emsController_StartCalibration_type3(uint8_t joint, int32_t pos, int32_t vel, int32_t offset);
-extern void eo_emsController_StartCalibration_type6(uint8_t joint, int32_t pos, int32_t vel, int32_t maxencoder);
-extern void eo_emsController_StartCalibration_type5(uint8_t joint, int32_t pwmlimit, int32_t final_position);
+extern void eo_emsController_StartCalibration(uint8_t joint, eOmc_calibration_type_t type, uint32_t* params);
 
 extern void eo_emsController_ResetPosPid(uint8_t joint);
 extern void eo_emsController_ResetTrqPid(uint8_t joint);

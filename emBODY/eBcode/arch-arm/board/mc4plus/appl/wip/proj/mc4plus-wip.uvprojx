@@ -840,11 +840,6 @@
               <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheMAIS.c</FilePath>
             </File>
             <File>
-              <FileName>EOtheCANdiscovery.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheCANdiscovery.c</FilePath>
-            </File>
-            <File>
               <FileName>EOtheInertial.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheInertial.c</FilePath>
@@ -858,6 +853,11 @@
               <FileName>EOtheSKIN.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheSKIN.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOtheCANdiscovery2.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheCANdiscovery2.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2095,11 +2095,6 @@
               <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheMAIS.c</FilePath>
             </File>
             <File>
-              <FileName>EOtheCANdiscovery.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheCANdiscovery.c</FilePath>
-            </File>
-            <File>
               <FileName>EOtheInertial.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheInertial.c</FilePath>
@@ -2113,6 +2108,11 @@
               <FileName>EOtheSKIN.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheSKIN.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOtheCANdiscovery2.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheCANdiscovery2.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -95,8 +95,8 @@ extern EOCurrentsWatchdog* eo_currents_watchdog_Initialise(void)
     if (s_eo_currents_watchdog.numberofmotors == 0)
         return NULL;
     
-    s_eo_currents_watchdog.cfg.i2t_thresh   = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_auto, sizeof(uint16_t), s_eo_currents_watchdog.numberofmotors);
-    memset(s_eo_currents_watchdog.cfg.i2t_thresh, EOK_int08dummy, s_eo_currents_watchdog.numberofmotors*sizeof(uint16_t)); //highest value so that the threshold surely lowers it
+    s_eo_currents_watchdog.cfg.i2t_thresh   = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_auto, sizeof(uint32_t), s_eo_currents_watchdog.numberofmotors);
+    memset(s_eo_currents_watchdog.cfg.i2t_thresh, EOK_int08dummy, s_eo_currents_watchdog.numberofmotors*sizeof(uint32_t)); //highest value so that the threshold surely lowers it
     
     s_eo_currents_watchdog.cfg.spike_thresh = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_auto, sizeof(uint16_t), s_eo_currents_watchdog.numberofmotors);
     memset(s_eo_currents_watchdog.cfg.spike_thresh, EOK_int08dummy, s_eo_currents_watchdog.numberofmotors*sizeof(uint16_t)); //highest value so that the threshold surely lowers it
@@ -155,7 +155,7 @@ extern eOresult_t eo_currents_watchdog_SetSpikeThreshold(EOCurrentsWatchdog* p, 
     return(eores_OK);
 }
 
-extern eOresult_t eo_currents_watchdog_SetI2TThreshold(EOCurrentsWatchdog* p, uint8_t joint, uint16_t threshold)
+extern eOresult_t eo_currents_watchdog_SetI2TThreshold(EOCurrentsWatchdog* p, uint8_t joint, uint32_t threshold)
 {
     if (p == NULL)
     {
@@ -228,6 +228,7 @@ static void s_eo_currents_watchdog_CheckSpike(uint8_t joint, int16_t value)
         {
             //simulate the CANframe used by 2FOC to signal the status
             uint64_t fault_mask = (((uint64_t)(current_state | MOTOR_OVERCURRENT_FAULT)) << 32) & 0xFFFFFFFF00000000; //adding the error to the current state
+            fault_mask |= icubCanProto_controlmode_hwFault; //setting the hard fault of the motor
             eo_motor_set_motor_status( eo_motors_GetHandle(), joint, (uint8_t*)&fault_mask);
         }
     }
@@ -272,6 +273,7 @@ static void s_eo_currents_watchdog_CheckI2T(uint8_t joint, int16_t value)
        {
             //simulate the CANframe used by 2FOC to signal the status
             uint64_t fault_mask = (((uint64_t)(current_state | MOTOR_I2T_LIMIT_FAULT)) << 32) & 0xFFFFFFFF00000000; //adding the error to the current state
+            fault_mask |= icubCanProto_controlmode_hwFault; //setting the hard fault of the motor
             eo_motor_set_motor_status( eo_motors_GetHandle(), joint, (uint8_t*)&fault_mask);
        }
     }        

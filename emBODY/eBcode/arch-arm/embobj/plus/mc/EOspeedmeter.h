@@ -63,11 +63,11 @@ extern void eo_absCalibratedEncoder_ClearFaults(EOabsCalibratedEncoder* o);
 extern eObool_t eo_absCalibratedEncoder_IsOk(EOabsCalibratedEncoder*);
 extern void eo_absCalibratedEncoder_ResetCalibration(EOabsCalibratedEncoder* o);
 extern void eo_absCalibratedEncoder_Calibrate(EOabsCalibratedEncoder*, int32_t offset);
-#ifndef USE_2FOC_FAST_ENCODER
+#if !defined (USE_2FOC_FAST_ENCODER) && !defined(CER_TICKS_CONTROL)
 extern int32_t eo_absCalibratedEncoder_GetVel(EOabsCalibratedEncoder* o);
 #endif
 
-#ifdef USE_2FOC_FAST_ENCODER
+#if defined (USE_2FOC_FAST_ENCODER) || defined (CER_TICKS_CONTROL)
 extern EOaxleVirtualEncoder* eo_axleVirtualEncoder_New(void);
 extern void eo_axleVirtualEncoder_Acquire(int32_t gearbox_reduction, EOaxleVirtualEncoder*, int32_t axle_abs_pos, int32_t axle_virt_pos, int32_t axle_virt_vel);
 extern int32_t eo_axleVirtualEncoder_GetPos(EOaxleVirtualEncoder*);

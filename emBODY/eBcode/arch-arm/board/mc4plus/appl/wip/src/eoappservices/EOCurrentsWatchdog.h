@@ -48,7 +48,7 @@ typedef struct EOCurrentsWatchdog_hid EOCurrentsWatchdog;
 
 typedef struct
 {
-    uint16_t*     i2t_thresh;
+    uint32_t*     i2t_thresh;
 	uint16_t*     spike_thresh;
 } eOcurrents_watchdog_cfg_t;
 
@@ -66,7 +66,7 @@ extern eOresult_t eo_currents_watchdog_Configure(EOCurrentsWatchdog* p, eOcurren
 
 extern eOresult_t eo_currents_watchdog_SetSpikeThreshold(EOCurrentsWatchdog* p, uint8_t joint, uint16_t threshold);
 
-extern eOresult_t eo_currents_watchdog_SetI2TThreshold(EOCurrentsWatchdog* p, uint8_t joint, uint16_t threshold);
+extern eOresult_t eo_currents_watchdog_SetI2TThreshold(EOCurrentsWatchdog* p, uint8_t joint, uint32_t threshold);
 
 void eo_currents_watchdog_Tick(EOCurrentsWatchdog* p);
 

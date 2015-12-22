@@ -433,6 +433,11 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
         //it could be nice to have a double-check every time I go in RUN state (a wire can get broken during normal usage of the robot)
         eo_serv_StartCANdiscovery(eo_serv_GetHandle());
     }
+    //ready straightforward to go in RUN
+    else
+    {
+        eo_serv_SetBoardReadyForControlLoop(eo_serv_GetHandle());
+    }
 }
 
 

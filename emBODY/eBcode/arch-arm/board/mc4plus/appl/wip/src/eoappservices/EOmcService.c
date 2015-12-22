@@ -85,7 +85,15 @@ static void s_eo_mcserv_init_motors_adc_feedbacks(void);
 
 static int16_t s_eo_mcserv_get_current_adc(uint8_t motor);
 
+static uint32_t s_eo_mcserv_get_analog_sensor_adc(uint8_t motor);
+
+static void s_eo_mcserv_init_quad_enc_indexes_interrupt(void);
+
 static uint32_t s_eo_mcserv_get_quad_enc (uint8_t motor);
+
+static eObool_t s_eo_mcserv_is_quad_enc_index_reached (uint8_t motor);
+
+static void s_eo_mcserv_reset_quad_enc(uint8_t motor);
 
 static void s_eo_mcserv_enable_all_motors(EOmcService *p);
 
@@ -344,7 +352,7 @@ extern eOresult_t eo_mcserv_EnableMotor(EOmcService *p, uint8_t joint_index)
     eOemscontroller_board_t board_control = s_eo_mcserv_getboardcontrol();
     
     //check coupled joints
-    if((emscontroller_board_SHOULDER == board_control) || (emscontroller_board_WAIST == board_control))    
+    if((emscontroller_board_SHOULDER == board_control) || (emscontroller_board_WAIST == board_control) || (emscontroller_board_CER_WRIST == board_control))    
     {
       if (joint_index <3) 
       {
@@ -414,7 +422,7 @@ extern eOresult_t eo_mcserv_SetMotorFaultMask(EOmcService *p, uint8_t motor, uin
     eOemscontroller_board_t board_control = s_eo_mcserv_getboardcontrol();
     
     //check coupled joints
-    if((emscontroller_board_SHOULDER == board_control) || (emscontroller_board_WAIST == board_control))    
+    if((emscontroller_board_SHOULDER == board_control) || (emscontroller_board_WAIST == board_control) || (emscontroller_board_CER_WRIST == board_control))    
     {
       if (motor <3) 
       {
@@ -488,6 +496,24 @@ extern int16_t eo_mcserv_GetMotorCurrent(EOmcService *p, uint8_t joint)
     return curr_val;
 }
 
+extern uint32_t eo_mcserv_GetMotorAnalogSensor(EOmcService *p, uint8_t joint)
+{
+    if(NULL == p)
+    {
+        return(NULL);
+    }
+   
+    uint32_t voltage = 0;
+    
+    // if local motor (MC4plus)
+    if(1 == p->config.jomos[joint].actuator.local.type)
+    {
+        voltage = s_eo_mcserv_get_analog_sensor_adc (p->config.jomos[joint].actuator.local.index);
+    }
+   
+    return voltage;
+}
+
 extern uint32_t eo_mcserv_GetMotorPositionRaw(EOmcService *p, uint8_t joint)
 {
     if(NULL == p)
@@ -510,6 +536,40 @@ extern uint32_t eo_mcserv_GetMotorPositionRaw(EOmcService *p, uint8_t joint)
     }
     return pos_val;
 }
+
+extern void eo_mcserv_ResetQuadEncCounter(EOmcService *p, uint8_t joint)
+{
+    if(NULL == p)
+    {
+        return;
+    }
+      
+    // if local motor (MC4plus)
+    if(1 == p->config.jomos[joint].actuator.local.type)
+    {
+        s_eo_mcserv_reset_quad_enc (p->config.jomos[joint].actuator.local.index);
+    }
+     
+}
+
+extern eObool_t eo_mcserv_IsMotorEncoderIndexReached(EOmcService *p, uint8_t joint)
+{
+    if(NULL == p)
+    {
+        return(NULL);
+    }
+   
+    eObool_t indx_reached = eobool_false;
+    
+    // if local motor (MC4plus)
+    if(1 == p->config.jomos[joint].actuator.local.type)
+    {
+        indx_reached = s_eo_mcserv_is_quad_enc_index_reached (p->config.jomos[joint].actuator.local.index);
+    }
+    
+    return indx_reached;
+}
+
 
 extern eOresult_t eo_mcserv_Actuate(EOmcService *p)
 {
@@ -743,7 +803,12 @@ static eOresult_t s_eo_mcserv_init_jomo(EOmcService *p)
                     
                     //store the encoder joint value --> use it when you get the value
                     p->config.jomos[jm].extra_encoder.enc_joint = enc_joint_index;
-                    
+                    if (!p->config.jomos[jm].encoder.isthere)
+                    {
+                        p->config.jomos[jm].encoder.enc_joint = p->config.jomos[jm].extra_encoder.enc_joint;
+                        enc_joint_index++;
+                    }
+                  
                     //only for SPI encoders
                     if (SPI_ENCODER(etype_extra))
                     {
@@ -782,6 +847,9 @@ static eOresult_t s_eo_mcserv_init_jomo(EOmcService *p)
         p->valuespwm             = NULL;
     }
     
+    //activate interupt line for quad_enc indexes check
+    s_eo_mcserv_init_quad_enc_indexes_interrupt();
+    
     return(res);
 }
 
@@ -803,9 +871,30 @@ static int16_t s_eo_mcserv_get_current_adc(uint8_t motor)
     return hal_adc_get_current_motor_mA(motor);
 }
 
+static uint32_t s_eo_mcserv_get_analog_sensor_adc(uint8_t motor)
+{
+    return hal_adc_get_hall_sensor_analog_input_mV(motor);
+}
+
+static void s_eo_mcserv_init_quad_enc_indexes_interrupt(void)
+{
+    hal_quad_enc_init_indexes_flags();
+}
 static uint32_t s_eo_mcserv_get_quad_enc(uint8_t motor)
 {
     return hal_quad_enc_getCounter(motor);
+}
+
+static void s_eo_mcserv_reset_quad_enc(uint8_t motor)
+{
+    hal_quad_enc_reset_counter(motor);
+    
+    return;
+}
+
+static eObool_t s_eo_mcserv_is_quad_enc_index_reached(uint8_t motor)
+{
+    return (eObool_t) hal_quad_is_index_found(motor);
 }
 
 static eOresult_t s_eo_mcserv_can_discovery_start(EOmcService *p)
@@ -985,9 +1074,10 @@ extern eOresult_t s_eo_mcserv_do_mc4plus(EOmcService *p)
     eo_emsController_AcquireAbsEncoders((int32_t*)p->valuesencoder, errormask);
     eo_emsController_CheckFaults();
     
-    // (for MAIS-controlled joints...do a check on the limits (see MC4 firmware) before entering here or inside the controller?)
     // 5. compute the pwm using pid
     eo_emsController_PWM(p->valuespwm);
+    
+    #warning: for MAIS-controlled joints...do a check on the limits (see MC4 firmware) before physically applying PWM
     
     // 6. apply the pwm. for the case of mc4plus we call hal_pwm();
     for(jm=0; jm<p->config.jomosnumber; jm++)
@@ -1134,10 +1224,16 @@ static eOemscontroller_board_t s_eo_mcserv_getboardcontrol(void)
         } break;
         
        
-        // board 17 --> ForeArmV3: wrist (differential coupling, pronosupination), finger abduction
+        // board 18 --> ForeArmV3: wrist (differential coupling, pronosupination), finger abduction
         case 17:
         {
             type = emscontroller_board_FOREARM;
+        } break;
+        
+        // board 22 --> CER_wrist
+        case 21:
+        {
+            type = emscontroller_board_CER_WRIST;
         } break;
         
         

@@ -47,7 +47,7 @@ struct EOabsCalibratedEncoder_hid
     int32_t position_last;
     int32_t position_sure;
     
-    #ifndef USE_2FOC_FAST_ENCODER
+    #if !defined (USE_2FOC_FAST_ENCODER) && !defined(CER_TICKS_CONTROL)
     int32_t velocity;
     #endif
 
