@@ -1198,8 +1198,9 @@ extern void eo_emsController_StartCalibration(uint8_t joint, eOmc_calibration_ty
                         eo_absCalibratedEncoder_Calibrate(ems->abs_calib_encoder[i], 0);
                         
                         //reset quad_enc so that they start from the same value again
+#ifdef USE_MC4PLUS
                         eo_mcserv_ResetQuadEncCounter(eo_mcserv_GetHandle(), i);
-                    
+#endif                    
                         eo_axisController_StartCalibration(ems->axis_controller[i], params);
                 }
                 return;

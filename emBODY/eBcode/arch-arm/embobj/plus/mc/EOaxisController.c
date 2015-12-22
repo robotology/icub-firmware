@@ -61,8 +61,9 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 static void axisMotionReset(EOaxisController *o);
+#ifdef USE_MC4PLUS
 static void s_eo_axisController_CheckHardwareLimitReached(EOaxisController *o);
-
+#endif
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
@@ -763,7 +764,11 @@ extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
                 }
                 
                 if (o->hardwarelimitreached == 0)
+#ifdef USE_MC4PLUS                
                     s_eo_axisController_CheckHardwareLimitReached(o);
+#else
+                    o->hardwarelimitreached = 1;
+#endif
                 else
                 {
                     
@@ -1282,7 +1287,7 @@ static void axisMotionReset(EOaxisController *o)
         o->torque_ref_mot = 0;
         o->err = 0;
 }
-
+#ifdef USE_MC4PLUS
 static void s_eo_axisController_CheckHardwareLimitReached(EOaxisController *o)
 {
     if (o->calibration_type == eomc_calibration_type5_hard_stops_mc4plus)
@@ -1342,7 +1347,7 @@ static void s_eo_axisController_CheckHardwareLimitReached(EOaxisController *o)
     
     return;
 }
-
+#endif
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------
