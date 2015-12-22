@@ -809,7 +809,7 @@ extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
                 }
             }
             // calib type 6
-            else if (o->calibration_type == eomc_calibration_type6_mais_mc4plus)
+            else if (o->calibration_type == eomc_calibration_type6_mais)
             {
                 #warning TBD: MAIS CALIBRATION
                 /*
