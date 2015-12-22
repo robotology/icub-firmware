@@ -951,10 +951,9 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
     if(eobool_true == s_motorcontrol_is2foc_based()) 
     {
         eo_emsController_SetAxisCalibrationZero (jxx, calibrator->params.type3.calibrationZero);
-        eo_emsController_StartCalibration_type3(jxx, 
-                                          calibrator->params.type3.position, 
-                                          calibrator->params.type3.velocity,
-                                          calibrator->params.type3.offset);
+        eo_emsController_StartCalibration(jxx,
+                                          eomc_calibration_type3_abs_sens_digital,
+                                          calibrator->params.any);
 
     }
     else // mc4can
