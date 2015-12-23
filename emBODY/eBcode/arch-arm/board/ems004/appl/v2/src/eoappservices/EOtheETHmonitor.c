@@ -387,7 +387,7 @@ static void s_eo_ethmonitor_taskworker_run(EOMtask *rt, uint32_t n)
 static void s_eo_ethmonitor_query_micrel(void)
 {
     uint8_t mask = 0;
-    hal_ethtransceiver_phystatus_t phys[2] = {0};
+    hal_ethtransceiver_phystatus_t phys[3] = {0};
     uint8_t i = 0;
     uint64_t start = 0;
     uint64_t stop = 0;
@@ -407,12 +407,14 @@ static void s_eo_ethmonitor_query_micrel(void)
     
     s_eo_theethmonitor.portstatus[0].previouson = s_eo_theethmonitor.portstatus[0].on;
     s_eo_theethmonitor.portstatus[1].previouson = s_eo_theethmonitor.portstatus[1].on;
+    s_eo_theethmonitor.portstatus[2].previouson = s_eo_theethmonitor.portstatus[2].on;
     
     s_eo_theethmonitor.portstatus[0].on = mask & 0x01;
     s_eo_theethmonitor.portstatus[1].on = (mask>>1) & 0x01;
+    s_eo_theethmonitor.portstatus[2].on = eobool_true;
     
 //    start = eov_sys_LifeTimeGet(eov_sys_GetHandle());
-    hal_ethtransceiver_phy_status(phys, 2);
+    hal_ethtransceiver_phy_status(phys, 3);
 //    stop = eov_sys_LifeTimeGet(eov_sys_GetHandle());
 //    delta = stop - start;
 //    s_eo_ethmonitor_print_delta("hal_ethtransceiver_phy_status(phys, 2)", delta);

@@ -48,7 +48,7 @@ typedef struct
     hal_ethtransceiver_phyerrorinfo_t   rxcrc;    
 } eOethmonitor_port_status_t;
 
-enum { eOethmonitor_numberofports = 2 };
+enum { eOethmonitor_numberofports = 3 };
 
 struct EOtheETHmonitor_hid
 {
@@ -63,7 +63,7 @@ struct EOtheETHmonitor_hid
     uint8_t                     upmask;
     uint64_t                    lastsequencenumbererror;
     uint16_t                    lastnumberofseqnumbererrors;
-    eOethmonitor_port_status_t  portstatus[eOethmonitor_numberofports];  // for hal_ethtransceiver_phy0 (P2) and hal_ethtransceiver_phy1 (P3)
+    eOethmonitor_port_status_t  portstatus[eOethmonitor_numberofports];  // for hal_ethtransceiver_phy0 (P2) and hal_ethtransceiver_phy1 (P3) and hal_ethtransceiver_phy1 (rmii)
 }; 
 
 
