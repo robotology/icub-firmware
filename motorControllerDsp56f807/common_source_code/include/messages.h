@@ -117,7 +117,8 @@
 { \
 	PREPARE_HEADER; \
 	CAN_LEN = 2; \
-	CAN_DATA[1] = BYTE_H(_useFilter[axis]); \
+	CAN_DATA[1] = (_useFilter[axis]); \
+    CAN1_send(CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
 }
 
 //-------------------------------------------------------------------
