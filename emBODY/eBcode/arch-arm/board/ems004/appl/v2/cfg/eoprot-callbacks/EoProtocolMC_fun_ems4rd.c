@@ -743,7 +743,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
             
             case eomc_setpoint_positionraw:
             {
-                eo_emsController_SetPosRaw(jxx, setpoint->to.position.value);
+                eo_emsController_SetPosRaw(jxx, setpoint->to.positionraw.value);
             } break;
             
             case eomc_setpoint_velocity:
@@ -893,7 +893,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
 
             case eomc_setpoint_positionraw:
             {    
-                pos = eo_mc4boards_Convert_Position_toCAN(mc4boards, jxx, setpoint->to.position.value);
+                pos = eo_mc4boards_Convert_Position_toCAN(mc4boards, jxx, setpoint->to.positionraw.value);
                 command.type  = ICUBCANPROTO_POL_MC_CMD__SET_COMMAND_POSITION; 
                 command.value =  &pos;                   
             } break;
