@@ -78,14 +78,19 @@ typedef struct EOaxisController_hid EOaxisController;
  **/
 extern EOaxisController* eo_axisController_New(uint8_t);
 
+
+extern void eo_axisController_SetItIsVirtuallyCoupled(EOaxisController* o);
+
 //extern eObool_t eo_axisController_HasLimits(EOaxisController *o);
 
 extern void    eo_axisController_SetAxisCalibrationZero (EOaxisController* o, int32_t calibration_zero);
 extern int32_t eo_axisController_GetAxisCalibrationZero (EOaxisController* o);
 
+extern int32_t eo_axisController_GetAxisPos (EOaxisController *o);
+extern int32_t eo_axisController_GetAxisVel (EOaxisController *o);
 extern void eo_axisController_SetEncPos(EOaxisController *o, int32_t pos); 
 extern void eo_axisController_SetEncVel(EOaxisController *o, int32_t vel);
-extern void eo_axisController_SetTorque(EOaxisController *o, int16_t trq);
+extern void eo_axisController_SetTorque(EOaxisController *o, eOmeas_torque_t trq);
 
 //extern int32_t eo_axisController_GetVelocity(EOaxisController *o);
 
@@ -93,6 +98,7 @@ extern void eo_axisController_SetTorque(EOaxisController *o, int16_t trq);
 
 extern eObool_t eo_axisController_SetPosRef(EOaxisController *o, int32_t pos, int32_t avg_vel);
 extern eObool_t eo_axisController_SetVelRef(EOaxisController *o, int32_t vel, int32_t avg_acc);
+extern int16_t eo_axisController_GetVelRef(EOaxisController *o);
 extern eObool_t eo_axisController_SetTrqRef(EOaxisController *o, int32_t trq);
 extern eObool_t eo_axisController_SetPosRaw(EOaxisController *o, int32_t pos);
 extern eObool_t eo_axisController_SetOutput(EOaxisController *o, int16_t out);
@@ -124,6 +130,7 @@ extern void eo_axisController_GetActivePidStatus(EOaxisController *o, eOmc_joint
 extern void eo_axisController_GetJointStatus(EOaxisController *o, eOmc_joint_status_t* jointStatus);
 extern eObool_t eo_axisController_GetMotionDone(EOaxisController *o);
 
+extern EOtrajectory* eo_axisController_GetTraj (EOaxisController *o);
 extern EOpid* eo_axisController_GetPosPidPtr(EOaxisController *o);
 extern EOpid* eo_axisController_GetTrqPidPtr(EOaxisController *o);
 
@@ -133,12 +140,15 @@ extern void eo_axisController_SetTcFilterType(EOaxisController *o, uint8_t filte
 extern void eo_axisController_SetPosPid(EOaxisController *o, float K, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff, float stiction_up, float stiction_down);
 extern void eo_axisController_SetTrqPid(EOaxisController *o, float K, float Kd, float Ki, float Imax, int32_t Ymax, int32_t Yoff, float Kff, float stiction_up, float stiction_down);
 
-extern void eo_axisController_StartCalibration_type3(EOaxisController *o);
-extern void eo_axisController_StartCalibration_type0(EOaxisController *o, int16_t pwmlimit, int16_t vel);
+extern void eo_axisController_StartCalibration(EOaxisController *o, uint32_t* params);
 extern void eo_axisController_SetCalibrated(EOaxisController *o);
+extern void eo_axisController_ResetCalibration(EOaxisController *o);
 extern eObool_t eo_axisController_IsCalibrated(EOaxisController *o);
 
 extern int32_t eo_axisController_EncRangeAdj(EOaxisController *o, int32_t *enc_pos); // shoulder joint 2 only
+extern void eo_axisController_RescaleAxisPosition(EOaxisController *o, int32_t current_pos); //axis controlled by incremental encoders 
+
+extern void eo_axisController_RescaleAxisPositionToVersionVergence(EOaxisController *o2, EOaxisController *o3, int32_t current_pos2, int32_t current_pos3, int joint);
 
 /** @}            
     end of group eo_axisController  

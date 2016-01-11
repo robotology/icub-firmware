@@ -18,18 +18,18 @@
 
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _EOTHEMOTIONDONE_H_
-#define _EOTHEMOTIONDONE_H_
+#ifndef _EOTHESERVICES0_H_
+#define _EOTHESERVICES0_H_
 
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
-/** @file       EOtheMotionDone.h
-    @brief      this object implements what is required for motion done.                
+/** @file       EOtheServices0.h
+    @brief      This file ...                
     @author     marco.accame@iit.it
-    @date       05/28/2015
+    @date       01/09/2015
 **/
 
-/** @defgroup eo_EOtheMotionDone Object EOtheMotionDone
+/** @defgroup eo_EOtheServices0 Object EOtheServices0
     ...... 
     @{        
  **/
@@ -38,15 +38,29 @@
 
 #include "EoCommon.h"
 #include "EoProtocol.h"
+#include "EoMotionControl.h"
+#include "EoAnalogSensors.h"
+#include "EoSkin.h"
 
+#include "EOmcService.h"
+#include "EOtheMAIS.h"
+#include "EOtheCANservice.h"
+#include "EOtheCANdiscovery2.h"
+#include "EOCurrentsWatchdog.h"
 
 // - public #define  --------------------------------------------------------------------------------------------------
-
-//#define EOMOTIONDONE_USEPROXY
-
+// empty-section
+ 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
-typedef struct EOtheMotionDone_hid EOtheMotionDone;
+typedef struct EOtheServices0_hid EOtheServices0;
+
+
+
+typedef struct
+{
+    uint8_t     whatever;
+} eOserv0_cfg_t;
 
 
    
@@ -55,18 +69,27 @@ typedef struct EOtheMotionDone_hid EOtheMotionDone;
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-extern EOtheMotionDone* eo_motiondone_Initialise(void);
+extern EOtheServices0* eo_serv0_Initialise(eOserv0_cfg_t *cfg);
 
-extern EOtheMotionDone* eo_motiondone_GetHandle(void);
+extern EOtheServices0* eo_serv0_GetHandle(void);
 
-// so far only the tick is implemented. it is to be called in the control loop in the do phase.
-extern eOresult_t eo_motiondone_Tick(EOtheMotionDone *p);
+extern eOresult_t eo_serv0_ConfigMC(EOtheServices0 *p, eOmcconfig_cfg_t *mccfg);
 
+extern eOresult_t eo_serv0_InitializeCurrentsWatchdog(EOtheServices0 *p);
 
+extern eOresult_t eo_serv0_ConfigCAN(EOtheServices0 *p, eOcanserv_cfg_t *cancfg);
+
+extern eOresult_t eo_serv0_StartCANdiscovery(EOtheServices0 *p);
+
+extern eObool_t eo_serv0_IsBoardReadyForControlLoop(EOtheServices0 *p);
+
+extern eOresult_t eo_serv0_SetBoardReadyForControlLoop(EOtheServices0 *p);
+
+extern eOresult_t eo_serv0_SendDiscoveryFailureReport(EOtheServices0 *p);
 
 
 /** @}            
-    end of group eo_EOtheMotionDone
+    end of group eo_EOtheServices0
  **/
 
 #endif  // include-guard

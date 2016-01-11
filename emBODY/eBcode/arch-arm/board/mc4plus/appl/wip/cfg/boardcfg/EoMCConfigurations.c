@@ -47,11 +47,11 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 // it contains a pair {value, configuration}
-typedef struct // 2B+12*4B = 50B
+typedef struct // 2B+12*8B = 98B
 {
     uint16_t                value;
     eOmcconfig_jomo_cfg_t   jomos[eomcconfig_jomo_maxnumberof];
-} eomcconfig_codeconfig_t;  EO_VERIFYsizeof(eomcconfig_codeconfig_t, 50);
+} eomcconfig_codeconfig_t;  EO_VERIFYsizeof(eomcconfig_codeconfig_t, 98);
 
 // it contains a pair {string, value}
 typedef struct // 4B+2B = 6B
@@ -132,37 +132,47 @@ const eomcconfig_codeconfig_t eomcconfig_codeconfig_MC4PLUS[] =
 {
     {EO_INIT(.value) eOmcconfig_value_MC4PLUS_unspecified},
     /* experimental configurations */
+    /* Modify these values as needed to run your own experimental configuration. If you are using a setup with more than 2 joints, add a new entry properly */
     {EO_INIT(.value) eOmcconfig_value_MC4PLUS_experimental,
-        EO_INIT(.jomos[0].actuator.local.type)  1, EO_INIT(.jomos[0].actuator.local.index) 3, EO_INIT(.jomos[0].encoder.etype)  2, EO_INIT(.jomos[0].encoder.index)  3
+        EO_INIT(.jomos[0].actuator.local.type)  1, EO_INIT(.jomos[0].actuator.local.index) 2, EO_INIT(.jomos[0].encoder.isthere)       1 ,EO_INIT(.jomos[0].encoder.etype)        2, EO_INIT(.jomos[0].encoder.index)        2, EO_INIT(.jomos[0].encoder.pos_type)       0,
+                                                                                              EO_INIT(.jomos[0].extra_encoder.isthere) 1, EO_INIT(.jomos[0].extra_encoder.etype)  2, EO_INIT(.jomos[0].extra_encoder.index)  2, EO_INIT(.jomos[0].extra_encoder.pos_type) 1,
     },
-    {EO_INIT(.value) eOmcconfig_value_MC4PLUS_experimental_aea1joint,
-        EO_INIT(.jomos[0].actuator.local.type)  1, EO_INIT(.jomos[0].actuator.local.index) 2, EO_INIT(.jomos[0].encoder.etype)  0, EO_INIT(.jomos[0].encoder.index)  0
-    },
-    {EO_INIT(.value) eOmcconfig_value_MC4PLUS_experimental_inc2joint, 
-        EO_INIT(.jomos[0].actuator.local.type)  1, EO_INIT(.jomos[0].actuator.local.index) 2, EO_INIT(.jomos[0].encoder.etype)  2, EO_INIT(.jomos[0].encoder.index)  2,
-        EO_INIT(.jomos[1].actuator.local.type)  1, EO_INIT(.jomos[1].actuator.local.index) 3, EO_INIT(.jomos[1].encoder.etype)  2, EO_INIT(.jomos[1].encoder.index)  3
+    {EO_INIT(.value) eOmcconfig_value_MC4PLUS_experimental_2joints,
+        EO_INIT(.jomos[0].actuator.local.type)  1, EO_INIT(.jomos[0].actuator.local.index) 2, EO_INIT(.jomos[0].encoder.isthere)       1, EO_INIT(.jomos[0].encoder.etype)        2, EO_INIT(.jomos[0].encoder.index)        2, EO_INIT(.jomos[0].encoder.pos_type)       0,
+                                                                                              //EO_INIT(.jomos[0].encoder.isthere)       1, EO_INIT(.jomos[0].encoder.etype)        1, EO_INIT(.jomos[0].encoder.index)        0, EO_INIT(.jomos[0].encoder.pos_type)       0,
+                                                                                              //EO_INIT(.jomos[0].extra_encoder.isthere) 1, EO_INIT(.jomos[0].extra_encoder.etype)  1, EO_INIT(.jomos[0].extra_encoder.index)  0, EO_INIT(.jomos[0].extra_encoder.pos_type) 1,
+                                                                                              EO_INIT(.jomos[0].extra_encoder.isthere) 1, EO_INIT(.jomos[0].extra_encoder.etype)  2, EO_INIT(.jomos[0].extra_encoder.index)  2, EO_INIT(.jomos[0].extra_encoder.pos_type) 1,
+        EO_INIT(.jomos[1].actuator.local.type)  1, EO_INIT(.jomos[1].actuator.local.index) 3, EO_INIT(.jomos[1].encoder.isthere)       1, EO_INIT(.jomos[1].encoder.etype)        2, EO_INIT(.jomos[1].encoder.index)        3, EO_INIT(.jomos[1].encoder.pos_type)       0,
+                                                                                              EO_INIT(.jomos[1].extra_encoder.isthere) 1, EO_INIT(.jomos[1].extra_encoder.etype)  2, EO_INIT(.jomos[1].extra_encoder.index)  3, EO_INIT(.jomos[1].extra_encoder.pos_type) 1,
     },
     
     /* v3 icub head configs */
     //board 12 - b0
     {EO_INIT(.value) eOmcconfig_value_MC4PLUS_b0,
-        // mapping between actuators and encoders for this board is unspecified in the PDF containing HeadV3 schemes...ask maggia
-        EO_INIT(.jomos[0].actuator.local.type)  1, EO_INIT(.jomos[0].actuator.local.index) 0, EO_INIT(.jomos[0].encoder.etype)  0, EO_INIT(.jomos[0].encoder.index)  1,
-        EO_INIT(.jomos[1].actuator.local.type)  1, EO_INIT(.jomos[1].actuator.local.index) 2, EO_INIT(.jomos[1].encoder.etype)  0, EO_INIT(.jomos[1].encoder.index)  0
+        EO_INIT(.jomos[0].actuator.local.type)  1, EO_INIT(.jomos[0].actuator.local.index) 0, EO_INIT(.jomos[0].encoder.isthere)       1, EO_INIT(.jomos[0].encoder.etype)        0, EO_INIT(.jomos[0].encoder.index)        1, EO_INIT(.jomos[0].encoder.pos_type)       0, // j0-> neck-pitch, motor0, aea-encoder
+                                                                                              EO_INIT(.jomos[0].extra_encoder.isthere) 1, EO_INIT(.jomos[0].extra_encoder.etype)  2, EO_INIT(.jomos[0].extra_encoder.index)  0, EO_INIT(.jomos[0].extra_encoder.pos_type) 1,
+        EO_INIT(.jomos[1].actuator.local.type)  1, EO_INIT(.jomos[1].actuator.local.index) 2, EO_INIT(.jomos[1].encoder.isthere)       1, EO_INIT(.jomos[1].encoder.etype)        0, EO_INIT(.jomos[1].encoder.index)        0, EO_INIT(.jomos[1].encoder.pos_type)       0, // j0-> neck-roll, motor2, aea-encoder
+                                                                                              EO_INIT(.jomos[1].extra_encoder.isthere) 1, EO_INIT(.jomos[1].extra_encoder.etype)  2, EO_INIT(.jomos[1].extra_encoder.index)  2, EO_INIT(.jomos[1].extra_encoder.pos_type) 1,
     },
     
     //board 13 - b1
     {EO_INIT(.value) eOmcconfig_value_MC4PLUS_b1, 
-        EO_INIT(.jomos[0].actuator.local.type)  1, EO_INIT(.jomos[0].actuator.local.index) 0, EO_INIT(.jomos[0].encoder.etype)  0, EO_INIT(.jomos[0].encoder.index)  1,
-        EO_INIT(.jomos[1].actuator.local.type)  1, EO_INIT(.jomos[1].actuator.local.index) 1, EO_INIT(.jomos[1].encoder.etype)  0, EO_INIT(.jomos[1].encoder.index)  0,
-        EO_INIT(.jomos[2].actuator.local.type)  1, EO_INIT(.jomos[2].actuator.local.index) 3, EO_INIT(.jomos[2].encoder.etype)  2, EO_INIT(.jomos[2].encoder.index)  3,
-        EO_INIT(.jomos[3].actuator.local.type)  1, EO_INIT(.jomos[3].actuator.local.index) 2, EO_INIT(.jomos[3].encoder.etype)  2, EO_INIT(.jomos[3].encoder.index)  2
+        EO_INIT(.jomos[0].actuator.local.type)  1, EO_INIT(.jomos[0].actuator.local.index) 0, EO_INIT(.jomos[0].encoder.isthere)       1, EO_INIT(.jomos[0].encoder.etype)        0, EO_INIT(.jomos[0].encoder.index)        1, EO_INIT(.jomos[0].encoder.pos_type)       0, // j0-> neck-yaw, motor0, aea-encoder
+                                                                                              EO_INIT(.jomos[0].extra_encoder.isthere) 1, EO_INIT(.jomos[0].extra_encoder.etype)  2, EO_INIT(.jomos[0].extra_encoder.index)  0, EO_INIT(.jomos[0].extra_encoder.pos_type) 1,
+        EO_INIT(.jomos[1].actuator.local.type)  1, EO_INIT(.jomos[1].actuator.local.index) 1, EO_INIT(.jomos[1].encoder.isthere)       1, EO_INIT(.jomos[1].encoder.etype)        0, EO_INIT(.jomos[1].encoder.index)        0, EO_INIT(.jomos[1].encoder.pos_type)       0, // j1-> eyes tilt, motor1, aea-encoder
+                                                                                              EO_INIT(.jomos[1].extra_encoder.isthere) 1, EO_INIT(.jomos[1].extra_encoder.etype)  2, EO_INIT(.jomos[1].extra_encoder.index)  1, EO_INIT(.jomos[1].extra_encoder.pos_type) 1,
+        EO_INIT(.jomos[2].actuator.local.type)  1, EO_INIT(.jomos[2].actuator.local.index) 3, EO_INIT(.jomos[2].encoder.isthere)       1, EO_INIT(.jomos[2].encoder.etype)        2, EO_INIT(.jomos[2].encoder.index)        3, EO_INIT(.jomos[2].encoder.pos_type)       0, // j2-> right-eye, motor3, inc-encoder
+                                                                                              EO_INIT(.jomos[2].extra_encoder.isthere) 1, EO_INIT(.jomos[2].extra_encoder.etype)  2, EO_INIT(.jomos[2].extra_encoder.index)  3, EO_INIT(.jomos[2].extra_encoder.pos_type) 1,
+        EO_INIT(.jomos[3].actuator.local.type)  1, EO_INIT(.jomos[3].actuator.local.index) 2, EO_INIT(.jomos[3].encoder.isthere)       1, EO_INIT(.jomos[3].encoder.etype)        2, EO_INIT(.jomos[3].encoder.index)        2, EO_INIT(.jomos[3].encoder.pos_type)       0, // j3-> left-eye, motor2, inc-encoder
+                                                                                              EO_INIT(.jomos[3].extra_encoder.isthere) 1, EO_INIT(.jomos[3].extra_encoder.etype)  2, EO_INIT(.jomos[3].extra_encoder.index)  2, EO_INIT(.jomos[3].extra_encoder.pos_type) 1,
     },
     
+    /* v3 icub face configs */
     //board 14 - b7
     {EO_INIT(.value) eOmcconfig_value_MC4PLUS_b7, 
-        EO_INIT(.jomos[0].actuator.local.type)  1, EO_INIT(.jomos[0].actuator.local.index) 0, EO_INIT(.jomos[0].encoder.etype)  0, EO_INIT(.jomos[0].encoder.index)  1, // j0-> jaw, motor0, aea-encoder
-        EO_INIT(.jomos[1].actuator.local.type)  1, EO_INIT(.jomos[1].actuator.local.index) 1, EO_INIT(.jomos[1].encoder.etype)  0, EO_INIT(.jomos[1].encoder.index)  0, // j1-> eyelids, motor1, aea-encoder
+        EO_INIT(.jomos[0].actuator.local.type)  1, EO_INIT(.jomos[0].actuator.local.index) 0, EO_INIT(.jomos[0].encoder.isthere)       1, EO_INIT(.jomos[0].encoder.etype)        0, EO_INIT(.jomos[0].encoder.index)        1, EO_INIT(.jomos[0].encoder.pos_type)       0,// j0-> jaw, motor0, aea-encoder
+        EO_INIT(.jomos[1].actuator.local.type)  1, EO_INIT(.jomos[1].actuator.local.index) 1, EO_INIT(.jomos[1].encoder.isthere)       1, EO_INIT(.jomos[1].encoder.etype)        0, EO_INIT(.jomos[1].encoder.index)        0, EO_INIT(.jomos[1].encoder.pos_type)       0,// j1-> eyelids, motor1, aea-encoder
+                                                                                              EO_INIT(.jomos[1].extra_encoder.isthere) 1, EO_INIT(.jomos[1].extra_encoder.etype)  2, EO_INIT(.jomos[1].extra_encoder.index)  1, EO_INIT(.jomos[1].extra_encoder.pos_type) 1,
     },
     
     //board 15 - b9
@@ -181,52 +191,112 @@ const eomcconfig_codeconfig_t eomcconfig_codeconfig_MC4PLUS[] =
 
 
         // order is coherent with .xml file from grenoble: lip-left is j0 (not j3), lip-high is j1 (not j0), lip-right is j2 (j2 as before), lip-bottom is j3 (not j1)
-        EO_INIT(.jomos[0].actuator.local.type)  1, EO_INIT(.jomos[0].actuator.local.index) 2, EO_INIT(.jomos[0].encoder.etype)  2, EO_INIT(.jomos[0].encoder.index)  2, // j0-> lip-left, motor2, incremental-encoder
-        EO_INIT(.jomos[1].actuator.local.type)  1, EO_INIT(.jomos[1].actuator.local.index) 1, EO_INIT(.jomos[1].encoder.etype)  2, EO_INIT(.jomos[1].encoder.index)  1, // j1-> lip-high, motor1, incremental-encoder
-        EO_INIT(.jomos[2].actuator.local.type)  1, EO_INIT(.jomos[2].actuator.local.index) 0, EO_INIT(.jomos[2].encoder.etype)  2, EO_INIT(.jomos[2].encoder.index)  0, // j2-> lip-right, motor0, incremental-encoder
-        EO_INIT(.jomos[3].actuator.local.type)  1, EO_INIT(.jomos[3].actuator.local.index) 3, EO_INIT(.jomos[3].encoder.etype)  2, EO_INIT(.jomos[3].encoder.index)  3  // j3-> lip-bottom, motor3, incremental-encoder
+        EO_INIT(.jomos[0].actuator.local.type)  1, EO_INIT(.jomos[0].actuator.local.index) 2, EO_INIT(.jomos[0].encoder.isthere)       1, EO_INIT(.jomos[0].encoder.etype)         2, EO_INIT(.jomos[0].encoder.index)        2, EO_INIT(.jomos[0].encoder.pos_type)       0, // j0-> lip-left, motor2, inc-encoder
+                                                                                              EO_INIT(.jomos[0].extra_encoder.isthere) 1, EO_INIT(.jomos[0].extra_encoder.etype)   2, EO_INIT(.jomos[0].extra_encoder.index)  2, EO_INIT(.jomos[0].extra_encoder.pos_type) 1,
+        EO_INIT(.jomos[1].actuator.local.type)  1, EO_INIT(.jomos[1].actuator.local.index) 1, EO_INIT(.jomos[1].encoder.isthere)       1, EO_INIT(.jomos[1].encoder.etype)         2, EO_INIT(.jomos[1].encoder.index)        1, EO_INIT(.jomos[1].encoder.pos_type)       0, // j1-> lip-high, motor1, inc-encoder
+                                                                                              EO_INIT(.jomos[1].extra_encoder.isthere) 1, EO_INIT(.jomos[1].extra_encoder.etype)   2, EO_INIT(.jomos[1].extra_encoder.index)  1, EO_INIT(.jomos[1].extra_encoder.pos_type) 1,
+        EO_INIT(.jomos[2].actuator.local.type)  1, EO_INIT(.jomos[2].actuator.local.index) 0, EO_INIT(.jomos[2].encoder.isthere)       1, EO_INIT(.jomos[2].encoder.etype)         2, EO_INIT(.jomos[2].encoder.index)        0, EO_INIT(.jomos[2].encoder.pos_type)       0, // j2-> lip-right,motor0, inc-encoder
+                                                                                              EO_INIT(.jomos[2].extra_encoder.isthere) 1, EO_INIT(.jomos[2].extra_encoder.etype)   2, EO_INIT(.jomos[2].extra_encoder.index)  0, EO_INIT(.jomos[2].extra_encoder.pos_type) 1,
+        EO_INIT(.jomos[3].actuator.local.type)  1, EO_INIT(.jomos[3].actuator.local.index) 3, EO_INIT(.jomos[3].encoder.isthere)       1, EO_INIT(.jomos[3].encoder.etype)         2, EO_INIT(.jomos[3].encoder.index)        3, EO_INIT(.jomos[3].encoder.pos_type)       0, // j3-> lip-bottom, motor3, inc-encoder
+                                                                                              EO_INIT(.jomos[3].extra_encoder.isthere) 1, EO_INIT(.jomos[3].extra_encoder.etype)   2, EO_INIT(.jomos[3].extra_encoder.index)  3, EO_INIT(.jomos[3].extra_encoder.pos_type) 1,
     },
     
-}; EO_VERIFYsizeof(eomcconfig_codeconfig_MC4PLUS, eOmcconfig_value_MC4PLUS_numberof*sizeof(const eomcconfig_codeconfig_t)); 
+    /* v3 icub left-forearm boards */
+    //board 16 - 1b4
+    //right order of the joint (for high-level) must be checked
+    {EO_INIT(.value) eOmcconfig_value_MC4PLUS_1b4, 
+        EO_INIT(.jomos[0].actuator.local.type)  1, EO_INIT(.jomos[0].actuator.local.index) 0, EO_INIT(.jomos[0].encoder.isthere)       1, EO_INIT(.jomos[0].encoder.etype)        4, EO_INIT(.jomos[0].encoder.index)        0, EO_INIT(.jomos[0].encoder.pos_type)       0, // j0-> index-distal, motor0, mais, 0 stands for 1st mais entity
+                                                                                              EO_INIT(.jomos[0].extra_encoder.isthere) 1, EO_INIT(.jomos[0].extra_encoder.etype)  1, EO_INIT(.jomos[0].extra_encoder.index)  0, EO_INIT(.jomos[0].extra_encoder.pos_type) 1,
+        EO_INIT(.jomos[1].actuator.local.type)  1, EO_INIT(.jomos[1].actuator.local.index) 1, EO_INIT(.jomos[1].encoder.isthere)       1, EO_INIT(.jomos[1].encoder.etype)        4, EO_INIT(.jomos[1].encoder.index)        0, EO_INIT(.jomos[1].encoder.pos_type)       0, // j1-> middle-proximal, motor1, mais
+                                                                                              EO_INIT(.jomos[1].extra_encoder.isthere) 1, EO_INIT(.jomos[1].extra_encoder.etype)  1, EO_INIT(.jomos[1].extra_encoder.index)  0, EO_INIT(.jomos[1].extra_encoder.pos_type) 1,
+        EO_INIT(.jomos[2].actuator.local.type)  1, EO_INIT(.jomos[2].actuator.local.index) 2, EO_INIT(.jomos[2].encoder.isthere)       1, EO_INIT(.jomos[2].encoder.etype)        4, EO_INIT(.jomos[2].encoder.index)        0, EO_INIT(.jomos[2].encoder.pos_type)       0, // j2-> middle-distal, motor2, mais
+                                                                                              EO_INIT(.jomos[2].extra_encoder.isthere) 1, EO_INIT(.jomos[2].extra_encoder.etype)  1, EO_INIT(.jomos[2].extra_encoder.index)  0, EO_INIT(.jomos[2].extra_encoder.pos_type) 1,
+        EO_INIT(.jomos[3].actuator.local.type)  1, EO_INIT(.jomos[3].actuator.local.index) 3, EO_INIT(.jomos[3].encoder.isthere)       1, EO_INIT(.jomos[3].encoder.etype)        4, EO_INIT(.jomos[3].encoder.index)        0, EO_INIT(.jomos[3].encoder.pos_type)       0,  // j3-> little-fingers, motor3, mais
+                                                                                              EO_INIT(.jomos[3].extra_encoder.isthere) 1, EO_INIT(.jomos[3].extra_encoder.etype)  1, EO_INIT(.jomos[3].extra_encoder.index)  0, EO_INIT(.jomos[3].extra_encoder.pos_type) 1,
+    },
+    
+    /* CER-wrist board */
+    {EO_INIT(.value) eOmcconfig_value_MC4PLUS_CER_wrist,
+        EO_INIT(.jomos[0].actuator.local.type)  1, EO_INIT(.jomos[0].actuator.local.index) 0, EO_INIT(.jomos[0].encoder.isthere)       0, /*EO_INIT(.jomos[0].encoder.etype)        2, EO_INIT(.jomos[0].encoder.index)        0, EO_INIT(.jomos[0].encoder.pos_type)       0,*/
+                                                                                              EO_INIT(.jomos[0].extra_encoder.isthere) 1, EO_INIT(.jomos[0].extra_encoder.etype)  2, EO_INIT(.jomos[0].extra_encoder.index)  0, EO_INIT(.jomos[0].extra_encoder.pos_type) 1,
+        EO_INIT(.jomos[1].actuator.local.type)  1, EO_INIT(.jomos[1].actuator.local.index) 1, EO_INIT(.jomos[1].encoder.isthere)       0,
+                                                                                              EO_INIT(.jomos[1].extra_encoder.isthere) 1, EO_INIT(.jomos[1].extra_encoder.etype)  2, EO_INIT(.jomos[1].extra_encoder.index)  1, EO_INIT(.jomos[1].extra_encoder.pos_type) 1,
+        EO_INIT(.jomos[2].actuator.local.type)  1, EO_INIT(.jomos[2].actuator.local.index) 2, EO_INIT(.jomos[2].encoder.isthere)       0, 
+                                                                                              EO_INIT(.jomos[2].extra_encoder.isthere) 1, EO_INIT(.jomos[2].extra_encoder.etype)  2, EO_INIT(.jomos[2].extra_encoder.index)  2, EO_INIT(.jomos[2].extra_encoder.pos_type) 1,
+        /*EO_INIT(.jomos[0].actuator.local.type)  1, EO_INIT(.jomos[0].actuator.local.index) 0, EO_INIT(.jomos[0].encoder.isthere)       0,
+                                                                                              EO_INIT(.jomos[0].extra_encoder.isthere) 1, EO_INIT(.jomos[0].extra_encoder.etype)  2, EO_INIT(.jomos[0].extra_encoder.index)  0, EO_INIT(.jomos[0].extra_encoder.pos_type) 1, */
+    }
+    
+}; EO_VERIFYsizeof(eomcconfig_codeconfig_MC4PLUS, eOmcconfig_value_MC4PLUS_numberof*sizeof(const eomcconfig_codeconfig_t));
 
 const eomcconfig_valuestring_t eomcconfig_valuestring_MC4PLUS[] =
 {
     {EO_INIT(.value) eOmcconfig_value_MC4PLUS_unspecified,              EO_INIT(.string) "Unspecified configuration"},
     {EO_INIT(.value) eOmcconfig_value_MC4PLUS_experimental,             EO_INIT(.string) "MC4Plus_experimental_jig"},
-    {EO_INIT(.value) eOmcconfig_value_MC4PLUS_experimental_aea1joint,   EO_INIT(.string) "MC4Plus_experimental_jig_aea1joint"},
-    {EO_INIT(.value) eOmcconfig_value_MC4PLUS_experimental_inc2joint,   EO_INIT(.string) "MC4Plus_experimental_jig_inc2joint"},
+    {EO_INIT(.value) eOmcconfig_value_MC4PLUS_experimental_2joints,     EO_INIT(.string) "MC4Plus_experimental_jig_2joints"},
     {EO_INIT(.value) eOmcconfig_value_MC4PLUS_b0,                       EO_INIT(.string) "MC4plus_b0"},
     {EO_INIT(.value) eOmcconfig_value_MC4PLUS_b1,                       EO_INIT(.string) "MC4plus_b1"},
     {EO_INIT(.value) eOmcconfig_value_MC4PLUS_b7,                       EO_INIT(.string) "MC4plus_b7"},
-    {EO_INIT(.value) eOmcconfig_value_MC4PLUS_b9,                       EO_INIT(.string) "MC4plus_b9"}
+    {EO_INIT(.value) eOmcconfig_value_MC4PLUS_b9,                       EO_INIT(.string) "MC4plus_b9"},
+    {EO_INIT(.value) eOmcconfig_value_MC4PLUS_1b4,                      EO_INIT(.string) "MC4plus_1b4"},
+    {EO_INIT(.value) eOmcconfig_value_MC4PLUS_CER_wrist,                EO_INIT(.string) "MC4plus_CER_wrist"}
 };
 
 
 
 //MC config for boards
-enum { eOmcconfig_boardjomosnumberof = 5 };
+enum { eOmcconfig_boardjomosnumberof = 10 };
 const eomcconfig_boardjomos_t eomcconfig_boardjomos_MC4PLUS[] =
 {
-    /* v3 icub head boards */
-    {EO_INIT(.board_num) 11,  EO_INIT (.joints) 2}, //board 12, b0
-    {EO_INIT(.board_num) 12,  EO_INIT (.joints) 4}, //board 13, b1
-    {EO_INIT(.board_num) 13,  EO_INIT (.joints) 2}, //board 14, b7
-    {EO_INIT(.board_num) 14,  EO_INIT (.joints) 4}, //board 15, b9
-    
-    /* others */
+    /* experimentals */
+    {EO_INIT(.board_num) 97,  EO_INIT (.joints) 2}, // experimental board
     {EO_INIT(.board_num) 98,  EO_INIT (.joints) 1}, // experimental board
+    
+    /* v3 icub head boards */
+    {EO_INIT(.board_num) 11,  EO_INIT (.joints) 2}, //board 12, 0b0
+    {EO_INIT(.board_num) 12,  EO_INIT (.joints) 4}, //board 13, 0b1
+    /* v3 icub face boards */
+    {EO_INIT(.board_num) 13,  EO_INIT (.joints) 2}, //board 14, 0b7
+    {EO_INIT(.board_num) 14,  EO_INIT (.joints) 4}, //board 15, 0b9
+    
+    /* v3 icub left-forearm boards */
+    {EO_INIT(.board_num) 15,  EO_INIT (.joints) 4}, //board 16, 1b4
+    {EO_INIT(.board_num) 16,  EO_INIT (.joints) 4}, //board 17, 1b3
+    {EO_INIT(.board_num) 17,  EO_INIT (.joints) 4}, //board 18, 1b2
+    
+    /* v3 icub right-forearm boards */
+    //TBA
+    
+    /* CER-wrist board */
+    {EO_INIT(.board_num) 21,  EO_INIT (.joints) 3}  // board 19, CER-wrist (4 joints! --> 3 for tripod and 1 for rotation)
+
 }; EO_VERIFYsizeof(eomcconfig_boardjomos_MC4PLUS, eOmcconfig_boardjomosnumberof*sizeof(eomcconfig_boardjomos_t));
 
 const eomcconfig_boardcode_t eomcconfig_boardcode_MC4PLUS[] =
 {
-    /* v3 icub head boards */
-    {EO_INIT(.board_num) 11,  EO_INIT (.value) eOmcconfig_value_MC4PLUS_b0}, //board 12, b0
-    {EO_INIT(.board_num) 12,  EO_INIT (.value) eOmcconfig_value_MC4PLUS_b1}, //board 13, b1
-    {EO_INIT(.board_num) 13,  EO_INIT (.value) eOmcconfig_value_MC4PLUS_b7}, //board 14, b7
-    {EO_INIT(.board_num) 14,  EO_INIT (.value) eOmcconfig_value_MC4PLUS_b9}, //board 15, b9
-    
-    /* others */
+    /* experimentals */
+    {EO_INIT(.board_num) 97,  EO_INIT (.value) eOmcconfig_value_MC4PLUS_experimental_2joints}, // experimental board
     {EO_INIT(.board_num) 98,  EO_INIT (.value) eOmcconfig_value_MC4PLUS_experimental}, // experimental board
+    
+    /* v3 icub head boards */
+    {EO_INIT(.board_num) 11,  EO_INIT (.value) eOmcconfig_value_MC4PLUS_b0}, //board 12, 0b0
+    {EO_INIT(.board_num) 12,  EO_INIT (.value) eOmcconfig_value_MC4PLUS_b1}, //board 13, 0b1
+    /* v3 icub face boards */
+    {EO_INIT(.board_num) 13,  EO_INIT (.value) eOmcconfig_value_MC4PLUS_b7}, //board 14, 0b7
+    {EO_INIT(.board_num) 14,  EO_INIT (.value) eOmcconfig_value_MC4PLUS_b9}, //board 15, 0b9
+    
+    /* v3 icub left-forearm boards */
+    {EO_INIT(.board_num) 15,  EO_INIT (.value) eOmcconfig_value_MC4PLUS_1b4},         //board 16, 1b4
+    {EO_INIT(.board_num) 16,  EO_INIT (.value) eOmcconfig_value_MC4PLUS_unspecified}, //board 17, 1b3
+    {EO_INIT(.board_num) 17,  EO_INIT (.value) eOmcconfig_value_MC4PLUS_unspecified}, //board 18, 1b2
+    
+    
+    /* v3 icub right-forearm boards */
+    //TBA
+    
+    /* CER-wrist board */
+    {EO_INIT(.board_num) 21,  EO_INIT (.value) eOmcconfig_value_MC4PLUS_CER_wrist}
+    
 }; EO_VERIFYsizeof(eomcconfig_boardcode_MC4PLUS, eOmcconfig_boardjomosnumberof*sizeof(eomcconfig_boardcode_t));
 
 //const pointer reference to const structures

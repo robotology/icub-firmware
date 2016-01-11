@@ -82,7 +82,8 @@ struct EOMtheEMSrunner_hid
     uint8_t             usedTXdecimationfactor;
     eObool_t            itisaTXcycle;
     eOtransmitter_ropsnumber_t  txropsnumberincycle;
-    eObool_t            prevTXactiviySentRegularROPs;
+    uint8_t             txcan1frames;
+    uint8_t             txcan2frames;
 };
 
 
@@ -114,7 +115,7 @@ extern void eom_emsrunner_hid_userdef_onemstransceivererror(EOMtheEMStransceiver
 extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(EOMtheEMSrunner *p);
 // default function for RX-datagram-reception: it repeates upto xx times: get a pkt, call the transceiver, verifies if a quit evt has arrived.
 extern void eom_emsrunner_hid_userdef_taskRX_activity_datagramreception(EOMtheEMSrunner *p);
-// deafult function for RX-after-datagram-reception
+// default function for RX-after-datagram-reception
 extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOMtheEMSrunner *p);
 
 

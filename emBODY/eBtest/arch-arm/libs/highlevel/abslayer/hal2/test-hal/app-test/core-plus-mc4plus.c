@@ -108,6 +108,8 @@
 #undef EXECUTE_TEST_ENCODER_SPI
 //#define EXECUTE_TEST_ENCODER_SPI
 
+#undef EXECUTE_TEST_QUAD_ENC
+//#define EXECUTE_TEST_QUAD_ENC
 
 #define haLcAn1    hal_can1
 //#define haLcAn2    hal_can2
@@ -121,7 +123,6 @@
 #define EXECUTE_TEST_CAN_TX1
 
 //#define EXECUTE_TEST_CAN_TX1_RX2
-//#define EXECUTE_TEST_ETH_UDP_RECEIVEANDREPLY
 #endif//EXECUTE_TEST_CAN
 
 #undef EXECUTE_TEST_SWITCH
@@ -137,8 +138,7 @@
 //#define EXECUTE_TEST_DEVICE_MOTORCTL
 
 #ifdef EXECUTE_TEST_ETH
-//#define EXECUTE_TEST_ETH_PING
-#define EXECUTE_TEST_ETH_UDP_RECEIVEANDREPLY
+#define EXECUTE_TEST_ETH_PING
 //#define EXECUTE_TEST_ETH_UDP_RECEIVEANDREPLY
 #endif
 
@@ -239,9 +239,11 @@ static int16_t current[4]={0,0,0,0};
 
 #if     defined(EXECUTE_TEST_ENCODER_SPI)    
 static void test_encoder_spi(void);
-static void test_quad_enc(void);
 #endif//defined(EXECUTE_TEST_ENCODER_SPI) 
-
+#if     defined(EXECUTE_TEST_QUAD_ENC)
+static void test_quad_enc_real_motor(void);
+static void test_quad_enc_jig_encoders(void);
+#endif//defined(EXECUTE_TEST_QUAD_ENC)
 
 #if     defined(EXECUTE_TEST_ADC)    
 static void test_periph_adc(void);
@@ -459,14 +461,20 @@ int main(void)
     //test_periph_adc_new_api();
     test_periph_adc_motors();
     hal_sys_delay(2*hal_RELTIME_1second);
-		
+#endif//defined(EXECUTE_TEST_ADC) 
+
 #if     defined(EXECUTE_TEST_ENCODER_SPI)
-	//test_encoder_spi();
-    test_quad_enc();
+	test_encoder_spi();
     hal_sys_delay(2*hal_RELTIME_1second);
 #endif//defined(EXECUTE_TEST_ENCODER_SPI)
+
+#if     defined(EXECUTE_TEST_QUAD_ENC)
+    test_quad_enc_real_motor();
+    //test_quad_enc_jig_encoders();
+    hal_sys_delay(2*hal_RELTIME_1second);
+#endif//defined(EXECUTE_TEST_QUAD_ENC)
  
-#endif//defined(EXECUTE_TEST_ADC) 
+
 
 #if     defined(EXECUTE_TEST_DEVICE_MOTORCTL)    
     //test_device_motorctl_1();
@@ -1082,49 +1090,137 @@ static void test_encoder_spi(void)
   test_was_successful("encoder as5048-as5055"); 
 	    
 }
+#endif//defined(EXECUTE_TEST_ENCODER_SPI)  
 
-static void test_quad_enc(void)
+#if     defined(EXECUTE_TEST_QUAD_ENC)
+
+static const hal_can_cfg_t canconfigbase_quadenc =
 {
-    test_is_beginning("quad_enc:");
+    .runmode                    = hal_can_runmode_isr_1txq1rxq,
+    .baudrate                   = hal_can_baudrate_1mbps,
+    .priorx                     = hal_int_priority10,
+    .priotx                     = hal_int_priority11,
+    .capacityofrxfifoofframes   = 8,
+    .capacityoftxfifoofframes   = 8,
+    .capacityoftxfifohighprio   = 0,
+    .callback_on_rx             = NULL,
+    .arg_cb_rx                  = NULL,
+    .callback_on_tx             = NULL,
+    .arg_cb_tx                  = NULL
+};
+
+static void test_quad_enc_real_motor(void)
+{
+    test_is_beginning("quad_enc: motors");
     
-    //hal_quad_enc_Init();
     hal_quad_enc_single_init(0);
-    hal_quad_enc_single_init(1);
+    //hal_quad_enc_single_init(1); //you can't see trace if this init is enabled --> common PIN
     hal_quad_enc_single_init(2);
     hal_quad_enc_single_init(3);
     
-    //fake init, it should return doing nothing
-    hal_quad_enc_single_init(10);
+    //activate interrupt on indexes
+    hal_quad_enc_init_indexes_flags();
+  
+    //initialize motors
+    hal_motors_extfault_handling_init();
+    hal_motor_enable(motor1);
+    hal_motor_enable(motor2);
+    hal_motor_enable(motor3);
+    hal_motor_enable(motor4);
+    
+    //init the CAN
+	hal_can_frame_t canframe;
+    hal_can_init(hal_can1, &canconfigbase_quadenc);
+    hal_can_enable(hal_can1);
     
     char str_quad_enc[64];
-    for(uint8_t i = 0; i< 50; i++)
+
+    hal_bool_t finished = hal_false;
+    hal_result_t res;
+    uint8_t remaining = 0;
+    int16_t pwm=0;
+    uint32_t cnt = 0;
+    //creating a loop to control in openloop the motors and in the meanwhile reading the ADCs (don't know yet the association, if it occurs)
+    while(finished == hal_false)
+	{
+		res = hal_can_get(hal_can1, &canframe, &remaining); 
+		if (res==hal_res_OK) 
+		{
+			switch (canframe.data[0]) //in data 0 there is the command: 0..3 pwm for motor 0..3, F= finished  
+			{
+                // switch off all the motors
+                case 0xF: 
+                {
+                    pwm=0; 	
+                    hal_motor_pwmset(motor1,pwm);
+                    hal_motor_pwmset(motor2,pwm);
+                    hal_motor_pwmset(motor3,pwm);
+                    hal_motor_pwmset(motor4,pwm);
+                    
+                    finished = hal_true;
+                }
+                break;
+                // set the pwm written in data[1] and data[2]
+                default:
+                {
+                    //reconstruct value from data[1] and data[2]
+                    pwm=canframe.data[1] + ( canframe.data[2]<<8);
+                   
+                    //sign is in data[3] (0 positive, 1 negative)
+                    if (canframe.data[3] == 1)
+                        pwm = -pwm;
+                    
+                    //in data[0] there's the ID of the motor
+                    hal_motor_pwmset((hal_motor_t) canframe.data[0],(int32_t)pwm);
+                }
+                break;
+			}
+        }
+        
+        for(uint8_t i = 0; i<4; i++)
+        {
+            cnt = hal_quad_enc_getCounter(i);
+            snprintf(str_quad_enc, sizeof(str_quad_enc), "Encoder %d counter value: %d", i+1, cnt);
+            test_message(str_quad_enc);
+        }
+		
+        hal_trace_puts("\n\n");
+        hal_sys_delay(500*hal_RELTIME_1millisec);
+    }
+
+    test_was_successful("quad_enc: motors test ended");
+}
+
+static void test_quad_enc_jig_encoders(void)
+{
+    test_is_beginning("quad_enc: jig-setup");
+    
+    hal_quad_enc_single_init(0);
+    //hal_quad_enc_single_init(1);
+    hal_quad_enc_single_init(2);
+    hal_quad_enc_single_init(3);
+    
+    //activate interrupt on indexes
+    hal_quad_enc_init_indexes_flags();
+      
+    char str_quad_enc[64];
+    for(uint8_t i = 0; i< 200; i++)
     {
         uint32_t cnt =  0;
-        static uint16_t step = 0;
-        step++;
-        //Test to reset 
-        if (step == 100)
-        {
-            hal_quad_enc_reset_counter(0);
-            hal_quad_enc_reset_counter(1);
-            hal_quad_enc_reset_counter(2);
-            hal_quad_enc_reset_counter(3);
-        }
+        hal_bool_t isindxfnd =  hal_false;
         for(uint8_t i = 0; i<4; i++)
         {
             hal_sys_delay(10*hal_RELTIME_1millisec);
             cnt = hal_quad_enc_getCounter(i);
-            snprintf(str_quad_enc, sizeof(str_quad_enc), "Encoder %d counter value: %d", i+1, cnt);
+            isindxfnd = hal_quad_is_index_found(i);
+            snprintf(str_quad_enc, sizeof(str_quad_enc), "Encoder %d counter value: %d, indexfound: %d", i+1, cnt, isindxfnd);
             test_message(str_quad_enc);
-            //print_tag_utility("QUADRATURE ENC", str_quad_enc);
         }
         test_message("\n");
         hal_sys_delay(500*hal_RELTIME_1millisec);
     }
 }
-#endif//defined(EXECUTE_TEST_ENCODER_SPI)  
-
-
+#endif//defined(EXECUTE_TEST_QUAD_ENC)
 
 #if     defined(EXECUTE_TEST_EEPROM)
 
@@ -1261,8 +1357,8 @@ static void test_timer_callback_blink3(void* p)
 
 static const hal_timer_t haltimer_ontest = hal_timer6;
 
-static const hal_timer_t haltimer_blink1 = hal_timer9;
-static const hal_timer_t haltimer_blink2 = hal_timer10;
+static const hal_timer_t haltimer_blink1 = hal_timer6;
+static const hal_timer_t haltimer_blink2 = hal_timer7;
 static const hal_timer_t haltimer_blink3 = hal_timer11;
 
 static const hal_timer_cfg_t test_timer_config =
@@ -1332,17 +1428,17 @@ static void test_periph_timer2(void)
 	test_is_beginning("timer: check conflict test");
 
 	hal_result_t res = hal_res_OK;
-    //res += hal_timer_init(haltimer_blink1, &test_timer_config_blink, NULL);
+    res += hal_timer_init(haltimer_blink1, &test_timer_config_blink, NULL);
     
     test_timer_config_blink.callback_on_exp = test_timer_callback_blink2;
 	res += hal_timer_init(haltimer_blink2, &test_timer_config_blink, NULL);
     
-    //test_timer_config_blink.callback_on_exp = test_timer_callback_blink3;
-	//res += hal_timer_init(haltimer_blink3, &test_timer_config_blink, NULL);
+    test_timer_config_blink.callback_on_exp = test_timer_callback_blink3;
+	res += hal_timer_init(haltimer_blink3, &test_timer_config_blink, NULL);
 
-    //res += hal_timer_start(haltimer_blink1);
+    res += hal_timer_start(haltimer_blink1);
 	res += hal_timer_start(haltimer_blink2);
-	//res += hal_timer_start(haltimer_blink3);
+	res += hal_timer_start(haltimer_blink3);
 
     if(hal_res_OK != res)
     {
@@ -2086,7 +2182,7 @@ static void test_periph_adc2_curr_custom (void)
 {
     char str[96];
     hal_adc_dma_init_ADC2_tvaux_tvin_temperature();
-    hal_motor_and_adc_init(motor1, NULL);
+    hal_motors_extfault_handling_init();
     for(;;)
     {  
      for (uint8_t i = 0; i<3; i++)
@@ -2117,7 +2213,7 @@ static void test_periph_adc_motors (void)
     hal_adc_dma_init_ADC2_tvaux_tvin_temperature();//ADC2 configured to convert regurarly TvAux - TVIn - Temperature
     
     //init motors and enable them
-    hal_motor_and_adc_init(motor1, NULL);
+    hal_motors_extfault_handling_init();
     hal_motor_enable(motor1);
     hal_motor_enable(motor2);
     hal_motor_enable(motor3);

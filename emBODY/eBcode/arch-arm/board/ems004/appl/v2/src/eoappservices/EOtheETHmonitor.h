@@ -18,70 +18,67 @@
 
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _EOTHESERVICES_H_
-#define _EOTHESERVICES_H_
+#ifndef _EOTHEETHMONITOR_H_
+#define _EOTHEETHMONITOR_H_
 
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
-/** @file       EOtheServices.h
-    @brief      This file ...                
+/** @file       EOtheETHmonitor.h
+    @brief      this object implements what is required for managing the SKIN.                
     @author     marco.accame@iit.it
-    @date       01/09/2015
+    @date       12/12/2015
 **/
 
-/** @defgroup eo_EOtheServices Object EOtheServices
+/** @defgroup eo_EOtheETHmonitor Object EOtheETHmonitor
     ...... 
     @{        
  **/
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
-#include "eOcommon.h"
-#include "EoProtocol.h"
-#include "EoMotionControl.h"
-#include "EoAnalogSensors.h"
-#include "EoSkin.h"
+#include "EoCommon.h"
+#include "EOMtask.h"
 
-#include "EOmcService.h"
-#include "EOtheMAIS.h"
-#include "EOtheCANservice.h"
-#include "EOtheCANdiscovery.h"
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
  
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
-typedef struct EOtheServices_hid EOtheServices;
-
-
+typedef struct EOtheETHmonitor_hid EOtheETHmonitor;
 
 typedef struct
 {
-    uint8_t     whatever;
-} eOserv_cfg_t;
-
-
+    uint8_t         priority;          
+    uint16_t        stacksize;
+    eOreltime_t     period; 
+} eOethmonitor_cfg_t;
    
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------
-// empty-section
+
+extern const eOethmonitor_cfg_t eo_ethmonitor_DefaultCfg;
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-extern EOtheServices* eo_serv_Initialise(eOserv_cfg_t *cfg);
+extern EOtheETHmonitor* eo_ethmonitor_Initialise(const eOethmonitor_cfg_t *cfg);
 
-extern EOtheServices* eo_serv_GetHandle(void);
+extern EOtheETHmonitor* eo_ethmonitor_GetHandle(void);
 
-extern eOresult_t eo_serv_ConfigMC(EOtheServices *p, eOmcconfig_cfg_t *mccfg);
+extern eOresult_t eo_ethmonitor_Start(EOtheETHmonitor *p);
 
-extern eOresult_t eo_serv_ConfigCAN(EOtheServices *p, eOcanserv_cfg_t *cancfg);
+extern eOresult_t eo_ethmonitor_SetAlert(EOtheETHmonitor *p, EOMtask *task, eOevent_t event);
 
-extern eOresult_t eo_serv_StartCANdiscovery(EOtheServices *p);
+extern eOresult_t eo_ethmonitor_Tick(EOtheETHmonitor *p);
+
+extern eOresult_t eo_ethmonitor_Stop(EOtheETHmonitor *p);
+
+
+
 
 
 
 /** @}            
-    end of group eo_EOtheServices
+    end of group eo_EOtheETHmonitor
  **/
 
 #endif  // include-guard

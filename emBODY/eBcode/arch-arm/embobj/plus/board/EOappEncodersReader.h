@@ -101,6 +101,13 @@ typedef enum
     eo_appEncReader_encoder_positionNONE = 255,
 } eo_appEncReader_encoder_position_t;
 
+typedef enum
+{
+    eo_appEncReader_detected_position_joint    = 0,  
+    eo_appEncReader_detected_position_rotor    = 1,
+    eo_appEncReader_detected_positionNONE      = 255,
+} eo_appEncReader_detected_position_t;
+
 enum { eo_appEncReader_encoder_position_numberof = 6 }; //6 for AEA and AMO, 4 for INC
 
 /** @typedef    struct eOappEncReader_joint_cfg_t
@@ -110,8 +117,10 @@ typedef struct
 {
     eo_appEncReader_enc_type_t          primary_encoder;
     eo_appEncReader_encoder_position_t  primary_enc_position;
+    eo_appEncReader_detected_position_t primary_encoder_pos_type;
     eo_appEncReader_enc_type_t          extra_encoder;
     eo_appEncReader_encoder_position_t  extra_enc_position;
+    eo_appEncReader_detected_position_t extra_encoder_pos_type;
 } eOappEncReader_joint_t;
 
 

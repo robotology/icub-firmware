@@ -34,11 +34,7 @@
 
 
 #include "EOtheCANservice.h"
-#if defined (USE_MC4PLUS)
-#include "EOtheCANdiscovery.h"
-#elif defined (USE_EMS4RD)
 #include "EOtheCANdiscovery2.h"
-#endif
 
 #include "EOMtheEMStransceiver.h"
 
@@ -229,12 +225,8 @@ extern eOresult_t eocanprotASpolling_parser_POL_AS_CMD__GET_FIRMWARE_VERSION(eOc
     detected.protocolversion.major      = frame->data[5];
     detected.protocolversion.minor      = frame->data[6];   
     
-#if defined (USE_MC4PLUS)
-    eo_candiscovery_ManageDetectedBoard(eo_candiscovery_GetHandle(), loc, match, &detected);
-#elif defined (USE_EMS4RD)
     eo_candiscovery2_OneBoardIsFound(eo_candiscovery2_GetHandle(), loc, match, &detected);   
-#endif
-   
+
     return eores_OK;
 }
 

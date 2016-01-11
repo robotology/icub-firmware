@@ -218,6 +218,27 @@ extern void eo_emsController_AcquireMotorEncoder(uint8_t motor, int16_t current,
     }
 }
 
+extern void eo_emsController_AcquireMotorPosition(uint8_t motor, int32_t position)
+{
+    eo_motors_reset_wdog(ems->motors, motor);
+    
+    ems->motor_position[motor] = position;
+    //change the sign of motor position according to the sign of rotorencoder
+    if (ems->rotorencoder[motor]<0)
+    {
+       ems->motor_position[motor]     = - ems->motor_position[motor];
+    }
+}
+
+extern void eo_emsController_AcquireMotorCurrent(uint8_t motor, int16_t current)
+{
+    eo_motors_reset_wdog(ems->motors, motor);
+    
+    ems->motor_current [motor] = (2*current)/3; // Iq = sqrt(3)/2*Imeas, 32768 = 25000 mA ==> 0.66 scale factor
+}
+
+
+
 extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t error_mask)
 {
 #if defined(USE_2FOC_FAST_ENCODER)    
@@ -1648,6 +1669,34 @@ extern void eo_emsController_StartCalibration_type3(uint8_t joint, int32_t pos, 
     eo_absCalibratedEncoder_Calibrate(ems->abs_calib_encoder[joint], offset);
     
     eo_axisController_StartCalibration_type3(ems->axis_controller[joint]);
+}
+
+extern void eo_emsController_StartCalibration_type6(uint8_t joint, int32_t pos, int32_t vel, int32_t maxencoder)
+{
+    if (!ems) return;
+    
+    ems->n_calibrated = 0;
+        
+    //Set the right calibration type
+    ems->axis_controller[joint] ->calibration_type = eomc_calibration_type6_mais_mc4plus;
+    
+    /*
+    //in case of coupled joints, I reset the calibration state of the others...they must always their state together
+    s_eo_emsController_ResetCalibrationCoupledJoints(joint);
+    
+    //zero offset for this calib? maybe I could change it later, when the calib procedure is ended
+    eo_absCalibratedEncoder_Calibrate(ems->abs_calib_encoder[joint], 0);
+    
+    //I should convert the position and velocity in iCubDegrees? probably yes
+    eOmc_joint_t *joint_ref = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, joint);
+    float divider = joint_ref->config.jntEncoderResolution;
+    if(divider < 0)
+        divider = -divider;
+    
+    uint32_t pos_icubdeg = (float) pos * 65535.0 / divider; //icub degrees are always unsigned (0-65535)
+    uint32_t vel_icubdeg = (float) vel * 65535.0 / divider;
+    eo_axisController_StartCalibration_type6(ems->axis_controller[joint], pos_icubdeg, vel_icubdeg, maxencoder);
+    */
 }
 extern void eo_emsController_StartCalibration_type5(uint8_t joint, int32_t pwmlimit, int32_t final_position)
 {

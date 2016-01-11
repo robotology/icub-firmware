@@ -281,15 +281,18 @@ int CAN1_handleRx (unsigned int board_id)
     while (CAN1_getRxbufferIndex()>0)
     {
 
+        IdTx = (CANRxBuffer[canRxBufferIndex-1].CAN_messID & 0x0700);         
+        IdTx |=  ((_board_ID) << 4);
+        IdTx |= ((CANRxBuffer[canRxBufferIndex-1].CAN_messID >> 4) & 0x000F);  
         //  bootloader messages, 
         // ID 0x700 (100 0000 0000b) message class = bootloader message
         if (((((CANRxBuffer[canRxBufferIndex-1].CAN_messID & 0x700) == 0x700) && (((CANRxBuffer[canRxBufferIndex-1].CAN_messID & 0x00F) == _board_ID))) || ((CANRxBuffer[canRxBufferIndex-1].CAN_messID & 0x00F) == 0x00F)) )
         {
             DisableIntT1;
             DisableIntT2;
-            IdTx = (CANRxBuffer[canRxBufferIndex-1].CAN_messID & 0x0700);         
+            /* IdTx = (CANRxBuffer[canRxBufferIndex-1].CAN_messID & 0x0700);         
             IdTx |=  ((_board_ID) << 4);
-            IdTx |= ((CANRxBuffer[canRxBufferIndex-1].CAN_messID >> 4) & 0x000F);     
+            IdTx |= ((CANRxBuffer[canRxBufferIndex-1].CAN_messID >> 4) & 0x000F);   */   
 
             switch (CANRxBuffer[canRxBufferIndex-1].CAN_data[0])
             {
@@ -370,7 +373,8 @@ int CAN1_handleRx (unsigned int board_id)
         // ID 0x200 (001 0000 0000b) message class = polling message                
         if ((CANRxBuffer[canRxBufferIndex-1].CAN_messID & 0x70F) == (0x200 | BoardConfig.EE_CAN_BoardAddress))
 		{
-			// Board Setup or Calibration Commands    
+           
+            // Board Setup or Calibration Commands    
     		switch (CANRxBuffer[canRxBufferIndex-1].CAN_data[0])
 			{
 			 	case ICUBCANPROTO_POL_AS_CMD__SET_BOARD_ADX:  //SETTING THE BOARD ID
@@ -675,6 +679,31 @@ int CAN1_handleRx (unsigned int board_id)
                     //i used !txena, beacuse if txena==0 ==> then start to tasmit else stop.
                     can_enaDisa_transmission_messages(!txena);
                 }break;
+                case ICUBCANPROTO_POL_AS_CMD__GET_FW_VERSION:
+		        {
+    		        uint8_t canProtocol_compatibility_ack;
+    		        
+			        if( (_canProtocolVersion == CANRxBuffer[canRxBufferIndex-1].CAN_data[1]) &&
+			            (_canProtocolRelease == CANRxBuffer[canRxBufferIndex-1].CAN_data[2]) )
+			    	{
+    					canProtocol_compatibility_ack = 1;
+    				}
+                    else
+                    {
+                        canProtocol_compatibility_ack = 0;
+                    }
+	
+    	             CANRxBuffer[canRxBufferIndex-1].CAN_data[0] = ICUBCANPROTO_POL_AS_CMD__GET_FW_VERSION;
+                     CANRxBuffer[canRxBufferIndex-1].CAN_data[1] = ICUBCANPROTO_BOARDTYPE__SKIN;  
+                     CANRxBuffer[canRxBufferIndex-1].CAN_data[2] = (_version & 0xff00) >> 8;  // firmware version.	
+                     CANRxBuffer[canRxBufferIndex-1].CAN_data[3] = _version & 0x00ff;       // firmware revision
+                     CANRxBuffer[canRxBufferIndex-1].CAN_data[4] = _build_number & 0x00ff;    // build number
+                     CANRxBuffer[canRxBufferIndex-1].CAN_data[5] = _canProtocolVersion;
+                     CANRxBuffer[canRxBufferIndex-1].CAN_data[6] = _canProtocolRelease;
+                     CANRxBuffer[canRxBufferIndex-1].CAN_data[7] = canProtocol_compatibility_ack;
+                     CAN1_send(IdTx, 1, 8, CANRxBuffer[canRxBufferIndex-1].CAN_data);             
+        		}break;
+		
 			}	
  	   	
 	

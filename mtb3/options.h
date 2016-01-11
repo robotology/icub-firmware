@@ -26,8 +26,10 @@
 #define TIMER_ALL      0x1A00    
 
 
-#define _version  0x0210
-#define _build_number  21
+#define _version  0x0211
+#define _build_number  0x00
+#define _canProtocolVersion 0x01
+#define _canProtocolRelease 0x00
 
 enum skin_type
 {

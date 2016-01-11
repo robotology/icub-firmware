@@ -78,7 +78,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
-static void s_eoprot_ep_mc_fun_MotorReactivationAttempt(uint8_t motor);
+static void s_eoprot_ep_mc_fun_MotorReactivationAttempt(uint8_t motor, uint32_t current_state);
 
 
 
@@ -102,7 +102,7 @@ const eOmc_joint_t joint_default_value =
             .kff =                   0,
             .stiction_up_val =       0,
             .stiction_down_val =     0,
-            .filler =                {0xf1, 0xf2, 0xf3}
+            .filler =                {0}
         },
         .pidvelocity =
         {
@@ -116,7 +116,7 @@ const eOmc_joint_t joint_default_value =
             .kff =                   0,
             .stiction_up_val =       0,
             .stiction_down_val =     0,
-            .filler =                {0xf1, 0xf2, 0xf3}
+            .filler =                {0}
         },
         .pidtorque =
         {
@@ -130,7 +130,7 @@ const eOmc_joint_t joint_default_value =
             .kff =                   0,
             .stiction_up_val =       0,
             .stiction_down_val =     0,
-            .filler =                {0xf1, 0xf2, 0xf3}
+            .filler =                {0}
         }, 
         .limitsofjoint =
         {
@@ -141,27 +141,21 @@ const eOmc_joint_t joint_default_value =
         {
             .stiffness =             0,
             .damping =               0,
-            .offset =                0,
-            .filler02 =              {0xf1, 0xf2}           
-        },        
-        
-        .velocitysetpointtimeout =   0,
-       
-        .motionmonitormode =         eomc_motionmonitormode_dontmonitor,
-        .filler01 =                  0xe0,
+            .offset =                0          
+        },               
         .maxvelocityofjoint =        0,
-		.jntEncoderResolution =		 0,
         .motor_params =
         {
             .bemf_value =            0,
             .ktau_value =            0,
             .bemf_scale =            0,
             .ktau_scale =            0,
-            .filler02 =              {0xf1, 0xf2}
+            .filler02 =              {0}
         },
+        .velocitysetpointtimeout =   0,
         .tcfiltertype =              0,
         .jntEncoderType =            0,
-        .filler02 =                  {0xf1, 0xf2}
+        .filler04 =                  {0}
     },
     .status =                       
     {
@@ -170,13 +164,16 @@ const eOmc_joint_t joint_default_value =
             .jnt_position =          0,
             .jnt_velocity =          0,
             .jnt_acceleration =      0,
-            .jnt_torque =            0,
-            .motionmonitorstatus =   eomc_motionmonitorstatus_notmonitored,
-            .controlmodestatus =     eomc_controlmode_idle,
+            .jnt_torque =            0
         },
         .ofpid =                     {0},
-        .interactionmodestatus =     eomc_imodeval_stiff,
-        .chamaleon03 =               {0} //{0xd1, 0xd2, 0xd3}
+        .modes = 
+        {
+            .controlmodestatus =        eomc_controlmode_idle,
+            .interactionmodestatus =    eOmc_interactionmode_stiff,
+            .ismotiondone =             eobool_false,
+            .filler =                   {0}
+        }
     },
     .inputs =                        {0},
     .cmmnds =                       
@@ -184,9 +181,9 @@ const eOmc_joint_t joint_default_value =
         .calibration =               {0},
         .setpoint =                  {0},
         .stoptrajectory =            0,
-        .controlmode =                 eomc_controlmode_cmd_switch_everything_off,
-        .interactionmode =           eomc_imodeval_stiff,
-        .filler01 =                  0        
+        .controlmode =               eomc_controlmode_cmd_switch_everything_off,
+        .interactionmode =           eOmc_interactionmode_stiff,
+        .filler =                    {0}        
     }
 }; 
 
@@ -206,11 +203,10 @@ const eOmc_motor_t motor_default_value =
             .kff =                   0,
             .stiction_up_val =       0,
             .stiction_down_val =     0,
-            .filler =                {0xf1, 0xf2, 0xf3}
+            .filler =                {0}
         },
         .gearboxratio =              0,
         .rotorEncoderResolution =    0,
-        .filler01 =                  0,
         .maxvelocityofmotor =        0,
         .maxcurrentofmotor =         0,
         .rotorIndexOffset =          0,
@@ -220,6 +216,7 @@ const eOmc_motor_t motor_default_value =
         .hasRotorEncoder =           eobool_false,
         .hasRotorEncoderIndex =      eobool_false,
         .rotorEncoderType =          0,
+        .filler02 =                  {0},
         .limitsofrotor =
         {
             .max = 0,
@@ -318,16 +315,6 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
         
     // 7) set impedance 
     eo_emsController_SetImpedance(jxx, cfg->impedance.stiffness, cfg->impedance.damping, cfg->impedance.offset);
-    
-    // 8) set monitormode status    
-    if(eomc_motionmonitormode_dontmonitor == cfg->motionmonitormode)
-    {
-        jstatus->basic.motionmonitorstatus = eomc_motionmonitorstatus_notmonitored;  
-    }
-    else
-    {
-        jstatus->basic.motionmonitorstatus = eomc_motionmonitorstatus_setpointnotreachedyet;
-    }
 
 }
 
@@ -347,7 +334,6 @@ extern void eoprot_fun_UPDT_mc_joint_config_pidposition(const EOnv* nv, const eO
                                     pid_ptr->stiction_up_val*rescaler,
                                     pid_ptr->stiction_down_val*rescaler);
 }
-
 
 extern void eoprot_fun_UPDT_mc_joint_config_pidtorque(const EOnv* nv, const eOropdescriptor_t* rd)
 {
@@ -401,7 +387,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_velocitysetpointtimeout(const EOnv* 
     eo_emsController_SetVelTimeout(jxx, *time);
 }
 
-
+/*
 extern void eoprot_fun_UPDT_mc_joint_config_motionmonitormode(const EOnv* nv, const eOropdescriptor_t* rd)
 {   // 2foc or mc4plus or mc4can is equal
     eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
@@ -425,29 +411,20 @@ extern void eoprot_fun_UPDT_mc_joint_config_motionmonitormode(const EOnv* nv, co
         jstatus->basic.motionmonitorstatus = eomc_motionmonitorstatus_setpointnotreachedyet;
     }
 }
-
+*/
 
 extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOmc_setpoint_t *setpoint = (eOmc_setpoint_t*)rd->data;
     eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
-    eOmc_joint_t *joint = eo_entities_GetJoint(eo_entities_GetHandle(), jxx); 
+    eOmc_joint_t *joint = eo_entities_GetJoint(eo_entities_GetHandle(), jxx);
 
     if(NULL == joint)
     {
         return; //error
     }
 
-    // set monitor status = notreachedyet if monitormode is forever    
-    if(eomc_motionmonitormode_forever == joint->config.motionmonitormode)
-    {
-        /* if monitorstatus values setpointreached means this is a new set point, 
-        so i need to start to check is set point is reached because i'm in monitormode = forever */
-        if(eomc_motionmonitorstatus_setpointisreached == joint->status.basic.motionmonitorstatus)
-        {
-            joint->status.basic.motionmonitorstatus = eomc_motionmonitorstatus_setpointnotreachedyet;
-        }
-    }
+    joint->status.modes.ismotiondone = eobool_false;
     
     switch(setpoint->type)
     { 
@@ -489,58 +466,18 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_stoptrajectory(const EOnv* nv, const
 }
 
 
-
 extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eOropdescriptor_t* rd)
-{
+{   
     eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
     eOmc_calibrator_t *calibrator = (eOmc_calibrator_t*)rd->data;
 
-
-
-#warning -> see comment.
-    // abilitare la perif pwm, mettere il emscontrl in controlmode che dipende dal joint e da calib type (chiedere a randaz), 
-    // per il tipo 3 e': position...?
-    
-    // la StartCalibration deve esser edificata in modo da poter gestire anche altri tipi di calibrazione.
-    // alessandro: aiutera'
-    // usare joint index per identificare quali devono avere calibrazione 1,2,3...etc ?
-    
-    // commento: la calib tipo 3 ha solo offset (in xml e' il calibration3. il calibration2 etc non viene usato).
-    // per calib 3: viene usato solo il calibration3.
-    
-    uint16_t state = eo_mcserv_GetMotorFaultMask(eo_mcserv_GetHandle(),jxx);
+    uint32_t state = eo_mcserv_GetMotorFaultMask(eo_mcserv_GetHandle(),jxx);
     if ((eo_mcserv_AreMotorsExtFaulted(eo_mcserv_GetHandle())) || (state & MOTOR_EXTERNAL_FAULT)) //or motors still faulted OR state (and so PWM) still need to be enabled
     {
-        s_eoprot_ep_mc_fun_MotorReactivationAttempt(jxx);
+        s_eoprot_ep_mc_fun_MotorReactivationAttempt(jxx, state);
     }
 
-    //check for the type of calibration required
-
-    if(calibrator->type == eomc_calibration_type5_hard_stops_mc4plus)
-    {
-        // calibration for joint with incremental encoders
-        eo_emsController_SetAxisCalibrationZero (jxx, calibrator->params.type5.calibrationZero);
-        eo_emsController_StartCalibration_type5 (jxx,
-                                                 calibrator->params.type5.pwmlimit,
-                                                 calibrator->params.type5.final_pos);
-    }
-    else if(calibrator->type == eomc_calibration_type3_abs_sens_digital)
-    {
-        // calibration for joint with abs encoders
-        eo_emsController_SetAxisCalibrationZero (jxx, calibrator->params.type3.calibrationZero);
-        eo_emsController_StartCalibration_type3 (jxx, 
-                                                calibrator->params.type3.position, 
-                                                calibrator->params.type3.velocity,
-                                                calibrator->params.type3.offset);
-    }                             
-    // davide:
-    /*
-     probably I shouldn't set the control mode in here...
-     1) with the StartCalibration it's set to eomc_controlmode_cmd_calib
-     2) after the calibration there's a control inside the axis controller --> if all the coupled joints are calibrated, then the control mode is set to position
-    
-    //eo_emsController_SetControlModeGroupJoints(jxx, (eOmc_controlmode_command_t) eomc_controlmode_cmd_position);
-    */
+    eo_emsController_StartCalibration(jxx, calibrator->type, calibrator->params.any);                          
 }
 
 
@@ -551,10 +488,10 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_controlmode(const EOnv* nv, const eO
     eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
 
     //if this joint was in external fault or the state (and so PWM) is not updated, reenable it
-    uint16_t state = eo_mcserv_GetMotorFaultMask(eo_mcserv_GetHandle(),jxx);
+    uint32_t state = eo_mcserv_GetMotorFaultMask(eo_mcserv_GetHandle(),jxx);
     if ((eo_mcserv_AreMotorsExtFaulted(eo_mcserv_GetHandle())) || (state & MOTOR_EXTERNAL_FAULT))
     {
-       s_eoprot_ep_mc_fun_MotorReactivationAttempt(jxx);
+       s_eoprot_ep_mc_fun_MotorReactivationAttempt(jxx, state);
     }
         
     eo_emsController_SetControlModeGroupJoints(jxx, (eOmc_controlmode_command_t)(*controlmode));       
@@ -635,7 +572,6 @@ extern void eoprot_fun_UPDT_mc_controller_config_jointcoupling(const EOnv* nv, c
 
 // -- entity motor
 
-
 extern void eoprot_fun_INIT_mc_motor_config(const EOnv* nv)
 {
     eOmc_motor_config_t *cfg = (eOmc_motor_config_t*)eo_nv_RAM(nv);
@@ -660,7 +596,9 @@ extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescripto
     eOmc_motor_config_t *cfg_ptr = (eOmc_motor_config_t*)rd->data;
     eOmc_motorId_t mxx = eoprot_ID2index(rd->id32);
 
-
+    //set rotor encoder sign
+    eo_emsController_SetRotorEncoderSign((uint8_t)mxx, (int32_t)cfg_ptr->rotorEncoderResolution);
+    
     cfg_ptr = cfg_ptr;
     #warning -> in here the 2foc-based control does config the can board with ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID, ICUBCANPROTO_POL_MC_CMD__SET_MAX_VELOCITY and ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT. what about mc4plus?
 }
@@ -696,8 +634,6 @@ extern void eoprot_fun_UPDT_mc_motor_config_maxcurrentofmotor(const EOnv* nv, co
     #warning TBD: marco.accame -> in eoprot_fun_UPDT_mc_motor_config_maxcurrentofmotor() i have removed messages sent to CAN. how do we do that for mc4plus ???   
 }
 
-
-
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
@@ -708,13 +644,19 @@ extern void eoprot_fun_UPDT_mc_motor_config_maxcurrentofmotor(const EOnv* nv, co
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
-static void s_eoprot_ep_mc_fun_MotorReactivationAttempt(uint8_t motor)
+static void s_eoprot_ep_mc_fun_MotorReactivationAttempt(uint8_t motor, uint32_t current_state)
 {
      eo_mcserv_EnableMotor(eo_mcserv_GetHandle(), motor);
      eo_mcserv_EnableFaultDetection(eo_mcserv_GetHandle());
-        
-     uint8_t fault_mask[6] = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0}; //clear all the faults
-     eo_mcserv_SetMotorFaultMask(eo_mcserv_GetHandle(), motor, fault_mask);
+     
+     //simulate the CANframe used by 2FOC to signal the status
+     //uint8_t fault_mask[8] = {0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0, 0x0}; //clear all the faults
+     uint64_t fault_mask = (((uint64_t)(current_state & ~MOTOR_EXTERNAL_FAULT)) << 32) & 0xFFFFFFFF00000000; //adding the error to the current state
+    
+     eo_mcserv_SetMotorFaultMask(eo_mcserv_GetHandle(), motor, (uint8_t*)&fault_mask);
+     
+     //reports to emscontroller the changed mask
+     eo_emsController_CheckFaults();
 }
 
 

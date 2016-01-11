@@ -628,12 +628,12 @@ extern icubCanProto_torque_t eo_mc4boards_Convert_torque_I2S(EOtheMC4boards *p, 
 //    {   
 //        return(0);
 //    }
-    
-    return(torque);   
+    icubCanProto_torque_t ret = EOMC4BOARDS_CLIP_INT16(torque);
+    return(ret);   
 }
 
-// revides: it is ok
-extern eOmeas_torque_t       eo_mc4boards_Convert_torque_S2I(EOtheMC4boards *p, uint8_t joint, icubCanProto_torque_t torque)
+// revised: it is ok
+extern eOmeas_torque_t eo_mc4boards_Convert_torque_S2I(EOtheMC4boards *p, uint8_t joint, icubCanProto_torque_t torque)
 {
 //    if(joint >= s_eo_themc4boards.numofjomos)
 //    {   

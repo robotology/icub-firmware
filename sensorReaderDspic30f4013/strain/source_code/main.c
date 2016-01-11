@@ -124,6 +124,9 @@ int8_t eeprom_status = 1;
 int8_t trasmission_counter=0;
 uint8_t canProtocol_compatibility_ack = 0;
 
+#define SATURATION_THRESHOLD_HIGH       64000
+#define SATURATION_THRESHOLD_LOW        1000
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -139,6 +142,7 @@ static void s_parse_can_loaderMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *da
 static void s_parse_can_msg(void);
 static void s_calculate_and_send_data(void);
 static void s_timer1_callback(void);
+inline icubCanProto_strain_saturationInfo_t getSaturationInfo(uint16_t value);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -314,166 +318,149 @@ static void s_parse_can_msg(void)
 	  }
    }
 
-
-
+inline icubCanProto_strain_saturationInfo_t getSaturationInfo(uint16_t value)
+{
+    if (value > SATURATION_THRESHOLD_HIGH )
+        return (saturationHIGH);
+    else if (value <  SATURATION_THRESHOLD_LOW)
+        return(saturationLOW);
+    else 
+        return saturationNONE;
+}
+ 
 static void s_calculate_and_send_data(void)
 {    
-  uint16_t SID; //adc;
-  // LATBbits.LATB12 = 1; // led on
+    uint16_t SID;
 
-  // ForceData and TorqueData are defined as 8 bytes arrays, but only 6 bytes are used.
-  // The remainaing two should be not trasmitted, unless a particular event occurs (i.e:debug message, saturation warning etc.)
-  uint8_t ForceDataCalib[8], TorqueDataCalib[8]; 
-  static uint8_t ForceDataCalibSafe[8];
-  static uint8_t TorqueDataCalibSafe[8];
-  uint8_t ForceDataUncalib[8], TorqueDataUncalib[8]; 
-  static uint8_t ChToTransmit=1; 
-  uint8_t saturation = 0;
-  uint8_t i=0;
-  uint8_t length=6;
- 
-  for (i=0; i<6; i++)
-  {
-	if ((uint16_t)(strain_cfg.ee_data.EE_AN_ChannelValue[i]+HEX_VALC) > 64000 ||
-	    (uint16_t)(strain_cfg.ee_data.EE_AN_ChannelValue[i]+HEX_VALC) <  1000)
-		saturation=1; 
-  }
-
-
-
-  VectorAdd (6,(fractional*) strain_cfg.ee_data.EE_AN_ChannelValue, (fractional*)strain_cfg.ee_data.EE_AN_ChannelValue, strain_cfg.ee_data.EE_CalibrationTare); // ChannelValue = ChannelValue + CalibrationTare 
-
-  //MatrixMultiply (int numRows1,int numCols1Rows2,int numCols2,fractional* dstM,fractional* srcM1,fractional* srcM2, torque_value = Tmatrix * channel value)
-       if (UseCalibration==0 || UseCalibration>=4)
-    MatrixMultiply(6,6,1,&strain_cfg.ee_data.EE_TF_TorqueValue[0],&strain_cfg.ee_data.EE_TF_TMatrix_A[0][0],(int*) &strain_cfg.ee_data.EE_AN_ChannelValue[0]);
-  else if (UseCalibration==1)
-    MatrixMultiply(6,6,1,&strain_cfg.ee_data.EE_TF_TorqueValue[0],&strain_cfg.ee_data.EE_TF_TMatrix_A[0][0],(int*) &strain_cfg.ee_data.EE_AN_ChannelValue[0]);
-  else if (UseCalibration==2)
-    MatrixMultiply(6,6,1,&strain_cfg.ee_data.EE_TF_TorqueValue[0],&strain_cfg.ee_data.EE_TF_TMatrix_B[0][0],(int*) &strain_cfg.ee_data.EE_AN_ChannelValue[0]);
-  else if (UseCalibration==3)
-    MatrixMultiply(6,6,1,&strain_cfg.ee_data.EE_TF_TorqueValue[0],&strain_cfg.ee_data.EE_TF_TMatrix_C[0][0],(int*) &strain_cfg.ee_data.EE_AN_ChannelValue[0]);
-
-/*Note: anche se EE_TF_TorqueValue è composto da tre elementi, 
-si effettua la moltiplicazione su 6 per effettuare in una unica operazione su EE_TF_TorqueValue e EE_TF_ForceValue.
-Ovviamente i due array devono essere salvati su memoria contigua.
-*/
-	//calculate Data for calibrated values...
-	VectorAdd (6, (fractional*)strain_cfg.ee_data.EE_TF_TorqueValue, (fractional*)strain_cfg.ee_data.EE_TF_TorqueValue, CurrentTare); //torque value += CurrentTare
-	strain_cfg.ee_data.EE_TF_TorqueValue[0]+=HEX_VALC;
-	strain_cfg.ee_data.EE_TF_TorqueValue[1]+=HEX_VALC;
-	strain_cfg.ee_data.EE_TF_TorqueValue[2]+=HEX_VALC;
-	strain_cfg.ee_data.EE_TF_TorqueValue[3]+=HEX_VALC; // is equal to EE_TF_ForceValue[0], because it is saved on contiguos memory with EE_TF_TorqueValue
-	strain_cfg.ee_data.EE_TF_TorqueValue[4]+=HEX_VALC; // is equal to EE_TF_ForceValue[1]
-	strain_cfg.ee_data.EE_TF_TorqueValue[5]+=HEX_VALC; // is equal to EE_TF_ForceValue[2]
-
-    //Note: in despite of field name in strain_cfg.ee_data, Force value are the first three elements
-	memcpy(ForceDataCalib,strain_cfg.ee_data.EE_TF_TorqueValue,6); // TorqueValue is an array of 3 int ==> 6 byte
-	memcpy(TorqueDataCalib,strain_cfg.ee_data.EE_TF_ForceValue,6); // ForceeValue is an array of 3 int ==> 6 byte
-
-	//...and for not calibrated ones
-	strain_cfg.ee_data.EE_AN_ChannelValue[0]+=HEX_VALC;
-	strain_cfg.ee_data.EE_AN_ChannelValue[1]+=HEX_VALC;
-	strain_cfg.ee_data.EE_AN_ChannelValue[2]+=HEX_VALC;
-	strain_cfg.ee_data.EE_AN_ChannelValue[3]+=HEX_VALC;
-	strain_cfg.ee_data.EE_AN_ChannelValue[4]+=HEX_VALC;
-	strain_cfg.ee_data.EE_AN_ChannelValue[5]+=HEX_VALC;
-	memcpy(ForceDataUncalib,strain_cfg.ee_data.EE_AN_ChannelValue,6);
-	memcpy(TorqueDataUncalib,&strain_cfg.ee_data.EE_AN_ChannelValue[3],6);
-
-  // Load message ID , Data into transmit buffer and set transmit request bit
-  // class, source, type for periodoc messages
-  if (saturation!=0)
-  {
-	 length=7;
-	 ForceDataCalib[0]=ForceDataCalibSafe[0];
-	 ForceDataCalib[1]=ForceDataCalibSafe[1];
-	 ForceDataCalib[2]=ForceDataCalibSafe[2];
-	 ForceDataCalib[3]=ForceDataCalibSafe[3];
-	 ForceDataCalib[4]=ForceDataCalibSafe[4];
-	 ForceDataCalib[5]=ForceDataCalibSafe[5];
-	 TorqueDataCalib[0]=TorqueDataCalibSafe[0];
-	 TorqueDataCalib[1]=TorqueDataCalibSafe[1];
-	 TorqueDataCalib[2]=TorqueDataCalibSafe[2];
-	 TorqueDataCalib[3]=TorqueDataCalibSafe[3];
-	 TorqueDataCalib[4]=TorqueDataCalibSafe[4];
-	 TorqueDataCalib[5]=TorqueDataCalibSafe[5];
-	 ForceDataCalib[6]=1;
-	 TorqueDataCalib[6]=1;	
-	 ForceDataUncalib[6]=1;
-	 TorqueDataUncalib[6]=1;
-  }
-  else
-  {
-	 ForceDataCalibSafe[0]=ForceDataCalib[0];
-	 ForceDataCalibSafe[1]=ForceDataCalib[1];
-	 ForceDataCalibSafe[2]=ForceDataCalib[2];
-	 ForceDataCalibSafe[3]=ForceDataCalib[3];
-	 ForceDataCalibSafe[4]=ForceDataCalib[4];
-	 ForceDataCalibSafe[5]=ForceDataCalib[5];
-	 TorqueDataCalibSafe[0]=TorqueDataCalib[0];
-	 TorqueDataCalibSafe[1]=TorqueDataCalib[1];
-	 TorqueDataCalibSafe[2]=TorqueDataCalib[2];
-	 TorqueDataCalibSafe[3]=TorqueDataCalib[3];
-	 TorqueDataCalibSafe[4]=TorqueDataCalib[4];
-	 TorqueDataCalibSafe[5]=TorqueDataCalib[5];
-	 ForceDataCalibSafe[6]=0;
-	 ForceDataCalibSafe[7]=0;
-	 TorqueDataCalibSafe[6]=0;
-	 TorqueDataCalibSafe[7]=0;
-  }
-
-  // force data 
-
-  if (DebugCalibration==1)
-  {
-	  SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_MSG__FORCE_VECTOR) ;
-	  hal_can_put_immediately(hal_can_portCAN1, SID, ForceDataCalib, length, 0 );
-
-	  SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_MSG__TORQUE_VECTOR) ;
-	  hal_can_put_immediately(hal_can_portCAN1, SID, TorqueDataCalib,length,1);
-
-	  SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_MSG__UNCALIBFORCE_VECTOR_DEBUGMODE) ;
-	  hal_can_put_immediately(hal_can_portCAN1, SID, ForceDataUncalib,length,2);
-
-	  SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_MSG__UNCALIBTORQUE_VECTOR_DEBUGMODE) ;
-	  while(!(hal_can_txHwBuff_isEmpty(hal_can_portCAN1, 0))); // wiat buffer 0
-	  hal_can_put_immediately(hal_can_portCAN1, SID, TorqueDataUncalib,length,0);
-  }
-else
-{
-  if (UseCalibration==1)
-	{
-	  SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_MSG__FORCE_VECTOR) ;
-	  hal_can_put_immediately(hal_can_portCAN1, SID, ForceDataCalib, length,0 );
-	  // torque data 
-	  SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_MSG__TORQUE_VECTOR) ;
-	  hal_can_put_immediately(hal_can_portCAN1, SID, TorqueDataCalib, length, 1 );
-	}
-  else
-	{
-	  SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_MSG__FORCE_VECTOR) ;
-	  hal_can_put_immediately(hal_can_portCAN1, SID, ForceDataUncalib, length,0 );
-	  // torque data 
-	  SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_MSG__TORQUE_VECTOR) ;
-	  hal_can_put_immediately(hal_can_portCAN1, SID, TorqueDataUncalib, length, 1 );
-	}  
-}
-
-  // Wait till message is transmitted completely
-  //  while(!CAN1IsTXReady(0)) 
-  //    ;
+    int16_t ForceDataCalib[3], TorqueDataCalib[3]; 
+    int16_t ForceDataUncalib[3], TorqueDataUncalib[3];
+    //here last safe force and torque values are saved. (Safe values are values without saturation.)
+    static int16_t ForceDataCalibSafe[3];
+    static int16_t TorqueDataCalibSafe[3];
+    
+    uint8_t saturation = 0;
+    uint8_t i=0;
+    uint8_t length=6;
+    uint16_t u_resultval[6] = {0};
+    int16_t  s_resultval[6] = {0};
+    uint8_t canPayloadForceDataCalib[8] = {0};
+    uint8_t canPayloadTorqueDataCalib[8] = {0};
+    uint8_t canPayloadForceDataUncalib[8] = {0};
+    uint8_t canPayloadTorqueDataUncalib[8] = {0};
+    icubCanProto_strain_forceSaturationInfo_t forceSaturationInfo = {0};
+    icubCanProto_strain_torqueSaturationInfo_t torqueSaturationInfo = {0};
   
-  // Next channel
-  if (ChToTransmit == 5)
-    ChToTransmit=0;
-  else
-    ChToTransmit++;
+   // 1) get saturation info
+   forceSaturationInfo.saturationInChannel_0 = getSaturationInfo((uint16_t)(strain_cfg.ee_data.EE_AN_ChannelValue[0]+HEX_VALC) );
+   forceSaturationInfo.saturationInChannel_1 = getSaturationInfo((uint16_t)(strain_cfg.ee_data.EE_AN_ChannelValue[1]+HEX_VALC) );
+   forceSaturationInfo.saturationInChannel_2 = getSaturationInfo((uint16_t)(strain_cfg.ee_data.EE_AN_ChannelValue[2]+HEX_VALC) );
+   
+   torqueSaturationInfo.saturationInChannel_3 = getSaturationInfo((uint16_t)(strain_cfg.ee_data.EE_AN_ChannelValue[3]+HEX_VALC) );
+   torqueSaturationInfo.saturationInChannel_4 = getSaturationInfo((uint16_t)(strain_cfg.ee_data.EE_AN_ChannelValue[4]+HEX_VALC) );
+   torqueSaturationInfo.saturationInChannel_5 = getSaturationInfo((uint16_t)(strain_cfg.ee_data.EE_AN_ChannelValue[5]+HEX_VALC) );
+  
+    
+    if(( *((uint8_t*)&forceSaturationInfo) + *((uint8_t*)&torqueSaturationInfo) ) > 0 )
+        saturation=1; //at least one channel is saturating
+
+    // 2) calculate data for calibrated values
+    VectorAdd (6,(fractional*) u_resultval, (fractional*)strain_cfg.ee_data.EE_AN_ChannelValue, strain_cfg.ee_data.EE_CalibrationTare); // ChannelValue = ChannelValue + CalibrationTare 
+
+    //MatrixMultiply (int numRows1,int numCols1Rows2,int numCols2,fractional* dstM,fractional* srcM1,fractional* srcM2, torque_value = Tmatrix * channel value)
+    MatrixMultiply(6,6,1,&s_resultval[0],&strain_cfg.ee_data.EE_TF_TMatrix[0][0],(int*) &u_resultval[0]);
+    
+	VectorAdd (6, (fractional*)s_resultval, (fractional*)s_resultval, CurrentTare); //torque value += CurrentTare
+	
+    for (i=0; i<6; i++)
+    {
+        s_resultval[i] +=HEX_VALC;
+    }
+
+    
+    
+    // 3) prepare uncalibrated data to send
+	ForceDataUncalib[0] = strain_cfg.ee_data.EE_AN_ChannelValue[0]+HEX_VALC;
+    ForceDataUncalib[1] = strain_cfg.ee_data.EE_AN_ChannelValue[1]+HEX_VALC;
+    ForceDataUncalib[2] = strain_cfg.ee_data.EE_AN_ChannelValue[2]+HEX_VALC;
+    TorqueDataUncalib[0] = strain_cfg.ee_data.EE_AN_ChannelValue[3]+HEX_VALC;
+    TorqueDataUncalib[1] = strain_cfg.ee_data.EE_AN_ChannelValue[4]+HEX_VALC;
+    TorqueDataUncalib[2] = strain_cfg.ee_data.EE_AN_ChannelValue[5]+HEX_VALC;
+
+    // 4) prepare calibrating data to send
+    if(saturation == 0) //no saturation
+    {
+        //prepare data to send and save safe values
+        ForceDataCalib[0] = ForceDataCalibSafe[0] = s_resultval[0];
+        ForceDataCalib[1] = ForceDataCalibSafe[1] = s_resultval[1];
+        ForceDataCalib[2] = ForceDataCalibSafe[2] = s_resultval[2];
+        TorqueDataCalib[0] = TorqueDataCalibSafe[0] = s_resultval[3];
+        TorqueDataCalib[1] = TorqueDataCalibSafe[1] = s_resultval[4];
+        TorqueDataCalib[2] = TorqueDataCalibSafe[2] = s_resultval[5];
+    }
+    else
+    {
+        //at least one channel is saturating:
+        //- send safe values
+        ForceDataCalib[0] = ForceDataCalibSafe[0];
+        ForceDataCalib[1] = ForceDataCalibSafe[1];
+        ForceDataCalib[2] = ForceDataCalibSafe[2];
+        TorqueDataCalib[0] = TorqueDataCalibSafe[0];
+        TorqueDataCalib[1] = TorqueDataCalibSafe[1];
+        TorqueDataCalib[2] = TorqueDataCalibSafe[2];
+        //- send one byte more with saturation info
+        length=7;
+        
+        forceSaturationInfo.thereIsSaturationInAtLeastOneChannel = 1;
+        torqueSaturationInfo.thereIsSaturationInAtLeastOneChannel = 1;
+        canPayloadForceDataCalib[6]=*((uint8_t*)&forceSaturationInfo);
+        canPayloadTorqueDataCalib[6]=*((uint8_t*)&torqueSaturationInfo);
+        canPayloadForceDataUncalib[6]=*((uint8_t*)&forceSaturationInfo);
+        canPayloadTorqueDataUncalib[6]=*((uint8_t*)&torqueSaturationInfo);	
+    } 
+  
+    // 5) add data in msg payload
+    memcpy(canPayloadForceDataCalib, (uint8_t*)ForceDataCalib, 6);
+    memcpy(canPayloadTorqueDataCalib, (uint8_t*)TorqueDataCalib, 6);
+    memcpy(canPayloadForceDataUncalib, (uint8_t*)ForceDataUncalib, 6);
+    memcpy(canPayloadTorqueDataUncalib, (uint8_t*)TorqueDataUncalib, 6);
+
+   // 6) send messages
+    if (DebugCalibration==1)
+    {
+        SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_MSG__FORCE_VECTOR) ;
+        hal_can_put_immediately(hal_can_portCAN1, SID, canPayloadForceDataCalib, length, 0 );
+
+        SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_MSG__TORQUE_VECTOR) ;
+        hal_can_put_immediately(hal_can_portCAN1, SID, canPayloadTorqueDataCalib,length,1);
+
+        SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_MSG__UNCALIBFORCE_VECTOR_DEBUGMODE) ;
+        hal_can_put_immediately(hal_can_portCAN1, SID, canPayloadForceDataUncalib,length,2);
+
+        SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_MSG__UNCALIBTORQUE_VECTOR_DEBUGMODE) ;
+        while(!(hal_can_txHwBuff_isEmpty(hal_can_portCAN1, 0))); // wiat buffer 0
+        hal_can_put_immediately(hal_can_portCAN1, SID, canPayloadTorqueDataUncalib,length,0);
+    }
+    else
+    {
+        if (UseCalibration==1)
+        {
+            SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_MSG__FORCE_VECTOR) ;
+            hal_can_put_immediately(hal_can_portCAN1, SID, canPayloadForceDataCalib, length,0 );
+            // torque data 
+            SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_MSG__TORQUE_VECTOR) ;
+            hal_can_put_immediately(hal_can_portCAN1, SID, canPayloadTorqueDataCalib, length, 1 );
+        }
+        else
+        {
+          SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_MSG__FORCE_VECTOR) ;
+          hal_can_put_immediately(hal_can_portCAN1, SID, canPayloadForceDataUncalib, length,0 );
+          // torque data 
+          SID = (CAN_MSG_CLASS_PERIODIC) | ((strain_cfg.ee_data.EE_CAN_BoardAddress)<<4) | (ICUBCANPROTO_PER_AS_MSG__TORQUE_VECTOR) ;
+          hal_can_put_immediately(hal_can_portCAN1, SID, canPayloadTorqueDataUncalib, length, 1 );
+        }  
+    }
 
 
-  // LATBbits.LATB12 = 0; // led off
-
-  // WriteTimer2(0x0);
-  //IFS0bits.T2IF = 0; // clear flag  
 }
 
 
@@ -555,33 +542,12 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 			{
 				if(msg->CAN_Per_Msg_PayLoad[2] < 6)
 				{
-                    if (msg->CAN_Per_Msg_PayLoad[3]==0)
-                    {
-                        Txdata[0] = ICUBCANPROTO_POL_AS_CMD__GET_MATRIX_RC; 
-                        Txdata[1] = msg->CAN_Per_Msg_PayLoad[1]; 
-                        Txdata[2] = msg->CAN_Per_Msg_PayLoad[2]; 
-                        Txdata[3] = strain_cfg.ee_data.EE_TF_TMatrix_A[msg->CAN_Per_Msg_PayLoad[1]][msg->CAN_Per_Msg_PayLoad[2]] >> 8; 
-                        Txdata[4] = strain_cfg.ee_data.EE_TF_TMatrix_A[msg->CAN_Per_Msg_PayLoad[1]][msg->CAN_Per_Msg_PayLoad[2]] & 0xFF;  
-                        *datalen=5;	            
-                    }
-                    else if (msg->CAN_Per_Msg_PayLoad[3]==1)
-                    {
-                        Txdata[0] = ICUBCANPROTO_POL_AS_CMD__GET_MATRIX_RC; 
-                        Txdata[1] = msg->CAN_Per_Msg_PayLoad[1]; 
-                        Txdata[2] = msg->CAN_Per_Msg_PayLoad[2]; 
-                        Txdata[3] = strain_cfg.ee_data.EE_TF_TMatrix_B[msg->CAN_Per_Msg_PayLoad[1]][msg->CAN_Per_Msg_PayLoad[2]] >> 8; 
-                        Txdata[4] = strain_cfg.ee_data.EE_TF_TMatrix_B[msg->CAN_Per_Msg_PayLoad[1]][msg->CAN_Per_Msg_PayLoad[2]] & 0xFF;  
-                        *datalen=5;	            
-                    }
-                    else if (msg->CAN_Per_Msg_PayLoad[3]==2)
-                    {
-                        Txdata[0] = ICUBCANPROTO_POL_AS_CMD__GET_MATRIX_RC; 
-                        Txdata[1] = msg->CAN_Per_Msg_PayLoad[1]; 
-                        Txdata[2] = msg->CAN_Per_Msg_PayLoad[2]; 
-                        Txdata[3] = strain_cfg.ee_data.EE_TF_TMatrix_C[msg->CAN_Per_Msg_PayLoad[1]][msg->CAN_Per_Msg_PayLoad[2]] >> 8; 
-                        Txdata[4] = strain_cfg.ee_data.EE_TF_TMatrix_C[msg->CAN_Per_Msg_PayLoad[1]][msg->CAN_Per_Msg_PayLoad[2]] & 0xFF;  
-                        *datalen=5;	            
-                    }
+                    Txdata[0] = ICUBCANPROTO_POL_AS_CMD__GET_MATRIX_RC; 
+                    Txdata[1] = msg->CAN_Per_Msg_PayLoad[1]; 
+                    Txdata[2] = msg->CAN_Per_Msg_PayLoad[2]; 
+                    Txdata[3] = strain_cfg.ee_data.EE_TF_TMatrix[msg->CAN_Per_Msg_PayLoad[1]][msg->CAN_Per_Msg_PayLoad[2]] >> 8; 
+                    Txdata[4] = strain_cfg.ee_data.EE_TF_TMatrix[msg->CAN_Per_Msg_PayLoad[1]][msg->CAN_Per_Msg_PayLoad[2]] & 0xFF;  
+                    *datalen=5;	            
 				}
 			}
 		break;			
@@ -608,7 +574,7 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 			{
                 hal_timer_interrupt_disa(hal_timerT1);// stop timer to avoid rece condition on strain_cfg.ee_data.EE_AN_ChannelValue
                 hal_timer_stop(hal_timerT1);
-				if(msg->CAN_Per_Msg_PayLoad[2] == 0 || msg->CAN_Per_Msg_PayLoad[2]>=4)
+				if(msg->CAN_Per_Msg_PayLoad[2] == 0)
 				{
 					Txdata[0] = ICUBCANPROTO_POL_AS_CMD__GET_CH_ADC; 
 					Txdata[1] = msg->CAN_Per_Msg_PayLoad[1];  
@@ -625,14 +591,9 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 					Txdata[2] = msg->CAN_Per_Msg_PayLoad[2];
 					
 					VectorAdd (6, (fractional*)strain_cfg.ee_data.EE_AN_ChannelValue, (fractional*)strain_cfg.ee_data.EE_AN_ChannelValue, strain_cfg.ee_data.EE_CalibrationTare);
-				
-			        if(msg->CAN_Per_Msg_PayLoad[2]==1)
-					    MatrixMultiply(6,6,1,&strain_cfg.ee_data.EE_TF_TorqueValue[0],&strain_cfg.ee_data.EE_TF_TMatrix_A[0][0],(int*) &strain_cfg.ee_data.EE_AN_ChannelValue[0]); // fractional* srcM2 
-			        else if(msg->CAN_Per_Msg_PayLoad[2]==2)
-					    MatrixMultiply(6,6,1,&strain_cfg.ee_data.EE_TF_TorqueValue[0],&strain_cfg.ee_data.EE_TF_TMatrix_B[0][0],(int*) &strain_cfg.ee_data.EE_AN_ChannelValue[0]); // fractional* srcM2 
-			        else if(msg->CAN_Per_Msg_PayLoad[2]==3)
-					    MatrixMultiply(6,6,1,&strain_cfg.ee_data.EE_TF_TorqueValue[0],&strain_cfg.ee_data.EE_TF_TMatrix_C[0][0],(int*) &strain_cfg.ee_data.EE_AN_ChannelValue[0]); // fractional* srcM2 
 
+					MatrixMultiply(6,6,1,&strain_cfg.ee_data.EE_TF_TorqueValue[0],&strain_cfg.ee_data.EE_TF_TMatrix[0][0],(int*) &strain_cfg.ee_data.EE_AN_ChannelValue[0]); // fractional* srcM2 
+			        
 					VectorAdd (6, (fractional*)strain_cfg.ee_data.EE_TF_TorqueValue, (fractional*)strain_cfg.ee_data.EE_TF_TorqueValue, CurrentTare);
 					Txdata[3] = (strain_cfg.ee_data.EE_TF_TorqueValue[msg->CAN_Per_Msg_PayLoad[1]]+HEX_VALC) >> 8; 
 					Txdata[4] = (strain_cfg.ee_data.EE_TF_TorqueValue[msg->CAN_Per_Msg_PayLoad[1]]+HEX_VALC) & 0xFF; 
@@ -794,25 +755,21 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 			}
 			else if (msg->CAN_Per_Msg_PayLoad[1]==1)
 			{
+                uint16_t value[ANALOG_CHANEL_NUM] = {0};
+                int16_t result[ANALOG_CHANEL_NUM] = {0};
+                
                 hal_timer_interrupt_disa(hal_timerT1);// stop timer to avoid rece condition on strain_cfg.ee_data.EE_AN_ChannelValue
-                hal_timer_stop(hal_timerT1);
+                memcpy((uint8_t*)value, strain_cfg.ee_data.EE_AN_ChannelValue, 2*6);
 
-				VectorAdd (6, (fractional*)strain_cfg.ee_data.EE_AN_ChannelValue, (fractional*)strain_cfg.ee_data.EE_AN_ChannelValue, strain_cfg.ee_data.EE_CalibrationTare);
-			    if (UseCalibration==0 || UseCalibration==1)
-				    MatrixMultiply(6,6,1,&strain_cfg.ee_data.EE_TF_TorqueValue[0],&strain_cfg.ee_data.EE_TF_TMatrix_A[0][0],(int*) &strain_cfg.ee_data.EE_AN_ChannelValue[0]); // fractional* srcM2 
-			    else if (UseCalibration==2)
-				    MatrixMultiply(6,6,1,&strain_cfg.ee_data.EE_TF_TorqueValue[0],&strain_cfg.ee_data.EE_TF_TMatrix_B[0][0],(int*) &strain_cfg.ee_data.EE_AN_ChannelValue[0]); // fractional* srcM2 
-			    else if (UseCalibration==3)
-				    MatrixMultiply(6,6,1,&strain_cfg.ee_data.EE_TF_TorqueValue[0],&strain_cfg.ee_data.EE_TF_TMatrix_C[0][0],(int*) &strain_cfg.ee_data.EE_AN_ChannelValue[0]); // fractional* srcM2 
-                else
-  				    MatrixMultiply(6,6,1,&strain_cfg.ee_data.EE_TF_TorqueValue[0],&strain_cfg.ee_data.EE_TF_TMatrix_A[0][0],(int*) &strain_cfg.ee_data.EE_AN_ChannelValue[0]); // fractional* srcM2 
-              
+				VectorAdd (6, (fractional*)value, (fractional*)value, strain_cfg.ee_data.EE_CalibrationTare);
+
+				MatrixMultiply(6,6,1,&result[0],&strain_cfg.ee_data.EE_TF_TMatrix[0][0],(int*) &value[0]); // fractional* srcM2 
+
 				for (i=0; i<6; i++)
 				{
-					CurrentTare[i]=-(strain_cfg.ee_data.EE_TF_TorqueValue[i]);
+					CurrentTare[i]=-(result[i]);
 				}
 
-                hal_timer_start(hal_timerT1);
                 hal_timer_interrupt_ena(hal_timerT1);
 			}
 			else if (msg->CAN_Per_Msg_PayLoad[1]==2)
@@ -835,20 +792,7 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 			{
 				if(msg->CAN_Per_Msg_PayLoad[2] < 6)
 				{
-                    if      (msg->CAN_Per_Msg_PayLoad[5] == 0)
-                    {
-					   strain_cfg.ee_data.EE_TF_TMatrix_A[msg->CAN_Per_Msg_PayLoad[1]][msg->CAN_Per_Msg_PayLoad[2]] = msg->CAN_Per_Msg_PayLoad[3]<<8 | msg->CAN_Per_Msg_PayLoad[4];
-                    }
-                    else if (msg->CAN_Per_Msg_PayLoad[5] == 1)
-                    {
-					   strain_cfg.ee_data.EE_TF_TMatrix_B[msg->CAN_Per_Msg_PayLoad[1]][msg->CAN_Per_Msg_PayLoad[2]] = msg->CAN_Per_Msg_PayLoad[3]<<8 | msg->CAN_Per_Msg_PayLoad[4];
-                    }                   
-                    else if (msg->CAN_Per_Msg_PayLoad[5] == 2)
-                    {
-					   strain_cfg.ee_data.EE_TF_TMatrix_C[msg->CAN_Per_Msg_PayLoad[1]][msg->CAN_Per_Msg_PayLoad[2]] = msg->CAN_Per_Msg_PayLoad[3]<<8 | msg->CAN_Per_Msg_PayLoad[4];
-                    }                    
-                    else
-                       hal_error_manage(ERR_CAN_MATRIX_INDEXING);
+                    strain_cfg.ee_data.EE_TF_TMatrix[msg->CAN_Per_Msg_PayLoad[1]][msg->CAN_Per_Msg_PayLoad[2]] = msg->CAN_Per_Msg_PayLoad[3]<<8 | msg->CAN_Per_Msg_PayLoad[4];
 				}
 			}
 			else 
@@ -880,7 +824,7 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 		
 		case ICUBCANPROTO_POL_AS_CMD__SET_TXMODE: // set continuous or on demand tx  0x205 len 2  data 7 0/1
 		{
-			if(msg->CAN_Per_Msg_PayLoad[1]==0)//Transmit calibrated data continuosly with matrix A
+			if(msg->CAN_Per_Msg_PayLoad[1]==0)//Transmit calibrated data continuously
 			{ 
 				UseCalibration=1;
 				DebugCalibration=0;
@@ -889,33 +833,18 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 			}
 			else if (msg->CAN_Per_Msg_PayLoad[1]==1) //Do acquisition but do not transmit
 			{
-				UseCalibration=1;
 				DebugCalibration=0;
 				can_enable=0; 
 				hal_timer_interrupt_ena(hal_timerT1);
 			}
-			else if (msg->CAN_Per_Msg_PayLoad[1]==3) //Transmit NOT calibrated data continuosly
+			else if (msg->CAN_Per_Msg_PayLoad[1]==3) //Transmit NOT calibrated data continuously
 			{
+				can_enable=1;
 				UseCalibration=0;
 				DebugCalibration=0;
-				can_enable=1;
 				hal_timer_interrupt_ena(hal_timerT1);
 			}
-			else if (msg->CAN_Per_Msg_PayLoad[1]==4) //Transmit calibrated data continuosly with matrix B
-			{
-				UseCalibration=1;
-				DebugCalibration=0;
-				can_enable=1;
-				hal_timer_interrupt_ena(hal_timerT1);
-			}
-			else if (msg->CAN_Per_Msg_PayLoad[1]==5) //Transmit calibrated data continuosly with matrix C
-			{
-				UseCalibration=2;
-				DebugCalibration=0;
-				can_enable=1;
-				hal_timer_interrupt_ena(hal_timerT1);
-			}
-			else if(msg->CAN_Per_Msg_PayLoad[1]==100) //Transmit calibrated (A) and NOT calibrated data continuosly
+			else if(msg->CAN_Per_Msg_PayLoad[1]==4) //Transmit calibrated and NOT calibrated data continuously
 			{ 
 				UseCalibration=1;
 				DebugCalibration=1;
@@ -924,8 +853,6 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 			}
 			else //Stop acquisition
 			{
-				UseCalibration=0;
-				DebugCalibration=0;
 				can_enable=0;
 				hal_timer_interrupt_disa(hal_timerT1);
 			}

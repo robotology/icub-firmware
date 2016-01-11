@@ -104,6 +104,12 @@ extern EOconstvector s_eo_vectorof_des_strain_eb7;
 // for eb10 / eb11
 extern EOconstvector s_eo_vectorof_des_skin_eb10; 
 
+// for eb15
+extern EOconstvector s_eo_vectorof_des_jomo_eb15;
+
+
+// for eb21
+extern EOconstvector s_eo_vectorof_des_jomo_eb21;
 
 
 const EOconstvector s_eo_empty_constvector_board = 
@@ -246,6 +252,42 @@ const EOconstvector * const entitiesmapB10[eoprot_endpoints_numberof][eoboardcon
     }
 };
 
+const EOconstvector * const entitiesmapB15[eoprot_endpoints_numberof][eoboardconfig_maxvalueofsupportedentity+1] =
+{
+    { // mn
+        &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
+    },
+   
+    { // mc
+        &s_eo_vectorof_des_jomo_eb15, &s_eo_vectorof_des_jomo_eb15, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
+    }, 
+
+    { // as
+        &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
+    },
+    { // sk
+        &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
+    }
+};
+
+
+const EOconstvector * const entitiesmapB21[eoprot_endpoints_numberof][eoboardconfig_maxvalueofsupportedentity+1] =
+{   // as eb6 but without strain .....
+    { // mn
+        &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
+    },
+   
+    { // mc
+        &s_eo_vectorof_des_jomo_eb21, &s_eo_vectorof_des_jomo_eb21, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
+    }, 
+
+    { // as
+        &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
+    },
+    { // sk
+        &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity, &s_eo_empty_constvector_entity
+    }
+};
 
 static const eOcandiscovery_target_t s_candiscoverytarget_mc_eb1 =
 {   
@@ -332,6 +374,24 @@ static const eOcandiscovery_target_t s_candiscoverytarget_strain_eb7 =
     .canmap             = {0x0000, 0x0002}
 };
 
+static const eOcandiscovery_target_t s_candiscoverytarget_mc_eb15 =
+{   
+    .boardtype          = eobrd_cantype_1foc,
+    .filler             = {0},
+    .firmwareversion    = {0, 0},
+    .protocolversion    = {1, 3},
+    .canmap             = {0x001e, 0x0000}
+};
+
+
+static const eOcandiscovery_target_t s_candiscoverytarget_mc_eb21 =
+{   
+    .boardtype          = eobrd_cantype_1foc,
+    .filler             = {0},
+    .firmwareversion    = {0, 0},
+    .protocolversion    = {1, 3},
+    .canmap             = {0x001e, 0x0000}
+};
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -379,6 +439,17 @@ extern const eOcandiscovery_target_t * eoboardconfig_code2mcdiscoverytarget(uint
             ret = NULL; 
         } break;         
 
+        case 14:             
+        {
+            ret = &s_candiscoverytarget_mc_eb15; 
+        } break;
+
+        
+        case 20:             
+        {
+            ret = &s_candiscoverytarget_mc_eb21; 
+        } break;
+        
         default:    
         {
             ret = ret;
@@ -432,6 +503,16 @@ extern const eOcandiscovery_target_t * eoboardconfig_code2maisdiscoverytarget(ui
             ret = NULL; 
         } break;         
 
+        case 14:             
+        {
+            ret = NULL; 
+        } break; 
+
+        case 20:             
+        {
+            ret = NULL; 
+        } break;
+        
         default:    
         {
             ret = ret;
@@ -490,6 +571,16 @@ extern const eOcandiscovery_target_t * eoboardconfig_code2straindiscoverytarget(
             ret = NULL; 
         } break;         
 
+        case 14:             
+        {
+            ret = NULL; 
+        } break;  
+
+        case 20:             
+        {
+            ret = NULL; 
+        } break;
+        
         default:    
         {
             ret = ret;
@@ -508,6 +599,8 @@ extern EOconstvector* eo_vectorof_boardprops_eb5;   // eb5
 extern EOconstvector* eo_vectorof_boardprops_eb6;   // eb6/8
 extern EOconstvector* eo_vectorof_boardprops_eb7;   // eb7/9
 extern EOconstvector* eo_vectorof_boardprops_eb10;  // eb10/11
+extern EOconstvector* eo_vectorof_boardprops_eb15;  // eb15
+extern EOconstvector* eo_vectorof_boardprops_eb21;  // eb21
 
 // of eOcanmap_board_properties_t
 // the constvector contains all the boards in can1 and can2. or ... is empty.
@@ -552,6 +645,16 @@ extern EOconstvector * eoboardconfig_code2canboards(uint32_t code)
         {
             ret = eo_vectorof_boardprops_eb10; 
         } break;         
+
+        case 14:
+        {
+            ret = eo_vectorof_boardprops_eb15; 
+        } break;
+        
+        case 20:
+        {
+            ret = eo_vectorof_boardprops_eb21; 
+        } break;        
 
         default:    
         {
@@ -612,6 +715,16 @@ extern EOconstvector * eoboardconfig_code2entitydescriptors(uint32_t code, eOpro
             ret = (EOconstvector*)entitiesmapB10[ep][entity]; 
         } break;
         
+        case 14:
+        {
+            ret = (EOconstvector*)entitiesmapB15[ep][entity];
+        } break;
+        
+        case 20:
+        {
+            ret = (EOconstvector*)entitiesmapB21[ep][entity];
+        } break;        
+        
         default:    
         {
             ret = ret;
@@ -671,6 +784,16 @@ extern const eOappEncReader_cfg_t * eoboardconfig_code2encoderconfig(uint32_t co
             ret = &encoder_reader_config_none; 
         } break;        
     
+        case 14:
+        {   // no encoder is boards eb15
+            ret = &encoder_reader_config_none; 
+        } break;  
+
+        case 20:
+        {   // no encoder is boards eb21
+            ret = &encoder_reader_config_none; 
+        } break;  
+        
         default:    
         {
             ret = ret;
@@ -699,6 +822,8 @@ extern EOconstvector s_eo_vectorof_EPcfg_eb5;
 extern EOconstvector s_eo_vectorof_EPcfg_eb6eb8;
 extern EOconstvector s_eo_vectorof_EPcfg_eb7eb9;
 extern EOconstvector s_eo_vectorof_EPcfg_eb10eb11;
+extern EOconstvector s_eo_vectorof_EPcfg_eb15;
+extern EOconstvector s_eo_vectorof_EPcfg_eb21;
 
 extern EOconstvector * eoboardconfig_code2EPcfg(uint32_t code)
 {
@@ -740,6 +865,16 @@ extern EOconstvector * eoboardconfig_code2EPcfg(uint32_t code)
         case 10:    
         {   
             ret = (EOconstvector*)&s_eo_vectorof_EPcfg_eb10eb11; 
+        } break;
+        
+        case 14:    
+        {   
+            ret = (EOconstvector*)&s_eo_vectorof_EPcfg_eb15;  
+        } break;
+
+        case 20:    
+        {   
+            ret = (EOconstvector*)&s_eo_vectorof_EPcfg_eb21;  
         } break;
         
         default:    
@@ -806,6 +941,49 @@ extern const eOas_inertial_serviceconfig_t * eoboardconfig_code2inertialCFG(uint
         default:    
         {   // all the others
             ret = NULL;
+        } break;
+    
+    }
+
+    return(ret);   
+}
+
+
+extern const eOemsrunner_timing_t * eoboardconfig_code2ctrlooptiming(uint32_t code)
+{
+    static const eOemsrunner_timing_t normal = 
+    {   // 400-300-300, but maybe better doing 400-250-350 or even 400-200-400
+        .period         = 1000,
+        .rxstartafter   = 0,
+        .dostartafter   = 400,
+        .txstartafter   = 700,
+        .safetygap      = 50          
+    };
+    
+    static const eOemsrunner_timing_t gateway = 
+    {   // 450-050-500 .... or even we dont wait the can tx end in the tx phase.
+        .period         = 1000,
+        .rxstartafter   = 0,
+        .dostartafter   = 450,
+        .txstartafter   = 500,
+        .safetygap      = 25          
+    };
+    
+    const eOemsrunner_timing_t *ret = &normal;
+ 
+    switch(code)
+    {
+        case 1:
+        case 3:
+        case 9:
+        case 10:            
+        {   // eb1, eb2, eb10, eb11
+            ret = &gateway;
+        } break;
+         
+        default:    
+        {   // all the others
+            ret = &normal;
         } break;
     
     }

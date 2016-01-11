@@ -15,7 +15,6 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
  * Public License for more details
 */
-#include "hal_middleware_interface.h"
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
@@ -43,7 +42,6 @@
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "hl_common.h"
-#include "hl_core.h"
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section

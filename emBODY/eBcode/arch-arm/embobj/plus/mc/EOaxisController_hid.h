@@ -86,6 +86,8 @@ struct EOaxisController_hid
     int8_t  rot_sign;
     
     int32_t err;
+    int32_t vel_raw;
+    int16_t time_raw;
     
     // measures (read only)
     int32_t torque_meas_jnt;
@@ -107,6 +109,7 @@ struct EOaxisController_hid
     int32_t damping;
 
     int16_t openloop_out;
+    int16_t openloop_limitreached;
     int16_t controller_output;
 
     eOmc_controlmode_t control_mode;
@@ -115,7 +118,16 @@ struct EOaxisController_hid
     uint16_t state_mask;
     
     eOmc_calibration_type_t calibration_type;
-    float pwm_limit_calib;
+    int32_t pwm_limit_calib;
+    uint16_t calib_count;
+    uint16_t pos_stable;
+    int32_t old_pos;
+    int32_t pos_to_reach;
+    int32_t offset;
+    uint8_t isvirtuallycoupled;
+    uint8_t hardwarelimitreached;
+    uint8_t calibration_finished;
+    
     int32_t calibration_zero;
 }; 
 

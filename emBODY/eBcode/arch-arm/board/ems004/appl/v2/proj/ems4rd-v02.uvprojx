@@ -10,7 +10,7 @@
       <TargetName>ems4rd</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>5060020::V5.06 (build 20)::ARMCC</pCCUsed>
+      <pCCUsed>5060061::V5.06 update 1 (build 61)::ARMCC</pCCUsed>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32F407IG</Device>
@@ -965,6 +965,16 @@
               <FileName>EoProtConfig.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\cfg\boardcfg\EoProtConfig.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoCANmapBoardsEB15.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\boardcfg\EoCANmapBoardsEB15.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoCANmapBoardsEB21.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\boardcfg\EoCANmapBoardsEB21.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2337,6 +2347,16 @@
               <FileName>EoProtConfig.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\cfg\boardcfg\EoProtConfig.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoCANmapBoardsEB15.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\boardcfg\EoCANmapBoardsEB15.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoCANmapBoardsEB21.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\boardcfg\EoCANmapBoardsEB21.c</FilePath>
             </File>
           </Files>
         </Group>

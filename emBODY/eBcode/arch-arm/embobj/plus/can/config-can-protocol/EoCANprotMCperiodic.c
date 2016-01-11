@@ -180,14 +180,14 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__PID_VAL(eOcanframe_t *f
             #warning CAVEAT: jstatus->ofpid.output is now an int16_t and the can frame should have a int16_t ... however it works like that
             // marco.accame on 02apr15: i ahve seen together with marco.randazzo that the mc4 send uint16, thus in here there is a double error which make things work 
             // see s_eo_icubCanProto_parser_per_mb_cmd__pidVal() in ems4rd-v01.uvproj
-            joint->status.ofpid.output = *((uint16_t*)&(frame->data[offset[j]]));
+            joint->status.ofpid.legacy.output = *((uint16_t*)&(frame->data[offset[j]]));
         #else
         {
             // marco.accame on 02apr15: this is the ways it should be after we have changed the type of jstatus->ofpid.output
             // ... and if we consider the content of the can frame as a signed int int16_t .... however the can frame contains a uint16 (as checked in mc4 code)
             int16_t value = 0;
             value = *((int16_t*)&(frame->data[offset[j]]));
-            joint->status.ofpid.output = value;
+            joint->status.ofpid.legacy.output = value;
         }
         #endif                
     }
@@ -261,7 +261,7 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__STATUS(eOcanframe_t *fr
                 return(eores_OK);    
             }
             
-            joint->status.basic.controlmodestatus = eomc_controlmode;
+            joint->status.modes.controlmodestatus = eomc_controlmode;
             
             if(eomc_controlmode_hwFault == eomc_controlmode)
             {        
@@ -374,14 +374,14 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__PID_ERROR(eOcanframe_t 
         pidpos_error = *((uint16_t*)&(frame->data[offsetpos[j]]));
         pidtrq_error = *((uint16_t*)&(frame->data[offsettrq[j]]));
         
-        if(eomc_controlmode_torque == joint->status.basic.controlmodestatus)
+        if(eomc_controlmode_torque == joint->status.modes.controlmodestatus)
         {
-            joint->status.ofpid.error = pidtrq_error;
+            joint->status.ofpid.legacy.error = pidtrq_error;
         }
         else
         {
-            joint->status.ofpid.error = pidpos_error;
-        }             
+            joint->status.ofpid.legacy.error = pidpos_error;
+        }            
     }
    
     return(eores_OK);
@@ -414,7 +414,7 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__ADDITIONAL_STATUS(eOcan
         {
             return(eores_OK);        
         }
-        joint->status.interactionmodestatus = tmp;        
+        joint->status.modes.interactionmodestatus = tmp;        
     }
    
     return(eores_OK);

@@ -7,8 +7,8 @@
 
 // CORRECT
 #define a_coeff 1.6455F
-#define b_coeff 1.6455F
-#define t_coeff 0.6077F
+#define b_coeff 0.6077F
+const bool trq_decouple_enable = false;
 
 /***************************************************************************/
 /**
@@ -186,7 +186,6 @@ void decouple_dutycycle(Int32 *pwm)
        tau_m = [0  b -b] tau_j
                [0  0  b]
 
-       b = 1.6455
     */
 
     /* The shoulder coupling is the following:
@@ -241,7 +240,7 @@ void decouple_dutycycle(Int32 *pwm)
         //          [-t  t  t]   
 
     }
-    else if (mode_is_force_controlled(0) )
+    else if (mode_is_force_controlled(0) && trq_decouple_enable )
     {    
         //          [ 1  1  0]
         //  tau_m = [ 0  b -b] tau_j
@@ -274,7 +273,7 @@ void decouple_dutycycle(Int32 *pwm)
         tempf = tempf * a_coeff;
         pwm_out[1] = (Int32) tempf;
     }
-    else if (mode_is_force_controlled(1))
+    else if (mode_is_force_controlled(1) && trq_decouple_enable)
     {
         //             [ 1  1  0]
         //  tau_m =    [ 0  b -b] tau_j
@@ -395,7 +394,7 @@ void decouple_dutycycle(Int32 *pwm)
         temp32 = (Int32) (tempf);
         pwm_out[0] = temp32;        
     }
-    else if (mode_is_force_controlled(0))
+    else if (mode_is_force_controlled(0) && trq_decouple_enable)
     {
         //          [ 1  1  0]
         //  tau_m = [ 0  s -s] tau_j

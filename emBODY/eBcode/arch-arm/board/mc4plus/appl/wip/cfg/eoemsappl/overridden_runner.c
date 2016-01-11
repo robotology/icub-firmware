@@ -51,6 +51,7 @@
 
 #include "EOtheServices.h"
 
+#include "EOtheEntities.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -100,7 +101,7 @@ void userDef_hwErrCntr(void){}
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static void overriden_runner_CheckAndUpdateExtFaults(void);
+static void    s_overriden_runner_CheckAndUpdateExtFaults(void);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -122,7 +123,10 @@ static uint8_t event_view = 0;
 
 extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(EOMtheEMSrunner *p)
 {
+  //here we could update some of the values which are updated via CAN callback for the EMS with mc 2foc-based (e.g. currents of the motors OR rotor position etc...)
     
+  //tick of currents watchdog  
+  eo_currents_watchdog_Tick(eo_currents_watchdog_GetHandle());
 }
 
 extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOMtheEMSrunner *p)
@@ -164,6 +168,9 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOM
         eo_canserv_Parse(eo_canserv_GetHandle(), (eOcanport_t)port, numofRXcanframe, NULL);
     }
     */
+    
+    //check and update faults mask for the motor
+    s_overriden_runner_CheckAndUpdateExtFaults();
 }
 
 
@@ -172,9 +179,6 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOM
 
 extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
 {  
-    #warning: here we should check if a fault is occurred to the motors, and notify the EOemsController in this case
-    overriden_runner_CheckAndUpdateExtFaults();
-    
     eo_mcserv_Actuate(eo_mcserv_GetHandle());    
 }
 
@@ -244,24 +248,26 @@ extern void eom_emsrunner_hid_userdef_onemstransceivererror(EOMtheEMStransceiver
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-static void overriden_runner_CheckAndUpdateExtFaults(void)
+static void s_overriden_runner_CheckAndUpdateExtFaults(void)
 {
     if (eo_mcserv_AreMotorsExtFaulted(eo_mcserv_GetHandle()))
-    {      
+    {
+        uint8_t numofjomos = eo_entities_NumOfJoints(eo_entities_GetHandle());
+        uint32_t state = 0;
         //set the fault mask for ALL the motors
-        for (uint8_t i = 0; i<eo_mcserv_GetMotionControlConfig(eo_mcserv_GetHandle())->jomosnumber; i++)
+        for (uint8_t i = 0; i < numofjomos; i++)
         {
-            uint16_t state = eo_mcserv_GetMotorFaultMask(eo_mcserv_GetHandle(),i);
-            if((state & MOTOR_EXTERNAL_FAULT) == 0) //external fault bit
+            state = eo_mcserv_GetMotorFaultMask(eo_mcserv_GetHandle(),i);
+            if((state & MOTOR_EXTERNAL_FAULT) == 0) //external fault bit not set
             {
-                uint8_t fault_mask[6] = {0x4, 0x0, 0x0, 0x0, 0x0, 0x0}; //setting only the external fault bit
-                eo_motor_set_motor_status(eo_motors_GetHandle(),i, fault_mask);
+                //simulate the CANframe used by 2FOC to signal the status
+                uint64_t fault_mask = (((uint64_t)(state | MOTOR_EXTERNAL_FAULT)) << 32) & 0xFFFFFFFF00000000; //adding the error to the current state
+                eo_motor_set_motor_status(eo_motors_GetHandle(),i, (uint8_t*)&fault_mask);
             }
         }
     }
     return;
 }
-
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------

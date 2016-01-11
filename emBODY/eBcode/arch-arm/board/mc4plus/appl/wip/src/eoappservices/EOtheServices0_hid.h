@@ -19,38 +19,28 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef _EOCANSERVICE_HID_H_
-#define _EOCANSERVICE_HID_H_
+#ifndef _EOTHESERVICES0_HID_H_
+#define _EOTHESERVICES0_HID_H_
 
 
 
 
 // - external dependencies --------------------------------------------------------------------------------------------
-
-#include "eOcommon.h"
-#include "EOemsController.h"
-#include "EOappEncodersReader.h"
+// empty-section
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
 
-#include "EOmcService.h"
+#include "EOtheServices0.h"
 
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
-// evaluate to save memory by changing the arrays in pointers
-struct EOmcService_hid
+
+struct EOtheServices0_hid
 {
-    eObool_t            initted;
-    eOmcconfig_cfg_t    config;
-    eObool_t            resourcesareready;
-    eOmc_joint_t**      thejoints;
-    eOmc_motor_t**      themotors;
-    EOemsController*    thelocalcontroller;
-    EOappEncReader*     thelocalencoderreader;
-    uint32_t*           valuesencoder;
-    uint32_t*           valuesencoder_extra;
-    int16_t*            valuespwm;
+    eObool_t    initted;
+    eObool_t    isASmais_ready;
+    eObool_t    BOARDisreadyforcontrolloop;
 }; 
 
 

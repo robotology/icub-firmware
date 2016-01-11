@@ -169,6 +169,32 @@ extern void eo_axisController_StartCalibration_type3(EOaxisController *o)
     o->control_mode = eomc_controlmode_calib;
 }
 
+extern void eo_axisController_StartCalibration_type6(EOaxisController *o, int32_t position, int32_t velocity, int32_t maxencoder)
+{
+    if (!o) return;
+    
+    if (NOT_READY() && (o->state_mask !=  AC_NOT_CALIBRATED))
+    {
+        o->control_mode = eomc_controlmode_hwFault;
+        return;
+    }
+    
+    SET_BITS(o->state_mask, AC_NOT_CALIBRATED);
+    
+    /*
+    //init the traj object
+    eo_trajectory_Init(o->trajectory, GET_AXIS_POSITION(), GET_AXIS_VELOCITY(), 0);
+    eo_trajectory_Stop(o->trajectory, GET_AXIS_POSITION());
+    
+    //new trajectory using params1 and params2
+    eo_axisController_SetPosRef(o, position, velocity);
+    
+    //what should I do with param3???
+    
+    o->control_mode = eomc_controlmode_calib;
+    */
+}
+
 extern void eo_axisController_StartCalibration_type5(EOaxisController *o, int32_t pwmlimit, int32_t final_position)
 {
     if (!o) return;
@@ -772,8 +798,42 @@ extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
                     return o->pwm_limit_calib;
                 }
             }
+            // calib type 6
+            else if (o->calibration_type == eomc_calibration_type6_mais_mc4plus)
+            {
+                if (IS_CALIBRATED())
+                {
+                    eo_pid_Reset(o->pidP);
+                    eo_trajectory_Init(o->trajectory, pos - o->calibration_zero, vel, 0);
+                    eo_trajectory_Stop(o->trajectory, pos - o->calibration_zero); 
+                    o->control_mode = eomc_controlmode_position;
+                    
+                    o->err = 0;
+                    
+                    return 0;
+                }
+                o->interact_mode = eOmc_interactionmode_stiff;
+                *stiff = eobool_true;
+                
+                float pos_ref;
+                float vel_ref;
+                float acc_ref;
+                eo_trajectory_Step(o->trajectory, &pos_ref, &vel_ref, &acc_ref);
+            
+                int32_t err = pos_ref - pos;
+
+                o->err = err;
+                
+                //when the trajectory is ended I can can safely set the axis as calibrated
+                if (eo_trajectory_IsDone(o->trajectory))
+                {
+                    //Set the axis calibrated cause the calibration procedure has ended
+                    eo_axisController_SetCalibrated (o);
+                }
+                return eo_pid_PWM_pid(o->pidP, o->err);
+            }
             // calib type 3
-            else
+            else if (o->calibration_type == eomc_calibration_type3_abs_sens_digital)
             {
                 if (IS_CALIBRATED())
                 {

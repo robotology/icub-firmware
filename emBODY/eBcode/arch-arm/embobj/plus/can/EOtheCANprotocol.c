@@ -586,6 +586,10 @@ const eOcanprot_functions_t s_eo_canprot_functions_pollingMotorControl[] =
     {   // 119      ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_CONFIG 
         .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MOTOR_CONFIG,
         .parser     = NULL
+    },
+    {   // 120      ICUBCANPROTO_POL_MC_CMD__GET_TCFILTER_TYPE 
+        .former     = NULL,
+        .parser     = NULL
     }
 };  EO_VERIFYsizeof(s_eo_canprot_functions_pollingMotorControl, (ICUBCANPROTO_POL_MC_CMD_MAXNUM)*sizeof(eOcanprot_functions_t));
 

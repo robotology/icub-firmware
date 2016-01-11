@@ -60,10 +60,11 @@ typedef enum
 
 typedef struct
 {
-    EOappEncReader_configEncSPIXReadSequence_hid_t readSeq;  /**< contains the sequence of reading of encoders connected to SPIX (1 or 3)*/ 
-    eOappEncReader_readStatusSPIX_t                st;       /**< contains the status of reading on SPIX (1 or 3) */
-    eo_appEncReader_enc_type_t                     enc_type; /**< the type of the encoder to be read (AEA and AMO supported) */
-    uint8_t                                        enc_numbers; //number of encoders associated
+    EOappEncReader_configEncSPIXReadSequence_hid_t readSeq;             /**< contains the sequence of reading of encoders connected to SPIX (1 or 3)*/ 
+    eOappEncReader_readStatusSPIX_t                st;                  /**< contains the status of reading on SPIX (1 or 3) */
+    eo_appEncReader_enc_type_t                     enc_type;            /**< the type of the encoder to be read (AEA and AMO supported) */
+    uint8_t                                        enc_numbers;         //number of encoders associated
+    uint8_t                                        enc_number_supported;
 } EOappEncReader_confEncDataPerSPI_hid_t;
 
 

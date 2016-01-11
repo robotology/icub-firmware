@@ -40,14 +40,14 @@
 #include "EOtheErrorManager.h"
 #include "EoError.h"
 
-#include "EOMtheEMSappl.h"
-
-
 #include "EOtheCANmapping.h"
 
 #include "EOtheCANdiscovery2.h"
 
 #include "EOtheMC4boards.h"
+
+#include "EOMtheEMSappl.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -216,31 +216,45 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__MOTION_DONE(eOcanprot_de
     return(eores_OK);     
 }
 
-
 extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__MOTION_DONE(eOcanframe_t *frame, eOcanport_t port)
 {
-//    eOresult_t res = eores_OK; 
     eOmc_joint_t *joint = NULL;
-    //eOprotIndex_t jointindex = 0;
+    eOprotIndex_t index = EOK_uint08dummy; 
     
-    // retrieve the joint related to the frame
-    
-    if(NULL == (joint = s_eocanprotMCpolling_get_entity(eoprot_entity_mc_joint, frame, port, NULL)))
+    // retrieve the joint related to the frame    
+    if(NULL == (joint = s_eocanprotMCpolling_get_entity(eoprot_entity_mc_joint, frame, port, &index)))
     {
         return(eores_OK);        
-    }
-
+    }   
     
+    // in byte data[1] there is: 0/1 
+    joint->status.modes.ismotiondone = (eObool_t)frame->data[1];    
+   
+    // and now let's manage the proxy
     
-    eOmc_motionmonitorstatus_t motionmonitorstatus = (eOmc_motionmonitorstatus_t) joint->status.basic.motionmonitorstatus;
+    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, index, eoprot_tag_mc_joint_status_modes_ismotiondone);
     
-    if(eomc_motionmonitorstatus_notmonitored == motionmonitorstatus)
+    EOproxy * proxy = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
+    eOproxy_params_t *param = eo_proxy_Params_Get(proxy, id32);
+    if(NULL == param)
     {
-        // pc104 isn't interested in motion monitoring
+        eOerrmanDescriptor_t errdes = {0};
+        errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+        errdes.sourceaddress    = 0;
+        errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_ropdes_notfound);
+        errdes.par16            = 0; 
+        errdes.par64            = id32; 
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
         return(eores_OK);
-    }
+    }  
     
-    joint->status.basic.motionmonitorstatus = (eOmc_motionmonitorstatus_t)frame->data[1];    
+    param->p08_2 ++;
+    
+    if(param->p08_1 == param->p08_2)
+    {
+        eOresult_t res = eo_proxy_ReplyROP_Load(proxy, id32, NULL);  
+        eom_emsappl_SendTXRequest(eom_emsappl_GetHandle());       
+    }        
     
     return(eores_OK);
 }
@@ -587,7 +601,7 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_CURRENT_PID(eOcanpro
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_CURRENT_PIDLIMITS(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
-    #warning marco.accame CHECK: see if ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PIDLIMITS has len 7 or 8 as some other SET_xxx_PIDLIMITS 
+    //#warning marco.accame CHECK: see if ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PIDLIMITS has len 7 or 8 as some other SET_xxx_PIDLIMITS 
     s_former_POL_MC_CMD_setpid_limits_7(descriptor, frame, ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PIDLIMITS);
     return(eores_OK);      
 }
@@ -596,7 +610,7 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_CURRENT_PIDLIMITS(eO
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_VELOCITY_PID(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
     // ... apparently s_former_POL_MC_CMD_setpid uses len 8 and not len 7 and has pid->scale
-    #warning marco.accame CHECK: see if ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID has len 7 or 8 as some other SET_xxx_PID 
+    //#warning marco.accame CHECK: see if ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID has len 7 or 8 as some other SET_xxx_PID 
     s_former_POL_MC_CMD_setpid_7(descriptor, frame, ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID);
     return(eores_OK);      
 }
@@ -604,7 +618,7 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_VELOCITY_PID(eOcanpr
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_VELOCITY_PIDLIMITS(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
     // ... apparently s_former_POL_MC_CMD_setpid_limits uses len 8 and not len 7 
-    #warning marco.accame CHECK: see if ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PIDLIMITS has len 7 or 8 as some other SET_xxx_PIDLIMITS 
+    //#warning marco.accame CHECK: see if ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PIDLIMITS has len 7 or 8 as some other SET_xxx_PIDLIMITS 
     s_former_POL_MC_CMD_setpid_limits_7(descriptor, frame, ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PIDLIMITS);
     return(eores_OK);      
 }
@@ -653,9 +667,10 @@ extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_OPENLOOP_PARAMS(eOca
     {
         return(eores_OK);        
     }
-      
-    joint->status.ofpid.positionreference = *((int16_t*)&frame->data[1]);    
-    
+  
+    //it is: joint->status.ofpid.openloop.refolo = *((int16_t*)&frame->data[1]);    
+    joint->status.ofpid.legacy.positionreference = *((int16_t*)&frame->data[1]);
+  
     return(eores_OK);    
 }
 

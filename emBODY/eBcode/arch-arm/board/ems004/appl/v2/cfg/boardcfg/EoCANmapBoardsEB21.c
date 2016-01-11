@@ -23,8 +23,9 @@
 
 #include "stdlib.h"
 #include "EoCommon.h"
-#include "EOappEncodersReader.h"
+#include "EOtheCANmapping.h"
 
+#include "EOconstvector_hid.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -54,6 +55,7 @@
 // empty-section
 
 
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
@@ -65,75 +67,116 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-// for EB1_3_6_8
 
-const eOappEncReader_cfg_t encoder_reader_config_eb1 =
+
+
+static const eOcanmap_board_properties_t s_boardprops[] = 
 {
-    .joints = 
-    {   // there are managed 4 joints, all served by an AEA
-        {   // pos 0
-            .primary_encoder        = eo_appEncReader_enc_type_AEA,
-            .primary_enc_position   = (eo_appEncReader_encoder_position_t)hal_encoder1,
-            .primary_encoder_pos_type = eo_appEncReader_detected_position_joint,
-            .extra_encoder          = eo_appEncReader_enc_type_NONE,
-            .extra_enc_position     = eo_appEncReader_encoder_positionNONE,
-            .extra_encoder_pos_type = eo_appEncReader_detected_positionNONE           
-        },
-        {   // pos 1
-            .primary_encoder        = eo_appEncReader_enc_type_AEA,
-            .primary_enc_position   = (eo_appEncReader_encoder_position_t)hal_encoder4,
-            .primary_encoder_pos_type = eo_appEncReader_detected_position_joint,
-            .extra_encoder          = eo_appEncReader_enc_type_NONE,
-            .extra_enc_position     = eo_appEncReader_encoder_positionNONE,
-            .extra_encoder_pos_type = eo_appEncReader_detected_positionNONE
-        },
-        {   // pos 2
-            .primary_encoder        = eo_appEncReader_enc_type_AEA,
-            .primary_enc_position   = (eo_appEncReader_encoder_position_t)hal_encoder2,
-            .primary_encoder_pos_type = eo_appEncReader_detected_position_joint,
-            .extra_encoder          = eo_appEncReader_enc_type_NONE,
-            .extra_enc_position     = eo_appEncReader_encoder_positionNONE,
-            .extra_encoder_pos_type = eo_appEncReader_detected_positionNONE
-        },        
-        {   // pos 3
-            .primary_encoder        = eo_appEncReader_enc_type_AEA,
-            .primary_enc_position   = (eo_appEncReader_encoder_position_t)hal_encoder5,
-            .primary_encoder_pos_type = eo_appEncReader_detected_position_joint,
-            .extra_encoder          = eo_appEncReader_enc_type_NONE,
-            .extra_enc_position     = eo_appEncReader_encoder_positionNONE,
-            .extra_encoder_pos_type = eo_appEncReader_detected_positionNONE
-        }, 
-        {   // pos 4
-            .primary_encoder        = eo_appEncReader_enc_type_NONE,
-            .primary_enc_position   = eo_appEncReader_encoder_positionNONE,
-            .primary_encoder_pos_type = eo_appEncReader_detected_positionNONE,
-            .extra_encoder          = eo_appEncReader_enc_type_NONE,
-            .extra_enc_position     = eo_appEncReader_encoder_positionNONE,
-            .extra_encoder_pos_type = eo_appEncReader_detected_positionNONE
-        },
-        {   // pos 5
-            .primary_encoder        = eo_appEncReader_enc_type_NONE,
-            .primary_enc_position   = eo_appEncReader_encoder_positionNONE,
-            .primary_encoder_pos_type = eo_appEncReader_detected_positionNONE,
-            .extra_encoder          = eo_appEncReader_enc_type_NONE,
-            .extra_enc_position     = eo_appEncReader_encoder_positionNONE,
-            .extra_encoder_pos_type = eo_appEncReader_detected_positionNONE
-        }            
-    },
-    .SPI_streams    =
-    {   // at most 2 streams: one over spix and one over spiy
+    {
+        .type               = eobrd_cantype_1foc,
+        .location =
         {
-            .type       = hal_encoder_t1, // or hal_encoder_t1 for aea
-            .numberof   = 2
+            .port   = eOcanport1,
+            .addr   = 1         
         },
+        .requiredprotocol   = {.major = 1, .minor = 3}
+    },  
+    {
+        .type               = eobrd_cantype_1foc,
+        .location =
         {
-            .type       = hal_encoder_t1, // or hal_encoder_t1 for aea
-            .numberof   = 2
-        }
+            .port   = eOcanport1,
+            .addr   = 2         
+        },
+        .requiredprotocol   = {.major = 1, .minor = 3}
     },
-    .SPI_callbackOnLastRead = NULL,
-    .SPI_callback_arg       = NULL       
+    {
+        .type               = eobrd_cantype_1foc,
+        .location =
+        {
+            .port   = eOcanport1,
+            .addr   = 3         
+        },
+        .requiredprotocol   = {.major = 1, .minor = 3}
+    },
+    {
+        .type               = eobrd_cantype_1foc,
+        .location =
+        {
+            .port   = eOcanport1,
+            .addr   = 4         
+        },
+        .requiredprotocol   = {.major = 1, .minor = 3}
+    }
 };
+
+static EOconstvector s_eo_vectorof_boardprops_eb21 = 
+{
+    .capacity       = sizeof(s_boardprops)/sizeof(eOcanmap_board_properties_t),
+    .size           = sizeof(s_boardprops)/sizeof(eOcanmap_board_properties_t),
+    .item_size      = sizeof(eOcanmap_board_properties_t),
+    .dummy          = 0,
+    .stored_items   = (void*)s_boardprops,
+    .functions      = NULL   
+};
+
+EOconstvector* eo_vectorof_boardprops_eb21 = &s_eo_vectorof_boardprops_eb21;
+
+
+
+static const eOcanmap_entitydescriptor_t s_des_jomo[] = 
+{
+    {   // jomo 0
+        .location   =
+        {   
+            .port           = eOcanport1,
+            .addr           = 4,
+            .insideindex    = eocanmap_insideindex_first
+        },
+        .index      = entindex00
+    },        
+    {   // jomo 1
+        .location   =
+        {
+            .port           = eOcanport1,
+            .addr           = 2,
+            .insideindex    = eocanmap_insideindex_first
+        },
+        .index      = entindex01,        
+    },    
+    {   // jomo 2
+        .location   =
+        {
+            .port           = eOcanport1,
+            .addr           = 3,
+            .insideindex    = eocanmap_insideindex_first
+        },
+        .index      = entindex02
+    },
+    {   // jomo 3
+        .location   =
+        {
+            .port           = eOcanport1,
+            .addr           = 1,
+            .insideindex    = eocanmap_insideindex_first
+        },
+        .index      = entindex03
+    }     
+};
+
+EOconstvector s_eo_vectorof_des_jomo_eb21 = 
+{
+    .capacity       = sizeof(s_des_jomo)/sizeof(eOcanmap_entitydescriptor_t),
+    .size           = sizeof(s_des_jomo)/sizeof(eOcanmap_entitydescriptor_t),
+    .item_size      = sizeof(eOcanmap_entitydescriptor_t),
+    .dummy          = 0,
+    .stored_items   = (void*)s_des_jomo,
+    .functions      = NULL   
+};
+
+EOconstvector* eo_vectorof_descriptor_jomo_eb21 = &s_eo_vectorof_des_jomo_eb21;
+
+
 
 
 // --------------------------------------------------------------------------------------------------------------------

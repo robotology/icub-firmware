@@ -42,7 +42,7 @@
 #define MOTORS(m) for (uint8_t m=0; m<o->nMotors; ++m)
 #define JOINTS(j) MOTORS(j) 
 
-#define MOTOR_EXTERNAL_FAULT     0x00000004
+//#define MOTOR_EXTERNAL_FAULT     0x00000004
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -66,6 +66,7 @@ static char invert_matrix(float** M, float** I, char n);
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
+static EOmotors *o = NULL;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -76,7 +77,7 @@ extern EOmotors* eo_motors_New(uint8_t nMotors, eOemscontroller_board_t board)
     if (!nMotors) return NULL;
     if (nMotors > MAX_NAXLES) nMotors = MAX_NAXLES;
     
-    EOmotors *o = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOmotors), 1);
+    o = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOmotors), 1);
 
     if (o)
     {
@@ -93,6 +94,7 @@ extern EOmotors* eo_motors_New(uint8_t nMotors, eOemscontroller_board_t board)
             o->motor_run_state_req_wdog[m] = 100;
             o->motor_fault_mask[m] = 0;
             o->motor_qe_error[m] = 0;
+            o->motor_enc_not_calibrated[m] = 0xFF;
             
             JOINTS(j)
             {
@@ -104,9 +106,22 @@ extern EOmotors* eo_motors_New(uint8_t nMotors, eOemscontroller_board_t board)
     return o;
 }
 
+extern EOmotors* eo_motors_GetHandle()
+{
+    if(o)
+        return o;
+    else
+        return NULL;
+}
+
 extern uint32_t eo_motors_getQEError(EOmotors *o, uint8_t motor)
 {
     return o->motor_qe_error[motor];
+}
+
+extern eObool_t eo_motors_isEncCalibrated(EOmotors *o, uint8_t motor)
+{
+    return !o->motor_enc_not_calibrated[motor];
 }
 
 extern void eo_motors_new_state_req(EOmotors *o, uint8_t motor, uint8_t control_mode)
@@ -121,6 +136,11 @@ extern void eo_motors_new_state_req(EOmotors *o, uint8_t motor, uint8_t control_
     {
         o->motor_run_state_req_wdog[motor] = 50;
     }
+}
+
+extern void eo_motors_reset_wdog(EOmotors *o, uint8_t motor)
+{
+    o->motor_watchdog[motor] = 0;
 }
 
 extern void eo_motors_rearm_wdog(EOmotors *o, uint8_t motor)
@@ -154,9 +174,10 @@ extern void eo_motor_set_motor_status(EOmotors *o, uint8_t m, uint8_t *state)
 {   
     if (!state) return;
 
-    o->motor_run_state[m] = state[0];
-    o->motor_fault_mask[m] = ((uint32_t*)state)[1];
-    o->motor_qe_error[m] = (((uint32_t)(((uint16_t*)state)[1]))<<16) | (uint32_t)state[1];
+    o->motor_run_state[m] = state[0]; //1byte
+	o->motor_fault_mask[m] = ((uint32_t*)state)[1]; //4bytes    
+	o->motor_qe_error[m] = (((uint32_t)(((uint16_t*)state)[1]))<<16) | (uint32_t)state[1]; //4bytes
+    o->motor_enc_not_calibrated[m] = state[1] & 0x10; //1byte
 }
 
 #include "EoError.h"
@@ -226,6 +247,8 @@ extern void eo_motors_decouple_PWM(EOmotors *o, float *pwm_joint, float *pwm_mot
         
         pwm_motor[m] >>= 14;
         
+        #warning: be careful when the jacobian will be enabled...dont think the limit is useful here
+		//here should give an error as a reminder
         LIMIT(pwm_motor[m], NOMINAL_CURRENT);
     }
 }
@@ -319,33 +342,96 @@ extern void eo_motors_decouple_PWM(EOmotors *o, float *pwm_joint, float *pwm_mot
         if (stiff[1]) {pwm_motor[1] = (pwm_joint[0]+pwm_joint[1])/2;} else {pwm_motor[1] = pwm_joint[1];}
         if (stiff[2]) {pwm_motor[2] =  pwm_joint[2];                } else {pwm_motor[2] = pwm_joint[2];}
     }        
-    else if (emscontroller_board_UPPERLEG == o->board)
+    else if (   (emscontroller_board_UPPERLEG == o->board)
+            ||  (emscontroller_board_CER_WAIST == o->board)
+            ||  (emscontroller_board_FACE_lips == o->board)
+            ||  (emscontroller_board_CER_BASE == o->board)
+            ||  (emscontroller_board_CER_WRIST == o->board))
     {    
         pwm_motor[0] = pwm_joint[0];
         pwm_motor[1] = pwm_joint[1];
         pwm_motor[2] = pwm_joint[2];
         pwm_motor[3] = pwm_joint[3];
     }        
-    else if (emscontroller_board_ANKLE == o->board)
+    else if ((emscontroller_board_ANKLE == o->board) || (emscontroller_board_FACE_eyelids_jaw == o->board))
     {    
         pwm_motor[0] = pwm_joint[0];
         pwm_motor[1] = pwm_joint[1];
     }
-    /*
-    else if((emscontroller_board_HEAD_neckpitch_neckroll == ems->board) || (emscontroller_board_HEAD_neckyaw_eyes == ems->board))
+    else if(emscontroller_board_HEAD_neckpitch_neckroll == o->board)
     {
-        #warning TODO: for head v3
-        // marco.accame: questo e' un placeholder per mettere le azioni specifiche riguardanti la scheda della head-v3.
-        // ovviamente si deve sviluppare gli if-else (o un bel switch-case) per tutte le board head v3. 
-        // qui se la scheda NON presenta coupled joints, allora si procede come nel caso del emscontroller_board_UPPERLEG.  
-        // altrimenti si procede come nel caso del emscontroller_board_WAIST.
-        // attenzione al caso di solo alcuni coupled joints (vedi emscontroller_board_SHOULDER)  
+        // use following formula:
+        // m0: left motor on neck
+        // m1: rigth motor on neck
+        // j0: pitch (the head moves forward and backwards)
+        // j1: roll (the head moves rigth and left)
+        // j0 = 0.5*m0 - 0.5*m1             (we must move the motors in opposite directions to move head forward or backwards)
+        // j1 = 0.5*m0 + 0.5*m1             (we must move the motors in the same directions to move head left or right)
+        // or:
+        // J = M * A, J = [j0, j1], M = {m0, m1], A = [0.5, -0.5], [0.5, 0.5]]
+        // hence M = J * A^-1, where A^-1 = [[1, 1,], [-1, 1]].
+        // m0 = +j0 + j1
+        // m1 = -j0 + j1
+        
+        // in here i must use the inverse matrix A ....
+        // however, as for the second joint we use a negative value of encoderconversionfactor in xml files, if we also want to keep the same sign 
+        // of the kp in PID then the matrix is [[-1 -1] [+1 -1]]        
+        {
+            if (stiff[0]) {pwm_motor[0] = (-pwm_joint[0]-pwm_joint[1]);} else {pwm_motor[0] = pwm_joint[0];}
+            if (stiff[1]) {pwm_motor[1] = (+pwm_joint[0]-pwm_joint[1]);} else {pwm_motor[1] = pwm_joint[1];}
+        }
+    }   
+   	else if((emscontroller_board_HEAD_neckyaw_eyes == o->board)) 
+    {
+        // joints 0 and 1 are independent, 2 and 3 are dependent.
+
+        pwm_motor[0] = pwm_joint[0];
+        pwm_motor[1] = pwm_joint[1];
+        
+        // for j2 and j3 ...
+        
+        // use following formula:
+        // m2: motor position of left eye (as read by encoder)              (L)
+        // m3: motor position of rigth eye (as read by encoder)             (R)
+        // e2: version of eyes                                              (Vs)
+        // e3: vergence of eyes                                             (Vg)
+        // e2 = 0.5*m2 + 0.5*m3             (we must move the motors in the same directions to move eyes to follow a direction)
+        // e3 = 1.0*m2 - 1.0*m3             (we must move the motors in the opposite directions to do convergence or divergence)
+        // or:
+        // E = A * M, E = [e2, e3], M = {m2, m3], A = [0.5, +0.5], [1.0, -1.0]]
+        // hence M = E * A^-1, where A^-1 = [[1, 0.5,], [1, -0.5]].
+        // m2 = +e2 + e3
+        // m3 = e2 - 0.5 * e3
+        
+        // in here i must use the inverse matrix A
+        {
+            float pwm2jo = pwm_joint[2];
+            float pwm3jo = pwm_joint[3];
+            uint8_t virtualCalibrationInProgress = 0;
+            // notyetbothcalibrated = (0 == pwm2jo) || (0 == pwm3jo); /// qui non siamo sicuri, meglio forse usare una formula piu' complessa.
+            
+            virtualCalibrationInProgress = eo_emsController_IsVirtualCalibrationInProgress();
+            
+            if(1 == virtualCalibrationInProgress)
+            {
+                pwm_motor[2] = pwm_joint[2];
+                pwm_motor[3] = pwm_joint[3];                
+            }
+            else
+            {
+                // we need to use the inverse of eyesDirectMatrix[] = {+0.500, +0.500, -0.500, +0.500} which is:
+                // const float eyesInverseMatrix[] = {+1.000, -1.000, +1.000, +1.000};
+                if (stiff[2]) {pwm_motor[2] = ( (+1.000f)*pwm2jo + (-1.000f)*pwm3jo);} else {pwm_motor[2] = pwm_joint[2];}
+                if (stiff[3]) {pwm_motor[3] = ( (+1.000f)*pwm2jo + (+1.000f)*pwm3jo);} else {pwm_motor[3] = pwm_joint[3];}                 
+            }
+        }  
     }
-    */
     else    // marco.accame: this board does not have coupled joints
+            // davide: to me seems more like that your trying to compute the PWM of an undefined board
     {    
         MOTORS(m) pwm_motor[m] = 0;
     }
+    
     //#endif
 }
 

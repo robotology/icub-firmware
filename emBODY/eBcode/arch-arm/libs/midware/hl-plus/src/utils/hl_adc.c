@@ -34,6 +34,7 @@
 #include "stdlib.h"
 #include "string.h"
 #include "stdio.h"
+#include "hl_core.h"
 #include "hl_sys.h"
 #include "hl_bits.h" 
 // --------------------------------------------------------------------------------------------------------------------

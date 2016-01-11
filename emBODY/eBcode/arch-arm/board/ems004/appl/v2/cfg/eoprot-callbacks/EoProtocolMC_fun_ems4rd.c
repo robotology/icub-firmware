@@ -116,6 +116,7 @@ static eOresult_t s_translate_eOmcControlMode2icubCanProtoControlMode(eOmc_contr
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
+// empty-section
 
 
 
@@ -272,17 +273,18 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
         command.value = &vel_ticks; 
         eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);         
     }
-    
-    // 8) set monitormode status
-    
-    if(eomc_motionmonitormode_dontmonitor == cfg->motionmonitormode)
-    {
-        jstatus->basic.motionmonitorstatus = eomc_motionmonitorstatus_notmonitored;  
-    }
-    else
-    {
-        jstatus->basic.motionmonitorstatus = eomc_motionmonitorstatus_setpointnotreachedyet;
-    }
+
+// we dont need it anymore     
+//    // 8) set monitormode status
+//    
+//    if(eomc_motionmonitormode_dontmonitor == cfg->motionmonitormode)
+//    {
+//        jstatus->basic.motionmonitorstatus = eomc_motionmonitorstatus_notmonitored;  
+//    }
+//    else
+//    {
+//        jstatus->basic.motionmonitorstatus = eomc_motionmonitorstatus_setpointnotreachedyet;
+//    }
 
 }
 
@@ -519,25 +521,49 @@ extern void eoprot_fun_UPDT_mc_joint_config_velocitysetpointtimeout(const EOnv* 
 }
 
 
-extern void eoprot_fun_UPDT_mc_joint_config_motionmonitormode(const EOnv* nv, const eOropdescriptor_t* rd)
-{   // 2foc or mc4can is equal
+
+extern void eoprot_fun_UPDT_mc_joint_status_modes_ismotiondone(const EOnv* nv, const eOropdescriptor_t* rd)
+{
     eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
-    eOmc_joint_status_t *jstatus = eo_entities_GetJointStatus(eo_entities_GetHandle(), jxx);
+    eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
+   
+    if(eo_motcon_mode_foc == mcmode)
+    {
+        // do nothing
+    }
+    else if(eo_motcon_mode_mc4 == mcmode)
+    {          
+        if(eo_ropcode_ask == rd->ropcode)
+        {   
+            // must send a get motion done request to the mc4 board and then ... activate the proxy for the reply to robotInterface            
+            eOcanprot_command_t command = {0};
+            command.class = eocanprot_msgclass_pollingMotorControl;
+            command.type = ICUBCANPROTO_POL_MC_CMD__MOTION_DONE;
+            command.value = NULL;
+        
+            EOproxy * proxy = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
+            eOproxy_params_t *param = eo_proxy_Params_Get(proxy, rd->id32);
+            if(NULL == param)
+            {
+                eOerrmanDescriptor_t errdes = {0};
+                errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+                errdes.sourceaddress    = 0;
+                errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_forward_callback_fails);
+                errdes.par16            = 0; 
+                errdes.par64            = ((uint64_t)rd->signature << 32) | (rd->id32); 
+                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
+                return;
+            }
+            param->p08_1 = 1;       // we expect one can frame
+            param->p08_2 = 0;       // and we havent received any yet
+              
+            eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);        
+                      
+            return;
+        }
     
-    if(NULL == jstatus)
-    {
-        return; //error
-    }
-    
-    //#warning marco.accame: better using cast to eOmc_motionmonitormode_t
-    if(eomc_motionmonitormode_dontmonitor == *((eOenum08_t*)rd->data))
-    {
-        jstatus->basic.motionmonitorstatus = (eOenum08_t)eomc_motionmonitorstatus_notmonitored;  
-    }
-    else
-    {
-        jstatus->basic.motionmonitorstatus = eomc_motionmonitorstatus_setpointnotreachedyet;
-    }
+    }    
+
 }
 
 
@@ -555,17 +581,35 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
     } 
        
     //#warning -> marco.accame: cast to proper type
-    if(eomc_motionmonitormode_forever == joint->config.motionmonitormode)
-    {       
+//    if(eomc_motionmonitormode_forever == joint->config.motionmonitormode)
+//    {       
+//        //#warning --> marco.accame: cast to proper type
+//        /* if monitorstatus values setpointreached means this is a new set point, 
+//        so i need to start to check is set point is reached because i'm in monitormode = forever */
+//        if(eomc_motionmonitorstatus_setpointisreached == joint->status.basic.motionmonitorstatus)
+//        {
+//            joint->status.basic.motionmonitorstatus = eomc_motionmonitorstatus_setpointnotreachedyet;
+//        }
+//    }
+    
+    
+//    if(eomc_motionmonitormode_forever == joint->config.motionmonitormode)
+//    {       
         //#warning --> marco.accame: cast to proper type
         /* if monitorstatus values setpointreached means this is a new set point, 
         so i need to start to check is set point is reached because i'm in monitormode = forever */
-        if(eomc_motionmonitorstatus_setpointisreached == joint->status.basic.motionmonitorstatus)
-        {
-            joint->status.basic.motionmonitorstatus = eomc_motionmonitorstatus_setpointnotreachedyet;
-        }
-    }
+//        if(eomc_motionmonitorstatus_setpointisreached == joint->status.basic.motionmonitorstatus)
+//        {
+//            joint->status.basic.motionmonitorstatus = eomc_motionmonitorstatus_setpointnotreachedyet;
+//        }
+//        if(eobool_true == joint->status.basic.ismotiondone)
+//        {   // ok, ma ... la condizione di sopra e' inutile
+//            joint->status.ismotiondone = eobool_false;
+//        }
+//    }    
 
+
+    joint->status.modes.ismotiondone = eobool_false;
 
     //if(eobool_true == s_motorcontrol_is2foc_based())   
     if(eo_motcon_mode_foc == mcmode)
@@ -579,7 +623,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
             
             case eomc_setpoint_positionraw:
             {
-                eo_emsController_SetPosRaw(jxx, setpoint->to.position.value);
+                eo_emsController_SetPosRaw(jxx, setpoint->to.positionraw.value);
             } break;
             
             case eomc_setpoint_velocity:
@@ -729,7 +773,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
 
             case eomc_setpoint_positionraw:
             {    
-                pos = eo_mc4boards_Convert_Position_toCAN(mc4boards, jxx, setpoint->to.position.value);
+                pos = eo_mc4boards_Convert_Position_toCAN(mc4boards, jxx, setpoint->to.positionraw.value);
                 command.type  = ICUBCANPROTO_POL_MC_CMD__SET_COMMAND_POSITION; 
                 command.value =  &pos;                   
             } break;
@@ -793,10 +837,9 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
     if(eo_motcon_mode_foc == mcmode)
     {
         eo_emsController_SetAxisCalibrationZero (jxx, calibrator->params.type3.calibrationZero);
-        eo_emsController_StartCalibration_type3(jxx, 
-                                          calibrator->params.type3.position, 
-                                          calibrator->params.type3.velocity,
-                                          calibrator->params.type3.offset);
+        eo_emsController_StartCalibration(jxx,
+                                          eomc_calibration_type3_abs_sens_digital,
+                                          calibrator->params.any);
 
     }
     else if(eo_motcon_mode_mc4 == mcmode)
@@ -1101,7 +1144,8 @@ extern void eoprot_fun_UPDT_mc_joint_inputs_externallymeasuredtorque(const EOnv*
     }
     else if(eo_motcon_mode_mc4 == mcmode)
     {
-        icubCanProto_torque_t icub_torque = *torque + 0x8000;
+        eOmeas_torque_t trq = EO_CLIP_INT16(*torque);
+        icubCanProto_torque_t icub_torque = trq + 0x8000;
         eo_virtualstrain_SetTorque(eo_virtualstrain_GetHandle(), jxx, icub_torque);        
     }
 }
@@ -1135,7 +1179,7 @@ extern void eoprot_fun_UPDT_mc_motor_config_rotorencoder(const EOnv* nv, const e
 }
 
 #if defined(EOMOTIONCONTROL_DONTREDEFINE_JOINTCOUPLING_CALLBACK)
-    #warning --> EOMOTIONCONTROL_DONTREDEFINE_JOINTCOUPLING_CALLBACK is defined, thus we are not using eo_emsController_set_Jacobian() etc
+#warning INFO: EOMOTIONCONTROL_DONTREDEFINE_JOINTCOUPLING_CALLBACK is defined, thus we are not using eo_emsController_set_Jacobian() etc
 #else
 extern void eoprot_fun_UPDT_mc_controller_config_jointcoupling(const EOnv* nv, const eOropdescriptor_t* rd)
 {    

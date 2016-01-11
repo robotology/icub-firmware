@@ -92,7 +92,7 @@
 #undef 	SEND_STATISTICS_INFO
 
 #ifdef SEND_STATISTICS_INFO
-	#define	STATISTICS_PERIOD 							10000
+    #define	STATISTICS_PERIOD   10000
 #endif
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -194,7 +194,8 @@ static EOMtheEMSrunner s_theemsrunner =
     .usedTXdecimationfactor = 1,
     .itisaTXcycle           = eobool_true,
     .txropsnumberincycle    = {0, 0, 0},
-    .prevTXactiviySentRegularROPs   = eobool_false   
+    .txcan1frames           = 0,
+    .txcan2frames           = 0
 };
 
 
@@ -359,6 +360,19 @@ extern eOresult_t eom_emsrunner_Set_TXdecimationFactor(EOMtheEMSrunner *p, uint8
     return(eores_OK);    
 }
 
+extern eOresult_t eom_emsrunner_Set_TXcanframes(EOMtheEMSrunner *p, uint8_t txcan1, uint8_t txcan2)
+{  
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }   
+
+    p->txcan1frames = txcan1;
+    p->txcan2frames = txcan2;
+    
+    return(eores_OK);    
+}
+
 extern eObool_t eom_emsrunner_CycleHasJustTransmittedRegulars(EOMtheEMSrunner *p)
 {
     if(NULL == p)
@@ -366,8 +380,35 @@ extern eObool_t eom_emsrunner_CycleHasJustTransmittedRegulars(EOMtheEMSrunner *p
         return(eobool_false);
     } 
     
-    return(p->prevTXactiviySentRegularROPs);     
+    eObool_t ret = (0 == p->txropsnumberincycle.numberofregulars) ? (eobool_false) : (eobool_true);
+
+    return(ret);   
 }
+
+
+extern eOresult_t eom_emsrunner_SetTiming(EOMtheEMSrunner *p, const eOemsrunner_timing_t *timing)
+{
+    if((NULL == p) || (NULL == timing))
+    {
+        return(eores_NOK_nullpointer);
+    } 
+    
+    if(eobool_true == s_theemsrunner.cycleisrunning)
+    {
+        return(eores_NOK_generic);        
+    }
+    
+    p->cfg.execRXafter = timing->rxstartafter;
+    p->cfg.safeRXexecutiontime = timing->dostartafter - timing->rxstartafter - timing->safetygap;
+    p->cfg.execDOafter = timing->dostartafter;
+    p->cfg.safeDOexecutiontime = timing->txstartafter - timing->dostartafter - timing->safetygap;
+    p->cfg.execTXafter = timing->txstartafter;
+    p->cfg.safeTXexecutiontime = timing->period - timing->txstartafter - timing->safetygap;
+    p->cfg.period = timing->period;
+    
+    return(eores_OK);
+}
+
 
 extern eOresult_t eom_emsrunner_Start(EOMtheEMSrunner *p)
 {
@@ -729,8 +770,6 @@ __weak extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtrans
 //    }
     
     
-    p->prevTXactiviySentRegularROPs = eobool_false;
-    
         
     // the transmission section
     if(eobool_true == processtransmission)
@@ -741,7 +780,7 @@ __weak extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtrans
         processedpkts++;   
         
         // 1.1 call the former to retrieve a tx packet (even if it is an empty ropframe)        
-        resformer = eom_emstransceiver_Form(eom_emstransceiver_GetHandle(), &txpkt, &numberoftxrops, &p->txropsnumberincycle);
+        resformer = eom_emstransceiver_Form(eom_emstransceiver_GetHandle(), &txpkt, &numberoftxrops, &s_theemsrunner.txropsnumberincycle);
         
        
         // 1.2  send a packet back. but only if the former gave us a good one and if we have at least 1 rop inside
@@ -755,8 +794,6 @@ __weak extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtrans
                     p->numoftxrops += numberoftxrops;
                     p->numoftxpackets++;
                     p->numofpacketsinsidesocket++;
-                    // update this state variable
-                    p->prevTXactiviySentRegularROPs = (0 == p->txropsnumberincycle.numberofregulars) ? (eobool_false) : (eobool_true);
                 }
                 else
                 {
@@ -1115,9 +1152,6 @@ static void s_eom_emsrunner_taskTX_run(EOMtask *p, uint32_t t)
         // stop the tx timers ...
         hal_timer_stop(s_theemsrunner.haltimer_start[eo_emsrunner_taskid_runTX]);        
         hal_timer_stop(s_theemsrunner.haltimer_alert[eo_emsrunner_taskid_runTX]);
-        
-        // clear the value
-        s_theemsrunner.prevTXactiviySentRegularROPs = eobool_false;
         
         // and now ... finally we sent the state machine into the new state
         // reset the event to the dummy value.
@@ -1550,59 +1584,77 @@ static void s_eom_emsrunner_send_diagnosticsinfo_maxmin_timing(void)
 
 static void s_eom_emsrunner_update_diagnosticsinfo_check_overflows(eOemsrunner_taskid_t taskid)
 {
+    static uint64_t last4durations = 0;
+    
+    uint64_t currduration = 0;
+    
 	eOerrmanDescriptor_t errdes = {0};
-	errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+	errdes.sourcedevice = eo_errman_sourcedevice_localboard;
   	errdes.sourceaddress    = 0;
 	eOerrmanErrorType_t errortype = (eo_emsrunner_mode_hardrealtime == s_theemsrunner.mode) ? (eo_errortype_error) : (eo_errortype_warning);
 	switch (taskid)
 	{
 		case eo_emsrunner_taskid_runRX:
+        {
+            currduration = eom_emsrunner_rxduration & 0xffff;
 			if (eom_emsrunner_rxduration > s_theemsrunner.cfg.execDOafter)
 			{
 				eom_runner_hid_overflow_set(&s_theemsrunner, eo_emsrunner_taskid_runRX);
 				s_eom_emsrunner_update_diagnosticsinfo_exeoverflows(eo_emsrunner_taskid_runRX);
 				errdes.code             = eoerror_code_get(eoerror_category_System,eoerror_value_SYS_ctrloop_execoverflowRX);
 				errdes.par16            = eom_emsrunner_rxduration;
-                errdes.par64            = 0; 
+                errdes.par64            = last4durations; 
 				eo_errman_Error(eo_errman_GetHandle(), errortype, NULL, s_eobj_ownname, &errdes);
 			}
 			else
 			{
 				eom_runner_hid_overflow_reset(&s_theemsrunner, eo_emsrunner_taskid_runRX);
 			}
-			break;
+        } break;
+            
 		case eo_emsrunner_taskid_runDO:
+        {
+            currduration = eom_emsrunner_doduration & 0xffff;
 			if (eom_emsrunner_doduration > (s_theemsrunner.cfg.execTXafter - s_theemsrunner.cfg.execDOafter))
 			{
 				eom_runner_hid_overflow_set(&s_theemsrunner, eo_emsrunner_taskid_runDO);
 				s_eom_emsrunner_update_diagnosticsinfo_exeoverflows(eo_emsrunner_taskid_runDO);
 				errdes.code             = eoerror_code_get(eoerror_category_System,eoerror_value_SYS_ctrloop_execoverflowDO);
 				errdes.par16            = eom_emsrunner_doduration;
-                errdes.par64            = 0; 
+                errdes.par64            = last4durations; 
 				eo_errman_Error(eo_errman_GetHandle(), errortype, NULL, s_eobj_ownname, &errdes);
 			}
 			else
 			{
 				eom_runner_hid_overflow_reset(&s_theemsrunner, eo_emsrunner_taskid_runDO);
 			}
-			break;
+        } break;
+            
 		case eo_emsrunner_taskid_runTX:
+        {
+            currduration = eom_emsrunner_txduration & 0xffff;
 			if (eom_emsrunner_txduration > (s_theemsrunner.cfg.period - s_theemsrunner.cfg.execTXafter))
 			{
 				eom_runner_hid_overflow_set(&s_theemsrunner, eo_emsrunner_taskid_runTX);
 				s_eom_emsrunner_update_diagnosticsinfo_exeoverflows(eo_emsrunner_taskid_runTX);
 				errdes.code             = eoerror_code_get(eoerror_category_System,eoerror_value_SYS_ctrloop_execoverflowTX);
 				errdes.par16            = eom_emsrunner_txduration;
-                errdes.par64            = 0; 
+                uint64_t canframes = s_theemsrunner.txcan1frames | (s_theemsrunner.txcan2frames << 8);
+                errdes.par64            = (last4durations & 0x0000ffffffffffff) | (canframes << 48); 
 				eo_errman_Error(eo_errman_GetHandle(), errortype, NULL, s_eobj_ownname, &errdes);
 			}
 			else
 			{
 				eom_runner_hid_overflow_reset(&s_theemsrunner, eo_emsrunner_taskid_runTX);
-			}
-			break;
+			}           
+        } break;
 	}
+    
+    last4durations = last4durations << 16;
+    last4durations = last4durations & 0xffffffffffff0000;
+    last4durations = last4durations | (currduration & 0xffff);    
 }
+
 #if defined(EVIEWER_ENABLED)
 void evRXstart(void){}
 void evRXalert(void){}

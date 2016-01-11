@@ -210,6 +210,7 @@ extern EOMtask * eom_task_New(eOmtaskType_t type, uint8_t priority, uint16_t sta
                                     NULL, NULL,
                                     s_eom_task_get_id
                                   );
+
 #if defined(PRINT_TASK_ADDITIONAL_INFO)
             snprintf(typestr, sizeof(typestr), "%s", "evt-drvn");
 #endif
@@ -237,6 +238,7 @@ extern EOMtask * eom_task_New(eOmtaskType_t type, uint8_t priority, uint16_t sta
                                     NULL, NULL,
                                     s_eom_task_get_id
                                   );
+
 #if defined(PRINT_TASK_ADDITIONAL_INFO)
             snprintf(typestr, sizeof(typestr), "%s", "msg-drvn");
 #endif
@@ -265,6 +267,7 @@ extern EOMtask * eom_task_New(eOmtaskType_t type, uint8_t priority, uint16_t sta
                                     s_eom_task_isr_exec_callback, s_eom_task_tsk_exec_callback,
                                     s_eom_task_get_id
                                   );
+
 #if defined(PRINT_TASK_ADDITIONAL_INFO)
             snprintf(typestr, sizeof(typestr), "%s", "actv-drvn");
 #endif
@@ -289,6 +292,7 @@ extern EOMtask * eom_task_New(eOmtaskType_t type, uint8_t priority, uint16_t sta
                                     NULL, NULL,
                                     s_eom_task_get_id
                                   );
+
 #if defined(PRINT_TASK_ADDITIONAL_INFO)
             snprintf(typestr, sizeof(typestr), "%s", "periodic");
 #endif

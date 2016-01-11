@@ -26,6 +26,7 @@
 #include "EOtheErrorManager.h"
 #include "EOtheCANservice.h"
 #include "EOtheCANdiscovery2.h"
+#include "EOtheETHmonitor.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -91,11 +92,18 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdef00Event(EOMtheEMSconfi
 // if we are in CFG state so that we can _Tick() it.
 
 extern void eom_emsconfigurator_hid_userdef_ProcessUserdef01Event(EOMtheEMSconfigurator* p)
-{    
+{
     eo_candiscovery2_Tick(eo_candiscovery2_GetHandle());
 }
 
-// marco.accame on 20 cot 2015: this function is triggered if function eom_emssocket_Transmit() inside the task 
+
+
+extern void eom_emsconfigurator_hid_userdef_ProcessUserdef02Event(EOMtheEMSconfigurator* p)
+{
+    eo_ethmonitor_Tick(eo_ethmonitor_GetHandle());
+}
+
+// marco.accame on 20 oct 2015: this function is triggered if function eom_emssocket_Transmit() inside the task 
 // of EOMtheEMSconfigurator it there is a failure to transmit a UDP packet.
 
 extern void eom_emsconfigurator_hid_userdef_onemstransceivererror(EOMtheEMStransceiver* p)

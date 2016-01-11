@@ -24,7 +24,7 @@
 #include "stdlib.h"
 #include "string.h"
 
-#include "eOcommon.h"
+#include "EoCommon.h"
 #include "EOtheErrorManager.h"
 #include "EOMtheEMSconfigurator.h"
 
@@ -34,7 +34,7 @@
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "EOtheServices.h"
+#include "EOtheServices0.h"
 
 
 
@@ -42,7 +42,7 @@
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "EOtheServices_hid.h"
+#include "EOtheServices0_hid.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -65,16 +65,18 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
-static void s_eo_theservices_cancbkonrx(void *arg);
-
+static void s_eo_theserv0ices_cancbkonrx(void *arg);
+static eOresult_t s_eo_theserv0ices_onstop_search4mais(void* par, EOtheCANdiscovery2* p, eObool_t searchisok);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static EOtheServices s_eo_theserv = 
+static EOtheServices0 s_eo_theserv0 = 
 {
-    .initted                 = eobool_false
+    .initted                    = eobool_false,
+    .isASmais_ready             = eobool_false,
+    .BOARDisreadyforcontrolloop = eobool_false
 };
 
 static eOcanserv_cfg_t eo_canserv_DefaultCfgMc4plus = 
@@ -87,7 +89,16 @@ static eOcanserv_cfg_t eo_canserv_DefaultCfgMc4plus =
     .onrxargument           = {NULL, NULL}
 };
 
-//static const char s_eobj_ownname[] = "EOtheServices";
+static const eOcandiscovery_target_t s_candiscoverytarget_mais_mc4plus =
+{   
+    .boardtype          = eobrd_cantype_mais,
+    .filler             = {0},
+    .firmwareversion    = {0, 0},
+    .protocolversion    = {1, 0},
+    .canmap             = {0x4000, 0x0000}
+};
+
+//static const char s_eobj_ownname[] = "EOtheServices0";
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -95,24 +106,24 @@ static eOcanserv_cfg_t eo_canserv_DefaultCfgMc4plus =
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern EOtheServices* eo_serv_Initialise(eOserv_cfg_t *cfg)
+extern EOtheServices0* eo_serv0_Initialise(eOserv0_cfg_t *cfg)
 {
-    s_eo_theserv.initted = eobool_true;    
-    return(&s_eo_theserv);
+    s_eo_theserv0.initted = eobool_true;    
+    return(&s_eo_theserv0);
 }
 
 
-extern EOtheServices* eo_serv_GetHandle(void)
+extern EOtheServices0* eo_serv0_GetHandle(void)
 {
-    if(eobool_false == s_eo_theserv.initted)
+    if(eobool_false == s_eo_theserv0.initted)
     {
         return(NULL);
     }
-    return(&s_eo_theserv);
+    return(&s_eo_theserv0);
 }
 
 
-extern eOresult_t eo_serv_ConfigMC(EOtheServices *p, eOmcconfig_cfg_t *mccfg)
+extern eOresult_t eo_serv0_ConfigMC(EOtheServices0 *p, eOmcconfig_cfg_t *mccfg)
 {
 //    eOresult_t res = eores_OK;
     
@@ -127,7 +138,20 @@ extern eOresult_t eo_serv_ConfigMC(EOtheServices *p, eOmcconfig_cfg_t *mccfg)
 }
 
 
-extern eOresult_t eo_serv_ConfigCAN(EOtheServices *p, eOcanserv_cfg_t *cancfg)
+
+extern eOresult_t eo_serv0_InitializeCurrentsWatchdog(EOtheServices0 *p)
+{    
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    eo_currents_watchdog_Initialise();
+    
+    return(eores_OK);
+}
+
+extern eOresult_t eo_serv0_ConfigCAN(EOtheServices0 *p, eOcanserv_cfg_t *cancfg)
 {
 //    eOresult_t res = eores_OK;
     
@@ -141,7 +165,7 @@ extern eOresult_t eo_serv_ConfigCAN(EOtheServices *p, eOcanserv_cfg_t *cancfg)
     {
         //use default config for MC4plus (can1 and NOT can2)
         cancfg = &eo_canserv_DefaultCfgMc4plus;
-        cancfg->onrxcallback[0]  = s_eo_theservices_cancbkonrx; 
+        cancfg->onrxcallback[0]  = s_eo_theserv0ices_cancbkonrx; 
         cancfg->onrxargument[0]  = eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle());    
     }
     
@@ -152,7 +176,7 @@ extern eOresult_t eo_serv_ConfigCAN(EOtheServices *p, eOcanserv_cfg_t *cancfg)
 }
 
 
-extern eOresult_t eo_serv_StartCANdiscovery(EOtheServices *p)
+extern eOresult_t eo_serv0_StartCANdiscovery(EOtheServices0 *p)
 {
     if(NULL == p)
     {
@@ -160,8 +184,50 @@ extern eOresult_t eo_serv_StartCANdiscovery(EOtheServices *p)
     }
     
     //Init and start the discovery
-    eo_candiscovery_Initialise();
-    eo_candiscovery_Start(eo_candiscovery_GetHandle());
+    eo_candiscovery2_Initialise(NULL);
+    
+    //start mais discovery
+    const eOcandiscovery_target_t *mais_t = &s_candiscoverytarget_mais_mc4plus;
+    eOcandiscovery_onstop_t onstop = {0};
+    onstop.function = s_eo_theserv0ices_onstop_search4mais;
+    onstop.parameter = NULL;
+    eo_candiscovery2_Start(eo_candiscovery2_GetHandle(),mais_t, &onstop);
+    
+    return(eores_OK);
+}
+
+extern eObool_t eo_serv0_IsBoardReadyForControlLoop(EOtheServices0 *p)
+{
+    if(NULL == p)
+    {
+        return(eobool_false);
+    }
+    
+    return(p->BOARDisreadyforcontrolloop);    
+}
+
+extern eOresult_t eo_serv0_SetBoardReadyForControlLoop(EOtheServices0 *p)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+         
+    p->BOARDisreadyforcontrolloop = eobool_true;
+        
+    return eores_OK;
+}
+
+extern eOresult_t eo_serv0_SendDiscoveryFailureReport(EOtheServices0 *p)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    eo_candiscovery2_SendLatestSearchResults(eo_candiscovery2_GetHandle());
+    
+    return(eores_OK);    
 }
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
@@ -171,16 +237,35 @@ extern eOresult_t eo_serv_StartCANdiscovery(EOtheServices *p)
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
-static void s_eo_theservices_cancbkonrx(void *arg)
+static void s_eo_theserv0ices_cancbkonrx(void *arg)
 {
     EOMtask *task = (EOMtask *)arg;
     eom_task_isrSetEvent(task, emsconfigurator_evt_userdef00);
 }
 
+static eOresult_t s_eo_theserv0ices_onstop_search4mais(void* par, EOtheCANdiscovery2* p, eObool_t searchisok)
+{
+    if(eobool_true == searchisok)
+    {
+        s_eo_theserv0.isASmais_ready = eobool_true;
+        eo_serv0_SetBoardReadyForControlLoop(&s_eo_theserv0);
+        
+        eo_mais_Initialise();
+        
+        uint8_t board_n = eoprot_board_local_get();
+        //only the owners should start the mais (c-shape boards on the lower arms)
+        if ((board_n == 15) || (board_n == 18))
+            eo_mais_Start(eo_mais_GetHandle());          
+    }     
+    else
+    {
+//        const eOcandiscovery_detection_t* det = eo_candiscovery2_GetDetection(eo_candiscovery2_GetHandle());
+//        memcpy(&s_applBody.failedDetection, det, sizeof(eOcandiscovery_detection_t));        
+    }
+    
+    return(eores_OK);
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------
-
-
-

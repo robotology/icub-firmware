@@ -23,45 +23,55 @@
 #include "hal_led.h"
 #include "EOtheLEDpulser.h"
 #include "EOtheErrorManager.h"
+#include "EoError.h"
 
 #include "EOVtheSystem.h"
 
 #include "EOMtheEMSappl_hid.h"
+
 #include "EOMtheEMSapplCfg.h"
 
 
 #include "EOaction.h"
-
+#include "EOtimer.h"
 
 #include "EOMtheEMSapplCfg_cfg.h"
 
-#include "EOnvSet.h"
-#include "EoProtocolMC.h"
+//#include "EOnvSet.h"
+//#include "EoProtocolMC.h"
 
 
 #include "EOtheCANservice.h"
-#include "EOtheCANprotocol.h"
+//#include "EOtheCANprotocol.h"
 
-#include "EOtheEntities.h"
+//#include "EOtheEntities.h"
+
+#include "EOtheServices.h"
+#include "EOtheMotionController.h"
 #include "EOtheSTRAIN.h"
 #include "EOtheMAIS.h"
 #include "EOtheSKIN.h"
 #include "EOtheInertials.h"
+#include "EOtheETHmonitor.h"
 
 #include "EOtheBoardConfig.h"
 
 
-#include "EOconstvector_hid.h"
 
-#include "EOtimer.h"
 
 #include "EOVtheCallbackManager.h"
 
-#include "EOconstarray.h"
 
-#include "EOtheMotionController.h"
 
-#include "EoError.h"
+//#include "EOconstarray.h"
+
+
+
+
+//#warning MERGE-> remove asap inclusion of EOemsControllerCfg.h
+//#include "EOemsControllerCfg.h"
+
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -86,66 +96,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
-   
 
-//static const eOemsapplbody_cfg_t theemsapplbodycfg =
-//{
-//    .encoderreaderconfig    =
-//    {
-//        .joints = 
-//        {   // at most 6 joints can be managed. one with an encoder each 
-//            {   // pos 0
-//                .primary_encoder        = eo_appEncReader_enc_type_NONE,
-//                .primary_enc_position   = eo_appEncReader_encoder_positionNONE,
-//                .extra_encoder          = eo_appEncReader_enc_type_NONE,
-//                .extra_enc_position     = eo_appEncReader_encoder_positionNONE                
-//            },
-//            {   // pos 1
-//                .primary_encoder        = eo_appEncReader_enc_type_NONE,
-//                .primary_enc_position   = eo_appEncReader_encoder_positionNONE,
-//                .extra_encoder          = eo_appEncReader_enc_type_NONE,
-//                .extra_enc_position     = eo_appEncReader_encoder_positionNONE                
-//            },
-//            {   // pos 2
-//                .primary_encoder        = eo_appEncReader_enc_type_NONE,
-//                .primary_enc_position   = eo_appEncReader_encoder_positionNONE,
-//                .extra_encoder          = eo_appEncReader_enc_type_NONE,
-//                .extra_enc_position     = eo_appEncReader_encoder_positionNONE                
-//            },
-//            {   // pos 3
-//                .primary_encoder        = eo_appEncReader_enc_type_NONE,
-//                .primary_enc_position   = eo_appEncReader_encoder_positionNONE,
-//                .extra_encoder          = eo_appEncReader_enc_type_NONE,
-//                .extra_enc_position     = eo_appEncReader_encoder_positionNONE                
-//            }, 
-//            {   // pos 4
-//                .primary_encoder        = eo_appEncReader_enc_type_NONE,
-//                .primary_enc_position   = eo_appEncReader_encoder_positionNONE,
-//                .extra_encoder          = eo_appEncReader_enc_type_NONE,
-//                .extra_enc_position     = eo_appEncReader_encoder_positionNONE                
-//            },
-//            {   // pos 5
-//                .primary_encoder        = eo_appEncReader_enc_type_NONE,
-//                .primary_enc_position   = eo_appEncReader_encoder_positionNONE,
-//                .extra_encoder          = eo_appEncReader_enc_type_NONE,
-//                .extra_enc_position     = eo_appEncReader_encoder_positionNONE                
-//            }            
-//        },
-//        .SPI_streams    =
-//        {   // at most 2 streams: one over spix and one over spiy
-//            {
-//                .type       = hal_encoder_tundefined, // or hal_encoder_t1 for aea
-//                .numberof   = 0
-//            },
-//            {
-//                .type       = hal_encoder_tundefined, // or hal_encoder_t1 for aea
-//                .numberof   = 0
-//            }
-//        },
-//        .SPI_callbackOnLastRead = NULL,
-//        .SPI_callback_arg       = NULL       
-//    }
-//};
 
 // we need to define it ... even if it is useless. we shall remove it later on
 const EOVtheEMSapplCfgBody theapplbodyconfig = 
@@ -153,6 +104,7 @@ const EOVtheEMSapplCfgBody theapplbodyconfig =
     .type               =   0,
     .thetrueconfig      =   NULL
 };
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -164,38 +116,18 @@ const EOVtheEMSapplCfgBody theapplbodyconfig =
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static void overridden_appl_led_error_init(void);
+static void s_overridden_appl_led_error_init(void);
+
+static void s_overridden_appl_initialise_services(void);
+
+static eOprotBRD_t s_overridden_appl_get_boardnumber_fromIPaddress(void);
 
 
-static void s_overridden_appl_initialise_eb9(EOMtheEMSappl* p);
-static void s_debug_eb9(void);
-static void callback_eb9(void *p);
-static eOresult_t s_on_strain_verify_eb9(EOaService* p, eObool_t verifyisok);
-static eOresult_t s_on_mcfoc_verify_eb9(EOaService* p, eObool_t verifyisok);
-
-
-
-static void s_overridden_appl_initialise_eb1(EOMtheEMSappl* p);
-static void s_debug_eb1(void);
-static void callback_eb1(void *p);
-static eOresult_t s_on_strain_verify_eb1(EOaService* p, eObool_t verifyisok);
-static eOresult_t s_on_mcfoc_verify_eb1(EOaService* p, eObool_t verifyisok);
-
-
-
-
-static void s_overridden_appl_initialise_eb2(EOMtheEMSappl* p);
-static void s_debug_eb2(void);
-static void callback_eb2(void *p);
-static eOresult_t s_on_inertials_verify_eb2(EOaService* p, eObool_t verifyisok);
-static eOresult_t s_on_skin_verify_eb2(EOaService* p, eObool_t verifyisok);
-static eOresult_t s_on_mc4_verify_eb2(EOaService* p, eObool_t verifyisok);
-static eOresult_t s_on_mais_verify_eb2(EOaService* p, eObool_t verifyisok);
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static uint8_t s_boardnum = 0;
+static eOprotBRD_t s_boardnum = 0;
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -207,16 +139,188 @@ static uint8_t s_boardnum = 0;
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
 
+// it is called by the init task before scheduling is enabled and before we activate the CFG-RUN-ERR state machine
+extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
+{   
+    // pulse led3 forever at 20 hz.
+    eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_three, EOK_reltime1sec/20, 0); 
+    
+    // do whatever is needed to start services.
+    s_overridden_appl_initialise_services();    
+}
+
+
+extern void eom_emsappl_hid_userdef_on_entry_CFG(EOMtheEMSappl* p)
+{    
+    // pulse led3 forever at 0.50 hz.       
+    eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_three, 2*EOK_reltime1sec, 0);
+
+    // EOtheCANservice: set straight mode and force parsing of all packets in the RX queues.
+    eo_canserv_SetMode(eo_canserv_GetHandle(), eocanserv_mode_straight);
+    eo_canserv_ParseAll(eo_canserv_GetHandle());
+    
+    // tell the ethmonitor to alert the task of the configurator
+    eo_ethmonitor_SetAlert(eo_ethmonitor_GetHandle(), eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()), emsconfigurator_evt_userdef02);
+}
+
+
+extern void eom_emsappl_hid_userdef_on_exit_CFG(EOMtheEMSappl* p)
+{
+    // tell the ethmonitor to alert no task. the relevant on_entry_xxx function will set a new action
+    eo_ethmonitor_SetAlert(eo_ethmonitor_GetHandle(), NULL, 0);
+}
+
+
+extern void eom_emsappl_hid_userdef_on_entry_RUN(EOMtheEMSappl* p)
+{
+    // pulse led3 forever at 1 hz.
+    eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_three, EOK_reltime1sec/1, 0);  
+    
+    // EOtheCANservice: set on demand mode. then tx all canframes remained in the tx queues
+    eo_canserv_SetMode(eo_canserv_GetHandle(), eocanserv_mode_ondemand);    
+    eo_canserv_TXstartAll(eo_canserv_GetHandle(), NULL, NULL);
+    eo_canserv_TXwaitAllUntilDone(eo_canserv_GetHandle(), 5*eok_reltime1ms);
+    
+    // tell the ethmonitor to alert no task, because the runner will tick it now at every cycle
+    eo_ethmonitor_SetAlert(eo_ethmonitor_GetHandle(), NULL, 0);
+
+    // motion-control:
+    eo_motioncontrol_Start(eo_motioncontrol_GetHandle());
+    
+    //#warning -> TODO: i am not sure about activating strain in this way in the future
+    // enable the tx mode of strain, if present and as configured. 
+    eo_strain_SendTXmode(eo_strain_GetHandle());
+    
+    
+//#if 0  
+//    eOresult_t res = eores_NOK_generic;
+//    
+//    // enable joints
+//    res = eo_emsapplBody_EnableTxAllJointOnCan(eo_emsapplBody_GetHandle());
+//    if (eores_NOK_generic == res)
+//    {
+//        //handle the error
+//    }
+//    
+//    // enable the tx mode of strain, if present and as configured
+//    eo_strain_SendTXmode(eo_strain_GetHandle());
+//    
+//    // pulse led3 forever at 1 hz.
+//    eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_three, EOK_reltime1sec/1, 0); 
+//     
+//    // set mode on demand. then tx all canframes remained in the tx queue
+//    eo_canserv_SetMode(eo_canserv_GetHandle(), eocanserv_mode_ondemand);
+//   
+//    eo_canserv_TXstart(eo_canserv_GetHandle(), eOcanport1, NULL);    
+//    eo_canserv_TXstart(eo_canserv_GetHandle(), eOcanport2, NULL);    
+//    
+//    eo_canserv_TXwaituntildone(eo_canserv_GetHandle(), eOcanport1, 5*eok_reltime1ms);
+//    eo_canserv_TXwaituntildone(eo_canserv_GetHandle(), eOcanport2, 5*eok_reltime1ms);
+// 
+//    // Start reading the encoders
+//    #ifndef USE_ONLY_QE
+//    eo_appEncReader_StartRead(eo_emsapplBody_GetEncoderReader(eo_emsapplBody_GetHandle()));
+//    #endif
+//#endif
+}
+
+
+extern void eom_emsappl_hid_userdef_on_exit_RUN(EOMtheEMSappl* p)
+{       
+    // EOtheCANservice: set straigth mode and force parsing of all packets in the RX queues.
+    eo_canserv_SetMode(eo_canserv_GetHandle(), eocanserv_mode_straight);
+    eo_canserv_ParseAll(eo_canserv_GetHandle());  
+  
+    
+    // stop services which were started in on_entry_RUN()
+    
+    // motion-control
+    eo_motioncontrol_Stop(eo_motioncontrol_GetHandle());
+    
+    
+    // stop tx activity of services that may have been started by callback function
+    
+    // strain
+    eo_strain_TXstop(eo_strain_GetHandle());
+        
+    // skin
+    eo_skin_TXstop(eo_skin_GetHandle());
+        
+    // mais
+    // we prefer NOT to stop it
+    //eo_mais_TXstop(eo_mais_GetHandle());
+
+    //#warning MERGE-> remember to stop inertials ... check if already tested in branch
+    eo_inertials_Stop(eo_inertials_GetHandle());
+    
+    
+//#if 0  
+//    
+//    // stop skin. the check whether to stop skin or not is done internally.
+//    eo_skin_DisableTX(eo_skin_GetHandle());
+// 
+// 
+//    // stop motion control
+//    res = eo_emsapplBody_DisableTxAllJointOnCan(eo_emsapplBody_GetHandle());
+//    if (eores_NOK_generic == res)
+//	  {
+//		// handle the error ... not important
+//    }
+//    
+//    // stop tx of strain, if present
+//    eo_strain_TXstop(eo_strain_GetHandle()); 
+//    //eo_strain_DisableTX(eo_strain_GetHandle());    
+// 
+//    // stop tx of inertial. the check whether to stop mtb boards or not is done internally.
+//    eo_inertials_Stop(eo_inertials_GetHandle());
+//#endif
+    
+}
+
+extern void eom_emsappl_hid_userdef_on_entry_ERR(EOMtheEMSappl* p)
+{
+    // pulse led3 forever at 4 hz.
+    eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_three, EOK_reltime1sec/4, 0);
+   
+
+    // EOtheCANservice: set straight mode and force parsing of all packets in the RX queues.
+    eo_canserv_SetMode(eo_canserv_GetHandle(), eocanserv_mode_straight);
+    eo_canserv_ParseAll(eo_canserv_GetHandle());  
+
+    
+    
+    // stop services which may have been started 
+    
+    // motion-control
+    eo_motioncontrol_Stop(eo_motioncontrol_GetHandle());
+        
+    // stop tx activity of services that may have been started by callback function
+    
+    // strain
+    eo_strain_TXstop(eo_strain_GetHandle());
+        
+    // skin
+    eo_skin_TXstop(eo_skin_GetHandle());
+        
+    // mais
+    // we prefer NOT to stop it
+    //eo_mais_TXstop(eo_mais_GetHandle());
+
+    //#warning MERGE-> remember to stop inertials ... check if already tested in branch
+    eo_inertials_Stop(eo_inertials_GetHandle());
+}
+
+
 
 // marco.accame on Nov 26 2014
-// this is the function used by EOtheErrorManager from startup until redefinition done by the EOMtheEMSappl 
+// this is the function used by EOtheErrorManager from start-up until redefinition done by the EOMtheEMSappl 
 // in this first phase, the EOtheErrorManager shall just print a string into the trace port and in case of a fatal error 
 // it stops execution and start blinking leds
 // in the second phase, the EOtheEMSappl redefines begaviours so that error messages are inserted into a sig<> ROP which 
 // is sent to the remote host inside the standard EOMtheEMSsocket
 
 
-// this funtion is exactly the same as the default one except for the blinking of leds
+// this function is exactly the same as the default one except for the blinking of leds
 
 extern void eom_emsapplcfg_hid_userdef_OnError(eOerrmanErrorType_t errtype, const char *info, eOerrmanCaller_t *caller, const eOerrmanDescriptor_t *des)
 {
@@ -245,7 +349,7 @@ extern void eom_emsapplcfg_hid_userdef_OnError(eOerrmanErrorType_t errtype, cons
     eov_sys_Stop(eov_sys_GetHandle());
     
     // init leds
-    overridden_appl_led_error_init();
+    s_overridden_appl_led_error_init();
     
     // compute the mask of led to be toggled.
     uint8_t ledmask = 0xff;    
@@ -289,45 +393,96 @@ extern void eom_emsapplcfg_hid_userdef_OnError(eOerrmanErrorType_t errtype, cons
 }
 
 
-extern eObool_t eoprot_b02_b04_mc_isproxied(eOnvID32_t id)
-{    
-    eOprotEndpoint_t ep = eoprot_ID2endpoint(id);
+// --------------------------------------------------------------------------------------------------------------------
+// - definition of static functions 
+// --------------------------------------------------------------------------------------------------------------------
+
+static void s_overridden_appl_led_error_init(void)
+{
+    // marco.accame: we init all the leds and we switch them off
+    hal_led_init(hal_led0, NULL);
+    hal_led_init(hal_led1, NULL);
+    hal_led_init(hal_led2, NULL);
+    hal_led_init(hal_led3, NULL);
+    hal_led_init(hal_led4, NULL);
+    hal_led_init(hal_led5, NULL);
     
-    eOprotEntity_t ent = eoprot_ID2entity(id);
-    if(eoprot_entity_mc_joint != ent)
-    {
-        return(eobool_false);
-    }
-    
-    eOprotTag_t tag = eoprot_ID2tag(id);
-    
-    switch(tag)
-    {
-        //VALE get velocity pid not implemented!!!
-        case eoprot_tag_mc_joint_config_pidposition:
-        // case eoprot_tag_mc_joint_config_pidvelocity:     // marco.accame on 03mar15: the pidvelocity propagation to mc4 is is not implemented, thus i must remove from proxy.
-        case eoprot_tag_mc_joint_config_pidtorque:
-        case eoprot_tag_mc_joint_config_limitsofjoint:
-        case eoprot_tag_mc_joint_config_impedance:
-        case eoprot_tag_mc_joint_cmmnds_setpoint:           // marco.accame on 03mar15: the setpoint should not be asked, thus why in here? i may just remove the handler so that no reply is obtained if wrongly used
-        {
-            return(eobool_true);
-        }
-        
-        default:
-        {
-            return(eobool_false);
-        }
-     }
+    hal_led_off(hal_led0);
+    hal_led_off(hal_led1);
+    hal_led_off(hal_led2);
+    hal_led_off(hal_led3);
+    hal_led_off(hal_led4);
+    hal_led_off(hal_led5);   
 }
 
-//#define DEBUG_INERTIAL
-// marco.accame: this function is called inside eom_emsappl_Initialise() just before to run the state machine
-// which enters in the CFG state. it is the place where to launch new services
+
+static eOprotBRD_t s_overridden_appl_get_boardnumber_fromIPaddress(void)
+{
+    eOprotBRD_t ret = 0;
+    eOipv4addr_t ipaddress = eom_ipnet_GetIPaddress(eom_ipnet_GetHandle());
+    ret = ipaddress >> 24; 
+    if((0 == ret) || (ret > 32))
+    {
+        ret = 1;
+    }    
+    ret --;
+    
+//    #warning -> debug board eb1
+//    ret = 0;
+    
+    return(ret);
+}
+
+static void s_overridden_appl_initialise_services(void)
+{    
+    // board is ... get ip address
+    s_boardnum = s_overridden_appl_get_boardnumber_fromIPaddress();   
+
+    // initialise services ...
+    eo_services_Initialise();
+    // and start them on the basis of the boardnumber
+    eo_services_StartLegacyMode(eo_services_GetHandle(), s_boardnum);
+}
+
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - removed code 
+// --------------------------------------------------------------------------------------------------------------------
+
+
+#if 0
+// removed code ....
+static void s_overridden_appl_initialise_eb9(EOMtheEMSappl* p);
+static void s_debug_eb9(void);
+static void callback_eb9(void *p);
+static eOresult_t s_on_strain_verify_eb9(EOaService* p, eObool_t verifyisok);
+static eOresult_t s_on_mcfoc_verify_eb9(EOaService* p, eObool_t verifyisok);
+
+static void s_overridden_appl_initialise_eb1(EOMtheEMSappl* p);
+static void s_debug_eb1(void);
+static void callback_eb1(void *p);
+static eOresult_t s_on_strain_verify_eb1(EOaService* p, eObool_t verifyisok);
+static eOresult_t s_on_mcfoc_verify_eb1(EOaService* p, eObool_t verifyisok);
+
+
+static void s_overridden_appl_initialise_eb2(EOMtheEMSappl* p);
+static void s_debug_eb2(void);
+static void callback_eb2(void *p);
+static eOresult_t s_on_inertials_verify_eb2(EOaService* p, eObool_t verifyisok);
+static eOresult_t s_on_skin_verify_eb2(EOaService* p, eObool_t verifyisok);
+static eOresult_t s_on_mc4_verify_eb2(EOaService* p, eObool_t verifyisok);
+static eOresult_t s_on_mais_verify_eb2(EOaService* p, eObool_t verifyisok);
 
 static void s_overridden_appl_initialise2(EOMtheEMSappl* p);
 
 static void s_overridden_appl_initialise3(EOMtheEMSappl* p);
+
+// removed code ....
+#endif
+
+
+#if 0
 
 extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
 {  
@@ -353,13 +508,14 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
     {   // board number is from IP address
         s_boardnum = 0;
         eOipv4addr_t ipaddress = eom_ipnet_GetIPaddress(eom_ipnet_GetHandle());
-        s_boardnum = ipaddress >> 24;  
-        s_boardnum --;
-        if(s_boardnum > 16)
+        s_boardnum = ipaddress >> 24; 
+        if((0 == s_boardnum) || (s_boardnum > 32))
         {
-            //return;
-            s_boardnum = 0;
+            s_boardnum = 1;
         }
+        
+        s_boardnum --;
+        
 #if defined(DEBUG_INERTIAL)        
         s_boardnum = 1; //it imposes that the board is the eb2
 #endif
@@ -403,7 +559,7 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
 
         // sk-skin
         entitydes = eoboardconfig_code2entitydescriptors(s_boardnum, eoprot_endpoint_skin, eoprot_entity_sk_skin);
-        eo_canmap_ConfigEntity(canmap, eoprot_endpoint_skin, eoprot_entity_sk_skin, entitydes);      
+        eo_canmap_ConfigEntity(canmap, eoprot_endpoint_skin, eoprot_entity_sk_skin, entitydes);   
     }
     
     {   // CAN-PROTOCOL
@@ -433,7 +589,8 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
                 eo_nvset_LoadEP(nvset, epcfg, eobool_true);
             }                        
         }
-        
+
+#if !defined(TEST_EB2_EB4_WITHOUT_MC)          
         // now we must define the .... proxy rules
         // if we have board number equal to 1 or 3 ... (eb2 or eb4) then we set it for mc only
         eOprotBRD_t localboard = eoprot_board_local_get();
@@ -441,6 +598,8 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
         {
             eoprot_config_proxied_variables(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_b02_b04_mc_isproxied);
         }
+#endif
+        
     }   
 
 
@@ -455,6 +614,16 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
     eo_inertials_Initialise();
     // the can network is loaded in runtime. we need 2x15 values, which for now are taken from its ip address. later on they will be taken from a UDP message
     //eo_inertials_ServiceConfig(eo_inertials_GetHandle(), eoboardconfig_code2inertialCFG(s_boardnum));
+    
+    
+    // before we go in run mode we can set different timing for the control loop:    
+    eom_emsrunner_SetTiming(eom_emsrunner_GetHandle(), eoboardconfig_code2ctrlooptiming(s_boardnum));
+    
+    
+    // start the eth-monitor
+       
+    eo_ethmonitor_Initialise(NULL);
+    eo_ethmonitor_Start(eo_ethmonitor_GetHandle());
     
     // start the application body   
     eOemsapplbody_cfg_t applbodyconfig;
@@ -522,172 +691,6 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
 
 #endif
 }
-
-
-extern void eom_emsappl_hid_userdef_on_entry_CFG(EOMtheEMSappl* p)
-{    
-    // pulse led3 forever at 0.50 hz.       
-    eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_three, 2*EOK_reltime1sec, 0);
-
-    // EOtheCANservice: set straight mode and force parsing of all packets in the RX queues.
-    eo_canserv_SetMode(eo_canserv_GetHandle(), eocanserv_mode_straight);
-    eo_canserv_ParseAll(eo_canserv_GetHandle());
-}
-
-extern void eom_emsappl_hid_userdef_on_exit_CFG(EOMtheEMSappl* p)
-{
-}
-
-extern void eom_emsappl_hid_userdef_on_entry_RUN(EOMtheEMSappl* p)
-{
-    // pulse led3 forever at 1 hz.
-    eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_three, EOK_reltime1sec/1, 0);  
-    
-    // EOtheCANservice: set on demand mode. then tx all canframes remained in the tx queues
-    eo_canserv_SetMode(eo_canserv_GetHandle(), eocanserv_mode_ondemand);    
-    eo_canserv_TXstartAll(eo_canserv_GetHandle());
-    eo_canserv_TXwaitAllUntilDone(eo_canserv_GetHandle(), 5*eok_reltime1ms);
-    
-    
-    // motion-control:
-    eo_motioncontrol_Start(eo_motioncontrol_GetHandle());
-    
-    
-#if 0  
-    eOresult_t res = eores_NOK_generic;    
-    // enable joints
-    res = eo_emsapplBody_EnableTxAllJointOnCan(eo_emsapplBody_GetHandle());
-    if (eores_NOK_generic == res)
-    {
-        //handle the error
-    }
-    
-    // enable the tx mode of strain, if present and as configured
-    eo_strain_SendTXmode(eo_strain_GetHandle());
-    
-     
-     
-    // set mode on demand. then tx all canframes remained in the tx queue
-    eo_canserv_SetMode(eo_canserv_GetHandle(), eocanserv_mode_ondemand);
-   
-    eo_canserv_TXstart(eo_canserv_GetHandle(), eOcanport1, NULL);    
-    eo_canserv_TXstart(eo_canserv_GetHandle(), eOcanport2, NULL);    
-    
-    eo_canserv_TXwaituntildone(eo_canserv_GetHandle(), eOcanport1, 5*eok_reltime1ms);
-    eo_canserv_TXwaituntildone(eo_canserv_GetHandle(), eOcanport2, 5*eok_reltime1ms);
-
-    // Start reading the encoders
-    eo_appEncReader_StartRead(eo_emsapplBody_GetEncoderReader(eo_emsapplBody_GetHandle()));
-#endif
-}
-
-
-extern void eom_emsappl_hid_userdef_on_exit_RUN(EOMtheEMSappl* p)
-{
-    eOresult_t res = eores_NOK_generic;
-    
-    
-    // EOtheCANservice: set straigth mode and force parsing of all packets in the RX queues.
-    eo_canserv_SetMode(eo_canserv_GetHandle(), eocanserv_mode_straight);
-    eo_canserv_ParseAll(eo_canserv_GetHandle());  
-  
-    
-    // stop services which were started in on_entry_RUN()
-    
-    // motion-control
-    eo_motioncontrol_Stop(eo_motioncontrol_GetHandle());
-    
-    
-    // stop tx activity of services that may have been started by callback function
-    
-    // strain
-    eo_strain_TXstop(eo_strain_GetHandle());
-        
-    // skin
-    eo_skin_TXstop(eo_skin_GetHandle());
-        
-    // mais
-    // we prefer NOT to stop it
-    //eo_mais_TXstop(eo_mais_GetHandle());
-    
-    
-#if 0  
-    
-    // stop skin. the check whether to stop skin or not is done internally.
-    eo_skin_DisableTX(eo_skin_GetHandle());
-
-
-    // stop motion control
-    res = eo_emsapplBody_DisableTxAllJointOnCan(eo_emsapplBody_GetHandle());
-    if (eores_NOK_generic == res)
-	{
-		// handle the error ... not important
-    }
-    
-    // stop tx of strain, if present
-    eo_strain_TXstop(eo_strain_GetHandle()); 
-    //eo_strain_DisableTX(eo_strain_GetHandle());    
-
-    // stop tx of inertial. the check whether to stop mtb boards or not is done internally.
-    eo_inertials_Stop(eo_inertials_GetHandle());
-#endif
-    
-}
-
-extern void eom_emsappl_hid_userdef_on_entry_ERR(EOMtheEMSappl* p)
-{
-    // pulse led3 forever at 4 hz.
-    eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_three, EOK_reltime1sec/4, 0);
-   
-
-    // EOtheCANservice: set straigth mode and force parsing of all packets in the RX queues.
-    eo_canserv_SetMode(eo_canserv_GetHandle(), eocanserv_mode_straight);
-    eo_canserv_ParseAll(eo_canserv_GetHandle());  
-
-    
-    
-    // stop services which may have been started 
-    
-    // motion-control
-    eo_motioncontrol_Stop(eo_motioncontrol_GetHandle());
-        
-    // stop tx activity of services that may have been started by callback function
-    
-    // strain
-    eo_strain_TXstop(eo_strain_GetHandle());
-        
-    // skin
-    eo_skin_TXstop(eo_skin_GetHandle());
-        
-    // mais
-    // we prefer NOT to stop it
-    //eo_mais_TXstop(eo_mais_GetHandle());
-}
-
-
-
-// --------------------------------------------------------------------------------------------------------------------
-// - definition of static functions 
-// --------------------------------------------------------------------------------------------------------------------
-
-static void overridden_appl_led_error_init(void)
-{
-    // marco.accame: we init all the leds and we switch them off
-    hal_led_init(hal_led0, NULL);
-    hal_led_init(hal_led1, NULL);
-    hal_led_init(hal_led2, NULL);
-    hal_led_init(hal_led3, NULL);
-    hal_led_init(hal_led4, NULL);
-    hal_led_init(hal_led5, NULL);
-    
-    hal_led_off(hal_led0);
-    hal_led_off(hal_led1);
-    hal_led_off(hal_led2);
-    hal_led_off(hal_led3);
-    hal_led_off(hal_led4);
-    hal_led_off(hal_led5);   
-}
-
 
 
 // -----------------------------------------------------------------------------------------------------------------
@@ -1787,6 +1790,8 @@ static void s_overridden_appl_initialise_eb2(EOMtheEMSappl* p)
         eo_motioncontrol_Initialise();    
         eo_skin_Initialise(); 
         eo_inertials_Initialise();        
+        eo_ethmonitor_Initialise(NULL);
+        eo_ethmonitor_Start(eo_ethmonitor_GetHandle());
     }
     
     {   // i init a service handler. for instance to be called EOtheServices
@@ -2039,6 +2044,7 @@ static eOresult_t s_on_mais_verify_eb2(EOaService* p, eObool_t verifyisok)
     return(eores_OK);
 }
 
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

@@ -130,8 +130,6 @@ extern void eo_pid_SetPidBase(EOpid *o, float Kp, float Kd, float Ki, float Imax
     //o->Ki = Ki;
     o->Ki = 0.5f*Ki*EMS_PERIOD;
     
-    //o->A = 0.9f;
-    //o->B = (1.f - o->A)*Kd;
     if (Kd != 0.f && Kp != 0.f)
     {
     o->A = Kd / (Kd + Kp*N*EMS_PERIOD);

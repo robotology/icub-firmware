@@ -19,6 +19,8 @@
 #include "EoError.h"
 #include "EOtheErrorManager.h"
 #include "EOVtheSystem.h"
+
+#include "EOMtheEMSrunner.h"
 //#include "hal_led.h"
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -80,7 +82,7 @@ extern EOabsCalibratedEncoder* eo_absCalibratedEncoder_New(uint8_t ID)
         o->position_last = 0;
         o->position_sure = 0;
         
-        #ifndef USE_2FOC_FAST_ENCODER
+        #if !defined (USE_2FOC_FAST_ENCODER) && !defined(CER_TICKS_CONTROL)
         o->velocity = 0;
         #endif
         
@@ -94,6 +96,8 @@ extern EOabsCalibratedEncoder* eo_absCalibratedEncoder_New(uint8_t ID)
         o->first_valid_data = 0;
         
         o->state_mask = SM_NOT_READY;
+        
+        o->spikes_count = 0;
     }
 
     return o;
@@ -139,6 +143,14 @@ extern void eo_absCalibratedEncoder_ClearFaults(EOabsCalibratedEncoder* o)
     RST_BITS(o->state_mask,SM_HARDWARE_FAULT);
 }
 
+extern void eo_absCalibratedEncoder_ResetCalibration(EOabsCalibratedEncoder* o)
+{
+    //o->offset = 0; --> dangerous, cause the axis position sharply change (even if I'm in position ctrl mode)
+    SET_BITS(o->state_mask, SM_NOT_CALIBRATED);
+    RST_BITS(o->state_mask, SM_NOT_INITIALIZED);
+    //should I clear the faults too?
+    RST_BITS(o->state_mask,SM_HARDWARE_FAULT);
+}
 extern void eo_absCalibratedEncoder_Calibrate(EOabsCalibratedEncoder* o, int32_t offset)
 {
     o->offset = offset;
@@ -152,6 +164,8 @@ extern int32_t eo_absCalibratedEncoder_Acquire(EOabsCalibratedEncoder* o, int32_
 {
     static const int16_t MAX_ENC_CHANGE = 7*ENCODER_QUANTIZATION;
     
+    eOemsrunner_diagnosticsinfo_t* runner_info = eom_emsrunner_GetDiagnosticsInfoHandle(eom_emsrunner_GetHandle());
+        
     if (!o->sign) return 0;
 	
     if (!error_mask)
@@ -209,7 +223,7 @@ extern int32_t eo_absCalibratedEncoder_Acquire(EOabsCalibratedEncoder* o, int32_
     {
         encoder_init(o, position, error_mask);
         
-        #ifndef USE_2FOC_FAST_ENCODER
+        #if !defined (USE_2FOC_FAST_ENCODER) && !defined(CER_TICKS_CONTROL)
         o->velocity = 0;
         #endif
         
@@ -236,17 +250,14 @@ extern int32_t eo_absCalibratedEncoder_Acquire(EOabsCalibratedEncoder* o, int32_
                 o->delta = delta;
                 
                 o->distance += delta;
-                //if (inc)
-                //{
                 //    o->distance += inc;
-                //}
                 
-                #ifndef USE_2FOC_FAST_ENCODER
+                #if !defined (USE_2FOC_FAST_ENCODER) && !defined(CER_TICKS_CONTROL)
                 //o->velocity = (7*o->velocity + o->sign*EMS_FREQUENCY_INT32*inc) >> 3;
                 o->velocity = (7*o->velocity + o->sign*EMS_FREQUENCY_INT32*delta) >> 3;
                 #endif
             }
-            #ifndef USE_2FOC_FAST_ENCODER
+            #if !defined (USE_2FOC_FAST_ENCODER) && !defined(CER_TICKS_CONTROL)
             else
             {
                 o->velocity = (7*o->velocity) >> 3;
@@ -255,32 +266,51 @@ extern int32_t eo_absCalibratedEncoder_Acquire(EOabsCalibratedEncoder* o, int32_
         }
         else
         {
-            static uint16_t count = 0;
-            count++;
-            //we don't want to send up too many messages...
-            if (count == 100)
-            {
+            o->spikes_count++;
+       
+            #if !defined (USE_2FOC_FAST_ENCODER) && !defined(CER_TICKS_CONTROL)
+            o->velocity = (7*o->velocity) >> 3;
+            #endif
+        }
+        
+        //every second
+        if ((runner_info->numberofperiods % 1000) == 0)
+        {
+            if (o->spikes_count > 0)
+            {                
                 //message "spike encoder error"
                 eOerrmanDescriptor_t descriptor = {0};
-                descriptor.par16 = check;   // unless required
-                descriptor.par64 = 0;       // unless required
-                descriptor.sourcedevice = eo_errman_sourcedevice_localboard; // 0 e' board, 1 can1, 2 can2
-                descriptor.sourceaddress = o->ID; // oppure l'id del can che ha dato errore
+                descriptor.par16 = o->ID;           
+                descriptor.par64 = o->spikes_count;
+                descriptor.sourcedevice = eo_errman_sourcedevice_localboard;
+                descriptor.sourceaddress = 0;
                 descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_aea_abs_enc_spikes);
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, NULL, &descriptor);
                 
-                count = 0;
-            }  
-            #ifndef USE_2FOC_FAST_ENCODER
-            o->velocity = (7*o->velocity) >> 3;
-            #endif
+                o->spikes_count = 0;
+            }
         }
     }
     
     return o->sign*o->distance;
 }
 
-#ifndef USE_2FOC_FAST_ENCODER
+extern eObool_t eo_absCalibratedEncoder_AreThereTooManySpikes(EOabsCalibratedEncoder* o)
+{
+    if (!o) return eobool_false;
+    
+    // ~1seconds of consecutive spikes...we should put in hw fault
+    if (o->spikes_count == 1000)
+    {
+        o->spikes_count = 0;
+        SET_BITS(o->state_mask, SM_INVALID_FAULT); //not using another code, just considering invalid value
+        return eobool_true;
+
+    }
+    
+    return eobool_false;
+}
+#if !defined (USE_2FOC_FAST_ENCODER) && !defined(CER_TICKS_CONTROL)
 extern int32_t eo_absCalibratedEncoder_GetVel(EOabsCalibratedEncoder* o)
 {
     return o->velocity;
@@ -293,7 +323,7 @@ extern int32_t eo_absCalibratedEncoder_GetVel(EOabsCalibratedEncoder* o)
 
 
 
-#ifdef USE_2FOC_FAST_ENCODER
+#if defined (USE_2FOC_FAST_ENCODER) || defined (CER_TICKS_CONTROL)
 
 extern EOaxleVirtualEncoder* eo_axleVirtualEncoder_New(void)
 {
@@ -316,20 +346,17 @@ extern void eo_axleVirtualEncoder_Acquire(int32_t gearbox_reduction, EOaxleVirtu
     
     o->axle_abs_pos = axle_abs_pos;
     
-    o->velocity = + axle_virt_vel;    
+    o->velocity = axle_virt_vel;    
     o->axle_inc_pos += axle_virt_pos - o->axle_virt_pos;
   
     o->axle_inc_pos -= inc*gearbox_reduction;
                         
     LIMIT(o->axle_inc_pos, N_BITS_PRECISION_BOUND);
     
-    #ifdef USE_4BIT_INC_ENC_PRECISION
-    #ifdef USE_ONLY_QE
+    #if defined (USE_ONLY_QE) || defined(CER_TICKS_CONTROL)
     o->position = axle_virt_pos/gearbox_reduction;
     #else
-    o->position = axle_abs_pos + o->axle_inc_pos/gearbox_reduction;
-    #endif
-    #else
+    //o->position = axle_abs_pos + o->axle_inc_pos/gearbox_reduction;
     o->position = axle_abs_pos;
     #endif
     
@@ -373,18 +400,6 @@ static void encoder_init(EOabsCalibratedEncoder* o, int32_t position, uint8_t er
         return;
     }
     
-	// check if it's working now...
-    // for incremental encoders this function has only to set a flag in a bit mask
-    // how can I detect that the encoder is incremental?
-    
-    //old method using function encoder type dependent
-    /*
-    if (joint2encodertype(o->ID) == 2)
-    {
-        RST_BITS(o->state_mask, SM_NOT_INITIALIZED);
-    }
-    */
-    // nb: for inc encoders, this part is never executed 
     if (++o->first_valid_data >= 3)
     {
         //o->time = 0;
@@ -394,7 +409,7 @@ static void encoder_init(EOabsCalibratedEncoder* o, int32_t position, uint8_t er
 
         o->distance = position;
         
-        #ifndef USE_2FOC_FAST_ENCODER
+        #if !defined (USE_2FOC_FAST_ENCODER) && !defined(CER_TICKS_CONTROL)
         o->velocity = 0;
         #endif
         

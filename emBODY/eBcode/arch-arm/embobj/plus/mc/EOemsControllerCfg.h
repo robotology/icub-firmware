@@ -24,9 +24,7 @@ extern "C" {
 //#define FORCE_ZERO_PWM_OUT
 //#define EXPERIMENTAL_MOTOR_TORQUE
 //#define EXPERIMENTAL_SPEED_CONTROL
-
 //#define USE_ONLY_QE
-//#define USE_4BIT_INC_ENC_PRECISION
     
 //#define SHOULDER_3rd_JOINT_COUPLING
 //#define USE_JACOBIAN
@@ -37,18 +35,17 @@ extern "C" {
 #elif   defined(ICUB_MEC_V2) | defined(ICUB_DARMSTADT01)
     #define V2_MECHANICS
     #define USE_2FOC_FAST_ENCODER
-#else
-    #error -> specify either ICUB_MEC_V1 or ICUB_MEC_V2
+#elif defined(ICUB_MEC_V3)
+    #define V3_MECHANICS
+    #undef  USE_2FOC_FAST_ENCODER
+#elif defined CER
+    #define CER_MECHANICS
+    #define CER_TICKS_CONTROL
+#else 
+    #error -> specify either ICUB_MEC_V1 or ICUB_MEC_V2 or ICUB_MEC_V3 or CER
 #endif
 
-#if defined(HEAD_V3)
-    #undef USE_2FOC_FAST_ENCODER
-#endif
 //#warning in v3 fare in modo che NON venga definito USE_2FOC_FAST_ENCODER 
-
-#ifdef USE_2FOC_FAST_ENCODER
-//#define USE_4BIT_INC_ENC_PRECISION
-#endif
 
 #define EMS_PERIOD           0.001f
 #define EMS_FREQUENCY_INT32  1000
@@ -63,7 +60,8 @@ extern "C" {
 #define TORQUE_SENSOR_TIMEOUT     100 // cycles
 #define ENCODER_TIMEOUT            50 // cycles
 
-#define NOMINAL_CURRENT     10000
+#define PWM_OUTPUT_LIMIT_2FOC 10000
+#define PWM_OUTPUT_LIMIT      0x7FFF //32767 
 
 #define MAX_NAXLES 4
 
@@ -111,6 +109,7 @@ extern "C" {
 #define CHK_BITS(mask,bits) (((mask) & (bits)) == (bits))
 #define LIMIT(x,L) { if (x>(L)) x=(L); else if (x<-(L)) x=-(L); }
 #define LIMIT2(min, x, max) { if (x < (min)) x = (min); else if (x > (max)) x = (max); }
+#define RESCALE2PWMLIMITS(x, hw_limit) (int16_t)((int32_t)(PWM_OUTPUT_LIMIT * (x + hw_limit))/hw_limit - PWM_OUTPUT_LIMIT) //linear rescaling
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 /* NOT USED

@@ -61,6 +61,18 @@
 
 
 // --------------------------------------------------------------------------------------------------------------------
+// - declaration of static functions
+// --------------------------------------------------------------------------------------------------------------------
+
+static void s_hal_quad_enc_set_index_found(uint8_t encoder_number);
+
+// --------------------------------------------------------------------------------------------------------------------
+// - definition (and initialisation) of static variables
+// --------------------------------------------------------------------------------------------------------------------
+
+static hal_bool_t index_found[4] = {hal_false,hal_false,hal_false,hal_false};
+
+// --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -615,21 +627,77 @@ extern void hal_quad_enc_single_init (uint8_t encoder_number)
 #endif    
 }
 
+extern void hal_quad_enc_init_indexes_flags(void)
+{
+  // Indexes  //
+  /* Enable GPIOG clock */
+  RCC_AHB1PeriphClockCmd( RCC_AHB1Periph_GPIOG , ENABLE); 
+  /* Enable SYSCFG clock */
+  RCC_APB2PeriphClockCmd(RCC_APB2Periph_SYSCFG, ENABLE);
+
+  // Init GPIO associated to quad_enc indexes
+  GPIO_InitTypeDef GPIO_InitStructure;	
+  GPIO_StructInit(&GPIO_InitStructure);
+  GPIO_InitStructure.GPIO_Pin =  GPIO_Pin_12 | GPIO_Pin_13 |GPIO_Pin_14 |GPIO_Pin_15;
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
+  GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+  GPIO_Init(GPIOG, &GPIO_InitStructure);
+	
+  /* Connect EXTI Line 12 to PAG12 pin */
+  SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOG, EXTI_PinSource12);
+  SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOG, EXTI_PinSource13);
+  SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOG, EXTI_PinSource14);
+  SYSCFG_EXTILineConfig(EXTI_PortSourceGPIOG, EXTI_PinSource15);
+    
+  /* Configure EXTI Line0 */
+  EXTI_InitTypeDef   EXTI_InitStructure;
+  EXTI_InitStructure.EXTI_Line = EXTI_Line12|EXTI_Line13|EXTI_Line14|EXTI_Line15;
+  EXTI_InitStructure.EXTI_Mode = EXTI_Mode_Interrupt;
+  EXTI_InitStructure.EXTI_Trigger = EXTI_Trigger_Rising;  
+  EXTI_InitStructure.EXTI_LineCmd = ENABLE;
+  EXTI_Init(&EXTI_InitStructure);
+
+  /* Enable and set EXTI Line0 Interrupt to the lowest priority */
+  NVIC_InitTypeDef NVIC_InitStructure;
+  NVIC_InitStructure.NVIC_IRQChannel =  EXTI15_10_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0x0F;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0x0F;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&NVIC_InitStructure);
+}
+
+extern hal_bool_t hal_quad_is_index_found(uint8_t encoder_number)
+{
+    if (encoder_number > 3)
+        return hal_false;
+    
+    if (index_found[encoder_number] == hal_true)
+    {
+        //reset flag
+        index_found[encoder_number] = hal_false;
+        return hal_true;
+    }
+    else
+    {
+        return hal_false;
+    }
+}
+
 extern void hal_quad_enc_reset_counter(uint8_t encoder_number)
 {
     switch (encoder_number)
     {
         case 0:
-            TIM_SetCounter(ENCODER1_TIMER,0x0);
+            TIM_SetCounter(ENCODER1_TIMER,ENCODER_START_VAL);
             break;
         case 1:
-            TIM_SetCounter(ENCODER2_TIMER,0x0);
+            TIM_SetCounter(ENCODER2_TIMER,ENCODER_START_VAL);
             break;
         case 2:
-            TIM_SetCounter(ENCODER3_TIMER,0x0);
+            TIM_SetCounter(ENCODER3_TIMER,ENCODER_START_VAL);
             break;
         case 3:
-            TIM_SetCounter(ENCODER4_TIMER,0x0);
+            TIM_SetCounter(ENCODER4_TIMER,ENCODER_START_VAL);
             break;
         default:
             break;
@@ -643,50 +711,40 @@ extern void hal_quad_enc_reset_counter(uint8_t encoder_number)
   */
 void EXTI15_10_IRQHandler(void)
 {
-  if(EXTI_GetITStatus(EXTI_Line12) != RESET)
-  {
-		if (TIM_GetCounter(ENCODER1_TIMER)==0)
-			/* Reset Counter ENCODER1 -> TIM2 */
-			TIM_SetCounter(ENCODER1_TIMER,0x0);  
-    else
-			/* Reset Counter ENCODER1 -> TIM2 */
-			TIM_SetCounter(ENCODER1_TIMER,ENCODER_PPR);      
-    
-            /* Clear the EXTI line 12 pending bit */
-            EXTI_ClearITPendingBit(EXTI_Line12);
-  }
-  if(EXTI_GetITStatus(EXTI_Line13) != RESET)
-  {
-		/* Clear the EXTI line 13 pending bit */
-    EXTI_ClearITPendingBit(EXTI_Line13);
-		
-		if (TIM_GetCounter(ENCODER2_TIMER)==0)
-			/* Reset Counter ENCODER2 -> TIM3 */
-			TIM_SetCounter(ENCODER2_TIMER,0x0);  
-		else
-			TIM_SetCounter(ENCODER2_TIMER,ENCODER_PPR);  
-	}
-	
-	if(EXTI_GetITStatus(EXTI_Line14) != RESET)
-  {
-		 /* Clear the EXTI line 14 pending bit */
-    EXTI_ClearITPendingBit(EXTI_Line14);
-		if (TIM_GetCounter(ENCODER3_TIMER)==0)
-			/* Reset Counter ENCODER3 -> TIM4 */
-			TIM_SetCounter(ENCODER3_TIMER,0x0);  
-    else
-			TIM_SetCounter(ENCODER3_TIMER,ENCODER_PPR); 
-   
-  }
-	if(EXTI_GetITStatus(EXTI_Line15) != RESET)
-  {
-		 /* Clear the EXTI line 15 pending bit */
-    EXTI_ClearITPendingBit(EXTI_Line15);
-		if (TIM_GetCounter(ENCODER4_TIMER)==0)
-			/* Reset Counter ENCODER4 -> TIM5 */
-			TIM_SetCounter(ENCODER4_TIMER,0x0);  
-    else TIM_SetCounter(ENCODER4_TIMER,ENCODER_PPR);
-   
-  }
+    //index on quad enc 0
+    if(EXTI_GetITStatus(EXTI_Line13) != RESET)
+    {
+        EXTI_ClearITPendingBit(EXTI_Line13);
+        s_hal_quad_enc_set_index_found(0);
+    }
+    //index on quad enc 1
+    if(EXTI_GetITStatus(EXTI_Line12) != RESET)
+    {
+        EXTI_ClearITPendingBit(EXTI_Line12);
+        s_hal_quad_enc_set_index_found(1);
+    }
+	//index on quad enc 2
+    if(EXTI_GetITStatus(EXTI_Line14) != RESET)
+    {
+        EXTI_ClearITPendingBit(EXTI_Line14);
+        s_hal_quad_enc_set_index_found(2);
+    }
+    //index on quad enc 3
+    if(EXTI_GetITStatus(EXTI_Line15) != RESET)
+    {
+        EXTI_ClearITPendingBit(EXTI_Line15);
+        s_hal_quad_enc_set_index_found(3);
+    }
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+// - definition of static functions 
+// --------------------------------------------------------------------------------------------------------------------
+
+static void s_hal_quad_enc_set_index_found(uint8_t encoder_number)
+{
+    if (encoder_number > 3)
+        return;
+    index_found[encoder_number] = hal_true;
 }
 
