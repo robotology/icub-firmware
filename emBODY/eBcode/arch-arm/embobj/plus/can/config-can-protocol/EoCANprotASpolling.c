@@ -164,7 +164,7 @@ __weak extern eObool_t eocanprotASpolling_redefinable_alert_reception_of_POL_AS_
 // this funtion receives the full scale of a channel, stores it into the strain entity and then 
 // it calls fucntion eocanprotASpolling_redefinable_alert_reception_of_POL_AS_CMD__GET_FULL_SCALES()
 // the default eocanprotASpolling_redefinable_alert_reception_of_POL_AS_CMD__GET_FULL_SCALES() does nothing.
-// the procedure of asking the next full scale until compeltion must be done inside the redefined function.
+// the procedure of asking the next full scale until completion must be done inside the redefined function.
 extern eOresult_t eocanprotASpolling_parser_POL_AS_CMD__GET_FULL_SCALES(eOcanframe_t *frame, eOcanport_t port)
 {
     // get the strain

@@ -35,6 +35,7 @@
 
 #include "EOtheMotionDone.h"
 
+#error DOT USE IT ANYMORE
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 

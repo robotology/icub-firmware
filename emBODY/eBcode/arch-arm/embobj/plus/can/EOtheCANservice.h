@@ -138,7 +138,7 @@ extern eOresult_t eo_canserv_SendCommandToEntity(EOtheCANservice *p, eOcanprot_c
 extern eOresult_t eo_canserv_SendCommandToAllBoardsInEntity(EOtheCANservice *p, eOcanprot_command_t *command, eOprotID32_t id32);
 
 
-extern eOresult_t eo_canserv_TXstartAll(EOtheCANservice *p);
+extern eOresult_t eo_canserv_TXstartAll(EOtheCANservice *p, uint8_t *sizeofTXqueueCAN1, uint8_t *sizeofTXqueueCAN2);
 
 extern eOresult_t eo_canserv_TXwaitAllUntilDone(EOtheCANservice *p, uint32_t timeout);
 

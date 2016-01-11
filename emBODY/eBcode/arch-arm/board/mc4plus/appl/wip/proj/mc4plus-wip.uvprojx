@@ -10,11 +10,12 @@
       <TargetName>mc4plus</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
+      <pCCUsed>5060061::V5.06 update 1 (build 61)::ARMCC</pCCUsed>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32F407IG</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F4xx_DFP.2.2.0</PackID>
+          <PackID>Keil.STM32F4xx_DFP.2.6.0</PackID>
           <PackURL>http://www.keil.com/pack</PackURL>
           <Cpu>IRAM(0x20000000-0x2001FFFF) IRAM2(0x10000000-0x1000FFFF) IROM(0x8000000-0x80FFFFF) CLOCK(25000000) CPUTYPE("Cortex-M4") FPU2</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -84,6 +85,8 @@
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
+            <nStopA1X>0</nStopA1X>
+            <nStopA2X>0</nStopA2X>
           </AfterMake>
           <SelectedForBatchBuild>0</SelectedForBatchBuild>
           <SVCSIdString></SVCSIdString>
@@ -145,7 +148,6 @@
             <RestoreToolbox>1</RestoreToolbox>
             <RestoreTracepoints>0</RestoreTracepoints>
             <RestoreSysVw>1</RestoreSysVw>
-            <UsePdscDebugDescription>1</UsePdscDebugDescription>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>7</TargetSelection>
@@ -228,6 +230,7 @@
             <useUlib>0</useUlib>
             <EndSel>0</EndSel>
             <uLtcg>0</uLtcg>
+            <nSecure>0</nSecure>
             <RoSelD>3</RoSelD>
             <RwSelD>5</RwSelD>
             <CodeSel>0</CodeSel>
@@ -362,6 +365,10 @@
             <uSurpInc>1</uSurpInc>
             <uC99>1</uC99>
             <useXO>0</useXO>
+            <v6Lang>0</v6Lang>
+            <v6LangP>0</v6LangP>
+            <vShortEn>0</vShortEn>
+            <vShortWch>0</vShortWch>
             <VariousControls>
               <MiscControls>-DUSE_MC4PLUS</MiscControls>
               <Define>ICUB_MEC_V3 USE_CANCOMM_V2</Define>
@@ -825,9 +832,9 @@
           <GroupName>services</GroupName>
           <Files>
             <File>
-              <FileName>EOtheServices.c</FileName>
+              <FileName>EOtheServices0.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\eoappservices\EOtheServices.c</FilePath>
+              <FilePath>..\src\eoappservices\EOtheServices0.c</FilePath>
             </File>
             <File>
               <FileName>EOmcService.c</FileName>
@@ -838,11 +845,6 @@
               <FileName>EOtheMAIS.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheMAIS.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOtheInertial.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheInertial.c</FilePath>
             </File>
             <File>
               <FileName>EOCurrentsWatchdog.c</FileName>
@@ -858,6 +860,11 @@
               <FileName>EOtheCANdiscovery2.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheCANdiscovery2.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOtheInertials.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheInertials.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -907,6 +914,10 @@
                 <uSurpInc>2</uSurpInc>
                 <uC99>2</uC99>
                 <useXO>2</useXO>
+                <v6Lang>0</v6Lang>
+                <v6LangP>0</v6LangP>
+                <vShortEn>0</vShortEn>
+                <vShortWch>0</vShortWch>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -1232,6 +1243,10 @@
                 <uSurpInc>2</uSurpInc>
                 <uC99>2</uC99>
                 <useXO>2</useXO>
+                <v6Lang>0</v6Lang>
+                <v6LangP>0</v6LangP>
+                <vShortEn>0</vShortEn>
+                <vShortWch>0</vShortWch>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -1269,7 +1284,7 @@
         <TargetCommonOption>
           <Device>STM32F407IG</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F4xx_DFP.2.2.0</PackID>
+          <PackID>Keil.STM32F4xx_DFP.2.6.0</PackID>
           <PackURL>http://www.keil.com/pack</PackURL>
           <Cpu>IRAM(0x20000000-0x2001FFFF) IRAM2(0x10000000-0x1000FFFF) IROM(0x8000000-0x80FFFFF) CLOCK(25000000) CPUTYPE("Cortex-M4") FPU2</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -1339,6 +1354,8 @@
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
+            <nStopA1X>0</nStopA1X>
+            <nStopA2X>0</nStopA2X>
           </AfterMake>
           <SelectedForBatchBuild>0</SelectedForBatchBuild>
           <SVCSIdString></SVCSIdString>
@@ -1400,7 +1417,6 @@
             <RestoreToolbox>1</RestoreToolbox>
             <RestoreTracepoints>0</RestoreTracepoints>
             <RestoreSysVw>1</RestoreSysVw>
-            <UsePdscDebugDescription>1</UsePdscDebugDescription>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>7</TargetSelection>
@@ -1483,6 +1499,7 @@
             <useUlib>0</useUlib>
             <EndSel>0</EndSel>
             <uLtcg>0</uLtcg>
+            <nSecure>0</nSecure>
             <RoSelD>3</RoSelD>
             <RwSelD>5</RwSelD>
             <CodeSel>0</CodeSel>
@@ -1617,6 +1634,10 @@
             <uSurpInc>1</uSurpInc>
             <uC99>1</uC99>
             <useXO>0</useXO>
+            <v6Lang>0</v6Lang>
+            <v6LangP>0</v6LangP>
+            <vShortEn>0</vShortEn>
+            <vShortWch>0</vShortWch>
             <VariousControls>
               <MiscControls>-DUSE_MC4PLUS</MiscControls>
               <Define>NOT_ICUB_GENOVA04 ICUB_DARMSTADT01 USE_PROTO_PROXY</Define>
@@ -2080,9 +2101,9 @@
           <GroupName>services</GroupName>
           <Files>
             <File>
-              <FileName>EOtheServices.c</FileName>
+              <FileName>EOtheServices0.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\eoappservices\EOtheServices.c</FilePath>
+              <FilePath>..\src\eoappservices\EOtheServices0.c</FilePath>
             </File>
             <File>
               <FileName>EOmcService.c</FileName>
@@ -2093,11 +2114,6 @@
               <FileName>EOtheMAIS.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheMAIS.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOtheInertial.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheInertial.c</FilePath>
             </File>
             <File>
               <FileName>EOCurrentsWatchdog.c</FileName>
@@ -2113,6 +2129,11 @@
               <FileName>EOtheCANdiscovery2.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheCANdiscovery2.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOtheInertials.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheInertials.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2427,6 +2448,10 @@
                 <uSurpInc>2</uSurpInc>
                 <uC99>2</uC99>
                 <useXO>2</useXO>
+                <v6Lang>0</v6Lang>
+                <v6LangP>0</v6LangP>
+                <vShortEn>0</vShortEn>
+                <vShortWch>0</vShortWch>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>

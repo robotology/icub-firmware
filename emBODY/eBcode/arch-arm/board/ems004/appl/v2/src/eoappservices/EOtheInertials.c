@@ -415,9 +415,7 @@ extern eOresult_t eo_inertials_Deactivate(EOtheInertials *p)
     s_eo_theinertials.inertial2 = NULL;
     
     eo_vector_Clear(s_eo_theinertials.fifoofinertialdata);
-        
-    #warning ---> what else should i deinit?
-        
+                
     memset(&s_eo_theinertials.service.servconfig, 0, sizeof(eOmn_serv_configuration_t));
     s_eo_theinertials.service.servconfig.type = eomn_serv_NONE;
     
@@ -521,7 +519,7 @@ extern eOresult_t eo_inertials_Activate(EOtheInertials *p, const eOmn_serv_confi
 }
 
 
-#warning THINK of how to use instead of eo_inertials_ServiceConfig()
+#warning THINK of what to use instead of eo_inertials_ServiceConfig()
 extern eOresult_t eo_inertials_ServiceConfig(EOtheInertials *p, const eOas_inertial_serviceconfig_t* cfg)
 {    
     // we can configure the service how many times we want. however the object must be initted and must there be an inertial entity

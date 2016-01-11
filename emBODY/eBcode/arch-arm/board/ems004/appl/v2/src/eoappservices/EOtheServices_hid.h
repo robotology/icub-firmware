@@ -35,6 +35,8 @@
 #include "EOtheErrorManager.h"
 #include "EOvector.h"
 
+#include "EOnvSet.h"
+
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
 
@@ -78,7 +80,10 @@ typedef struct
 
 struct EOtheServices_hid
 {
-    uint32_t        tbd;
+    eObool_t        initted;
+    EOnvSet*        nvset;      
+    EOtimer*        timer;
+    eOprotBRD_t     board;    
 }; 
 
 

@@ -36,7 +36,7 @@
 #include "EOMtheEMSapplCfg_cfg.h"
 
 
-#include "EOtheServices.h"
+#include "EOtheServices0.h"
 
 
 #include "EOnvSet.h"
@@ -86,7 +86,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
-static const eOserv_cfg_t theservicescfg =
+static const eOserv0_cfg_t theservicescfg =
 {  
     .whatever = 0
 };
@@ -328,6 +328,10 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
         //if at least one board is present, go on
         if (canboards->size != 0)
         {
+            #warning TODO: fix mais service with new objects
+            hal_trace_puts("hei marco, devi sistemare il servizio di mais");
+            for(;;);
+            
             eo_canmap_LoadBoards(canmap, canboards);
 
             // connecting the entity descriptors the canmap
@@ -380,7 +384,6 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
         {
             eOprot_EPcfg_t* epcfg = &ep_mais_cfg;   
             eo_nvset_LoadEP(nvset, epcfg, eobool_true);
-            eo_entities_Refresh(eo_entities_GetHandle());
         }
 
         //do the same for the skin, later on
@@ -408,35 +411,45 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
         // 3. ...
         // how to load the other endpoints? it seems that also the SKIN is needed for MC4plus...
 
-        //refresh the entities basing on eth endpoints
-        eo_entities_Initialise();            
+        // refresh the entities basing on eth endpoints so far loaded with eo_nvset_LoadEP() 
+        eo_entities_Initialise();     
+        
+        // and set number of entities according to what we have
+        if ((s_boardnum == 15) || (s_boardnum == 16) || (s_boardnum == 18) || (s_boardnum == 19))
+        {
+            eo_entities_SetNumOfMaises(eo_entities_GetHandle(), 1);
+        }
+        
+        eo_entities_SetNumOfJoints(eo_entities_GetHandle(), mc_config.jomosnumber);
+        eo_entities_SetNumOfMotors(eo_entities_GetHandle(), mc_config.jomosnumber);
+        
     }        
    
     // general services initializer
-    eo_serv_Initialise(NULL);
+    eo_serv0_Initialise(NULL);
     
     //init the MCService
-    eo_serv_ConfigMC(eo_serv_GetHandle(), &mc_config); 
+    eo_serv0_ConfigMC(eo_serv0_GetHandle(), &mc_config); 
     eo_mcserv_CheckResources(eo_mcserv_GetHandle());
     
     //init the CurrentsWatchdog
-    eo_serv_InitializeCurrentsWatchdog(eo_serv_GetHandle());
+    eo_serv0_InitializeCurrentsWatchdog(eo_serv0_GetHandle());
     
     //init the CANService    
     //CAN must be activated only for boards: 16,17 (left_lower_arm) 19,20 (right_lower_arm) (skin is still not considered at the moment)
     if ((s_boardnum == 15) || (s_boardnum == 16) || (s_boardnum == 18) || (s_boardnum == 19))
     {
-        eo_serv_ConfigCAN(eo_serv_GetHandle(), NULL);
+        eo_serv0_ConfigCAN(eo_serv0_GetHandle(), NULL);
 
         //init and and start the discovery of CANboards
         //davide: now we are doing it once until the board is reset...
         //it could be nice to have a double-check every time I go in RUN state (a wire can get broken during normal usage of the robot)
-        eo_serv_StartCANdiscovery(eo_serv_GetHandle());
+        eo_serv0_StartCANdiscovery(eo_serv0_GetHandle());
     }
     //ready straightforward to go in RUN
     else
     {
-        eo_serv_SetBoardReadyForControlLoop(eo_serv_GetHandle());
+        eo_serv0_SetBoardReadyForControlLoop(eo_serv0_GetHandle());
     }
 }
 

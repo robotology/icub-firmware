@@ -118,9 +118,9 @@ static void s_eo_ethmonitor_query_micrel(void);
 
 static void s_eo_ethmonitor_process_resultsofquery(void);
 
-static void s_eo_ethmonitor_print_delta(const char *prefix, uint32_t delta);
+//static void s_eo_ethmonitor_print_delta(const char *prefix, uint32_t delta);
 
-static void s_eo_ethmonitor_print_timeoflife(const char *prefix);
+//static void s_eo_ethmonitor_print_timeoflife(const char *prefix);
 
 static void s_eo_ethmonitor_verifyTXropframe(hl_eth_frame_t* frame);
 
@@ -389,9 +389,9 @@ static void s_eo_ethmonitor_query_micrel(void)
     uint8_t mask = 0;
     hal_ethtransceiver_phystatus_t phys[3] = {0};
     uint8_t i = 0;
-    uint64_t start = 0;
-    uint64_t stop = 0;
-    uint32_t delta = 0;
+//    uint64_t start = 0;
+//    uint64_t stop = 0;
+//    uint32_t delta = 0;
     
     
     s_eo_theethmonitor.newresultsavailable = eobool_false;
@@ -497,28 +497,28 @@ static void s_eo_ethmonitor_process_resultsofquery(void)
 }
 
 
-static void s_eo_ethmonitor_print_delta(const char *prefix, uint32_t delta)
-{
-    static char strA[64] = {0};  
-    snprintf(strA, sizeof(strA), "%s takes %d usec", prefix, delta);    
-    hal_trace_puts(strA);    
-}
+//static void s_eo_ethmonitor_print_delta(const char *prefix, uint32_t delta)
+//{
+//    static char strA[64] = {0};  
+//    snprintf(strA, sizeof(strA), "%s takes %d usec", prefix, delta);    
+//    hal_trace_puts(strA);    
+//}
 
-static void s_eo_ethmonitor_print_timeoflife(const char *prefix)
-{
-    static char strrr[64] = {0};  
-    uint32_t sec = 0;
-    uint32_t ms = 0;
-    uint32_t us = 0;
-    uint64_t start = eov_sys_LifeTimeGet(eov_sys_GetHandle());
-    sec = start / (1000*1000);
-    start = start - 1000*1000*sec;
-    ms = start / 1000; 
-    us = start % 1000;
+//static void s_eo_ethmonitor_print_timeoflife(const char *prefix)
+//{
+//    static char strrr[64] = {0};  
+//    uint32_t sec = 0;
+//    uint32_t ms = 0;
+//    uint32_t us = 0;
+//    uint64_t start = eov_sys_LifeTimeGet(eov_sys_GetHandle());
+//    sec = start / (1000*1000);
+//    start = start - 1000*1000*sec;
+//    ms = start / 1000; 
+//    us = start % 1000;
 
-    snprintf(strrr, sizeof(strrr), "%s @ %ds %dm %du", prefix, sec, ms, us);    
-    hal_trace_puts(strrr);    
-}
+//    snprintf(strrr, sizeof(strrr), "%s @ %ds %dm %du", prefix, sec, ms, us);    
+//    hal_trace_puts(strrr);    
+//}
 
 
 

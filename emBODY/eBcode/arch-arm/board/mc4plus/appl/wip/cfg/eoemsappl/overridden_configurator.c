@@ -34,7 +34,7 @@
 #include "EoError.h"
 #include "EOtheErrorManager.h"
 
-#include "EOtheServices.h"
+#include "EOtheServices0.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface

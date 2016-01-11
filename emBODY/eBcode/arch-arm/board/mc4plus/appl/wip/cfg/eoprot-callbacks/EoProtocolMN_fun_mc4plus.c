@@ -45,7 +45,8 @@
 
 #include "eEsharedServices.h"
 
-#include "EOtheServices.h"
+
+#include "EOtheServices0.h"
 #include "EOmcService.h"
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -350,9 +351,9 @@ extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropd
 
         case applstate_running:
         {
-            if(eobool_false == eo_serv_IsBoardReadyForControlLoop(eo_serv_GetHandle()))
+            if(eobool_false == eo_serv0_IsBoardReadyForControlLoop(eo_serv0_GetHandle()))
             {
-                eo_serv_SendDiscoveryFailureReport(eo_serv_GetHandle());
+                eo_serv0_SendDiscoveryFailureReport(eo_serv0_GetHandle());
                 return;
             }
                

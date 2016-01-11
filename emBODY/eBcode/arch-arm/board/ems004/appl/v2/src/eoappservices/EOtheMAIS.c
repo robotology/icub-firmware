@@ -257,7 +257,9 @@ extern eOresult_t eo_mais_Activate(EOtheMAIS *p, const eOmn_serv_configuration_t
     
     if(eobool_true == s_eo_themais.service.active)
     {
-        eo_mais_Deactivate(p);        
+        // marco.accame on 30dec2015: better not to deactivate the mais .... it may be that the masi was activated by mc and then thi function called again by as-mais
+        // eo_mais_Deactivate(p);     
+        return(eores_OK);
     }   
     
     eo_entities_SetNumOfMaises(eo_entities_GetHandle(), 1);

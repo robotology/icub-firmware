@@ -173,15 +173,15 @@ extern eOresult_t eo_canserv_SetMode(EOtheCANservice *p, eOcanserv_mode_t mode)
     return(eores_OK);
 }
 
-extern eOresult_t eo_canserv_TXstartAll(EOtheCANservice *p)
+extern eOresult_t eo_canserv_TXstartAll(EOtheCANservice *p, uint8_t *sizeofTXqueueCAN1, uint8_t *sizeofTXqueueCAN2)
 {
     if(NULL == p)
     {
         return(eores_NOK_nullpointer);
     }
     
-    eo_canserv_TXstart(p, eOcanport1, NULL);
-    eo_canserv_TXstart(p, eOcanport2, NULL);
+    eo_canserv_TXstart(p, eOcanport1, sizeofTXqueueCAN1);
+    eo_canserv_TXstart(p, eOcanport2, sizeofTXqueueCAN2);
     
     return(eores_OK);
 }

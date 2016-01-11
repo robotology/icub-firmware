@@ -41,8 +41,8 @@
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
-
-//#define EOMOTIONDONE_USEPROXY
+// empty-section
+#error DOT USE IT ANYMORE
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 

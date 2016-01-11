@@ -669,11 +669,12 @@ static eOresult_t s_eo_mcserv_protocol_load_mc_endpoint(EOmcService *p)
     epcfgmc.numberofentities[1] = p->config.jomosnumber;
     epcfgmc.numberofentities[2] = 1; // one controller
 
-
+    #warning -> WIP: but you must change it
     if(eobool_true == eoprot_EPcfg_isvalid(&epcfgmc))
     {
         eo_nvset_LoadEP(nvset, &epcfgmc, eobool_true);
-        eo_entities_Refresh(eo_entities_GetHandle());
+        eo_entities_SetNumOfJoints(eo_entities_GetHandle(), p->config.jomosnumber);
+        eo_entities_SetNumOfMotors(eo_entities_GetHandle(), p->config.jomosnumber);
     }                        
         
     // now we must define the .... proxy rules

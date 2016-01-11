@@ -91,9 +91,13 @@ static eo_appEncReader_enc_type_t s_eo_encoderreader_GetEncoderType(uint8_t sens
 
 static eo_appEncReader_encoder_position_t s_eo_encoderreader_GetEncoderPosition(uint8_t sensorport);
 
+static eo_appEncReader_detected_position_t s_eo_encoderreader_GetEncoderPositionType(uint8_t sensorpos);
+
 static void s_eo_encoderreader_config_ereader(const eOmn_serv_arrayof_4jomodescriptors_t * jomodes, eOcallback_t callback, void* arg);
 
 static void s_eo_encoderreader_read_encoders(void* p);
+
+static eo_appEncReader_stream_number_t s_eo_encoderreader_encoder_get_spi_stream(eo_appEncReader_encoder_position_t pos);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -220,6 +224,7 @@ extern eOresult_t eo_encoderreader_Deactivate(EOtheEncoderReader *p)
     #warning TODO: eo_encoderreader_Deactivate() must be terminated. see comments below
     
     // in order to do this function we should change EOappEncReader so that it can be de-initted. 
+    // even better to merge what is inside EOappEncReader into object EOtheEncoderReader 
     
     // to do: 
     // deinit EOappEncReader, undo what in s_eo_encoderreader_config_ereader()
@@ -437,6 +442,17 @@ static eo_appEncReader_encoder_position_t s_eo_encoderreader_GetEncoderPosition(
     return(pos);    
 }
 
+static eo_appEncReader_detected_position_t s_eo_encoderreader_GetEncoderPositionType(uint8_t sensorpos)
+{
+    eo_appEncReader_detected_position_t postype = eo_appEncReader_detected_positionNONE;
+    if(sensorpos <= eo_appEncReader_detected_position_rotor)
+    {
+        postype = (eo_appEncReader_detected_position_t)sensorpos;
+    }
+    
+    return(postype);    
+}
+
 
 
 static void s_eo_encoderreader_config_ereader(const eOmn_serv_arrayof_4jomodescriptors_t * jomodes, eOcallback_t callback, void* arg)
@@ -479,21 +495,31 @@ static void s_eo_encoderreader_config_ereader(const eOmn_serv_arrayof_4jomodescr
             // must convert things 
             config.joints[i].primary_encoder = s_eo_encoderreader_GetEncoderType(jomodes->sensor.type);
             config.joints[i].primary_enc_position = s_eo_encoderreader_GetEncoderPosition(jomodes->sensor.port);
+            config.joints[i].primary_encoder_pos_type = s_eo_encoderreader_GetEncoderPositionType(jomodes->sensor.pos);
             config.joints[i].extra_encoder = s_eo_encoderreader_GetEncoderType(jomodes->extrasensor.type);
-            config.joints[i].extra_enc_position = s_eo_encoderreader_GetEncoderPosition(jomodes->extrasensor.port);        
+            config.joints[i].extra_enc_position = s_eo_encoderreader_GetEncoderPosition(jomodes->extrasensor.port);      
+            config.joints[i].extra_encoder_pos_type = s_eo_encoderreader_GetEncoderPositionType(jomodes->extrasensor.pos);   
 
             if(eo_appEncReader_enc_type_NONE != config.joints[i].primary_encoder)
             {
-                numberofencoders++;
-                config.SPI_streams[config.joints[i].primary_enc_position%2].numberof++;
-                config.SPI_streams[config.joints[i].primary_enc_position%2].type = hal_encoder_t1;
+                eo_appEncReader_stream_number_t streamnumber = s_eo_encoderreader_encoder_get_spi_stream(config.joints[i].primary_enc_position);
+                if(eo_appEncReader_streamNONE != streamnumber)
+                {
+                    numberofencoders++;
+                    config.SPI_streams[streamnumber].numberof++;
+                    config.SPI_streams[streamnumber].type = hal_encoder_t1;
+                }
             }
 
             if(eo_appEncReader_enc_type_NONE != config.joints[i].extra_encoder)
             {
-                numberofencoders++;
-                config.SPI_streams[config.joints[i].extra_enc_position%2].numberof++;
-                config.SPI_streams[config.joints[i].extra_enc_position%2].type = hal_encoder_t1;
+                eo_appEncReader_stream_number_t streamnumber = s_eo_encoderreader_encoder_get_spi_stream(config.joints[i].extra_enc_position);
+                if(eo_appEncReader_streamNONE != streamnumber)
+                {
+                    numberofencoders++;
+                    config.SPI_streams[streamnumber].numberof++;
+                    config.SPI_streams[streamnumber].type = hal_encoder_t1;
+                }
             } 
         }        
     }
@@ -529,6 +555,20 @@ static void s_eo_encoderreader_read_encoders(void* p)
     s_eo_encoderreader_onstop_verifyreading((void*)p, readingisok);   
 }
 
+
+// if we merge encoder reader with EOtheEncoderReader ... change it
+static eo_appEncReader_stream_number_t s_eo_encoderreader_encoder_get_spi_stream(eo_appEncReader_encoder_position_t pos)
+{
+    uint8_t pp = pos;
+    if(eo_appEncReader_encoder_positionNONE == pp)
+    {
+        return(eo_appEncReader_streamNONE);
+    }
+    // eo_appEncReader_stream_position_numberof is 3, so that we can map eo_appEncReader_encoder_position[1, 2, 3, 4, 5, 6] into: eo_appEncReader_stream[0, 0, 0, 1, 1, 1]
+    
+    pp = pp/eo_appEncReader_stream_position_numberof;
+    return((eo_appEncReader_stream_number_t)pp);  
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

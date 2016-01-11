@@ -401,7 +401,7 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__ADDITIONAL_STATUS(eOcan
     // the two joints have ...
     const eOcanmap_insideindex_t insideindex[2] = {eocanmap_insideindex_first, eocanmap_insideindex_second};
     caninteractionmodes[0] = (icubCanProto_interactionmode_t)(frame->data[0] & 0x0f);          // for first joint
-    caninteractionmodes[1] = (icubCanProto_interactionmode_t)(frame->data[0] & 0xf0) >> 4;     // for second joint
+    caninteractionmodes[1] = (icubCanProto_interactionmode_t)((frame->data[0] & 0xf0) >> 4);     // for second joint
     eOmc_interactionmode_t tmp = eOmc_interactionmode_stiff;
     for(j=0; j<2; j++)
     {

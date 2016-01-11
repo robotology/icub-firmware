@@ -44,6 +44,11 @@
 
 #include "EOVtheCallbackManager.h"
 
+#warning TODO: i have kept inclusion of EOemsControllerCfg.h, but it must be removed. read following comment
+// there must be another way to propagate externally to the motor-controller library some properties .... macros must be removed
+
+#include "EOemsControllerCfg.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -570,7 +575,7 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
             
             // init others
             eo_virtualstrain_Initialise();
-            eo_motiondone_Initialise();
+            // notused anymore: eo_motiondone_Initialise();
             
             
             // proxy config
@@ -608,9 +613,10 @@ extern eOresult_t eo_motioncontrol_Start(EOtheMotionController *p)
     // focbased: just init a read of the encoder
     if(eomn_serv_MC_foc == p->service.servconfig.type)
     {   
+#ifndef USE_ONLY_QE
         // just start a reading of encoders        
         eo_encoderreader_StartReading(p->mcfoc.theencoderreader);
-
+#endif
     }
     else if(eomn_serv_MC_mc4 == p->service.servconfig.type)
     {
@@ -652,6 +658,9 @@ extern eOresult_t eo_motioncontrol_Tick(EOtheMotionController *p)
         int16_t pwm[4] = {0};
         
         uint8_t i = 0;
+
+        #warning TODO: -> maybe we have a better mode than the the macro USE_ONLY_QE
+#ifndef USE_ONLY_QE   
         
         // wait for the encoders for some time 
         for(i=0; i<30; ++i)
@@ -688,6 +697,8 @@ extern eOresult_t eo_motioncontrol_Tick(EOtheMotionController *p)
 
         // Restart the reading of the encoders
         eo_encoderreader_StartReading(p->mcfoc.theencoderreader);
+        
+#endif // USE_ONLY_QE        
             
         eo_emsController_AcquireAbsEncoders((int32_t*)encvalue, error_mask);
         
@@ -706,7 +717,7 @@ extern eOresult_t eo_motioncontrol_Tick(EOtheMotionController *p)
     else if(eomn_serv_MC_mc4 == p->service.servconfig.type)
     {
         // motion done
-        eo_motiondone_Tick(eo_motiondone_GetHandle());
+        // not used anymore: eo_motiondone_Tick(eo_motiondone_GetHandle());
     
         // virtual strain
         eo_virtualstrain_Tick(eo_virtualstrain_GetHandle());        
@@ -773,7 +784,7 @@ static const eOmc_joint_t s_joint_default_value =
             .kff =                   0,
             .stiction_up_val =       0,
             .stiction_down_val =     0,
-            .filler =                {0xf1, 0xf2, 0xf3}
+            .filler =                {0}
         },
         .pidvelocity =
         {
@@ -787,7 +798,7 @@ static const eOmc_joint_t s_joint_default_value =
             .kff =                   0,
             .stiction_up_val =       0,
             .stiction_down_val =     0,
-            .filler =                {0xf1, 0xf2, 0xf3}
+            .filler =                {0}
         },
         .pidtorque =
         {
@@ -801,7 +812,7 @@ static const eOmc_joint_t s_joint_default_value =
             .kff =                   0,
             .stiction_up_val =       0,
             .stiction_down_val =     0,
-            .filler =                {0xf1, 0xf2, 0xf3}
+            .filler =                {0}
         }, 
         .limitsofjoint =
         {
@@ -812,14 +823,8 @@ static const eOmc_joint_t s_joint_default_value =
         {
             .stiffness =             0,
             .damping =               0,
-            .offset =                0,
-            .filler02 =              {0xf1, 0xf2}           
-        },        
-        
-        .velocitysetpointtimeout =   0,
-       
-        .motionmonitormode =         eomc_motionmonitormode_dontmonitor,
-        .filler01 =                  0xe0,
+            .offset =                0          
+        },               
         .maxvelocityofjoint =        0,
         .motor_params =
         {
@@ -827,11 +832,12 @@ static const eOmc_joint_t s_joint_default_value =
             .ktau_value =            0,
             .bemf_scale =            0,
             .ktau_scale =            0,
-            .filler02 =              {0xf1, 0xf2}
+            .filler02 =              {0}
         },
+        .velocitysetpointtimeout =   0,
         .tcfiltertype =              0,
         .jntEncoderType =            0,
-        .filler02 =                  {0xf1, 0xf2}
+        .filler04 =                  {0}
     },
     .status =                       
     {
@@ -840,13 +846,16 @@ static const eOmc_joint_t s_joint_default_value =
             .jnt_position =          0,
             .jnt_velocity =          0,
             .jnt_acceleration =      0,
-            .jnt_torque =            0,
-            .motionmonitorstatus =   eomc_motionmonitorstatus_notmonitored,
-            .controlmodestatus =     eomc_controlmode_idle,
+            .jnt_torque =            0
         },
         .ofpid =                     {0},
-        .interactionmodestatus =     eomc_imodeval_stiff,
-        .chamaleon03 =               {0} //{0xd1, 0xd2, 0xd3}
+        .modes = 
+        {
+            .controlmodestatus =        eomc_controlmode_idle,
+            .interactionmodestatus =    eOmc_interactionmode_stiff,
+            .ismotiondone =             eobool_false,
+            .filler =                   {0}
+        }
     },
     .inputs =                        {0},
     .cmmnds =                       
@@ -854,9 +863,9 @@ static const eOmc_joint_t s_joint_default_value =
         .calibration =               {0},
         .setpoint =                  {0},
         .stoptrajectory =            0,
-        .controlmode =                 eomc_controlmode_cmd_switch_everything_off,
-        .interactionmode =           eomc_imodeval_stiff,
-        .filler01 =                  0        
+        .controlmode =               eomc_controlmode_cmd_switch_everything_off,
+        .interactionmode =           eOmc_interactionmode_stiff,
+        .filler =                    {0}        
     }
 }; 
 
@@ -876,11 +885,10 @@ static const eOmc_motor_t s_motor_default_value =
             .kff =                   0,
             .stiction_up_val =       0,
             .stiction_down_val =     0,
-            .filler =                {0xf1, 0xf2, 0xf3}
+            .filler =                {0}
         },
         .gearboxratio =              0,
         .rotorEncoderResolution =    0,
-        .filler01 =                  0,
         .maxvelocityofmotor =        0,
         .maxcurrentofmotor =         0,
         .rotorIndexOffset =          0,
@@ -890,6 +898,7 @@ static const eOmc_motor_t s_motor_default_value =
         .hasRotorEncoder =           eobool_false,
         .hasRotorEncoderIndex =      eobool_false,
         .rotorEncoderType =          0,
+        .filler02 =                  {0},
         .limitsofrotor =
         {
             .max = 0,
@@ -898,6 +907,7 @@ static const eOmc_motor_t s_motor_default_value =
     },
     .status =                       {0}
 }; 
+
 
 extern void eoprot_fun_INIT_mc_joint_config(const EOnv* nv)
 {
@@ -1195,27 +1205,14 @@ static void s_eo_motioncontrol_UpdateJointStatus(EOtheMotionController *p)
             
             eo_emsController_GetActivePidStatus(jId, &jstatus->ofpid);
             
-            if (transmit_decoupled_pwms) 
+            if(1 == transmit_decoupled_pwms) 
             {  
-                //this functions is used to get the motor PWM after the decoupling matrix
-                eo_emsController_GetPWMOutput(jId, &jstatus->ofpid.output);
+                // this functions is used to get the motor PWM after the decoupling matrix
+                eo_emsController_GetPWMOutput(jId, &jstatus->ofpid.generic.output);
             }
             
-            if(eomc_motionmonitorstatus_setpointnotreachedyet == jstatus->basic.motionmonitorstatus)
-            {
-                /* if motionmonitorstatus is equal to _setpointnotreachedyet, i send motion done message. 
-                - if (motionmonitorstatus == eomc_motionmonitorstatus_setpointisreached), i don't send
-                message because the setpoint is alredy reached. this means that:
-                    - if monitormode is forever, no new set point has been configured 
-                    - if monitormode is _untilreached, the joint reached the setpoint already.
-                - if (motionmonitorstatus == eomc_motionmonitorstatus_notmonitored), i don't send
-                message because pc104 is not interested in getting motion done.
-                */
-                if(eo_emsController_GetMotionDone(jId))
-                {
-                    jstatus->basic.motionmonitorstatus = eomc_motionmonitorstatus_setpointisreached;
-                }
-            }
+            jstatus->modes.ismotiondone = eo_emsController_GetMotionDone(jId);
+           
         }
  
     }   
@@ -1267,13 +1264,12 @@ static eObool_t s_eo_motioncontrol_mc4based_variableisproxied(eOnvID32_t id)
     
     switch(tag)
     {
-        //VALE get velocity pid not implemented!!!
         case eoprot_tag_mc_joint_config_pidposition:
         // case eoprot_tag_mc_joint_config_pidvelocity:     // marco.accame on 03mar15: the pidvelocity propagation to mc4 is is not implemented, thus i must remove from proxy.
         case eoprot_tag_mc_joint_config_pidtorque:
         case eoprot_tag_mc_joint_config_limitsofjoint:
         case eoprot_tag_mc_joint_config_impedance:
-        case eoprot_tag_mc_joint_cmmnds_setpoint:           // marco.accame on 03mar15: the setpoint should not be asked, thus why in here? i may just remove the handler so that no reply is obtained if wrongly used
+        case eoprot_tag_mc_joint_status_modes_ismotiondone:
         {
             return(eobool_true);
         }

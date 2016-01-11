@@ -174,7 +174,7 @@ extern void eo_axisController_StartCalibration(EOaxisController *o, uint32_t* pa
     {
         case eomc_calibration_type3_abs_sens_digital:
         {
-            eOmc_calibrator_params_type3_abs_sens_digital_t* p_type3 = (eOmc_calibrator_params_type3_abs_sens_digital_t*) params;
+            //eOmc_calibrator_params_type3_abs_sens_digital_t* p_type3 = (eOmc_calibrator_params_type3_abs_sens_digital_t*) params;
             
             o->control_mode = eomc_controlmode_calib;
             
@@ -811,7 +811,7 @@ extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
             // calib type 6
             else if (o->calibration_type == eomc_calibration_type6_mais)
             {
-                #warning TBD: MAIS CALIBRATION
+                #warning TODO: MAIS CALIBRATION
                 /*
                 if (IS_CALIBRATED())
                 {
@@ -1135,7 +1135,7 @@ extern void eo_axisController_GetJointStatus(EOaxisController *o, eOmc_joint_sta
     jointStatus->modes.ismotiondone             = eo_axisController_GetMotionDone(o);
     jointStatus->basic.jnt_position             = GET_AXIS_POSITION();           
     jointStatus->basic.jnt_velocity             = GET_AXIS_VELOCITY();        
-    #warning acceleration to be implemented
+    #warning TODO: acceleration to be implemented
     jointStatus->basic.jnt_acceleration         = 0; //eo_speedometer_GetAcceleration(o->speedmeter);       
     jointStatus->basic.jnt_torque               = o->torque_meas_jnt;
 }

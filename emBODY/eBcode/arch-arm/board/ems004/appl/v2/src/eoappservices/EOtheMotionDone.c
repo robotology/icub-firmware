@@ -16,6 +16,7 @@
  * Public License for more details
 */
 
+#error DOT USE IT ANYMORE
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -94,8 +95,8 @@ static EOtheMotionDone s_eo_themotiondone =
 extern EOtheMotionDone* eo_motiondone_Initialise(void)
 {
 
-	#warning MERGE-> dont use EOtheMotionDone anymore ...
-	for(;;) {;}
+    #warning MERGE-> dont use EOtheMotionDone anymore ...
+    //for(;;) {;}
 
     if(eobool_true == s_eo_themotiondone.initted)
     {
@@ -119,7 +120,11 @@ extern EOtheMotionDone* eo_motiondone_Initialise(void)
 
 extern EOtheMotionDone* eo_motiondone_GetHandle(void)
 {
-    return(eo_motiondone_Initialise());
+    if(eobool_true == s_eo_themotiondone.initted)
+    {
+        return(&s_eo_themotiondone);
+    }
+    return(NULL);
 }
 
 extern eOresult_t eo_motiondone_Tick(EOtheMotionDone *p)
@@ -129,7 +134,7 @@ extern eOresult_t eo_motiondone_Tick(EOtheMotionDone *p)
         return(eores_NOK_nullpointer);
     }
     
-
+    #warning MERGE-> removed the code inside eo_motiondone_Tick()
     return(eores_OK); 
 }
 
