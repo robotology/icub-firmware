@@ -28,7 +28,8 @@
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "EoCommon.h"
-#include "EOtheCANprotocol.h"
+#include "EoProtocol.h"
+#include "EOtheServices_hid.h"
 
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
@@ -41,11 +42,13 @@
 
 struct EOtheSTRAIN_hid
 {
-    eObool_t            initted;
-    eObool_t            thereisstrain;
-    uint8_t             protindex;
-    eOprotID32_t        id32;
-    eOcanprot_command_t command;
+    eOservice_core_t                        service;
+    eOservice_diagnostics_t                 diagnostics;
+    eOservice_cantools_t                    sharedcan;
+    
+    eOprotID32_t                            id32;
+    eOservice_onendofoperation_fun_t        overrideonfullscaleready; 
+    eOas_strain_t*                          strain;       
 }; 
 
 

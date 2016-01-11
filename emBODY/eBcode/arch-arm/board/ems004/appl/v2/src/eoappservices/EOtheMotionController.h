@@ -18,78 +18,87 @@
 
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _EOTHESERVICES_H_
-#define _EOTHESERVICES_H_
+#ifndef _EOTHEMOTIONCONTROLLER_H_
+#define _EOTHEMOTIONCONTROLLER_H_
 
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
-/** @file       EOtheServices.h
-    @brief      This file ...                
+/** @file       EOtheMotionController.h
+    @brief      this object implements what is required for managing the STRAIN.                
     @author     marco.accame@iit.it
-    @date       01/09/2015
+    @date       05/28/2015
 **/
 
-/** @defgroup eo_EOtheServices Object EOtheServices
+/** @defgroup eo_EOtheMotionController Object EOtheMotionController
     ...... 
     @{        
  **/
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
-#include "eOcommon.h"
+#include "EoCommon.h"
 #include "EoProtocol.h"
-#include "EoMotionControl.h"
-#include "EoAnalogSensors.h"
-#include "EoSkin.h"
 
-#include "EOmcService.h"
-#include "EOtheMAIS.h"
-#include "EOtheCANservice.h"
-#include "EOtheCANdiscovery2.h"
-#include "EOCurrentsWatchdog.h"
+#include "EOtheServices.h"
+
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
  
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
-typedef struct EOtheServices_hid EOtheServices;
+typedef struct EOtheMotionController_hid EOtheMotionController;
 
 
 
-typedef struct
+//typedef eOresult_t (*eOmotcon_onendofoperation_fun_t) (EOtheMotionController* p, eObool_t operationisok);
+
+enum { eo_motcon_maxJOMOs = 12 };
+
+
+typedef enum
 {
-    uint8_t     whatever;
-} eOserv_cfg_t;
-
-
+    eo_motcon_mode_NONE         = eomn_serv_NONE,
+    eo_motcon_mode_foc          = eomn_serv_MC_foc,
+    eo_motcon_mode_mc4          = eomn_serv_MC_mc4,
+    eo_motcon_mode_mc4plus      = eomn_serv_MC_mc4plus,
+    eo_motcon_mode_mc4plusmais  = eomn_serv_MC_mc4plusmais   
+} eOmotioncontroller_mode_t;
    
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------
 // empty-section
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-extern EOtheServices* eo_serv_Initialise(eOserv_cfg_t *cfg);
 
-extern EOtheServices* eo_serv_GetHandle(void);
+extern EOtheMotionController* eo_motioncontrol_Initialise(void);
 
-extern eOresult_t eo_serv_ConfigMC(EOtheServices *p, eOmcconfig_cfg_t *mccfg);
+extern EOtheMotionController* eo_motioncontrol_GetHandle(void);
 
-extern eOresult_t eo_serv_InitializeCurrentsWatchdog(EOtheServices *p);
 
-extern eOresult_t eo_serv_ConfigCAN(EOtheServices *p, eOcanserv_cfg_t *cancfg);
+extern eOmotioncontroller_mode_t eo_motioncontrol_GetMode(EOtheMotionController *p);
 
-extern eOresult_t eo_serv_StartCANdiscovery(EOtheServices *p);
 
-extern eObool_t eo_serv_IsBoardReadyForControlLoop(EOtheServices *p);
 
-extern eOresult_t eo_serv_SetBoardReadyForControlLoop(EOtheServices *p);
+// so far we support only eo_motcon_mode_foc and eo_motcon_mode_mc4
 
-extern eOresult_t eo_serv_SendDiscoveryFailureReport(EOtheServices *p);
+extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify);
 
+extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn_serv_configuration_t * servcfg);
+
+extern eOresult_t eo_motioncontrol_Deactivate(EOtheMotionController *p);
+
+
+// to be called once before to be ticked
+extern eOresult_t eo_motioncontrol_Start(EOtheMotionController *p);
+
+// it ticks every ms of the control-loop
+extern eOresult_t eo_motioncontrol_Tick(EOtheMotionController *p);
+
+extern eOresult_t eo_motioncontrol_Stop(EOtheMotionController *p);
 
 /** @}            
-    end of group eo_EOtheServices
+    end of group eo_EOtheMotionController
  **/
 
 #endif  // include-guard

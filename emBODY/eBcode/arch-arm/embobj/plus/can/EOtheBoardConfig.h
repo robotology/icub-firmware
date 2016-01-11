@@ -46,14 +46,15 @@ extern "C" {
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "EoCommon.h"
-#include "EOconstvector.h"
 #include "EoProtocol.h"
-#include "EOappEncodersReader.h"
-#include "EOtheInertial.h"
-
-#include "EOtheCANdiscovery2.h"
-
 #include "EOMtheEMSrunner.h"
+
+//#include "EOconstvector.h"
+//#include "EOappEncodersReader.h"
+//#include "EOtheInertials.h"
+//#include "EOtheCANdiscovery2.h"
+
+
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
@@ -66,33 +67,50 @@ enum { eoboardconfig_maxvalueofsupportedentity = 3 };  // with value of 3 we sup
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-extern const eOcandiscovery_target_t * eoboardconfig_code2mcdiscoverytarget(uint32_t code);
+//#if 0
 
-extern const eOcandiscovery_target_t * eoboardconfig_code2maisdiscoverytarget(uint32_t code);
+//extern const eOcandiscovery_target_t * eoboardconfig_code2mcdiscoverytarget(uint32_t code);
 
-extern const eOcandiscovery_target_t * eoboardconfig_code2straindiscoverytarget(uint32_t code) ;
+//extern const eOcandiscovery_target_t * eoboardconfig_code2maisdiscoverytarget(uint32_t code);
 
-// of eOcanmap_board_properties_t
-// the constvector contains all the boards in can1 and can2. or ... is empty.
-extern EOconstvector * eoboardconfig_code2canboards(uint32_t code); 
+//extern const eOcandiscovery_target_t * eoboardconfig_code2straindiscoverytarget(uint32_t code) ;
 
-// of eOcanmap_entitydescriptor_t
-// teh constnector contains reference to the boards used to offer service to a given entity.
-// or ... is empty in case of no such an entity on teh board or entity being served not by can
-// entity cannot be higher than eoboardconfig_maxvalueofsupportedentity. if so then it returns an empty vector
-extern EOconstvector * eoboardconfig_code2entitydescriptors(uint32_t code, eOprotEndpoint_t ep, eOprotEntity_t entity); 
+//// of eOcanmap_board_properties_t
+//// the constvector contains all the boards in can1 and can2. or ... is empty.
+//extern EOconstvector * eoboardconfig_code2canboards(uint32_t code); 
+
+//// of eOcanmap_entitydescriptor_t
+//// teh constnector contains reference to the boards used to offer service to a given entity.
+//// or ... is empty in case of no such an entity on teh board or entity being served not by can
+//// entity cannot be higher than eoboardconfig_maxvalueofsupportedentity. if so then it returns an empty vector
+//extern EOconstvector * eoboardconfig_code2entitydescriptors(uint32_t code, eOprotEndpoint_t ep, eOprotEntity_t entity); 
 
 
-extern const eOappEncReader_cfg_t * eoboardconfig_code2encoderconfig(uint32_t code);
+//extern const eOappEncReader_cfg_t * eoboardconfig_code2encoderconfig(uint32_t code);
 
-// of eOprot_EPcfg_t
-extern EOconstvector * eoboardconfig_code2EPcfg(uint32_t code);
+//// of eOprot_EPcfg_t
+//extern EOconstvector * eoboardconfig_code2EPcfg(uint32_t code);
 
-//extern eOas_inertialidentifier_t eoboardconfig_code2inertialID(uint32_t code);
+////extern eOas_inertialidentifier_t eoboardconfig_code2inertialID(uint32_t code);
 
-extern const eOas_inertial_serviceconfig_t * eoboardconfig_code2inertialCFG(uint32_t code);
+//extern const eOas_inertial_serviceconfig_t * eoboardconfig_code2inertialCFG(uint32_t code);
+
+//#endif
 
 extern const eOemsrunner_timing_t * eoboardconfig_code2ctrlooptiming(uint32_t code);
+
+
+extern const eOmn_serv_configuration_t * eoboardconfig_code2motion_serv_configuration(uint32_t code);
+
+extern const eOmn_serv_configuration_t * eoboardconfig_code2strain_serv_configuration(uint32_t code);
+
+extern const eOmn_serv_configuration_t * eoboardconfig_code2mais_serv_configuration(uint32_t code);
+
+extern const eOmn_serv_configuration_t * eoboardconfig_code2skin_serv_configuration(uint32_t code);
+
+extern const eOmn_serv_configuration_t * eoboardconfig_code2inertials_serv_configuration(uint32_t code);
+
+
 
 
 /** @}            

@@ -217,54 +217,6 @@ static void s_eom_emsappl_main_init(void)
 
     eo_ledpulser_Initialise(&ledpulsercfg);
     
-//    {
-//        eOprotID32_t id32 = 0;
-//        eOresult_t res = eores_OK;
-//        eOcanmap_location_t loc = {0};
-//        uint8_t numoflocs = 0;
-//        uint8_t index = 0;
-//        eObrd_cantype_t boardtype = eobrd_cantype_unknown;
-//        extern EOconstvector* eo_vectorof_boardprops_eb1;
-//        extern EOconstvector* eo_vectorof_descriptor_jomo_eb1;
-//        extern EOconstvector* eo_vectorof_descriptor_skin_eb1;
-//        EOtheCANmapping * canmap = eo_canmap_Initialise(NULL);
-//        
-//        eo_canmap_LoadBoards(canmap, eo_vectorof_boardprops_eb1);        
-//        eo_canmap_ConfigEntity(canmap, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, eo_vectorof_descriptor_jomo_eb1); 
-////        eo_canmap_eo_canmap_ConfigEntity(canmap, eoprot_endpoint_skin, eoprot_entity_sk_skin, eo_vectorof_descriptor_skin_eb2);
-//        
-//        // mc
-//        id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, 2, eoprot_tag_none);       
-//        res = eo_canmap_GetEntityLocation(canmap, id32, &loc, &numoflocs, &boardtype);      
-//        res  = res;   
-
-//        index = eo_canmap_GetEntityIndex(canmap, loc);      
-//        index = index; 
-//        
-//        // sk
-//        id32 = eoprot_ID_get(eoprot_endpoint_skin, eoprot_entity_sk_skin, 0, eoprot_tag_none);
-//        res = eo_canmap_GetEntityLocation(canmap, id32, &loc, &numoflocs, &boardtype);      
-//        res  = res;   
-
-//        loc.port = 1;
-//        loc.addr = 8;
-//        index = eo_canmap_GetEntityIndex(canmap, loc);      
-//        index = index; 
-//        
-//        EOconstarray *carray = eo_canmap_GetBoardLocations(canmap);
-//        uint8_t size = eo_constarray_Size(carray);
-//        uint8_t i = 0;
-//        const eOcanmap_board_extended_t *extbrd = NULL;
-//        for(i=0; i<size; i++)
-//        {
-//            eOcanmap_location_t *ll = (eOcanmap_location_t*) eo_constarray_At(carray, i);
-//            extbrd = eo_canmap_GetBoard(canmap,  *ll);
-//            uint8_t adr1 = extbrd->board.props.location.addr;
-//            adr1 = adr1;
-//            uint8_t adr2 = ll->addr;
-//            adr2 = adr2;
-//        }
-//    }
     
     // init the ems application
     EOMtheEMSapplCfg* emscfg = eom_emsapplcfg_GetHandle();    

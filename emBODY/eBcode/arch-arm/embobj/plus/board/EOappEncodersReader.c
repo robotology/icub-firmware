@@ -27,10 +27,11 @@
 **/
 
 
-
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
+
+#warning TODO: i would remove the use of macro USE_MC4PLUS in here by using the proper hal functions which returns 0
 #include "stdlib.h"
 #include "string.h"
 #include "hal_encoder.h"
@@ -156,18 +157,23 @@ static const eo_appEncReader_stream_position_t SPIstreams_positioning[eo_appEncR
     #error -> either USE_EMS4RD or USE_MC4PLUS
 #endif
     
-static const uint32_t encoders_fullscales [eo_appEncReader_enc_type_numberof] =
-{
-    /* AEA */     65520,
-    /* AMO */     65535,
-    /* INC */     28671,
-    /* ADH */     0,
-    /* ... */
-};
+//static const uint32_t encoders_fullscales [eo_appEncReader_enc_type_numberof] =
+//{
+//    /* AEA */     65520,
+//    /* AMO */     65535,
+//    /* INC */     28671,
+//    /* ADH */     0,
+//    /* ... */
+//};
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
+
+extern EOappEncReader* eo_appEncReader_Initialise(void)
+{
+    return(eo_appEncReader_New(NULL));
+}
 
 extern EOappEncReader* eo_appEncReader_New(eOappEncReader_cfg_t *cfg)
 {
@@ -242,7 +248,7 @@ extern eOresult_t  eo_appEncReader_GetJointValue(EOappEncReader *p, eo_appEncRea
         return(eores_NOK_nullpointer);
     }
     
-    uint32_t val_raw = 0;;
+    hal_encoder_position_t val_raw = 0; // marco.accame: it should be is a hal_encoder_position_t 
     eOresult_t res1 = eores_OK;
     eOresult_t res2 = eores_OK;
     eOappEncReader_errortype_t errortype;
@@ -269,7 +275,7 @@ extern eOresult_t  eo_appEncReader_GetJointValue(EOappEncReader *p, eo_appEncRea
                     return eores_NOK_generic;
                 }
 
-                res1 = (eOresult_t)hal_encoder_get_value(read_stream.list[SPIstreams_positioning[this_joint.primary_enc_position]], &val_raw, flags);
+                res1 = (eOresult_t)hal_encoder_get_value((hal_encoder_t)read_stream.list[SPIstreams_positioning[this_joint.primary_enc_position]], &val_raw, flags);
                 
                 if(eores_OK != res1)
                 {
@@ -324,7 +330,7 @@ extern eOresult_t  eo_appEncReader_GetJointValue(EOappEncReader *p, eo_appEncRea
                 }
                 
                 
-                res1 = (eOresult_t)hal_encoder_get_value(read_stream.list[SPIstreams_positioning[this_joint.primary_enc_position]], &val_raw, flags);
+                res1 = (eOresult_t)hal_encoder_get_value((hal_encoder_t)read_stream.list[SPIstreams_positioning[this_joint.primary_enc_position]], &val_raw, flags);
             
                 if(eores_OK != res1)
                 {
@@ -404,7 +410,7 @@ extern eOresult_t  eo_appEncReader_GetJointValue(EOappEncReader *p, eo_appEncRea
                     return eores_NOK_generic;
                 }
 
-                res2 = (eOresult_t)hal_encoder_get_value(read_stream.list[SPIstreams_positioning[this_joint.extra_enc_position]], &val_raw, flags);
+                res2 = (eOresult_t)hal_encoder_get_value((hal_encoder_t)read_stream.list[SPIstreams_positioning[this_joint.extra_enc_position]], &val_raw, flags);
                 
                 if(eores_OK != res2)
                 {
@@ -447,7 +453,7 @@ extern eOresult_t  eo_appEncReader_GetJointValue(EOappEncReader *p, eo_appEncRea
                     return eores_NOK_generic;
                 }
                     
-                res2 = (eOresult_t)hal_encoder_get_value(read_stream.list[SPIstreams_positioning[this_joint.extra_enc_position]], &val_raw, flags);
+                res2 = (eOresult_t)hal_encoder_get_value((hal_encoder_t)read_stream.list[SPIstreams_positioning[this_joint.extra_enc_position]], &val_raw, flags);
             
                 if(eores_OK != res2)
                 {
@@ -1009,7 +1015,7 @@ static uint32_t s_eo_appEncReader_rescale2icubdegrees(uint32_t val_raw, uint8_t 
         divider = -divider;
     }
 
-    retval = (float)val_raw * 65535.0 / divider;
+    retval = (float)val_raw * 65535.0f / divider;
     
     return(retval);
 

@@ -29,7 +29,7 @@ extern "C" {
 #include "EOaxisController.h"
 #include "EoMotionControl.h"
 
-# warning: read commment about ifdef specialization for MC4plus inside the EOemsController
+#warning TODO: read commment about ifdef specialization for MC4plus inside the EOemsController
 // the definition of the MACRO is used to call some functions which are included only inside MC4plus project (to read ADC or reset the quadrature encoders).
 // In the future something similar to EOmcService will be included in both applications, and so the handling of the return values will be done from that service;
 // anyway the functions will be visible from both application, making useless these ifdef checks.

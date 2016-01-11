@@ -102,7 +102,8 @@ static eOresult_t s_eo_canserv_SendCommand(EOtheCANservice *p, eOcanprot_descrip
 static EOtheCANservice s_eo_canserv_singleton = 
 {    
     .initted            = eobool_false,
-	.config             = {0},
+    .isactive           = {eobool_false, eobool_false},
+	.config             = {.mode = eocanserv_mode_straight, .canstabilizationtime = 0, .rxqueuesize = {0}, .txqueuesize = {0}, .onrxcallback = {NULL}, .onrxargument = {NULL}},
     .locktilltxall      = {0}
 };
 
@@ -132,11 +133,11 @@ extern EOtheCANservice * eo_canserv_Initialise(const eOcanserv_cfg_t *cfg)
     
     if(eores_OK != s_eo_canserv_peripheral_init(&s_eo_canserv_singleton))
     {
-        #warning --> put diagnostics .... maybe return NULL
+//        #warning --> put diagnostics .... maybe return NULL
     }
     else if(eores_OK != s_eo_canserv_otherdata_init(&s_eo_canserv_singleton))
     {  
-        #warning --> put diagnostics .... maybe return NULL
+//        #warning --> put diagnostics .... maybe return NULL
     }
     else
     {                 
@@ -172,13 +173,44 @@ extern eOresult_t eo_canserv_SetMode(EOtheCANservice *p, eOcanserv_mode_t mode)
     return(eores_OK);
 }
 
+extern eOresult_t eo_canserv_TXstartAll(EOtheCANservice *p, uint8_t *sizeofTXqueueCAN1, uint8_t *sizeofTXqueueCAN2)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    eo_canserv_TXstart(p, eOcanport1, sizeofTXqueueCAN1);
+    eo_canserv_TXstart(p, eOcanport2, sizeofTXqueueCAN2);
+    
+    return(eores_OK);
+}
 
+extern eOresult_t eo_canserv_TXwaitAllUntilDone(EOtheCANservice *p, uint32_t timeout)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    eo_canserv_TXwaituntildone(p, eOcanport1, timeout);
+    eo_canserv_TXwaituntildone(p, eOcanport2, timeout);       
+    
+    return(eores_OK);
+}
+
+    
 extern eOresult_t eo_canserv_TXstart(EOtheCANservice *p, eOcanport_t port, uint8_t *sizeofTXqueue)
 {
     if(NULL == p)
     {
         return(eores_NOK_nullpointer);
     }
+    
+    if(eobool_false == p->isactive[port])
+    {
+        return(eores_NOK_generic);
+    }    
     
     if(eocanserv_mode_straight == p->config.mode)
     {
@@ -215,6 +247,11 @@ extern eOresult_t eo_canserv_TXwaituntildone(EOtheCANservice *p, eOcanport_t por
         return(eores_NOK_nullpointer);
     }
     
+    if(eobool_false == p->isactive[port])
+    {
+        return(eores_NOK_generic);
+    }    
+    
     if(eocanserv_mode_straight == p->config.mode)
     {   // dont wait ...
         return(eores_OK);
@@ -248,10 +285,42 @@ extern uint8_t eo_canserv_NumberOfFramesInRXqueue(EOtheCANservice *p, eOcanport_
     {
         return(0);
     }
+    
+    if(eobool_false == p->isactive[port])
+    {
+        return(0);
+    }    
+    
+    if(eobool_false == p->isactive[port])
+    {
+        return(0);
+    }    
 
     uint8_t number = 0; 
     hal_can_received((hal_can_port_t)port, &number);
     return(number);
+}
+
+
+extern eOresult_t eo_canserv_ParseAll(EOtheCANservice *p)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+
+    uint8_t port = eOcanport1;
+    uint8_t rxframes = 0;
+    
+    for(port=eOcanport1; port<eOcanports_number; port++)
+    {   
+        if(0 != (rxframes = eo_canserv_NumberOfFramesInRXqueue(p, (eOcanport_t)port)))
+        {
+            eo_canserv_Parse(p, (eOcanport_t)port, rxframes, NULL);
+        }
+    }
+    
+    return(eores_OK);    
 }
 
 
@@ -262,8 +331,13 @@ extern eOresult_t eo_canserv_Parse(EOtheCANservice *p, eOcanport_t port, uint8_t
         return(eores_NOK_nullpointer);
     }
     
-    eOresult_t res = eores_NOK_generic;
-    hal_result_t halres = hal_res_NOK_nodata;
+    if(eobool_false == p->isactive[port])
+    {
+        return(eores_NOK_generic);
+    }
+    
+    //eOresult_t res = eores_NOK_generic;
+    //hal_result_t halres = hal_res_NOK_nodata;
     hal_can_frame_t canframe = {0};
     uint8_t readcanframes = 0;
     uint8_t i = 0;
@@ -271,7 +345,7 @@ extern eOresult_t eo_canserv_Parse(EOtheCANservice *p, eOcanport_t port, uint8_t
     for(i=0; i<maxnumofcanframes; i++)
     {
         memset(&canframe, 0, sizeof(hal_can_frame_t));
-        if(hal_res_OK != (halres = hal_can_get((hal_can_port_t)port, &canframe, NULL)))
+        if(hal_res_OK != (/*halres =*/ hal_can_get((hal_can_port_t)port, &canframe, NULL)))
         {
             break;      // marco.accame on 12 jan 2015: changed the original continue in a break because:
                         // if we have a NOK then we cannot go on because the fifo is surely empty.                     
@@ -280,7 +354,7 @@ extern eOresult_t eo_canserv_Parse(EOtheCANservice *p, eOcanport_t port, uint8_t
         readcanframes++;
         
         // now parse the frame.
-        if(eores_OK != (res = eo_canprot_Parse(eo_canprot_GetHandle(), (eOcanframe_t*)&canframe, port))) 
+        if(eores_OK != (/*res =*/ eo_canprot_Parse(eo_canprot_GetHandle(), (eOcanframe_t*)&canframe, port))) 
         {  
             eOerrmanDescriptor_t errdes = {0};
             errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_parsingfailure);
@@ -307,17 +381,20 @@ extern eOresult_t eo_canserv_SendCommandToLocation(EOtheCANservice *p, eOcanprot
         return(eores_NOK_nullpointer);
     }
     
+    if(eobool_false == p->isactive[loc.port])
+    {
+        return(eores_NOK_generic);
+    }    
+    
     eOcanprot_descriptor_t descriptor = {0};
     memcpy(&descriptor.cmd, command, sizeof(eOcanprot_command_t));
     memcpy(&descriptor.loc, &loc, sizeof(eOcanmap_location_t));
     return(s_eo_canserv_SendCommand(p, &descriptor));
 }
 
-#warning ---> it is ok for all but for skin .......
+//#warning ---> it is ok for all but for skin .......
 extern eOresult_t eo_canserv_SendCommandToEntity(EOtheCANservice *p, eOcanprot_command_t *command, eOprotID32_t id32)
 {
-    eOerrmanDescriptor_t errdes = {0};
-
     if((NULL == p) || (NULL == command))
     {
         return(eores_NOK_nullpointer);
@@ -328,9 +405,14 @@ extern eOresult_t eo_canserv_SendCommandToEntity(EOtheCANservice *p, eOcanprot_c
    
     if(eores_OK != eo_canmap_GetEntityLocation(eo_canmap_GetHandle(), id32, &descriptor.loc, NULL, NULL))
     {   // error ...
-        #warning --> put diagnostics
+//        #warning --> put diagnostics
         return(eores_NOK_generic);
     }
+    
+    if(eobool_false == p->isactive[descriptor.loc.port])
+    {
+        return(eores_NOK_generic);
+    }    
     
     // now i complete the descriptor
     //eOcanport_t port = (eOcanport_t)descriptor.loc.port; 
@@ -345,6 +427,7 @@ extern eOresult_t eo_canserv_SendCommandToEntity(EOtheCANservice *p, eOcanprot_c
 //    
 //    if(eores_OK != eo_canprot_Form(eo_canprot_GetHandle(), command, &frame))
 //    {   // error ...
+//        eOerrmanDescriptor_t errdes = {0};
 //        errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_formingfailure);
 //        errdes.par16                = (command->msgclass << 8) | (command->msgtype);
 //        errdes.par64                = 0;
@@ -358,10 +441,10 @@ extern eOresult_t eo_canserv_SendCommandToEntity(EOtheCANservice *p, eOcanprot_c
 //    return(s_eo_canserv_send_frame_simplemode(p, port, &frame));
 }
 
-#warning -> TBD: we may merge eo_canserv_SendCommandToAllBoardsInEntity() into eo_canserv_SendCommandToEntity() ....
+
 extern eOresult_t eo_canserv_SendCommandToAllBoardsInEntity(EOtheCANservice *p, eOcanprot_command_t *command, eOprotID32_t id32)
 {
-    eOerrmanDescriptor_t errdes = {0};
+//    eOerrmanDescriptor_t errdes = {0};
 
     if((NULL == p) || (NULL == command))
     {
@@ -373,9 +456,15 @@ extern eOresult_t eo_canserv_SendCommandToAllBoardsInEntity(EOtheCANservice *p, 
     uint8_t numoflocs = 0;
     if(eores_OK != eo_canmap_GetEntityLocation(eo_canmap_GetHandle(), id32, &descriptor.loc, &numoflocs, NULL))
     {   // error ...
-        #warning --> put diagnostics
+//        #warning --> put diagnostics
         return(eores_NOK_generic);
     }
+    
+    if(eobool_false == p->isactive[descriptor.loc.port])
+    {
+        return(eores_NOK_generic);
+    }      
+    
     
     // now i complete the descriptor
     //eOcanport_t port = (eOcanport_t)descriptor.loc.port; 
@@ -392,6 +481,7 @@ extern eOresult_t eo_canserv_SendCommandToAllBoardsInEntity(EOtheCANservice *p, 
 //        
 //        if(eores_OK != eo_canprot_Form(eo_canprot_GetHandle(), command, &frame))
 //        {   // error ...
+//            eOerrmanDescriptor_t errdes = {0};
 //            errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_formingfailure);
 //            errdes.par16                = (command->msgclass << 8) | (command->msgtype);
 //            errdes.par64                = 0;
@@ -435,7 +525,10 @@ extern eOresult_t eo_canserv_SendCommandToAllBoardsInEntity(EOtheCANservice *p, 
 
 static eOresult_t s_eo_canserv_peripheral_init(EOtheCANservice *p)
 {
-    hal_can_cfg_t can_cfg = {0};
+    hal_can_cfg_t can_cfg;
+    memset(&can_cfg, 0, sizeof(can_cfg));
+    
+    p->isactive[hal_can_port1] = p->isactive[hal_can_port2] = eobool_false;
 
     // can 1
     // if queues size is 0, don't enable this can port
@@ -465,7 +558,9 @@ static eOresult_t s_eo_canserv_peripheral_init(EOtheCANservice *p)
         if(hal_res_OK != hal_can_enable(hal_can_port1))
         {
             return(eores_NOK_generic);
-        }    
+        }  
+
+        p->isactive[hal_can_port1] = eobool_true;
     }
     // can 2
     // if queues size is 0, don't enable this can port
@@ -495,7 +590,9 @@ static eOresult_t s_eo_canserv_peripheral_init(EOtheCANservice *p)
         if(hal_res_OK != hal_can_enable(hal_can_port2))
         {
             return(eores_NOK_generic);
-        }    
+        }  
+
+        p->isactive[hal_can_port2] = eobool_true;
     }
     
     eOreltime_t stabilizationtime = p->config.canstabilizationtime;
@@ -528,7 +625,7 @@ static void s_eo_canserv_onrx_can(void *arg)
     }    
 }
 
-#warning TDO: think of how to implement the eo_appCanSP_EmptyCanOutputQueue so that it is blocking. maybe we just set mode to eocanserv_mode_ondemand and start the tx blocking until done.
+
 static void s_eo_canserv_ontx_can(void *arg)
 {
     // i look at the mode.
@@ -555,7 +652,8 @@ static void s_eo_canserv_onerror_can(void *arg)
 {
     uint32_t n = (uint32_t)arg;
     hal_can_port_t port = (hal_can_port_t)n; // either hal_can_port1 or hal_can_port2
-    #warning TODO: add whatever is needed by can error
+    port = port;
+//    #warning TODO: add whatever is needed by can error
 }
 
 
@@ -636,7 +734,7 @@ static eOresult_t s_eo_canserv_SendCommand(EOtheCANservice *p, eOcanprot_descrip
     }
     
     // ok now i can sent the frame over can. what i do depends on the mode.
-    return(s_eo_canserv_send_frame_simplemode(p, descriptor->loc.port, &frame));   
+    return(s_eo_canserv_send_frame_simplemode(p, (eOcanport_t)descriptor->loc.port, &frame));   
 }
 
 // --------------------------------------------------------------------------------------------------------------------

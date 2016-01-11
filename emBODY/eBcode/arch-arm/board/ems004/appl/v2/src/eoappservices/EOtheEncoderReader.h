@@ -18,29 +18,30 @@
 
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _EOTHEMAIS_H_
-#define _EOTHEMAIS_H_
+#ifndef _EOTHEENCODERREADER_H_
+#define _EOTHEENCODERREADER_H_
 
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
-/** @file       EOtheMAIS.h
-    @brief      this object implements what is required for managing the MAIS.                
+/** @file       EOtheEncoderReader.h
+    @brief      this object implements what is required for managing the STRAIN.                
     @author     marco.accame@iit.it
     @date       05/28/2015
 **/
 
-/** @defgroup eo_EOtheMAIS Object EOtheMAIS
+/** @defgroup eo_EOtheEncoderReader Object EOtheEncoderReader
     ...... 
     @{        
  **/
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
-#include "EOtheServices.h"
-
 #include "EoCommon.h"
 #include "EoProtocol.h"
-#include "EOtheCANdiscovery2.h"
+
+#include "hal_encoder.h"
+
+#include "EOtheServices.h"
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
@@ -48,10 +49,11 @@
  
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
-typedef struct EOtheMAIS_hid EOtheMAIS;
+typedef struct EOtheEncoderReader_hid EOtheEncoderReader;
 
 
-//typedef eOresult_t (*eOmais_onendofoperation_fun_t) (EOtheMAIS* p, eObool_t operationisok);
+
+//typedef eOresult_t (*eOencoderreader_onendofoperation_fun_t) (EOtheEncoderReader* p, eObool_t operationisok);
 
 
    
@@ -60,44 +62,33 @@ typedef struct EOtheMAIS_hid EOtheMAIS;
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-extern EOtheMAIS* eo_mais_Initialise(void);
 
-extern EOtheMAIS* eo_mais_GetHandle(void);
+extern EOtheEncoderReader* eo_encoderreader_Initialise(void);
 
-extern eOresult_t eo_mais_Verify(EOtheMAIS *p, const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify);
+extern EOtheEncoderReader* eo_encoderreader_GetHandle(void);
 
-// it activates the mais service by loading the service configuration
-extern eOresult_t eo_mais_Activate(EOtheMAIS *p, const eOmn_serv_configuration_t * servcfg);
+
+
+// it verifies if the service as defined in te configuration is possible (is there a good strain board or not?), it executes a callback
+// (which may send a confirmation to the entity which asked fot verification), and then it may activate the strain service by calling  eo_encoderreader_Activate().
+extern eOresult_t eo_encoderreader_Verify(EOtheEncoderReader *p, const eOmn_serv_arrayof_4jomodescriptors_t * jomodes, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify);
+
+// it activates the strain service by loading the service configuration
+extern eOresult_t eo_encoderreader_Activate(EOtheEncoderReader *p, const eOmn_serv_arrayof_4jomodescriptors_t * jomodes);
 
 // it deactivates service.
-extern eOresult_t eo_mais_Deactivate(EOtheMAIS *p);
+extern eOresult_t eo_encoderreader_Deactivate(EOtheEncoderReader *p);
 
+extern eOresult_t eo_encoderreader_StartReading(EOtheEncoderReader *p);
 
-// Start() take
-extern eOresult_t eo_mais_Start(EOtheMAIS *p);
+extern eObool_t eo_encoderreader_IsReadingAvailable(EOtheEncoderReader *p);
 
-extern eOresult_t eo_mais_Tick(EOtheMAIS *p);
-
-extern eOresult_t eo_mais_Stop(EOtheMAIS *p);
-
-
-
-extern eOresult_t eo_mais_TXstart(EOtheMAIS *p, uint8_t datarate, eOas_maismode_t mode, eOas_maisresolution_t resolution);
-
-extern eOresult_t eo_mais_TXstop(EOtheMAIS *p);
-
-extern eOresult_t eo_mais_Set(EOtheMAIS *p, eOas_mais_config_t* maiscfg);
-
-extern eOresult_t eo_mais_SetMode(EOtheMAIS *p, eOas_maismode_t mode);
-
-extern eOresult_t eo_mais_SetDataRate(EOtheMAIS *p, uint8_t datarate);
-
-extern eOresult_t eo_mais_SetResolution(EOtheMAIS *p, eOas_maisresolution_t resolution);
+extern eOresult_t eo_encoderreader_Read(EOtheEncoderReader *p, uint8_t position, uint32_t *primary, uint32_t *secondary, hal_encoder_errors_flags *errors);
 
 
 
 /** @}            
-    end of group eo_EOtheMAIS
+    end of group eo_EOtheEncoderReader
  **/
 
 #endif  // include-guard

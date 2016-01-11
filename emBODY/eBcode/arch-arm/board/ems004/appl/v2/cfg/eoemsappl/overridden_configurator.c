@@ -21,28 +21,11 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-
-#include "stdlib.h"
-#include "string.h"
 #include "EoCommon.h"
-#include "EOMtask.h"
-
-#include "EOMtheEMSappl.h"
-#include "EOtheEMSApplBody.h"
-#include "EOMtheEMSapplCfg.h"
-
-
 #include "EoError.h"
 #include "EOtheErrorManager.h"
-
 #include "EOtheCANservice.h"
-
-#include "EOtheMAIS.h"
-
 #include "EOtheCANdiscovery2.h"
-
-#include "EOtheMC4boards.h"
-
 #include "EOtheETHmonitor.h"
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -62,7 +45,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-
+// empty-section
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -95,44 +78,34 @@
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-// marco.accame on Nov 26 2014: the user-defined emsconfigurator_evt_userdef is triggered by the EOtheEMSapplBody to
-// tell the EOMtheEMSconfigurator that has received a CAN frame.
+// marco.accame on 20 oct 2015: the object EOtheCANservice is configured with the argument passed to eo_canserv_Initialise()
+// to make the CAN-RX handler to send the event emsconfigurator_evt_userdef00 to the task of EOMtheEMSconfigurator whenever 
+// a CAN frame is received in CFG state. the task then executes this function, where it is correct to put the parser.
 
 extern void eom_emsconfigurator_hid_userdef_ProcessUserdef00Event(EOMtheEMSconfigurator* p)
-{
-    // in here we want to read all can frames that we have on can1 and also on can2
-    
-    uint8_t numofrxframes = 0;
-    
-    if(0 != (numofrxframes = eo_canserv_NumberOfFramesInRXqueue(eo_canserv_GetHandle(), eOcanport1)))
-    {
-        eo_canserv_Parse(eo_canserv_GetHandle(), eOcanport1, numofrxframes, NULL);        
-    }
-    
-    if(0 != (numofrxframes = eo_canserv_NumberOfFramesInRXqueue(eo_canserv_GetHandle(), eOcanport2)))
-    {
-        eo_canserv_Parse(eo_canserv_GetHandle(), eOcanport2, numofrxframes, NULL);        
-    }
-       
+{   
+    eo_canserv_ParseAll(eo_canserv_GetHandle());
 }
 
 
-// marco.accame on 15 sept 15:  user-defined emsconfigurator_evt_userdef01 is triggered by a timer inside the EOtheCANdiscovery2 so that we can tick it.
+// marco.accame on 15 sept 15:  the event emsconfigurator_evt_userdef01 is send by a timer inside the EOtheCANdiscovery2 
+// if we are in CFG state so that we can _Tick() it.
 
 extern void eom_emsconfigurator_hid_userdef_ProcessUserdef01Event(EOMtheEMSconfigurator* p)
-{    
+{
     eo_candiscovery2_Tick(eo_candiscovery2_GetHandle());
 }
 
 
 
 extern void eom_emsconfigurator_hid_userdef_ProcessUserdef02Event(EOMtheEMSconfigurator* p)
-{   
-    eo_ethmonitor_Tick(eo_ethmonitor_GetHandle());     
+{
+    eo_ethmonitor_Tick(eo_ethmonitor_GetHandle());
 }
 
-// marco.accame on Nov 26 2014: this function is triggered if function eom_emssocket_Transmit() fails
-// to transmit a udp packet.
+// marco.accame on 20 oct 2015: this function is triggered if function eom_emssocket_Transmit() inside the task 
+// of EOMtheEMSconfigurator it there is a failure to transmit a UDP packet.
+
 extern void eom_emsconfigurator_hid_userdef_onemstransceivererror(EOMtheEMStransceiver* p)
 {
     eOerrmanDescriptor_t errdes = {0};
@@ -147,7 +120,7 @@ extern void eom_emsconfigurator_hid_userdef_onemstransceivererror(EOMtheEMStrans
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
-
+// empty-section
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

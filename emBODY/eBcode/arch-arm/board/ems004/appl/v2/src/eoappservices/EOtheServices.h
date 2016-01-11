@@ -18,18 +18,18 @@
 
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _EOTHEINERTIAL_H_
-#define _EOTHEINERTIAL_H_
+#ifndef _EOTHESERVICES_H_
+#define _EOTHESERVICES_H_
 
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
-/** @file       EOtheInertial.h
-    @brief      this object implements what is required for managing the inertial sensor.                
+/** @file       EOtheServices.h
+    @brief      this object implements what is required for managing all services in the ETH board.    
     @author     marco.accame@iit.it
-    @date       08/19/2015
+    @date       05/28/2015
 **/
 
-/** @defgroup eo_EOtheInertial Object EOtheInertial
+/** @defgroup eo_EOtheServices Object EOtheServices
     ...... 
     @{        
  **/
@@ -40,54 +40,50 @@
 #include "EoProtocol.h"
 
 
+
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
  
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
-typedef struct EOtheInertial_hid EOtheInertial;
+typedef struct EOtheServices_hid EOtheServices;
 
+typedef void EOaService;
 
+typedef enum
+{
+    eo_service_NONE             = eomn_serv_NONE,
+    eo_service_MC_foc           = eomn_serv_MC_foc,
+    eo_service_MC_mc4           = eomn_serv_MC_mc4,
+    eo_service_MC_mc4plus       = eomn_serv_MC_mc4plus,
+    eo_service_MC_mc4plusmais   = eomn_serv_MC_mc4plusmais,
+    eo_service_MAIS             = eomn_serv_AS_mais,
+    eo_service_STRAIN           = eomn_serv_AS_strain,    
+    eo_service_INERTIAL         = eomn_serv_AS_inertial,
+    eo_service_SKIN             = eomn_serv_SK_skin
+} eOservice_t;
 
-//typedef struct
-//{
-//    eOas_inertial_position_t    canmapofsupportedsensors[2][15];  // contains in pos i,j: eoas_inertial_pos_none if no mtb is at that address, else another value of eOas_inertial_position_t
-//} eOinertial_cfg_t;
+typedef eOresult_t (*eOservice_onendofoperation_fun_t) (EOaService* p, eObool_t operationisok);
 
-
+// a service has methods: _Initialise(), _GetHandle(), _Verify(), _Activate(), _Deactivate(), _Start(), _Tick(), _Stop()
+   
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------
-
-extern const eOas_inertial_serviceconfig_t eo_inertial_cfg_eb2;
-extern const eOas_inertial_serviceconfig_t eo_inertial_cfg_eb4;
-extern const eOas_inertial_serviceconfig_t eo_inertial_cfg_eb10;
-extern const eOas_inertial_serviceconfig_t eo_inertial_cfg_eb11;
+// empty-section
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
 
+extern EOtheServices* eo_services_Initialise(void);
 
-extern EOtheInertial* eo_inertial_Initialise(void);
+extern EOtheServices* eo_services_GetHandle(void);
 
-extern eOresult_t eo_inertial_ServiceConfig(EOtheInertial *p, const eOas_inertial_serviceconfig_t* cfg);
-
-extern EOtheInertial* eo_inertial_Initialise2(const eOas_inertial_serviceconfig_t* cfg);
-
-extern EOtheInertial* eo_inertial_GetHandle(void);
+extern eOresult_t eo_services_StartLegacyMode(EOtheServices *p, eOprotBRD_t brd);
 
 
-extern eOresult_t eo_inertial_SensorsConfig(EOtheInertial *p, eOas_inertial_sensorsconfig_t* config);
-
-extern eOresult_t eo_inertial_Start(EOtheInertial *p);
-
-extern eOresult_t eo_inertial_Stop(EOtheInertial *p);
-
-extern eOresult_t eo_inertial_Receive(EOtheInertial *p, eOas_inertial_type_t type, eOcanframe_t *frame, eOcanport_t port);
-
-extern eOresult_t eo_inertial_RefreshStatusOfEntity(EOtheInertial *p);
 
 
 /** @}            
-    end of group eo_EOtheInertial
+    end of group eo_EOtheServices
  **/
 
 #endif  // include-guard

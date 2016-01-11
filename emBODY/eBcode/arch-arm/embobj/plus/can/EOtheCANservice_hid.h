@@ -71,8 +71,8 @@ typedef struct
 struct EOtheCANservice_hid 
 {    
     eObool_t                initted;
+    eObool_t                isactive[eOcanports_number];
 	eOcanserv_cfg_t         config;
-//    eOcanserv_txwait_t      txwait[eOcanports_number]; // apparently used by emptytxqueues
     eOcanserv_lockdata_t    locktilltxall[eOcanports_number];
 };
 

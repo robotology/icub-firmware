@@ -115,6 +115,8 @@ extern EOtheCANservice * eo_canserv_GetHandle(void);
 
 extern eOresult_t eo_canserv_SetMode(EOtheCANservice *p, eOcanserv_mode_t mode); // tx-on-event or tx-on-demand
 
+extern eOresult_t eo_canserv_ParseAll(EOtheCANservice *p);
+
 extern uint8_t eo_canserv_NumberOfFramesInRXqueue(EOtheCANservice *p, eOcanport_t port);
 
 extern eOresult_t eo_canserv_Parse(EOtheCANservice *p, eOcanport_t canport, uint8_t maxnumofcanframes, uint8_t *numofreadcanframes); 
@@ -134,6 +136,11 @@ extern eOresult_t eo_canserv_SendCommandToLocation(EOtheCANservice *p, eOcanprot
 extern eOresult_t eo_canserv_SendCommandToEntity(EOtheCANservice *p, eOcanprot_command_t *command, eOprotID32_t id32); 
 
 extern eOresult_t eo_canserv_SendCommandToAllBoardsInEntity(EOtheCANservice *p, eOcanprot_command_t *command, eOprotID32_t id32);
+
+
+extern eOresult_t eo_canserv_TXstartAll(EOtheCANservice *p, uint8_t *sizeofTXqueueCAN1, uint8_t *sizeofTXqueueCAN2);
+
+extern eOresult_t eo_canserv_TXwaitAllUntilDone(EOtheCANservice *p, uint32_t timeout);
 
 // it is meaningful only if the mode is ... otherwise .... 
 extern eOresult_t eo_canserv_TXstart(EOtheCANservice *p, eOcanport_t port, uint8_t *sizeofTXqueue);

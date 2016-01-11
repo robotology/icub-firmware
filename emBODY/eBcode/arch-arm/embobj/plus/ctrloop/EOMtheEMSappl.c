@@ -62,6 +62,8 @@
 #include "EoProtocol.h"
 #include "EoProtocolMN.h"
 
+#include "EOMtheEMStransceiver.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -409,6 +411,23 @@ extern eOresult_t eom_emsappl_SendTXRequest(EOMtheEMSappl *p)
 }
 
 
+extern eOresult_t eom_emsappl_Transmit_OccasionalROP(EOMtheEMSappl *p, eOropdescriptor_t *ropdes)
+{
+    if((NULL == p) || (NULL == ropdes))
+    {
+        return(eores_NOK_nullpointer);
+    } 
+
+    eOresult_t res = eores_NOK_generic;   
+
+    res = eo_transceiver_OccasionalROP_Load(eom_emstransceiver_GetTransceiver(eom_emstransceiver_GetHandle()), ropdes); 
+    
+    eom_emsappl_SendTXRequest(p);
+    
+    return(res);
+}
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
@@ -683,7 +702,11 @@ static void s_eom_emsappl_OnError(eOerrmanErrorType_t errtype, const char *info,
         }
         else
         {
-            snprintf(str, sizeof(str), "EOMtheEMSerror: [eobj: %s, tsk: %d] %s %s: no info", eobjstr, taskid, err, strdes);  
+            uint64_t tt = eov_sys_LifeTimeGet(eov_sys_GetHandle());
+            uint32_t sec = tt/(1000*1000);
+            uint32_t msec = tt%(1000*1000);
+            msec /= 1000;
+            snprintf(str, sizeof(str), "EOMtheEMSerror: [eobj: %s, tsk: %d @s%dm%d] %s %s: no info", eobjstr, taskid, sec, msec, err, strdes);  
         }
         hal_trace_puts(str);
     }

@@ -40,8 +40,8 @@
 
 // - for ems 
 #include "EOMtheEMSappl.h"
-#include "EOtheEMSapplBody.h"
-//#include "EOtheEMSapplDiagnostics.h"
+//#include "EOtheEMSapplBody.h"
+
 #include "EOtheErrorManager.h"
 
 #include "EoError.h"
@@ -303,7 +303,7 @@ extern void eoprot_fun_UPDT_mn_appl_config(const EOnv* nv, const eOropdescriptor
     if(1000 != cfg->cycletime)
     {
         cfg->cycletime = 1000;
-        #warning marco.accame: send up a warning about unsuppported feature
+        //#warning marco.accame: send up a warning about unsuppported feature
     }
     
     if(0 == cfg->txratedivider)
@@ -352,22 +352,7 @@ extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropd
 
         case applstate_running:
         {
-//            eo_candiscovery_SendDiagnosticsAboutBoardsWithIssues(eo_candiscovery_GetHandle()); //if everything is ok, it does nothing
-//            
-//            if (!((eo_candiscovery_isMCReady(eo_candiscovery_GetHandle()) == eobool_true) && (eo_candiscovery_isMAISReady(eo_candiscovery_GetHandle()) == eobool_true)))
-//            {
-//                return;
-//            }
-//            else
-//			{
-//				eo_candiscovery_SignalDetectedCANboards(eo_candiscovery_GetHandle());
-//			}
-            
-            if(eobool_false == eo_emsapplBody_isreadyforcontrolloop(eo_emsapplBody_GetHandle()))
-            {
-                eo_emsapplBody_SendDiscoveryFailureReport(eo_emsapplBody_GetHandle());
-                return;
-            }
+            // we always allow entering the control loop. to be in control loop does nothing unless the service is activated.
             
             res = eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STrun);
 
@@ -456,7 +441,8 @@ static void s_eoprot_ep_mn_fun_querynumofcommand(eOmn_command_t* command)
             ropdesc.ropcode = eo_ropcode_sig;
             ropdesc.id32    = eoprot_ID_get(eoprot_endpoint_management, eoprot_entity_mn_comm, 0, eoprot_tag_mn_comm_cmmnds_command_replynumof);
             ropdesc.data    = NULL; // so that dat from teh EOnv is retrieved.
-            eo_transceiver_OccasionalROP_Load(theems00transceiver, &ropdesc);            
+            //eo_transceiver_OccasionalROP_Load(theems00transceiver, &ropdesc);    
+            eom_emsappl_Transmit_OccasionalROP(eom_emsappl_GetHandle(), &ropdesc);    // it also alert someone to send the rop        
         } break;
               
 
@@ -478,7 +464,8 @@ static void s_eoprot_ep_mn_fun_querynumofcommand(eOmn_command_t* command)
             ropdesc.ropcode = eo_ropcode_sig;
             ropdesc.id32    = eoprot_ID_get(eoprot_endpoint_management, eoprot_entity_mn_comm, 0, eoprot_tag_mn_comm_cmmnds_command_replynumof);
             ropdesc.data    = NULL; // so that dat from teh EOnv is retrieved.
-            eo_transceiver_OccasionalROP_Load(theems00transceiver, &ropdesc);            
+            //eo_transceiver_OccasionalROP_Load(theems00transceiver, &ropdesc);   
+            eom_emsappl_Transmit_OccasionalROP(eom_emsappl_GetHandle(), &ropdesc);            
         } break;
        
         
@@ -501,7 +488,8 @@ static void s_eoprot_ep_mn_fun_querynumofcommand(eOmn_command_t* command)
             ropdesc.ropcode = eo_ropcode_sig;
             ropdesc.id32    = eoprot_ID_get(eoprot_endpoint_management, eoprot_entity_mn_comm, 0, eoprot_tag_mn_comm_cmmnds_command_replynumof);
             ropdesc.data    = NULL; // so that data from the EOnv is retrieved.
-            eo_transceiver_OccasionalROP_Load(theems00transceiver, &ropdesc);
+            //eo_transceiver_OccasionalROP_Load(theems00transceiver, &ropdesc);
+            eom_emsappl_Transmit_OccasionalROP(eom_emsappl_GetHandle(), &ropdesc);
            
         } break;
  
@@ -567,7 +555,8 @@ static void s_eoprot_ep_mn_fun_queryarraycommand(eOmn_command_t* command)
             cmdreplyarray->opcpar.setnumber = setnumber;
             cmdreplyarray->opcpar.setsize   = setsize;
             eoprot_endpoints_array_get(eoprot_board_localboard, ep08array, setnumber*setsize);                      
-            eo_transceiver_OccasionalROP_Load(theems00transceiver, &ropdesc); 
+            //eo_transceiver_OccasionalROP_Load(theems00transceiver, &ropdesc); 
+            eom_emsappl_Transmit_OccasionalROP(eom_emsappl_GetHandle(), &ropdesc);
            
         } break;      
 
@@ -595,7 +584,8 @@ static void s_eoprot_ep_mn_fun_queryarraycommand(eOmn_command_t* command)
             cmdreplyarray->opcpar.setnumber = setnumber;
             cmdreplyarray->opcpar.setsize   = setsize;
             eoprot_endpoints_arrayofdescriptors_get(eoprot_board_localboard, epdesarray, setnumber*setsize);                      
-            eo_transceiver_OccasionalROP_Load(theems00transceiver, &ropdesc); 
+            //eo_transceiver_OccasionalROP_Load(theems00transceiver, &ropdesc); 
+            eom_emsappl_Transmit_OccasionalROP(eom_emsappl_GetHandle(), &ropdesc);
            
         } break;           
 
@@ -632,7 +622,8 @@ static void s_eoprot_ep_mn_fun_queryarraycommand(eOmn_command_t* command)
                 eoprot_entities_in_endpoint_arrayofdescriptors_get(eoprot_board_localboard, endpoint, endesarray, setnumber*setsize);
             }
             
-            eo_transceiver_OccasionalROP_Load(theems00transceiver, &ropdesc); 
+            //eo_transceiver_OccasionalROP_Load(theems00transceiver, &ropdesc); 
+            eom_emsappl_Transmit_OccasionalROP(eom_emsappl_GetHandle(), &ropdesc);
 
            
         } break;  
@@ -673,7 +664,8 @@ static void s_eoprot_ep_mn_fun_queryarraycommand(eOmn_command_t* command)
                 eo_transceiver_RegularROP_ArrayID32GetWithEP(theems00transceiver, endpoint, setnumber*setsize, id32array);
             }
             
-            eo_transceiver_OccasionalROP_Load(theems00transceiver, &ropdesc); 
+            //eo_transceiver_OccasionalROP_Load(theems00transceiver, &ropdesc); 
+            eom_emsappl_Transmit_OccasionalROP(eom_emsappl_GetHandle(), &ropdesc);
            
         } break;         
         
@@ -741,9 +733,13 @@ static void s_eoprot_ep_mn_fun_configcommand(eOmn_command_t* command)
                 res = res;
                 if(eores_OK != res)
                 {
-                    #warning marco.accame: TODO: put diagnostics
-//                    eo_theEMSdgn_UpdateApplCore(eo_theEMSdgn_GetHandle());
-//                    eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsapplcommon , 1000);
+                    eOerrmanDescriptor_t errdes = {0};
+                    errdes.sourcedevice = eo_errman_sourcedevice_localboard;
+                    errdes.sourceaddress = 0;
+                    errdes.par16 = 0;
+                    errdes.par64 = sigcfg->id32; 
+                    errdes.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_comm_cannotloadaregularrop);              
+                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
                 }
             }        
         } break;
@@ -768,9 +764,13 @@ static void s_eoprot_ep_mn_fun_configcommand(eOmn_command_t* command)
                 res = res;
                 if(eores_OK != res)
                 {
-                    #warning marco.accame: TODO: put diagnostics
-//                    eo_theEMSdgn_UpdateApplCore(eo_theEMSdgn_GetHandle());
-//                    eo_theEMSdgn_Signalerror(eo_theEMSdgn_GetHandle(), eodgn_nvidbdoor_emsapplcommon , 1000);
+                    eOerrmanDescriptor_t errdes = {0};
+                    errdes.sourcedevice = eo_errman_sourcedevice_localboard;
+                    errdes.sourceaddress = 0;
+                    errdes.par16 = 0;
+                    errdes.par64 = sigcfg->id32; 
+                    errdes.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_comm_cannotloadaregularrop);              
+                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
                 }
             }         
         } break;        

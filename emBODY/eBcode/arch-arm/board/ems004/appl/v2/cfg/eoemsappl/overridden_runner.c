@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia
+ * Copyright (C) 2015 iCub Facility - Istituto Italiano di Tecnologia
  * Author:  Marco Accame
  * email:   marco.accame@iit.it
  * website: www.robotcub.org
@@ -20,53 +20,17 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "stdio.h"
-
-
-#include "stdlib.h"
-#include "string.h"
-#include "stdio.h"
-#include "string.h"
-
-#include "EOemsControllerCfg.h"
-
 #include "EoCommon.h"
-#include "EOarray.h"
+
 #include "EOtheErrorManager.h"
 #include "EoError.h"
 
 
-#include "EOMtheEMSappl.h"
-#include "EOtheEMSApplBody.h"
-
-
-#include "EoMotionControl.h"
-#include "EoAnalogSensors.h"
-#include "EoManagement.h"
-
-#include "EOtheEntities.h"
-
-//#include "EOtheCANdiscovery.h"
-
-#include "EOemsController_hid.h" 
-#include "OPCprotocolManager_Cfg.h" 
-
-#include "EOarray.h"
-
-#include "eventviewer.h"
-
-
 #include "EOtheCANservice.h"
-#include "EOtheCANmapping.h"
-#include "EOtheCANprotocol.h"
-
-#include "EOtheMotionDone.h"
-#include "EOtheVirtualStrain.h"
-
-#include "EOtheInertial.h"
-
-#include "EOtheSkin.h"
-
+#include "EOtheInertials.h"
+#include "EOtheCANdiscovery2.h"
+#include "EOtheMotionController.h"
+#include "EOtheSKIN.h"
 #include "EOtheETHmonitor.h"
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -86,18 +50,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
+// empty-section
 
-
-
-#if defined(EVIEWER_ENABLED)
-#define EVIEWER_userDef_IDbase             (ev_ID_first_usrdef+1)
-//#define EVIEWER_userDef_RUNRecRopframe     (EVIEWER_userDef_IDbase +1) see definition in EOMtheEMSrunner.c
-#define EVIEWER_userDef_hwErrCntr          (EVIEWER_userDef_IDbase +3)
-#endif
-
-#if defined(EVIEWER_ENABLED)
-void userDef_hwErrCntr(void){}
-#endif
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -109,41 +63,26 @@ void userDef_hwErrCntr(void){}
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-
+// empty-section
 
     
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
-    
-
-//DO
-static void s_taskDO_activity_2foc(EOMtheEMSrunner *p);
-
-static void s_taskDO_activity_mc4(EOMtheEMSrunner *p);
-
-
-
-//utils
-static void s_UpdateJointstatus(EOMtheEMSrunner *p);
-
-
-static eOresult_t s_SetCurrentSetpoint(EOtheEMSapplBody *p, int16_t *pwmList, uint8_t size);
+// empty-section    
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
+// empty-section
 
 
-#if defined(EVIEWER_ENABLED) 
-static uint8_t event_view = 0;
-#endif 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
-
+// empty-section
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -152,32 +91,20 @@ static uint8_t event_view = 0;
 
 extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(EOMtheEMSrunner *p)
 {
-    #if defined(EVIEWER_ENABLED)   
-    if(0 == event_view)
-    {   
-        eventviewer_load(EVIEWER_userDef_hwErrCntr, userDef_hwErrCntr);
-        event_view = 1;
-    }
-    #endif    
+  
 }
 
 
 extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOMtheEMSrunner *p)
 {
+    // i tick the can-discovery. 
+    // this function does something only if a discovery is active and if the search timer period has expired.
+    eo_candiscovery2_Tick(eo_candiscovery2_GetHandle());
     
-    // i parse every can frame. in branch runtime_ems_config we use eo_canserv_ParseAll() with code as below.
-    
-    uint8_t port = eOcanport1;
-    uint8_t rxframes = 0;
-    
-    for(port=eOcanport1; port<eOcanports_number; port++)
-    {   
-        if(0 != (rxframes = eo_canserv_NumberOfFramesInRXqueue(eo_canserv_GetHandle(), (eOcanport_t)port)))
-        {
-            eo_canserv_Parse(eo_canserv_GetHandle(), (eOcanport_t)port, rxframes, NULL);
-        }
-    }    
-
+    // i manage the can-bus reception. i parse everything. 
+    // it will be the can parser functions which will call the relevant objects which will do what they must.
+    // as an example, the broadcast skin can frames are always parsed and are given to EOtheSKIN which will decide what to do with them
+    eo_canserv_ParseAll(eo_canserv_GetHandle());    
 }
 
 
@@ -186,49 +113,22 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOM
 
 extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
 {
-#if !defined(TEST_EB2_EB4_WITHOUT_MC)
-    EOtheEMSapplBody* emsappbody_ptr = eo_emsapplBody_GetHandle();
-    eOmn_appl_runMode_t runmode = eo_emsapplBody_GetAppRunMode(emsappbody_ptr);
-
-
-    switch(runmode)
-    {
-        case applrunMode__2foc:
-        {
-            s_taskDO_activity_2foc(p);
-        } break;
-        
-        case applrunMode__mc4Only:
-        case applrunMode__skinAndMc4:
-        {
-            s_taskDO_activity_mc4(p);
-        } break;
-        
-        case applrunMode__skinOnly:
-        {
-            //currently nothing to do 
-        } break;
-        
-        default:
-        {
-
-        } break;
-    }
+    // so far we tick only the motion control.
+    eo_motioncontrol_Tick(eo_motioncontrol_GetHandle());
     
-#endif
+    // however, we could also tick others ....
+    // TODO: see if i can move all the _Tick() in the do phase.
     
-    // eo_ethmonitor_Tick(eo_ethmonitor_GetHandle());
-    
+    // eo_ethmonitor_Tick(eo_ethmonitor_GetHandle()); // if we do it in here, then in eb2/eb4 it warns about execution time overflow
 }
 
 
 extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission(EOMtheEMSrunner *p)
-{   
+{
     uint8_t txcan1frames = 0;
     uint8_t txcan2frames = 0;
-    
-    eo_canserv_TXstart(eo_canserv_GetHandle(), eOcanport1, &txcan1frames);
-    eo_canserv_TXstart(eo_canserv_GetHandle(), eOcanport2, &txcan1frames);
+
+    eo_canserv_TXstartAll(eo_canserv_GetHandle(), &txcan1frames, &txcan2frames);
     
     eom_emsrunner_Set_TXcanframes(eom_emsrunner_GetHandle(), txcan1frames, txcan2frames);
 }
@@ -236,26 +136,25 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission
 
 
 extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(EOMtheEMSrunner *p)
-{        
+{  
     eObool_t prevTXhadRegulars = eom_emsrunner_CycleHasJustTransmittedRegulars(eom_emsrunner_GetHandle());
-    // we tick skin as we do in branch runtime_ems_config. we move can frames from internal buffer of EOtheSkin to status of skin inside this function
+    
+    // ticks some services ... 
+    // marco.accame: i put them in here just after tx phase. however, we can move it even in eom_emsrunner_hid_userdef_taskDO_activity() 
+    // because eom_emsrunner_CycleHasJustTransmittedRegulars() keeps memory of previous tx cycle.
     eo_skin_Tick(eo_skin_GetHandle(), prevTXhadRegulars); 
     
-
-    // we could refresh status in here ... but only if we have just sent to robotinterface the previous status
-    if(eobool_true == prevTXhadRegulars)
-    {
-        eo_inertial_RefreshStatusOfEntity(eo_inertial_GetHandle());
-    }
+    eo_inertials_Tick(eo_inertials_GetHandle(), prevTXhadRegulars); 
     
     eo_ethmonitor_Tick(eo_ethmonitor_GetHandle());
+
+
     
-    
-    // now we wait for the can tx to finish. 
-    // diagnostics about tx failure within the specified timeout is managed internally 
-    const uint32_t timeout = 3*osal_reltime1ms;
-    eo_canserv_TXwaituntildone(eo_canserv_GetHandle(), eOcanport1, timeout);
-    eo_canserv_TXwaituntildone(eo_canserv_GetHandle(), eOcanport2, timeout);       
+    // ABSOLUTELY KEEP IT LAST: wait until can tx started by eo_canserv_TXstartAll() in eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission() is all done
+    const eOreltime_t timeout = 3*EOK_reltime1ms;
+    eo_canserv_TXwaitAllUntilDone(eo_canserv_GetHandle(), timeout);   
+
+    return; 
 }
 
 
@@ -270,6 +169,7 @@ extern void eom_emsrunner_hid_userdef_onfailedtransmission(EOMtheEMSrunner *p)
     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, "EOMtheEMSrunner", &errdes); 
 }
 
+
 extern void eom_emsrunner_hid_userdef_onemstransceivererror(EOMtheEMStransceiver *p)
 {
     eOerrmanDescriptor_t errdes = {0};
@@ -281,9 +181,21 @@ extern void eom_emsrunner_hid_userdef_onemstransceivererror(EOMtheEMStransceiver
     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, "EOMtheEMSrunner", &errdes); 
 }
 
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
+// empty-section
+
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - removed code 
+// --------------------------------------------------------------------------------------------------------------------
+
+
+// maybe: USE_ONLY_QE, motiondon is not different, etc.
+#if 0
 
 
 
@@ -479,6 +391,7 @@ static void s_taskDO_activity_mc4(EOMtheEMSrunner *p)
     
 }
 
+#endif // 0
 
 
 // --------------------------------------------------------------------------------------------------------------------

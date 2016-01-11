@@ -135,7 +135,6 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__POSITION(eOcanframe_t *
 {    
     // this frame is from mc4 only, thus ... it manages two joints.
     // i retrieve the two joints related to the can frame. 
-    eOresult_t res = eores_OK; 
     eOprotIndex_t jointindex = 0;
     eOmc_joint_t *joint = NULL;
     icubCanProto_position_t pos = 0;
@@ -163,7 +162,6 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__PID_VAL(eOcanframe_t *f
 {
     // this frame is from mc4 only, thus ...
     // i retrieve the two joints related to the can frame. such a frame manages two joints per can address
-    eOresult_t res = eores_OK; 
     eOprotIndex_t jointindex = 0;
     eOmc_joint_t *joint = NULL;
     
@@ -204,18 +202,12 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__STATUS(eOcanframe_t *fr
     // - the 2foc contains info related to one joint only and it is used the EMScontroller to parse the frame,
     // - the mc4 contains info related to two joints and we need to parse the frame directly
     
-    eOresult_t res = eores_OK; 
     eOprotIndex_t jointindex = 0;
     eOmc_joint_t *joint = NULL;
     eOmc_controlmode_t eomc_controlmode = eomc_controlmode_idle;
     eOerrmanDescriptor_t des = {0};
     
     eObrd_cantype_t boardtype = s_eocanprotMCperiodic_get_boardtype(frame, port);
-    
-    if((eobrd_cantype_mc4 != boardtype) || (eobrd_cantype_1foc != boardtype))
-    {
-        #warning -> TODO: add diagnostics about invalid board as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
-    }
     
     
     if(eobrd_cantype_1foc == boardtype)
@@ -265,7 +257,7 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__STATUS(eOcanframe_t *fr
             // manage controlmode
             if(eores_OK != s_eocanprotMCperiodic_convert_icubCanProtoControlMode2eOmcControlMode((icubCanProto_controlmode_t) frame->data[offset[j]], &eomc_controlmode))
             {
-                #warning -> TODO: add diagnostics about not found board as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
+                #warning -> TODO: add diagnostics about not found control mode as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
                 return(eores_OK);    
             }
             
@@ -290,7 +282,6 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__CURRENT(eOcanframe_t *f
 {
     // this frame is from mc4 only, thus ...
     // i retrieve the two motors related to the can frame. such a frame manages two motors per can address
-    eOresult_t res = eores_OK; 
     eOprotIndex_t motorindex = 0;
     eOmc_motor_t *motor = NULL;
         
@@ -329,7 +320,6 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__VELOCITY(eOcanframe_t *
 {
     // this frame is from mc4 only, thus ...
     // i retrieve the two joints related to the can frame. such a frame manages two joints per can address
-    eOresult_t res = eores_OK; 
     eOprotIndex_t jointindex = 0;
     eOmc_joint_t *joint = NULL;
     icubCanProto_velocity_t vel_icubCanProtValue = 0;
@@ -363,7 +353,6 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__PID_ERROR(eOcanframe_t 
 {
     // this frame is from mc4 only, thus ...
     // i retrieve the two joints related to the can frame. such a frame manages two joints per can address
-    eOresult_t res = eores_OK; 
     eOprotIndex_t jointindex = 0;
     eOmc_joint_t *joint = NULL;
     uint16_t pidpos_error = 0;
@@ -404,7 +393,6 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__ADDITIONAL_STATUS(eOcan
 {
     // this frame is from mc4 only, thus ...
     // i retrieve the two joints related to the can frame. such a frame manages two joints per can address
-    eOresult_t res = eores_OK; 
     eOprotIndex_t jointindex = 0;
     eOmc_joint_t *joint = NULL;
     icubCanProto_interactionmode_t caninteractionmodes[2] = {icubCanProto_interactionmode_stiff, icubCanProto_interactionmode_stiff};
@@ -413,7 +401,7 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__ADDITIONAL_STATUS(eOcan
     // the two joints have ...
     const eOcanmap_insideindex_t insideindex[2] = {eocanmap_insideindex_first, eocanmap_insideindex_second};
     caninteractionmodes[0] = (icubCanProto_interactionmode_t)(frame->data[0] & 0x0f);          // for first joint
-    caninteractionmodes[1] = (icubCanProto_interactionmode_t)(frame->data[0] & 0xf0) >> 4;     // for second joint
+    caninteractionmodes[1] = (icubCanProto_interactionmode_t)((frame->data[0] & 0xf0) >> 4);     // for second joint
     eOmc_interactionmode_t tmp = eOmc_interactionmode_stiff;
     for(j=0; j<2; j++)
     {
@@ -495,7 +483,7 @@ static void* s_eocanprotMCperiodic_get_entity(eOprot_entity_t entity, eOcanframe
     
     if(EOK_uint08dummy == ii)
     {     
-        #warning -> TODO: add diagnostics about not found board as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
+        //#warning -> TODO: add diagnostics about not found board as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
         return(NULL);
     }
     

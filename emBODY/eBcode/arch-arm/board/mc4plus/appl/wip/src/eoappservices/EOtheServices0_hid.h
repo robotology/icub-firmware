@@ -19,41 +19,28 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef _EOTHEInertial_HID_H_
-#define _EOTHEInertial_HID_H_
+#ifndef _EOTHESERVICES0_HID_H_
+#define _EOTHESERVICES0_HID_H_
 
 
 
 
 // - external dependencies --------------------------------------------------------------------------------------------
-
-#include "EoCommon.h"
-#include "EOtheCANprotocol.h"
-#include "EOvector.h"
-
+// empty-section
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
 
-#include "EOtheInertial.h"
+#include "EOtheServices0.h"
 
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
 
-
-struct EOtheInertial_hid
+struct EOtheServices0_hid
 {
-    eObool_t                        initted;
-    eObool_t                        configured;
-    eObool_t                        thereisinertial;
-    uint8_t                         protindex;
-    eObool_t                        istransmitting;
-    eOas_inertial_sensorsconfig_t   sensorsconfig;
-    eOcanprot_command_t             command;
-    eOas_inertial_serviceconfig_t   serviceconfig;
-    uint64_t                        supportedmask64;
-    eOas_inertial_t                 *inertial2;
-    EOvector                        *fifo;
+    eObool_t    initted;
+    eObool_t    isASmais_ready;
+    eObool_t    BOARDisreadyforcontrolloop;
 }; 
 
 

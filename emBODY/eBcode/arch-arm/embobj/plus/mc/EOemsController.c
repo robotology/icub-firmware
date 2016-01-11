@@ -18,12 +18,12 @@
 // keep it before any evaluation of macros ...
 #include "EOemsControllerCfg.h"
 
-#if defined(USE_CANCOMM_V2)
+//#if defined(USE_CANCOMM_V2)
     #include "EOtheCANservice.h"
-#else
-    #include "EOicubCanProto_specifications.h"
-    #include "EOtheEMSapplBody.h"
-#endif
+//#else
+//    #include "EOicubCanProto_specifications.h"
+//    #include "EOtheEMSapplBody.h"
+//#endif
 
 //////////////////////////////////
 #include "EOtheBOARDtransceiver.h"
@@ -1931,7 +1931,7 @@ static void s_eo_emsController_InitTrajectoryVersionVergence(uint8_t j)
          return;
     }
     
-    #warning does it worth to put the virtually coupled joints in 0? its a choice, discuss it 
+    #warning TODO: does it worth to put the virtually coupled joints in 0? its a choice, discuss it 
 }
 static eObool_t s_eo_emsController_AreMechanicalConstraintsRespected(void)
 {
@@ -2162,7 +2162,7 @@ static float s_eo_emsController_PWM_SafeCalibration(float base_pwm, int32_t mean
 void sendErrorMessage(uint8_t j, uint32_t ems_fault_mask_j, uint32_t motor_fault_mask_j)
 {
     //eObool_t managed = eobool_false;
-    uint64_t par64 = (((uint64_t)ems_fault_mask_j)<<32)|(uint64_t)motor_fault_mask_j;
+    //uint64_t par64 = (((uint64_t)ems_fault_mask_j)<<32)|(uint64_t)motor_fault_mask_j;
      
     // 2FOC ERRORS
     if (motor_fault_mask_j & MOTOR_EXTERNAL_FAULT)

@@ -161,16 +161,16 @@ typedef struct
 
 enum { eocanmap_maxlocations = 32 };
 
-/**	@typedef    typedef struct eOcanmap_arrayof_locations_t 
- 	@brief      Contains the compact description of all the board locations which have been loaded into EOtheCAN mapping object.
-                The description is an array of locations. At most there are 28 boards (14 boards per can bus) because addresses 0 
-                and 15 are not used. We however use 32.
- **/
-typedef struct
-{
-    eOarray_head_t      head;
-    eOcanmap_location_t data[eocanmap_maxlocations];   
-} eOcanmap_arrayof_locations_t;
+///**	@typedef    typedef struct eOcanmap_arrayof_locations_t 
+// 	@brief      Contains the compact description of all the board locations which have been loaded into EOtheCAN mapping object.
+//                The description is an array of locations. At most there are 28 boards (14 boards per can bus) because addresses 0 
+//                and 15 are not used. We however use 32.
+// **/
+//typedef struct
+//{
+//    eOarray_head_t      head;
+//    eOcanmap_location_t data[eocanmap_maxlocations];   
+//} eOcanmap_arrayof_locations_t;
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
@@ -207,6 +207,9 @@ extern eOresult_t eo_canmap_LoadBoards(EOtheCANmapping *p,  EOconstvector *vecto
 
 
 
+extern eOresult_t eo_canmap_UnloadBoards(EOtheCANmapping *p,  EOconstvector *vectorof_boardprops);
+
+
 /** @fn         eOresult_t eo_canmap_ConfigEntity(EOtheCANmapping *p,  eOprotEndpoint_t ep, eOprotEntity_t entity, EOconstvector *vectorof_entitydescriptors)
     @brief      After the boards are loaded, it configures an entity so that it is mapped into the boards. The function can be called only once with a vector containing 
                 all the descriptors for the entity or it can be called multiple times to load some descriptors at a time. 
@@ -220,7 +223,7 @@ extern eOresult_t eo_canmap_LoadBoards(EOtheCANmapping *p,  EOconstvector *vecto
  **/
 extern eOresult_t eo_canmap_ConfigEntity(EOtheCANmapping *p,  eOprotEndpoint_t ep, eOprotEntity_t entity, EOconstvector *vectorof_entitydescriptors);
 
-
+extern eOresult_t eo_canmap_DeconfigEntity(EOtheCANmapping *p,  eOprotEndpoint_t ep, eOprotEntity_t entity, EOconstvector *vectorof_entitydescriptors);
 
 /** @fn         const eOcanmap_board_extended_t * eo_canmap_GetBoard(EOtheCANmapping *p, eOcanmap_location_t loc)
     @brief      get a board given its can location, for read only purposes.        
@@ -291,7 +294,7 @@ extern eOresult_t eo_canmap_GetEntityLocation(EOtheCANmapping *p, eOprotID32_t i
     @param      p           The handle to the EOtheCANmapping
     @return     the array, or NULL if p is NULL.
 **/
-extern EOconstarray* eo_canmap_GetBoardLocations(EOtheCANmapping *p);
+//extern EOconstarray* eo_canmap_GetBoardLocations(EOtheCANmapping *p);
 
 
 /** @}            

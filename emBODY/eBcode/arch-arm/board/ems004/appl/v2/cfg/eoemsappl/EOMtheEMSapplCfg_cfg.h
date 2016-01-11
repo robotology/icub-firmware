@@ -79,22 +79,22 @@ extern "C" {
 
 //  <h> version
 //  <o> major           <0-255> 
-#define EOMTHEEMSAPPLCFG_VERSION_MAJOR          2
+#define EOMTHEEMSAPPLCFG_VERSION_MAJOR          100
 //  <o> minor           <0-255> 
-#define EOMTHEEMSAPPLCFG_VERSION_MINOR          24
+#define EOMTHEEMSAPPLCFG_VERSION_MINOR          55
 //  </h>version
 
 //  <h> build date
 //  <o> year            <2010-2020> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_YEAR         2015
+#define EOMTHEEMSAPPLCFG_BUILDDATE_YEAR         2016
 //  <o> month           <1-12> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_MONTH        12
+#define EOMTHEEMSAPPLCFG_BUILDDATE_MONTH        1
 //  <o> day             <1-31> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          22
+#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          11
 //  <o> hour            <0-23> 
 #define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         16
 //  <o> minute          <0-59> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          10
+#define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          26
 //  </h>build date
 
 // </h>Info 
@@ -153,19 +153,19 @@ extern "C" {
 
 //  <o> task stack size <256-1024:128>
 //  <i> default: 512
-#define TMRMAN_TMP_STACK   512
+#define TMRMAN_TMP_STACK   1024
 
 //  <o> task message queue size <1-16>
 //  <i> default: 8
-#define TMRMAN_TMP_MSGQ   4
+#define TMRMAN_TMP_MSGQ   12
 
 //  </h>user defined 
 
 
 #if (1 == TMRMAN_USEDEFAULT)
     #define EOMTHEEMSAPPLCFG_TMRMAN_TASK_PRIORITYof                 240
-    #define EOMTHEEMSAPPLCFG_TMRMAN_TASK_STACKSIZEof                512
-    #define EOMTHEEMSAPPLCFG_TMRMAN_TASK_QUEUESIZEof                8
+    #define EOMTHEEMSAPPLCFG_TMRMAN_TASK_STACKSIZEof                1024
+    #define EOMTHEEMSAPPLCFG_TMRMAN_TASK_QUEUESIZEof                12
 #else
     #define EOMTHEEMSAPPLCFG_TMRMAN_TASK_PRIORITYof                 TMRMAN_TMP_PRIO
     #define EOMTHEEMSAPPLCFG_TMRMAN_TASK_STACKSIZEof                TMRMAN_TMP_STACK
@@ -190,19 +190,19 @@ extern "C" {
 
 //  <o> task stack size <256-1024:128>
 //  <i> default: 512
-#define CBKMAN_TMP_STACK   512
+#define CBKMAN_TMP_STACK   2048
 
 //  <o> task message queue size <1-16>
 //  <i> default: 8
-#define CBKMAN_TMP_MSGQ   4
+#define CBKMAN_TMP_MSGQ   12
 
 //  </h>user defined 
 
 
 #if (1 == CBKMAN_USEDEFAULT)
     #define EOMTHEEMSAPPLCFG_CBKMAN_TASK_PRIORITYof                 202
-    #define EOMTHEEMSAPPLCFG_CBKMAN_TASK_STACKSIZEof                512
-    #define EOMTHEEMSAPPLCFG_CBKMAN_TASK_QUEUESIZEof                8
+    #define EOMTHEEMSAPPLCFG_CBKMAN_TASK_STACKSIZEof                2048
+    #define EOMTHEEMSAPPLCFG_CBKMAN_TASK_QUEUESIZEof                12
 #else
     #define EOMTHEEMSAPPLCFG_CBKMAN_TASK_PRIORITYof                 CBKMAN_TMP_PRIO
     #define EOMTHEEMSAPPLCFG_CBKMAN_TASK_STACKSIZEof                CBKMAN_TMP_STACK

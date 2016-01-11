@@ -16,59 +16,58 @@
  * Public License for more details
 */
 
+
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _EOTHECANMAPPING_HID_H_
-#define _EOTHECANMAPPING_HID_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#ifndef _EOTHEENCODERREADER_HID_H_
+#define _EOTHEENCODERREADER_HID_H_
 
-/* @file       EOtheCANmapping_hid.h
-    @brief      This header file implements hidden interface to the can mapping 
-    @author     marco.accame@iit.it
-    @date       12 mar 2015
- **/
+
 
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "EoCommon.h"
 
+#include "EOappEncodersReader.h"
+
+#include "EOtimer.h"
+#include "EOtheErrorManager.h"
+
+
+#include "EOtheServices_hid.h"
+
+
 // - declaration of extern public interface ---------------------------------------------------------------------------
- 
-#include "EOtheCANmapping.h"
 
+#include "EOtheEncoderReader.h"
 
-// - #define used with hidden struct ----------------------------------------------------------------------------------
-// empty-section
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
-/** @struct     EOtheCANmapping_hid
-    @brief      Hidden definition. 
- **/  
-struct EOtheCANmapping_hid 
+
+struct EOtheEncoderReader_hid
 {
-	eOcanmap_cfg_t                  config;
-    eOcanmap_board_extended_t***    canmapping;         // [can][adr] -> pointer to 
-    eOcanmap_board_extended_t****   entitylocation;     // [ep][ent][index]-> pointer to
-    eOcanmap_board_extended_t***    skinlocation;       // [index]-> array[] of up to 8 pointers to 
-    uint8_t                         numofskinboardsindex[eocanmap_skins_maxnumberof];
-//    eOcanmap_arrayof_locations_t    arrayofboardlocations;
-    uint32_t                        tobedefined;
-};
+    eOservice_core_t                        service;
+    eOservice_diagnostics_t                 diagnostics;
+    
+    eOmn_serv_arrayof_4jomodescriptors_t    arrayofjomodes;
+
+    EOtimer*                                waitreadtimer;
+    uint8_t                                 numofjomos;
+    uint8_t                                 numofencoders;
+    hal_encoder_errors_flags                errorflags[eOappEncReader_joint_numberof];
+    EOappEncReader*                         reader;
+}; 
 
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
-// empty-section
+// empty section
 
 
-#ifdef __cplusplus
-}       // closing brace for extern "C"
-#endif 
- 
-#endif  // include-guard
+#endif  // include guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
+
+
 

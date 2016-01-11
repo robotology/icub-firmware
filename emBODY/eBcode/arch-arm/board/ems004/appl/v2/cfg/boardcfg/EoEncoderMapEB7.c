@@ -16,6 +16,8 @@
  * Public License for more details
 */
 
+#if 0
+
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
@@ -70,7 +72,7 @@
 const eOappEncReader_cfg_t encoder_reader_config_eb7 =
 {
     .joints = 
-    {   // there are managed 4 joints, all served by an AEA
+    {   // there are managed 2 joints, all served by an AEA
         {   // pos 0
             .primary_encoder        = eo_appEncReader_enc_type_AEA,
             .primary_enc_position   = (eo_appEncReader_encoder_position_t)hal_encoder1,
@@ -154,7 +156,7 @@ const eOappEncReader_cfg_t encoder_reader_config_eb7 =
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
 
-
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

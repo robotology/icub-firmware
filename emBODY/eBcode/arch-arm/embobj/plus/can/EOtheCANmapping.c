@@ -191,10 +191,9 @@ static EOtheCANmapping s_eo_canmap_singleton =
     .entitylocation         = NULL,
     .skinlocation           = NULL,
     .numofskinboardsindex   = {0, 0},
-    .arrayofboardlocations  = {0},
+//    .arrayofboardlocations  = {0},
     .tobedefined            = 0
 };
-
 
 
 
@@ -221,7 +220,21 @@ extern EOtheCANmapping * eo_canmap_Initialise(const eOcanmap_cfg_t *canmapcfg)
     s_eo_canmap_singleton.entitylocation = s_eo_canmap_canmapcfg_entities;
     s_eo_canmap_singleton.skinlocation = s_eo_canmap_canmapcfg_skin;
     
-    eo_array_New(eocanmap_maxlocations, sizeof(eOcanmap_location_t), &s_eo_canmap_singleton.arrayofboardlocations);
+//    eo_array_New(eocanmap_maxlocations, sizeof(eOcanmap_location_t), &s_eo_canmap_singleton.arrayofboardlocations);
+    
+    uint8_t i=0;
+    uint8_t j=0;
+    for(i=0; i<2; i++)
+    {
+        for(j=0; j<16; j++)
+        {
+            // i use board.props.type to understand if to load a board.
+            s_eo_canmap_boards_ram[i][j].board.props.type = eobrd_cantype_none;
+            // i use board.indexofentity[0,1] to understand if to unload a board 
+            s_eo_canmap_boards_ram[i][j].board.indexofentity[0] = s_eo_canmap_boards_ram[i][j].board.indexofentity[1] = entindexNONE;
+        }
+    }
+    
     
     // so far i dont clear canmapping[][] but i should do it.
     
@@ -235,6 +248,7 @@ extern EOtheCANmapping* eo_canmap_GetHandle(void)
 {
     return(&s_eo_canmap_singleton);    
 }
+
 
 
 extern eOresult_t eo_canmap_LoadBoards(EOtheCANmapping *p,  EOconstvector *vectorof_boardprops)
@@ -258,15 +272,81 @@ extern eOresult_t eo_canmap_LoadBoards(EOtheCANmapping *p,  EOconstvector *vecto
     {   // note: i can use location.port and location.addr safely in addressing memory because their max values are 1 and 15 respectively.
         eOcanmap_board_properties_t *prop = (eOcanmap_board_properties_t*)eo_constvector_At(vectorof_boardprops, i);
         eOcanmap_board_extended_t *boardext = &s_eo_canmap_boards_ram[prop->location.port][prop->location.addr];
-        memset(boardext, 0, sizeof(eOcanmap_board_extended_t));
-        memcpy(&boardext->board.props, prop, sizeof(eOcanmap_board_properties_t));
-        boardext->board.indexofentity[0] = boardext->board.indexofentity[1] = entindexNONE;
+        // now that we have a boardext, we must NOT memset it to 0!!! we must keep the existing indexofentity[] values.
+        // the problem does not apply if this board is used by one service only. BUT if it is used by more than one, THEN ...
+        // Example: i call eo_canmap_LoadBoards() for skin service and i load some mtb boards. then i call it again for inertial and i have the same mtb boards.
+        // in such a case, i must not load the board again.
+
         if(NULL == s_eo_canmap_singleton.canmapping[prop->location.port][prop->location.addr])
-        {   // first time we add the location
-            eo_array_PushBack((EOarray*)&s_eo_canmap_singleton.arrayofboardlocations, &prop->location);
+        {   // it means that noboby uses this board yet. i perform a full initialisation
+            memcpy(&boardext->board.props, prop, sizeof(eOcanmap_board_properties_t));
+            boardext->board.indexofentity[0] = boardext->board.indexofentity[1] = entindexNONE;
+            s_eo_canmap_singleton.canmapping[prop->location.port][prop->location.addr] = boardext;
         }
+        else
+        {   // it means that someone else already is using the board OR that i have loader them twice. what i can do in here is just to verify if there are problems.
+            eOcanmap_board_extended_t *existing = s_eo_canmap_singleton.canmapping[prop->location.port][prop->location.addr];
+            if(existing->board.props.type != prop->type)
+            {
+                // send diagnostics because someone is attempting to load at the same address a different board type
+            }            
+        }
+
+//        if(NULL == s_eo_canmap_singleton.canmapping[prop->location.port][prop->location.addr])
+//        {   // first time we add the location
+//            eo_array_PushBack((EOarray*)&s_eo_canmap_singleton.arrayofboardlocations, &prop->location);
+//        }
         // i dont care if we load again in the same position
-        s_eo_canmap_singleton.canmapping[prop->location.port][prop->location.addr] = boardext;
+//        s_eo_canmap_singleton.canmapping[prop->location.port][prop->location.addr] = boardext;
+    }
+     
+    return(eores_OK);    
+}
+
+
+extern eOresult_t eo_canmap_UnloadBoards(EOtheCANmapping *p,  EOconstvector *vectorof_boardprops)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    uint8_t num = 0;
+    if((NULL == vectorof_boardprops) || (0 == (num = eo_constvector_Size(vectorof_boardprops))))
+    {
+        return(eores_NOK_generic);
+    }
+    
+    uint8_t i = 0;
+    for(i=0; i<num; i++)
+    {   // note: i can use location.port and location.addr safely in addressing memory because their max values are 1 and 15 respectively.
+        
+        // lo posso togliere. devo pero' capire cosa fare nel caso di board che offrono piu' servizi. 
+        // ad esempio: la mtb che offre skin ed inertial.
+        // remove board only if it is not used by any entity, thus if both indexofentity[0] and indexofentity[1] are equal to entindexNONE
+        
+        
+        eOcanmap_board_properties_t *prop = (eOcanmap_board_properties_t*)eo_constvector_At(vectorof_boardprops, i);
+        eOcanmap_board_extended_t *boardext = &s_eo_canmap_boards_ram[prop->location.port][prop->location.addr];
+        if((entindexNONE == boardext->board.indexofentity[0]) && (entindexNONE == boardext->board.indexofentity[1])) 
+        {
+            memset(boardext, 0, sizeof(eOcanmap_board_extended_t));
+            memset(&boardext->board.props, 0, sizeof(eOcanmap_board_properties_t));
+            boardext->board.indexofentity[0] = boardext->board.indexofentity[1] = entindexNONE;
+            boardext->board.props.type = eobrd_cantype_none;
+            s_eo_canmap_singleton.canmapping[prop->location.port][prop->location.addr] = NULL;
+        }
+        
+        // vedi come fare per rimuovere questa location dall'array. dovrei cercare questo item, segnarmi l'indice e rimuovere l'item.
+//        if(NULL == s_eo_canmap_singleton.canmapping[prop->location.port][prop->location.addr])
+//        {   // first time we add the location
+//            eo_array_PushBack((EOarray*)&s_eo_canmap_singleton.arrayofboardlocations, &prop->location);
+//        }
+        
+        
+        // lo posso togliere. devo pero' capire cosa fare nel caso di board che offrono piu' servizi. 
+        // ad esempio: la mtb che offre skin ed inertial
+        //s_eo_canmap_singleton.canmapping[prop->location.port][prop->location.addr] = NULL;
     }
      
     return(eores_OK);    
@@ -347,6 +427,81 @@ extern eOresult_t eo_canmap_ConfigEntity(EOtheCANmapping *p,  eOprotEndpoint_t e
     
     return(eores_OK);     
 }
+
+// remove info about the entity, but does not remove the board
+extern eOresult_t eo_canmap_DeconfigEntity(EOtheCANmapping *p,  eOprotEndpoint_t ep, eOprotEntity_t entity, EOconstvector *vectorof_entitydescriptors)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+         
+    if(eobool_false == s_eocanmap_is_entity_supported(ep, entity))
+    {
+        return(eores_NOK_generic);
+    }
+           
+    if((NULL == vectorof_entitydescriptors) || (0 == eo_constvector_Size(vectorof_entitydescriptors)))
+    {
+        return(eores_NOK_generic);
+    }   
+
+    // numofcanlocations is the number of canlocations used to define the entity. for instance: 
+    // - for mc4can-based motion control of eb2 with 12 joints we have 12 can locations (3 mc4 boards, each with two 
+    //   can addresses, each can address with two indices).
+    // - for skin of board eb2 which as only one entity but uses 7 can boards we have 7 can locations. but we have only ONE index.
+    uint8_t numofcanlocations = eo_constvector_Size(vectorof_entitydescriptors);
+    uint8_t maxnumofentities = s_eo_canmap_max_entities(ep, entity);
+    
+    
+    // ok, i allocate the pointers     
+    uint8_t i = 0;
+    for(i=0; i<numofcanlocations; i++)
+    {
+        eOcanmap_entitydescriptor_t *des = (eOcanmap_entitydescriptor_t*) eo_constvector_At(vectorof_entitydescriptors, i); 
+        if(des->index >= maxnumofentities)
+        {   // something is going wrong
+            continue;
+        }
+        eOcanmap_location_t *loc = &des->location; 
+        // now .... i retrieve the board.
+        eOcanmap_board_extended_t *boardext = s_eo_canmap_singleton.canmapping[loc->port][loc->addr];
+        if(NULL == boardext)
+        {
+            continue;
+        }
+        // it must not be NULL .... but for now i dont check it
+        // now i must do:
+        // 1. set the boardext with the index of the entity.
+        // 2. fill the entity array        
+        if(eoprot_endpoint_motioncontrol == ep)
+        {   // for motion control the board can be 1foc or mc4. 1foc manages 1 joint only and is placed in position 0 of indexofentity[]. mc4 manages two joints which are placed in position 0 and position 1
+            boardext->board.indexofentity[loc->insideindex] = entindexNONE;
+            s_eo_canmap_singleton.entitylocation[ep][eoprot_entity_mc_joint][des->index] = NULL;
+            s_eo_canmap_singleton.entitylocation[ep][eoprot_entity_mc_motor][des->index] = NULL;
+        }   
+        else if(eoprot_endpoint_skin == ep)
+        {   // for skin endpoint the board is a mtb. for entity of type skin we use position 0 of indexofentity[]
+            boardext->board.indexofentity[0] = entindexNONE;  // as described in NOTE-123454321 we use position 0    
+            uint8_t pos = s_eo_canmap_singleton.numofskinboardsindex[des->index];
+            s_eo_canmap_singleton.skinlocation[des->index][pos] = NULL; 
+            s_eo_canmap_singleton.numofskinboardsindex[des->index] --;            
+        }
+        else if((eoprot_endpoint_analogsensors == ep) && (eoprot_entity_as_inertial == entity))
+        {   // NOTE-123454321: for analog sensor endpoint and inertial entity the board is a mtb. we use position 1 of indexofentity[] because position 0 is reserved to skin entity managed by the same board
+            boardext->board.indexofentity[1] = entindexNONE; // as described in NOTE-123454321 we use position 1
+            s_eo_canmap_singleton.entitylocation[ep][entity][des->index] = NULL;            
+        }
+        else 
+        {   // all other cases are managed by a board only which manages only one entity. we use position 0 of indexofentity[]
+            boardext->board.indexofentity[0] = entindexNONE;
+            s_eo_canmap_singleton.entitylocation[ep][entity][des->index] = NULL;
+        }
+    }
+    
+    return(eores_OK);     
+}
+
 
 extern const eOcanmap_board_extended_t * eo_canmap_GetBoard(EOtheCANmapping *p, eOcanmap_location_t bloc)
 {
@@ -781,15 +936,15 @@ extern eOresult_t eo_canmap_GetEntityLocation(EOtheCANmapping *p, eOprotID32_t i
 }
    
 
-extern EOconstarray* eo_canmap_GetBoardLocations(EOtheCANmapping *p)
-{
-    if(NULL == p)
-    {
-        return(NULL);
-    }
-    
-    return((EOconstarray*)&s_eo_canmap_singleton.arrayofboardlocations);   
-}
+//extern EOconstarray* eo_canmap_GetBoardLocations(EOtheCANmapping *p)
+//{
+//    if(NULL == p)
+//    {
+//        return(NULL);
+//    }
+//    
+//    return((EOconstarray*)&s_eo_canmap_singleton.arrayofboardlocations);   
+//}
 
 
 ///**	@typedef    typedef struct eOcanmap_compact_address_list_t 

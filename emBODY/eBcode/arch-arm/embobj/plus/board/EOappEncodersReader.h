@@ -182,6 +182,8 @@ typedef struct
 // empty-section
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
+
+extern EOappEncReader* eo_appEncReader_Initialise(void);
 extern EOappEncReader* eo_appEncReader_New(eOappEncReader_cfg_t *cfg);
 extern eOresult_t eo_appEncReader_StartRead(EOappEncReader *p); 
 

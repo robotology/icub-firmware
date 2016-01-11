@@ -45,6 +45,7 @@ extern "C" {
 #include "eEcommon.h"
 #include "EOsm.h"
 #include "eOcfg_sm_EMSappl.h"
+#include "EOrop.h"
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
@@ -122,6 +123,8 @@ extern eOresult_t eom_emsappl_GetCurrentState(EOMtheEMSappl *p, eOsmStatesEMSapp
 
 
 extern eOresult_t eom_emsappl_SendTXRequest(EOMtheEMSappl *p);
+
+extern eOresult_t eom_emsappl_Transmit_OccasionalROP(EOMtheEMSappl *p, eOropdescriptor_t *ropdes);
 
 
 

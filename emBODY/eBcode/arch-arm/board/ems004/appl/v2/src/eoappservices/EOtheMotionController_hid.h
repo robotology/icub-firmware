@@ -19,8 +19,8 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef _EOTHESKIN_HID_H_
-#define _EOTHESKIN_HID_H_
+#ifndef _EOTHEMOTIONCONTROLLER_HID_H_
+#define _EOTHEMOTIONCONTROLLER_HID_H_
 
 
 
@@ -29,30 +29,59 @@
 
 #include "EoCommon.h"
 #include "EoProtocol.h"
-#include "EOtheServices_hid.h"
-#include "EOvector.h"
 
+#include "EOemsController.h"
+#include "EOtheEncoderReader.h"
+
+#include "EOtheMAIS.h"
+#include "EOtheMC4boards.h"
+#include "EOtheVirtualStrain.h"
+
+
+#include "EOtheServices_hid.h"
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
 
-#include "EOtheSKIN.h"
+#include "EOtheMotionController.h"
 
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
 
-struct EOtheSKIN_hid
+typedef struct
+{
+    EOemsController*                        thecontroller;
+    EOtheEncoderReader*                     theencoderreader;    
+} eOmotioncontroller_objs_foc_t;
+
+typedef struct
+{
+    eOmn_serv_configuration_t               servconfigmais;
+    EOtheMAIS*                              themais;  
+    EOtheMC4boards*                         themc4boards;    
+} eOmotioncontroller_objs_mc4_t;
+
+typedef struct
+{
+    EOemsController*                        thecontroller;
+    EOtheEncoderReader*                     theencoderreader;  
+    // anything else? add it in here. or maybe we use the one from foc ... 
+} eOmotioncontroller_objs_mc4plus_t;
+
+
+
+struct EOtheMotionController_hid
 {
     eOservice_core_t                        service;
     eOservice_diagnostics_t                 diagnostics;
-    eOservice_cantools_t                    sharedcan;
+    eOservice_cantools_t                    sharedcan;  
     
-    eObool_t                                patchisrunning[eomn_serv_skin_maxpatches];
-    uint8_t                                 numofskinpatches;    
-    uint8_t                                 numofmtbs;       
-    
-    EOvector*                               rxdata[eomn_serv_skin_maxpatches]; // of eOsk_candata_t     
-    eOsk_skin_t*                            skinpatches[eomn_serv_skin_maxpatches];
+    uint8_t                                 numofjomos;
+         
+    // they are for foc-based mc only
+    eOmotioncontroller_objs_foc_t           mcfoc;    
+    // they are for mc4-based mc only
+    eOmotioncontroller_objs_mc4_t           mcmc4;    
 }; 
 
 

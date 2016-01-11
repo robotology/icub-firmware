@@ -761,20 +761,29 @@ static eObool_t s_eo_candiscovery2_search(void)
     hal_trace_puts("EOtheCANdiscovery2: searching on CAN");
 #endif
     
-    for(i=eOcanport1; i<eOcanports_number; i++)
-    {
-        for(j=1; j<15; j++)
-        {   // valid addresses are [1, 14]
-            if((eobool_true == eo_common_hlfword_bitcheck(s_eo_thecandiscovery2.target.canmap[i], j)) && (eobool_false == eo_common_hlfword_bitcheck(s_eo_thecandiscovery2.detection.replies[i], j)))
-            {
-                eOcanmap_location_t location = {.port = i, .addr = j, .insideindex = eocanmap_insideindex_none};
-                s_eo_candiscovery2_getFWversion(s_eo_thecandiscovery2.target.boardtype, location, s_eo_thecandiscovery2.target.protocolversion);
-                allFound = eobool_false;
-            }        
+    if((0 != s_eo_thecandiscovery2.target.protocolversion.major) || (0 != s_eo_thecandiscovery2.target.protocolversion.minor))
+    {   // i trigger the search only if the protocol is non-zero. if zero, then i mark the boards all found
+        for(i=eOcanport1; i<eOcanports_number; i++)
+        {
+            for(j=1; j<15; j++)
+            {   // valid addresses are [1, 14]
+                if((eobool_true == eo_common_hlfword_bitcheck(s_eo_thecandiscovery2.target.canmap[i], j)) && (eobool_false == eo_common_hlfword_bitcheck(s_eo_thecandiscovery2.detection.replies[i], j)))
+                {
+                    eOcanmap_location_t location = {.port = i, .addr = j, .insideindex = eocanmap_insideindex_none};
+                    s_eo_candiscovery2_getFWversion(s_eo_thecandiscovery2.target.boardtype, location, s_eo_thecandiscovery2.target.protocolversion);
+                    allFound = eobool_false;
+                }        
+            }
         }
     }
     
     s_eo_thecandiscovery2.detection.allhavereplied = allFound;
+    
+    
+    if(eobool_true == s_eo_thecandiscovery2.detection.allhavereplied)
+    {
+        eo_candiscovery2_Stop(&s_eo_thecandiscovery2);
+    }
 
     return(s_eo_thecandiscovery2.detection.allhavereplied);
 }
@@ -800,13 +809,13 @@ static eOresult_t s_eo_candiscovery2_getFWversion(uint8_t boardtype, eOcanmap_lo
         
         case eobrd_cantype_mais:
         case eobrd_cantype_strain:
+        case eobrd_cantype_mtb:
         {
             found = eobool_true;
             command.class = eocanprot_msgclass_pollingAnalogSensor;
             command.type  = ICUBCANPROTO_POL_AS_CMD__GET_FW_VERSION;         
         } break;
         
-        case eobrd_cantype_mtb:
         default:
         {
             found = eobool_false;            

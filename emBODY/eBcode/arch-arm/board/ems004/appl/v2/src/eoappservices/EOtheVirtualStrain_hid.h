@@ -43,7 +43,7 @@
 struct EOtheVirtualStrain_hid
 {
     eObool_t            initted;
-    eObool_t            itismc4can;
+//    eObool_t            itismc4can;
     eOcanmap_location_t location;
     uint16_t            torques[6];
     eObool_t            thereisanewvalueoftorque;
