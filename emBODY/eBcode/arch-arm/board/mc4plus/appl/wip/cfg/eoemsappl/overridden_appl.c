@@ -44,6 +44,9 @@
 
 #include "EOtheEntities.h"
 
+
+#include "hal_5v.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -286,6 +289,15 @@ extern void eom_emsapplcfg_hid_userdef_OnError(eOerrmanErrorType_t errtype, cons
 
 extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
 {
+    
+    // marco.accame-> the initialisation of hal 5v was in eom_sys_Initialise() just after hal_core_start().
+    //                i believe that is is much better in here .... or if it is too late, we could move in hal_board_initialise() or similar function inside the hal of mc4plus board.
+    // davide wrote: I think that (for MC4plus) we should init the 5V enable GPIO (with hal_5v) here...just to make phisical stuff (voltage is there at the beginning) coherent to GPIO status
+//#if defined (USE_MC4PLUS)
+    hal_5v_init(NULL);
+    hal_5v_on();
+//#endif    
+    
      // to do:
     // 1. read ip adddress and get board number
     // 2. load all the config it is needed:
