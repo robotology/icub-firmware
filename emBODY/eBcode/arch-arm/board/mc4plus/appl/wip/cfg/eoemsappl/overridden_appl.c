@@ -86,6 +86,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
+
 static const eOserv0_cfg_t theservicescfg =
 {  
     .whatever = 0
@@ -109,6 +110,8 @@ const EOVtheEMSapplCfgBody theapplbodyconfig =
 
 static void overridden_appl_led_error_init(void);
 static EOconstvector* overriden_appl_code2canboards (uint32_t code);
+
+static void overriden_appl_load_mc_endpoint(uint8_t jomosnumber);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -377,6 +380,10 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
                 //use this config for MCservice (which also loads MCendpoint)
                 memcpy(mc_config.jomos, jomos_ptr,jomosn*sizeof(eOmcconfig_jomo_cfg_t));        
             }
+            
+            
+            // here i manually load the mc endpoint ... i must do it before i call eo_entities_Initialise(), otherwise ... 
+            overriden_appl_load_mc_endpoint(mc_config.jomosnumber);
         }
 
         //here I manually load the MAIS endpoint (if needed)
@@ -590,6 +597,21 @@ static EOconstvector* overriden_appl_code2canboards (uint32_t code)
         } break;    
     }
     return(ret);
+}
+
+
+static void overriden_appl_load_mc_endpoint(uint8_t jomosnumber)
+{
+    EOnvSet* nvset = eom_emstransceiver_GetNVset(eom_emstransceiver_GetHandle()); 
+
+    // load mc endpoint specific to this board using a proper number of joint motors
+    eOprot_EPcfg_t epcfgmc = {0};
+    epcfgmc.endpoint            = eoprot_endpoint_motioncontrol;
+    epcfgmc.numberofentities[0] = jomosnumber;
+    epcfgmc.numberofentities[1] = jomosnumber;
+    epcfgmc.numberofentities[2] = 1; // one controller
+
+    eo_nvset_LoadEP(nvset, &epcfgmc, eobool_true);                     
 }
 
 // --------------------------------------------------------------------------------------------------------------------
