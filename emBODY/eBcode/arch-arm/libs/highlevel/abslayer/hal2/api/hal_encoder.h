@@ -74,9 +74,12 @@ enum { hal_encoders_number = 6 };
  **/
 typedef enum  
 { 
-    hal_encoder_t1 = 0, 
-    hal_encoder_t2 = 1,
-    hal_encoder_tundefined = 255
+    hal_encoder_t1          = 0, 
+    hal_encoder_t2          = 1,
+    hal_encoder_typeAEA     = 0, 
+    hal_encoder_typeAMO     = 1, 
+    hal_encoder_typeNONE    = 255,
+    hal_encoder_tundefined  = 255
 } hal_encoder_type;
 
 /** @typedef    typedef uint32_t hal_encoder_position_t
