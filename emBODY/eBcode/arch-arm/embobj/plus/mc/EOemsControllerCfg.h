@@ -115,7 +115,7 @@ extern "C" {
 /* NOT USED
 extern int32_t joint2ticksperrevolution (uint8_t joint_n);
 
-extern eo_appEncReader_enc_type_t joint2encodertype (uint8_t joint_n);
+extern eo_appEncReader_encoder_type_t joint2encodertype (uint8_t joint_n);
 */
  #ifdef __cplusplus
 }       // closing brace for extern "C"

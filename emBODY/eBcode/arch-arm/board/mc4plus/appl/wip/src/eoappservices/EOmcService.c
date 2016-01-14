@@ -742,11 +742,21 @@ static eOresult_t s_eo_mcserv_init_jomo(EOmcService *p)
         //init enc config
         eOappEncReader_cfg_t encoder_reader_cfg;
         memset(&encoder_reader_cfg, 0xFF, sizeof(eOappEncReader_cfg_t)); //0xFF is the invalid value
-        encoder_reader_cfg.SPI_callbackOnLastRead = NULL, encoder_reader_cfg.SPI_callback_arg = NULL; //not using SPI callback
-        encoder_reader_cfg.SPI_streams[eo_appEncReader_stream0].numberof = 0, encoder_reader_cfg.SPI_streams[eo_appEncReader_stream1].numberof = 0; //reset number of encoders on SPIs
+        encoder_reader_cfg.numofjomos = 0;
+        encoder_reader_cfg.SPI_callbackOnLastRead = NULL;
+        encoder_reader_cfg.SPI_callback_arg = NULL; //not using SPI callback
+        
+        for(jm=0; jm<eOappEncReader_jomos_maxnumberof; jm++)
+        {
+            encoder_reader_cfg.jomoconfig[jm].primary_encoder_type = encoder_reader_cfg.jomoconfig[jm].secondary_encoder_type = eo_appEncReader_enc_type_NONE;
+            encoder_reader_cfg.jomoconfig[jm].primary_encoder_port = encoder_reader_cfg.jomoconfig[jm].secondary_encoder_port = eo_appEncReader_encoder_portNONE;
+            encoder_reader_cfg.jomoconfig[jm].primary_encoder_place = encoder_reader_cfg.jomoconfig[jm].secondary_encoder_place = eo_appEncReader_encoder_place_NONE;            
+        }
         
         eOmcconfig_jomo_cfg_t current_jomo = {0};
         uint8_t enc_joint_index = 0, etype_primary = 0, etype_extra = 0;
+        
+        encoder_reader_cfg.numofjomos = p->config.jomosnumber;
         for(jm=0; jm<p->config.jomosnumber; jm++)
         {
             current_jomo    = p->config.jomos[jm];
@@ -759,30 +769,14 @@ static eOresult_t s_eo_mcserv_init_jomo(EOmcService *p)
                 if (LOCAL_ENCODER(etype_primary))
                 {
                     //set type, position and pos_type (primary encoder)
-                    encoder_reader_cfg.joints[jm].primary_encoder           = (eo_appEncReader_enc_type_t) current_jomo.encoder.etype;
-                    encoder_reader_cfg.joints[jm].primary_enc_position      = (eo_appEncReader_encoder_position_t) current_jomo.encoder.index;
-                    encoder_reader_cfg.joints[jm].primary_encoder_pos_type  = (eo_appEncReader_detected_position_t) current_jomo.encoder.pos_type;
+                    encoder_reader_cfg.jomoconfig[jm].primary_encoder_type      = (eo_appEncReader_encoder_type_t) current_jomo.encoder.etype;
+                    encoder_reader_cfg.jomoconfig[jm].primary_encoder_port      = current_jomo.encoder.index;
+                    encoder_reader_cfg.jomoconfig[jm].primary_encoder_place     = (eo_appEncReader_encoder_place_t) current_jomo.encoder.pos_type;
                     
                     //store the encoder joint value --> use it when you get the value
                     p->config.jomos[jm].encoder.enc_joint = enc_joint_index;
                     enc_joint_index++;
                     
-                    //only for SPI encoders
-                    if (SPI_ENCODER(etype_primary))
-                    {
-                        if (current_jomo.encoder.index % 2 == 0)
-                        {
-                           encoder_reader_cfg.SPI_streams[eo_appEncReader_stream0].numberof++; // even
-                              if (encoder_reader_cfg.SPI_streams[eo_appEncReader_stream0].numberof == 1) //if not set yet
-                                  encoder_reader_cfg.SPI_streams[eo_appEncReader_stream0].type = (hal_encoder_type) etype_primary;
-                        }                      
-                        else
-                        {
-                           encoder_reader_cfg.SPI_streams[eo_appEncReader_stream1].numberof++; // odd
-                              if (encoder_reader_cfg.SPI_streams[eo_appEncReader_stream1].numberof == 1) //if not set yet
-                                  encoder_reader_cfg.SPI_streams[eo_appEncReader_stream1].type = (hal_encoder_type) etype_primary; 
-                        }
-                    }
                 }
                 // here I could check if it's a MAIS encoder. If it's the case, I could set as a primary encoder a quad enc, so that I can get it's value
                 // in the control loop and apply the limit
@@ -798,9 +792,9 @@ static eOresult_t s_eo_mcserv_init_jomo(EOmcService *p)
                 if (LOCAL_ENCODER(etype_extra))
                 {
                     //set type, position and pos_type (extra encoder)
-                    encoder_reader_cfg.joints[jm].extra_encoder             = (eo_appEncReader_enc_type_t) current_jomo.extra_encoder.etype;
-                    encoder_reader_cfg.joints[jm].extra_enc_position        = (eo_appEncReader_encoder_position_t) current_jomo.extra_encoder.index;
-                    encoder_reader_cfg.joints[jm].extra_encoder_pos_type    = (eo_appEncReader_detected_position_t) current_jomo.extra_encoder.pos_type;
+                    encoder_reader_cfg.jomoconfig[jm].secondary_encoder_type        = (eo_appEncReader_encoder_type_t) current_jomo.extra_encoder.etype;
+                    encoder_reader_cfg.jomoconfig[jm].secondary_encoder_port        = current_jomo.extra_encoder.index;
+                    encoder_reader_cfg.jomoconfig[jm].secondary_encoder_place       = (eo_appEncReader_encoder_place_t) current_jomo.extra_encoder.pos_type;
                     
                     //store the encoder joint value --> use it when you get the value
                     p->config.jomos[jm].extra_encoder.enc_joint = enc_joint_index;
@@ -810,22 +804,6 @@ static eOresult_t s_eo_mcserv_init_jomo(EOmcService *p)
                         enc_joint_index++;
                     }
                   
-                    //only for SPI encoders
-                    if (SPI_ENCODER(etype_extra))
-                    {
-                        if (current_jomo.extra_encoder.index % 2 == 0)
-                        {
-                           encoder_reader_cfg.SPI_streams[eo_appEncReader_stream0].numberof++; // even
-                              if (encoder_reader_cfg.SPI_streams[eo_appEncReader_stream0].numberof == 1) //if not set yet
-                                  encoder_reader_cfg.SPI_streams[eo_appEncReader_stream0].type = (hal_encoder_type) etype_extra;
-                        }                      
-                        else
-                        {
-                           encoder_reader_cfg.SPI_streams[eo_appEncReader_stream1].numberof++; // odd
-                              if (encoder_reader_cfg.SPI_streams[eo_appEncReader_stream1].numberof == 1) //if not set yet
-                                  encoder_reader_cfg.SPI_streams[eo_appEncReader_stream1].type = (hal_encoder_type) etype_extra; 
-                        }
-                    }
                 }
                 // here I could check if it's a MAIS encoder. If it's the case, I could set as a primary encoder a quad enc, so that I can get it's value
                 // in the control loop and apply the limit
@@ -836,6 +814,7 @@ static eOresult_t s_eo_mcserv_init_jomo(EOmcService *p)
             }
          
         }
+        
         
         // in here we init the encoder reader
         p->thelocalencoderreader = (void*)eo_appEncReader_New(&encoder_reader_cfg);
@@ -999,24 +978,20 @@ extern eOresult_t s_eo_mcserv_do_mc4plus(EOmcService *p)
     hal_encoder_errors_flags fl = {0};
     EOappEncReader *app_enc_reader = p->thelocalencoderreader;
     
-    #warning maybe we could add a timeout here, instead of trying to read tot times...the behaviour coded below it's the one used for ems control loop       
-    uint8_t spi_stream0 = 0, spi_stream1 = 0;
+    // wait for the encoders for some time
     for(uint8_t i=0; i<30; ++i)
     {
         if (eo_appEncReader_isReady(app_enc_reader))
         {
             break;
         }
-        // it means that the SPI encoders are not ready yet...
         else
         {
-            if (!eo_appEncReader_isReadySPI_stream0(app_enc_reader)) ++spi_stream0;
-            if (!eo_appEncReader_isReadySPI_stream1(app_enc_reader)) ++spi_stream1;
-            hal_sys_delay(5);
+            hal_sys_delay(5*hal_RELTIME_1microsec);
         }
     }
     
-    // 2. read encoders and put result into p->valuesencoder[] and p->valuesencoder_extra[]  and fill an errormask
+    // read the encoders
     if (eo_appEncReader_isReady(app_enc_reader))
     {
         for(jm=0; jm<p->config.jomosnumber; jm++)
@@ -1025,8 +1000,8 @@ extern eOresult_t s_eo_mcserv_do_mc4plus(EOmcService *p)
             // at least one of the two encoder is local 
             if (LOCAL_ENCODER(p->config.jomos[jm].encoder.etype) || LOCAL_ENCODER(p->config.jomos[jm].extra_encoder.etype))
             {
-                res = eo_appEncReader_GetJointValue (app_enc_reader,
-                                                     (eo_appEncReader_joint_position_t)p->config.jomos[jm].encoder.enc_joint,
+                res = eo_appEncReader_GetValue (app_enc_reader,
+                                                     p->config.jomos[jm].encoder.enc_joint,
                                                      &p->valuesencoder[jm],
                                                      &p->valuesencoder_extra[jm],
                                                      &fl);

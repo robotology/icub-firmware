@@ -51,6 +51,9 @@
 
 typedef struct EOtheEncoderReader2_hid EOtheEncoderReader2;
 
+enum { eo_encoderreader2_maxnumberof_jomos = 4 };
+
+enum { eo_encoderreader2_maxnumberof_encoders = hal_encoders_number }; // hal_encoders_number is 6.
 
 
 //typedef eOresult_t (*eOencoderreader_onendofoperation_fun_t) (EOtheEncoderReader2* p, eObool_t operationisok);
@@ -68,7 +71,6 @@ extern EOtheEncoderReader2* eo_encoderreader2_Initialise(void);
 extern EOtheEncoderReader2* eo_encoderreader2_GetHandle(void);
 
 
-
 // it verifies if the service as defined in te configuration is possible (is there a good strain board or not?), it executes a callback
 // (which may send a confirmation to the entity which asked fot verification), and then it may activate the strain service by calling  eo_encoderreader2_Activate().
 extern eOresult_t eo_encoderreader2_Verify(EOtheEncoderReader2 *p, const eOmn_serv_arrayof_4jomodescriptors_t * jomodes, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify);
@@ -83,7 +85,7 @@ extern eOresult_t eo_encoderreader2_StartReading(EOtheEncoderReader2 *p);
 
 extern eObool_t eo_encoderreader2_IsReadingAvailable(EOtheEncoderReader2 *p);
 
-extern eOresult_t eo_encoderreader2_Read(EOtheEncoderReader2 *p, uint8_t position, uint32_t *primary, uint32_t *secondary, hal_encoder_errors_flags *errors);
+extern eOresult_t eo_encoderreader2_Read(EOtheEncoderReader2 *p, uint8_t jomo, hal_encoder_position_t *primary, hal_encoder_position_t *secondary, hal_encoder_errors_flags *errors);
 
 
 
