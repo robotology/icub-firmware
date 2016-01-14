@@ -106,10 +106,14 @@ extern eOresult_t eo_mc4boards_Convert_encoderfactor_Set(EOtheMC4boards *p, uint
 extern eOresult_t eo_mc4boards_Convert_encoderoffset_Set(EOtheMC4boards *p, uint8_t joint, eOmc4boards_conv_encoder_offset_t offset);
 
 
-extern void eo_mc4boards_Convert_maxPos_Set(EOtheMC4boards *p, uint8_t joint, icubCanProto_position_t max);
-extern void eo_mc4boards_Convert_minPos_Set(EOtheMC4boards *p, uint8_t joint, icubCanProto_position_t min);
-extern icubCanProto_position_t eo_mc4boards_Convert_maxPos_Get(EOtheMC4boards *p, uint8_t joint);
-extern icubCanProto_position_t eo_mc4boards_Convert_minPos_Get(EOtheMC4boards *p, uint8_t joint);
+extern void eo_mc4boards_Convert_maxJointPos_Set(EOtheMC4boards *p, uint8_t joint, icubCanProto_position_t max);
+extern void eo_mc4boards_Convert_minJointPos_Set(EOtheMC4boards *p, uint8_t joint, icubCanProto_position_t min);
+extern icubCanProto_position_t eo_mc4boards_Convert_maxJointPos_Get(EOtheMC4boards *p, uint8_t joint);
+extern icubCanProto_position_t eo_mc4boards_Convert_minJointPos_Get(EOtheMC4boards *p, uint8_t joint);
+extern void eo_mc4boards_Convert_maxMotorPos_Set(EOtheMC4boards *p, uint8_t joint, icubCanProto_position_t max);
+extern void eo_mc4boards_Convert_minMotorPos_Set(EOtheMC4boards *p, uint8_t joint, icubCanProto_position_t min);
+extern icubCanProto_position_t eo_mc4boards_Convert_maxMotorPos_Get(EOtheMC4boards *p, uint8_t joint);
+extern icubCanProto_position_t eo_mc4boards_Convert_minMotorPos_Get(EOtheMC4boards *p, uint8_t joint);
 
 extern eOmeas_position_t eo_mc4boards_Convert_Position_fromCAN(EOtheMC4boards *p, uint8_t joint, icubCanProto_position_t pos);
 extern icubCanProto_position_t eo_mc4boards_Convert_Position_toCAN(EOtheMC4boards *p, uint8_t joint, eOmeas_position_t pos);

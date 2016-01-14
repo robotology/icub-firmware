@@ -42,8 +42,10 @@ typedef struct
 {
     eOmc4boards_conv_encoder_factor_t   factor;
     eOmc4boards_conv_encoder_offset_t   offset;
-    icubCanProto_position_t max_mc4_pos;
-    icubCanProto_position_t min_mc4_pos;
+    icubCanProto_position_t max_mc4_joint_pos;
+    icubCanProto_position_t min_mc4_joint_pos;
+    icubCanProto_position_t max_mc4_motor_pos;
+    icubCanProto_position_t min_mc4_motor_pos;
 } eOmc4boards_conv_encoder_t;
 
 struct EOtheMC4boards_hid

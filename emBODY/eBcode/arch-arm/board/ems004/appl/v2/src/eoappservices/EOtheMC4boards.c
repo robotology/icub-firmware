@@ -270,24 +270,44 @@ extern eOresult_t eo_mc4boards_BroadcastStop(EOtheMC4boards *p)
     return(eores_OK);       
 }
 
-extern void eo_mc4boards_Convert_maxPos_Set(EOtheMC4boards *p, uint8_t joint, icubCanProto_position_t max)
+extern void eo_mc4boards_Convert_maxJointPos_Set(EOtheMC4boards *p, uint8_t joint, icubCanProto_position_t max)
 {
-    p->convencoder[joint].max_mc4_pos = max;
+    p->convencoder[joint].max_mc4_joint_pos = max;
 }
 
-extern void eo_mc4boards_Convert_minPos_Set(EOtheMC4boards *p, uint8_t joint, icubCanProto_position_t min)
+extern void eo_mc4boards_Convert_minJointPos_Set(EOtheMC4boards *p, uint8_t joint, icubCanProto_position_t min)
 {
-    p->convencoder[joint].min_mc4_pos = min;
+    p->convencoder[joint].min_mc4_joint_pos = min;
 }
 
-extern icubCanProto_position_t eo_mc4boards_Convert_maxPos_Get(EOtheMC4boards *p, uint8_t joint)
+extern icubCanProto_position_t eo_mc4boards_Convert_maxJointPos_Get(EOtheMC4boards *p, uint8_t joint)
 {
-    return p->convencoder[joint].max_mc4_pos;
+    return p->convencoder[joint].max_mc4_joint_pos;
 }
 
-extern icubCanProto_position_t eo_mc4boards_Convert_minPos_Get(EOtheMC4boards *p, uint8_t joint)
+extern icubCanProto_position_t eo_mc4boards_Convert_minJointPos_Get(EOtheMC4boards *p, uint8_t joint)
 {
-    return p->convencoder[joint].min_mc4_pos;
+    return p->convencoder[joint].min_mc4_joint_pos;
+}
+
+extern void eo_mc4boards_Convert_maxMotorPos_Set(EOtheMC4boards *p, uint8_t joint, icubCanProto_position_t max)
+{
+    p->convencoder[joint].max_mc4_motor_pos = max;
+}
+
+extern void eo_mc4boards_Convert_minMotorPos_Set(EOtheMC4boards *p, uint8_t joint, icubCanProto_position_t min)
+{
+    p->convencoder[joint].min_mc4_motor_pos = min;
+}
+
+extern icubCanProto_position_t eo_mc4boards_Convert_maxMotorPos_Get(EOtheMC4boards *p, uint8_t joint)
+{
+    return p->convencoder[joint].max_mc4_motor_pos;
+}
+
+extern icubCanProto_position_t eo_mc4boards_Convert_minMotorPos_Get(EOtheMC4boards *p, uint8_t joint)
+{
+    return p->convencoder[joint].min_mc4_motor_pos;
 }
 
 extern eOresult_t eo_mc4boards_Config(EOtheMC4boards *p)
