@@ -1018,7 +1018,6 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
                 float computed_zero=0;
                 float computed_encoder=0;
               
-                iCubCanProtCalibrator.type = icubCanProto_calibration_type4_abs_and_incremental; //(type 4) calibrator remapping
                 iCubCanProtCalibrator.params.type4.position = calibrator->params.type6.position;
                 iCubCanProtCalibrator.params.type4.velocity = calibrator->params.type6.velocity;
                 
@@ -1071,7 +1070,6 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
                 float computed_zero=0;
                 float computed_encoder=0;
               
-                iCubCanProtCalibrator.type = icubCanProto_calibration_type4_abs_and_incremental; //(type 4) calibrator remapping
                 iCubCanProtCalibrator.params.type3.position = calibrator->params.type7.position;
                 iCubCanProtCalibrator.params.type3.velocity = calibrator->params.type7.velocity;
                 iCubCanProtCalibrator.params.type3.offset = 0; //fixed to zero
@@ -1380,6 +1378,7 @@ extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescripto
     }
     else if(eo_motcon_mode_mc4 == mcmode)
     {
+        //char info [50];
         EOtheMC4boards *mc4boards = eo_mc4boards_GetHandle();
       
         eo_mc4boards_Convert_minJointPos_Set(mc4boards, mxx, cfg_ptr->limitsofrotor.min);
@@ -1396,6 +1395,19 @@ extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescripto
         command.type  = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT;
         command.value = &cfg_ptr->maxcurrentofmotor;
         eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32); 
+      
+        // set max motor encoder limit
+        command.type  = ICUBCANPROTO_POL_MC_CMD__SET_MAX_MOTOR_POS;
+        command.value = &cfg_ptr->limitsofrotor.max;
+        eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);
+        
+        // set min motor encoder limit
+        command.type  = ICUBCANPROTO_POL_MC_CMD__SET_MIN_MOTOR_POS;
+        command.value = &cfg_ptr->limitsofrotor.min;
+        eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32); 
+        
+        //sprintf(info,"motomax %d motomin %d",cfg_ptr->limitsofrotor.max,cfg_ptr->limitsofrotor.min);
+        //send_diagnostic_debugmessage(eo_errortype_debug, eoerror_value_DEB_tag01, mxx, 0, 0, info);
     }
 
 }

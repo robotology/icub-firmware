@@ -167,12 +167,12 @@ const eOcanprot_functions_t s_eo_canprot_functions_pollingMotorControl[] =
         .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_SPEED_ESTIM_SHIFT,
         .parser     = NULL
     },  
-    {   // 015
-        .former     = NULL,
+    {   // 015      ICUBCANPROTO_POL_MC_CMD__SET_MAX_MOTOR_POS
+        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_MOTOR_POS,
         .parser     = NULL
     },     
-    {   // 016
-        .former     = NULL,
+    {   // 016      ICUBCANPROTO_POL_MC_CMD__SET_MIN_MOTOR_POS
+        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_MIN_MOTOR_POS,
         .parser     = NULL
     },  
     {   // 017

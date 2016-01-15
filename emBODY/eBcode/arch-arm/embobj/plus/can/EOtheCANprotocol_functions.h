@@ -195,6 +195,12 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_POSITION(eOcanpr
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__GET_MAX_POSITION(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame);
 extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_MAX_POSITION(eOcanframe_t *frame, eOcanport_t port);
 
+extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_MOTOR_POS(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame);
+// no parser
+
+extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_MIN_MOTOR_POS(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame);
+// no parser
+
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_VELOCITY(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame);
 // no parser
 

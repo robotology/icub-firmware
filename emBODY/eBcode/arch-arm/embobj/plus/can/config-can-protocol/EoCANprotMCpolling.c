@@ -376,6 +376,23 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__GET_MAX_POSITION(eOcanpr
     return(eores_OK);  
 }
 
+extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_MOTOR_POS(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
+{
+    s_former_POL_MC_prepare_frame(descriptor, frame, 5, ICUBCANPROTO_POL_MC_CMD__SET_MAX_MOTOR_POS);    
+    // now i prepare data[1] -> data[4]   
+    *((icubCanProto_position_t*)(&frame->data[1])) = *((icubCanProto_position_t*)descriptor->cmd.value);
+    return(eores_OK);
+}
+
+extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_MIN_MOTOR_POS(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
+{
+    s_former_POL_MC_prepare_frame(descriptor, frame, 5, ICUBCANPROTO_POL_MC_CMD__SET_MIN_MOTOR_POS);    
+    // now i prepare data[1] -> data[4]   
+    *((icubCanProto_position_t*)(&frame->data[1])) = *((icubCanProto_position_t*)descriptor->cmd.value);
+    return(eores_OK);
+}
+
+
 extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_MAX_POSITION(eOcanframe_t *frame, eOcanport_t port)
 {  
     return(s_parser_POL_MC_CMD_getposition(frame, port, ICUBCANPROTO_POL_MC_CMD__GET_MAX_POSITION));    

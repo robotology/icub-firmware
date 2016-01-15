@@ -412,30 +412,23 @@
 }
 
 //-------------------------------------------------------------------
-#define CAN_SET_MOTORPOS_LIMITS_HANDLER(x) \
+#define CAN_SET_MAX_MOTOR_POS_HANDLER(x) \
 { \
-	if (CAN_LEN == 8) \
+	if (CAN_LEN == 5) \
 	{ \
-		_min_position_enc [axis] = BYTE_C(CAN_DATA[1], CAN_DATA[2], CAN_DATA[3], CAN_DATA[4]); \
-		_max_position_enc [axis] = BYTE_C(CAN_DATA[5], CAN_DATA[6], CAN_DATA[7], CAN_DATA[8]); \
+		_max_position_enc [axis] = BYTE_C(CAN_DATA[1], CAN_DATA[2], CAN_DATA[3], CAN_DATA[4]); \
 	} \
 }
 
 //-------------------------------------------------------------------
-#define CAN_GET_MOTORPOS_LIMITS_HANDLER(x) \
+#define CAN_SET_MIN_MOTOR_POS_HANDLER(x) \
 { \
-	PREPARE_HEADER; \
-		CAN_LEN = 8; \
-		CAN_DATA[1] = BYTE_4(_min_position_enc[axis]); \
-		CAN_DATA[2] = BYTE_3(_min_position_enc[axis]); \
-		CAN_DATA[3] = BYTE_2(_min_position_enc[axis]); \
-		CAN_DATA[4] = BYTE_1(_min_position_enc[axis]); \
-		CAN_DATA[5] = BYTE_4(_max_position_enc[axis]); \
-		CAN_DATA[6] = BYTE_3(_max_position_enc[axis]); \
-		CAN_DATA[7] = BYTE_2(_max_position_enc[axis]); \
-		CAN_DATA[8] = BYTE_1(_max_position_enc[axis]); \
-		CAN1_send ( CAN_ID, CAN_FRAME_TYPE, CAN_LEN, CAN_DATA); \
+	if (CAN_LEN == 5) \
+	{ \
+		_min_position_enc [axis] = BYTE_C(CAN_DATA[1], CAN_DATA[2], CAN_DATA[3], CAN_DATA[4]); \
+	} \
 }
+
 //-------------------------------------------------------------------
 #define CAN_SET_OFFSET_ABS_ENCODER_HANDLER(x) \
 { \
