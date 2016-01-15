@@ -21,7 +21,6 @@
 #	error "No valid version specified"
 #endif
 
-Int16 _max_position_enc_tmp[JN]      = INIT_ARRAY (0);
 Int32 _position_of_some_time_ago[JN] = INIT_ARRAY (0);
 
 //helper functions
@@ -31,6 +30,7 @@ void helper_calib_hall_digital(byte channel, Int16 param1,Int16 param2, Int16 pa
 void helper_calib_abs_and_incremental(byte channel, Int16 param1,Int16 param2, Int16 param3);
 void helper_calib_abs_digital_coupled (byte channel, Int16 param1,Int16 param2, Int16 param3);
 void helper_calib_eyes(byte channel, Int16 param1,Int16 param2, Int16 param3);
+void helper_calib_mais(byte channel, Int16 param1,Int16 param2, Int16 param3);
 
 /************************************************************ 
  * this function checks if the calibration is terminated
@@ -82,38 +82,13 @@ void check_in_position_calib(byte jnt)
 #if ((VERSION == 0x0128) || (VERSION == 0x0228))
 		if (jnt!=0)
 		{
-			_max_position_enc[jnt] = _max_position_enc_tmp[jnt];					
-			_min_position_enc[1]=-1800; //Thumb proximal right and left
-			
-			if (_max_position_enc[2]>0)
-				_min_position_enc[2]=-3000; //Thumb distal
-   			 else 
-   			 	_min_position_enc[2]=3000; //Thumb distal
-  
-			_min_position_enc[3]=-300; //Index proximal  right and left
-			
 			_calibrated[jnt] = true;
 			return;
 		}		
 
 #elif ((VERSION == 0x0130) || (VERSION == 0x0230))
-		{
-			_max_position_enc[jnt] = _max_position_enc_tmp[jnt];
-		
-			if (_max_position_enc[0]>0)
-				_min_position_enc[0]=-3000; //Index distal
-			else
-				_min_position_enc[0]=3000; //Index distal
-				
-			_min_position_enc[1]=-300; //Middle proximal right and left
-			
-			if (_max_position_enc[2]>0)
-				_min_position_enc[2]=-3000; //Middle distal
-			else
-				_min_position_enc[2]=3000; //Middle distal	
-			
-			_min_position_enc[3]=0; //little fingers  right and left
-				
+		if (1)
+		{	
 			_calibrated[jnt] = true;
 			return;
 		}						
@@ -273,7 +248,57 @@ void helper_calib_abs_and_incremental(byte channel, Int16 param1,Int16 param2, I
 	    switch_interaction_mode(channel,icubCanProto_interactionmode_stiff);
 	    
 	    _set_point[channel] = param1;
-		_max_position_enc_tmp[channel] = param3;
+
+		init_trajectory(channel, _position[channel], _set_point[channel], param2);
+	}
+	if (param2==0)
+	{
+		put_motor_in_fault(channel);
+		can_printf ("invalid calib p2");
+	}
+	
+#if ((VERSION == 0x0128) || (VERSION == 0x0228))
+	if (channel!=0)
+	{	
+		_max_position_enc[channel] = param3;
+		_min_position_enc[1]=-1800; //Thumb proximal right and left
+		
+		if (_max_position_enc[2]>0)
+			_min_position_enc[2]=-3000; //Thumb distal
+		 else 
+	 		_min_position_enc[2]=3000; //Thumb distal
+
+		_min_position_enc[3]=-300; //Index proximal  right and left
+	}
+#elif ((VERSION == 0x0130) || (VERSION == 0x0230))
+	{
+		_max_position_enc[channel] = param3;
+	
+		if (_max_position_enc[0]>0)
+			_min_position_enc[0]=-3000; //Index distal
+		else
+			_min_position_enc[0]=3000; //Index distal
+			
+		_min_position_enc[1]=-300; //Middle proximal right and left
+		
+		if (_max_position_enc[2]>0)
+			_min_position_enc[2]=-3000; //Middle distal
+		else
+			_min_position_enc[2]=3000; //Middle distal
+		
+		_min_position_enc[3]=0; //little fingers  right and left
+	}
+#endif	
+}
+
+void helper_calib_mais(byte channel, Int16 param1,Int16 param2, Int16 param3)
+{
+	if (param2>0)
+	{
+		enable_motor_pwm(channel, MODE_CALIB_ABS_AND_INCREMENTAL);
+	    switch_interaction_mode(channel,icubCanProto_interactionmode_stiff);
+	    
+	    _set_point[channel] = param1;
 
 		init_trajectory(channel, _position[channel], _set_point[channel], param2);
 	}
@@ -454,9 +479,11 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 
    //FINGER J8
 	if ((type==CALIB_ABS_DIGITAL) && (channel==0) ) helper_calib_hall_digital (channel, param1, param2, param3); 
-
+	if ((type==CALIB_HALL_ADC)    && (channel==0) ) helper_calib_hall_digital (channel, param1, param2, param3); 
+	
     //FINGER J9 J10 J11
-	if ((type==CALIB_ABS_AND_INCREMENTAL) &&  (channel!=0)) helper_calib_abs_and_incremental (channel, param1, param2,param3);	
+	if ((type==CALIB_ABS_AND_INCREMENTAL) &&  (channel!=0)) helper_calib_abs_and_incremental (channel, param1, param2,param3);
+	if ((type==CALIB_MAIS)                &&  (channel!=0)) helper_calib_mais                (channel, param1, param2,param3);		
 	
 //-------------------------------	 	  
 //  1.30 2.30   4DC  	 
@@ -466,6 +493,7 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 
     //FINGER J12 J13 J14 J15
 	if ((type==CALIB_ABS_AND_INCREMENTAL) ) helper_calib_abs_and_incremental (channel, param1, param2,param3);	
+    if ((type==CALIB_MAIS) )                helper_calib_mais                (channel, param1, param2,param3);	
 
 //-------------------------------	 	  
 // 3.51     2BLLIE  

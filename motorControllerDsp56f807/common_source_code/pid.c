@@ -187,11 +187,9 @@ Int16   _cpl_pid_counter = 0;					// counter to check when last _cpl_pid_ was re
 Int32  _adjustment[JN]=INIT_ARRAY (0);          // the sum of the three value coming from the MAIS board
 #endif
 
-#if ((VERSION == 0x0128) || (VERSION == 0x0130) || (VERSION == 0x0228) || (VERSION == 0x0230))
-// max allowed position for encoder while controlling with absolute position sensors
-Int16 _max_position_enc[JN] = INIT_ARRAY (0);
-Int16 _min_position_enc[JN] = INIT_ARRAY (0);
-#endif
+// max allowed position for encoder while controlling with absolute position sensors (used in versions 0x0128, 0x0130, 0x0228, 0x0230)
+Int32 _max_position_enc[JN] = INIT_ARRAY (0);
+Int32 _min_position_enc[JN] = INIT_ARRAY (0);
 
 
 /*
