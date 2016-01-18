@@ -70,6 +70,8 @@ extern eOresult_t eo_currents_watchdog_SetI2TThreshold(EOCurrentsWatchdog* p, ui
 
 void eo_currents_watchdog_Tick(EOCurrentsWatchdog* p);
 
+extern eOresult_t eo_currents_watchdog_UpdateCurrentLimits(EOCurrentsWatchdog* p, uint8_t motor);
+
 
 /** @}            
     end of group eo_EOCurrentsWatchdog
