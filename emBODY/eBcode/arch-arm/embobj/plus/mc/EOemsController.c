@@ -110,6 +110,7 @@ static void s_eo_emsController_InitTrajectoryVersionVergence(uint8_t j);
 static float s_eo_emsController_PWM_SafeCalibration(float base_pwm, int32_t mean_distance, int32_t jdistance );
 static eObool_t s_eo_emsController_AreMechanicalConstraintsRespected(void);
 static void s_eo_emsController_AdjustPWM(float *pwm);
+static uint16_t s_eo_emsController_GetLocalActuationLimit(void);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -125,6 +126,8 @@ static EOemsController *ems = NULL;
 
 extern EOemsController* eo_emsController_Init(eOemscontroller_board_t board, eOemscontroller_actuation_t act, uint8_t nax) 
 {
+    uint8_t i;
+    
     if (board == emscontroller_board_NO_CONTROL) return NULL;
 
     if (nax == 0) return NULL;
@@ -139,7 +142,9 @@ extern EOemsController* eo_emsController_Init(eOemscontroller_board_t board, eOe
     
     ems->board = board;
     ems->act = act;
-    ems->actuation_limit = eo_emsController_GetActuationLimit(); 
+    for(i=0; i<nax; i++)
+        ems->actuation_limit[i] = s_eo_emsController_GetLocalActuationLimit(); 
+    
     ems->naxles = nax;
     ems->n_calibrated = 0;
         
@@ -752,7 +757,7 @@ extern void eo_emsController_PWM(int16_t* pwm_motor_16)
     #endif
 
     //hardware limit
-    MOTORS(m) LIMIT(pwm_motor[m], ems->actuation_limit);
+    MOTORS(m) LIMIT(pwm_motor[m], ems->actuation_limit[m]);
     
     //save the pwm data after the decoupling   
     //the output should be between -PWM_OUTPUT_LIMIT and +PWM_OUTPUT_LIMIT, indipendently from the hardware
@@ -774,29 +779,64 @@ extern void eo_emsController_PWM(int16_t* pwm_motor_16)
 //////////////////////////////////////////////////////////////////////////////////////////
 
 
-extern void eo_emsController_SetOutput(uint8_t joint, int16_t out)
+extern eObool_t eo_emsController_SetOutput(uint8_t joint, int16_t out)
 {
-    if (ems) eo_axisController_SetOutput(ems->axis_controller[joint], out);    
+    if (ems)
+    {
+            return (eo_axisController_SetOutput(ems->axis_controller[joint], out));
+    }
+    else
+    {
+        return eobool_false;
+    }
 }
 
-extern void eo_emsController_SetPosRef(uint8_t joint, int32_t pos, int32_t avg_vel)
+extern eObool_t eo_emsController_SetPosRef(uint8_t joint, int32_t pos, int32_t avg_vel)
 {
-    if (ems) eo_axisController_SetPosRef(ems->axis_controller[joint], pos, avg_vel);       
+    if (ems)
+    {
+            return (eo_axisController_SetPosRef(ems->axis_controller[joint], pos, avg_vel));
+    }
+    else
+    {
+        return eobool_false;
+    }
 }
 
-extern void eo_emsController_SetPosRaw(uint8_t joint, int32_t pos)
+extern eObool_t eo_emsController_SetPosRaw(uint8_t joint, int32_t pos)
 {
-    if (ems) eo_axisController_SetPosRaw(ems->axis_controller[joint], pos);       
+   if (ems)
+    {
+            return (eo_axisController_SetPosRaw(ems->axis_controller[joint], pos));       
+    }
+    else
+    {
+        return eobool_false;
+    }
 }
 
-extern void eo_emsController_SetVelRef(uint8_t joint, int32_t vel, int32_t avg_acc)
+extern eObool_t eo_emsController_SetVelRef(uint8_t joint, int32_t vel, int32_t avg_acc)
 {
-    if (ems) eo_axisController_SetVelRef(ems->axis_controller[joint], vel, avg_acc);
+    if (ems)
+    {
+            return (eo_axisController_SetVelRef(ems->axis_controller[joint], vel, avg_acc));
+    }
+    else
+    {
+        return eobool_false;
+    }
 }
 
-extern void eo_emsController_SetTrqRef(uint8_t joint, int32_t trq)
+extern eObool_t eo_emsController_SetTrqRef(uint8_t joint, int32_t trq)
 {
-    if (ems) eo_axisController_SetTrqRef(ems->axis_controller[joint], trq);
+    if (ems)
+    {
+            return (eo_axisController_SetTrqRef(ems->axis_controller[joint], trq));
+    }
+    else
+    {
+        return eobool_false;
+    }
 }
 
 extern void eo_emsController_GetDecoupledMeasuredTorque(uint8_t joint_id, int32_t * torque_motor)
@@ -1600,6 +1640,14 @@ extern void eo_emsController_GetPWMOutput(uint8_t joint, int32_t* pwm)
     }
 }
 
+extern void eo_emsController_GetPWMOutput_int16(uint8_t joint, int16_t* pwm)
+{
+    if (ems && ems->axis_controller[joint])
+    {
+        *pwm = (int16_t)ems->axis_controller[joint]->controller_output;
+    }
+}
+
 extern void eo_emsController_GetActivePidStatus(uint8_t joint, eOmc_joint_status_ofpid_t* pidStatus)
 {
     if (ems && ems->axis_controller[joint])
@@ -1626,9 +1674,9 @@ extern void eo_emsController_GetJointStatus(uint8_t joint, eOmc_joint_status_t* 
     }
     else
     {
-        memset(&jointStatus->basic, 0, sizeof(eOmc_joint_status_basic_t)); 
-        jointStatus->modes.controlmodestatus    = eomc_controlmode_idle;  // use eOmc_controlmode_t. it is a readonly shadow copy of jconfig.controlmode used to remind the host of the current controlmode
-        jointStatus->modes.ismotiondone         = eobool_false;  
+        memset(&jointStatus->core, 0, sizeof(eOmc_joint_status_core_t)); 
+        jointStatus->core.modes.controlmodestatus    = eomc_controlmode_idle;  // use eOmc_controlmode_t. it is a readonly shadow copy of jconfig.controlmode used to remind the host of the current controlmode
+        jointStatus->core.modes.ismotiondone         = eobool_false;  
     }
 }
 
@@ -1770,7 +1818,7 @@ extern void eo_emsController_SetMotorConfig(uint8_t joint, eOmc_motor_config_t m
       ems->motor_config_gearbox_ratio[joint]=motorconfig.gearboxratio;
       //placeholder filler01
       ems->motor_config_maxvelocityofmotor[joint]=motorconfig.maxvelocityofmotor;
-      ems->motor_config_maxcurrentofmotor[joint]=motorconfig.maxcurrentofmotor;
+      ems->motor_config_maxcurrentofmotor[joint]=motorconfig.currentLimits.overloadCurrent;
       ems->motor_config_rotorIndexOffset[joint]=motorconfig.rotorIndexOffset;
       ems->motor_config_motorPoles[joint]=motorconfig.motorPoles;
       ems->motor_config_hasHallSensor[joint]=motorconfig.hasHallSensor;
@@ -1782,20 +1830,22 @@ extern void eo_emsController_SetMotorConfig(uint8_t joint, eOmc_motor_config_t m
     }
 }
 
-extern uint16_t eo_emsController_GetActuationLimit(void)
+extern void eo_emsController_SetActuationLimit(uint8_t mId, uint16_t actuation_limit)
+{
+    if (!ems) return;
+    
+    if(actuation_limit > s_eo_emsController_GetLocalActuationLimit())
+        return;
+    ems->actuation_limit[mId] = actuation_limit;
+
+}
+
+
+extern uint16_t eo_emsController_GetActuationLimit(uint8_t mId)
 {
     if (!ems) return 0;
     
-    //2FOC is internally limited
-    if (ems->act == emscontroller_actuation_2FOC)
-        //return PWM_OUTPUT_LIMIT;
-        return PWM_OUTPUT_LIMIT_2FOC;
-        //return 32000; //input limit of the the CAN command containing the PWM applied to motors
-    //MC4plus, hw-limited to 3360
-    else if (ems->act == emscontroller_actuation_LOCAL)
-        return 3360;
-    
-    return 0;
+    return ems->actuation_limit[mId];
 }
 extern void eo_emsMotorController_GoIdle(void)
 {
@@ -1861,6 +1911,23 @@ void set_2FOC_running(uint8_t motor)
     eo_emsController_hid_userdef_set_motor_running(ems, motor);
     
 }
+
+static uint16_t s_eo_emsController_GetLocalActuationLimit(void)
+{
+    if (!ems) return 0;
+    
+    //2FOC is internally limited
+    if (ems->act == emscontroller_actuation_2FOC)
+        //return PWM_OUTPUT_LIMIT;
+        return PWM_OUTPUT_LIMIT_2FOC;
+        //return 32000; //input limit of the the CAN command containing the PWM applied to motors
+    //MC4plus, hw-limited to 3360
+    else if (ems->act == emscontroller_actuation_LOCAL)
+        return 3360;
+    
+    return 0;
+}
+
 
 //#define MOTOR_QENCODER_FAULT     0x00100000
 
