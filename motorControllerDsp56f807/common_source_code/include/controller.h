@@ -68,7 +68,7 @@
 #define CALIB_ABS_DIGITAL           icubCanProto_calibration_type3_abs_sens_digital
 #define CALIB_ABS_AND_INCREMENTAL   icubCanProto_calibration_type4_abs_and_incremental
 #define CALIB_MAIS                  icubCanProto_calibration_type6_mais
-#define CALIB_HALL_ADC              icubCanProto_calibration_type4_abs_and_incremental
+#define CALIB_HALL_ADC              icubCanProto_calibration_type7_hall_sensor
 
 #define DEFAULT_VELOCITY 10
 #define DEFAULT_ACCELERATION 10
