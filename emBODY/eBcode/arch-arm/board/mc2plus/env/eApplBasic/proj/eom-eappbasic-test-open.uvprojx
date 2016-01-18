@@ -7,14 +7,15 @@
 
   <Targets>
     <Target>
-      <TargetName>mc4plus</TargetName>
+      <TargetName>mc2plus</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
+      <pCCUsed>5060061::V5.06 update 1 (build 61)::ARMCC</pCCUsed>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32F407IG</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F4xx_DFP.2.4.0</PackID>
+          <PackID>Keil.STM32F4xx_DFP.2.6.0</PackID>
           <PackURL>http://www.keil.com/pack</PackURL>
           <Cpu>IRAM(0x20000000-0x2001FFFF) IRAM2(0x10000000-0x1000FFFF) IROM(0x8000000-0x80FFFFF) CLOCK(25000000) CPUTYPE("Cortex-M4") FPU2</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -47,7 +48,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\Obj\</OutputDirectory>
-          <OutputName>eApplBasic_mc4plus</OutputName>
+          <OutputName>eApplBasic_mc2plus</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>1</CreateHexFile>
@@ -80,7 +81,7 @@
           <AfterMake>
             <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name>cmd.exe /C copy .\Obj\eApplBasic_mc4plus.hex ..\bin\eApplBasic_mc4plus.hex</UserProg1Name>
+            <UserProg1Name>cmd.exe /C copy .\Obj\eApplBasic_mc2plus.hex ..\bin\eApplBasic_mc2plus.hex</UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
@@ -229,6 +230,7 @@
             <useUlib>0</useUlib>
             <EndSel>0</EndSel>
             <uLtcg>0</uLtcg>
+            <nSecure>0</nSecure>
             <RoSelD>3</RoSelD>
             <RwSelD>5</RwSelD>
             <CodeSel>0</CodeSel>
@@ -365,6 +367,8 @@
             <useXO>0</useXO>
             <v6Lang>0</v6Lang>
             <v6LangP>0</v6LangP>
+            <vShortEn>0</vShortEn>
+            <vShortWch>0</vShortWch>
             <VariousControls>
               <MiscControls>-DemBODYrobot_ROBOT_NAME=iCubANY -DemBODYrobot_BOARD_NAME=boardMC4PLUS -DemBODYrobot_BOARD_NUMBER=boardnumberANY</MiscControls>
               <Define>HAL_IS_VERSION_2 DONT_USE_IPADDR_FROM_IPAL_CFG_</Define>
@@ -448,9 +452,9 @@
               <FilePath>..\..\..\..\..\libs\highlevel\abslayer\ipal\lib\ipal.base.medium.cm4.lib</FilePath>
             </File>
             <File>
-              <FileName>hal2.mc4plus.ethdbg.lib</FileName>
+              <FileName>hal2.mc2plus.ethdbg.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\hal2\lib\hal2.mc4plus.ethdbg.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\hal2\lib\hal2.mc2plus.ethdbg.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -772,6 +776,8 @@
                 <useXO>2</useXO>
                 <v6Lang>0</v6Lang>
                 <v6LangP>0</v6LangP>
+                <vShortEn>0</vShortEn>
+                <vShortWch>0</vShortWch>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -809,7 +815,7 @@
       <component Cclass="CMSIS" Cgroup="CORE" Cvendor="ARM" Cversion="3.30.0" condition="CMSIS Core">
         <package name="CMSIS" schemaVersion="1.2" url="http://www.keil.com/pack/" vendor="ARM" version="4.1.0"/>
         <targetInfos>
-          <targetInfo excluded="1" name="mc4plus"/>
+          <targetInfo excluded="1" name="mc2plus"/>
         </targetInfos>
       </component>
     </components>
