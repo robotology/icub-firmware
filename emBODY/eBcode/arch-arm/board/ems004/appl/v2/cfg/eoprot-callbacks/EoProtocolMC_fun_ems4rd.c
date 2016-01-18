@@ -609,7 +609,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
 //    }    
 
 
-    joint->status.modes.ismotiondone = eobool_false;
+    joint->status.core.modes.ismotiondone = eobool_false;
 
     //if(eobool_true == s_motorcontrol_is2foc_based())   
     if(eo_motcon_mode_foc == mcmode)
@@ -1411,7 +1411,7 @@ extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescripto
 
         // set current limit  
         command.type  = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT;
-        command.value = &cfg_ptr->maxcurrentofmotor;
+        command.value = &cfg_ptr->currentLimits.overloadCurrent ;
         eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32); 
       
         // set max motor encoder limit

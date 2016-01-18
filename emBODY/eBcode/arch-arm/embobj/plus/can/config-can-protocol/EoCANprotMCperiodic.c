@@ -151,7 +151,7 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__POSITION(eOcanframe_t *
         }
         
         pos = *((icubCanProto_position_t*)&(frame->data[offset[j]])); 
-        joint->status.basic.jnt_position = eo_mc4boards_Convert_Position_fromCAN(eo_mc4boards_GetHandle(), jointindex, pos);                      
+        joint->status.core.measures.meas_position = eo_mc4boards_Convert_Position_fromCAN(eo_mc4boards_GetHandle(), jointindex, pos);                      
     }
 
     return(eores_OK);        
@@ -180,7 +180,7 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__PID_VAL(eOcanframe_t *f
             #warning CAVEAT: jstatus->ofpid.output is now an int16_t and the can frame should have a int16_t ... however it works like that
             // marco.accame on 02apr15: i ahve seen together with marco.randazzo that the mc4 send uint16, thus in here there is a double error which make things work 
             // see s_eo_icubCanProto_parser_per_mb_cmd__pidVal() in ems4rd-v01.uvproj
-            joint->status.ofpid.legacy.output = *((uint16_t*)&(frame->data[offset[j]]));
+            joint->status.core.ofpid.legacy.output = *((uint16_t*)&(frame->data[offset[j]]));
         #else
         {
             // marco.accame on 02apr15: this is the ways it should be after we have changed the type of jstatus->ofpid.output
@@ -261,7 +261,7 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__STATUS(eOcanframe_t *fr
                 return(eores_OK);    
             }
             
-            joint->status.modes.controlmodestatus = eomc_controlmode;
+            joint->status.core.modes.controlmodestatus = eomc_controlmode;
             
             if(eomc_controlmode_hwFault == eomc_controlmode)
             {        
@@ -340,9 +340,9 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__VELOCITY(eOcanframe_t *
         vel_icubCanProtValue = *((icubCanProto_velocity_t*)&(frame->data[offsetvelocity[j]]));
         acc_icubCanProtValue = *((icubCanProto_acceleration_t*)&(frame->data[offsetacceleration[j]]));
         
-        joint->status.basic.jnt_velocity = eo_mc4boards_Convert_Velocity_fromCAN(eo_mc4boards_GetHandle(), jointindex, vel_icubCanProtValue);
+        joint->status.core.measures.meas_velocity = eo_mc4boards_Convert_Velocity_fromCAN(eo_mc4boards_GetHandle(), jointindex, vel_icubCanProtValue);
     
-        joint->status.basic.jnt_acceleration = eo_mc4boards_Convert_Acceleration_fromCAN(eo_mc4boards_GetHandle(), jointindex, acc_icubCanProtValue);               
+        joint->status.core.measures.meas_acceleration = eo_mc4boards_Convert_Acceleration_fromCAN(eo_mc4boards_GetHandle(), jointindex, acc_icubCanProtValue);               
     }
    
     return(eores_OK);
@@ -374,13 +374,13 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__PID_ERROR(eOcanframe_t 
         pidpos_error = *((uint16_t*)&(frame->data[offsetpos[j]]));
         pidtrq_error = *((uint16_t*)&(frame->data[offsettrq[j]]));
         
-        if(eomc_controlmode_torque == joint->status.modes.controlmodestatus)
+        if(eomc_controlmode_torque == joint->status.core.modes.controlmodestatus)
         {
-            joint->status.ofpid.legacy.error = pidtrq_error;
+            joint->status.core.ofpid.legacy.error = pidtrq_error;
         }
         else
         {
-            joint->status.ofpid.legacy.error = pidpos_error;
+            joint->status.core.ofpid.legacy.error = pidpos_error;
         }            
     }
    
@@ -414,7 +414,7 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__ADDITIONAL_STATUS(eOcan
         {
             return(eores_OK);        
         }
-        joint->status.modes.interactionmodestatus = tmp;        
+        joint->status.core.modes.interactionmodestatus = tmp;        
     }
    
     return(eores_OK);
