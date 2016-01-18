@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2013 iCub Facility - Istituto Italiano di Tecnologia
- * Author:  Valentina Gaggero, Marco Accame
- * email:   valentina.gaggero@iit.it, marco.accame@iit.it
+ * Copyright (C) 2014 iCub Facility - Istituto Italiano di Tecnologia
+ * Author:  Marco Maggiali, Valentina Gaggero, Marco Accame
+ * email:   marco.maggiali@iit.it, valentina.gaggero@iit.it, marco.accame@iit.it
  * website: www.robotcub.org
  * Permission is granted to copy, distribute, and/or modify this program
  * under the terms of the GNU General Public License, version 2 or any
@@ -15,59 +15,77 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
  * Public License for more details
 */
-
+  
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _HAL_BRDCFG_H_
-#define _HAL_BRDCFG_H_
+#ifndef _HAL_BRDCFG_MC2PLUS_H_
+#define _HAL_BRDCFG_MC2PLUS_H_
 
+// - doxy begin -------------------------------------------------------------------------------------------------------
 
-/* @file       hal_brdcfg.h
-    @brief      This header file includes .h dependent on board
-    @author     valentina.gaggero@iit.it, marco.accame@iit.it
-    @date       02/28/2013
+/* @file       hal_brdcfg_mc2plus.h
+    @brief      This header file defines support for board mc2plus
+    @author     marco.accame@iit.it
+    @date       18jan2016
  **/
 
+// - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
+#include "hal_brdcfg_modules.h"
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "hal_base.h"
+//#include "hal_base_hid.h"
 
-#include "hal_brdcfg_modules.h"
+#include "hal_mpu.h"
+#include "hal_mpu_name.h"
+//#include "hal_mpu_arch_armcmx.h"
+//#include "hal_mpu_name_stm32f407ig.h"
+//#include "hal_mpu_hid.h"
+
+//#include "hal_sys.h"
+//#include "hal_sys_hid.h"
+
+//#include "hal_flash_hid.h"
+//#include "hal_heap_hid.h"
+
+//#include "hal_middleware_interface.h"
+
+// -- mpu peripherals
+
+
+
+
+// -- devices
+
+
+
+ 
+
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
-// empty-section
-  
+
+
+
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 // empty-section
 
-
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
-// empty-section
+
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
+// empty-section
 
 
-extern hal_result_t hal_brdcfg__start(void);
-
-// - other declarations which are specific of the chosen board
-
-#if   defined(HAL_BOARD_MCBSTM32F400) 
-    #include "mcbstm32f400/hal_brdcfg_mcbstm32f400.h"
-#elif defined(HAL_BOARD_EMS4RD) 
-    #include "ems4rd/hal_brdcfg_ems4rd.h"        
-#elif defined(HAL_BOARD_MC4PLUS) 
-    #include "mc4plus/hal_brdcfg_mc4plus.h" 
-#elif defined(HAL_BOARD_MC2PLUS) 
-    #include "mc2plus/hal_brdcfg_mc2plus.h"    
-#else     
-	#error "Please select board XXX w/ HAL_BOARD_XXX"
-#endif                      
 
 
-#endif  // include guard
+
+
+#endif  // include-guard
+
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
+
 

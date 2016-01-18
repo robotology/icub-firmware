@@ -34,6 +34,8 @@
 	#include "ems4rd/hal_brdcfg_ems4rd_modules.h"      
 #elif defined(HAL_BOARD_MC4PLUS)
 	#include "mc4plus/hal_brdcfg_mc4plus_modules.h"  
+#elif defined(HAL_BOARD_MC2PLUS)
+	#include "mc2plus/hal_brdcfg_mc2plus_modules.h"  
 #else
 	#error "Please select board XXX w/ HAL_BOARD_XXX"
 #endif                      
