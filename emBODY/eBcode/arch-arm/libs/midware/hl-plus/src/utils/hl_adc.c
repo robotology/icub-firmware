@@ -301,7 +301,7 @@ static hl_result_t s_hl_adc_hw_registers_init(hl_adc_t id)
         ADC_StructInit(init2use);      
         
         // copy the default configuration
-        memcpy(init2use, &hl_adc_advcfg_default, sizeof(DMA_InitTypeDef));
+        memcpy(init2use, &hl_adc_advcfg_default, sizeof(ADC_InitTypeDef));
         
         // and now change it         
         // apply only stream       
