@@ -33,8 +33,15 @@ extern "C" {
 // the definition of the MACRO is used to call some functions which are included only inside MC4plus project (to read ADC or reset the quadrature encoders).
 // In the future something similar to EOmcService will be included in both applications, and so the handling of the return values will be done from that service;
 // anyway the functions will be visible from both application, making useless these ifdef checks.
+
+
 #ifdef USE_MC4PLUS
+#if defined(MC4PLUS_APPL_V2)
+#warning TODO: think of how to ............................................................................................
+//#include "EomcService.h"
+#else
 #include "EomcService.h"
+#endif
 #endif
 
 
