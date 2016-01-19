@@ -177,6 +177,20 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__CALIBRATE_ENCODER(eOcanp
             *((uint16_t*)(&frame->data[6])) = calib->params.type4.maxencoder;        
         } break;
         
+        case icubCanProto_calibration_type6_mais:
+        {
+            *((uint16_t*)(&frame->data[2])) = calib->params.type6.position;
+            *((uint16_t*)(&frame->data[4])) = calib->params.type6.velocity;
+            memset(&frame->data[6], 0, 2); // pad with 0        
+        } break;
+        
+        case icubCanProto_calibration_type7_hall_sensor:
+        {
+            *((uint16_t*)(&frame->data[2])) = calib->params.type7.position;
+            *((uint16_t*)(&frame->data[4])) = calib->params.type7.velocity;
+            memset(&frame->data[6], 0, 2); // pad with 0       
+        } break;
+        
         default:
         {
             //#warning --> TODO error about unknown param ...

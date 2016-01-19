@@ -826,7 +826,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_stoptrajectory(const EOnv* nv, const
 }
 
 
-/*static void send_diagnostic_debugmessage(eOerrmanErrorType_t type, eOerror_value_DEB_t value, uint8_t jointnum, uint16_t par16, uint64_t par64, const char* info)
+static void send_diagnostic_debugmessage(eOerrmanErrorType_t type, eOerror_value_DEB_t value, uint8_t jointnum, uint16_t par16, uint64_t par64, const char* info)
 {
     eOerrmanDescriptor_t errdes = {0};
 
@@ -836,7 +836,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_stoptrajectory(const EOnv* nv, const
     errdes.par16            = par16;
     errdes.par64            = par64;
     eo_errman_Error(eo_errman_GetHandle(), type, info, NULL, &errdes);
-}*/
+}
 
 
 extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eOropdescriptor_t* rd)
@@ -1018,48 +1018,66 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
                 float computed_zero=0;
                 float computed_encoder=0;
               
-                iCubCanProtCalibrator.params.type4.position = calibrator->params.type6.position;
-                iCubCanProtCalibrator.params.type4.velocity = calibrator->params.type6.velocity;
-                
                 //compute the encoder conversion
                 {
-                   //char info [50];
+                   char info [50];
                   
                    icubCanProto_position_t tmp_min_joint_pos = eo_mc4boards_Convert_minJointPos_Get(mc4boards, jxx);
                    icubCanProto_position_t tmp_max_joint_pos = eo_mc4boards_Convert_maxJointPos_Get(mc4boards, jxx);
                    icubCanProto_position_t tmp_min_motor_pos = eo_mc4boards_Convert_minMotorPos_Get(mc4boards, jxx);
                    icubCanProto_position_t tmp_max_motor_pos = eo_mc4boards_Convert_maxMotorPos_Get(mc4boards, jxx);
-                   iCubCanProtCalibrator.params.type4.maxencoder = tmp_max_motor_pos;
+                  
+                   if (calibrator->params.type6.current==1)
+                   {
+                       iCubCanProtCalibrator.params.type6.position= tmp_max_motor_pos;
+                   }
+                   else if (calibrator->params.type6.current==-1)
+                   {
+                       iCubCanProtCalibrator.params.type6.position= tmp_min_motor_pos;
+                   }
+                   else
+                   {
+                       sprintf(info,"error type6.current=%d",calibrator->params.type6.current);
+                       send_diagnostic_debugmessage(eo_errortype_debug, eoerror_value_DEB_tag01, jxx, 0, 0, info);
+                       iCubCanProtCalibrator.params.type6.position=0;
+                   }
+             
+                   sprintf(info,"type6 pos%d curr%d %d %d",iCubCanProtCalibrator.params.type6.position,calibrator->params.type6.current,tmp_max_motor_pos,tmp_min_motor_pos);
+                   send_diagnostic_debugmessage(eo_errortype_debug, eoerror_value_DEB_tag01, jxx, 0, 0, info);
+                   iCubCanProtCalibrator.params.type6.velocity = calibrator->params.type6.velocity;
+                   
                    computed_encoder =  (float)(calibrator->params.type6.vmax - calibrator->params.type6.vmin) / (float)(tmp_max_joint_pos - tmp_min_joint_pos);
                                
                    //sprintf(info,"vmin %d vmax %d enc %f",calibrator->params.type6.vmin, calibrator->params.type6.vmax,computed_encoder);
                    //send_diagnostic_debugmessage(eo_errortype_debug, eoerror_value_DEB_tag01, jxx, 0, 0, info);
+                   //sprintf(info,"calicom %d",iCubCanProtCalibrator.params.type6.velocity);
+                   //send_diagnostic_debugmessage(eo_errortype_debug, eoerror_value_DEB_tag01, jxx, 0, 0, info);
                   
                    computed_zero    =  - (float)(tmp_min_joint_pos) + ((float)(calibrator->params.type6.vmin) / computed_encoder);
 
-                   //sprintf(info,"min %d max %d zero %f",tmp_minpos, tmp_maxpos, computed_zero);
+                   //sprintf(info,"min %d max %d zero %f",tmp_min_motor_pos, tmp_max_motor_pos, computed_zero);
                    //send_diagnostic_debugmessage(eo_errortype_debug, eoerror_value_DEB_tag00, jxx, 0, 0, info);
                   
                    eo_mc4boards_Convert_encoderoffset_Set(mc4boards, jxx, calibrator->params.type6.calibrationZero+computed_zero);
                    eo_mc4boards_Convert_encoderfactor_Set(mc4boards, jxx, computed_encoder);
                   
-                   icubCanProto_position_t minpos_icubCanProtValue = eo_mc4boards_Convert_Position_toCAN(mc4boards, jxx, tmp_min_joint_pos);
-                   icubCanProto_position_t maxpos_icubCanProtValue = eo_mc4boards_Convert_Position_toCAN(mc4boards, jxx, tmp_max_joint_pos);
-                   if(maxpos_icubCanProtValue < minpos_icubCanProtValue)
+                   icubCanProto_position_t min_joint_pos_icubCanProtValue = eo_mc4boards_Convert_Position_toCAN(mc4boards, jxx, tmp_min_joint_pos);
+                   icubCanProto_position_t max_joint_pos_icubCanProtValue = eo_mc4boards_Convert_Position_toCAN(mc4boards, jxx, tmp_max_joint_pos);
+                   if(max_joint_pos_icubCanProtValue < min_joint_pos_icubCanProtValue)
                    {
                        //swap min and max
-                       icubCanProto_position_t pos_icubCanProtValue = minpos_icubCanProtValue;
-                       minpos_icubCanProtValue = maxpos_icubCanProtValue;
-                       maxpos_icubCanProtValue = pos_icubCanProtValue;
+                       icubCanProto_position_t pos_icubCanProtValue = min_joint_pos_icubCanProtValue;
+                       min_joint_pos_icubCanProtValue = max_joint_pos_icubCanProtValue;
+                       max_joint_pos_icubCanProtValue = pos_icubCanProtValue;
                    }
                    eOcanprot_command_t command_limit = {0};
                    command_limit.class = eocanprot_msgclass_pollingMotorControl;
                    command_limit.type  = ICUBCANPROTO_POL_MC_CMD__SET_MIN_POSITION;
-                   command_limit.value = &minpos_icubCanProtValue;
+                   command_limit.value = &min_joint_pos_icubCanProtValue;
                    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command_limit, rd->id32); 
                   
                    command_limit.type  = ICUBCANPROTO_POL_MC_CMD__SET_MAX_POSITION;
-                   command_limit.value = &maxpos_icubCanProtValue;
+                   command_limit.value = &max_joint_pos_icubCanProtValue;
                    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command_limit, rd->id32);
                 }
                 found = eobool_true; 
@@ -1070,9 +1088,9 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
                 float computed_zero=0;
                 float computed_encoder=0;
               
-                iCubCanProtCalibrator.params.type3.position = calibrator->params.type7.position;
-                iCubCanProtCalibrator.params.type3.velocity = calibrator->params.type7.velocity;
-                iCubCanProtCalibrator.params.type3.offset = 0; //fixed to zero
+                iCubCanProtCalibrator.params.type7.position = calibrator->params.type7.position;
+                iCubCanProtCalibrator.params.type7.velocity = calibrator->params.type7.velocity;
+                iCubCanProtCalibrator.params.type7.reserved = 0; //fixed to zero
               
                 //compute the encoder conversion
                 {
@@ -1381,8 +1399,8 @@ extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescripto
         //char info [50];
         EOtheMC4boards *mc4boards = eo_mc4boards_GetHandle();
       
-        eo_mc4boards_Convert_minJointPos_Set(mc4boards, mxx, cfg_ptr->limitsofrotor.min);
-        eo_mc4boards_Convert_maxJointPos_Set(mc4boards, mxx, cfg_ptr->limitsofrotor.max);
+        eo_mc4boards_Convert_minMotorPos_Set(mc4boards, mxx, cfg_ptr->limitsofrotor.min);
+        eo_mc4boards_Convert_maxMotorPos_Set(mc4boards, mxx, cfg_ptr->limitsofrotor.max);
       
     // marco.accame on 8oct2015: removed because it is wrong. message ICUBCANPROTO_POL_MC_CMD__SET_MAX_VELOCITY must be used with max velocity of JOINT !!!    
     //    // set max velocity      
