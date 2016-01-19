@@ -55,15 +55,26 @@ typedef enum
     eo_appEncReader_enc_type_AEA  = 0,  /* AEA encoder (SPI) */ 
     eo_appEncReader_enc_type_AMO  = 1,  /* AMO encoder (SPI) */
     eo_appEncReader_enc_type_INC  = 2,  /* Incremental/Quadrature Encoder */
-    eo_appEncReader_enc_type_ADH  = 3,  /* Analogic Hall Effect Encoder*/
-    //eo_appEncReader_enc_type_MAIS = 4,  /* Encoder position coming from MAIS Can board */ // --> it will be probably managed at another level
+    eo_appEncReader_enc_type_ADH  = 3,  /* Analogic Hall Effect Encoder */
+    eo_appEncReader_enc_type_MAIS = 4,  /* Encoder position coming from MAIS can board. the field port specifies the kind of finger is requested */ 
     eo_appEncReader_enc_type_NONE = 255 /* Encoder NOT DEFINED */
 } eo_appEncReader_encoder_type_t;
 
-enum { eo_appEncReader_enc_type_numberof = 4 };
+enum { eo_appEncReader_enc_type_numberof = 5 };
 
 
-enum { eo_appEncReader_encoder_portMAX = 5, eo_appEncReader_encoder_portNONE = 255 }; // from 0 to MAX
+enum 
+{ 
+    eo_appEncReader_encoder_portFingerTHUMB0        = 0,
+    eo_appEncReader_encoder_portFingerTHUMB1        = 1,
+    eo_appEncReader_encoder_portFingerINDEXprox     = 2, 
+    eo_appEncReader_encoder_portFingerINDEXdist     = 3,
+    eo_appEncReader_encoder_portFingerMEDIUMprox    = 4,
+    eo_appEncReader_encoder_portFingerMEDIUMdist    = 5,
+    eo_appEncReader_encoder_portFingerPINKY         = 6,
+    eo_appEncReader_encoder_portMAX = 8, 
+    eo_appEncReader_encoder_portNONE = 255 
+}; // from 0 to MAX
 
 
 
@@ -110,7 +121,8 @@ typedef enum
 {
     err_onParityError   = 0,
     err_onInvalidValue  = 1,
-    err_onReadFromSpi   = 2
+    err_onReadFromSpi   = 2,
+    err_NONE            = 255,
 } eOappEncReader_errortype_t;
 
 
@@ -122,10 +134,14 @@ typedef enum
 
 extern EOappEncReader* eo_appEncReader_Initialise(void);
 
-
 extern EOappEncReader* eo_appEncReader_GetHandle(void);
 
-extern EOappEncReader* eo_appEncReader_New(eOappEncReader_cfg_t *cfg);
+extern eOresult_t eo_appEncReader_Activate(EOappEncReader *p, eOappEncReader_cfg_t *cfg);
+
+extern eOresult_t eo_appEncReader_Deactivate(EOappEncReader *p);
+
+
+//extern EOappEncReader* eo_appEncReader_New(eOappEncReader_cfg_t *cfg);
 
 extern eOresult_t eo_appEncReader_StartRead(EOappEncReader *p); 
 

@@ -814,10 +814,10 @@ static eOresult_t s_eo_mcserv_init_jomo(EOmcService *p)
             }
          
         }
-        
-        
+                
         // in here we init the encoder reader
-        p->thelocalencoderreader = (void*)eo_appEncReader_New(&encoder_reader_cfg);
+        p->thelocalencoderreader = eo_appEncReader_Initialise();
+        eo_appEncReader_Activate(p->thelocalencoderreader, &encoder_reader_cfg);
     }
     else
     {

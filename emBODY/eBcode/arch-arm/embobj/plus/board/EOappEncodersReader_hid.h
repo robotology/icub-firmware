@@ -18,6 +18,7 @@
 
 
 // - include guard ----------------------------------------------------------------------------------------------------
+
 #ifndef _EOAPPENCODERSREADER_HID_H_
 #define _EOAPPENCODERSREADER_HID_H_
 
@@ -37,6 +38,7 @@
 
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
+
 #include "EOappEncodersReader.h"
 
 
@@ -96,8 +98,8 @@ typedef struct
 
 typedef struct
 {
-    uint8_t list[eo_appEncReader_stream_position_numberof+1];   /**< for the encoder i-th: in list[i] the encoder i-th finds the number of encoder it must start when it has finish its onw read. */
     uint8_t first;                                              /**< indicates the first encoder to read */
+    uint8_t list[eo_appEncReader_stream_position_numberof+1];   /**< for the encoder i-th: in list[i] the encoder i-th finds the number of encoder it must start when it has finish its onw read. */
 } EOappEncReader_configEncSPIXReadSequence_hid_t;
 
 
@@ -111,18 +113,20 @@ typedef enum
 
 typedef struct
 {
-    EOappEncReader_configEncSPIXReadSequence_hid_t  readSeq;             /**< contains the sequence of reading of encoders connected to SPIX (1 or 3)*/ 
     eOappEncReader_readStatusSPIX_t                 st;                  /**< contains the status of reading on SPIX (1 or 3) */
     eo_appEncReader_encoder_type_t                  enc_type;            /**< the type of the encoder to be read (AEA and AMO supported) */
     uint8_t                                         enc_numbers;         //number of encoders associated
     uint8_t                                         enc_number_supported;
+    EOappEncReader_configEncSPIXReadSequence_hid_t  readSeq;             /**< contains the sequence of reading of encoders connected to SPIX (1 or 3)*/ 
 } EOappEncReader_confEncDataPerSPI_hid_t;
 
 
 struct EOappEncReader_hid
 {
+    eObool_t                                initted;
+    eObool_t                                active;
     const hal_encoder_spimapping_t*         spimap;
-    eOappEncReader_cfg_t                    cfg;                            /* Init configuration */ 
+    eOappEncReader_cfg_t                    config;       
     eOappEncReader_stream_t                 SPI_streams[eo_appEncReader_streams_numberof];  // SPI streams; must be coherent with what inside cfg
     EOappEncReader_confEncDataPerSPI_hid_t  configuredEnc_SPI_stream0;      /* Encoders configured on the first  SPI stream */
     EOappEncReader_confEncDataPerSPI_hid_t  configuredEnc_SPI_stream1;      /* Encoders configured on the second SPI stream */

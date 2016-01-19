@@ -93,7 +93,7 @@ static uint8_t s_eo_encoderreader_GetEncoderPort(uint8_t sensorport);
 
 static eo_appEncReader_encoder_place_t s_eo_encoderreader_GetEncoderPlace(uint8_t sensorpos);
 
-static void s_eo_encoderreader_config_ereader(const eOmn_serv_arrayof_4jomodescriptors_t * jomodes, eOcallback_t callback, void* arg);
+static void s_eo_encoderreader_init_ereader(const eOmn_serv_arrayof_4jomodescriptors_t * jomodes, eOcallback_t callback, void* arg);
 
 static void s_eo_encoderreader_read_encoders(void* p);
 
@@ -153,7 +153,7 @@ extern EOtheEncoderReader* eo_encoderreader_Initialise(void)
 
     s_eo_theencoderreader.waitreadtimer = eo_timer_New();
     
-    s_eo_theencoderreader.reader = NULL; // in future use: Initialise() 
+    s_eo_theencoderreader.reader = eo_appEncReader_Initialise(); 
     
     s_eo_theencoderreader.diagnostics.reportTimer = eo_timer_New();
         
@@ -194,7 +194,7 @@ extern eOresult_t eo_encoderreader_Verify(EOtheEncoderReader *p, const eOmn_serv
     s_eo_theencoderreader.service.onverify = onverify;
     s_eo_theencoderreader.service.activateafterverify = activateafterverify;
                     
-    s_eo_encoderreader_config_ereader(jomodes, NULL, NULL);
+    s_eo_encoderreader_init_ereader(jomodes, NULL, NULL);
     
     eo_appEncReader_StartRead(s_eo_theencoderreader.reader);
     
@@ -227,7 +227,7 @@ extern eOresult_t eo_encoderreader_Deactivate(EOtheEncoderReader *p)
     // even better to merge what is inside EOappEncReader into object EOtheEncoderReader 
     
     // to do: 
-    // deinit EOappEncReader, undo what in s_eo_encoderreader_config_ereader()
+    // deinit EOappEncReader, undo what in s_eo_encoderreader_init_ereader()
 
 //    
 //    s_eo_theencoderreader.service.active = eobool_false;
@@ -258,7 +258,7 @@ extern eOresult_t eo_encoderreader_Activate(EOtheEncoderReader *p, const eOmn_se
 
 //    memcpy(&s_eo_theencoderreader.arrayofjomodes, jomodes, sizeof(eOmn_serv_arrayof_4jomodescriptors_t));
 //                    
-//    s_eo_encoderreader_config_ereader(NULL, NULL);
+//    s_eo_encoderreader_init_ereader(NULL, NULL);
 //    
 //
     eo_appEncReader_StartRead(s_eo_theencoderreader.reader);
@@ -456,15 +456,8 @@ static eo_appEncReader_encoder_place_t s_eo_encoderreader_GetEncoderPlace(uint8_
 
 
 
-static void s_eo_encoderreader_config_ereader(const eOmn_serv_arrayof_4jomodescriptors_t * jomodes, eOcallback_t callback, void* arg)
-{
-    
-    if(NULL != s_eo_theencoderreader.reader)
-    {
-        return;
-    }
-    
-    
+static void s_eo_encoderreader_init_ereader(const eOmn_serv_arrayof_4jomodescriptors_t * jomodes, eOcallback_t callback, void* arg)
+{   
     memcpy(&s_eo_theencoderreader.arrayofjomodes, jomodes, sizeof(eOmn_serv_arrayof_4jomodescriptors_t));
     
     // now... use the servcfg
@@ -528,8 +521,7 @@ static void s_eo_encoderreader_config_ereader(const eOmn_serv_arrayof_4jomodescr
     }
     
     s_eo_theencoderreader.numofencoders = numberofencoders;
-    s_eo_theencoderreader.reader = eo_appEncReader_New(&config);
-    
+    eo_appEncReader_Activate(s_eo_theencoderreader.reader, &config);    
 }
 
 
