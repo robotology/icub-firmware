@@ -618,27 +618,43 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
         { 
             case eomc_setpoint_position:
             {
-                eo_emsController_SetPosRef(jxx, setpoint->to.position.value, setpoint->to.position.withvelocity);
+                if(eo_emsController_SetPosRef(jxx, setpoint->to.position.value, setpoint->to.position.withvelocity))
+                {
+                    joint->status.target.trgt_position = setpoint->to.position.value;
+                }
             } break;
             
             case eomc_setpoint_positionraw:
             {
-                eo_emsController_SetPosRaw(jxx, setpoint->to.positionraw.value);
+                if(eo_emsController_SetPosRaw(jxx, setpoint->to.positionraw.value))
+                {
+                    joint->status.target.trgt_positionraw = setpoint->to.positionraw.value;
+                }
             } break;
             
             case eomc_setpoint_velocity:
             {
-                eo_emsController_SetVelRef(jxx, setpoint->to.velocity.value, setpoint->to.velocity.withacceleration);    
+                if(eo_emsController_SetVelRef(jxx, setpoint->to.velocity.value, setpoint->to.velocity.withacceleration))
+                {
+                    joint->status.target.trgt_velocity = setpoint->to.velocity.value;
+                }                
             } break;
 
             case eomc_setpoint_torque:
             {
-                eo_emsController_SetTrqRef(jxx, setpoint->to.torque.value);
+                if(eo_emsController_SetTrqRef(jxx, setpoint->to.torque.value))
+                {
+                    joint->status.target.trgt_torque = setpoint->to.torque.value;
+                }
+
             } break;
 
-            case eomc_setpoint_current:
+            case eomc_setpoint_openloop:
             {
-                eo_emsController_SetOutput(jxx, setpoint->to.current.value);
+                if(eo_emsController_SetOutput(jxx, setpoint->to.openloop.value))
+                {
+                    joint->status.target.trgt_openloop = setpoint->to.openloop.value;
+                }
             } break;
 
             default:
@@ -660,7 +676,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
         icubCanProto_setpoint_position_t setpoint_pos = {0};
         icubCanProto_setpoint_velocity_t setpoint_vel = {0};
         icubCanProto_setpoint_torque_t setpoint_torque = {0};
-        icubCanProto_setpoint_current_t setpoint_current = {0};
+        icubCanProto_setpoint_openloop_t setpoint_openloop = {0};
         icubCanProto_position_t pos = 0;
         
         command.type  = 0;
@@ -739,7 +755,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
                 command.value =  &setpoint_torque;                  
             } break;
 
-            case eomc_setpoint_current:
+            case eomc_setpoint_openloop:
             { 
                 // marco.accame on 27 feb 2015.               
                 // when embObjMotionControl::setRefOutputRaw() sends a set<setpoint, (current, value)>,
@@ -765,10 +781,10 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
                 // is sent up with a say<eoprot_tag_mc_joint_status_ofpid_positionreference, value> 
                 // in such a way the value is always correct   
                                
-                setpoint_current.value = setpoint->to.current.value;
+                setpoint_openloop.value = setpoint->to.openloop.value;
 
                 command.type  = ICUBCANPROTO_POL_MC_CMD__SET_OPENLOOP_PARAMS; 
-                command.value =  &setpoint_current;                  
+                command.value =  &setpoint_openloop;                  
             } break;
 
             case eomc_setpoint_positionraw:
@@ -793,7 +809,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
         eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);
 
                
-        if(eomc_setpoint_current == setpoint->type)
+        if(eomc_setpoint_openloop == setpoint->type)
         {
             // since mc4 does not send periodic messages with openloop reference values
             // i need to ask it direct to mc4
@@ -1374,6 +1390,11 @@ extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescripto
     eOmc_motor_config_t *cfg_ptr = (eOmc_motor_config_t*)rd->data;
     eOmc_motorId_t mxx = eoprot_ID2index(rd->id32);
     
+    eo_emsController_SetActuationLimit(mxx, (int16_t)cfg_ptr->pwmLimit);
+    // If pwmLimit is bigger than hardwhere limit, emsController uses hardwarelimit. 
+    // Therefore I need to update netvar with the limit used in emsController.
+    cfg_ptr->pwmLimit = eo_emsController_GetActuationLimit(mxx);
+    
     eOcanprot_command_t command = {0};
     command.class = eocanprot_msgclass_pollingMotorControl;
     
@@ -1478,7 +1499,7 @@ extern void eoprot_fun_UPDT_mc_motor_config_pidcurrent(const EOnv* nv, const eOr
 //}
 
 
-extern void eoprot_fun_UPDT_mc_motor_config_maxcurrentofmotor(const EOnv* nv, const eOropdescriptor_t* rd)
+extern void eoprot_fun_UPDT_mc_motor_config_currentlimits(const EOnv* nv, const eOropdescriptor_t* rd)
 {    
     eOmeas_current_t *curr = (eOmeas_current_t*)rd->data;
     
@@ -1490,6 +1511,17 @@ extern void eoprot_fun_UPDT_mc_motor_config_maxcurrentofmotor(const EOnv* nv, co
     command.value = curr;
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);     
   
+}
+
+extern void eoprot_fun_UPDT_mc_motor_config_pwmlimit(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    eOmeas_pwm_t *pwm_limit = (eOmeas_pwm_t *)rd->data;
+    eOmc_motorId_t mxx = eoprot_ID2index(rd->id32);
+
+    eo_emsController_SetActuationLimit(mxx, (int16_t)*pwm_limit);
+    // If pwmLimit is bigger than hardwhere limit, emsController uses hardwarelimit. 
+    // Therefore I need to update netvar with the limit used in emsController.
+    *pwm_limit = eo_emsController_GetActuationLimit(mxx);
 }
 
 // --------------------------------------------------------------------------------------------------------------------

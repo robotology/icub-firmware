@@ -699,8 +699,8 @@ extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_OPENLOOP_PARAMS(eOca
         return(eores_OK);        
     }
   
-    //it is: joint->status.ofpid.openloop.refolo = *((int16_t*)&frame->data[1]);    
-    joint->status.core.ofpid.legacy.positionreference = *((int16_t*)&frame->data[1]);
+    //it is: joint->status.ofpid.openloop.refolo = *((int16_t*)&frame->data[1]);  
+    joint->status.target.trgt_openloop = *((int16_t*)&frame->data[1]);
   
     return(eores_OK);    
 }

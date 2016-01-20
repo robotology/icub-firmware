@@ -446,9 +446,9 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
         
         case eomc_setpoint_positionraw:
         { 
-            if(eo_emsController_SetPosRaw(jxx, setpoint->to.position.value))
+            if(eo_emsController_SetPosRaw(jxx, setpoint->to.positionraw.value))
             {
-                joint->status.target.trgt_positionraw = setpoint->to.position.value;
+                joint->status.target.trgt_positionraw = setpoint->to.positionraw.value;
             }
         } break;
         
@@ -619,7 +619,14 @@ extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescripto
     eOmc_motorId_t mxx = eoprot_ID2index(rd->id32);
 
     //set rotor encoder sign
+    eo_emsController_SetMotorConfig(mxx, *cfg_ptr);
     eo_emsController_SetRotorEncoderSign((uint8_t)mxx, (int32_t)cfg_ptr->rotorEncoderResolution);
+    eo_currents_watchdog_UpdateCurrentLimits( eo_currents_watchdog_GetHandle(), mxx);
+    
+    eo_emsController_SetActuationLimit(mxx, (int16_t)cfg_ptr->pwmLimit);
+    // If pwmLimit is bigger than hardwhere limit, emsController uses hardwarelimit. 
+    // Therefore I need to update netvar with the limit used in emsController.
+    cfg_ptr->pwmLimit = eo_emsController_GetActuationLimit(mxx);
     
     cfg_ptr = cfg_ptr;
     #warning -> in here the 2foc-based control does config the can board with ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID, ICUBCANPROTO_POL_MC_CMD__SET_MAX_VELOCITY and ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT. what about mc4plus?
@@ -659,7 +666,6 @@ extern void eoprot_fun_UPDT_mc_motor_config_pwmlimit(const EOnv* nv, const eOrop
     eOmeas_pwm_t *pwm_limit = (eOmeas_pwm_t *)rd->data;
     eOmc_motorId_t mxx = eoprot_ID2index(rd->id32);
 
-    //set rotor encoder sign
     eo_emsController_SetActuationLimit(mxx, (int16_t)*pwm_limit);
     // If pwmLimit is bigger than hardwhere limit, emsController uses hardwarelimit. 
     // Therefore I need to update netvar with the limit used in emsController.
