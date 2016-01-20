@@ -1024,16 +1024,16 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
                   
                    icubCanProto_position_t tmp_min_joint_pos = eo_mc4boards_Convert_minJointPos_Get(mc4boards, jxx);
                    icubCanProto_position_t tmp_max_joint_pos = eo_mc4boards_Convert_maxJointPos_Get(mc4boards, jxx);
-                   icubCanProto_position_t tmp_min_motor_pos = eo_mc4boards_Convert_minMotorPos_Get(mc4boards, jxx);
-                   icubCanProto_position_t tmp_max_motor_pos = eo_mc4boards_Convert_maxMotorPos_Get(mc4boards, jxx);
+                   //icubCanProto_position_t tmp_min_motor_pos = eo_mc4boards_Convert_minMotorPos_Get(mc4boards, jxx);
+                   //icubCanProto_position_t tmp_max_motor_pos = eo_mc4boards_Convert_maxMotorPos_Get(mc4boards, jxx);
                   
                    if (calibrator->params.type6.current==1)
                    {
-                       iCubCanProtCalibrator.params.type6.position= tmp_max_motor_pos;
+                       iCubCanProtCalibrator.params.type6.position= calibrator->params.type6.vmax;
                    }
                    else if (calibrator->params.type6.current==-1)
                    {
-                       iCubCanProtCalibrator.params.type6.position= tmp_min_motor_pos;
+                       iCubCanProtCalibrator.params.type6.position= calibrator->params.type6.vmin;
                    }
                    else
                    {
@@ -1042,8 +1042,8 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
                        iCubCanProtCalibrator.params.type6.position=0;
                    }
              
-                   sprintf(info,"type6 pos%d curr%d %d %d",iCubCanProtCalibrator.params.type6.position,calibrator->params.type6.current,tmp_max_motor_pos,tmp_min_motor_pos);
-                   send_diagnostic_debugmessage(eo_errortype_debug, eoerror_value_DEB_tag01, jxx, 0, 0, info);
+                   //sprintf(info,"type6 pos%d curr%d %d %d",iCubCanProtCalibrator.params.type6.position,calibrator->params.type6.current,tmp_max_motor_pos,tmp_min_motor_pos);
+                   //send_diagnostic_debugmessage(eo_errortype_debug, eoerror_value_DEB_tag01, jxx, 0, 0, info);
                    iCubCanProtCalibrator.params.type6.velocity = calibrator->params.type6.velocity;
                    
                    computed_encoder =  (float)(calibrator->params.type6.vmax - calibrator->params.type6.vmin) / (float)(tmp_max_joint_pos - tmp_min_joint_pos);
@@ -1103,14 +1103,14 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
                    computed_encoder =  (float)(calibrator->params.type7.vmax - calibrator->params.type7.vmin) / (float)(tmp_max_joint_pos - tmp_min_joint_pos);
                                
                    //sprintf(info,"vmin %d vmax %d enc %f",calibrator->params.type7.vmin, calibrator->params.type7.vmax,computed_encoder);
-                   //send_diagnostic_debugmessage(eo_errortype_debug, eoerror_value_DEB_tag01, jxx, 0, 0, info);
+                   //send_diagnostic_debugmessage(eo_errortype_debug, eoerror_value_DEB_tag02, jxx, 0, 0, info);
                   
                    computed_zero    =  - (float)(tmp_min_joint_pos) + ((float)(calibrator->params.type7.vmin) / computed_encoder);
 
-                   //sprintf(info,"min %d max %d zero %f",tmp_minpos, tmp_maxpos, computed_zero);
-                   //send_diagnostic_debugmessage(eo_errortype_debug, eoerror_value_DEB_tag00, jxx, 0, 0, info);
+                   //sprintf(info,"min %d max %d zero %f",tmp_min_motor_pos, tmp_max_motor_pos, computed_zero);
+                   //send_diagnostic_debugmessage(eo_errortype_debug, eoerror_value_DEB_tag03, jxx, 0, 0, info);
                   
-                   eo_mc4boards_Convert_encoderoffset_Set(mc4boards, jxx, calibrator->params.type6.calibrationZero+computed_zero);
+                   eo_mc4boards_Convert_encoderoffset_Set(mc4boards, jxx, calibrator->params.type7.calibrationZero+computed_zero);
                    eo_mc4boards_Convert_encoderfactor_Set(mc4boards, jxx, computed_encoder);
                   
                    icubCanProto_position_t minpos_icubCanProtValue = eo_mc4boards_Convert_Position_toCAN(mc4boards, jxx, tmp_min_joint_pos);
