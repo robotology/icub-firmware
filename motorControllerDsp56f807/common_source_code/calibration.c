@@ -349,7 +349,7 @@ void helper_calib_abs_digital_coupled_wrist_v2(byte channel, Int16 param1,Int16 
  ****************************************************************/
 void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3)
 {
-
+	
 //-------------------------------
 // 3.00 4DC
 //-------------------------------
@@ -443,11 +443,17 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 			_velocity_calibration[channel]=1;	
 	}	
 	
-	if (type==CALIB_ABS_DIGITAL ) 
+	if (type==CALIB_ABS_DIGITAL) 
 	{
 		if (channel==3)  
 			helper_calib_hall_digital (channel, param1, param2, param3);				
 	}
+	
+	if (type==CALIB_HALL_ADC) 
+	{
+		if (channel==3)  
+			helper_calib_hall_digital (channel, param1, param2, param3);				
+	}	
 
 //-------------------------------	 
 // 2.19 4DC   
@@ -457,7 +463,7 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 	//pronosupination J4
 	if ((type==CALIB_HARD_STOPS) && (channel==0)) helper_calib_hard_stops (channel, param1, param2,param3);
 
-	if (type==CALIB_ABS_DIGITAL )  
+	if (type==CALIB_ABS_DIGITAL)  
 	{
 		//wrist J5 J6	
 		if (channel!=3)  
@@ -469,6 +475,12 @@ void calibrate (byte channel, byte type, Int16 param1,Int16 param2, Int16 param3
 		{
 			helper_calib_hall_digital (channel, param1, param2, param3);				
 		}
+	}
+	
+	if (type==CALIB_HALL_ADC) 
+	{
+		if (channel==3)  
+			helper_calib_hall_digital (channel, param1, param2, param3);				
 	}
 	
 //-------------------------------	 	  
