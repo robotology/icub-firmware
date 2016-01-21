@@ -1526,11 +1526,21 @@ extern void eoprot_fun_UPDT_mc_motor_config_pwmlimit(const EOnv* nv, const eOrop
 {
     eOmeas_pwm_t *pwm_limit = (eOmeas_pwm_t *)rd->data;
     eOmc_motorId_t mxx = eoprot_ID2index(rd->id32);
+    eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
+    
+    if(eo_motcon_mode_foc == mcmode)
+    {
+        eo_emsController_SetActuationLimit(mxx, (int16_t)*pwm_limit);
+        // If pwmLimit is bigger than hardwhere limit, emsController uses hardwarelimit. 
+        // Therefore I need to update netvar with the limit used in emsController.
+        *pwm_limit = eo_emsController_GetActuationLimit(mxx);
+    }
+    else if(eo_motcon_mode_mc4 == mcmode)
+    {
+        //TODO: send message to mc4 board
+    }
 
-    eo_emsController_SetActuationLimit(mxx, (int16_t)*pwm_limit);
-    // If pwmLimit is bigger than hardwhere limit, emsController uses hardwarelimit. 
-    // Therefore I need to update netvar with the limit used in emsController.
-    *pwm_limit = eo_emsController_GetActuationLimit(mxx);
+    
 }
 
 // --------------------------------------------------------------------------------------------------------------------
