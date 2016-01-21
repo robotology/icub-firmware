@@ -522,7 +522,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_velocitysetpointtimeout(const EOnv* 
 
 
 
-extern void eoprot_fun_UPDT_mc_joint_status_modes_ismotiondone(const EOnv* nv, const eOropdescriptor_t* rd)
+extern void eoprot_fun_UPDT_mc_joint_status_core_modes_ismotiondone(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
@@ -539,7 +539,7 @@ extern void eoprot_fun_UPDT_mc_joint_status_modes_ismotiondone(const EOnv* nv, c
             eOcanprot_command_t command = {0};
             command.class = eocanprot_msgclass_pollingMotorControl;
             command.type = ICUBCANPROTO_POL_MC_CMD__MOTION_DONE;
-            command.value = NULL;
+            command.value = NULL; 
         
             EOproxy * proxy = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
             eOproxy_params_t *param = eo_proxy_Params_Get(proxy, rd->id32);
@@ -637,7 +637,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
                 if(eo_emsController_SetVelRef(jxx, setpoint->to.velocity.value, setpoint->to.velocity.withacceleration))
                 {
                     joint->status.target.trgt_velocity = setpoint->to.velocity.value;
-                }                
+                }    
             } break;
 
             case eomc_setpoint_torque:
@@ -689,7 +689,9 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
                 setpoint_pos.withvelocity = eo_mc4boards_Convert_Velocity_toCAN(mc4boards, jxx, setpoint->to.position.withvelocity, eomc4_velocitycontext_toCAN_positionsetpoint);
                 
                 command.type  = ICUBCANPROTO_POL_MC_CMD__POSITION_MOVE; 
-                command.value =  &setpoint_pos; 
+                command.value =  &setpoint_pos;
+
+                joint->status.target.trgt_position = setpoint->to.position.value;
             } break;
 
             case eomc_setpoint_velocity:
@@ -705,6 +707,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
                 command.type  = ICUBCANPROTO_POL_MC_CMD__VELOCITY_MOVE; 
                 command.value =  &setpoint_vel;   
                 
+                joint->status.target.trgt_velocity = setpoint->to.velocity.value;
 //#undef DEBUG_SETPOINT_VELOCITY
 //#if defined(DEBUG_SETPOINT_VELOCITY) 
 //                
@@ -752,7 +755,9 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
                 setpoint_torque.value = eo_mc4boards_Convert_torque_I2S(mc4boards,jxx, setpoint->to.torque.value);
                   
                 command.type  = ICUBCANPROTO_POL_MC_CMD__SET_DESIRED_TORQUE; 
-                command.value =  &setpoint_torque;                  
+                command.value =  &setpoint_torque;         
+                
+                joint->status.target.trgt_torque = setpoint->to.torque.value;
             } break;
 
             case eomc_setpoint_openloop:
@@ -784,14 +789,18 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
                 setpoint_openloop.value = setpoint->to.openloop.value;
 
                 command.type  = ICUBCANPROTO_POL_MC_CMD__SET_OPENLOOP_PARAMS; 
-                command.value =  &setpoint_openloop;                  
+                command.value =  &setpoint_openloop;   
+
+                 joint->status.target.trgt_openloop = setpoint->to.openloop.value;
             } break;
 
             case eomc_setpoint_positionraw:
             {    
                 pos = eo_mc4boards_Convert_Position_toCAN(mc4boards, jxx, setpoint->to.positionraw.value);
                 command.type  = ICUBCANPROTO_POL_MC_CMD__SET_COMMAND_POSITION; 
-                command.value =  &pos;                   
+                command.value =  &pos;  
+
+                joint->status.target.trgt_positionraw = setpoint->to.positionraw.value;
             } break;
             
             default:
