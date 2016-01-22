@@ -144,8 +144,8 @@ static EOappEncReader s_eo_theappencreader =
     .spimap                     = NULL,
     .config                     = {0},
     .SPI_streams                = {{.type = hal_encoder_typeNONE, .numberof = 0}, {.type = hal_encoder_typeNONE, .numberof = 0}},
-    .configuredEnc_SPI_stream0  = {0},
-    .configuredEnc_SPI_stream1  = {0},
+    .configuredEnc_SPI_stream0  = {.st = eOEncReader_readSt__idle, .enc_type = eo_appEncReader_enc_type_NONE, .enc_numbers = 0, .enc_number_supported = 0, .readSeq = {0}},
+    .configuredEnc_SPI_stream1  = {.st = eOEncReader_readSt__idle, .enc_type = eo_appEncReader_enc_type_NONE, .enc_numbers = 0, .enc_number_supported = 0, .readSeq = {0}},
     .times                      = {0}   
 };
 
@@ -861,7 +861,7 @@ __inline extern eObool_t eo_appEncReader_isReadySPI_stream1(EOappEncReader *p)
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-#warning TODO: develop proper hal functions to change these....
+#warning TODO: add in compilation of hal for all boards these hal functions (even dummy, if peripheral is not supported) and remove the macro USE_MC4PLUS (or USE_MC2PLUS)
 // later on ... remove the USE_MC4PLUS macro and develop proper hal functions ... this code must be independent from board
 #if defined(USE_MC4PLUS)
 #include "hal_quad_enc.h"
@@ -1025,6 +1025,7 @@ static eObool_t s_eo_prepare_SPI_streams(EOappEncReader *p)
             else
             {
                 portError = eobool_true;
+                portError = portError;
                 //return(portError);
             }
             
@@ -1206,7 +1207,7 @@ static void s_eo_appEncReader_deinit_SPIencoders(EOappEncReader *p, EOappEncRead
 static void s_eo_appEncReader_init_SPIencoders(EOappEncReader *p, EOappEncReader_confEncDataPerSPI_hid_t *cfgSPIX, eo_appEncReader_stream_number_t stream_number)
 {
     uint8_t i;
-	hal_encoder_cfg_t enc_cfg = {0};
+	hal_encoder_cfg_t enc_cfg = {.priority = hal_int_priorityNONE, .callback_on_rx = NULL, .arg = NULL, .type = hal_encoder_typeNONE, .reg_address = 0, .sdata_precheck = hal_false};
     
     for(i=0; i < cfgSPIX->enc_numbers; i++)
     {
