@@ -15,6 +15,8 @@ extern "C" {
  **/
 
 
+    #error marco.accame: THIS PROJECT IS OBSOLETE. use project mc4plus-v2. this one was made obsolete on jan 22, 2015. it was left working.
+
 // -  default constants ----------------------------------------------------------------------------------------------- 
 
 #if defined(USE_MC4PLUS)
