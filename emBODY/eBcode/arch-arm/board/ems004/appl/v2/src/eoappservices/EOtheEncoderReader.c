@@ -221,7 +221,7 @@ extern eOresult_t eo_encoderreader_Deactivate(EOtheEncoderReader *p)
         return(eores_OK);        
     } 
     
-    #warning TODO: eo_encoderreader_Deactivate() must be terminated. see comments below
+    #warning TODO: eo_encoderreader_Deactivate() must be completed. and tested. see comments below
     
     // in order to do this function we should change EOappEncReader so that it can be de-initted. 
     // even better to merge what is inside EOappEncReader into object EOtheEncoderReader 
@@ -253,7 +253,7 @@ extern eOresult_t eo_encoderreader_Activate(EOtheEncoderReader *p, const eOmn_se
     }   
  
     #warning TODO: eo_encoderreader_Activate() should be changed. see comments below.
-    // since EOappEncReader can only be crated, but not initted or de-inittedd, we must change it so that it can do that.
+    // since EOappEncReader can only be created, but not initted or de-inittedd, we must change it so that it can do that.
     
 
 //    memcpy(&s_eo_theencoderreader.arrayofjomodes, jomodes, sizeof(eOmn_serv_arrayof_4jomodescriptors_t));
