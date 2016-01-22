@@ -50,6 +50,7 @@
 // maybe move them into _hid.h
 typedef struct
 {
+    const eOmn_serv_configuration_t*        tmpcfg;
     eOmn_serv_configuration_t               servconfig;
     eObool_t                                initted;
     eObool_t                                active;  

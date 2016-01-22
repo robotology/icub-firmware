@@ -233,6 +233,13 @@ extern eOresult_t eo_services_StartLegacyMode(EOtheServices *p, eOprotBRD_t brd)
         config.onrxargument[0]      = eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle());    
         config.onrxcallback[1]      = s_can_cbkonrx; 
         config.onrxargument[1]      = eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()); 
+
+        
+#if defined(USE_MC4PLUS)       
+        #warning TODO: think of how to config the can in the proper way if a board does not support can2. maybe using hal_can_supported_is().                
+        config.rxqueuesize[1] = config.txqueuesize[1] = 0;
+        config.onrxcallback[1] = config.onrxargument[1] = NULL;       
+#endif
             
         // attenzione alla mc4cplus che ha 1 solo can ... potrei cambiare il eo_canserv_Initialise() in modo che
         // se hal_can_supported_is(canx) e' falso allora non retsituisco errore ma semplicemente non inizializzo.
