@@ -53,7 +53,7 @@ typedef struct EOtheMotionController_hid EOtheMotionController;
 
 //typedef eOresult_t (*eOmotcon_onendofoperation_fun_t) (EOtheMotionController* p, eObool_t operationisok);
 
-enum { eo_motcon_maxJOMOs = 12 };
+enum { eo_motcon_standardJOMOs = 4, eo_motcon_maxJOMOs = 12 };
 
 
 typedef enum
@@ -96,6 +96,36 @@ extern eOresult_t eo_motioncontrol_Start(EOtheMotionController *p);
 extern eOresult_t eo_motioncontrol_Tick(EOtheMotionController *p);
 
 extern eOresult_t eo_motioncontrol_Stop(EOtheMotionController *p);
+
+
+// others, needed by mc4plus original code by davide.pollarolo. see if they can be moved elsewhere or if they are really needed
+extern eOresult_t eo_motioncontrol_extra_MotorEnable(EOtheMotionController *p, uint8_t jomo);
+
+extern eOresult_t eo_motioncontrol_extra_FaultDetectionEnable(EOtheMotionController *p);
+
+extern eObool_t eo_motioncontrol_extra_AreMotorsExtFaulted(EOtheMotionController *p);
+
+extern eOresult_t eo_motioncontrol_extra_SetMotorFaultMask(EOtheMotionController *p, uint8_t jomo, uint8_t* fault_mask);
+
+extern uint32_t eo_motioncontrol_extra_GetMotorFaultMask(EOtheMotionController *p, uint8_t jomo);
+
+extern uint16_t eo_motioncontrol_extra_GetMotorCurrent(EOtheMotionController *p, uint8_t jomo);
+
+extern uint32_t eo_motioncontrol_extra_GetMotorAnalogSensor(EOtheMotionController *p, uint8_t jomo);
+
+extern uint32_t eo_motioncontrol_extra_GetMotorPositionRaw(EOtheMotionController *p, uint8_t jomo);
+
+extern void eo_motioncontrol_extra_ResetQuadEncCounter(EOtheMotionController *p, uint8_t jomo);
+
+extern eObool_t eo_motioncontrol_extra_IsMotorEncoderIndexReached(EOtheMotionController *p, uint8_t jomo);
+
+// others, one make by marco.accame which groups actions
+
+// why dont we put it inside _Tick() ????
+extern eOresult_t eo_motioncontrol_extra_ManageEXTfault(EOtheMotionController *p);
+
+
+
 
 /** @}            
     end of group eo_EOtheMotionController

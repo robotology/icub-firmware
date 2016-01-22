@@ -64,7 +64,9 @@ typedef struct
 typedef struct
 {
     EOemsController*                        thecontroller;
-    EOtheEncoderReader*                     theencoderreader;  
+    EOtheEncoderReader*                     theencoderreader; 
+    int16_t                                 pwmvalue[eo_motcon_standardJOMOs]; // at most i can manage 4 joints, hence 4 pwm values
+    uint8_t                                 pwmport[eo_motcon_standardJOMOs];
     // anything else? add it in here. or maybe we use the one from foc ... 
 } eOmotioncontroller_objs_mc4plus_t;
 
@@ -81,7 +83,9 @@ struct EOtheMotionController_hid
     // they are for foc-based mc only
     eOmotioncontroller_objs_foc_t           mcfoc;    
     // they are for mc4-based mc only
-    eOmotioncontroller_objs_mc4_t           mcmc4;    
+    eOmotioncontroller_objs_mc4_t           mcmc4; 
+    // they are for mc4plus only
+    eOmotioncontroller_objs_mc4plus_t       mcmc4plus;
 }; 
 
 
