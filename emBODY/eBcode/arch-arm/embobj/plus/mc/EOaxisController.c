@@ -21,6 +21,7 @@
 #include "EoError.h"
 #include "EoemsController.h"
 
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -1335,17 +1336,17 @@ static void s_eo_axisController_CheckHardwareLimitReached(EOaxisController *o)
         }
         */
 
+        #warning marco.accame: i dont understand the use of method eo_mcserv_IsMotorEncoderIndexReached() ..... ASK to davide.pollarolo
+        
 #if defined(MC4PLUS_APPL_V2)
-        #warning TODO: VERY IMPORTANT:::: implent this ......
-
-//        //must be 0 or a value close to 0?
-//        #warning voltage threshold to set hardware-limit reached is hardcoded, but it could become a calib param
-//        if (eo_mcserv_GetMotorAnalogSensor(eo_mcserv_GetHandle(), o->axisID) < 500) //1/10 of the nominal value
-//        {       
-//            //reset the flag associated to quad_enc index reached
-//            eo_mcserv_IsMotorEncoderIndexReached(eo_mcserv_GetHandle(), o->axisID);
-//            o->hardwarelimitreached = 1;
-//        }
+        // must be 0 or a value close to 0?
+        #warning voltage threshold to set hardware-limit reached is hardcoded, but it could become a calib param
+        if(eo_motioncontrol_extra_GetMotorAnalogSensor(eo_motioncontrol_GetHandle(), o->axisID) < 500) //1/10 of the nominal value
+        {       
+            //reset the flag associated to quad_enc index reached
+            eo_motioncontrol_extra_IsMotorEncoderIndexReached(eo_motioncontrol_GetHandle(), o->axisID);
+            o->hardwarelimitreached = 1;
+        }
 #else
         //must be 0 or a value close to 0?
         #warning voltage threshold to set hardware-limit reached is hardcoded, but it could become a calib param

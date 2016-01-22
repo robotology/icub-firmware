@@ -1200,8 +1200,7 @@ extern void eo_emsController_StartCalibration(uint8_t joint, eOmc_calibration_ty
                         //reset quad_enc so that they start from the same value again
 #ifdef USE_MC4PLUS
 #if defined(MC4PLUS_APPL_V2)
-                    #warning TODO: VERYIMPORTANT:::::::::: implement this
-                    //    eo_mcserv_ResetQuadEncCounter(eo_mcserv_GetHandle(), i);
+                    eo_motioncontrol_extra_ResetQuadEncCounter(eo_motioncontrol_GetHandle(), i);
 #else
                     eo_mcserv_ResetQuadEncCounter(eo_mcserv_GetHandle(), i);
 #endif
