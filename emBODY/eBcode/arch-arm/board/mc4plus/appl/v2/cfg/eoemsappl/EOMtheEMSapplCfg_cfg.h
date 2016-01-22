@@ -74,7 +74,7 @@ extern "C" {
 //  <o> major           <0-255> 
 #define EOMTHEEMSAPPLCFG_VERSION_MAJOR          2
 //  <o> minor           <0-255> 
-#define EOMTHEEMSAPPLCFG_VERSION_MINOR          18
+#define EOMTHEEMSAPPLCFG_VERSION_MINOR          19
 //  </h>version
 
 //  <h> build date
@@ -83,11 +83,11 @@ extern "C" {
 //  <o> month           <1-12> 
 #define EOMTHEEMSAPPLCFG_BUILDDATE_MONTH        1
 //  <o> day             <1-31> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          19
+#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          22
 //  <o> hour            <0-23> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         16
+#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         14
 //  <o> minute          <0-59> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          15
+#define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          57
 //  </h>build date
 
 // </h>Info 
@@ -157,8 +157,8 @@ extern "C" {
 
 #if (1 == TMRMAN_USEDEFAULT)
     #define EOMTHEEMSAPPLCFG_TMRMAN_TASK_PRIORITYof                 240
-    #define EOMTHEEMSAPPLCFG_TMRMAN_TASK_STACKSIZEof                512
-    #define EOMTHEEMSAPPLCFG_TMRMAN_TASK_QUEUESIZEof                8
+    #define EOMTHEEMSAPPLCFG_TMRMAN_TASK_STACKSIZEof                1024
+    #define EOMTHEEMSAPPLCFG_TMRMAN_TASK_QUEUESIZEof                12
 #else
     #define EOMTHEEMSAPPLCFG_TMRMAN_TASK_PRIORITYof                 TMRMAN_TMP_PRIO
     #define EOMTHEEMSAPPLCFG_TMRMAN_TASK_STACKSIZEof                TMRMAN_TMP_STACK
@@ -194,8 +194,8 @@ extern "C" {
 
 #if (1 == CBKMAN_USEDEFAULT)
     #define EOMTHEEMSAPPLCFG_CBKMAN_TASK_PRIORITYof                 202
-    #define EOMTHEEMSAPPLCFG_CBKMAN_TASK_STACKSIZEof                512
-    #define EOMTHEEMSAPPLCFG_CBKMAN_TASK_QUEUESIZEof                8
+    #define EOMTHEEMSAPPLCFG_CBKMAN_TASK_STACKSIZEof                2048
+    #define EOMTHEEMSAPPLCFG_CBKMAN_TASK_QUEUESIZEof                12
 #else
     #define EOMTHEEMSAPPLCFG_CBKMAN_TASK_PRIORITYof                 CBKMAN_TMP_PRIO
     #define EOMTHEEMSAPPLCFG_CBKMAN_TASK_STACKSIZEof                CBKMAN_TMP_STACK
@@ -633,7 +633,7 @@ extern "C" {
 
 //  <o> task stack size <256-8192:128>
 //  <i> default: 512
-#define EOMTHEEMSAPPLCFG_CFGOBJ_TASK_STACKSIZEof   7168
+#define EOMTHEEMSAPPLCFG_CFGOBJ_TASK_STACKSIZEof   8192
 
 //  </h>Configurator object configuration
 
@@ -644,7 +644,7 @@ extern "C" {
 //  <i> default: 40
 #define EOMTHEEMSAPPLCFG_ERROBJ_TASK_PRIORITYof   40
 
-//  <o> task stack size <256-2048:128>
+//  <o> task stack size <256-4096:128>
 //  <i> default: 512
 #define EOMTHEEMSAPPLCFG_ERROBJ_TASK_STACKSIZEof   2048
 
