@@ -110,7 +110,7 @@ static const eOmn_serv_configuration_t s_serv_config_as_strain_eb6_eb8 =
     }    
 };
 
-
+#if     defined(ICUB_MEC_V2)  
 static const eOmn_serv_configuration_t s_serv_config_as_strain_eb7_eb9 =
 {   // eb7 or eb9
     .type       = eomn_serv_AS_strain,
@@ -130,7 +130,7 @@ static const eOmn_serv_configuration_t s_serv_config_as_strain_eb7_eb9 =
         }
     }    
 };
-
+#endif
 
 static const eOmn_serv_configuration_t s_serv_config_mc_eb1_eb3 =
 {   // eb1 / eb3
@@ -726,6 +726,397 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb15 =
 };
 
 
+
+static const eOmn_serv_configuration_t s_serv_config_mc_v3_0B0 =
+{   // eb12 or 0B0
+    .type       = eomn_serv_MC_mc4plus,
+    .filler     = {0},
+    .data.mc.mc4plus_based = 
+    {
+        .boardtype4mccontroller = emscontroller_board_HEAD_neckpitch_neckroll,
+        .filler                 = {0},
+        .arrayofjomodescriptors =
+        {
+            .head   = 
+            {
+                .capacity       = 4,
+                .itemsize       = 3,
+                .size           = 2,
+                .internalmem    = 0                    
+            },
+            .data   =
+            {
+                { // joint 0: neck-pitch
+                    .actuator.pwm   =
+                    {
+                        .port   = 0  // eomn_serv_mc_port_mc4plus_pwmP3 is hal_motor1=0 ?? verify!                          
+                    },
+                    .sensor         =
+                    {
+                        .type   = eomn_serv_mc_sensor_encoder_aea,
+                        .port   = 1, // eomn_serv_mc_port_mc4plus_spiP11 ?? verify!
+                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                    },
+                    .extrasensor    =
+                    {
+                        .type   = eomn_serv_mc_sensor_encoder_inc,
+                        .port   = 0,  // eomn_serv_mc_port_mc4plus_qencP3 ?? verify!
+                        .pos    = eomn_serv_mc_sensor_pos_atmotor
+                    }
+                },
+                { // joint 1: neck-roll
+                    .actuator.pwm   =
+                    {
+                        .port   = 2  // eomn_serv_mc_port_mc4plus_pwmP4 is hal_motor3=2 ?? verify!                          
+                    },
+                    .sensor         =
+                    {
+                        .type   = eomn_serv_mc_sensor_encoder_aea,
+                        .port   = 0, // eomn_serv_mc_port_mc4plus_spiP10 ?? verify!
+                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                    },
+                    .extrasensor    =
+                    {
+                        .type   = eomn_serv_mc_sensor_encoder_inc,
+                        .port   = 2,  // eomn_serv_mc_port_mc4plus_qencP4 ?? verify!
+                        .pos    = eomn_serv_mc_sensor_pos_atmotor
+                    }
+                },                
+                { // joint 2
+                    .actuator.pwm   =
+                    {
+                        .port   = eomn_serv_mc_port_none                          
+                    },
+                    .sensor         =
+                    {
+                        .type   = eomn_serv_mc_sensor_none,
+                        .port   = eomn_serv_mc_port_none, 
+                        .pos    = eomn_serv_mc_sensor_pos_none
+                    },
+                    .extrasensor    =
+                    {
+                        .type   = eomn_serv_mc_sensor_none,
+                        .port   = eomn_serv_mc_port_none,  
+                        .pos    = eomn_serv_mc_sensor_pos_none
+                    }
+                },                
+                { // joint 3
+                    .actuator.pwm   =
+                    {
+                        .port   = eomn_serv_mc_port_none                          
+                    },
+                    .sensor         =
+                    {
+                        .type   = eomn_serv_mc_sensor_none,
+                        .port   = eomn_serv_mc_port_none, 
+                        .pos    = eomn_serv_mc_sensor_pos_none
+                    },
+                    .extrasensor    =
+                    {
+                        .type   = eomn_serv_mc_sensor_none,
+                        .port   = eomn_serv_mc_port_none,  
+                        .pos    = eomn_serv_mc_sensor_pos_none
+                    }
+                }                          
+            }
+        }
+    }
+};
+
+
+
+
+static const eOmn_serv_configuration_t s_serv_config_mc_v3_0B1 =
+{   // eb13 or 0B1
+    .type       = eomn_serv_MC_mc4plus,
+    .filler     = {0},
+    .data.mc.mc4plus_based = 
+    {
+        .boardtype4mccontroller = emscontroller_board_HEAD_neckyaw_eyes,
+        .filler                 = {0},
+        .arrayofjomodescriptors =
+        {
+            .head   = 
+            {
+                .capacity       = 4,
+                .itemsize       = 3,
+                .size           = 4,
+                .internalmem    = 0                    
+            },
+            .data   =
+            {
+                { // joint 0: neck-yaw
+                    .actuator.pwm   =
+                    {
+                        .port   = 0  // eomn_serv_mc_port_mc4plus_pwmP3 is hal_motor1=0 ?? verify!                          
+                    },
+                    .sensor         =
+                    {
+                        .type   = eomn_serv_mc_sensor_encoder_aea,
+                        .port   = 1, // eomn_serv_mc_port_mc4plus_spiP11 ?? verify!
+                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                    },
+                    .extrasensor    =
+                    {
+                        .type   = eomn_serv_mc_sensor_encoder_inc,
+                        .port   = 0,  // eomn_serv_mc_port_mc4plus_qencP3 ?? verify!
+                        .pos    = eomn_serv_mc_sensor_pos_atmotor
+                    }
+                },
+                { // joint 1: eyes-tilt
+                    .actuator.pwm   =
+                    {
+                        .port   = 1  // eomn_serv_mc_port_mc4plus_pwmP2 is hal_motor2=1 ?? verify!                          
+                    },
+                    .sensor         =
+                    {
+                        .type   = eomn_serv_mc_sensor_encoder_aea,
+                        .port   = 0, // eomn_serv_mc_port_mc4plus_spiP10 ?? verify!
+                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                    },
+                    .extrasensor    =
+                    {
+                        .type   = eomn_serv_mc_sensor_encoder_inc,
+                        .port   = 1,  // eomn_serv_mc_port_mc4plus_qencP2 ?? verify!
+                        .pos    = eomn_serv_mc_sensor_pos_atmotor
+                    }
+                },                
+                { // joint 2: right-eye
+                    .actuator.pwm   =
+                    {
+                        .port   = 3  // eomn_serv_mc_port_mc4plus_pwmP5 is hal_motor4=3 ?? verify!                          
+                    },
+                    .sensor         =
+                    {
+                        .type   = eomn_serv_mc_sensor_encoder_inc,
+                        .port   = 3, // eomn_serv_mc_port_mc4plus_qencP5 is hal_quad_enc4 = 3 ?? verify!
+                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                    },
+                    .extrasensor    =
+                    {
+                        .type   = eomn_serv_mc_sensor_encoder_inc,
+                        .port   = 3, // eomn_serv_mc_port_mc4plus_qencP5 is hal_quad_enc4 = 3 ?? verify!
+                        .pos    = eomn_serv_mc_sensor_pos_atmotor
+                    }
+                },                               
+                { // joint 3: left-eye
+                    .actuator.pwm   =
+                    {
+                        .port   = 2  // eomn_serv_mc_port_mc4plus_pwmP4 is hal_motor3=2 ?? verify!                          
+                    },
+                    .sensor         =
+                    {
+                        .type   = eomn_serv_mc_sensor_encoder_inc,
+                        .port   = 2, // eomn_serv_mc_port_mc4plus_qencP4 is hal_quad_enc3 = 2 ?? verify!
+                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                    },
+                    .extrasensor    =
+                    {
+                        .type   = eomn_serv_mc_sensor_encoder_inc,
+                        .port   = 2, // eomn_serv_mc_port_mc4plus_qencP4 is hal_quad_enc3 = 2 ?? verify!
+                        .pos    = eomn_serv_mc_sensor_pos_atmotor
+                    }
+                }            
+            }
+        }
+    }
+};
+
+
+static const eOmn_serv_configuration_t s_serv_config_mc_v3_0B7 =
+{   // eb14 or 0B7
+    .type       = eomn_serv_MC_mc4plus,
+    .filler     = {0},
+    .data.mc.mc4plus_based = 
+    {
+        .boardtype4mccontroller = emscontroller_board_HEAD_neckyaw_eyes,
+        .filler                 = {0},
+        .arrayofjomodescriptors =
+        {
+            .head   = 
+            {
+                .capacity       = 4,
+                .itemsize       = 3,
+                .size           = 2,
+                .internalmem    = 0                    
+            },
+            .data   =
+            {
+                { // joint 0: jaw
+                    .actuator.pwm   =
+                    {
+                        .port   = 0  // eomn_serv_mc_port_mc4plus_pwmP3 is hal_motor1=0 ?? verify!                          
+                    },
+                    .sensor         =
+                    {
+                        .type   = eomn_serv_mc_sensor_encoder_aea,
+                        .port   = 1, // eomn_serv_mc_port_mc4plus_spiP11 ?? verify!
+                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                    },
+                    .extrasensor    =
+                    {
+                        .type   = eomn_serv_mc_sensor_none,
+                        .port   = eomn_serv_mc_port_none,  
+                        .pos    = eomn_serv_mc_sensor_pos_none
+                    }
+                },
+                { // joint 1: eyelids
+                    .actuator.pwm   =
+                    {
+                        .port   = 1  // eomn_serv_mc_port_mc4plus_pwmP2 is hal_motor2=1 ?? verify!                          
+                    },
+                    .sensor         =
+                    {
+                        .type   = eomn_serv_mc_sensor_encoder_aea,
+                        .port   = 0, // eomn_serv_mc_port_mc4plus_spiP10 ?? verify!
+                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                    },
+                    .extrasensor    =
+                    {
+                        .type   = eomn_serv_mc_sensor_encoder_inc,
+                        .port   = 1,  // eomn_serv_mc_port_mc4plus_qencP2 ?? verify!
+                        .pos    = eomn_serv_mc_sensor_pos_atmotor
+                    }
+                },                
+                { // joint 2
+                    .actuator.pwm   =
+                    {
+                        .port   = eomn_serv_mc_port_none                          
+                    },
+                    .sensor         =
+                    {
+                        .type   = eomn_serv_mc_sensor_none,
+                        .port   = eomn_serv_mc_port_none, 
+                        .pos    = eomn_serv_mc_sensor_pos_none
+                    },
+                    .extrasensor    =
+                    {
+                        .type   = eomn_serv_mc_sensor_none,
+                        .port   = eomn_serv_mc_port_none,  
+                        .pos    = eomn_serv_mc_sensor_pos_none
+                    }
+                },                
+                { // joint 3
+                    .actuator.pwm   =
+                    {
+                        .port   = eomn_serv_mc_port_none                          
+                    },
+                    .sensor         =
+                    {
+                        .type   = eomn_serv_mc_sensor_none,
+                        .port   = eomn_serv_mc_port_none, 
+                        .pos    = eomn_serv_mc_sensor_pos_none
+                    },
+                    .extrasensor    =
+                    {
+                        .type   = eomn_serv_mc_sensor_none,
+                        .port   = eomn_serv_mc_port_none,  
+                        .pos    = eomn_serv_mc_sensor_pos_none
+                    }
+                }            
+            }
+        }
+    }
+};
+
+static const eOmn_serv_configuration_t s_serv_config_mc_v3_0B9 =
+{   // eb15 or 0B9
+    .type       = eomn_serv_MC_mc4plus,
+    .filler     = {0},
+    .data.mc.mc4plus_based = 
+    {
+        .boardtype4mccontroller = emscontroller_board_FACE_lips,
+        .filler                 = {0},
+        .arrayofjomodescriptors =
+        {
+            .head   = 
+            {
+                .capacity       = 4,
+                .itemsize       = 3,
+                .size           = 4,
+                .internalmem    = 0                    
+            },
+            .data   =
+            {
+                { // joint 0: lip-left
+                    .actuator.pwm   =
+                    {
+                        .port   = 2  // eomn_serv_mc_port_mc4plus_pwmP4 is hal_motor2=1 ?? verify!                          
+                    },
+                    .sensor         =
+                    {
+                        .type   = eomn_serv_mc_sensor_encoder_inc,
+                        .port   = 2, // eomn_serv_mc_port_mc4plus_qencP4 ?? verify!
+                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                    },
+                    .extrasensor    =
+                    {
+                        .type   = eomn_serv_mc_sensor_encoder_inc,
+                        .port   = 2,  // eomn_serv_mc_port_mc4plus_qencP4 ?? verify!
+                        .pos    = eomn_serv_mc_sensor_pos_atmotor
+                    }
+                },
+                { // joint 1: lip-high
+                    .actuator.pwm   =
+                    {
+                        .port   = 1  // eomn_serv_mc_port_mc4plus_pwmP2 is hal_motor2=1 ?? verify!                          
+                    },
+                    .sensor         =
+                    {
+                        .type   = eomn_serv_mc_sensor_encoder_inc,
+                        .port   = 1, // eomn_serv_mc_port_mc4plus_qencP2 ?? verify!
+                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                    },
+                    .extrasensor    =
+                    {
+                        .type   = eomn_serv_mc_sensor_encoder_inc,
+                        .port   = 1,  // eomn_serv_mc_port_mc4plus_qencP2 ?? verify!
+                        .pos    = eomn_serv_mc_sensor_pos_atmotor
+                    }
+                },                
+                { // joint 2: lip-right
+                    .actuator.pwm   =
+                    {
+                        .port   = 0  // eomn_serv_mc_port_mc4plus_pwmP3 is hal_motor4=3 ?? verify!                          
+                    },
+                    .sensor         =
+                    {
+                        .type   = eomn_serv_mc_sensor_encoder_inc,
+                        .port   = 0, // eomn_serv_mc_port_mc4plus_qencP3 is hal_quad_enc1 = 0 ?? verify!
+                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                    },
+                    .extrasensor    =
+                    {
+                        .type   = eomn_serv_mc_sensor_encoder_inc,
+                        .port   = 0, // eomn_serv_mc_port_mc4plus_qencP3 is hal_quad_enc1 = 0 ?? verify!
+                        .pos    = eomn_serv_mc_sensor_pos_atmotor
+                    }
+                },                               
+                { // joint 3: lip-bottom
+                    .actuator.pwm   =
+                    {
+                        .port   = 3  // eomn_serv_mc_port_mc4plus_pwmP5 is hal_motor3=2 ?? verify!                          
+                    },
+                    .sensor         =
+                    {
+                        .type   = eomn_serv_mc_sensor_encoder_inc,
+                        .port   = 3, // eomn_serv_mc_port_mc4plus_qencP5 is hal_quad_enc4 = 3 ?? verify!
+                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                    },
+                    .extrasensor    =
+                    {
+                        .type   = eomn_serv_mc_sensor_encoder_inc,
+                        .port   = 3, // eomn_serv_mc_port_mc4plus_qencP5 is hal_quad_enc4 = 3 ?? verify!
+                        .pos    = eomn_serv_mc_sensor_pos_atmotor
+                    }
+                }            
+            }
+        }
+    }
+};
+
+
+
 static const eOmn_serv_configuration_t s_serv_config_mc_eb21 =
 {   // eb21
     .type       = eomn_serv_MC_foc,
@@ -946,6 +1337,32 @@ static const eOmn_serv_configuration_t * const s_serv_config_mc_V2[maxboards_V2]
     NULL
 };
 
+enum {maxboards_V3 = 21};
+static const eOmn_serv_configuration_t * const s_serv_config_mc_V3[maxboards_V3] =
+{   // there are only ....   
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    &s_serv_config_mc_v3_0B0,   // board ip.12, 0b0, neck pitch + neck roll
+    &s_serv_config_mc_v3_0B1,   // board ip.13, 0b1, neck yaw + 3 eyes
+    &s_serv_config_mc_v3_0B7,   // board ip.14, 0b7, eyelids + jaw
+    &s_serv_config_mc_v3_0B9,   // board ip.15, 0b9, 4 lips
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL    
+};
+
 enum {maxboards_CER = 21};
 static const eOmn_serv_configuration_t * const s_serv_config_mc_CER[maxboards_CER] =
 {   // there are only eb15 and eb21 .   
@@ -1033,15 +1450,23 @@ extern const eOemsrunner_timing_t * eoboardconfig_code2ctrlooptiming(uint32_t co
 extern const eOmn_serv_configuration_t * eoboardconfig_code2motion_serv_configuration(uint32_t code)
 {
     const eOmn_serv_configuration_t * ret = NULL;
-    
+
+#if     defined(ICUB_MEC_V3)
+    if(code < maxboards_V3)
+    {   
+        ret = s_serv_config_mc_V3[code]; 
+    }        
+#elif   defined(CER)
+    if(code < maxboards_CER)
+    {
+        ret= s_serv_config_mc_CER[code];
+    }
+#else
     if(code < maxboards_V2)
     {   // boards from eb1 to eb11
         ret = s_serv_config_mc_V2[code]; 
     }
-    else if(code < maxboards_CER)
-    {
-        ret= s_serv_config_mc_CER[code];
-    }
+#endif    
 
     return(ret);        
 }
