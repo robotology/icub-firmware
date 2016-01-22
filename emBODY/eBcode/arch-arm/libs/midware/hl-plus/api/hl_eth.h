@@ -161,7 +161,7 @@ typedef struct
 } hl_eth_cfg_t;
 
 
-#warning --> TODO: for use with lwip we need to modify it
+//#warning --> TODO: for use with lwip we need to modify it
 #ifdef HAL_COMPATIBLE_LWIP
 typedef struct
 {
