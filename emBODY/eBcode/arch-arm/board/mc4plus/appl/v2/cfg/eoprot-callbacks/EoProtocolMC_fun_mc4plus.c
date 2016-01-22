@@ -370,14 +370,13 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
         eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
         eOmc_calibrator_t *calibrator = (eOmc_calibrator_t*)rd->data;
 
-        #warning TODO: put   eo_mcserv_GetMotorFaultMask() etc inside motion-control object ....  and then uncomment the following lines    
-//        uint32_t state = eo_mcserv_GetMotorFaultMask(eo_mcserv_GetHandle(),jxx);
-//        if ((eo_mcserv_AreMotorsExtFaulted(eo_mcserv_GetHandle())) || (state & MOTOR_EXTERNAL_FAULT)) //or motors still faulted OR state (and so PWM) still need to be enabled
-//        {
-//            s_eoprot_ep_mc_fun_MotorReactivationAttempt(jxx, state);
-//        }
+        uint32_t state = eo_motioncontrol_extra_GetMotorFaultMask(eo_motioncontrol_GetHandle(), jxx);
+        if((eobool_true == eo_motioncontrol_extra_AreMotorsExtFaulted(eo_motioncontrol_GetHandle())) || (state & MOTOR_EXTERNAL_FAULT)) // or motors still faulted OR state (and so PWM) still need to be enabled
+        {
+            s_eoprot_ep_mc_fun_MotorReactivationAttempt(jxx, state);
+        }
 
-        eo_emsController_StartCalibration(jxx, calibrator->type, calibrator->params.any);   
+        eo_emsController_StartCalibration(jxx, (eOmc_calibration_type_t)calibrator->type, calibrator->params.any);   
     }    
 }
 
@@ -392,14 +391,12 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_controlmode(const EOnv* nv, const eO
     {
         eOmc_controlmode_command_t *controlmode = (eOmc_controlmode_command_t*)rd->data;
         eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
-
-        #warning TODO: put   eo_mcserv_GetMotorFaultMask() etc inside motion-control object ....  and then uncomment the following lines 
-//        //if this joint was in external fault or the state (and so PWM) is not updated, reenable it
-//        uint32_t state = eo_mcserv_GetMotorFaultMask(eo_mcserv_GetHandle(),jxx);
-//        if ((eo_mcserv_AreMotorsExtFaulted(eo_mcserv_GetHandle())) || (state & MOTOR_EXTERNAL_FAULT))
-//        {
-//           s_eoprot_ep_mc_fun_MotorReactivationAttempt(jxx, state);
-//        }
+       
+        uint32_t state = eo_motioncontrol_extra_GetMotorFaultMask(eo_motioncontrol_GetHandle(), jxx);
+        if((eobool_true == eo_motioncontrol_extra_AreMotorsExtFaulted(eo_motioncontrol_GetHandle())) || (state & MOTOR_EXTERNAL_FAULT))
+        {
+            s_eoprot_ep_mc_fun_MotorReactivationAttempt(jxx, state);
+        }        
             
         eo_emsController_SetControlModeGroupJoints(jxx, (eOmc_controlmode_command_t)(*controlmode));   
     }    
@@ -515,7 +512,7 @@ extern void eoprot_fun_UPDT_mc_controller_config_jointcoupling(const EOnv* nv, c
 
 #warning --> see comments
 
-// finaora le mc4 normali non hanno controllo di corrente.
+// finora le mc4 normali non hanno controllo di corrente.
 // propsota: per ora ignorare i comandi di: pid-corrente, limte corrente, 
 
 extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescriptor_t* rd)
@@ -532,7 +529,7 @@ extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescripto
         eo_emsController_SetRotorEncoderSign((uint8_t)mxx, (int32_t)cfg_ptr->rotorEncoderResolution);
         
         cfg_ptr = cfg_ptr;
-        #warning -> in here the 2foc-based control does config the can board with ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID, ICUBCANPROTO_POL_MC_CMD__SET_MAX_VELOCITY and ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT. what about mc4plus?
+        #warning -> TBD: in here the 2foc-based control does config the can board with ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID, ICUBCANPROTO_POL_MC_CMD__SET_MAX_VELOCITY and ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT. what about mc4plus?
     }
 }
 
@@ -547,7 +544,7 @@ extern void eoprot_fun_UPDT_mc_motor_config_pidcurrent(const EOnv* nv, const eOr
         eOmc_PID_t *pid_ptr = (eOmc_PID_t*)rd->data;
         
         pid_ptr = pid_ptr;
-        #warning -> in here the 2foc-based control does config the can board with ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID etc. what about mc4plus?
+        #warning -> TBD: in here the 2foc-based control does config the can board with ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID etc. what about mc4plus?
     }
 }
 
@@ -599,13 +596,12 @@ static eOmotioncontroller_mode_t s_motorcontrol_getmode(void)
 
 static void s_eoprot_ep_mc_fun_MotorReactivationAttempt(uint8_t motor, uint32_t current_state)
 {
-    #warning marco.accame TODO: we must put eo_mcserv_EnableMotor() and eo_mcserv_EnableFaultDetection() and eo_mcserv_SetMotorFaultMask() inside EOtheMotionController
-//    eo_mcserv_EnableMotor(eo_mcserv_GetHandle(), motor);
-//    eo_mcserv_EnableFaultDetection(eo_mcserv_GetHandle());
+    eo_motioncontrol_extra_MotorEnable(eo_motioncontrol_GetHandle(), motor);
+    eo_motioncontrol_extra_FaultDetectionEnable(eo_motioncontrol_GetHandle());
 
     // simulate the CANframe used by 2FOC to signal the status
-//    uint64_t fault_mask = (((uint64_t)(current_state & ~MOTOR_EXTERNAL_FAULT)) << 32) & 0xFFFFFFFF00000000; //adding the error to the current state
-//    eo_mcserv_SetMotorFaultMask(eo_mcserv_GetHandle(), motor, (uint8_t*)&fault_mask);
+    uint64_t fault_mask = (((uint64_t)(current_state & ~MOTOR_EXTERNAL_FAULT)) << 32) & 0xFFFFFFFF00000000; //adding the error to the current state
+    eo_motioncontrol_extra_SetMotorFaultMask(eo_motioncontrol_GetHandle(), motor, (uint8_t*)&fault_mask);
 
     // reports to emscontroller the changed mask
     eo_emsController_CheckFaults();

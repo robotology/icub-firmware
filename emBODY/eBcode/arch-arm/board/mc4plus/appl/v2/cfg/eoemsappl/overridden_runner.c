@@ -70,7 +70,7 @@
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static void s_overriden_runner_CheckAndUpdateExtFaults(void);
+//static void s_overriden_runner_CheckAndUpdateExtFaults(void);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -105,9 +105,9 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOM
     // as an example, the broadcast skin can frames are always parsed and are given to EOtheSKIN which will decide what to do with them
     eo_canserv_ParseAll(eo_canserv_GetHandle());    
     
-    #warning marco.accame: put the check of external faults somewhere else .... maybe in the object motion controller
+ 
     //check and update faults mask for the motor
-    s_overriden_runner_CheckAndUpdateExtFaults();    
+    eo_motioncontrol_extra_ManageEXTfault(eo_motioncontrol_GetHandle());
 }
 
 
@@ -297,27 +297,27 @@ extern void eom_emsrunner_hid_userdef_onemstransceivererror(EOMtheEMStransceiver
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-static void s_overriden_runner_CheckAndUpdateExtFaults(void)
-{
-    #warning marco.accame: implement in motion-controller object the external faults
-//    if (eo_mcserv_AreMotorsExtFaulted(eo_mcserv_GetHandle()))
-//    {
-//        uint8_t numofjomos = eo_entities_NumOfJoints(eo_entities_GetHandle());
-//        uint32_t state = 0;
-//        //set the fault mask for ALL the motors
-//        for (uint8_t i = 0; i < numofjomos; i++)
-//        {
-//            state = eo_mcserv_GetMotorFaultMask(eo_mcserv_GetHandle(),i);
-//            if((state & MOTOR_EXTERNAL_FAULT) == 0) //external fault bit not set
-//            {
-//                //simulate the CANframe used by 2FOC to signal the status
-//                uint64_t fault_mask = (((uint64_t)(state | MOTOR_EXTERNAL_FAULT)) << 32) & 0xFFFFFFFF00000000; //adding the error to the current state
-//                eo_motor_set_motor_status(eo_motors_GetHandle(),i, (uint8_t*)&fault_mask);
-//            }
-//        }
-//    }
-    return;
-}
+//static void s_overriden_runner_CheckAndUpdateExtFaults(void)
+//{
+//    #warning marco.accame: implement in motion-controller object the external faults
+////    if (eo_mcserv_AreMotorsExtFaulted(eo_mcserv_GetHandle()))
+////    {
+////        uint8_t numofjomos = eo_entities_NumOfJoints(eo_entities_GetHandle());
+////        uint32_t state = 0;
+////        //set the fault mask for ALL the motors
+////        for (uint8_t i = 0; i < numofjomos; i++)
+////        {
+////            state = eo_mcserv_GetMotorFaultMask(eo_mcserv_GetHandle(),i);
+////            if((state & MOTOR_EXTERNAL_FAULT) == 0) //external fault bit not set
+////            {
+////                //simulate the CANframe used by 2FOC to signal the status
+////                uint64_t fault_mask = (((uint64_t)(state | MOTOR_EXTERNAL_FAULT)) << 32) & 0xFFFFFFFF00000000; //adding the error to the current state
+////                eo_motor_set_motor_status(eo_motors_GetHandle(),i, (uint8_t*)&fault_mask);
+////            }
+////        }
+////    }
+//    return;
+//}
 
 
 // --------------------------------------------------------------------------------------------------------------------
