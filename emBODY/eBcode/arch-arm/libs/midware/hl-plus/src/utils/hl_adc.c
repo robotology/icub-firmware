@@ -196,7 +196,7 @@ extern hl_result_t hl_adc_enable(hl_adc_t id)
 
 extern hl_result_t hl_adc_disable(hl_adc_t id) 
 {
-    ADC_TypeDef* ADCx = HL_adc2peripheral(id); 
+//    ADC_TypeDef* ADCx = HL_adc2peripheral(id); 
 
 #if     !defined(HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)    
     if(hl_false == s_hl_adc_initted_is(id))
@@ -253,7 +253,7 @@ static hl_boolval_t s_hl_adc_initted_is(hl_adc_t id)
 static void s_hl_adc_hw_clock_init(hl_adc_t id)
 {
     //ADC_DeInit();   
-    ADC_TypeDef* ADCx = HL_adc2peripheral(id);       
+//    ADC_TypeDef* ADCx = HL_adc2peripheral(id);       
     switch(id)
     {
         case hl_adc1:

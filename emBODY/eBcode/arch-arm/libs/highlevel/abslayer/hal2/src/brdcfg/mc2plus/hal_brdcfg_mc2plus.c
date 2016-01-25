@@ -294,7 +294,7 @@
 
 #ifdef  HAL_USE_5V
     
-    #warning ricordati di verificare il pinout dei HAL_USE_5V
+    //#warning ricordati di verificare il pinout dei HAL_USE_5V
     #include "hal_5v_hid.h"
     
     const hal_5v_boardconfig_t hal_5v__theboardconfig =
@@ -316,7 +316,7 @@
 
 #ifdef HAL_USE_ADC
     
-    #warning TODO: ricordati di verificare il pinout
+    //#warning TODO: ricordati di verificare il pinout
     #include "hal_adc_hid.h"
     const hal_adc_boardconfig_t hal_adc__theboardconfig =
     {
@@ -324,7 +324,8 @@
         .data_regs_addresses = { ADC1_DR_ADDRESS,
                                  ADC2_DR_ADDRESS, 
                                  ADC3_DR_ADDRESS
-                               }
+                               },
+        .use4motorcontrol = hal_true
     };
 #else
     #warning TODO: activate HAL_USE_ADC
