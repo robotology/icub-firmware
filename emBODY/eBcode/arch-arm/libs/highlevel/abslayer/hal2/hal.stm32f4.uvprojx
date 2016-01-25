@@ -2506,7 +2506,7 @@
             <vShortWch>0</vShortWch>
             <VariousControls>
               <MiscControls></MiscControls>
-              <Define>HAL_BOARD_EMS4RD HL_USE_BRD_EMS4RD HL_CFG_PLUS_TARGET_BY_FILE EMS4RD_ETHDBG</Define>
+              <Define>HAL_BOARD_EMS4RD HL_CFG_PLUS_TARGET_BY_FILE EMS4RD_ETHDBG</Define>
               <Undefine></Undefine>
               <IncludePath>.\api;.\src\core;.\src\brdcfg;.\src\extra\chips;.\src\extra\devices;.\src\extra\extbrds;.\src\extra\periphs;.\src\extra\utilities;..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\libs\abslayer\ipal\api;..\..\..\..\libs\midware\hl-plus\api;..\..\..\..\libs\lowlevel\hl-core\cmsis\api;..\..\..\..\libs\lowlevel\hl-core\stm32f4\api</IncludePath>
             </VariousControls>
