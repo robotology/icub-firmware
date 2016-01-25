@@ -146,11 +146,11 @@ extern "C" {
 
 //  <o> task stack size <256-1024:128>
 //  <i> default: 512
-#define TMRMAN_TMP_STACK   512
+#define TMRMAN_TMP_STACK   1024
 
 //  <o> task message queue size <1-16>
 //  <i> default: 8
-#define TMRMAN_TMP_MSGQ   4
+#define TMRMAN_TMP_MSGQ   12
 
 //  </h>user defined 
 
@@ -183,11 +183,11 @@ extern "C" {
 
 //  <o> task stack size <256-1024:128>
 //  <i> default: 512
-#define CBKMAN_TMP_STACK   512
+#define CBKMAN_TMP_STACK   2048
 
 //  <o> task message queue size <1-16>
 //  <i> default: 8
-#define CBKMAN_TMP_MSGQ   4
+#define CBKMAN_TMP_MSGQ   12
 
 //  </h>user defined 
 
@@ -393,7 +393,6 @@ extern "C" {
 #ifndef EOMTHEEMSAPPLCFG_BACKDOOR_ENABLED
  #define EOMTHEEMSAPPLCFG_BACKDOOR_ENABLED       0
 #endif
-
 
 //  <o> IP listening port <4444=> 4444
 //  <i> default: 4444
@@ -760,13 +759,13 @@ extern "C" {
 //  <o> hal_timer for start rx
 //                           <0=> hal_timer1 <1=> hal_timer2 <2=> hal_timer3 <3=> hal_timer4 <4=> hal_timer5 <5=> hal_timer6 <6=> hal_timer7 
 //                           <7=> hal_timer8 <8=> hal_timer9 <9=> hal_timer10 <10=> hal_timer11 <11=> hal_timer12 <12=> hal_timer13 <13=> hal_timer14
-//  <i> default: hal_timer9
+//  <i> default: hal_timer6
 #define EOMTHEEMSAPPLCFG_RUNOBJ_TIMER_N_STARTRX   5
 
 //  <o> hal_timer for start do
 //                           <0=> hal_timer1 <1=> hal_timer2 <2=> hal_timer3 <3=> hal_timer4 <4=> hal_timer5 <5=> hal_timer6 <6=> hal_timer7 
 //                           <7=> hal_timer8 <8=> hal_timer9 <9=> hal_timer10 <10=> hal_timer11 <11=> hal_timer12 <12=> hal_timer13 <13=> hal_timer14
-//  <i> default: hal_timer10
+//  <i> default: hal_timer7
 #define EOMTHEEMSAPPLCFG_RUNOBJ_TIMER_N_STARTDO   6
 
 //  <o> hal_timer for start tx
@@ -938,9 +937,6 @@ extern "C" {
 
         #define     NUM     00
         #define     EOMTHEEMSAPPLCFG_NAME                   STRINGIZE(PPCAT(NAME_PREFIX, NUM, NAME_POSTFIX))
-
-
-
 
 #ifdef __cplusplus
 }       // closing brace for extern "C"
