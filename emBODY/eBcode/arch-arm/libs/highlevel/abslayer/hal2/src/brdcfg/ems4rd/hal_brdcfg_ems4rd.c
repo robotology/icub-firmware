@@ -597,11 +597,11 @@
 #ifdef  HAL_USE_TIMER
     
     #include "hal_timer_hid.h"
-    
-    extern const hal_timer_boardconfig_t hal_timer__theboardconfig =
+    //#warning --> supporting all timers apart the first 5 and timer 8 (reserved for some objects...)
+    const hal_timer_boardconfig_t hal_timer__theboardconfig =
     {
-        .supportedmask  = (1 << hal_timer1)  | (1 << hal_timer2)  | (1 << hal_timer3)  | (1 << hal_timer4)  | 
-                          (1 << hal_timer5)  | (1 << hal_timer6)  | (1 << hal_timer7)  | (1 << hal_timer8)  | 
+        .supportedmask  = (0 << hal_timer1)  | (0 << hal_timer2)  | (0 << hal_timer3)  | (0 << hal_timer4)  | 
+                          (0 << hal_timer5)  | (1 << hal_timer6)  | (1 << hal_timer7)  | (0 << hal_timer8)  | 
                           (1 << hal_timer9)  | (1 << hal_timer10) | (1 << hal_timer11) | (1 << hal_timer12) |
                           (1 << hal_timer13) | (1 << hal_timer14)
     }; 
