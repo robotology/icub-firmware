@@ -42,7 +42,7 @@
 #include "EOemsController.h"
 
 #include "hal_sys.h"
-#include "hal_dc_motorctl.h"
+#include "hal_motor.h"
 #include "hal_adc.h"
 #include "hal_quad_enc.h"
 
@@ -688,6 +688,7 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
 
             
             // e. activate interrupt line for quad_enc indexes check
+            #warning: marco.accame: maybe it is better to move it inside eo_appEncReader_Activate()
             s_eo_motioncontrol_mc4plusbased_hal_init_quad_enc_indexes_interrupt();
             
            
@@ -977,9 +978,9 @@ extern eOresult_t eo_motioncontrol_extra_FaultDetectionEnable(EOtheMotionControl
         return(eores_NOK_generic);
     }
     
-#if defined(USE_MC4PLUS)    
+//#if defined(USE_MC4PLUS)    
     hal_motor_reenable_break_interrupts();
-#endif
+//#endif
 
     return(eores_OK);
 }
@@ -1145,9 +1146,9 @@ extern uint16_t eo_motioncontrol_extra_GetMotorCurrent(EOtheMotionController *p,
     // if local motor (MC4plus)
 //    if(1 == p->config.jomos[joint].actuator.local.type)
 //    {
-#if defined(USE_MC4PLUS)     
+//#if defined(USE_MC4PLUS)     
     curr_val = hal_adc_get_current_motor_mA(p->mcmc4plus.pwmport[jomo]);
-#endif    
+//#endif    
 //    }
     
 //    // if remote (EMS4rd-2foc or mc4) --> should return what's inside the array ems->motor_current [motor]
@@ -1190,9 +1191,9 @@ extern uint32_t eo_motioncontrol_extra_GetMotorAnalogSensor(EOtheMotionControlle
     // if local motor (MC4plus)
 //    if(1 == p->config.jomos[joint].actuator.local.type)
 //    {
-#if defined(USE_MC4PLUS)    
+//#if defined(USE_MC4PLUS)    
     voltage = hal_adc_get_hall_sensor_analog_input_mV(p->mcmc4plus.pwmport[jomo]);
-#endif    
+//#endif    
 //    }
    
     return(voltage);
@@ -1231,9 +1232,10 @@ extern uint32_t eo_motioncontrol_extra_GetMotorPositionRaw(EOtheMotionController
     // if local motor (MC4plus)
 //    if(1 == p->config.jomos[joint].actuator.local.type)
 //    {
-#if defined(USE_MC4PLUS)    
-    pos_val = hal_quad_enc_getCounter(p->mcmc4plus.pwmport[jomo]);
-#endif    
+//#if defined(USE_MC4PLUS)    
+    // use inc port not pwm port ??
+    pos_val = hal_quad_enc_get_counter((hal_quad_enc_t)p->mcmc4plus.pwmport[jomo]);
+//#endif    
 //    }
     
 //    // if remote (EMS4rd-2foc or mc4) --> should return what's inside the array ems->motor_position[motor]
@@ -1276,9 +1278,9 @@ extern void eo_motioncontrol_extra_ResetQuadEncCounter(EOtheMotionController *p,
     // if local motor (MC4plus)
 //    if(1 == p->config.jomos[joint].actuator.local.type)
 //    {
-#if defined(USE_MC4PLUS)     
-    hal_quad_enc_reset_counter(p->mcmc4plus.pwmport[jomo]);
-#endif    
+//#if defined(USE_MC4PLUS)     
+    hal_quad_enc_reset_counter((hal_quad_enc_t)p->mcmc4plus.pwmport[jomo]);
+//#endif    
 //    }
      
 }
@@ -1311,9 +1313,10 @@ extern eObool_t eo_motioncontrol_extra_IsMotorEncoderIndexReached(EOtheMotionCon
     // if local motor (MC4plus)
 //    if(1 == p->config.jomos[joint].actuator.local.type)
 //    {
-#if defined(USE_MC4PLUS)      
-    indx_reached = (eObool_t) hal_quad_is_index_found(p->mcmc4plus.pwmport[jomo]);
-#endif    
+//#if defined(USE_MC4PLUS)     
+    //#warning marco.accame: why do we use a pwm port for an inc encoder? we should use the inc port instead.   
+    indx_reached = (eObool_t) hal_quad_enc_is_index_found((hal_quad_enc_t)p->mcmc4plus.pwmport[jomo]);
+//#endif    
 //    }
     
     return(indx_reached);
@@ -1939,26 +1942,26 @@ static eObool_t s_eo_motioncontrol_mc4based_variableisproxied(eOnvID32_t id)
 
 
 static void s_eo_motioncontrol_mc4plusbased_hal_init_motors_adc_feedbacks(void)
-{   // low level init for motors and adc
-#if defined(USE_MC4PLUS)    
-    //currently the motors are initialized all together and without config
-    hal_motors_extfault_handling_init();
+{   // low level init for motors and adc in mc4plus
+//#if defined(USE_MC4PLUS)    
+    // currently the motors are initialized all together and without config
+    hal_motor_init(hal_motorALL, NULL);
         
-    //first initialize all ADC as indipendents
+    // first initialize all ADC as indipendents
     hal_adc_common_structure_init();
         
     // init the ADC to read the (4) current values of the motor and (4) analog inputs (hall_sensors, if any) using ADC1/ADC3
     // always initialized at the moment, but the proper interface for reading the values is in EOappEncodersReader
     hal_adc_dma_init_ADC1_ADC3_hall_sensor_current();    
-#endif    
+//#endif    
 }
 
 
 static void s_eo_motioncontrol_mc4plusbased_hal_init_quad_enc_indexes_interrupt(void)
-{   // activate interupt line for quad_enc indexes check
-#if defined(USE_MC4PLUS)   
+{   // activate interupt line for quad_enc indexes check. the call of hal_quad_enc_init() is inside eo_appEncReader_Activate() ... maybe move it inside there too
+//#if defined(USE_MC4PLUS)   
     hal_quad_enc_init_indexes_flags();    
-#endif    
+//#endif    
 }
 
 static void s_eo_motioncontrol_mc4plusbased_enable_all_motors(EOtheMotionController *p)
@@ -1985,9 +1988,9 @@ static void s_eo_mcserv_pwm_set(uint8_t i, int16_t v)
     //out of bound
     if (i > 3)
         return;
-#if defined(USE_MC4PLUS)    
+//#if defined(USE_MC4PLUS)    
     hal_motor_pwmset((hal_motor_t)i, v);
-#endif    
+//#endif    
 }
 
 static void s_eo_mcserv_pwm_enable(uint8_t i)
@@ -1995,9 +1998,9 @@ static void s_eo_mcserv_pwm_enable(uint8_t i)
     //out of bound
     if (i > 3)
         return;
-#if defined(USE_MC4PLUS)    
+//#if defined(USE_MC4PLUS)    
     hal_motor_enable((hal_motor_t)i);
-#endif    
+//#endif    
 }
 
 static void s_eo_mcserv_pwm_disable(uint8_t i)
@@ -2005,20 +2008,20 @@ static void s_eo_mcserv_pwm_disable(uint8_t i)
     //out of bound
     if (i > 3)
         return;
-#if defined(USE_MC4PLUS)    
+//#if defined(USE_MC4PLUS)    
     hal_motor_disable((hal_motor_t)i);
-#endif    
+//#endif    
 }
 
 
 static eObool_t s_eo_mcserv_are_motors_ext_faulted(void)
 {
-#if defined(USE_MC4PLUS)    
-    if (hal_motor_isfault())
+//#if defined(USE_MC4PLUS)    
+    if(hal_true == hal_motor_externalfaulted())
     {
         return eobool_true;
     }
-#endif       
+//#endif       
     return eobool_false;
 }
 

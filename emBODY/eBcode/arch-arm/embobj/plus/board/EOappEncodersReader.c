@@ -45,6 +45,10 @@
 
 #include "EoProtocol.h"
 
+#include "hal_quad_enc.h"
+#include "hal_adc.h"
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -81,7 +85,7 @@ extern uint32_t fake_hal_adc_get_hall_sensor_analog_input_mV(uint8_t port);
 #define DGN_THRESHOLD                           0
 
 #define ENCODER_NULL                            255
-#define ENCODER_VALUE_NOT_SUPPORTED             0xFFFFFFFF
+#define ENCODER_VALUE_NOT_SUPPORTED             hal_NA32
 
 #define RESCALE_IN_ICUB_DEGREES(val,fullscale)  (TICKS_PER_REVOLUTION*val)/fullscale    
 
@@ -863,14 +867,11 @@ __inline extern eObool_t eo_appEncReader_isReadySPI_stream1(EOappEncReader *p)
 
 #warning TODO: add in compilation of hal for all boards these hal functions (even dummy, if peripheral is not supported) and remove the macro USE_MC4PLUS (or USE_MC2PLUS)
 // later on ... remove the USE_MC4PLUS macro and develop proper hal functions ... this code must be independent from board
-#if defined(USE_MC4PLUS)
-#include "hal_quad_enc.h"
-#include "hal_adc.h"
-#endif
+
 
 extern const hal_encoder_spimapping_t * fake_hal_encoder_spimapping_get(void)
 {
-#if defined(USE_MC4PLUS)
+#if defined(USE_MC4PLUS) | defined(USE_MC2PLUS)
 
     static const hal_encoder_spimapping_t s_hal_encoder_spi_mapping = 
     {
@@ -948,7 +949,7 @@ extern const hal_encoder_spimapping_t * fake_hal_encoder_spimapping_get(void)
     //static const uint8_t maskOfSupportedSPIencoders[hal_encoders_number] = {1, 1, 1, 1, 1, 1};
 
 #else
-    #error -> either USE_EMS4RD or USE_MC4PLUS
+    #error -> either USE_EMS4RD or USE_MC4PLUS or USE_MC2PLUS
 #endif
     
     return(&s_hal_encoder_spi_mapping);
@@ -957,29 +958,35 @@ extern const hal_encoder_spimapping_t * fake_hal_encoder_spimapping_get(void)
 
 extern void fake_hal_quad_enc_single_init(uint8_t port)
 {   // use only if mc4plus and the macro EOAPPENCODERREADER_DONTUSE_INC is not define
-#if defined(USE_MC4PLUS) && !defined(EOAPPENCODERREADER_DONTUSE_INC)
-    hal_quad_enc_single_init(port);   
-#else
+//#if defined(USE_MC4PLUS) && !defined(EOAPPENCODERREADER_DONTUSE_INC)
+    hal_quad_enc_init((hal_quad_enc_t)port);    
+//#else
     // do nothing
-#endif
+//#endif
 }
 
 extern uint32_t fake_hal_quad_enc_getCounter(uint8_t port)
 {
-#if defined(USE_MC4PLUS) && !defined(EOAPPENCODERREADER_DONTUSE_INC)
-    return(hal_quad_enc_getCounter(port));   
-#else
+//#if defined(USE_MC4PLUS) && !defined(EOAPPENCODERREADER_DONTUSE_INC)
+//    return(hal_quad_enc_get_counter((hal_quad_enc_t)port));   
+//#else
+//    return(ENCODER_VALUE_NOT_SUPPORTED);
+//#endif 
+
+#if defined(EOAPPENCODERREADER_DONTUSE_INC)
     return(ENCODER_VALUE_NOT_SUPPORTED);
-#endif    
+#else
+    return(hal_quad_enc_get_counter((hal_quad_enc_t)port)); 
+#endif       
 }
 
 extern uint32_t fake_hal_adc_get_hall_sensor_analog_input_mV(uint8_t port)
 {
-#if defined(USE_MC4PLUS)
+//#if defined(USE_MC4PLUS)
     return(hal_adc_get_hall_sensor_analog_input_mV(port));   
-#else
-    return(ENCODER_VALUE_NOT_SUPPORTED);
-#endif   
+//#else
+//    return(ENCODER_VALUE_NOT_SUPPORTED);
+//#endif   
 }
 
 

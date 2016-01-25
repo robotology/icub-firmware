@@ -529,10 +529,11 @@ static eOresult_t s_eo_canserv_peripheral_init(EOtheCANservice *p)
     memset(&can_cfg, 0, sizeof(can_cfg));
     
     p->isactive[hal_can_port1] = p->isactive[hal_can_port2] = eobool_false;
+    
 
     // can 1
     // if queues size is 0, don't enable this can port
-    if ((p->config.rxqueuesize[eOcanport1] != 0) && (p->config.txqueuesize[eOcanport1] != 0))
+    if((hal_true == hal_can_supported_is(hal_can1)) && (p->config.rxqueuesize[eOcanport1] != 0) && (p->config.txqueuesize[eOcanport1] != 0))
     {
         can_cfg.runmode                     = hal_can_runmode_isr_1txq1rxq;
         can_cfg.baudrate                    = hal_can_baudrate_1mbps; 
@@ -564,7 +565,7 @@ static eOresult_t s_eo_canserv_peripheral_init(EOtheCANservice *p)
     }
     // can 2
     // if queues size is 0, don't enable this can port
-    if ((p->config.rxqueuesize[eOcanport2] != 0) && (p->config.txqueuesize[eOcanport2] != 0))
+    if((hal_true == hal_can_supported_is(hal_can2)) && (p->config.rxqueuesize[eOcanport2] != 0) && (p->config.txqueuesize[eOcanport2] != 0))
     {    
         can_cfg.runmode            = hal_can_runmode_isr_1txq1rxq;
         can_cfg.baudrate           = hal_can_baudrate_1mbps; 
