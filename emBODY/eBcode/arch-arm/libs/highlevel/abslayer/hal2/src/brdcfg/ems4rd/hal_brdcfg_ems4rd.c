@@ -925,8 +925,15 @@
             {   // hal_encoder6:    P11 on ems4rd
                 .spiid = hal_spi3,  .muxid = hal_mux3,  .muxsel = hal_mux_selC                
             }                        
+        },
+        .streammap                  =
+        {
+            .numberofencoders       = 6,
+            .numberinstream0        = 3,
+            .numberinstream1        = 3,
+            .encoder2stream         = {hal_encoder_stream0, hal_encoder_stream0, hal_encoder_stream0, hal_encoder_stream1, hal_encoder_stream1, hal_encoder_stream1},
+            .encoder2indexinstream  = {0, 1, 2, 0, 1, 2}          
         }
-
     };
     
 #endif//HAL_USE_ENCODER  

@@ -60,6 +60,7 @@ typedef struct
     uint32_t                    supportedmask;
     uint32_t                    spimaxspeed;                    // in hz
     hal_encoder_spimap_t        spimap[hal_encoders_number];
+    hal_encoder_stream_map_t    streammap;
 } hal_encoder_boardconfig_t;
 
 

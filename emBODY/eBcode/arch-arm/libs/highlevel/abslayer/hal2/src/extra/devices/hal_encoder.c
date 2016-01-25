@@ -166,6 +166,13 @@ extern hal_boolval_t hal_encoder_supported_is(hal_encoder_t id)
     return(s_hal_encoder_supported_is(id));
 }
 
+
+extern const hal_encoder_stream_map_t* hal_encoder_stream_map_get(void)
+{
+    return(&hal_encoder__theboardconfig.streammap);
+}
+
+
 extern hal_result_t hal_encoder_init(hal_encoder_t id, const hal_encoder_cfg_t *cfg)
 {
     hal_encoder_internal_item_t* intitem = s_hal_encoder_theinternals.items[HAL_encoder_id2index(id)];

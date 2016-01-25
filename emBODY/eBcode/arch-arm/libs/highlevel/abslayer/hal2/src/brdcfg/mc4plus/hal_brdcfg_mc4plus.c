@@ -834,8 +834,15 @@
             {   // hal_encoder2:    P11 on mc4plus
                 .spiid = hal_spi2,  .muxid = hal_mux2,  .muxsel = hal_mux_selNONE               
             }                   
+        },
+        .streammap                  =
+        {
+            .numberofencoders       = 2,
+            .numberinstream0        = 1,
+            .numberinstream1        = 1,
+            .encoder2stream         = {hal_encoder_stream0, hal_encoder_stream1, hal_encoder_streamNONE, hal_encoder_streamNONE, hal_encoder_streamNONE, hal_encoder_streamNONE},
+            .encoder2indexinstream  = {0, 0, hal_NA08, hal_NA08, hal_NA08, hal_NA08}           
         }
-
     };
     
 #endif//HAL_USE_ENCODER  

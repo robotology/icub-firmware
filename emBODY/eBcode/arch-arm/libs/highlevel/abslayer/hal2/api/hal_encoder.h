@@ -111,6 +111,30 @@ typedef struct
     hal_bool_t                  sdata_precheck;	/**< If hal_true, performs a validity check on the sensor data transmission before the real reading (not meaningful for AEA board)  */
 } hal_encoder_cfg_t;
 
+
+/** @typedef    typedef enum hal_encoder_stream_t;
+    @brief      contains the possible streams. on a given stream are mapped some encodeders. each stream can be acquired in parallel to another. 
+ **/
+typedef enum
+{
+    hal_encoder_stream0      = 0,
+    hal_encoder_stream1      = 1,
+    hal_encoder_streamNONE   = 255   
+} hal_encoder_stream_t; 
+
+
+/** @typedef    typedef struct hal_encoder_stream_map_t;
+    @brief      contains the way the encoders are mapped into the two streams. encoders in different streams can be acquired in parallel 
+ **/
+typedef struct
+{
+    uint8_t                 numberofencoders;                           /**< number of total supported encoders in teh given board */
+    uint8_t                 numberinstream0;                            /**< number of encoders in stream 0 */
+    uint8_t                 numberinstream1;                            /**< number of encoders in stream 1 */
+    hal_encoder_stream_t    encoder2stream[hal_encoders_number];        /**< look up table whihc gives the stream given the encoder */
+    uint8_t                 encoder2indexinstream[hal_encoders_number]; /**< index in the proper stream for each encoder */
+} hal_encoder_stream_map_t;
+
  
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
@@ -126,6 +150,13 @@ extern const hal_encoder_cfg_t hal_encoder_cfg_default;   // = { .priority = hal
     @return     hal_true or hal_false
   */
 extern hal_boolval_t hal_encoder_supported_is(hal_encoder_t id);
+
+
+/** @fn         extern const hal_encoder_stream_map_t* hal_encoder_stream_map_get(void)
+    @brief      This function returns the map of the streams of the encoders. 
+    @return     teh required map
+  */
+extern const hal_encoder_stream_map_t* hal_encoder_stream_map_get(void);
 
 
 /** @fn			extern hal_result_t hal_encoder_init(hal_encoder_t id, const hal_encoder_cfg_t *cfg)
