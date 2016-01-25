@@ -64,6 +64,7 @@
 // -- peripherals: define what you need (beware of cross dependencies)
 
 #define     HAL_USE_5V
+#define     HAL_USE_ADC
 #define     HAL_USE_CAN
 #define     HAL_USE_ETH
 #define     HAL_USE_GPIO
@@ -72,7 +73,7 @@
 #define     HAL_USE_TIMER
 #define     HAL_USE_TRACE
 #define     HAL_USE_UNIQUEID
-#undef     HAL_USE_WATCHDOG
+#undef     HAL_USE_WATCHDO
 
 
 // -- devices: define what you need (beware of cross dependencies)
@@ -87,6 +88,9 @@
 #define     HAL_USE_MUX
 #define     HAL_USE_SWITCH
 #undef  HAL_USE_TERMOMETER
+#define     HAL_USE_DEVICE_MOTORCTL
+#define     HAL_USE_QUAD_ENC
+
 
 
 // -- behaviour: define how the code is shaped

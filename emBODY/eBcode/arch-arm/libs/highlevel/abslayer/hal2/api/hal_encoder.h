@@ -119,6 +119,15 @@ extern const hal_encoder_cfg_t hal_encoder_cfg_default;   // = { .priority = hal
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
+
+/** @fn         extern hal_boolval_t hal_encoder_supported_is(hal_encoder_t id)
+    @brief      This function tells if the specified encoder is supported by the board. 
+    @param      id              identifies encoder id 
+    @return     hal_true or hal_false
+  */
+extern hal_boolval_t hal_encoder_supported_is(hal_encoder_t id);
+
+
 /** @fn			extern hal_result_t hal_encoder_init(hal_encoder_t id, const hal_encoder_cfg_t *cfg)
     @brief  	This function initializes the encoder and whatever is required for its behaviour (mux and spi).
     @param  	encoder 	    the encoder

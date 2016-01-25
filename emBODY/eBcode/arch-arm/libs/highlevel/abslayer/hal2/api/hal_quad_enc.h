@@ -38,44 +38,54 @@ typedef enum
     hal_quad_enc1       = 0,        
     hal_quad_enc2       = 1,          
 	hal_quad_enc3       = 2,        
-    hal_quad_enc4       = 3       
+    hal_quad_enc4       = 3,
+    hal_quad_encALL     = 254,      /**< all supported  */
+    hal_quad_encNONE    = 255       /**< none */        
 } hal_quad_enc_t;
 
-// - declaration of extern public functions ---------------------------------------------------------------------------
-/** @fn         extern void hal_quad_enc_Init(void)
-    @brief      This function initialize all the quadrature encoders for the MC4 plus boards.
-                It uses the ports from P2 to P5 (included) and HW TIMERS 2 to 5.
-   @return      none
-  */
-extern void hal_quad_enc_Init(void);
+enum { hal_quad_encs_number = 4 };
 
-/** @fn         extern void hal_quad_single_init(void)
-    @brief      This function initialize the quadrature choosen as a parameter.
-    Every encoder is associated to a port and an hw timer. In particular:
-    - 0 : P2, TIM2
-    - 1 : P3, TIM3
-    - 2 : P4, TIM4
-    - 3 : P5. TIM5
-   @param       encoder_number  encoder to initialize
+// - declaration of extern public functions ---------------------------------------------------------------------------
+
+
+/** @fn         extern hal_boolval_t hal_quad_enc_supported_is(hal_quad_enc_t id)
+    @brief      This function tells if the specified quad encoder is supported by the board. 
+    @param      id              identifies encoder id 
+    @return     hal_true or hal_false
+  */
+extern hal_boolval_t hal_quad_enc_supported_is(hal_quad_enc_t id);
+
+
+/** @fn         extern void hal_quad_enc_init(hal_quad_enc_t id)
+    @brief      This function initialize the chosen quadrature encoder 
+                In mc4plus: every encoder is associated to a port and an hw timer. In particular:
+                - 0 : P2, TIM2
+                - 1 : P3, TIM3
+                - 2 : P4, TIM4
+                - 3 : P5. TIM5
+   @param       id      encoder to initialize
    @retval      none
   */
-extern void hal_quad_enc_single_init(uint8_t encoder_number);
+extern hal_result_t hal_quad_enc_init(hal_quad_enc_t id);
 
-/** @fn         uint32_t hal_quad_enc_getCounter(uint8_t encoder_number)
+
+/** @fn         uint32_t hal_quad_enc_get_counter(hal_quad_enc_t id)
     @brief      This function returns the angular position of the encoder,
                 reading the counter of the associated timer
-   @param       encoder_number  encoder to be read
-   @retval      uint32_t        position read
+   @param       id  encoder to be read
+   @retval      uint32_t        position read (hal_NA32 if invalid or id is not supported)
   */
-extern uint32_t hal_quad_enc_getCounter(uint8_t encoder_number);
+extern uint32_t hal_quad_enc_get_counter(hal_quad_enc_t id);
 
-/** @fn         hal_quad_enc_reset_counter(uint8_t encoder_number)
+
+/** @fn         hal_quad_enc_reset_counter(hal_quad_enc_t id)
     @brief      This function reset the value of the timer associated to the encoder,
                 setting it to 0.
-   @param       encoder_number  encoder to be reset
+   @param       id  encoder to be reset
    @retval      none
   */
-extern void hal_quad_enc_reset_counter(uint8_t encoder_number);
+extern void hal_quad_enc_reset_counter(hal_quad_enc_t id);
+
 
 /** @fn         hal_quad_enc_init_indexes_flags(void)
     @brief      This function initialize the interrupt line (which is not mandatory) of the index for the quadrature encoder 
@@ -84,12 +94,19 @@ extern void hal_quad_enc_reset_counter(uint8_t encoder_number);
   */
 extern void hal_quad_enc_init_indexes_flags(void);
 
-/** @fn         hal_quad_is_index_found(uint8_t encoder_number)
+
+/** @fn         hal_quad_enc_is_index_found(hal_quad_enc_t id)
     @brief      This function checks if the encoder has reached (no matter when in the past) the index. If it returns true, it also clears the
                 flag set by the interrupt line, so that it will be set again only when the index will be reached again 
-   @param       encoder_number  encoder flag to be read
+   @param       id  encoder flag to be read
    @retval      none
   */
-extern hal_bool_t hal_quad_is_index_found(uint8_t encoder_number);
+extern hal_bool_t hal_quad_enc_is_index_found(hal_quad_enc_t id);
 
-#endif
+
+#endif // include-guard
+
+
+// - end-of-file (leave a blank line after)----------------------------------------------------------------------------
+
+

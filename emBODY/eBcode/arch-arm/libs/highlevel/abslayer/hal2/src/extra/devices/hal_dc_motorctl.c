@@ -18,7 +18,7 @@
 
 
 /* @file       hal_device_motorcl.c
-	@brief      This file implements internal implementation of the hal led module.
+	@brief      This file implements internal implementation of the hal motor module.
 	@author     marco.maggiali@iit.it, 
     @date       26/03/2013
 **/
@@ -36,26 +36,31 @@
 #include "string.h"
 #include "hal_gpio.h"
 #include "hal_brdcfg.h"
-//#include "hal_utility_bits.h" 
 #include "hal_adc.h" 
 #include "hl_core.h" 
+#include "hl_bits.h" 
+ 
  
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hal_dc_motorctl.h"
+#include "hal_motor.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
+#include "hal_motor_hid.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
+
+#define HAL_motor_id2index(p)             ((uint8_t)(p))
+
 
 #define EN1 	GPIO_Pin_12
 #define EN2 	GPIO_Pin_13
@@ -72,171 +77,74 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+typedef struct
+{
+    uint32_t                    inittedmask;
+    hal_bool_t                  anyinitted;
+    hal_bool_t                  externalfaultpressed;
+} hal_motor_theinternals_t;
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static const variables
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
 
- 
-// --------------------------------------------------------------------------------------------------------------------
-// - declaration of static functions
-// --------------------------------------------------------------------------------------------------------------------
+static const hal_motor_cfg_t s_hal_motor_config_default = {0};
 
-static hal_boolval_t s_hal_device_motor_supported_is(hal_motor_t id);
-static void s_hal_device_motor_initted_set(hal_motor_t id);
-static hal_boolval_t s_hal_device_motor_initted_is(hal_motor_t id);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static uint16_t s_hal_device_motor_initted = 0;
-static hal_bool_t s_hal_device_motor_fault = hal_false;
+static hal_motor_theinternals_t s_hal_motor_theinternals =
+{
+    .inittedmask            = 0,
+    .anyinitted             = hal_false,
+    .externalfaultpressed   = hal_false   
+};
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - declaration of static functions
+// --------------------------------------------------------------------------------------------------------------------
+
+static hal_boolval_t s_hal_motor_none_supported_is(void);
+static hal_boolval_t s_hal_motor_supported_is(hal_motor_t id);
+static void s_hal_motor_initted_set(hal_motor_t id);
+static hal_boolval_t s_hal_motor_initted_is(hal_motor_t id);
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-// Motors independent init
-extern hal_result_t hal_motor_init(hal_motor_t id, const hal_pwm_cfg_t *cfg)
+
+extern hal_boolval_t hal_motor_supported_is(hal_motor_t id)
 {
- /*   const hal_gpio_map_t *gm = NULL;		  */
-    hal_result_t res = hal_res_NOK_generic;
-	TIM_TimeBaseInitTypeDef TIM1_TimeBaseStructure;
-  	TIM_OCInitTypeDef TIM1_OCInitStructure;
-  	TIM_BDTRInitTypeDef TIM1_BDTRInitStructure;
-//  NVIC_InitTypeDef NVIC_InitStructure;
-  	GPIO_InitTypeDef GPIO_InitStructure;
-
-/* INIT MOTOR 1 and 2 */
-
-//	if (id<2)  
-	{
-	//initialization of TIM1 for controlling the first 2 motors
-	/* TIM1 Peripheral Configuration -------------------------------------------*/
- 	/* GPIOA  Clocks enable */
-  	RCC_AHB1PeriphClockCmd( RCC_AHB1Periph_GPIOA , ENABLE);
-
-	/* GPIOA Configuration: Channel 1, 2, 3 and 4 as alternate function push-pull */
-	GPIO_StructInit(&GPIO_InitStructure);  
-	
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8 | GPIO_Pin_9 | GPIO_Pin_10 | GPIO_Pin_11;
-  	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
-  	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
-  	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-  	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP ;
-  	GPIO_Init(GPIOA, &GPIO_InitStructure);
- 
-	/*Timer1 alternate function full remapping*/  
-	GPIO_PinAFConfig(GPIOA,GPIO_PinSource8,GPIO_AF_TIM1);  //MOT1_PHA
-	GPIO_PinAFConfig(GPIOA,GPIO_PinSource9,GPIO_AF_TIM1);  //MOT1_PHB
-	GPIO_PinAFConfig(GPIOA,GPIO_PinSource10,GPIO_AF_TIM1); //MOT2_PHA
-	GPIO_PinAFConfig(GPIOA,GPIO_PinSource11,GPIO_AF_TIM1); //MOT2_PHB
-
-	/* TIM1 clock enable */
-	TIM_DeInit(TIM1);
-    RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1 , ENABLE);	
-//	TIM_TimeBaseStructInit(&TIM1_TimeBaseStructure);
-	/* Time Base configuration */
-	TIM1_TimeBaseStructure.TIM_Prescaler = PWM_PRSC;
-	TIM1_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_CenterAligned1;//TIM_CounterMode_Up;
-	TIM1_TimeBaseStructure.TIM_Period = PWM_PERIOD/2; // in CenterAligned mode the couter counts twice half a pwm period 
-	TIM1_TimeBaseStructure.TIM_ClockDivision = 0;// TIM_CKD_DIV2;
-	TIM1_TimeBaseStructure.TIM_RepetitionCounter = 0;// REP_RATE;
-
-	TIM_TimeBaseInit(TIM1, &TIM1_TimeBaseStructure);
-	
-//	TIM_OCStructInit(&TIM1_OCInitStructure);
-	/* Channel 1, 2,3 and 4 Configuration in PWM mode */
-	TIM1_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1; //indipendent channels 
-	TIM1_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable; 
-	TIM1_OCInitStructure.TIM_OutputNState = TIM_OutputNState_Disable;                  
-	TIM1_OCInitStructure.TIM_Pulse = 0x000; //dummy value
-	TIM1_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High; 
-	TIM1_OCInitStructure.TIM_OCNPolarity = TIM_OCNPolarity_Low;         
-	TIM1_OCInitStructure.TIM_OCIdleState = TIM_OCIdleState_Reset;
-	TIM1_OCInitStructure.TIM_OCNIdleState = TIM_OCIdleState_Reset; //LOW_SIDE_POLARITY;          
-	
-	//MOTOR1 PHASE A and B
-	TIM_OC1Init(TIM1, &TIM1_OCInitStructure);
-	TIM1_OCInitStructure.TIM_Pulse = (PWM_PERIOD>>0); //dummy value 
-	TIM_OC1Init(TIM1, &TIM1_OCInitStructure);
-	TIM1_OCInitStructure.TIM_Pulse = (PWM_PERIOD>>8); //dummy value
-    TIM_OC2Init(TIM1, &TIM1_OCInitStructure);
-	
-	//MOTOR2 PHASE A and B 
-	TIM1_OCInitStructure.TIM_Pulse = (PWM_PERIOD>>8); //clock wise
-	TIM_OC3Init(TIM1, &TIM1_OCInitStructure);
-    TIM1_OCInitStructure.TIM_Pulse = (PWM_PERIOD); //ccw 
-	TIM_OC4Init(TIM1, &TIM1_OCInitStructure);
-
-    // Automatic Output enable, Break, dead time and lock configuration
-    /*
-	TIM1_BDTRInitStructure.TIM_OSSRState = TIM_OSSRState_Enable;
-	TIM1_BDTRInitStructure.TIM_OSSIState = TIM_OSSIState_Enable;
-	TIM1_BDTRInitStructure.TIM_LOCKLevel = TIM_LOCKLevel_1; 
-	TIM1_BDTRInitStructure.TIM_DeadTime = MOTOR_DEADTIME;
-	TIM1_BDTRInitStructure.TIM_Break = TIM_Break_Enable;
-	TIM1_BDTRInitStructure.TIM_BreakPolarity = TIM_BreakPolarity_Low;
-	TIM1_BDTRInitStructure.TIM_AutomaticOutput = TIM_AutomaticOutput_Disable;
-	
-	TIM_BDTRConfig(TIM1, &TIM1_BDTRInitStructure);
-	
-	TIM_SelectOutputTrigger(TIM1, TIM_TRGOSource_Update);
-	
-	TIM_ClearITPendingBit(TIM1, TIM_IT_Break);
-	TIM_ITConfig(TIM1, TIM_IT_Break, ENABLE);
-    */	
-	/* TIM1 counter enable */
-	TIM_Cmd(TIM1, ENABLE);
-	/* Main PWM Output Enable */
-    TIM_CtrlPWMOutputs(TIM1,ENABLE);
-
-	//ENABLING THE EN1..EN4 L6206...?
-	RCC_AHB1PeriphClockCmd( RCC_AHB1Periph_GPIOE , ENABLE);
-
-	GPIO_StructInit(&GPIO_InitStructure);  
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15; 	
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
-    GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL ;
-    GPIO_Init(GPIOE, &GPIO_InitStructure);
-
-	GPIO_SetBits(GPIOE, GPIO_Pin_12);
-	GPIO_SetBits(GPIOE, GPIO_Pin_13);
-	GPIO_SetBits(GPIOE, GPIO_Pin_14);
-	GPIO_SetBits(GPIOE, GPIO_Pin_15);
-
-	//SETTING DRVFLT1..4 as output L6206...?
-
-	RCC_AHB1PeriphClockCmd( RCC_AHB1Periph_GPIOD , ENABLE);
-
-	GPIO_StructInit(&GPIO_InitStructure);  
-
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1| GPIO_Pin_2 | GPIO_Pin_3; 	
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
-    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
-    GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
-    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL ;
-    GPIO_Init(GPIOD, &GPIO_InitStructure);
-    }
-/* INIT MOTOR 3 and 4 */
-	{
-		// inizialization of the motor 3 and 4
-        // ?? how ??
-	}
-    return(hal_res_OK);
+    return(s_hal_motor_supported_is(id));
 }
 
+
 // Motor init with active interrupts on external fault channels
-extern hal_result_t hal_motors_extfault_handling_init(void)
+
+extern hal_result_t hal_motor_init(hal_motor_t id, const hal_motor_cfg_t *cfg)
 {
+    
+    if(hal_true == s_hal_motor_none_supported_is())
+    {
+        return(hal_res_NOK_generic);
+    }
+    
+    if(NULL == cfg)
+    {
+        cfg = &s_hal_motor_config_default;
+    }
+    
+    id = hal_motorALL;
+    
     /*   const hal_gpio_map_t *gm = NULL;		  */
-    hal_result_t res = hal_res_NOK_generic;
+//    hal_result_t res = hal_res_NOK_generic;
 	TIM_TimeBaseInitTypeDef TIM1_TimeBaseStructure;
   	TIM_OCInitTypeDef TIM1_OCInitStructure;
 	TIM_TimeBaseInitTypeDef TIM8_TimeBaseStructure;
@@ -467,7 +375,7 @@ extern hal_result_t hal_motors_extfault_handling_init(void)
     // this part was previously commented, now reactivated
 
     //Set the motor not in fault before activating the interrupts
-    s_hal_device_motor_fault = hal_false;
+    s_hal_motor_theinternals.externalfaultpressed = hal_false;
     
     /* Enable the TIM1 BRK Interrupt */
     NVIC_InitStructure.NVIC_IRQChannel = TIM1_BRK_TIM9_IRQn;
@@ -488,7 +396,26 @@ extern hal_result_t hal_motors_extfault_handling_init(void)
     NVIC_Init(&NVIC_InitStructure);
 #endif
 	}
-    return(hal_res_OK);
+ 
+    // set all motors which are supported also initted
+    if(hal_motorALL == id)
+    {
+        uint8_t ii=0;
+        for(ii=0; ii<hal_motors_number; ii++)
+        {
+            if(hal_true == s_hal_motor_supported_is((hal_motor_t)ii))
+            {
+                s_hal_motor_theinternals.anyinitted = hal_true;
+                s_hal_motor_initted_set((hal_motor_t)ii);
+            }
+        }
+    }
+    else if(id < hal_motors_number)
+    {
+        s_hal_motor_initted_set(id);
+    }
+    
+    return(hal_res_OK);    
 }
 
 
@@ -496,6 +423,14 @@ extern hal_result_t hal_motors_extfault_handling_init(void)
 
 extern hal_result_t hal_motor_pwmset(hal_motor_t id, int16_t pwmvalue)
 {
+    
+#if !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)       
+    if(hal_false == s_hal_motor_initted_is(id))
+    {
+        return(hal_res_NOK_generic);
+    }
+#endif
+    
     // choose the right pwm to assign
 	if (pwmvalue>=0) 
 	{
@@ -527,7 +462,7 @@ extern hal_result_t hal_motor_pwmset(hal_motor_t id, int16_t pwmvalue)
     // switch case to set the pwm to the right motor
 	switch (id)
 	{
-		case 1:	   //motor1
+		case 1:	   
 		{
 			if (pwmvalue>0) 
 			{
@@ -542,7 +477,7 @@ extern hal_result_t hal_motor_pwmset(hal_motor_t id, int16_t pwmvalue)
 			}
 		}
 		break;
-		case 0:	  //motor2
+		case 0:	  
 		{
 			if (pwmvalue>0) 
 			{
@@ -557,7 +492,7 @@ extern hal_result_t hal_motor_pwmset(hal_motor_t id, int16_t pwmvalue)
 			}
 		}
 		break;
-		case 2:	   //motor3
+		case 2:	  
 		{
 			if (pwmvalue>0) 
 			{
@@ -572,7 +507,7 @@ extern hal_result_t hal_motor_pwmset(hal_motor_t id, int16_t pwmvalue)
 			}
 		}
 		break;
-		case 3:		//motor4
+		case 3:		
 		{
 			if (pwmvalue>0) 
 			{
@@ -595,31 +530,41 @@ extern hal_result_t hal_motor_pwmset(hal_motor_t id, int16_t pwmvalue)
 
 	return hal_res_OK;
 }
+
+
 extern int16_t hal_motor_pwmget(hal_motor_t id)
 {
+    
+#if !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)       
+    if(hal_false == s_hal_motor_initted_is(id))
+    {
+        return(0);
+    }
+#endif    
+    
 	int16_t pwm=0;
 	switch (id)
 	{
-		case 0:		//motor1
+		case 0:		
 		{
 			pwm= TIM1->CCR1; //take the pwmvalue 
 			if (pwm==0) 	pwm=-TIM1->CCR2; //take the pwmvalue
             break;
         }
-		case 1:		//motor2
+		case 1:		
 		{
 			pwm= TIM1->CCR3; //take the pwmvalue 
 			if (pwm==0) 	pwm=-TIM1->CCR4; //take the pwmvalue
 		
 		break;
         }
-		case 2:		//motor3
+		case 2:		
 		{
 			pwm= TIM8->CCR1; //take the pwmvalue 
 			if (pwm==0) 	pwm=-TIM8->CCR2; //take the pwmvalue
             break;
         }
-		case 3:	    //motor4
+		case 3:	    
 		{
 			pwm= TIM8->CCR3; //take the pwmvalue 
 			if (pwm==0) 	pwm=-TIM8->CCR4; //take the pwmvalue
@@ -634,78 +579,24 @@ extern int16_t hal_motor_pwmget(hal_motor_t id)
  	return pwm;
 }
 
-extern hal_bool_t hal_motor_isfault(void)
+
+extern hal_bool_t hal_motor_externalfaulted(void)
 {
-    return s_hal_device_motor_fault;
+    //if(hal_true == s_hal_motor_theinternals.anyinitted)
+    return(s_hal_motor_theinternals.externalfaultpressed);
 }
 
 
-/*******************************************************************************
-* Function Name  : TIM1_BRK_IRQHandler
-* Description    : This function handles TIM1 Break interrupt request.
-* Input          : None
-* Output         : None
-* Return         : None
-*******************************************************************************/
-void TIM1_BRK_TIM9_IRQHandler(void)
-{
-  /* TO DO HERE:
-  - deactivate the interrupt on TIM1 Break
-  - disable motors 1-2
-  - if only this interrupt channel is enabled, disable also motors 3-4
-  - set the flag signalling the fault
-  - clear pending bit
-  */    
-  // write somewhere disable due to external fault 
-  if(SET == TIM_GetFlagStatus(TIM1, TIM_FLAG_Break))
-  {
-      TIM_ITConfig(TIM1, TIM_IT_Break, DISABLE);
-      hal_motor_disable(motor1);
-      hal_motor_disable(motor2);
-#if (ACTIVE_INTERRUPTS_CHANNELS == 1)
-      hal_motor_disable(motor3);
-      hal_motor_disable(motor4);
-#endif
-      s_hal_device_motor_fault = hal_true;
-      TIM_ClearITPendingBit(TIM1, TIM_IT_Break);
-  }
-}
-#if (ACTIVE_INTERRUPTS_CHANNELS == 2)
-/*******************************************************************************
-* Function Name  : TIM8_BRK_IRQHandler
-* Description    : This function handles TIM8 Break interrupt request.
-* Input          : None
-* Output         : None
-* Return         : None
-*******************************************************************************/
-void TIM8_BRK_TIM12_IRQHandler(void)
-{
-  /* TO DO HERE:
-  - deactivate the interrupt on TIM1 Break
-  - disable motors 3-4
-  - set the flag signalling the fault
-  - clear pending bit
-  */    
-  // write somewhere disable due to external fault 
-  if(SET == TIM_GetFlagStatus(TIM8, TIM_FLAG_Break))
-  {
-      TIM_ITConfig(TIM8, TIM_IT_Break, DISABLE);
-      hal_motor_disable(motor3);
-      hal_motor_disable(motor4);
-      s_hal_device_motor_fault = hal_true;
-      TIM_ClearITPendingBit(TIM8, TIM_IT_Break);
-  }
-}
-#endif
-/*******************************************************************************
-* Function Name  : hal_motor_enable
-* Description    : This function enables the motors 
-* Input          : None
-* Output         : None
-* Return         : None
-*******************************************************************************/
 extern hal_result_t hal_motor_enable(hal_motor_t id)
 {
+    
+#if !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)       
+    if(hal_false == s_hal_motor_initted_is(id))
+    {
+        return(hal_res_NOK_generic);
+    }
+#endif
+    
 	switch (id)
 	{
 		case 0:
@@ -738,15 +629,17 @@ extern hal_result_t hal_motor_enable(hal_motor_t id)
 	return hal_res_OK;
 }
 
-/*******************************************************************************
-* Function Name  : hal_motor_disable
-* Description    : This function disables the motors 
-* Input          : None
-* Output         : None
-* Return         : None
-*******************************************************************************/
+
 extern hal_result_t hal_motor_disable(hal_motor_t id)
 {
+    
+#if !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)       
+    if(hal_false == s_hal_motor_initted_is(id))
+    {
+        return(hal_res_NOK_generic);
+    }
+#endif
+    
 	switch (id)
 	{
 		case 0:
@@ -779,10 +672,16 @@ extern hal_result_t hal_motor_disable(hal_motor_t id)
 	return hal_res_OK;
 }
 
+
 extern hal_result_t hal_motor_reenable_break_interrupts(void)
-{
+{    
+    if(hal_false == s_hal_motor_theinternals.anyinitted)
+    {
+        return(hal_res_NOK_generic);
+    }
+    
     //calling this function, I presume that the fault is no more occurring
-    s_hal_device_motor_fault = hal_false;
+    s_hal_motor_theinternals.externalfaultpressed = hal_false;
     
     //reenables the interrupts
     TIM_ClearITPendingBit(TIM1, TIM_IT_Break);
@@ -792,9 +691,303 @@ extern hal_result_t hal_motor_reenable_break_interrupts(void)
     TIM_ClearITPendingBit(TIM8, TIM_IT_Break);
     TIM_ITConfig(TIM8, TIM_IT_Break, ENABLE);
 #endif
-    return hal_res_OK;
+    
+    return(hal_res_OK);
+}
+
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - definition of extern hidden functions 
+// --------------------------------------------------------------------------------------------------------------------
+
+// ---- isr of the module: begin ----
+
+/*******************************************************************************
+* Function Name  : TIM1_BRK_IRQHandler
+* Description    : This function handles TIM1 Break interrupt request.
+* Input          : None
+* Output         : None
+* Return         : None
+*******************************************************************************/
+
+void TIM1_BRK_TIM9_IRQHandler(void)
+{
+  /* TO DO HERE:
+  - deactivate the interrupt on TIM1 Break
+  - disable motors 1-2
+  - if only this interrupt channel is enabled, disable also motors 3-4
+  - set the flag signalling the fault
+  - clear pending bit
+  */    
+  // write somewhere disable due to external fault 
+  if(SET == TIM_GetFlagStatus(TIM1, TIM_FLAG_Break))
+  {
+      TIM_ITConfig(TIM1, TIM_IT_Break, DISABLE);
+      hal_motor_disable(hal_motor1);
+      hal_motor_disable(hal_motor2);
+#if (ACTIVE_INTERRUPTS_CHANNELS == 1)
+      hal_motor_disable(hal_motor3);
+      hal_motor_disable(hal_motor4);
+#endif
+      s_hal_motor_theinternals.externalfaultpressed = hal_true;
+      TIM_ClearITPendingBit(TIM1, TIM_IT_Break);
+  }
+}
+
+#if (ACTIVE_INTERRUPTS_CHANNELS == 2)
+/*******************************************************************************
+* Function Name  : TIM8_BRK_IRQHandler
+* Description    : This function handles TIM8 Break interrupt request.
+* Input          : None
+* Output         : None
+* Return         : None
+*******************************************************************************/
+void TIM8_BRK_TIM12_IRQHandler(void)
+{
+  /* TO DO HERE:
+  - deactivate the interrupt on TIM1 Break
+  - disable motors 3-4
+  - set the flag signalling the fault
+  - clear pending bit
+  */    
+  // write somewhere disable due to external fault 
+  if(SET == TIM_GetFlagStatus(TIM8, TIM_FLAG_Break))
+  {
+      TIM_ITConfig(TIM8, TIM_IT_Break, DISABLE);
+      hal_motor_disable(motor3);
+      hal_motor_disable(motor4);
+      s_hal_motor_theinternals.externalfaultpressed = hal_true;
+      TIM_ClearITPendingBit(TIM8, TIM_IT_Break);
+  }
+}
+#endif
+
+// ---- isr of the module: end ------
+
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - definition of static functions 
+// --------------------------------------------------------------------------------------------------------------------
+
+static hal_boolval_t s_hal_motor_none_supported_is(void)
+{
+    if(0 == hal_motor__theboardconfig.supportedmask)
+    {
+        return(hal_true);
+    }
+    return(hal_false);
+}
+
+
+static hal_boolval_t s_hal_motor_supported_is(hal_motor_t id)
+{
+    if(id >= hal_motors_number)
+    {
+        return(hal_false);
+    }
+    return((hal_boolval_t)hl_bits_word_bitcheck(hal_motor__theboardconfig.supportedmask, HAL_motor_id2index(id)) );
+}
+
+static void s_hal_motor_initted_set(hal_motor_t id)
+{
+    hl_bits_word_bitset(&s_hal_motor_theinternals.inittedmask, HAL_motor_id2index(id));
+}
+
+static void s_hal_motor_initted_reset(hal_motor_t id)
+{
+    hl_bits_word_bitclear(&s_hal_motor_theinternals.inittedmask, HAL_motor_id2index(id));
+}
+
+static hal_boolval_t s_hal_motor_initted_is(hal_motor_t id)
+{  
+    if(id >= hal_motors_number)
+    {
+        return(hal_false);
+    }    
+    return((hal_boolval_t)hl_bits_word_bitcheck(s_hal_motor_theinternals.inittedmask, HAL_motor_id2index(id)));
 }
     
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - obsolete code
+// --------------------------------------------------------------------------------------------------------------------
+
+
+///** @fn         extern hal_result_t hal_motor_init(hal_motor_t id, const hal_motor_cfg_t *cfg)
+//    @brief      This function initializes a motor. It can be called once per motor. 
+
+//    @details    On ARM-STM32 architecture, the registers of the timers are 16 bits, and holds bot the counter and the prescaler.
+//                As a result, the precision and maximum range is chosen as follows: (prec, max) = (1000 us, 6400ms), 
+//                (100 us, 640ms), (10 us, 64ms), (1 us, 8ms). 
+//    @param      motor           The motor to initialise. 
+//    @param      cfg             The configuration. It cannot be NULL.
+
+//    @return     hal_res_NOK_generic in case the motor isn't configured or not supported by board.
+//                hal_res_NOK_unsupported if the chosen pwm cfg is not supported
+//                hal_res_NOK_nullpointer if @e cfg is NULL
+//                hal_res_OK otherwise
+//  */
+//extern hal_result_t hal_motor_init(hal_motor_t id, const hal_motor_cfg_t *cfg);
+
+//extern hal_result_t hal_motor_init(hal_motor_t id, const hal_motor_cfg_t *cfg)
+//{
+//    
+//    // marco.accame: so far initialization is done for all ports and cfg is not used 
+//    //               use id = hal_motorALL
+//    
+//    #warning TODO: remove possibility of multiple init(). add a deinit().
+//    
+//    
+// /*   const hal_gpio_map_t *gm = NULL;		  */
+////    hal_result_t res = hal_res_NOK_generic;
+//    
+//	TIM_TimeBaseInitTypeDef TIM1_TimeBaseStructure;
+//  	TIM_OCInitTypeDef TIM1_OCInitStructure;
+//  	TIM_BDTRInitTypeDef TIM1_BDTRInitStructure;
+////  NVIC_InitTypeDef NVIC_InitStructure;
+//  	GPIO_InitTypeDef GPIO_InitStructure;
+
+///* INIT MOTOR 1 and 2 */
+
+////	if (id<2)  
+//	{
+//	//initialization of TIM1 for controlling the first 2 motors
+//	/* TIM1 Peripheral Configuration -------------------------------------------*/
+// 	/* GPIOA  Clocks enable */
+//  	RCC_AHB1PeriphClockCmd( RCC_AHB1Periph_GPIOA , ENABLE);
+
+//	/* GPIOA Configuration: Channel 1, 2, 3 and 4 as alternate function push-pull */
+//	GPIO_StructInit(&GPIO_InitStructure);  
+//	
+//	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8 | GPIO_Pin_9 | GPIO_Pin_10 | GPIO_Pin_11;
+//  	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+//  	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
+//  	GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+//  	GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP ;
+//  	GPIO_Init(GPIOA, &GPIO_InitStructure);
+// 
+//	/*Timer1 alternate function full remapping*/  
+//	GPIO_PinAFConfig(GPIOA,GPIO_PinSource8,GPIO_AF_TIM1);  //MOT1_PHA
+//	GPIO_PinAFConfig(GPIOA,GPIO_PinSource9,GPIO_AF_TIM1);  //MOT1_PHB
+//	GPIO_PinAFConfig(GPIOA,GPIO_PinSource10,GPIO_AF_TIM1); //MOT2_PHA
+//	GPIO_PinAFConfig(GPIOA,GPIO_PinSource11,GPIO_AF_TIM1); //MOT2_PHB
+
+//	/* TIM1 clock enable */
+//	TIM_DeInit(TIM1);
+//    RCC_APB2PeriphClockCmd(RCC_APB2Periph_TIM1 , ENABLE);	
+////	TIM_TimeBaseStructInit(&TIM1_TimeBaseStructure);
+//	/* Time Base configuration */
+//	TIM1_TimeBaseStructure.TIM_Prescaler = PWM_PRSC;
+//	TIM1_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_CenterAligned1;//TIM_CounterMode_Up;
+//	TIM1_TimeBaseStructure.TIM_Period = PWM_PERIOD/2; // in CenterAligned mode the couter counts twice half a pwm period 
+//	TIM1_TimeBaseStructure.TIM_ClockDivision = 0;// TIM_CKD_DIV2;
+//	TIM1_TimeBaseStructure.TIM_RepetitionCounter = 0;// REP_RATE;
+
+//	TIM_TimeBaseInit(TIM1, &TIM1_TimeBaseStructure);
+//	
+////	TIM_OCStructInit(&TIM1_OCInitStructure);
+//	/* Channel 1, 2,3 and 4 Configuration in PWM mode */
+//	TIM1_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1; //indipendent channels 
+//	TIM1_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable; 
+//	TIM1_OCInitStructure.TIM_OutputNState = TIM_OutputNState_Disable;                  
+//	TIM1_OCInitStructure.TIM_Pulse = 0x000; //dummy value
+//	TIM1_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High; 
+//	TIM1_OCInitStructure.TIM_OCNPolarity = TIM_OCNPolarity_Low;         
+//	TIM1_OCInitStructure.TIM_OCIdleState = TIM_OCIdleState_Reset;
+//	TIM1_OCInitStructure.TIM_OCNIdleState = TIM_OCIdleState_Reset; //LOW_SIDE_POLARITY;          
+//	
+//	//MOTOR1 PHASE A and B
+//	TIM_OC1Init(TIM1, &TIM1_OCInitStructure);
+//	TIM1_OCInitStructure.TIM_Pulse = (PWM_PERIOD>>0); //dummy value 
+//	TIM_OC1Init(TIM1, &TIM1_OCInitStructure);
+//	TIM1_OCInitStructure.TIM_Pulse = (PWM_PERIOD>>8); //dummy value
+//    TIM_OC2Init(TIM1, &TIM1_OCInitStructure);
+//	
+//	//MOTOR2 PHASE A and B 
+//	TIM1_OCInitStructure.TIM_Pulse = (PWM_PERIOD>>8); //clock wise
+//	TIM_OC3Init(TIM1, &TIM1_OCInitStructure);
+//    TIM1_OCInitStructure.TIM_Pulse = (PWM_PERIOD); //ccw 
+//	TIM_OC4Init(TIM1, &TIM1_OCInitStructure);
+
+//    // Automatic Output enable, Break, dead time and lock configuration
+//    /*
+//	TIM1_BDTRInitStructure.TIM_OSSRState = TIM_OSSRState_Enable;
+//	TIM1_BDTRInitStructure.TIM_OSSIState = TIM_OSSIState_Enable;
+//	TIM1_BDTRInitStructure.TIM_LOCKLevel = TIM_LOCKLevel_1; 
+//	TIM1_BDTRInitStructure.TIM_DeadTime = MOTOR_DEADTIME;
+//	TIM1_BDTRInitStructure.TIM_Break = TIM_Break_Enable;
+//	TIM1_BDTRInitStructure.TIM_BreakPolarity = TIM_BreakPolarity_Low;
+//	TIM1_BDTRInitStructure.TIM_AutomaticOutput = TIM_AutomaticOutput_Disable;
+//	
+//	TIM_BDTRConfig(TIM1, &TIM1_BDTRInitStructure);
+//	
+//	TIM_SelectOutputTrigger(TIM1, TIM_TRGOSource_Update);
+//	
+//	TIM_ClearITPendingBit(TIM1, TIM_IT_Break);
+//	TIM_ITConfig(TIM1, TIM_IT_Break, ENABLE);
+//    */	
+//	/* TIM1 counter enable */
+//	TIM_Cmd(TIM1, ENABLE);
+//	/* Main PWM Output Enable */
+//    TIM_CtrlPWMOutputs(TIM1,ENABLE);
+
+//	//ENABLING THE EN1..EN4 L6206...?
+//	RCC_AHB1PeriphClockCmd( RCC_AHB1Periph_GPIOE , ENABLE);
+
+//	GPIO_StructInit(&GPIO_InitStructure);  
+//	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15; 	
+//	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+//    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
+//    GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+//    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL ;
+//    GPIO_Init(GPIOE, &GPIO_InitStructure);
+
+//	GPIO_SetBits(GPIOE, GPIO_Pin_12);
+//	GPIO_SetBits(GPIOE, GPIO_Pin_13);
+//	GPIO_SetBits(GPIOE, GPIO_Pin_14);
+//	GPIO_SetBits(GPIOE, GPIO_Pin_15);
+
+//	//SETTING DRVFLT1..4 as output L6206...?
+
+//	RCC_AHB1PeriphClockCmd( RCC_AHB1Periph_GPIOD , ENABLE);
+
+//	GPIO_StructInit(&GPIO_InitStructure);  
+
+//	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1| GPIO_Pin_2 | GPIO_Pin_3; 	
+//	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
+//    GPIO_InitStructure.GPIO_Speed = GPIO_Speed_2MHz;
+//    GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
+//    GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL ;
+//    GPIO_Init(GPIOD, &GPIO_InitStructure);
+//    }
+///* INIT MOTOR 3 and 4 */
+//	{
+//		// inizialization of the motor 3 and 4
+//        // ?? how ??
+//	}
+//    
+//    // set all motors whciha re supported also initted
+//    if(hal_motorALL == id)
+//    {
+//        uint8_t ii=0;
+//        for(ii=0; ii<hal_motors_number; ii++)
+//        {
+//            if(hal_true == s_hal_motor_supported_is((hal_motor_t)ii))
+//            {
+//                s_hal_motor_initted_set((hal_motor_t)ii);
+//            }
+//        }
+//    }
+//    else if(id < hal_motors_number)
+//    {
+//        s_hal_motor_initted_set(id);
+//    }
+//    
+//    return(hal_res_OK);
+//}
 
 
 #endif//HAL_USE_DEVICE_MOTORCL

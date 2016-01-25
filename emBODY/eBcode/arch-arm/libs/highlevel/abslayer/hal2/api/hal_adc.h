@@ -87,10 +87,14 @@ typedef struct
 
 extern const hal_adc_cfg_t hal_adc_cfg_default;
 
-enum { hal_adc_max_channels = 16};
+enum { hal_adc_max_channels = 16 };
+
+typedef int16_t hal_dma_current_t; // in pos-neg milliA. value hal_NA16 is the invalid one.
+typedef uint32_t hal_dma_voltage_t; // in positive milliV. value hal_NA32 is the invalid one
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
+
 extern hal_result_t hal_adc_dma_init(void);
 extern hal_result_t hal_adc_dma_common_init(void);
 extern hal_result_t hal_adc_dma_single_init(hal_adc_t adc);
@@ -110,6 +114,7 @@ extern hal_result_t hal_adc_dma_init_ADC1_ADC3_hall_sensor_current(void);
     Data stored using DMA and accessible using the hal_adc_get_tvaux_tvin_temperature_raw and hal_adc_get_tvaux_tvin_mV functions
 */
 extern hal_result_t hal_adc_dma_init_ADC2_tvaux_tvin_temperature (void);
+
 extern hal_result_t hal_adc_ADC1_ADC3_current_init(void);
 
 //use it if initialized all the ADCs with hal_adc_dma_init()
@@ -124,15 +129,20 @@ extern uint32_t hal_adc_get_tvaux_tvin_mV(uint16_t channel);
 
 //use them if initialized ADC1 and ADC3 with hal_adc_dma_init_ADC1_ADC3_hall_sensor_current ()
 extern uint16_t hal_adc_get_hall_sensor_analog_input_raw(uint8_t motor);
-extern uint32_t hal_adc_get_hall_sensor_analog_input_mV(uint8_t motor);
+
+// returns hal_NA32 if argument is not supported or ... 
+extern hal_dma_voltage_t hal_adc_get_hall_sensor_analog_input_mV(uint8_t motor);
 
 //use them if initialized ADC1 and ADC3 with hal_adc_dma_init_ADC1_ADC3_hall_sensor_current ()
 extern uint16_t hal_adc_get_current_motor_raw(uint8_t motor);
-extern int16_t hal_adc_get_current_motor_mA(uint8_t motor);
+
+// returns hal_NA16 if argument is not supported
+extern hal_dma_current_t hal_adc_get_current_motor_mA(uint8_t motor);
 
 /* NEW API */
 //general init for ADC
 extern hal_result_t hal_adc_init(hal_adc_t adc, const hal_adc_cfg_t *cfg);
+
 /** @}            
     end of group doxy_group_hal_adc  
  **/

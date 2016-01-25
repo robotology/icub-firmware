@@ -26,6 +26,9 @@
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
 
+#if defined(HAL_USE_QUAD_ENC)
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
@@ -34,7 +37,8 @@
 #include "string.h"
 #include "hal_gpio.h"
 #include "hal_brdcfg.h"
-#include "hl_core.h" 
+#include "hl_core.h"  
+#include "hl_bits.h" 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -42,9 +46,20 @@
 
 #include "hal_quad_enc.h"
 
+
+// --------------------------------------------------------------------------------------------------------------------
+// - declaration of extern hidden interface 
+// --------------------------------------------------------------------------------------------------------------------
+
+#include "hal_quad_enc_hid.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
+
+#define HAL_QUAD_ENC_INIT_ONLY_BY_PORT
+
+#define HAL_quad_enc_id2index(p)             ((uint8_t)(p))
 
 #define TIMx_PRE_EMPTION_PRIORITY 2
 #define TIMx_SUB_PRIORITY 0
@@ -59,24 +74,65 @@
 #define ENCODER3_TIMER TIM4
 #define ENCODER4_TIMER TIM5
 
+// --------------------------------------------------------------------------------------------------------------------
+// - typedef with internal scope
+// --------------------------------------------------------------------------------------------------------------------
+
+typedef struct
+{
+    uint32_t                    inittedmask;
+//    hal_bool_t                  allinitted;
+    hal_bool_t                  index_found[hal_quad_encs_number];
+} hal_quad_enc_theinternals_t;
+
 
 // --------------------------------------------------------------------------------------------------------------------
-// - declaration of static functions
+// - definition (and initialisation) of static const variables
 // --------------------------------------------------------------------------------------------------------------------
+// empty-section
 
-static void s_hal_quad_enc_set_index_found(uint8_t encoder_number);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_bool_t index_found[4] = {hal_false,hal_false,hal_false,hal_false};
+static hal_quad_enc_theinternals_t s_hal_quad_enc_theinternals =
+{
+    .inittedmask            = 0,
+//    .allinitted             = hal_false,
+    .index_found            = {hal_false, hal_false, hal_false, hal_false}
+};
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - declaration of static functions
+// --------------------------------------------------------------------------------------------------------------------
+
+
+#if !defined(HAL_QUAD_ENC_INIT_ONLY_BY_PORT)
+static hal_result_t s_hal_quad_enc_init_all(void);
+#endif
+
+static void s_hal_quad_enc_set_index_found(hal_quad_enc_t id);
+
+static hal_boolval_t s_hal_quad_enc_none_supported_is(void);
+static hal_boolval_t s_hal_quad_enc_supported_is(hal_quad_enc_t id);
+static void s_hal_quad_enc_initted_set(hal_quad_enc_t id);
+static hal_boolval_t s_hal_quad_enc_initted_is(hal_quad_enc_t id);
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-extern void hal_quad_enc_Init(void)
+
+extern hal_boolval_t hal_quad_enc_supported_is(hal_quad_enc_t id)
+{
+    return(s_hal_quad_enc_supported_is(id));
+}
+
+#if !defined(HAL_QUAD_ENC_INIT_ONLY_BY_PORT)
+static hal_result_t s_hal_quad_enc_init_all(void)
 {
   TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
   TIM_ICInitTypeDef TIM_ICInitStructure;
@@ -339,44 +395,31 @@ extern void hal_quad_enc_Init(void)
 //	
 }	
 
+    const hal_quad_enc_t id = hal_quad_encALL;
+    if(hal_quad_encALL == id)
+    {
+        uint8_t ii=0;
+        for(ii=0; ii<hal_quad_encs_number; ii++)
+        {
+            if(hal_true == s_hal_quad_enc_supported_is((hal_quad_enc_t)ii))
+            {
+                s_hal_quad_enc_initted_set((hal_quad_enc_t)ii);
+            }
+        }
+    }
+    else if(id < hal_quad_encs_number)
+    {
+        s_hal_quad_enc_initted_set(id);
+    }
+    
+    return(hal_res_OK);
 }
-extern uint32_t hal_quad_enc_getCounter(uint8_t encoder_number)
-{
-  uint32_t temp;
-  switch (encoder_number)
-  {	
-  case 0:
-  {
-        temp = TIM_GetCounter(ENCODER1_TIMER);
-  }
-  break;
-  case 1:
-  {
-        temp = TIM_GetCounter(ENCODER2_TIMER);      
-  }
-  break;
-  case 2:
-  {
-        temp = TIM_GetCounter(ENCODER3_TIMER);  
-  }
-  break;
-  case 3:
-  {
-        temp = TIM_GetCounter(ENCODER4_TIMER);  
-  }
-  break;
-  default:
-  {
-  return 0;  
-  }
-  }         
-  return temp; 
-}
+#endif
 
-
-extern void hal_quad_enc_single_init (uint8_t encoder_number)
-{
+extern hal_result_t hal_quad_enc_init(hal_quad_enc_t id)
+{       
 #if 0
+    
     static uint8_t initted = 0;
     
     if(1 == initted)
@@ -384,16 +427,24 @@ extern void hal_quad_enc_single_init (uint8_t encoder_number)
         return;
     }
     
-    hal_quad_enc_Init();
+    s_hal_quad_enc_init_all();
     
     initted = 1;
     
-#else    
+#else   
+    
+#if !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)       
+    if(hal_false == s_hal_quad_enc_supported_is(id))
+    {
+        return(hal_res_NOK_generic);
+    }
+#endif    
+    
     TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
     TIM_ICInitTypeDef TIM_ICInitStructure;
     GPIO_InitTypeDef GPIO_InitStructure;
 
-    switch (encoder_number)
+    switch (id)
     {
         case 0:
         {
@@ -622,13 +673,69 @@ extern void hal_quad_enc_single_init (uint8_t encoder_number)
              break;
          }
         default:
-             return;
+        {
+             
+        } break;
     }
+    
+    
+    s_hal_quad_enc_initted_set(id);    
+    
+    return(hal_res_OK);
+    
 #endif    
 }
 
+
+
+extern uint32_t hal_quad_enc_get_counter(hal_quad_enc_t id)
+{
+    
+#if !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)       
+    if(hal_false == s_hal_quad_enc_initted_is(id))
+    {
+        return(hal_NA32);
+    }
+#endif
+    
+    uint32_t temp = hal_NA32;
+    switch(id)
+    {	
+        case hal_quad_enc1:
+        {
+            temp = TIM_GetCounter(ENCODER1_TIMER);
+        } break;
+        case hal_quad_enc2:
+        {
+            temp = TIM_GetCounter(ENCODER2_TIMER);      
+        } break;
+        case hal_quad_enc3:
+        {
+            temp = TIM_GetCounter(ENCODER3_TIMER);  
+        } break;
+        case hal_quad_enc4:
+        {
+            temp = TIM_GetCounter(ENCODER4_TIMER);  
+        } break;
+        default:
+        {
+
+        } break;
+    } 
+    
+    return(temp); 
+}
+
+
 extern void hal_quad_enc_init_indexes_flags(void)
 {
+    if(hal_true == s_hal_quad_enc_none_supported_is())
+    {
+        return;
+    }
+    
+    // in future we should do it per quad-enc, thus .... 
+    
   // Indexes  //
   /* Enable GPIOG clock */
   RCC_AHB1PeriphClockCmd( RCC_AHB1Periph_GPIOG , ENABLE); 
@@ -666,15 +773,21 @@ extern void hal_quad_enc_init_indexes_flags(void)
   NVIC_Init(&NVIC_InitStructure);
 }
 
-extern hal_bool_t hal_quad_is_index_found(uint8_t encoder_number)
+
+extern hal_bool_t hal_quad_enc_is_index_found(hal_quad_enc_t id)
 {
-    if (encoder_number > 3)
-        return hal_false;
     
-    if (index_found[encoder_number] == hal_true)
+#if !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)       
+    if(hal_false == s_hal_quad_enc_initted_is(id))
+    {
+        return(hal_false);
+    }
+#endif    
+    
+    if(hal_true == s_hal_quad_enc_theinternals.index_found[HAL_quad_enc_id2index(id)])
     {
         //reset flag
-        index_found[encoder_number] = hal_false;
+        s_hal_quad_enc_theinternals.index_found[HAL_quad_enc_id2index(id)] = hal_false;
         return hal_true;
     }
     else
@@ -683,9 +796,17 @@ extern hal_bool_t hal_quad_is_index_found(uint8_t encoder_number)
     }
 }
 
-extern void hal_quad_enc_reset_counter(uint8_t encoder_number)
+extern void hal_quad_enc_reset_counter(hal_quad_enc_t id)
 {
-    switch (encoder_number)
+    
+#if !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)       
+    if(hal_false == s_hal_quad_enc_initted_is(id))
+    {
+        return;
+    }
+#endif 
+    
+    switch (id)
     {
         case 0:
             TIM_SetCounter(ENCODER1_TIMER,ENCODER_START_VAL);
@@ -711,29 +832,29 @@ extern void hal_quad_enc_reset_counter(uint8_t encoder_number)
   */
 void EXTI15_10_IRQHandler(void)
 {
-    //index on quad enc 0
+    // index of quad enc is 0 (hal_quad_enc1)
     if(EXTI_GetITStatus(EXTI_Line13) != RESET)
     {
         EXTI_ClearITPendingBit(EXTI_Line13);
-        s_hal_quad_enc_set_index_found(0);
+        s_hal_quad_enc_set_index_found(hal_quad_enc1); //0
     }
-    //index on quad enc 1
+    // index of quad enc is 1 (hal_quad_enc2)
     if(EXTI_GetITStatus(EXTI_Line12) != RESET)
     {
         EXTI_ClearITPendingBit(EXTI_Line12);
-        s_hal_quad_enc_set_index_found(1);
+        s_hal_quad_enc_set_index_found(hal_quad_enc2); // 1
     }
-	//index on quad enc 2
+	// index of quad enc is 2 (hal_quad_enc3)
     if(EXTI_GetITStatus(EXTI_Line14) != RESET)
     {
         EXTI_ClearITPendingBit(EXTI_Line14);
-        s_hal_quad_enc_set_index_found(2);
+        s_hal_quad_enc_set_index_found(hal_quad_enc3); // 2
     }
-    //index on quad enc 3
+    // index of quad enc is 3 (hal_quad_enc4)
     if(EXTI_GetITStatus(EXTI_Line15) != RESET)
     {
         EXTI_ClearITPendingBit(EXTI_Line15);
-        s_hal_quad_enc_set_index_found(3);
+        s_hal_quad_enc_set_index_found(hal_quad_enc4); // 3
     }
 }
 
@@ -741,10 +862,57 @@ void EXTI15_10_IRQHandler(void)
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-static void s_hal_quad_enc_set_index_found(uint8_t encoder_number)
+
+static void s_hal_quad_enc_set_index_found(hal_quad_enc_t id)
 {
-    if (encoder_number > 3)
+    if(id > 3)
         return;
-    index_found[encoder_number] = hal_true;
+    s_hal_quad_enc_theinternals.index_found[HAL_quad_enc_id2index(id)] = hal_true;
 }
+
+
+static hal_boolval_t s_hal_quad_enc_none_supported_is(void)
+{
+    if(0 == hal_quad_enc__theboardconfig.supportedmask)
+    {
+        return(hal_true);
+    }
+    return(hal_false);
+}
+
+static hal_boolval_t s_hal_quad_enc_supported_is(hal_quad_enc_t id)
+{
+    if(id >= hal_quad_encs_number)
+    {
+        return(hal_false);
+    }
+    return((hal_boolval_t)hl_bits_word_bitcheck(hal_quad_enc__theboardconfig.supportedmask, HAL_quad_enc_id2index(id)) );
+}
+
+static void s_hal_quad_enc_initted_set(hal_quad_enc_t id)
+{
+    hl_bits_word_bitset(&s_hal_quad_enc_theinternals.inittedmask, HAL_quad_enc_id2index(id));
+}
+
+static void s_hal_quad_enc_initted_reset(hal_quad_enc_t id)
+{
+    hl_bits_word_bitclear(&s_hal_quad_enc_theinternals.inittedmask, HAL_quad_enc_id2index(id));
+}
+
+static hal_boolval_t s_hal_quad_enc_initted_is(hal_quad_enc_t id)
+{   
+    if(id >= hal_quad_encs_number)
+    {
+        return(hal_false);
+    }    
+    return((hal_boolval_t)hl_bits_word_bitcheck(s_hal_quad_enc_theinternals.inittedmask, HAL_quad_enc_id2index(id)));
+}
+
+
+#endif // HAL_USE_QUAD_ENC
+
+// --------------------------------------------------------------------------------------------------------------------
+// - end-of-file (leave a blank line after)
+// --------------------------------------------------------------------------------------------------------------------
+
 

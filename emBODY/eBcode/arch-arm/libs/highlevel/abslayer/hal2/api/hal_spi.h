@@ -153,6 +153,14 @@ extern const hal_spi_cfg_t hal_spi_cfg_default; /**< = { .ownership = hal_spi_ow
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
 
+/** @fn         extern hal_boolval_t hal_spi_supported_is(hal_spi_t id)
+    @brief      This function tells if the specified SPI port is supported by the board. 
+    @param      id              identifies SPI id 
+    @return     hal_true or hal_false
+  */
+extern hal_boolval_t hal_spi_supported_is(hal_spi_t id);
+
+
 /** @fn         extern uint32_t hal_spi_speedofbus_get(hal_spi_t id)
     @brief      this function tells what is the internal bus speed of an spi id. it can be used to chose the right value of the
                 prescaler to be assigned inside the hal_spi_cfg_t argument to be passed to hal_spi_init().

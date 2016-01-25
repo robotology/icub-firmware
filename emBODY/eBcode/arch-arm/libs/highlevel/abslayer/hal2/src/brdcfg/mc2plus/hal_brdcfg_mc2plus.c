@@ -1003,6 +1003,18 @@
     
 #endif//HAL_USE_LED
  
+ 
+
+#ifdef HAL_USE_DEVICE_MOTORCTL
+ 
+    #include "hal_motor_hid.h"
+
+    extern const hal_motor_boardconfig_t hal_motor__theboardconfig =
+    {
+        .supportedmask              =  (1 << hal_motor1) | (1 << hal_motor2) | (0 << hal_motor3) | (0 << hal_motor4)
+    };
+    
+#endif//HAL_USE_DEVICE_MOTORCTL
     
     
 #ifdef HAL_USE_MUX
@@ -1089,6 +1101,19 @@
 #endif//HAL_USE_MUX      
     
 
+    
+#ifdef HAL_USE_QUAD_ENC
+ 
+    #include "hal_quad_enc_hid.h"
+
+    extern const hal_quad_enc_boardconfig_t hal_quad_enc__theboardconfig =
+    {
+        .supportedmask              =  (1 << hal_quad_enc1) | (1 << hal_quad_enc2) | (0 << hal_quad_enc3) | (0 << hal_quad_enc4)
+    };
+    
+#endif//HAL_USE_QUAD_ENC
+
+    
     
 #ifdef HAL_USE_SWITCH
     

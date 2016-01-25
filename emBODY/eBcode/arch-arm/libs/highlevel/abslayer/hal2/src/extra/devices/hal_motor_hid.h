@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2014 iCub Facility - Istituto Italiano di Tecnologia
- * Author:  Davide Pollarolo
- * email:   davide.pollarolo@iit.it
+ * Copyright (C) 2016 iCub Facility - Istituto Italiano di Tecnologia
+ * Author:  Marco Accame
+ * email:   marco.accame@iit.it
  * website: www.robotcub.org
  * Permission is granted to copy, distribute, and/or modify this program
  * under the terms of the GNU General Public License, version 2 or any
@@ -18,14 +18,14 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef _HAL_ADC_HID_H_
-#define _HAL_ADC_HID_H_
+#ifndef _HAL_MOTOR_HID_H_
+#define _HAL_MOTOR_HID_H_
 
 
-/* @file       hal_adc_hid.h
-    @brief      This header file implements hidden interface to an ADC
-    @author     davide.pollarolo@iit.it
-    @date       03/04/2013
+/* @file       hal_motor_hid.h
+    @brief      This header file implements hidden interface to a motor
+    @author     marco.accame@iit.it
+    @date       25 jan 2016
  **/
 
 
@@ -36,30 +36,26 @@
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
-#include "hal_adc.h"
+#include "hal_motor.h"
+
 
 
 // - #define used with hidden struct ----------------------------------------------------------------------------------
-// marco.accame: ma a che cosa servono qui e poi messi nel data_regs_addresses ??
-#define ADC1_DR_ADDRESS          ((uint32_t)0x4001204C) //ADC1BASE +0x4C 
-#define ADC2_DR_ADDRESS          ((uint32_t)0x4001214C)
-#define ADC3_DR_ADDRESS          ((uint32_t)0x4001224C)
-#define ADC_CDR_ADDRESS          ((uint32_t)0x40012308) // common data register?
+// empty-section
 
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
+
 typedef struct
 {
-    uint32_t                    supportedmask;
-    uint32_t                    data_regs_addresses[hal_adc_number];
-    hal_bool_t                  use4motorcontrol;
-} hal_adc_boardconfig_t;
+    uint32_t        supportedmask;
+} hal_motor_boardconfig_t;
 
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
 
-extern const hal_adc_boardconfig_t hal_adc__theboardconfig;
+extern const hal_motor_boardconfig_t hal_motor__theboardconfig;
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
@@ -68,3 +64,7 @@ extern const hal_adc_boardconfig_t hal_adc__theboardconfig;
 #endif  // include guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
+
+
+
+

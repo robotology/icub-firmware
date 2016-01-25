@@ -18,6 +18,10 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
+#error THIS HEADER IS OBSOLETE: USE hal_motor.h INSTEAD !
+
+#if 0
+
 #ifndef _HAL_MOTORCTL_H_
 #define _HAL_MOTORCTL_H_
 
@@ -241,6 +245,8 @@ extern hal_result_t hal_motor_reenable_break_interrupts(void);
  **/
 
 #endif  // include-guard
+
+#endif
 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------

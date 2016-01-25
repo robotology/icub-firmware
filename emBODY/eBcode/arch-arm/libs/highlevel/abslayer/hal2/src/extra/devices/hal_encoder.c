@@ -160,7 +160,12 @@ static hal_encoder_theinternals_t s_hal_encoder_theinternals =
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
-//Initialization
+
+extern hal_boolval_t hal_encoder_supported_is(hal_encoder_t id)
+{
+    return(s_hal_encoder_supported_is(id));
+}
+
 extern hal_result_t hal_encoder_init(hal_encoder_t id, const hal_encoder_cfg_t *cfg)
 {
     hal_encoder_internal_item_t* intitem = s_hal_encoder_theinternals.items[HAL_encoder_id2index(id)];

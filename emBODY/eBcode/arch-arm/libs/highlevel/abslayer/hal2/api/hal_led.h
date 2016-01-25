@@ -86,6 +86,14 @@ typedef struct
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
+/** @fn         extern hal_boolval_t hal_led_supported_is(hal_led_t id)
+    @brief      This function tells if the specified LED is supported by the board. 
+    @param      id              identifies LED id 
+    @return     hal_true or hal_false
+  */
+extern hal_boolval_t hal_led_supported_is(hal_led_t id);
+
+
 /** @fn			extern hal_result_t hal_led_init(hal_led_t id, const hal_led_cfg_t *cfg);
     @brief  	This function inits a led.
     @details    c rfce.

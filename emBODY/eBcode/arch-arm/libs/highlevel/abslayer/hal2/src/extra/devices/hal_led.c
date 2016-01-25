@@ -111,6 +111,12 @@ static uint32_t s_hal_led_inittedmask = 0;
 // --------------------------------------------------------------------------------------------------------------------
 
 
+extern hal_boolval_t hal_led_supported_is(hal_led_t id)
+{
+    return(s_hal_led_supported_is(id));
+}
+
+
 extern hal_result_t hal_led_init(hal_led_t id, const hal_led_cfg_t *cfg)
 {
     const hal_gpio_map_t *gm = NULL;

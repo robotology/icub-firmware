@@ -178,6 +178,13 @@ const hl_spi_mapping_t* hl_spi_map = NULL;
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
+
+extern hal_boolval_t hal_spi_supported_is(hal_spi_t id)
+{
+    return(s_hal_spi_supported_is(id));
+}
+
+
 // this is not implemented in here.
 // /** @fn            extern hal_result_t hal_spi_send(hal_spi_t id, uint8_t* txframe, uint8_t size)
 //     @brief      this function adds the frame to the transmission buffer.  

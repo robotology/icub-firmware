@@ -143,7 +143,7 @@ static hal_can_theinternals_t s_hal_can_theinternals =
 
 
 // it must be defined in order to use hl_can.
-extern const hl_can_mapping_t* hl_can_map = NULL;
+const hl_can_mapping_t* hl_can_map = NULL;
 
 
 
@@ -151,6 +151,10 @@ extern const hl_can_mapping_t* hl_can_map = NULL;
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
+extern hal_boolval_t hal_can_supported_is(hal_can_t id)
+{
+    return(s_hal_can_supported_is(id));
+}
 
 extern hal_result_t hal_can_init(hal_can_t id, const hal_can_cfg_t *cfg)
 {

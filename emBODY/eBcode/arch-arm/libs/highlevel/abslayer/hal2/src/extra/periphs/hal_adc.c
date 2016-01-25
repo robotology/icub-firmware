@@ -42,7 +42,8 @@
 #include "hl_core.h" //stm32 libraries
 #include "hl_adc.h"
 
- 
+#include "hal_motor.h" 
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -94,11 +95,12 @@
 #define CUR_REDUCTION_FACTOR        (float) (3.2/5.0)
 #define TVAUX_REDUCTION_FACTOR      (float) (3.0/5.0)
 #define TVIN_REDUCTION_FACTOR       (float) (1.0/21.0)    
+    
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
-extern const hal_adc_cfg_t hal_adc_cfg_default =
+const hal_adc_cfg_t hal_adc_cfg_default =
 { 
     .init_mode              = hal_adc_indipendent,   
     .simult_adc             = NULL,                   
@@ -129,11 +131,15 @@ typedef struct
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static const variables
 // --------------------------------------------------------------------------------------------------------------------
+
 static ADC_TypeDef* const s_hal_adc_stmADCmap[] = { ADC1, ADC2, ADC3 };
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
+
+static hal_boolval_t s_hal_adc_none_supported_is(void);
+    
 static hal_boolval_t s_hal_adc_supported_is(hal_adc_t id);
 static void s_hal_adc_initted_set(hal_adc_t id);
 static void s_hal_adc_initted_reset(hal_adc_t id);
@@ -193,6 +199,12 @@ static uint32_t uwVBATVoltage = 0;
 //Init with DMA (Regular Conversions, not Injected using Timers)
 extern hal_result_t hal_adc_dma_init()	   
 {
+    
+    if(hal_true == s_hal_adc_none_supported_is())
+    {
+        return(hal_res_NOK_generic);
+    }
+    
   ADC_InitTypeDef       ADC_InitStructure;
   ADC_CommonInitTypeDef ADC_CommonInitStructure;
   DMA_InitTypeDef       DMA_InitStructure;
@@ -322,6 +334,11 @@ extern hal_result_t hal_adc_dma_init()
 // here the conversions are triggered with TIMER1, which is initialized only in hal_dc_motorctl.c
 extern hal_result_t hal_adc_ADC1_ADC3_current_init()	   
 {
+    if(hal_true == s_hal_adc_none_supported_is())
+    {
+        return(hal_res_NOK_generic);
+    }    
+    
   ADC_InitTypeDef       ADC_InitStructure;
   GPIO_InitTypeDef      GPIO_InitStructure;
   ADC_CommonInitTypeDef ADC_CommonInitStructure;
@@ -408,6 +425,11 @@ extern hal_result_t hal_adc_ADC1_ADC3_current_init()
 
 extern hal_result_t hal_adc_dma_common_init()
 {
+    if(hal_true == s_hal_adc_none_supported_is())
+    {
+        return(hal_res_NOK_generic);
+    }    
+    
   //if (initialized == hal_false)
   //{
   ADC_CommonInitTypeDef ADC_CommonInitStructure;
@@ -483,6 +505,12 @@ extern hal_result_t hal_adc_dma_common_init()
 }
 extern hal_result_t hal_adc_dma_single_init(hal_adc_t adc)
 {
+    
+    if(hal_true == s_hal_adc_none_supported_is())
+    {
+        return(hal_res_NOK_generic);
+    }
+    
   ADC_InitTypeDef       ADC_InitStructure;
     
   switch (adc)
@@ -566,6 +594,11 @@ return hal_res_OK;
 
 extern hal_result_t hal_adc_common_structure_init()
 {
+    if(hal_true == s_hal_adc_none_supported_is())
+    {
+        return(hal_res_NOK_generic);
+    }    
+    
   ADC_CommonInitTypeDef ADC_CommonInitStructure;
   
   //ADC common init
@@ -577,8 +610,15 @@ extern hal_result_t hal_adc_common_structure_init()
   
   return hal_res_OK;
 }
+
 extern hal_result_t hal_adc_dma_init_ADC1_ADC3_hall_sensor_current ()
 {
+    
+    if(hal_true == s_hal_adc_none_supported_is())
+    {
+        return(hal_res_NOK_generic);
+    }
+    
       ADC_InitTypeDef       ADC_InitStructure;
       ADC_CommonInitTypeDef ADC_CommonInitStructure;
       DMA_InitTypeDef       DMA_InitStructure;
@@ -691,8 +731,15 @@ extern hal_result_t hal_adc_dma_init_ADC1_ADC3_hall_sensor_current ()
       
       return hal_res_OK;  
 }
+
 extern hal_result_t hal_adc_dma_init_ADC2_tvaux_tvin_temperature ()
 {
+    
+    if(hal_true == s_hal_adc_none_supported_is())
+    {
+        return(hal_res_NOK_generic);
+    }
+    
   ADC_InitTypeDef       ADC_InitStructure;
   ADC_CommonInitTypeDef ADC_CommonInitStructure;
   DMA_InitTypeDef       DMA_InitStructure;
@@ -774,6 +821,7 @@ extern hal_result_t hal_adc_dma_init_ADC2_tvaux_tvin_temperature ()
   ADC_SoftwareStartConv(ADC2);
   return hal_res_OK;
 }
+
 extern uint16_t hal_adc_get(uint16_t ADC_TYPE, uint16_t channel)
 {   
     if ((ADC_TYPE < 1) || (ADC_TYPE > 3) || (channel > hal_adc_max_channels))
@@ -817,19 +865,30 @@ extern int16_t hal_adc_get_current(uint16_t channel)
         return 0;
 	return	uhCur[channel];
 }
+
 extern uint16_t hal_adc_get_hall_sensor_analog_input_raw(uint8_t motor)
 {
-    if (motor > 3)
-        return 0;
+    if(hal_false == hal_motor_supported_is((hal_motor_t)motor))
+    {
+        return(hal_NA16);
+    }    
+    
+//    if (motor > 3)
+//        return 0;
+    
     //swap motor 0 and motor 1
     if ((motor == 0) || (motor == 1)) motor = !motor;
     
 	return	AnalogMotorsInput[motor*2];
 }
-extern uint32_t hal_adc_get_hall_sensor_analog_input_mV(uint8_t motor)
+
+extern hal_dma_voltage_t hal_adc_get_hall_sensor_analog_input_mV(uint8_t motor)
 {
-    if (motor > 3)
-        return 0;
+    if(hal_false == hal_motor_supported_is((hal_motor_t)motor))
+    {
+        return(hal_NA32);
+    }
+    
     //swap motor 0 and motor 1
     if ((motor == 0) || (motor == 1)) motor = !motor;
     
@@ -838,19 +897,29 @@ extern uint32_t hal_adc_get_hall_sensor_analog_input_mV(uint8_t motor)
   
 	return	result;
 }
+
 extern uint16_t hal_adc_get_current_motor_raw(uint8_t motor)
 {
-    if (motor > 3)
-        return 0;
+    // marco.accame: best thing is to verify vs initialisation of the assocaited adc peripheral, but for now we accept this check.
+    if(hal_false == hal_motor_supported_is((hal_motor_t)motor))
+    {
+        return(hal_NA16);
+    }
+    
     //swap motor 0 and motor 1
     if ((motor == 0) || (motor == 1)) motor = !motor;
     
 	return	(uint16_t)(AnalogMotorsInput[motor*2 + 1] - hCurOffset[motor]);
 }
-extern int16_t hal_adc_get_current_motor_mA(uint8_t motor)
+
+extern hal_dma_current_t hal_adc_get_current_motor_mA(uint8_t motor)
 {
-    if (motor > 3)
-        return 0;
+    // marco.accame: best thing is to verify vs initialisation of the assocaited adc peripheral, but for now we accept this check.
+    if(hal_false == hal_motor_supported_is((hal_motor_t)motor))
+    {
+        return(hal_NA16);
+    }
+
     //swap motor 0 and motor 1
     if ((motor == 0) || (motor == 1)) motor = !motor;
     
@@ -859,7 +928,9 @@ extern int16_t hal_adc_get_current_motor_mA(uint8_t motor)
     
 	return	result;
 }
+
 /*-------------------NEW APIs BEGIN-------------------------------------------*/
+
 extern hal_result_t hal_adc_init(hal_adc_t id, const hal_adc_cfg_t *cfg)
 {
     //check if supported & initted
@@ -1003,7 +1074,9 @@ extern hal_result_t hal_adc_init(hal_adc_t id, const hal_adc_cfg_t *cfg)
     
     return hal_res_OK;
 }
+
 /*-------------------NEW APIs END-------------------------------------------*/
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
@@ -1226,6 +1299,23 @@ void ADC_IRQHandler(void)
     //ADC_ClearFlag(ADC1, ADC_FLAG_AWD);
 }
 
+
+// --------------------------------------------------------------------------------------------------------------------
+// - definition of static functions 
+// --------------------------------------------------------------------------------------------------------------------
+
+
+
+static hal_boolval_t s_hal_adc_none_supported_is(void)
+{
+    if(0 == hal_adc__theboardconfig.supportedmask)
+    {
+        return(hal_true);
+    }
+    return(hal_false);
+}
+
+
 static hal_boolval_t s_hal_adc_supported_is(hal_adc_t id)
 {
     return((hal_boolval_t)hl_bits_word_bitcheck(hal_adc__theboardconfig.supportedmask, HAL_adc_id2index(id)) );
@@ -1246,4 +1336,10 @@ static hal_boolval_t s_hal_adc_initted_is(hal_adc_t id)
     return((hal_boolval_t)hl_bits_word_bitcheck(s_hal_adc_theinternals.inittedmask, HAL_adc_id2index(id)));
 }
 
-#endif
+#endif // HAL_USE_ADC
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - end-of-file (leave a blank line after)
+// --------------------------------------------------------------------------------------------------------------------
+

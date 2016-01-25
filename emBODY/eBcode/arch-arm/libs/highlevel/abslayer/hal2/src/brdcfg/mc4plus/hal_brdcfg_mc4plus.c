@@ -145,7 +145,7 @@
         return(hl_res_OK);    
     }    
 
-    extern const hl_chip_micrel_ks8893_cfg_t ks8893_config = 
+    const hl_chip_micrel_ks8893_cfg_t ks8893_config = 
     {
         .i2cid              = hl_i2c3,
         .resetpin           = { .port = hl_gpio_portC,     .pin = hl_gpio_pin8 }, // it is ETH_SLV in schematics
@@ -217,7 +217,7 @@
 
     #include "hal_base_hid.h"
     
-    extern const hal_base_boardconfig_t hal_base__theboardconfig  =
+    const hal_base_boardconfig_t hal_base__theboardconfig  =
     {
         .dummy  = 0
     };  
@@ -229,7 +229,7 @@
     
     #include "hal_mpu_hid.h"
     
-    extern const hal_mpu_boardconfig_t hal_mpu__theboardconfig  =
+    const hal_mpu_boardconfig_t hal_mpu__theboardconfig  =
     {
         .architecture       = hal_mpu_arch_armcm4,
         .type               = hal_mpu_type_stm32f4,
@@ -250,7 +250,7 @@
     
     #include "hal_flash_hid.h"
     
-    extern const hal_flash_boardconfig_t hal_flash__theboardconfig =
+    const hal_flash_boardconfig_t hal_flash__theboardconfig =
     {
         .baseaddress    =   0x08000000,                 // on every stm32
         .totalsize      =   
@@ -269,7 +269,7 @@
     
     #include "hal_heap_hid.h"
     
-    extern const hal_heap_boardconfig_t hal_heap__theboardconfig =
+    const hal_heap_boardconfig_t hal_heap__theboardconfig =
     {
         .nothingsofar   = 0
     };
@@ -281,7 +281,7 @@
     
     #include "hal_sys_hid.h"
     
-    extern const hal_sys_boardconfig_t hal_sys__theboardconfig  =
+    const hal_sys_boardconfig_t hal_sys__theboardconfig  =
     {
         .dummy             = 0
     };   
@@ -296,7 +296,7 @@
     
     #include "hal_5v_hid.h"
     
-    extern const hal_5v_boardconfig_t hal_5v__theboardconfig =
+    const hal_5v_boardconfig_t hal_5v__theboardconfig =
     {
         .supported          = 1,
         .gpiomap            =
@@ -315,13 +315,14 @@
 #ifdef HAL_USE_ADC
     
     #include "hal_adc_hid.h"
-    extern const hal_adc_boardconfig_t hal_adc__theboardconfig =
+    const hal_adc_boardconfig_t hal_adc__theboardconfig =
     {
-        .supportedmask =  (1 << hal_adc1) | (1 << hal_adc2) | (1 << hal_adc3),
-        .data_regs_addresses = { ADC1_DR_ADDRESS,
-                                 ADC2_DR_ADDRESS, 
-                                 ADC3_DR_ADDRESS
-                               }
+        .supportedmask          =  (1 << hal_adc1) | (1 << hal_adc2) | (1 << hal_adc3),
+        .data_regs_addresses    = { ADC1_DR_ADDRESS,
+                                    ADC2_DR_ADDRESS, 
+                                    ADC3_DR_ADDRESS
+                                  },
+        .use4motorcontrol       = hal_true
     };
     
 #endif
@@ -332,7 +333,7 @@
     
     #include "hal_can_hid.h"
     
-    extern const hal_can_boardconfig_t hal_can__theboardconfig =
+    const hal_can_boardconfig_t hal_can__theboardconfig =
     {
         .supportedmask      = (1 << hal_can1) | (0 << hal_can2),
 		.gpiomap            =
@@ -371,7 +372,7 @@
 
     
     #include "hal_eth_hid.h"
-    extern const hal_eth_boardconfig_t hal_eth__theboardconfig =
+    const hal_eth_boardconfig_t hal_eth__theboardconfig =
     {
         .supported          = hal_true,
         .rxdmafifocapacity  = 4, //hal_NA08, //4, //hal_NA08
@@ -441,7 +442,7 @@
     
     #include "hal_gpio_hid.h"
     
-    extern const hal_gpio_boardconfig_t hal_gpio__theboardconfig =
+    const hal_gpio_boardconfig_t hal_gpio__theboardconfig =
     {
         .supportedmask_byport    =
         {   // ok, i enable every pin of every port.
@@ -465,7 +466,7 @@
     
     #include "hal_i2c_hid.h"
     
-    extern const hal_i2c_boardconfig_t hal_i2c__theboardconfig =
+    const hal_i2c_boardconfig_t hal_i2c__theboardconfig =
     {
     .supportedmask          = (1 << hal_i2c1) | (0 << hal_i2c2) | (1 << hal_i2c3),
 		.gpiomap                =
@@ -520,7 +521,7 @@
 		
     #include "hal_spi_hid.h"
 
-    extern const hal_spi_boardconfig_t hal_spi__theboardconfig =
+    const hal_spi_boardconfig_t hal_spi__theboardconfig =
     {
 		.supportedmask      = (0 << hal_spi1) | (1 << hal_spi2) | (1 << hal_spi3),
 		.gpiomap            =
@@ -587,7 +588,7 @@
     
     #include "hal_timer_hid.h"
     #warning --> supporting all timers apart the first 5 and timer 8 (reserved for some objects...)
-		extern const hal_timer_boardconfig_t hal_timer__theboardconfig =
+    const hal_timer_boardconfig_t hal_timer__theboardconfig =
     {
         .supportedmask  = (0 << hal_timer1)  | (0 << hal_timer2)  | (0 << hal_timer3)  | (0 << hal_timer4)  | 
                           (0 << hal_timer5)  | (1 << hal_timer6)  | (1 << hal_timer7)  | (0 << hal_timer8)  | 
@@ -602,7 +603,7 @@
     
     #include "hal_trace_hid.h"
     
-    extern const hal_trace_boardconfig_t hal_trace__theboardconfig =
+    const hal_trace_boardconfig_t hal_trace__theboardconfig =
     {
         .supported          = hal_true
     }; 
@@ -614,7 +615,7 @@
     
     #include "hal_uniqueid_hid.h"
     
-    extern const hal_uniqueid_boardconfig_t hal_uniqueid__theboardconfig =
+    const hal_uniqueid_boardconfig_t hal_uniqueid__theboardconfig =
     {
         .supportedmask      = (1 << hal_uniqueid_id64bit) | (0 << hal_uniqueid_macaddr),
         .macoui             = 0
@@ -627,7 +628,7 @@
     
     #include "hal_watchdog_hid.h" 
     
-    extern const hal_watchdog_boardconfig_t hal_watchdog__theboardconfig =
+    const hal_watchdog_boardconfig_t hal_watchdog__theboardconfig =
     {
         .supportedmask      = (1 << hal_watchdog1_normal) | (1 << hal_watchdog2_window)
     };   
@@ -698,7 +699,7 @@
         return(hal_res_OK);
     }
     
-    extern const hal_cantransceiver_boardconfig_t hal_cantransceiver__theboardconfig =
+    const hal_cantransceiver_boardconfig_t hal_cantransceiver__theboardconfig =
     {
         .supportedmask      =  (1 << hal_cantransceiver1) | (1 << hal_cantransceiver2),
         .driver             =
@@ -763,7 +764,7 @@
     } 
     
 
-    extern const hal_eeprom_boardconfig_t hal_eeprom__theboardconfig =
+    const hal_eeprom_boardconfig_t hal_eeprom__theboardconfig =
     {
         .supportedmask      =  (0 << hal_eeprom_emulatedflash) | (1 << hal_eeprom_i2c_01) | (0 << hal_eeprom_i2c_02),
         .driver             =
@@ -821,7 +822,7 @@
  
     #include "hal_encoder_hid.h"
 
-    extern const hal_encoder_boardconfig_t hal_encoder__theboardconfig =
+    const hal_encoder_boardconfig_t hal_encoder__theboardconfig =
     {
         .supportedmask              =  (1 << hal_encoder1) | (1 << hal_encoder2) | (0 << hal_encoder3) | (0 << hal_encoder4) | (0 << hal_encoder5) | (0 << hal_encoder6),  
         .spimaxspeed                =  1000*1000, // not more than 1 mhz. actually on stm32f4 it is exactly 42m/64 = 0.65625 mhz
@@ -848,7 +849,7 @@
     
 #if     defined(MC4PLUS_USE_MICREL_AS_MANAGED_DEVICE)      
             
-    extern const hal_ethtransceiver_boardconfig_t hal_ethtransceiver__theboardconfig =
+    const hal_ethtransceiver_boardconfig_t hal_ethtransceiver__theboardconfig =
     {
         .supportedmask          = (1 << hal_ethtransceiver1),
         .driver                 =
@@ -890,7 +891,7 @@
     } 
 
 
-    extern const hal_ethtransceiver_boardconfig_t hal_ethtransceiver__theboardconfig =
+    const hal_ethtransceiver_boardconfig_t hal_ethtransceiver__theboardconfig =
     {
         .supportedmask          = (1 << hal_ethtransceiver1),
         .driver                 =
@@ -928,7 +929,7 @@
     
     #include "hal_led_hid.h"
     
-    extern const hal_led_boardconfig_t hal_led__theboardconfig =
+    const hal_led_boardconfig_t hal_led__theboardconfig =
     {
         .supportedmask      = (1 << hal_led0) | (1 << hal_led1) | (1 << hal_led2) | (1 << hal_led3) , // only first 4 leds
         .boardcommon        =
@@ -999,6 +1000,18 @@
     
 #endif//HAL_USE_LED
  
+
+#ifdef HAL_USE_DEVICE_MOTORCTL
+ 
+    #include "hal_motor_hid.h"
+
+    const hal_motor_boardconfig_t hal_motor__theboardconfig =
+    {
+        .supportedmask              =  (1 << hal_motor1) | (1 << hal_motor2) | (1 << hal_motor3) | (1 << hal_motor4)
+    };
+    
+#endif//HAL_USE_DEVICE_MOTORCTL
+    
     
     
 #ifdef HAL_USE_MUX
@@ -1007,7 +1020,7 @@
 		
     #include "hal_mux_hid.h"
     
-    extern const hal_mux_boardconfig_t hal_mux__theboardconfig =
+    const hal_mux_boardconfig_t hal_mux__theboardconfig =
     {
         .supportedmask      = (1 << hal_mux1) | (1 << hal_mux2) | (0 << hal_mux3) | (0 << hal_mux4), 
         .gpiomap            =
@@ -1086,6 +1099,19 @@
     
 
     
+#ifdef HAL_USE_QUAD_ENC
+ 
+    #include "hal_quad_enc_hid.h"
+
+    const hal_quad_enc_boardconfig_t hal_quad_enc__theboardconfig =
+    {
+        .supportedmask              =  (1 << hal_quad_enc1) | (1 << hal_quad_enc2) | (1 << hal_quad_enc3) | (1 << hal_quad_enc4)
+    };
+    
+#endif//HAL_USE_QUAD_ENC
+    
+    
+    
 #ifdef HAL_USE_SWITCH
     
     #include "hal_switch_hid.h" 
@@ -1096,7 +1122,7 @@
     #include "hl_chip_micrel_ks8893.h"
     
 
-    extern const hal_switch_boardconfig_t hal_switch__theboardconfig =
+    const hal_switch_boardconfig_t hal_switch__theboardconfig =
     {
         .supportedmask      = (1 << hal_switch1),
         .driver                 =
@@ -1124,7 +1150,7 @@
    
 #else
     
-    extern const hal_switch_boardconfig_t hal_switch__theboardconfig =
+    const hal_switch_boardconfig_t hal_switch__theboardconfig =
     {
         .supportedmask      = (1 << hal_switch1),
         .driver                 =

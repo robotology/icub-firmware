@@ -325,6 +325,22 @@
         }
     };
 #endif
+    
+    
+#ifdef HAL_USE_ADC
+    
+    #include "hal_adc_hid.h"
+    const hal_adc_boardconfig_t hal_adc__theboardconfig =
+    {
+        .supportedmask          =  (0 << hal_adc1) | (0 << hal_adc2) | (0 << hal_adc3),
+        .data_regs_addresses    = { ADC1_DR_ADDRESS,
+                                    ADC2_DR_ADDRESS, 
+                                    ADC3_DR_ADDRESS
+                                  },
+        .use4motorcontrol       = hal_false
+    };
+    
+#endif    
 
 
 #ifdef  HAL_USE_CAN
@@ -1109,6 +1125,19 @@
     
 #endif//HAL_USE_LED
  
+
+
+#ifdef HAL_USE_DEVICE_MOTORCTL
+ 
+    #include "hal_motor_hid.h"
+
+    extern const hal_motor_boardconfig_t hal_motor__theboardconfig =
+    {
+        .supportedmask              =  (0 << hal_motor1) | (0 << hal_motor2) | (0 << hal_motor3) | (0 << hal_motor4)
+    };
+    
+#endif//HAL_USE_DEVICE_MOTORCTL
+
     
     
 #ifdef HAL_USE_MUX
@@ -1193,6 +1222,17 @@
     
 #endif//HAL_USE_MUX      
     
+
+#ifdef HAL_USE_QUAD_ENC
+ 
+    #include "hal_quad_enc_hid.h"
+
+    extern const hal_quad_enc_boardconfig_t hal_quad_enc__theboardconfig =
+    {
+        .supportedmask              =  (0 << hal_quad_enc1) | (0 << hal_quad_enc2) | (0 << hal_quad_enc3) | (0 << hal_quad_enc4)
+    };
+    
+#endif//HAL_USE_QUAD_ENC
 
     
 #ifdef HAL_USE_SWITCH
