@@ -522,7 +522,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_velocitysetpointtimeout(const EOnv* 
 
 
 
-extern void eoprot_fun_UPDT_mc_joint_status_modes_ismotiondone(const EOnv* nv, const eOropdescriptor_t* rd)
+extern void eoprot_fun_UPDT_mc_joint_status_core_modes_ismotiondone(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
@@ -539,7 +539,7 @@ extern void eoprot_fun_UPDT_mc_joint_status_modes_ismotiondone(const EOnv* nv, c
             eOcanprot_command_t command = {0};
             command.class = eocanprot_msgclass_pollingMotorControl;
             command.type = ICUBCANPROTO_POL_MC_CMD__MOTION_DONE;
-            command.value = NULL;
+            command.value = NULL; 
         
             EOproxy * proxy = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
             eOproxy_params_t *param = eo_proxy_Params_Get(proxy, rd->id32);
@@ -609,7 +609,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
 //    }    
 
 
-    joint->status.modes.ismotiondone = eobool_false;
+    joint->status.core.modes.ismotiondone = eobool_false;
 
     //if(eobool_true == s_motorcontrol_is2foc_based())   
     if(eo_motcon_mode_foc == mcmode)
@@ -618,27 +618,43 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
         { 
             case eomc_setpoint_position:
             {
-                eo_emsController_SetPosRef(jxx, setpoint->to.position.value, setpoint->to.position.withvelocity);
+                if(eo_emsController_SetPosRef(jxx, setpoint->to.position.value, setpoint->to.position.withvelocity))
+                {
+                    joint->status.target.trgt_position = setpoint->to.position.value;
+                }
             } break;
             
             case eomc_setpoint_positionraw:
             {
-                eo_emsController_SetPosRaw(jxx, setpoint->to.positionraw.value);
+                if(eo_emsController_SetPosRaw(jxx, setpoint->to.positionraw.value))
+                {
+                    joint->status.target.trgt_positionraw = setpoint->to.positionraw.value;
+                }
             } break;
             
             case eomc_setpoint_velocity:
             {
-                eo_emsController_SetVelRef(jxx, setpoint->to.velocity.value, setpoint->to.velocity.withacceleration);    
+                if(eo_emsController_SetVelRef(jxx, setpoint->to.velocity.value, setpoint->to.velocity.withacceleration))
+                {
+                    joint->status.target.trgt_velocity = setpoint->to.velocity.value;
+                }    
             } break;
 
             case eomc_setpoint_torque:
             {
-                eo_emsController_SetTrqRef(jxx, setpoint->to.torque.value);
+                if(eo_emsController_SetTrqRef(jxx, setpoint->to.torque.value))
+                {
+                    joint->status.target.trgt_torque = setpoint->to.torque.value;
+                }
+
             } break;
 
-            case eomc_setpoint_current:
+            case eomc_setpoint_openloop:
             {
-                eo_emsController_SetOutput(jxx, setpoint->to.current.value);
+                if(eo_emsController_SetOutput(jxx, setpoint->to.openloop.value))
+                {
+                    joint->status.target.trgt_openloop = setpoint->to.openloop.value;
+                }
             } break;
 
             default:
@@ -660,7 +676,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
         icubCanProto_setpoint_position_t setpoint_pos = {0};
         icubCanProto_setpoint_velocity_t setpoint_vel = {0};
         icubCanProto_setpoint_torque_t setpoint_torque = {0};
-        icubCanProto_setpoint_current_t setpoint_current = {0};
+        icubCanProto_setpoint_openloop_t setpoint_openloop = {0};
         icubCanProto_position_t pos = 0;
         
         command.type  = 0;
@@ -673,7 +689,9 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
                 setpoint_pos.withvelocity = eo_mc4boards_Convert_Velocity_toCAN(mc4boards, jxx, setpoint->to.position.withvelocity, eomc4_velocitycontext_toCAN_positionsetpoint);
                 
                 command.type  = ICUBCANPROTO_POL_MC_CMD__POSITION_MOVE; 
-                command.value =  &setpoint_pos; 
+                command.value =  &setpoint_pos;
+
+                joint->status.target.trgt_position = setpoint->to.position.value;
             } break;
 
             case eomc_setpoint_velocity:
@@ -689,6 +707,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
                 command.type  = ICUBCANPROTO_POL_MC_CMD__VELOCITY_MOVE; 
                 command.value =  &setpoint_vel;   
                 
+                joint->status.target.trgt_velocity = setpoint->to.velocity.value;
 //#undef DEBUG_SETPOINT_VELOCITY
 //#if defined(DEBUG_SETPOINT_VELOCITY) 
 //                
@@ -736,10 +755,12 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
                 setpoint_torque.value = eo_mc4boards_Convert_torque_I2S(mc4boards,jxx, setpoint->to.torque.value);
                   
                 command.type  = ICUBCANPROTO_POL_MC_CMD__SET_DESIRED_TORQUE; 
-                command.value =  &setpoint_torque;                  
+                command.value =  &setpoint_torque;         
+                
+                joint->status.target.trgt_torque = setpoint->to.torque.value;
             } break;
 
-            case eomc_setpoint_current:
+            case eomc_setpoint_openloop:
             { 
                 // marco.accame on 27 feb 2015.               
                 // when embObjMotionControl::setRefOutputRaw() sends a set<setpoint, (current, value)>,
@@ -765,17 +786,21 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
                 // is sent up with a say<eoprot_tag_mc_joint_status_ofpid_positionreference, value> 
                 // in such a way the value is always correct   
                                
-                setpoint_current.value = setpoint->to.current.value;
+                setpoint_openloop.value = setpoint->to.openloop.value;
 
                 command.type  = ICUBCANPROTO_POL_MC_CMD__SET_OPENLOOP_PARAMS; 
-                command.value =  &setpoint_current;                  
+                command.value =  &setpoint_openloop;   
+
+                 joint->status.target.trgt_openloop = setpoint->to.openloop.value;
             } break;
 
             case eomc_setpoint_positionraw:
             {    
                 pos = eo_mc4boards_Convert_Position_toCAN(mc4boards, jxx, setpoint->to.positionraw.value);
                 command.type  = ICUBCANPROTO_POL_MC_CMD__SET_COMMAND_POSITION; 
-                command.value =  &pos;                   
+                command.value =  &pos;  
+
+                joint->status.target.trgt_positionraw = setpoint->to.positionraw.value;
             } break;
             
             default:
@@ -793,7 +818,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
         eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);
 
                
-        if(eomc_setpoint_current == setpoint->type)
+        if(eomc_setpoint_openloop == setpoint->type)
         {
             // since mc4 does not send periodic messages with openloop reference values
             // i need to ask it direct to mc4
@@ -1374,6 +1399,11 @@ extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescripto
     eOmc_motor_config_t *cfg_ptr = (eOmc_motor_config_t*)rd->data;
     eOmc_motorId_t mxx = eoprot_ID2index(rd->id32);
     
+    eo_emsController_SetActuationLimit(mxx, (int16_t)cfg_ptr->pwmLimit);
+    // If pwmLimit is bigger than hardwhere limit, emsController uses hardwarelimit. 
+    // Therefore I need to update netvar with the limit used in emsController.
+    cfg_ptr->pwmLimit = eo_emsController_GetActuationLimit(mxx);
+    
     eOcanprot_command_t command = {0};
     command.class = eocanprot_msgclass_pollingMotorControl;
     
@@ -1411,7 +1441,7 @@ extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescripto
 
         // set current limit  
         command.type  = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT;
-        command.value = &cfg_ptr->maxcurrentofmotor;
+        command.value = &cfg_ptr->currentLimits.overloadCurrent ;
         eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32); 
       
         // set max motor encoder limit
@@ -1478,7 +1508,7 @@ extern void eoprot_fun_UPDT_mc_motor_config_pidcurrent(const EOnv* nv, const eOr
 //}
 
 
-extern void eoprot_fun_UPDT_mc_motor_config_maxcurrentofmotor(const EOnv* nv, const eOropdescriptor_t* rd)
+extern void eoprot_fun_UPDT_mc_motor_config_currentlimits(const EOnv* nv, const eOropdescriptor_t* rd)
 {    
     eOmeas_current_t *curr = (eOmeas_current_t*)rd->data;
     
@@ -1490,6 +1520,27 @@ extern void eoprot_fun_UPDT_mc_motor_config_maxcurrentofmotor(const EOnv* nv, co
     command.value = curr;
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);     
   
+}
+
+extern void eoprot_fun_UPDT_mc_motor_config_pwmlimit(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    eOmeas_pwm_t *pwm_limit = (eOmeas_pwm_t *)rd->data;
+    eOmc_motorId_t mxx = eoprot_ID2index(rd->id32);
+    eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
+    
+    if(eo_motcon_mode_foc == mcmode)
+    {
+        eo_emsController_SetActuationLimit(mxx, (int16_t)*pwm_limit);
+        // If pwmLimit is bigger than hardwhere limit, emsController uses hardwarelimit. 
+        // Therefore I need to update netvar with the limit used in emsController.
+        *pwm_limit = eo_emsController_GetActuationLimit(mxx);
+    }
+    else if(eo_motcon_mode_mc4 == mcmode)
+    {
+        //TODO: send message to mc4 board
+    }
+
+    
 }
 
 // --------------------------------------------------------------------------------------------------------------------

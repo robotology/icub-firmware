@@ -118,11 +118,11 @@ extern void eo_emsController_ReadTorque(uint8_t joint, eOmeas_torque_t trq_measu
 extern void eo_emsController_CheckFaults(void);
 extern void eo_emsController_PWM(int16_t* pwm);
 
-extern void eo_emsController_SetOutput(uint8_t joint, int16_t out);
-extern void eo_emsController_SetPosRef(uint8_t joint, int32_t pos, int32_t avg_vel);
-extern void eo_emsController_SetVelRef(uint8_t joint, int32_t vel, int32_t avg_acc);
-extern void eo_emsController_SetPosRaw(uint8_t joint, int32_t pos);
-extern void eo_emsController_SetTrqRef(uint8_t joint, int32_t trq);
+extern eObool_t eo_emsController_SetOutput(uint8_t joint, int16_t out);
+extern eObool_t eo_emsController_SetPosRef(uint8_t joint, int32_t pos, int32_t avg_vel);
+extern eObool_t eo_emsController_SetVelRef(uint8_t joint, int32_t vel, int32_t avg_acc);
+extern eObool_t eo_emsController_SetPosRaw(uint8_t joint, int32_t pos);
+extern eObool_t eo_emsController_SetTrqRef(uint8_t joint, int32_t trq);
 
 // asynchronous
 
@@ -149,6 +149,7 @@ extern void eo_emsController_ResetTrqPid(uint8_t joint);
 extern void eo_emsController_Stop(uint8_t joint);
 
 extern void eo_emsController_GetPWMOutput(uint8_t joint, int32_t* pwm);
+extern void eo_emsController_GetPWMOutput_int16(uint8_t joint, int16_t* pwm);
 extern void eo_emsController_GetActivePidStatus(uint8_t joint, eOmc_joint_status_ofpid_t* pidStatus);
 extern void eo_emsController_GetJointStatus(uint8_t joint, eOmc_joint_status_t* jointStatus);
 extern eObool_t eo_emsController_GetMotionDone(uint8_t joint);
@@ -170,7 +171,8 @@ extern void eo_emsController_SetVelTimeout(uint8_t joint, int32_t vel_timeout);
 extern void eo_emsController_SetGearboxRatio(uint8_t joint, int32_t gearboxratio);
 extern void eo_emsController_GetDecoupledMeasuredTorque (uint8_t joint, int32_t * Trq);
 extern void eo_emsController_GetDecoupledReferenceTorque (uint8_t joint, int32_t * Trq);
-extern uint16_t eo_emsController_GetActuationLimit(void);
+extern uint16_t eo_emsController_GetActuationLimit(uint8_t mId);
+extern void eo_emsController_SetActuationLimit(uint8_t mId, uint16_t actuation_limit);
 extern void eo_emsMotorController_GoIdle(void);
 
 extern eObool_t eo_emsMotorController_isMotorEncoderCalibrated(uint8_t motor);    

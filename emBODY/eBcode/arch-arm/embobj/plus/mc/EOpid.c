@@ -248,6 +248,9 @@ extern void eo_pid_Reset(EOpid *o)
     
     o->xv0 = o->xv1 = 0.0f;
     o->yv0 = o->yv1 = 0.0f;
+
+    o->pwm = 0;
+    o->En = 0;
 }
 
 extern void eo_pid_GetStatus(EOpid *o, float *pwm, float *err)

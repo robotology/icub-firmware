@@ -1446,21 +1446,25 @@ static const eOmc_joint_t s_joint_default_value =
     },
     .status =                       
     {
-        .basic =
-        {
-            .jnt_position =          0,
-            .jnt_velocity =          0,
-            .jnt_acceleration =      0,
-            .jnt_torque =            0
+        .core =
+        {        
+            .measures =
+            {
+                .meas_position =          0,
+                .meas_velocity =          0,
+                .meas_acceleration =      0,
+                .meas_torque =            0
+            },
+            .ofpid =                     {0},
+            .modes = 
+            {
+                .controlmodestatus =        eomc_controlmode_idle,
+                .interactionmodestatus =    eOmc_interactionmode_stiff,
+                .ismotiondone =             eobool_false,
+                .filler =                   {0}
+            }
         },
-        .ofpid =                     {0},
-        .modes = 
-        {
-            .controlmodestatus =        eomc_controlmode_idle,
-            .interactionmodestatus =    eOmc_interactionmode_stiff,
-            .ismotiondone =             eobool_false,
-            .filler =                   {0}
-        }
+        .target = {0}
     },
     .inputs =                        {0},
     .cmmnds =                       
@@ -1495,7 +1499,7 @@ static const eOmc_motor_t s_motor_default_value =
         .gearboxratio =              0,
         .rotorEncoderResolution =    0,
         .maxvelocityofmotor =        0,
-        .maxcurrentofmotor =         0,
+        .currentLimits =             {0},
         .rotorIndexOffset =          0,
         .motorPoles =                0,
         .hasHallSensor =             eobool_false,
@@ -1848,7 +1852,7 @@ static eOresult_t s_eo_motioncontrol_SetCurrentSetpoint(EOtheMotionController *p
 
 static void s_eo_motioncontrol_UpdateJointStatus(EOtheMotionController *p)
 {
-    const uint8_t transmit_decoupled_pwms = 1;
+    const uint8_t transmit_decoupled_pwms = 0;
     
     eOmc_joint_status_t *jstatus = NULL;
     eOmc_motor_status_t *mstatus = NULL;
@@ -1862,15 +1866,15 @@ static void s_eo_motioncontrol_UpdateJointStatus(EOtheMotionController *p)
        
             eo_emsController_GetJointStatus(jId, jstatus);
             
-            eo_emsController_GetActivePidStatus(jId, &jstatus->ofpid);
+            eo_emsController_GetActivePidStatus(jId, &jstatus->core.ofpid);
             
             if(1 == transmit_decoupled_pwms) 
             {  
                 // this functions is used to get the motor PWM after the decoupling matrix
-                eo_emsController_GetPWMOutput(jId, &jstatus->ofpid.generic.output);
+                eo_emsController_GetPWMOutput(jId, &jstatus->core.ofpid.generic.output);
             }
             
-            jstatus->modes.ismotiondone = eo_emsController_GetMotionDone(jId);
+            jstatus->core.modes.ismotiondone = eo_emsController_GetMotionDone(jId);
            
         }
  
@@ -1882,6 +1886,7 @@ static void s_eo_motioncontrol_UpdateJointStatus(EOtheMotionController *p)
         if(NULL != (mstatus = eo_entities_GetMotorStatus(eo_entities_GetHandle(), jId)))
         {
             eo_emsController_GetMotorStatus(jId, mstatus);
+            eo_emsController_GetPWMOutput_int16(jId, &(mstatus->basic.mot_pwm));
         }
     }
 }
@@ -1928,7 +1933,7 @@ static eObool_t s_eo_motioncontrol_mc4based_variableisproxied(eOnvID32_t id)
         case eoprot_tag_mc_joint_config_pidtorque:
         case eoprot_tag_mc_joint_config_limitsofjoint:
         case eoprot_tag_mc_joint_config_impedance:
-        case eoprot_tag_mc_joint_status_modes_ismotiondone:
+        case eoprot_tag_mc_joint_status_core_modes_ismotiondone:
         {
             return(eobool_true);
         }
@@ -2150,7 +2155,7 @@ static eOresult_t s_eo_mcserv_do_mc4plus(EOtheMotionController *p)
 
     // 7. propagate the status of joint motors locally computed in localcontroller to the joints / motors in ram
     {   // so far in here. but later on move it in a function.... also 2foc mode does that 
-        const uint8_t transmit_decoupled_pwms = 1;
+        const uint8_t transmit_decoupled_pwms = 0;
                 
         for(i=0; i<p->numofjomos; i++)
         {
@@ -2159,13 +2164,13 @@ static eOresult_t s_eo_mcserv_do_mc4plus(EOtheMotionController *p)
             {
             
                 eo_emsController_GetJointStatus(i, jstatus);
-                eo_emsController_GetActivePidStatus(i, &(jstatus->ofpid)); 
+                eo_emsController_GetActivePidStatus(i, &(jstatus->core.ofpid)); 
                 if(1 == transmit_decoupled_pwms) 
                 {   //this functions is used to get the motor PWM after the decoupling matrix
-                    eo_emsController_GetPWMOutput(i, &(jstatus->ofpid.generic.output));
+                    eo_emsController_GetPWMOutput(i, &(jstatus->core.ofpid.generic.output));
                 }
                 
-                jstatus->modes.ismotiondone = eo_emsController_GetMotionDone(i);
+                jstatus->core.modes.ismotiondone = eo_emsController_GetMotionDone(i);
             }
             
         }

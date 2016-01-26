@@ -1063,7 +1063,7 @@ extern eOresult_t s_eo_mcserv_do_mc4plus(EOmcService *p)
 
     // 7. propagate the status of joint motors locally computed in localcontroller to the joints / motors in ram
     {   // so far in here. but later on move it in a function.... also 2foc mode does that 
-        uint8_t transmit_decoupled_pwms = 1;
+        uint8_t transmit_decoupled_pwms = 0;
         for(jm=0; jm<p->config.jomosnumber; jm++)
         {
             // joint ...
@@ -1074,13 +1074,13 @@ extern eOresult_t s_eo_mcserv_do_mc4plus(EOmcService *p)
             }
             
             eo_emsController_GetJointStatus(jm, jstatus);
-            eo_emsController_GetActivePidStatus(jm, &(jstatus->ofpid)); 
+            eo_emsController_GetActivePidStatus(jm, &(jstatus->core.ofpid)); 
             if(transmit_decoupled_pwms) 
             {   //this functions is used to get the motor PWM after the decoupling matrix
-                eo_emsController_GetPWMOutput(jm, &(jstatus->ofpid.generic.output));
+                eo_emsController_GetPWMOutput(jm, &(jstatus->core.ofpid.generic.output));
             }
             
-            jstatus->modes.ismotiondone = eo_emsController_GetMotionDone(jm);
+            jstatus->core.modes.ismotiondone = eo_emsController_GetMotionDone(jm);
 
 //            if(eomc_motionmonitorstatus_setpointnotreachedyet == jstatus->modes.ismotiondone)
 //            {
@@ -1107,6 +1107,7 @@ extern eOresult_t s_eo_mcserv_do_mc4plus(EOmcService *p)
             }
             
             eo_emsController_GetMotorStatus(jm, mstatus);
+            eo_emsController_GetPWMOutput_int16(jm, &(mstatus->basic.mot_pwm));
   
         }
         

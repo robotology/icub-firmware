@@ -251,7 +251,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb2_eb4 =
         .mc4version =
         {
             .firmware   = {0, 0},
-            .protocol   = {1, 2}                 
+            .protocol   = {1, 5}                 
         },
         .mc4shifts =
         {

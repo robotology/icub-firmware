@@ -1131,14 +1131,14 @@ extern void eo_axisController_GetJointStatus(EOaxisController *o, eOmc_joint_sta
 {
     if (!o) return;
     
-    jointStatus->modes.interactionmodestatus    =  o->interact_mode;
-    jointStatus->modes.controlmodestatus        = o->control_mode;
-    jointStatus->modes.ismotiondone             = eo_axisController_GetMotionDone(o);
-    jointStatus->basic.jnt_position             = GET_AXIS_POSITION();           
-    jointStatus->basic.jnt_velocity             = GET_AXIS_VELOCITY();        
+    jointStatus->core.modes.interactionmodestatus    =  o->interact_mode;
+    jointStatus->core.modes.controlmodestatus        = o->control_mode;
+    jointStatus->core.modes.ismotiondone             = eo_axisController_GetMotionDone(o);
+    jointStatus->core.measures.meas_position         = GET_AXIS_POSITION();           
+    jointStatus->core.measures.meas_velocity         = GET_AXIS_VELOCITY();        
     #warning TODO: acceleration to be implemented
-    jointStatus->basic.jnt_acceleration         = 0; //eo_speedometer_GetAcceleration(o->speedmeter);       
-    jointStatus->basic.jnt_torque               = o->torque_meas_jnt;
+    jointStatus->core.measures.meas_acceleration     = 0; //eo_speedometer_GetAcceleration(o->speedmeter);       
+    jointStatus->core.measures.meas_torque           = o->torque_meas_jnt;
 }
 
 extern void eo_axisController_GetActivePidStatus(EOaxisController *o, eOmc_joint_status_ofpid_t* pidStatus)

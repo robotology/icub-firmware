@@ -48,6 +48,8 @@
 
 #include "EOemsController.h"
 
+#include "EOCurrentsWatchdog.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -159,21 +161,25 @@ const eOmc_joint_t joint_default_value =
     },
     .status =                       
     {
-        .basic =
-        {
-            .jnt_position =          0,
-            .jnt_velocity =          0,
-            .jnt_acceleration =      0,
-            .jnt_torque =            0
+        .core =
+        {        
+            .measures =
+            {
+                .meas_position =          0,
+                .meas_velocity =          0,
+                .meas_acceleration =      0,
+                .meas_torque =            0
+            },
+            .ofpid =                     {0},
+            .modes = 
+            {
+                .controlmodestatus =        eomc_controlmode_idle,
+                .interactionmodestatus =    eOmc_interactionmode_stiff,
+                .ismotiondone =             eobool_false,
+                .filler =                   {0}
+            }
         },
-        .ofpid =                     {0},
-        .modes = 
-        {
-            .controlmodestatus =        eomc_controlmode_idle,
-            .interactionmodestatus =    eOmc_interactionmode_stiff,
-            .ismotiondone =             eobool_false,
-            .filler =                   {0}
-        }
+        .target = {0}
     },
     .inputs =                        {0},
     .cmmnds =                       
@@ -208,7 +214,7 @@ const eOmc_motor_t motor_default_value =
         .gearboxratio =              0,
         .rotorEncoderResolution =    0,
         .maxvelocityofmotor =        0,
-        .maxcurrentofmotor =         0,
+        .currentLimits =             {0},
         .rotorIndexOffset =          0,
         .motorPoles =                0,
         .hasHallSensor =             eobool_false,
@@ -221,7 +227,9 @@ const eOmc_motor_t motor_default_value =
         {
             .max = 0,
             .min = 0
-        }
+        },
+        .temperatureLimit =          0,
+        .filler02 =                  {0}
     },
     .status =                       {0}
 }; 
@@ -424,33 +432,48 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
         return; //error
     }
 
-    joint->status.modes.ismotiondone = eobool_false;
+    joint->status.core.modes.ismotiondone = eobool_false;
     
     switch(setpoint->type)
     { 
         case eomc_setpoint_position:
         {
-            eo_emsController_SetPosRef(jxx, setpoint->to.position.value, setpoint->to.position.withvelocity);
+            if(eo_emsController_SetPosRef(jxx, setpoint->to.position.value, setpoint->to.position.withvelocity))
+            {
+                joint->status.target.trgt_position = setpoint->to.position.value;
+            }
         } break;
         
         case eomc_setpoint_positionraw:
         { 
-            eo_emsController_SetPosRaw(jxx, setpoint->to.position.value);
+            if(eo_emsController_SetPosRaw(jxx, setpoint->to.positionraw.value))
+            {
+                joint->status.target.trgt_positionraw = setpoint->to.positionraw.value;
+            }
         } break;
         
         case eomc_setpoint_velocity:
         {
-            eo_emsController_SetVelRef(jxx, setpoint->to.velocity.value, setpoint->to.velocity.withacceleration);    
+            if(eo_emsController_SetVelRef(jxx, setpoint->to.velocity.value, setpoint->to.velocity.withacceleration))
+            {
+                joint->status.target.trgt_velocity = setpoint->to.velocity.value;
+            }
         } break;
 
         case eomc_setpoint_torque:
         {
-            eo_emsController_SetTrqRef(jxx, setpoint->to.torque.value);
+            if(eo_emsController_SetTrqRef(jxx, setpoint->to.torque.value))
+            {
+                joint->status.target.trgt_torque = setpoint->to.torque.value;
+            }
         } break;
 
-        case eomc_setpoint_current:
+        case eomc_setpoint_openloop:
         {
-            eo_emsController_SetOutput(jxx, setpoint->to.current.value);
+            if(eo_emsController_SetOutput(jxx, setpoint->to.openloop.value))
+            {
+                joint->status.target.trgt_openloop = setpoint->to.openloop.value;
+            }
         } break;
 
         default:
@@ -585,7 +608,6 @@ extern void eoprot_fun_INIT_mc_motor_status(const EOnv* nv)
 }
 
 
-
 #warning --> see comments
 
 // finaora le mc4 normali non hanno controllo di corrente.
@@ -597,7 +619,14 @@ extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescripto
     eOmc_motorId_t mxx = eoprot_ID2index(rd->id32);
 
     //set rotor encoder sign
+    eo_emsController_SetMotorConfig(mxx, *cfg_ptr);
     eo_emsController_SetRotorEncoderSign((uint8_t)mxx, (int32_t)cfg_ptr->rotorEncoderResolution);
+    eo_currents_watchdog_UpdateCurrentLimits( eo_currents_watchdog_GetHandle(), mxx);
+    
+    eo_emsController_SetActuationLimit(mxx, (int16_t)cfg_ptr->pwmLimit);
+    // If pwmLimit is bigger than hardwhere limit, emsController uses hardwarelimit. 
+    // Therefore I need to update netvar with the limit used in emsController.
+    cfg_ptr->pwmLimit = eo_emsController_GetActuationLimit(mxx);
     
     cfg_ptr = cfg_ptr;
     #warning -> in here the 2foc-based control does config the can board with ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID, ICUBCANPROTO_POL_MC_CMD__SET_MAX_VELOCITY and ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT. what about mc4plus?
@@ -624,14 +653,23 @@ extern void eoprot_fun_UPDT_mc_motor_config_maxvelocityofmotor(const EOnv* nv, c
 }
 
 
-extern void eoprot_fun_UPDT_mc_motor_config_maxcurrentofmotor(const EOnv* nv, const eOropdescriptor_t* rd)
+extern void eoprot_fun_UPDT_mc_motor_config_currentlimits(const EOnv* nv, const eOropdescriptor_t* rd)
 {
-    eOmeas_current_t *curr_ptr = (eOmeas_current_t*)rd->data;
     eOmc_motorId_t mxx = eoprot_ID2index(rd->id32);
     
+    eo_currents_watchdog_UpdateCurrentLimits( eo_currents_watchdog_GetHandle(), mxx);
+}
 
-    curr_ptr = curr_ptr;
-    #warning TBD: marco.accame -> in eoprot_fun_UPDT_mc_motor_config_maxcurrentofmotor() i have removed messages sent to CAN. how do we do that for mc4plus ???   
+
+extern void eoprot_fun_UPDT_mc_motor_config_pwmlimit(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    eOmeas_pwm_t *pwm_limit = (eOmeas_pwm_t *)rd->data;
+    eOmc_motorId_t mxx = eoprot_ID2index(rd->id32);
+
+    eo_emsController_SetActuationLimit(mxx, (int16_t)*pwm_limit);
+    // If pwmLimit is bigger than hardwhere limit, emsController uses hardwarelimit. 
+    // Therefore I need to update netvar with the limit used in emsController.
+    *pwm_limit = eo_emsController_GetActuationLimit(mxx);
 }
 
 // --------------------------------------------------------------------------------------------------------------------
