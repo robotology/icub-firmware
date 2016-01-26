@@ -305,7 +305,8 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
         return; //error
     }
 
-    joint->status.modes.ismotiondone = eobool_false;
+
+    joint->status.core.modes.ismotiondone = eobool_false;
     
     if((eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode))
     {
@@ -314,27 +315,43 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
         { 
             case eomc_setpoint_position:
             {
-                eo_emsController_SetPosRef(jxx, setpoint->to.position.value, setpoint->to.position.withvelocity);
+                if(eo_emsController_SetPosRef(jxx, setpoint->to.position.value, setpoint->to.position.withvelocity))
+                {
+                    joint->status.target.trgt_position = setpoint->to.position.value;
+                }
             } break;
             
             case eomc_setpoint_positionraw:
             { 
-                eo_emsController_SetPosRaw(jxx, setpoint->to.positionraw.value);
+                if(eo_emsController_SetPosRaw(jxx, setpoint->to.positionraw.value))
+                {
+                    joint->status.target.trgt_positionraw = setpoint->to.positionraw.value;
+                }
             } break;
             
             case eomc_setpoint_velocity:
             {
-                eo_emsController_SetVelRef(jxx, setpoint->to.velocity.value, setpoint->to.velocity.withacceleration);    
+                if(eo_emsController_SetVelRef(jxx, setpoint->to.velocity.value, setpoint->to.velocity.withacceleration))
+                {
+                    joint->status.target.trgt_velocity = setpoint->to.velocity.value;
+                }    
             } break;
 
             case eomc_setpoint_torque:
             {
-                eo_emsController_SetTrqRef(jxx, setpoint->to.torque.value);
+                if(eo_emsController_SetTrqRef(jxx, setpoint->to.torque.value))
+                {
+                    joint->status.target.trgt_torque = setpoint->to.torque.value;
+                }
+
             } break;
 
-            case eomc_setpoint_current:
+            case eomc_setpoint_openloop:
             {
-                eo_emsController_SetOutput(jxx, setpoint->to.current.value);
+                if(eo_emsController_SetOutput(jxx, setpoint->to.openloop.value))
+                {
+                    joint->status.target.trgt_openloop = setpoint->to.openloop.value;
+                }
             } break;
 
             default:
@@ -549,32 +566,32 @@ extern void eoprot_fun_UPDT_mc_motor_config_pidcurrent(const EOnv* nv, const eOr
 }
 
 
-extern void eoprot_fun_UPDT_mc_motor_config_maxvelocityofmotor(const EOnv* nv, const eOropdescriptor_t* rd)
-{
-    eOmeas_velocity_t *vel_ptr = (eOmeas_velocity_t*)rd->data;
-    eOmc_motorId_t mxx = eoprot_ID2index(rd->id32);
-    
+//extern void eoprot_fun_UPDT_mc_motor_config_maxvelocityofmotor(const EOnv* nv, const eOropdescriptor_t* rd)
+//{
+//    eOmeas_velocity_t *vel_ptr = (eOmeas_velocity_t*)rd->data;
+//    eOmc_motorId_t mxx = eoprot_ID2index(rd->id32);
+//    
 
-    vel_ptr = vel_ptr;
-    #warning TBD: marco.accame -> in eoprot_fun_UPDT_mc_motor_config_maxvelocityofmotor() i have removed messages sent to CAN. how do we do that for mc4plus ???
-}
+//    vel_ptr = vel_ptr;
+//    #warning TBD: marco.accame -> in eoprot_fun_UPDT_mc_motor_config_maxvelocityofmotor() i have removed messages sent to CAN. how do we do that for mc4plus ???
+//}
 
+#warning marco.accame: implement eoprot_fun_UPDT_mc_motor_config_currentlimits() ??
+//extern void eoprot_fun_UPDT_mc_motor_config_maxcurrentofmotor(const EOnv* nv, const eOropdescriptor_t* rd)
+//{
+//    // now we see if it is a mc4can or a 2foc or a mc4plus
+//    eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
+//    
+//    if((eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode))
+//    {
+//        eOmeas_current_t *curr_ptr = (eOmeas_current_t*)rd->data;
+//        eOmc_motorId_t mxx = eoprot_ID2index(rd->id32);
+//        
 
-extern void eoprot_fun_UPDT_mc_motor_config_maxcurrentofmotor(const EOnv* nv, const eOropdescriptor_t* rd)
-{
-    // now we see if it is a mc4can or a 2foc or a mc4plus
-    eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
-    
-    if((eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode))
-    {
-        eOmeas_current_t *curr_ptr = (eOmeas_current_t*)rd->data;
-        eOmc_motorId_t mxx = eoprot_ID2index(rd->id32);
-        
-
-        curr_ptr = curr_ptr;
-        #warning TBD: marco.accame -> in eoprot_fun_UPDT_mc_motor_config_maxcurrentofmotor() i have removed messages sent to CAN. how do we do that for mc4plus ???   
-    }
-}
+//        curr_ptr = curr_ptr;
+//        #warning TBD: marco.accame -> in eoprot_fun_UPDT_mc_motor_config_maxcurrentofmotor() i have removed messages sent to CAN. how do we do that for mc4plus ???   
+//    }
+//}
 
 
 // --------------------------------------------------------------------------------------------------------------------
