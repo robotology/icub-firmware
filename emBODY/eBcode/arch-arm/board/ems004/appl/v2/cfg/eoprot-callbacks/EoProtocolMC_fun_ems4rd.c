@@ -580,34 +580,6 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
         return; //error
     } 
        
-    //#warning -> marco.accame: cast to proper type
-//    if(eomc_motionmonitormode_forever == joint->config.motionmonitormode)
-//    {       
-//        //#warning --> marco.accame: cast to proper type
-//        /* if monitorstatus values setpointreached means this is a new set point, 
-//        so i need to start to check is set point is reached because i'm in monitormode = forever */
-//        if(eomc_motionmonitorstatus_setpointisreached == joint->status.basic.motionmonitorstatus)
-//        {
-//            joint->status.basic.motionmonitorstatus = eomc_motionmonitorstatus_setpointnotreachedyet;
-//        }
-//    }
-    
-    
-//    if(eomc_motionmonitormode_forever == joint->config.motionmonitormode)
-//    {       
-        //#warning --> marco.accame: cast to proper type
-        /* if monitorstatus values setpointreached means this is a new set point, 
-        so i need to start to check is set point is reached because i'm in monitormode = forever */
-//        if(eomc_motionmonitorstatus_setpointisreached == joint->status.basic.motionmonitorstatus)
-//        {
-//            joint->status.basic.motionmonitorstatus = eomc_motionmonitorstatus_setpointnotreachedyet;
-//        }
-//        if(eobool_true == joint->status.basic.ismotiondone)
-//        {   // ok, ma ... la condizione di sopra e' inutile
-//            joint->status.ismotiondone = eobool_false;
-//        }
-//    }    
-
 
     joint->status.core.modes.ismotiondone = eobool_false;
 
