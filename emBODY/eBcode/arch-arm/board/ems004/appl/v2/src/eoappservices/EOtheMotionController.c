@@ -44,7 +44,7 @@
 #include "hal_sys.h"
 #include "hal_motor.h"
 #include "hal_adc.h"
-#include "hal_quad_enc.h"
+#include "hal_quadencoder.h"
 
 #include "EOVtheCallbackManager.h"
 
@@ -770,7 +770,7 @@ extern eOresult_t eo_motioncontrol_Tick(EOtheMotionController *p)
         uint8_t error_mask = 0;
         eOresult_t res = eores_NOK_generic;
         uint32_t encvalue[4] = {0}; 
-        hal_encoder_errors_flags encflags[4] = {0};
+        hal_spiencoder_errors_flags encflags[4] = {0};
         int16_t pwm[4] = {0};
         
         uint8_t i = 0;
@@ -1234,7 +1234,7 @@ extern uint32_t eo_motioncontrol_extra_GetMotorPositionRaw(EOtheMotionController
 //    {
 //#if defined(USE_MC4PLUS)    
     // use inc port not pwm port ??
-    pos_val = hal_quad_enc_get_counter((hal_quad_enc_t)p->mcmc4plus.pwmport[jomo]);
+    pos_val = hal_quadencoder_get_counter((hal_quadencoder_t)p->mcmc4plus.pwmport[jomo]);
 //#endif    
 //    }
     
@@ -1279,7 +1279,7 @@ extern void eo_motioncontrol_extra_ResetQuadEncCounter(EOtheMotionController *p,
 //    if(1 == p->config.jomos[joint].actuator.local.type)
 //    {
 //#if defined(USE_MC4PLUS)     
-    hal_quad_enc_reset_counter((hal_quad_enc_t)p->mcmc4plus.pwmport[jomo]);
+    hal_quadencoder_reset_counter((hal_quadencoder_t)p->mcmc4plus.pwmport[jomo]);
 //#endif    
 //    }
      
@@ -1315,7 +1315,7 @@ extern eObool_t eo_motioncontrol_extra_IsMotorEncoderIndexReached(EOtheMotionCon
 //    {
 //#if defined(USE_MC4PLUS)     
     //#warning marco.accame: why do we use a pwm port for an inc encoder? we should use the inc port instead.   
-    indx_reached = (eObool_t) hal_quad_enc_is_index_found((hal_quad_enc_t)p->mcmc4plus.pwmport[jomo]);
+    indx_reached = (eObool_t) hal_quadencoder_is_index_found((hal_quadencoder_t)p->mcmc4plus.pwmport[jomo]);
 //#endif    
 //    }
     
@@ -1458,7 +1458,7 @@ static const eOmc_joint_t s_joint_default_value =
             .ofpid =                     {0},
             .modes = 
             {
-                .controlmodestatus =        eomc_controlmode_idle,
+                .controlmodestatus =        eomc_controlmode_notConfigured,
                 .interactionmodestatus =    eOmc_interactionmode_stiff,
                 .ismotiondone =             eobool_false,
                 .filler =                   {0}
@@ -1963,9 +1963,9 @@ static void s_eo_motioncontrol_mc4plusbased_hal_init_motors_adc_feedbacks(void)
 
 
 static void s_eo_motioncontrol_mc4plusbased_hal_init_quad_enc_indexes_interrupt(void)
-{   // activate interupt line for quad_enc indexes check. the call of hal_quad_enc_init() is inside eo_appEncReader_Activate() ... maybe move it inside there too
+{   // activate interupt line for quad_enc indexes check. the call of hal_quadencoder_init() is inside eo_appEncReader_Activate() ... maybe move it inside there too
 //#if defined(USE_MC4PLUS)   
-    hal_quad_enc_init_indexes_flags();    
+    hal_quadencoder_init_indexes_flags();    
 //#endif    
 }
 
@@ -2037,7 +2037,7 @@ static eOresult_t s_eo_mcserv_do_mc4plus(EOtheMotionController *p)
     eOresult_t res = eores_NOK_generic;
     uint32_t encvalue[4] = {0}; 
     uint32_t extra[4] = {0};
-    hal_encoder_errors_flags encflags[4] = {0};
+    hal_spiencoder_errors_flags encflags[4] = {0};
     int16_t pwm[4] = {0};  
     
     EOconstarray* carray = eo_constarray_Load((EOarray*)&p->service.servconfig.data.mc.mc4plus_based.arrayofjomodescriptors);

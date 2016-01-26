@@ -33,7 +33,7 @@
 
 #include "stdlib.h"
 #include "string.h"
-#include "hal_encoder.h"
+#include "hal_spiencoder.h"
 
 
 #include "EOtheMemoryPool.h"
@@ -45,7 +45,7 @@
 
 #include "EoProtocol.h"
 
-#include "hal_quad_enc.h"
+#include "hal_quadencoder.h"
 #include "hal_adc.h"
 
 
@@ -63,12 +63,12 @@
 #include "EOappEncodersReader_hid.h"
 
 
-// - part which must be taken from hal by means of a proper functions. for now we wrap them 
-extern const hal_encoder_spimapping_t * fake_hal_encoder_spimapping_get(void);
+//// - part which must be taken from hal by means of a proper functions. for now we wrap them 
+//extern const hal_spiencoder_spimapping_t * fake_hal_spiencoder_spimapping_get(void);
 
-extern void fake_hal_quad_enc_single_init(uint8_t port);
+extern void fake_hal_quadencoder_single_init(uint8_t port);
 
-extern uint32_t fake_hal_quad_enc_getCounter(uint8_t port);
+extern uint32_t fake_hal_quadencoder_getCounter(uint8_t port);
 
 extern uint32_t fake_hal_adc_get_hall_sensor_analog_input_mV(uint8_t port);
 
@@ -84,7 +84,6 @@ extern uint32_t fake_hal_adc_get_hall_sensor_analog_input_mV(uint8_t port);
 #define DGN_COUNT_MAX                           10000 //1 sec
 #define DGN_THRESHOLD                           0
 
-#define ENCODER_NULL                            255
 #define ENCODER_VALUE_NOT_SUPPORTED             hal_NA32
 
 #define RESCALE_IN_ICUB_DEGREES(val,fullscale)  (TICKS_PER_REVOLUTION*val)/fullscale    
@@ -115,11 +114,11 @@ static void s_eo_appEncReader_isrCbk_onEncRead(void *arg);
 static void s_eo_appEncReader_isrCbk_onLastEncRead_SPI_stream0(void *arg);
 static void s_eo_appEncReader_isrCbk_onLastEncRead_SPI_stream1(void *arg);
 
-static void s_eo_appEncReader_deinit_ListOfSPIencoders(EOappEncReader *p,  EOappEncReader_confEncDataPerSPI_hid_t *cfgSPIX, eo_appEncReader_stream_number_t stream_number);
-static void s_eo_appEncReader_init_ListOfSPIencoders(EOappEncReader *p, EOappEncReader_confEncDataPerSPI_hid_t *cfgSPIX, eo_appEncReader_stream_number_t stream_number);
+static void s_eo_appEncReader_deinit_ListOfSPIencoders(EOappEncReader *p,  EOappEncReader_confEncDataPerSPI_hid_t *cfgSPIX, hal_spiencoder_stream_t stream_number);
+static void s_eo_appEncReader_init_ListOfSPIencoders(EOappEncReader *p, EOappEncReader_confEncDataPerSPI_hid_t *cfgSPIX, hal_spiencoder_stream_t stream_number);
 
-static void s_eo_appEncReader_deinit_SPIencoders(EOappEncReader *p, EOappEncReader_confEncDataPerSPI_hid_t *cfgSPIX, eo_appEncReader_stream_number_t stream_number);
-static void s_eo_appEncReader_init_SPIencoders(EOappEncReader *p, EOappEncReader_confEncDataPerSPI_hid_t *cfgSPIX, eo_appEncReader_stream_number_t stream_number);
+static void s_eo_appEncReader_deinit_SPIencoders(EOappEncReader *p, EOappEncReader_confEncDataPerSPI_hid_t *cfgSPIX, hal_spiencoder_stream_t stream_number);
+static void s_eo_appEncReader_init_SPIencoders(EOappEncReader *p, EOappEncReader_confEncDataPerSPI_hid_t *cfgSPIX, hal_spiencoder_stream_t stream_number);
 
 static eObool_t s_eo_appEncReader_IsValidValue_AEA(uint32_t *valueraw, eOappEncReader_errortype_t *error);
 
@@ -129,11 +128,11 @@ static void s_eo_appEncReader_configure_NONSPI_encoders(EOappEncReader *p);
 static uint32_t s_eo_appEncReader_rescale2icubdegrees(uint32_t val_raw, uint8_t jomo, eo_appEncReader_encoder_place_t pos_type);
 
 
-EO_extern_inline eObool_t eo_appEncReader_isReadySPI_stream0(EOappEncReader *p);
-EO_extern_inline eObool_t eo_appEncReader_isReadySPI_stream1(EOappEncReader *p);
+static eObool_t s_eo_appEncReader_isReadySPI_stream0(EOappEncReader *p);
+static eObool_t s_eo_appEncReader_isReadySPI_stream1(EOappEncReader *p);
 
 
-static eo_appEncReader_stream_number_t s_eo_appEncReader_get_spi_stream(EOappEncReader* p, uint8_t port);
+static hal_spiencoder_stream_t s_eo_appEncReader_get_spi_stream(EOappEncReader* p, uint8_t port);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -145,11 +144,11 @@ static EOappEncReader s_eo_theappencreader =
 {
     .initted                    = eobool_false,
     .active                     = eobool_false,
-    .spimap                     = NULL,
+    .stream_map                 = NULL,
     .config                     = {0},
-    .SPI_streams                = {{.type = hal_encoder_typeNONE, .numberof = 0}, {.type = hal_encoder_typeNONE, .numberof = 0}},
-    .configuredEnc_SPI_stream0  = {.st = eOEncReader_readSt__idle, .enc_type = eo_appEncReader_enc_type_NONE, .enc_numbers = 0, .enc_number_supported = 0, .readSeq = {0}},
-    .configuredEnc_SPI_stream1  = {.st = eOEncReader_readSt__idle, .enc_type = eo_appEncReader_enc_type_NONE, .enc_numbers = 0, .enc_number_supported = 0, .readSeq = {0}},
+    .SPI_streams                = {{.type = hal_spiencoder_typeNONE, .numberof = 0}, {.type = hal_spiencoder_typeNONE, .numberof = 0}},
+    .configuredEnc_SPI_stream0  = {.st = eOEncReader_readSt__idle, .enc_type = eo_appEncReader_enc_type_NONE, .enc_numbers = 0, .enc_number_supported = 0, .readSeq = {hal_spiencoderNONE}},
+    .configuredEnc_SPI_stream1  = {.st = eOEncReader_readSt__idle, .enc_type = eo_appEncReader_enc_type_NONE, .enc_numbers = 0, .enc_number_supported = 0, .readSeq = {hal_spiencoderNONE}},
     .times                      = {0}   
 };
 
@@ -170,9 +169,9 @@ extern EOappEncReader* eo_appEncReader_Initialise(void)
     
     // step 1: retrieve the spi mapping from hal
     
-    s_eo_theappencreader.spimap = fake_hal_encoder_spimapping_get();
+    s_eo_theappencreader.stream_map = hal_spiencoder_stream_map_get();
     
-    if(NULL == s_eo_theappencreader.spimap)
+    if(NULL == s_eo_theappencreader.stream_map)
     {
         // marco.accame: put a diagnostics message about the failure
         return(NULL);
@@ -277,7 +276,7 @@ extern eOresult_t eo_appEncReader_Activate(EOappEncReader *p, eOappEncReader_cfg
 //    
 //    // step 1: retrieve the spi mapping from hal
 //    
-//    retptr->spimap = fake_hal_encoder_spimapping_get();
+//    retptr->spimap = fake_hal_spiencoder_spimapping_get();
 //    
 //    if(NULL == retptr->spimap)
 //    {
@@ -318,20 +317,20 @@ extern eOresult_t eo_appEncReader_StartRead(EOappEncReader *p)
 
     //s_eo_appEncReader_check(p);
 
-    if(ENCODER_NULL != p->configuredEnc_SPI_stream0.readSeq.first)
+    if(hal_spiencoderNONE != p->configuredEnc_SPI_stream0.readSeq.first)
     { 
         memset(&p->times[0], 0, 4); // spi stream0
         p->times[0][0] = osal_system_abstime_get();
         p->configuredEnc_SPI_stream0.st = eOEncReader_readSt__started;
-        hal_encoder_read_start((hal_encoder_t)p->configuredEnc_SPI_stream0.readSeq.first);  
+        hal_spiencoder_read_start(p->configuredEnc_SPI_stream0.readSeq.first);  
     }
 
-    if(ENCODER_NULL != p->configuredEnc_SPI_stream1.readSeq.first)
+    if(hal_spiencoderNONE != p->configuredEnc_SPI_stream1.readSeq.first)
     {   
         memset(&p->times[1], 0, 4); // spi stream1   
         p->times[1][0] = osal_system_abstime_get();        
         p->configuredEnc_SPI_stream1.st = eOEncReader_readSt__started;
-        hal_encoder_read_start((hal_encoder_t)p->configuredEnc_SPI_stream1.readSeq.first);  
+        hal_spiencoder_read_start(p->configuredEnc_SPI_stream1.readSeq.first);  
     }
      
     return(eores_OK);
@@ -340,14 +339,14 @@ extern eOresult_t eo_appEncReader_StartRead(EOappEncReader *p)
 
 
 extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint32_t *primary_value,
-                                            uint32_t *extra_value, hal_encoder_errors_flags *flags)
+                                            uint32_t *extra_value, hal_spiencoder_errors_flags *flags)
 {    
     if(NULL == p)
     {
         return(eores_NOK_nullpointer);
     }
     
-    hal_encoder_position_t val_raw = 0; // marco.accame: it should be is a hal_encoder_position_t 
+    hal_spiencoder_position_t val_raw = 0; // marco.accame: it should be is a hal_spiencoder_position_t 
     eOresult_t res1 = eores_OK;
     eOresult_t res2 = eores_OK;
     eOappEncReader_errortype_t errortype = err_NONE;
@@ -361,20 +360,20 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint
             case eo_appEncReader_enc_type_AEA:
             {
                 EOappEncReader_configEncSPIXReadSequence_hid_t read_stream; 
-                if (p->spimap->usedstream[this_jomoconfig.primary_encoder_port] == eo_appEncReader_stream0)
+                if (p->stream_map->encoder2stream[this_jomoconfig.primary_encoder_port] == hal_spiencoder_stream0)
                 {
                     read_stream = p->configuredEnc_SPI_stream0.readSeq;
                 }
-                else if (p->spimap->usedstream[this_jomoconfig.primary_encoder_port] == eo_appEncReader_stream1)
+                else if (p->stream_map->encoder2stream[this_jomoconfig.primary_encoder_port] == hal_spiencoder_stream1)
                 {
                     read_stream = p->configuredEnc_SPI_stream1.readSeq;
                 }
                 else
                 {
-                    return eores_NOK_generic;
+                    return(eores_NOK_generic);
                 }
 
-                res1 = (eOresult_t)hal_encoder_get_value((hal_encoder_t)read_stream.list[p->spimap->indexinstream[this_jomoconfig.primary_encoder_port]], &val_raw, flags);
+                res1 = (eOresult_t)hal_spiencoder_get_value(read_stream.list[p->stream_map->encoder2indexinstream[this_jomoconfig.primary_encoder_port]], &val_raw, flags);
                 
                 if(eores_OK != res1)
                 {
@@ -396,7 +395,7 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint
                 //*value <<= 4; // 65536 ticks/revolution normalization;
                 //val_raw = (val_raw>>2) & 0xFFF0;
                 //*primary_value = RESCALE_IN_ICUB_DEGREES(val_raw, encoders_fullscales[eo_appEncReader_enc_type_AEA]);
-                // marco.accame: hal_encoder_get_value() gives back a value in uint32_t with only 18 bits of information (internally masked with 0x03FFFF).
+                // marco.accame: hal_spiencoder_get_value() gives back a value in uint32_t with only 18 bits of information (internally masked with 0x03FFFF).
                 // only the 12 most significant bits contain a position reading. to obtain the ticks we should do:
                 // ticks = (val_raw >> 6) & 0x0FFF;
                 // the resolution is now 4096 ticks per revolution.
@@ -415,21 +414,21 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint
             case eo_appEncReader_enc_type_AMO:
             {
                 EOappEncReader_configEncSPIXReadSequence_hid_t read_stream; 
-                if (p->spimap->usedstream[this_jomoconfig.primary_encoder_port] == eo_appEncReader_stream0)
+                if (p->stream_map->encoder2stream[this_jomoconfig.primary_encoder_port] == hal_spiencoder_stream0)
                 {
                     read_stream = p->configuredEnc_SPI_stream0.readSeq;
                 }
-                else if (p->spimap->usedstream[this_jomoconfig.primary_encoder_port] == eo_appEncReader_stream1)
+                else if (p->stream_map->encoder2stream[this_jomoconfig.primary_encoder_port] == hal_spiencoder_stream1)
                 {
                     read_stream = p->configuredEnc_SPI_stream1.readSeq;
                 }
                 else
                 {
-                    return eores_NOK_generic;
+                    return(eores_NOK_generic);
                 }
                 
                 
-                res1 = (eOresult_t)hal_encoder_get_value((hal_encoder_t)read_stream.list[p->spimap->indexinstream[this_jomoconfig.primary_encoder_port]], &val_raw, flags);
+                res1 = (eOresult_t)hal_spiencoder_get_value(read_stream.list[p->stream_map->encoder2indexinstream[this_jomoconfig.primary_encoder_port]], &val_raw, flags);
             
                 if(eores_OK != res1)
                 {
@@ -447,7 +446,7 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint
             case eo_appEncReader_enc_type_INC:
             {
 #if 1                
-                val_raw = fake_hal_quad_enc_getCounter(this_jomoconfig.primary_encoder_port);
+                val_raw = fake_hal_quadencoder_getCounter(this_jomoconfig.primary_encoder_port);
                 if(ENCODER_VALUE_NOT_SUPPORTED == val_raw)
                 {
                     *primary_value = 0;
@@ -460,7 +459,7 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint
 //                #if defined(EOAPPENCODERREADER_DONTUSE_INC)
 //                *primary_value = 0;
 //                #else
-//                val_raw = fake_hal_quad_enc_getCounter(this_jomoconfig.primary_encoder_port);
+//                val_raw = fake_hal_quadencoder_getCounter(this_jomoconfig.primary_encoder_port);
 //                //val_raw = val_raw & 0xFFFF;
 //                //*primary_value = RESCALE_IN_ICUB_DEGREES(val_raw, encoders_fullscales[eo_appEncReader_enc_type_INC]);
 //                // marco.accame: by this we use the encoder ticks and rescale them in icubdegrees using the factor in GENERAL:Encoders
@@ -531,11 +530,11 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint
             case eo_appEncReader_enc_type_AEA:
             {
                 EOappEncReader_configEncSPIXReadSequence_hid_t read_stream; 
-                if (p->spimap->usedstream[this_jomoconfig.secondary_encoder_port] == eo_appEncReader_stream0)
+                if (p->stream_map->encoder2stream[this_jomoconfig.secondary_encoder_port] == hal_spiencoder_stream0)
                 {
                     read_stream = p->configuredEnc_SPI_stream0.readSeq;
                 }
-                else if (p->spimap->usedstream[this_jomoconfig.secondary_encoder_port] == eo_appEncReader_stream1)
+                else if (p->stream_map->encoder2stream[this_jomoconfig.secondary_encoder_port] == hal_spiencoder_stream1)
                 {
                     read_stream = p->configuredEnc_SPI_stream1.readSeq;
                 }
@@ -544,7 +543,7 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint
                     return eores_NOK_generic;
                 }
 
-                res2 = (eOresult_t)hal_encoder_get_value((hal_encoder_t)read_stream.list[p->spimap->indexinstream[this_jomoconfig.secondary_encoder_port]], &val_raw, flags);
+                res2 = (eOresult_t)hal_spiencoder_get_value(read_stream.list[p->stream_map->encoder2indexinstream[this_jomoconfig.secondary_encoder_port]], &val_raw, flags);
                 
                 if(eores_OK != res2)
                 {
@@ -574,20 +573,20 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint
             case eo_appEncReader_enc_type_AMO:
             {
                 EOappEncReader_configEncSPIXReadSequence_hid_t read_stream; 
-                if (p->spimap->usedstream[this_jomoconfig.secondary_encoder_port] == eo_appEncReader_stream0)
+                if (p->stream_map->encoder2stream[this_jomoconfig.secondary_encoder_port] == hal_spiencoder_stream0)
                 {
                     read_stream = p->configuredEnc_SPI_stream0.readSeq;
                 }
-                else if (p->spimap->usedstream[this_jomoconfig.secondary_encoder_port] == eo_appEncReader_stream1)
+                else if (p->stream_map->encoder2stream[this_jomoconfig.secondary_encoder_port] == hal_spiencoder_stream1)
                 {
                     read_stream = p->configuredEnc_SPI_stream1.readSeq;
                 }
                 else
                 {
-                    return eores_NOK_generic;
+                    return(eores_NOK_generic);
                 }
                     
-                res2 = (eOresult_t)hal_encoder_get_value((hal_encoder_t)read_stream.list[p->spimap->indexinstream[this_jomoconfig.secondary_encoder_port]], &val_raw, flags);
+                res2 = (eOresult_t)hal_spiencoder_get_value(read_stream.list[p->stream_map->encoder2indexinstream[this_jomoconfig.secondary_encoder_port]], &val_raw, flags);
             
                 if(eores_OK != res2)
                 {
@@ -605,7 +604,7 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint
             case eo_appEncReader_enc_type_INC:
             {
 #if 1                
-                val_raw = fake_hal_quad_enc_getCounter(this_jomoconfig.secondary_encoder_port);
+                val_raw = fake_hal_quadencoder_getCounter(this_jomoconfig.secondary_encoder_port);
                 if(ENCODER_VALUE_NOT_SUPPORTED == val_raw)
                 {
                     *extra_value = 0;
@@ -618,7 +617,7 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint
 //                #if defined(EOAPPENCODERREADER_DONTUSE_INC)
 //                *extra_value = 0;
 //                #else
-//                val_raw = fake_hal_quad_enc_getCounter(this_jomoconfig.secondary_encoder_port);
+//                val_raw = fake_hal_quadencoder_getCounter(this_jomoconfig.secondary_encoder_port);
 //                *extra_value = s_eo_appEncReader_rescale2icubdegrees(val_raw, jomo, this_jomoconfig.secondary_encoder_place);
 //                #endif
 //                res2 = eores_OK;
@@ -678,10 +677,10 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint
     }
     
     //return value based only on the reading of the primary encoder
-    return res1;
+    return(res1);
 }
 
-//extern eOresult_t  eo_appEncReader_GetValue(EOappEncReader *p, eOappEncReader_encoder_t enc, uint32_t *value, hal_encoder_errors_flags *flags)
+//extern eOresult_t  eo_appEncReader_GetValue(EOappEncReader *p, eOappEncReader_encoder_t enc, uint32_t *value, hal_spiencoder_errors_flags *flags)
 //{
 //    
 //    if(NULL == p)
@@ -722,9 +721,9 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint
 //    #error use either USE_MC4PLUS or USE_EMS4RD
 //#endif    
 //    //If AEA encoder
-//    if(p->config.SPI_streams[current_stream].type == hal_encoder_t1)
+//    if(p->config.SPI_streams[current_stream].type == hal_spiencoder_t1)
 //    {
-//        res = (eOresult_t)hal_encoder_get_value((hal_encoder_t)enc, &val_raw, flags);
+//        res = (eOresult_t)hal_spiencoder_get_value((hal_spiencoder_t)enc, &val_raw, flags);
 //        if(eores_OK != res)
 //        {
 //                //*value = (uint32_t)err_onReadFromSpi;
@@ -747,9 +746,9 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint
 //    }			
 
 //    //If AMO encoder
-//    if(p->config.SPI_streams[current_stream].type == hal_encoder_t2)
+//    if(p->config.SPI_streams[current_stream].type == hal_spiencoder_t2)
 //    {
-//        res = (eOresult_t)hal_encoder_get_value((hal_encoder_t)enc, &val_raw, flags);
+//        res = (eOresult_t)hal_spiencoder_get_value((hal_spiencoder_t)enc, &val_raw, flags);
 //        if(eores_OK != res)
 //        {
 //                //*value = (uint32_t)err_onReadFromSpi;
@@ -809,12 +808,12 @@ extern eObool_t eo_appEncReader_isReady(EOappEncReader *p)
         return(eobool_true);
     }
     // no SPI encoders
-    if((p->configuredEnc_SPI_stream0.readSeq.first == ENCODER_NULL) && (p->configuredEnc_SPI_stream1.readSeq.first == ENCODER_NULL))
+    if((p->configuredEnc_SPI_stream0.readSeq.first == hal_spiencoderNONE) && (p->configuredEnc_SPI_stream1.readSeq.first == hal_spiencoderNONE))
     {
         return eobool_true;
     }
     // both streams has SPI encoders
-    else if((p->configuredEnc_SPI_stream0.readSeq.first != ENCODER_NULL) && (p->configuredEnc_SPI_stream1.readSeq.first != ENCODER_NULL))
+    else if((p->configuredEnc_SPI_stream0.readSeq.first != hal_spiencoderNONE) && (p->configuredEnc_SPI_stream1.readSeq.first != hal_spiencoderNONE))
     {
         if((eOEncReader_readSt__finished == p->configuredEnc_SPI_stream1.st) && (eOEncReader_readSt__finished == p->configuredEnc_SPI_stream0.st))
 		{
@@ -823,24 +822,24 @@ extern eObool_t eo_appEncReader_isReady(EOappEncReader *p)
 		return(eobool_false);
 	}
     // SPI encoders only on stream1
-    else if (p->configuredEnc_SPI_stream0.readSeq.first == ENCODER_NULL)
+    else if (p->configuredEnc_SPI_stream0.readSeq.first == hal_spiencoderNONE)
     {
-		return eo_appEncReader_isReadySPI_stream1(p);
+		return s_eo_appEncReader_isReadySPI_stream1(p);
 	}
     // SPI encoders only on stream0
-	else if (p->configuredEnc_SPI_stream1.readSeq.first == ENCODER_NULL)
+	else if (p->configuredEnc_SPI_stream1.readSeq.first == hal_spiencoderNONE)
 	{
-		return eo_appEncReader_isReadySPI_stream0(p);
+		return s_eo_appEncReader_isReadySPI_stream0(p);
 	}
 	return(eobool_false);
 }
 
-__inline extern eObool_t eo_appEncReader_isReadySPI_stream0(EOappEncReader *p)
+static eObool_t s_eo_appEncReader_isReadySPI_stream0(EOappEncReader *p)
 {
-    if(NULL == p)
-    {
-        return(eobool_true);
-    }
+//    if(NULL == p)
+//    {
+//        return(eobool_true);
+//    }
     if((eOEncReader_readSt__finished == p->configuredEnc_SPI_stream0.st))
     {
         return(eobool_true);
@@ -848,12 +847,12 @@ __inline extern eObool_t eo_appEncReader_isReadySPI_stream0(EOappEncReader *p)
     return(eobool_false);
 }
 
-__inline extern eObool_t eo_appEncReader_isReadySPI_stream1(EOappEncReader *p)
+static eObool_t s_eo_appEncReader_isReadySPI_stream1(EOappEncReader *p)
 {
-    if(NULL == p)
-    {
-        return(eobool_false);
-    }
+//    if(NULL == p)
+//    {
+//        return(eobool_false);
+//    }
     if((eOEncReader_readSt__finished == p->configuredEnc_SPI_stream1.st))
     {
         return(eobool_true);
@@ -869,106 +868,106 @@ __inline extern eObool_t eo_appEncReader_isReadySPI_stream1(EOappEncReader *p)
 // later on ... remove the USE_MC4PLUS macro and develop proper hal functions ... this code must be independent from board
 
 
-extern const hal_encoder_spimapping_t * fake_hal_encoder_spimapping_get(void)
-{
-#if defined(USE_MC4PLUS) | defined(USE_MC2PLUS)
+//extern const hal_spiencoder_spimapping_t * fake_hal_spiencoder_spimapping_get(void)
+//{
+//#if defined(USE_MC4PLUS) | defined(USE_MC2PLUS)
 
-    static const hal_encoder_spimapping_t s_hal_encoder_spi_mapping = 
-    {
-        .numberofspiencoders        = 2,
-        .numberofspiencodersStream0 = 1,
-        .numberofspiencodersStream1 = 1,
-        .maskofsupported            = {1, 1, 0, 0, 0, 0},
-        .usedstream                 = {hal_encoder_spistream0, hal_encoder_spistream1, eo_appEncReader_streamNONE, eo_appEncReader_streamNONE, eo_appEncReader_streamNONE, eo_appEncReader_streamNONE},
-        //.usedstream ... as found in old code                = {hal_encoder_spistream0, hal_encoder_spistream1, hal_encoder_spistream0, hal_encoder_spistream1, hal_encoder_spistream0, hal_encoder_spistream1},
-        .indexinstream              = {0, 0, 255, 255, 255, 255}
-        //.indexinstream ... as found in old code              = {0, 0, 1, 1, 2, 2}        
-    };
-
-
-    // SPI Encoders MAP
-    //static const eo_appEncReader_stream_number_t SPIencodersMap[eo_appEncReader_encoder_position_numberof] =
-    //{
-    //    /* 0 */     eo_appEncReader_stream0,
-    //    /* 1 */     eo_appEncReader_stream1,
-    //    /* 2 */     eo_appEncReader_stream0,
-    //    /* 3 */     eo_appEncReader_stream1,
-    //    /* 4 */     eo_appEncReader_stream0,
-    //    /* 5 */     eo_appEncReader_stream1
-    //};
-
-    //// SPI Stream Positioning MAP
-    //static const eo_appEncReader_stream_position_t SPIstreams_positioning[eo_appEncReader_encoder_position_numberof] =
-    //{
-    //    /* 0 */     eo_appEncReader_stream_position0,
-    //    /* 1 */     eo_appEncReader_stream_position0,
-    //    /* 2 */     eo_appEncReader_stream_position1,
-    //    /* 3 */     eo_appEncReader_stream_position1,
-    //    /* 4 */     eo_appEncReader_stream_position2,
-    //    /* 5 */     eo_appEncReader_stream_position2
-    //};
-    //static const uint8_t numOfSupportedSPIencoders = 2;
-    //static const uint8_t maskOfSupportedSPIencoders[hal_encoders_number] = {1, 1, 0, 0, 0, 0};
-
-#elif defined(USE_EMS4RD)
-
-    static const hal_encoder_spimapping_t s_hal_encoder_spi_mapping = 
-    {
-        .numberofspiencoders        = 6,
-        .numberofspiencodersStream0 = 3,
-        .numberofspiencodersStream1 = 3,
-        .maskofsupported            = {1, 1, 1, 1, 1, 1},
-        .usedstream                 = {hal_encoder_spistream0, hal_encoder_spistream0, hal_encoder_spistream0, hal_encoder_spistream1, hal_encoder_spistream1, hal_encoder_spistream1},
-        .indexinstream              = {0, 1, 2, 0, 1, 2}   
-    };
-
-    //// SPI Encoders MAP
-    //static const eo_appEncReader_stream_number_t SPIencodersMap[eo_appEncReader_encoder_position_maxnumberof] =
-    //{
-    //    /* 0 */     eo_appEncReader_stream0,
-    //    /* 1 */     eo_appEncReader_stream0,
-    //    /* 2 */     eo_appEncReader_stream0,
-    //    /* 3 */     eo_appEncReader_stream1,
-    //    /* 4 */     eo_appEncReader_stream1,
-    //    /* 5 */     eo_appEncReader_stream1
-    //};
+//    static const hal_spiencoder_spimapping_t s_hal_spiencoder_spi_mapping = 
+//    {
+//        .numberofspiencoders        = 2,
+//        .numberofspiencodersStream0 = 1,
+//        .numberofspiencodersStream1 = 1,
+//        .maskofsupported            = {1, 1, 0, 0, 0, 0},
+//        .usedstream                 = {hal_spiencoder_spistream0, hal_spiencoder_spistream1, eo_appEncReader_streamNONE, eo_appEncReader_streamNONE, eo_appEncReader_streamNONE, eo_appEncReader_streamNONE},
+//        //.usedstream ... as found in old code                = {hal_spiencoder_spistream0, hal_spiencoder_spistream1, hal_spiencoder_spistream0, hal_spiencoder_spistream1, hal_spiencoder_spistream0, hal_spiencoder_spistream1},
+//        .indexinstream              = {0, 0, 255, 255, 255, 255}
+//        //.indexinstream ... as found in old code              = {0, 0, 1, 1, 2, 2}        
+//    };
 
 
-    //// SPI Stream Positioning MAP
-    //static const eo_appEncReader_stream_position_t SPIstreams_positioning[eo_appEncReader_encoder_position_maxnumberof] =
-    //{
-    //    /* 0 */     eo_appEncReader_stream_position0,
-    //    /* 1 */     eo_appEncReader_stream_position1,
-    //    /* 2 */     eo_appEncReader_stream_position2,
-    //    /* 3 */     eo_appEncReader_stream_position0,
-    //    /* 4 */     eo_appEncReader_stream_position1,
-    //    /* 5 */     eo_appEncReader_stream_position2
-    //};
+//    // SPI Encoders MAP
+//    //static const eo_appEncReader_stream_number_t SPIencodersMap[eo_appEncReader_encoder_position_numberof] =
+//    //{
+//    //    /* 0 */     eo_appEncReader_stream0,
+//    //    /* 1 */     eo_appEncReader_stream1,
+//    //    /* 2 */     eo_appEncReader_stream0,
+//    //    /* 3 */     eo_appEncReader_stream1,
+//    //    /* 4 */     eo_appEncReader_stream0,
+//    //    /* 5 */     eo_appEncReader_stream1
+//    //};
 
-    //static const uint8_t numOfSupportedSPIencoders = 6;
-    //static const uint8_t maskOfSupportedSPIencoders[hal_encoders_number] = {1, 1, 1, 1, 1, 1};
+//    //// SPI Stream Positioning MAP
+//    //static const eo_appEncReader_stream_position_t SPIstreams_positioning[eo_appEncReader_encoder_position_numberof] =
+//    //{
+//    //    /* 0 */     eo_appEncReader_stream_position0,
+//    //    /* 1 */     eo_appEncReader_stream_position0,
+//    //    /* 2 */     eo_appEncReader_stream_position1,
+//    //    /* 3 */     eo_appEncReader_stream_position1,
+//    //    /* 4 */     eo_appEncReader_stream_position2,
+//    //    /* 5 */     eo_appEncReader_stream_position2
+//    //};
+//    //static const uint8_t numOfSupportedSPIencoders = 2;
+//    //static const uint8_t maskOfSupportedSPIencoders[hal_spiencoders_number] = {1, 1, 0, 0, 0, 0};
 
-#else
-    #error -> either USE_EMS4RD or USE_MC4PLUS or USE_MC2PLUS
-#endif
-    
-    return(&s_hal_encoder_spi_mapping);
-}
+//#elif defined(USE_EMS4RD)
+
+//    static const hal_spiencoder_spimapping_t s_hal_spiencoder_spi_mapping = 
+//    {
+//        .numberofspiencoders        = 6,
+//        .numberofspiencodersStream0 = 3,
+//        .numberofspiencodersStream1 = 3,
+//        .maskofsupported            = {1, 1, 1, 1, 1, 1},
+//        .usedstream                 = {hal_spiencoder_spistream0, hal_spiencoder_spistream0, hal_spiencoder_spistream0, hal_spiencoder_spistream1, hal_spiencoder_spistream1, hal_spiencoder_spistream1},
+//        .indexinstream              = {0, 1, 2, 0, 1, 2}   
+//    };
+
+//    //// SPI Encoders MAP
+//    //static const eo_appEncReader_stream_number_t SPIencodersMap[eo_appEncReader_encoder_position_maxnumberof] =
+//    //{
+//    //    /* 0 */     eo_appEncReader_stream0,
+//    //    /* 1 */     eo_appEncReader_stream0,
+//    //    /* 2 */     eo_appEncReader_stream0,
+//    //    /* 3 */     eo_appEncReader_stream1,
+//    //    /* 4 */     eo_appEncReader_stream1,
+//    //    /* 5 */     eo_appEncReader_stream1
+//    //};
 
 
-extern void fake_hal_quad_enc_single_init(uint8_t port)
+//    //// SPI Stream Positioning MAP
+//    //static const eo_appEncReader_stream_position_t SPIstreams_positioning[eo_appEncReader_encoder_position_maxnumberof] =
+//    //{
+//    //    /* 0 */     eo_appEncReader_stream_position0,
+//    //    /* 1 */     eo_appEncReader_stream_position1,
+//    //    /* 2 */     eo_appEncReader_stream_position2,
+//    //    /* 3 */     eo_appEncReader_stream_position0,
+//    //    /* 4 */     eo_appEncReader_stream_position1,
+//    //    /* 5 */     eo_appEncReader_stream_position2
+//    //};
+
+//    //static const uint8_t numOfSupportedSPIencoders = 6;
+//    //static const uint8_t maskOfSupportedSPIencoders[hal_spiencoders_number] = {1, 1, 1, 1, 1, 1};
+
+//#else
+//    #error -> either USE_EMS4RD or USE_MC4PLUS or USE_MC2PLUS
+//#endif
+//    
+//    return(&s_hal_spiencoder_spi_mapping);
+//}
+
+
+extern void fake_hal_quadencoder_single_init(uint8_t port)
 {   // use only if mc4plus and the macro EOAPPENCODERREADER_DONTUSE_INC is not define
 //#if defined(USE_MC4PLUS) && !defined(EOAPPENCODERREADER_DONTUSE_INC)
-    hal_quad_enc_init((hal_quad_enc_t)port);    
+    hal_quadencoder_init((hal_quadencoder_t)port);    
 //#else
     // do nothing
 //#endif
 }
 
-extern uint32_t fake_hal_quad_enc_getCounter(uint8_t port)
+extern uint32_t fake_hal_quadencoder_getCounter(uint8_t port)
 {
 //#if defined(USE_MC4PLUS) && !defined(EOAPPENCODERREADER_DONTUSE_INC)
-//    return(hal_quad_enc_get_counter((hal_quad_enc_t)port));   
+//    return(hal_quadencoder_get_counter((hal_quadencoder_t)port));   
 //#else
 //    return(ENCODER_VALUE_NOT_SUPPORTED);
 //#endif 
@@ -976,7 +975,7 @@ extern uint32_t fake_hal_quad_enc_getCounter(uint8_t port)
 #if defined(EOAPPENCODERREADER_DONTUSE_INC)
     return(ENCODER_VALUE_NOT_SUPPORTED);
 #else
-    return(hal_quad_enc_get_counter((hal_quad_enc_t)port)); 
+    return(hal_quadencoder_get_counter((hal_quadencoder_t)port)); 
 #endif       
 }
 
@@ -999,10 +998,10 @@ extern uint32_t fake_hal_adc_get_hall_sensor_analog_input_mV(uint8_t port)
 static void s_eo_clear_SPI_streams(EOappEncReader *p)
 {
     uint8_t i = 0;
-    for(i=0; i<eo_appEncReader_streams_numberof; i++)
+    for(i=0; i<hal_spiencoder_streams_number; i++)
     {    
         p->SPI_streams[i].numberof = 0;
-        p->SPI_streams[i].type = hal_encoder_typeNONE;
+        p->SPI_streams[i].type = hal_spiencoder_typeNONE;
     }        
 }
 
@@ -1014,7 +1013,7 @@ static eObool_t s_eo_prepare_SPI_streams(EOappEncReader *p)
     
     uint8_t numberofSPIbased = 0;
     eObool_t portError = eobool_false;
-    uint8_t spiports[hal_encoders_number] = {0};
+    uint8_t spiports[hal_spiencoders_number] = {0};
     
     for(i=0; i<p->config.numofjomos; i++)
     {
@@ -1036,12 +1035,12 @@ static eObool_t s_eo_prepare_SPI_streams(EOappEncReader *p)
                 //return(portError);
             }
             
-            eo_appEncReader_stream_number_t streamnumber = s_eo_appEncReader_get_spi_stream(p, jdes->primary_encoder_port);
-            if(eo_appEncReader_streamNONE != streamnumber)
+            hal_spiencoder_stream_t streamnumber = s_eo_appEncReader_get_spi_stream(p, jdes->primary_encoder_port);
+            if(hal_spiencoder_streamNONE != streamnumber)
             {
                 numberofSPIbased++;
                 p->SPI_streams[streamnumber].numberof++;
-                p->SPI_streams[streamnumber].type = hal_encoder_typeAEA; // TODO ... dovrei mettere AEA oppure AMO e poi non posso mischiare nello stesso stream un AMO ed un AEA
+                p->SPI_streams[streamnumber].type = hal_spiencoder_typeAEA; // TODO ... dovrei mettere AEA oppure AMO e poi non posso mischiare nello stesso stream un AMO ed un AEA
             }
             else
             {
@@ -1062,12 +1061,12 @@ static eObool_t s_eo_prepare_SPI_streams(EOappEncReader *p)
                 //return(portError);
             }
             
-            eo_appEncReader_stream_number_t streamnumber = s_eo_appEncReader_get_spi_stream(p, jdes->secondary_encoder_port);
-            if(eo_appEncReader_streamNONE != streamnumber)
+            hal_spiencoder_stream_t streamnumber = s_eo_appEncReader_get_spi_stream(p, jdes->secondary_encoder_port);
+            if(hal_spiencoder_streamNONE != streamnumber)
             {
                 numberofSPIbased++;
                 p->SPI_streams[streamnumber].numberof++;
-                p->SPI_streams[streamnumber].type = hal_encoder_typeAEA; // TODO ... dovrei mettere AEA oppure AMO e poi non posso mischiare nello stesso stream un AMO ed un AEA
+                p->SPI_streams[streamnumber].type = hal_spiencoder_typeAEA; // TODO ... dovrei mettere AEA oppure AMO e poi non posso mischiare nello stesso stream un AMO ed un AEA
             }
             else
             {
@@ -1078,7 +1077,7 @@ static eObool_t s_eo_prepare_SPI_streams(EOappEncReader *p)
     } 
 
     // TODO: we should check that numberofSPIbased is not bigger than 6 for ems or 2 for mc4plus ......
-    if(numberofSPIbased > p->spimap->numberofspiencoders)
+    if(numberofSPIbased > p->stream_map->totalnumberofencoders)
     {
         // put diagnostics ...
         return(eobool_false);
@@ -1092,12 +1091,12 @@ static void s_eo_deconfigure_SPI_encoders(EOappEncReader *p)
     #warning TODO: make some tests about initting and deinitting hal etc.
         
     // deinit connected spi encoders
-    s_eo_appEncReader_deinit_SPIencoders(p, &(p->configuredEnc_SPI_stream1), eo_appEncReader_stream1);    
-    s_eo_appEncReader_deinit_SPIencoders(p, &(p->configuredEnc_SPI_stream0), eo_appEncReader_stream0);
+    s_eo_appEncReader_deinit_SPIencoders(p, &(p->configuredEnc_SPI_stream1), hal_spiencoder_stream1);    
+    s_eo_appEncReader_deinit_SPIencoders(p, &(p->configuredEnc_SPI_stream0), hal_spiencoder_stream0);
     
     // clear list of the two spi streams
-    s_eo_appEncReader_deinit_ListOfSPIencoders(p, &(p->configuredEnc_SPI_stream0), eo_appEncReader_stream0);
-    s_eo_appEncReader_deinit_ListOfSPIencoders(p, &(p->configuredEnc_SPI_stream1), eo_appEncReader_stream1);
+    s_eo_appEncReader_deinit_ListOfSPIencoders(p, &(p->configuredEnc_SPI_stream0), hal_spiencoder_stream0);
+    s_eo_appEncReader_deinit_ListOfSPIencoders(p, &(p->configuredEnc_SPI_stream1), hal_spiencoder_stream1);
 
     // clear the streams
     s_eo_clear_SPI_streams(p);    
@@ -1112,19 +1111,19 @@ static eObool_t s_eo_configure_SPI_encoders(EOappEncReader *p)
     }   
         
     // fill the list of the two SPI streams depending on the spi encoders which we want to manage   
-    s_eo_appEncReader_init_ListOfSPIencoders(p, &(p->configuredEnc_SPI_stream0), eo_appEncReader_stream0);
-    s_eo_appEncReader_init_ListOfSPIencoders(p, &(p->configuredEnc_SPI_stream1), eo_appEncReader_stream1);
+    s_eo_appEncReader_init_ListOfSPIencoders(p, &(p->configuredEnc_SPI_stream0), hal_spiencoder_stream0);
+    s_eo_appEncReader_init_ListOfSPIencoders(p, &(p->configuredEnc_SPI_stream1), hal_spiencoder_stream1);
 
     // init the spi encoders
-    s_eo_appEncReader_init_SPIencoders(p, &(p->configuredEnc_SPI_stream0), eo_appEncReader_stream0);
-    s_eo_appEncReader_init_SPIencoders(p, &(p->configuredEnc_SPI_stream1), eo_appEncReader_stream1);
+    s_eo_appEncReader_init_SPIencoders(p, &(p->configuredEnc_SPI_stream0), hal_spiencoder_stream0);
+    s_eo_appEncReader_init_SPIencoders(p, &(p->configuredEnc_SPI_stream1), hal_spiencoder_stream1);
     
     
     return(eobool_true);
 }
 
 
-static void s_eo_appEncReader_deinit_ListOfSPIencoders(EOappEncReader *p,  EOappEncReader_confEncDataPerSPI_hid_t *cfgSPIX, eo_appEncReader_stream_number_t stream_number)
+static void s_eo_appEncReader_deinit_ListOfSPIencoders(EOappEncReader *p,  EOappEncReader_confEncDataPerSPI_hid_t *cfgSPIX, hal_spiencoder_stream_t stream_number)
 {
     uint8_t i = 0;
     
@@ -1133,14 +1132,14 @@ static void s_eo_appEncReader_deinit_ListOfSPIencoders(EOappEncReader *p,  EOapp
     cfgSPIX->enc_numbers = 0;
     cfgSPIX->enc_number_supported = 0;
  
-    cfgSPIX->readSeq.first     = ENCODER_NULL;    
-    for(i=0; i<(eo_appEncReader_stream_position_numberof+1); i++)
+    cfgSPIX->readSeq.first = hal_spiencoderNONE;    
+    for(i=0; i<(hal_spiencoder_maxnumber_in_stream+1); i++)
     {
-        cfgSPIX->readSeq.list[i] = ENCODER_NULL; // doing also in last pos (i=3) is dummy but useful because it signals the last encoder
+        cfgSPIX->readSeq.list[i] = hal_spiencoderNONE; // doing also in last pos (i=3) is dummy but useful because it signals the last encoder
     }
 }
 
-static void s_eo_appEncReader_init_ListOfSPIencoders(EOappEncReader *p,  EOappEncReader_confEncDataPerSPI_hid_t *cfgSPIX, eo_appEncReader_stream_number_t stream_number)
+static void s_eo_appEncReader_init_ListOfSPIencoders(EOappEncReader *p,  EOappEncReader_confEncDataPerSPI_hid_t *cfgSPIX, hal_spiencoder_stream_t stream_number)
 {
     // deinit so that we start from a clean situation
     s_eo_appEncReader_deinit_ListOfSPIencoders(p, cfgSPIX, stream_number);
@@ -1149,8 +1148,8 @@ static void s_eo_appEncReader_init_ListOfSPIencoders(EOappEncReader *p,  EOappEn
     cfgSPIX->st = eOEncReader_readSt__idle;
     cfgSPIX->enc_type = (eo_appEncReader_encoder_type_t)p->SPI_streams[stream_number].type;
     cfgSPIX->enc_numbers = p->SPI_streams[stream_number].numberof;
-    cfgSPIX->enc_number_supported = (eo_appEncReader_stream0 == stream_number) ? (p->spimap->numberofspiencodersStream0) : (p->spimap->numberofspiencodersStream1);
-     
+    cfgSPIX->enc_number_supported = p->stream_map->stream2numberofencoders[stream_number];
+         
     uint8_t i = 0;
     // cycle for all the jomos to fill the sequence 
     for(i=0; i<eOappEncReader_jomos_maxnumberof; i++)
@@ -1161,17 +1160,17 @@ static void s_eo_appEncReader_init_ListOfSPIencoders(EOappEncReader *p,  EOappEn
         if (CHECK_ENC_IS_ON_SPI(jmcfg->primary_encoder_type))
         {
             // check if stream is correct, otherwise do nothing
-            if (p->spimap->usedstream[jmcfg->primary_encoder_port] == stream_number)
+            if (p->stream_map->encoder2stream[jmcfg->primary_encoder_port] == stream_number)
             {
-                if (cfgSPIX->readSeq.first == ENCODER_NULL)
+                if (cfgSPIX->readSeq.first == hal_spiencoderNONE)
                 {
-                    cfgSPIX->readSeq.first     = jmcfg->primary_encoder_port;
-                    cfgSPIX->readSeq.list[0]   = jmcfg->primary_encoder_port;
+                    cfgSPIX->readSeq.first     = (hal_spiencoder_t)jmcfg->primary_encoder_port;
+                    cfgSPIX->readSeq.list[0]   = (hal_spiencoder_t)jmcfg->primary_encoder_port;
                 }
                 // if out of bound, discard it
-                else if (p->spimap->indexinstream[jmcfg->primary_encoder_port] < cfgSPIX->enc_number_supported)
+                else if (p->stream_map->encoder2indexinstream[jmcfg->primary_encoder_port] < cfgSPIX->enc_number_supported)
                 {
-                    cfgSPIX->readSeq.list[p->spimap->indexinstream[jmcfg->primary_encoder_port]] = jmcfg->primary_encoder_port;
+                    cfgSPIX->readSeq.list[p->stream_map->encoder2indexinstream[jmcfg->primary_encoder_port]] = (hal_spiencoder_t)jmcfg->primary_encoder_port;
                 }
             }
         }
@@ -1180,17 +1179,17 @@ static void s_eo_appEncReader_init_ListOfSPIencoders(EOappEncReader *p,  EOappEn
         if (CHECK_ENC_IS_ON_SPI(jmcfg->secondary_encoder_type))
         {
             // check if stream is correct, otherwise do nothing
-            if (p->spimap->usedstream[jmcfg->secondary_encoder_port] == stream_number)
+            if (p->stream_map->encoder2stream[jmcfg->secondary_encoder_port] == stream_number)
             {
-                if (cfgSPIX->readSeq.first == ENCODER_NULL)
+                if (cfgSPIX->readSeq.first == hal_spiencoderNONE)
                 {
-                    cfgSPIX->readSeq.first     = jmcfg->secondary_encoder_port;
-                    cfgSPIX->readSeq.list[0]   = jmcfg->secondary_encoder_port;
+                    cfgSPIX->readSeq.first     = (hal_spiencoder_t)jmcfg->secondary_encoder_port;
+                    cfgSPIX->readSeq.list[0]   = (hal_spiencoder_t)jmcfg->secondary_encoder_port;
                 }
                 //if out of bound, discard it
-                else if (p->spimap->indexinstream[jmcfg->secondary_encoder_port] < cfgSPIX->enc_number_supported)
+                else if (p->stream_map->encoder2indexinstream[jmcfg->secondary_encoder_port] < cfgSPIX->enc_number_supported)
                 {
-                    cfgSPIX->readSeq.list[p->spimap->indexinstream[jmcfg->secondary_encoder_port]] = jmcfg->secondary_encoder_port;
+                    cfgSPIX->readSeq.list[p->stream_map->encoder2indexinstream[jmcfg->secondary_encoder_port]] = (hal_spiencoder_t)jmcfg->secondary_encoder_port;
                 }
             }
         }
@@ -1198,43 +1197,43 @@ static void s_eo_appEncReader_init_ListOfSPIencoders(EOappEncReader *p,  EOappEn
 }
 
 
-static void s_eo_appEncReader_deinit_SPIencoders(EOappEncReader *p, EOappEncReader_confEncDataPerSPI_hid_t *cfgSPIX, eo_appEncReader_stream_number_t stream_number)
+static void s_eo_appEncReader_deinit_SPIencoders(EOappEncReader *p, EOappEncReader_confEncDataPerSPI_hid_t *cfgSPIX, hal_spiencoder_stream_t stream_number)
 {
     uint8_t i;
 
     for(i=0; i<cfgSPIX->enc_numbers; i++)
     {        
         // we simply deinit the hal encoder
-        hal_encoder_deinit((hal_encoder_t)cfgSPIX->readSeq.list[i]);
+        hal_spiencoder_deinit(cfgSPIX->readSeq.list[i]);
     }
 }
 
 
 
-static void s_eo_appEncReader_init_SPIencoders(EOappEncReader *p, EOappEncReader_confEncDataPerSPI_hid_t *cfgSPIX, eo_appEncReader_stream_number_t stream_number)
+static void s_eo_appEncReader_init_SPIencoders(EOappEncReader *p, EOappEncReader_confEncDataPerSPI_hid_t *cfgSPIX, hal_spiencoder_stream_t stream_number)
 {
     uint8_t i;
-	hal_encoder_cfg_t enc_cfg = {.priority = hal_int_priorityNONE, .callback_on_rx = NULL, .arg = NULL, .type = hal_encoder_typeNONE, .reg_address = 0, .sdata_precheck = hal_false};
+	hal_spiencoder_cfg_t enc_cfg = {.priority = hal_int_priorityNONE, .callback_on_rx = NULL, .arg = NULL, .type = hal_spiencoder_typeNONE, .reg_address = 0, .sdata_precheck = hal_false};
     
     for(i=0; i < cfgSPIX->enc_numbers; i++)
     {
         // we define the basic configuration
         
-        if(cfgSPIX->enc_type == (eo_appEncReader_encoder_type_t)hal_encoder_typeAEA)
+        if(cfgSPIX->enc_type == (eo_appEncReader_encoder_type_t)hal_spiencoder_typeAEA)
         {   // AEA encoders 
             enc_cfg.priority     	    = INTPRIO_SPI_ENCODERS;
             enc_cfg.callback_on_rx      = NULL;
             enc_cfg.arg                 = NULL;
-            enc_cfg.type				= hal_encoder_t1;
+            enc_cfg.type				= hal_spiencoder_typeAEA;
             enc_cfg.reg_address	        = 0; // not meaningful
             enc_cfg.sdata_precheck      = hal_false;
         }      
-        else if(cfgSPIX->enc_type == (eo_appEncReader_encoder_type_t)hal_encoder_t2)
+        else if(cfgSPIX->enc_type == (eo_appEncReader_encoder_type_t)hal_spiencoder_typeAMO)
         {   // AMO encoders
             enc_cfg.priority      	    = INTPRIO_SPI_ENCODERS;
             enc_cfg.callback_on_rx      = NULL;
             enc_cfg.arg                 = NULL;
-            enc_cfg.type			    = hal_encoder_typeAMO;
+            enc_cfg.type			    = hal_spiencoder_typeAMO;
             enc_cfg.reg_address		    = 0x77;
             enc_cfg.sdata_precheck	    = hal_false;
         }
@@ -1246,7 +1245,7 @@ static void s_eo_appEncReader_init_SPIencoders(EOappEncReader *p, EOappEncReader
         // now we now must define what callback and argument each encoder must have. 
         // the first encoder must activates the next, until reaching the last encoder which stops the chain and marks the reading DONE!
               
-        if(ENCODER_NULL != cfgSPIX->readSeq.list[i+1])
+        if(hal_spiencoderNONE != cfgSPIX->readSeq.list[i+1])
         {   // normal init if it's not the last
             enc_cfg.callback_on_rx = s_eo_appEncReader_isrCbk_onEncRead;
             // the argument is the next encoder to be started
@@ -1254,11 +1253,11 @@ static void s_eo_appEncReader_init_SPIencoders(EOappEncReader *p, EOappEncReader
         }
         else
         {    //if it's the last
-            if(stream_number == eo_appEncReader_stream0)
+            if(stream_number == hal_spiencoder_stream0)
             {
                 enc_cfg.callback_on_rx = s_eo_appEncReader_isrCbk_onLastEncRead_SPI_stream0;
             }
-            else if(stream_number == eo_appEncReader_stream1)
+            else if(stream_number == hal_spiencoder_stream1)
             {
                 enc_cfg.callback_on_rx = s_eo_appEncReader_isrCbk_onLastEncRead_SPI_stream1;
             }
@@ -1266,14 +1265,14 @@ static void s_eo_appEncReader_init_SPIencoders(EOappEncReader *p, EOappEncReader
         }
         
         // finally we init the hal encoder with the filled configuration
-        hal_encoder_init((hal_encoder_t)cfgSPIX->readSeq.list[i], &enc_cfg);
+        hal_spiencoder_init(cfgSPIX->readSeq.list[i], &enc_cfg);
     }
 }
 
 
 static void s_eo_appEncReader_isrCbk_onEncRead(void *arg)
 {
-    hal_encoder_read_start(*((hal_encoder_t*)(arg)));
+    hal_spiencoder_read_start(*((hal_spiencoder_t*)(arg)));
 }
 
 static void s_eo_appEncReader_isrCbk_onLastEncRead_SPI_stream0(void *arg)
@@ -1283,14 +1282,15 @@ static void s_eo_appEncReader_isrCbk_onLastEncRead_SPI_stream0(void *arg)
    p->times[0][3] = osal_system_abstime_get(); 
  
    p->configuredEnc_SPI_stream0.st = eOEncReader_readSt__finished;
-   //if the user has configured a callback and reading on spi stream1 are already finished ==> then invoke it
-   if (NULL != p->config.SPI_callbackOnLastRead)
-   {
-       if((eOEncReader_readSt__finished == p->configuredEnc_SPI_stream1.st) || (eOEncReader_readSt__idle == p->configuredEnc_SPI_stream1.st)) 
-       {
-            p->config.SPI_callbackOnLastRead(p->config.SPI_callback_arg);
-       }
-   }
+    
+//   // if the user has configured a callback and reading on spi stream1 are already finished ==> then invoke it
+//   if (NULL != p->config.SPI_callbackOnLastRead)
+//   {
+//       if((eOEncReader_readSt__finished == p->configuredEnc_SPI_stream1.st) || (eOEncReader_readSt__idle == p->configuredEnc_SPI_stream1.st)) 
+//       {
+//            p->config.SPI_callbackOnLastRead(p->config.SPI_callback_arg);
+//       }
+//   }
 }
 
 static void s_eo_appEncReader_isrCbk_onLastEncRead_SPI_stream1(void *arg)
@@ -1302,14 +1302,14 @@ static void s_eo_appEncReader_isrCbk_onLastEncRead_SPI_stream1(void *arg)
    //set status of reding on spi stream1
    p->configuredEnc_SPI_stream1.st = eOEncReader_readSt__finished;
 
-   //if the user has configured a callback and reading on spi stream0 are already finished ==> then invoke it
-   if (NULL != p->config.SPI_callbackOnLastRead)
-   {
-       if((eOEncReader_readSt__finished == p->configuredEnc_SPI_stream0.st) || (eOEncReader_readSt__idle == p->configuredEnc_SPI_stream0.st)) 
-       {
-            p->config.SPI_callbackOnLastRead(p->config.SPI_callback_arg);
-       }
-   }
+//   //if the user has configured a callback and reading on spi stream0 are already finished ==> then invoke it
+//   if (NULL != p->config.SPI_callbackOnLastRead)
+//   {
+//       if((eOEncReader_readSt__finished == p->configuredEnc_SPI_stream0.st) || (eOEncReader_readSt__idle == p->configuredEnc_SPI_stream0.st)) 
+//       {
+//            p->config.SPI_callbackOnLastRead(p->config.SPI_callback_arg);
+//       }
+//   }
 }
 
 //return 0 in case of error else 1
@@ -1353,11 +1353,11 @@ static void s_eo_appEncReader_configure_NONSPI_encoders(EOappEncReader *p)
         eOappEncReader_jomoconfig_t* jmcfg = &p->config.jomoconfig[i];
         if(jmcfg->primary_encoder_type == eo_appEncReader_enc_type_INC)
         {
-            fake_hal_quad_enc_single_init(jmcfg->primary_encoder_port);
+            fake_hal_quadencoder_single_init(jmcfg->primary_encoder_port);
         }
         if(jmcfg->secondary_encoder_type == eo_appEncReader_enc_type_INC)
         {
-            fake_hal_quad_enc_single_init(jmcfg->secondary_encoder_port);
+            fake_hal_quadencoder_single_init(jmcfg->secondary_encoder_port);
         }
         // handle other cases...
         /*
@@ -1411,7 +1411,7 @@ static uint32_t s_eo_appEncReader_rescale2icubdegrees(uint32_t val_raw, uint8_t 
     // divider = joint->config.encoderconversionfactor.
 
     // this code does apply also to AEA encoders. 
-    // so far the hal_encoder_get_value() has retrieved ticks with a resulution of 64K ticks / 360 degrees (the upscale from 16K to 64 is done internally)
+    // so far the hal_spiencoder_get_value() has retrieved ticks with a resulution of 64K ticks / 360 degrees (the upscale from 16K to 64 is done internally)
     // in such a case the GENERAL:Encoders value in xml must be 182.044, so that divider = 1.
     // in cases where we want to apply a motor-reduction (e.g., in eyelids there is 100/42 between the aea and the joint) we may put it inside this parameter.
     
@@ -1464,15 +1464,15 @@ static uint32_t s_eo_appEncReader_rescale2icubdegrees(uint32_t val_raw, uint8_t 
 }
 
 
-static eo_appEncReader_stream_number_t s_eo_appEncReader_get_spi_stream(EOappEncReader* p, uint8_t port)
+static hal_spiencoder_stream_t s_eo_appEncReader_get_spi_stream(EOappEncReader* p, uint8_t port)
 {
     if(eo_appEncReader_encoder_portNONE == port)
     {
-        return(eo_appEncReader_streamNONE);
+        return(hal_spiencoder_streamNONE);
     }
     // eo_appEncReader_stream_position_numberof is 3, so that we can map eo_appEncReader_encoder_position[1, 2, 3, 4, 5, 6] into: eo_appEncReader_stream[0, 0, 0, 1, 1, 1]
     
-    return((eo_appEncReader_stream_number_t)p->spimap->usedstream[port]);
+    return((hal_spiencoder_stream_t)p->stream_map->encoder2stream[port]);
 }
 
 // --------------------------------------------------------------------------------------------------------------------

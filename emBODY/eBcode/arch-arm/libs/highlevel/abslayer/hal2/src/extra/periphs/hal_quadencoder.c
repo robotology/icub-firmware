@@ -17,7 +17,7 @@
 */
 
 
-/* @file       hal_quad_enc.c
+/* @file       hal_quadencoder.c
 	@brief      This file implements the quadrature encoder interface.
 	@author     marco.maggiali@iit.it, 
     @date       26/03/2013
@@ -26,7 +26,7 @@
 // - modules to be built: contains the HAL_USE_* macros ---------------------------------------------------------------
 #include "hal_brdcfg_modules.h"
 
-#if defined(HAL_USE_QUAD_ENC)
+#if defined(HAL_USE_QUADENCODER)
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -44,20 +44,20 @@
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hal_quad_enc.h"
+#include "hal_quadencoder.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hal_quad_enc_hid.h"
+#include "hal_quadencoder_hid.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define HAL_QUAD_ENC_INIT_ONLY_BY_PORT
+#define HAL_QUADENCODER_INIT_ONLY_BY_PORT
 
 #define HAL_quad_enc_id2index(p)             ((uint8_t)(p))
 
@@ -82,8 +82,8 @@ typedef struct
 {
     uint32_t                    inittedmask;
 //    hal_bool_t                  allinitted;
-    hal_bool_t                  index_found[hal_quad_encs_number];
-} hal_quad_enc_theinternals_t;
+    hal_bool_t                  index_found[hal_quadencoders_number];
+} hal_quadencoder_theinternals_t;
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -96,7 +96,7 @@ typedef struct
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_quad_enc_theinternals_t s_hal_quad_enc_theinternals =
+static hal_quadencoder_theinternals_t s_hal_quadencoder_theinternals =
 {
     .inittedmask            = 0,
 //    .allinitted             = hal_false,
@@ -109,16 +109,16 @@ static hal_quad_enc_theinternals_t s_hal_quad_enc_theinternals =
 // --------------------------------------------------------------------------------------------------------------------
 
 
-#if !defined(HAL_QUAD_ENC_INIT_ONLY_BY_PORT)
-static hal_result_t s_hal_quad_enc_init_all(void);
+#if !defined(HAL_QUADENCODER_INIT_ONLY_BY_PORT)
+static hal_result_t s_hal_quadencoder_init_all(void);
 #endif
 
-static void s_hal_quad_enc_set_index_found(hal_quad_enc_t id);
+static void s_hal_quadencoder_set_index_found(hal_quadencoder_t id);
 
-static hal_boolval_t s_hal_quad_enc_none_supported_is(void);
-static hal_boolval_t s_hal_quad_enc_supported_is(hal_quad_enc_t id);
-static void s_hal_quad_enc_initted_set(hal_quad_enc_t id);
-static hal_boolval_t s_hal_quad_enc_initted_is(hal_quad_enc_t id);
+static hal_boolval_t s_hal_quadencoder_none_supported_is(void);
+static hal_boolval_t s_hal_quadencoder_supported_is(hal_quadencoder_t id);
+static void s_hal_quadencoder_initted_set(hal_quadencoder_t id);
+static hal_boolval_t s_hal_quadencoder_initted_is(hal_quadencoder_t id);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -126,13 +126,13 @@ static hal_boolval_t s_hal_quad_enc_initted_is(hal_quad_enc_t id);
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern hal_boolval_t hal_quad_enc_supported_is(hal_quad_enc_t id)
+extern hal_boolval_t hal_quadencoder_supported_is(hal_quadencoder_t id)
 {
-    return(s_hal_quad_enc_supported_is(id));
+    return(s_hal_quadencoder_supported_is(id));
 }
 
-#if !defined(HAL_QUAD_ENC_INIT_ONLY_BY_PORT)
-static hal_result_t s_hal_quad_enc_init_all(void)
+#if !defined(HAL_QUADENCODER_INIT_ONLY_BY_PORT)
+static hal_result_t s_hal_quadencoder_init_all(void)
 {
   TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
   TIM_ICInitTypeDef TIM_ICInitStructure;
@@ -395,28 +395,28 @@ static hal_result_t s_hal_quad_enc_init_all(void)
 //	
 }	
 
-    const hal_quad_enc_t id = hal_quad_encALL;
-    if(hal_quad_encALL == id)
+    const hal_quadencoder_t id = hal_quadencoderALL;
+    if(hal_quadencoderALL == id)
     {
         uint8_t ii=0;
-        for(ii=0; ii<hal_quad_encs_number; ii++)
+        for(ii=0; ii<hal_quadencoders_number; ii++)
         {
-            if(hal_true == s_hal_quad_enc_supported_is((hal_quad_enc_t)ii))
+            if(hal_true == s_hal_quadencoder_supported_is((hal_quadencoder_t)ii))
             {
-                s_hal_quad_enc_initted_set((hal_quad_enc_t)ii);
+                s_hal_quadencoder_initted_set((hal_quadencoder_t)ii);
             }
         }
     }
-    else if(id < hal_quad_encs_number)
+    else if(id < hal_quadencoders_number)
     {
-        s_hal_quad_enc_initted_set(id);
+        s_hal_quadencoder_initted_set(id);
     }
     
     return(hal_res_OK);
 }
 #endif
 
-extern hal_result_t hal_quad_enc_init(hal_quad_enc_t id)
+extern hal_result_t hal_quadencoder_init(hal_quadencoder_t id)
 {       
 #if 0
     
@@ -427,14 +427,14 @@ extern hal_result_t hal_quad_enc_init(hal_quad_enc_t id)
         return;
     }
     
-    s_hal_quad_enc_init_all();
+    s_hal_quadencoder_init_all();
     
     initted = 1;
     
 #else   
     
 #if !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)       
-    if(hal_false == s_hal_quad_enc_supported_is(id))
+    if(hal_false == s_hal_quadencoder_supported_is(id))
     {
         return(hal_res_NOK_generic);
     }
@@ -679,7 +679,7 @@ extern hal_result_t hal_quad_enc_init(hal_quad_enc_t id)
     }
     
     
-    s_hal_quad_enc_initted_set(id);    
+    s_hal_quadencoder_initted_set(id);    
     
     return(hal_res_OK);
     
@@ -688,11 +688,11 @@ extern hal_result_t hal_quad_enc_init(hal_quad_enc_t id)
 
 
 
-extern uint32_t hal_quad_enc_get_counter(hal_quad_enc_t id)
+extern uint32_t hal_quadencoder_get_counter(hal_quadencoder_t id)
 {
     
 #if !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)       
-    if(hal_false == s_hal_quad_enc_initted_is(id))
+    if(hal_false == s_hal_quadencoder_initted_is(id))
     {
         return(hal_NA32);
     }
@@ -701,19 +701,19 @@ extern uint32_t hal_quad_enc_get_counter(hal_quad_enc_t id)
     uint32_t temp = hal_NA32;
     switch(id)
     {	
-        case hal_quad_enc1:
+        case hal_quadencoder1:
         {
             temp = TIM_GetCounter(ENCODER1_TIMER);
         } break;
-        case hal_quad_enc2:
+        case hal_quadencoder2:
         {
             temp = TIM_GetCounter(ENCODER2_TIMER);      
         } break;
-        case hal_quad_enc3:
+        case hal_quadencoder3:
         {
             temp = TIM_GetCounter(ENCODER3_TIMER);  
         } break;
-        case hal_quad_enc4:
+        case hal_quadencoder4:
         {
             temp = TIM_GetCounter(ENCODER4_TIMER);  
         } break;
@@ -727,9 +727,9 @@ extern uint32_t hal_quad_enc_get_counter(hal_quad_enc_t id)
 }
 
 
-extern void hal_quad_enc_init_indexes_flags(void)
+extern void hal_quadencoder_init_indexes_flags(void)
 {
-    if(hal_true == s_hal_quad_enc_none_supported_is())
+    if(hal_true == s_hal_quadencoder_none_supported_is())
     {
         return;
     }
@@ -774,20 +774,20 @@ extern void hal_quad_enc_init_indexes_flags(void)
 }
 
 
-extern hal_bool_t hal_quad_enc_is_index_found(hal_quad_enc_t id)
+extern hal_bool_t hal_quadencoder_is_index_found(hal_quadencoder_t id)
 {
     
 #if !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)       
-    if(hal_false == s_hal_quad_enc_initted_is(id))
+    if(hal_false == s_hal_quadencoder_initted_is(id))
     {
         return(hal_false);
     }
 #endif    
     
-    if(hal_true == s_hal_quad_enc_theinternals.index_found[HAL_quad_enc_id2index(id)])
+    if(hal_true == s_hal_quadencoder_theinternals.index_found[HAL_quad_enc_id2index(id)])
     {
         //reset flag
-        s_hal_quad_enc_theinternals.index_found[HAL_quad_enc_id2index(id)] = hal_false;
+        s_hal_quadencoder_theinternals.index_found[HAL_quad_enc_id2index(id)] = hal_false;
         return hal_true;
     }
     else
@@ -796,11 +796,11 @@ extern hal_bool_t hal_quad_enc_is_index_found(hal_quad_enc_t id)
     }
 }
 
-extern void hal_quad_enc_reset_counter(hal_quad_enc_t id)
+extern void hal_quadencoder_reset_counter(hal_quadencoder_t id)
 {
     
 #if !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)       
-    if(hal_false == s_hal_quad_enc_initted_is(id))
+    if(hal_false == s_hal_quadencoder_initted_is(id))
     {
         return;
     }
@@ -832,29 +832,29 @@ extern void hal_quad_enc_reset_counter(hal_quad_enc_t id)
   */
 void EXTI15_10_IRQHandler(void)
 {
-    // index of quad enc is 0 (hal_quad_enc1)
+    // index of quad enc is 0 (hal_quadencoder1)
     if(EXTI_GetITStatus(EXTI_Line13) != RESET)
     {
         EXTI_ClearITPendingBit(EXTI_Line13);
-        s_hal_quad_enc_set_index_found(hal_quad_enc1); //0
+        s_hal_quadencoder_set_index_found(hal_quadencoder1); //0
     }
-    // index of quad enc is 1 (hal_quad_enc2)
+    // index of quad enc is 1 (hal_quadencoder2)
     if(EXTI_GetITStatus(EXTI_Line12) != RESET)
     {
         EXTI_ClearITPendingBit(EXTI_Line12);
-        s_hal_quad_enc_set_index_found(hal_quad_enc2); // 1
+        s_hal_quadencoder_set_index_found(hal_quadencoder2); // 1
     }
-	// index of quad enc is 2 (hal_quad_enc3)
+	// index of quad enc is 2 (hal_quadencoder3)
     if(EXTI_GetITStatus(EXTI_Line14) != RESET)
     {
         EXTI_ClearITPendingBit(EXTI_Line14);
-        s_hal_quad_enc_set_index_found(hal_quad_enc3); // 2
+        s_hal_quadencoder_set_index_found(hal_quadencoder3); // 2
     }
-    // index of quad enc is 3 (hal_quad_enc4)
+    // index of quad enc is 3 (hal_quadencoder4)
     if(EXTI_GetITStatus(EXTI_Line15) != RESET)
     {
         EXTI_ClearITPendingBit(EXTI_Line15);
-        s_hal_quad_enc_set_index_found(hal_quad_enc4); // 3
+        s_hal_quadencoder_set_index_found(hal_quadencoder4); // 3
     }
 }
 
@@ -863,53 +863,53 @@ void EXTI15_10_IRQHandler(void)
 // --------------------------------------------------------------------------------------------------------------------
 
 
-static void s_hal_quad_enc_set_index_found(hal_quad_enc_t id)
+static void s_hal_quadencoder_set_index_found(hal_quadencoder_t id)
 {
     if(id > 3)
         return;
-    s_hal_quad_enc_theinternals.index_found[HAL_quad_enc_id2index(id)] = hal_true;
+    s_hal_quadencoder_theinternals.index_found[HAL_quad_enc_id2index(id)] = hal_true;
 }
 
 
-static hal_boolval_t s_hal_quad_enc_none_supported_is(void)
+static hal_boolval_t s_hal_quadencoder_none_supported_is(void)
 {
-    if(0 == hal_quad_enc__theboardconfig.supportedmask)
+    if(0 == hal_quadencoder__theboardconfig.supportedmask)
     {
         return(hal_true);
     }
     return(hal_false);
 }
 
-static hal_boolval_t s_hal_quad_enc_supported_is(hal_quad_enc_t id)
+static hal_boolval_t s_hal_quadencoder_supported_is(hal_quadencoder_t id)
 {
-    if(id >= hal_quad_encs_number)
+    if(id >= hal_quadencoders_number)
     {
         return(hal_false);
     }
-    return((hal_boolval_t)hl_bits_word_bitcheck(hal_quad_enc__theboardconfig.supportedmask, HAL_quad_enc_id2index(id)) );
+    return((hal_boolval_t)hl_bits_word_bitcheck(hal_quadencoder__theboardconfig.supportedmask, HAL_quad_enc_id2index(id)) );
 }
 
-static void s_hal_quad_enc_initted_set(hal_quad_enc_t id)
+static void s_hal_quadencoder_initted_set(hal_quadencoder_t id)
 {
-    hl_bits_word_bitset(&s_hal_quad_enc_theinternals.inittedmask, HAL_quad_enc_id2index(id));
+    hl_bits_word_bitset(&s_hal_quadencoder_theinternals.inittedmask, HAL_quad_enc_id2index(id));
 }
 
-static void s_hal_quad_enc_initted_reset(hal_quad_enc_t id)
+static void s_hal_quadencoder_initted_reset(hal_quadencoder_t id)
 {
-    hl_bits_word_bitclear(&s_hal_quad_enc_theinternals.inittedmask, HAL_quad_enc_id2index(id));
+    hl_bits_word_bitclear(&s_hal_quadencoder_theinternals.inittedmask, HAL_quad_enc_id2index(id));
 }
 
-static hal_boolval_t s_hal_quad_enc_initted_is(hal_quad_enc_t id)
+static hal_boolval_t s_hal_quadencoder_initted_is(hal_quadencoder_t id)
 {   
-    if(id >= hal_quad_encs_number)
+    if(id >= hal_quadencoders_number)
     {
         return(hal_false);
     }    
-    return((hal_boolval_t)hl_bits_word_bitcheck(s_hal_quad_enc_theinternals.inittedmask, HAL_quad_enc_id2index(id)));
+    return((hal_boolval_t)hl_bits_word_bitcheck(s_hal_quadencoder_theinternals.inittedmask, HAL_quad_enc_id2index(id)));
 }
 
 
-#endif // HAL_USE_QUAD_ENC
+#endif // HAL_USE_QUADENCODER
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

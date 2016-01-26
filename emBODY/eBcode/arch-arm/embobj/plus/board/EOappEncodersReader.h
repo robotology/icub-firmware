@@ -39,7 +39,7 @@
 
 #include "EoCommon.h"
 
-#include "hal_encoder.h"
+#include "hal_spiencoder.h"
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
@@ -93,10 +93,10 @@ typedef enum
 typedef struct
 {                                       
     eo_appEncReader_encoder_type_t      primary_encoder_type;
-    uint8_t                             primary_encoder_port;
+    uint8_t                             primary_encoder_port;   // it can be a hal_spiencoder_t or a hal_quadencoder_t or a ...
     eo_appEncReader_encoder_place_t     primary_encoder_place;
     eo_appEncReader_encoder_type_t      secondary_encoder_type;
-    uint8_t                             secondary_encoder_port;
+    uint8_t                             secondary_encoder_port; // it can be a hal_spiencoder_t or a hal_quadencoder_t or a ...
     eo_appEncReader_encoder_place_t     secondary_encoder_place;
 } eOappEncReader_jomoconfig_t;
 
@@ -112,11 +112,14 @@ typedef struct
 {   
     uint8_t                     numofjomos;  
     eOappEncReader_jomoconfig_t jomoconfig[eOappEncReader_jomos_maxnumberof];   
-    eOcallback_t                SPI_callbackOnLastRead;                     
-    void*                       SPI_callback_arg;                           
+//    eOcallback_t                SPI_callbackOnLastRead;                     
+//    void*                       SPI_callback_arg;                           
 } eOappEncReader_cfg_t;
 
 
+/** @typedef    enum eOappEncReader_errortype_t
+    @brief      contains the error typed detected by the encoder reader. 
+ **/
 typedef enum
 {
     err_onParityError   = 0,
@@ -147,9 +150,9 @@ extern eOresult_t eo_appEncReader_StartRead(EOappEncReader *p);
 
 extern eObool_t eo_appEncReader_isReady(EOappEncReader *p);  
 
-
+// if eo_appEncReader_GetValue() has an error return value in runtime, then the primary_value and extra_value contains a value from eOappEncReader_errortype_t
 extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint32_t *primary_value,
-                                                uint32_t *extra_value, hal_encoder_errors_flags *flags);
+                                                uint32_t *extra_value, hal_spiencoder_errors_flags *flags);
 
 
 /** @}            

@@ -745,8 +745,8 @@ static eOresult_t s_eo_mcserv_init_jomo(EOmcService *p)
         eOappEncReader_cfg_t encoder_reader_cfg;
         memset(&encoder_reader_cfg, 0xFF, sizeof(eOappEncReader_cfg_t)); //0xFF is the invalid value
         encoder_reader_cfg.numofjomos = 0;
-        encoder_reader_cfg.SPI_callbackOnLastRead = NULL;
-        encoder_reader_cfg.SPI_callback_arg = NULL; //not using SPI callback
+//        encoder_reader_cfg.SPI_callbackOnLastRead = NULL;
+//        encoder_reader_cfg.SPI_callback_arg = NULL; //not using SPI callback
         
         for(jm=0; jm<eOappEncReader_jomos_maxnumberof; jm++)
         {

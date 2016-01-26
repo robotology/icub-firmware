@@ -81,7 +81,7 @@
 #undef  HAL_USE_ACCELEROMETER
 #define     HAL_USE_CANTRANSCEIVER
 #define     HAL_USE_EEPROM
-#define     HAL_USE_ENCODER
+#define     HAL_USE_SPIENCODER
 #define     HAL_USE_ETHTRANSCEIVER
 #undef  HAL_USE_GYROSCOPE
 #define     HAL_USE_LED
@@ -89,7 +89,7 @@
 #define     HAL_USE_SWITCH
 #undef  HAL_USE_TERMOMETER
 #define     HAL_USE_DEVICE_MOTORCTL
-#define     HAL_USE_QUAD_ENC
+#define     HAL_USE_QUADENCODER
 
 
 // -- behaviour: define how the code is shaped

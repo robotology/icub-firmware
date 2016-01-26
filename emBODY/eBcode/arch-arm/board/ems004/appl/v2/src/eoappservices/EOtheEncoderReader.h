@@ -39,7 +39,7 @@
 #include "EoCommon.h"
 #include "EoProtocol.h"
 
-#include "hal_encoder.h"
+#include "hal_spiencoder.h"
 
 #include "EOtheServices.h"
 
@@ -83,7 +83,7 @@ extern eOresult_t eo_encoderreader_StartReading(EOtheEncoderReader *p);
 
 extern eObool_t eo_encoderreader_IsReadingAvailable(EOtheEncoderReader *p);
 
-extern eOresult_t eo_encoderreader_Read(EOtheEncoderReader *p, uint8_t position, uint32_t *primary, uint32_t *secondary, hal_encoder_errors_flags *errors);
+extern eOresult_t eo_encoderreader_Read(EOtheEncoderReader *p, uint8_t position, uint32_t *primary, uint32_t *secondary, hal_spiencoder_errors_flags *errors);
 
 
 

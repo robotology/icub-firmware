@@ -718,9 +718,9 @@
               <FilePath>.\src\extra\devices\hal_eeprom.c</FilePath>
             </File>
             <File>
-              <FileName>hal_encoder.c</FileName>
+              <FileName>hal_spiencoder.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\devices\hal_encoder.c</FilePath>
+              <FilePath>.\src\extra\devices\hal_spiencoder.c</FilePath>
             </File>
             <File>
               <FileName>hal_ethtransceiver.c</FileName>
@@ -818,9 +818,9 @@
               <FilePath>.\src\extra\periphs\hal_adc.c</FilePath>
             </File>
             <File>
-              <FileName>hal_quad_enc.c</FileName>
+              <FileName>hal_quadencoder.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\periphs\hal_quad_enc.c</FilePath>
+              <FilePath>.\src\extra\periphs\hal_quadencoder.c</FilePath>
             </File>
             <File>
               <FileName>hal_5v.c</FileName>
@@ -1668,9 +1668,9 @@
               <FilePath>.\src\extra\devices\hal_eeprom.c</FilePath>
             </File>
             <File>
-              <FileName>hal_encoder.c</FileName>
+              <FileName>hal_spiencoder.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\devices\hal_encoder.c</FilePath>
+              <FilePath>.\src\extra\devices\hal_spiencoder.c</FilePath>
             </File>
             <File>
               <FileName>hal_ethtransceiver.c</FileName>
@@ -1909,9 +1909,9 @@
               </FileOption>
             </File>
             <File>
-              <FileName>hal_quad_enc.c</FileName>
+              <FileName>hal_quadencoder.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\periphs\hal_quad_enc.c</FilePath>
+              <FilePath>.\src\extra\periphs\hal_quadencoder.c</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -2807,9 +2807,9 @@
               <FilePath>.\src\extra\devices\hal_eeprom.c</FilePath>
             </File>
             <File>
-              <FileName>hal_encoder.c</FileName>
+              <FileName>hal_spiencoder.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\devices\hal_encoder.c</FilePath>
+              <FilePath>.\src\extra\devices\hal_spiencoder.c</FilePath>
             </File>
             <File>
               <FileName>hal_ethtransceiver.c</FileName>
@@ -2954,9 +2954,9 @@
               <FilePath>.\src\extra\periphs\hal_adc.c</FilePath>
             </File>
             <File>
-              <FileName>hal_quad_enc.c</FileName>
+              <FileName>hal_quadencoder.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\periphs\hal_quad_enc.c</FilePath>
+              <FilePath>.\src\extra\periphs\hal_quadencoder.c</FilePath>
             </File>
             <File>
               <FileName>hal_5v.c</FileName>
@@ -3898,9 +3898,9 @@
               <FilePath>.\src\extra\devices\hal_eeprom.c</FilePath>
             </File>
             <File>
-              <FileName>hal_encoder.c</FileName>
+              <FileName>hal_spiencoder.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\devices\hal_encoder.c</FilePath>
+              <FilePath>.\src\extra\devices\hal_spiencoder.c</FilePath>
             </File>
             <File>
               <FileName>hal_ethtransceiver.c</FileName>
@@ -3998,9 +3998,9 @@
               <FilePath>.\src\extra\periphs\hal_adc.c</FilePath>
             </File>
             <File>
-              <FileName>hal_quad_enc.c</FileName>
+              <FileName>hal_quadencoder.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\periphs\hal_quad_enc.c</FilePath>
+              <FilePath>.\src\extra\periphs\hal_quadencoder.c</FilePath>
             </File>
             <File>
               <FileName>hal_5v.c</FileName>
@@ -4849,9 +4849,9 @@
               <FilePath>.\src\extra\devices\hal_eeprom.c</FilePath>
             </File>
             <File>
-              <FileName>hal_encoder.c</FileName>
+              <FileName>hal_spiencoder.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\devices\hal_encoder.c</FilePath>
+              <FilePath>.\src\extra\devices\hal_spiencoder.c</FilePath>
             </File>
             <File>
               <FileName>hal_ethtransceiver.c</FileName>
@@ -4949,9 +4949,9 @@
               <FilePath>.\src\extra\periphs\hal_adc.c</FilePath>
             </File>
             <File>
-              <FileName>hal_quad_enc.c</FileName>
+              <FileName>hal_quadencoder.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\periphs\hal_quad_enc.c</FilePath>
+              <FilePath>.\src\extra\periphs\hal_quadencoder.c</FilePath>
             </File>
             <File>
               <FileName>hal_5v.c</FileName>
@@ -5800,9 +5800,9 @@
               <FilePath>.\src\extra\devices\hal_eeprom.c</FilePath>
             </File>
             <File>
-              <FileName>hal_encoder.c</FileName>
+              <FileName>hal_spiencoder.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\devices\hal_encoder.c</FilePath>
+              <FilePath>.\src\extra\devices\hal_spiencoder.c</FilePath>
             </File>
             <File>
               <FileName>hal_ethtransceiver.c</FileName>
@@ -5900,9 +5900,9 @@
               <FilePath>.\src\extra\periphs\hal_adc.c</FilePath>
             </File>
             <File>
-              <FileName>hal_quad_enc.c</FileName>
+              <FileName>hal_quadencoder.c</FileName>
               <FileType>1</FileType>
-              <FilePath>.\src\extra\periphs\hal_quad_enc.c</FilePath>
+              <FilePath>.\src\extra\periphs\hal_quadencoder.c</FilePath>
             </File>
             <File>
               <FileName>hal_5v.c</FileName>

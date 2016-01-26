@@ -17,7 +17,7 @@
 */
 
 
-/* @file       hal_encoder.c
+/* @file       hal_spiencoder.c
     @brief      This file implements internal implementation of the hal encoder module.
     @author     marco.accame@iit.it, valentina.gaggero@iit.it
     @date       02/07/2013
@@ -28,7 +28,7 @@
 // - middleware interface: contains hl, stm32 etc. --------------------------------------------------------------------
 //#include "hal_middleware_interface.h"
 
-#ifdef HAL_USE_ENCODER
+#ifdef HAL_USE_SPIENCODER
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
@@ -43,14 +43,14 @@
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hal_encoder.h"
+#include "hal_spiencoder.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hal_encoder_hid.h"
+#include "hal_spiencoder_hid.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
@@ -63,12 +63,12 @@
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
-const hal_encoder_cfg_t hal_encoder_cfg_default =
+const hal_spiencoder_cfg_t hal_spiencoder_cfg_default =
 { 
     .priority =         hal_int_priority15, 
     .callback_on_rx =   NULL,
     .arg =              NULL, 
-    .type =             hal_encoder_tundefined, 
+    .type =             hal_spiencoder_typeNONE, 
     .reg_address =      NULL, 
     .sdata_precheck =   hal_false
 };
@@ -79,53 +79,53 @@ const hal_encoder_cfg_t hal_encoder_cfg_default =
 
 typedef struct
 {
-    hal_encoder_cfg_t       config;
+    hal_spiencoder_cfg_t       config;
     hal_mux_t               muxid;
     hal_gpio_t              chip_sel;
     hal_mux_sel_t           muxsel;
     hal_spi_t               spiid;
-    hal_encoder_position_t  position;
+    hal_spiencoder_position_t  position;
     uint8_t                 rxframes[3][4]; //3 possible frames received. The size of everyone is the maximum possible
-} hal_encoder_internal_item_t;
+} hal_spiencoder_internal_item_t;
 
 
 typedef struct
 {
     uint32_t                                inittedmask;
-    hal_encoder_internal_item_t*            items[hal_encoders_number];   
-} hal_encoder_theinternals_t;
+    hal_spiencoder_internal_item_t*            items[hal_spiencoders_number];   
+} hal_spiencoder_theinternals_t;
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_boolval_t s_hal_encoder_supported_is(hal_encoder_t id);
-static void s_hal_encoder_initted_set(hal_encoder_t id);
-static void s_hal_encoder_initted_reset(hal_encoder_t id);
-static hal_boolval_t s_hal_encoder_initted_is(hal_encoder_t id);
+static hal_boolval_t s_hal_spiencoder_supported_is(hal_spiencoder_t id);
+static void s_hal_spiencoder_initted_set(hal_spiencoder_t id);
+static void s_hal_spiencoder_initted_reset(hal_spiencoder_t id);
+static hal_boolval_t s_hal_spiencoder_initted_is(hal_spiencoder_t id);
 
-static hal_result_t s_hal_encoder_read_sdad_status_t2(hal_encoder_t id);
-static hal_result_t s_hal_encoder_read_sensor_t2(hal_encoder_t id);
-static hal_result_t s_hal_encoder_read_register_init_t2(hal_encoder_t id);
-static hal_result_t s_hal_encoder_read_register_execute_t2(hal_encoder_t id);
+static hal_result_t s_hal_spiencoder_read_sdad_status_t2(hal_spiencoder_t id);
+static hal_result_t s_hal_spiencoder_read_sensor_t2(hal_spiencoder_t id);
+static hal_result_t s_hal_spiencoder_read_register_init_t2(hal_spiencoder_t id);
+static hal_result_t s_hal_spiencoder_read_register_execute_t2(hal_spiencoder_t id);
 
 //Static callback functions
-static void s_hal_encoder_onreceiv(void* p);
-static void s_hal_encoder_onreceiv_sdad_status(void* p);
-static void s_hal_encoder_onreceiv_sensor_data(void* p);
-static void s_hal_encoder_onreceiv_reg_init(void* p);
-static void s_hal_encoder_onreceiv_reg_data(void* p);
+static void s_hal_spiencoder_onreceiv(void* p);
+static void s_hal_spiencoder_onreceiv_sdad_status(void* p);
+static void s_hal_spiencoder_onreceiv_sensor_data(void* p);
+static void s_hal_spiencoder_onreceiv_reg_init(void* p);
+static void s_hal_spiencoder_onreceiv_reg_data(void* p);
 
-static hal_encoder_position_t s_hal_encoder_frame2position_t1(uint8_t* frame);
-static hal_encoder_position_t s_hal_encoder_frame2position_t2(uint8_t* frame);
+static hal_spiencoder_position_t s_hal_spiencoder_frame2position_t1(uint8_t* frame);
+static hal_spiencoder_position_t s_hal_spiencoder_frame2position_t2(uint8_t* frame);
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static const variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static const hal_spi_cfg_t s_hal_encoder_spicfg_master =
+static const hal_spi_cfg_t s_hal_spiencoder_spicfg_master =
 {
     .ownership                  = hal_spi_ownership_master,
     .direction                  = hal_spi_dir_rxonly,
@@ -150,7 +150,7 @@ static const hal_spi_cfg_t s_hal_encoder_spicfg_master =
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_encoder_theinternals_t s_hal_encoder_theinternals =
+static hal_spiencoder_theinternals_t s_hal_spiencoder_theinternals =
 {
     .inittedmask        = 0,
     .items              = { NULL }   
@@ -161,25 +161,25 @@ static hal_encoder_theinternals_t s_hal_encoder_theinternals =
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern hal_boolval_t hal_encoder_supported_is(hal_encoder_t id)
+extern hal_boolval_t hal_spiencoder_supported_is(hal_spiencoder_t id)
 {
-    return(s_hal_encoder_supported_is(id));
+    return(s_hal_spiencoder_supported_is(id));
 }
 
 
-extern const hal_encoder_stream_map_t* hal_encoder_stream_map_get(void)
+extern const hal_spiencoder_stream_map_t* hal_spiencoder_stream_map_get(void)
 {
-    return(&hal_encoder__theboardconfig.streammap);
+    return(&hal_spiencoder__theboardconfig.streammap);
 }
 
 
-extern hal_result_t hal_encoder_init(hal_encoder_t id, const hal_encoder_cfg_t *cfg)
+extern hal_result_t hal_spiencoder_init(hal_spiencoder_t id, const hal_spiencoder_cfg_t *cfg)
 {
-    hal_encoder_internal_item_t* intitem = s_hal_encoder_theinternals.items[HAL_encoder_id2index(id)];
+    hal_spiencoder_internal_item_t* intitem = s_hal_spiencoder_theinternals.items[HAL_encoder_id2index(id)];
     hal_result_t res = hal_res_NOK_generic;
 
     // If encoder not supported return not OK
-    if(hal_false == s_hal_encoder_supported_is(id))
+    if(hal_false == s_hal_spiencoder_supported_is(id))
     {
         return(hal_res_NOK_generic);
     }
@@ -187,14 +187,14 @@ extern hal_result_t hal_encoder_init(hal_encoder_t id, const hal_encoder_cfg_t *
     // Set the default config if cfc is NULL
     if(NULL == cfg)
     {
-        cfg = &hal_encoder_cfg_default;
+        cfg = &hal_spiencoder_cfg_default;
     }
     
     // Check initialization
-    if(hal_true == s_hal_encoder_initted_is(id))
+    if(hal_true == s_hal_spiencoder_initted_is(id))
     {
         //Memory comparison
-        if(0 == memcmp(cfg, &intitem->config, sizeof(hal_encoder_cfg_t)))
+        if(0 == memcmp(cfg, &intitem->config, sizeof(hal_spiencoder_cfg_t)))
         {   // ok only if the previously used config is the same as the current one
             return(hal_res_OK);
         }
@@ -207,18 +207,18 @@ extern hal_result_t hal_encoder_init(hal_encoder_t id, const hal_encoder_cfg_t *
     // if it does not have ram yet, then attempt to allocate it.
     if(NULL == intitem)
     {
-        intitem = s_hal_encoder_theinternals.items[HAL_encoder_id2index(id)] = hal_heap_new(sizeof(hal_encoder_internal_item_t));
+        intitem = s_hal_spiencoder_theinternals.items[HAL_encoder_id2index(id)] = hal_heap_new(sizeof(hal_spiencoder_internal_item_t));
         // minimal initialisation of the internal item
         // nothing to init.      
     }
     // Copy configuration in a protected memory
-    memcpy(&intitem->config, cfg, sizeof(hal_encoder_cfg_t));   
+    memcpy(&intitem->config, cfg, sizeof(hal_spiencoder_cfg_t));   
     
     // configure the required mux port and spi port (using the configuration of the board for the selected encoder)
-    // "hal_encoder__theboardconfig" struct is defined inside the board modules 
-    intitem->spiid  = hal_encoder__theboardconfig.spimap[HAL_encoder_id2index(id)].spiid;    
-    intitem->muxid  = hal_encoder__theboardconfig.spimap[HAL_encoder_id2index(id)].muxid;
-    intitem->muxsel = hal_encoder__theboardconfig.spimap[HAL_encoder_id2index(id)].muxsel;
+    // "hal_spiencoder__theboardconfig" struct is defined inside the board modules 
+    intitem->spiid  = hal_spiencoder__theboardconfig.spimap[HAL_encoder_id2index(id)].spiid;    
+    intitem->muxid  = hal_spiencoder__theboardconfig.spimap[HAL_encoder_id2index(id)].muxid;
+    intitem->muxsel = hal_spiencoder__theboardconfig.spimap[HAL_encoder_id2index(id)].muxsel;
     intitem->position  = 0;
     
     res = hal_mux_init(intitem->muxid, NULL);
@@ -229,18 +229,18 @@ extern hal_result_t hal_encoder_init(hal_encoder_t id, const hal_encoder_cfg_t *
     hal_mux_get_cs(intitem->muxid, &(intitem->chip_sel));
         
     hal_spi_cfg_t spicfg;
-    memcpy(&spicfg, &s_hal_encoder_spicfg_master, sizeof(hal_spi_cfg_t));
+    memcpy(&spicfg, &s_hal_spiencoder_spicfg_master, sizeof(hal_spi_cfg_t));
         
-    if (intitem->config.type == hal_encoder_t2)
+    if (intitem->config.type == hal_spiencoder_typeAMO)
     {
-        //We use the master SPI configuration for encoder type 2
+        //We use the master SPI configuration for encoder type 2 (AMO)
         //This sizeofframe is used as an upper bound for reserving heap memory during the initialization (hal_spi level) 
         spicfg.sizeofframe = 4;
         spicfg.cpolarity = hal_spi_cpolarity_low;
     }
         
-    //we get the max speed of spi from what specified in hal_encoder__theboardconfig
-    spicfg.maxspeed = hal_encoder__theboardconfig.spimaxspeed;
+    //we get the max speed of spi from what specified in hal_spiencoder__theboardconfig
+    spicfg.maxspeed = hal_spiencoder__theboardconfig.spimaxspeed;
     
     //Initialize the SPI with the correct config
     res = hal_spi_init(intitem->spiid, &spicfg);
@@ -250,30 +250,30 @@ extern hal_result_t hal_encoder_init(hal_encoder_t id, const hal_encoder_cfg_t *
     }
  
     // Flag to set the encoder initialized
-    s_hal_encoder_initted_set(id);
+    s_hal_spiencoder_initted_set(id);
     return(hal_res_OK);
 }
 
 // Start reading for the encoders
-extern hal_result_t hal_encoder_read_start(hal_encoder_t id)
+extern hal_result_t hal_spiencoder_read_start(hal_spiencoder_t id)
 {  
-    hal_encoder_internal_item_t* intitem = s_hal_encoder_theinternals.items[HAL_encoder_id2index(id)];
+    hal_spiencoder_internal_item_t* intitem = s_hal_spiencoder_theinternals.items[HAL_encoder_id2index(id)];
 #if !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)       
-    if(hal_false == s_hal_encoder_initted_is(id))
+    if(hal_false == s_hal_spiencoder_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
 #endif
     
     
-    if (intitem->config.type == hal_encoder_t1) // Encoder type 1 (AEA)
+    if (intitem->config.type == hal_spiencoder_typeAEA) // Encoder type 1 (AEA)
     {
         static const uint8_t txframe_dummy[3] = {0x00, 0x00, 0x00};
         // Mux enabled
         hal_mux_enable(intitem->muxid, intitem->muxsel);
 
         // SPI: set the callback function
-        hal_spi_on_framereceiv_set(intitem->spiid, s_hal_encoder_onreceiv, (void*)id);
+        hal_spi_on_framereceiv_set(intitem->spiid, s_hal_spiencoder_onreceiv, (void*)id);
 
         //Added 26/11/2014
         //----------------
@@ -287,10 +287,10 @@ extern hal_result_t hal_encoder_read_start(hal_encoder_t id)
         // SPI start to receive (only one frame)
         hal_spi_start(intitem->spiid, 1); // 1 solo frame ...
 
-        // when the frame is received, then the isr will call s_hal_encoder_onreceiv() to copy the frame into local memory,
-        // so that hal_encoder_get_value() can be called to retrieve teh encoder value
+        // when the frame is received, then the isr will call s_hal_spiencoder_onreceiv() to copy the frame into local memory,
+        // so that hal_spiencoder_get_value() can be called to retrieve teh encoder value
     }    
-    else if (intitem->config.type == hal_encoder_t2)    // Encoder type 2 (AMO)
+    else if (intitem->config.type == hal_spiencoder_typeAMO)    // Encoder type 2 (AMO)
     {        
         //Enabling the MUX
         hal_mux_enable(intitem->muxid, intitem->muxsel);
@@ -298,29 +298,29 @@ extern hal_result_t hal_encoder_read_start(hal_encoder_t id)
         
         if(hal_true == intitem->config.sdata_precheck)
         {   // Precheck needed
-            s_hal_encoder_read_sdad_status_t2 (id);
+            s_hal_spiencoder_read_sdad_status_t2 (id);
         }        
         else    
         {   // Precheck not needed
             intitem->rxframes[0][0] = 0xF5;
             intitem->rxframes[0][1] = UINT8_MAX;
-            s_hal_encoder_read_sensor_t2 (id);
+            s_hal_spiencoder_read_sensor_t2 (id);
         }
     }
     return(hal_res_OK);
 }
 
 //Start reading for encoder t2
-extern hal_result_t hal_encoder_read_start_t2(hal_encoder_t id, uint8_t reg_address, hal_bool_t sdata_check)
+extern hal_result_t hal_spiencoder_read_start_t2(hal_spiencoder_t id, uint8_t reg_address, hal_bool_t sdata_check)
 {
-    hal_encoder_internal_item_t* intitem = s_hal_encoder_theinternals.items[HAL_encoder_id2index(id)];   
+    hal_spiencoder_internal_item_t* intitem = s_hal_spiencoder_theinternals.items[HAL_encoder_id2index(id)];   
 #if !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)       
-    if(hal_false == s_hal_encoder_initted_is(id))
+    if(hal_false == s_hal_spiencoder_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
     
-    if (intitem->config.type != hal_encoder_t2)
+    if (intitem->config.type != hal_spiencoder_typeAMO)
     {
         return (hal_res_NOK_generic);
     }
@@ -336,25 +336,25 @@ extern hal_result_t hal_encoder_read_start_t2(hal_encoder_t id, uint8_t reg_addr
         {
             // If a check is needed, start with the first phase
             // This launch a chain of execution for performing a complete reading of the sensor data
-            s_hal_encoder_read_sdad_status_t2 (id);
+            s_hal_spiencoder_read_sdad_status_t2 (id);
         }
         else
         {
             // Check not needed, we can start from the reading of the sensor
             intitem->rxframes[0][0] = 0xF5;
             intitem->rxframes[0][1] = UINT8_MAX;
-            s_hal_encoder_read_sensor_t2 (id);
+            s_hal_spiencoder_read_sensor_t2 (id);
         }
     return(hal_res_OK);
 }
 
 // Get the last value saved with a read_start
-extern hal_result_t hal_encoder_get_value(hal_encoder_t id, hal_encoder_position_t* pos, hal_encoder_errors_flags* e_flags)
+extern hal_result_t hal_spiencoder_get_value(hal_spiencoder_t id, hal_spiencoder_position_t* pos, hal_spiencoder_errors_flags* e_flags)
 {
-    hal_encoder_internal_item_t* intitem = s_hal_encoder_theinternals.items[HAL_encoder_id2index(id)];
+    hal_spiencoder_internal_item_t* intitem = s_hal_spiencoder_theinternals.items[HAL_encoder_id2index(id)];
     
 #if !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)       
-    if(hal_false == s_hal_encoder_initted_is(id))
+    if(hal_false == s_hal_spiencoder_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
@@ -367,7 +367,7 @@ extern hal_result_t hal_encoder_get_value(hal_encoder_t id, hal_encoder_position
     }
 #endif
         //Encoder type 1 (AEA)
-        if (intitem->config.type == hal_encoder_t1)
+        if (intitem->config.type == hal_spiencoder_typeAEA)
         {
             // Check if SPI connection is working (if not, is answering 0xFF in all the received bytes)
             // Here I check the bits which should validate the data. In fact, AEA frame consists of 18 bits:
@@ -395,7 +395,7 @@ extern hal_result_t hal_encoder_get_value(hal_encoder_t id, hal_encoder_position
                 *pos = intitem->position;
         }
         //Encoder type 2 (AMO)
-        else if (intitem->config.type == hal_encoder_t2)
+        else if (intitem->config.type == hal_spiencoder_typeAMO)
         {
             // Check if SPI connection is working
             // Here I check only the first bytes received for all the communications, which should be = to the different
@@ -438,12 +438,12 @@ extern hal_result_t hal_encoder_get_value(hal_encoder_t id, hal_encoder_position
 }
 
 // Get the last values saved with a read_start_t2
-extern hal_result_t hal_encoder_get_value_t2(hal_encoder_t id, hal_encoder_position_t* pos, hal_bool_t* val, uint16_t* reg)
+extern hal_result_t hal_spiencoder_get_value_t2(hal_spiencoder_t id, hal_spiencoder_position_t* pos, hal_bool_t* val, uint16_t* reg)
 {
-    hal_encoder_internal_item_t* intitem = s_hal_encoder_theinternals.items[HAL_encoder_id2index(id)];
+    hal_spiencoder_internal_item_t* intitem = s_hal_spiencoder_theinternals.items[HAL_encoder_id2index(id)];
 
 #if !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)       
-    if(hal_false == s_hal_encoder_initted_is(id))
+    if(hal_false == s_hal_spiencoder_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
@@ -480,12 +480,12 @@ extern hal_result_t hal_encoder_get_value_t2(hal_encoder_t id, hal_encoder_posit
 
 //Get the single bytes inside the array rxframes[1] = sensor data
 // used only for debugging AMO
-extern hal_result_t hal_encoder_get_frame(hal_encoder_t id, uint8_t* bytes)
+extern hal_result_t hal_spiencoder_get_frame(hal_spiencoder_t id, uint8_t* bytes)
 {
-    hal_encoder_internal_item_t* intitem = s_hal_encoder_theinternals.items[HAL_encoder_id2index(id)];
+    hal_spiencoder_internal_item_t* intitem = s_hal_spiencoder_theinternals.items[HAL_encoder_id2index(id)];
 
 #if !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)       
-    if(hal_false == s_hal_encoder_initted_is(id))
+    if(hal_false == s_hal_spiencoder_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
@@ -499,28 +499,28 @@ extern hal_result_t hal_encoder_get_frame(hal_encoder_t id, uint8_t* bytes)
     return(hal_res_OK);
 }
 
-extern hal_result_t hal_encoder_get_spi(hal_encoder_t id, hal_spi_t* spiid)
+extern hal_result_t hal_spiencoder_get_spi(hal_spiencoder_t id, hal_spi_t* spiid)
 {
     //returns the spiid even if the encoder is not initialized...it's a static information, always valid
  
-    if(hal_false == s_hal_encoder_supported_is(id))
+    if(hal_false == s_hal_spiencoder_supported_is(id))
     {
         return(hal_res_NOK_generic);
     }
     
     //if supported, copy the info
-    *spiid = hal_encoder__theboardconfig.spimap[HAL_encoder_id2index(id)].spiid;        
+    *spiid = hal_spiencoder__theboardconfig.spimap[HAL_encoder_id2index(id)].spiid;        
     return(hal_res_OK);
 }
 
-extern hal_result_t hal_encoder_deinit(hal_encoder_t id)
+extern hal_result_t hal_spiencoder_deinit(hal_spiencoder_t id)
 {
     // Here I should remove everything connected to the specified encoder
     // In this way, I should be able to initialize e deinitialize the encoders programmatically
-    hal_encoder_internal_item_t* intitem = s_hal_encoder_theinternals.items[HAL_encoder_id2index(id)];
+    hal_spiencoder_internal_item_t* intitem = s_hal_spiencoder_theinternals.items[HAL_encoder_id2index(id)];
     
     //If the encoder is not initialized, return and do nothing
-    if(hal_false == s_hal_encoder_initted_is(id))
+    if(hal_false == s_hal_spiencoder_initted_is(id))
         return hal_res_NOK_generic;
     
     //SPI & MUX DEINIT HANDLE
@@ -532,11 +532,11 @@ extern hal_result_t hal_encoder_deinit(hal_encoder_t id)
     // 3 - if used, leave the SPI & MUX config as it is
     uint8_t i = 0;
     hal_result_t res;
-    hal_encoder_internal_item_t* extitem;
+    hal_spiencoder_internal_item_t* extitem;
 
-    for (i = 0; i<hal_encoders_number; i++)
+    for (i = 0; i<hal_spiencoders_number; i++)
     {
-        extitem = s_hal_encoder_theinternals.items[HAL_encoder_id2index(i)];
+        extitem = s_hal_spiencoder_theinternals.items[HAL_encoder_id2index(i)];
         if(extitem != NULL)
         {
             //At least one encoder connected to the same muxid, I can go on 
@@ -545,7 +545,7 @@ extern hal_result_t hal_encoder_deinit(hal_encoder_t id)
                 break;
             }
         }
-        if (i == hal_encoders_number -1)
+        if (i == hal_spiencoders_number -1)
         {
                 // If I'm here, it means that no encoder is connected to the same muxid == spiid
                 // So I must deinit both MUX & SPI, but before it's safer to disable something that may be still running
@@ -563,10 +563,10 @@ extern hal_result_t hal_encoder_deinit(hal_encoder_t id)
     }
     
     //Reset the flag associated to the encoder
-    s_hal_encoder_initted_reset(id);
+    s_hal_spiencoder_initted_reset(id);
     
     //Dealloc all the associated memory
-    hal_heap_delete((void**)&(s_hal_encoder_theinternals.items[HAL_encoder_id2index(id)]));
+    hal_heap_delete((void**)&(s_hal_spiencoder_theinternals.items[HAL_encoder_id2index(id)]));
     //hal_heap_delete((void**)&intitem);
 
     return(hal_res_OK);
@@ -584,13 +584,13 @@ extern hal_result_t hal_encoder_deinit(hal_encoder_t id)
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_result_t s_hal_encoder_read_sdad_status_t2(hal_encoder_t id)
+static hal_result_t s_hal_spiencoder_read_sdad_status_t2(hal_spiencoder_t id)
 {
-    hal_encoder_internal_item_t* intitem = s_hal_encoder_theinternals.items[HAL_encoder_id2index(id)];
+    hal_spiencoder_internal_item_t* intitem = s_hal_spiencoder_theinternals.items[HAL_encoder_id2index(id)];
     static const uint8_t txframe_sdad[2] = {0xF5, 0x00};
         
     // SPI: set the callback function
-    hal_spi_on_framereceiv_set(intitem->spiid, s_hal_encoder_onreceiv_sdad_status, (void*)id);
+    hal_spi_on_framereceiv_set(intitem->spiid, s_hal_spiencoder_onreceiv_sdad_status, (void*)id);
     
     // SPI: set the sizeofframe for this transmission (2)
     hal_spi_set_sizeofframe(intitem->spiid, 2);
@@ -604,16 +604,16 @@ static hal_result_t s_hal_encoder_read_sdad_status_t2(hal_encoder_t id)
     return (hal_res_OK);
 }
 
-static hal_result_t s_hal_encoder_read_sensor_t2(hal_encoder_t id)
+static hal_result_t s_hal_spiencoder_read_sensor_t2(hal_spiencoder_t id)
 {    
-    hal_encoder_internal_item_t* intitem = s_hal_encoder_theinternals.items[HAL_encoder_id2index(id)];
+    hal_spiencoder_internal_item_t* intitem = s_hal_spiencoder_theinternals.items[HAL_encoder_id2index(id)];
     static const uint8_t txframe_sdata[4] = {0xA6, 0x00, 0x00, 0x00};
     
     //Enable CHIPSELECT
     hal_gpio_setval(intitem->chip_sel, hal_gpio_valLOW);
     
     // SPI: set the callback function
-    hal_spi_on_framereceiv_set(intitem->spiid, s_hal_encoder_onreceiv_sensor_data, (void*)id);
+    hal_spi_on_framereceiv_set(intitem->spiid, s_hal_spiencoder_onreceiv_sensor_data, (void*)id);
     
     // SPI: set the sizeofframe for this transmission (4)
     hal_spi_set_sizeofframe(intitem->spiid, 4);
@@ -628,9 +628,9 @@ static hal_result_t s_hal_encoder_read_sensor_t2(hal_encoder_t id)
 }
 
 
-static hal_result_t s_hal_encoder_read_register_init_t2(hal_encoder_t id)
+static hal_result_t s_hal_spiencoder_read_register_init_t2(hal_spiencoder_t id)
 {
-    hal_encoder_internal_item_t* intitem = s_hal_encoder_theinternals.items[HAL_encoder_id2index(id)];
+    hal_spiencoder_internal_item_t* intitem = s_hal_spiencoder_theinternals.items[HAL_encoder_id2index(id)];
     
     if (intitem->config.reg_address == NULL)
     {
@@ -644,7 +644,7 @@ static hal_result_t s_hal_encoder_read_register_init_t2(hal_encoder_t id)
     hal_gpio_setval(intitem->chip_sel, hal_gpio_valLOW);
     
     // SPI: set the callback function
-    hal_spi_on_framereceiv_set(intitem->spiid, s_hal_encoder_onreceiv_reg_init, (void*)id);
+    hal_spi_on_framereceiv_set(intitem->spiid, s_hal_spiencoder_onreceiv_reg_init, (void*)id);
     
     // SPI: set the sizeofframe for this transmission (2)
     hal_spi_set_sizeofframe(intitem->spiid, 2);
@@ -658,16 +658,16 @@ static hal_result_t s_hal_encoder_read_register_init_t2(hal_encoder_t id)
     return (hal_res_OK);
 }
 
-static hal_result_t s_hal_encoder_read_register_execute_t2(hal_encoder_t id)
+static hal_result_t s_hal_spiencoder_read_register_execute_t2(hal_spiencoder_t id)
 {
-    hal_encoder_internal_item_t* intitem = s_hal_encoder_theinternals.items[HAL_encoder_id2index(id)];
+    hal_spiencoder_internal_item_t* intitem = s_hal_spiencoder_theinternals.items[HAL_encoder_id2index(id)];
     static const uint8_t txframe_rdata[3] = {0xAD, 0x00, 0x00};
     
     //Enable CHIPSELECT
     hal_gpio_setval(intitem->chip_sel, hal_gpio_valLOW);
     
     // SPI: set the callback function
-    hal_spi_on_framereceiv_set(intitem->spiid, s_hal_encoder_onreceiv_reg_data, (void*)id);
+    hal_spi_on_framereceiv_set(intitem->spiid, s_hal_spiencoder_onreceiv_reg_data, (void*)id);
     
     // SPI: set the sizeofframe for this transmission (3)
     hal_spi_set_sizeofframe(intitem->spiid, 3);
@@ -681,31 +681,31 @@ static hal_result_t s_hal_encoder_read_register_execute_t2(hal_encoder_t id)
     return (hal_res_OK);
 }
 
-static hal_boolval_t s_hal_encoder_supported_is(hal_encoder_t id)
+static hal_boolval_t s_hal_spiencoder_supported_is(hal_spiencoder_t id)
 {
-    return((hal_boolval_t)hl_bits_word_bitcheck(hal_encoder__theboardconfig.supportedmask, HAL_encoder_id2index(id)) );
+    return((hal_boolval_t)hl_bits_word_bitcheck(hal_spiencoder__theboardconfig.supportedmask, HAL_encoder_id2index(id)) );
 }
 
-static void s_hal_encoder_initted_set(hal_encoder_t id)
+static void s_hal_spiencoder_initted_set(hal_spiencoder_t id)
 {
-    hl_bits_word_bitset(&s_hal_encoder_theinternals.inittedmask, HAL_encoder_id2index(id));
+    hl_bits_word_bitset(&s_hal_spiencoder_theinternals.inittedmask, HAL_encoder_id2index(id));
 }
 
-static void s_hal_encoder_initted_reset(hal_encoder_t id)
+static void s_hal_spiencoder_initted_reset(hal_spiencoder_t id)
 {
-    hl_bits_word_bitclear(&s_hal_encoder_theinternals.inittedmask, HAL_encoder_id2index(id));
+    hl_bits_word_bitclear(&s_hal_spiencoder_theinternals.inittedmask, HAL_encoder_id2index(id));
 }
 
-static hal_boolval_t s_hal_encoder_initted_is(hal_encoder_t id)
+static hal_boolval_t s_hal_spiencoder_initted_is(hal_spiencoder_t id)
 {
-    return((hal_boolval_t)hl_bits_word_bitcheck(s_hal_encoder_theinternals.inittedmask, HAL_encoder_id2index(id)));
+    return((hal_boolval_t)hl_bits_word_bitcheck(s_hal_spiencoder_theinternals.inittedmask, HAL_encoder_id2index(id)));
 }
 
-static void s_hal_encoder_onreceiv(void* p)
+static void s_hal_spiencoder_onreceiv(void* p)
 {
     int32_t tmp = (int32_t)p;                   // tmp is used just to remove a warning about conversion from pointer to smaller integer
-    hal_encoder_t id = (hal_encoder_t)tmp;
-    hal_encoder_internal_item_t* intitem = s_hal_encoder_theinternals.items[HAL_encoder_id2index(id)];
+    hal_spiencoder_t id = (hal_spiencoder_t)tmp;
+    hal_spiencoder_internal_item_t* intitem = s_hal_spiencoder_theinternals.items[HAL_encoder_id2index(id)];
     
     //hal_spi_stop(intitem->spiid);
     hal_mux_disable(intitem->muxid);
@@ -717,7 +717,7 @@ static void s_hal_encoder_onreceiv(void* p)
     hal_spi_get(intitem->spiid, intitem->rxframes[1], NULL);
     
     // Formatting result and saving in position field
-    intitem->position = s_hal_encoder_frame2position_t1(intitem->rxframes[1]);
+    intitem->position = s_hal_spiencoder_frame2position_t1(intitem->rxframes[1]);
         
     // ok. now i call the callbcak on execution of encoder
     
@@ -727,11 +727,11 @@ static void s_hal_encoder_onreceiv(void* p)
     }
 }
 
-static void s_hal_encoder_onreceiv_sdad_status(void* p)
+static void s_hal_spiencoder_onreceiv_sdad_status(void* p)
 {
     int32_t tmp = (int32_t)p;                   // tmp is used just to remove a warning about conversion from pointer to smaller integer
-    hal_encoder_t id = (hal_encoder_t)tmp;
-    hal_encoder_internal_item_t* intitem = s_hal_encoder_theinternals.items[HAL_encoder_id2index(id)];
+    hal_spiencoder_t id = (hal_spiencoder_t)tmp;
+    hal_spiencoder_internal_item_t* intitem = s_hal_spiencoder_theinternals.items[HAL_encoder_id2index(id)];
     
     //Disable chip select
     hal_gpio_setval(intitem->chip_sel, hal_gpio_valHIGH);
@@ -742,14 +742,14 @@ static void s_hal_encoder_onreceiv_sdad_status(void* p)
     hal_spi_get(intitem->spiid, intitem->rxframes[0], NULL);
 
     //Invoke the reading of the sensor data
-    s_hal_encoder_read_sensor_t2 (id);
+    s_hal_spiencoder_read_sensor_t2 (id);
 }
 
-static void s_hal_encoder_onreceiv_sensor_data(void* p)
+static void s_hal_spiencoder_onreceiv_sensor_data(void* p)
 {
     int32_t tmp = (int32_t)p;                   // tmp is used just to remove a warning about conversion from pointer to smaller integer
-    hal_encoder_t id = (hal_encoder_t)tmp;
-    hal_encoder_internal_item_t* intitem = s_hal_encoder_theinternals.items[HAL_encoder_id2index(id)];
+    hal_spiencoder_t id = (hal_spiencoder_t)tmp;
+    hal_spiencoder_internal_item_t* intitem = s_hal_spiencoder_theinternals.items[HAL_encoder_id2index(id)];
         
     //Disable chip select
     hal_gpio_setval(intitem->chip_sel, hal_gpio_valHIGH);
@@ -760,17 +760,17 @@ static void s_hal_encoder_onreceiv_sensor_data(void* p)
     hal_spi_get(intitem->spiid, intitem->rxframes[1], NULL);
     
     //Formatting the result and saving in position field
-    intitem->position = s_hal_encoder_frame2position_t2(intitem->rxframes[1]);
+    intitem->position = s_hal_spiencoder_frame2position_t2(intitem->rxframes[1]);
     
     //Invoke the register initialization
-    s_hal_encoder_read_register_init_t2 (id);
+    s_hal_spiencoder_read_register_init_t2 (id);
 }
 
-static void s_hal_encoder_onreceiv_reg_init(void* p)
+static void s_hal_spiencoder_onreceiv_reg_init(void* p)
 {
     int32_t tmp = (int32_t)p;                   // tmp is used just to remove a warning about conversion from pointer to smaller integer
-    hal_encoder_t id = (hal_encoder_t)tmp;
-    hal_encoder_internal_item_t* intitem = s_hal_encoder_theinternals.items[HAL_encoder_id2index(id)];
+    hal_spiencoder_t id = (hal_spiencoder_t)tmp;
+    hal_spiencoder_internal_item_t* intitem = s_hal_spiencoder_theinternals.items[HAL_encoder_id2index(id)];
     
     //hal_spi_stop(intitem->spiid);
     //Disable chip select
@@ -779,14 +779,14 @@ static void s_hal_encoder_onreceiv_reg_init(void* p)
     //No bytes of this transmission are used
     hal_spi_get(intitem->spiid, rxregdummy, NULL);
     //Invoke the register reading
-    s_hal_encoder_read_register_execute_t2(id);
+    s_hal_spiencoder_read_register_execute_t2(id);
 }
 
-static void s_hal_encoder_onreceiv_reg_data(void* p)
+static void s_hal_spiencoder_onreceiv_reg_data(void* p)
 {
     int32_t tmp = (int32_t)p;                   // tmp is used just to remove a warning about conversion from pointer to smaller integer
-    hal_encoder_t id = (hal_encoder_t)tmp;
-    hal_encoder_internal_item_t* intitem = s_hal_encoder_theinternals.items[HAL_encoder_id2index(id)];
+    hal_spiencoder_t id = (hal_spiencoder_t)tmp;
+    hal_spiencoder_internal_item_t* intitem = s_hal_spiencoder_theinternals.items[HAL_encoder_id2index(id)];
     
     //hal_spi_stop(intitem->spiid);
     hal_mux_disable(intitem->muxid);
@@ -802,7 +802,7 @@ static void s_hal_encoder_onreceiv_reg_data(void* p)
 }
 
 // Formatting the result for encoder type 1
-static hal_encoder_position_t s_hal_encoder_frame2position_t1(uint8_t* frame)
+static hal_spiencoder_position_t s_hal_spiencoder_frame2position_t1(uint8_t* frame)
 {
     uint32_t pos = 0;
     // pos = frame[0] | (frame[1] << 8) | (frame[2] << 16);
@@ -814,7 +814,7 @@ static hal_encoder_position_t s_hal_encoder_frame2position_t1(uint8_t* frame)
 }
 
 // Formatting the result for encoder type 2
-static hal_encoder_position_t s_hal_encoder_frame2position_t2(uint8_t* frame)
+static hal_spiencoder_position_t s_hal_spiencoder_frame2position_t2(uint8_t* frame)
 {
     uint32_t pos = 0;
     pos = ((frame[1] << 16) | (frame[2] << 8) | (frame[3]));
@@ -823,7 +823,7 @@ static hal_encoder_position_t s_hal_encoder_frame2position_t2(uint8_t* frame)
     return(pos);
 }
 
-#endif//HAL_USE_ENCODER
+#endif//HAL_USE_SPIENCODER
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

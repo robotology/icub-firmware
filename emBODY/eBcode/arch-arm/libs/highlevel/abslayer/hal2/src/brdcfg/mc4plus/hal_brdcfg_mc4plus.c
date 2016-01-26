@@ -818,34 +818,33 @@
 #endif//HAL_USE_EEPROM 
 
 
-#ifdef HAL_USE_ENCODER
+#ifdef HAL_USE_SPIENCODER
  
-    #include "hal_encoder_hid.h"
+    #include "hal_spiencoder_hid.h"
 
-    const hal_encoder_boardconfig_t hal_encoder__theboardconfig =
+    const hal_spiencoder_boardconfig_t hal_spiencoder__theboardconfig =
     {
-        .supportedmask              =  (1 << hal_encoder1) | (1 << hal_encoder2) | (0 << hal_encoder3) | (0 << hal_encoder4) | (0 << hal_encoder5) | (0 << hal_encoder6),  
+        .supportedmask              =  (1 << hal_spiencoder1) | (1 << hal_spiencoder2) | (0 << hal_spiencoder3) | (0 << hal_spiencoder4) | (0 << hal_spiencoder5) | (0 << hal_spiencoder6),  
         .spimaxspeed                =  1000*1000, // not more than 1 mhz. actually on stm32f4 it is exactly 42m/64 = 0.65625 mhz
         .spimap                     =
         {
-            {   // hal_encoder1:    P10 on mc4plus
+            {   // hal_spiencoder1:    P10 on mc4plus
                 .spiid = hal_spi3,  .muxid = hal_mux1,  .muxsel = hal_mux_selNONE                
             },
-            {   // hal_encoder2:    P11 on mc4plus
+            {   // hal_spiencoder2:    P11 on mc4plus
                 .spiid = hal_spi2,  .muxid = hal_mux2,  .muxsel = hal_mux_selNONE               
             }                   
         },
         .streammap                  =
         {
-            .numberofencoders       = 2,
-            .numberinstream0        = 1,
-            .numberinstream1        = 1,
-            .encoder2stream         = {hal_encoder_stream0, hal_encoder_stream1, hal_encoder_streamNONE, hal_encoder_streamNONE, hal_encoder_streamNONE, hal_encoder_streamNONE},
-            .encoder2indexinstream  = {0, 0, hal_NA08, hal_NA08, hal_NA08, hal_NA08}           
+            .totalnumberofencoders      = 2,
+            .stream2numberofencoders    = {1, 1},
+            .encoder2stream             = {hal_spiencoder_stream0, hal_spiencoder_stream1, hal_spiencoder_streamNONE, hal_spiencoder_streamNONE, hal_spiencoder_streamNONE, hal_spiencoder_streamNONE},
+            .encoder2indexinstream      = {0, 0, hal_NA08, hal_NA08, hal_NA08, hal_NA08}           
         }
     };
     
-#endif//HAL_USE_ENCODER  
+#endif//HAL_USE_SPIENCODER  
   
   
 
@@ -1106,16 +1105,16 @@
     
 
     
-#ifdef HAL_USE_QUAD_ENC
+#ifdef HAL_USE_QUADENCODER
  
-    #include "hal_quad_enc_hid.h"
+    #include "hal_quadencoder_hid.h"
 
-    const hal_quad_enc_boardconfig_t hal_quad_enc__theboardconfig =
+    const hal_quadencoder_boardconfig_t hal_quadencoder__theboardconfig =
     {
-        .supportedmask              =  (1 << hal_quad_enc1) | (1 << hal_quad_enc2) | (1 << hal_quad_enc3) | (1 << hal_quad_enc4)
+        .supportedmask              =  (1 << hal_quadencoder1) | (1 << hal_quadencoder2) | (1 << hal_quadencoder3) | (1 << hal_quadencoder4)
     };
     
-#endif//HAL_USE_QUAD_ENC
+#endif//HAL_USE_QUADENCODER
     
     
     

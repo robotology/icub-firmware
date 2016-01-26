@@ -897,46 +897,45 @@
 #endif//HAL_USE_EEPROM 
 
 
-#ifdef HAL_USE_ENCODER
+#ifdef HAL_USE_SPIENCODER
     
-    #include "hal_encoder_hid.h"
+    #include "hal_spiencoder_hid.h"
 
-    extern const hal_encoder_boardconfig_t hal_encoder__theboardconfig =
+    extern const hal_spiencoder_boardconfig_t hal_spiencoder__theboardconfig =
     {
-        .supportedmask              = (1 << hal_encoder1) | (1 << hal_encoder2) | (1 << hal_encoder3) | (1 << hal_encoder4) | (1 << hal_encoder5) | (1 << hal_encoder6), 
+        .supportedmask              = (1 << hal_spiencoder1) | (1 << hal_spiencoder2) | (1 << hal_spiencoder3) | (1 << hal_spiencoder4) | (1 << hal_spiencoder5) | (1 << hal_spiencoder6), 
         .spimaxspeed                =  1000*1000, // not more than 1 mhz. actually on stm32f4 it is exactly 42m/64 = 0.65625 mhz
         .spimap                     =
         {
-            {   // hal_encoder1:    P6 on ems4rd
+            {   // hal_spiencoder1:    P6 on ems4rd
                 .spiid = hal_spi2,  .muxid = hal_mux2,  .muxsel = hal_mux_selA                
             },
-            {   // hal_encoder2:    P8 on ems4rd
+            {   // hal_spiencoder2:    P8 on ems4rd
                 .spiid = hal_spi2,  .muxid = hal_mux2,  .muxsel = hal_mux_selB                
             },            
-            {   // hal_encoder3:    P10 on ems4rd
+            {   // hal_spiencoder3:    P10 on ems4rd
                 .spiid = hal_spi2,  .muxid = hal_mux2,  .muxsel = hal_mux_selC                
             },
-            {   // hal_encoder4:    P7 on ems4rd
+            {   // hal_spiencoder4:    P7 on ems4rd
                 .spiid = hal_spi3,  .muxid = hal_mux3,  .muxsel = hal_mux_selA                
             },
-            {   // hal_encoder5:    P9 on ems4rd
+            {   // hal_spiencoder5:    P9 on ems4rd
                 .spiid = hal_spi3,  .muxid = hal_mux3,  .muxsel = hal_mux_selB                
             },            
-            {   // hal_encoder6:    P11 on ems4rd
+            {   // hal_spiencoder6:    P11 on ems4rd
                 .spiid = hal_spi3,  .muxid = hal_mux3,  .muxsel = hal_mux_selC                
             }                        
         },
         .streammap                  =
         {
-            .numberofencoders       = 6,
-            .numberinstream0        = 3,
-            .numberinstream1        = 3,
-            .encoder2stream         = {hal_encoder_stream0, hal_encoder_stream0, hal_encoder_stream0, hal_encoder_stream1, hal_encoder_stream1, hal_encoder_stream1},
-            .encoder2indexinstream  = {0, 1, 2, 0, 1, 2}          
+            .totalnumberofencoders      = 6,
+            .stream2numberofencoders    = {3, 3},
+            .encoder2stream             = {hal_spiencoder_stream0, hal_spiencoder_stream0, hal_spiencoder_stream0, hal_spiencoder_stream1, hal_spiencoder_stream1, hal_spiencoder_stream1},
+            .encoder2indexinstream      = {0, 1, 2, 0, 1, 2}          
         }
     };
     
-#endif//HAL_USE_ENCODER  
+#endif//HAL_USE_SPIENCODER  
   
   
 
@@ -1230,16 +1229,16 @@
 #endif//HAL_USE_MUX      
     
 
-#ifdef HAL_USE_QUAD_ENC
+#ifdef HAL_USE_QUADENCODER
  
-    #include "hal_quad_enc_hid.h"
+    #include "hal_quadencoder_hid.h"
 
-    extern const hal_quad_enc_boardconfig_t hal_quad_enc__theboardconfig =
+    extern const hal_quadencoder_boardconfig_t hal_quadencoder__theboardconfig =
     {
-        .supportedmask              =  (0 << hal_quad_enc1) | (0 << hal_quad_enc2) | (0 << hal_quad_enc3) | (0 << hal_quad_enc4)
+        .supportedmask              =  (0 << hal_quadencoder1) | (0 << hal_quadencoder2) | (0 << hal_quadencoder3) | (0 << hal_quadencoder4)
     };
     
-#endif//HAL_USE_QUAD_ENC
+#endif//HAL_USE_QUADENCODER
 
     
 #ifdef HAL_USE_SWITCH

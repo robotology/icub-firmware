@@ -1,7 +1,7 @@
 /*
- * Copyright (C) 2013 iCub Facility - Istituto Italiano di Tecnologia
- * Author:  Valentina Gaggero, Marco Accame
- * email:   valentina.gaggero@iit.it, marco.accame@iit.it
+ * Copyright (C) 2016 iCub Facility - Istituto Italiano di Tecnologia
+ * Author:  Marco Accame
+ * email:   marco.accame@iit.it
  * website: www.robotcub.org
  * Permission is granted to copy, distribute, and/or modify this program
  * under the terms of the GNU General Public License, version 2 or any
@@ -18,26 +18,25 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef _HAL_ENCODER_HID_H_
-#define _HAL_ENCODER_HID_H_
+#ifndef _HAL_QUADENCODER_HID_H_
+#define _HAL_QUADENCODER_HID_H_
 
 
-/* @file       hal_encoder_hid.h
-    @brief      This header file implements hidden interface to a encoder
-    @author     marco.accame@iit.it, valentina.gaggero@iit.it
-    @date       02/07/2013
+/* @file       hal_quan_enc_hid.h
+    @brief      This header file implements hidden interface to a quadrature encoder
+    @author     marco.accame@iit.it
+    @date       25 jan 2016
  **/
 
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "hal_common.h"
-#include "hal_mux.h"
 
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
-#include "hal_encoder.h"
+#include "hal_quadencoder.h"
 
 
 
@@ -47,26 +46,16 @@
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
-typedef struct
-{
-    hal_spi_t               spiid;          /**< which spi port is used for each encoder */
-    hal_mux_t               muxid;          /**< which mux id is used for each encoder */
-    hal_mux_sel_t           muxsel;         /**< which mux selection is used of the mux port */    
-} hal_encoder_spimap_t;
-
 
 typedef struct
 {
-    uint32_t                    supportedmask;
-    uint32_t                    spimaxspeed;                    // in hz
-    hal_encoder_spimap_t        spimap[hal_encoders_number];
-    hal_encoder_stream_map_t    streammap;
-} hal_encoder_boardconfig_t;
+    uint32_t        supportedmask;
+} hal_quadencoder_boardconfig_t;
 
 
 // - declaration of extern hidden variables ---------------------------------------------------------------------------
 
-extern const hal_encoder_boardconfig_t hal_encoder__theboardconfig;
+extern const hal_quadencoder_boardconfig_t hal_quadencoder__theboardconfig;
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 

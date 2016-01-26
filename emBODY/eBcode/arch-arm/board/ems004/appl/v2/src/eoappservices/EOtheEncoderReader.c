@@ -308,7 +308,7 @@ extern eObool_t eo_encoderreader_IsReadingAvailable(EOtheEncoderReader *p)
 
 
 
-extern eOresult_t eo_encoderreader_Read(EOtheEncoderReader *p, uint8_t position, uint32_t *primary, uint32_t *secondary, hal_encoder_errors_flags *errors)
+extern eOresult_t eo_encoderreader_Read(EOtheEncoderReader *p, uint8_t position, uint32_t *primary, uint32_t *secondary, hal_spiencoder_errors_flags *errors)
 {
     if(NULL == p)
     {
@@ -473,8 +473,8 @@ static void s_eo_encoderreader_init_ereader(const eOmn_serv_arrayof_4jomodescrip
     memset(&config, 0, sizeof(config));
     
     config.numofjomos = numofjomos;
-    config.SPI_callbackOnLastRead = callback;
-    config.SPI_callback_arg = arg;
+//    config.SPI_callbackOnLastRead = callback;
+//    config.SPI_callback_arg = arg;
     uint8_t numberofencoders = 0;
     for(i=0; i<eOappEncReader_jomos_maxnumberof; i++)
     {
@@ -503,7 +503,7 @@ static void s_eo_encoderreader_init_ereader(const eOmn_serv_arrayof_4jomodescrip
 //                {
 //                    numberofencoders++;
 //                    config.SPI_streams[streamnumber].numberof++;
-//                    config.SPI_streams[streamnumber].type = hal_encoder_t1;
+//                    config.SPI_streams[streamnumber].type = hal_spiencoder_t1;
 //                }
 //            }
 
@@ -514,7 +514,7 @@ static void s_eo_encoderreader_init_ereader(const eOmn_serv_arrayof_4jomodescrip
 //                {
 //                    numberofencoders++;
 //                    config.SPI_streams[streamnumber].numberof++;
-//                    config.SPI_streams[streamnumber].type = hal_encoder_t1;
+//                    config.SPI_streams[streamnumber].type = hal_spiencoder_t1;
 //                }
 //            } 
         }        

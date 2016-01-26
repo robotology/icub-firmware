@@ -53,7 +53,7 @@
 #include "hal_can.h"
 #include "hal_cantransceiver.h"
 #include "hal_eeprom.h"
-#include "hal_encoder.h"
+#include "hal_spiencoder.h"
 #include "hal_eth.h"
 #include "hal_ethtransceiver.h"
 #include "hal_flash.h"
@@ -71,12 +71,12 @@
 #include "hal_watchdog.h"
 
 //only for MC4 plus
-#if defined(HAL_BOARD_MC4PLUS)
-#include "hal_quad_enc.h"
+//#if defined(HAL_BOARD_MC4PLUS)
+#include "hal_quadencoder.h"
 #include "hal_as5048.h"
 #include "hal_adc.h"
-#include "hal_dc_motorctl.h"
-#endif
+#include "hal_motor.h"
+//#endif
 
 
 
