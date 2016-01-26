@@ -69,13 +69,12 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
-
-//static void s_overriden_runner_CheckAndUpdateExtFaults(void);
+// empty-section
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
-// emoty-section
+// empty-section
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -111,49 +110,6 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOM
 }
 
 
-//extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOMtheEMSrunner *p)
-//{
-//    // we should also handle a skin case in here (see comments at the end of this function), but at the moment we make it work with the mais
-//    
-//    if (eo_canserv_GetHandle() != NULL)
-//    {
-//        uint8_t numofRXcanframe = 0;
-//        numofRXcanframe = eo_canserv_NumberOfFramesInRXqueue(eo_canserv_GetHandle(), eOcanport1);
-//        eo_canserv_Parse(eo_canserv_GetHandle(), eOcanport1, numofRXcanframe, NULL);
-//    }
-//    /*
-//    for(port=eOcanport1; port<eOcanports_number; port++)
-//    {
-//        // marco.accame: the following strategy is ok if the bus containing skin does not contain any other board type
-//        // the bus has only skin? then i read at most a number of canframes equal to what the skin-data buffer can host
-//        // else i read all the content of the rx can buffer.
-//        
-//        // step 1: decide the max number of can frames to read
-//        
-//        EOarray *arrayofcandata = s_getSkinDataArray((eOcanport_t)port);
-//        if(NULL != arrayofcandata)
-//        {   // ok, in this can bus we have a skin 
-
-//            // i read from bus at most the number of can frame that the array can host. 
-//            // that does not depend on the fact that in this cycle we transmit the regulars.
-//            // the array is emptied only after the regulars are transmitted, so that no can frame is lost.
-//            // this operation is done in function eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission()
-//            numofRXcanframe = eo_array_Available(arrayofcandata);
-//        }
-//        else
-//        {   // in this can bus we dont have skin, thus ... i read everything in the rx can buffer
-//            numofRXcanframe = eo_canserv_NumberOfFramesInRXqueue(eo_canserv_GetHandle(), (eOcanport_t)port);
-//        }
-
-//        // step 2: read the can frames. this function also parses them and triggers associated action ...
-//        
-//        eo_canserv_Parse(eo_canserv_GetHandle(), (eOcanport_t)port, numofRXcanframe, NULL);
-//    }
-//    */
-//    
-//    //check and update faults mask for the motor
-//    s_overriden_runner_CheckAndUpdateExtFaults();
-//}
 
 
 
@@ -167,21 +123,6 @@ extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
     
     // eo_ethmonitor_Tick(eo_ethmonitor_GetHandle()); // if we do it in here, then in eb2/eb4 it warns about execution time overflow
 }
-
-
-//extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
-//{  
-//    eo_mcserv_Actuate(eo_mcserv_GetHandle());    
-//}
-
-
-//extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission(EOMtheEMSrunner *p)
-//{
-//    if (eo_canserv_GetHandle() != NULL)
-//    {
-//        eo_canserv_TXstart(eo_canserv_GetHandle(), eOcanport1, NULL);
-//    }
-//}
 
 
 extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission(EOMtheEMSrunner *p)
@@ -218,34 +159,6 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(
 }
 
 
-//extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(EOMtheEMSrunner *p)
-//{
-//    // we should also handle a skin case in here (see comments at the end of this function), but at the moment we make it work with the mais
-//    
-//    if (eo_canserv_GetHandle() != NULL)
-//    {
-//        // wait for the can tx to finish. 
-//        // diagnostics about tx failure within the specified timeout is managed internally 
-//        const uint32_t timeout = 3*osal_reltime1ms;
-//        eo_canserv_TXwaituntildone(eo_canserv_GetHandle(), eOcanport1, timeout);
-//    }
-//    
-//    /*
-//    uint8_t port = 0;
-//    EOarray *arrayofcandata = NULL;
-//    for(port=eOcanport1; port<eOcanports_number; port++)
-//    {
-//        if(NULL != (arrayofcandata = s_getSkinDataArray((eOcanport_t)port)))
-//        {   // ok, in this can bus we have a skin   
-//            if(eobool_true == eom_emsrunner_CycleHasJustTransmittedRegulars(eom_emsrunner_GetHandle()))
-//            {   // ok, we can reset the array of can data
-//                eo_array_Reset(arrayofcandata);
-//            }            
-//        }
-//    }
-//    */
-//}
-
 
 extern void eom_emsrunner_hid_userdef_onfailedtransmission(EOMtheEMSrunner *p)
 {
@@ -271,53 +184,11 @@ extern void eom_emsrunner_hid_userdef_onemstransceivererror(EOMtheEMStransceiver
 }
 
 
-//extern void eom_emsrunner_hid_userdef_onfailedtransmission(EOMtheEMSrunner *p)
-//{
-//    eOerrmanDescriptor_t errdes = {0};
-//    errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_runner_udptxfailure);
-//    errdes.par16            = 0;
-//    errdes.par64            = 0;
-//    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-//    errdes.sourceaddress    = 0;    
-//    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, "EOMtheEMSrunner", &errdes);         
-//}
-
-//extern void eom_emsrunner_hid_userdef_onemstransceivererror(EOMtheEMStransceiver *p)
-//{
-//    eOerrmanDescriptor_t errdes = {0};
-//    errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_runner_transceivererror);
-//    errdes.par16            = 0;
-//    errdes.par64            = 0;
-//    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-//    errdes.sourceaddress    = 0;    
-//    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, "EOMtheEMSrunner", &errdes); 
-//}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
-
-//static void s_overriden_runner_CheckAndUpdateExtFaults(void)
-//{
-//    #warning marco.accame: implement in motion-controller object the external faults
-////    if (eo_mcserv_AreMotorsExtFaulted(eo_mcserv_GetHandle()))
-////    {
-////        uint8_t numofjomos = eo_entities_NumOfJoints(eo_entities_GetHandle());
-////        uint32_t state = 0;
-////        //set the fault mask for ALL the motors
-////        for (uint8_t i = 0; i < numofjomos; i++)
-////        {
-////            state = eo_mcserv_GetMotorFaultMask(eo_mcserv_GetHandle(),i);
-////            if((state & MOTOR_EXTERNAL_FAULT) == 0) //external fault bit not set
-////            {
-////                //simulate the CANframe used by 2FOC to signal the status
-////                uint64_t fault_mask = (((uint64_t)(state | MOTOR_EXTERNAL_FAULT)) << 32) & 0xFFFFFFFF00000000; //adding the error to the current state
-////                eo_motor_set_motor_status(eo_motors_GetHandle(),i, (uint8_t*)&fault_mask);
-////            }
-////        }
-////    }
-//    return;
-//}
+// empty-section
 
 
 // --------------------------------------------------------------------------------------------------------------------
