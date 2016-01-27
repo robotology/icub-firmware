@@ -1371,11 +1371,6 @@ extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescripto
     eOmc_motor_config_t *cfg_ptr = (eOmc_motor_config_t*)rd->data;
     eOmc_motorId_t mxx = eoprot_ID2index(rd->id32);
     
-    eo_emsController_SetActuationLimit(mxx, (int16_t)cfg_ptr->pwmLimit);
-    // If pwmLimit is bigger than hardwhere limit, emsController uses hardwarelimit. 
-    // Therefore I need to update netvar with the limit used in emsController.
-    cfg_ptr->pwmLimit = eo_emsController_GetActuationLimit(mxx);
-    
     eOcanprot_command_t command = {0};
     command.class = eocanprot_msgclass_pollingMotorControl;
     
@@ -1384,6 +1379,11 @@ extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescripto
     if(eo_motcon_mode_foc == mcmode)
     {
         eo_emsController_SetMotorConfig(mxx, *cfg_ptr);
+        eo_emsController_SetActuationLimit(mxx, (int16_t)cfg_ptr->pwmLimit);
+        // If pwmLimit is bigger than hardwhere limit, emsController uses hardwarelimit. 
+        // Therefore I need to update netvar with the limit used in emsController.
+        cfg_ptr->pwmLimit = eo_emsController_GetActuationLimit(mxx);
+        //TODO: send current limits about I2T to 2foc (nominal and peak current)
         return;
         
         // send current pid
@@ -1482,16 +1482,25 @@ extern void eoprot_fun_UPDT_mc_motor_config_pidcurrent(const EOnv* nv, const eOr
 
 extern void eoprot_fun_UPDT_mc_motor_config_currentlimits(const EOnv* nv, const eOropdescriptor_t* rd)
 {    
-    eOmeas_current_t *curr = (eOmeas_current_t*)rd->data;
     
+    eOmc_current_limits_params_t *currentLimits = (eOmc_current_limits_params_t*)rd->data;
+    eOmeas_current_t curr = currentLimits->overloadCurrent;
+    eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
+    
+    //both ems-2foc and ems-mc4 should send motorOveroladcurrent to can-boards
     eOcanprot_command_t command = {0};
     command.class = eocanprot_msgclass_pollingMotorControl;
 
     // set current limit  
     command.type  = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT;
-    command.value = curr;
+    command.value = &curr;
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);     
-  
+    
+    if(eo_motcon_mode_foc == mcmode)
+    {
+        //todo for Ale: please insert here function for update maxcurrent of moror value insied your motorcontroller object
+        return;
+    }
 }
 
 extern void eoprot_fun_UPDT_mc_motor_config_pwmlimit(const EOnv* nv, const eOropdescriptor_t* rd)

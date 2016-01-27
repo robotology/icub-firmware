@@ -2135,6 +2135,7 @@ static eOresult_t s_eo_mcserv_do_mc4plus(EOtheMotionController *p)
             if(NULL != (mstatus = eo_entities_GetMotorStatus(eo_entities_GetHandle(), i)))
             {
                 eo_emsController_GetMotorStatus(i, mstatus);
+                eo_emsController_GetPWMOutput_int16(i, &(mstatus->basic.mot_pwm));
             }
         }
         
