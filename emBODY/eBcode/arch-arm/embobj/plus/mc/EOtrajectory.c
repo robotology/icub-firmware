@@ -156,11 +156,13 @@ extern void eo_trajectory_SetPosReference(EOtrajectory *o, int32_t x0, int32_t x
 {
     if (!o) return;
     
+    if (!velAvg) return;
+    
     if (o->bVelocityMove || (o->vTimer < o->vT)) eo_trajectory_VelocityStop(o);
 
     LIMIT2(o->pos_min, xStar, o->pos_max)
 
-    if (!velAvg) velAvg = o->vel_max;
+    //if (!velAvg) velAvg = o->vel_max;
     
     LIMIT(velAvg, o->vel_max)
     
@@ -207,11 +209,18 @@ extern void eo_trajectory_SetVelReference(EOtrajectory *o, int32_t vStar, int32_
 {
     if (!o) return;
     
+    if (!accAvg)
+    {
+        eo_trajectory_VelocityStop(o);
+        
+        return;
+    }
+    
     o->bVelocityMove = eobool_true;
 
     LIMIT(vStar, o->vel_max)
     
-    if (!accAvg) accAvg = o->acc_max;
+    //if (!accAvg) accAvg = o->acc_max;
     
     LIMIT(accAvg, o->acc_max)
 

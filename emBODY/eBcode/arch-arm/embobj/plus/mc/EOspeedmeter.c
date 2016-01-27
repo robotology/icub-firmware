@@ -105,14 +105,17 @@ extern EOabsCalibratedEncoder* eo_absCalibratedEncoder_New(uint8_t ID)
 
 extern void eo_absCalibratedEncoder_SetSign(EOabsCalibratedEncoder* o, int32_t sign)
 {
+    /*
     if (sign > 0) 
         o->sign =  1; 
     else if (sign < 0)
         o->sign = -1; 
     else 
         o->sign =  0;
-		
-    //o->sign = (sign > 0) ? 1 : -1;
+    */
+    
+    o->sign = (sign > 0) ? 1 : -1;
+    
     RST_BITS(o->state_mask, SM_ENC_SIGN_NOT_SET);
 }
 
