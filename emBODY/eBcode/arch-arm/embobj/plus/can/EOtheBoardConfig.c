@@ -929,7 +929,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_0B7 =
     .filler     = {0},
     .data.mc.mc4plus_based = 
     {
-        .boardtype4mccontroller = emscontroller_board_HEAD_neckyaw_eyes,
+        .boardtype4mccontroller = emscontroller_board_FACE_eyelids_jaw,
         .filler                 = {0},
         .arrayofjomodescriptors =
         {
@@ -1351,10 +1351,10 @@ static const eOmn_serv_configuration_t * const s_serv_config_mc_V3[maxboards_V3]
     NULL,
     NULL,
     NULL,
-    &s_serv_config_mc_v3_0B0,   // board ip.12, 0b0, neck pitch + neck roll
-    &s_serv_config_mc_v3_0B1,   // board ip.13, 0b1, neck yaw + 3 eyes
-    &s_serv_config_mc_v3_0B7,   // board ip.14, 0b7, eyelids + jaw
-    &s_serv_config_mc_v3_0B9,   // board ip.15, 0b9, 4 lips
+    &s_serv_config_mc_v3_0B0,   // board ip.12, 0b0, head neck pitch + neck roll
+    &s_serv_config_mc_v3_0B1,   // board ip.13, 0b1, head neck yaw + 3 eyes
+    &s_serv_config_mc_v3_0B7,   // board ip.14, 0b7, face eyelids + jaw
+    &s_serv_config_mc_v3_0B9,   // board ip.15, 0b9, face 4 lips
     NULL,
     NULL,
     NULL,
