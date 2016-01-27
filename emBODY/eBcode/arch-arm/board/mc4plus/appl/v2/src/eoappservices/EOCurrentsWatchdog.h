@@ -16,8 +16,6 @@
  * Public License for more details
 */
 
-#error DONT USE IT
-
 
 // - include guard ----------------------------------------------------------------------------------------------------
 #ifndef _EOCURRENTSWATCHDOG_H_
@@ -71,6 +69,8 @@ extern eOresult_t eo_currents_watchdog_SetSpikeThreshold(EOCurrentsWatchdog* p, 
 extern eOresult_t eo_currents_watchdog_SetI2TThreshold(EOCurrentsWatchdog* p, uint8_t joint, uint32_t threshold);
 
 void eo_currents_watchdog_Tick(EOCurrentsWatchdog* p);
+
+extern eOresult_t eo_currents_watchdog_UpdateCurrentLimits(EOCurrentsWatchdog* p, uint8_t motor);
 
 
 /** @}            

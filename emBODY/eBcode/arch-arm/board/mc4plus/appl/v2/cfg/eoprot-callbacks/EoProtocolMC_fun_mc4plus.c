@@ -48,6 +48,8 @@
 
 #include "EOemsController.h"
 
+#include "EOCurrentsWatchdog.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -280,7 +282,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_velocitysetpointtimeout(const EOnv* 
 }
 
 
-extern void eoprot_fun_UPDT_mc_joint_status_modes_ismotiondone(const EOnv* nv, const eOropdescriptor_t* rd)
+extern void eoprot_fun_UPDT_mc_joint_status_core_modes_ismotiondone(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
@@ -541,12 +543,19 @@ extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescripto
     {    
         eOmc_motor_config_t *cfg_ptr = (eOmc_motor_config_t*)rd->data;
         eOmc_motorId_t mxx = eoprot_ID2index(rd->id32);
-
+        
+        eo_emsController_SetMotorConfig(mxx, *cfg_ptr);
+        
         //set rotor encoder sign
         eo_emsController_SetRotorEncoderSign((uint8_t)mxx, (int32_t)cfg_ptr->rotorEncoderResolution);
         
-        cfg_ptr = cfg_ptr;
-        #warning -> TBD: in here the 2foc-based control does config the can board with ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID, ICUBCANPROTO_POL_MC_CMD__SET_MAX_VELOCITY and ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT. what about mc4plus?
+        eo_currents_watchdog_UpdateCurrentLimits( eo_currents_watchdog_GetHandle(), mxx);
+    
+        eo_emsController_SetActuationLimit(mxx, (int16_t)cfg_ptr->pwmLimit);
+        // If pwmLimit is bigger than hardwhere limit, emsController uses hardwarelimit. 
+        // Therefore I need to update netvar with the limit used in emsController.
+        cfg_ptr->pwmLimit = eo_emsController_GetActuationLimit(mxx);
+
     }
 }
 
@@ -576,22 +585,24 @@ extern void eoprot_fun_UPDT_mc_motor_config_pidcurrent(const EOnv* nv, const eOr
 //    #warning TBD: marco.accame -> in eoprot_fun_UPDT_mc_motor_config_maxvelocityofmotor() i have removed messages sent to CAN. how do we do that for mc4plus ???
 //}
 
-#warning marco.accame: implement eoprot_fun_UPDT_mc_motor_config_currentlimits() ??
-//extern void eoprot_fun_UPDT_mc_motor_config_maxcurrentofmotor(const EOnv* nv, const eOropdescriptor_t* rd)
-//{
-//    // now we see if it is a mc4can or a 2foc or a mc4plus
-//    eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
-//    
-//    if((eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode))
-//    {
-//        eOmeas_current_t *curr_ptr = (eOmeas_current_t*)rd->data;
-//        eOmc_motorId_t mxx = eoprot_ID2index(rd->id32);
-//        
+extern void eoprot_fun_UPDT_mc_motor_config_currentlimits(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    eOmc_motorId_t mxx = eoprot_ID2index(rd->id32);
+    
+    eo_currents_watchdog_UpdateCurrentLimits( eo_currents_watchdog_GetHandle(), mxx);
+}
 
-//        curr_ptr = curr_ptr;
-//        #warning TBD: marco.accame -> in eoprot_fun_UPDT_mc_motor_config_maxcurrentofmotor() i have removed messages sent to CAN. how do we do that for mc4plus ???   
-//    }
-//}
+
+extern void eoprot_fun_UPDT_mc_motor_config_pwmlimit(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    eOmeas_pwm_t *pwm_limit = (eOmeas_pwm_t *)rd->data;
+    eOmc_motorId_t mxx = eoprot_ID2index(rd->id32);
+
+    eo_emsController_SetActuationLimit(mxx, (int16_t)*pwm_limit);
+    // If pwmLimit is bigger than hardwhere limit, emsController uses hardwarelimit. 
+    // Therefore I need to update netvar with the limit used in emsController.
+    *pwm_limit = eo_emsController_GetActuationLimit(mxx);
+}
 
 
 // --------------------------------------------------------------------------------------------------------------------

@@ -17,17 +17,14 @@
 */
 
 
-#error DONT USE IT
-
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "EoMotionControl.h"
-#include "EOmcService.h"
 #include "EOtheEntities.h"
 #include "EOtheMemoryPool.h"
-
+#include "EOtheMotionController.h"
 //to signal errors
 #include "EOemsController.h"
 
@@ -48,7 +45,7 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define FILTER_WINDOW (float) 1000.0 //make it configurable? --> could become a parameter from XML
+#define FILTER_WINDOW (float) 500.0 //make it configurable? --> could become a parameter from XML
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -68,6 +65,9 @@
 static void s_eo_currents_watchdog_CheckSpike(uint8_t joint, int16_t value);
 static void s_eo_currents_watchdog_CheckI2T(uint8_t joint, int16_t value);
 static void s_eo_currents_watchdog_UpdateMotorCurrents(uint8_t joint, int16_t value);
+EO_static_inline uint32_t s_eo_currents_watchdog_averageCalc_addValue(uint8_t motor, int16_t value);
+EO_static_inline void s_eo_currents_watchdog_averageCalc_reset(uint8_t motor);
+EO_static_inline eObool_t s_eo_currents_watchdog_averageCalc_collectDataIsCompleted(uint8_t motor);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -76,10 +76,14 @@ static void s_eo_currents_watchdog_UpdateMotorCurrents(uint8_t joint, int16_t va
 
 static EOCurrentsWatchdog s_eo_currents_watchdog = 
 {
-    .cfg            = {0},
-    .numberofmotors = 0,
-    .filter_reg     = NULL,
-	.initted	    = eobool_false,
+    .themotors       = NULL,
+    .numberofmotors  = 0,
+    //.filter_reg     = NULL,
+    .nominalCurrent2 = NULL,
+    .I2T_threshold   = NULL,
+    .avgCurrent      = NULL,
+    .accomulatorEp   = NULL,
+    .initted         = eobool_false
 };
 
 //static const char s_eobj_ownname[] = "EOCurrentsWatchdog";
@@ -91,22 +95,38 @@ static EOCurrentsWatchdog s_eo_currents_watchdog =
 
 extern EOCurrentsWatchdog* eo_currents_watchdog_Initialise(void)
 {
+    uint8_t m;
     //reserve memory for the number of thresholds needed
     s_eo_currents_watchdog.numberofmotors = eo_entities_NumOfJoints(eo_entities_GetHandle());
     
     if (s_eo_currents_watchdog.numberofmotors == 0)
         return NULL;
+
+    s_eo_currents_watchdog.themotors = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_auto, sizeof(eOmc_motor_t*), s_eo_currents_watchdog.numberofmotors);
+    // retrieve pointers to motors   
+    for(m=0; m<s_eo_currents_watchdog.numberofmotors; m++)
+    {
+        s_eo_currents_watchdog.themotors[m] = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, m);
+    }
     
-    s_eo_currents_watchdog.cfg.i2t_thresh   = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_auto, sizeof(uint32_t), s_eo_currents_watchdog.numberofmotors);
-    memset(s_eo_currents_watchdog.cfg.i2t_thresh, EOK_int08dummy, s_eo_currents_watchdog.numberofmotors*sizeof(uint32_t)); //highest value so that the threshold surely lowers it
     
-    s_eo_currents_watchdog.cfg.spike_thresh = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_auto, sizeof(uint16_t), s_eo_currents_watchdog.numberofmotors);
-    memset(s_eo_currents_watchdog.cfg.spike_thresh, EOK_int08dummy, s_eo_currents_watchdog.numberofmotors*sizeof(uint16_t)); //highest value so that the threshold surely lowers it
+    s_eo_currents_watchdog.nominalCurrent2 = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_auto, sizeof(float), s_eo_currents_watchdog.numberofmotors);
+    memset(s_eo_currents_watchdog.nominalCurrent2, 0, s_eo_currents_watchdog.numberofmotors*sizeof(float));
     
-    s_eo_currents_watchdog.filter_reg = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_auto, sizeof(float), s_eo_currents_watchdog.numberofmotors);
-    memset(s_eo_currents_watchdog.filter_reg, 0, s_eo_currents_watchdog.numberofmotors*sizeof(float));
+    s_eo_currents_watchdog.I2T_threshold = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_auto, sizeof(float), s_eo_currents_watchdog.numberofmotors);
+    memset(s_eo_currents_watchdog.I2T_threshold, 0, s_eo_currents_watchdog.numberofmotors*sizeof(float));
     
+    //s_eo_currents_watchdog.filter_reg = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_auto, sizeof(float), s_eo_currents_watchdog.numberofmotors);
+    //memset(s_eo_currents_watchdog.filter_reg, 0, s_eo_currents_watchdog.numberofmotors*sizeof(float));
+    
+    s_eo_currents_watchdog.avgCurrent = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_auto, sizeof(eoCurrentWD_averageData_t), s_eo_currents_watchdog.numberofmotors);
+    memset(s_eo_currents_watchdog.avgCurrent, 0, s_eo_currents_watchdog.numberofmotors*sizeof(eoCurrentWD_averageData_t));
+
+    s_eo_currents_watchdog.accomulatorEp = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_auto, sizeof(float), s_eo_currents_watchdog.numberofmotors);
+    memset(s_eo_currents_watchdog.accomulatorEp, 0, s_eo_currents_watchdog.numberofmotors*sizeof(float));
+
     s_eo_currents_watchdog.initted = eobool_true;
+    
     return(&s_eo_currents_watchdog);
 }
 
@@ -121,59 +141,84 @@ extern EOCurrentsWatchdog* eo_currents_watchdog_GetHandle(void)
 }
 
 
+//USELESS
 extern eOresult_t eo_currents_watchdog_Configure(EOCurrentsWatchdog* p, eOcurrents_watchdog_cfg_t* cfg)
 {
-	if (p == NULL)
-    {
-        return(eores_NOK_nullpointer);
-    }
-    
-    if((eobool_false == s_eo_currents_watchdog.initted) || (cfg == NULL))
-    {
-        return(eores_NOK_generic);
-    }
-        
-    //save in reserved memory
-    memcpy(&(s_eo_currents_watchdog.cfg), cfg, sizeof(eOcurrents_watchdog_cfg_t));
+//	if (p == NULL)
+//    {
+//        return(eores_NOK_nullpointer);
+//    }
+//    
+//    if((eobool_false == s_eo_currents_watchdog.initted) || (cfg == NULL))
+//    {
+//        return(eores_NOK_generic);
+//    }
+//        
+//    //save in reserved memory
+//    memcpy(&(s_eo_currents_watchdog.cfg), cfg, sizeof(eOcurrents_watchdog_cfg_t));
         
     return(eores_OK);
 }
 
+//USELESS
 extern eOresult_t eo_currents_watchdog_SetSpikeThreshold(EOCurrentsWatchdog* p, uint8_t joint, uint16_t threshold)
 {
-    if (p == NULL)
-    {
-        return(eores_NOK_nullpointer);
-    }
-    
-    if(joint >= s_eo_currents_watchdog.numberofmotors)
-    {
-        return eores_NOK_generic;
-    }
-    
-    //set the new threshold
-    s_eo_currents_watchdog.cfg.spike_thresh[joint] = threshold;
+//    if (p == NULL)
+//    {
+//        return(eores_NOK_nullpointer);
+//    }
+//    
+//    if(joint >= s_eo_currents_watchdog.numberofmotors)
+//    {
+//        return eores_NOK_generic;
+//    }
+//    
+//    //set the new threshold
+//    s_eo_currents_watchdog.cfg.spike_thresh[joint] = threshold;
     
     return(eores_OK);
 }
 
+//USELESS
 extern eOresult_t eo_currents_watchdog_SetI2TThreshold(EOCurrentsWatchdog* p, uint8_t joint, uint32_t threshold)
+{
+//    if (p == NULL)
+//    {
+//        return(eores_NOK_nullpointer);
+//    }
+//    
+//    if(joint >= s_eo_currents_watchdog.numberofmotors)
+//    {
+//        return eores_NOK_generic;
+//    }
+//	    
+//    //set the new threshold
+//    s_eo_currents_watchdog.cfg.i2t_thresh[joint] = threshold;
+    
+    return(eores_OK);
+}
+
+extern eOresult_t eo_currents_watchdog_UpdateCurrentLimits(EOCurrentsWatchdog* p, uint8_t motor)
 {
     if (p == NULL)
     {
         return(eores_NOK_nullpointer);
     }
     
-    if(joint >= s_eo_currents_watchdog.numberofmotors)
+    if(motor >= s_eo_currents_watchdog.numberofmotors)
     {
         return eores_NOK_generic;
     }
-	    
-    //set the new threshold
-    s_eo_currents_watchdog.cfg.i2t_thresh[joint] = threshold;
+    
+    //calculate nominalCurrent^2 and I2T_thershold
+    eOmeas_current_t nc = s_eo_currents_watchdog.themotors[motor]->config.currentLimits.nominalCurrent;
+    eOmeas_current_t pc = s_eo_currents_watchdog.themotors[motor]->config.currentLimits.peakCurrent;
+    s_eo_currents_watchdog.nominalCurrent2[motor] = (float)(nc*nc);
+    s_eo_currents_watchdog.I2T_threshold[motor] = (float)((pc*pc) - s_eo_currents_watchdog.nominalCurrent2[motor]); 
     
     return(eores_OK);
 }
+
 
 extern void eo_currents_watchdog_Tick(EOCurrentsWatchdog* p)
 {
@@ -187,7 +232,7 @@ extern void eo_currents_watchdog_Tick(EOCurrentsWatchdog* p)
     for (uint8_t i = 0; i < s_eo_currents_watchdog.numberofmotors; i++)
     {
         //get current value
-        current_value = eo_mcserv_GetMotorCurrent (eo_mcserv_GetHandle(), i);
+        current_value = eo_motioncontrol_extra_GetMotorCurrent(eo_motioncontrol_GetHandle(), i);
         
         //Update currents broadcasted
         s_eo_currents_watchdog_UpdateMotorCurrents(i, current_value);
@@ -208,11 +253,13 @@ extern void eo_currents_watchdog_Tick(EOCurrentsWatchdog* p)
 // --------------------------------------------------------------------------------------------------------------------
 
 
-static void s_eo_currents_watchdog_UpdateMotorCurrents(uint8_t joint, int16_t value)
+static void s_eo_currents_watchdog_UpdateMotorCurrents(uint8_t motor, int16_t value)
 {
-    eo_emsController_AcquireMotorCurrent(joint, value);  
+    eo_emsController_AcquireMotorCurrent(motor, value);  
 }
-static void s_eo_currents_watchdog_CheckSpike(uint8_t joint, int16_t value)
+
+
+static void s_eo_currents_watchdog_CheckSpike(uint8_t motor, int16_t value)
 {
 	// single sample cannot be above a certain treshold
     
@@ -220,25 +267,25 @@ static void s_eo_currents_watchdog_CheckSpike(uint8_t joint, int16_t value)
     if (value < 0)
         value = -value;
     
-    if (value > s_eo_currents_watchdog.cfg.spike_thresh[joint])
+    if (value > s_eo_currents_watchdog.themotors[motor]->config.currentLimits.overloadCurrent)
     {
         //signal the OVERCURRENT error EOemsController
         
-        uint32_t current_state = eo_mcserv_GetMotorFaultMask(eo_mcserv_GetHandle(),joint);
+        uint32_t current_state = eo_motioncontrol_extra_GetMotorFaultMask(eo_motioncontrol_GetHandle(),motor);
         
         if((current_state & MOTOR_OVERCURRENT_FAULT) == 0) //overcurrent fault bit not set
         {
             //simulate the CANframe used by 2FOC to signal the status
             uint64_t fault_mask = (((uint64_t)(current_state | MOTOR_OVERCURRENT_FAULT)) << 32) & 0xFFFFFFFF00000000; //adding the error to the current state
             fault_mask |= icubCanProto_controlmode_hwFault; //setting the hard fault of the motor
-            eo_motor_set_motor_status( eo_motors_GetHandle(), joint, (uint8_t*)&fault_mask);
+            eo_motor_set_motor_status( eo_motors_GetHandle(), motor, (uint8_t*)&fault_mask);
         }
     }
     
     return;
 }
 
-static void s_eo_currents_watchdog_CheckI2T(uint8_t joint, int16_t value)
+static void s_eo_currents_watchdog_CheckI2T(uint8_t motor, int16_t value)
 {
 	// apply a simple LOW-PASS filter and if the value is above a threshold signal the error
     
@@ -261,25 +308,109 @@ static void s_eo_currents_watchdog_CheckI2T(uint8_t joint, int16_t value)
         }
     }
     */
-    int32_t i2 = (int32_t) (value * value);
+    //int32_t i2 = (int32_t) (value * value);
     
-    s_eo_currents_watchdog.filter_reg[joint] += (float) (i2 - s_eo_currents_watchdog.filter_reg[joint]) / FILTER_WINDOW;
+    //s_eo_currents_watchdog.filter_reg[motor] += (float) (i2 - s_eo_currents_watchdog.filter_reg[joint]) / FILTER_WINDOW;
     
-    if (s_eo_currents_watchdog.filter_reg[joint] >= s_eo_currents_watchdog.cfg.i2t_thresh[joint])
+    
+    
+    //change sign to check absolute value
+    if (value < 0)
+        value = -value;
+    
+    uint32_t averageCurrent = s_eo_currents_watchdog_averageCalc_addValue( motor, value);
+   
+    if(!s_eo_currents_watchdog_averageCalc_collectDataIsCompleted(motor))
+    {
+        return;
+    
+    }
+    // 1) calculate Ep
+    s_eo_currents_watchdog.accomulatorEp[motor] += (averageCurrent*averageCurrent) - s_eo_currents_watchdog.nominalCurrent2[motor];
+
+    // 2) check if current Ep is bigger than thresholdeo_motioncontrol_extra_GetMotorFaultMask(eo_motioncontrol_GetHandle(),motor)
+    if( s_eo_currents_watchdog.accomulatorEp[motor] > s_eo_currents_watchdog.I2T_threshold[motor])
     {
         //signal the I2T error to EOemsController
-        
-       uint32_t current_state = eo_mcserv_GetMotorFaultMask(eo_mcserv_GetHandle(),joint);
-        
-       if((current_state & MOTOR_I2T_LIMIT_FAULT) == 0) //I2T fault bit not set
-       {
+    
+        uint32_t current_state = eo_motioncontrol_extra_GetMotorFaultMask(eo_motioncontrol_GetHandle(),motor);
+
+        if((current_state & MOTOR_I2T_LIMIT_FAULT) == 0) //I2T fault bit not set
+        {
             //simulate the CANframe used by 2FOC to signal the status
             uint64_t fault_mask = (((uint64_t)(current_state | MOTOR_I2T_LIMIT_FAULT)) << 32) & 0xFFFFFFFF00000000; //adding the error to the current state
             fault_mask |= icubCanProto_controlmode_hwFault; //setting the hard fault of the motor
-            eo_motor_set_motor_status( eo_motors_GetHandle(), joint, (uint8_t*)&fault_mask);
-       }
-    }        
+            eo_motor_set_motor_status( eo_motors_GetHandle(), motor, (uint8_t*)&fault_mask);
+        }
+    }
+    
+    // 3) reset average data
+    s_eo_currents_watchdog_averageCalc_reset(motor);
+
 }
+#define I2T_CHECK_USE_AVERAGE_CURRENT
+
+#ifdef I2T_CHECK_USE_AVERAGE_CURRENT 
+/* With this implementation I2T check is done using average current of FILETR_WINDOW samples.
+
+
+The Average is calculated with following formula:
+
+Cumulative moving average (cma)
+cma_n: is Cumulative moving average on n samples;
+x_n: is the nth sample
+x_n+1 is n+1 th sample
+
+cma_n+1 = cma_n + ( (x_n+1 -cma_n) / (n+1) )
+
+see: https://en.wikipedia.org/wiki/Moving_average
+
+*/
+EO_static_inline uint32_t s_eo_currents_watchdog_averageCalc_addValue(uint8_t motor, int16_t value)
+{
+    s_eo_currents_watchdog.avgCurrent[motor].counter++;
+    s_eo_currents_watchdog.avgCurrent[motor].commulativeAverage += (value - s_eo_currents_watchdog.avgCurrent[motor].commulativeAverage)/s_eo_currents_watchdog.avgCurrent[motor].counter ;
+
+}
+
+EO_static_inline void s_eo_currents_watchdog_averageCalc_reset(uint8_t motor)
+{
+    s_eo_currents_watchdog.avgCurrent[motor].counter = 0;
+    s_eo_currents_watchdog.avgCurrent[motor].commulativeAverage = 0;
+}
+
+EO_static_inline eObool_t s_eo_currents_watchdog_averageCalc_collectDataIsCompleted(uint8_t motor)
+{
+    return(s_eo_currents_watchdog.avgCurrent[motor].counter==FILTER_WINDOW);
+}
+
+#else
+
+/* With this implementation I2T check is done using istantaneous current read  each FILTER_WINDOW samples */
+
+EO_static_inline uint32_t s_eo_currents_watchdog_averageCalc_addValue(uint8_t motor, int16_t value)
+{
+    s_eo_currents_watchdog.avgCurrent[motor].counter++;
+    s_eo_currents_watchdog.avgCurrent[motor].commulativeAverage = value ;
+
+}
+
+EO_static_inline void s_eo_currents_watchdog_averageCalc_reset(uint8_t motor)
+{
+    s_eo_currents_watchdog.avgCurrent[motor].counter = 0;
+    s_eo_currents_watchdog.avgCurrent[motor].commulativeAverage = 0;
+}
+
+EO_static_inline eObool_t s_eo_currents_watchdog_averageCalc_collectDataIsCompleted(uint8_t motor)
+{
+    return(s_eo_currents_watchdog.avgCurrent[motor].counter==FILTER_WINDOW);
+}
+
+
+#endif //I2T_CHECK_USE_AVERAGE_CURRENT 
+
+
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

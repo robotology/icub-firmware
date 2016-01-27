@@ -29,16 +29,26 @@
 // - declaration of extern public interface ---------------------------------------------------------------------------
 
 #include "EOCurrentsWatchdog.h"
+#include "EoMotionControl.h"
 
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
+typedef struct
+{
+    float                commulativeAverage;
+    uint16_t             counter;
+} eoCurrentWD_averageData_t;
 
 struct EOCurrentsWatchdog_hid
 {
-    eOcurrents_watchdog_cfg_t   cfg;
+    eOmc_motor_t**              themotors;
     uint8_t                     numberofmotors;
-    float*                      filter_reg;
+    //float*                    filter_reg;
+    float*                      nominalCurrent2; //in this list nominalCurrent^2 for each motor are saved
+    float*                      I2T_threshold; //=(peakCurrent^2 - nominalCurrent^2);
+    eoCurrentWD_averageData_t*  avgCurrent;
+    float*                      accomulatorEp; //Ep_t = (averageCurrent_t^2-nominalCurrent^2) + Ep_t-1, where Ep_t is Ep at time t
     eObool_t                    initted;
 }; 
 
