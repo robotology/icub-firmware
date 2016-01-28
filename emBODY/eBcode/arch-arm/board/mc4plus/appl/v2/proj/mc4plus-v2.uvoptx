@@ -1372,7 +1372,7 @@
 
   <Group>
     <GroupName>eo-emsappl-cfg</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -2056,7 +2056,7 @@
 
   <Group>
     <GroupName>eo-protocol-cfg-callbacks</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -2091,8 +2091,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\ems004\appl\v2\cfg\eoprot-callbacks\EoProtocolMC_fun_ems4rd.old.c</PathWithFileName>
-      <FilenameWithoutPath>EoProtocolMC_fun_ems4rd.old.c</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\ems004\appl\v2\cfg\eoprot-callbacks\EoProtocolMC_fun_ems4rd.c</PathWithFileName>
+      <FilenameWithoutPath>EoProtocolMC_fun_ems4rd.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

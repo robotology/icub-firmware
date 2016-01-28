@@ -1154,9 +1154,9 @@
               <FilePath>..\..\..\..\ems004\appl\v2\cfg\eoprot-callbacks\EoProtocolAS_fun_ems4rd.c</FilePath>
             </File>
             <File>
-              <FileName>EoProtocolMC_fun_ems4rd.old.c</FileName>
+              <FileName>EoProtocolMC_fun_ems4rd.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\ems004\appl\v2\cfg\eoprot-callbacks\EoProtocolMC_fun_ems4rd.old.c</FilePath>
+              <FilePath>..\..\..\..\ems004\appl\v2\cfg\eoprot-callbacks\EoProtocolMC_fun_ems4rd.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolSK_fun_ems4rd.c</FileName>
@@ -2385,9 +2385,9 @@
               <FilePath>..\..\..\..\ems004\appl\v2\cfg\eoprot-callbacks\EoProtocolAS_fun_ems4rd.c</FilePath>
             </File>
             <File>
-              <FileName>EoProtocolMC_fun_ems4rd.old.c</FileName>
+              <FileName>EoProtocolMC_fun_ems4rd.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\ems004\appl\v2\cfg\eoprot-callbacks\EoProtocolMC_fun_ems4rd.old.c</FilePath>
+              <FilePath>..\..\..\..\ems004\appl\v2\cfg\eoprot-callbacks\EoProtocolMC_fun_ems4rd.c</FilePath>
             </File>
             <File>
               <FileName>EoProtocolSK_fun_ems4rd.c</FileName>
