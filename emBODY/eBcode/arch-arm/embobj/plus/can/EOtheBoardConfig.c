@@ -1615,7 +1615,7 @@ static const eOmn_serv_configuration_t * const s_serv_config_mc_V3[maxboards_V3]
 enum {maxboards_CER = 21};
 static const eOmn_serv_configuration_t * const s_serv_config_mc_CER[maxboards_CER] =
 {   // there are only eb15 and eb21 .   
-    &s_serv_config_mc_cer_testOfmc2plus,
+    NULL,
     NULL,
     NULL,
     NULL,
@@ -1634,7 +1634,7 @@ static const eOmn_serv_configuration_t * const s_serv_config_mc_CER[maxboards_CE
     NULL,
     NULL,
     NULL,
-    NULL,
+    &s_serv_config_mc_cer_testOfmc2plus,
     &s_serv_config_mc_cer_eb21    
 };
 
