@@ -52,6 +52,7 @@
 // there must be another way to propagate externally to the motor-controller library some properties .... macros must be removed
 #warning TODO: -> remove inclusion of EOemsControllerCfg.h and find a better mode to propagate the macro USE_ONLY_QE
 #include "EOemsControllerCfg.h"
+#include "EOCurrentsWatchdog.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -219,7 +220,7 @@ extern EOtheMotionController* eo_motioncontrol_Initialise(void)
 
     s_eo_themotcon.service.initted = eobool_true;
     
-    return(&s_eo_themotcon);   
+    return(&s_eo_themotcon);
 }
 
 
@@ -691,7 +692,8 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
             #warning: marco.accame: maybe it is better to move it inside eo_appEncReader_Activate()
             s_eo_motioncontrol_mc4plusbased_hal_init_quad_enc_indexes_interrupt();
             
-           
+            eo_currents_watchdog_Initialise();
+            
             s_eo_themotcon.service.active = eobool_true;        
         }
         
@@ -1997,6 +1999,8 @@ static eOresult_t s_eo_mcserv_do_mc4plus(EOtheMotionController *p)
 
     uint8_t i = 0;
     
+    eo_currents_watchdog_Tick(eo_currents_watchdog_GetHandle());
+    
     // wait for the encoders for some time 
     for(i=0; i<30; ++i)
     {
@@ -2136,6 +2140,7 @@ static eOresult_t s_eo_mcserv_do_mc4plus(EOtheMotionController *p)
             {
                 eo_emsController_GetMotorStatus(i, mstatus);
                 eo_emsController_GetPWMOutput_int16(i, &(mstatus->basic.mot_pwm));
+//                mstatus->basic.mot_current = eo_motioncontrol_extra_GetMotorCurrent(eo_motioncontrol_GetHandle(), i);
             }
         }
         

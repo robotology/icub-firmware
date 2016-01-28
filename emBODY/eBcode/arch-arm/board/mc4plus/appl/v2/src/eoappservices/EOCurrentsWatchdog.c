@@ -27,6 +27,8 @@
 #include "EOtheMotionController.h"
 //to signal errors
 #include "EOemsController.h"
+#include "EOtheErrorManager.h"
+#include "EoError.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -97,7 +99,7 @@ extern EOCurrentsWatchdog* eo_currents_watchdog_Initialise(void)
 {
     uint8_t m;
     //reserve memory for the number of thresholds needed
-    s_eo_currents_watchdog.numberofmotors = eo_entities_NumOfJoints(eo_entities_GetHandle());
+    s_eo_currents_watchdog.numberofmotors = eo_entities_NumOfMotors(eo_entities_GetHandle());
     
     if (s_eo_currents_watchdog.numberofmotors == 0)
         return NULL;
@@ -106,7 +108,7 @@ extern EOCurrentsWatchdog* eo_currents_watchdog_Initialise(void)
     // retrieve pointers to motors   
     for(m=0; m<s_eo_currents_watchdog.numberofmotors; m++)
     {
-        s_eo_currents_watchdog.themotors[m] = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, m);
+        s_eo_currents_watchdog.themotors[m] = eo_entities_GetMotor(eo_entities_GetHandle(), m);
     }
     
     
@@ -115,9 +117,6 @@ extern EOCurrentsWatchdog* eo_currents_watchdog_Initialise(void)
     
     s_eo_currents_watchdog.I2T_threshold = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_auto, sizeof(float), s_eo_currents_watchdog.numberofmotors);
     memset(s_eo_currents_watchdog.I2T_threshold, 0, s_eo_currents_watchdog.numberofmotors*sizeof(float));
-    
-    //s_eo_currents_watchdog.filter_reg = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_auto, sizeof(float), s_eo_currents_watchdog.numberofmotors);
-    //memset(s_eo_currents_watchdog.filter_reg, 0, s_eo_currents_watchdog.numberofmotors*sizeof(float));
     
     s_eo_currents_watchdog.avgCurrent = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_auto, sizeof(eoCurrentWD_averageData_t), s_eo_currents_watchdog.numberofmotors);
     memset(s_eo_currents_watchdog.avgCurrent, 0, s_eo_currents_watchdog.numberofmotors*sizeof(eoCurrentWD_averageData_t));
@@ -138,64 +137,6 @@ extern EOCurrentsWatchdog* eo_currents_watchdog_GetHandle(void)
         return(NULL);
     }
     return(&s_eo_currents_watchdog);
-}
-
-
-//USELESS
-extern eOresult_t eo_currents_watchdog_Configure(EOCurrentsWatchdog* p, eOcurrents_watchdog_cfg_t* cfg)
-{
-//	if (p == NULL)
-//    {
-//        return(eores_NOK_nullpointer);
-//    }
-//    
-//    if((eobool_false == s_eo_currents_watchdog.initted) || (cfg == NULL))
-//    {
-//        return(eores_NOK_generic);
-//    }
-//        
-//    //save in reserved memory
-//    memcpy(&(s_eo_currents_watchdog.cfg), cfg, sizeof(eOcurrents_watchdog_cfg_t));
-        
-    return(eores_OK);
-}
-
-//USELESS
-extern eOresult_t eo_currents_watchdog_SetSpikeThreshold(EOCurrentsWatchdog* p, uint8_t joint, uint16_t threshold)
-{
-//    if (p == NULL)
-//    {
-//        return(eores_NOK_nullpointer);
-//    }
-//    
-//    if(joint >= s_eo_currents_watchdog.numberofmotors)
-//    {
-//        return eores_NOK_generic;
-//    }
-//    
-//    //set the new threshold
-//    s_eo_currents_watchdog.cfg.spike_thresh[joint] = threshold;
-    
-    return(eores_OK);
-}
-
-//USELESS
-extern eOresult_t eo_currents_watchdog_SetI2TThreshold(EOCurrentsWatchdog* p, uint8_t joint, uint32_t threshold)
-{
-//    if (p == NULL)
-//    {
-//        return(eores_NOK_nullpointer);
-//    }
-//    
-//    if(joint >= s_eo_currents_watchdog.numberofmotors)
-//    {
-//        return eores_NOK_generic;
-//    }
-//	    
-//    //set the new threshold
-//    s_eo_currents_watchdog.cfg.i2t_thresh[joint] = threshold;
-    
-    return(eores_OK);
 }
 
 extern eOresult_t eo_currents_watchdog_UpdateCurrentLimits(EOCurrentsWatchdog* p, uint8_t motor)
@@ -222,13 +163,14 @@ extern eOresult_t eo_currents_watchdog_UpdateCurrentLimits(EOCurrentsWatchdog* p
 
 extern void eo_currents_watchdog_Tick(EOCurrentsWatchdog* p)
 {
-	if (p == NULL)
+
+    if (p == NULL)
     {
         return;
     }
     
     int16_t current_value = 0;
-    //check spikes and I2T
+
     for (uint8_t i = 0; i < s_eo_currents_watchdog.numberofmotors; i++)
     {
         //get current value
@@ -239,7 +181,8 @@ extern void eo_currents_watchdog_Tick(EOCurrentsWatchdog* p)
         
         //error flags signalling is done internally
         s_eo_currents_watchdog_CheckSpike(i, current_value);
-        s_eo_currents_watchdog_CheckI2T(i, current_value);
+        //VALE: I disabled check I2T until I have nominal and peack current values
+        //s_eo_currents_watchdog_CheckI2T(i, current_value);
     }
     
 }

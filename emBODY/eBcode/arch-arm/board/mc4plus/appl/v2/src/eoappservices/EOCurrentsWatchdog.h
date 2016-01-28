@@ -62,12 +62,6 @@ extern EOCurrentsWatchdog* eo_currents_watchdog_Initialise(void);
 
 extern EOCurrentsWatchdog* eo_currents_watchdog_GetHandle(void);
 
-extern eOresult_t eo_currents_watchdog_Configure(EOCurrentsWatchdog* p, eOcurrents_watchdog_cfg_t* cfg);
-
-extern eOresult_t eo_currents_watchdog_SetSpikeThreshold(EOCurrentsWatchdog* p, uint8_t joint, uint16_t threshold);
-
-extern eOresult_t eo_currents_watchdog_SetI2TThreshold(EOCurrentsWatchdog* p, uint8_t joint, uint32_t threshold);
-
 void eo_currents_watchdog_Tick(EOCurrentsWatchdog* p);
 
 extern eOresult_t eo_currents_watchdog_UpdateCurrentLimits(EOCurrentsWatchdog* p, uint8_t motor);
