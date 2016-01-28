@@ -63,6 +63,9 @@
 // foc-case
 #include "EOemsController.h"
 
+// mc4lus-case
+#include "EOCurrentsWatchdog.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -99,17 +102,24 @@ typedef enum
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-//static eObool_t s_motorcontrol_is2foc_based(void);
+// -- common functions
 
 static eOmotioncontroller_mode_t s_motorcontrol_getmode(void);
 
 
-// mc4can-based 
-static void s_onpid(const EOnv* nv, const eOropdescriptor_t* rd, pid_type_t type);
+// -- foc-based functions
 
+
+// -- mc4plus-based functions
+
+static void s_eoprot_ep_mc_fun_MotorReactivationAttempt(uint8_t motor, uint32_t current_state);
+
+
+// -- mc4can-based functions
+
+static void s_onpid(const EOnv* nv, const eOropdescriptor_t* rd, pid_type_t type);
 static eOresult_t s_translate_eOmcControlMode2icubCanProtoControlMode(eOmc_controlmode_command_t eomc_controlmode, eOprotIndex_t jId,
                                                                       icubCanProto_controlmode_t *icubcanProto_controlmode);
-
 
 
 
@@ -135,6 +145,7 @@ static eOresult_t s_translate_eOmcControlMode2icubCanProtoControlMode(eOmc_contr
 // -- entity joint
 
 
+// f-marker-begin
 extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOmc_joint_config_t *cfg = (eOmc_joint_config_t*)rd->data;
@@ -144,7 +155,6 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
     // now we see if it is a mc4can or a 2foc or a mc4plus    
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
         
-    //if(eobool_true == s_motorcontrol_is2foc_based())
     if(eo_motcon_mode_foc == mcmode)
     {
         float rescaler_pos = 0;
@@ -199,6 +209,61 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
         // 7) set impedance 
         eo_emsController_SetImpedance(jxx, cfg->impedance.stiffness, cfg->impedance.damping, cfg->impedance.offset);
         
+    }
+    else if((eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode))
+    {   // marco.accame on 28 jan 16: so far the 2foc and mc4plus cases have the same code
+        float rescaler_pos = 0;
+        float rescaler_trq = 0;    
+
+        //currently no joint config param must be sent to 2foc board. (for us called 1foc :) )
+        //(currently no pid velocity is sent to 2foc)
+     
+
+        
+        // 1) set pid position 
+        rescaler_pos = 1.0f/(float)(1<<cfg->pidposition.scale);
+        eo_emsController_SetPosPid(jxx, cfg->pidposition.kp*rescaler_pos, 
+                                        cfg->pidposition.kd*rescaler_pos, 
+                                        cfg->pidposition.ki*rescaler_pos, 
+                                        cfg->pidposition.limitonintegral,
+                                        cfg->pidposition.limitonoutput,
+                                        cfg->pidposition.offset,
+                                        cfg->pidposition.stiction_up_val*rescaler_pos, 
+                                        cfg->pidposition.stiction_down_val*rescaler_pos);
+
+        // 2) set torque pid    
+        rescaler_trq = 1.0f/(float)(1<<cfg->pidtorque.scale);
+        eo_emsController_SetTrqPid(jxx, cfg->pidtorque.kp*rescaler_trq, 
+                                        cfg->pidtorque.kd*rescaler_trq, 
+                                        cfg->pidtorque.ki*rescaler_trq,
+                                        cfg->pidtorque.limitonintegral,
+                                        cfg->pidtorque.limitonoutput, 
+                                        cfg->pidtorque.offset,
+                                        cfg->pidtorque.kff*rescaler_trq,
+                                        cfg->pidtorque.stiction_up_val*rescaler_trq, 
+                                        cfg->pidtorque.stiction_down_val*rescaler_trq);
+
+        //eo_emsController_SetAbsEncoderSign((uint8_t)jxx, (int32_t)cfg->DEPRECATED_encoderconversionfactor);
+        eo_emsController_SetAbsEncoderSign((uint8_t)jxx, (int32_t)cfg->jntEncoderResolution);
+        
+        eo_emsController_SetMotorParams((uint8_t)jxx, cfg->motor_params);
+        
+        eo_emsController_SetTcFilterType((uint8_t)jxx, (uint8_t) cfg->tcfiltertype);
+
+        // 3) set velocity pid:    to be implemented
+       
+        // 4) set min position    
+        eo_emsController_SetPosMin(jxx, cfg->limitsofjoint.min);
+            
+        // 5) set max position
+        eo_emsController_SetPosMax(jxx, cfg->limitsofjoint.max);
+
+        // 6) set vel timeout        
+        eo_emsController_SetVelTimeout(jxx, cfg->velocitysetpointtimeout);
+            
+        // 7) set impedance 
+        eo_emsController_SetImpedance(jxx, cfg->impedance.stiffness, cfg->impedance.damping, cfg->impedance.offset);
+    
     }
     else if(eo_motcon_mode_mc4 == mcmode)
     {
@@ -274,40 +339,41 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
         eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);         
     }
 
-// we dont need it anymore     
-//    // 8) set monitormode status
-//    
-//    if(eomc_motionmonitormode_dontmonitor == cfg->motionmonitormode)
-//    {
-//        jstatus->basic.motionmonitorstatus = eomc_motionmonitorstatus_notmonitored;  
-//    }
-//    else
-//    {
-//        jstatus->basic.motionmonitorstatus = eomc_motionmonitorstatus_setpointnotreachedyet;
-//    }
-
 }
 
 
+// f-marker-begin
 extern void eoprot_fun_UPDT_mc_joint_config_pidposition(const EOnv* nv, const eOropdescriptor_t* rd)
 {
+    eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
+    eOmc_PID_t *pid = (eOmc_PID_t*)rd->data;
+    float rescaler = 1.0f/(float)(1<<pid->scale);
+
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
     
-    //if(eobool_true == s_motorcontrol_is2foc_based())
     if(eo_motcon_mode_foc == mcmode)
     {
-        eOmc_PID_t *pid_ptr = (eOmc_PID_t*)rd->data;
-        eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
-        float rescaler = 1.0f/(float)(1<<pid_ptr->scale);
 
-        eo_emsController_SetPosPid(jxx, pid_ptr->kp*rescaler,   
-                                        pid_ptr->kd*rescaler, 
-                                        pid_ptr->ki*rescaler,
-                                        pid_ptr->limitonintegral,
-                                        pid_ptr->limitonoutput, 
-                                        pid_ptr->offset,
-                                        pid_ptr->stiction_up_val*rescaler,
-                                        pid_ptr->stiction_down_val*rescaler);
+        eo_emsController_SetPosPid(jxx, pid->kp*rescaler,   
+                                        pid->kd*rescaler, 
+                                        pid->ki*rescaler,
+                                        pid->limitonintegral,
+                                        pid->limitonoutput, 
+                                        pid->offset,
+                                        pid->stiction_up_val*rescaler,
+                                        pid->stiction_down_val*rescaler);
+    }
+    else if((eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode))
+    {   // marco.accame on 28 jan 16: so far the 2foc and mc4plus cases have the same code
+
+        eo_emsController_SetPosPid(jxx, pid->kp*rescaler,   
+                                        pid->kd*rescaler, 
+                                        pid->ki*rescaler,
+                                        pid->limitonintegral,
+                                        pid->limitonoutput, 
+                                        pid->offset,
+                                        pid->stiction_up_val*rescaler,
+                                        pid->stiction_down_val*rescaler);
     }
     else if(eo_motcon_mode_mc4 == mcmode)
     {
@@ -315,26 +381,39 @@ extern void eoprot_fun_UPDT_mc_joint_config_pidposition(const EOnv* nv, const eO
     }
 }
 
+
+// f-marker-begin
 extern void eoprot_fun_UPDT_mc_joint_config_pidtorque(const EOnv* nv, const eOropdescriptor_t* rd)
 {
+    eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
+    eOmc_PID_t *pid = (eOmc_PID_t*)rd->data;
+    float rescaler = 1.0f/(float)(1<<pid->scale);
+
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
     
-    //if(eobool_true == s_motorcontrol_is2foc_based())
     if(eo_motcon_mode_foc == mcmode)
     {
-        eOmc_PID_t *pid_ptr = (eOmc_PID_t*)rd->data;
-        eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
-        float rescaler = 1.0f/(float)(1<<pid_ptr->scale);
-        
-        eo_emsController_SetTrqPid(jxx, pid_ptr->kp*rescaler, 
-                                        pid_ptr->kd*rescaler, 
-                                        pid_ptr->ki*rescaler,
-                                        pid_ptr->limitonintegral,
-                                        pid_ptr->limitonoutput, 
-                                        pid_ptr->offset,
-                                        pid_ptr->kff*rescaler,
-                                        pid_ptr->stiction_up_val*rescaler,
-                                        pid_ptr->stiction_down_val*rescaler);
+        eo_emsController_SetTrqPid(jxx, pid->kp*rescaler, 
+                                        pid->kd*rescaler, 
+                                        pid->ki*rescaler,
+                                        pid->limitonintegral,
+                                        pid->limitonoutput, 
+                                        pid->offset,
+                                        pid->kff*rescaler,
+                                        pid->stiction_up_val*rescaler,
+                                        pid->stiction_down_val*rescaler);
+    }
+    else if((eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode))
+    {   // marco.accame on 28 jan 16: so far the 2foc and mc4plus cases have the same code
+        eo_emsController_SetTrqPid(jxx, pid->kp*rescaler, 
+                                        pid->kd*rescaler, 
+                                        pid->ki*rescaler,
+                                        pid->limitonintegral,
+                                        pid->limitonoutput, 
+                                        pid->offset,
+                                        pid->kff*rescaler,
+                                        pid->stiction_up_val*rescaler,
+                                        pid->stiction_down_val*rescaler);
     }
     else if(eo_motcon_mode_mc4 == mcmode)
     {
@@ -343,20 +422,27 @@ extern void eoprot_fun_UPDT_mc_joint_config_pidtorque(const EOnv* nv, const eOro
 }
 
 
+
+// f-marker-begin
 extern void eoprot_fun_UPDT_mc_joint_config_motor_params(const EOnv* nv, const eOropdescriptor_t* rd) 
-{   // only 2foc
+{   // not for mc4can
+    eOmc_motor_params_t *mparams = (eOmc_motor_params_t*)rd->data;
+    eOprotIndex_t jxx = eoprot_ID2index(rd->id32);        
+
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
     
-    //if(eobool_true == s_motorcontrol_is2foc_based())
     if(eo_motcon_mode_foc == mcmode)
     {
-        eOmc_motor_params_t *params_ptr = (eOmc_motor_params_t*)rd->data;
-        eOprotIndex_t jxx = eoprot_ID2index(rd->id32);        
-        eo_emsController_SetMotorParams ((uint8_t)jxx, *params_ptr);
+        eo_emsController_SetMotorParams(jxx, *mparams);
+    }
+    else if((eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode))
+    {   // marco.accame on 28 jan 16: so far the 2foc and mc4plus cases have the same code
+        eo_emsController_SetMotorParams(jxx, *mparams);
     }
 }
 
 
+// f-marker-begin
 extern void eoprot_fun_UPDT_mc_joint_config_impedance(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOmc_impedance_t *impedance = (eOmc_impedance_t*)rd->data;
@@ -364,11 +450,14 @@ extern void eoprot_fun_UPDT_mc_joint_config_impedance(const EOnv* nv, const eOro
     
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
     
-    //if(eobool_true == s_motorcontrol_is2foc_based())
     if(eo_motcon_mode_foc == mcmode)
     {
         eo_emsController_SetImpedance(jxx, impedance->stiffness, impedance->damping, impedance->offset);
     }
+    else if((eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode))
+    {   // marco.accame on 28 jan 16: so far the 2foc and mc4plus cases have the same code
+        eo_emsController_SetImpedance(jxx, impedance->stiffness, impedance->damping, impedance->offset);
+    } // mark
     else if(eo_motcon_mode_mc4 == mcmode)
     {   
         eOcanprot_command_t command = {0};
@@ -425,6 +514,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_impedance(const EOnv* nv, const eOro
 }
 
 
+// f-marker-begin
 extern void eoprot_fun_UPDT_mc_joint_config_limitsofjoint(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOmeas_position_limits_t *limitsofjoint = (eOmeas_position_limits_t*)rd->data;
@@ -432,9 +522,13 @@ extern void eoprot_fun_UPDT_mc_joint_config_limitsofjoint(const EOnv* nv, const 
     
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
     
-    //if(eobool_true == s_motorcontrol_is2foc_based())
     if(eo_motcon_mode_foc == mcmode)
     {
+        eo_emsController_SetPosMin(jxx, limitsofjoint->min);
+        eo_emsController_SetPosMax(jxx, limitsofjoint->max);
+    }
+    else if((eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode))
+    {   // marco.accame on 28 jan 16: so far the 2foc and mc4plus cases have the same code
         eo_emsController_SetPosMin(jxx, limitsofjoint->min);
         eo_emsController_SetPosMax(jxx, limitsofjoint->max);
     }
@@ -498,6 +592,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_limitsofjoint(const EOnv* nv, const 
 }
 
 
+// f-marker-begin
 extern void eoprot_fun_UPDT_mc_joint_config_velocitysetpointtimeout(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOmeas_time_t *time = (eOmeas_time_t*)rd->data;
@@ -505,11 +600,14 @@ extern void eoprot_fun_UPDT_mc_joint_config_velocitysetpointtimeout(const EOnv* 
 
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
     
-    //if(eobool_true == s_motorcontrol_is2foc_based())
     if(eo_motcon_mode_foc == mcmode)
     {    
         eo_emsController_SetVelTimeout(jxx, *time);
     }
+    else if((eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode))
+    {   // marco.accame on 28 jan 16: so far the 2foc and mc4plus cases have the same code
+        eo_emsController_SetVelTimeout(jxx, *time);
+    } // marker
     else if(eo_motcon_mode_mc4 == mcmode)
     {
         eOcanprot_command_t command = {0};
@@ -521,7 +619,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_velocitysetpointtimeout(const EOnv* 
 }
 
 
-
+// f-marker-begin
 extern void eoprot_fun_UPDT_mc_joint_status_core_modes_ismotiondone(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
@@ -531,6 +629,10 @@ extern void eoprot_fun_UPDT_mc_joint_status_core_modes_ismotiondone(const EOnv* 
     {
         // do nothing
     }
+    else if((eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode))
+    {   // marco.accame on 28 jan 16: so far the 2foc and mc4plus cases have the same code
+        // do nothing
+    } // marker
     else if(eo_motcon_mode_mc4 == mcmode)
     {          
         if(eo_ropcode_ask == rd->ropcode)
@@ -567,6 +669,7 @@ extern void eoprot_fun_UPDT_mc_joint_status_core_modes_ismotiondone(const EOnv* 
 }
 
 
+// f-marker-begin
 extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOmc_setpoint_t *setpoint = (eOmc_setpoint_t*)rd->data;
@@ -577,13 +680,12 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
 
     if(NULL == joint)
     {
-        return; //error
+        return; // error... maybe robotInterface sends a command to a joint with index higher than supported
     } 
        
 
     joint->status.core.modes.ismotiondone = eobool_false;
 
-    //if(eobool_true == s_motorcontrol_is2foc_based())   
     if(eo_motcon_mode_foc == mcmode)
     {        
         switch(setpoint->type)
@@ -598,6 +700,57 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
             
             case eomc_setpoint_positionraw:
             {
+                if(eo_emsController_SetPosRaw(jxx, setpoint->to.positionraw.value))
+                {
+                    joint->status.target.trgt_positionraw = setpoint->to.positionraw.value;
+                }
+            } break;
+            
+            case eomc_setpoint_velocity:
+            {
+                if(eo_emsController_SetVelRef(jxx, setpoint->to.velocity.value, setpoint->to.velocity.withacceleration))
+                {
+                    joint->status.target.trgt_velocity = setpoint->to.velocity.value;
+                }    
+            } break;
+
+            case eomc_setpoint_torque:
+            {
+                if(eo_emsController_SetTrqRef(jxx, setpoint->to.torque.value))
+                {
+                    joint->status.target.trgt_torque = setpoint->to.torque.value;
+                }
+
+            } break;
+
+            case eomc_setpoint_openloop:
+            {
+                if(eo_emsController_SetOutput(jxx, setpoint->to.openloop.value))
+                {
+                    joint->status.target.trgt_openloop = setpoint->to.openloop.value;
+                }
+            } break;
+
+            default:
+            {
+                
+            } break;
+        }
+    }
+    else if((eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode))
+    {   // marco.accame on 28 jan 16: so far the 2foc and mc4plus cases have the same code
+        switch(setpoint->type)
+        { 
+            case eomc_setpoint_position:
+            {
+                if(eo_emsController_SetPosRef(jxx, setpoint->to.position.value, setpoint->to.position.withvelocity))
+                {
+                    joint->status.target.trgt_position = setpoint->to.position.value;
+                }
+            } break;
+            
+            case eomc_setpoint_positionraw:
+            { 
                 if(eo_emsController_SetPosRaw(jxx, setpoint->to.positionraw.value))
                 {
                     joint->status.target.trgt_positionraw = setpoint->to.positionraw.value;
@@ -799,16 +952,23 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
             eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);
         }
         
-    }
-}
+    }   // marker-end-of-case-mc4-can
 
+} // f-marker-end
+
+
+// f-marker-begin
 extern void eoprot_fun_UPDT_mc_joint_cmmnds_stoptrajectory(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
     
-    //if(eobool_true == s_motorcontrol_is2foc_based()) 
     if(eo_motcon_mode_foc == mcmode)
     {
+        eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
+        eo_emsController_Stop(jxx);
+    }
+    else if((eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode))
+    {   // marco.accame on 28 jan 16: so far the 2foc and mc4plus cases have the same code
         eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
         eo_emsController_Stop(jxx);
     }
@@ -820,9 +980,11 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_stoptrajectory(const EOnv* nv, const
         command.value = NULL;
         eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);        
     }
-}
+
+} // fmarker-end
 
 
+// f-marker-begin
 static void send_diagnostic_debugmessage(eOerrmanErrorType_t type, eOerror_value_DEB_t value, uint8_t jointnum, uint16_t par16, uint64_t par64, const char* info)
 {
     eOerrmanDescriptor_t errdes = {0};
@@ -836,6 +998,7 @@ static void send_diagnostic_debugmessage(eOerrmanErrorType_t type, eOerror_value
 }
 
 
+// f-marker-begin
 extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eOropdescriptor_t* rd)
 {   
     eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
@@ -843,7 +1006,6 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
     
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
     
-    //if(eobool_true == s_motorcontrol_is2foc_based()) 
     if(eo_motcon_mode_foc == mcmode)
     {
         eo_emsController_SetAxisCalibrationZero (jxx, calibrator->params.type3.calibrationZero);
@@ -852,6 +1014,16 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
                                           calibrator->params.any);
 
     }
+    else if((eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode))
+    {        
+        uint32_t state = eo_motioncontrol_extra_GetMotorFaultMask(eo_motioncontrol_GetHandle(), jxx);
+        if((eobool_true == eo_motioncontrol_extra_AreMotorsExtFaulted(eo_motioncontrol_GetHandle())) || (state & MOTOR_EXTERNAL_FAULT)) // or motors still faulted OR state (and so PWM) still need to be enabled
+        {
+            s_eoprot_ep_mc_fun_MotorReactivationAttempt(jxx, state);
+        }
+
+        eo_emsController_StartCalibration(jxx, (eOmc_calibration_type_t)calibrator->type, calibrator->params.any);   
+    } 
     else if(eo_motcon_mode_mc4 == mcmode)
     {
         EOtheMC4boards *mc4boards = eo_mc4boards_GetHandle();
@@ -1191,6 +1363,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
 }
 
 
+// f-marker-begin
 extern void eoprot_fun_UPDT_mc_joint_cmmnds_controlmode(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOmc_controlmode_command_t *controlmode = (eOmc_controlmode_command_t*)rd->data;
@@ -1198,12 +1371,20 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_controlmode(const EOnv* nv, const eO
     
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
     
-      
-    //if(eobool_true == s_motorcontrol_is2foc_based()) 
     if(eo_motcon_mode_foc == mcmode)
     {       
         eo_emsController_SetControlModeGroupJoints(jxx, (eOmc_controlmode_command_t)(*controlmode));    
     }
+    else if((eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode))
+    {
+        uint32_t state = eo_motioncontrol_extra_GetMotorFaultMask(eo_motioncontrol_GetHandle(), jxx);
+        if((eobool_true == eo_motioncontrol_extra_AreMotorsExtFaulted(eo_motioncontrol_GetHandle())) || (state & MOTOR_EXTERNAL_FAULT))
+        {
+            s_eoprot_ep_mc_fun_MotorReactivationAttempt(jxx, state);
+        }        
+            
+        eo_emsController_SetControlModeGroupJoints(jxx, (eOmc_controlmode_command_t)(*controlmode));   
+    }    
     else if(eo_motcon_mode_mc4 == mcmode)
     {
         icubCanProto_controlmode_t icubcanProto_controlmode = icubCanProto_controlmode_idle;
@@ -1221,18 +1402,22 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_controlmode(const EOnv* nv, const eO
 }
 
 
+// f-marker-begin
 extern void eoprot_fun_UPDT_mc_joint_cmmnds_interactionmode(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOmc_interactionmode_t* interaction = (eOmc_interactionmode_t*)rd->data;
+    eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
     
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
     
-    //if(eobool_true == s_motorcontrol_is2foc_based()) 
     if(eo_motcon_mode_foc == mcmode)
     {
-        eOprotIndex_t jxx = eoprot_ID2index(rd->id32);    
         eo_emsController_SetInteractionModeGroupJoints(jxx, *interaction);
     }
+    else if((eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode))
+    {   // marco.accame on 28 jan 16: so far the 2foc and mc4plus cases have the same code
+        eo_emsController_SetInteractionModeGroupJoints(jxx, *interaction);
+    } // marker
     else if(eo_motcon_mode_mc4 == mcmode)
     {
         icubCanProto_interactionmode_t icub_interactionmode = icubCanProto_interactionmode_unknownError;
@@ -1260,7 +1445,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_interactionmode(const EOnv* nv, cons
 }
 
 
-
+// f-marker-begin
 extern void eoprot_fun_UPDT_mc_joint_inputs_externallymeasuredtorque(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOmeas_torque_t *torque = (eOmeas_torque_t*)rd->data;
@@ -1268,12 +1453,14 @@ extern void eoprot_fun_UPDT_mc_joint_inputs_externallymeasuredtorque(const EOnv*
     
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
     
-    
-    //if(eobool_true == s_motorcontrol_is2foc_based()) 
     if(eo_motcon_mode_foc == mcmode)
     {
         eo_emsController_ReadTorque(jxx, *torque);
     }
+    else if((eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode))
+    {   // marco.accame on 28 jan 16: so far the 2foc and mc4plus cases have the same code
+        eo_emsController_ReadTorque(jxx, *torque);
+    } // marker
     else if(eo_motcon_mode_mc4 == mcmode)
     {
         eOmeas_torque_t trq = EO_CLIP_INT16(*torque);
@@ -1282,48 +1469,59 @@ extern void eoprot_fun_UPDT_mc_joint_inputs_externallymeasuredtorque(const EOnv*
     }
 }
 
+
+// f-marker-begin
 extern void eoprot_fun_UPDT_mc_motor_config_gearboxratio(const EOnv* nv, const eOropdescriptor_t* rd)
-{   
+{   // not for mc4can
+    eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
+    int32_t *gbxratio = (int32_t*)rd->data;
+
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
     
-    // 2foc only
-    //if(eobool_false == s_motorcontrol_is2foc_based()) 
     if(eo_motcon_mode_foc == mcmode)
     {
-        eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
-        int32_t *gbx_ptr = (int32_t*)rd->data;
-        eo_emsController_SetGearboxRatio(jxx, *gbx_ptr);
+        eo_emsController_SetGearboxRatio(jxx, *gbxratio);
+    }
+    else if((eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode))
+    {   // marco.accame on 28 jan 16: so far the 2foc and mc4plus cases have the same code
+        eo_emsController_SetGearboxRatio(jxx, *gbxratio);
     }
 }
 
+
+// f-marker-begin
 extern void eoprot_fun_UPDT_mc_motor_config_rotorencoder(const EOnv* nv, const eOropdescriptor_t* rd)
-{
+{   // not for mc4can
+
+    eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
+    int32_t *rotenc = (int32_t*)rd->data;    
+    
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
     
-    // 2foc only
-    //if(eobool_false == s_motorcontrol_is2foc_based()) 
     if(eo_motcon_mode_foc == mcmode)
     {
-        eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
-        int32_t *gbx_ptr = (int32_t*)rd->data;
-        eo_emsController_SetRotorEncoder(jxx, *gbx_ptr);
+        eo_emsController_SetRotorEncoder(jxx, *rotenc);
+    }
+    else if((eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode))
+    {   // marco.accame on 28 jan 16: so far the 2foc and mc4plus cases have the same code
+        eo_emsController_SetRotorEncoder(jxx, *rotenc);
     }
 }
 
 #if defined(EOMOTIONCONTROL_DONTREDEFINE_JOINTCOUPLING_CALLBACK)
 #warning INFO: EOMOTIONCONTROL_DONTREDEFINE_JOINTCOUPLING_CALLBACK is defined, thus we are not using eo_emsController_set_Jacobian() etc
 #else
+// f-marker-begin
 extern void eoprot_fun_UPDT_mc_controller_config_jointcoupling(const EOnv* nv, const eOropdescriptor_t* rd)
-{    
+{   // not for mc4can
+
+    eOmc_jointcouplingmatrix_t *mat = (eOmc_jointcouplingmatrix_t*)rd->data;    
+
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
     
-    // 2foc only
-    //if(eobool_false == s_motorcontrol_is2foc_based()) 
-    if(eo_motcon_mode_foc = mcmode)
+    if((eo_motcon_mode_foc = mcmode) || (eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode))
     {
    
-        eOmc_jointcouplingmatrix_t *mat = (eOmc_jointcouplingmatrix_t*)rd->data;
-        
         /*
         float Ji[4][4];
         
@@ -1361,85 +1559,105 @@ extern void eoprot_fun_UPDT_mc_controller_config_jointcoupling(const EOnv* nv, c
 // -- entity motor
 
 
+// f-marker-begin
 extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescriptor_t* rd)
 {   
+    eOmc_motor_config_t *mconfig = (eOmc_motor_config_t*)rd->data;
+    eOprotIndex_t mxx = eoprot_ID2index(rd->id32);
+
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
     
-    // must send some can frames. however, in here i need the type of attached board: 1foc or mc4.
-    // there are many modes to do this, but in wait of the EOmcManager object we just use a s_motorcontrol_is2foc_based() function
-    
-    eOmc_motor_config_t *cfg_ptr = (eOmc_motor_config_t*)rd->data;
-    eOmc_motorId_t mxx = eoprot_ID2index(rd->id32);
     
     eOcanprot_command_t command = {0};
     command.class = eocanprot_msgclass_pollingMotorControl;
     
-    // in here i assume that all the mc boards are either 1foc or mc4
-    //if(eobool_true == s_motorcontrol_is2foc_based())
+    #warning marco.accame: the code for ems and mc4plus is sligthly different .... what it correct?
+        
     if(eo_motcon_mode_foc == mcmode)
     {
-        eo_emsController_SetMotorConfig(mxx, *cfg_ptr);
-        eo_emsController_SetActuationLimit(mxx, (int16_t)cfg_ptr->pwmLimit);
+        #warning cambiare api.
+        eo_emsController_SetMotorConfig(mxx, *mconfig);
+        eo_emsController_SetActuationLimit(mxx, (int16_t)mconfig->pwmLimit);
         // If pwmLimit is bigger than hardwhere limit, emsController uses hardwarelimit. 
         // Therefore I need to update netvar with the limit used in emsController.
-        cfg_ptr->pwmLimit = eo_emsController_GetActuationLimit(mxx);
+        mconfig->pwmLimit = eo_emsController_GetActuationLimit(mxx);
         //TODO: send current limits about I2T to 2foc (nominal and peak current)
         return;
         
         // send current pid
         //command.type  = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID;
-        //command.value = &cfg_ptr->pidcurrent;
+        //command.value = &mconfig->pidcurrent;
         //eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);
 
         // send current pid limits
         //command.type  = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PIDLIMITS;
-        //command.value = &cfg_ptr->pidcurrent;
+        //command.value = &mconfig->pidcurrent;
         //eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);             
+    }
+    else if((eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode))   
+    {    
+        eo_emsController_SetMotorConfig(mxx, *mconfig);
+        // set also rotor encoder sign ... it is active only if the control is local as in mc4plus or mc2plus
+        eo_emsController_SetRotorEncoderSign((uint8_t)mxx, (int32_t)mconfig->rotorEncoderResolution);
+        
+        // it updates settings inside the object 
+        eo_currents_watchdog_UpdateCurrentLimits( eo_currents_watchdog_GetHandle(), mxx);
+    
+        eo_emsController_SetActuationLimit(mxx, (int16_t)mconfig->pwmLimit);
+        // If pwmLimit is bigger than hardwhere limit, emsController uses hardwarelimit. 
+        // Therefore I need to update netvar with the limit used in emsController.
+        mconfig->pwmLimit = eo_emsController_GetActuationLimit(mxx);
     }
     else if(eo_motcon_mode_mc4 == mcmode)
     {
         //char info [50];
         EOtheMC4boards *mc4boards = eo_mc4boards_GetHandle();
       
-        eo_mc4boards_Convert_minMotorPos_Set(mc4boards, mxx, cfg_ptr->limitsofrotor.min);
-        eo_mc4boards_Convert_maxMotorPos_Set(mc4boards, mxx, cfg_ptr->limitsofrotor.max);
+        eo_mc4boards_Convert_minMotorPos_Set(mc4boards, mxx, mconfig->limitsofrotor.min);
+        eo_mc4boards_Convert_maxMotorPos_Set(mc4boards, mxx, mconfig->limitsofrotor.max);
       
     // marco.accame on 8oct2015: removed because it is wrong. message ICUBCANPROTO_POL_MC_CMD__SET_MAX_VELOCITY must be used with max velocity of JOINT !!!    
     //    // set max velocity      
-    //    icubCanProto_velocity_t vel_icubCanProtValue = eo_mc4boards_Convert_Velocity_toCAN(eo_mc4boards_GetHandle(), mxx, cfg_ptr->maxvelocityofmotor);           
+    //    icubCanProto_velocity_t vel_icubCanProtValue = eo_mc4boards_Convert_Velocity_toCAN(eo_mc4boards_GetHandle(), mxx, mconfig->maxvelocityofmotor);           
     //    command.type  = ICUBCANPROTO_POL_MC_CMD__SET_MAX_VELOCITY;
     //    command.value = &vel_icubCanProtValue;
     //    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32); 
 
         // set current limit  
         command.type  = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT;
-        command.value = &cfg_ptr->currentLimits.overloadCurrent ;
+        command.value = &mconfig->currentLimits.overloadCurrent ;
         eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32); 
       
         // set max motor encoder limit
         command.type  = ICUBCANPROTO_POL_MC_CMD__SET_MAX_MOTOR_POS;
-        command.value = &cfg_ptr->limitsofrotor.max;
+        command.value = &mconfig->limitsofrotor.max;
         eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);
         
         // set min motor encoder limit
         command.type  = ICUBCANPROTO_POL_MC_CMD__SET_MIN_MOTOR_POS;
-        command.value = &cfg_ptr->limitsofrotor.min;
+        command.value = &mconfig->limitsofrotor.min;
         eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32); 
         
-        //sprintf(info,"motomax %d motomin %d",cfg_ptr->limitsofrotor.max,cfg_ptr->limitsofrotor.min);
+        //sprintf(info,"motomax %d motomin %d",mconfig->limitsofrotor.max,mconfig->limitsofrotor.min);
         //send_diagnostic_debugmessage(eo_errortype_debug, eoerror_value_DEB_tag01, mxx, 0, 0, info);
     }
 
 }
 
+
+// f-marker-begin
 extern void eoprot_fun_UPDT_mc_motor_config_pidcurrent(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
     
-    //if(eobool_true == s_motorcontrol_is2foc_based())
     if(eo_motcon_mode_foc == mcmode)
     {
         #warning ALE: not to be managed directly
+        return;
+    }
+    else if((eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode))
+    {
+        #warning -> TBD: what to do in eoprot_fun_UPDT_mc_motor_config_pidcurrent() for mc4plus ?
         return;
     }
     else if(eo_motcon_mode_mc4 == mcmode)
@@ -1463,50 +1681,55 @@ extern void eoprot_fun_UPDT_mc_motor_config_pidcurrent(const EOnv* nv, const eOr
 }
 
 
-// marco.accame on 8oct2015: removed because it is wrong. message ICUBCANPROTO_POL_MC_CMD__SET_MAX_VELOCITY must be used with max velocity of JOINT !!!    
-//extern void eoprot_fun_UPDT_mc_motor_config_maxvelocityofmotor(const EOnv* nv, const eOropdescriptor_t* rd)
-//{
-//    eOmeas_velocity_t *vel = (eOmeas_velocity_t*)rd->data;
-//    eOmc_motorId_t mxx = eoprot_ID2index(rd->id32);
-//    
-//    eOcanprot_command_t command = {0};
-//    command.class = eocanprot_msgclass_pollingMotorControl;
-//    
-//    // set max velocity  
-//    icubCanProto_velocity_t vel_icubCanProtValue = eo_mc4boards_Convert_Velocity_toCAN(eo_mc4boards_GetHandle(), mxx, *vel);           
-//    command.type  = ICUBCANPROTO_POL_MC_CMD__SET_MAX_VELOCITY;
-//    command.value = &vel_icubCanProtValue;
-//    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32); 
-//}
-
-
+// f-marker-begin
 extern void eoprot_fun_UPDT_mc_motor_config_currentlimits(const EOnv* nv, const eOropdescriptor_t* rd)
 {    
-    
+    eOprotIndex_t mxx = eoprot_ID2index(rd->id32);
+
     eOmc_current_limits_params_t *currentLimits = (eOmc_current_limits_params_t*)rd->data;
     eOmeas_current_t curr = currentLimits->overloadCurrent;
+
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
     
-    //both ems-2foc and ems-mc4 should send motorOveroladcurrent to can-boards
-    eOcanprot_command_t command = {0};
-    command.class = eocanprot_msgclass_pollingMotorControl;
+    // foc-base and mc4based should send overloadCurrent to can-boards
 
-    // set current limit  
-    command.type  = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT;
-    command.value = &curr;
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);     
-    
+
     if(eo_motcon_mode_foc == mcmode)
     {
-        //todo for Ale: please insert here function for update maxcurrent of moror value insied your motorcontroller object
-        return;
+        //  send the can message to relevant board
+        eOcanprot_command_t command = {0};
+        command.class = eocanprot_msgclass_pollingMotorControl;
+        command.type  = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT;
+        command.value = &curr;
+        eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);
+        
+        #warning TODO: ALE should add in here a function for updating maxcurrent of motor value inside the controller
+    }
+    else if((eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode))
+    {
+        eo_currents_watchdog_UpdateCurrentLimits( eo_currents_watchdog_GetHandle(), mxx);
+        // now for the case of mc4plus, the watchdog updates the current limits inside ems controller. 
+        // we should re-evaluate the situation after refactoring of mc-controller
+    }
+    else if(eo_motcon_mode_mc4 == mcmode)
+    {
+        // just send the can message to relevant board
+       //  send the can message to relevant board
+        eOcanprot_command_t command = {0};
+        command.class = eocanprot_msgclass_pollingMotorControl;
+        command.type  = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT;
+        command.value = &curr;
+        eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);
     }
 }
 
+
+// f-marker-begin
 extern void eoprot_fun_UPDT_mc_motor_config_pwmlimit(const EOnv* nv, const eOropdescriptor_t* rd)
 {
+    eOprotIndex_t mxx = eoprot_ID2index(rd->id32);
     eOmeas_pwm_t *pwm_limit = (eOmeas_pwm_t *)rd->data;
-    eOmc_motorId_t mxx = eoprot_ID2index(rd->id32);
+
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
     
     if(eo_motcon_mode_foc == mcmode)
@@ -1516,13 +1739,20 @@ extern void eoprot_fun_UPDT_mc_motor_config_pwmlimit(const EOnv* nv, const eOrop
         // Therefore I need to update netvar with the limit used in emsController.
         *pwm_limit = eo_emsController_GetActuationLimit(mxx);
     }
+    else if((eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode))
+    {   // marco.accame on 28 jan 16: so far the 2foc and mc4plus cases have the same code
+        eo_emsController_SetActuationLimit(mxx, (int16_t)*pwm_limit);
+        // If pwmLimit is bigger than hardwhere limit, emsController uses hardwarelimit. 
+        // Therefore I need to update netvar with the limit used in emsController.
+        *pwm_limit = eo_emsController_GetActuationLimit(mxx);
+    }
     else if(eo_motcon_mode_mc4 == mcmode)
     {
-        //TODO: send message to mc4 board
+        // TODO: send message to mc4can board
     }
 
-    
 }
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
@@ -1535,17 +1765,7 @@ extern void eoprot_fun_UPDT_mc_motor_config_pwmlimit(const EOnv* nv, const eOrop
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-//// in the future, there will be 2foc, mc4can, and mc4plus
-//static eObool_t s_motorcontrol_is2foc_based(void)
-//{
-//    eOmotioncontrol_mode_t mode = eo_motioncontrol_GetMode(eo_motioncontrol_GetHandle());
-//    
-//    if(eo_motcon_mode_foc == mode)
-//    {
-//        return(eobool_true);
-//    }
-//    return(eobool_false);
-//}
+// -- common functions
 
 static eOmotioncontroller_mode_t s_motorcontrol_getmode(void)
 {
@@ -1555,6 +1775,22 @@ static eOmotioncontroller_mode_t s_motorcontrol_getmode(void)
 
 // -- 2foc-based functions
 
+
+// -- mc4plus-based funtions
+
+
+static void s_eoprot_ep_mc_fun_MotorReactivationAttempt(uint8_t motor, uint32_t current_state)
+{
+    eo_motioncontrol_extra_MotorEnable(eo_motioncontrol_GetHandle(), motor);
+    eo_motioncontrol_extra_FaultDetectionEnable(eo_motioncontrol_GetHandle());
+
+    // simulate the CANframe used by 2FOC to signal the status
+    uint64_t fault_mask = (((uint64_t)(current_state & ~MOTOR_EXTERNAL_FAULT)) << 32) & 0xFFFFFFFF00000000; //adding the error to the current state
+    eo_motioncontrol_extra_SetMotorFaultMask(eo_motioncontrol_GetHandle(), motor, (uint8_t*)&fault_mask);
+
+    // reports to emscontroller the changed mask
+    eo_emsController_CheckFaults();
+}
 
 
 // -- mc4can-based functions

@@ -38,12 +38,9 @@
 #include "EOMtheEMSappl.h"
 #include "EOMtheEMSapplCfg.h"
 
-// - for ems 
 #include "EOMtheEMSappl.h"
-//#include "EOtheEMSapplBody.h"
 
 #include "EOtheErrorManager.h"
-
 #include "EoError.h"
 
 #include "eEsharedServices.h"
@@ -80,7 +77,6 @@
 
 static void s_eoprot_ep_mn_fun_apply_config_txratedivider(uint8_t txratedivider);
 
-//static void s_eoprot_ep_mn_fun_generic_configcommand(eOmn_ropsigcfg_command_t* ropsigcfgcmd);
 
 static void s_eoprot_ep_mn_fun_configcommand(eOmn_command_t* command);
 
@@ -360,7 +356,7 @@ extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropd
         
         case applstate_error:
         {
-            //I don't expect to receive go to error cmd
+            // i don't expect to receive a go2error command
             res = eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STerr);
             // the new currstate is set inside the on-entry of the state machine
             //if(eores_OK == res)
