@@ -118,6 +118,12 @@ typedef enum
     hal_spi_cpolarity_high      = 1
 } hal_spi_cpolarity_t;
 
+typedef enum
+{
+    hal_spi_datasize_8bit       = 0,
+    hal_spi_datasize_16bit      = 1
+} hal_spi_datasize_t;
+
 
 /** @typedef    typedef enum hal_spi_cfg_t 
     @brief      hal_spi_cfg_t contains the configuration for spi
@@ -129,15 +135,14 @@ typedef struct
     hal_spi_activity_t      activity;           /**< the activity: raw or frame-based */
     hal_spi_prescaler_t     prescaler;          /**< if hal_spi_prescaler_auto then use .maxspeed to determine the correct prescaler, otherwise use what is specified */
     uint32_t                maxspeed;           /**< used only in case of hal_spi_prescaler_auto. it is the max spi speed in Hz that can be reached */
-    uint8_t                 sizeofframe;        /**< the size of the frame in the frame-based activity */
+    hal_spi_datasize_t      datasize;           /**< the size of the data item */
+    uint8_t                 maxsizeofframe;     /**< the max size of the frame in the frame-based activity. the size can be changed (only lowered) in runtime */
     uint8_t                 capacityoftxfifoofframes; /**< if direction is not hal_spi_dir_rxonly, it specifies the capacity of the fifo of frames to tx */
     uint8_t                 capacityofrxfifoofframes; /**< if direction is not hal_spi_dir_txonly, it specifies the capacity of the fifo of frames to rx */
-    //uint8_t                 dummytxvalue;       /**< it specifies which is the value to transmit in case the fifo is empty or in case direction is hal_spi_dir_rxonly */
-    //uint8_t                 starttxvalue;    
-    hal_callback_t          onframetransm;      /**< if not NULL and direction is not hal_spi_dir_rxonly it is called by the ISR when a frame is transmitted */
-    void*                   argonframetransm;
-    hal_callback_t          onframereceiv;      /**< if not NULL and direction is not hal_spi_dir_txonly it is called by the ISR when a frame is received */
-    void*                   argonframereceiv;
+    hal_callback_t          onframestransmitted;    /**< if not NULL and direction is not hal_spi_dir_rxonly it is called by the ISR when all the frames are transmitted */
+    void*                   argonframestransmitted;
+    hal_callback_t          onframesreceived;      /**< if not NULL and direction is not hal_spi_dir_txonly it is called by the ISR when all the frames are received */
+    void*                   argonframesreceived;
     hal_spi_cpolarity_t     cpolarity;                    // if 0 SPI_CPOL_Low, if 1 SPI_CPOL_High
 } hal_spi_cfg_t;
 
@@ -145,7 +150,7 @@ typedef struct
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
 extern const hal_spi_cfg_t hal_spi_cfg_default; /**< = { .ownership = hal_spi_ownership_master, .direction = hal_spi_dir_rxonly, .activity = hal_spi_act_framebased,
-                                                         .prescaler = hal_spi_prescaler_64, .maxspeed = 0, .sizeofframe = 4, 
+                                                         .prescaler = hal_spi_prescaler_64, .maxspeed = 0, .datasize = hal_spi_datasize_8bit, .sizeofframe = 4, 
                                                          .capacityoftxfifoofframes = 0, .capacityofrxfifoofframes = 2, .dummytxvalue = 0, 
                                                          .onframetransm = NULL, .argonframetransm = NULL, .onframereceiv = NULL, .argonframereceiv = NULL };
                                                  */
@@ -192,11 +197,12 @@ extern hal_boolval_t hal_spi_initted_is(hal_spi_t id);
 
 /** @fn         extern hal_result_t hal_spi_start(hal_spi_t id, uint8_t numberofframes)
     @brief      this function starts communication. in case of hal_spi_ownership_master, hal_spi_dir_rxonly, and hal_spi_act_framebased
-                the function sends numberofframes dummy frames filled with values specified by cfg->dummytxvalue. upon reception of a
-                frame from the slave, it stores it inside its internal fifo and triggers the cfg->onframereceiv(arg) callback.
-                when all the numberofframes frames are received, then the spi is automatically stopped.
-    @param      id                    the id
-    @param      numberofframes      the number of frames to manage (FOR FUTURE USE. NOW IT IS IS ALWAYS 1)
+                the function sends numberofframes dummy frames filled with values specified by funtion hal_spi_set_isrtxframe() WHICH
+                MUST be called every time. Upon reception of a frame from the slave, it stores it inside its internal fifo.
+                when all the numberofframes frames are received,  it triggers  the cfg->onframesreceiv(arg) callback, then the spi is 
+                automatically stopped.
+    @param      id                      the id
+    @param      numberofframes          the number of frames to manage. it cannot be zero otherwise there is a failure
     @return     hal_res_OK or hal_res_NOK_generic on failure
   */
 extern hal_result_t hal_spi_start(hal_spi_t id, uint8_t numberofframes);
@@ -221,14 +227,14 @@ extern hal_bool_t hal_spi_active_is(hal_spi_t id);
 extern hal_result_t hal_spi_get(hal_spi_t id, uint8_t* rxframe, uint8_t* remainingrxframes);
 
 
-/** @fn         extern hal_result_t hal_spi_on_framereceiv_set(hal_spi_t id, hal_callback_t onframereceiv, void* arg)
+/** @fn         extern hal_result_t hal_spi_on_framesreceived_set(hal_spi_t id, hal_callback_t onframeereceived, void* arg)
     @brief      this function allows changing the cfg->onframereceiv(arg) callback originally configured at hal_spi_init().
     @param      id                    the id
     @param      onframereceiv       the callback (it can be NULL).
     @param      arg                 its argument
     @return     hal_res_OK if spi is initted, hal_res_NOK_generic on failure
   */
-extern hal_result_t hal_spi_on_framereceiv_set(hal_spi_t id, hal_callback_t onframereceiv, void* arg); 
+extern hal_result_t hal_spi_on_framesreceived_set(hal_spi_t id, hal_callback_t onframesreceived, void* arg); 
 
 
 /** @fn         extern hal_result_t hal_spi_rx_isr_enable(hal_spi_t id)
@@ -268,6 +274,7 @@ extern hal_result_t hal_spi_periph_disable(hal_spi_t id);
     @param      id              the id
     @param      framesize       number of bytes contained in the frame
     @return     hal_res_OK if procedure is successful, hal_res_NOK_generic on failure
+    @warning    the framesize cannot be higher than cfg->sizeofframe defined by hal_spi_init(). 
   */
 extern hal_result_t hal_spi_set_sizeofframe(hal_spi_t id, uint8_t framesize);
 
@@ -275,7 +282,8 @@ extern hal_result_t hal_spi_set_sizeofframe(hal_spi_t id, uint8_t framesize);
 /** @fn         extern hal_result_t hal_spi_set_isrtxframe(hal_spi_t id, const uint8_t* txframe)
     @brief      this function set the tx frame by copying the bytes array pointed by txframe 
     @param      id          the id
-    @param      txframe     pointer to the transmission frame
+    @param      txframe     pointer to the transmission frame. it must be of size framesize*1 or framesize*2
+                            depending on the value of cfg->datasize
     @return     hal_res_OK if procedure is successful, hal_res_NOK_generic on failure
   */
 extern hal_result_t hal_spi_set_isrtxframe(hal_spi_t id, const uint8_t* txframe);

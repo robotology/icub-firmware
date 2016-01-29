@@ -71,6 +71,14 @@
 
 #define HAL_spi_id2stmSPI(p)            (s_hal_spi_stmSPImap[HAL_spi_id2index(p)])
 
+// HAL_MANAGE_ISRFRAMES_WITH_FIFO
+// marco.accame: info abouth macro HAL_MANAGE_ISRFRAMES_WITH_FIFO (introduced on 29 jan 2016)
+// by defining this macro we manage spi communication using fifo objects to manage the tx and rx frames.
+// if we undef this, we use uint8_t* buffers. 
+// both ways manage hal_spi_datasize_8bit and hal_spi_datasize_16bit, for number of frames = 1 or higher.
+// prior to 29 jan 2016 we used used uint8_t* buffers but managed only teh case hal_spi_datasize_8bit and 1 frame only
+
+#define HAL_MANAGE_ISRFRAMES_WITH_FIFO
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -83,16 +91,15 @@ const hal_spi_cfg_t hal_spi_cfg_default =
     .direction                  = hal_spi_dir_rxonly,
     .activity                   = hal_spi_act_framebased,      
     .prescaler                  = hal_spi_prescaler_064,   
-    .maxspeed                   = 0,           
-    .sizeofframe                = 4,
+    .maxspeed                   = 0,  
+    .datasize                   = hal_spi_datasize_8bit,    
+    .maxsizeofframe             = 4,
     .capacityoftxfifoofframes   = 0,
     .capacityofrxfifoofframes   = 1,
-    //.dummytxvalue               = 0x00,    //removable?
-        //.starttxvalue               = 0x00,    //removable?
-    .onframetransm              = NULL,
-    .argonframetransm           = NULL,
-    .onframereceiv              = NULL,
-    .argonframereceiv           = NULL,
+    .onframestransmitted        = NULL,
+    .argonframestransmitted     = NULL,
+    .onframesreceived           = NULL,
+    .argonframesreceived        = NULL,
     .cpolarity                  = hal_spi_cpolarity_high,
 };
 
@@ -102,18 +109,25 @@ const hal_spi_cfg_t hal_spi_cfg_default =
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
 
+
 typedef struct
 {
     hal_spi_cfg_t       config;
-    //hl_spi_cfg_t                adv_config;
-    //uint8_t*            dummytxframe; //removable?
-    uint8_t*            isrrxframe;
-    uint8_t             isrrxcounter;
-    uint8_t*            isrtxframe;
-    hl_fifo_t*          fiforx;
     hal_spi_t           id;
-    uint8_t             frameburstcountdown;
     hal_bool_t          isrisenabled;
+    uint8_t             sizeofframe;            // cannot be higher than config.maxsizeofframe. it can be configured for each transmission
+    uint8_t             sizeofword;             // it is 1 or 2 depending on hal_spi_datasize_8bit or hal_spi_datasize_16bit
+    hl_fifo_t*          fiforx;                 // it is a fifo of rx frames. the basic item is a frame, whose size if cfg->maxsizeofframe*1 or cfg->maxsizeofframe*2 depending on hal_spi_datasize_8bit or hal_spi_datasize_16bit
+    uint8_t             rxWORDScounter;         // it forward counts the rx words until a frame is reached. its range is [0, sizeoframeinuse-1]
+    uint8_t             rxFRAMEScountdown;      // it backard counts the rx frames. it is initted by hal_spi_start() and reding continues until it reaches zero.
+#if defined(HAL_MANAGE_ISRFRAMES_WITH_FIFO)
+    hl_fifo_t*          rxFIFOisrframe; 
+    hl_fifo_t*          txFIFOisrframe;
+    uint8_t*            userdeftxframe;
+#else
+    uint8_t*            rxBUFFERisrframe;
+    uint8_t*            txBUFFERisrframe;   
+#endif    
 } hal_spi_internal_item_t;
 
 
@@ -277,16 +291,19 @@ extern hal_result_t hal_spi_start(hal_spi_t id, uint8_t numberofframes)
 {
     hal_spi_internal_item_t* intitem = s_hal_spi_theinternals.items[HAL_spi_id2index(id)];
     
-        //SPI low level identifier
+    //SPI low level identifier
     SPI_TypeDef* SPIx = HAL_spi_id2stmSPI(id);
-      //numberofframes is ignored. 1 is always used
-    const uint8_t num2use = 1;
+
 
 #if !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)      
     if(hal_false == hal_spi_initted_is(id))
     {
         return(hal_res_NOK_generic);
     } 
+    if(0 == numberofframes)
+    {
+        return(hal_res_NOK_generic);
+    }
 #endif    
 
 //#if 0    
@@ -300,22 +317,39 @@ extern hal_result_t hal_spi_start(hal_spi_t id, uint8_t numberofframes)
     s_hal_spi_rx_isr_disable(id);       
     
     // tells how many frames to use
-    intitem->frameburstcountdown = num2use;
+    intitem->rxFRAMEScountdown = numberofframes;
         
-    // reset isrrxframe, isrtxframe and its counter  
-    memset(intitem->isrrxframe, 0, intitem->config.sizeofframe);
-    intitem->isrrxcounter = 0;
+    // clear rx frame + rxWORDScounter 
+#if defined(HAL_MANAGE_ISRFRAMES_WITH_FIFO)    
+    hl_fifo_clear(intitem->rxFIFOisrframe);
+    intitem->rxWORDScounter = 0;
+#else    
+    memset(intitem->rxBUFFERisrframe, 0, intitem->config.maxsizeofframe * intitem->sizeofword);
+    intitem->rxWORDScounter = 0;
+#endif
+
+    // need to send the first value as someone loaded into tx frame
+   
+#if defined(HAL_MANAGE_ISRFRAMES_WITH_FIFO)
+    uint16_t data = 0;
+    uint8_t* dd = NULL;
+    if(hl_res_OK == hl_fifo_get(intitem->txFIFOisrframe, dd, NULL))
+    {
+        data = (1 == intitem->sizeofword) ? ( *dd ) : (  *((uint16_t*)dd)  ); 
+    }   // if someone does not reload the tx frame each time, then we transmit 0
+#else
+    uint16_t data = intitem->txBUFFERisrframe[0];
+#endif
     
     s_hal_spi_rx_isr_enable(id);        // enable interrupt rx
 
     s_hal_spi_periph_enable(id);        // enable spi peripheral
     
-    //Need to send the first value inside the isrtxframe array
+    // wait till spi is ready
     while (SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_TXE) == RESET);
-    SPI_I2S_SendData(SPIx, intitem->isrtxframe[0]);
-
-    // ok, the isr shall read n frames of m bytes each and then issue a callback to me.
-    // n = intitem->frameburstcountdown (=1 for encoder), and m = intitem->config.sizeofframe (=3 for encoder)
+    SPI_I2S_SendData(SPIx, data);
+    
+    // and now processing is done by the ISR
     
     return(hal_res_OK);    
 }
@@ -327,10 +361,10 @@ extern hal_bool_t hal_spi_active_is(hal_spi_t id)
     
     if(hal_false == hal_spi_initted_is(id))
     {
-        return(hal_true);
+        return(hal_false);
     }  
   
-    return((0 == intitem->frameburstcountdown) ? (hal_true) : (hal_false));     
+    return((0 != intitem->rxFRAMEScountdown) ? (hal_true) : (hal_false));     
 }
 
 
@@ -377,7 +411,7 @@ extern hal_result_t hal_spi_get(hal_spi_t id, uint8_t* rxframe, uint8_t* remaini
 // }
 */
 
-extern hal_result_t hal_spi_on_framereceiv_set(hal_spi_t id, hal_callback_t onframereceiv, void* arg)
+extern hal_result_t hal_spi_on_framesreceived_set(hal_spi_t id, hal_callback_t onframesreceived, void* arg)
 {
     hal_spi_internal_item_t* intitem = s_hal_spi_theinternals.items[HAL_spi_id2index(id)]; 
 
@@ -388,8 +422,8 @@ extern hal_result_t hal_spi_on_framereceiv_set(hal_spi_t id, hal_callback_t onfr
     }
 #endif
     
-    intitem->config.onframereceiv       = onframereceiv;
-    intitem->config.argonframereceiv    = arg;
+    intitem->config.onframesreceived       = onframesreceived;
+    intitem->config.argonframesreceived    = arg;
     
     return(hal_res_OK);    
 }
@@ -456,9 +490,29 @@ extern hal_result_t hal_spi_set_isrtxframe(hal_spi_t id, const uint8_t* txframe)
     }
 #endif
     
-    // Maybe to be changed
-    memcpy(intitem->isrtxframe, txframe, (intitem->config.sizeofframe)*sizeof(uint8_t));
-    return (hal_res_OK);
+#if defined(HAL_MANAGE_ISRFRAMES_WITH_FIFO)
+    if(NULL == txframe)
+    {
+        memset(intitem->userdeftxframe, 0, intitem->config.maxsizeofframe * intitem->sizeofword);
+        hl_fifo_clear(intitem->txFIFOisrframe);         
+    }
+    else 
+    {
+        memcpy(intitem->userdeftxframe, txframe, intitem->config.maxsizeofframe * intitem->sizeofword);
+        hl_fifo_load(intitem->txFIFOisrframe, txframe); 
+    }
+#else  
+    if(NULL == txframe)
+    {
+        memset(intitem->txBUFFERisrframe, 0, intitem->config.maxsizeofframe * intitem->sizeofword);
+    }
+    else
+    {
+        memcpy(intitem->txBUFFERisrframe, txframe, intitem->config.maxsizeofframe * intitem->sizeofword);
+    }
+#endif    
+        
+    return(hal_res_OK);
 }
 
 extern hal_result_t hal_spi_set_sizeofframe(hal_spi_t id, uint8_t framesize)
@@ -471,8 +525,14 @@ extern hal_result_t hal_spi_set_sizeofframe(hal_spi_t id, uint8_t framesize)
     }
 #endif
     
-    intitem->config.sizeofframe = framesize;
-    return (hal_res_OK);
+    if(framesize > intitem->config.maxsizeofframe)
+    {
+        return(hal_res_NOK_generic);
+    }
+
+    intitem->sizeofframe = framesize;
+    
+    return(hal_res_OK);
 }
 
 extern hal_result_t hal_spi_deinit(hal_spi_t id)
@@ -551,50 +611,115 @@ static void s_hal_spi_read_isr(hal_spi_t id)
     hal_spi_internal_item_t* intitem = s_hal_spi_theinternals.items[HAL_spi_id2index(id)]; 
     SPI_TypeDef* SPIx = HAL_spi_id2stmSPI(id);
      
-    uint8_t rxbyte = SPI_I2S_ReceiveData(SPIx);
+    uint16_t rxword = SPI_I2S_ReceiveData(SPIx);
      
-    if(intitem->isrrxcounter < intitem->config.sizeofframe)
+    if(intitem->rxWORDScounter < intitem->sizeofframe)
     {
-        intitem->isrrxframe[intitem->isrrxcounter] = rxbyte;
-        intitem->isrrxcounter ++;
+#if defined(HAL_MANAGE_ISRFRAMES_WITH_FIFO)        
+        hl_fifo_put(intitem->rxFIFOisrframe, (uint8_t*)&rxword);
+#else        
+        memcpy(&intitem->rxBUFFERisrframe[intitem->rxWORDScounter * intitem->sizeofword], &rxword, intitem->sizeofword); // this is generic
+        //        intitem->rxBUFFERisrframe[intitem->rxWORDScounter] = (uint8_t) rxword; // marco.accame: this is good only if datasize is 8 bit
+#endif        
+        intitem->rxWORDScounter ++;
     }
      
-    if(intitem->isrrxcounter == intitem->config.sizeofframe)
-    {   // ok. the frame is finished
-        // 1. stop spi 
-        s_hal_spi_periph_disable(id);           // disable periph
-        s_hal_spi_rx_isr_disable(id);           // disable interrupt rx
-                
-        // set back to zero the frame burst
-        intitem->frameburstcountdown = 0;
-        // set rx counter to zero again
-        intitem->isrrxcounter = 0;
-            
-        // Erase the isrtxframe
-        memset(intitem->isrtxframe, 0, intitem->config.sizeofframe);
+    if(intitem->rxWORDScounter == intitem->sizeofframe)
+    {   // received a full frame.
         
-        // copy the rxframe into the rx fifo
+        // reset word counter and decrement the frame counter
+        intitem->rxWORDScounter = 0;
+        intitem->rxFRAMEScountdown --;
+        
+        // eval if to stop activity
+        hal_bool_t stopActivity = (0 == intitem->rxFRAMEScountdown) ? (hal_true) : (hal_false);
+
+//        if(hal_true == stopActivity)
+//        {
+////            // 1. stop spi 
+////            s_hal_spi_periph_disable(id);           // disable periph
+////            s_hal_spi_rx_isr_disable(id);           // disable interrupt rx
+////            
+////            // clear tx frame
+////#if defined(HAL_MANAGE_ISRFRAMES_WITH_FIFO)
+////            hl_fifo_clear(intitem->txFIFOisrframe);
+////#else
+////            memset(intitem->txBUFFERisrframe, 0, intitem->config.maxsizeofframe * intitem->sizeofword);  
+////#endif              
+//        }
+                
+       
+        // always: copy rx frame into the rx fifo of all the frames     
         
         if(hl_true == hl_fifo_full(intitem->fiforx))
-        {
+        {   // if the fifo is full, drop first element
             hl_fifo_pop(intitem->fiforx);
         }
-        hl_fifo_put(intitem->fiforx, intitem->isrrxframe);         
-        
-        // now manage the callback
-        hal_callback_t onframereceiv = intitem->config.onframereceiv;
-        void *arg = intitem->config.argonframereceiv;     
-        if(NULL != onframereceiv)
+
+        uint8_t *data = NULL;
+#if defined(HAL_MANAGE_ISRFRAMES_WITH_FIFO)        
+        data = hl_fifo_front(intitem->rxFIFOisrframe); // front because we want to retrieve the whole frame
+#else        
+        data = intitem->rxBUFFERisrframe; 
+#endif        
+        hl_fifo_put(intitem->fiforx, data);  
+
+         
+        // always: clear rx frame
+#if defined(HAL_MANAGE_ISRFRAMES_WITH_FIFO)         
+        hl_fifo_clear(intitem->rxFIFOisrframe);
+#else        
+        memset(intitem->rxBUFFERisrframe, 0, intitem->config.maxsizeofframe * intitem->sizeofword);
+#endif  
+
+        if(hal_true == stopActivity)
         {
-            onframereceiv(arg);
+            // 1. stop spi 
+            s_hal_spi_periph_disable(id);           // disable periph
+            s_hal_spi_rx_isr_disable(id);           // disable interrupt rx
+            
+            // 2. clear tx frame
+#if defined(HAL_MANAGE_ISRFRAMES_WITH_FIFO)
+            hl_fifo_clear(intitem->txFIFOisrframe);
+            memset(intitem->userdeftxframe, 0, intitem->config.maxsizeofframe * intitem->sizeofword);
+#else
+            memset(intitem->txBUFFERisrframe, 0, intitem->config.maxsizeofframe * intitem->sizeofword);  
+#endif              
+            
+            // now manage the callback
+            hal_callback_t onframesreceived = intitem->config.onframesreceived;
+            void *arg = intitem->config.argonframesreceived;     
+            if(NULL != onframesreceived)
+            {
+                onframesreceived(arg);
+            }
         }
+        else
+        {
+#if defined(HAL_MANAGE_ISRFRAMES_WITH_FIFO)
+            // reload the txFIFOisrframe with what the user previously set
+            hl_fifo_load(intitem->txFIFOisrframe, intitem->userdeftxframe);
+#endif            
+        }
+        
+        // ok: we have done
     }
     else
     {
-        // transmit one dummy byte to trigger yet another reception
-        // SPI_I2S_SendData(SPIx, intitem->config.dummytxvalue);
-        // transmit the corresponding byte to trigger another reception
-        SPI_I2S_SendData(SPIx, intitem->isrtxframe[intitem->isrrxcounter]);
+        // transmit one dummy word to trigger another reception
+        uint16_t data = 0;
+        uint8_t* dd = NULL;
+#if defined(HAL_MANAGE_ISRFRAMES_WITH_FIFO)         
+        hl_fifo_get(intitem->txFIFOisrframe, dd, NULL);
+        if(NULL != dd)
+        {
+            data = (1 == intitem->sizeofword) ? ( *dd ) : (  *((uint16_t*)dd)  );  
+        } 
+#else 
+        dd = &intitem->txBUFFERisrframe[intitem->rxWORDScounter * intitem->sizeofword];
+        data = *dd;
+#endif            
+        SPI_I2S_SendData(SPIx, data);
     }
 }
 
@@ -608,10 +733,12 @@ static void s_hal_spi_initted_set(hal_spi_t id)
 {
     hl_bits_word_bitset(&s_hal_spi_theinternals.inittedmask, HAL_spi_id2index(id));
 }
+
 static void s_hal_spi_initted_reset(hal_spi_t id)
 {
     hl_bits_word_bitclear(&s_hal_spi_theinternals.inittedmask, HAL_spi_id2index(id));
 }
+
 static hal_boolval_t s_hal_spi_initted_is(hal_spi_t id)
 {   
     return((hal_boolval_t)hl_bits_word_bitcheck(s_hal_spi_theinternals.inittedmask, HAL_spi_id2index(id)));
@@ -682,6 +809,8 @@ static hal_result_t s_hal_spi_init(hal_spi_t id, const hal_spi_cfg_t *cfg)
         hl_spi_advcfg_ems4rd.SPI_CPOL = SPI_CPOL_Low;
     }
 
+    hl_spi_advcfg_ems4rd.SPI_DataSize = (hal_spi_datasize_16bit == cfg->datasize) ? (SPI_DataSize_16b) : (SPI_DataSize_8b);
+
     //SPI1 has a different clock
     if (hal_spi1 == id)
     {
@@ -726,22 +855,37 @@ static hal_result_t s_hal_spi_init(hal_spi_t id, const hal_spi_cfg_t *cfg)
     usedcfg = &intitem->config;    
     
     // only frame-based
+    intitem->sizeofframe = usedcfg->maxsizeofframe;
+    intitem->sizeofword = (hal_spi_datasize_16bit == usedcfg->datasize) ? (2) : (1);
+ 
+    volatile uint8_t sss = intitem->sizeofword;
+    sss = sss;
     
     // - the isr rx frame (heap allocation)  
-    intitem->isrrxframe = (uint8_t*)hal_heap_new(usedcfg->sizeofframe);    
-    intitem->isrrxcounter = 0;
+#if defined(HAL_MANAGE_ISRFRAMES_WITH_FIFO)    
+    intitem->rxFIFOisrframe = hl_fifo_new(usedcfg->maxsizeofframe, intitem->sizeofword, NULL);
+#else    
+    intitem->rxBUFFERisrframe = (uint8_t*)hal_heap_new(usedcfg->maxsizeofframe * intitem->sizeofword);    
+#endif 
+    // reset counter
+    intitem->rxWORDScounter = 0;
         
-        // - the isr tx frame (heap allocation)
-    intitem->isrtxframe = (uint8_t*)hal_heap_new(usedcfg->sizeofframe);    
- 
+    // - the isr tx frame (heap allocation)
+#if defined(HAL_MANAGE_ISRFRAMES_WITH_FIFO)      
+    intitem->txFIFOisrframe = hl_fifo_new(usedcfg->maxsizeofframe, intitem->sizeofword, NULL);
+    intitem->userdeftxframe = (uint8_t*)hal_heap_new(usedcfg->maxsizeofframe * intitem->sizeofword);
+#else    
+    intitem->txBUFFERisrframe = (uint8_t*)hal_heap_new(usedcfg->maxsizeofframe * intitem->sizeofword);    
+#endif
+
     // - the fifo of rx frames. but only if it is needed ... we dont need it if ...
-    intitem->fiforx = hl_fifo_new(usedcfg->capacityofrxfifoofframes, usedcfg->sizeofframe, NULL);
+    intitem->fiforx = hl_fifo_new(usedcfg->capacityofrxfifoofframes, usedcfg->maxsizeofframe * intitem->sizeofword, NULL);
         
     // - the id
     intitem->id = id;
 
-    // - frameburstcountdown
-    intitem->frameburstcountdown = 0;
+    // - rxFRAMEScountdown
+    intitem->rxFRAMEScountdown = 0;
    
     // -- locked
     intitem->isrisenabled = hal_false;
@@ -754,9 +898,11 @@ static hal_result_t s_hal_spi_init(hal_spi_t id, const hal_spi_cfg_t *cfg)
          
     return(hal_res_OK);
 }
+
+
 static hal_bool_t s_hal_spi_config_is_correct(hal_spi_t id, const hal_spi_cfg_t *cfg)
 {
-    // mild verification of the config: ownership, activity, sizeofframe, direction, capacity of frames.
+    // mild verification of the config: ownership, activity, maxsizeofframe, direction, capacity of frames.
     // so far we support only master, framebase, rxonly   
     
 //     if(hal_false == s_hal_spi_is_speed_correct(cfg->prescaler, cfg->maxspeed))
@@ -774,7 +920,7 @@ static hal_bool_t s_hal_spi_config_is_correct(hal_spi_t id, const hal_spi_cfg_t 
         return(hal_false);
     }
 
-    if(0 == cfg->sizeofframe)
+    if(0 == cfg->maxsizeofframe)
     {
         return(hal_false);
     }    
