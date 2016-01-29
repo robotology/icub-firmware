@@ -2753,7 +2753,7 @@
       <Focus>0</Focus>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\mc4plus\appl\v2\src\eoappservices\EOCurrentsWatchdog.c</PathWithFileName>
+      <PathWithFileName>..\src\eoappservices\EOCurrentsWatchdog.c</PathWithFileName>
       <FilenameWithoutPath>EOCurrentsWatchdog.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>

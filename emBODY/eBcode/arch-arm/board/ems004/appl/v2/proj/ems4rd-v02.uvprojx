@@ -890,7 +890,7 @@
             <File>
               <FileName>EOCurrentsWatchdog.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\mc4plus\appl\v2\src\eoappservices\EOCurrentsWatchdog.c</FilePath>
+              <FilePath>..\src\eoappservices\EOCurrentsWatchdog.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2183,7 +2183,7 @@
             <File>
               <FileName>EOCurrentsWatchdog.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\mc4plus\appl\v2\src\eoappservices\EOCurrentsWatchdog.c</FilePath>
+              <FilePath>..\src\eoappservices\EOCurrentsWatchdog.c</FilePath>
             </File>
           </Files>
         </Group>
