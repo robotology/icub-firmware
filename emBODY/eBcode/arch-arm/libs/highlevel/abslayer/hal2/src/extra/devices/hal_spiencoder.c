@@ -79,20 +79,20 @@ const hal_spiencoder_cfg_t hal_spiencoder_cfg_default =
 
 typedef struct
 {
-    hal_spiencoder_cfg_t       config;
-    hal_mux_t               muxid;
-    hal_gpio_t              chip_sel;
-    hal_mux_sel_t           muxsel;
-    hal_spi_t               spiid;
-    hal_spiencoder_position_t  position;
-    uint8_t                 rxframes[3][4]; //3 possible frames received. The size of everyone is the maximum possible
+    hal_spiencoder_cfg_t        config;
+    hal_mux_t                   muxid;
+    hal_gpio_t                  chip_sel;
+    hal_mux_sel_t               muxsel;
+    hal_spi_t                   spiid;
+    hal_spiencoder_position_t   position;
+    uint8_t                     rxframes[3][4]; // 3 possible frames received. The size of everyone is the maximum possible
 } hal_spiencoder_internal_item_t;
 
 
 typedef struct
 {
     uint32_t                                inittedmask;
-    hal_spiencoder_internal_item_t*            items[hal_spiencoders_number];   
+    hal_spiencoder_internal_item_t*         items[hal_spiencoders_number];   
 } hal_spiencoder_theinternals_t;
 
 
@@ -134,15 +134,16 @@ static const hal_spi_cfg_t s_hal_spiencoder_spicfg_master =
 //     .maxspeed                   = 0, 
     .prescaler                  = hal_spi_prescaler_auto,
     .maxspeed                   = 1000*1000,   
-    .sizeofframe                = 3,
+    .datasize                   = hal_spi_datasize_8bit,
+    .maxsizeofframe             = 3, // 3 is for aea.
     .capacityoftxfifoofframes   = 0,
     .capacityofrxfifoofframes   = 1,
     //.dummytxvalue               = 0x00, //removable?
     //.starttxvalue               = 0x00,    //removable?
-    .onframetransm              = NULL,
-    .argonframetransm           = NULL,
-    .onframereceiv              = NULL,
-    .argonframereceiv           = NULL,
+    .onframestransmitted        = NULL,
+    .argonframestransmitted     = NULL,
+    .onframesreceived           = NULL,
+    .argonframesreceived        = NULL,
     .cpolarity                  = hal_spi_cpolarity_high,
 };
 
@@ -233,9 +234,9 @@ extern hal_result_t hal_spiencoder_init(hal_spiencoder_t id, const hal_spiencode
         
     if (intitem->config.type == hal_spiencoder_typeAMO)
     {
-        //We use the master SPI configuration for encoder type 2 (AMO)
-        //This sizeofframe is used as an upper bound for reserving heap memory during the initialization (hal_spi level) 
-        spicfg.sizeofframe = 4;
+        // We use the master SPI configuration for encoder type 2 (AMO)
+        // This sizeofframe is used as an upper bound for reserving heap memory during the initialization (hal_spi level) 
+        spicfg.maxsizeofframe = 4;
         spicfg.cpolarity = hal_spi_cpolarity_low;
     }
         
@@ -273,7 +274,7 @@ extern hal_result_t hal_spiencoder_read_start(hal_spiencoder_t id)
         hal_mux_enable(intitem->muxid, intitem->muxsel);
 
         // SPI: set the callback function
-        hal_spi_on_framereceiv_set(intitem->spiid, s_hal_spiencoder_onreceiv, (void*)id);
+        hal_spi_on_framesreceived_set(intitem->spiid, s_hal_spiencoder_onreceiv, (void*)id);
 
         //Added 26/11/2014
         //----------------
@@ -590,7 +591,7 @@ static hal_result_t s_hal_spiencoder_read_sdad_status_t2(hal_spiencoder_t id)
     static const uint8_t txframe_sdad[2] = {0xF5, 0x00};
         
     // SPI: set the callback function
-    hal_spi_on_framereceiv_set(intitem->spiid, s_hal_spiencoder_onreceiv_sdad_status, (void*)id);
+    hal_spi_on_framesreceived_set(intitem->spiid, s_hal_spiencoder_onreceiv_sdad_status, (void*)id);
     
     // SPI: set the sizeofframe for this transmission (2)
     hal_spi_set_sizeofframe(intitem->spiid, 2);
@@ -613,7 +614,7 @@ static hal_result_t s_hal_spiencoder_read_sensor_t2(hal_spiencoder_t id)
     hal_gpio_setval(intitem->chip_sel, hal_gpio_valLOW);
     
     // SPI: set the callback function
-    hal_spi_on_framereceiv_set(intitem->spiid, s_hal_spiencoder_onreceiv_sensor_data, (void*)id);
+    hal_spi_on_framesreceived_set(intitem->spiid, s_hal_spiencoder_onreceiv_sensor_data, (void*)id);
     
     // SPI: set the sizeofframe for this transmission (4)
     hal_spi_set_sizeofframe(intitem->spiid, 4);
@@ -644,7 +645,7 @@ static hal_result_t s_hal_spiencoder_read_register_init_t2(hal_spiencoder_t id)
     hal_gpio_setval(intitem->chip_sel, hal_gpio_valLOW);
     
     // SPI: set the callback function
-    hal_spi_on_framereceiv_set(intitem->spiid, s_hal_spiencoder_onreceiv_reg_init, (void*)id);
+    hal_spi_on_framesreceived_set(intitem->spiid, s_hal_spiencoder_onreceiv_reg_init, (void*)id);
     
     // SPI: set the sizeofframe for this transmission (2)
     hal_spi_set_sizeofframe(intitem->spiid, 2);
@@ -667,7 +668,7 @@ static hal_result_t s_hal_spiencoder_read_register_execute_t2(hal_spiencoder_t i
     hal_gpio_setval(intitem->chip_sel, hal_gpio_valLOW);
     
     // SPI: set the callback function
-    hal_spi_on_framereceiv_set(intitem->spiid, s_hal_spiencoder_onreceiv_reg_data, (void*)id);
+    hal_spi_on_framesreceived_set(intitem->spiid, s_hal_spiencoder_onreceiv_reg_data, (void*)id);
     
     // SPI: set the sizeofframe for this transmission (3)
     hal_spi_set_sizeofframe(intitem->spiid, 3);
