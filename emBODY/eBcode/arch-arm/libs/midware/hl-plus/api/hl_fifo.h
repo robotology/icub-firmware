@@ -122,6 +122,15 @@ extern void hl_fifo_delete(hl_fifo_t *fifo);
 extern hl_result_t hl_fifo_init(hl_fifo_t *fifo, uint8_t capacity, uint8_t sizeofitem, uint8_t *dataforfifo, uint8_t *iteminitval);
 
 
+/** @fn         extern hl_result_t hl_fifo_load(hl_fifo_t *fifo, const uint8_t *data)
+    @brief      It first reset the fifo and the copies inside all the data to completely fill the available space. 
+    @param      fifo        The fifo
+    @param      data        The pointer to item to be copied inside.
+    @return     hl_res_OK on success and hl_res_NOK_generic if the fifo or data is NULL.
+ **/
+extern hl_result_t hl_fifo_load(hl_fifo_t *fifo, const uint8_t *data);
+
+
 /** @fn         extern void hl_fifo_reset(hl_fifo_t *fifo)
     @brief      It resets the fifo by setting its size to zero.
     @param      fifo        The fifo

@@ -245,11 +245,28 @@ extern void hl_fifo_clear(hl_fifo_t *fifo)
     fifo->index = 0;
 }
 
+extern hl_result_t hl_fifo_load(hl_fifo_t *fifo, const uint8_t *data)
+{
+#if     !defined(HL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)  
+    if((NULL == fifo) || (NULL == data)) 
+    {
+        return(hl_res_NOK_generic);
+    }
+#endif  
+
+    memcpy(&(fifo->data[0]), data, fifo->sizeofitem * fifo->capacity);   
+
+    fifo->size = fifo->capacity;
+    fifo->index = 0;    
+   
+    return(hl_res_OK);    
+}
+
 
 extern hl_result_t hl_fifo_put(hl_fifo_t *fifo, uint8_t *data)
 {
 #if     !defined(HL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)  
-    if(NULL == fifo) // dat can be NULL
+    if(NULL == fifo) // data can be NULL
     {
         return(hl_res_NOK_generic);
     }
