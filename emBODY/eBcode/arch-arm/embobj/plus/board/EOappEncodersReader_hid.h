@@ -45,91 +45,93 @@
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
 
+
 /** @typedef    struct eOappEncReader_stream_t
     @brief      contains representation of an SPI stream of hal encoders. They all must be of the same type.
  **/
 typedef struct 
 {
-    hal_spiencoder_type_t      type;                               /**< the type of SPI encoders. They must be all homogeneous */
-    uint8_t                 numberof;                           /**< their number inside encoders[] */
+    hal_spiencoder_type_t   type;                               /**< the type of SPI encoders. it must be only one */
+    uint8_t                 numberof;                           /**< their number inside the stream */
+    volatile eObool_t       isacquiring;                        // we shoudl use it in the future to see if acquisition is still ongoing. infact also the incremental are mapped into streams
 } eOappEncReader_stream_t;
 
-//typedef enum
-//{
-//    eo_appEncReader_stream0     = 0,  /* SPI stream 0 */ 
-//    eo_appEncReader_stream1     = 1,  /* SPI stream 1 */
-//    eo_appEncReader_streamNONE  = 255 /* SPI stream NOT DEFINED */     
-//} eo_appEncReader_stream_number_t;
-
-//enum { eo_appEncReader_streams_numberof = hal_spiencoder_streams_number };
-
-//typedef enum
-//{
-//    eo_appEncReader_stream_position0    = 0,  
-//    eo_appEncReader_stream_position1    = 1,  
-//    eo_appEncReader_stream_position2    = 2,
-//    eo_appEncReader_stream_positionNONE = 255,    
-//} eo_appEncReader_stream_position_t;
-
-//enum { eo_appEncReader_stream_position_numberof = hal_spiencoder_maxnumber_in_stream };
-
-
-//typedef enum
-//{
-//    hal_spiencoder_spistream0      = 0,
-//    hal_spiencoder_spistream1      = 1,
-//    hal_spiencoder_spistreamNONE   = 255   
-//} hal_spiencoder_spistream_t; 
-
-
-
-//typedef struct
-//{
-//    uint8_t     numberofspiencoders;
-//    uint8_t     numberofspiencodersStream0;
-//    uint8_t     numberofspiencodersStream1;
-//    uint8_t     maskofsupported[hal_spiencoders_number];
-//    uint8_t     usedstream[hal_spiencoders_number];
-//    uint8_t     indexinstream[hal_spiencoders_number];
-//} hal_spiencoder_spimapping_t;
 
 // the application is able to read until a maximum of 6 encoders (EMS board): 3 connected with one SPI (SPI2) and others 3 connected with another SPI bus (SPI3).
 //
 
 typedef struct
 {
-    hal_spiencoder_t first;                                      /**< indicates the first encoder to read */
-    hal_spiencoder_t list[hal_spiencoder_maxnumber_in_stream+1];   /**< for the encoder i-th: in list[i] the encoder i-th finds the number of encoder it must start when it has finish its onw read. */
-} EOappEncReader_configEncSPIXReadSequence_hid_t;
+    hal_spiencoder_t first;                                         /**< indicates the first encoder to read */
+    hal_spiencoder_t list[hal_spiencoder_maxnumber_in_stream+1];    /**< for the encoder i-th: in list[i] the encoder i-th finds the number of encoder it must start when it has finish its onw read. */
+} EOappEncReader_streamedSPIsequence_t;
 
 
 typedef enum
 {
-    eOEncReader_readSt__idle      = 0,
-    eOEncReader_readSt__started   = 1,
-    eOEncReader_readSt__finished  = 2  
-} eOappEncReader_readStatusSPIX_t;
+    encreader_spistatus_idle      = 0,
+    encreader_spistatus_reading   = 1,
+    encreader_spistatus_finished  = 2  
+} eOappEncReader_SPIstatus_t;
 
 
 typedef struct
 {
-    eOappEncReader_readStatusSPIX_t                 st;                  /**< contains the status of reading on SPIX (1 or 3) */
-    eo_appEncReader_encoder_type_t                  enc_type;            /**< the type of the encoder to be read (AEA and AMO supported) */
-    uint8_t                                         enc_numbers;         //number of encoders associated
-    uint8_t                                         enc_number_supported;
-    EOappEncReader_configEncSPIXReadSequence_hid_t  readSeq;             /**< contains the sequence of reading of encoders connected to a stream */ 
-} EOappEncReader_confEncDataPerSPI_hid_t;
+    volatile eOappEncReader_SPIstatus_t     spiStatus;              /**< contains the status of reading */
+    eo_appEncReader_encoder_type_t          encType;                /**< the type of the encoder to be read (AEA and AMO supported) */
+    uint8_t                                 numberofencoders;       // the number of encoders associated to stream
+    uint8_t                                 maxsupportedencoders;
+    EOappEncReader_streamedSPIsequence_t    sequence;               /**< contains the sequence of reading of encoders connected to a stream */ 
+} EOappEncReader_SPIstream_config_t;
 
+
+typedef struct
+{
+    volatile eOappEncReader_SPIstatus_t     spiStatus;          /**< contains the status of reading  */
+    eo_appEncReader_encoder_type_t          encType;            /**< the type of the encoder to be read  */
+    uint8_t                                 numberofencoders;   // the number of encoders associated to stream
+    uint8_t                                 maxsupportedencoders;
+    hal_spiencoder_t                        singleport;
+} EOappEncReader_SPIchained_config_t;
+
+
+// in future: instead of the above two struct use the following
+// 
+//typedef struct
+//{
+//    volatile eOappEncReader_SPIstatus_t     spiStatus;          /**< contains the status of reading  */
+//    eo_appEncReader_encoder_type_t          encType;            /**< the type of the encoder to be read  */
+//    uint8_t                                 numberofencoders;   // the number of encoders associated to stream
+//    uint8_t                                 maxsupportedencoders;
+//} EOappEncReader_SPIstreamConfig_t;
+// 
+//typedef union
+//{
+//    hal_spiencoder_t                        singleport;
+//    EOappEncReader_streamedSPIsequence_t    sequence;
+//} EOappEncReader_SPIstreamports_t;
+// 
+//typedef struct
+//{
+//    EOappEncReader_SPIstreamConfig_t        streamconfig;
+//    EOappEncReader_SPIstreamports_t         streamports;
+//} EOappEncReader_SPIstream_t;
+
+//enum { encoder_readingtype_spichained = 0, encoder_readingtype_spistreamed = 1, encoder_readingtype_other = 2, encoder_readingtypes_numberof = 3 };
 
 struct EOappEncReader_hid
 {
     eObool_t                                initted;
     eObool_t                                active;
-    const hal_spiencoder_stream_map_t*         stream_map;
+    uint8_t                                 totalnumberofencoders; // it cannot be higher than eOappEncReader_encoders_maxnumberof
+    const hal_spiencoder_stream_map_t*      stream_map;
     eOappEncReader_cfg_t                    config;       
     eOappEncReader_stream_t                 SPI_streams[hal_spiencoder_streams_number];  // SPI streams; must be coherent with what inside cfg
-    EOappEncReader_confEncDataPerSPI_hid_t  configuredEnc_SPI_stream0;      /* Encoders configured on the first  SPI stream */
-    EOappEncReader_confEncDataPerSPI_hid_t  configuredEnc_SPI_stream1;      /* Encoders configured on the second SPI stream */
+    EOappEncReader_SPIstream_config_t       configofSPIstream0;      /* encoders of type aea or amo configured on the first  SPI stream */
+    EOappEncReader_SPIstream_config_t       configofSPIstream1;      /* encoders of type aea or amo configured on the second SPI stream */
+    EOappEncReader_SPIchained_config_t      configofSPIChained[hal_spiencoder_streams_number];  // at most 
+    eo_appEncReader_encoder_type_t          encodertype[eOappEncReader_encoders_maxnumberof];
+    //volatile uint8_t                        maskofacquiringspichained;
     uint64_t                                times[2][4];
 }; 
 

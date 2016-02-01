@@ -52,15 +52,16 @@ typedef struct EOappEncReader_hid  EOappEncReader;
 
 typedef enum
 {
-    eo_appEncReader_enc_type_AEA  = 0,  /* AEA encoder (SPI) */ 
-    eo_appEncReader_enc_type_AMO  = 1,  /* AMO encoder (SPI) */
-    eo_appEncReader_enc_type_INC  = 2,  /* Incremental/Quadrature Encoder */
-    eo_appEncReader_enc_type_ADH  = 3,  /* Analogic Hall Effect Encoder */
-    eo_appEncReader_enc_type_MAIS = 4,  /* Encoder position coming from MAIS can board. the field port specifies the kind of finger is requested */ 
-    eo_appEncReader_enc_type_NONE = 255 /* Encoder NOT DEFINED */
+    eo_appEncReader_enc_type_AEA            = 0,  /* AEA encoder (SPI) */ 
+    eo_appEncReader_enc_type_AMO            = 1,  /* AMO encoder (SPI) */
+    eo_appEncReader_enc_type_INC            = 2,  /* Incremental/Quadrature Encoder */
+    eo_appEncReader_enc_type_ADH            = 3,  /* Analogic Hall Effect Encoder */
+    eo_appEncReader_enc_type_MAIS           = 4,  /* Encoder position coming from MAIS can board. the field port specifies the kind of finger is requested */ 
+    eo_appEncReader_enc_type_SPICHAINOF2    = 5,
+    eo_appEncReader_enc_type_NONE           = 255 /* Encoder NOT DEFINED */
 } eo_appEncReader_encoder_type_t;
 
-enum { eo_appEncReader_enc_type_numberof = 5 };
+enum { eo_appEncReader_enc_type_numberof = 6 };
 
 
 enum 
@@ -101,8 +102,11 @@ typedef struct
 } eOappEncReader_jomoconfig_t;
 
 
-// the value is referred to the maximum number of joint-motors directly managed by this object. for MC4plus, hw limitations lower this number to 4 
-enum { eOappEncReader_jomos_maxnumberof = 6 }; 
+// the value is referred to the maximum number of joint-motors directly managed by this object.
+enum { eOappEncReader_jomos_maxnumberof = 4 }; 
+
+// the value is referred to the maximum number of encoder directly managed by this object. there are 
+enum { eOappEncReader_encoders_maxnumberof = 2*eOappEncReader_jomos_maxnumberof }; 
 
 
 /** @typedef    struct eOappEncReader_cfg_t
@@ -111,9 +115,7 @@ enum { eOappEncReader_jomos_maxnumberof = 6 };
 typedef struct
 {   
     uint8_t                     numofjomos;  
-    eOappEncReader_jomoconfig_t jomoconfig[eOappEncReader_jomos_maxnumberof];   
-//    eOcallback_t                SPI_callbackOnLastRead;                     
-//    void*                       SPI_callback_arg;                           
+    eOappEncReader_jomoconfig_t jomoconfig[eOappEncReader_jomos_maxnumberof];                           
 } eOappEncReader_cfg_t;
 
 
@@ -144,15 +146,12 @@ extern eOresult_t eo_appEncReader_Activate(EOappEncReader *p, eOappEncReader_cfg
 extern eOresult_t eo_appEncReader_Deactivate(EOappEncReader *p);
 
 
-//extern EOappEncReader* eo_appEncReader_New(eOappEncReader_cfg_t *cfg);
-
 extern eOresult_t eo_appEncReader_StartRead(EOappEncReader *p); 
 
 extern eObool_t eo_appEncReader_isReady(EOappEncReader *p);  
 
 // if eo_appEncReader_GetValue() has an error return value in runtime, then the primary_value and extra_value contains a value from eOappEncReader_errortype_t
-extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint32_t *primary_value,
-                                                uint32_t *extra_value, hal_spiencoder_errors_flags *flags);
+extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint32_t *primary_value, uint32_t *extra_value, hal_spiencoder_errors_flags *flags);
 
 
 /** @}            
