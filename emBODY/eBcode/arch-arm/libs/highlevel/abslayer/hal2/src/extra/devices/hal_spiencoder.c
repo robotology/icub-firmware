@@ -86,6 +86,7 @@ typedef struct
     hal_spi_t                   spiid;
     hal_spiencoder_position_t   position;
     uint8_t                     rxframes[3][4]; // 3 possible frames received. The size of everyone is the maximum possible
+    uint16_t                    rxframeschain[3];                   
 } hal_spiencoder_internal_item_t;
 
 
@@ -112,6 +113,7 @@ static hal_result_t s_hal_spiencoder_read_register_execute_t2(hal_spiencoder_t i
 
 //Static callback functions
 static void s_hal_spiencoder_onreceiv(void* p);
+static void s_hal_spiencoder_onreceived_daisychain(void* p);
 static void s_hal_spiencoder_onreceiv_sdad_status(void* p);
 static void s_hal_spiencoder_onreceiv_sensor_data(void* p);
 static void s_hal_spiencoder_onreceiv_reg_init(void* p);
@@ -232,12 +234,18 @@ extern hal_result_t hal_spiencoder_init(hal_spiencoder_t id, const hal_spiencode
     hal_spi_cfg_t spicfg;
     memcpy(&spicfg, &s_hal_spiencoder_spicfg_master, sizeof(hal_spi_cfg_t));
         
-    if (intitem->config.type == hal_spiencoder_typeAMO)
+    if(intitem->config.type == hal_spiencoder_typeAMO)
     {
         // We use the master SPI configuration for encoder type 2 (AMO)
         // This sizeofframe is used as an upper bound for reserving heap memory during the initialization (hal_spi level) 
         spicfg.maxsizeofframe = 4;
         spicfg.cpolarity = hal_spi_cpolarity_low;
+    }
+    else if(hal_spiencoder_typeCHAINof2 == intitem->config.type)
+    {
+        spicfg.maxsizeofframe = 2; 
+        spicfg.datasize = hal_spi_datasize_16bit;
+        spicfg.capacityofrxfifoofframes = 3; 
     }
         
     //we get the max speed of spi from what specified in hal_spiencoder__theboardconfig
@@ -267,7 +275,7 @@ extern hal_result_t hal_spiencoder_read_start(hal_spiencoder_t id)
 #endif
     
     
-    if (intitem->config.type == hal_spiencoder_typeAEA) // Encoder type 1 (AEA)
+    if(intitem->config.type == hal_spiencoder_typeAEA) // Encoder type 1 (AEA)
     {
         static const uint8_t txframe_dummy[3] = {0x00, 0x00, 0x00};
         // Mux enabled
@@ -291,9 +299,9 @@ extern hal_result_t hal_spiencoder_read_start(hal_spiencoder_t id)
         // when the frame is received, then the isr will call s_hal_spiencoder_onreceiv() to copy the frame into local memory,
         // so that hal_spiencoder_get_value() can be called to retrieve teh encoder value
     }    
-    else if (intitem->config.type == hal_spiencoder_typeAMO)    // Encoder type 2 (AMO)
+    else if(intitem->config.type == hal_spiencoder_typeAMO)    // Encoder type 2 (AMO)
     {        
-        //Enabling the MUX
+        // Enabling the MUX
         hal_mux_enable(intitem->muxid, intitem->muxsel);
 
         
@@ -308,6 +316,26 @@ extern hal_result_t hal_spiencoder_read_start(hal_spiencoder_t id)
             s_hal_spiencoder_read_sensor_t2 (id);
         }
     }
+    else if(hal_spiencoder_typeCHAINof2 == intitem->config.type)
+    {
+        // only in mc2plus ...
+        #warning TODO: code for hal_spiencoder_typeCHAINof2 is yet to be done.
+#if 0        
+        static const uint16_t txframe_dummy_chained[2] = {0x0000, 0x0000};
+
+        hal_mux_enable(intitem->muxid, intitem->muxsel);
+
+        hal_spi_on_framesreceived_set(intitem->spiid, s_hal_spiencoder_onreceived_daisychain, (void*)id);
+
+        hal_spi_set_sizeofframe(intitem->spiid, 2);
+
+        hal_spi_set_isrtxframe(intitem->spiid, (uint8_t*)txframe_dummy_chained);
+
+        hal_spi_start(intitem->spiid, 3); // 3 frames
+#endif                
+    }
+    
+    
     return(hal_res_OK);
 }
 
@@ -367,75 +395,80 @@ extern hal_result_t hal_spiencoder_get_value(hal_spiencoder_t id, hal_spiencoder
         return(hal_res_NOK_nullpointer);
     }
 #endif
-        //Encoder type 1 (AEA)
-        if (intitem->config.type == hal_spiencoder_typeAEA)
+    
+    //Encoder type 1 (AEA)
+    if (intitem->config.type == hal_spiencoder_typeAEA)
+    {
+        // Check if SPI connection is working (if not, is answering 0xFF in all the received bytes)
+        // Here I check the bits which should validate the data. In fact, AEA frame consists of 18 bits:
+        // - first 12 MSB bits of positional data
+        // - last 6 LSB bits of validity checks
+        // In particular I check OCF, COF and LIN, which must have particular values (1,0,0) to validate the frame
+        // Attention: since the SPI polarity is High, the message is shifted to the right of one bit (first discarded)
+        if((intitem->rxframes[1][1] & 0x07) != 0x04)
         {
-            // Check if SPI connection is working (if not, is answering 0xFF in all the received bytes)
-            // Here I check the bits which should validate the data. In fact, AEA frame consists of 18 bits:
-            // - first 12 MSB bits of positional data
-            // - last 6 LSB bits of validity checks
-            // In particular I check OCF, COF and LIN, which must have particular values (1,0,0) to validate the frame
-            // Attention: since the SPI polarity is High, the message is shifted to the right of one bit (first discarded)
-            if((intitem->rxframes[1][1] & 0x07) != 0x04)
-            {
-                //Everything 0xFF, SPI is not working
-                if (((intitem->rxframes[1][0]) == 0xFF) && ((intitem->rxframes[1][1]) == 0xFF) && ((intitem->rxframes[1][2]) == 0xFF))
-                {    
-                    e_flags->tx_error = 1;
-                    return(hal_res_NOK_generic);
-                }
-                if (((intitem->rxframes[1][1] & 0x01) != 0x00) || ((intitem->rxframes[1][1] & 0x02) != 0x00))
-                {
-                    e_flags->data_error = 1;
-                }
-                if ((intitem->rxframes[1][1] & 0x04) != 0x04)
-                {
-                    e_flags->data_notready = 1;
-                }
+            //Everything 0xFF, SPI is not working
+            if (((intitem->rxframes[1][0]) == 0xFF) && ((intitem->rxframes[1][1]) == 0xFF) && ((intitem->rxframes[1][2]) == 0xFF))
+            {    
+                e_flags->tx_error = 1;
+                return(hal_res_NOK_generic);
             }
-                *pos = intitem->position;
+            if (((intitem->rxframes[1][1] & 0x01) != 0x00) || ((intitem->rxframes[1][1] & 0x02) != 0x00))
+            {
+                e_flags->data_error = 1;
+            }
+            if ((intitem->rxframes[1][1] & 0x04) != 0x04)
+            {
+                e_flags->data_notready = 1;
+            }
         }
-        //Encoder type 2 (AMO)
-        else if (intitem->config.type == hal_spiencoder_typeAMO)
+        *pos = intitem->position;
+    }
+    else if (intitem->config.type == hal_spiencoder_typeAMO)
+    {
+        // Check if SPI connection is working
+        // Here I check only the first bytes received for all the communications, which should be = to the different
+        // opcode used
+        if((intitem->rxframes[0][0] != 0xF5) || (intitem->rxframes[1][0] != 0xA6) || (intitem->rxframes[2][0] != 0xAD))
         {
-            // Check if SPI connection is working
-            // Here I check only the first bytes received for all the communications, which should be = to the different
-            // opcode used
-            if((intitem->rxframes[0][0] != 0xF5) || (intitem->rxframes[1][0] != 0xA6) || (intitem->rxframes[2][0] != 0xAD))
+            if (((intitem->rxframes[1][0]) == 0xFF) && ((intitem->rxframes[1][1]) == 0xFF) && ((intitem->rxframes[1][2]) == 0xFF) && ((intitem->rxframes[1][3]) == 0xFF))
             {
-                if (((intitem->rxframes[1][0]) == 0xFF) && ((intitem->rxframes[1][1]) == 0xFF) && ((intitem->rxframes[1][2]) == 0xFF) && ((intitem->rxframes[1][3]) == 0xFF))
-                {
-                    e_flags->tx_error = 1;
-                    return(hal_res_NOK_generic);    
-                }
+                e_flags->tx_error = 1;
+                return(hal_res_NOK_generic);    
             }
-            //Check errors for reg: 0x76
-            if ((intitem->config.reg_address) == 0x76)
-            {                
-                if(((intitem->rxframes[2][2]) & 0x0F) != 0x00)
-                {
-                    e_flags->data_error = 1;
-                }
-                if(((intitem->rxframes[2][2]) & 0x10) != 0x00)
-                {
-                    e_flags->data_notready = 1;
-                }
-            }
-            //Check errors for reg: 0x77
-            else if ((intitem->config.reg_address) == 0x77)
-            {
-                if(((intitem->rxframes[2][2]) & 0x08) != 0x00)
-                {
-                    e_flags->data_error = 1;
-                }
-                if(((intitem->rxframes[2][2]) & 0xC0) != 0x00)
-                {
-                    e_flags->chip_error = 1;
-                }
-            }
-                *pos= intitem->position;
         }
-        return(hal_res_OK);        
+        //Check errors for reg: 0x76
+        if ((intitem->config.reg_address) == 0x76)
+        {                
+            if(((intitem->rxframes[2][2]) & 0x0F) != 0x00)
+            {
+                e_flags->data_error = 1;
+            }
+            if(((intitem->rxframes[2][2]) & 0x10) != 0x00)
+            {
+                e_flags->data_notready = 1;
+            }
+        }
+        //Check errors for reg: 0x77
+        else if ((intitem->config.reg_address) == 0x77)
+        {
+            if(((intitem->rxframes[2][2]) & 0x08) != 0x00)
+            {
+                e_flags->data_error = 1;
+            }
+            if(((intitem->rxframes[2][2]) & 0xC0) != 0x00)
+            {
+                e_flags->chip_error = 1;
+            }
+        }
+        *pos = intitem->position;
+    }
+    else if(hal_spiencoder_typeCHAINof2 == intitem->config.type)
+    {
+        *pos = 1;    
+    }
+    
+    return(hal_res_OK);        
 }
 
 // Get the last values saved with a read_start_t2
@@ -453,10 +486,10 @@ extern hal_result_t hal_spiencoder_get_value_t2(hal_spiencoder_t id, hal_spienco
         return(hal_res_NOK_generic); 
     }
 #endif
-        // Check if SPI connection is working (if not, is answering 0xFF in all the received bytes)
-        // Here I check only the first bytes received for all the communications, which should be = to the different
-        // opcode used. If not, I put the validity to false
-        if((intitem->rxframes[0][0] != 0xF5) || (intitem->rxframes[1][0] != 0xA6) || (intitem->rxframes[2][0] != 0xAD))
+    // Check if SPI connection is working (if not, is answering 0xFF in all the received bytes)
+    // Here I check only the first bytes received for all the communications, which should be = to the different
+    // opcode used. If not, I put the validity to false
+    if((intitem->rxframes[0][0] != 0xF5) || (intitem->rxframes[1][0] != 0xA6) || (intitem->rxframes[2][0] != 0xAD))
     {
               *val = hal_false;
         return(hal_res_NOK_generic); 
@@ -466,15 +499,15 @@ extern hal_result_t hal_spiencoder_get_value_t2(hal_spiencoder_t id, hal_spienco
         
         // True also if we didn't check...
     if((intitem->rxframes[0][1] == 0x80) || (intitem->rxframes[0][1] == UINT8_MAX))
-        {
-            *val = hal_true;
-        }
-        else
-        {
-            *val = hal_false;
-        }
+    {
+        *val = hal_true;
+    }
+    else
+    {
+        *val = hal_false;
+    }
 
-        *reg = (((intitem->rxframes[2][1] << 8 ) & 0xFF00) | (intitem->rxframes[2][2])); 
+    *reg = (((intitem->rxframes[2][1] << 8 ) & 0xFF00) | (intitem->rxframes[2][2])); 
         
     return(hal_res_OK);
 }
@@ -727,6 +760,26 @@ static void s_hal_spiencoder_onreceiv(void* p)
         intitem->config.callback_on_rx(intitem->config.arg);
     }
 }
+
+static void s_hal_spiencoder_onreceived_daisychain(void* p)
+{
+    int32_t tmp = (int32_t)p;                   
+    hal_spiencoder_t id = (hal_spiencoder_t)tmp;
+    hal_spiencoder_internal_item_t* intitem = s_hal_spiencoder_theinternals.items[HAL_encoder_id2index(id)];
+    
+    hal_mux_disable(intitem->muxid);    
+    
+    // ok, now i get the frames .. 3 frames each with 2 uint16_t. thus ... 6 bytes. boh.
+    hal_spi_get(intitem->spiid, (uint8_t*)&intitem->rxframeschain[0], NULL);
+    hal_spi_get(intitem->spiid, (uint8_t*)&intitem->rxframeschain[1], NULL);
+    hal_spi_get(intitem->spiid, (uint8_t*)&intitem->rxframeschain[3], NULL);
+    
+    if(NULL != intitem->config.callback_on_rx)
+    {
+        intitem->config.callback_on_rx(intitem->config.arg);
+    }    
+}
+
 
 static void s_hal_spiencoder_onreceiv_sdad_status(void* p)
 {
