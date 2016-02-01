@@ -73,6 +73,7 @@ extern bool    _pending_request ;			// whether a request to another card is pend
 extern Int16   _timeout ;					// used to timeout requests 
 extern Rec_Pid _received_pid[JN];
 extern Int32   _bfc_PWMoutput [JN];
+extern Int16   _PWM_limit[JN];
 
 // DEBUG VARIABLES
 extern byte  _t1c;                      // general purpouse counter
@@ -266,6 +267,19 @@ extern Int32  _adjustment[JN];         // the sum of the three value coming from
 		_pid[j] =  -PID_LIMIT; \
 	else \
 		_pid[j] = (Int16)(PID); \
+	}\
+}
+
+/* PWM saturation */ \
+#define ENFORCE_PWM_LIMITS(j, PWM) \
+{ \
+	if (PWM > _PWM_limit[j]) \
+	{\
+		PWM = _PWM_limit[j]; \
+	}\
+	else if ( PWM < -_PWM_limit[j]) \
+	{\
+		PWM = -_PWM_limit[j]; \
 	}\
 }
 

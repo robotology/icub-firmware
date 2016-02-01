@@ -387,6 +387,7 @@ void main(void)
 #endif
 			if (!mode_is_idle(i)) 
 			{
+				ENFORCE_PWM_LIMITS(i,_pid[i]);
 				PWM_generate(i,_pid[i]);
 		//		setReg (TMRD0_CNTR, 39998);              				
 			}

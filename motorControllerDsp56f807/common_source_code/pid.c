@@ -38,6 +38,7 @@ bool    _pending_request = false;					// whether a request to another card is pe
 Int16   _timeout = 0;								// used to timeout requests 
 Rec_Pid _received_pid[JN];
 Int32   _bfc_PWMoutput [JN] = INIT_ARRAY (0);
+Int16   _PWM_limit[JN] = INIT_ARRAY (1333);
 
 // DEBUG VARIABLES
 Int16 _debug_in0[JN] = INIT_ARRAY (0); 		 		// general purpouse debug

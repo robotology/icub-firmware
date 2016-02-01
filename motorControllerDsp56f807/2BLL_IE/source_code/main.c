@@ -531,7 +531,11 @@ void main(void)
 		/* generate PWM */		
 		for (i=0; i<JN; i++)
 		{
-			if (!mode_is_idle(i)) {PWM_generate(i,_pid[i]);}			
+			if (!mode_is_idle(i))
+			{
+				ENFORCE_PWM_LIMITS(i,_pid[i]);
+				PWM_generate(i,_pid[i]);
+			}			
 		}
 	
 		/* Check Current done in T1 */
