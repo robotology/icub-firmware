@@ -420,12 +420,14 @@ static eo_appEncReader_encoder_type_t s_eo_encoderreader_GetEncoderType(uint8_t 
     
     switch(sensortype)
     {
-        case eomn_serv_mc_sensor_encoder_aea:   type = eo_appEncReader_enc_type_AEA;    break;
-        case eomn_serv_mc_sensor_encoder_amo:   type = eo_appEncReader_enc_type_AMO;    break;
-        case eomn_serv_mc_sensor_encoder_inc:   type = eo_appEncReader_enc_type_INC;    break;
-        case eomn_serv_mc_sensor_hall:          type = eo_appEncReader_enc_type_ADH;    break;
-        case eomn_serv_mc_sensor_none:          type = eo_appEncReader_enc_type_NONE;   break;
-        default:                                type = eo_appEncReader_enc_type_NONE;   break;        
+        case eomn_serv_mc_sensor_encoder_aea:           type = eo_appEncReader_enc_type_AEA;            break;
+        case eomn_serv_mc_sensor_encoder_amo:           type = eo_appEncReader_enc_type_AMO;            break;
+        case eomn_serv_mc_sensor_encoder_inc:           type = eo_appEncReader_enc_type_INC;            break;
+        case eomn_serv_mc_sensor_hall:                  type = eo_appEncReader_enc_type_ADH;            break;
+        case eomn_serv_mc_sensor_encoder_spichainof2:   type = eo_appEncReader_enc_type_SPICHAINOF2;    break;
+        case eomn_serv_mc_sensor_mais:                  type = eo_appEncReader_enc_type_MAIS;           break;
+        case eomn_serv_mc_sensor_none:                  type = eo_appEncReader_enc_type_NONE;           break;
+        default:                                        type = eo_appEncReader_enc_type_NONE;           break;        
     }
     
     return(type);    
@@ -473,8 +475,7 @@ static void s_eo_encoderreader_init_ereader(const eOmn_serv_arrayof_4jomodescrip
     memset(&config, 0, sizeof(config));
     
     config.numofjomos = numofjomos;
-//    config.SPI_callbackOnLastRead = callback;
-//    config.SPI_callback_arg = arg;
+
     uint8_t numberofencoders = 0;
     for(i=0; i<eOappEncReader_jomos_maxnumberof; i++)
     {
@@ -495,28 +496,6 @@ static void s_eo_encoderreader_init_ereader(const eOmn_serv_arrayof_4jomodescrip
             config.jomoconfig[i].secondary_encoder_type = s_eo_encoderreader_GetEncoderType(jomodes->extrasensor.type);
             config.jomoconfig[i].secondary_encoder_port = s_eo_encoderreader_GetEncoderPort(jomodes->extrasensor.port);      
             config.jomoconfig[i].secondary_encoder_place = s_eo_encoderreader_GetEncoderPlace(jomodes->extrasensor.pos);   
-
-//            if(eo_appEncReader_enc_type_NONE != config.jomoconfig[i].primary_encoder_type)
-//            {
-//                eo_appEncReader_stream_number_t streamnumber = s_eo_encoderreader_encoder_get_spi_stream(config.jomoconfig[i].primary_encoder_port);
-//                if(eo_appEncReader_streamNONE != streamnumber)
-//                {
-//                    numberofencoders++;
-//                    config.SPI_streams[streamnumber].numberof++;
-//                    config.SPI_streams[streamnumber].type = hal_spiencoder_t1;
-//                }
-//            }
-
-//            if(eo_appEncReader_enc_type_NONE != config.jomoconfig[i].secondary_encoder_type)
-//            {
-//                eo_appEncReader_stream_number_t streamnumber = s_eo_encoderreader_encoder_get_spi_stream(config.jomoconfig[i].secondary_encoder_port);
-//                if(eo_appEncReader_streamNONE != streamnumber)
-//                {
-//                    numberofencoders++;
-//                    config.SPI_streams[streamnumber].numberof++;
-//                    config.SPI_streams[streamnumber].type = hal_spiencoder_t1;
-//                }
-//            } 
         }        
     }
     
