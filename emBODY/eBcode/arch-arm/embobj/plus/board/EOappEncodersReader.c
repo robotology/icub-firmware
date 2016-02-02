@@ -47,6 +47,7 @@
 
 #include "hal_quadencoder.h"
 #include "hal_adc.h"
+#include "EOtheEntities.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -120,6 +121,8 @@ static void s_eo_appEncReader_deinit_halSPIencoders(EOappEncReader *p);
 
 static void s_eo_appEncReader_anotherSPIread(void* arg);
 static void s_eo_appEncReader_stopSPIread(void* arg);
+
+static uint32_t s_eo_read_mais_for_port(EOappEncReader *p, uint8_t port);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -407,7 +410,25 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint
                
             } break;
             
-                
+            case eo_appEncReader_enc_type_MAIS:
+            {
+
+                val_raw =  s_eo_read_mais_for_port(p, this_jomoconfig.primary_encoder_port); 
+  
+                if(ENCODER_VALUE_NOT_SUPPORTED == val_raw)
+                {
+                    *primary_value = ENCODER_VALUE_NOT_SUPPORTED;
+                    res1 = eores_NOK_generic;                    
+                }
+                else
+                {
+                    // convert to iCubDegrees
+                    *primary_value = s_eo_appEncReader_rescale2icubdegrees(val_raw, jomo, this_jomoconfig.primary_encoder_place);   
+                    res1 = eores_OK;                    
+                }                             
+               
+            } break;
+            
             default:
             {
                 *primary_value = ENCODER_VALUE_NOT_SUPPORTED;
@@ -520,6 +541,25 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint
                
                 
             } break;
+            
+            case eo_appEncReader_enc_type_MAIS:
+            {
+
+                val_raw =  s_eo_read_mais_for_port(p, this_jomoconfig.secondary_encoder_port); 
+  
+                if(ENCODER_VALUE_NOT_SUPPORTED == val_raw)
+                {
+                    *primary_value = ENCODER_VALUE_NOT_SUPPORTED;
+                    res1 = eores_NOK_generic;                    
+                }
+                else
+                {
+                    // convert to iCubDegrees
+                    *primary_value = s_eo_appEncReader_rescale2icubdegrees(val_raw, jomo, this_jomoconfig.secondary_encoder_place);   
+                    res1 = eores_OK;                    
+                }                             
+               
+            } break;            
             
             default:
             {
@@ -907,7 +947,10 @@ static void s_eo_appEncReader_configure_NONSPI_encoders(EOappEncReader *p)
         {           
             s_fake_hal_quadencoder_single_init(jmcfg->secondary_encoder_port);
         }
-        // handle other cases... with a switch case
+        
+        // for adh: do things ...
+        
+        //  for mais-based encoder ... do nothing because wa get direct access to mais memory
        
     }
 }
@@ -1008,6 +1051,78 @@ static uint32_t s_fake_hal_adc_get_hall_sensor_analog_input_mV(uint8_t port)
     return(hal_adc_get_hall_sensor_analog_input_mV(port));     
 }
 
+
+static uint32_t s_eo_read_mais_for_port(EOappEncReader *p, uint8_t port)
+{
+    uint32_t val_raw = ENCODER_VALUE_NOT_SUPPORTED;
+    
+    // get the mais status and then combine its values
+    eOas_mais_t *mais = eo_entities_GetMais(eo_entities_GetHandle(), 0); 
+    EOarray* array = (EOarray*)&mais->status.the15values; // even better would be to treat it as a const-array. maybe put it in constructor of the object
+    
+    uint8_t value1 = 0;
+    uint8_t value2 = 0;
+    uint8_t value3 = 0;
+    uint8_t *tmp = NULL;
+    if(eo_appEncReader_encoder_portFingerTHUMB0 == port)
+    {
+        tmp = (uint8_t*)eo_array_At(array, 0);
+        value1 = (NULL == tmp) ? (0) : (*tmp);
+        val_raw = value1;        
+    }
+    else if(eo_appEncReader_encoder_portFingerTHUMB1 == port)
+    {
+        tmp = (uint8_t*)eo_array_At(array, 1);
+        value1 = (NULL == tmp) ? (0) : (*tmp);
+        tmp = (uint8_t*)eo_array_At(array, 2);
+        value2 = (NULL == tmp) ? (0) : (*tmp);
+        val_raw = value1 + value2;                                             
+    }
+    else if(eo_appEncReader_encoder_portFingerINDEXprox == port)
+    {
+        tmp = (uint8_t*)eo_array_At(array, 3);
+        value1 = (NULL == tmp) ? (0) : (*tmp);
+        val_raw = value1;                                             
+    }
+    else if(eo_appEncReader_encoder_portFingerINDEXdist == port)
+    {
+        tmp = (uint8_t*)eo_array_At(array, 4);
+        value1 = (NULL == tmp) ? (0) : (*tmp);
+        tmp = (uint8_t*)eo_array_At(array, 5);
+        value2 = (NULL == tmp) ? (0) : (*tmp);
+        val_raw = value1 + value2;                                             
+    } 
+    else if(eo_appEncReader_encoder_portFingerMEDIUMprox == port)
+    {
+        tmp = (uint8_t*)eo_array_At(array, 6);
+        value1 = (NULL == tmp) ? (0) : (*tmp);
+        val_raw = value1;                                             
+    }  
+    else if(eo_appEncReader_encoder_portFingerMEDIUMdist == port)
+    {
+        tmp = (uint8_t*)eo_array_At(array, 7);
+        value1 = (NULL == tmp) ? (0) : (*tmp);
+        tmp = (uint8_t*)eo_array_At(array, 8);
+        value2 = (NULL == tmp) ? (0) : (*tmp);
+        val_raw = value1 + value2;                                             
+    }                 
+    else if(eo_appEncReader_encoder_portFingerPINKY == port)
+    {
+        tmp = (uint8_t*)eo_array_At(array, 11);
+        value1 = (NULL == tmp) ? (0) : (*tmp);
+        tmp = (uint8_t*)eo_array_At(array, 12);
+        value2 = (NULL == tmp) ? (0) : (*tmp);
+        tmp = (uint8_t*)eo_array_At(array, 13);
+        value3 = (NULL == tmp) ? (0) : (*tmp);
+        val_raw = value1 + value2 + value3;                                             
+    }
+    else
+    {
+        val_raw = ENCODER_VALUE_NOT_SUPPORTED;
+    }    
+    
+    return(val_raw);
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
