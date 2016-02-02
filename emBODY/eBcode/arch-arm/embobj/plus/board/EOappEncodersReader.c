@@ -368,8 +368,10 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint
                     return(eores_NOK_generic);
                 }
 
-                #warning TODO: formatting of eomn_serv_mc_sensor_encoder_spichainof2 must be defined
-                val_raw = (val_raw >> 6) & 0x0FFF; 
+                uint16_t val1 = (val_raw >> 2) & 0x0fff; // it is the first encoder in the chain
+                uint16_t val2 = (val_raw >> 18) & 0x0fff; // it is the second encoder in the chain
+                val_raw = val1 + val2; // we give back the sum of the two
+                
                 *primaryvalue = s_eo_appEncReader_rescale2icubdegrees(val_raw, jomo, (eOmn_serv_mc_sensor_position_t)this_jomoconfig.primary.pos);                
                
             } break; 	            
@@ -501,8 +503,10 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint
                     return((eOresult_t)res2);
                 }
             
-                #warning TODO: rescaling of SPICHAIN2 must be defined
-                val_raw = (val_raw>>4) & 0xFFFF;
+                uint16_t val1 = (val_raw >> 2) & 0x0fff; // it is the first encoder in the chain
+                uint16_t val2 = (val_raw >> 18) & 0x0fff; // it is the second encoder in the chain
+                val_raw = val1 + val2; // we give back the sum of the two
+                
                 *secondaryvalue = s_eo_appEncReader_rescale2icubdegrees( val_raw, jomo, (eOmn_serv_mc_sensor_position_t)this_jomoconfig.secondary.pos);
  
             } break; 	            
@@ -635,6 +639,7 @@ static void s_eo_clear_SPI_streams(EOappEncReader *p)
 static eObool_t s_eo_prepare_SPI_streams(EOappEncReader *p)
 {           
     uint8_t i = 0;
+    uint8_t spiencoderportisused[hal_spiencoders_number] = {0};
     
     s_eo_clear_SPI_streams(p);
     
@@ -647,22 +652,29 @@ static eObool_t s_eo_prepare_SPI_streams(EOappEncReader *p)
         // if in the joint i-th we have any spi-based encoder which is primary or secondary, then we put it into the proper spi-stream        
 
         if(CHECK_ENC_IS_ON_STREAMED_SPI_WITHOTHERS(jdes->primary.type))
-        {               
-            hal_spiencoder_stream_t streamnumber = s_eo_appEncReader_get_spi_stream(p, jdes->primary.port);
+        {    
+            uint8_t port = jdes->primary.port;
+            hal_spiencoder_stream_t streamnumber = s_eo_appEncReader_get_spi_stream(p, port);
             if(hal_spiencoder_streamNONE != streamnumber)
             {    
                 p->SPI_streams[streamnumber].type = (hal_spiencoder_type_t)jdes->primary.type;   
                 p->SPI_streams[streamnumber].maxsupported = p->stream_map->stream2numberofencoders[streamnumber];
-                if(p->SPI_streams[streamnumber].numberof < p->SPI_streams[streamnumber].maxsupported)
+                // i must check if there is already encoder specified by jdes->primary.port inside ... if already, then we dont add it.
+                // we do that because we may have a primary and secondary which have the same aea on the same port.
+                if(0 == spiencoderportisused[port])
                 {
-                    p->SPI_streams[streamnumber].id[p->SPI_streams[streamnumber].numberof++] = (hal_spiencoder_t)jdes->primary.port;
-                }
-                else
-                {
-                    // error ....
-                }
+                    if(p->SPI_streams[streamnumber].numberof < p->SPI_streams[streamnumber].maxsupported)
+                    {
+                        spiencoderportisused[port] = 1;
+                        p->SPI_streams[streamnumber].id[p->SPI_streams[streamnumber].numberof++] = (hal_spiencoder_t)port;
+                    }
+                    else
+                    {
+                        // error ....
+                    }
+                    numberofSPIbased++;
+                } // else it means that another jomo is using it ... 
                 
-                numberofSPIbased++;
             }
             else
             {
@@ -672,22 +684,26 @@ static eObool_t s_eo_prepare_SPI_streams(EOappEncReader *p)
 
         if(CHECK_ENC_IS_ON_STREAMED_SPI_WITHOTHERS(jdes->secondary.type))
         {   
-            hal_spiencoder_stream_t streamnumber = s_eo_appEncReader_get_spi_stream(p, jdes->secondary.port);
+            uint8_t port = jdes->secondary.port;
+            hal_spiencoder_stream_t streamnumber = s_eo_appEncReader_get_spi_stream(p, port);
             if(hal_spiencoder_streamNONE != streamnumber)
             {    
                 p->SPI_streams[streamnumber].type = (hal_spiencoder_type_t)jdes->secondary.type;   
                 p->SPI_streams[streamnumber].maxsupported = p->stream_map->stream2numberofencoders[streamnumber];
-                if(p->SPI_streams[streamnumber].numberof < p->SPI_streams[streamnumber].maxsupported)
+                if(0 == spiencoderportisused[port])
                 {
-                    p->SPI_streams[streamnumber].id[p->SPI_streams[streamnumber].numberof++] = (hal_spiencoder_t)jdes->secondary.port;
-                }
-                else
-                {
-                    // error ....
-                }
+                    if(p->SPI_streams[streamnumber].numberof < p->SPI_streams[streamnumber].maxsupported)
+                    {
+                        spiencoderportisused[port] = 1;
+                        p->SPI_streams[streamnumber].id[p->SPI_streams[streamnumber].numberof++] = (hal_spiencoder_t)port;
+                    }
+                    else
+                    {
+                        // error ....
+                    }
+                    numberofSPIbased++;
+                } // else it means that another jomo is using it ...                
                 
-                
-                numberofSPIbased++;
             }
             else
             {
@@ -696,23 +712,27 @@ static eObool_t s_eo_prepare_SPI_streams(EOappEncReader *p)
         }  
         
         if(CHECK_ENC_IS_ON_STREAMED_SPI_ALONE(jdes->primary.type))
-        {               
-            hal_spiencoder_stream_t streamnumber = s_eo_appEncReader_get_spi_stream(p, jdes->primary.port);
+        { 
+            uint8_t port = jdes->primary.port;
+            hal_spiencoder_stream_t streamnumber = s_eo_appEncReader_get_spi_stream(p, port);
             if(hal_spiencoder_streamNONE != streamnumber)
             {    
                 p->SPI_streams[streamnumber].type = (hal_spiencoder_type_t)jdes->primary.type;   
                 p->SPI_streams[streamnumber].maxsupported = 1;
-                if(p->SPI_streams[streamnumber].numberof < p->SPI_streams[streamnumber].maxsupported)
+                if(0 == spiencoderportisused[port])
                 {
-                    p->SPI_streams[streamnumber].id[p->SPI_streams[streamnumber].numberof++] = (hal_spiencoder_t)jdes->primary.port;
-                }
-                else
-                {
-                    // error ....
-                }
-                
-                
-                numberofSPIbased++;
+                    if(p->SPI_streams[streamnumber].numberof < p->SPI_streams[streamnumber].maxsupported)
+                    {
+                        spiencoderportisused[port] = 1;
+                        p->SPI_streams[streamnumber].id[p->SPI_streams[streamnumber].numberof++] = (hal_spiencoder_t)port;
+                    }
+                    else
+                    {
+                        // error ....
+                    }
+                    numberofSPIbased++;
+                }  // else it means that another jomo is using it ... 
+               
             }
             else
             {
@@ -721,23 +741,26 @@ static eObool_t s_eo_prepare_SPI_streams(EOappEncReader *p)
         }
 
         if(CHECK_ENC_IS_ON_STREAMED_SPI_ALONE(jdes->secondary.type))
-        {   
-            hal_spiencoder_stream_t streamnumber = s_eo_appEncReader_get_spi_stream(p, jdes->secondary.port);
+        {  
+            uint8_t port = jdes->secondary.port;            
+            hal_spiencoder_stream_t streamnumber = s_eo_appEncReader_get_spi_stream(p, port);
             if(hal_spiencoder_streamNONE != streamnumber)
             {    
                 p->SPI_streams[streamnumber].type = (hal_spiencoder_type_t)jdes->secondary.type;   
                 p->SPI_streams[streamnumber].maxsupported = 1;
-                if(p->SPI_streams[streamnumber].numberof < p->SPI_streams[streamnumber].maxsupported)
+                if(0 == spiencoderportisused[port])
                 {
-                    p->SPI_streams[streamnumber].id[p->SPI_streams[streamnumber].numberof++] = (hal_spiencoder_t)jdes->secondary.port;
-                }
-                else
-                {
-                    // error ....
-                }
-                
-                
-                numberofSPIbased++;
+                    if(p->SPI_streams[streamnumber].numberof < p->SPI_streams[streamnumber].maxsupported)
+                    {
+                        spiencoderportisused[port] = 1;
+                        p->SPI_streams[streamnumber].id[p->SPI_streams[streamnumber].numberof++] = (hal_spiencoder_t)port;
+                    }
+                    else
+                    {
+                        // error ....
+                    }                
+                    numberofSPIbased++;
+                } // else it means that another jomo is using it ... 
             }
             else
             {
@@ -924,8 +947,53 @@ static eObool_t s_eo_appEncReader_IsValidValue_AEA(uint32_t *valueraw, eOappEncR
 
 
 static eObool_t s_eo_appEncReader_IsValidValue_SPICHAIN2(uint32_t *valueraw, eOappEncReader_errortype_t *error)
-{
-    #warning -> to be defined    
+{    
+    uint8_t b = 0;
+    uint8_t parity_error = 0;
+    uint16_t errorframe = 0;
+
+    
+    uint16_t first = *valueraw & 0xffff;
+    
+    for(parity_error=0, b=0; b<16; ++b)
+    {
+        parity_error ^= (first)>>b;
+    }
+    
+    if(parity_error & 1) 
+    { 
+        *error = err_onParityError;
+        return(eobool_false);
+    }
+    
+    uint16_t second = ((*valueraw) >> 16) & 0xffff;   
+    parity_error = 0;
+    
+    for(parity_error=0, b=0; b<16; ++b)
+    {
+        parity_error ^= (second)>>b;
+    }
+    
+    if (parity_error & 1) 
+    { 
+        *error = err_onParityError;
+        return(eobool_false);
+    }  
+
+    errorframe = (first >> 1) & 0x0001;
+    if(errorframe)
+    {
+        *error = err_onReadFromSpi;
+        return(eobool_false);    
+    }
+    
+    errorframe = (second >> 1) & 0x0001;
+    if(errorframe)
+    {
+        *error = err_onReadFromSpi;
+        return(eobool_false);    
+    }    
+    
     return(eobool_true);
 }
 
