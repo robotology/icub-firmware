@@ -87,11 +87,6 @@ static eOresult_t s_eo_encoderreader_onstop_verifyreading(void *par, eObool_t re
 
 static void s_eo_encodereader_send_periodic_error_report(void *p);
 
-static eo_appEncReader_encoder_type_t s_eo_encoderreader_GetEncoderType(uint8_t sensortype);
-
-static uint8_t s_eo_encoderreader_GetEncoderPort(uint8_t sensorport);
-
-static eo_appEncReader_encoder_place_t s_eo_encoderreader_GetEncoderPlace(uint8_t sensorpos);
 
 static void s_eo_encoderreader_init_ereader(const eOmn_serv_arrayof_4jomodescriptors_t * jomodes, eOcallback_t callback, void* arg);
 
@@ -414,47 +409,7 @@ static void s_eo_encodereader_send_periodic_error_report(void *p)
 }
 
 
-static eo_appEncReader_encoder_type_t s_eo_encoderreader_GetEncoderType(uint8_t sensortype)
-{
-    eo_appEncReader_encoder_type_t type = eo_appEncReader_enc_type_NONE;
-    
-    switch(sensortype)
-    {
-        case eomn_serv_mc_sensor_encoder_aea:           type = eo_appEncReader_enc_type_AEA;            break;
-        case eomn_serv_mc_sensor_encoder_amo:           type = eo_appEncReader_enc_type_AMO;            break;
-        case eomn_serv_mc_sensor_encoder_inc:           type = eo_appEncReader_enc_type_INC;            break;
-        case eomn_serv_mc_sensor_hall:                  type = eo_appEncReader_enc_type_ADH;            break;
-        case eomn_serv_mc_sensor_encoder_spichainof2:   type = eo_appEncReader_enc_type_SPICHAINOF2;    break;
-        case eomn_serv_mc_sensor_mais:                  type = eo_appEncReader_enc_type_MAIS;           break;
-        case eomn_serv_mc_sensor_none:                  type = eo_appEncReader_enc_type_NONE;           break;
-        default:                                        type = eo_appEncReader_enc_type_NONE;           break;        
-    }
-    
-    return(type);    
-}
 
-
-static uint8_t s_eo_encoderreader_GetEncoderPort(uint8_t sensorport)
-{
-    uint8_t port = eo_appEncReader_encoder_portNONE;
-    if(sensorport <= eo_appEncReader_encoder_portMAX)
-    {
-        port = sensorport;
-    }
-    
-    return(port);    
-}
-
-static eo_appEncReader_encoder_place_t s_eo_encoderreader_GetEncoderPlace(uint8_t sensorpos)
-{
-    eo_appEncReader_encoder_place_t postype = eo_appEncReader_encoder_place_NONE;
-    if(sensorpos <= eo_appEncReader_encoder_place_atmotor)
-    {
-        postype = (eo_appEncReader_encoder_place_t)sensorpos;
-    }
-    
-    return(postype);    
-}
 
 
 
@@ -470,37 +425,9 @@ static void s_eo_encoderreader_init_ereader(const eOmn_serv_arrayof_4jomodescrip
     uint8_t numofjomos = eo_constarray_Size(carray);
     s_eo_theencoderreader.numofjomos = numofjomos;
 
-        
-    eOappEncReader_cfg_t config;
-    memset(&config, 0, sizeof(config));
     
-    config.numofjomos = numofjomos;
-
-    uint8_t numberofencoders = 0;
-    for(i=0; i<eOappEncReader_jomos_maxnumberof; i++)
-    {
-        const eOmn_serv_jomo_descriptor_t *jomodes = (eOmn_serv_jomo_descriptor_t*) eo_constarray_At(carray, i);
-        
-        if(NULL == jomodes)
-        {   // i am beyond the number of jomos
-            config.jomoconfig[i].primary_encoder_type = config.jomoconfig[i].secondary_encoder_type = eo_appEncReader_enc_type_NONE;
-            config.jomoconfig[i].primary_encoder_port = config.jomoconfig[i].secondary_encoder_port = eo_appEncReader_encoder_portNONE;
-            config.jomoconfig[i].primary_encoder_place = config.jomoconfig[i].secondary_encoder_place = eo_appEncReader_encoder_place_NONE;
-        }
-        else 
-        {
-            // must convert things 
-            config.jomoconfig[i].primary_encoder_type = s_eo_encoderreader_GetEncoderType(jomodes->sensor.type);
-            config.jomoconfig[i].primary_encoder_port = s_eo_encoderreader_GetEncoderPort(jomodes->sensor.port);
-            config.jomoconfig[i].primary_encoder_place = s_eo_encoderreader_GetEncoderPlace(jomodes->sensor.pos);
-            config.jomoconfig[i].secondary_encoder_type = s_eo_encoderreader_GetEncoderType(jomodes->extrasensor.type);
-            config.jomoconfig[i].secondary_encoder_port = s_eo_encoderreader_GetEncoderPort(jomodes->extrasensor.port);      
-            config.jomoconfig[i].secondary_encoder_place = s_eo_encoderreader_GetEncoderPlace(jomodes->extrasensor.pos);   
-        }        
-    }
-    
-    s_eo_theencoderreader.numofencoders = numberofencoders;
-    eo_appEncReader_Activate(s_eo_theencoderreader.reader, &config);    
+//    s_eo_theencoderreader.numofencoders = numberofencoders;
+    eo_appEncReader_Activate(s_eo_theencoderreader.reader, &s_eo_theencoderreader.arrayofjomodes);    
 }
 
 

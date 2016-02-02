@@ -33,21 +33,14 @@
 
 #include "stdlib.h"
 #include "string.h"
+
+#include "hal_common.h"
 #include "hal_spiencoder.h"
-
-
-#include "EOtheMemoryPool.h"
-
-#include "OPCprotocolManager_Cfg.h" 
-
-#include "EOemsControllerCfg.h"
-#include "osal.h"
-
-#include "EoProtocol.h"
-
 #include "hal_quadencoder.h"
 #include "hal_adc.h"
+
 #include "EOtheEntities.h"
+#include "EOconstarray.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -68,12 +61,13 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define CHECK_ENC_IS_CONNECTED(joint_enc)           (joint_enc != eo_appEncReader_enc_type_NONE)
-#define CHECK_ENC_IS_ON_STREAMED_SPI(joint_enc)     ((joint_enc == eo_appEncReader_enc_type_AEA) || (joint_enc == eo_appEncReader_enc_type_AMO))
-#define CHECK_ENC_IS_CHAINED_SPI(joint_enc)         ((joint_enc == eo_appEncReader_enc_type_SPICHAINOF2))
+#define CHECK_ENC_IS_CONNECTED(type)                    (eomn_serv_mc_sensor_none != (type))
+#define CHECK_ENC_IS_ON_SPI(type)                       ((eomn_serv_mc_sensor_encoder_aea == (type)) || (eomn_serv_mc_sensor_encoder_amo == (type)) || (eomn_serv_mc_sensor_encoder_spichainof2 == (type)))
+#define CHECK_ENC_IS_ON_STREAMED_SPI_WITHOTHERS(type)   ((eomn_serv_mc_sensor_encoder_aea == (type)) || (eomn_serv_mc_sensor_encoder_amo == (type)))
+#define CHECK_ENC_IS_ON_STREAMED_SPI_ALONE(type)        ((eomn_serv_mc_sensor_encoder_spichainof2 == (type)))
 
 
-#define ENCODER_VALUE_NOT_SUPPORTED                 hal_NA32
+#define ENCODER_VALUE_NOT_SUPPORTED                     (hal_NA32)
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -102,7 +96,7 @@ static eObool_t s_eo_appEncReader_IsValidValue_SPICHAIN2(uint32_t *valueraw, eOa
 static void s_eo_appEncReader_deconfigure_NONSPI_encoders(EOappEncReader *p);
 static void s_eo_appEncReader_configure_NONSPI_encoders(EOappEncReader *p);
 
-static uint32_t s_eo_appEncReader_rescale2icubdegrees(uint32_t val_raw, uint8_t jomo, eo_appEncReader_encoder_place_t pos_type);
+static uint32_t s_eo_appEncReader_rescale2icubdegrees(uint32_t val_raw, uint8_t jomo, eOmn_serv_mc_sensor_position_t pos);
 
 
 static hal_spiencoder_stream_t s_eo_appEncReader_get_spi_stream(EOappEncReader* p, uint8_t port);
@@ -132,12 +126,12 @@ static uint32_t s_eo_read_mais_for_port(EOappEncReader *p, uint8_t port);
 
 static EOappEncReader s_eo_theappencreader =
 {
-    .initted            = eobool_false,
-    .active             = eobool_false,
-    .totalnumberofencoders = 0,
-    .stream_map         = NULL,
-    .config             = {0},
-    .SPI_streams        = {{.type = hal_spiencoder_typeNONE, .numberof = 0, .maxsupported = 0, .isacquiring = eobool_false, .id = {hal_spiencoderNONE}}}
+    .initted                = eobool_false,
+    .active                 = eobool_false,
+    .totalnumberofencoders  = 0,
+    .stream_map             = NULL,
+    .config                 = {0},
+    .SPI_streams            = {{.type = hal_spiencoder_typeNONE, .numberof = 0, .maxsupported = 0, .isacquiring = eobool_false, .id = {hal_spiencoderNONE}}}
 };
 
 
@@ -167,6 +161,8 @@ extern EOappEncReader* eo_appEncReader_Initialise(void)
         return(NULL);
     }   
 
+    memset(&s_eo_theappencreader.config, 0, sizeof(s_eo_theappencreader.config));
+    
     s_eo_clear_SPI_streams(&s_eo_theappencreader);   
 
     
@@ -208,7 +204,7 @@ extern eOresult_t eo_appEncReader_Deactivate(EOappEncReader *p)
     s_eo_deconfigure_SPI_encoders(p);
     
     
-    memset(&p->config, 0, sizeof(eOappEncReader_cfg_t));
+    memset(&p->config, 0, sizeof(s_eo_theappencreader.config));
     p->config.numofjomos = 0;
     
     s_eo_theappencreader.totalnumberofencoders = 0;
@@ -217,12 +213,14 @@ extern eOresult_t eo_appEncReader_Deactivate(EOappEncReader *p)
 }
 
 
-extern eOresult_t eo_appEncReader_Activate(EOappEncReader *p, eOappEncReader_cfg_t *cfg)
+extern eOresult_t eo_appEncReader_Activate(EOappEncReader *p, const eOmn_serv_arrayof_4jomodescriptors_t *arrayofjomodes)
 {
-    if((NULL == p) || (NULL == cfg))
+    if((NULL == p) || (NULL == arrayofjomodes))
     {
         return(eores_NOK_nullpointer);
-    }    
+    }   
+
+    EOconstarray* carray = eo_constarray_Load((EOarray*)arrayofjomodes);
     
     if(eobool_true == s_eo_theappencreader.active)
     {
@@ -232,13 +230,20 @@ extern eOresult_t eo_appEncReader_Activate(EOappEncReader *p, eOappEncReader_cfg
     // ok, now the rest of the things
     
     // basic check ...
-    if(cfg->numofjomos > eOappEncReader_jomos_maxnumberof)
+    if(eo_constarray_Size(carray) > eOappEncReader_jomos_maxnumberof)
     {
         return(eores_NOK_generic);
     }
     
-    // 1. copy the config
-    memcpy(&p->config, cfg, sizeof(eOappEncReader_cfg_t));
+    // 1. prepare the config
+    p->config.numofjomos = eo_constarray_Size(carray);
+    for(uint8_t i=0; i<eOappEncReader_jomos_maxnumberof; i++)
+    {
+        const eOmn_serv_jomo_descriptor_t *jomodes = (eOmn_serv_jomo_descriptor_t*) eo_constarray_At(carray, i);
+        p->config.jomoconfig[i].primary = jomodes->sensor;
+        p->config.jomoconfig[i].secondary = jomodes->extrasensor;
+    }
+
     
     // 2. configure spi encoders   
     s_eo_configure_SPI_encoders(p);
@@ -284,7 +289,7 @@ extern eOresult_t eo_appEncReader_StartRead(EOappEncReader *p)
 
 
 
-extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint32_t *primary_value, uint32_t *extra_value, hal_spiencoder_errors_flags *flags)
+extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint32_t *primaryvalue, uint32_t *secondaryvalue, hal_spiencoder_errors_flags *flags)
 {    
     if(NULL == p)
     {
@@ -298,24 +303,24 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint
     eOappEncReader_jomoconfig_t this_jomoconfig = p->config.jomoconfig[jomo];
 	 
     // check existence for primary encoder
-    if (CHECK_ENC_IS_CONNECTED(this_jomoconfig.primary_encoder_type))
+    if (CHECK_ENC_IS_CONNECTED(this_jomoconfig.primary.type))
     {
-        switch (this_jomoconfig.primary_encoder_type)
+        switch (this_jomoconfig.primary.type)
         {
-            case eo_appEncReader_enc_type_AEA:
+            case eomn_serv_mc_sensor_encoder_aea:
             {
 
-                res1 = (eOresult_t)hal_spiencoder_get_value((hal_spiencoder_t)this_jomoconfig.primary_encoder_port, &val_raw, flags);
+                res1 = (eOresult_t)hal_spiencoder_get_value((hal_spiencoder_t)this_jomoconfig.primary.port, &val_raw, flags);
                 
                 if(eores_OK != res1)
                 {
-                    *primary_value = (uint32_t)err_onReadFromSpi;
+                    *primaryvalue = (uint32_t)err_onReadFromSpi;
                     return((eOresult_t)res1);
                 }
 
                 if(eobool_false == s_eo_appEncReader_IsValidValue_AEA(&val_raw, &errortype))
                 {
-                    *primary_value = (eOappEncReader_errortype_t)errortype;  
+                    *primaryvalue = (eOappEncReader_errortype_t)errortype;  
                     flags->data_error = 1;
                     return(eores_NOK_generic);
                 }
@@ -326,80 +331,80 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint
                 // the resolution is now 4096 ticks per revolution.
                 
                 val_raw = (val_raw >> 6) & 0x0FFF;
-                *primary_value = s_eo_appEncReader_rescale2icubdegrees(val_raw, jomo, this_jomoconfig.primary_encoder_place);                
+                *primaryvalue = s_eo_appEncReader_rescale2icubdegrees(val_raw, jomo, (eOmn_serv_mc_sensor_position_t)this_jomoconfig.primary.pos);                
                
             } break; 			
 
-            case eo_appEncReader_enc_type_AMO:
+            case eomn_serv_mc_sensor_encoder_amo:
             {
                 
-                res1 = (eOresult_t)hal_spiencoder_get_value((hal_spiencoder_t)this_jomoconfig.primary_encoder_port, &val_raw, flags);
+                res1 = (eOresult_t)hal_spiencoder_get_value((hal_spiencoder_t)this_jomoconfig.primary.port, &val_raw, flags);
             
                 if(eores_OK != res1)
                 {
-                    *primary_value = (uint32_t)err_onReadFromSpi;
+                    *primaryvalue = (uint32_t)err_onReadFromSpi;
                     return((eOresult_t)res1);
                 }
             
                 val_raw = (val_raw>>4) & 0xFFFF;
-                *primary_value = s_eo_appEncReader_rescale2icubdegrees(val_raw, jomo, this_jomoconfig.primary_encoder_place);
+                *primaryvalue = s_eo_appEncReader_rescale2icubdegrees(val_raw, jomo, (eOmn_serv_mc_sensor_position_t)this_jomoconfig.primary.pos);
                 
             } break;
             
-            case eo_appEncReader_enc_type_SPICHAINOF2:
+            case eomn_serv_mc_sensor_encoder_spichainof2:
             {
-                res1 = (eOresult_t)hal_spiencoder_get_value((hal_spiencoder_t)this_jomoconfig.primary_encoder_port, &val_raw, flags);
+                res1 = (eOresult_t)hal_spiencoder_get_value((hal_spiencoder_t)this_jomoconfig.primary.port, &val_raw, flags);
                 
                 if(eores_OK != res1)
                 {
-                    *primary_value = (uint32_t)err_onReadFromSpi;
+                    *primaryvalue = (uint32_t)err_onReadFromSpi;
                     return((eOresult_t)res1);
                 }
 
                 if(eobool_false == s_eo_appEncReader_IsValidValue_SPICHAIN2(&val_raw, &errortype))
                 {
-                    *primary_value = (eOappEncReader_errortype_t)errortype;  
+                    *primaryvalue = (eOappEncReader_errortype_t)errortype;  
                     flags->data_error = 1;
                     return(eores_NOK_generic);
                 }
 
-                #warning TODO: rescaling of SPICHAIN2 must be defined
+                #warning TODO: formatting of eomn_serv_mc_sensor_encoder_spichainof2 must be defined
                 val_raw = (val_raw >> 6) & 0x0FFF; 
-                *primary_value = s_eo_appEncReader_rescale2icubdegrees(val_raw, jomo, this_jomoconfig.primary_encoder_place);                
+                *primaryvalue = s_eo_appEncReader_rescale2icubdegrees(val_raw, jomo, (eOmn_serv_mc_sensor_position_t)this_jomoconfig.primary.pos);                
                
             } break; 	            
             
-            case eo_appEncReader_enc_type_INC:
+            case eomn_serv_mc_sensor_encoder_inc:
             {
                 
-                val_raw = s_fake_hal_quadencoder_getCounter(this_jomoconfig.primary_encoder_port);
+                val_raw = s_fake_hal_quadencoder_getCounter(this_jomoconfig.primary.pos);
                 if(ENCODER_VALUE_NOT_SUPPORTED == val_raw)
                 {
-                    *primary_value = 0;
+                    *primaryvalue = 0;
                 }
                 else
                 {
-                    *primary_value = s_eo_appEncReader_rescale2icubdegrees(val_raw, jomo, this_jomoconfig.primary_encoder_place);
+                    *primaryvalue = s_eo_appEncReader_rescale2icubdegrees(val_raw, jomo, (eOmn_serv_mc_sensor_position_t)this_jomoconfig.primary.pos);
                 }    
          
                 res1 = eores_OK;
                 
             } break;
             
-            case eo_appEncReader_enc_type_ADH:
+            case eomn_serv_mc_sensor_encoder_absanalog:
             {
                 // get the voltage from the motor port (0 - 3300mV)
             
-                val_raw = s_fake_hal_adc_get_hall_sensor_analog_input_mV(this_jomoconfig.primary_encoder_port);        
+                val_raw = s_fake_hal_adc_get_hall_sensor_analog_input_mV(this_jomoconfig.primary.port);        
                 if(ENCODER_VALUE_NOT_SUPPORTED == val_raw)
                 {
-                    *primary_value = ENCODER_VALUE_NOT_SUPPORTED;
+                    *primaryvalue = ENCODER_VALUE_NOT_SUPPORTED;
                     res1 = eores_NOK_generic;                    
                 }
                 else
                 {
                     // convert to iCubDegrees
-                    *primary_value = s_eo_appEncReader_rescale2icubdegrees(val_raw, jomo, this_jomoconfig.primary_encoder_place);
+                    *primaryvalue = s_eo_appEncReader_rescale2icubdegrees(val_raw, jomo, (eOmn_serv_mc_sensor_position_t)this_jomoconfig.primary.pos);
                     
                     if(0 != val_raw)
                     {   // marco.accame: boh ... e non si mette NOK_generic in caso contrario ??? per ora non lo cambio.
@@ -410,20 +415,20 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint
                
             } break;
             
-            case eo_appEncReader_enc_type_MAIS:
+            case eomn_serv_mc_sensor_mais:
             {
 
-                val_raw =  s_eo_read_mais_for_port(p, this_jomoconfig.primary_encoder_port); 
+                val_raw =  s_eo_read_mais_for_port(p, this_jomoconfig.primary.port); 
   
                 if(ENCODER_VALUE_NOT_SUPPORTED == val_raw)
                 {
-                    *primary_value = ENCODER_VALUE_NOT_SUPPORTED;
+                    *primaryvalue = ENCODER_VALUE_NOT_SUPPORTED;
                     res1 = eores_NOK_generic;                    
                 }
                 else
                 {
                     // convert to iCubDegrees
-                    *primary_value = s_eo_appEncReader_rescale2icubdegrees(val_raw, jomo, this_jomoconfig.primary_encoder_place);   
+                    *primaryvalue = s_eo_appEncReader_rescale2icubdegrees(val_raw, jomo, (eOmn_serv_mc_sensor_position_t)this_jomoconfig.primary.pos);   
                     res1 = eores_OK;                    
                 }                             
                
@@ -431,7 +436,7 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint
             
             default:
             {
-                *primary_value = ENCODER_VALUE_NOT_SUPPORTED;
+                *primaryvalue = ENCODER_VALUE_NOT_SUPPORTED;
                 
             } break;
             
@@ -440,98 +445,98 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint
     }
     else
     {
-        *primary_value = ENCODER_VALUE_NOT_SUPPORTED;
+        *primaryvalue = ENCODER_VALUE_NOT_SUPPORTED;
     }
     
     // check existence for extra encoder
-    if (CHECK_ENC_IS_CONNECTED(this_jomoconfig.secondary_encoder_type))
+    if (CHECK_ENC_IS_CONNECTED(this_jomoconfig.secondary.type))
     {
-        switch (this_jomoconfig.secondary_encoder_type)
+        switch (this_jomoconfig.secondary.type)
         {
-            case eo_appEncReader_enc_type_AEA:
+            case eomn_serv_mc_sensor_encoder_aea:
             {
-                res2 = (eOresult_t)hal_spiencoder_get_value((hal_spiencoder_t)this_jomoconfig.secondary_encoder_port, &val_raw, flags);
+                res2 = (eOresult_t)hal_spiencoder_get_value((hal_spiencoder_t)this_jomoconfig.secondary.port, &val_raw, flags);
                 
                 if(eores_OK != res2)
                 {
-                    *extra_value = (uint32_t)err_onReadFromSpi;
+                    *secondaryvalue = (uint32_t)err_onReadFromSpi;
                     return((eOresult_t)res2);
                 }
 
                 if (eobool_false == s_eo_appEncReader_IsValidValue_AEA(&val_raw, &errortype))
                 {
-                    *extra_value = (eOappEncReader_errortype_t)errortype;  
+                    *secondaryvalue = (eOappEncReader_errortype_t)errortype;  
                     flags->data_error = 1;
                     return(eores_NOK_generic);
                 }
 
                 val_raw = (val_raw >> 6) & 0x0FFF;
-                *extra_value = s_eo_appEncReader_rescale2icubdegrees(val_raw, jomo, this_jomoconfig.secondary_encoder_place);  
+                *secondaryvalue = s_eo_appEncReader_rescale2icubdegrees(val_raw, jomo, (eOmn_serv_mc_sensor_position_t)this_jomoconfig.secondary.pos);  
                 
             } break;  			
 
-            case eo_appEncReader_enc_type_AMO:
+            case eomn_serv_mc_sensor_encoder_amo:
             {
                     
-                res2 = (eOresult_t)hal_spiencoder_get_value((hal_spiencoder_t)this_jomoconfig.secondary_encoder_port, &val_raw, flags);
+                res2 = (eOresult_t)hal_spiencoder_get_value((hal_spiencoder_t)this_jomoconfig.secondary.port, &val_raw, flags);
             
                 if(eores_OK != res2)
                 {
-                    *extra_value = (uint32_t)err_onReadFromSpi;
+                    *secondaryvalue = (uint32_t)err_onReadFromSpi;
                     return((eOresult_t)res2);
                 }
             
                 val_raw = (val_raw>>4) & 0xFFFF;
-                *extra_value = s_eo_appEncReader_rescale2icubdegrees( val_raw, jomo, this_jomoconfig.secondary_encoder_place);
+                *secondaryvalue = s_eo_appEncReader_rescale2icubdegrees( val_raw, jomo, (eOmn_serv_mc_sensor_position_t)this_jomoconfig.secondary.pos);
                
             } break;
             
-            case eo_appEncReader_enc_type_SPICHAINOF2:
+            case eomn_serv_mc_sensor_encoder_spichainof2:
             {                    
-                res2 = (eOresult_t)hal_spiencoder_get_value((hal_spiencoder_t)this_jomoconfig.secondary_encoder_port, &val_raw, flags);
+                res2 = (eOresult_t)hal_spiencoder_get_value((hal_spiencoder_t)this_jomoconfig.secondary.port, &val_raw, flags);
             
                 if(eores_OK != res2)
                 {
-                    *extra_value = (uint32_t)err_onReadFromSpi;
+                    *secondaryvalue = (uint32_t)err_onReadFromSpi;
                     return((eOresult_t)res2);
                 }
             
                 #warning TODO: rescaling of SPICHAIN2 must be defined
                 val_raw = (val_raw>>4) & 0xFFFF;
-                *extra_value = s_eo_appEncReader_rescale2icubdegrees( val_raw, jomo, this_jomoconfig.secondary_encoder_place);
+                *secondaryvalue = s_eo_appEncReader_rescale2icubdegrees( val_raw, jomo, (eOmn_serv_mc_sensor_position_t)this_jomoconfig.secondary.pos);
  
             } break; 	            
             
-            case eo_appEncReader_enc_type_INC:
+            case eomn_serv_mc_sensor_encoder_inc:
             {
              
-                val_raw = s_fake_hal_quadencoder_getCounter(this_jomoconfig.secondary_encoder_port);
+                val_raw = s_fake_hal_quadencoder_getCounter(this_jomoconfig.secondary.port);
                 if(ENCODER_VALUE_NOT_SUPPORTED == val_raw)
                 {
-                    *extra_value = 0;
+                    *secondaryvalue = 0;
                 }
                 else
                 {
-                    *extra_value = s_eo_appEncReader_rescale2icubdegrees(val_raw, jomo, this_jomoconfig.secondary_encoder_place);
+                    *secondaryvalue = s_eo_appEncReader_rescale2icubdegrees(val_raw, jomo, (eOmn_serv_mc_sensor_position_t)this_jomoconfig.secondary.pos);
                 }                
               
                 
             } break;
             
-            case eo_appEncReader_enc_type_ADH:
+            case eomn_serv_mc_sensor_encoder_absanalog:
             {
                 // get the voltage from the motor port (0 - 3300mV)
            
-                val_raw = s_fake_hal_adc_get_hall_sensor_analog_input_mV(this_jomoconfig.secondary_encoder_port);        
+                val_raw = s_fake_hal_adc_get_hall_sensor_analog_input_mV(this_jomoconfig.secondary.port);        
                 if(ENCODER_VALUE_NOT_SUPPORTED == val_raw)
                 {
-                    *extra_value = ENCODER_VALUE_NOT_SUPPORTED;
+                    *secondaryvalue = ENCODER_VALUE_NOT_SUPPORTED;
                     res2 = eores_NOK_generic;                    
                 }
                 else
                 {
                     // convert to iCubDegrees
-                    *extra_value = s_eo_appEncReader_rescale2icubdegrees(val_raw, jomo, this_jomoconfig.secondary_encoder_place);
+                    *secondaryvalue = s_eo_appEncReader_rescale2icubdegrees(val_raw, jomo, (eOmn_serv_mc_sensor_position_t)this_jomoconfig.secondary.pos);
                     
                     if(0 != val_raw)
                     {   // marco.accame: boh ... e non si mette NOK_generic in caso contrario ??? per ora non lo cambio.
@@ -542,20 +547,20 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint
                 
             } break;
             
-            case eo_appEncReader_enc_type_MAIS:
+            case eomn_serv_mc_sensor_mais:
             {
 
-                val_raw =  s_eo_read_mais_for_port(p, this_jomoconfig.secondary_encoder_port); 
+                val_raw =  s_eo_read_mais_for_port(p, this_jomoconfig.secondary.port); 
   
                 if(ENCODER_VALUE_NOT_SUPPORTED == val_raw)
                 {
-                    *primary_value = ENCODER_VALUE_NOT_SUPPORTED;
+                    *secondaryvalue = ENCODER_VALUE_NOT_SUPPORTED;
                     res1 = eores_NOK_generic;                    
                 }
                 else
                 {
                     // convert to iCubDegrees
-                    *primary_value = s_eo_appEncReader_rescale2icubdegrees(val_raw, jomo, this_jomoconfig.secondary_encoder_place);   
+                    *secondaryvalue = s_eo_appEncReader_rescale2icubdegrees(val_raw, jomo, (eOmn_serv_mc_sensor_position_t)this_jomoconfig.secondary.pos);   
                     res1 = eores_OK;                    
                 }                             
                
@@ -563,7 +568,7 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint
             
             default:
             {
-                *extra_value = ENCODER_VALUE_NOT_SUPPORTED;                
+                *secondaryvalue = ENCODER_VALUE_NOT_SUPPORTED;                
             } break;
             
             // should handle the other cases...
@@ -571,7 +576,7 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint
     }
     else
     {
-        *extra_value = ENCODER_VALUE_NOT_SUPPORTED;
+        *secondaryvalue = ENCODER_VALUE_NOT_SUPPORTED;
     }
     
     // return value based only on the reading of the primary encoder
@@ -641,16 +646,16 @@ static eObool_t s_eo_prepare_SPI_streams(EOappEncReader *p)
         
         // if in the joint i-th we have any spi-based encoder which is primary or secondary, then we put it into the proper spi-stream        
 
-        if(CHECK_ENC_IS_ON_STREAMED_SPI(jdes->primary_encoder_type))
+        if(CHECK_ENC_IS_ON_STREAMED_SPI_WITHOTHERS(jdes->primary.type))
         {               
-            hal_spiencoder_stream_t streamnumber = s_eo_appEncReader_get_spi_stream(p, jdes->primary_encoder_port);
+            hal_spiencoder_stream_t streamnumber = s_eo_appEncReader_get_spi_stream(p, jdes->primary.port);
             if(hal_spiencoder_streamNONE != streamnumber)
             {    
-                p->SPI_streams[streamnumber].type = (hal_spiencoder_type_t)jdes->primary_encoder_type;   
+                p->SPI_streams[streamnumber].type = (hal_spiencoder_type_t)jdes->primary.type;   
                 p->SPI_streams[streamnumber].maxsupported = p->stream_map->stream2numberofencoders[streamnumber];
                 if(p->SPI_streams[streamnumber].numberof < p->SPI_streams[streamnumber].maxsupported)
                 {
-                    p->SPI_streams[streamnumber].id[p->SPI_streams[streamnumber].numberof++] = (hal_spiencoder_t)jdes->primary_encoder_port;
+                    p->SPI_streams[streamnumber].id[p->SPI_streams[streamnumber].numberof++] = (hal_spiencoder_t)jdes->primary.port;
                 }
                 else
                 {
@@ -665,16 +670,16 @@ static eObool_t s_eo_prepare_SPI_streams(EOappEncReader *p)
             }
         }
 
-        if(CHECK_ENC_IS_ON_STREAMED_SPI(jdes->secondary_encoder_type))
+        if(CHECK_ENC_IS_ON_STREAMED_SPI_WITHOTHERS(jdes->secondary.type))
         {   
-            hal_spiencoder_stream_t streamnumber = s_eo_appEncReader_get_spi_stream(p, jdes->secondary_encoder_port);
+            hal_spiencoder_stream_t streamnumber = s_eo_appEncReader_get_spi_stream(p, jdes->secondary.port);
             if(hal_spiencoder_streamNONE != streamnumber)
             {    
-                p->SPI_streams[streamnumber].type = (hal_spiencoder_type_t)jdes->secondary_encoder_type;   
+                p->SPI_streams[streamnumber].type = (hal_spiencoder_type_t)jdes->secondary.type;   
                 p->SPI_streams[streamnumber].maxsupported = p->stream_map->stream2numberofencoders[streamnumber];
                 if(p->SPI_streams[streamnumber].numberof < p->SPI_streams[streamnumber].maxsupported)
                 {
-                    p->SPI_streams[streamnumber].id[p->SPI_streams[streamnumber].numberof++] = (hal_spiencoder_t)jdes->secondary_encoder_port;
+                    p->SPI_streams[streamnumber].id[p->SPI_streams[streamnumber].numberof++] = (hal_spiencoder_t)jdes->secondary.port;
                 }
                 else
                 {
@@ -690,16 +695,16 @@ static eObool_t s_eo_prepare_SPI_streams(EOappEncReader *p)
             }
         }  
         
-        if(CHECK_ENC_IS_CHAINED_SPI(jdes->primary_encoder_type))
+        if(CHECK_ENC_IS_ON_STREAMED_SPI_ALONE(jdes->primary.type))
         {               
-            hal_spiencoder_stream_t streamnumber = s_eo_appEncReader_get_spi_stream(p, jdes->primary_encoder_port);
+            hal_spiencoder_stream_t streamnumber = s_eo_appEncReader_get_spi_stream(p, jdes->primary.port);
             if(hal_spiencoder_streamNONE != streamnumber)
             {    
-                p->SPI_streams[streamnumber].type = (hal_spiencoder_type_t)jdes->primary_encoder_type;   
+                p->SPI_streams[streamnumber].type = (hal_spiencoder_type_t)jdes->primary.type;   
                 p->SPI_streams[streamnumber].maxsupported = 1;
                 if(p->SPI_streams[streamnumber].numberof < p->SPI_streams[streamnumber].maxsupported)
                 {
-                    p->SPI_streams[streamnumber].id[p->SPI_streams[streamnumber].numberof++] = (hal_spiencoder_t)jdes->primary_encoder_port;
+                    p->SPI_streams[streamnumber].id[p->SPI_streams[streamnumber].numberof++] = (hal_spiencoder_t)jdes->primary.port;
                 }
                 else
                 {
@@ -715,16 +720,16 @@ static eObool_t s_eo_prepare_SPI_streams(EOappEncReader *p)
             }
         }
 
-        if(CHECK_ENC_IS_CHAINED_SPI(jdes->secondary_encoder_type))
+        if(CHECK_ENC_IS_ON_STREAMED_SPI_ALONE(jdes->secondary.type))
         {   
-            hal_spiencoder_stream_t streamnumber = s_eo_appEncReader_get_spi_stream(p, jdes->secondary_encoder_port);
+            hal_spiencoder_stream_t streamnumber = s_eo_appEncReader_get_spi_stream(p, jdes->secondary.port);
             if(hal_spiencoder_streamNONE != streamnumber)
             {    
-                p->SPI_streams[streamnumber].type = (hal_spiencoder_type_t)jdes->secondary_encoder_type;   
+                p->SPI_streams[streamnumber].type = (hal_spiencoder_type_t)jdes->secondary.type;   
                 p->SPI_streams[streamnumber].maxsupported = 1;
                 if(p->SPI_streams[streamnumber].numberof < p->SPI_streams[streamnumber].maxsupported)
                 {
-                    p->SPI_streams[streamnumber].id[p->SPI_streams[streamnumber].numberof++] = (hal_spiencoder_t)jdes->secondary_encoder_port;
+                    p->SPI_streams[streamnumber].id[p->SPI_streams[streamnumber].numberof++] = (hal_spiencoder_t)jdes->secondary.port;
                 }
                 else
                 {
@@ -917,12 +922,12 @@ static eObool_t s_eo_appEncReader_IsValidValue_AEA(uint32_t *valueraw, eOappEncR
     return(eobool_true);
 }
 
+
 static eObool_t s_eo_appEncReader_IsValidValue_SPICHAIN2(uint32_t *valueraw, eOappEncReader_errortype_t *error)
 {
     #warning -> to be defined    
     return(eobool_true);
 }
-
 
 
 static void s_eo_appEncReader_deconfigure_NONSPI_encoders(EOappEncReader *p)
@@ -938,14 +943,14 @@ static void s_eo_appEncReader_configure_NONSPI_encoders(EOappEncReader *p)
     {
         eOappEncReader_jomoconfig_t* jmcfg = &p->config.jomoconfig[i];
         
-        if(jmcfg->primary_encoder_type == eo_appEncReader_enc_type_INC)
+        if(jmcfg->primary.type == eomn_serv_mc_sensor_encoder_inc)
         {           
-            s_fake_hal_quadencoder_single_init(jmcfg->primary_encoder_port);
+            s_fake_hal_quadencoder_single_init(jmcfg->primary.port);
         }
         
-        if(jmcfg->secondary_encoder_type == eo_appEncReader_enc_type_INC)
+        if(jmcfg->secondary.type == eomn_serv_mc_sensor_encoder_inc)
         {           
-            s_fake_hal_quadencoder_single_init(jmcfg->secondary_encoder_port);
+            s_fake_hal_quadencoder_single_init(jmcfg->secondary.port);
         }
         
         // for adh: do things ...
@@ -956,7 +961,7 @@ static void s_eo_appEncReader_configure_NONSPI_encoders(EOappEncReader *p)
 }
 
 
-static uint32_t s_eo_appEncReader_rescale2icubdegrees(uint32_t val_raw, uint8_t jomo, eo_appEncReader_encoder_place_t pos_type)
+static uint32_t s_eo_appEncReader_rescale2icubdegrees(uint32_t val_raw, uint8_t jomo, eOmn_serv_mc_sensor_position_t pos)
 {
 
     // this is the correct code: we divide by the encoderconversionfactor ...
@@ -978,7 +983,8 @@ static uint32_t s_eo_appEncReader_rescale2icubdegrees(uint32_t val_raw, uint8_t 
     uint32_t retval = val_raw;
     float divider = 1.0f;
 
-    if (pos_type == eo_appEncReader_encoder_place_atjoint)
+    
+    if(eomn_serv_mc_sensor_pos_atjoint == pos)
     {
         eOmc_joint_t *joint = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, jomo);
                 
@@ -990,7 +996,7 @@ static uint32_t s_eo_appEncReader_rescale2icubdegrees(uint32_t val_raw, uint8_t 
         /*divider = eo_common_Q17_14_to_float(joint->config.DEPRECATED_encoderconversionfactor); NO MORE NEEDED */
         divider = joint->config.jntEncoderResolution;
     }
-    else if (pos_type == eo_appEncReader_encoder_place_atmotor)
+    else if(eomn_serv_mc_sensor_pos_atmotor == pos)
     {
         eOmc_motor_t *motor = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, jomo);
                 
@@ -1000,6 +1006,10 @@ static uint32_t s_eo_appEncReader_rescale2icubdegrees(uint32_t val_raw, uint8_t 
         }
         
         divider = motor->config.rotorEncoderResolution;
+    }
+    else
+    {
+        return(0);
     }
     
     //check divider validity
@@ -1022,7 +1032,7 @@ static uint32_t s_eo_appEncReader_rescale2icubdegrees(uint32_t val_raw, uint8_t 
 
 static hal_spiencoder_stream_t s_eo_appEncReader_get_spi_stream(EOappEncReader* p, uint8_t port)
 {
-    if(eo_appEncReader_encoder_portNONE == port)
+    if(port >= eomn_serv_mc_port_none)
     {
         return(hal_spiencoder_streamNONE);
     }
@@ -1064,13 +1074,13 @@ static uint32_t s_eo_read_mais_for_port(EOappEncReader *p, uint8_t port)
     uint8_t value2 = 0;
     uint8_t value3 = 0;
     uint8_t *tmp = NULL;
-    if(eo_appEncReader_encoder_portFingerTHUMB0 == port)
+    if(eomn_serv_mc_port_mais_thumb_proximal == port)
     {
         tmp = (uint8_t*)eo_array_At(array, 0);
         value1 = (NULL == tmp) ? (0) : (*tmp);
         val_raw = value1;        
     }
-    else if(eo_appEncReader_encoder_portFingerTHUMB1 == port)
+    else if(eomn_serv_mc_port_mais_thumb_distal == port)
     {
         tmp = (uint8_t*)eo_array_At(array, 1);
         value1 = (NULL == tmp) ? (0) : (*tmp);
@@ -1078,13 +1088,13 @@ static uint32_t s_eo_read_mais_for_port(EOappEncReader *p, uint8_t port)
         value2 = (NULL == tmp) ? (0) : (*tmp);
         val_raw = value1 + value2;                                             
     }
-    else if(eo_appEncReader_encoder_portFingerINDEXprox == port)
+    else if(eomn_serv_mc_port_mais_index_proximal == port)
     {
         tmp = (uint8_t*)eo_array_At(array, 3);
         value1 = (NULL == tmp) ? (0) : (*tmp);
         val_raw = value1;                                             
     }
-    else if(eo_appEncReader_encoder_portFingerINDEXdist == port)
+    else if(eomn_serv_mc_port_mais_index_distal == port)
     {
         tmp = (uint8_t*)eo_array_At(array, 4);
         value1 = (NULL == tmp) ? (0) : (*tmp);
@@ -1092,13 +1102,13 @@ static uint32_t s_eo_read_mais_for_port(EOappEncReader *p, uint8_t port)
         value2 = (NULL == tmp) ? (0) : (*tmp);
         val_raw = value1 + value2;                                             
     } 
-    else if(eo_appEncReader_encoder_portFingerMEDIUMprox == port)
+    else if(eomn_serv_mc_port_mais_medium_proximal == port)
     {
         tmp = (uint8_t*)eo_array_At(array, 6);
         value1 = (NULL == tmp) ? (0) : (*tmp);
         val_raw = value1;                                             
     }  
-    else if(eo_appEncReader_encoder_portFingerMEDIUMdist == port)
+    else if(eomn_serv_mc_port_mais_medium_distal == port)
     {
         tmp = (uint8_t*)eo_array_At(array, 7);
         value1 = (NULL == tmp) ? (0) : (*tmp);
@@ -1106,7 +1116,7 @@ static uint32_t s_eo_read_mais_for_port(EOappEncReader *p, uint8_t port)
         value2 = (NULL == tmp) ? (0) : (*tmp);
         val_raw = value1 + value2;                                             
     }                 
-    else if(eo_appEncReader_encoder_portFingerPINKY == port)
+    else if(eomn_serv_mc_port_mais_littlefingers == port)
     {
         tmp = (uint8_t*)eo_array_At(array, 11);
         value1 = (NULL == tmp) ? (0) : (*tmp);

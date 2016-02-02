@@ -38,7 +38,7 @@
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "EoCommon.h"
-
+#include "EoManagement.h"
 #include "hal_spiencoder.h"
 
 
@@ -50,73 +50,11 @@
 typedef struct EOappEncReader_hid  EOappEncReader;
 
 
-typedef enum
-{
-    eo_appEncReader_enc_type_AEA            = 0,  /* AEA encoder (SPI) */ 
-    eo_appEncReader_enc_type_AMO            = 1,  /* AMO encoder (SPI) */
-    eo_appEncReader_enc_type_INC            = 2,  /* Incremental/Quadrature Encoder */
-    eo_appEncReader_enc_type_ADH            = 3,  /* Analogic Hall Effect Encoder */
-    eo_appEncReader_enc_type_MAIS           = 4,  /* Encoder position coming from MAIS can board. the field port specifies the kind of finger is requested */ 
-    eo_appEncReader_enc_type_SPICHAINOF2    = 5,
-    eo_appEncReader_enc_type_NONE           = 255 /* Encoder NOT DEFINED */
-} eo_appEncReader_encoder_type_t;
-
-enum { eo_appEncReader_enc_type_numberof = 6 };
-
-
-enum 
-{ 
-    eo_appEncReader_encoder_portFingerTHUMB0        = 0,
-    eo_appEncReader_encoder_portFingerTHUMB1        = 1,
-    eo_appEncReader_encoder_portFingerINDEXprox     = 2, 
-    eo_appEncReader_encoder_portFingerINDEXdist     = 3,
-    eo_appEncReader_encoder_portFingerMEDIUMprox    = 4,
-    eo_appEncReader_encoder_portFingerMEDIUMdist    = 5,
-    eo_appEncReader_encoder_portFingerPINKY         = 6,
-    eo_appEncReader_encoder_portMAX = 8, 
-    eo_appEncReader_encoder_portNONE = 255 
-}; // from 0 to MAX
-
-
-
-typedef enum
-{
-    eo_appEncReader_encoder_place_atjoint   = 0,  
-    eo_appEncReader_encoder_place_atmotor   = 1,
-    eo_appEncReader_encoder_place_NONE      = 255,
-} eo_appEncReader_encoder_place_t;
-
-
-
-/** @typedef    struct eOappEncReader_joint_cfg_t
-    @brief      contains representation of a joint from the encoder reader module point of view
- **/
-typedef struct
-{                                       
-    eo_appEncReader_encoder_type_t      primary_encoder_type;
-    uint8_t                             primary_encoder_port;   // it can be a hal_spiencoder_t or a hal_quadencoder_t or a ...
-    eo_appEncReader_encoder_place_t     primary_encoder_place;
-    eo_appEncReader_encoder_type_t      secondary_encoder_type;
-    uint8_t                             secondary_encoder_port; // it can be a hal_spiencoder_t or a hal_quadencoder_t or a ...
-    eo_appEncReader_encoder_place_t     secondary_encoder_place;
-} eOappEncReader_jomoconfig_t;
-
-
 // the value is referred to the maximum number of joint-motors directly managed by this object.
 enum { eOappEncReader_jomos_maxnumberof = 4 }; 
 
-// the value is referred to the maximum number of encoder directly managed by this object. there are 
+// the value is referred to the maximum number of encoders directly managed by this object. 
 enum { eOappEncReader_encoders_maxnumberof = 2*eOappEncReader_jomos_maxnumberof }; 
-
-
-/** @typedef    struct eOappEncReader_cfg_t
-    @brief      contains the configuration used to initialize the EOappEncodersReader application
- **/
-typedef struct
-{   
-    uint8_t                     numofjomos;  
-    eOappEncReader_jomoconfig_t jomoconfig[eOappEncReader_jomos_maxnumberof];                           
-} eOappEncReader_cfg_t;
 
 
 /** @typedef    enum eOappEncReader_errortype_t
@@ -141,7 +79,7 @@ extern EOappEncReader* eo_appEncReader_Initialise(void);
 
 extern EOappEncReader* eo_appEncReader_GetHandle(void);
 
-extern eOresult_t eo_appEncReader_Activate(EOappEncReader *p, eOappEncReader_cfg_t *cfg);
+extern eOresult_t eo_appEncReader_Activate(EOappEncReader *p, const eOmn_serv_arrayof_4jomodescriptors_t *arrayofjomodes);
 
 extern eOresult_t eo_appEncReader_Deactivate(EOappEncReader *p);
 
@@ -150,8 +88,8 @@ extern eOresult_t eo_appEncReader_StartRead(EOappEncReader *p);
 
 extern eObool_t eo_appEncReader_isReady(EOappEncReader *p);  
 
-// if eo_appEncReader_GetValue() has an error return value in runtime, then the primary_value and extra_value contains a value from eOappEncReader_errortype_t
-extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint32_t *primary_value, uint32_t *extra_value, hal_spiencoder_errors_flags *flags);
+// if eo_appEncReader_GetValue() has an error return value in runtime, then the primary and secondary values contains a value from eOappEncReader_errortype_t
+extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint32_t *primaryvalue, uint32_t *secondaryvalue, hal_spiencoder_errors_flags *flags);
 
 
 /** @}            

@@ -44,11 +44,20 @@
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
+typedef struct
+{                                       
+    eOmn_serv_mc_sensor_t       primary;
+    eOmn_serv_mc_sensor_t       secondary;
+} eOappEncReader_jomoconfig_t;
 
 
-/** @typedef    struct eOappEncReader_stream_t
-    @brief      contains representation of an SPI stream of hal encoders. They all must be of the same type.
- **/
+typedef struct
+{   
+    uint8_t                     numofjomos;  
+    eOappEncReader_jomoconfig_t jomoconfig[eOappEncReader_jomos_maxnumberof];                           
+} eOappEncReader_cfg_t;
+
+
 typedef struct 
 {
     hal_spiencoder_type_t   type;                               /**< the type of SPI encoders. it must be only one */
