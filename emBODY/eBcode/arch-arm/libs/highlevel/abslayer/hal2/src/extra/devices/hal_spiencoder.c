@@ -38,6 +38,7 @@
 #include "hal_gpio.h"
 #include "hl_bits.h" 
 #include "hal_heap.h"
+#include "hal_sys.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -85,8 +86,8 @@ typedef struct
     hal_mux_sel_t               muxsel;
     hal_spi_t                   spiid;
     hal_spiencoder_position_t   position;
-    uint8_t                     rxframes[3][4]; // 3 possible frames received. The size of everyone is the maximum possible
-    uint16_t                    rxframeschain[3];                   
+    uint8_t                     rxframes[3][4];     // 3 possible frames received. The size of everyone is the maximum possible
+    uint16_t                    rxframechain[2];    // 1 frame of 2 words of 16 bits
 } hal_spiencoder_internal_item_t;
 
 
@@ -113,6 +114,7 @@ static hal_result_t s_hal_spiencoder_read_register_execute_t2(hal_spiencoder_t i
 
 //Static callback functions
 static void s_hal_spiencoder_onreceiv(void* p);
+static void s_hal_spiencoder_onreceived_daisychain_prepare(void* p);
 static void s_hal_spiencoder_onreceived_daisychain(void* p);
 static void s_hal_spiencoder_onreceiv_sdad_status(void* p);
 static void s_hal_spiencoder_onreceiv_sensor_data(void* p);
@@ -121,6 +123,8 @@ static void s_hal_spiencoder_onreceiv_reg_data(void* p);
 
 static hal_spiencoder_position_t s_hal_spiencoder_frame2position_t1(uint8_t* frame);
 static hal_spiencoder_position_t s_hal_spiencoder_frame2position_t2(uint8_t* frame);
+
+static void s_hal_spiencoder_2chained_askvalues(hal_spiencoder_internal_item_t* intitem, hal_callback_t callback, void* arg);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -132,16 +136,12 @@ static const hal_spi_cfg_t s_hal_spiencoder_spicfg_master =
     .ownership                  = hal_spi_ownership_master,
     .direction                  = hal_spi_dir_rxonly,
     .activity                   = hal_spi_act_framebased,
-//     .prescaler                  = hal_spi_prescaler_064,
-//     .maxspeed                   = 0, 
     .prescaler                  = hal_spi_prescaler_auto,
     .maxspeed                   = 1000*1000,   
     .datasize                   = hal_spi_datasize_8bit,
     .maxsizeofframe             = 3, // 3 is for aea.
     .capacityoftxfifoofframes   = 0,
     .capacityofrxfifoofframes   = 1,
-    //.dummytxvalue               = 0x00, //removable?
-    //.starttxvalue               = 0x00,    //removable?
     .onframestransmitted        = NULL,
     .argonframestransmitted     = NULL,
     .onframesreceived           = NULL,
@@ -243,12 +243,13 @@ extern hal_result_t hal_spiencoder_init(hal_spiencoder_t id, const hal_spiencode
     }
     else if(hal_spiencoder_typeCHAINof2 == intitem->config.type)
     {
-        spicfg.maxsizeofframe = 2; 
-        spicfg.datasize = hal_spi_datasize_16bit;
-        spicfg.capacityofrxfifoofframes = 3; 
+        spicfg.capacityofrxfifoofframes = 1;        // we need to manage only one frame at a time
+        spicfg.maxsizeofframe = 2;                  // each frame is done of two words
+        spicfg.datasize = hal_spi_datasize_16bit;   // and each word is of 16 bits
+                                                    // all the rest is equal to default 
     }
         
-    //we get the max speed of spi from what specified in hal_spiencoder__theboardconfig
+    // we get the max speed of spi from what specified in hal_spiencoder__theboardconfig
     spicfg.maxspeed = hal_spiencoder__theboardconfig.spimaxspeed;
     
     //Initialize the SPI with the correct config
@@ -319,20 +320,8 @@ extern hal_result_t hal_spiencoder_read_start(hal_spiencoder_t id)
     else if(hal_spiencoder_typeCHAINof2 == intitem->config.type)
     {
         // only in mc2plus ...
-        #warning TODO: code for hal_spiencoder_typeCHAINof2 is yet to be done.
-#if 0        
-        static const uint16_t txframe_dummy_chained[2] = {0x0000, 0x0000};
-
-        hal_mux_enable(intitem->muxid, intitem->muxsel);
-
-        hal_spi_on_framesreceived_set(intitem->spiid, s_hal_spiencoder_onreceived_daisychain, (void*)id);
-
-        hal_spi_set_sizeofframe(intitem->spiid, 2);
-
-        hal_spi_set_isrtxframe(intitem->spiid, (uint8_t*)txframe_dummy_chained);
-
-        hal_spi_start(intitem->spiid, 3); // 3 frames
-#endif                
+        #warning TODO: test reading of hal_spiencoder_typeCHAINof2
+        s_hal_spiencoder_2chained_askvalues(intitem, s_hal_spiencoder_onreceived_daisychain_prepare, (void*)id);           
     }
     
     
@@ -354,26 +343,26 @@ extern hal_result_t hal_spiencoder_read_start_t2(hal_spiencoder_t id, uint8_t re
         return (hal_res_NOK_generic);
     }
 #endif
-        // Saving the status register address to be read in intitem
-        //intitem->act_reg_address = reg_address;
-        
-        //Enabling the MUX
-        hal_mux_enable(intitem->muxid, intitem->muxsel);
-        
-        // Check if we can skip the first phase or not
-        if(hal_true == sdata_check)
-        {
-            // If a check is needed, start with the first phase
-            // This launch a chain of execution for performing a complete reading of the sensor data
-            s_hal_spiencoder_read_sdad_status_t2 (id);
-        }
-        else
-        {
-            // Check not needed, we can start from the reading of the sensor
-            intitem->rxframes[0][0] = 0xF5;
-            intitem->rxframes[0][1] = UINT8_MAX;
-            s_hal_spiencoder_read_sensor_t2 (id);
-        }
+    // Saving the status register address to be read in intitem
+    //intitem->act_reg_address = reg_address;
+    
+    //Enabling the MUX
+    hal_mux_enable(intitem->muxid, intitem->muxsel);
+    
+    // Check if we can skip the first phase or not
+    if(hal_true == sdata_check)
+    {
+        // If a check is needed, start with the first phase
+        // This launch a chain of execution for performing a complete reading of the sensor data
+        s_hal_spiencoder_read_sdad_status_t2 (id);
+    }
+    else
+    {
+        // Check not needed, we can start from the reading of the sensor
+        intitem->rxframes[0][0] = 0xF5;
+        intitem->rxframes[0][1] = UINT8_MAX;
+        s_hal_spiencoder_read_sensor_t2 (id);
+    }
     return(hal_res_OK);
 }
 
@@ -465,7 +454,7 @@ extern hal_result_t hal_spiencoder_get_value(hal_spiencoder_t id, hal_spiencoder
     }
     else if(hal_spiencoder_typeCHAINof2 == intitem->config.type)
     {
-        *pos = 1;    
+        *pos = intitem->position; 
     }
     
     return(hal_res_OK);        
@@ -497,7 +486,7 @@ extern hal_result_t hal_spiencoder_get_value_t2(hal_spiencoder_t id, hal_spienco
         
     *pos = intitem->position;
         
-        // True also if we didn't check...
+    // True also if we didn't check...
     if((intitem->rxframes[0][1] == 0x80) || (intitem->rxframes[0][1] == UINT8_MAX))
     {
         *val = hal_true;
@@ -581,18 +570,22 @@ extern hal_result_t hal_spiencoder_deinit(hal_spiencoder_t id)
         }
         if (i == hal_spiencoders_number -1)
         {
-                // If I'm here, it means that no encoder is connected to the same muxid == spiid
-                // So I must deinit both MUX & SPI, but before it's safer to disable something that may be still running
-                hal_spi_rx_isr_disable(intitem->spiid);
-                hal_spi_periph_disable(intitem->spiid);
-                res = hal_spi_deinit(intitem->spiid);
-                if (hal_res_NOK_generic == res)
-                    return hal_res_NOK_generic;
-                
-                hal_mux_disable(intitem->muxid);
-                res = hal_mux_deinit(intitem->muxid);
-                if (hal_res_NOK_generic == res)
-                    return hal_res_NOK_generic;
+            // If I'm here, it means that no encoder is connected to the same muxid == spiid
+            // So I must deinit both MUX & SPI, but before it's safer to disable something that may be still running
+            hal_spi_rx_isr_disable(intitem->spiid);
+            hal_spi_periph_disable(intitem->spiid);
+            res = hal_spi_deinit(intitem->spiid);
+            if (hal_res_NOK_generic == res)
+            {
+                return hal_res_NOK_generic;
+            }
+            
+            hal_mux_disable(intitem->muxid);
+            res = hal_mux_deinit(intitem->muxid);
+            if (hal_res_NOK_generic == res)
+            {
+                return hal_res_NOK_generic;
+            }
         }            
     }
     
@@ -769,15 +762,43 @@ static void s_hal_spiencoder_onreceived_daisychain(void* p)
     
     hal_mux_disable(intitem->muxid);    
     
-    // ok, now i get the frames .. 3 frames each with 2 uint16_t. thus ... 6 bytes. boh.
-    hal_spi_get(intitem->spiid, (uint8_t*)&intitem->rxframeschain[0], NULL);
-    hal_spi_get(intitem->spiid, (uint8_t*)&intitem->rxframeschain[1], NULL);
-    hal_spi_get(intitem->spiid, (uint8_t*)&intitem->rxframeschain[3], NULL);
+    // ok, now i get the frame .. it has two words with 2 uint16_t. thus ... 4 bytes
+    hal_spi_get(intitem->spiid, (uint8_t*)&intitem->rxframechain, NULL);
+    
+    // so far i get the two readings in raw format inside the 32 bits output
+    // the formatting in each uint16_t value is: (see pag 15)
+    // bit 0:       parity                  parity = value & 0x0001      // calculated as parity even calculated on upper 15 bits 
+    // bit 1:       errorframe              errorframe = (value >> 1) & 0x0001
+    // bit 2-15:    data                    data = (value >> 2) & 0x3fff
+    // in data, assuming it is now shifted down in bits 0:15 (see pag 21)
+    // bit 0-11:    position                position = data & 0x0fff // or (value >> 2) & 0x0fff
+    // bit 13:      alarmlow                alarmlow = (data >> 13) & 0x0001
+    // bit 12:      alarmhigh               alarmhigh = (data >> 12) & 0x0001    
+    intitem->position = intitem->rxframechain[0] | (intitem->rxframechain[1] << 16);
     
     if(NULL != intitem->config.callback_on_rx)
     {
         intitem->config.callback_on_rx(intitem->config.arg);
     }    
+}
+
+
+static void s_hal_spiencoder_onreceived_daisychain_prepare(void* p)
+{
+    int32_t tmp = (int32_t)p;                   
+    hal_spiencoder_t id = (hal_spiencoder_t)tmp;
+    hal_spiencoder_internal_item_t* intitem = s_hal_spiencoder_theinternals.items[HAL_encoder_id2index(id)];
+    
+    hal_mux_disable(intitem->muxid);    
+    
+    // ok, now i get the frame .. it has two words with 2 uint16_t. thus ... 4 bytes
+    // i get it just to remove it from spi buffer.
+    hal_spi_get(intitem->spiid, (uint8_t*)&intitem->rxframechain, NULL);
+    
+    // how much should we wait before we enable the mux again? is 1 microsec enough?   
+    hal_sys_delay(1); 
+    
+    s_hal_spiencoder_2chained_askvalues(intitem, s_hal_spiencoder_onreceived_daisychain, p);
 }
 
 
@@ -875,6 +896,22 @@ static hal_spiencoder_position_t s_hal_spiencoder_frame2position_t2(uint8_t* fra
     pos = pos >> 4;
     pos = pos & 0x0FFFFF;
     return(pos);
+}
+
+
+static void s_hal_spiencoder_2chained_askvalues(hal_spiencoder_internal_item_t* intitem, hal_callback_t callback, void* arg)
+{
+    static const uint16_t txframe_as5055a_angulardata[2] = {0xFFFF, 0xFFFF};
+
+    hal_mux_enable(intitem->muxid, intitem->muxsel);
+
+    hal_spi_on_framesreceived_set(intitem->spiid, callback, arg);
+
+    hal_spi_set_sizeofframe(intitem->spiid, 2);
+
+    hal_spi_set_isrtxframe(intitem->spiid, (uint8_t*)txframe_as5055a_angulardata);
+
+    hal_spi_start(intitem->spiid, 1); // 1 frame 
 }
 
 #endif//HAL_USE_SPIENCODER
