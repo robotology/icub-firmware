@@ -286,7 +286,7 @@ void as5048_init(uint8_t sensorID)
 
 uint16_t * as5048_read(uint8_t sensorID) 
  {
- 	  uint16_t value[3]= {0x3FFF,0x3FFF,0x3FFF};
+ 	  static uint16_t value[3]= {0x3FFF,0x3FFF,0x3FFF};
 
       if (sensorID==0)
 	  {
