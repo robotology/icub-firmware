@@ -440,6 +440,11 @@ extern hal_result_t hal_quadencoder_init(hal_quadencoder_t id)
     }
 #endif    
     
+    if(hal_true == s_hal_quadencoder_initted_is(id))
+    {
+        return(hal_res_OK);
+    }
+    
     TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
     TIM_ICInitTypeDef TIM_ICInitStructure;
     GPIO_InitTypeDef GPIO_InitStructure;
