@@ -18,8 +18,8 @@
 
 
 /* @file       hal_mux.c
-	@brief      This file implements internal implementation of the hal id module.
-	@author     marco.accame@iit.it, valentina.gaggero@iit.it
+    @brief      This file implements internal implementation of the hal id module.
+    @author     marco.accame@iit.it, valentina.gaggero@iit.it
     @date       02/07/2013
 **/
 
@@ -174,13 +174,13 @@ extern hal_result_t hal_mux_init(hal_mux_t id, const hal_mux_cfg_t *cfg)
     hal_gpio_init(intitem->enable, &s_hal_mux_gpio_config);
     hal_gpio_setval(intitem->enable, hal_gpio_valHIGH);
     
-		//If virtual mux, do nothing and return OK
-		if((intitem->sel0.port == hal_gpio_portNONE) || (intitem->sel1.port == hal_gpio_portNONE))
-		{
-			  s_hal_mux_initted_set(id);
-				return (hal_res_OK);
-		}
-		
+    //If virtual mux, do nothing and return OK
+    if((intitem->sel0.port == hal_gpio_portNONE) || (intitem->sel1.port == hal_gpio_portNONE))
+    {
+        s_hal_mux_initted_set(id);
+        return (hal_res_OK);
+    }
+        
     hal_sys_delay(1);   // we use 1 microsec, but it is actually 50 ns
     
     hal_gpio_init(intitem->sel0, &s_hal_mux_gpio_config);
@@ -209,18 +209,18 @@ extern hal_result_t hal_mux_enable(hal_mux_t id, hal_mux_sel_t muxsel)
     }
 #endif
     
-		//If not virtual mux
+    //If not virtual mux
     if((hal_mux_selNONE == muxsel) && ((intitem->sel0.port != hal_gpio_portNONE) || (intitem->sel1.port != hal_gpio_portNONE)))
     {
         return(hal_mux_disable(id));
     }
-		//the mux is virtual, we must enable only one GPIO, the NSEL
-		else if ((hal_mux_selNONE == muxsel) && (intitem->sel0.port == hal_gpio_portNONE) && (intitem->sel1.port == hal_gpio_portNONE))
-		{
-				 hal_gpio_setval(intitem->enable, hal_gpio_valLOW);
-				 return(hal_res_OK);
-		}
-			
+    //the mux is virtual, we must enable only one GPIO, the NSEL
+    else if ((hal_mux_selNONE == muxsel) && (intitem->sel0.port == hal_gpio_portNONE) && (intitem->sel1.port == hal_gpio_portNONE))
+    {
+        hal_gpio_setval(intitem->enable, hal_gpio_valLOW);
+        return(hal_res_OK);
+    }
+            
     
     // do something 
         
@@ -252,10 +252,12 @@ extern hal_result_t hal_mux_disable(hal_mux_t id)
     // do something 
     
     hal_gpio_setval(intitem->enable, hal_gpio_valHIGH);
-		//If virtual mux, do nothing and return OK
-		if((intitem->sel0.port == hal_gpio_portNONE) || (intitem->sel1.port == hal_gpio_portNONE))
-				return (hal_res_OK);
-		
+    //If virtual mux, do nothing and return OK
+    if((intitem->sel0.port == hal_gpio_portNONE) || (intitem->sel1.port == hal_gpio_portNONE))
+    {
+        return (hal_res_OK);
+    }
+        
     hal_sys_delay(delay);   
     hal_gpio_setval(intitem->sel0, hal_gpio_valHIGH);    
     hal_gpio_setval(intitem->sel1, hal_gpio_valHIGH);   
@@ -265,31 +267,31 @@ extern hal_result_t hal_mux_disable(hal_mux_t id)
 
 extern hal_result_t hal_mux_get_cs(hal_mux_t id, hal_gpio_t* cs)
 {
-		hal_mux_internal_item_t* intitem = s_hal_mux_theinternals.items[HAL_mux_id2index(id)];
+    hal_mux_internal_item_t* intitem = s_hal_mux_theinternals.items[HAL_mux_id2index(id)];
     #if     !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)     
     if(hal_false == s_hal_mux_initted_is(id))
     {
         return(hal_res_NOK_generic);
     }
-		#endif
-	
-		*cs = intitem->enable;
-		return(hal_res_OK);
+    #endif
+
+    *cs = intitem->enable;
+    return(hal_res_OK);
 }
 
 extern hal_result_t hal_mux_deinit(hal_mux_t id)
 {
 #if   !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)      
-			if(hal_false == s_hal_mux_initted_is(id))
-			{
-        return(hal_res_NOK_generic);
-			}
+    if(hal_false == s_hal_mux_initted_is(id))
+    {
+    return(hal_res_NOK_generic);
+    }
 #endif
-		s_hal_mux_initted_reset(id);
-		hal_heap_delete((void**)&(s_hal_mux_theinternals.items[HAL_mux_id2index(id)]));
-		//hal_heap_delete((void**)&intitem);
-	
-		return(hal_res_OK);
+    s_hal_mux_initted_reset(id);
+    hal_heap_delete((void**)&(s_hal_mux_theinternals.items[HAL_mux_id2index(id)]));
+    //hal_heap_delete((void**)&intitem);
+
+    return(hal_res_OK);
 }
 
 // --------------------------------------------------------------------------------------------------------------------
