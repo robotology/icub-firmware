@@ -426,6 +426,15 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
         axle_virt_pos[0] = ems->motor_position[0];
         axle_virt_pos[1] = ems->motor_position[1];
     }
+    else
+    {
+        MOTORS(m)
+        {
+            axle_virt_vel[m] = ems->motor_velocity_gbx[m];
+            axle_virt_pos[m] = ems->motor_position[m];
+        }
+    
+    }
     #endif // USE_JACOBIAN
 
 #endif //USE_2FOC_FAST_ENCODER || CER_TICKS_CONTROL
@@ -1219,7 +1228,7 @@ extern void eo_emsController_StartCalibration(uint8_t joint, eOmc_calibration_ty
     
             eo_emsController_SetAxisCalibrationZero(joint, p_type5->calibrationZero);
             
-            ems->axis_controller[joint] ->calibration_type = eomc_calibration_type5_hard_stops_mc4plus;
+            ems->axis_controller[joint]->calibration_type = eomc_calibration_type5_hard_stops_mc4plus;
             s_eo_emsController_ResetCalibrationCoupledJoints(joint);
             eo_absCalibratedEncoder_Calibrate(ems->abs_calib_encoder[joint], 0);            
         } break;
