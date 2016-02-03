@@ -1397,8 +1397,8 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_testOfmc2plus =
                     },
                     .extrasensor    =
                     {
-                        .type   = eomn_serv_mc_sensor_encoder_inc,
-                        .port   = 0,  
+                        .type   = eomn_serv_mc_sensor_encoder_inc, // or: eomn_serv_mc_sensor_encoder_spichainof2,
+                        .port   = 0, // port J2   of mc2plus, which is connected to encoder1 = 0.
                         .pos    = eomn_serv_mc_sensor_pos_atmotor
                     }
                 },
