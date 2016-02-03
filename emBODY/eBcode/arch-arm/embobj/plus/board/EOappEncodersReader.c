@@ -118,6 +118,8 @@ static void s_eo_appEncReader_stopSPIread(void* arg);
 
 static uint32_t s_eo_read_mais_for_port(EOappEncReader *p, uint8_t port);
 
+static hal_spiencoder_type_t s_eo_appEncReader_map_encodertype_to_halspiencodertype(eOmn_serv_mc_sensor_type_t encodertype);
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -502,6 +504,13 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint
                     *secondaryvalue = (uint32_t)err_onReadFromSpi;
                     return((eOresult_t)res2);
                 }
+                
+                if(eobool_false == s_eo_appEncReader_IsValidValue_SPICHAIN2(&val_raw, &errortype))
+                {
+                    *secondaryvalue = (eOappEncReader_errortype_t)errortype;  
+                    flags->data_error = 1;
+                    return(eores_NOK_generic);
+                }                
             
                 uint16_t val1 = (val_raw >> 2) & 0x0fff; // it is the first encoder in the chain
                 uint16_t val2 = (val_raw >> 18) & 0x0fff; // it is the second encoder in the chain
@@ -657,7 +666,7 @@ static eObool_t s_eo_prepare_SPI_streams(EOappEncReader *p)
             hal_spiencoder_stream_t streamnumber = s_eo_appEncReader_get_spi_stream(p, port);
             if(hal_spiencoder_streamNONE != streamnumber)
             {    
-                p->SPI_streams[streamnumber].type = (hal_spiencoder_type_t)jdes->primary.type;   
+                p->SPI_streams[streamnumber].type = s_eo_appEncReader_map_encodertype_to_halspiencodertype((eOmn_serv_mc_sensor_type_t)jdes->primary.type);   
                 p->SPI_streams[streamnumber].maxsupported = p->stream_map->stream2numberofencoders[streamnumber];
                 // i must check if there is already encoder specified by jdes->primary.port inside ... if already, then we dont add it.
                 // we do that because we may have a primary and secondary which have the same aea on the same port.
@@ -688,7 +697,7 @@ static eObool_t s_eo_prepare_SPI_streams(EOappEncReader *p)
             hal_spiencoder_stream_t streamnumber = s_eo_appEncReader_get_spi_stream(p, port);
             if(hal_spiencoder_streamNONE != streamnumber)
             {    
-                p->SPI_streams[streamnumber].type = (hal_spiencoder_type_t)jdes->secondary.type;   
+                p->SPI_streams[streamnumber].type = s_eo_appEncReader_map_encodertype_to_halspiencodertype((eOmn_serv_mc_sensor_type_t)jdes->secondary.type);   
                 p->SPI_streams[streamnumber].maxsupported = p->stream_map->stream2numberofencoders[streamnumber];
                 if(0 == spiencoderportisused[port])
                 {
@@ -717,7 +726,7 @@ static eObool_t s_eo_prepare_SPI_streams(EOappEncReader *p)
             hal_spiencoder_stream_t streamnumber = s_eo_appEncReader_get_spi_stream(p, port);
             if(hal_spiencoder_streamNONE != streamnumber)
             {    
-                p->SPI_streams[streamnumber].type = (hal_spiencoder_type_t)jdes->primary.type;   
+                p->SPI_streams[streamnumber].type = s_eo_appEncReader_map_encodertype_to_halspiencodertype((eOmn_serv_mc_sensor_type_t)jdes->primary.type);   
                 p->SPI_streams[streamnumber].maxsupported = 1;
                 if(0 == spiencoderportisused[port])
                 {
@@ -746,7 +755,7 @@ static eObool_t s_eo_prepare_SPI_streams(EOappEncReader *p)
             hal_spiencoder_stream_t streamnumber = s_eo_appEncReader_get_spi_stream(p, port);
             if(hal_spiencoder_streamNONE != streamnumber)
             {    
-                p->SPI_streams[streamnumber].type = (hal_spiencoder_type_t)jdes->secondary.type;   
+                p->SPI_streams[streamnumber].type = s_eo_appEncReader_map_encodertype_to_halspiencodertype((eOmn_serv_mc_sensor_type_t)jdes->secondary.type);   
                 p->SPI_streams[streamnumber].maxsupported = 1;
                 if(0 == spiencoderportisused[port])
                 {
@@ -1200,6 +1209,22 @@ static uint32_t s_eo_read_mais_for_port(EOappEncReader *p, uint8_t port)
     }    
     
     return(val_raw);
+}
+
+
+static hal_spiencoder_type_t s_eo_appEncReader_map_encodertype_to_halspiencodertype(eOmn_serv_mc_sensor_type_t encodertype)
+{
+    hal_spiencoder_type_t ret = hal_spiencoder_typeNONE;
+    
+    switch(encodertype)
+    {
+        case eomn_serv_mc_sensor_encoder_aea:           ret = hal_spiencoder_typeAEA;       break;
+        case eomn_serv_mc_sensor_encoder_amo:           ret = hal_spiencoder_typeAMO;       break;
+        case eomn_serv_mc_sensor_encoder_spichainof2:   ret = hal_spiencoder_typeCHAINof2;  break;
+        default:                                        ret = hal_spiencoder_typeNONE;      break;
+    }
+    
+    return(ret);
 }
 
 // --------------------------------------------------------------------------------------------------------------------
