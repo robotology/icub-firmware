@@ -822,8 +822,6 @@
 
 
 #ifdef HAL_USE_SPIENCODER
-
-    #warning TODO: this code is OK only for AEA and/or AMO. if you need another kind of encoder, such as the daisy chained ones , then implement them.
  
     #include "hal_spiencoder_hid.h"
 
@@ -833,10 +831,10 @@
         .spimaxspeed                =  1000*1000, // not more than 1 mhz. actually on stm32f4 it is exactly 42m/64 = 0.65625 mhz
         .spimap                     =
         {
-            {   // hal_spiencoder1:    P10 on mc4plus
+            {   // hal_spiencoder1:    connector J2 on mc2plus (placed in the side of the board with most of the connectors: 6 on this face)
                 .spiid = hal_spi3,  .muxid = hal_mux1,  .muxsel = hal_mux_selNONE                
             },
-            {   // hal_spiencoder2:    P11 on mc4plus
+            {   // hal_spiencoder2:    connector J3 on mc4plus (placed in the side of the board with only two connectors: one is ETH and teh other is J3) 
                 .spiid = hal_spi2,  .muxid = hal_mux2,  .muxsel = hal_mux_selNONE               
             }                   
         },
