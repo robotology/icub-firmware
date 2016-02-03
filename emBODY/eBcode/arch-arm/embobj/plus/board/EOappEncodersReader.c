@@ -381,7 +381,7 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint
             case eomn_serv_mc_sensor_encoder_inc:
             {
                 
-                val_raw = s_fake_hal_quadencoder_getCounter(this_jomoconfig.primary.pos);
+                val_raw = s_fake_hal_quadencoder_getCounter(this_jomoconfig.primary.port);
                 if(ENCODER_VALUE_NOT_SUPPORTED == val_raw)
                 {
                     *primaryvalue = 0;
