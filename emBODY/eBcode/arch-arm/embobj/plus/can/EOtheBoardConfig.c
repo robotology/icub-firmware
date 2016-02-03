@@ -1397,9 +1397,9 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_testOfmc2plus =
                     },
                     .extrasensor    =
                     {
-                        .type   = eomn_serv_mc_sensor_none,
-                        .port   = eomn_serv_mc_port_none,  
-                        .pos    = eomn_serv_mc_sensor_pos_none
+                        .type   = eomn_serv_mc_sensor_encoder_inc,
+                        .port   = 0,  
+                        .pos    = eomn_serv_mc_sensor_pos_atmotor
                     }
                 },
                 { // joint 1: second
@@ -1415,9 +1415,9 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_testOfmc2plus =
                     },
                     .extrasensor    =
                     {
-                        .type   = eomn_serv_mc_sensor_none,
-                        .port   = eomn_serv_mc_port_none,  
-                        .pos    = eomn_serv_mc_sensor_pos_none
+                        .type   = eomn_serv_mc_sensor_encoder_inc,
+                        .port   = 1,  
+                        .pos    = eomn_serv_mc_sensor_pos_atmotor
                     }
                 },                
                 { // joint 2
@@ -1608,7 +1608,7 @@ static const eOmn_serv_configuration_t * const s_serv_config_mc_V3[maxboards_V3]
     NULL,
     NULL,
     NULL,
-    NULL,
+    &s_serv_config_mc_cer_testOfmc2plus,
     NULL    
 };
 
@@ -1634,7 +1634,7 @@ static const eOmn_serv_configuration_t * const s_serv_config_mc_CER[maxboards_CE
     NULL,
     NULL,
     NULL,
-    &s_serv_config_mc_cer_testOfmc2plus,
+    NULL,
     &s_serv_config_mc_cer_eb21    
 };
 
