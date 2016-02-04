@@ -84,18 +84,27 @@
   #define SPI2_SCK_SOURCE                GPIO_PinSource1
   #define SPI2_SCK_AF                    GPIO_AF_SPI2
 
+  // m.a: SPI2_MISO is PC2
+  
   #define SPI2_MISO_PIN                  GPIO_Pin_2
   #define SPI2_MISO_GPIO_PORT            GPIOC
   #define SPI2_MISO_GPIO_CLK             RCC_AHB1Periph_GPIOC
   #define SPI2_MISO_SOURCE               GPIO_PinSource2
   #define SPI2_MISO_AF                   GPIO_AF_SPI2
-
+  
+  // m.a: SPI2_MOSI is PCI3 on schematics, thus i impose it. i remove any sign of PC13
+  
+  //m.a: #define SPI2_MOSI_PIN                  GPIO_Pin_13
   #define SPI2_MOSI_PIN                  GPIO_Pin_3
   #define SPI2_MOSI_GPIO_PORT            GPIOI
+  //m.a: #define SPI2_MOSI_GPIO_CLK             RCC_AHB1Periph_GPIOC
   #define SPI2_MOSI_GPIO_CLK             RCC_AHB1Periph_GPIOI
+  //m.a: #define SPI2_MOSI_SOURCE               GPIO_PinSource13
   #define SPI2_MOSI_SOURCE               GPIO_PinSource3
   #define SPI2_MOSI_AF                   GPIO_AF_SPI2
 
+   // m.a: SPI2_NSEL is PI0
+   
   #define SPI2_NSEL_PIN                  GPIO_Pin_0
   #define SPI2_NSEL_GPIO_PORT            GPIOI
   #define SPI2_NSEL_GPIO_CLK             RCC_AHB1Periph_GPIOI
@@ -302,10 +311,10 @@ uint16_t * as5048_read(uint8_t sensorID)
 	  value[1]=SPI_I2S_ReceiveData(SPI3)&0x3fff;  //remove the parity and errorflag bit
 //	  while(SPI_I2S_GetFlagStatus(SPI3, SPI_I2S_FLAG_BSY));
 
-		GPIO_ResetBits(SPI3_NSEL_GPIO_PORT, SPI3_NSEL_PIN);
-	  SPI_I2S_SendData(SPI3, 0xffff);   //send a dummy value 
-	  while(SPI_I2S_GetFlagStatus(SPI3, SPI_I2S_FLAG_TXE)==0);
-	  value[2]=SPI_I2S_ReceiveData(SPI3)&0x3fff;  //remove the parity and errorflag bit
+//		GPIO_ResetBits(SPI3_NSEL_GPIO_PORT, SPI3_NSEL_PIN);
+//	  SPI_I2S_SendData(SPI3, 0xffff);   //send a dummy value 
+//	  while(SPI_I2S_GetFlagStatus(SPI3, SPI_I2S_FLAG_TXE)==0);
+//	  value[2]=SPI_I2S_ReceiveData(SPI3)&0x3fff;  //remove the parity and errorflag bit
 			
 	  //angle[0] +=(aRxBuffer[0]&0x3fff);
 	  while(SPI_I2S_GetFlagStatus(SPI3, SPI_I2S_FLAG_BSY));
@@ -325,9 +334,9 @@ uint16_t * as5048_read(uint8_t sensorID)
 	  value[1]=SPI_I2S_ReceiveData(SPI2)&0x3fff;  //remove the parity and errorflag bit
 			 while(SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_BSY));
 	  //angle[0] +=(aRxBuffer[0]&0x3fff);			
-		SPI_I2S_SendData(SPI2, 0x3fff);   //send a dummy value 
-	  while(SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_TXE)==0);
-	  value[2]=SPI_I2S_ReceiveData(SPI2)&0x3fff;  //remove the parity and errorflag bit
+//		SPI_I2S_SendData(SPI2, 0x3fff);   //send a dummy value 
+//	  while(SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_TXE)==0);
+//	  value[2]=SPI_I2S_ReceiveData(SPI2)&0x3fff;  //remove the parity and errorflag bit
 	  //angle[0] +=(aRxBuffer[0]&0x3fff);
 ///			
 			 
