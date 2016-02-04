@@ -147,6 +147,7 @@ static const hal_spi_cfg_t s_hal_spiencoder_spicfg_master =
     .onframesreceived           = NULL,
     .argonframesreceived        = NULL,
     .cpolarity                  = hal_spi_cpolarity_high,
+    .datacapture                = hal_spi_datacapture_1edge
 };
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -167,6 +168,11 @@ static hal_spiencoder_theinternals_t s_hal_spiencoder_theinternals =
 extern hal_boolval_t hal_spiencoder_supported_is(hal_spiencoder_t id)
 {
     return(s_hal_spiencoder_supported_is(id));
+}
+
+extern hal_boolval_t hal_spiencoder_initted_is(hal_spiencoder_t id)
+{
+    return(s_hal_spiencoder_initted_is(id));
 }
 
 
@@ -247,6 +253,8 @@ extern hal_result_t hal_spiencoder_init(hal_spiencoder_t id, const hal_spiencode
         spicfg.maxsizeofframe = 2;                  // each frame is done of two words
         spicfg.datasize = hal_spi_datasize_16bit;   // and each word is of 16 bits
                                                     // all the rest is equal to default 
+        spicfg.cpolarity = hal_spi_cpolarity_low;
+        spicfg.datacapture = hal_spi_datacapture_2edge;        
     }
         
     // we get the max speed of spi from what specified in hal_spiencoder__theboardconfig
@@ -320,7 +328,6 @@ extern hal_result_t hal_spiencoder_read_start(hal_spiencoder_t id)
     else if(hal_spiencoder_typeCHAINof2 == intitem->config.type)
     {
         // only in mc2plus ...
-        #warning TODO: test reading of hal_spiencoder_typeCHAINof2
         s_hal_spiencoder_2chained_askvalues(intitem, s_hal_spiencoder_onreceived_daisychain_prepare, (void*)id);           
     }
     
@@ -480,7 +487,7 @@ extern hal_result_t hal_spiencoder_get_value_t2(hal_spiencoder_t id, hal_spienco
     // opcode used. If not, I put the validity to false
     if((intitem->rxframes[0][0] != 0xF5) || (intitem->rxframes[1][0] != 0xA6) || (intitem->rxframes[2][0] != 0xAD))
     {
-              *val = hal_false;
+        *val = hal_false;
         return(hal_res_NOK_generic); 
     }
         
@@ -901,6 +908,31 @@ static hal_spiencoder_position_t s_hal_spiencoder_frame2position_t2(uint8_t* fra
 
 static void s_hal_spiencoder_2chained_askvalues(hal_spiencoder_internal_item_t* intitem, hal_callback_t callback, void* arg)
 {
+#define HAL_SPIENCODER_2CHAINED__TEST_RAWMODE
+#if defined(HAL_SPIENCODER_2CHAINED__TEST_RAWMODE)
+    uint16_t data0 = 0;
+    uint16_t data1 = 0;
+    
+    hal_mux_enable(intitem->muxid, intitem->muxsel);
+    hal_spi_raw_enable(intitem->spiid);
+    hal_spi_raw_writeread(intitem->spiid, 0xffff, &data0);
+    hal_spi_raw_writeread(intitem->spiid, 0xffff, &data1);
+    hal_spi_raw_disable(intitem->spiid);
+    hal_mux_disable(intitem->muxid);
+    
+    hal_mux_enable(intitem->muxid, intitem->muxsel);
+    hal_spi_raw_enable(intitem->spiid);
+    hal_spi_raw_writeread(intitem->spiid, 0xffff, &data0);
+    hal_spi_raw_writeread(intitem->spiid, 0xffff, &data1);
+    hal_spi_raw_disable(intitem->spiid);
+    hal_mux_disable(intitem->muxid);
+    
+    intitem->rxframechain[0] = data0;
+    intitem->rxframechain[1] = data1;   
+    
+    intitem->position = data0 | (data1 << 16);
+    
+#else    
     static const uint16_t txframe_as5055a_angulardata[2] = {0xFFFF, 0xFFFF};
 
     hal_mux_enable(intitem->muxid, intitem->muxsel);
@@ -912,6 +944,7 @@ static void s_hal_spiencoder_2chained_askvalues(hal_spiencoder_internal_item_t* 
     hal_spi_set_isrtxframe(intitem->spiid, (uint8_t*)txframe_as5055a_angulardata);
 
     hal_spi_start(intitem->spiid, 1); // 1 frame 
+#endif    
 }
 
 #endif//HAL_USE_SPIENCODER

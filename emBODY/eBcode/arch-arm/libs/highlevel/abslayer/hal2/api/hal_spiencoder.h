@@ -160,6 +160,14 @@ extern hal_boolval_t hal_spiencoder_supported_is(hal_spiencoder_t id);
 extern const hal_spiencoder_stream_map_t* hal_spiencoder_stream_map_get(void);
 
 
+/** @fn         extern hal_boolval_t hal_spiencoder_initted_is(hal_spiencoder_t id)
+    @brief      This function tells if the specified encoder is already initted. 
+    @param      id              identifies encoder id 
+    @return     hal_true or hal_false
+  */
+extern hal_boolval_t hal_spiencoder_initted_is(hal_spiencoder_t id);
+
+
 /** @fn            extern hal_result_t hal_spiencoder_init(hal_spiencoder_t id, const hal_spiencoder_cfg_t *cfg)
     @brief      This function initializes the encoder and whatever is required for its behaviour (mux and spi).
     @param      encoder         the encoder
