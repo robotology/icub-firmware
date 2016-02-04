@@ -40,6 +40,8 @@
 #include "hal_heap.h"
 #include "hal_sys.h"
 
+#include "hal_as5048.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -57,8 +59,13 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-// Cast from t to uint8_t
 #define HAL_encoder_id2index(t)              ((uint8_t)((t)))
+
+
+#define HAL_SPIENCODER_2CHAINED__TEST_RAWMODE0
+//#define HAL_SPIENCODER_2CHAINED__TEST_RAWMODE1
+//#define HAL_SPIENCODER_2CHAINED__DONT_TEST
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -81,6 +88,7 @@ const hal_spiencoder_cfg_t hal_spiencoder_cfg_default =
 typedef struct
 {
     hal_spiencoder_cfg_t        config;
+    hal_spiencoder_t            encid;
     hal_mux_t                   muxid;
     hal_gpio_t                  chip_sel;
     hal_mux_sel_t               muxsel;
@@ -225,10 +233,11 @@ extern hal_result_t hal_spiencoder_init(hal_spiencoder_t id, const hal_spiencode
     
     // configure the required mux port and spi port (using the configuration of the board for the selected encoder)
     // "hal_spiencoder__theboardconfig" struct is defined inside the board modules 
-    intitem->spiid  = hal_spiencoder__theboardconfig.spimap[HAL_encoder_id2index(id)].spiid;    
-    intitem->muxid  = hal_spiencoder__theboardconfig.spimap[HAL_encoder_id2index(id)].muxid;
-    intitem->muxsel = hal_spiencoder__theboardconfig.spimap[HAL_encoder_id2index(id)].muxsel;
-    intitem->position  = 0;
+    intitem->encid      = id;
+    intitem->spiid      = hal_spiencoder__theboardconfig.spimap[HAL_encoder_id2index(id)].spiid;    
+    intitem->muxid      = hal_spiencoder__theboardconfig.spimap[HAL_encoder_id2index(id)].muxid;
+    intitem->muxsel     = hal_spiencoder__theboardconfig.spimap[HAL_encoder_id2index(id)].muxsel;
+    intitem->position   = 0;
     
     res = hal_mux_init(intitem->muxid, NULL);
     if(hal_res_OK != res)
@@ -249,6 +258,11 @@ extern hal_result_t hal_spiencoder_init(hal_spiencoder_t id, const hal_spiencode
     }
     else if(hal_spiencoder_typeCHAINof2 == intitem->config.type)
     {
+#if defined(HAL_SPIENCODER_2CHAINED__TEST_RAWMODE0)        
+        as5048_init(id);
+        s_hal_spiencoder_initted_set(id);
+        return(hal_res_OK);
+#endif        
         spicfg.capacityofrxfifoofframes = 1;        // we need to manage only one frame at a time
         spicfg.maxsizeofframe = 2;                  // each frame is done of two words
         spicfg.datasize = hal_spi_datasize_16bit;   // and each word is of 16 bits
@@ -907,9 +921,20 @@ static hal_spiencoder_position_t s_hal_spiencoder_frame2position_t2(uint8_t* fra
 
 
 static void s_hal_spiencoder_2chained_askvalues(hal_spiencoder_internal_item_t* intitem, hal_callback_t callback, void* arg)
-{
-#define HAL_SPIENCODER_2CHAINED__TEST_RAWMODE
-#if defined(HAL_SPIENCODER_2CHAINED__TEST_RAWMODE)
+{   
+#if     defined(HAL_SPIENCODER_2CHAINED__TEST_RAWMODE0)    
+    uint16_t *values = NULL;
+
+    values = as5048_read(intitem->encid, 0xffff);
+    values = as5048_read(intitem->encid, 0xffff);
+
+    intitem->rxframechain[0] = values[0];
+    intitem->rxframechain[1] = values[1];   
+    
+    intitem->position = values[0] | (values[1] << 16);
+    
+#elif   defined(HAL_SPIENCODER_2CHAINED__TEST_RAWMODE1)
+    
     uint16_t data0 = 0;
     uint16_t data1 = 0;
     
@@ -932,7 +957,8 @@ static void s_hal_spiencoder_2chained_askvalues(hal_spiencoder_internal_item_t* 
     
     intitem->position = data0 | (data1 << 16);
     
-#else    
+#elif   defined(HAL_SPIENCODER_2CHAINED__DONT_TEST)      
+
     static const uint16_t txframe_as5055a_angulardata[2] = {0xFFFF, 0xFFFF};
 
     hal_mux_enable(intitem->muxid, intitem->muxsel);
@@ -944,6 +970,7 @@ static void s_hal_spiencoder_2chained_askvalues(hal_spiencoder_internal_item_t* 
     hal_spi_set_isrtxframe(intitem->spiid, (uint8_t*)txframe_as5055a_angulardata);
 
     hal_spi_start(intitem->spiid, 1); // 1 frame 
+    
 #endif    
 }
 
