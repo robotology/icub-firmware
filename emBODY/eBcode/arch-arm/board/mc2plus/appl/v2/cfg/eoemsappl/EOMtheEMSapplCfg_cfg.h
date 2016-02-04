@@ -924,7 +924,7 @@ extern "C" {
 
 // in here we put only the macros required for the reference application
 
-    #define NAME_PREFIX     aMC4
+    #define NAME_PREFIX     aMC2
     #define NAME_POSTFIX    v3
 
 
