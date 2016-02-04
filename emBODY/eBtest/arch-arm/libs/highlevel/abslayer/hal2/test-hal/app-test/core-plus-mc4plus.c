@@ -87,8 +87,8 @@
 //#undef EXECUTE_TEST_I2C
 #define EXECUTE_TEST_I2C
 
-//#undef  EXECUTE_TEST_EEPROM
-#define EXECUTE_TEST_EEPROM
+#undef  EXECUTE_TEST_EEPROM
+//#define EXECUTE_TEST_EEPROM
 
 #undef  EXECUTE_TEST_TIMER
 //#define EXECUTE_TEST_TIMER
@@ -354,7 +354,7 @@ int main(void)
     hal_core_start();
 
     // we can exec in here because test-encoder-spi() initialises can if not doen yet
-    test_encoder_spi();
+//    test_encoder_spi();
    
     
     leds_init();    
@@ -1061,15 +1061,16 @@ static void test_encoder_spi(void)
 	//loop until i receive a message on can
 	while(message_received==0)
 	{
+        const uint16_t mask = 0xffff;
 		// read the encoders and fill the canframe with the data
 	  angle[0]=0; 
 	  angle[0]=1; 
-   	angle[0]=as5048_read(0)[0];
-		angle[1]=as5048_read(0)[1];
-	//	angle[2]=as5048_read(0)[2];
-		angle[3]=as5048_read(1)[0];
-		angle[4]=as5048_read(1)[1];
-	//  angle[5]=as5048_read(1)[2];	 
+   	angle[0]=as5048_read(0, mask)[0];
+		angle[1]=as5048_read(0, mask)[1];
+	//	angle[2]=as5048_read(0, mask)[2];
+		angle[3]=as5048_read(1, mask)[0];
+		angle[4]=as5048_read(1, mask)[1];
+	//  angle[5]=as5048_read(1, mask)[2];	 
 		canframe.id = 0x1AA;
     canframe.data[1] = (angle[0] & 0xFF); 
 	  canframe.data[2] = (angle[0] & 0xFF00)>>8; // rimuovo il parity bit e l'errorflag
