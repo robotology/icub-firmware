@@ -156,6 +156,11 @@ extern hal_boolval_t hal_can_supported_is(hal_can_t id)
     return(s_hal_can_supported_is(id));
 }
 
+extern hal_boolval_t hal_can_initted_is(hal_can_t id)
+{
+    return(s_hal_can_initted_is(id));
+}
+
 extern hal_result_t hal_can_init(hal_can_t id, const hal_can_cfg_t *cfg)
 {
     hal_can_internal_item_t* intitem = s_hal_can_theinternals.items[HAL_can_id2index(id)];

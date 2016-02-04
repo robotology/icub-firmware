@@ -212,6 +212,14 @@ extern const hal_can_cfg_t hal_can_cfg_default;
 extern hal_boolval_t hal_can_supported_is(hal_can_t id);
 
 
+/** @fn         extern hal_boolval_t hal_can_initted_is(hal_can_t id)
+    @brief      This function tells if the specified CAN port is initted or not. 
+    @param      id              identifies CAN id 
+    @return     hal_true or hal_false
+  */
+extern hal_boolval_t hal_can_initted_is(hal_can_t id);
+
+
 /** @fn         extern hal_result_t hal_can_init(hal_can_t id, const hal_can_cfg_t *cfg)
     @brief      This function configures CAN.
     @param      id              identifies CAN id 
