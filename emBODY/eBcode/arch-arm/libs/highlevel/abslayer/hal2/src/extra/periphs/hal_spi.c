@@ -101,6 +101,7 @@ const hal_spi_cfg_t hal_spi_cfg_default =
     .onframesreceived           = NULL,
     .argonframesreceived        = NULL,
     .cpolarity                  = hal_spi_cpolarity_high,
+    .datacapture                = hal_spi_datacapture_1edge
 };
 
 
@@ -286,6 +287,72 @@ extern hal_boolval_t hal_spi_initted_is(hal_spi_t id)
 //}
 //#endif
 
+
+extern hal_result_t hal_spi_raw_enable(hal_spi_t id)
+{
+//    hal_spi_internal_item_t* intitem = s_hal_spi_theinternals.items[HAL_spi_id2index(id)];
+//    SPI_TypeDef* SPIx = HAL_spi_id2stmSPI(id);
+
+    if(hal_false == hal_spi_initted_is(id))
+    {
+        return(hal_res_NOK_generic);
+    }
+    
+    s_hal_spi_periph_enable(id);
+    
+    return(hal_res_OK);   
+}
+
+extern hal_result_t hal_spi_raw_disable(hal_spi_t id)
+{
+//    hal_spi_internal_item_t* intitem = s_hal_spi_theinternals.items[HAL_spi_id2index(id)];
+//    SPI_TypeDef* SPIx = HAL_spi_id2stmSPI(id);
+
+    if(hal_false == hal_spi_initted_is(id))
+    {
+        return(hal_res_NOK_generic);
+    }
+    
+    s_hal_spi_periph_disable(id);
+    
+    return(hal_res_OK);   
+}
+
+
+extern hal_result_t hal_spi_raw_writeread(hal_spi_t id, uint16_t writedata, uint16_t* dataread)
+{
+//    hal_spi_internal_item_t* intitem = s_hal_spi_theinternals.items[HAL_spi_id2index(id)];
+    SPI_TypeDef* SPIx = HAL_spi_id2stmSPI(id);
+    
+    if(hal_false == hal_spi_initted_is(id))
+    {
+        return(hal_res_NOK_generic);
+    }
+    // marco.accame: later on put back a timeout and give hal_res_NOK_generic upon timeout
+    while (SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_TXE) == RESET);
+    SPI_I2S_SendData(SPIx, writedata);    
+
+
+    // we need to wait for a reply from the slave
+//    timeout = 10000;
+    while(RESET == SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_RXNE));
+//    {
+//        if(0 == (timeout--)) break;
+//    }  
+
+    // ok. here it is
+    uint16_t rb = SPI_I2S_ReceiveData(SPIx);
+
+    // if we want to retrieve it we copy into return value
+    if(NULL != dataread)   
+    {
+        *dataread = rb;
+    }  
+
+    return(hal_res_OK);     
+}
+
+
    
 extern hal_result_t hal_spi_start(hal_spi_t id, uint8_t numberofframes)
 {
@@ -332,10 +399,15 @@ extern hal_result_t hal_spi_start(hal_spi_t id, uint8_t numberofframes)
    
 #if defined(HAL_MANAGE_ISRFRAMES_WITH_FIFO)
     uint16_t data = 0;
-    uint8_t* dd = NULL;
-    if(hl_res_OK == hl_fifo_get(intitem->txFIFOisrframe, dd, NULL))
+    if(1 == intitem->sizeofword)
     {
-        data = (1 == intitem->sizeofword) ? ( *dd ) : (  *((uint16_t*)dd)  ); 
+        uint8_t d01 = 0;
+        hl_fifo_get(intitem->txFIFOisrframe, &d01, NULL);
+        data = d01;
+    }
+    else
+    {
+        hl_fifo_get(intitem->txFIFOisrframe, (uint8_t*)&data, NULL);
     }   // if someone does not reload the tx frame each time, then we transmit 0
 #else
     uint16_t data = intitem->txBUFFERisrframe[0];
@@ -708,15 +780,19 @@ static void s_hal_spi_read_isr(hal_spi_t id)
     {
         // transmit one dummy word to trigger another reception
         uint16_t data = 0;
-        uint8_t* dd = NULL;
 #if defined(HAL_MANAGE_ISRFRAMES_WITH_FIFO)         
-        hl_fifo_get(intitem->txFIFOisrframe, dd, NULL);
-        if(NULL != dd)
+        if(1 == intitem->sizeofword)
         {
-            data = (1 == intitem->sizeofword) ? ( *dd ) : (  *((uint16_t*)dd)  );  
-        } 
+            uint8_t d01 = 0;
+            hl_fifo_get(intitem->txFIFOisrframe, &d01, NULL);
+            data = d01;
+        }
+        else
+        {
+            hl_fifo_get(intitem->txFIFOisrframe, (uint8_t*)&data, NULL);
+        }   // if someone does not reload the tx frame each time, then we transmit 0     
 #else 
-        dd = &intitem->txBUFFERisrframe[intitem->rxWORDScounter * intitem->sizeofword];
+        uint8_t* dd = &intitem->txBUFFERisrframe[intitem->rxWORDScounter * intitem->sizeofword];
         data = *dd;
 #endif            
         SPI_I2S_SendData(SPIx, data);
@@ -804,21 +880,23 @@ static hal_result_t s_hal_spi_init(hal_spi_t id, const hal_spi_cfg_t *cfg)
         .SPI_CRCPolynomial      = 0x0007 // reset value
     };
         
-    if(cfg->cpolarity == hal_spi_cpolarity_low)
-    {
-        hl_spi_advcfg_ems4rd.SPI_CPOL = SPI_CPOL_Low;
-    }
+    hl_spi_advcfg_ems4rd.SPI_CPOL = (hal_spi_cpolarity_low == cfg->cpolarity) ? (SPI_CPOL_Low) : (SPI_CPOL_High);
+
+    hl_spi_advcfg_ems4rd.SPI_CPHA = (hal_spi_datacapture_1edge == cfg->datacapture) ? (SPI_CPHA_1Edge) : (SPI_CPHA_2Edge);
 
     hl_spi_advcfg_ems4rd.SPI_DataSize = (hal_spi_datasize_16bit == cfg->datasize) ? (SPI_DataSize_16b) : (SPI_DataSize_8b);
 
     //SPI1 has a different clock
-    if (hal_spi1 == id)
+    // marco.accame: yes, it is correct that SPI1 has a difefrent speed, ...
+    //               but inside hl_spi_init() we always use the value in hlcfg.prescaler 
+    //               moreover: we use s_hal_spi_get_hl_prescaler() which correctly computes the prescaler depending on maxspeed and the used SPI port
+    //               thus: no need to change value of hl_spi_advcfg_ems4rd.SPI_BaudRatePrescaler with SPI_BaudRatePrescaler_128 !!!!!!
+    if(hal_spi1 == id)
     {
         hl_spi_advcfg_ems4rd.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_128;
     }
         
-    //We should set the correct baud rate also...?
-    //The prescaler used is the one defined in advcfg, if it's not null
+
     hl_spi_cfg_t hlcfg =
     {
         .mode       = hl_spi_mode_master,
@@ -827,7 +905,7 @@ static hal_result_t s_hal_spi_init(hal_spi_t id, const hal_spi_cfg_t *cfg)
     };
     hlcfg.mode = (hal_spi_ownership_master == cfg->ownership) ? (hl_spi_mode_master) : (hl_spi_mode_slave); 
         
-    //Compute the prescaler and substitute it inside hlcfg structure
+    // compute the prescaler and substitute it inside hlcfg structure
     hlcfg.prescaler = s_hal_spi_get_hl_prescaler(id, cfg);
     
     hl_result_t r = hl_spi_init((hl_spi_t)id, &hlcfg);      // the gpio, the clock

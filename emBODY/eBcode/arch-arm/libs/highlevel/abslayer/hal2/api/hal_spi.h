@@ -118,6 +118,14 @@ typedef enum
     hal_spi_cpolarity_high      = 1
 } hal_spi_cpolarity_t;
 
+
+typedef enum
+{
+    hal_spi_datacapture_1edge   = 0,
+    hal_spi_datacapture_2edge   = 1
+} hal_spi_datacapture_t;
+
+
 typedef enum
 {
     hal_spi_datasize_8bit       = 0,
@@ -143,7 +151,8 @@ typedef struct
     void*                   argonframestransmitted;
     hal_callback_t          onframesreceived;      /**< if not NULL and direction is not hal_spi_dir_txonly it is called by the ISR when all the frames are received */
     void*                   argonframesreceived;
-    hal_spi_cpolarity_t     cpolarity;                    // if 0 SPI_CPOL_Low, if 1 SPI_CPOL_High
+    hal_spi_cpolarity_t     cpolarity;    
+    hal_spi_datacapture_t   datacapture;    
 } hal_spi_cfg_t;
 
  
@@ -193,6 +202,36 @@ extern hal_result_t hal_spi_init(hal_spi_t id, const hal_spi_cfg_t *cfg);
     @return     hal_true or hal_false
   */
 extern hal_boolval_t hal_spi_initted_is(hal_spi_t id);
+
+
+/** @fn         extern hal_result_t hal_spi_raw_enable(hal_spi_t id)
+    @brief      it enables the spi for raw use. 
+                spi must have been initted with hal_spi_init().
+    @param      id            the id
+    @return     hal_true or hal_false
+  */
+extern hal_result_t hal_spi_raw_enable(hal_spi_t id);
+    
+    
+/** @fn         extern hal_result_t hal_spi_raw_disable(hal_spi_t id)
+    @brief      it disables the spi for raw use. 
+                spi must have been initted with hal_spi_init() and enabled with hal_spi_raw_enable().
+    @param      id            the id
+    @return     hal_true or hal_false
+  */    
+extern hal_result_t hal_spi_raw_disable(hal_spi_t id);
+
+
+/** @fn         extern hal_result_t hal_spi_raw_writeread(hal_spi_t id, uint16_t writedata, uint16_t* dataread)
+    @brief      it sends on spi a word of size specified by the field hal_spi_cfg_t::datasize and it waits for reception 
+                of a word of similar size. 
+                spi must have been initted with hal_spi_init() and enabled with hal_spi_raw_enable().
+    @param      id            the id
+    @param      writedata     the word written on spi. if hal_spi_cfg_t::datasize is hal_spi_datasize_8bit, only its LSB is sent.
+    @param      dataread      if non-NULL, it holds the received word. if hal_spi_cfg_t::datasize is hal_spi_datasize_8bit, only its MSB is zero. 
+    @return     hal_true or hal_false
+  */    
+extern hal_result_t hal_spi_raw_writeread(hal_spi_t id, uint16_t writedata, uint16_t* dataread);
 
 
 /** @fn         extern hal_result_t hal_spi_start(hal_spi_t id, uint8_t numberofframes)
