@@ -677,8 +677,15 @@ extern hal_result_t hal_quadencoder_init(hal_quadencoder_t id)
              TIM_Cmd(ENCODER4_TIMER, ENABLE);
              break;
          }
+        
+//        case hal_quadencoderALL:
+//        {
+//            
+//        } break;
+        
         default:
         {
+            return(hal_res_NOK_generic);
              
         } break;
     }
