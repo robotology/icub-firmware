@@ -461,31 +461,26 @@ static hl_result_t s_hl_spi_hw_registers_init(hl_spi_t id)
     
     SPI_InitTypeDef* init2use = NULL;
         
-    SPI_InitTypeDef SPI_InitStructure;
+    SPI_InitTypeDef SPI_InitStructure = {0};
+    
+    init2use = &SPI_InitStructure;
 
     if(NULL != cfg->advcfg)
     {
         // use advcfg. it has the same layout as SPI_InitTypeDef
-        init2use = (SPI_InitTypeDef*) cfg->advcfg;      
+        memcpy(init2use, cfg->advcfg, sizeof(SPI_InitTypeDef));      
     }
     else
-    {
-        // use SPI_InitStructure.
-        init2use = &SPI_InitStructure;       
-        
-        // which i must init according to some cfg params and other constant choices
-        
-        SPI_StructInit(init2use);      
-        
-        // copy the default configuration
+    {            
+        // use the default configuration
         memcpy(init2use, &hl_spi_advcfg_default, sizeof(SPI_InitTypeDef));
-        
-        // and now change it
-                
-        // apply only mode and prescaler       
-        init2use->SPI_Mode              = (hl_spi_mode_master == cfg->mode) ? (SPI_Mode_Master) : (SPI_Mode_Slave);  
-        init2use->SPI_BaudRatePrescaler = s_hl_spi_stm32_baudrateprescalers[cfg->prescaler];      
     }
+        
+    // and now change it
+                
+    // apply only mode and prescaler       
+    init2use->SPI_Mode              = (hl_spi_mode_master == cfg->mode) ? (SPI_Mode_Master) : (SPI_Mode_Slave);  
+    init2use->SPI_BaudRatePrescaler = s_hl_spi_stm32_baudrateprescalers[cfg->prescaler];      
     
     
     // ok, we init the SPI
