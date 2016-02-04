@@ -126,7 +126,8 @@ extern hal_boolval_t hal_motor_supported_is(hal_motor_t id)
 }
 
 
-// Motor init with active interrupts on external fault channels
+// Motor init with active interrupts on external fault channels. 
+// marco.accame on 4 feb 2016: it is the old function hal_motor_and_adc_init() which had comment: "Motor init with ADC for currents feedback" 
 
 extern hal_result_t hal_motor_init(hal_motor_t id, const hal_motor_cfg_t *cfg)
 {
