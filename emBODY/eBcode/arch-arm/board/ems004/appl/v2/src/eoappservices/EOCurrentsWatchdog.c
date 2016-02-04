@@ -266,7 +266,6 @@ static void s_eo_currents_watchdog_CheckI2T(uint8_t motor, int16_t value)
     if(!s_eo_currents_watchdog_averageCalc_collectDataIsCompleted(motor))
     {
         return;
-    
     }
     // 1) calculate Ep
     s_eo_currents_watchdog.accomulatorEp[motor] += (averageCurrent*averageCurrent) - s_eo_currents_watchdog.nominalCurrent2[motor];
@@ -313,7 +312,7 @@ EO_static_inline uint32_t s_eo_currents_watchdog_averageCalc_addValue(uint8_t mo
 {
     s_eo_currents_watchdog.avgCurrent[motor].counter++;
     s_eo_currents_watchdog.avgCurrent[motor].commulativeAverage += (value - s_eo_currents_watchdog.avgCurrent[motor].commulativeAverage)/s_eo_currents_watchdog.avgCurrent[motor].counter ;
-
+    return(s_eo_currents_watchdog.avgCurrent[motor].commulativeAverage); 
 }
 
 EO_static_inline void s_eo_currents_watchdog_averageCalc_reset(uint8_t motor)
