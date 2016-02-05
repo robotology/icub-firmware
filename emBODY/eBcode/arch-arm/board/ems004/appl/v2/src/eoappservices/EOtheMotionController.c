@@ -1879,30 +1879,49 @@ static eObool_t s_eo_motioncontrol_mc4based_variableisproxied(eOnvID32_t id)
     eOprotEndpoint_t ep = eoprot_ID2endpoint(id);
     
     eOprotEntity_t ent = eoprot_ID2entity(id);
-    if(eoprot_entity_mc_joint != ent)
-    {
-        return(eobool_false);
-    }
     
     eOprotTag_t tag = eoprot_ID2tag(id);
     
-    switch(tag)
+    if(eoprot_entity_mc_joint == ent)
     {
-        case eoprot_tag_mc_joint_config_pidposition:
-        // case eoprot_tag_mc_joint_config_pidvelocity:     // marco.accame on 03mar15: the pidvelocity propagation to mc4 is is not implemented, thus i must remove from proxy.
-        case eoprot_tag_mc_joint_config_pidtorque:
-        case eoprot_tag_mc_joint_config_limitsofjoint:
-        case eoprot_tag_mc_joint_config_impedance:
-        case eoprot_tag_mc_joint_status_core_modes_ismotiondone:
+        switch(tag)
         {
-            return(eobool_true);
-        }
-        
-        default:
+            case eoprot_tag_mc_joint_config_pidposition:
+            // case eoprot_tag_mc_joint_config_pidvelocity:     // marco.accame on 03mar15: the pidvelocity propagation to mc4 is is not implemented, thus i must remove from proxy.
+            case eoprot_tag_mc_joint_config_pidtorque:
+            case eoprot_tag_mc_joint_config_limitsofjoint:
+            case eoprot_tag_mc_joint_config_impedance:
+            case eoprot_tag_mc_joint_status_core_modes_ismotiondone:
+            {
+                return(eobool_true);
+            }
+            
+            default:
+            {
+                return(eobool_false);
+            }
+         }
+    }
+    else if(eoprot_entity_mc_motor == ent)
+    {
+        switch(tag)
         {
-            return(eobool_false);
-        }
-     }
+            case eoprot_tag_mc_motor_config_pwmlimit:
+            {
+                return(eobool_true);
+            }
+            
+            default:
+            {
+                return(eobool_false);
+            }
+         }
+    }
+    else
+    {
+        return(eobool_false);
+    }
+
 }
 
 

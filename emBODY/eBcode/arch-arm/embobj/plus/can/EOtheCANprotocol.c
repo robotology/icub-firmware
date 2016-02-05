@@ -295,13 +295,13 @@ const eOcanprot_functions_t s_eo_canprot_functions_pollingMotorControl[] =
         .former     = eocanprotMCpolling_former_POL_MC_CMD__STOP_TRAJECTORY,
         .parser     = NULL
     },  
-    {   // 047
-        .former     = NULL,
+    {   // 047      ICUBCANPROTO_POL_MC_CMD__SET_PWM_LIMIT
+        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_PWM_LIMIT,
         .parser     = NULL
     },     
-    {   // 048
-        .former     = NULL,
-        .parser     = NULL
+    {   // 048      ICUBCANPROTO_POL_MC_CMD__GET_PWM_LIMIT
+        .former     = eocanprotMCpolling_former_POL_MC_CMD__GET_PWM_LIMIT,
+        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__GET_PWM_LIMIT,
     },  
     {   // 049
         .former     = NULL,

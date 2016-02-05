@@ -1638,6 +1638,12 @@ extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescripto
         command.value = &mconfig->limitsofrotor.min;
         eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32); 
         
+        //set pwmlimit
+        icubCanProto_pwm_t icubcan_pwm = mconfig->pwmLimit; //eOmeas_pwm_t and icubCanProto_pwm_t are defined like int16
+        command.type  = ICUBCANPROTO_POL_MC_CMD__SET_PWM_LIMIT;
+        command.value = &icubcan_pwm;
+        eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);
+        
         //sprintf(info,"motomax %d motomin %d",mconfig->limitsofrotor.max,mconfig->limitsofrotor.min);
         //send_diagnostic_debugmessage(eo_errortype_debug, eoerror_value_DEB_tag01, mxx, 0, 0, info);
     }
@@ -1748,7 +1754,39 @@ extern void eoprot_fun_UPDT_mc_motor_config_pwmlimit(const EOnv* nv, const eOrop
     }
     else if(eo_motcon_mode_mc4 == mcmode)
     {
-        // TODO: send message to mc4can board
+        if(eo_ropcode_set == rd->ropcode)
+        {    
+            icubCanProto_pwm_t icubcan_pwm = *pwm_limit; //eOmeas_pwm_t and icubCanProto_pwm_t are defined like int16
+        
+            eOcanprot_command_t command = {0};
+            command.class = eocanprot_msgclass_pollingMotorControl;
+            command.type  = ICUBCANPROTO_POL_MC_CMD__SET_PWM_LIMIT;
+            command.value = &icubcan_pwm;
+            eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);
+        }
+        else if(eo_ropcode_ask == rd->ropcode)
+        {      
+            EOproxy * proxy = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
+            eOproxy_params_t *param = eo_proxy_Params_Get(proxy, rd->id32);
+            eOcanprot_command_t command = {0};
+            if(NULL == param)
+            {
+                eOerrmanDescriptor_t errdes = {0};
+                errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+                errdes.sourceaddress    = 0;
+                errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_forward_callback_fails);
+                errdes.par16            = 0; 
+                errdes.par64            = ((uint64_t)rd->signature << 32) | (rd->id32); 
+                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
+                return;
+            }
+            param->p08_1 = 1;       // we expect one can frames
+            param->p08_2 = 0;       // and we havent received any yet
+                   
+            command.type  = ICUBCANPROTO_POL_MC_CMD__GET_PWM_LIMIT;
+            command.value = NULL;
+            eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);        
+        }     
     }
 
 }

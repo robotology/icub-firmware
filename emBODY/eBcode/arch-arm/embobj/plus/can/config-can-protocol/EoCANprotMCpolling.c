@@ -390,6 +390,74 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__GET_MAX_POSITION(eOcanpr
     return(eores_OK);  
 }
 
+
+
+
+
+
+extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_PWM_LIMIT(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
+{
+    s_former_POL_MC_prepare_frame(descriptor, frame, 3, ICUBCANPROTO_POL_MC_CMD__SET_PWM_LIMIT);      
+    *((icubCanProto_pwm_t*)(&frame->data[1])) = *((icubCanProto_pwm_t*)descriptor->cmd.value);    
+    return(eores_OK);
+}
+
+extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__GET_PWM_LIMIT(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
+{
+    s_former_POL_MC_prepare_frame(descriptor, frame, 1, ICUBCANPROTO_POL_MC_CMD__GET_PWM_LIMIT);
+    return(eores_OK);  
+}
+
+extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_PWM_LIMIT(eOcanframe_t *frame, eOcanport_t port)
+{  
+    eOprotIndex_t index = EOK_uint08dummy;  
+
+    eOcanmap_location_t loc = {0};
+    loc.port            = port;
+    loc.addr            = EOCANPROT_FRAME_GET_SOURCE(frame);
+    loc.insideindex     = EOCANPROT_FRAME_POLLING_MC_GET_INTERNALINDEX(frame);
+    
+    index = eo_canmap_GetEntityIndexExtraCheck(eo_canmap_GetHandle(), loc, eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor);
+    if(EOK_uint08dummy == index)
+    {
+        //s_eo_icubCanProto_mb_send_runtime_error_diagnostics(6);
+        return(eores_OK);
+    }
+    
+    
+    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, index, eoprot_tag_mc_motor_config_pwmlimit);
+   
+
+    EOproxy * proxy = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
+    eOproxy_params_t *param = eo_proxy_Params_Get(proxy, id32);
+    if(NULL == param)
+    {
+        eOerrmanDescriptor_t errdes = {0};
+        errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+        errdes.sourceaddress    = 0;
+        errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_ropdes_notfound);
+        errdes.par16            = 0; 
+        errdes.par64            = id32; 
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
+        return(eores_OK);
+    } 
+
+    eOmeas_pwm_t *pwmLimit = (eOmeas_pwm_t*)eoprot_variable_ramof_get(eoprot_board_localboard, id32);    
+    
+    *pwmLimit = *((eOmeas_pwm_t*)(&frame->data[1]));
+
+    param->p08_2 ++;
+    
+    if(param->p08_1 == param->p08_2)
+    {
+        eOresult_t res = eo_proxy_ReplyROP_Load(proxy, id32, NULL);  
+        eom_emsappl_SendTXRequest(eom_emsappl_GetHandle());        
+    }
+          
+    return(eores_OK);
+}
+
+
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_MOTOR_POS(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
     s_former_POL_MC_prepare_frame(descriptor, frame, 5, ICUBCANPROTO_POL_MC_CMD__SET_MAX_MOTOR_POS);    
