@@ -93,6 +93,8 @@
 static void s_eo_motioncontrol_send_periodic_error_report(void *p);
 
 static eOresult_t s_eo_motioncontrol_mc4plus_onendofverify_encoder(EOaService* s, eObool_t operationisok);
+static eOresult_t s_eo_motioncontrol_mc4plusmais_onendofverify_encoder(EOaService* s, eObool_t operationisok);
+static eOresult_t s_eo_motioncontrol_mc4plusmais_onstop_search4mais(void *par, EOtheCANdiscovery2* p, eObool_t searchisok);
 
 static eOresult_t s_eo_motioncontrol_onendofverify_encoder(EOaService* s, eObool_t operationisok);
 
@@ -115,11 +117,6 @@ static void s_eo_motioncontrol_mc4plusbased_hal_init_motors_adc_feedbacks(void);
 static void s_eo_motioncontrol_mc4plusbased_hal_init_quad_enc_indexes_interrupt(void);
 static void s_eo_motioncontrol_mc4plusbased_enable_all_motors(EOtheMotionController *p);
 
-// todo: rename them with usual prefix and hal_XXX
-static void s_eo_mcserv_pwm_set(uint8_t i, int16_t v);
-static void s_eo_mcserv_pwm_enable(uint8_t i);
-static void s_eo_mcserv_pwm_disable(uint8_t i);
-static eObool_t s_eo_mcserv_are_motors_ext_faulted(void);
 
 static eOresult_t s_eo_mcserv_do_mc4plus(EOtheMotionController *p);
 
@@ -177,7 +174,7 @@ static EOtheMotionController s_eo_themotcon =
         .thecontroller          = NULL,
         .theencoderreader       = NULL,
         .pwmvalue               = {0},
-        .pwmport                = {0}        
+        .pwmport                = {hal_motorNONE}        
     }
 };
 
@@ -269,7 +266,7 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
     
     s_eo_themotcon.service.tmpcfg = servcfg;
     
-    if(eomn_serv_MC_foc == servcfg->type)
+    if(eo_motcon_mode_foc == servcfg->type)
     {
         
         s_eo_themotcon.service.onverify = onverify;
@@ -300,7 +297,7 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
         eo_encoderreader_Verify(eo_encoderreader_GetHandle(), &servcfg->data.mc.foc_based.arrayofjomodescriptors, s_eo_motioncontrol_onendofverify_encoder, eobool_true); 
         
     }
-    else if(eomn_serv_MC_mc4 == servcfg->type)
+    else if(eo_motcon_mode_mc4 == servcfg->type)
     {
         
         s_eo_themotcon.service.onverify = onverify;
@@ -332,18 +329,39 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
         eo_mais_Verify(eo_mais_GetHandle(), &s_eo_themotcon.mcmc4.servconfigmais, s_eo_motioncontrol_onendofverify_mais, eobool_true);
       
     }
-    else if(eomn_serv_MC_mc4plus == servcfg->type)
+    else if(eo_motcon_mode_mc4plus == servcfg->type)
     {
-        
         // for now verify the encoder reader. 
         // we dont verify the pwm actuators. only way to do that is to add a hal_pwm_supported_is()
         s_eo_themotcon.service.onverify = onverify;
         s_eo_themotcon.service.activateafterverify = activateafterverify;
-        eo_encoderreader_Verify(eo_encoderreader_GetHandle(), &servcfg->data.mc.mc4plus_based.arrayofjomodescriptors, s_eo_motioncontrol_mc4plus_onendofverify_encoder, eobool_true);   
-        
+        eo_encoderreader_Verify(eo_encoderreader_GetHandle(), &servcfg->data.mc.mc4plus_based.arrayofjomodescriptors, s_eo_motioncontrol_mc4plus_onendofverify_encoder, eobool_true);           
     }
-    
+    else if(eo_motcon_mode_mc4plusmais == servcfg->type)
+    {
+        // prepare the verify of mais
+        s_eo_themotcon.mcmc4.servconfigmais.type = eomn_serv_AS_mais;
+        memcpy(&s_eo_themotcon.mcmc4.servconfigmais.data.as.mais, &servcfg->data.mc.mc4plusmais_based.mais, sizeof(eOmn_serv_config_data_as_mais_t));    
+
+
+       // 1. prepare the can discovery for mais board 
+        memset(&s_eo_themotcon.sharedcan.discoverytarget, 0, sizeof(s_eo_themotcon.sharedcan.discoverytarget));
+        s_eo_themotcon.sharedcan.discoverytarget.boardtype = eobrd_cantype_mais;
+        s_eo_themotcon.sharedcan.discoverytarget.protocolversion.major = servcfg->data.mc.mc4plusmais_based.mais.version.protocol.major; 
+        s_eo_themotcon.sharedcan.discoverytarget.protocolversion.minor = servcfg->data.mc.mc4plusmais_based.mais.version.protocol.minor;
+        s_eo_themotcon.sharedcan.discoverytarget.firmwareversion.major = servcfg->data.mc.mc4plusmais_based.mais.version.firmware.major; 
+        s_eo_themotcon.sharedcan.discoverytarget.firmwareversion.minor = servcfg->data.mc.mc4plusmais_based.mais.version.firmware.minor;                   
+        s_eo_themotcon.sharedcan.ondiscoverystop.function = s_eo_motioncontrol_mc4plusmais_onstop_search4mais;
+        s_eo_themotcon.sharedcan.ondiscoverystop.parameter = (void*)servcfg;
+  
  
+        // for now verify the encoder reader. 
+        // we dont verify the pwm actuators. only way to do that is to add a hal_pwm_supported_is()
+        s_eo_themotcon.service.onverify = onverify;
+        s_eo_themotcon.service.activateafterverify = activateafterverify;
+        eo_encoderreader_Verify(eo_encoderreader_GetHandle(), &servcfg->data.mc.mc4plusmais_based.arrayofjomodescriptors, s_eo_motioncontrol_mc4plusmais_onendofverify_encoder, eobool_true);           
+    }
+
     return(eores_OK);   
 }
 
@@ -368,7 +386,7 @@ extern eOresult_t eo_motioncontrol_Deactivate(EOtheMotionController *p)
     }        
     
     // then we deconfig things
-    if(eomn_serv_MC_foc == s_eo_themotcon.service.servconfig.type)
+    if(eo_motcon_mode_foc == s_eo_themotcon.service.servconfig.type)
     {
         
         // for foc-based, we must ... deconfig mc foc boards, unload them, set num of entities = 0, clear status, deactivate encoder 
@@ -392,7 +410,7 @@ extern eOresult_t eo_motioncontrol_Deactivate(EOtheMotionController *p)
         s_eo_motioncontrol_proxy_config(eobool_false);        
     
     }
-    else if(eomn_serv_MC_mc4 == s_eo_themotcon.service.servconfig.type)
+    else if(eo_motcon_mode_mc4 == s_eo_themotcon.service.servconfig.type)
     {
         
         // for mc4-based, we must ... deconfig mc4 foc boards, unload them, set num of entities = 0, clear status, deactivate mais 
@@ -414,15 +432,22 @@ extern eOresult_t eo_motioncontrol_Deactivate(EOtheMotionController *p)
         s_eo_motioncontrol_proxy_config(eobool_false); 
 
     }
-    else if(eomn_serv_MC_mc4plus == s_eo_themotcon.service.servconfig.type)   
+    else if((eo_motcon_mode_mc4plus == s_eo_themotcon.service.servconfig.type) || (eo_motcon_mode_mc4plusmais == s_eo_themotcon.service.servconfig.type))   
     {
+        
+        if(eo_motcon_mode_mc4plusmais == s_eo_themotcon.service.servconfig.type)
+        {
+            // for mais i use the mcmc4 data structure
+            eo_mais_Deactivate(p->mcmc4.themais);        
+            memset(&s_eo_themotcon.mcmc4.servconfigmais, 0, sizeof(s_eo_themotcon.mcmc4.servconfigmais));     
+        }            
         
         eo_encoderreader_Deactivate(p->mcmc4plus.theencoderreader);
         #warning TODO: in eo_motioncontrol_Deactivate() for mc4plus call: eo_emsController_Deinit()
         #warning TODO: in eo_motioncontrol_Deactivate() for mc4plus call: disable the motors ...
             
     }        
-    
+  
     
     s_eo_themotcon.numofjomos = 0;
     eo_entities_SetNumOfJoints(eo_entities_GetHandle(), 0);
@@ -463,7 +488,7 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
         eo_motioncontrol_Deactivate(p);        
     }   
 
-    if(eomn_serv_MC_foc == servcfg->type)
+    if(eo_motcon_mode_foc == servcfg->type)
     {
         
         EOconstarray* carray = eo_constarray_Load((EOarray*)&servcfg->data.mc.foc_based.arrayofjomodescriptors);
@@ -548,7 +573,7 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
         }
     
     }
-    else if(eomn_serv_MC_mc4 == servcfg->type)
+    else if(eo_motcon_mode_mc4 == servcfg->type)
     {
         
         const uint8_t numofjomos = 12;
@@ -633,7 +658,7 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
         }            
         
     }
-    else if(eomn_serv_MC_mc4plus == servcfg->type)
+    else if((eo_motcon_mode_mc4plus == servcfg->type) || (eo_motcon_mode_mc4plusmais == servcfg->type))
     {
         
         EOconstarray* carray = eo_constarray_Load((EOarray*)&servcfg->data.mc.mc4plus_based.arrayofjomodescriptors);
@@ -656,10 +681,17 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
           
             s_eo_themotcon.numofjomos = numofjomos;
             
+            // if also mais, then i activate it.
+            if(eo_motcon_mode_mc4plusmais == servcfg->type)
+            {
+                eo_mais_Activate(p->mcmc4.themais, &s_eo_themotcon.mcmc4.servconfigmais);
+                eo_mais_Start(p->mcmc4.themais);                
+            }
+            
             // now... use the servcfg
             uint8_t i=0;
            
-            
+           
             // marco.accame: i keep the same initialisation order as davide.pollarolo did in his EOmcService.c (a, b, c etc)
             // a. init the emscontroller.
             #warning TODO: change the emsController. see comments below
@@ -672,13 +704,13 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
 
             // b. clear the pwm values and the port mapping
             memset(p->mcmc4plus.pwmvalue, 0, sizeof(p->mcmc4plus.pwmvalue));
-            memset(p->mcmc4plus.pwmport, 0, sizeof(p->mcmc4plus.pwmport));
+            memset(p->mcmc4plus.pwmport, hal_motorNONE, sizeof(p->mcmc4plus.pwmport));
             
             // b1. init the port mapping
             for(i=0; i<numofjomos; i++)
             {
                 const eOmn_serv_jomo_descriptor_t *jomodes = (eOmn_serv_jomo_descriptor_t*) eo_constarray_At(carray, i);            
-                p->mcmc4plus.pwmport[i] = jomodes->actuator.pwm.port;                
+                p->mcmc4plus.pwmport[i] = (jomodes->actuator.pwm.port == eomn_serv_mc_port_none) ? (hal_motorNONE) : ((hal_motor_t)jomodes->actuator.pwm.port);                
             }
             
             // c. low level init for motors and adc           
@@ -724,18 +756,18 @@ extern eOresult_t eo_motioncontrol_Start(EOtheMotionController *p)
     
     // mc4based: enable broadcast etc
     // focbased: just init a read of the encoder
-    if(eomn_serv_MC_foc == p->service.servconfig.type)
+    if(eo_motcon_mode_foc == p->service.servconfig.type)
     {   
 #ifndef USE_ONLY_QE
         // just start a reading of encoders        
         eo_encoderreader_StartReading(p->mcfoc.theencoderreader);
 #endif
     }
-    else if(eomn_serv_MC_mc4 == p->service.servconfig.type)
+    else if(eo_motcon_mode_mc4 == p->service.servconfig.type)
     {
         eo_mc4boards_BroadcastStart(eo_mc4boards_GetHandle());
     }
-    else if(eomn_serv_MC_mc4plus == p->service.servconfig.type)
+    else if((eo_motcon_mode_mc4plus == p->service.servconfig.type) || (eo_motcon_mode_mc4plusmais == p->service.servconfig.type))
     {
         eo_encoderreader_StartReading(p->mcmc4plus.theencoderreader);
         s_eo_motioncontrol_mc4plusbased_enable_all_motors(p);      
@@ -767,7 +799,7 @@ extern eOresult_t eo_motioncontrol_Tick(EOtheMotionController *p)
     }
     
     
-    if(eomn_serv_MC_foc == p->service.servconfig.type)
+    if(eo_motcon_mode_foc == p->service.servconfig.type)
     {
         uint8_t error_mask = 0;
         eOresult_t res = eores_NOK_generic;
@@ -830,7 +862,7 @@ extern eOresult_t eo_motioncontrol_Tick(EOtheMotionController *p)
         s_eo_motioncontrol_UpdateJointStatus(p);
   
     }
-    else if(eomn_serv_MC_mc4 == p->service.servconfig.type)
+    else if(eo_motcon_mode_mc4 == p->service.servconfig.type)
     {
         // motion done
         // not used anymore: eo_motiondone_Tick(eo_motiondone_GetHandle());
@@ -839,7 +871,7 @@ extern eOresult_t eo_motioncontrol_Tick(EOtheMotionController *p)
         eo_virtualstrain_Tick(eo_virtualstrain_GetHandle());        
         
     }
-    else if(eomn_serv_MC_mc4plus == p->service.servconfig.type)
+    else if((eo_motcon_mode_mc4plus == p->service.servconfig.type) || (eo_motcon_mode_mc4plusmais == p->service.servconfig.type))
     {
         s_eo_mcserv_do_mc4plus(p);        
     }
@@ -865,17 +897,18 @@ extern eOresult_t eo_motioncontrol_Stop(EOtheMotionController *p)
         return(eores_OK);
     }
     
-    if(eomn_serv_MC_foc == p->service.servconfig.type)
+    
+    if(eo_motcon_mode_foc == p->service.servconfig.type)
     {   
         // just put controller in idle mode        
         eo_emsMotorController_GoIdle();
     }      
-    else if(eomn_serv_MC_mc4 == p->service.servconfig.type)
+    else if(eo_motcon_mode_mc4 == p->service.servconfig.type)
     {
         // just stop broadcast of the mc4 boards
         eo_mc4boards_BroadcastStop(eo_mc4boards_GetHandle()); 
     }    
-    else if(eomn_serv_MC_mc4plus == p->service.servconfig.type)
+    else if((eo_motcon_mode_mc4plus == p->service.servconfig.type) || (eo_motcon_mode_mc4plusmais == p->service.servconfig.type))
     {   
         s_eo_mcserv_disable_all_motors(p);
     }
@@ -905,8 +938,8 @@ extern eOresult_t eo_motioncontrol_extra_MotorEnable(EOtheMotionController *p, u
         return(eores_OK);
     }    
     
-    if(eomn_serv_MC_mc4plus != p->service.servconfig.type)
-    {   // so far only for mc4plus service
+    if((eo_motcon_mode_mc4plus != p->service.servconfig.type) && (eo_motcon_mode_mc4plusmais != p->service.servconfig.type))
+    {   // so far only for mc4plus and mc4plusmais services
         return(eores_NOK_generic);
     }
     
@@ -922,35 +955,35 @@ extern eOresult_t eo_motioncontrol_extra_MotorEnable(EOtheMotionController *p, u
     {
         if(jomo < 3) // mi piace pochissimo questo codice ...
         {
-            s_eo_mcserv_pwm_enable(p->mcmc4plus.pwmport[0]);
-            s_eo_mcserv_pwm_enable(p->mcmc4plus.pwmport[1]);
-            s_eo_mcserv_pwm_enable(p->mcmc4plus.pwmport[2]);
+            hal_motor_enable(p->mcmc4plus.pwmport[0]);
+            hal_motor_enable(p->mcmc4plus.pwmport[1]);
+            hal_motor_enable(p->mcmc4plus.pwmport[2]);
         }
         else
         {
-            s_eo_mcserv_pwm_enable(p->mcmc4plus.pwmport[jomo]);
+            hal_motor_enable(p->mcmc4plus.pwmport[jomo]);
         }
     }
     else if(emscontroller_board_HEAD_neckpitch_neckroll == board_control)  
     {
-        s_eo_mcserv_pwm_enable(p->mcmc4plus.pwmport[0]);
-        s_eo_mcserv_pwm_enable(p->mcmc4plus.pwmport[1]);
+        hal_motor_enable(p->mcmc4plus.pwmport[0]);
+        hal_motor_enable(p->mcmc4plus.pwmport[1]);
     }
     else if(emscontroller_board_HEAD_neckyaw_eyes == board_control) 
     {
         if((jomo == 2) || (jomo == 3) ) 
         {
-            s_eo_mcserv_pwm_enable(p->mcmc4plus.pwmport[2]);
-            s_eo_mcserv_pwm_enable(p->mcmc4plus.pwmport[3]);
+            hal_motor_enable(p->mcmc4plus.pwmport[2]);
+            hal_motor_enable(p->mcmc4plus.pwmport[3]);
         }
         else
         {
-            s_eo_mcserv_pwm_enable(p->mcmc4plus.pwmport[jomo]);
+            hal_motor_enable(p->mcmc4plus.pwmport[jomo]);
         }      
     }
     else  // the joint is not coupled to any other joint 
     { 
-        s_eo_mcserv_pwm_enable(p->mcmc4plus.pwmport[jomo]);
+        hal_motor_enable(p->mcmc4plus.pwmport[jomo]);
     }          
     
     return(eores_OK);   
@@ -973,16 +1006,14 @@ extern eOresult_t eo_motioncontrol_extra_FaultDetectionEnable(EOtheMotionControl
     if(eobool_false == s_eo_themotcon.service.running)
     {
         return(eores_OK);
+    }  
+
+    if((eo_motcon_mode_mc4plus != p->service.servconfig.type) && (eo_motcon_mode_mc4plusmais != p->service.servconfig.type))
+    {   // so far only for mc4plus and mc4plusmais services
+        return(eores_NOK_generic);
     }    
     
-    if(eomn_serv_MC_mc4plus != p->service.servconfig.type)
-    {   // so far only for mc4plus service
-        return(eores_NOK_generic);
-    }
-    
-
     hal_motor_reenable_break_interrupts();
-
 
     return(eores_OK);
 }
@@ -1005,12 +1036,12 @@ extern eObool_t eo_motioncontrol_extra_AreMotorsExtFaulted(EOtheMotionController
         return(eobool_false);
     }    
     
-    if(eomn_serv_MC_mc4plus != p->service.servconfig.type)
-    {   // so far only for mc4plus service
+    if((eo_motcon_mode_mc4plus != p->service.servconfig.type) && (eo_motcon_mode_mc4plusmais != p->service.servconfig.type))
+    {   // so far only for mc4plus and mc4plusmais services
         return(eobool_false);
     }
     
-    return(s_eo_mcserv_are_motors_ext_faulted());
+    return(hal_motor_externalfaulted());
 }
 
 
@@ -1031,8 +1062,8 @@ extern eOresult_t eo_motioncontrol_extra_SetMotorFaultMask(EOtheMotionController
         return(eores_OK);
     }    
     
-    if(eomn_serv_MC_mc4plus != p->service.servconfig.type)
-    {   // so far only for mc4plus service
+    if((eo_motcon_mode_mc4plus != p->service.servconfig.type) && (eo_motcon_mode_mc4plusmais != p->service.servconfig.type))
+    {   // so far only for mc4plus and mc4plusmais services
         return(eores_NOK_generic);
     }
     
@@ -1101,8 +1132,8 @@ extern uint32_t eo_motioncontrol_extra_GetMotorFaultMask(EOtheMotionController *
         return(0);
     }    
     
-    if(eomn_serv_MC_mc4plus != p->service.servconfig.type)
-    {   // so far only for mc4plus service
+    if((eo_motcon_mode_mc4plus != p->service.servconfig.type) && (eo_motcon_mode_mc4plusmais != p->service.servconfig.type))
+    {   // so far only for mc4plus and mc4plusmais services
         return(0);
     }
     
@@ -1133,8 +1164,8 @@ extern uint16_t eo_motioncontrol_extra_GetMotorCurrent(EOtheMotionController *p,
         return(0);
     }    
     
-    if(eomn_serv_MC_mc4plus != p->service.servconfig.type)
-    {   // so far only for mc4plus service
+    if((eo_motcon_mode_mc4plus != p->service.servconfig.type) && (eo_motcon_mode_mc4plusmais != p->service.servconfig.type))
+    {   // so far only for mc4plus and mc4plusmais services
         return(0);
     }
     
@@ -1167,8 +1198,8 @@ extern uint32_t eo_motioncontrol_extra_GetMotorAnalogSensor(EOtheMotionControlle
         return(0);
     }    
     
-    if(eomn_serv_MC_mc4plus != p->service.servconfig.type)
-    {   // so far only for mc4plus service
+    if((eo_motcon_mode_mc4plus != p->service.servconfig.type) && (eo_motcon_mode_mc4plusmais != p->service.servconfig.type))
+    {   // so far only for mc4plus and mc4plusmais services
         return(0);
     }
     
@@ -1203,8 +1234,8 @@ extern uint32_t eo_motioncontrol_extra_GetMotorPositionRaw(EOtheMotionController
         return(0);
     }    
     
-    if(eomn_serv_MC_mc4plus != p->service.servconfig.type)
-    {   // so far only for mc4plus service
+    if((eo_motcon_mode_mc4plus != p->service.servconfig.type) && (eo_motcon_mode_mc4plusmais != p->service.servconfig.type))
+    {   // so far only for mc4plus and mc4plusmais services
         return(0);
     }
     
@@ -1240,8 +1271,8 @@ extern void eo_motioncontrol_extra_ResetQuadEncCounter(EOtheMotionController *p,
         return;
     }    
     
-    if(eomn_serv_MC_mc4plus != p->service.servconfig.type)
-    {   // so far only for mc4plus service
+    if((eo_motcon_mode_mc4plus != p->service.servconfig.type) && (eo_motcon_mode_mc4plusmais != p->service.servconfig.type))
+    {   // so far only for mc4plus and mc4plusmais services
         return;
     }
     
@@ -1272,8 +1303,8 @@ extern eObool_t eo_motioncontrol_extra_IsMotorEncoderIndexReached(EOtheMotionCon
         return(eobool_false);
     }    
     
-    if(eomn_serv_MC_mc4plus != p->service.servconfig.type)
-    {   // so far only for mc4plus service
+    if((eo_motcon_mode_mc4plus != p->service.servconfig.type) && (eo_motcon_mode_mc4plusmais != p->service.servconfig.type))
+    {   // so far only for mc4plus and mc4plusmais services
         return(eobool_false);
     }
     
@@ -1304,8 +1335,8 @@ extern eOresult_t eo_motioncontrol_extra_ManageEXTfault(EOtheMotionController *p
         return(eores_OK);
     }    
     
-    if(eomn_serv_MC_mc4plus != p->service.servconfig.type)
-    {   // so far only for mc4plus service
+    if((eo_motcon_mode_mc4plus != p->service.servconfig.type) && (eo_motcon_mode_mc4plusmais != p->service.servconfig.type))
+    {   // so far only for mc4plus and mc4plusmais services
         return(eores_NOK_generic);
     }
     
@@ -1768,6 +1799,100 @@ static eOresult_t s_eo_motioncontrol_onstop_search4mc4s(void *par, EOtheCANdisco
 }
 
 
+static eOresult_t s_eo_motioncontrol_mc4plusmais_onendofverify_encoder(EOaService* s, eObool_t operationisok)
+{    
+    if(eobool_true == operationisok)
+    {
+        eo_candiscovery2_Start(eo_candiscovery2_GetHandle(), &s_eo_themotcon.sharedcan.discoverytarget, &s_eo_themotcon.sharedcan.ondiscoverystop);        
+    }    
+    else
+    {
+        // the encoder reader fails. we dont even start the discovery of the mais board. we just issue an error report and call onverify() w/ false argument
+        
+        // prepare things
+        s_eo_themotcon.diagnostics.errorDescriptor.sourcedevice     = eo_errman_sourcedevice_localboard;
+        s_eo_themotcon.diagnostics.errorDescriptor.sourceaddress    = 0;
+        s_eo_themotcon.diagnostics.errorDescriptor.par16            = 0;
+        s_eo_themotcon.diagnostics.errorDescriptor.par64            = 0;    
+        EOaction_strg astrg = {0};
+        EOaction *act = (EOaction*)&astrg;
+        eo_action_SetCallback(act, s_eo_motioncontrol_send_periodic_error_report, NULL, eov_callbackman_GetTask(eov_callbackman_GetHandle()));    
+        
+
+        // fill error description. and transmit it
+        s_eo_themotcon.diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_mc_mc4plusmais_failed_encoders_verify);
+        s_eo_themotcon.diagnostics.errorType = eo_errortype_error;                
+        eo_errman_Error(eo_errman_GetHandle(), s_eo_themotcon.diagnostics.errorType, NULL, s_eobj_ownname, &s_eo_themotcon.diagnostics.errorDescriptor);
+        
+        if(0 != s_eo_themotcon.diagnostics.reportPeriod)
+        {
+            s_eo_themotcon.diagnostics.errorCallbackCount = EOK_int08dummy;
+            eo_timer_Start(s_eo_themotcon.diagnostics.reportTimer, eok_abstimeNOW, s_eo_themotcon.diagnostics.reportPeriod, eo_tmrmode_FOREVER, act);
+        }
+  
+        // call onverify
+        if(NULL != s_eo_themotcon.service.onverify)
+        {
+            s_eo_themotcon.service.onverify(&s_eo_themotcon, eobool_false); 
+        }            
+                
+    }  
+    
+    return(eores_OK);    
+}
+
+
+
+static eOresult_t s_eo_motioncontrol_mc4plusmais_onstop_search4mais(void *par, EOtheCANdiscovery2* p, eObool_t searchisok)
+{
+    
+    if((eobool_true == searchisok) && (eobool_true == s_eo_themotcon.service.activateafterverify))
+    {
+        const eOmn_serv_configuration_t * mcserv = (const eOmn_serv_configuration_t *)par;
+        eo_motioncontrol_Activate(&s_eo_themotcon, mcserv);
+    }
+    
+    s_eo_themotcon.diagnostics.errorDescriptor.sourcedevice     = eo_errman_sourcedevice_localboard;
+    s_eo_themotcon.diagnostics.errorDescriptor.sourceaddress    = 0;
+    s_eo_themotcon.diagnostics.errorDescriptor.par16            = 0;
+    s_eo_themotcon.diagnostics.errorDescriptor.par64            = 0;    
+    EOaction_strg astrg = {0};
+    EOaction *act = (EOaction*)&astrg;
+    eo_action_SetCallback(act, s_eo_motioncontrol_send_periodic_error_report, NULL, eov_callbackman_GetTask(eov_callbackman_GetHandle()));    
+    
+    if(eobool_true == searchisok)
+    {        
+        s_eo_themotcon.diagnostics.errorType = eo_errortype_debug;
+        s_eo_themotcon.diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_mc_mc4plusmais_ok);
+        eo_errman_Error(eo_errman_GetHandle(), s_eo_themotcon.diagnostics.errorType, NULL, s_eobj_ownname, &s_eo_themotcon.diagnostics.errorDescriptor);
+        
+        if((0 != s_eo_themotcon.diagnostics.repetitionOKcase) && (0 != s_eo_themotcon.diagnostics.reportPeriod))
+        {
+            s_eo_themotcon.diagnostics.errorCallbackCount = s_eo_themotcon.diagnostics.repetitionOKcase;        
+            eo_timer_Start(s_eo_themotcon.diagnostics.reportTimer, eok_abstimeNOW, s_eo_themotcon.diagnostics.reportPeriod, eo_tmrmode_FOREVER, act);
+        }
+    } 
+
+    if(eobool_false == searchisok)
+    {
+        s_eo_themotcon.diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_mc_mc4plusmais_failed_candiscovery_of_mais);
+        s_eo_themotcon.diagnostics.errorType = eo_errortype_error;                
+        eo_errman_Error(eo_errman_GetHandle(), s_eo_themotcon.diagnostics.errorType, NULL, s_eobj_ownname, &s_eo_themotcon.diagnostics.errorDescriptor);
+        
+        if(0 != s_eo_themotcon.diagnostics.reportPeriod)
+        {
+            s_eo_themotcon.diagnostics.errorCallbackCount = EOK_int08dummy;
+            eo_timer_Start(s_eo_themotcon.diagnostics.reportTimer, eok_abstimeNOW, s_eo_themotcon.diagnostics.reportPeriod, eo_tmrmode_FOREVER, act);
+        }
+    }     
+           
+    if(NULL != s_eo_themotcon.service.onverify)
+    {
+        s_eo_themotcon.service.onverify(&s_eo_themotcon, searchisok); 
+    }    
+    
+    return(eores_OK);   
+}
 
 // want to send a canframe with pwm onto can bus. 
 static eOresult_t s_eo_motioncontrol_SetCurrentSetpoint(EOtheMotionController *p, int16_t *pwmList, uint8_t size)
@@ -1854,7 +1979,7 @@ static void s_eo_motioncontrol_UpdateJointStatus(EOtheMotionController *p)
 
 static void s_eo_motioncontrol_proxy_config(eObool_t on)
 {    
-    if(eomn_serv_MC_mc4 == s_eo_themotcon.service.servconfig.type)
+    if(eo_motcon_mode_mc4 == s_eo_themotcon.service.servconfig.type)
     {
         if(eobool_true == on)
         {
@@ -1948,7 +2073,7 @@ static void s_eo_motioncontrol_mc4plusbased_hal_init_quad_enc_indexes_interrupt(
 static void s_eo_motioncontrol_mc4plusbased_enable_all_motors(EOtheMotionController *p)
 {
     // enable PWM of the motors (if not faulted)
-    if (!s_eo_mcserv_are_motors_ext_faulted())
+    if (!hal_motor_externalfaulted())
     {
         EOconstarray* carray = eo_constarray_Load((EOarray*)&p->service.servconfig.data.mc.mc4plus_based.arrayofjomodescriptors);
         
@@ -1956,52 +2081,11 @@ static void s_eo_motioncontrol_mc4plusbased_enable_all_motors(EOtheMotionControl
         {
             //const eOmn_serv_jomo_descriptor_t *jomodes = (eOmn_serv_jomo_descriptor_t*) eo_constarray_At(carray, i);            
             //uint8_t port = jomodes->actuator.pwm.port;
-            s_eo_mcserv_pwm_enable(p->mcmc4plus.pwmport[i]);
+            hal_motor_enable(p->mcmc4plus.pwmport[i]);
         }
     }
     
     return;
-}
-
-
-static void s_eo_mcserv_pwm_set(uint8_t i, int16_t v)
-{
-    //out of bound
-    if (i > 3)
-        return;
-   
-    hal_motor_pwmset((hal_motor_t)i, v);
-   
-}
-
-static void s_eo_mcserv_pwm_enable(uint8_t i)
-{
-    //out of bound
-    if (i > 3)
-        return;
-    
-    hal_motor_enable((hal_motor_t)i);  
-}
-
-static void s_eo_mcserv_pwm_disable(uint8_t i)
-{
-    //out of bound
-    if (i > 3)
-        return;
- 
-    hal_motor_disable((hal_motor_t)i);
-  
-}
-
-
-static eObool_t s_eo_mcserv_are_motors_ext_faulted(void)
-{
-    if(hal_true == hal_motor_externalfaulted())
-    {
-        return eobool_true;
-    }
-    
-    return eobool_false;
 }
 
 
@@ -2126,7 +2210,7 @@ static eOresult_t s_eo_mcserv_do_mc4plus(EOtheMotionController *p)
     // 6. apply the pwm. for the case of mc4plus we call hal_pwm();
     for(i=0; i<p->numofjomos; i++)
     {
-        s_eo_mcserv_pwm_set(p->mcmc4plus.pwmport[i], pwm[i]);
+        hal_motor_pwmset(p->mcmc4plus.pwmport[i], pwm[i]);
     }
 
     // 7. propagate the status of joint motors locally computed in localcontroller to the joints / motors in ram
@@ -2173,8 +2257,8 @@ static void s_eo_mcserv_disable_all_motors(EOtheMotionController *p)
 {
      for(uint8_t i=0; i<p->numofjomos; i++)
      {
-        s_eo_mcserv_pwm_set(p->mcmc4plus.pwmport[i], 0);
-        s_eo_mcserv_pwm_disable(p->mcmc4plus.pwmport[i]);
+        hal_motor_pwmset(p->mcmc4plus.pwmport[i], 0);
+        hal_motor_disable(p->mcmc4plus.pwmport[i]);
      }
      
      return;

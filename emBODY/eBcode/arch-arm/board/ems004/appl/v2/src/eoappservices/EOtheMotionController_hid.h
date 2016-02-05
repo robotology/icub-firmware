@@ -36,6 +36,7 @@
 #include "EOtheMAIS.h"
 #include "EOtheMC4boards.h"
 #include "EOtheVirtualStrain.h"
+#include "hal_motor.h"
 
 
 #include "EOtheServices_hid.h"
@@ -65,8 +66,8 @@ typedef struct
 {
     EOemsController*                        thecontroller;
     EOtheEncoderReader*                     theencoderreader; 
-    int16_t                                 pwmvalue[eo_motcon_standardJOMOs]; // at most i can manage 4 joints, hence 4 pwm values
-    uint8_t                                 pwmport[eo_motcon_standardJOMOs];
+    int16_t                                 pwmvalue[hal_motors_number]; // at most i can manage 4 joints, hence 4 pwm values
+    hal_motor_t                             pwmport[hal_motors_number];
     // anything else? add it in here. or maybe we use the one from foc ... 
 } eOmotioncontroller_objs_mc4plus_t;
 
