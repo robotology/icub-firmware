@@ -932,6 +932,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\midware\hl-plus\src\chips\hl_chip_xx_ethphy.c</FilePath>
             </File>
+            <File>
+              <FileName>hl_chip_ams_as5055a.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\midware\hl-plus\src\chips\hl_chip_ams_as5055a.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2070,6 +2075,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\midware\hl-plus\src\chips\hl_chip_xx_ethphy.c</FilePath>
             </File>
+            <File>
+              <FileName>hl_chip_ams_as5055a.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\midware\hl-plus\src\chips\hl_chip_ams_as5055a.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -3115,6 +3125,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\midware\hl-plus\src\chips\hl_chip_xx_ethphy.c</FilePath>
             </File>
+            <File>
+              <FileName>hl_chip_ams_as5055a.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\midware\hl-plus\src\chips\hl_chip_ams_as5055a.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -4064,6 +4079,11 @@
               <FileName>hl_chip_xx_ethphy.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\midware\hl-plus\src\chips\hl_chip_xx_ethphy.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_chip_ams_as5055a.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\midware\hl-plus\src\chips\hl_chip_ams_as5055a.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -5016,6 +5036,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\midware\hl-plus\src\chips\hl_chip_xx_ethphy.c</FilePath>
             </File>
+            <File>
+              <FileName>hl_chip_ams_as5055a.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\midware\hl-plus\src\chips\hl_chip_ams_as5055a.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -5133,7 +5158,7 @@
           <CreateExecutable>0</CreateExecutable>
           <CreateLib>1</CreateLib>
           <CreateHexFile>0</CreateHexFile>
-          <DebugInformation>0</DebugInformation>
+          <DebugInformation>1</DebugInformation>
           <BrowseInformation>1</BrowseInformation>
           <ListingPath>.\Lst\</ListingPath>
           <HexFormatSelection>1</HexFormatSelection>
@@ -5432,8 +5457,8 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>4</Optim>
-            <oTime>1</oTime>
+            <Optim>1</Optim>
+            <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
             <Strict>0</Strict>
@@ -5966,6 +5991,11 @@
               <FileName>hl_chip_xx_ethphy.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\midware\hl-plus\src\chips\hl_chip_xx_ethphy.c</FilePath>
+            </File>
+            <File>
+              <FileName>hl_chip_ams_as5055a.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\midware\hl-plus\src\chips\hl_chip_ams_as5055a.c</FilePath>
             </File>
           </Files>
         </Group>
