@@ -116,7 +116,7 @@ extern const hl_dma_cfg_t hl_dma_cfg_default;
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
 
-/** @fn         extern hl_result_t hl_spi_init(hl_dma_t id, const hl_dma_cfg_t *cfg)
+/** @fn         extern hl_result_t hl_dma_init(hl_dma_t id, const hl_dma_cfg_t *cfg)
     @brief      This function configures DMA.
     @param      id              identifies SPI id 
     @param      cfg             the configuration of the DMA peripheral
@@ -124,7 +124,7 @@ extern const hl_dma_cfg_t hl_dma_cfg_default;
   */
 extern hl_result_t hl_dma_init(hl_dma_t id, const hl_dma_cfg_t *cfg);
 
-/** @fn         extern hl_boolval_t hl_dma_supported_is(hl_spi_t id)
+/** @fn         extern hl_boolval_t hl_dma_supported_is(hl_dma_t id)
     @brief      This function tells if a given DMA periph is supported.
     @param      id              identifies DMA
     @return     hl_true or hl_false
@@ -132,7 +132,7 @@ extern hl_result_t hl_dma_init(hl_dma_t id, const hl_dma_cfg_t *cfg);
 extern hl_boolval_t hl_dma_supported_is(hl_dma_t id);
 
 
-/** @fn         extern hl_boolval_t hl_spi_initted_is(hl_dma_t id)
+/** @fn         extern hl_boolval_t hl_dma_initted_is(hl_dma_t id)
     @brief      This function tells if a given DMA is initted.
     @param      id              identifies DMA port
     @return     hl_true or hl_false
