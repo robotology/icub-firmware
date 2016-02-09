@@ -153,7 +153,7 @@ extern uint32_t hl_spi_speedofbus_get(hl_spi_t id);
 
 
 /** @fn         extern hl_result_t hl_spi_init(hl_spi_t id, const hl_spi_cfg_t *cfg)
-    @brief      This function configures SPI. It does not configure or enable the SPI transceiver.
+    @brief      This function configures SPI. 
     @param      id              identifies SPI id 
     @param      cfg             the configuration of the SPI peripheral
     @return     hl_res_NOK_generic in case of error, else hl_res_OK
@@ -178,7 +178,7 @@ extern hl_boolval_t hl_spi_initted_is(hl_spi_t id);
 
 
 /** @fn         extern hl_result_t hl_spi_enable(hl_spi_t id)
-    @brief      This function starts SPI. It must be invoked after hl_spi_init.
+    @brief      This function starts SPI. It must be invoked after hl_spi_init().
     @param      id              identifies SPI port 
     @return     hl_res_NOK_generic in case of error, else hl_res_OK
   */
@@ -192,28 +192,51 @@ extern hl_result_t hl_spi_enable(hl_spi_t id);
   */
 extern hl_result_t hl_spi_disable(hl_spi_t id);
 
-/** @fn         extern hl_result_t hl_spi_send_raw (hl_spi_t id, uint8_t byte)
-    @brief      This function send a raw byte using an SPI bus.
+
+/** @fn         extern hl_result_t hl_spi_send_receive_raw(hl_spi_t id, uint16_t tx, uint16_t* rx)
+    @brief      This function send a raw word using SPI bus and receives one back.
     @param      id              identifies SPI port
-    @param      byte            byte value to be sent 
+    @param      tx              value to be sent 
+    @param      rx              pointer to the variable in which the received word will be stored (it can be NULL)
     @return     hl_res_NOK_generic in case of error, else hl_res_OK
   */
-extern hl_result_t hl_spi_send_raw (hl_spi_t id, uint8_t byte);
+extern hl_result_t hl_spi_send_receive_raw(hl_spi_t id, uint16_t tx, uint16_t* rx);
 
-/** @fn         extern hl_result_t hl_spi_receive_raw (hl_spi_t id, uint8_t* byte)
-    @brief      This function receive a raw byte using an SPI bus. The value is written on the variable byte
+
+/** @fn         extern hl_result_t hl_spi_wait_until_completion(hl_spi_t id)
+    @brief      This function waits that the SPI is not busy anymore.
     @param      id              identifies SPI port
-    @param      byte            pointer to the variable in which the received bbyte will be stored
     @return     hl_res_NOK_generic in case of error, else hl_res_OK
   */
-extern hl_result_t hl_spi_receive_raw (hl_spi_t id, uint8_t* value);
+extern hl_result_t hl_spi_wait_until_completion(hl_spi_t id);
 
-/** @fn         extern hl_result_t hl_spi_init(hl_spi_t id)
+
+/** @fn         extern hl_result_t hl_spi_send_raw(hl_spi_t id, uint16_t tx)
+    @brief      This function send a raw word using SPI bus.
+    @param      id              identifies SPI port
+    @param      tx              value to be sent 
+    @return     hl_res_NOK_generic in case of error, else hl_res_OK
+  */
+extern hl_result_t hl_spi_send_raw(hl_spi_t id, uint16_t tx);
+
+
+/** @fn         extern hl_result_t hl_spi_receive_raw(hl_spi_t id, uint16_t* rx)
+    @brief      This function receive a raw word using SPI bus. 
+    @param      id              identifies SPI port
+    @param      rx              pointer to the variable in which the received word will be stored (it can be NULL)
+    @return     hl_res_NOK_generic in case of error, else hl_res_OK
+  */
+extern hl_result_t hl_spi_receive_raw(hl_spi_t id, uint16_t* rx);
+
+
+/** @fn         extern hl_result_t hl_spi_deinit(hl_spi_t id)
     @brief      This function deinitalize the resources associated to the low-level abstraction of the spi
     @param      id              identifies SPI id 
     @return     hl_res_NOK_generic in case of error, else hl_res_OK
   */
-extern hl_result_t hl_spi_deinit (hl_spi_t id);
+extern hl_result_t hl_spi_deinit(hl_spi_t id);
+
+
 /** @}            
     end of group doxy_group_hl_spi  
  **/

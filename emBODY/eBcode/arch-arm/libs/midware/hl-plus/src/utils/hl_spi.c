@@ -246,6 +246,9 @@ extern hl_result_t hl_spi_init(hl_spi_t id, const hl_spi_cfg_t *cfg)
     // init gpios
     s_hl_spi_hw_gpio_init(id, cfg->mode);    
     
+    // init registers
+    s_hl_spi_hw_registers_init(id); 
+    
     s_hl_spi_initted_set(id);
 
     return(hl_res_OK);
@@ -263,23 +266,17 @@ extern hl_boolval_t hl_spi_initted_is(hl_spi_t id)
 }
 
 extern hl_result_t hl_spi_enable(hl_spi_t id)
-{
+{   
 #if     !defined(HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)
     if(hl_false == s_hl_spi_initted_is(id))
     {
         return(hl_res_NOK_generic);
     }
 #endif
+ 
+    SPI_TypeDef* SPIx = HL_spi_port2peripheral(id);
     
-    hl_result_t res = s_hl_spi_hw_registers_init(id); // hardware setup
-
-    if(res != hl_res_OK)
-    {
-        return(hl_res_NOK_generic);
-    }
-    
-    // i dont init any isr in here ...
-
+    SPI_Cmd(SPIx, ENABLE);
 
     return(hl_res_OK);
 }
@@ -287,56 +284,109 @@ extern hl_result_t hl_spi_enable(hl_spi_t id)
 
 extern hl_result_t hl_spi_disable(hl_spi_t id) 
 {
-    SPI_TypeDef* SPIx = HL_spi_port2peripheral(id); 
-
 #if     !defined(HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)    
     if(hl_false == s_hl_spi_initted_is(id))
     {
         return(hl_res_NOK_generic);
     }
 #endif
+
+    SPI_TypeDef* SPIx = HL_spi_port2peripheral(id);    
    
-    SPI_I2S_DeInit(SPIx);
+    while(SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_BSY) == SET);    // wait until it's free                                       
+    SPI_Cmd(SPIx, DISABLE);
 
     return(hl_res_OK);
 }
 
-extern hl_result_t hl_spi_send_raw (hl_spi_t id, uint8_t byte)
+
+extern hl_result_t hl_spi_send_receive_raw(hl_spi_t id, uint16_t tx, uint16_t* rx)
 {
-    SPI_TypeDef* SPIx = HL_spi_port2peripheral(id);
 #if     !defined(HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)    
     if(hl_false == s_hl_spi_initted_is(id))
     {
         return(hl_res_NOK_generic);
     }
 #endif
-        
-    while (SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_TXE) == RESET);
-    SPI_I2S_SendData(SPIx, byte);
     
-    return (hl_res_OK);
+    SPI_TypeDef* SPIx = HL_spi_port2peripheral(id);    
+        
+    while(SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_TXE) == RESET);
+    SPI_I2S_SendData(SPIx, tx);
+    
+
+    while(SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_RXNE) == RESET);
+    uint16_t tmp = SPI_I2S_ReceiveData(SPIx);
+    
+    if(NULL != rx)
+    {
+        *rx = tmp;
+    }
+        
+    return(hl_res_OK);
 }
 
-extern hl_result_t hl_spi_receive_raw (hl_spi_t id, uint8_t* value)
+
+extern hl_result_t hl_spi_wait_until_completion(hl_spi_t id)
 {
-    SPI_TypeDef* SPIx = HL_spi_port2peripheral(id);
 #if     !defined(HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)    
     if(hl_false == s_hl_spi_initted_is(id))
     {
         return(hl_res_NOK_generic);
     }
-    if (value == NULL)
+#endif
+    
+    SPI_TypeDef* SPIx = HL_spi_port2peripheral(id);    
+       
+    while(SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_BSY) == SET);
+     
+    return(hl_res_OK);
+}
+
+
+extern hl_result_t hl_spi_send_raw(hl_spi_t id, uint16_t tx)
+{
+#if     !defined(HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)    
+    if(hl_false == s_hl_spi_initted_is(id))
     {
         return(hl_res_NOK_generic);
     }
 #endif
+    
+    SPI_TypeDef* SPIx = HL_spi_port2peripheral(id);    
         
-    while (SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_RXNE) == RESET);
-    *value = SPI_I2S_ReceiveData(SPIx);
-    return hl_res_OK;
+    while(SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_TXE) == RESET);
+    SPI_I2S_SendData(SPIx, tx);
+
+    
+    return(hl_res_OK);
 }
 
-extern hl_result_t hl_spi_deinit (hl_spi_t id)
+
+extern hl_result_t hl_spi_receive_raw(hl_spi_t id, uint16_t* rx)
+{
+#if     !defined(HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)    
+    if(hl_false == s_hl_spi_initted_is(id))
+    {
+        return(hl_res_NOK_generic);
+    }
+#endif
+    
+    SPI_TypeDef* SPIx = HL_spi_port2peripheral(id);    
+        
+    while(SPI_I2S_GetFlagStatus(SPIx, SPI_I2S_FLAG_RXNE) == RESET);
+    uint16_t tmp = SPI_I2S_ReceiveData(SPIx);
+    
+    if(NULL != rx)
+    {
+        *rx = tmp;
+    }
+    
+    return(hl_res_OK);
+}
+
+
+extern hl_result_t hl_spi_deinit(hl_spi_t id)
 {
 #if   !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)      
     if(hl_false == hl_spi_initted_is(id))
@@ -344,6 +394,10 @@ extern hl_result_t hl_spi_deinit (hl_spi_t id)
         return(hl_res_NOK_generic);
     }
 #endif
+
+    SPI_TypeDef* SPIx = HL_spi_port2peripheral(id);     
+    
+    SPI_I2S_DeInit(SPIx);
             
     s_hl_spi_initted_reset(id);
     //hal_heap_delete((void**)&(s_hl_spi_theinternals.items[HL_spi_id2index(id)]));

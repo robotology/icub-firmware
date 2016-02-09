@@ -908,12 +908,12 @@ static hal_result_t s_hal_spi_init(hal_spi_t id, const hal_spi_cfg_t *cfg)
     // compute the prescaler and substitute it inside hlcfg structure
     hlcfg.prescaler = s_hal_spi_get_hl_prescaler(id, cfg);
     
-    hl_result_t r = hl_spi_init((hl_spi_t)id, &hlcfg);      // the gpio, the clock
+    hl_result_t r = hl_spi_init((hl_spi_t)id, &hlcfg);      // the gpio, the clock, the peripheral: everything apart isr and start
     if(hl_res_OK != r)
     {
         return((hal_result_t)r);
     }
-    hl_spi_enable((hl_spi_t)id);            // the SPI_Init()
+
 
     
     // --------------------------------------------------------------------------------------
