@@ -199,6 +199,7 @@ extern const hl_i2c_advcfg_t hl_i2c_advcfg_default; // =
 
 #include "hl_can.h"
 
+typedef enum {hlDISABLE = 0, hlENABLE = !hlDISABLE} hl_FunctionalState;
 
 
 struct hl_can_advcfg_opaque_t
@@ -208,12 +209,12 @@ struct hl_can_advcfg_opaque_t
     uint8_t         CAN_SJW;
     uint8_t         CAN_BS1;
     uint8_t         CAN_BS2;
-    FunctionalState CAN_TTCM;
-    FunctionalState CAN_ABOM;
-    FunctionalState CAN_AWUM; 
-    FunctionalState CAN_NART;
-    FunctionalState CAN_RFLM; 
-    FunctionalState CAN_TXFP; 
+    hl_FunctionalState CAN_TTCM;
+    hl_FunctionalState CAN_ABOM;
+    hl_FunctionalState CAN_AWUM; 
+    hl_FunctionalState CAN_NART;
+    hl_FunctionalState CAN_RFLM; 
+    hl_FunctionalState CAN_TXFP; 
 };
 
 extern const hl_can_advcfg_t hl_can_advcfg_default; // =

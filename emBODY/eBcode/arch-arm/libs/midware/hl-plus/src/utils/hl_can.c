@@ -83,12 +83,12 @@ const hl_can_advcfg_t hl_can_advcfg_default =
     .CAN_SJW            = CAN_BS1_3tq,          // depends on: canclock
     .CAN_BS1            = CAN_BS1_5tq,          // depends on: canclock
     .CAN_BS2            = CAN_BS1_3tq,          // depends on: canclock         
-    .CAN_TTCM           = DISABLE,              // time-triggered communication mode
-    .CAN_ABOM           = DISABLE,              // automatic bus-off
-    .CAN_AWUM           = DISABLE,              // automatic wake-up 
-    .CAN_NART           = DISABLE,              // no-automatic retransmission mode 
-    .CAN_RFLM           = DISABLE,              // receive fifo locked mode 
-    .CAN_TXFP           = ENABLE                // transmit fifo priority (if ENABLEd, priority amongst the pending mailboxes is driven by the request order) 
+    .CAN_TTCM           = (hl_FunctionalState)DISABLE,              // time-triggered communication mode
+    .CAN_ABOM           = (hl_FunctionalState)DISABLE,              // automatic bus-off
+    .CAN_AWUM           = (hl_FunctionalState)DISABLE,              // automatic wake-up 
+    .CAN_NART           = (hl_FunctionalState)DISABLE,              // no-automatic retransmission mode 
+    .CAN_RFLM           = (hl_FunctionalState)DISABLE,              // receive fifo locked mode 
+    .CAN_TXFP           = (hl_FunctionalState)ENABLE                // transmit fifo priority (if ENABLEd, priority amongst the pending mailboxes is driven by the request order) 
 };
 
 //__weak extern const hl_can_mapping_t* hl_can_map = NULL;
