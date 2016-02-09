@@ -204,7 +204,7 @@ void as5048_init(uint8_t sensorID)
 	
 	  //NVIC_Init(&NVIC_InitStructure);
 	
-	  SPI_Cmd(SPI3, ENABLE);
+//	  SPI_Cmd(SPI3, ENABLE);
 	  /* Enable the Rx buffer not empty interrupt */
 	  //SPI_I2S_ITConfig(SPI3, SPI_I2S_IT_RXNE, ENABLE);   
 	  }
@@ -278,7 +278,7 @@ void as5048_init(uint8_t sensorID)
 	
 	  // NVIC_Init(&NVIC_InitStructure);
 	
-	  SPI_Cmd(SPI2, ENABLE);
+//	  SPI_Cmd(SPI2, ENABLE);
 	  /* Enable the Rx buffer not empty interrupt */
 	  //SPI_I2S_ITConfig(SPI2, SPI_I2S_IT_RXNE, ENABLE); 
 	  }
@@ -299,6 +299,8 @@ uint16_t * as5048_read(uint8_t sensorID, uint16_t mask)
 
       if (sensorID==0)
 	  {
+        SPI_Cmd(SPI3, ENABLE);
+          
 	  GPIO_ResetBits(SPI3_NSEL_GPIO_PORT, SPI3_NSEL_PIN);
 	  SPI_I2S_SendData(SPI3, 0xffff);   //send a dummy value 
 	  while(SPI_I2S_GetFlagStatus(SPI3, SPI_I2S_FLAG_TXE)==0);
@@ -319,9 +321,14 @@ uint16_t * as5048_read(uint8_t sensorID, uint16_t mask)
 	  //angle[0] +=(aRxBuffer[0]&0x3fff);
 	  while(SPI_I2S_GetFlagStatus(SPI3, SPI_I2S_FLAG_BSY));
    	  GPIO_SetBits(SPI3_NSEL_GPIO_PORT, SPI3_NSEL_PIN);
+      
+        SPI_Cmd(SPI3, DISABLE);
+      
 	  }
 	  else 
 	  {
+        SPI_Cmd(SPI2, ENABLE);
+          
 	  GPIO_ResetBits(SPI2_NSEL_GPIO_PORT, SPI2_NSEL_PIN);
 	  SPI_I2S_SendData(SPI2, 0x3fff);   //send a dummy value 
 		while(SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_TXE)==0);
@@ -342,6 +349,8 @@ uint16_t * as5048_read(uint8_t sensorID, uint16_t mask)
 			 
 	  while(SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_BSY));
 	  GPIO_SetBits(SPI2_NSEL_GPIO_PORT, SPI2_NSEL_PIN);
+      
+        SPI_Cmd(SPI2, DISABLE);
 	  } 
 	  return value;
  }
