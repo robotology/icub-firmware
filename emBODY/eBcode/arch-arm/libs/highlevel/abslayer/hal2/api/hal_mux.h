@@ -58,7 +58,7 @@
 typedef enum  
 { 
     hal_mux1   = 0,
-		hal_mux2   = 1,
+    hal_mux2   = 1,
     hal_mux3   = 2,         
     hal_mux4   = 3
 } hal_mux_t;
