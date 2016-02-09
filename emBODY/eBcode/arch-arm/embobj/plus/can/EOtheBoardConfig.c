@@ -1391,7 +1391,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_testOfmc2plus =
                     },
                     .sensor         =
                     {
-                        .type   = eomn_serv_mc_sensor_encoder_inc,
+                        .type   = eomn_serv_mc_sensor_encoder_inc, // eomn_serv_mc_sensor_encoder_spichainof2, // eomn_serv_mc_sensor_encoder_inc, // or eomn_serv_mc_sensor_encoder_spichainof2
                         .port   = 0, // eomn_serv_mc_port_mc4plus_pwmP3 ?? verify!
                         .pos    = eomn_serv_mc_sensor_pos_atjoint
                     },
