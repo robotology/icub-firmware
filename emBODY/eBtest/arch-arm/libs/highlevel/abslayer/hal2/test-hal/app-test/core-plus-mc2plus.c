@@ -29,6 +29,8 @@
 #include "hal.h"  
 #include "hal_core.h"  
 
+#include "hl_bits.h"
+
 #if     !defined(HAL_USE_LIB)
 #include "hal_brdcfg_modules.h"
 #else
@@ -360,9 +362,6 @@ int main(void)
     
     hal_core_start();
 
-    // we can exec in here because test-encoder-spi() initialises can if not doen yet
-//    test_encoder_spi();
-   
     
     leds_init();    
     button_init();
@@ -375,6 +374,11 @@ int main(void)
     test_message("");
     test_message(" # THE SYSTEM HAS JUST STARTED AND HAL INITTED ");
     test_message("");
+    
+    
+    // we can exec in here because test-encoder-spi() initialises can if not doen yet
+    test_encoder_spi();
+       
 
     
 #if defined(USE_EVENTVIEWER)
@@ -1071,6 +1075,13 @@ static void test_encoder_spi(void)
     hl_chip_ams_as5055a_init(hl_chip_ams_as5055a_channel1, &as5055a_config);
     hl_chip_ams_as5055a_reset(hl_chip_ams_as5055a_channel1, hl_chip_ams_as5055a_resetmode_master); // or hl_chip_ams_as5055a_resetmode_software_plus_spiregisters
     
+    hl_chip_ams_as5055a_reset(hl_chip_ams_as5055a_channel1, hl_chip_ams_as5055a_resetmode_clearerrorflag);
+    
+    uint16_t eee[3] = {0};
+    hl_chip_ams_as5055a_read_errorstatus(hl_chip_ams_as5055a_channel1, &eee[0], &eee[1], &eee[2]);
+    
+    hl_chip_ams_as5055a_read_errorstatus(hl_chip_ams_as5055a_channel1, &eee[0], &eee[1], &eee[2]);
+    
     // so far we dont prepare for hl_chip_ams_as5055a_channel2 which is on spi2 and its nsel is PI10
 //    as5055a_config.spiid = hl_spi2;
 //    as5055a_config.nsel.port = hl_gpio_portI;
@@ -1106,10 +1117,58 @@ static void test_encoder_spi(void)
         
 #if defined(_USE_CHIP_AMS_AS5055A_)
         
-        uint16_t values[3];
+        uint16_t values[3] = {0};
+        uint16_t errors[3] = {0};
+        hl_bool_t crcerrors[3] = {hl_false};
+        hl_bool_t errorframes[3] = {hl_false};
+        uint16_t angularvalues[3] = {0};
+        uint16_t alarms[3] = {0};
+        hl_bool_t err_wow[3] = {hl_false};
+        uint8_t err_spi[3] = {0};
+        
+        static char message[256] = {0};
+        
         hl_chip_ams_as5055a_read_angulardata(hl_chip_ams_as5055a_channel1, hl_chip_ams_as5055a_readmode_start_wait_read, &values[0], &values[1], &values[2]);
-        angle[0] = values[0];
-        angle[1] = values[1];   
+        
+        hl_chip_ams_as5055a_read_errorstatus(hl_chip_ams_as5055a_channel1, &errors[0], &errors[1], &errors[2]);
+        
+        for(uint8_t i=0; i<as5055a_config.numberofchained; i++) // we check only some values
+        {
+            angle[i] = values[i];
+            
+            // crc
+            uint8_t tmp08 = hl_bits_hlfword_bitsetcount(values[i]);
+            if(1 == (tmp08 % 2))
+            {   // parity is even, thus if we have even number of bits then there is a crc error
+                crcerrors[i] = hl_true;                
+            }
+            else
+            {
+                crcerrors[i] = hl_false; 
+            }
+            
+            // errorframe.... if crc is correct it is on bit 1
+            errorframes[i] = hl_bits_hlfword_bitcheck(values[i], 1);     
+
+            // angular value ... bits 0 and 1 are crc and ef. thus i shift down by 2. then, of teh remaining: angular value is in 11:0. in 13:12 there are alarm bits.
+            angularvalues[i] = (values[i] >> 2) & 0x0fff;   
+            
+            // alarms
+            alarms[i] = ((values[i] >> 2) >> 12) & 0x0003; 
+            
+            // errors
+            uint16_t err = errors[i] >> 2;
+            err_wow[i] = hl_bits_hlfword_bitcheck(err, 4);  
+            err_spi[i] = err & 0x0007;
+            
+            snprintf(message, sizeof(message), "as5055a chn1, value %d: [crc, ef, alarms] = [%d, %d, %d]. angular value = 0x%x (%d).", i, crcerrors[i], errorframes[i], alarms[i], angularvalues[i], angularvalues[i]);
+            
+            hal_trace_puts(message);
+        }
+        
+        volatile uint8_t debuggerstopshere = 0;
+        debuggerstopshere = debuggerstopshere;
+
         
 #else 
         
