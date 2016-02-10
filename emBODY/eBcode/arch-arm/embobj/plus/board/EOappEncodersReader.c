@@ -957,47 +957,28 @@ static eObool_t s_eo_appEncReader_IsValidValue_AEA(uint32_t *valueraw, eOappEncR
 
 static eObool_t s_eo_appEncReader_IsValidValue_SPICHAIN2(uint32_t *valueraw, eOappEncReader_errortype_t *error)
 {    
-    uint8_t b = 0;
-    uint8_t parity_error = 0;
-    uint16_t errorframe = 0;
-
-    
     uint16_t first = *valueraw & 0xffff;
-    
-    for(parity_error=0, b=0; b<16; ++b)
-    {
-        parity_error ^= (first)>>b;
-    }
-    
-    if(parity_error & 1) 
+    uint16_t second = ((*valueraw) >> 16) & 0xffff;   
+       
+    if(1 == (eo_common_hlfword_bitsetcount(first) % 2))
     { 
         *error = err_onParityError;
         return(eobool_false);
     }
     
-    uint16_t second = ((*valueraw) >> 16) & 0xffff;   
-    parity_error = 0;
-    
-    for(parity_error=0, b=0; b<16; ++b)
-    {
-        parity_error ^= (second)>>b;
-    }
-    
-    if (parity_error & 1) 
+    if(1 == (eo_common_hlfword_bitsetcount(second) % 2))
     { 
         *error = err_onParityError;
         return(eobool_false);
     }  
 
-    errorframe = (first >> 1) & 0x0001;
-    if(errorframe)
+    if(eobool_true == eo_common_hlfword_bitcheck(first, 1))
     {
         *error = err_onReadFromSpi;
         return(eobool_false);    
     }
     
-    errorframe = (second >> 1) & 0x0001;
-    if(errorframe)
+    if(eobool_true == eo_common_hlfword_bitcheck(second, 1))
     {
         *error = err_onReadFromSpi;
         return(eobool_false);    
