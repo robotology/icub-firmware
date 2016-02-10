@@ -94,6 +94,15 @@ extern void hl_bits_word_bitclear(uint32_t* word, uint8_t bit);
 extern void hl_bits_word_bittoggle(uint32_t* word, uint8_t bit);
 
 
+extern uint8_t hl_bits_byte_bitsetcount(uint8_t byte);
+
+extern uint8_t hl_bits_hlfword_bitsetcount(uint16_t hword);
+
+extern uint8_t hl_bits_word_bitsetcount(uint32_t word);
+
+extern uint8_t hl_bits_dword_bitsetcount(uint64_t dword);
+
+
 /** @}            
     end of group arm_hl_bits  
  **/
