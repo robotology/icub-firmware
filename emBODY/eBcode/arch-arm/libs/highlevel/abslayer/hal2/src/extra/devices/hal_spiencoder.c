@@ -274,11 +274,12 @@ extern hal_result_t hal_spiencoder_init(hal_spiencoder_t id, const hal_spiencode
         {
             .spiid              = hl_spi2,
             .numberofchained    = 2,
-            .spicfg             = NULL,
+            .spicfg             = NULL, // the spi initialisation is done externally to the chip (just a few lines above actually)...
             .nsel               = { .port = hl_gpio_portNONE, .pin = hl_gpio_pinNONE }, // get the cs of the mux
             .nint               = { .port = hl_gpio_portNONE, .pin = hl_gpio_pinNONE }   
         };
         hl_chip_ams_as5055a_channel_t chn = (hal_spi2 == intitem->spiid) ? (hl_chip_ams_as5055a_channel2) : (hl_chip_ams_as5055a_channel1);
+        #warning TODO: get the (port, pin) of the cs from the mux instead of writing it directly in here ....
         if(hal_spi2 == intitem->spiid)
         {
             chn = hl_chip_ams_as5055a_channel2;

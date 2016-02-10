@@ -114,6 +114,21 @@ static hl_result_t s_hl_chip_ams_as5055a_master_reset(hl_chip_ams_as5055a_channe
 // - definition (and initialisation) of static const variables
 // --------------------------------------------------------------------------------------------------------------------
 
+// it the advanced spi config to use. 
+static const hl_spi_advcfg_t s_hl_chip_ams_as5055a_spiadvancedconfig =
+{
+    .SPI_Direction          = SPI_Direction_2Lines_FullDuplex,
+    .SPI_Mode               = SPI_Mode_Master,                            
+    .SPI_DataSize           = SPI_DataSize_16b, 
+    .SPI_CPOL               = SPI_CPOL_Low, 
+    .SPI_CPHA               = SPI_CPHA_2Edge,
+    .SPI_NSS                = SPI_NSS_Soft,
+    .SPI_BaudRatePrescaler  = SPI_BaudRatePrescaler_64, 
+    .SPI_FirstBit           = SPI_FirstBit_MSB, 
+    .SPI_CRCPolynomial      = 0x0007           
+};
+        
+
 static const uint16_t s_Command_READ_ErrorStatus = 0xE6B5; // it is 0x335A of Figure 22 at page 19, shifted up by 1 bit, with the bit 15 = 1 (READs and with bit 0 adjusted for parity 
 static const uint16_t s_Command_READ_AngularData = 0xFFFF; // it is 0x3fff of Figure 22 at page 19, shifted up by 1 bit, with the bit 15 = 1 (READs and with bit 0 adjusted for parity 
 static const uint16_t s_Command_NOP = 0x0000;
@@ -525,6 +540,30 @@ static hl_result_t s_hl_chip_ams_as5055a_hw_init(const hl_chip_ams_as5055a_cfg_t
     as5048_init(1);
     
 #else    
+    
+    
+    if(NULL != cfg->spicfg)
+    {   // must init spi with this field. 
+        
+        // 1. init hl spimap: it is needed by hl_spi to find sck, miso, mosi
+        hl_spi_map = cfg->spicfg->spimap2use;
+        
+        // 2. define a proper hl_spi_cfg_t        
+        hl_spi_cfg_t spiconfig = {0};
+        spiconfig.mode = hl_spi_mode_master;
+        spiconfig.prescaler = cfg->spicfg->prescaler;
+        spiconfig.advcfg = &s_hl_chip_ams_as5055a_spiadvancedconfig;
+        
+        // 3. call hl_spi_init
+        hl_result_t r = hl_spi_init(cfg->spiid, &spiconfig);      // the gpio, the clock, the peripheral: everything apart isr and start
+        if(hl_res_OK != r)
+        {
+            return(r);
+        }        
+    }
+    
+    
+    
     // is spi bus already initialised?
     if(hl_false == hl_spi_initted_is(spiid))
     {
@@ -573,7 +612,7 @@ static hl_result_t s_hl_chip_ams_as5055a_hw_init(const hl_chip_ams_as5055a_cfg_t
     };
 
     
-    if(hl_gpio_portNONE != cfg->nint.port)
+    if((hl_gpio_portNONE != cfg->nint.port) && (hl_gpio_pinNONE != cfg->nint.pin))
     {
         memcpy(&gpioinit, &inpgpioinit, sizeof(hl_gpio_init_t));
         gpiomap.gpio.port = cfg->nint.port;

@@ -68,16 +68,22 @@ enum
     hl_chip_ams_as5055a_max_chips_in_channel    = 3     // maximum number of chips that we can put in daisy chain in each channel. 
 };
 
+typedef struct
+{
+    hl_spi_mapping_t*           spimap2use;         // the spi map (sck, miso, mosi) to use.
+    hl_spi_prescaler_t          prescaler;          // the only possible spi param. The AS5055A SPI must be master, and then with mode=1 (CPOL=0, CPHA=1) or (SPI_CPOL_Low, SPI_CPHA_2Edge).               
+} hl_chip_ams_as5055a_spicfg_t;
+
 /** @typedef    typedef struct hl_chip_ams_as5055a_cfg_t 
     @brief      contains the configuration for the chip. prior to call hl_chip_ams_as5055a_init(), the user MUST initialise the hl_spi_map variable 
  **/
 typedef struct
 {
-    hl_spi_t                    spiid;
-    uint8_t                     numberofchained;    // upto to hl_chip_ams_as5055a_max_chips_in_channel
-    hl_spi_cfg_t*               spicfg;             // for now we need spi externally initted (sck, miso, mosi). The AS5055A SPI uses mode=1 (CPOL=0, CPHA=1) or (SPI_CPOL_Low, SPI_CPHA_2Edge).
-    hl_gpio_t                   nsel;
-    hl_gpio_t                   nint;
+    hl_spi_t                        spiid;
+    uint8_t                         numberofchained;    // upto to hl_chip_ams_as5055a_max_chips_in_channel
+    hl_chip_ams_as5055a_spicfg_t*   spicfg;             // if NULL, the driver must find the hl_spi already initted. otherwise it uses this field to init it.
+    hl_gpio_t                       nsel;
+    hl_gpio_t                       nint;
 } hl_chip_ams_as5055a_cfg_t;
 
 
