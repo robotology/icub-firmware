@@ -74,7 +74,7 @@
 //#if defined(HAL_BOARD_MC4PLUS)
 #include "hal_quadencoder.h"
 #include "hal_as5048.h"
-#include "hal_adc.h"
+//#include "hal_adc.h"
 #include "hal_motor.h"
 //#endif
 
