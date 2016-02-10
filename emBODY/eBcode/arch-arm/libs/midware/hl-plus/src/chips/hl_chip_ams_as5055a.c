@@ -207,8 +207,15 @@ extern hl_result_t hl_chip_ams_as5055a_init(hl_chip_ams_as5055a_channel_t chn, c
         return(hl_res_NOK_generic);
     }
     
+    hl_sys_delay(s_Treadout);
+    
     
     s_hl_chip_ams_as5055a_initted_set(chn);
+    
+    // keep them after s_hl_chip_ams_as5055a_initted_set() otherwise they dont execute
+    hl_chip_ams_as5055a_reset(chn, hl_chip_ams_as5055a_resetmode_software_plus_spiregisters); // or hl_chip_ams_as5055a_resetmode_master
+    hl_chip_ams_as5055a_reset(chn, hl_chip_ams_as5055a_resetmode_clearerrorflag);
+        
 
     return(hl_res_OK);
 }
