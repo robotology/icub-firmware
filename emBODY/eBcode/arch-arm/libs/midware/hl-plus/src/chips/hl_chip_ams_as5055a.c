@@ -109,6 +109,7 @@ static hl_result_t s_hl_chip_ams_as5055a_software_reset(hl_chip_ams_as5055a_chan
 
 static hl_result_t s_hl_chip_ams_as5055a_master_reset(hl_chip_ams_as5055a_channel_t chn);
 
+static hl_result_t s_hl_chip_ams_as5055a_clearerrorflag(hl_chip_ams_as5055a_channel_t chn);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static const variables
@@ -129,6 +130,7 @@ static const hl_spi_advcfg_t s_hl_chip_ams_as5055a_spiadvancedconfig =
 };
         
 
+static const uint16_t s_Command_READ_ClearErrorFlag = 0xE700; // it is 0x3380 shifted up by 1 with the bit  15 = 1 and crc bit adjusted to 0.
 static const uint16_t s_Command_READ_ErrorStatus = 0xE6B5; // it is 0x335A of Figure 22 at page 19, shifted up by 1 bit, with the bit 15 = 1 (READs and with bit 0 adjusted for parity 
 static const uint16_t s_Command_READ_AngularData = 0xFFFF; // it is 0x3fff of Figure 22 at page 19, shifted up by 1 bit, with the bit 15 = 1 (READs and with bit 0 adjusted for parity 
 static const uint16_t s_Command_NOP = 0x0000;
@@ -227,9 +229,13 @@ extern hl_result_t hl_chip_ams_as5055a_reset(hl_chip_ams_as5055a_channel_t chn, 
     {
         res = s_hl_chip_ams_as5055a_master_reset(chn);
     }
-    else
+    else if(hl_chip_ams_as5055a_resetmode_software_plus_spiregisters == resetmode)
     {
         res = s_hl_chip_ams_as5055a_software_reset(chn);
+    }
+    else if(hl_chip_ams_as5055a_resetmode_clearerrorflag == resetmode)
+    {
+        res = s_hl_chip_ams_as5055a_clearerrorflag(chn);
     }
 
     return(res);
@@ -709,6 +715,65 @@ static hl_result_t s_hl_chip_ams_as5055a_master_reset(hl_chip_ams_as5055a_channe
 }
 
 
+static hl_result_t s_hl_chip_ams_as5055a_clearerrorflag(hl_chip_ams_as5055a_channel_t chn)
+{
+    const uint32_t tick = 1;
+    uint16_t tmpvalues[hl_chip_ams_as5055a_max_chips_in_channel] = {0};
+    hl_chip_ams_as5055a_internal_item_t *intitem = s_hl_chip_ams_as5055a_theinternals.items[HL_chip_channel2index(chn)];
+    hl_spi_t spiid = intitem->config.spiid;
+    uint8_t nchained = intitem->config.numberofchained;
+    uint8_t i = 0;
+
+
+    // enable spi
+    hl_spi_enable(spiid);
+    
+    // step 1: start    
+    
+    hl_gpio_pin_write(intitem->config.nsel, hl_gpio_valRESET);
+//    hl_sys_delay(tick); 
+
+    for(i=0; i<nchained; i++)
+    {
+        hl_spi_send_receive_raw(spiid, s_Command_READ_ClearErrorFlag, &tmpvalues[hl_chip_ams_as5055a_max_chips_in_channel-1-i]);
+//        hl_sys_delay(tick);
+    }
+    
+    hl_spi_wait_until_completion(spiid);
+    
+//    hl_sys_delay(tick);
+    hl_gpio_pin_write(intitem->config.nsel, hl_gpio_valSET);
+
+    
+    // step 2: wait     either wait for the pin in intitem->config.nint.gpio to become high or ... wait for the maximum time of 500 usec.
+    
+    hl_sys_delay(s_Treadout);
+    
+    
+    // step 3: read
+    // marco.accame: instead of s_Command_READ_AngularData we may send the null command 0x0000 .... maybe it work better because it does not triggers new readings ..
+    
+    hl_gpio_pin_write(intitem->config.nsel, hl_gpio_valRESET);
+//    hl_sys_delay(tick);
+    
+    for(i=0; i<nchained; i++)
+    {
+        hl_spi_send_receive_raw(spiid, s_Command_NOP, &intitem->values[hl_chip_ams_as5055a_max_chips_in_channel-1-i]);
+//        hl_sys_delay(2*s_Treadout);
+    }
+       
+    hl_spi_wait_until_completion(spiid);
+     
+//    hl_sys_delay(tick);
+    hl_gpio_pin_write(intitem->config.nsel, hl_gpio_valSET);    
+    
+    
+    // disable spi
+    hl_spi_disable(spiid);     
+    
+
+    return(hl_res_NOK_generic);         
+}
 
 
 #endif//defined(HL_USE_CHIP_AMS_AS5055A)

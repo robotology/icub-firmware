@@ -90,7 +90,8 @@ typedef struct
 typedef enum
 {
     hl_chip_ams_as5055a_resetmode_master                        = 0,
-    hl_chip_ams_as5055a_resetmode_software_plus_spiregisters    = 1
+    hl_chip_ams_as5055a_resetmode_software_plus_spiregisters    = 1,
+    hl_chip_ams_as5055a_resetmode_clearerrorflag                = 2
 } hl_chip_ams_as5055a_resetmode_t;
 
 
