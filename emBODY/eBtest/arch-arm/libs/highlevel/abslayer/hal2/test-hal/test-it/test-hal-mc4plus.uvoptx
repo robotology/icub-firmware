@@ -216,6 +216,22 @@
           <ExecCommand></ExecCommand>
           <Expression></Expression>
         </Bp>
+        <Bp>
+          <Number>3</Number>
+          <Type>0</Type>
+          <LineNumber>1014</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>0</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>0</BreakIfRCount>
+          <Filename>..\app-test\core-plus-mc4plus.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
       </Breakpoint>
       <Tracepoint>
         <THDelay>0</THDelay>
@@ -447,6 +463,22 @@
           <ExecCommand></ExecCommand>
           <Expression></Expression>
         </Bp>
+        <Bp>
+          <Number>3</Number>
+          <Type>0</Type>
+          <LineNumber>1014</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>0</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>0</BreakIfRCount>
+          <Filename>..\app-test\core-plus-mc4plus.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
       </Breakpoint>
       <Tracepoint>
         <THDelay>0</THDelay>
@@ -658,41 +690,9 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>1606</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134260046</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\app-test\core-plus-mc4plus.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\blinky\../app-test/core-plus-mc4plus.c\1606</Expression>
-        </Bp>
-        <Bp>
-          <Number>1</Number>
-          <Type>0</Type>
-          <LineNumber>1070</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134258852</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\app-test\core-plus-mc4plus.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\blinky\../app-test/core-plus-mc4plus.c\1070</Expression>
-        </Bp>
-        <Bp>
-          <Number>2</Number>
-          <Type>0</Type>
           <LineNumber>1014</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134258690</Address>
+          <Address>134257670</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -702,22 +702,6 @@
           <Filename>..\app-test\core-plus-mc4plus.c</Filename>
           <ExecCommand></ExecCommand>
           <Expression>\\blinky\../app-test/core-plus-mc4plus.c\1014</Expression>
-        </Bp>
-        <Bp>
-          <Number>3</Number>
-          <Type>0</Type>
-          <LineNumber>357</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134246426</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\app-test\core-plus-mc4plus.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\blinky\../app-test/core-plus-mc4plus.c\357</Expression>
         </Bp>
       </Breakpoint>
       <Tracepoint>
@@ -1945,7 +1929,7 @@
 
   <Group>
     <GroupName>hl-plus-chips</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -2006,6 +1990,18 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\chips\hl_chip_xx_ethphy.c</PathWithFileName>
       <FilenameWithoutPath>hl_chip_xx_ethphy.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>13</GroupNumber>
+      <FileNumber>97</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\hl-plus\src\chips\hl_chip_ams_as5055a.c</PathWithFileName>
+      <FilenameWithoutPath>hl_chip_ams_as5055a.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
