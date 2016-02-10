@@ -43,6 +43,9 @@
 
 #include "hl_chip_ams_as5055a.h"
 
+#include "hal_spi_hid.h" // to see hal_spi__theboardconfig
+#include "hal_mux_hid.h" // to see hal_mux__theboardconfig
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -62,7 +65,7 @@
 
 #define HAL_encoder_id2index(t)              ((uint8_t)((t)))
 
-
+#define HAL_SPIENCODER_2CHAINED_USE_RAWMODE
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -93,6 +96,7 @@ typedef struct
     hal_spiencoder_position_t   position;
     uint8_t                     rxframes[3][4];     // 3 possible frames received. The size of everyone is the maximum possible
     uint16_t                    rxframechain[2];    // 1 frame of 2 words of 16 bits
+    hl_chip_ams_as5055a_channel_t chainchannel;
 } hal_spiencoder_internal_item_t;
 
 
@@ -237,24 +241,51 @@ extern hal_result_t hal_spiencoder_init(hal_spiencoder_t id, const hal_spiencode
     intitem->muxsel     = hal_spiencoder__theboardconfig.spimap[HAL_encoder_id2index(id)].muxsel;
     intitem->position   = 0;
     
-   
-    res = hal_mux_init(intitem->muxid, NULL);
-    if(hal_res_OK != res)
+    hal_bool_t initMUX = hal_true;
+    
+#if defined(HAL_SPIENCODER_2CHAINED_USE_RAWMODE)
+    if(hal_spiencoder_typeCHAINof2 == intitem->config.type)
     {
-        return(res);
+        initMUX = hal_false;
     }
-    hal_mux_get_cs(intitem->muxid, &(intitem->chip_sel));  // per i rawmodes 0 ed 1 il cs non serve
+#endif    
+    
+    if(hal_true == initMUX)
+    {
+        res = hal_mux_init(intitem->muxid, NULL);
+        if(hal_res_OK != res)
+        {
+            return(res);
+        }
+        hal_mux_get_cs(intitem->muxid, &(intitem->chip_sel));  // per i rawmodes 0 ed 1 il cs non serve
+    }
+    else
+    {
+        intitem->chip_sel = hal_mux__theboardconfig.gpiomap[intitem->muxid].gpio_enable.gpio;        
+    }
       
-        
+       
+    hal_bool_t initSPI = hal_true;    
     hal_spi_cfg_t spicfg;
     memcpy(&spicfg, &s_hal_spiencoder_spicfg_master, sizeof(hal_spi_cfg_t));
+    
+    // we get the max speed of spi from what specified in hal_spiencoder__theboardconfig
+    spicfg.maxspeed = hal_spiencoder__theboardconfig.spimaxspeed;
+    
         
-    if(intitem->config.type == hal_spiencoder_typeAMO)
+    if(hal_spiencoder_typeAMO == intitem->config.type)
     {
         // We use the master SPI configuration for encoder type 2 (AMO)
         // This sizeofframe is used as an upper bound for reserving heap memory during the initialization (hal_spi level) 
         spicfg.maxsizeofframe = 4;
         spicfg.cpolarity = hal_spi_cpolarity_low;
+        
+        initSPI = hal_true;
+    }
+    else if(hal_spiencoder_typeAEA == intitem->config.type)
+    {
+        // no change from default
+        initSPI = hal_true;        
     }
     else if(hal_spiencoder_typeCHAINof2 == intitem->config.type)
     {     
@@ -263,20 +294,58 @@ extern hal_result_t hal_spiencoder_init(hal_spiencoder_t id, const hal_spiencode
         spicfg.datasize = hal_spi_datasize_16bit;   // and each word is of 16 bits
                                                     // all the rest is equal to default 
         spicfg.cpolarity = hal_spi_cpolarity_low;
-        spicfg.datacapture = hal_spi_datacapture_2edge;        
-    }
-    
+        spicfg.datacapture = hal_spi_datacapture_2edge;    
 
-    // we get the max speed of spi from what specified in hal_spiencoder__theboardconfig
-    spicfg.maxspeed = hal_spiencoder__theboardconfig.spimaxspeed;
+        initSPI = hal_true;
+#if defined(HAL_SPIENCODER_2CHAINED_USE_RAWMODE)
+        initSPI = hal_false;
+#endif        
+    }
+
+    if(hal_true == initSPI)
+    {    
+        // Initialize the SPI with the correct config
+        res = hal_spi_init(intitem->spiid, &spicfg);
+        if(hal_res_OK != res)
+        {
+            return(res);
+        }
+    }
+
+#if defined(HAL_SPIENCODER_2CHAINED_USE_RAWMODE)
     
-    // Initialize the SPI with the correct config
-    res = hal_spi_init(intitem->spiid, &spicfg);
-    if(hal_res_OK != res)
-    {
-        return(res);
+    if(hal_spiencoder_typeCHAINof2 == intitem->config.type)
+    {  
+        // need to init the spi inside the chip ...
+        
+        static hl_chip_ams_as5055a_spicfg_t as5055a_spicfg =
+        {
+            .spimap2use = (hl_spi_mapping_t*)&hal_spi__theboardconfig,
+            .prescaler = hl_spi_prescaler_064        
+        };
+
+        hl_chip_ams_as5055a_cfg_t as5055a_config = 
+        {
+            .spiid              = hl_spi1,
+            .numberofchained    = 2,
+            .initthegpios       = hl_true,
+            .nsel               = { .port = hl_gpio_portNONE, .pin = hl_gpio_pinNONE },
+            .nint               = { .port = hl_gpio_portNONE, .pin = hl_gpio_pinNONE },              
+            .spicfg             = &as5055a_spicfg, 
+        };        
+                
+        hl_chip_ams_as5055a_channel_t chn = (hal_spi2 == intitem->spiid) ? (hl_chip_ams_as5055a_channel2) : (hl_chip_ams_as5055a_channel1);
+        as5055a_config.spiid = (hl_spi_t) intitem->spiid;
+        as5055a_config.nsel.port = (hl_gpio_port_t)intitem->chip_sel.port;
+        as5055a_config.nsel.pin = (hl_gpio_pin_t)intitem->chip_sel.pin;
+
+        hl_chip_ams_as5055a_init(chn, &as5055a_config);  
+
+        intitem->chainchannel = chn;       
     }
     
+#else    
+       
     if(hal_spiencoder_typeCHAINof2 == intitem->config.type)
     {  
         // need to init the chip ...
@@ -293,24 +362,13 @@ extern hal_result_t hal_spiencoder_init(hal_spiencoder_t id, const hal_spiencode
         as5055a_config.spiid = (hl_spi_t) intitem->spiid;
         as5055a_config.nsel.port = (hl_gpio_port_t)intitem->chip_sel.port;
         as5055a_config.nsel.pin = (hl_gpio_pin_t)intitem->chip_sel.pin;
-//        if(hal_spi2 == intitem->spiid)
-//        {
-//            chn = hl_chip_ams_as5055a_channel2;
-//            as5055a_config.spiid = hl_spi2; 
-//            as5055a_config.nsel.port = hl_gpio_portI;
-//            as5055a_config.nsel.pin  = hl_gpio_pin10;                      
-//        }
-//        else
-//        {
-//            chn = hl_chip_ams_as5055a_channel1;
-//            as5055a_config.spiid = hl_spi3; 
-//            as5055a_config.nsel.port = hl_gpio_portC;
-//            as5055a_config.nsel.pin  = hl_gpio_pin13;                
-//        }
-        hl_chip_ams_as5055a_init(chn, &as5055a_config);         
+
+        hl_chip_ams_as5055a_init(chn, &as5055a_config);  
+
+        intitem->chainchannel = chn;         
             
     }    
-    
+#endif    
  
     // Flag to set the encoder initialized
     s_hal_spiencoder_initted_set(id);
@@ -372,9 +430,31 @@ extern hal_result_t hal_spiencoder_read_start(hal_spiencoder_t id)
     }
     else if(hal_spiencoder_typeCHAINof2 == intitem->config.type)
     {
+#if defined(HAL_SPIENCODER_2CHAINED_USE_RAWMODE)
+
+// following is OK, but i wnat to try the reaidng in two steps to avoid 600 usec delay
+//    hl_chip_ams_as5055a_read_angulardata(intitem->chainchannel, hl_chip_ams_as5055a_readmode_start_wait_read, &intitem->rxframechain[0], &intitem->rxframechain[1], NULL);
+//        
+//    intitem->position = intitem->rxframechain[0] | (intitem->rxframechain[1] << 16);
+//    
+//    if(NULL != intitem->config.callback_on_rx)
+//    {
+//        intitem->config.callback_on_rx(intitem->config.arg);
+//    } 
+//
+        
+    hl_chip_ams_as5055a_read_angulardata(intitem->chainchannel, hl_chip_ams_as5055a_readmode_start_only, NULL, NULL, NULL);      
+        
+    if(NULL != intitem->config.callback_on_rx)
+    {
+        intitem->config.callback_on_rx(intitem->config.arg);
+    }         
+
+#else        
         // only in mc2plus ...
         static const uint16_t txframe_as5055a_angulardata[2] = {0xFFFF, 0xFFFF};
-        s_hal_spiencoder_2chained_askvalues(intitem, s_hal_spiencoder_onreceived_daisychain_prepare, (void*)id, (uint8_t*)txframe_as5055a_angulardata);           
+        s_hal_spiencoder_2chained_askvalues(intitem, s_hal_spiencoder_onreceived_daisychain_prepare, (void*)id, (uint8_t*)txframe_as5055a_angulardata);    
+#endif        
     }
     
     
@@ -507,6 +587,9 @@ extern hal_result_t hal_spiencoder_get_value(hal_spiencoder_t id, hal_spiencoder
     }
     else if(hal_spiencoder_typeCHAINof2 == intitem->config.type)
     {
+        hl_chip_ams_as5055a_read_angulardata(intitem->chainchannel, hl_chip_ams_as5055a_readmode_read_only, &intitem->rxframechain[0], &intitem->rxframechain[1], NULL);        
+        intitem->position = intitem->rxframechain[0] | (intitem->rxframechain[1] << 16);  
+        
         *pos = intitem->position; 
     }
     
