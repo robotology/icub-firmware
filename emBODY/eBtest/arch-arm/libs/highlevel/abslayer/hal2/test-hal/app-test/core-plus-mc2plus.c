@@ -1073,14 +1073,14 @@ static void test_encoder_spi(void)
     as5055a_config.nsel.port = hl_gpio_portC;
     as5055a_config.nsel.pin = hl_gpio_pin13;
     hl_chip_ams_as5055a_init(hl_chip_ams_as5055a_channel1, &as5055a_config);
-    hl_chip_ams_as5055a_reset(hl_chip_ams_as5055a_channel1, hl_chip_ams_as5055a_resetmode_master); // or hl_chip_ams_as5055a_resetmode_software_plus_spiregisters
+//    hl_chip_ams_as5055a_reset(hl_chip_ams_as5055a_channel1, hl_chip_ams_as5055a_resetmode_master); // or hl_chip_ams_as5055a_resetmode_software_plus_spiregisters
     
-    hl_chip_ams_as5055a_reset(hl_chip_ams_as5055a_channel1, hl_chip_ams_as5055a_resetmode_clearerrorflag);
+//    hl_chip_ams_as5055a_reset(hl_chip_ams_as5055a_channel1, hl_chip_ams_as5055a_resetmode_clearerrorflag);
     
     uint16_t eee[3] = {0};
-    hl_chip_ams_as5055a_read_errorstatus(hl_chip_ams_as5055a_channel1, &eee[0], &eee[1], &eee[2]);
+//    hl_chip_ams_as5055a_read_errorstatus(hl_chip_ams_as5055a_channel1, &eee[0], &eee[1], &eee[2]);
     
-    hl_chip_ams_as5055a_read_errorstatus(hl_chip_ams_as5055a_channel1, &eee[0], &eee[1], &eee[2]);
+//    hl_chip_ams_as5055a_read_errorstatus(hl_chip_ams_as5055a_channel1, &eee[0], &eee[1], &eee[2]);
     
     // so far we dont prepare for hl_chip_ams_as5055a_channel2 which is on spi2 and its nsel is PI10
 //    as5055a_config.spiid = hl_spi2;
