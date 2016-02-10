@@ -31,6 +31,8 @@
 
 #include "hl_bits.h"
 
+#include "hl_sys.h"
+
 #if     !defined(HAL_USE_LIB)
 #include "hal_brdcfg_modules.h"
 #else
@@ -376,14 +378,17 @@ int main(void)
     test_message("");
     
     
+#if defined(USE_EVENTVIEWER)
+    brd_eventviewer_init();
+#endif    
+    
+    
     // we can exec in here because test-encoder-spi() initialises can if not doen yet
     test_encoder_spi();
        
 
     
-#if defined(USE_EVENTVIEWER)
-    brd_eventviewer_init();
-#endif
+
     
     // 1 millisec.
     res = hal_sys_systick_sethandler(onsystick, systickperiod, hal_int_priority00);
@@ -1022,6 +1027,8 @@ static void test_encoder_spi(void)
     hal_can_frame_t canframe;
     hal_can_t CAN_PERIPH=hal_can1;
     
+    evEntityId_t prev;
+    
     if(hal_false == hal_can_initted_is(CAN_PERIPH))
     {
         // init can peripheral in a simple way, so that it can transmit frames
@@ -1063,9 +1070,10 @@ static void test_encoder_spi(void)
     {
         .spiid              = hl_spi1,
         .numberofchained    = 2,
-        .spicfg             = &as5055a_spicfg,
+        .initthegpios       = hl_true,
         .nsel               = { .port = hl_gpio_portNONE, .pin = hl_gpio_pinNONE },
-        .nint               = { .port = hl_gpio_portNONE, .pin = hl_gpio_pinNONE }        
+        .nint               = { .port = hl_gpio_portNONE, .pin = hl_gpio_pinNONE },              
+        .spicfg             = &as5055a_spicfg, 
     };
   
     // prepare for hl_chip_ams_as5055a_channel1. it is on spi3 and its nsel is PC13
@@ -1128,8 +1136,30 @@ static void test_encoder_spi(void)
         
         static char message[256] = {0};
         
-        hl_chip_ams_as5055a_read_angulardata(hl_chip_ams_as5055a_channel1, hl_chip_ams_as5055a_readmode_start_wait_read, &values[0], &values[1], &values[2]);
+        hl_sys_delay(1000);
         
+#undef READ_IN_TWO_STEPS
+
+#if !defined(READ_IN_TWO_STEPS)     
+        // it takes 610 us (606 us w/ full optimisation): 500 us are the fixed delay beetween start and read, 55us and 55 us are the start an red phases.
+        // however it works also with a zero internal delay ............
+        prev = eventviewer_switch_to(ev_ID_first_usrdef+1);
+        hl_chip_ams_as5055a_read_angulardata(hl_chip_ams_as5055a_channel1, hl_chip_ams_as5055a_readmode_start_wait_read, &values[0], &values[1], &values[2]);
+        eventviewer_switch_to(prev);
+#else        
+        // it takes 55 us (53 us with full optimization) 
+        prev = eventviewer_switch_to(ev_ID_first_usrdef+2);
+        hl_chip_ams_as5055a_read_angulardata(hl_chip_ams_as5055a_channel1, hl_chip_ams_as5055a_readmode_start_only, NULL, NULL, NULL);
+        eventviewer_switch_to(prev);
+        
+        hl_sys_delay(1000);
+        
+        // it takes 55 us (53 us with full optimization)
+        prev = eventviewer_switch_to(ev_ID_first_usrdef+3);
+        hl_chip_ams_as5055a_read_angulardata(hl_chip_ams_as5055a_channel1, hl_chip_ams_as5055a_readmode_read_only, &values[0], &values[1], &values[2]);
+        eventviewer_switch_to(prev);
+#endif
+
         hl_chip_ams_as5055a_read_errorstatus(hl_chip_ams_as5055a_channel1, &errors[0], &errors[1], &errors[2]);
         
         for(uint8_t i=0; i<as5055a_config.numberofchained; i++) // we check only some values
