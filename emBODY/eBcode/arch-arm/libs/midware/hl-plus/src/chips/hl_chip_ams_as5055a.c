@@ -344,6 +344,394 @@ extern hl_result_t hl_chip_ams_as5055a_read_angulardata(hl_chip_ams_as5055a_chan
     }
 #endif  
 
+    //const uint32_t tick = 1;
+    uint16_t tmpvalues[hl_chip_ams_as5055a_max_chips_in_channel] = {0};
+    hl_chip_ams_as5055a_internal_item_t *intitem = s_hl_chip_ams_as5055a_theinternals.items[HL_chip_channel2index(chn)];
+    hl_spi_t spiid = intitem->config.spiid;
+    uint8_t nchained = intitem->config.numberofchained;
+    uint8_t i = 0;
+
+    // now i write the read-angle command (0xffff), i wait for the safe time (or poll until the nint pin is high) for a number of times
+    // specified by nchained.
+    // here is example with nchained = 2 taken from page "AS5055A – 18" of "ams Datasheet: 2014-Apr-28 [v2-02]"
+    // 
+    //  MOSI    <0xFFFF>    <0xFFFF>        <0xFFFF>    <0xFFFF>   
+    //
+    /// MISO    <      >    <      >        <angle1>    <angle0>    
+    //
+    //  NSEL --|____________________|------|____________________|------   
+    //
+    //  NINT _______________________|---|_______________________|---|__   
+    //
+    // EXPLANATION:
+    // we write the read-angle commands on MOSI with NSEL driven low. the two commands propagate to first and then second chip in daisy chain.
+    // from the datasheet at pag 10: 
+    // > Sending a READ ANGLE command through the SPI interface automatically powers up the chip, drives INT/ high and starts another angle measurement. 
+    // > The completion of the angle measurement is indicated by driving the INT/ output low and clearing the WOW flag in the error status register. The
+    // > microcontroller can respond to the interrupt by reading the angle value from the AS5055A over the SPI interface. (See Figure 11).
+    // > A READ ANGLE command must not be sent while a measurement is being performed as indicated by INT/ driven high or WOW = 1.
+    // thus: after having sent two first two <0xFFFF> we must wait until NINT is low again, and then send other two <0xFFFF>.
+    // The values read on MISO are the two values, where the first read is the angle from the more distant chip in the chain.
+    // Question: how much does the NINT stay high? The answer is in datasheet at page 10:
+    // > After the INT/ output is driven low the device goes into low-power mode. If the microcontroller doesn't monitor the
+    // > INT/ output a minimum guard time (treadout) must be inserted before the next READ ANGLE command can be sent.
+    // At page 6, figure 7 (system parameters):
+    // >    Symbol          Parameter           Conditions                                          Min     Typ             Max         Units
+    // >    treadout        Readout rate        Time between READ ANGLE command and INTERRUPT       -       -               500         μs
+    // >
+
+
+
+    // enable spi
+    hl_spi_enable(spiid);
+    
+    
+    if((readmode == hl_chip_ams_as5055a_readmode_start_wait_read) || (readmode == hl_chip_ams_as5055a_readmode_start_only))
+    {
+        // step 1: start    
+        
+        hl_gpio_pin_write(intitem->config.nsel, hl_gpio_valRESET);
+
+        for(i=0; i<nchained; i++)
+        {  
+            hl_spi_send_receive_raw(spiid, s_Command_READ_AngularData, NULL);
+        }
+        
+        hl_spi_wait_until_completion(spiid);
+        
+        hl_gpio_pin_write(intitem->config.nsel, hl_gpio_valSET);     
+        
+    }    
+    
+    if(readmode == hl_chip_ams_as5055a_readmode_start_wait_read)
+    {    
+        // step 2: wait     either wait for the pin in intitem->config.nint.gpio to become high or ... wait for the maximum time of 500 usec.    
+        hl_sys_delay(s_Treadout);
+    }
+    
+    if((readmode == hl_chip_ams_as5055a_readmode_start_wait_read) || (readmode == hl_chip_ams_as5055a_readmode_read_only))
+    {    
+        // step 3: read   
+        hl_gpio_pin_write(intitem->config.nsel, hl_gpio_valRESET);
+
+        for(i=0; i<nchained; i++)
+        {
+            uint16_t data = 0x0000; // or s_Command_READ_AngularData
+            hl_spi_send_receive_raw(spiid, data, &intitem->values[hl_chip_ams_as5055a_max_chips_in_channel-1-i]);
+        }
+           
+        hl_spi_wait_until_completion(spiid);
+         
+        hl_gpio_pin_write(intitem->config.nsel, hl_gpio_valSET);        
+    }
+    
+    // disable spi
+    hl_spi_disable(spiid);    
+ 
+
+    if((readmode == hl_chip_ams_as5055a_readmode_start_wait_read) || (readmode == hl_chip_ams_as5055a_readmode_read_only))
+    {    
+        // step 4: copy results back
+        if(NULL != value0)
+        {
+            *value0 = intitem->values[2];
+        }
+
+        if(NULL != value1)
+        {
+            *value1 = intitem->values[1];
+        }
+
+        if(NULL != value2)
+        {
+            *value2 = intitem->values[0];
+        }
+    }
+    
+    return(hl_res_OK);
+}
+
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - definition of extern hidden functions 
+// --------------------------------------------------------------------------------------------------------------------
+
+// ---- isr of the module: begin ----
+// empty-section
+// ---- isr of the module: end ------
+
+
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - definition of static functions 
+// --------------------------------------------------------------------------------------------------------------------
+
+static void s_hl_chip_ams_as5055a_initted_set(hl_chip_ams_as5055a_channel_t chn)
+{
+    hl_bits_word_bitset(&s_hl_chip_ams_as5055a_theinternals.inittedmask, HL_chip_channel2index(chn));
+}
+
+
+static hl_boolval_t s_hl_chip_ams_as5055a_initted_is(hl_chip_ams_as5055a_channel_t chn)
+{
+    return(hl_bits_word_bitcheck(s_hl_chip_ams_as5055a_theinternals.inittedmask, HL_chip_channel2index(chn)));
+}
+
+
+static hl_result_t s_hl_chip_ams_as5055a_hw_init(const hl_chip_ams_as5055a_cfg_t *cfg, hl_chip_ams_as5055a_internal_item_t *intitem)
+{
+    hl_spi_t spiid = cfg->spiid;
+     
+    
+    if(NULL != cfg->spicfg)
+    {   // must init spi with this field. 
+        
+        // 1. init hl spimap: it is needed by hl_spi to find sck, miso, mosi
+        hl_spi_map = cfg->spicfg->spimap2use;
+        
+        // 2. define a proper hl_spi_cfg_t        
+        hl_spi_cfg_t spiconfig = {0};
+        spiconfig.mode = hl_spi_mode_master;
+        spiconfig.prescaler = cfg->spicfg->prescaler;
+        spiconfig.advcfg = &s_hl_chip_ams_as5055a_spiadvancedconfig;
+        
+        // 3. call hl_spi_init
+        hl_result_t r = hl_spi_init(cfg->spiid, &spiconfig);      // the gpio, the clock, the peripheral: everything apart isr and start
+        if(hl_res_OK != r)
+        {
+            return(r);
+        }        
+    }
+    
+    
+    
+    // is spi bus already initialised?
+    if(hl_false == hl_spi_initted_is(spiid))
+    {
+        return(hl_res_NOK_generic);
+    }   
+    
+    // config spi ...
+    
+    if(hl_true == cfg->initthegpios)
+    {
+        // config nsel as output
+        static const hl_gpio_init_t outgpioinit = 
+        {
+            .port           = hl_gpio_portNONE,
+            .mode           =
+            {
+                .gpio_pins  = 0,
+                .gpio_mode  = GPIO_Mode_OUT,
+                .gpio_speed = GPIO_Speed_50MHz,
+                .gpio_otype = GPIO_OType_PP,
+                .gpio_pupd  = GPIO_PuPd_NOPULL
+            }      
+        };
+        
+        hl_gpio_init_t gpioinit;
+        hl_gpio_map_t gpiomap;
+        memcpy(&gpioinit, &outgpioinit, sizeof(hl_gpio_init_t));
+        gpiomap.gpio.port = cfg->nsel.port;
+        gpiomap.gpio.pin  = cfg->nsel.pin;
+        gpiomap.af32      = hl_NA32;
+        hl_gpio_fill_init(&gpioinit, &gpiomap);
+        hl_gpio_init(&gpioinit);  
+        
+        // config nint as input
+        
+        static const hl_gpio_init_t inpgpioinit = 
+        {
+            .port           = hl_gpio_portNONE,
+            .mode           =
+            {
+                .gpio_pins  = 0,
+                .gpio_mode  = GPIO_Mode_IN,
+                .gpio_speed = GPIO_Speed_50MHz,
+                .gpio_otype = GPIO_OType_PP,
+                .gpio_pupd  = GPIO_PuPd_NOPULL
+            }      
+        };
+
+        
+        if((hl_gpio_portNONE != cfg->nint.port) && (hl_gpio_pinNONE != cfg->nint.pin))
+        {
+            memcpy(&gpioinit, &inpgpioinit, sizeof(hl_gpio_init_t));
+            gpiomap.gpio.port = cfg->nint.port;
+            gpiomap.gpio.pin  = cfg->nint.pin;
+            gpiomap.af32      = hl_NA32;
+            hl_gpio_fill_init(&gpioinit, &gpiomap);
+            hl_gpio_init(&gpioinit);  
+        }
+    }
+    
+    
+    memcpy(&intitem->config, cfg, sizeof(hl_chip_ams_as5055a_cfg_t));
+    
+    memset(&intitem->values, 0, sizeof(intitem->values));
+
+    return(hl_res_OK);
+}
+
+
+static hl_result_t s_hl_chip_ams_as5055a_software_reset(hl_chip_ams_as5055a_channel_t chn)
+{
+    const uint32_t tick = 1;
+    uint16_t tmpvalues[2*hl_chip_ams_as5055a_max_chips_in_channel] = {0};
+    hl_chip_ams_as5055a_internal_item_t *intitem = s_hl_chip_ams_as5055a_theinternals.items[HL_chip_channel2index(chn)];
+    hl_spi_t spiid = intitem->config.spiid;    
+    uint8_t nchained = intitem->config.numberofchained;
+    uint8_t i = 0;
+    
+   // enable spi
+    hl_spi_enable(spiid);
+    
+    // step 1: start
+    
+    hl_gpio_pin_write(intitem->config.nsel, hl_gpio_valRESET);
+//    hl_sys_delay(tick); 
+    
+    const uint16_t DataPackage = 0x0006; // it resets spi register
+
+    for(i=0; i<nchained; i++)
+    {
+        hl_spi_send_receive_raw(spiid, s_Command_WRITE_SoftwareReset, &tmpvalues[2*hl_chip_ams_as5055a_max_chips_in_channel-1 -2*i]);
+        hl_spi_send_receive_raw(spiid, DataPackage, &tmpvalues[2*hl_chip_ams_as5055a_max_chips_in_channel-1 -2*i-1]);
+    }
+        
+    hl_spi_wait_until_completion(spiid);
+    
+    hl_gpio_pin_write(intitem->config.nsel, hl_gpio_valSET);
+    
+    // wait either wait for the pin in intitem->config.nint.gpio to become high or ... wait for the maximum time of 500 usec.
+    
+    hl_sys_delay(s_Treadout);
+        
+    // disable spi
+    hl_spi_disable(spiid);        
+
+    return(hl_res_NOK_generic);  
+}
+
+
+static hl_result_t s_hl_chip_ams_as5055a_master_reset(hl_chip_ams_as5055a_channel_t chn)
+{
+    const uint32_t tick = 1;
+    uint16_t tmpvalues[hl_chip_ams_as5055a_max_chips_in_channel] = {0};
+    hl_chip_ams_as5055a_internal_item_t *intitem = s_hl_chip_ams_as5055a_theinternals.items[HL_chip_channel2index(chn)];
+    hl_spi_t spiid = intitem->config.spiid;    
+    uint8_t nchained = intitem->config.numberofchained;
+    uint8_t i = 0;
+    
+    // enable spi
+    hl_spi_enable(spiid);
+    
+    // step 1: start
+    
+    hl_gpio_pin_write(intitem->config.nsel, hl_gpio_valRESET);
+//    hl_sys_delay(tick); 
+    
+    for(i=0; i<nchained; i++)
+    {
+        hl_spi_send_receive_raw(spiid, s_Command_WRITE_MasterReset, &tmpvalues[hl_chip_ams_as5055a_max_chips_in_channel-1 -i]);
+    }
+    
+    hl_spi_wait_until_completion(spiid);
+    
+    hl_gpio_pin_write(intitem->config.nsel, hl_gpio_valSET);
+    
+    // wait either wait for the pin in intitem->config.nint.gpio to become high or ... wait for the maximum time of 500 usec.
+    
+    hl_sys_delay(s_Treadout);
+        
+    // disable spi
+    hl_spi_disable(spiid);        
+
+    return(hl_res_NOK_generic);  
+}
+
+
+static hl_result_t s_hl_chip_ams_as5055a_clearerrorflag(hl_chip_ams_as5055a_channel_t chn)
+{
+    const uint32_t tick = 1;
+    uint16_t tmpvalues[hl_chip_ams_as5055a_max_chips_in_channel] = {0};
+    hl_chip_ams_as5055a_internal_item_t *intitem = s_hl_chip_ams_as5055a_theinternals.items[HL_chip_channel2index(chn)];
+    hl_spi_t spiid = intitem->config.spiid;
+    uint8_t nchained = intitem->config.numberofchained;
+    uint8_t i = 0;
+
+
+    // enable spi
+    hl_spi_enable(spiid);
+    
+    // step 1: start    
+    
+    hl_gpio_pin_write(intitem->config.nsel, hl_gpio_valRESET);
+//    hl_sys_delay(tick); 
+
+    for(i=0; i<nchained; i++)
+    {
+        hl_spi_send_receive_raw(spiid, s_Command_READ_ClearErrorFlag, &tmpvalues[hl_chip_ams_as5055a_max_chips_in_channel-1-i]);
+//        hl_sys_delay(tick);
+    }
+    
+    hl_spi_wait_until_completion(spiid);
+    
+//    hl_sys_delay(tick);
+    hl_gpio_pin_write(intitem->config.nsel, hl_gpio_valSET);
+
+    
+    // step 2: wait     either wait for the pin in intitem->config.nint.gpio to become high or ... wait for the maximum time of 500 usec.
+    
+    hl_sys_delay(s_Treadout);
+    
+    
+    // step 3: read
+    // marco.accame: instead of s_Command_READ_AngularData we may send the null command 0x0000 .... maybe it work better because it does not triggers new readings ..
+    
+    hl_gpio_pin_write(intitem->config.nsel, hl_gpio_valRESET);
+//    hl_sys_delay(tick);
+    
+    for(i=0; i<nchained; i++)
+    {
+        hl_spi_send_receive_raw(spiid, s_Command_NOP, &intitem->values[hl_chip_ams_as5055a_max_chips_in_channel-1-i]);
+//        hl_sys_delay(2*s_Treadout);
+    }
+       
+    hl_spi_wait_until_completion(spiid);
+     
+//    hl_sys_delay(tick);
+    hl_gpio_pin_write(intitem->config.nsel, hl_gpio_valSET);    
+    
+    
+    // disable spi
+    hl_spi_disable(spiid);     
+    
+
+    return(hl_res_NOK_generic);         
+}
+
+
+#endif//defined(HL_USE_CHIP_AMS_AS5055A)
+
+
+
+// - old code
+
+
+#if 0
+
+extern hl_result_t hl_chip_ams_as5055a_read_angulardata_old(hl_chip_ams_as5055a_channel_t chn, hl_chip_ams_as5055a_readmode_t readmode, uint16_t* value0, uint16_t* value1, uint16_t* value2)
+{
+#if     !defined(HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)
+    if(hl_false == s_hl_chip_ams_as5055a_initted_is(chn))
+    {
+        return(hl_res_NOK_generic);
+    }
+#endif  
+
     if(readmode != hl_chip_ams_as5055a_readmode_start_wait_read)
     {
         return(hl_res_NOK_generic);
@@ -515,275 +903,8 @@ extern hl_result_t hl_chip_ams_as5055a_read_angulardata(hl_chip_ams_as5055a_chan
 }
 
 
-
-// --------------------------------------------------------------------------------------------------------------------
-// - definition of extern hidden functions 
-// --------------------------------------------------------------------------------------------------------------------
-
-// ---- isr of the module: begin ----
-// empty-section
-// ---- isr of the module: end ------
-
-
-
-
-// --------------------------------------------------------------------------------------------------------------------
-// - definition of static functions 
-// --------------------------------------------------------------------------------------------------------------------
-
-static void s_hl_chip_ams_as5055a_initted_set(hl_chip_ams_as5055a_channel_t chn)
-{
-    hl_bits_word_bitset(&s_hl_chip_ams_as5055a_theinternals.inittedmask, HL_chip_channel2index(chn));
-}
-
-
-static hl_boolval_t s_hl_chip_ams_as5055a_initted_is(hl_chip_ams_as5055a_channel_t chn)
-{
-    return(hl_bits_word_bitcheck(s_hl_chip_ams_as5055a_theinternals.inittedmask, HL_chip_channel2index(chn)));
-}
-
-
-static hl_result_t s_hl_chip_ams_as5055a_hw_init(const hl_chip_ams_as5055a_cfg_t *cfg, hl_chip_ams_as5055a_internal_item_t *intitem)
-{
-    hl_spi_t spiid = cfg->spiid;
-    
-#if defined(TEST_AMS_AS5055A_AS_MAGGIALI) 
-    
-    as5048_init(0);
-    as5048_init(1);
-    
-#else    
-    
-    
-    if(NULL != cfg->spicfg)
-    {   // must init spi with this field. 
-        
-        // 1. init hl spimap: it is needed by hl_spi to find sck, miso, mosi
-        hl_spi_map = cfg->spicfg->spimap2use;
-        
-        // 2. define a proper hl_spi_cfg_t        
-        hl_spi_cfg_t spiconfig = {0};
-        spiconfig.mode = hl_spi_mode_master;
-        spiconfig.prescaler = cfg->spicfg->prescaler;
-        spiconfig.advcfg = &s_hl_chip_ams_as5055a_spiadvancedconfig;
-        
-        // 3. call hl_spi_init
-        hl_result_t r = hl_spi_init(cfg->spiid, &spiconfig);      // the gpio, the clock, the peripheral: everything apart isr and start
-        if(hl_res_OK != r)
-        {
-            return(r);
-        }        
-    }
-    
-    
-    
-    // is spi bus already initialised?
-    if(hl_false == hl_spi_initted_is(spiid))
-    {
-        return(hl_res_NOK_generic);
-    }   
-    
-    // config spi ...
-    
-    
-    // config nsel as output
-    static const hl_gpio_init_t outgpioinit = 
-    {
-        .port           = hl_gpio_portNONE,
-        .mode           =
-        {
-            .gpio_pins  = 0,
-            .gpio_mode  = GPIO_Mode_OUT,
-            .gpio_speed = GPIO_Speed_50MHz,
-            .gpio_otype = GPIO_OType_PP,
-            .gpio_pupd  = GPIO_PuPd_NOPULL
-        }      
-    };
-    
-    hl_gpio_init_t gpioinit;
-    hl_gpio_map_t gpiomap;
-    memcpy(&gpioinit, &outgpioinit, sizeof(hl_gpio_init_t));
-    gpiomap.gpio.port = cfg->nsel.port;
-    gpiomap.gpio.pin  = cfg->nsel.pin;
-    gpiomap.af32      = hl_NA32;
-    hl_gpio_fill_init(&gpioinit, &gpiomap);
-    hl_gpio_init(&gpioinit);  
-    
-    // config nint as input
-    
-    static const hl_gpio_init_t inpgpioinit = 
-    {
-        .port           = hl_gpio_portNONE,
-        .mode           =
-        {
-            .gpio_pins  = 0,
-            .gpio_mode  = GPIO_Mode_IN,
-            .gpio_speed = GPIO_Speed_50MHz,
-            .gpio_otype = GPIO_OType_PP,
-            .gpio_pupd  = GPIO_PuPd_NOPULL
-        }      
-    };
-
-    
-    if((hl_gpio_portNONE != cfg->nint.port) && (hl_gpio_pinNONE != cfg->nint.pin))
-    {
-        memcpy(&gpioinit, &inpgpioinit, sizeof(hl_gpio_init_t));
-        gpiomap.gpio.port = cfg->nint.port;
-        gpiomap.gpio.pin  = cfg->nint.pin;
-        gpiomap.af32      = hl_NA32;
-        hl_gpio_fill_init(&gpioinit, &gpiomap);
-        hl_gpio_init(&gpioinit);  
-    }
-    
 #endif
-    
-    memcpy(&intitem->config, cfg, sizeof(hl_chip_ams_as5055a_cfg_t));
-    
-    memset(&intitem->values, 0, sizeof(intitem->values));
 
-    return(hl_res_OK);
-}
-
-
-static hl_result_t s_hl_chip_ams_as5055a_software_reset(hl_chip_ams_as5055a_channel_t chn)
-{
-    const uint32_t tick = 1;
-    uint16_t tmpvalues[2*hl_chip_ams_as5055a_max_chips_in_channel] = {0};
-    hl_chip_ams_as5055a_internal_item_t *intitem = s_hl_chip_ams_as5055a_theinternals.items[HL_chip_channel2index(chn)];
-    hl_spi_t spiid = intitem->config.spiid;    
-    uint8_t nchained = intitem->config.numberofchained;
-    uint8_t i = 0;
-    
-   // enable spi
-    hl_spi_enable(spiid);
-    
-    // step 1: start
-    
-    hl_gpio_pin_write(intitem->config.nsel, hl_gpio_valRESET);
-//    hl_sys_delay(tick); 
-    
-    const uint16_t DataPackage = 0x0006; // it resets spi register
-
-    for(i=0; i<nchained; i++)
-    {
-        hl_spi_send_receive_raw(spiid, s_Command_WRITE_SoftwareReset, &tmpvalues[2*hl_chip_ams_as5055a_max_chips_in_channel-1 -2*i]);
-        hl_spi_send_receive_raw(spiid, DataPackage, &tmpvalues[2*hl_chip_ams_as5055a_max_chips_in_channel-1 -2*i-1]);
-    }
-        
-    hl_spi_wait_until_completion(spiid);
-    
-    hl_gpio_pin_write(intitem->config.nsel, hl_gpio_valSET);
-    
-    // wait either wait for the pin in intitem->config.nint.gpio to become high or ... wait for the maximum time of 500 usec.
-    
-    hl_sys_delay(s_Treadout);
-        
-    // disable spi
-    hl_spi_disable(spiid);        
-
-    return(hl_res_NOK_generic);  
-}
-
-
-static hl_result_t s_hl_chip_ams_as5055a_master_reset(hl_chip_ams_as5055a_channel_t chn)
-{
-    const uint32_t tick = 1;
-    uint16_t tmpvalues[hl_chip_ams_as5055a_max_chips_in_channel] = {0};
-    hl_chip_ams_as5055a_internal_item_t *intitem = s_hl_chip_ams_as5055a_theinternals.items[HL_chip_channel2index(chn)];
-    hl_spi_t spiid = intitem->config.spiid;    
-    uint8_t nchained = intitem->config.numberofchained;
-    uint8_t i = 0;
-    
-    // enable spi
-    hl_spi_enable(spiid);
-    
-    // step 1: start
-    
-    hl_gpio_pin_write(intitem->config.nsel, hl_gpio_valRESET);
-//    hl_sys_delay(tick); 
-    
-    for(i=0; i<nchained; i++)
-    {
-        hl_spi_send_receive_raw(spiid, s_Command_WRITE_MasterReset, &tmpvalues[hl_chip_ams_as5055a_max_chips_in_channel-1 -i]);
-    }
-    
-    hl_spi_wait_until_completion(spiid);
-    
-    hl_gpio_pin_write(intitem->config.nsel, hl_gpio_valSET);
-    
-    // wait either wait for the pin in intitem->config.nint.gpio to become high or ... wait for the maximum time of 500 usec.
-    
-    hl_sys_delay(s_Treadout);
-        
-    // disable spi
-    hl_spi_disable(spiid);        
-
-    return(hl_res_NOK_generic);  
-}
-
-
-static hl_result_t s_hl_chip_ams_as5055a_clearerrorflag(hl_chip_ams_as5055a_channel_t chn)
-{
-    const uint32_t tick = 1;
-    uint16_t tmpvalues[hl_chip_ams_as5055a_max_chips_in_channel] = {0};
-    hl_chip_ams_as5055a_internal_item_t *intitem = s_hl_chip_ams_as5055a_theinternals.items[HL_chip_channel2index(chn)];
-    hl_spi_t spiid = intitem->config.spiid;
-    uint8_t nchained = intitem->config.numberofchained;
-    uint8_t i = 0;
-
-
-    // enable spi
-    hl_spi_enable(spiid);
-    
-    // step 1: start    
-    
-    hl_gpio_pin_write(intitem->config.nsel, hl_gpio_valRESET);
-//    hl_sys_delay(tick); 
-
-    for(i=0; i<nchained; i++)
-    {
-        hl_spi_send_receive_raw(spiid, s_Command_READ_ClearErrorFlag, &tmpvalues[hl_chip_ams_as5055a_max_chips_in_channel-1-i]);
-//        hl_sys_delay(tick);
-    }
-    
-    hl_spi_wait_until_completion(spiid);
-    
-//    hl_sys_delay(tick);
-    hl_gpio_pin_write(intitem->config.nsel, hl_gpio_valSET);
-
-    
-    // step 2: wait     either wait for the pin in intitem->config.nint.gpio to become high or ... wait for the maximum time of 500 usec.
-    
-    hl_sys_delay(s_Treadout);
-    
-    
-    // step 3: read
-    // marco.accame: instead of s_Command_READ_AngularData we may send the null command 0x0000 .... maybe it work better because it does not triggers new readings ..
-    
-    hl_gpio_pin_write(intitem->config.nsel, hl_gpio_valRESET);
-//    hl_sys_delay(tick);
-    
-    for(i=0; i<nchained; i++)
-    {
-        hl_spi_send_receive_raw(spiid, s_Command_NOP, &intitem->values[hl_chip_ams_as5055a_max_chips_in_channel-1-i]);
-//        hl_sys_delay(2*s_Treadout);
-    }
-       
-    hl_spi_wait_until_completion(spiid);
-     
-//    hl_sys_delay(tick);
-    hl_gpio_pin_write(intitem->config.nsel, hl_gpio_valSET);    
-    
-    
-    // disable spi
-    hl_spi_disable(spiid);     
-    
-
-    return(hl_res_NOK_generic);         
-}
-
-
-#endif//defined(HL_USE_CHIP_AMS_AS5055A)
 
 
 // --------------------------------------------------------------------------------------------------------------------
