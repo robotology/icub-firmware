@@ -62,18 +62,16 @@ typedef struct
     void*                       parameter;    
 } eOcandiscovery_onstop_t;
 
+
 typedef struct
-{
-    uint8_t                     boardtype;              // use eObrd_cantype_t
-    uint8_t                     filler[3];
-    eObrd_version_t             firmwareversion;
-    eObrd_version_t             protocolversion;    
+{   // 6+2*2=10
+    eObrd_info_t                info;  
     uint16_t                    canmap[eOcanports_number];  // use bitmap of required can addresses.
-} eOcandiscovery_target_t;      EO_VERIFYsizeof(eOcandiscovery_target_t, 12);
+} eOcandiscovery_target_t;      EO_VERIFYsizeof(eOcandiscovery_target_t, 10);
 
 typedef struct
 {
-    eObrd_typeandversions_t     info;       // the board info as give by the get-fw-version-reply message
+    eObrd_info_t                info;       // the board info as given by the get-fw-version-reply message
     uint16_t                    time;       // the time in ms after the start of search when the get-fw-version-reply message has arrived
 } eOcandiscovery_board_t;       EO_VERIFYsizeof(eOcandiscovery_board_t, 8);
 
@@ -105,7 +103,7 @@ extern EOtheCANdiscovery2* eo_candiscovery2_GetHandle(void);
 extern eOresult_t eo_candiscovery2_Start(EOtheCANdiscovery2 *p, const eOcandiscovery_target_t *target, eOcandiscovery_onstop_t* onstop);
 
 //  call it in the can parser when a board replies to the get-fw-version request
-extern eOresult_t eo_candiscovery2_OneBoardIsFound(EOtheCANdiscovery2 *p, eOcanmap_location_t loc, eObool_t match, eObrd_typeandversions_t *detected);
+extern eOresult_t eo_candiscovery2_OneBoardIsFound(EOtheCANdiscovery2 *p, eOcanmap_location_t loc, eObool_t match, eObrd_info_t *detected);
 
 // call it regularly inside the control-loop or upon event received by the configurator task.
 

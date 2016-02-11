@@ -210,11 +210,12 @@ extern eOresult_t eo_skin_Verify(EOtheSKIN *p, const eOmn_serv_configuration_t *
     s_eo_theskin.service.activateafterverify = activateafterverify;
 
 
-    s_eo_theskin.sharedcan.discoverytarget.boardtype = eobrd_cantype_mtb;
-    s_eo_theskin.sharedcan.discoverytarget.protocolversion.major = servcfg->data.sk.skin.version.protocol.major; 
-    s_eo_theskin.sharedcan.discoverytarget.protocolversion.minor = servcfg->data.sk.skin.version.protocol.minor;
-    s_eo_theskin.sharedcan.discoverytarget.firmwareversion.major = servcfg->data.sk.skin.version.firmware.major; 
-    s_eo_theskin.sharedcan.discoverytarget.firmwareversion.minor = servcfg->data.sk.skin.version.firmware.minor;    
+    s_eo_theskin.sharedcan.discoverytarget.info.type = eobrd_cantype_mtb;
+    s_eo_theskin.sharedcan.discoverytarget.info.protocol.major = servcfg->data.sk.skin.version.protocol.major; 
+    s_eo_theskin.sharedcan.discoverytarget.info.protocol.minor = servcfg->data.sk.skin.version.protocol.minor;
+    s_eo_theskin.sharedcan.discoverytarget.info.firmware.major = servcfg->data.sk.skin.version.firmware.major; 
+    s_eo_theskin.sharedcan.discoverytarget.info.firmware.minor = servcfg->data.sk.skin.version.firmware.minor;    
+    s_eo_theskin.sharedcan.discoverytarget.info.firmware.build = servcfg->data.sk.skin.version.firmware.build;    
     
     // now i must do discovery of the patches. all patches can be at most on the two can buses ...
     // moreover, we cannot have more than .... eo_skin_maxnumberofMTBboards boards
@@ -933,9 +934,9 @@ static eOresult_t s_eo_skin_onstop_search4mtbs(void *par, EOtheCANdiscovery2* p,
     s_eo_theskin.diagnostics.errorDescriptor.sourcedevice       = eo_errman_sourcedevice_localboard;
     s_eo_theskin.diagnostics.errorDescriptor.sourceaddress      = 0;
     s_eo_theskin.diagnostics.errorDescriptor.par16              = servcfg->data.sk.skin.numofpatches;
-    s_eo_theskin.diagnostics.errorDescriptor.par64              = (servcfg->data.sk.skin.version.firmware.minor)       | (servcfg->data.sk.skin.version.firmware.major << 8) |
-                                                      (servcfg->data.sk.skin.version.protocol.minor << 16) | (servcfg->data.sk.skin.version.protocol.major << 24) |
-                                                      ((uint64_t)s_eo_theskin.sharedcan.discoverytarget.canmap[eOcanport1] << 32) | ((uint64_t)s_eo_theskin.sharedcan.discoverytarget.canmap[eOcanport2] << 48);
+    s_eo_theskin.diagnostics.errorDescriptor.par64              = (servcfg->data.sk.skin.version.firmware.minor)      | (servcfg->data.sk.skin.version.firmware.major << 8)  |
+                                                                 (servcfg->data.sk.skin.version.protocol.minor << 16) | (servcfg->data.sk.skin.version.protocol.major << 24) |
+                                                                 ((uint64_t)s_eo_theskin.sharedcan.discoverytarget.canmap[eOcanport1] << 32) | ((uint64_t)s_eo_theskin.sharedcan.discoverytarget.canmap[eOcanport2] << 48);
    
     EOaction_strg astrg = {0};
     EOaction *act = (EOaction*)&astrg;

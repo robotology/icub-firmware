@@ -104,9 +104,9 @@ typedef struct
 
 typedef struct
 {
-    eOenum08_t                  type;               /**< use eObrd_cantype_t */
+    uint8_t                     type;               /**< use eObrd_cantype_t */
     eOcanmap_location_t         location;           /**< its can location */
-    eObrd_version_t             requiredprotocol;   /**< so far, the only requirement is that the protocol version is ... */
+    eObrd_protocolversion_t     requiredprotocol;   /**< so far, the only requirement is that the protocol version is ... */
 } eOcanmap_board_properties_t;  EO_VERIFYsizeof(eOcanmap_board_properties_t, 4); 
 
 
@@ -136,7 +136,7 @@ typedef struct
 typedef struct
 {
     eOcanmap_board_t            board;
-    eObrd_typeandversions_t     detected;
+    eObrd_info_t                detected;
 } eOcanmap_board_extended_t;    EO_VERIFYsizeof(eOcanmap_board_extended_t, 12); 
 
 
@@ -237,14 +237,14 @@ extern const eOcanmap_board_extended_t * eo_canmap_GetBoard(EOtheCANmapping *p, 
 extern eObrd_cantype_t eo_canmap_GetBoardType(EOtheCANmapping *p, eOcanmap_location_t bloc);
 
 
-/** @fn         eOresult_t eo_canmap_BoardSetDetected(EOtheCANmapping *p, eOcanmap_location_t loc, eObrd_typeandversions_t *detected)
+/** @fn         eOresult_t eo_canmap_BoardSetDetected(EOtheCANmapping *p, eOcanmap_location_t loc, eObrd_info_t *detected)
     @brief      change the fw version etc on a board. we read it from can and then we set it with this function       
     @param      p           The handle to the EOtheCANmapping
     @param      loc         teh can location
     @param      detected    the detected type and versions which we want to set inside the object
     @return     eores_OK if successfull.
 **/
-extern eOresult_t eo_canmap_BoardSetDetected(EOtheCANmapping *p, eOcanmap_location_t loc, eObrd_typeandversions_t *detected);
+extern eOresult_t eo_canmap_BoardSetDetected(EOtheCANmapping *p, eOcanmap_location_t loc, eObrd_info_t *detected);
 
 
 

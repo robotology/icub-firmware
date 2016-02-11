@@ -334,11 +334,12 @@ extern eOresult_t eo_inertials_Verify(EOtheInertials *p, const eOmn_serv_configu
     s_eo_theinertials.service.activateafterverify = activateafterverify;
 
 
-    s_eo_theinertials.sharedcan.discoverytarget.boardtype = eobrd_cantype_mtb;
-    s_eo_theinertials.sharedcan.discoverytarget.protocolversion.major = servcfg->data.as.inertial.version.protocol.major; 
-    s_eo_theinertials.sharedcan.discoverytarget.protocolversion.minor = servcfg->data.as.inertial.version.protocol.minor;
-    s_eo_theinertials.sharedcan.discoverytarget.firmwareversion.major = servcfg->data.as.inertial.version.firmware.major; 
-    s_eo_theinertials.sharedcan.discoverytarget.firmwareversion.minor = servcfg->data.as.inertial.version.firmware.minor;    
+    s_eo_theinertials.sharedcan.discoverytarget.info.type = eobrd_cantype_mtb;
+    s_eo_theinertials.sharedcan.discoverytarget.info.protocol.major = servcfg->data.as.inertial.version.protocol.major; 
+    s_eo_theinertials.sharedcan.discoverytarget.info.protocol.minor = servcfg->data.as.inertial.version.protocol.minor;
+    s_eo_theinertials.sharedcan.discoverytarget.info.firmware.major = servcfg->data.as.inertial.version.firmware.major; 
+    s_eo_theinertials.sharedcan.discoverytarget.info.firmware.minor = servcfg->data.as.inertial.version.firmware.minor;
+    s_eo_theinertials.sharedcan.discoverytarget.info.firmware.build = servcfg->data.as.inertial.version.firmware.build;    
     
     // now i must do discovery of the mtb boards. the one used for the inertials are all in the canmap
     s_eo_theinertials.sharedcan.discoverytarget.canmap[eOcanport1] = servcfg->data.as.inertial.canmap[eOcanport1];

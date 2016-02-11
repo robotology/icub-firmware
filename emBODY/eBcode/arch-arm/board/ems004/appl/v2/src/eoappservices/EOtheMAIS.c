@@ -184,11 +184,12 @@ extern eOresult_t eo_mais_Verify(EOtheMAIS *p, const eOmn_serv_configuration_t *
     s_eo_themais.service.activateafterverify = activateafterverify;
 
 
-    s_eo_themais.sharedcan.discoverytarget.boardtype = eobrd_cantype_mais;
-    s_eo_themais.sharedcan.discoverytarget.protocolversion.major = servcfg->data.as.mais.version.protocol.major; 
-    s_eo_themais.sharedcan.discoverytarget.protocolversion.minor = servcfg->data.as.mais.version.protocol.minor;
-    s_eo_themais.sharedcan.discoverytarget.firmwareversion.major = servcfg->data.as.mais.version.firmware.major; 
-    s_eo_themais.sharedcan.discoverytarget.firmwareversion.minor = servcfg->data.as.mais.version.firmware.minor;    
+    s_eo_themais.sharedcan.discoverytarget.info.type = eobrd_cantype_mais;
+    s_eo_themais.sharedcan.discoverytarget.info.protocol.major = servcfg->data.as.mais.version.protocol.major; 
+    s_eo_themais.sharedcan.discoverytarget.info.protocol.minor = servcfg->data.as.mais.version.protocol.minor;
+    s_eo_themais.sharedcan.discoverytarget.info.firmware.major = servcfg->data.as.mais.version.firmware.major; 
+    s_eo_themais.sharedcan.discoverytarget.info.firmware.minor = servcfg->data.as.mais.version.firmware.minor;
+    s_eo_themais.sharedcan.discoverytarget.info.firmware.build = servcfg->data.as.mais.version.firmware.build;    
     s_eo_themais.sharedcan.discoverytarget.canmap[servcfg->data.as.mais.canloc.port] = 0x0001 << servcfg->data.as.mais.canloc.addr; 
     
     s_eo_themais.sharedcan.ondiscoverystop.function = s_eo_mais_onstop_search4mais;
@@ -601,8 +602,8 @@ static eOresult_t s_eo_mais_onstop_search4mais(void *par, EOtheCANdiscovery2* p,
     s_eo_themais.diagnostics.errorDescriptor.sourcedevice     = eo_errman_sourcedevice_localboard;
     s_eo_themais.diagnostics.errorDescriptor.sourceaddress    = 0;
     s_eo_themais.diagnostics.errorDescriptor.par16            = (servcfg->data.as.mais.canloc.addr) | (servcfg->data.as.mais.canloc.port << 8);
-    s_eo_themais.diagnostics.errorDescriptor.par64            = (servcfg->data.as.mais.version.firmware.minor)       | (servcfg->data.as.mais.version.firmware.major << 8) |
-                                                    (servcfg->data.as.mais.version.protocol.minor << 16) | (servcfg->data.as.mais.version.protocol.major << 24);    
+    s_eo_themais.diagnostics.errorDescriptor.par64            = (servcfg->data.as.mais.version.firmware.minor << 0) | (servcfg->data.as.mais.version.firmware.major << 8) |
+                                                                (servcfg->data.as.mais.version.protocol.minor << 16) | (servcfg->data.as.mais.version.protocol.major << 24);    
     EOaction_strg astrg = {0};
     EOaction *act = (EOaction*)&astrg;
     eo_action_SetCallback(act, s_eo_mais_send_periodic_error_report, NULL, eov_callbackman_GetTask(eov_callbackman_GetHandle()));    

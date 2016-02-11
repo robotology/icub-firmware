@@ -190,11 +190,12 @@ extern eOresult_t eo_strain_Verify(EOtheSTRAIN *p, const eOmn_serv_configuration
     s_eo_thestrain.service.activateafterverify = activateafterverify;
 
 
-    s_eo_thestrain.sharedcan.discoverytarget.boardtype = eobrd_cantype_strain;
-    s_eo_thestrain.sharedcan.discoverytarget.protocolversion.major = servcfg->data.as.strain.version.protocol.major; 
-    s_eo_thestrain.sharedcan.discoverytarget.protocolversion.minor = servcfg->data.as.strain.version.protocol.minor;
-    s_eo_thestrain.sharedcan.discoverytarget.firmwareversion.major = servcfg->data.as.strain.version.firmware.major; 
-    s_eo_thestrain.sharedcan.discoverytarget.firmwareversion.minor = servcfg->data.as.strain.version.firmware.minor;    
+    s_eo_thestrain.sharedcan.discoverytarget.info.type = eobrd_cantype_strain;
+    s_eo_thestrain.sharedcan.discoverytarget.info.protocol.major = servcfg->data.as.strain.version.protocol.major; 
+    s_eo_thestrain.sharedcan.discoverytarget.info.protocol.minor = servcfg->data.as.strain.version.protocol.minor;
+    s_eo_thestrain.sharedcan.discoverytarget.info.firmware.major = servcfg->data.as.strain.version.firmware.major; 
+    s_eo_thestrain.sharedcan.discoverytarget.info.firmware.minor = servcfg->data.as.strain.version.firmware.minor; 
+    s_eo_thestrain.sharedcan.discoverytarget.info.firmware.build = servcfg->data.as.strain.version.firmware.build;     
     s_eo_thestrain.sharedcan.discoverytarget.canmap[servcfg->data.as.strain.canloc.port] = 0x0001 << servcfg->data.as.strain.canloc.addr; 
     
     s_eo_thestrain.sharedcan.ondiscoverystop.function = s_eo_strain_onstop_search4strain;
@@ -744,7 +745,7 @@ static eOresult_t s_eo_strain_onstop_search4strain(void *par, EOtheCANdiscovery2
     s_eo_thestrain.diagnostics.errorDescriptor.sourceaddress    = 0;
     s_eo_thestrain.diagnostics.errorDescriptor.par16            = (servcfg->data.as.strain.canloc.addr) | (servcfg->data.as.strain.canloc.port << 8);
     s_eo_thestrain.diagnostics.errorDescriptor.par64            = (servcfg->data.as.strain.version.firmware.minor)       | (servcfg->data.as.strain.version.firmware.major << 8) |
-                                                      (servcfg->data.as.strain.version.protocol.minor << 16) | (servcfg->data.as.strain.version.protocol.major << 24);    
+                                                                  (servcfg->data.as.strain.version.protocol.minor << 16) | (servcfg->data.as.strain.version.protocol.major << 24);    
     EOaction_strg astrg = {0};
     EOaction *act = (EOaction*)&astrg;
     eo_action_SetCallback(act, s_eo_strain_send_periodic_error_report, NULL, eov_callbackman_GetTask(eov_callbackman_GetHandle()));

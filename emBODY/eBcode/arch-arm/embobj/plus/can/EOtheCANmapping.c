@@ -533,7 +533,7 @@ extern eObrd_cantype_t eo_canmap_GetBoardType(EOtheCANmapping *p, eOcanmap_locat
 }
 
 
-extern eOresult_t eo_canmap_BoardSetDetected(EOtheCANmapping *p, eOcanmap_location_t bloc, eObrd_typeandversions_t *detected)
+extern eOresult_t eo_canmap_BoardSetDetected(EOtheCANmapping *p, eOcanmap_location_t bloc, eObrd_info_t *detected)
 {
     
 //      eOresult_t res = eores_NOK_generic;
@@ -561,7 +561,7 @@ extern eOresult_t eo_canmap_BoardSetDetected(EOtheCANmapping *p, eOcanmap_locati
         return(eores_NOK_generic);
     }
     
-    memcpy(&board->detected, detected, sizeof(eObrd_typeandversions_t));
+    memcpy(&board->detected, detected, sizeof(eObrd_info_t));
     
     return(eores_OK);
 }

@@ -78,8 +78,8 @@ static const eOmn_serv_configuration_t s_serv_config_as_strain_eb1_eb3 =
     {
         .version    =
         {
-            .firmware   = {0, 0},
-            .protocol   = {1, 0}
+            .firmware   = { .major = 0, .minor = 0, .build = 0 },
+            .protocol   = { .major = 1, .minor = 0 }
         },
         .canloc         =
         {
@@ -98,8 +98,8 @@ static const eOmn_serv_configuration_t s_serv_config_as_strain_eb6_eb8 =
     {
         .version    =
         {
-            .firmware   = {0, 0},
-            .protocol   = {1, 0}
+            .firmware   = { .major = 0, .minor = 0, .build = 0 },
+            .protocol   = { .major = 1, .minor = 0 }
         },
         .canloc         =
         {
@@ -120,7 +120,7 @@ static const eOmn_serv_configuration_t s_serv_config_as_strain_eb7_eb9 =
         .version    =
         {
             .firmware   = {0, 0},
-            .protocol   = {1, 0}
+            .protocol   = { .major = 1, .minor = 0 }
         },
         .canloc         =
         {
@@ -139,18 +139,18 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_eb3 =
     .data.mc.foc_based = 
     {
         .boardtype4mccontroller = emscontroller_board_SHOULDER,
-        .filler                 = {0},
         .version   =
         {
-            .firmware   = {0, 0},
-            .protocol   = {1, 3}
+            .firmware   = { .major = 0, .minor = 0, .build = 0 },
+            .protocol   = { .major = 1, .minor = 3 }
         },
+        .filler                 = {0},
         .arrayofjomodescriptors =
         {
             .head   = 
             {
                 .capacity       = 4,
-                .itemsize       = 3,
+                .itemsize       = sizeof(eOmn_serv_jomo_descriptor_t),
                 .size           = 4,
                 .internalmem    = 0                    
             },
@@ -264,8 +264,8 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb2_eb4 =
     {
         .mc4version =
         {
-            .firmware   = {0, 0},
-            .protocol   = {1, 6}                 
+            .firmware   = { .major = 0, .minor = 0, .build = 0 },
+            .protocol   = { .major = 1, .minor = 6 }                 
         },
         .mc4shifts =
         {
@@ -338,8 +338,8 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb2_eb4 =
         {
             .version    =
             {
-                .firmware   = {0, 0},
-                .protocol   = {1, 0}    
+                .firmware   = { .major = 0, .minor = 0, .build = 0 },
+                .protocol   = { .major = 1, .minor = 0 }    
             },
             .canloc = 
             {
@@ -358,18 +358,18 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb5 =
     .data.mc.foc_based = 
     {
         .boardtype4mccontroller = emscontroller_board_WAIST,
-        .filler                 = {0},
         .version   =
         {
-            .firmware   = {0, 0},
-            .protocol   = {1, 3}
+            .firmware   = { .major = 0, .minor = 0, .build = 0 },
+            .protocol   = { .major = 1, .minor = 3 }
         },
+        .filler                 = {0},
         .arrayofjomodescriptors =
         {
             .head   = 
             {
                 .capacity       = 4,
-                .itemsize       = 3,
+                .itemsize       = sizeof(eOmn_serv_jomo_descriptor_t),
                 .size           = 3,
                 .internalmem    = 0                    
             },
@@ -464,18 +464,18 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb6_eb8 =
     .data.mc.foc_based = 
     {
         .boardtype4mccontroller = emscontroller_board_UPPERLEG,
-        .filler                 = {0},
         .version   =
         {
-            .firmware   = {0, 0},
-            .protocol   = {1, 3}
+            .firmware   = { .major = 0, .minor = 0, .build = 0 },
+            .protocol   = { .major = 1, .minor = 3 }
         },
+        .filler                 = {0},
         .arrayofjomodescriptors =
         {
             .head   = 
             {
                 .capacity       = 4,
-                .itemsize       = 3,
+                .itemsize       = sizeof(eOmn_serv_jomo_descriptor_t),
                 .size           = 4,
                 .internalmem    = 0                    
             },
@@ -587,18 +587,18 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb7_eb9 =
     .data.mc.foc_based = 
     {
         .boardtype4mccontroller = emscontroller_board_ANKLE,
-        .filler                 = {0},
         .version   =
         {
-            .firmware   = {0, 0},
-            .protocol   = {1, 3}
+            .firmware   = { .major = 0, .minor = 0, .build = 0 },
+            .protocol   = { .major = 1, .minor = 3 }
         },
+        .filler                 = {0},
         .arrayofjomodescriptors =
         {
             .head   = 
             {
                 .capacity       = 4,
-                .itemsize       = 3,
+                .itemsize       = sizeof(eOmn_serv_jomo_descriptor_t),
                 .size           = 2,
                 .internalmem    = 0                    
             },
@@ -678,18 +678,18 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb15 =
     .data.mc.foc_based = 
     {
         .boardtype4mccontroller = emscontroller_board_CER_WAIST,
-        .filler                 = {0},
         .version    =
         {
-            .firmware   = {0, 0},
-            .protocol   = {1, 3}
+            .firmware   = { .major = 0, .minor = 0, .build = 0 },
+            .protocol   = { .major = 1, .minor = 3 }
         },
+        .filler                 = {0},
         .arrayofjomodescriptors =
         {
             .head   = 
             {
                 .capacity       = 4,
-                .itemsize       = 3,
+                .itemsize       = sizeof(eOmn_serv_jomo_descriptor_t),
                 .size           = 4,
                 .internalmem    = 0                    
             },
@@ -809,7 +809,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_0B0 =
             .head   = 
             {
                 .capacity       = 4,
-                .itemsize       = 3,
+                .itemsize       = sizeof(eOmn_serv_jomo_descriptor_t),
                 .size           = 2,
                 .internalmem    = 0                    
             },
@@ -922,7 +922,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_0B1 =
             .head   = 
             {
                 .capacity       = 4,
-                .itemsize       = 3,
+                .itemsize       = sizeof(eOmn_serv_jomo_descriptor_t),
                 .size           = 4,
                 .internalmem    = 0                    
             },
@@ -1033,7 +1033,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_0B7 =
             .head   = 
             {
                 .capacity       = 4,
-                .itemsize       = 3,
+                .itemsize       = sizeof(eOmn_serv_jomo_descriptor_t),
                 .size           = 2,
                 .internalmem    = 0                    
             },
@@ -1143,7 +1143,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_0B9 =
             .head   = 
             {
                 .capacity       = 4,
-                .itemsize       = 3,
+                .itemsize       = sizeof(eOmn_serv_jomo_descriptor_t),
                 .size           = 4,
                 .internalmem    = 0                    
             },
@@ -1249,18 +1249,18 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb21 =
     .data.mc.foc_based = 
     {
         .boardtype4mccontroller = emscontroller_board_CER_BASE,
-        .filler                 = {0},
         .version    =
         {
-            .firmware   = {0, 0},
-            .protocol   = {1, 3}
+            .firmware   = { .major = 0, .minor = 0, .build = 0 },
+            .protocol   = { .major = 1, .minor = 3 }
         },
+        .filler                 = {0},
         .arrayofjomodescriptors =
         {
             .head   = 
             {
                 .capacity       = 4,
-                .itemsize       = 3,
+                .itemsize       = sizeof(eOmn_serv_jomo_descriptor_t),
                 .size           = 4,
                 .internalmem    = 0                    
             },
@@ -1378,7 +1378,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_testOfmc2plus =
             .head   = 
             {
                 .capacity       = 4,
-                .itemsize       = 3,
+                .itemsize       = sizeof(eOmn_serv_jomo_descriptor_t),
                 .size           = 2,
                 .internalmem    = 0                    
             },
@@ -1484,8 +1484,8 @@ static const eOmn_serv_configuration_t s_serv_config_as_mais_eb2_eb4 =
     {
         .version    =
         {
-            .firmware   = {0, 0},
-            .protocol   = {1, 0}    
+            .firmware   = { .major = 0, .minor = 0, .build = 0 },
+            .protocol   = { .major = 1, .minor = 0 }    
         },
         .canloc = 
         {
@@ -1505,8 +1505,8 @@ static const eOmn_serv_configuration_t s_serv_config_sk_skin_eb2_eb4 =
     {
         .version    =
         {
-            .firmware   = {0, 0},
-            .protocol   = {0, 0}  // in case of {0, 0} the can discovery is not done but the verify will be ok. for normal case use: {1, 0}    
+            .firmware   = { .major = 0, .minor = 0, .build = 0 },
+            .protocol   = { .major = 0, .minor = 0 }  // in case of {0, 0} the can discovery is not done but the verify will be ok. for normal case use: {1, 0}    
         },
         .numofpatches   = 1,
         .canmapskin[0] = { 0x0000, 0x7f00 },
@@ -1524,8 +1524,8 @@ static const eOmn_serv_configuration_t s_serv_config_sk_skin_eb10_eb11 =
     {
         .version    =
         {
-            .firmware   = {0, 0},
-            .protocol   = {0, 0}  // in case of {0, 0} the can discovery is not done but the verify will be ok. for normal case use: {1, 0}   
+            .firmware   = { .major = 0, .minor = 0, .build = 0 },
+            .protocol   = { .major = 0, .minor = 0 }  // in case of {0, 0} the can discovery is not done but the verify will be ok. for normal case use: {1, 0}   
         },
         .numofpatches   = 2,
         .canmapskin[0] = { 0x00fe, 0x0000 },
@@ -1546,8 +1546,8 @@ static const eOmn_serv_configuration_t s_serv_config_as_inertial_eb2_eb4 =
     {
         .version    =
         {
-            .firmware   = {0, 0},
-            .protocol   = {0, 0}  // in case of {0, 0} the can discovery is not done but the verify will be ok. for normal case use: {1, 0}  
+            .firmware   = { .major = 0, .minor = 0, .build = 0 },
+            .protocol   = { .major = 0, .minor = 0 }  // in case of {0, 0} the can discovery is not done but the verify will be ok. for normal case use: {1, 0}  
         },
         .canmap = { 0x0000, 0x7f00 }
     }    
@@ -1562,8 +1562,8 @@ static const eOmn_serv_configuration_t s_serv_config_as_inertial_eb10_eb11 =
     {
         .version    =
         {
-            .firmware   = {0, 0},
-            .protocol   = {0, 0}  // in case of {0, 0} the can discovery is not done but the verify will be ok. for normal case use: {1, 0}  
+            .firmware   = { .major = 0, .minor = 0, .build = 0 },
+            .protocol   = { .major = 0, .minor = 0 }  // in case of {0, 0} the can discovery is not done but the verify will be ok. for normal case use: {1, 0}  
         },
         .canmap = { 0x00fe, 0x3f00 }
     }    

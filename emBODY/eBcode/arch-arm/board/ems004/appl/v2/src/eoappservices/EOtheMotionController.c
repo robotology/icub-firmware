@@ -274,11 +274,12 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
 
         // 1. prepare the can discovery for foc boards 
         memset(&s_eo_themotcon.sharedcan.discoverytarget, 0, sizeof(s_eo_themotcon.sharedcan.discoverytarget));
-        s_eo_themotcon.sharedcan.discoverytarget.boardtype = eobrd_cantype_foc;
-        s_eo_themotcon.sharedcan.discoverytarget.protocolversion.major = servcfg->data.mc.foc_based.version.protocol.major; 
-        s_eo_themotcon.sharedcan.discoverytarget.protocolversion.minor = servcfg->data.mc.foc_based.version.protocol.minor;
-        s_eo_themotcon.sharedcan.discoverytarget.firmwareversion.major = servcfg->data.mc.foc_based.version.firmware.major; 
-        s_eo_themotcon.sharedcan.discoverytarget.firmwareversion.minor = servcfg->data.mc.foc_based.version.firmware.minor;   
+        s_eo_themotcon.sharedcan.discoverytarget.info.type = eobrd_cantype_foc;
+        s_eo_themotcon.sharedcan.discoverytarget.info.protocol.major = servcfg->data.mc.foc_based.version.protocol.major; 
+        s_eo_themotcon.sharedcan.discoverytarget.info.protocol.minor = servcfg->data.mc.foc_based.version.protocol.minor;
+        s_eo_themotcon.sharedcan.discoverytarget.info.firmware.major = servcfg->data.mc.foc_based.version.firmware.major; 
+        s_eo_themotcon.sharedcan.discoverytarget.info.firmware.minor = servcfg->data.mc.foc_based.version.firmware.minor;   
+        s_eo_themotcon.sharedcan.discoverytarget.info.firmware.build = servcfg->data.mc.foc_based.version.firmware.build;   
         
         EOconstarray* carray = eo_constarray_Load((EOarray*)&servcfg->data.mc.foc_based.arrayofjomodescriptors);
         
@@ -309,11 +310,12 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
 
         // 2. prepare the can discovery of mc4 boards
         memset(&s_eo_themotcon.sharedcan.discoverytarget, 0, sizeof(s_eo_themotcon.sharedcan.discoverytarget));
-        s_eo_themotcon.sharedcan.discoverytarget.boardtype = eobrd_cantype_mc4;
-        s_eo_themotcon.sharedcan.discoverytarget.protocolversion.major = servcfg->data.mc.mc4_based.mc4version.protocol.major; 
-        s_eo_themotcon.sharedcan.discoverytarget.protocolversion.minor = servcfg->data.mc.mc4_based.mc4version.protocol.minor;
-        s_eo_themotcon.sharedcan.discoverytarget.firmwareversion.major = servcfg->data.mc.mc4_based.mc4version.firmware.major; 
-        s_eo_themotcon.sharedcan.discoverytarget.firmwareversion.minor = servcfg->data.mc.mc4_based.mc4version.firmware.minor;   
+        s_eo_themotcon.sharedcan.discoverytarget.info.type = eobrd_cantype_mc4;
+        s_eo_themotcon.sharedcan.discoverytarget.info.protocol.major = servcfg->data.mc.mc4_based.mc4version.protocol.major; 
+        s_eo_themotcon.sharedcan.discoverytarget.info.protocol.minor = servcfg->data.mc.mc4_based.mc4version.protocol.minor;
+        s_eo_themotcon.sharedcan.discoverytarget.info.firmware.major = servcfg->data.mc.mc4_based.mc4version.firmware.major; 
+        s_eo_themotcon.sharedcan.discoverytarget.info.firmware.minor = servcfg->data.mc.mc4_based.mc4version.firmware.minor; 
+        s_eo_themotcon.sharedcan.discoverytarget.info.firmware.build = servcfg->data.mc.mc4_based.mc4version.firmware.build;        
         
         uint8_t i = 0;
         for(i=0; i<12; i++)
@@ -346,11 +348,12 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
 
        // 1. prepare the can discovery for mais board 
         memset(&s_eo_themotcon.sharedcan.discoverytarget, 0, sizeof(s_eo_themotcon.sharedcan.discoverytarget));
-        s_eo_themotcon.sharedcan.discoverytarget.boardtype = eobrd_cantype_mais;
-        s_eo_themotcon.sharedcan.discoverytarget.protocolversion.major = servcfg->data.mc.mc4plusmais_based.mais.version.protocol.major; 
-        s_eo_themotcon.sharedcan.discoverytarget.protocolversion.minor = servcfg->data.mc.mc4plusmais_based.mais.version.protocol.minor;
-        s_eo_themotcon.sharedcan.discoverytarget.firmwareversion.major = servcfg->data.mc.mc4plusmais_based.mais.version.firmware.major; 
-        s_eo_themotcon.sharedcan.discoverytarget.firmwareversion.minor = servcfg->data.mc.mc4plusmais_based.mais.version.firmware.minor;                   
+        s_eo_themotcon.sharedcan.discoverytarget.info.type = eobrd_cantype_mais;
+        s_eo_themotcon.sharedcan.discoverytarget.info.protocol.major = servcfg->data.mc.mc4plusmais_based.mais.version.protocol.major; 
+        s_eo_themotcon.sharedcan.discoverytarget.info.protocol.minor = servcfg->data.mc.mc4plusmais_based.mais.version.protocol.minor;
+        s_eo_themotcon.sharedcan.discoverytarget.info.firmware.major = servcfg->data.mc.mc4plusmais_based.mais.version.firmware.major; 
+        s_eo_themotcon.sharedcan.discoverytarget.info.firmware.minor = servcfg->data.mc.mc4plusmais_based.mais.version.firmware.minor;  
+        s_eo_themotcon.sharedcan.discoverytarget.info.firmware.build = servcfg->data.mc.mc4plusmais_based.mais.version.firmware.build;         
         s_eo_themotcon.sharedcan.ondiscoverystop.function = s_eo_motioncontrol_mc4plusmais_onstop_search4mais;
         s_eo_themotcon.sharedcan.ondiscoverystop.parameter = (void*)servcfg;
   

@@ -649,7 +649,7 @@ extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_IMPEDANCE_OFFSET(eOc
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__GET_FIRMWARE_VERSION(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
-    eObrd_version_t *reqprot = (eObrd_version_t*)descriptor->cmd.value;
+    eObrd_protocolversion_t *reqprot = (eObrd_protocolversion_t*)descriptor->cmd.value;
     s_former_POL_MC_prepare_frame(descriptor, frame, 3, ICUBCANPROTO_POL_MC_CMD__GET_FIRMWARE_VERSION);
     
     frame->data[1] = reqprot->major;
@@ -674,13 +674,13 @@ extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_FIRMWARE_VERSION(eOc
     
     eObool_t match = (1 == frame->data[7]) ? eobool_true : eobool_false;    
     
-    eObrd_typeandversions_t detected    = {0};
-    detected.boardtype                  = frame->data[1];
-    detected.firmwareversion.major      = frame->data[2];
-    detected.firmwareversion.minor      = frame->data[3];
-    detected.firmwarebuildnumber        = frame->data[4];
-    detected.protocolversion.major      = frame->data[5];
-    detected.protocolversion.minor      = frame->data[6];   
+    eObrd_info_t detected = {0};
+    detected.type               = frame->data[1];
+    detected.firmware.major     = frame->data[2];
+    detected.firmware.minor     = frame->data[3];
+    detected.firmware.build     = frame->data[4];
+    detected.protocol.major     = frame->data[5];
+    detected.protocol.minor     = frame->data[6];   
     
     
     eo_candiscovery2_OneBoardIsFound(eo_candiscovery2_GetHandle(), loc, match, &detected);

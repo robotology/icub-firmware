@@ -124,6 +124,7 @@ static EOtheEncoderReader s_eo_theencoderreader =
     .numofjomos                 = 0,
     .numofencoders              = 0,
     .errorflags                 = {0},
+    .failuremask                = 0,
     .reader                     = NULL
 };
 
@@ -354,7 +355,11 @@ static eOresult_t s_eo_encoderreader_onstop_verifyreading(void *par, eObool_t re
     s_eo_theencoderreader.diagnostics.errorDescriptor.sourcedevice     = eo_errman_sourcedevice_localboard;
     s_eo_theencoderreader.diagnostics.errorDescriptor.sourceaddress    = 0;
     s_eo_theencoderreader.diagnostics.errorDescriptor.par16            = s_eo_theencoderreader.numofjomos | (s_eo_theencoderreader.numofencoders << 8);
-    memcpy(&s_eo_theencoderreader.diagnostics.errorDescriptor.par64, &s_eo_theencoderreader.errorflags[0], sizeof(s_eo_theencoderreader.errorflags));    
+    // in the 4 lsb i put the errorflags.
+    // in the msb i put the failuremask
+    memcpy(&s_eo_theencoderreader.diagnostics.errorDescriptor.par64, &s_eo_theencoderreader.errorflags[0], sizeof(s_eo_theencoderreader.errorflags));   
+    uint64_t mmm =  s_eo_theencoderreader.failuremask;
+    s_eo_theencoderreader.diagnostics.errorDescriptor.par64 |= (mmm << 56);
     EOaction_strg astrg = {0};
     EOaction *act = (EOaction*)&astrg;
     eo_action_SetCallback(act, s_eo_encodereader_send_periodic_error_report, NULL, eov_callbackman_GetTask(eov_callbackman_GetHandle()));
@@ -417,16 +422,12 @@ static void s_eo_encoderreader_init_ereader(const eOmn_serv_arrayof_4jomodescrip
 {   
     memcpy(&s_eo_theencoderreader.arrayofjomodes, jomodes, sizeof(eOmn_serv_arrayof_4jomodescriptors_t));
     
-    // now... use the servcfg
-    uint8_t i = 0;
-    
     EOconstarray* carray = eo_constarray_Load((EOarray*)&s_eo_theencoderreader.arrayofjomodes);
 
     uint8_t numofjomos = eo_constarray_Size(carray);
     s_eo_theencoderreader.numofjomos = numofjomos;
 
     
-//    s_eo_theencoderreader.numofencoders = numberofencoders;
     eo_appEncReader_Activate(s_eo_theencoderreader.reader, &s_eo_theencoderreader.arrayofjomodes);    
 }
 
@@ -438,6 +439,7 @@ static void s_eo_encoderreader_read_encoders(void* p)
     uint8_t i = 0;
     
     memset(&s_eo_theencoderreader.errorflags, 0, sizeof(s_eo_theencoderreader.errorflags));
+    s_eo_theencoderreader.failuremask = 0;
     
     for(i=0; i< s_eo_theencoderreader.numofjomos; i++)
     {
@@ -448,8 +450,11 @@ static void s_eo_encoderreader_read_encoders(void* p)
         if((0 != s_eo_theencoderreader.errorflags[i].chip_error) || (0 != s_eo_theencoderreader.errorflags[i].data_error) || 
            (0 != s_eo_theencoderreader.errorflags[i].data_notready) || (0 != s_eo_theencoderreader.errorflags[i].tx_error) )
         {
+            eo_common_byte_bitset(&s_eo_theencoderreader.failuremask, i);
             readingisok = eobool_false;
-        }            
+        }   
+        // so far we assume that we have so many encoders as joints ...
+        s_eo_theencoderreader.numofencoders ++;        
     }
     
     
