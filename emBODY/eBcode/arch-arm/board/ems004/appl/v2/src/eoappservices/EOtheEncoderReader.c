@@ -197,9 +197,10 @@ extern eOresult_t eo_encoderreader_Verify(EOtheEncoderReader *p, const eOmn_serv
     EOaction_strg astrg = {0};
     EOaction *act = (EOaction*)&astrg;
     
-    // now i start a timer of 2 ms. and at its expiry i exec s_eo_encoderreader_read_encoders().    
+    // now i start a timer of 20 ms. and at its expiry i exec s_eo_encoderreader_read_encoders().  
+    // for SPI encoders 2 ms would be more than enough, but we give it 20, so that in case of mais we are able to receive data.
     eo_action_SetCallback(act, s_eo_encoderreader_read_encoders, (void*)jomodes, eov_callbackman_GetTask(eov_callbackman_GetHandle()));     
-    eo_timer_Start(s_eo_theencoderreader.waitreadtimer, eok_abstimeNOW, 2*eok_reltime1ms, eo_tmrmode_ONESHOT, act);   
+    eo_timer_Start(s_eo_theencoderreader.waitreadtimer, eok_abstimeNOW, 20*eok_reltime1ms, eo_tmrmode_ONESHOT, act);   
      
     return(eores_OK);   
 }
