@@ -1126,6 +1126,10 @@ static uint32_t s_eo_read_mais_for_port(EOappEncReader *p, uint8_t port)
     
     // get the mais status and then combine its values
     eOas_mais_t *mais = eo_entities_GetMais(eo_entities_GetHandle(), 0); 
+    if(NULL == mais)
+    {   // it is possible to have NULL if we call the encoder-reader before we have called eo_mais_Activate(). theus, the motion-controller must verify and activate MAIS before the encoders.
+        return(0);
+    }
     EOarray* array = (EOarray*)&mais->status.the15values; // even better would be to treat it as a const-array. maybe put it in constructor of the object
     
     uint8_t value1 = 0;
