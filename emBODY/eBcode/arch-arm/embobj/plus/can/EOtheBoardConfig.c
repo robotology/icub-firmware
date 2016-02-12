@@ -1242,6 +1242,366 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_0B9 =
 
 
 
+static const eOmn_serv_configuration_t s_serv_config_mc_v3_1B2_2B2 =
+{   // .18 or .xx
+    .type       = eomn_serv_MC_mc4plus,
+    .filler     = {0},
+    .data.mc.mc4plus_based = 
+    {
+        .boardtype4mccontroller = emscontroller_board_FACE_lips, // so far we keep it like this. later on we either develop a emscontroller_board_FOREARM_wrist or we use new ems controller
+        .filler                 = {0},
+        .arrayofjomodescriptors =
+        {
+            .head   = 
+            {
+                .capacity       = 4,
+                .itemsize       = sizeof(eOmn_serv_jomo_descriptor_t),
+                .size           = 4,
+                .internalmem    = 0                    
+            },
+            .data   =           // marco.accame: so far i map at random. i dont know where to put motors, sensors etc.
+            {
+                { // joint 0:   tentative wrist pronosupination
+                    .actuator.pwm   =
+                    {   // motor 1B2M2
+                        .port   = eomn_serv_mc_port_mc4plus_pwmP4,                          
+                    },
+                    .sensor         =
+                    {
+                        .type   = eomn_serv_mc_sensor_encoder_inc,
+                        .port   = eomn_serv_mc_port_mc4plus_qencP4,
+                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                    },
+                    .extrasensor    =
+                    {
+                        .type   = eomn_serv_mc_sensor_none,
+                        .port   = eomn_serv_mc_port_none,
+                        .pos    = eomn_serv_mc_sensor_pos_none
+                    }
+                },                 
+                { // joint 1:   tentative wrist coupled w/ 1B2M0 and LA-S5
+                    .actuator.pwm   =
+                    {   // motor 1B2M0
+                        .port   = eomn_serv_mc_port_mc4plus_pwmP3,                         
+                    },
+                    .sensor         =
+                    {   // i try the aea LA-S5 in port SPI1 (P10)
+                        .type   = eomn_serv_mc_sensor_encoder_aea,
+                        .port   = eomn_serv_mc_port_mc4plus_spiP10,
+                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                    },
+                    .extrasensor    =
+                    {   // inc encoder of motor 1B2M0
+                        .type   = eomn_serv_mc_sensor_encoder_inc,
+                        .port   = eomn_serv_mc_port_mc4plus_qencP3,
+                        .pos    = eomn_serv_mc_sensor_pos_atmotor
+                    }
+                },
+                { // joint 2:   tentative wrist coupled w/ 1B2M1 and LA-S6
+                    .actuator.pwm   =
+                    {   // motor 1B2M1
+                        .port   = eomn_serv_mc_port_mc4plus_pwmP2,                         
+                    },
+                    .sensor         =
+                    {   // i try the aea LA-S6 in port SPI2 (P11)
+                        .type   = eomn_serv_mc_sensor_encoder_aea,
+                        .port   = eomn_serv_mc_port_mc4plus_spiP11,
+                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                    },
+                    .extrasensor    =
+                    {
+                        .type   = eomn_serv_mc_sensor_encoder_inc,
+                        .port   = eomn_serv_mc_port_mc4plus_qencP2,
+                        .pos    = eomn_serv_mc_sensor_pos_atmotor
+                    }
+                },                                              
+                { // joint 3:   tentative finger abduction 
+                    .actuator.pwm   =
+                    {   // motor 1B2H3
+                        .port   = eomn_serv_mc_port_mc4plus_pwmP5,                      
+                    },
+                    .sensor         =
+                    {
+                        .type   = eomn_serv_mc_sensor_encoder_absanalog,
+                        .port   = eomn_serv_mc_port_mc4plus_qencP5, // maybe define a proper eomn_serv_mc_port_mc4plus_adcP5 or absanalogP5
+                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                    },
+                    .extrasensor    =
+                    {
+                        .type   = eomn_serv_mc_sensor_none,
+                        .port   = eomn_serv_mc_port_none,
+                        .pos    = eomn_serv_mc_sensor_pos_none
+                    }
+                }            
+            }
+        },
+        .couplingjoint2motor    = 
+        {   // zero matrix: use matrix embedded in controller and seecetd by boardtype4mccontroller
+            { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+            { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+            { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+            { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) }        
+        },
+        .couplingjoint2encoder  = 
+        {   // identical matrix
+            { EO_COMMON_FLOAT_TO_Q17_14(1.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+            { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+            { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+            { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(1.0f) } 
+        }           
+    }
+};
+
+
+static const eOmn_serv_configuration_t s_serv_config_mc_v3_1B3_2B3 =
+{   // .17 or .xx
+    .type       = eomn_serv_MC_mc4plusmais,
+    .filler     = {0},
+    .data.mc.mc4plusmais_based = 
+    {
+        .boardtype4mccontroller = emscontroller_board_FACE_lips, // so far we keep it like this. later on we either develop a emscontroller_board_FOREARM_thumb or we use new ems controller
+        .mais                   = 
+        {
+            .version    =
+            {
+                .firmware   = { .major = 0, .minor = 0, .build = 0 },
+                .protocol   = { .major = 1, .minor = 0 }    
+            },
+            .canloc = 
+            {
+                .port           = eOcanport1,
+                .addr           = 14,
+                .insideindex    = eocanmap_insideindex_none                    
+            }               
+        },
+        .filler                 = {0},
+        .arrayofjomodescriptors =
+        {
+            .head   = 
+            {
+                .capacity       = 4,
+                .itemsize       = sizeof(eOmn_serv_jomo_descriptor_t),
+                .size           = 4,
+                .internalmem    = 0                    
+            },
+            .data   =           // marco.accame: so far i map at random. i dont know where to put motors, sensors etc.
+            {
+                { // joint 0:   tentative thumb abduction w/ 1B3M0 and hall sensor 1B3H0
+                    .actuator.pwm   =
+                    {   // motor 1B3M0
+                        .port   = eomn_serv_mc_port_mc4plus_pwmP3,                         
+                    },
+                    .sensor         =
+                    {   // the 1B3H0
+                        .type   = eomn_serv_mc_sensor_encoder_absanalog,
+                        .port   = eomn_serv_mc_port_mc4plus_qencP3,
+                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                    },
+                    .extrasensor    =
+                    {   
+                        .type   = eomn_serv_mc_sensor_none,
+                        .port   = eomn_serv_mc_port_none,
+                        .pos    = eomn_serv_mc_sensor_pos_none
+                    }
+                },
+                { // joint 1:   tentative thumb proximal w/ 1B3M1
+                    .actuator.pwm   =
+                    {   // motor 1B3M1
+                        .port   = eomn_serv_mc_port_mc4plus_pwmP2,                         
+                    },
+                    .sensor         =
+                    {  
+                        .type   = eomn_serv_mc_sensor_mais,
+                        .port   = eomn_serv_mc_port_mais_thumb_proximal,
+                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                    },
+                    .extrasensor    =
+                    {   // i use the incremental associated to the motor
+                        .type   = eomn_serv_mc_sensor_encoder_inc,
+                        .port   = eomn_serv_mc_port_mc4plus_qencP2,
+                        .pos    = eomn_serv_mc_sensor_pos_atmotor
+                    }
+                },                
+                { // joint 2:   tentative thumb distal
+                    .actuator.pwm   =
+                    {   // motor 1B3M2
+                        .port   = eomn_serv_mc_port_mc4plus_pwmP4,                          
+                    },
+                    .sensor         =
+                    {  
+                        .type   = eomn_serv_mc_sensor_mais,
+                        .port   = eomn_serv_mc_port_mais_thumb_distal,
+                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                    },
+                    .extrasensor    =
+                    {   // i use the incremental associated to the motor
+                        .type   = eomn_serv_mc_sensor_encoder_inc,
+                        .port   = eomn_serv_mc_port_mc4plus_qencP4,
+                        .pos    = eomn_serv_mc_sensor_pos_atmotor
+                    }
+                },                               
+                { // joint 3:   tentative index proximal 
+                    .actuator.pwm   =
+                    {   // motor 1B3M3
+                        .port   = eomn_serv_mc_port_mc4plus_pwmP5,                      
+                    },
+                    .sensor         =
+                    {
+                        .type   = eomn_serv_mc_sensor_mais,
+                        .port   = eomn_serv_mc_port_mais_index_proximal,
+                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                    },
+                    .extrasensor    =
+                    {   // i use the incremental associated to the motor
+                        .type   = eomn_serv_mc_sensor_encoder_inc,
+                        .port   = eomn_serv_mc_port_mc4plus_qencP5,
+                        .pos    = eomn_serv_mc_sensor_pos_atmotor
+                    }
+                }            
+            }
+        },
+        .couplingjoint2motor    = 
+        {   // zero matrix: use matrix embedded in controller and seecetd by boardtype4mccontroller
+            { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+            { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+            { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+            { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) }        
+        },
+        .couplingjoint2encoder  = 
+        {   // identical matrix
+            { EO_COMMON_FLOAT_TO_Q17_14(1.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+            { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+            { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+            { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(1.0f) } 
+        }           
+    }
+};
+
+
+static const eOmn_serv_configuration_t s_serv_config_mc_v3_1B4_2B4 =
+{   // .16 or .19 (cshape)
+    .type       = eomn_serv_MC_mc4plusmais,
+    .filler     = {0},
+    .data.mc.mc4plusmais_based = 
+    {
+        .boardtype4mccontroller = emscontroller_board_FACE_lips, // so far we keep it like this. later on we either develop a emscontroller_board_FOREARM_thumb or we use new ems controller
+        .mais                   = 
+        {
+            .version    =
+            {
+                .firmware   = { .major = 0, .minor = 0, .build = 0 },
+                .protocol   = { .major = 1, .minor = 0 }    
+            },
+            .canloc = 
+            {
+                .port           = eOcanport1,
+                .addr           = 14,
+                .insideindex    = eocanmap_insideindex_none                    
+            }               
+        },
+        .filler                 = {0},
+        .arrayofjomodescriptors =
+        {
+            .head   = 
+            {
+                .capacity       = 4,
+                .itemsize       = sizeof(eOmn_serv_jomo_descriptor_t),
+                .size           = 4,
+                .internalmem    = 0                    
+            },
+            .data   =           // marco.accame: so far i map at random. i dont know where to put motors, sensors etc.
+            {
+                { // joint 0:   tentative index distal w/ 1B4M0 
+                    .actuator.pwm   =
+                    {   // motor 1B4M0
+                        .port   = eomn_serv_mc_port_mc4plus_pwmP2,                         
+                    },
+                    .sensor         =
+                    {   // mais
+                        .type   = eomn_serv_mc_sensor_mais,
+                        .port   = eomn_serv_mc_port_mais_index_distal,
+                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                    },
+                    .extrasensor    =
+                    {   
+                        .type   = eomn_serv_mc_sensor_encoder_inc,
+                        .port   = eomn_serv_mc_port_mc4plus_qencP2,
+                        .pos    = eomn_serv_mc_sensor_pos_atmotor
+                    }
+                },
+                { // joint 1:   tentative medium proximal w/ 1B4M1
+                    .actuator.pwm   =
+                    {   // motor 1B4M1
+                        .port   = eomn_serv_mc_port_mc4plus_pwmP3,                         
+                    },
+                    .sensor         =
+                    {  
+                        .type   = eomn_serv_mc_sensor_mais,
+                        .port   = eomn_serv_mc_port_mais_medium_proximal,
+                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                    },
+                    .extrasensor    =
+                    {   // i use the incremental associated to the motor
+                        .type   = eomn_serv_mc_sensor_encoder_inc,
+                        .port   = eomn_serv_mc_port_mc4plus_qencP3,
+                        .pos    = eomn_serv_mc_sensor_pos_atmotor
+                    }
+                },                
+                { // joint 2:   tentative medium distal
+                    .actuator.pwm   =
+                    {   // motor 1B4M2
+                        .port   = eomn_serv_mc_port_mc4plus_pwmP4,                          
+                    },
+                    .sensor         =
+                    {  
+                        .type   = eomn_serv_mc_sensor_mais,
+                        .port   = eomn_serv_mc_port_mais_medium_distal,
+                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                    },
+                    .extrasensor    =
+                    {   // i use the incremental associated to the motor
+                        .type   = eomn_serv_mc_sensor_encoder_inc,
+                        .port   = eomn_serv_mc_port_mc4plus_qencP4,
+                        .pos    = eomn_serv_mc_sensor_pos_atmotor
+                    }
+                },                               
+                { // joint 3:   tentative little fingers
+                    .actuator.pwm   =
+                    {   // motor 1B4M3
+                        .port   = eomn_serv_mc_port_mc4plus_pwmP5,                      
+                    },
+                    .sensor         =
+                    {
+                        .type   = eomn_serv_mc_sensor_mais,
+                        .port   = eomn_serv_mc_port_mais_littlefingers,
+                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                    },
+                    .extrasensor    =
+                    {   // i use the incremental associated to the motor
+                        .type   = eomn_serv_mc_sensor_encoder_inc,
+                        .port   = eomn_serv_mc_port_mc4plus_qencP5,
+                        .pos    = eomn_serv_mc_sensor_pos_atmotor
+                    }
+                }            
+            }
+        },
+        .couplingjoint2motor    = 
+        {   // zero matrix: use matrix embedded in controller and seecetd by boardtype4mccontroller
+            { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+            { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+            { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+            { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) }        
+        },
+        .couplingjoint2encoder  = 
+        {   // identical matrix
+            { EO_COMMON_FLOAT_TO_Q17_14(1.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+            { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+            { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+            { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(1.0f) } 
+        }           
+    }
+};
+
 static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb21 =
 {   // eb21
     .type       = eomn_serv_MC_foc,
@@ -1586,7 +1946,7 @@ static const eOmn_serv_configuration_t * const s_serv_config_mc_V2[maxboards_V2]
     NULL
 };
 
-enum {maxboards_V3 = 21};
+enum {maxboards_V3 = 22};
 static const eOmn_serv_configuration_t * const s_serv_config_mc_V3[maxboards_V3] =
 {   // there are only ....   
     NULL,
@@ -1600,17 +1960,20 @@ static const eOmn_serv_configuration_t * const s_serv_config_mc_V3[maxboards_V3]
     NULL,
     NULL,
     NULL,
-    &s_serv_config_mc_v3_0B0,   // board ip.12, 0b0, head neck pitch + neck roll
-    &s_serv_config_mc_v3_0B1,   // board ip.13, 0b1, head neck yaw + 3 eyes
-    &s_serv_config_mc_v3_0B7,   // board ip.14, 0b7, face eyelids + jaw
-    &s_serv_config_mc_v3_0B9,   // board ip.15, 0b9, face 4 lips
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    &s_serv_config_mc_cer_testOfmc2plus,
-    NULL    
+    &s_serv_config_mc_v3_0B0,       // board ip.12, 0b0, head neck pitch + neck roll
+    &s_serv_config_mc_v3_0B1,       // board ip.13, 0b1, head neck yaw + 3 eyes
+    &s_serv_config_mc_v3_0B7,       // board ip.14, 0b7, face eyelids + jaw
+    &s_serv_config_mc_v3_0B9,       // board ip.15, 0b9, face 4 lips
+    &s_serv_config_mc_v3_1B4_2B4,   // board ip.16, 1b4, left forearm:  little fingers, medium (distal, proximal), index distal
+    &s_serv_config_mc_v3_1B3_2B3,   // board ip.17, 1b3, left forearm: thumb (abduction, proximal, distal), index proximal
+    &s_serv_config_mc_v3_1B2_2B2,   // board ip.18, 1b2, left forearm: wrist (wrist coupled 1b2m1, wrist coupled 1b2m0, pronosupination 1b2m2), finger abduction
+    &s_serv_config_mc_v3_1B4_2B4,   // board ip.19, 2b4, right forearm:  little fingers, medium (distal, proximal), index distal
+    &s_serv_config_mc_v3_1B3_2B3,   // board ip.20, 2b3, right forearm: thumb (abduction, proximal, distal), index proximal
+    &s_serv_config_mc_v3_1B2_2B2,   // board ip.21, 2b2, right forearm: wrist (wrist coupled 1b2m1, wrist coupled 1b2m0, pronosupination 1b2m2), finger abduction,
+    &s_serv_config_mc_cer_testOfmc2plus // moved at address .22  
 };
+
+
 
 enum {maxboards_CER = 21};
 static const eOmn_serv_configuration_t * const s_serv_config_mc_CER[maxboards_CER] =
@@ -1775,6 +2138,12 @@ extern const eOmn_serv_configuration_t * eoboardconfig_code2mais_serv_configurat
     {
         case 1:
         case 3:
+#if     defined(ICUB_MEC_V3)              
+        case 15:    // for lower arm mec-v3: 1b4 10.0.1.16            
+        case 16:    // for lower arm mec-v3: 1b3 10.0.1.17
+        case 18:    // for lower arm mec-v3: 2b4 10.0.1.19            
+        case 19:    // for lower arm mec-v3: 2b3 10.0.1.20     
+#endif            
         {   // board eb2 / eb4   
             ret = &s_serv_config_as_mais_eb2_eb4; 
         } break;  
