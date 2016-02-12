@@ -105,6 +105,10 @@ static eOresult_t s_eo_motioncontrol_SetCurrentSetpoint(EOtheMotionController *p
 static eOresult_t s_eo_motioncontrol_onendofverify_mais(EOaService* s, eObool_t operationisok);
 
 static eOresult_t s_eo_motioncontrol_onstop_search4mc4s(void *par, EOtheCANdiscovery2* p, eObool_t searchisok);
+
+
+static eOresult_t s_eo_motioncontrol_mc4plusmais_onstop_search4mais_BIS_now_verify_encoder(void *par, EOtheCANdiscovery2* p, eObool_t searchisok);
+static eOresult_t s_eo_motioncontrol_mc4plusmais_onendofverify_encoder_BIS(EOaService* s, eObool_t operationisok);
     
 static void s_eo_motioncontrol_UpdateJointStatus(EOtheMotionController *p);
 
@@ -341,28 +345,23 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
     }
     else if(eo_motcon_mode_mc4plusmais == servcfg->type)
     {
+        
+        s_eo_themotcon.service.onverify = onverify;
+        s_eo_themotcon.service.activateafterverify = activateafterverify;
+        
         // prepare the verify of mais
         s_eo_themotcon.mcmc4.servconfigmais.type = eomn_serv_AS_mais;
         memcpy(&s_eo_themotcon.mcmc4.servconfigmais.data.as.mais, &servcfg->data.mc.mc4plusmais_based.mais, sizeof(eOmn_serv_config_data_as_mais_t));    
-
-
-       // 1. prepare the can discovery for mais board 
-        memset(&s_eo_themotcon.sharedcan.discoverytarget, 0, sizeof(s_eo_themotcon.sharedcan.discoverytarget));
-        s_eo_themotcon.sharedcan.discoverytarget.info.type = eobrd_cantype_mais;
-        s_eo_themotcon.sharedcan.discoverytarget.info.protocol.major = servcfg->data.mc.mc4plusmais_based.mais.version.protocol.major; 
-        s_eo_themotcon.sharedcan.discoverytarget.info.protocol.minor = servcfg->data.mc.mc4plusmais_based.mais.version.protocol.minor;
-        s_eo_themotcon.sharedcan.discoverytarget.info.firmware.major = servcfg->data.mc.mc4plusmais_based.mais.version.firmware.major; 
-        s_eo_themotcon.sharedcan.discoverytarget.info.firmware.minor = servcfg->data.mc.mc4plusmais_based.mais.version.firmware.minor;  
-        s_eo_themotcon.sharedcan.discoverytarget.info.firmware.build = servcfg->data.mc.mc4plusmais_based.mais.version.firmware.build;         
-        s_eo_themotcon.sharedcan.ondiscoverystop.function = s_eo_motioncontrol_mc4plusmais_onstop_search4mais;
-        s_eo_themotcon.sharedcan.ondiscoverystop.parameter = (void*)servcfg;
+   
+        // at first i verify the mais. then, function s_eo_motioncontrol_onendofverify_mais() shall either issue a mais error or start verification of encoders (if mode is eo_motcon_mode_mc4plusmais)     
+        eo_mais_Verify(eo_mais_GetHandle(), &s_eo_themotcon.mcmc4.servconfigmais, s_eo_motioncontrol_onendofverify_mais, eobool_true);        
+        
+        
+//        // verify the mais first. then then the encoder-reader. the reason is that the encoder-reader uses mais data
+//        s_eo_themotcon.service.onverify = onverify;
+//        s_eo_themotcon.service.activateafterverify = activateafterverify;        
+//        eo_candiscovery2_Start(eo_candiscovery2_GetHandle(), &s_eo_themotcon.sharedcan.discoverytarget, &s_eo_themotcon.sharedcan.ondiscoverystop); 
   
- 
-        // for now verify the encoder reader. 
-        // we dont verify the pwm actuators. only way to do that is to add a hal_pwm_supported_is()
-        s_eo_themotcon.service.onverify = onverify;
-        s_eo_themotcon.service.activateafterverify = activateafterverify;
-        eo_encoderreader_Verify(eo_encoderreader_GetHandle(), &servcfg->data.mc.mc4plusmais_based.arrayofjomodescriptors, s_eo_motioncontrol_mc4plusmais_onendofverify_encoder, eobool_true);           
     }
 
     return(eores_OK);   
@@ -1709,13 +1708,27 @@ static eOresult_t s_eo_motioncontrol_onendofverify_encoder(EOaService* s, eObool
 
 static eOresult_t s_eo_motioncontrol_onendofverify_mais(EOaService* s, eObool_t operationisok)
 {
+    const eOmn_serv_configuration_t * servcfg = s_eo_themotcon.service.tmpcfg; 
+    // we can be either mc4 or mc4plusmais
+    
     if(eobool_true == operationisok)
     {
-        eo_candiscovery2_Start(eo_candiscovery2_GetHandle(), &s_eo_themotcon.sharedcan.discoverytarget, &s_eo_themotcon.sharedcan.ondiscoverystop);        
+        if(eo_motcon_mode_mc4 == servcfg->type)
+        {
+            eo_candiscovery2_Start(eo_candiscovery2_GetHandle(), &s_eo_themotcon.sharedcan.discoverytarget, &s_eo_themotcon.sharedcan.ondiscoverystop); 
+        }
+        else // mc4plusmais: verify encoders
+        {
+            // mais is already activated.... i start it
+            eo_mais_Start(eo_mais_GetHandle());
+            eo_encoderreader_Verify(eo_encoderreader_GetHandle(), &servcfg->data.mc.mc4plusmais_based.arrayofjomodescriptors, s_eo_motioncontrol_mc4plusmais_onendofverify_encoder_BIS, eobool_true);             
+        }
     } 
     else
     {
         // the mais fails. we dont even start the discovery of the mc4 boards. we just issue an error report and call onverify() w/ false argument
+        
+        eOerror_value_CFG_t errorvalue = (eo_motcon_mode_mc4 == servcfg->type) ? (eoerror_value_CFG_mc_mc4_failed_mais_verify) : (eoerror_value_CFG_mc_mc4plusmais_failed_candiscovery_of_mais);
         
         // prepare things        
         s_eo_themotcon.diagnostics.errorDescriptor.sourcedevice     = eo_errman_sourcedevice_localboard;
@@ -1895,6 +1908,104 @@ static eOresult_t s_eo_motioncontrol_mc4plusmais_onstop_search4mais(void *par, E
     }    
     
     return(eores_OK);   
+}
+
+
+static eOresult_t s_eo_motioncontrol_mc4plusmais_onendofverify_encoder_BIS(EOaService* s, eObool_t operationisok)
+{  
+
+    if((eobool_true == operationisok) && (eobool_true == s_eo_themotcon.service.activateafterverify))
+    {
+        const eOmn_serv_configuration_t * mcserv = s_eo_themotcon.service.tmpcfg;
+        eo_motioncontrol_Activate(&s_eo_themotcon, mcserv);
+    }
+    
+    
+    s_eo_themotcon.diagnostics.errorDescriptor.sourcedevice     = eo_errman_sourcedevice_localboard;
+    s_eo_themotcon.diagnostics.errorDescriptor.sourceaddress    = 0;
+    s_eo_themotcon.diagnostics.errorDescriptor.par16            = 0;
+    s_eo_themotcon.diagnostics.errorDescriptor.par64            = 0;    
+    EOaction_strg astrg = {0};
+    EOaction *act = (EOaction*)&astrg;
+    eo_action_SetCallback(act, s_eo_motioncontrol_send_periodic_error_report, NULL, eov_callbackman_GetTask(eov_callbackman_GetHandle()));    
+    
+    if(eobool_true == operationisok)
+    {        
+        s_eo_themotcon.diagnostics.errorType = eo_errortype_debug;
+        s_eo_themotcon.diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_mc_mc4plusmais_ok);
+        eo_errman_Error(eo_errman_GetHandle(), s_eo_themotcon.diagnostics.errorType, NULL, s_eobj_ownname, &s_eo_themotcon.diagnostics.errorDescriptor);
+        
+        if((0 != s_eo_themotcon.diagnostics.repetitionOKcase) && (0 != s_eo_themotcon.diagnostics.reportPeriod))
+        {
+            s_eo_themotcon.diagnostics.errorCallbackCount = s_eo_themotcon.diagnostics.repetitionOKcase;        
+            eo_timer_Start(s_eo_themotcon.diagnostics.reportTimer, eok_abstimeNOW, s_eo_themotcon.diagnostics.reportPeriod, eo_tmrmode_FOREVER, act);
+        }
+    } 
+
+    if(eobool_false == operationisok)
+    {
+        s_eo_themotcon.diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_mc_mc4plusmais_failed_encoders_verify);
+        s_eo_themotcon.diagnostics.errorType = eo_errortype_error;                
+        eo_errman_Error(eo_errman_GetHandle(), s_eo_themotcon.diagnostics.errorType, NULL, s_eobj_ownname, &s_eo_themotcon.diagnostics.errorDescriptor);
+        
+        if(0 != s_eo_themotcon.diagnostics.reportPeriod)
+        {
+            s_eo_themotcon.diagnostics.errorCallbackCount = EOK_int08dummy;
+            eo_timer_Start(s_eo_themotcon.diagnostics.reportTimer, eok_abstimeNOW, s_eo_themotcon.diagnostics.reportPeriod, eo_tmrmode_FOREVER, act);
+        }
+    }     
+           
+    if(NULL != s_eo_themotcon.service.onverify)
+    {
+        s_eo_themotcon.service.onverify(&s_eo_themotcon, eoerror_value_CFG_mc_mc4plusmais_failed_encoders_verify); 
+    }    
+    
+    return(eores_OK);        
+}
+
+
+
+static eOresult_t s_eo_motioncontrol_mc4plusmais_onstop_search4mais_BIS_now_verify_encoder(void *par, EOtheCANdiscovery2* p, eObool_t searchisok)
+{    
+    if(eobool_true == searchisok)
+    {
+        const eOmn_serv_configuration_t * mcserv = (const eOmn_serv_configuration_t *)par;        
+        eo_encoderreader_Verify(eo_encoderreader_GetHandle(), &mcserv->data.mc.mc4plusmais_based.arrayofjomodescriptors, s_eo_motioncontrol_mc4plusmais_onendofverify_encoder_BIS, eobool_true);                   
+    }    
+    else
+    {
+        // the discovery of the mais board. we just issue an error report and call onverify() w/ false argument
+        
+        // prepare things
+        s_eo_themotcon.diagnostics.errorDescriptor.sourcedevice     = eo_errman_sourcedevice_localboard;
+        s_eo_themotcon.diagnostics.errorDescriptor.sourceaddress    = 0;
+        s_eo_themotcon.diagnostics.errorDescriptor.par16            = 0;
+        s_eo_themotcon.diagnostics.errorDescriptor.par64            = 0;    
+        EOaction_strg astrg = {0};
+        EOaction *act = (EOaction*)&astrg;
+        eo_action_SetCallback(act, s_eo_motioncontrol_send_periodic_error_report, NULL, eov_callbackman_GetTask(eov_callbackman_GetHandle()));    
+        
+
+        // fill error description. and transmit it
+        s_eo_themotcon.diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_mc_mc4plusmais_failed_candiscovery_of_mais);
+        s_eo_themotcon.diagnostics.errorType = eo_errortype_error;                
+        eo_errman_Error(eo_errman_GetHandle(), s_eo_themotcon.diagnostics.errorType, NULL, s_eobj_ownname, &s_eo_themotcon.diagnostics.errorDescriptor);
+        
+        if(0 != s_eo_themotcon.diagnostics.reportPeriod)
+        {
+            s_eo_themotcon.diagnostics.errorCallbackCount = EOK_int08dummy;
+            eo_timer_Start(s_eo_themotcon.diagnostics.reportTimer, eok_abstimeNOW, s_eo_themotcon.diagnostics.reportPeriod, eo_tmrmode_FOREVER, act);
+        }
+  
+        // call onverify
+        if(NULL != s_eo_themotcon.service.onverify)
+        {
+            s_eo_themotcon.service.onverify(&s_eo_themotcon, eobool_false); 
+        }            
+                
+    }  
+    
+    return(eores_OK);    
 }
 
 // want to send a canframe with pwm onto can bus. 
