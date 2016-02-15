@@ -45,6 +45,8 @@
 
 #include "eEsharedServices.h"
 
+#include "EOtheServices.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -350,7 +352,10 @@ extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropd
         {
             // we always allow entering the control loop. to be in control loop does nothing unless the service is activated.
             
-            res = eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STrun);
+            if(eobool_true == eo_services_CanGoToRUN(eo_services_GetHandle()))
+            {
+                res = eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STrun);
+            }
 
         } break;
         
