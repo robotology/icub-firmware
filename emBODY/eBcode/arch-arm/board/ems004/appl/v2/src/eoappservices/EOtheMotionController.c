@@ -337,6 +337,9 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
     }
     else if(eo_motcon_mode_mc4plus == servcfg->type)
     {
+        // marco.accame: it is required to read adc values if the encoder is absanalog
+        // s_eo_motioncontrol_mc4plusbased_hal_init_motors_adc_feedbacks();
+        
         // for now verify the encoder reader. 
         // we dont verify the pwm actuators. only way to do that is to add a hal_pwm_supported_is()
         s_eo_themotcon.service.onverify = onverify;
@@ -345,6 +348,9 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
     }
     else if(eo_motcon_mode_mc4plusmais == servcfg->type)
     {
+        // marco.accame: it is required to read adc values if the encoder is absanalog. 
+        // s_eo_motioncontrol_mc4plusbased_hal_init_motors_adc_feedbacks();
+        
         
         s_eo_themotcon.service.onverify = onverify;
         s_eo_themotcon.service.activateafterverify = activateafterverify;
@@ -2166,6 +2172,14 @@ static eObool_t s_eo_motioncontrol_mc4based_variableisproxied(eOnvID32_t id)
 
 static void s_eo_motioncontrol_mc4plusbased_hal_init_motors_adc_feedbacks(void)
 {   // low level init for motors and adc in mc4plus
+    static eObool_t initted = eobool_false;
+    
+    if(eobool_true == initted)
+    {
+        return;
+    }
+    
+    initted = eobool_true;
 
     // currently the motors are initialized all together and without config
     hal_motor_init(hal_motorALL, NULL);
