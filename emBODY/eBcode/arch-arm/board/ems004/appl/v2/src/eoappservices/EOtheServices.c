@@ -102,7 +102,8 @@ static EOtheServices s_eo_theservices =
     .initted    = eobool_false,
     .nvset      = NULL,
     .timer      = NULL,
-    .board      = eo_prot_BRDdummy
+    .board      = eo_prot_BRDdummy,
+    .cango2run  = eobool_false
 };
 
 //static const char s_eobj_ownname[] = "EOtheServices";
@@ -255,6 +256,15 @@ extern eOresult_t eo_services_StartLegacyMode(EOtheServices *p, eOprotBRD_t brd)
 }
 
 
+extern eObool_t eo_services_CanGoToRUN(EOtheServices *p)
+{    
+    if(NULL == p)
+    {
+        return(eobool_false);
+    }    
+        
+    return(s_eo_theservices.cango2run);    
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
@@ -304,7 +314,11 @@ static void s_activate_services_now(void *p)
     else if(NULL != (servcfg = eoboardconfig_code2inertials_serv_configuration(s_eo_theservices.board)))
     {
         eo_inertials_Verify(eo_inertials_GetHandle(), servcfg, s_after_verify_inertials, eobool_true); 
-    }       
+    } 
+    else
+    {   // nothing to verify .. set the value of cango2run 
+        s_eo_theservices.cango2run = eobool_true;
+    }    
 }
 
 
@@ -330,9 +344,12 @@ static eOresult_t s_after_verify_motion(EOaService* p, eObool_t operationisok)
     else if(NULL != (servcfg = eoboardconfig_code2inertials_serv_configuration(s_eo_theservices.board)))
     {
         eo_inertials_Verify(eo_inertials_GetHandle(), servcfg, s_after_verify_inertials, eobool_true); 
-    }           
+    }
+    else
+    {   // nothing else to verify .. set the value of cango2run 
+        s_eo_theservices.cango2run = operationisok;
+    }
     
-
     return(eores_OK);
 }
 
@@ -355,7 +372,10 @@ static eOresult_t s_after_verify_strain(EOaService* p, eObool_t operationisok)
     {
         eo_inertials_Verify(eo_inertials_GetHandle(), servcfg, s_after_verify_inertials, eobool_true); 
     }              
-    
+    else
+    {   // nothing else to verify .. set the value of cango2run 
+        s_eo_theservices.cango2run = operationisok;
+    }    
    
     return(eores_OK);
 }
@@ -374,7 +394,10 @@ static eOresult_t s_after_verify_skin(EOaService* p, eObool_t operationisok)
     {
         eo_inertials_Verify(eo_inertials_GetHandle(), servcfg, s_after_verify_inertials, eobool_true); 
     }              
-        
+    else
+    {   // nothing else to verify .. set the value of cango2run 
+        s_eo_theservices.cango2run = operationisok;
+    }        
  
     return(eores_OK);
 }
@@ -385,7 +408,10 @@ static eOresult_t s_after_verify_inertials(EOaService* p, eObool_t operationisok
     {
         return(eores_OK);
     }
-    
+    else
+    {   // nothing else to verify .. set the value of cango2run 
+        s_eo_theservices.cango2run = operationisok;
+    }    
  
    
     return(eores_OK);

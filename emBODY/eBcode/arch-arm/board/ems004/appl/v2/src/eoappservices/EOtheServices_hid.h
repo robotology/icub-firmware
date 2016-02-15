@@ -84,7 +84,8 @@ struct EOtheServices_hid
     eObool_t        initted;
     EOnvSet*        nvset;      
     EOtimer*        timer;
-    eOprotBRD_t     board;    
+    eOprotBRD_t     board;   
+    eObool_t        cango2run;    
 }; 
 
 

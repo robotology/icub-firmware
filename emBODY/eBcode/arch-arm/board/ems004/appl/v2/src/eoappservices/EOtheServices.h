@@ -79,6 +79,8 @@ extern EOtheServices* eo_services_GetHandle(void);
 
 extern eOresult_t eo_services_StartLegacyMode(EOtheServices *p, eOprotBRD_t brd);
 
+extern eObool_t eo_services_CanGoToRUN(EOtheServices *p);
+
 
 
 
