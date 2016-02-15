@@ -647,6 +647,11 @@ static void s_eo_mais_send_periodic_error_report(void *p)
 {
     eo_errman_Error(eo_errman_GetHandle(), s_eo_themais.diagnostics.errorType, NULL, s_eobj_ownname, &s_eo_themais.diagnostics.errorDescriptor);
     
+    if(eoerror_value_CFG_mais_failed_candiscovery == eoerror_code2value(s_eo_themais.diagnostics.errorDescriptor.code))
+    {   // if i dont find the mais, i keep on sending the discovery results up. it is a temporary diagnostics tricks until we use the verification of services at bootstrap
+        eo_candiscovery2_SendLatestSearchResults(eo_candiscovery2_GetHandle());
+    }
+    
     if(EOK_int08dummy != s_eo_themais.diagnostics.errorCallbackCount)
     {
         s_eo_themais.diagnostics.errorCallbackCount--;

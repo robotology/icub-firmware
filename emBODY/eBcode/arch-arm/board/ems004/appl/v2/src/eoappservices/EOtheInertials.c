@@ -1336,6 +1336,11 @@ static eOresult_t s_eo_inertials_onstop_search4mtbs(void *par, EOtheCANdiscovery
 static void s_eo_inertials_send_periodic_error_report(void *p)
 {
     eo_errman_Error(eo_errman_GetHandle(), s_eo_theinertials.diagnostics.errorType, NULL, s_eobj_ownname, &s_eo_theinertials.diagnostics.errorDescriptor);
+
+    if(eoerror_value_CFG_inertials_failed_candiscovery == eoerror_code2value(s_eo_theinertials.diagnostics.errorDescriptor.code))
+    {   // if i dont find the mtbs, i keep on sending the discovery results up. it is a temporary diagnostics tricks until we use the verification of services at bootstrap
+        eo_candiscovery2_SendLatestSearchResults(eo_candiscovery2_GetHandle());
+    }
     
     if(EOK_int08dummy != s_eo_theinertials.diagnostics.errorCallbackCount)
     {

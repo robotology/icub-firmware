@@ -1555,6 +1555,13 @@ static void s_eo_motioncontrol_send_periodic_error_report(void *p)
     s_eo_themotcon.diagnostics.errorDescriptor.par64 ++;
     eo_errman_Error(eo_errman_GetHandle(), s_eo_themotcon.diagnostics.errorType, NULL, s_eobj_ownname, &s_eo_themotcon.diagnostics.errorDescriptor);
     
+    if(eoerror_value_CFG_mc_foc_failed_candiscovery_of_foc == eoerror_code2value(s_eo_themotcon.diagnostics.errorDescriptor.code) ||
+       eoerror_value_CFG_mc_mc4_failed_candiscovery_of_mc4 == eoerror_code2value(s_eo_themotcon.diagnostics.errorDescriptor.code)
+      )
+    {   // if i dont find the focs / mc4s, i keep on sending the discovery results up. it is a temporary diagnostics tricks until we use the verification of services at bootstrap
+        eo_candiscovery2_SendLatestSearchResults(eo_candiscovery2_GetHandle());
+    }
+    
     if(EOK_int08dummy != s_eo_themotcon.diagnostics.errorCallbackCount)
     {
         s_eo_themotcon.diagnostics.errorCallbackCount--;
