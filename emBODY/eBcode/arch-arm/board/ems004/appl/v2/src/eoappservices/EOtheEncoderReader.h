@@ -79,6 +79,8 @@ extern eOresult_t eo_encoderreader_Activate(EOtheEncoderReader *p, const eOmn_se
 // it deactivates service.
 extern eOresult_t eo_encoderreader_Deactivate(EOtheEncoderReader *p);
 
+extern eOresult_t eo_encoderreader_SendReport(EOtheEncoderReader *p);
+
 extern eOresult_t eo_encoderreader_StartReading(EOtheEncoderReader *p);
 
 extern eObool_t eo_encoderreader_IsReadingAvailable(EOtheEncoderReader *p);

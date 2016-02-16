@@ -152,6 +152,9 @@ extern EOtheEncoderReader* eo_encoderreader_Initialise(void)
     s_eo_theencoderreader.reader = eo_appEncReader_Initialise(); 
     
     s_eo_theencoderreader.diagnostics.reportTimer = eo_timer_New();
+    s_eo_theencoderreader.diagnostics.errorType = eo_errortype_error;
+    s_eo_theencoderreader.diagnostics.errorDescriptor.sourceaddress = eo_errman_sourcedevice_localboard;
+    s_eo_theencoderreader.diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_encoders_not_verified_yet);      
         
     s_eo_theencoderreader.service.initted = eobool_true;
     
@@ -263,6 +266,19 @@ extern eOresult_t eo_encoderreader_Activate(EOtheEncoderReader *p, const eOmn_se
     s_eo_theencoderreader.service.active = eobool_true;        
     
     return(eores_OK);   
+}
+
+
+extern eOresult_t eo_encoderreader_SendReport(EOtheEncoderReader *p)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+
+    eo_errman_Error(eo_errman_GetHandle(), p->diagnostics.errorType, NULL, s_eobj_ownname, &p->diagnostics.errorDescriptor);
+        
+    return(eores_OK);      
 }
 
 

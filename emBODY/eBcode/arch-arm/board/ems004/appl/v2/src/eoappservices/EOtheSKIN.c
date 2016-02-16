@@ -162,7 +162,11 @@ extern EOtheSKIN* eo_skin_Initialise(void)
     }
     
     s_eo_theskin.diagnostics.reportTimer = eo_timer_New();
-        
+    s_eo_theskin.diagnostics.errorType = eo_errortype_error;
+    s_eo_theskin.diagnostics.errorDescriptor.sourceaddress = eo_errman_sourcedevice_localboard;
+    s_eo_theskin.diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_skin_not_verified_yet);  
+
+    
     s_eo_theskin.service.initted = eobool_true;
     s_eo_theskin.service.active = eobool_false;
     s_eo_theskin.service.running = eobool_false;
@@ -719,6 +723,36 @@ extern eOresult_t eo_skin_AcceptCANframe(EOtheSKIN *p, eOcanframe_t *frame, eOca
 
     return(eores_OK);
 }
+
+
+extern eOresult_t eo_skin_SendReport(EOtheSKIN *p)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+
+    eo_errman_Error(eo_errman_GetHandle(), p->diagnostics.errorType, NULL, s_eobj_ownname, &p->diagnostics.errorDescriptor);
+    
+    eOerror_value_t errorvalue = eoerror_code2value(p->diagnostics.errorDescriptor.code);
+    
+    switch(errorvalue)
+    {
+        case eoerror_value_CFG_skin_failed_candiscovery:
+        {
+            eo_candiscovery2_SendLatestSearchResults(eo_candiscovery2_GetHandle());            
+        } break;
+        
+        default:
+        {
+            // dont send any additional info
+        } break;
+    }       
+
+    
+    return(eores_OK);      
+}
+
 
 extern eOresult_t eo_skin_Start(EOtheSKIN *p)
 {

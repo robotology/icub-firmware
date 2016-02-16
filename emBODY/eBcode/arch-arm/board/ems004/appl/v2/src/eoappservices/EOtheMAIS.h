@@ -73,6 +73,8 @@ extern eOresult_t eo_mais_Activate(EOtheMAIS *p, const eOmn_serv_configuration_t
 extern eOresult_t eo_mais_Deactivate(EOtheMAIS *p);
 
 
+extern eOresult_t eo_mais_SendReport(EOtheMAIS *p);
+
 // Start() take
 extern eOresult_t eo_mais_Start(EOtheMAIS *p);
 

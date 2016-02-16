@@ -71,6 +71,8 @@ extern eOresult_t eo_skin_Activate(EOtheSKIN *p, const eOmn_serv_configuration_t
 
 extern eOresult_t eo_skin_Deactivate(EOtheSKIN *p);
 
+extern eOresult_t eo_skin_SendReport(EOtheSKIN *p);
+
 extern eOresult_t eo_skin_Start(EOtheSKIN *p);
 
 // use regularROPSjustTransmitted = eom_emsrunner_CycleHasJustTransmittedRegulars(eom_emsrunner_GetHandle())

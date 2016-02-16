@@ -45,6 +45,8 @@
 
 #include "EOtheBoardConfig.h"
 
+#include "EoError.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -99,14 +101,15 @@ static eOresult_t s_after_verify_inertials(EOaService* p, eObool_t operationisok
     
 static EOtheServices s_eo_theservices = 
 {
-    .initted    = eobool_false,
-    .nvset      = NULL,
-    .timer      = NULL,
-    .board      = eo_prot_BRDdummy,
-    .cango2run  = eobool_false
+    .initted            = eobool_false,
+    .nvset              = NULL,
+    .timer              = NULL,
+    .board              = eo_prot_BRDdummy,
+    .allactivated       = eobool_false,
+    .failedservice      = eo_service_none,
 };
 
-//static const char s_eobj_ownname[] = "EOtheServices";
+static const char s_eobj_ownname[] = "EOtheServices";
 
 
 static const eOprot_EPcfg_t s_eo_theservices_theEPcfgsOthersMAX[] =
@@ -153,6 +156,9 @@ extern EOtheServices* eo_services_Initialise(void)
     s_eo_theservices.initted = eobool_true;
     s_eo_theservices.nvset = eom_emstransceiver_GetNVset(eom_emstransceiver_GetHandle()); 
     s_eo_theservices.timer = eo_timer_New();
+    
+    s_eo_theservices.allactivated = eobool_false;
+    s_eo_theservices.failedservice = eo_service_none;
     
     return(&s_eo_theservices);
 }
@@ -256,14 +262,75 @@ extern eOresult_t eo_services_StartLegacyMode(EOtheServices *p, eOprotBRD_t brd)
 }
 
 
-extern eObool_t eo_services_CanGoToRUN(EOtheServices *p)
+extern eObool_t eo_services_AllActivated(EOtheServices *p)
 {    
     if(NULL == p)
     {
         return(eobool_false);
     }    
         
-    return(s_eo_theservices.cango2run);    
+    return(s_eo_theservices.allactivated);    
+}
+
+
+extern eOresult_t eo_services_SendFailureReport(EOtheServices *p)
+{    
+    if((NULL == p))
+    {
+        return(eores_NOK_nullpointer);
+    }
+
+    if(eobool_true == p->allactivated)
+    {
+        // so far dont send any OK report
+        return(eores_OK);
+    }
+        
+    switch(s_eo_theservices.failedservice)
+    {
+        case eo_service_mc:
+        {
+            eo_motioncontrol_SendReport(eo_motioncontrol_GetHandle());
+        } break;
+
+        case eo_service_strain:
+        {
+            eo_strain_SendReport(eo_strain_GetHandle());
+        } break;
+        
+        case eo_service_mais:
+        {
+            eo_mais_SendReport(eo_mais_GetHandle());            
+        } break; 
+
+        case eo_service_skin:
+        {
+            eo_skin_SendReport(eo_skin_GetHandle());
+        } break;   
+
+
+        case eo_service_inertial:
+        {
+            eo_inertials_SendReport(eo_inertials_GetHandle());   
+        } break;        
+        
+        case eo_service_none:
+        {
+            // send message that the services are not verified yet.           
+            eOerrmanDescriptor_t errorDescriptor = {0};
+            errorDescriptor.sourceaddress = eo_errman_sourcedevice_localboard;
+            errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_services_not_verified_yet);
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errorDescriptor);            
+        } break;
+        
+        default:
+        {
+            
+        } break;
+        
+    }
+        
+    return(eores_OK);    
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -316,8 +383,8 @@ static void s_activate_services_now(void *p)
         eo_inertials_Verify(eo_inertials_GetHandle(), servcfg, s_after_verify_inertials, eobool_true); 
     } 
     else
-    {   // nothing to verify .. set the value of cango2run 
-        s_eo_theservices.cango2run = eobool_true;
+    {   // nothing else to verify .. actually none is activated but in here tehre was nothing to activate
+        s_eo_theservices.allactivated = eobool_true;
     }    
 }
 
@@ -328,6 +395,7 @@ static eOresult_t s_after_verify_motion(EOaService* p, eObool_t operationisok)
 {
     if(eobool_false == operationisok)
     {
+        s_eo_theservices.failedservice = eo_service_mc;
         return(eores_OK);
     }
     
@@ -346,8 +414,8 @@ static eOresult_t s_after_verify_motion(EOaService* p, eObool_t operationisok)
         eo_inertials_Verify(eo_inertials_GetHandle(), servcfg, s_after_verify_inertials, eobool_true); 
     }
     else
-    {   // nothing else to verify .. set the value of cango2run 
-        s_eo_theservices.cango2run = operationisok;
+    {   // nothing else to verify ..
+        s_eo_theservices.allactivated = eobool_true;
     }
     
     return(eores_OK);
@@ -358,6 +426,7 @@ static eOresult_t s_after_verify_strain(EOaService* p, eObool_t operationisok)
 {
     if(eobool_false == operationisok)
     {
+        s_eo_theservices.failedservice = eo_service_strain;
         return(eores_OK);
     }
     
@@ -373,8 +442,8 @@ static eOresult_t s_after_verify_strain(EOaService* p, eObool_t operationisok)
         eo_inertials_Verify(eo_inertials_GetHandle(), servcfg, s_after_verify_inertials, eobool_true); 
     }              
     else
-    {   // nothing else to verify .. set the value of cango2run 
-        s_eo_theservices.cango2run = operationisok;
+    {   // nothing else to verify ..
+        s_eo_theservices.allactivated = eobool_true;
     }    
    
     return(eores_OK);
@@ -385,6 +454,7 @@ static eOresult_t s_after_verify_skin(EOaService* p, eObool_t operationisok)
 {
     if(eobool_false == operationisok)
     {
+        s_eo_theservices.failedservice = eo_service_skin;
         return(eores_OK);
     }
     
@@ -395,8 +465,8 @@ static eOresult_t s_after_verify_skin(EOaService* p, eObool_t operationisok)
         eo_inertials_Verify(eo_inertials_GetHandle(), servcfg, s_after_verify_inertials, eobool_true); 
     }              
     else
-    {   // nothing else to verify .. set the value of cango2run 
-        s_eo_theservices.cango2run = operationisok;
+    {   // nothing else to verify .. 
+        s_eo_theservices.allactivated = eobool_true;
     }        
  
     return(eores_OK);
@@ -406,11 +476,12 @@ static eOresult_t s_after_verify_inertials(EOaService* p, eObool_t operationisok
 {
     if(eobool_false == operationisok)
     {
+        s_eo_theservices.failedservice = eo_service_inertial;
         return(eores_OK);
     }
     else
-    {   // nothing else to verify .. set the value of cango2run 
-        s_eo_theservices.cango2run = operationisok;
+    {   // nothing else to verify .. 
+        s_eo_theservices.allactivated = eobool_true;
     }    
  
    

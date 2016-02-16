@@ -81,7 +81,7 @@ extern eOresult_t eo_inertials_Tick(EOtheInertials *p, eObool_t regularROPSjustT
 
 extern eOresult_t eo_inertials_Stop(EOtheInertials *p);
 
-
+extern eOresult_t eo_inertials_SendReport(EOtheInertials *p);
 
 // and now others
 

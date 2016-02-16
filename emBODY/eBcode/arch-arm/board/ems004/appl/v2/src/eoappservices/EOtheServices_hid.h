@@ -78,14 +78,24 @@ typedef struct
     uint8_t                                 repetitionOKcase;
 } eOservice_diagnostics_t;
 
+typedef enum
+{
+    eo_service_mc           = 0,
+    eo_service_strain       = 1,
+    eo_service_mais         = 2,
+    eo_service_skin         = 3,
+    eo_service_inertial     = 4,
+    eo_service_none         = 5
+} eOservice_type_t;
 
 struct EOtheServices_hid
 {
-    eObool_t        initted;
-    EOnvSet*        nvset;      
-    EOtimer*        timer;
-    eOprotBRD_t     board;   
-    eObool_t        cango2run;    
+    eObool_t            initted;
+    EOnvSet*            nvset;      
+    EOtimer*            timer;
+    eOprotBRD_t         board;   
+    eObool_t            allactivated;
+    eOservice_type_t    failedservice;    
 }; 
 
 

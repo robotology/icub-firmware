@@ -75,6 +75,9 @@ extern eOresult_t eo_strain_Activate(EOtheSTRAIN *p, const eOmn_serv_configurati
 extern eOresult_t eo_strain_Deactivate(EOtheSTRAIN *p);
 
 
+extern eOresult_t eo_strain_SendReport(EOtheSTRAIN *p);
+
+
 extern eOresult_t eo_strain_Start(EOtheSTRAIN *p);
 
 extern eOresult_t eo_strain_Tick(EOtheSTRAIN *p);

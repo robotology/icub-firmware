@@ -153,6 +153,9 @@ extern EOtheSTRAIN* eo_strain_Initialise(void)
     s_eo_thestrain.overrideonfullscaleready = NULL;
     
     s_eo_thestrain.diagnostics.reportTimer = eo_timer_New();
+    s_eo_thestrain.diagnostics.errorType = eo_errortype_error;
+    s_eo_thestrain.diagnostics.errorDescriptor.sourceaddress = eo_errman_sourcedevice_localboard;
+    s_eo_thestrain.diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_strain_not_verified_yet);      
         
     s_eo_thestrain.service.initted = eobool_true;
     s_eo_thestrain.service.active = eobool_false;
@@ -310,6 +313,35 @@ extern eOresult_t eo_strain_Activate(EOtheSTRAIN *p, const eOmn_serv_configurati
 
     
     return(eores_OK);   
+}
+
+
+extern eOresult_t eo_strain_SendReport(EOtheSTRAIN *p)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+
+    eo_errman_Error(eo_errman_GetHandle(), p->diagnostics.errorType, NULL, s_eobj_ownname, &p->diagnostics.errorDescriptor);
+            
+    eOerror_value_t errorvalue = eoerror_code2value(p->diagnostics.errorDescriptor.code);
+    
+    switch(errorvalue)
+    {
+        case eoerror_value_CFG_strain_failed_candiscovery:
+        {
+            eo_candiscovery2_SendLatestSearchResults(eo_candiscovery2_GetHandle());            
+        } break;
+        
+        default:
+        {
+            // dont send any additional info
+        } break;
+    }      
+    
+    
+    return(eores_OK);      
 }
 
 

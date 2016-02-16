@@ -287,7 +287,10 @@ extern EOtheInertials* eo_inertials_Initialise(void)
     s_eo_theinertials.fifoofinertialdata = eo_vector_New(sizeof(eOas_inertial_data_t), 32, NULL, 0, NULL, NULL);
     
     s_eo_theinertials.diagnostics.reportTimer = eo_timer_New();
-        
+    s_eo_theinertials.diagnostics.errorType = eo_errortype_error;
+    s_eo_theinertials.diagnostics.errorDescriptor.sourceaddress = eo_errman_sourcedevice_localboard;
+    s_eo_theinertials.diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_inertials_not_verified_yet);  
+    
     s_eo_theinertials.service.initted = eobool_true;
     s_eo_theinertials.service.active = eobool_false;
     s_eo_theinertials.service.running = eobool_false;
@@ -517,6 +520,35 @@ extern eOresult_t eo_inertials_Activate(EOtheInertials *p, const eOmn_serv_confi
 
     
     return(eores_OK);   
+}
+
+
+
+extern eOresult_t eo_inertials_SendReport(EOtheInertials *p)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+
+    eo_errman_Error(eo_errman_GetHandle(), p->diagnostics.errorType, NULL, s_eobj_ownname, &p->diagnostics.errorDescriptor);
+    
+    eOerror_value_t errorvalue = eoerror_code2value(p->diagnostics.errorDescriptor.code);
+    
+    switch(errorvalue)
+    {
+        case eoerror_value_CFG_inertials_failed_candiscovery:
+        {
+            eo_candiscovery2_SendLatestSearchResults(eo_candiscovery2_GetHandle());            
+        } break;
+        
+        default:
+        {
+            // dont send any additional info
+        } break;
+    }    
+    
+    return(eores_OK);      
 }
 
 

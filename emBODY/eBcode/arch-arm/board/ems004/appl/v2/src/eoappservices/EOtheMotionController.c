@@ -217,7 +217,10 @@ extern EOtheMotionController* eo_motioncontrol_Initialise(void)
             
     s_eo_themotcon.mcmc4.themais = eo_mais_Initialise();
            
-    s_eo_themotcon.diagnostics.reportTimer = eo_timer_New();
+    s_eo_themotcon.diagnostics.reportTimer = eo_timer_New();   
+    s_eo_themotcon.diagnostics.errorType = eo_errortype_error;
+    s_eo_themotcon.diagnostics.errorDescriptor.sourceaddress = eo_errman_sourcedevice_localboard;
+    s_eo_themotcon.diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_mc_not_verified_yet);    
 
     s_eo_themotcon.service.initted = eobool_true;
     
@@ -743,6 +746,49 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
     return(eores_OK);   
 }
 
+
+
+extern eOresult_t eo_motioncontrol_SendReport(EOtheMotionController *p)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+
+    eo_errman_Error(eo_errman_GetHandle(), p->diagnostics.errorType, NULL, s_eobj_ownname, &p->diagnostics.errorDescriptor);
+    
+    eOerror_value_t errorvalue = eoerror_code2value(p->diagnostics.errorDescriptor.code);
+    
+    switch(errorvalue)
+    {
+        case eoerror_value_CFG_mc_foc_failed_candiscovery_of_foc:
+        case eoerror_value_CFG_mc_mc4_failed_candiscovery_of_mc4:
+        {
+            eo_candiscovery2_SendLatestSearchResults(eo_candiscovery2_GetHandle());            
+        } break;
+        
+        case eoerror_value_CFG_mc_mc4_failed_mais_verify:
+        case eoerror_value_CFG_mc_mc4plusmais_failed_candiscovery_of_mais:
+        {
+            eo_mais_SendReport(eo_mais_GetHandle());
+        } break;
+        
+        case eoerror_value_CFG_mc_foc_failed_encoders_verify:
+        case eoerror_value_CFG_mc_mc4plus_failed_encoders_verify:
+        case eoerror_value_CFG_mc_mc4plusmais_failed_encoders_verify:
+        {
+            eo_encoderreader_SendReport(eo_encoderreader_GetHandle());
+        } break;
+        
+        default:
+        {
+            // dont send any additional info
+        } break;
+    }
+    
+    
+    return(eores_OK);      
+}
 
 
 extern eOresult_t eo_motioncontrol_Start(EOtheMotionController *p)
@@ -1753,7 +1799,7 @@ static eOresult_t s_eo_motioncontrol_onendofverify_mais(EOaService* s, eObool_t 
         eo_action_SetCallback(act, s_eo_motioncontrol_send_periodic_error_report, NULL, eov_callbackman_GetTask(eov_callbackman_GetHandle()));    
                
         // fill error description. and transmit it
-        s_eo_themotcon.diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_mc_mc4_failed_mais_verify);
+        s_eo_themotcon.diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, errorvalue);
         s_eo_themotcon.diagnostics.errorType = eo_errortype_error;                
         eo_errman_Error(eo_errman_GetHandle(), s_eo_themotcon.diagnostics.errorType, NULL, s_eobj_ownname, &s_eo_themotcon.diagnostics.errorDescriptor);
         

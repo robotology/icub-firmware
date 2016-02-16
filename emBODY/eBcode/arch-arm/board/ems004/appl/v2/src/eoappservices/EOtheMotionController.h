@@ -88,6 +88,7 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
 
 extern eOresult_t eo_motioncontrol_Deactivate(EOtheMotionController *p);
 
+extern eOresult_t eo_motioncontrol_SendReport(EOtheMotionController *p);
 
 // to be called once before to be ticked
 extern eOresult_t eo_motioncontrol_Start(EOtheMotionController *p);

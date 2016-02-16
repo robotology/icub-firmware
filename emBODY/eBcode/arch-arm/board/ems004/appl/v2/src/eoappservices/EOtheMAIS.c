@@ -149,6 +149,9 @@ extern EOtheMAIS* eo_mais_Initialise(void)
     s_eo_themais.mais = NULL;
     
     s_eo_themais.diagnostics.reportTimer = eo_timer_New();
+    s_eo_themais.diagnostics.errorType = eo_errortype_error;
+    s_eo_themais.diagnostics.errorDescriptor.sourceaddress = eo_errman_sourcedevice_localboard;
+    s_eo_themais.diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_mais_not_verified_yet);  
         
     s_eo_themais.service.initted = eobool_true;    
        
@@ -309,6 +312,33 @@ extern eOresult_t eo_mais_Activate(EOtheMAIS *p, const eOmn_serv_configuration_t
     return(eores_OK);   
 }
 
+
+extern eOresult_t eo_mais_SendReport(EOtheMAIS *p)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+
+    eo_errman_Error(eo_errman_GetHandle(), p->diagnostics.errorType, NULL, s_eobj_ownname, &p->diagnostics.errorDescriptor);
+    
+    eOerror_value_t errorvalue = eoerror_code2value(p->diagnostics.errorDescriptor.code);
+    
+    switch(errorvalue)
+    {
+        case eoerror_value_CFG_mais_failed_candiscovery:
+        {
+            eo_candiscovery2_SendLatestSearchResults(eo_candiscovery2_GetHandle());            
+        } break;
+        
+        default:
+        {
+            // dont send any additional info
+        } break;
+    }       
+    
+    return(eores_OK);      
+}
 
 
 extern eOresult_t eo_mais_Start(EOtheMAIS *p)
