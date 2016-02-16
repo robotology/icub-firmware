@@ -142,14 +142,15 @@ static const char s_eobj_ownname[] = "EOMtheEMSappl";
  
 static EOMtheEMSappl s_emsappl_singleton = 
 {
-    EO_INIT(.sm)                NULL,
-    EO_INIT(.cfg) 
+    .sm             = NULL,
+    .cfg            =
     { 
-        EO_INIT(.emsappinfo)        NULL,
-        EO_INIT(.hostipv4addr)      EO_COMMON_IPV4ADDR(10, 0, 0, 254), 
+        .emsappinfo     = NULL,
+        .hostipv4addr   = EO_COMMON_IPV4ADDR(10, 0, 0, 254) 
     },
-    EO_INIT(.initted)           0,
-    EO_INIT(.blockingsemaphore) NULL
+    .initted            = 0,
+    .blockingsemaphore  = NULL,
+    .onerrormutex       = NULL    
 };
 
 
@@ -669,6 +670,7 @@ static void s_eom_emsppl_theemsrunner_init(void)
 static void s_eom_emsappl_errormamager_customise(void)
 {
     s_emsappl_singleton.blockingsemaphore = osal_semaphore_new(2, 0);
+    s_emsappl_singleton.onerrormutex = osal_mutex_new();
     eo_errman_SetOnErrorHandler(eo_errman_GetHandle(), s_eom_emsappl_OnError);    
 }
 
@@ -680,7 +682,8 @@ EO_static_inline eOsmStatesEMSappl_t s_eom_emsappl_GetCurrentState(EOMtheEMSappl
 
 static void s_eom_emsappl_OnError(eOerrmanErrorType_t errtype, const char *info, eOerrmanCaller_t *caller, const eOerrmanDescriptor_t *des)
 {
-  
+    // i want to protect this function vs concurrent access. for instance it may be called by a timer callback and by teh control loop.
+    // i use a mutex but only where it is required. for sure snprintf is reentrant and it uses memory on the stack ....
     const char empty[] = "EO?";
     const char *err = eo_errman_ErrorStringGet(eo_errman_GetHandle(), errtype);
     const char *eobjstr = (NULL == caller) ? (empty) : (caller->eobjstr);
@@ -708,6 +711,7 @@ static void s_eom_emsappl_OnError(eOerrmanErrorType_t errtype, const char *info,
             msec /= 1000;
             snprintf(str, sizeof(str), "EOMtheEMSerror: [eobj: %s, tsk: %d @s%dm%d] %s %s: no info", eobjstr, taskid, sec, msec, err, strdes);  
         }
+        // i dont care is trace is interrupted ... thus NO MUTEX in here
         hal_trace_puts(str);
     }
     
@@ -730,10 +734,17 @@ static void s_eom_emsappl_OnError(eOerrmanErrorType_t errtype, const char *info,
     EOMN_INFO_PROPERTIES_FLAGS_set_extraformat(props.flags, extraformat);
     EOMN_INFO_PROPERTIES_FLAGS_set_futureuse(props.flags, 0);
     
+    // well, i DONT want these functions to be interruted
+    osal_mutex_take(s_emsappl_singleton.onerrormutex, osal_reltimeINFINITE);
     
-    eo_infodispatcher_Put(eo_infodispatcher_GetHandle(), &props, info);
-   
+    // the call eo_infodispatcher_Put() is only in here, thus we can either protect with a mutex in here or put put a mutex inside. WE USE MUTEX IN HERE
+    eo_infodispatcher_Put(eo_infodispatcher_GetHandle(), &props, info); 
+    // the call eom_emsappl_SendTXRequest() either does nothing and is reentrant (when in run mode) or sends an event to a task with osal_eventflag_set() which is reentrant.
+    // it is called also by the can protocol parser in case of proxy, which however is used in run mode (thus reentrant).
+    // i protect both functions in here
     eom_emsappl_SendTXRequest(eom_emsappl_GetHandle());
+    
+    osal_mutex_release(s_emsappl_singleton.onerrormutex);
     
     //eom_emserror_OnError_userdefined_call(errtype, info, caller, des);
     
@@ -742,7 +753,12 @@ static void s_eom_emsappl_OnError(eOerrmanErrorType_t errtype, const char *info,
         return;
     }
     
+
+    
     //#warning --> marco.accame: in case of fatal error, shall we: (1) go smoothly to error state, (2) force immediate transition to error state?
+    
+    // if in here tehre is a serious error. but we dont care about concurrency
+    //osal_mutex_take(s_emsappl_singleton.onerrormutex, osal_reltimeINFINITE);    
     
     // i am going to error state, thus i set the correct state in eOmn_appl_status_t variable, which is used by robotInterface
     // to understand the status of the ems: cfg, run, err.
