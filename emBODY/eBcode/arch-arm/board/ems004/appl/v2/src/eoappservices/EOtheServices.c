@@ -176,6 +176,56 @@ extern EOtheServices* eo_services_GetHandle(void)
 }
 
 
+
+extern eOmn_serv_state_t eo_service_GetState(eOmn_serv_category_t category)
+{
+    eOmn_serv_state_t state = eomn_serv_state_notsupported;
+    
+    if(eobool_true == s_eo_theservices.initted)
+    {
+        return(state);
+    }  
+
+    switch(category)
+    {
+        
+        case eomn_serv_category_mais:
+        {
+            state = eo_mais_GetServiceState(eo_mais_GetHandle());
+        } break;
+        
+        case eomn_serv_category_mc:
+        {
+            state = eo_motioncontrol_GetServiceState(eo_motioncontrol_GetHandle());
+        } break;
+        
+        case eomn_serv_category_strain:
+        {
+            state = eo_strain_GetServiceState(eo_strain_GetHandle());   
+        } break;
+        
+        case eomn_serv_category_inertials:
+        {
+            state = eo_inertials_GetServiceState(eo_inertials_GetHandle());   
+        } break;
+        
+        case eomn_serv_category_skin:
+        {
+            state = eo_skin_GetServiceState(eo_skin_GetHandle());
+        } break;
+        
+        default:
+        {
+            
+        } break;
+
+    }
+
+    return(state);
+    
+}
+
+
 extern eOresult_t eo_services_StartLegacyMode(EOtheServices *p, eOprotBRD_t brd)
 {
     if((NULL == p))
@@ -362,7 +412,10 @@ static void s_activate_services_deferred(void)
 static void s_activate_services_now(void *p)
 {
     // depending on the board number we have something to do which is different
-    // at first we do motion control, then strain, then skin, then inertials
+    // at first we do motion control, then strain, then skin, then inertials.
+
+#warning -->  SO FAR, we dont verify/activate/start the MAIS as a standalone service.
+    // we could do it by simply doing it as second thing after motioncontrol.
     
     const eOmn_serv_configuration_t * servcfg = NULL;
     
@@ -479,12 +532,11 @@ static eOresult_t s_after_verify_inertials(EOaService* p, eObool_t operationisok
         s_eo_theservices.failedservice = eo_service_inertial;
         return(eores_OK);
     }
-    else
-    {   // nothing else to verify .. 
-        s_eo_theservices.allactivated = eobool_true;
-    }    
- 
-   
+    
+    // nothing else to verify .. 
+    s_eo_theservices.allactivated = eobool_true;
+  
+  
     return(eores_OK);
 }
 

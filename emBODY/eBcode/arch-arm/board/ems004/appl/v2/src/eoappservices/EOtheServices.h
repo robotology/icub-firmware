@@ -77,6 +77,8 @@ extern EOtheServices* eo_services_Initialise(void);
 
 extern EOtheServices* eo_services_GetHandle(void);
 
+extern eOmn_serv_state_t eo_service_GetState(eOmn_serv_category_t category);
+
 extern eOresult_t eo_services_StartLegacyMode(EOtheServices *p, eOprotBRD_t brd);
 
 extern eObool_t eo_services_AllActivated(EOtheServices *p);

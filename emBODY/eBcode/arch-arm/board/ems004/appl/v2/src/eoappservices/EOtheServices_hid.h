@@ -57,6 +57,7 @@ typedef struct
     eObool_t                                activateafterverify;
     eObool_t                                running;
     eOservice_onendofoperation_fun_t        onverify;
+    eOmn_serv_state_t                       state;
 } eOservice_core_t;    
 
 typedef struct
