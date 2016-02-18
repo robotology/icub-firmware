@@ -42,7 +42,6 @@
 
 #include "EOtheServices.h"
 #include "EOtheMotionController.h"
-//#include "EOtheSTRAIN.h"
 #include "EOtheMAIS.h"
 #include "EOtheSKIN.h"
 #include "EOtheInertials.h"
@@ -165,10 +164,9 @@ extern void eom_emsappl_hid_userdef_on_entry_RUN(EOMtheEMSappl* p)
     // motion-control:
     eo_motioncontrol_Start(eo_motioncontrol_GetHandle());
     
-    //#warning -> TODO: i am not sure about activating strain in this way in the future
-    // enable the tx mode of strain, if present and as configured. 
-//    eo_strain_SendTXmode(eo_strain_GetHandle());
+//    eo_strain_Start(eo_strain_GetHandle());
     
+    eo_skin_Start(eo_skin_GetHandle());    
 }
 
 
@@ -191,7 +189,7 @@ extern void eom_emsappl_hid_userdef_on_exit_RUN(EOMtheEMSappl* p)
 //    eo_strain_TXstop(eo_strain_GetHandle());
         
     // skin
-    eo_skin_TXstop(eo_skin_GetHandle());
+    eo_skin_Stop(eo_skin_GetHandle());
         
     // mais
     // we prefer NOT to stop it
@@ -223,10 +221,10 @@ extern void eom_emsappl_hid_userdef_on_entry_ERR(EOMtheEMSappl* p)
     // stop tx activity of services that may have been started by callback function
     
     // strain
-//    eo_strain_TXstop(eo_strain_GetHandle());
+//    eo_strain_Stop(eo_strain_GetHandle());
         
     // skin
-    eo_skin_TXstop(eo_skin_GetHandle());
+    eo_skin_Stop(eo_skin_GetHandle());
         
     // mais
     // we prefer NOT to stop it
