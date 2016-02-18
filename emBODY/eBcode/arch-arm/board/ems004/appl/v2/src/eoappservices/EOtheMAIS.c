@@ -75,11 +75,15 @@
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
+static eOresult_t s_eo_mais_TXstart(EOtheMAIS *p, uint8_t datarate, eOas_maismode_t mode, eOas_maisresolution_t resolution);
+
+static eOresult_t s_eo_mais_TXstop(EOtheMAIS *p);
+
 static void s_eo_mais_process_mais_resolution(eOas_maisresolution_t resolution, eOas_mais_status_t* status);
 
-static eOresult_t s_eo_mais_onstop_search4mais(void *par, EOtheCANdiscovery2* p, eObool_t searchisok);
+static eOresult_t s_eo_mais_onstop_search4mais(void *par, EOtheCANdiscovery2* cd2, eObool_t searchisok);
 
-static void s_eo_mais_send_periodic_error_report(void *p);
+static void s_eo_mais_send_periodic_error_report(void *par);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -95,7 +99,8 @@ static EOtheMAIS s_eo_themais =
         .active                 = eobool_false,
         .activateafterverify    = eobool_false,
         .running                = eobool_false,
-        .onverify               = NULL        
+        .onverify               = NULL,
+        .state                  = eomn_serv_state_notsupported
     },
     .diagnostics = 
     {
@@ -129,33 +134,39 @@ static const char s_eobj_ownname[] = "EOtheMAIS";
 
 extern EOtheMAIS* eo_mais_Initialise(void)
 {
-    if(eobool_true == s_eo_themais.service.initted)
+    EOtheMAIS* p = &s_eo_themais;
+
+    if(eobool_true == p->service.initted)
     {
-        return(&s_eo_themais);
+        return(p);
     }
+
     
-    s_eo_themais.service.active = eobool_false;
+    p->service.active = eobool_false;
     
 
-    s_eo_themais.id32 = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_mais, 0, eoprot_tag_none);
+    p->id32 = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_mais, 0, eoprot_tag_none);
 
-    s_eo_themais.service.servconfig.type = eomn_serv_NONE;
+    p->service.servconfig.type = eomn_serv_NONE;
     
     
-    s_eo_themais.sharedcan.boardproperties = eo_vector_New(sizeof(eOcanmap_board_properties_t), 1, NULL, NULL, NULL, NULL);
+    p->sharedcan.boardproperties = eo_vector_New(sizeof(eOcanmap_board_properties_t), 1, NULL, NULL, NULL, NULL);
     
-    s_eo_themais.sharedcan.entitydescriptor = eo_vector_New(sizeof(eOcanmap_entitydescriptor_t), 1, NULL, NULL, NULL, NULL);
+    p->sharedcan.entitydescriptor = eo_vector_New(sizeof(eOcanmap_entitydescriptor_t), 1, NULL, NULL, NULL, NULL);
     
-    s_eo_themais.mais = NULL;
+    p->mais = NULL;
     
-    s_eo_themais.diagnostics.reportTimer = eo_timer_New();
-    s_eo_themais.diagnostics.errorType = eo_errortype_error;
-    s_eo_themais.diagnostics.errorDescriptor.sourceaddress = eo_errman_sourcedevice_localboard;
-    s_eo_themais.diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_mais_not_verified_yet);  
+    p->diagnostics.reportTimer = eo_timer_New();
+    p->diagnostics.errorType = eo_errortype_error;
+    p->diagnostics.errorDescriptor.sourceaddress = eo_errman_sourcedevice_localboard;
+    p->diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_mais_not_verified_yet);  
         
-    s_eo_themais.service.initted = eobool_true;    
+    p->service.initted = eobool_true;    
+    p->service.active = eobool_false;
+    p->service.running = eobool_false;
+    p->service.state = eomn_serv_state_idle;    
        
-    return(&s_eo_themais);   
+    return(p);   
 }
 
 
@@ -170,146 +181,14 @@ extern EOtheMAIS* eo_mais_GetHandle(void)
 }
 
 
-extern eOresult_t eo_mais_Verify(EOtheMAIS *p, const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify)
-{
-    if((NULL == p) || (NULL == servcfg))
-    {
-        return(eores_NOK_nullpointer);
-    }  
- 
-// DONT Deactivate ... we may want just to check again ....    
-//    if(eobool_true == s_eo_themais.service.active)
-//    {
-//        eo_mais_Deactivate(p);        
-//    }   
-
-    s_eo_themais.service.onverify = onverify;
-    s_eo_themais.service.activateafterverify = activateafterverify;
-
-
-    s_eo_themais.sharedcan.discoverytarget.info.type = eobrd_cantype_mais;
-    s_eo_themais.sharedcan.discoverytarget.info.protocol.major = servcfg->data.as.mais.version.protocol.major; 
-    s_eo_themais.sharedcan.discoverytarget.info.protocol.minor = servcfg->data.as.mais.version.protocol.minor;
-    s_eo_themais.sharedcan.discoverytarget.info.firmware.major = servcfg->data.as.mais.version.firmware.major; 
-    s_eo_themais.sharedcan.discoverytarget.info.firmware.minor = servcfg->data.as.mais.version.firmware.minor;
-    s_eo_themais.sharedcan.discoverytarget.info.firmware.build = servcfg->data.as.mais.version.firmware.build;    
-    s_eo_themais.sharedcan.discoverytarget.canmap[servcfg->data.as.mais.canloc.port] = 0x0001 << servcfg->data.as.mais.canloc.addr; 
-    
-    s_eo_themais.sharedcan.ondiscoverystop.function = s_eo_mais_onstop_search4mais;
-    s_eo_themais.sharedcan.ondiscoverystop.parameter = (void*)servcfg;
-        
-    // make sure the timer is not running
-    eo_timer_Stop(s_eo_themais.diagnostics.reportTimer); 
-    
-    // start discovery    
-    eo_candiscovery2_Start(eo_candiscovery2_GetHandle(), &s_eo_themais.sharedcan.discoverytarget, &s_eo_themais.sharedcan.ondiscoverystop);   
-
-    
-    return(eores_OK);   
-}
-
-
-extern eOresult_t eo_mais_Deactivate(EOtheMAIS *p)
+extern eOmn_serv_state_t eo_mais_GetServiceState(EOtheMAIS *p)
 {
     if(NULL == p)
     {
-        return(eores_NOK_nullpointer);
-    }
-
-    if(eobool_false == s_eo_themais.service.active)
-    {
-        return(eores_OK);        
+        return(eomn_serv_state_notsupported);
     } 
-    
-    // send stop messages to mais, unload the entity-can-mapping and the board-can-mapping, reset all things inside this object
-       
-    if(eobool_true == s_eo_themais.service.running)
-    {
-        eo_mais_TXstop(&s_eo_themais);
-    }
-    
-    eo_canmap_DeconfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_analogsensors, eoprot_entity_as_mais, s_eo_themais.sharedcan.entitydescriptor); 
-    
-    eo_canmap_UnloadBoards(eo_canmap_GetHandle(), s_eo_themais.sharedcan.boardproperties);
-     
-    
-    eo_entities_SetNumOfMaises(eo_entities_GetHandle(), 0);
-    
-    s_eo_themais.mais = NULL;
-    
-    memset(&s_eo_themais.service.servconfig, 0, sizeof(eOmn_serv_configuration_t));
-    s_eo_themais.service.servconfig.type = eomn_serv_NONE;
-    
-    eo_vector_Clear(s_eo_themais.sharedcan.boardproperties);
-    eo_vector_Clear(s_eo_themais.sharedcan.entitydescriptor);
-    
-    // make sure the timer is not running
-    eo_timer_Stop(s_eo_themais.diagnostics.reportTimer); 
-    
-    s_eo_themais.service.active = eobool_false;
-    
-    return(eores_OK);
-}
 
-
-extern eOresult_t eo_mais_Activate(EOtheMAIS *p, const eOmn_serv_configuration_t * servcfg)
-{
-    if((NULL == p) || (NULL == servcfg))
-    {
-        return(eores_NOK_nullpointer);
-    }    
-    
-    if(eobool_true == s_eo_themais.service.active)
-    {
-        // marco.accame on 30dec2015: better not to deactivate the mais .... it may be that the masi was activated by mc and then thi function called again by as-mais
-        // eo_mais_Deactivate(p);     
-        return(eores_OK);
-    }   
-    
-    eo_entities_SetNumOfMaises(eo_entities_GetHandle(), 1);
-    
-
-    if(0 == eo_entities_NumOfMaises(eo_entities_GetHandle()))
-    {
-        s_eo_themais.service.active = eobool_false;
-        return(eores_NOK_generic);
-    }
-    else
-    {
-        
-        s_eo_themais.mais = eo_entities_GetMais(eo_entities_GetHandle(), 0);
-        
-        memcpy(&s_eo_themais.service.servconfig, servcfg, sizeof(eOmn_serv_configuration_t));
-            
-        
-        // now... use the servcfg
-        eOcanmap_board_properties_t prop = 
-        {
-            .type               = eobrd_cantype_mais, 
-            .location           = { .port = servcfg->data.as.mais.canloc.port, .addr = servcfg->data.as.mais.canloc.addr, .insideindex = eocanmap_insideindex_none },
-            .requiredprotocol   = { .major = servcfg->data.as.mais.version.protocol.major, .minor = servcfg->data.as.mais.version.protocol.minor }
-        };       
-        eo_vector_PushBack(s_eo_themais.sharedcan.boardproperties, &prop);
-        
-        // load the can mapping ... make an UnloadBoards()
-        eo_canmap_LoadBoards(eo_canmap_GetHandle(), s_eo_themais.sharedcan.boardproperties); 
-        
-        // load the entity mapping.
-        eOcanmap_entitydescriptor_t des = 
-        {
-            .location   = { .port = servcfg->data.as.mais.canloc.port, .addr = servcfg->data.as.mais.canloc.addr, .insideindex = eocanmap_insideindex_none },
-            .index      = entindex00 // we have only one mais
-        };
-        eo_vector_PushBack(s_eo_themais.sharedcan.entitydescriptor, &des);
-        
-        eo_canmap_ConfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_analogsensors, eoprot_entity_as_mais, s_eo_themais.sharedcan.entitydescriptor);   
-
-
-        s_eo_themais.service.active = eobool_true;        
-    }
-
-    
-    return(eores_OK);   
+    return(p->service.state);
 }
 
 
@@ -319,6 +198,8 @@ extern eOresult_t eo_mais_SendReport(EOtheMAIS *p)
     {
         return(eores_NOK_nullpointer);
     }
+    
+    // the report is sent in any state ....
 
     eo_errman_Error(eo_errman_GetHandle(), p->diagnostics.errorType, NULL, s_eobj_ownname, &p->diagnostics.errorDescriptor);
     
@@ -341,6 +222,171 @@ extern eOresult_t eo_mais_SendReport(EOtheMAIS *p)
 }
 
 
+extern eOresult_t eo_mais_Verify(EOtheMAIS *p, const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify)
+{
+    if((NULL == p) || (NULL == servcfg))
+    {
+        s_eo_themais.service.state = eomn_serv_state_failureofverify;
+        if(NULL != onverify)
+        {
+            onverify(p, eobool_false); 
+        }            
+        return(eores_NOK_nullpointer);
+    }  
+    
+    if(eomn_serv_AS_mais != servcfg->type)
+    {
+        p->service.state = eomn_serv_state_failureofverify;
+        if(NULL != onverify)
+        {
+            onverify(p, eobool_false); 
+        }          
+        return(eores_NOK_generic);
+    }     
+ 
+// DONT Deactivate ... we may want just to check again ....    
+//    if(eobool_true == p->service.active)
+//    {
+//        eo_mais_Deactivate(p);        
+//    } 
+
+    p->service.state = eomn_serv_state_verifying;   
+
+    // make sure the timer is not running
+    eo_timer_Stop(p->diagnostics.reportTimer);      
+
+    p->service.onverify = onverify;
+    p->service.activateafterverify = activateafterverify;
+
+
+    p->sharedcan.discoverytarget.info.type = eobrd_cantype_mais;
+    p->sharedcan.discoverytarget.info.protocol.major = servcfg->data.as.mais.version.protocol.major; 
+    p->sharedcan.discoverytarget.info.protocol.minor = servcfg->data.as.mais.version.protocol.minor;
+    p->sharedcan.discoverytarget.info.firmware.major = servcfg->data.as.mais.version.firmware.major; 
+    p->sharedcan.discoverytarget.info.firmware.minor = servcfg->data.as.mais.version.firmware.minor;
+    p->sharedcan.discoverytarget.info.firmware.build = servcfg->data.as.mais.version.firmware.build;    
+    p->sharedcan.discoverytarget.canmap[servcfg->data.as.mais.canloc.port] = 0x0001 << servcfg->data.as.mais.canloc.addr; 
+    
+    p->sharedcan.ondiscoverystop.function = s_eo_mais_onstop_search4mais;
+    p->sharedcan.ondiscoverystop.parameter = (void*)servcfg;
+        
+    // start discovery    
+    eo_candiscovery2_Start(eo_candiscovery2_GetHandle(), &p->sharedcan.discoverytarget, &p->sharedcan.ondiscoverystop);   
+    
+    return(eores_OK);   
+}
+
+
+extern eOresult_t eo_mais_Deactivate(EOtheMAIS *p)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+
+    if(eobool_false == p->service.active)
+    {
+        return(eores_OK);        
+    } 
+    
+    // send stop messages to mais, unload the entity-can-mapping and the board-can-mapping, reset all things inside this object
+       
+    if(eobool_true == p->service.running)
+    {
+        eo_mais_Stop(p);
+    }
+    
+    eo_canmap_DeconfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_analogsensors, eoprot_entity_as_mais, p->sharedcan.entitydescriptor); 
+    
+    eo_canmap_UnloadBoards(eo_canmap_GetHandle(), p->sharedcan.boardproperties);
+     
+    
+    eo_entities_SetNumOfMaises(eo_entities_GetHandle(), 0);
+    
+    p->mais = NULL;
+    
+    memset(&p->service.servconfig, 0, sizeof(eOmn_serv_configuration_t));
+    p->service.servconfig.type = eomn_serv_NONE;
+    
+    eo_vector_Clear(p->sharedcan.boardproperties);
+    eo_vector_Clear(p->sharedcan.entitydescriptor);
+    
+    // make sure the timer is not running
+    eo_timer_Stop(p->diagnostics.reportTimer); 
+    
+    p->service.active = eobool_false;    
+    p->service.state = eomn_serv_state_idle; 
+    
+    return(eores_OK);
+}
+
+
+extern eOresult_t eo_mais_Activate(EOtheMAIS *p, const eOmn_serv_configuration_t * servcfg)
+{
+    if((NULL == p) || (NULL == servcfg))
+    {
+        return(eores_NOK_nullpointer);
+    }    
+    
+    if(eomn_serv_AS_mais != servcfg->type)
+    {
+        return(eores_NOK_generic);
+    }    
+    
+    if(eobool_true == p->service.active)
+    {
+        // marco.accame on 30dec2015: better not to deactivate the mais .... it may be that the mais was activated by mc and then this function called again by as-mais
+        // eo_mais_Deactivate(p);     
+        return(eores_OK);
+    }   
+    
+    eo_entities_SetNumOfMaises(eo_entities_GetHandle(), 1);
+    
+
+    if(0 == eo_entities_NumOfMaises(eo_entities_GetHandle()))
+    {
+        p->service.active = eobool_false;
+        return(eores_NOK_generic);
+    }
+    else
+    {
+        
+        p->mais = eo_entities_GetMais(eo_entities_GetHandle(), 0);
+        
+        memcpy(&p->service.servconfig, servcfg, sizeof(eOmn_serv_configuration_t));
+            
+        
+        // now... use the servcfg
+        eOcanmap_board_properties_t prop = 
+        {
+            .type               = eobrd_cantype_mais, 
+            .location           = { .port = servcfg->data.as.mais.canloc.port, .addr = servcfg->data.as.mais.canloc.addr, .insideindex = eocanmap_insideindex_none },
+            .requiredprotocol   = { .major = servcfg->data.as.mais.version.protocol.major, .minor = servcfg->data.as.mais.version.protocol.minor }
+        };       
+        eo_vector_PushBack(p->sharedcan.boardproperties, &prop);
+        
+        // load the can mapping ... make an UnloadBoards()
+        eo_canmap_LoadBoards(eo_canmap_GetHandle(), p->sharedcan.boardproperties); 
+        
+        // load the entity mapping.
+        eOcanmap_entitydescriptor_t des = 
+        {
+            .location   = { .port = servcfg->data.as.mais.canloc.port, .addr = servcfg->data.as.mais.canloc.addr, .insideindex = eocanmap_insideindex_none },
+            .index      = entindex00 // we have only one mais
+        };
+        eo_vector_PushBack(p->sharedcan.entitydescriptor, &des);
+        
+        eo_canmap_ConfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_analogsensors, eoprot_entity_as_mais, p->sharedcan.entitydescriptor);   
+
+
+        p->service.active = eobool_true;    
+        p->service.state = eomn_serv_state_activated;         
+    }
+    
+    return(eores_OK);   
+}
+
+
 extern eOresult_t eo_mais_Start(EOtheMAIS *p)
 {
     if(NULL == p)
@@ -348,13 +394,25 @@ extern eOresult_t eo_mais_Start(EOtheMAIS *p)
         return(eores_NOK_nullpointer);
     }
     
-    if(eobool_false == s_eo_themais.service.active)
-    {   // nothing to do because we dont have a mais board
+    if(eobool_false == p->service.active)
+    {   // nothing to do because object must be first activated
         return(eores_OK);
     }  
     
-    return(eo_mais_TXstart(p, p->mais->config.datarate, eoas_maismode_txdatacontinuously, (eOas_maisresolution_t)p->mais->config.resolution));   
+    if(eobool_true == p->service.running)
+    {   // it is already running
+        return(eores_OK);
+    }   
+    
+    p->service.running = eobool_true;    
+    p->service.state = eomn_serv_state_running; 
+    
+    // now we activate tx according to config of mais
+    //s_eo_mais_TXstart(p, p->mais->config.datarate, eoas_maismode_txdatacontinuously, (eOas_maisresolution_t)p->mais->config.resolution);   
+    
+    return(eores_OK);
 }
+
 
 extern eOresult_t eo_mais_Stop(EOtheMAIS *p)
 {
@@ -363,12 +421,22 @@ extern eOresult_t eo_mais_Stop(EOtheMAIS *p)
         return(eores_NOK_nullpointer);
     }
     
-    if(eobool_false == s_eo_themais.service.active)
-    {   // nothing to do because we dont have a mais board
+    if(eobool_false == p->service.active)
+    {   // nothing to do because object must be first activated
         return(eores_OK);
     }  
     
-    return(eo_mais_TXstop(p));        
+    if(eobool_false == p->service.running)
+    {   // it is already stopped
+        return(eores_OK);
+    }     
+     
+    s_eo_mais_TXstop(p);
+       
+    p->service.running = eobool_false;
+    p->service.state = eomn_serv_state_activated;     
+    
+    return(eores_OK);
 }
 
 
@@ -379,60 +447,50 @@ extern eOresult_t eo_mais_Tick(EOtheMAIS *p)
         return(eores_NOK_nullpointer);
     }
     
-    if(eobool_false == s_eo_themais.service.active)
-    {   // nothing to do because we dont have a mais board
+    if(eobool_false == p->service.active)
+    {   // nothing to do because object must be first activated
         return(eores_OK);
-    }  
+    } 
+
+    if(eobool_false == p->service.running)
+    {   // not running, thus we do nothing
+        return(eores_OK);
+    }     
+    
+    // now we dont do anything becase mais does not need any action because everything is done by the can parser
     
     return(eores_OK);       
 }
 
 
-extern eOresult_t eo_mais_TXstart(EOtheMAIS *p, uint8_t datarate, eOas_maismode_t mode, eOas_maisresolution_t resolution)
-{   
-    if(NULL == p)
-    {
-        return(eores_NOK_nullpointer);
-    }
-    
-    if(eobool_false == s_eo_themais.service.active)
-    {   // nothing to do because we dont have a mais board
-        return(eores_OK);
-    }   
-    
-    eOas_mais_config_t config = {0};
-    config.datarate = datarate;
-    config.mode = mode;
-    config.resolution = resolution;
-    
-    return(eo_mais_Set(p, &config));      
-}
-
-
-extern eOresult_t eo_mais_TXstop(EOtheMAIS *p)
+extern eOresult_t eo_mais_Transmission(EOtheMAIS *p, eObool_t on)
 {
     if(NULL == p)
     {
         return(eores_NOK_nullpointer);
     }
     
-    if(eobool_false == s_eo_themais.service.active)
-    {   // nothing to do because we dont have a mais board
+    if(eobool_false == p->service.active)
+    {   // nothing to do because object must be first activated
         return(eores_OK);
-    }   
-    
-    s_eo_themais.sharedcan.command.class = eocanprot_msgclass_pollingAnalogSensor;    
-    
-    // set txmode
-    uint8_t mode = eoas_maismode_acquirebutdonttx;
-    s_eo_themais.sharedcan.command.type  = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;
-    s_eo_themais.sharedcan.command.value = &mode;                       
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &s_eo_themais.sharedcan.command, s_eo_themais.id32);    
+    } 
+
+    if(eobool_false == p->service.running)
+    {   // not running, thus we do nothing
+        return(eores_OK);
+    }     
     
     
-    s_eo_themais.service.running = eobool_false;
+    if(eobool_true == on)
+    {   // we activate tx according to config of mais
+        s_eo_mais_TXstart(p, p->mais->config.datarate, eoas_maismode_txdatacontinuously, (eOas_maisresolution_t)p->mais->config.resolution); 
+    }
+    else
+    {
+        s_eo_mais_TXstop(p);
+    }
     
-    return(eores_OK);
+    return(eores_OK);      
 }
 
 
@@ -443,10 +501,16 @@ extern eOresult_t eo_mais_Set(EOtheMAIS *p, eOas_mais_config_t* maiscfg)
         return(eores_NOK_nullpointer);
     }
         
-    if(eobool_false == s_eo_themais.service.active)
-    {   // nothing to do because we dont have a mais board
+    if(eobool_false == p->service.active)
+    {   // nothing to do because object must be first activated
         return(eores_OK);
     }  
+  
+// we allow doing things also if we are not in running mode yet    
+//    if(eobool_false == p->service.running)
+//    {   // not running, thus we do nothing
+//        return(eores_OK);
+//    }     
 
     // ok, now we do something. 
     
@@ -478,28 +542,25 @@ extern eOresult_t eo_mais_SetMode(EOtheMAIS *p, eOas_maismode_t mode)
         return(eores_NOK_nullpointer);
     }
     
-    if(eobool_false == s_eo_themais.service.active)
-    {   // nothing to do because we dont have a mais board
+    if(eobool_false == p->service.active)
+    {   // nothing to do because object must be first activated
         return(eores_OK);
     }  
 
-    // ok, now we do something.  i always send the mode, even if i am in CFG state  
+// we allow doing things also if we are not in running mode yet     
+//    if(eobool_false == p->service.running)
+//    {   // not running, thus we do nothing
+//        return(eores_OK);
+//    }     
+
+    // ok, now we do something.
  
-    s_eo_themais.sharedcan.command.class = eocanprot_msgclass_pollingAnalogSensor;
-    s_eo_themais.sharedcan.command.type  = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;
-    s_eo_themais.sharedcan.command.value = &mode;
+    p->sharedcan.command.class = eocanprot_msgclass_pollingAnalogSensor;
+    p->sharedcan.command.type  = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;
+    p->sharedcan.command.value = &mode;
     
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &s_eo_themais.sharedcan.command, s_eo_themais.id32);
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &p->sharedcan.command, p->id32);
     
-    
-    if(eoas_maismode_txdatacontinuously == mode)
-    {
-        s_eo_themais.service.running = eobool_true;
-    }
-    else
-    {
-        s_eo_themais.service.running = eobool_false;
-    }    
 
     return(eores_OK);
 }
@@ -512,18 +573,24 @@ extern eOresult_t eo_mais_SetDataRate(EOtheMAIS *p, uint8_t datarate)
         return(eores_NOK_nullpointer);
     }
     
-    if(eobool_false == s_eo_themais.service.active)
-    {   // nothing to do because we dont have a mais board
+    if(eobool_false == p->service.active)
+    {   // nothing to do because object must be first activated
         return(eores_OK);
-    }   
+    } 
+
+// we allow doing things also if we are not in running mode yet 
+//    if(eobool_false == p->service.running)
+//    {   // not running, thus we do nothing
+//        return(eores_OK);
+//    }     
 
     // ok, now we do something.     
  
-    s_eo_themais.sharedcan.command.class = eocanprot_msgclass_pollingAnalogSensor;
-    s_eo_themais.sharedcan.command.type  = ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE;
-    s_eo_themais.sharedcan.command.value = &datarate;
+    p->sharedcan.command.class = eocanprot_msgclass_pollingAnalogSensor;
+    p->sharedcan.command.type  = ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE;
+    p->sharedcan.command.value = &datarate;
     
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &s_eo_themais.sharedcan.command, s_eo_themais.id32);    
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &p->sharedcan.command, p->id32);    
     
     return(eores_OK);  
 }
@@ -537,18 +604,24 @@ extern eOresult_t eo_mais_SetResolution(EOtheMAIS *p, eOas_maisresolution_t reso
         return(eores_NOK_nullpointer);
     }
     
-    if(eobool_false == s_eo_themais.service.active)
-    {   // nothing to do because we dont have a mais board
+    if(eobool_false == p->service.active)
+    {   // nothing to do because object must be first activated
         return(eores_OK);
-    }    
+    }  
+
+// we allow doing things also if we are not in running mode yet     
+//    if(eobool_false == p->service.running)
+//    {   // not running, thus we do nothing
+//        return(eores_OK);
+//    }     
 
     // ok, now we do something.     
  
-    s_eo_themais.sharedcan.command.class = eocanprot_msgclass_pollingAnalogSensor;
-    s_eo_themais.sharedcan.command.type  = ICUBCANPROTO_POL_AS_CMD__SET_RESOLUTION;
-    s_eo_themais.sharedcan.command.value = &resolution;
+    p->sharedcan.command.class = eocanprot_msgclass_pollingAnalogSensor;
+    p->sharedcan.command.type  = ICUBCANPROTO_POL_AS_CMD__SET_RESOLUTION;
+    p->sharedcan.command.value = &resolution;
     
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &s_eo_themais.sharedcan.command, s_eo_themais.id32);    
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &p->sharedcan.command, p->id32);    
     
     eOas_mais_status_t *status = eo_entities_GetMaisStatus(eo_entities_GetHandle(), 0);
     if(NULL == status)
@@ -596,6 +669,55 @@ extern void eoprot_fun_INIT_as_mais_status(const EOnv* nv)
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
+static eOresult_t s_eo_mais_TXstart(EOtheMAIS *p, uint8_t datarate, eOas_maismode_t mode, eOas_maisresolution_t resolution)
+{   
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    if(eobool_false == p->service.active)
+    {   // nothing to do because object must be first activated
+        return(eores_OK);
+    }  
+
+    if(eobool_false == p->service.running)
+    {   // not running, thus we do nothing
+        return(eores_OK);
+    }     
+    
+    eOas_mais_config_t config = {0};
+    config.datarate = datarate;
+    config.mode = mode;
+    config.resolution = resolution;
+    
+    return(eo_mais_Set(p, &config));      
+}
+
+
+static eOresult_t s_eo_mais_TXstop(EOtheMAIS *p)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    if(eobool_false == p->service.active)
+    {   // nothing to do because object must be first activated
+        return(eores_OK);
+    }   
+    
+    if(eobool_false == p->service.running)
+    {   // not running, thus we do nothing
+        return(eores_OK);
+    }     
+    
+    eo_mais_SetMode(p, eoas_maismode_acquirebutdonttx);
+ 
+    return(eores_OK);
+}
+
+
 static void s_eo_mais_process_mais_resolution(eOas_maisresolution_t resolution, eOas_mais_status_t* status)
 {
     uint8_t size = 0;
@@ -620,77 +742,91 @@ static void s_eo_mais_process_mais_resolution(eOas_maisresolution_t resolution, 
 }
 
 
-static eOresult_t s_eo_mais_onstop_search4mais(void *par, EOtheCANdiscovery2* p, eObool_t searchisok)
-{    
+static eOresult_t s_eo_mais_onstop_search4mais(void *par, EOtheCANdiscovery2* cd2, eObool_t searchisok)
+{  
+    EOtheMAIS* p = &s_eo_themais;
+    
     const eOmn_serv_configuration_t * servcfg = (const eOmn_serv_configuration_t *)par;
     
-    if((eobool_true == searchisok) && (eobool_true == s_eo_themais.service.activateafterverify))
+    if(eobool_true == searchisok)
+    {
+        p->service.state = eomn_serv_state_verified;
+    }
+    else
+    {   
+        p->service.state = eomn_serv_state_failureofverify;
+    }    
+    
+    if((eobool_true == searchisok) && (eobool_true == p->service.activateafterverify))
     {
         eo_mais_Activate(&s_eo_themais, servcfg);        
     }
     
-    s_eo_themais.diagnostics.errorDescriptor.sourcedevice     = eo_errman_sourcedevice_localboard;
-    s_eo_themais.diagnostics.errorDescriptor.sourceaddress    = 0;
-    s_eo_themais.diagnostics.errorDescriptor.par16            = (servcfg->data.as.mais.canloc.addr) | (servcfg->data.as.mais.canloc.port << 8);
-    s_eo_themais.diagnostics.errorDescriptor.par64            = (servcfg->data.as.mais.version.firmware.minor << 0) | (servcfg->data.as.mais.version.firmware.major << 8) |
-                                                                (servcfg->data.as.mais.version.protocol.minor << 16) | (servcfg->data.as.mais.version.protocol.major << 24);    
+    p->diagnostics.errorDescriptor.sourcedevice     = eo_errman_sourcedevice_localboard;
+    p->diagnostics.errorDescriptor.sourceaddress    = 0;
+    p->diagnostics.errorDescriptor.par16            = (servcfg->data.as.mais.canloc.addr) | (servcfg->data.as.mais.canloc.port << 8);
+    p->diagnostics.errorDescriptor.par64            = (servcfg->data.as.mais.version.firmware.minor << 0) | (servcfg->data.as.mais.version.firmware.major << 8) |
+                                                      (servcfg->data.as.mais.version.protocol.minor << 16) | (servcfg->data.as.mais.version.protocol.major << 24);    
     EOaction_strg astrg = {0};
     EOaction *act = (EOaction*)&astrg;
-    eo_action_SetCallback(act, s_eo_mais_send_periodic_error_report, NULL, eov_callbackman_GetTask(eov_callbackman_GetHandle()));    
+    eo_action_SetCallback(act, s_eo_mais_send_periodic_error_report, p, eov_callbackman_GetTask(eov_callbackman_GetHandle()));    
     
     if(eobool_true == searchisok)
     {           
-        s_eo_themais.diagnostics.errorType = eo_errortype_debug;
-        s_eo_themais.diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_mais_ok);
-        eo_errman_Error(eo_errman_GetHandle(), s_eo_themais.diagnostics.errorType, NULL, s_eobj_ownname, &s_eo_themais.diagnostics.errorDescriptor);
+        p->diagnostics.errorType = eo_errortype_debug;
+        p->diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_mais_ok);
+        eo_errman_Error(eo_errman_GetHandle(), p->diagnostics.errorType, NULL, s_eobj_ownname, &p->diagnostics.errorDescriptor);
         
-        if((0 != s_eo_themais.diagnostics.repetitionOKcase) && (0 != s_eo_themais.diagnostics.reportPeriod))
+        if((0 != p->diagnostics.repetitionOKcase) && (0 != p->diagnostics.reportPeriod))
         {
-            s_eo_themais.diagnostics.errorCallbackCount = s_eo_themais.diagnostics.repetitionOKcase;        
-            eo_timer_Start(s_eo_themais.diagnostics.reportTimer, eok_abstimeNOW, s_eo_themais.diagnostics.reportPeriod, eo_tmrmode_FOREVER, act);
+            p->diagnostics.errorCallbackCount = p->diagnostics.repetitionOKcase;        
+            eo_timer_Start(p->diagnostics.reportTimer, eok_abstimeNOW, p->diagnostics.reportPeriod, eo_tmrmode_FOREVER, act);
         }
     }    
     
     if(eobool_false == searchisok)
     {
-        s_eo_themais.diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_mais_failed_candiscovery);
-        s_eo_themais.diagnostics.errorType = eo_errortype_error;                
-        eo_errman_Error(eo_errman_GetHandle(), s_eo_themais.diagnostics.errorType, NULL, s_eobj_ownname, &s_eo_themais.diagnostics.errorDescriptor);
+        p->diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_mais_failed_candiscovery);
+        p->diagnostics.errorType = eo_errortype_error;                
+        eo_errman_Error(eo_errman_GetHandle(), p->diagnostics.errorType, NULL, s_eobj_ownname, &p->diagnostics.errorDescriptor);
         
-        if(0 != s_eo_themais.diagnostics.reportPeriod)
+        if(0 != p->diagnostics.reportPeriod)
         {
-            s_eo_themais.diagnostics.errorCallbackCount = EOK_int08dummy;
-            eo_timer_Start(s_eo_themais.diagnostics.reportTimer, eok_abstimeNOW, s_eo_themais.diagnostics.reportPeriod, eo_tmrmode_FOREVER, act);  
+            p->diagnostics.errorCallbackCount = EOK_int08dummy;
+            eo_timer_Start(p->diagnostics.reportTimer, eok_abstimeNOW, p->diagnostics.reportPeriod, eo_tmrmode_FOREVER, act);  
         }
     }      
     
-    if(NULL != s_eo_themais.service.onverify)
+    if(NULL != p->service.onverify)
     {
-        s_eo_themais.service.onverify(&s_eo_themais, searchisok); 
+        p->service.onverify(&s_eo_themais, searchisok); 
     }    
     
     return(eores_OK);   
 }
 
 
-static void s_eo_mais_send_periodic_error_report(void *p)
+static void s_eo_mais_send_periodic_error_report(void *par)
 {
-    eo_errman_Error(eo_errman_GetHandle(), s_eo_themais.diagnostics.errorType, NULL, s_eobj_ownname, &s_eo_themais.diagnostics.errorDescriptor);
+    EOtheMAIS* p = (EOtheMAIS*) par;
     
-    if(eoerror_value_CFG_mais_failed_candiscovery == eoerror_code2value(s_eo_themais.diagnostics.errorDescriptor.code))
+    eo_errman_Error(eo_errman_GetHandle(), p->diagnostics.errorType, NULL, s_eobj_ownname, &p->diagnostics.errorDescriptor);
+    
+    if(eoerror_value_CFG_mais_failed_candiscovery == eoerror_code2value(p->diagnostics.errorDescriptor.code))
     {   // if i dont find the mais, i keep on sending the discovery results up. it is a temporary diagnostics tricks until we use the verification of services at bootstrap
         eo_candiscovery2_SendLatestSearchResults(eo_candiscovery2_GetHandle());
     }
     
-    if(EOK_int08dummy != s_eo_themais.diagnostics.errorCallbackCount)
+    if(EOK_int08dummy != p->diagnostics.errorCallbackCount)
     {
-        s_eo_themais.diagnostics.errorCallbackCount--;
+        p->diagnostics.errorCallbackCount--;
     }
-    if(0 == s_eo_themais.diagnostics.errorCallbackCount)
+    if(0 == p->diagnostics.errorCallbackCount)
     {
-        eo_timer_Stop(s_eo_themais.diagnostics.reportTimer);
+        eo_timer_Stop(p->diagnostics.reportTimer);
     }
 }
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

@@ -67,37 +67,30 @@ extern EOtheInertials* eo_inertials_Initialise(void);
 
 extern EOtheInertials* eo_inertials_GetHandle(void);
 
+// we can call them if _Initialise() was called
+extern eOmn_serv_state_t eo_inertials_GetServiceState(EOtheInertials *p);
+extern eOresult_t eo_inertials_SendReport(EOtheInertials *p);
+
+
 extern eOresult_t eo_inertials_Verify(EOtheInertials *p, const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify);
 
 extern eOresult_t eo_inertials_Activate(EOtheInertials *p, const eOmn_serv_configuration_t * servcfg);
 
 extern eOresult_t eo_inertials_Deactivate(EOtheInertials *p);
 
-
 extern eOresult_t eo_inertials_Start(EOtheInertials *p);
 
-// tick() is eo_inertials_RefreshStatusOfEntity()
-extern eOresult_t eo_inertials_Tick(EOtheInertials *p, eObool_t regularROPSjustTransmitted);
+extern eOresult_t eo_inertials_Tick(EOtheInertials *p, eObool_t resetstatus); // we reset the status when there has just been a transmission of the regulars containing the inertial-status
 
 extern eOresult_t eo_inertials_Stop(EOtheInertials *p);
 
-extern eOresult_t eo_inertials_SendReport(EOtheInertials *p);
-
-// and now others
+extern eOresult_t eo_inertials_Transmission(EOtheInertials *p, eObool_t on);
 
 
+// we can call them if _Activate() was called. they are used by the callbacks of eth protocol
 extern eOresult_t eo_inertials_ServiceConfig(EOtheInertials *p, const eOas_inertial_serviceconfig_t* cfg);
-
-
 extern eOresult_t eo_inertials_SensorsConfig(EOtheInertials *p, eOas_inertial_sensorsconfig_t* config);
-
-//extern eOresult_t eo_inertials_Start(EOtheInertials *p);
-
-//extern eOresult_t eo_inertials_Stop(EOtheInertials *p);
-
 extern eOresult_t eo_inertials_AcceptCANframe(EOtheInertials *p, eOas_inertial_type_t type, eOcanframe_t *frame, eOcanport_t port);
-
-//extern eOresult_t eo_inertials_RefreshStatusOfEntity(EOtheInertials *p);
 
 
 /** @}            

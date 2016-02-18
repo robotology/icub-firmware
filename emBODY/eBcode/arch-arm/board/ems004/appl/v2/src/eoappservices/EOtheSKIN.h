@@ -64,6 +64,10 @@ extern EOtheSKIN* eo_skin_Initialise(void);
 
 extern EOtheSKIN* eo_skin_GetHandle(void);
 
+// we can call them if _Initialise() was called
+extern eOmn_serv_state_t eo_skin_GetServiceState(EOtheSKIN *p);
+extern eOresult_t eo_skin_SendReport(EOtheSKIN *p);
+
 
 extern eOresult_t eo_skin_Verify(EOtheSKIN *p, const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify);
 
@@ -71,30 +75,21 @@ extern eOresult_t eo_skin_Activate(EOtheSKIN *p, const eOmn_serv_configuration_t
 
 extern eOresult_t eo_skin_Deactivate(EOtheSKIN *p);
 
-extern eOresult_t eo_skin_SendReport(EOtheSKIN *p);
-
 extern eOresult_t eo_skin_Start(EOtheSKIN *p);
 
-// use regularROPSjustTransmitted = eom_emsrunner_CycleHasJustTransmittedRegulars(eom_emsrunner_GetHandle())
-extern eOresult_t eo_skin_Tick(EOtheSKIN *p, eObool_t regularROPSjustTransmitted);
+extern eOresult_t eo_skin_Tick(EOtheSKIN *p, eObool_t resetstatus); // we reset the status when there has just been a transmission of the regulars containing the skin-status
 
 extern eOresult_t eo_skin_Stop(EOtheSKIN *p);
 
+// it enables/disables transmission of all the skin patches. _Start() just starts the service, not the transmission. 
+extern eOresult_t eo_skin_Transmission(EOtheSKIN *p, eObool_t on);
 
-extern eOresult_t eo_skin_TXstop(EOtheSKIN *p);
 
-
+// we can call them if _Activate() was called. they are used by the callbacks of eth or can protocol
 extern eOresult_t eo_skin_SetMode(EOtheSKIN *p, uint8_t patchindex, eOsk_sigmode_t mode);
-
 extern eOresult_t eo_skin_SetBoardsConfig(EOtheSKIN *p, uint8_t patchindex, eOsk_cmd_boardsCfg_t *brdcfg);
-
 extern eOresult_t eo_skin_SetTrianglesConfig(EOtheSKIN *p, uint8_t patchindex, eOsk_cmd_trianglesCfg_t *trgcfg);
-
 extern eOresult_t eo_skin_AcceptCANframe(EOtheSKIN *p, eOcanframe_t *frame, eOcanport_t port);
-
-
-
-
 
 
 

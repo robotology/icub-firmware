@@ -187,6 +187,9 @@ const eOas_inertial_serviceconfig_t eo_inertials_cfg_eb11 =
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
+static eOresult_t s_eo_inertials_TXstart(EOtheInertials *p);
+static eOresult_t s_eo_inertials_TXstop(EOtheInertials *p);
+
 static eObool_t s_eo_inertials_activestate_can_accept_canframe(void);
 
 static void s_eo_inertials_build_maps(const eOas_inertial_serviceconfig_t* cfg);
@@ -223,7 +226,8 @@ static EOtheInertials s_eo_theinertials =
         .active                 = eobool_false,
         .activateafterverify    = eobool_false,
         .running                = eobool_false,
-        .onverify               = NULL            
+        .onverify               = NULL,
+        .state                  = eomn_serv_state_notsupported          
     },
     .diagnostics = 
     {
@@ -266,35 +270,36 @@ static const char s_eobj_ownname[] = "EOtheInertials";
 
 extern EOtheInertials* eo_inertials_Initialise(void)
 {
-    if(eobool_true == s_eo_theinertials.service.initted)
+    EOtheInertials* p = &s_eo_theinertials;
+    if(eobool_true == p->service.initted)
     {
-        return(&s_eo_theinertials);
+        return(p);
     }
     
-    s_eo_theinertials.service.active = eobool_false;
+    p->service.active = eobool_false;
         
-    s_eo_theinertials.numofmtbs = 0;
-    s_eo_theinertials.service.servconfig.type = eomn_serv_NONE;
+    p->numofmtbs = 0;
+    p->service.servconfig.type = eomn_serv_NONE;
     
     
-    s_eo_theinertials.sharedcan.boardproperties = eo_vector_New(sizeof(eOcanmap_board_properties_t), eo_inertials_maxnumberofMTBboards, NULL, NULL, NULL, NULL);
+    p->sharedcan.boardproperties = eo_vector_New(sizeof(eOcanmap_board_properties_t), eo_inertials_maxnumberofMTBboards, NULL, NULL, NULL, NULL);
     
-    s_eo_theinertials.sharedcan.entitydescriptor = eo_vector_New(sizeof(eOcanmap_entitydescriptor_t), eo_inertials_maxnumberofMTBboards, NULL, NULL, NULL, NULL);
+    p->sharedcan.entitydescriptor = eo_vector_New(sizeof(eOcanmap_entitydescriptor_t), eo_inertials_maxnumberofMTBboards, NULL, NULL, NULL, NULL);
     
 
-    s_eo_theinertials.inertial2 = NULL;
-    memcpy(&s_eo_theinertials.sensorsconfig, &s_eo_default_inertialsensorsconfig, sizeof(eOas_inertial_sensorsconfig_t));
-    s_eo_theinertials.fifoofinertialdata = eo_vector_New(sizeof(eOas_inertial_data_t), 32, NULL, 0, NULL, NULL);
+    p->inertial2 = NULL;
+    memcpy(&p->sensorsconfig, &s_eo_default_inertialsensorsconfig, sizeof(eOas_inertial_sensorsconfig_t));
+    p->fifoofinertialdata = eo_vector_New(sizeof(eOas_inertial_data_t), 32, NULL, 0, NULL, NULL);
     
-    s_eo_theinertials.diagnostics.reportTimer = eo_timer_New();
-    s_eo_theinertials.diagnostics.errorType = eo_errortype_error;
-    s_eo_theinertials.diagnostics.errorDescriptor.sourceaddress = eo_errman_sourcedevice_localboard;
-    s_eo_theinertials.diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_inertials_not_verified_yet);  
+    p->diagnostics.reportTimer = eo_timer_New();
+    p->diagnostics.errorType = eo_errortype_error;
+    p->diagnostics.errorDescriptor.sourceaddress = eo_errman_sourcedevice_localboard;
+    p->diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_inertials_not_verified_yet);  
     
-    s_eo_theinertials.service.initted = eobool_true;
-    s_eo_theinertials.service.active = eobool_false;
-    s_eo_theinertials.service.running = eobool_false;
-
+    p->service.initted = eobool_true;    
+    p->service.active = eobool_false;
+    p->service.running = eobool_false;
+    p->service.state = eomn_serv_state_idle;
     
     return(&s_eo_theinertials);   
 }
@@ -311,217 +316,15 @@ extern EOtheInertials* eo_inertials_GetHandle(void)
 }
 
 
-extern eOresult_t eo_inertials_Verify(EOtheInertials *p, const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify)
-{
-    if((NULL == p) || (NULL == servcfg))
-    {
-        return(eores_NOK_nullpointer);
-    } 
-
-    if(eomn_serv_AS_inertial != servcfg->type)
-    {
-        return(eores_NOK_generic);
-    }   
-    
- 
-// DONT Deactivate ... we may want just to check again ....    
-//    if(eobool_true == s_eo_theinertials.service.active)
-//    {
-//        eo_inertials_Deactivate(p);        
-//    }   
-    
-    // make sure the timer is not running
-    eo_timer_Stop(s_eo_theinertials.diagnostics.reportTimer);    
-
-    s_eo_theinertials.service.onverify = onverify;
-    s_eo_theinertials.service.activateafterverify = activateafterverify;
-
-
-    s_eo_theinertials.sharedcan.discoverytarget.info.type = eobrd_cantype_mtb;
-    s_eo_theinertials.sharedcan.discoverytarget.info.protocol.major = servcfg->data.as.inertial.version.protocol.major; 
-    s_eo_theinertials.sharedcan.discoverytarget.info.protocol.minor = servcfg->data.as.inertial.version.protocol.minor;
-    s_eo_theinertials.sharedcan.discoverytarget.info.firmware.major = servcfg->data.as.inertial.version.firmware.major; 
-    s_eo_theinertials.sharedcan.discoverytarget.info.firmware.minor = servcfg->data.as.inertial.version.firmware.minor;
-    s_eo_theinertials.sharedcan.discoverytarget.info.firmware.build = servcfg->data.as.inertial.version.firmware.build;    
-    
-    // now i must do discovery of the mtb boards. the one used for the inertials are all in the canmap
-    s_eo_theinertials.sharedcan.discoverytarget.canmap[eOcanport1] = servcfg->data.as.inertial.canmap[eOcanport1];
-    s_eo_theinertials.sharedcan.discoverytarget.canmap[eOcanport2] = servcfg->data.as.inertial.canmap[eOcanport2];
-
-    
-    uint8_t numofboards = eo_common_hlfword_bitsetcount(s_eo_theinertials.sharedcan.discoverytarget.canmap[eOcanport1]) +
-                          eo_common_hlfword_bitsetcount(s_eo_theinertials.sharedcan.discoverytarget.canmap[eOcanport2]);
-    
-    if(numofboards > eo_inertials_maxnumberofMTBboards)
-    {
-        
-        s_eo_theinertials.diagnostics.errorDescriptor.sourcedevice       = eo_errman_sourcedevice_localboard;
-        s_eo_theinertials.diagnostics.errorDescriptor.sourceaddress      = 0;
-        s_eo_theinertials.diagnostics.errorDescriptor.par16              = (numofboards << 8) | (eo_inertials_maxnumberofMTBboards & 0x00ff);
-        s_eo_theinertials.diagnostics.errorDescriptor.par64              = (s_eo_theinertials.sharedcan.discoverytarget.canmap[eOcanport2] << 16) | (s_eo_theinertials.sharedcan.discoverytarget.canmap[eOcanport1]);
-       
-        EOaction_strg astrg = {0};
-        EOaction *act = (EOaction*)&astrg;
-        eo_action_SetCallback(act, s_eo_inertials_send_periodic_error_report, NULL, eov_callbackman_GetTask(eov_callbackman_GetHandle()));        
-        
-        s_eo_theinertials.diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_inertials_failed_toomanyboards);
-        s_eo_theinertials.diagnostics.errorType = eo_errortype_error;                
-        eo_errman_Error(eo_errman_GetHandle(), s_eo_theinertials.diagnostics.errorType, NULL, s_eobj_ownname, &s_eo_theinertials.diagnostics.errorDescriptor);
-        
-        if(0 != s_eo_theinertials.diagnostics.reportPeriod)
-        {
-            s_eo_theinertials.diagnostics.errorCallbackCount = EOK_int08dummy;
-            eo_timer_Start(s_eo_theinertials.diagnostics.reportTimer, eok_abstimeNOW, s_eo_theinertials.diagnostics.reportPeriod, eo_tmrmode_FOREVER, act);   
-        }            
-        
-        return(eores_NOK_generic); 
-    }
-              
-    
-
-    s_eo_theinertials.sharedcan.ondiscoverystop.function = s_eo_inertials_onstop_search4mtbs;
-    s_eo_theinertials.sharedcan.ondiscoverystop.parameter = (void*)servcfg;
-    
-    // start discovery   
-    eo_candiscovery2_Start(eo_candiscovery2_GetHandle(), &s_eo_theinertials.sharedcan.discoverytarget, &s_eo_theinertials.sharedcan.ondiscoverystop);   
-   
-    return(eores_OK);   
-}
-
-
-
-extern eOresult_t eo_inertials_Deactivate(EOtheInertials *p)
+extern eOmn_serv_state_t eo_inertials_GetServiceState(EOtheInertials *p)
 {
     if(NULL == p)
     {
-        return(eores_NOK_nullpointer);
-    }
-
-    if(eobool_false == s_eo_theinertials.service.active)
-    {
-        return(eores_OK);        
-    } 
-    
-
-    eo_inertials_Stop(&s_eo_theinertials);
-    s_eo_theinertials.service.running = eobool_false;
-
-        
-    eo_canmap_DeconfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_analogsensors, eoprot_entity_as_inertial, s_eo_theinertials.sharedcan.entitydescriptor); 
-    
-    eo_canmap_UnloadBoards(eo_canmap_GetHandle(), s_eo_theinertials.sharedcan.boardproperties);
-     
-    
-    eo_entities_SetNumOfInertials(eo_entities_GetHandle(), 0);
-    
-    s_eo_theinertials.numofmtbs = 0;
-    
-    s_eo_theinertials.inertial2 = NULL;
-    
-    eo_vector_Clear(s_eo_theinertials.fifoofinertialdata);
-                
-    memset(&s_eo_theinertials.service.servconfig, 0, sizeof(eOmn_serv_configuration_t));
-    s_eo_theinertials.service.servconfig.type = eomn_serv_NONE;
-    
-    eo_vector_Clear(s_eo_theinertials.sharedcan.boardproperties);
-    eo_vector_Clear(s_eo_theinertials.sharedcan.entitydescriptor);
-    
-    // make sure the timer is not running
-    eo_timer_Stop(s_eo_theinertials.diagnostics.reportTimer);  
-    
-    s_eo_theinertials.service.active = eobool_false;
-    
-    return(eores_OK);
-}
-
-
-
-extern eOresult_t eo_inertials_Activate(EOtheInertials *p, const eOmn_serv_configuration_t * servcfg)
-{
-    if((NULL == p) || (NULL == servcfg))
-    {
-        return(eores_NOK_nullpointer);
+        return(eomn_serv_state_notsupported);
     } 
 
-    if(eomn_serv_AS_inertial != servcfg->type)
-    {
-        return(eores_NOK_generic);
-    }
-    
-    if(eobool_true == s_eo_theinertials.service.active)
-    {
-        eo_inertials_Deactivate(p);        
-    }   
-    
-    eo_entities_SetNumOfInertials(eo_entities_GetHandle(), 1);
-    
-    if(0 == eo_entities_NumOfInertials(eo_entities_GetHandle()))
-    {
-        s_eo_theinertials.service.active = eobool_false;
-        return(eores_NOK_generic);
-    }
-    
-       
-    memcpy(&s_eo_theinertials.service.servconfig, servcfg, sizeof(eOmn_serv_configuration_t));
-
-
-    s_eo_theinertials.inertial2 = eo_entities_GetInertial(eo_entities_GetHandle(), 0);
-    
-    
-    // now i must add all the mtb boards. i iterate per canbus
-    
-    eOcanmap_board_properties_t prop = 
-    {
-        .type               = eobrd_cantype_mtb, 
-        .location           = { .port = 0, .addr = 0, .insideindex = eocanmap_insideindex_none },
-        .requiredprotocol   = { .major = servcfg->data.as.inertial.version.protocol.major, .minor = servcfg->data.as.inertial.version.protocol.minor }
-    };  
-    
-    eOcanmap_entitydescriptor_t des = 
-    {
-        .location   = { .port = 0, .addr = 0, .insideindex = eocanmap_insideindex_none },
-        .index      = entindex00
-    };        
-    
-    s_eo_theinertials.numofmtbs = 0;
-    
-    uint8_t j = 0;
-    uint8_t k = 0;
-
-    for(j=0; j<eOcanports_number; j++)
-    {
-        uint16_t canbusmapping = servcfg->data.as.inertial.canmap[j];
-        for(k=1; k<15; k++)
-        {
-            if(eobool_true == eo_common_hlfword_bitcheck(canbusmapping, k))
-            {   // i pushback. i dont verify vs teh capacity of the vector because eo_inertials_Verify() has already done it
-                prop.location.port = j;
-                prop.location.addr = k;
-                eo_vector_PushBack(s_eo_theinertials.sharedcan.boardproperties, &prop);
-                
-                des.location.port = j;
-                des.location.addr = k;
-                des.index = entindex00;                        
-                eo_vector_PushBack(s_eo_theinertials.sharedcan.entitydescriptor, &des);
-                
-                s_eo_theinertials.numofmtbs++;
-            }
-        }
-    }
-
-    
-    // load the can mapping 
-    eo_canmap_LoadBoards(eo_canmap_GetHandle(), s_eo_theinertials.sharedcan.boardproperties); 
-    
-    // load the entity mapping.
-    eo_canmap_ConfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_analogsensors, eoprot_entity_as_inertial, s_eo_theinertials.sharedcan.entitydescriptor);   
-
-    s_eo_theinertials.service.active = eobool_true;        
-
-    
-    return(eores_OK);   
+    return(p->service.state);
 }
-
 
 
 extern eOresult_t eo_inertials_SendReport(EOtheInertials *p)
@@ -552,6 +355,396 @@ extern eOresult_t eo_inertials_SendReport(EOtheInertials *p)
 }
 
 
+extern eOresult_t eo_inertials_Verify(EOtheInertials *p, const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify)
+{
+    if((NULL == p) || (NULL == servcfg))
+    {
+        s_eo_theinertials.service.state = eomn_serv_state_failureofverify;
+        if(NULL != onverify)
+        {
+            onverify(p, eobool_false); 
+        }        
+        return(eores_NOK_nullpointer);
+    } 
+
+    if(eomn_serv_AS_inertial != servcfg->type)
+    {
+        p->service.state = eomn_serv_state_failureofverify;
+        if(NULL != onverify)
+        {
+            onverify(p, eobool_false); 
+        }        
+        return(eores_NOK_generic);
+    }   
+    
+ 
+// DONT Deactivate ... we may want just to check again ....    
+//    if(eobool_true == p->service.active)
+//    {
+//        eo_inertials_Deactivate(p);        
+//    }   
+    
+    p->service.state = eomn_serv_state_verifying;   
+
+    // make sure the timer is not running
+    eo_timer_Stop(p->diagnostics.reportTimer);    
+
+    p->service.onverify = onverify;
+    p->service.activateafterverify = activateafterverify;
+
+
+    p->sharedcan.discoverytarget.info.type = eobrd_cantype_mtb;
+    p->sharedcan.discoverytarget.info.protocol.major = servcfg->data.as.inertial.version.protocol.major; 
+    p->sharedcan.discoverytarget.info.protocol.minor = servcfg->data.as.inertial.version.protocol.minor;
+    p->sharedcan.discoverytarget.info.firmware.major = servcfg->data.as.inertial.version.firmware.major; 
+    p->sharedcan.discoverytarget.info.firmware.minor = servcfg->data.as.inertial.version.firmware.minor;
+    p->sharedcan.discoverytarget.info.firmware.build = servcfg->data.as.inertial.version.firmware.build;    
+    
+    // now i must do discovery of the mtb boards. the one used for the inertials are all in the canmap
+    p->sharedcan.discoverytarget.canmap[eOcanport1] = servcfg->data.as.inertial.canmap[eOcanport1];
+    p->sharedcan.discoverytarget.canmap[eOcanport2] = servcfg->data.as.inertial.canmap[eOcanport2];
+
+    
+    uint8_t numofboards = eo_common_hlfword_bitsetcount(p->sharedcan.discoverytarget.canmap[eOcanport1]) +
+                          eo_common_hlfword_bitsetcount(p->sharedcan.discoverytarget.canmap[eOcanport2]);
+    
+    if(numofboards > eo_inertials_maxnumberofMTBboards)
+    {
+        
+        p->diagnostics.errorDescriptor.sourcedevice       = eo_errman_sourcedevice_localboard;
+        p->diagnostics.errorDescriptor.sourceaddress      = 0;
+        p->diagnostics.errorDescriptor.par16              = (numofboards << 8) | (eo_inertials_maxnumberofMTBboards & 0x00ff);
+        p->diagnostics.errorDescriptor.par64              = (p->sharedcan.discoverytarget.canmap[eOcanport2] << 16) | (p->sharedcan.discoverytarget.canmap[eOcanport1]);
+       
+        EOaction_strg astrg = {0};
+        EOaction *act = (EOaction*)&astrg;
+        eo_action_SetCallback(act, s_eo_inertials_send_periodic_error_report, p, eov_callbackman_GetTask(eov_callbackman_GetHandle()));        
+        
+        p->diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_inertials_failed_toomanyboards);
+        p->diagnostics.errorType = eo_errortype_error;                
+        eo_errman_Error(eo_errman_GetHandle(), p->diagnostics.errorType, NULL, s_eobj_ownname, &p->diagnostics.errorDescriptor);
+        
+        if(0 != p->diagnostics.reportPeriod)
+        {
+            p->diagnostics.errorCallbackCount = EOK_int08dummy;
+            eo_timer_Start(p->diagnostics.reportTimer, eok_abstimeNOW, p->diagnostics.reportPeriod, eo_tmrmode_FOREVER, act);   
+        }  
+        
+        p->service.state = eomn_serv_state_failureofverify;
+        if(NULL != onverify)
+        {
+            onverify(p, eobool_false); 
+        }    
+        
+        return(eores_NOK_generic); 
+    }
+                  
+    p->sharedcan.ondiscoverystop.function = s_eo_inertials_onstop_search4mtbs;
+    p->sharedcan.ondiscoverystop.parameter = (void*)servcfg;
+    
+    // start discovery   
+    eo_candiscovery2_Start(eo_candiscovery2_GetHandle(), &p->sharedcan.discoverytarget, &p->sharedcan.ondiscoverystop);   
+   
+    return(eores_OK);   
+}
+
+
+
+extern eOresult_t eo_inertials_Deactivate(EOtheInertials *p)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+
+    if(eobool_false == p->service.active)
+    {
+        return(eores_OK);        
+    } 
+    
+    if(eobool_true == p->service.running)
+    {
+        eo_inertials_Stop(p);
+    }
+      
+    eo_canmap_DeconfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_analogsensors, eoprot_entity_as_inertial, p->sharedcan.entitydescriptor); 
+    
+    eo_canmap_UnloadBoards(eo_canmap_GetHandle(), p->sharedcan.boardproperties);
+     
+    
+    eo_entities_SetNumOfInertials(eo_entities_GetHandle(), 0);
+    
+    p->numofmtbs = 0;
+    
+    p->inertial2 = NULL;
+    
+    eo_vector_Clear(p->fifoofinertialdata);
+                
+    memset(&p->service.servconfig, 0, sizeof(eOmn_serv_configuration_t));
+    p->service.servconfig.type = eomn_serv_NONE;
+    
+    eo_vector_Clear(p->sharedcan.boardproperties);
+    eo_vector_Clear(p->sharedcan.entitydescriptor);
+    
+    // make sure the timer is not running
+    eo_timer_Stop(p->diagnostics.reportTimer);  
+    
+    p->service.active = eobool_false;    
+    p->service.state = eomn_serv_state_idle;
+    
+    return(eores_OK);
+}
+
+
+
+extern eOresult_t eo_inertials_Activate(EOtheInertials *p, const eOmn_serv_configuration_t * servcfg)
+{
+    if((NULL == p) || (NULL == servcfg))
+    {
+        return(eores_NOK_nullpointer);
+    } 
+
+    if(eomn_serv_AS_inertial != servcfg->type)
+    {
+        return(eores_NOK_generic);
+    }
+    
+    if(eobool_true == p->service.active)
+    {
+        eo_inertials_Deactivate(p);        
+    }   
+    
+    eo_entities_SetNumOfInertials(eo_entities_GetHandle(), 1);
+    
+    if(0 == eo_entities_NumOfInertials(eo_entities_GetHandle()))
+    {
+        p->service.active = eobool_false;
+        return(eores_NOK_generic);
+    }
+    
+       
+    memcpy(&p->service.servconfig, servcfg, sizeof(eOmn_serv_configuration_t));
+
+
+    p->inertial2 = eo_entities_GetInertial(eo_entities_GetHandle(), 0);
+    
+    
+    // now i must add all the mtb boards. i iterate per canbus
+    
+    eOcanmap_board_properties_t prop = 
+    {
+        .type               = eobrd_cantype_mtb, 
+        .location           = { .port = 0, .addr = 0, .insideindex = eocanmap_insideindex_none },
+        .requiredprotocol   = { .major = servcfg->data.as.inertial.version.protocol.major, .minor = servcfg->data.as.inertial.version.protocol.minor }
+    };  
+    
+    eOcanmap_entitydescriptor_t des = 
+    {
+        .location   = { .port = 0, .addr = 0, .insideindex = eocanmap_insideindex_none },
+        .index      = entindex00
+    };        
+    
+    p->numofmtbs = 0;
+    
+    uint8_t j = 0;
+    uint8_t k = 0;
+
+    for(j=0; j<eOcanports_number; j++)
+    {
+        uint16_t canbusmapping = servcfg->data.as.inertial.canmap[j];
+        for(k=1; k<15; k++)
+        {
+            if(eobool_true == eo_common_hlfword_bitcheck(canbusmapping, k))
+            {   // i pushback. i dont verify vs teh capacity of the vector because eo_inertials_Verify() has already done it
+                prop.location.port = j;
+                prop.location.addr = k;
+                eo_vector_PushBack(p->sharedcan.boardproperties, &prop);
+                
+                des.location.port = j;
+                des.location.addr = k;
+                des.index = entindex00;                        
+                eo_vector_PushBack(p->sharedcan.entitydescriptor, &des);
+                
+                p->numofmtbs++;
+            }
+        }
+    }
+
+    
+    // load the can mapping 
+    eo_canmap_LoadBoards(eo_canmap_GetHandle(), p->sharedcan.boardproperties); 
+    
+    // load the entity mapping.
+    eo_canmap_ConfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_analogsensors, eoprot_entity_as_inertial, p->sharedcan.entitydescriptor);   
+
+    p->service.active = eobool_true;    
+    p->service.state = eomn_serv_state_activated;        
+
+    
+    return(eores_OK);   
+}
+
+
+
+extern eOresult_t eo_inertials_Start(EOtheInertials *p)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    if(eobool_false == p->service.active)
+    {   // nothing to do because object must be first activated
+        return(eores_OK);
+    } 
+
+    if(eobool_true == p->service.running)
+    {   // it is already running
+        return(eores_OK);
+    } 
+    
+//    if(eobool_true == p->service.running)
+//    {   // if running we stop before
+//        eo_inertials_Stop(p);
+//    } 
+    
+
+    // ok, now we do something.    
+         
+    //s_eo_inertials_TXstart(p);
+
+    p->service.running = eobool_true;    
+    p->service.state = eomn_serv_state_running;
+    
+    
+    return(eores_OK);      
+}
+
+
+
+extern eOresult_t eo_inertials_Stop(EOtheInertials *p)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    if(eobool_false == p->service.active)
+    {   // nothing to do because object must be first activated
+        return(eores_OK);
+    }  
+    
+    if(eobool_false == p->service.running)
+    {   // it is already stopped
+        return(eores_OK);
+    } 
+        
+
+    // ok, now we do something.    
+      
+    s_eo_inertials_TXstop(p);
+    
+               
+    p->service.running = eobool_false;
+    p->service.state = eomn_serv_state_activated;
+ 
+    return(eores_OK);     
+}
+
+
+extern eOresult_t eo_inertials_Transmission(EOtheInertials *p, eObool_t on)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    if(eobool_false == p->service.active)
+    {   // nothing to do because object must be first activated
+        return(eores_OK);
+    } 
+
+    if(eobool_false == p->service.running)
+    {   // not running, thus we do nothing
+        return(eores_OK);
+    } 
+
+    if(eobool_false == p->configured)
+    {   // nothing to do because we dont have a configured service 
+        return(eores_OK);
+    } 
+
+    if(eobool_true == on)
+    {
+        s_eo_inertials_TXstart(p);
+    }
+    else
+    {
+        s_eo_inertials_TXstop(p);
+    }
+
+    return(eores_OK);
+}
+
+
+extern eOresult_t eo_inertials_Tick(EOtheInertials *p, eObool_t resetstatus)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    if(eobool_false == p->service.active)
+    {   // nothing to do because object must be first activated
+        return(eores_OK);
+    } 
+
+    if(eobool_false == p->service.running)
+    {   // not running, thus we do nothing
+        return(eores_OK);
+    } 
+
+    if(eobool_false == p->configured)
+    {   // nothing to do because we dont have a configured service 
+        return(eores_OK);
+    }    
+
+    if(eobool_false == resetstatus)
+    {   // nothing to do because we cannot overwrite the status of inertial 
+        return(eores_OK);
+    }       
+    
+    // i can update the status of the inertial because the old value has already been transmitted.
+    
+    
+    // the status data of the inertial entity is in ...
+    eOas_inertial_data_t *data = &p->inertial2->status.data;
+    memset(data, 0, sizeof(eOas_inertial_data_t)); 
+    
+    if(eobool_true == eo_vector_Empty(p->fifoofinertialdata))
+    {
+        // just reset the status->data 
+        data->type = eoas_inertial_type_none;
+        data->position = eoas_inertial_pos_none;
+        data->timestamp = eov_sys_LifeTimeGet(eov_sys_GetHandle());           
+    }
+    else
+    {
+        // else ... retrieve the item from fifoofinertialdata, copy it into status->data and remove it from fifoofinertialdata 
+        eOas_inertial_data_t * item = (eOas_inertial_data_t*) eo_vector_Front(p->fifoofinertialdata);
+        if(NULL != item)
+        {
+            memcpy(data, item, sizeof(eOas_inertial_data_t));   
+            eo_vector_PopFront(p->fifoofinertialdata);   
+        }
+    }
+    
+    return(eores_OK);        
+}
+
+
+
+
 //#warning THINK of what to use instead of eo_inertials_ServiceConfig()
 extern eOresult_t eo_inertials_ServiceConfig(EOtheInertials *p, const eOas_inertial_serviceconfig_t* cfg)
 {    
@@ -562,13 +755,19 @@ extern eOresult_t eo_inertials_ServiceConfig(EOtheInertials *p, const eOas_inert
         return(eores_NOK_nullpointer);
     }
     
-    if(eobool_false == s_eo_theinertials.service.active)
-    {   // nothing to do because we dont have a inertials service active
+    if(eobool_false == p->service.active)
+    {   // nothing to do because object must be first activated
         return(eores_OK);
     }  
+  
+// we allow doing things also if we are not in running mode yet    
+//    if(eobool_false == p->service.running)
+//    {   // not running, thus we do nothing
+//        return(eores_OK);
+//    } 
     
     
-    if(eobool_true == s_eo_theinertials.service.running)
+    if(eobool_true == p->service.running)
     {
         eo_inertials_Stop(p);
     }
@@ -577,7 +776,7 @@ extern eOresult_t eo_inertials_ServiceConfig(EOtheInertials *p, const eOas_inert
     s_eo_inertials_build_maps(cfg);
     
     // and set it configured
-    s_eo_theinertials.configured = eobool_true;
+    p->configured = eobool_true;
     
     return(eores_OK);  
 }
@@ -592,12 +791,18 @@ extern eOresult_t eo_inertials_SensorsConfig(EOtheInertials *p, eOas_inertial_se
         return(eores_NOK_nullpointer);
     }
     
-    if(eobool_false == s_eo_theinertials.service.active)
-    {   // nothing to do because we dont have a inertials service active
+    if(eobool_false == p->service.active)
+    {   // nothing to do because object must be first activated
         return(eores_OK);
     }  
+  
+// we allow doing things also if we are not in running mode yet    
+//    if(eobool_false == p->service.running)
+//    {   // not running, thus we do nothing
+//        return(eores_OK);
+//    }
     
-    if(eobool_false == s_eo_theinertials.configured)
+    if(eobool_false == p->configured)
     {
         // nothing to do because we dont have a configured object yet 
         return(eores_OK);
@@ -608,355 +813,60 @@ extern eOresult_t eo_inertials_SensorsConfig(EOtheInertials *p, eOas_inertial_se
     
     // at first we copy the target config into the local config
     
-    s_eo_theinertials.sensorsconfig.datarate         = config->datarate;
-    s_eo_theinertials.sensorsconfig.accelerometers   = config->accelerometers;
-    s_eo_theinertials.sensorsconfig.gyroscopes       = config->gyroscopes;
+    p->sensorsconfig.datarate         = config->datarate;
+    p->sensorsconfig.accelerometers   = config->accelerometers;
+    p->sensorsconfig.gyroscopes       = config->gyroscopes;
     
     // then we check enabled mask and datarate
     
     // the enabled must be in bitwise AND with the supported ones
-    s_eo_theinertials.sensorsconfig.accelerometers   &= s_eo_theinertials.supportedmask64;
-    if(s_eo_theinertials.sensorsconfig.accelerometers != config->accelerometers)
+    p->sensorsconfig.accelerometers   &= p->supportedmask64;
+    if(p->sensorsconfig.accelerometers != config->accelerometers)
     {
         // send up diagnostics
         // warning -> "Object EOtheInertials does not not support some accelerometers."               
     }
     
-    if(0 == s_eo_theinertials.sensorsconfig.accelerometers)
+    if(0 == p->sensorsconfig.accelerometers)
     {
         // send up diagnostics
         // warning -> "Object EOtheInertials does not have a valid configuration."            
     }
     
-    s_eo_theinertials.sensorsconfig.gyroscopes   &= s_eo_theinertials.supportedmask64;
-    if(s_eo_theinertials.sensorsconfig.gyroscopes != config->gyroscopes)
+    p->sensorsconfig.gyroscopes   &= p->supportedmask64;
+    if(p->sensorsconfig.gyroscopes != config->gyroscopes)
     {
         // send up diagnostics
         // warning -> "Object EOtheInertials does not not support some gyroscopes."               
     }
     
-    if(0 == s_eo_theinertials.sensorsconfig.gyroscopes)
+    if(0 == p->sensorsconfig.gyroscopes)
     {
         // send up diagnostics
         // warning -> "Object EOtheInertials does not have a valid configuration."            
     }
     
-    if(s_eo_theinertials.sensorsconfig.datarate < 10)
+    if(p->sensorsconfig.datarate < 10)
     {
-        s_eo_theinertials.sensorsconfig.datarate = 10;
+        p->sensorsconfig.datarate = 10;
         // send up diagnostics
         // warning -> "Object EOtheInertials has changed the requested datarate."         
     }
     
-    if(s_eo_theinertials.sensorsconfig.datarate > 200)
+    if(p->sensorsconfig.datarate > 200)
     {
-        s_eo_theinertials.sensorsconfig.datarate = 200;
+        p->sensorsconfig.datarate = 200;
         // send up diagnostics
         // warning -> "Object EOtheInertials has changed the requested datarate."             
     }
     
  
-    // ok guys: now we transmit the configuration to each one of the sensors which have a non-zero bit inside teh s_eo_theinertials.config2.enabled mask.
+    // ok guys: now we transmit the configuration to each one of the sensors which have a non-zero bit inside teh p->config2.enabled mask.
     // WAIT A MINUTE: we do it inside eo_inertials_Start() !!!!!!!!!!!!
 
     
     return(eores_OK);           
 }
-
-
-extern eOresult_t eo_inertials_Start(EOtheInertials *p)
-{
-    if(NULL == p)
-    {
-        return(eores_NOK_nullpointer);
-    }
-    
-    if(eobool_false == s_eo_theinertials.service.active)
-    {   // nothing to do because we dont have an active service
-        return(eores_OK);
-    }  
-
-    if(eobool_false == s_eo_theinertials.configured)
-    {   // dont have a configured service
-        return(eores_OK);
-    }    
-
-    // ok, now we do something.    
-
-    if(eobool_true == s_eo_theinertials.service.running)
-    {   // if transmitting we stop before
-        eo_inertials_Stop(p);
-    }       
-    
-    
-    if((0 == s_eo_theinertials.sensorsconfig.accelerometers) && (0 == s_eo_theinertials.sensorsconfig.gyroscopes))
-    {
-        // send up diagnostics
-        // error -> "Object EOtheInertials does not contain a valid configuration, thus will NOT activate any sensor."         
-    } 
-
-    
-    eObool_t sentconfig = eobool_false;
- 
-    icubCanProto_inertial_config_t canprotoconfig = {0};
-    
-    canprotoconfig.period           = s_eo_theinertials.sensorsconfig.datarate;
-    canprotoconfig.enabledsensors   = icubCanProto_inertial_sensorflag_none;
-    
-    s_eo_theinertials.sharedcan.command.class = eocanprot_msgclass_pollingAnalogSensor;
-    s_eo_theinertials.sharedcan.command.type  = ICUBCANPROTO_POL_SK_CMD__ACC_GYRO_SETUP;
-    s_eo_theinertials.sharedcan.command.value = &canprotoconfig;
-
-    uint8_t i = 0;
-    eOcanmap_location_t location = {0};
-    
-    for(i=0; i<eoas_inertial_pos_max_numberof; i++)
-    {
-        canprotoconfig.enabledsensors = icubCanProto_inertial_sensorflag_none;
-
-        if(1 == EOAS_ISPOSENABLED(s_eo_theinertials.sensorsconfig.accelerometers, i))
-        {
-            // for jorhabib: he needs the external accelerometer on feet. long term solution is to introduce an externalaccelerometers mask and an internalgyroscope mask
-            //#define FOR_JORHABIB
-            #if defined(FOR_JORHABIB)
-            if((eoas_inertial_pos_l_foot_1 == i) || (eoas_inertial_pos_l_foot_2 == i) || (eoas_inertial_pos_r_foot_1 == i) || (eoas_inertial_pos_r_foot_2 == i))
-            {
-                canprotoconfig.enabledsensors |= icubCanProto_inertial_sensorflag_externaldigitalaccelerometer;
-            }
-            else
-            {
-                canprotoconfig.enabledsensors |= icubCanProto_inertial_sensorflag_internaldigitalaccelerometer;
-            }
-            #else
-            canprotoconfig.enabledsensors |= icubCanProto_inertial_sensorflag_internaldigitalaccelerometer;
-            #endif
-        }
-
-        if(1 == EOAS_ISPOSENABLED(s_eo_theinertials.sensorsconfig.gyroscopes, i))
-        {
-            canprotoconfig.enabledsensors |= icubCanProto_inertial_sensorflag_externaldigitalgyroscope;
-        } 
-
-        if(icubCanProto_inertial_sensorflag_none != canprotoconfig.enabledsensors)
-        {
-            // ok, we have at least a gyro or an accel or them both. thus we send the config to the can location
-            eOas_inertial_position_t position = (eOas_inertial_position_t)i;
-            if(eobool_true == s_eo_inertials_get_canlocation(position, &location))
-            {
-                sentconfig = eobool_true;
-                eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), &s_eo_theinertials.sharedcan.command, location);  
-            } 
-            
-        }       
-    }
-
-
-    if(eobool_false == sentconfig)
-    {
-        s_eo_theinertials.service.running = eobool_false;
-    }
-    else
-    {
-        s_eo_theinertials.service.running = eobool_true;
-    }
-    
-    // send up diagnostics
-    // debug -> "Object EOtheInertials has programmed the mtb. In param16 in msb there is the mode, in lsb there is datarate"  
-    
-    return(eores_OK);  
-    
-}
-
-
-
-//extern eOresult_t eo_inertials_StartOLD(EOtheInertials *p)
-//{
-//    if(NULL == p)
-//    {
-//        return(eores_NOK_nullpointer);
-//    }
-//    
-//    if(eobool_false == s_eo_theinertials.thereisinertial)
-//    {   // nothing to do because we dont have an inertial board
-//        // send up diagnostics
-//        // error -> "Object EOtheInertials does not not support any inertial, thus will NOT process any command."          
-//        return(eores_OK);
-//    } 
-
-//    if(eobool_false == s_eo_theinertials.configured)
-//    {
-//        // nothing to do because we dont have a configured object et
-//        // send up diagnostics
-//        // error -> "Object EOtheInertials is not yet configured, thus will NOT process any command."   
-//        return(eores_OK);
-//    }    
-
-//    // ok, now we do something.    
-
-//    if(eobool_true == s_eo_theinertials.service.running)
-//    {   // if transmitting we stop before
-//        eo_inertials_Stop(p);
-//    }       
-//    
-//    
-//    if((0 == s_eo_theinertials.sensorsconfig.accelerometers) && (0 == s_eo_theinertials.sensorsconfig.gyroscopes))
-//    {
-//        // send up diagnostics
-//        // error -> "Object EOtheInertials does not contain a valid configuration, thus will NOT activate any sensor."         
-//    } 
-
-//    
-//    eObool_t sentconfig = eobool_false;
-// 
-//    icubCanProto_inertial_config_t canprotoconfig = {0};
-//    
-//    canprotoconfig.period           = s_eo_theinertials.sensorsconfig.datarate;
-//    canprotoconfig.enabledsensors   = icubCanProto_inertial_sensorflag_none;
-//    
-//    s_eo_theinertials.command.class = eocanprot_msgclass_pollingAnalogSensor;
-//    s_eo_theinertials.command.type  = ICUBCANPROTO_POL_SK_CMD__ACC_GYRO_SETUP;
-//    s_eo_theinertials.command.value = &canprotoconfig;
-
-//    uint8_t i = 0;
-//    eOcanmap_location_t location = {0};
-//    
-//    for(i=0; i<eoas_inertial_pos_max_numberof; i++)
-//    {
-//        canprotoconfig.enabledsensors = icubCanProto_inertial_sensorflag_none;
-
-//        if(1 == EOAS_ISPOSENABLED(s_eo_theinertials.sensorsconfig.accelerometers, i))
-//        {
-//            // for jorhabib: he needs the external accelerometer on feet. long term solution is to introduce an externalaccelerometers mask and an internalgyroscope mask
-//            //#define FOR_JORHABIB
-//            #if defined(FOR_JORHABIB)
-//            if((eoas_inertial_pos_l_foot_1 == i) || (eoas_inertial_pos_l_foot_2 == i) || (eoas_inertial_pos_r_foot_1 == i) || (eoas_inertial_pos_r_foot_2 == i))
-//            {
-//                canprotoconfig.enabledsensors |= icubCanProto_inertial_sensorflag_externaldigitalaccelerometer;
-//            }
-//            else
-//            {
-//                canprotoconfig.enabledsensors |= icubCanProto_inertial_sensorflag_internaldigitalaccelerometer;
-//            }
-//            #else
-//            canprotoconfig.enabledsensors |= icubCanProto_inertial_sensorflag_internaldigitalaccelerometer;
-//            #endif
-//        }
-
-//        if(1 == EOAS_ISPOSENABLED(s_eo_theinertials.sensorsconfig.gyroscopes, i))
-//        {
-//            canprotoconfig.enabledsensors |= icubCanProto_inertial_sensorflag_externaldigitalgyroscope;
-//        } 
-
-//        if(icubCanProto_inertial_sensorflag_none != canprotoconfig.enabledsensors)
-//        {
-//            // ok, we have at least a gyro or an accel or them both. thus we send the config to the can location
-//            eOas_inertial_position_t position = (eOas_inertial_position_t)i;
-//            if(eobool_true == s_eo_inertials_get_canlocation(position, &location))
-//            {
-//                sentconfig = eobool_true;
-//                eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), &s_eo_theinertials.command, location);  
-//            } 
-//            
-//        }       
-//    }
-
-
-//    if(eobool_false == sentconfig)
-//    {
-//        s_eo_theinertials.service.running = eobool_false;
-//    }
-//    else
-//    {
-//        s_eo_theinertials.service.running = eobool_true;
-//    }
-//    
-//    // send up diagnostics
-//    // debug -> "Object EOtheInertials has programmed the mtb. In param16 in msb there is the mode, in lsb there is datarate"  
-//    
-//    return(eores_OK);  
-//    
-//}
-
-
-
-extern eOresult_t eo_inertials_Stop(EOtheInertials *p)
-{
-    if(NULL == p)
-    {
-        return(eores_NOK_nullpointer);
-    }
-    
-    if(eobool_false == s_eo_theinertials.service.active)
-    {   // nothing to do because we dont have an active service
-        return(eores_OK);
-    }  
-    
-    if(eobool_false == s_eo_theinertials.configured)
-    {   // nothing to do because we dont have a configured service 
-        return(eores_OK);
-    }    
-
-    // ok, now we do something.    
-
-    // if it is not transmitting we dont send a useless command on can.
-    
-    if(eobool_false == s_eo_theinertials.service.running)
-    {
-         return(eores_OK);
-    }
-
-    icubCanProto_inertial_config_t canprotoconfig = {0};
-    
-    canprotoconfig.enabledsensors   = icubCanProto_inertial_sensorflag_none;
-    canprotoconfig.period           = s_eo_theinertials.sensorsconfig.datarate;
-
-    s_eo_theinertials.sharedcan.command.class = eocanprot_msgclass_pollingAnalogSensor;
-    s_eo_theinertials.sharedcan.command.type  = ICUBCANPROTO_POL_SK_CMD__ACC_GYRO_SETUP;
-    s_eo_theinertials.sharedcan.command.value = &canprotoconfig;
-    
-    
-    uint8_t i = 0;
-    eOcanmap_location_t location = {0};
-    
-    for(i=0; i<eoas_inertial_pos_max_numberof; i++)
-    {
-        if((1 == EOAS_ISPOSENABLED(s_eo_theinertials.sensorsconfig.accelerometers, i)) || (1 == EOAS_ISPOSENABLED(s_eo_theinertials.sensorsconfig.gyroscopes, i)))
-        {            
-            eOas_inertial_position_t position = (eOas_inertial_position_t)i;            
-
-            // fill location and send 
-            if(eobool_true == s_eo_inertials_get_canlocation(position, &location))
-            {
-                eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), &s_eo_theinertials.sharedcan.command, location);  
-            }                                       
-        }             
-    }    
-           
-    
-    s_eo_theinertials.service.running = eobool_false;
- 
-    // send up diagnostics
-    // debug -> "Object EOtheInertials has programmed the mtb. In param16 in msb there is the mode, in lsb there is datarate"
-    
-    return(eores_OK);  
-    
-}
-
-// not used
-//extern eObool_t eo_inertials_IsTransmitting(EOtheInertials *p)
-//{
-//    if(NULL == p)
-//    {
-//        return(eobool_false);
-//    }
-//    
-//    if(eobool_false == s_eo_theinertials.service.active)
-//    {   // false because we have an inactive service
-//        return(eobool_false);
-//    }  
-
-//    return(s_eo_theinertials.service.running);
-//}    
 
 
 extern eOresult_t eo_inertials_AcceptCANframe(EOtheInertials *p, eOas_inertial_type_t type, eOcanframe_t *frame, eOcanport_t port)
@@ -966,12 +876,18 @@ extern eOresult_t eo_inertials_AcceptCANframe(EOtheInertials *p, eOas_inertial_t
         return(eores_NOK_nullpointer);
     }
     
-    if(eobool_false == s_eo_theinertials.service.active)
-    {   // nothing to do because we dont have an active service        
+    if(eobool_false == p->service.active)
+    {   // nothing to do because object must be first activated
         return(eores_OK);
     }  
+  
+    // we must be in run mode to accept frames, because the tick must be working   
+    if(eobool_false == p->service.running)
+    {   // not running, thus we dont accept
+        return(eores_OK);
+    } 
 
-    if(eobool_false == s_eo_theinertials.configured)
+    if(eobool_false == p->configured)
     {   // nothing to do because we dont have a configured service 
         return(eores_OK);
     }  
@@ -982,7 +898,7 @@ extern eOresult_t eo_inertials_AcceptCANframe(EOtheInertials *p, eOas_inertial_t
     }
     
     // the inertial entity is in ...
-    //s_eo_theinertials.inertial2 = s_eo_theinertials.inertial2;    
+    //p->inertial2 = p->inertial2;    
     // however, we dont use it ...
     // we put what we have inside a fifo of eOas_inertial_data_t
     eOas_inertial_data_t data = {0};
@@ -1002,7 +918,7 @@ extern eOresult_t eo_inertials_AcceptCANframe(EOtheInertials *p, eOas_inertial_t
         return(eores_OK);        
     }
     
-    if(eobool_true == eo_vector_Full(s_eo_theinertials.fifoofinertialdata))
+    if(eobool_true == eo_vector_Full(p->fifoofinertialdata))
     {
         // damn... a loss of can frames
         #warning TODO: add a proper message for loss of inertial can frames and remove eoerror_value_SK_arrayofcandataoverflow
@@ -1015,7 +931,7 @@ extern eOresult_t eo_inertials_AcceptCANframe(EOtheInertials *p, eOas_inertial_t
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, NULL, &des);    
         
         // BUT dont want to lose NEW data ... i could just call a pop front to remove oldest data
-        //eo_vector_PopFront(s_eo_theinertials.fifoofinertialdata);  
+        //eo_vector_PopFront(p->fifoofinertialdata);  
         // BUT .. as i dont want to througth data away, i decide that i put it inside the status.
         // in short: i call eo_inertials_Tick(p, true) which already does that        
         eo_inertials_Tick(p, eobool_true);      
@@ -1030,7 +946,7 @@ extern eOresult_t eo_inertials_AcceptCANframe(EOtheInertials *p, eOas_inertial_t
     
     // ok, now we can pushback data into the fifoofinertialdata
     
-    eo_vector_PushBack(s_eo_theinertials.fifoofinertialdata, &data);
+    eo_vector_PushBack(p->fifoofinertialdata, &data);
 
 //    char str[128] = {0};    
 //    int mms = (int)(data.timestamp/1000);
@@ -1039,107 +955,6 @@ extern eOresult_t eo_inertials_AcceptCANframe(EOtheInertials *p, eOas_inertial_t
     
     return(eores_OK);      
 }
-
-extern eOresult_t eo_inertials_Tick(EOtheInertials *p, eObool_t regularROPSjustTransmitted)
-{
-    if(NULL == p)
-    {
-        return(eores_NOK_nullpointer);
-    }
-    
-    if(eobool_false == s_eo_theinertials.service.active)
-    {   // nothing to do because we dont have an active service        
-        return(eores_OK);
-    }  
-
-    if(eobool_false == s_eo_theinertials.configured)
-    {   // nothing to do because we dont have a configured service 
-        return(eores_OK);
-    }    
-
-    if(eobool_false == regularROPSjustTransmitted)
-    {   // nothing to do because we cannot overwrite the status of inertial 
-        return(eores_OK);
-    }       
-    
-    // i can update the status of teh inertial because the old value has already been transmitted.
-    
-    
-    // the status data of the inertial entity is in ...
-    eOas_inertial_data_t *data = &s_eo_theinertials.inertial2->status.data;
-    memset(data, 0, sizeof(eOas_inertial_data_t)); 
-    
-    if(eobool_true == eo_vector_Empty(s_eo_theinertials.fifoofinertialdata))
-    {
-        // just reset the status->data 
-        data->type = eoas_inertial_type_none;
-        data->position = eoas_inertial_pos_none;
-        data->timestamp = eov_sys_LifeTimeGet(eov_sys_GetHandle());           
-    }
-    else
-    {
-        // else ... retrieve the item from fifoofinertialdata, copy it into status->data and remove it from fifoofinertialdata 
-        eOas_inertial_data_t * item = (eOas_inertial_data_t*) eo_vector_Front(s_eo_theinertials.fifoofinertialdata);
-        if(NULL != item)
-        {
-            memcpy(data, item, sizeof(eOas_inertial_data_t));   
-            eo_vector_PopFront(s_eo_theinertials.fifoofinertialdata);   
-        }
-    }
-    
-    return(eores_OK);        
-}
-
-
-
-//extern eOresult_t eo_inertials_RefreshStatusOfEntity(EOtheInertials *p)
-//{
-//    if(NULL == p)
-//    {
-//        return(eores_NOK_nullpointer);
-//    }
-//    
-//    if(eobool_false == s_eo_theinertials.service.active)
-//    {   // nothing to do because we dont have an active service        
-//        return(eores_OK);
-//    }  
-// 
-//    if(eobool_false == s_eo_theinertials.configured)
-//    {   // nothing to do because we dont have a configured service 
-//        return(eores_OK);
-//    }   
-// 
-//    // the inertial entity is in ...
-//    eOas_inertial_data_t *data = &s_eo_theinertials.inertial2->status.data;
-//    memset(data, 0, sizeof(eOas_inertial_data_t)); 
-//    
-//    if(eobool_true == eo_vector_Empty(s_eo_theinertials.fifoofinertialdata))
-//    {
-//        // just reset the status->data 
-//        data->type = eoas_inertial_type_none;
-//        data->position = eoas_inertial_pos_none;
-//        data->timestamp = eov_sys_LifeTimeGet(eov_sys_GetHandle());           
-//    }
-//    else
-//    {
-//        // else ... retrieve the item from fifoofinertialdata, copy it into status->data and remove it from fifoofinertialdata 
-//        eOas_inertial_data_t * item = (eOas_inertial_data_t*) eo_vector_Front(s_eo_theinertials.fifoofinertialdata);
-//        if(NULL != item)
-//        {
-//            memcpy(data, item, sizeof(eOas_inertial_data_t));   
-//            eo_vector_PopFront(s_eo_theinertials.fifoofinertialdata);   
-//            
-////            char str[128] = {0};
-////            int ms = (int)(data->timestamp/1000);
-////            int now = eov_sys_LifeTimeGet(eov_sys_GetHandle()) /  1000;
-////            snprintf(str, sizeof(str), "\nstatus has: sensor type = %d @ t = %d ms. time now is %d", data->type, ms, now);
-////            hal_trace_puts(str);
-//        }
-//    }
-//    
-//    return(eores_OK);        
-//}
-
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -1181,6 +996,12 @@ extern eObool_t eocanprotINperiodic_redefinable_SkipParsingOf_ANY_PERIODIC_INERT
     
     // marco.accame:        
     // i dont want to put data in the fifoofinertialdata when we are not in the control loop.
+    // moreover: i put it in its inside only if we have called _Start() 
+    
+    if(eobool_false == s_eo_theinertials.service.running)
+    {   // it is not running
+        return(eobool_true);
+    } 
 
     eOsmStatesEMSappl_t applstate = eo_sm_emsappl_STcfg;
     eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), &applstate);   
@@ -1197,6 +1018,126 @@ extern eObool_t eocanprotINperiodic_redefinable_SkipParsingOf_ANY_PERIODIC_INERT
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
+
+
+static eOresult_t s_eo_inertials_TXstart(EOtheInertials *p)
+{ 
+
+    if(eobool_false == p->configured)
+    {   // dont have a configured service
+        return(eores_OK);
+    }    
+    
+    if((0 == p->sensorsconfig.accelerometers) && (0 == p->sensorsconfig.gyroscopes))
+    {
+        // send up diagnostics
+        // error -> "Object EOtheInertials does not contain a valid configuration, thus will NOT activate any sensor."     
+        return(eores_OK);
+    } 
+   
+    eObool_t sentconfig = eobool_false;
+ 
+    icubCanProto_inertial_config_t canprotoconfig = {0};
+    
+    canprotoconfig.period = p->sensorsconfig.datarate;
+    canprotoconfig.enabledsensors = icubCanProto_inertial_sensorflag_none;
+    
+    p->sharedcan.command.class = eocanprot_msgclass_pollingAnalogSensor;
+    p->sharedcan.command.type  = ICUBCANPROTO_POL_SK_CMD__ACC_GYRO_SETUP;
+    p->sharedcan.command.value = &canprotoconfig;
+
+    uint8_t i = 0;
+    eOcanmap_location_t location = {0};
+    
+    for(i=0; i<eoas_inertial_pos_max_numberof; i++)
+    {
+        canprotoconfig.enabledsensors = icubCanProto_inertial_sensorflag_none;
+
+        if(1 == EOAS_ISPOSENABLED(p->sensorsconfig.accelerometers, i))
+        {
+            // for jorhabib: he needs the external accelerometer on feet. long term solution is to introduce an externalaccelerometers mask and an internalgyroscope mask
+            //#define FOR_JORHABIB
+            #if defined(FOR_JORHABIB)
+            if((eoas_inertial_pos_l_foot_1 == i) || (eoas_inertial_pos_l_foot_2 == i) || (eoas_inertial_pos_r_foot_1 == i) || (eoas_inertial_pos_r_foot_2 == i))
+            {
+                canprotoconfig.enabledsensors |= icubCanProto_inertial_sensorflag_externaldigitalaccelerometer;
+            }
+            else
+            {
+                canprotoconfig.enabledsensors |= icubCanProto_inertial_sensorflag_internaldigitalaccelerometer;
+            }
+            #else
+            canprotoconfig.enabledsensors |= icubCanProto_inertial_sensorflag_internaldigitalaccelerometer;
+            #endif
+        }
+
+        if(1 == EOAS_ISPOSENABLED(p->sensorsconfig.gyroscopes, i))
+        {
+            canprotoconfig.enabledsensors |= icubCanProto_inertial_sensorflag_externaldigitalgyroscope;
+        } 
+
+        if(icubCanProto_inertial_sensorflag_none != canprotoconfig.enabledsensors)
+        {
+            // ok, we have at least a gyro or an accel or them both. thus we send the config to the can location
+            eOas_inertial_position_t position = (eOas_inertial_position_t)i;
+            if(eobool_true == s_eo_inertials_get_canlocation(position, &location))
+            {
+                sentconfig = eobool_true;
+                eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), &p->sharedcan.command, location);  
+            } 
+            
+        }       
+    }
+
+    sentconfig = sentconfig;   
+
+    // send up diagnostics
+    // debug -> "Object EOtheInertials has programmed the mtb. In param16 in msb there is the mode, in lsb there is datarate"      
+    
+    return(eores_OK);   
+}
+
+
+static eOresult_t s_eo_inertials_TXstop(EOtheInertials *p)
+{
+    if(eobool_false == p->configured)
+    {   // nothing to do because we dont have a configured service 
+        return(eores_OK);
+    }    
+
+    icubCanProto_inertial_config_t canprotoconfig = {0};
+    
+    canprotoconfig.enabledsensors   = icubCanProto_inertial_sensorflag_none;
+    canprotoconfig.period           = p->sensorsconfig.datarate;
+
+    p->sharedcan.command.class = eocanprot_msgclass_pollingAnalogSensor;
+    p->sharedcan.command.type  = ICUBCANPROTO_POL_SK_CMD__ACC_GYRO_SETUP;
+    p->sharedcan.command.value = &canprotoconfig;
+    
+    
+    uint8_t i = 0;
+    eOcanmap_location_t location = {0};
+    
+    for(i=0; i<eoas_inertial_pos_max_numberof; i++)
+    {
+        if((1 == EOAS_ISPOSENABLED(p->sensorsconfig.accelerometers, i)) || (1 == EOAS_ISPOSENABLED(p->sensorsconfig.gyroscopes, i)))
+        {            
+            eOas_inertial_position_t position = (eOas_inertial_position_t)i;            
+
+            // fill location and send 
+            if(eobool_true == s_eo_inertials_get_canlocation(position, &location))
+            {
+                eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), &p->sharedcan.command, location);  
+            }                                       
+        }             
+    }
+
+    // send up diagnostics
+    // debug -> "Object EOtheInertials has programmed the mtb. In param16 in msb there is the mode, in lsb there is datarate"    
+               
+    return(eores_OK);
+}
+
 
 //#define EOINERTIALS_ALWAYS_ACCEPT_CANFRAMES_IN_ACTIVE_MODE
 static eObool_t s_eo_inertials_activestate_can_accept_canframe(void)
@@ -1220,11 +1161,12 @@ static eObool_t s_eo_inertials_activestate_can_accept_canframe(void)
 
 static void s_eo_inertials_build_maps(const eOas_inertial_serviceconfig_t* cfg)
 {
+    EOtheInertials* p = &s_eo_theinertials;
     // copy the new service configuration
-    memcpy(&s_eo_theinertials.serviceconfig, cfg, sizeof(eOas_inertial_serviceconfig_t));
+    memcpy(&p->serviceconfig, cfg, sizeof(eOas_inertial_serviceconfig_t));
     
     // at first i reset the supported mask
-    s_eo_theinertials.supportedmask64 = 0;
+    p->supportedmask64 = 0;
         
     // then i search for in can1 and can2 which sensors we are asked to support
     uint8_t i = 0;
@@ -1234,11 +1176,11 @@ static void s_eo_inertials_build_maps(const eOas_inertial_serviceconfig_t* cfg)
     {
         for(j=0; j<15; j++)
         {
-            eOas_inertial_position_t position = (eOas_inertial_position_t)s_eo_theinertials.serviceconfig.canmapofsupportedsensors[i][j];
+            eOas_inertial_position_t position = (eOas_inertial_position_t)p->serviceconfig.canmapofsupportedsensors[i][j];
             if(eoas_inertial_pos_none != position)
             {
                 // ok, we add this position to tthe supported mask
-                s_eo_theinertials.supportedmask64 |= EOAS_ENABLEPOS(position);                
+                p->supportedmask64 |= EOAS_ENABLEPOS(position);                
             }
         }
     }
@@ -1250,6 +1192,7 @@ static eObool_t s_eo_inertials_get_canlocation(eOas_inertial_position_t targetpo
 {   
     // this function is not optimised in search because it is seldom called. 
     // we call it only in configuration of the sensors to search for the address to where to send teh can message 
+    EOtheInertials* p = &s_eo_theinertials;
     
     if(eoas_inertial_pos_none == targetposition)
     {
@@ -1263,7 +1206,7 @@ static eObool_t s_eo_inertials_get_canlocation(eOas_inertial_position_t targetpo
     {
         for(j=0; j<15; j++)
         {
-            eOas_inertial_position_t position = (eOas_inertial_position_t)s_eo_theinertials.serviceconfig.canmapofsupportedsensors[i][j];
+            eOas_inertial_position_t position = (eOas_inertial_position_t)p->serviceconfig.canmapofsupportedsensors[i][j];
             if(targetposition == position)
             {
                 loc->port = i;
@@ -1281,8 +1224,9 @@ static eObool_t s_eo_inertials_get_canlocation(eOas_inertial_position_t targetpo
 
 
 static eObool_t s_eo_inertials_get_sensor(eOcanmap_location_t location, eOas_inertial_position_t *position)
-{       
-    eOas_inertial_position_t internalposition = (eOas_inertial_position_t)s_eo_theinertials.serviceconfig.canmapofsupportedsensors[location.port][location.addr];
+{    
+    EOtheInertials* p = &s_eo_theinertials;    
+    eOas_inertial_position_t internalposition = (eOas_inertial_position_t)p->serviceconfig.canmapofsupportedsensors[location.port][location.addr];
     
     if(eoas_inertial_pos_none == internalposition)
     {
@@ -1296,36 +1240,46 @@ static eObool_t s_eo_inertials_get_sensor(eOcanmap_location_t location, eOas_ine
 
 
 
-static eOresult_t s_eo_inertials_onstop_search4mtbs(void *par, EOtheCANdiscovery2* p, eObool_t searchisok)
+static eOresult_t s_eo_inertials_onstop_search4mtbs(void *par, EOtheCANdiscovery2* cd2, eObool_t searchisok)
 {
     const eOmn_serv_configuration_t * servcfg = (const eOmn_serv_configuration_t *)par;
+    EOtheInertials *p = &s_eo_theinertials;
     
-    if((eobool_true == searchisok) && (eobool_true == s_eo_theinertials.service.activateafterverify))
+    if(eobool_true == searchisok)
     {
-        eo_inertials_Activate(&s_eo_theinertials, servcfg);        
+        p->service.state = eomn_serv_state_verified;
+    }
+    else
+    {   
+        p->service.state = eomn_serv_state_failureofverify;
+    }
+    
+    if((eobool_true == searchisok) && (eobool_true == p->service.activateafterverify))
+    {
+        eo_inertials_Activate(p, servcfg);        
     }
 
-    s_eo_theinertials.diagnostics.errorDescriptor.sourcedevice      = eo_errman_sourcedevice_localboard;
-    s_eo_theinertials.diagnostics.errorDescriptor.sourceaddress     = 0;
-    s_eo_theinertials.diagnostics.errorDescriptor.par16             = servcfg->data.sk.skin.numofpatches;
-    s_eo_theinertials.diagnostics.errorDescriptor.par64             = (servcfg->data.sk.skin.version.firmware.minor)       | (servcfg->data.sk.skin.version.firmware.major << 8) |
-                                                                      (servcfg->data.sk.skin.version.protocol.minor << 16) | (servcfg->data.sk.skin.version.protocol.major << 24) |
-                                                                      ((uint64_t)s_eo_theinertials.sharedcan.discoverytarget.canmap[eOcanport1] << 32) | ((uint64_t)s_eo_theinertials.sharedcan.discoverytarget.canmap[eOcanport2] << 48);
+    p->diagnostics.errorDescriptor.sourcedevice      = eo_errman_sourcedevice_localboard;
+    p->diagnostics.errorDescriptor.sourceaddress     = 0;
+    p->diagnostics.errorDescriptor.par16             = servcfg->data.sk.skin.numofpatches;
+    p->diagnostics.errorDescriptor.par64             = (servcfg->data.sk.skin.version.firmware.minor)       | (servcfg->data.sk.skin.version.firmware.major << 8) |
+                                                       (servcfg->data.sk.skin.version.protocol.minor << 16) | (servcfg->data.sk.skin.version.protocol.major << 24) |
+                                                       ((uint64_t)p->sharedcan.discoverytarget.canmap[eOcanport1] << 32) | ((uint64_t)p->sharedcan.discoverytarget.canmap[eOcanport2] << 48);
    
     EOaction_strg astrg = {0};
     EOaction *act = (EOaction*)&astrg;
-    eo_action_SetCallback(act, s_eo_inertials_send_periodic_error_report, NULL, eov_callbackman_GetTask(eov_callbackman_GetHandle()));
+    eo_action_SetCallback(act, s_eo_inertials_send_periodic_error_report, p, eov_callbackman_GetTask(eov_callbackman_GetHandle()));
 
     if(eobool_true == searchisok)
     {        
-        s_eo_theinertials.diagnostics.errorType = eo_errortype_debug;
-        s_eo_theinertials.diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_inertials_ok);
-        eo_errman_Error(eo_errman_GetHandle(), s_eo_theinertials.diagnostics.errorType, NULL, s_eobj_ownname, &s_eo_theinertials.diagnostics.errorDescriptor);
+        p->diagnostics.errorType = eo_errortype_debug;
+        p->diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_inertials_ok);
+        eo_errman_Error(eo_errman_GetHandle(), p->diagnostics.errorType, NULL, s_eobj_ownname, &p->diagnostics.errorDescriptor);
         
-        if((0 != s_eo_theinertials.diagnostics.repetitionOKcase) && (0 != s_eo_theinertials.diagnostics.reportPeriod))
+        if((0 != p->diagnostics.repetitionOKcase) && (0 != p->diagnostics.reportPeriod))
         {
-            s_eo_theinertials.diagnostics.errorCallbackCount = s_eo_theinertials.diagnostics.repetitionOKcase;        
-            eo_timer_Start(s_eo_theinertials.diagnostics.reportTimer, eok_abstimeNOW, s_eo_theinertials.diagnostics.reportPeriod, eo_tmrmode_FOREVER, act);
+            p->diagnostics.errorCallbackCount = p->diagnostics.repetitionOKcase;        
+            eo_timer_Start(p->diagnostics.reportTimer, eok_abstimeNOW, p->diagnostics.reportPeriod, eo_tmrmode_FOREVER, act);
         }
     }
     
@@ -1337,27 +1291,27 @@ static eOresult_t s_eo_inertials_onstop_search4mtbs(void *par, EOtheCANdiscovery
         
         const eOcandiscovery_detection_t* detection = eo_candiscovery2_GetDetection(eo_candiscovery2_GetHandle());
                 
-        uint16_t maskofmissingCAN1 = s_eo_theinertials.sharedcan.discoverytarget.canmap[0] & (~detection->replies[0]);
-        uint16_t maskofmissingCAN2 = s_eo_theinertials.sharedcan.discoverytarget.canmap[1] & (~detection->replies[1]);
+        uint16_t maskofmissingCAN1 = p->sharedcan.discoverytarget.canmap[0] & (~detection->replies[0]);
+        uint16_t maskofmissingCAN2 = p->sharedcan.discoverytarget.canmap[1] & (~detection->replies[1]);
         uint16_t maskofincompatibleCAN1 = detection->incompatibilities[0]; 
         uint16_t maskofincompatibleCAN2 = detection->incompatibilities[1]; 
         
-        s_eo_theinertials.diagnostics.errorDescriptor.par64 = ((uint64_t)maskofmissingCAN1) | ((uint64_t)maskofmissingCAN2<<16) | ((uint64_t)maskofincompatibleCAN1<<32) | ((uint64_t)maskofincompatibleCAN2<<32);
+        p->diagnostics.errorDescriptor.par64 = ((uint64_t)maskofmissingCAN1) | ((uint64_t)maskofmissingCAN2<<16) | ((uint64_t)maskofincompatibleCAN1<<32) | ((uint64_t)maskofincompatibleCAN2<<32);
         
-        s_eo_theinertials.diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_inertials_failed_candiscovery);
-        s_eo_theinertials.diagnostics.errorType = eo_errortype_error;                
-        eo_errman_Error(eo_errman_GetHandle(), s_eo_theinertials.diagnostics.errorType, NULL, s_eobj_ownname, &s_eo_theinertials.diagnostics.errorDescriptor);
+        p->diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_inertials_failed_candiscovery);
+        p->diagnostics.errorType = eo_errortype_error;                
+        eo_errman_Error(eo_errman_GetHandle(), p->diagnostics.errorType, NULL, s_eobj_ownname, &p->diagnostics.errorDescriptor);
         
-        if(0 != s_eo_theinertials.diagnostics.reportPeriod)
+        if(0 != p->diagnostics.reportPeriod)
         {
-            s_eo_theinertials.diagnostics.errorCallbackCount = EOK_int08dummy;
-            eo_timer_Start(s_eo_theinertials.diagnostics.reportTimer, eok_abstimeNOW, s_eo_theinertials.diagnostics.reportPeriod, eo_tmrmode_FOREVER, act);
+            p->diagnostics.errorCallbackCount = EOK_int08dummy;
+            eo_timer_Start(p->diagnostics.reportTimer, eok_abstimeNOW, p->diagnostics.reportPeriod, eo_tmrmode_FOREVER, act);
         }
     }  
     
-    if(NULL != s_eo_theinertials.service.onverify)
+    if(NULL != p->service.onverify)
     {
-        s_eo_theinertials.service.onverify(&s_eo_theinertials, searchisok); 
+        p->service.onverify(&s_eo_theinertials, searchisok); 
     }    
     
     return(eores_OK);
@@ -1365,22 +1319,24 @@ static eOresult_t s_eo_inertials_onstop_search4mtbs(void *par, EOtheCANdiscovery
 }
 
 
-static void s_eo_inertials_send_periodic_error_report(void *p)
+static void s_eo_inertials_send_periodic_error_report(void *par)
 {
-    eo_errman_Error(eo_errman_GetHandle(), s_eo_theinertials.diagnostics.errorType, NULL, s_eobj_ownname, &s_eo_theinertials.diagnostics.errorDescriptor);
+    EOtheInertials* p = (EOtheInertials*) par;
+    
+    eo_errman_Error(eo_errman_GetHandle(), p->diagnostics.errorType, NULL, s_eobj_ownname, &p->diagnostics.errorDescriptor);
 
-    if(eoerror_value_CFG_inertials_failed_candiscovery == eoerror_code2value(s_eo_theinertials.diagnostics.errorDescriptor.code))
+    if(eoerror_value_CFG_inertials_failed_candiscovery == eoerror_code2value(p->diagnostics.errorDescriptor.code))
     {   // if i dont find the mtbs, i keep on sending the discovery results up. it is a temporary diagnostics tricks until we use the verification of services at bootstrap
         eo_candiscovery2_SendLatestSearchResults(eo_candiscovery2_GetHandle());
     }
     
-    if(EOK_int08dummy != s_eo_theinertials.diagnostics.errorCallbackCount)
+    if(EOK_int08dummy != p->diagnostics.errorCallbackCount)
     {
-        s_eo_theinertials.diagnostics.errorCallbackCount--;
+        p->diagnostics.errorCallbackCount--;
     }
-    if(0 == s_eo_theinertials.diagnostics.errorCallbackCount)
+    if(0 == p->diagnostics.errorCallbackCount)
     {
-        eo_timer_Stop(s_eo_theinertials.diagnostics.reportTimer);
+        eo_timer_Stop(p->diagnostics.reportTimer);
     }
 }
 

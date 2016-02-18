@@ -75,7 +75,9 @@ extern EOtheMotionController* eo_motioncontrol_Initialise(void);
 
 extern EOtheMotionController* eo_motioncontrol_GetHandle(void);
 
-
+// we can call them if _Initialise() was called
+extern eOmn_serv_state_t eo_motioncontrol_GetServiceState(EOtheMotionController *p);
+extern eOresult_t eo_motioncontrol_SendReport(EOtheMotionController *p);
 extern eOmotioncontroller_mode_t eo_motioncontrol_GetMode(EOtheMotionController *p);
 
 
@@ -88,7 +90,6 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
 
 extern eOresult_t eo_motioncontrol_Deactivate(EOtheMotionController *p);
 
-extern eOresult_t eo_motioncontrol_SendReport(EOtheMotionController *p);
 
 // to be called once before to be ticked
 extern eOresult_t eo_motioncontrol_Start(EOtheMotionController *p);

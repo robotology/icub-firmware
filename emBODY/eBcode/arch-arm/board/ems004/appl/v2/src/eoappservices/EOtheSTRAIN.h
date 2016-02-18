@@ -63,20 +63,16 @@ extern EOtheSTRAIN* eo_strain_Initialise(void);
 
 extern EOtheSTRAIN* eo_strain_GetHandle(void);
 
-
-// it verifies if the service as defined in te configuration is possible (is there a good strain board or not?), it executes a callback
-// (which may send a confirmation to the entity which asked fot verification), and then it may activate the strain service by calling  eo_strain_Activate().
-extern eOresult_t eo_strain_Verify(EOtheSTRAIN *p, const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify);
-
-// it activates the strain service by loading the service configuration
-extern eOresult_t eo_strain_Activate(EOtheSTRAIN *p, const eOmn_serv_configuration_t * servcfg);
-
-// it deactivates service.
-extern eOresult_t eo_strain_Deactivate(EOtheSTRAIN *p);
-
-
+// we can call them if _Initialise() was called
+extern eOmn_serv_state_t eo_strain_GetServiceState(EOtheSTRAIN *p);
 extern eOresult_t eo_strain_SendReport(EOtheSTRAIN *p);
 
+
+extern eOresult_t eo_strain_Verify(EOtheSTRAIN *p, const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify);
+
+extern eOresult_t eo_strain_Activate(EOtheSTRAIN *p, const eOmn_serv_configuration_t * servcfg);
+
+extern eOresult_t eo_strain_Deactivate(EOtheSTRAIN *p);
 
 extern eOresult_t eo_strain_Start(EOtheSTRAIN *p);
 
@@ -84,32 +80,14 @@ extern eOresult_t eo_strain_Tick(EOtheSTRAIN *p);
 
 extern eOresult_t eo_strain_Stop(EOtheSTRAIN *p);
 
-
-// i can call the following only if ... service is activated.
-
-extern eOresult_t eo_strain_TXstart(EOtheSTRAIN *p, uint8_t datarate, eOas_strainmode_t mode);
-
-extern eOresult_t eo_strain_TXstop(EOtheSTRAIN *p);
+// it enables/disables transmission of the strain board. _Start() just starts the service, not the transmission
+extern eOresult_t eo_strain_Transmission(EOtheSTRAIN *p, eObool_t on);
 
 
-// if overrideonfullscaleready is NULL the function eo_strain_GetFullScale() signals the fullscale to robotInterface ....
-// if overrideonfullscaleready is not NULL the function eo_strain_GetFullScale() just calls it
+// we can call them if _Activate() was called. they are used by the callbacks of eth protocol
 extern eOresult_t eo_strain_GetFullScale(EOtheSTRAIN *p, eOservice_onendofoperation_fun_t overrideonfullscaleready);
-
-
-// the following are more tricky funtions .... shall we keep tehm?
-
-// it sets the strain tx mode according to the mode is kept in the ram of the entity.
-// this function is used only in RUN:on-entry. 
-// i suggest to remove this thing.
-extern eOresult_t eo_strain_SendTXmode(EOtheSTRAIN *p);
-
-
-// following funtions apply the settings in argument by sending proper messages to the strain board
 extern eOresult_t eo_strain_Set(EOtheSTRAIN *p, eOas_strain_config_t *cfg);
-
 extern eOresult_t eo_strain_SetMode(EOtheSTRAIN *p, eOas_strainmode_t mode);
-
 extern eOresult_t eo_strain_SetDataRate(EOtheSTRAIN *p, uint8_t datarate);
 
 
