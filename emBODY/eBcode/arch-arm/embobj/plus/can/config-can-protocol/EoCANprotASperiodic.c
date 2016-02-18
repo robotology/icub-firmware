@@ -338,7 +338,7 @@ static eOresult_t s_eocanprotASperiodic_parser_process_forcetorque(eOcanframe_t 
                 errdes.code                 = eoerror_code_get(eoerror_category_HardWare, eoerror_value_HW_strain_saturation);
                 errdes.par16                = frame->size;
                 errdes.par64                = eo_common_canframe_data2u64((eOcanframe_t*)frame);
-                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, NULL, &errdes);
+                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
             }
             
             if (count_message == 300)
@@ -483,7 +483,7 @@ static void s_eocanprotASperiodic_strain_saturation_handler(eOcanframe_t *frame,
                 errdes.code                 = eoerror_code_get(eoerror_category_HardWare, eoerror_value_HW_strain_saturation);
                 errdes.par16                = i; //channel involved
                 errdes.par64                = (uint64_t) (upper_saturations[i]) << 32 | (uint64_t) lower_saturations[i]; //LSW->lower_sat, MSW->upper_sat
-                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, NULL, &errdes);
+                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
                 
                 upper_saturations[i] = 0;
                 lower_saturations[i] = 0;
