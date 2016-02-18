@@ -193,6 +193,7 @@ extern void eoprot_fun_UPDT_as_inertial_cmmnds_enable(const EOnv* nv, const eOro
     else
     {
         eo_inertials_Start(eo_inertials_GetHandle());    
+        eo_inertials_Transmission(eo_inertials_GetHandle(), eobool_true);
     }
 }
 
