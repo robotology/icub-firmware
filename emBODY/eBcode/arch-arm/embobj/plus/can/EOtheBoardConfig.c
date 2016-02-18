@@ -2047,27 +2047,27 @@ static const eOmn_serv_configuration_t * const s_serv_config_mc_V2[maxboards_V2]
 enum {maxboards_V3 = 22};
 static const eOmn_serv_configuration_t * const s_serv_config_mc_V3[maxboards_V3] =
 {   // there are only ....   
+    &s_serv_config_mc_v3_0B9,       // board ip.1, 0b9, face 4 lips
+    &s_serv_config_mc_v3_0B7,       // board ip.2, 0b7, face eyelids + jaw
+    &s_serv_config_mc_v3_0B1,       // board ip.3, 0b1, head neck yaw + 3 eyes
+    &s_serv_config_mc_v3_0B0,       // board ip.4, 0b0, head neck pitch + neck roll
+    NULL, 
+    NULL,
+    &s_serv_config_mc_v3_1B2_2B2,   // board ip.7, 1b2, left forearm: wrist (wrist coupled 1b2m1, wrist coupled 1b2m0, pronosupination 1b2m2), finger abduction
+    &s_serv_config_mc_v3_1B3_2B3,   // board ip.8, 1b3, left forearm: thumb (abduction, proximal, distal), index proximal
+    &s_serv_config_mc_v3_1B4_2B4,   // board ip.9, 1b4, left forearm:  little fingers, medium (distal, proximal), index distal
     NULL,
     NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    &s_serv_config_mc_v3_0B0,       // board ip.12, 0b0, head neck pitch + neck roll
-    &s_serv_config_mc_v3_0B1,       // board ip.13, 0b1, head neck yaw + 3 eyes
-    &s_serv_config_mc_v3_0B7,       // board ip.14, 0b7, face eyelids + jaw
-    &s_serv_config_mc_v3_0B9,       // board ip.15, 0b9, face 4 lips
-    &s_serv_config_mc_v3_1B4_2B4,   // board ip.16, 1b4, left forearm:  little fingers, medium (distal, proximal), index distal
-    &s_serv_config_mc_v3_1B3_2B3,   // board ip.17, 1b3, left forearm: thumb (abduction, proximal, distal), index proximal
-    &s_serv_config_mc_v3_1B2_2B2,   // board ip.18, 1b2, left forearm: wrist (wrist coupled 1b2m1, wrist coupled 1b2m0, pronosupination 1b2m2), finger abduction
-    &s_serv_config_mc_v3_1B4_2B4,   // board ip.19, 2b4, right forearm:  little fingers, medium (distal, proximal), index distal
-    &s_serv_config_mc_v3_1B3_2B3,   // board ip.20, 2b3, right forearm: thumb (abduction, proximal, distal), index proximal
-    &s_serv_config_mc_v3_1B2_2B2,   // board ip.21, 2b2, right forearm: wrist (wrist coupled 1b2m1, wrist coupled 1b2m0, pronosupination 1b2m2), finger abduction,
+    &s_serv_config_mc_v3_1B2_2B2,   // board ip.12, 2b2, right forearm: wrist (wrist coupled 1b2m1, wrist coupled 1b2m0, pronosupination 1b2m2), finger abduction,
+    &s_serv_config_mc_v3_1B3_2B3,   // board ip.13, 2b3, right forearm: thumb (abduction, proximal, distal), index proximal
+    &s_serv_config_mc_v3_1B4_2B4,   // board ip.14, 2b4, right forearm:  little fingers, medium (distal, proximal), index distal 
+    NULL, 
+    NULL, 
+    NULL, 
+    NULL, 
+    NULL, 
+    NULL, 
+    NULL, 
     &s_serv_config_mc_cer_testOfmc2plus // moved at address .22  
 };
 
@@ -2185,7 +2185,16 @@ extern const eOmn_serv_configuration_t * eoboardconfig_code2motion_serv_configur
 extern const eOmn_serv_configuration_t * eoboardconfig_code2strain_serv_configuration(uint32_t code)
 {
     const eOmn_serv_configuration_t * ret = NULL;
-    
+
+#if     defined(ICUB_MEC_V3) 
+    switch(code)
+    {
+        default:    
+        {   // currently all our boards haven't strain
+            ret = NULL;
+        } break;
+    }
+#else 
     switch(code)
     {
         case 0:
@@ -2222,7 +2231,7 @@ extern const eOmn_serv_configuration_t * eoboardconfig_code2strain_serv_configur
         } break;
     
     }
-
+#endif
     return(ret);        
 }
 
@@ -2237,10 +2246,10 @@ extern const eOmn_serv_configuration_t * eoboardconfig_code2mais_serv_configurat
         case 1:
         case 3:
 #if     defined(ICUB_MEC_V3)              
-        case 15:    // for lower arm mec-v3: 1b4 10.0.1.16            
-        case 16:    // for lower arm mec-v3: 1b3 10.0.1.17
-        case 18:    // for lower arm mec-v3: 2b4 10.0.1.19            
-        case 19:    // for lower arm mec-v3: 2b3 10.0.1.20     
+        case 7:    // for left lower arm mec-v3: 1b3 10.0.1.8            
+        case 8:    // for left lower arm mec-v3: 1b4 10.0.1.9
+        case 12:   // for right lower arm mec-v3: 2b3 10.0.1.13            
+        case 13:   // for right lower arm mec-v3: 2b4 10.0.1.14     
 #endif            
         {   // board eb2 / eb4   
             ret = &s_serv_config_as_mais_eb2_eb4; 
@@ -2263,6 +2272,15 @@ extern const eOmn_serv_configuration_t * eoboardconfig_code2skin_serv_configurat
     
 //    #warning --> rimuovo la skin per debug sul viola che ha problemi sul can2 della eb2
 //    return(NULL);
+#if     defined(ICUB_MEC_V3) 
+    switch(code)
+    {
+        default:    
+        {   // currently all our boards haven't skin
+            ret = NULL;
+        } break;
+    }
+#else 
     
     switch(code)
     {
@@ -2284,7 +2302,7 @@ extern const eOmn_serv_configuration_t * eoboardconfig_code2skin_serv_configurat
         } break;
     
     }
-
+#endif
     return(ret);        
 }
 
