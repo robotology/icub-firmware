@@ -1262,6 +1262,35 @@ extern uint16_t eo_motioncontrol_extra_GetMotorCurrent(EOtheMotionController *p,
     return(curr_val);
 }
 
+extern int16_t eo_motioncontrol_extra_GetSuppliedVoltage(EOtheMotionController *p)
+{   // former eo_mcserv_GetMotorCurrent()
+    if(NULL == p)
+    {
+        return(0);
+    }
+    
+    if(eobool_false == p->service.active)
+    {   // nothing to do because object must be first activated 
+        return(0);
+    } 
+    
+    if(eobool_false == p->service.running)
+    {   // not running, thus we do nothing
+        return(0);
+    }    
+    
+    if((eo_motcon_mode_mc4plus != p->service.servconfig.type) && (eo_motcon_mode_mc4plusmais != p->service.servconfig.type))
+    {   // so far only for mc4plus and mc4plusmais services
+        return(0);
+    }
+   
+    int16_t curr_val = 0;
+      
+    curr_val = (int16_t)hal_adc_get_supplyVoltage_mV();
+
+    return(curr_val);
+}
+
 extern uint32_t eo_motioncontrol_extra_GetMotorAnalogSensor(EOtheMotionController *p, uint8_t jomo)
 {   // former eo_mcserv_GetMotorAnalogSensor
     if(NULL == p)
@@ -2341,6 +2370,9 @@ static void s_eo_motioncontrol_mc4plusbased_hal_init_motors_adc_feedbacks(void)
     // init the ADC to read the (4) current values of the motor and (4) analog inputs (hall_sensors, if any) using ADC1/ADC3
     // always initialized at the moment, but the proper interface for reading the values is in EOappEncodersReader
     hal_adc_dma_init_ADC1_ADC3_hall_sensor_current();    
+    
+    //init ADC2 to read supplyVoltage
+    hal_adc_dma_init_ADC2_tvaux_tvin_temperature();
 }
 
 
@@ -2527,6 +2559,8 @@ static eOresult_t s_eo_mcserv_do_mc4plus(EOtheMotionController *p)
         }
         
     } // propagate status
+    
+    eo_currents_watchdog_TickSupplyVoltage();
     
     return(res);
 }

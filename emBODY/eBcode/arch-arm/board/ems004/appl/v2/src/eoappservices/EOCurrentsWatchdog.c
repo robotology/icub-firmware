@@ -29,7 +29,7 @@
 #include "EOemsController.h"
 #include "EOtheErrorManager.h"
 #include "EoError.h"
-
+#include "EoProtocol.h"
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -88,6 +88,9 @@ static EOCurrentsWatchdog s_eo_currents_watchdog =
     .initted         = eobool_false
 };
 
+static uint16_t suppliedVoltage_counter = 0;
+static eOmc_controller_t *nv_controller_ptr = NULL;
+#define SUMMPLIED_VOLTAGE_COUNTER_MAX 500
 //static const char s_eobj_ownname[] = "EOCurrentsWatchdog";
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -125,6 +128,13 @@ extern EOCurrentsWatchdog* eo_currents_watchdog_Initialise(void)
     memset(s_eo_currents_watchdog.accomulatorEp, 0, s_eo_currents_watchdog.numberofmotors*sizeof(float));
 
     s_eo_currents_watchdog.initted = eobool_true;
+    
+    suppliedVoltage_counter = 0;
+    nv_controller_ptr = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_controller, 0);
+    
+    if(nv_controller_ptr == NULL)
+        return NULL;
+    
     
     return(&s_eo_currents_watchdog);
 }
@@ -184,6 +194,26 @@ extern void eo_currents_watchdog_Tick(EOCurrentsWatchdog* p)
         //VALE: I disabled check I2T until I have nominal and peack current values
         //s_eo_currents_watchdog_CheckI2T(i, current_value);
     }
+    
+}
+
+extern void eo_currents_watchdog_TickSupplyVoltage(EOCurrentsWatchdog* p)
+{
+
+    if (p == NULL)
+    {
+        return;
+    }
+    
+    suppliedVoltage_counter++;
+    
+    if(suppliedVoltage_counter < SUMMPLIED_VOLTAGE_COUNTER_MAX)
+        return;
+    
+    nv_controller_ptr->status.supplyVoltage = eo_motioncontrol_extra_GetSuppliedVoltage(eo_motioncontrol_GetHandle());
+    suppliedVoltage_counter = 0;
+    return;
+    
     
 }
 // --------------------------------------------------------------------------------------------------------------------

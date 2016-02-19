@@ -121,6 +121,8 @@ extern void eo_motioncontrol_extra_ResetQuadEncCounter(EOtheMotionController *p,
 
 extern eObool_t eo_motioncontrol_extra_IsMotorEncoderIndexReached(EOtheMotionController *p, uint8_t jomo);
 
+extern int16_t eo_motioncontrol_extra_GetSuppliedVoltage(EOtheMotionController *p);
+
 // others, one make by marco.accame which groups actions
 
 // why dont we put it inside _Tick() ????
