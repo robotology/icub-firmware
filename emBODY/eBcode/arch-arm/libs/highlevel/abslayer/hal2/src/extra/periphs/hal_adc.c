@@ -731,7 +731,11 @@ extern hal_result_t hal_adc_dma_init_ADC1_ADC3_hall_sensor_current ()
       
       return hal_res_OK;  
 }
-
+/*
+Vale: tvin ==> input voltage. (Voltage supply to the board, from 12V to 50V. Usually 12V.
+      tvaux ==> auxiliary voltage (5V) 
+      temperature is inetrnal temp of micro.
+*/
 extern hal_result_t hal_adc_dma_init_ADC2_tvaux_tvin_temperature ()
 {
     
@@ -839,6 +843,11 @@ extern uint16_t hal_adc_get_tvaux_tvin_temperature_raw(uint16_t channel)
     return	uhADC2ConvertedValue[channel];
 }
 
+/*
+Vale: tvin ==> input voltage. (Voltage supply to the board, from 12V to 50V. Usually 12V.
+      tvaux ==> auxiliary voltage (5V) 
+*/
+
 extern uint32_t hal_adc_get_tvaux_tvin_mV(uint16_t channel)
 {    
 	if (channel > 1)
@@ -859,6 +868,12 @@ extern uint32_t hal_adc_get_tvaux_tvin_mV(uint16_t channel)
     
     return	result;
 }
+
+extern uint32_t hal_adc_get_supplyVoltage_mV(void)
+{    
+    return(hal_adc_get_tvaux_tvin_mV(1));
+}
+
 extern int16_t hal_adc_get_current(uint16_t channel)
 {
     if (channel > 3)

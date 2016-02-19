@@ -126,6 +126,7 @@ extern int16_t hal_adc_get_current(uint16_t channel);
 //use them if initialized ADC2 with hal_adc_dma_init_ADC2_tvaux_tvin_temperature ()
 extern uint16_t hal_adc_get_tvaux_tvin_temperature_raw(uint16_t channel);
 extern uint32_t hal_adc_get_tvaux_tvin_mV(uint16_t channel);
+extern uint32_t hal_adc_get_supplyVoltage_mV(void); //return supplied voltage to the board
 
 //use them if initialized ADC1 and ADC3 with hal_adc_dma_init_ADC1_ADC3_hall_sensor_current ()
 extern uint16_t hal_adc_get_hall_sensor_analog_input_raw(uint8_t motor);
