@@ -85,6 +85,8 @@ extern eObool_t eo_services_AllActivated(EOtheServices *p);
 
 extern eOresult_t eo_services_SendFailureReport(EOtheServices *p);
 
+extern eOresult_t eo_services_ProcessCommand(EOtheServices *p, eOmn_service_cmmnds_command_t *command);
+
 
 
 

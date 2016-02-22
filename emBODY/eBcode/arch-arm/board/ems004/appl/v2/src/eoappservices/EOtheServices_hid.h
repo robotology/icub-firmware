@@ -96,12 +96,15 @@ struct EOtheServices_hid
     EOtimer*            timer;
     eOprotBRD_t         board;   
     eObool_t            allactivated;
-    eOservice_type_t    failedservice;    
+    eOservice_type_t    failedservice; 
+    eOmn_service_t*     mnservice;  
+    eObool_t            running[eomn_serv_categories_numberof];    
 }; 
 
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
-// empty section
+
+extern eOresult_t eo_service_hid_SynchServiceState(EOtheServices *p, eOmn_serv_category_t category, eOmn_serv_state_t servstate);
 
 
 #endif  // include guard

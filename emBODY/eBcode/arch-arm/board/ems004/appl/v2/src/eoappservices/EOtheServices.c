@@ -47,6 +47,10 @@
 
 #include "EoError.h"
 
+#include "EOMtheEMSappl.h"
+
+#include "EoProtocolMN.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -95,6 +99,18 @@ static eOresult_t s_after_verify_skin(EOaService* p, eObool_t operationisok);
 static eOresult_t s_after_verify_inertials(EOaService* p, eObool_t operationisok);
 
 
+static eOresult_t s_eo_services_verifyactivate(EOtheServices *p, eOmn_serv_category_t category, eOmn_serv_configuration_t* config);
+
+static eOresult_t s_eo_services_process_start(EOtheServices *p, eOmn_serv_category_t category);
+static eOresult_t s_eo_services_process_stop(EOtheServices *p, eOmn_serv_category_t category);
+static eOresult_t s_eo_services_process_failure(EOtheServices *p, eOmn_service_operation_t operation, eOmn_serv_category_t category);
+
+static eOresult_t s_eo_services_start(EOtheServices *p, eOmn_serv_category_t category);
+static eOresult_t s_eo_services_stop(EOtheServices *p, eOmn_serv_category_t category);
+
+
+static void send_rop_command_result(void);
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
@@ -107,6 +123,8 @@ static EOtheServices s_eo_theservices =
     .board              = eo_prot_BRDdummy,
     .allactivated       = eobool_false,
     .failedservice      = eo_service_none,
+    .mnservice          = NULL,
+    .running            = {eobool_false}
 };
 
 static const char s_eobj_ownname[] = "EOtheServices";
@@ -159,6 +177,7 @@ extern EOtheServices* eo_services_Initialise(void)
     
     s_eo_theservices.allactivated = eobool_false;
     s_eo_theservices.failedservice = eo_service_none;
+    s_eo_theservices.mnservice = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_management, eoprot_entity_mn_service, 0);
     
     return(&s_eo_theservices);
 }
@@ -224,6 +243,7 @@ extern eOmn_serv_state_t eo_service_GetState(eOmn_serv_category_t category)
     return(state);
     
 }
+
 
 
 extern eOresult_t eo_services_StartLegacyMode(EOtheServices *p, eOprotBRD_t brd)
@@ -325,7 +345,7 @@ extern eObool_t eo_services_AllActivated(EOtheServices *p)
 
 extern eOresult_t eo_services_SendFailureReport(EOtheServices *p)
 {    
-    if((NULL == p))
+    if(NULL == p)
     {
         return(eores_NOK_nullpointer);
     }
@@ -383,21 +403,108 @@ extern eOresult_t eo_services_SendFailureReport(EOtheServices *p)
     return(eores_OK);    
 }
 
+
+extern eOresult_t eo_services_ProcessCommand(EOtheServices *p, eOmn_service_cmmnds_command_t *command)
+{
+    if((NULL == p) || (NULL == command))
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    
+    eOmn_service_operation_t operation = command->operation;
+    eOmn_serv_category_t category = command->category;
+    eOmn_serv_configuration_t *config = &command->configuration;
+    
+    
+    // if we can do it, then we ... do it and then the callback of ... will sig<command.result, OK>
+    // if we cannot do it, then send sig<command.result, KO>
+    
+    // the operation can be: eomn_serv_operation_verifyactivate, eomn_serv_operation_start, eomn_serv_operation_stop
+    // the category can be mc, mais, strain, skin, inertials
+    
+    #warning TODO: put in function eo_services_ProcessCommand() all what is needed to activate / start / stop the service and send reply back.
+        
+    switch(operation)
+    {
+        case eomn_serv_operation_verifyactivate:
+        {
+            s_eo_services_verifyactivate(p, category, config);            
+        } break;
+        
+        case eomn_serv_operation_start:
+        {
+            s_eo_services_process_start(p, category);
+        } break;
+        
+        case eomn_serv_operation_stop:
+        {
+            s_eo_services_process_stop(p, category);
+        } break;
+        
+        default:
+        {
+            // send failure
+            s_eo_services_process_failure(p, operation, category);
+        } break;
+        
+    }
+    
+    return(eores_OK);
+}
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
 
+
+extern void eoprot_fun_INIT_mn_service_wholeitem(const EOnv* nv)
+{    
+    eOmn_service_t* mnservice = eo_nv_RAM(nv);
+    
+    // we init the stateofservice with eomn_serv_state_notsupported. we shall change later on.
+    memset(&mnservice->status.stateofservice, eomn_serv_state_notsupported, sizeof(mnservice->status.stateofservice));    
+    
+    memset(&mnservice->status.filler, 3, sizeof(mnservice->status.filler));
+ 
+    mnservice->status.commandresult.operation = eomn_serv_operation_none;
+}
+
+
+
+
+
+
+extern eOresult_t eo_service_hid_SynchServiceState(EOtheServices *p, eOmn_serv_category_t category, eOmn_serv_state_t servstate)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }   
+    
+    if((eomn_serv_category_none == category) || (eomn_serv_category_all == category))
+    {
+        return(eores_NOK_generic);
+    }
+    
+    p->mnservice->status.stateofservice[category] = servstate;
+    
+    return(eores_OK);
+}
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
+
 static void s_can_cbkonrx(void *arg)
 {
     EOMtask *task = (EOMtask *)arg;
     eom_task_isrSetEvent(task, emsconfigurator_evt_userdef00);
 }
+
 
 static void s_activate_services_deferred(void)
 {
@@ -540,6 +647,426 @@ static eOresult_t s_after_verify_inertials(EOaService* p, eObool_t operationisok
     return(eores_OK);
 }
 
+
+static eOresult_t s_eo_services_verifyactivate(EOtheServices *p, eOmn_serv_category_t category, eOmn_serv_configuration_t* config)
+{
+    // check if the category is ok and if it is supported. 
+    
+    // in here we must put for for two phases: 
+    // phase1: all services are verified and activated at bootstrap. teh command verifyactivate does nothing apart sending a ok/nok back to robotInterface
+    // phase2: at bootstratp service are just _Initalise()-ed and every verification-activation is done in here. 
+    
+    // if not supported or not already activated send up a negative reply.
+    if((eomn_serv_category_none == category) || (eomn_serv_category_all == category))
+    {
+        // send a failure about wrong param
+        p->mnservice->status.commandresult.latestcommandisok = eobool_false;
+        p->mnservice->status.commandresult.category = category;
+        p->mnservice->status.commandresult.operation = eomn_serv_operation_verifyactivate;
+        p->mnservice->status.commandresult.type = config->type;
+        p->mnservice->status.commandresult.data[0] = eomn_serv_state_notsupported;
+        
+        send_rop_command_result();   
+        
+        return(eores_OK);
+    }
+    
+    eOmn_serv_state_t state = p->mnservice->status.stateofservice[category];
+    
+    // now have a look at state. it must be eomn_serv_state_activated.
+    
+    if(eomn_serv_state_activated != state)
+    {
+        // send a failure about wrong state of the board
+        p->mnservice->status.commandresult.latestcommandisok = eobool_false;
+        p->mnservice->status.commandresult.category = category;
+        p->mnservice->status.commandresult.operation = eomn_serv_operation_verifyactivate;
+        p->mnservice->status.commandresult.type = config->type;        
+        p->mnservice->status.commandresult.data[0] = state;
+        
+        send_rop_command_result();   
+        
+        return(eores_OK);
+    }
+    
+    // ok, we have it activated. is the config coherent with what we already have? for instance ... the eOmn_serv_type_t, the number of ...?
+    // we decide for now to avoid that.
+    
+    // we just send the command up telling that things are ok.
+    
+    p->mnservice->status.commandresult.latestcommandisok = eobool_true;
+    p->mnservice->status.commandresult.category = category;
+    p->mnservice->status.commandresult.operation = eomn_serv_operation_verifyactivate;
+    p->mnservice->status.commandresult.type = config->type;
+    p->mnservice->status.commandresult.data[0] = state;
+    
+    send_rop_command_result();    
+    
+    return(eores_OK);
+}
+
+
+
+static eOresult_t s_eo_services_process_start(EOtheServices *p, eOmn_serv_category_t category)
+{
+    // check if the category is ok and if it is supported. 
+    
+    // in here we must put for for two phases: 
+    // phase1: all services are verified and activated at bootstrap. teh command verifyactivate does nothing apart sending a ok/nok back to robotInterface
+    // phase2: at bootstratp service are just _Initalise()-ed and every verification-activation is done in here. 
+    
+    // if not supported send up a negative reply.
+    if((eomn_serv_category_none == category) || (eomn_serv_category_all == category))
+    {
+        // send a failure about wrong param
+        p->mnservice->status.commandresult.latestcommandisok = eobool_false;
+        p->mnservice->status.commandresult.category = category;
+        p->mnservice->status.commandresult.operation = eomn_serv_operation_start;
+        p->mnservice->status.commandresult.type = eomn_serv_NONE;
+        p->mnservice->status.commandresult.data[0] = eomn_serv_state_notsupported;
+        
+        send_rop_command_result();   
+        
+        return(eores_OK);
+    }
+    
+    
+    // now have a look at state. it must be eomn_serv_state_activated.    
+    if(eomn_serv_state_activated != p->mnservice->status.stateofservice[category])
+    {
+        // send a failure about wrong state of the board
+        p->mnservice->status.commandresult.latestcommandisok = eobool_false;
+        p->mnservice->status.commandresult.category = category;
+        p->mnservice->status.commandresult.operation = eomn_serv_operation_start;
+        p->mnservice->status.commandresult.type = eomn_serv_NONE;        
+        p->mnservice->status.commandresult.data[0] = p->mnservice->status.stateofservice[category];
+        
+        send_rop_command_result();   
+        
+        return(eores_OK);
+    }
+    
+    // now we start the service.
+    if(eores_OK == s_eo_services_start(p, category))
+    {
+        p->mnservice->status.commandresult.latestcommandisok = eobool_true;        
+    }
+    else
+    {
+        p->mnservice->status.commandresult.latestcommandisok = eobool_false;
+    }
+    
+    // ok, we have it activated. is the config coherent with what we already have? for instance ... the eOmn_serv_type_t, the number of ...?
+    // we decide for now to avoid that.
+    
+    // we just send the command up telling that things are ok.
+    
+    p->mnservice->status.commandresult.category = category;
+    p->mnservice->status.commandresult.operation = eomn_serv_operation_start;
+    p->mnservice->status.commandresult.type = eomn_serv_NONE;
+    p->mnservice->status.commandresult.data[0] = p->mnservice->status.stateofservice[category];
+    
+    send_rop_command_result();    
+    
+    return(eores_OK);        
+}
+
+
+
+static eOresult_t s_eo_services_process_stop(EOtheServices *p, eOmn_serv_category_t category)
+{
+    // check if the category is ok and if it is supported. 
+    
+    // in here we must put for for two phases: 
+    // phase1: all services are verified and activated at bootstrap. teh command verifyactivate does nothing apart sending a ok/nok back to robotInterface
+    // phase2: at bootstratp service are just _Initalise()-ed and every verification-activation is done in here. 
+    
+    // if not supported send up a negative reply.
+    if(eomn_serv_category_none == category)
+    {
+        // send a failure about wrong param
+        p->mnservice->status.commandresult.latestcommandisok = eobool_false;
+        p->mnservice->status.commandresult.category = category;
+        p->mnservice->status.commandresult.operation = eomn_serv_operation_stop;
+        p->mnservice->status.commandresult.type = eomn_serv_NONE;
+        p->mnservice->status.commandresult.data[0] = eomn_serv_state_notsupported;
+        
+        send_rop_command_result();   
+        
+        return(eores_OK);
+    }
+    
+ 
+// we stop in any case
+    
+//    // now have a look at state. it must be eomn_serv_state_runningd.    
+//    if(eomn_serv_state_running != p->mnservice->status.stateofservice[category])
+//    {
+//        // send a failure about wrong state of the board
+//        p->mnservice->status.commandresult.latestcommandisok = eobool_false;
+//        p->mnservice->status.commandresult.category = category;
+//        p->mnservice->status.commandresult.operation = eomn_serv_operation_verifyactivate;
+//        p->mnservice->status.commandresult.type = eomn_serv_NONE;        
+//        p->mnservice->status.commandresult.data[0] = p->mnservice->status.stateofservice[category];
+//        
+//        send_rop_command_result();   
+//        
+//        return(eores_OK);
+//    }
+    
+    // now we stop the service.
+    if(eores_OK == s_eo_services_stop(p, category))
+    {
+        p->mnservice->status.commandresult.latestcommandisok = eobool_true;        
+    }
+    else
+    {
+        p->mnservice->status.commandresult.latestcommandisok = eobool_false;
+    }
+    
+    // ok, we have it stopped. is the config coherent with what we already have? for instance ... the eOmn_serv_type_t, the number of ...?
+    // we decide for now to avoid that.
+    
+    // we just send the command up telling that things are ok.
+    
+    p->mnservice->status.commandresult.category = category;
+    p->mnservice->status.commandresult.operation = eomn_serv_operation_stop;
+    p->mnservice->status.commandresult.type = eomn_serv_NONE;
+    p->mnservice->status.commandresult.data[0] = p->mnservice->status.stateofservice[category];
+    
+    send_rop_command_result();    
+    
+    return(eores_OK);        
+}
+
+
+static eOresult_t s_eo_services_process_failure(EOtheServices *p, eOmn_service_operation_t operation, eOmn_serv_category_t category)
+{
+    // send a failure about wrong param
+    p->mnservice->status.commandresult.latestcommandisok = eobool_false;
+    p->mnservice->status.commandresult.category = category;
+    p->mnservice->status.commandresult.operation = operation;
+    p->mnservice->status.commandresult.type = eomn_serv_NONE;
+
+    send_rop_command_result(); 
+
+    return(eores_OK);    
+}
+
+
+
+//static eOresult_t s_eo_services_process_stop(EOtheServices *p, eOmn_serv_category_t category)
+//{
+//    // check if the category is ok and if it is supported. 
+//    
+//    // in here we must put for for two phases: 
+//    // phase1: all services are verified and activated at bootstrap. teh command verifyactivate does nothing apart sending a ok/nok back to robotInterface
+//    // phase2: at bootstratp service are just _Initalise()-ed and every verification-activation is done in here. 
+//    
+//    // if not supported send up a negative reply.
+//    if(eomn_serv_category_none == category)
+//    {
+//        // send a failure about wrong param
+//        p->mnservice->status.commandresult.latestcommandisok = eobool_false;
+//        p->mnservice->status.commandresult.category = category;
+//        p->mnservice->status.commandresult.operation = eomn_serv_operation_start;
+//        p->mnservice->status.commandresult.type = eomn_serv_NONE;
+//        p->mnservice->status.commandresult.data[0] = eomn_serv_state_notsupported;
+//        
+//        send_rop_command_result();   
+//        
+//        return(eores_OK);
+//    }
+//    
+//    // is it a single service or _all ? not for now ...
+//    
+//    
+////    if(eomn_serv_category_all == category)
+////    {
+////        
+////        
+////        
+////    }
+//    
+//    
+//    // now have a look at state. it must be eomn_serv_state_running.    
+//    if(eomn_serv_state_running != p->mnservice->status.stateofservice[category])
+//    {
+//        // send a failure about wrong state of the board
+//        p->mnservice->status.commandresult.latestcommandisok = eobool_false;
+//        p->mnservice->status.commandresult.category = category;
+//        p->mnservice->status.commandresult.operation = eomn_serv_operation_stop;
+//        p->mnservice->status.commandresult.type = eomn_serv_NONE;        
+//        p->mnservice->status.commandresult.data[0] = p->mnservice->status.stateofservice[category];
+//        
+//        send_rop_command_result();   
+//        
+//        return(eores_OK);
+//    }
+//    
+//    // now we stop the service.
+//    if(eores_OK == s_eo_services_start(p, category))
+//    {
+//        p->mnservice->status.commandresult.latestcommandisok = eobool_true;        
+//    }
+//    else
+//    {
+//        p->mnservice->status.commandresult.latestcommandisok = eobool_false;
+//    }
+//    
+//    // ok, we have it activated. is the config coherent with what we already have? for instance ... the eOmn_serv_type_t, the number of ...?
+//    // we decide for now to avoid that.
+//    
+//    // we just send the command up telling that things are ok.
+//    
+//    p->mnservice->status.commandresult.category = category;
+//    p->mnservice->status.commandresult.operation = eomn_serv_operation_start;
+//    p->mnservice->status.commandresult.type = eomn_serv_NONE;
+//    p->mnservice->status.commandresult.data[0] = p->mnservice->status.stateofservice[category];
+//    
+//    send_rop_command_result();    
+//    
+//    return(eores_OK);        
+//}
+
+
+static void send_rop_command_result(void)
+{
+    eOropdescriptor_t ropdesc;
+    // ok, prepare the occasional rops
+    memcpy(&ropdesc, &eok_ropdesc_basic, sizeof(eok_ropdesc_basic));
+    ropdesc.ropcode = eo_ropcode_sig;
+    ropdesc.id32    = eoprot_ID_get(eoprot_endpoint_management, eoprot_entity_mn_comm, 0, eoprot_tag_mn_service_status_commandresult);
+    ropdesc.data    = NULL; // so that dat from the EOnv is retrieved.            
+
+    // now write what we want inside 
+    // already done before this function call
+    
+    eom_emsappl_Transmit_OccasionalROP(eom_emsappl_GetHandle(), &ropdesc);
+}
+
+
+static eOresult_t s_eo_services_start(EOtheServices *p, eOmn_serv_category_t category)
+{
+    eOresult_t res = eores_NOK_generic;
+    
+    // now we start the service.
+    switch(category)
+    {
+        case eomn_serv_category_mc:
+        {
+            res = eo_motioncontrol_Start(eo_motioncontrol_GetHandle());
+            // verify that we are in state eomn_serv_state_running ... not required because if previous call it is OK then the call puts the state equal to running
+//            if(eomn_serv_state_running != p->mnservice->status.stateofservice[category])
+//            {
+//                res = eores_NOK_generic;
+//            }
+        } break;
+        
+        case eomn_serv_category_strain:
+        {
+            res = eo_strain_Start(eo_strain_GetHandle());
+        } break;
+
+        case eomn_serv_category_mais:
+        {
+            res = eo_mais_Start(eo_mais_GetHandle());
+        } break;    
+
+        case eomn_serv_category_skin:
+        {
+            res = eo_skin_Start(eo_skin_GetHandle());
+        } break;        
+
+        case eomn_serv_category_inertials:
+        {
+            res = eo_inertials_Start(eo_inertials_GetHandle());
+        } break;
+        
+        default:
+        {
+            res = eores_NOK_generic;
+        } break;
+    }
+    
+    
+    if(eores_OK == res)
+    {
+        // must send the application in run mode ...
+        p->running[category] = eobool_true;
+        res = eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STrun);        
+    }
+    
+    return(res);
+}
+
+
+static eOresult_t s_eo_services_stop(EOtheServices *p, eOmn_serv_category_t category)
+{
+    eOresult_t res = eores_NOK_generic;
+    
+    // now we start the service.
+    switch(category)
+    {
+        case eomn_serv_category_mc:
+        {
+            res = eo_motioncontrol_Stop(eo_motioncontrol_GetHandle());
+            // verify that we are in state eomn_serv_state_running ... not required because if previous call it is OK then the call puts the state equal to running
+//            if(eomn_serv_state_running != p->mnservice->status.stateofservice[category])
+//            {
+//                res = eores_NOK_generic;
+//            }
+        } break;
+        
+        case eomn_serv_category_strain:
+        {
+            res = eo_strain_Stop(eo_strain_GetHandle());
+        } break;
+
+        case eomn_serv_category_mais:
+        {
+            res = eo_mais_Stop(eo_mais_GetHandle());
+        } break;    
+
+        case eomn_serv_category_skin:
+        {
+            res = eo_skin_Stop(eo_skin_GetHandle());
+        } break;        
+
+        case eomn_serv_category_inertials:
+        {
+            res = eo_inertials_Stop(eo_inertials_GetHandle());
+        } break;
+        
+        default:
+        {
+            res = eores_NOK_generic;
+        } break;
+    }
+    
+    
+    if(eores_OK == res)
+    {
+        // must send the application in cfg mode ... only if there is no one running anymore
+        p->running[category] = eobool_false; 
+        eObool_t anyrunning = eobool_false;        
+        for(uint8_t i=0; i<eomn_serv_categories_numberof; i++)
+        {
+            if(eobool_true == p->running[i])
+            {
+                anyrunning = eobool_true;
+                break;
+            }           
+        }
+        
+        if(eobool_false == anyrunning)
+        {
+            res = eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STcfg);
+        } 
+    }
+    
+    return(res);
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
