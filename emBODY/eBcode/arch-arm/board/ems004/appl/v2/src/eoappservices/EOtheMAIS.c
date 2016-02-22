@@ -165,6 +165,7 @@ extern EOtheMAIS* eo_mais_Initialise(void)
     p->service.active = eobool_false;
     p->service.running = eobool_false;
     p->service.state = eomn_serv_state_idle;    
+    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mais, p->service.state);
        
     return(p);   
 }
@@ -227,6 +228,8 @@ extern eOresult_t eo_mais_Verify(EOtheMAIS *p, const eOmn_serv_configuration_t *
     if((NULL == p) || (NULL == servcfg))
     {
         s_eo_themais.service.state = eomn_serv_state_failureofverify;
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mais, s_eo_themais.service.state);
+        
         if(NULL != onverify)
         {
             onverify(p, eobool_false); 
@@ -237,6 +240,7 @@ extern eOresult_t eo_mais_Verify(EOtheMAIS *p, const eOmn_serv_configuration_t *
     if(eomn_serv_AS_mais != servcfg->type)
     {
         p->service.state = eomn_serv_state_failureofverify;
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mais, p->service.state);
         if(NULL != onverify)
         {
             onverify(p, eobool_false); 
@@ -251,6 +255,7 @@ extern eOresult_t eo_mais_Verify(EOtheMAIS *p, const eOmn_serv_configuration_t *
 //    } 
 
     p->service.state = eomn_serv_state_verifying;   
+    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mais, p->service.state);
 
     // make sure the timer is not running
     eo_timer_Stop(p->diagnostics.reportTimer);      
@@ -316,6 +321,7 @@ extern eOresult_t eo_mais_Deactivate(EOtheMAIS *p)
     
     p->service.active = eobool_false;    
     p->service.state = eomn_serv_state_idle; 
+    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mais, p->service.state);
     
     return(eores_OK);
 }
@@ -380,7 +386,8 @@ extern eOresult_t eo_mais_Activate(EOtheMAIS *p, const eOmn_serv_configuration_t
 
 
         p->service.active = eobool_true;    
-        p->service.state = eomn_serv_state_activated;         
+        p->service.state = eomn_serv_state_activated;   
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mais, p->service.state);        
     }
     
     return(eores_OK);   
@@ -406,6 +413,7 @@ extern eOresult_t eo_mais_Start(EOtheMAIS *p)
     
     p->service.running = eobool_true;    
     p->service.state = eomn_serv_state_running; 
+    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mais, p->service.state);   
     
     // now we activate tx according to config of mais
     //s_eo_mais_TXstart(p, p->mais->config.datarate, eoas_maismode_txdatacontinuously, (eOas_maisresolution_t)p->mais->config.resolution);   
@@ -434,7 +442,8 @@ extern eOresult_t eo_mais_Stop(EOtheMAIS *p)
     s_eo_mais_TXstop(p);
        
     p->service.running = eobool_false;
-    p->service.state = eomn_serv_state_activated;     
+    p->service.state = eomn_serv_state_activated;
+    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mais, p->service.state);       
     
     return(eores_OK);
 }
@@ -751,10 +760,12 @@ static eOresult_t s_eo_mais_onstop_search4mais(void *par, EOtheCANdiscovery2* cd
     if(eobool_true == searchisok)
     {
         p->service.state = eomn_serv_state_verified;
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mais, p->service.state);   
     }
     else
     {   
         p->service.state = eomn_serv_state_failureofverify;
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mais, p->service.state);   
     }    
     
     if((eobool_true == searchisok) && (eobool_true == p->service.activateafterverify))

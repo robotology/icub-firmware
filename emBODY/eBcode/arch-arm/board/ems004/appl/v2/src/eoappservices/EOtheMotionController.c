@@ -226,6 +226,10 @@ extern EOtheMotionController* eo_motioncontrol_Initialise(void)
     p->diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_mc_not_verified_yet);    
 
     p->service.initted = eobool_true;
+    p->service.active = eobool_false;
+    p->service.running = eobool_false;
+    p->service.state = eomn_serv_state_idle;    
+    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mc, p->service.state);
     
     return(p);
 }
@@ -316,6 +320,7 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
     if((NULL == p) || (NULL == servcfg))
     {
         s_eo_themotcon.service.state = eomn_serv_state_failureofverify;
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mc, s_eo_themotcon.service.state);
         if(NULL != onverify)
         {
             onverify(p, eobool_false); 
@@ -327,6 +332,7 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
     if((eo_motcon_mode_foc != servcfg->type) && (eo_motcon_mode_mc4 != servcfg->type) && (eo_motcon_mode_mc4plus != servcfg->type) && (eo_motcon_mode_mc4plusmais != servcfg->type))
     {
         p->service.state = eomn_serv_state_failureofverify;
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mc, p->service.state);
         if(NULL != onverify)
         {
             onverify(p, eobool_false); 
@@ -340,6 +346,7 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
     } 
     
     p->service.state = eomn_serv_state_verifying;
+    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mc, p->service.state);
 
     // make sure the timer is not running
     eo_timer_Stop(p->diagnostics.reportTimer);        
@@ -541,7 +548,8 @@ extern eOresult_t eo_motioncontrol_Deactivate(EOtheMotionController *p)
     eo_timer_Stop(p->diagnostics.reportTimer);  
     
     p->service.active = eobool_false;    
-    p->service.state = eomn_serv_state_idle;  
+    p->service.state = eomn_serv_state_idle; 
+    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mc, p->service.state);    
     
     return(eores_OK);
 }
@@ -646,7 +654,8 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
             s_eo_motioncontrol_proxy_config(p, eobool_true);
             
             p->service.active = eobool_true;
-            p->service.state = eomn_serv_state_activated;        
+            p->service.state = eomn_serv_state_activated;
+            eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mc, p->service.state);            
         }
     
     }
@@ -733,7 +742,8 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
             s_eo_motioncontrol_proxy_config(p, eobool_true);
                     
             p->service.active = eobool_true;
-            p->service.state = eomn_serv_state_activated;         
+            p->service.state = eomn_serv_state_activated;
+            eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mc, p->service.state);            
         }            
         
     }
@@ -807,7 +817,8 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
             eo_currents_watchdog_Initialise();
             
             p->service.active = eobool_true;
-            p->service.state = eomn_serv_state_activated;      
+            p->service.state = eomn_serv_state_activated;
+            eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mc, p->service.state);            
         }
         
     }
@@ -835,7 +846,8 @@ extern eOresult_t eo_motioncontrol_Start(EOtheMotionController *p)
     }
        
     p->service.running = eobool_true;    
-    p->service.state = eomn_serv_state_running; 
+    p->service.state = eomn_serv_state_running;
+    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mc, p->service.state);    
     
     // mc4based: enable broadcast etc
     // focbased: just init a read of the encoder
@@ -995,6 +1007,7 @@ extern eOresult_t eo_motioncontrol_Stop(EOtheMotionController *p)
       
     p->service.running = eobool_false;
     p->service.state = eomn_serv_state_activated;
+    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mc, p->service.state);
     
     return(eores_OK);    
 }
@@ -1683,10 +1696,12 @@ static eOresult_t s_eo_motioncontrol_onstop_search4focs(void *par, EOtheCANdisco
     if(eobool_true == searchisok)
     {
         p->service.state = eomn_serv_state_verified;
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mc, p->service.state);
     }
     else
     {   
         p->service.state = eomn_serv_state_failureofverify;
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mc, p->service.state);
     }    
     
     if((eobool_true == searchisok) && (eobool_true == p->service.activateafterverify))
@@ -1744,10 +1759,12 @@ static eOresult_t s_eo_motioncontrol_mc4plus_onendofverify_encoder(EOaService* s
     if(eobool_true == operationisok)
     {
         p->service.state = eomn_serv_state_verified;
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mc, p->service.state);
     }
     else
     {   
         p->service.state = eomn_serv_state_failureofverify;
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mc, p->service.state);
     }    
     
     if((eobool_true == operationisok) && (eobool_true == p->service.activateafterverify))
@@ -1812,6 +1829,7 @@ static eOresult_t s_eo_motioncontrol_onendofverify_encoder(EOaService* s, eObool
         // the encoder reader fails. we dont even start the discovery of the foc boards. we just issue an error report and call onverify() w/ false argument
         
         p->service.state = eomn_serv_state_failureofverify;
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mc, p->service.state);
         
         // prepare things
         p->diagnostics.errorDescriptor.sourcedevice     = eo_errman_sourcedevice_localboard;
@@ -1875,6 +1893,7 @@ static eOresult_t s_eo_motioncontrol_onendofverify_mais(EOaService* s, eObool_t 
         // the mais fails. we dont even start the discovery of the mc4 boards. we just issue an error report and call onverify() w/ false argument
         
         p->service.state = eomn_serv_state_failureofverify;
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mc, p->service.state);
         
         eOerror_value_CFG_t errorvalue = (eo_motcon_mode_mc4 == servcfg->type) ? (eoerror_value_CFG_mc_mc4_failed_mais_verify) : (eoerror_value_CFG_mc_mc4plusmais_failed_candiscovery_of_mais);
         
@@ -1917,10 +1936,12 @@ static eOresult_t s_eo_motioncontrol_onstop_search4mc4s(void *par, EOtheCANdisco
     if(eobool_true == searchisok)
     {
         p->service.state = eomn_serv_state_verified;
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mc, p->service.state);
     }
     else
     {   
         p->service.state = eomn_serv_state_failureofverify;
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mc, p->service.state);
     }    
     
     if((eobool_true == searchisok) && (eobool_true == p->service.activateafterverify))
@@ -1986,6 +2007,7 @@ static eOresult_t s_eo_motioncontrol_mc4plusmais_onendofverify_encoder(EOaServic
         // the encoder reader fails. we dont even start the discovery of the mais board. we just issue an error report and call onverify() w/ false argument
         
         p->service.state = eomn_serv_state_failureofverify;
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mc, p->service.state);
         
         // prepare things
         p->diagnostics.errorDescriptor.sourcedevice     = eo_errman_sourcedevice_localboard;
@@ -2028,10 +2050,12 @@ static eOresult_t s_eo_motioncontrol_mc4plusmais_onstop_search4mais(void *par, E
     if(eobool_true == searchisok)
     {
         p->service.state = eomn_serv_state_verified;
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mc, p->service.state);
     }
     else
     {   
         p->service.state = eomn_serv_state_failureofverify;
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mc, p->service.state);
     }    
     
     if((eobool_true == searchisok) && (eobool_true == p->service.activateafterverify))
@@ -2090,10 +2114,12 @@ static eOresult_t s_eo_motioncontrol_mc4plusmais_onendofverify_encoder_BIS(EOaSe
     if(eobool_true == operationisok)
     {
         p->service.state = eomn_serv_state_verified;
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mc, p->service.state);
     }
     else
     {   
         p->service.state = eomn_serv_state_failureofverify;
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mc, p->service.state);
     }    
     
     if((eobool_true == operationisok) && (eobool_true == p->service.activateafterverify))
@@ -2161,6 +2187,7 @@ static eOresult_t s_eo_motioncontrol_mc4plusmais_onstop_search4mais_BIS_now_veri
         // the discovery of the mais board fails. we just issue an error report and call onverify() w/ false argument
         
         p->service.state = eomn_serv_state_failureofverify;
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mc, p->service.state);
         
         // prepare things
         p->diagnostics.errorDescriptor.sourcedevice     = eo_errman_sourcedevice_localboard;

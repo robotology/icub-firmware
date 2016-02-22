@@ -168,7 +168,8 @@ extern EOtheSTRAIN* eo_strain_Initialise(void)
     p->service.initted = eobool_true;
     p->service.active = eobool_false;
     p->service.running = eobool_false;    
-    p->service.state = eomn_serv_state_idle;   
+    p->service.state = eomn_serv_state_idle;  
+    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_strain, p->service.state);       
     
     return(p);   
 }
@@ -229,6 +230,7 @@ extern eOresult_t eo_strain_Verify(EOtheSTRAIN *p, const eOmn_serv_configuration
     if((NULL == p) || (NULL == servcfg))
     {
         s_eo_thestrain.service.state = eomn_serv_state_failureofverify;
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_strain, s_eo_thestrain.service.state);
         if(NULL != onverify)
         {
             onverify(p, eobool_false); 
@@ -239,6 +241,7 @@ extern eOresult_t eo_strain_Verify(EOtheSTRAIN *p, const eOmn_serv_configuration
     if(eomn_serv_AS_strain != servcfg->type)
     {
         p->service.state = eomn_serv_state_failureofverify;
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_strain, p->service.state);
         if(NULL != onverify)
         {
             onverify(p, eobool_false); 
@@ -254,6 +257,7 @@ extern eOresult_t eo_strain_Verify(EOtheSTRAIN *p, const eOmn_serv_configuration
 //    }  
 
     p->service.state = eomn_serv_state_verifying;
+    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_strain, p->service.state);
 
     // make sure the timer is not running
     eo_timer_Stop(p->diagnostics.reportTimer);  
@@ -319,6 +323,7 @@ extern eOresult_t eo_strain_Deactivate(EOtheSTRAIN *p)
     
     p->service.active = eobool_false;    
     p->service.state = eomn_serv_state_idle; 
+    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_strain, p->service.state);
     
     return(eores_OK);
 }
@@ -380,7 +385,8 @@ extern eOresult_t eo_strain_Activate(EOtheSTRAIN *p, const eOmn_serv_configurati
 
 
         p->service.active = eobool_true;
-        p->service.state = eomn_serv_state_activated;        
+        p->service.state = eomn_serv_state_activated; 
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_strain, p->service.state);        
     }
    
     return(eores_OK);   
@@ -406,6 +412,7 @@ extern eOresult_t eo_strain_Start(EOtheSTRAIN *p)
     
     p->service.running = eobool_true;    
     p->service.state = eomn_serv_state_running; 
+    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_strain, p->service.state);
     
     // start() does not force the tx of the board. 
     // this function just config the strain according to values in strain.config (default are: 10 ms, acquire but dont tx)
@@ -437,7 +444,8 @@ extern eOresult_t eo_strain_Stop(EOtheSTRAIN *p)
     s_eo_strain_TXstop(p);   
 
     p->service.running = eobool_false;
-    p->service.state = eomn_serv_state_activated;     
+    p->service.state = eomn_serv_state_activated;
+    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_strain, p->service.state);    
     
     return(eores_OK);    
 }
@@ -914,10 +922,12 @@ static eOresult_t s_eo_strain_onstop_search4strain(void *par, EOtheCANdiscovery2
     if(eobool_true == searchisok)
     {
         p->service.state = eomn_serv_state_verified;
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_strain, p->service.state);
     }
     else
     {   
         p->service.state = eomn_serv_state_failureofverify;
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_strain, p->service.state);
     }
     
     if((eobool_true == searchisok) && (eobool_true == p->service.activateafterverify))

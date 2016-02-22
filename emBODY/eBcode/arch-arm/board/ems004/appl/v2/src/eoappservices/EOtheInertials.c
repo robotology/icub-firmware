@@ -300,6 +300,7 @@ extern EOtheInertials* eo_inertials_Initialise(void)
     p->service.active = eobool_false;
     p->service.running = eobool_false;
     p->service.state = eomn_serv_state_idle;
+    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_inertials, p->service.state);
     
     return(&s_eo_theinertials);   
 }
@@ -360,6 +361,7 @@ extern eOresult_t eo_inertials_Verify(EOtheInertials *p, const eOmn_serv_configu
     if((NULL == p) || (NULL == servcfg))
     {
         s_eo_theinertials.service.state = eomn_serv_state_failureofverify;
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_inertials, s_eo_theinertials.service.state);
         if(NULL != onverify)
         {
             onverify(p, eobool_false); 
@@ -370,6 +372,7 @@ extern eOresult_t eo_inertials_Verify(EOtheInertials *p, const eOmn_serv_configu
     if(eomn_serv_AS_inertial != servcfg->type)
     {
         p->service.state = eomn_serv_state_failureofverify;
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_inertials, p->service.state);
         if(NULL != onverify)
         {
             onverify(p, eobool_false); 
@@ -384,7 +387,8 @@ extern eOresult_t eo_inertials_Verify(EOtheInertials *p, const eOmn_serv_configu
 //        eo_inertials_Deactivate(p);        
 //    }   
     
-    p->service.state = eomn_serv_state_verifying;   
+    p->service.state = eomn_serv_state_verifying; 
+    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_inertials, p->service.state);    
 
     // make sure the timer is not running
     eo_timer_Stop(p->diagnostics.reportTimer);    
@@ -431,6 +435,7 @@ extern eOresult_t eo_inertials_Verify(EOtheInertials *p, const eOmn_serv_configu
         }  
         
         p->service.state = eomn_serv_state_failureofverify;
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_inertials, p->service.state);
         if(NULL != onverify)
         {
             onverify(p, eobool_false); 
@@ -491,6 +496,7 @@ extern eOresult_t eo_inertials_Deactivate(EOtheInertials *p)
     
     p->service.active = eobool_false;    
     p->service.state = eomn_serv_state_idle;
+    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_inertials, p->service.state);
     
     return(eores_OK);
 }
@@ -578,7 +584,8 @@ extern eOresult_t eo_inertials_Activate(EOtheInertials *p, const eOmn_serv_confi
     eo_canmap_ConfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_analogsensors, eoprot_entity_as_inertial, p->sharedcan.entitydescriptor);   
 
     p->service.active = eobool_true;    
-    p->service.state = eomn_serv_state_activated;        
+    p->service.state = eomn_serv_state_activated;
+    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_inertials, p->service.state);    
 
     
     return(eores_OK);   
@@ -615,6 +622,7 @@ extern eOresult_t eo_inertials_Start(EOtheInertials *p)
 
     p->service.running = eobool_true;    
     p->service.state = eomn_serv_state_running;
+    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_inertials, p->service.state);
     
     
     return(eores_OK);      
@@ -647,6 +655,7 @@ extern eOresult_t eo_inertials_Stop(EOtheInertials *p)
                
     p->service.running = eobool_false;
     p->service.state = eomn_serv_state_activated;
+    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_inertials, p->service.state);
  
     return(eores_OK);     
 }
@@ -1248,10 +1257,12 @@ static eOresult_t s_eo_inertials_onstop_search4mtbs(void *par, EOtheCANdiscovery
     if(eobool_true == searchisok)
     {
         p->service.state = eomn_serv_state_verified;
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_inertials, p->service.state);
     }
     else
     {   
         p->service.state = eomn_serv_state_failureofverify;
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_inertials, p->service.state);
     }
     
     if((eobool_true == searchisok) && (eobool_true == p->service.activateafterverify))

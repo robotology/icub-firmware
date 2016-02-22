@@ -174,7 +174,8 @@ extern EOtheSKIN* eo_skin_Initialise(void)
     p->service.initted = eobool_true;    
     p->service.active = eobool_false;
     p->service.running = eobool_false;
-    p->service.state = eomn_serv_state_idle;   
+    p->service.state = eomn_serv_state_idle;
+    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_skin, p->service.state);    
     
     return(p);   
 }
@@ -237,6 +238,7 @@ extern eOresult_t eo_skin_Verify(EOtheSKIN *p, const eOmn_serv_configuration_t *
     if((NULL == p) || (NULL == servcfg))
     {
         s_eo_theskin.service.state = eomn_serv_state_failureofverify;
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_skin, s_eo_theskin.service.state);
         if(NULL != onverify)
         {
             onverify(p, eobool_false); 
@@ -247,6 +249,7 @@ extern eOresult_t eo_skin_Verify(EOtheSKIN *p, const eOmn_serv_configuration_t *
     if(eomn_serv_SK_skin != servcfg->type)
     {
         p->service.state = eomn_serv_state_failureofverify;
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_skin, p->service.state);
         if(NULL != onverify)
         {
             onverify(p, eobool_false); 
@@ -262,6 +265,7 @@ extern eOresult_t eo_skin_Verify(EOtheSKIN *p, const eOmn_serv_configuration_t *
 //    }   
     
     p->service.state = eomn_serv_state_verifying;
+    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_skin, p->service.state);
     
     // make sure the timer is not running
     eo_timer_Stop(p->diagnostics.reportTimer);  
@@ -312,6 +316,7 @@ extern eOresult_t eo_skin_Verify(EOtheSKIN *p, const eOmn_serv_configuration_t *
         }  
 
         p->service.state = eomn_serv_state_failureofverify;
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_skin, p->service.state);
         if(NULL != onverify)
         {
             onverify(p, eobool_false); 
@@ -376,6 +381,7 @@ extern eOresult_t eo_skin_Deactivate(EOtheSKIN *p)
     
     p->service.active = eobool_false;    
     p->service.state = eomn_serv_state_idle; 
+    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_skin, p->service.state);
     
     return(eores_OK);
 }
@@ -468,7 +474,8 @@ extern eOresult_t eo_skin_Activate(EOtheSKIN *p, const eOmn_serv_configuration_t
         eo_canmap_ConfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_skin, eoprot_entity_sk_skin, p->sharedcan.entitydescriptor);   
 
         p->service.active = eobool_true;    
-        p->service.state = eomn_serv_state_activated;        
+        p->service.state = eomn_serv_state_activated;
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_skin, p->service.state);        
     }
     
     return(eores_OK);   
@@ -495,6 +502,7 @@ extern eOresult_t eo_skin_Start(EOtheSKIN *p)
     
     p->service.running = eobool_true;    
     p->service.state = eomn_serv_state_running; 
+    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_skin, p->service.state);
  
     // marco.accame: i start the skin but i dont say to the patches to tx. the eth callback will do it.    
 //    uint8_t i = 0;
@@ -527,7 +535,8 @@ extern eOresult_t eo_skin_Stop(EOtheSKIN *p)
     s_eo_skin_TXstop(p);     
 
     p->service.running = eobool_false;
-    p->service.state = eomn_serv_state_activated;     
+    p->service.state = eomn_serv_state_activated; 
+    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_skin, p->service.state);    
     
     return(eores_OK);    
 }
@@ -1099,10 +1108,12 @@ static eOresult_t s_eo_skin_onstop_search4mtbs(void *par, EOtheCANdiscovery2* cd
     if(eobool_true == searchisok)
     {
         p->service.state = eomn_serv_state_verified;
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_skin, p->service.state);
     }
     else
     {   
         p->service.state = eomn_serv_state_failureofverify;
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_skin, p->service.state);
     }
     
     if((eobool_true == searchisok) && (eobool_true == p->service.activateafterverify))
