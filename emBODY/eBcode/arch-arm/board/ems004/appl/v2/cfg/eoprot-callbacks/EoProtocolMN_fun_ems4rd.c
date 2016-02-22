@@ -394,6 +394,16 @@ extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropd
 }
 
 
+extern void eoprot_fun_UPDT_mn_service_cmmnds_command(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    eOmn_service_cmmnds_command_t *command = (eOmn_service_cmmnds_command_t *)nv->ram;
+    
+    // ok, we have received a command for a given service. we ask the object theservices to manage the thing
+    
+    eo_services_ProcessCommand(eo_services_GetHandle(), command);
+}
+
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
