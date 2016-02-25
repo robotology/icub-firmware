@@ -429,6 +429,8 @@ extern eOresult_t eom_emsappl_Transmit_OccasionalROP(EOMtheEMSappl *p, eOropdesc
 }
 
 
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
@@ -695,6 +697,27 @@ static void s_eom_emsappl_OnError(eOerrmanErrorType_t errtype, const char *info,
     if(emsapplcfg->errmng_haltrace_enabled)
     {
         char strdes[64] = {0};
+        uint64_t tt = eov_sys_LifeTimeGet(eov_sys_GetHandle());
+        uint32_t sec = tt/(1000*1000);
+        uint32_t tmp = tt%(1000*1000);
+        uint32_t msec = tmp / 1000;
+        uint32_t usec = tmp % 1000;
+        
+        if(NULL == des)
+        {   // it is a trace
+            
+            if(NULL != info)
+            {
+                snprintf(str, sizeof(str), "[TRACE] %s @s%dm%du%d: %s -> %s.", eobjstr, sec, msec, usec, err, info); 
+            }
+            else
+            {
+                snprintf(str, sizeof(str), "[TRACE] %s @s%dm%du%d: %s.", eobjstr, sec, msec, usec, err); 
+            }
+            hal_trace_puts(str);
+            return;            
+        }
+        
         if(NULL != des)
         {
             snprintf(strdes, sizeof(strdes), "code 0x%x, p16 0x%04x, p64 0x%016llx, dev %d, adr %d", des->code, des->par16, des->par64, des->sourcedevice, des->sourceaddress);
@@ -705,10 +728,6 @@ static void s_eom_emsappl_OnError(eOerrmanErrorType_t errtype, const char *info,
         }
         else
         {
-            uint64_t tt = eov_sys_LifeTimeGet(eov_sys_GetHandle());
-            uint32_t sec = tt/(1000*1000);
-            uint32_t msec = tt%(1000*1000);
-            msec /= 1000;
             snprintf(str, sizeof(str), "EOMtheEMSerror: [eobj: %s, tsk: %d @s%dm%d] %s %s: no info", eobjstr, taskid, sec, msec, err, strdes);  
         }
         // i dont care is trace is interrupted ... thus NO MUTEX in here
