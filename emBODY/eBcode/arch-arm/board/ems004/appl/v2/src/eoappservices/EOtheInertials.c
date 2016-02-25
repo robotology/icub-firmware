@@ -202,6 +202,7 @@ static eOresult_t s_eo_inertials_onstop_search4mtbs(void *par, EOtheCANdiscovery
 
 static void s_eo_inertials_send_periodic_error_report(void *p);
 
+static eObool_t s_eo_inertials_isID32relevant(uint32_t id32);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -254,7 +255,8 @@ static EOtheInertials s_eo_theinertials =
     
     .configured                 = eobool_false,
 
-    .inertial2                  = NULL
+    .inertial2                  = NULL,
+    .id32ofregulars             = NULL
 };
 
 
@@ -288,6 +290,9 @@ extern EOtheInertials* eo_inertials_Initialise(void)
     
 
     p->inertial2 = NULL;
+    p->id32ofregulars = eo_array_New(inertials_maxRegulars, sizeof(uint32_t), NULL);
+
+    
     memcpy(&p->sensorsconfig, &s_eo_default_inertialsensorsconfig, sizeof(eOas_inertial_sensorsconfig_t));
     p->fifoofinertialdata = eo_vector_New(sizeof(eOas_inertial_data_t), 32, NULL, 0, NULL, NULL);
     
@@ -471,6 +476,8 @@ extern eOresult_t eo_inertials_Deactivate(EOtheInertials *p)
     {
         eo_inertials_Stop(p);
     }
+    
+    eo_inertials_SetRegulars(p, NULL, NULL);
       
     eo_canmap_DeconfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_analogsensors, eoprot_entity_as_inertial, p->sharedcan.entitydescriptor); 
     
@@ -628,6 +635,20 @@ extern eOresult_t eo_inertials_Start(EOtheInertials *p)
     return(eores_OK);      
 }
 
+extern eOresult_t eo_inertials_SetRegulars(EOtheInertials *p, eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t* numberofthem)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    if(eobool_false == p->service.active)
+    {   // nothing to do because object must be first activated
+        return(eores_OK);
+    }  
+    
+    return(eo_service_hid_SetRegulars(p->id32ofregulars, arrayofid32, s_eo_inertials_isID32relevant, numberofthem));
+}
 
 
 extern eOresult_t eo_inertials_Stop(EOtheInertials *p)
@@ -656,7 +677,16 @@ extern eOresult_t eo_inertials_Stop(EOtheInertials *p)
     p->service.running = eobool_false;
     p->service.state = eomn_serv_state_activated;
     eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_inertials, p->service.state);
- 
+    
+    // reset the various buffers
+    eOas_inertial_data_t *data = &p->inertial2->status.data;
+    memset(data, 0, sizeof(eOas_inertial_data_t)); 
+    eo_vector_Clear(p->fifoofinertialdata);
+    
+    
+    // remove all regulars related to inertials entity ... no, dont do that.
+    //eo_inertials_SetRegulars(p, NULL, NULL);
+    
     return(eores_OK);     
 }
 
@@ -1351,6 +1381,17 @@ static void s_eo_inertials_send_periodic_error_report(void *par)
     }
 }
 
+static eObool_t s_eo_inertials_isID32relevant(uint32_t id32)
+{
+    static const uint32_t mask0 = (((uint32_t)eoprot_endpoint_analogsensors) << 24) | (((uint32_t)eoprot_entity_as_inertial) << 16);
+    
+    if((id32 & mask0) == mask0)
+    {
+        return(eobool_true);
+    }
+    
+    return(eobool_false); 
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

@@ -51,6 +51,10 @@
 
 #include "EoProtocolMN.h"
 
+#include "EOtheBOARDtransceiver.h"
+
+//#include "hal_trace.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -94,6 +98,7 @@ static void s_activate_services_deferred(void);
 static void s_activate_services_now(void *p);
 
 static eOresult_t s_after_verify_motion(EOaService* p, eObool_t operationisok);
+static eOresult_t s_after_verify_mais(EOaService* p, eObool_t operationisok);
 static eOresult_t s_after_verify_strain(EOaService* p, eObool_t operationisok);
 static eOresult_t s_after_verify_skin(EOaService* p, eObool_t operationisok);
 static eOresult_t s_after_verify_inertials(EOaService* p, eObool_t operationisok);
@@ -103,6 +108,9 @@ static eOresult_t s_eo_services_verifyactivate(EOtheServices *p, eOmn_serv_categ
 
 static eOresult_t s_eo_services_process_start(EOtheServices *p, eOmn_serv_category_t category);
 static eOresult_t s_eo_services_process_stop(EOtheServices *p, eOmn_serv_category_t category);
+
+static eOresult_t s_eo_services_process_regsig_manage(EOtheServices *p, eOmn_serv_category_t category, eOmn_serv_arrayof_id32_t* arrayofid32);
+    
 static eOresult_t s_eo_services_process_failure(EOtheServices *p, eOmn_service_operation_t operation, eOmn_serv_category_t category);
 
 static eOresult_t s_eo_services_start(EOtheServices *p, eOmn_serv_category_t category);
@@ -244,6 +252,16 @@ extern eOmn_serv_state_t eo_service_GetState(eOmn_serv_category_t category)
     
 }
 
+extern eOresult_t eo_services_ActivateAll(EOtheServices *p, eOprotBRD_t brd)
+{
+    if((NULL == p))
+    {
+        return(eores_NOK_nullpointer);
+    }  
+
+
+    return(eores_OK);
+}
 
 
 extern eOresult_t eo_services_StartLegacyMode(EOtheServices *p, eOprotBRD_t brd)
@@ -412,9 +430,10 @@ extern eOresult_t eo_services_ProcessCommand(EOtheServices *p, eOmn_service_cmmn
     }
     
     
-    eOmn_service_operation_t operation = command->operation;
-    eOmn_serv_category_t category = command->category;
-    eOmn_serv_configuration_t *config = &command->configuration;
+    eOmn_service_operation_t operation = (eOmn_service_operation_t)command->operation;
+    eOmn_serv_category_t category = (eOmn_serv_category_t)command->category;
+    eOmn_serv_configuration_t *config = &command->parameter.configuration;
+    eOmn_serv_arrayof_id32_t *arrayofid32 = &command->parameter.arrayofid32;
     
     
     // if we can do it, then we ... do it and then the callback of ... will sig<command.result, OK>
@@ -429,21 +448,37 @@ extern eOresult_t eo_services_ProcessCommand(EOtheServices *p, eOmn_service_cmmn
     {
         case eomn_serv_operation_verifyactivate:
         {
+            eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "COMMAND: verifiactivate()", s_eobj_ownname);
             s_eo_services_verifyactivate(p, category, config);            
         } break;
         
         case eomn_serv_operation_start:
         {
+            eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "COMMAND: start()", s_eobj_ownname);
             s_eo_services_process_start(p, category);
         } break;
         
         case eomn_serv_operation_stop:
         {
+            eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "COMMAND: stop()", s_eobj_ownname);            
             s_eo_services_process_stop(p, category);
         } break;
         
+        case eomn_serv_operation_regsig_load:
+        {
+            eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "COMMAND: load regsig()", s_eobj_ownname);            
+            s_eo_services_process_regsig_manage(p, category, arrayofid32);
+        } break;        
+
+        case eomn_serv_operation_regsig_clear:
+        {
+            eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "COMMAND: clear regsig()", s_eobj_ownname);            
+            s_eo_services_process_regsig_manage(p, category, NULL);
+        } break;  
+        
         default:
         {
+            eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "COMMAND: failure()", s_eobj_ownname);
             // send failure
             s_eo_services_process_failure(p, operation, category);
         } break;
@@ -494,6 +529,86 @@ extern eOresult_t eo_service_hid_SynchServiceState(EOtheServices *p, eOmn_serv_c
 }
 
 
+extern eOresult_t eo_service_hid_SetRegulars(EOarray* id32ofregulars, eOmn_serv_arrayof_id32_t* arrayofid32, eObool_t (*isID32relevant)(uint32_t), uint8_t* numberofthem)
+{
+    EOarray* id32array = (EOarray*)arrayofid32;    
+        
+    uint8_t size = 0;
+    uint8_t i = 0;
+    
+    EOtransceiver* boardtransceiver = eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle());
+    
+    eOropdescriptor_t ropdesc;
+    memcpy(&ropdesc.control, &eok_ropctrl_basic, sizeof(eOropctrl_t));
+    ropdesc.control.plustime        = eobool_false;
+    ropdesc.control.plussign        = eobool_false;
+    ropdesc.ropcode                 = eo_ropcode_sig;
+    ropdesc.id32                    = eo_prot_ID32dummy;    
+    ropdesc.signature               = eo_rop_SIGNATUREdummy;  
+    uint32_t* id32 = NULL;
+    
+    // at first we remove all regulars inside id32ofregulars and we reset it
+    size = eo_array_Size(id32ofregulars);
+    for(i=0; i<size; i++)
+    {
+        id32 = (uint32_t*)eo_array_At(id32ofregulars, i);
+        if(NULL != id32)
+        {
+            ropdesc.id32 = *id32;
+            eo_transceiver_RegularROP_Unload(boardtransceiver, &ropdesc);
+        }       
+    }    
+    eo_array_Reset(id32ofregulars);
+    
+    
+    // then i load the new id32s ... if there are any
+    if((NULL != id32array) && (0 != eo_array_Size(id32array)))
+    {
+        // get all the id32 from id32array (but not more than ...) and: 1. push back into id32ofregulars, 2. load the regular
+        size = eo_array_Size(id32array);
+        
+        eOropdescriptor_t ropdesc;
+        memcpy(&ropdesc.control, &eok_ropctrl_basic, sizeof(eOropctrl_t));
+        
+        for(i=0; i<size; i++)
+        {
+            id32 = (uint32_t*)eo_array_At(id32array, i);
+            if(NULL != id32)
+            { 
+                // filter them 
+                eObool_t itisrelevant = eobool_true;
+                if(NULL != isID32relevant)
+                {
+                    itisrelevant = isID32relevant(*id32);                   
+                }
+                
+                if(eobool_true == itisrelevant)
+                {
+                    ropdesc.id32 = *id32;     
+                    if(eores_OK == eo_transceiver_RegularROP_Load(boardtransceiver, &ropdesc))
+                    {
+                        eo_array_PushBack(id32ofregulars , id32);
+                        if(eobool_true == eo_array_Full(id32ofregulars))
+                        {   // cannot add any more regulars
+                            break;
+                        }
+                    }
+                   
+                }                
+            }           
+        }
+    }
+    
+    if(NULL != numberofthem)
+    {
+        *numberofthem = eo_array_Size(id32ofregulars);
+    }
+    
+    return(eores_OK);     
+}
+
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
@@ -529,7 +644,11 @@ static void s_activate_services_now(void *p)
     if(NULL != (servcfg = eoboardconfig_code2motion_serv_configuration(s_eo_theservices.board)))
     {
         eo_motioncontrol_Verify(eo_motioncontrol_GetHandle(), servcfg, s_after_verify_motion, eobool_true); 
-    } 
+    }
+    else if(NULL != (servcfg = eoboardconfig_code2mais_serv_configuration(s_eo_theservices.board)))
+    {
+        eo_mais_Verify(eo_mais_GetHandle(), servcfg, s_after_verify_mais, eobool_true); 
+    }
     else if(NULL != (servcfg = eoboardconfig_code2strain_serv_configuration(s_eo_theservices.board)))
     {
         eo_strain_Verify(eo_strain_GetHandle(), servcfg, s_after_verify_strain, eobool_true); 
@@ -561,7 +680,11 @@ static eOresult_t s_after_verify_motion(EOaService* p, eObool_t operationisok)
     
     const eOmn_serv_configuration_t * servcfg = NULL;
     
-    if(NULL != (servcfg = eoboardconfig_code2strain_serv_configuration(s_eo_theservices.board)))
+    if(NULL != (servcfg = eoboardconfig_code2mais_serv_configuration(s_eo_theservices.board)))
+    {
+        eo_mais_Verify(eo_mais_GetHandle(), servcfg, s_after_verify_mais, eobool_true); 
+    }
+    else if(NULL != (servcfg = eoboardconfig_code2strain_serv_configuration(s_eo_theservices.board)))
     {
         eo_strain_Verify(eo_strain_GetHandle(), servcfg, s_after_verify_strain, eobool_true); 
     }
@@ -578,6 +701,37 @@ static eOresult_t s_after_verify_motion(EOaService* p, eObool_t operationisok)
         s_eo_theservices.allactivated = eobool_true;
     }
     
+    return(eores_OK);
+}
+
+
+static eOresult_t s_after_verify_mais(EOaService* p, eObool_t operationisok)
+{
+    if(eobool_false == operationisok)
+    {
+        s_eo_theservices.failedservice = eo_service_mais;
+        return(eores_OK);
+    }
+        
+    const eOmn_serv_configuration_t * servcfg = NULL;
+    
+    if(NULL != (servcfg = eoboardconfig_code2strain_serv_configuration(s_eo_theservices.board)))
+    {
+        eo_strain_Verify(eo_strain_GetHandle(), servcfg, s_after_verify_strain, eobool_true); 
+    }
+    else if(NULL != (servcfg = eoboardconfig_code2skin_serv_configuration(s_eo_theservices.board)))
+    {
+        eo_skin_Verify(eo_skin_GetHandle(), servcfg, s_after_verify_skin, eobool_true); 
+    }
+    else if(NULL != (servcfg = eoboardconfig_code2inertials_serv_configuration(s_eo_theservices.board)))
+    {
+        eo_inertials_Verify(eo_inertials_GetHandle(), servcfg, s_after_verify_inertials, eobool_true); 
+    }              
+    else
+    {   // nothing else to verify ..
+        s_eo_theservices.allactivated = eobool_true;
+    }    
+   
     return(eores_OK);
 }
 
@@ -671,7 +825,7 @@ static eOresult_t s_eo_services_verifyactivate(EOtheServices *p, eOmn_serv_categ
         return(eores_OK);
     }
     
-    eOmn_serv_state_t state = p->mnservice->status.stateofservice[category];
+    eOmn_serv_state_t state = (eOmn_serv_state_t)p->mnservice->status.stateofservice[category];
     
     // now have a look at state. it must be eomn_serv_state_activated.
     
@@ -772,7 +926,6 @@ static eOresult_t s_eo_services_process_start(EOtheServices *p, eOmn_serv_catego
 }
 
 
-
 static eOresult_t s_eo_services_process_stop(EOtheServices *p, eOmn_serv_category_t category)
 {
     // check if the category is ok and if it is supported. 
@@ -797,22 +950,6 @@ static eOresult_t s_eo_services_process_stop(EOtheServices *p, eOmn_serv_categor
     }
     
  
-// we stop in any case
-    
-//    // now have a look at state. it must be eomn_serv_state_runningd.    
-//    if(eomn_serv_state_running != p->mnservice->status.stateofservice[category])
-//    {
-//        // send a failure about wrong state of the board
-//        p->mnservice->status.commandresult.latestcommandisok = eobool_false;
-//        p->mnservice->status.commandresult.category = category;
-//        p->mnservice->status.commandresult.operation = eomn_serv_operation_verifyactivate;
-//        p->mnservice->status.commandresult.type = eomn_serv_NONE;        
-//        p->mnservice->status.commandresult.data[0] = p->mnservice->status.stateofservice[category];
-//        
-//        send_rop_command_result();   
-//        
-//        return(eores_OK);
-//    }
     
     // now we stop the service.
     if(eores_OK == s_eo_services_stop(p, category))
@@ -831,6 +968,86 @@ static eOresult_t s_eo_services_process_stop(EOtheServices *p, eOmn_serv_categor
     
     p->mnservice->status.commandresult.category = category;
     p->mnservice->status.commandresult.operation = eomn_serv_operation_stop;
+    p->mnservice->status.commandresult.type = eomn_serv_NONE;
+    p->mnservice->status.commandresult.data[0] = p->mnservice->status.stateofservice[category];
+    
+    send_rop_command_result();    
+    
+    return(eores_OK);        
+}
+
+
+static eOresult_t s_eo_services_process_regsig_manage(EOtheServices *p, eOmn_serv_category_t category, eOmn_serv_arrayof_id32_t* arrayofid32)
+{
+    // check if the category is ok and if it is supported. 
+    
+    // in here we must put for for two phases: 
+    // phase1: all services are verified and activated at bootstrap. teh command verifyactivate does nothing apart sending a ok/nok back to robotInterface
+    // phase2: at bootstratp service are just _Initalise()-ed and every verification-activation is done in here. 
+    
+    // if not supported send up a negative reply.
+    if(eomn_serv_category_none == category)
+    {
+        // send a failure about wrong param
+        p->mnservice->status.commandresult.latestcommandisok = eobool_false;
+        p->mnservice->status.commandresult.category = category;
+        p->mnservice->status.commandresult.operation = (NULL != arrayofid32) ? (eomn_serv_operation_regsig_load) : (eomn_serv_operation_regsig_clear);
+        p->mnservice->status.commandresult.type = eomn_serv_NONE;
+        p->mnservice->status.commandresult.data[0] = eomn_serv_state_notsupported;
+        
+        send_rop_command_result();   
+        
+        return(eores_OK);
+    }
+     
+    eOresult_t res = eores_NOK_generic;
+    
+    // now we operate ... by calling the specific function of the service.
+    switch(category)
+    {
+        case eomn_serv_category_mc:
+        {
+        //    res = eo_motioncontrol_SetRegularSigROPs(eo_motioncontrol_GetHandle(), arrayofid32); 
+            // which can either be load or unload. the load will first reset what in the endpoint-entity, thsn it will
+        //    res = eo_motioncontrol_Start(eo_motioncontrol_GetHandle());
+        } break;
+        
+        case eomn_serv_category_strain:
+        {
+            res = eo_strain_SetRegulars(eo_strain_GetHandle(), arrayofid32, NULL);
+        } break;
+
+        case eomn_serv_category_mais:
+        {
+            res = eo_mais_SetRegulars(eo_mais_GetHandle(), arrayofid32, NULL);
+        } break;    
+
+        case eomn_serv_category_skin:
+        {
+            res = eo_skin_SetRegulars(eo_skin_GetHandle(), arrayofid32, NULL);
+        } break;        
+
+        case eomn_serv_category_inertials:
+        {
+            res = eo_inertials_SetRegulars(eo_inertials_GetHandle(), arrayofid32, NULL);
+        } break;
+        
+        default:
+        {
+            res = eores_NOK_generic;
+        } break;
+    }
+
+    p->mnservice->status.commandresult.latestcommandisok = (eores_OK == res) ? (eobool_true) : (eobool_false);
+    
+    
+    // ok, we have it stopped. is the config coherent with what we already have? for instance ... the eOmn_serv_type_t, the number of ...?
+    // we decide for now to avoid that.
+    
+    // we just send the command up telling that things are ok.
+    
+    p->mnservice->status.commandresult.category = category;
+    p->mnservice->status.commandresult.operation = (NULL != arrayofid32) ? (eomn_serv_operation_regsig_load) : (eomn_serv_operation_regsig_clear);
     p->mnservice->status.commandresult.type = eomn_serv_NONE;
     p->mnservice->status.commandresult.data[0] = p->mnservice->status.stateofservice[category];
     
@@ -936,7 +1153,7 @@ static void send_rop_command_result(void)
     // ok, prepare the occasional rops
     memcpy(&ropdesc, &eok_ropdesc_basic, sizeof(eok_ropdesc_basic));
     ropdesc.ropcode = eo_ropcode_sig;
-    ropdesc.id32    = eoprot_ID_get(eoprot_endpoint_management, eoprot_entity_mn_comm, 0, eoprot_tag_mn_service_status_commandresult);
+    ropdesc.id32    = eoprot_ID_get(eoprot_endpoint_management, eoprot_entity_mn_service, 0, eoprot_tag_mn_service_status_commandresult);
     ropdesc.data    = NULL; // so that dat from the EOnv is retrieved.            
 
     // now write what we want inside 
@@ -956,11 +1173,6 @@ static eOresult_t s_eo_services_start(EOtheServices *p, eOmn_serv_category_t cat
         case eomn_serv_category_mc:
         {
             res = eo_motioncontrol_Start(eo_motioncontrol_GetHandle());
-            // verify that we are in state eomn_serv_state_running ... not required because if previous call it is OK then the call puts the state equal to running
-//            if(eomn_serv_state_running != p->mnservice->status.stateofservice[category])
-//            {
-//                res = eores_NOK_generic;
-//            }
         } break;
         
         case eomn_serv_category_strain:
@@ -1005,37 +1217,62 @@ static eOresult_t s_eo_services_stop(EOtheServices *p, eOmn_serv_category_t cate
 {
     eOresult_t res = eores_NOK_generic;
     
-    // now we start the service.
+    // now we stop the service. and we also clear the regulars
     switch(category)
     {
         case eomn_serv_category_mc:
         {
             res = eo_motioncontrol_Stop(eo_motioncontrol_GetHandle());
-            // verify that we are in state eomn_serv_state_running ... not required because if previous call it is OK then the call puts the state equal to running
-//            if(eomn_serv_state_running != p->mnservice->status.stateofservice[category])
-//            {
-//                res = eores_NOK_generic;
-//            }
+            eo_motioncontrol_SetRegulars(eo_motioncontrol_GetHandle(), NULL, NULL);
         } break;
         
         case eomn_serv_category_strain:
         {
             res = eo_strain_Stop(eo_strain_GetHandle());
+            eo_strain_SetRegulars(eo_strain_GetHandle(), NULL, NULL);
         } break;
 
         case eomn_serv_category_mais:
         {
             res = eo_mais_Stop(eo_mais_GetHandle());
+            eo_mais_SetRegulars(eo_mais_GetHandle(), NULL, NULL);
         } break;    
 
         case eomn_serv_category_skin:
         {
             res = eo_skin_Stop(eo_skin_GetHandle());
+            eo_skin_SetRegulars(eo_skin_GetHandle(), NULL, NULL);
         } break;        
 
         case eomn_serv_category_inertials:
         {
             res = eo_inertials_Stop(eo_inertials_GetHandle());
+            eo_inertials_SetRegulars(eo_inertials_GetHandle(), NULL, NULL);
+        } break;
+        
+        case eomn_serv_category_all:
+        {
+            eo_motioncontrol_Stop(eo_motioncontrol_GetHandle()); 
+            eo_motioncontrol_SetRegulars(eo_motioncontrol_GetHandle(), NULL, NULL);
+
+            
+            eo_mais_Stop(eo_mais_GetHandle());
+            eo_mais_SetRegulars(eo_mais_GetHandle(), NULL, NULL);
+            
+            eo_strain_Stop(eo_strain_GetHandle());
+            eo_strain_SetRegulars(eo_strain_GetHandle(), NULL, NULL);
+            
+            eo_skin_Stop(eo_skin_GetHandle());
+            eo_skin_SetRegulars(eo_skin_GetHandle(), NULL, NULL);
+            
+            eo_inertials_Stop(eo_inertials_GetHandle());
+            eo_inertials_SetRegulars(eo_inertials_GetHandle(), NULL, NULL);            
+            
+            // if i dont use the service command to load the rop, then it is safe to remove all rops anyway.
+            eo_transceiver_RegularROPs_Clear(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
+            
+            // also i send the application in config mode            
+            res = eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STcfg);            
         } break;
         
         default:
@@ -1047,7 +1284,7 @@ static eOresult_t s_eo_services_stop(EOtheServices *p, eOmn_serv_category_t cate
     
     if(eores_OK == res)
     {
-        // must send the application in cfg mode ... only if there is no one running anymore
+        // must send the application in cfg mode ... only if there is no service running anymore
         p->running[category] = eobool_false; 
         eObool_t anyrunning = eobool_false;        
         for(uint8_t i=0; i<eomn_serv_categories_numberof; i++)

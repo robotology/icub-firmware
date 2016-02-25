@@ -77,6 +77,8 @@ extern eOresult_t eo_skin_Deactivate(EOtheSKIN *p);
 
 extern eOresult_t eo_skin_Start(EOtheSKIN *p);
 
+extern eOresult_t eo_skin_SetRegulars(EOtheSKIN *p, eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t* numberofthem);
+
 extern eOresult_t eo_skin_Tick(EOtheSKIN *p, eObool_t resetstatus); // we reset the status when there has just been a transmission of the regulars containing the skin-status
 
 extern eOresult_t eo_skin_Stop(EOtheSKIN *p);

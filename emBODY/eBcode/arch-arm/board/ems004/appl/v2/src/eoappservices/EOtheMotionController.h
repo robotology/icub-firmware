@@ -94,6 +94,8 @@ extern eOresult_t eo_motioncontrol_Deactivate(EOtheMotionController *p);
 // to be called once before to be ticked
 extern eOresult_t eo_motioncontrol_Start(EOtheMotionController *p);
 
+extern eOresult_t eo_motioncontrol_SetRegulars(EOtheMotionController *p, eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t* numberofthem);
+
 // it ticks every ms of the control-loop
 extern eOresult_t eo_motioncontrol_Tick(EOtheMotionController *p);
 

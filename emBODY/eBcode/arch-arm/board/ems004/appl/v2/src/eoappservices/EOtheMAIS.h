@@ -77,6 +77,8 @@ extern eOresult_t eo_mais_Deactivate(EOtheMAIS *p);
 
 extern eOresult_t eo_mais_Start(EOtheMAIS *p);
 
+extern eOresult_t eo_mais_SetRegulars(EOtheMAIS *p, eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t* numberofthem);
+
 extern eOresult_t eo_mais_Tick(EOtheMAIS *p);
 
 extern eOresult_t eo_mais_Stop(EOtheMAIS *p);

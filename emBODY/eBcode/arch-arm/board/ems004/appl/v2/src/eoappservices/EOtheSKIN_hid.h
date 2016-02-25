@@ -40,6 +40,7 @@
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
+enum { skin_maxRegulars = eomn_serv_skin_maxpatches }; // there cannot be more than 4 patches, and typically not more than 1 signalled variable per patch
 
 struct EOtheSKIN_hid
 {
@@ -53,6 +54,7 @@ struct EOtheSKIN_hid
     
     EOvector*                               rxdata[eomn_serv_skin_maxpatches]; // of eOsk_candata_t     
     eOsk_skin_t*                            skinpatches[eomn_serv_skin_maxpatches];
+    EOarray*                                id32ofregulars;
 }; 
 
 

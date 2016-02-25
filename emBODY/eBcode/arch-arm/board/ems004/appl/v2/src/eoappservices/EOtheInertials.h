@@ -80,6 +80,8 @@ extern eOresult_t eo_inertials_Deactivate(EOtheInertials *p);
 
 extern eOresult_t eo_inertials_Start(EOtheInertials *p);
 
+extern eOresult_t eo_inertials_SetRegulars(EOtheInertials *p, eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t* numberofthem);
+
 extern eOresult_t eo_inertials_Tick(EOtheInertials *p, eObool_t resetstatus); // we reset the status when there has just been a transmission of the regulars containing the inertial-status
 
 extern eOresult_t eo_inertials_Stop(EOtheInertials *p);

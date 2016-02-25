@@ -76,6 +76,8 @@ extern eOresult_t eo_strain_Deactivate(EOtheSTRAIN *p);
 
 extern eOresult_t eo_strain_Start(EOtheSTRAIN *p);
 
+extern eOresult_t eo_strain_SetRegulars(EOtheSTRAIN *p, eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t* numberofthem);
+
 extern eOresult_t eo_strain_Tick(EOtheSTRAIN *p);
 
 extern eOresult_t eo_strain_Stop(EOtheSTRAIN *p);

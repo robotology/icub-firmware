@@ -39,7 +39,7 @@
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
-
+enum { inertials_maxRegulars = 2 }; // there cannot be more than 1 inertials object, and typically not more than 1 signalled variable.
 
 struct EOtheInertials_hid
 {
@@ -59,6 +59,7 @@ struct EOtheInertials_hid
 
     // the inertial at the end
     eOas_inertial_t*                        inertial2;  
+    EOarray*                                id32ofregulars;
 }; 
 
 

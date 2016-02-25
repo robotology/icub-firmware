@@ -73,6 +73,9 @@ typedef struct
 
 
 
+enum { motioncontrol_maxRegulars = 32 }; // there can be at most 12 jomos. we typically use status of joint and status of motor, thus 24 ... however, i use 32 which is the max value of regulars in a board
+
+
 struct EOtheMotionController_hid
 {
     eOservice_core_t                        service;
@@ -87,6 +90,7 @@ struct EOtheMotionController_hid
     eOmotioncontroller_objs_mc4_t           mcmc4; 
     // they are for mc4plus only
     eOmotioncontroller_objs_mc4plus_t       mcmc4plus;
+    EOarray*                                id32ofregulars;
 }; 
 
 
