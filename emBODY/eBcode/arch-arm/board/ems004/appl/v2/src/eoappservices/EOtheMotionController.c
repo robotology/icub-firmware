@@ -46,13 +46,16 @@
 #include "hal_adc.h"
 #include "hal_quadencoder.h"
 
+#include "EOCurrentsWatchdog.h"
+
 #include "EOVtheCallbackManager.h"
 
 //#warning TODO: i have kept inclusion of EOemsControllerCfg.h, but it must be removed. read following comment
 // there must be another way to propagate externally to the motor-controller library some properties .... macros must be removed
 #warning TODO: -> remove inclusion of EOemsControllerCfg.h and find a better mode to propagate the macro USE_ONLY_QE
 #include "EOemsControllerCfg.h"
-#include "EOCurrentsWatchdog.h"
+
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -126,6 +129,8 @@ static eOresult_t s_eo_mcserv_do_mc4plus(EOtheMotionController *p);
 
 static void s_eo_mcserv_disable_all_motors(EOtheMotionController *p);
 
+static eObool_t s_eo_motioncontrol_isID32relevant(uint32_t id32);
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
@@ -180,7 +185,8 @@ static EOtheMotionController s_eo_themotcon =
         .theencoderreader       = NULL,
         .pwmvalue               = {0},
         .pwmport                = {hal_motorNONE}        
-    }
+    },
+    .id32ofregulars             = NULL
 };
 
 static const char s_eobj_ownname[] = "EOtheMotionController";
@@ -214,6 +220,8 @@ extern EOtheMotionController* eo_motioncontrol_Initialise(void)
     
     // up to 12 jomos
     p->sharedcan.entitydescriptor = eo_vector_New(sizeof(eOcanmap_entitydescriptor_t), eo_motcon_maxJOMOs, NULL, NULL, NULL, NULL);
+    
+    p->id32ofregulars = eo_array_New(motioncontrol_maxRegulars, sizeof(uint32_t), NULL);
     
     p->mcfoc.thecontroller = p->mcmc4plus.thecontroller  = NULL;
     p->mcfoc.theencoderreader = p->mcmc4plus.theencoderreader = eo_encoderreader_Initialise();
@@ -466,7 +474,9 @@ extern eOresult_t eo_motioncontrol_Deactivate(EOtheMotionController *p)
     if(eobool_true == p->service.running)
     {
         eo_motioncontrol_Stop(p);   
-    }        
+    }    
+
+    eo_motioncontrol_SetRegulars(p, NULL, NULL);
     
     // then we deconfig things
     if(eo_motcon_mode_foc == p->service.servconfig.type)
@@ -868,9 +878,27 @@ extern eOresult_t eo_motioncontrol_Start(EOtheMotionController *p)
         s_eo_motioncontrol_mc4plusbased_enable_all_motors(p);      
     }
     
+    //eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "eo_motioncontrol_Start()", s_eobj_ownname);
     
     return(eores_OK);    
 }
+
+
+extern eOresult_t eo_motioncontrol_SetRegulars(EOtheMotionController *p, eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t* numberofthem)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    if(eobool_false == p->service.active)
+    {   // nothing to do because object must be first activated
+        return(eores_OK);
+    }  
+    
+    return(eo_service_hid_SetRegulars(p->id32ofregulars, arrayofid32, s_eo_motioncontrol_isID32relevant, numberofthem));
+}
+
 
 
 extern eOresult_t eo_motioncontrol_Tick(EOtheMotionController *p)
@@ -1008,6 +1036,11 @@ extern eOresult_t eo_motioncontrol_Stop(EOtheMotionController *p)
     p->service.running = eobool_false;
     p->service.state = eomn_serv_state_activated;
     eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mc, p->service.state);
+    
+    // remove all regulars related to motion control entities: joint, motor, controller ... no, dont do that
+    //eo_motioncontrol_SetRegulars(p, NULL, NULL);
+    
+    //eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "eo_motioncontrol_Stop()", s_eobj_ownname);
     
     return(eores_OK);    
 }
@@ -2587,7 +2620,7 @@ static eOresult_t s_eo_mcserv_do_mc4plus(EOtheMotionController *p)
         
     } // propagate status
     
-    eo_currents_watchdog_TickSupplyVoltage();
+    eo_currents_watchdog_TickSupplyVoltage(eo_currents_watchdog_GetHandle());
     
     return(res);
 }
@@ -2602,6 +2635,28 @@ static void s_eo_mcserv_disable_all_motors(EOtheMotionController *p)
      }
      
      return;
+}
+
+static eObool_t s_eo_motioncontrol_isID32relevant(uint32_t id32)
+{
+    static const uint32_t mask0 = (((uint32_t)eoprot_endpoint_motioncontrol) << 24) | (((uint32_t)eoprot_entity_mc_joint) << 16);
+    static const uint32_t mask1 = (((uint32_t)eoprot_endpoint_motioncontrol) << 24) | (((uint32_t)eoprot_entity_mc_motor) << 16);
+    static const uint32_t mask2 = (((uint32_t)eoprot_endpoint_motioncontrol) << 24) | (((uint32_t)eoprot_entity_mc_controller) << 16);
+    
+    if((id32 & mask0) == mask0)
+    {
+        return(eobool_true);
+    }
+    if((id32 & mask1) == mask1)
+    {
+        return(eobool_true);
+    } 
+    if((id32 & mask2) == mask2)
+    {
+        return(eobool_true);
+    }    
+    
+    return(eobool_false); 
 }
 
 
