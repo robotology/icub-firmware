@@ -65,7 +65,7 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-
+//#define TEST_RUNTIME_CONFIG
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -162,16 +162,30 @@ extern void eom_emsappl_hid_userdef_on_entry_RUN(EOMtheEMSappl* p)
 //    eo_ethmonitor_SetAlert(eo_ethmonitor_GetHandle(), NULL, 0);
 
     // motion-control:
+#if defined(TEST_RUNTIME_CONFIG)
+#else
     eo_motioncontrol_Start(eo_motioncontrol_GetHandle());
-    
+#endif
+
 //    eo_strain_Start(eo_strain_GetHandle());
-    
+
+#if defined(TEST_RUNTIME_CONFIG)
+#else    
     eo_skin_Start(eo_skin_GetHandle());    
+#endif
+
+#if defined(TEST_RUNTIME_CONFIG)
+    eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "on_entry_RUN()", "EOMtheEMSappl");
+#endif
+    
 }
 
 
 extern void eom_emsappl_hid_userdef_on_exit_RUN(EOMtheEMSappl* p)
-{       
+{    
+#if defined(TEST_RUNTIME_CONFIG)
+    eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "entering on_exit_RUN()", "EOMtheEMSappl");    
+#endif
     // EOtheCANservice: set straigth mode and force parsing of all packets in the RX queues.
     eo_canserv_SetMode(eo_canserv_GetHandle(), eocanserv_mode_straight);
     eo_canserv_ParseAll(eo_canserv_GetHandle());  
@@ -197,7 +211,10 @@ extern void eom_emsappl_hid_userdef_on_exit_RUN(EOMtheEMSappl* p)
 
     //#warning MERGE-> remember to stop inertials ... check if already tested in branch
     eo_inertials_Stop(eo_inertials_GetHandle());
-    
+
+#if defined(TEST_RUNTIME_CONFIG)
+    eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "exiting on_exit_RUN()", "EOMtheEMSappl");
+#endif
 }
 
 
