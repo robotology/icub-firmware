@@ -436,8 +436,8 @@ extern eOresult_t eom_emsrunner_Start(EOMtheEMSrunner *p)
     
     // set the ems-transceiver to have a given tx-rate.
     EOtransmitter * transmitter = eo_transceiver_GetTransmitter(eom_emstransceiver_GetTransceiver(eom_emstransceiver_GetHandle()));    
-    // replies are not decimated. only regulars and occasionals are decimated. in this way we have prompt responses to ask<> rops
-    eo_transmitter_TXdecimation_Set(transmitter, 1, s_theemsrunner.usedTXdecimationfactor, s_theemsrunner.usedTXdecimationfactor);
+    // replies and occasionals are not decimated. only regulars are decimated. in this way we have prompt responses to ask<> rops and we can send up occasionals asap.
+    eo_transmitter_TXdecimation_Set(transmitter, 1, s_theemsrunner.usedTXdecimationfactor, 1);
 
     s_eom_emsrunner_6HALTIMERS_start_oneshotosalcbk_for_rxdotx_cycle(&s_theemsrunner);
   
