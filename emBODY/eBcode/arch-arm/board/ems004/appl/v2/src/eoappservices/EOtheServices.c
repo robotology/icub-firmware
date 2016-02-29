@@ -569,6 +569,10 @@ extern eOresult_t eo_service_hid_SetRegulars(EOarray* id32ofregulars, eOmn_serv_
         
         eOropdescriptor_t ropdesc;
         memcpy(&ropdesc.control, &eok_ropctrl_basic, sizeof(eOropctrl_t));
+        ropdesc.control.plustime    = 0;
+        ropdesc.control.plussign    = 0;
+        ropdesc.ropcode             = eo_ropcode_sig;
+        ropdesc.signature           = eo_rop_SIGNATUREdummy;   
         
         for(i=0; i<size; i++)
         {
@@ -587,11 +591,15 @@ extern eOresult_t eo_service_hid_SetRegulars(EOarray* id32ofregulars, eOmn_serv_
                     ropdesc.id32 = *id32;     
                     if(eores_OK == eo_transceiver_RegularROP_Load(boardtransceiver, &ropdesc))
                     {
-                        eo_array_PushBack(id32ofregulars , id32);
+                        eo_array_PushBack(id32ofregulars, id32);
                         if(eobool_true == eo_array_Full(id32ofregulars))
                         {   // cannot add any more regulars
                             break;
                         }
+                    }
+                    else
+                    {
+                        
                     }
                    
                 }                
@@ -980,6 +988,7 @@ static eOresult_t s_eo_services_process_stop(EOtheServices *p, eOmn_serv_categor
 static eOresult_t s_eo_services_process_regsig_manage(EOtheServices *p, eOmn_serv_category_t category, eOmn_serv_arrayof_id32_t* arrayofid32)
 {
     // check if the category is ok and if it is supported. 
+    uint8_t number = 0;
     
     // in here we must put for for two phases: 
     // phase1: all services are verified and activated at bootstrap. teh command verifyactivate does nothing apart sending a ok/nok back to robotInterface
@@ -1007,29 +1016,27 @@ static eOresult_t s_eo_services_process_regsig_manage(EOtheServices *p, eOmn_ser
     {
         case eomn_serv_category_mc:
         {
-        //    res = eo_motioncontrol_SetRegularSigROPs(eo_motioncontrol_GetHandle(), arrayofid32); 
-            // which can either be load or unload. the load will first reset what in the endpoint-entity, thsn it will
-        //    res = eo_motioncontrol_Start(eo_motioncontrol_GetHandle());
+            res = eo_motioncontrol_SetRegulars(eo_motioncontrol_GetHandle(), arrayofid32, &number); 
         } break;
         
         case eomn_serv_category_strain:
         {
-            res = eo_strain_SetRegulars(eo_strain_GetHandle(), arrayofid32, NULL);
+            res = eo_strain_SetRegulars(eo_strain_GetHandle(), arrayofid32, &number);
         } break;
 
         case eomn_serv_category_mais:
         {
-            res = eo_mais_SetRegulars(eo_mais_GetHandle(), arrayofid32, NULL);
+            res = eo_mais_SetRegulars(eo_mais_GetHandle(), arrayofid32, &number);
         } break;    
 
         case eomn_serv_category_skin:
         {
-            res = eo_skin_SetRegulars(eo_skin_GetHandle(), arrayofid32, NULL);
+            res = eo_skin_SetRegulars(eo_skin_GetHandle(), arrayofid32, &number);
         } break;        
 
         case eomn_serv_category_inertials:
         {
-            res = eo_inertials_SetRegulars(eo_inertials_GetHandle(), arrayofid32, NULL);
+            res = eo_inertials_SetRegulars(eo_inertials_GetHandle(), arrayofid32, &number);
         } break;
         
         default:
