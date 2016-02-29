@@ -139,6 +139,9 @@ extern void eom_emsappl_hid_userdef_on_entry_CFG(EOMtheEMSappl* p)
     
     // tell the ethmonitor to alert the task of the configurator
 //    eo_ethmonitor_SetAlert(eo_ethmonitor_GetHandle(), eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()), emsconfigurator_evt_userdef02);
+    
+    // prefer sending a tx request just in case. because cfg state transmit only if requested an we dont want to hav missed a previous request.
+    eom_task_SetEvent(eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()), emsconfigurator_evt_ropframeTx);
 }
 
 extern void eom_emsappl_hid_userdef_on_exit_CFG(EOMtheEMSappl* p)
