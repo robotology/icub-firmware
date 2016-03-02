@@ -760,7 +760,19 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
     else if((eo_motcon_mode_mc4plus == servcfg->type) || (eo_motcon_mode_mc4plusmais == servcfg->type))
     {
         
-        EOconstarray* carray = eo_constarray_Load((EOarray*)&servcfg->data.mc.mc4plus_based.arrayofjomodescriptors);
+        EOconstarray* carray;
+        const eOmn_serv_arrayof_4jomodescriptors_t * arrayof_jomodes;
+
+        if(eo_motcon_mode_mc4plus == servcfg->type)
+        {
+            carray = eo_constarray_Load((EOarray*)&servcfg->data.mc.mc4plus_based.arrayofjomodescriptors);
+            arrayof_jomodes = &servcfg->data.mc.mc4plus_based.arrayofjomodescriptors;
+        }
+        else //eomn_serv_MC_mc4plusmais
+        {
+            carray = eo_constarray_Load((EOarray*)&servcfg->data.mc.mc4plusmais_based.arrayofjomodescriptors);
+            arrayof_jomodes = &servcfg->data.mc.mc4plusmais_based.arrayofjomodescriptors;
+        }
         
         uint8_t numofjomos = eo_constarray_Size(carray);
         
@@ -799,7 +811,16 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
             // it should have a _Initialise(), a _GetHandle(), a _Config(cfg) and a _Deconfig().
             if(NULL == p->mcmc4plus.thecontroller)
             {
-                p->mcmc4plus.thecontroller = eo_emsController_Init((eOemscontroller_board_t)servcfg->data.mc.mc4plus_based.boardtype4mccontroller, emscontroller_actuation_LOCAL, numofjomos);   
+                eOemscontroller_board_t controller_type;
+                if(eo_motcon_mode_mc4plus == servcfg->type)
+                {
+                    controller_type = (eOemscontroller_board_t)servcfg->data.mc.mc4plus_based.boardtype4mccontroller;
+                }
+                else //eomn_serv_MC_mc4plusmais
+                {
+                    controller_type = (eOemscontroller_board_t)servcfg->data.mc.mc4plusmais_based.boardtype4mccontroller;
+                }
+                p->mcmc4plus.thecontroller = eo_emsController_Init(controller_type, emscontroller_actuation_LOCAL, numofjomos);   
             }       
 
             // b. clear the pwm values and the port mapping
@@ -817,7 +838,7 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
             s_eo_motioncontrol_mc4plusbased_hal_init_motors_adc_feedbacks();
 
             // d. init the encoders            
-            eo_encoderreader_Activate(p->mcmc4plus.theencoderreader, &servcfg->data.mc.mc4plus_based.arrayofjomodescriptors);
+            eo_encoderreader_Activate(p->mcmc4plus.theencoderreader, arrayof_jomodes);
 
             
             // e. activate interrupt line for quad_enc indexes check
@@ -2446,12 +2467,8 @@ static void s_eo_motioncontrol_mc4plusbased_enable_all_motors(EOtheMotionControl
     // enable PWM of the motors (if not faulted)
     if (!hal_motor_externalfaulted())
     {
-        EOconstarray* carray = eo_constarray_Load((EOarray*)&p->service.servconfig.data.mc.mc4plus_based.arrayofjomodescriptors);
-        
         for(uint8_t i=0; i<p->numofjomos; i++)
         {
-            //const eOmn_serv_jomo_descriptor_t *jomodes = (eOmn_serv_jomo_descriptor_t*) eo_constarray_At(carray, i);            
-            //uint8_t port = jomodes->actuator.pwm.port;
             hal_motor_enable(p->mcmc4plus.pwmport[i]);
         }
     }
@@ -2469,7 +2486,16 @@ static eOresult_t s_eo_mcserv_do_mc4plus(EOtheMotionController *p)
     hal_spiencoder_errors_flags encflags[4] = {0};
     int16_t pwm[4] = {0};  
     
-    EOconstarray* carray = eo_constarray_Load((EOarray*)&p->service.servconfig.data.mc.mc4plus_based.arrayofjomodescriptors);
+    EOconstarray* carray;
+    if(eo_motcon_mode_mc4plus == p->service.servconfig.type)
+    {
+        carray = eo_constarray_Load((EOarray*)&p->service.servconfig.data.mc.mc4plus_based.arrayofjomodescriptors);
+    }
+    else //mc4plus with mais
+    {
+        carray = eo_constarray_Load((EOarray*)&p->service.servconfig.data.mc.mc4plusmais_based.arrayofjomodescriptors);
+    }
+   
 
     uint8_t i = 0;
     

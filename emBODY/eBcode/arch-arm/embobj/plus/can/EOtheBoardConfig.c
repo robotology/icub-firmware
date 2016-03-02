@@ -1542,7 +1542,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_0B9 =
 
 
 static const eOmn_serv_configuration_t s_serv_config_mc_v3_1B2_2B2 =
-{   // .18 or .xx
+{
     .type       = eomn_serv_MC_mc4plus,
     .filler     = {0},
     .data.mc.mc4plus_based = 
@@ -1562,26 +1562,26 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_1B2_2B2 =
             {
                 { // joint 0:   tentative wrist pronosupination
                     .actuator.pwm   =
-                    {   // motor 1B2M2
-                        .port   = eomn_serv_mc_port_mc4plus_pwmP4,                          
+                    {   // motor 1B2M0
+                        .port   = eomn_serv_mc_port_mc4plus_pwmP3,                          
                     },
                     .sensor         =
                     {
                         .type   = eomn_serv_mc_sensor_encoder_inc,
-                        .port   = eomn_serv_mc_port_mc4plus_qencP4,
+                        .port   = eomn_serv_mc_port_mc4plus_qencP3,
                         .pos    = eomn_serv_mc_sensor_pos_atjoint
                     },
                     .extrasensor    =
                     {
-                        .type   = eomn_serv_mc_sensor_none,
-                        .port   = eomn_serv_mc_port_none,
-                        .pos    = eomn_serv_mc_sensor_pos_none
+                        .type   = eomn_serv_mc_sensor_encoder_inc,
+                        .port   = eomn_serv_mc_port_mc4plus_qencP3,
+                        .pos    = eomn_serv_mc_sensor_pos_atmotor
                     }
                 },                 
                 { // joint 1:   tentative wrist coupled w/ 1B2M0 and LA-S5
                     .actuator.pwm   =
-                    {   // motor 1B2M0
-                        .port   = eomn_serv_mc_port_mc4plus_pwmP3,                         
+                    {   // motor 1B2M2
+                        .port   = eomn_serv_mc_port_mc4plus_pwmP4,                         
                     },
                     .sensor         =
                     {   // i try the aea LA-S5 in port SPI1 (P10)
@@ -1592,7 +1592,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_1B2_2B2 =
                     .extrasensor    =
                     {   // inc encoder of motor 1B2M0
                         .type   = eomn_serv_mc_sensor_encoder_inc,
-                        .port   = eomn_serv_mc_port_mc4plus_qencP3,
+                        .port   = eomn_serv_mc_port_mc4plus_qencP4,
                         .pos    = eomn_serv_mc_sensor_pos_atmotor
                     }
                 },
@@ -1660,7 +1660,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_1B2_2B2 =
 
 
 static const eOmn_serv_configuration_t s_serv_config_mc_v3_1B3_2B3 =
-{   // .17 or .xx
+{
     .type       = eomn_serv_MC_mc4plusmais,
     .filler     = {0},
     .data.mc.mc4plusmais_based = 
@@ -2146,10 +2146,6 @@ extern const eOemsrunner_timing_t * eoboardconfig_code2ctrlooptiming(uint32_t co
         .txstartafter   = 700,
         .safetygap      = 50          
     };
-        
-    const eOemsrunner_timing_t *ret = &normal;
-
-#if     defined(ICUB_MEC_V1) | defined(ICUB_MEC_V2)    
     
     static const eOemsrunner_timing_t gateway = 
     {   // 450-050-500 .... or even we dont wait the can tx end in the tx phase.
@@ -2158,7 +2154,13 @@ extern const eOemsrunner_timing_t * eoboardconfig_code2ctrlooptiming(uint32_t co
         .dostartafter   = 450,
         .txstartafter   = 500,
         .safetygap      = 25          
-    };    
+    };  
+    
+    const eOemsrunner_timing_t *ret = &normal;
+
+#if     defined(ICUB_MEC_V1) | defined(ICUB_MEC_V2)    
+    
+  
     
     switch(code)
     {
@@ -2176,13 +2178,28 @@ extern const eOemsrunner_timing_t * eoboardconfig_code2ctrlooptiming(uint32_t co
         } break;
     
     }
+
 #elif   defined(ICUB_MEC_V3)
-    // so far there are not gateways in v3
+    switch(code)
+    {
+        case 18: // for left lower leg mec-v3: eb8 10.0.1.19 (reads skin only)
+        case 22: // for right lower leg mec-v3: eb12 10.0.1.23 (reads skin only)
+        {
+            ret = &gateway;
+        } break;
+         
+        default:    
+        {   // all the others
+            ret = &normal;
+        } break;
+    
+    }
 #elif   defined(CER)    
     // so far there are not gateways in cer
 #endif
-           
-    return(ret);   
+
+    return(ret);
+
 }
     
 
@@ -2253,7 +2270,7 @@ extern const eOmn_serv_configuration_t * eoboardconfig_code2strain_serv_configur
     // so far not supported
 #endif
     
-    return(ret);        
+    return(ret);    
 }
 
 
@@ -2276,12 +2293,13 @@ extern const eOmn_serv_configuration_t * eoboardconfig_code2mais_serv_configurat
         } break;   
     }
 #elif   defined(ICUB_MEC_V3)
+    
     switch(code)
     {
-        case 7:
-        case 8: 
-        case 12:
-        case 13:
+        case 7:    // for left lower arm mec-v3: 1b3 10.0.1.8            
+        case 8:    // for left lower arm mec-v3: 1b4 10.0.1.9
+        case 12:   // for right lower arm mec-v3: 2b3 10.0.1.13            
+        case 13:   // for right lower arm mec-v3: 2b4 10.0.1.14          
         { 
             ret = &s_serv_config_as_mais; 
         } break;  
@@ -2295,7 +2313,7 @@ extern const eOmn_serv_configuration_t * eoboardconfig_code2mais_serv_configurat
     // so far not supported
 #endif
     
-    return(ret);        
+    return(ret);  
 }
 
 
