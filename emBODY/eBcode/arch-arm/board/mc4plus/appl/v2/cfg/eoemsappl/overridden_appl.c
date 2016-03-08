@@ -65,7 +65,7 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-//#define TEST_RUNTIME_CONFIG
+#define TEST_RUNTIME_CONFIG
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 

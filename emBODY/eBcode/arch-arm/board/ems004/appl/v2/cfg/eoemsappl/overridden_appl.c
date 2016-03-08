@@ -64,7 +64,7 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-
+#define TEST_RUNTIME_CONFIG
 
 
 
@@ -160,12 +160,20 @@ extern void eom_emsappl_hid_userdef_on_entry_RUN(EOMtheEMSappl* p)
     eo_ethmonitor_SetAlert(eo_ethmonitor_GetHandle(), NULL, 0);
 
     // motion-control:
+#if defined(TEST_RUNTIME_CONFIG)
+#else
     eo_motioncontrol_Start(eo_motioncontrol_GetHandle());
+#endif
     
-
+#if defined(TEST_RUNTIME_CONFIG)
+#else 
     eo_strain_Start(eo_strain_GetHandle());     
-    
-    eo_skin_Start(eo_skin_GetHandle());         
+#endif
+
+#if defined(TEST_RUNTIME_CONFIG)
+#else 
+    eo_skin_Start(eo_skin_GetHandle());      
+#endif    
 }
 
 
