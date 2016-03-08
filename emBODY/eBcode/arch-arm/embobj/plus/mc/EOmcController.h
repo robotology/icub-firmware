@@ -49,7 +49,8 @@ typedef enum
     emscontroller_board_FOREARM                 = 11,   //MC4plus
     emscontroller_board_CER_WRIST               = 12,   //MC4plus
 	emscontroller_board_CER_WAIST               = 15,   //2FOC
-	emscontroller_board_CER_BASE                = 21    //2FOC
+	emscontroller_board_CER_UPPER_ARM           = 17,   //2FOC
+    emscontroller_board_CER_BASE                = 21    //2FOC
 } eOemscontroller_board_t;
 
 

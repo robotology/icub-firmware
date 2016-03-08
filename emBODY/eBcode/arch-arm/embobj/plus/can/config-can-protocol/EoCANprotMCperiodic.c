@@ -33,7 +33,7 @@
 
 // but also to retrieve information of other things ...
 
-#include "EOemsController.h"
+#include "Controller.h"
 //#include "EOtheMeasuresConverter.h"
 //#include "EOtheMeasuresConverter_hid.h" // to see a bunch of inline functions ...
 
@@ -124,8 +124,10 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__2FOC(eOcanframe_t *fram
     motor->status.basic.mot_velocity = ((int16_t*)frame->data)[1];
     motor->status.basic.mot_position = ((int32_t*)frame->data)[1];
      
-    eo_emsController_AcquireMotorEncoder(motorindex, motor->status.basic.mot_current, motor->status.basic.mot_velocity, motor->status.basic.mot_position);
+    //eo_emsController_AcquireMotorEncoder(motorindex, motor->status.basic.mot_current, motor->status.basic.mot_velocity, motor->status.basic.mot_position);
 
+    MController_update_motor_odometry_fbk_can(motorindex, frame->data);
+    
     return(eores_OK);
 }
 
@@ -232,7 +234,8 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__STATUS(eOcanframe_t *fr
         //    #warning -> TODO: add diagnostics about not found board as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
         //    return(eores_OK);    
         //}
-        eo_emsController_ReadMotorstatus(jointindex, frame->data);
+        //eo_emsController_ReadMotorstatus(jointindex, frame->data);
+        MController_update_motor_state_fbk(jointindex, frame->data);
         // l'aggiornamento delle nv del giunto sara' fatto nel DO.
         // se l'appl e' in config sicuramente i giunti sono in idle e quindi non c'e' ninete da aggiornare
         // marco.accame: the previous code contained the following function which does nothing but putting into motor.status.filler04[]

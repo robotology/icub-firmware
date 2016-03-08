@@ -382,7 +382,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_eb3 =
         .version   =
         {
             .firmware   = { .major = 0, .minor = 0, .build = 0 },
-            .protocol   = { .major = 1, .minor = 3 }
+            .protocol   = { .major = 1, .minor = 4 }
         },
         .filler                 = {0},
         .arrayofjomodescriptors =
@@ -608,7 +608,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb5 =
         .version   =
         {
             .firmware   = { .major = 0, .minor = 0, .build = 0 },
-            .protocol   = { .major = 1, .minor = 3 }
+            .protocol   = { .major = 1, .minor = 4 }
         },
         .filler                 = {0},
         .arrayofjomodescriptors =
@@ -721,7 +721,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb6_eb8 =
         .version   =
         {
             .firmware   = { .major = 0, .minor = 0, .build = 0 },
-            .protocol   = { .major = 1, .minor = 3 }
+            .protocol   = { .major = 1, .minor = 4 }
         },
         .filler                 = {0},
         .arrayofjomodescriptors =
@@ -851,7 +851,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb7_eb9 =
         .version   =
         {
             .firmware   = { .major = 0, .minor = 0, .build = 0 },
-            .protocol   = { .major = 1, .minor = 3 }
+            .protocol   = { .major = 1, .minor = 4 }
         },
         .filler                 = {0},
         .arrayofjomodescriptors =
@@ -1073,6 +1073,97 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb15 =
         }             
     }
 };
+
+static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb17 =
+{   // eb17
+    .type       = eomn_serv_MC_foc,
+    .filler     = {0},
+    .data.mc.foc_based = 
+    {
+        .boardtype4mccontroller = emscontroller_board_CER_UPPER_ARM,
+        .version    =
+        {
+            .firmware   = { .major = 0, .minor = 0, .build = 0 },
+            .protocol   = { .major = 1, .minor = 3 }
+        },
+        .filler                 = {0},
+        .arrayofjomodescriptors =
+        {
+            .head   = 
+            {
+                .capacity       = 4,
+                .itemsize       = sizeof(eOmn_serv_jomo_descriptor_t),
+                .size           = 2,
+                .internalmem    = 0                    
+            },
+            .data   =
+            {
+                { // joint 0
+                    .actuator.foc.canloc    =
+                    {
+                        .port           = eOcanport1,
+                        .addr           = 1,
+                        .insideindex    = eomn_serv_caninsideindex_first                             
+                    },
+                    .sensor         =
+                    {
+                        .type   = eomn_serv_mc_sensor_none,
+                        .port   = eomn_serv_mc_port_none,
+                        .pos    = eomn_serv_mc_sensor_pos_none
+                    },
+                    .extrasensor    =
+                    {
+                        .type   = eomn_serv_mc_sensor_none,
+                        .port   = eomn_serv_mc_port_none,
+                        .pos    = eomn_serv_mc_sensor_pos_none
+                    }
+                },
+                { // joint 1
+                    .actuator.foc.canloc    =
+                    {
+                        .port           = eOcanport1,
+                        .addr           = 2,
+                        .insideindex    = eomn_serv_caninsideindex_first                             
+                    },
+                    .sensor         =
+                    {
+                        .type   = eomn_serv_mc_sensor_none,
+                        .port   = eomn_serv_mc_port_none,
+                        .pos    = eomn_serv_mc_sensor_pos_none                         
+                    },
+                    .extrasensor    =
+                    {
+                        .type   = eomn_serv_mc_sensor_none,
+                        .port   = eomn_serv_mc_port_none,
+                        .pos    = eomn_serv_mc_sensor_pos_none
+                    }
+                }                 
+            }
+        },
+        .jomocoupling       =
+        {
+            .joint2set      = 
+            {   // each joint is on a different set 
+                0, 1, 2, 3 
+            },
+            .joint2motor    = 
+            {   // zero matrix: use matrix embedded in controller and seecetd by boardtype4mccontroller
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) }        
+            },
+            .joint2encoder  = 
+            {   // identical matrix
+                { EO_COMMON_FLOAT_TO_Q17_14(1.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(1.0f) } 
+            }  
+        }             
+    }
+};
+
 
 static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb21 =
 {   // eb21
@@ -2241,7 +2332,7 @@ static const eOmn_serv_configuration_t * const s_serv_config_mc_V3[maxboards_V3]
 #if defined(CER)
 enum {maxboards_CER = 21};
 static const eOmn_serv_configuration_t * const s_serv_config_mc_CER[maxboards_CER] =
-{   // there are only eb15 and eb21 .   
+{   // there are only eb15, eb17 and eb21 .   
     NULL,
     NULL,
     NULL,
@@ -2258,7 +2349,7 @@ static const eOmn_serv_configuration_t * const s_serv_config_mc_CER[maxboards_CE
     NULL,
     &s_serv_config_mc_cer_eb15,
     NULL,
-    NULL,
+    &s_serv_config_mc_cer_eb17,
     NULL,
     NULL,
     NULL,

@@ -62,7 +62,7 @@ extern EOCurrentsWatchdog* eo_currents_watchdog_Initialise(void);
 
 extern EOCurrentsWatchdog* eo_currents_watchdog_GetHandle(void);
 
-void eo_currents_watchdog_Tick(EOCurrentsWatchdog* p);
+extern void eo_currents_watchdog_Tick(EOCurrentsWatchdog* p);
 
 extern eOresult_t eo_currents_watchdog_UpdateCurrentLimits(EOCurrentsWatchdog* p, uint8_t motor);
 

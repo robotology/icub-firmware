@@ -30,7 +30,7 @@
 #include "EoCommon.h"
 #include "EoProtocol.h"
 
-#include "EOemsController.h"
+#include "Controller.h"
 #include "EOtheEncoderReader.h"
 
 #include "EOtheMAIS.h"
@@ -51,7 +51,8 @@
 
 typedef struct
 {
-    EOemsController*                        thecontroller;
+    //EOemsController*                        thecontroller;
+    MController*                            thecontroller;
     EOtheEncoderReader*                     theencoderreader;    
 } eOmotioncontroller_objs_foc_t;
 
@@ -64,7 +65,7 @@ typedef struct
 
 typedef struct
 {
-    EOemsController*                        thecontroller;
+    MController*                            thecontroller;
     EOtheEncoderReader*                     theencoderreader; 
     int16_t                                 pwmvalue[hal_motors_number]; // at most i can manage 4 joints, hence 4 pwm values
     hal_motor_t                             pwmport[hal_motors_number];

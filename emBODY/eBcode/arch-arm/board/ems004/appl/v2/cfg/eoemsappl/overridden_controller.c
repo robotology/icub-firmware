@@ -28,14 +28,12 @@
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "EOemsController.h"
+#include "Controller.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
-
- #include "EOemsController_hid.h" 
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -78,6 +76,7 @@
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
 
+#if 0
 extern void eo_emsController_hid_userdef_config_motor(EOemsController* ctrl, uint8_t motor)
 {   
     int8_t KpKiKdKs[7];
@@ -176,6 +175,7 @@ extern void eo_emsController_hid_userdef_set_motor_running(EOemsController* ctrl
 
     eo_motors_new_state_req(ctrl->motors, motor, controlmode_2foc);
 }
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
