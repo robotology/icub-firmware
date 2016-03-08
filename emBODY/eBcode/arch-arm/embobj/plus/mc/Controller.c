@@ -17,7 +17,7 @@
 
 MController* smc = NULL;
 
-//static char invert_matrix(float** M, float** I, char n);
+static char invert_matrix(float** M, float** I, char n);
 //static void MController_config_motor_set(MController* o);
 //static void MController_config_encoder_set(MController* o);
 
@@ -107,10 +107,10 @@ void MController_config_board(uint8_t part_type, uint8_t actuation_type)
     o->part_type      = part_type;
     o->actuation_type = actuation_type;
     
-    float **Jjm = o->Jjm;
-    float **Jmj = o->Jmj;
+    float **Jjm = NULL; //o->Jjm;
+    float **Jmj = NULL; //o->Jmj;
   
-    float **Sjm = o->Sjm;
+    float **Sjm = NULL; //o->Sjm;
     float **Sje = NULL; //o->Sje;
     
     switch (part_type)
@@ -132,8 +132,15 @@ void MController_config_board(uint8_t part_type, uint8_t actuation_type)
             o->motor[k].HARDWARE_TYPE = HARDWARE_2FOC;
         }
         
+        o->jointSet[0].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
+        o->jointSet[1].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
+        
+        o->jointSet[0].CAN_DO_TRQ_CTRL = TRUE;
+        o->jointSet[1].CAN_DO_TRQ_CTRL = TRUE;
+        
         break;
     
+    /*
     case emscontroller_board_CER_UPPER_ARM:               //= 17,    //2FOC
         o->nJoints = 2;
         o->nSets   = 2;
@@ -152,11 +159,64 @@ void MController_config_board(uint8_t part_type, uint8_t actuation_type)
         o->jointSet[0].MOTOR_CONTROL_TYPE = VEL_CONTROLLED_MOTOR;
         o->jointSet[1].MOTOR_CONTROL_TYPE = VEL_CONTROLLED_MOTOR;
         
-        break;
+        o->jointSet[0].CAN_DO_TRQ_CTRL = TRUE;
+        o->jointSet[1].CAN_DO_TRQ_CTRL = TRUE;
         
+        break;
+    */
+
+    case emscontroller_board_CER_UPPER_ARM:                   //= 3,    //2FOC
+    {    
+        o->nJoints = 2;
+        o->nSets   = 1;
+        
+        o->jointSet[0].CAN_DO_TRQ_CTRL = TRUE;
+        o->jointSet[0].MOTOR_CONTROL_TYPE = VEL_CONTROLLED_MOTOR;
+
+        // |j0|   |   0.5   0.5    0   |   |m0|
+        // |j1| = |  -0.5   0.5    0   | * |m1|
+        // |j2|   | 22/80 22/80  44/80 |   |m2|
+        
+        //Sje = o->Sje;
+        Sjm = o->Sjm;
+        Jjm = o->Jjm;
+        Jmj = o->Jmj;
+    
+        //Sjm[0][0] =  0.5f; Sjm[0][1] =  0.5f;
+        //Sjm[1][0] = -0.5f; Sjm[1][1] =  0.5f;
+    
+        Sjm[0][0] =  1.0f; Sjm[0][1] =  1.0f;
+        Sjm[1][0] = -1.0f; Sjm[1][1] =  1.0f;
+        
+        for (int j=0; j<2; ++j)
+            for (int m=0; m<2; ++m)
+                Jjm[j][m] = Sjm[j][m];
+        
+        // beware: the 3rd joint (yaw) is considered independent in position control
+        invert_matrix(Jjm, Jmj, 2);
+        //Jmj[0][0] =  0.5f; Jmj[0][1] = -0.5f;
+        //Jmj[1][0] =  0.5f; Jmj[1][1] =  0.5f;
+        
+        o->j2s[0] = 0; o->m2s[0] = 0;
+        o->j2s[1] = 0; o->m2s[1] = 0;
+        
+        for (int k = 0; k<o->nJoints; ++k)
+        {
+            o->joint[k].CAN_DO_TRQ_CTRL = TRUE;
+            o->joint[k].MOTOR_CONTROL_TYPE = VEL_CONTROLLED_MOTOR;
+            o->motor[k].MOTOR_CONTROL_TYPE = VEL_CONTROLLED_MOTOR;
+            o->motor[k].HARDWARE_TYPE = HARDWARE_2FOC;
+        }
+        
+        break;
+    }
+
     case emscontroller_board_UPPERLEG:                //= 2,    //2FOC
         o->nJoints = 4;
         o->nSets   = 4;
+    
+        Jjm = o->Jjm;
+        Sjm = o->Sjm;
     
         Sjm[0][0] = 50.0f/75.0f;
         Jjm[0][0] = Sjm[0][0];
@@ -174,6 +234,9 @@ void MController_config_board(uint8_t part_type, uint8_t actuation_type)
             o->joint[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
             o->motor[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
             o->motor[k].HARDWARE_TYPE = HARDWARE_2FOC;
+            
+            o->jointSet[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
+            o->jointSet[k].CAN_DO_TRQ_CTRL = TRUE;
         }
     
         break;
@@ -185,6 +248,10 @@ void MController_config_board(uint8_t part_type, uint8_t actuation_type)
         // |j0|   |   0.5   0.5    0   |   |m0|
         // |j1| = |  -0.5   0.5    0   | * |m1|
         // |j2|   | 22/80 22/80  44/80 |   |m2|
+        
+        Sjm = o->Sjm;
+        Jjm = o->Jjm;
+        Jmj = o->Jmj;
         
         float alfa = 22.0f/80.0f;
     
@@ -213,12 +280,19 @@ void MController_config_board(uint8_t part_type, uint8_t actuation_type)
             o->motor[k].HARDWARE_TYPE = HARDWARE_2FOC;
         }
         
+        o->jointSet[0].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
+        o->jointSet[0].CAN_DO_TRQ_CTRL = TRUE;
+        
         break;
     }
     case emscontroller_board_SHOULDER:                //= 4,    //2FOC
     {
         o->nJoints = 4;
         o->nSets   = 2;
+        
+        Sjm = o->Sjm;
+        Jjm = o->Jjm;
+        Jmj = o->Jmj;
         
         // |j0|    | 1     0       0   |   |m0|
         // |j1|  = | 1   40/65     0   | * |m1|
@@ -261,6 +335,12 @@ void MController_config_board(uint8_t part_type, uint8_t actuation_type)
             o->motor[k].HARDWARE_TYPE = HARDWARE_2FOC;
         }
         
+        o->jointSet[0].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
+        o->jointSet[0].CAN_DO_TRQ_CTRL = TRUE;
+        
+        o->jointSet[1].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
+        o->jointSet[1].CAN_DO_TRQ_CTRL = TRUE;
+        
         break;
     }
     case emscontroller_board_CER_WAIST:               //= 15,   //2FOC
@@ -284,6 +364,12 @@ void MController_config_board(uint8_t part_type, uint8_t actuation_type)
         o->joint[3].MOTOR_CONTROL_TYPE = VEL_CONTROLLED_MOTOR;
         o->motor[3].MOTOR_CONTROL_TYPE = VEL_CONTROLLED_MOTOR;
         o->motor[3].HARDWARE_TYPE = HARDWARE_2FOC;
+        
+        o->jointSet[0].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
+        o->jointSet[0].CAN_DO_TRQ_CTRL = FALSE;
+        
+        o->jointSet[1].MOTOR_CONTROL_TYPE = VEL_CONTROLLED_MOTOR;
+        o->jointSet[1].CAN_DO_TRQ_CTRL = TRUE;
     
         break;
 	case emscontroller_board_CER_BASE:                //= 21    //2FOC
@@ -302,6 +388,9 @@ void MController_config_board(uint8_t part_type, uint8_t actuation_type)
             o->joint[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
             o->motor[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
             o->motor[k].HARDWARE_TYPE = HARDWARE_2FOC;
+            
+            o->jointSet[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
+            o->jointSet[k].CAN_DO_TRQ_CTRL = FALSE;
         }
     }
         break;
@@ -350,7 +439,7 @@ void MController_config_board(uint8_t part_type, uint8_t actuation_type)
     
     for (int s=0; s<o->nSets; ++s)
     {
-        for (int n=0; n<o->set_dim[n]; ++n)
+        for (int n=0; n<o->set_dim[s]; ++n)
         {
             o->eos[s][n] = o->jos[s][n];
         }
@@ -685,7 +774,6 @@ static void MController_config_encoder_set(MController *o)
 #define FOR(i) for (int i=0; i<n; ++i)
 #define SCAN(r,c) FOR(r) FOR(c)
 
-/*
 static char invert_matrix(float** M, float** I, char n)
 {
     float B[MAX_PER_BOARD][MAX_PER_BOARD];
@@ -761,7 +849,6 @@ static char invert_matrix(float** M, float** I, char n)
     
     return 1;
 }
-*/
 
 void MController_calibrate(uint8_t e, eOmc_calibrator_t *calibrator)
 {

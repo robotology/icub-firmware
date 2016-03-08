@@ -318,8 +318,18 @@ void Joint_set_limits(Joint* o, CTRL_UNITS pos_min, CTRL_UNITS pos_max)
     Trajectory_config_limits(&o->trajectory, pos_min, pos_max, 0.0f, 0.0f);
 }
 
+//#include "hal_led.h"
+
 CTRL_UNITS Joint_do_pwm_control(Joint* o)
 {
+    /*
+    static int n = 0;
+    if (++n > 1000)
+    {
+        n = 0;
+        hal_led_toggle(hal_led1+o->ID);
+    } 
+    */
     o->pushing_limit = FALSE;
     
     switch (o->control_mode)
@@ -435,10 +445,8 @@ CTRL_UNITS Joint_do_pwm_control(Joint* o)
     return o->output;
 }
 
-#include "hal_led.h"
-
 CTRL_UNITS Joint_do_vel_control(Joint* o)
-{
+{            
     o->pushing_limit = FALSE;
     
     switch (o->control_mode)
@@ -487,7 +495,7 @@ CTRL_UNITS Joint_do_vel_control(Joint* o)
         case eomc_controlmode_direct:
         {    
             Trajectory_do_step(&o->trajectory, &o->pos_ref, &o->vel_ref, &o->acc_ref);
-        
+            
             //CTRL_UNITS pos_err_old = o->pos_err;
         
             o->pos_err = o->pos_ref - o->pos_fbk;
@@ -512,13 +520,6 @@ CTRL_UNITS Joint_do_vel_control(Joint* o)
                         o->vel_ref += o->scKpos*o->pos_err;
                     }
                 }
-                
-                static int n = 0;
-                if (++n > 1000)
-                {
-                    n = 0;
-                    hal_led_toggle(hal_led1);
-                } 
                 
                 o->output = o->vel_ref;
             }
@@ -634,8 +635,6 @@ BOOL Joint_get_pid_state(Joint* o, eOmc_joint_status_ofpid_t* pid_state)
 
 BOOL Joint_set_pos_ref(Joint* o, CTRL_UNITS pos_ref, CTRL_UNITS vel_ref)
 {    
-    //if (NOT_READY()) return eobool_false; // TODOALE
-
     if ((o->control_mode != eomc_controlmode_position) && (o->control_mode != eomc_controlmode_mixed))
     {
         return FALSE;
@@ -657,8 +656,6 @@ BOOL Joint_set_pos_ref(Joint* o, CTRL_UNITS pos_ref, CTRL_UNITS vel_ref)
 
 BOOL Joint_set_vel_ref(Joint* o, CTRL_UNITS vel_ref, CTRL_UNITS acc_ref)
 {
-    //if (NOT_READY()) return eobool_false; // TODOALE
-
     if ((o->control_mode != eomc_controlmode_velocity) && (o->control_mode != eomc_controlmode_mixed))
     {
         return FALSE;
@@ -681,8 +678,6 @@ BOOL Joint_set_vel_ref(Joint* o, CTRL_UNITS vel_ref, CTRL_UNITS acc_ref)
 
 BOOL Joint_set_pos_raw(Joint* o, CTRL_UNITS pos_ref)
 {    
-    //if (NOT_READY()) return eobool_false; // TODOALE
-
     if (o->control_mode != eomc_controlmode_direct)
     {
         return FALSE;

@@ -954,7 +954,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb15 =
         .version    =
         {
             .firmware   = { .major = 0, .minor = 0, .build = 0 },
-            .protocol   = { .major = 1, .minor = 3 }
+            .protocol   = { .major = 1, .minor = 4 }
         },
         .filler                 = {0},
         .arrayofjomodescriptors =
@@ -1084,7 +1084,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb17 =
         .version    =
         {
             .firmware   = { .major = 0, .minor = 0, .build = 0 },
-            .protocol   = { .major = 1, .minor = 3 }
+            .protocol   = { .major = 1, .minor = 4 }
         },
         .filler                 = {0},
         .arrayofjomodescriptors =
@@ -1175,7 +1175,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb21 =
         .version    =
         {
             .firmware   = { .major = 0, .minor = 0, .build = 0 },
-            .protocol   = { .major = 1, .minor = 3 }
+            .protocol   = { .major = 1, .minor = 4 }
         },
         .filler                 = {0},
         .arrayofjomodescriptors =

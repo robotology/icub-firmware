@@ -122,6 +122,15 @@ void JointSet_do_odometry(JointSet* o) //
         }
     }
     
+    /*
+    static int n = 0;
+    if (++n > 1000)
+    {
+        n = 0;
+        hal_led_toggle(hal_led1+j);
+    } 
+    */
+    
     if (!o->Sje) // no encoder coupling
     {
         for (js=0; js<N; ++js)
