@@ -130,13 +130,10 @@ void MController_config_board(uint8_t part_type, uint8_t actuation_type)
             o->joint[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
             o->motor[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
             o->motor[k].HARDWARE_TYPE = HARDWARE_2FOC;
+            
+            o->jointSet[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
+            o->jointSet[k].CAN_DO_TRQ_CTRL = TRUE;
         }
-        
-        o->jointSet[0].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-        o->jointSet[1].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-        
-        o->jointSet[0].CAN_DO_TRQ_CTRL = TRUE;
-        o->jointSet[1].CAN_DO_TRQ_CTRL = TRUE;
         
         break;
     
@@ -172,21 +169,17 @@ void MController_config_board(uint8_t part_type, uint8_t actuation_type)
         
         o->jointSet[0].CAN_DO_TRQ_CTRL = TRUE;
         o->jointSet[0].MOTOR_CONTROL_TYPE = VEL_CONTROLLED_MOTOR;
-
-        // |j0|   |   0.5   0.5    0   |   |m0|
-        // |j1| = |  -0.5   0.5    0   | * |m1|
-        // |j2|   | 22/80 22/80  44/80 |   |m2|
         
         //Sje = o->Sje;
         Sjm = o->Sjm;
         Jjm = o->Jjm;
         Jmj = o->Jmj;
     
-        //Sjm[0][0] =  0.5f; Sjm[0][1] =  0.5f;
-        //Sjm[1][0] = -0.5f; Sjm[1][1] =  0.5f;
+        Sjm[0][0] =  0.5f; Sjm[0][1] =  0.5f;
+        Sjm[1][0] = -0.5f; Sjm[1][1] =  0.5f;
     
-        Sjm[0][0] =  1.0f; Sjm[0][1] =  1.0f;
-        Sjm[1][0] = -1.0f; Sjm[1][1] =  1.0f;
+        //Sjm[0][0] =  1.0f; Sjm[0][1] =  1.0f;
+        //Sjm[1][0] = -1.0f; Sjm[1][1] =  1.0f;
         
         for (int j=0; j<2; ++j)
             for (int m=0; m<2; ++m)
@@ -240,6 +233,7 @@ void MController_config_board(uint8_t part_type, uint8_t actuation_type)
         }
     
         break;
+        
     case emscontroller_board_WAIST:                   //= 3,    //2FOC
     {    
         o->nJoints = 3;

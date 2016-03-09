@@ -693,23 +693,25 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
 {
     switch (calibrator->type)
     {
+        case eomc_calibration_type3_abs_sens_digital:
+            AbsEncoder_calibrate(o->absEncoder+e, calibrator->params.type3.offset);
+            Motor_calibrate(o->motor+e, 0);
+            break;
+        
+        
+        
+        
+        //case eomc_calibration_type9_motor_self_calibrated:
+        //    AbsEncoder_calibrate(o->absEncoder+e, 0);
+        //    Motor_config_pos_offset(o->motor+e, calibrator->params.type9.offset);
+        //    break;
+        
         /*
         case eomc_calibration_type3_abs_sens_digital:
-            AbsEncoder_calibrate(o->absEncoder+e, calibrator->params.type3.calibrationZero);
-            Motor_config_pos_offset(o->motor+e, 0);
-            break;
-        
-        case eomc_calibration_type9_motor_self_calibrated:
             AbsEncoder_calibrate(o->absEncoder+e, 0);
-            Motor_config_pos_offset(o->motor+e, calibrator->params.type9.calibrationZero);
+            Motor_calibrate(o->motor+e, calibrator->params.type3.offset);
             break;
         */
-        
-        case eomc_calibration_type3_abs_sens_digital:
-            AbsEncoder_calibrate(o->absEncoder+e, 0);
-            Motor_calibrate(o->motor+e, calibrator->params.type3.calibrationZero);
-            break;
-        
         default:
             break;
     }
