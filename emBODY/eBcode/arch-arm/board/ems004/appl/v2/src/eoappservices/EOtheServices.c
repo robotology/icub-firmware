@@ -833,7 +833,11 @@ static eOresult_t s_eo_services_verifyactivate(EOtheServices *p, eOmn_serv_categ
     
     // now have a look at state. it must be eomn_serv_state_activated.
     
-    if(eomn_serv_state_activated != state)
+    if((eomn_serv_state_activated == state) || (eomn_serv_state_running == state))
+    {
+        // ok ....
+    }
+    else
     {       
         // JUST for NOW: send the failure report      
         eo_services_SendFailureReport(eo_services_GetHandle());        
@@ -892,11 +896,11 @@ static eOresult_t s_eo_services_process_start(EOtheServices *p, eOmn_serv_catego
     }
     
     // now have a look at state. it must be eomn_serv_state_activated or eomn_serv_state_running  
-    if(eomn_serv_state_running == p->mnservice->status.stateofservice[category])
+    if((eomn_serv_state_running == p->mnservice->status.stateofservice[category]) || (eomn_serv_state_activated == p->mnservice->status.stateofservice[category]))
     {     
         // ok, we attempt to start it again however
     } 
-    else if(eomn_serv_state_activated != p->mnservice->status.stateofservice[category])
+    else
     {
         // send a failure about wrong state of the board ... dont send it if the service is already started.
         p->mnservice->status.commandresult.latestcommandisok = eobool_false;
