@@ -441,9 +441,7 @@ extern eOresult_t eo_services_ProcessCommand(EOtheServices *p, eOmn_service_cmmn
     
     // the operation can be: eomn_serv_operation_verifyactivate, eomn_serv_operation_start, eomn_serv_operation_stop
     // the category can be mc, mais, strain, skin, inertials
-    
-    #warning TODO: put in function eo_services_ProcessCommand() all what is needed to activate / start / stop the service and send reply back.
-        
+            
     switch(operation)
     {
         case eomn_serv_operation_verifyactivate:
@@ -644,8 +642,6 @@ static void s_activate_services_now(void *p)
     // depending on the board number we have something to do which is different
     // at first we do motion control, then strain, then skin, then inertials.
 
-#warning -->  SO FAR, we dont verify/activate/start the MAIS as a standalone service.
-    // we could do it by simply doing it as second thing after motioncontrol.
     
     const eOmn_serv_configuration_t * servcfg = NULL;
     
@@ -838,7 +834,10 @@ static eOresult_t s_eo_services_verifyactivate(EOtheServices *p, eOmn_serv_categ
     // now have a look at state. it must be eomn_serv_state_activated.
     
     if(eomn_serv_state_activated != state)
-    {
+    {       
+        // JUST for NOW: send the failure report      
+        eo_services_SendFailureReport(eo_services_GetHandle());        
+        
         // send a failure about wrong state of the board
         p->mnservice->status.commandresult.latestcommandisok = eobool_false;
         p->mnservice->status.commandresult.category = category;
@@ -892,11 +891,14 @@ static eOresult_t s_eo_services_process_start(EOtheServices *p, eOmn_serv_catego
         return(eores_OK);
     }
     
-    
-    // now have a look at state. it must be eomn_serv_state_activated.    
-    if(eomn_serv_state_activated != p->mnservice->status.stateofservice[category])
+    // now have a look at state. it must be eomn_serv_state_activated or eomn_serv_state_running  
+    if(eomn_serv_state_running == p->mnservice->status.stateofservice[category])
+    {     
+        // ok, we attempt to start it again however
+    } 
+    else if(eomn_serv_state_activated != p->mnservice->status.stateofservice[category])
     {
-        // send a failure about wrong state of the board
+        // send a failure about wrong state of the board ... dont send it if the service is already started.
         p->mnservice->status.commandresult.latestcommandisok = eobool_false;
         p->mnservice->status.commandresult.category = category;
         p->mnservice->status.commandresult.operation = eomn_serv_operation_start;
@@ -907,6 +909,8 @@ static eOresult_t s_eo_services_process_start(EOtheServices *p, eOmn_serv_catego
         
         return(eores_OK);
     }
+    
+    
     
     // now we start the service.
     if(eores_OK == s_eo_services_start(p, category))
@@ -1241,7 +1245,7 @@ static eOresult_t s_eo_services_stop(EOtheServices *p, eOmn_serv_category_t cate
 
         case eomn_serv_category_mais:
         {
-            res = eo_mais_Stop(eo_mais_GetHandle());
+            res = eores_OK; // prefer not to stop mais in order to avoid problems with the mc4can boards going in hw fault .... eo_mais_Stop(eo_mais_GetHandle());
             eo_mais_SetRegulars(eo_mais_GetHandle(), NULL, NULL);
         } break;    
 
@@ -1263,7 +1267,7 @@ static eOresult_t s_eo_services_stop(EOtheServices *p, eOmn_serv_category_t cate
             eo_motioncontrol_SetRegulars(eo_motioncontrol_GetHandle(), NULL, NULL);
 
             
-            eo_mais_Stop(eo_mais_GetHandle());
+             // prefer not to stop mais in order to avoid problems with the mc4can boards going in hw fault .... eo_mais_Stop(eo_mais_GetHandle());
             eo_mais_SetRegulars(eo_mais_GetHandle(), NULL, NULL);
             
             eo_strain_Stop(eo_strain_GetHandle());
