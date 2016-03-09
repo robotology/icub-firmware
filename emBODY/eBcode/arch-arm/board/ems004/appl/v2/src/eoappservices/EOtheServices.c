@@ -1249,7 +1249,8 @@ static eOresult_t s_eo_services_stop(EOtheServices *p, eOmn_serv_category_t cate
 
         case eomn_serv_category_mais:
         {
-            res = eores_OK; // prefer not to stop mais in order to avoid problems with the mc4can boards going in hw fault .... eo_mais_Stop(eo_mais_GetHandle());
+            res = eores_OK; // prefer not to stop mais in order to avoid problems with the mc4can boards going in hw fault .... 
+            eo_mais_Stop(eo_mais_GetHandle());
             eo_mais_SetRegulars(eo_mais_GetHandle(), NULL, NULL);
         } break;    
 
@@ -1269,9 +1270,9 @@ static eOresult_t s_eo_services_stop(EOtheServices *p, eOmn_serv_category_t cate
         {
             eo_motioncontrol_Stop(eo_motioncontrol_GetHandle()); 
             eo_motioncontrol_SetRegulars(eo_motioncontrol_GetHandle(), NULL, NULL);
-
-            
-             // prefer not to stop mais in order to avoid problems with the mc4can boards going in hw fault .... eo_mais_Stop(eo_mais_GetHandle());
+           
+             // prefer not to stop mais in order to avoid problems with the mc4can boards going in hw fault .... 
+            eo_mais_Stop(eo_mais_GetHandle());
             eo_mais_SetRegulars(eo_mais_GetHandle(), NULL, NULL);
             
             eo_strain_Stop(eo_strain_GetHandle());
