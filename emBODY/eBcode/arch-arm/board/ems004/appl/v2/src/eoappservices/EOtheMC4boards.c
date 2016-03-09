@@ -655,7 +655,7 @@ extern eOmeas_damping_t       eo_mc4boards_Convert_impedanceDamping_S2I(EOtheMC4
         return(0);
     }
    
-    float ret  = damping*s_eo_themc4boards.convencoder[joint].factor*1000;  
+    float ret  = damping*s_eo_themc4boards.convencoder[joint].factor;  
 
     if(ret<0)
         ret = -ret;
