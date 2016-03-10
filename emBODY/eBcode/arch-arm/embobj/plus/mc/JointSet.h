@@ -60,11 +60,11 @@ extern void JointSet_config //
     uint8_t* encoders_of_set,
     Joint* joint,
     Motor* motor,
+    AbsEncoder *absEncoder,
     float** Jjm,
     float** Jmj,
     float** Sje,
-    float** Sjm,
-    AbsEncoder *absEncoder
+    float** Sjm
 );
 
 extern void JointSet_do_odometry(JointSet* o); //

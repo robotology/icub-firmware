@@ -47,7 +47,8 @@ extern MController* MController_new(uint8_t nJoints); //
 
 extern void MController_init(void); //
 
-extern void MController_config_board(uint8_t board_type, uint8_t actuation_type);
+void MController_config_board(const eOmn_serv_configuration_t* brd_cfg);
+//extern void MController_config_board(uint8_t board_type, uint8_t actuation_type);
 
 extern void MController_config_joint(int j, eOmc_joint_config_t* config); //
 extern void MController_config_motor(int m, eOmc_motor_config_t* config); //

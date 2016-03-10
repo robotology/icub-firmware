@@ -63,12 +63,12 @@ void JointSet_config //
     uint8_t* motors_of_set,
     uint8_t* encoders_of_set,
     Joint* joint, 
-    Motor* motor, 
+    Motor* motor,
+    AbsEncoder *absEncoder,
     float** Jjm,
     float** Jmj,
     float** Sje,
-    float** Sjm,
-    AbsEncoder *absEncoder
+    float** Sjm
 )
 {
     o->pN = pN;
@@ -77,11 +77,11 @@ void JointSet_config //
     o->encoders_of_set = encoders_of_set;
     o->joint = joint;
     o->motor = motor;
+    o->absEncoder = absEncoder;
     o->Jjm = Jjm;
     o->Jmj = Jmj;
     o->Sje = Sje;
     o->Sjm = Sjm;
-    o->absEncoder = absEncoder;
 }
 
 void JointSet_do_odometry(JointSet* o) //
@@ -121,15 +121,6 @@ void JointSet_do_odometry(JointSet* o) //
             o->joint[j].vel_fbk_from_motors = o->motor[j].vel_fbk;
         }
     }
-    
-    /*
-    static int n = 0;
-    if (++n > 1000)
-    {
-        n = 0;
-        hal_led_toggle(hal_led1+j);
-    } 
-    */
     
     if (!o->Sje) // no encoder coupling
     {
@@ -511,6 +502,7 @@ static void JointSet_do_pwm_control(JointSet* o)
         }
 
         Motor_set_pwm_ref(o->motor+m, motor_pwm_ref);
+        //Motor_set_pwm_ref(o->motor+m, 0);
     }
     
     if (limits_torque_protection)
@@ -599,42 +591,13 @@ static void JointSet_do_vel_control(JointSet* o)
                 motor_vel_ref += Ji[m][j]*o->joint[j].output;
             }
         
-            Motor_set_vel_ref(o->motor+m, motor_vel_ref);
+            Motor_set_vel_ref(o->motor+m, 0);
         }
         else
         {
-            Motor_set_vel_ref(o->motor+m, o->joint[m].output);
+            Motor_set_vel_ref(o->motor+m, 0);
         }
     }
-}
-
-static void JointSet_do_wait_calibration(JointSet* o)
-{
-    int N = *(o->pN);
-    
-    for (int ms=0; ms<N; ++ms)
-    {
-        if (!Motor_is_calibrated(o->motor+o->motors_of_set[ms])) return;
-    }
-    
-    for (int es=0; es<N; ++es)
-    {
-        if (!AbsEncoder_is_calibrated(o->absEncoder+o->encoders_of_set[es])) return;
-    }
-    
-    o->is_calibrated = TRUE;
-    
-    //if (o->control_mode == eomc_controlmode_calib)
-    {
-        for (int js=0; js<N; ++js)
-        {
-            o->joint[o->joints_of_set[js]].control_mode = eomc_controlmode_idle;
-        }
-    }
-    
-    o->control_mode = eomc_controlmode_idle;
-    
-    JointSet_set_control_mode(o, eomc_controlmode_cmd_position);
 }
 
 static void JointSet_set_inner_control_flags(JointSet* o)
@@ -689,29 +652,45 @@ typedef struct                  // size is 1+3+4*4 = 20
 typedef eOmc_calibrator32_t eOmc_calibrator_t;
 #endif
 
+static void JointSet_do_wait_calibration(JointSet* o)
+{
+    int N = *(o->pN);
+    
+    for (int ms=0; ms<N; ++ms)
+    {
+        if (!Motor_is_calibrated(o->motor+o->motors_of_set[ms])) return;
+    }
+    
+    for (int es=0; es<N; ++es)
+    {
+        if (!AbsEncoder_is_calibrated(o->absEncoder+o->encoders_of_set[es])) return;
+    }
+    
+    o->is_calibrated = TRUE;
+    
+    o->control_mode = eomc_controlmode_idle;
+    
+    for (int js=0; js<N; ++js)
+    {
+        o->joint[o->joints_of_set[js]].control_mode = eomc_controlmode_idle;
+    }
+    
+    JointSet_set_control_mode(o, eomc_controlmode_cmd_position);
+}
+
 void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
 {
+    // testALE
+    
     switch (calibrator->type)
     {
         case eomc_calibration_type3_abs_sens_digital:
-            AbsEncoder_calibrate(o->absEncoder+e, calibrator->params.type3.offset);
+            AbsEncoder_calibrate(o->absEncoder+e, calibrator->params.type3.offset, calibrator->params.type3.calibrationZero);
             Motor_calibrate(o->motor+e, 0);
+            //AbsEncoder_calibrate(o->absEncoder+e, 0, 0);
+            //Motor_calibrate(o->motor+e, calibrator->params.type3.offset);
             break;
         
-        
-        
-        
-        //case eomc_calibration_type9_motor_self_calibrated:
-        //    AbsEncoder_calibrate(o->absEncoder+e, 0);
-        //    Motor_config_pos_offset(o->motor+e, calibrator->params.type9.offset);
-        //    break;
-        
-        /*
-        case eomc_calibration_type3_abs_sens_digital:
-            AbsEncoder_calibrate(o->absEncoder+e, 0);
-            Motor_calibrate(o->motor+e, calibrator->params.type3.offset);
-            break;
-        */
         default:
             break;
     }
@@ -720,6 +699,8 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
     {
         o->joint[o->joints_of_set[js]].control_mode = eomc_controlmode_calib;
     }
+    
+    //o->joint[e].control_mode = eomc_controlmode_calib;
     
     o->control_mode = eomc_controlmode_calib;
 }

@@ -671,7 +671,8 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
             {
                 //p->mcfoc.thecontroller = eo_emsController_Init((eOemscontroller_board_t)servcfg->data.mc.foc_based.boardtype4mccontroller, emscontroller_actuation_2FOC, numofjomos);
                 p->mcfoc.thecontroller = MController_new(numofjomos);
-                MController_config_board((eOemscontroller_board_t)servcfg->data.mc.foc_based.boardtype4mccontroller, HARDWARE_2FOC);                
+                //MController_config_board((eOemscontroller_board_t)servcfg->data.mc.foc_based.boardtype4mccontroller, HARDWARE_2FOC);                
+                MController_config_board(servcfg);
             }
             
             
@@ -837,7 +838,8 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
                 }
                 //p->mcmc4plus.thecontroller = eo_emsController_Init(controller_type, emscontroller_actuation_LOCAL, numofjomos);
                 p->mcmc4plus.thecontroller = MController_new(numofjomos);   
-                MController_config_board(controller_type, HARDWARE_MC4p);    
+                //MController_config_board(controller_type, HARDWARE_MC4p);
+                MController_config_board(servcfg);                
             }       
 
             // b. clear the pwm values and the port mapping

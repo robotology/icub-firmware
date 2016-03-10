@@ -36,6 +36,7 @@ typedef struct //AbsEncoder
 
     int32_t sign;
     int16_t offset;
+    int32_t zero;
 
     int16_t delta;
 
@@ -76,7 +77,7 @@ extern AbsEncoder* AbsEncoder_new(uint8_t n);
 extern void AbsEncoder_init(AbsEncoder* o);
 extern void AbsEncoder_destroy(AbsEncoder* o);
 extern void AbsEncoder_config(AbsEncoder *o, uint8_t ID, int32_t resolution, int16_t spike_mag_limit, uint16_t spike_cnt_limit);
-extern void AbsEncoder_calibrate(AbsEncoder* o, int32_t offset);
+extern void AbsEncoder_calibrate(AbsEncoder* o, int32_t offset, int32_t zero);
 
 extern int32_t AbsEncoder_update(AbsEncoder* o, int16_t position);
 extern void AbsEncoder_invalid(AbsEncoder* o, hal_spiencoder_errors_flags error_flags);
@@ -93,7 +94,6 @@ extern void AbsEncoder_clear_faults(AbsEncoder* o);
 
 extern void AbsEncoder_overwrite(AbsEncoder* o, int32_t position, int32_t velocity);
 extern BOOL AbsEncoder_is_fake(AbsEncoder* o);
-extern void AbsEncoder_config_fake(AbsEncoder* o, uint8_t ID);
 
 #endif
 

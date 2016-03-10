@@ -77,38 +77,35 @@ void AbsEncoder_config(AbsEncoder* o, uint8_t ID, int32_t resolution, int16_t sp
 {
     o->ID = ID;
     
-    o->fake = FALSE;
+    //o->fake = FALSE;
     
-    o->spike_mag_limit = spike_mag_limit;//7*(65536L/resolution);
-    o->spike_cnt_limit = spike_cnt_limit;//7*(65536L/resolution);
+    if (!o->fake)
+    {
+        o->spike_mag_limit = spike_mag_limit;//7*(65536L/resolution);
+        o->spike_cnt_limit = spike_cnt_limit;//7*(65536L/resolution);
     
-    o->sign = resolution >= 0 ? 1 : -1;
+        o->sign = resolution >= 0 ? 1 : -1;
+    }
+    else
+    {
+        o->sign = 1;
+        o->state.bits.not_initialized = FALSE; 
+    }
     
     o->state.bits.not_configured = FALSE;
 }
 
-void AbsEncoder_config_fake(AbsEncoder* o, uint8_t ID)
-{
-    o->ID = ID;
-    
-    o->fake = TRUE;
-    
-    o->sign = 1;
-    
-    o->state.bits.not_configured = FALSE;
-    o->state.bits.not_initialized = FALSE;    
-}
-
-void AbsEncoder_calibrate(AbsEncoder* o, int32_t offset)
+void AbsEncoder_calibrate(AbsEncoder* o, int32_t offset, int32_t zero)
 {
     o->offset = offset;
+    o->zero = zero;
     
     o->state.bits.not_calibrated = FALSE;
 }
 
 int32_t AbsEncoder_position(AbsEncoder* o)
 {
-    return o->sign*o->distance;
+    return o->sign*o->distance - o->zero;
 }
 
 int32_t AbsEncoder_velocity(AbsEncoder* o)
@@ -118,7 +115,7 @@ int32_t AbsEncoder_velocity(AbsEncoder* o)
 
 void AbsEncoder_posvel(AbsEncoder* o, int32_t* position, int32_t* velocity)
 {
-    *position = o->sign*o->distance;
+    *position = o->sign*o->distance - o->zero;
     *velocity = o->sign*o->velocity;
 }
 
@@ -312,8 +309,6 @@ BOOL AbsEncoder_is_ok(AbsEncoder* o)
 
 BOOL AbsEncoder_is_calibrated(AbsEncoder* o)
 {    
-    if (!o) return TRUE;
-    
     return !o->state.bits.not_calibrated;
 }
 
