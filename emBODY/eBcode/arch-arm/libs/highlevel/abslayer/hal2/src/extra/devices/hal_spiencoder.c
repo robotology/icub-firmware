@@ -499,6 +499,16 @@ extern hal_result_t hal_spiencoder_read_start_t2(hal_spiencoder_t id, uint8_t re
     return(hal_res_OK);
 }
 
+extern hal_result_t hal_spiencoder_get_value2(hal_spiencoder_t id, hal_spiencoder_value_t* val)
+{
+    
+    
+  
+
+    return(hal_res_OK);
+}
+
+
 // Get the last value saved with a read_start
 extern hal_result_t hal_spiencoder_get_value(hal_spiencoder_t id, hal_spiencoder_position_t* pos, hal_spiencoder_errors_flags* e_flags)
 {
