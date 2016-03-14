@@ -669,7 +669,7 @@ static void JointSet_do_wait_calibration(JointSet* o)
     o->is_calibrated = TRUE;
     
     o->control_mode = eomc_controlmode_idle;
-    
+
     for (int js=0; js<N; ++js)
     {
         o->joint[o->joints_of_set[js]].control_mode = eomc_controlmode_idle;
@@ -680,7 +680,14 @@ static void JointSet_do_wait_calibration(JointSet* o)
 
 void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
 {
-    // testALE
+    for (int js=0; js<*(o->pN); ++js)
+    {
+        o->joint[o->joints_of_set[js]].control_mode = eomc_controlmode_calib;
+    }
+    
+    o->control_mode = eomc_controlmode_calib;
+    
+    o->is_calibrated = FALSE;
     
     switch (calibrator->type)
     {
@@ -694,13 +701,4 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
         default:
             break;
     }
-    
-    for (int js=0; js<*(o->pN); ++js)
-    {
-        o->joint[o->joints_of_set[js]].control_mode = eomc_controlmode_calib;
-    }
-    
-    //o->joint[e].control_mode = eomc_controlmode_calib;
-    
-    o->control_mode = eomc_controlmode_calib;
 }

@@ -192,7 +192,7 @@ void Motor_calibrate(Motor* o, int32_t offset) //
 {
     o->pos_calib_offset = offset;
     
-    Motor_set_run(o);
+    //Motor_set_run(o);
 }
 
 void Motor_set_run(Motor* o) //

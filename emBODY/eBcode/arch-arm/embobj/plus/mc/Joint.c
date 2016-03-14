@@ -322,14 +322,6 @@ void Joint_set_limits(Joint* o, CTRL_UNITS pos_min, CTRL_UNITS pos_max)
 
 CTRL_UNITS Joint_do_pwm_control(Joint* o)
 {
-    /*
-    static int n = 0;
-    if (++n > 1000)
-    {
-        n = 0;
-        hal_led_toggle(hal_led1+o->ID);
-    } 
-    */
     o->pushing_limit = FALSE;
     
     switch (o->control_mode)
@@ -634,7 +626,7 @@ BOOL Joint_get_pid_state(Joint* o, eOmc_joint_status_ofpid_t* pid_state)
 }
 
 BOOL Joint_set_pos_ref(Joint* o, CTRL_UNITS pos_ref, CTRL_UNITS vel_ref)
-{    
+{
     if ((o->control_mode != eomc_controlmode_position) && (o->control_mode != eomc_controlmode_mixed))
     {
         return FALSE;
