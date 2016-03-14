@@ -217,7 +217,7 @@ static const eOmn_serv_configuration_t s_serv_config_as_strain_eb7_eb9 =
     {
         .version    =
         {
-            .firmware   = {0, 0},
+            .firmware   = { .major = 0, .minor = 0, .build = 0},
             .protocol   = { .major = 1, .minor = 0 }
         },
         .canloc         =
