@@ -114,7 +114,7 @@ static eOresult_t s_eo_services_process_regsig_manage(EOtheServices *p, eOmn_ser
 static eOresult_t s_eo_services_process_failure(EOtheServices *p, eOmn_service_operation_t operation, eOmn_serv_category_t category);
 
 static eOresult_t s_eo_services_start(EOtheServices *p, eOmn_serv_category_t category);
-static eOresult_t s_eo_services_stop(EOtheServices *p, eOmn_serv_category_t category);
+static eOresult_t s_eo_services_stop(EOtheServices *p, eOmn_serv_category_t category, uint8_t *numofregulars, eOsmStatesEMSappl_t *state);
 
 
 static void send_rop_command_result(void);
@@ -965,10 +965,11 @@ static eOresult_t s_eo_services_process_stop(EOtheServices *p, eOmn_serv_categor
         return(eores_OK);
     }
     
- 
+    uint8_t numofregulars = 0;
+    eOsmStatesEMSappl_t state = eo_sm_emsappl_STcfg;
     
     // now we stop the service.
-    if(eores_OK == s_eo_services_stop(p, category))
+    if(eores_OK == s_eo_services_stop(p, category, &numofregulars, &state))
     {
         p->mnservice->status.commandresult.latestcommandisok = eobool_true;        
     }
@@ -985,7 +986,14 @@ static eOresult_t s_eo_services_process_stop(EOtheServices *p, eOmn_serv_categor
     p->mnservice->status.commandresult.category = category;
     p->mnservice->status.commandresult.operation = eomn_serv_operation_stop;
     p->mnservice->status.commandresult.type = eomn_serv_NONE;
-    p->mnservice->status.commandresult.data[0] = p->mnservice->status.stateofservice[category];
+#if 0
+    // todo: add this ... later on
+    eOmn_service_command_stop_result_data_t resdata = {0};
+    resdata.applstate = (eOmn_appl_state_t)state;
+    resdata.totalregulars = eo_transceiver_RegularROP_ArrayID32Size(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
+    resdata.serviceregulars = numofregulars;
+    memcpy(p->mnservice->status.commandresult.data, &resdata, sizeof(resdata));
+#endif
     
     send_rop_command_result();    
     
@@ -1228,9 +1236,12 @@ static eOresult_t s_eo_services_start(EOtheServices *p, eOmn_serv_category_t cat
 }
 
 
-static eOresult_t s_eo_services_stop(EOtheServices *p, eOmn_serv_category_t category)
+static eOresult_t s_eo_services_stop(EOtheServices *p, eOmn_serv_category_t category, uint8_t *numofregulars, eOsmStatesEMSappl_t *state)
 {
     eOresult_t res = eores_NOK_generic;
+    
+    eom_emsappl_GetCurrentState(eom_emsappl_GetHandle(), state);
+    
     
     // now we stop the service. and we also clear the regulars
     switch(category)
@@ -1238,32 +1249,32 @@ static eOresult_t s_eo_services_stop(EOtheServices *p, eOmn_serv_category_t cate
         case eomn_serv_category_mc:
         {
             res = eo_motioncontrol_Stop(eo_motioncontrol_GetHandle());
-            eo_motioncontrol_SetRegulars(eo_motioncontrol_GetHandle(), NULL, NULL);
+            eo_motioncontrol_SetRegulars(eo_motioncontrol_GetHandle(), NULL, numofregulars);
         } break;
         
         case eomn_serv_category_strain:
         {
             res = eo_strain_Stop(eo_strain_GetHandle());
-            eo_strain_SetRegulars(eo_strain_GetHandle(), NULL, NULL);
+            eo_strain_SetRegulars(eo_strain_GetHandle(), NULL, numofregulars);
         } break;
 
         case eomn_serv_category_mais:
         {
             res = eores_OK; // prefer not to stop mais in order to avoid problems with the mc4can boards going in hw fault .... 
             eo_mais_Stop(eo_mais_GetHandle());
-            eo_mais_SetRegulars(eo_mais_GetHandle(), NULL, NULL);
+            eo_mais_SetRegulars(eo_mais_GetHandle(), NULL, numofregulars);
         } break;    
 
         case eomn_serv_category_skin:
         {
             res = eo_skin_Stop(eo_skin_GetHandle());
-            eo_skin_SetRegulars(eo_skin_GetHandle(), NULL, NULL);
+            eo_skin_SetRegulars(eo_skin_GetHandle(), NULL, numofregulars);
         } break;        
 
         case eomn_serv_category_inertials:
         {
             res = eo_inertials_Stop(eo_inertials_GetHandle());
-            eo_inertials_SetRegulars(eo_inertials_GetHandle(), NULL, NULL);
+            eo_inertials_SetRegulars(eo_inertials_GetHandle(), NULL, numofregulars);
         } break;
         
         case eomn_serv_category_all:
@@ -1287,6 +1298,8 @@ static eOresult_t s_eo_services_stop(EOtheServices *p, eOmn_serv_category_t cate
             // if i dont use the service command to load the rop, then it is safe to remove all rops anyway.
             eo_transceiver_RegularROPs_Clear(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
             
+            *numofregulars = eo_transceiver_RegularROP_ArrayID32Size(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
+            
             // also i send the application in config mode            
             res = eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STcfg);            
         } break;
@@ -1296,7 +1309,7 @@ static eOresult_t s_eo_services_stop(EOtheServices *p, eOmn_serv_category_t cate
             res = eores_NOK_generic;
         } break;
     }
-    
+       
     
     if(eores_OK == res)
     {
@@ -1315,6 +1328,10 @@ static eOresult_t s_eo_services_stop(EOtheServices *p, eOmn_serv_category_t cate
         if(eobool_false == anyrunning)
         {
             res = eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STcfg);
+            if(eo_sm_emsappl_STerr != *state)
+            {
+                *state = eo_sm_emsappl_STcfg;
+            }
         } 
     }
     
