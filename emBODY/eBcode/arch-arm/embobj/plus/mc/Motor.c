@@ -29,6 +29,13 @@ static void Motor_config_MC4p(uint8_t motor, eOmc_motor_config_t* config)
 }
 */
 
+static void Motor_hardStopCalbData_reset(Motor* o)
+{
+    memset(&o->hardstop_calibdata, 0, sizeof(HardStopCalibData));
+    //explicit reset calib
+    o->hardstop_calibdata.u.bits.iscalibrating = 0;
+
+}
 static void Motor_config_2FOC(uint8_t motor, eOmc_motor_config_t* config)
 {   
     int8_t KpKiKdKs[7];
@@ -127,6 +134,8 @@ void Motor_init(Motor* o) //
     
     WatchDog_init(&o->control_mode_req_wdog);
     WatchDog_init(&o->can_2FOC_alive_wdog);
+    
+    Motor_hardStopCalbData_reset(o);
 }
 
 void Motor_config(Motor* o, uint8_t ID, eOmc_motor_config_t* config) //
@@ -188,11 +197,74 @@ void Motor_config_friction(Motor* o, float Bemf, float Ktau) //
     PID_config_friction(&o->trqPID, Bemf, Ktau);
 }
 
-void Motor_calibrate(Motor* o, int32_t offset) //
+void Motor_calibrate_withOffset(Motor* o, int32_t offset) //
 {
     o->pos_calib_offset = offset;
     
     //Motor_set_run(o);
+}
+
+void Motor_calibrate_moving2Hardstop(Motor* o, int32_t pwm, int32_t zero) //
+{
+    int16_t gearbox = 1;
+    o->pos_calib_offset = 0;
+    o->hardstop_calibdata.limited_pwm = pwm;
+    o->hardstop_calibdata.u.bits.hwlimitreached = 0;
+    o->hardstop_calibdata.u.bits.iscalibrating = 1;
+    o->hardstop_calibdata.last_pos = o->pos_fbk;
+    if(0 != o->GEARBOX)
+        gearbox  = o->GEARBOX; //to avoid to do a divition by zero ig gearbox is not configured correctly
+    
+    o->hardstop_calibdata.zero = zero/gearbox;
+    Motor_set_run(o);
+}
+#define MOTOR_HARDSTOP_WAITCALIBCOUNTER_MAX     1200
+#define MOTOR_POSSTABLE_COUNTER_MAX             20
+
+static void Motor_check_hardstopReached(Motor *o)
+{
+//if for 20 consecutive times (~20ms) I'm in the same position (but let the calibration start before...), it means that I reached the hardware limit
+
+    o->hardstop_calibdata.waitcalib_counter += 1;
+    if (o->hardstop_calibdata.waitcalib_counter > MOTOR_HARDSTOP_WAITCALIBCOUNTER_MAX)
+    {
+        if (o->pos_fbk == o->hardstop_calibdata.last_pos)
+        {
+            o->hardstop_calibdata.posStable_counter += 1;
+            if (o->hardstop_calibdata.posStable_counter == MOTOR_POSSTABLE_COUNTER_MAX)
+            {
+                o->hardstop_calibdata.posStable_counter = 0;
+                o->hardstop_calibdata.waitcalib_counter = 0;
+                o->hardstop_calibdata.u.bits.hwlimitreached = 1;
+            }
+        }
+        else
+        {
+           o->hardstop_calibdata.posStable_counter = 0;
+           o->hardstop_calibdata.last_pos = o->pos_fbk;
+        }
+    }
+}
+
+
+extern void Motor_do_calibration(Motor* o)
+{
+    if(0 == o->hardstop_calibdata.u.bits.iscalibrating)
+        return;
+    
+    Motor_check_hardstopReached(o);
+    if(o->hardstop_calibdata.u.bits.hwlimitreached)
+    {
+        o->output = 0;
+        o->pos_calib_offset = o->pos_fbk - o->hardstop_calibdata.zero;
+        o->not_calibrated = FALSE;
+        Motor_hardStopCalbData_reset(o);
+    }
+    else
+    {
+         o->output = o->hardstop_calibdata.limited_pwm;
+    }
+
 }
 
 void Motor_set_run(Motor* o) //

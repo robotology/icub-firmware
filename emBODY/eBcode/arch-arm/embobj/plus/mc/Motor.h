@@ -98,6 +98,26 @@ typedef struct //State2FocMsg
     
 } State2FocMsg;
 
+typedef struct //HardStopCalibData
+{
+    union
+    {
+        struct
+        {
+            unsigned iscalibrating   :1;
+            unsigned hwlimitreached  :1;
+            unsigned unused          :6;
+        } bits;
+        uint8_t bitmask;
+    }u;
+    uint8_t posStable_counter;
+    uint16_t waitcalib_counter;
+    int32_t limited_pwm;
+    int32_t last_pos;
+    int32_t zero;
+    
+} HardStopCalibData;
+
 typedef struct //Motor
 {
     // consts
@@ -173,6 +193,7 @@ typedef struct //Motor
     icubCanProto_controlmode_t  control_mode_req;
     WatchDog control_mode_req_wdog;
 
+    HardStopCalibData hardstop_calibdata;
     // 2FOC specific data
     
     WatchDog can_2FOC_alive_wdog;
@@ -190,7 +211,8 @@ extern void Motor_destroy(Motor* o); //
 extern void Motor_config_trqPID(Motor* o, eOmc_PID_t* pid); //
 extern void Motor_config_filter(Motor* o, uint8_t filter); //
 extern void Motor_config_friction(Motor* o, float Bemf, float Ktau); //
-extern void Motor_calibrate(Motor* o, int32_t offset); //
+extern void Motor_calibrate_withOffset(Motor* o, int32_t offset); //
+extern void Motor_calibrate_moving2Hardstop(Motor* o, int32_t pwm, int32_t zero); //
 
 extern void Motor_set_run(Motor* o); //
 extern void Motor_set_idle(Motor* o); //
@@ -203,6 +225,7 @@ extern BOOL Motor_check_faults(Motor* o); //
 extern CTRL_UNITS Motor_do_trq_control(Motor* o, CTRL_UNITS trq_ref, CTRL_UNITS trq_fbk); //
 extern void Motor_update_state_fbk(Motor* o, void* state_msg); //
 extern void Motor_update_odometry_fbk_can(Motor* o, CanOdometry2FocMsg* data); //
+extern void Motor_do_calibration(Motor* o); //
 
 extern void Motor_actuate(Motor* o, uint8_t N); //
 

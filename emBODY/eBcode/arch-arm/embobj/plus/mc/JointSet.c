@@ -285,6 +285,11 @@ static void JointSet_do_wait_calibration(JointSet* o);
 
 void JointSet_do(JointSet* o)
 {
+    if(eomc_controlmode_notConfigured == o->control_mode)
+    {
+        //devo aggiornare dati encoder e specificare pmw output =0???
+        return;
+    }
     if (o->is_calibrated)
     {            
         JointSet_do_odometry(o);
@@ -297,12 +302,12 @@ void JointSet_do(JointSet* o)
     {
         JointSet_do_wait_calibration(o);
         
-        for (int ms=0; ms<*(o->pN); ++ms)
-        {
-            int m = o->motors_of_set[ms];
-            
-            o->motor[m].output = 0;
-        }
+//        for (int ms=0; ms<*(o->pN); ++ms)
+//        {
+//            int m = o->motors_of_set[ms];
+//            
+//            o->motor[m].output = 0;
+//        } spostato dentro la motor do calibration
     }
 }
 
@@ -656,17 +661,29 @@ static void JointSet_do_wait_calibration(JointSet* o)
 {
     int N = *(o->pN);
     
+    o->is_calibrated = TRUE;
+    
     for (int ms=0; ms<N; ++ms)
     {
-        if (!Motor_is_calibrated(o->motor+o->motors_of_set[ms])) return;
+        if (!Motor_is_calibrated(o->motor+o->motors_of_set[ms])) 
+        {
+            o->is_calibrated = FALSE;
+            Motor_do_calibration(o->motor+o->motors_of_set[ms]);
+        }
     }
+    
+    if(!o->is_calibrated) return;
     
     for (int es=0; es<N; ++es)
     {
-        if (!AbsEncoder_is_calibrated(o->absEncoder+o->encoders_of_set[es])) return;
+        if (!AbsEncoder_is_calibrated(o->absEncoder+o->encoders_of_set[es])) 
+        {
+            o->is_calibrated = FALSE;
+            return;
+        }
     }
     
-    o->is_calibrated = TRUE;
+    
     
     o->control_mode = eomc_controlmode_idle;
 
@@ -693,11 +710,14 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
     {
         case eomc_calibration_type3_abs_sens_digital:
             AbsEncoder_calibrate(o->absEncoder+e, calibrator->params.type3.offset, calibrator->params.type3.calibrationZero);
-            Motor_calibrate(o->motor+e, 0);
+            Motor_calibrate_withOffset(o->motor+e, 0);
             //AbsEncoder_calibrate(o->absEncoder+e, 0, 0);
             //Motor_calibrate(o->motor+e, calibrator->params.type3.offset);
             break;
-        
+        case eomc_calibration_type5_hard_stops_mc4plus:
+            AbsEncoder_calibrate(o->absEncoder+e, 0, 0);
+            Motor_calibrate_moving2Hardstop(o->motor+e, calibrator->params.type5.pwmlimit, calibrator->params.type5.calibrationZero);
+            break;
         default:
             break;
     }

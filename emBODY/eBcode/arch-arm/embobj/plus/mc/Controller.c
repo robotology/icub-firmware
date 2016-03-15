@@ -47,7 +47,7 @@ MController* MController_new(uint8_t nJoints) //
     o->joint = Joint_new(nJoints);
     o->motor = Motor_new(nJoints); 
     
-    o->absEncoder = NEW(AbsEncoder, nJoints);
+    o->absEncoder = AbsEncoder_new(nJoints);
     
     o->Jjm = NEW(float*, nJoints);
     o->Jmj = NEW(float*, nJoints);
