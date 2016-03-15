@@ -105,7 +105,7 @@ void AbsEncoder_calibrate(AbsEncoder* o, int32_t offset, int32_t zero)
 
 int32_t AbsEncoder_position(AbsEncoder* o)
 {
-    return o->sign*o->distance - o->zero;
+    return o->sign*o->distance;// - o->zero;
 }
 
 int32_t AbsEncoder_velocity(AbsEncoder* o)
@@ -115,7 +115,7 @@ int32_t AbsEncoder_velocity(AbsEncoder* o)
 
 void AbsEncoder_posvel(AbsEncoder* o, int32_t* position, int32_t* velocity)
 {
-    *position = o->sign*o->distance - o->zero;
+    *position = o->sign*o->distance;// - o->zero;
     *velocity = o->sign*o->velocity;
 }
 
@@ -205,7 +205,7 @@ void AbsEncoder_invalid(AbsEncoder* o, hal_spiencoder_errors_flags error_flags)
     o->valid_first_data_cnt = 0;
 }
 
-int32_t AbsEncoder_update(AbsEncoder* o, int16_t position)
+int32_t AbsEncoder_update(AbsEncoder* o, int32_t position)
 {
     if (!o) return 0;
         
@@ -216,7 +216,16 @@ int32_t AbsEncoder_update(AbsEncoder* o, int16_t position)
     if (o->state.bits.not_calibrated) return 0;
     
     position -= o->offset;
-        
+    
+    if (position<0)
+    {
+        position += 65536L;
+    }
+    else if (position>=65536L)
+    {
+        position -= 65536L;
+    }
+    
     o->invalid_cnt = 0;
     o->timeout_cnt = 0;
     
@@ -229,23 +238,29 @@ int32_t AbsEncoder_update(AbsEncoder* o, int16_t position)
         return o->sign*o->distance;
     }
     
-    int16_t check = position - o->position_last;
+    int32_t check = position - o->position_last;
         
+    while (check> 32768L) check-=65536L;
+    while (check<-32768L) check+=65536L;
+    
     o->position_last = position;
 
     if (-o->spike_mag_limit <= check && check <= o->spike_mag_limit)
     {
-        int16_t delta = position - o->position_sure;
-            
+        int32_t delta = position - o->position_sure;
+         
+        while (delta> 32768L) delta-=65536L;
+        while (delta<-32768L) delta+=65536L;
+        
         if (delta)
         {
             o->position_sure = position;
                 
             o->delta = delta;
                 
-            o->distance += delta;
+            o->distance += o->delta;
                 
-            o->velocity = (7*o->velocity + ((int32_t)CTRL_LOOP_FREQUENCY)*delta) >> 3;
+            o->velocity = (7*o->velocity + ((int32_t)CTRL_LOOP_FREQUENCY)*o->delta) >> 3;
         }
         else
         {
