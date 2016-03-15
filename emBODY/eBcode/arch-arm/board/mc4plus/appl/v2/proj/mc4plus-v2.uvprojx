@@ -10,13 +10,10 @@
       <TargetName>mc4plus</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>5060061::V5.06 update 1 (build 61)::ARMCC</pCCUsed>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32F407IG</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F4xx_DFP.2.6.0</PackID>
-          <PackURL>http://www.keil.com/pack</PackURL>
           <Cpu>IRAM(0x20000000-0x2001FFFF) IRAM2(0x10000000-0x1000FFFF) IROM(0x8000000-0x80FFFFF) CLOCK(25000000) CPUTYPE("Cortex-M4") FPU2</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile>"Startup\ST\STM32F4xx\startup_stm32f4xx.s" ("STM32F4xx Startup Code")</StartupFile>
@@ -85,8 +82,6 @@
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
-            <nStopA1X>0</nStopA1X>
-            <nStopA2X>0</nStopA2X>
           </AfterMake>
           <SelectedForBatchBuild>0</SelectedForBatchBuild>
           <SVCSIdString></SVCSIdString>
@@ -148,6 +143,7 @@
             <RestoreToolbox>1</RestoreToolbox>
             <RestoreTracepoints>0</RestoreTracepoints>
             <RestoreSysVw>1</RestoreSysVw>
+            <UsePdscDebugDescription>1</UsePdscDebugDescription>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>7</TargetSelection>
@@ -230,7 +226,6 @@
             <useUlib>0</useUlib>
             <EndSel>0</EndSel>
             <uLtcg>0</uLtcg>
-            <nSecure>0</nSecure>
             <RoSelD>3</RoSelD>
             <RwSelD>5</RwSelD>
             <CodeSel>0</CodeSel>
@@ -365,10 +360,6 @@
             <uSurpInc>1</uSurpInc>
             <uC99>1</uC99>
             <useXO>0</useXO>
-            <v6Lang>0</v6Lang>
-            <v6LangP>0</v6LangP>
-            <vShortEn>0</vShortEn>
-            <vShortWch>0</vShortWch>
             <VariousControls>
               <MiscControls>-DUSE_MC4PLUS</MiscControls>
               <Define>ICUB_MEC_V3 MC4PLUS_APPL_V2</Define>
@@ -937,10 +928,6 @@
                 <uSurpInc>2</uSurpInc>
                 <uC99>2</uC99>
                 <useXO>2</useXO>
-                <v6Lang>0</v6Lang>
-                <v6LangP>0</v6LangP>
-                <vShortEn>0</vShortEn>
-                <vShortWch>0</vShortWch>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -969,34 +956,92 @@
           </GroupOption>
           <Files>
             <File>
-              <FileName>EOaxisController.c</FileName>
+              <FileName>AbsEncoder.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\mc\EOaxisController.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\mc\AbsEncoder.c</FilePath>
             </File>
             <File>
-              <FileName>EOdecoupler.c</FileName>
+              <FileName>Controller.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\mc\EOdecoupler.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\mc\Controller.c</FilePath>
             </File>
             <File>
-              <FileName>EOemsController.c</FileName>
+              <FileName>EOemsControllerCfg.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\mc\EOemsController.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\mc\EOemsControllerCfg.c</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds>
+                  <Cads>
+                    <interw>2</interw>
+                    <Optim>0</Optim>
+                    <oTime>2</oTime>
+                    <SplitLS>2</SplitLS>
+                    <OneElfS>2</OneElfS>
+                    <Strict>2</Strict>
+                    <EnumInt>2</EnumInt>
+                    <PlainCh>2</PlainCh>
+                    <Ropi>2</Ropi>
+                    <Rwpi>2</Rwpi>
+                    <wLevel>2</wLevel>
+                    <uThumb>2</uThumb>
+                    <uSurpInc>2</uSurpInc>
+                    <uC99>2</uC99>
+                    <useXO>2</useXO>
+                    <VariousControls>
+                      <MiscControls></MiscControls>
+                      <Define></Define>
+                      <Undefine></Undefine>
+                      <IncludePath></IncludePath>
+                    </VariousControls>
+                  </Cads>
+                </FileArmAds>
+              </FileOption>
             </File>
             <File>
-              <FileName>EOpid.c</FileName>
+              <FileName>Joint.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\mc\EOpid.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\mc\Joint.c</FilePath>
             </File>
             <File>
-              <FileName>EOspeedmeter.c</FileName>
+              <FileName>JointSet.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\mc\EOspeedmeter.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\mc\JointSet.c</FilePath>
             </File>
             <File>
-              <FileName>EOtrajectory.c</FileName>
+              <FileName>Motor.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\mc\EOtrajectory.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\mc\Motor.c</FilePath>
+            </File>
+            <File>
+              <FileName>Pid.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\embobj\plus\mc\Pid.c</FilePath>
+            </File>
+            <File>
+              <FileName>Trajectory.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\embobj\plus\mc\Trajectory.c</FilePath>
+            </File>
+            <File>
+              <FileName>WatchDog.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\embobj\plus\mc\WatchDog.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1281,10 +1326,6 @@
                 <uSurpInc>2</uSurpInc>
                 <uC99>2</uC99>
                 <useXO>2</useXO>
-                <v6Lang>0</v6Lang>
-                <v6LangP>0</v6LangP>
-                <vShortEn>0</vShortEn>
-                <vShortWch>0</vShortWch>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -1390,8 +1431,6 @@
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
-            <nStopA1X>0</nStopA1X>
-            <nStopA2X>0</nStopA2X>
           </AfterMake>
           <SelectedForBatchBuild>0</SelectedForBatchBuild>
           <SVCSIdString></SVCSIdString>
@@ -1453,6 +1492,7 @@
             <RestoreToolbox>1</RestoreToolbox>
             <RestoreTracepoints>0</RestoreTracepoints>
             <RestoreSysVw>1</RestoreSysVw>
+            <UsePdscDebugDescription>1</UsePdscDebugDescription>
           </Target>
           <RunDebugAfterBuild>0</RunDebugAfterBuild>
           <TargetSelection>7</TargetSelection>
@@ -1535,7 +1575,6 @@
             <useUlib>0</useUlib>
             <EndSel>0</EndSel>
             <uLtcg>0</uLtcg>
-            <nSecure>0</nSecure>
             <RoSelD>3</RoSelD>
             <RwSelD>5</RwSelD>
             <CodeSel>0</CodeSel>
@@ -1670,10 +1709,6 @@
             <uSurpInc>1</uSurpInc>
             <uC99>1</uC99>
             <useXO>0</useXO>
-            <v6Lang>0</v6Lang>
-            <v6LangP>0</v6LangP>
-            <vShortEn>0</vShortEn>
-            <vShortWch>0</vShortWch>
             <VariousControls>
               <MiscControls>-DUSE_MC4PLUS</MiscControls>
               <Define>NOT_ICUB_GENOVA04 ICUB_DARMSTADT01 USE_PROTO_PROXY</Define>
@@ -2210,34 +2245,49 @@
           <GroupName>eo-motor-controller</GroupName>
           <Files>
             <File>
-              <FileName>EOaxisController.c</FileName>
+              <FileName>AbsEncoder.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\mc\EOaxisController.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\mc\AbsEncoder.c</FilePath>
             </File>
             <File>
-              <FileName>EOdecoupler.c</FileName>
+              <FileName>Controller.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\mc\EOdecoupler.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\mc\Controller.c</FilePath>
             </File>
             <File>
-              <FileName>EOemsController.c</FileName>
+              <FileName>EOemsControllerCfg.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\mc\EOemsController.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\mc\EOemsControllerCfg.c</FilePath>
             </File>
             <File>
-              <FileName>EOpid.c</FileName>
+              <FileName>Joint.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\mc\EOpid.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\mc\Joint.c</FilePath>
             </File>
             <File>
-              <FileName>EOspeedmeter.c</FileName>
+              <FileName>JointSet.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\mc\EOspeedmeter.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\mc\JointSet.c</FilePath>
             </File>
             <File>
-              <FileName>EOtrajectory.c</FileName>
+              <FileName>Motor.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\mc\EOtrajectory.c</FilePath>
+              <FilePath>..\..\..\..\..\embobj\plus\mc\Motor.c</FilePath>
+            </File>
+            <File>
+              <FileName>Pid.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\embobj\plus\mc\Pid.c</FilePath>
+            </File>
+            <File>
+              <FileName>Trajectory.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\embobj\plus\mc\Trajectory.c</FilePath>
+            </File>
+            <File>
+              <FileName>WatchDog.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\embobj\plus\mc\WatchDog.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2522,10 +2572,6 @@
                 <uSurpInc>2</uSurpInc>
                 <uC99>2</uC99>
                 <useXO>2</useXO>
-                <v6Lang>0</v6Lang>
-                <v6LangP>0</v6LangP>
-                <vShortEn>0</vShortEn>
-                <vShortWch>0</vShortWch>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
