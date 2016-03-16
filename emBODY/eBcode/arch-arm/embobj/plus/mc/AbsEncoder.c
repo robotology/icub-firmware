@@ -105,7 +105,7 @@ void AbsEncoder_calibrate(AbsEncoder* o, int32_t offset, int32_t zero)
 
 int32_t AbsEncoder_position(AbsEncoder* o)
 {
-    return o->sign*o->distance;// - o->zero;
+    return o->sign*(o->distance + o->zero);
 }
 
 int32_t AbsEncoder_velocity(AbsEncoder* o)
@@ -115,7 +115,7 @@ int32_t AbsEncoder_velocity(AbsEncoder* o)
 
 void AbsEncoder_posvel(AbsEncoder* o, int32_t* position, int32_t* velocity)
 {
-    *position = o->sign*o->distance;// - o->zero;
+    *position = o->sign*(o->distance + o->zero);
     *velocity = o->sign*o->velocity;
 }
 
@@ -205,15 +205,15 @@ void AbsEncoder_invalid(AbsEncoder* o, hal_spiencoder_errors_flags error_flags)
     o->valid_first_data_cnt = 0;
 }
 
-int32_t AbsEncoder_update(AbsEncoder* o, int32_t position)
+void AbsEncoder_update(AbsEncoder* o, int32_t position)
 {
-    if (!o) return 0;
+    if (!o) return;
         
-    if (o->fake) return 0;
+    if (o->fake) return;
     
-    if (o->state.bits.not_configured) return 0;
+    if (o->state.bits.not_configured) return;
     
-    if (o->state.bits.not_calibrated) return 0;
+    if (o->state.bits.not_calibrated) return;
     
     position -= o->offset;
     
@@ -235,7 +235,7 @@ int32_t AbsEncoder_update(AbsEncoder* o, int32_t position)
         
         o->velocity = 0;
         
-        return o->sign*o->distance;
+        return;
     }
     
     int32_t check = position - o->position_last;
@@ -300,15 +300,13 @@ int32_t AbsEncoder_update(AbsEncoder* o, int32_t position)
             o->spike_cnt = 0;
         }
     }
-    
-    return o->sign*o->distance;
 }
 
 void AbsEncoder_overwrite(AbsEncoder* o, int32_t position, int32_t velocity)
 {
     if (!o->fake) return;
     
-    o->distance = position + o->offset;
+    o->distance = position - o->offset;
     o->velocity = velocity;
 }
 
