@@ -977,7 +977,8 @@ extern eOresult_t eo_motioncontrol_Tick(EOtheMotionController *p)
                     error_mask |= 1<<(i<<1);
                     //encvalue[enc] = (uint32_t)ENC_INVALID;
                 }
-            }        
+            } 
+            // eo_encoderreader_Diagnostics_Tick(p->mcfoc.theencoderreader);           
         }
         else
         {
