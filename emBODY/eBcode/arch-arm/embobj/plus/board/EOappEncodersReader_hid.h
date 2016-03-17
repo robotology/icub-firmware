@@ -35,6 +35,9 @@
 
 
 #include "hal_spiencoder.h"
+#include "hal_gpio.h"
+#include "EOtheLEDpulser.h"
+
 
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
@@ -68,6 +71,26 @@ typedef struct
 } eOappEncReader_stream_t;
 
 
+
+enum { AEAerror_NONE = 0,  AEAerror_SPI = 1, AEAerror_CRC = 2, AEAerror_CHIP = 3 }; // it goes inside each nibble of par16 
+typedef struct
+{   // so far only for AEA and primary encoder
+    uint8_t             jomomask;
+    uint32_t            periodOKreport;
+    uint32_t            periodKOreport;
+    eOledpulser_led_t   errorled;
+    hal_gpio_t          errorgpio;   
+} eo_appEncReader_diagnostics_cfg_t;
+
+
+typedef struct
+{   // so far only for AEA and primary encoder
+    eo_appEncReader_diagnostics_cfg_t       config;
+    uint64_t                                par64;
+    uint16_t                                par16;
+} eo_appEncReader_diagnostics_t;
+
+
 struct EOappEncReader_hid
 {
     eObool_t                                initted;
@@ -76,6 +99,7 @@ struct EOappEncReader_hid
     const hal_spiencoder_stream_map_t*      stream_map;
     eOappEncReader_cfg_t                    config;       
     eOappEncReader_stream_t                 SPI_streams[hal_spiencoder_streams_number];  // SPI streams; must be coherent with what inside cfg
+    eo_appEncReader_diagnostics_t           diagnostics;
 }; 
 
 

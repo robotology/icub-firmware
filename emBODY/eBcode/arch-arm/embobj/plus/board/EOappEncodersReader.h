@@ -91,6 +91,10 @@ extern eObool_t eo_appEncReader_isReady(EOappEncReader *p);
 // if eo_appEncReader_GetValue() has an error return value in runtime, then the primary and secondary values contains a value from eOappEncReader_errortype_t
 extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint32_t *primaryvalue, uint32_t *secondaryvalue, hal_spiencoder_errors_flags *flags);
 
+extern eOresult_t eo_appEncReader_Diagnostics_Enable(EOappEncReader *p, eObool_t on);
+
+extern eOresult_t eo_appEncReader_Diagnostics_Tick(EOappEncReader *p);
+
 
 /** @}            
     end of group eo_app_encodersReader

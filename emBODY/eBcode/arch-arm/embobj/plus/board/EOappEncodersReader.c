@@ -42,6 +42,9 @@
 #include "EOtheEntities.h"
 #include "EOconstarray.h"
 
+#include "EoError.h"
+#include "EOtheErrorManager.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -121,6 +124,10 @@ static uint32_t s_eo_read_mais_for_port(EOappEncReader *p, uint8_t port);
 static hal_spiencoder_type_t s_eo_appEncReader_map_encodertype_to_halspiencodertype(eOmn_serv_mc_sensor_type_t encodertype);
 
 
+
+static eOresult_t s_eo_appEncReader_Diagnostics_Config(EOappEncReader *p, eo_appEncReader_diagnostics_cfg_t* cfg);
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
@@ -133,7 +140,20 @@ static EOappEncReader s_eo_theappencreader =
     .totalnumberofencoders  = 0,
     .stream_map             = NULL,
     .config                 = {0},
-    .SPI_streams            = {{.type = hal_spiencoder_typeNONE, .numberof = 0, .maxsupported = 0, .isacquiring = eobool_false, .id = {hal_spiencoderNONE}}}
+    .SPI_streams            = {{.type = hal_spiencoder_typeNONE, .numberof = 0, .maxsupported = 0, .isacquiring = eobool_false, .id = {hal_spiencoderNONE}}},
+    .diagnostics            =
+    {
+        .config = 
+        {
+            .jomomask       = 0,
+            .periodOKreport = 0,
+            .periodKOreport = 0,
+            .errorled       = eo_ledpulser_led_none,
+            .errorgpio      = { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE }
+        },
+        .par64              = 0,
+        .par16              = 0
+    }
 };
 
 
@@ -290,6 +310,75 @@ extern eOresult_t eo_appEncReader_StartRead(EOappEncReader *p)
 }
 
 
+extern eOresult_t eo_appEncReader_Diagnostics_Enable(EOappEncReader *p, eObool_t on)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    eo_appEncReader_diagnostics_cfg_t config =
+    {
+        .jomomask = 0x0f,
+        .periodOKreport = 0,
+        .periodKOreport = 1,
+        //.errorled = eo_ledpulser_led_five,
+        //.errorgpio = { .port = hal_gpio_portC, .pin = hal_gpio_pin13 }  
+        .errorled = eo_ledpulser_led_none,
+        .errorgpio = { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE }          
+    };
+    
+    if(eobool_false == on)
+    {
+        config.jomomask = 0;
+        config.periodKOreport = 0;
+        config.periodOKreport = 0;
+    }
+
+    return(s_eo_appEncReader_Diagnostics_Config(p, &config));    
+}
+
+
+extern eOresult_t eo_appEncReader_Diagnostics_Tick(EOappEncReader *p)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    if(0 != p->diagnostics.config.jomomask)
+    {
+        eOerrmanDescriptor_t errdes = {0};
+        
+        if(0 != p->diagnostics.par16)
+        {   // we have something wrong to signal
+            
+            // the gpio is put on and it stays on forever, no matter what.
+            hal_gpio_setval(p->diagnostics.config.errorgpio, hal_gpio_valHIGH);  
+            
+            // the led is made pulsing once for 100 ms. we pulse again only if the situation stays wrong
+            if(eobool_false == eo_ledpulser_IsOn(eo_ledpulser_GetHandle(), p->diagnostics.config.errorled))
+            {
+                eo_ledpulser_Start(eo_ledpulser_GetHandle(), p->diagnostics.config.errorled, eok_reltime100ms, 1);
+            }
+            
+            // we transmit a diagnostics message
+            errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag07);
+            errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+            errdes.sourceaddress    = 0;
+            errdes.par16            = p->diagnostics.par16;
+            errdes.par64            = p->diagnostics.par64;
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, NULL, &errdes);                        
+        }
+        
+        // reset par16 / par64
+        p->diagnostics.par16 = 0;
+        p->diagnostics.par64 = 0;     
+        
+    }
+    
+    return(eores_OK);
+}
 
 extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint32_t *primaryvalue, uint32_t *secondaryvalue, hal_spiencoder_errors_flags *flags)
 {    
@@ -297,6 +386,8 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint
     {
         return(eores_NOK_nullpointer);
     }
+    
+//    eOerrmanDescriptor_t errdes = {0};
     
     hal_spiencoder_position_t val_raw = 0; // marco.accame: it should be is a hal_spiencoder_position_t 
     eOresult_t res1 = eores_OK;
@@ -311,11 +402,25 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint
         {
             case eomn_serv_mc_sensor_encoder_aea:
             {
+                eObool_t evaldiagnostics = eo_common_byte_bitcheck(p->diagnostics.config.jomomask, jomo);
 
                 res1 = (eOresult_t)hal_spiencoder_get_value((hal_spiencoder_t)this_jomoconfig.primary.port, &val_raw, flags);
                 
                 if(eores_OK != res1)
                 {
+                    if(eobool_true == evaldiagnostics)
+                    {   // i assume someone has reset the bits previously
+                        p->diagnostics.par16 |= (AEAerror_SPI<<(4*jomo));       // shift by nibbles ..
+                        p->diagnostics.par64 |= (0xffff<<(16*jomo));            // shift by two bytes                   
+                    }                    
+                                        
+//                    errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag07);
+//                    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+//                    errdes.sourceaddress    = 0;
+//                    errdes.par16            = jomo;
+//                    errdes.par64            = 0x666;
+//                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &errdes);
+                    
                     *primaryvalue = (uint32_t)err_onReadFromSpi;
                     return((eOresult_t)res1);
                 }
@@ -324,6 +429,29 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint
                 {
                     *primaryvalue = (eOappEncReader_errortype_t)errortype;  
                     flags->data_error = 1;
+                                       
+                    if(eobool_true == evaldiagnostics)
+                    {
+                        if(err_onParityError == errortype)
+                        {   // i assume someone has reset the bits previously
+                            p->diagnostics.par16 |= (AEAerror_CRC<<(4*jomo));       // shift by nibbles ..
+                            p->diagnostics.par64 &= (0xe000<<(16*jomo));            // shift by two bytes   
+                        }
+                        else
+                        {   // i assume someone has reset the bits previously
+                            uint16_t value = (val_raw >> 6) & 0x0FFF;
+                            p->diagnostics.par16 |= (AEAerror_CHIP<<(4*jomo));      // shift by nibbles ..
+                            p->diagnostics.par64 &= (value<<(16*jomo));             // shift by two bytes                               
+                        }
+                    }
+                    
+//                    errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag07);
+//                    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+//                    errdes.sourceaddress    = 0;
+//                    errdes.par16            = jomo;
+//                    errdes.par64            = (err_onParityError == errortype) ? (0x777) : (0x888);
+//                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &errdes);                    
+
                     return(eores_NOK_generic);
                 }
 
@@ -1211,6 +1339,33 @@ static hal_spiencoder_type_t s_eo_appEncReader_map_encodertype_to_halspiencodert
     
     return(ret);
 }
+
+
+static eOresult_t s_eo_appEncReader_Diagnostics_Config(EOappEncReader *p, eo_appEncReader_diagnostics_cfg_t* cfg)
+{
+    if((NULL == p) || (NULL == cfg))
+    {
+        return(eores_NOK_nullpointer);
+    }
+
+    memcpy(&p->diagnostics.config, cfg, sizeof(eo_appEncReader_diagnostics_cfg_t));
+    if(eo_ledpulser_led_none != p->diagnostics.config.errorled)
+    {
+        eo_ledpulser_Off(eo_ledpulser_GetHandle(), p->diagnostics.config.errorled);       
+    }
+    
+    if((hal_gpio_portNONE != p->diagnostics.config.errorgpio.port) && (hal_gpio_pinNONE != p->diagnostics.config.errorgpio.pin))
+    {
+        hal_gpio_init(p->diagnostics.config.errorgpio, NULL); // NULL forces it to be output ...
+        hal_gpio_setval(p->diagnostics.config.errorgpio, hal_gpio_valLOW);      
+    }  
+
+    p->diagnostics.par16 = 0;
+    p->diagnostics.par64 = 0;    
+    
+    return(eores_OK);
+}
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
