@@ -87,6 +87,8 @@ extern eObool_t eo_encoderreader_IsReadingAvailable(EOtheEncoderReader *p);
 
 extern eOresult_t eo_encoderreader_Read(EOtheEncoderReader *p, uint8_t position, uint32_t *primary, uint32_t *secondary, hal_spiencoder_errors_flags *errors);
 
+extern eOresult_t eo_encoderreader_Diagnostics_Tick(EOtheEncoderReader* p);
+
 
 
 /** @}            

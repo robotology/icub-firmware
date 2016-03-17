@@ -319,6 +319,10 @@ extern eObool_t eo_encoderreader_IsReadingAvailable(EOtheEncoderReader *p)
     return(res);
 }
 
+extern eOresult_t eo_encoderreader_Diagnostics_Tick(EOtheEncoderReader* p)
+{
+    return(eo_appEncReader_Diagnostics_Tick(s_eo_theencoderreader.reader));    
+}
 
 
 extern eOresult_t eo_encoderreader_Read(EOtheEncoderReader *p, uint8_t position, uint32_t *primary, uint32_t *secondary, hal_spiencoder_errors_flags *errors)
@@ -431,10 +435,6 @@ static void s_eo_encodereader_send_periodic_error_report(void *p)
 }
 
 
-
-
-
-
 static void s_eo_encoderreader_init_ereader(const eOmn_serv_arrayof_4jomodescriptors_t * jomodes, eOcallback_t callback, void* arg)
 {   
     memcpy(&s_eo_theencoderreader.arrayofjomodes, jomodes, sizeof(eOmn_serv_arrayof_4jomodescriptors_t));
@@ -446,6 +446,9 @@ static void s_eo_encoderreader_init_ereader(const eOmn_serv_arrayof_4jomodescrip
 
     
     eo_appEncReader_Activate(s_eo_theencoderreader.reader, &s_eo_theencoderreader.arrayofjomodes);    
+    
+    // to enable the diagnostics ... use on equal to eobool_true
+    eo_appEncReader_Diagnostics_Enable(s_eo_theencoderreader.reader, eobool_false);
 }
 
 
