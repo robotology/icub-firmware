@@ -64,7 +64,8 @@ typedef enum
     hal_led4 = 4,         
     hal_led5 = 5,
 	hal_led6 = 6,
-    hal_led7 = 7
+    hal_led7 = 7,
+    hal_ledNONE = hal_NA08
 } hal_led_t;
 
 enum { hal_leds_number = 8 };
