@@ -340,8 +340,41 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         
         o->jointSet[1].MOTOR_CONTROL_TYPE = VEL_CONTROLLED_MOTOR;
         o->jointSet[1].CAN_DO_TRQ_CTRL = TRUE;
+        
+        o->jointSet[0].special_constraint = TRIFID_CONSTRAINT;
+        o->jointSet[0].special_limit = WAIST_TRIFID_LIMIT;
     
         break;
+        
+    case emscontroller_board_CER_WRIST:               //= 12,   //MC4plus
+        o->nSets   = 2;
+
+        o->j2s[0] = o->m2s[0] = o->e2s[0] = 0;
+        o->j2s[1] = o->m2s[1] = o->e2s[1] = 1;
+        o->j2s[2] = o->m2s[2] = o->e2s[2] = 1;
+        o->j2s[3] = o->m2s[3] = o->e2s[3] = 1;
+        
+        for (int k = 1; k<4; ++k)
+        {
+            o->joint[k].CAN_DO_TRQ_CTRL = FALSE;
+            o->joint[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
+            o->motor[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
+        }
+        
+        o->joint[0].CAN_DO_TRQ_CTRL = TRUE;
+        o->joint[0].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
+        o->motor[0].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
+        
+        o->jointSet[0].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
+        o->jointSet[0].CAN_DO_TRQ_CTRL = TRUE;
+        
+        o->jointSet[1].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
+        o->jointSet[1].CAN_DO_TRQ_CTRL = FALSE;
+        
+        o->jointSet[0].special_constraint = TRIFID_CONSTRAINT;
+        o->jointSet[0].special_limit = WRIST_TRIFID_LIMIT;
+        break;
+        
 	case emscontroller_board_CER_BASE:                //= 21    //2FOC
     {
         o->nSets   = 4;
@@ -373,8 +406,6 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         break;
     case emscontroller_board_FOREARM:                 //= 11,   //MC4plus
         break;
-    case emscontroller_board_CER_WRIST:               //= 12,   //MC4plus
-        break;
     default:
         return;
     }
@@ -405,11 +436,6 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
 
         o->jos[s][(o->set_dim[s])++] = j;
     }
-
-    //for (int j=0; j<o->nJoints; ++j)
-    //{
-    //    o->e2s[j] = o->j2s[j]; 
-    //}
     
     for (int s=0; s<o->nSets; ++s)
     {

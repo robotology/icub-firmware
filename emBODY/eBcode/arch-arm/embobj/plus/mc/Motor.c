@@ -609,22 +609,74 @@ void Motor_actuate(Motor* motor, uint8_t N) //
 /////////////////////////////////////////////////////////
 
 void Motor_set_pwm_ref(Motor* o, int32_t pwm_ref)
-{ 
-    o->output = o->pwm_ref = CUT(pwm_ref, o->pwm_max);
+{
+    if (o->pos_min != o->pos_max)
+    {        
+        if ((o->pos_fbk < o->pos_min) && (pwm_ref < 0))
+        {
+            o->output = o->pwm_ref = 0;
+        }
+        else if ((o->pos_fbk > o->pos_max) && (pwm_ref > 0))
+        {
+            o->output = o->pwm_ref = 0;
+        }
+        else
+        {
+            o->output = o->pwm_ref = CUT(pwm_ref, o->pwm_max);
+        }
+    }
+    else
+    {
+        o->output = o->pwm_ref = CUT(pwm_ref, o->pwm_max);
+    }
 }
 
 void Motor_set_Iqq_ref(Motor* o, int32_t Iqq_ref)
-{ 
-    o->output = o->Iqq_ref = CUT(Iqq_ref, o->Iqq_max);
+{
+    if (o->pos_min != o->pos_max)
+    {        
+        if ((o->pos_fbk < o->pos_min) && (Iqq_ref < 0))
+        {
+            o->output = o->Iqq_ref = 0;
+        }
+        else if ((o->pos_fbk > o->pos_max) && (Iqq_ref > 0))
+        {
+            o->output = o->Iqq_ref = 0;
+        }
+        else
+        {
+            o->output = o->Iqq_ref = CUT(Iqq_ref, o->Iqq_max);
+        }
+    }
+    else
+    {
+        o->output = o->Iqq_ref = CUT(Iqq_ref, o->Iqq_max);
+    }
 }
 
-void Motor_set_vel_ref(Motor* o, int32_t vel_ref) 
+void Motor_set_vel_ref(Motor* o, int32_t vel_ref)
 {
-    o->vel_ref = vel_ref;
-    // TODOALE
-    //o->vel_ref = CUT(vel_ref, o->vel_max);
-    
-    o->output = (o->vel_ref * o->GEARBOX)/1000;
+    if (o->pos_min != o->pos_max)
+    {        
+        if ((o->pos_fbk < o->pos_min) && (vel_ref < 0))
+        {
+            o->output = o->vel_ref = 0;
+        }
+        else if ((o->pos_fbk > o->pos_max) && (vel_ref > 0))
+        {
+            o->output = o->vel_ref = 0;
+        }
+        else
+        {
+            o->vel_ref = vel_ref; // CUT(vel_ref, o->vel_max);
+            o->output = (o->vel_ref * o->GEARBOX)/1000;
+        }
+    }
+    else
+    {
+        o->vel_ref = vel_ref; // CUT(vel_ref, o->vel_max);
+        o->output = (o->vel_ref * o->GEARBOX)/1000;
+    }
 }
 
 /*

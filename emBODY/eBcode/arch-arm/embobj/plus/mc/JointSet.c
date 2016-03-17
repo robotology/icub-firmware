@@ -53,6 +53,8 @@ void JointSet_init(JointSet* o) //
     o->CAN_DO_TRQ_CTRL = TRUE;
     
     o->is_calibrated = FALSE;
+    
+    o->special_constraint = NO_CONSTRAINT;
 }
 
 void JointSet_config //
@@ -438,6 +440,47 @@ void JointSet_set_interaction_mode(JointSet* o, eOmc_interactionmode_t interacti
 //////////////////////////////////////////////////////////////////////////
 // statics
 
+static void JointSet_manage_trifid_constraint(JointSet* o)
+{
+    int j0 = o->joints_of_set[0];
+    int j1 = o->joints_of_set[1];
+    int j2 = o->joints_of_set[2];
+
+    int m0 = o->motors_of_set[0];
+    int m1 = o->motors_of_set[1];
+    int m2 = o->motors_of_set[2];
+    
+    int32_t rho0 = o->joint[j0].pos_fbk;
+    int32_t rho1 = o->joint[j1].pos_fbk;
+    int32_t rho2 = o->joint[j2].pos_fbk;
+
+    if (rho0*rho0+rho1*rho1+rho2*rho2-rho0*rho1-rho1*rho2-rho2*rho0 < o->special_limit)
+    {
+        return;
+    }
+            
+    if ( !(rho0<=rho1 && rho0<=rho2 && o->motor[m0].output>=0) 
+      && !(rho0>=rho1 && rho0>=rho2 && o->motor[m0].output<=0))
+    {
+        o->motor[j0].output = 0;
+        Joint_stop(o->joint+j0);
+    }
+                
+    if ( !(rho1<=rho2 && rho1<=rho0 && o->motor[m1].output>=0) 
+      && !(rho1>=rho2 && rho1>=rho0 && o->motor[m1].output<=0))
+    {
+        o->motor[j1].output = 0;
+        Joint_stop(o->joint+j1);
+    }
+                
+    if ( !(rho2<=rho0 && rho2<=rho1 && o->motor[m2].output>=0) 
+      && !(rho2>=rho0 && rho2>=rho1 && o->motor[m2].output<=0))
+    {
+        o->motor[j2].output = 0;
+        Joint_stop(o->joint+j2);
+    }
+}
+
 static void JointSet_do_pwm_control(JointSet* o)
 {
     int N = *(o->pN);
@@ -568,6 +611,16 @@ static void JointSet_do_pwm_control(JointSet* o)
             }
         }
     }
+    
+    switch (o->special_constraint)
+    {
+        case TRIFID_CONSTRAINT:
+            JointSet_manage_trifid_constraint(o);
+            break;
+        
+        default:
+            break;
+    }
 }
 
 static void JointSet_do_vel_control(JointSet* o)
@@ -602,6 +655,16 @@ static void JointSet_do_vel_control(JointSet* o)
         {
             Motor_set_vel_ref(o->motor+m, 0);
         }
+    }
+    
+    switch (o->special_constraint)
+    {
+        case TRIFID_CONSTRAINT:
+            JointSet_manage_trifid_constraint(o);
+            break;
+        
+        default:
+            break;
     }
 }
 

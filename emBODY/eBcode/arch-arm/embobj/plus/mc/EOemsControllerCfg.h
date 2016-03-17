@@ -97,6 +97,12 @@ extern "C" {
 #define USE_FLOAT_CTRL_UNITS
 #define USE_SPEED_FBK_FROM_MOTORS
 
+#define NO_CONSTRAINT     0
+#define TRIFID_CONSTRAINT 3
+
+#define WAIST_TRIFID_LIMIT  400000
+#define WRIST_TRIFID_LIMIT 1130000
+
 #ifdef USE_FLOAT_CTRL_UNITS
     typedef float   CTRL_UNITS;
     #define ZERO 0.0f

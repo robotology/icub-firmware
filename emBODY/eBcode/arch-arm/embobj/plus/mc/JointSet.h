@@ -45,6 +45,10 @@ typedef struct // JointSet
     BOOL is_calibrated;
     
     BOOL external_fault;
+    
+    uint8_t special_constraint;
+    
+    int32_t special_limit;
 } JointSet;
 
 extern JointSet* JointSet_new(uint8_t n); //
