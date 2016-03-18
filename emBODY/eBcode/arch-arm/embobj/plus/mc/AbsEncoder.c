@@ -105,7 +105,7 @@ void AbsEncoder_calibrate(AbsEncoder* o, int32_t offset, int32_t zero)
 
 int32_t AbsEncoder_position(AbsEncoder* o)
 {
-    return o->sign*(o->distance + o->zero);
+    return o->sign*o->distance - o->zero;
 }
 
 int32_t AbsEncoder_velocity(AbsEncoder* o)
@@ -115,11 +115,11 @@ int32_t AbsEncoder_velocity(AbsEncoder* o)
 
 void AbsEncoder_posvel(AbsEncoder* o, int32_t* position, int32_t* velocity)
 {
-    *position = o->sign*(o->distance + o->zero);
+    *position = o->sign*o->distance - o->zero;
     *velocity = o->sign*o->velocity;
 }
 
-static void AbsEncoder_position_init(AbsEncoder* o, int16_t position)
+static void AbsEncoder_position_init(AbsEncoder* o, int32_t position)
 {
     if (!o) return;
     
@@ -239,18 +239,18 @@ void AbsEncoder_update(AbsEncoder* o, int32_t position)
     }
     
     int32_t check = position - o->position_last;
-        
-    while (check> 32768L) check-=65536L;
-    while (check<-32768L) check+=65536L;
+    
+    while (check<-32768) check+=65536;    
+    while (check> 32768) check-=65536;
     
     o->position_last = position;
 
     if (-o->spike_mag_limit <= check && check <= o->spike_mag_limit)
     {
         int32_t delta = position - o->position_sure;
-         
-        while (delta> 32768L) delta-=65536L;
-        while (delta<-32768L) delta+=65536L;
+
+        while (delta<-32768) delta+=65536;        
+        while (delta> 32768) delta-=65536;
         
         if (delta)
         {
