@@ -77,7 +77,7 @@ extern void MController_go_idle(void);
 extern void MController_get_joint_state(int j, eOmc_joint_status_t* joint_state);
 extern void MController_get_pid_state(int j, eOmc_joint_status_ofpid_t* pid_state, BOOL decoupled_pwm);
 extern void MController_get_motor_state(int m, eOmc_motor_status_t* motor_status);
-extern void MController_update_motor_pos_fbk(int m, int32_t position);
+extern void MController_update_motor_pos_fbk(int m, int32_t position_raw);
 extern void MController_update_motor_current_fbk(int m, int16_t current);
 extern void MController_config_motor_friction(int m, eOmc_motor_params_t* friction); //
 extern void MController_config_joint_impedance(int j, eOmc_impedance_t* impedance); //

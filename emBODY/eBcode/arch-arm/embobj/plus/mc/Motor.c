@@ -206,20 +206,22 @@ void Motor_calibrate_withOffset(Motor* o, int32_t offset) //
 
 void Motor_calibrate_moving2Hardstop(Motor* o, int32_t pwm, int32_t zero) //
 {
-    int16_t gearbox = 1;
+    Motor_hardStopCalbData_reset(o);
+    //int16_t gearbox = 1;
     o->pos_calib_offset = 0;
     o->hardstop_calibdata.limited_pwm = pwm;
     o->hardstop_calibdata.u.bits.hwlimitreached = 0;
     o->hardstop_calibdata.u.bits.iscalibrating = 1;
     o->hardstop_calibdata.last_pos = o->pos_fbk;
-    if(0 != o->GEARBOX)
-        gearbox  = o->GEARBOX; //to avoid to do a divition by zero ig gearbox is not configured correctly
-    
-    o->hardstop_calibdata.zero = zero/gearbox;
+//    if(0 != o->GEARBOX)
+//        gearbox  = o->GEARBOX; //to avoid to do a divition by zero ig gearbox is not configured correctly
+//    
+//    o->hardstop_calibdata.zero = zero*gearbox;
+    o->hardstop_calibdata.zero = zero;
     Motor_set_run(o);
 }
 #define MOTOR_HARDSTOP_WAITCALIBCOUNTER_MAX     1200
-#define MOTOR_POSSTABLE_COUNTER_MAX             20
+#define MOTOR_POSSTABLE_COUNTER_MAX             100
 
 static void Motor_check_hardstopReached(Motor *o)
 {
@@ -256,7 +258,7 @@ extern void Motor_do_calibration(Motor* o)
     if(o->hardstop_calibdata.u.bits.hwlimitreached)
     {
         o->output = 0;
-        o->pos_calib_offset = o->pos_fbk - o->hardstop_calibdata.zero;
+        o->pos_calib_offset = (o->pos_fbk - o->hardstop_calibdata.zero);
         o->not_calibrated = FALSE;
         Motor_hardStopCalbData_reset(o);
     }
@@ -600,7 +602,7 @@ void Motor_actuate(Motor* motor, uint8_t N) //
     {
         for (int m=0; m<N; ++m)
         {
-            hal_motor_pwmset((hal_motor_t)motor[m].ID, motor[m].output);
+            hal_motor_pwmset((hal_motor_t)motor[m].actuatorPort, motor[m].output);
         }
     }
 }  
@@ -708,10 +710,18 @@ void Motor_get_state(Motor* o, eOmc_motor_status_t* motor_status)
     motor_status->basic.mot_pwm      = o->pwm_fbk;
 }
 
-void Motor_update_pos_fbk(Motor* o, int32_t position)
+void Motor_update_pos_fbk(Motor* o, int32_t position_raw)
 {
-    position += o->pos_calib_offset;
+    int32_t position;  
+    int32_t pippo=0;
     
+    o->pos_raw_fbk = position_raw;
+    position = o->pos_raw_fbk/o->GEARBOX - o->pos_calib_offset;
+    
+    if(o->ID == 1)
+    {
+        pippo=position_raw;
+    }    
     //valid for init
     if ((o->pos_fbk == 0) && (o->pos_fbk_old == 0))
     {

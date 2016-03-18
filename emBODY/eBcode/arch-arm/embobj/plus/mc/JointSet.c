@@ -287,14 +287,20 @@ static void JointSet_do_wait_calibration(JointSet* o);
 
 void JointSet_do(JointSet* o)
 {
+    JointSet_do_odometry(o);
+    
     if(eomc_controlmode_notConfigured == o->control_mode)
     {
-        //devo aggiornare dati encoder e specificare pmw output =0???
+        for (int ms=0; ms<*(o->pN); ++ms)
+        {
+            int m = o->motors_of_set[ms];
+            o->motor[m].output = 0;
+        }
         return;
     }
     if (o->is_calibrated)
     {            
-        JointSet_do_odometry(o);
+        //JointSet_do_odometry(o);
     
         JointSet_do_check_faults(o);
     
@@ -779,7 +785,8 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             break;
         case eomc_calibration_type5_hard_stops_mc4plus:
             AbsEncoder_calibrate(o->absEncoder+e, 0, 0);
-            Motor_calibrate_moving2Hardstop(o->motor+e, calibrator->params.type5.pwmlimit, calibrator->params.type5.calibrationZero);
+            //Motor_calibrate_moving2Hardstop(o->motor+e, calibrator->params.type5.pwmlimit, calibrator->params.type5.calibrationZero);
+            Motor_calibrate_moving2Hardstop(o->motor+e, calibrator->params.type5.pwmlimit, calibrator->params.type5.final_pos);
             break;
         default:
             break;

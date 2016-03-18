@@ -122,6 +122,7 @@ typedef struct //Motor
 {
     // consts
     uint8_t ID;
+    uint8_t actuatorPort;
 
     // UNKNOWN              0
     // HARDWARE_2FOC        1
@@ -238,7 +239,7 @@ extern void Motor_set_vel_ref(Motor* o, int32_t vel_ref);
 //extern uint32_t Motor_get_fault_mask(Motor* o);
 extern void Motor_get_pid_state(Motor* o, eOmc_joint_status_ofpid_t* pid_state);
 extern void Motor_get_state(Motor* o, eOmc_motor_status_t* motor_status);
-extern void Motor_update_pos_fbk(Motor* o, int32_t position);
+extern void Motor_update_pos_fbk(Motor* o, int32_t position_raw);
 extern void Motor_update_current_fbk(Motor* o, int16_t current);
 
 extern void Motor_set_overcurrent_fault(Motor* o);

@@ -148,6 +148,19 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         }
         
         o->motor[k].HARDWARE_TYPE = o->actuation_type;
+        
+        switch(o->motor[k].HARDWARE_TYPE)
+        {
+            case HARDWARE_MC4p:
+                o->motor[k].actuatorPort = jomodes->actuator.pwm.port;
+                break;
+            
+            case HARDWARE_2FOC:
+                o->motor[k].actuatorPort = jomodes->actuator.foc.canloc.addr;
+                break;
+            default:
+                return;
+        }
     }
     
     float **Jjm = NULL; //o->Jjm;
@@ -399,6 +412,19 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
     case emscontroller_board_FACE_eyelids_jaw:        //= 7,    //MC4plus
         break;
     case emscontroller_board_FACE_lips:               //= 8,    //MC4plus
+        o->nSets   = 4;
+        
+        for (int k = 0; k<o->nJoints; ++k)
+        {
+            o->joint[k].CAN_DO_TRQ_CTRL = FALSE;
+            o->joint[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
+            o->motor[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
+            
+            o->jointSet[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
+            o->jointSet[k].CAN_DO_TRQ_CTRL = FALSE;
+            
+            o->j2s[k] = o->m2s[k] = o->e2s[k] = k;
+        }
         break;
     case emscontroller_board_HAND_1:                  //= 9,    //MC4plus
         break;
@@ -872,9 +898,9 @@ void MController_get_motor_state(int m, eOmc_motor_status_t* motor_status)
     Motor_get_state(smc->motor+m, motor_status);
 }
 
-void MController_update_motor_pos_fbk(int m, int32_t position)
+void MController_update_motor_pos_fbk(int m, int32_t position_raw)
 {
-    Motor_update_pos_fbk(smc->motor+m, position);
+    Motor_update_pos_fbk(smc->motor+m, position_raw);
 }
 
 void MController_update_motor_current_fbk(int m, int16_t current)

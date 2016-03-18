@@ -2167,7 +2167,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_testOfmc2plus =
     .filler     = {0},
     .data.mc.mc4plus_based = 
     {
-        .boardtype4mccontroller = emscontroller_board_FACE_eyelids_jaw, // it uses two independent joints
+        .boardtype4mccontroller = emscontroller_board_FACE_lips, // it uses two independent joints
         .filler                 = {0},
         .arrayofjomodescriptors =
         {
@@ -2175,7 +2175,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_testOfmc2plus =
             {
                 .capacity       = 4,
                 .itemsize       = sizeof(eOmn_serv_jomo_descriptor_t),
-                .size           = 2,
+                .size           = 4,
                 .internalmem    = 0                    
             },
             .data   =
@@ -2219,37 +2219,37 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_testOfmc2plus =
                 { // joint 2
                     .actuator.pwm   =
                     {
-                        .port   = eomn_serv_mc_port_none                          
+                        .port   = 2                          
                     },
                     .sensor         =
                     {
-                        .type   = eomn_serv_mc_sensor_none,
-                        .port   = eomn_serv_mc_port_none, 
-                        .pos    = eomn_serv_mc_sensor_pos_none
+                        .type   = eomn_serv_mc_sensor_encoder_inc,
+                        .port   = 2, 
+                        .pos    = eomn_serv_mc_sensor_pos_atjoint
                     },
                     .extrasensor    =
                     {
-                        .type   = eomn_serv_mc_sensor_none,
-                        .port   = eomn_serv_mc_port_none,  
-                        .pos    = eomn_serv_mc_sensor_pos_none
+                        .type   = eomn_serv_mc_sensor_encoder_inc,
+                        .port   = 2,  
+                        .pos    = eomn_serv_mc_sensor_pos_atmotor
                     }
                 },                
                 { // joint 3
                     .actuator.pwm   =
                     {
-                        .port   = eomn_serv_mc_port_none                          
+                        .port   = 3                          
                     },
                     .sensor         =
                     {
-                        .type   = eomn_serv_mc_sensor_none,
-                        .port   = eomn_serv_mc_port_none, 
-                        .pos    = eomn_serv_mc_sensor_pos_none
+                        .type   = eomn_serv_mc_sensor_encoder_inc,
+                        .port   = 3, // eomn_serv_mc_port_mc4plus_pwmP2 ?? verify!
+                        .pos    = eomn_serv_mc_sensor_pos_atjoint
                     },
                     .extrasensor    =
                     {
-                        .type   = eomn_serv_mc_sensor_none,
-                        .port   = eomn_serv_mc_port_none,  
-                        .pos    = eomn_serv_mc_sensor_pos_none
+                        .type   = eomn_serv_mc_sensor_encoder_inc,
+                        .port   = 3,  
+                        .pos    = eomn_serv_mc_sensor_pos_atmotor
                     }
                 }            
             }
