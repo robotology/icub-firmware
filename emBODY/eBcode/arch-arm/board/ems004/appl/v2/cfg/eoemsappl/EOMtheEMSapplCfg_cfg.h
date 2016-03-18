@@ -930,6 +930,9 @@ extern "C" {
 #elif   defined(ICUB_MEC_V2)
     #define NAME_PREFIX     aEMS
     #define NAME_POSTFIX    v2mec
+#elif   defined(CER)
+    #define NAME_PREFIX     aEMS
+    #define NAME_POSTFIX    cer    
 #else
     #error -> specify either ICUB_MEC_V1 or ICUB_MEC_V2
 #endif    
