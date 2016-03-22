@@ -626,7 +626,7 @@ static void JointSet_do_pwm_control(JointSet* o)
 static void JointSet_do_vel_control(JointSet* o)
 {
     int N = *(o->pN);
-        
+
     for (int js=0; js<N; ++js)
     {
         Joint_do_vel_control(o->joint+o->joints_of_set[js]);
@@ -649,11 +649,11 @@ static void JointSet_do_vel_control(JointSet* o)
                 motor_vel_ref += Ji[m][j]*o->joint[j].output;
             }
         
-            Motor_set_vel_ref(o->motor+m, 0);
+            Motor_set_vel_ref(o->motor+m, motor_vel_ref);
         }
         else
         {
-            Motor_set_vel_ref(o->motor+m, 0);
+            Motor_set_vel_ref(o->motor+m, o->joint[m].output);
         }
     }
     

@@ -977,9 +977,13 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb15 =
                     },
                     .sensor         =
                     {
-                        .type   = eomn_serv_mc_sensor_none,
-                        .port   = eomn_serv_mc_port_none,
-                        .pos    = eomn_serv_mc_sensor_pos_none
+                        .type   = eomn_serv_mc_sensor_encoder_aea,
+                        .port   = eomn_serv_mc_port_ems_spiP8,   
+                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                        
+                        //.type   = eomn_serv_mc_sensor_none,
+                        //.port   = eomn_serv_mc_port_none,
+                        //.pos    = eomn_serv_mc_sensor_pos_none
                     },
                     .extrasensor    =
                     {
