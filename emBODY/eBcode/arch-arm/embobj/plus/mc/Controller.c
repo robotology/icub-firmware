@@ -156,8 +156,9 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
                 break;
             
             case HARDWARE_2FOC:
-                o->motor[k].actuatorPort = jomodes->actuator.foc.canloc.addr;
+                o->motor[k].actuatorPort = jomodes->actuator.foc.canloc.addr-1;
                 break;
+
             default:
                 return;
         }
@@ -314,7 +315,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         o->j2s[2] = o->m2s[2] = o->e2s[2] = 0;
         o->j2s[3] = o->m2s[3] = o->e2s[3] = 1;
         
-        for (int k = 0; k<o->nJoints; ++k)
+        for (int k=0; k<o->nJoints; ++k)
         {
             o->joint[k].CAN_DO_TRQ_CTRL = TRUE;
             o->joint[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
@@ -337,7 +338,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         o->j2s[2] = o->m2s[2] = o->e2s[2] = 0;
         o->j2s[3] = o->m2s[3] = o->e2s[3] = 1;
         
-        for (int k = 0; k<3; ++k)
+        for (int k=0; k<3; ++k)
         {
             o->joint[k].CAN_DO_TRQ_CTRL = FALSE;
             o->joint[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;

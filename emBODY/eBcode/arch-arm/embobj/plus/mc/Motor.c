@@ -201,7 +201,7 @@ void Motor_calibrate_withOffset(Motor* o, int32_t offset) //
 {
     o->pos_calib_offset = offset;
     
-    //Motor_set_run(o);
+    Motor_set_run(o);
 }
 
 void Motor_calibrate_moving2Hardstop(Motor* o, int32_t pwm, int32_t zero) //
@@ -582,7 +582,8 @@ void Motor_actuate(Motor* motor, uint8_t N) //
     
         for (int m=0; m<N; ++m)
         {
-            output[m] = motor[m].output;
+            output[motor[m].actuatorPort] = motor[m].output;
+            //output[m] = motor[m].output;
         }
     
         eOcanprot_command_t command = {0};

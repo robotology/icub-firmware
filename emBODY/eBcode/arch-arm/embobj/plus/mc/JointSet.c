@@ -287,20 +287,21 @@ static void JointSet_do_wait_calibration(JointSet* o);
 
 void JointSet_do(JointSet* o)
 {
-    JointSet_do_odometry(o);
+    //JointSet_do_odometry(o);
     
-    if(eomc_controlmode_notConfigured == o->control_mode)
+    if (eomc_controlmode_notConfigured == o->control_mode)
     {
         for (int ms=0; ms<*(o->pN); ++ms)
         {
-            int m = o->motors_of_set[ms];
-            o->motor[m].output = 0;
+            o->motor[o->motors_of_set[ms]].output = 0;
         }
+        
         return;
     }
+    
     if (o->is_calibrated)
     {            
-        //JointSet_do_odometry(o);
+        JointSet_do_odometry(o);
     
         JointSet_do_check_faults(o);
     
@@ -309,13 +310,6 @@ void JointSet_do(JointSet* o)
     else
     {
         JointSet_do_wait_calibration(o);
-        
-//        for (int ms=0; ms<*(o->pN); ++ms)
-//        {
-//            int m = o->motors_of_set[ms];
-//            
-//            o->motor[m].output = 0;
-//        } spostato dentro la motor do calibration
     }
 }
 
@@ -752,8 +746,6 @@ static void JointSet_do_wait_calibration(JointSet* o)
         }
     }
     
-    
-    
     o->control_mode = eomc_controlmode_idle;
 
     for (int js=0; js<N; ++js)
@@ -788,6 +780,12 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             //Motor_calibrate_moving2Hardstop(o->motor+e, calibrator->params.type5.pwmlimit, calibrator->params.type5.calibrationZero);
             Motor_calibrate_moving2Hardstop(o->motor+e, calibrator->params.type5.pwmlimit, calibrator->params.type5.final_pos);
             break;
+        
+        case eomc_calibration_type0_hard_stops:
+            AbsEncoder_calibrate(o->absEncoder+e, 0, 0);
+            Motor_calibrate_withOffset(o->motor+e, 0);
+            break;
+        
         default:
             break;
     }
