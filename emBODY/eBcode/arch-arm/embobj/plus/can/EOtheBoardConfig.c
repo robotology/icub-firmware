@@ -944,6 +944,132 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb7_eb9 =
 
 #if defined(CER)
 
+static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb10 =
+{   // eb15
+    .type       = eomn_serv_MC_mc4plus,
+    .filler     = {0},
+    .data.mc.foc_based = 
+    {
+        .boardtype4mccontroller = emscontroller_board_CER_NECK,
+        .version    =
+        {
+            .firmware   = { .major = 0, .minor = 0, .build = 0 },
+            .protocol   = { .major = 0, .minor = 0 }
+        },
+        .filler                 = {0},
+        .arrayofjomodescriptors =
+        {
+            .head   = 
+            {
+                .capacity       = 4,
+                .itemsize       = sizeof(eOmn_serv_jomo_descriptor_t),
+                .size           = 2,
+                .internalmem    = 0                    
+            },
+            .data   =
+            {
+                { // joint 0: first ==> neck pitch
+                    .actuator.pwm   =
+                    {
+                        .port   = eomn_serv_mc_port_mc4plus_pwmP3         
+                    },
+                    .sensor         =
+                    {
+                        .type   = eomn_serv_mc_sensor_encoder_aea,
+                        .port   = eomn_serv_mc_port_ems_spiP10,
+                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                    },
+                    .extrasensor    =
+                    {
+                        .type   = eomn_serv_mc_sensor_none,
+                        .port   = 0, 
+                        .pos    = eomn_serv_mc_sensor_pos_none
+                    }
+                },
+                { // joint 1: second ==> neck roll
+                    .actuator.pwm   =
+                    {
+                        .port   = eomn_serv_mc_port_mc4plus_pwmP2              
+                    },
+                    .sensor         =
+                    {
+                        .type   = eomn_serv_mc_sensor_encoder_aea,
+                        .port   = eomn_serv_mc_port_ems_spiP11,
+                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                    },
+                    .extrasensor    =
+                    {
+                        .type   = eomn_serv_mc_sensor_none,
+                        .port   = 0, 
+                        .pos    = eomn_serv_mc_sensor_pos_none
+                    }
+                },                
+                { // joint 2
+                    .actuator.pwm   =
+                    {
+                        .port   = eomn_serv_mc_port_none
+                    },
+                    .sensor         =
+                    {
+                        .type   = eomn_serv_mc_sensor_none,
+                        .port   = 0, 
+                        .pos    = eomn_serv_mc_sensor_pos_none
+                    },
+                    .extrasensor    =
+                    {
+                        .type   = eomn_serv_mc_sensor_none,
+                        .port   = 0, 
+                        .pos    = eomn_serv_mc_sensor_pos_none
+                    }
+                },                
+                { // joint 3
+                    .actuator.pwm   =
+                    {
+                        .port   = eomn_serv_mc_port_none                          
+                    },
+                    .sensor         =
+                    {
+                        .type   = eomn_serv_mc_sensor_none,
+                        .port   = 0, 
+                        .pos    = eomn_serv_mc_sensor_pos_none
+                    },
+                    .extrasensor    =
+                    {
+                       .type   = eomn_serv_mc_sensor_none,
+                        .port   = 0, 
+                        .pos    = eomn_serv_mc_sensor_pos_none
+                    }
+                }            
+            }
+        },
+        .jomocoupling       =
+        {
+            .joint2set      = 
+            {   // each joint is on a different set 
+                0, 1, 2, 3 
+            },
+            .joint2motor    = 
+            {   // zero matrix: use matrix embedded in controller and seecetd by boardtype4mccontroller
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) }        
+            },
+            .joint2encoder  = 
+            {   // identical matrix
+                { EO_COMMON_FLOAT_TO_Q17_14(1.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(1.0f) } 
+            }  
+        }             
+    }
+};
+
+
+
+
+
 static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb15 =
 {   // eb15
     .type       = eomn_serv_MC_foc,
@@ -2220,7 +2346,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_testOfmc2plus =
                         .pos    = eomn_serv_mc_sensor_pos_atmotor
                     }
                 },                
-                { // joint 2
+               { // joint 2
                     .actuator.pwm   =
                     {
                         .port   = 2                          
@@ -2255,7 +2381,44 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_testOfmc2plus =
                         .port   = 3,  
                         .pos    = eomn_serv_mc_sensor_pos_atmotor
                     }
-                }            
+                } 
+ /*               { // joint 2
+                    .actuator.pwm   =
+                    {
+                        .port   = eomn_serv_mc_port_none
+                    },
+                    .sensor         =
+                    {
+                        .type   = eomn_serv_mc_sensor_none,
+                        .port   = 0, 
+                        .pos    = eomn_serv_mc_sensor_pos_none
+                    },
+                    .extrasensor    =
+                    {
+                        .type   = eomn_serv_mc_sensor_none,
+                        .port   = 0, 
+                        .pos    = eomn_serv_mc_sensor_pos_none
+                    }
+                },                
+                { // joint 3
+                    .actuator.pwm   =
+                    {
+                        .port   = eomn_serv_mc_port_none                          
+                    },
+                    .sensor         =
+                    {
+                        .type   = eomn_serv_mc_sensor_none,
+                        .port   = 0, 
+                        .pos    = eomn_serv_mc_sensor_pos_none
+                    },
+                    .extrasensor    =
+                    {
+                       .type   = eomn_serv_mc_sensor_none,
+                        .port   = 0, 
+                        .pos    = eomn_serv_mc_sensor_pos_none
+                    }
+                }*/            
+                
             }
         },
         .jomocoupling       =
@@ -2340,7 +2503,7 @@ static const eOmn_serv_configuration_t * const s_serv_config_mc_CER[maxboards_CE
     NULL,
     NULL,
     NULL,
-    NULL,
+    &s_serv_config_mc_cer_eb10,
     NULL,
     NULL,
     NULL,

@@ -406,9 +406,43 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         }
     }
         break;
+    
+    case emscontroller_board_CER_NECK:                   //= 22,    //mc4plus
+        o->nSets   = 2;
+    
+        for (int k = 0; k<o->nJoints; ++k)
+        {            
+            o->joint[k].CAN_DO_TRQ_CTRL = FALSE;
+            o->joint[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
+            o->motor[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
+            
+            o->jointSet[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
+            o->jointSet[k].CAN_DO_TRQ_CTRL = FALSE;
+            
+            o->j2s[k] = o->m2s[k] = o->e2s[k] = k;
+        }
+        
+        break;
+    
+    
+    
     case emscontroller_board_HEAD_neckpitch_neckroll: //= 5,    //MC4plus
         break;
     case emscontroller_board_HEAD_neckyaw_eyes:       //= 6,    //MC4plus
+        o->nSets   = 4;
+    
+        for (int k = 0; k<o->nJoints; ++k)
+        {            
+            o->joint[k].CAN_DO_TRQ_CTRL = FALSE;
+            o->joint[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
+            o->motor[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
+            
+            o->jointSet[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
+            o->jointSet[k].CAN_DO_TRQ_CTRL = FALSE;
+            
+            o->j2s[k] = o->m2s[k] = o->e2s[k] = k;
+        }
+        
         break;
     case emscontroller_board_FACE_eyelids_jaw:        //= 7,    //MC4plus
         break;
