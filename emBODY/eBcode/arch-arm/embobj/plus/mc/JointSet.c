@@ -299,9 +299,11 @@ void JointSet_do(JointSet* o)
         return;
     }
     
+    JointSet_do_odometry(o);
+    
     if (o->is_calibrated)
     {            
-        JointSet_do_odometry(o);
+        //JointSet_do_odometry(o);
     
         JointSet_do_check_faults(o);
     
