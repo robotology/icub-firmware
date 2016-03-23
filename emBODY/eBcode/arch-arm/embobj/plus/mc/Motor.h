@@ -222,6 +222,7 @@ extern void Motor_force_idle(Motor* o); //
 extern void Motor_motion_reset(Motor *o); //
 extern BOOL Motor_is_calibrated(Motor* o); //
 extern BOOL Motor_check_faults(Motor* o); //
+extern void Motor_reset(Motor *o);//
 
 extern CTRL_UNITS Motor_do_trq_control(Motor* o, CTRL_UNITS trq_ref, CTRL_UNITS trq_fbk); //
 extern void Motor_update_state_fbk(Motor* o, void* state_msg); //

@@ -788,6 +788,35 @@ BOOL Motor_is_external_fault(Motor* o)
     return FALSE;
 }
 
+void Motor_reset(Motor *o)
+{
+    o->pwm_fbk=ZERO;
+    o->pwm_ref=ZERO;
+
+    o->pos_raw_fbk=ZERO;
+    o->vel_raw_fbk=ZERO;
+
+    o->pos_calib_offset=ZERO;
+
+    o->pos_ref=ZERO;
+    o->pos_fbk=ZERO;
+    o->pos_err=ZERO;
+
+    o->pos_fbk_old=ZERO;
+
+    o->vel_ref=ZERO;
+    o->vel_fbk=ZERO;
+    o->vel_err=ZERO;
+
+    Motor_motion_reset(o);
+
+    o->output=ZERO;
+
+    o->not_calibrated = TRUE;
+
+    //o->control_mode = ???
+    //o->control_mode_req;
+}
 /*
 void Motor_update_temperature_fbk(Motor* o, int16_t temperature_fbk) { o->temperature_fbk = temperature_fbk; }
 void Motor_update_pos_raw_fbk(Motor* o, int32_t pos_raw_fbk) { o->pos_raw_fbk = pos_raw_fbk; }
