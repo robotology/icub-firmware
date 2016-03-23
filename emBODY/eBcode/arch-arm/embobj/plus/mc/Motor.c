@@ -127,6 +127,7 @@ void Motor_init(Motor* o) //
 
     o->can_dead = FALSE;
     o->wrong_ctrl_mode = FALSE;
+    o->external_fault = FALSE;
     
     o->fault_state_prec.bitmask = 0;
     o->fault_state.bitmask = 0;
@@ -371,45 +372,63 @@ BOOL Motor_check_faults(Motor* o) //
     
     BOOL can_dead        = FALSE;
     BOOL wrong_ctrl_mode = FALSE;
+    BOOL external_fault  = FALSE;
     
     if (o->HARDWARE_TYPE == HARDWARE_2FOC)
     {
+        if (o->fault_state.bits.ExternalFaultAsserted)
+        {
+            external_fault = TRUE;
+        }
+        else
+        {
+            o->external_fault = FALSE;
+        }
+        
+        if (o->control_mode == o->control_mode_req)
+        {
+            o->wrong_ctrl_mode = FALSE;
+            
+            WatchDog_rearm(&o->control_mode_req_wdog);
+        }
+        else
+        {
+            if (!(external_fault || o->hardware_fault))
+            {
+                if (WatchDog_check_expired(&o->control_mode_req_wdog))
+                {
+                    wrong_ctrl_mode = TRUE;
+                        
+                    o->hardware_fault = TRUE;
+                }    
+            }
+        }    
+        
         if (WatchDog_check_expired(&o->can_2FOC_alive_wdog))
         {
             can_dead = TRUE;
+            
             o->hardware_fault = TRUE;
         }
-        
-        if (o->control_mode != o->control_mode_req)
+        else
         {
-            if (o->control_mode != icubCanProto_controlmode_hwFault)
-            {   
-                if ((o->control_mode != icubCanProto_controlmode_idle) || !o->fault_state.bits.ExternalFaultAsserted)
-                {
-                    if (WatchDog_check_expired(&o->control_mode_req_wdog))
-                    {
-                        wrong_ctrl_mode = TRUE;
-                        o->hardware_fault = TRUE;
-                    }
-                }
-            }
+            o->can_dead = FALSE;
         }
     }
-    
-    if (o->HARDWARE_TYPE == HARDWARE_MC4p)
+    else if (o->HARDWARE_TYPE == HARDWARE_MC4p)
     {
-        if (o->hardware_fault || hal_motor_externalfaulted())
+        external_fault = hal_motor_externalfaulted();
+        
+        if (o->hardware_fault || external_fault)
         {
             hal_motor_disable((hal_motor_t)o->ID);
         }
     }
     
-    if (!o->hardware_fault)
+    if (!(o->hardware_fault || external_fault))
     {
         o->fault_state_prec.bitmask = 0;
-        o->wrong_ctrl_mode = FALSE;
-        o->can_dead = FALSE;
-        
+
         return FALSE;
     }
     
@@ -417,6 +436,10 @@ BOOL Motor_check_faults(Motor* o) //
     {
         o->diagnostics_refresh = 0;
         o->fault_state_prec.bitmask = 0;
+        
+        o->can_dead = FALSE;
+        o->wrong_ctrl_mode = FALSE;
+        o->external_fault = FALSE;
     }
     
     if (o->fault_state_prec.bitmask != o->fault_state.bitmask)
@@ -488,17 +511,25 @@ BOOL Motor_check_faults(Motor* o) //
             Motor_send_error(o->ID, eoerror_value_MC_motor_wrong_state, 0);
         }
         
+        if (external_fault && !o->external_fault)
+        {
+            Motor_send_error(o->ID, eoerror_value_MC_motor_external_fault, 0);
+            fault_state.bits.ExternalFaultAsserted = FALSE;
+        }
+        
         if (fault_state.bitmask)
         {
             Motor_send_error(o->ID, eoerror_value_MC_generic_error, fault_state.bitmask);
         }
+        
+        o->fault_state_prec.bitmask = o->fault_state.bitmask;
     }
     
-    o->fault_state_prec.bitmask = o->fault_state.bitmask;
+    o->external_fault = external_fault;
     o->wrong_ctrl_mode = wrong_ctrl_mode;
     o->can_dead = can_dead;
     
-    return TRUE;
+    return o->hardware_fault;
 }
 
 void Motor_raise_fault_overcurrent(Motor* o)

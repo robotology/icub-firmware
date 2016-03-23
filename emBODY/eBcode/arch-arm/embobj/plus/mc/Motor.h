@@ -184,6 +184,7 @@ typedef struct //Motor
     
     BOOL can_dead;
     BOOL wrong_ctrl_mode;
+    BOOL external_fault;
     
     uint16_t diagnostics_refresh;
     MotorFaultState fault_state_prec;

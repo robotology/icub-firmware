@@ -256,7 +256,7 @@ BOOL JointSet_do_check_faults(JointSet* o)
             Motor_set_idle(o->motor+o->motors_of_set[k]);
         }
         
-        o->control_mode = eomc_controlmode_idle;    
+        o->control_mode = eomc_controlmode_idle;
     }
     
     return fault;
