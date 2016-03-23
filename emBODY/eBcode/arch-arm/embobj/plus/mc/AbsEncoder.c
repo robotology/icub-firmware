@@ -24,24 +24,10 @@ AbsEncoder* AbsEncoder_new(uint8_t n)
     return o;
 }
 
-void AbsEncoder_init(AbsEncoder* o)
+static void AbsEncoder_reset(AbsEncoder* o)
 {
-    ////////////////////// set by config
-    
-    o->ID = 0;
-    
-    o->spike_cnt_limit = 32767;
-    o->spike_mag_limit = 32767;
-    
-    o->sign = 0;
-    
-    o->fake = FALSE;
-    
-    ////////////////////// set by calibrate
-    
+  
     o->offset = 0;
-    
-    //////////////////////
     
     o->distance = 0;
     o->position_last = 0;
@@ -63,9 +49,26 @@ void AbsEncoder_init(AbsEncoder* o)
     
     o->valid_first_data_cnt = 0;
     
-    o->state.bits.not_configured  = TRUE;
     o->state.bits.not_calibrated  = TRUE;
     o->state.bits.not_initialized = TRUE;
+}
+void AbsEncoder_init(AbsEncoder* o)
+{
+    ////////////////////// set by config
+    
+    o->ID = 0;
+    
+    o->spike_cnt_limit = 32767;
+    o->spike_mag_limit = 32767;
+    
+    o->sign = 0;
+    
+    o->fake = FALSE;
+    
+    o->state.bits.not_configured  = TRUE;
+    
+    AbsEncoder_reset(o);
+
 }
 
 void AbsEncoder_destroy(AbsEncoder* o)
@@ -97,6 +100,8 @@ void AbsEncoder_config(AbsEncoder* o, uint8_t ID, int32_t resolution, int16_t sp
 
 void AbsEncoder_calibrate(AbsEncoder* o, int32_t offset, int32_t zero)
 {
+    AbsEncoder_reset(o);
+    
     o->offset = offset;
     o->zero = zero;
     
