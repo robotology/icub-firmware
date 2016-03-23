@@ -202,6 +202,10 @@ void Motor_calibrate_withOffset(Motor* o, int32_t offset) //
     o->pos_calib_offset = offset;
     
     Motor_set_run(o);
+    if(o->HARDWARE_TYPE == HARDWARE_MC4p)
+    {
+        o->not_calibrated = FALSE;
+    }
 }
 
 void Motor_calibrate_moving2Hardstop(Motor* o, int32_t pwm, int32_t zero) //
