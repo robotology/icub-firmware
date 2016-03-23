@@ -607,6 +607,7 @@ void Motor_actuate(Motor* motor, uint8_t N) //
     {
         for (int m=0; m<N; ++m)
         {
+            motor[m].pwm_fbk = motor[m].output;
             hal_motor_pwmset((hal_motor_t)motor[m].actuatorPort, motor[m].output);
         }
     }
