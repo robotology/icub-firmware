@@ -287,18 +287,6 @@ static void JointSet_do_wait_calibration(JointSet* o);
 
 void JointSet_do(JointSet* o)
 {
-    //JointSet_do_odometry(o);
-    
-    if (eomc_controlmode_notConfigured == o->control_mode)
-    {
-        for (int ms=0; ms<*(o->pN); ++ms)
-        {
-            o->motor[o->motors_of_set[ms]].output = 0;
-        }
-        
-        return;
-    }
-    
     JointSet_do_odometry(o);
     
     if (o->is_calibrated)
