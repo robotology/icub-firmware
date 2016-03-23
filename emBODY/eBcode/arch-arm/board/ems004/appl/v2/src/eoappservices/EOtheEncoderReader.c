@@ -123,7 +123,7 @@ static EOtheEncoderReader s_eo_theencoderreader =
     .waitreadtimer              = NULL,
     .numofjomos                 = 0,
     .numofencoders              = 0,
-    .errorflags                 = {0},
+    .errors                     = {encreader_err_NONE},
     .failuremask                = 0,
     .reader                     = NULL
 };
@@ -150,6 +150,10 @@ extern EOtheEncoderReader* eo_encoderreader_Initialise(void)
     s_eo_theencoderreader.waitreadtimer = eo_timer_New();
     
     s_eo_theencoderreader.reader = eo_appEncReader_Initialise(); 
+    
+    // we need it so that we have initialisation of an empty array
+    EOarray* array = eo_array_New(4, sizeof(eOmn_serv_jomo_descriptor_t), &s_eo_theencoderreader.arrayofjomodes);
+
     
     s_eo_theencoderreader.diagnostics.reportTimer = eo_timer_New();
     s_eo_theencoderreader.diagnostics.errorType = eo_errortype_error;
@@ -324,8 +328,50 @@ extern eOresult_t eo_encoderreader_Diagnostics_Tick(EOtheEncoderReader* p)
     return(eo_appEncReader_Diagnostics_Tick(s_eo_theencoderreader.reader));    
 }
 
+extern eOresult_t eo_encoderreader_GetPrimaryEncoder(EOtheEncoderReader *p, uint8_t position, eOmn_serv_mc_sensor_t *encoder)
+{
+    if((NULL == p) || (NULL == encoder))
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    if(eobool_false == s_eo_theencoderreader.service.active)
+    {   // nothing to do because we dont have it
+        return(eores_NOK_generic);
+    }   
 
-extern eOresult_t eo_encoderreader_Read(EOtheEncoderReader *p, uint8_t position, uint32_t *primary, uint32_t *secondary, hal_spiencoder_errors_flags *errors)
+    if(position >= p->numofjomos)
+    {
+        return(eores_NOK_generic);
+    }
+    
+    // ok, now i retrieve the position 
+    
+
+    
+    EOconstarray* carray = eo_constarray_Load((EOarray*)&s_eo_theencoderreader.arrayofjomodes);
+    
+    eOmn_serv_jomo_descriptor_t *jomodes = (eOmn_serv_jomo_descriptor_t*) eo_constarray_At(carray, position);
+    
+    if(NULL != jomodes)
+    {
+        encoder->port = jomodes->sensor.port;
+        encoder->type = jomodes->sensor.type;
+        encoder->pos = jomodes->sensor.pos;        
+    }
+    else
+    {
+        encoder->port = eomn_serv_mc_port_none;
+        encoder->type = eomn_serv_mc_sensor_none;
+        encoder->pos = eomn_serv_mc_sensor_pos_none;
+    }
+    
+    
+    return(eores_OK);
+}
+
+
+extern eOresult_t eo_encoderreader_Read(EOtheEncoderReader *p, uint8_t position, uint32_t *primary, uint32_t *secondary,  eOencoderreader_errortype_t *error1, eOencoderreader_errortype_t *error2)
 {
     if(NULL == p)
     {
@@ -342,8 +388,19 @@ extern eOresult_t eo_encoderreader_Read(EOtheEncoderReader *p, uint8_t position,
         return(eores_NOK_generic);
     }
 
-    eOresult_t res = eo_appEncReader_GetValue(s_eo_theencoderreader.reader, position, primary, secondary, errors); 
+    eOappEncReader_errortype_t err1;
+    eOappEncReader_errortype_t err2;
+    eOresult_t res = eo_appEncReader_GetValue(s_eo_theencoderreader.reader, position, primary, secondary, &err1, &err2); 
     
+    if(NULL != error1)
+    {
+        *error1 = (eOencoderreader_errortype_t)err1;
+    }
+
+    if(NULL != error2)
+    {
+        *error1 = (eOencoderreader_errortype_t)err2;
+    }
     
     return(res);
 }
@@ -367,6 +424,8 @@ extern eOresult_t eo_encoderreader_Read(EOtheEncoderReader *p, uint8_t position,
 static eOresult_t s_eo_encoderreader_onstop_verifyreading(void *par, eObool_t readingisok)
 {
     const eOmn_serv_arrayof_4jomodescriptors_t * jomodes = (const eOmn_serv_arrayof_4jomodescriptors_t *)par;
+    
+    EOconstarray* carray = eo_constarray_Load((EOarray*)jomodes);    
         
     if((eobool_true == readingisok) && (eobool_true == s_eo_theencoderreader.service.activateafterverify))
     {
@@ -375,12 +434,24 @@ static eOresult_t s_eo_encoderreader_onstop_verifyreading(void *par, eObool_t re
 
     s_eo_theencoderreader.diagnostics.errorDescriptor.sourcedevice     = eo_errman_sourcedevice_localboard;
     s_eo_theencoderreader.diagnostics.errorDescriptor.sourceaddress    = 0;
-    s_eo_theencoderreader.diagnostics.errorDescriptor.par16            = s_eo_theencoderreader.numofjomos | (s_eo_theencoderreader.numofencoders << 8);
-    // in the 4 lsb i put the errorflags.
-    // in the msb i put the failuremask
-    memcpy(&s_eo_theencoderreader.diagnostics.errorDescriptor.par64, &s_eo_theencoderreader.errorflags[0], sizeof(s_eo_theencoderreader.errorflags));   
-    uint64_t mmm =  s_eo_theencoderreader.failuremask;
-    s_eo_theencoderreader.diagnostics.errorDescriptor.par64 |= (mmm << 56);
+    
+    // in par16 i put: number of joint in msb and failure mask in lsb
+    s_eo_theencoderreader.diagnostics.errorDescriptor.par16 = 0;
+    uint16_t mask = s_eo_theencoderreader.failuremask;
+    s_eo_theencoderreader.diagnostics.errorDescriptor.par64 |= ((s_eo_theencoderreader.numofjomos<<8)|(mask));
+    
+    // in par64 i put in each byte: (port|error) of each primary joint
+    s_eo_theencoderreader.diagnostics.errorDescriptor.par64 = 0;    
+    for(uint8_t i=0; i<s_eo_theencoderreader.numofjomos; i++)
+    {
+        eOmn_serv_jomo_descriptor_t *jdes = (eOmn_serv_jomo_descriptor_t*) eo_constarray_At(carray, i);
+        uint8_t port = jdes->sensor.port;
+        uint8_t err = s_eo_theencoderreader.errors[i];
+        uint64_t value = (((port&0xf)<<4) | (err&0xf)) & 0xff;
+        s_eo_theencoderreader.diagnostics.errorDescriptor.par64 |= (value<<(i*8));
+    }
+    
+
     EOaction_strg astrg = {0};
     EOaction *act = (EOaction*)&astrg;
     eo_action_SetCallback(act, s_eo_encodereader_send_periodic_error_report, NULL, eov_callbackman_GetTask(eov_callbackman_GetHandle()));
@@ -458,17 +529,20 @@ static void s_eo_encoderreader_read_encoders(void* p)
     
     uint8_t i = 0;
     
-    memset(&s_eo_theencoderreader.errorflags, 0, sizeof(s_eo_theencoderreader.errorflags));
+    memset(&s_eo_theencoderreader.errors, encreader_err_NONE, sizeof(s_eo_theencoderreader.errors));
     s_eo_theencoderreader.failuremask = 0;
     
     for(i=0; i< s_eo_theencoderreader.numofjomos; i++)
     {
         uint32_t primary = 0;
         uint32_t secondary = 0;
+        eOappEncReader_errortype_t err1;
+        eOappEncReader_errortype_t err2;
 
-        eo_appEncReader_GetValue(s_eo_theencoderreader.reader, i, &primary, &secondary, &s_eo_theencoderreader.errorflags[i]);
-        if((0 != s_eo_theencoderreader.errorflags[i].chip_error) || (0 != s_eo_theencoderreader.errorflags[i].data_error) || 
-           (0 != s_eo_theencoderreader.errorflags[i].data_notready) || (0 != s_eo_theencoderreader.errorflags[i].tx_error) )
+        eOresult_t res = eo_appEncReader_GetValue(s_eo_theencoderreader.reader, i, &primary, &secondary, &err1, &err2);
+        
+        s_eo_theencoderreader.errors[i] = (eOencoderreader_errortype_t)err1;
+        if(err_NONE != err1)
         {
             eo_common_byte_bitset(&s_eo_theencoderreader.failuremask, i);
             readingisok = eobool_false;

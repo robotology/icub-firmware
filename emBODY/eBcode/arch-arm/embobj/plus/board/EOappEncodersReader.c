@@ -380,7 +380,7 @@ extern eOresult_t eo_appEncReader_Diagnostics_Tick(EOappEncReader *p)
     return(eores_OK);
 }
 
-extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint32_t *primaryvalue, uint32_t *secondaryvalue, hal_spiencoder_errors_flags *flags)
+extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint32_t *primaryvalue, uint32_t *secondaryvalue, eOappEncReader_errortype_t *etype1, eOappEncReader_errortype_t *etype2)
 {    
     if(NULL == p)
     {
@@ -394,6 +394,10 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint
     eOresult_t res2 = eores_OK;
     eOappEncReader_errortype_t errortype = err_NONE;
     eOappEncReader_jomoconfig_t this_jomoconfig = p->config.jomoconfig[jomo];
+    hal_spiencoder_errors_flags flags = {0};
+    
+    *etype1 = err_NONE;
+    *etype2 = err_NONE;
 	 
     // check existence for primary encoder
     if (CHECK_ENC_IS_CONNECTED(this_jomoconfig.primary.type))
@@ -404,7 +408,7 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint
             {
                 eObool_t evaldiagnostics = eo_common_byte_bitcheck(p->diagnostics.config.jomomask, jomo);
 
-                res1 = (eOresult_t)hal_spiencoder_get_value((hal_spiencoder_t)this_jomoconfig.primary.port, &val_raw, flags);
+                res1 = (eOresult_t)hal_spiencoder_get_value((hal_spiencoder_t)this_jomoconfig.primary.port, &val_raw, &flags);
                 
                 if(eores_OK != res1)
                 {
@@ -421,14 +425,13 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint
 //                    errdes.par64            = 0x666;
 //                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &errdes);
                     
-                    *primaryvalue = (uint32_t)err_onReadFromSpi;
-                    return((eOresult_t)res1);
+                    //*primaryvalue = 0;
+                    *etype1 = err_onReadFromSpi;
+                    return(eores_NOK_generic);
                 }
 
                 if(eobool_false == s_eo_appEncReader_IsValidValue_AEA(&val_raw, &errortype))
                 {
-                    *primaryvalue = (eOappEncReader_errortype_t)errortype;  
-                    flags->data_error = 1;
                                        
                     if(eobool_true == evaldiagnostics)
                     {
@@ -450,8 +453,10 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint
 //                    errdes.sourceaddress    = 0;
 //                    errdes.par16            = jomo;
 //                    errdes.par64            = (err_onParityError == errortype) ? (0x777) : (0x888);
-//                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &errdes);                    
-
+//                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &errdes);  
+                    
+                    //*primaryvalue = 0;  
+                    *etype1 = errortype;
                     return(eores_NOK_generic);
                 }
 
@@ -468,12 +473,14 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint
             case eomn_serv_mc_sensor_encoder_amo:
             {
                 
-                res1 = (eOresult_t)hal_spiencoder_get_value((hal_spiencoder_t)this_jomoconfig.primary.port, &val_raw, flags);
+                res1 = (eOresult_t)hal_spiencoder_get_value((hal_spiencoder_t)this_jomoconfig.primary.port, &val_raw, &flags);
             
                 if(eores_OK != res1)
                 {
-                    *primaryvalue = (uint32_t)err_onReadFromSpi;
-                    return((eOresult_t)res1);
+                    // marco.accame: verify if the hal for amo encoder returns error also for parity or else ... so far, i just return a spi error
+                    //*primaryvalue = 0;
+                    *etype1 = err_onReadFromSpi;
+                    return(eores_NOK_generic);
                 }
             
                 val_raw = (val_raw>>4) & 0xFFFF;
@@ -483,21 +490,22 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint
             
             case eomn_serv_mc_sensor_encoder_spichainof2:
             {
-                res1 = (eOresult_t)hal_spiencoder_get_value((hal_spiencoder_t)this_jomoconfig.primary.port, &val_raw, flags);
+                res1 = (eOresult_t)hal_spiencoder_get_value((hal_spiencoder_t)this_jomoconfig.primary.port, &val_raw, &flags);
                 
                 if(eores_OK != res1)
                 {
-                    *primaryvalue = (uint32_t)err_onReadFromSpi;
-                    return((eOresult_t)res1);
+                    //*primaryvalue = 0;
+                    *etype1 = err_onReadFromSpi;
+                    return(eores_NOK_generic);
                 }
 
                 if(eobool_false == s_eo_appEncReader_IsValidValue_SPICHAIN2(&val_raw, &errortype))
                 {
-                    *primaryvalue = (eOappEncReader_errortype_t)errortype;  
-                    flags->data_error = 1;
+                    //*primaryvalue = 0;  
+                    *etype1 = errortype;
                     return(eores_NOK_generic);
                 }
-
+                
                 uint16_t val1 = (val_raw >> 2) & 0x0fff; // it is the first encoder in the chain
                 uint16_t val2 = (val_raw >> 18) & 0x0fff; // it is the second encoder in the chain
                 val_raw = val1 + val2; // we give back the sum of the two
@@ -587,18 +595,19 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint
         {
             case eomn_serv_mc_sensor_encoder_aea:
             {
-                res2 = (eOresult_t)hal_spiencoder_get_value((hal_spiencoder_t)this_jomoconfig.secondary.port, &val_raw, flags);
+                res2 = (eOresult_t)hal_spiencoder_get_value((hal_spiencoder_t)this_jomoconfig.secondary.port, &val_raw, &flags);
                 
                 if(eores_OK != res2)
                 {
-                    *secondaryvalue = (uint32_t)err_onReadFromSpi;
-                    return((eOresult_t)res2);
+                    //*secondaryvalue = 0;
+                    *etype2 = err_onReadFromSpi;
+                    return(eores_NOK_generic);
                 }
 
                 if (eobool_false == s_eo_appEncReader_IsValidValue_AEA(&val_raw, &errortype))
                 {
-                    *secondaryvalue = (eOappEncReader_errortype_t)errortype;  
-                    flags->data_error = 1;
+                    //*secondaryvalue =0;  
+                    *etype2 = errortype;
                     return(eores_NOK_generic);
                 }
 
@@ -610,12 +619,13 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint
             case eomn_serv_mc_sensor_encoder_amo:
             {
                     
-                res2 = (eOresult_t)hal_spiencoder_get_value((hal_spiencoder_t)this_jomoconfig.secondary.port, &val_raw, flags);
+                res2 = (eOresult_t)hal_spiencoder_get_value((hal_spiencoder_t)this_jomoconfig.secondary.port, &val_raw, &flags);
             
                 if(eores_OK != res2)
                 {
-                    *secondaryvalue = (uint32_t)err_onReadFromSpi;
-                    return((eOresult_t)res2);
+                    //*secondaryvalue = 0;
+                    *etype2 = err_onReadFromSpi;
+                    return(eores_NOK_generic);
                 }
             
                 val_raw = (val_raw>>4) & 0xFFFF;
@@ -625,18 +635,19 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint
             
             case eomn_serv_mc_sensor_encoder_spichainof2:
             {                    
-                res2 = (eOresult_t)hal_spiencoder_get_value((hal_spiencoder_t)this_jomoconfig.secondary.port, &val_raw, flags);
+                res2 = (eOresult_t)hal_spiencoder_get_value((hal_spiencoder_t)this_jomoconfig.secondary.port, &val_raw, &flags);
             
                 if(eores_OK != res2)
                 {
-                    *secondaryvalue = (uint32_t)err_onReadFromSpi;
-                    return((eOresult_t)res2);
+                    //*secondaryvalue = 0;
+                    *etype2 = err_onReadFromSpi;
+                    return(eores_NOK_generic);
                 }
                 
                 if(eobool_false == s_eo_appEncReader_IsValidValue_SPICHAIN2(&val_raw, &errortype))
                 {
-                    *secondaryvalue = (eOappEncReader_errortype_t)errortype;  
-                    flags->data_error = 1;
+                    //*secondaryvalue = 0;  
+                    *etype2 = errortype;
                     return(eores_NOK_generic);
                 }                
             
@@ -720,7 +731,7 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint
         *secondaryvalue = ENCODER_VALUE_NOT_SUPPORTED;
     }
     
-    // return value based only on the reading of the primary encoder
+    // return value based only on the reading of the primary encoder ... mah ... non sarebbe meglio usare una funzione dedicata al primary ed una la secondary? pensaci.
     return(res1);
 }
 

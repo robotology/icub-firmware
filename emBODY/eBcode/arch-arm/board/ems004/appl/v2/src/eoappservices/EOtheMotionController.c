@@ -945,7 +945,7 @@ extern eOresult_t eo_motioncontrol_Tick(EOtheMotionController *p)
         uint8_t error_mask = 0;
         eOresult_t res = eores_NOK_generic;
         uint32_t encvalue[4] = {0}; 
-        hal_spiencoder_errors_flags encflags[4] = {0};
+        //hal_spiencoder_errors_flags encflags[4] = {0};
         int16_t pwm[4] = {0};
         
         uint8_t i = 0;
@@ -971,7 +971,7 @@ extern eOresult_t eo_motioncontrol_Tick(EOtheMotionController *p)
             for(i=0; i<p->numofjomos; i++)
             {
                 uint32_t extra = 0;
-                res = eo_encoderreader_Read(p->mcfoc.theencoderreader, i, &(encvalue[i]), &extra, &(encflags[i]));
+                res = eo_encoderreader_Read(p->mcfoc.theencoderreader, i, &(encvalue[i]), &extra, NULL, NULL);
                 if (res != eores_OK)
                 {
                     error_mask |= 1<<(i<<1);
@@ -2484,7 +2484,7 @@ static eOresult_t s_eo_mcserv_do_mc4plus(EOtheMotionController *p)
     eOresult_t res = eores_NOK_generic;
     uint32_t encvalue[4] = {0}; 
     uint32_t extra[4] = {0};
-    hal_spiencoder_errors_flags encflags[4] = {0};
+    //hal_spiencoder_errors_flags encflags[4] = {0};
     int16_t pwm[4] = {0};  
     
     EOconstarray* carray;
@@ -2523,7 +2523,7 @@ static eOresult_t s_eo_mcserv_do_mc4plus(EOtheMotionController *p)
             const eOmn_serv_jomo_descriptor_t *jomodes = (eOmn_serv_jomo_descriptor_t*) eo_constarray_At(carray, i);   
             
             // the object EOtheEncoderReader (but maybe it may be called EOthePositionReader) will internaly manage any type of sensor, even the MAIS
-            res = eo_encoderreader_Read(p->mcmc4plus.theencoderreader, i, &(encvalue[i]), &(extra[i]), &(encflags[i]));
+            res = eo_encoderreader_Read(p->mcmc4plus.theencoderreader, i, &(encvalue[i]), &(extra[i]), NULL, NULL);
             if(res != eores_OK)
             {
                 error_mask |= 1<<(i<<1);

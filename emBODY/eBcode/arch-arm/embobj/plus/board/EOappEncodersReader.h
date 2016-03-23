@@ -62,10 +62,10 @@ enum { eOappEncReader_encoders_maxnumberof = 2*eOappEncReader_jomos_maxnumberof 
  **/
 typedef enum
 {
-    err_onParityError   = 0,
-    err_onInvalidValue  = 1,
-    err_onReadFromSpi   = 2,
-    err_NONE            = 255,
+    err_NONE            = 0,
+    err_onReadFromSpi   = 1,
+    err_onParityError   = 2,
+    err_onInvalidValue  = 3
 } eOappEncReader_errortype_t;
 
 
@@ -88,8 +88,7 @@ extern eOresult_t eo_appEncReader_StartRead(EOappEncReader *p);
 
 extern eObool_t eo_appEncReader_isReady(EOappEncReader *p);  
 
-// if eo_appEncReader_GetValue() has an error return value in runtime, then the primary and secondary values contains a value from eOappEncReader_errortype_t
-extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint32_t *primaryvalue, uint32_t *secondaryvalue, hal_spiencoder_errors_flags *flags);
+extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint32_t *primaryvalue, uint32_t *secondaryvalue, eOappEncReader_errortype_t *etype1, eOappEncReader_errortype_t *etype2);
 
 extern eOresult_t eo_appEncReader_Diagnostics_Enable(EOappEncReader *p, eObool_t on);
 

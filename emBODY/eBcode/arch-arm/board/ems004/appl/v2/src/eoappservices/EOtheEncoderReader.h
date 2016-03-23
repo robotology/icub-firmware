@@ -53,6 +53,14 @@ typedef struct EOtheEncoderReader_hid EOtheEncoderReader;
 
 
 
+typedef enum
+{
+    encreader_err_NONE      = 0,
+    encreader_err_READING   = 1,
+    encreader_err_PARITY    = 2,
+    encreader_err_CHIP      = 3
+} eOencoderreader_errortype_t;
+
 //typedef eOresult_t (*eOencoderreader_onendofoperation_fun_t) (EOtheEncoderReader* p, eObool_t operationisok);
 
 
@@ -85,10 +93,11 @@ extern eOresult_t eo_encoderreader_StartReading(EOtheEncoderReader *p);
 
 extern eObool_t eo_encoderreader_IsReadingAvailable(EOtheEncoderReader *p);
 
-extern eOresult_t eo_encoderreader_Read(EOtheEncoderReader *p, uint8_t position, uint32_t *primary, uint32_t *secondary, hal_spiencoder_errors_flags *errors);
+extern eOresult_t eo_encoderreader_Read(EOtheEncoderReader *p, uint8_t position, uint32_t *primary, uint32_t *secondary, eOencoderreader_errortype_t *error1, eOencoderreader_errortype_t *error2);
 
 extern eOresult_t eo_encoderreader_Diagnostics_Tick(EOtheEncoderReader* p);
 
+extern eOresult_t eo_encoderreader_GetPrimaryEncoder(EOtheEncoderReader *p, uint8_t position, eOmn_serv_mc_sensor_t *encoder);
 
 
 /** @}            

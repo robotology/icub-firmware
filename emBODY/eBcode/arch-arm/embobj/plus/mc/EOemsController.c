@@ -13,6 +13,8 @@
 #include "EoCommon.h"
 #include "EOtheMemoryPool.h"
 
+#include "EOtheEncoderReader.h"
+
 #include <string.h>
 
 // keep it before any evaluation of macros ...
@@ -2243,6 +2245,9 @@ void sendErrorMessage(uint8_t j, uint32_t ems_fault_mask_j, uint32_t motor_fault
 {
     //eObool_t managed = eobool_false;
     //uint64_t par64 = (((uint64_t)ems_fault_mask_j)<<32)|(uint64_t)motor_fault_mask_j;
+    
+    eOmn_serv_mc_sensor_t encoder = {0};
+    eo_encoderreader_GetPrimaryEncoder(eo_encoderreader_GetHandle(), j, &encoder);
      
     // 2FOC ERRORS
     if (motor_fault_mask_j & MOTOR_EXTERNAL_FAULT)
@@ -2356,8 +2361,8 @@ void sendErrorMessage(uint8_t j, uint32_t ems_fault_mask_j, uint32_t motor_fault
     {
         //managed = eobool_true;
         eOerrmanDescriptor_t descriptor = {0};
-        descriptor.par16 = j;
-        descriptor.par64 = 0; //par64;
+        descriptor.par16 = j | (encoder.port<<8);
+        descriptor.par64 = 0;
         descriptor.sourcedevice = eo_errman_sourcedevice_localboard; // 0 e' board, 1 can1, 2 can2
         descriptor.sourceaddress = 0; // oppure l'id del can che ha dato errore
         descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_aea_abs_enc_invalid);
@@ -2369,8 +2374,8 @@ void sendErrorMessage(uint8_t j, uint32_t ems_fault_mask_j, uint32_t motor_fault
     {
         //managed = eobool_true;
         eOerrmanDescriptor_t descriptor = {0};
-        descriptor.par16 = j;
-        descriptor.par64 = 0; //par64;
+        descriptor.par16 = j | (encoder.port<<8);
+        descriptor.par64 = 0;
         descriptor.sourcedevice = eo_errman_sourcedevice_localboard; // 0 e' board, 1 can1, 2 can2
         descriptor.sourceaddress = 0; // oppure l'id del can che ha dato errore
         descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_aea_abs_enc_timeout);

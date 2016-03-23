@@ -20,6 +20,8 @@
 #include "EOtheErrorManager.h"
 #include "EOVtheSystem.h"
 
+#include "EOtheEncoderReader.h"
+
 #include "EOMtheEMSrunner.h"
 //#include "hal_led.h"
 // --------------------------------------------------------------------------------------------------------------------
@@ -280,10 +282,12 @@ extern int32_t eo_absCalibratedEncoder_Acquire(EOabsCalibratedEncoder* o, int32_
         if ((runner_info->numberofperiods % 1000) == 0)
         {
             if (o->spikes_count > 0)
-            {                
+            {  
+                eOmn_serv_mc_sensor_t encoder = {0};
+                eo_encoderreader_GetPrimaryEncoder(eo_encoderreader_GetHandle(), o->ID, &encoder);                
                 //message "spike encoder error"
                 eOerrmanDescriptor_t descriptor = {0};
-                descriptor.par16 = o->ID;           
+                descriptor.par16 = o->ID | (encoder.port<<8);           
                 descriptor.par64 = o->spikes_count;
                 descriptor.sourcedevice = eo_errman_sourcedevice_localboard;
                 descriptor.sourceaddress = 0;
