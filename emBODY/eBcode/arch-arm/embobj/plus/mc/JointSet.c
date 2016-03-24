@@ -353,7 +353,7 @@ BOOL JointSet_set_control_mode(JointSet* o, eOmc_controlmode_command_t control_m
         break;
     
     case eomc_controlmode_cmd_openloop:
-        if (o->external_fault) return FALSE;
+        //if (o->external_fault) return FALSE;
         for (int k=0; k<N; ++k)
         { 
             Motor_motion_reset(o->motor+o->motors_of_set[k]);
@@ -365,7 +365,7 @@ BOOL JointSet_set_control_mode(JointSet* o, eOmc_controlmode_command_t control_m
         break;
         
     case eomc_controlmode_cmd_torque:
-        if (o->external_fault) return FALSE;
+        //if (o->external_fault) return FALSE;
         for (int k=0; k<N; ++k)
         { 
             Motor_motion_reset(o->motor+o->motors_of_set[k]);
@@ -380,7 +380,7 @@ BOOL JointSet_set_control_mode(JointSet* o, eOmc_controlmode_command_t control_m
     case eomc_controlmode_cmd_mixed:
     case eomc_controlmode_cmd_position:
     case eomc_controlmode_cmd_velocity:
-        if (o->external_fault) return FALSE;
+        //if (o->external_fault) return FALSE;
         for (int k=0; k<N; ++k)
         { 
             Motor_motion_reset(o->motor+o->motors_of_set[k]);
@@ -735,6 +735,8 @@ static void JointSet_do_wait_calibration(JointSet* o)
             return;
         }
     }
+    
+    JointSet_do_odometry(o);
     
     o->control_mode = eomc_controlmode_idle;
 

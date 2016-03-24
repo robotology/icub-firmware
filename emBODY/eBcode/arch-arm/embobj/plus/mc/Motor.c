@@ -303,6 +303,8 @@ void Motor_set_run(Motor* o) //
     }
     else if (o->HARDWARE_TYPE == HARDWARE_MC4p)
     {
+        hal_motor_reenable_break_interrupts();
+        
         hal_motor_enable((hal_motor_t)o->ID);
         
         o->control_mode = control_mode;
@@ -440,6 +442,8 @@ BOOL Motor_check_faults(Motor* o) //
         o->can_dead = FALSE;
         o->wrong_ctrl_mode = FALSE;
         o->external_fault = FALSE;
+        
+        //
     }
     
     if (o->fault_state_prec.bitmask != o->fault_state.bitmask)

@@ -28,19 +28,22 @@ typedef union
 
 typedef struct //AbsEncoder
 {
-    int32_t distance;
-    
-    int32_t position_last;
-    int32_t position_sure;
-    
-    int32_t velocity;
+    //int32_t position_last;
+    //int32_t position_sure;
+    //int32_t offset;
+    //int32_t delta;
 
-    int32_t sign;
-    int32_t offset;
+    uint16_t position_last;
+    uint16_t position_sure;
+    int16_t offset;
+    int16_t delta;
+    
     int32_t zero;
+    int32_t sign;
 
-    int32_t delta;
-
+    int32_t distance;
+    int32_t velocity;
+    
     uint16_t invalid_cnt;
     uint16_t timeout_cnt;
     
@@ -80,7 +83,8 @@ extern void AbsEncoder_destroy(AbsEncoder* o);
 extern void AbsEncoder_config(AbsEncoder *o, uint8_t ID, int32_t resolution, int16_t spike_mag_limit, uint16_t spike_cnt_limit);
 extern void AbsEncoder_calibrate(AbsEncoder* o, int32_t offset, int32_t zero);
 
-extern void AbsEncoder_update(AbsEncoder* o, int32_t position);
+//extern void AbsEncoder_update(AbsEncoder* o, int32_t position);
+extern void AbsEncoder_update(AbsEncoder* o, uint16_t position);
 extern void AbsEncoder_invalid(AbsEncoder* o, hal_spiencoder_errors_flags error_flags);
 extern void AbsEncoder_timeout(AbsEncoder* o);
 
