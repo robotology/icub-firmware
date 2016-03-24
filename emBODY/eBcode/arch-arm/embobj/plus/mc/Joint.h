@@ -86,6 +86,8 @@ typedef struct // Joint
     JointFaultState fault_state_prec;
     JointFaultState fault_state;
     uint16_t diagnostics_refresh;
+    eOmc_joint_t * eo_joint_ptr; // pointer to network variable of ethernet protocol.
+    
 } Joint;
 
 extern Joint* Joint_new(uint8_t n);

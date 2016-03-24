@@ -89,6 +89,8 @@ void Joint_init(Joint* o)
     o->fault_state.bitmask = 0;
     o->diagnostics_refresh = 0;
     
+    o->eo_joint_ptr = NULL;
+    
     //SpeedController_init(o->speedController);
 }
 
@@ -153,7 +155,40 @@ void Joint_motion_reset(Joint *o)
     
     o->output = ZERO;
 }
+static void Joint_update_status_reference(Joint* o, eOmc_controlmode_command_t control_mode)
+{
+    switch (control_mode)
+    {
+        case eomc_controlmode_cmd_force_idle:
+        case eomc_controlmode_cmd_idle:
+            break;
+        case eomc_controlmode_cmd_mixed:
+            o->eo_joint_ptr->status.target.trgt_velocity = o->vel_ref;
+            o->eo_joint_ptr->status.target.trgt_position = o->pos_ref;
+            break;
+        case eomc_controlmode_cmd_velocity:
+            o->eo_joint_ptr->status.target.trgt_velocity = o->vel_ref;
+            break;
+        case eomc_controlmode_cmd_position:
+            o->eo_joint_ptr->status.target.trgt_position = o->pos_ref;
+            break;
+        case eomc_controlmode_cmd_direct:
+            o->eo_joint_ptr->status.target.trgt_positionraw = o->pos_ref;
+            break;
+                
+        case eomc_controlmode_cmd_openloop:
+            o->eo_joint_ptr->status.target.trgt_openloop = o->out_ref;
+            break;
 
+        case eomc_controlmode_cmd_torque:
+            o->eo_joint_ptr->status.target.trgt_torque = o->trq_ref;
+            break;
+            
+        default:
+            ;
+    }
+
+}
 BOOL Joint_set_control_mode(Joint* o, eOmc_controlmode_command_t control_mode)
 {
     if (o->control_mode == control_mode) return TRUE;
@@ -202,6 +237,8 @@ BOOL Joint_set_control_mode(Joint* o, eOmc_controlmode_command_t control_mode)
     Joint_set_inner_control_flags(o);
     
     Joint_motion_reset(o);
+    
+    Joint_update_status_reference(o, control_mode);
     
     return TRUE;
 }

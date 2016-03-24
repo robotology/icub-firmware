@@ -6,6 +6,8 @@
 
 #include "EOemsControllerCfg.h"
 
+#include "EOtheEntities.h"
+
 #include "Joint.h"
 #include "Motor.h"
 #include "AbsEncoder.h"
@@ -162,6 +164,8 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
             default:
                 return;
         }
+        
+        o->joint[k].eo_joint_ptr = eo_entities_GetJoint(eo_entities_GetHandle(), k);
     }
     
     float **Jjm = NULL; //o->Jjm;
