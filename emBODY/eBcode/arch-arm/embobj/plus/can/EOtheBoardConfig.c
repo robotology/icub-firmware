@@ -945,17 +945,12 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb7_eb9 =
 #if defined(CER)
 
 static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb10 =
-{   // eb15
+{   // eb10
     .type       = eomn_serv_MC_mc4plus,
     .filler     = {0},
-    .data.mc.foc_based = 
+    .data.mc.mc4plus_based = 
     {
         .boardtype4mccontroller = emscontroller_board_CER_NECK,
-        .version    =
-        {
-            .firmware   = { .major = 0, .minor = 0, .build = 0 },
-            .protocol   = { .major = 0, .minor = 0 }
-        },
         .filler                 = {0},
         .arrayofjomodescriptors =
         {
@@ -976,7 +971,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb10 =
                     .sensor         =
                     {
                         .type   = eomn_serv_mc_sensor_encoder_aea,
-                        .port   = eomn_serv_mc_port_ems_spiP10,
+                        .port   = eomn_serv_mc_port_ems_spiP11,
                         .pos    = eomn_serv_mc_sensor_pos_atjoint
                     },
                     .extrasensor    =
@@ -994,7 +989,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb10 =
                     .sensor         =
                     {
                         .type   = eomn_serv_mc_sensor_encoder_aea,
-                        .port   = eomn_serv_mc_port_ems_spiP11,
+                        .port   = eomn_serv_mc_port_ems_spiP10,
                         .pos    = eomn_serv_mc_sensor_pos_atjoint
                     },
                     .extrasensor    =
@@ -1062,8 +1057,9 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb10 =
                 { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
                 { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(1.0f) } 
             }  
-        }             
+        }         
     }
+
 };
 
 
