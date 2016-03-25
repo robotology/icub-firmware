@@ -473,7 +473,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
     }
     case emscontroller_board_HEAD_neckyaw_eyes:       //=6,      //MC4plus
     {
-        o->nSets   = 2;
+        o->nSets   = 3;
         
         Sjm = o->Sjm;
         Jjm = o->Jjm;
@@ -511,9 +511,9 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         
         //joint, motor, encoder to set
         o->j2s[0] = o->m2s[0] = o->e2s[0] = 0;
-        o->j2s[1] = o->m2s[1] = o->e2s[1] = 0;
-        o->j2s[2] = o->m2s[2] = o->e2s[2] = 1;
-        o->j2s[3] = o->m2s[3] = o->e2s[3] = 1;
+        o->j2s[1] = o->m2s[1] = o->e2s[1] = 1;
+        o->j2s[2] = o->m2s[2] = o->e2s[2] = 2;
+        o->j2s[3] = o->m2s[3] = o->e2s[3] = 2;
         
         for (int k=0; k<o->nJoints; ++k)
         {
@@ -527,6 +527,9 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         
         o->jointSet[1].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
         o->jointSet[1].CAN_DO_TRQ_CTRL = FALSE;
+        
+        o->jointSet[2].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
+        o->jointSet[2].CAN_DO_TRQ_CTRL = FALSE;
         
         break;
     }
