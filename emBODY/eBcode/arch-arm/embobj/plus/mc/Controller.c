@@ -430,24 +430,107 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
     
     
     
-    case emscontroller_board_HEAD_neckpitch_neckroll: //= 5,    //MC4plus
-        break;
-    case emscontroller_board_HEAD_neckyaw_eyes:       //= 6,    //MC4plus
-        o->nSets   = 4;
+    case emscontroller_board_HEAD_neckpitch_neckroll:      //= 5,    //MC4plus
+    {
+        o->nSets   = 1;
+
+        // motor to joint
+        // |j0|   |   0.5   -0.5  |   |m0|
+        // |j1| = |   0.5    0.5  | * |m1|
+
+        Sjm = o->Sjm;
+        Jjm = o->Jjm;
+        Jmj = o->Jmj;
+        
+        Sjm[0][0] =  0.5f; Sjm[0][1] = -0.5f;
+        Sjm[1][0] =  0.5f; Sjm[1][1] =  0.5f;
     
+        for (int j=0; j<o->nJoints; ++j)
+            for (int m=0; m<o->nJoints; ++m)
+                Jjm[j][m] = Sjm[j][m];
+        
+        
+        //joint to motor
+        // |m0|   |   1.0    1.0  |   |j0|
+        // |m1| = |  -1.0    1.0  | * |j1|
+        
+        Jmj[0][0] =  1.0f; Jmj[0][1] =  1.0f;
+        Jmj[1][0] = -1.0f; Jmj[1][1] =  1.0f;
+        
         for (int k = 0; k<o->nJoints; ++k)
-        {            
+        {
             o->joint[k].CAN_DO_TRQ_CTRL = FALSE;
             o->joint[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
             o->motor[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-            
-            o->jointSet[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-            o->jointSet[k].CAN_DO_TRQ_CTRL = FALSE;
-            
-            o->j2s[k] = o->m2s[k] = o->e2s[k] = k;
+            //jiont, motor, encoder to set
+            o->j2s[k] = o->m2s[k] = o->e2s[k] = 0;
         }
         
+        o->jointSet[0].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
+        o->jointSet[0].CAN_DO_TRQ_CTRL = FALSE;
+        
         break;
+    }
+    case emscontroller_board_HEAD_neckyaw_eyes:       //=6,      //MC4plus
+    {
+        o->nSets   = 2;
+        
+        Sjm = o->Sjm;
+        Jjm = o->Jjm;
+        Jmj = o->Jmj;
+        
+        //motor to joint
+        
+        // |j0|    | 1     0       0      0 |    |m0|
+        // |j1|  = | 0     1       0      0 |  * |m1|
+        // |j2|    | 0     0      0.5    0.5|    |m2|
+        // |j3|    | 0     0     -0.5    0.5|    |m2|
+
+        Sjm[0][0] =  1.0f; Sjm[0][1] =  0.0f; Sjm[0][2] =  0.0f; Sjm[0][3] =  0.0f;
+        Sjm[1][0] =  0.0f; Sjm[1][1] =  1.0f; Sjm[1][2] =  0.0f; Sjm[1][3] =  0.0f;
+        Sjm[2][0] =  0.0f; Sjm[2][1] =  0.0f; Sjm[2][2] =  0.5f; Sjm[2][3] =  0.5f;
+        Sjm[3][0] =  0.0f; Sjm[3][1] =  0.0f; Sjm[3][2] = -0.5f; Sjm[3][3] =  0.5f;
+
+        for (int j=0; j<4; ++j)
+            for (int m=0; m<4; ++m)
+                Jjm[j][m] = Sjm[j][m];
+        
+
+        //inverted matrix: joint to motor
+        // |m0|    | 1     0       0      0 |    |j0|
+        // |m1|  = | 0     1       0      0 |  * |j1|
+        // |m2|    | 0     0       1     -1 |    |j2|
+        // |m3|    | 0     0       1      1 |    |j2|
+        
+        Jmj[0][0] =  1.0f; Jmj[0][1] =  0.0f; Jmj[0][2] =  0.0f; Jmj[0][3] =  0.0f;
+        Jmj[1][0] =  0.0f; Jmj[1][1] =  1.0f; Jmj[1][2] =  0.0f; Jmj[1][3] =  0.0f;
+        Jmj[2][0] =  0.0f; Jmj[2][1] =  0.0f; Jmj[2][2] =  1.0f; Jmj[2][3] = -1.0f;
+        Jmj[3][0] =  0.0f; Jmj[3][1] =  0.0f; Jmj[3][2] =  1.0f; Jmj[3][3] =  1.0f;
+        
+        
+        
+        //joint, motor, encoder to set
+        o->j2s[0] = o->m2s[0] = o->e2s[0] = 0;
+        o->j2s[1] = o->m2s[1] = o->e2s[1] = 0;
+        o->j2s[2] = o->m2s[2] = o->e2s[2] = 1;
+        o->j2s[3] = o->m2s[3] = o->e2s[3] = 1;
+        
+        for (int k=0; k<o->nJoints; ++k)
+        {
+            o->joint[k].CAN_DO_TRQ_CTRL = FALSE;
+            o->joint[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
+            o->motor[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
+        }
+        
+        o->jointSet[0].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
+        o->jointSet[0].CAN_DO_TRQ_CTRL = FALSE;
+        
+        o->jointSet[1].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
+        o->jointSet[1].CAN_DO_TRQ_CTRL = FALSE;
+        
+        break;
+    }
+
     case emscontroller_board_FACE_eyelids_jaw:        //= 7,    //MC4plus
         break;
     case emscontroller_board_FACE_lips:               //= 8,    //MC4plus
@@ -470,7 +553,9 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
     case emscontroller_board_HAND_2:                  //= 10,   //MC4plus
         break;
     case emscontroller_board_FOREARM:                 //= 11,   //MC4plus
-        break;
+        break;    
+    
+    
     default:
         return;
     }
