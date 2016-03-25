@@ -769,11 +769,11 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             //AbsEncoder_calibrate(o->absEncoder+e, 0, 0);
             //Motor_calibrate(o->motor+e, calibrator->params.type3.offset);
             break;
-        case eomc_calibration_type5_hard_stops_mc4plus:
+        case eomc_calibration_type5_hard_stops:
             AbsEncoder_calibrate(o->absEncoder+e, 0, 0);
              Motor_reset(o->motor+e);
-            //Motor_calibrate_moving2Hardstop(o->motor+e, calibrator->params.type5.pwmlimit, calibrator->params.type5.calibrationZero);
-            Motor_calibrate_moving2Hardstop(o->motor+e, calibrator->params.type5.pwmlimit, calibrator->params.type5.final_pos);
+            Motor_calibrate_moving2Hardstop(o->motor+e, calibrator->params.type5.pwmlimit, calibrator->params.type5.calibrationZero);
+            //Motor_calibrate_moving2Hardstop(o->motor+e, calibrator->params.type5.pwmlimit, calibrator->params.type5.final_pos);
             break;
         
         case eomc_calibration_type0_hard_stops:
