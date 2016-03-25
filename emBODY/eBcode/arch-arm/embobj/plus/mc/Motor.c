@@ -754,15 +754,10 @@ void Motor_get_state(Motor* o, eOmc_motor_status_t* motor_status)
 void Motor_update_pos_fbk(Motor* o, int32_t position_raw)
 {
     int32_t position;  
-    int32_t pippo=0;
     
     o->pos_raw_fbk = position_raw;
     position = o->pos_raw_fbk/o->GEARBOX - o->pos_calib_offset;
-    
-    if(o->ID == 1)
-    {
-        pippo=position_raw;
-    }    
+      
     //valid for init
     if ((o->pos_fbk == 0) && (o->pos_fbk_old == 0))
     {
