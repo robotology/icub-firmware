@@ -180,8 +180,8 @@ extern void eo_axisController_StartCalibration(EOaxisController *o, uint32_t* pa
             o->control_mode = eomc_controlmode_calib;
             
         } break;
-        case eomc_calibration_type5_hard_stops_mc4plus:
-        case eomc_calibration_type8_adc_and_incr_mc4plus: //same params
+        case eomc_calibration_type5_hard_stops:
+        case eomc_calibration_type8_tripod_internal_hard_stop: //same params
         {
             eOmc_calibrator_params_type5_hard_stops_mc4plus_t* p_type5 = (eOmc_calibrator_params_type5_hard_stops_mc4plus_t*) params;
     
@@ -189,9 +189,9 @@ extern void eo_axisController_StartCalibration(EOaxisController *o, uint32_t* pa
             o->pwm_limit_calib = p_type5->pwmlimit;
     
             if (o->pwm_limit_calib >= 0)
-                o->pos_to_reach = p_type5->final_pos;
+                o->pos_to_reach = p_type5->calibrationZero;
             else
-                o->pos_to_reach = -p_type5->final_pos;
+                o->pos_to_reach = -p_type5->calibrationZero;
  
             //reset the offset
             o->offset = 0;
@@ -570,7 +570,7 @@ extern eObool_t eo_axisController_SetControlMode(EOaxisController *o, eOmc_contr
         //N.B. at the moment only for calibration5 cause calibration3 applies only an offset to the encoder raw values (no risks)
         if ((!IS_CALIBRATED()))
         {    
-            if (o->calibration_type == eomc_calibration_type5_hard_stops_mc4plus)
+            if (o->calibration_type == eomc_calibration_type5_hard_stops)
             {
                 //if the joint was calibrating, I reset its calibration values
                 if (o->control_mode == eomc_controlmode_calib)
@@ -756,7 +756,7 @@ extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
         case eomc_controlmode_calib:
         {
             //calib type 5 and calib type 8
-            if ((o->calibration_type == eomc_calibration_type5_hard_stops_mc4plus) || (o->calibration_type == eomc_calibration_type8_adc_and_incr_mc4plus))
+            if ((o->calibration_type == eomc_calibration_type5_hard_stops) || (o->calibration_type == eomc_calibration_type8_tripod_internal_hard_stop))
             {
                 //inside here only with coupled joints (some already calibrated, the others not)
                 if(1 == o->calibration_finished)
@@ -775,7 +775,7 @@ extern float eo_axisController_PWM(EOaxisController *o, eObool_t *stiff)
                     
                     //calibration type 8 now ends (as type 5) when the limit is reached, without searching for the index (more precise). 
                     /*
-                    if ((o->calibration_type == eomc_calibration_type8_adc_and_incr_mc4plus) && (eo_mcserv_IsMotorEncoderIndexReached(eo_mcserv_GetHandle(), o->axisID) == eobool_false))
+                    if ((o->calibration_type == eomc_calibration_type8_tripod_internal_hard_stop) && (eo_mcserv_IsMotorEncoderIndexReached(eo_mcserv_GetHandle(), o->axisID) == eobool_false))
                     {
                         //still need to find the index of quad_enc (search in the opposite direction)
                         return -(o->pwm_limit_calib); 
@@ -1291,7 +1291,7 @@ static void axisMotionReset(EOaxisController *o)
 #ifdef USE_MC4PLUS
 static void s_eo_axisController_CheckHardwareLimitReached(EOaxisController *o)
 {
-    if (o->calibration_type == eomc_calibration_type5_hard_stops_mc4plus)
+    if (o->calibration_type == eomc_calibration_type5_hard_stops)
     {
         //if for 20 consecutive times (~20ms) I'm in the same position (but let the calibration start before...), it means that I reached the hardware limit
         o->calib_count += 1;
@@ -1314,7 +1314,7 @@ static void s_eo_axisController_CheckHardwareLimitReached(EOaxisController *o)
         }
         o->old_pos = GET_AXIS_POSITION();
     }
-    else if (o->calibration_type == eomc_calibration_type8_adc_and_incr_mc4plus)
+    else if (o->calibration_type == eomc_calibration_type8_tripod_internal_hard_stop)
     {
         //DEBUG PRINTING
         /*

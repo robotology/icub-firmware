@@ -449,14 +449,14 @@ extern void eo_emsController_AcquireAbsEncoders(int32_t *abs_enc_pos, uint8_t er
             #else
             eo_axleVirtualEncoder_Acquire(ems->motor_config_gearbox_ratio[j], ems->axle_virt_encoder[j], axle_abs_pos[j], axle_virt_pos[j], axle_virt_vel[j]);
             #endif
-            if (ems->axis_controller[j]->calibration_type == eomc_calibration_type8_adc_and_incr_mc4plus)
+            if (ems->axis_controller[j]->calibration_type == eomc_calibration_type8_tripod_internal_hard_stop)
                 eo_axisController_RescaleAxisPosition(ems->axis_controller[j], eo_axleVirtualEncoder_GetPos(ems->axle_virt_encoder[j]));
             else
                 eo_axisController_SetEncPos(ems->axis_controller[j], eo_axleVirtualEncoder_GetPos(ems->axle_virt_encoder[j]));
             
             eo_axisController_SetEncVel(ems->axis_controller[j], eo_axleVirtualEncoder_GetVel(ems->axle_virt_encoder[j]));
         #else
-            if (ems->axis_controller[j]->calibration_type == eomc_calibration_type5_hard_stops_mc4plus)  
+            if (ems->axis_controller[j]->calibration_type == eomc_calibration_type5_hard_stops)  
             { 
                 if((emscontroller_board_HEAD_neckyaw_eyes == ems->board) && ((2==j)||(3==j))  && eo_axisController_IsCalibrated(ems->axis_controller[j]))
                 {
@@ -693,7 +693,7 @@ extern void eo_emsController_PWM(int16_t* pwm_motor_16)
         torque_protection[j] = eobool_false;
         // davide: don'tcompute the PWM if the encoder is not calibrated, for calibration type 5
         // this should let to initialize the encoder (encoder_init() inside the speedmeter during the first cycles of the loop)
-        if((!eo_absCalibratedEncoder_IsOk(ems->abs_calib_encoder[j])) && (ems->axis_controller[j]->calibration_type == eomc_calibration_type5_hard_stops_mc4plus))
+        if((!eo_absCalibratedEncoder_IsOk(ems->abs_calib_encoder[j])) && (ems->axis_controller[j]->calibration_type == eomc_calibration_type5_hard_stops))
         {
             pwm_joint[j] = 0;
         }
@@ -1224,20 +1224,20 @@ extern void eo_emsController_StartCalibration(uint8_t joint, eOmc_calibration_ty
             
         } break;
         
-        case eomc_calibration_type5_hard_stops_mc4plus:
+        case eomc_calibration_type5_hard_stops:
         {
             eOmc_calibrator_params_type5_hard_stops_mc4plus_t* p_type5 = (eOmc_calibrator_params_type5_hard_stops_mc4plus_t*) params;
     
             eo_emsController_SetAxisCalibrationZero(joint, p_type5->calibrationZero);
             
-            ems->axis_controller[joint]->calibration_type = eomc_calibration_type5_hard_stops_mc4plus;
+            ems->axis_controller[joint]->calibration_type = eomc_calibration_type5_hard_stops;
             s_eo_emsController_ResetCalibrationCoupledJoints(joint);
             eo_absCalibratedEncoder_Calibrate(ems->abs_calib_encoder[joint], 0);            
         } break;
         
-        case eomc_calibration_type8_adc_and_incr_mc4plus:
+        case eomc_calibration_type8_tripod_internal_hard_stop:
         {
-            eomc_calibration_type8_adc_and_incr_mc4plus_t* p_type8 = (eomc_calibration_type8_adc_and_incr_mc4plus_t*) params;
+            eOmc_calibrator_params_type8_tripod_internal_hard_stop_t* p_type8 = (eOmc_calibrator_params_type8_tripod_internal_hard_stop_t*) params;
     
             //test: start the calibration for the tripod joints of the board ALL together
             if ((ems->board == emscontroller_board_CER_WRIST) && (joint != 3))
@@ -1245,7 +1245,7 @@ extern void eo_emsController_StartCalibration(uint8_t joint, eOmc_calibration_ty
                 for (uint8_t i = 0; i < 3; i++)
                 {
                         eo_emsController_SetAxisCalibrationZero(i, p_type8->calibrationZero);
-                        ems->axis_controller[i] ->calibration_type = eomc_calibration_type8_adc_and_incr_mc4plus;
+                        ems->axis_controller[i] ->calibration_type = eomc_calibration_type8_tripod_internal_hard_stop;
                         eo_absCalibratedEncoder_Calibrate(ems->abs_calib_encoder[i], 0);
                         
                         //reset quad_enc so that they start from the same value again
@@ -1265,7 +1265,7 @@ extern void eo_emsController_StartCalibration(uint8_t joint, eOmc_calibration_ty
             {
                 eo_emsController_SetAxisCalibrationZero(joint, p_type8->calibrationZero);
             
-                ems->axis_controller[joint] ->calibration_type = eomc_calibration_type8_adc_and_incr_mc4plus;
+                ems->axis_controller[joint] ->calibration_type = eomc_calibration_type8_tripod_internal_hard_stop;
                 s_eo_emsController_ResetCalibrationCoupledJoints(joint);
                 eo_absCalibratedEncoder_Calibrate(ems->abs_calib_encoder[joint], 0);     
             }
@@ -1337,7 +1337,7 @@ extern void eo_emsController_CheckCalibrations(void)
             {
                 if( (ems->axis_controller[j]->calibration_type == eomc_calibration_type3_abs_sens_digital)
                     ||
-                    (ems->axis_controller[j]->calibration_type == eomc_calibration_type5_hard_stops_mc4plus && ems->axis_controller[j]->calibration_finished))
+                    (ems->axis_controller[j]->calibration_type == eomc_calibration_type5_hard_stops && ems->axis_controller[j]->calibration_finished))
                 {
                     ems->n_calibrated++;
                     eo_axisController_SetCalibrated(ems->axis_controller[j]);
@@ -1395,7 +1395,7 @@ extern void eo_emsController_CheckCalibrations(void)
             {
                 if((ems->axis_controller[j]->calibration_type == eomc_calibration_type3_abs_sens_digital)
                     ||
-                    (ems->axis_controller[j]->calibration_type == eomc_calibration_type5_hard_stops_mc4plus && ems->axis_controller[j]->calibration_finished))
+                    (ems->axis_controller[j]->calibration_type == eomc_calibration_type5_hard_stops && ems->axis_controller[j]->calibration_finished))
                 {    
                     ems->n_calibrated++;
                     eo_axisController_SetCalibrated(ems->axis_controller[j]);
@@ -1498,8 +1498,8 @@ extern void eo_emsController_CheckCalibrations(void)
             if ((  (ems->axis_controller[0]->calibration_type == eomc_calibration_type3_abs_sens_digital)
                 && (ems->axis_controller[1]->calibration_type == eomc_calibration_type3_abs_sens_digital))
                 ||
-                (  (ems->axis_controller[0]->calibration_type == eomc_calibration_type5_hard_stops_mc4plus && ems->axis_controller[0]->calibration_finished)
-                && (ems->axis_controller[1]->calibration_type == eomc_calibration_type5_hard_stops_mc4plus && ems->axis_controller[1]->calibration_finished)))
+                (  (ems->axis_controller[0]->calibration_type == eomc_calibration_type5_hard_stops && ems->axis_controller[0]->calibration_finished)
+                && (ems->axis_controller[1]->calibration_type == eomc_calibration_type5_hard_stops && ems->axis_controller[1]->calibration_finished)))
             {
                 ems->n_calibrated+=2;
                 eo_axisController_SetCalibrated(ems->axis_controller[0]);
@@ -1530,7 +1530,7 @@ extern void eo_emsController_CheckCalibrations(void)
             {
                 if  ((ems->axis_controller[j]->calibration_type == eomc_calibration_type3_abs_sens_digital)
                     ||
-                    (ems->axis_controller[j]->calibration_type == eomc_calibration_type5_hard_stops_mc4plus && ems->axis_controller[j]->calibration_finished))
+                    (ems->axis_controller[j]->calibration_type == eomc_calibration_type5_hard_stops && ems->axis_controller[j]->calibration_finished))
                 {
                     ems->n_calibrated++;
                     eo_axisController_SetCalibrated(ems->axis_controller[j]);
@@ -1554,8 +1554,8 @@ extern void eo_emsController_CheckCalibrations(void)
             if ((  (ems->axis_controller[2]->calibration_type == eomc_calibration_type3_abs_sens_digital)
                 && (ems->axis_controller[3]->calibration_type == eomc_calibration_type3_abs_sens_digital))
                 ||
-                (  (ems->axis_controller[2]->calibration_type == eomc_calibration_type5_hard_stops_mc4plus && ems->axis_controller[2]->calibration_finished)
-                && (ems->axis_controller[3]->calibration_type == eomc_calibration_type5_hard_stops_mc4plus && ems->axis_controller[3]->calibration_finished)))
+                (  (ems->axis_controller[2]->calibration_type == eomc_calibration_type5_hard_stops && ems->axis_controller[2]->calibration_finished)
+                && (ems->axis_controller[3]->calibration_type == eomc_calibration_type5_hard_stops && ems->axis_controller[3]->calibration_finished)))
             {
                 ems->n_calibrated+=2; 
                 eo_axisController_SetCalibrated(ems->axis_controller[2]);
