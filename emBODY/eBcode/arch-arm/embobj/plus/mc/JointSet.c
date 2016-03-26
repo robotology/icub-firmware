@@ -216,7 +216,6 @@ BOOL JointSet_do_check_faults(JointSet* o)
         {
             fault = TRUE;
             
-            // TODOALE
             // traditional confusion among joints, motors and encoders: I don't like it
             o->joint[o->joints_of_set[k]].control_mode = eomc_controlmode_hwFault;
         }
@@ -230,7 +229,6 @@ BOOL JointSet_do_check_faults(JointSet* o)
         {
             fault = TRUE;
             
-            // TODOALE
             // traditional confusion among joints, motors and encoders: I don't like it
             o->joint[o->joints_of_set[k]].control_mode = eomc_controlmode_hwFault;
         }

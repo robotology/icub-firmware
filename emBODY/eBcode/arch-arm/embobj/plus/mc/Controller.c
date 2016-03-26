@@ -618,7 +618,6 @@ void MController_config_joint(int j, eOmc_joint_config_t* config) //
     
     Joint_config(o->joint+j, j, config);
     
-    // TODOALE move to motor config
     Motor_config_trqPID(o->motor+j, &(config->pidtorque));
     Motor_config_filter(o->motor+j,   config->tcfiltertype);
     Motor_config_friction(o->motor+j, config->motor_params.bemf_value, config->motor_params.ktau_value);
@@ -639,6 +638,16 @@ void MController_config_motor_friction(int m, eOmc_motor_params_t* friction) //
 void MController_config_joint_impedance(int j, eOmc_impedance_t* impedance) //
 {
     Joint_set_impedance(smc->joint+j, impedance);
+}
+
+void MController_motor_config_current_PID(int m, eOmc_PID_t* pidcurrent)
+{
+    Motor_config_current_PID(smc->motor+m, pidcurrent);
+}
+
+void MController_motor_config_max_currents(int m, eOmc_current_limits_params_t* current_params)
+{
+    Motor_config_max_currents(smc->motor+m, current_params);
 }
 
 /*
@@ -1090,7 +1099,10 @@ void MController_config_motor_gearbox_ratio(int m, int32_t gearbox_ratio)
     Motor_config_gearbox_ratio(smc->motor+m, gearbox_ratio);
 }
 
-void empty_fake_MController_config_motor_encoder(int m, int32_t resolution){}
+void MController_config_motor_encoder(int m, int32_t resolution)
+{
+    Motor_config_encoder(smc->motor+m, resolution);
+}
     
 int16_t MController_config_motor_pwm_limit(int m, int16_t pwm_limit)
 {

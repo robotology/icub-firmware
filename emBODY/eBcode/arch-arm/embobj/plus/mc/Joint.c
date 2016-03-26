@@ -120,11 +120,7 @@ void Joint_config(Joint* o, uint8_t ID, eOmc_joint_config_t* config)
     WatchDog_set_base_time_msec(&o->vel_ref_wdog, config->velocitysetpointtimeout);
     WatchDog_rearm(&o->vel_ref_wdog);
     
-    // TODOALE *** MCR joint output max (openloop) missing ***
-    //o->out_max = config->
-    // TODOALE *** MCR joint torque max (openloop) missing ***
-    //o->trq_max = config->
-    // TODOALE *** MCR joint admittance missing ***
+    // TODOALE joint admittance missing
     o->Kadmitt = ZERO;
 }
 
@@ -507,7 +503,9 @@ CTRL_UNITS Joint_do_vel_control(Joint* o)
             {
                 o->vel_ref = -o->Kadmitt * o->trq_err;
             }
-                
+            
+            LIMIT(o->vel_ref, o->vel_max);
+            
             o->output = o->vel_ref;
 
             break;
@@ -550,6 +548,8 @@ CTRL_UNITS Joint_do_vel_control(Joint* o)
                     }
                 }
                 
+                LIMIT(o->vel_ref, o->vel_max);
+                
                 o->output = o->vel_ref;
             }
             else
@@ -575,6 +575,8 @@ CTRL_UNITS Joint_do_vel_control(Joint* o)
                 {
                     o->vel_ref += o->scKpos * (o->pos_err + o->Kadmitt * o->trq_fbk);
                 }
+                
+                LIMIT(o->vel_ref, o->vel_max);
                 
                 o->output = o->vel_ref;
             }
@@ -742,7 +744,7 @@ BOOL Joint_set_out_ref(Joint* o, CTRL_UNITS out_ref)
     }
     
     o->out_ref = out_ref;
-    
+
     return TRUE;
 }
 

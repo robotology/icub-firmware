@@ -29,8 +29,6 @@ typedef struct // Joint
     CTRL_UNITS pos_max;
     CTRL_UNITS vel_max;
     CTRL_UNITS acc_max;
-    //CTRL_UNITS trq_max;
-    //CTRL_UNITS out_max;
     
     CTRL_UNITS output_lim;
     
@@ -80,8 +78,6 @@ typedef struct // Joint
     BOOL pos_control_active;
     BOOL trq_control_active;
     BOOL CAN_DO_TRQ_CTRL;
-    
-    
     
     JointFaultState fault_state_prec;
     JointFaultState fault_state;

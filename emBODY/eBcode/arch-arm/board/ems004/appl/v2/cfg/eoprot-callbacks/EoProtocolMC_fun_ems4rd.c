@@ -112,9 +112,6 @@ static eOmotioncontroller_mode_t s_motorcontrol_getmode(void);
 
 // -- mc4plus-based functions
 
-// TODOALE manage this stuff
-//static void s_eoprot_ep_mc_fun_MotorReactivationAttempt(uint8_t motor, uint32_t current_state);
-
 
 // -- mc4can-based functions
 
@@ -1241,7 +1238,7 @@ extern void eoprot_fun_UPDT_mc_motor_config_rotorencoder(const EOnv* nv, const e
     
     if((eo_motcon_mode_foc == mcmode) || (eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode))
     {
-        empty_fake_MController_config_motor_encoder(jxx, *rotenc);
+        MController_config_motor_encoder(jxx, *rotenc);
     }
 }
 
@@ -1251,9 +1248,6 @@ extern void eoprot_fun_UPDT_mc_motor_config_rotorencoder(const EOnv* nv, const e
 // f-marker-begin
 extern void eoprot_fun_UPDT_mc_controller_config_jointcoupling(const EOnv* nv, const eOropdescriptor_t* rd)
 {   // not for mc4can
-
-    // TODOALE
-    
     eOmc_jointcouplingmatrix_t *mat = (eOmc_jointcouplingmatrix_t*)rd->data;    
 
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
@@ -1273,9 +1267,7 @@ extern void eoprot_fun_UPDT_mc_controller_config_jointcoupling(const EOnv* nv, c
         }
         */
         
-        eo_emsController_set_Jacobian(*mat);
-            
-        #warning --> marco.accame: put in here the debug messages for jointcoupling (and then remove them)
+        MController_set_Jacobian(*mat);
             
         eOerrmanDescriptor_t errdes = {0};
         errdes.code                 = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag00);
@@ -1306,27 +1298,19 @@ extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescripto
 
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
     
-    
     eOcanprot_command_t command = {0};
     command.class = eocanprot_msgclass_pollingMotorControl;
-    
-    #warning marco.accame: the code for ems and mc4plus is sligthly different .... what it correct?
         
     if(eo_motcon_mode_foc == mcmode)
     {
         MController_config_motor(mxx, mconfig);
-        // TODOALE
-        //mconfig->pwmLimit = eo_emsController_GetActuationLimit(mxx);
+
         return;           
     }
     else if((eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode))   
     {
         MController_config_motor(mxx, mconfig);
         eo_currents_watchdog_UpdateCurrentLimits( eo_currents_watchdog_GetHandle(), mxx);
-        // If pwmLimit is bigger than hardwhere limit, emsController uses hardwarelimit. 
-        // Therefore I need to update netvar with the limit used in emsController.
-        // TODOALE
-        //mconfig->pwmLimit = eo_emsController_GetActuationLimit(mxx);
     }
     else if(eo_motcon_mode_mc4 == mcmode)
     {
@@ -1378,7 +1362,11 @@ extern void eoprot_fun_UPDT_mc_motor_config_pidcurrent(const EOnv* nv, const eOr
     
     if(eo_motcon_mode_foc == mcmode)
     {
-        //TODOALE
+        eOmc_PID_t *pid = (eOmc_PID_t*)rd->data;
+        eOprotIndex_t mxx = eoprot_ID2index(rd->id32);
+
+        MController_motor_config_current_PID(mxx, pid);
+
         return;
     }
     else if((eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode))
@@ -1428,8 +1416,8 @@ extern void eoprot_fun_UPDT_mc_motor_config_currentlimits(const EOnv* nv, const 
         command.type  = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT;
         command.value = &curr;
         eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);
-        // TODOALE
-        #warning TODO: ALE should add in here a function for updating maxcurrent of motor value inside the controller
+
+        MController_motor_config_max_currents(mxx, currentLimits);
     }
     else if((eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode))
     {

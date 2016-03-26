@@ -36,7 +36,39 @@ static void Motor_hardStopCalbData_reset(Motor* o)
     o->hardstop_calibdata.u.bits.iscalibrating = 0;
 
 }
-static void Motor_config_2FOC(uint8_t motor, eOmc_motor_config_t* config)
+
+static void Motor_config_current_PID_2FOC(Motor* o, eOmc_PID_t* pidcurrent)
+{
+    int8_t KpKiKdKs[7];
+    
+    ((int16_t*)KpKiKdKs)[0] = pidcurrent->kp;    //Kp
+    ((int16_t*)KpKiKdKs)[1] = pidcurrent->ki;    //Ki
+    ((int16_t*)KpKiKdKs)[2] = pidcurrent->kd;    //Kd (unused in 2FOC)
+               KpKiKdKs [6] = pidcurrent->scale; // shift
+    
+    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, o->ID, 0);
+    
+    eOcanprot_command_t cmdPid;
+    cmdPid.class = eocanprot_msgclass_pollingMotorControl;
+    cmdPid.type = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID;
+    cmdPid.value = KpKiKdKs;
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdPid, id32);
+}
+
+static void Motor_config_max_currents_2FOC(Motor* o, eOmc_current_limits_params_t* current_params)
+{    
+    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, o->ID, 0);
+    
+    int32_t max_current = current_params->nominalCurrent;
+    
+    eOcanprot_command_t cmdMaxCurrent;
+    cmdMaxCurrent.class = eocanprot_msgclass_pollingMotorControl;
+    cmdMaxCurrent.type = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT;
+    cmdMaxCurrent.value = &max_current;
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdMaxCurrent, id32);
+}
+
+static void Motor_config_2FOC(Motor* o, eOmc_motor_config_t* config)
 {   
     int8_t KpKiKdKs[7];
     
@@ -50,28 +82,28 @@ static void Motor_config_2FOC(uint8_t motor, eOmc_motor_config_t* config)
     //((int16_t*)KpKiKdKs)[2] =  0; //Kd (unused in 2FOC)
     //           KpKiKdKs [6] = 10; // shift
     
-    uint32_t max_current = config->currentLimits.overloadCurrent;
+    uint32_t max_current = config->currentLimits.nominalCurrent;
     
     #define HAS_QE      0x0001
     #define HAS_HALL    0x0002
     #define HAS_TSENS   0x0004
     #define USE_INDEX   0x0008
 
-    uint8_t motor_config[6];
+    //uint8_t can_motor_config[6];
     
-    motor_config[0] = 0; // HAS_QE|HAS_HALL;
+    o->can_motor_config[0] = 0; // HAS_QE|HAS_HALL;
     
-    if (config->hasRotorEncoder)        motor_config[0] |= HAS_QE;
-    if (config->hasHallSensor)          motor_config[0] |= HAS_HALL;
-    if (config->hasRotorEncoderIndex)   motor_config[0] |= USE_INDEX;
-    if (config->hasTempSensor)          motor_config[0] |= HAS_TSENS;
+    if (config->hasRotorEncoder)        o->can_motor_config[0] |= HAS_QE;
+    if (config->hasHallSensor)          o->can_motor_config[0] |= HAS_HALL;
+    if (config->hasRotorEncoderIndex)   o->can_motor_config[0] |= USE_INDEX;
+    if (config->hasTempSensor)          o->can_motor_config[0] |= HAS_TSENS;
     
-    *(int16_t*)(motor_config+1) = config->rotorEncoderResolution;
-    *(int16_t*)(motor_config+3) = config->rotorIndexOffset;
+    *(int16_t*)(o->can_motor_config+1) = config->rotorEncoderResolution;
+    *(int16_t*)(o->can_motor_config+3) = config->rotorIndexOffset;
     
-    motor_config[5] = config->motorPoles;
+    o->can_motor_config[5] = config->motorPoles;
     
-    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, motor, 0);
+    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, o->ID, 0);
     
     eOcanprot_command_t cmdPid;
     cmdPid.class = eocanprot_msgclass_pollingMotorControl;
@@ -88,7 +120,7 @@ static void Motor_config_2FOC(uint8_t motor, eOmc_motor_config_t* config)
     eOcanprot_command_t cmdMotorConfig;
     cmdMotorConfig.class = eocanprot_msgclass_pollingMotorControl;
     cmdMotorConfig.type = ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_CONFIG;
-    cmdMotorConfig.value = motor_config;
+    cmdMotorConfig.value = o->can_motor_config;
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdMotorConfig, id32);      
 }
 
@@ -155,13 +187,13 @@ void Motor_config(Motor* o, uint8_t ID, eOmc_motor_config_t* config) //
     o->pos_min = config->limitsofrotor.min;
     o->pos_max = config->limitsofrotor.max;    
     o->vel_max = config->maxvelocityofmotor;
-    o->pwm_max = config->pwmLimit;
     o->Iqq_max = config->pidcurrent.limitonoutput;
-    //o->Trq_max = ???
+    
+    config->pwmLimit = Motor_config_pwm_limit(o, config->pwmLimit);
  
     if (o->HARDWARE_TYPE == HARDWARE_2FOC)
     {
-        Motor_config_2FOC(o->ID, config);
+        Motor_config_2FOC(o, config);
         
         WatchDog_set_base_time_msec(&o->can_2FOC_alive_wdog, CAN_ALIVE_TIMEOUT);
         WatchDog_rearm(&o->can_2FOC_alive_wdog);
@@ -176,6 +208,42 @@ void Motor_config(Motor* o, uint8_t ID, eOmc_motor_config_t* config) //
         o->control_mode = icubCanProto_controlmode_idle;
         hal_motor_disable((hal_motor_t)o->ID);
     }    
+}
+
+void Motor_config_encoder(Motor* o, int32_t resolution)
+{
+    o->enc_sign = resolution >= 0 ? 1 : -1;
+    
+    if (o->HARDWARE_TYPE == HARDWARE_2FOC)
+    {
+        *(int16_t*)(o->can_motor_config+1) = resolution;
+        
+        eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, o->ID, 0);
+        
+        eOcanprot_command_t cmdMotorConfig;
+        cmdMotorConfig.class = eocanprot_msgclass_pollingMotorControl;
+        cmdMotorConfig.type = ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_CONFIG;
+        cmdMotorConfig.value = o->can_motor_config;
+        eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdMotorConfig, id32);  
+    }
+}
+
+void Motor_config_max_currents(Motor* o, eOmc_current_limits_params_t* current_params)
+{
+    o->Iqq_max = current_params->nominalCurrent;
+    
+    if (o->HARDWARE_TYPE == HARDWARE_2FOC)
+    {
+        Motor_config_max_currents_2FOC(o, current_params);
+    }
+}
+
+void Motor_config_current_PID(Motor* o, eOmc_PID_t* pidcurrent)
+{
+    if (o->HARDWARE_TYPE == HARDWARE_2FOC)
+    {
+        Motor_config_current_PID_2FOC(o, pidcurrent);
+    }
 }
 
 void Motor_destroy(Motor* o) //
@@ -806,7 +874,7 @@ int16_t Motor_config_pwm_limit(Motor* o, int16_t pwm_limit)
     
     o->pwm_max = pwm_limit;
     
-    return pwm_limit;
+    return o->pwm_max;
 }
 
 BOOL Motor_is_external_fault(Motor* o)

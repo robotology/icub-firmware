@@ -196,12 +196,10 @@ typedef struct //Motor
     WatchDog control_mode_req_wdog;
 
     HardStopCalibData hardstop_calibdata;
+
     // 2FOC specific data
-    
     WatchDog can_2FOC_alive_wdog;
-    //CanState2FocMsg state_2FOC_fbk;
-    
-    // MC4p specific data
+    uint8_t can_motor_config[6];
 
 } Motor;
 
@@ -209,6 +207,10 @@ extern Motor* Motor_new(uint8_t n);  //
 extern void Motor_init(Motor* o);  //
 extern void Motor_config(Motor* o, uint8_t ID, eOmc_motor_config_t* config); //
 extern void Motor_destroy(Motor* o); //
+
+extern void Motor_config_encoder(Motor* o, int32_t resolution);
+extern void Motor_config_max_currents(Motor* o, eOmc_current_limits_params_t* current_params);
+extern void Motor_config_current_PID(Motor* o, eOmc_PID_t* pidcurrent);
 
 extern void Motor_config_trqPID(Motor* o, eOmc_PID_t* pid); //
 extern void Motor_config_filter(Motor* o, uint8_t filter); //

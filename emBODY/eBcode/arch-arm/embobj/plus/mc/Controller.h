@@ -85,6 +85,9 @@ extern void MController_config_pos_pid(int j, eOmc_PID_t *pid_conf); //
 extern void MController_config_trq_pid(int m, eOmc_PID_t *pid_conf); //
 extern void MController_config_joint_pos_limits(int j, int32_t pos_min, int32_t pos_max);
 extern void MController_config_joint_vel_ref_timeout(int j, int32_t timeout_ms);
+extern void MController_motor_config_current_PID(int m, eOmc_PID_t* pidcurrent);
+extern void MController_motor_config_max_currents(int m, eOmc_current_limits_params_t* current_params);
+
 extern BOOL MController_set_joint_pos_ref(int j, CTRL_UNITS pos_ref, CTRL_UNITS vel_ref);
 extern BOOL MController_set_joint_vel_ref(int j, CTRL_UNITS vel_ref, CTRL_UNITS acc_ref);
 extern BOOL MController_set_joint_pos_raw(int j, CTRL_UNITS pos_ref);
@@ -92,7 +95,7 @@ extern BOOL MController_set_joint_trq_ref(int j, CTRL_UNITS trq_ref);
 extern BOOL MController_set_joint_out_ref(int j, CTRL_UNITS out_ref);
 extern void MController_stop_joint(int j);
 extern void MController_config_motor_gearbox_ratio(int m, int32_t gearbox_ratio);
-extern void empty_fake_MController_config_motor_encoder(int m, int32_t resolution);
+extern void MController_config_motor_encoder(int m, int32_t resolution);
 extern int16_t MController_config_motor_pwm_limit(int m, int16_t pwm_limit);
 extern void MController_update_motor_odometry_fbk_can(int m, void* data);
 
