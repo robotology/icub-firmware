@@ -152,6 +152,8 @@ void Motor_init(Motor* o) //
 {
     memset(o, 0, sizeof(Motor));
 
+    o->GEARBOX = 1;
+    
     o->not_calibrated = TRUE;
     
     o->control_mode           = icubCanProto_controlmode_notConfigured;
@@ -285,11 +287,9 @@ void Motor_calibrate_moving2Hardstop(Motor* o, int32_t pwm, int32_t zero) //
     o->hardstop_calibdata.limited_pwm = pwm;
     o->hardstop_calibdata.u.bits.hwlimitreached = 0;
     o->hardstop_calibdata.u.bits.iscalibrating = 1;
+
     o->hardstop_calibdata.last_pos = o->pos_fbk;
-//    if(0 != o->GEARBOX)
-//        gearbox  = o->GEARBOX; //to avoid to do a divition by zero ig gearbox is not configured correctly
-//    
-//    o->hardstop_calibdata.zero = zero*gearbox;
+    
     o->hardstop_calibdata.zero = zero;
     Motor_set_run(o);
 }
@@ -321,8 +321,7 @@ static void Motor_check_hardstopReached(Motor *o)
     }
 }
 
-
-extern void Motor_do_calibration(Motor* o)
+extern void Motor_do_calibration_hard_stop(Motor* o)
 {
     if(0 == o->hardstop_calibdata.u.bits.iscalibrating)
         return;
@@ -339,7 +338,6 @@ extern void Motor_do_calibration(Motor* o)
     {
          o->output = o->hardstop_calibdata.limited_pwm;
     }
-
 }
 
 void Motor_set_run(Motor* o) //
@@ -678,7 +676,7 @@ void Motor_update_odometry_fbk_can(Motor* o, CanOdometry2FocMsg* can_msg) //
     o->vel_fbk = o->vel_raw_fbk/o->GEARBOX;
     
     o->pos_raw_fbk = can_msg->position;
-    o->pos_fbk = o->pos_calib_offset + o->pos_raw_fbk/o->GEARBOX;
+    o->pos_fbk = o->pos_raw_fbk/o->GEARBOX - o->pos_calib_offset;
 }
 
 void Motor_actuate(Motor* motor, uint8_t N) //

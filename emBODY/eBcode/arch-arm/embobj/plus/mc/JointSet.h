@@ -12,6 +12,16 @@
 
 #include "hal_led.h"
 
+typedef struct // TripodCalib
+{
+    int32_t pwm;
+    int32_t zero;
+    int32_t max_delta;
+    int32_t pos[3];
+    int32_t start_pos[3];
+    int16_t cnt[3];
+} TripodCalib;
+
 typedef struct // JointSet
 {
     hal_led_t led;
@@ -49,6 +59,10 @@ typedef struct // JointSet
     uint8_t special_constraint;
     
     int32_t special_limit;
+    
+    eOmc_calibration_type_t calibration_in_progress;
+    
+    TripodCalib tripod_calib;
 } JointSet;
 
 extern JointSet* JointSet_new(uint8_t n); //
