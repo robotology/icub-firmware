@@ -216,7 +216,7 @@ extern void Motor_config_trqPID(Motor* o, eOmc_PID_t* pid); //
 extern void Motor_config_filter(Motor* o, uint8_t filter); //
 extern void Motor_config_friction(Motor* o, float Bemf, float Ktau); //
 extern void Motor_calibrate_withOffset(Motor* o, int32_t offset); //
-extern void Motor_calibrate_moving2Hardstop(Motor* o, int32_t pwm, int32_t zero); //
+extern BOOL Motor_calibrate_moving2Hardstop(Motor* o, int32_t pwm, int32_t zero); //
 
 extern void Motor_set_run(Motor* o); //
 extern void Motor_set_idle(Motor* o); //
@@ -253,6 +253,7 @@ extern void Motor_raise_fault_overcurrent(Motor* o);
 extern void Motor_raise_fault_i2t(Motor* o);
 extern void Motor_raise_fault_external(Motor* o);
 extern BOOL Motor_is_external_fault(Motor* o);
+BOOL Motor_is_in_fault(Motor *o);
 
 ////////////////////////////////////////////////////////////////////////////
 extern void Motor_config_gearbox_ratio(Motor* o, int32_t gearbox_ratio);

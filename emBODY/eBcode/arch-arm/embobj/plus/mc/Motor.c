@@ -279,8 +279,16 @@ void Motor_calibrate_withOffset(Motor* o, int32_t offset) //
     }
 }
 
-void Motor_calibrate_moving2Hardstop(Motor* o, int32_t pwm, int32_t zero) //
+BOOL Motor_calibrate_moving2Hardstop(Motor* o, int32_t pwm, int32_t zero) //
 {
+    Motor_set_run(o);
+    Motor_check_faults(o);
+    
+    if(Motor_is_in_fault(o))
+        return FALSE;
+    
+    Motor_reset(o);
+    
     Motor_hardStopCalbData_reset(o);
     //int16_t gearbox = 1;
     o->pos_calib_offset = 0;
@@ -291,7 +299,8 @@ void Motor_calibrate_moving2Hardstop(Motor* o, int32_t pwm, int32_t zero) //
     o->hardstop_calibdata.last_pos = o->pos_fbk;
     
     o->hardstop_calibdata.zero = zero;
-    Motor_set_run(o);
+    //Motor_set_run(o);
+    return TRUE;
 }
 #define MOTOR_HARDSTOP_WAITCALIBCOUNTER_MAX     1200
 #define MOTOR_POSSTABLE_COUNTER_MAX             100
@@ -323,7 +332,7 @@ static void Motor_check_hardstopReached(Motor *o)
 
 extern void Motor_do_calibration_hard_stop(Motor* o)
 {
-    if(0 == o->hardstop_calibdata.u.bits.iscalibrating)
+    if((0 == o->hardstop_calibdata.u.bits.iscalibrating) || (TRUE == o->external_fault))
         return;
     
     Motor_check_hardstopReached(o);
@@ -496,6 +505,7 @@ BOOL Motor_check_faults(Motor* o) //
     if (!(o->hardware_fault || external_fault))
     {
         o->fault_state_prec.bitmask = 0;
+        o->external_fault = external_fault;
 
         return FALSE;
     }
@@ -844,6 +854,7 @@ void Motor_update_pos_fbk(Motor* o, int32_t position_raw)
     
     //update velocity
     o->vel_fbk = delta*CTRL_LOOP_FREQUENCY_INT;
+    o->vel_raw_fbk = o->vel_fbk*o->GEARBOX;
     
     //update last position for next iteration
     o->pos_fbk_old = position;
@@ -917,6 +928,11 @@ void Motor_reset(Motor *o)
 
     //o->control_mode = ???
     //o->control_mode_req;
+}
+
+BOOL Motor_is_in_fault(Motor *o)
+{
+    return(o->hardware_fault || o->external_fault);
 }
 /*
 void Motor_update_temperature_fbk(Motor* o, int16_t temperature_fbk) { o->temperature_fbk = temperature_fbk; }
