@@ -274,7 +274,9 @@ void AbsEncoder_update(AbsEncoder* o, uint16_t position)
                 
             position -= o->offset;
             
-            o->distance = position;
+            o->distance += (int32_t)delta;
+            
+            //o->distance = position;
                 
             o->velocity = (7*o->velocity + ((int32_t)CTRL_LOOP_FREQUENCY)*o->delta) >> 3;
         }

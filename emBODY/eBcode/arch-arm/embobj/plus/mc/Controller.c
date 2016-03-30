@@ -372,6 +372,9 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         o->j2s[2] = o->m2s[2] = o->e2s[2] = 1;
         o->j2s[3] = o->m2s[3] = o->e2s[3] = 1;
         
+        Sje = o->Sje;
+        Sje[0][0] = 1.0f/64.0f;
+    
         for (int k = 1; k<4; ++k)
         {
             o->joint[k].CAN_DO_TRQ_CTRL = FALSE;
@@ -622,7 +625,14 @@ void MController_config_joint(int j, eOmc_joint_config_t* config) //
     Motor_config_filter(o->motor+j,   config->tcfiltertype);
     Motor_config_friction(o->motor+j, config->motor_params.bemf_value, config->motor_params.ktau_value);
     
-    AbsEncoder_config(o->absEncoder+j, j, config->jntEncoderResolution, AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
+    if (j==0 && o->part_type==emscontroller_board_CER_WRIST)
+    {
+        AbsEncoder_config(o->absEncoder+j, j, config->jntEncoderResolution, 64*AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
+    }
+    else
+    {
+        AbsEncoder_config(o->absEncoder+j, j, config->jntEncoderResolution, AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
+    }
 }
 
 void MController_config_motor(int m, eOmc_motor_config_t* config) //

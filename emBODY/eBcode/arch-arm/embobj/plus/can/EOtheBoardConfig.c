@@ -1062,10 +1062,6 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb10 =
 
 };
 
-
-
-
-
 static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb15 =
 {   // eb15
     .type       = eomn_serv_MC_foc,
@@ -1180,7 +1176,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb15 =
         {
             .joint2set      = 
             {   // each joint is on a different set 
-                0, 1, 2, 3 
+                0, 0, 0, 1 
             },
             .joint2motor    = 
             {   // zero matrix: use matrix embedded in controller and seecetd by boardtype4mccontroller
@@ -1200,7 +1196,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb15 =
     }
 };
 
-static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb17 =
+static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb17_eb19 =
 {   // eb17
     .type       = eomn_serv_MC_foc,
     .filler     = {0},
@@ -1289,6 +1285,126 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb17 =
         }             
     }
 };
+
+
+static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb18_eb20 =
+{   // eb10
+    .type       = eomn_serv_MC_mc4plus,
+    .filler     = {0},
+    .data.mc.mc4plus_based = 
+    {
+        .boardtype4mccontroller = emscontroller_board_CER_WRIST,
+        .filler                 = {0},
+        .arrayofjomodescriptors =
+        {
+            .head   = 
+            {
+                .capacity       = 4,
+                .itemsize       = sizeof(eOmn_serv_jomo_descriptor_t),
+                .size           = 4,
+                .internalmem    = 0                    
+            },
+            .data   =
+            {
+                { // joint 0: pronosupination
+                    .actuator.pwm   =
+                    {
+                        .port   = eomn_serv_mc_port_mc4plus_pwmP3         
+                    },
+                    .sensor         =
+                    {
+                        .type   = eomn_serv_mc_sensor_encoder_aea,
+                        .port   = eomn_serv_mc_port_mc4plus_spiP10,
+                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                    },
+                    .extrasensor    =
+                    {
+                        .type   = eomn_serv_mc_sensor_none,
+                        .port   = 0, 
+                        .pos    = eomn_serv_mc_sensor_pos_none
+                    }
+                },
+                { // joint 1: trifid motor 1
+                    .actuator.pwm   =
+                    {
+                        .port   = eomn_serv_mc_port_mc4plus_pwmP2              
+                    },
+                    .sensor         =
+                    {
+                        .type   = eomn_serv_mc_sensor_none,
+                        .port   = 0, 
+                        .pos    = eomn_serv_mc_sensor_pos_none
+                    },
+                    .extrasensor    =
+                    {                        
+                        .type   = eomn_serv_mc_sensor_encoder_inc,
+                        .port   = eomn_serv_mc_port_mc4plus_qencP2,
+                        .pos    = eomn_serv_mc_sensor_pos_atmotor
+                    }
+                },                
+                { // joint 2: trifid motor 2
+                    .actuator.pwm   =
+                    {
+                        .port   = eomn_serv_mc_port_mc4plus_pwmP4              
+                    },
+                    .sensor         =
+                    {
+                        .type   = eomn_serv_mc_sensor_none,
+                        .port   = 0, 
+                        .pos    = eomn_serv_mc_sensor_pos_none
+                    },
+                    .extrasensor    =
+                    {
+                        .type   = eomn_serv_mc_sensor_encoder_inc,
+                        .port   = eomn_serv_mc_port_mc4plus_qencP4,
+                        .pos    = eomn_serv_mc_sensor_pos_atmotor
+                    }
+                },               
+                { // joint 3: trifid motor 3
+                    .actuator.pwm   =
+                    {
+                        .port   = eomn_serv_mc_port_mc4plus_pwmP5              
+                    },
+                    .sensor         =
+                    {
+                        .type   = eomn_serv_mc_sensor_none,
+                        .port   = 0, 
+                        .pos    = eomn_serv_mc_sensor_pos_none
+                    },
+                    .extrasensor    =
+                    {                        
+                        .type   = eomn_serv_mc_sensor_encoder_inc,
+                        .port   = eomn_serv_mc_port_mc4plus_qencP5,
+                        .pos    = eomn_serv_mc_sensor_pos_atmotor
+                    }
+                }            
+            }
+        },
+        .jomocoupling       =
+        {
+            .joint2set      = 
+            {   // each joint is on a different set 
+                0, 1, 1, 1 
+            },
+            .joint2motor    = 
+            {   // zero matrix: use matrix embedded in controller and seecetd by boardtype4mccontroller
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) }        
+            },
+            .joint2encoder  = 
+            {   // identical matrix
+                { EO_COMMON_FLOAT_TO_Q17_14(1.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(1.0f) } 
+            }  
+        }         
+    }
+
+};
+
 
 
 static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb21 =
@@ -2512,10 +2628,10 @@ static const eOmn_serv_configuration_t * const s_serv_config_mc_CER[maxboards_CE
     NULL,
     &s_serv_config_mc_cer_eb15,
     NULL,
-    &s_serv_config_mc_cer_eb17,
-    NULL,
-    NULL,
-    NULL,
+    &s_serv_config_mc_cer_eb17_eb19,
+    &s_serv_config_mc_cer_eb18_eb20,
+    &s_serv_config_mc_cer_eb17_eb19,
+    &s_serv_config_mc_cer_eb18_eb20,
     &s_serv_config_mc_cer_eb21    
 };
 
