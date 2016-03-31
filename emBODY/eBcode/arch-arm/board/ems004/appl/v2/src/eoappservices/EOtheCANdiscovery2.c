@@ -107,6 +107,10 @@ static void s_eo_candiscovery2_on_timer_expiry(void *arg);
 
 static eObool_t s_eo_candiscovery2_search(void);
 
+static eObool_t s_eo_isFirmwareVersionToBeVerified(const eObrd_firmwareversion_t* target);
+
+static eObool_t s_eo_isProtocolVersionToBeVerified(const eObrd_protocolversion_t* target);
+
 static eOresult_t s_eo_candiscovery2_getFWversion(uint8_t boardtype, eOcanmap_location_t location, eObrd_protocolversion_t requiredprotocolversion);
 
 static eObool_t s_eo_isFirmwareVersionCompatible(const eObrd_firmwareversion_t* target, const eObrd_firmwareversion_t* detected);
@@ -248,18 +252,25 @@ extern eOresult_t eo_candiscovery2_Start(EOtheCANdiscovery2 *p, const eOcandisco
 #endif
     
     // 1. i send to all the can boards the first request. all subsequent requests are managed by the _Tick() function which is triggered by the timer
+    //    however, if we dont need to send any request, this function sets s_eo_thecandiscovery2.detection.allhavereplied to true nd we dont neeed to
+    //    activate the timer.
+    
     s_eo_candiscovery2_search();
     
-    EOaction_strg astg = {0};
-    EOaction *action = (EOaction*)&astg;
-       
-    // the action depends on the state of the application. 
-    // if we are in config mode, then we send an event to the config task.  
-    // else if we are in run mode we just set an enable flag for teh control-loop to exec _Tick().
+    if(eobool_false == s_eo_thecandiscovery2.detection.allhavereplied)
+    {
     
-    eo_action_SetCallback(action, s_eo_candiscovery2_on_timer_expiry, p, eov_callbackman_GetTask(eov_callbackman_GetHandle())); // eom_callbackman_GetTask(eom_callbackman_GetHandle()));
-    eo_timer_Start(s_eo_thecandiscovery2.discoverytimer, eok_abstimeNOW, s_eo_thecandiscovery2.config.period, eo_tmrmode_FOREVER, action);         
-
+        EOaction_strg astg = {0};
+        EOaction *action = (EOaction*)&astg;
+           
+        // the action depends on the state of the application. 
+        // if we are in config mode, then we send an event to the config task.  
+        // else if we are in run mode we just set an enable flag for teh control-loop to exec _Tick().
+        
+        eo_action_SetCallback(action, s_eo_candiscovery2_on_timer_expiry, p, eov_callbackman_GetTask(eov_callbackman_GetHandle()));
+        eo_timer_Start(s_eo_thecandiscovery2.discoverytimer, eok_abstimeNOW, s_eo_thecandiscovery2.config.period, eo_tmrmode_FOREVER, action);         
+    }
+    
     return(eores_OK);
 }
 
@@ -550,20 +561,16 @@ static void s_eo_candiscovery2_sendDiagnosticsToHost(eObool_t allboardsfound, eO
                             {
                                 nib |= 0x1;
                             }
-                            if((0 != s_eo_thecandiscovery2.target.info.firmware.major) || (0 != s_eo_thecandiscovery2.target.info.firmware.minor))
-                            {   // dont signal error if fw version is (0, 0)
+                            if(eobool_true == s_eo_isFirmwareVersionToBeVerified(&s_eo_thecandiscovery2.target.info.firmware))
+                            {   // signal error only if fw version is to be verified
                                 if(eobool_false == s_eo_isFirmwareVersionCompatible(&s_eo_thecandiscovery2.target.info.firmware, &s_eo_thecandiscovery2.detection.boards[i][n].info.firmware))
-                                //if(0 != memcmp(&s_eo_thecandiscovery2.target.firmware, &s_eo_thecandiscovery2.detection.boards[i][n].info.firmware, sizeof(s_eo_thecandiscovery2.target.firmware)))
                                 {
                                     nib |= 0x2;
                                 }
                             }
-                            if((0 != s_eo_thecandiscovery2.target.info.protocol.major) || (0 != s_eo_thecandiscovery2.target.info.protocol.minor))
-                            {   // dont signal error if fw prot is (0, 0)   
-                
-                                if(eobool_false == s_eo_isProtocolVersionCompatible(&s_eo_thecandiscovery2.target.info.protocol, &s_eo_thecandiscovery2.detection.boards[i][n].info.protocol))
-                                //if((s_eo_thecandiscovery2.detection.boards[i][n].info.info.protocol.major != s_eo_thecandiscovery2.target.info.protocol.major) || (s_eo_thecandiscovery2.detection.boards[i][n].info.info.protocol.minor < s_eo_thecandiscovery2.target.info.protocol.minor))
-                                //if(0 != memcmp(&s_eo_thecandiscovery2.target.protocol, &s_eo_thecandiscovery2.detection.boards[i][n].info.protocol, sizeof(s_eo_thecandiscovery2.target.protocol)))
+                            if(eobool_true == s_eo_isProtocolVersionToBeVerified(&s_eo_thecandiscovery2.target.info.protocol))
+                            {   // signal error ony if prot version is be verified   
+                                if(eobool_false == s_eo_isProtocolVersionCompatible(&s_eo_thecandiscovery2.target.info.protocol, &s_eo_thecandiscovery2.detection.boards[i][n].info.protocol))                                
                                 {
                                     nib |= 0x4;
                                 }
@@ -664,20 +671,20 @@ static eObool_t s_eo_candiscovery2_IsDetectionOK(EOtheCANdiscovery2 *p, eOcanmap
 {  
     eObool_t protocolVersionIsOK = eobool_true;
     eObool_t firmwareVersionIsOK = eobool_true;
+    eObool_t boardtTypeIsOK = eobool_true;
     
     if(s_eo_thecandiscovery2.target.info.type != detected->type)
     {   // the board must be of the same type
         eo_common_hlfword_bitset(&s_eo_thecandiscovery2.detection.differentboardtype[loc.port], loc.addr);
-        return(eobool_false);
+        boardtTypeIsOK = eobool_false;
     }
 
-    // if((required->major == detected->major) && (required->minor <= detected->minor)): formerly the rule for correct version was this one.
-    if ((0 == s_eo_thecandiscovery2.target.info.protocol.major) && (0 == s_eo_thecandiscovery2.target.info.protocol.minor))
-    {   // if the required protocol version is 0.0, i don't care about the answer
+    if(eobool_false == s_eo_isProtocolVersionToBeVerified(&s_eo_thecandiscovery2.target.info.protocol))
+    {   // if the protocol version is not to be verified, i don't care about the answer
+        protocolVersionIsOK = eobool_true;
     }
     else
-    {   // ok, i compare ...  
-        
+    {   // ok, i compare ...          
         // check differences between target and detected
         if(0 != memcmp(&detected->protocol, &s_eo_thecandiscovery2.target.info.protocol, sizeof(detected->protocol)))
         {   // in such a case i mark a difference in prot version. not necessarily we return false. because it may be that the minor 
@@ -686,41 +693,34 @@ static eObool_t s_eo_candiscovery2_IsDetectionOK(EOtheCANdiscovery2 *p, eOcanmap
         
         // verify compatibility of protocol version
         if(eobool_false == s_eo_isProtocolVersionCompatible(&s_eo_thecandiscovery2.target.info.protocol, &detected->protocol))
-        //if((detected->info.protocol.major != s_eo_thecandiscovery2.target.info.protocol.major) || (detected->info.protocol.minor < s_eo_thecandiscovery2.target.info.protocol.minor))
-        {   // there must be a protocol version in board which is in minor >= of the required. if not i must return false
-            // if i return false in here i mark a difference in prot version
+        {   
             protocolVersionIsOK = eobool_false;
         }
     }
     
-    
-    if ((0 == s_eo_thecandiscovery2.target.info.firmware.major) && (0 == s_eo_thecandiscovery2.target.info.firmware.minor))
-    {   // if the required firmware version is 0.0, i don't care about the answer
+    if(eobool_false == s_eo_isFirmwareVersionToBeVerified(&s_eo_thecandiscovery2.target.info.firmware))
+    {   // if the firmware version is not to be verified, i don't care about the answer
+        firmwareVersionIsOK = eobool_true;
     }
     else
     {   // ok, i compare
-        #warning TODO: check all memcmp and memcopy etc where there is sizeof(eObrd_version_t)
         // check differences between target and detected
         if(0 != memcmp(&detected->firmware, &s_eo_thecandiscovery2.target.info.firmware, sizeof(s_eo_thecandiscovery2.target.info.firmware)))
-        //if((detected->firmwareversion.major != s_eo_thecandiscovery2.target.info.firmware.major) || (detected->firmwareversion.minor != s_eo_thecandiscovery2.target.info.firmware.minor))
         {   // in such a case i mark a difference in fw version.
-            eo_common_hlfword_bitset(&s_eo_thecandiscovery2.detection.differentfirmwareversion[loc.port], loc.addr);                       
-            // there must be the very same application firmware version. if not i must return false
-            return(eobool_false);
+            eo_common_hlfword_bitset(&s_eo_thecandiscovery2.detection.differentfirmwareversion[loc.port], loc.addr);
         } 
         
         // verify compatibility of firmware version
         if(eobool_false == s_eo_isFirmwareVersionCompatible(&s_eo_thecandiscovery2.target.info.firmware, &detected->firmware)) 
-        //if((detected->firmwareversion.major != s_eo_thecandiscovery2.target.info.firmware.major) || (detected->firmwareversion.minor != s_eo_thecandiscovery2.target.info.firmware.minor))
-        {   // there must be the very same application firmware version. if not i must return false
+        {   
             firmwareVersionIsOK = eobool_false;
         }          
         
     }
       
     
-    // all tests are ok
-    return(firmwareVersionIsOK && protocolVersionIsOK);    
+    // return the logical AND of all tests
+    return(boardtTypeIsOK && firmwareVersionIsOK && protocolVersionIsOK);    
 }
 
 
@@ -761,8 +761,9 @@ static eObool_t s_eo_candiscovery2_search(void)
     hal_trace_puts("EOtheCANdiscovery2: searching on CAN");
 #endif
     
-    if((0 != s_eo_thecandiscovery2.target.info.protocol.major) || (0 != s_eo_thecandiscovery2.target.info.protocol.minor))
-    {   // i trigger the search only if the protocol is non-zero. if zero, then i mark the boards all found
+    
+    if((eobool_true == s_eo_isFirmwareVersionToBeVerified(&s_eo_thecandiscovery2.target.info.firmware)) || (eobool_true == s_eo_isProtocolVersionToBeVerified(&s_eo_thecandiscovery2.target.info.protocol)))
+    {   // i trigger the search only if at least one of protocol and firmware needs verification. if i dont search, then i mark the boards all found
         for(i=eOcanport1; i<eOcanports_number; i++)
         {
             for(j=1; j<15; j++)
@@ -824,8 +825,7 @@ static eOresult_t s_eo_candiscovery2_getFWversion(uint8_t boardtype, eOcanmap_lo
     
     if(eobool_false == found)
     {
-        return(eores_NOK_generic);
-        
+        return(eores_NOK_generic);        
     }
     
     
@@ -838,7 +838,9 @@ static eOresult_t s_eo_candiscovery2_getFWversion(uint8_t boardtype, eOcanmap_lo
 
 static eObool_t s_eo_isFirmwareVersionCompatible(const eObrd_firmwareversion_t* target, const eObrd_firmwareversion_t* detected)
 {
-    if((detected->major != target->major) || (detected->minor != target->minor))    
+    //if((detected->major != target->major) || (detected->minor != target->minor)) 
+    //if((detected->major != target->major) || (detected->minor < target->minor))    
+    if((detected->major != target->major) || (detected->minor != target->minor) || (detected->build < target->build))
     {
         return(eobool_false);
     }
@@ -850,6 +852,28 @@ static eObool_t s_eo_isFirmwareVersionCompatible(const eObrd_firmwareversion_t* 
 static eObool_t s_eo_isProtocolVersionCompatible(const eObrd_protocolversion_t* target, const eObrd_protocolversion_t* detected)
 {
     if((detected->major != target->major) || (detected->minor < target->minor))    
+    {
+        return(eobool_false);
+    }
+    
+    return(eobool_true);    
+}
+
+
+static eObool_t s_eo_isFirmwareVersionToBeVerified(const eObrd_firmwareversion_t* target)
+{  
+    if((0 == target->major) && (0 == target->minor) && (0 == target->build))
+    {
+        return(eobool_false);
+    }
+    
+    return(eobool_true);
+}
+
+
+static eObool_t s_eo_isProtocolVersionToBeVerified(const eObrd_protocolversion_t* target)
+{
+    if((0 == target->major) && (0 == target->minor))    
     {
         return(eobool_false);
     }
