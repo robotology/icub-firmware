@@ -438,7 +438,7 @@ static eOresult_t s_eo_encoderreader_onstop_verifyreading(void *par, eObool_t re
     // in par16 i put: number of joint in msb and failure mask in lsb
     s_eo_theencoderreader.diagnostics.errorDescriptor.par16 = 0;
     uint16_t mask = s_eo_theencoderreader.failuremask;
-    s_eo_theencoderreader.diagnostics.errorDescriptor.par64 |= ((s_eo_theencoderreader.numofjomos<<8)|(mask));
+    s_eo_theencoderreader.diagnostics.errorDescriptor.par16 |= ((s_eo_theencoderreader.numofjomos<<8)|(mask));
     
     // in par64 i put in each byte: (port|error) of each primary joint
     s_eo_theencoderreader.diagnostics.errorDescriptor.par64 = 0;    
