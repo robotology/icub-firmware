@@ -23,35 +23,7 @@ AbsEncoder* AbsEncoder_new(uint8_t n)
     
     return o;
 }
-/*
-static void AbsEncoder_reset(AbsEncoder* o)
-{ 
-    o->offset = 0;
-    
-    o->distance = 0;
-    o->position_last = 0;
-    o->position_sure = 0;
-    
-    o->velocity = 0;
 
-    o->delta = 0;
-
-    o->hardware_fault = FALSE;
-    o->invalid_cnt = 0;
-    o->timeout_cnt = 0;
-    
-    o->spike_cnt = 0;
-    
-    o->fault_state_prec.bitmask = 0;
-    o->fault_state.bitmask = 0;
-    o->diagnostics_refresh = 0;
-    
-    o->valid_first_data_cnt = 0;
-    
-    o->state.bits.not_calibrated  = TRUE;
-    o->state.bits.not_initialized = TRUE;
-}
-*/
 void AbsEncoder_init(AbsEncoder* o)
 {
     o->ID = 0;
@@ -73,6 +45,9 @@ void AbsEncoder_init(AbsEncoder* o)
 
     o->delta = 0;
 
+    o->partial_timer = 0;
+    o->partial_space = 0;
+    
     o->hardware_fault = FALSE;
     o->invalid_cnt = 0;
     o->timeout_cnt = 0;
@@ -85,9 +60,10 @@ void AbsEncoder_init(AbsEncoder* o)
     
     o->valid_first_data_cnt = 0;
     
+    o->state.bits.not_configured  = TRUE;
     o->state.bits.not_calibrated  = TRUE;
     o->state.bits.not_initialized = TRUE;
-    o->state.bits.not_configured  = TRUE;
+    o->state.bits.hard_stop_calib = FALSE;
 }
 
 void AbsEncoder_destroy(AbsEncoder* o)
@@ -117,10 +93,36 @@ void AbsEncoder_config(AbsEncoder* o, uint8_t ID, int32_t resolution, int16_t sp
     o->state.bits.not_configured = FALSE;
 }
 
+void AbsEncoder_start_hard_stop_calibrate(AbsEncoder* o, int32_t hard_stop_zero)
+{
+    o->offset = 0;
+    o->zero = 0;
+    
+    o->hard_stop_zero = hard_stop_zero;
+    
+    o->distance = o->position_sure;
+    
+    o->state.bits.not_calibrated  = TRUE;
+    o->state.bits.hard_stop_calib = TRUE;
+}
+
+void AbsEncoder_calibrate_in_hard_stop(AbsEncoder* o)
+{
+    o->offset = 0;
+
+    o->zero = o->sign*o->distance - o->hard_stop_zero;  
+    
+    o->state.bits.not_calibrated  = FALSE;
+    o->state.bits.hard_stop_calib = FALSE;
+}
+
+BOOL AbsEncoder_is_hard_stop_calibrating(AbsEncoder* o)
+{
+    return o->state.bits.hard_stop_calib;
+}
+
 void AbsEncoder_calibrate(AbsEncoder* o, int32_t offset, int32_t zero)
 {
-    //AbsEncoder_reset(o);
-    
     o->offset = offset;
     o->zero = zero;
     
@@ -128,7 +130,8 @@ void AbsEncoder_calibrate(AbsEncoder* o, int32_t offset, int32_t zero)
     position -= o->offset;
     o->distance = position;
     
-    o->state.bits.not_calibrated = FALSE;
+    o->state.bits.not_calibrated  = FALSE;
+    o->state.bits.hard_stop_calib = FALSE;
 }
 
 int32_t AbsEncoder_position(AbsEncoder* o)
@@ -236,6 +239,29 @@ void AbsEncoder_invalid(AbsEncoder* o, hal_spiencoder_errors_flags error_flags)
     o->valid_first_data_cnt = 0;
 }
 
+BOOL AbsEncoder_is_still(AbsEncoder* o, int32_t space_window, int32_t time_window)
+{
+    o->partial_space += (int32_t)o->delta;
+    
+    BOOL still = FALSE;
+    
+    if (++o->partial_timer > time_window)
+    {        
+        still = abs(o->partial_space) < space_window;
+        
+        o->partial_timer = 0;
+        o->partial_space = 0;
+    }
+    
+    return still;
+}
+
+void AbsEncoder_still_check_reset(AbsEncoder* o)
+{
+    o->partial_timer = 0;
+    o->partial_space = 0;
+}
+
 void AbsEncoder_update(AbsEncoder* o, uint16_t position)
 {
     if (!o) return;
@@ -257,6 +283,8 @@ void AbsEncoder_update(AbsEncoder* o, uint16_t position)
         
         return;
     }
+    
+    o->delta = 0;
     
     int16_t check = position - o->position_last;
     

@@ -196,7 +196,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         break;
     
     case emscontroller_board_CER_UPPER_ARM:               //= 17,    //2FOC
-        o->nSets   = 2;
+        o->nSets   = 4;
         
         for (int k = 0; k<o->nJoints; ++k)
         {
@@ -372,8 +372,8 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         o->j2s[2] = o->m2s[2] = o->e2s[2] = 1;
         o->j2s[3] = o->m2s[3] = o->e2s[3] = 1;
         
-        Sje = o->Sje;
-        Sje[0][0] = 1.0f/64.0f;
+        //Sje = o->Sje;
+        //Sje[0][0] = 1.0f/64.0f;
     
         for (int k = 1; k<4; ++k)
         {

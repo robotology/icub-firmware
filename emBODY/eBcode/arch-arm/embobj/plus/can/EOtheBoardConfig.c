@@ -1215,7 +1215,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb17_eb19 =
             {
                 .capacity       = 4,
                 .itemsize       = sizeof(eOmn_serv_jomo_descriptor_t),
-                .size           = 2,
+                .size           = 4,
                 .internalmem    = 0                    
             },
             .data   =
@@ -1245,6 +1245,46 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb17_eb19 =
                     {
                         .port           = eOcanport1,
                         .addr           = 2,
+                        .insideindex    = eomn_serv_caninsideindex_first                             
+                    },
+                    .sensor         =
+                    {
+                        .type   = eomn_serv_mc_sensor_none,
+                        .port   = eomn_serv_mc_port_none,
+                        .pos    = eomn_serv_mc_sensor_pos_none                         
+                    },
+                    .extrasensor    =
+                    {
+                        .type   = eomn_serv_mc_sensor_none,
+                        .port   = eomn_serv_mc_port_none,
+                        .pos    = eomn_serv_mc_sensor_pos_none
+                    }
+                },
+                { // joint 2
+                    .actuator.foc.canloc    =
+                    {
+                        .port           = eOcanport1,
+                        .addr           = 3,
+                        .insideindex    = eomn_serv_caninsideindex_first                             
+                    },
+                    .sensor         =
+                    {
+                        .type   = eomn_serv_mc_sensor_none,
+                        .port   = eomn_serv_mc_port_none,
+                        .pos    = eomn_serv_mc_sensor_pos_none
+                    },
+                    .extrasensor    =
+                    {
+                        .type   = eomn_serv_mc_sensor_none,
+                        .port   = eomn_serv_mc_port_none,
+                        .pos    = eomn_serv_mc_sensor_pos_none
+                    }
+                },
+                { // joint 3
+                    .actuator.foc.canloc    =
+                    {
+                        .port           = eOcanport1,
+                        .addr           = 4,
                         .insideindex    = eomn_serv_caninsideindex_first                             
                     },
                     .sensor         =

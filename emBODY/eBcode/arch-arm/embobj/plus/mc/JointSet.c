@@ -542,7 +542,6 @@ static void JointSet_do_pwm_control(JointSet* o)
         }
 
         Motor_set_pwm_ref(o->motor+m, motor_pwm_ref);
-        //Motor_set_pwm_ref(o->motor+m, 0);
     }
     
     if (limits_torque_protection)
@@ -748,6 +747,271 @@ static BOOL JointSet_do_wait_calibration_8(JointSet* o)
 {
     BOOL calibrated = TRUE;
     
+    for (int ms=0; ms<*(o->pN); ++ms)
+    {
+        int m = o->motors_of_set[ms];
+        
+        if (hal_adc_get_hall_sensor_analog_input_mV(o->motor[m].actuatorPort) < 1500)
+        {
+            o->motor[m].not_calibrated = FALSE;
+            
+            hal_led_on(hal_led0+ms);
+        }
+        
+        if (Motor_is_calibrated(o->motor+m))
+        {
+            Motor_set_pwm_ref(o->motor+m, 0);
+        }
+        else
+        {
+            Motor_set_pwm_ref(o->motor+m, o->tripod_calib.pwm);
+            
+            calibrated = FALSE;
+        }
+    }
+    
+    if (calibrated)
+    {        
+        o->motor[o->motors_of_set[0]].pos_calib_offset += o->motor[o->motors_of_set[0]].pos_fbk - o->tripod_calib.zero;
+        o->motor[o->motors_of_set[1]].pos_calib_offset += o->motor[o->motors_of_set[1]].pos_fbk - o->tripod_calib.zero;
+        o->motor[o->motors_of_set[2]].pos_calib_offset += o->motor[o->motors_of_set[2]].pos_fbk - o->tripod_calib.zero;
+        
+        o->motor[o->motors_of_set[0]].pos_fbk = o->tripod_calib.zero;
+        o->motor[o->motors_of_set[1]].pos_fbk = o->tripod_calib.zero;
+        o->motor[o->motors_of_set[2]].pos_fbk = o->tripod_calib.zero;
+
+        o->motor[o->motors_of_set[0]].pos_fbk_old = o->motor[o->motors_of_set[0]].pos_fbk;
+        o->motor[o->motors_of_set[1]].pos_fbk_old = o->motor[o->motors_of_set[1]].pos_fbk;
+        o->motor[o->motors_of_set[2]].pos_fbk_old = o->motor[o->motors_of_set[2]].pos_fbk;
+        
+        return TRUE;
+    }
+    
+    return FALSE;
+}
+
+static BOOL JointSet_do_wait_calibration_9(JointSet* o)
+{
+    BOOL calibrated = TRUE;
+    
+    for (int ms=0; ms<*(o->pN); ++ms)
+    {
+        int m = o->motors_of_set[ms];
+        
+        if (Motor_is_calibrated(o->motor+m))
+        {
+            Motor_set_pwm_ref(o->motor+m, 0);
+        }
+        else
+        {
+            Motor_set_pwm_ref(o->motor+m, o->tripod_calib.pwm);
+            
+            calibrated = FALSE;
+        }
+    }
+    
+    if (calibrated)
+    {        
+        o->motor[o->motors_of_set[0]].pos_calib_offset += o->motor[o->motors_of_set[0]].pos_fbk - o->tripod_calib.zero;
+        o->motor[o->motors_of_set[1]].pos_calib_offset += o->motor[o->motors_of_set[1]].pos_fbk - o->tripod_calib.zero;
+        o->motor[o->motors_of_set[2]].pos_calib_offset += o->motor[o->motors_of_set[2]].pos_fbk - o->tripod_calib.zero;
+        
+        o->motor[o->motors_of_set[0]].pos_fbk = o->tripod_calib.zero;
+        o->motor[o->motors_of_set[1]].pos_fbk = o->tripod_calib.zero;
+        o->motor[o->motors_of_set[2]].pos_fbk = o->tripod_calib.zero;
+
+        o->motor[o->motors_of_set[0]].pos_fbk_old = o->motor[o->motors_of_set[0]].pos_fbk;
+        o->motor[o->motors_of_set[1]].pos_fbk_old = o->motor[o->motors_of_set[1]].pos_fbk;
+        o->motor[o->motors_of_set[2]].pos_fbk_old = o->motor[o->motors_of_set[2]].pos_fbk;
+        
+        return TRUE;
+    }
+    
+    return FALSE;
+}
+
+static BOOL JointSet_do_wait_calibration_10(JointSet* o)
+{
+    BOOL calibrated = TRUE;
+    
+    for (int k=0; k<*(o->pN); ++k)
+    {
+        int m = o->motors_of_set[k];
+        
+        int e = o->encoders_of_set[k];
+        
+        if (AbsEncoder_is_hard_stop_calibrating(o->absEncoder+e))
+        {
+            Motor_set_pwm_ref(o->motor+m, o->motor[m].calib_pwm);
+        
+            if (AbsEncoder_is_still(o->absEncoder+e, 12000, 500))
+            {
+                AbsEncoder_calibrate_in_hard_stop(o->absEncoder+e);
+            }
+            else
+            {
+                calibrated = FALSE;
+            }
+        }
+        else
+        {
+            Motor_set_pwm_ref(o->motor+m, 0);
+        }
+    }
+    
+    return calibrated;
+}
+
+static void JointSet_do_wait_calibration(JointSet* o)
+{
+    int N = *(o->pN);
+    
+    o->is_calibrated = TRUE;
+    
+    switch (o->calibration_in_progress)
+    {
+        case eomc_calibration_type3_abs_sens_digital:
+            o->is_calibrated = JointSet_do_wait_calibration_3(o);
+            break;
+        
+        case eomc_calibration_type5_hard_stops:
+            o->is_calibrated = JointSet_do_wait_calibration_5(o);
+            break;
+
+        case eomc_calibration_type8_tripod_internal_hard_stop:
+            o->is_calibrated = JointSet_do_wait_calibration_8(o);
+            break;
+        
+        case eomc_calibration_type9_tripod_external_hard_stop:
+            o->is_calibrated = JointSet_do_wait_calibration_9(o);
+            break;
+
+        case eomc_calibration_type10_abs_hard_stop:
+            o->is_calibrated = JointSet_do_wait_calibration_10(o);
+            break;
+        
+        default:
+            o->is_calibrated = FALSE;
+            break;
+    }
+    
+    if (!o->is_calibrated) return;
+    
+    for (int es=0; es<N; ++es)
+    {
+        if (!AbsEncoder_is_calibrated(o->absEncoder+o->encoders_of_set[es])) 
+        {
+            o->is_calibrated = FALSE;
+            return;
+        }
+    }
+    
+    //o->calibration_in_progress = eomc_calibration_typeUndefined;
+    
+    JointSet_do_odometry(o);
+    
+    o->control_mode = eomc_controlmode_idle;
+
+    for (int js=0; js<N; ++js)
+    {
+        o->joint[o->joints_of_set[js]].control_mode = eomc_controlmode_idle;
+    }
+    
+    JointSet_set_control_mode(o, eomc_controlmode_cmd_position);
+}
+
+void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
+{
+//    for (int js=0; js<*(o->pN); ++js)
+//    {
+//        o->joint[o->joints_of_set[js]].control_mode = eomc_controlmode_calib;
+//    }
+    
+    eOmc_controlmode_t joint_controlMode_old = o->joint[e].control_mode;
+    eOmc_controlmode_t jointSet_controlMode_old = o->control_mode;
+    
+    o->joint[e].control_mode = eomc_controlmode_calib;
+    
+    o->control_mode = eomc_controlmode_calib;
+    
+    o->is_calibrated = FALSE;
+    
+    switch (calibrator->type)
+    {
+        case eomc_calibration_type3_abs_sens_digital:
+        {
+            AbsEncoder_calibrate(o->absEncoder+e, calibrator->params.type3.offset, calibrator->params.type3.calibrationZero);
+            Motor_calibrate_withOffset(o->motor+e, 0);
+            o->calibration_in_progress = (eOmc_calibration_type_t)calibrator->type;
+            break;
+        }
+        case eomc_calibration_type5_hard_stops:
+        {
+            BOOL ret = Motor_calibrate_moving2Hardstop(o->motor+e, calibrator->params.type5.pwmlimit, calibrator->params.type5.calibrationZero);
+            
+            if(!ret)
+            {
+                o->joint[e].control_mode = joint_controlMode_old;
+                o->control_mode = jointSet_controlMode_old;
+                return;
+            }
+            AbsEncoder_calibrate(o->absEncoder+e, 0, 0);
+            o->calibration_in_progress = (eOmc_calibration_type_t)calibrator->type;
+            break;
+        }
+        case eomc_calibration_type8_tripod_internal_hard_stop:
+        case eomc_calibration_type9_tripod_external_hard_stop:
+        {
+            if (o->calibration_in_progress == calibrator->type) return;
+            
+            o->calibration_in_progress = (eOmc_calibration_type_t)calibrator->type;
+
+            o->joint[o->joints_of_set[0]].control_mode = eomc_controlmode_calib;
+            o->joint[o->joints_of_set[1]].control_mode = eomc_controlmode_calib;
+            o->joint[o->joints_of_set[2]].control_mode = eomc_controlmode_calib;
+            
+            AbsEncoder_calibrate(o->absEncoder+o->encoders_of_set[0], 0, 0);
+            AbsEncoder_calibrate(o->absEncoder+o->encoders_of_set[1], 0, 0);
+            AbsEncoder_calibrate(o->absEncoder+o->encoders_of_set[2], 0, 0);
+            
+            o->tripod_calib.pwm       = calibrator->params.type9.pwmlimit;
+            o->tripod_calib.max_delta = calibrator->params.type9.max_delta;
+            o->tripod_calib.zero      = calibrator->params.type9.calibrationZero;
+            
+            Motor_set_run(o->motor+o->motors_of_set[0]);
+            Motor_set_run(o->motor+o->motors_of_set[1]);
+            Motor_set_run(o->motor+o->motors_of_set[2]);
+            
+            o->tripod_calib.start_pos[0] = o->motor[o->motors_of_set[0]].pos_fbk;
+            o->tripod_calib.start_pos[1] = o->motor[o->motors_of_set[1]].pos_fbk;
+            o->tripod_calib.start_pos[2] = o->motor[o->motors_of_set[2]].pos_fbk;
+            
+            break;
+        }
+        
+        case eomc_calibration_type10_abs_hard_stop:
+        {
+            o->calibration_in_progress = (eOmc_calibration_type_t)calibrator->type;
+            
+            Motor_calibrate_withOffset(o->motor+e, 0);
+            Motor_set_run(o->motor+e);
+            o->motor[e].calib_pwm = calibrator->params.type10.pwmlimit;
+            
+            AbsEncoder_still_check_reset(o->absEncoder+e);
+            AbsEncoder_start_hard_stop_calibrate(o->absEncoder+e, calibrator->params.type10.calibrationZero);
+            break;
+        }
+        default:
+            break;
+    }
+}
+
+#if 0
+
+static BOOL JointSet_do_wait_calibration_8(JointSet* o)
+{
+    BOOL calibrated = TRUE;
+    
     int32_t pos[3];
     
     float pwm[3];
@@ -848,6 +1112,12 @@ static BOOL JointSet_do_wait_calibration_9(JointSet* o)
     
     int32_t pos[3];
     
+    float pwm[3];
+    
+    pwm[0] = o->tripod_calib.pwm;
+    pwm[1] = o->tripod_calib.pwm;
+    pwm[2] = o->tripod_calib.pwm;
+    
     for (int ms=0; ms<*(o->pN); ++ms)
     {
         int m = o->motors_of_set[ms];
@@ -860,6 +1130,7 @@ static BOOL JointSet_do_wait_calibration_9(JointSet* o)
         }
         else
         {
+            pwm[ms] = 0;
             pos[ms] = 0x7FFFFFFF;
         }
     }
@@ -880,9 +1151,8 @@ static BOOL JointSet_do_wait_calibration_9(JointSet* o)
         
         return TRUE;
     }
-        
-    float pwm[3];
     
+    /*
     if (o->tripod_calib.pwm < 0)
     {
         pos[0] = -pos[0];
@@ -914,6 +1184,7 @@ static BOOL JointSet_do_wait_calibration_9(JointSet* o)
         pwm[1] = -pwm[1];
         pwm[2] = -pwm[2];
     }
+    */
     
     Motor_set_pwm_ref(o->motor+o->motors_of_set[0], (int32_t)pwm[0]);
     Motor_set_pwm_ref(o->motor+o->motors_of_set[1], (int32_t)pwm[1]);
@@ -922,132 +1193,4 @@ static BOOL JointSet_do_wait_calibration_9(JointSet* o)
     return FALSE;
 }
 
-static void JointSet_do_wait_calibration(JointSet* o)
-{
-    int N = *(o->pN);
-    
-    o->is_calibrated = TRUE;
-    
-    switch (o->calibration_in_progress)
-    {
-        case eomc_calibration_type3_abs_sens_digital:
-            o->is_calibrated = JointSet_do_wait_calibration_3(o);
-            break;
-        
-        case eomc_calibration_type5_hard_stops:
-            o->is_calibrated = JointSet_do_wait_calibration_5(o);
-            break;
-
-        case eomc_calibration_type8_tripod_internal_hard_stop:
-            o->is_calibrated = JointSet_do_wait_calibration_8(o);
-            break;
-        
-        case eomc_calibration_type9_tripod_external_hard_stop:
-            o->is_calibrated = JointSet_do_wait_calibration_9(o);
-            break;
-        
-        default:
-            o->is_calibrated = FALSE;
-            break;
-    }
-    
-    if (!o->is_calibrated) return;
-    
-    o->calibration_in_progress = eomc_calibration_typeUndefined;
-    
-    for (int es=0; es<N; ++es)
-    {
-        if (!AbsEncoder_is_calibrated(o->absEncoder+o->encoders_of_set[es])) 
-        {
-            o->is_calibrated = FALSE;
-            return;
-        }
-    }
-    
-    JointSet_do_odometry(o);
-    
-    o->control_mode = eomc_controlmode_idle;
-
-    for (int js=0; js<N; ++js)
-    {
-        o->joint[o->joints_of_set[js]].control_mode = eomc_controlmode_idle;
-    }
-    
-    JointSet_set_control_mode(o, eomc_controlmode_cmd_position);
-}
-
-void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
-{
-//    for (int js=0; js<*(o->pN); ++js)
-//    {
-//        o->joint[o->joints_of_set[js]].control_mode = eomc_controlmode_calib;
-//    }
-    
-    eOmc_controlmode_t joint_controlMode_old = o->joint[e].control_mode;
-    eOmc_controlmode_t jointSet_controlMode_old = o->control_mode;
-    
-    o->joint[e].control_mode = eomc_controlmode_calib;
-    
-    o->control_mode = eomc_controlmode_calib;
-    
-    o->is_calibrated = FALSE;
-    
-    switch (calibrator->type)
-    {
-        case eomc_calibration_type3_abs_sens_digital:
-        {
-            AbsEncoder_calibrate(o->absEncoder+e, calibrator->params.type3.offset, calibrator->params.type3.calibrationZero);
-            Motor_calibrate_withOffset(o->motor+e, 0);
-            o->calibration_in_progress = (eOmc_calibration_type_t)calibrator->type;
-            break;
-        }
-        case eomc_calibration_type5_hard_stops:
-        {
-            BOOL ret = Motor_calibrate_moving2Hardstop(o->motor+e, calibrator->params.type5.pwmlimit, calibrator->params.type5.calibrationZero);
-            
-            if(!ret)
-            {
-                o->joint[e].control_mode = joint_controlMode_old;
-                o->control_mode = jointSet_controlMode_old;
-                return;
-            }
-            AbsEncoder_calibrate(o->absEncoder+e, 0, 0);
-            o->calibration_in_progress = (eOmc_calibration_type_t)calibrator->type;
-            break;
-        }
-        case eomc_calibration_type8_tripod_internal_hard_stop:
-        case eomc_calibration_type9_tripod_external_hard_stop:
-        {
-            if (o->calibration_in_progress == calibrator->type) return;
-            o->calibration_in_progress = (eOmc_calibration_type_t)calibrator->type;
-
-            o->joint[o->joints_of_set[0]].control_mode = eomc_controlmode_calib;
-            o->joint[o->joints_of_set[1]].control_mode = eomc_controlmode_calib;
-            o->joint[o->joints_of_set[2]].control_mode = eomc_controlmode_calib;
-            
-            AbsEncoder_calibrate(o->absEncoder+o->encoders_of_set[0], 0, 0);
-            AbsEncoder_calibrate(o->absEncoder+o->encoders_of_set[1], 0, 0);
-            AbsEncoder_calibrate(o->absEncoder+o->encoders_of_set[2], 0, 0);
-            
-            o->tripod_calib.pwm       = calibrator->params.type9.pwmlimit;
-            o->tripod_calib.max_delta = calibrator->params.type9.max_delta;
-            o->tripod_calib.zero      = calibrator->params.type9.calibrationZero;
-            
-            Motor_set_run(o->motor+o->motors_of_set[0]);
-            Motor_set_run(o->motor+o->motors_of_set[1]);
-            Motor_set_run(o->motor+o->motors_of_set[2]);
-            
-            o->tripod_calib.start_pos[0] = o->motor[o->motors_of_set[0]].pos_fbk;
-            o->tripod_calib.start_pos[1] = o->motor[o->motors_of_set[1]].pos_fbk;
-            o->tripod_calib.start_pos[2] = o->motor[o->motors_of_set[2]].pos_fbk;
-            
-            o->tripod_calib.cnt[0] = 0;
-            o->tripod_calib.cnt[1] = 0;
-            o->tripod_calib.cnt[2] = 0;
-            
-            break;
-        }
-        default:
-            break;
-    }
-}
+#endif

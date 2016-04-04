@@ -17,9 +17,8 @@ typedef struct // TripodCalib
     int32_t pwm;
     int32_t zero;
     int32_t max_delta;
-    int32_t pos[3];
     int32_t start_pos[3];
-    int16_t cnt[3];
+
 } TripodCalib;
 
 typedef struct // JointSet

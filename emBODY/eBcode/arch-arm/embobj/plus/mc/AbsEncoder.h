@@ -33,10 +33,15 @@ typedef struct //AbsEncoder
     //int32_t offset;
     //int32_t delta;
 
+    uint32_t partial_timer;
+    int32_t  partial_space;
+    
     uint16_t position_last;
     uint16_t position_sure;
     int16_t offset;
     int16_t delta;
+    
+    int32_t hard_stop_zero;
     
     int32_t zero;
     int32_t sign;
@@ -65,7 +70,8 @@ typedef struct //AbsEncoder
             unsigned not_configured  :1;
             unsigned not_calibrated  :1;
             unsigned not_initialized :1;
-            unsigned unused          :5;
+            unsigned hard_stop_calib :1;
+            unsigned unused          :4;
         } bits;
         
         uint8_t not_ready;
@@ -100,6 +106,12 @@ extern void AbsEncoder_clear_faults(AbsEncoder* o);
 extern void AbsEncoder_overwrite(AbsEncoder* o, int32_t position, int32_t velocity);
 extern BOOL AbsEncoder_is_fake(AbsEncoder* o);
 
+extern BOOL AbsEncoder_is_still(AbsEncoder* o, int32_t space_window, int32_t time_window);
+extern void AbsEncoder_still_check_reset(AbsEncoder* o);
+
+extern void AbsEncoder_start_hard_stop_calibrate(AbsEncoder* o, int32_t hard_stop_zero);
+extern BOOL AbsEncoder_is_hard_stop_calibrating(AbsEncoder* o);
+extern void AbsEncoder_calibrate_in_hard_stop(AbsEncoder* o);
 #endif
 
 // AbsEncoder
