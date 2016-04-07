@@ -709,7 +709,7 @@ void Motor_actuate(Motor* motor, uint8_t N) //
     
         eOcanmap_location_t location = {0};
         location.port = eOcanport1;
-        location.addr = 0; // marco.accame: we put 0 just because it is periodic and this is the source address (the EMS has can address 0).
+        location.addr = 0;
         location.insideindex = eocanmap_insideindex_first; // because all 2foc have motor on index-0. 
 
         // and i send the command
