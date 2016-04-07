@@ -27,13 +27,12 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-#include "EOemsController.h"
+#include "Controller.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
- #include "EOemsController_hid.h" 
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -73,6 +72,7 @@
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
 
+#if 0
 extern void eo_emsController_hid_userdef_config_motor(EOemsController* ctrl, uint8_t motor)
 {
     // this is used by the EMS application to initialize the 2FOCs controller (the first time eo_emsController_SetControlMode is called)
@@ -106,6 +106,7 @@ extern void eo_emsController_hid_userdef_set_motor_running(EOemsController* ctrl
     
 }
 
+#endif
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
