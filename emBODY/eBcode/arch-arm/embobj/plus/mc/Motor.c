@@ -208,7 +208,7 @@ void Motor_config(Motor* o, uint8_t ID, eOmc_motor_config_t* config) //
     {
         //Motor_config_MC4p(o->ID, config);
         o->control_mode = icubCanProto_controlmode_idle;
-        hal_motor_disable((hal_motor_t)o->ID);
+        hal_motor_disable((hal_motor_t)o->actuatorPort);
     }    
 }
 
@@ -381,7 +381,7 @@ void Motor_set_run(Motor* o) //
     {
         hal_motor_reenable_break_interrupts();
         
-        hal_motor_enable((hal_motor_t)o->ID);
+        hal_motor_enable((hal_motor_t)o->actuatorPort);
         
         o->control_mode = control_mode;
     }
@@ -396,7 +396,7 @@ void Motor_set_idle(Motor* o) //
     }
     else if (o->HARDWARE_TYPE == HARDWARE_MC4p)
     {
-        hal_motor_disable((hal_motor_t)o->ID);
+        hal_motor_disable((hal_motor_t)o->actuatorPort);
         
         if (o->control_mode != icubCanProto_controlmode_hwFault)
         {
@@ -415,7 +415,7 @@ void Motor_force_idle(Motor* o) //
     }
     else if (o->HARDWARE_TYPE == HARDWARE_MC4p)
     {
-        hal_motor_disable((hal_motor_t)o->ID);
+        hal_motor_disable((hal_motor_t)o->actuatorPort);
         
         o->control_mode = icubCanProto_controlmode_idle;
     }
@@ -499,7 +499,7 @@ BOOL Motor_check_faults(Motor* o) //
         
         if (o->hardware_fault || external_fault)
         {
-            hal_motor_disable((hal_motor_t)o->ID);
+            hal_motor_disable((hal_motor_t)o->actuatorPort);
         }
     }
     
@@ -615,7 +615,7 @@ BOOL Motor_check_faults(Motor* o) //
 
 void Motor_raise_fault_overcurrent(Motor* o)
 {
-    hal_motor_disable((hal_motor_t)o->ID);
+    hal_motor_disable((hal_motor_t)o->actuatorPort);
     
     o->fault_state.bits.OverCurrentFailure = TRUE;
     
@@ -624,7 +624,7 @@ void Motor_raise_fault_overcurrent(Motor* o)
 
 void Motor_raise_fault_i2t(Motor* o)
 {
-    hal_motor_disable((hal_motor_t)o->ID);
+    hal_motor_disable((hal_motor_t)o->actuatorPort);
     
     o->fault_state.bits.I2TFailure = TRUE;
     
@@ -633,7 +633,7 @@ void Motor_raise_fault_i2t(Motor* o)
 
 void Motor_raise_fault_external(Motor* o)
 {
-    hal_motor_disable((hal_motor_t)o->ID);
+    hal_motor_disable((hal_motor_t)o->actuatorPort);
     
     o->fault_state.bits.ExternalFaultAsserted = TRUE;
     
