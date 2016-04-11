@@ -501,10 +501,12 @@ static void s_eo_candiscovery2_sendDiagnosticsToHost(eObool_t allboardsfound, eO
                 errdes.code             = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_candiscovery_ok);
                 errdes.sourcedevice     = (eOcanport1 == i) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
                 errdes.sourceaddress    = 0;
-                errdes.par16            = (s_eo_thecandiscovery2.target.info.type << 8) | (numofboards & 0x00ff);
-                errdes.par64            = (s_eo_thecandiscovery2.target.info.firmware.minor) | (s_eo_thecandiscovery2.target.info.firmware.major << 8) |
-                                          (s_eo_thecandiscovery2.target.info.protocol.minor << 16) | (s_eo_thecandiscovery2.target.info.protocol.major << 24) |
-                                          (((uint64_t)s_eo_thecandiscovery2.detection.duration) << 48);
+                errdes.par16            = (numofboards & 0x00ff);
+                errdes.par64            = ((uint64_t)s_eo_thecandiscovery2.target.info.firmware.build) |
+                                          ((uint64_t)s_eo_thecandiscovery2.target.info.firmware.minor << 8) | ((uint64_t)s_eo_thecandiscovery2.target.info.firmware.major << 16) |                                          
+                                          ((uint64_t)s_eo_thecandiscovery2.target.info.protocol.minor << 24) | ((uint64_t)s_eo_thecandiscovery2.target.info.protocol.major << 32) |
+                                          ((uint64_t)s_eo_thecandiscovery2.target.info.type << 40) |
+                                          (((uint64_t)s_eo_thecandiscovery2.detection.duration) << 48);                      
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);
                 
             }
@@ -531,8 +533,8 @@ static void s_eo_candiscovery2_sendDiagnosticsToHost(eObool_t allboardsfound, eO
                     errdes.code             = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_candiscovery_boardsmissing);
                     errdes.sourcedevice     = (eOcanport1 == i) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
                     errdes.sourceaddress    = 0;
-                    errdes.par16            = (s_eo_thecandiscovery2.target.info.type << 8) | (numofmissing & 0x00ff);
-                    errdes.par64            = maskofmissing | (((uint64_t)s_eo_thecandiscovery2.detection.duration) << 48);
+                    errdes.par16            = ((uint16_t)s_eo_thecandiscovery2.target.info.type << 8) | (numofmissing & 0x00ff);
+                    errdes.par64            = (uint64_t)maskofmissing | (((uint64_t)s_eo_thecandiscovery2.detection.duration) << 48);
                     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);
                 }
             }
@@ -575,14 +577,14 @@ static void s_eo_candiscovery2_sendDiagnosticsToHost(eObool_t allboardsfound, eO
                                     nib |= 0x4;
                                 }
                             }
-                            nibbles64 |= (nib<<(4*n));
+                            nibbles64 |= ((uint64_t)nib << (4*n));
                         }
                     }
                     
                     errdes.code             = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_candiscovery_boardsinvalid);
                     errdes.sourcedevice     = (eOcanport1 == i) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
                     errdes.sourceaddress    = 0;
-                    errdes.par16            = (s_eo_thecandiscovery2.target.info.type << 8) | (numofinvalid & 0x00ff);
+                    errdes.par16            = ((uint16_t)s_eo_thecandiscovery2.target.info.type << 8) | (numofinvalid & 0x00ff);
                     errdes.par64            = nibbles64;
                     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);
                 }
@@ -608,10 +610,12 @@ static void s_eo_candiscovery2_sendDiagnosticsToHost(eObool_t allboardsfound, eO
                 errdes.code             = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_candiscovery_detectedboard);
                 errdes.sourcedevice     = (eOcanport1 == i) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
                 errdes.sourceaddress    = 0;
-                errdes.par16            = (s_eo_thecandiscovery2.detection.boards[i][n].info.type << 8) | (n & 0x000f);
-                errdes.par64            = (s_eo_thecandiscovery2.detection.boards[i][n].info.firmware.minor) | (s_eo_thecandiscovery2.detection.boards[i][n].info.firmware.major << 8) |
-                                          (s_eo_thecandiscovery2.detection.boards[i][n].info.protocol.minor << 16) | (s_eo_thecandiscovery2.detection.boards[i][n].info.protocol.major << 24) |
-                                          (((uint64_t)s_eo_thecandiscovery2.detection.boards[i][n].time) << 48);
+                errdes.par16            = (n & 0x000f);
+                errdes.par64            = ((uint64_t)s_eo_thecandiscovery2.detection.boards[i][n].info.firmware.build) |
+                                          ((uint64_t)s_eo_thecandiscovery2.detection.boards[i][n].info.firmware.minor << 8) | ((uint64_t)s_eo_thecandiscovery2.detection.boards[i][n].info.firmware.major << 16) |
+                                          ((uint64_t)s_eo_thecandiscovery2.detection.boards[i][n].info.protocol.minor << 24) | ((uint64_t)s_eo_thecandiscovery2.detection.boards[i][n].info.protocol.major << 32) |
+                                          ((uint64_t)s_eo_thecandiscovery2.detection.boards[i][n].info.type << 40) |
+                                          (((uint64_t)s_eo_thecandiscovery2.detection.boards[i][n].time) << 48);                
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, s_eobj_ownname, &errdes);                    
             } 
 #if defined(EOCANDISCOVERY2_DIAGNOSTICS_SENDUPDETECTEDBOARDS)            
@@ -620,10 +624,12 @@ static void s_eo_candiscovery2_sendDiagnosticsToHost(eObool_t allboardsfound, eO
                 errdes.code             = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_candiscovery_detectedboard);
                 errdes.sourcedevice     = (eOcanport1 == i) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
                 errdes.sourceaddress    = 0;
-                errdes.par16            = (s_eo_thecandiscovery2.detection.boards[i][n].info.type << 8) | (n & 0x000f);
-                errdes.par64            = (s_eo_thecandiscovery2.detection.boards[i][n].info.firmware.minor) | (s_eo_thecandiscovery2.detection.boards[i][n].info.firmware.major << 8) |
-                                          (s_eo_thecandiscovery2.detection.boards[i][n].info.protocol.minor << 16) | (s_eo_thecandiscovery2.detection.boards[i][n].info.protocol.major << 24) |
-                                          (((uint64_t)s_eo_thecandiscovery2.detection.boards[i][n].time) << 48);
+                errdes.par16            = (n & 0x000f);
+                errdes.par64            = ((uint64_t)s_eo_thecandiscovery2.detection.boards[i][n].info.firmware.build) |
+                                          ((uint64_t)s_eo_thecandiscovery2.detection.boards[i][n].info.firmware.minor << 8) | ((uint64_t)s_eo_thecandiscovery2.detection.boards[i][n].info.firmware.major << 16) |
+                                          ((uint64_t)s_eo_thecandiscovery2.detection.boards[i][n].info.protocol.minor << 24) | ((uint64_t)s_eo_thecandiscovery2.detection.boards[i][n].info.protocol.major << 32) |
+                                          ((uint64_t)s_eo_thecandiscovery2.detection.boards[i][n].info.type << 40) |
+                                          (((uint64_t)s_eo_thecandiscovery2.detection.boards[i][n].time) << 48);                      
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);                                 
             }
 #endif            
