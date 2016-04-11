@@ -184,7 +184,7 @@ extern void eoprot_fun_UPDT_as_inertial_config_sensors(const EOnv* nv, const eOr
 
 extern void eoprot_fun_UPDT_as_inertial_cmmnds_enable(const EOnv* nv, const eOropdescriptor_t* rd)
 {
-    eOmc_inertial_commands_t *cmd = (eOmc_inertial_commands_t*)rd->data;  
+    eOas_inertial_commands_t *cmd = (eOas_inertial_commands_t*)rd->data;  
 
     if(0 == cmd->enable)
     {
