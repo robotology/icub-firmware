@@ -103,9 +103,9 @@ extern eOresult_t eo_motioncontrol_Stop(EOtheMotionController *p);
 
 
 // others, needed by mc4plus original code by davide.pollarolo. see if they can be moved elsewhere or if they are really needed
-extern eOresult_t eo_motioncontrol_extra_MotorEnable(EOtheMotionController *p, uint8_t jomo);
+//extern eOresult_t eo_motioncontrol_extra_MotorEnable(EOtheMotionController *p, uint8_t jomo);
 
-extern eOresult_t eo_motioncontrol_extra_FaultDetectionEnable(EOtheMotionController *p);
+//extern eOresult_t eo_motioncontrol_extra_FaultDetectionEnable(EOtheMotionController *p);
 
 extern eObool_t eo_motioncontrol_extra_AreMotorsExtFaulted(EOtheMotionController *p);
 

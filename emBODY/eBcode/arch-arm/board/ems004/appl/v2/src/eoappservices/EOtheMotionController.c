@@ -670,7 +670,7 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
             if(NULL == p->mcfoc.thecontroller)
             {
                 //p->mcfoc.thecontroller = eo_emsController_Init((eOemscontroller_board_t)servcfg->data.mc.foc_based.boardtype4mccontroller, emscontroller_actuation_2FOC, numofjomos);
-                p->mcfoc.thecontroller = MController_new(numofjomos);
+                p->mcfoc.thecontroller = MController_new(numofjomos, numofjomos);
                 //MController_config_board((eOemscontroller_board_t)servcfg->data.mc.foc_based.boardtype4mccontroller, HARDWARE_2FOC);                
                 MController_config_board(servcfg);
             }
@@ -837,7 +837,7 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
                     controller_type = (eOemscontroller_board_t)servcfg->data.mc.mc4plusmais_based.boardtype4mccontroller;
                 }
                 //p->mcmc4plus.thecontroller = eo_emsController_Init(controller_type, emscontroller_actuation_LOCAL, numofjomos);
-                p->mcmc4plus.thecontroller = MController_new(numofjomos);   
+                p->mcmc4plus.thecontroller = MController_new(numofjomos, 4);   
                 //MController_config_board(controller_type, HARDWARE_MC4p);
                 MController_config_board(servcfg);                
             }       
@@ -1103,7 +1103,7 @@ extern eOresult_t eo_motioncontrol_Stop(EOtheMotionController *p)
 }
 
 
-
+#if 0
 #warning TODO: move MotorEnable inside the controller ... it must check vs coupled joints ...
 extern eOresult_t eo_motioncontrol_extra_MotorEnable(EOtheMotionController *p, uint8_t jomo)
 {   // former eo_mcserv_EnableMotor()
@@ -1173,7 +1173,6 @@ extern eOresult_t eo_motioncontrol_extra_MotorEnable(EOtheMotionController *p, u
     return(eores_OK);   
 }
 
-
 extern eOresult_t eo_motioncontrol_extra_FaultDetectionEnable(EOtheMotionController *p)
 {   // former eo_mcserv_EnableFaultDetection()
     
@@ -1201,7 +1200,7 @@ extern eOresult_t eo_motioncontrol_extra_FaultDetectionEnable(EOtheMotionControl
 
     return(eores_OK);
 }
-
+#endif
 
 extern eObool_t eo_motioncontrol_extra_AreMotorsExtFaulted(EOtheMotionController *p)
 {   // former eo_mcserv_AreMotorsExtFaulted()     

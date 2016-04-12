@@ -26,6 +26,7 @@ typedef struct // JointSet
     hal_led_t led;
     
     uint8_t* pN;
+    uint8_t* pE;
     
     uint8_t* joints_of_set;
     uint8_t* motors_of_set;
@@ -48,6 +49,7 @@ typedef struct // JointSet
     BOOL pos_control_active;
     BOOL trq_control_active;
     BOOL CAN_DO_TRQ_CTRL;
+    BOOL USE_SPEED_FBK_FROM_MOTORS;
     
     uint8_t MOTOR_CONTROL_TYPE;
     
@@ -72,6 +74,7 @@ extern void JointSet_config //
 (
     JointSet* o,
     uint8_t* pN,
+    uint8_t* pE,
     uint8_t* joints_of_set,
     uint8_t* motors_of_set,
     uint8_t* encoders_of_set,

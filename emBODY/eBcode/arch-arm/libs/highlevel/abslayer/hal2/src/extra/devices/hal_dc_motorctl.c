@@ -555,13 +555,13 @@ extern int16_t hal_motor_pwmget(hal_motor_t id)
 	int16_t pwm=0;
 	switch (id)
 	{
-		case 0:		
+		case 1:		
 		{
 			pwm= TIM1->CCR1; //take the pwmvalue 
 			if (pwm==0) 	pwm=-TIM1->CCR2; //take the pwmvalue
             break;
         }
-		case 1:		
+		case 0:		
 		{
 			pwm= TIM1->CCR3; //take the pwmvalue 
 			if (pwm==0) 	pwm=-TIM1->CCR4; //take the pwmvalue
@@ -609,14 +609,14 @@ extern hal_result_t hal_motor_enable(hal_motor_t id)
     
 	switch (id)
 	{
-		case 0:
+		case 1:
         {
 		    TIM_CtrlPWMOutputs(TIM1,ENABLE);
 			GPIO_SetBits(GPIOE, EN1);
 			s_hal_motor_out_enabled[0] = hal_true;
 		}
 		break;
-		case 1:
+		case 0:
 		{
 		    TIM_CtrlPWMOutputs(TIM1,ENABLE);
 			GPIO_SetBits(GPIOE, EN2);
@@ -668,14 +668,14 @@ extern hal_result_t hal_motor_disable(hal_motor_t id)
     
 	switch (id)
 	{
-		case 0:
+		case 1:
 		{
 		    if (s_hal_motor_out_enabled[1] == hal_false) TIM_CtrlPWMOutputs(TIM1,DISABLE);
 			GPIO_ResetBits(GPIOE, EN1);
             s_hal_motor_out_enabled[0] = hal_false;
 		}
 		break;
-		case 1:
+		case 0:
 		{
 		    if (s_hal_motor_out_enabled[0] == hal_false) TIM_CtrlPWMOutputs(TIM1,DISABLE);
 			GPIO_ResetBits(GPIOE, EN2);

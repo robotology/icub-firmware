@@ -13,12 +13,16 @@
 
 typedef struct //MController
 {
+    uint8_t nEncoders;
     uint8_t nJoints;
     uint8_t nSets;
     
     JointSet *jointSet;
     
     uint8_t* set_dim;
+    uint8_t* enc_set_dim;
+    
+    uint8_t multi_encs;
     
     uint8_t** jos;
     uint8_t** mos;
@@ -43,7 +47,7 @@ typedef struct //MController
     AbsEncoder *absEncoder;
 } MController;
 
-extern MController* MController_new(uint8_t nJoints); //
+extern MController* MController_new(uint8_t nJoints, uint8_t nEncoders); //
 
 extern void MController_init(void); //
 
@@ -57,7 +61,8 @@ extern void MController_config_Jje(float **Jje); //
 
 extern void MController_update_motor_state_fbk(uint8_t m, void* state);
 extern void MController_update_joint_torque_fbk(uint8_t j, CTRL_UNITS trq_fbk); //
-extern void MController_update_absEncoder_fbk(uint8_t e, int32_t position); //
+//extern void MController_update_absEncoder_fbk(uint8_t e, int32_t position); //
+extern void MController_update_absEncoder_fbk(uint8_t e, uint16_t* positions); //
 extern void MController_invalid_absEncoder_fbk(uint8_t e, hal_spiencoder_errors_flags error_flags);
 extern void MController_timeout_absEncoder_fbk(uint8_t e);
 

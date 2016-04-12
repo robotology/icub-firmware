@@ -23,7 +23,7 @@ static char invert_matrix(float** M, float** I, char n);
 //static void MController_config_motor_set(MController* o);
 //static void MController_config_encoder_set(MController* o);
 
-MController* MController_new(uint8_t nJoints) //
+MController* MController_new(uint8_t nJoints, uint8_t nEncoders) //
 {
     if (!smc) smc = NEW(MController, 1);
     
@@ -31,12 +31,14 @@ MController* MController_new(uint8_t nJoints) //
 
     if (!o) return NULL;
     
+    o->nEncoders = nJoints;
     o->nJoints = nJoints;
     o->nSets = nJoints;
     
     o->jointSet = JointSet_new(nJoints);
     
     o->set_dim = NEW(uint8_t, nJoints);
+    o->enc_set_dim = NEW(uint8_t, nJoints);
     
     o->jos = NEW(uint8_t*, nJoints);
     o->mos = NEW(uint8_t*, nJoints);
@@ -44,12 +46,14 @@ MController* MController_new(uint8_t nJoints) //
     
     o->j2s = NEW(uint8_t, nJoints);
     o->m2s = NEW(uint8_t, nJoints);
-    o->e2s = NEW(uint8_t, nJoints);
+    o->e2s = NEW(uint8_t, nEncoders);
+    
+    //o->multi_encs = NEW(uint8_t, nJoints);
     
     o->joint = Joint_new(nJoints);
     o->motor = Motor_new(nJoints); 
     
-    o->absEncoder = AbsEncoder_new(nJoints);
+    o->absEncoder = AbsEncoder_new(nEncoders);
     
     o->Jjm = NEW(float*, nJoints);
     o->Jmj = NEW(float*, nJoints);
@@ -61,13 +65,17 @@ MController* MController_new(uint8_t nJoints) //
     {
         o->jos[i] = NEW(uint8_t, nJoints);
         o->mos[i] = NEW(uint8_t, nJoints);
-        o->eos[i] = NEW(uint8_t, nJoints);
         
         o->Jjm[i] = NEW(float, nJoints);
         o->Jmj[i] = NEW(float, nJoints);
         
         o->Sjm[i] = NEW(float, nJoints);
-        o->Sje[i] = NEW(float, nJoints);
+    }
+    
+    for (int i=0; i<nJoints; ++i)
+    {
+        o->Sje[i] = NEW(float,   nEncoders);
+        o->eos[i] = NEW(uint8_t, nEncoders);
     }
     
     MController_init();
@@ -83,13 +91,18 @@ void MController_init() //
     
     o->nSets = o->nJoints;
     
+    o->multi_encs = 1;
+    
     for (int i=0; i<o->nJoints; ++i)
     {
         o->j2s[i] = i;
         o->m2s[i] = i;
         o->e2s[i] = i;
         
+        //o->multi_encs[i] = 1;
+        
         o->set_dim[i] = 1;
+        o->enc_set_dim[i] = 1;
         
         o->jos[i][0] = i;
         o->mos[i][0] = i;
@@ -140,13 +153,17 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
     {
         const eOmn_serv_jomo_descriptor_t *jomodes = (eOmn_serv_jomo_descriptor_t*) eo_constarray_At(carray, k);
         
-        if (jomodes->sensor.type == eomn_serv_mc_sensor_encoder_aea)
+        switch (jomodes->sensor.type)
         {
+        case eomn_serv_mc_sensor_encoder_aea:
+        case eomn_serv_mc_sensor_encoder_spichainof2:
+        case eomn_serv_mc_sensor_encoder_spichainof3:       
             o->absEncoder[k].fake = FALSE;
-        }
-        else
-        {
+            break;
+        
+        default:
             o->absEncoder[k].fake = TRUE;
+            break;
         }
         
         o->motor[k].HARDWARE_TYPE = o->actuation_type;
@@ -364,7 +381,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
     
         break;
         
-    case emscontroller_board_CER_WRIST:               //= 12,   //MC4plus
+    case emscontroller_board_CER_LOWER_ARM:               //= 12,   //MC4plus
         o->nSets   = 2;
 
         o->j2s[0] = o->m2s[0] = o->e2s[0] = 0;
@@ -431,7 +448,34 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         
         break;
     
+    case emscontroller_board_CER_HAND:                   //= 14, 16,    //mc2plus
+        o->nSets     = 2;
+        o->nEncoders = 4;
     
+        o->multi_encs = 2;
+    
+        Sje = o->Sje;
+        Sje[0][0] = 1.0f; Sje[0][1] = 1.0f; Sje[0][2] = 0.0f; Sje[0][3] = 0.0f;
+        Sje[1][0] = 0.0f; Sje[1][1] = 0.0f; Sje[1][2] = 1.0f; Sje[1][3] = 1.0f;
+    
+        o->e2s[0] = o->e2s[1] = 0;
+        o->e2s[2] = o->e2s[3] = 1;
+    
+        for (int k = 0; k<o->nJoints; ++k)
+        {            
+            o->joint[k].CAN_DO_TRQ_CTRL = FALSE;
+            o->joint[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
+            o->motor[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
+            
+            o->jointSet[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
+            o->jointSet[k].CAN_DO_TRQ_CTRL = FALSE;
+            
+            o->j2s[k] = o->m2s[k] = k;
+            
+            //o->multi_encs[k] = 2;
+        }
+        
+        break;    
     
     case emscontroller_board_HEAD_neckpitch_neckroll:      //= 5,    //MC4plus
     {
@@ -566,13 +610,13 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         return;
     }
     
-    for (int s=0; s<o->nSets; ++s) o->set_dim[s] = 0;
+    for (int s=0; s<o->nSets; ++s) o->enc_set_dim[s] = 0;
     
-    for (int e=0; e<o->nJoints; ++e)
+    for (int e=0; e<o->nEncoders; ++e)
     {
         int s = o->e2s[e];
 
-        o->eos[s][(o->set_dim[s])++] = e;
+        o->eos[s][(o->enc_set_dim[s])++] = e;
     }
     
     for (int s=0; s<o->nSets; ++s) o->set_dim[s] = 0;
@@ -599,6 +643,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         (
             o->jointSet+s,
             o->set_dim+s,
+            o->enc_set_dim+s,
             o->jos[s],
             o->mos[s],
             o->eos[s],
@@ -625,7 +670,7 @@ void MController_config_joint(int j, eOmc_joint_config_t* config) //
     Motor_config_filter(o->motor+j,   config->tcfiltertype);
     Motor_config_friction(o->motor+j, config->motor_params.bemf_value, config->motor_params.ktau_value);
     
-    if (j==0 && o->part_type==emscontroller_board_CER_WRIST)
+    if (j==0 && o->part_type==emscontroller_board_CER_LOWER_ARM)
     {
         AbsEncoder_config(o->absEncoder+j, j, config->jntEncoderResolution, 64*AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
     }
@@ -806,9 +851,14 @@ void MController_update_joint_torque_fbk(uint8_t j, CTRL_UNITS trq_fbk) //
     Joint_update_torque_fbk(smc->joint+j, trq_fbk);
 }
 
-void MController_update_absEncoder_fbk(uint8_t e, int32_t position) //
+void MController_update_absEncoder_fbk(uint8_t e, uint16_t* positions) //
 {
-    AbsEncoder_update(smc->absEncoder+e, position);
+    AbsEncoder* enc = smc->absEncoder + e*smc->multi_encs;
+    
+    for (int k=0; k<smc->multi_encs; ++k)
+    {
+        AbsEncoder_update(enc++, positions[k]);
+    }
 }
 
 void MController_update_motor_state_fbk(uint8_t m, void* state)

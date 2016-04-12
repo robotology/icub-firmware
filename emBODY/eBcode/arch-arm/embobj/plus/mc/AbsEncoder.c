@@ -466,7 +466,7 @@ BOOL AbsEncoder_is_ok(AbsEncoder* o)
 }
 
 BOOL AbsEncoder_is_calibrated(AbsEncoder* o)
-{    
+{
     return !o->state.bits.not_calibrated;
 }
 

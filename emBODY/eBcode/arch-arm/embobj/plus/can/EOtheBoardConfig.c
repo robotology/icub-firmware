@@ -1062,6 +1062,128 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb10 =
 
 };
 
+static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb14_eb16 =
+{   // eb10
+    .type       = eomn_serv_MC_mc4plus,
+    .filler     = {0},
+    .data.mc.mc4plus_based = 
+    {
+        .boardtype4mccontroller = emscontroller_board_CER_HAND,
+        .filler                 = {0},
+        .arrayofjomodescriptors =
+        {
+            .head   = 
+            {
+                .capacity       = 4,
+                .itemsize       = sizeof(eOmn_serv_jomo_descriptor_t),
+                .size           = 2,
+                .internalmem    = 0                    
+            },
+            .data   =
+            {
+                { // joint 0: first ==> neck pitch
+                    .actuator.pwm   =
+                    {
+                        .port   = eomn_serv_mc_port_mc4plus_pwmP3         
+                    },
+                    .sensor         =
+                    {
+                        //.type   = eomn_serv_mc_sensor_encoder_spichainof2,
+                        //.port   = eomn_serv_mc_port_mc4plus_spiP10,
+                        //.pos    = eomn_serv_mc_sensor_pos_atjoint
+                        .type   = eomn_serv_mc_sensor_none,
+                        .port   = 0, 
+                        .pos    = eomn_serv_mc_sensor_pos_none
+                    },
+                    .extrasensor    =
+                    {
+                        .type   = eomn_serv_mc_sensor_encoder_inc,
+                        .port   = eomn_serv_mc_port_mc4plus_qencP3,
+                        .pos    = eomn_serv_mc_sensor_pos_atmotor
+                    }
+                },
+                { // joint 1: second ==> neck roll
+                    .actuator.pwm   =
+                    {
+                        .port   = eomn_serv_mc_port_mc4plus_pwmP2             
+                    },
+                    .sensor         =
+                    {
+                        .type   = eomn_serv_mc_sensor_encoder_spichainof2,
+                        .port   = eomn_serv_mc_port_mc4plus_spiP11,
+                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                    },
+                    .extrasensor    =
+                    {
+                        .type   = eomn_serv_mc_sensor_encoder_inc,
+                        .port   = eomn_serv_mc_port_mc4plus_qencP2,
+                        .pos    = eomn_serv_mc_sensor_pos_atmotor
+                        
+                    }
+                },                
+                { // joint 2
+                    .actuator.pwm   =
+                    {
+                        .port   = eomn_serv_mc_port_none
+                    },
+                    .sensor         =
+                    {
+                        .type   = eomn_serv_mc_sensor_none,
+                        .port   = 0, 
+                        .pos    = eomn_serv_mc_sensor_pos_none
+                    },
+                    .extrasensor    =
+                    {
+                        .type   = eomn_serv_mc_sensor_none,
+                        .port   = 0, 
+                        .pos    = eomn_serv_mc_sensor_pos_none
+                    }
+                },                
+                { // joint 3
+                    .actuator.pwm   =
+                    {
+                        .port   = eomn_serv_mc_port_none                          
+                    },
+                    .sensor         =
+                    {
+                        .type   = eomn_serv_mc_sensor_none,
+                        .port   = 0, 
+                        .pos    = eomn_serv_mc_sensor_pos_none
+                    },
+                    .extrasensor    =
+                    {
+                       .type   = eomn_serv_mc_sensor_none,
+                        .port   = 0, 
+                        .pos    = eomn_serv_mc_sensor_pos_none
+                    }
+                }            
+            }
+        },
+        .jomocoupling       =
+        {
+            .joint2set      = 
+            {   // each joint is on a different set 
+                0, 1, 2, 3 
+            },
+            .joint2motor    = 
+            {   // zero matrix: use matrix embedded in controller and seecetd by boardtype4mccontroller
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) }        
+            },
+            .joint2encoder  = 
+            {   // identical matrix
+                { EO_COMMON_FLOAT_TO_Q17_14(1.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(1.0f) } 
+            }  
+        }         
+    }
+
+};
+
 static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb15 =
 {   // eb15
     .type       = eomn_serv_MC_foc,
@@ -1333,7 +1455,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb18_eb20 =
     .filler     = {0},
     .data.mc.mc4plus_based = 
     {
-        .boardtype4mccontroller = emscontroller_board_CER_WRIST,
+        .boardtype4mccontroller = emscontroller_board_CER_LOWER_ARM,
         .filler                 = {0},
         .arrayofjomodescriptors =
         {
@@ -2652,27 +2774,27 @@ static const eOmn_serv_configuration_t * const s_serv_config_mc_V3[maxboards_V3]
 enum {maxboards_CER = 21};
 static const eOmn_serv_configuration_t * const s_serv_config_mc_CER[maxboards_CER] =
 {   // there are only eb15, eb17 and eb21 .   
-    NULL,
-    NULL,
-    NULL,
-    &s_serv_config_mc_cer_eb10,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    NULL,
-    &s_serv_config_mc_cer_eb15,
-    NULL,
-    &s_serv_config_mc_cer_eb17_eb19,
-    &s_serv_config_mc_cer_eb18_eb20,
-    &s_serv_config_mc_cer_eb17_eb19,
-    &s_serv_config_mc_cer_eb18_eb20,
-    &s_serv_config_mc_cer_eb21    
+    NULL, // ip addr  1
+    NULL, // ip addr  2
+    NULL, // ip addr  3  
+    NULL, // ip addr  4
+    NULL, // ip addr  5
+    NULL, // ip addr  6
+    NULL, // ip addr  7
+    NULL, // ip addr  8
+    NULL, // ip addr  9
+    &s_serv_config_mc_cer_eb10, // ip addr  10
+    NULL, // ip addr  11
+    NULL, // ip addr  12
+    NULL, // ip addr  13
+    &s_serv_config_mc_cer_eb14_eb16, // ip addr  14
+    &s_serv_config_mc_cer_eb15, // ip addr  15
+    &s_serv_config_mc_cer_eb14_eb16, // ip addr  16
+    &s_serv_config_mc_cer_eb17_eb19, // ip addr  17
+    &s_serv_config_mc_cer_eb18_eb20, // ip addr  18
+    &s_serv_config_mc_cer_eb17_eb19, // ip addr  19
+    &s_serv_config_mc_cer_eb18_eb20, // ip addr  20
+    &s_serv_config_mc_cer_eb21  // ip addr  21    
 };
 
 #endif

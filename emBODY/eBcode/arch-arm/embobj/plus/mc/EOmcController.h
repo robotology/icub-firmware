@@ -47,12 +47,15 @@ typedef enum
     emscontroller_board_HAND_1                  = 9,    //MC4plus
     emscontroller_board_HAND_2                  = 10,   //MC4plus
     emscontroller_board_FOREARM                 = 11,   //MC4plus
-    emscontroller_board_CER_WRIST               = 12,   //MC4plus
-	emscontroller_board_CER_WAIST               = 15,   //2FOC
-	emscontroller_board_CER_UPPER_ARM           = 17,   //2FOC
-    //emscontroller_board_CER_FOREARM             = 18,   //MC4plus
-    emscontroller_board_CER_BASE                = 21,   //2FOC
-    emscontroller_board_CER_NECK                = 22    //MC4plus
+    
+    // CER
+    
+    emscontroller_board_CER_LOWER_ARM         = 12,   //MC4plus
+    emscontroller_board_CER_HAND              = 14,   //MC2plus
+	emscontroller_board_CER_WAIST             = 15,   //2FOC
+	emscontroller_board_CER_UPPER_ARM         = 17,   //2FOC
+    emscontroller_board_CER_BASE              = 21,   //2FOC
+    emscontroller_board_CER_NECK              = 22    //MC4plus
 } eOemscontroller_board_t;
 
 
