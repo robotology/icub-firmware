@@ -31,6 +31,7 @@
 #include "string.h"
 #include "stdio.h"
 #include "EOconstvector_hid.h"
+#include "EOtheCANmapping.h"
 #include "EOappEncodersReader.h"
 
 #include "EOmcController.h"
@@ -86,7 +87,7 @@ static const eOmn_serv_configuration_t s_serv_config_as_mais =
         {
             .port           = eOcanport1,
             .addr           = 14,
-            .insideindex    = eobrd_caninsideindex_none                    
+            .insideindex    = eocanmap_insideindex_none                    
         }
     }    
 };
@@ -137,175 +138,32 @@ static const eOmn_serv_configuration_t s_serv_config_sk_skin_eb10_eb11 =
 
 static const eOmn_serv_configuration_t s_serv_config_as_inertial_eb2_eb4 =
 {   // eb2 / eb4
-    .type       = eomn_serv_AS_inertials,
+    .type       = eomn_serv_AS_inertial,
     .filler     = {0},
     .data.as.inertial = 
     {
-        .mtbversion    =
+        .version    =
         {
             .firmware   = { .major = 0, .minor = 0, .build = 0 },
             .protocol   = { .major = 0, .minor = 0 }  // in case of {0, 0} the can discovery is not done but the verify will be ok. for normal case use: {1, 0}  
         },
-// only hand (ext accel and gyros) + two forearm (int accel)
-        .arrayofsensors =
-        {
-            .head   = 
-            {
-                .capacity       = eOas_inertials_maxnumber,
-                .itemsize       = sizeof(eOas_inertial_descriptor_t),
-                .size           = 4,
-                .internalmem    = 0                    
-            },
-            .data   =
-            {
-                {   // hand
-                    .type   = eoas_inertial_accel_mtb_ext,
-                    .on.can = { .place = eobrd_place_can, .port = eOcanport2, .addr = 14 }
-                },                                
-                {   // forearm 1
-                    .type   = eoas_inertial_accel_mtb_int,
-                    .on.can = { .place = eobrd_place_can, .port = eOcanport2, .addr = 12 }
-                },  
-                {   // forearm 2
-                    .type   = eoas_inertial_accel_mtb_int,
-                    .on.can = { .place = eobrd_place_can, .port = eOcanport2, .addr = 13 }
-                },  
-                {   // hand
-                    .type   = eoas_inertial_gyros_mtb_ext,
-                    .on.can = { .place = eobrd_place_can, .port = eOcanport2, .addr = 14 }
-                }                  
-            }                
-        }
-        
-// all mtbs have int accel apart the hand wit ext accel and ext gyros
-//        .arrayofsensors =
-//        {
-//            .head   = 
-//            {
-//                .capacity       = eOas_inertials_maxnumber,
-//                .itemsize       = sizeof(eOas_inertial_descriptor_t),
-//                .size           = 8,
-//                .internalmem    = 0                    
-//            },
-//            .data   =
-//            {
-//                {
-//                    .type   = eoas_inertial_accel_mtb_int,
-//                    .on.can = { .place = eobrd_place_can, .port = eOcanport2, .addr = 8  }
-//                },
-//                {
-//                    .type   = eoas_inertial_accel_mtb_int,
-//                    .on.can = { .place = eobrd_place_can, .port = eOcanport2, .addr = 9  }
-//                },
-//                {
-//                    .type   = eoas_inertial_accel_mtb_int,
-//                    .on.can = { .place = eobrd_place_can, .port = eOcanport2, .addr = 10 }
-//                }, 
-//                {
-//                    .type   = eoas_inertial_accel_mtb_int,
-//                    .on.can = { .place = eobrd_place_can, .port = eOcanport2, .addr = 11 }
-//                },  
-//                {
-//                    .type   = eoas_inertial_accel_mtb_int,
-//                    .on.can = { .place = eobrd_place_can, .port = eOcanport2, .addr = 12 }
-//                },  
-//                {
-//                    .type   = eoas_inertial_accel_mtb_int,
-//                    .on.can = { .place = eobrd_place_can, .port = eOcanport2, .addr = 13 }
-//                },  
-//                {   // hand
-//                    .type   = eoas_inertial_accel_mtb_ext,
-//                    .on.can = { .place = eobrd_place_can, .port = eOcanport2, .addr = 14 }
-//                },
-//                {   // hand
-//                    .type   = eoas_inertial_gyros_mtb_ext,
-//                    .on.can = { .place = eobrd_place_can, .port = eOcanport2, .addr = 14 }
-//                }                  
-//            }                
-//        }
-//        .canmap = { 0x0000, 0x7f00 }
+        .canmap = { 0x0000, 0x7f00 }
     }    
 };
     
 
 static const eOmn_serv_configuration_t s_serv_config_as_inertial_eb10_eb11 =    
 {   // eb10 / eb11
-    .type       = eomn_serv_AS_inertials,
+    .type       = eomn_serv_AS_inertial,
     .filler     = {0},
     .data.as.inertial = 
     {
-        .mtbversion    =
+        .version    =
         {
             .firmware   = { .major = 0, .minor = 0, .build = 0 },
             .protocol   = { .major = 0, .minor = 0 }  // in case of {0, 0} the can discovery is not done but the verify will be ok. for normal case use: {1, 0}  
         },
-        .arrayofsensors =
-        {
-            .head   = 
-            {
-                .capacity       = eOas_inertials_maxnumber,
-                .itemsize       = sizeof(eOas_inertial_descriptor_t),
-                .size           = 13,
-                .internalmem    = 0                    
-            },
-            .data   =
-            {                
-                {
-                    .type   = eoas_inertial_accel_mtb_int,
-                    .on.can = { .place = eobrd_place_can, .port = eOcanport1, .addr = 1  }
-                },                
-
-                {
-                    .type   = eoas_inertial_accel_mtb_int,
-                    .on.can = { .place = eobrd_place_can, .port = eOcanport1, .addr = 2  }
-                },  
-                {
-                    .type   = eoas_inertial_accel_mtb_int,
-                    .on.can = { .place = eobrd_place_can, .port = eOcanport1, .addr = 3  }
-                },  
-                {
-                    .type   = eoas_inertial_accel_mtb_int,
-                    .on.can = { .place = eobrd_place_can, .port = eOcanport1, .addr = 4  }
-                },  
-                {
-                    .type   = eoas_inertial_accel_mtb_int,
-                    .on.can = { .place = eobrd_place_can, .port = eOcanport1, .addr = 5  }
-                },  
-                {
-                    .type   = eoas_inertial_accel_mtb_int,
-                    .on.can = { .place = eobrd_place_can, .port = eOcanport1, .addr = 6  }
-                },                  
-                {
-                    .type   = eoas_inertial_accel_mtb_int,
-                    .on.can = { .place = eobrd_place_can, .port = eOcanport1, .addr = 7  }
-                },                                  
-                {
-                    .type   = eoas_inertial_accel_mtb_int,
-                    .on.can = { .place = eobrd_place_can, .port = eOcanport2, .addr = 8  }
-                },
-                {
-                    .type   = eoas_inertial_accel_mtb_int,
-                    .on.can = { .place = eobrd_place_can, .port = eOcanport2, .addr = 9  }
-                },
-                {
-                    .type   = eoas_inertial_accel_mtb_int,
-                    .on.can = { .place = eobrd_place_can, .port = eOcanport2, .addr = 10 }
-                }, 
-                {
-                    .type   = eoas_inertial_accel_mtb_int,
-                    .on.can = { .place = eobrd_place_can, .port = eOcanport2, .addr = 11 }
-                },  
-                {
-                    .type   = eoas_inertial_accel_mtb_int,
-                    .on.can = { .place = eobrd_place_can, .port = eOcanport2, .addr = 12 }
-                },  
-                {
-                    .type   = eoas_inertial_accel_mtb_int,
-                    .on.can = { .place = eobrd_place_can, .port = eOcanport2, .addr = 13 }
-                }                 
-            }                
-        }        
-//        .canmap = { 0x00fe, 0x3f00 }
+        .canmap = { 0x00fe, 0x3f00 }
     }    
 };  
 
@@ -319,13 +177,13 @@ static const eOmn_serv_configuration_t s_serv_config_as_strain_eb1_eb3 =
         .version    =
         {
             .firmware   = { .major = 0, .minor = 0, .build = 0 },
-            .protocol   = { .major = 0, .minor = 0 }
+            .protocol   = { .major = 1, .minor = 0 }
         },
         .canloc         =
         {
             .port           = eOcanport2,
             .addr           = 13,
-            .insideindex    = eobrd_caninsideindex_none                   
+            .insideindex    = eomn_serv_caninsideindex_none                   
         }
     }    
 };
@@ -339,13 +197,13 @@ static const eOmn_serv_configuration_t s_serv_config_as_strain_eb6_eb8 =
         .version    =
         {
             .firmware   = { .major = 0, .minor = 0, .build = 0 },
-            .protocol   = { .major = 0, .minor = 0 }
+            .protocol   = { .major = 1, .minor = 0 }
         },
         .canloc         =
         {
             .port           = eOcanport2,
             .addr           = 13,
-            .insideindex    = eobrd_caninsideindex_none                   
+            .insideindex    = eomn_serv_caninsideindex_none                   
         }
     }    
 };
@@ -360,13 +218,13 @@ static const eOmn_serv_configuration_t s_serv_config_as_strain_eb7_eb9 =
         .version    =
         {
             .firmware   = { .major = 0, .minor = 0, .build = 0},
-            .protocol   = { .major = 0, .minor = 0 }
+            .protocol   = { .major = 1, .minor = 0 }
         },
         .canloc         =
         {
             .port           = eOcanport2,
             .addr           = 1,
-            .insideindex    = eobrd_caninsideindex_none                   
+            .insideindex    = eomn_serv_caninsideindex_none                   
         }
     }    
 };
@@ -401,7 +259,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_eb3 =
                     {
                         .port           = eOcanport1,
                         .addr           = 1,
-                        .insideindex    = eobrd_caninsideindex_first                             
+                        .insideindex    = eomn_serv_caninsideindex_first                             
                     },
                     .sensor         =
                     {
@@ -421,7 +279,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_eb3 =
                     {
                         .port           = eOcanport1,
                         .addr           = 2,
-                        .insideindex    = eobrd_caninsideindex_first                             
+                        .insideindex    = eomn_serv_caninsideindex_first                             
                     },
                     .sensor         =
                     {
@@ -441,7 +299,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_eb3 =
                     {
                         .port           = eOcanport1,
                         .addr           = 3,
-                        .insideindex    = eobrd_caninsideindex_first                             
+                        .insideindex    = eomn_serv_caninsideindex_first                             
                     },
                     .sensor         =
                     {
@@ -461,7 +319,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_eb3 =
                     {
                         .port           = eOcanport1,
                         .addr           = 4,
-                        .insideindex    = eobrd_caninsideindex_first                             
+                        .insideindex    = eomn_serv_caninsideindex_first                             
                     },
                     .sensor         =
                     {
@@ -512,7 +370,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb2_eb4 =
         .mc4version =
         {
             .firmware   = { .major = 0, .minor = 0, .build = 0 },
-            .protocol   = { .major = 1, .minor = 0 }                 
+            .protocol   = { .major = 1, .minor = 6 }                 
         },
         .mc4shifts =
         {
@@ -523,62 +381,62 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb2_eb4 =
             {   // jomo 0   
                 .port           = eOcanport1,
                 .addr           = 3,
-                .insideindex    = eobrd_caninsideindex_first
+                .insideindex    = eocanmap_insideindex_first
             },      
             {   // jomo 1
                 .port           = eOcanport1,
                 .addr           = 3,
-                .insideindex    = eobrd_caninsideindex_second
+                .insideindex    = eocanmap_insideindex_second
             },
             {   // jomo 2
                 .port           = eOcanport1,
                 .addr           = 4,
-                .insideindex    = eobrd_caninsideindex_first
+                .insideindex    = eocanmap_insideindex_first
             },
             {   // jomo 3
                 .port           = eOcanport1,
                 .addr           = 4,
-                .insideindex    = eobrd_caninsideindex_second
+                .insideindex    = eocanmap_insideindex_second
             },
             {   // jomo 4   
                 .port           = eOcanport1,
                 .addr           = 5,
-                .insideindex    = eobrd_caninsideindex_first
+                .insideindex    = eocanmap_insideindex_first
             },
             {   // jomo 
                 .port           = eOcanport1,
                 .addr           = 5,
-                .insideindex    = eobrd_caninsideindex_second
+                .insideindex    = eocanmap_insideindex_second
             },
             {   // jomo 6
                 .port           = eOcanport1,
                 .addr           = 6,
-                .insideindex    = eobrd_caninsideindex_first
+                .insideindex    = eocanmap_insideindex_first
             },
             {   // jomo 7
                 .port           = eOcanport1,
                 .addr           = 6,
-                .insideindex    = eobrd_caninsideindex_second
+                .insideindex    = eocanmap_insideindex_second
             },
             {   // jomo 8   
                 .port           = eOcanport1,
                 .addr           = 7,
-                .insideindex    = eobrd_caninsideindex_first
+                .insideindex    = eocanmap_insideindex_first
             },
             {   // jomo 9
                 .port           = eOcanport1,
                 .addr           = 7,
-                .insideindex    = eobrd_caninsideindex_second
+                .insideindex    = eocanmap_insideindex_second
             },
             {   // jomo 10
                 .port           = eOcanport1,
                 .addr           = 8,
-                .insideindex    = eobrd_caninsideindex_first
+                .insideindex    = eocanmap_insideindex_first
             },
             {   // jomo 11
                 .port           = eOcanport1,
                 .addr           = 8,
-                .insideindex    = eobrd_caninsideindex_second
+                .insideindex    = eocanmap_insideindex_second
             }
         },
         .mais = 
@@ -592,7 +450,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb2_eb4 =
             {
                 .port           = eOcanport1,
                 .addr           = 14,
-                .insideindex    = eobrd_caninsideindex_none                    
+                .insideindex    = eocanmap_insideindex_none                    
             }              
         }
     }    
@@ -627,7 +485,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb5 =
                     {
                         .port           = eOcanport1,
                         .addr           = 3,
-                        .insideindex    = eobrd_caninsideindex_first                             
+                        .insideindex    = eomn_serv_caninsideindex_first                             
                     },
                     .sensor         =
                     {
@@ -647,7 +505,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb5 =
                     {
                         .port           = eOcanport1,
                         .addr           = 4,
-                        .insideindex    = eobrd_caninsideindex_first                             
+                        .insideindex    = eomn_serv_caninsideindex_first                             
                     },
                     .sensor         =
                     {
@@ -667,7 +525,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb5 =
                     {
                         .port           = eOcanport1,
                         .addr           = 1,
-                        .insideindex    = eobrd_caninsideindex_first                             
+                        .insideindex    = eomn_serv_caninsideindex_first                             
                     },
                     .sensor         =
                     {
@@ -740,7 +598,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb6_eb8 =
                     {
                         .port           = eOcanport1,
                         .addr           = 3,
-                        .insideindex    = eobrd_caninsideindex_first                             
+                        .insideindex    = eomn_serv_caninsideindex_first                             
                     },
                     .sensor         =
                     {
@@ -760,7 +618,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb6_eb8 =
                     {
                         .port           = eOcanport1,
                         .addr           = 4,
-                        .insideindex    = eobrd_caninsideindex_first                             
+                        .insideindex    = eomn_serv_caninsideindex_first                             
                     },
                     .sensor         =
                     {
@@ -780,7 +638,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb6_eb8 =
                     {
                         .port           = eOcanport1,
                         .addr           = 1,
-                        .insideindex    = eobrd_caninsideindex_first                             
+                        .insideindex    = eomn_serv_caninsideindex_first                             
                     },
                     .sensor         =
                     {
@@ -800,7 +658,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb6_eb8 =
                     {
                         .port           = eOcanport1,
                         .addr           = 2,
-                        .insideindex    = eobrd_caninsideindex_first                             
+                        .insideindex    = eomn_serv_caninsideindex_first                             
                     },
                     .sensor         =
                     {
@@ -870,7 +728,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb7_eb9 =
                     {
                         .port           = eOcanport1,
                         .addr           = 1,
-                        .insideindex    = eobrd_caninsideindex_first                             
+                        .insideindex    = eomn_serv_caninsideindex_first                             
                     },
                     .sensor         =
                     {
@@ -890,7 +748,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb7_eb9 =
                     {
                         .port           = eOcanport1,
                         .addr           = 2,
-                        .insideindex    = eobrd_caninsideindex_first                             
+                        .insideindex    = eomn_serv_caninsideindex_first                             
                     },
                     .sensor         =
                     {
@@ -943,8 +801,27 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb7_eb9 =
 
 
 #if defined(CER)
+static const eOmn_serv_configuration_t s_serv_config_as_strain_cer_upper_arm = 
+{
+    .type       = eomn_serv_AS_strain,
+    .filler     = {0},
+    .data.as.strain = 
+    {
+        .version    =
+        {
+            .firmware   = { .major = 0, .minor = 0, .build = 0 },
+            .protocol   = { .major = 1, .minor = 0 }
+        },
+        .canloc         =
+        {
+            .port           = eOcanport2,
+            .addr           = 13,
+            .insideindex    = eomn_serv_caninsideindex_none                   
+        }
+    }    
+};
 
-static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb10 =
+static const eOmn_serv_configuration_t s_serv_config_mc_cer_neck =
 {   // eb10
     .type       = eomn_serv_MC_mc4plus,
     .filler     = {0},
@@ -1062,7 +939,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb10 =
 
 };
 
-static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb14_eb16 =
+static const eOmn_serv_configuration_t s_serv_config_mc_cer_hand =
 {   // eb10
     .type       = eomn_serv_MC_mc4plus,
     .filler     = {0},
@@ -1081,19 +958,19 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb14_eb16 =
             },
             .data   =
             {
-                { // joint 0: first ==> neck pitch
+                { // joint 0: first
                     .actuator.pwm   =
                     {
                         .port   = eomn_serv_mc_port_mc4plus_pwmP3         
                     },
                     .sensor         =
                     {
-                        //.type   = eomn_serv_mc_sensor_encoder_spichainof2,
-                        //.port   = eomn_serv_mc_port_mc4plus_spiP10,
-                        //.pos    = eomn_serv_mc_sensor_pos_atjoint
-                        .type   = eomn_serv_mc_sensor_none,
-                        .port   = 0, 
-                        .pos    = eomn_serv_mc_sensor_pos_none
+                        .type   = eomn_serv_mc_sensor_encoder_spichainof2,
+                        .port   = eomn_serv_mc_port_mc4plus_spiP10,
+                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                        //.type   = eomn_serv_mc_sensor_none,
+                        //.port   = 0, 
+                        //.pos    = eomn_serv_mc_sensor_pos_none
                     },
                     .extrasensor    =
                     {
@@ -1102,7 +979,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb14_eb16 =
                         .pos    = eomn_serv_mc_sensor_pos_atmotor
                     }
                 },
-                { // joint 1: second ==> neck roll
+                { // joint 1
                     .actuator.pwm   =
                     {
                         .port   = eomn_serv_mc_port_mc4plus_pwmP2             
@@ -1112,6 +989,9 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb14_eb16 =
                         .type   = eomn_serv_mc_sensor_encoder_spichainof2,
                         .port   = eomn_serv_mc_port_mc4plus_spiP11,
                         .pos    = eomn_serv_mc_sensor_pos_atjoint
+                        //.type   = eomn_serv_mc_sensor_none,
+                        //.port   = 0, 
+                        //.pos    = eomn_serv_mc_sensor_pos_none
                     },
                     .extrasensor    =
                     {
@@ -1184,7 +1064,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb14_eb16 =
 
 };
 
-static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb15 =
+static const eOmn_serv_configuration_t s_serv_config_mc_cer_waist =
 {   // eb15
     .type       = eomn_serv_MC_foc,
     .filler     = {0},
@@ -1213,17 +1093,13 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb15 =
                     {
                         .port           = eOcanport1,
                         .addr           = 1,
-                        .insideindex    = eobrd_caninsideindex_first                             
+                        .insideindex    = eomn_serv_caninsideindex_first                             
                     },
                     .sensor         =
                     {
-                        .type   = eomn_serv_mc_sensor_encoder_aea,
-                        .port   = eomn_serv_mc_port_ems_spiP8,   
-                        .pos    = eomn_serv_mc_sensor_pos_atjoint
-                        
-                        //.type   = eomn_serv_mc_sensor_none,
-                        //.port   = eomn_serv_mc_port_none,
-                        //.pos    = eomn_serv_mc_sensor_pos_none
+                        .type   = eomn_serv_mc_sensor_none,
+                        .port   = eomn_serv_mc_port_none,
+                        .pos    = eomn_serv_mc_sensor_pos_none
                     },
                     .extrasensor    =
                     {
@@ -1237,7 +1113,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb15 =
                     {
                         .port           = eOcanport1,
                         .addr           = 2,
-                        .insideindex    = eobrd_caninsideindex_first                             
+                        .insideindex    = eomn_serv_caninsideindex_first                             
                     },
                     .sensor         =
                     {
@@ -1257,7 +1133,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb15 =
                     {
                         .port           = eOcanport1,
                         .addr           = 3,
-                        .insideindex    = eobrd_caninsideindex_first                             
+                        .insideindex    = eomn_serv_caninsideindex_first                             
                     },
                     .sensor         =
                     {
@@ -1277,13 +1153,17 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb15 =
                     {
                         .port           = eOcanport1,
                         .addr           = 4,
-                        .insideindex    = eobrd_caninsideindex_first                             
+                        .insideindex    = eomn_serv_caninsideindex_first                             
                     },
                     .sensor         =
                     {
-                        .type   = eomn_serv_mc_sensor_none,
-                        .port   = eomn_serv_mc_port_none,
-                        .pos    = eomn_serv_mc_sensor_pos_none
+                        .type   = eomn_serv_mc_sensor_encoder_aea,
+                        .port   = eomn_serv_mc_port_ems_spiP8,   
+                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                        
+                        //.type   = eomn_serv_mc_sensor_none,
+                        //.port   = eomn_serv_mc_port_none,
+                        //.pos    = eomn_serv_mc_sensor_pos_none
                     },
                     .extrasensor    =
                     {
@@ -1318,7 +1198,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb15 =
     }
 };
 
-static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb17_eb19 =
+static const eOmn_serv_configuration_t s_serv_config_mc_cer_upper_arm =
 {   // eb17
     .type       = eomn_serv_MC_foc,
     .filler     = {0},
@@ -1351,9 +1231,9 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb17_eb19 =
                     },
                     .sensor         =
                     {
-                        .type   = eomn_serv_mc_sensor_none,
-                        .port   = eomn_serv_mc_port_none,
-                        .pos    = eomn_serv_mc_sensor_pos_none
+                        .type   = eomn_serv_mc_sensor_encoder_aea,
+                        .port   = eomn_serv_mc_port_ems_spiP6,
+                        .pos    = eomn_serv_mc_sensor_pos_atjoint
                     },
                     .extrasensor    =
                     {
@@ -1371,9 +1251,9 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb17_eb19 =
                     },
                     .sensor         =
                     {
-                        .type   = eomn_serv_mc_sensor_none,
-                        .port   = eomn_serv_mc_port_none,
-                        .pos    = eomn_serv_mc_sensor_pos_none                         
+                        .type   = eomn_serv_mc_sensor_encoder_aea,
+                        .port   = eomn_serv_mc_port_ems_spiP8,
+                        .pos    = eomn_serv_mc_sensor_pos_atjoint                       
                     },
                     .extrasensor    =
                     {
@@ -1391,9 +1271,9 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb17_eb19 =
                     },
                     .sensor         =
                     {
-                        .type   = eomn_serv_mc_sensor_none,
-                        .port   = eomn_serv_mc_port_none,
-                        .pos    = eomn_serv_mc_sensor_pos_none
+                        .type   = eomn_serv_mc_sensor_encoder_aea,
+                        .port   = eomn_serv_mc_port_ems_spiP7,
+                        .pos    = eomn_serv_mc_sensor_pos_atjoint
                     },
                     .extrasensor    =
                     {
@@ -1411,9 +1291,9 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb17_eb19 =
                     },
                     .sensor         =
                     {
-                        .type   = eomn_serv_mc_sensor_none,
-                        .port   = eomn_serv_mc_port_none,
-                        .pos    = eomn_serv_mc_sensor_pos_none                         
+                        .type   = eomn_serv_mc_sensor_encoder_aea,
+                        .port   = eomn_serv_mc_port_ems_spiP9,
+                        .pos    = eomn_serv_mc_sensor_pos_atjoint                       
                     },
                     .extrasensor    =
                     {
@@ -1449,7 +1329,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb17_eb19 =
 };
 
 
-static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb18_eb20 =
+static const eOmn_serv_configuration_t s_serv_config_mc_cer_lower_arm =
 {   // eb10
     .type       = eomn_serv_MC_mc4plus,
     .filler     = {0},
@@ -1468,25 +1348,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb18_eb20 =
             },
             .data   =
             {
-                { // joint 0: pronosupination
-                    .actuator.pwm   =
-                    {
-                        .port   = eomn_serv_mc_port_mc4plus_pwmP3         
-                    },
-                    .sensor         =
-                    {
-                        .type   = eomn_serv_mc_sensor_encoder_aea,
-                        .port   = eomn_serv_mc_port_mc4plus_spiP10,
-                        .pos    = eomn_serv_mc_sensor_pos_atjoint
-                    },
-                    .extrasensor    =
-                    {
-                        .type   = eomn_serv_mc_sensor_none,
-                        .port   = 0, 
-                        .pos    = eomn_serv_mc_sensor_pos_none
-                    }
-                },
-                { // joint 1: trifid motor 1
+                { // joint 0: trifid motor 0
                     .actuator.pwm   =
                     {
                         .port   = eomn_serv_mc_port_mc4plus_pwmP2              
@@ -1504,7 +1366,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb18_eb20 =
                         .pos    = eomn_serv_mc_sensor_pos_atmotor
                     }
                 },                
-                { // joint 2: trifid motor 2
+                { // joint 1: trifid motor 1
                     .actuator.pwm   =
                     {
                         .port   = eomn_serv_mc_port_mc4plus_pwmP4              
@@ -1522,7 +1384,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb18_eb20 =
                         .pos    = eomn_serv_mc_sensor_pos_atmotor
                     }
                 },               
-                { // joint 3: trifid motor 3
+                { // joint 2: trifid motor 2
                     .actuator.pwm   =
                     {
                         .port   = eomn_serv_mc_port_mc4plus_pwmP5              
@@ -1539,14 +1401,32 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb18_eb20 =
                         .port   = eomn_serv_mc_port_mc4plus_qencP5,
                         .pos    = eomn_serv_mc_sensor_pos_atmotor
                     }
-                }            
+                },
+                { // joint 3: pronosupination
+                    .actuator.pwm   =
+                    {
+                        .port   = eomn_serv_mc_port_mc4plus_pwmP3         
+                    },
+                    .sensor         =
+                    {
+                        .type   = eomn_serv_mc_sensor_encoder_aea,
+                        .port   = eomn_serv_mc_port_mc4plus_spiP10,
+                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                    },
+                    .extrasensor    =
+                    {
+                        .type   = eomn_serv_mc_sensor_none,
+                        .port   = 0, 
+                        .pos    = eomn_serv_mc_sensor_pos_none
+                    }
+                }                
             }
         },
         .jomocoupling       =
         {
             .joint2set      = 
             {   // each joint is on a different set 
-                0, 1, 1, 1 
+                0, 0, 0, 1 
             },
             .joint2motor    = 
             {   // zero matrix: use matrix embedded in controller and seecetd by boardtype4mccontroller
@@ -1569,7 +1449,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb18_eb20 =
 
 
 
-static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb21 =
+static const eOmn_serv_configuration_t s_serv_config_mc_cer_base =
 {   // eb21
     .type       = eomn_serv_MC_foc,
     .filler     = {0},
@@ -1598,7 +1478,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb21 =
                     {
                         .port           = eOcanport1,
                         .addr           = 4,
-                        .insideindex    = eobrd_caninsideindex_first                             
+                        .insideindex    = eomn_serv_caninsideindex_first                             
                     },
                     .sensor         =
                     {
@@ -1618,7 +1498,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb21 =
                     {
                         .port           = eOcanport1,
                         .addr           = 2,
-                        .insideindex    = eobrd_caninsideindex_first                             
+                        .insideindex    = eomn_serv_caninsideindex_first                             
                     },
                     .sensor         =
                     {
@@ -1638,7 +1518,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb21 =
                     {
                         .port           = eOcanport1,
                         .addr           = 3,
-                        .insideindex    = eobrd_caninsideindex_first                             
+                        .insideindex    = eomn_serv_caninsideindex_first                             
                     },
                     .sensor         =
                     {
@@ -1658,7 +1538,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb21 =
                     {
                         .port           = eOcanport1,
                         .addr           = 1,
-                        .insideindex    = eobrd_caninsideindex_first                             
+                        .insideindex    = eomn_serv_caninsideindex_first                             
                     },
                     .sensor         =
                     {
@@ -2184,7 +2064,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_1B2_2B2 =
     .filler     = {0},
     .data.mc.mc4plus_based = 
     {
-        .boardtype4mccontroller = emscontroller_board_FACE_lips, // so far we keep it like this. later on we either develop a emscontroller_board_FOREARM_wrist or we use new ems controller
+        .boardtype4mccontroller = emscontroller_board_FOREARM,
         .filler                 = {0},
         .arrayofjomodescriptors =
         {
@@ -2195,9 +2075,9 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_1B2_2B2 =
                 .size           = 4,
                 .internalmem    = 0                    
             },
-            .data   =           // marco.accame: so far i map at random. i dont know where to put motors, sensors etc.
+            .data   = 
             {
-                { // joint 0:   tentative wrist pronosupination
+                { // joint 0:   wrist pronosupination
                     .actuator.pwm   =
                     {   // motor 1B2M0
                         .port   = eomn_serv_mc_port_mc4plus_pwmP3,                          
@@ -2215,31 +2095,31 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_1B2_2B2 =
                         .pos    = eomn_serv_mc_sensor_pos_atmotor
                     }
                 },                 
-                { // joint 1:   tentative wrist coupled w/ 1B2M0 and LA-S5
-                    .actuator.pwm   =
-                    {   // motor 1B2M2
-                        .port   = eomn_serv_mc_port_mc4plus_pwmP4,                         
-                    },
-                    .sensor         =
-                    {   // i try the aea LA-S5 in port SPI1 (P10)
-                        .type   = eomn_serv_mc_sensor_encoder_aea,
-                        .port   = eomn_serv_mc_port_mc4plus_spiP10,
-                        .pos    = eomn_serv_mc_sensor_pos_atjoint
-                    },
-                    .extrasensor    =
-                    {   // inc encoder of motor 1B2M0
-                        .type   = eomn_serv_mc_sensor_encoder_inc,
-                        .port   = eomn_serv_mc_port_mc4plus_qencP4,
-                        .pos    = eomn_serv_mc_sensor_pos_atmotor
-                    }
-                },
-                { // joint 2:   tentative wrist coupled w/ 1B2M1 and LA-S6
+                { // joint 1: //wrist coupled (pitch)
                     .actuator.pwm   =
                     {   // motor 1B2M1
                         .port   = eomn_serv_mc_port_mc4plus_pwmP2,                         
                     },
                     .sensor         =
-                    {   // i try the aea LA-S6 in port SPI2 (P11)
+                    {   // the aea LA-S5 in port SPI1 (P10)
+                        .type   = eomn_serv_mc_sensor_encoder_aea,
+                        .port   = eomn_serv_mc_port_mc4plus_spiP10,
+                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                    },
+                    .extrasensor    =
+                    {   // inc encoder of motor 1B2M1
+                        .type   = eomn_serv_mc_sensor_encoder_inc,
+                        .port   = eomn_serv_mc_port_mc4plus_qencP2,
+                        .pos    = eomn_serv_mc_sensor_pos_atmotor
+                    }
+                },
+                { // joint 2:   //wrist coupled (yaw)
+                    .actuator.pwm   =
+                    {   // motor 1B2M2
+                        .port   = eomn_serv_mc_port_mc4plus_pwmP4,                         
+                    },
+                    .sensor         =
+                    {   // the aea LA-S6 in port SPI2 (P11)
                         .type   = eomn_serv_mc_sensor_encoder_aea,
                         .port   = eomn_serv_mc_port_mc4plus_spiP11,
                         .pos    = eomn_serv_mc_sensor_pos_atjoint
@@ -2247,13 +2127,13 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_1B2_2B2 =
                     .extrasensor    =
                     {
                         .type   = eomn_serv_mc_sensor_encoder_inc,
-                        .port   = eomn_serv_mc_port_mc4plus_qencP2,
+                        .port   = eomn_serv_mc_port_mc4plus_qencP4,
                         .pos    = eomn_serv_mc_sensor_pos_atmotor
                     }
                 },                                              
-                { // joint 3:   tentative finger abduction 
+                { // joint 3:   finger abduction
                     .actuator.pwm   =
-                    {   // motor 1B2H3
+                    {   // motor 1B2M3
                         .port   = eomn_serv_mc_port_mc4plus_pwmP5,                      
                     },
                     .sensor         =
@@ -2302,19 +2182,19 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_1B3_2B3 =
     .filler     = {0},
     .data.mc.mc4plusmais_based = 
     {
-        .boardtype4mccontroller = emscontroller_board_FACE_lips, // so far we keep it like this. later on we either develop a emscontroller_board_FOREARM_thumb or we use new ems controller
+        .boardtype4mccontroller = emscontroller_board_HAND_1,
         .mais                   = 
         {
             .version    =
             {
                 .firmware   = { .major = 0, .minor = 0, .build = 0 },
-                .protocol   = { .major = 1, .minor = 0 }    
+                .protocol   = { .major = 0, .minor = 0 }    
             },
             .canloc = 
             {
                 .port           = eOcanport1,
                 .addr           = 14,
-                .insideindex    = eobrd_caninsideindex_none                    
+                .insideindex    = eocanmap_insideindex_none                    
             }               
         },
         .filler                 = {0},
@@ -2327,9 +2207,9 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_1B3_2B3 =
                 .size           = 4,
                 .internalmem    = 0                    
             },
-            .data   =           // marco.accame: so far i map at random. i dont know where to put motors, sensors etc.
+            .data   = 
             {
-                { // joint 0:   tentative thumb abduction w/ 1B3M0 and hall sensor 1B3H0
+                { // joint 0: thumb abduction w/ 1B3M0 and hall sensor 1B3H0
                     .actuator.pwm   =
                     {   // motor 1B3M0
                         .port   = eomn_serv_mc_port_mc4plus_pwmP3,                         
@@ -2347,7 +2227,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_1B3_2B3 =
                         .pos    = eomn_serv_mc_sensor_pos_none
                     }
                 },
-                { // joint 1:   tentative thumb proximal w/ 1B3M1
+                { // joint 1:  thumb proximal w/ 1B3M1
                     .actuator.pwm   =
                     {   // motor 1B3M1
                         .port   = eomn_serv_mc_port_mc4plus_pwmP2,                         
@@ -2359,13 +2239,13 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_1B3_2B3 =
                         .pos    = eomn_serv_mc_sensor_pos_atjoint
                     },
                     .extrasensor    =
-                    {   // i use the incremental associated to the motor
+                    {   
                         .type   = eomn_serv_mc_sensor_encoder_inc,
                         .port   = eomn_serv_mc_port_mc4plus_qencP2,
                         .pos    = eomn_serv_mc_sensor_pos_atmotor
                     }
                 },                
-                { // joint 2:   tentative thumb distal
+                { // joint 2:  thumb distal
                     .actuator.pwm   =
                     {   // motor 1B3M2
                         .port   = eomn_serv_mc_port_mc4plus_pwmP4,                          
@@ -2377,13 +2257,13 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_1B3_2B3 =
                         .pos    = eomn_serv_mc_sensor_pos_atjoint
                     },
                     .extrasensor    =
-                    {   // i use the incremental associated to the motor
+                    {
                         .type   = eomn_serv_mc_sensor_encoder_inc,
                         .port   = eomn_serv_mc_port_mc4plus_qencP4,
                         .pos    = eomn_serv_mc_sensor_pos_atmotor
                     }
                 },                               
-                { // joint 3:   tentative index proximal 
+                { // joint 3:   index proximal 
                     .actuator.pwm   =
                     {   // motor 1B3M3
                         .port   = eomn_serv_mc_port_mc4plus_pwmP5,                      
@@ -2395,7 +2275,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_1B3_2B3 =
                         .pos    = eomn_serv_mc_sensor_pos_atjoint
                     },
                     .extrasensor    =
-                    {   // i use the incremental associated to the motor
+                    {
                         .type   = eomn_serv_mc_sensor_encoder_inc,
                         .port   = eomn_serv_mc_port_mc4plus_qencP5,
                         .pos    = eomn_serv_mc_sensor_pos_atmotor
@@ -2440,13 +2320,13 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_1B4_2B4 =
             .version    =
             {
                 .firmware   = { .major = 0, .minor = 0, .build = 0 },
-                .protocol   = { .major = 1, .minor = 0 }    
+                .protocol   = { .major = 0, .minor = 0 }    
             },
             .canloc = 
             {
                 .port           = eOcanport1,
                 .addr           = 14,
-                .insideindex    = eobrd_caninsideindex_none                    
+                .insideindex    = eocanmap_insideindex_none                    
             }               
         },
         .filler                 = {0},
@@ -2459,9 +2339,9 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_1B4_2B4 =
                 .size           = 4,
                 .internalmem    = 0                    
             },
-            .data   =           // marco.accame: so far i map at random. i dont know where to put motors, sensors etc.
+            .data   = 
             {
-                { // joint 0:   tentative index distal w/ 1B4M0 
+                { // joint 0:   index distal w/ 1B4M0 
                     .actuator.pwm   =
                     {   // motor 1B4M0
                         .port   = eomn_serv_mc_port_mc4plus_pwmP2,                         
@@ -2479,7 +2359,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_1B4_2B4 =
                         .pos    = eomn_serv_mc_sensor_pos_atmotor
                     }
                 },
-                { // joint 1:   tentative medium proximal w/ 1B4M1
+                { // joint 1:medium proximal w/ 1B4M1
                     .actuator.pwm   =
                     {   // motor 1B4M1
                         .port   = eomn_serv_mc_port_mc4plus_pwmP3,                         
@@ -2491,13 +2371,13 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_1B4_2B4 =
                         .pos    = eomn_serv_mc_sensor_pos_atjoint
                     },
                     .extrasensor    =
-                    {   // i use the incremental associated to the motor
+                    {
                         .type   = eomn_serv_mc_sensor_encoder_inc,
                         .port   = eomn_serv_mc_port_mc4plus_qencP3,
                         .pos    = eomn_serv_mc_sensor_pos_atmotor
                     }
                 },                
-                { // joint 2:   tentative medium distal
+                { // joint 2: medium distal
                     .actuator.pwm   =
                     {   // motor 1B4M2
                         .port   = eomn_serv_mc_port_mc4plus_pwmP4,                          
@@ -2509,13 +2389,13 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_1B4_2B4 =
                         .pos    = eomn_serv_mc_sensor_pos_atjoint
                     },
                     .extrasensor    =
-                    {   // i use the incremental associated to the motor
+                    {   
                         .type   = eomn_serv_mc_sensor_encoder_inc,
                         .port   = eomn_serv_mc_port_mc4plus_qencP4,
                         .pos    = eomn_serv_mc_sensor_pos_atmotor
                     }
                 },                               
-                { // joint 3:   tentative little fingers
+                { // joint 3: little fingers
                     .actuator.pwm   =
                     {   // motor 1B4M3
                         .port   = eomn_serv_mc_port_mc4plus_pwmP5,                      
@@ -2527,7 +2407,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_1B4_2B4 =
                         .pos    = eomn_serv_mc_sensor_pos_atjoint
                     },
                     .extrasensor    =
-                    {   // i use the incremental associated to the motor
+                    {
                         .type   = eomn_serv_mc_sensor_encoder_inc,
                         .port   = eomn_serv_mc_port_mc4plus_qencP5,
                         .pos    = eomn_serv_mc_sensor_pos_atmotor
@@ -2773,30 +2653,29 @@ static const eOmn_serv_configuration_t * const s_serv_config_mc_V3[maxboards_V3]
 #if defined(CER)
 enum {maxboards_CER = 21};
 static const eOmn_serv_configuration_t * const s_serv_config_mc_CER[maxboards_CER] =
-{   // there are only eb15, eb17 and eb21 .   
-    NULL, // ip addr  1
-    NULL, // ip addr  2
-    NULL, // ip addr  3  
-    NULL, // ip addr  4
-    NULL, // ip addr  5
-    NULL, // ip addr  6
-    NULL, // ip addr  7
-    NULL, // ip addr  8
-    NULL, // ip addr  9
-    &s_serv_config_mc_cer_eb10, // ip addr  10
-    NULL, // ip addr  11
-    NULL, // ip addr  12
-    NULL, // ip addr  13
-    &s_serv_config_mc_cer_eb14_eb16, // ip addr  14
-    &s_serv_config_mc_cer_eb15, // ip addr  15
-    &s_serv_config_mc_cer_eb14_eb16, // ip addr  16
-    &s_serv_config_mc_cer_eb17_eb19, // ip addr  17
-    &s_serv_config_mc_cer_eb18_eb20, // ip addr  18
-    &s_serv_config_mc_cer_eb17_eb19, // ip addr  19
-    &s_serv_config_mc_cer_eb18_eb20, // ip addr  20
-    &s_serv_config_mc_cer_eb21  // ip addr  21    
+{   
+    NULL,                            // ip addr  1
+    NULL,                            // ip addr  2
+    NULL,                            // ip addr  3  
+    &s_serv_config_mc_cer_upper_arm, // ip addr  4
+    &s_serv_config_mc_cer_upper_arm, // ip addr  5
+    &s_serv_config_mc_cer_lower_arm, // ip addr  6
+    &s_serv_config_mc_cer_hand,      // ip addr  7
+    &s_serv_config_mc_cer_lower_arm, // ip addr  8
+    &s_serv_config_mc_cer_hand,      // ip addr  9
+    &s_serv_config_mc_cer_neck,      // ip addr  10
+    NULL,                            // ip addr  11
+    NULL,                            // ip addr  12
+    NULL,                            // ip addr  13
+    NULL,                            // ip addr  14
+    &s_serv_config_mc_cer_waist,     // ip addr  15
+    NULL,                            // ip addr  16
+    NULL,                            // ip addr  17
+    NULL,                            // ip addr  18
+    NULL,                            // ip addr  19
+    NULL,                            // ip addr  20
+    &s_serv_config_mc_cer_base       // ip addr  21    
 };
-
 #endif
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -2936,12 +2815,25 @@ extern const eOmn_serv_configuration_t * eoboardconfig_code2strain_serv_configur
         {   // all the others
             ret = NULL;
         } break;
-    
+
     }
 #elif   defined(ICUB_MEC_V3)
     // so far not supported
 #elif   defined(CER)    
-    // so far not supported
+    switch(code)
+    {
+        case 3:
+        case 4:
+        { 
+            ret = &s_serv_config_as_strain_cer_upper_arm; 
+        } break;  
+        
+        default:    
+        {   // all the others
+            ret = NULL;
+        } break;
+
+    }
 #endif
     
     return(ret);    

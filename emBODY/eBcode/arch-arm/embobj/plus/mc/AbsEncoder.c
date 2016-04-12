@@ -212,7 +212,7 @@ void AbsEncoder_timeout(AbsEncoder* o)
     o->valid_first_data_cnt = 0;
 }
 
-void AbsEncoder_invalid(AbsEncoder* o, hal_spiencoder_errors_flags error_flags)
+void AbsEncoder_invalid(AbsEncoder* o, eOencoderreader_errortype_t error_type)
 {
     if (!o) return;
     
@@ -231,10 +231,20 @@ void AbsEncoder_invalid(AbsEncoder* o, hal_spiencoder_errors_flags error_flags)
         ++o->invalid_cnt;
     }
     
-    if (error_flags.data_error)    o->fault_state.bits.data_error = TRUE;
-    if (error_flags.tx_error)      o->fault_state.bits.tx_error   = TRUE;
-    if (error_flags.chip_error)    o->fault_state.bits.chip_error = TRUE;
-    if (error_flags.data_notready) o->fault_state.bits.chip_error = TRUE;
+    switch (error_type)
+    {
+        case encreader_err_READING:
+            o->fault_state.bits.data_error = TRUE;
+            break;
+        case encreader_err_PARITY:
+            o->fault_state.bits.tx_error = TRUE;
+            break;
+        case encreader_err_CHIP:
+            o->fault_state.bits.chip_error = TRUE;
+            break;
+        default:
+            break;
+    }
         
     o->valid_first_data_cnt = 0;
 }

@@ -455,8 +455,9 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         o->multi_encs = 2;
     
         Sje = o->Sje;
-        Sje[0][0] = 1.0f; Sje[0][1] = 1.0f; Sje[0][2] = 0.0f; Sje[0][3] = 0.0f;
-        Sje[1][0] = 0.0f; Sje[1][1] = 0.0f; Sje[1][2] = 1.0f; Sje[1][3] = 1.0f;
+        
+        Sje[0][0] = 0.0f; Sje[0][1] =  1.0f;  Sje[0][2] =  0.0f; Sje[0][3] = 0.0f;
+        Sje[1][0] = 0.0f; Sje[1][1] =  0.0f;  Sje[1][2] =  0.0f; Sje[1][3] = 1.0f;
     
         o->e2s[0] = o->e2s[1] = 0;
         o->e2s[2] = o->e2s[3] = 1;
@@ -674,6 +675,11 @@ void MController_config_joint(int j, eOmc_joint_config_t* config) //
     {
         AbsEncoder_config(o->absEncoder+j, j, config->jntEncoderResolution, 64*AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
     }
+    else if (o->part_type==emscontroller_board_CER_HAND)
+    {
+        AbsEncoder_config(o->absEncoder+j*2,   j, config->jntEncoderResolution, 32000, AEA_DEFAULT_SPIKE_CNT_LIMIT);
+        AbsEncoder_config(o->absEncoder+j*2+1, j, config->jntEncoderResolution, 32000, AEA_DEFAULT_SPIKE_CNT_LIMIT);
+    }
     else
     {
         AbsEncoder_config(o->absEncoder+j, j, config->jntEncoderResolution, AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
@@ -866,14 +872,28 @@ void MController_update_motor_state_fbk(uint8_t m, void* state)
     Motor_update_state_fbk(smc->motor+m, state);
 }
 
-void MController_invalid_absEncoder_fbk(uint8_t e, hal_spiencoder_errors_flags error_flags) //
+void MController_invalid_absEncoder_fbk(uint8_t e, eOencoderreader_errortype_t error_type) //
 {
-    AbsEncoder_invalid(smc->absEncoder+e, error_flags);
+    //AbsEncoder_invalid(smc->absEncoder+e, error_type);
+    
+    AbsEncoder* enc = smc->absEncoder + e*smc->multi_encs;
+    
+    for (int k=0; k<smc->multi_encs; ++k)
+    {
+        AbsEncoder_invalid(enc++, error_type);
+    }
 }
 
 void MController_timeout_absEncoder_fbk(uint8_t e) //
 {
-    AbsEncoder_timeout(smc->absEncoder+e);
+    //AbsEncoder_timeout(smc->absEncoder+e);
+    
+    AbsEncoder* enc = smc->absEncoder + e*smc->multi_encs;
+    
+    for (int k=0; k<smc->multi_encs; ++k)
+    {
+        AbsEncoder_timeout(enc++);
+    }
 }
 
 int32_t MController_get_absEncoder(uint8_t j)
@@ -1057,7 +1077,7 @@ static char invert_matrix(float** M, float** I, char n)
 
 void MController_calibrate(uint8_t e, eOmc_calibrator_t *calibrator)
 {
-    JointSet_calibrate(smc->jointSet+smc->e2s[e], e, calibrator);
+    JointSet_calibrate(smc->jointSet+smc->e2s[e*smc->multi_encs], e, calibrator);
 }
 
 void MController_go_idle(void)

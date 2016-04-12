@@ -113,6 +113,7 @@ extern eObool_t eo_motioncontrol_extra_AreMotorsExtFaulted(EOtheMotionController
 
 //extern uint32_t eo_motioncontrol_extra_GetMotorFaultMask(EOtheMotionController *p, uint8_t jomo);
 
+
 extern uint16_t eo_motioncontrol_extra_GetMotorCurrent(EOtheMotionController *p, uint8_t jomo);
 
 extern uint32_t eo_motioncontrol_extra_GetMotorAnalogSensor(EOtheMotionController *p, uint8_t jomo);

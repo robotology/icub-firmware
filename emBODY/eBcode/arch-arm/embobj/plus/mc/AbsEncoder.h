@@ -3,9 +3,9 @@
 
 #include "EoCommon.h"
 
-#include "EOEmsControllerCfg.h"
+#include "EOtheEncoderReader.h"
 
-#include "hal_spiencoder.h"
+#include "EOEmsControllerCfg.h"
 
 /////////////////////////////////////////////////////////
 // AbsEncoder
@@ -91,7 +91,7 @@ extern void AbsEncoder_calibrate(AbsEncoder* o, int32_t offset, int32_t zero);
 
 //extern void AbsEncoder_update(AbsEncoder* o, int32_t position);
 extern void AbsEncoder_update(AbsEncoder* o, uint16_t position);
-extern void AbsEncoder_invalid(AbsEncoder* o, hal_spiencoder_errors_flags error_flags);
+extern void AbsEncoder_invalid(AbsEncoder* o, eOencoderreader_errortype_t error_type);
 extern void AbsEncoder_timeout(AbsEncoder* o);
 
 extern int32_t AbsEncoder_position(AbsEncoder* o);

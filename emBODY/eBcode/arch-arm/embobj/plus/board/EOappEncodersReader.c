@@ -483,7 +483,7 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint
                     return(eores_NOK_generic);
                 }
             
-                val_raw = (val_raw>>4) & 0xFFFF;
+                //val_raw = (val_raw>>4) & 0xFFFF;
                 *primaryvalue = s_eo_appEncReader_rescale2icubdegrees(val_raw, jomo, (eOmn_serv_mc_sensor_position_t)this_jomoconfig.primary.pos);
                 
             } break;
@@ -510,8 +510,7 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint
                 //val_raw = val1 + val2; // we give back the sum of the two
                 
                 //*primaryvalue = s_eo_appEncReader_rescale2icubdegrees(val_raw, jomo, (eOmn_serv_mc_sensor_position_t)this_jomoconfig.primary.pos);                
-                
-                *primaryvalue = (val_raw<<2)&0xFFF0FFF0; 
+                *primaryvalue = (val_raw<<4)&0xFFF0FFF0;
             } break; 	            
             
             case eomn_serv_mc_sensor_encoder_inc:
@@ -651,12 +650,12 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint
                     return(eores_NOK_generic);
                 }                
             
-                uint16_t val1 = (val_raw >> 2) & 0x0fff; // it is the first encoder in the chain
-                uint16_t val2 = (val_raw >> 18) & 0x0fff; // it is the second encoder in the chain
-                val_raw = val1 + val2; // we give back the sum of the two
+                //uint16_t val1 = (val_raw >> 2) & 0x0fff; // it is the first encoder in the chain
+                //uint16_t val2 = (val_raw >> 18) & 0x0fff; // it is the second encoder in the chain
+                //val_raw = val1 + val2; // we give back the sum of the two
                 
-                *secondaryvalue = s_eo_appEncReader_rescale2icubdegrees( val_raw, jomo, (eOmn_serv_mc_sensor_position_t)this_jomoconfig.secondary.pos);
- 
+                //*secondaryvalue = s_eo_appEncReader_rescale2icubdegrees( val_raw, jomo, (eOmn_serv_mc_sensor_position_t)this_jomoconfig.secondary.pos);
+                *secondaryvalue = (val_raw<<2)&0xFFF0FFF0;
             } break; 	            
             
             case eomn_serv_mc_sensor_encoder_inc:

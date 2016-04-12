@@ -775,7 +775,7 @@ static BOOL JointSet_do_wait_calibration_8(JointSet* o)
         {
             o->motor[m].not_calibrated = FALSE;
             
-            hal_led_on(hal_led0+ms);
+            //hal_led_on(hal_led0+ms);
         }
         
         if (Motor_is_calibrated(o->motor+m))
@@ -911,6 +911,10 @@ static void JointSet_do_wait_calibration(JointSet* o)
             o->is_calibrated = JointSet_do_wait_calibration_10(o);
             break;
         
+        case eomc_calibration_type11_cer_hands:
+            o->is_calibrated = JointSet_do_wait_calibration_3(o);
+            break;
+        
         default:
             o->is_calibrated = FALSE;
             break;
@@ -986,7 +990,11 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             if (o->calibration_in_progress == calibrator->type) return;
             
             o->calibration_in_progress = (eOmc_calibration_type_t)calibrator->type;
-
+            
+            //hal_led_off(hal_led0);
+            //hal_led_off(hal_led1);
+            //hal_led_off(hal_led2);
+            
             o->joint[o->joints_of_set[0]].control_mode = eomc_controlmode_calib;
             o->joint[o->joints_of_set[1]].control_mode = eomc_controlmode_calib;
             o->joint[o->joints_of_set[2]].control_mode = eomc_controlmode_calib;
@@ -1025,6 +1033,11 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
         
         case eomc_calibration_type11_cer_hands:
         {
+            hal_led_off(hal_led0);
+            hal_led_off(hal_led1);
+            hal_led_off(hal_led2);
+            hal_led_off(hal_led3);
+            
             AbsEncoder* enc = o->absEncoder + 2*e;
             AbsEncoder_calibrate(enc  , calibrator->params.type11.offset0, calibrator->params.type11.calibrationZero);
             AbsEncoder_calibrate(enc+1, calibrator->params.type11.offset1, calibrator->params.type11.calibrationZero);

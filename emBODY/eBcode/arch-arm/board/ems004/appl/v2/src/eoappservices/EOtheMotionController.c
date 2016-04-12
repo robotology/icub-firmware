@@ -969,6 +969,7 @@ extern eOresult_t eo_motioncontrol_Tick(EOtheMotionController *p)
     
     
     if(eo_motcon_mode_foc == p->service.servconfig.type)
+
     {
         uint8_t error_mask = 0;
         eOresult_t res = eores_NOK_generic;
@@ -980,10 +981,13 @@ extern eOresult_t eo_motioncontrol_Tick(EOtheMotionController *p)
 
 
         // wait for the encoders for some time
+
         for (uint8_t i=0; i<30; ++i)
         {
             if (eo_encoderreader_IsReadingAvailable(p->mcfoc.theencoderreader))
             {
+                timeout = eobool_false;
+                
                 break;
             }
             
@@ -2517,7 +2521,7 @@ static eOresult_t s_eo_mcserv_do_mc4plus(EOtheMotionController *p)
     eOresult_t res = eores_NOK_generic;
     uint32_t encvalue[4] = {0}; 
     uint32_t extra[4] = {0};
-    //hal_spiencoder_errors_flags encflags[4] = {0};
+    hal_spiencoder_errors_flags encflags[4] = {0};
     int16_t pwm[4] = {0};  
     */
     
@@ -2532,6 +2536,7 @@ static eOresult_t s_eo_mcserv_do_mc4plus(EOtheMotionController *p)
     }
     
     uint8_t i = 0;
+
     
     eo_currents_watchdog_Tick(eo_currents_watchdog_GetHandle());
     
@@ -2571,13 +2576,13 @@ static eOresult_t s_eo_mcserv_do_mc4plus(EOtheMotionController *p)
             {
                 MController_update_absEncoder_fbk(i, (uint16_t*)&enc_value);
             }
+
             
-            // if the extra encoder is a rotor position, update the proper value
             if(eomn_serv_mc_sensor_pos_atmotor == jomodes->extrasensor.pos) 
             {
                 MController_update_motor_pos_fbk(i, extra);
             }
-        }        
+        }     
     }
     else
     {
