@@ -455,9 +455,9 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         o->multi_encs = 2;
     
         Sje = o->Sje;
-        
-        Sje[0][0] = 0.0f; Sje[0][1] =  1.0f;  Sje[0][2] =  0.0f; Sje[0][3] = 0.0f;
-        Sje[1][0] = 0.0f; Sje[1][1] =  0.0f;  Sje[1][2] =  0.0f; Sje[1][3] = 1.0f;
+
+        Sje[0][0] = -1.0f; Sje[0][1] =  1.0f;  Sje[0][2] =  0.0f; Sje[0][3] = 0.0f;
+        Sje[1][0] =  0.0f; Sje[1][1] =  0.0f;  Sje[1][2] = -1.0f; Sje[1][3] = 1.0f;
     
         o->e2s[0] = o->e2s[1] = 0;
         o->e2s[2] = o->e2s[3] = 1;
