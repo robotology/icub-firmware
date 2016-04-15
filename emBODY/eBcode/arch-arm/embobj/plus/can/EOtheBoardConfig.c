@@ -1252,7 +1252,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_upper_arm =
                     .sensor         =
                     {
                         .type   = eomn_serv_mc_sensor_encoder_aea,
-                        .port   = eomn_serv_mc_port_ems_spiP8,
+                        .port   = eomn_serv_mc_port_ems_spiP7,
                         .pos    = eomn_serv_mc_sensor_pos_atjoint                       
                     },
                     .extrasensor    =
@@ -1272,7 +1272,11 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_upper_arm =
                     .sensor         =
                     {
                         .type   = eomn_serv_mc_sensor_encoder_aea,
+<<<<<<< HEAD
                         .port   = eomn_serv_mc_port_ems_spiP7,
+=======
+                        .port   = eomn_serv_mc_port_ems_spiP8,
+>>>>>>> Added AEA configuration to CER upper arm.
                         .pos    = eomn_serv_mc_sensor_pos_atjoint
                     },
                     .extrasensor    =
