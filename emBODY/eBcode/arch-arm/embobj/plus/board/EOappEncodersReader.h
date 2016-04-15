@@ -95,6 +95,8 @@ extern eOresult_t eo_appEncReader_Diagnostics_Enable(EOappEncReader *p, eObool_t
 extern eOresult_t eo_appEncReader_Diagnostics_Tick(EOappEncReader *p);
 
 
+extern eOresult_t eo_appEncReader_UpdatedMaisConversionFactors(EOappEncReader *p, uint8_t jomo, float convFactor);
+
 /** @}            
     end of group eo_app_encodersReader
  **/

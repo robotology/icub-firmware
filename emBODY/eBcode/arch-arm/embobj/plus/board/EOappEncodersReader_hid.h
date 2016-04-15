@@ -100,6 +100,7 @@ struct EOappEncReader_hid
     eOappEncReader_cfg_t                    config;       
     eOappEncReader_stream_t                 SPI_streams[hal_spiencoder_streams_number];  // SPI streams; must be coherent with what inside cfg
     eo_appEncReader_diagnostics_t           diagnostics;
+    float                                   maisCoversionFactors[eOappEncReader_jomos_maxnumberof];
 }; 
 
 

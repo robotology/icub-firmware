@@ -21,6 +21,7 @@ typedef struct // TripodCalib
 
 } TripodCalib;
 
+
 typedef struct // JointSet
 {
     hal_led_t led;

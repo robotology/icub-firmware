@@ -2601,8 +2601,6 @@ static eOresult_t s_eo_mcserv_do_mc4plus(EOtheMotionController *p)
     // compute the pwm using pid
     //eo_emsController_PWM(pwm);
     
-    #warning: for MAIS-controlled joints... do a check on the limits (see MC4 firmware) before physically applying PWM //VALE: questo warning non lo avevo tolto???
-    
     // 6. apply the pwm. for the case of mc4plus we call hal_pwm();
     //for(i=0; i<p->numofjomos; i++)
     //{

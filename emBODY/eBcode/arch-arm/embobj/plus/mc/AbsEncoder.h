@@ -32,6 +32,8 @@ typedef struct //AbsEncoder
     //int32_t position_sure;
     //int32_t offset;
     //int32_t delta;
+    
+    eOmc_EncoderType_t type;
 
     uint32_t partial_timer;
     int32_t  partial_space;
@@ -86,7 +88,8 @@ typedef struct //AbsEncoder
 extern AbsEncoder* AbsEncoder_new(uint8_t n);
 extern void AbsEncoder_init(AbsEncoder* o);
 extern void AbsEncoder_destroy(AbsEncoder* o);
-extern void AbsEncoder_config(AbsEncoder *o, uint8_t ID, int32_t resolution, int16_t spike_mag_limit, uint16_t spike_cnt_limit);
+extern void AbsEncoder_config(AbsEncoder* o, uint8_t ID, eOmc_EncoderType_t type, int32_t resolution, int16_t spike_mag_limit, uint16_t spike_cnt_limit);
+extern void AbsEncoder_config_resolution(AbsEncoder* o, float resolution);
 extern void AbsEncoder_calibrate(AbsEncoder* o, int32_t offset, int32_t zero);
 
 //extern void AbsEncoder_update(AbsEncoder* o, int32_t position);

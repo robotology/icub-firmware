@@ -100,7 +100,7 @@ static void s_eo_appEncReader_deconfigure_NONSPI_encoders(EOappEncReader *p);
 static void s_eo_appEncReader_configure_NONSPI_encoders(EOappEncReader *p);
 
 static uint32_t s_eo_appEncReader_rescale2icubdegrees(uint32_t val_raw, uint8_t jomo, eOmn_serv_mc_sensor_position_t pos);
-
+static uint32_t s_eo_appEncReader_mais_rescale2icubdegrees(EOappEncReader* p, uint32_t val_raw, uint8_t jomo);
 
 static hal_spiencoder_stream_t s_eo_appEncReader_get_spi_stream(EOappEncReader* p, uint8_t port);
 
@@ -154,6 +154,8 @@ static EOappEncReader s_eo_theappencreader =
         .par64              = 0,
         .par16              = 0
     }
+    .maisCoversionFactors   = {1.0, 1.0, 1.0, 1.0}
+
 };
 
 
@@ -278,7 +280,26 @@ extern eOresult_t eo_appEncReader_Activate(EOappEncReader *p, const eOmn_serv_ar
     return(eores_OK);
 }
 
+extern eOresult_t eo_appEncReader_UpdatedMaisConversionFactors(EOappEncReader *p, uint8_t jomo, float convFactor)
+{
+    eOappEncReader_jomoconfig_t this_jomoconfig = p->config.jomoconfig[jomo];
 
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+
+    // check existence for primary encoder
+    if (eomn_serv_mc_sensor_mais != this_jomoconfig.primary.type)
+    {
+        return(eores_NOK_unsupported);
+    }
+    
+    p->maisCoversionFactors[jomo] = convFactor;
+    
+    return(eores_OK);
+}
 extern eOresult_t eo_appEncReader_StartRead(EOappEncReader *p)
 {
     // i can start reading at most two spi encoders which are mapped into different streams
@@ -567,7 +588,7 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint
                 else
                 {
                     // convert to iCubDegrees
-                    *primaryvalue = s_eo_appEncReader_rescale2icubdegrees(val_raw, jomo, (eOmn_serv_mc_sensor_position_t)this_jomoconfig.primary.pos);   
+                    *primaryvalue = s_eo_appEncReader_mais_rescale2icubdegrees(p, val_raw, jomo);
                     res1 = eores_OK;                    
                 }                             
                
@@ -711,7 +732,7 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint
                 else
                 {
                     // convert to iCubDegrees
-                    *secondaryvalue = s_eo_appEncReader_rescale2icubdegrees(val_raw, jomo, (eOmn_serv_mc_sensor_position_t)this_jomoconfig.secondary.pos);   
+                    *secondaryvalue = s_eo_appEncReader_mais_rescale2icubdegrees(p, val_raw, jomo);
                     res1 = eores_OK;                    
                 }                             
                
@@ -1156,6 +1177,26 @@ static void s_eo_appEncReader_configure_NONSPI_encoders(EOappEncReader *p)
     }
 }
 
+static uint32_t s_eo_appEncReader_mais_rescale2icubdegrees(EOappEncReader* p, uint32_t val_raw, uint8_t jomo)
+{
+    uint32_t retval = val_raw;
+    
+    float divider = p->maisCoversionFactors[jomo];
+    
+    if(0.0f == divider)
+    {
+        return(3000);
+    }
+    
+    if(divider < 0)
+    {
+        divider = -divider;
+    }
+
+    retval = (float)val_raw / divider;
+    
+    return(retval);
+}
 
 static uint32_t s_eo_appEncReader_rescale2icubdegrees(uint32_t val_raw, uint8_t jomo, eOmn_serv_mc_sensor_position_t pos)
 {

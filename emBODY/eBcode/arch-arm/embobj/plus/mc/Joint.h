@@ -19,6 +19,24 @@ typedef union
     uint8_t bitmask;
 } JointFaultState;
 
+typedef enum
+{
+    calibtype6_st_inited =0,
+    calibtype6_st_jntEncResComputed = 1,
+    calibtype6_st_absEncoderCalibrated = 2,
+    calibtype6_st_trajectoryStarted = 3,
+    calibtype6_st_finished = 4
+} calibtype6_states;
+
+typedef struct
+{
+    BOOL is_active;
+    CTRL_UNITS targetpos;
+    CTRL_UNITS velocity;
+    calibtype6_states state;
+    int32_t computedZero; 
+} jointCalibType6Data;
+
 typedef struct // Joint
 {
     uint8_t ID;
@@ -84,6 +102,8 @@ typedef struct // Joint
     uint16_t diagnostics_refresh;
     eOmc_joint_t * eo_joint_ptr; // pointer to network variable of ethernet protocol.
     
+    jointCalibType6Data calib_type6_data;
+    
 } Joint;
 
 extern Joint* Joint_new(uint8_t n);
@@ -124,4 +144,6 @@ extern BOOL Joint_set_pos_raw(Joint* o, CTRL_UNITS pos_ref);
 extern BOOL Joint_set_trq_ref(Joint* o, CTRL_UNITS trq_ref);
 extern BOOL Joint_set_out_ref(Joint* o, CTRL_UNITS out_ref);
 extern void Joint_stop(Joint* o);
+
+extern BOOL Joint_set_pos_ref_in_calibType6(Joint* o, CTRL_UNITS pos_ref, CTRL_UNITS vel_ref);
 #endif

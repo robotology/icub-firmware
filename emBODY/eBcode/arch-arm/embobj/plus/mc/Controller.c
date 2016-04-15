@@ -153,18 +153,37 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
     {
         const eOmn_serv_jomo_descriptor_t *jomodes = (eOmn_serv_jomo_descriptor_t*) eo_constarray_At(carray, k);
         
-        switch (jomodes->sensor.type)
+        switch(jomodes->sensor.type)
         {
-        case eomn_serv_mc_sensor_encoder_aea:
-        case eomn_serv_mc_sensor_encoder_spichainof2:
-        case eomn_serv_mc_sensor_encoder_spichainof3:       
-            o->absEncoder[k].fake = FALSE;
-            break;
-        
-        default:
-            o->absEncoder[k].fake = TRUE;
-            break;
-        }
+            case eomn_serv_mc_sensor_encoder_spichainof2:
+            case eomn_serv_mc_sensor_encoder_spichainof3:       
+            case eomn_serv_mc_sensor_encoder_aea:
+            {
+                o->absEncoder[k].type = eomc_encoder_AEA;
+                o->absEncoder[k].fake = FALSE;
+                break;
+            }
+            
+            case eomn_serv_mc_sensor_mais:
+            {
+                o->absEncoder[k].type = eomc_encoder_MAIS;
+                o->absEncoder[k].fake = FALSE;
+                break;
+            }
+            
+            case eomn_serv_mc_sensor_encoder_absanalog:
+            {
+                o->absEncoder[k].type = eomc_encoder_HALL_ADC;
+                o->absEncoder[k].fake = FALSE;
+                break;
+            }
+            default:
+            {
+                o->absEncoder[k].fake = TRUE;
+                o->absEncoder[k].type = eomc_encoder_NONE;
+                break;
+            }
+        };
         
         o->motor[k].HARDWARE_TYPE = o->actuation_type;
         
@@ -673,7 +692,7 @@ void MController_config_joint(int j, eOmc_joint_config_t* config) //
     
     if (j==0 && o->part_type==emscontroller_board_CER_LOWER_ARM)
     {
-        AbsEncoder_config(o->absEncoder+j, j, config->jntEncoderResolution, 64*AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
+        AbsEncoder_config(o->absEncoder+j, j, config->jntEncoderType, config->jntEncoderResolution, 64*AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
     }
     else if (o->part_type==emscontroller_board_CER_HAND)
     {
@@ -682,7 +701,15 @@ void MController_config_joint(int j, eOmc_joint_config_t* config) //
     }
     else
     {
-        AbsEncoder_config(o->absEncoder+j, j, config->jntEncoderResolution, AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
+        int16_t spike_mag_limit = AEA_DEFAULT_SPIKE_MAG_LIMIT;
+        uint16_t spike_cnt_limit = AEA_DEFAULT_SPIKE_CNT_LIMIT;
+        
+        if(config->jntEncoderType == eomc_encoder_AEA)
+        {
+            spike_mag_limit = AEA_DEFAULT_SPIKE_MAG_LIMIT;
+            spike_cnt_limit = AEA_DEFAULT_SPIKE_CNT_LIMIT;
+        }
+        AbsEncoder_config(o->absEncoder+j, j, config->jntEncoderType, config->jntEncoderResolution, spike_mag_limit, spike_cnt_limit);
     }
 }
 

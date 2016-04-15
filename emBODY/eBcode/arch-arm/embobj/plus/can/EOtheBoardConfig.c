@@ -1272,11 +1272,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_upper_arm =
                     .sensor         =
                     {
                         .type   = eomn_serv_mc_sensor_encoder_aea,
-<<<<<<< HEAD
-                        .port   = eomn_serv_mc_port_ems_spiP7,
-=======
                         .port   = eomn_serv_mc_port_ems_spiP8,
->>>>>>> Added AEA configuration to CER upper arm.
                         .pos    = eomn_serv_mc_sensor_pos_atjoint
                     },
                     .extrasensor    =
@@ -2099,7 +2095,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_1B2_2B2 =
                         .pos    = eomn_serv_mc_sensor_pos_atmotor
                     }
                 },                 
-                { // joint 1: //wrist coupled (pitch)
+                { // joint 1: //wrist coupled
                     .actuator.pwm   =
                     {   // motor 1B2M1
                         .port   = eomn_serv_mc_port_mc4plus_pwmP2,                         
@@ -2117,7 +2113,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_1B2_2B2 =
                         .pos    = eomn_serv_mc_sensor_pos_atmotor
                     }
                 },
-                { // joint 2:   //wrist coupled (yaw)
+                { // joint 2:   //wrist coupled
                     .actuator.pwm   =
                     {   // motor 1B2M2
                         .port   = eomn_serv_mc_port_mc4plus_pwmP4,                         
@@ -2135,7 +2131,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_1B2_2B2 =
                         .pos    = eomn_serv_mc_sensor_pos_atmotor
                     }
                 },                                              
-                { // joint 3:   finger abduction
+                { // joint 3:
                     .actuator.pwm   =
                     {   // motor 1B2M3
                         .port   = eomn_serv_mc_port_mc4plus_pwmP5,                      

@@ -6,7 +6,10 @@
 #include "EoError.h"
 
 static void Joint_set_inner_control_flags(Joint* o);
-
+static void joint_reset_calibType6Data(Joint* o)
+{
+    o->calib_type6_data.is_active = FALSE;
+}
 Joint* Joint_new(uint8_t n)
 {
     Joint* o = NEW(Joint, n);
@@ -90,6 +93,8 @@ void Joint_init(Joint* o)
     o->diagnostics_refresh = 0;
     
     o->eo_joint_ptr = NULL;
+    
+    joint_reset_calibType6Data(o);
     
     //SpeedController_init(o->speedController);
 }
@@ -410,7 +415,13 @@ CTRL_UNITS Joint_do_pwm_control(Joint* o)
         }
         case eomc_controlmode_position:
         case eomc_controlmode_direct:
+        case eomc_controlmode_calib:
         {    
+            if((eomc_controlmode_calib == o->control_mode) && (!o->calib_type6_data.is_active))
+            {
+                o->output = ZERO;
+                break;
+            }
             Trajectory_do_step(&o->trajectory, &o->pos_ref, &o->vel_ref, &o->acc_ref);
         
             CTRL_UNITS pos_err_old = o->pos_err;
@@ -664,15 +675,8 @@ BOOL Joint_get_pid_state(Joint* o, eOmc_joint_status_ofpid_t* pid_state)
     return trq_active;
 }
 
-BOOL Joint_set_pos_ref(Joint* o, CTRL_UNITS pos_ref, CTRL_UNITS vel_ref)
+static BOOL Joint_set_pos_ref_core(Joint* o, CTRL_UNITS pos_ref, CTRL_UNITS vel_ref)
 {
-    if ((o->control_mode != eomc_controlmode_position) && (o->control_mode != eomc_controlmode_mixed))
-    {
-        return FALSE;
-    }
-    
-    if (o->pos_min != o->pos_max) LIMIT2(o->pos_min, pos_ref, o->pos_max);
-    
     LIMIT(vel_ref, o->vel_max);
     
     o->pos_ref = pos_ref;
@@ -683,6 +687,31 @@ BOOL Joint_set_pos_ref(Joint* o, CTRL_UNITS pos_ref, CTRL_UNITS vel_ref)
     Trajectory_set_pos_end(&o->trajectory, pos_ref, vel_ref);
     
     return TRUE;  
+}
+
+BOOL Joint_set_pos_ref(Joint* o, CTRL_UNITS pos_ref, CTRL_UNITS vel_ref)
+{
+    if ((o->control_mode != eomc_controlmode_position) && (o->control_mode != eomc_controlmode_mixed))
+    {
+        return FALSE;
+    }
+    
+    if (o->pos_min != o->pos_max) LIMIT2(o->pos_min, pos_ref, o->pos_max);
+    
+    return(Joint_set_pos_ref_core(o, pos_ref, vel_ref));
+}
+
+BOOL Joint_set_pos_ref_in_calibType6(Joint* o, CTRL_UNITS pos_ref, CTRL_UNITS vel_ref)
+{
+    if ((o->control_mode != eomc_controlmode_calib) && (o->calib_type6_data.is_active == FALSE))
+    {
+        return FALSE;
+    }
+    
+    if( (pos_ref>o->pos_max) || (pos_ref<o->pos_min))//if reference is out of limits
+        return FALSE;
+    
+    return(Joint_set_pos_ref_core(o, pos_ref, vel_ref));
 }
 
 BOOL Joint_set_vel_ref(Joint* o, CTRL_UNITS vel_ref, CTRL_UNITS acc_ref)

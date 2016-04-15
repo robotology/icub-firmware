@@ -28,6 +28,8 @@ void AbsEncoder_init(AbsEncoder* o)
 {
     o->ID = 0;
     
+    o->type = eomc_encoder_NONE;
+    
     o->spike_cnt_limit = 32767;
     o->spike_mag_limit = 32767;
     
@@ -71,27 +73,55 @@ void AbsEncoder_destroy(AbsEncoder* o)
     DELETE(o);
 }
 
-void AbsEncoder_config(AbsEncoder* o, uint8_t ID, int32_t resolution, int16_t spike_mag_limit, uint16_t spike_cnt_limit)
+void AbsEncoder_config(AbsEncoder* o, uint8_t ID, eOmc_EncoderType_t type, int32_t resolution, int16_t spike_mag_limit, uint16_t spike_cnt_limit)
 {
     o->ID = ID;
     
     //o->fake = FALSE;
+    if(o->type != type)
+    {
+        eOerrmanDescriptor_t descriptor = {0};
+        char str[50];
+        snprintf(str, 50, "missmach encoder type: xmlFile=%d. fw=%d", type, o->type);
+        descriptor.par16 = o->ID;
+        descriptor.par64 = 0;
+        descriptor.sourcedevice = eo_errman_sourcedevice_localboard;
+        descriptor.sourceaddress = 0;
+        descriptor.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag00);
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, str, NULL, &descriptor);
+        return;
+    }
+    
+    AbsEncoder_config_resolution(o, (int32_t)resolution);
     
     if (!o->fake)
     {
         o->spike_mag_limit = spike_mag_limit;//7*(65536L/resolution);
         o->spike_cnt_limit = spike_cnt_limit;//7*(65536L/resolution);
     
-        o->sign = resolution >= 0 ? 1 : -1;
+        //o->sign = resolution >= 0 ? 1 : -1;
     }
     else
     {
-        o->sign = 1;
+        //o->sign = 1;
         o->state.bits.not_initialized = FALSE; 
     }
     
     o->state.bits.not_configured = FALSE;
 }
+
+void AbsEncoder_config_resolution(AbsEncoder* o, float resolution)
+{
+    if (!o->fake)
+    {
+        o->sign = resolution >= 0 ? 1 : -1;
+    }
+    else
+    {
+        o->sign = 1;
+    }
+}
+
 
 void AbsEncoder_start_hard_stop_calibrate(AbsEncoder* o, int32_t hard_stop_zero)
 {
@@ -151,11 +181,8 @@ void AbsEncoder_posvel(AbsEncoder* o, int32_t* position, int32_t* velocity)
 }
 
 //static void AbsEncoder_position_init(AbsEncoder* o, int32_t position)
-static void AbsEncoder_position_init(AbsEncoder* o, uint16_t position)
+static void AbsEncoder_position_init_aea(AbsEncoder* o, uint16_t position)
 {
-    if (!o) return;
-    
-    if (o->fake) return;
     
     if (!o->valid_first_data_cnt)
     {
@@ -186,6 +213,49 @@ static void AbsEncoder_position_init(AbsEncoder* o, uint16_t position)
         
         o->state.bits.not_initialized = FALSE;
     }
+}
+
+
+static void AbsEncoder_position_init_others(AbsEncoder* o, uint16_t position)
+{
+    //mais doesn't need an init procedure like aea encoder
+    o->position_last = position;
+    o->position_sure = position;
+
+    position -= o->offset;
+    
+    o->distance = position;
+    
+    o->velocity = 0;
+    
+    o->delta = 0;
+
+    o->valid_first_data_cnt = 0;
+    
+    o->state.bits.not_initialized = FALSE;
+
+}
+
+static void AbsEncoder_position_init(AbsEncoder* o, uint16_t position)
+{
+    if (!o) return;
+    
+    if (o->fake) return;
+    
+    switch(o->type)
+    {
+        case eomc_encoder_AEA:
+            AbsEncoder_position_init_aea(o, position);
+            break;
+        
+        case eomc_encoder_MAIS:
+        case eomc_encoder_HALL_ADC:
+            AbsEncoder_position_init_others(o, position);
+            break;
+            
+        default:
+            return;
+    };
 }
 
 void AbsEncoder_timeout(AbsEncoder* o)
@@ -300,7 +370,8 @@ void AbsEncoder_update(AbsEncoder* o, uint16_t position)
     
     o->position_last = position;
 
-    if (-o->spike_mag_limit <= check && check <= o->spike_mag_limit)
+    if( ((o->spike_mag_limit != 0 ) && (-o->spike_mag_limit <= check && check <= o->spike_mag_limit)) || //if spike_mag_limit has been configured and there is not a spike
+        (o->spike_mag_limit == 0 )) // or spike_mag_limit has not been configured
     {
         int16_t delta = position - o->position_sure;
 
@@ -488,7 +559,7 @@ static void AbsEncoder_send_error(uint8_t id, eOerror_value_MC_t err_id, uint64_
     descriptor.sourcedevice = eo_errman_sourcedevice_localboard;
     descriptor.sourceaddress = 0;
     descriptor.code = eoerror_code_get(eoerror_category_MotionControl, err_id);
-    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);    
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
 }
 
 BOOL AbsEncoder_is_in_fault(AbsEncoder* o)
