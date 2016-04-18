@@ -33,7 +33,7 @@
 
 #include "EOtheCANmapping.h"
 
-#include "EOtheInertials.h"
+#include "EOtheInertials2.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -96,7 +96,7 @@ extern eOresult_t eocanprotINperiodic_parser_PER_IS_MSG__DIGITAL_GYROSCOPE(eOcan
         return(eores_OK);
     }
     
-    eo_inertials_AcceptCANframe(eo_inertials_GetHandle(), eoas_inertial_type_gyroscope, frame, port);
+    eo_inertials2_AcceptCANframe(eo_inertials2_GetHandle(), eoas_inertial_gyros_mtb_ext, frame, port);
     
     return(eores_OK);
     
@@ -126,7 +126,7 @@ extern eOresult_t eocanprotINperiodic_parser_PER_IS_MSG__DIGITAL_ACCELEROMETER(e
         return(eores_OK);
     }
     
-    eo_inertials_AcceptCANframe(eo_inertials_GetHandle(), eoas_inertial_type_accelerometer, frame, port);
+    eo_inertials2_AcceptCANframe(eo_inertials2_GetHandle(), eoas_inertial_accel_mtb_int, frame, port);
     
     return(eores_OK);
     
