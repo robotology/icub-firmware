@@ -43,6 +43,8 @@
 
 #include "EOtheInfoDispatcher.h"
 
+#include "EOMtheEMSappl.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -288,6 +290,7 @@ extern eOresult_t eom_emstransceiver_Form(EOMtheEMStransceiver* p, EOpacket** tx
     eOresult_t res;
     uint16_t numofrops = 0;
     //static int nn = 0;
+    uint16_t remaining = 0;
     
     if((NULL == p) || (NULL == txpkt))
     {
@@ -296,7 +299,7 @@ extern eOresult_t eom_emstransceiver_Form(EOMtheEMStransceiver* p, EOpacket** tx
 
     
     // call the info-dispatcher so that it may insert sig<info> rops in occasional ropframe.
-    eo_infodispatcher_Send(eo_infodispatcher_GetHandle(), eoinfodispatcher_sendnumber_all, NULL);
+    eo_infodispatcher_Send(eo_infodispatcher_GetHandle(), eoinfodispatcher_sendnumber_all, NULL, &remaining);
        
     res = eo_transceiver_outpacket_Prepare(s_emstransceiver_singleton.transceiver, &numofrops, ropsnum);
     if(eores_OK != res)
@@ -316,6 +319,12 @@ extern eOresult_t eom_emstransceiver_Form(EOMtheEMStransceiver* p, EOpacket** tx
     {
         res = eo_transceiver_outpacket_Get(s_emstransceiver_singleton.transceiver, txpkt);
     }
+    
+    // if we have some more dignaostics to transmit, we do a new tx request.
+    if(remaining > 0)
+    {
+        eom_emsappl_SendTXRequest(eom_emsappl_GetHandle());
+    }        
     
     s_eom_emstransceiver_update_diagnosticsinfo();
     
