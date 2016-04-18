@@ -684,7 +684,7 @@ extern eOprotIndex_t eo_canmap_GetEntityIndexExtraCheck(EOtheCANmapping *p, eOca
             } 
             else if(eoprot_entity_as_inertial == entity)
             {   // the board can be only a skin ... the index is always on board.indexofentity[1] !!!!!! SEE NOTE-123454321 in FUNCTION eo_canmap_ConfigEntity()
-                if(theboard->board.props.type == eobrd_cantype_skin) 
+                if(theboard->board.props.type == eobrd_cantype_mtb) 
                 {
                     index = theboard->board.indexofentity[1]; // as described in NOTE-123454321 we use position 1
                 }
@@ -696,7 +696,7 @@ extern eOprotIndex_t eo_canmap_GetEntityIndexExtraCheck(EOtheCANmapping *p, eOca
         {   // only a skin
             if(eoprot_entity_sk_skin == entity)
             {   // the board can be only a skin board ... the index is on board.indexofentity[0]
-                if(theboard->board.props.type == eobrd_cantype_skin) 
+                if(theboard->board.props.type == eobrd_cantype_mtb) 
                 {
                     index = theboard->board.indexofentity[0]; // as described in NOTE-123454321 we use position 0
                 }
@@ -861,7 +861,7 @@ extern eOresult_t eo_canmap_GetEntityLocation(EOtheCANmapping *p, eOprotID32_t i
                     theboard = s_eo_canmap_singleton.entitylocation[ep][entity][index];
                     if(NULL != theboard)
                     {
-                        if(eobrd_cantype_skin == theboard->board.props.type)
+                        if(eobrd_cantype_mtb == theboard->board.props.type)
                         {   // ok, correct board. we retrieve the info
                             if(NULL != numoflocs)
                             {
@@ -902,7 +902,7 @@ extern eOresult_t eo_canmap_GetEntityLocation(EOtheCANmapping *p, eOprotID32_t i
                         theboard = theboards[0];
                         if(NULL != theboard)
                         {   // must verify it is non NULL ... and that it is a skin board
-                            if(eobrd_cantype_skin == theboard->board.props.type)
+                            if(eobrd_cantype_mtb == theboard->board.props.type)
                             {   // ok, correct board. we retrieve the info
                                 if(NULL != numoflocs)
                                 {
