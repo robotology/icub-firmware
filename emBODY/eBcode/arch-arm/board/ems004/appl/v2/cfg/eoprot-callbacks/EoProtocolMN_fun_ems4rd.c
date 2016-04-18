@@ -352,10 +352,10 @@ extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropd
         {
             // we always allow entering the control loop. to be in control loop does nothing unless the service is activated.
             
-            if(eobool_false == eo_services_AllActivated(eo_services_GetHandle()))
-            {
-               eo_services_SendFailureReport(eo_services_GetHandle());    
-            }
+//            if(eobool_false == eo_services_startupactivation_AllActivated(eo_services_GetHandle()))
+//            {
+//               eo_services_startupactivation_SendFailureReport(eo_services_GetHandle());    
+//            }
             res = eom_emsappl_ProcessGo2stateRequest(eom_emsappl_GetHandle(), eo_sm_emsappl_STrun);
 
         } break;
