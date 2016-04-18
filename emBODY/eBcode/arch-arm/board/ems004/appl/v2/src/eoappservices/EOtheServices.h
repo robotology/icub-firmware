@@ -43,6 +43,7 @@
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
+
  
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
@@ -72,20 +73,18 @@ typedef eOresult_t (*eOservice_onendofoperation_fun_t) (EOaService* p, eObool_t 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
+// call it at startup
+extern EOtheServices* eo_services_Initialise(eOipv4addr_t ipaddress);
 
-extern EOtheServices* eo_services_Initialise(void);
-
+// retrieve handle
 extern EOtheServices* eo_services_GetHandle(void);
 
-extern eOmn_serv_state_t eo_service_GetState(eOmn_serv_category_t category);
-
-extern eOresult_t eo_services_StartLegacyMode(EOtheServices *p, eOprotBRD_t brd);
-
-extern eObool_t eo_services_AllActivated(EOtheServices *p);
-
-extern eOresult_t eo_services_SendFailureReport(EOtheServices *p);
-
+// use it to process commands of type eOmn_service_cmmnds_command_t coming from robotInterface
 extern eOresult_t eo_services_ProcessCommand(EOtheServices *p, eOmn_service_cmmnds_command_t *command);
+
+// use it to know about the state of a service
+extern eOmn_serv_state_t eo_service_GetState(EOtheServices *p, eOmn_serv_category_t category);
+
 
 
 
