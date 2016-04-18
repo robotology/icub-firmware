@@ -81,7 +81,7 @@ static const eOmn_serv_configuration_t s_serv_config_as_mais =
         .version    =
         {
             .firmware   = { .major = 0, .minor = 0, .build = 0 },
-            .protocol   = { .major = 1, .minor = 0 }    
+            .protocol   = { .major = 0, .minor = 0 }    
         },
         .canloc = 
         {
@@ -142,12 +142,89 @@ static const eOmn_serv_configuration_t s_serv_config_as_inertial_eb2_eb4 =
     .filler     = {0},
     .data.as.inertial = 
     {
-        .version    =
+        .mtbversion    =
         {
             .firmware   = { .major = 0, .minor = 0, .build = 0 },
             .protocol   = { .major = 0, .minor = 0 }  // in case of {0, 0} the can discovery is not done but the verify will be ok. for normal case use: {1, 0}  
         },
-        .canmap = { 0x0000, 0x7f00 }
+// only hand (ext accel and gyros) + two forearm (int accel)
+        .arrayofsensors =
+        {
+            .head   = 
+            {
+                .capacity       = eOas_inertials_maxnumber,
+                .itemsize       = sizeof(eOas_inertial_descriptor_t),
+                .size           = 4,
+                .internalmem    = 0                    
+            },
+            .data   =
+            {
+                {   // hand
+                    .type   = eoas_inertial_accel_mtb_ext,
+                    .on.can = { .place = eobrd_place_can, .port = eOcanport2, .addr = 14 }
+                },                                
+                {   // forearm 1
+                    .type   = eoas_inertial_accel_mtb_int,
+                    .on.can = { .place = eobrd_place_can, .port = eOcanport2, .addr = 12 }
+                },  
+                {   // forearm 2
+                    .type   = eoas_inertial_accel_mtb_int,
+                    .on.can = { .place = eobrd_place_can, .port = eOcanport2, .addr = 13 }
+                },  
+                {   // hand
+                    .type   = eoas_inertial_gyros_mtb_ext,
+                    .on.can = { .place = eobrd_place_can, .port = eOcanport2, .addr = 14 }
+                }                  
+            }                
+        }
+        
+// all mtbs have int accel apart the hand wit ext accel and ext gyros
+//        .arrayofsensors =
+//        {
+//            .head   = 
+//            {
+//                .capacity       = eOas_inertials_maxnumber,
+//                .itemsize       = sizeof(eOas_inertial_descriptor_t),
+//                .size           = 8,
+//                .internalmem    = 0                    
+//            },
+//            .data   =
+//            {
+//                {
+//                    .type   = eoas_inertial_accel_mtb_int,
+//                    .on.can = { .place = eobrd_place_can, .port = eOcanport2, .addr = 8  }
+//                },
+//                {
+//                    .type   = eoas_inertial_accel_mtb_int,
+//                    .on.can = { .place = eobrd_place_can, .port = eOcanport2, .addr = 9  }
+//                },
+//                {
+//                    .type   = eoas_inertial_accel_mtb_int,
+//                    .on.can = { .place = eobrd_place_can, .port = eOcanport2, .addr = 10 }
+//                }, 
+//                {
+//                    .type   = eoas_inertial_accel_mtb_int,
+//                    .on.can = { .place = eobrd_place_can, .port = eOcanport2, .addr = 11 }
+//                },  
+//                {
+//                    .type   = eoas_inertial_accel_mtb_int,
+//                    .on.can = { .place = eobrd_place_can, .port = eOcanport2, .addr = 12 }
+//                },  
+//                {
+//                    .type   = eoas_inertial_accel_mtb_int,
+//                    .on.can = { .place = eobrd_place_can, .port = eOcanport2, .addr = 13 }
+//                },  
+//                {   // hand
+//                    .type   = eoas_inertial_accel_mtb_ext,
+//                    .on.can = { .place = eobrd_place_can, .port = eOcanport2, .addr = 14 }
+//                },
+//                {   // hand
+//                    .type   = eoas_inertial_gyros_mtb_ext,
+//                    .on.can = { .place = eobrd_place_can, .port = eOcanport2, .addr = 14 }
+//                }                  
+//            }                
+//        }
+//        .canmap = { 0x0000, 0x7f00 }
     }    
 };
     
@@ -158,12 +235,78 @@ static const eOmn_serv_configuration_t s_serv_config_as_inertial_eb10_eb11 =
     .filler     = {0},
     .data.as.inertial = 
     {
-        .version    =
+        .mtbversion    =
         {
             .firmware   = { .major = 0, .minor = 0, .build = 0 },
             .protocol   = { .major = 0, .minor = 0 }  // in case of {0, 0} the can discovery is not done but the verify will be ok. for normal case use: {1, 0}  
         },
-        .canmap = { 0x00fe, 0x3f00 }
+        .arrayofsensors =
+        {
+            .head   = 
+            {
+                .capacity       = eOas_inertials_maxnumber,
+                .itemsize       = sizeof(eOas_inertial_descriptor_t),
+                .size           = 13,
+                .internalmem    = 0                    
+            },
+            .data   =
+            {                
+                {
+                    .type   = eoas_inertial_accel_mtb_int,
+                    .on.can = { .place = eobrd_place_can, .port = eOcanport1, .addr = 1  }
+                },                
+
+                {
+                    .type   = eoas_inertial_accel_mtb_int,
+                    .on.can = { .place = eobrd_place_can, .port = eOcanport1, .addr = 2  }
+                },  
+                {
+                    .type   = eoas_inertial_accel_mtb_int,
+                    .on.can = { .place = eobrd_place_can, .port = eOcanport1, .addr = 3  }
+                },  
+                {
+                    .type   = eoas_inertial_accel_mtb_int,
+                    .on.can = { .place = eobrd_place_can, .port = eOcanport1, .addr = 4  }
+                },  
+                {
+                    .type   = eoas_inertial_accel_mtb_int,
+                    .on.can = { .place = eobrd_place_can, .port = eOcanport1, .addr = 5  }
+                },  
+                {
+                    .type   = eoas_inertial_accel_mtb_int,
+                    .on.can = { .place = eobrd_place_can, .port = eOcanport1, .addr = 6  }
+                },                  
+                {
+                    .type   = eoas_inertial_accel_mtb_int,
+                    .on.can = { .place = eobrd_place_can, .port = eOcanport1, .addr = 7  }
+                },                                  
+                {
+                    .type   = eoas_inertial_accel_mtb_int,
+                    .on.can = { .place = eobrd_place_can, .port = eOcanport2, .addr = 8  }
+                },
+                {
+                    .type   = eoas_inertial_accel_mtb_int,
+                    .on.can = { .place = eobrd_place_can, .port = eOcanport2, .addr = 9  }
+                },
+                {
+                    .type   = eoas_inertial_accel_mtb_int,
+                    .on.can = { .place = eobrd_place_can, .port = eOcanport2, .addr = 10 }
+                }, 
+                {
+                    .type   = eoas_inertial_accel_mtb_int,
+                    .on.can = { .place = eobrd_place_can, .port = eOcanport2, .addr = 11 }
+                },  
+                {
+                    .type   = eoas_inertial_accel_mtb_int,
+                    .on.can = { .place = eobrd_place_can, .port = eOcanport2, .addr = 12 }
+                },  
+                {
+                    .type   = eoas_inertial_accel_mtb_int,
+                    .on.can = { .place = eobrd_place_can, .port = eOcanport2, .addr = 13 }
+                }                 
+            }                
+        }        
+//        .canmap = { 0x00fe, 0x3f00 }
     }    
 };  
 
@@ -177,7 +320,7 @@ static const eOmn_serv_configuration_t s_serv_config_as_strain_eb1_eb3 =
         .version    =
         {
             .firmware   = { .major = 0, .minor = 0, .build = 0 },
-            .protocol   = { .major = 1, .minor = 0 }
+            .protocol   = { .major = 0, .minor = 0 }
         },
         .canloc         =
         {
@@ -197,7 +340,7 @@ static const eOmn_serv_configuration_t s_serv_config_as_strain_eb6_eb8 =
         .version    =
         {
             .firmware   = { .major = 0, .minor = 0, .build = 0 },
-            .protocol   = { .major = 1, .minor = 0 }
+            .protocol   = { .major = 0, .minor = 0 }
         },
         .canloc         =
         {
@@ -218,7 +361,7 @@ static const eOmn_serv_configuration_t s_serv_config_as_strain_eb7_eb9 =
         .version    =
         {
             .firmware   = { .major = 0, .minor = 0, .build = 0},
-            .protocol   = { .major = 1, .minor = 0 }
+            .protocol   = { .major = 0, .minor = 0 }
         },
         .canloc         =
         {
@@ -444,7 +587,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb2_eb4 =
             .version    =
             {
                 .firmware   = { .major = 0, .minor = 0, .build = 0 },
-                .protocol   = { .major = 1, .minor = 0 }    
+                .protocol   = { .major = 0, .minor = 0 }    
             },
             .canloc = 
             {
