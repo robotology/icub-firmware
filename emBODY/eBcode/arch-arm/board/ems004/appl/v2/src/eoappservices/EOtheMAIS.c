@@ -88,6 +88,7 @@ static void s_eo_mais_send_periodic_error_report(void *par);
 static eObool_t s_eo_mais_isID32relevant(uint32_t id32);
 
 
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
@@ -107,11 +108,11 @@ static EOtheMAIS s_eo_themais =
     .diagnostics = 
     {
         .reportTimer            = NULL,
-        .reportPeriod           = 10*EOK_reltime1sec,
+        .reportPeriod           = 0, // 10*EOK_reltime1sec, // with 0 we dont periodically report
         .errorDescriptor        = {0},
         .errorType              = eo_errortype_info,
-        .errorCallbackCount     = 0,
-        .repetitionOKcase       = 10
+        .errorCallbackCount     = 0, 
+        .repetitionOKcase       = 0 // 10 // with 0 we transmit report only once at succesful activation
     },     
     .sharedcan =
     {
@@ -124,7 +125,8 @@ static EOtheMAIS s_eo_themais =
 
     .id32                       = eo_prot_ID32dummy,  
     .mais                       = NULL,
-    .id32ofregulars             = NULL    
+    .id32ofregulars             = NULL,
+    .numberofowners             = 0    
 };
 
 static const char s_eobj_ownname[] = "EOtheMAIS";
@@ -143,11 +145,7 @@ extern EOtheMAIS* eo_mais_Initialise(void)
     {
         return(p);
     }
-
     
-    p->service.active = eobool_false;
-    
-
     p->id32 = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_mais, 0, eoprot_tag_none);
 
     p->service.servconfig.type = eomn_serv_NONE;
@@ -159,6 +157,7 @@ extern EOtheMAIS* eo_mais_Initialise(void)
     
     p->mais = NULL;
     p->id32ofregulars = eo_array_New(mais_maxRegulars, sizeof(uint32_t), NULL);
+    p->numberofowners = 0;
     
     p->diagnostics.reportTimer = eo_timer_New();
     p->diagnostics.errorType = eo_errortype_error;
@@ -229,6 +228,8 @@ extern eOresult_t eo_mais_SendReport(EOtheMAIS *p)
 
 extern eOresult_t eo_mais_Verify(EOtheMAIS *p, const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify)
 {
+    // eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "called: eo_mais_Verify()", s_eobj_ownname);
+    
     if((NULL == p) || (NULL == servcfg))
     {
         s_eo_themais.service.state = eomn_serv_state_failureofverify;
@@ -250,14 +251,37 @@ extern eOresult_t eo_mais_Verify(EOtheMAIS *p, const eOmn_serv_configuration_t *
             onverify(p, eobool_false); 
         }          
         return(eores_NOK_generic);
+    } 
+
+
+
+    if(eobool_true == p->service.active)
+    {
+        // it means that some other object has activated the mais. it can be either EOtheMotionController or EOtheServices upon request from embObjMais
+        // ... we dont want to interfere, thus we cannot call eo_mais_Deactivate().  
+        // we just verify that the eOmn_serv_configuration_t* in argument is the same of (or compatible with) the one already used for activation.
+        
+        eObool_t verificationOK = eobool_false;
+        
+        if(0 == memcmp(&p->service.servconfig, servcfg, sizeof(eOmn_serv_configuration_t)))
+        {
+            verificationOK = eobool_true;
+        }
+        else
+        {
+            verificationOK = eobool_false;
+        }
+        
+        // in here we dont activate because it is already active ...
+
+        if(NULL != onverify)
+        {
+            onverify(p, verificationOK); 
+        }          
+        return((eobool_true == verificationOK) ? (eores_OK) : (eores_NOK_generic));        
     }     
  
-// DONT Deactivate ... we may want just to check again ....    
-//    if(eobool_true == p->service.active)
-//    {
-//        eo_mais_Deactivate(p);        
-//    } 
-
+    
     p->service.state = eomn_serv_state_verifying;   
     eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mais, p->service.state);
 
@@ -285,9 +309,20 @@ extern eOresult_t eo_mais_Verify(EOtheMAIS *p, const eOmn_serv_configuration_t *
     return(eores_OK);   
 }
 
+extern uint8_t eo_mais_GetNumberOfOwners(EOtheMAIS *p)
+{
+    if(NULL == p)
+    {
+        return(0);
+    } 
+
+    return(p->numberofowners);   
+}
 
 extern eOresult_t eo_mais_Deactivate(EOtheMAIS *p)
 {
+    // eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "called: eo_mais_Deactivate()", s_eobj_ownname);
+    
     if(NULL == p)
     {
         return(eores_NOK_nullpointer);
@@ -295,6 +330,9 @@ extern eOresult_t eo_mais_Deactivate(EOtheMAIS *p)
 
     if(eobool_false == p->service.active)
     {
+        // i force to eomn_serv_state_idle because it may be that state was eomn_serv_state_verified or eomn_serv_state_failureofverify
+        p->service.state = eomn_serv_state_idle; 
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mais, p->service.state);
         return(eores_OK);        
     } 
     
@@ -304,6 +342,12 @@ extern eOresult_t eo_mais_Deactivate(EOtheMAIS *p)
     {
         eo_mais_Stop(p);
     }
+    
+    if(0 != p->numberofowners)
+    {   // _Stop() decrements numberofowners and we can _Deactivate() only when there is no owner anymore
+        return(eores_OK); 
+    }
+    
     eo_mais_SetRegulars(p, NULL, NULL);
     
     eo_canmap_DeconfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_analogsensors, eoprot_entity_as_mais, p->sharedcan.entitydescriptor); 
@@ -334,6 +378,8 @@ extern eOresult_t eo_mais_Deactivate(EOtheMAIS *p)
 
 extern eOresult_t eo_mais_Activate(EOtheMAIS *p, const eOmn_serv_configuration_t * servcfg)
 {
+    // eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "called: eo_mais_Activate()", s_eobj_ownname);
+    
     if((NULL == p) || (NULL == servcfg))
     {
         return(eores_NOK_nullpointer);
@@ -346,9 +392,24 @@ extern eOresult_t eo_mais_Activate(EOtheMAIS *p, const eOmn_serv_configuration_t
     
     if(eobool_true == p->service.active)
     {
-        // marco.accame on 30dec2015: better not to deactivate the mais .... it may be that the mais was activated by mc and then this function called again by as-mais
-        // eo_mais_Deactivate(p);     
-        return(eores_OK);
+        // it means that some other object has activated the mais. it can be either EOtheMotionController or EOtheServices upon request from embObjMais
+        // ... we dont want to interfere, thus we cannot call eo_mais_Deactivate().  
+        // we just verify that the eOmn_serv_configuration_t* in argument is the same of (or compatible with) the one already used for activation.
+        
+        eObool_t verificationOK = eobool_false;
+        
+        if(0 == memcmp(&p->service.servconfig, servcfg, sizeof(eOmn_serv_configuration_t)))
+        {
+            verificationOK = eobool_true;
+        }
+        else
+        {
+            verificationOK = eobool_false;
+        }
+        
+        // in here we dont activate because it is already active ...
+        
+        return((eobool_true == verificationOK) ? (eores_OK) : (eores_NOK_generic));        
     }   
     
     eo_entities_SetNumOfMaises(eo_entities_GetHandle(), 1);
@@ -401,6 +462,8 @@ extern eOresult_t eo_mais_Activate(EOtheMAIS *p, const eOmn_serv_configuration_t
 
 extern eOresult_t eo_mais_Start(EOtheMAIS *p)
 {
+    // eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "called: eo_mais_Start()", s_eobj_ownname);
+    
     if(NULL == p)
     {
         return(eores_NOK_nullpointer);
@@ -412,10 +475,12 @@ extern eOresult_t eo_mais_Start(EOtheMAIS *p)
     }  
     
     if(eobool_true == p->service.running)
-    {   // it is already running
+    {   // it is already running. however we increment number of owners
+        p->numberofowners ++;
         return(eores_OK);
     }   
     
+    p->numberofowners = 1; // dont increment. just set to 1.
     p->service.running = eobool_true;    
     p->service.state = eomn_serv_state_running; 
     eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mais, p->service.state);   
@@ -445,6 +510,8 @@ extern eOresult_t eo_mais_SetRegulars(EOtheMAIS *p, eOmn_serv_arrayof_id32_t* ar
 
 extern eOresult_t eo_mais_Stop(EOtheMAIS *p)
 {
+    // eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "called: eo_mais_Stop()", s_eobj_ownname);
+    
     if(NULL == p)
     {
         return(eores_NOK_nullpointer);
@@ -458,7 +525,19 @@ extern eOresult_t eo_mais_Stop(EOtheMAIS *p)
     if(eobool_false == p->service.running)
     {   // it is already stopped
         return(eores_OK);
-    }     
+    }
+
+    if(0 == p->numberofowners)
+    {   // actually we should not get in here because of previous check of running equal false
+        return(eores_OK);
+    }
+    
+    p->numberofowners --;
+    
+    if(0 != p->numberofowners)
+    {   // there is someone else owning the object ... i dont stop it.
+        return(eores_OK);
+    }    
      
     s_eo_mais_TXstop(p);
        
@@ -697,6 +776,7 @@ extern void eoprot_fun_INIT_as_mais_status(const EOnv* nv)
     EOarray* array = eo_array_New(capacity, itemsize, &status->the15values);
     eo_array_Resize(array, size);
 }
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 

@@ -151,11 +151,11 @@ static EOtheMotionController s_eo_themotcon =
     .diagnostics = 
     {
         .reportTimer            = NULL,
-        .reportPeriod           = 10*EOK_reltime1sec,
+        .reportPeriod           = 0, // 10*EOK_reltime1sec, // with 0 we dont periodically report
         .errorDescriptor        = {0},
         .errorType              = eo_errortype_info,
         .errorCallbackCount     = 0,
-        .repetitionOKcase       = 10
+        .repetitionOKcase       = 0 // 10 // with 0 we transmit report only once at succesful activation
     },     
     .sharedcan =
     {
@@ -205,9 +205,6 @@ extern EOtheMotionController* eo_motioncontrol_Initialise(void)
     {
         return(p);
     }
-    
-    p->service.active = eobool_false;
-    p->service.running = eobool_false;
 
     p->numofjomos = 0;
 
@@ -325,6 +322,8 @@ extern eOmotioncontroller_mode_t eo_motioncontrol_GetMode(EOtheMotionController 
 
 extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify)
 {
+    eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "called: eo_motioncontrol_Verify()", s_eobj_ownname);
+    
     if((NULL == p) || (NULL == servcfg))
     {
         s_eo_themotcon.service.state = eomn_serv_state_failureofverify;
@@ -459,6 +458,8 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
 
 extern eOresult_t eo_motioncontrol_Deactivate(EOtheMotionController *p)
 {
+    eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "called: eo_motioncontrol_Deactivate()", s_eobj_ownname);
+    
     if(NULL == p)
     {
         return(eores_NOK_nullpointer);
@@ -466,8 +467,18 @@ extern eOresult_t eo_motioncontrol_Deactivate(EOtheMotionController *p)
 
     if(eobool_false == p->service.active)
     {
+        // i force to eomn_serv_state_idle because it may be that state was eomn_serv_state_verified or eomn_serv_state_failureofverify
+        p->service.state = eomn_serv_state_idle; 
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mc, p->service.state);
         return(eores_OK);        
     } 
+    
+    // for now i allow deactivate() only for the mc4-based control .. because at date of 13 april 2016 the local mc control cannot be destructed.
+    // then we deconfig things ... so far only for eo_motcon_mode_mc4.
+    if(eo_motcon_mode_mc4 != p->service.servconfig.type) 
+    {
+        return(eo_motioncontrol_Stop(p));
+    }
     
     
     // at first we stop the service
@@ -478,7 +489,7 @@ extern eOresult_t eo_motioncontrol_Deactivate(EOtheMotionController *p)
 
     eo_motioncontrol_SetRegulars(p, NULL, NULL);
     
-    // then we deconfig things
+
     if(eo_motcon_mode_foc == p->service.servconfig.type)
     {       
         // for foc-based, we must ... deconfig mc foc boards, unload them, set num of entities = 0, clear status, deactivate encoder 
@@ -567,6 +578,8 @@ extern eOresult_t eo_motioncontrol_Deactivate(EOtheMotionController *p)
 
 extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn_serv_configuration_t * servcfg)
 {
+    eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "called: eo_motioncontrol_Activate()", s_eobj_ownname);
+    
     if((NULL == p) || (NULL == servcfg))
     {
         return(eores_NOK_nullpointer);
@@ -732,9 +745,8 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
             eo_canmap_ConfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, p->sharedcan.entitydescriptor); 
             eo_canmap_ConfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, p->sharedcan.entitydescriptor);        
 
-            // init the mais
-            
-            eo_mais_Activate(eo_mais_GetHandle(), &p->mcmc4.servconfigmais);
+            // start the mais which was activated in s_eo_motioncontrol_onendofverify_mais()            
+            //eo_mais_Activate(eo_mais_GetHandle(), &p->mcmc4.servconfigmais);
             eo_mais_Start(eo_mais_GetHandle());
             eo_mais_Transmission(eo_mais_GetHandle(), eobool_true);
             
@@ -795,7 +807,8 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
             // if also mais, then i activate it.
             if(eo_motcon_mode_mc4plusmais == servcfg->type)
             {
-                eo_mais_Activate(eo_mais_GetHandle(), &p->mcmc4.servconfigmais);
+                // start the mais which was activated in s_eo_motioncontrol_onendofverify_mais()
+                //eo_mais_Activate(eo_mais_GetHandle(), &p->mcmc4.servconfigmais);
                 eo_mais_Start(eo_mais_GetHandle());   
                 eo_mais_Transmission(eo_mais_GetHandle(), eobool_true);                
             }
@@ -860,7 +873,9 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
 
 
 extern eOresult_t eo_motioncontrol_Start(EOtheMotionController *p)
-{    
+{ 
+    eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "called: eo_motioncontrol_Start()", s_eobj_ownname);  
+    
     if(NULL == p)
     {
         return(eores_NOK_nullpointer);
@@ -1023,7 +1038,9 @@ extern eOresult_t eo_motioncontrol_Tick(EOtheMotionController *p)
 
 
 extern eOresult_t eo_motioncontrol_Stop(EOtheMotionController *p)
-{    
+{ 
+    eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "called: eo_motioncontrol_Stop()", s_eobj_ownname);
+    
     if(NULL == p)
     {
         return(eores_NOK_nullpointer);
@@ -1049,6 +1066,8 @@ extern eOresult_t eo_motioncontrol_Stop(EOtheMotionController *p)
     {
         // just stop broadcast of the mc4 boards
         eo_mc4boards_BroadcastStop(eo_mc4boards_GetHandle()); 
+        // then stop the mais
+        eo_mais_Stop(eo_mais_GetHandle());
     }    
     else if((eo_motcon_mode_mc4plus == p->service.servconfig.type) || (eo_motcon_mode_mc4plusmais == p->service.servconfig.type))
     {   
@@ -1929,9 +1948,9 @@ static eOresult_t s_eo_motioncontrol_onendofverify_mais(EOaService* s, eObool_t 
     
     if(eobool_true == operationisok)
     {
-        // mais is already activated.... i start it
-        eo_mais_Start(eo_mais_GetHandle());
-        eo_mais_Transmission(eo_mais_GetHandle(), eobool_true);
+        // mais is already activated.... i .... DONT START IT !!!
+//        eo_mais_Start(eo_mais_GetHandle());
+//        eo_mais_Transmission(eo_mais_GetHandle(), eobool_true);
         
         // then: start verification of mc4s or encoders
         if(eo_motcon_mode_mc4 == servcfg->type)

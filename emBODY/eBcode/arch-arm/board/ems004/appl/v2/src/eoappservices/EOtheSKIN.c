@@ -109,11 +109,11 @@ static EOtheSKIN s_eo_theskin =
     .diagnostics = 
     {
         .reportTimer            = NULL,
-        .reportPeriod           = 10*EOK_reltime1sec,
+        .reportPeriod           = 0, // 10*EOK_reltime1sec, // with 0 we dont periodically report
         .errorDescriptor        = {0},
         .errorType              = eo_errortype_info,
         .errorCallbackCount     = 0,
-        .repetitionOKcase       = 10
+        .repetitionOKcase       = 0 // 10 // with 0 we transmit report only once at succesful activation
     },     
     .sharedcan =
     {
@@ -147,9 +147,7 @@ extern EOtheSKIN* eo_skin_Initialise(void)
     {
         return(p);
     }
-    
-    p->service.active = eobool_false;
-        
+
     p->numofskinpatches = 0;
     p->numofmtbs = 0;
     p->service.servconfig.type = eomn_serv_NONE;
@@ -263,11 +261,10 @@ extern eOresult_t eo_skin_Verify(EOtheSKIN *p, const eOmn_serv_configuration_t *
     }   
     
  
-// DONT Deactivate ... we may want just to check again ....    
-//    if(eobool_true == p->service.active)
-//    {
-//        eo_skin_Deactivate(p);        
-//    }   
+    if(eobool_true == p->service.active)
+    {
+        eo_skin_Deactivate(p);        
+    }   
     
     p->service.state = eomn_serv_state_verifying;
     eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_skin, p->service.state);
@@ -349,6 +346,9 @@ extern eOresult_t eo_skin_Deactivate(EOtheSKIN *p)
 
     if(eobool_false == p->service.active)
     {
+        // i force to eomn_serv_state_idle because it may be that state was eomn_serv_state_verified or eomn_serv_state_failureofverify
+        p->service.state = eomn_serv_state_idle; 
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_skin, p->service.state);
         return(eores_OK);        
     } 
     

@@ -113,11 +113,11 @@ static EOtheEncoderReader s_eo_theencoderreader =
     .diagnostics = 
     {
         .reportTimer            = NULL,
-        .reportPeriod           = 10*EOK_reltime1sec,
+        .reportPeriod           = 0, // 10*EOK_reltime1sec, // with 0 we dont periodically report
         .errorDescriptor        = {0},
         .errorType              = eo_errortype_info,
         .errorCallbackCount     = 0,
-        .repetitionOKcase       = 10
+        .repetitionOKcase       = 0 // 10 // with 0 we transmit report only once at succesful activation
     },     
     .arrayofjomodes             = { 0 },   
     .waitreadtimer              = NULL,
@@ -143,10 +143,6 @@ extern EOtheEncoderReader* eo_encoderreader_Initialise(void)
         return(&s_eo_theencoderreader);
     }
     
-    s_eo_theencoderreader.service.active = eobool_false;
-
-
-
     s_eo_theencoderreader.waitreadtimer = eo_timer_New();
     
     s_eo_theencoderreader.reader = eo_appEncReader_Initialise(); 
@@ -159,8 +155,10 @@ extern EOtheEncoderReader* eo_encoderreader_Initialise(void)
     s_eo_theencoderreader.diagnostics.errorType = eo_errortype_error;
     s_eo_theencoderreader.diagnostics.errorDescriptor.sourceaddress = eo_errman_sourcedevice_localboard;
     s_eo_theencoderreader.diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_encoders_not_verified_yet);      
-        
+       
     s_eo_theencoderreader.service.initted = eobool_true;
+    s_eo_theencoderreader.service.active = eobool_false;   
+    s_eo_theencoderreader.service.running = eobool_false;   
     
     return(&s_eo_theencoderreader);   
 }
@@ -222,6 +220,7 @@ extern eOresult_t eo_encoderreader_Deactivate(EOtheEncoderReader *p)
 
     if(eobool_false == s_eo_theencoderreader.service.active)
     {
+        p->service.state = eomn_serv_state_idle; // i force to eomn_serv_state_idle because it may be that state was eomn_serv_state_verified or eomn_serv_state_failureofverify
         return(eores_OK);        
     } 
     
