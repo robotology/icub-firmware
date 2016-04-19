@@ -17,6 +17,8 @@
 #include "hal_led.h"
 #include "hal_adc.h"
 
+#define CALIB_TYPE_6_POS_TRHESHOLD 546 //546=3 degree //91.02f // = 0.5 degree
+
 JointSet* JointSet_new(uint8_t n) //
 {
     JointSet* o = NEW(JointSet, n);
@@ -766,7 +768,7 @@ static BOOL JointSet_do_wait_calibration_5(JointSet* o)
     return calibrated;
 }
 
-#define CALIB_TYPE_6_POS_TRHESHOLD 546 //546=3 degree //91.02f // = 0.5 degree
+
 static BOOL JointSet_calibType6_check_reached_pos(JointSet* o)
 {
     int32_t N = *(o->pN);
@@ -794,18 +796,18 @@ static BOOL JointSet_calibType6_check_reached_pos(JointSet* o)
         
         
         
-        int8_t limitExceded = Joint_check_limits(j);
-        if(limitExceded != 0)
-        {
-            snprintf(info, 70, "limit reached e=%.1f lim%d", j->pos_err, limitExceded);
-            errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
-            errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-            errdes.sourceaddress    = j->ID;
-            errdes.par16            = 0;
-            errdes.par64            = 0;
-            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, info, NULL, &errdes);
-            return TRUE;
-        }
+//        int8_t limitExceded = Joint_check_limits(j);
+//        if(limitExceded != 0)
+//        {
+//            snprintf(info, 70, "limit reached e=%.1f lim%d", j->pos_err, limitExceded);
+//            errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
+//            errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+//            errdes.sourceaddress    = j->ID;
+//            errdes.par16            = 0;
+//            errdes.par64            = 0;
+//            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, info, NULL, &errdes);
+//            return TRUE;
+//        }
         if( (delta>CALIB_TYPE_6_POS_TRHESHOLD ) || (delta<-CALIB_TYPE_6_POS_TRHESHOLD ) )
             return FALSE;
     }
@@ -842,6 +844,32 @@ static BOOL JointSet_do_wait_calibration_6(JointSet* o)
             case calibtype6_st_absEncoderCalibrated:
             {
                 
+                int32_t curr_pos = AbsEncoder_position(o->absEncoder+j->ID);
+                if((curr_pos > j->pos_max+CALIB_TYPE_6_POS_TRHESHOLD) || (curr_pos < j->pos_min-CALIB_TYPE_6_POS_TRHESHOLD))
+                {
+                    //clean calibration and set hardware fault
+                    o->calibration_in_progress = eomc_calibration_typeUndefined;
+                    o->control_mode = eomc_controlmode_hwFault;
+                    j->control_mode = eomc_controlmode_hwFault;
+                    j->calib_type6_data.is_active = FALSE;
+                    Motor_set_idle(m);
+
+                    char info[80];
+                    sprintf(info,"outLim: cp%d mx%d mn%d",curr_pos, j->pos_max, j->pos_min);
+                    //send_diagnostic_debugmessage(eo_errortype_debug, eoerror_value_DEB_tag01, jxx, 0, 0, info);
+                    eOerrmanDescriptor_t errdes = {0};
+
+                    errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
+                    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+                    errdes.sourceaddress    = j->ID;
+                    errdes.par16            = 0;
+                    errdes.par64            = 0;
+                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, info, NULL, &errdes);
+
+                    return(calibrationCompleted);
+                
+                }
+                                
                 Motor_motion_reset(m);
                 Joint_motion_reset(j);
 
@@ -862,7 +890,7 @@ static BOOL JointSet_do_wait_calibration_6(JointSet* o)
                     Motor_set_idle(m);
 
                     char info[50];
-                    sprintf(info,"error in Joint_set_pos_ref_in_calibType6");
+                    snprintf(info, 50,"error in Joint_set_pos_ref_in_calibType6");
                     //send_diagnostic_debugmessage(eo_errortype_debug, eoerror_value_DEB_tag01, jxx, 0, 0, info);
                     eOerrmanDescriptor_t errdes = {0};
 
@@ -894,6 +922,8 @@ static BOOL JointSet_do_wait_calibration_6(JointSet* o)
             
             case calibtype6_st_trajectoryStarted:
             {
+                static uint8_t limit_reached_count = 0;
+                
                 JointSet_do_pwm_control(o);
                 
                 if(JointSet_calibType6_check_reached_pos(o))
@@ -903,6 +933,40 @@ static BOOL JointSet_do_wait_calibration_6(JointSet* o)
                     calibrationCompleted = TRUE;
                     
                     Motor_calibrate_withOffset(m, m->pos_fbk);//the offset is the current position
+                }
+                else
+                {
+                    //qui verifico di non allontanarmi dal target
+                    int8_t limitExceded = Joint_check_limits(j);
+                    if(limitExceded != 0)
+                    {
+                        limit_reached_count++;
+                    }
+                    else
+                    {
+                        limit_reached_count = 0;
+                    }
+                
+                    if(limit_reached_count>20)
+                    {
+                        //clean calibration and set hardware fault
+                        o->calibration_in_progress = eomc_calibration_typeUndefined;
+                        o->control_mode = eomc_controlmode_hwFault;
+                        j->control_mode = eomc_controlmode_hwFault;
+                        j->calib_type6_data.is_active = FALSE;
+                        Motor_set_idle(m);
+
+                        char info [70];
+                        eOerrmanDescriptor_t errdes = {0};
+                        snprintf(info, 70, "limit reached e=%.1f lim%d", j->pos_err, limitExceded);
+                        errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
+                        errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+                        errdes.sourceaddress    = j->ID;
+                        errdes.par16            = 0;
+                        errdes.par64            = 0;
+                        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, info, NULL, &errdes);
+                    
+                    }
                 }
             }
             break;

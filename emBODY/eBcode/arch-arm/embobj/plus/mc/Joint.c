@@ -704,15 +704,26 @@ BOOL Joint_set_pos_ref(Joint* o, CTRL_UNITS pos_ref, CTRL_UNITS vel_ref)
 
 BOOL Joint_set_pos_ref_in_calibType6(Joint* o, CTRL_UNITS pos_ref, CTRL_UNITS vel_ref)
 {
+    CTRL_UNITS pos_ref_limited = pos_ref;
+    
     if ((o->control_mode != eomc_controlmode_calib) && (o->calib_type6_data.is_active == FALSE))
     {
         return FALSE;
     }
+    //if reference is out of limits, i'll use limit instead of pos_ref
+    //if( (pos_ref>o->pos_max) || (pos_ref<o->pos_min))
+    //    return FALSE;
     
-    if( (pos_ref>o->pos_max) || (pos_ref<o->pos_min))//if reference is out of limits
-        return FALSE;
+    if(pos_ref > o->pos_max)
+    {
+        pos_ref_limited = o->pos_max;
+    }
+    if(pos_ref < o->pos_min)
+    {
+        pos_ref_limited = o->pos_min;
+    }
     
-    return(Joint_set_pos_ref_core(o, pos_ref, vel_ref));
+    return(Joint_set_pos_ref_core(o, pos_ref_limited, vel_ref));
 }
 
 BOOL Joint_set_vel_ref(Joint* o, CTRL_UNITS vel_ref, CTRL_UNITS acc_ref)
