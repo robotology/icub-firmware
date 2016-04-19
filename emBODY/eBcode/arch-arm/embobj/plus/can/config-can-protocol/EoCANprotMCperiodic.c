@@ -210,7 +210,7 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__STATUS(eOcanframe_t *fr
     eObrd_cantype_t boardtype = s_eocanprotMCperiodic_get_boardtype(frame, port);
     
     
-    if(eobrd_cantype_1foc == boardtype)
+    if(eobrd_cantype_foc == boardtype)
     {   
         // in case we have a 2foc ... i treat the first joint only   
         // first joint: use eocanmap_insideindex_first and gets the first 2 bytes of the frame         

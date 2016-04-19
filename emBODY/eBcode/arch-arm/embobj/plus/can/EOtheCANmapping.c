@@ -646,7 +646,7 @@ extern eOprotIndex_t eo_canmap_GetEntityIndexExtraCheck(EOtheCANmapping *p, eOca
         {   // on can boards there are either joints or motors
             if((eoprot_entity_mc_joint == entity) || (eoprot_entity_mc_motor == entity))
             {   // get the jomoindex. it depends upon the board being mc4 or 1foc
-                if(theboard->board.props.type == eobrd_cantype_1foc) 
+                if(theboard->board.props.type == eobrd_cantype_foc) 
                 {   // if 1foc it is always on board.indexofentity[0], irrespectively of the value of loc.insideindex 
                     index = theboard->board.indexofentity[0];
                 }
@@ -760,7 +760,7 @@ extern eOresult_t eo_canmap_GetEntityLocation(EOtheCANmapping *p, eOprotID32_t i
             // verification for motion control is equal for joint or motor
             if(NULL != theboard)
             {   // ok, we have a board. now see if it is a 2foc or 4dc
-                if((eobrd_cantype_1foc == theboard->board.props.type) || (eobrd_cantype_mc4 == theboard->board.props.type))
+                if((eobrd_cantype_foc == theboard->board.props.type) || (eobrd_cantype_mc4 == theboard->board.props.type))
                 {   // ok, correct board type: we retrieve the info
                     if(NULL != numoflocs)
                     {
