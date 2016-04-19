@@ -404,8 +404,8 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         o->nSets   = 2;
 
         o->j2s[0] = o->m2s[0] = o->e2s[0] = 0;
-        o->j2s[1] = o->m2s[1] = o->e2s[1] = 1;
-        o->j2s[2] = o->m2s[2] = o->e2s[2] = 1;
+        o->j2s[1] = o->m2s[1] = o->e2s[1] = 0;
+        o->j2s[2] = o->m2s[2] = o->e2s[2] = 0;
         o->j2s[3] = o->m2s[3] = o->e2s[3] = 1;
         
         //Sje = o->Sje;
@@ -418,18 +418,21 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
             o->motor[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
         }
         
-        o->joint[0].CAN_DO_TRQ_CTRL = TRUE;
-        o->joint[0].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-        o->motor[0].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-        
         o->jointSet[0].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-        o->jointSet[0].CAN_DO_TRQ_CTRL = TRUE;
+        o->jointSet[0].CAN_DO_TRQ_CTRL = FALSE;
+        
+        o->jointSet[0].special_constraint = TRIFID_CONSTRAINT;
+        o->jointSet[0].special_limit = WRIST_TRIFID_LIMIT;
+        
+        //////////////////////////////////////////////////////
+        
+        o->joint[1].CAN_DO_TRQ_CTRL = TRUE;
+        o->joint[1].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
+        o->motor[1].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
         
         o->jointSet[1].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-        o->jointSet[1].CAN_DO_TRQ_CTRL = FALSE;
+        o->jointSet[1].CAN_DO_TRQ_CTRL = TRUE;
         
-        o->jointSet[1].special_constraint = TRIFID_CONSTRAINT;
-        o->jointSet[1].special_limit = WRIST_TRIFID_LIMIT;
         break;
         
 	case emscontroller_board_CER_BASE:                //= 21    //2FOC
@@ -474,9 +477,9 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         o->multi_encs = 2;
     
         Sje = o->Sje;
-
-        Sje[0][0] = -1.0f; Sje[0][1] =  1.0f;  Sje[0][2] =  0.0f; Sje[0][3] = 0.0f;
-        Sje[1][0] =  0.0f; Sje[1][1] =  0.0f;  Sje[1][2] = -1.0f; Sje[1][3] = 1.0f;
+        
+        Sje[0][0] = -1.0f; Sje[0][1] =  1.0f;  Sje[0][2] =  0.0f; Sje[0][3] =  0.0f;
+        Sje[1][0] =  0.0f; Sje[1][1] =  0.0f;  Sje[1][2] =  1.0f; Sje[1][3] = -1.0f;
     
         o->e2s[0] = o->e2s[1] = 0;
         o->e2s[2] = o->e2s[3] = 1;
@@ -690,14 +693,14 @@ void MController_config_joint(int j, eOmc_joint_config_t* config) //
     Motor_config_filter(o->motor+j,   config->tcfiltertype);
     Motor_config_friction(o->motor+j, config->motor_params.bemf_value, config->motor_params.ktau_value);
     
-    if (j==0 && o->part_type==emscontroller_board_CER_LOWER_ARM)
+    if (j==3 && o->part_type==emscontroller_board_CER_LOWER_ARM)
     {
         AbsEncoder_config(o->absEncoder+j, j, config->jntEncoderType, config->jntEncoderResolution, 64*AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
     }
     else if (o->part_type==emscontroller_board_CER_HAND)
     {
-        AbsEncoder_config(o->absEncoder+j*2,   j, config->jntEncoderResolution, 32000, AEA_DEFAULT_SPIKE_CNT_LIMIT);
-        AbsEncoder_config(o->absEncoder+j*2+1, j, config->jntEncoderResolution, 32000, AEA_DEFAULT_SPIKE_CNT_LIMIT);
+        AbsEncoder_config(o->absEncoder+j*2,   j, config->jntEncoderResolution, AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
+        AbsEncoder_config(o->absEncoder+j*2+1, j, config->jntEncoderResolution, AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
     }
     else
     {

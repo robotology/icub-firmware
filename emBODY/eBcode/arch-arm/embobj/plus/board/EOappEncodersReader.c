@@ -531,7 +531,7 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint
                 //val_raw = val1 + val2; // we give back the sum of the two
                 
                 //*primaryvalue = s_eo_appEncReader_rescale2icubdegrees(val_raw, jomo, (eOmn_serv_mc_sensor_position_t)this_jomoconfig.primary.pos);                
-                *primaryvalue = (val_raw<<4)&0xFFF0FFF0;
+                *primaryvalue = (val_raw<<2)&0xFFF0FFF0;
             } break; 	            
             
             case eomn_serv_mc_sensor_encoder_inc:
