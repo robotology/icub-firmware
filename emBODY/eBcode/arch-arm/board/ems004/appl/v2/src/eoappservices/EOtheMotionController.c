@@ -414,7 +414,7 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
         uint8_t i = 0;
         for(i=0; i<12; i++)
         {            
-            const eOmn_serv_canlocation_t *canloc = &servcfg->data.mc.mc4_based.mc4joints[i];
+            const eObrd_canlocation_t *canloc = &servcfg->data.mc.mc4_based.mc4joints[i];
             eo_common_hlfword_bitset(&p->sharedcan.discoverytarget.canmap[canloc->port], canloc->addr);         
         }
                        
@@ -706,7 +706,7 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
             uint8_t i = 0;
           
             eOcanmap_board_properties_t prop = {0};
-            const eOmn_serv_canlocation_t *canloc = NULL;
+            const eObrd_canlocation_t *canloc = NULL;
             
             // load the can mapping for the 12 boards ... (only mc4 boards as teh mais was added bt eo_mais_Activate()
             

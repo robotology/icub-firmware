@@ -111,7 +111,7 @@ static eOresult_t s_eo_services_process_start(EOtheServices *p, eOmn_serv_catego
 static eOresult_t s_eo_services_process_stop(EOtheServices *p, eOmn_serv_category_t category, eObool_t and_deactivate);
 static eOresult_t s_eo_services_process_deactivate(EOtheServices *p, eOmn_serv_category_t category);
 static eOresult_t s_eo_services_process_regsig(EOtheServices *p, eOmn_serv_category_t category, eOmn_serv_arrayof_id32_t* arrayofid32);
-static eOresult_t s_eo_services_process_failure(EOtheServices *p, eOmn_service_operation_t operation, eOmn_serv_category_t category);
+static eOresult_t s_eo_services_process_failure(EOtheServices *p, eOmn_serv_operation_t operation, eOmn_serv_category_t category);
 
 // others
 static eOresult_t s_eo_services_start(EOtheServices *p, eOmn_serv_category_t category);
@@ -288,6 +288,7 @@ extern eOmn_serv_state_t eo_service_GetState(EOtheServices *p, eOmn_serv_categor
         
         case eomn_serv_category_none:
         case eomn_serv_category_all:
+        case eomn_serv_category_unknown:
         default:
         {
             state = eomn_serv_state_notsupported;
@@ -306,7 +307,7 @@ extern eOresult_t eo_services_ProcessCommand(EOtheServices *p, eOmn_service_cmmn
         return(eores_NOK_nullpointer);
     }
        
-    eOmn_service_operation_t operation = (eOmn_service_operation_t)command->operation;
+    eOmn_serv_operation_t operation = (eOmn_serv_operation_t)command->operation;
     eOmn_serv_category_t category = (eOmn_serv_category_t)command->category;
     const eOmn_serv_configuration_t *config = &command->parameter.configuration;
     eOmn_serv_arrayof_id32_t *arrayofid32 = &command->parameter.arrayofid32;
@@ -480,7 +481,7 @@ extern eOresult_t eo_service_hid_SynchServiceState(EOtheServices *p, eOmn_serv_c
         return(eores_NOK_nullpointer);
     }   
     
-    if((eomn_serv_category_none == category) || (eomn_serv_category_all == category))
+    if((eomn_serv_category_none == category) || (eomn_serv_category_all == category) || (eomn_serv_category_unknown == category))
     {
         return(eores_NOK_generic);
     }
@@ -842,6 +843,7 @@ static eOresult_t s_eo_services_process_verifyactivate(EOtheServices *p, eOmn_se
         default:
         case eomn_serv_category_none:
         case eomn_serv_category_all:
+        case eomn_serv_category_unknown:
         {
             // send a failure about wrong param
             p->mnservice->status.commandresult.latestcommandisok = eobool_false;
@@ -869,7 +871,7 @@ static eOresult_t s_eo_services_process_start(EOtheServices *p, eOmn_serv_catego
     // phase2: at bootstratp service are just _Initalise()-ed and every verification-activation is done in here. 
     
     // if not supported send up a negative reply.
-    if((eomn_serv_category_none == category) || (eomn_serv_category_all == category))
+    if((eomn_serv_category_none == category) || (eomn_serv_category_all == category) || (eomn_serv_category_unknown))
     {
         // send a failure about wrong param
         p->mnservice->status.commandresult.latestcommandisok = eobool_false;
@@ -936,7 +938,7 @@ static eOresult_t s_eo_services_process_deactivate(EOtheServices *p, eOmn_serv_c
 
 static eOresult_t s_eo_services_process_stop(EOtheServices *p, eOmn_serv_category_t category, eObool_t and_deactivate)
 {
-    if(eomn_serv_category_none == category)
+    if((eomn_serv_category_none == category) || (eomn_serv_category_unknown == category))
     {
         // send a failure about wrong param
         p->mnservice->status.commandresult.latestcommandisok = eobool_false;
@@ -986,7 +988,7 @@ static eOresult_t s_eo_services_process_regsig(EOtheServices *p, eOmn_serv_categ
 {
     uint8_t number = 0;
 
-    if(eomn_serv_category_none == category)
+    if((eomn_serv_category_none == category) || (eomn_serv_category_unknown == category))
     {
         // send a failure about wrong param
         p->mnservice->status.commandresult.latestcommandisok = eobool_false;
@@ -1049,7 +1051,7 @@ static eOresult_t s_eo_services_process_regsig(EOtheServices *p, eOmn_serv_categ
 }
 
 
-static eOresult_t s_eo_services_process_failure(EOtheServices *p, eOmn_service_operation_t operation, eOmn_serv_category_t category)
+static eOresult_t s_eo_services_process_failure(EOtheServices *p, eOmn_serv_operation_t operation, eOmn_serv_category_t category)
 {
     p->mnservice->status.commandresult.latestcommandisok = eobool_false;
     p->mnservice->status.commandresult.category = category;

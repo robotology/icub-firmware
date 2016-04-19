@@ -326,7 +326,7 @@ static const eOmn_serv_configuration_t s_serv_config_as_strain_eb1_eb3 =
         {
             .port           = eOcanport2,
             .addr           = 13,
-            .insideindex    = eomn_serv_caninsideindex_none                   
+            .insideindex    = eobrd_caninsideindex_none                   
         }
     }    
 };
@@ -346,7 +346,7 @@ static const eOmn_serv_configuration_t s_serv_config_as_strain_eb6_eb8 =
         {
             .port           = eOcanport2,
             .addr           = 13,
-            .insideindex    = eomn_serv_caninsideindex_none                   
+            .insideindex    = eobrd_caninsideindex_none                   
         }
     }    
 };
@@ -367,7 +367,7 @@ static const eOmn_serv_configuration_t s_serv_config_as_strain_eb7_eb9 =
         {
             .port           = eOcanport2,
             .addr           = 1,
-            .insideindex    = eomn_serv_caninsideindex_none                   
+            .insideindex    = eobrd_caninsideindex_none                   
         }
     }    
 };
@@ -402,7 +402,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_eb3 =
                     {
                         .port           = eOcanport1,
                         .addr           = 1,
-                        .insideindex    = eomn_serv_caninsideindex_first                             
+                        .insideindex    = eobrd_caninsideindex_first                             
                     },
                     .sensor         =
                     {
@@ -422,7 +422,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_eb3 =
                     {
                         .port           = eOcanport1,
                         .addr           = 2,
-                        .insideindex    = eomn_serv_caninsideindex_first                             
+                        .insideindex    = eobrd_caninsideindex_first                             
                     },
                     .sensor         =
                     {
@@ -442,7 +442,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_eb3 =
                     {
                         .port           = eOcanport1,
                         .addr           = 3,
-                        .insideindex    = eomn_serv_caninsideindex_first                             
+                        .insideindex    = eobrd_caninsideindex_first                             
                     },
                     .sensor         =
                     {
@@ -462,7 +462,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_eb3 =
                     {
                         .port           = eOcanport1,
                         .addr           = 4,
-                        .insideindex    = eomn_serv_caninsideindex_first                             
+                        .insideindex    = eobrd_caninsideindex_first                             
                     },
                     .sensor         =
                     {
@@ -628,7 +628,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb5 =
                     {
                         .port           = eOcanport1,
                         .addr           = 3,
-                        .insideindex    = eomn_serv_caninsideindex_first                             
+                        .insideindex    = eobrd_caninsideindex_first                             
                     },
                     .sensor         =
                     {
@@ -648,7 +648,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb5 =
                     {
                         .port           = eOcanport1,
                         .addr           = 4,
-                        .insideindex    = eomn_serv_caninsideindex_first                             
+                        .insideindex    = eobrd_caninsideindex_first                             
                     },
                     .sensor         =
                     {
@@ -668,7 +668,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb5 =
                     {
                         .port           = eOcanport1,
                         .addr           = 1,
-                        .insideindex    = eomn_serv_caninsideindex_first                             
+                        .insideindex    = eobrd_caninsideindex_first                             
                     },
                     .sensor         =
                     {
@@ -741,7 +741,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb6_eb8 =
                     {
                         .port           = eOcanport1,
                         .addr           = 3,
-                        .insideindex    = eomn_serv_caninsideindex_first                             
+                        .insideindex    = eobrd_caninsideindex_first                             
                     },
                     .sensor         =
                     {
@@ -761,7 +761,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb6_eb8 =
                     {
                         .port           = eOcanport1,
                         .addr           = 4,
-                        .insideindex    = eomn_serv_caninsideindex_first                             
+                        .insideindex    = eobrd_caninsideindex_first                             
                     },
                     .sensor         =
                     {
@@ -781,7 +781,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb6_eb8 =
                     {
                         .port           = eOcanport1,
                         .addr           = 1,
-                        .insideindex    = eomn_serv_caninsideindex_first                             
+                        .insideindex    = eobrd_caninsideindex_first                             
                     },
                     .sensor         =
                     {
@@ -801,7 +801,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb6_eb8 =
                     {
                         .port           = eOcanport1,
                         .addr           = 2,
-                        .insideindex    = eomn_serv_caninsideindex_first                             
+                        .insideindex    = eobrd_caninsideindex_first                             
                     },
                     .sensor         =
                     {
@@ -871,7 +871,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb7_eb9 =
                     {
                         .port           = eOcanport1,
                         .addr           = 1,
-                        .insideindex    = eomn_serv_caninsideindex_first                             
+                        .insideindex    = eobrd_caninsideindex_first                             
                     },
                     .sensor         =
                     {
@@ -891,7 +891,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb7_eb9 =
                     {
                         .port           = eOcanport1,
                         .addr           = 2,
-                        .insideindex    = eomn_serv_caninsideindex_first                             
+                        .insideindex    = eobrd_caninsideindex_first                             
                     },
                     .sensor         =
                     {
@@ -974,7 +974,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb15 =
                     {
                         .port           = eOcanport1,
                         .addr           = 1,
-                        .insideindex    = eomn_serv_caninsideindex_first                             
+                        .insideindex    = eobrd_caninsideindex_first                             
                     },
                     .sensor         =
                     {
@@ -994,7 +994,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb15 =
                     {
                         .port           = eOcanport1,
                         .addr           = 2,
-                        .insideindex    = eomn_serv_caninsideindex_first                             
+                        .insideindex    = eobrd_caninsideindex_first                             
                     },
                     .sensor         =
                     {
@@ -1014,7 +1014,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb15 =
                     {
                         .port           = eOcanport1,
                         .addr           = 3,
-                        .insideindex    = eomn_serv_caninsideindex_first                             
+                        .insideindex    = eobrd_caninsideindex_first                             
                     },
                     .sensor         =
                     {
@@ -1034,7 +1034,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb15 =
                     {
                         .port           = eOcanport1,
                         .addr           = 4,
-                        .insideindex    = eomn_serv_caninsideindex_first                             
+                        .insideindex    = eobrd_caninsideindex_first                             
                     },
                     .sensor         =
                     {
@@ -1104,7 +1104,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb21 =
                     {
                         .port           = eOcanport1,
                         .addr           = 4,
-                        .insideindex    = eomn_serv_caninsideindex_first                             
+                        .insideindex    = eobrd_caninsideindex_first                             
                     },
                     .sensor         =
                     {
@@ -1124,7 +1124,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb21 =
                     {
                         .port           = eOcanport1,
                         .addr           = 2,
-                        .insideindex    = eomn_serv_caninsideindex_first                             
+                        .insideindex    = eobrd_caninsideindex_first                             
                     },
                     .sensor         =
                     {
@@ -1144,7 +1144,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb21 =
                     {
                         .port           = eOcanport1,
                         .addr           = 3,
-                        .insideindex    = eomn_serv_caninsideindex_first                             
+                        .insideindex    = eobrd_caninsideindex_first                             
                     },
                     .sensor         =
                     {
@@ -1164,7 +1164,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_eb21 =
                     {
                         .port           = eOcanport1,
                         .addr           = 1,
-                        .insideindex    = eomn_serv_caninsideindex_first                             
+                        .insideindex    = eobrd_caninsideindex_first                             
                     },
                     .sensor         =
                     {
