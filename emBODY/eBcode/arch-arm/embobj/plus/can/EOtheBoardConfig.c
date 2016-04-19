@@ -821,6 +821,26 @@ static const eOmn_serv_configuration_t s_serv_config_as_strain_cer_upper_arm =
     }    
 };
 
+static const eOmn_serv_configuration_t s_serv_config_as_strain_cer_upper_arm = 
+{
+    .type       = eomn_serv_AS_strain,
+    .filler     = {0},
+    .data.as.strain = 
+    {
+        .version    =
+        {
+            .firmware   = { .major = 0, .minor = 0, .build = 0 },
+            .protocol   = { .major = 1, .minor = 0 }
+        },
+        .canloc         =
+        {
+            .port           = eOcanport2,
+            .addr           = 13,
+            .insideindex    = eomn_serv_caninsideindex_none                   
+        }
+    }    
+};
+
 static const eOmn_serv_configuration_t s_serv_config_mc_cer_neck =
 {   // eb10
     .type       = eomn_serv_MC_mc4plus,
@@ -1252,7 +1272,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_upper_arm =
                     .sensor         =
                     {
                         .type   = eomn_serv_mc_sensor_encoder_aea,
-                        .port   = eomn_serv_mc_port_ems_spiP7,
+                        .port   = eomn_serv_mc_port_ems_spiP8,
                         .pos    = eomn_serv_mc_sensor_pos_atjoint                       
                     },
                     .extrasensor    =
@@ -1272,7 +1292,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_upper_arm =
                     .sensor         =
                     {
                         .type   = eomn_serv_mc_sensor_encoder_aea,
-                        .port   = eomn_serv_mc_port_ems_spiP8,
+                        .port   = eomn_serv_mc_port_ems_spiP7,
                         .pos    = eomn_serv_mc_sensor_pos_atjoint
                     },
                     .extrasensor    =

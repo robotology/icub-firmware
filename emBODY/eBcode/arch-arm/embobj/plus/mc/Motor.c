@@ -41,10 +41,15 @@ static void Motor_config_current_PID_2FOC(Motor* o, eOmc_PID_t* pidcurrent)
 {
     int8_t KpKiKdKs[7];
     
-    ((int16_t*)KpKiKdKs)[0] = pidcurrent->kp;    //Kp
-    ((int16_t*)KpKiKdKs)[1] = pidcurrent->ki;    //Ki
-    ((int16_t*)KpKiKdKs)[2] = pidcurrent->kd;    //Kd (unused in 2FOC)
-               KpKiKdKs [6] = pidcurrent->scale; // shift
+    //((int16_t*)KpKiKdKs)[0] = pidcurrent->kp;    //Kp
+    //((int16_t*)KpKiKdKs)[1] = pidcurrent->ki;    //Ki
+    //((int16_t*)KpKiKdKs)[2] = pidcurrent->kd;    //Kd (unused in 2FOC)
+    //           KpKiKdKs [6] = pidcurrent->scale; // shift
+    
+    ((int16_t*)KpKiKdKs)[0] =  8; //Kp
+    ((int16_t*)KpKiKdKs)[1] =  2; //Ki
+    ((int16_t*)KpKiKdKs)[2] =  0; //Kd (unused in 2FOC)
+               KpKiKdKs [6] = 10; // shift
     
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, o->ID, 0);
     
@@ -59,7 +64,7 @@ static void Motor_config_max_currents_2FOC(Motor* o, eOmc_current_limits_params_
 {    
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, o->ID, 0);
     
-    int32_t max_current = current_params->nominalCurrent;
+    int32_t max_current = 5000;//current_params->nominalCurrent;
     
     eOcanprot_command_t cmdMaxCurrent;
     cmdMaxCurrent.class = eocanprot_msgclass_pollingMotorControl;
@@ -77,12 +82,12 @@ static void Motor_config_2FOC(Motor* o, eOmc_motor_config_t* config)
     ((int16_t*)KpKiKdKs)[2] = config->pidcurrent.kd;    //Kd (unused in 2FOC)
                KpKiKdKs [6] = config->pidcurrent.scale; // shift
     
-    //((int16_t*)KpKiKdKs)[0] =  8; //Kp
-    //((int16_t*)KpKiKdKs)[1] =  2; //Ki
-    //((int16_t*)KpKiKdKs)[2] =  0; //Kd (unused in 2FOC)
-    //           KpKiKdKs [6] = 10; // shift
+    ((int16_t*)KpKiKdKs)[0] =  8; //Kp
+    ((int16_t*)KpKiKdKs)[1] =  2; //Ki
+    ((int16_t*)KpKiKdKs)[2] =  0; //Kd (unused in 2FOC)
+               KpKiKdKs [6] = 10; // shift
     
-    uint32_t max_current = config->currentLimits.nominalCurrent;
+    uint32_t max_current = 5000;//config->currentLimits.nominalCurrent;
     
     #define HAS_QE      0x0001
     #define HAS_HALL    0x0002
@@ -303,6 +308,22 @@ BOOL Motor_calibrate_moving2Hardstop(Motor* o, int32_t pwm, int32_t zero) //
     //Motor_set_run(o);
     return TRUE;
 }
+
+extern void Motor_uncalibrate(Motor* o)
+{
+    o->not_calibrated = TRUE;
+
+    if (o->HARDWARE_TYPE == HARDWARE_2FOC)
+    {
+        eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, o->ID, 0);
+        eOcanprot_command_t command = {0};
+        command.class = eocanprot_msgclass_pollingMotorControl;
+        command.type  = ICUBCANPROTO_POL_MC_CMD__CALIBRATE_ENCODER;
+        eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);
+    }
+}
+
+
 #define MOTOR_HARDSTOP_WAITCALIBCOUNTER_MAX     1200
 #define MOTOR_POSSTABLE_COUNTER_MAX             100
 

@@ -555,7 +555,8 @@ CTRL_UNITS Joint_do_vel_control(Joint* o)
                     }
                     else
                     {
-                        o->vel_ref += o->scKpos*o->pos_err;
+                        //o->vel_ref += o->scKvel*o->vel_err + o->scKpos*o->pos_err;
+                        o->vel_ref = o->scKvel*o->vel_ref + o->scKpos*o->pos_err;
                     }
                 }
                 

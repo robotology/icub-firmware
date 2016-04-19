@@ -42,6 +42,8 @@ typedef struct // JointSet
     float** Sje;
     float** Sjm;
     
+    uint32_t calibration_wait;
+    
     AbsEncoder* absEncoder;
  
     eOmc_controlmode_t control_mode;

@@ -18,7 +18,7 @@ void PID_init(PID* o)
 }
 
 void PID_config(PID* o, eOmc_PID_t* config)
-{
+{    
     float rescaler = 1.0f/(float)(1<<config->scale);
     
     o->Ko = config->offset;

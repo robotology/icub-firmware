@@ -428,8 +428,8 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         o->jointSet[1].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
         o->jointSet[1].CAN_DO_TRQ_CTRL = FALSE;
         
-        o->jointSet[0].special_constraint = TRIFID_CONSTRAINT;
-        o->jointSet[0].special_limit = WRIST_TRIFID_LIMIT;
+        o->jointSet[1].special_constraint = TRIFID_CONSTRAINT;
+        o->jointSet[1].special_limit = WRIST_TRIFID_LIMIT;
         break;
         
 	case emscontroller_board_CER_BASE:                //= 21    //2FOC

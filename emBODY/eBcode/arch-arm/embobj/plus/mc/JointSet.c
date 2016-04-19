@@ -989,20 +989,35 @@ static BOOL JointSet_do_wait_calibration_8(JointSet* o)
 }
 
 static BOOL JointSet_do_wait_calibration_9(JointSet* o)
-{
+{    
+    if (o->calibration_wait<250)
+    {
+        Motor_set_pwm_ref(o->motor+o->motors_of_set[0], o->tripod_calib.pwm);
+        Motor_set_pwm_ref(o->motor+o->motors_of_set[1], o->tripod_calib.pwm);
+        Motor_set_pwm_ref(o->motor+o->motors_of_set[2], o->tripod_calib.pwm);
+        ++o->calibration_wait;
+        return FALSE;
+    }
+    
     BOOL calibrated = TRUE;
+    
+    int32_t pos[3];
     
     for (int ms=0; ms<*(o->pN); ++ms)
     {
         int m = o->motors_of_set[ms];
-        
+
         if (Motor_is_calibrated(o->motor+m))
         {
-            Motor_set_pwm_ref(o->motor+m, 0);
+            //Motor_set_pwm_ref(o->motor+m, 0);
+            
+            pos[ms] = 0x7FFFFFFF;
         }
         else
         {
-            Motor_set_pwm_ref(o->motor+m, o->tripod_calib.pwm);
+            pos[ms] = o->motor[m].pos_fbk - o->tripod_calib.start_pos[ms];
+            
+            //Motor_set_pwm_ref(o->motor+m, o->tripod_calib.pwm);
             
             calibrated = FALSE;
         }
@@ -1025,6 +1040,50 @@ static BOOL JointSet_do_wait_calibration_9(JointSet* o)
         return TRUE;
     }
     
+    float pwm[3];
+    
+    if (pos[0]<0) pos[0] = -pos[0];
+    if (pos[1]<0) pos[1] = -pos[1];
+    if (pos[2]<0) pos[2] = -pos[2];
+    
+    int32_t posL = pos[0];
+    if (pos[1] < posL) posL = pos[1];
+    if (pos[2] < posL) posL = pos[2];
+    
+    pwm[0] = (float)o->tripod_calib.pwm * (1.0f - (float)(pos[0] - posL)/(float)o->tripod_calib.max_delta);
+    pwm[1] = (float)o->tripod_calib.pwm * (1.0f - (float)(pos[1] - posL)/(float)o->tripod_calib.max_delta);
+    pwm[2] = (float)o->tripod_calib.pwm * (1.0f - (float)(pos[2] - posL)/(float)o->tripod_calib.max_delta);
+    
+    if (pwm[0] < 0.0f) pwm[0] = 0.0f;
+    if (pwm[1] < 0.0f) pwm[1] = 0.0f;
+    if (pwm[2] < 0.0f) pwm[2] = 0.0f;
+    
+    float pwm_min = pwm[0];
+    if (pwm[1] < pwm_min) pwm_min = pwm[1];
+    if (pwm[2] < pwm_min) pwm_min = pwm[2];
+    
+    if (pwm_min < 3500.0f)
+    {
+        pwm[0] += 3500.0f - pwm_min;
+        pwm[1] += 3500.0f - pwm_min;
+        pwm[2] += 3500.0f - pwm_min;
+    }
+
+    if (o->tripod_calib.pwm < 0)
+    {
+        pwm[0] = -pwm[0];
+        pwm[1] = -pwm[1];
+        pwm[2] = -pwm[2];
+    }
+    
+    Motor_set_pwm_ref(o->motor+o->motors_of_set[0], (int32_t)pwm[0]);
+    Motor_set_pwm_ref(o->motor+o->motors_of_set[1], (int32_t)pwm[1]);
+    Motor_set_pwm_ref(o->motor+o->motors_of_set[2], (int32_t)pwm[2]);
+    
+    //Motor_set_pwm_ref(o->motor+o->motors_of_set[0], o->tripod_calib.pwm);
+    //Motor_set_pwm_ref(o->motor+o->motors_of_set[1], o->tripod_calib.pwm);
+    //Motor_set_pwm_ref(o->motor+o->motors_of_set[2], o->tripod_calib.pwm);
+
     return FALSE;
 }
 
@@ -1113,7 +1172,7 @@ static void JointSet_do_wait_calibration(JointSet* o)
         }
     }
     
-    //o->calibration_in_progress = eomc_calibration_typeUndefined;
+    o->calibration_in_progress = eomc_calibration_typeUndefined;
     
     JointSet_do_odometry(o);
     
@@ -1321,11 +1380,9 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
         {
             if (o->calibration_in_progress == calibrator->type) return;
             
-            o->calibration_in_progress = (eOmc_calibration_type_t)calibrator->type;
+            o->calibration_wait = 0;
             
-            //hal_led_off(hal_led0);
-            //hal_led_off(hal_led1);
-            //hal_led_off(hal_led2);
+            o->calibration_in_progress = (eOmc_calibration_type_t)calibrator->type;
             
             o->joint[o->joints_of_set[0]].control_mode = eomc_controlmode_calib;
             o->joint[o->joints_of_set[1]].control_mode = eomc_controlmode_calib;
@@ -1339,6 +1396,10 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             o->tripod_calib.max_delta = calibrator->params.type9.max_delta;
             o->tripod_calib.zero      = calibrator->params.type9.calibrationZero;
             
+            Motor_uncalibrate(o->motor+o->motors_of_set[0]);
+            Motor_uncalibrate(o->motor+o->motors_of_set[1]);
+            Motor_uncalibrate(o->motor+o->motors_of_set[2]);
+            
             Motor_set_run(o->motor+o->motors_of_set[0]);
             Motor_set_run(o->motor+o->motors_of_set[1]);
             Motor_set_run(o->motor+o->motors_of_set[2]);
@@ -1346,6 +1407,14 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             o->tripod_calib.start_pos[0] = o->motor[o->motors_of_set[0]].pos_fbk;
             o->tripod_calib.start_pos[1] = o->motor[o->motors_of_set[1]].pos_fbk;
             o->tripod_calib.start_pos[2] = o->motor[o->motors_of_set[2]].pos_fbk;
+            
+            AbsEncoder_still_check_reset(o->absEncoder+o->encoders_of_set[0]);
+            AbsEncoder_still_check_reset(o->absEncoder+o->encoders_of_set[1]);
+            AbsEncoder_still_check_reset(o->absEncoder+o->encoders_of_set[2]);
+            
+            AbsEncoder_start_hard_stop_calibrate(o->absEncoder+o->encoders_of_set[0], 0);
+            AbsEncoder_start_hard_stop_calibrate(o->absEncoder+o->encoders_of_set[1], 0);
+            AbsEncoder_start_hard_stop_calibrate(o->absEncoder+o->encoders_of_set[2], 0);
             
             break;
         }
