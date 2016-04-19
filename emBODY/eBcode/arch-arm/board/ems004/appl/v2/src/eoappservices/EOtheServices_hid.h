@@ -85,7 +85,7 @@ typedef enum
     eo_service_strain       = 1,
     eo_service_mais         = 2,
     eo_service_skin         = 3,
-    eo_service_inertial     = 4,
+    eo_service_inertials    = 4,
     eo_service_none         = 5
 } eOservice_type_t;
 

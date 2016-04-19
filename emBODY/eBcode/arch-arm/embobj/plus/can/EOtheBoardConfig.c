@@ -138,7 +138,7 @@ static const eOmn_serv_configuration_t s_serv_config_sk_skin_eb10_eb11 =
 
 static const eOmn_serv_configuration_t s_serv_config_as_inertial_eb2_eb4 =
 {   // eb2 / eb4
-    .type       = eomn_serv_AS_inertial,
+    .type       = eomn_serv_AS_inertials,
     .filler     = {0},
     .data.as.inertial = 
     {
@@ -231,7 +231,7 @@ static const eOmn_serv_configuration_t s_serv_config_as_inertial_eb2_eb4 =
 
 static const eOmn_serv_configuration_t s_serv_config_as_inertial_eb10_eb11 =    
 {   // eb10 / eb11
-    .type       = eomn_serv_AS_inertial,
+    .type       = eomn_serv_AS_inertials,
     .filler     = {0},
     .data.as.inertial = 
     {

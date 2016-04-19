@@ -272,7 +272,7 @@ extern eOresult_t eo_inertials2_Verify(EOtheInertials2 *p, const eOmn_serv_confi
         return(eores_NOK_nullpointer);
     } 
 
-    if(eomn_serv_AS_inertial != servcfg->type)
+    if(eomn_serv_AS_inertials != servcfg->type)
     {
         p->service.state = eomn_serv_state_failureofverify;
         eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_inertials, p->service.state);
@@ -436,7 +436,7 @@ extern eOresult_t eo_inertials2_Activate(EOtheInertials2 *p, const eOmn_serv_con
         return(eores_NOK_nullpointer);
     } 
 
-    if(eomn_serv_AS_inertial != servcfg->type)
+    if(eomn_serv_AS_inertials != servcfg->type)
     {
         return(eores_NOK_generic);
     }

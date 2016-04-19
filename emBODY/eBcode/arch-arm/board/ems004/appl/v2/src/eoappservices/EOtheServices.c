@@ -701,7 +701,7 @@ static eOresult_t s_services_callback_afterverify_inertial(EOaService* p, eObool
         eo_inertials2_Deactivate(eo_inertials2_GetHandle());
     }
     
-    s_eo_services_alert_afterverify_service(operationisok, eomn_serv_category_inertials, eomn_serv_AS_inertial, eo_service_inertial);
+    s_eo_services_alert_afterverify_service(operationisok, eomn_serv_category_inertials, eomn_serv_AS_inertials, eo_service_inertials);
        
     return(eores_OK);
 }
