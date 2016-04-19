@@ -1140,6 +1140,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub\EoError.c</FilePath>
             </File>
+            <File>
+              <FileName>EoBoards.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub\EoBoards.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2382,6 +2387,11 @@
               <FileName>EoError.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub\EoError.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoBoards.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub\EoBoards.c</FilePath>
             </File>
           </Files>
         </Group>
