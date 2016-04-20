@@ -161,7 +161,8 @@ extern EOtheMAIS* eo_mais_Initialise(void)
     
     p->diagnostics.reportTimer = eo_timer_New();
     p->diagnostics.errorType = eo_errortype_error;
-    p->diagnostics.errorDescriptor.sourceaddress = eo_errman_sourcedevice_localboard;
+    p->diagnostics.errorDescriptor.sourceaddress = 0;
+    p->diagnostics.errorDescriptor.sourcedevice = eo_errman_sourcedevice_localboard;
     p->diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_mais_not_verified_yet);  
         
     p->service.initted = eobool_true;    
@@ -270,10 +271,13 @@ extern eOresult_t eo_mais_Verify(EOtheMAIS *p, const eOmn_serv_configuration_t *
         else
         {
             verificationOK = eobool_false;
-            eOerrmanDescriptor_t errorDescriptor = {0};
-            errorDescriptor.sourceaddress = eo_errman_sourcedevice_localboard;
-            errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_mais_failed_verify_because_active);
-            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, s_eobj_ownname, &errorDescriptor); 
+            p->diagnostics.errorType = eo_errortype_error;
+            p->diagnostics.errorDescriptor.par16 = 0;
+            p->diagnostics.errorDescriptor.par64 = 0;
+            p->diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_mais_failed_verify_because_active);
+            p->diagnostics.errorDescriptor.sourceaddress = 0;
+            p->diagnostics.errorDescriptor.sourcedevice = eo_errman_sourcedevice_localboard; 
+            eo_errman_Error(eo_errman_GetHandle(), p->diagnostics.errorType, NULL, s_eobj_ownname, &p->diagnostics.errorDescriptor); 
         }
         
         // in here we dont activate because it is already active ...
