@@ -31,7 +31,6 @@
 #include "string.h"
 #include "stdio.h"
 #include "EOconstvector_hid.h"
-#include "EOtheCANmapping.h"
 #include "EOappEncodersReader.h"
 
 #include "EOmcController.h"
@@ -87,7 +86,7 @@ static const eOmn_serv_configuration_t s_serv_config_as_mais =
         {
             .port           = eOcanport1,
             .addr           = 14,
-            .insideindex    = eocanmap_insideindex_none                    
+            .insideindex    = eobrd_caninsideindex_none                    
         }
     }    
 };
@@ -524,62 +523,62 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb2_eb4 =
             {   // jomo 0   
                 .port           = eOcanport1,
                 .addr           = 3,
-                .insideindex    = eocanmap_insideindex_first
+                .insideindex    = eobrd_caninsideindex_first
             },      
             {   // jomo 1
                 .port           = eOcanport1,
                 .addr           = 3,
-                .insideindex    = eocanmap_insideindex_second
+                .insideindex    = eobrd_caninsideindex_second
             },
             {   // jomo 2
                 .port           = eOcanport1,
                 .addr           = 4,
-                .insideindex    = eocanmap_insideindex_first
+                .insideindex    = eobrd_caninsideindex_first
             },
             {   // jomo 3
                 .port           = eOcanport1,
                 .addr           = 4,
-                .insideindex    = eocanmap_insideindex_second
+                .insideindex    = eobrd_caninsideindex_second
             },
             {   // jomo 4   
                 .port           = eOcanport1,
                 .addr           = 5,
-                .insideindex    = eocanmap_insideindex_first
+                .insideindex    = eobrd_caninsideindex_first
             },
             {   // jomo 
                 .port           = eOcanport1,
                 .addr           = 5,
-                .insideindex    = eocanmap_insideindex_second
+                .insideindex    = eobrd_caninsideindex_second
             },
             {   // jomo 6
                 .port           = eOcanport1,
                 .addr           = 6,
-                .insideindex    = eocanmap_insideindex_first
+                .insideindex    = eobrd_caninsideindex_first
             },
             {   // jomo 7
                 .port           = eOcanport1,
                 .addr           = 6,
-                .insideindex    = eocanmap_insideindex_second
+                .insideindex    = eobrd_caninsideindex_second
             },
             {   // jomo 8   
                 .port           = eOcanport1,
                 .addr           = 7,
-                .insideindex    = eocanmap_insideindex_first
+                .insideindex    = eobrd_caninsideindex_first
             },
             {   // jomo 9
                 .port           = eOcanport1,
                 .addr           = 7,
-                .insideindex    = eocanmap_insideindex_second
+                .insideindex    = eobrd_caninsideindex_second
             },
             {   // jomo 10
                 .port           = eOcanport1,
                 .addr           = 8,
-                .insideindex    = eocanmap_insideindex_first
+                .insideindex    = eobrd_caninsideindex_first
             },
             {   // jomo 11
                 .port           = eOcanport1,
                 .addr           = 8,
-                .insideindex    = eocanmap_insideindex_second
+                .insideindex    = eobrd_caninsideindex_second
             }
         },
         .mais = 
@@ -593,7 +592,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb2_eb4 =
             {
                 .port           = eOcanport1,
                 .addr           = 14,
-                .insideindex    = eocanmap_insideindex_none                    
+                .insideindex    = eobrd_caninsideindex_none                    
             }              
         }
     }    
@@ -1820,7 +1819,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_1B3_2B3 =
             {
                 .port           = eOcanport1,
                 .addr           = 14,
-                .insideindex    = eocanmap_insideindex_none                    
+                .insideindex    = eobrd_caninsideindex_none                    
             }               
         },
         .filler                 = {0},
@@ -1952,7 +1951,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_1B4_2B4 =
             {
                 .port           = eOcanport1,
                 .addr           = 14,
-                .insideindex    = eocanmap_insideindex_none                    
+                .insideindex    = eobrd_caninsideindex_none                    
             }               
         },
         .filler                 = {0},
