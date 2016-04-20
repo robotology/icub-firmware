@@ -871,7 +871,7 @@ static eOresult_t s_eo_services_process_start(EOtheServices *p, eOmn_serv_catego
     // phase2: at bootstratp service are just _Initalise()-ed and every verification-activation is done in here. 
     
     // if not supported send up a negative reply.
-    if((eomn_serv_category_none == category) || (eomn_serv_category_all == category) || (eomn_serv_category_unknown))
+    if((eomn_serv_category_none == category) || (eomn_serv_category_all == category) || (eomn_serv_category_unknown == category))
     {
         // send a failure about wrong param
         p->mnservice->status.commandresult.latestcommandisok = eobool_false;
