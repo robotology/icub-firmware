@@ -412,7 +412,7 @@ extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_PWM_LIMIT(eOcanframe
 {  
     eOprotIndex_t index = EOK_uint08dummy;  
 
-    eOcanmap_location_t loc = {0};
+    eObrd_canlocation_t loc = {0};
     loc.port            = port;
     loc.addr            = EOCANPROT_FRAME_GET_SOURCE(frame);
     loc.insideindex     = EOCANPROT_FRAME_POLLING_MC_GET_INTERNALINDEX(frame);
@@ -667,7 +667,7 @@ extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_FIRMWARE_VERSION(eOc
     // then: (but it could be put somewhere else) ... if all boards are ready: stop, send config, start mais
     // i would like to do it inside a method of ...
     
-    eOcanmap_location_t loc = {0};
+    eObrd_canlocation_t loc = {0};
     loc.port                = port;
     loc.addr                = EOCANPROT_FRAME_GET_SOURCE(frame);
     loc.insideindex         = EOCANPROT_FRAME_POLLING_MC_GET_INTERNALINDEX(frame);
@@ -806,7 +806,7 @@ static void* s_eocanprotMCpolling_get_entity(eOprot_entity_t entity, eOcanframe_
 {
     void * ret = NULL;
     uint8_t ii = 0;
-    eOcanmap_location_t loc = {0};
+    eObrd_canlocation_t loc = {0};
     
     loc.port = port;
     loc.addr = EOCANPROT_FRAME_GET_SOURCE(frame);    
@@ -899,7 +899,7 @@ static eOresult_t s_parser_POL_MC_CMD_getposition(eOcanframe_t *frame, eOcanport
 {   
     eOprotIndex_t index = EOK_uint08dummy;  
 
-    eOcanmap_location_t loc = {0};
+    eObrd_canlocation_t loc = {0};
     loc.port            = port;
     loc.addr            = EOCANPROT_FRAME_GET_SOURCE(frame);
     loc.insideindex     = EOCANPROT_FRAME_POLLING_MC_GET_INTERNALINDEX(frame);
@@ -974,7 +974,7 @@ static eOresult_t s_parser_POL_MC_CMD_getpid_etc(eOcanframe_t *frame, eOcanport_
 {    
     eOprotIndex_t index = EOK_uint08dummy;  
 
-    eOcanmap_location_t loc = {0};
+    eObrd_canlocation_t loc = {0};
     loc.port            = port;
     loc.addr            = EOCANPROT_FRAME_GET_SOURCE(frame);
     loc.insideindex     = EOCANPROT_FRAME_POLLING_MC_GET_INTERNALINDEX(frame);
@@ -1061,7 +1061,7 @@ static eOresult_t s_parser_POL_MC_CMD_getimpedance(eOcanframe_t *frame, eOcanpor
     
     eOprotIndex_t index = EOK_uint08dummy;  
 
-    eOcanmap_location_t loc = {0};
+    eObrd_canlocation_t loc = {0};
     loc.port            = port;
     loc.addr            = EOCANPROT_FRAME_GET_SOURCE(frame);
     loc.insideindex     = EOCANPROT_FRAME_POLLING_MC_GET_INTERNALINDEX(frame);

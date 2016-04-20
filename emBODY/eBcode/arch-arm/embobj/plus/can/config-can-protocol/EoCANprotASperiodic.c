@@ -256,11 +256,11 @@ static void* s_eocanprotASperiodic_get_entity(eOprotEndpoint_t endpoint, eOprot_
 {
     void * ret = NULL;
     uint8_t ii = 0;
-    eOcanmap_location_t loc = {0};
+    eObrd_canlocation_t loc = {0};
     
     loc.port = port;
     loc.addr = EOCANPROT_FRAME_GET_SOURCE(frame);    
-    loc.insideindex = eocanmap_insideindex_none;
+    loc.insideindex = eobrd_caninsideindex_none;
     
     ii = eo_canmap_GetEntityIndexExtraCheck(eo_canmap_GetHandle(), loc, endpoint, entity);
     

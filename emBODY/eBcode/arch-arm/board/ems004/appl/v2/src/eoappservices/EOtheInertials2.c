@@ -94,7 +94,7 @@ static void s_eo_inertials2_send_periodic_error_report(void *p);
 
 static eObool_t s_eo_inertials2_isID32relevant(uint32_t id32);
 
-static eObool_t s_eo_inertials2_get_id(eOcanmap_location_t loc, eOas_inertial_type_t type, uint16_t *id);
+static eObool_t s_eo_inertials2_get_id(eObrd_canlocation_t loc, eOas_inertial_type_t type, uint16_t *id);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -177,7 +177,7 @@ extern EOtheInertials2* eo_inertials2_Initialise(void)
     p->numofmtbs = 0;
     p->service.servconfig.type = eomn_serv_NONE;
         
-    p->sharedcan.boardproperties = eo_vector_New(sizeof(eOcanmap_board_properties_t), eo_inertials2_maxnumberofMTBboards, NULL, NULL, NULL, NULL);
+    p->sharedcan.boardproperties = eo_vector_New(sizeof(eObrd_canproperties_t), eo_inertials2_maxnumberofMTBboards, NULL, NULL, NULL, NULL);
     
     p->sharedcan.entitydescriptor = eo_vector_New(sizeof(eOcanmap_entitydescriptor_t), eo_inertials2_maxnumberofMTBboards, NULL, NULL, NULL, NULL);
     
@@ -463,16 +463,16 @@ extern eOresult_t eo_inertials2_Activate(EOtheInertials2 *p, const eOmn_serv_con
     
     // now i must add all the mtb boards. i iterate per canbus
     
-    eOcanmap_board_properties_t prop = 
+    eObrd_canproperties_t prop = 
     {
         .type               = eobrd_cantype_mtb, 
-        .location           = { .port = 0, .addr = 0, .insideindex = eocanmap_insideindex_none },
+        .location           = { .port = 0, .addr = 0, .insideindex = eobrd_caninsideindex_none },
         .requiredprotocol   = { .major = servcfg->data.as.inertial.mtbversion.protocol.major, .minor = servcfg->data.as.inertial.mtbversion.protocol.minor }
     };  
     
     eOcanmap_entitydescriptor_t des = 
     {
-        .location   = { .port = 0, .addr = 0, .insideindex = eocanmap_insideindex_none },
+        .location   = { .port = 0, .addr = 0, .insideindex = eobrd_caninsideindex_none },
         .index      = entindex00
     };        
     
@@ -817,10 +817,10 @@ extern eOresult_t eo_inertials2_AcceptCANframe(EOtheInertials2 *p, eOas_inertial
     eOas_inertial_data_t data = {0};
        
     
-    eOcanmap_location_t loc = {0};    
+    eObrd_canlocation_t loc = {0};    
     loc.port = port;
     loc.addr = EOCANPROT_FRAME_GET_SOURCE(frame);    
-    loc.insideindex = eocanmap_insideindex_none;
+    loc.insideindex = eobrd_caninsideindex_none;
     
     uint16_t id = 999;
 
@@ -951,8 +951,8 @@ static eOresult_t s_eo_inertials2_TXstart(EOtheInertials2 *p)
     p->sharedcan.command.type  = ICUBCANPROTO_POL_SK_CMD__ACC_GYRO_SETUP;
     p->sharedcan.command.value = &canprotoconfig;
 
-    eOcanmap_location_t location = {0};
-    location.insideindex = eocanmap_insideindex_none;
+    eObrd_canlocation_t location = {0};
+    location.insideindex = eobrd_caninsideindex_none;
     for(uint8_t port=0; port<2; port++)
     {
         location.port = port;
@@ -1001,8 +1001,8 @@ static eOresult_t s_eo_inertials2_TXstop(EOtheInertials2 *p)
     p->sharedcan.command.value = &canprotoconfig;
     
     
-    eOcanmap_location_t location = {0};
-    location.insideindex = eocanmap_insideindex_none;
+    eObrd_canlocation_t location = {0};
+    location.insideindex = eobrd_caninsideindex_none;
     for(uint8_t port=0; port<2; port++)
     {            
         location.port = port;
@@ -1217,7 +1217,7 @@ static eObool_t s_eo_inertials2_isID32relevant(uint32_t id32)
     return(eobool_false); 
 }
 
-static eObool_t s_eo_inertials2_get_id(eOcanmap_location_t loc, eOas_inertial_type_t type, uint16_t *id)
+static eObool_t s_eo_inertials2_get_id(eObrd_canlocation_t loc, eOas_inertial_type_t type, uint16_t *id)
 {
     EOtheInertials2* p = &s_eo_theinertials2;
     

@@ -79,7 +79,7 @@
 
 static eObool_t s_eocanprotMCperiodic_is_from_unused2foc_in_eb5(eOcanframe_t *frame, eOcanport_t port);
 
-static void* s_eocanprotMCperiodic_get_entity(eOprot_entity_t entity, eOcanframe_t *frame, eOcanport_t port, eOcanmap_insideindex_t insideindex, uint8_t *index);
+static void* s_eocanprotMCperiodic_get_entity(eOprot_entity_t entity, eOcanframe_t *frame, eOcanport_t port, eObrd_caninsideindex_t insideindex, uint8_t *index);
 
 static eObrd_cantype_t s_eocanprotMCperiodic_get_boardtype(eOcanframe_t *frame, eOcanport_t port);
 
@@ -106,7 +106,7 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__2FOC(eOcanframe_t *fram
     eOmc_motor_t *motor = NULL;
     eOprotIndex_t motorindex = EOK_uint08dummy;
     
-    if(NULL == (motor = s_eocanprotMCperiodic_get_entity(eoprot_entity_mc_motor, frame, port, eocanmap_insideindex_first, &motorindex)))
+    if(NULL == (motor = s_eocanprotMCperiodic_get_entity(eoprot_entity_mc_motor, frame, port, eobrd_caninsideindex_first, &motorindex)))
     {
         if(eobool_true == s_eocanprotMCperiodic_is_from_unused2foc_in_eb5(frame, port))
         {   // the board eb5 has an additional 1foc board which sends a can frame of this kind but it does not serve any motor
@@ -141,7 +141,7 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__POSITION(eOcanframe_t *
         
     uint8_t j=0;
     // the two joints have ...
-    const eOcanmap_insideindex_t insideindex[2] = {eocanmap_insideindex_first, eocanmap_insideindex_second};
+    const eObrd_caninsideindex_t insideindex[2] = {eobrd_caninsideindex_first, eobrd_caninsideindex_second};
     const uint8_t offset[2] = {0, 4};
     for(j=0; j<2; j++)
     {
@@ -168,7 +168,7 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__PID_VAL(eOcanframe_t *f
     
     uint8_t j=0;
     // the two joints have ...
-    const eOcanmap_insideindex_t insideindex[2] = {eocanmap_insideindex_first, eocanmap_insideindex_second};
+    const eObrd_caninsideindex_t insideindex[2] = {eobrd_caninsideindex_first, eobrd_caninsideindex_second};
     const uint8_t offset[2] = {0, 2};    
     for(j=0; j<2; j++)
     {
@@ -213,8 +213,8 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__STATUS(eOcanframe_t *fr
     if(eobrd_cantype_foc == boardtype)
     {   
         // in case we have a 2foc ... i treat the first joint only   
-        // first joint: use eocanmap_insideindex_first and gets the first 2 bytes of the frame         
-        if(NULL == (joint = s_eocanprotMCperiodic_get_entity(eoprot_entity_mc_joint, frame, port, eocanmap_insideindex_first, &jointindex)))
+        // first joint: use eobrd_caninsideindex_first and gets the first 2 bytes of the frame         
+        if(NULL == (joint = s_eocanprotMCperiodic_get_entity(eoprot_entity_mc_joint, frame, port, eobrd_caninsideindex_first, &jointindex)))
         {
             if(eobool_true == s_eocanprotMCperiodic_is_from_unused2foc_in_eb5(frame, port))
             {
@@ -244,7 +244,7 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__STATUS(eOcanframe_t *fr
     {   // we have a mc4, thus we must manage two joints
         uint8_t j=0;
         // the two joints have ...
-        const eOcanmap_insideindex_t insideindex[2] = {eocanmap_insideindex_first, eocanmap_insideindex_second};
+        const eObrd_caninsideindex_t insideindex[2] = {eobrd_caninsideindex_first, eobrd_caninsideindex_second};
         const uint8_t offset[2] = {1, 3};
         
         for(j=0; j<2; j++) // 2 joints ....
@@ -287,7 +287,7 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__CURRENT(eOcanframe_t *f
         
     uint8_t m=0;
     // the two motors have ...
-    const eOcanmap_insideindex_t insideindex[2] = {eocanmap_insideindex_first, eocanmap_insideindex_second};
+    const eObrd_caninsideindex_t insideindex[2] = {eobrd_caninsideindex_first, eobrd_caninsideindex_second};
     const uint8_t offset[2] = {0, 2};    
     for(m=0; m<2; m++)
     {
@@ -328,7 +328,7 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__VELOCITY(eOcanframe_t *
     
     uint8_t j=0;
     // the two joints have ...
-    const eOcanmap_insideindex_t insideindex[2] = {eocanmap_insideindex_first, eocanmap_insideindex_second};
+    const eObrd_caninsideindex_t insideindex[2] = {eobrd_caninsideindex_first, eobrd_caninsideindex_second};
     const uint8_t offsetvelocity[2] = {0, 4};    
     const uint8_t offsetacceleration[2] = {2, 6}; 
     for(j=0; j<2; j++)
@@ -361,7 +361,7 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__PID_ERROR(eOcanframe_t 
     
     uint8_t j=0;
     // the two joints have ...
-    const eOcanmap_insideindex_t insideindex[2] = {eocanmap_insideindex_first, eocanmap_insideindex_second};
+    const eObrd_caninsideindex_t insideindex[2] = {eobrd_caninsideindex_first, eobrd_caninsideindex_second};
     const uint8_t offsetpos[2] = {0, 2};    
     const uint8_t offsettrq[2] = {4, 6}; 
     for(j=0; j<2; j++)
@@ -399,7 +399,7 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__ADDITIONAL_STATUS(eOcan
        
     uint8_t j=0;
     // the two joints have ...
-    const eOcanmap_insideindex_t insideindex[2] = {eocanmap_insideindex_first, eocanmap_insideindex_second};
+    const eObrd_caninsideindex_t insideindex[2] = {eobrd_caninsideindex_first, eobrd_caninsideindex_second};
     caninteractionmodes[0] = (icubCanProto_interactionmode_t)(frame->data[0] & 0x0f);          // for first joint
     caninteractionmodes[1] = (icubCanProto_interactionmode_t)((frame->data[0] & 0xf0) >> 4);     // for second joint
     eOmc_interactionmode_t tmp = eOmc_interactionmode_stiff;
@@ -469,11 +469,11 @@ static eObool_t s_eocanprotMCperiodic_is_from_unused2foc_in_eb5(eOcanframe_t *fr
 }
 
 
-static void* s_eocanprotMCperiodic_get_entity(eOprot_entity_t entity, eOcanframe_t *frame, eOcanport_t port, eOcanmap_insideindex_t insideindex, uint8_t *index)
+static void* s_eocanprotMCperiodic_get_entity(eOprot_entity_t entity, eOcanframe_t *frame, eOcanport_t port, eObrd_caninsideindex_t insideindex, uint8_t *index)
 {
     void * ret = NULL;
     uint8_t ii = 0;
-    eOcanmap_location_t loc = {0};
+    eObrd_canlocation_t loc = {0};
     
     loc.port = port;
     loc.addr = EOCANPROT_FRAME_GET_SOURCE(frame);    
@@ -500,10 +500,10 @@ static void* s_eocanprotMCperiodic_get_entity(eOprot_entity_t entity, eOcanframe
 
 static eObrd_cantype_t s_eocanprotMCperiodic_get_boardtype(eOcanframe_t *frame, eOcanport_t port)
 {
-    eOcanmap_location_t loc = {0};
+    eObrd_canlocation_t loc = {0};
     loc.port = port;
     loc.addr = EOCANPROT_FRAME_GET_SOURCE(frame);    
-    loc.insideindex = eocanmap_insideindex_none; // dont care of it if we look for a board
+    loc.insideindex = eobrd_caninsideindex_none; // dont care of it if we look for a board
     return(eo_canmap_GetBoardType(eo_canmap_GetHandle(), loc));
 }  
 
@@ -639,11 +639,11 @@ static void s_former_PER_MC_prepare_frame(eOcanprot_descriptor_t *descriptor, eO
 // - oldies or discarded
 
 
-//static eOmc_motor_t* s_eocanprotMCperiodic_get_motor(eOcanframe_t *frame, eOcanport_t port, eOcanmap_insideindex_t insideindex, uint8_t *mindex)
+//static eOmc_motor_t* s_eocanprotMCperiodic_get_motor(eOcanframe_t *frame, eOcanport_t port, eObrd_caninsideindex_t insideindex, uint8_t *mindex)
 //{
 //    eOmc_motor_t *motor = NULL;
 //    uint8_t index = 0;
-//    eOcanmap_location_t loc = {0};
+//    eObrd_canlocation_t loc = {0};
 //    
 //    loc.port = port;
 //    loc.addr = EOCANPROT_FRAME_GET_SOURCE(frame);    
@@ -667,11 +667,11 @@ static void s_former_PER_MC_prepare_frame(eOcanprot_descriptor_t *descriptor, eO
 //    return(motor);   
 //}
 
-//static eOmc_joint_t* s_eocanprotMCperiodic_get_joint(eOcanframe_t *frame, eOcanport_t port, eOcanmap_insideindex_t insideindex, uint8_t *jindex)
+//static eOmc_joint_t* s_eocanprotMCperiodic_get_joint(eOcanframe_t *frame, eOcanport_t port, eObrd_caninsideindex_t insideindex, uint8_t *jindex)
 //{
 //    eOmc_joint_t *joint = NULL;
 //    uint8_t index = 0;
-//    eOcanmap_location_t loc = {0};
+//    eObrd_canlocation_t loc = {0};
 //    
 //    loc.port = port;
 //    loc.addr = EOCANPROT_FRAME_GET_SOURCE(frame);    
@@ -700,10 +700,10 @@ static void s_former_PER_MC_prepare_frame(eOcanprot_descriptor_t *descriptor, eO
 //    eOresult_t res = eores_OK; 
 //    // this can frame is from 2foc only ... as the name of the message says
 //    // i retrieve the motor related to the frame
-//    eOcanmap_location_t loc = {0};
+//    eObrd_canlocation_t loc = {0};
 //    loc.port = port;
 //    loc.addr = EOCANPROT_FRAME_GET_SOURCE(frame);
-//    loc.insideindex = eocanmap_insideindex_first;  // the 2foc board sends this message for its only motor
+//    loc.insideindex = eobrd_caninsideindex_first;  // the 2foc board sends this message for its only motor
 //    
 //    eOprotIndex_t motorindex = eo_canmap_GetEntityIndexExtraCheck(eo_canmap_GetHandle(), loc, eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor);
 //    

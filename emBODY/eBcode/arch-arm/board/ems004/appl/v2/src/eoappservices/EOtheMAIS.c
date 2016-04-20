@@ -151,7 +151,7 @@ extern EOtheMAIS* eo_mais_Initialise(void)
     p->service.servconfig.type = eomn_serv_NONE;
     
     
-    p->sharedcan.boardproperties = eo_vector_New(sizeof(eOcanmap_board_properties_t), 1, NULL, NULL, NULL, NULL);
+    p->sharedcan.boardproperties = eo_vector_New(sizeof(eObrd_canproperties_t), 1, NULL, NULL, NULL, NULL);
     
     p->sharedcan.entitydescriptor = eo_vector_New(sizeof(eOcanmap_entitydescriptor_t), 1, NULL, NULL, NULL, NULL);
     
@@ -437,10 +437,10 @@ extern eOresult_t eo_mais_Activate(EOtheMAIS *p, const eOmn_serv_configuration_t
             
         
         // now... use the servcfg
-        eOcanmap_board_properties_t prop = 
+        eObrd_canproperties_t prop = 
         {
             .type               = eobrd_cantype_mais, 
-            .location           = { .port = servcfg->data.as.mais.canloc.port, .addr = servcfg->data.as.mais.canloc.addr, .insideindex = eocanmap_insideindex_none },
+            .location           = { .port = servcfg->data.as.mais.canloc.port, .addr = servcfg->data.as.mais.canloc.addr, .insideindex = eobrd_caninsideindex_none },
             .requiredprotocol   = { .major = servcfg->data.as.mais.version.protocol.major, .minor = servcfg->data.as.mais.version.protocol.minor }
         };       
         eo_vector_PushBack(p->sharedcan.boardproperties, &prop);
@@ -451,7 +451,7 @@ extern eOresult_t eo_mais_Activate(EOtheMAIS *p, const eOmn_serv_configuration_t
         // load the entity mapping.
         eOcanmap_entitydescriptor_t des = 
         {
-            .location   = { .port = servcfg->data.as.mais.canloc.port, .addr = servcfg->data.as.mais.canloc.addr, .insideindex = eocanmap_insideindex_none },
+            .location   = { .port = servcfg->data.as.mais.canloc.port, .addr = servcfg->data.as.mais.canloc.addr, .insideindex = eobrd_caninsideindex_none },
             .index      = entindex00 // we have only one mais
         };
         eo_vector_PushBack(p->sharedcan.entitydescriptor, &des);

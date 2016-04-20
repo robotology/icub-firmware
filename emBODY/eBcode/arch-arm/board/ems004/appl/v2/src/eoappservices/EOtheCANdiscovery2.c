@@ -102,7 +102,7 @@ static void s_eo_candiscovery2_resetSearchStatus(void);
 
 static eObool_t s_eo_candiscovery2_AllBoardsAreFound(EOtheCANdiscovery2 *p);
 
-static eObool_t s_eo_candiscovery2_IsDetectionOK(EOtheCANdiscovery2 *p, eOcanmap_location_t loc, eObool_t match, eObrd_info_t *detected);
+static eObool_t s_eo_candiscovery2_IsDetectionOK(EOtheCANdiscovery2 *p, eObrd_canlocation_t loc, eObool_t match, eObrd_info_t *detected);
 
 
 static void s_eo_candiscovery2_on_timer_expiry(void *arg);
@@ -113,7 +113,7 @@ static eObool_t s_eo_isFirmwareVersionToBeVerified(const eObrd_firmwareversion_t
 
 static eObool_t s_eo_isProtocolVersionToBeVerified(const eObrd_protocolversion_t* target);
 
-static eOresult_t s_eo_candiscovery2_getFWversion(uint8_t boardtype, eOcanmap_location_t location, eObrd_protocolversion_t requiredprotocolversion);
+static eOresult_t s_eo_candiscovery2_getFWversion(uint8_t boardtype, eObrd_canlocation_t location, eObrd_protocolversion_t requiredprotocolversion);
 
 static eObool_t s_eo_isFirmwareVersionCompatible(const eObrd_firmwareversion_t* target, const eObrd_firmwareversion_t* detected);
 
@@ -316,7 +316,7 @@ extern eOresult_t eo_candiscovery2_Tick(EOtheCANdiscovery2 *p)
 
 
 
-extern eOresult_t eo_candiscovery2_OneBoardIsFound(EOtheCANdiscovery2 *p, eOcanmap_location_t loc, eObool_t match, eObrd_info_t *detected)
+extern eOresult_t eo_candiscovery2_OneBoardIsFound(EOtheCANdiscovery2 *p, eObrd_canlocation_t loc, eObool_t match, eObrd_info_t *detected)
 {   
     if((NULL == p) || (NULL == detected))
     {
@@ -672,7 +672,7 @@ static eObool_t s_eo_candiscovery2_AllBoardsAreFound(EOtheCANdiscovery2 *p)
     }      
 }
 
-static eObool_t s_eo_candiscovery2_IsDetectionOK(EOtheCANdiscovery2 *p, eOcanmap_location_t loc, eObool_t match, eObrd_info_t *detected)  
+static eObool_t s_eo_candiscovery2_IsDetectionOK(EOtheCANdiscovery2 *p, eObrd_canlocation_t loc, eObool_t match, eObrd_info_t *detected)  
 {  
     eObool_t protocolVersionIsOK = eobool_true;
     eObool_t firmwareVersionIsOK = eobool_true;
@@ -775,7 +775,7 @@ static eObool_t s_eo_candiscovery2_search(void)
             {   // valid addresses are [1, 14]
                 if((eobool_true == eo_common_hlfword_bitcheck(s_eo_thecandiscovery2.target.canmap[i], j)) && (eobool_false == eo_common_hlfword_bitcheck(s_eo_thecandiscovery2.detection.replies[i], j)))
                 {
-                    eOcanmap_location_t location = {.port = i, .addr = j, .insideindex = eocanmap_insideindex_none};
+                    eObrd_canlocation_t location = {.port = i, .addr = j, .insideindex = eobrd_caninsideindex_none};
                     s_eo_candiscovery2_getFWversion(s_eo_thecandiscovery2.target.info.type, location, s_eo_thecandiscovery2.target.info.protocol);
                     allFound = eobool_false;
                 }        
@@ -795,7 +795,7 @@ static eObool_t s_eo_candiscovery2_search(void)
 }
 
 
-static eOresult_t s_eo_candiscovery2_getFWversion(uint8_t boardtype, eOcanmap_location_t location, eObrd_protocolversion_t requiredprotocolversion)
+static eOresult_t s_eo_candiscovery2_getFWversion(uint8_t boardtype, eObrd_canlocation_t location, eObrd_protocolversion_t requiredprotocolversion)
 {  
     eOcanprot_command_t command = {0};
     command.value = (void*)&requiredprotocolversion;

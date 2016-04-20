@@ -153,7 +153,7 @@ extern EOtheSKIN* eo_skin_Initialise(void)
     p->service.servconfig.type = eomn_serv_NONE;
     
     
-    p->sharedcan.boardproperties = eo_vector_New(sizeof(eOcanmap_board_properties_t), eo_skin_maxnumberofMTBboards, NULL, NULL, NULL, NULL);
+    p->sharedcan.boardproperties = eo_vector_New(sizeof(eObrd_canproperties_t), eo_skin_maxnumberofMTBboards, NULL, NULL, NULL, NULL);
     
     p->sharedcan.entitydescriptor = eo_vector_New(sizeof(eOcanmap_entitydescriptor_t), eo_skin_maxnumberofMTBboards, NULL, NULL, NULL, NULL);
     
@@ -433,16 +433,16 @@ extern eOresult_t eo_skin_Activate(EOtheSKIN *p, const eOmn_serv_configuration_t
         
         // now i must add all the mtb boards. i iterate per patch and then per canbus
         
-        eOcanmap_board_properties_t prop = 
+        eObrd_canproperties_t prop = 
         {
             .type               = eobrd_cantype_mtb, 
-            .location           = { .port = 0, .addr = 0, .insideindex = eocanmap_insideindex_none },
+            .location           = { .port = 0, .addr = 0, .insideindex = eobrd_caninsideindex_none },
             .requiredprotocol   = { .major = servcfg->data.sk.skin.version.protocol.major, .minor = servcfg->data.sk.skin.version.protocol.minor }
         };  
         
         eOcanmap_entitydescriptor_t des = 
         {
-            .location   = { .port = 0, .addr = 0, .insideindex = eocanmap_insideindex_none },
+            .location   = { .port = 0, .addr = 0, .insideindex = eobrd_caninsideindex_none },
             .index      = entindexNONE
         };        
         
@@ -860,7 +860,7 @@ extern eOresult_t eo_skin_SetTrianglesConfig(EOtheSKIN *p, uint8_t patchindex, e
     p->sharedcan.command.type  = ICUBCANPROTO_POL_SK_CMD__SET_TRIANG_CFG;
     p->sharedcan.command.value = &canProto_trgscfg; 
     
-    eOcanmap_location_t location = {0};
+    eObrd_canlocation_t location = {0};
     eo_canmap_GetEntityLocation(eo_canmap_GetHandle(), id32, &location, NULL, NULL);
     // the function eo_canmap_GetEntityLocation() puts in location.addr the address of the first board of the entity (the patch).
     // we call eo_canmap_GetEntityLocation() to retrieve the canbus (port1 or port2) and insideindex.
@@ -1114,11 +1114,11 @@ static eOsk_skin_t* s_eo_skin_get_entity(EOtheSKIN* p, eOcanframe_t *frame, eOca
 {
     eOsk_skin_t * ret = NULL;
     uint8_t ii = 0;
-    eOcanmap_location_t loc = {0};
+    eObrd_canlocation_t loc = {0};
     
     loc.port = port;
     loc.addr = EOCANPROT_FRAME_GET_SOURCE(frame);    
-    loc.insideindex = eocanmap_insideindex_none;
+    loc.insideindex = eobrd_caninsideindex_none;
     
     ii = eo_canmap_GetEntityIndexExtraCheck(eo_canmap_GetHandle(), loc, eoprot_endpoint_skin, eoprot_entity_sk_skin);
     

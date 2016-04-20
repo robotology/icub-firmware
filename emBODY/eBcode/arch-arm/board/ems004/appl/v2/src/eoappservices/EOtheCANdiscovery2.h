@@ -103,7 +103,7 @@ extern EOtheCANdiscovery2* eo_candiscovery2_GetHandle(void);
 extern eOresult_t eo_candiscovery2_Start(EOtheCANdiscovery2 *p, const eOcandiscovery_target_t *target, eOcandiscovery_onstop_t* onstop);
 
 //  call it in the can parser when a board replies to the get-fw-version request
-extern eOresult_t eo_candiscovery2_OneBoardIsFound(EOtheCANdiscovery2 *p, eOcanmap_location_t loc, eObool_t match, eObrd_info_t *detected);
+extern eOresult_t eo_candiscovery2_OneBoardIsFound(EOtheCANdiscovery2 *p, eObrd_canlocation_t loc, eObool_t match, eObrd_info_t *detected);
 
 // call it regularly inside the control-loop or upon event received by the configurator task.
 

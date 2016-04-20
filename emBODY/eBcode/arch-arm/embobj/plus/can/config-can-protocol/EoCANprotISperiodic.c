@@ -164,11 +164,11 @@ extern eOresult_t eocanprotINperiodic_parser_PER_IS_MSG__DIGITAL_ACCELEROMETER(e
 //{
 //    void * ret = NULL;
 //    uint8_t ii = 0;
-//    eOcanmap_location_t loc = {0};
+//    eObrd_canlocation_t loc = {0};
 //    
 //    loc.port = port;
 //    loc.addr = EOCANPROT_FRAME_GET_SOURCE(frame);    
-//    loc.insideindex = eocanmap_insideindex_none;
+//    loc.insideindex = eobrd_caninsideindex_none;
 //    
 //    ii = eo_canmap_GetEntityIndexExtraCheck(eo_canmap_GetHandle(), loc, endpoint, entity);
 //    if(EOK_uint08dummy == ii)

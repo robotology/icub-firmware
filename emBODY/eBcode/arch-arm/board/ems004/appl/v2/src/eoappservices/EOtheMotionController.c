@@ -213,7 +213,7 @@ extern EOtheMotionController* eo_motioncontrol_Initialise(void)
     
     // up to to 12 mc4 OR upto 4 foc (the MAIS is managed directly by the EOtheMAIS object)
     //#warning CHECK: we could use only 3 mc4 boards instead of 12 in candiscovery. shall we do it?
-    p->sharedcan.boardproperties = eo_vector_New(sizeof(eOcanmap_board_properties_t), eo_motcon_maxJOMOs, NULL, NULL, NULL, NULL);
+    p->sharedcan.boardproperties = eo_vector_New(sizeof(eObrd_canproperties_t), eo_motcon_maxJOMOs, NULL, NULL, NULL, NULL);
     
     // up to 12 jomos
     p->sharedcan.entitydescriptor = eo_vector_New(sizeof(eOcanmap_entitydescriptor_t), eo_motcon_maxJOMOs, NULL, NULL, NULL, NULL);
@@ -628,7 +628,7 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
             {
                 const eOmn_serv_jomo_descriptor_t *jomodes = (eOmn_serv_jomo_descriptor_t*) eo_constarray_At(carray, i);
                 
-                eOcanmap_board_properties_t prop = {0};
+                eObrd_canproperties_t prop = {0};
                 
                 prop.type = eobrd_cantype_foc;
                 prop.location.port = jomodes->actuator.foc.canloc.port;
@@ -705,7 +705,7 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
             // now... use the servcfg
             uint8_t i = 0;
           
-            eOcanmap_board_properties_t prop = {0};
+            eObrd_canproperties_t prop = {0};
             const eObrd_canlocation_t *canloc = NULL;
             
             // load the can mapping for the 12 boards ... (only mc4 boards as teh mais was added bt eo_mais_Activate()
@@ -2308,7 +2308,7 @@ static eOresult_t s_eo_motioncontrol_SetCurrentSetpoint(EOtheMotionController *p
     uint8_t i=0;
     for(i=0; i<p->numofjomos; i++)
     {
-        eOcanmap_location_t loc = {0};
+        eObrd_canlocation_t loc = {0};
         // search the address of motor i-th and fill the pwmValues[] in relevant position.
         if(eores_OK == eo_canmap_GetEntityLocation(eo_canmap_GetHandle(), eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, i, 0), &loc, NULL, NULL))
         {
@@ -2326,10 +2326,10 @@ static eOresult_t s_eo_motioncontrol_SetCurrentSetpoint(EOtheMotionController *p
     command.type  = ICUBCANPROTO_PER_MC_MSG__EMSTO2FOC_DESIRED_CURRENT;
     command.value = &pwmValues[0];
     
-    eOcanmap_location_t location = {0};
+    eObrd_canlocation_t location = {0};
     location.port = port;
     location.addr = 0; // marco.accame: we put 0 just because it is periodic and this is the source address (the EMS has can address 0).
-    location.insideindex = eocanmap_insideindex_first; // because all 2foc have motor on index-0. 
+    location.insideindex = eobrd_caninsideindex_first; // because all 2foc have motor on index-0. 
 
     // and i send the command
     return(eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), &command, location));   
