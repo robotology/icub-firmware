@@ -13,9 +13,7 @@
 #include "Pid.h"
 
 #include "JointSet.h"
-
-#include "hal_led.h"
-#include "hal_adc.h"
+#include "Calibrators.h"
 
 #define CALIB_TYPE_6_POS_TRHESHOLD 546 //546=3 degree //91.02f // = 0.5 degree
 
@@ -457,6 +455,14 @@ void JointSet_set_interaction_mode(JointSet* o, eOmc_interactionmode_t interacti
 //////////////////////////////////////////////////////////////////////////
 // statics
 
+static void JointSet_manage_cable_constraint(JointSet* o)
+{
+    for (int js=0; js<*(o->pN); ++js)
+    {
+        Joint_manage_cable_constraint(o->joint+o->joints_of_set[js]);
+    }
+}
+
 static void JointSet_manage_trifid_constraint(JointSet* o)
 {
     int j0 = o->joints_of_set[0];
@@ -632,6 +638,10 @@ static void JointSet_do_pwm_control(JointSet* o)
     {
         case TRIFID_CONSTRAINT:
             JointSet_manage_trifid_constraint(o);
+            break;
+        
+        case CER_HAND_CONSTRAINT:
+            JointSet_manage_cable_constraint(o);
             break;
         
         default:
@@ -1346,6 +1356,7 @@ static BOOL JointSet_do_wait_calibration_10(JointSet* o)
     return calibrated;
 }
 
+
 static void JointSet_do_wait_calibration(JointSet* o)
 {
     int N = *(o->pN);
@@ -1384,7 +1395,7 @@ static void JointSet_do_wait_calibration(JointSet* o)
             break;
         
         case eomc_calibration_type11_cer_hands:
-            o->is_calibrated = JointSet_do_wait_calibration_3(o);
+            o->is_calibrated = JointSet_do_wait_calibration_11(o);
             break;
         
         default:
@@ -1765,16 +1776,22 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
         }
         
         case eomc_calibration_type11_cer_hands:
-        {
-            hal_led_off(hal_led0);
-            hal_led_off(hal_led1);
-            hal_led_off(hal_led2);
-            hal_led_off(hal_led3);
-            
+        {   
             AbsEncoder* enc = o->absEncoder + 2*e;
             AbsEncoder_calibrate(enc  , calibrator->params.type11.offset0, calibrator->params.type11.calibrationZero);
             AbsEncoder_calibrate(enc+1, calibrator->params.type11.offset1, calibrator->params.type11.calibrationZero);
+            
+            JointSet_do_odometry(o);
+            
             Motor_calibrate_withOffset(o->motor+e, 0);
+            
+            o->joint[e].cable_calib.pwm         = calibrator->params.type11.pwm;
+            o->joint[e].cable_calib.cable_range = calibrator->params.type11.cable_range;
+            o->joint[e].cable_calib.target      = o->joint[e].pos_fbk + calibrator->params.type11.delta;
+            
+            if (o->joint[e].cable_calib.target > o->joint[e].pos_max) o->joint[e].cable_calib.target = o->joint[e].pos_max;  
+            if (o->joint[e].cable_calib.target < o->joint[e].pos_min) o->joint[e].cable_calib.target = o->joint[e].pos_min;
+            
             o->calibration_in_progress = (eOmc_calibration_type_t)calibrator->type;
             break;
         }

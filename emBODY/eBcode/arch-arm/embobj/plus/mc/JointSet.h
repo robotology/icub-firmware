@@ -10,16 +10,9 @@
 #include "AbsEncoder.h"
 #include "Pid.h"
 
+#include "CalibrationHelperData.h"
+
 #include "hal_led.h"
-
-typedef struct // TripodCalib
-{
-    int32_t pwm;
-    int32_t zero;
-    int32_t max_delta;
-    int32_t start_pos[3];
-
-} TripodCalib;
 
 
 typedef struct // JointSet

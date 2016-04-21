@@ -356,7 +356,32 @@ void Joint_set_limits(Joint* o, CTRL_UNITS pos_min, CTRL_UNITS pos_max)
     Trajectory_config_limits(&o->trajectory, pos_min, pos_max, 0.0f, 0.0f);
 }
 
-//#include "hal_led.h"
+void Joint_manage_cable_constraint(Joint* o)
+{
+    if (o->pos_fbk > o->cable_constr.last_joint_closing_pos)
+    {
+        o->cable_constr.last_joint_closing_pos = o->pos_fbk;
+        o->cable_constr.last_motor_closing_pos = o->pos_fbk_from_motors;
+    }
+    else
+    {
+        if (o->output*o->posPID.Kp < ZERO) // going back
+        {
+            int32_t motor_back = o->cable_constr.last_motor_closing_pos - o->pos_fbk_from_motors;
+            int32_t joint_back = o->cable_constr.last_joint_closing_pos - o->pos_fbk;
+
+            if (motor_back - joint_back > 8192) // 45 deg
+            {
+                o->output = ZERO;
+            }
+        }
+    }
+    
+    if (o->pos_fbk_from_motors < o->cable_constr.motor_pos_min || o->pos_fbk_from_motors > o->cable_constr.motor_pos_max)
+    {
+        o->output = ZERO;
+    }
+}
 
 CTRL_UNITS Joint_do_pwm_control(Joint* o)
 {
@@ -433,7 +458,14 @@ CTRL_UNITS Joint_do_pwm_control(Joint* o)
             {
                 o->trq_err = o->trq_ref = ZERO;
                 
-                o->output = PID_do_out(&o->posPID, o->pos_err);
+                if ((o->pos_min != o->pos_max) && ((o->pos_fbk < o->pos_min - POS_LIMIT_MARGIN) || (o->pos_fbk > o->pos_max + POS_LIMIT_MARGIN))) 
+                {
+                    o->output = ZERO;
+                }
+                else
+                {
+                    o->output = PID_do_out(&o->posPID, o->pos_err);
+                }
             }
             else
             {

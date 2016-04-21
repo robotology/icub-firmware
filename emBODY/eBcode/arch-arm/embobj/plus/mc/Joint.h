@@ -9,6 +9,8 @@
 #include "Trajectory.h"
 #include "WatchDog.h"
 
+#include "CalibrationHelperData.h"
+
 typedef union
 {
     struct
@@ -18,6 +20,7 @@ typedef union
         
     uint8_t bitmask;
 } JointFaultState;
+
 
 typedef enum
 {
@@ -53,6 +56,15 @@ typedef struct
     calibtype7_states state;
     int32_t computedZero; 
 } jointCalibType7Data;
+
+typedef struct
+{
+    int32_t motor_pos_min;
+    int32_t motor_pos_max;
+    int32_t last_motor_closing_pos;
+    int32_t last_joint_closing_pos;
+} CableConstraintData;
+
 
 typedef struct // Joint
 {
@@ -114,6 +126,9 @@ typedef struct // Joint
     BOOL trq_control_active;
     BOOL CAN_DO_TRQ_CTRL;
     
+    CableConstraintData cable_constr;
+    CableCalib          cable_calib;  
+    
     JointFaultState fault_state_prec;
     JointFaultState fault_state;
     uint16_t diagnostics_refresh;
@@ -142,6 +157,8 @@ extern int8_t Joint_check_limits(Joint* o);
 extern int8_t Joint_pushing_limit(Joint* o);
 
 extern void Joint_set_limits(Joint* o, CTRL_UNITS pos_min, CTRL_UNITS pos_max);
+
+extern void Joint_manage_cable_constraint(Joint* o);
 
 extern CTRL_UNITS Joint_do_pwm_control(Joint* o);
 extern CTRL_UNITS Joint_do_vel_control(Joint* o);
