@@ -1005,8 +1005,65 @@ static BOOL JointSet_do_wait_calibration_6(JointSet* o)
 //    return FALSE;
 }
 
+static BOOL JointSet_do_wait_calibration_7(JointSet* o)
+{
+    
+    /* When i'm here i sure that:
+       - state = calibtype7_st_jntEncResComputed
+       - this set has only one joint */
+    
+    BOOL calibrationCompleted = FALSE;
+    
+    Joint *j = o->joint+o->joints_of_set[0];
+    Motor* m = o->motor+o->motors_of_set[0];
+    switch(j->calib_type7_data.state)
+    {
+        case calibtype7_st_jntEncResComputed:
+        {
+            AbsEncoder_calibrate(o->absEncoder+j->ID, 0, j->calib_type7_data.computedZero);
+            j->calib_type7_data.state = calibtype7_st_finished;
+        }    
+        break;
+        
+        case calibtype7_st_finished:
+        {
+            
+            int32_t curr_pos = AbsEncoder_position(o->absEncoder+j->ID);
+            if((curr_pos > j->pos_max+CALIB_TYPE_6_POS_TRHESHOLD) || (curr_pos < j->pos_min-CALIB_TYPE_6_POS_TRHESHOLD))
+            {
+                //clean calibration and set hardware fault
+                o->calibration_in_progress = eomc_calibration_typeUndefined;
+                o->control_mode = eomc_controlmode_hwFault;
+                j->control_mode = eomc_controlmode_hwFault;
+                j->calib_type6_data.is_active = FALSE;
+                Motor_set_idle(m);
 
-/*
+                char info[80];
+                sprintf(info,"outLim: cp%d mx%d mn%d",curr_pos, j->pos_max, j->pos_min);
+                //send_diagnostic_debugmessage(eo_errortype_debug, eoerror_value_DEB_tag01, jxx, 0, 0, info);
+                eOerrmanDescriptor_t errdes = {0};
+
+                errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
+                errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+                errdes.sourceaddress    = j->ID;
+                errdes.par16            = 0;
+                errdes.par64            = 0;
+                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, info, NULL, &errdes);
+
+                return(calibrationCompleted);
+            
+            }
+            else
+            {
+                calibrationCompleted = TRUE;
+            }
+         }    
+        break;
+    }
+    return(calibrationCompleted);
+
+}
+
 
 static BOOL JointSet_do_wait_calibration_8(JointSet* o)
 {
@@ -1309,6 +1366,10 @@ static void JointSet_do_wait_calibration(JointSet* o)
         case eomc_calibration_type6_mais:
             o->is_calibrated = JointSet_do_wait_calibration_6(o);
             break;
+        
+        case eomc_calibration_type7_hall_sensor:
+            o->is_calibrated = JointSet_do_wait_calibration_7(o);
+            break;
 
         case eomc_calibration_type8_tripod_internal_hard_stop:
             o->is_calibrated = JointSet_do_wait_calibration_8(o);
@@ -1454,7 +1515,7 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             o->calibration_in_progress = (eOmc_calibration_type_t)calibrator->type;
             
             
-            // 2) calculate new joint encoder factor and param_zero
+            // 3) calculate new joint encoder factor and param_zero
             eOmc_joint_config_t *jconfig = &o->joint[e].eo_joint_ptr->config;
             float computedJntEncoderResolution = (float)(calibrator->params.type6.vmax - calibrator->params.type6.vmin) / (float) (jconfig->limitsofjoint.max  - jconfig->limitsofjoint.min);
             eOresult_t res = eo_appEncReader_UpdatedMaisConversionFactors(eo_appEncReader_GetHandle(), e, computedJntEncoderResolution);
@@ -1488,12 +1549,6 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             
             
             o->joint[e].calib_type6_data.state = calibtype6_st_jntEncResComputed;
-            
-            return;
-            
-            
-            
-            
             
             
 //            AbsEncoder_calibrate(o->absEncoder+e, 0, (int32_t)(calibrator->params.type6.calibrationZero+computedJntEncoderZero)); 
@@ -1545,6 +1600,121 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             
         }
 
+        case eomc_calibration_type7_hall_sensor:
+        {
+            //1) check params
+            int N = *(o->pN);
+            
+            if(N>1)
+            {
+                char info[50];
+                snprintf(info, 50, "error calib 7 can't be done on coupled joint");
+                //send_diagnostic_debugmessage(eo_errortype_debug, eoerror_value_DEB_tag01, jxx, 0, 0, info);
+                eOerrmanDescriptor_t errdes = {0};
+
+                errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
+                errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+                errdes.sourceaddress    = e;
+                errdes.par16            = 0;
+                errdes.par64            = 0;
+                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, info, NULL, &errdes);
+
+                return;
+            }
+            
+            // 2) set state
+            o->joint[e].calib_type7_data.is_active = TRUE;
+            o->joint[e].calib_type7_data.state = calibtype7_st_inited;
+            o->calibration_in_progress = (eOmc_calibration_type_t)calibrator->type;
+            
+            // 2) calculate new joint encoder factor and param_zero
+            eOmc_joint_config_t *jconfig = &o->joint[e].eo_joint_ptr->config;
+            float computedJntEncoderResolution = (float)(calibrator->params.type7.vmax - calibrator->params.type7.vmin) / (float) (jconfig->limitsofjoint.max  - jconfig->limitsofjoint.min);
+            
+            
+            //In some cases, position returned by encoder reader is bigger than 65535, therefore I need to rescale this value into range [0, 6535] in order to work with AbsEncoder object.
+            float jmin = ((float)calibrator->params.type7.vmin)/computedJntEncoderResolution;
+            float jmax = ((float)calibrator->params.type7.vmax)/computedJntEncoderResolution;
+            #define ROUND_ANGLE_IDEGREE 65535.0f
+            int32_t offset;
+            if((jmin > ROUND_ANGLE_IDEGREE) && (jmax > ROUND_ANGLE_IDEGREE))
+            {
+                offset = 65535;
+                
+            }
+            else if((jmin < ROUND_ANGLE_IDEGREE) && (jmax < ROUND_ANGLE_IDEGREE))
+            {
+                offset = 0;
+            }
+            else
+            {
+                //error 
+                char info[50];
+                snprintf(info, 50, "error calib 7 computing encoder factor");
+                eOerrmanDescriptor_t errdes = {0};
+
+                errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
+                errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+                errdes.sourceaddress    = e;
+                errdes.par16            = 0;
+                errdes.par64            = 0;
+                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, info, NULL, &errdes);
+
+                return;
+            }
+            
+            eOresult_t res = eo_appEncReader_UpdatedHallAdcOffset(eo_appEncReader_GetHandle(), e, offset);
+            if(eores_OK != res)
+            {    
+                char info[50];
+                snprintf(info, 50, "error updating HallADC offset j%d", e);
+                //send_diagnostic_debugmessage(eo_errortype_debug, eoerror_value_DEB_tag01, jxx, 0, 0, info);
+                eOerrmanDescriptor_t errdes = {0};
+
+                errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
+                errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+                errdes.sourceaddress    = e;
+                errdes.par16            = 0;
+                errdes.par64            = 0;
+                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, info, NULL, &errdes);
+                return;
+            }
+            
+            
+            
+            
+            
+            res = eo_appEncReader_UpdatedHallAdcConversionFactors(eo_appEncReader_GetHandle(), e, computedJntEncoderResolution);
+            if(eores_OK != res)
+            {    
+                char info[50];
+                snprintf(info, 50, "error updating HallADC conversion factor j%d", e);
+                //send_diagnostic_debugmessage(eo_errortype_debug, eoerror_value_DEB_tag01, jxx, 0, 0, info);
+                eOerrmanDescriptor_t errdes = {0};
+
+                errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
+                errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+                errdes.sourceaddress    = e;
+                errdes.par16            = 0;
+                errdes.par64            = 0;
+                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, info, NULL, &errdes);
+                return;
+            }
+
+            AbsEncoder_config_resolution(o->absEncoder+e, EOK_CLIP_INT32(computedJntEncoderResolution));
+            
+            //Now I need to re init absEncoder because I chenged maisConversionFactor, therefore the values returned by EOappEncoreReder are changed.
+            o->absEncoder[e].state.bits.not_initialized = TRUE;
+            
+            float computedJntEncoderZero =  (((float)calibrator->params.type7.vmin) / computedJntEncoderResolution) - ((float)(jconfig->limitsofjoint.min)) - offset;
+
+            
+            o->joint[e].calib_type7_data.computedZero = computedJntEncoderZero;
+            o->joint[e].calib_type7_data.state = calibtype7_st_jntEncResComputed;
+            
+        }
+        break;
+        
         case eomc_calibration_type8_tripod_internal_hard_stop:
         case eomc_calibration_type9_tripod_external_hard_stop:
         {

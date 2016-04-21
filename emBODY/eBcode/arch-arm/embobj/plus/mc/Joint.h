@@ -28,14 +28,31 @@ typedef enum
     calibtype6_st_finished = 4
 } calibtype6_states;
 
+ typedef struct
+ {
+     BOOL is_active;
+     CTRL_UNITS targetpos;
+     CTRL_UNITS velocity;
+     calibtype6_states state;
+     int32_t computedZero;
+ } jointCalibType6Data;
+
+
+
+
+typedef enum
+{
+    calibtype7_st_inited =0,
+    calibtype7_st_jntEncResComputed = 1,
+    calibtype7_st_finished = 2
+} calibtype7_states;
+
 typedef struct
 {
     BOOL is_active;
-    CTRL_UNITS targetpos;
-    CTRL_UNITS velocity;
-    calibtype6_states state;
+    calibtype7_states state;
     int32_t computedZero; 
-} jointCalibType6Data;
+} jointCalibType7Data;
 
 typedef struct // Joint
 {
@@ -103,6 +120,7 @@ typedef struct // Joint
     eOmc_joint_t * eo_joint_ptr; // pointer to network variable of ethernet protocol.
     
     jointCalibType6Data calib_type6_data;
+    jointCalibType7Data calib_type7_data;
     
 } Joint;
 
