@@ -16,6 +16,7 @@
 #include "Calibrators.h"
 
 #define CALIB_TYPE_6_POS_TRHESHOLD 546 //546=3 degree //91.02f // = 0.5 degree
+static void send_debug_message(char *message, uint8_t jid);
 
 JointSet* JointSet_new(uint8_t n) //
 {
@@ -781,46 +782,21 @@ static BOOL JointSet_do_wait_calibration_5(JointSet* o)
 
 static BOOL JointSet_calibType6_check_reached_pos(JointSet* o)
 {
-    int32_t N = *(o->pN);
     char info[70];
-    eOerrmanDescriptor_t errdes = {0};
-    //VALE: this doesn't work on coupled joint
-    for (int32_t k=0; k<N; ++k)
-    {
-        Joint *j = o->joint+o->joints_of_set[k];
-        int32_t t_ref_pos = Trajectory_get_pos_ref(&j->trajectory);
-        int32_t t_ref_vel = Trajectory_get_vel_ref(&j->trajectory);
-        
-        
-        CTRL_UNITS delta = j->calib_type6_data.targetpos - j->pos_fbk;
-        
-        
-        snprintf(info, 70, "e=%.1f rp=%d rv=%d d=%.1f", j->pos_err, t_ref_pos, t_ref_vel, delta);
-        errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
-        errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-        errdes.sourceaddress    = j->ID;
-        errdes.par16            = 0;
-        errdes.par64            = 0;
-        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, info, NULL, &errdes);
-        
-        
-        
-        
-//        int8_t limitExceded = Joint_check_limits(j);
-//        if(limitExceded != 0)
-//        {
-//            snprintf(info, 70, "limit reached e=%.1f lim%d", j->pos_err, limitExceded);
-//            errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
-//            errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-//            errdes.sourceaddress    = j->ID;
-//            errdes.par16            = 0;
-//            errdes.par64            = 0;
-//            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, info, NULL, &errdes);
-//            return TRUE;
-//        }
-        if( (delta>CALIB_TYPE_6_POS_TRHESHOLD ) || (delta<-CALIB_TYPE_6_POS_TRHESHOLD ) )
-            return FALSE;
-    }
+
+    Joint *j = o->joint+o->joints_of_set[0];
+    
+    CTRL_UNITS delta = j->calib_type6_data.targetpos - j->pos_fbk;
+    
+    ///// debug code
+    int32_t t_ref_pos = Trajectory_get_pos_ref(&j->trajectory);
+    int32_t t_ref_vel = Trajectory_get_vel_ref(&j->trajectory);
+    snprintf(info, 70, "e=%.1f rp=%d rv=%d d=%.1f", j->pos_err, t_ref_pos, t_ref_vel, delta);
+    send_debug_message(info, j->ID);
+    ///// debug code end
+    
+    if( (delta>CALIB_TYPE_6_POS_TRHESHOLD ) || (delta<-CALIB_TYPE_6_POS_TRHESHOLD ) )
+        return FALSE;
     
     return TRUE;
 }
@@ -832,187 +808,126 @@ static BOOL JointSet_do_wait_calibration_6(JointSet* o)
        - this set has only one joint */
     
     BOOL calibrationCompleted = FALSE;
-    int N = *(o->pN);
     
-    if(TRUE == o->external_fault) //==> non posso calibrarmi col fault premuto
+    if(TRUE == o->external_fault) //==> if ext fault is pressed calibration cannlt continue
         return FALSE;
     
+    Joint *j = o->joint+o->joints_of_set[0];
+    Motor* m = o->motor+o->motors_of_set[0];
     
-    for (int k=0; k<N; ++k) //this is useless, but...
+    switch(j->calib_type6_data.state)
     {
-        Joint *j = o->joint+o->joints_of_set[k];
-        Motor* m = o->motor+o->motors_of_set[k];
-        switch(j->calib_type6_data.state)
+        case calibtype6_st_jntEncResComputed:
         {
-            case calibtype6_st_jntEncResComputed:
+            AbsEncoder_calibrate(o->absEncoder+j->ID, 0, j->calib_type6_data.computedZero);
+            j->calib_type6_data.state = calibtype6_st_absEncoderCalibrated;
+        }    
+        break;
+        
+        case calibtype6_st_absEncoderCalibrated:
+        {
+            //if the current position (computed with calib param of abs encoder) is out of limits range, I'll put joint in fault
+            int32_t curr_pos = AbsEncoder_position(o->absEncoder+j->ID);
+            if((curr_pos > j->pos_max+CALIB_TYPE_6_POS_TRHESHOLD) || (curr_pos < j->pos_min-CALIB_TYPE_6_POS_TRHESHOLD))
             {
-                AbsEncoder_calibrate(o->absEncoder+j->ID, 0, j->calib_type6_data.computedZero);
-                j->calib_type6_data.state = calibtype6_st_absEncoderCalibrated;
-            }    
-            break;
-            
-            case calibtype6_st_absEncoderCalibrated:
-            {
-                
-                int32_t curr_pos = AbsEncoder_position(o->absEncoder+j->ID);
-                if((curr_pos > j->pos_max+CALIB_TYPE_6_POS_TRHESHOLD) || (curr_pos < j->pos_min-CALIB_TYPE_6_POS_TRHESHOLD))
-                {
-                    //clean calibration and set hardware fault
-                    o->calibration_in_progress = eomc_calibration_typeUndefined;
-                    o->control_mode = eomc_controlmode_hwFault;
-                    j->control_mode = eomc_controlmode_hwFault;
-                    j->calib_type6_data.is_active = FALSE;
-                    Motor_set_idle(m);
+                //clean calibration and set hardware fault
+                o->calibration_in_progress = eomc_calibration_typeUndefined;
+                o->control_mode = eomc_controlmode_hwFault;
+                j->control_mode = eomc_controlmode_hwFault;
+                j->calib_type6_data.is_active = FALSE;
+                Motor_set_idle(m);
 
-                    char info[80];
-                    sprintf(info,"outLim: cp%d mx%d mn%d",curr_pos, j->pos_max, j->pos_min);
-                    //send_diagnostic_debugmessage(eo_errortype_debug, eoerror_value_DEB_tag01, jxx, 0, 0, info);
-                    eOerrmanDescriptor_t errdes = {0};
+                char info[80];
+                sprintf(info,"outLim: cp%d mx%.1f mn%.1f",curr_pos, j->pos_max, j->pos_min);
+                send_debug_message(info, j->ID);
 
-                    errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
-                    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-                    errdes.sourceaddress    = j->ID;
-                    errdes.par16            = 0;
-                    errdes.par64            = 0;
-                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, info, NULL, &errdes);
-
-                    return(calibrationCompleted);
-                
-                }
-                                
-                Motor_motion_reset(m);
-                Joint_motion_reset(j);
-
-                JointSet_set_interaction_mode(o, eOmc_interactionmode_stiff);
-
-                Motor_set_run(m);
-
-                BOOL ret = Joint_set_pos_ref_in_calibType6(j, j->calib_type6_data.targetpos, j->calib_type6_data.velocity);
-
-                
-                if(!ret)
-                {
-                    //clean calibration and set hardware fault
-                    o->calibration_in_progress = eomc_calibration_typeUndefined;
-                    o->control_mode = eomc_controlmode_hwFault;
-                    j->control_mode = eomc_controlmode_hwFault;
-                    j->calib_type6_data.is_active = FALSE;
-                    Motor_set_idle(m);
-
-                    char info[50];
-                    snprintf(info, 50,"error in Joint_set_pos_ref_in_calibType6");
-                    //send_diagnostic_debugmessage(eo_errortype_debug, eoerror_value_DEB_tag01, jxx, 0, 0, info);
-                    eOerrmanDescriptor_t errdes = {0};
-
-                    errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
-                    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-                    errdes.sourceaddress    = j->ID;
-                    errdes.par16            = 0;
-                    errdes.par64            = 0;
-                    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, info, NULL, &errdes);
-
-                    return(calibrationCompleted);
-                }
-                
-                char info[70];
-                snprintf(info, 70, "init traj: cpos=%.2f target=%.2f lim%.2f %.2f", j->pos_fbk, j->calib_type6_data.targetpos, j->pos_max, j->pos_min);
-                //send_diagnostic_debugmessage(eo_errortype_debug, eoerror_value_DEB_tag01, jxx, 0, 0, info);
-                eOerrmanDescriptor_t errdes = {0};
-
-                errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
-                errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-                errdes.sourceaddress    = j->ID;
-                errdes.par16            = 0;
-                errdes.par64            = 0;
-                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, info, NULL, &errdes);
-                
-                j->calib_type6_data.state = calibtype6_st_trajectoryStarted;
-            }    
-            break;
-            
-            case calibtype6_st_trajectoryStarted:
-            {
-                static uint8_t limit_reached_count = 0;
-                
-                JointSet_do_pwm_control(o);
-                
-                if(JointSet_calibType6_check_reached_pos(o))
-                {
-                    j->calib_type6_data.state = calibtype6_st_finished;
-                    j->calib_type6_data.is_active = FALSE;
-                    calibrationCompleted = TRUE;
-                    
-                    Motor_calibrate_withOffset(m, m->pos_fbk);//the offset is the current position
-                }
-                else
-                {
-                    //qui verifico di non allontanarmi dal target
-                    int8_t limitExceded = Joint_check_limits(j);
-                    if(limitExceded != 0)
-                    {
-                        limit_reached_count++;
-                    }
-                    else
-                    {
-                        limit_reached_count = 0;
-                    }
-                
-                    if(limit_reached_count>20)
-                    {
-                        //clean calibration and set hardware fault
-                        o->calibration_in_progress = eomc_calibration_typeUndefined;
-                        o->control_mode = eomc_controlmode_hwFault;
-                        j->control_mode = eomc_controlmode_hwFault;
-                        j->calib_type6_data.is_active = FALSE;
-                        Motor_set_idle(m);
-
-                        char info [70];
-                        eOerrmanDescriptor_t errdes = {0};
-                        snprintf(info, 70, "limit reached e=%.1f lim%d", j->pos_err, limitExceded);
-                        errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
-                        errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-                        errdes.sourceaddress    = j->ID;
-                        errdes.par16            = 0;
-                        errdes.par64            = 0;
-                        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, info, NULL, &errdes);
-                    
-                    }
-                }
+                return(calibrationCompleted);
             }
-            break;
-    
+                            
+            Motor_motion_reset(m);
+            Joint_motion_reset(j);
+
+            JointSet_set_interaction_mode(o, eOmc_interactionmode_stiff);
+
+            Motor_set_run(m);
+
+            BOOL ret = Joint_set_pos_ref_in_calibType6(j, j->calib_type6_data.targetpos, j->calib_type6_data.velocity);
+            if(!ret)
+            {
+                //clean calibration and set hardware fault
+                o->calibration_in_progress = eomc_calibration_typeUndefined;
+                o->control_mode = eomc_controlmode_hwFault;
+                j->control_mode = eomc_controlmode_hwFault;
+                j->calib_type6_data.is_active = FALSE;
+                Motor_set_idle(m);
+
+                char info[50];
+                snprintf(info, 50,"error in Joint_set_pos_ref_in_calibType6");
+                send_debug_message(info, j->ID);
+
+                return(calibrationCompleted);
+            }
+            
+            ///// debug code
+            char info[70];
+            snprintf(info, 70, "init traj: cpos=%.2f target=%.2f lim%.2f %.2f", j->pos_fbk, j->calib_type6_data.targetpos, j->pos_max, j->pos_min);
+            send_debug_message(info, j->ID);
+            //// debug code ended
+            
+            j->calib_type6_data.state = calibtype6_st_trajectoryStarted;
+        }    
+        break;
+        
+        case calibtype6_st_trajectoryStarted:
+        {
+//            static uint8_t limit_reached_count = 0;
+            
+            JointSet_do_pwm_control(o);
+            
+            if(JointSet_calibType6_check_reached_pos(o))
+            {
+                j->calib_type6_data.state = calibtype6_st_finished;
+                j->calib_type6_data.is_active = FALSE;
+                calibrationCompleted = TRUE;
+                
+                Motor_calibrate_withOffset(m, m->pos_fbk);//the offset is the current position
+            }
+//            else
+//            {
+//                // here i would to check if joint didn't reach the other limits, that is joint is going in opposite way
+//                int8_t limitExceded = Joint_check_limits(j);
+//                if(limitExceded != 0)
+//                {
+//                    limit_reached_count++;
+//                }
+//                else
+//                {
+//                    limit_reached_count = 0;
+//                }
+//            
+//                if(limit_reached_count>50)
+//                {
+//                    //clean calibration and set hardware fault
+//                    o->calibration_in_progress = eomc_calibration_typeUndefined;
+//                    o->control_mode = eomc_controlmode_hwFault;
+//                    j->control_mode = eomc_controlmode_hwFault;
+//                    j->calib_type6_data.is_active = FALSE;
+//                    Motor_set_idle(m);
+
+//                    //// debug code
+//                    char info [70];
+//                    snprintf(info, 70, "limit reached e=%.1f lim%d", j->pos_err, limitExceded);
+//                    send_debug_message(info, j->ID);
+//                    ////debug code ended
+//                }
+//            }
         }
+        break;
+
     }
+
     return(calibrationCompleted);
 
-    
-    
-    
-    
-    //   /*quando arrivo qua mi aspetto di avere resettato il pid e inizializzata la traiettoria*/
-//    //mi devo assicurare di non avere il torque attivo
-//    
-//    if(TRUE == o->external_fault) //==> non posso calibrarmi col fault premuto
-//        return FALSE;
-//    
-//    if(JointSet_calibType6_check_reached_pos(o))
-//    {
-//        int N = *(o->pN);
-//        //fai i reset necessari
-//        for (int k=0; k<N; ++k)
-//        {
-//            Joint *j = o->joint+o->joints_of_set[k];
-//            
-//            //JointSet_set_interaction_mode(o, eOmc_interactionmode_stiff); l'ho gia impostato su ricezione del comando di calibarzione
-
-//            j->calib_type6_data.is_active = FALSE;
-//        }
-//        return (TRUE);
-//    }
-//        
-//    JointSet_do_pwm_control(o);
-    
-//    return FALSE;
 }
 
 static BOOL JointSet_do_wait_calibration_7(JointSet* o)
@@ -1037,7 +952,6 @@ static BOOL JointSet_do_wait_calibration_7(JointSet* o)
         
         case calibtype7_st_finished:
         {
-            
             int32_t curr_pos = AbsEncoder_position(o->absEncoder+j->ID);
             if((curr_pos > j->pos_max+CALIB_TYPE_6_POS_TRHESHOLD) || (curr_pos < j->pos_min-CALIB_TYPE_6_POS_TRHESHOLD))
             {
@@ -1048,17 +962,11 @@ static BOOL JointSet_do_wait_calibration_7(JointSet* o)
                 j->calib_type6_data.is_active = FALSE;
                 Motor_set_idle(m);
 
+                //// debug code
                 char info[80];
-                sprintf(info,"outLim: cp%d mx%d mn%d",curr_pos, j->pos_max, j->pos_min);
-                //send_diagnostic_debugmessage(eo_errortype_debug, eoerror_value_DEB_tag01, jxx, 0, 0, info);
-                eOerrmanDescriptor_t errdes = {0};
-
-                errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
-                errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-                errdes.sourceaddress    = j->ID;
-                errdes.par16            = 0;
-                errdes.par64            = 0;
-                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, info, NULL, &errdes);
+                sprintf(info,"outLim: cp%d mx%.1f mn%.1f",curr_pos, j->pos_max, j->pos_min);
+                send_debug_message(info, j->ID);
+                ////debug code ended
 
                 return(calibrationCompleted);
             
@@ -1470,7 +1378,7 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
         
         case eomc_calibration_type6_mais:
         {
-             // 1) check params are ok
+            // 1) check params are ok
 
             CTRL_UNITS target_pos;
             
@@ -1484,18 +1392,11 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             }
             else
             {
+                ////debug code
                 char info[50];
                 snprintf(info, 50, "error type6.current=%d",calibrator->params.type6.current);
-                //send_diagnostic_debugmessage(eo_errortype_debug, eoerror_value_DEB_tag01, jxx, 0, 0, info);
-                eOerrmanDescriptor_t errdes = {0};
-
-                errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
-                errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-                errdes.sourceaddress    = e;
-                errdes.par16            = 0;
-                errdes.par64            = 0;
-                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, info, NULL, &errdes);
-
+                send_debug_message(info, e);
+                ////debug code ended
                 return;
             }
             
@@ -1503,22 +1404,15 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             
             if(N>1)
             {
+                ////debug code
                 char info[50];
                 snprintf(info, 50, "error calib 6 can't be done on coupled joint");
-                //send_diagnostic_debugmessage(eo_errortype_debug, eoerror_value_DEB_tag01, jxx, 0, 0, info);
-                eOerrmanDescriptor_t errdes = {0};
-
-                errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
-                errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-                errdes.sourceaddress    = e;
-                errdes.par16            = 0;
-                errdes.par64            = 0;
-                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, info, NULL, &errdes);
-
+                send_debug_message(info, e);
+                ////debug code ended
                 return;
             }
                 
-            //if I'm here i can perform calib type 6.
+            //if I'm here I can perform calib type 6.
             
             // 2) set state
             o->joint[e].calib_type6_data.is_active = TRUE;
@@ -1528,27 +1422,23 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             
             // 3) calculate new joint encoder factor and param_zero
             eOmc_joint_config_t *jconfig = &o->joint[e].eo_joint_ptr->config;
+           
             float computedJntEncoderResolution = (float)(calibrator->params.type6.vmax - calibrator->params.type6.vmin) / (float) (jconfig->limitsofjoint.max  - jconfig->limitsofjoint.min);
+            
             eOresult_t res = eo_appEncReader_UpdatedMaisConversionFactors(eo_appEncReader_GetHandle(), e, computedJntEncoderResolution);
             if(eores_OK != res)
             {    
+                ////debug code
                 char info[50];
                 snprintf(info, 50, "error updating Mais conversion factor j%d", e);
-                //send_diagnostic_debugmessage(eo_errortype_debug, eoerror_value_DEB_tag01, jxx, 0, 0, info);
-                eOerrmanDescriptor_t errdes = {0};
-
-                errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
-                errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-                errdes.sourceaddress    = e;
-                errdes.par16            = 0;
-                errdes.par64            = 0;
-                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, info, NULL, &errdes);
+                send_debug_message(info, e);
+                ////debug code ended
                 return;
             }
 
             AbsEncoder_config_resolution(o->absEncoder+e, EOK_CLIP_INT32(computedJntEncoderResolution));
             
-            //Now I need to re init absEncoder because I chenged maisConversionFactor, therefore the values returned by EOappEncoreReder are changed.
+            //Now I need to re-init absEncoder because I chenged maisConversionFactor, therefore the values returned by EOappEncoreReder are changed.
             o->absEncoder[e].state.bits.not_initialized = TRUE;
 
             float computedJntEncoderZero =  - (float)(jconfig->limitsofjoint.min) + ((float)(calibrator->params.type6.vmin) / computedJntEncoderResolution);
@@ -1561,54 +1451,6 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             
             o->joint[e].calib_type6_data.state = calibtype6_st_jntEncResComputed;
             
-            
-//            AbsEncoder_calibrate(o->absEncoder+e, 0, (int32_t)(calibrator->params.type6.calibrationZero+computedJntEncoderZero)); 
-
-//            // 3) start to calibrate motor encoder (it is an incremental encoder)
-
-//            o->calibration_in_progress = (eOmc_calibration_type_t)calibrator->type;
-//            BOOL ret=TRUE;
-//            int N = *(o->pN);
-//            for (int k=0; ((k<N) && (TRUE==ret)); ++k)
-//            { 
-//                Motor_motion_reset(o->motor+o->motors_of_set[k]);
-//                Joint_motion_reset(o->joint+o->joints_of_set[k]);
-
-//                o->joint[e].interaction_mode = eOmc_interactionmode_stiff;
-//                o->joint[e].calib_type6_data.is_active = TRUE;
-
-//                Motor_set_run(o->motor+o->motors_of_set[k]);
-
-//                ret = Joint_set_pos_ref_in_calibType6(o->joint+o->joints_of_set[k], target_pos, calibrator->params.type6.velocity);
-//            }
-//            
-//            if(!ret)
-//            {
-//                //clean calibration and set hardware fault
-//                o->calibration_in_progress = eomc_calibration_typeUndefined;
-//                o->control_mode = eomc_controlmode_hwFault;
-//                
-//                for (int k=0; (k<N); ++k)
-//                { 
-//                    o->joint[e].control_mode = eomc_controlmode_hwFault;
-//                    o->joint[e].calib_type6_data.is_active = FALSE;
-//                }
-//                char info[50];
-//                sprintf(info,"error in Joint_set_pos_ref_in_calibType6");
-//                //send_diagnostic_debugmessage(eo_errortype_debug, eoerror_value_DEB_tag01, jxx, 0, 0, info);
-//                eOerrmanDescriptor_t errdes = {0};
-
-//                errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
-//                errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-//                errdes.sourceaddress    = e;
-//                errdes.par16            = 0;
-//                errdes.par64            = 0;
-//                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, info, NULL, &errdes);
-
-//                return;
-//            }
-            
-            
         }
 
         case eomc_calibration_type7_hall_sensor:
@@ -1618,18 +1460,11 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             
             if(N>1)
             {
+                ////debug code 
                 char info[50];
                 snprintf(info, 50, "error calib 7 can't be done on coupled joint");
-                //send_diagnostic_debugmessage(eo_errortype_debug, eoerror_value_DEB_tag01, jxx, 0, 0, info);
-                eOerrmanDescriptor_t errdes = {0};
-
-                errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
-                errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-                errdes.sourceaddress    = e;
-                errdes.par16            = 0;
-                errdes.par64            = 0;
-                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, info, NULL, &errdes);
-
+                send_debug_message(info, e);
+                ////debug code ended
                 return;
             }
             
@@ -1643,9 +1478,10 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             float computedJntEncoderResolution = (float)(calibrator->params.type7.vmax - calibrator->params.type7.vmin) / (float) (jconfig->limitsofjoint.max  - jconfig->limitsofjoint.min);
             
             
-            //In some cases, position returned by encoder reader is bigger than 65535, therefore I need to rescale this value into range [0, 6535] in order to work with AbsEncoder object.
+            //In some cases, position returned by encoder reader is bigger than 65535, therefore I need to rescale this value into range [0, 65535] in order to work with AbsEncoder object.
             float jmin = ((float)calibrator->params.type7.vmin)/computedJntEncoderResolution;
             float jmax = ((float)calibrator->params.type7.vmax)/computedJntEncoderResolution;
+            
             #define ROUND_ANGLE_IDEGREE 65535.0f
             int32_t offset;
             if((jmin > ROUND_ANGLE_IDEGREE) && (jmax > ROUND_ANGLE_IDEGREE))
@@ -1659,62 +1495,40 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             }
             else
             {
-                //error 
+                ////debug code 
                 char info[50];
                 snprintf(info, 50, "error calib 7 computing encoder factor");
-                eOerrmanDescriptor_t errdes = {0};
-
-                errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
-                errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-                errdes.sourceaddress    = e;
-                errdes.par16            = 0;
-                errdes.par64            = 0;
-                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, info, NULL, &errdes);
-
+                send_debug_message(info, e);
+                ////debug code ended
                 return;
             }
             
             eOresult_t res = eo_appEncReader_UpdatedHallAdcOffset(eo_appEncReader_GetHandle(), e, offset);
             if(eores_OK != res)
             {    
+                ////debug code 
                 char info[50];
                 snprintf(info, 50, "error updating HallADC offset j%d", e);
-                //send_diagnostic_debugmessage(eo_errortype_debug, eoerror_value_DEB_tag01, jxx, 0, 0, info);
-                eOerrmanDescriptor_t errdes = {0};
-
-                errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
-                errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-                errdes.sourceaddress    = e;
-                errdes.par16            = 0;
-                errdes.par64            = 0;
-                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, info, NULL, &errdes);
+                send_debug_message(info, e);
+                ////debug code ended
                 return;
             }
-            
-            
-            
             
             
             res = eo_appEncReader_UpdatedHallAdcConversionFactors(eo_appEncReader_GetHandle(), e, computedJntEncoderResolution);
             if(eores_OK != res)
             {    
+                ////debug code 
                 char info[50];
                 snprintf(info, 50, "error updating HallADC conversion factor j%d", e);
-                //send_diagnostic_debugmessage(eo_errortype_debug, eoerror_value_DEB_tag01, jxx, 0, 0, info);
-                eOerrmanDescriptor_t errdes = {0};
-
-                errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
-                errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-                errdes.sourceaddress    = e;
-                errdes.par16            = 0;
-                errdes.par64            = 0;
-                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, info, NULL, &errdes);
+                send_debug_message(info, e);
+                ////debug code ended
                 return;
             }
 
             AbsEncoder_config_resolution(o->absEncoder+e, EOK_CLIP_INT32(computedJntEncoderResolution));
             
-            //Now I need to re init absEncoder because I chenged maisConversionFactor, therefore the values returned by EOappEncoreReder are changed.
+            //Now I need to re init absEncoder because I chenged hallADCConversionFactor, therefore the values returned by EOappEncoreReder are changed.
             o->absEncoder[e].state.bits.not_initialized = TRUE;
             
             float computedJntEncoderZero =  (((float)calibrator->params.type7.vmin) / computedJntEncoderResolution) - ((float)(jconfig->limitsofjoint.min)) - offset;
@@ -1801,3 +1615,16 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
     }
 }
 
+static void send_debug_message(char *message, uint8_t jid)
+{
+
+    eOerrmanDescriptor_t errdes = {0};
+
+    errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
+    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+    errdes.sourceaddress    = jid;
+    errdes.par16            = 0;
+    errdes.par64            = 0;
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, message, NULL, &errdes);
+
+}

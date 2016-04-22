@@ -70,6 +70,11 @@ typedef struct
     hal_spiencoder_t        id[hal_spiencoder_maxnumber_in_stream+1]; // reading order of encoders 
 } eOappEncReader_stream_t;
 
+typedef struct 
+{
+    float   factors[eOappEncReader_jomos_maxnumberof];
+    int32_t offsets[eOappEncReader_jomos_maxnumberof];
+} eOappEncReader_hallAdc_conversionData_t;
 
 
 enum { AEAerror_NONE = 0,  AEAerror_SPI = 1, AEAerror_CRC = 2, AEAerror_CHIP = 3 }; // it goes inside each nibble of par16 
@@ -101,8 +106,7 @@ struct EOappEncReader_hid
     eOappEncReader_stream_t                 SPI_streams[hal_spiencoder_streams_number];  // SPI streams; must be coherent with what inside cfg
     eo_appEncReader_diagnostics_t           diagnostics;
     float                                   maisCoversionFactors[eOappEncReader_jomos_maxnumberof];
-    float                                   hallAdcCoversionFactors[eOappEncReader_jomos_maxnumberof];
-    int32_t                                 hallAdcOffsets[eOappEncReader_jomos_maxnumberof];
+    eOappEncReader_hallAdc_conversionData_t hallAdcConversionData;
 }; 
 
 

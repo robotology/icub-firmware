@@ -742,9 +742,6 @@ BOOL Joint_set_pos_ref_in_calibType6(Joint* o, CTRL_UNITS pos_ref, CTRL_UNITS ve
     {
         return FALSE;
     }
-    //if reference is out of limits, i'll use limit instead of pos_ref
-    //if( (pos_ref>o->pos_max) || (pos_ref<o->pos_min))
-    //    return FALSE;
     
     if(pos_ref > o->pos_max)
     {

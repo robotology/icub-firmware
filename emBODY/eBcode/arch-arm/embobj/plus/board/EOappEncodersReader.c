@@ -156,9 +156,11 @@ static EOappEncReader s_eo_theappencreader =
         .par16              = 0
     }
     .maisCoversionFactors   = {1.0, 1.0, 1.0, 1.0},
-    .hallAdcCoversionFactors= {1.0, 1.0, 1.0, 1.0},
-    .hallAdcOffsets         = {0,   0,   0,   0}
-
+    .hallAdcConversionData  = 
+    {
+        .offsets            = {0,   0,   0,   0},
+        .factors            = {1.0, 1.0, 1.0, 1.0}
+    }
 };
 
 
@@ -321,7 +323,7 @@ extern eOresult_t eo_appEncReader_UpdatedHallAdcConversionFactors(EOappEncReader
         return(eores_NOK_unsupported);
     }
     
-    p->hallAdcCoversionFactors[jomo] = convFactor;
+    p->hallAdcConversionData.factors[jomo] = convFactor;
     
     return(eores_OK);
 }
@@ -341,7 +343,7 @@ extern eOresult_t eo_appEncReader_UpdatedHallAdcOffset(EOappEncReader *p, uint8_
         return(eores_NOK_unsupported);
     }
     
-    p->hallAdcOffsets[jomo] = offset;
+    p->hallAdcConversionData.offsets[jomo] = offset;
     
     return(eores_OK);
 }
@@ -1247,7 +1249,7 @@ static uint32_t s_eo_appEncReader_hallAdc_rescale2icubdegrees(EOappEncReader* p,
 {
     uint32_t retval = val_raw;
     
-    float divider = p->hallAdcCoversionFactors[jomo];
+    float divider = p->hallAdcConversionData.factors[jomo];
     
     if(0.0f == divider)
     {
@@ -1261,7 +1263,7 @@ static uint32_t s_eo_appEncReader_hallAdc_rescale2icubdegrees(EOappEncReader* p,
 
     
     retval = (float)retval / divider;
-    retval -=p->hallAdcOffsets[jomo];
+    retval -=p->hallAdcConversionData.offsets[jomo];
     
     return(retval);
 }
