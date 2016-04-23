@@ -496,6 +496,8 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
             o->j2s[k] = o->m2s[k] = k;
             
             //o->multi_encs[k] = 2;
+            
+            o->jointSet[k].special_constraint = CER_HAND_CONSTRAINT;
         }
         
         break;    

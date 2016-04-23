@@ -356,8 +356,10 @@ void Joint_set_limits(Joint* o, CTRL_UNITS pos_min, CTRL_UNITS pos_max)
     Trajectory_config_limits(&o->trajectory, pos_min, pos_max, 0.0f, 0.0f);
 }
 
-void Joint_manage_cable_constraint(Joint* o)
+BOOL Joint_manage_cable_constraint(Joint* o)
 {
+    BOOL opening = o->output*o->posPID.Kp < ZERO;
+    
     if (o->pos_fbk > o->cable_constr.last_joint_closing_pos)
     {
         o->cable_constr.last_joint_closing_pos = o->pos_fbk;
@@ -365,22 +367,25 @@ void Joint_manage_cable_constraint(Joint* o)
     }
     else
     {
-        if (o->output*o->posPID.Kp < ZERO) // going back
+        if (opening) // going back
         {
             int32_t motor_back = o->cable_constr.last_motor_closing_pos - o->pos_fbk_from_motors;
             int32_t joint_back = o->cable_constr.last_joint_closing_pos - o->pos_fbk;
 
-            if (motor_back - joint_back > 8192) // 45 deg
-            {
-                o->output = ZERO;
-            }
+            if (motor_back - joint_back > 3000) return TRUE;
         }
     }
     
-    if (o->pos_fbk_from_motors < o->cable_constr.motor_pos_min || o->pos_fbk_from_motors > o->cable_constr.motor_pos_max)
+    if (opening)
     {
-        o->output = ZERO;
+        if (o->pos_fbk_from_motors < o->cable_constr.motor_pos_min) return TRUE;
     }
+    else
+    {
+        if (o->pos_fbk_from_motors > o->cable_constr.motor_pos_max) return TRUE;
+    }
+    
+    return FALSE;
 }
 
 CTRL_UNITS Joint_do_pwm_control(Joint* o)

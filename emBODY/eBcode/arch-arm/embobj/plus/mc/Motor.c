@@ -698,19 +698,6 @@ void Motor_update_state_fbk(Motor* o, void* state) //
     o->not_calibrated      = o->qe_state.bits.not_calibrated;
 }
 
-void Motor_update_odometry_fbk_can(Motor* o, CanOdometry2FocMsg* can_msg) //
-{
-    WatchDog_rearm(&o->can_2FOC_alive_wdog);
-    
-    o->Iqq_fbk = can_msg->current;
-    
-    o->vel_raw_fbk = can_msg->current*1000;
-    o->vel_fbk = o->vel_raw_fbk/o->GEARBOX;
-    
-    o->pos_raw_fbk = can_msg->position;
-    o->pos_fbk = o->pos_raw_fbk/o->GEARBOX - o->pos_calib_offset;
-}
-
 void Motor_actuate(Motor* motor, uint8_t N) //
 {
     if (motor->HARDWARE_TYPE == HARDWARE_2FOC)
@@ -842,31 +829,38 @@ void Motor_get_pid_state(Motor* o, eOmc_joint_status_ofpid_t* pid_state)
 
 void Motor_get_state(Motor* o, eOmc_motor_status_t* motor_status)
 {
-    motor_status->basic.mot_position = o->pos_raw_fbk;
-    motor_status->basic.mot_velocity = o->vel_raw_fbk;
+    motor_status->basic.mot_position = o->pos_fbk;
+    motor_status->basic.mot_velocity = o->vel_fbk;
     motor_status->basic.mot_acceleration = 0; // not implemented
     motor_status->basic.mot_current  = o->Iqq_fbk;    
     motor_status->basic.mot_pwm      = o->pwm_fbk;
 }
 
+void Motor_update_odometry_fbk_can(Motor* o, CanOdometry2FocMsg* can_msg) //
+{
+    WatchDog_rearm(&o->can_2FOC_alive_wdog);
+    
+    o->Iqq_fbk = can_msg->current;
+    
+    o->vel_raw_fbk = can_msg->current*1000;
+    o->vel_fbk = o->vel_raw_fbk/o->GEARBOX;
+    
+    o->pos_raw_fbk = can_msg->position;
+    o->pos_fbk = o->pos_raw_fbk/o->GEARBOX - o->pos_calib_offset;
+}
+
 void Motor_update_pos_fbk(Motor* o, int32_t position_raw)
 {
-    int32_t position;  
-    
     o->pos_raw_fbk = position_raw;
-    position = o->pos_raw_fbk/o->GEARBOX - o->pos_calib_offset;
+    
+    int32_t pos_fbk = o->pos_raw_fbk/o->GEARBOX - o->pos_calib_offset;
       
-    //valid for init
-    if ((o->pos_fbk == 0) && (o->pos_fbk_old == 0))
-    {
-        o->pos_fbk     = position;
-        o->pos_fbk_old = position;
-        
-        return;
-    }
+    if (o->pos_fbk_old == 0) o->pos_fbk_old = pos_fbk; 
     
     //direction of movement changes depending on the sign
-    int32_t delta = o->enc_sign * (position - o->pos_fbk_old);
+    int32_t delta = o->enc_sign * (pos_fbk - o->pos_fbk_old);
+    
+    o->pos_fbk_old = pos_fbk;
     
     //normalize delta to avoid discontinuities
     while (delta < -TICKS_PER_HALF_REVOLUTION) delta += TICKS_PER_REVOLUTION;
@@ -877,9 +871,6 @@ void Motor_update_pos_fbk(Motor* o, int32_t position_raw)
     //update velocity
     o->vel_fbk = delta*CTRL_LOOP_FREQUENCY_INT;
     o->vel_raw_fbk = o->vel_fbk*o->GEARBOX;
-    
-    //update last position for next iteration
-    o->pos_fbk_old = position;
 }
 
 void Motor_update_current_fbk(Motor* o, int16_t current)

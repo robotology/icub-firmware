@@ -458,9 +458,12 @@ void JointSet_set_interaction_mode(JointSet* o, eOmc_interactionmode_t interacti
 
 static void JointSet_manage_cable_constraint(JointSet* o)
 {
-    for (int js=0; js<*(o->pN); ++js)
+    for (int k=0; k<*(o->pN); ++k)
     {
-        Joint_manage_cable_constraint(o->joint+o->joints_of_set[js]);
+        if (Joint_manage_cable_constraint(o->joint+o->joints_of_set[k]))
+        {
+            o->motor[o->motors_of_set[k]].output = 0; 
+        }
     }
 }
 
@@ -1598,6 +1601,8 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             JointSet_do_odometry(o);
             
             Motor_calibrate_withOffset(o->motor+e, 0);
+            Motor_set_run(o->motor+e);
+            Motor_uncalibrate(o->motor+e);
             
             o->joint[e].cable_calib.pwm         = calibrator->params.type11.pwm;
             o->joint[e].cable_calib.cable_range = calibrator->params.type11.cable_range;

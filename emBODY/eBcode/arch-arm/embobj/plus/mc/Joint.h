@@ -158,7 +158,7 @@ extern int8_t Joint_pushing_limit(Joint* o);
 
 extern void Joint_set_limits(Joint* o, CTRL_UNITS pos_min, CTRL_UNITS pos_max);
 
-extern void Joint_manage_cable_constraint(Joint* o);
+extern BOOL Joint_manage_cable_constraint(Joint* o);
 
 extern CTRL_UNITS Joint_do_pwm_control(Joint* o);
 extern CTRL_UNITS Joint_do_vel_control(Joint* o);

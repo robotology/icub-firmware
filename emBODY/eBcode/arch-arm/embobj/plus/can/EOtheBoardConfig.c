@@ -985,12 +985,12 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_hand =
                     },
                     .sensor         =
                     {
-                        //.type   = eomn_serv_mc_sensor_encoder_spichainof2,
-                        //.port   = eomn_serv_mc_port_mc4plus_spiP10,
-                        //.pos    = eomn_serv_mc_sensor_pos_atjoint
-                        .type   = eomn_serv_mc_sensor_none,
-                        .port   = 0, 
-                        .pos    = eomn_serv_mc_sensor_pos_none
+                        .type   = eomn_serv_mc_sensor_encoder_spichainof2,
+                        .port   = eomn_serv_mc_port_mc4plus_spiP10,
+                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                        //.type   = eomn_serv_mc_sensor_none,
+                        //.port   = 0, 
+                        //.pos    = eomn_serv_mc_sensor_pos_none
                     },
                     .extrasensor    =
                     {
@@ -1006,12 +1006,12 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_hand =
                     },
                     .sensor         =
                     {
-                        //.type   = eomn_serv_mc_sensor_encoder_spichainof2,
-                        //.port   = eomn_serv_mc_port_mc4plus_spiP11,
-                        //.pos    = eomn_serv_mc_sensor_pos_atjoint
-                        .type   = eomn_serv_mc_sensor_none,
-                        .port   = 0, 
-                        .pos    = eomn_serv_mc_sensor_pos_none
+                        .type   = eomn_serv_mc_sensor_encoder_spichainof2,
+                        .port   = eomn_serv_mc_port_mc4plus_spiP11,
+                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                        //.type   = eomn_serv_mc_sensor_none,
+                        //.port   = 0, 
+                        //.pos    = eomn_serv_mc_sensor_pos_none
                     },
                     .extrasensor    =
                     {
