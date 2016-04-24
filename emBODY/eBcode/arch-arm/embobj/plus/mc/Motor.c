@@ -166,7 +166,6 @@ void Motor_init(Motor* o) //
 
     o->can_dead = FALSE;
     o->wrong_ctrl_mode = FALSE;
-    o->external_fault = FALSE;
     
     o->fault_state_prec.bitmask = 0;
     o->fault_state.bitmask = 0;
@@ -354,7 +353,7 @@ static void Motor_check_hardstopReached(Motor *o)
 
 extern void Motor_do_calibration_hard_stop(Motor* o)
 {
-    if((0 == o->hardstop_calibdata.u.bits.iscalibrating) || (TRUE == o->external_fault))
+    if((0 == o->hardstop_calibdata.u.bits.iscalibrating) || Motor_is_external_fault(o))
         return;
     
     Motor_check_hardstopReached(o);
@@ -471,20 +470,10 @@ BOOL Motor_check_faults(Motor* o) //
     
     BOOL can_dead        = FALSE;
     BOOL wrong_ctrl_mode = FALSE;
-    BOOL external_fault  = FALSE;
     
     if (o->HARDWARE_TYPE == HARDWARE_2FOC)
     {
-        if (o->fault_state.bits.ExternalFaultAsserted)
-        {
-            external_fault = TRUE;
-        }
-        else
-        {
-            o->external_fault = FALSE;
-        }
-        
-        if (o->control_mode == o->control_mode_req)
+        if (o->control_mode == o->control_mode_req || o->hardware_fault || o->fault_state.bits.ExternalFaultAsserted)
         {
             o->wrong_ctrl_mode = FALSE;
             
@@ -492,14 +481,11 @@ BOOL Motor_check_faults(Motor* o) //
         }
         else
         {
-            if (!(external_fault || o->hardware_fault))
+            if (WatchDog_check_expired(&o->control_mode_req_wdog))
             {
-                if (WatchDog_check_expired(&o->control_mode_req_wdog))
-                {
-                    wrong_ctrl_mode = TRUE;
+                wrong_ctrl_mode = TRUE;
                         
-                    o->hardware_fault = TRUE;
-                }    
+                o->hardware_fault = TRUE;    
             }
         }    
         
@@ -516,20 +502,26 @@ BOOL Motor_check_faults(Motor* o) //
     }
     else if (o->HARDWARE_TYPE == HARDWARE_MC4p)
     {
-        external_fault = hal_motor_externalfaulted();
+        o->fault_state.bits.ExternalFaultAsserted = hal_motor_externalfaulted();
         
-        if (o->hardware_fault || external_fault)
+        if (o->hardware_fault || o->fault_state.bits.ExternalFaultAsserted)
         {
             hal_motor_disable((hal_motor_t)o->actuatorPort);
         }
     }
     
-    if (!(o->hardware_fault || external_fault))
+    if (o->fault_state.bits.ExternalFaultAsserted)
     {
-        o->fault_state_prec.bitmask = 0;
-        o->external_fault = external_fault;
+        o->control_mode_req = icubCanProto_controlmode_idle;
+    }
+    else
+    {
+        if (!o->hardware_fault)
+        {
+            o->fault_state_prec.bitmask = 0;
 
-        return FALSE;
+            return FALSE;
+        }
     }
     
     if (++o->diagnostics_refresh > 5*CTRL_LOOP_FREQUENCY_INT)
@@ -539,15 +531,18 @@ BOOL Motor_check_faults(Motor* o) //
         
         o->can_dead = FALSE;
         o->wrong_ctrl_mode = FALSE;
-        o->external_fault = FALSE;
-        
-        //
     }
     
     if (o->fault_state_prec.bitmask != o->fault_state.bitmask)
     {
         MotorFaultState fault_state;
         fault_state.bitmask = o->fault_state.bitmask;
+        
+        if (o->fault_state.bits.ExternalFaultAsserted & !o->fault_state_prec.bits.ExternalFaultAsserted)
+        {
+            Motor_send_error(o->ID, eoerror_value_MC_motor_external_fault, 0);
+            fault_state.bits.ExternalFaultAsserted = FALSE;
+        }
         
         if (o->fault_state.bits.OverCurrentFailure && !o->fault_state_prec.bits.OverCurrentFailure)
         {
@@ -613,12 +608,6 @@ BOOL Motor_check_faults(Motor* o) //
             Motor_send_error(o->ID, eoerror_value_MC_motor_wrong_state, 0);
         }
         
-        if (external_fault && !o->external_fault)
-        {
-            Motor_send_error(o->ID, eoerror_value_MC_motor_external_fault, 0);
-            fault_state.bits.ExternalFaultAsserted = FALSE;
-        }
-        
         if (fault_state.bitmask)
         {
             Motor_send_error(o->ID, eoerror_value_MC_generic_error, fault_state.bitmask);
@@ -627,7 +616,6 @@ BOOL Motor_check_faults(Motor* o) //
         o->fault_state_prec.bitmask = o->fault_state.bitmask;
     }
     
-    o->external_fault = external_fault;
     o->wrong_ctrl_mode = wrong_ctrl_mode;
     o->can_dead = can_dead;
     
@@ -913,6 +901,11 @@ BOOL Motor_is_external_fault(Motor* o)
     return FALSE;
 }
 
+BOOL Motor_is_in_fault(Motor *o)
+{
+    return(o->hardware_fault || Motor_is_external_fault(o));
+}
+
 void Motor_reset(Motor *o)
 {
     o->pwm_fbk=ZERO;
@@ -943,10 +936,6 @@ void Motor_reset(Motor *o)
     //o->control_mode_req;
 }
 
-BOOL Motor_is_in_fault(Motor *o)
-{
-    return(o->hardware_fault || o->external_fault);
-}
 /*
 void Motor_update_temperature_fbk(Motor* o, int16_t temperature_fbk) { o->temperature_fbk = temperature_fbk; }
 void Motor_update_pos_raw_fbk(Motor* o, int32_t pos_raw_fbk) { o->pos_raw_fbk = pos_raw_fbk; }

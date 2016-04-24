@@ -311,12 +311,8 @@ void JointSet_do(JointSet* o)
     JointSet_do_odometry(o);
     JointSet_do_check_faults(o);
     
-    if (o->is_calibrated) 
-    {            
-        //JointSet_do_odometry(o);
-    
-        //JointSet_do_check_faults(o);
-    
+    if (o->is_calibrated)
+    {                
         JointSet_do_control(o);
     }
     else
