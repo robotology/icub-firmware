@@ -777,7 +777,7 @@ static eOresult_t s_eo_services_process_verifyactivate(EOtheServices *p, eOmn_se
         {
             if(eobool_true == uselocalconfig)
             {
-#define TEST_14APR16 
+#undef TEST_14APR16 
 #if defined(TEST_14APR16)        
                 config = eoboardconfig_code2motion_serv_configuration(1); // eb2
 #else
