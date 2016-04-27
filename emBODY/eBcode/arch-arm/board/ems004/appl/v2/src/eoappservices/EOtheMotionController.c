@@ -745,10 +745,10 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
             eo_canmap_ConfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, p->sharedcan.entitydescriptor); 
             eo_canmap_ConfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, p->sharedcan.entitydescriptor);        
 
-            // start the mais which was activated in s_eo_motioncontrol_onendofverify_mais()            
-            //eo_mais_Activate(eo_mais_GetHandle(), &p->mcmc4.servconfigmais);
-            eo_mais_Start(eo_mais_GetHandle());
-            eo_mais_Transmission(eo_mais_GetHandle(), eobool_true);
+//            // start the mais which was activated in s_eo_motioncontrol_onendofverify_mais()            
+//            //eo_mais_Activate(eo_mais_GetHandle(), &p->mcmc4.servconfigmais);
+//            eo_mais_Start(eo_mais_GetHandle());
+//            eo_mais_Transmission(eo_mais_GetHandle(), eobool_true);
             
             // do something with the mc4s....
             
@@ -804,14 +804,14 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
           
             p->numofjomos = numofjomos;
             
-            // if also mais, then i activate it.
-            if(eo_motcon_mode_mc4plusmais == servcfg->type)
-            {
-                // start the mais which was activated in s_eo_motioncontrol_onendofverify_mais()
-                //eo_mais_Activate(eo_mais_GetHandle(), &p->mcmc4.servconfigmais);
-                eo_mais_Start(eo_mais_GetHandle());   
-                eo_mais_Transmission(eo_mais_GetHandle(), eobool_true);                
-            }
+//            // if also mais, then i activate it.
+//            if(eo_motcon_mode_mc4plusmais == servcfg->type)
+//            {
+//                // start the mais which was activated in s_eo_motioncontrol_onendofverify_mais()
+//                //eo_mais_Activate(eo_mais_GetHandle(), &p->mcmc4.servconfigmais);
+//                eo_mais_Start(eo_mais_GetHandle());   
+//                eo_mais_Transmission(eo_mais_GetHandle(), eobool_true);                
+//            }
             
             // now... use the servcfg
             uint8_t i=0;
@@ -906,10 +906,17 @@ extern eOresult_t eo_motioncontrol_Start(EOtheMotionController *p)
     }
     else if(eo_motcon_mode_mc4 == p->service.servconfig.type)
     {
+        eo_mais_Start(eo_mais_GetHandle());
+        eo_mais_Transmission(eo_mais_GetHandle(), eobool_true);
         eo_mc4boards_BroadcastStart(eo_mc4boards_GetHandle());
     }
     else if((eo_motcon_mode_mc4plus == p->service.servconfig.type) || (eo_motcon_mode_mc4plusmais == p->service.servconfig.type))
     {
+        if(eo_motcon_mode_mc4plusmais == p->service.servconfig.type)
+        {
+            eo_mais_Start(eo_mais_GetHandle());   
+            eo_mais_Transmission(eo_mais_GetHandle(), eobool_true);                
+        }
         eo_encoderreader_StartReading(p->mcmc4plus.theencoderreader);
         s_eo_motioncontrol_mc4plusbased_enable_all_motors(p);      
     }
