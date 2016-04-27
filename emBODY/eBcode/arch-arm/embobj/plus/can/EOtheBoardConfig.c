@@ -512,7 +512,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb2_eb4 =
         .mc4version =
         {
             .firmware   = { .major = 0, .minor = 0, .build = 0 },
-            .protocol   = { .major = 0, .minor = 0 }                 
+            .protocol   = { .major = 1, .minor = 0 }                 
         },
         .mc4shifts =
         {
@@ -586,7 +586,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb2_eb4 =
             .version    =
             {
                 .firmware   = { .major = 0, .minor = 0, .build = 0 },
-                .protocol   = { .major = 0, .minor = 0 }    
+                .protocol   = { .major = 1, .minor = 0 }    
             },
             .canloc = 
             {
