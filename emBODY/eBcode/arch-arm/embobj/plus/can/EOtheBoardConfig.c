@@ -2115,7 +2115,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_1B2_2B2 =
                         .pos    = eomn_serv_mc_sensor_pos_atmotor
                     }
                 },                 
-                { // joint 1: //wrist coupled
+                { // joint 1: //wrist coupled (pitch)
                     .actuator.pwm   =
                     {   // motor 1B2M1
                         .port   = eomn_serv_mc_port_mc4plus_pwmP2,                         
@@ -2133,7 +2133,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_1B2_2B2 =
                         .pos    = eomn_serv_mc_sensor_pos_atmotor
                     }
                 },
-                { // joint 2:   //wrist coupled
+                { // joint 2:   //wrist coupled (yaw)
                     .actuator.pwm   =
                     {   // motor 1B2M2
                         .port   = eomn_serv_mc_port_mc4plus_pwmP4,                         
@@ -2151,7 +2151,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_1B2_2B2 =
                         .pos    = eomn_serv_mc_sensor_pos_atmotor
                     }
                 },                                              
-                { // joint 3:
+                { // joint 3:   finger abduction
                     .actuator.pwm   =
                     {   // motor 1B2M3
                         .port   = eomn_serv_mc_port_mc4plus_pwmP5,                      

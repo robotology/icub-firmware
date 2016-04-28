@@ -628,7 +628,68 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
     case emscontroller_board_HAND_2:                  //= 10,   //MC4plus
         break;
     case emscontroller_board_FOREARM:                 //= 11,   //MC4plus
-        break;    
+    {
+        o->nSets   = 3;
+        
+        Sjm = o->Sjm;
+        Jjm = o->Jjm;
+        Jmj = o->Jmj;
+        
+        //motor to joint
+        
+        // |j0|    | 1     0       0      0 |    |m0|
+        // |j1|  = | 0     1       0      0 |  * |m1|
+        // |j2|    | 0     1       1      0 |    |m2|
+        // |j3|    | 0     0       0      1 |    |m3|
+
+        Sjm[0][0] =  1.0f; Sjm[0][1] =  0.0f; Sjm[0][2] =  0.0f; Sjm[0][3] =  0.0f;
+        Sjm[1][0] =  0.0f; Sjm[1][1] =  1.0f; Sjm[1][2] =  1.0f; Sjm[1][3] =  0.0f;
+        Sjm[2][0] =  0.0f; Sjm[2][1] =  0.0f; Sjm[2][2] =  1.0f; Sjm[2][3] =  0.0f;
+        Sjm[3][0] =  0.0f; Sjm[3][1] =  0.0f; Sjm[3][2] =  0.0f; Sjm[3][3] =  1.0f;
+
+        for (int j=0; j<4; ++j)
+            for (int m=0; m<4; ++m)
+                Jjm[j][m] = Sjm[j][m];
+        
+
+        //inverted matrix: joint to motor
+        // |m0|    | 1     0       0      0 |    |j0|
+        // |m1|  = | 0     1       0      0 |  * |j1|
+        // |m2|    | 0    -1       1      0 |    |j2|
+        // |m3|    | 0     0       0      1 |    |j3|
+        
+        Jmj[0][0] =  1.0f; Jmj[0][1] =  0.0f; Jmj[0][2] =  0.0f; Jmj[0][3] =  0.0f;
+        Jmj[1][0] =  0.0f; Jmj[1][1] =  1.0f; Jmj[1][2] =  0.0f; Jmj[1][3] =  0.0f;
+        Jmj[2][0] =  0.0f; Jmj[2][1] = -1.0f; Jmj[2][2] =  1.0f; Jmj[2][3] =  0.0f;
+        Jmj[3][0] =  0.0f; Jmj[3][1] =  0.0f; Jmj[3][2] =  0.0f; Jmj[3][3] =  1.0f;
+        
+        
+        
+        //joint, motor, encoder to set
+        o->j2s[0] = o->m2s[0] = o->e2s[0] = 0;
+        o->j2s[1] = o->m2s[1] = o->e2s[1] = 1;
+        o->j2s[2] = o->m2s[2] = o->e2s[2] = 1;
+        o->j2s[3] = o->m2s[3] = o->e2s[3] = 2;
+        
+        for (int k=0; k<o->nJoints; ++k)
+        {
+            o->joint[k].CAN_DO_TRQ_CTRL = FALSE;
+            o->joint[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
+            o->motor[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
+        }
+        
+        o->jointSet[0].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
+        o->jointSet[0].CAN_DO_TRQ_CTRL = FALSE;
+        
+        o->jointSet[1].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
+        o->jointSet[1].CAN_DO_TRQ_CTRL = FALSE;
+        
+        o->jointSet[2].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
+        o->jointSet[2].CAN_DO_TRQ_CTRL = FALSE;
+    }    
+    
+    
+    break;    
     
     
     default:
