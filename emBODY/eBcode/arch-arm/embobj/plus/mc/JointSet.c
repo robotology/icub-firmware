@@ -1451,6 +1451,7 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             o->joint[e].calib_type6_data.state = calibtype6_st_jntEncResComputed;
             
         }
+        break;
 
         case eomc_calibration_type7_hall_sensor:
         {
