@@ -61,6 +61,7 @@ typedef struct // JointSet
     int32_t calibration_timeout;
     
     TripodCalib tripod_calib;
+    
 } JointSet;
 
 extern JointSet* JointSet_new(uint8_t n); //

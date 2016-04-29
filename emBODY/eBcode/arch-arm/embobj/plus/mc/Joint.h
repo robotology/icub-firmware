@@ -47,7 +47,8 @@ typedef enum
 {
     calibtype7_st_inited =0,
     calibtype7_st_jntEncResComputed = 1,
-    calibtype7_st_finished = 2
+    calibtype7_st_jntCheckLimits = 2,
+    calibtype7_st_finished = 3
 } calibtype7_states;
 
 typedef struct
@@ -136,6 +137,7 @@ typedef struct // Joint
     
     jointCalibType6Data calib_type6_data;
     jointCalibType7Data calib_type7_data;
+    eOmc_calibration_type_t calibration_in_progress;
     
 } Joint;
 

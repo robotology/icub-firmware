@@ -318,6 +318,7 @@ void JointSet_do(JointSet* o)
     else
     {
         JointSet_do_wait_calibration(o);
+        
     }
 }
 
@@ -504,6 +505,64 @@ static void JointSet_manage_trifid_constraint(JointSet* o)
     }
 }
 
+//static void JointSet_do_setpwm(jointSet* o)
+//{
+//    
+//    CTRL_UNITS motor_pwm_ref = ZERO;
+//    
+//    for (int ms=0; ms<N; ++ms)
+//    {
+//        int m = o->motors_of_set[ms];
+//    
+//        if (o->trq_control_active)
+//        {   
+//            if (o->Jjm)
+//            {
+//                CTRL_UNITS motor_trq_ref = ZERO;
+//                CTRL_UNITS motor_trq_fbk = ZERO;
+//            
+//                for (int js=0; js<N; ++js)
+//                {
+//                    int j = o->joints_of_set[js];
+//                
+//                    // mu = Jt Tau 
+//                    // transposed direct Jacobian
+//                    motor_trq_ref += o->Jjm[j][m]*o->joint[j].trq_ref;
+//                    motor_trq_fbk += o->Jjm[j][m]*o->joint[j].trq_fbk;
+//                }
+//                
+//                motor_pwm_ref = Motor_do_trq_control(o->motor+m, motor_trq_ref, motor_trq_fbk);
+//            }
+//            else
+//            {
+//                motor_pwm_ref = Motor_do_trq_control(o->motor+m, o->joint[m].trq_ref, o->joint[m].trq_fbk);
+//            }
+//        }
+//        else
+//        {
+//            if (o->Jmj)
+//            {
+//                motor_pwm_ref = ZERO;
+//            
+//                for (int js=0; js<N; ++js)
+//                {
+//                    int j = o->joints_of_set[js];
+//                
+//                    // inverse Jacobian
+//                    motor_pwm_ref += o->Jmj[m][j]*o->joint[j].output;
+//                }
+//            }
+//            else
+//            {
+//                motor_pwm_ref = o->joint[m].output;
+//            }
+//        }
+
+//        Motor_set_pwm_ref(o->motor+m, motor_pwm_ref);
+//    }
+
+//}
+
 static void JointSet_do_pwm_control(JointSet* o)
 {
     int N = *(o->pN);
@@ -521,6 +580,8 @@ static void JointSet_do_pwm_control(JointSet* o)
             limits_torque_protection = TRUE;
         }
     }
+    
+//    JointSet_do_setpwm(o);
     
     CTRL_UNITS motor_pwm_ref = ZERO;
     
@@ -779,12 +840,10 @@ static BOOL JointSet_do_wait_calibration_5(JointSet* o)
 }
 
 
-static BOOL JointSet_calibType6_check_reached_pos(JointSet* o)
+static BOOL JointSet_calibType6_check_reached_pos(Joint *j)
 {
     char info[70];
 
-    Joint *j = o->joint+o->joints_of_set[0];
-    
     CTRL_UNITS delta = j->calib_type6_data.targetpos - j->pos_fbk;
     
     ///// debug code
@@ -799,6 +858,234 @@ static BOOL JointSet_calibType6_check_reached_pos(JointSet* o)
     
     return TRUE;
 }
+
+//static eOresult_t JointSet_do_wait_calibration_6_singleJoint(Joint *j, Motor* m, AbsEncoder* e, BOOL* calibrationCompleted)
+static eOresult_t JointSet_do_wait_calibration_6_singleJoint(JointSet *o, int indexSet, BOOL* calibrationCompleted)
+{
+    
+    /* When i'm here i sure that:
+       - state = calibtype6_st_jntEncResComputed
+     */
+    
+    *calibrationCompleted = FALSE;   
+    //get poiter to the joint to calibrate
+    Joint* j_ptr = o->joint + o->joints_of_set[indexSet];
+    
+    //get the encoder of joint to calibrate
+    AbsEncoder* e_ptr = o->absEncoder+ o->encoders_of_set[indexSet];
+    
+    switch(j_ptr->calib_type6_data.state)
+    {
+        case calibtype6_st_jntEncResComputed:
+        {
+            AbsEncoder_calibrate(e_ptr, 0, j_ptr->calib_type6_data.computedZero);
+            j_ptr->calib_type6_data.state = calibtype6_st_absEncoderCalibrated;
+        }
+        break;
+        
+        case calibtype6_st_absEncoderCalibrated:
+        {
+            //if the current position (computed with calib param of abs encoder) is out of limits range, I'll put joint in fault
+            int32_t curr_pos = AbsEncoder_position(e_ptr);
+            if((curr_pos > j_ptr->pos_max+CALIB_TYPE_6_POS_TRHESHOLD) || (curr_pos < j_ptr->pos_min-CALIB_TYPE_6_POS_TRHESHOLD))
+            {
+                
+                j_ptr->calib_type6_data.is_active = FALSE;
+                char info[80];
+                sprintf(info,"outLim: cp%d mx%.1f mn%.1f",curr_pos, j_ptr->pos_max, j_ptr->pos_min);
+                send_debug_message(info, j_ptr->ID);
+
+                return(eores_NOK_generic);
+            }
+            
+            for (int k=0; k<*(o->pN); ++k)
+            {
+                int m = o->motors_of_set[k];
+                int j = o->joints_of_set[k];
+                Motor_motion_reset(o->motor+ m);
+                Joint_motion_reset(o->joint+ j);
+                Motor_set_run(o->motor+ m); //clear ext fault bit if it is not pressed
+            }
+        
+            if(j_ptr->control_mode == eomc_controlmode_hwFault)
+            {
+                return(eores_NOK_generic);
+            }
+            
+            BOOL ret = Joint_set_pos_ref_in_calibType6(j_ptr, j_ptr->calib_type6_data.targetpos, j_ptr->calib_type6_data.velocity);
+            if(!ret)
+            {
+                char info[50];
+                snprintf(info, 50,"error in Joint_set_pos_ref_in_calibType6");
+                send_debug_message(info, j_ptr->ID);
+
+                return(eores_NOK_generic);
+            }
+            
+            ///// debug code
+            char info[70];
+            snprintf(info, 70, "init traj: cpos=%.2f target=%.2f lim%.2f %.2f", j_ptr->pos_fbk, j_ptr->calib_type6_data.targetpos, j_ptr->pos_max, j_ptr->pos_min);
+            send_debug_message(info, j_ptr->ID);
+            //// debug code ended
+            
+            j_ptr->calib_type6_data.state = calibtype6_st_trajectoryStarted;
+        }    
+        break;
+        
+        case calibtype6_st_trajectoryStarted:
+        {
+            JointSet_do_pwm_control(o);
+            //Joint_do_pwm_control(j);//I cannot perform control on other joint
+            //JointSet_do_setpwm(o);
+           // Motor_set_pwm_ref(m, j->output);//here I don't want use coupling matrix NON VA BENE
+            
+            
+            if(JointSet_calibType6_check_reached_pos(j_ptr))
+            {
+                j_ptr->calib_type6_data.state = calibtype6_st_finished;
+                j_ptr->calib_type6_data.is_active = FALSE;
+                *calibrationCompleted = TRUE;
+                
+                Motor* m_ptr = o->motor + o->motors_of_set[indexSet];
+                Motor_calibrate_withOffset(m_ptr, m_ptr->pos_fbk);//the offset is the current position
+                
+                for (int k=0; k<*(o->pN); ++k)
+                {
+                    int m = o->motors_of_set[k];
+                    int j = o->joints_of_set[k];
+                    Motor_motion_reset(o->motor+ m);
+                    Joint_motion_reset(o->joint+ j);
+                    Motor_set_idle(o->motor+ m);
+                }
+            }
+        }
+        break;
+        
+        case calibtype6_st_finished:
+        {
+            *calibrationCompleted = TRUE;
+        }break;
+        
+        default:
+            return(eores_NOK_generic);
+
+    }
+
+    return(eores_OK);
+
+}
+
+
+static eOresult_t JointSet_do_wait_calibration_7_singleJoint(Joint *j, Motor* m, AbsEncoder* e, BOOL* calibrationCompleted)
+{
+    
+    /* When i'm here i sure that:
+       - state = calibtype7_st_jntEncResComputed
+    */
+    
+    *calibrationCompleted = FALSE;
+    
+
+    switch(j->calib_type7_data.state)
+    {
+        case calibtype7_st_jntEncResComputed:
+        {
+            AbsEncoder_calibrate(e, 0, j->calib_type7_data.computedZero);
+            j->calib_type7_data.state = calibtype7_st_jntCheckLimits;
+        }    
+        break;
+        
+        case calibtype7_st_jntCheckLimits:
+        {
+            int32_t curr_pos = AbsEncoder_position(e);
+            if((curr_pos > j->pos_max+CALIB_TYPE_6_POS_TRHESHOLD) || (curr_pos < j->pos_min-CALIB_TYPE_6_POS_TRHESHOLD))
+            {
+                //// debug code
+                char info[80];
+                sprintf(info,"outLim: cp%d mx%.1f mn%.1f",curr_pos, j->pos_max, j->pos_min);
+                send_debug_message(info, j->ID);
+                ////debug code ended
+
+                return(eores_NOK_generic);
+            
+            }
+            else
+            {
+                *calibrationCompleted = TRUE;
+                j->calib_type7_data.state = calibtype7_st_finished;
+            }
+         }    
+        break;
+        case calibtype7_st_finished:
+        {
+            *calibrationCompleted = TRUE;
+        }break;
+    }
+    return(eores_OK);
+}
+
+static BOOL JointSet_do_wait_calibration_mixed(JointSet* o)
+{
+//    if(TRUE == o->external_fault) //==> if ext fault is pressed calibration cannot continue
+//        return FALSE;
+    
+    JointSet_set_interaction_mode(o, eOmc_interactionmode_stiff);
+    
+    BOOL calibrationCompleted = TRUE;
+    eOresult_t res = eores_OK;
+    
+    for (int k=0; ( (k<*(o->pN)) && (eores_OK == res) ); ++k)
+    {
+        int m = o->motors_of_set[k];
+        int e = o->encoders_of_set[k];
+        int j = o->joints_of_set[k];
+        Joint* j_ptr = o->joint+j;
+        BOOL calibrated_single_joint = FALSE;
+        
+       switch (j_ptr->calibration_in_progress)
+       {
+        case eomc_calibration_type6_mais:
+            //res = JointSet_do_wait_calibration_6_singleJoint(j_ptr, o->motor+m, o->absEncoder+e, &calibrated_single_joint);
+            res = JointSet_do_wait_calibration_6_singleJoint(o, k, &calibrated_single_joint);
+            break;
+        
+        case eomc_calibration_type7_hall_sensor:
+            res = JointSet_do_wait_calibration_7_singleJoint(j_ptr, o->motor+m, o->absEncoder+e, &calibrated_single_joint);
+            break;
+
+        case eomc_calibration_typeUndefined:
+            res = eores_OK; //if I'm here means joint j didn't receive calib command or is already calibrated. Both cases are ok! 
+            
+            break;
+        default://If i'm here means joint has a calib type that not support calibration for single joint.
+            res = eores_NOK_generic;
+            break;
+        }
+       
+       calibrationCompleted = calibrationCompleted & calibrated_single_joint;
+
+    }//end for
+    
+    
+    if(res != eores_OK)
+    {
+        o->calibration_in_progress = eomc_calibration_typeUndefined;
+        o->control_mode = eomc_controlmode_hwFault;
+        
+        for (int k=0; k<*(o->pN); ++k)
+        {
+            Joint* j_ptr = o->joint + o->joints_of_set[k];
+            j_ptr->control_mode = eomc_controlmode_hwFault;
+            j_ptr->calibration_in_progress = eomc_calibration_typeUndefined;
+            Motor_set_idle(o->motor+o->motors_of_set[k]);
+        }
+        
+    }
+    return(calibrationCompleted);
+
+}
+
+#if 0
 static BOOL JointSet_do_wait_calibration_6(JointSet* o)
 {
     
@@ -1306,13 +1593,13 @@ static void JointSet_do_wait_calibration(JointSet* o)
             o->is_calibrated = JointSet_do_wait_calibration_5(o);
             break;
 
-        case eomc_calibration_type6_mais:
-            o->is_calibrated = JointSet_do_wait_calibration_6(o);
-            break;
-        
-        case eomc_calibration_type7_hall_sensor:
-            o->is_calibrated = JointSet_do_wait_calibration_7(o);
-            break;
+//        case eomc_calibration_type6_mais: ==> managed in mixed
+//            o->is_calibrated = JointSet_do_wait_calibration_6(o);
+//            break;
+//        
+//        case eomc_calibration_type7_hall_sensor: ==> managed in mixed
+//            o->is_calibrated = JointSet_do_wait_calibration_7(o);
+//            break;
 
         case eomc_calibration_type8_tripod_internal_hard_stop:
             o->is_calibrated = JointSet_do_wait_calibration_8(o);
@@ -1326,8 +1613,13 @@ static void JointSet_do_wait_calibration(JointSet* o)
             o->is_calibrated = JointSet_do_wait_calibration_10(o);
             break;
         
+<<<<<<< HEAD
         case eomc_calibration_type11_cer_hands:
             o->is_calibrated = JointSet_do_wait_calibration_11(o);
+=======
+        case eomc_calibration_typeMixed:
+            o->is_calibrated = JointSet_do_wait_calibration_mixed(o);
+>>>>>>> added thums abduction and proximal management as coupled joints.
             break;
         
         default:
@@ -1347,6 +1639,17 @@ static void JointSet_do_wait_calibration(JointSet* o)
     }
     
     o->calibration_in_progress = eomc_calibration_typeUndefined;
+    
+//    if(o->dependOnSet != NULL)
+//    {
+//        JointSet* theOtherSet = o->dependOnSet;
+//        if(!theOtherSet->is_calibrated)
+//            return;
+//        else
+//        {
+//            updated_matrices();
+//        }
+//    }
     
     JointSet_do_odometry(o);
     
@@ -1424,24 +1727,25 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
                 return;
             }
             
-            int N = *(o->pN);
-            
-            if(N>1)
-            {
-                ////debug code
-                char info[50];
-                snprintf(info, 50, "error calib 6 can't be done on coupled joint");
-                send_debug_message(info, e);
-                ////debug code ended
-                return;
-            }
+//            int N = *(o->pN);
+//            
+//            if(N>1)
+//            {
+//                ////debug code
+//                char info[50];
+//                snprintf(info, 50, "error calib 6 can't be done on coupled joint");
+//                send_debug_message(info, e);
+//                ////debug code ended
+//                return;
+//            }
                 
             //if I'm here I can perform calib type 6.
             
             // 2) set state
             o->joint[e].calib_type6_data.is_active = TRUE;
             o->joint[e].calib_type6_data.state = calibtype6_st_inited;
-            o->calibration_in_progress = (eOmc_calibration_type_t)calibrator->type;
+            o->joint[e].calibration_in_progress = (eOmc_calibration_type_t)calibrator->type;
+            o->calibration_in_progress = eomc_calibration_typeMixed;
             
             
             // 3) calculate new joint encoder factor and param_zero
@@ -1481,22 +1785,23 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
         case eomc_calibration_type7_hall_sensor:
         {
             //1) check params
-            int N = *(o->pN);
-            
-            if(N>1)
-            {
-                ////debug code 
-                char info[50];
-                snprintf(info, 50, "error calib 7 can't be done on coupled joint");
-                send_debug_message(info, e);
-                ////debug code ended
-                return;
-            }
+//            int N = *(o->pN);
+//            
+//            if(N>1)
+//            {
+//                ////debug code 
+//                char info[50];
+//                snprintf(info, 50, "error calib 7 can't be done on coupled joint");
+//                send_debug_message(info, e);
+//                ////debug code ended
+//                return;
+//            }
             
             // 2) set state
             o->joint[e].calib_type7_data.is_active = TRUE;
             o->joint[e].calib_type7_data.state = calibtype7_st_inited;
-            o->calibration_in_progress = (eOmc_calibration_type_t)calibrator->type;
+            o->joint[e].calibration_in_progress = (eOmc_calibration_type_t)calibrator->type;
+            o->calibration_in_progress = eomc_calibration_typeMixed;
             
             // 2) calculate new joint encoder factor and param_zero
             eOmc_joint_config_t *jconfig = &o->joint[e].eo_joint_ptr->config;

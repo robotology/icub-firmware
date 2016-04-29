@@ -95,6 +95,7 @@ void Joint_init(Joint* o)
     o->eo_joint_ptr = NULL;
     
     joint_reset_calibType6Data(o);
+    o->calibration_in_progress = eomc_calibration_typeUndefined;
     
     //SpeedController_init(o->speedController);
 }
