@@ -1602,6 +1602,7 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             Motor_uncalibrate(o->motor+e);
             
             o->joint[e].cable_calib.pwm         = calibrator->params.type11.pwm;
+            o->joint[e].cable_calib.delta       = calibrator->params.type11.delta;
             o->joint[e].cable_calib.cable_range = calibrator->params.type11.cable_range;
             o->joint[e].cable_calib.target      = o->joint[e].pos_fbk + calibrator->params.type11.delta;
             
@@ -1609,6 +1610,9 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             if (o->joint[e].cable_calib.target < o->joint[e].pos_min) o->joint[e].cable_calib.target = o->joint[e].pos_min;
             
             o->calibration_in_progress = (eOmc_calibration_type_t)calibrator->type;
+            
+            o->calibration_wait = TRUE;
+            
             break;
         }
         

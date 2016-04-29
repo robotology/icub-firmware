@@ -265,7 +265,22 @@ BOOL JointSet_do_wait_calibration_11(JointSet* o)
         
         if (pm->not_calibrated)
         {
-            if (pj->pos_fbk < pj->cable_calib.target)
+            if (o->calibration_wait)
+            {
+                if (pj->pos_fbk_from_motors > -2*pj->cable_calib.delta)
+                {
+                    Motor_set_pwm_ref(pm, -pj->cable_calib.pwm);
+                }
+                else
+                {
+                    Motor_set_pwm_ref(pm, 0);
+                    pj->cable_calib.target = pj->pos_fbk + pj->cable_calib.delta;
+                    o->calibration_wait = FALSE;
+                }
+                
+                calibrated = FALSE;
+            }
+            else if (pj->pos_fbk < pj->cable_calib.target)
             {
                 Motor_set_pwm_ref(pm, pj->cable_calib.pwm);
             

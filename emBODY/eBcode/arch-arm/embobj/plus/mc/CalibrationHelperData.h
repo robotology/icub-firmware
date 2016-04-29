@@ -15,9 +15,9 @@ typedef struct // TripodCalib
 typedef struct // CableCalib
 {
     int32_t pwm;
+    int32_t delta;
     int32_t target;
     int32_t cable_range;
-
 } CableCalib;
 
 #endif
