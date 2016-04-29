@@ -814,7 +814,8 @@ extern eOresult_t eo_skin_SetBoardsConfig(EOtheSKIN *p, uint8_t patchindex, eOsk
     p->sharedcan.command.class = eocanprot_msgclass_pollingSkin;    
     p->sharedcan.command.type  = ICUBCANPROTO_POL_SK_CMD__SET_BRD_CFG;
     p->sharedcan.command.value = &canProto_skcfg; 
-    
+//    #error --> change so that we send the command to all boards of given address .... if they are in patch....
+        
     // and now we send the p->sharedcan.command to all the skin boards
     eo_canserv_SendCommandToAllBoardsInEntity(eo_canserv_GetHandle(), &p->sharedcan.command, id32); 
     
