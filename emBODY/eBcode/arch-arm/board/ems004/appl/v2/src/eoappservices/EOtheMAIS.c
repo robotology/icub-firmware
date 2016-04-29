@@ -833,7 +833,8 @@ static eOresult_t s_eo_mais_TXstop(EOtheMAIS *p)
         return(eores_OK);
     }     
     
-    eo_mais_SetMode(p, eoas_maismode_acquirebutdonttx);
+    // marco.accame on 28apr16: i prefer to NEVER stop the tx of the mais can board to avoid the mc4 can board may go in hw fault
+    // eo_mais_SetMode(p, eoas_maismode_acquirebutdonttx);
  
     return(eores_OK);
 }
