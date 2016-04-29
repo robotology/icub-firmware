@@ -64,8 +64,6 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define TEST_RUNTIME_CONFIG
-
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -133,6 +131,9 @@ extern void eom_emsappl_hid_userdef_on_entry_CFG(EOMtheEMSappl* p)
     
     // tell the ethmonitor to alert the task of the configurator
     eo_ethmonitor_SetAlert(eo_ethmonitor_GetHandle(), eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()), emsconfigurator_evt_userdef02);
+    
+    // prefer sending a tx request just in case. because cfg state transmit only if requested an we dont want to have missed a previous request.
+    eom_task_SetEvent(eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()), emsconfigurator_evt_ropframeTx);
 }
 
 
@@ -156,21 +157,7 @@ extern void eom_emsappl_hid_userdef_on_entry_RUN(EOMtheEMSappl* p)
     // tell the ethmonitor to alert no task, because the runner will tick it now at every cycle
     eo_ethmonitor_SetAlert(eo_ethmonitor_GetHandle(), NULL, 0);
 
-    // motion-control:
-#if defined(TEST_RUNTIME_CONFIG)
-#else
-    eo_motioncontrol_Start(eo_motioncontrol_GetHandle());
-#endif
-    
-#if defined(TEST_RUNTIME_CONFIG)
-#else 
-    eo_strain_Start(eo_strain_GetHandle());     
-#endif
-
-#if defined(TEST_RUNTIME_CONFIG)
-#else 
-    eo_skin_Start(eo_skin_GetHandle());      
-#endif    
+    // we dont start services
 }
 
 
