@@ -1346,19 +1346,29 @@ extern eOresult_t eo_canprot_Form(EOtheCANprotocol *p, eOcanprot_descriptor_t *d
 static eOresult_t s_eo_canprot_parse0length(eOcanframe_t *frame, eOcanport_t port)
 {
     // the only zero-length can frames are those coming as ack sent by strain or mais for a polling message.
-    // we just check that the message is class eocanprot_msgclass_pollingAnalogSensor and is for address 0 (the EMS).
-    // we avoid doing the extra check that the sender address is from a mais/strain to save computations
+    // we check that the message is class eocanprot_msgclass_pollingAnalogSensor and is for address 0 (the EMS).
     if((eocanprot_msgclass_pollingAnalogSensor == EOCANPROT_FRAME_GET_CLASS(frame)) && (0 == EOCANPROT_FRAME_POLLING_GET_DESTINATION(frame)))
     {
-        eObrd_canlocation_t bloc = {0};
+#if 0   
+        // we avoid doing the extra check that the sender address is from a mais/strain to save computations 
+        return(eores_OK);
+#else 
+        // in here we do the check ... however, (case 666) in runtime configuration when we call a eo_strain_Deactivate(), we also call eo_canmap_UnloadBoards()
+        // which makes eo_canmap_GetBoard() returning NULL. in such a case, we may have an ack sent by mais or strain bu the board is not managed anymore, and hence
+        // we cannot know who the sender is 
+        eObrd_canlocation_t bloc = {0}; 
         bloc.port = port;
         bloc.addr = EOCANPROT_FRAME_GET_SOURCE(frame);
-        //loc.insideindex = eocanmap_insideindex_none;
         const eOcanmap_board_extended_t *board = eo_canmap_GetBoard(eo_canmap_GetHandle(), bloc);
-        if((eobrd_cantype_strain == board->board.props.type) || (eobrd_cantype_mais == board->board.props.type))
-        {
+        if(NULL == board)
+        {   // board is not in EOtheCANmapping. it may be that we are in (case 666). 
             return(eores_OK);
         }
+        if((eobrd_cantype_strain == board->board.props.type) || (eobrd_cantype_mais == board->board.props.type))
+        {   // we have a ack sent by strain or mais
+            return(eores_OK);
+        }
+#endif        
     }
 
     return(eores_NOK_generic);
