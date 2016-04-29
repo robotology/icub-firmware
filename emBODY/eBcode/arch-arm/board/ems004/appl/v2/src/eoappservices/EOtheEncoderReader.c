@@ -419,15 +419,22 @@ extern eOresult_t eo_encoderreader_Read(EOtheEncoderReader *p, uint8_t position,
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
+#define EO_ENCODERREADER_ACTIVATE_EVEN_IF_READING_FAILS
 
 static eOresult_t s_eo_encoderreader_onstop_verifyreading(void *par, eObool_t readingisok)
 {
     const eOmn_serv_arrayof_4jomodescriptors_t * jomodes = (const eOmn_serv_arrayof_4jomodescriptors_t *)par;
     
     EOconstarray* carray = eo_constarray_Load((EOarray*)jomodes);    
-        
-    if((eobool_true == readingisok) && (eobool_true == s_eo_theencoderreader.service.activateafterverify))
-    {
+
+#if defined(EO_ENCODERREADER_ACTIVATE_EVEN_IF_READING_FAILS)
+    eObool_t activateit = s_eo_theencoderreader.service.activateafterverify; 
+#else 
+    eObool_t activateit = (eobool_true == readingisok) && (eobool_true == s_eo_theencoderreader.service.activateafterverify);
+#endif 
+    
+    if(eobool_true == activateit)
+    {      
         eo_encoderreader_Activate(&s_eo_theencoderreader, jomodes);        
     }
 
@@ -479,11 +486,18 @@ static eOresult_t s_eo_encoderreader_onstop_verifyreading(void *par, eObool_t re
             s_eo_theencoderreader.diagnostics.errorCallbackCount = EOK_int08dummy;
             eo_timer_Start(s_eo_theencoderreader.diagnostics.reportTimer, eok_abstimeNOW, s_eo_theencoderreader.diagnostics.reportPeriod, eo_tmrmode_FOREVER, act);
         }
-    }    
+    }   
+
+
+#if defined(EO_ENCODERREADER_ACTIVATE_EVEN_IF_READING_FAILS)
+    eObool_t readingisok_for_upperlayers = eobool_true; 
+#else 
+    eObool_t readingisok_for_upperlayers = readingisok;
+#endif    
     
     if(NULL != s_eo_theencoderreader.service.onverify)
     {
-        s_eo_theencoderreader.service.onverify(&s_eo_theencoderreader, readingisok); 
+        s_eo_theencoderreader.service.onverify(&s_eo_theencoderreader, readingisok_for_upperlayers); 
     }    
     
     return(eores_OK);   
