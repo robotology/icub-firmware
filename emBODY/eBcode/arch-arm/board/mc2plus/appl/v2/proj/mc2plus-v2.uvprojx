@@ -852,9 +852,9 @@
               <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheSKIN.c</FilePath>
             </File>
             <File>
-              <FileName>EOtheInertials.c</FileName>
+              <FileName>EOtheInertials2.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheInertials.c</FilePath>
+              <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheInertials2.c</FilePath>
             </File>
             <File>
               <FileName>EOtheServices.c</FileName>
@@ -2157,9 +2157,9 @@
               <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheSKIN.c</FilePath>
             </File>
             <File>
-              <FileName>EOtheInertials.c</FileName>
+              <FileName>EOtheInertials2.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheInertials.c</FilePath>
+              <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheInertials2.c</FilePath>
             </File>
             <File>
               <FileName>EOtheServices.c</FileName>
