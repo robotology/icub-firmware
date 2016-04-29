@@ -1269,6 +1269,31 @@ static void JointSet_do_wait_calibration(JointSet* o)
     int N = *(o->pN);
     int E = *(o->pE);
     
+    if (o->calibration_in_progress != eomc_calibration_typeUndefined)
+    {
+        if (o->calibration_timeout < CALIBRATION_TIMEOUT)
+        {
+            ++o->calibration_timeout;
+        }
+        else
+        {
+            o->calibration_in_progress = eomc_calibration_typeUndefined;
+        
+            o->control_mode = eomc_controlmode_notConfigured;
+            
+            for (int k=0; k<N; ++k)
+            {
+                o->joint[o->joints_of_set[k]].control_mode = eomc_controlmode_notConfigured;
+            
+                Motor_set_pwm_ref(o->motor+o->motors_of_set[k], 0);
+                Motor_set_idle(o->motor+o->motors_of_set[k]);
+                Motor_uncalibrate(o->motor+o->motors_of_set[k]);
+            }    
+            
+            return;
+        }
+    }
+    
     o->is_calibrated = TRUE;
     
     switch (o->calibration_in_progress)
@@ -1546,6 +1571,7 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             if (o->calibration_in_progress == calibrator->type) return;
             
             o->calibration_wait = 0;
+            o->calibration_timeout = 0;
             
             o->calibration_in_progress = (eOmc_calibration_type_t)calibrator->type;
             
@@ -1580,6 +1606,8 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
         {
             o->calibration_in_progress = (eOmc_calibration_type_t)calibrator->type;
             
+            o->calibration_timeout = 0;
+            
             Motor_calibrate_withOffset(o->motor+e, 0);
             Motor_set_run(o->motor+e);
             o->motor[e].calib_pwm = calibrator->params.type10.pwmlimit;
@@ -1612,6 +1640,8 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             o->calibration_in_progress = (eOmc_calibration_type_t)calibrator->type;
             
             o->calibration_wait = TRUE;
+            
+            o->calibration_timeout = 0;
             
             break;
         }

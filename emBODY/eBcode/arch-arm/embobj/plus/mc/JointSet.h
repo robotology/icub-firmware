@@ -58,6 +58,7 @@ typedef struct // JointSet
     int32_t special_limit;
     
     eOmc_calibration_type_t calibration_in_progress;
+    int32_t calibration_timeout;
     
     TripodCalib tripod_calib;
 } JointSet;
