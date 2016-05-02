@@ -210,7 +210,7 @@ extern eOresult_t eocanprotASpolling_former_POL_AS_CMD__GET_FIRMWARE_VERSION(eOc
 
 extern eOresult_t eocanprotASpolling_parser_POL_AS_CMD__GET_FIRMWARE_VERSION(eOcanframe_t *frame, eOcanport_t port)
 {   
-    eOcanmap_location_t loc = {0};
+    eObrd_canlocation_t loc = {0};
     loc.port                = port;
     loc.addr                = EOCANPROT_FRAME_GET_SOURCE(frame);
     loc.insideindex         = EOCANPROT_FRAME_POLLING_MC_GET_INTERNALINDEX(frame);
@@ -360,11 +360,11 @@ static void* s_eocanprotASpolling_get_entity(eOprotEndpoint_t endpoint, eOprot_e
 {
     void * ret = NULL;
     uint8_t ii = 0;
-    eOcanmap_location_t loc = {0};
+    eObrd_canlocation_t loc = {0};
     
     loc.port = port;
     loc.addr = EOCANPROT_FRAME_GET_SOURCE(frame);    
-    loc.insideindex = eocanmap_insideindex_none;
+    loc.insideindex = eobrd_caninsideindex_none;
     
     ii = eo_canmap_GetEntityIndexExtraCheck(eo_canmap_GetHandle(), loc, endpoint, entity);
     

@@ -75,7 +75,7 @@ enum { eoboardconfig_maxvalueofsupportedentity = 3 };  // with value of 3 we sup
 
 //extern const eOcandiscovery_target_t * eoboardconfig_code2straindiscoverytarget(uint32_t code) ;
 
-//// of eOcanmap_board_properties_t
+//// of eObrd_canproperties_t
 //// the constvector contains all the boards in can1 and can2. or ... is empty.
 //extern EOconstvector * eoboardconfig_code2canboards(uint32_t code); 
 

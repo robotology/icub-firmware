@@ -129,7 +129,7 @@ typedef struct
 typedef struct
 {
     eOcanprot_command_t     cmd;        /**< the command */
-    eOcanmap_location_t     loc;        /**< the destination if polling message, the source if periodic */
+    eObrd_canlocation_t     loc;        /**< the destination if polling message, the source if periodic */
 } eOcanprot_descriptor_t; 
 
 

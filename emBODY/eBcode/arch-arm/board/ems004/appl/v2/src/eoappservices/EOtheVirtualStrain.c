@@ -126,7 +126,7 @@ extern EOtheVirtualStrain* eo_virtualstrain_Initialise(void)
     //eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, 0, eoprot_tag_none);
     //eo_canmap_GetEntityLocation(eo_canmap_GetHandle(), id32, &s_eo_thevirtualstrain.location, NULL, NULL);    
     s_eo_thevirtualstrain.location.addr = eo_virtualstrain_canaddress;
-    s_eo_thevirtualstrain.location.insideindex = eocanmap_insideindex_none;
+    s_eo_thevirtualstrain.location.insideindex = eobrd_caninsideindex_none;
     
     
     memset(&s_eo_thevirtualstrain.torques, 0, sizeof(s_eo_thevirtualstrain.torques));

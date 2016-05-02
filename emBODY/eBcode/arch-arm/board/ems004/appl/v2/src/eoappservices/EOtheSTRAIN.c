@@ -111,11 +111,11 @@ static EOtheSTRAIN s_eo_thestrain =
     .diagnostics = 
     {
         .reportTimer            = NULL,
-        .reportPeriod           = 10*EOK_reltime1sec,
+        .reportPeriod           = 0, // 10*EOK_reltime1sec, // with 0 we dont periodically report
         .errorDescriptor        = {0},
         .errorType              = eo_errortype_info,
         .errorCallbackCount     = 0,
-        .repetitionOKcase       = 10
+        .repetitionOKcase       = 0 // 10 // with 0 we transmit report only once at succesful activation
     },     
     .sharedcan =
     {
@@ -148,14 +148,12 @@ extern EOtheSTRAIN* eo_strain_Initialise(void)
         return(p);
     }
     
-    p->service.active = eobool_false;
-    
     p->id32 = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_strain, 0, eoprot_tag_none);
 
     p->service.servconfig.type = eomn_serv_NONE;
     
     
-    p->sharedcan.boardproperties = eo_vector_New(sizeof(eOcanmap_board_properties_t), 1, NULL, NULL, NULL, NULL);
+    p->sharedcan.boardproperties = eo_vector_New(sizeof(eObrd_canproperties_t), 1, NULL, NULL, NULL, NULL);
     
     p->sharedcan.entitydescriptor = eo_vector_New(sizeof(eOcanmap_entitydescriptor_t), 1, NULL, NULL, NULL, NULL);
     
@@ -254,11 +252,10 @@ extern eOresult_t eo_strain_Verify(EOtheSTRAIN *p, const eOmn_serv_configuration
     } 
     
  
-// DONT Deactivate ... we may want just to check again ....    
-//    if(eobool_true == p->service.active)
-//    {
-//        eo_strain_Deactivate(p);        
-//    }  
+    if(eobool_true == p->service.active)
+    {
+        eo_strain_Deactivate(p);        
+    }  
 
     p->service.state = eomn_serv_state_verifying;
     eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_strain, p->service.state);
@@ -297,6 +294,9 @@ extern eOresult_t eo_strain_Deactivate(EOtheSTRAIN *p)
 
     if(eobool_false == p->service.active)
     {
+        // i force to eomn_serv_state_idle because it may be that state was eomn_serv_state_verified or eomn_serv_state_failureofverify
+        p->service.state = eomn_serv_state_idle; 
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_strain, p->service.state);
         return(eores_OK);        
     } 
     
@@ -368,10 +368,10 @@ extern eOresult_t eo_strain_Activate(EOtheSTRAIN *p, const eOmn_serv_configurati
             
         
         // now... use the servcfg
-        eOcanmap_board_properties_t prop = 
+        eObrd_canproperties_t prop = 
         {
             .type               = eobrd_cantype_strain, 
-            .location           = { .port = servcfg->data.as.strain.canloc.port, .addr = servcfg->data.as.strain.canloc.addr, .insideindex = eocanmap_insideindex_none },
+            .location           = { .port = servcfg->data.as.strain.canloc.port, .addr = servcfg->data.as.strain.canloc.addr, .insideindex = eobrd_caninsideindex_none },
             .requiredprotocol   = { .major = servcfg->data.as.strain.version.protocol.major, .minor = servcfg->data.as.strain.version.protocol.minor }
         };       
         eo_vector_PushBack(p->sharedcan.boardproperties, &prop);
@@ -382,7 +382,7 @@ extern eOresult_t eo_strain_Activate(EOtheSTRAIN *p, const eOmn_serv_configurati
         // load the entity mapping.
         eOcanmap_entitydescriptor_t des = 
         {
-            .location   = { .port = servcfg->data.as.strain.canloc.port, .addr = servcfg->data.as.strain.canloc.addr, .insideindex = eocanmap_insideindex_none },
+            .location   = { .port = servcfg->data.as.strain.canloc.port, .addr = servcfg->data.as.strain.canloc.addr, .insideindex = eobrd_caninsideindex_none },
             .index      = entindex00 // we have only one strain
         };
         eo_vector_PushBack(p->sharedcan.entitydescriptor, &des);

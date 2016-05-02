@@ -45,7 +45,8 @@ typedef struct
     uint8_t                     discoverynumretries;
     eObool_t                    forcestop;
     eObool_t                    searching;
-    eObool_t                    tickingenabled;    
+    eObool_t                    tickingenabled;   
+    eObool_t                    fakesearch;
 } eOcandiscovery_searchstatus_t;
 
 

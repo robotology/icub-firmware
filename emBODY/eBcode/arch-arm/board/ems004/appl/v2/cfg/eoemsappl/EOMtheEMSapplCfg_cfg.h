@@ -74,7 +74,7 @@ extern "C" {
 //  <o> major           <0-255> 
 #define EOMTHEEMSAPPLCFG_VERSION_MAJOR          2
 //  <o> minor           <0-255> 
-#define EOMTHEEMSAPPLCFG_VERSION_MINOR          42
+#define EOMTHEEMSAPPLCFG_VERSION_MINOR          43
 //  </h>version
 
 //  <h> build date
@@ -83,11 +83,11 @@ extern "C" {
 //  <o> month           <1-12> 
 #define EOMTHEEMSAPPLCFG_BUILDDATE_MONTH        4
 //  <o> day             <1-31> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          11
+#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          29
 //  <o> hour            <0-23> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         12
+#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         14
 //  <o> minute          <0-59> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          11
+#define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          45
 //  </h>build date
 
 // </h>Info 

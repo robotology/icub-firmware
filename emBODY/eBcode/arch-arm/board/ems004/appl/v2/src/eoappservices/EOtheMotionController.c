@@ -151,11 +151,11 @@ static EOtheMotionController s_eo_themotcon =
     .diagnostics = 
     {
         .reportTimer            = NULL,
-        .reportPeriod           = 10*EOK_reltime1sec,
+        .reportPeriod           = 0, // 10*EOK_reltime1sec, // with 0 we dont periodically report
         .errorDescriptor        = {0},
         .errorType              = eo_errortype_info,
         .errorCallbackCount     = 0,
-        .repetitionOKcase       = 10
+        .repetitionOKcase       = 0 // 10 // with 0 we transmit report only once at succesful activation
     },     
     .sharedcan =
     {
@@ -205,9 +205,6 @@ extern EOtheMotionController* eo_motioncontrol_Initialise(void)
     {
         return(p);
     }
-    
-    p->service.active = eobool_false;
-    p->service.running = eobool_false;
 
     p->numofjomos = 0;
 
@@ -216,7 +213,7 @@ extern EOtheMotionController* eo_motioncontrol_Initialise(void)
     
     // up to to 12 mc4 OR upto 4 foc (the MAIS is managed directly by the EOtheMAIS object)
     //#warning CHECK: we could use only 3 mc4 boards instead of 12 in candiscovery. shall we do it?
-    p->sharedcan.boardproperties = eo_vector_New(sizeof(eOcanmap_board_properties_t), eo_motcon_maxJOMOs, NULL, NULL, NULL, NULL);
+    p->sharedcan.boardproperties = eo_vector_New(sizeof(eObrd_canproperties_t), eo_motcon_maxJOMOs, NULL, NULL, NULL, NULL);
     
     // up to 12 jomos
     p->sharedcan.entitydescriptor = eo_vector_New(sizeof(eOcanmap_entitydescriptor_t), eo_motcon_maxJOMOs, NULL, NULL, NULL, NULL);
@@ -325,6 +322,8 @@ extern eOmotioncontroller_mode_t eo_motioncontrol_GetMode(EOtheMotionController 
 
 extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify)
 {
+    eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "called: eo_motioncontrol_Verify()", s_eobj_ownname);
+    
     if((NULL == p) || (NULL == servcfg))
     {
         s_eo_themotcon.service.state = eomn_serv_state_failureofverify;
@@ -415,7 +414,7 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
         uint8_t i = 0;
         for(i=0; i<12; i++)
         {            
-            const eOmn_serv_canlocation_t *canloc = &servcfg->data.mc.mc4_based.mc4joints[i];
+            const eObrd_canlocation_t *canloc = &servcfg->data.mc.mc4_based.mc4joints[i];
             eo_common_hlfword_bitset(&p->sharedcan.discoverytarget.canmap[canloc->port], canloc->addr);         
         }
                        
@@ -459,6 +458,8 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
 
 extern eOresult_t eo_motioncontrol_Deactivate(EOtheMotionController *p)
 {
+    eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "called: eo_motioncontrol_Deactivate()", s_eobj_ownname);
+    
     if(NULL == p)
     {
         return(eores_NOK_nullpointer);
@@ -466,8 +467,18 @@ extern eOresult_t eo_motioncontrol_Deactivate(EOtheMotionController *p)
 
     if(eobool_false == p->service.active)
     {
+        // i force to eomn_serv_state_idle because it may be that state was eomn_serv_state_verified or eomn_serv_state_failureofverify
+        p->service.state = eomn_serv_state_idle; 
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mc, p->service.state);
         return(eores_OK);        
     } 
+    
+    // for now i allow deactivate() only for the mc4-based control .. because at date of 13 april 2016 the local mc control cannot be destructed.
+    // then we deconfig things ... so far only for eo_motcon_mode_mc4.
+    if(eo_motcon_mode_mc4 != p->service.servconfig.type) 
+    {
+        return(eo_motioncontrol_Stop(p));
+    }
     
     
     // at first we stop the service
@@ -478,7 +489,7 @@ extern eOresult_t eo_motioncontrol_Deactivate(EOtheMotionController *p)
 
     eo_motioncontrol_SetRegulars(p, NULL, NULL);
     
-    // then we deconfig things
+
     if(eo_motcon_mode_foc == p->service.servconfig.type)
     {       
         // for foc-based, we must ... deconfig mc foc boards, unload them, set num of entities = 0, clear status, deactivate encoder 
@@ -567,6 +578,8 @@ extern eOresult_t eo_motioncontrol_Deactivate(EOtheMotionController *p)
 
 extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn_serv_configuration_t * servcfg)
 {
+    eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "called: eo_motioncontrol_Activate()", s_eobj_ownname);
+    
     if((NULL == p) || (NULL == servcfg))
     {
         return(eores_NOK_nullpointer);
@@ -615,7 +628,7 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
             {
                 const eOmn_serv_jomo_descriptor_t *jomodes = (eOmn_serv_jomo_descriptor_t*) eo_constarray_At(carray, i);
                 
-                eOcanmap_board_properties_t prop = {0};
+                eObrd_canproperties_t prop = {0};
                 
                 prop.type = eobrd_cantype_foc;
                 prop.location.port = jomodes->actuator.foc.canloc.port;
@@ -692,8 +705,8 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
             // now... use the servcfg
             uint8_t i = 0;
           
-            eOcanmap_board_properties_t prop = {0};
-            const eOmn_serv_canlocation_t *canloc = NULL;
+            eObrd_canproperties_t prop = {0};
+            const eObrd_canlocation_t *canloc = NULL;
             
             // load the can mapping for the 12 boards ... (only mc4 boards as teh mais was added bt eo_mais_Activate()
             
@@ -732,11 +745,10 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
             eo_canmap_ConfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, p->sharedcan.entitydescriptor); 
             eo_canmap_ConfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, p->sharedcan.entitydescriptor);        
 
-            // init the mais
-            
-            eo_mais_Activate(eo_mais_GetHandle(), &p->mcmc4.servconfigmais);
-            eo_mais_Start(eo_mais_GetHandle());
-            eo_mais_Transmission(eo_mais_GetHandle(), eobool_true);
+//            // start the mais which was activated in s_eo_motioncontrol_onendofverify_mais()            
+//            //eo_mais_Activate(eo_mais_GetHandle(), &p->mcmc4.servconfigmais);
+//            eo_mais_Start(eo_mais_GetHandle());
+//            eo_mais_Transmission(eo_mais_GetHandle(), eobool_true);
             
             // do something with the mc4s....
             
@@ -792,13 +804,14 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
           
             p->numofjomos = numofjomos;
             
-            // if also mais, then i activate it.
-            if(eo_motcon_mode_mc4plusmais == servcfg->type)
-            {
-                eo_mais_Activate(eo_mais_GetHandle(), &p->mcmc4.servconfigmais);
-                eo_mais_Start(eo_mais_GetHandle());   
-                eo_mais_Transmission(eo_mais_GetHandle(), eobool_true);                
-            }
+//            // if also mais, then i activate it.
+//            if(eo_motcon_mode_mc4plusmais == servcfg->type)
+//            {
+//                // start the mais which was activated in s_eo_motioncontrol_onendofverify_mais()
+//                //eo_mais_Activate(eo_mais_GetHandle(), &p->mcmc4.servconfigmais);
+//                eo_mais_Start(eo_mais_GetHandle());   
+//                eo_mais_Transmission(eo_mais_GetHandle(), eobool_true);                
+//            }
             
             // now... use the servcfg
             uint8_t i=0;
@@ -860,7 +873,9 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
 
 
 extern eOresult_t eo_motioncontrol_Start(EOtheMotionController *p)
-{    
+{ 
+    eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "called: eo_motioncontrol_Start()", s_eobj_ownname);  
+    
     if(NULL == p)
     {
         return(eores_NOK_nullpointer);
@@ -891,10 +906,17 @@ extern eOresult_t eo_motioncontrol_Start(EOtheMotionController *p)
     }
     else if(eo_motcon_mode_mc4 == p->service.servconfig.type)
     {
+        eo_mais_Start(eo_mais_GetHandle());
+        eo_mais_Transmission(eo_mais_GetHandle(), eobool_true);
         eo_mc4boards_BroadcastStart(eo_mc4boards_GetHandle());
     }
     else if((eo_motcon_mode_mc4plus == p->service.servconfig.type) || (eo_motcon_mode_mc4plusmais == p->service.servconfig.type))
     {
+        if(eo_motcon_mode_mc4plusmais == p->service.servconfig.type)
+        {
+            eo_mais_Start(eo_mais_GetHandle());   
+            eo_mais_Transmission(eo_mais_GetHandle(), eobool_true);                
+        }
         eo_encoderreader_StartReading(p->mcmc4plus.theencoderreader);
         s_eo_motioncontrol_mc4plusbased_enable_all_motors(p);      
     }
@@ -1023,7 +1045,9 @@ extern eOresult_t eo_motioncontrol_Tick(EOtheMotionController *p)
 
 
 extern eOresult_t eo_motioncontrol_Stop(EOtheMotionController *p)
-{    
+{ 
+    eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "called: eo_motioncontrol_Stop()", s_eobj_ownname);
+    
     if(NULL == p)
     {
         return(eores_NOK_nullpointer);
@@ -1049,6 +1073,8 @@ extern eOresult_t eo_motioncontrol_Stop(EOtheMotionController *p)
     {
         // just stop broadcast of the mc4 boards
         eo_mc4boards_BroadcastStop(eo_mc4boards_GetHandle()); 
+        // then stop the mais
+        eo_mais_Stop(eo_mais_GetHandle());
     }    
     else if((eo_motcon_mode_mc4plus == p->service.servconfig.type) || (eo_motcon_mode_mc4plusmais == p->service.servconfig.type))
     {   
@@ -1929,9 +1955,9 @@ static eOresult_t s_eo_motioncontrol_onendofverify_mais(EOaService* s, eObool_t 
     
     if(eobool_true == operationisok)
     {
-        // mais is already activated.... i start it
-        eo_mais_Start(eo_mais_GetHandle());
-        eo_mais_Transmission(eo_mais_GetHandle(), eobool_true);
+        // mais is already activated.... i .... DONT START IT !!!
+//        eo_mais_Start(eo_mais_GetHandle());
+//        eo_mais_Transmission(eo_mais_GetHandle(), eobool_true);
         
         // then: start verification of mc4s or encoders
         if(eo_motcon_mode_mc4 == servcfg->type)
@@ -2289,7 +2315,7 @@ static eOresult_t s_eo_motioncontrol_SetCurrentSetpoint(EOtheMotionController *p
     uint8_t i=0;
     for(i=0; i<p->numofjomos; i++)
     {
-        eOcanmap_location_t loc = {0};
+        eObrd_canlocation_t loc = {0};
         // search the address of motor i-th and fill the pwmValues[] in relevant position.
         if(eores_OK == eo_canmap_GetEntityLocation(eo_canmap_GetHandle(), eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, i, 0), &loc, NULL, NULL))
         {
@@ -2307,10 +2333,10 @@ static eOresult_t s_eo_motioncontrol_SetCurrentSetpoint(EOtheMotionController *p
     command.type  = ICUBCANPROTO_PER_MC_MSG__EMSTO2FOC_DESIRED_CURRENT;
     command.value = &pwmValues[0];
     
-    eOcanmap_location_t location = {0};
+    eObrd_canlocation_t location = {0};
     location.port = port;
     location.addr = 0; // marco.accame: we put 0 just because it is periodic and this is the source address (the EMS has can address 0).
-    location.insideindex = eocanmap_insideindex_first; // because all 2foc have motor on index-0. 
+    location.insideindex = eobrd_caninsideindex_first; // because all 2foc have motor on index-0. 
 
     // and i send the command
     return(eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), &command, location));   

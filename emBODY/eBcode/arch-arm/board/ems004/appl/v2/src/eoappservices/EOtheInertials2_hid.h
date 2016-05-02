@@ -49,7 +49,7 @@ struct EOtheInertials_hid
     uint8_t                                 numofmtbs;
     
     // now the old ones
-    eOas_inertial2_config_t                 sensorsconfig;
+    eOas_inertial_config_t                  sensorsconfig;
     EOvector*                               fifoofinertialdata;    
     
     eObool_t                                configured;
@@ -59,10 +59,10 @@ struct EOtheInertials_hid
     uint16_t                                canmap_mtb_gyros_ext[2];
     uint16_t                                canmap_mtb_active[2];
     
-    uint16_t                                fromcan2id[2][16][3];   // 2 ports, 15 addresses (0->14), 3 kinds on mtb
+    uint16_t                                fromcan2id[2][16][3];   // 2 ports, 15 addresses (0->14), 3 kinds on mtb ... use mtb-eoas_inertial_accel_mtb_int
 
     // the inertial at the end
-    eOas_inertial2_t*                       inertial2;  
+    eOas_inertial_t*                        inertial2;  
     EOarray*                                id32ofregulars;
     EOarray*                                arrayofsensors;
 }; 

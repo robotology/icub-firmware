@@ -708,7 +708,7 @@ static eObool_t s_eo_mc4boards_foundone(void)
     eObool_t found = eobool_false;
 
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, 0, 0);        
-    eOcanmap_location_t location = {0};
+    eObrd_canlocation_t location = {0};
     eObrd_cantype_t boardtype = eobrd_cantype_unknown; 
     if(eores_OK == eo_canmap_GetEntityLocation(eo_canmap_GetHandle(), id32, &location, NULL, &boardtype))
     {

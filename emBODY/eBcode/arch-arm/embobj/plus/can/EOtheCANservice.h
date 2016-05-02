@@ -123,7 +123,7 @@ extern eOresult_t eo_canserv_Parse(EOtheCANservice *p, eOcanport_t canport, uint
 
 
 // must specify all the entries in eOcanprot_descriptor_t
-extern eOresult_t eo_canserv_SendCommandToLocation(EOtheCANservice *p, eOcanprot_command_t *command, eOcanmap_location_t loc);
+extern eOresult_t eo_canserv_SendCommandToLocation(EOtheCANservice *p, eOcanprot_command_t *command, eObrd_canlocation_t loc);
 
 /** @fn         extern eOresult_t eo_canserv_Parse(EOtheCANservice *p, eOcanframe_t *frame, eOcanport_t port) 
     @brief      It parses a can frame and executes associated actions. 

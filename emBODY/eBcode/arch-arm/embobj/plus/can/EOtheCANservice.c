@@ -374,7 +374,7 @@ extern eOresult_t eo_canserv_Parse(EOtheCANservice *p, eOcanport_t port, uint8_t
     return(eores_OK);
 }
 
-extern eOresult_t eo_canserv_SendCommandToLocation(EOtheCANservice *p, eOcanprot_command_t *command, eOcanmap_location_t loc)
+extern eOresult_t eo_canserv_SendCommandToLocation(EOtheCANservice *p, eOcanprot_command_t *command, eObrd_canlocation_t loc)
 {
     if((NULL == p) || (NULL == command))
     {
@@ -388,7 +388,7 @@ extern eOresult_t eo_canserv_SendCommandToLocation(EOtheCANservice *p, eOcanprot
     
     eOcanprot_descriptor_t descriptor = {0};
     memcpy(&descriptor.cmd, command, sizeof(eOcanprot_command_t));
-    memcpy(&descriptor.loc, &loc, sizeof(eOcanmap_location_t));
+    memcpy(&descriptor.loc, &loc, sizeof(eObrd_canlocation_t));
     return(s_eo_canserv_SendCommand(p, &descriptor));
 }
 

@@ -85,9 +85,15 @@ typedef enum
     eo_service_strain       = 1,
     eo_service_mais         = 2,
     eo_service_skin         = 3,
-    eo_service_inertial     = 4,
+    eo_service_inertials    = 4,
     eo_service_none         = 5
 } eOservice_type_t;
+
+typedef struct
+{
+    eObool_t            allactivated;
+    eOservice_type_t    failedservice;      
+} eOservice_startupactivation_state_t;
 
 struct EOtheServices_hid
 {
@@ -95,10 +101,10 @@ struct EOtheServices_hid
     EOnvSet*            nvset;      
     EOtimer*            timer;
     eOprotBRD_t         board;   
-    eObool_t            allactivated;
-    eOservice_type_t    failedservice; 
     eOmn_service_t*     mnservice;  
-    eObool_t            running[eomn_serv_categories_numberof];    
+    eObool_t            running[eomn_serv_categories_numberof];  
+    eOipv4addr_t        ipaddress;    
+    eOservice_startupactivation_state_t startupactivationstate;
 }; 
 
 

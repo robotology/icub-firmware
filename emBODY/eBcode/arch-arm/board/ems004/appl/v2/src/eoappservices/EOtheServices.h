@@ -43,6 +43,7 @@
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
+
  
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
@@ -50,18 +51,18 @@ typedef struct EOtheServices_hid EOtheServices;
 
 typedef void EOaService;
 
-typedef enum
-{
-    eo_service_NONE             = eomn_serv_NONE,
-    eo_service_MC_foc           = eomn_serv_MC_foc,
-    eo_service_MC_mc4           = eomn_serv_MC_mc4,
-    eo_service_MC_mc4plus       = eomn_serv_MC_mc4plus,
-    eo_service_MC_mc4plusmais   = eomn_serv_MC_mc4plusmais,
-    eo_service_MAIS             = eomn_serv_AS_mais,
-    eo_service_STRAIN           = eomn_serv_AS_strain,    
-    eo_service_INERTIAL         = eomn_serv_AS_inertial,
-    eo_service_SKIN             = eomn_serv_SK_skin
-} eOservice_t;
+//typedef enum
+//{
+//    eo_service_NONE             = eomn_serv_NONE,
+//    eo_service_MC_foc           = eomn_serv_MC_foc,
+//    eo_service_MC_mc4           = eomn_serv_MC_mc4,
+//    eo_service_MC_mc4plus       = eomn_serv_MC_mc4plus,
+//    eo_service_MC_mc4plusmais   = eomn_serv_MC_mc4plusmais,
+//    eo_service_MAIS             = eomn_serv_AS_mais,
+//    eo_service_STRAIN           = eomn_serv_AS_strain,    
+//    eo_service_INERTIALS        = eomn_serv_AS_inertials,
+//    eo_service_SKIN             = eomn_serv_SK_skin
+//} eOservice_t;
 
 typedef eOresult_t (*eOservice_onendofoperation_fun_t) (EOaService* p, eObool_t operationisok);
 
@@ -72,20 +73,18 @@ typedef eOresult_t (*eOservice_onendofoperation_fun_t) (EOaService* p, eObool_t 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
+// call it at startup
+extern EOtheServices* eo_services_Initialise(eOipv4addr_t ipaddress);
 
-extern EOtheServices* eo_services_Initialise(void);
-
+// retrieve handle
 extern EOtheServices* eo_services_GetHandle(void);
 
-extern eOmn_serv_state_t eo_service_GetState(eOmn_serv_category_t category);
-
-extern eOresult_t eo_services_StartLegacyMode(EOtheServices *p, eOprotBRD_t brd);
-
-extern eObool_t eo_services_AllActivated(EOtheServices *p);
-
-extern eOresult_t eo_services_SendFailureReport(EOtheServices *p);
-
+// use it to process commands of type eOmn_service_cmmnds_command_t coming from robotInterface
 extern eOresult_t eo_services_ProcessCommand(EOtheServices *p, eOmn_service_cmmnds_command_t *command);
+
+// use it to know about the state of a service
+extern eOmn_serv_state_t eo_service_GetState(EOtheServices *p, eOmn_serv_category_t category);
+
 
 
 

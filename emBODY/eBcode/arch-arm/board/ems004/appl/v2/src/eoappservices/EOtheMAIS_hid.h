@@ -48,7 +48,8 @@ struct EOtheMAIS_hid
     
     eOprotID32_t                            id32;  
     eOas_mais_t*                            mais;
-    EOarray*                                id32ofregulars;    
+    EOarray*                                id32ofregulars;
+    uint8_t                                 numberofowners; // increased / decreased at _Start() _Stop()
 }; 
 
 

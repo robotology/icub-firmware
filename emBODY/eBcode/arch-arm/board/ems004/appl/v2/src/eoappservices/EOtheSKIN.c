@@ -109,11 +109,11 @@ static EOtheSKIN s_eo_theskin =
     .diagnostics = 
     {
         .reportTimer            = NULL,
-        .reportPeriod           = 10*EOK_reltime1sec,
+        .reportPeriod           = 0, // 10*EOK_reltime1sec, // with 0 we dont periodically report
         .errorDescriptor        = {0},
         .errorType              = eo_errortype_info,
         .errorCallbackCount     = 0,
-        .repetitionOKcase       = 10
+        .repetitionOKcase       = 0 // 10 // with 0 we transmit report only once at succesful activation
     },     
     .sharedcan =
     {
@@ -147,15 +147,13 @@ extern EOtheSKIN* eo_skin_Initialise(void)
     {
         return(p);
     }
-    
-    p->service.active = eobool_false;
-        
+
     p->numofskinpatches = 0;
     p->numofmtbs = 0;
     p->service.servconfig.type = eomn_serv_NONE;
     
     
-    p->sharedcan.boardproperties = eo_vector_New(sizeof(eOcanmap_board_properties_t), eo_skin_maxnumberofMTBboards, NULL, NULL, NULL, NULL);
+    p->sharedcan.boardproperties = eo_vector_New(sizeof(eObrd_canproperties_t), eo_skin_maxnumberofMTBboards, NULL, NULL, NULL, NULL);
     
     p->sharedcan.entitydescriptor = eo_vector_New(sizeof(eOcanmap_entitydescriptor_t), eo_skin_maxnumberofMTBboards, NULL, NULL, NULL, NULL);
     
@@ -263,11 +261,10 @@ extern eOresult_t eo_skin_Verify(EOtheSKIN *p, const eOmn_serv_configuration_t *
     }   
     
  
-// DONT Deactivate ... we may want just to check again ....    
-//    if(eobool_true == p->service.active)
-//    {
-//        eo_skin_Deactivate(p);        
-//    }   
+    if(eobool_true == p->service.active)
+    {
+        eo_skin_Deactivate(p);        
+    }   
     
     p->service.state = eomn_serv_state_verifying;
     eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_skin, p->service.state);
@@ -349,6 +346,9 @@ extern eOresult_t eo_skin_Deactivate(EOtheSKIN *p)
 
     if(eobool_false == p->service.active)
     {
+        // i force to eomn_serv_state_idle because it may be that state was eomn_serv_state_verified or eomn_serv_state_failureofverify
+        p->service.state = eomn_serv_state_idle; 
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_skin, p->service.state);
         return(eores_OK);        
     } 
     
@@ -433,16 +433,16 @@ extern eOresult_t eo_skin_Activate(EOtheSKIN *p, const eOmn_serv_configuration_t
         
         // now i must add all the mtb boards. i iterate per patch and then per canbus
         
-        eOcanmap_board_properties_t prop = 
+        eObrd_canproperties_t prop = 
         {
             .type               = eobrd_cantype_mtb, 
-            .location           = { .port = 0, .addr = 0, .insideindex = eocanmap_insideindex_none },
+            .location           = { .port = 0, .addr = 0, .insideindex = eobrd_caninsideindex_none },
             .requiredprotocol   = { .major = servcfg->data.sk.skin.version.protocol.major, .minor = servcfg->data.sk.skin.version.protocol.minor }
         };  
         
         eOcanmap_entitydescriptor_t des = 
         {
-            .location   = { .port = 0, .addr = 0, .insideindex = eocanmap_insideindex_none },
+            .location   = { .port = 0, .addr = 0, .insideindex = eobrd_caninsideindex_none },
             .index      = entindexNONE
         };        
         
@@ -814,7 +814,8 @@ extern eOresult_t eo_skin_SetBoardsConfig(EOtheSKIN *p, uint8_t patchindex, eOsk
     p->sharedcan.command.class = eocanprot_msgclass_pollingSkin;    
     p->sharedcan.command.type  = ICUBCANPROTO_POL_SK_CMD__SET_BRD_CFG;
     p->sharedcan.command.value = &canProto_skcfg; 
-    
+//    #error --> change so that we send the command to all boards of given address .... if they are in patch....
+        
     // and now we send the p->sharedcan.command to all the skin boards
     eo_canserv_SendCommandToAllBoardsInEntity(eo_canserv_GetHandle(), &p->sharedcan.command, id32); 
     
@@ -860,7 +861,7 @@ extern eOresult_t eo_skin_SetTrianglesConfig(EOtheSKIN *p, uint8_t patchindex, e
     p->sharedcan.command.type  = ICUBCANPROTO_POL_SK_CMD__SET_TRIANG_CFG;
     p->sharedcan.command.value = &canProto_trgscfg; 
     
-    eOcanmap_location_t location = {0};
+    eObrd_canlocation_t location = {0};
     eo_canmap_GetEntityLocation(eo_canmap_GetHandle(), id32, &location, NULL, NULL);
     // the function eo_canmap_GetEntityLocation() puts in location.addr the address of the first board of the entity (the patch).
     // we call eo_canmap_GetEntityLocation() to retrieve the canbus (port1 or port2) and insideindex.
@@ -1114,11 +1115,11 @@ static eOsk_skin_t* s_eo_skin_get_entity(EOtheSKIN* p, eOcanframe_t *frame, eOca
 {
     eOsk_skin_t * ret = NULL;
     uint8_t ii = 0;
-    eOcanmap_location_t loc = {0};
+    eObrd_canlocation_t loc = {0};
     
     loc.port = port;
     loc.addr = EOCANPROT_FRAME_GET_SOURCE(frame);    
-    loc.insideindex = eocanmap_insideindex_none;
+    loc.insideindex = eobrd_caninsideindex_none;
     
     ii = eo_canmap_GetEntityIndexExtraCheck(eo_canmap_GetHandle(), loc, eoprot_endpoint_skin, eoprot_entity_sk_skin);
     

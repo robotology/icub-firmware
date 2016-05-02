@@ -44,7 +44,7 @@
 #include "EOtheMotionController.h"
 #include "EOtheMAIS.h"
 #include "EOtheSKIN.h"
-#include "EOtheInertials.h"
+#include "EOtheInertials2.h"
 #include "EOtheETHmonitor.h"
 #include "EOtheBoardConfig.h"
 #include "EOVtheCallbackManager.h"
@@ -65,7 +65,7 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define TEST_RUNTIME_CONFIG
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -91,8 +91,6 @@ const EOVtheEMSapplCfgBody theapplbodyconfig =
 static void s_overridden_appl_led_error_init(void);
 
 static void s_overridden_appl_initialise_services(void);
-
-static eOprotBRD_t s_overridden_appl_get_boardnumber_fromIPaddress(void);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -140,7 +138,7 @@ extern void eom_emsappl_hid_userdef_on_entry_CFG(EOMtheEMSappl* p)
     // tell the ethmonitor to alert the task of the configurator
 //    eo_ethmonitor_SetAlert(eo_ethmonitor_GetHandle(), eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()), emsconfigurator_evt_userdef02);
     
-    // prefer sending a tx request just in case. because cfg state transmit only if requested an we dont want to hav missed a previous request.
+    // prefer sending a tx request just in case. because cfg state transmit only if requested an we dont want to have missed a previous request.
     eom_task_SetEvent(eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()), emsconfigurator_evt_ropframeTx);
 }
 
@@ -164,60 +162,40 @@ extern void eom_emsappl_hid_userdef_on_entry_RUN(EOMtheEMSappl* p)
     // tell the ethmonitor to alert no task, because the runner will tick it now at every cycle
 //    eo_ethmonitor_SetAlert(eo_ethmonitor_GetHandle(), NULL, 0);
 
-    // motion-control:
-#if defined(TEST_RUNTIME_CONFIG)
-#else
-    eo_motioncontrol_Start(eo_motioncontrol_GetHandle());
-#endif
-
-//    eo_strain_Start(eo_strain_GetHandle());
-
-#if defined(TEST_RUNTIME_CONFIG)
-#else    
-    eo_skin_Start(eo_skin_GetHandle());    
-#endif
-
-#if defined(TEST_RUNTIME_CONFIG)
-    eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "on_entry_RUN()", "EOMtheEMSappl");
-#endif
-    
+    // we dont start services   
 }
 
 
 extern void eom_emsappl_hid_userdef_on_exit_RUN(EOMtheEMSappl* p)
 {    
-#if defined(TEST_RUNTIME_CONFIG)
-    eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "entering on_exit_RUN()", "EOMtheEMSappl");    
-#endif
     // EOtheCANservice: set straigth mode and force parsing of all packets in the RX queues.
     eo_canserv_SetMode(eo_canserv_GetHandle(), eocanserv_mode_straight);
     eo_canserv_ParseAll(eo_canserv_GetHandle());  
   
     
-    // stop services which were started in on_entry_RUN()
+    // stop services 
     
     // motion-control
     eo_motioncontrol_Stop(eo_motioncontrol_GetHandle());
-    
+    eo_motioncontrol_Deactivate(eo_motioncontrol_GetHandle());
     
     // stop tx activity of services that may have been started by callback function
     
-    // strain
-//    eo_strain_TXstop(eo_strain_GetHandle());
+    // strain... no strain in here
+//    eo_strain_Stop(eo_strain_GetHandle());
+//    eo_strain_Deactivate(eo_strain_GetHandle());
         
     // skin
     eo_skin_Stop(eo_skin_GetHandle());
+    eo_skin_Deactivate(eo_skin_GetHandle());
         
     // mais
-    // we prefer NOT to stop it
-    //eo_mais_TXstop(eo_mais_GetHandle());
+    eo_mais_Stop(eo_mais_GetHandle());
+    eo_mais_Deactivate(eo_mais_GetHandle());
 
-    //#warning MERGE-> remember to stop inertials ... check if already tested in branch
-    eo_inertials_Stop(eo_inertials_GetHandle());
-
-#if defined(TEST_RUNTIME_CONFIG)
-    eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "exiting on_exit_RUN()", "EOMtheEMSappl");
-#endif
+    // inertials
+    eo_inertials2_Stop(eo_inertials2_GetHandle());    
+    eo_inertials2_Deactivate(eo_inertials2_GetHandle());
 }
 
 
@@ -237,21 +215,25 @@ extern void eom_emsappl_hid_userdef_on_entry_ERR(EOMtheEMSappl* p)
     
     // motion-control
     eo_motioncontrol_Stop(eo_motioncontrol_GetHandle());
+    eo_motioncontrol_Deactivate(eo_motioncontrol_GetHandle());
         
     // stop tx activity of services that may have been started by callback function
     
-    // strain
+    // strain... no strain in here
 //    eo_strain_Stop(eo_strain_GetHandle());
+//    eo_strain_Deactivate(eo_strain_GetHandle());
         
     // skin
     eo_skin_Stop(eo_skin_GetHandle());
+    eo_skin_Deactivate(eo_skin_GetHandle());
         
     // mais
-    // we prefer NOT to stop it
-    //eo_mais_TXstop(eo_mais_GetHandle());
+    eo_mais_Stop(eo_mais_GetHandle());
+    eo_mais_Deactivate(eo_mais_GetHandle());
 
-    //#warning MERGE-> remember to stop inertials ... check if already tested in branch
-    eo_inertials_Stop(eo_inertials_GetHandle());
+    // inertials
+    eo_inertials2_Stop(eo_inertials2_GetHandle());    
+    eo_inertials2_Deactivate(eo_inertials2_GetHandle());
 }
 
 
@@ -360,35 +342,20 @@ static void s_overridden_appl_led_error_init(void)
     hal_led_off(hal_led5);   
 }
 
-
-
-static eOprotBRD_t s_overridden_appl_get_boardnumber_fromIPaddress(void)
-{
-    eOprotBRD_t ret = 0;
-    eOipv4addr_t ipaddress = eom_ipnet_GetIPaddress(eom_ipnet_GetHandle());
-    ret = ipaddress >> 24; 
-    if((0 == ret) || (ret > 32))
-    {
-        ret = 1;
-    }    
-    ret --;
-    
-//    #warning -> debug board eb1
-//    ret = 0;
-    
-    return(ret);
-}
-
 static void s_overridden_appl_initialise_services(void)
 {    
-    // board is ... get ip address
-    s_boardnum = s_overridden_appl_get_boardnumber_fromIPaddress();   
+    eOipv4addr_t ipaddress = eom_ipnet_GetIPaddress(eom_ipnet_GetHandle());
+    // if we want to use another board ... uncomment the following for board 10.0.1.2 ... or change to other address.
+    // ipaddress = eo_common_ipv4addr(10, 0, 1, 2);
 
     // initialise services ...
-    eo_services_Initialise();
-    // and start them on the basis of the boardnumber
-    eo_services_StartLegacyMode(eo_services_GetHandle(), s_boardnum);
+    eo_services_Initialise(ipaddress);
+    
+    // and start them on the basis of the boardnumber 
+    // ..... DONT DO IT ANYMORE because now we use runtime configuration.
+    // eo_services_Start(eo_services_GetHandle());
 }
+
 
 
 // --------------------------------------------------------------------------------------------------------------------

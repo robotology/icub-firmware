@@ -124,6 +124,8 @@ static void s_eo_ethmonitor_process_resultsofquery(void);
 
 static void s_eo_ethmonitor_verifyTXropframe(hl_eth_frame_t* frame);
 
+static void s_eo_ethmonitor_verifyTXropframe_DUMMY(hl_eth_frame_t* frame);
+
 static void s_eo_ethmonitor_send_error_sequencenumber(void);
 
 
@@ -290,7 +292,8 @@ extern eOresult_t eo_ethmonitor_Start(EOtheETHmonitor *p)
     
     s_eo_theethmonitor.lastnumberofseqnumbererrors = 0;
     s_eo_theethmonitor.lastsequencenumbererror = 0;
-    hl_eth_set_callback_on_sendframe(s_eo_ethmonitor_verifyTXropframe);
+    //hl_eth_set_callback_on_sendframe(s_eo_ethmonitor_verifyTXropframe);
+    hl_eth_set_callback_on_sendframe(s_eo_ethmonitor_verifyTXropframe_DUMMY);
     
     s_eo_theethmonitor.enabled = eobool_true;
           
@@ -520,7 +523,9 @@ static void s_eo_ethmonitor_process_resultsofquery(void)
 //    hal_trace_puts(strrr);    
 //}
 
-
+static void s_eo_ethmonitor_verifyTXropframe_DUMMY(hl_eth_frame_t* frame)
+{
+}
 
 static void s_eo_ethmonitor_verifyTXropframe(hl_eth_frame_t* frame)
 {    

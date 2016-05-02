@@ -90,6 +90,8 @@ const eOcandiscovery_cfg_t eo_candiscovery_default_cfg =
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
+static void s_eo_candiscovery2_start(void);
+
 static void s_eo_candiscovery2_resetTarget(void);
 
 static void s_eo_candiscovery2_resetDetection(void);
@@ -100,7 +102,7 @@ static void s_eo_candiscovery2_resetSearchStatus(void);
 
 static eObool_t s_eo_candiscovery2_AllBoardsAreFound(EOtheCANdiscovery2 *p);
 
-static eObool_t s_eo_candiscovery2_IsDetectionOK(EOtheCANdiscovery2 *p, eOcanmap_location_t loc, eObool_t match, eObrd_info_t *detected);
+static eObool_t s_eo_candiscovery2_IsDetectionOK(EOtheCANdiscovery2 *p, eObrd_canlocation_t loc, eObool_t match, eObrd_info_t *detected);
 
 
 static void s_eo_candiscovery2_on_timer_expiry(void *arg);
@@ -111,7 +113,7 @@ static eObool_t s_eo_isFirmwareVersionToBeVerified(const eObrd_firmwareversion_t
 
 static eObool_t s_eo_isProtocolVersionToBeVerified(const eObrd_protocolversion_t* target);
 
-static eOresult_t s_eo_candiscovery2_getFWversion(uint8_t boardtype, eOcanmap_location_t location, eObrd_protocolversion_t requiredprotocolversion);
+static eOresult_t s_eo_candiscovery2_getFWversion(uint8_t boardtype, eObrd_canlocation_t location, eObrd_protocolversion_t requiredprotocolversion);
 
 static eObool_t s_eo_isFirmwareVersionCompatible(const eObrd_firmwareversion_t* target, const eObrd_firmwareversion_t* detected);
 
@@ -250,12 +252,9 @@ extern eOresult_t eo_candiscovery2_Start(EOtheCANdiscovery2 *p, const eOcandisco
     snprintf(s_trace_string, sizeof(s_trace_string), "EOtheCANdiscovery2: starts @ lifetime %d ms", (uint32_t)start);
     hal_trace_puts(s_trace_string);
 #endif
-    
-    // 1. i send to all the can boards the first request. all subsequent requests are managed by the _Tick() function which is triggered by the timer
-    //    however, if we dont need to send any request, this function sets s_eo_thecandiscovery2.detection.allhavereplied to true nd we dont neeed to
-    //    activate the timer.
-    
-    s_eo_candiscovery2_search();
+
+
+    s_eo_candiscovery2_start();
     
     if(eobool_false == s_eo_thecandiscovery2.detection.allhavereplied)
     {
@@ -317,7 +316,7 @@ extern eOresult_t eo_candiscovery2_Tick(EOtheCANdiscovery2 *p)
 
 
 
-extern eOresult_t eo_candiscovery2_OneBoardIsFound(EOtheCANdiscovery2 *p, eOcanmap_location_t loc, eObool_t match, eObrd_info_t *detected)
+extern eOresult_t eo_candiscovery2_OneBoardIsFound(EOtheCANdiscovery2 *p, eObrd_canlocation_t loc, eObool_t match, eObrd_info_t *detected)
 {   
     if((NULL == p) || (NULL == detected))
     {
@@ -484,33 +483,75 @@ static void s_eo_candiscovery2_sendDiagnosticsToHost(eObool_t allboardsfound, eO
     eOerrmanDescriptor_t errdes = {0};
     uint8_t i = 0;
     uint8_t n = 0;
-     
+    
+    // 1. at first we send info about what we have discovered
+    // now we send more info if: board is unmatched, fw is different, prot is different.
+    // by defining SEND_FOR_ALL we also send and info if everything is ok
+    for(i=eOcanport1; i<eOcanports_number; i++)
+    {
+        uint16_t differentboardtype = s_eo_thecandiscovery2.detection.differentboardtype[i] & s_eo_thecandiscovery2.target.canmap[i];
+        uint16_t differentfirmwareversion = s_eo_thecandiscovery2.detection.differentfirmwareversion[i] & s_eo_thecandiscovery2.target.canmap[i];
+        uint16_t differentprotocolversion = s_eo_thecandiscovery2.detection.differentprotocolversion[i] & s_eo_thecandiscovery2.target.canmap[i];
+        
+        uint16_t maskofdifferences = differentboardtype | differentfirmwareversion | differentprotocolversion;
+        
+        for(n=0; n<15; n++)
+        {
+            if(eobool_true == eo_common_hlfword_bitcheck(maskofdifferences, n))
+            {   // we have differences
+                errdes.code             = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_candiscovery_detectedboard);
+                errdes.sourcedevice     = (eOcanport1 == i) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
+                errdes.sourceaddress    = 0;
+                errdes.par16            = (n & 0x000f);
+                errdes.par64            = ((uint64_t)s_eo_thecandiscovery2.detection.boards[i][n].info.firmware.build) |
+                                          ((uint64_t)s_eo_thecandiscovery2.detection.boards[i][n].info.firmware.minor << 8) | ((uint64_t)s_eo_thecandiscovery2.detection.boards[i][n].info.firmware.major << 16) |
+                                          ((uint64_t)s_eo_thecandiscovery2.detection.boards[i][n].info.protocol.minor << 24) | ((uint64_t)s_eo_thecandiscovery2.detection.boards[i][n].info.protocol.major << 32) |
+                                          ((uint64_t)s_eo_thecandiscovery2.detection.boards[i][n].info.type << 40) |
+                                          (((uint64_t)s_eo_thecandiscovery2.detection.boards[i][n].time) << 48);                
+                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, s_eobj_ownname, &errdes);                    
+            } 
+#if defined(EOCANDISCOVERY2_DIAGNOSTICS_SENDUPDETECTEDBOARDS)            
+            else if(eobool_true == eo_common_hlfword_bitcheck(s_eo_thecandiscovery2.detection.replies[i], n))
+            {   // we dont have differences. send an info but only if the board has replied 
+                errdes.code             = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_candiscovery_detectedboard);
+                errdes.sourcedevice     = (eOcanport1 == i) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
+                errdes.sourceaddress    = 0;
+                errdes.par16            = (n & 0x000f);
+                errdes.par64            = ((uint64_t)s_eo_thecandiscovery2.detection.boards[i][n].info.firmware.build) |
+                                          ((uint64_t)s_eo_thecandiscovery2.detection.boards[i][n].info.firmware.minor << 8) | ((uint64_t)s_eo_thecandiscovery2.detection.boards[i][n].info.firmware.major << 16) |
+                                          ((uint64_t)s_eo_thecandiscovery2.detection.boards[i][n].info.protocol.minor << 24) | ((uint64_t)s_eo_thecandiscovery2.detection.boards[i][n].info.protocol.major << 32) |
+                                          ((uint64_t)s_eo_thecandiscovery2.detection.boards[i][n].info.type << 40) |
+                                          (((uint64_t)s_eo_thecandiscovery2.detection.boards[i][n].time) << 48);                      
+                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);                                 
+            }
+#endif            
+        }
+ 
+    }    
+    
+    // 2. then we send info about OK or KO
+    
     if((eobool_true == allboardsfound) && (eobool_true == allboardsareok))
     {
         
 #if defined(EOCANDISCOVERY2_DIAGNOSTICS_SENDUPOKRESULT)
         
-        for(i=eOcanport1; i<eOcanports_number; i++)
+        uint8_t numofboards = eo_common_hlfword_bitsetcount(s_eo_thecandiscovery2.target.canmap[0]) + eo_common_hlfword_bitsetcount(s_eo_thecandiscovery2.target.canmap[1]);
+        
+        if(numofboards > 0)
         {
-            uint16_t maskofboards = s_eo_thecandiscovery2.target.canmap[i];  
+            eOerrmanErrorType_t errtype = (eobool_true == s_eo_thecandiscovery2.searchstatus.fakesearch) ? (eo_errortype_warning) : (eo_errortype_info);
             
-            if(0 != maskofboards)
-            { 
-                uint8_t numofboards = eo_common_hlfword_bitsetcount(maskofboards);      
-                
-                errdes.code             = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_candiscovery_ok);
-                errdes.sourcedevice     = (eOcanport1 == i) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
-                errdes.sourceaddress    = 0;
-                errdes.par16            = (numofboards & 0x00ff);
-                errdes.par64            = ((uint64_t)s_eo_thecandiscovery2.target.info.firmware.build) |
-                                          ((uint64_t)s_eo_thecandiscovery2.target.info.firmware.minor << 8) | ((uint64_t)s_eo_thecandiscovery2.target.info.firmware.major << 16) |                                          
-                                          ((uint64_t)s_eo_thecandiscovery2.target.info.protocol.minor << 24) | ((uint64_t)s_eo_thecandiscovery2.target.info.protocol.major << 32) |
-                                          ((uint64_t)s_eo_thecandiscovery2.target.info.type << 40) |
-                                          (((uint64_t)s_eo_thecandiscovery2.detection.duration) << 48);                      
-                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);
-                
-            }
-
+            errdes.code             = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_candiscovery_ok);
+            errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+            errdes.sourceaddress    = 0;
+            errdes.par16            = (numofboards & 0x00ff) | ((uint16_t)s_eo_thecandiscovery2.searchstatus.fakesearch << 12);
+            errdes.par64            = ((uint64_t)s_eo_thecandiscovery2.target.info.firmware.build) |
+                                      ((uint64_t)s_eo_thecandiscovery2.target.info.firmware.minor << 8) | ((uint64_t)s_eo_thecandiscovery2.target.info.firmware.major << 16) |                                          
+                                      ((uint64_t)s_eo_thecandiscovery2.target.info.protocol.minor << 24) | ((uint64_t)s_eo_thecandiscovery2.target.info.protocol.major << 32) |
+                                      ((uint64_t)s_eo_thecandiscovery2.target.info.type << 40) |
+                                      (((uint64_t)s_eo_thecandiscovery2.detection.duration) << 48);                      
+            eo_errman_Error(eo_errman_GetHandle(), errtype, NULL, s_eobj_ownname, &errdes);            
         } 
         
 #endif        
@@ -518,6 +559,7 @@ static void s_eo_candiscovery2_sendDiagnosticsToHost(eObool_t allboardsfound, eO
     }
     else
     {
+       
         if(eobool_false == allboardsfound)
         {
             // "CFG: CANdiscovery cannot find some boards. In p16: board type in 0xff00 and number of missing in 0x00ff. In p64: mask of missing addresses in 0x000000000000ffff"
@@ -544,7 +586,7 @@ static void s_eo_candiscovery2_sendDiagnosticsToHost(eObool_t allboardsfound, eO
         if(eobool_false == allboardsareok)
         {
             // "CFG: CANdiscovery detected invalid boards. In p16: target board type in 0xff00 and number of invalid in 0x00ff. In p64: each nibble contains 0x0 if ok, mask 0x1 if wrong type, mask 0x2 if wrong fw, mask 0x4 if wrong prot"
- 
+            
             for(i=eOcanport1; i<eOcanports_number; i++)
             {
                 uint16_t maskofinvalid = (s_eo_thecandiscovery2.detection.incompatibilities[i]) & s_eo_thecandiscovery2.target.canmap[i];  
@@ -593,49 +635,6 @@ static void s_eo_candiscovery2_sendDiagnosticsToHost(eObool_t allboardsfound, eO
         }                
     }
     
-    // now we send more info if: board is unmatched, fw is different, prot is different.
-    // by defining SEND_FOR_ALL we also send and info if everything is ok
-    for(i=eOcanport1; i<eOcanports_number; i++)
-    {
-        uint16_t differentboardtype = s_eo_thecandiscovery2.detection.differentboardtype[i] & s_eo_thecandiscovery2.target.canmap[i];
-        uint16_t differentfirmwareversion = s_eo_thecandiscovery2.detection.differentfirmwareversion[i] & s_eo_thecandiscovery2.target.canmap[i];
-        uint16_t differentprotocolversion = s_eo_thecandiscovery2.detection.differentprotocolversion[i] & s_eo_thecandiscovery2.target.canmap[i];
-        
-        uint16_t maskofdifferences = differentboardtype | differentfirmwareversion | differentprotocolversion;
-        
-        for(n=0; n<15; n++)
-        {
-            if(eobool_true == eo_common_hlfword_bitcheck(maskofdifferences, n))
-            {   // we have differences
-                errdes.code             = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_candiscovery_detectedboard);
-                errdes.sourcedevice     = (eOcanport1 == i) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
-                errdes.sourceaddress    = 0;
-                errdes.par16            = (n & 0x000f);
-                errdes.par64            = ((uint64_t)s_eo_thecandiscovery2.detection.boards[i][n].info.firmware.build) |
-                                          ((uint64_t)s_eo_thecandiscovery2.detection.boards[i][n].info.firmware.minor << 8) | ((uint64_t)s_eo_thecandiscovery2.detection.boards[i][n].info.firmware.major << 16) |
-                                          ((uint64_t)s_eo_thecandiscovery2.detection.boards[i][n].info.protocol.minor << 24) | ((uint64_t)s_eo_thecandiscovery2.detection.boards[i][n].info.protocol.major << 32) |
-                                          ((uint64_t)s_eo_thecandiscovery2.detection.boards[i][n].info.type << 40) |
-                                          (((uint64_t)s_eo_thecandiscovery2.detection.boards[i][n].time) << 48);                
-                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, s_eobj_ownname, &errdes);                    
-            } 
-#if defined(EOCANDISCOVERY2_DIAGNOSTICS_SENDUPDETECTEDBOARDS)            
-            else if(eobool_true == eo_common_hlfword_bitcheck(s_eo_thecandiscovery2.detection.replies[i], n))
-            {   // we dont have differences. send an info but only if the board has replied 
-                errdes.code             = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_candiscovery_detectedboard);
-                errdes.sourcedevice     = (eOcanport1 == i) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
-                errdes.sourceaddress    = 0;
-                errdes.par16            = (n & 0x000f);
-                errdes.par64            = ((uint64_t)s_eo_thecandiscovery2.detection.boards[i][n].info.firmware.build) |
-                                          ((uint64_t)s_eo_thecandiscovery2.detection.boards[i][n].info.firmware.minor << 8) | ((uint64_t)s_eo_thecandiscovery2.detection.boards[i][n].info.firmware.major << 16) |
-                                          ((uint64_t)s_eo_thecandiscovery2.detection.boards[i][n].info.protocol.minor << 24) | ((uint64_t)s_eo_thecandiscovery2.detection.boards[i][n].info.protocol.major << 32) |
-                                          ((uint64_t)s_eo_thecandiscovery2.detection.boards[i][n].info.type << 40) |
-                                          (((uint64_t)s_eo_thecandiscovery2.detection.boards[i][n].time) << 48);                      
-                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);                                 
-            }
-#endif            
-        }
- 
-    }
        
 }
 
@@ -673,7 +672,7 @@ static eObool_t s_eo_candiscovery2_AllBoardsAreFound(EOtheCANdiscovery2 *p)
     }      
 }
 
-static eObool_t s_eo_candiscovery2_IsDetectionOK(EOtheCANdiscovery2 *p, eOcanmap_location_t loc, eObool_t match, eObrd_info_t *detected)  
+static eObool_t s_eo_candiscovery2_IsDetectionOK(EOtheCANdiscovery2 *p, eObrd_canlocation_t loc, eObool_t match, eObrd_info_t *detected)  
 {  
     eObool_t protocolVersionIsOK = eobool_true;
     eObool_t firmwareVersionIsOK = eobool_true;
@@ -776,7 +775,7 @@ static eObool_t s_eo_candiscovery2_search(void)
             {   // valid addresses are [1, 14]
                 if((eobool_true == eo_common_hlfword_bitcheck(s_eo_thecandiscovery2.target.canmap[i], j)) && (eobool_false == eo_common_hlfword_bitcheck(s_eo_thecandiscovery2.detection.replies[i], j)))
                 {
-                    eOcanmap_location_t location = {.port = i, .addr = j, .insideindex = eocanmap_insideindex_none};
+                    eObrd_canlocation_t location = {.port = i, .addr = j, .insideindex = eobrd_caninsideindex_none};
                     s_eo_candiscovery2_getFWversion(s_eo_thecandiscovery2.target.info.type, location, s_eo_thecandiscovery2.target.info.protocol);
                     allFound = eobool_false;
                 }        
@@ -796,7 +795,7 @@ static eObool_t s_eo_candiscovery2_search(void)
 }
 
 
-static eOresult_t s_eo_candiscovery2_getFWversion(uint8_t boardtype, eOcanmap_location_t location, eObrd_protocolversion_t requiredprotocolversion)
+static eOresult_t s_eo_candiscovery2_getFWversion(uint8_t boardtype, eObrd_canlocation_t location, eObrd_protocolversion_t requiredprotocolversion)
 {  
     eOcanprot_command_t command = {0};
     command.value = (void*)&requiredprotocolversion;
@@ -807,7 +806,7 @@ static eOresult_t s_eo_candiscovery2_getFWversion(uint8_t boardtype, eOcanmap_lo
     switch(boardtype)
     {
         case eobrd_cantype_mc4:
-        case eobrd_cantype_1foc:
+        case eobrd_cantype_foc:
         {
             found = eobool_true;
             command.class = eocanprot_msgclass_pollingMotorControl;
@@ -887,7 +886,37 @@ static eObool_t s_eo_isProtocolVersionToBeVerified(const eObrd_protocolversion_t
     return(eobool_true);    
 }
 
-
+static void s_eo_candiscovery2_start(void)
+{
+    eOerrmanDescriptor_t errdes = {0};
+    
+    errdes.code             = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_candiscovery_started);
+    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+    errdes.sourceaddress    = 0;
+    errdes.par16            = s_eo_thecandiscovery2.target.canmap[1]; 
+    errdes.par64            = ((uint64_t)s_eo_thecandiscovery2.target.info.firmware.build) |
+                              ((uint64_t)s_eo_thecandiscovery2.target.info.firmware.minor << 8) | ((uint64_t)s_eo_thecandiscovery2.target.info.firmware.major << 16) |                                          
+                              ((uint64_t)s_eo_thecandiscovery2.target.info.protocol.minor << 24) | ((uint64_t)s_eo_thecandiscovery2.target.info.protocol.major << 32) |
+                              ((uint64_t)s_eo_thecandiscovery2.target.info.type << 40) |
+                              ((uint64_t)s_eo_thecandiscovery2.target.canmap[0] << 48);            
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);
+    
+    if((eobool_false == s_eo_isFirmwareVersionToBeVerified(&s_eo_thecandiscovery2.target.info.firmware)) && (eobool_false == s_eo_isProtocolVersionToBeVerified(&s_eo_thecandiscovery2.target.info.protocol)))
+    {
+        s_eo_thecandiscovery2.searchstatus.fakesearch = eobool_true;
+    }
+    else
+    {
+        s_eo_thecandiscovery2.searchstatus.fakesearch = eobool_false;
+    }
+    
+    
+    // 1. i send to all the can boards the first request. all subsequent requests are managed by the _Tick() function which is triggered by the timer
+    //    however, if we dont need to send any request, this function sets s_eo_thecandiscovery2.detection.allhavereplied to true nd we dont neeed to
+    //    activate the timer.
+    
+    s_eo_candiscovery2_search();    
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

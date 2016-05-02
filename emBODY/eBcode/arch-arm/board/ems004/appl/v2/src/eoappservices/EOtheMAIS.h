@@ -83,6 +83,8 @@ extern eOresult_t eo_mais_Tick(EOtheMAIS *p);
 
 extern eOresult_t eo_mais_Stop(EOtheMAIS *p);
 
+extern uint8_t eo_mais_GetNumberOfOwners(EOtheMAIS *p); // start() increments owners, stop or deactivate() decrements them.
+
 // it enables/disables transmission of the mais board. _Start() just starts the service, not the transmission
 extern eOresult_t eo_mais_Transmission(EOtheMAIS *p, eObool_t on);
 
