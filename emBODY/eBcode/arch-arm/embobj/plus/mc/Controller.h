@@ -52,7 +52,6 @@ extern MController* MController_new(uint8_t nJoints, uint8_t nEncoders); //
 extern void MController_init(void); //
 
 void MController_config_board(const eOmn_serv_configuration_t* brd_cfg);
-//void MController_updated_jointSet_matrices(void);
 //extern void MController_config_board(uint8_t board_type, uint8_t actuation_type);
 
 extern void MController_config_joint(int j, eOmc_joint_config_t* config); //
