@@ -41,15 +41,15 @@ static void Motor_config_current_PID_2FOC(Motor* o, eOmc_PID_t* pidcurrent)
 {
     int8_t KpKiKdKs[7];
     
-    //((int16_t*)KpKiKdKs)[0] = pidcurrent->kp;    //Kp
-    //((int16_t*)KpKiKdKs)[1] = pidcurrent->ki;    //Ki
-    //((int16_t*)KpKiKdKs)[2] = pidcurrent->kd;    //Kd (unused in 2FOC)
-    //           KpKiKdKs [6] = pidcurrent->scale; // shift
+    ((int16_t*)KpKiKdKs)[0] = pidcurrent->kp;    //Kp
+    ((int16_t*)KpKiKdKs)[1] = pidcurrent->ki;    //Ki
+    ((int16_t*)KpKiKdKs)[2] = pidcurrent->kd;    //Kd (unused in 2FOC)
+               KpKiKdKs [6] = pidcurrent->scale; // shift
     
-    ((int16_t*)KpKiKdKs)[0] =  8; //Kp
-    ((int16_t*)KpKiKdKs)[1] =  2; //Ki
-    ((int16_t*)KpKiKdKs)[2] =  0; //Kd (unused in 2FOC)
-               KpKiKdKs [6] = 10; // shift
+    //((int16_t*)KpKiKdKs)[0] =  8; //Kp
+    //((int16_t*)KpKiKdKs)[1] =  2; //Ki
+    //((int16_t*)KpKiKdKs)[2] =  0; //Kd (unused in 2FOC)
+    //           KpKiKdKs [6] = 10; // shift
     
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, o->ID, 0);
     
@@ -64,7 +64,8 @@ static void Motor_config_max_currents_2FOC(Motor* o, eOmc_current_limits_params_
 {    
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, o->ID, 0);
     
-    int32_t max_current = 5000;//current_params->nominalCurrent;
+    //uint32_t max_current = 5000;
+    uint32_t max_current = current_params->peakCurrent;
     
     eOcanprot_command_t cmdMaxCurrent;
     cmdMaxCurrent.class = eocanprot_msgclass_pollingMotorControl;
@@ -82,12 +83,13 @@ static void Motor_config_2FOC(Motor* o, eOmc_motor_config_t* config)
     ((int16_t*)KpKiKdKs)[2] = config->pidcurrent.kd;    //Kd (unused in 2FOC)
                KpKiKdKs [6] = config->pidcurrent.scale; // shift
     
-    ((int16_t*)KpKiKdKs)[0] =  8; //Kp
-    ((int16_t*)KpKiKdKs)[1] =  2; //Ki
-    ((int16_t*)KpKiKdKs)[2] =  0; //Kd (unused in 2FOC)
-               KpKiKdKs [6] = 10; // shift
+    //((int16_t*)KpKiKdKs)[0] =  8; //Kp
+    //((int16_t*)KpKiKdKs)[1] =  2; //Ki
+    //((int16_t*)KpKiKdKs)[2] =  0; //Kd (unused in 2FOC)
+    //           KpKiKdKs [6] = 10; // shift
     
-    uint32_t max_current = 5000;//config->currentLimits.nominalCurrent;
+    //uint32_t max_current = 5000;
+    uint32_t max_current = config->currentLimits.peakCurrent;
     
     #define HAS_QE      0x0001
     #define HAS_HALL    0x0002
