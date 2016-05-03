@@ -144,7 +144,7 @@ static EOtheMotionController s_eo_themotcon =
         .initted                = eobool_false,
         .active                 = eobool_false,
         .activateafterverify    = eobool_false,
-        .running                = eobool_false,
+        .started                = eobool_false,
         .onverify               = NULL,
         .state                  = eomn_serv_state_notsupported         
     },
@@ -232,7 +232,7 @@ extern EOtheMotionController* eo_motioncontrol_Initialise(void)
 
     p->service.initted = eobool_true;
     p->service.active = eobool_false;
-    p->service.running = eobool_false;
+    p->service.started = eobool_false;
     p->service.state = eomn_serv_state_idle;    
     eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mc, p->service.state);
     
@@ -482,7 +482,7 @@ extern eOresult_t eo_motioncontrol_Deactivate(EOtheMotionController *p)
     
     
     // at first we stop the service
-    if(eobool_true == p->service.running)
+    if(eobool_true == p->service.started)
     {
         eo_motioncontrol_Stop(p);   
     }    
@@ -886,13 +886,13 @@ extern eOresult_t eo_motioncontrol_Start(EOtheMotionController *p)
         return(eores_OK);
     } 
         
-    if(eobool_true == p->service.running)
+    if(eobool_true == p->service.started)
     {   // it is already running
         return(eores_OK);
     }
        
-    p->service.running = eobool_true;    
-    p->service.state = eomn_serv_state_running;
+    p->service.started = eobool_true;    
+    p->service.state = eomn_serv_state_started;
     eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mc, p->service.state);    
     
     // mc4based: enable broadcast etc
@@ -956,7 +956,7 @@ extern eOresult_t eo_motioncontrol_Tick(EOtheMotionController *p)
         return(eores_OK);
     } 
     
-    if(eobool_false == p->service.running)
+    if(eobool_false == p->service.started)
     {   // not running, thus we do nothing
         return(eores_OK);
     }
@@ -1058,7 +1058,7 @@ extern eOresult_t eo_motioncontrol_Stop(EOtheMotionController *p)
         return(eores_OK);
     } 
     
-    if(eobool_false == p->service.running)
+    if(eobool_false == p->service.started)
     {   // it is already stopped
         return(eores_OK);
     }
@@ -1081,7 +1081,7 @@ extern eOresult_t eo_motioncontrol_Stop(EOtheMotionController *p)
         s_eo_mcserv_disable_all_motors(p);
     }
       
-    p->service.running = eobool_false;
+    p->service.started = eobool_false;
     p->service.state = eomn_serv_state_activated;
     eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mc, p->service.state);
     
@@ -1108,7 +1108,7 @@ extern eOresult_t eo_motioncontrol_extra_MotorEnable(EOtheMotionController *p, u
         return(eores_OK);
     } 
     
-    if(eobool_false == p->service.running)
+    if(eobool_false == p->service.started)
     {   // not running, thus we do nothing
         return(eores_OK);
     }    
@@ -1178,7 +1178,7 @@ extern eOresult_t eo_motioncontrol_extra_FaultDetectionEnable(EOtheMotionControl
         return(eores_OK);
     } 
     
-    if(eobool_false == p->service.running)
+    if(eobool_false == p->service.started)
     {   // not running, thus we do nothing
         return(eores_OK);
     }  
@@ -1206,7 +1206,7 @@ extern eObool_t eo_motioncontrol_extra_AreMotorsExtFaulted(EOtheMotionController
         return(eobool_false);
     } 
     
-    if(eobool_false == p->service.running)
+    if(eobool_false == p->service.started)
     {   // not running, thus we do nothing
         return(eobool_false);
     }    
@@ -1232,7 +1232,7 @@ extern eOresult_t eo_motioncontrol_extra_SetMotorFaultMask(EOtheMotionController
         return(eores_OK);
     } 
     
-    if(eobool_false == p->service.running)
+    if(eobool_false == p->service.started)
     {   // not running, thus we do nothing
         return(eores_OK);
     }    
@@ -1302,7 +1302,7 @@ extern uint32_t eo_motioncontrol_extra_GetMotorFaultMask(EOtheMotionController *
         return(0);
     } 
     
-    if(eobool_false == p->service.running)
+    if(eobool_false == p->service.started)
     {   // not running, thus we do nothing
         return(0);
     }    
@@ -1334,7 +1334,7 @@ extern uint16_t eo_motioncontrol_extra_GetMotorCurrent(EOtheMotionController *p,
         return(0);
     } 
     
-    if(eobool_false == p->service.running)
+    if(eobool_false == p->service.started)
     {   // not running, thus we do nothing
         return(0);
     }    
@@ -1368,7 +1368,7 @@ extern int16_t eo_motioncontrol_extra_GetSuppliedVoltage(EOtheMotionController *
         return(0);
     } 
     
-    if(eobool_false == p->service.running)
+    if(eobool_false == p->service.started)
     {   // not running, thus we do nothing
         return(0);
     }    
@@ -1397,7 +1397,7 @@ extern uint32_t eo_motioncontrol_extra_GetMotorAnalogSensor(EOtheMotionControlle
         return(0);
     } 
     
-    if(eobool_false == p->service.running)
+    if(eobool_false == p->service.started)
     {   // not running, thus we do nothing
         return(0);
     }    
@@ -1433,7 +1433,7 @@ extern uint32_t eo_motioncontrol_extra_GetMotorPositionRaw(EOtheMotionController
         return(0);
     } 
     
-    if(eobool_false == p->service.running)
+    if(eobool_false == p->service.started)
     {   // not running, thus we do nothing
         return(0);
     }    
@@ -1470,7 +1470,7 @@ extern void eo_motioncontrol_extra_ResetQuadEncCounter(EOtheMotionController *p,
         return;
     } 
     
-    if(eobool_false == p->service.running)
+    if(eobool_false == p->service.started)
     {   // not running, thus we do nothing
         return;
     }    
@@ -1502,7 +1502,7 @@ extern eObool_t eo_motioncontrol_extra_IsMotorEncoderIndexReached(EOtheMotionCon
         return(eobool_false);
     } 
     
-    if(eobool_false == p->service.running)
+    if(eobool_false == p->service.started)
     {   // not running, thus we do nothing
         return(eobool_false);
     }    
@@ -1534,7 +1534,7 @@ extern eOresult_t eo_motioncontrol_extra_ManageEXTfault(EOtheMotionController *p
         return(eores_OK);
     } 
     
-    if(eobool_false == p->service.running)
+    if(eobool_false == p->service.started)
     {   // not running, thus we do nothing
         return(eores_OK);
     }    

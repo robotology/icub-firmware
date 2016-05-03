@@ -102,7 +102,7 @@ static EOtheSKIN s_eo_theskin =
         .initted                = eobool_false,
         .active                 = eobool_false,
         .activateafterverify    = eobool_false,
-        .running                = eobool_false,
+        .started                = eobool_false,
         .onverify               = NULL,
         .state                  = eomn_serv_state_notsupported       
     },
@@ -176,7 +176,7 @@ extern EOtheSKIN* eo_skin_Initialise(void)
     
     p->service.initted = eobool_true;    
     p->service.active = eobool_false;
-    p->service.running = eobool_false;
+    p->service.started = eobool_false;
     p->service.state = eomn_serv_state_idle;
     eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_skin, p->service.state);    
     
@@ -352,7 +352,7 @@ extern eOresult_t eo_skin_Deactivate(EOtheSKIN *p)
         return(eores_OK);        
     } 
     
-    if(eobool_true == p->service.running)
+    if(eobool_true == p->service.started)
     {
         eo_skin_Stop(p);
     }
@@ -502,13 +502,13 @@ extern eOresult_t eo_skin_Start(EOtheSKIN *p)
         return(eores_OK);
     }  
     
-    if(eobool_true == p->service.running)
+    if(eobool_true == p->service.started)
     {   // it is already running
         return(eores_OK);
     }   
     
-    p->service.running = eobool_true;    
-    p->service.state = eomn_serv_state_running; 
+    p->service.started = eobool_true;    
+    p->service.state = eomn_serv_state_started; 
     eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_skin, p->service.state);
  
     // marco.accame: i start the skin but i dont say to the patches to tx. the eth callback will do it.    
@@ -550,14 +550,14 @@ extern eOresult_t eo_skin_Stop(EOtheSKIN *p)
         return(eores_OK);
     }  
     
-    if(eobool_false == p->service.running)
+    if(eobool_false == p->service.started)
     {   // it is already stopped
         return(eores_OK);
     }       
     
     s_eo_skin_TXstop(p);     
 
-    p->service.running = eobool_false;
+    p->service.started = eobool_false;
     p->service.state = eomn_serv_state_activated; 
     eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_skin, p->service.state);    
     
@@ -591,7 +591,7 @@ extern eOresult_t eo_skin_Tick(EOtheSKIN *p, eObool_t resetstatus)
         return(eores_OK);
     } 
 
-    if(eobool_false == p->service.running)
+    if(eobool_false == p->service.started)
     {   // not running, thus we do nothing
         return(eores_OK);
     }
@@ -648,7 +648,7 @@ extern eOresult_t eo_skin_Transmission(EOtheSKIN *p, eObool_t on)
         return(eores_OK);
     } 
 
-    if(eobool_false == p->service.running)
+    if(eobool_false == p->service.started)
     {   // not running, thus we do nothing
         return(eores_OK);
     }
@@ -680,7 +680,7 @@ extern eOresult_t eo_skin_SetMode(EOtheSKIN *p, uint8_t patchindex, eOsk_sigmode
     }  
   
 // we allow doing things also if we are not in running mode yet    
-//    if(eobool_false == p->service.running)
+//    if(eobool_false == p->service.started)
 //    {   // not running, thus we do nothing
 //        return(eores_OK);
 //    }
@@ -794,7 +794,7 @@ extern eOresult_t eo_skin_SetBoardsConfig(EOtheSKIN *p, uint8_t patchindex, eOsk
     }  
   
 // we allow doing things also if we are not in running mode yet    
-//    if(eobool_false == p->service.running)
+//    if(eobool_false == p->service.started)
 //    {   // not running, thus we do nothing
 //        return(eores_OK);
 //    }
@@ -836,7 +836,7 @@ extern eOresult_t eo_skin_SetTrianglesConfig(EOtheSKIN *p, uint8_t patchindex, e
     }  
   
 // we allow doing things also if we are not in running mode yet    
-//    if(eobool_false == p->service.running)
+//    if(eobool_false == p->service.started)
 //    {   // not running, thus we do nothing
 //        return(eores_OK);
 //    }
@@ -887,7 +887,7 @@ extern eOresult_t eo_skin_AcceptCANframe(EOtheSKIN *p, eOcanframe_t *frame, eOca
     }  
   
     // we must be in run mode to accept frames, because the tick must be working    
-    if(eobool_false == p->service.running)
+    if(eobool_false == p->service.started)
     {   // not running, thus we dont accept
         return(eores_OK);
     }

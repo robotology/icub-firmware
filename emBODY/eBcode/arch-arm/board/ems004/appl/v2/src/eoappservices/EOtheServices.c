@@ -885,8 +885,8 @@ static eOresult_t s_eo_services_process_start(EOtheServices *p, eOmn_serv_catego
         return(eores_OK);
     }
     
-    // now have a look at state. it must be eomn_serv_state_activated or eomn_serv_state_running  
-    if((eomn_serv_state_running == p->mnservice->status.stateofservice[category]) || (eomn_serv_state_activated == p->mnservice->status.stateofservice[category]))
+    // now have a look at state. it must be eomn_serv_state_activated or eomn_serv_state_started  
+    if((eomn_serv_state_started == p->mnservice->status.stateofservice[category]) || (eomn_serv_state_activated == p->mnservice->status.stateofservice[category]))
     {     
         // ok
     } 

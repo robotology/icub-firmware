@@ -104,7 +104,7 @@ static EOtheSTRAIN s_eo_thestrain =
         .initted                = eobool_false,
         .active                 = eobool_false,
         .activateafterverify    = eobool_false,
-        .running                = eobool_false,
+        .started                = eobool_false,
         .onverify               = NULL,
         .state                  = eomn_serv_state_notsupported         
     },
@@ -169,7 +169,7 @@ extern EOtheSTRAIN* eo_strain_Initialise(void)
         
     p->service.initted = eobool_true;
     p->service.active = eobool_false;
-    p->service.running = eobool_false;    
+    p->service.started = eobool_false;    
     p->service.state = eomn_serv_state_idle;  
     eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_strain, p->service.state);       
     
@@ -302,7 +302,7 @@ extern eOresult_t eo_strain_Deactivate(EOtheSTRAIN *p)
     
     // send stop messages to strain, unload the entity-can-mapping and the board-can-mapping, reset all things inside this object
 
-    if(eobool_true == p->service.running)
+    if(eobool_true == p->service.started)
     {
         eo_strain_Stop(p);
     }
@@ -411,13 +411,13 @@ extern eOresult_t eo_strain_Start(EOtheSTRAIN *p)
         return(eores_OK);
     }  
     
-    if(eobool_true == p->service.running)
+    if(eobool_true == p->service.started)
     {   // it is already running
         return(eores_OK);
     }   
     
-    p->service.running = eobool_true;    
-    p->service.state = eomn_serv_state_running; 
+    p->service.started = eobool_true;    
+    p->service.state = eomn_serv_state_started; 
     eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_strain, p->service.state);
     
     // start() does not force the tx of the board. 
@@ -458,14 +458,14 @@ extern eOresult_t eo_strain_Stop(EOtheSTRAIN *p)
         return(eores_OK);
     }  
     
-    if(eobool_false == p->service.running)
+    if(eobool_false == p->service.started)
     {   // it is already stopped
         return(eores_OK);
     }  
     
     s_eo_strain_TXstop(p);   
 
-    p->service.running = eobool_false;
+    p->service.started = eobool_false;
     p->service.state = eomn_serv_state_activated;
     eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_strain, p->service.state);    
     
@@ -488,7 +488,7 @@ extern eOresult_t eo_strain_Tick(EOtheSTRAIN *p)
         return(eores_OK);
     } 
 
-    if(eobool_false == p->service.running)
+    if(eobool_false == p->service.started)
     {   // not running, thus we do nothing
         return(eores_OK);
     }     
@@ -512,7 +512,7 @@ extern eOresult_t eo_strain_Transmission(EOtheSTRAIN *p, eObool_t on)
         return(eores_OK);
     } 
 
-    if(eobool_false == p->service.running)
+    if(eobool_false == p->service.started)
     {   // not running, thus we do nothing
         return(eores_OK);
     }     
@@ -545,7 +545,7 @@ extern eOresult_t eo_strain_Set(EOtheSTRAIN *p, eOas_strain_config_t *cfg)
     }  
 
 // we allow doing things also if we are not in running mode yet     
-//    if(eobool_false == p->service.running)
+//    if(eobool_false == p->service.started)
 //    {   // not running, thus we do nothing
 //        return(eores_OK);
 //    }     
@@ -578,7 +578,7 @@ extern eOresult_t eo_strain_SetMode(EOtheSTRAIN *p, eOas_strainmode_t mode)
     }  
 
 // we allow doing things also if we are not in running mode yet     
-//    if(eobool_false == p->service.running)
+//    if(eobool_false == p->service.started)
 //    {   // not running, thus we do nothing
 //        return(eores_OK);
 //    }     
@@ -608,7 +608,7 @@ extern eOresult_t eo_strain_SetDataRate(EOtheSTRAIN *p, uint8_t datarate)
     }  
 
 // we allow doing things also if we are not in running mode yet     
-//    if(eobool_false == p->service.running)
+//    if(eobool_false == p->service.started)
 //    {   // not running, thus we do nothing
 //        return(eores_OK);
 //    }     
@@ -648,7 +648,7 @@ extern eOresult_t eo_strain_GetFullScale(EOtheSTRAIN *p, eOservice_onendofoperat
     }
     
 // we allow doing things also if we are not in running mode yet     
-//    if(eobool_false == p->service.running)
+//    if(eobool_false == p->service.started)
 //    {   // not running, thus we do nothing
 //        return(eores_OK);
 //    }     
@@ -781,11 +781,11 @@ extern eObool_t eocanprotASpolling_redefinable_alert_reception_of_POL_AS_CMD__GE
 //    
 //    if(eoas_strainmode_acquirebutdonttx == mode)
 //    {
-//        p->service.running = eobool_false;
+//        p->service.started = eobool_false;
 //    }
 //    else
 //    {
-//        p->service.running = eobool_true;
+//        p->service.started = eobool_true;
 //    }
 
 //    return(eores_OK);

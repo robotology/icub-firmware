@@ -101,7 +101,7 @@ static EOtheMAIS s_eo_themais =
         .initted                = eobool_false,
         .active                 = eobool_false,
         .activateafterverify    = eobool_false,
-        .running                = eobool_false,
+        .started                = eobool_false,
         .onverify               = NULL,
         .state                  = eomn_serv_state_notsupported
     },
@@ -167,7 +167,7 @@ extern EOtheMAIS* eo_mais_Initialise(void)
         
     p->service.initted = eobool_true;    
     p->service.active = eobool_false;
-    p->service.running = eobool_false;
+    p->service.started = eobool_false;
     p->service.state = eomn_serv_state_idle;    
     eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mais, p->service.state);
        
@@ -346,7 +346,7 @@ extern eOresult_t eo_mais_Deactivate(EOtheMAIS *p)
     
     // send stop messages to mais, unload the entity-can-mapping and the board-can-mapping, reset all things inside this object
        
-    if(eobool_true == p->service.running)
+    if(eobool_true == p->service.started)
     {
         eo_mais_Stop(p);
     }
@@ -482,15 +482,15 @@ extern eOresult_t eo_mais_Start(EOtheMAIS *p)
         return(eores_OK);
     }  
     
-    if(eobool_true == p->service.running)
+    if(eobool_true == p->service.started)
     {   // it is already running. however we increment number of owners
         p->numberofowners ++;
         return(eores_OK);
     }   
     
     p->numberofowners = 1; // dont increment. just set to 1.
-    p->service.running = eobool_true;    
-    p->service.state = eomn_serv_state_running; 
+    p->service.started = eobool_true;    
+    p->service.state = eomn_serv_state_started; 
     eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mais, p->service.state);   
     
     // now we activate tx according to config of mais
@@ -530,7 +530,7 @@ extern eOresult_t eo_mais_Stop(EOtheMAIS *p)
         return(eores_OK);
     }  
     
-    if(eobool_false == p->service.running)
+    if(eobool_false == p->service.started)
     {   // it is already stopped
         return(eores_OK);
     }
@@ -549,7 +549,7 @@ extern eOresult_t eo_mais_Stop(EOtheMAIS *p)
      
     s_eo_mais_TXstop(p);
        
-    p->service.running = eobool_false;
+    p->service.started = eobool_false;
     p->service.state = eomn_serv_state_activated;
     eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_mais, p->service.state);       
     
@@ -572,7 +572,7 @@ extern eOresult_t eo_mais_Tick(EOtheMAIS *p)
         return(eores_OK);
     } 
 
-    if(eobool_false == p->service.running)
+    if(eobool_false == p->service.started)
     {   // not running, thus we do nothing
         return(eores_OK);
     }     
@@ -595,7 +595,7 @@ extern eOresult_t eo_mais_Transmission(EOtheMAIS *p, eObool_t on)
         return(eores_OK);
     } 
 
-    if(eobool_false == p->service.running)
+    if(eobool_false == p->service.started)
     {   // not running, thus we do nothing
         return(eores_OK);
     }     
@@ -627,7 +627,7 @@ extern eOresult_t eo_mais_Set(EOtheMAIS *p, eOas_mais_config_t* maiscfg)
     }  
   
 // we allow doing things also if we are not in running mode yet    
-//    if(eobool_false == p->service.running)
+//    if(eobool_false == p->service.started)
 //    {   // not running, thus we do nothing
 //        return(eores_OK);
 //    }     
@@ -668,7 +668,7 @@ extern eOresult_t eo_mais_SetMode(EOtheMAIS *p, eOas_maismode_t mode)
     }  
 
 // we allow doing things also if we are not in running mode yet     
-//    if(eobool_false == p->service.running)
+//    if(eobool_false == p->service.started)
 //    {   // not running, thus we do nothing
 //        return(eores_OK);
 //    }     
@@ -699,7 +699,7 @@ extern eOresult_t eo_mais_SetDataRate(EOtheMAIS *p, uint8_t datarate)
     } 
 
 // we allow doing things also if we are not in running mode yet 
-//    if(eobool_false == p->service.running)
+//    if(eobool_false == p->service.started)
 //    {   // not running, thus we do nothing
 //        return(eores_OK);
 //    }     
@@ -730,7 +730,7 @@ extern eOresult_t eo_mais_SetResolution(EOtheMAIS *p, eOas_maisresolution_t reso
     }  
 
 // we allow doing things also if we are not in running mode yet     
-//    if(eobool_false == p->service.running)
+//    if(eobool_false == p->service.started)
 //    {   // not running, thus we do nothing
 //        return(eores_OK);
 //    }     
@@ -802,7 +802,7 @@ static eOresult_t s_eo_mais_TXstart(EOtheMAIS *p, uint8_t datarate, eOas_maismod
         return(eores_OK);
     }  
 
-    if(eobool_false == p->service.running)
+    if(eobool_false == p->service.started)
     {   // not running, thus we do nothing
         return(eores_OK);
     }     
@@ -828,7 +828,7 @@ static eOresult_t s_eo_mais_TXstop(EOtheMAIS *p)
         return(eores_OK);
     }   
     
-    if(eobool_false == p->service.running)
+    if(eobool_false == p->service.started)
     {   // not running, thus we do nothing
         return(eores_OK);
     }     

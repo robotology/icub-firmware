@@ -107,7 +107,7 @@ static EOtheEncoderReader s_eo_theencoderreader =
         .initted                = eobool_false,
         .active                 = eobool_false,
         .activateafterverify    = eobool_false,
-        .running                = eobool_false,
+        .started                = eobool_false,
         .onverify               = NULL             
     },
     .diagnostics = 
@@ -158,7 +158,7 @@ extern EOtheEncoderReader* eo_encoderreader_Initialise(void)
        
     s_eo_theencoderreader.service.initted = eobool_true;
     s_eo_theencoderreader.service.active = eobool_false;   
-    s_eo_theencoderreader.service.running = eobool_false;   
+    s_eo_theencoderreader.service.started = eobool_false;   
     
     return(&s_eo_theencoderreader);   
 }

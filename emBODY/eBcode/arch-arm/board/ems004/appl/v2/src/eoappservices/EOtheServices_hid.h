@@ -55,7 +55,7 @@ typedef struct
     eObool_t                                initted;
     eObool_t                                active;  
     eObool_t                                activateafterverify;
-    eObool_t                                running;
+    eObool_t                                started;
     eOservice_onendofoperation_fun_t        onverify;
     eOmn_serv_state_t                       state;
 } eOservice_core_t;    

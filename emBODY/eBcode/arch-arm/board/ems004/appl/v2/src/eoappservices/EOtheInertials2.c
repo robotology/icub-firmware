@@ -117,7 +117,7 @@ static EOtheInertials2 s_eo_theinertials2 =
         .initted                = eobool_false,
         .active                 = eobool_false,
         .activateafterverify    = eobool_false,
-        .running                = eobool_false,
+        .started                = eobool_false,
         .onverify               = NULL,
         .state                  = eomn_serv_state_notsupported          
     },
@@ -201,7 +201,7 @@ extern EOtheInertials2* eo_inertials2_Initialise(void)
     
     p->service.initted = eobool_true;    
     p->service.active = eobool_false;
-    p->service.running = eobool_false;
+    p->service.started = eobool_false;
     p->service.state = eomn_serv_state_idle;
     eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_inertials, p->service.state);
     
@@ -388,7 +388,7 @@ extern eOresult_t eo_inertials2_Deactivate(EOtheInertials2 *p)
         return(eores_OK);        
     } 
     
-    if(eobool_true == p->service.running)
+    if(eobool_true == p->service.started)
     {
         eo_inertials2_Stop(p);
     }
@@ -553,12 +553,12 @@ extern eOresult_t eo_inertials2_Start(EOtheInertials2 *p)
         return(eores_OK);
     } 
 
-    if(eobool_true == p->service.running)
+    if(eobool_true == p->service.started)
     {   // it is already running
         return(eores_OK);
     } 
     
-//    if(eobool_true == p->service.running)
+//    if(eobool_true == p->service.started)
 //    {   // if running we stop before
 //        eo_inertials2_Stop(p);
 //    } 
@@ -568,8 +568,8 @@ extern eOresult_t eo_inertials2_Start(EOtheInertials2 *p)
          
     //s_eo_inertials2_TXstart(p);
 
-    p->service.running = eobool_true;    
-    p->service.state = eomn_serv_state_running;
+    p->service.started = eobool_true;    
+    p->service.state = eomn_serv_state_started;
     eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_inertials, p->service.state);
     
     
@@ -604,7 +604,7 @@ extern eOresult_t eo_inertials2_Stop(EOtheInertials2 *p)
         return(eores_OK);
     }  
     
-    if(eobool_false == p->service.running)
+    if(eobool_false == p->service.started)
     {   // it is already stopped
         return(eores_OK);
     } 
@@ -615,7 +615,7 @@ extern eOresult_t eo_inertials2_Stop(EOtheInertials2 *p)
     s_eo_inertials2_TXstop(p);
     
                
-    p->service.running = eobool_false;
+    p->service.started = eobool_false;
     p->service.state = eomn_serv_state_activated;
     eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_inertials, p->service.state);
     
@@ -644,7 +644,7 @@ extern eOresult_t eo_inertials2_Transmission(EOtheInertials2 *p, eObool_t on)
         return(eores_OK);
     } 
 
-    if(eobool_false == p->service.running)
+    if(eobool_false == p->service.started)
     {   // not running, thus we do nothing
         return(eores_OK);
     } 
@@ -679,7 +679,7 @@ extern eOresult_t eo_inertials2_Tick(EOtheInertials2 *p, eObool_t resetstatus)
         return(eores_OK);
     } 
 
-    if(eobool_false == p->service.running)
+    if(eobool_false == p->service.started)
     {   // not running, thus we do nothing
         return(eores_OK);
     } 
@@ -735,7 +735,7 @@ extern eOresult_t eo_inertials2_Config(EOtheInertials2 *p, eOas_inertial_config_
     }  
   
 // we allow doing things also if we are not in running mode yet    
-//    if(eobool_false == p->service.running)
+//    if(eobool_false == p->service.started)
 //    {   // not running, thus we do nothing
 //        return(eores_OK);
 //    }
@@ -792,7 +792,7 @@ extern eOresult_t eo_inertials2_AcceptCANframe(EOtheInertials2 *p, eOas_inertial
     }  
   
     // we must be in run mode to accept frames, because the tick must be working   
-    if(eobool_false == p->service.running)
+    if(eobool_false == p->service.started)
     {   // not running, thus we dont accept
         return(eores_OK);
     } 
@@ -902,7 +902,7 @@ extern eObool_t eocanprotINperiodic_redefinable_SkipParsingOf_ANY_PERIODIC_INERT
     // i dont want to put data in the fifoofinertialdata when we are not in the control loop.
     // moreover: i put it in its inside only if we have called _Start() 
     
-    if(eobool_false == p->service.running)
+    if(eobool_false == p->service.started)
     {   // it is not running
         return(eobool_true);
     } 
