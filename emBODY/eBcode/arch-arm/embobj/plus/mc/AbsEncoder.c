@@ -151,7 +151,7 @@ BOOL AbsEncoder_is_hard_stop_calibrating(AbsEncoder* o)
     return o->state.bits.hard_stop_calib;
 }
 
-void AbsEncoder_calibrate(AbsEncoder* o, int32_t offset, int32_t zero)
+void AbsEncoder_calibrate_absolute(AbsEncoder* o, int32_t offset, int32_t zero)
 {
     o->offset = offset;
     o->zero = zero;
@@ -162,6 +162,11 @@ void AbsEncoder_calibrate(AbsEncoder* o, int32_t offset, int32_t zero)
     
     o->state.bits.not_calibrated  = FALSE;
     o->state.bits.hard_stop_calib = FALSE;
+}
+
+void AbsEncoder_calibrate_fake(AbsEncoder* o)
+{
+    AbsEncoder_calibrate_absolute(o, 0, 0);
 }
 
 int32_t AbsEncoder_position(AbsEncoder* o)

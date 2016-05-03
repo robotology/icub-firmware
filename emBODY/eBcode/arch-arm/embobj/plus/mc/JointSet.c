@@ -1498,6 +1498,8 @@ static void JointSet_do_wait_calibration(JointSet* o)
         
             o->control_mode = eomc_controlmode_notConfigured;
             
+            o->is_calibrated = FALSE;
+            
             for (int k=0; k<N; ++k)
             {
                 o->joint[o->joints_of_set[k]].control_mode = eomc_controlmode_notConfigured;
@@ -1602,7 +1604,7 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
     {
         case eomc_calibration_type3_abs_sens_digital:
         {
-            AbsEncoder_calibrate(o->absEncoder+e, calibrator->params.type3.offset, calibrator->params.type3.calibrationZero);
+            AbsEncoder_calibrate_absolute(o->absEncoder+e, calibrator->params.type3.offset, calibrator->params.type3.calibrationZero);
             Motor_calibrate_withOffset(o->motor+e, 0);
             o->calibration_in_progress = (eOmc_calibration_type_t)calibrator->type;
             break;
@@ -1617,7 +1619,7 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
                 o->control_mode = jointSet_controlMode_old;
                 return;
             }
-            AbsEncoder_calibrate(o->absEncoder+e, 0, 0);
+            AbsEncoder_calibrate_fake(o->absEncoder+e);
             o->calibration_in_progress = (eOmc_calibration_type_t)calibrator->type;
             break;
         }
@@ -1781,9 +1783,9 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             o->joint[o->joints_of_set[1]].control_mode = eomc_controlmode_calib;
             o->joint[o->joints_of_set[2]].control_mode = eomc_controlmode_calib;
             
-            AbsEncoder_calibrate(o->absEncoder+o->encoders_of_set[0], 0, 0);
-            AbsEncoder_calibrate(o->absEncoder+o->encoders_of_set[1], 0, 0);
-            AbsEncoder_calibrate(o->absEncoder+o->encoders_of_set[2], 0, 0);
+            AbsEncoder_calibrate_fake(o->absEncoder+o->encoders_of_set[0]);
+            AbsEncoder_calibrate_fake(o->absEncoder+o->encoders_of_set[1]);
+            AbsEncoder_calibrate_fake(o->absEncoder+o->encoders_of_set[2]);
             
             o->tripod_calib.pwm       = calibrator->params.type9.pwmlimit;
             o->tripod_calib.max_delta = calibrator->params.type9.max_delta;
@@ -1822,8 +1824,8 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
         case eomc_calibration_type11_cer_hands:
         {   
             AbsEncoder* enc = o->absEncoder + 2*e;
-            AbsEncoder_calibrate(enc  , calibrator->params.type11.offset0, calibrator->params.type11.calibrationZero);
-            AbsEncoder_calibrate(enc+1, calibrator->params.type11.offset1, calibrator->params.type11.calibrationZero);
+            AbsEncoder_calibrate_absolute(enc  , calibrator->params.type11.offset0, calibrator->params.type11.calibrationZero);
+            AbsEncoder_calibrate_absolute(enc+1, calibrator->params.type11.offset1, calibrator->params.type11.calibrationZero);
             
             JointSet_do_odometry(o);
             
