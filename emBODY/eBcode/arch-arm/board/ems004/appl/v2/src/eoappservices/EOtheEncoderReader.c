@@ -540,31 +540,31 @@ static void s_eo_encoderreader_read_encoders(void* p)
 {
     eObool_t readingisok = eobool_true;
     
-//    uint8_t i = 0;
+    uint8_t i = 0;
     
     memset(&s_eo_theencoderreader.errors, encreader_err_NONE, sizeof(s_eo_theencoderreader.errors));
     s_eo_theencoderreader.failuremask = 0;
     
-//    for(i=0; i< s_eo_theencoderreader.numofjomos; i++)
-//    {
-//        uint32_t primary = 0;
-//        uint32_t secondary = 0;
-//        eOappEncReader_errortype_t err1;
-//        eOappEncReader_errortype_t err2;
+    for(i=0; i< s_eo_theencoderreader.numofjomos; i++)
+    {
+        uint32_t primary = 0;
+        uint32_t secondary = 0;
+        eOappEncReader_errortype_t err1;
+        eOappEncReader_errortype_t err2;
 
-//        eOresult_t res = eo_appEncReader_GetValue(s_eo_theencoderreader.reader, i, &primary, &secondary, &err1, &err2);
-//        
-//        s_eo_theencoderreader.errors[i] = (eOencoderreader_errortype_t)err1;
-//        if(err_NONE != err1)
-//        {
-//            eo_common_byte_bitset(&s_eo_theencoderreader.failuremask, i);
-//            readingisok = eobool_false;
-//        }   
-//        // so far we assume that we have so many encoders as joints ...
-//        s_eo_theencoderreader.numofencoders ++;        
-//    }
-//    
-//    
+        eOresult_t res = eo_appEncReader_GetValue(s_eo_theencoderreader.reader, i, &primary, &secondary, &err1, &err2);
+        
+        s_eo_theencoderreader.errors[i] = (eOencoderreader_errortype_t)err1;
+        if(err_NONE != err1)
+        {
+            eo_common_byte_bitset(&s_eo_theencoderreader.failuremask, i);
+            readingisok = eobool_false;
+        }   
+        // so far we assume that we have so many encoders as joints ...
+        s_eo_theencoderreader.numofencoders ++;        
+    }
+    
+    
     s_eo_encoderreader_onstop_verifyreading((void*)p, readingisok);   
 }
 

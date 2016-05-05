@@ -435,7 +435,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         
         break;
         
-	case emscontroller_board_CER_BASE:                //= 21    //2FOC
+    case emscontroller_board_CER_BASE:                //= 21    //2FOC
     {
         o->nSets   = 4;
         
@@ -477,7 +477,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         o->multi_encs = 2;
     
         Sje = o->Sje;
-        
+
         Sje[0][0] = -1.0f; Sje[0][1] =  1.0f;  Sje[0][2] =  0.0f; Sje[0][3] =  0.0f;
         Sje[1][0] =  0.0f; Sje[1][1] =  0.0f;  Sje[1][2] =  1.0f; Sje[1][3] = -1.0f;
 
@@ -818,20 +818,12 @@ void MController_config_joint(int j, eOmc_joint_config_t* config) //
     }
     else if (o->part_type==emscontroller_board_CER_HAND)
     {
-        AbsEncoder_config(o->absEncoder+j*2,   j, config->jntEncoderResolution, AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
-        AbsEncoder_config(o->absEncoder+j*2+1, j, config->jntEncoderResolution, AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
+        AbsEncoder_config(o->absEncoder+j*2,   j, config->jntEncoderType, config->jntEncoderResolution, AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
+        AbsEncoder_config(o->absEncoder+j*2+1, j, config->jntEncoderType, config->jntEncoderResolution, AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
     }
     else
     {
-        int16_t spike_mag_limit = AEA_DEFAULT_SPIKE_MAG_LIMIT;
-        uint16_t spike_cnt_limit = AEA_DEFAULT_SPIKE_CNT_LIMIT;
-        
-        if(config->jntEncoderType == eomc_encoder_AEA)
-        {
-            spike_mag_limit = AEA_DEFAULT_SPIKE_MAG_LIMIT;
-            spike_cnt_limit = AEA_DEFAULT_SPIKE_CNT_LIMIT;
-        }
-        AbsEncoder_config(o->absEncoder+j, j, config->jntEncoderType, config->jntEncoderResolution, spike_mag_limit, spike_cnt_limit);
+        AbsEncoder_config(o->absEncoder+j, j, config->jntEncoderType, config->jntEncoderResolution, AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
     }
 }
 

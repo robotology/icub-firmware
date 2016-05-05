@@ -90,13 +90,15 @@ extern void AbsEncoder_init(AbsEncoder* o);
 extern void AbsEncoder_destroy(AbsEncoder* o);
 
 extern void AbsEncoder_config(AbsEncoder* o, uint8_t ID, eOmc_EncoderType_t type, int32_t resolution, int16_t spike_mag_limit, uint16_t spike_cnt_limit);
-extern void AbsEncoder_config_resolution(AbsEncoder* o, float resolution);
 extern void AbsEncoder_calibrate_absolute(AbsEncoder* o, int32_t offset, int32_t zero);
 extern void AbsEncoder_calibrate_fake(AbsEncoder* o);
 
 //extern void AbsEncoder_update(AbsEncoder* o, int32_t position);
 extern void AbsEncoder_update(AbsEncoder* o, uint16_t position);
 extern void AbsEncoder_invalid(AbsEncoder* o, eOencoderreader_errortype_t error_type);
+
+extern void AbsEncoder_config_resolution(AbsEncoder* o, float resolution);
+
 extern void AbsEncoder_timeout(AbsEncoder* o);
 
 extern int32_t AbsEncoder_position(AbsEncoder* o);

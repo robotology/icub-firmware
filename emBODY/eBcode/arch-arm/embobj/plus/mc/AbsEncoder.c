@@ -98,7 +98,6 @@ void AbsEncoder_config(AbsEncoder* o, uint8_t ID, eOmc_EncoderType_t type, int32
     {
         o->spike_mag_limit = spike_mag_limit;//7*(65536L/resolution);
         o->spike_cnt_limit = spike_cnt_limit;//7*(65536L/resolution);
-    
         //o->sign = resolution >= 0 ? 1 : -1;
     }
     else

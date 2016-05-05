@@ -705,10 +705,10 @@ void Motor_actuate(Motor* motor, uint8_t N) //
         command.type  = ICUBCANPROTO_PER_MC_MSG__EMSTO2FOC_DESIRED_CURRENT;
         command.value = output;
     
-        eOcanmap_location_t location = {0};
+        eObrd_canlocation_t location = {0};
         location.port = eOcanport1;
         location.addr = 0;
-        location.insideindex = eocanmap_insideindex_first; // because all 2foc have motor on index-0. 
+        location.insideindex = eobrd_caninsideindex_first; // because all 2foc have motor on index-0. 
 
         // and i send the command
         eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), &command, location); 
@@ -821,6 +821,10 @@ void Motor_get_state(Motor* o, eOmc_motor_status_t* motor_status)
 {
     motor_status->basic.mot_position = o->pos_fbk;
     motor_status->basic.mot_velocity = o->vel_fbk;
+
+    //motor_status->basic.mot_position = o->pos_raw_fbk;
+    //motor_status->basic.mot_velocity = o->vel_raw_fbk;
+
     motor_status->basic.mot_acceleration = 0; // not implemented
     motor_status->basic.mot_current  = o->Iqq_fbk;    
     motor_status->basic.mot_pwm      = o->pwm_fbk;

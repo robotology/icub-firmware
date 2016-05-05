@@ -58,10 +58,11 @@ typedef struct // JointSet
     int32_t special_limit;
     
     eOmc_calibration_type_t calibration_in_progress;
+    
     int32_t calibration_timeout;
     
     TripodCalib tripod_calib;
-    
+
 } JointSet;
 
 extern JointSet* JointSet_new(uint8_t n); //
@@ -95,5 +96,8 @@ extern BOOL JointSet_set_control_mode(JointSet* o, eOmc_controlmode_command_t co
 extern void JointSet_set_interaction_mode(JointSet* o, eOmc_interactionmode_t interaction_mode);
 
 extern void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator);
+
+extern void JointSet_do_pwm_control(JointSet* o);
     
+extern void JointSet_send_debug_message(char *message, uint8_t jid);
 #endif

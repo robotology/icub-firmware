@@ -13,10 +13,8 @@
 #include "Pid.h"
 
 #include "JointSet.h"
-#include "Calibrators.h"
 
-#define CALIB_TYPE_6_POS_TRHESHOLD 546 //546=3 degree //91.02f // = 0.5 degree
-static void send_debug_message(char *message, uint8_t jid);
+#include "Calibrators.h"
 
 JointSet* JointSet_new(uint8_t n) //
 {
@@ -283,7 +281,6 @@ BOOL JointSet_do_check_faults(JointSet* o)
     return fault;
 }
 
-static void JointSet_do_pwm_control(JointSet* o);
 static void JointSet_do_vel_control(JointSet* o);
 
 void JointSet_do_control(JointSet* o)
@@ -318,7 +315,6 @@ void JointSet_do(JointSet* o)
     else
     {
         JointSet_do_wait_calibration(o);
-        
     }
 }
 
@@ -505,7 +501,7 @@ static void JointSet_manage_trifid_constraint(JointSet* o)
     }
 }
 
-static void JointSet_do_pwm_control(JointSet* o)
+void JointSet_do_pwm_control(JointSet* o)
 {
     int N = *(o->pN);
         
@@ -644,7 +640,7 @@ static void JointSet_do_pwm_control(JointSet* o)
         case CER_HAND_CONSTRAINT:
             JointSet_manage_cable_constraint(o);
             break;
-        
+
         default:
             break;
     }
@@ -724,763 +720,6 @@ static void JointSet_set_inner_control_flags(JointSet* o)
     }
 }
 
-
-#if 0
-typedef struct                  // size is 1+3+4*4 = 20
-{
-    eOenum08_t                  type;                               /**< use eOmc_calibration_type_t */
-    uint8_t                     filler03[3];
-    union
-    {
-        uint32_t                                                any[6];
-        eOmc_calibrator_params_type0_hard_stops_t               type0;
-        eOmc_calibrator_params_type1_abs_sens_analog_t          type1;
-        eOmc_calibrator_params_type2_hard_stops_diff_t          type2;
-        eOmc_calibrator_params_type3_abs_sens_digital_t         type3;
-        eOmc_calibrator_params_type4_abs_and_incremental_t      type4;
-        eOmc_calibrator_params_type5_hard_stops_mc4plus_t       type5;
-        eOmc_calibrator_params_type6_mais_t                     type6;
-        eOmc_calibrator_params_type7_hall_sensor_t              type7;
-        eOmc_calibration_type8_adc_and_incr_mc4plus_t           type8;
-    } params;                                                       /**< the params of the calibrator */   
-} eOmc_calibrator32_t;           EO_VERIFYsizeof(eOmc_calibrator32_t, 28);
-typedef eOmc_calibrator32_t eOmc_calibrator_t;
-#endif
-
-static BOOL JointSet_do_wait_calibration_3(JointSet* o)
-{
-    BOOL calibrated = TRUE;
-    
-    for (int ms=0; ms<*(o->pN); ++ms)
-    {
-        if (!Motor_is_calibrated(o->motor+o->motors_of_set[ms])) 
-        {
-            calibrated = FALSE;
-        }
-    }
-    
-    return calibrated;
-}
-
-static BOOL JointSet_do_wait_calibration_5(JointSet* o)
-{
-    BOOL calibrated = TRUE;
-    
-    for (int ms=0; ms<*(o->pN); ++ms)
-    {
-        if (!Motor_is_calibrated(o->motor+o->motors_of_set[ms])) 
-        {
-            calibrated = FALSE;
-            
-            Motor_do_calibration_hard_stop(o->motor+o->motors_of_set[ms]);
-        }
-    }
-    
-    return calibrated;
-}
-
-
-static BOOL JointSet_calibType6_check_reached_pos(Joint *j)
-{
-    char info[70];
-
-    CTRL_UNITS delta = j->calib_type6_data.targetpos - j->pos_fbk;
-    
-    ///// debug code
-    int32_t t_ref_pos = Trajectory_get_pos_ref(&j->trajectory);
-    int32_t t_ref_vel = Trajectory_get_vel_ref(&j->trajectory);
-    snprintf(info, 70, "e=%.1f rp=%d rv=%d d=%.1f", j->pos_err, t_ref_pos, t_ref_vel, delta);
-    send_debug_message(info, j->ID);
-    ///// debug code end
-    
-    if( (delta>CALIB_TYPE_6_POS_TRHESHOLD ) || (delta<-CALIB_TYPE_6_POS_TRHESHOLD ) )
-        return FALSE;
-    
-    return TRUE;
-}
-
-static eOresult_t JointSet_do_wait_calibration_6_singleJoint(JointSet *o, int indexSet, BOOL* calibrationCompleted)
-{
-    
-    /* When i'm here i sure that:
-       - state = calibtype6_st_jntEncResComputed
-     */
-    
-    *calibrationCompleted = FALSE;   
-    //get poiter to the joint to calibrate
-    Joint* j_ptr = o->joint + o->joints_of_set[indexSet];
-    
-    //get the encoder of joint to calibrate
-    AbsEncoder* e_ptr = o->absEncoder+ o->encoders_of_set[indexSet];
-    
-    switch(j_ptr->calib_type6_data.state)
-    {
-        case calibtype6_st_jntEncResComputed:
-        {
-            AbsEncoder_calibrate(e_ptr, 0, j_ptr->calib_type6_data.computedZero);
-            j_ptr->calib_type6_data.state = calibtype6_st_absEncoderCalibrated;
-        }
-        break;
-        
-        case calibtype6_st_absEncoderCalibrated:
-        {
-            //if the current position (computed with calib param of abs encoder) is out of limits range, I'll put joint in fault
-            int32_t curr_pos = AbsEncoder_position(e_ptr);
-            if((curr_pos > j_ptr->pos_max+CALIB_TYPE_6_POS_TRHESHOLD) || (curr_pos < j_ptr->pos_min-CALIB_TYPE_6_POS_TRHESHOLD))
-            {
-                
-                j_ptr->calib_type6_data.is_active = FALSE;
-                char info[80];
-                sprintf(info,"calib 6: outLim: cp%d mx%.1f mn%.1f",curr_pos, j_ptr->pos_max, j_ptr->pos_min);
-                send_debug_message(info, j_ptr->ID);
-
-                return(eores_NOK_generic);
-            }
-            
-            for (int k=0; k<*(o->pN); ++k)
-            {
-                int m = o->motors_of_set[k];
-                int j = o->joints_of_set[k];
-                Motor_motion_reset(o->motor+ m);
-                Joint_motion_reset(o->joint+ j);
-                Motor_set_run(o->motor+ m); //clear ext fault bit if it is not pressed
-            }
-        
-            if(j_ptr->control_mode == eomc_controlmode_hwFault)
-            {
-                return(eores_NOK_generic);
-            }
-            
-            BOOL ret = Joint_set_pos_ref_in_calibType6(j_ptr, j_ptr->calib_type6_data.targetpos, j_ptr->calib_type6_data.velocity);
-            if(!ret)
-            {
-                char info[50];
-                snprintf(info, 50,"error in Joint_set_pos_ref_in_calibType6");
-                send_debug_message(info, j_ptr->ID);
-
-                return(eores_NOK_generic);
-            }
-            
-//            ///// debug code
-//            char info[70];
-//            snprintf(info, 70, "init traj: cpos=%.2f target=%.2f lim%.2f %.2f", j_ptr->pos_fbk, j_ptr->calib_type6_data.targetpos, j_ptr->pos_max, j_ptr->pos_min);
-//            send_debug_message(info, j_ptr->ID);
-//            //// debug code ended
-            
-            j_ptr->calib_type6_data.state = calibtype6_st_trajectoryStarted;
-        }    
-        break;
-        
-        case calibtype6_st_trajectoryStarted:
-        {
-            JointSet_do_pwm_control(o);
-            
-            
-            if(JointSet_calibType6_check_reached_pos(j_ptr))
-            {
-                j_ptr->calib_type6_data.state = calibtype6_st_finished;
-                j_ptr->calib_type6_data.is_active = FALSE;
-                *calibrationCompleted = TRUE;
-                
-                Motor* m_ptr = o->motor + o->motors_of_set[indexSet];
-                Motor_calibrate_withOffset(m_ptr, m_ptr->pos_fbk);//the offset is the current position
-                
-                for (int k=0; k<*(o->pN); ++k)
-                {
-                    int m = o->motors_of_set[k];
-                    int j = o->joints_of_set[k];
-                    Motor_motion_reset(o->motor+ m);
-                    Joint_motion_reset(o->joint+ j);
-                    Motor_set_idle(o->motor+ m);
-                }
-            }
-        }
-        break;
-        
-        case calibtype6_st_finished:
-        {
-            *calibrationCompleted = TRUE;
-        }break;
-        
-        default:
-            return(eores_NOK_generic);
-
-    }
-
-    return(eores_OK);
-
-}
-
-
-static eOresult_t JointSet_do_wait_calibration_7_singleJoint(Joint *j, Motor* m, AbsEncoder* e, BOOL* calibrationCompleted)
-{
-    
-    /* When i'm here i sure that:
-       - state = calibtype7_st_jntEncResComputed
-    */
-    
-    *calibrationCompleted = FALSE;
-    
-
-    switch(j->calib_type7_data.state)
-    {
-        case calibtype7_st_jntEncResComputed:
-        {
-            AbsEncoder_calibrate(e, 0, j->calib_type7_data.computedZero);
-            j->calib_type7_data.state = calibtype7_st_jntCheckLimits;
-        }    
-        break;
-        
-        case calibtype7_st_jntCheckLimits:
-        {
-            int32_t curr_pos = AbsEncoder_position(e);
-            if((curr_pos > j->pos_max+CALIB_TYPE_6_POS_TRHESHOLD) || (curr_pos < j->pos_min-CALIB_TYPE_6_POS_TRHESHOLD))
-            {
-                //// debug code
-                char info[80];
-                sprintf(info,"calib7:outLim: cp%d mx%.1f mn%.1f",curr_pos, j->pos_max, j->pos_min);
-                send_debug_message(info, j->ID);
-                ////debug code ended
-
-                return(eores_NOK_generic);
-            
-            }
-            else
-            {
-                *calibrationCompleted = TRUE;
-                j->calib_type7_data.state = calibtype7_st_finished;
-            }
-         }    
-        break;
-        case calibtype7_st_finished:
-        {
-            *calibrationCompleted = TRUE;
-        }break;
-    }
-    return(eores_OK);
-}
-
-static BOOL JointSet_do_wait_calibration_mixed(JointSet* o)
-{
-    JointSet_set_interaction_mode(o, eOmc_interactionmode_stiff);
-    
-    BOOL calibrationCompleted = TRUE;
-    eOresult_t res = eores_OK;
-    
-    for (int k=0; ( (k<*(o->pN)) && (eores_OK == res) ); ++k)
-    {
-        int m = o->motors_of_set[k];
-        int e = o->encoders_of_set[k];
-        int j = o->joints_of_set[k];
-        Joint* j_ptr = o->joint+j;
-        BOOL calibrated_single_joint = FALSE;
-        
-       switch (j_ptr->calibration_in_progress)
-       {
-        case eomc_calibration_type6_mais:
-            res = JointSet_do_wait_calibration_6_singleJoint(o, k, &calibrated_single_joint);
-            break;
-        
-        case eomc_calibration_type7_hall_sensor:
-            res = JointSet_do_wait_calibration_7_singleJoint(j_ptr, o->motor+m, o->absEncoder+e, &calibrated_single_joint);
-            break;
-
-        case eomc_calibration_typeUndefined:
-            res = eores_OK; //if I'm here means joint j didn't receive calib command or is already calibrated. Both cases are ok! 
-            
-            break;
-        default://If i'm here means joint has a calib type that not support calibration for single joint.
-            res = eores_NOK_generic;
-            break;
-        }
-       
-       calibrationCompleted = calibrationCompleted & calibrated_single_joint;
-
-    }//end for
-    
-    
-    if(res != eores_OK)
-    {
-        o->calibration_in_progress = eomc_calibration_typeUndefined;
-        o->control_mode = eomc_controlmode_hwFault;
-        
-        for (int k=0; k<*(o->pN); ++k)
-        {
-            Joint* j_ptr = o->joint + o->joints_of_set[k];
-            j_ptr->control_mode = eomc_controlmode_hwFault;
-            j_ptr->calibration_in_progress = eomc_calibration_typeUndefined;
-            Motor_set_idle(o->motor+o->motors_of_set[k]);
-        }
-        
-    }
-    return(calibrationCompleted);
-
-}
-
-
-static BOOL JointSet_do_wait_calibration_6(JointSet* o)
-{
-    
-    /* When i'm here i sure that:
-       - state = calibtype6_st_jntEncResComputed
-       - this set has only one joint */
-    
-    BOOL calibrationCompleted = FALSE;
-    
-    if(TRUE == o->external_fault) //==> if ext fault is pressed calibration cannlt continue
-        return FALSE;
-    
-    Joint *j = o->joint+o->joints_of_set[0];
-    Motor* m = o->motor+o->motors_of_set[0];
-    
-    switch(j->calib_type6_data.state)
-    {
-        case calibtype6_st_jntEncResComputed:
-        {
-            AbsEncoder_calibrate(o->absEncoder+j->ID, 0, j->calib_type6_data.computedZero);
-            j->calib_type6_data.state = calibtype6_st_absEncoderCalibrated;
-        }    
-        break;
-        
-        case calibtype6_st_absEncoderCalibrated:
-        {
-            //if the current position (computed with calib param of abs encoder) is out of limits range, I'll put joint in fault
-            int32_t curr_pos = AbsEncoder_position(o->absEncoder+j->ID);
-            if((curr_pos > j->pos_max+CALIB_TYPE_6_POS_TRHESHOLD) || (curr_pos < j->pos_min-CALIB_TYPE_6_POS_TRHESHOLD))
-            {
-                //clean calibration and set hardware fault
-                o->calibration_in_progress = eomc_calibration_typeUndefined;
-                o->control_mode = eomc_controlmode_hwFault;
-                j->control_mode = eomc_controlmode_hwFault;
-                j->calib_type6_data.is_active = FALSE;
-                Motor_set_idle(m);
-
-                char info[80];
-                sprintf(info,"outLim: cp%d mx%.1f mn%.1f",curr_pos, j->pos_max, j->pos_min);
-                send_debug_message(info, j->ID);
-
-                return(calibrationCompleted);
-            }
-                            
-            Motor_motion_reset(m);
-            Joint_motion_reset(j);
-
-            JointSet_set_interaction_mode(o, eOmc_interactionmode_stiff);
-
-            Motor_set_run(m);
-
-            BOOL ret = Joint_set_pos_ref_in_calibType6(j, j->calib_type6_data.targetpos, j->calib_type6_data.velocity);
-            if(!ret)
-            {
-                //clean calibration and set hardware fault
-                o->calibration_in_progress = eomc_calibration_typeUndefined;
-                o->control_mode = eomc_controlmode_hwFault;
-                j->control_mode = eomc_controlmode_hwFault;
-                j->calib_type6_data.is_active = FALSE;
-                Motor_set_idle(m);
-
-                char info[50];
-                snprintf(info, 50,"error in Joint_set_pos_ref_in_calibType6");
-                send_debug_message(info, j->ID);
-
-                return(calibrationCompleted);
-            }
-            
-            ///// debug code
-            char info[70];
-            snprintf(info, 70, "init traj: cpos=%.2f target=%.2f lim%.2f %.2f", j->pos_fbk, j->calib_type6_data.targetpos, j->pos_max, j->pos_min);
-            send_debug_message(info, j->ID);
-            //// debug code ended
-            
-            j->calib_type6_data.state = calibtype6_st_trajectoryStarted;
-        }    
-        break;
-        
-        case calibtype6_st_trajectoryStarted:
-        {
-//            static uint8_t limit_reached_count = 0;
-            
-            JointSet_do_pwm_control(o);
-            
-            if(JointSet_calibType6_check_reached_pos(o))
-            {
-                j->calib_type6_data.state = calibtype6_st_finished;
-                j->calib_type6_data.is_active = FALSE;
-                calibrationCompleted = TRUE;
-                
-                Motor_calibrate_withOffset(m, m->pos_fbk);//the offset is the current position
-            }
-//            else
-//            {
-//                // here i would to check if joint didn't reach the other limits, that is joint is going in opposite way
-//                int8_t limitExceded = Joint_check_limits(j);
-//                if(limitExceded != 0)
-//                {
-//                    limit_reached_count++;
-//                }
-//                else
-//                {
-//                    limit_reached_count = 0;
-//                }
-//            
-//                if(limit_reached_count>50)
-//                {
-//                    //clean calibration and set hardware fault
-//                    o->calibration_in_progress = eomc_calibration_typeUndefined;
-//                    o->control_mode = eomc_controlmode_hwFault;
-//                    j->control_mode = eomc_controlmode_hwFault;
-//                    j->calib_type6_data.is_active = FALSE;
-//                    Motor_set_idle(m);
-
-//                    //// debug code
-//                    char info [70];
-//                    snprintf(info, 70, "limit reached e=%.1f lim%d", j->pos_err, limitExceded);
-//                    send_debug_message(info, j->ID);
-//                    ////debug code ended
-//                }
-//            }
-        }
-        break;
-
-    }
-
-    return(calibrationCompleted);
-
-}
-
-static BOOL JointSet_do_wait_calibration_7(JointSet* o)
-{
-    
-    /* When i'm here i sure that:
-       - state = calibtype7_st_jntEncResComputed
-       - this set has only one joint */
-    
-    BOOL calibrationCompleted = FALSE;
-    
-    Joint *j = o->joint+o->joints_of_set[0];
-    Motor* m = o->motor+o->motors_of_set[0];
-    switch(j->calib_type7_data.state)
-    {
-        case calibtype7_st_jntEncResComputed:
-        {
-            AbsEncoder_calibrate(o->absEncoder+j->ID, 0, j->calib_type7_data.computedZero);
-            j->calib_type7_data.state = calibtype7_st_finished;
-        }    
-        break;
-        
-        case calibtype7_st_finished:
-        {
-            int32_t curr_pos = AbsEncoder_position(o->absEncoder+j->ID);
-            if((curr_pos > j->pos_max+CALIB_TYPE_6_POS_TRHESHOLD) || (curr_pos < j->pos_min-CALIB_TYPE_6_POS_TRHESHOLD))
-            {
-                //clean calibration and set hardware fault
-                o->calibration_in_progress = eomc_calibration_typeUndefined;
-                o->control_mode = eomc_controlmode_hwFault;
-                j->control_mode = eomc_controlmode_hwFault;
-                j->calib_type6_data.is_active = FALSE;
-                Motor_set_idle(m);
-
-                //// debug code
-                char info[80];
-                sprintf(info,"outLim: cp%d mx%.1f mn%.1f",curr_pos, j->pos_max, j->pos_min);
-                send_debug_message(info, j->ID);
-                ////debug code ended
-
-                return(calibrationCompleted);
-            
-            }
-            else
-            {
-                calibrationCompleted = TRUE;
-            }
-         }    
-        break;
-    }
-    return(calibrationCompleted);
-
-}
-static BOOL JointSet_do_wait_calibration_8(JointSet* o)
-{
-    BOOL calibrated = TRUE;
-    
-    for (int ms=0; ms<*(o->pN); ++ms)
-    {
-        int m = o->motors_of_set[ms];
-        
-        if (hal_adc_get_hall_sensor_analog_input_mV(o->motor[m].actuatorPort) < 1500)
-        {
-            o->motor[m].not_calibrated = FALSE;
-            
-            //hal_led_on(hal_led0+ms);
-        }
-        
-        if (Motor_is_calibrated(o->motor+m))
-        {
-            Motor_set_pwm_ref(o->motor+m, 0);
-        }
-        else
-        {
-            Motor_set_pwm_ref(o->motor+m, o->tripod_calib.pwm);
-            
-            calibrated = FALSE;
-        }
-    }
-    
-    if (calibrated)
-    {        
-        o->motor[o->motors_of_set[0]].pos_calib_offset += o->motor[o->motors_of_set[0]].pos_fbk - o->tripod_calib.zero;
-        o->motor[o->motors_of_set[1]].pos_calib_offset += o->motor[o->motors_of_set[1]].pos_fbk - o->tripod_calib.zero;
-        o->motor[o->motors_of_set[2]].pos_calib_offset += o->motor[o->motors_of_set[2]].pos_fbk - o->tripod_calib.zero;
-        
-        o->motor[o->motors_of_set[0]].pos_fbk = o->tripod_calib.zero;
-        o->motor[o->motors_of_set[1]].pos_fbk = o->tripod_calib.zero;
-        o->motor[o->motors_of_set[2]].pos_fbk = o->tripod_calib.zero;
-
-        o->motor[o->motors_of_set[0]].pos_fbk_old = o->motor[o->motors_of_set[0]].pos_fbk;
-        o->motor[o->motors_of_set[1]].pos_fbk_old = o->motor[o->motors_of_set[1]].pos_fbk;
-        o->motor[o->motors_of_set[2]].pos_fbk_old = o->motor[o->motors_of_set[2]].pos_fbk;
-        
-        return TRUE;
-    }
-    
-    return FALSE;
-}
-*/
-
-static BOOL JointSet_do_wait_calibration_8(JointSet* o)
-{    
-    BOOL calibrated = TRUE;
-    
-    int32_t pos[3];
-    
-    for (int ms=0; ms<*(o->pN); ++ms)
-    {
-        int m = o->motors_of_set[ms];
-
-        if (hal_adc_get_hall_sensor_analog_input_mV(o->motor[m].actuatorPort) < 1500)
-        {
-            o->motor[m].not_calibrated = FALSE;
-            
-            //hal_led_on(hal_led0+ms);
-        }
-        
-        if (Motor_is_calibrated(o->motor+m))
-        {
-            Motor_set_pwm_ref(o->motor+m, 0);
-            
-            pos[ms] = 0x7FFFFFFF;
-        }
-        else
-        {
-            pos[ms] = o->motor[m].pos_fbk - o->tripod_calib.start_pos[ms];
-            
-            //Motor_set_pwm_ref(o->motor+m, o->tripod_calib.pwm);
-            
-            calibrated = FALSE;
-        }
-    }
-    
-    if (calibrated)
-    {        
-        o->motor[o->motors_of_set[0]].pos_calib_offset += o->motor[o->motors_of_set[0]].pos_fbk - o->tripod_calib.zero;
-        o->motor[o->motors_of_set[1]].pos_calib_offset += o->motor[o->motors_of_set[1]].pos_fbk - o->tripod_calib.zero;
-        o->motor[o->motors_of_set[2]].pos_calib_offset += o->motor[o->motors_of_set[2]].pos_fbk - o->tripod_calib.zero;
-        
-        o->motor[o->motors_of_set[0]].pos_fbk = o->tripod_calib.zero;
-        o->motor[o->motors_of_set[1]].pos_fbk = o->tripod_calib.zero;
-        o->motor[o->motors_of_set[2]].pos_fbk = o->tripod_calib.zero;
-
-        o->motor[o->motors_of_set[0]].pos_fbk_old = o->motor[o->motors_of_set[0]].pos_fbk;
-        o->motor[o->motors_of_set[1]].pos_fbk_old = o->motor[o->motors_of_set[1]].pos_fbk;
-        o->motor[o->motors_of_set[2]].pos_fbk_old = o->motor[o->motors_of_set[2]].pos_fbk;
-        
-        return TRUE;
-    }
-    
-    float pwm[3];
-    
-    if (pos[0]<0) pos[0] = -pos[0];
-    if (pos[1]<0) pos[1] = -pos[1];
-    if (pos[2]<0) pos[2] = -pos[2];
-    
-    int32_t posL = pos[0];
-    if (pos[1] < posL) posL = pos[1];
-    if (pos[2] < posL) posL = pos[2];
-    
-    float pwm_calib = (float)o->tripod_calib.pwm;
-    
-    if (pwm_calib < 0.0f) pwm_calib = -pwm_calib;
-    
-    pwm[0] = pwm_calib * (1.0f - (float)(pos[0] - posL)/(float)o->tripod_calib.max_delta);
-    pwm[1] = pwm_calib * (1.0f - (float)(pos[1] - posL)/(float)o->tripod_calib.max_delta);
-    pwm[2] = pwm_calib * (1.0f - (float)(pos[2] - posL)/(float)o->tripod_calib.max_delta);
-    
-    if (pwm[0] < 0.0f) pwm[0] = 0.0f;
-    if (pwm[1] < 0.0f) pwm[1] = 0.0f;
-    if (pwm[2] < 0.0f) pwm[2] = 0.0f;
-    
-    float pwm_min = pwm[0];
-    if (pwm[1] < pwm_min) pwm_min = pwm[1];
-    if (pwm[2] < pwm_min) pwm_min = pwm[2];
-
-    if (o->tripod_calib.pwm < 0)
-    {
-        pwm[0] = -pwm[0];
-        pwm[1] = -pwm[1];
-        pwm[2] = -pwm[2];
-    }
-    
-    Motor_set_pwm_ref(o->motor+o->motors_of_set[0], (int32_t)pwm[0]);
-    Motor_set_pwm_ref(o->motor+o->motors_of_set[1], (int32_t)pwm[1]);
-    Motor_set_pwm_ref(o->motor+o->motors_of_set[2], (int32_t)pwm[2]);
-    
-    //Motor_set_pwm_ref(o->motor+o->motors_of_set[0], o->tripod_calib.pwm);
-    //Motor_set_pwm_ref(o->motor+o->motors_of_set[1], o->tripod_calib.pwm);
-    //Motor_set_pwm_ref(o->motor+o->motors_of_set[2], o->tripod_calib.pwm);
-
-    return FALSE;
-}
-
-static BOOL JointSet_do_wait_calibration_9(JointSet* o)
-{
-    if (o->calibration_wait<250)
-    {
-        Motor_set_pwm_ref(o->motor+o->motors_of_set[0], o->tripod_calib.pwm);
-        Motor_set_pwm_ref(o->motor+o->motors_of_set[1], o->tripod_calib.pwm);
-        Motor_set_pwm_ref(o->motor+o->motors_of_set[2], o->tripod_calib.pwm);
-        ++o->calibration_wait;
-        return FALSE;
-    }
-    
-    BOOL calibrated = TRUE;
-    
-    int32_t pos[3];
-    
-    for (int ms=0; ms<*(o->pN); ++ms)
-    {
-        int m = o->motors_of_set[ms];
-
-        if (hal_adc_get_hall_sensor_analog_input_mV(o->motor[m].actuatorPort) < 1500)
-        {
-            o->motor[m].not_calibrated = FALSE;
-            
-            //hal_led_on(hal_led0+ms);
-        }
-        
-        if (Motor_is_calibrated(o->motor+m))
-        {
-            Motor_set_pwm_ref(o->motor+m, 0);
-            
-            pos[ms] = 0x7FFFFFFF;
-        }
-        else
-        {
-            pos[ms] = o->motor[m].pos_fbk - o->tripod_calib.start_pos[ms];
-            
-            //Motor_set_pwm_ref(o->motor+m, o->tripod_calib.pwm);
-            
-            calibrated = FALSE;
-        }
-    }
-    
-    if (calibrated)
-    {        
-        o->motor[o->motors_of_set[0]].pos_calib_offset += o->motor[o->motors_of_set[0]].pos_fbk - o->tripod_calib.zero;
-        o->motor[o->motors_of_set[1]].pos_calib_offset += o->motor[o->motors_of_set[1]].pos_fbk - o->tripod_calib.zero;
-        o->motor[o->motors_of_set[2]].pos_calib_offset += o->motor[o->motors_of_set[2]].pos_fbk - o->tripod_calib.zero;
-        
-        o->motor[o->motors_of_set[0]].pos_fbk = o->tripod_calib.zero;
-        o->motor[o->motors_of_set[1]].pos_fbk = o->tripod_calib.zero;
-        o->motor[o->motors_of_set[2]].pos_fbk = o->tripod_calib.zero;
-
-        o->motor[o->motors_of_set[0]].pos_fbk_old = o->motor[o->motors_of_set[0]].pos_fbk;
-        o->motor[o->motors_of_set[1]].pos_fbk_old = o->motor[o->motors_of_set[1]].pos_fbk;
-        o->motor[o->motors_of_set[2]].pos_fbk_old = o->motor[o->motors_of_set[2]].pos_fbk;
-        
-        return TRUE;
-    }
-    
-    float pwm[3];
-    
-    if (pos[0]<0) pos[0] = -pos[0];
-    if (pos[1]<0) pos[1] = -pos[1];
-    if (pos[2]<0) pos[2] = -pos[2];
-    
-    int32_t posL = pos[0];
-    if (pos[1] < posL) posL = pos[1];
-    if (pos[2] < posL) posL = pos[2];
-    
-    pwm[0] = (float)o->tripod_calib.pwm * (1.0f - (float)(pos[0] - posL)/(float)o->tripod_calib.max_delta);
-    pwm[1] = (float)o->tripod_calib.pwm * (1.0f - (float)(pos[1] - posL)/(float)o->tripod_calib.max_delta);
-    pwm[2] = (float)o->tripod_calib.pwm * (1.0f - (float)(pos[2] - posL)/(float)o->tripod_calib.max_delta);
-    
-    if (pwm[0] < 0.0f) pwm[0] = 0.0f;
-    if (pwm[1] < 0.0f) pwm[1] = 0.0f;
-    if (pwm[2] < 0.0f) pwm[2] = 0.0f;
-    
-    float pwm_min = pwm[0];
-    if (pwm[1] < pwm_min) pwm_min = pwm[1];
-    if (pwm[2] < pwm_min) pwm_min = pwm[2];
-
-    if (pwm_min < 3500.0f)
-    {
-        pwm[0] += 3500.0f - pwm_min;
-        pwm[1] += 3500.0f - pwm_min;
-        pwm[2] += 3500.0f - pwm_min;
-    }
-
-    if (o->tripod_calib.pwm < 0)
-    {
-        pwm[0] = -pwm[0];
-        pwm[1] = -pwm[1];
-        pwm[2] = -pwm[2];
-    }
-    
-    Motor_set_pwm_ref(o->motor+o->motors_of_set[0], (int32_t)pwm[0]);
-    Motor_set_pwm_ref(o->motor+o->motors_of_set[1], (int32_t)pwm[1]);
-    Motor_set_pwm_ref(o->motor+o->motors_of_set[2], (int32_t)pwm[2]);
-    
-    //Motor_set_pwm_ref(o->motor+o->motors_of_set[0], o->tripod_calib.pwm);
-    //Motor_set_pwm_ref(o->motor+o->motors_of_set[1], o->tripod_calib.pwm);
-    //Motor_set_pwm_ref(o->motor+o->motors_of_set[2], o->tripod_calib.pwm);
-
-    return FALSE;
-}
-
-
-static BOOL JointSet_do_wait_calibration_10(JointSet* o)
-{
-    BOOL calibrated = TRUE;
-    
-    for (int k=0; k<*(o->pN); ++k)
-    {
-        int m = o->motors_of_set[k];
-        
-        int e = o->encoders_of_set[k];
-        
-        if (AbsEncoder_is_hard_stop_calibrating(o->absEncoder+e))
-        {
-            Motor_set_pwm_ref(o->motor+m, o->motor[m].calib_pwm);
-        
-            if (AbsEncoder_is_still(o->absEncoder+e, 12000, 500))
-            {
-                AbsEncoder_calibrate_in_hard_stop(o->absEncoder+e);
-            }
-            else
-            {
-                calibrated = FALSE;
-            }
-        }
-        else
-        {
-            Motor_set_pwm_ref(o->motor+m, 0);
-        }
-    }
-    
-    return calibrated;
-}
-
-
 static void JointSet_do_wait_calibration(JointSet* o)
 {
     int N = *(o->pN);
@@ -1512,7 +751,7 @@ static void JointSet_do_wait_calibration(JointSet* o)
             return;
         }
     }
-    
+
     o->is_calibrated = TRUE;
     
     switch (o->calibration_in_progress)
@@ -1524,7 +763,7 @@ static void JointSet_do_wait_calibration(JointSet* o)
         case eomc_calibration_type5_hard_stops:
             o->is_calibrated = JointSet_do_wait_calibration_5(o);
             break;
-
+            
 //        case eomc_calibration_type6_mais: ==> managed in mixed
 //            o->is_calibrated = JointSet_do_wait_calibration_6(o);
 //            break;
@@ -1544,14 +783,13 @@ static void JointSet_do_wait_calibration(JointSet* o)
         case eomc_calibration_type10_abs_hard_stop:
             o->is_calibrated = JointSet_do_wait_calibration_10(o);
             break;
-        
-<<<<<<< HEAD
+            
         case eomc_calibration_type11_cer_hands:
             o->is_calibrated = JointSet_do_wait_calibration_11(o);
-=======
+            break;
+            
         case eomc_calibration_typeMixed:
             o->is_calibrated = JointSet_do_wait_calibration_mixed(o);
->>>>>>> added thums abduction and proximal management as coupled joints.
             break;
         
         default:
@@ -1605,6 +843,7 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
         case eomc_calibration_type3_abs_sens_digital:
         {
             AbsEncoder_calibrate_absolute(o->absEncoder+e, calibrator->params.type3.offset, calibrator->params.type3.calibrationZero);
+            
             Motor_calibrate_withOffset(o->motor+e, 0);
             o->calibration_in_progress = (eOmc_calibration_type_t)calibrator->type;
             break;
@@ -1643,7 +882,7 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
                 ////debug code
                 char info[50];
                 snprintf(info, 50, "error type6.current=%d",calibrator->params.type6.current);
-                send_debug_message(info, e);
+                JointSet_send_debug_message(info, e);
                 ////debug code ended
                 return;
             }
@@ -1669,7 +908,7 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
                 ////debug code
                 char info[70];
                 snprintf(info, 70, "calib6: error updating Mais conversion factor j%d", e);
-                send_debug_message(info, e);
+                JointSet_send_debug_message(info, e);
                 ////debug code ended
                 return;
             }
@@ -1727,7 +966,7 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
                 ////debug code 
                 char info[50];
                 snprintf(info, 50, "error calib 7 computing encoder factor");
-                send_debug_message(info, e);
+                JointSet_send_debug_message(info, e);
                 ////debug code ended
                 return;
             }
@@ -1738,7 +977,7 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
                 ////debug code 
                 char info[70];
                 snprintf(info, 70, "calib7: error updating HallADC offset j%d", e);
-                send_debug_message(info, e);
+                JointSet_send_debug_message(info, e);
                 ////debug code ended
                 return;
             }
@@ -1750,7 +989,7 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
                 ////debug code 
                 char info[70];
                 snprintf(info, 70, "calib7: error updating HallADC conversion factor j%d", e);
-                send_debug_message(info, e);
+                JointSet_send_debug_message(info, e);
                 ////debug code ended
                 return;
             }
@@ -1768,7 +1007,7 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             
         }
         break;
-        
+
         case eomc_calibration_type8_tripod_internal_hard_stop:
         case eomc_calibration_type9_tripod_external_hard_stop:
         {
@@ -1855,7 +1094,7 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
     }
 }
 
-static void send_debug_message(char *message, uint8_t jid)
+void JointSet_send_debug_message(char *message, uint8_t jid)
 {
 
     eOerrmanDescriptor_t errdes = {0};

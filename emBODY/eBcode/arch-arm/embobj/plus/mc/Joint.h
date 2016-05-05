@@ -22,6 +22,14 @@ typedef union
 } JointFaultState;
 
 
+typedef struct
+{
+    int32_t motor_pos_min;
+    int32_t motor_pos_max;
+    int32_t last_motor_closing_pos;
+    int32_t last_joint_closing_pos;
+} CableConstraintData;
+
 typedef enum
 {
     calibtype6_st_inited =0,
@@ -57,14 +65,6 @@ typedef struct
     calibtype7_states state;
     int32_t computedZero; 
 } jointCalibType7Data;
-
-typedef struct
-{
-    int32_t motor_pos_min;
-    int32_t motor_pos_max;
-    int32_t last_motor_closing_pos;
-    int32_t last_joint_closing_pos;
-} CableConstraintData;
 
 
 typedef struct // Joint
