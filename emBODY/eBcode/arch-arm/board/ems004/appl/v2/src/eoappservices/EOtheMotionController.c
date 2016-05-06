@@ -919,7 +919,7 @@ extern eOresult_t eo_motioncontrol_Start(EOtheMotionController *p)
             eo_mais_Transmission(eo_mais_GetHandle(), eobool_true);                
         }
         eo_encoderreader_StartReading(p->mcmc4plus.theencoderreader);
-        s_eo_motioncontrol_mc4plusbased_enable_all_motors(p);      
+        //s_eo_motioncontrol_mc4plusbased_enable_all_motors(p);      
     }
     
     //eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "eo_motioncontrol_Start()", s_eobj_ownname);
