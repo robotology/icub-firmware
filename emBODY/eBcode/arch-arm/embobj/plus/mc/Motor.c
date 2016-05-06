@@ -912,6 +912,20 @@ BOOL Motor_is_in_fault(Motor *o)
     return(o->hardware_fault || Motor_is_external_fault(o));
 }
 
+BOOL Motor_is_running(Motor* o)
+{
+    switch (o->control_mode)
+    {
+        case icubCanProto_controlmode_openloop:
+        case icubCanProto_controlmode_speed_voltage:
+        case icubCanProto_controlmode_current:
+            return TRUE;
+        
+        default: 
+            return FALSE;
+    }
+}
+
 void Motor_reset(Motor *o)
 {
     o->pwm_fbk=ZERO;

@@ -261,7 +261,10 @@ BOOL JointSet_do_check_faults(JointSet* o)
         {
             Joint_set_control_mode(o->joint+o->joints_of_set[k], eomc_controlmode_cmd_idle);
             
-            Motor_set_idle(o->motor+o->motors_of_set[k]);
+            if (Motor_is_running(o->motor+o->motors_of_set[k]))
+            {
+                Motor_set_idle(o->motor+o->motors_of_set[k]);
+            }
         }
         
         o->control_mode = eomc_controlmode_hwFault;

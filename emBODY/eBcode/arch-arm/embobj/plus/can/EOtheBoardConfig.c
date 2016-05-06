@@ -383,7 +383,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_eb3 =
         .version   =
         {
             .firmware   = { .major = 0, .minor = 0, .build = 0 },
-            .protocol   = { .major = 1, .minor = 3 }
+            .protocol   = { .major = 1, .minor = 4 }
         },
         .filler                 = {0},
         .arrayofjomodescriptors =
@@ -609,7 +609,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb5 =
         .version   =
         {
             .firmware   = { .major = 0, .minor = 0, .build = 0 },
-            .protocol   = { .major = 1, .minor = 3 }
+            .protocol   = { .major = 1, .minor = 4 }
         },
         .filler                 = {0},
         .arrayofjomodescriptors =
@@ -722,7 +722,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb6_eb8 =
         .version   =
         {
             .firmware   = { .major = 0, .minor = 0, .build = 0 },
-            .protocol   = { .major = 1, .minor = 3 }
+            .protocol   = { .major = 1, .minor = 4 }
         },
         .filler                 = {0},
         .arrayofjomodescriptors =
@@ -852,7 +852,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb7_eb9 =
         .version   =
         {
             .firmware   = { .major = 0, .minor = 0, .build = 0 },
-            .protocol   = { .major = 1, .minor = 3 }
+            .protocol   = { .major = 1, .minor = 4 }
         },
         .filler                 = {0},
         .arrayofjomodescriptors =

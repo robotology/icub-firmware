@@ -255,7 +255,8 @@ extern void Motor_raise_fault_overcurrent(Motor* o);
 extern void Motor_raise_fault_i2t(Motor* o);
 extern void Motor_raise_fault_external(Motor* o);
 extern BOOL Motor_is_external_fault(Motor* o);
-BOOL Motor_is_in_fault(Motor *o);
+extern BOOL Motor_is_in_fault(Motor* o);
+extern BOOL Motor_is_running(Motor* o);
 
 ////////////////////////////////////////////////////////////////////////////
 extern void Motor_config_gearbox_ratio(Motor* o, int32_t gearbox_ratio);

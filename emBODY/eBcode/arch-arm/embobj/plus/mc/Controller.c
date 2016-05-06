@@ -814,16 +814,16 @@ void MController_config_joint(int j, eOmc_joint_config_t* config) //
     
     if (j==3 && o->part_type==emscontroller_board_CER_LOWER_ARM)
     {
-        AbsEncoder_config(o->absEncoder+j, j, config->jntEncoderType, config->jntEncoderResolution, 64*AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
+        AbsEncoder_config(o->absEncoder+j, j, (eOmc_EncoderType_t)config->jntEncoderType, config->jntEncoderResolution, 64*AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
     }
     else if (o->part_type==emscontroller_board_CER_HAND)
     {
-        AbsEncoder_config(o->absEncoder+j*2,   j, config->jntEncoderType, config->jntEncoderResolution, AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
-        AbsEncoder_config(o->absEncoder+j*2+1, j, config->jntEncoderType, config->jntEncoderResolution, AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
+        AbsEncoder_config(o->absEncoder+j*2,   j, (eOmc_EncoderType_t)config->jntEncoderType, config->jntEncoderResolution, AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
+        AbsEncoder_config(o->absEncoder+j*2+1, j, (eOmc_EncoderType_t)config->jntEncoderType, config->jntEncoderResolution, AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
     }
     else
     {
-        AbsEncoder_config(o->absEncoder+j, j, config->jntEncoderType, config->jntEncoderResolution, AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
+        AbsEncoder_config(o->absEncoder+j, j, (eOmc_EncoderType_t)config->jntEncoderType, config->jntEncoderResolution, AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
     }
 }
 
