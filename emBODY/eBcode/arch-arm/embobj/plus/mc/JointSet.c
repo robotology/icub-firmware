@@ -891,10 +891,17 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             //if I'm here I can perform calib type 6.
             
             // 2) set state
-            o->joint[e].calib_type6_data.is_active = TRUE;
-            o->joint[e].calib_type6_data.state = calibtype6_st_inited;
-            o->joint[e].calibration_in_progress = (eOmc_calibration_type_t)calibrator->type;
+            
             o->calibration_in_progress = eomc_calibration_typeMixed;
+            o->joint[e].running_calibration.type = (eOmc_calibration_type_t)calibrator->type;
+            o->joint[e].running_calibration.data.type6.is_active = TRUE;
+            o->joint[e].running_calibration.data.type6.state = calibtype6_st_inited;
+            
+            
+//            o->joint[e].calib_type6_data.is_active = TRUE;
+//            o->joint[e].calib_type6_data.state = calibtype6_st_inited;
+//            o->joint[e].calibration_in_progress = (eOmc_calibration_type_t)calibrator->type;
+            
             
             
             // 3) calculate new joint encoder factor and param_zero
@@ -919,14 +926,13 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             o->absEncoder[e].state.bits.not_initialized = TRUE;
 
             float computedJntEncoderZero =  - (float)(jconfig->limitsofjoint.min) + ((float)(calibrator->params.type6.vmin) / computedJntEncoderResolution);
-            o->joint[e].calib_type6_data.computedZero = computedJntEncoderZero;
+            o->joint[e].running_calibration.data.type6.computedZero = computedJntEncoderZero;
 
-            o->joint[e].calib_type6_data.targetpos = target_pos / computedJntEncoderResolution - computedJntEncoderZero; //convert target pos from mais unit to icub deegre
+            o->joint[e].running_calibration.data.type6.targetpos = target_pos / computedJntEncoderResolution - computedJntEncoderZero; //convert target pos from mais unit to icub deegre
 
-            o->joint[e].calib_type6_data.velocity = calibrator->params.type6.velocity;
+            o->joint[e].running_calibration.data.type6.velocity = calibrator->params.type6.velocity;
             
-            
-            o->joint[e].calib_type6_data.state = calibtype6_st_jntEncResComputed;
+            o->joint[e].running_calibration.data.type6.state = calibtype6_st_jntEncResComputed;
             
         }
         break;
@@ -936,10 +942,15 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             //1) check params: nothinh to do
             
             // 2) set state
-            o->joint[e].calib_type7_data.is_active = TRUE;
-            o->joint[e].calib_type7_data.state = calibtype7_st_inited;
-            o->joint[e].calibration_in_progress = (eOmc_calibration_type_t)calibrator->type;
             o->calibration_in_progress = eomc_calibration_typeMixed;
+            o->joint[e].running_calibration.type = (eOmc_calibration_type_t)calibrator->type;
+            o->joint[e].running_calibration.data.type7.state = calibtype7_st_inited;
+            o->joint[e].running_calibration.data.type7.is_active = TRUE;
+            
+//            o->joint[e].calib_type7_data.is_active = TRUE;
+//            o->joint[e].calib_type7_data.state = calibtype7_st_inited;
+//            o->joint[e].calibration_in_progress = (eOmc_calibration_type_t)calibrator->type;
+            
             
             // 2) calculate new joint encoder factor and param_zero
             eOmc_joint_config_t *jconfig = &o->joint[e].eo_joint_ptr->config;
@@ -1002,8 +1013,8 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             float computedJntEncoderZero =  (((float)calibrator->params.type7.vmin) / computedJntEncoderResolution) - ((float)(jconfig->limitsofjoint.min)) - offset;
 
             
-            o->joint[e].calib_type7_data.computedZero = computedJntEncoderZero;
-            o->joint[e].calib_type7_data.state = calibtype7_st_jntEncResComputed;
+            o->joint[e].running_calibration.data.type7.computedZero = computedJntEncoderZero;
+            o->joint[e].running_calibration.data.type7.state = calibtype7_st_jntEncResComputed;
             
         }
         break;

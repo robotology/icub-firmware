@@ -67,6 +67,17 @@ typedef struct
 } jointCalibType7Data;
 
 
+
+typedef struct
+{
+    union
+    {
+        jointCalibType6Data type6;
+        jointCalibType7Data type7;
+    }data;
+    eOmc_calibration_type_t type;
+} jointCalibrationData;
+
 typedef struct // Joint
 {
     uint8_t ID;
@@ -135,15 +146,19 @@ typedef struct // Joint
     uint16_t diagnostics_refresh;
     eOmc_joint_t * eo_joint_ptr; // pointer to network variable of ethernet protocol.
     
-    jointCalibType6Data calib_type6_data;
-    jointCalibType7Data calib_type7_data;
-    eOmc_calibration_type_t calibration_in_progress;
+//    jointCalibType6Data calib_type6_data;
+//    jointCalibType7Data calib_type7_data;
+//    eOmc_calibration_type_t calibration_in_progress;
+    
+    jointCalibrationData running_calibration;
     
 } Joint;
 
 extern Joint* Joint_new(uint8_t n);
 extern void Joint_init(Joint* o);
 extern void Joint_destroy(Joint* o);
+
+extern void Joint_reset_calibration_data(Joint* o);
 
 extern void Joint_config(Joint* o, uint8_t ID, eOmc_joint_config_t* config);
 

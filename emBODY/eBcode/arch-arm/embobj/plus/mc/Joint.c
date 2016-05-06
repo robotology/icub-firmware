@@ -6,10 +6,7 @@
 #include "EoError.h"
 
 static void Joint_set_inner_control_flags(Joint* o);
-static void joint_reset_calibType6Data(Joint* o)
-{
-    o->calib_type6_data.is_active = FALSE;
-}
+
 Joint* Joint_new(uint8_t n)
 {
     Joint* o = NEW(Joint, n);
@@ -94,10 +91,16 @@ void Joint_init(Joint* o)
     
     o->eo_joint_ptr = NULL;
     
-    joint_reset_calibType6Data(o);
-    o->calibration_in_progress = eomc_calibration_typeUndefined;
+    Joint_reset_calibration_data(o);
     
     //SpeedController_init(o->speedController);
+}
+
+void Joint_reset_calibration_data(Joint* o)
+{
+    memset(&o->running_calibration, 0, sizeof(jointCalibrationData));
+    o->running_calibration.type = eomc_calibration_typeUndefined;
+
 }
 
 void Joint_config(Joint* o, uint8_t ID, eOmc_joint_config_t* config)
@@ -452,7 +455,14 @@ CTRL_UNITS Joint_do_pwm_control(Joint* o)
         case eomc_controlmode_direct:
         case eomc_controlmode_calib:
         {    
-            if((eomc_controlmode_calib == o->control_mode) && (!o->calib_type6_data.is_active))
+//            if((eomc_controlmode_calib == o->control_mode) && (!o->calib_type6_data.is_active))
+//            {
+//                o->output = ZERO;
+//                break;
+//            }
+            
+            if( (o->running_calibration.type == eomc_calibration_type7_hall_sensor) || 
+                ((o->running_calibration.type == eomc_calibration_type6_mais) && (o->running_calibration.data.type6.is_active == FALSE)) )
             {
                 o->output = ZERO;
                 break;
@@ -748,7 +758,7 @@ BOOL Joint_set_pos_ref_in_calibType6(Joint* o, CTRL_UNITS pos_ref, CTRL_UNITS ve
 {
     CTRL_UNITS pos_ref_limited = pos_ref;
     
-    if ((o->control_mode != eomc_controlmode_calib) && (o->calib_type6_data.is_active == FALSE))
+    if( (o->control_mode != eomc_controlmode_calib) || (o->running_calibration.type != eomc_calibration_type6_mais) || (o->running_calibration.data.type6.is_active == FALSE) )
     {
         return FALSE;
     }

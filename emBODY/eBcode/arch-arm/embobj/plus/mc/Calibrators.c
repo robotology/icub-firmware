@@ -41,7 +41,7 @@ static BOOL JointSet_calibType6_check_reached_pos(Joint *j)
 {
 //    char info[70];
 
-    CTRL_UNITS delta = j->calib_type6_data.targetpos - j->pos_fbk;
+    CTRL_UNITS delta = j->running_calibration.data.type6.targetpos - j->pos_fbk;
     
 //    ///// debug code
 //    int32_t t_ref_pos = Trajectory_get_pos_ref(&j->trajectory);
@@ -70,12 +70,14 @@ static eOresult_t JointSet_do_wait_calibration_6_singleJoint(JointSet *o, int in
     //get the encoder of joint to calibrate
     AbsEncoder* e_ptr = o->absEncoder+ o->encoders_of_set[indexSet];
     
-    switch(j_ptr->calib_type6_data.state)
+    jointCalibType6Data *jCalib6Data_ptr = &(j_ptr->running_calibration.data.type6);
+    
+    switch(jCalib6Data_ptr->state)
     {
         case calibtype6_st_jntEncResComputed:
         {
-            AbsEncoder_calibrate_absolute(e_ptr, 0, j_ptr->calib_type6_data.computedZero);
-            j_ptr->calib_type6_data.state = calibtype6_st_absEncoderCalibrated;
+            AbsEncoder_calibrate_absolute(e_ptr, 0, jCalib6Data_ptr->computedZero);
+            jCalib6Data_ptr->state = calibtype6_st_absEncoderCalibrated;
         }
         break;
         
@@ -86,7 +88,7 @@ static eOresult_t JointSet_do_wait_calibration_6_singleJoint(JointSet *o, int in
             if((curr_pos > j_ptr->pos_max+CALIB_TYPE_6_POS_TRHESHOLD) || (curr_pos < j_ptr->pos_min-CALIB_TYPE_6_POS_TRHESHOLD))
             {
                 
-                j_ptr->calib_type6_data.is_active = FALSE;
+                jCalib6Data_ptr->is_active = FALSE;
                 char info[80];
                 sprintf(info,"calib 6: outLim: cp%d mx%.1f mn%.1f",curr_pos, j_ptr->pos_max, j_ptr->pos_min);
                 JointSet_send_debug_message(info, j_ptr->ID);
@@ -108,7 +110,7 @@ static eOresult_t JointSet_do_wait_calibration_6_singleJoint(JointSet *o, int in
                 return(eores_NOK_generic);
             }
             
-            BOOL ret = Joint_set_pos_ref_in_calibType6(j_ptr, j_ptr->calib_type6_data.targetpos, j_ptr->calib_type6_data.velocity);
+            BOOL ret = Joint_set_pos_ref_in_calibType6(j_ptr, jCalib6Data_ptr->targetpos, jCalib6Data_ptr->velocity);
             if(!ret)
             {
                 char info[50];
@@ -124,7 +126,7 @@ static eOresult_t JointSet_do_wait_calibration_6_singleJoint(JointSet *o, int in
 //            send_debug_message(info, j_ptr->ID);
 //            //// debug code ended
             
-            j_ptr->calib_type6_data.state = calibtype6_st_trajectoryStarted;
+            jCalib6Data_ptr->state = calibtype6_st_trajectoryStarted;
         }    
         break;
         
@@ -135,8 +137,8 @@ static eOresult_t JointSet_do_wait_calibration_6_singleJoint(JointSet *o, int in
             
             if(JointSet_calibType6_check_reached_pos(j_ptr))
             {
-                j_ptr->calib_type6_data.state = calibtype6_st_finished;
-                j_ptr->calib_type6_data.is_active = FALSE;
+                jCalib6Data_ptr->state = calibtype6_st_finished;
+                jCalib6Data_ptr->is_active = FALSE;
                 *calibrationCompleted = TRUE;
                 
                 Motor* m_ptr = o->motor + o->motors_of_set[indexSet];
@@ -178,13 +180,14 @@ static eOresult_t JointSet_do_wait_calibration_7_singleJoint(Joint *j, Motor* m,
     
     *calibrationCompleted = FALSE;
     
+    jointCalibType7Data* jCalib7data_ptr = &(j->running_calibration.data.type7);
 
-    switch(j->calib_type7_data.state)
+    switch(jCalib7data_ptr->state)
     {
         case calibtype7_st_jntEncResComputed:
         {
-            AbsEncoder_calibrate_absolute(e, 0, j->calib_type7_data.computedZero);
-            j->calib_type7_data.state = calibtype7_st_jntCheckLimits;
+            AbsEncoder_calibrate_absolute(e, 0, j->running_calibration.data.type7.computedZero);
+            jCalib7data_ptr->state = calibtype7_st_jntCheckLimits;
         }    
         break;
         
@@ -205,7 +208,7 @@ static eOresult_t JointSet_do_wait_calibration_7_singleJoint(Joint *j, Motor* m,
             else
             {
                 *calibrationCompleted = TRUE;
-                j->calib_type7_data.state = calibtype7_st_finished;
+                jCalib7data_ptr->state = calibtype7_st_finished;
             }
          }    
         break;
@@ -232,7 +235,7 @@ BOOL JointSet_do_wait_calibration_mixed(JointSet* o)
         Joint* j_ptr = o->joint+j;
         BOOL calibrated_single_joint = FALSE;
         
-       switch (j_ptr->calibration_in_progress)
+       switch (j_ptr->running_calibration.type)
        {
         case eomc_calibration_type6_mais:
             res = JointSet_do_wait_calibration_6_singleJoint(o, k, &calibrated_single_joint);
@@ -265,10 +268,20 @@ BOOL JointSet_do_wait_calibration_mixed(JointSet* o)
         {
             Joint* j_ptr = o->joint + o->joints_of_set[k];
             j_ptr->control_mode = eomc_controlmode_hwFault;
-            j_ptr->calibration_in_progress = eomc_calibration_typeUndefined;
+            //j_ptr->calibration_in_progress = eomc_calibration_typeUndefined;
+            Joint_reset_calibration_data(j_ptr);
             Motor_set_idle(o->motor+o->motors_of_set[k]);
         }
         
+    }
+    if(calibrationCompleted)
+    {
+        for (int k=0; k<*(o->pN); ++k)
+        {
+            Joint* j_ptr = o->joint + o->joints_of_set[k];
+            Joint_reset_calibration_data(j_ptr);
+        }
+    
     }
     return(calibrationCompleted);
 
