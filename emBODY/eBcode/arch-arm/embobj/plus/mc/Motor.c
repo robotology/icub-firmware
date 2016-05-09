@@ -819,8 +819,8 @@ void Motor_get_pid_state(Motor* o, eOmc_joint_status_ofpid_t* pid_state)
 
 void Motor_get_state(Motor* o, eOmc_motor_status_t* motor_status)
 {
-    motor_status->basic.mot_position = o->pos_fbk;
-    motor_status->basic.mot_velocity = o->vel_fbk;
+    motor_status->basic.mot_position = o->pos_raw_fbk;
+    motor_status->basic.mot_velocity = o->vel_raw_fbk;
 
     //motor_status->basic.mot_position = o->pos_raw_fbk;
     //motor_status->basic.mot_velocity = o->vel_raw_fbk;
