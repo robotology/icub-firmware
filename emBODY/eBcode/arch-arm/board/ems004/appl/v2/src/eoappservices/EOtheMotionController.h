@@ -114,13 +114,13 @@ extern eOresult_t eo_motioncontrol_Stop(EOtheMotionController *p);
 
 extern uint16_t eo_motioncontrol_extra_GetMotorCurrent(EOtheMotionController *p, uint8_t jomo);
 
-extern uint32_t eo_motioncontrol_extra_GetMotorAnalogSensor(EOtheMotionController *p, uint8_t jomo);
+//extern uint32_t eo_motioncontrol_extra_GetMotorAnalogSensor(EOtheMotionController *p, uint8_t jomo); NOTE: commented because unused, may
 
-extern uint32_t eo_motioncontrol_extra_GetMotorPositionRaw(EOtheMotionController *p, uint8_t jomo);
+//extern uint32_t eo_motioncontrol_extra_GetMotorPositionRaw(EOtheMotionController *p, uint8_t jomo); NOTE: commented because unused
 
-extern void eo_motioncontrol_extra_ResetQuadEncCounter(EOtheMotionController *p, uint8_t jomo);
+//extern void eo_motioncontrol_extra_ResetQuadEncCounter(EOtheMotionController *p, uint8_t jomo); NOTE: commented because unused
 
-extern eObool_t eo_motioncontrol_extra_IsMotorEncoderIndexReached(EOtheMotionController *p, uint8_t jomo);
+//extern eObool_t eo_motioncontrol_extra_IsMotorEncoderIndexReached(EOtheMotionController *p, uint8_t jomo); NOTE: commented because unused
 
 extern int16_t eo_motioncontrol_extra_GetSuppliedVoltage(EOtheMotionController *p);
 
