@@ -107,8 +107,6 @@ extern eOresult_t eo_motioncontrol_Stop(EOtheMotionController *p);
 
 //extern eOresult_t eo_motioncontrol_extra_FaultDetectionEnable(EOtheMotionController *p);
 
-extern eObool_t eo_motioncontrol_extra_AreMotorsExtFaulted(EOtheMotionController *p);
-
 //extern eOresult_t eo_motioncontrol_extra_SetMotorFaultMask(EOtheMotionController *p, uint8_t jomo, uint8_t* fault_mask);
 
 //extern uint32_t eo_motioncontrol_extra_GetMotorFaultMask(EOtheMotionController *p, uint8_t jomo);
@@ -128,8 +126,6 @@ extern int16_t eo_motioncontrol_extra_GetSuppliedVoltage(EOtheMotionController *
 
 // others, one make by marco.accame which groups actions
 
-// why dont we put it inside _Tick() ????
-extern eOresult_t eo_motioncontrol_extra_ManageEXTfault(EOtheMotionController *p);
 
 
 

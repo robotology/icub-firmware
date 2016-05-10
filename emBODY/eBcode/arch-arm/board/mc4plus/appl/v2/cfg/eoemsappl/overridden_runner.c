@@ -104,9 +104,6 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOM
     // as an example, the broadcast skin can frames are always parsed and are given to EOtheSKIN which will decide what to do with them
     eo_canserv_ParseAll(eo_canserv_GetHandle());    
     
- 
-    //check and update faults mask for the motor
-    eo_motioncontrol_extra_ManageEXTfault(eo_motioncontrol_GetHandle());
 }
 
 

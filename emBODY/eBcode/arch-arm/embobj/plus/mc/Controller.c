@@ -1345,14 +1345,14 @@ void MController_motor_raise_fault_overcurrent(int m)
     Motor_raise_fault_overcurrent(smc->motor+m);
 }
 
-void MController_motor_raise_fault_external(int m)
-{
-    Motor_raise_fault_external(smc->motor+m);
-}
+//void MController_motor_raise_fault_external(int m)
+//{
+//    Motor_raise_fault_external(smc->motor+m);
+//}
 
-BOOL MController_motor_is_external_fault(int m)
-{
-    return Motor_is_external_fault(smc->motor+m);
-}
+//BOOL MController_motor_is_external_fault(int m)
+//{
+//    return Motor_is_external_fault(smc->motor+m);
+//}
 
 ////////////////////////////////////////////////////////////////////////////////

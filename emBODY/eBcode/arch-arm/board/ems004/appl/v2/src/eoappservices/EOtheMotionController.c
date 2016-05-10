@@ -1201,30 +1201,6 @@ extern eOresult_t eo_motioncontrol_extra_FaultDetectionEnable(EOtheMotionControl
 }
 #endif
 
-extern eObool_t eo_motioncontrol_extra_AreMotorsExtFaulted(EOtheMotionController *p)
-{   // former eo_mcserv_AreMotorsExtFaulted()     
-    if(NULL == p)
-    {
-        return(eobool_false);
-    }
-    
-    if(eobool_false == p->service.active)
-    {   // nothing to do because object must be first activated 
-        return(eobool_false);
-    } 
-    
-    if(eobool_false == p->service.started)
-    {   // not running, thus we do nothing
-        return(eobool_false);
-    }    
-    
-    if((eo_motcon_mode_mc4plus != p->service.servconfig.type) && (eo_motcon_mode_mc4plusmais != p->service.servconfig.type))
-    {   // so far only for mc4plus and mc4plusmais services
-        return(eobool_false);
-    }
-    
-    return(hal_motor_externalfaulted());
-}
 
 //extern eOresult_t eo_motioncontrol_extra_SetMotorFaultMask(EOtheMotionController *p, uint8_t jomo, uint8_t* fault_mask)
 //{   // former eo_mcserv_SetMotorFaultMask()
@@ -1525,45 +1501,6 @@ extern eObool_t eo_motioncontrol_extra_IsMotorEncoderIndexReached(EOtheMotionCon
     
     return(indx_reached);
 }
-
-
-#warning marco.accame: TODO: make eo_motioncontrol_extra_ManageEXTfault() a static function and put it inside eo_motioncontrol_Tick() and only for mc4plus-based control ...
-extern eOresult_t eo_motioncontrol_extra_ManageEXTfault(EOtheMotionController *p)
-{   // formerly this code was in s_overriden_runner_CheckAndUpdateExtFaults().
-    if(NULL == p)
-    {
-        return(eores_NOK_nullpointer);
-    }
-
-    if(eobool_false == p->service.active)
-    {   // nothing to do because object must be first activated 
-        return(eores_OK);
-    } 
-    
-    if(eobool_false == p->service.started)
-    {   // not running, thus we do nothing
-        return(eores_OK);
-    }    
-    
-    if((eo_motcon_mode_mc4plus != p->service.servconfig.type) && (eo_motcon_mode_mc4plusmais != p->service.servconfig.type))
-    {   // so far only for mc4plus and mc4plusmais services
-        return(eores_NOK_generic);
-    }
-    
-    if(eobool_false == eo_motioncontrol_extra_AreMotorsExtFaulted(p))
-    {
-        return(eores_OK);
-    }
-    
-    // set the fault mask for ALL the motors
-    for(uint8_t i=0; i<p->numofjomos; i++)
-    {        
-        if (!MController_motor_is_external_fault(i)) MController_motor_raise_fault_external(i);
-    }
-   
-    return(eores_OK);
-}
-
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
