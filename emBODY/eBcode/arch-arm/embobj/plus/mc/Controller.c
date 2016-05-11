@@ -695,8 +695,8 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         //motor to joint
         
         // |j0|    | 1     0       0      0 |    |m0|
-        // |j1|  = | 0     1       0      0 |  * |m1|
-        // |j2|    | 0     1       1      0 |    |m2|
+        // |j1|  = | 0     1       1      0 |  * |m1|
+        // |j2|    | 0     0       1      0 |    |m2|
         // |j3|    | 0     0       0      1 |    |m3|
 
         Sjm[0][0] =  1.0f; Sjm[0][1] =  0.0f; Sjm[0][2] =  0.0f; Sjm[0][3] =  0.0f;
