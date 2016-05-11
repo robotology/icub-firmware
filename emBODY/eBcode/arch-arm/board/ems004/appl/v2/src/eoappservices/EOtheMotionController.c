@@ -108,7 +108,7 @@ static eOresult_t s_eo_motioncontrol_onstop_search4mc4s(void *par, EOtheCANdisco
 static eOresult_t s_eo_motioncontrol_mc4plusmais_onstop_search4mais_BIS_now_verify_encoder(void *par, EOtheCANdiscovery2* p, eObool_t searchisok);
 static eOresult_t s_eo_motioncontrol_mc4plusmais_onendofverify_encoder_BIS(EOaService* s, eObool_t operationisok);
     
-static void s_eo_motioncontrol_UpdateJointStatus(EOtheMotionController *p);
+static void s_eo_motioncontrol_UpdateJointMotorStatus(EOtheMotionController *p);
 
 
 static void s_eo_motioncontrol_proxy_config(EOtheMotionController* p, eObool_t on);
@@ -120,11 +120,9 @@ static void s_eo_motioncontrol_mc4plusbased_hal_init_quad_enc_indexes_interrupt(
 //static void s_eo_motioncontrol_mc4plusbased_enable_all_motors(EOtheMotionController *p);
 
 
-static eOresult_t s_eo_mcserv_do_mc4plus(EOtheMotionController *p);
-
-static void s_eo_mcserv_disable_all_motors(EOtheMotionController *p);
-
 static eObool_t s_eo_motioncontrol_isID32relevant(uint32_t id32);
+
+static eOresult_t s_eo_motioncontrol_updatedPositionsFromEncoders(EOtheEncoderReader *encReader, EOconstarray* carray, uint8_t numofjoint);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -947,6 +945,9 @@ extern eOresult_t eo_motioncontrol_SetRegulars(EOtheMotionController *p, eOmn_se
 
 extern eOresult_t eo_motioncontrol_Tick(EOtheMotionController *p)
 {   
+    EOconstarray* carray;
+    EOtheEncoderReader *encReader;
+    
     if(NULL == p)
     {
         return(eores_NOK_nullpointer);
@@ -962,90 +963,60 @@ extern eOresult_t eo_motioncontrol_Tick(EOtheMotionController *p)
         return(eores_OK);
     }
     
-    
-    if(eo_motcon_mode_foc == p->service.servconfig.type)
-
-    {
-        uint8_t error_mask = 0;
-        eOresult_t res = eores_NOK_generic;
-        //uint32_t encvalue[4] = {0}; 
-        //hal_spiencoder_errors_flags encflags[4] = {0};
-        //int16_t pwm[4] = {0};
-        
-        uint8_t i = 0;
-
-
-        // wait for the encoders for some time
-
-        for (uint8_t i=0; i<30; ++i)
-        {
-            if (eo_encoderreader_IsReadingAvailable(p->mcfoc.theencoderreader))
-            {
-                break;
-            }
-            
-            hal_sys_delay(5*hal_RELTIME_1microsec);
-        }        
-        
-        // read the encoders        
-        if(eobool_true == eo_encoderreader_IsReadingAvailable(p->mcfoc.theencoderreader))
-        {
-            for(i=0; i<p->numofjomos; i++)
-            {
-
-                uint32_t extra = 0;
-                uint32_t enc_value = 0;
-                eOencoderreader_errortype_t error_type;
-                
-                res = eo_encoderreader_Read(p->mcfoc.theencoderreader, i, &enc_value, &extra, &error_type, NULL);
-                if (res != eores_OK)
-                {
-                    error_mask |= 1<<(i<<1);
-                    //encvalue[enc] = (uint32_t)ENC_INVALID;
-                    MController_invalid_absEncoder_fbk(i, error_type);
-                }
-                else
-                {
-                    MController_update_absEncoder_fbk(i, (uint16_t*)&enc_value);
-                }
-            } 
-            // eo_encoderreader_Diagnostics_Tick(p->mcfoc.theencoderreader);           
-        }
-        else // encoder readings available
-        {
-            error_mask = 0xAA; // timeout
-        }
-       
-        // Restart the reading of the encoders
-        eo_encoderreader_StartReading(p->mcfoc.theencoderreader);
-
-        MController_do();
-        
-        //eo_emsController_CheckFaults();
-            
-        /* 2) pid calc */
-        //eo_emsController_PWM(pwm);
-
-        /* 3) prepare and punt in rx queue new setpoint */
-        //s_eo_motioncontrol_SetCurrentSetpoint(p, pwm, 4); 
-     
-        /* 4) update joint status */
-        s_eo_motioncontrol_UpdateJointStatus(p);
-  
-    }
-    else if((eo_motcon_mode_mc4plus == p->service.servconfig.type) || (eo_motcon_mode_mc4plusmais == p->service.servconfig.type))
-    {
-        s_eo_mcserv_do_mc4plus(p);        
-    }
-    else if(eo_motcon_mode_mc4 == p->service.servconfig.type)
+    if(eo_motcon_mode_mc4 == p->service.servconfig.type)
     {
         // motion done
         // not used anymore: eo_motiondone_Tick(eo_motiondone_GetHandle());
     
         // virtual strain
         eo_virtualstrain_Tick(eo_virtualstrain_GetHandle());        
-        
+        return(eores_OK);
     }
+    
+    
+    if(eo_motcon_mode_foc == p->service.servconfig.type)
+    {
+        carray = eo_constarray_Load((EOarray*)&p->service.servconfig.data.mc.foc_based.arrayofjomodescriptors);
+        encReader = p->mcfoc.theencoderreader;
+    }
+    else
+    { //I'm a mc4plus or mc4plus_mais
+        encReader = p->mcmc4plus.theencoderreader;
+        if(eo_motcon_mode_mc4plus == p->service.servconfig.type)
+        {
+            carray = eo_constarray_Load((EOarray*)&p->service.servconfig.data.mc.mc4plus_based.arrayofjomodescriptors);
+        }
+        else
+        {
+            carray = eo_constarray_Load((EOarray*)&p->service.servconfig.data.mc.mc4plusmais_based.arrayofjomodescriptors);
+        }
+    }
+    
+    //first af all check current limits
+    if((eo_motcon_mode_mc4plus == p->service.servconfig.type) || (eo_motcon_mode_mc4plusmais == p->service.servconfig.type))
+    {
+        eo_currents_watchdog_Tick(eo_currents_watchdog_GetHandle());
+    }
+    
+    // 1) read positions from both joint and motor encoders and update motor controller engine.
+    s_eo_motioncontrol_updatedPositionsFromEncoders(encReader, carray, p->numofjomos);
+    
+    eo_encoderreader_StartReading(encReader); // Restart the reading of the encoders
+    
+    // 2) perform motor control
+    MController_do();
+    
+    // 3) update status of motors and joints
+    s_eo_motioncontrol_UpdateJointMotorStatus(p);
+    
+    
+    //NOTE: i put ticksupplyvoltage and checkcurrents together in order to maintain same order of operations
+    //we can change this?
+    if((eo_motcon_mode_mc4plus == p->service.servconfig.type) || (eo_motcon_mode_mc4plusmais == p->service.servconfig.type))
+    {
+        eo_currents_watchdog_TickSupplyVoltage(eo_currents_watchdog_GetHandle());
+    }
+
 
     return(eores_OK);    
 }
@@ -1071,22 +1042,16 @@ extern eOresult_t eo_motioncontrol_Stop(EOtheMotionController *p)
     }
     
     
-    if(eo_motcon_mode_foc == p->service.servconfig.type)
-    {   
-        // just put controller in idle mode        
-        //eo_emsMotorController_GoIdle();
-        MController_go_idle();
-    }      
-    else if(eo_motcon_mode_mc4 == p->service.servconfig.type)
+    if(eo_motcon_mode_mc4 == p->service.servconfig.type)
     {
         // just stop broadcast of the mc4 boards
         eo_mc4boards_BroadcastStop(eo_mc4boards_GetHandle()); 
         // then stop the mais
         eo_mais_Stop(eo_mais_GetHandle());
-    }    
-    else if((eo_motcon_mode_mc4plus == p->service.servconfig.type) || (eo_motcon_mode_mc4plusmais == p->service.servconfig.type))
-    {   
-        s_eo_mcserv_disable_all_motors(p);
+    }
+    else //foc, mc4plus, mc4plusmais
+    {
+         MController_go_idle();
     }
       
     p->service.started = eobool_false;
@@ -1165,140 +1130,6 @@ extern int16_t eo_motioncontrol_extra_GetSuppliedVoltage(EOtheMotionController *
     return(curr_val);
 }
 
-//extern uint32_t eo_motioncontrol_extra_GetMotorAnalogSensor(EOtheMotionController *p, uint8_t jomo)
-//{   // former eo_mcserv_GetMotorAnalogSensor
-//    if(NULL == p)
-//    {
-//        return(NULL);
-//    }
-
-//    if(eobool_false == p->service.active)
-//    {   // nothing to do because object must be first activated 
-//        return(0);
-//    } 
-//    
-//    if(eobool_false == p->service.started)
-//    {   // not running, thus we do nothing
-//        return(0);
-//    }    
-//    
-//    if((eo_motcon_mode_mc4plus != p->service.servconfig.type) && (eo_motcon_mode_mc4plusmais != p->service.servconfig.type))
-//    {   // so far only for mc4plus and mc4plusmais services
-//        return(0);
-//    }
-//    
-//    if(jomo >= p->numofjomos)
-//    {
-//        return(0);
-//    }
-//    
-//    uint32_t voltage = 0;
-//      
-//    voltage = hal_adc_get_hall_sensor_analog_input_mV(p->mcmc4plus.pwmport[jomo]);
-
-//   
-//    return(voltage);
-//}
-
-
-//extern uint32_t eo_motioncontrol_extra_GetMotorPositionRaw(EOtheMotionController *p, uint8_t jomo)
-//{   // former eo_mcserv_GetMotorPositionRaw()
-//    if(NULL == p)
-//    {
-//        return(0);
-//    }
-// 
-//    if(eobool_false == p->service.active)
-//    {   // nothing to do because object must be first activated 
-//        return(0);
-//    } 
-//    
-//    if(eobool_false == p->service.started)
-//    {   // not running, thus we do nothing
-//        return(0);
-//    }    
-//    
-//    if((eo_motcon_mode_mc4plus != p->service.servconfig.type) && (eo_motcon_mode_mc4plusmais != p->service.servconfig.type))
-//    {   // so far only for mc4plus and mc4plusmais services
-//        return(0);
-//    }
-//    
-//    if(jomo >= p->numofjomos)
-//    {
-//        return(0);
-//    }
-//    
-//    uint32_t pos_val = 0;
-//      
-//    // use inc port not pwm port ??
-//    pos_val = hal_quadencoder_get_counter((hal_quadencoder_t)p->mcmc4plus.pwmport[jomo]);
-
-//    
-//    return(pos_val);
-//}
-
-
-//extern void eo_motioncontrol_extra_ResetQuadEncCounter(EOtheMotionController *p, uint8_t jomo)
-//{   // former eo_mcserv_ResetQuadEncCounter()
-//    if(NULL == p)
-//    {
-//        return;
-//    }
-
-//    if(eobool_false == p->service.active)
-//    {   // nothing to do because object must be first activated 
-//        return;
-//    } 
-//    
-//    if(eobool_false == p->service.started)
-//    {   // not running, thus we do nothing
-//        return;
-//    }    
-//    
-//    if((eo_motcon_mode_mc4plus != p->service.servconfig.type) && (eo_motcon_mode_mc4plusmais != p->service.servconfig.type))
-//    {   // so far only for mc4plus and mc4plusmais services
-//        return;
-//    }
-//    
-//    if(jomo >= p->numofjomos)
-//    {
-//        return;
-//    }
-//       
-//    hal_quadencoder_reset_counter((hal_quadencoder_t)p->mcmc4plus.pwmport[jomo]);
-//     
-//}
-
-
-//extern eObool_t eo_motioncontrol_extra_IsMotorEncoderIndexReached(EOtheMotionController *p, uint8_t jomo)
-//{   // former eo_mcserv_IsMotorEncoderIndexReached()
-//    if(NULL == p)
-//    {
-//        return(eobool_false);
-//    }
-
-//    if(eobool_false == p->service.active)
-//    {   // nothing to do because object must be first activated 
-//        return(eobool_false);
-//    } 
-//    
-//    if(eobool_false == p->service.started)
-//    {   // not running, thus we do nothing
-//        return(eobool_false);
-//    }    
-//    
-//    if((eo_motcon_mode_mc4plus != p->service.servconfig.type) && (eo_motcon_mode_mc4plusmais != p->service.servconfig.type))
-//    {   // so far only for mc4plus and mc4plusmais services
-//        return(eobool_false);
-//    }
-//    
-//    eObool_t indx_reached = eobool_false;
-//    
-//    //#warning marco.accame: why do we use a pwm port for an inc encoder? we should use the inc port instead.   
-//    indx_reached = (eObool_t) hal_quadencoder_is_index_found((hal_quadencoder_t)p->mcmc4plus.pwmport[jomo]);
-//    
-//    return(indx_reached);
-//}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
@@ -1480,6 +1311,62 @@ extern void eoprot_fun_INIT_mc_motor_status(const EOnv* nv)
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
+/*This function gets values from encoders at joints and at motors(if present)and updates the motionController engine.
+returns:
+ - eores_NOK_timeout if readings are not available
+ - eores_NOK_generic if an error occurred during reading at least one encoder 
+ - eores_OK in case of success*/
+static eOresult_t s_eo_motioncontrol_updatedPositionsFromEncoders(EOtheEncoderReader *encReader, EOconstarray* carray, uint8_t numofjoint)
+{
+
+    eOresult_t res = eores_OK;
+    uint8_t error_mask = 0; 
+    
+    // wait for the encoders for some time
+    for (uint8_t i=0; i<30; ++i)
+    {
+        if (eo_encoderreader_IsReadingAvailable(encReader))
+        {
+            break;
+        }
+        
+        hal_sys_delay(5*hal_RELTIME_1microsec);
+    }        
+        
+    
+    if(eobool_false == eo_encoderreader_IsReadingAvailable(encReader))
+    {
+        return(eores_NOK_timeout);
+    }
+    
+    // read the encoders        
+    for(uint8_t i=0; i<numofjoint; i++)
+    {
+        uint32_t extra = 0;
+        uint32_t enc_value = 0;
+        eOencoderreader_errortype_t error_type;
+        const eOmn_serv_jomo_descriptor_t *jomodes = (eOmn_serv_jomo_descriptor_t*) eo_constarray_At(carray, i);   
+        
+        res = eo_encoderreader_Read(encReader, i, &enc_value, &extra, &error_type, NULL);
+        if (res != eores_OK)
+        {
+            error_mask |= 1<<(i<<1);
+            MController_invalid_absEncoder_fbk(i, error_type);
+            res = eores_NOK_generic;
+        }
+        else
+        {
+            MController_update_absEncoder_fbk(i, (uint16_t*)&enc_value);
+        
+            if(eomn_serv_mc_sensor_pos_atmotor == jomodes->extrasensor.pos) 
+            {
+                MController_update_motor_pos_fbk(i, extra);
+            }
+        }
+    } 
+    return(res);
+
+}
 
 static void s_eo_motioncontrol_send_periodic_error_report(void *par)
 {
@@ -2037,48 +1924,7 @@ static eOresult_t s_eo_motioncontrol_mc4plusmais_onstop_search4mais_BIS_now_veri
     return(eores_OK);    
 }
 
-// want to send a canframe with pwm onto can bus. 
-//static eOresult_t s_eo_motioncontrol_SetCurrentSetpoint(EOtheMotionController *p, int16_t *pwmList, uint8_t size)
-//{
-//    eOcanport_t port = eOcanport1;
-//    
-//    // now i need to assign port and command with correct values.
-//    
-//    // i manage 2foc boards. they are at most 4. they must be all in the same can bus. 
-//    int16_t pwmValues[4] = {0, 0, 0, 0};
-//    
-//    uint8_t i=0;
-//    for(i=0; i<p->numofjomos; i++)
-//    {
-//        eObrd_canlocation_t loc = {0};
-//        // search the address of motor i-th and fill the pwmValues[] in relevant position.
-//        if(eores_OK == eo_canmap_GetEntityLocation(eo_canmap_GetHandle(), eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, i, 0), &loc, NULL, NULL))
-//        {
-//            port = (eOcanport_t)loc.port;  // marco.accame: i dont check if the port is not always the same ... it MUST be.          
-//            if((loc.addr > 0) && (loc.addr <= 4))
-//            {
-//                pwmValues[loc.addr-1] = pwmList[i];
-//            }            
-//        }        
-//    }
-//    
-//    // ok, now i fill command and location
-//    eOcanprot_command_t command = {0};
-//    command.class = eocanprot_msgclass_periodicMotorControl;    
-//    command.type  = ICUBCANPROTO_PER_MC_MSG__EMSTO2FOC_DESIRED_CURRENT;
-//    command.value = &pwmValues[0];
-//    
-//    eObrd_canlocation_t location = {0};
-//    location.port = port;
-//    location.addr = 0; // marco.accame: we put 0 just because it is periodic and this is the source address (the EMS has can address 0).
-//    location.insideindex = eobrd_caninsideindex_first; // because all 2foc have motor on index-0. 
-
-//    // and i send the command
-//    return(eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), &command, location));   
-//}
-
-
-static void s_eo_motioncontrol_UpdateJointStatus(EOtheMotionController *p)
+static void s_eo_motioncontrol_UpdateJointMotorStatus(EOtheMotionController *p)
 {
     const uint8_t transmit_decoupled_pwms = 0;
     
@@ -2091,35 +1937,17 @@ static void s_eo_motioncontrol_UpdateJointStatus(EOtheMotionController *p)
     {
         if(NULL != (jstatus = eo_entities_GetJointStatus(eo_entities_GetHandle(), jId)))
         {
-       
-            //eo_emsController_GetJointStatus(jId, jstatus);
             MController_get_joint_state(jId, jstatus);
             
-            //eo_emsController_GetActivePidStatus(jId, &jstatus->core.ofpid);
             MController_get_pid_state(jId, &jstatus->core.ofpid, transmit_decoupled_pwms);
-            
-            /*
-            if(1 == transmit_decoupled_pwms) 
-            {  
-                // this functions is used to get the motor PWM after the decoupling matrix
-                eo_emsController_GetPWMOutput(jId, &jstatus->core.ofpid.generic.output);
-            }
-            
-            jstatus->core.modes.ismotiondone = eo_emsController_GetMotionDone(jId);
-            */
         }
- 
     }   
-    
     
     for(jId = 0; jId<p->numofjomos; jId++)
     {
         if(NULL != (mstatus = eo_entities_GetMotorStatus(eo_entities_GetHandle(), jId)))
         {
-            //eo_emsController_GetMotorStatus(jId, mstatus);
             MController_get_motor_state(jId, mstatus);
-            //eo_emsController_GetPWMOutput_int16(jId, &(mstatus->basic.mot_pwm));
-            
         }
     }
 }
@@ -2227,131 +2055,6 @@ static void s_eo_motioncontrol_mc4plusbased_hal_init_motors_adc_feedbacks(void)
 static void s_eo_motioncontrol_mc4plusbased_hal_init_quad_enc_indexes_interrupt(void)
 {   // activate interrupt line for quad_enc indexes check. the call of hal_quadencoder_init() is inside eo_appEncReader_Activate() ... maybe move it inside there too
     hal_quadencoder_init_indexes_flags();      
-}
-
-//static void s_eo_motioncontrol_mc4plusbased_enable_all_motors(EOtheMotionController *p)
-//{
-//    // enable PWM of the motors (if not faulted)
-//    if (!hal_motor_externalfaulted())
-//    {
-//        for(uint8_t i=0; i<p->numofjomos; i++)
-//        {
-//            hal_motor_enable(p->mcmc4plus.pwmport[i]);
-//        }
-//    }
-//    
-//    return;
-//}
-
-
-static eOresult_t s_eo_mcserv_do_mc4plus(EOtheMotionController *p)
-{
-    
-    uint8_t error_mask = 0;
-    eOresult_t res = eores_NOK_generic;
-    /*uint32_t encvalue[4] = {0}; 
-    uint32_t extra[4] = {0};
-    hal_spiencoder_errors_flags encflags[4] = {0};
-    int16_t pwm[4] = {0};  
-    */
-    
-    EOconstarray* carray;
-    if(eo_motcon_mode_mc4plus == p->service.servconfig.type)
-    {
-        carray = eo_constarray_Load((EOarray*)&p->service.servconfig.data.mc.mc4plus_based.arrayofjomodescriptors);
-    }
-    else //mc4plus with mais
-    {
-        carray = eo_constarray_Load((EOarray*)&p->service.servconfig.data.mc.mc4plusmais_based.arrayofjomodescriptors);
-    }
-    
-    uint8_t i = 0;
-
-    
-    eo_currents_watchdog_Tick(eo_currents_watchdog_GetHandle());
-        
-    for (uint8_t i=0; i<30; ++i)
-    {
-        if (eo_encoderreader_IsReadingAvailable(p->mcmc4plus.theencoderreader))
-        {
-            break;
-        }
-        else
-        {        
-            hal_sys_delay(5*hal_RELTIME_1microsec);
-        }
-    }        
-        
-    // read the encoders        
-    if(eobool_true == eo_encoderreader_IsReadingAvailable(p->mcmc4plus.theencoderreader))
-    {    
-        for(i=0; i<p->numofjomos; i++)
-        {
-            uint32_t extra = 0;
-            uint32_t enc_value = 0;
-            eOencoderreader_errortype_t error_type;
-            
-            const eOmn_serv_jomo_descriptor_t *jomodes = (eOmn_serv_jomo_descriptor_t*) eo_constarray_At(carray, i);   
-            
-            // the object EOtheEncoderReader (but maybe it may be called EOthePositionReader) will internaly manage any type of sensor, even the MAIS
-            res = eo_encoderreader_Read(p->mcmc4plus.theencoderreader, i, &enc_value, &extra, &error_type, NULL);
-            if(res != eores_OK)
-            {
-                error_mask |= 1<<(i<<1);
-                MController_invalid_absEncoder_fbk(i, error_type);//VALe: controlla error type
-            }
-            else
-            {
-                MController_update_absEncoder_fbk(i, (uint16_t*)&enc_value);
-            }
-
-            
-            if(eomn_serv_mc_sensor_pos_atmotor == jomodes->extrasensor.pos) 
-            {
-                MController_update_motor_pos_fbk(i, extra);
-            }
-        }     
-    }
-    else
-    {
-        error_mask = 0xAA; // timeout
-    }    
-   
-    // Restart the reading of the encoders
-    eo_encoderreader_StartReading(p->mcmc4plus.theencoderreader);
-    
-    MController_do();
-    
-    // apply the readings (primary encoder) to local controller and check for possible faults
-    //eo_emsController_AcquireAbsEncoders((int32_t*)encvalue, error_mask);
-    //eo_emsController_CheckFaults();
-    
-    // compute the pwm using pid
-    //eo_emsController_PWM(pwm);
-    
-    // 6. apply the pwm. for the case of mc4plus we call hal_pwm();
-    //for(i=0; i<p->numofjomos; i++)
-    //{
-    //    hal_motor_pwmset(p->mcmc4plus.pwmport[i], pwm[i]);
-    //}
-
-    s_eo_motioncontrol_UpdateJointStatus(p);
-    
-    eo_currents_watchdog_TickSupplyVoltage(eo_currents_watchdog_GetHandle());
-    
-    return(eores_OK);
-}
-
-
-static void s_eo_mcserv_disable_all_motors(EOtheMotionController *p)
-{
-     for(uint8_t i=0; i<p->numofjomos; i++)
-     {
-        hal_motor_pwmset(p->mcmc4plus.pwmport[i], 0);
-        hal_motor_disable(p->mcmc4plus.pwmport[i]);
-     }
-     
-     return;
 }
 
 static eObool_t s_eo_motioncontrol_isID32relevant(uint32_t id32)
