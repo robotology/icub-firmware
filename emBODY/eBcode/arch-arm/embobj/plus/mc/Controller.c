@@ -1267,7 +1267,17 @@ void MController_update_motor_current_fbk(int m, int16_t current)
 
 void MController_config_pos_pid(int j, eOmc_PID_t *pid_conf)
 {
-    PID_config(&smc->joint[j].posPID, pid_conf);
+    Joint* joint = smc->joint+j;
+    
+    joint->scKpos   = pid_conf->kp;
+    joint->scKvel   = pid_conf->kd;
+    joint->scKstill = pid_conf->ki;
+
+    //o->scKpos   = pid_conf->ki;
+    //o->scKvel   = pid_conf->kp;
+    //o->scKstill = pid_conf->ki;
+    
+    PID_config(&(joint->posPID), pid_conf);
 }
 
 void MController_config_trq_pid(int m, eOmc_PID_t *pid_conf)

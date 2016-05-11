@@ -109,13 +109,13 @@ void Joint_config(Joint* o, uint8_t ID, eOmc_joint_config_t* config)
     
     PID_config(&o->posPID, &config->pidposition);
     
-    //o->scKpos   = config->pidposition.kp;
-    //o->scKvel   = config->pidposition.kd;
-    //o->scKstill = config->pidposition.ki;
-
-    o->scKpos   = config->pidvelocity.ki;
-    o->scKvel   = config->pidvelocity.kp;
+    o->scKpos   = config->pidposition.kp;
+    o->scKvel   = config->pidposition.kd;
     o->scKstill = config->pidposition.ki;
+
+    //o->scKpos   = config->pidvelocity.ki;
+    //o->scKvel   = config->pidvelocity.kp;
+    //o->scKstill = config->pidposition.ki;
     
     o->pos_min = config->limitsofjoint.min;
     o->pos_max = config->limitsofjoint.max;
