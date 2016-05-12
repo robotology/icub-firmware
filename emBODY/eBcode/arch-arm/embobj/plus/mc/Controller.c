@@ -23,59 +23,63 @@ static char invert_matrix(float** M, float** I, char n);
 //static void MController_config_motor_set(MController* o);
 //static void MController_config_encoder_set(MController* o);
 
-MController* MController_new(uint8_t nJoints, uint8_t nEncoders) //
+MController* MController_new(uint8_t nJoints, uint8_t nEncods) //
 {
     if (!smc) smc = NEW(MController, 1);
     
     MController* o = smc;
 
     if (!o) return NULL;
-    
-    o->nEncoders = nJoints;
+        
+    o->nEncods = nEncods;
     o->nJoints = nJoints;
-    o->nSets = nJoints;
+    o->nSets   = nJoints;
     
-    o->jointSet = JointSet_new(nJoints);
+    o->jointSet = JointSet_new(MAX_JOINTS_PER_BOARD);
     
-    o->set_dim = NEW(uint8_t, nJoints);
-    o->enc_set_dim = NEW(uint8_t, nJoints);
+    o->set_dim     = NEW(uint8_t, MAX_JOINTS_PER_BOARD);
+    o->enc_set_dim = NEW(uint8_t, MAX_ENCODS_PER_BOARD);
     
-    o->jos = NEW(uint8_t*, nJoints);
-    o->mos = NEW(uint8_t*, nJoints);
-    o->eos = NEW(uint8_t*, nJoints);
+    o->jos = NEW(uint8_t*, MAX_JOINTS_PER_BOARD);
+    o->mos = NEW(uint8_t*, MAX_MOTORS_PER_BOARD);
+    o->eos = NEW(uint8_t*, MAX_ENCODS_PER_BOARD);
     
-    o->j2s = NEW(uint8_t, nJoints);
-    o->m2s = NEW(uint8_t, nJoints);
-    o->e2s = NEW(uint8_t, nEncoders);
+    o->j2s = NEW(uint8_t, MAX_JOINTS_PER_BOARD);
+    o->m2s = NEW(uint8_t, MAX_MOTORS_PER_BOARD);
+    o->e2s = NEW(uint8_t, MAX_ENCODS_PER_BOARD);
     
-    //o->multi_encs = NEW(uint8_t, nJoints);
+    //o->multi_encs = NEW(uint8_t, MAX_JOINTS_PER_BOARD);
     
-    o->joint = Joint_new(nJoints);
-    o->motor = Motor_new(nJoints); 
+    o->joint = Joint_new(MAX_JOINTS_PER_BOARD);
+    o->motor = Motor_new(MAX_MOTORS_PER_BOARD); 
     
-    o->absEncoder = AbsEncoder_new(nEncoders);
+    o->absEncoder = AbsEncoder_new(MAX_ENCODS_PER_BOARD);
     
-    o->Jjm = NEW(float*, nJoints);
-    o->Jmj = NEW(float*, nJoints);
+    o->Jjm = NEW(float*, MAX_JOINTS_PER_BOARD);
+    o->Jmj = NEW(float*, MAX_MOTORS_PER_BOARD);
     
-    o->Sjm = NEW(float*, nJoints);
-    o->Sje = NEW(float*, nJoints);
+    o->Sjm = NEW(float*, MAX_JOINTS_PER_BOARD);
+    o->Sje = NEW(float*, MAX_JOINTS_PER_BOARD);
     
-    for (int i=0; i<nJoints; ++i)
+    for (int i=0; i<MAX_JOINTS_PER_BOARD; ++i)
     {
-        o->jos[i] = NEW(uint8_t, nJoints);
-        o->mos[i] = NEW(uint8_t, nJoints);
+        o->jos[i] = NEW(uint8_t, MAX_JOINTS_PER_BOARD);
         
-        o->Jjm[i] = NEW(float, nJoints);
-        o->Jmj[i] = NEW(float, nJoints);
+        o->Jjm[i] = NEW(float, MAX_MOTORS_PER_BOARD);
+        o->Sjm[i] = NEW(float, MAX_MOTORS_PER_BOARD);
+        o->Sje[i] = NEW(float, MAX_ENCODS_PER_BOARD);
+    }
+
+    for (int i=0; i<MAX_MOTORS_PER_BOARD; ++i)
+    {
+        o->mos[i] = NEW(uint8_t, MAX_MOTORS_PER_BOARD);
         
-        o->Sjm[i] = NEW(float, nJoints);
+        o->Jmj[i] = NEW(float, MAX_JOINTS_PER_BOARD);
     }
     
-    for (int i=0; i<nJoints; ++i)
+    for (int i=0; i<MAX_ENCODS_PER_BOARD; ++i)
     {
-        o->Sje[i] = NEW(float,   nEncoders);
-        o->eos[i] = NEW(uint8_t, nEncoders);
+        o->eos[i] = NEW(uint8_t, MAX_ENCODS_PER_BOARD);
     }
     
     MController_init();
@@ -93,26 +97,56 @@ void MController_init() //
     
     o->multi_encs = 1;
     
-    for (int i=0; i<o->nJoints; ++i)
+    for (int i=0; i<MAX_JOINTS_PER_BOARD; ++i)
     {
-        o->j2s[i] = i;
-        o->m2s[i] = i;
-        o->e2s[i] = i;
-        
         //o->multi_encs[i] = 1;
         
         o->set_dim[i] = 1;
+        
+        o->j2s[i] = i;
+
+        o->jos[i][0] = i;
+        
+        for (int k=0; k<MAX_MOTORS_PER_BOARD; ++k)
+        {
+            o->Jjm[i][k] = o->Sjm[i][k] = (i==k?1.0f:0.0f);
+        }
+        
+        for (int k=0; k<MAX_ENCODS_PER_BOARD; ++k)
+        {
+            o->Sje[i][k] = (i==k?1.0f:0.0f);
+        }
+        
+        Joint_init(o->joint+i);
+    }
+    
+    for (int i=0; i<MAX_MOTORS_PER_BOARD; ++i)
+    {
+        o->m2s[i] = i;
+        
+        o->mos[i][0] = i;
+
+        for (int k=0; k<MAX_JOINTS_PER_BOARD; ++k)
+        {
+            o->Jmj[i][k] = (i==k?1.0f:0.0f);
+        }
+        
+        Motor_init(o->motor+i);
+    }
+    
+    for (int i=0; i<MAX_ENCODS_PER_BOARD; ++i)
+    {
         o->enc_set_dim[i] = 1;
         
-        o->jos[i][0] = i;
-        o->mos[i][0] = i;
         o->eos[i][0] = i;
         
-        for (int k=0; k<o->nJoints; ++k)
-        {
-            o->Jjm[i][k] = o->Jmj[i][k] = o->Sje[i][k] = o->Sjm[i][k] = (i==k?1.0f:0.0f);
-        }
+        AbsEncoder_init(o->absEncoder+i);
     }
+}
+
+void MController_deinit()
+{
+    MController_init();
 }
 
 //void MController_config_board(uint8_t part_type, uint8_t actuation_type)
@@ -342,7 +376,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         Jmj[1][0] = -1.0f/alfa; Jmj[1][1] =  1.0f/alfa;
         Jmj[2][2] =  1.0f/alfa;
         
-        #if defined(V1_MECHANICS)
+        #if defined(ICUB_MEC_V1) || defined(ICUB_GENOVA04)
         // |j0|   |  1     0    0   |   |e0|     
         // |j1| = |  0     1    0   | * |e1|
         // |j2|   |  1    -1  40/65 |   |e2|
@@ -471,8 +505,8 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         break;
     
     case emscontroller_board_CER_HAND:                   //= 14, 16,    //mc2plus
-        o->nSets     = 2;
-        o->nEncoders = 4;
+        o->nSets   = 2;
+        o->nEncods = 4;
     
         o->multi_encs = 2;
     
@@ -755,7 +789,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
     
     for (int s=0; s<o->nSets; ++s) o->enc_set_dim[s] = 0;
     
-    for (int e=0; e<o->nEncoders; ++e)
+    for (int e=0; e<o->nEncods; ++e)
     {
         int s = o->e2s[e];
 
@@ -1142,7 +1176,7 @@ static void MController_config_encoder_set(MController *o)
 
 static char invert_matrix(float** M, float** I, char n)
 {
-    float B[MAX_PER_BOARD][MAX_PER_BOARD];
+    float B[MAX_JOINTS_PER_BOARD][MAX_JOINTS_PER_BOARD];
     SCAN(r,c) { B[r][c]=M[r][c]; I[r][c]=0.0f; }
     FOR(i) I[i][i]=1.0f;
     

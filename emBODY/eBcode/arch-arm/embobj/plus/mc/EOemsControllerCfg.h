@@ -22,30 +22,6 @@ extern "C" {
 #include "EOtheMemoryPool.h"
  
  // - public #define  --------------------------------------------------------------------------------------------------
- 
-//#define FORCE_ZERO_PWM_OUT
-//#define EXPERIMENTAL_MOTOR_TORQUE
-//#define EXPERIMENTAL_SPEED_CONTROL
-//#define USE_ONLY_QE
-    
-//#define SHOULDER_3rd_JOINT_COUPLING
-//#define USE_JACOBIAN
-
-#if     defined(ICUB_MEC_V1) | defined(ICUB_GENOVA04)
-    #define V1_MECHANICS
-    #define USE_2FOC_FAST_ENCODER
-#elif   defined(ICUB_MEC_V2) | defined(ICUB_DARMSTADT01)
-    #define V2_MECHANICS
-    #define USE_2FOC_FAST_ENCODER
-#elif defined(ICUB_MEC_V3)
-    #define V3_MECHANICS
-    #undef  USE_2FOC_FAST_ENCODER
-#elif defined CER
-    #define CER_MECHANICS
-    #define CER_TICKS_CONTROL
-#else 
-    #error -> specify either ICUB_MEC_V1 or ICUB_MEC_V2 or ICUB_MEC_V3 or CER
-#endif
 
 #define UNKNOWN              0
 
@@ -73,8 +49,10 @@ extern "C" {
 //#define EMS_FREQUENCY_INT32 1000
 //#define EMS_FREQUENCY_FLOAT CTRL_LOOP_FREQUENCY
     
-#define MAX_PER_BOARD 4
-    
+#define MAX_ENCODS_PER_BOARD 4
+#define MAX_JOINTS_PER_BOARD 4
+#define MAX_MOTORS_PER_BOARD 4
+
 #define TICKS_PER_REVOLUTION      65536
 #define TICKS_PER_HALF_REVOLUTION 32768
 #define ENCODER_QUANTIZATION      16

@@ -166,8 +166,8 @@ void JointSet_do_odometry(JointSet* o) //
     {
         int E = *(o->pE);
         
-        float pos[MAX_PER_BOARD];
-        float vel[MAX_PER_BOARD];
+        float pos[MAX_JOINTS_PER_BOARD];
+        float vel[MAX_JOINTS_PER_BOARD];
         
         int es, e;
         
@@ -580,7 +580,7 @@ void JointSet_do_pwm_control(JointSet* o)
     
     if (limits_torque_protection)
     {
-        CTRL_UNITS joint_pwm_ref[MAX_PER_BOARD];
+        CTRL_UNITS joint_pwm_ref[MAX_JOINTS_PER_BOARD];
         
         for (int js=0; js<N; ++js)
         {

@@ -13,7 +13,7 @@
 
 typedef struct //MController
 {
-    uint8_t nEncoders;
+    uint8_t nEncods;
     uint8_t nJoints;
     uint8_t nSets;
     
@@ -50,9 +50,8 @@ typedef struct //MController
 extern MController* MController_new(uint8_t nJoints, uint8_t nEncoders); //
 
 extern void MController_init(void); //
-
-void MController_config_board(const eOmn_serv_configuration_t* brd_cfg);
-//extern void MController_config_board(uint8_t board_type, uint8_t actuation_type);
+extern void MController_deinit(void); //
+extern void MController_config_board(const eOmn_serv_configuration_t* brd_cfg);
 
 extern void MController_config_joint(int j, eOmc_joint_config_t* config); //
 extern void MController_config_motor(int m, eOmc_motor_config_t* config); //

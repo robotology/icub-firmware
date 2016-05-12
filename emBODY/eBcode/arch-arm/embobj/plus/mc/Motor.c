@@ -692,7 +692,7 @@ void Motor_actuate(Motor* motor, uint8_t N) //
 {
     if (motor->HARDWARE_TYPE == HARDWARE_2FOC)
     {
-        int16_t output[MAX_PER_BOARD];
+        int16_t output[MAX_JOINTS_PER_BOARD];
     
         for (int m=0; m<N; ++m)
         {
