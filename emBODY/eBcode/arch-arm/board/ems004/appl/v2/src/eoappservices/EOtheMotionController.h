@@ -50,9 +50,6 @@
 typedef struct EOtheMotionController_hid EOtheMotionController;
 
 
-
-//typedef eOresult_t (*eOmotcon_onendofoperation_fun_t) (EOtheMotionController* p, eObool_t operationisok);
-
 enum { eo_motcon_standardJOMOs = 4, eo_motcon_maxJOMOs = 12 };
 
 
@@ -81,51 +78,19 @@ extern eOresult_t eo_motioncontrol_SendReport(EOtheMotionController *p);
 extern eOmotioncontroller_mode_t eo_motioncontrol_GetMode(EOtheMotionController *p);
 
 
-
-// so far we support only eo_motcon_mode_foc and eo_motcon_mode_mc4
-
 extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify);
 
 extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn_serv_configuration_t * servcfg);
 
 extern eOresult_t eo_motioncontrol_Deactivate(EOtheMotionController *p);
 
-
-// to be called once before to be ticked
 extern eOresult_t eo_motioncontrol_Start(EOtheMotionController *p);
 
 extern eOresult_t eo_motioncontrol_SetRegulars(EOtheMotionController *p, eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t* numberofthem);
 
-// it ticks every ms of the control-loop
 extern eOresult_t eo_motioncontrol_Tick(EOtheMotionController *p);
 
 extern eOresult_t eo_motioncontrol_Stop(EOtheMotionController *p);
-
-
-// others, needed by mc4plus original code by davide.pollarolo. see if they can be moved elsewhere or if they are really needed
-//extern eOresult_t eo_motioncontrol_extra_MotorEnable(EOtheMotionController *p, uint8_t jomo);
-
-//extern eOresult_t eo_motioncontrol_extra_FaultDetectionEnable(EOtheMotionController *p);
-
-//extern eOresult_t eo_motioncontrol_extra_SetMotorFaultMask(EOtheMotionController *p, uint8_t jomo, uint8_t* fault_mask);
-
-//extern uint32_t eo_motioncontrol_extra_GetMotorFaultMask(EOtheMotionController *p, uint8_t jomo);
-
-
-extern uint16_t eo_motioncontrol_extra_GetMotorCurrent(EOtheMotionController *p, uint8_t jomo);
-
-//extern uint32_t eo_motioncontrol_extra_GetMotorAnalogSensor(EOtheMotionController *p, uint8_t jomo); NOTE: commented because unused, may
-
-//extern uint32_t eo_motioncontrol_extra_GetMotorPositionRaw(EOtheMotionController *p, uint8_t jomo); NOTE: commented because unused
-
-//extern void eo_motioncontrol_extra_ResetQuadEncCounter(EOtheMotionController *p, uint8_t jomo); NOTE: commented because unused
-
-//extern eObool_t eo_motioncontrol_extra_IsMotorEncoderIndexReached(EOtheMotionController *p, uint8_t jomo); NOTE: commented because unused
-
-extern int16_t eo_motioncontrol_extra_GetSuppliedVoltage(EOtheMotionController *p);
-
-// others, one make by marco.accame which groups actions
-
 
 
 
