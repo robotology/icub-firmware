@@ -232,6 +232,12 @@ __weak extern void eom_emsconfigurator_hid_userdef_ProcessUserdef02Event(EOMtheE
 
 } 
 
+__weak extern void eom_emsconfigurator_hid_userdef_ProcessUserdef03Event(EOMtheEMSconfigurator* p)
+{
+
+}
+
+
 __weak extern void eom_emsconfigurator_hid_userdef_onemstransceivererror(EOMtheEMStransceiver* p)
 {
 
@@ -282,15 +288,6 @@ static void s_eom_emsconfigurator_task_run(EOMtask *p, uint32_t t)
         return;
     }     
     
-    if(eobool_true == eo_common_event_check(evt, emsconfigurator_evt_go2runner))
-    {
-        eom_emsappl_SM_ProcessEvent(eom_emsappl_GetHandle(), eo_sm_emsappl_EVgo2run);
-        // no other event is managed anymore:
-        // a possible received packet shall be managed by the runner as it reads all packet in rx fifo at each iteration
-        // a request to form and tx a packet will be managed by the runner. 
-        return;
-    }
-       
      
     if(eobool_true == eo_common_event_check(evt, emsconfigurator_evt_ropframeTx))
     {
@@ -389,8 +386,20 @@ static void s_eom_emsconfigurator_task_run(EOMtask *p, uint32_t t)
     if(eobool_true == eo_common_event_check(evt, emsconfigurator_evt_userdef02))
     {
         eom_emsconfigurator_hid_userdef_ProcessUserdef02Event(&s_emsconfigurator_singleton);
-    }    
-    
+    }   
+
+    // we can process a user-defined event03
+    if(eobool_true == eo_common_event_check(evt, emsconfigurator_evt_userdef03))
+    {
+        eom_emsconfigurator_hid_userdef_ProcessUserdef03Event(&s_emsconfigurator_singleton);
+    }  
+        
+    // moved at the end so that we dont miss any other event sent only to the config task
+    if(eobool_true == eo_common_event_check(evt, emsconfigurator_evt_go2runner))
+    {
+        eom_emsappl_SM_ProcessEvent(eom_emsappl_GetHandle(), eo_sm_emsappl_EVgo2run);
+        return;
+    }        
 }
 
 
@@ -401,6 +410,8 @@ static void s_eom_emsconfigurator_task_run(EOMtask *p, uint32_t t)
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------
+
+
 
 
 

@@ -83,7 +83,8 @@ typedef enum
     emsconfigurator_evt_tick            =   0x00000010,
     emsconfigurator_evt_userdef00       =   0x00000020,
     emsconfigurator_evt_userdef01       =   0x00000040,
-    emsconfigurator_evt_userdef02       =   0x00000080
+    emsconfigurator_evt_userdef02       =   0x00000080,
+    emsconfigurator_evt_userdef03       =   0x00000100
 } eOemsconfigurator_event_t;
 
 
@@ -133,4 +134,3 @@ extern eOresult_t eom_emsconfigurator_GracefulStopAndGoTo(EOMtheEMSconfigurator 
 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
-
