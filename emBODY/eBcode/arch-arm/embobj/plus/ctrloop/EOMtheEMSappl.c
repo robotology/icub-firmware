@@ -35,6 +35,7 @@
 #include "EOVtheSystem.h"
 #include "EOtheMemoryPool.h"
 #include "EOtheErrormanager.h"
+#include "EoError.h"
 #include "EOMtheIPnet.h"
 
 
@@ -696,7 +697,7 @@ static void s_eom_emsappl_OnError(eOerrmanErrorType_t errtype, const char *info,
 
     if(emsapplcfg->errmng_haltrace_enabled)
     {
-        char strdes[64] = {0};
+        char strdes[196] = {0};
         uint64_t tt = eov_sys_LifeTimeGet(eov_sys_GetHandle());
         uint32_t sec = tt/(1000*1000);
         uint32_t tmp = tt%(1000*1000);
@@ -720,7 +721,7 @@ static void s_eom_emsappl_OnError(eOerrmanErrorType_t errtype, const char *info,
         
         if(NULL != des)
         {
-            snprintf(strdes, sizeof(strdes), "code 0x%x, p16 0x%04x, p64 0x%016llx, dev %d, adr %d", des->code, des->par16, des->par64, des->sourcedevice, des->sourceaddress);
+            snprintf(strdes, sizeof(strdes), "code 0x%x, p16 0x%04x, p64 0x%016llx, dev %d, adr %d: %s", des->code, des->par16, des->par64, des->sourcedevice, des->sourceaddress, eoerror_code2string(des->code));
         }
         if(NULL != info)
         {
@@ -820,6 +821,7 @@ static void s_eom_emsappl_OnError(eOerrmanErrorType_t errtype, const char *info,
 //    return;
 //#endif    
 }
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -928,8 +930,6 @@ extern void eo_cfg_sm_EMSappl_hid_on_exit_RUN(EOsm *s)
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------
-
-
 
 
 
