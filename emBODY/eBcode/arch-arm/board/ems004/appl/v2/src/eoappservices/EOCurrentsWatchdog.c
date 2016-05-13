@@ -171,7 +171,7 @@ extern eOresult_t eo_currents_watchdog_UpdateCurrentLimits(EOCurrentsWatchdog* p
 }
 
 
-extern void eo_currents_watchdog_Tick(EOCurrentsWatchdog* p)
+extern void eo_currents_watchdog_Tick(EOCurrentsWatchdog* p, int16_t voltage, int16_t *currents)
 {
 
     if (p == NULL)
@@ -184,7 +184,7 @@ extern void eo_currents_watchdog_Tick(EOCurrentsWatchdog* p)
     for (uint8_t i = 0; i < s_eo_currents_watchdog.numberofmotors; i++)
     {
         //get current value
-        current_value = eo_motioncontrol_extra_GetMotorCurrent(eo_motioncontrol_GetHandle(), i);
+        current_value = currents[i];
         
         //Update currents broadcasted
         s_eo_currents_watchdog_UpdateMotorCurrents(i, current_value);
@@ -195,27 +195,42 @@ extern void eo_currents_watchdog_Tick(EOCurrentsWatchdog* p)
         //s_eo_currents_watchdog_CheckI2T(i, current_value);
     }
     
-}
-
-extern void eo_currents_watchdog_TickSupplyVoltage(EOCurrentsWatchdog* p)
-{
-
-    if (p == NULL)
+    
+    // in here i proces the voltage
     {
-        return;
+        suppliedVoltage_counter++;
+        
+        if(suppliedVoltage_counter < SUMMPLIED_VOLTAGE_COUNTER_MAX)
+            return;
+        
+        nv_controller_ptr->status.supplyVoltage = voltage;
+        suppliedVoltage_counter = 0;               
     }
     
-    suppliedVoltage_counter++;
-    
-    if(suppliedVoltage_counter < SUMMPLIED_VOLTAGE_COUNTER_MAX)
-        return;
-    
-    nv_controller_ptr->status.supplyVoltage = eo_motioncontrol_extra_GetSuppliedVoltage(eo_motioncontrol_GetHandle());
-    suppliedVoltage_counter = 0;
-    return;
-    
     
 }
+
+//extern void eo_currents_watchdog_TickSupplyVoltage(EOCurrentsWatchdog* p)
+//{
+
+//    if (p == NULL)
+//    {
+//        return;
+//    }
+//    
+//    suppliedVoltage_counter++;
+//    
+//    if(suppliedVoltage_counter < SUMMPLIED_VOLTAGE_COUNTER_MAX)
+//        return;
+//    
+//    nv_controller_ptr->status.supplyVoltage = eo_motioncontrol_extra_GetSuppliedVoltage(eo_motioncontrol_GetHandle());
+//    suppliedVoltage_counter = 0;
+//    return;
+//    
+//    
+//}
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
