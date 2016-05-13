@@ -105,13 +105,6 @@ static uint32_t s_eo_appEncReader_hallAdc_rescale2icubdegrees(EOappEncReader* p,
 
 static hal_spiencoder_stream_t s_eo_appEncReader_get_spi_stream(EOappEncReader* p, uint8_t port);
 
-static void s_fake_hal_quadencoder_single_init(uint8_t port);
-
-static uint32_t s_fake_hal_quadencoder_getCounter(uint8_t port);
-
-static uint32_t s_fake_hal_adc_get_hall_sensor_analog_input_mV(uint8_t port);
-
-
 
 static void s_eo_appEncReader_init_halSPIencoders(EOappEncReader *p);
 
@@ -585,7 +578,7 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint
             case eomn_serv_mc_sensor_encoder_inc:
             {
                 
-                val_raw = s_fake_hal_quadencoder_getCounter(this_jomoconfig.primary.port);
+                val_raw = hal_quadencoder_get_counter((hal_quadencoder_t)this_jomoconfig.primary.port);
                 if(ENCODER_VALUE_NOT_SUPPORTED == val_raw)
                 {
                     *primaryvalue = 0;
@@ -603,7 +596,7 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint
             {
                 // get the voltage from the motor port (0 - 3300mV)
             
-                val_raw = s_fake_hal_adc_get_hall_sensor_analog_input_mV(this_jomoconfig.primary.port);        
+                val_raw = hal_adc_get_hall_sensor_analog_input_mV(this_jomoconfig.primary.port);        
                 if(ENCODER_VALUE_NOT_SUPPORTED == val_raw)
                 {
                     *primaryvalue = ENCODER_VALUE_NOT_SUPPORTED;
@@ -730,7 +723,7 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint
             case eomn_serv_mc_sensor_encoder_inc:
             {
              
-                val_raw = s_fake_hal_quadencoder_getCounter(this_jomoconfig.secondary.port);
+                val_raw = hal_quadencoder_get_counter((hal_quadencoder_t)this_jomoconfig.secondary.port);
                 if(ENCODER_VALUE_NOT_SUPPORTED == val_raw)
                 {
                     *secondaryvalue = 0;
@@ -747,7 +740,7 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint
             {
                 // get the voltage from the motor port (0 - 3300mV)
            
-                val_raw = s_fake_hal_adc_get_hall_sensor_analog_input_mV(this_jomoconfig.secondary.port);        
+                val_raw = hal_adc_get_hall_sensor_analog_input_mV(this_jomoconfig.secondary.port);        
                 if(ENCODER_VALUE_NOT_SUPPORTED == val_raw)
                 {
                     *secondaryvalue = ENCODER_VALUE_NOT_SUPPORTED;
@@ -1209,13 +1202,13 @@ static void s_eo_appEncReader_configure_NONSPI_encoders(EOappEncReader *p)
         eOappEncReader_jomoconfig_t* jmcfg = &p->config.jomoconfig[i];
         
         if(jmcfg->primary.type == eomn_serv_mc_sensor_encoder_inc)
-        {           
-            s_fake_hal_quadencoder_single_init(jmcfg->primary.port);
+        {  
+            hal_quadencoder_init((hal_quadencoder_t)jmcfg->primary.port);            
         }
         
         if(jmcfg->secondary.type == eomn_serv_mc_sensor_encoder_inc)
-        {           
-            s_fake_hal_quadencoder_single_init(jmcfg->secondary.port);
+        { 
+            hal_quadencoder_init((hal_quadencoder_t)jmcfg->secondary.port);           
         }
         
         // for adh: do things ...
@@ -1348,26 +1341,6 @@ static hal_spiencoder_stream_t s_eo_appEncReader_get_spi_stream(EOappEncReader* 
     return((hal_spiencoder_stream_t)p->stream_map->encoder2stream[port]);
 }
 
-
-static void s_fake_hal_quadencoder_single_init(uint8_t port)
-{
-    hal_quadencoder_init((hal_quadencoder_t)port);    
-}
-
-
-static uint32_t s_fake_hal_quadencoder_getCounter(uint8_t port)
-{
-#if defined(EOAPPENCODERREADER_DONTUSE_INC)
-    return(ENCODER_VALUE_NOT_SUPPORTED);
-#else
-    return(hal_quadencoder_get_counter((hal_quadencoder_t)port)); 
-#endif       
-}
-
-static uint32_t s_fake_hal_adc_get_hall_sensor_analog_input_mV(uint8_t port)
-{
-    return(hal_adc_get_hall_sensor_analog_input_mV(port));     
-}
 
 
 static uint32_t s_eo_read_mais_for_port(EOappEncReader *p, uint8_t port)
