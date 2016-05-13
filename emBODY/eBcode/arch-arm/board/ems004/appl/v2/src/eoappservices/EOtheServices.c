@@ -53,6 +53,8 @@
 
 #include "EOtheBOARDtransceiver.h"
 
+#include "testRTC.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -232,6 +234,8 @@ extern EOtheServices* eo_services_Initialise(eOipv4addr_t ipaddress)
     
     // we initialise the services
     s_eo_services_initialise(p);
+    
+    testRTC_init();
     
     return(&s_eo_theservices);
 }

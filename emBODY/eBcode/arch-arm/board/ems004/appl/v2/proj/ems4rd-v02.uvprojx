@@ -821,6 +821,11 @@
               <FileType>1</FileType>
               <FilePath>..\cfg\eoemsappl\overridden_controller.c</FilePath>
             </File>
+            <File>
+              <FileName>testRTC.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\eoappservices\testRTC.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2157,6 +2162,11 @@
               <FileName>overridden_controller.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\cfg\eoemsappl\overridden_controller.c</FilePath>
+            </File>
+            <File>
+              <FileName>testRTC.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\eoappservices\testRTC.c</FilePath>
             </File>
           </Files>
         </Group>

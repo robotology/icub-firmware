@@ -94,6 +94,7 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(EO
   
 }
 
+#include "testRTC.h"
 
 extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOMtheEMSrunner *p)
 {
@@ -105,6 +106,8 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOM
     // it will be the can parser functions which will call the relevant objects which will do what they must.
     // as an example, the broadcast skin can frames are always parsed and are given to EOtheSKIN which will decide what to do with them
     eo_canserv_ParseAll(eo_canserv_GetHandle());    
+    
+    testRTC_RUN_tick();
 }
 
 
