@@ -161,21 +161,21 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         case eomn_serv_MC_foc:
             carray = eo_constarray_Load((EOarray*)&brd_cfg->data.mc.foc_based.arrayofjomodescriptors);
             o->part_type = brd_cfg->data.mc.foc_based.boardtype4mccontroller;
-            o->nJoints = brd_cfg->data.mc.foc_based.arrayofjomodescriptors.head.size;
+            o->nSets = o->nEncods = o->nJoints = brd_cfg->data.mc.foc_based.arrayofjomodescriptors.head.size;
             o->actuation_type = HARDWARE_2FOC;
             break;
         
         case eomn_serv_MC_mc4plusmais:
             carray = eo_constarray_Load((EOarray*)&brd_cfg->data.mc.mc4plusmais_based.arrayofjomodescriptors);
             o->part_type = brd_cfg->data.mc.mc4plusmais_based.boardtype4mccontroller;
-            o->nJoints = brd_cfg->data.mc.mc4plusmais_based.arrayofjomodescriptors.head.size;
+            o->nSets = o->nEncods = o->nJoints = brd_cfg->data.mc.mc4plusmais_based.arrayofjomodescriptors.head.size;
             o->actuation_type = HARDWARE_MC4p;
             break;
         
         case eomn_serv_MC_mc4plus:
             carray = eo_constarray_Load((EOarray*)&brd_cfg->data.mc.mc4plus_based.arrayofjomodescriptors);
             o->part_type = brd_cfg->data.mc.mc4plus_based.boardtype4mccontroller;
-            o->nJoints = brd_cfg->data.mc.mc4plus_based.arrayofjomodescriptors.head.size;
+            o->nSets = o->nEncods = o->nJoints = brd_cfg->data.mc.mc4plus_based.arrayofjomodescriptors.head.size;
             o->actuation_type = HARDWARE_MC4p;
             break;
         
