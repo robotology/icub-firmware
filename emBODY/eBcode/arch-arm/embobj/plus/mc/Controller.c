@@ -1269,7 +1269,24 @@ void MController_go_idle(void)
 
 void MController_get_joint_state(int j, eOmc_joint_status_t* joint_state)
 {
-    Joint_get_state(smc->joint+j, joint_state);
+//    static uint32_t count =0;
+//    
+//    count++;
+    
+    Joint *j_ptr= smc->joint+j;
+    
+    Joint_get_state(j_ptr, joint_state);
+    
+    AbsEncoder* enc_ptr = smc->absEncoder + j*smc->multi_encs;
+    
+    for (int k=0; k<smc->multi_encs; ++k)
+    {
+        joint_state->addinfo.multienc[k] = AbsEncoder_position(enc_ptr++);
+        //joint_state->addinfo.multienc[k] = count;
+    }
+    
+//    if(count>10000)
+//        count = 0;
 }
 
 
