@@ -689,55 +689,72 @@ static void s_eom_emsappl_OnError(eOerrmanErrorType_t errtype, const char *info,
     // i use a mutex but only where it is required. for sure snprintf is reentrant and it uses memory on the stack ....
     const char empty[] = "EO?";
     const char *err = eo_errman_ErrorStringGet(eo_errman_GetHandle(), errtype);
-    const char *eobjstr = (NULL == caller) ? (empty) : (caller->eobjstr);
+    const char *eobjstr = (NULL == caller) ? (empty) : ((NULL == caller->eobjstr) ? (empty) : (caller->eobjstr));
     const uint32_t taskid = (NULL == caller) ? (0) : (caller->taskid);
-    char str[256];
 
     EOMtheEMSapplCfg *emsapplcfg = eom_emsapplcfg_GetHandle();
 
     if(emsapplcfg->errmng_haltrace_enabled)
-    {
-        char strdes[196] = {0};
+    {        
+        char text[256];
+        
         uint64_t tt = eov_sys_LifeTimeGet(eov_sys_GetHandle());
         uint32_t sec = tt/(1000*1000);
         uint32_t tmp = tt%(1000*1000);
         uint32_t msec = tmp / 1000;
         uint32_t usec = tmp % 1000;
         
-        if(NULL == des)
+        if(eo_errortype_trace == errtype)
         {   // it is a trace
             
             if(NULL != info)
             {
-                snprintf(str, sizeof(str), "[TRACE] %s @s%dm%du%d: %s -> %s.", eobjstr, sec, msec, usec, err, info); 
+                snprintf(text, sizeof(text), "[TRACE] (%s @s%dm%du%d)-> %s.", eobjstr, sec, msec, usec, info); 
             }
             else
             {
-                snprintf(str, sizeof(str), "[TRACE] %s @s%dm%du%d: %s.", eobjstr, sec, msec, usec, err); 
+                snprintf(text, sizeof(text), "[TRACE] (%s @s%dm%du%d)-> ...", eobjstr, sec, msec, usec); 
             }
-            hal_trace_puts(str);
+            hal_trace_puts(text);
             return;            
         }
         
-        if(NULL != des)
+        text[0] = 0; // i put a '0' terminator
+        
+        if((NULL == des) && (NULL == info))
         {
-            snprintf(strdes, sizeof(strdes), "code 0x%x, p16 0x%04x, p64 0x%016llx, dev %d, adr %d: %s", des->code, des->par16, des->par64, des->sourcedevice, des->sourceaddress, eoerror_code2string(des->code));
+            snprintf(text, sizeof(text), "[%s] (%s tsk%d @s%dm%du%d)-> ...", err, eobjstr, taskid, sec, msec, usec);            
         }
-        if(NULL != info)
+        else if((NULL != des) && (NULL != info))
         {
-            snprintf(str, sizeof(str), "EOMtheEMSerror: [eobj: %s, tsk: %d] %s %s: %s", eobjstr, taskid, err, strdes, info);        
+            snprintf(text, sizeof(text), "[%s] (%s tsk%d @s%dm%du%d)-> {0x%x p16 0x%04x, p64 0x%016llx, dev %d, adr %d}: %s. INFO = %s", err, eobjstr, taskid, sec, msec, usec, des->code, des->par16, des->par64, des->sourcedevice, des->sourceaddress, eoerror_code2string(des->code), info);  
         }
-        else
+        else if((NULL != des) && (NULL == info))
         {
-            snprintf(str, sizeof(str), "EOMtheEMSerror: [eobj: %s, tsk: %d @s%dm%d] %s %s: no info", eobjstr, taskid, sec, msec, err, strdes);  
+            snprintf(text, sizeof(text), "[%s] (%s tsk%d @s%dm%du%d)-> {0x%x, p16 0x%04x, p64 0x%016llx, dev %d, adr %d}: %s.", err, eobjstr, taskid, sec, msec, usec, des->code, des->par16, des->par64, des->sourcedevice, des->sourceaddress, eoerror_code2string(des->code));               
         }
+        else if((NULL == des) && (NULL != info))
+        {
+            snprintf(text, sizeof(text), "[%s] (%s tsk%d @s%dm%du%d)-> {}: ... INFO = %s", err, eobjstr, taskid, sec, msec, usec, info);  
+        }
+         
+        
         // i dont care is trace is interrupted ... thus NO MUTEX in here
-        hal_trace_puts(str);
+        hal_trace_puts(text);
     }
     
     // now i use the info-dispatcher
     
-    eOmn_info_type_t type = (eOmn_info_type_t)errtype;
+    if(eo_errortype_trace == errtype)
+    {   // we dont transmit the trace
+        return;
+    }
+    
+    // from eOerrmanErrorType_t to eOmn_info_type_t ...
+    uint8_t eee = errtype;
+    eee --;
+    eOmn_info_type_t type = (eOmn_info_type_t)eee;
+    
     eOmn_info_source_t source = (NULL != des) ? ((eOmn_info_source_t)des->sourcedevice) : (eomn_info_source_board);
     uint8_t  address = (NULL != des) ? (des->sourceaddress) : (0);
     eOmn_info_extraformat_t extraformat = (NULL == info) ? (eomn_info_extraformat_none) : (eomn_info_extraformat_verbal);
@@ -754,7 +771,7 @@ static void s_eom_emsappl_OnError(eOerrmanErrorType_t errtype, const char *info,
     EOMN_INFO_PROPERTIES_FLAGS_set_extraformat(props.flags, extraformat);
     EOMN_INFO_PROPERTIES_FLAGS_set_futureuse(props.flags, 0);
     
-    // well, i DONT want these functions to be interruted
+    // well, i DONT want these functions to be interrupted
     osal_mutex_take(s_emsappl_singleton.onerrormutex, osal_reltimeINFINITE);
     
     // the call eo_infodispatcher_Put() is only in here, thus we can either protect with a mutex in here or put put a mutex inside. WE USE MUTEX IN HERE
