@@ -97,7 +97,8 @@ static void s_overridden_appl_initialise_services(void);
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+//static const char s_eobj_ownname[] = "EOMtheEMSappl";
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -122,7 +123,7 @@ extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
 
 extern void eom_emsappl_hid_userdef_on_entry_CFG(EOMtheEMSappl* p)
 {   
-    eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "called: eom_emsappl_hid_userdef_on_entry_CFG()", NULL);
+//    eo_errman_Trace(eo_errman_GetHandle(), "called: eom_emsappl_hid_userdef_on_entry_CFG()", s_eobj_ownname);
         
     // pulse led3 forever at 0.50 hz.       
     eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_three, 2*EOK_reltime1sec, 0);
@@ -148,7 +149,7 @@ extern void eom_emsappl_hid_userdef_on_exit_CFG(EOMtheEMSappl* p)
 
 extern void eom_emsappl_hid_userdef_on_entry_RUN(EOMtheEMSappl* p)
 {
-    eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "called: eom_emsappl_hid_userdef_on_entry_RUN()", NULL);
+//    eo_errman_Trace(eo_errman_GetHandle(), "called: eom_emsappl_hid_userdef_on_entry_RUN()", s_eobj_ownname);
     
     // pulse led3 forever at 1 hz.
     eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_three, EOK_reltime1sec/1, 0);  
@@ -199,7 +200,7 @@ extern void eom_emsappl_hid_userdef_on_exit_RUN(EOMtheEMSappl* p)
 
 extern void eom_emsappl_hid_userdef_on_entry_ERR(EOMtheEMSappl* p)
 {
-    eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "called: eom_emsappl_hid_userdef_on_entry_ERR()", NULL);
+//    eo_errman_Trace(eo_errman_GetHandle(), "called: eom_emsappl_hid_userdef_on_entry_ERR()", s_eobj_ownname);
 
     // pulse led3 forever at 4 hz.
     eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_three, EOK_reltime1sec/4, 0);

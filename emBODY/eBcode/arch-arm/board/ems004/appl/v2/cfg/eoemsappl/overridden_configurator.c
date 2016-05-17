@@ -28,6 +28,8 @@
 #include "EOtheCANdiscovery2.h"
 #include "EOtheETHmonitor.h"
 
+#include "testRTC.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -103,12 +105,13 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdef02Event(EOMtheEMSconfi
     eo_ethmonitor_Tick(eo_ethmonitor_GetHandle());
 }
 
-#include "testRTC.h"
 
+#if defined(TESTRTC_IS_ACTIVE) 
 extern void eom_emsconfigurator_hid_userdef_ProcessUserdef03Event(EOMtheEMSconfigurator* p)
 {
     testRTC_CFG_tick();
 }
+#endif
 
 // marco.accame on 20 oct 2015: this function is triggered if function eom_emssocket_Transmit() inside the task 
 // of EOMtheEMSconfigurator it there is a failure to transmit a UDP packet.

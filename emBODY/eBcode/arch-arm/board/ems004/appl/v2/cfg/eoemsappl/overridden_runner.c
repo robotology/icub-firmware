@@ -33,6 +33,8 @@
 #include "EOtheSKIN.h"
 #include "EOtheETHmonitor.h"
 
+#include "testRTC.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -94,7 +96,6 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(EO
   
 }
 
-#include "testRTC.h"
 
 extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOMtheEMSrunner *p)
 {
@@ -107,7 +108,9 @@ extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOM
     // as an example, the broadcast skin can frames are always parsed and are given to EOtheSKIN which will decide what to do with them
     eo_canserv_ParseAll(eo_canserv_GetHandle());    
     
+#if defined(TESTRTC_IS_ACTIVE)     
     testRTC_RUN_tick();
+#endif    
 }
 
 
