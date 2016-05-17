@@ -70,8 +70,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-
-#define TESTRTC_IS_ACTIVE
+// empty-section
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -80,7 +79,7 @@
 
 static void s_services_test_mc_multiplesteps(void *arg);
 
-static void s_eo_services_test();
+static void s_eo_services_test(void);
 
 static void s_services_test_stop(void *arg);
 
@@ -145,6 +144,137 @@ extern void testRTC_CFG_tick(void)
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
+
+
+static const eOmn_serv_configuration_t s_serv_config_mc_eb1_eb3_zeroprotocol =
+{   // eb1 / eb3
+    .type       = eomn_serv_MC_foc,
+    .filler     = {0},
+    .data.mc.foc_based = 
+    {
+        .boardtype4mccontroller = emscontroller_board_SHOULDER,
+        .version   =
+        {
+            .firmware   = { .major = 0, .minor = 0, .build = 0 },
+            .protocol   = { .major = 0, .minor = 0 }
+        },
+        .filler                 = {0},
+        .arrayofjomodescriptors =
+        {
+            .head   = 
+            {
+                .capacity       = 4,
+                .itemsize       = sizeof(eOmn_serv_jomo_descriptor_t),
+                .size           = 4,
+                .internalmem    = 0                    
+            },
+            .data   =
+            {
+                { // joint 0
+                    .actuator.foc.canloc    =
+                    {
+                        .port           = eOcanport1,
+                        .addr           = 1,
+                        .insideindex    = eobrd_caninsideindex_first                             
+                    },
+                    .sensor         =
+                    {
+                        .type   = eomn_serv_mc_sensor_encoder_aea,
+                        .port   = eomn_serv_mc_port_ems_spiP6, // hal_encoder1   
+                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                    },
+                    .extrasensor    =
+                    {
+                        .type   = eomn_serv_mc_sensor_none,
+                        .port   = eomn_serv_mc_port_none,
+                        .pos    = eomn_serv_mc_sensor_pos_none
+                    }
+                },
+                { // joint 1
+                    .actuator.foc.canloc    =
+                    {
+                        .port           = eOcanport1,
+                        .addr           = 2,
+                        .insideindex    = eobrd_caninsideindex_first                             
+                    },
+                    .sensor         =
+                    {
+                        .type   = eomn_serv_mc_sensor_encoder_aea,
+                        .port   = eomn_serv_mc_port_ems_spiP7, // hal_encoder4
+                        .pos    = eomn_serv_mc_sensor_pos_atjoint                            
+                    },
+                    .extrasensor    =
+                    {
+                        .type   = eomn_serv_mc_sensor_none,
+                        .port   = eomn_serv_mc_port_none,
+                        .pos    = eomn_serv_mc_sensor_pos_none
+                    }
+                },                    
+                { // joint 2
+                    .actuator.foc.canloc    =
+                    {
+                        .port           = eOcanport1,
+                        .addr           = 3,
+                        .insideindex    = eobrd_caninsideindex_first                             
+                    },
+                    .sensor         =
+                    {
+                        .type   = eomn_serv_mc_sensor_encoder_aea,
+                        .port   = eomn_serv_mc_port_ems_spiP8, // hal_encoder2  
+                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                    },
+                    .extrasensor    =
+                    {
+                        .type   = eomn_serv_mc_sensor_none,
+                        .port   = eomn_serv_mc_port_none,
+                        .pos    = eomn_serv_mc_sensor_pos_none
+                    }
+                },               
+                { // joint 3
+                    .actuator.foc.canloc    =
+                    {
+                        .port           = eOcanport1,
+                        .addr           = 4,
+                        .insideindex    = eobrd_caninsideindex_first                             
+                    },
+                    .sensor         =
+                    {
+                        .type   = eomn_serv_mc_sensor_encoder_aea,
+                        .port   = eomn_serv_mc_port_ems_spiP9,    // hal_encoder5 
+                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                    },
+                    .extrasensor    =
+                    {
+                        .type   = eomn_serv_mc_sensor_none,
+                        .port   = eomn_serv_mc_port_none,
+                        .pos    = eomn_serv_mc_sensor_pos_none
+                    }
+                }                    
+            }   
+        },  
+        .jomocoupling       =
+        {
+            .joint2set      = 
+            {   // each joint is on a different set 
+                0, 1, 2, 3 
+            },
+            .joint2motor    = 
+            {   // zero matrix: use matrix embedded in controller and seecetd by boardtype4mccontroller
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) }        
+            },
+            .joint2encoder  = 
+            {   // identical matrix
+                { EO_COMMON_FLOAT_TO_Q17_14(1.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(1.0f) } 
+            }  
+        }        
+    }
+};
 
 static const eOmn_serv_configuration_t s_serv_config_mc_eb1_fake_aea =
 {   // eb1 / eb3
@@ -595,6 +725,8 @@ static void s_services_test_mc_stop(void *par)
 
 static void s_services_test_mc_multiplesteps(void *arg)
 {
+#if 0    
+    // this is a test for fully working activate() /  deactivate()
     static uint8_t step = 0;
     
     step++;
@@ -632,13 +764,49 @@ static void s_services_test_mc_multiplesteps(void *arg)
         services_stop_MC_service_now = 0;
         s_services_test_start(arg);
     }
-//    else if(6 == step)
-//    {
-//        s_services_test_stop(arg);
-//        eo_timer_Stop(s_timer);
-//    } 
-//    
-//    eom_task_SetEvent(eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()), emsconfigurator_evt_tick);
+
+#else
+    
+    // this is a test for simple activate() and start() in case of not fully working deactivate() of mc, as it is at the data of 16 may 2016
+    static uint8_t step = 0;
+    
+    step++;
+    
+    if(1 == step)
+    {
+        s_services_test_stop(arg);
+        eo_action_SetEvent(s_act, emsconfigurator_evt_userdef03, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));    
+        eo_timer_Start(s_timer, eok_abstimeNOW, 3*eok_reltime1sec, eo_tmrmode_ONESHOT, s_act);    
+    }
+    else if(2 == step)
+    {
+        s_services_test_activate(s_test_config_ok);
+        eo_action_SetEvent(s_act, emsconfigurator_evt_userdef03, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));    
+        eo_timer_Start(s_timer, eok_abstimeNOW, 3*eok_reltime1sec, eo_tmrmode_ONESHOT, s_act);          
+    }
+    else if(3 == step)
+    {        
+        s_services_test_start(arg);
+        
+        // prepare to stop it ... by setting a flag which the runner will process and call 
+        services_stop_MC_service_now = 0;
+        eo_action_SetCallback(s_act, s_services_test_mc_stop, NULL, eov_callbackman_GetTask(eov_callbackman_GetHandle())); 
+        eo_timer_Start(s_timer, eok_abstimeNOW, 3*eok_reltime1sec, eo_tmrmode_ONESHOT, s_act); 
+    }
+    else if(4 == step)
+    {
+        services_stop_MC_service_now = 0;
+        s_services_test_activate(s_test_config_ok);
+        eo_action_SetEvent(s_act, emsconfigurator_evt_userdef03, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));    
+        eo_timer_Start(s_timer, eok_abstimeNOW, 3*eok_reltime1sec, eo_tmrmode_ONESHOT, s_act);    
+    }
+    else if(5 == step)
+    {
+        services_stop_MC_service_now = 0;
+        s_services_test_start(arg);
+    }    
+    
+#endif
           
 }
 
@@ -647,7 +815,7 @@ static void s_services_test_mc_multiplesteps(void *arg)
 static void s_eo_services_test(void)
 {
     
-    s_test_config_ok = eoboardconfig_code2motion_serv_configuration(0); // eb1 
+    s_test_config_ok = &s_serv_config_mc_eb1_eb3_zeroprotocol; // board eb1, with no check of can boards
     
     // start a timer of 1 seconds which will activate verify a service of motioncontrol for board eb1
     

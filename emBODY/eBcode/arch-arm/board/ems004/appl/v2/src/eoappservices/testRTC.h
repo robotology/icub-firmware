@@ -45,6 +45,8 @@
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
+#undef TESTRTC_IS_ACTIVE
+
 
    
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------
