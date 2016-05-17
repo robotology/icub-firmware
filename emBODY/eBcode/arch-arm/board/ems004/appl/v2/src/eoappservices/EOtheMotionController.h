@@ -87,6 +87,7 @@ extern eOresult_t eo_motioncontrol_Deactivate(EOtheMotionController *p);
 extern eOresult_t eo_motioncontrol_Start(EOtheMotionController *p);
 
 extern eOresult_t eo_motioncontrol_SetRegulars(EOtheMotionController *p, eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t* numberofthem);
+extern eOresult_t eo_motioncontrol_AddRegulars(EOtheMotionController *p, eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t* numberofthem);
 
 extern eOresult_t eo_motioncontrol_Tick(EOtheMotionController *p);
 

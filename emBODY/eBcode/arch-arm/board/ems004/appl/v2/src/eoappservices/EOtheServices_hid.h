@@ -114,6 +114,8 @@ extern eOresult_t eo_service_hid_SynchServiceState(EOtheServices *p, eOmn_serv_c
 
 extern eOresult_t eo_service_hid_SetRegulars(EOarray* id32ofregulars, eOmn_serv_arrayof_id32_t* arrayofid32, eObool_t (*isID32relevant)(uint32_t), uint8_t* numberofthem);
 
+extern eOresult_t eo_service_hid_AddRegulars(EOarray* id32ofregulars, eOmn_serv_arrayof_id32_t* arrayofid32, eObool_t (*isID32relevant)(uint32_t), uint8_t* numberofthem);
+
 
 #endif  // include guard
 

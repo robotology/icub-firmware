@@ -585,7 +585,78 @@ extern eOresult_t eo_service_hid_SetRegulars(EOarray* id32ofregulars, eOmn_serv_
 }
 
 
+extern eOresult_t eo_service_hid_AddRegulars(EOarray* id32ofregulars, eOmn_serv_arrayof_id32_t* arrayofid32, eObool_t (*isID32relevant)(uint32_t), uint8_t* numberofthem)
+{
+    EOarray* id32array = (EOarray*)arrayofid32;    
+        
+    uint8_t size = 0;
+    uint8_t i = 0;
+    
+    EOtransceiver* boardtransceiver = eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle());
+    
+    eOropdescriptor_t ropdesc;
+    memcpy(&ropdesc.control, &eok_ropctrl_basic, sizeof(eOropctrl_t));
+    ropdesc.control.plustime        = eobool_false;
+    ropdesc.control.plussign        = eobool_false;
+    ropdesc.ropcode                 = eo_ropcode_sig;
+    ropdesc.id32                    = eo_prot_ID32dummy;    
+    ropdesc.signature               = eo_rop_SIGNATUREdummy;  
+    uint32_t* id32 = NULL;
+    
 
+    // then i load the new id32s ... if there are any
+    if((NULL != id32array) && (0 != eo_array_Size(id32array)))
+    {
+        // get all the id32 from id32array (but not more than ...) and: 1. push back into id32ofregulars, 2. load the regular
+        size = eo_array_Size(id32array);
+        
+        eOropdescriptor_t ropdesc;
+        memcpy(&ropdesc.control, &eok_ropctrl_basic, sizeof(eOropctrl_t));
+        ropdesc.control.plustime    = 0;
+        ropdesc.control.plussign    = 0;
+        ropdesc.ropcode             = eo_ropcode_sig;
+        ropdesc.signature           = eo_rop_SIGNATUREdummy;   
+        
+        for(i=0; i<size; i++)
+        {
+            id32 = (uint32_t*)eo_array_At(id32array, i);
+            if(NULL != id32)
+            { 
+                // filter them 
+                eObool_t itisrelevant = eobool_true;
+                if(NULL != isID32relevant)
+                {
+                    itisrelevant = isID32relevant(*id32);                   
+                }
+                
+                if(eobool_true == itisrelevant)
+                {
+                    ropdesc.id32 = *id32;     
+                    if(eores_OK == eo_transceiver_RegularROP_Load(boardtransceiver, &ropdesc))
+                    {
+                        eo_array_PushBack(id32ofregulars, id32);
+                        if(eobool_true == eo_array_Full(id32ofregulars))
+                        {   // cannot add any more regulars
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        
+                    }
+                   
+                }                
+            }           
+        }
+    }
+    
+    if(NULL != numberofthem)
+    {
+        *numberofthem = eo_array_Size(id32ofregulars);
+    }
+    
+    return(eores_OK);     
+}
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
@@ -1015,7 +1086,14 @@ static eOresult_t s_eo_services_process_regsig(EOtheServices *p, eOmn_serv_categ
     {
         case eomn_serv_category_mc:
         {
-            res = eo_motioncontrol_SetRegulars(eo_motioncontrol_GetHandle(), arrayofid32, &number); 
+            if(NULL == arrayofid32)
+            {
+                res = eo_motioncontrol_SetRegulars(eo_motioncontrol_GetHandle(), arrayofid32, &number); 
+            }
+            else
+            {
+                res = eo_motioncontrol_AddRegulars(eo_motioncontrol_GetHandle(), arrayofid32, &number); 
+            }
         } break;
         
         case eomn_serv_category_strain:
