@@ -307,7 +307,7 @@ extern eOmotioncontroller_mode_t eo_motioncontrol_GetMode(EOtheMotionController 
 
 extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify)
 {
-    eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "called: eo_motioncontrol_Verify()", s_eobj_ownname);
+    //eo_errman_Trace(eo_errman_GetHandle(), "called: eo_motioncontrol_Verify()", s_eobj_ownname);
     
     if((NULL == p) || (NULL == servcfg))
     {
@@ -457,7 +457,7 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
 
 extern eOresult_t eo_motioncontrol_Deactivate(EOtheMotionController *p)
 {
-    eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "called: eo_motioncontrol_Deactivate()", s_eobj_ownname);
+    // eo_errman_Trace(eo_errman_GetHandle(), "called: eo_motioncontrol_Deactivate()", s_eobj_ownname);
     
     if(NULL == p)
     {
@@ -579,7 +579,7 @@ extern eOresult_t eo_motioncontrol_Deactivate(EOtheMotionController *p)
 
 extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn_serv_configuration_t * servcfg)
 {
-    eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "called: eo_motioncontrol_Activate()", s_eobj_ownname);
+    // eo_errman_Trace(eo_errman_GetHandle(), "called: eo_motioncontrol_Activate()", s_eobj_ownname);
     
     if((NULL == p) || (NULL == servcfg))
     {
@@ -870,7 +870,7 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
 
 extern eOresult_t eo_motioncontrol_Start(EOtheMotionController *p)
 { 
-    eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "called: eo_motioncontrol_Start()", s_eobj_ownname);  
+    // eo_errman_Trace(eo_errman_GetHandle(), "called: eo_motioncontrol_Start()", s_eobj_ownname);  
     
     if(NULL == p)
     {
@@ -914,7 +914,7 @@ extern eOresult_t eo_motioncontrol_Start(EOtheMotionController *p)
         eo_encoderreader_StartReading(eo_encoderreader_GetHandle());     
     }
     
-    //eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "eo_motioncontrol_Start()", s_eobj_ownname);
+    // eo_errman_Trace(eo_errman_GetHandle(), "eo_motioncontrol_Start()", s_eobj_ownname);
     
     return(eores_OK);    
 }
@@ -994,7 +994,7 @@ extern eOresult_t eo_motioncontrol_Tick(EOtheMotionController *p)
 
 extern eOresult_t eo_motioncontrol_Stop(EOtheMotionController *p)
 { 
-    eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "called: eo_motioncontrol_Stop()", s_eobj_ownname);
+    // eo_errman_Trace(eo_errman_GetHandle(), "called: eo_motioncontrol_Stop()", s_eobj_ownname);
     
     if(NULL == p)
     {
@@ -1031,7 +1031,7 @@ extern eOresult_t eo_motioncontrol_Stop(EOtheMotionController *p)
     // remove all regulars related to motion control entities: joint, motor, controller ... no, dont do that
     //eo_motioncontrol_SetRegulars(p, NULL, NULL);
     
-    //eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "eo_motioncontrol_Stop()", s_eobj_ownname);
+    // eo_errman_Trace(eo_errman_GetHandle(), "eo_motioncontrol_Stop()", s_eobj_ownname);
     
     return(eores_OK);    
 }

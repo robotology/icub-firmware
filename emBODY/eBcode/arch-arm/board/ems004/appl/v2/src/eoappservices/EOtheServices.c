@@ -234,8 +234,10 @@ extern EOtheServices* eo_services_Initialise(eOipv4addr_t ipaddress)
     
     // we initialise the services
     s_eo_services_initialise(p);
-    
+
+#if defined(TESTRTC_IS_ACTIVE)    
     testRTC_init();
+#endif
     
     return(&s_eo_theservices);
 }
@@ -320,43 +322,43 @@ extern eOresult_t eo_services_ProcessCommand(EOtheServices *p, eOmn_service_cmmn
     {
         case eomn_serv_operation_verifyactivate:
         {
-            eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "COMMAND: verifiactivate()", s_eobj_ownname);
+//            eo_errman_Trace(eo_errman_GetHandle(), "COMMAND: verifiactivate()", s_eobj_ownname);
             s_eo_services_process_verifyactivate(p, category, config);            
         } break;
         
         case eomn_serv_operation_start:
         {
-            eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "COMMAND: start()", s_eobj_ownname);
+//            eo_errman_Trace(eo_errman_GetHandle(), "COMMAND: start()", s_eobj_ownname);
             s_eo_services_process_start(p, category);
         } break;
         
         case eomn_serv_operation_stop:
         {
-            eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "COMMAND: stop()", s_eobj_ownname);            
+//            eo_errman_Trace(eo_errman_GetHandle(), "COMMAND: stop()", s_eobj_ownname);            
             s_eo_services_process_stop(p, category, eobool_true);
         } break;
         
         case eomn_serv_operation_deactivate:
         {
-            eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "COMMAND: deactivate()", s_eobj_ownname);            
+//            eo_errman_Trace(eo_errman_GetHandle(), "COMMAND: deactivate()", s_eobj_ownname);            
             s_eo_services_process_deactivate(p, category);
         } break;        
         
         case eomn_serv_operation_regsig_load:
         {
-            eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "COMMAND: load regsig()", s_eobj_ownname);            
+//            eo_errman_Trace(eo_errman_GetHandle(), "COMMAND: load regsig()", s_eobj_ownname);            
             s_eo_services_process_regsig(p, category, arrayofid32);
         } break;        
 
         case eomn_serv_operation_regsig_clear:
         {
-            eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "COMMAND: clear regsig()", s_eobj_ownname);            
+//            eo_errman_Trace(eo_errman_GetHandle(), "COMMAND: clear regsig()", s_eobj_ownname);            
             s_eo_services_process_regsig(p, category, NULL);
         } break;  
         
         default:
         {
-            eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "COMMAND: failure()", s_eobj_ownname);
+//            eo_errman_Trace(eo_errman_GetHandle(), "COMMAND: failure()", s_eobj_ownname);
             // send failure
             s_eo_services_process_failure(p, operation, category);
         } break;

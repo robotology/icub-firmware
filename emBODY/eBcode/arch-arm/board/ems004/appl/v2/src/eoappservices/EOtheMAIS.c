@@ -229,7 +229,7 @@ extern eOresult_t eo_mais_SendReport(EOtheMAIS *p)
 
 extern eOresult_t eo_mais_Verify(EOtheMAIS *p, const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify)
 {
-    // eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "called: eo_mais_Verify()", s_eobj_ownname);
+    // eo_errman_Trace(eo_errman_GetHandle(), "called: eo_mais_Verify()", s_eobj_ownname);
     
     if((NULL == p) || (NULL == servcfg))
     {
@@ -329,7 +329,7 @@ extern uint8_t eo_mais_GetNumberOfOwners(EOtheMAIS *p)
 
 extern eOresult_t eo_mais_Deactivate(EOtheMAIS *p)
 {
-    // eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "called: eo_mais_Deactivate()", s_eobj_ownname);
+    // eo_errman_Trace(eo_errman_GetHandle(), "called: eo_mais_Deactivate()", s_eobj_ownname);
     
     if(NULL == p)
     {
@@ -386,7 +386,7 @@ extern eOresult_t eo_mais_Deactivate(EOtheMAIS *p)
 
 extern eOresult_t eo_mais_Activate(EOtheMAIS *p, const eOmn_serv_configuration_t * servcfg)
 {
-    // eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "called: eo_mais_Activate()", s_eobj_ownname);
+    // eo_errman_Trace(eo_errman_GetHandle(), "called: eo_mais_Activate()", s_eobj_ownname);
     
     if((NULL == p) || (NULL == servcfg))
     {
@@ -470,7 +470,7 @@ extern eOresult_t eo_mais_Activate(EOtheMAIS *p, const eOmn_serv_configuration_t
 
 extern eOresult_t eo_mais_Start(EOtheMAIS *p)
 {
-    // eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "called: eo_mais_Start()", s_eobj_ownname);
+    // eo_errman_Trace(eo_errman_GetHandle(), "called: eo_mais_Start()", s_eobj_ownname);
     
     if(NULL == p)
     {
@@ -518,7 +518,7 @@ extern eOresult_t eo_mais_SetRegulars(EOtheMAIS *p, eOmn_serv_arrayof_id32_t* ar
 
 extern eOresult_t eo_mais_Stop(EOtheMAIS *p)
 {
-    // eo_errman_Trace(eo_errman_GetHandle(), eo_errortype_info, "called: eo_mais_Stop()", s_eobj_ownname);
+    // eo_errman_Trace(eo_errman_GetHandle(), "called: eo_mais_Stop()", s_eobj_ownname);
     
     if(NULL == p)
     {
