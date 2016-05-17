@@ -74,20 +74,20 @@ extern "C" {
 //  <o> major           <0-255> 
 #define EOMTHEEMSAPPLCFG_VERSION_MAJOR          2
 //  <o> minor           <0-255> 
-#define EOMTHEEMSAPPLCFG_VERSION_MINOR          43
+#define EOMTHEEMSAPPLCFG_VERSION_MINOR          44
 //  </h>version
 
 //  <h> build date
 //  <o> year            <2010-2020> 
 #define EOMTHEEMSAPPLCFG_BUILDDATE_YEAR         2016
 //  <o> month           <1-12> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_MONTH        4
+#define EOMTHEEMSAPPLCFG_BUILDDATE_MONTH        5
 //  <o> day             <1-31> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          29
+#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          17
 //  <o> hour            <0-23> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         14
+#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         13
 //  <o> minute          <0-59> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          45
+#define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          25
 //  </h>build date
 
 // </h>Info 
@@ -127,7 +127,7 @@ extern "C" {
 //  <o> on error   <0=>   redefine __weak eom_emsapplcfg_hid_userdef_OnError() 
 #define sdfefe004       0
 //  <o> printf on debug window enabled   <0=>   false  <1=>   true
-#define EOMTHEEMSAPPLCFG_HALTRACE_ENABLED    1
+#define EOMTHEEMSAPPLCFG_HALTRACE_ENABLED    0
 //  </h>error manager
 
 
