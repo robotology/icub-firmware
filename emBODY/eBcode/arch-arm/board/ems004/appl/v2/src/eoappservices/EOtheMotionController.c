@@ -204,7 +204,7 @@ extern EOtheMotionController* eo_motioncontrol_Initialise(void)
     
     p->id32ofregulars = eo_array_New(motioncontrol_maxRegulars, sizeof(uint32_t), NULL);
     
-    p->ctrlobjs.thecontroller = NULL;
+    p->ctrlobjs.thecontroller = MController_new(eo_motcon_standardJOMOs, eo_motcon_standardJOMOs);
     p->ctrlobjs.theencoderreader = eo_encoderreader_Initialise();
             
     p->ctrlobjs.themais = eo_mais_Initialise();
@@ -472,12 +472,13 @@ extern eOresult_t eo_motioncontrol_Deactivate(EOtheMotionController *p)
         return(eores_OK);        
     } 
     
-    // for now i allow deactivate() only for the mc4-based control .. because at date of 13 april 2016 the local mc control cannot be destructed.
-    // then we deconfig things ... so far only for eo_motcon_mode_mc4.
-    if(eo_motcon_mode_mc4 != p->service.servconfig.type) 
-    {
-        return(eo_motioncontrol_Stop(p));
-    }
+// in here we deactivate everything    
+//    // for now i allow deactivate() only for the mc4-based control .. because at date of 13 april 2016 the local mc control cannot be destructed.
+//    // then we deconfig things ... so far only for eo_motcon_mode_mc4.
+//    if(eo_motcon_mode_mc4 != p->service.servconfig.type) 
+//    {
+//        return(eo_motioncontrol_Stop(p));
+//    }
     
     
     // at first we stop the service
@@ -664,14 +665,15 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
             // marco.accame.TODO: change the emsController. see comments below
             //                the emscontroller is not a singleton which can be initted and deinitted. 
             // it should have a _Initialise(), a _GetHandle(), a _Config(cfg) and a _Deconfig().
-            if(NULL == p->ctrlobjs.thecontroller)
-            {
-                //p->ctrlobjs.thecontroller = eo_emsController_Init((eOemscontroller_board_t)p->service.servconfig.data.mc.foc_based.boardtype4mccontroller, emscontroller_actuation_2FOC, numofjomos);
-                p->ctrlobjs.thecontroller = MController_new(numofjomos, numofjomos);
-                //MController_config_board((eOemscontroller_board_t)p->service.servconfig.data.mc.foc_based.boardtype4mccontroller, HARDWARE_2FOC);                
-                MController_config_board(&p->service.servconfig);
-            }
+//            if(NULL == p->ctrlobjs.thecontroller)
+//            {
+//                //p->ctrlobjs.thecontroller = eo_emsController_Init((eOemscontroller_board_t)p->service.servconfig.data.mc.foc_based.boardtype4mccontroller, emscontroller_actuation_2FOC, numofjomos);
+//                p->ctrlobjs.thecontroller = MController_new(numofjomos, numofjomos);
+//                //MController_config_board((eOemscontroller_board_t)p->service.servconfig.data.mc.foc_based.boardtype4mccontroller, HARDWARE_2FOC);                
+//                MController_config_board(&p->service.servconfig);
+//            }
             
+            MController_config_board(&p->service.servconfig);
             
             // proxy config
             s_eo_motioncontrol_proxy_config(p, eobool_true);
@@ -814,21 +816,23 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
             // marco.accame.TODO: change the emsController. see comments below
             // the emscontroller is not a singleton which can be initted and deinitted. 
             // it should have a _Initialise(), a _GetHandle(), a _Config(cfg) and a _Deconfig().
-            if(NULL == p->ctrlobjs.thecontroller)
-            {
-//                eOemscontroller_board_t controller_type;
-//                if(eo_motcon_mode_mc4plus == p->service.servconfig.type)
-//                {
-//                    controller_type = (eOemscontroller_board_t)p->service.servconfig.data.mc.mc4plus_based.boardtype4mccontroller;
-//                }
-//                else //eomn_serv_MC_mc4plusmais
-//                {
-//                    controller_type = (eOemscontroller_board_t)p->service.servconfig.data.mc.mc4plusmais_based.boardtype4mccontroller;
-//                }
-                //p->ctrlobjs.thecontroller = eo_emsController_Init(controller_type, emscontroller_actuation_LOCAL, numofjomos);
-                p->ctrlobjs.thecontroller = MController_new(numofjomos, 4);   
-                MController_config_board(&p->service.servconfig);                
-            }       
+//            if(NULL == p->ctrlobjs.thecontroller)
+//            {
+////                eOemscontroller_board_t controller_type;
+////                if(eo_motcon_mode_mc4plus == p->service.servconfig.type)
+////                {
+////                    controller_type = (eOemscontroller_board_t)p->service.servconfig.data.mc.mc4plus_based.boardtype4mccontroller;
+////                }
+////                else //eomn_serv_MC_mc4plusmais
+////                {
+////                    controller_type = (eOemscontroller_board_t)p->service.servconfig.data.mc.mc4plusmais_based.boardtype4mccontroller;
+////                }
+//                //p->ctrlobjs.thecontroller = eo_emsController_Init(controller_type, emscontroller_actuation_LOCAL, numofjomos);
+//                p->ctrlobjs.thecontroller = MController_new(numofjomos, 4);   
+//                MController_config_board(&p->service.servconfig);                
+//            } 
+
+            MController_config_board(&p->service.servconfig);
 
             // b. clear the pwm values and the port mapping, currents and voltage
             memset(p->ctrlobjs.pwmvalue, 0, sizeof(p->ctrlobjs.pwmvalue));

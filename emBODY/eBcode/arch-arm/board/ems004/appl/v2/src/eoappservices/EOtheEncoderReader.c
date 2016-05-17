@@ -223,21 +223,15 @@ extern eOresult_t eo_encoderreader_Deactivate(EOtheEncoderReader *p)
         p->service.state = eomn_serv_state_idle; // i force to eomn_serv_state_idle because it may be that state was eomn_serv_state_verified or eomn_serv_state_failureofverify
         return(eores_OK);        
     } 
-    
-    #warning TODO: eo_encoderreader_Deactivate() must be completed. and tested. see comments below
-    
-    // in order to do this function we should change EOappEncReader so that it can be de-initted. 
-    // even better to merge what is inside EOappEncReader into object EOtheEncoderReader 
-    
-    // to do: 
-    // deinit EOappEncReader, undo what in s_eo_encoderreader_init_ereader()
 
-//    
-//    s_eo_theencoderreader.service.active = eobool_false;
-
-
+   
     // make sure the timer is not running
     eo_timer_Stop(s_eo_theencoderreader.diagnostics.reportTimer);  
+   
+    eo_appEncReader_Deactivate(s_eo_theencoderreader.reader);
+    
+    s_eo_theencoderreader.service.active = eobool_false;
+    p->service.state = eomn_serv_state_idle; 
     
     return(eores_OK);
 }
@@ -255,15 +249,10 @@ extern eOresult_t eo_encoderreader_Activate(EOtheEncoderReader *p, const eOmn_se
         eo_encoderreader_Deactivate(p);        
     }   
  
-    #warning TODO: eo_encoderreader_Activate() should be changed. see comments below.
-    // since EOappEncReader can only be created, but not initted or de-inittedd, we must change it so that it can do that.
-    
-
-//    memcpy(&s_eo_theencoderreader.arrayofjomodes, jomodes, sizeof(eOmn_serv_arrayof_4jomodescriptors_t));
-//                    
-//    s_eo_encoderreader_init_ereader(NULL, NULL);
-//    
-//
+    memcpy(&s_eo_theencoderreader.arrayofjomodes, jomodes, sizeof(eOmn_serv_arrayof_4jomodescriptors_t));
+  
+    s_eo_encoderreader_init_ereader(jomodes, NULL, NULL);
+      
     eo_appEncReader_StartRead(s_eo_theencoderreader.reader);
                      
     s_eo_theencoderreader.service.active = eobool_true;        

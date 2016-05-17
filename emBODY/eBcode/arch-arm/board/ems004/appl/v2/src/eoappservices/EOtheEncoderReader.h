@@ -81,7 +81,7 @@ extern EOtheEncoderReader* eo_encoderreader_GetHandle(void);
 // (which may send a confirmation to the entity which asked fot verification), and then it may activate the strain service by calling  eo_encoderreader_Activate().
 extern eOresult_t eo_encoderreader_Verify(EOtheEncoderReader *p, const eOmn_serv_arrayof_4jomodescriptors_t * jomodes, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify);
 
-// it activates the strain service by loading the service configuration
+// it activates the service by loading the service configuration
 extern eOresult_t eo_encoderreader_Activate(EOtheEncoderReader *p, const eOmn_serv_arrayof_4jomodescriptors_t * jomodes);
 
 // it deactivates service.
