@@ -33,7 +33,9 @@ void AbsEncoder_init(AbsEncoder* o)
     o->spike_cnt_limit = 32767;
     o->spike_mag_limit = 32767;
     
-    o->sign = 0;
+    //o->sign = 0;
+    o->mul = 0;
+    o->div = 1;
     
     o->fake = FALSE;
     
@@ -73,54 +75,59 @@ void AbsEncoder_destroy(AbsEncoder* o)
     DELETE(o);
 }
 
-void AbsEncoder_config(AbsEncoder* o, uint8_t ID, eOmc_EncoderType_t type, int32_t resolution, int16_t spike_mag_limit, uint16_t spike_cnt_limit)
+void AbsEncoder_config(AbsEncoder* o, uint8_t ID/*, eOmc_EncoderType_t type*/, int32_t resolution, int16_t spike_mag_limit, uint16_t spike_cnt_limit)
 {
     o->ID = ID;
     
     //o->fake = FALSE;
-    if(o->type != type)
-    {
-        eOerrmanDescriptor_t descriptor = {0};
-        char str[50];
-        snprintf(str, 50, "missmach encoder type: xmlFile=%d. fw=%d", type, o->type);
-        descriptor.par16 = o->ID;
-        descriptor.par64 = 0;
-        descriptor.sourcedevice = eo_errman_sourcedevice_localboard;
-        descriptor.sourceaddress = 0;
-        descriptor.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag00);
-        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, str, NULL, &descriptor);
-        return;
-    }
+
+//    if(o->type != type)
+//    {
+//        eOerrmanDescriptor_t descriptor = {0};
+//        char str[50];
+//        snprintf(str, 50, "missmach encoder type: xmlFile=%d. fw=%d", type, o->type);
+//        descriptor.par16 = o->ID;
+//        descriptor.par64 = 0;
+//        descriptor.sourcedevice = eo_errman_sourcedevice_localboard;
+//        descriptor.sourceaddress = 0;
+//        descriptor.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag00);
+//        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, str, NULL, &descriptor);
+//        return;
+//    }
     
-    AbsEncoder_config_resolution(o, (int32_t)resolution);
+    AbsEncoder_config_resolution(o, resolution);
     
     if (!o->fake)
     {
-        o->spike_mag_limit = spike_mag_limit;//7*(65536L/resolution);
-        o->spike_cnt_limit = spike_cnt_limit;//7*(65536L/resolution);
-        //o->sign = resolution >= 0 ? 1 : -1;
+        o->spike_mag_limit = spike_mag_limit;
+        o->spike_cnt_limit = spike_cnt_limit;
     }
     else
     {
-        //o->sign = 1;
         o->state.bits.not_initialized = FALSE; 
     }
     
     o->state.bits.not_configured = FALSE;
 }
 
-void AbsEncoder_config_resolution(AbsEncoder* o, float resolution)
+void AbsEncoder_config_resolution(AbsEncoder* o, int32_t resolution)
 {
     if (!o->fake)
     {
-        o->sign = resolution >= 0 ? 1 : -1;
+        //o->sign = resolution >= 0 ? 1 : -1;
+        o->mul = resolution >= 0 ? 1 : -1;
     }
     else
     {
-        o->sign = 1;
+        //o->sign = 1;
+        o->mul = o->div = 1;
     }
 }
 
+extern void AbsEncoder_config_divisor(AbsEncoder* o, int32_t divisor)
+{
+    o->div = divisor;
+}
 
 void AbsEncoder_start_hard_stop_calibrate(AbsEncoder* o, int32_t hard_stop_zero)
 {
@@ -139,7 +146,7 @@ void AbsEncoder_calibrate_in_hard_stop(AbsEncoder* o)
 {
     o->offset = 0;
 
-    o->zero = o->sign*o->distance - o->hard_stop_zero;  
+    o->zero = (o->mul*o->distance)/o->div - o->hard_stop_zero;  
     
     o->state.bits.not_calibrated  = FALSE;
     o->state.bits.hard_stop_calib = FALSE;
@@ -170,18 +177,18 @@ void AbsEncoder_calibrate_fake(AbsEncoder* o)
 
 int32_t AbsEncoder_position(AbsEncoder* o)
 {
-    return o->sign*o->distance - o->zero;
+    return (o->mul*o->distance)/o->div - o->zero;
 }
 
 int32_t AbsEncoder_velocity(AbsEncoder* o)
 {
-    return o->sign*o->velocity;
+    return (o->mul*o->velocity)/o->div;
 }
 
 void AbsEncoder_posvel(AbsEncoder* o, int32_t* position, int32_t* velocity)
 {
-    *position = o->sign*o->distance - o->zero;
-    *velocity = o->sign*o->velocity;
+    *position = (o->mul*o->distance)/o->div - o->zero;
+    *velocity = (o->mul*o->velocity)/o->div;
 }
 
 //static void AbsEncoder_position_init(AbsEncoder* o, int32_t position)
