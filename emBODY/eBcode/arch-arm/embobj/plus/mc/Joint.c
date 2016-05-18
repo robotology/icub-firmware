@@ -72,6 +72,7 @@ void Joint_init(Joint* o)
     Trajectory_init(&o->trajectory, 0, 0, 0);
     
     PID_init(&o->posPID);
+    PID_init(&o->velPID);
     
     o->control_mode = eomc_controlmode_notConfigured;
     o->interaction_mode = eOmc_interactionmode_stiff;
@@ -108,14 +109,15 @@ void Joint_config(Joint* o, uint8_t ID, eOmc_joint_config_t* config)
     o->ID = ID;
     
     PID_config(&o->posPID, &config->pidposition);
+    PID_config(&o->velPID, &config->pidvelocity);
+    
+    //o->scKvel   = config->pidvelocity.kp;
+    //o->scKpos   = config->pidvelocity.ki;
+    //o->scKstill = config->pidposition.ki;
     
     o->scKpos   = config->pidposition.kp;
     o->scKvel   = config->pidposition.kd;
     o->scKstill = config->pidposition.ki;
-
-    //o->scKpos   = config->pidvelocity.ki;
-    //o->scKvel   = config->pidvelocity.kp;
-    //o->scKstill = config->pidposition.ki;
     
     o->pos_min = config->limitsofjoint.min;
     o->pos_max = config->limitsofjoint.max;
@@ -145,6 +147,7 @@ void Joint_destroy(Joint* o)
 void Joint_motion_reset(Joint *o)
 {
     PID_reset(&o->posPID);
+    PID_reset(&o->velPID);
     
     Trajectory_stop(&o->trajectory, o->pos_fbk);
         

@@ -88,6 +88,7 @@ extern void MController_update_motor_current_fbk(int m, int16_t current);
 extern void MController_config_motor_friction(int m, eOmc_motor_params_t* friction); //
 extern void MController_config_joint_impedance(int j, eOmc_impedance_t* impedance); //
 extern void MController_config_pos_pid(int j, eOmc_PID_t *pid_conf); //
+extern void MController_config_vel_pid(int j, eOmc_PID_t *pid_conf); //
 extern void MController_config_trq_pid(int m, eOmc_PID_t *pid_conf); //
 extern void MController_config_joint_pos_limits(int j, int32_t pos_min, int32_t pos_max);
 extern void MController_config_joint_vel_ref_timeout(int j, int32_t timeout_ms);

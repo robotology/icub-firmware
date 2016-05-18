@@ -83,6 +83,7 @@ typedef struct // Joint
     uint8_t ID;
     
     PID posPID;
+    PID velPID;
     
     CTRL_UNITS pos_min;
     CTRL_UNITS pos_max;

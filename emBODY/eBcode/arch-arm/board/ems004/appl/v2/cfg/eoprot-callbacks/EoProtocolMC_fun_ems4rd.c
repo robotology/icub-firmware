@@ -239,7 +239,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_pidposition(const EOnv* nv, const eO
 {
     eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
     eOmc_PID_t *pid = (eOmc_PID_t*)rd->data;
-    float rescaler = 1.0f/(float)(1<<pid->scale);
+    //float rescaler = 1.0f/(float)(1<<pid->scale);
 
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
     
@@ -253,13 +253,31 @@ extern void eoprot_fun_UPDT_mc_joint_config_pidposition(const EOnv* nv, const eO
     }
 }
 
+// f-marker-begin
+extern void eoprot_fun_UPDT_mc_joint_config_pidvelocity(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
+    eOmc_PID_t *pid = (eOmc_PID_t*)rd->data;
+    //float rescaler = 1.0f/(float)(1<<pid->scale);
+
+    eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
+    
+    if((eo_motcon_mode_foc == mcmode) || (eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode))
+    {
+        MController_config_vel_pid(jxx, pid);
+    }
+    else if(eo_motcon_mode_mc4 == mcmode)
+    {
+        //s_onpid(nv, rd, pid_typePOS);
+    }
+}
 
 // f-marker-begin
 extern void eoprot_fun_UPDT_mc_joint_config_pidtorque(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
     eOmc_PID_t *pid = (eOmc_PID_t*)rd->data;
-    float rescaler = 1.0f/(float)(1<<pid->scale);
+    //float rescaler = 1.0f/(float)(1<<pid->scale);
 
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
     
