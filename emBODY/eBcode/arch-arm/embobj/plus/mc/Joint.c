@@ -63,8 +63,8 @@ void Joint_init(Joint* o)
     WatchDog_init(&o->trq_fbk_wdog);
     WatchDog_init(&o->vel_ref_wdog);
     
-    WatchDog_set_base_time_msec(&o->trq_fbk_wdog, DEFAULT_WATCHDOG_TIME_MSEC);
-    WatchDog_set_base_time_msec(&o->vel_ref_wdog, DEFAULT_WATCHDOG_TIME_MSEC);
+    WatchDog_set_base_time_msec(&o->trq_fbk_wdog, 2*DEFAULT_WATCHDOG_TIME_MSEC);
+    WatchDog_set_base_time_msec(&o->vel_ref_wdog,   DEFAULT_WATCHDOG_TIME_MSEC);
     
     WatchDog_rearm(&o->trq_fbk_wdog);
     WatchDog_rearm(&o->vel_ref_wdog);
@@ -287,7 +287,7 @@ void Joint_update_odometry_fbk(Joint* o, CTRL_UNITS pos_fbk, CTRL_UNITS vel_fbk)
 
 void Joint_update_torque_fbk(Joint* o, CTRL_UNITS trq_fbk)
 {
-    if (trq_fbk == o->trq_fbk) return;
+    if ((trq_fbk == o->trq_fbk) && (trq_fbk == 0.0f)) return;
     
     o->trq_fbk = trq_fbk;
     
