@@ -122,7 +122,7 @@
         <property key="enable-symbols" value="false"/>
         <property key="enable-unroll-loops" value="false"/>
         <property key="extra-include-directories"
-                  value="..\..\app-added;C:\Users\Alessandro Scalzo\Documents\Progetti\IIT\iCub\firmware\canProtocolLib;..\..\app"/>
+                  value="..\..\app-added;..\..\app;..\..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib"/>
         <property key="isolate-each-function" value="false"/>
         <property key="keep-inline" value="false"/>
         <property key="oXC16gcc-align-arr" value="false"/>

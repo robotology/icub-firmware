@@ -324,13 +324,15 @@ BOOL updateOdometry()
 
         return FALSE;
     }
-    else // no QE
+    else if (MotorConfig.has_hall)
     {
         gQEPosition = DHESPosition();
         gQEVelocity = DHESVelocity();
 
         return FALSE;
     }
+
+    return FALSE;
 }
 
 int alignRotor(volatile int* IqRef)
@@ -347,7 +349,16 @@ int alignRotor(volatile int* IqRef)
 
     if (sAlignInProgress == -1)
     {
-        if (IqRef_fake > 0) --IqRef_fake; else { sAlignInProgress = 0; QEcountErrorClear(); }
+        if (IqRef_fake > 0)
+        {
+            --IqRef_fake;
+        }
+        else
+        {
+            sAlignInProgress = 0;
+            gEncoderError.uncalibrated = 0;
+            QEcountErrorClear();
+        }
     }
     else if (sAlignInProgress == 1)
     {
@@ -382,9 +393,6 @@ int alignRotor(volatile int* IqRef)
 }
 
 // DMA0 IRQ Service Routine used for FOC loop
-
-//volatile int gulp_sector;
-//volatile int gulp_delta;
 
 void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
 {
@@ -441,19 +449,15 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
 
     if (MotorConfig.has_hall)
     {
-      //static const char dhes2sector[] = {0,1,3,2,5,6,4};
-        static const char dhes2sector[] = {0,4,6,5,2,3,1};
+        //static const char dhes2sector[] = {0,4,6,5,2,3,1};
+        //static const char dhes2sector[] = {0,6,4,5,2,1,3};
+        static const char dhes2sector[] = {0,6,2,1,4,5,3};
         sector = dhes2sector[DHESRead()];
-
-      //static const int dhes2angle[] = {0,0,120,60,240,300,180};
-      //enc = dhes2angle[DHESRead()];
     }
     else
     {
         sector = 1 + enc/60;
     }
-
-    //gulp_sector = sector;
 
     static char sector_stored = 0;
     static char sector_stored_old = 0;
@@ -506,37 +510,18 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
         sector_stored_old = sector_stored;
         sector_stored = sector;
 
+        #define HI(Ix,Vx) iH = &(ParkParm.Ix); ppwmH = &Vx;
+        #define LO(Ix,Vx) iL = &(ParkParm.Ix); ppwmL = &Vx;
+        #define NE(Ix,Vx) i0 = &(ParkParm.Ix); ppwm0 = &Vx;
+        
         switch (sector)
         {
-            case 1: // Sector 1: (0,0,1)   60-120 degrees
-                iH = &(ParkParm.qIa); iL = &(ParkParm.qIb); i0 = &(ParkParm.qIc);
-                ppwmH = &Va; ppwmL = &Vb; ppwm0 = &Vc;
-                break;
-
-            case 2: // Sector 2: (0,1,1)  120-180 degrees
-                iH = &(ParkParm.qIa); iL = &(ParkParm.qIc); i0 = &(ParkParm.qIb);
-                ppwmH = &Va; ppwm0 = &Vb; ppwmL = &Vc;
-                break;
-
-            case 3: // Sector 3: (0,1,0)  180-240 degrees
-                iH = &(ParkParm.qIb); iL = &(ParkParm.qIc); i0 = &(ParkParm.qIa);
-                ppwm0 = &Va; ppwmH = &Vb; ppwmL = &Vc;
-                break;
-
-            case 4: // Sector 4: (1,1,0)  240-300 degrees
-                iH = &(ParkParm.qIb); iL = &(ParkParm.qIa); i0 = &(ParkParm.qIc);
-                ppwmL = &Va; ppwmH = &Vb; ppwm0 = &Vc;
-                break;
-
-            case 5: // Sector 5: (1,0,0)  300-360 degrees
-                iH = &(ParkParm.qIc); iL = &(ParkParm.qIa); i0 = &(ParkParm.qIb);
-                ppwmL = &Va; ppwm0 = &Vb; ppwmH = &Vc;
-                break;
-
-            case 6: // Sector 6: (1,0,1)    0- 60 degrees
-                iH = &(ParkParm.qIc); iL = &(ParkParm.qIb); i0 = &(ParkParm.qIa);
-                ppwm0 = &Va; ppwmL = &Vb; ppwmH = &Vc;
-                break;
+            case 1: HI(qIa,Va) LO(qIb,Vb) NE(qIc,Vc) break; // 1 0 1   5 -> 1
+            case 2: HI(qIa,Va) LO(qIc,Vc) NE(qIb,Vb) break; // 1 0 0   4 -> 2
+            case 3: HI(qIb,Vb) LO(qIc,Vc) NE(qIa,Va) break; // 1 1 0   6 -> 3
+            case 4: HI(qIb,Vb) LO(qIa,Va) NE(qIc,Vc) break; // 0 1 0   2 -> 4
+            case 5: HI(qIc,Vc) LO(qIa,Va) NE(qIb,Vb) break; // 0 1 1   3 -> 5
+            case 6: HI(qIc,Vc) LO(qIb,Vb) NE(qIa,Va) break; // 0 0 1   1 -> 6
         }
     }
 
@@ -1039,17 +1024,23 @@ int main(void)
         IEC3bits.QEI1IE = 0;
     }
 
+    sAlignInProgress = 0;
+    gEncoderError.uncalibrated = 0;
+
     if (MotorConfig.has_hall)
     {
         MotorConfig.has_tsens = FALSE;
-        sAlignInProgress = 0;
         DHESInit(65536UL/(6*gEncoderConfig.numPoles));
     }
     else
     {
-        sAlignInProgress = 1;
-        
         if (MotorConfig.has_tsens) SetupPorts_I2C();
+    
+        if (MotorConfig.has_qe)
+        {
+            sAlignInProgress = 1;
+            gEncoderError.uncalibrated = 1;
+        }
     }
 
     setSPid(SKp, SKi, SKs);

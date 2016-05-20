@@ -52,9 +52,6 @@ void CanIcubProtoTransmitterInit(unsigned char bid)
 extern volatile long VqRef;
 extern volatile int  IqRef;
 
-//volatile extern int gulp_sector;
-//volatile extern int gulp_delta;
-
 extern void CanIcubProtoTrasmitterSendPeriodicData(void)
 {
     //volatile extern int encoder_error;

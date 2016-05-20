@@ -18,7 +18,7 @@ inline int Fault(void) __attribute__((always_inline));
 int Fault(void)
 {
     // exclude external fault
-    if (SysError.L & 0xFFFFFFFB) return 1;
+    if (SysError.L & 0xFFFFFFFE) return 1;
 
     return fault;
 }

@@ -17,17 +17,15 @@ typedef union uSysError
   {
 /********************************************************************************************************/
 /*    first byte  ==> data[0] in ICUBPROTO_PERIODICCMD_STATUS                                            */
-        
-/*b0*/  unsigned UnderVoltageFailure:1;     /* Undervoltage */       
-/*b1*/  unsigned OverVoltageFailure:1;      /* Overvoltage */
-/*b2*/  unsigned ExternalFaultAsserted:1;   /* External Fault */
-/*b3*/  unsigned OverCurrentFailure:1;      /* OverCurrent */
-                                            //ATTENTION IN PERIODICCMD_STATUS PUT IN OR WITH I2TFailure 
+
+/*b0*/  unsigned ExternalFaultAsserted:1;   /* External Fault */
+/*b1*/  unsigned UnderVoltageFailure:1;     /* Undervoltage */
+/*b2*/  unsigned OverVoltageFailure:1;      /* Overvoltage */
+/*b3*/  unsigned OverCurrentFailure:1;      /* OverCurrent */ 
 /*b4*/  unsigned DHESInvalidValue:1;        /* an invalid value of HES has been detected */ 
-/*b5*/  unsigned AS5045CSumError:1;         //ATTENTION IN MSG PUNT IN OR WITH    AS5045CalcError:1;
+/*b5*/  unsigned AS5045CSumError:1;         
 /*b6*/  unsigned DHESInvalidSequence:1;     /* an invalid sequence of HES activation has been detected */
 /*b7*/  unsigned CANInvalidProtocol:1;      /* can protocol incompatible with EMS */
-///*b7*/  unsigned unused:1;                /* UNUSED: put here for mad in msg */
 
 
 /********************************************************************************************************/

@@ -20,6 +20,7 @@ typedef union
         unsigned stuck:1;
         unsigned index_broken:1;
         unsigned phase_broken:1;
+        unsigned uncalibrated:1;
     };
 
     unsigned char bitmask;
