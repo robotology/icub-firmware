@@ -73,7 +73,8 @@ unsigned char DHESRead()
 
     //#ifdef DHES_CONNECTED_TO_P1_P6
     // HU==RP3==RB3, HV==RP8==RB8, HW==RP9==RB9
-    unsigned char port_read = (PORTBbits.RB3) | (PORTBbits.RB8<<2) | (PORTBbits.RB9<<1);
+    //unsigned char port_read = (PORTBbits.RB3) | (PORTBbits.RB8<<2) | (PORTBbits.RB9<<1);
+    unsigned char port_read = (PORTBbits.RB3<<2) | (PORTBbits.RB8<<1) | (PORTBbits.RB9);
     //#else
     // Read DHES vaue from the uC pins of choice
     // mask the port where the DHES are connected (RP5, RP6, RP7)
