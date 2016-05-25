@@ -43,13 +43,12 @@
  
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
-typedef struct EOCanMSgWatchdog_hid EOCanMSgWatchdog;
+typedef struct EOCanMSgWatchdog_hid EOCanMsgWatchdog;
 
 
 typedef struct
 {
-    eOreltime_t  periodofCanMsg;
-    eOreltime_t  timeout;
+    eOreltime_t  period;
 } eOcanmsg_watchdog_cfg_t;
 
    
@@ -58,18 +57,26 @@ typedef struct
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-extern EOCanMsgsWatchdog* eo_canmsg_watchdog_new(eOcanmsg_watchdog_cfg_t *cfg);
+// ***** Default cfg:
+//eOcanmsg_watchdog_cfg_t cfg_default = {.period = 100}; //100 ms
+//
 
-//configure the watchdog. return true if watchdog is configured
-extern eObool_t eo_canmsg_watchdog_config(EOCanMsgsWatchdog* wd, eOcanmsg_watchdog_cfg_t *cfg);
+//if cfg is null, then default cfg will be used
+extern EOCanMsgWatchdog* eo_canmsg_watchdog_new(eOcanmsg_watchdog_cfg_t *cfg);
 
-extern eOresult_t eo_canmsg_watchdog_rearm(EOCanMsgsWatchdog* wd);
+//update the configuration of watchdog. return eores_NOK_generic if watchdog ptr is null.
+// if cfg is null, then default cfg will be used.
+//if watchdog is running, then stops it configures new period and then start it again.
+extern eOresult_t eo_canmsg_watchdog_updateconfig(EOCanMsgWatchdog* wd, eOcanmsg_watchdog_cfg_t *cfg);
 
-extern eOresult_t eo_canmsg_watchdog_start(EOCanMsgsWatchdog* wd);
+extern eOresult_t eo_canmsg_watchdog_rearm(EOCanMsgWatchdog* wd);
 
-extern eOresult_t eo_canmsg_watchdog_stop(EOCanMsgsWatchdog* wd);
+extern eOresult_t eo_canmsg_watchdog_start(EOCanMsgWatchdog* wd);
 
-extern eObool_t eo_canmsg_watchdog_check(EOCanMsgsWatchdog* wd);
+extern eOresult_t eo_canmsg_watchdog_stop(EOCanMsgWatchdog* wd);
+
+//return false if watchdof has expired
+extern eObool_t eo_canmsg_watchdog_check(EOCanMsgWatchdog* wd);
 
 
 /** @}            

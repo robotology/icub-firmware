@@ -9,6 +9,8 @@
 
 #include "AbsEncoder.h"
 
+#include "EOtheMais.h"
+
 /////////////////////////////////////////////////////////
 // AbsEncoder
 
@@ -575,6 +577,20 @@ static void AbsEncoder_send_error(uint8_t id, eOerror_value_MC_t err_id, uint64_
 
 BOOL AbsEncoder_is_in_fault(AbsEncoder* o)
 {
+    if(eomc_encoder_MAIS == o->type)
+    {
+        if(!eo_mais_isAlive(eo_mais_GetHandle()))
+        {
+            o->hardware_fault = TRUE;
+            eOerrmanDescriptor_t descriptor = {0};
+            descriptor.par16 = o->ID;
+            descriptor.par64 = 0;
+            descriptor.sourcedevice = eo_errman_sourcedevice_localboard;
+            descriptor.sourceaddress = 0;
+            descriptor.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag02);
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, "mais timeout", NULL, &descriptor);
+        }
+    }
     if (!o->hardware_fault) return FALSE;
     
     if (++o->diagnostics_refresh > 5*CTRL_LOOP_FREQUENCY_INT)

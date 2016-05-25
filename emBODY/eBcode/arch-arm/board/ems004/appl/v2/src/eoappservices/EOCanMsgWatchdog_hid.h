@@ -33,20 +33,26 @@
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
-typedef enum
-{
-    wd_st_uninitilized  = 0,
-    wd_st_configured    = 1,
-    wd_st_started       = 2
-} eO_canmsg_watchdog_state_t;
+//typedef enum
+//{
+//    wd_st_uninitilized  = 0,
+//    wd_st_configured    = 1,
+//    wd_st_started       = 2
+//} eO_canmsg_watchdog_state_t;
 
 
-struct EOCanMsgWatchdog_hid
+//struct EOCanMSgWatchdog_hid
+//{
+//    eOcanmsg_watchdog_cfg_t    cfg;
+//    eO_canmsg_watchdog_state_t state;
+//    eOabstime_t starttime;
+//}; 
+
+struct EOCanMSgWatchdog_hid
 {
     eOcanmsg_watchdog_cfg_t    cfg;
-    eO_canmsg_watchdog_state_t state;
-    eOabstime_t starttime;
-    
+    eObool_t                   isrunning;
+    eOabstime_t                starttime;
 }; 
 
 

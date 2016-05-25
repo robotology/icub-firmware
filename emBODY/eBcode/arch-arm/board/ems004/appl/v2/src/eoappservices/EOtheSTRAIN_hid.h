@@ -30,6 +30,7 @@
 #include "EoCommon.h"
 #include "EoProtocol.h"
 #include "EOtheServices_hid.h"
+#include "EOCanMsgWatchdog.h"
 
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
@@ -51,6 +52,7 @@ struct EOtheSTRAIN_hid
     eOservice_onendofoperation_fun_t        overrideonfullscaleready; 
     eOas_strain_t*                          strain;   
     EOarray*                                id32ofregulars;    
+    EOCanMsgWatchdog                        *canmsgwatchdog;
 }; 
 
 

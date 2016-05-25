@@ -162,6 +162,8 @@ extern EOtheSTRAIN* eo_strain_Initialise(void)
     
     p->overrideonfullscaleready = NULL;
     
+    p->canmsgwatchdog = eo_canmsg_watchdog_new(NULL);
+    
     p->diagnostics.reportTimer = eo_timer_New();
     p->diagnostics.errorType = eo_errortype_error;
     p->diagnostics.errorDescriptor.sourceaddress = eo_errman_sourcedevice_localboard;
@@ -494,7 +496,16 @@ extern eOresult_t eo_strain_Tick(EOtheSTRAIN *p)
     }     
     
     // strain does not need any action because everything is done by the can parser
-    
+    if(!eo_canmsg_watchdog_check(p->canmsgwatchdog))
+    {
+        eOerrmanDescriptor_t descriptor = {0};
+        descriptor.par16 = 0;
+        descriptor.par64 = 0;
+        descriptor.sourcedevice = eo_errman_sourcedevice_localboard;
+        descriptor.sourceaddress = 0;
+        descriptor.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag03);
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, "strain timeout", NULL, &descriptor);
+    }
     return(eores_OK);         
 }
 
@@ -591,6 +602,18 @@ extern eOresult_t eo_strain_SetMode(EOtheSTRAIN *p, eOas_strainmode_t mode)
     
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &p->sharedcan.command, p->id32);
 
+    if(eoas_strainmode_acquirebutdonttx == mode)
+    {
+        eo_canmsg_watchdog_stop(p->canmsgwatchdog);
+    }
+    else 
+    {
+        /*  eoas_strainmode_txcalibrateddatacontinuously
+            eoas_strainmode_txuncalibrateddatacontinuously     
+            eoas_strainmode_txalldatacontinuously
+        */
+        eo_canmsg_watchdog_start(p->canmsgwatchdog);
+    }
     return(eores_OK); 
 }
 
@@ -621,6 +644,9 @@ extern eOresult_t eo_strain_SetDataRate(EOtheSTRAIN *p, uint8_t datarate)
    
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &p->sharedcan.command, p->id32);
 
+    eOcanmsg_watchdog_cfg_t cfg = {.period = datarate};
+    eo_canmsg_watchdog_updateconfig(p->canmsgwatchdog, &cfg);
+    
     return(eores_OK); 
 }
 
@@ -661,7 +687,22 @@ extern eOresult_t eo_strain_GetFullScale(EOtheSTRAIN *p, eOservice_onendofoperat
     return(eores_OK); 
 }
 
+extern eOresult_t eo_strain_notifymeOnNewReceivedData(EOtheSTRAIN *p)
+{
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    if(eobool_false == p->service.active)
+    {   // nothing to do because object must be first activated
+        return(eores_OK);
+    }  
+    
+    eo_canmsg_watchdog_rearm(p->canmsgwatchdog);
 
+    return(eores_OK);
+}
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------

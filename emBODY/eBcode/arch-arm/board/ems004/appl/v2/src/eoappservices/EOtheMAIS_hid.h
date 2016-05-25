@@ -30,6 +30,7 @@
 #include "EoCommon.h"
 #include "EoProtocol.h"
 #include "EOtheServices_hid.h"
+#include "EOCanMsgWatchdog.h"
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
 
@@ -50,6 +51,7 @@ struct EOtheMAIS_hid
     eOas_mais_t*                            mais;
     EOarray*                                id32ofregulars;
     uint8_t                                 numberofowners; // increased / decreased at _Start() _Stop()
+    EOCanMsgWatchdog*                       canmsgwatchdog; //watchdog for can messages reception
 }; 
 
 
