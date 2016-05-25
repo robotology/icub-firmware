@@ -47,7 +47,7 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define FILTER_WINDOW (float) 500.0 //make it configurable? --> could become a parameter from XML
+#define FILTER_WINDOW (float) 1000.0 //make it configurable? --> could become a parameter from XML
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -304,7 +304,13 @@ static void s_eo_currents_watchdog_CheckI2T(uint8_t motor, int16_t value)
         return;
     }
     // 1) calculate Ep
-    s_eo_currents_watchdog.accomulatorEp[motor] += (averageCurrent*averageCurrent) - s_eo_currents_watchdog.nominalCurrent2[motor];
+    float Ep_aux= (averageCurrent*averageCurrent) - s_eo_currents_watchdog.nominalCurrent2[motor];
+    
+    if(Ep_aux < 0) //Ep could not be smaller than zero
+    {
+        Ep_aux = 0;
+    }
+    s_eo_currents_watchdog.accomulatorEp[motor] += Ep_aux;
 
     // 2) check if current Ep is bigger than thresholdeo_motioncontrol_extra_GetMotorFaultMask(eo_motioncontrol_GetHandle(),motor)
     if( s_eo_currents_watchdog.accomulatorEp[motor] > s_eo_currents_watchdog.I2T_threshold[motor])
