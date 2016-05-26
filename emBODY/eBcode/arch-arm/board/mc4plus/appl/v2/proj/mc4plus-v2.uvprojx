@@ -362,7 +362,7 @@
             <useXO>0</useXO>
             <VariousControls>
               <MiscControls>-DUSE_MC4PLUS</MiscControls>
-              <Define>CER</Define>
+              <Define>ICUB_MEC_V3</Define>
               <Undefine></Undefine>
               <IncludePath>..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\libs\highlevel\services\embenv\api;..\cfg\boardcfg;..\cfg\eoemsappl;..\cfg\abslayer;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\protocol\api;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\protocol\src;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\transport;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\utils;.;..\src\eoappservices;..\cfg\eoappservices\icub-can-proto;..\cfg\eoappservices\icub-can-net;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\robotconfig\v1\backdoor;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\opcprot;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\ems004\env\cfg;..\..\..\..\..\libs\highlevel\services\embodyrobot;..\..\..\..\..\libs\midware\hl-plus\api;..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\embobj\plus\ctrloop;..\..\..\..\..\embobj\plus\embenv;..\..\..\..\..\embobj\plus\ipnet;..\..\..\..\..\embobj\plus\board;..\..\..\..\..\embobj\plus\can;..\..\..\..\..\embobj\plus\can\config-can-protocol;..\..\..\..\..\embobj\plus\mc;..\..\..\..\ems004\appl\v2\cfg\eoprot-callbacks;..\..\..\..\ems004\appl\v2\src\eoappservices</IncludePath>
             </VariousControls>
@@ -888,9 +888,9 @@
               <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheVirtualStrain.c</FilePath>
             </File>
             <File>
-              <FileName>EOCanMsgWatchdog.c</FileName>
+              <FileName>EOwatchdog.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOCanMsgWatchdog.c</FilePath>
+              <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOwatchdog.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2199,9 +2199,9 @@
               <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheVirtualStrain.c</FilePath>
             </File>
             <File>
-              <FileName>EOCanMsgWatchdog.c</FileName>
+              <FileName>EOwatchdog.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOCanMsgWatchdog.c</FilePath>
+              <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOwatchdog.c</FilePath>
             </File>
           </Files>
         </Group>

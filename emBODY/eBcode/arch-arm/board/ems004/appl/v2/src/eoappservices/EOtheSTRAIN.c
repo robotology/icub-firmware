@@ -164,7 +164,7 @@ extern EOtheSTRAIN* eo_strain_Initialise(void)
     
     p->overrideonfullscaleready = NULL;
     
-    eOcanmsg_watchdog_cfg_t wd_cfg =
+    eOwatchdog_cfg_t wd_cfg =
     {
         .diagncfg = 
         {
@@ -174,7 +174,7 @@ extern EOtheSTRAIN* eo_strain_Initialise(void)
         .period = 10 /*deafult transmission period of strain*/  *100 /*convert in microsec*/ *10 /*before signal error i would wait 10 times strain transmission period*/
     
     };
-    p->canmsgwatchdog = eo_canmsg_watchdog_new(&wd_cfg);
+    p->watchdog = eo_watchdog_new(&wd_cfg);
     
     p->diagnostics.reportTimer = eo_timer_New();
     p->diagnostics.errorType = eo_errortype_error;
@@ -509,7 +509,7 @@ extern eOresult_t eo_strain_Tick(EOtheSTRAIN *p)
     
     //VALE: Since the only action I would to perform on failure of following check would be send diagnostic message, I don't check the result of this function.
     //eo_canmsg_watchdog_check sends diagnostic message as i configured it (see eo_strain_Initialise)
-    eo_canmsg_watchdog_check(p->canmsgwatchdog);
+    eo_watchdog_check(p->watchdog);
     
     return(eores_OK);         
 }
@@ -609,7 +609,7 @@ extern eOresult_t eo_strain_SetMode(EOtheSTRAIN *p, eOas_strainmode_t mode)
 
     if(eoas_strainmode_acquirebutdonttx == mode)
     {
-        eo_canmsg_watchdog_stop(p->canmsgwatchdog);
+        eo_watchdog_stop(p->watchdog);
     }
     else 
     {
@@ -617,7 +617,7 @@ extern eOresult_t eo_strain_SetMode(EOtheSTRAIN *p, eOas_strainmode_t mode)
             eoas_strainmode_txuncalibrateddatacontinuously     
             eoas_strainmode_txalldatacontinuously
         */
-        eo_canmsg_watchdog_start(p->canmsgwatchdog);
+        eo_watchdog_start(p->watchdog);
     }
     return(eores_OK); 
 }
@@ -649,7 +649,7 @@ extern eOresult_t eo_strain_SetDataRate(EOtheSTRAIN *p, uint8_t datarate)
    
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &p->sharedcan.command, p->id32);
 
-    eo_canmsg_watchdog_updateconfigperiod(p->canmsgwatchdog, datarate*10*100); //I multiply *10 ==> so I wait a period ten tiems bigger than datarate befor signal error
+    eo_watchdog_updateconfigperiod(p->watchdog, datarate*10*100); //I multiply *10 ==> so I wait a period ten tiems bigger than datarate befor signal error
                                                                                //I multiply *100 ==> datarate is in millisec while period is in microsecs.
     
     return(eores_OK); 
@@ -704,7 +704,7 @@ extern eOresult_t eo_strain_notifymeOnNewReceivedData(EOtheSTRAIN *p)
         return(eores_OK);
     }  
     
-    eo_canmsg_watchdog_rearm(p->canmsgwatchdog);
+    eo_watchdog_rearm(p->watchdog);
 
     return(eores_OK);
 }
