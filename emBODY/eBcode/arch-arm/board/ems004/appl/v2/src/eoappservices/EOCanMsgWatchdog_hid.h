@@ -53,6 +53,8 @@ struct EOCanMSgWatchdog_hid
     eOcanmsg_watchdog_cfg_t    cfg;
     eObool_t                   isrunning;
     eOabstime_t                starttime;
+    uint16_t                   count_failures;
+    eObool_t                   diagnostic_enabled;
 }; 
 
 

@@ -59,6 +59,7 @@
 static void s_eo_canmsg_watchdog_configure(EOCanMsgWatchdog* wd, eOcanmsg_watchdog_cfg_t *cfg);
 static void s_eo_canmsg_watchdog_reset(EOCanMsgWatchdog* wd);
 static void s_eo_canmsg_watchdog_run(EOCanMsgWatchdog* wd);
+static void s_eo_canmsg_watchdog_diagnosticconfig(EOCanMsgWatchdog* wd, eOcanmsg_watchdog_cfg_t *cfg);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -78,13 +79,15 @@ extern EOCanMsgWatchdog* eo_canmsg_watchdog_new(eOcanmsg_watchdog_cfg_t *cfg)
     s_eo_canmsg_watchdog_configure(retptr, cfg);
     
     s_eo_canmsg_watchdog_reset(retptr);
+    
+    s_eo_canmsg_watchdog_diagnosticconfig(retptr, cfg);
 
     return(retptr);
 
 }
 
 
-extern eOresult_t eo_canmsg_watchdog_updateconfig(EOCanMsgWatchdog* wd, eOcanmsg_watchdog_cfg_t *cfg)
+extern eOresult_t eo_canmsg_watchdog_updateconfigperiod(EOCanMsgWatchdog* wd, eOreltime_t period)
 {
     if(NULL == wd)
     {
@@ -94,7 +97,8 @@ extern eOresult_t eo_canmsg_watchdog_updateconfig(EOCanMsgWatchdog* wd, eOcanmsg
     eObool_t wasrunning = wd->isrunning;
     
     s_eo_canmsg_watchdog_reset(wd);
-    s_eo_canmsg_watchdog_configure(wd, cfg);
+    //s_eo_canmsg_watchdog_configure(wd, cfg);
+    wd->cfg.period = period;
     if(wasrunning)
     {
         s_eo_canmsg_watchdog_run(wd);
@@ -118,24 +122,42 @@ extern eOresult_t eo_canmsg_watchdog_start(EOCanMsgWatchdog* wd)
 extern eObool_t eo_canmsg_watchdog_check(EOCanMsgWatchdog* wd)
 {
     eOabstime_t time;
+    eObool_t ret = eobool_false;
+    
     if(NULL == wd)
     {
-        return(eobool_false);
+        return(ret);
     }
+    
     if(eobool_false == wd->isrunning)
     {
-        return(eobool_false);
+        return(ret);
     }
     
     time = eov_sys_LifeTimeGet(eov_sys_GetHandle());
-    if( (time - wd->starttime) > wd->cfg.period)
+    
+    
+    if( (time - wd->starttime) <= wd->cfg.period)
     {
-        return(eobool_false);
+        ret = eobool_true;
+        wd->count_failures = 0; //resets num of failure
     }
-    else
+    
+    if((!ret) && (wd->diagnostic_enabled)) //if check is failed and diagnostic is enabled
     {
-        return(eobool_true);
+        wd->count_failures++;
+        if((wd->count_failures == 1) || (wd->count_failures > wd->cfg.diagncfg.numoffailures)) //if is the first failure or num of failures are already bigger than configured number, then I call function
+        {
+            wd->cfg.diagncfg.functiononfailure();
+        }
+        
+        if(wd->count_failures > wd->cfg.diagncfg.numoffailures)
+        {
+            wd->count_failures = 0;
+        }
     }
+    
+    return(ret);
 }
 
 extern eOresult_t eo_canmsg_watchdog_rearm(EOCanMsgWatchdog* wd)
@@ -199,6 +221,18 @@ static void s_eo_canmsg_watchdog_run(EOCanMsgWatchdog* wd)
 {
     wd->isrunning = eobool_true;
     wd->starttime = eov_sys_LifeTimeGet(eov_sys_GetHandle());
+}
+
+static void s_eo_canmsg_watchdog_diagnosticconfig(EOCanMsgWatchdog* wd, eOcanmsg_watchdog_cfg_t *cfg)
+{
+    wd->count_failures = 0;
+    wd->diagnostic_enabled = 0;
+    
+
+    if((NULL != cfg) && (NULL != cfg->diagncfg.functiononfailure))
+    {
+        wd->diagnostic_enabled = 1;
+    }
 }
 
 // --------------------------------------------------------------------------------------------------------------------

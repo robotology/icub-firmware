@@ -48,7 +48,14 @@ typedef struct EOCanMSgWatchdog_hid EOCanMsgWatchdog;
 
 typedef struct
 {
+    uint16_t    numoffailures;
+    eOvoid_fp_void_t functiononfailure;
+    
+} eOcanmsg_watchdog_diagnostic_cfg_t;
+typedef struct
+{
     eOreltime_t  period;
+    eOcanmsg_watchdog_diagnostic_cfg_t  diagncfg;
 } eOcanmsg_watchdog_cfg_t;
 
    
@@ -67,7 +74,7 @@ extern EOCanMsgWatchdog* eo_canmsg_watchdog_new(eOcanmsg_watchdog_cfg_t *cfg);
 //update the configuration of watchdog. return eores_NOK_generic if watchdog ptr is null.
 // if cfg is null, then default cfg will be used.
 //if watchdog is running, then stops it configures new period and then start it again.
-extern eOresult_t eo_canmsg_watchdog_updateconfig(EOCanMsgWatchdog* wd, eOcanmsg_watchdog_cfg_t *cfg);
+extern eOresult_t eo_canmsg_watchdog_updateconfigperiod(EOCanMsgWatchdog* wd, eOreltime_t period);
 
 extern eOresult_t eo_canmsg_watchdog_rearm(EOCanMsgWatchdog* wd);
 

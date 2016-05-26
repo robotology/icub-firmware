@@ -92,6 +92,8 @@ static eOresult_t s_eo_thestrain_on_fullscale_ready(EOtheSTRAIN* p, eObool_t ope
 
 static eObool_t s_eo_strain_isID32relevant(uint32_t id32);
 
+static void s_eo_strain_send_diagnostic_on_transmissioninterruption(void);
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
@@ -162,7 +164,17 @@ extern EOtheSTRAIN* eo_strain_Initialise(void)
     
     p->overrideonfullscaleready = NULL;
     
-    p->canmsgwatchdog = eo_canmsg_watchdog_new(NULL);
+    eOcanmsg_watchdog_cfg_t wd_cfg =
+    {
+        .diagncfg = 
+        {
+            .numoffailures = 1000,
+            .functiononfailure = s_eo_strain_send_diagnostic_on_transmissioninterruption,
+        },
+        .period = 10 /*deafult transmission period of strain*/  *100 /*convert in microsec*/ *10 /*before signal error i would wait 10 times strain transmission period*/
+    
+    };
+    p->canmsgwatchdog = eo_canmsg_watchdog_new(&wd_cfg);
     
     p->diagnostics.reportTimer = eo_timer_New();
     p->diagnostics.errorType = eo_errortype_error;
@@ -480,8 +492,6 @@ extern eOresult_t eo_strain_Stop(EOtheSTRAIN *p)
 
 extern eOresult_t eo_strain_Tick(EOtheSTRAIN *p)
 {
-    static uint16_t count_diagn = 0;
-    
     if(NULL == p)
     {
         return(eores_NOK_nullpointer);
@@ -497,29 +507,9 @@ extern eOresult_t eo_strain_Tick(EOtheSTRAIN *p)
         return(eores_OK);
     }     
     
-    if(!eo_canmsg_watchdog_check(p->canmsgwatchdog))
-    {
-        if((count_diagn == 0) || (count_diagn>1000))//send diagnostic info only if is first time the check returns false or each 1000 times (about 1 second) it returns false
-        {
-            eOerrmanDescriptor_t descriptor = {0};
-            descriptor.par16 = 0;
-            descriptor.par64 = 0;
-            descriptor.sourcedevice = eo_errman_sourcedevice_localboard;
-            descriptor.sourceaddress = 0;
-            descriptor.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag03);
-            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, "strain timeout", NULL, &descriptor);
-        }
-        count_diagn++;
-        if(count_diagn>1000)
-        {
-            count_diagn=0;
-        }
-    }
-    else
-    {
-        count_diagn=0;
-    }
-    
+    //VALE: Since the only action I would to perform on failure of following check would be send diagnostic message, I don't check the result of this function.
+    //eo_canmsg_watchdog_check sends diagnostic message as i configured it (see eo_strain_Initialise)
+    eo_canmsg_watchdog_check(p->canmsgwatchdog);
     
     return(eores_OK);         
 }
@@ -659,9 +649,8 @@ extern eOresult_t eo_strain_SetDataRate(EOtheSTRAIN *p, uint8_t datarate)
    
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &p->sharedcan.command, p->id32);
 
-    eOcanmsg_watchdog_cfg_t cfg = {.period = datarate*10*100 }; //I multiply *10 ==> so I wait a period ten tiems bigger than datarate befor signal error
-                                                                //I multiply *100 ==> datarate is in millisec while period is in microsecs.
-    eo_canmsg_watchdog_updateconfig(p->canmsgwatchdog, &cfg);
+    eo_canmsg_watchdog_updateconfigperiod(p->canmsgwatchdog, datarate*10*100); //I multiply *10 ==> so I wait a period ten tiems bigger than datarate befor signal error
+                                                                               //I multiply *100 ==> datarate is in millisec while period is in microsecs.
     
     return(eores_OK); 
 }
@@ -1094,6 +1083,18 @@ static eObool_t s_eo_strain_isID32relevant(uint32_t id32)
     return(eobool_false); 
 }
 
+
+static void s_eo_strain_send_diagnostic_on_transmissioninterruption(void)
+{
+    eOerrmanDescriptor_t descriptor = {0};
+    descriptor.par16 = 0;
+    descriptor.par64 = 0;
+    descriptor.sourcedevice = eo_errman_sourcedevice_localboard;
+    descriptor.sourceaddress = 0;
+    descriptor.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag03);
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, "strain timeout", NULL, &descriptor);
+
+}
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------

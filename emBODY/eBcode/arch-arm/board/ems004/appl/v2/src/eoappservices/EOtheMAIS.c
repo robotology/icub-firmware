@@ -87,6 +87,8 @@ static void s_eo_mais_send_periodic_error_report(void *par);
 
 static eObool_t s_eo_mais_isID32relevant(uint32_t id32);
 
+static void s_eo_mais_send_diagnostic_on_transmissioninterruption(void);
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -159,7 +161,18 @@ extern EOtheMAIS* eo_mais_Initialise(void)
     p->id32ofregulars = eo_array_New(mais_maxRegulars, sizeof(uint32_t), NULL);
     p->numberofowners = 0;
     
-    p->canmsgwatchdog = eo_canmsg_watchdog_new(NULL);
+     eOcanmsg_watchdog_cfg_t wd_cfg =
+    {
+        .diagncfg = 
+        {
+            .numoffailures = 1000,
+            .functiononfailure = s_eo_mais_send_diagnostic_on_transmissioninterruption,
+        },
+        .period = 10 /*deafult transmission period of mais*/  *100 /*convert in microsec*/ *10 /*before signal error i would wait 10 times mais transmission period*/
+    
+    };
+    p->canmsgwatchdog = eo_canmsg_watchdog_new(&wd_cfg);
+    
     p->diagnostics.reportTimer = eo_timer_New();
     p->diagnostics.errorType = eo_errortype_error;
     p->diagnostics.errorDescriptor.sourceaddress = 0;
@@ -724,9 +737,8 @@ extern eOresult_t eo_mais_SetDataRate(EOtheMAIS *p, uint8_t datarate)
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &p->sharedcan.command, p->id32);    
     
     
-    eOcanmsg_watchdog_cfg_t cfg = {.period = datarate*10*100 }; //I multiply *10 ==> so I wait a period ten tiems bigger than datarate befor signal error
-                                                                //I multiply *100 ==> datarate is in millisec while period is in microsecs.
-    eo_canmsg_watchdog_updateconfig(p->canmsgwatchdog, &cfg);
+    eo_canmsg_watchdog_updateconfigperiod(p->canmsgwatchdog, datarate*10*100); //I multiply *10 ==> so I wait a period ten tiems bigger than datarate befor signal error
+                                                                               //I multiply *100 ==> datarate is in millisec while period is in microsecs.
     
     return(eores_OK);  
 }
@@ -1008,6 +1020,18 @@ static eObool_t s_eo_mais_isID32relevant(uint32_t id32)
     return(eobool_false); 
 }
 
+
+
+static void s_eo_mais_send_diagnostic_on_transmissioninterruption(void)
+{
+    eOerrmanDescriptor_t descriptor = {0};
+    descriptor.par16 = 0;
+    descriptor.par64 = 0;
+    descriptor.sourcedevice = eo_errman_sourcedevice_localboard;
+    descriptor.sourceaddress = 0;
+    descriptor.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag02);
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, "mais timeout", NULL, &descriptor);
+}
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------

@@ -583,28 +583,9 @@ BOOL AbsEncoder_is_in_fault(AbsEncoder* o)
         if(!eo_mais_isAlive(eo_mais_GetHandle()))
         {
             o->hardware_fault = TRUE;
-            
-            if((o->count_diagn_mais == 0) || (o->count_diagn_mais>1000))//send diagnostic info only if is first time the check returns false or each 1000 times (about 1 second) it returns false
-            {
-                eOerrmanDescriptor_t descriptor = {0};
-                descriptor.par16 = o->ID;
-                descriptor.par64 = 0;
-                descriptor.sourcedevice = eo_errman_sourcedevice_localboard;
-                descriptor.sourceaddress = 0;
-                descriptor.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag02);
-                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, "mais timeout", NULL, &descriptor);
-            }
-            o->count_diagn_mais++;
-            if(o->count_diagn_mais>1000)
-            {
-                o->count_diagn_mais=0;
-            }            
-        }
-        else 
-        {
-            o->count_diagn_mais=0;
         }
     }
+    
     if (!o->hardware_fault) return FALSE;
     
     if (++o->diagnostics_refresh > 5*CTRL_LOOP_FREQUENCY_INT)
