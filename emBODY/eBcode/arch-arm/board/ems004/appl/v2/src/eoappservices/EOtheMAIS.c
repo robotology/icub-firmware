@@ -724,7 +724,8 @@ extern eOresult_t eo_mais_SetDataRate(EOtheMAIS *p, uint8_t datarate)
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &p->sharedcan.command, p->id32);    
     
     
-    eOcanmsg_watchdog_cfg_t cfg = {.period = datarate};
+    eOcanmsg_watchdog_cfg_t cfg = {.period = datarate*10*100 }; //I multiply *10 ==> so I wait a period ten tiems bigger than datarate befor signal error
+                                                                //I multiply *100 ==> datarate is in millisec while period is in microsecs.
     eo_canmsg_watchdog_updateconfig(p->canmsgwatchdog, &cfg);
     
     return(eores_OK);  

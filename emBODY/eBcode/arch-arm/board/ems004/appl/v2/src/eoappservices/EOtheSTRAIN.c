@@ -480,6 +480,8 @@ extern eOresult_t eo_strain_Stop(EOtheSTRAIN *p)
 
 extern eOresult_t eo_strain_Tick(EOtheSTRAIN *p)
 {
+    static uint16_t count_diagn = 0;
+    
     if(NULL == p)
     {
         return(eores_NOK_nullpointer);
@@ -495,17 +497,30 @@ extern eOresult_t eo_strain_Tick(EOtheSTRAIN *p)
         return(eores_OK);
     }     
     
-    // strain does not need any action because everything is done by the can parser
     if(!eo_canmsg_watchdog_check(p->canmsgwatchdog))
     {
-        eOerrmanDescriptor_t descriptor = {0};
-        descriptor.par16 = 0;
-        descriptor.par64 = 0;
-        descriptor.sourcedevice = eo_errman_sourcedevice_localboard;
-        descriptor.sourceaddress = 0;
-        descriptor.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag03);
-        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, "strain timeout", NULL, &descriptor);
+        if((count_diagn == 0) || (count_diagn>1000))//send diagnostic info only if is first time the check returns false or each 1000 times (about 1 second) it returns false
+        {
+            eOerrmanDescriptor_t descriptor = {0};
+            descriptor.par16 = 0;
+            descriptor.par64 = 0;
+            descriptor.sourcedevice = eo_errman_sourcedevice_localboard;
+            descriptor.sourceaddress = 0;
+            descriptor.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag03);
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, "strain timeout", NULL, &descriptor);
+        }
+        count_diagn++;
+        if(count_diagn>1000)
+        {
+            count_diagn=0;
+        }
     }
+    else
+    {
+        count_diagn=0;
+    }
+    
+    
     return(eores_OK);         
 }
 
@@ -644,7 +659,8 @@ extern eOresult_t eo_strain_SetDataRate(EOtheSTRAIN *p, uint8_t datarate)
    
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &p->sharedcan.command, p->id32);
 
-    eOcanmsg_watchdog_cfg_t cfg = {.period = datarate};
+    eOcanmsg_watchdog_cfg_t cfg = {.period = datarate*10*100 }; //I multiply *10 ==> so I wait a period ten tiems bigger than datarate befor signal error
+                                                                //I multiply *100 ==> datarate is in millisec while period is in microsecs.
     eo_canmsg_watchdog_updateconfig(p->canmsgwatchdog, &cfg);
     
     return(eores_OK); 
