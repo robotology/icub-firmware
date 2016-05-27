@@ -83,6 +83,7 @@ typedef struct //AbsEncoder
     EncoderFaultState fault_state;
     EncoderFaultState fault_state_prec;
     uint16_t diagnostics_refresh;
+    uint16_t count_diagn_mais;
     
 } AbsEncoder;
 

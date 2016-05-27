@@ -18,18 +18,18 @@
 
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _EOCANMESGWATCHDOG_H_
-#define _EOCANMESGWATCHDOG_H_
+#ifndef _EOWATCHDOG_H_
+#define _EOWATCHDOG_H_
 
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
-/** @file       EOCanMsgWatchdog.h
-    @brief      This file provides interfaces to the watchdog of can messages receiving
+/** @file       EOwatchdog.h
+    @brief      This file provides interfaces to watchdog
     @author     valentina.gaggero@iit.it
     @date       19/05/2016
 **/
 
-/** @defgroup eo_EOCanMsgWatchdog Object EOCanMsgWatchdog
+/** @defgroup eo_EOwatchdog Object EOwatchdog
     ...... 
     @{        
  **/
@@ -43,14 +43,20 @@
  
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
-typedef struct EOCanMSgWatchdog_hid EOCanMSgWatchdog;
+typedef struct EOwatchdog_hid EOwatchdog;
 
 
 typedef struct
 {
-    eOreltime_t  periodofCanMsg;
-    eOreltime_t  timeout;
-} eOcanmsg_watchdog_cfg_t;
+    uint16_t            numoffailures;
+    eOvoid_fp_void_t    functiononfailure; //this function is invoked inside _check function at first failure and every "numoffailures" failures consecutive
+    
+} eOwatchdog_diagnostics_cfg_t;
+typedef struct
+{
+    eOreltime_t                     period; //time expressed in microsec
+    eOwatchdog_diagnostics_cfg_t    diagncfg;
+} eOwatchdog_cfg_t;
 
    
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------
@@ -58,22 +64,37 @@ typedef struct
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-extern EOCanMsgsWatchdog* eo_canmsg_watchdog_new(eOcanmsg_watchdog_cfg_t *cfg);
+/* ***** Default cfg:
+//eOwatchdog_cfg_t cfg_default = 
+{
+    diagncfg = 
+    {
+        .numofnumoffailures = 0,
+        .functiononfailure = NULL,
+    },
+    .period = 100000 //1 sec
+}; 
+*/
 
-//configure the watchdog. return true if watchdog is configured
-extern eObool_t eo_canmsg_watchdog_config(EOCanMsgsWatchdog* wd, eOcanmsg_watchdog_cfg_t *cfg);
+//if cfg is null, then default cfg will be used (see above)
+extern EOwatchdog* eo_watchdog_new(eOwatchdog_cfg_t *cfg);
 
-extern eOresult_t eo_canmsg_watchdog_rearm(EOCanMsgsWatchdog* wd);
+//update the period of watchdog. return eores_NOK_generic if watchdog ptr is null.
+//if watchdog is running, then stops it configures new period and then start it again.
+extern eOresult_t eo_watchdog_updateconfigperiod(EOwatchdog* wd, eOreltime_t period);
 
-extern eOresult_t eo_canmsg_watchdog_start(EOCanMsgsWatchdog* wd);
+extern eOresult_t eo_watchdog_rearm(EOwatchdog* wd);
 
-extern eOresult_t eo_canmsg_watchdog_stop(EOCanMsgsWatchdog* wd);
+extern eOresult_t eo_watchdog_start(EOwatchdog* wd);
 
-extern eObool_t eo_canmsg_watchdog_check(EOCanMsgsWatchdog* wd);
+extern eOresult_t eo_watchdog_stop(EOwatchdog* wd);
+
+//return false if watchdog has expired
+extern eObool_t eo_watchdog_check(EOwatchdog* wd);
 
 
 /** @}            
-    end of group eo_EOCanMsgWatchdog
+    end of group eo_EOwatchdog
  **/
 
 #endif  // include-guard

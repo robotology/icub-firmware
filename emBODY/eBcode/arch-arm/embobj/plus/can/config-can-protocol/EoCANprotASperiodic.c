@@ -34,6 +34,7 @@
 #include "EoError.h"
 
 #include "EOtheCANmapping.h"
+#include "EOtheMAIS.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -292,7 +293,9 @@ static eOresult_t s_eocanprotASperiodic_parser_process_forcetorque(eOcanframe_t 
     {
         return(eores_OK);  
     }    
-        
+    
+    eObool_t update_watchdog = eobool_false;
+    
     // set incoming force values
     switch(strain->config.mode)
     {
@@ -300,11 +303,13 @@ static eOresult_t s_eocanprotASperiodic_parser_process_forcetorque(eOcanframe_t 
         case eoas_strainmode_txalldatacontinuously:
         {
             eo_array_Assign((EOarray*)(&strain->status.calibratedvalues), 3*mode, &(frame->data[0]), 3);
+            update_watchdog = eobool_true;
         } break;
 
         case eoas_strainmode_txuncalibrateddatacontinuously:
         {
             eo_array_Assign((EOarray*)(&strain->status.uncalibratedvalues), 3*mode, &(frame->data[0]), 3);
+            update_watchdog = eobool_true;
         } break;
         
         case eoas_strainmode_acquirebutdonttx:
@@ -319,6 +324,12 @@ static eOresult_t s_eocanprotASperiodic_parser_process_forcetorque(eOcanframe_t 
             //#warning -> TODO: add diagnostics about unknown mode as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
         }
     }
+    
+    if(update_watchdog)
+    {
+        eo_strain_notifymeOnNewReceivedData(eo_strain_GetHandle());
+    }
+        
     
     //check saturation
 //#define SIMPLE_SATURATION_DIAGNOSTIC
@@ -386,6 +397,8 @@ static eOresult_t s_eocanprotASperiodic_parser_process_maisvalue(eOcanframe_t *f
         eo_array_Assign(array, 7, &(frame->data[0]), 8); // 8 bytes of frame->data starting from array position 7 (7, 8, .. , 14)
     }
         
+    eo_mais_notifymeOnNewReceivedData(eo_mais_GetHandle());
+    
     return(eores_OK);       
 }
 

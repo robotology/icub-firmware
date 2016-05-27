@@ -19,8 +19,8 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef _EOCANMESGWATCHDOG_HID_H_
-#define _EOCANMESGWATCHDOG_HID_H_
+#ifndef _EOWATCHDOG_HID_H_
+#define _EOWATCHDOG_HID_H_
 
 
 // - external dependencies --------------------------------------------------------------------------------------------
@@ -28,25 +28,17 @@
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
 
-#include "EOCanMsgWatchdog.h"
+#include "EOwatchdog.h"
 
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
-
-typedef enum
+struct EOwatchdog_hid
 {
-    wd_st_uninitilized  = 0,
-    wd_st_configured    = 1,
-    wd_st_started       = 2
-} eO_canmsg_watchdog_state_t;
-
-
-struct EOCanMsgWatchdog_hid
-{
-    eOcanmsg_watchdog_cfg_t    cfg;
-    eO_canmsg_watchdog_state_t state;
-    eOabstime_t starttime;
-    
+    eOwatchdog_cfg_t           cfg;
+    eObool_t                   isrunning;
+    eOabstime_t                starttime;
+    uint16_t                   count_failures;
+    eObool_t                   diagnostic_enabled;
 }; 
 
 

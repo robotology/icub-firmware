@@ -95,6 +95,8 @@ extern eOresult_t eo_mais_Set(EOtheMAIS *p, eOas_mais_config_t* maiscfg);
 extern eOresult_t eo_mais_SetMode(EOtheMAIS *p, eOas_maismode_t mode);
 extern eOresult_t eo_mais_SetDataRate(EOtheMAIS *p, uint8_t datarate);
 extern eOresult_t eo_mais_SetResolution(EOtheMAIS *p, eOas_maisresolution_t resolution);
+extern eOresult_t eo_mais_notifymeOnNewReceivedData(EOtheMAIS *p);
+extern eObool_t eo_mais_isAlive(EOtheMAIS *p);
 
 
 

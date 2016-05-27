@@ -21,18 +21,19 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 #include "EOVtheSystem.h"
+#include "EOtheMemoryPool.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "EOCanMsgWatchdog.h"
+#include "EOwatchdog.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "EOCanMsgWatchdog_hid.h"
+#include "EOwatchdog_hid.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -55,103 +56,144 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
-static eObool_t s_eo_canmsg_watchdog_configure(EOCanMsgsWatchdog* wd, eOcanmsg_watchdog_cfg_t *cfg);
+static void s_eo_watchdog_configure(EOwatchdog* wd, eOwatchdog_cfg_t *cfg);
+static void s_eo_watchdog_reset(EOwatchdog* wd);
+static void s_eo_watchdog_run(EOwatchdog* wd);
+static void s_eo_watchdog_diagnosticconfig(EOwatchdog* wd, eOwatchdog_cfg_t *cfg);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
-
+static const eOwatchdog_cfg_t cfg_default = 
+{
+    .diagncfg = 
+    {
+        .numoffailures = 0,
+        .functiononfailure = NULL,
+    },
+    .period = 100000 //1 sec
+}; 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
-extern EOCanMsgsWatchdog* eo_canmsg_watchdog_new(eOcanmsg_watchdog_cfg_t *cfg)
+extern EOwatchdog* eo_watchdog_new(eOwatchdog_cfg_t *cfg)
 {
-    EOCanMsgsWatchdog *retptr = NULL;    
+    EOwatchdog *retptr = NULL;    
 
     // I get the memory for the object
-    retptr = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOCanMsgsWatchdog), 1);
+    retptr = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOwatchdog), 1);
     
-    retptr->state = wd_st_uninitilized;
+    s_eo_watchdog_configure(retptr, cfg);
     
-    s_eo_canmsg_watchdog_configure(cfg);
+    s_eo_watchdog_reset(retptr);
+    
+    s_eo_watchdog_diagnosticconfig(retptr, cfg);
 
     return(retptr);
 
 }
 
-extern eObool_t eo_canmsg_watchdog_config(EOCanMsgsWatchdog* wd, eOcanmsg_watchdog_cfg_t *cfg)
+
+extern eOresult_t eo_watchdog_updateconfigperiod(EOwatchdog* wd, eOreltime_t period)
 {
     if(NULL == wd)
     {
-        return(eobool_false);
+        return(eores_NOK_generic);
     }
-    return(s_eo_canmsg_watchdog_configure(cfg));
-}
+    
+    eObool_t wasrunning = wd->isrunning;
+    
+    s_eo_watchdog_reset(wd);
+    //s_eo_watchdog_configure(wd, cfg);
+    wd->cfg.period = period;
+    if(wasrunning)
+    {
+        s_eo_watchdog_run(wd);
+    }
+    return(eores_OK);
 
-extern eOresult_t eo_canmsg_watchdog_start(EOCanMsgsWatchdog* wd)
+}
+extern eOresult_t eo_watchdog_start(EOwatchdog* wd)
 {
     if(NULL == wd)
     {
         return(eores_NOK_nullpointer);
     }
-    if(wd_st_configured != wd->state)
-    {
-        return(eores_NOK_generic);
-    }
-    wd->state = wd_st_started;
-    wd->starttime = eov_sys_LifeTimeGet(eov_sys_GetHandle());
+    
+    s_eo_watchdog_run(wd);
+    
     return(eores_OK);
 }
 
 
-extern eObool_t eo_canmsg_watchdog_check(EOCanMsgsWatchdog* wd)
+extern eObool_t eo_watchdog_check(EOwatchdog* wd)
 {
     eOabstime_t time;
+    eObool_t ret = eobool_false;
+    
     if(NULL == wd)
     {
-        return(eobool_false);
+        return(ret);
     }
-    if(wd_st_started != wd->state)
+    
+    if(eobool_false == wd->isrunning)
     {
-        return(eobool_false);
+        return(ret);
     }
     
     time = eov_sys_LifeTimeGet(eov_sys_GetHandle());
-    if( (time - wd->startedtime) > cfg->period)
+    
+    
+    if( (time - wd->starttime) <= wd->cfg.period)
     {
-        return(eobool_false);
+        ret = eobool_true;
+        wd->count_failures = 0; //resets num of failure
     }
-    else
+    
+    if((!ret) && (wd->diagnostic_enabled)) //if check is failed and diagnostic is enabled
     {
-        return(eobool_true);
+        wd->count_failures++;
+        if((wd->count_failures == 1) || (wd->count_failures > wd->cfg.diagncfg.numoffailures)) //if is the first failure or num of failures are already bigger than configured number, then I call function
+        {
+            wd->cfg.diagncfg.functiononfailure();
+        }
+        
+        if(wd->count_failures > wd->cfg.diagncfg.numoffailures)
+        {
+            wd->count_failures = 0;
+        }
     }
+    
+    return(ret);
 }
 
-extern eOresult_t eo_canmsg_watchdog_rearm(EOCanMsgsWatchdog* wd)
+extern eOresult_t eo_watchdog_rearm(EOwatchdog* wd)
 {
     if(NULL == wd)
     {
         return(eores_NOK_nullpointer);
     }
-    if(wd_st_started != wd->state)
+    
+    if(eobool_false == wd->isrunning)
     {
         return(eores_NOK_generic);
     }
     
-    wd->startedtime = eov_sys_LifeTimeGet(eov_sys_GetHandle());
+    wd->starttime = eov_sys_LifeTimeGet(eov_sys_GetHandle());
     
     return(eores_OK);
 }
 
-extern eOresult_t eo_canmsg_watchdog_stop(EOCanMsgsWatchdog* wd)
+extern eOresult_t eo_watchdog_stop(EOwatchdog* wd)
 {
     if(NULL == wd)
     {
         return(eores_NOK_nullpointer);
     }
-    wd->startedtime = 0;
-    wd->state = wd_st_configured;
+    
+    s_eo_watchdog_reset(wd);
+    
     return(eores_OK);
 }
 // --------------------------------------------------------------------------------------------------------------------
@@ -162,17 +204,43 @@ extern eOresult_t eo_canmsg_watchdog_stop(EOCanMsgsWatchdog* wd)
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
-static eObool_t s_eo_canmsg_watchdog_configure(EOCanMsgsWatchdog* wd, eOcanmsg_watchdog_cfg_t *cfg)
+static void s_eo_watchdog_configure(EOwatchdog* wd, eOwatchdog_cfg_t *cfg)
 {
+    
     if(NULL == cfg)
     {
-        return(eobool_false);
+       
+        memcpy(&(wd->cfg), &cfg_default, sizeof(eOwatchdog_cfg_t));
     }
+    else
+    {
+        memcpy(&(wd->cfg), cfg, sizeof(eOwatchdog_cfg_t));
+    }
+
+}
+
+static void s_eo_watchdog_reset(EOwatchdog* wd)
+{
+    wd->isrunning = eobool_false;
+    wd->starttime = 0;
+}
+
+static void s_eo_watchdog_run(EOwatchdog* wd)
+{
+    wd->isrunning = eobool_true;
+    wd->starttime = eov_sys_LifeTimeGet(eov_sys_GetHandle());
+}
+
+static void s_eo_watchdog_diagnosticconfig(EOwatchdog* wd, eOwatchdog_cfg_t *cfg)
+{
+    wd->count_failures = 0;
+    wd->diagnostic_enabled = 0;
     
-    memcpy(wd->cfg, cfg, sizeof(eOcanmsg_watchdog_cfg_t));
-    wd->state = wd_st_configured;
-    wd->startedtime = 0;
-    return(eobool_true);
+
+    if((NULL != cfg) && (NULL != cfg->diagncfg.functiononfailure))
+    {
+        wd->diagnostic_enabled = 1;
+    }
 }
 
 // --------------------------------------------------------------------------------------------------------------------
