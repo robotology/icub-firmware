@@ -287,7 +287,8 @@ void Joint_update_odometry_fbk(Joint* o, CTRL_UNITS pos_fbk, CTRL_UNITS vel_fbk)
 
 void Joint_update_torque_fbk(Joint* o, CTRL_UNITS trq_fbk)
 {
-    if ((trq_fbk == o->trq_fbk) && (trq_fbk == 0.0f)) return;
+    // VALE: commented see issue 66 icub-firmware https://github.com/robotology/icub-firmware/issues/66
+    //if ((trq_fbk == o->trq_fbk) && (trq_fbk == 0.0f)) return;
     
     o->trq_fbk = trq_fbk;
     
