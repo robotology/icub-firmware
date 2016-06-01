@@ -199,4 +199,7 @@ extern BOOL Joint_set_out_ref(Joint* o, CTRL_UNITS out_ref);
 extern void Joint_stop(Joint* o);
 
 extern BOOL Joint_set_pos_ref_in_calibType6(Joint* o, CTRL_UNITS pos_ref, CTRL_UNITS vel_ref);
+
+//VALE: debug function. I'll remove it ASAP
+//extern void Joint_update_debug_current_info(Joint *o, int32_t avgCurrent, int32_t accum_Ep);
 #endif

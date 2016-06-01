@@ -874,3 +874,12 @@ static void Joint_set_inner_control_flags(Joint* o)
         o->trq_control_active = FALSE;
     }
 }
+
+//VALE: debug function. I'll remove it ASAP
+//void Joint_update_debug_current_info(Joint *o, int32_t avgCurrent, int32_t accum_Ep)
+//{
+//    if you use this function, comments updates meas_acceleration and meas_velocity in 
+//      Joint_get_state function
+//    o->eo_joint_ptr->status.core.measures.meas_acceleration = avgCurrent;
+//    o->eo_joint_ptr->status.core.measures.meas_velocity = accum_Ep;
+//}

@@ -113,4 +113,6 @@ extern void MController_motor_raise_fault_overcurrent(int m);
 
 ////////////////////////////////////////////////////////////////////////
 
+//VALE: debug function. I'll remove it ASAP
+//void MController_updated_debug_current_info(int j, int32_t avgCurrent, int32_t accum_Ep);
 #endif
