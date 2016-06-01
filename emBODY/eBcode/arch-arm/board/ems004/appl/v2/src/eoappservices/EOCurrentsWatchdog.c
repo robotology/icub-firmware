@@ -30,6 +30,7 @@
 #include "EOtheErrorManager.h"
 #include "EoError.h"
 #include "EoProtocol.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -48,7 +49,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #define FILTER_WINDOW (float) 1000.0 //make it configurable? --> could become a parameter from XML
-
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables. deprecated: better using _get(), _set() on static variables 
@@ -93,6 +93,9 @@ static eOmc_controller_t *nv_controller_ptr = NULL;
 #define SUMMPLIED_VOLTAGE_COUNTER_MAX 500
 //static const char s_eobj_ownname[] = "EOCurrentsWatchdog";
 
+static int16_t maxReadCurrent[4] ={15, 15, 15, 15};//15 mA is the cureent with no load see datasheet of motor (debug only)
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
@@ -126,6 +129,9 @@ extern EOCurrentsWatchdog* eo_currents_watchdog_Initialise(void)
 
     s_eo_currents_watchdog.accomulatorEp = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_auto, sizeof(float), s_eo_currents_watchdog.numberofmotors);
     memset(s_eo_currents_watchdog.accomulatorEp, 0, s_eo_currents_watchdog.numberofmotors*sizeof(float));
+    
+    s_eo_currents_watchdog.motorinI2Tfault = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_auto, sizeof(eObool_t), s_eo_currents_watchdog.numberofmotors);
+    memset(s_eo_currents_watchdog.motorinI2Tfault, 0, s_eo_currents_watchdog.numberofmotors*sizeof(eObool_t)); //all motors are not in I2t fault
 
     s_eo_currents_watchdog.initted = eobool_true;
     
@@ -151,6 +157,7 @@ extern EOCurrentsWatchdog* eo_currents_watchdog_GetHandle(void)
 
 extern eOresult_t eo_currents_watchdog_UpdateCurrentLimits(EOCurrentsWatchdog* p, uint8_t motor)
 {
+    char str[eomn_info_status_extra_sizeof];
     if (p == NULL)
     {
         return(eores_NOK_nullpointer);
@@ -167,6 +174,15 @@ extern eOresult_t eo_currents_watchdog_UpdateCurrentLimits(EOCurrentsWatchdog* p
     s_eo_currents_watchdog.nominalCurrent2[motor] = (float)(nc*nc);
     s_eo_currents_watchdog.I2T_threshold[motor] = (float)((pc*pc) - s_eo_currents_watchdog.nominalCurrent2[motor]); 
     
+    
+    eOerrmanDescriptor_t errdes = {0};
+    errdes.code                 = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag00);
+    errdes.par16                = motor;
+    errdes.sourcedevice         = eo_errman_sourcedevice_localboard;
+    errdes.sourceaddress        = 0;  
+
+    snprintf(str, sizeof(str), "nc2=%.4f I2T=%.4f", s_eo_currents_watchdog.nominalCurrent2[motor], s_eo_currents_watchdog.I2T_threshold[motor]);
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, str, NULL, &errdes);
     return(eores_OK);
 }
 
@@ -192,7 +208,27 @@ extern void eo_currents_watchdog_Tick(EOCurrentsWatchdog* p, int16_t voltage, in
         //error flags signalling is done internally
         s_eo_currents_watchdog_CheckSpike(i, current_value);
         //VALE: I disabled check I2T until I have nominal and peack current values
-        //s_eo_currents_watchdog_CheckI2T(i, current_value);
+        s_eo_currents_watchdog_CheckI2T(i, current_value);
+        
+
+        //added following code only 4 debug purpose
+        if(current_value > maxReadCurrent[i])
+        {
+            maxReadCurrent[i] = current_value;
+//            if(0 == i)//only for first joint
+//            {
+//                
+//                eOerrmanDescriptor_t errdes = {0};
+//                errdes.code                 = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag00);
+//                errdes.par16                = i;
+//                errdes.sourcedevice         = eo_errman_sourcedevice_localboard;
+//                errdes.sourceaddress        = 0;  
+//                char str[eomn_info_status_extra_sizeof];
+//                snprintf(str, sizeof(str), "NEW MAX CURR VAL: =%d ", current_value);
+//                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, str, NULL, &errdes);
+//            }
+        }
+
     }
     
     
@@ -248,7 +284,7 @@ static void s_eo_currents_watchdog_UpdateMotorCurrents(uint8_t motor, int16_t va
 
 static void s_eo_currents_watchdog_CheckSpike(uint8_t motor, int16_t value)
 {
-	// single sample cannot be above a certain treshold
+    // single sample cannot be above a certain treshold
     
     //change sign to check absolute value
     if (value < 0)
@@ -266,7 +302,7 @@ static void s_eo_currents_watchdog_CheckSpike(uint8_t motor, int16_t value)
 
 static void s_eo_currents_watchdog_CheckI2T(uint8_t motor, int16_t value)
 {
-	// apply a simple LOW-PASS filter and if the value is above a threshold signal the error
+    // apply a simple LOW-PASS filter and if the value is above a threshold signal the error
     
     // IMPLEMENTATION OF LOW-PASSFILTER TO CHECK I2T INSIDE 2FOC FW
     /*
@@ -306,18 +342,49 @@ static void s_eo_currents_watchdog_CheckI2T(uint8_t motor, int16_t value)
     // 1) calculate Ep
     float Ep_aux= (averageCurrent*averageCurrent) - s_eo_currents_watchdog.nominalCurrent2[motor];
     
-    if(Ep_aux < 0) //Ep could not be smaller than zero
-    {
-        Ep_aux = 0;
-    }
+    
     s_eo_currents_watchdog.accomulatorEp[motor] += Ep_aux;
+    
+    if(s_eo_currents_watchdog.accomulatorEp[motor] < 0) //Ep could not be smaller than zero
+    {
+        s_eo_currents_watchdog.accomulatorEp[motor] = 0;
+    }
+    
+    //debug in order to send value to robot interface
+    //MController_updated_debug_current_info(motor, averageCurrent, s_eo_currents_watchdog.accomulatorEp[motor]);
+    
+    
 
-    // 2) check if current Ep is bigger than thresholdeo_motioncontrol_extra_GetMotorFaultMask(eo_motioncontrol_GetHandle(),motor)
+    // 2) check if current Ep is bigger than threshold then rais fault
     if( s_eo_currents_watchdog.accomulatorEp[motor] > s_eo_currents_watchdog.I2T_threshold[motor])
     {
-        //signal the I2T error to EOemsController
+        s_eo_currents_watchdog.motorinI2Tfault[motor] = eobool_true;
         
         MController_motor_raise_fault_i2t(motor);
+    }
+    else
+    {
+        //I need to raise I2T fault until the current system energy is not littler than I2T threshold divided 2. (we decided so....)
+        if(s_eo_currents_watchdog.motorinI2Tfault[motor])
+        {
+            if(s_eo_currents_watchdog.accomulatorEp[motor] > (s_eo_currents_watchdog.I2T_threshold[motor]/2))
+            {
+                MController_motor_raise_fault_i2t(motor);
+            }
+            else
+            {
+                eOerrmanDescriptor_t errdes = {0};
+                errdes.code                 = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag00);
+                errdes.par16                = motor;
+                errdes.sourcedevice         = eo_errman_sourcedevice_localboard;
+                errdes.sourceaddress        = 0;  
+                char str[100];
+                snprintf(str, sizeof(str), "Ep < I2T/2: now it is possible put in idle the motor");
+                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, str, NULL, &errdes);
+                
+                s_eo_currents_watchdog.motorinI2Tfault[motor] = eobool_false;
+            }
+        }
     }
     
     // 3) reset average data

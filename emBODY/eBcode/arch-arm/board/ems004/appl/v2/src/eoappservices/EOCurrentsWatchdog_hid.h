@@ -50,6 +50,7 @@ struct EOCurrentsWatchdog_hid
     eoCurrentWD_averageData_t*  avgCurrent;
     float*                      accomulatorEp; //Ep_t = (averageCurrent_t^2-nominalCurrent^2) + Ep_t-1, where Ep_t is Ep at time t
     eObool_t                    initted;
+    eObool_t                    *motorinI2Tfault;
 }; 
 
 
