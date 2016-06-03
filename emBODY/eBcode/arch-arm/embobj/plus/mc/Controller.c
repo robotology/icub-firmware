@@ -6,6 +6,10 @@
 
 #include "EOemsControllerCfg.h"
 
+#include "EOtheErrorManager.h"
+
+#include "EoError.h"
+
 #include "EOtheEntities.h"
 
 #include "Joint.h"
@@ -814,6 +818,25 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         return;
     }
     
+    //check multi encoder compatibility
+    //currently all joint of same board have the the same number of multiple encoder. so i use j0
+    const eOmn_serv_jomo_descriptor_t *jomodes = (eOmn_serv_jomo_descriptor_t*) eo_constarray_At(carray, 0);
+    uint8_t cfg_multienc = (uint8_t) eomn_mc_sensor_getnumofcomponets((eOmn_serv_mc_sensor_type_t)jomodes->sensor.type);
+    if(o->multi_encs != cfg_multienc)
+    {
+        eOerrmanDescriptor_t errdes;
+        char str[50];
+        snprintf(str, sizeof(str), "multiEnc check: par16=mc par64=cfg");
+        errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag04);
+        errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+        errdes.sourceaddress    = 0;
+        errdes.par16            = o->multi_encs;
+        errdes.par64            = cfg_multienc;
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, str, NULL, &errdes);
+    
+    }
+    
+    
     for (int s=0; s<o->nSets; ++s) o->enc_set_dim[s] = 0;
     
     for (int e=0; e<o->nEncods; ++e)
@@ -1072,13 +1095,14 @@ void MController_update_joint_torque_fbk(uint8_t j, CTRL_UNITS trq_fbk) //
     Joint_update_torque_fbk(smc->joint+j, trq_fbk);
 }
 
-void MController_update_absEncoder_fbk(uint8_t e, uint16_t* positions) //
+void MController_update_absEncoder_fbk(uint8_t e, uint32_t* positions) //
 {
     AbsEncoder* enc = smc->absEncoder + e*smc->multi_encs;
     
     for (int k=0; k<smc->multi_encs; ++k)
     {
-        AbsEncoder_update(enc++, positions[k]);
+        uint16_t pos = EO_CLIP_UINT16(positions[k]);
+        AbsEncoder_update(enc++, pos);
     }
 }
 

@@ -61,6 +61,13 @@ typedef enum
     encreader_err_CHIP      = 3
 } eOencoderreader_errortype_t;
 
+typedef struct
+{
+    uint32_t                                value[eomn_serv_mc_sensor_nuomofcomp_max];
+    eOencoderreader_errortype_t             errortype;
+    eOmn_serv_mc_sensor_nuomofcomponents_t  composedof;
+} eOencoderreader_valueInfo_t;
+
 //typedef eOresult_t (*eOencoderreader_onendofoperation_fun_t) (EOtheEncoderReader* p, eObool_t operationisok);
 
 
@@ -93,7 +100,7 @@ extern eOresult_t eo_encoderreader_StartReading(EOtheEncoderReader *p);
 
 extern eObool_t eo_encoderreader_IsReadingAvailable(EOtheEncoderReader *p);
 
-extern eOresult_t eo_encoderreader_Read(EOtheEncoderReader *p, uint8_t position, uint32_t *primary, uint32_t *secondary, eOencoderreader_errortype_t *error1, eOencoderreader_errortype_t *error2);
+extern eOresult_t eo_encoderreader_Read(EOtheEncoderReader *p, uint8_t position, eOencoderreader_valueInfo_t *primary, eOencoderreader_valueInfo_t *secondary);
 
 extern eOresult_t eo_encoderreader_Diagnostics_Tick(EOtheEncoderReader* p);
 

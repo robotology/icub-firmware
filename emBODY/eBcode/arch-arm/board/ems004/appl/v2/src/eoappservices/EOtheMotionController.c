@@ -1267,25 +1267,23 @@ static eOresult_t s_eo_motioncontrol_updatedPositionsFromEncoders(EOtheMotionCon
     // read the encoders        
     for(uint8_t i=0; i<p->numofjomos; i++)
     {
-        uint32_t extra = 0;
-        uint32_t enc_value = 0;
-        eOencoderreader_errortype_t error_type;
+        eOencoderreader_valueInfo_t primary, secondary;
         const eOmn_serv_jomo_descriptor_t *jomodes = (eOmn_serv_jomo_descriptor_t*) eo_constarray_At(p->ctrlobjs.jomodescriptors, i);   
-        
-        res = eo_encoderreader_Read(eo_encoderreader_GetHandle(), i, &enc_value, &extra, &error_type, NULL);
+
+        res = eo_encoderreader_Read(eo_encoderreader_GetHandle(), i, &primary, &secondary);
         if (res != eores_OK)
         {
             error_mask |= 1<<(i<<1);
-            MController_invalid_absEncoder_fbk(i, error_type);
+            MController_invalid_absEncoder_fbk(i, primary.errortype);
             res = eores_NOK_generic;
         }
         else
         {
-            MController_update_absEncoder_fbk(i, (uint16_t*)&enc_value);
+            MController_update_absEncoder_fbk(i, primary.value);
         
             if(eomn_serv_mc_sensor_pos_atmotor == jomodes->extrasensor.pos) 
             {
-                MController_update_motor_pos_fbk(i, extra);
+                MController_update_motor_pos_fbk(i, (int32_t)secondary.value[0]);
             }
         }
     } 
