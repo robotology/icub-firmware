@@ -334,7 +334,7 @@ extern "C" {
 
 //  <o> max size of output datagrams <16-128>
 //  <i> default: 32
-#define EOMTHEEMSAPPLCFG_DISCOVERY_OUTDGRAMSIZEOF                  32
+#define EOMTHEEMSAPPLCFG_DISCOVERY_OUTDGRAMSIZEOF                  64
 
 //  </h>datagrams in socket
 
