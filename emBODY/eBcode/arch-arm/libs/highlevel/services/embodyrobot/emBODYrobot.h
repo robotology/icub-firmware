@@ -77,6 +77,7 @@ extern "C" {
 #define boardEMS001             10
 #define boardEMS4RD             11
 #define boardMC4PLUS            12
+#define boardMC2PLUS            13
 
 // must be the value of most recent board + 1
 #define boardNumberOf           13
