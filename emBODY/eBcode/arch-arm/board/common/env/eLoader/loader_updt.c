@@ -52,6 +52,8 @@
 
 #include "emBODYrobot.h"
 
+#include "EoBoards.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -146,15 +148,15 @@ static const eEmoduleExtendedInfo_t s_loader_info_extended __attribute__((at(EEN
                 .version    = 
                 { 
                     .major = 2, 
-                    .minor = 11
+                    .minor = 12
                 },  
                 .builddate  = 
                 {
-                    .year  = 2015,
-                    .month = 5,
-                    .day   = 26,
-                    .hour  = 11,
-                    .min   = 11
+                    .year  = 2016,
+                    .month = 6,
+                    .day   = 6,
+                    .hour  = 14,
+                    .min   = 22
                 }
             },
             .rom        = 
@@ -296,7 +298,7 @@ static eEboardInfo_t s_loader_boardinfo =
         .entity     =
         {
             .type       = ee_entity_board,
-            .signature  = 0x11,
+            .signature  = eobrd_ems4,
             .version    = 
             { 
                 .major = 1, 
@@ -394,7 +396,7 @@ static eEboardInfo_t s_loader_boardinfo =
         .entity     =
         {
             .type       = ee_entity_board,
-            .signature  = 0x11,
+            .signature  = eobrd_mc4plus,
             .version    = 
             { 
                 .major = 1, 
@@ -402,7 +404,7 @@ static eEboardInfo_t s_loader_boardinfo =
             },  
             .builddate  = 
             {
-                .year  = 2015,
+                .year  = 2016,
                 .month = 1,
                 .day   = 1,
                 .hour  = 12,
@@ -427,6 +429,53 @@ static eEboardInfo_t s_loader_boardinfo =
         },
         .communication  = ee_commtype_eth | ee_commtype_can1 | ee_commtype_can2,
         .name           = "mc4plus"
+    },
+    .uniqueid       = 0,
+    .extra          = {0}
+};
+
+#elif   defined(boardMC2PLUS)
+
+static eEboardInfo_t s_loader_boardinfo =                        
+{
+    .info           =
+    {
+        .entity     =
+        {
+            .type       = ee_entity_board,
+            .signature  = eobrd_mc2plus,
+            .version    = 
+            { 
+                .major = 1, 
+                .minor = 0
+            },  
+            .builddate  = 
+            {
+                .year  = 2016,
+                .month = 6,
+                .day   = 6,
+                .hour  = 12,
+                .min   = 0
+            }
+        },
+        .rom        = 
+        {   
+            .addr   = EENV_ROMSTART,
+            .size   = EENV_ROMSIZE
+        },
+        .ram        = 
+        {   
+            .addr   = EENV_RAMSTART,
+            .size   = EENV_RAMSIZE
+        },
+        .storage    = 
+        {
+            .type   = ee_strg_eeprom,
+            .size   = EENV_STGSIZE,
+            .addr   = EENV_STGSTART
+        },
+        .communication  = ee_commtype_eth | ee_commtype_can1 | ee_commtype_can2,
+        .name           = "mc2plus"
     },
     .uniqueid       = 0,
     .extra          = {0}
