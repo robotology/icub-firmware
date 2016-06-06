@@ -825,9 +825,12 @@ void Motor_get_state(Motor* o, eOmc_motor_status_t* motor_status)
     //motor_status->basic.mot_position = o->pos_fbk;
     //motor_status->basic.mot_velocity = o->vel_fbk;
 
-    motor_status->basic.mot_acceleration = 0; // not implemented
-    motor_status->basic.mot_current  = o->Iqq_fbk;    
+    motor_status->basic.mot_acceleration = 0; // not implemented  
+    
+    motor_status->basic.mot_current  = o->Iqq_peak_fbk; //o->Iqq_fbk;    
     motor_status->basic.mot_pwm      = o->pwm_fbk;
+    
+    
 }
 
 void Motor_update_odometry_fbk_can(Motor* o, CanOdometry2FocMsg* can_msg) //
@@ -869,6 +872,8 @@ void Motor_update_pos_fbk(Motor* o, int32_t position_raw)
 
 void Motor_update_current_fbk(Motor* o, int16_t current)
 {
+    if (abs(current) > o->Iqq_peak_fbk) o->Iqq_peak_fbk = abs(current);
+    
     o->Iqq_fbk = current;
 }
 

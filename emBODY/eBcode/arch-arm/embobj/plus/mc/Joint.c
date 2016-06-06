@@ -384,7 +384,7 @@ BOOL Joint_manage_cable_constraint(Joint* o)
             int32_t motor_back = o->cable_constr.last_motor_closing_pos - o->pos_fbk_from_motors;
             int32_t joint_back = o->cable_constr.last_joint_closing_pos - o->pos_fbk;
 
-            if (motor_back - joint_back > 3000) return TRUE;
+            if (motor_back - joint_back > HAND_CABLE_BACK_LIMIT) return TRUE;
         }
     }
     
@@ -612,7 +612,7 @@ CTRL_UNITS Joint_do_vel_control(Joint* o)
                     else
                     {
                         //o->vel_ref += o->scKvel*o->vel_err + o->scKpos*o->pos_err;
-                        o->vel_ref = o->scKvel*o->vel_ref + o->scKpos*o->pos_err;
+                        o->vel_ref  = o->scKvel*o->vel_ref + o->scKpos*o->pos_err;
                     }
                 }
                 

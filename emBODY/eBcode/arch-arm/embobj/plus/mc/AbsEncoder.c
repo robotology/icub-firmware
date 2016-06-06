@@ -383,8 +383,7 @@ void AbsEncoder_update(AbsEncoder* o, uint16_t position)
     
     o->position_last = position;
 
-    if( ((o->spike_mag_limit != 0 ) && (-o->spike_mag_limit <= check && check <= o->spike_mag_limit)) || //if spike_mag_limit has been configured and there is not a spike
-        (o->spike_mag_limit == 0 )) // or spike_mag_limit has not been configured
+    if( (o->spike_mag_limit == 0) || (-o->spike_mag_limit <= check && check <= o->spike_mag_limit))
     {
         int16_t delta = position - o->position_sure;
 

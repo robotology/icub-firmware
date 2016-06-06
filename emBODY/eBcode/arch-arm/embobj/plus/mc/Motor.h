@@ -170,6 +170,7 @@ typedef struct //Motor
     int32_t Iqq_max;
     int32_t Iqq_ref;
     int32_t Iqq_fbk;
+    int32_t Iqq_peak_fbk;
     int32_t Iqq_err;
     
     CTRL_UNITS trq_max;

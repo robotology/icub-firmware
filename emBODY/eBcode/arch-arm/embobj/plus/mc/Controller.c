@@ -190,7 +190,23 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         switch(jomodes->sensor.type)
         {
             case eomn_serv_mc_sensor_encoder_spichainof2:
-            case eomn_serv_mc_sensor_encoder_spichainof3:       
+            {
+                for (int e=0; e<2; ++e)
+                {
+                    o->absEncoder[k*2+e].type = eomc_encoder_AEA;
+                    o->absEncoder[k*2+e].fake = FALSE;
+                }
+                break;
+            }
+            case eomn_serv_mc_sensor_encoder_spichainof3:
+            {
+                for (int e=0; e<3; ++e)
+                {
+                    o->absEncoder[k*3+e].type = eomc_encoder_AEA;
+                    o->absEncoder[k*3+e].fake = FALSE;
+                }
+                break;
+            }                
             case eomn_serv_mc_sensor_encoder_aea:
             {
                 o->absEncoder[k].type = eomc_encoder_AEA;
@@ -514,8 +530,8 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
     
         Sje = o->Sje;
 
-        Sje[0][0] = -1.0f; Sje[0][1] =  1.0f;  Sje[0][2] =  0.0f; Sje[0][3] =  0.0f;
-        Sje[1][0] =  0.0f; Sje[1][1] =  0.0f;  Sje[1][2] =  1.0f; Sje[1][3] = -1.0f;
+        Sje[0][0] = -1.0f; Sje[0][1] =  1.0f;  Sje[0][2] =  0.0f; Sje[0][3] = 0.0f;
+        Sje[1][0] =  0.0f; Sje[1][1] =  0.0f;  Sje[1][2] = -1.0f; Sje[1][3] = 1.0f;
 
         o->e2s[0] = o->e2s[1] = 0;
         o->e2s[2] = o->e2s[3] = 1;
@@ -1338,9 +1354,9 @@ void MController_config_vel_pid(int j, eOmc_PID_t *pid_conf)
     //joint->scKvel   = pid_conf->kp;
     //joint->scKpos   = pid_conf->ki;
     
-    joint->scKpos   = pid_conf->kp;
-    joint->scKvel   = pid_conf->kd;
-    joint->scKstill = pid_conf->ki;
+    //joint->scKpos   = pid_conf->kp;
+    //joint->scKvel   = pid_conf->kd;
+    //joint->scKstill = pid_conf->ki;
     
     PID_config(&(joint->velPID), pid_conf);
 }
