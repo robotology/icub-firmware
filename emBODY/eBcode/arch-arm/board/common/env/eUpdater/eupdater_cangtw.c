@@ -37,7 +37,7 @@
 #include "osal_system.h"
 
 
-// embobj  
+
 #include "EoCommon.h"
 #include "EOtheErrormanager.h"
 #include "EOMtask.h"
@@ -53,6 +53,9 @@
 
 // sm
 #include "eOcfg_sm_CanGtw.h"
+
+
+#include "eupdater-info.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -85,8 +88,10 @@
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
-extern EOMtask*                 eupdater_task_cangateway           = NULL;
-extern EOsocketDatagram*        eupdater_sock_cangateway           = NULL;
+EOMtask*                 eupdater_task_cangateway           = NULL;
+EOsocketDatagram*        eupdater_sock_cangateway           = NULL;
+
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -118,9 +123,25 @@ static EOsm*                    s_sm_cangtw                 = NULL;
 
 static osal_semaphore_t *startup_done_semaphore = NULL; 
 
+
+
+static const cangtw_parameters_t default_params =
+{
+    .t_can_stabilisation    = 900,
+    .t_wait_ff_reply        = 0,
+    .send_ff                = eobool_false,
+    .clear_can_onentry_gtw  = eobool_false,
+    .send_ack               = eobool_false    
+};
+
+
+static cangtw_parameters_t eupdater_cantw_parameters = {0};
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
+
 
 extern eOresult_t eupdater_cangtw_block_until_startup(void)
 {
@@ -136,12 +157,19 @@ extern eOresult_t eupdater_cangtw_block_until_startup(void)
     return(eores_OK);    
 }
 
+extern const cangtw_parameters_t * eupdater_cangtw_get_parameters(void)
+{
+    return(&eupdater_cantw_parameters);
+}
+
 extern void eupdater_cangtw_init(void)
 {
     if(0 != s_status)
     {
         return;
     }
+    
+    memcpy(&eupdater_cantw_parameters, &default_params, sizeof(eupdater_cantw_parameters));
     
     startup_done_semaphore = osal_semaphore_new(2, 0); // but as it is used as a binary sempahore, 1 would be ok. what is important is the second arg: 0
     
@@ -153,16 +181,24 @@ extern void eupdater_cangtw_init(void)
     s_status = 1;    
 }
 
-extern void eupdater_cangtw_start(eOipv4addr_t remipaddr)
-{   
-    if(1 != s_status)
+extern void eupdater_cangtw_start(eOipv4addr_t remipaddr, const cangtw_parameters_t *params)
+{     
+    if(NULL == params)
     {
-        return;
+       params = &default_params;      
     }
     
-    char str[128];
-    snprintf(str, sizeof(str), "sending event_cangtw_start = %d", event_cangtw_start);
-    hal_trace_puts(str); 
+    memcpy(&eupdater_cantw_parameters, params, sizeof(eupdater_cantw_parameters)); 
+    
+    if(1 != s_status)
+    {
+        // already started ... we force an enter run again ...
+        eom_task_SetEvent(eupdater_task_cangateway, event_cangtw_go2run);     
+        return;
+    }    
+    
+    
+    // eupdater_info_trace(NULL, "sending event_cangtw_start = %d", event_cangtw_start);
 
     eupdater_cangtw_set_remote_addr(remipaddr);
     
@@ -286,18 +322,14 @@ extern void cangateway_hid_hal_enable(void)
 
 static void s_cangateway_startup(EOMtask *p, uint32_t t)
 {
-    char str[96];
- 
 
     // initialise the socket
     // up to 16 packets of 64 bytes ...    
     eupdater_sock_cangateway = eo_socketdtg_New (   16, eupdater_cangtw_udp_packet_maxsize, eom_mutex_New(), // input queue
                                                     16, eupdater_cangtw_udp_packet_maxsize, eom_mutex_New()  // output queue
-                                                );
-   
-
-    snprintf(str, sizeof(str), "opening a txrx socket on port %d for can gateway\n\r", s_cangtw_port);
-    hal_trace_puts(str);
+                                                );   
+    
+    eupdater_info_trace("canGTW", "opening a txrx socket on port %d", s_cangtw_port);
 
     EOaction_strg action_strg;
     EOaction* act = (EOaction*)&action_strg;  
@@ -321,9 +353,7 @@ static void s_cangateway_run(EOMtask *p, uint32_t t)
     eOevent_t evt = (eOevent_t) t;
     
 #if defined(_DEBUG_MODE_FULL_)    
-    char str[128];
-    snprintf(str, sizeof(str), "received event %d", evt);
-    hal_trace_puts(str);      
+    eupdater_info_trace(NULL, "received event %d", evt);    
 #endif    
     
     if(eobool_true == eo_common_event_check(evt, event_cangtw_start))
@@ -331,15 +361,10 @@ static void s_cangateway_run(EOMtask *p, uint32_t t)
         eo_sm_ProcessEvent(s_sm_cangtw, eo_sm_cangtw_evstart);        
     }
 
-    if(eobool_true == eo_common_event_check(evt, event_cangtw_blmsg1))
+    if(eobool_true == eo_common_event_check(evt, event_cangtw_canstable))
     {
-        eo_sm_ProcessEvent(s_sm_cangtw, eo_sm_cangtw_evcanblmsg1);        
+        eo_sm_ProcessEvent(s_sm_cangtw, eo_sm_cangtw_evcanstable);        
     }    
-
-    if(eobool_true == eo_common_event_check(evt, event_cangtw_blmsg2))
-    {
-        eo_sm_ProcessEvent(s_sm_cangtw, eo_sm_cangtw_evcanblmsg2);        
-    } 
     
     if(eobool_true == eo_common_event_check(evt, event_cangtw_go2run))
     {
@@ -372,6 +397,7 @@ static void s_isr_alert_cangtwtask_can2(void* p)
 {
     eom_task_isrSetEvent(eupdater_task_cangateway, event_cangtw_can2_rec);   
 }
+
 
 
 

@@ -222,14 +222,35 @@ extern void task_ethcommand(void *p)
 
 static void s_udpnode_errman_OnError(eOerrmanErrorType_t errtype, const char *info, eOerrmanCaller_t *caller, const eOerrmanDescriptor_t *des)
 {
-    //const char err[4][16] = {"info", "warning", "weak error", "fatal error"};
-    char str[128];
-
-    const char EOu[] = "EO?";
-    const char *eobjstr = (NULL == caller) ? (EOu) : (caller->eobjstr);
-    eOid08_t taskid = (NULL == caller) ? (0) : (caller->taskid);
-    snprintf(str, sizeof(str), "[eobj: %s, tsk: %d] %s: %s", eobjstr, taskid, eo_errman_ErrorStringGet(eo_errman_GetHandle(), errtype), info);
-    hal_trace_puts(str);
+    const char empty[] = "EO?";
+    // const char *err = eo_errman_ErrorStringGet(eo_errman_GetHandle(), errtype);
+    const char *eobjstr = (NULL == caller) ? (empty) : ((NULL == caller->eobjstr) ? (empty) : (caller->eobjstr));
+    const uint32_t taskid = (NULL == caller) ? (0) : (caller->taskid);
+    
+    char text[128];
+    uint64_t tt = eov_sys_LifeTimeGet(eov_sys_GetHandle());
+    uint32_t sec = tt/(1000*1000);
+    uint32_t tmp = tt%(1000*1000);
+    uint32_t msec = tmp / 1000;
+    uint32_t usec = tmp % 1000;    
+    
+    if(eo_errortype_trace == errtype)
+    {   // it is a trace
+        
+        if(NULL != info)
+        {
+            snprintf(text, sizeof(text), "[TRACE] (%s @s%dm%du%d)-> %s.", eobjstr, sec, msec, usec, info); 
+        }
+        else
+        {
+            snprintf(text, sizeof(text), "[TRACE] (%s @s%dm%du%d)-> ...", eobjstr, sec, msec, usec); 
+        }
+        hal_trace_puts(text);
+        return;            
+    }    
+    
+    snprintf(text, sizeof(text), "[eobj: %s, tsk: %d] %s: %s", eobjstr, taskid, eo_errman_ErrorStringGet(eo_errman_GetHandle(), errtype), info);
+    hal_trace_puts(text);
 
     if(errtype <= eo_errortype_error)
     {
@@ -238,6 +259,7 @@ static void s_udpnode_errman_OnError(eOerrmanErrorType_t errtype, const char *in
 
     for(;;);
 }
+
 
 static uint8_t *ipaddr = NULL;
 
@@ -248,7 +270,6 @@ static void s_eom_eupdater_main_init(void)
 #ifndef _USE_IPADDR_FROM_IPAL_CFG_
     const eEipnetwork_t *ipnet = NULL;
 #endif    
-    char str[96];
 
     const eOmipnet_cfg_dtgskt_t eom_ipnet_dtgskt_MyCfg = 
     { 
@@ -271,12 +292,11 @@ static void s_eom_eupdater_main_init(void)
     ipaddr  = (uint8_t*)&(ipalcfg->eth_ip);
     
     
-#if !defined(_MAINTAINER_APPL_)     
-    snprintf(str, sizeof(str), "starting EOMeUpdater:: \n\r");
-#else
-    snprintf(str, sizeof(str), "starting EOMeMaintainer:: \n\r");
-#endif  
-    hal_trace_puts(str);
+//#if !defined(_MAINTAINER_APPL_)     
+//    eupdater_info_trace("MAIN", "starting eUpdater:");
+//#else
+//    eupdater_info_trace("MAIN", "starting eMaintainer");
+//#endif  
 
     // eeprom is used for shared services but is initted also inside there
     hal_eeprom_init(hal_eeprom_i2c_01, NULL);
@@ -311,9 +331,8 @@ static void s_eom_eupdater_main_init(void)
     hal_eth_lowLevelUsePacket_ptr = s_verify_eth_isr;
 #endif
 
-    // start the ipnet
-    snprintf(str, sizeof(str), "starting ::ipnet with IP addr: %d.%d.%d.%d\n\r", ipaddr[0], ipaddr[1], ipaddr[2], ipaddr[3]);
-    hal_trace_puts(str);    
+//    // start the ipnet
+    eupdater_info_trace("MAIN", "starting ::ipnet with IP addr: %d.%d.%d.%d\n\r", ipaddr[0], ipaddr[1], ipaddr[2], ipaddr[3]); 
 
     eom_ipnet_Initialise(&eom_ipnet_DefaultCfg,
                          ipalcfg, 
@@ -332,8 +351,7 @@ static void s_eom_eupdater_main_init(void)
     
 
     // the eth command task 
-    snprintf(str, sizeof(str), "starting ::taskethcommand");
-    hal_trace_puts(str);                         
+//    eupdater_info_trace("MAIN", "starting ::taskethcommand");                       
 
     s_task_ethcommand = eom_task_New(eom_mtask_MessageDriven, 101, 2*1024, s_ethcommand_startup, s_ethcommand_run,  16, 
                                     eok_reltimeINFINITE, NULL, 
@@ -344,22 +362,18 @@ static void s_eom_eupdater_main_init(void)
     
 #if !defined(_MAINTAINER_APPL_)
     // there is also the can gateway
-    snprintf(str, sizeof(str), "starting ::cangateway");
-    hal_trace_puts(str);    
+//    eupdater_info_trace("MAIN", "starting ::cangateway");    
     eupdater_cangtw_init();
 #endif
 
     // eval if and when jumping
-    snprintf(str, sizeof(str), "calling ::evalwhenjumping");
-    hal_trace_puts(str);  
+//    eupdater_info_trace("MAIN", "calling ::evalwhenjumping");
     eupdater_parser_evalwhenjumping(); 
 }
 
 
 static void s_ethcommand_startup(EOMtask *p, uint32_t t)
 {
-    char str[96];
- 
     // init the rx and tx packets 
     s_rxpkt_ethcmd = eo_packet_New(1024);  
     s_txpkt_ethcmd = eo_packet_New(1024);
@@ -372,8 +386,7 @@ static void s_ethcommand_startup(EOMtask *p, uint32_t t)
                                       2, 1024, eom_mutex_New()  // output queue
                                    );   
 
-    snprintf(str, sizeof(str), "opening a txrx socket on port %d for eth messages\n\r", s_ethcmd_port);
-    hal_trace_puts(str);
+//    eupdater_info_trace("MAIN", "opening a txrx socket on port %d for eth messages\n\r", s_ethcmd_port);
 
 
     // set the rx action on socket to be a message s_message_from_skt_ethcmd to this task object
@@ -597,12 +610,9 @@ static void s_verify_eth_isr(uint8_t* packet, uint32_t size)
 {
     uint8_t* udp_data = NULL;
     uint32_t udp_size = 0;
-//    
-//    char str[64];
- //   snprintf(str, sizeof(str), "HALE %x %d", udp[0], udp[1]);
- //   hal_trace_puts(str);
+
     
-const eo_lowLevParser_ethernetHeader         *ethernet;  /* The ethernet header [1] */
+    const eo_lowLevParser_ethernetHeader         *ethernet;  /* The ethernet header [1] */
     const eo_lowLevParser_IPHeader               *ip;              /* The IP header */
     const eo_lowLevParser_UDPHeader              *udp_h;         /* The UDP header */
 //    /*const*/ uint8_t                            *payload = NULL;                    /* Packet payload */

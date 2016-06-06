@@ -34,6 +34,11 @@
 #include "osal.h"
 #include "ipal.h"
 
+#include <stdio.h>
+#include <stdarg.h>
+
+#include "EOtheErrormanager.h"
+
 #include "EOMtheSystem.h"
 
 
@@ -126,7 +131,7 @@ extern const ipal_cfg_t    ipal_cfg;
 //    .extra      = {0}
 //};
 
-#elif (emBODYrobot_BOARD_NAME == boardEMS4RD) | (emBODYrobot_BOARD_NAME == boardMC4PLUS)
+#elif (emBODYrobot_BOARD_NAME == boardEMS4RD) | (emBODYrobot_BOARD_NAME == boardMC4PLUS) | (emBODYrobot_BOARD_NAME == boardMC2PLUS)
 
 
 const eEmoduleExtendedInfo_t eupdater_modinfo_extended __attribute__((at(EENV_MEMMAP_EUPDATER_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
@@ -142,15 +147,15 @@ const eEmoduleExtendedInfo_t eupdater_modinfo_extended __attribute__((at(EENV_ME
                 .version    = 
                 { 
                     .major = 2, 
-                    .minor = 17
+                    .minor = 18
                 },  
                 .builddate  = 
                 {
-                    .year  = 2015,
+                    .year  = 2016,
                     .month = 6,
-                    .day   = 15,
-                    .hour  = 11,
-                    .min   = 37
+                    .day   = 6,
+                    .hour  = 14,
+                    .min   = 34
                 }
             },
             .rom        = 
@@ -221,7 +226,34 @@ const ipal_cfg_t* const eupdater_ipal_cfg = &ipal_cfg;
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+#define UPDATER_USE_TRACE
+#define UPDATER_USE_FULL_TRACE
+
+extern void eupdater_info_trace(const char *caller, char *format, ...)
+{
+#if defined(UPDATER_USE_TRACE)
+    
+#if defined(UPDATER_USE_FULL_TRACE)    
+    char str[96];
+//    char at[24];
+    uint32_t ms = osal_system_ticks_abstime_get() / 1000;
+    va_list args;
+    va_start(args, format);
+    vsnprintf(str, sizeof(str), format, args);
+    va_end(args);    
+    
+//    snprintf(at, sizeof(at), " @ ms %d", ms)    strcat(str, at);
+//    hal_trace_puts(str);      
+      
+    eo_errman_Trace(eo_errman_GetHandle(), str, caller);
+
+#else    
+    hal_trace_puts(caller);
+#endif
+ 
+#endif    
+}
 
 
 // --------------------------------------------------------------------------------------------------------------------

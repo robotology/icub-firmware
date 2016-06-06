@@ -22,7 +22,11 @@
 #include "osal.h"
 #include "stdint.h"
 
+#include "EoCommon.h"
+
+
 extern void upd_core_init(void);
-extern uint8_t upd_core_manage_cmd(uint8_t *pktin, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout);
+
+extern uint8_t upd_core_manage_cmd(uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout);
 
 #endif

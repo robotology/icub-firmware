@@ -45,12 +45,11 @@ typedef enum
 {
 	eo_sm_cangtw_evdummy    =  eo_sm_evNONE,        /**< the null event derived from eOsmBasicEvents_t */
 	eo_sm_cangtw_evstart 	= (eOsmEvent_t) 0,	    /**< another event managed by the example state machine */
-	eo_sm_cangtw_evcanblmsg1= (eOsmEvent_t) 1,		/**< another event managed by the example state machine */
-    eo_sm_cangtw_evcanblmsg2= (eOsmEvent_t) 2,		/**< another event managed by the example state machine */
-	eo_sm_cangtw_evgo2run   = (eOsmEvent_t) 3,		/**< another event managed by the example state machine */
-	eo_sm_cangtw_evrxeth    = (eOsmEvent_t) 4,		/**< another event managed by the example state machine */
-	eo_sm_cangtw_evrxcan1   = (eOsmEvent_t) 5,		/**< another event managed by the example state machine */
-	eo_sm_cangtw_evrxcan2   = (eOsmEvent_t) 6
+	eo_sm_cangtw_evcanstable= (eOsmEvent_t) 1,		/**< another event managed by the example state machine */
+	eo_sm_cangtw_evgo2run   = (eOsmEvent_t) 2,		/**< another event managed by the example state machine */
+	eo_sm_cangtw_evrxeth    = (eOsmEvent_t) 3,		/**< another event managed by the example state machine */
+	eo_sm_cangtw_evrxcan1   = (eOsmEvent_t) 4,		/**< another event managed by the example state machine */
+	eo_sm_cangtw_evrxcan2   = (eOsmEvent_t) 5
 } eOsmEventsCanGtw_t;
 
 

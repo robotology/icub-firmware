@@ -64,7 +64,9 @@ extern eObool_t eupdater_parser_process_ethcmd(EOpacket *rxpkt, EOpacket *txpkt)
 
 extern eObool_t eupdater_parser_stay_forever(void);
 
-extern void eupdater_parser_cangtw_activated(void);
+extern void eupdater_parser_cangtw_activate(void);
+
+extern eObool_t eupdater_parser_cangtw_isactivated(void);
 
 
 extern void eupdater_parser_download_blinkled_start(void);
