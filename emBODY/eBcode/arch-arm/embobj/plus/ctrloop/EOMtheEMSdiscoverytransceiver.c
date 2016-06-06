@@ -57,8 +57,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
 
+#undef KEEP_OLD_SCAN
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -89,7 +89,13 @@ static eObool_t s_parse_and_form(uint8_t *data, uint8_t size, eOipv4addr_t remad
 
 static void s_callback_shutdown2updater(void *p);
 
+#if defined(KEEP_OLD_SCAN)
 static uint8_t s_app_core_manage_cmd(uint8_t *pktin, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout);
+#endif
+
+static uint8_t s_fill_scan2(uint8_t *pktout, uint16_t *sizeout);
+static uint8_t s_process_SCAN2(uint8_t *pktin, uint8_t *pktout, uint16_t *sizeout);
+static uint8_t s_app_core_manage_cmd2(uint8_t *pktin, uint16_t pktinsize, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -246,7 +252,10 @@ static eObool_t s_parse_and_form(uint8_t *data, uint8_t size, eOipv4addr_t remad
     if(1)
     {   // it can be a eth-loader protocol
        
-        uint8_t r = s_app_core_manage_cmd(data, txdata, s_emsdiscoverytransceiver_singleton.cfg.txpktcapacity, &txsize);
+        //uint8_t r = s_app_core_manage_cmd(data, txdata, s_emsdiscoverytransceiver_singleton.cfg.txpktcapacity, &txsize);
+        
+        uint8_t r = s_app_core_manage_cmd2(data, size, txdata, s_emsdiscoverytransceiver_singleton.cfg.txpktcapacity, &txsize);
+        
         
         switch(r)
         {
@@ -371,7 +380,8 @@ static eObool_t s_parse_and_form(uint8_t *data, uint8_t size, eOipv4addr_t remad
 // content of appl-core.c
 
 typedef enum {
-    CMD_SCAN    =0xFF,          // supported
+    CMD_SCAN    = 0xFF,          // supported
+    CMD_SCAN2   = 0x7F,         //  supported
     CMD_START   =0x01,
     CMD_DATA    =0x02,
     CMD_JUMP    =0x03,
@@ -399,8 +409,12 @@ enum {
 
 #define MAX0(a) ( ((a)>0) ? (a) : (0) )
 
+#define PROTOCOL3333_VERSION 1
 
 
+
+
+#if defined(KEEP_OLD_SCAN)
 // acemor: 0 error or nothing to do. 1 transmit back. 2 tx back and start countdown
 // acemor: bytes: CMD_SCAN 14, 
 static uint8_t s_app_core_manage_cmd(uint8_t *pktin, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout)
@@ -553,6 +567,149 @@ static uint8_t s_app_core_manage_cmd(uint8_t *pktin, uint8_t *pktout, uint16_t c
     return retval;
 }
 
+#endif
+
+// acemor: 0 error or nothing to do. 1 transmit back. 2 tx back and start countdown
+// acemor: bytes: CMD_SCAN 14, 
+static uint8_t s_app_core_manage_cmd2(uint8_t *pktin, uint16_t pktinsize, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout)
+{
+    uint8_t opcode = pktin[0]; // use 0 .... 1 only for debug
+//#warning --> to debug CHANGE IN 1 but then put 0 back !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    *sizeout=0;
+    
+    uint8_t retval = 0;
+
+    switch(opcode) // opcode
+    {
+        case CMD_SCAN2:
+        case CMD_SCAN:
+        {
+            retval = s_process_SCAN2(pktin, pktout, sizeout);
+            
+        } break;
+
+
+        case CMD_RESET:
+        {
+            *sizeout = 0;
+
+            ee_sharserv_sys_restart();
+            
+            retval = 0;
+   
+        } break;
+
+
+        case CMD_UPD_ONCE:
+        {
+            *sizeout = 0;
+     
+            ee_sharserv_ipc_gotoproc_set(ee_procUpdater);
+            ee_sharserv_sys_restart();
+            
+            retval = 0;
+            
+        } break;
+        
+
+        default:
+        { 
+            *sizeout = 0;
+            retval = 0; 
+            
+        } break;
+    }
+
+    return retval;
+}
+
+
+static uint8_t s_process_SCAN2(uint8_t *pktin, uint8_t *pktout, uint16_t *sizeout)
+{
+    // eupdater_info_trace("CORE", "CMD_SCAN2");
+    
+    pktout[ 0] = CMD_SCAN2;
+    
+    return s_fill_scan2(pktout, sizeout);        
+}
+
+static uint8_t s_fill_scan2(uint8_t *pktout, uint16_t *sizeout)
+{
+    pktout[ 1] = PROTOCOL3333_VERSION;
+    
+    *sizeout = 40+32;
+
+    const eEipnetwork_t *ipnetworkstrg = NULL;
+    ee_sharserv_info_deviceinfo_item_get(sharserv_info_ipnet, (const void**)&ipnetworkstrg);
+    
+    const eEboardInfo_t* boardinfo = NULL;
+    ee_sharserv_info_boardinfo_get(&boardinfo);
+    // now get the board type.
+    uint8_t boardtype = 255; // use eobrd_ethtype_unknown later on
+    if(0x11 == boardinfo->info.entity.signature)
+    {   // old eLoader upto version 2.11 of build date 2015 May 26 11:11. it have info about board type in a string
+        
+        if(0 == strcmp((const char*)boardinfo->info.name, "ems4rd"))
+        {
+            boardtype = 32; // use eobrd_ethtype_ems4 later on        
+        }
+        else if(0 == strcmp((const char*)boardinfo->info.name, "mc4plus"))
+        {
+             boardtype = 33; // use eobrd_ethtype_mc4plus later on 
+        }        
+    }
+    else
+    {   // since eLoader version 2.12 the fiels boardinfo->info.entity.signature contains the board type. 
+        boardtype = boardinfo->info.entity.signature;
+    }
+    
+    eEprocess_t startup = ee_procNone;
+    eEprocess_t def2run = ee_procNone;
+    ee_sharserv_part_proc_startup_get(&startup);
+    ee_sharserv_part_proc_def2run_get(&def2run);
+    
+    pktout[ 2] = (ipnetworkstrg->macaddress>>40) & 0xFF;
+    pktout[ 3] = (ipnetworkstrg->macaddress>>32) & 0xFF;
+    pktout[ 4] = (ipnetworkstrg->macaddress>>24) & 0xFF;
+    pktout[ 5] = (ipnetworkstrg->macaddress>>16) & 0xFF;
+    pktout[ 6] = (ipnetworkstrg->macaddress>>8)  & 0xFF;
+    pktout[ 7] = (ipnetworkstrg->macaddress)     & 0xFF;
+    
+    pktout[ 8] = boardtype;
+    pktout[ 9] = startup;
+    pktout[10] = def2run;
+    
+    uint8_t nprocs = 0;
+    const eEprocess_t *s_proctable = NULL;
+    ee_sharserv_part_proc_allavailable_get(&s_proctable, &nprocs);
+    
+    pktout[11] = nprocs;
+    
+    for(uint8_t i=0; i<nprocs; i++)
+    {
+        const eEmoduleInfo_t *s_modinfo = NULL;
+        ee_sharserv_part_proc_get(s_proctable[i], &s_modinfo);
+        pktout[12+8*i] = s_proctable[i];
+        pktout[13+8*i] = s_modinfo->info.entity.version.major;
+        pktout[14+8*i] = s_modinfo->info.entity.version.minor;
+        uint8_t* builddate = (uint8_t*) &s_modinfo->info.entity.builddate;
+        pktout[15+8*i] = builddate[0];
+        pktout[16+8*i] = builddate[1];
+        pktout[17+8*i] = builddate[2];
+        pktout[18+8*i] = builddate[3];      
+    }
+    
+    pktout[36] = ee_procApplication;
+    pktout[37] = 0;
+    pktout[38] = 0;
+    pktout[39] = 0;
+    const void *page = NULL;
+    ee_sharserv_info_deviceinfo_item_get(sharserv_info_page32, &page);
+    memcpy(&pktout[40], page, 32);
+    
+
+    return 2; // tx back and start countdown
+}
 
 
 
