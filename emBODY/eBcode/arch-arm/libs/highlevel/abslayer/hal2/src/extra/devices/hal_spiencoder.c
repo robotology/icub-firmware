@@ -65,7 +65,7 @@
 
 #define HAL_encoder_id2index(t)              ((uint8_t)((t)))
 
-#define HAL_SPIENCODER_2CHAINED_USE_RAWMODE
+#define HAL_SPIENCODER_xCHAINED_USE_RAWMODE
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
@@ -95,7 +95,7 @@ typedef struct
     hal_spi_t                   spiid;
     hal_spiencoder_position_t   position;
     uint8_t                     rxframes[3][4];     // 3 possible frames received. The size of everyone is the maximum possible
-    uint16_t                    rxframechain[2];    // 1 frame of 2 words of 16 bits
+    uint16_t                    rxframechain[3];    // 1 frame of 2 words of 16 bits
     hl_chip_ams_as5055a_channel_t chainchannel;
 } hal_spiencoder_internal_item_t;
 
@@ -123,8 +123,12 @@ static hal_result_t s_hal_spiencoder_read_register_execute_t2(hal_spiencoder_t i
 
 //Static callback functions
 static void s_hal_spiencoder_onreceiv(void* p);
+#if !defined(HAL_SPIENCODER_xCHAINED_USE_RAWMODE)
 static void s_hal_spiencoder_onreceived_daisychain_prepare(void* p);
 static void s_hal_spiencoder_onreceived_daisychain(void* p);
+static void s_hal_spiencoder_2chained_askvalues(hal_spiencoder_internal_item_t* intitem, hal_callback_t callback, void* arg, uint8_t *txframe, uint8_t sizeofframe);
+#endif
+
 static void s_hal_spiencoder_onreceiv_sdad_status(void* p);
 static void s_hal_spiencoder_onreceiv_sensor_data(void* p);
 static void s_hal_spiencoder_onreceiv_reg_init(void* p);
@@ -133,7 +137,7 @@ static void s_hal_spiencoder_onreceiv_reg_data(void* p);
 static hal_spiencoder_position_t s_hal_spiencoder_frame2position_t1(uint8_t* frame);
 static hal_spiencoder_position_t s_hal_spiencoder_frame2position_t2(uint8_t* frame);
 
-static void s_hal_spiencoder_2chained_askvalues(hal_spiencoder_internal_item_t* intitem, hal_callback_t callback, void* arg, uint8_t *txframe);
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -243,8 +247,8 @@ extern hal_result_t hal_spiencoder_init(hal_spiencoder_t id, const hal_spiencode
     
     hal_bool_t initMUX = hal_true;
     
-#if defined(HAL_SPIENCODER_2CHAINED_USE_RAWMODE)
-    if(hal_spiencoder_typeCHAINof2 == intitem->config.type)
+#if defined(HAL_SPIENCODER_xCHAINED_USE_RAWMODE)
+    if((hal_spiencoder_typeCHAINof2 == intitem->config.type) || (hal_spiencoder_typeCHAINof3 == intitem->config.type))
     {
         initMUX = hal_false;
     }
@@ -297,11 +301,26 @@ extern hal_result_t hal_spiencoder_init(hal_spiencoder_t id, const hal_spiencode
         spicfg.datacapture = hal_spi_datacapture_2edge;    
 
         initSPI = hal_true;
-#if defined(HAL_SPIENCODER_2CHAINED_USE_RAWMODE)
+#if defined(HAL_SPIENCODER_xCHAINED_USE_RAWMODE)
         initSPI = hal_false;
 #endif        
     }
+    else if(hal_spiencoder_typeCHAINof3 == intitem->config.type)
+    {     
+        spicfg.capacityofrxfifoofframes = 1;        // we need to manage only one frame at a time
+        spicfg.maxsizeofframe = 3;                  // each frame is done of three words
+        spicfg.datasize = hal_spi_datasize_16bit;   // and each word is of 16 bits
+                                                    // all the rest is equal to default 
+        spicfg.cpolarity = hal_spi_cpolarity_low;
+        spicfg.datacapture = hal_spi_datacapture_2edge;    
 
+        initSPI = hal_true;
+#if defined(HAL_SPIENCODER_xCHAINED_USE_RAWMODE)
+        initSPI = hal_false;
+#endif        
+    }
+    
+    
     if(hal_true == initSPI)
     {    
         // Initialize the SPI with the correct config
@@ -312,7 +331,7 @@ extern hal_result_t hal_spiencoder_init(hal_spiencoder_t id, const hal_spiencode
         }
     }
 
-#if defined(HAL_SPIENCODER_2CHAINED_USE_RAWMODE)
+#if defined(HAL_SPIENCODER_xCHAINED_USE_RAWMODE)
     
     if(hal_spiencoder_typeCHAINof2 == intitem->config.type)
     {  
@@ -343,7 +362,35 @@ extern hal_result_t hal_spiencoder_init(hal_spiencoder_t id, const hal_spiencode
 
         intitem->chainchannel = chn;       
     }
-    
+    else if(hal_spiencoder_typeCHAINof3 == intitem->config.type)
+    {  
+        // need to init the spi inside the chip ...
+        
+        static hl_chip_ams_as5055a_spicfg_t as5055a_spicfg =
+        {
+            .spimap2use = (hl_spi_mapping_t*)&hal_spi__theboardconfig,
+            .prescaler = hl_spi_prescaler_064        
+        };
+
+        hl_chip_ams_as5055a_cfg_t as5055a_config = 
+        {
+            .spiid              = hl_spi1,
+            .numberofchained    = 3,
+            .initthegpios       = hl_true,
+            .nsel               = { .port = hl_gpio_portNONE, .pin = hl_gpio_pinNONE },
+            .nint               = { .port = hl_gpio_portNONE, .pin = hl_gpio_pinNONE },              
+            .spicfg             = &as5055a_spicfg, 
+        };        
+                
+        hl_chip_ams_as5055a_channel_t chn = (hal_spi2 == intitem->spiid) ? (hl_chip_ams_as5055a_channel2) : (hl_chip_ams_as5055a_channel1);
+        as5055a_config.spiid = (hl_spi_t) intitem->spiid;
+        as5055a_config.nsel.port = (hl_gpio_port_t)intitem->chip_sel.port;
+        as5055a_config.nsel.pin = (hl_gpio_pin_t)intitem->chip_sel.pin;
+
+        hl_chip_ams_as5055a_init(chn, &as5055a_config);  
+
+        intitem->chainchannel = chn;       
+    }
 #else    
        
     if(hal_spiencoder_typeCHAINof2 == intitem->config.type)
@@ -367,7 +414,8 @@ extern hal_result_t hal_spiencoder_init(hal_spiencoder_t id, const hal_spiencode
 
         intitem->chainchannel = chn;         
             
-    }    
+    }  
+    #error  marco.accame: hal_spiencoder_typeCHAINof3 only supports macro HAL_SPIENCODER_xCHAINED_USE_RAWMODE enabled
 #endif    
  
     // Flag to set the encoder initialized
@@ -430,33 +478,60 @@ extern hal_result_t hal_spiencoder_read_start(hal_spiencoder_t id)
     }
     else if(hal_spiencoder_typeCHAINof2 == intitem->config.type)
     {
-#if defined(HAL_SPIENCODER_2CHAINED_USE_RAWMODE)
+#if defined(HAL_SPIENCODER_xCHAINED_USE_RAWMODE)
 
-// following is OK, but i wnat to try the reaidng in two steps to avoid 600 usec delay
-//    hl_chip_ams_as5055a_read_angulardata(intitem->chainchannel, hl_chip_ams_as5055a_readmode_start_wait_read, &intitem->rxframechain[0], &intitem->rxframechain[1], NULL);
-//        
-//    intitem->position = intitem->rxframechain[0] | (intitem->rxframechain[1] << 16);
-//    
-//    if(NULL != intitem->config.callback_on_rx)
-//    {
-//        intitem->config.callback_on_rx(intitem->config.arg);
-//    } 
-//
-        
-    hl_chip_ams_as5055a_read_angulardata(intitem->chainchannel, hl_chip_ams_as5055a_readmode_start_only, NULL, NULL, NULL);      
-        
-    if(NULL != intitem->config.callback_on_rx)
-    {
-        intitem->config.callback_on_rx(intitem->config.arg);
-    }         
+    // following is OK, but i wnat to try the reaidng in two steps to avoid 600 usec delay
+    //    hl_chip_ams_as5055a_read_angulardata(intitem->chainchannel, hl_chip_ams_as5055a_readmode_start_wait_read, &intitem->rxframechain[0], &intitem->rxframechain[1], NULL);
+    //        
+    //    intitem->position = intitem->rxframechain[0] | (intitem->rxframechain[1] << 16);
+    //    
+    //    if(NULL != intitem->config.callback_on_rx)
+    //    {
+    //        intitem->config.callback_on_rx(intitem->config.arg);
+    //    } 
+    //
+            
+        hl_chip_ams_as5055a_read_angulardata(intitem->chainchannel, hl_chip_ams_as5055a_readmode_start_only, NULL, NULL, NULL);      
+            
+        if(NULL != intitem->config.callback_on_rx)
+        {
+            intitem->config.callback_on_rx(intitem->config.arg);
+        }         
 
 #else        
         // only in mc2plus ...
-        static const uint16_t txframe_as5055a_angulardata[2] = {0xFFFF, 0xFFFF};
-        s_hal_spiencoder_2chained_askvalues(intitem, s_hal_spiencoder_onreceived_daisychain_prepare, (void*)id, (uint8_t*)txframe_as5055a_angulardata);    
+        static const uint16_t txframe_as5055a_angulardata[3] = {0xFFFF, 0xFFFF, 0xFFFF}; // it is ok also for teh cse of chainof3
+        s_hal_spiencoder_2chained_askvalues(intitem, s_hal_spiencoder_onreceived_daisychain_prepare, (void*)id, (uint8_t*)txframe_as5055a_angulardata, 2);    
 #endif        
     }
-    
+    else if(hal_spiencoder_typeCHAINof3 == intitem->config.type)
+    {
+#if defined(HAL_SPIENCODER_xCHAINED_USE_RAWMODE)
+
+    // following is OK, but i wnat to try the reaidng in two steps to avoid 600 usec delay
+    //    hl_chip_ams_as5055a_read_angulardata(intitem->chainchannel, hl_chip_ams_as5055a_readmode_start_wait_read, &intitem->rxframechain[0], &intitem->rxframechain[1], NULL);
+    //        
+    //    intitem->position = intitem->rxframechain[0] | (intitem->rxframechain[1] << 16);
+    //    
+    //    if(NULL != intitem->config.callback_on_rx)
+    //    {
+    //        intitem->config.callback_on_rx(intitem->config.arg);
+    //    } 
+    //
+            
+        hl_chip_ams_as5055a_read_angulardata(intitem->chainchannel, hl_chip_ams_as5055a_readmode_start_only, NULL, NULL, NULL);      
+            
+        if(NULL != intitem->config.callback_on_rx)
+        {
+            intitem->config.callback_on_rx(intitem->config.arg);
+        }         
+
+#else        
+        // only in mc2plus ...
+        static const uint16_t txframe_as5055a_angulardata[3] = {0xFFFF, 0xFFFF, 0xFFFF};
+        s_hal_spiencoder_2chained_askvalues(intitem, s_hal_spiencoder_onreceived_daisychain_prepare, (void*)id, (uint8_t*)txframe_as5055a_angulardata, 3);    
+#endif        
+    }    
     
     return(hal_res_OK);
 }
@@ -602,7 +677,15 @@ extern hal_result_t hal_spiencoder_get_value(hal_spiencoder_t id, hal_spiencoder
         
         *pos = intitem->position; 
     }
-    
+    else if(hal_spiencoder_typeCHAINof3 == intitem->config.type)
+    {
+        hl_chip_ams_as5055a_read_angulardata(intitem->chainchannel, hl_chip_ams_as5055a_readmode_read_only, &intitem->rxframechain[0], &intitem->rxframechain[1], &intitem->rxframechain[2]);        
+
+        
+        pos[0] = intitem->rxframechain[0];
+        pos[1] = intitem->rxframechain[1]; 
+        pos[2] = intitem->rxframechain[2]; 
+    }    
     return(hal_res_OK);        
 }
 
@@ -900,6 +983,7 @@ static void s_hal_spiencoder_onreceiv(void* p)
     }
 }
 
+#if !defined(HAL_SPIENCODER_xCHAINED_USE_RAWMODE)
 static void s_hal_spiencoder_onreceived_daisychain(void* p)
 {
     int32_t tmp = (int32_t)p;                   
@@ -908,7 +992,7 @@ static void s_hal_spiencoder_onreceived_daisychain(void* p)
     
     hal_mux_disable(intitem->muxid);    
     
-    // ok, now i get the frame .. it has two words with 2 uint16_t. thus ... 4 bytes
+    // ok, now i get the frame .. the chainof2 it has two words with 2 uint16_t. thus ... 4 bytes
     hal_spi_get(intitem->spiid, (uint8_t*)&intitem->rxframechain, NULL);
     
     // so far i get the two readings in raw format inside the 32 bits output
@@ -927,8 +1011,9 @@ static void s_hal_spiencoder_onreceived_daisychain(void* p)
         intitem->config.callback_on_rx(intitem->config.arg);
     }    
 }
+#endif
 
-
+#if !defined(HAL_SPIENCODER_xCHAINED_USE_RAWMODE)
 static void s_hal_spiencoder_onreceived_daisychain_prepare(void* p)
 {
     int32_t tmp = (int32_t)p;                   
@@ -937,17 +1022,19 @@ static void s_hal_spiencoder_onreceived_daisychain_prepare(void* p)
     
     hal_mux_disable(intitem->muxid);    
     
-    // ok, now i get the frame .. it has two words with 2 uint16_t. thus ... 4 bytes
+    // ok, now i get the frame .. 
+    // for case daisy-2: it has two words of uint16_t each. thus ... 4 bytes
+    // for case daisy-3: it has 3 words of uint16_t each. thus ... 6 bytes
     // i get it just to remove it from spi buffer.
     hal_spi_get(intitem->spiid, (uint8_t*)&intitem->rxframechain, NULL);
     
     // how much should we wait before we enable the mux again? is 1 microsec enough?   
     //hal_sys_delay(1); 
     
-    static const uint16_t txframe_as5055a_nop[2] = {0x0000, 0x0000};
-    s_hal_spiencoder_2chained_askvalues(intitem, s_hal_spiencoder_onreceived_daisychain, p, (uint8_t*)txframe_as5055a_nop);
+    static const uint16_t txframe_as5055a_nop[3] = {0x0000, 0x0000, 0x0000}; // i use three items for teh case of chainof3
+    s_hal_spiencoder_2chained_askvalues(intitem, s_hal_spiencoder_onreceived_daisychain, p, (uint8_t*)txframe_as5055a_nop, (hal_spiencoder_typeCHAINof2 == intitem->config.type) ? 2 : 3);
 }
-
+#endif
 
 static void s_hal_spiencoder_onreceiv_sdad_status(void* p)
 {
@@ -1045,19 +1132,21 @@ static hal_spiencoder_position_t s_hal_spiencoder_frame2position_t2(uint8_t* fra
     return(pos);
 }
 
-
-static void s_hal_spiencoder_2chained_askvalues(hal_spiencoder_internal_item_t* intitem, hal_callback_t callback, void* arg, uint8_t *txframe)
+#if !defined(HAL_SPIENCODER_xCHAINED_USE_RAWMODE)
+static void s_hal_spiencoder_2chained_askvalues(hal_spiencoder_internal_item_t* intitem, hal_callback_t callback, void* arg, uint8_t *txframe, uint8_t sizeofframe)
 {   
     hal_mux_enable(intitem->muxid, intitem->muxsel);
 
     hal_spi_on_framesreceived_set(intitem->spiid, callback, arg);
 
-    hal_spi_set_sizeofframe(intitem->spiid, 2);
+    hal_spi_set_sizeofframe(intitem->spiid, sizeofframe); // or 3 if chainof3 ....
 
     hal_spi_set_isrtxframe(intitem->spiid, txframe);
 
     hal_spi_start(intitem->spiid, 1); // 1 frame 
 }
+#endif
+
 
 #endif//HAL_USE_SPIENCODER
 
