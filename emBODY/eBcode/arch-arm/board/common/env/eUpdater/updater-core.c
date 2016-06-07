@@ -198,9 +198,10 @@ static eEresult_t s_sys_eeprom_erase(void);
 #endif
 
 static uint8_t s_overlapping_with_code_space(uint32_t addr, uint32_t size);
-//static uint8_t s_process_SCAN_legacy(uint8_t *pktin, uint8_t *pktout, uint16_t *sizeout);
-static uint8_t s_process_SCAN2(uint8_t *pktin, uint8_t *pktout, uint16_t *sizeout);
-//static uint8_t s_process_PROCS_legacy(uint8_t *pktin, uint8_t *pktout, uint16_t *sizeout, uint16_t capacityout);
+static uint8_t s_process_SCAN_legacy(uint8_t *pktin, uint8_t *pktout, uint16_t *sizeout);
+static uint8_t s_process_SCAN2(uint8_t *pktin, uint16_t pktinsize, uint8_t *pktout, uint16_t *sizeout);
+//static uint8_t s_process_PROCS_legacy_safe(uint8_t *pktin, uint8_t *pktout, uint16_t *sizeout, uint16_t capacityout);
+static uint8_t s_process_PROCS_legacy(uint8_t *pktin, uint8_t *pktout, uint16_t *sizeout, uint16_t capacityout);
 static uint8_t s_process_PROCS2(uint8_t *pktin, uint8_t *pktout, uint16_t *sizeout, uint16_t capacityout);
 
 
@@ -268,7 +269,14 @@ extern uint8_t upd_core_manage_cmd(uint8_t *pktin, uint16_t pktinsize, eOipv4add
         case CMD_SCAN2:
         case CMD_SCAN:
         {
-            return(s_process_SCAN2(pktin, pktout, sizeout));
+            if(1 == pktinsize)
+            {
+                return(s_process_SCAN_legacy(pktin, pktout, sizeout));
+            }
+            else
+            {
+                return(s_process_SCAN2(pktin, pktinsize, pktout, sizeout));
+            }
         }// break;
         
 
@@ -806,10 +814,22 @@ extern uint8_t upd_core_manage_cmd(uint8_t *pktin, uint16_t pktinsize, eOipv4add
             return 1;
         }// break;   
         
+        case CMD_PROCS2:
+        {
+            return s_process_PROCS2(pktin, pktout, sizeout, capacityout);            
+        }// break;
+        
         case CMD_PROCS:
         {
-            return s_process_PROCS2(pktin, pktout, sizeout, capacityout);
-        }// break
+            if(1 == pktinsize)
+            {
+                return s_process_PROCS_legacy(pktin, pktout, sizeout, capacityout);
+            }
+            else
+            {   // because packet of size 2 with: {CMD_SCAN, CMD_SCAN2} is equivalent to {CMD_SCAN2} of size 1 
+                return s_process_PROCS2(pktin, pktout, sizeout, capacityout);
+            }
+        }// break;
 
         case CMD_BLINK:
         {
@@ -1013,39 +1033,39 @@ static uint8_t s_overlapping_with_code_space(uint32_t addr, uint32_t size)
 }
 
 
-//static uint8_t s_process_SCAN_legacy(uint8_t *pktin, uint8_t *pktout, uint16_t *sizeout)
-//{
-//    // eupdater_info_trace("CORE", "CMD_SCAN");
-//#if !defined(_MAINTAINER_APPL_ )
-//    eEmoduleInfo_t* module = (eEmoduleInfo_t*)(EENV_MEMMAP_EUPDATER_ROMADDR+EENV_MODULEINFO_OFFSET);
-//#else
-//    eEmoduleInfo_t* module = (eEmoduleInfo_t*)(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET);
-//#endif
-//    
-//    *sizeout = 14;
+static uint8_t s_process_SCAN_legacy(uint8_t *pktin, uint8_t *pktout, uint16_t *sizeout)
+{
+    // eupdater_info_trace("CORE", "CMD_SCAN");
+#if !defined(_MAINTAINER_APPL_ )
+    eEmoduleInfo_t* module = (eEmoduleInfo_t*)(EENV_MEMMAP_EUPDATER_ROMADDR+EENV_MODULEINFO_OFFSET);
+#else
+    eEmoduleInfo_t* module = (eEmoduleInfo_t*)(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET);
+#endif
+    
+    *sizeout = 14;
 
-//    pktout[ 0] = CMD_SCAN;
-//    pktout[ 1] = module->info.entity.version.major;
-//    pktout[ 2] = module->info.entity.version.minor;
-//    pktout[ 3] = BOARD_TYPE_EMS;
-//    
-//    const eEipnetwork_t *ipnetworkstrg;
-//    ee_sharserv_info_deviceinfo_item_get(sharserv_info_ipnet, (const void**)&ipnetworkstrg);
+    pktout[ 0] = CMD_SCAN;
+    pktout[ 1] = module->info.entity.version.major;
+    pktout[ 2] = module->info.entity.version.minor;
+    pktout[ 3] = BOARD_TYPE_EMS;
+    
+    const eEipnetwork_t *ipnetworkstrg;
+    ee_sharserv_info_deviceinfo_item_get(sharserv_info_ipnet, (const void**)&ipnetworkstrg);
 
-//    pktout[ 4] = (ipnetworkstrg->ipnetmask>>24) & 0xFF;
-//    pktout[ 5] = (ipnetworkstrg->ipnetmask>>16) & 0xFF;
-//    pktout[ 6] = (ipnetworkstrg->ipnetmask>>8)  & 0xFF;
-//    pktout[ 7] =  ipnetworkstrg->ipnetmask      & 0xFF;
+    pktout[ 4] = (ipnetworkstrg->ipnetmask>>24) & 0xFF;
+    pktout[ 5] = (ipnetworkstrg->ipnetmask>>16) & 0xFF;
+    pktout[ 6] = (ipnetworkstrg->ipnetmask>>8)  & 0xFF;
+    pktout[ 7] =  ipnetworkstrg->ipnetmask      & 0xFF;
 
-//    pktout[ 8] = (ipnetworkstrg->macaddress>>40) & 0xFF;
-//    pktout[ 9] = (ipnetworkstrg->macaddress>>32) & 0xFF;
-//    pktout[10] = (ipnetworkstrg->macaddress>>24) & 0xFF;
-//    pktout[11] = (ipnetworkstrg->macaddress>>16) & 0xFF;
-//    pktout[12] = (ipnetworkstrg->macaddress>>8)  & 0xFF;
-//    pktout[13] = (ipnetworkstrg->macaddress)     & 0xFF;
+    pktout[ 8] = (ipnetworkstrg->macaddress>>40) & 0xFF;
+    pktout[ 9] = (ipnetworkstrg->macaddress>>32) & 0xFF;
+    pktout[10] = (ipnetworkstrg->macaddress>>24) & 0xFF;
+    pktout[11] = (ipnetworkstrg->macaddress>>16) & 0xFF;
+    pktout[12] = (ipnetworkstrg->macaddress>>8)  & 0xFF;
+    pktout[13] = (ipnetworkstrg->macaddress)     & 0xFF;
 
-//    return 1;
-//}
+    return 1;
+}
 
 static uint8_t s_fill_scan2(uint8_t *pktout, uint16_t *sizeout)
 {
@@ -1126,17 +1146,24 @@ static uint8_t s_fill_scan2(uint8_t *pktout, uint16_t *sizeout)
 }
 
 
-static uint8_t s_process_SCAN2(uint8_t *pktin, uint8_t *pktout, uint16_t *sizeout)
+static uint8_t s_process_SCAN2(uint8_t *pktin, uint16_t pktinsize, uint8_t *pktout, uint16_t *sizeout)
 {
-    // eupdater_info_trace("CORE", "CMD_SCAN2");
-    
-    pktout[ 0] = CMD_SCAN2;
-    
-    return s_fill_scan2(pktout, sizeout);        
+    if(1 == pktinsize)
+    {
+        // case of old format
+        pktout[ 0] = CMD_SCAN;
+        return s_process_SCAN_legacy(pktin, pktout, sizeout);        
+    }
+    else
+    {
+        // case of new format which is of len 2    
+        pktout[ 0] = CMD_SCAN2;
+        return s_fill_scan2(pktout, sizeout);     
+    }        
 }
 
 
-//static uint8_t s_process_PROCS_legacy(uint8_t *pktin, uint8_t *pktout, uint16_t *sizeout, uint16_t capacityout)
+//static uint8_t s_process_PROCS_legacy_safe(uint8_t *pktin, uint8_t *pktout, uint16_t *sizeout, uint16_t capacityout)
 //{
 //    uint8_t num_procs = 0;
 //    const eEprocess_t *s_proctable = NULL;
@@ -1282,8 +1309,158 @@ static uint8_t s_process_SCAN2(uint8_t *pktin, uint8_t *pktout, uint16_t *sizeou
 //    return 1;
 //}
 
+static uint8_t s_process_PROCS_legacy(uint8_t *pktin, uint8_t *pktout, uint16_t *sizeout, uint16_t capacityout)
+{
+    uint8_t num_procs = 0;
+    const eEprocess_t *s_proctable = NULL;
+    const eEmoduleInfo_t *s_modinfo = NULL;
+
+    pktout[0] = CMD_PROCS;
+    pktout[1] = 0;   
+    
+    char *data = (char*)pktout;
+    uint16_t size = 2;            
+    
+    size+=snprintf(data+size, MAX0(capacityout-size), "reply to legacy PROCS\r\n");
+    
+    const eEmoduleInfo_t *sharserv = ee_sharserv_moduleinfo_get();
+//            
+//            size+=snprintf(data+size, MAX0(capacityout-size), "*** running e-proc uses sharserv\r\n");
+//            size+=snprintf(data+size, MAX0(capacityout-size), "version\t%d.%d %d/%d/%d %d:%.2d\r\n", 
+//                    sharserv->info.entity.version.major, 
+//                    sharserv->info.entity.version.minor,
+//                    sharserv->info.entity.builddate.month,
+//                    sharserv->info.entity.builddate.day,
+//                    sharserv->info.entity.builddate.year-2000,
+//                    sharserv->info.entity.builddate.hour,
+//                    sharserv->info.entity.builddate.min
+//                );
+//            size+=snprintf(data+size, MAX0(capacityout-size), "rom.addr\t0x%0.8X\r\n", sharserv->info.rom.addr);
+//            size+=snprintf(data+size, MAX0(capacityout-size), "rom.size\t0x%0.8X\r\n", sharserv->info.rom.size);
+//            size+=snprintf(data+size, MAX0(capacityout-size), "ram.addr\t0x%0.8X\r\n", sharserv->info.ram.addr);
+//            size+=snprintf(data+size, MAX0(capacityout-size), "ram.size\t0x%0.8X\r\n", sharserv->info.ram.size);
+
+//            size+=snprintf(data+size, MAX0(capacityout-size), "stg.type\t%s\r\n", (ee_strg_none == sharserv->info.storage.type) ? ("none") 
+//                                                        : ((ee_strg_eflash==sharserv->info.storage.type) ? ("flash") : ("eeprom")));
+//            size+=snprintf(data+size, MAX0(capacityout-size), "stg.addr\t0x%0.8X\r\n", sharserv->info.storage.addr);
+//            size+=snprintf(data+size, MAX0(capacityout-size), "stg.size\t0x%0.8X\r\n", sharserv->info.storage.size);                
+//            size+=snprintf(data+size, MAX0(capacityout-size), "\n");
+//            
+    const eEmoduleInfo_t *strsharserv = ee_sharserv_storage_moduleinfo_get();
+    
+    if((strsharserv->info.entity.version.major != sharserv->info.entity.version.major) || (strsharserv->info.entity.version.minor != sharserv->info.entity.version.minor))
+    {
+        size+=snprintf(data+size, MAX0(capacityout-size), "EEPROM contains sharserv version different from that of this process. it has:\r\n");
+        size+=snprintf(data+size, MAX0(capacityout-size), "eeprom version\t%d.%d %d/%d/%d %d:%.2d\r\n", 
+                strsharserv->info.entity.version.major, 
+                strsharserv->info.entity.version.minor,
+                strsharserv->info.entity.builddate.month,
+                strsharserv->info.entity.builddate.day,
+                strsharserv->info.entity.builddate.year,
+                strsharserv->info.entity.builddate.hour,
+                strsharserv->info.entity.builddate.min
+            );  
+        size+=snprintf(data+size, MAX0(capacityout-size), "process version\t%d.%d %d/%d/%d %d:%.2d\r\n", 
+                sharserv->info.entity.version.major, 
+                sharserv->info.entity.version.minor,
+                sharserv->info.entity.builddate.month,
+                sharserv->info.entity.builddate.day,
+                sharserv->info.entity.builddate.year,
+                sharserv->info.entity.builddate.hour,
+                sharserv->info.entity.builddate.min
+            );                       
+    }
+    
+    if(ee_res_NOK_generic == ee_sharserv_storage_isvalid())
+    {
+        size+=snprintf(data+size, MAX0(capacityout-size), "*** AND IT IS NOT VALID\r\n");
+        size+=snprintf(data+size, MAX0(capacityout-size), "*** CANNOT GIVE PARTITION INFO\r\n");              
+        size+=snprintf(data+size, MAX0(capacityout-size), "*** BYE BYE\r\n"); 
+        size+=snprintf(data+size, MAX0(capacityout-size), "\n");                    
+    }                        
+    else if (ee_res_OK == ee_sharserv_part_proc_allavailable_get(&s_proctable, &num_procs))
+    {
+        pktout[0] = CMD_PROCS;
+        pktout[1] = num_procs; 
+        
+
+        volatile eEmoduleExtendedInfo_t* extinfo = NULL;    
+        eEprocess_t defproc;
+        eEprocess_t startup;
+        eEprocess_t running =
+#if defined(_MAINTAINER_APPL_)  
+                                ee_procApplication;
+#else
+                                ee_procUpdater;
+#endif
+            
+        ee_sharserv_part_proc_def2run_get(&defproc);
+        ee_sharserv_part_proc_startup_get(&startup);
+                    
+        // processes
+        for (uint8_t i=0; i<num_procs; ++i)
+        {
+            ee_sharserv_part_proc_get(s_proctable[i], &s_modinfo);
+
+            size+=snprintf(data+size, MAX0(capacityout-size), "*** e-process #%d \r\n", i);
+            size+=snprintf(data+size, MAX0(capacityout-size), "props %s%s%s \r\n", defproc==i?"DEF ":"", startup==i?"START ":"", running==i?"RUNNING ":"" ) ;
+
+            size+=snprintf(data+size, MAX0(capacityout-size), "name  %s\r\n", s_modinfo->info.name);
+            size+=snprintf(data+size, MAX0(capacityout-size), "vers  %d.%d\r\n", 
+                s_modinfo->info.entity.version.major, 
+                s_modinfo->info.entity.version.minor
+            );
+            size+=snprintf(data+size, MAX0(capacityout-size), "date  %s %.2d %d %d:%.2d\r\n", 
+                ee_common_get_month_string(s_modinfo->info.entity.builddate),
+                s_modinfo->info.entity.builddate.day,                    
+                s_modinfo->info.entity.builddate.year,
+                s_modinfo->info.entity.builddate.hour,
+                s_modinfo->info.entity.builddate.min
+            );
+            
+            extinfo = (volatile eEmoduleExtendedInfo_t*)(s_modinfo->info.rom.addr+EENV_MODULEINFO_OFFSET);
+            
+            //if(0 == strcmp((const char*)extinfo->moduleinfo.extra, extendstr))
+            if(ee_res_OK == ee_is_extendemoduleinfo_valid((eEmoduleExtendedInfo_t*)extinfo))
+            {
+                size+=snprintf(data+size, MAX0(capacityout-size), "built %s\r\n", 
+                    extinfo->compilationdatetime
+                );                        
+            }
+            else
+            {
+                size+=snprintf(data+size, MAX0(capacityout-size), "built unknown date\r\n"
+                );    
+            }
+
+            size+=snprintf(data+size, MAX0(capacityout-size), "rom   @+%dKB, s=%dKB\r\n", (s_modinfo->info.rom.addr-EENV_ROMSTART+1023)/1024, (s_modinfo->info.rom.size+1023)/1024);
+//                    size+=snprintf(data+size, MAX0(capacityout-size), "rom\t[0x%0.8X, 0x%0.8X)\r\n", s_modinfo->info.rom.addr, s_modinfo->info.rom.addr+s_modinfo->info.rom.size);
+//                    size+=snprintf(data+size, MAX0(capacityout-size), "ram\t[0x%0.8X, 0x%0.8X)\r\n", s_modinfo->info.ram.addr, s_modinfo->info.ram.addr+s_modinfo->info.ram.size);
+
+            
+            //                    size+=snprintf(data+size, MAX0(capacityout-size), "rom.addr\t0x%0.8X\r\n", s_modinfo->info.rom.addr);
+//                    size+=snprintf(data+size, MAX0(capacityout-size), "rom.size\t0x%0.8X\r\n", s_modinfo->info.rom.size);
+//                    size+=snprintf(data+size, MAX0(capacityout-size), "ram.addr\t0x%0.8X\r\n", s_modinfo->info.ram.addr);
+//                    size+=snprintf(data+size, MAX0(capacityout-size), "ram.size\t0x%0.8X\r\n", s_modinfo->info.ram.size);
+
+//                    size+=snprintf(data+size, MAX0(capacityout-size), "stg.type\t%s\r\n", (ee_strg_none == s_modinfo->info.storage.type) ? ("none") 
+//                                                                : ((ee_strg_eflash==s_modinfo->info.storage.type) ? ("flash") : ("eeprom")));
+//                    size+=snprintf(data+size, MAX0(capacityout-size), "stg.addr\t0x%0.8X\r\n", s_modinfo->info.storage.addr);
+//                    size+=snprintf(data+size, MAX0(capacityout-size), "stg.size\t0x%0.8X\r\n", s_modinfo->info.storage.size);
+//                    size+=snprintf(data+size, MAX0(capacityout-size), "com.msk\t0x%0.8X\r\n\r", s_modinfo->info.communication);
+            //size+=snprintf(data+size, MAX0(capacityout-size), "\n");
+        }
+
+    }
+
+    *sizeout = size + 1;
+    return 1;
+}
+
 static uint8_t s_fill_PROC_text(char *data, uint16_t size, uint16_t *sizeout, uint16_t capacityout)
 {
+    
+    size+=snprintf(data+size, MAX0(capacityout-size), "reply to PROCS2\r\n");
     
     uint8_t num_procs = 0;
     const eEprocess_t *s_proctable = NULL;
@@ -1374,7 +1551,7 @@ static uint8_t s_fill_PROC_text(char *data, uint16_t size, uint16_t *sizeout, ui
             }
 
             size+=snprintf(data+size, MAX0(capacityout-size), "rom   @+%dKB, s=%dKB\r\n", (s_modinfo->info.rom.addr-EENV_ROMSTART+1023)/1024, (s_modinfo->info.rom.size+1023)/1024);
-            size+=snprintf(data+size, MAX0(capacityout-size), "\n");
+            //size+=snprintf(data+size, MAX0(capacityout-size), "\n");
         }
 
     }

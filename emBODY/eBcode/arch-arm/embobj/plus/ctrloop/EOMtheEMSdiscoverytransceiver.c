@@ -95,6 +95,9 @@ static uint8_t s_app_core_manage_cmd(uint8_t *pktin, uint8_t *pktout, uint16_t c
 
 static uint8_t s_fill_scan2(uint8_t *pktout, uint16_t *sizeout);
 static uint8_t s_process_SCAN2(uint8_t *pktin, uint8_t *pktout, uint16_t *sizeout);
+static uint8_t s_process_SCAN_legacy(uint8_t *pktin, uint8_t *pktout, uint16_t *sizeout, uint16_t capacityout);
+
+
 static uint8_t s_app_core_manage_cmd2(uint8_t *pktin, uint16_t pktinsize, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout);
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -582,9 +585,20 @@ static uint8_t s_app_core_manage_cmd2(uint8_t *pktin, uint16_t pktinsize, uint8_
     switch(opcode) // opcode
     {
         case CMD_SCAN2:
+        {
+            retval = s_process_SCAN2(pktin, pktout, sizeout);            
+        } break;
+        
         case CMD_SCAN:
         {
-            retval = s_process_SCAN2(pktin, pktout, sizeout);
+            if(1 == pktinsize)
+            {
+                retval = s_process_SCAN_legacy(pktin, pktout, sizeout, capacityout);                
+            }
+            else
+            {   // because packet of size 2 with: {CMD_SCAN, CMD_SCAN2} is equivalent to {CMD_SCAN2} of size 1 
+                retval = s_process_SCAN2(pktin, pktout, sizeout);
+            }
             
         } break;
 
@@ -619,6 +633,47 @@ static uint8_t s_app_core_manage_cmd2(uint8_t *pktin, uint16_t pktinsize, uint8_
             
         } break;
     }
+
+    return retval;
+}
+
+static uint8_t s_process_SCAN_legacy(uint8_t *pktin, uint8_t *pktout, uint16_t *sizeout, uint16_t capacityout)
+{
+    uint8_t retval = 0;
+    
+    if(capacityout < 14)
+    {
+        *sizeout = 0;
+        retval = 2; 
+    }
+    else
+    {
+        *sizeout = 14;
+        
+        eEmoduleInfo_t* module=(eEmoduleInfo_t*)(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET);
+
+        pktout[0] = CMD_SCAN;
+        pktout[1] = module->info.entity.version.major;
+        pktout[2] = module->info.entity.version.minor;
+        pktout[3] = BOARD_TYPE_EMS;
+        
+        const eEipnetwork_t *ipnetworkstrg;
+        ee_sharserv_info_deviceinfo_item_get(sharserv_info_ipnet, (const void**)&ipnetworkstrg);
+
+        pktout[4] = (ipnetworkstrg->ipnetmask>>24) & 0xFF;
+        pktout[5] = (ipnetworkstrg->ipnetmask>>16) & 0xFF;
+        pktout[6] = (ipnetworkstrg->ipnetmask>>8)  & 0xFF;
+        pktout[7] =  ipnetworkstrg->ipnetmask      & 0xFF;
+
+        pktout[ 8] = (ipnetworkstrg->macaddress>>40) & 0xFF;
+        pktout[ 9] = (ipnetworkstrg->macaddress>>32) & 0xFF;
+        pktout[10] = (ipnetworkstrg->macaddress>>24) & 0xFF;
+        pktout[11] = (ipnetworkstrg->macaddress>>16) & 0xFF;
+        pktout[12] = (ipnetworkstrg->macaddress>>8)  & 0xFF;
+        pktout[13] = (ipnetworkstrg->macaddress)     & 0xFF;
+
+        retval = 2;
+    } 
 
     return retval;
 }
