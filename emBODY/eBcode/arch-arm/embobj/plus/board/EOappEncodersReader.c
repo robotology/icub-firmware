@@ -65,9 +65,9 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #define CHECK_ENC_IS_CONNECTED(type)                    (eomn_serv_mc_sensor_none != (type))
-#define CHECK_ENC_IS_ON_SPI(type)                       ((eomn_serv_mc_sensor_encoder_aea == (type)) || (eomn_serv_mc_sensor_encoder_amo == (type)) || (eomn_serv_mc_sensor_encoder_spichainof2 == (type)))
+#define CHECK_ENC_IS_ON_SPI(type)                       ((eomn_serv_mc_sensor_encoder_aea == (type)) || (eomn_serv_mc_sensor_encoder_amo == (type)) || (eomn_serv_mc_sensor_encoder_spichainof2 == (type)) || (eomn_serv_mc_sensor_encoder_spichainof3 == (type)))
 #define CHECK_ENC_IS_ON_STREAMED_SPI_WITHOTHERS(type)   ((eomn_serv_mc_sensor_encoder_aea == (type)) || (eomn_serv_mc_sensor_encoder_amo == (type)))
-#define CHECK_ENC_IS_ON_STREAMED_SPI_ALONE(type)        ((eomn_serv_mc_sensor_encoder_spichainof2 == (type)))
+#define CHECK_ENC_IS_ON_STREAMED_SPI_ALONE(type)        ((eomn_serv_mc_sensor_encoder_spichainof2 == (type)) || (eomn_serv_mc_sensor_encoder_spichainof3 == (type)))
 
 
 #define ENCODER_VALUE_NOT_SUPPORTED                     (hal_NA32)
@@ -451,7 +451,7 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
     
 //    eOerrmanDescriptor_t errdes = {0};
     
-    hal_spiencoder_position_t val_raw = 0; // marco.accame: it should be is a hal_spiencoder_position_t 
+    hal_spiencoder_position_t val_raw = 0; 
     eOresult_t res1 = eores_OK;
     eOresult_t res2 = eores_OK;
     eOappEncReader_errortype_t errortype = err_NONE;
@@ -582,6 +582,33 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
                 primary->value[1] = (val_raw >> 18) & 0x0fff; // it is the second encoder in the chain
                 
             } break;
+
+            case eomn_serv_mc_sensor_encoder_spichainof3:
+            {
+                hal_spiencoder_position_t arrayof3[3] = {0};
+                
+                res1 = (eOresult_t)hal_spiencoder_get_value((hal_spiencoder_t)this_jomoconfig.primary.port, arrayof3, &flags);
+                
+                if(eores_OK != res1)
+                {
+                    //*primaryvalue = 0;
+                    primary->errortype = encreader_err_READING;
+                    return(eores_NOK_generic);
+                }
+
+                if(eobool_false == s_eo_appEncReader_IsValidValue_SPICHAIN3(arrayof3, &errortype))
+                {
+                    //*primaryvalue = 0;  
+                    primary->errortype = (eOencoderreader_errortype_t)errortype;
+                    return(eores_NOK_generic);
+                }
+                
+
+                primary->value[0] = (arrayof3[0] >> 2) & 0x0fff; // it is the first encoder in the chain
+                primary->value[1] = (arrayof3[1] >> 2) & 0x0fff; // it is the second encoder in the chain
+                primary->value[2] = (arrayof3[2] >> 2) & 0x0fff; // it is the third encoder in the chain
+            
+            } break;       
             
             case eomn_serv_mc_sensor_encoder_inc:
             {
@@ -642,31 +669,6 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
                 }                             
                
             } break;
-            
-            case eomn_serv_mc_sensor_encoder_spichainof3:
-            {
-                res1 = (eOresult_t)hal_spiencoder_get_value((hal_spiencoder_t)this_jomoconfig.primary.port, &val_raw, &flags);
-                
-                if(eores_OK != res1)
-                {
-                    //*primaryvalue = 0;
-                    primary->errortype = encreader_err_READING;
-                    return(eores_NOK_generic);
-                }
-
-                if(eobool_false == s_eo_appEncReader_IsValidValue_SPICHAIN3(&val_raw, &errortype))
-                {
-                    //*primaryvalue = 0;  
-                    primary->errortype = (eOencoderreader_errortype_t)errortype;
-                    return(eores_NOK_generic);
-                }
-                
-
-                primary->value[0] = (val_raw >>  2) & 0x0fff; // it is the first encoder in the chain
-                primary->value[1] = (val_raw >> 18) & 0x0fff; // it is the second encoder in the chain
-                primary->value[2] = 0;
-            
-            }break;
             
             default:
             {
@@ -1136,9 +1138,21 @@ static void s_eo_appEncReader_init_halSPIencoders(EOappEncReader *p)
             
             hal_spiencoder_init(thestream->id[0], &config);
             // if the stream is chainof2 we init only one encoder
-            continue;            
-            
+            continue;                        
         }
+        else if(hal_spiencoder_typeCHAINof3 == thestream->type)
+        {
+            config.priority = hal_int_priority05; 
+            config.callback_on_rx = s_eo_appEncReader_stopSPIread; 
+            config.arg = (void*) thestream; 
+            config.type = hal_spiencoder_typeCHAINof3; 
+            config.reg_address = 0; 
+            config.sdata_precheck = hal_false;
+            
+            hal_spiencoder_init(thestream->id[0], &config);
+            // if the stream is chainof3 we init only one encoder
+            continue;                        
+        }        
         else
         {
             continue;
@@ -1248,9 +1262,50 @@ static eObool_t s_eo_appEncReader_IsValidValue_SPICHAIN2(uint32_t *valueraw, eOa
 
 static eObool_t s_eo_appEncReader_IsValidValue_SPICHAIN3(uint32_t *valueraw, eOappEncReader_errortype_t *error)
 {    
-     //to be implemented
+    uint16_t first = valueraw[0] & 0xffff;
+    uint16_t second = valueraw[1] & 0xffff;   
+    uint16_t third = valueraw[2] & 0xffff;   
+       
+    if(1 == (eo_common_hlfword_bitsetcount(first) % 2))
+    { 
+        *error = err_onParityError;
+        return(eobool_false);
+    }
+    
+    if(1 == (eo_common_hlfword_bitsetcount(second) % 2))
+    { 
+        *error = err_onParityError;
+        return(eobool_false);
+    }  
+
+    if(1 == (eo_common_hlfword_bitsetcount(third) % 2))
+    { 
+        *error = err_onParityError;
+        return(eobool_false);
+    }  
+    
+    if(eobool_true == eo_common_hlfword_bitcheck(first, 1))
+    {
+        *error = err_onReadFromSpi;
+        return(eobool_false);    
+    }
+    
+    if(eobool_true == eo_common_hlfword_bitcheck(second, 1))
+    {
+        *error = err_onReadFromSpi;
+        return(eobool_false);    
+    }    
+
+    if(eobool_true == eo_common_hlfword_bitcheck(third, 1))
+    {
+        *error = err_onReadFromSpi;
+        return(eobool_false);    
+    }  
+    
     return(eobool_true);
+
 }
+
 static void s_eo_appEncReader_deconfigure_NONSPI_encoders(EOappEncReader *p)
 {
     // marco.accame on 14 jan 2016: boh .. for now i dont deinit anything. i must check if the hal has proper deinit() methods for quad enc and others   
@@ -1492,6 +1547,7 @@ static hal_spiencoder_type_t s_eo_appEncReader_map_encodertype_to_halspiencodert
         case eomn_serv_mc_sensor_encoder_aea:           ret = hal_spiencoder_typeAEA;       break;
         case eomn_serv_mc_sensor_encoder_amo:           ret = hal_spiencoder_typeAMO;       break;
         case eomn_serv_mc_sensor_encoder_spichainof2:   ret = hal_spiencoder_typeCHAINof2;  break;
+        case eomn_serv_mc_sensor_encoder_spichainof3:   ret = hal_spiencoder_typeCHAINof3;  break;
         default:                                        ret = hal_spiencoder_typeNONE;      break;
     }
     
