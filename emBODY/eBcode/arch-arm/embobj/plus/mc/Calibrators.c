@@ -550,8 +550,7 @@ BOOL JointSet_do_wait_calibration_11(JointSet* o)
                 pj->cable_constr.motor_pos_min = pj->pos_fbk_from_motors -       L *pj->cable_calib.cable_range;
                 pj->cable_constr.motor_pos_max = pj->pos_fbk_from_motors + (1.0f-L)*pj->cable_calib.cable_range;
                 
-                pj->cable_constr.last_motor_closing_pos = pj->pos_fbk_from_motors;
-                pj->cable_constr.last_joint_closing_pos = pj->pos_fbk;
+                pj->cable_constr.last_joint_pos = pj->pos_fbk;
             }
         }
         else

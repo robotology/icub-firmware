@@ -26,8 +26,7 @@ typedef struct
 {
     int32_t motor_pos_min;
     int32_t motor_pos_max;
-    int32_t last_motor_closing_pos;
-    int32_t last_joint_closing_pos;
+    CTRL_UNITS last_joint_pos;
 } CableConstraintData;
 
 typedef enum
@@ -81,6 +80,8 @@ typedef struct
 typedef struct // Joint
 {
     uint8_t ID;
+    
+    int16_t dead_zone;
     
     PID posPID;
     PID velPID;

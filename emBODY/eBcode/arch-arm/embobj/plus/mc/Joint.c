@@ -21,6 +21,8 @@ Joint* Joint_new(uint8_t n)
 
 void Joint_init(Joint* o)
 {
+    o->dead_zone = 0;
+    
     o->pos_min = ZERO;
     o->pos_max = ZERO;
     o->vel_max = ZERO;
@@ -369,26 +371,16 @@ void Joint_set_limits(Joint* o, CTRL_UNITS pos_min, CTRL_UNITS pos_max)
 }
 
 BOOL Joint_manage_cable_constraint(Joint* o)
-{
-    BOOL opening = o->output*o->posPID.Kp < ZERO;
+{    
+    BOOL opening_intention = (o->pos_err < ZERO);
     
-    if (o->pos_fbk > o->cable_constr.last_joint_closing_pos)
-    {
-        o->cable_constr.last_joint_closing_pos = o->pos_fbk;
-        o->cable_constr.last_motor_closing_pos = o->pos_fbk_from_motors;
-    }
-    else
-    {
-        if (opening) // going back
-        {
-            int32_t motor_back = o->cable_constr.last_motor_closing_pos - o->pos_fbk_from_motors;
-            int32_t joint_back = o->cable_constr.last_joint_closing_pos - o->pos_fbk;
-
-            if (motor_back - joint_back > HAND_CABLE_BACK_LIMIT) return TRUE;
-        }
-    }
+    BOOL opening_action = (o->pos_fbk < o->cable_constr.last_joint_pos);
     
-    if (opening)
+    o->cable_constr.last_joint_pos = o->pos_fbk;
+    
+    //if (opening_intention && !opening_action) return TRUE;
+    
+    if (opening_intention)
     {
         if (o->pos_fbk_from_motors < o->cable_constr.motor_pos_min) return TRUE;
     }
@@ -488,7 +480,16 @@ CTRL_UNITS Joint_do_pwm_control(Joint* o)
                 }
                 else
                 {
-                    o->output = PID_do_out(&o->posPID, o->pos_err);
+                    if (abs((int)o->pos_err)>o->dead_zone)
+                    {
+                        o->output = PID_do_out(&o->posPID, o->pos_err);
+                    }
+                    else
+                    {
+                        PID_reset(&o->posPID);
+                        
+                        o->output = 0;
+                    }
                 }
             }
             else

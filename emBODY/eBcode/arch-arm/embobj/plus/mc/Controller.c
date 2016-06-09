@@ -510,6 +510,8 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
     
         for (int k = 0; k<o->nJoints; ++k)
         {            
+            o->joint[k].dead_zone = 400;
+            
             o->joint[k].CAN_DO_TRQ_CTRL = FALSE;
             o->joint[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
             o->motor[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
@@ -538,6 +540,8 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
     
         for (int k = 0; k<o->nJoints; ++k)
         {            
+            o->joint[k].dead_zone = 400;
+            
             o->joint[k].CAN_DO_TRQ_CTRL = FALSE;
             o->joint[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
             o->motor[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
