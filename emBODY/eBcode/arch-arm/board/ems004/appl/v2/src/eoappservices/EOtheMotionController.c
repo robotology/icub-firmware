@@ -204,7 +204,7 @@ extern EOtheMotionController* eo_motioncontrol_Initialise(void)
     
     p->id32ofregulars = eo_array_New(motioncontrol_maxRegulars, sizeof(uint32_t), NULL);
     
-    p->ctrlobjs.thecontroller = MController_new(eo_motcon_standardJOMOs, eo_motcon_standardJOMOs);
+    p->ctrlobjs.thecontroller = MController_new(eo_motcon_standardJOMOs, 6/*eo_motcon_standardJOMOs*/);
     p->ctrlobjs.theencoderreader = eo_encoderreader_Initialise();
             
     p->ctrlobjs.themais = eo_mais_Initialise();
@@ -1245,7 +1245,6 @@ static eOresult_t s_eo_motioncontrol_updatedPositionsFromEncoders(EOtheMotionCon
 {
 
     eOresult_t res = eores_OK;
-    uint8_t error_mask = 0; 
     
     // wait for the encoders for some time
     for (uint8_t i=0; i<30; ++i)
@@ -1261,6 +1260,11 @@ static eOresult_t s_eo_motioncontrol_updatedPositionsFromEncoders(EOtheMotionCon
     
     if(eobool_false == eo_encoderreader_IsReadingAvailable(eo_encoderreader_GetHandle()))
     {
+        for(uint8_t i=0; i<p->numofjomos; i++)
+        {
+            MController_timeout_absEncoder_fbk(i);
+        }
+        
         return(eores_NOK_timeout);
     }
     
@@ -1273,7 +1277,6 @@ static eOresult_t s_eo_motioncontrol_updatedPositionsFromEncoders(EOtheMotionCon
         res = eo_encoderreader_Read(eo_encoderreader_GetHandle(), i, &primary, &secondary);
         if (res != eores_OK)
         {
-            error_mask |= 1<<(i<<1);
             MController_invalid_absEncoder_fbk(i, primary.errortype);
             res = eores_NOK_generic;
         }

@@ -578,9 +578,11 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
                 
                 //*primaryvalue = s_eo_appEncReader_rescale2icubdegrees(val_raw, jomo, (eOmn_serv_mc_sensor_position_t)this_jomoconfig.primary.pos);                
 
-                primary->value[0] = (val_raw >>  2) & 0x0fff; // it is the first encoder in the chain
-                primary->value[1] = (val_raw >> 18) & 0x0fff; // it is the second encoder in the chain
-                
+                //primary->value[0] = (val_raw >>  2) & 0x0fff; // it is the first encoder in the chain
+                //primary->value[1] = (val_raw >> 18) & 0x0fff; // it is the second encoder in the chain
+                primary->value[0] = (val_raw <<  2) & 0xfff0; // it is the first encoder in the chain
+                primary->value[1] = (val_raw >> 14) & 0xfff0; // it is the second encoder in the chain
+                //*primaryvalue = (val_raw<<2)&0xFFF0FFF0;
             } break;
 
             case eomn_serv_mc_sensor_encoder_spichainof3:
@@ -604,10 +606,12 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
                 }
                 
 
-                primary->value[0] = (arrayof3[0] >> 2) & 0x0fff; // it is the first encoder in the chain
-                primary->value[1] = (arrayof3[1] >> 2) & 0x0fff; // it is the second encoder in the chain
-                primary->value[2] = (arrayof3[2] >> 2) & 0x0fff; // it is the third encoder in the chain
-            
+                //primary->value[0] = (arrayof3[0] >> 2) & 0x0fff; // it is the first encoder in the chain
+                //primary->value[1] = (arrayof3[1] >> 2) & 0x0fff; // it is the second encoder in the chain
+                //primary->value[2] = (arrayof3[2] >> 2) & 0x0fff; // it is the third encoder in the chain
+                primary->value[0] = (arrayof3[0] << 2) & 0xfff0; // it is the first encoder in the chain
+                primary->value[1] = (arrayof3[1] << 2) & 0xfff0; // it is the second encoder in the chain
+                primary->value[2] = (arrayof3[2] << 2) & 0xfff0; // it is the third encoder in the chain
             } break;       
             
             case eomn_serv_mc_sensor_encoder_inc:
@@ -752,8 +756,10 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
                 //val_raw = val1 + val2; // we give back the sum of the two
                 
                 //*secondaryvalue = s_eo_appEncReader_rescale2icubdegrees( val_raw, jomo, (eOmn_serv_mc_sensor_position_t)this_jomoconfig.secondary.pos);
-                secondary->value[0] = (val_raw >> 2) & 0x0fff; // it is the first encoder in the chain
-                secondary->value[1] = (val_raw >> 18) & 0x0fff; // it is the second encoder in the chain
+                //secondary->value[0] = (val_raw >> 2) & 0x0fff; // it is the first encoder in the chain
+                //secondary->value[1] = (val_raw >> 18) & 0x0fff; // it is the second encoder in the chain
+                secondary->value[0] = (val_raw <<  2) & 0xfff0; // it is the first encoder in the chain
+                secondary->value[1] = (val_raw >> 14) & 0xfff0; // it is the second encoder in the chain
             } break; 	            
             
             case eomn_serv_mc_sensor_encoder_inc:
@@ -834,10 +840,13 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
                 }
                 
 
-                secondary->value[0] = (val_raw >>  2) & 0x0fff; // it is the first encoder in the chain
-                secondary->value[1] = (val_raw >> 18) & 0x0fff; // it is the second encoder in the chain
+                //secondary->value[0] = (val_raw >>  2) & 0x0fff; // it is the first encoder in the chain
+                //secondary->value[1] = (val_raw >> 18) & 0x0fff; // it is the second encoder in the chain
+                secondary->value[0] = (val_raw <<  2) & 0xfff0; // it is the first encoder in the chain
+                secondary->value[1] = (val_raw >> 14) & 0xfff0; // it is the second encoder in the chain
                 secondary->value[2] = 0;
             
+                
             }break;
             
             default:
