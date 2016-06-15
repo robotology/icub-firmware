@@ -926,7 +926,7 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
                 return;
             }
 
-            AbsEncoder_config_resolution(o->absEncoder+e, EOK_CLIP_INT32(computedJntEncoderResolution));
+            AbsEncoder_config_resolution(o->absEncoder+e, computedJntEncoderResolution);
             
             //Now I need to re-init absEncoder because I chenged maisConversionFactor, therefore the values returned by EOappEncoreReder are changed.
             o->absEncoder[e].state.bits.not_initialized = TRUE;
@@ -1011,7 +1011,7 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
                 return;
             }
 
-            AbsEncoder_config_resolution(o->absEncoder+e, EOK_CLIP_INT32(computedJntEncoderResolution));
+            AbsEncoder_config_resolution(o->absEncoder+e, computedJntEncoderResolution);
             
             //Now I need to re init absEncoder because I chenged hallADCConversionFactor, therefore the values returned by EOappEncoreReder are changed.
             o->absEncoder[e].state.bits.not_initialized = TRUE;
