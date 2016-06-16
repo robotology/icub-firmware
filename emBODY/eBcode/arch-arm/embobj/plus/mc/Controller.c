@@ -662,8 +662,6 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         break;
     }
 
-    case emscontroller_board_FACE_eyelids_jaw:        //= 7,    //MC4plus
-        break;
     case emscontroller_board_HAND_1:                  //= 9,    //MC4plus
     {
         o->nSets   = 3;
@@ -722,7 +720,9 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         o->jointSet[2].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
         o->jointSet[2].CAN_DO_TRQ_CTRL = FALSE;
     }    
-    break;    
+    break;
+    
+    case emscontroller_board_FACE_eyelids_jaw:        //= 7,    //MC4plus
     case emscontroller_board_FACE_lips:               //= 8,    //MC4plus
         o->nSets   = 4;
         
@@ -740,6 +740,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         break;
     case emscontroller_board_HAND_2:                  //= 10,   //MC4plus
         break;
+    
     case emscontroller_board_FOREARM:                 //= 11,   //MC4plus
     {
         o->nSets   = 3;
