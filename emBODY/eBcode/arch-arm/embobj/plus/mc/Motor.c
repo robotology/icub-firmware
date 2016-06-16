@@ -827,7 +827,7 @@ void Motor_get_state(Motor* o, eOmc_motor_status_t* motor_status)
 
     motor_status->basic.mot_acceleration = 0; // not implemented  
     
-    motor_status->basic.mot_current  = o->Iqq_peak_fbk; //o->Iqq_fbk;    
+    motor_status->basic.mot_current  = o->Iqq_fbk; //o->Iqq_peak_fbk;    
     motor_status->basic.mot_pwm      = o->pwm_fbk;
     
     
