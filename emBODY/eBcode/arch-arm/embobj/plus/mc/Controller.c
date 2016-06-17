@@ -664,6 +664,14 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
 
     case emscontroller_board_HAND_thumb:                  //= 9,    //MC4plus
     {
+        /*
+        NOTE: (VALE)
+            In this board, thumb oppose and thumb proximal joints are coupled.
+            I get decoupled matrix from mc4(CAN) firmware version 0x228 function "decouple_dutycycle".
+            In this function, the fw uses a different decoupled matrix if it runs on left arm or right arm.
+            Currently I tested only left arm, so we need to check if the same matrix can be use also on twin board on right arm.
+        */
+        
         o->nSets   = 3;
         
         Jjm = o->Jjm;
