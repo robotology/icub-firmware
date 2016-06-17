@@ -43,8 +43,8 @@ typedef enum
     emscontroller_board_HEAD_neckpitch_neckroll = 5,    //MC4plus
     emscontroller_board_HEAD_neckyaw_eyes       = 6,    //MC4plus
     emscontroller_board_FACE_eyelids_jaw        = 7,    //MC4plus
-    emscontroller_board_FACE_lips               = 8,    //MC4plus
-    emscontroller_board_HAND_1                  = 9,    //MC4plus
+    emscontroller_board_4jointsNotCoupled       = 8,    //MC4plus this is the new name of emscontroller_board_FACE_lips
+    emscontroller_board_HAND_thumb              = 9,    //MC4plus
     emscontroller_board_HAND_2                  = 10,   //MC4plus
     emscontroller_board_FOREARM                 = 11,   //MC4plus
     

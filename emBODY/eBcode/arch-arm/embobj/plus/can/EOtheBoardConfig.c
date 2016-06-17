@@ -2114,7 +2114,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_0B9 =
     .filler     = {0},
     .data.mc.mc4plus_based = 
     {
-        .boardtype4mccontroller = emscontroller_board_FACE_lips,
+        .boardtype4mccontroller = emscontroller_board_4jointsNotCoupled,
         .filler                 = {0},
         .arrayofjomodescriptors =
         {
@@ -2351,7 +2351,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_1B3_2B3 =
     .filler     = {0},
     .data.mc.mc4plusmais_based = 
     {
-        .boardtype4mccontroller = emscontroller_board_HAND_1,
+        .boardtype4mccontroller = emscontroller_board_HAND_thumb,
         .mais                   = 
         {
             .version    =
@@ -2483,7 +2483,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_1B4_2B4 =
     .filler     = {0},
     .data.mc.mc4plusmais_based = 
     {
-        .boardtype4mccontroller = emscontroller_board_FACE_lips, // so far we keep it like this. later on we either develop a emscontroller_board_FOREARM_thumb or we use new ems controller
+        .boardtype4mccontroller = emscontroller_board_4jointsNotCoupled,
         .mais                   = 
         {
             .version    =
@@ -2620,7 +2620,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_testOfmc2plus =
     .filler     = {0},
     .data.mc.mc4plus_based = 
     {
-        .boardtype4mccontroller = emscontroller_board_FACE_lips, // it uses two independent joints
+        .boardtype4mccontroller = emscontroller_board_4jointsNotCoupled, // it uses two independent joints
         .filler                 = {0},
         .arrayofjomodescriptors =
         {
@@ -2775,7 +2775,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_testOfmc2plus_withma
     .filler     = {0},
     .data.mc.mc4plusmais_based = 
     {
-        .boardtype4mccontroller = emscontroller_board_FACE_lips,
+        .boardtype4mccontroller = emscontroller_board_4jointsNotCoupled,
         .mais                   = 
         {
             .version    =

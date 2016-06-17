@@ -662,41 +662,37 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         break;
     }
 
-    case emscontroller_board_HAND_1:                  //= 9,    //MC4plus
+    case emscontroller_board_HAND_thumb:                  //= 9,    //MC4plus
     {
         o->nSets   = 3;
         
-        Sjm = o->Sjm;
         Jjm = o->Jjm;
         Jmj = o->Jmj;
         
         //motor to joint
         
         // |j0|    | 1     0       0      0 |    |m0|
-        // |j1|  = |-1     1       0      0 |  * |m1|
+        // |j1|  = | 1     1       0      0 |  * |m1|
         // |j2|    | 0     0       1      0 |    |m2|
         // |j3|    | 0     0       0      1 |    |m3|
 
-        Sjm[0][0] =  1.0f; Sjm[0][1] =  0.0f; Sjm[0][2] =  0.0f; Sjm[0][3] =  0.0f;
-        Sjm[1][0] = -1.0f; Sjm[1][1] =  1.0f; Sjm[1][2] =  0.0f; Sjm[1][3] =  0.0f;
-        Sjm[2][0] =  0.0f; Sjm[2][1] =  0.0f; Sjm[2][2] =  1.0f; Sjm[2][3] =  0.0f;
-        Sjm[3][0] =  0.0f; Sjm[3][1] =  0.0f; Sjm[3][2] =  0.0f; Sjm[3][3] =  1.0f;
+        Jjm[0][0] =  1.0f; Jjm[0][1] =  0.0f; Jjm[0][2] =  0.0f; Jjm[0][3] =  0.0f;
+        Jjm[1][0] =  1.0f; Jjm[1][1] =  1.0f; Jjm[1][2] =  0.0f; Jjm[1][3] =  0.0f;
+        Jjm[2][0] =  0.0f; Jjm[2][1] =  0.0f; Jjm[2][2] =  1.0f; Jjm[2][3] =  0.0f;
+        Jjm[3][0] =  0.0f; Jjm[3][1] =  0.0f; Jjm[3][2] =  0.0f; Jjm[3][3] =  1.0f;
 
-        for (int j=0; j<4; ++j)
-            for (int m=0; m<4; ++m)
-                Jjm[j][m] = Sjm[j][m];
-        
 
         //inverted matrix: joint to motor
         // |m0|    | 1     0       0      0 |    |j0|
-        // |m1|  = | 1     1       0      0 |  * |j1|
+        // |m1|  = |-1     1       0      0 |  * |j1|
         // |m2|    | 0     0       1      0 |    |j2|
         // |m3|    | 0     0       0      1 |    |j3|
         
         Jmj[0][0] =  1.0f; Jmj[0][1] =  0.0f; Jmj[0][2] =  0.0f; Jmj[0][3] =  0.0f;
-        Jmj[1][0] =  1.0f; Jmj[1][1] =  1.0f; Jmj[1][2] =  0.0f; Jmj[1][3] =  0.0f;
+        Jmj[1][0] = -1.0f; Jmj[1][1] =  1.0f; Jmj[1][2] =  0.0f; Jmj[1][3] =  0.0f;
         Jmj[2][0] =  0.0f; Jmj[2][1] =  0.0f; Jmj[2][2] =  1.0f; Jmj[2][3] =  0.0f;
         Jmj[3][0] =  0.0f; Jmj[3][1] =  0.0f; Jmj[3][2] =  0.0f; Jmj[3][3] =  1.0f;
+        
         
         //joint, motor, encoder to set
         o->j2s[0] = o->m2s[0] = o->e2s[0] = 0;
@@ -723,7 +719,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
     break;
     
     case emscontroller_board_FACE_eyelids_jaw:        //= 7,    //MC4plus
-    case emscontroller_board_FACE_lips:               //= 8,    //MC4plus
+    case emscontroller_board_4jointsNotCoupled:               //= 8,    //MC4plus
         o->nSets   = 4;
         
         for (int k = 0; k<o->nJoints; ++k)
@@ -880,7 +876,20 @@ void MController_config_joint(int j, eOmc_joint_config_t* config) //
     }
     else
     {
-        AbsEncoder_config(o->absEncoder+j, j, /*(eOmc_EncoderType_t)config->jntEncoderType,*/ config->jntEncoderResolution, AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
+        int16_t spike_mag_limit;
+        uint16_t spike_cnt_limit;
+        if((config->jntEncoderType == eomc_encoder_MAIS) || (config->jntEncoderType == eomc_encoder_HALL_ADC))
+        {
+            spike_mag_limit = 0;
+            spike_cnt_limit = 0;
+        }
+        else
+        {
+            spike_mag_limit = AEA_DEFAULT_SPIKE_MAG_LIMIT;
+            spike_cnt_limit = AEA_DEFAULT_SPIKE_CNT_LIMIT;
+        }
+            
+        AbsEncoder_config(o->absEncoder+j, j, /*(eOmc_EncoderType_t)config->jntEncoderType,*/ config->jntEncoderResolution, spike_mag_limit, spike_cnt_limit);
     }
 }
 
