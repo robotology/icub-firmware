@@ -378,7 +378,7 @@ extern "C" {
 
 //  <o> task stack size <256-1024:128>
 //  <i> default: 512
-#define EOMTHEEMSAPPLCFG_LISTENER_TASK_STACKSIZEof   512
+#define EOMTHEEMSAPPLCFG_LISTENER_TASK_STACKSIZEof   1024
 
 //  </h>listener task
 

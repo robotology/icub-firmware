@@ -57,6 +57,8 @@
 
 #include "eupdater-info.h"
 
+#include "updater-core.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of external variables 
