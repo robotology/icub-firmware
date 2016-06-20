@@ -1084,9 +1084,9 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
         case eomc_calibration_type11_cer_hands:
         {   
             AbsEncoder* enc = o->absEncoder + 3*e;
-            AbsEncoder_calibrate_absolute(enc  , calibrator->params.type11.offset0, calibrator->params.type11.calibrationZero);
-            AbsEncoder_calibrate_absolute(enc+1, calibrator->params.type11.offset1, calibrator->params.type11.calibrationZero);
-            AbsEncoder_calibrate_absolute(enc+2, 0,                                 calibrator->params.type11.calibrationZero);
+            AbsEncoder_calibrate_absolute(enc  , calibrator->params.type11.offset0, enc[0].mul*32767);
+            AbsEncoder_calibrate_absolute(enc+1, calibrator->params.type11.offset1, enc[1].mul*32767);
+            AbsEncoder_calibrate_absolute(enc+2, calibrator->params.type11.offset2, enc[2].mul*32767);
             
             JointSet_do_odometry(o);
             
@@ -1094,9 +1094,11 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             Motor_set_run(o->motor+e);
             Motor_uncalibrate(o->motor+e);
             
+            o->joint[e].cable_constr.max_tension = 0x1F00;
+            
             o->joint[e].cable_calib.pwm         = calibrator->params.type11.pwm;
-            o->joint[e].cable_calib.delta       = 900;//calibrator->params.type11.delta;
             o->joint[e].cable_calib.cable_range = calibrator->params.type11.cable_range;
+            o->joint[e].cable_calib.delta       = 900;//calibrator->params.type11.delta;
             o->joint[e].cable_calib.target      = o->joint[e].pos_fbk + o->joint[e].cable_calib.delta;
             
             if (o->joint[e].cable_calib.target > o->joint[e].pos_max) o->joint[e].cable_calib.target = o->joint[e].pos_max;  

@@ -27,6 +27,19 @@ static char invert_matrix(float** M, float** I, char n);
 //static void MController_config_motor_set(MController* o);
 //static void MController_config_encoder_set(MController* o);
 
+static void send_debug_message(char *message, uint8_t jid, uint16_t par16, uint64_t par64)
+{
+
+    eOerrmanDescriptor_t errdes = {0};
+
+    errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
+    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+    errdes.sourceaddress    = jid;
+    errdes.par16            = par16;
+    errdes.par64            = par64;
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, message, NULL, &errdes);
+}
+
 MController* MController_new(uint8_t nJoints, uint8_t nEncods) //
 {
     if (!smc) smc = NEW(MController, 1);
@@ -539,11 +552,11 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
     
         Sje = o->Sje;
 
-        //Sje[0][0] = 0*-1.0f; Sje[0][1] = 0*1.0f; Sje[0][2] = 1.0f; Sje[0][3] =  0.0f; Sje[0][4] = 0.0f; Sje[0][5] = 0.0f;
-        //Sje[1][0] =  0.0f; Sje[1][1] = 0.0f; Sje[1][2] = 0.0f; Sje[1][3] = 0*-1.0f; Sje[1][4] = 0*1.0f; Sje[1][5] = 1.0f;
+        //Sje[0][0] = -1.0f; Sje[0][1] = 1.0f; Sje[0][2] = 0.0f; Sje[0][3] =  0.0f; Sje[0][4] = 0.0f; Sje[0][5] = 0.0f;
+        //Sje[1][0] =  0.0f; Sje[1][1] = 0.0f; Sje[1][2] = 0.0f; Sje[1][3] = -1.0f; Sje[1][4] = 1.0f; Sje[1][5] = 0.0f;
 
-        Sje[0][0] = 0; Sje[0][1] = 1; Sje[0][2] = 0; Sje[0][3] = 0; Sje[0][4] = 0; Sje[0][5] = 0;
-        Sje[1][0] = 0; Sje[1][1] = 0; Sje[1][2] = 0; Sje[1][3] = 0; Sje[1][4] = 1; Sje[1][5] = 0;
+        Sje[0][0] = -1; Sje[0][1] = 1; Sje[0][2] = 0; Sje[0][3] =  0; Sje[0][4] = 0; Sje[0][5] = 0;
+        Sje[1][0] =  0; Sje[1][1] = 0; Sje[1][2] = 0; Sje[1][3] = -1; Sje[1][4] = 1; Sje[1][5] = 0;
     
         o->e2s[0] = o->e2s[1] = o->e2s[2] = 0;
         o->e2s[3] = o->e2s[4] = o->e2s[5] = 1;
@@ -909,8 +922,9 @@ void MController_config_joint(int j, eOmc_joint_config_t* config) //
     }
     else if (o->part_type==emscontroller_board_CER_HAND)
     {
-        AbsEncoder_config(o->absEncoder+j*2,   j, /*(eOmc_EncoderType_t)config->jntEncoderType,*/ config->jntEncoderResolution, AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
-        AbsEncoder_config(o->absEncoder+j*2+1, j, /*(eOmc_EncoderType_t)config->jntEncoderType,*/ config->jntEncoderResolution, AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
+        AbsEncoder_config(o->absEncoder+j*3,   j, /*(eOmc_EncoderType_t)config->jntEncoderType,*/ config->jntEncoderResolution, AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
+        AbsEncoder_config(o->absEncoder+j*3+1, j, /*(eOmc_EncoderType_t)config->jntEncoderType,*/ config->jntEncoderResolution, AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
+        AbsEncoder_config(o->absEncoder+j*3+2, j, /*(eOmc_EncoderType_t)config->jntEncoderType,*/ config->jntEncoderResolution, AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
     }
     else
     {
@@ -1103,13 +1117,26 @@ void MController_update_joint_torque_fbk(uint8_t j, CTRL_UNITS trq_fbk) //
 }
 
 void MController_update_absEncoder_fbk(uint8_t e, uint32_t* positions) //
-{
+{    
     AbsEncoder* enc = smc->absEncoder + e*smc->multi_encs;
     
     for (int k=0; k<smc->multi_encs; ++k)
     {
         AbsEncoder_update(enc++, (uint16_t)positions[k]);
     }
+    
+    MController_update_joint_torque_fbk(e, AbsEncoder_position(smc->absEncoder+(e*smc->multi_encs+2)));
+    
+    /*
+    static int repeat[2] = {0,500};
+    
+    if (++repeat[e]>=1000)
+    {
+        repeat[e] = 0;
+        
+        send_debug_message("Torque", e, smc->joint[e].trq_fbk, 0);
+    }
+    */
 }
 
 void MController_update_motor_state_fbk(uint8_t m, void* state)
