@@ -133,7 +133,7 @@ static void Motor_config_2FOC(Motor* o, eOmc_motor_config_t* config)
     cmdPid.type = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID;
     cmdPid.value = KpKiKdKs;
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdPid, id32);
-    
+        
     eOcanprot_command_t cmdMaxCurrent;
     cmdMaxCurrent.class = eocanprot_msgclass_pollingMotorControl;
     cmdMaxCurrent.type = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT;
@@ -144,7 +144,29 @@ static void Motor_config_2FOC(Motor* o, eOmc_motor_config_t* config)
     cmdMotorConfig.class = eocanprot_msgclass_pollingMotorControl;
     cmdMotorConfig.type = ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_CONFIG;
     cmdMotorConfig.value = o->can_motor_config;
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdMotorConfig, id32);      
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdMotorConfig, id32);
+    
+    /*
+    {
+        int8_t KpKiKdKs[7];
+    
+        //((int16_t*)KpKiKdKs)[0] = config->pidvelocity.kp;    //Kp
+        //((int16_t*)KpKiKdKs)[1] = config->pidvelocity.ki;    //Ki
+        //((int16_t*)KpKiKdKs)[2] = config->pidvelocity.kd;    //Kd (unused in 2FOC)
+        //           KpKiKdKs [6] = config->pidvelocity.scale; // shift
+        
+        ((int16_t*)KpKiKdKs)[0] =  0x0C; //Kp
+        ((int16_t*)KpKiKdKs)[1] =  0x10; //Ki
+        ((int16_t*)KpKiKdKs)[2] =  0x00; //Kd (unused in 2FOC)
+                   KpKiKdKs [6] =  0x0A; // shift
+        
+        eOcanprot_command_t cmdPid;
+        cmdPid.class = eocanprot_msgclass_pollingMotorControl;
+        cmdPid.type = ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID;
+        cmdPid.value = KpKiKdKs;
+        eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdPid, id32);
+    }
+    */
 }
 
 static void Motor_set_control_mode_2FOC(uint8_t motor, icubCanProto_controlmode_t control_mode)
