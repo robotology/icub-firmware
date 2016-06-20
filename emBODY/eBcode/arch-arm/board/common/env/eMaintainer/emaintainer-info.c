@@ -126,7 +126,7 @@ extern const ipal_cfg_t    ipal_cfg;
 //    .extra      = {0}
 //};
 
-#elif (emBODYrobot_BOARD_NAME == boardEMS4RD) | (emBODYrobot_BOARD_NAME == boardMC4PLUS)
+#elif (emBODYrobot_BOARD_NAME == boardEMS4RD) | (emBODYrobot_BOARD_NAME == boardMC4PLUS) | (emBODYrobot_BOARD_NAME == boardMC2PLUS)
 
 
 const eEmoduleExtendedInfo_t emaintainer_modinfo_extended __attribute__((at(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
@@ -142,13 +142,13 @@ const eEmoduleExtendedInfo_t emaintainer_modinfo_extended __attribute__((at(EENV
                 .version    = 
                 { 
                     .major = 2, 
-                    .minor = 13
+                    .minor = 14
                 },  
                 .builddate  = 
                 {
-                    .year  = 2015,
+                    .year  = 2016,
                     .month = 6,
-                    .day   = 15,
+                    .day   = 16,
                     .hour  = 11,
                     .min   = 37
                 }
@@ -170,7 +170,7 @@ const eEmoduleExtendedInfo_t emaintainer_modinfo_extended __attribute__((at(EENV
                 .addr   = 0
             },
             .communication  = ee_commtype_eth,  // later on we may also add can1 and can2
-            .name           = "eMaintainer"
+            .name           = "eApplPROGupdat"
         },
         .protocols  =
         {

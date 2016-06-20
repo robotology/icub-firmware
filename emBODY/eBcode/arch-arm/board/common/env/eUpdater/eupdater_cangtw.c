@@ -198,7 +198,7 @@ extern void eupdater_cangtw_start(eOipv4addr_t remipaddr, const cangtw_parameter
     }    
     
     
-    // eupdater_info_trace(NULL, "sending event_cangtw_start = %d", event_cangtw_start);
+    // updater_core_trace(NULL, "sending event_cangtw_start = %d", event_cangtw_start);
 
     eupdater_cangtw_set_remote_addr(remipaddr);
     
@@ -329,7 +329,7 @@ static void s_cangateway_startup(EOMtask *p, uint32_t t)
                                                     16, eupdater_cangtw_udp_packet_maxsize, eom_mutex_New()  // output queue
                                                 );   
     
-    eupdater_info_trace("canGTW", "opening a txrx socket on port %d", s_cangtw_port);
+    updater_core_trace("canGTW", "opening a txrx socket on port %d", s_cangtw_port);
 
     EOaction_strg action_strg;
     EOaction* act = (EOaction*)&action_strg;  
@@ -353,7 +353,7 @@ static void s_cangateway_run(EOMtask *p, uint32_t t)
     eOevent_t evt = (eOevent_t) t;
     
 #if defined(_DEBUG_MODE_FULL_)    
-    eupdater_info_trace(NULL, "received event %d", evt);    
+    updater_core_trace(NULL, "received event %d", evt);    
 #endif    
     
     if(eobool_true == eo_common_event_check(evt, event_cangtw_start))

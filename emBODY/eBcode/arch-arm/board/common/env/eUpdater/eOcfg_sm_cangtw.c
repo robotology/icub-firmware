@@ -27,6 +27,8 @@
 #include "EoCommon.h"
 #include "EOsm_hid.h"
 
+#include "EoUpdaterProtocol.h"
+
 
 
 // other things required for this particular state machine
@@ -42,6 +44,7 @@
 #include "osal_system.h"
 
 #include "eupdater-info.h"
+#include "updater-core.h"
 
 extern eObool_t eom_eupdater_main_connectsocket2host(eOipv4addr_t remaddr, EOsocketDatagram *skt, uint32_t usec);
 
@@ -539,7 +542,7 @@ static void s_smcfg_CanGtw_reset(EOsm *s)
 
 static void s_smcfg_CanGtw_on_entry_IDLE(EOsm *s) 
 {
-//    eupdater_info_trace(NULL, "inside s_smcfg_CanGtw_on_entry_IDLE()");
+//    updater_core_trace(NULL, "inside s_smcfg_CanGtw_on_entry_IDLE()");
     
     // allocate the service timer.
     s_smcfg_CanGtw_service_timer = eo_timer_New();   
@@ -552,7 +555,7 @@ static void s_smcfg_CanGtw_on_entry_IDLE(EOsm *s)
 
 static void s_smcfg_CanGtw_on_entry_STARTUP(EOsm *s) 
 {   
-    // eupdater_info_trace(NULL, "inside s_smcfg_CanGtw_on_entry_STARTUP() w/ CAN power on");
+    // updater_core_trace(NULL, "inside s_smcfg_CanGtw_on_entry_STARTUP() w/ CAN power on");
     
     // prepare can bus. then, emit two events which send all the can boards in bootloader mode    
     cangateway_hid_hal_init();
@@ -574,7 +577,7 @@ static void s_smcfg_CanGtw_on_entry_STARTUP(EOsm *s)
 
 static void s_smcfg_CanGtw_on_entry_RUN(EOsm *s) 
 {   
-    // eupdater_info_trace("GTW", "inside on_entry_RUN()");
+    // updater_core_trace("GTW", "inside on_entry_RUN()");
     
     eupdater_parser_cangtw_activate();
     
@@ -640,7 +643,7 @@ static void s_smcfg_CanGtw_on_trans_STARTUP_evcanstable(EOsm *s)
 
 static void s_smcfg_CanGtw_on_trans_RUN_evgo2run(EOsm *s)
 {    
-    // eupdater_info_trace("GTW", "called on_trans_RUN_evgo2run()");
+    // updater_core_trace("GTW", "called on_trans_RUN_evgo2run()");
 
     const cangtw_parameters_t * par = eupdater_cangtw_get_parameters();    
     
@@ -742,7 +745,7 @@ static void s_parse_upd_packet(EOpacket* pkt)
     eupdater_cangtw_set_remote_addr(remaddr);
     
 #if	defined(_DEBUG_MODE_PRINTETH_)    
-    eupdater_info_trace("GTW", "ETH2: prog #%d", simpleudpframe->header.progressive);
+    updater_core_trace("GTW", "ETH2: prog #%d", simpleudpframe->header.progressive);
 #endif
   
     
@@ -798,7 +801,7 @@ static void s_parse_upd_packet(EOpacket* pkt)
 	{
 		if(prog != (prevprog+1))
 		{
-            eupdater_info_trace("GTW", "LOST ETH #%d from host", prevprog+1);
+            updater_core_trace("GTW", "LOST ETH #%d from host", prevprog+1);
 		}
 	} 
 	prevprog = prog;  
@@ -823,7 +826,7 @@ static void s_can_get(hal_can_port_t port)
     
     if(eobool_false == eupdater_parser_cangtw_isactivated())
     {
-    //    eupdater_info_trace("GTW", "called s_can_get() but the gateway is not active yet");
+    //    updater_core_trace("GTW", "called s_can_get() but the gateway is not active yet");
 #if     defined(_DEBUG_MODE_PRINTCAN_)          
         s_print_canframe(0, 0, port, &frame);   
 #endif        
@@ -874,10 +877,18 @@ extern void cangtw_send_ack(void)
 
     eo_packet_Payload_Get(s_txpkt_gtwcan, (uint8_t**)&ack, &size);
     
-    ack[0] = 0x20;
-    ack[1] = (eobool_true == eupdater_parser_cangtw_isactivated()) ? 1 : 0;
+    eOuprot_cmdREPLY_t * reply = (eOuprot_cmdREPLY_t*) ack;
     
-    eo_packet_Size_Set(s_txpkt_gtwcan, 2);
+    reply->opc = uprot_OPC_CANGATEWAY;
+    reply->protversion = EOUPROT_PROTOCOL_VERSION;
+    reply->res = uprot_RES_OK;
+    reply->sizeofextra = 0;
+    
+    eo_packet_Size_Set(s_txpkt_gtwcan, sizeof(eOuprot_cmdREPLY_t));
+//    ack[0] = 0x20;
+//    ack[1] = (eobool_true == eupdater_parser_cangtw_isactivated()) ? 1 : 0;
+//    
+//    eo_packet_Size_Set(s_txpkt_gtwcan, 2);
             
     eOipv4addr_t remhostaddr = eupdater_cangtw_get_remote_addr();
     if(eok_ipv4addr_localhost != remhostaddr)
@@ -900,7 +911,7 @@ static void s_send_blmsg(EOsm *s)
 
     if(NULL != CANMSG2SEND)
     {            
-    //   eupdater_info_trace("GTW", "sent 0xff can command on both can buses");
+    //   updater_core_trace("GTW", "sent 0xff can command on both can buses");
         
         hal_can_frame_t frame;
               
@@ -925,7 +936,7 @@ static void s_smcfg_can_clean(hal_can_port_t port)
     hal_result_t res = hal_res_OK;
     uint8_t num = 0;
     
-    //eupdater_info_trace("GTW", "called s_smcfg_can_clean() for CAN%d", port+1);
+    //updater_core_trace("GTW", "called s_smcfg_can_clean() for CAN%d", port+1);
     
     
     for(;;)
@@ -936,7 +947,7 @@ static void s_smcfg_can_clean(hal_can_port_t port)
         {
             num++;
 
-//            eupdater_info_trace("GTW", "removed frame from can%d: size=%d, id=%d, d0=%d, d1=%d", 
+//            updater_core_trace("GTW", "removed frame from can%d: size=%d, id=%d, d0=%d, d1=%d", 
 //                                       (hal_can_port1==port)?1:2, 
 //                                        frame.size, 
 //                                        frame.id, 
@@ -948,7 +959,7 @@ static void s_smcfg_can_clean(hal_can_port_t port)
             break;        
         }
     }
-//    eupdater_info_trace("GTW", "in total removed %d frames from can%d.", 
+//    updater_core_trace("GTW", "in total removed %d frames from can%d.", 
 //                                num,
 //                               (hal_can_port1==port)?1:2
 //                                
@@ -968,7 +979,7 @@ static void s_print_canframe(uint32_t progr, uint8_t tx, hal_can_port_t port, ha
 
     memcpy(dd, frame->data, frame->size);
     
-    eupdater_info_trace("GTW", "%s frame #%d \t\t %d \t after %d ms: \t\tcan%d, id = %3.3x, s = %d, d[] = %2.2x %2.2x %2.2x %2.2x %2.2x %2.2x %2.2x %2.2x ", 
+    updater_core_trace("GTW", "%s frame #%d \t\t %d \t after %d ms: \t\tcan%d, id = %3.3x, s = %d, d[] = %2.2x %2.2x %2.2x %2.2x %2.2x %2.2x %2.2x %2.2x ", 
                                 (1 == tx) ? "tx" : "rx",
                                 progr,
                                 delta,

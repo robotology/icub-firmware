@@ -119,6 +119,7 @@ extern void task_ethcommand(void *p);
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
+enum { capacityofUDPpacket = 1200 };
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
@@ -293,9 +294,9 @@ static void s_eom_eupdater_main_init(void)
     
     
 //#if !defined(_MAINTAINER_APPL_)     
-//    eupdater_info_trace("MAIN", "starting eUpdater:");
+//    updater_core_trace("MAIN", "starting eUpdater:");
 //#else
-//    eupdater_info_trace("MAIN", "starting eMaintainer");
+//    updater_core_trace("MAIN", "starting eMaintainer");
 //#endif  
 
     // eeprom is used for shared services but is initted also inside there
@@ -332,7 +333,7 @@ static void s_eom_eupdater_main_init(void)
 #endif
 
 //    // start the ipnet
-    eupdater_info_trace("MAIN", "starting ::ipnet with IP addr: %d.%d.%d.%d\n\r", ipaddr[0], ipaddr[1], ipaddr[2], ipaddr[3]); 
+    updater_core_trace("MAIN", "starting ::ipnet with IP addr: %d.%d.%d.%d\n\r", ipaddr[0], ipaddr[1], ipaddr[2], ipaddr[3]); 
 
     eom_ipnet_Initialise(&eom_ipnet_DefaultCfg,
                          ipalcfg, 
@@ -351,23 +352,23 @@ static void s_eom_eupdater_main_init(void)
     
 
     // the eth command task 
-//    eupdater_info_trace("MAIN", "starting ::taskethcommand");                       
+//    updater_core_trace("MAIN", "starting ::taskethcommand");                       
 
     s_task_ethcommand = eom_task_New(eom_mtask_MessageDriven, 101, 2*1024, s_ethcommand_startup, s_ethcommand_run,  16, 
                                     eok_reltimeINFINITE, NULL, 
                                     task_ethcommand, "ethcommand");
     s_task_ethcommand = s_task_ethcommand;
     
-    upd_core_init();
+    updater_core_init();
     
 #if !defined(_MAINTAINER_APPL_)
     // there is also the can gateway
-//    eupdater_info_trace("MAIN", "starting ::cangateway");    
+//    updater_core_trace("MAIN", "starting ::cangateway");    
     eupdater_cangtw_init();
 #endif
 
     // eval if and when jumping
-//    eupdater_info_trace("MAIN", "calling ::evalwhenjumping");
+//    updater_core_trace("MAIN", "calling ::evalwhenjumping");
     eupdater_parser_evalwhenjumping(); 
 }
 
@@ -375,18 +376,18 @@ static void s_eom_eupdater_main_init(void)
 static void s_ethcommand_startup(EOMtask *p, uint32_t t)
 {
     // init the rx and tx packets 
-    s_rxpkt_ethcmd = eo_packet_New(1024);  
-    s_txpkt_ethcmd = eo_packet_New(1024);
+    s_rxpkt_ethcmd = eo_packet_New(capacityofUDPpacket);  
+    s_txpkt_ethcmd = eo_packet_New(capacityofUDPpacket);
 
     // init the action used for various tasks
     s_action_ethcmd = eo_action_New();  
 
     // initialise the socket 
-    s_skt_ethcmd = eo_socketdtg_New(  2, 1024, eom_mutex_New(), // input queue
-                                      2, 1024, eom_mutex_New()  // output queue
+    s_skt_ethcmd = eo_socketdtg_New(  2, capacityofUDPpacket, eom_mutex_New(), // input queue
+                                      2, capacityofUDPpacket, eom_mutex_New()  // output queue
                                    );   
 
-//    eupdater_info_trace("MAIN", "opening a txrx socket on port %d for eth messages\n\r", s_ethcmd_port);
+//    updater_core_trace("MAIN", "opening a txrx socket on port %d for eth messages\n\r", s_ethcmd_port);
 
 
     // set the rx action on socket to be a message s_message_from_skt_ethcmd to this task object
