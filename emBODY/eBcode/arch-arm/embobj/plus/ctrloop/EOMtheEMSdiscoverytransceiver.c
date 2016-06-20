@@ -36,7 +36,8 @@
 
 #include "eEmemorymap.h" 
 
-//#include "appl-core.h"
+
+#include "EoUpdaterProtocol.h"
 
 
 
@@ -93,12 +94,14 @@ static void s_callback_shutdown2updater(void *p);
 static uint8_t s_app_core_manage_cmd(uint8_t *pktin, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout);
 #endif
 
-static uint8_t s_fill_scan2(uint8_t *pktout, uint16_t *sizeout);
-static uint8_t s_process_SCAN2(uint8_t *pktin, uint8_t *pktout, uint16_t *sizeout);
-static uint8_t s_process_SCAN_legacy(uint8_t *pktin, uint8_t *pktout, uint16_t *sizeout, uint16_t capacityout);
+//static uint8_t s_fill_scan2(uint8_t *pktout, uint16_t *sizeout);
+//static uint8_t s_process_SCAN2(uint8_t *pktin, uint8_t *pktout, uint16_t *sizeout);
+//static uint8_t s_process_SCAN_legacy(uint8_t *pktin, uint8_t *pktout, uint16_t *sizeout, uint16_t capacityout);
 
 
-static uint8_t s_app_core_manage_cmd2(uint8_t *pktin, uint16_t pktinsize, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout);
+//static uint8_t s_app_core_manage_cmd2(uint8_t *pktin, uint16_t pktinsize, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout);
+
+static uint8_t s_appl_parse(uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -257,12 +260,15 @@ static eObool_t s_parse_and_form(uint8_t *data, uint8_t size, eOipv4addr_t remad
        
         //uint8_t r = s_app_core_manage_cmd(data, txdata, s_emsdiscoverytransceiver_singleton.cfg.txpktcapacity, &txsize);
         
-        uint8_t r = s_app_core_manage_cmd2(data, size, txdata, s_emsdiscoverytransceiver_singleton.cfg.txpktcapacity, &txsize);
+        //uint8_t r = s_app_core_manage_cmd2(data, size, txdata, s_emsdiscoverytransceiver_singleton.cfg.txpktcapacity, &txsize);
+        
+        uint8_t r = s_appl_parse(data, size, remaddr, txdata, s_emsdiscoverytransceiver_singleton.cfg.txpktcapacity, &txsize);
+        
         
         
         switch(r)
         {
-            case 2:
+            case 1:
             {
                 if(0 != txsize)
                 {
@@ -279,11 +285,6 @@ static eObool_t s_parse_and_form(uint8_t *data, uint8_t size, eOipv4addr_t remad
             
             } break;
             
-            case 1:
-            {
-                transmit = eobool_true;               
-                
-            } break;
             
             default:
             case 0:
@@ -382,6 +383,12 @@ static eObool_t s_parse_and_form(uint8_t *data, uint8_t size, eOipv4addr_t remad
 
 // content of appl-core.c
 
+
+
+
+
+#if defined(KEEP_OLD_SCAN)
+
 typedef enum {
     CMD_SCAN    = 0xFF,          // supported
     CMD_SCAN2   = 0x7F,         //  supported
@@ -415,9 +422,6 @@ enum {
 #define PROTOCOL3333_VERSION 1
 
 
-
-
-#if defined(KEEP_OLD_SCAN)
 // acemor: 0 error or nothing to do. 1 transmit back. 2 tx back and start countdown
 // acemor: bytes: CMD_SCAN 14, 
 static uint8_t s_app_core_manage_cmd(uint8_t *pktin, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout)
@@ -572,128 +576,244 @@ static uint8_t s_app_core_manage_cmd(uint8_t *pktin, uint8_t *pktout, uint16_t c
 
 #endif
 
-// acemor: 0 error or nothing to do. 1 transmit back. 2 tx back and start countdown
-// acemor: bytes: CMD_SCAN 14, 
-static uint8_t s_app_core_manage_cmd2(uint8_t *pktin, uint16_t pktinsize, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout)
-{
-    uint8_t opcode = pktin[0]; // use 0 .... 1 only for debug
-//#warning --> to debug CHANGE IN 1 but then put 0 back !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    *sizeout=0;
-    
-    uint8_t retval = 0;
+//// acemor: 0 error or nothing to do. 1 transmit back. 2 tx back and start countdown
+//// acemor: bytes: CMD_SCAN 14, 
+//static uint8_t s_app_core_manage_cmd2(uint8_t *pktin, uint16_t pktinsize, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout)
+//{
+//    uint8_t opcode = pktin[0]; // use 0 .... 1 only for debug
+////#warning --> to debug CHANGE IN 1 but then put 0 back !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//    *sizeout=0;
+//    
+//    uint8_t retval = 0;
 
-    switch(opcode) // opcode
-    {
-        case CMD_SCAN2:
-        {
-            retval = s_process_SCAN2(pktin, pktout, sizeout);            
-        } break;
-        
-        case CMD_SCAN:
-        {
-            if(1 == pktinsize)
-            {
-                retval = s_process_SCAN_legacy(pktin, pktout, sizeout, capacityout);                
-            }
-            else
-            {   // because packet of size 2 with: {CMD_SCAN, CMD_SCAN2} is equivalent to {CMD_SCAN2} of size 1 
-                retval = s_process_SCAN2(pktin, pktout, sizeout);
-            }
-            
-        } break;
-
-
-        case CMD_RESET:
-        {
-            *sizeout = 0;
-
-            ee_sharserv_sys_restart();
-            
-            retval = 0;
-   
-        } break;
+//    switch(opcode) // opcode
+//    {
+//        case CMD_SCAN2:
+//        {
+//            retval = s_process_SCAN2(pktin, pktout, sizeout);            
+//        } break;
+//        
+//        case CMD_SCAN:
+//        {
+//            if(1 == pktinsize)
+//            {
+//                retval = s_process_SCAN_legacy(pktin, pktout, sizeout, capacityout);                
+//            }
+//            else
+//            {   // because packet of size 2 with: {CMD_SCAN, CMD_SCAN2} is equivalent to {CMD_SCAN2} of size 1 
+//                retval = s_process_SCAN2(pktin, pktout, sizeout);
+//            }
+//            
+//        } break;
 
 
-        case CMD_UPD_ONCE:
-        {
-            *sizeout = 0;
-     
-            ee_sharserv_ipc_gotoproc_set(ee_procUpdater);
-            ee_sharserv_sys_restart();
-            
-            retval = 0;
-            
-        } break;
-        
+//        case CMD_RESET:
+//        {
+//            *sizeout = 0;
 
-        default:
-        { 
-            *sizeout = 0;
-            retval = 0; 
-            
-        } break;
-    }
+//            ee_sharserv_sys_restart();
+//            
+//            retval = 0;
+//   
+//        } break;
 
-    return retval;
+
+//        case CMD_UPD_ONCE:
+//        {
+//            *sizeout = 0;
+//     
+//            ee_sharserv_ipc_gotoproc_set(ee_procUpdater);
+//            ee_sharserv_sys_restart();
+//            
+//            retval = 0;
+//            
+//        } break;
+//        
+
+//        default:
+//        { 
+//            *sizeout = 0;
+//            retval = 0; 
+//            
+//        } break;
+//    }
+
+//    return retval;
+//}
+
+
+//static uint8_t s_process_SCAN_legacy(uint8_t *pktin, uint8_t *pktout, uint16_t *sizeout, uint16_t capacityout)
+//{
+//    uint8_t retval = 0;
+//    
+//    if(capacityout < 14)
+//    {
+//        *sizeout = 0;
+//        retval = 2; 
+//    }
+//    else
+//    {
+//        *sizeout = 14;
+//        
+//        eEmoduleInfo_t* module=(eEmoduleInfo_t*)(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET);
+
+//        pktout[0] = CMD_SCAN;
+//        pktout[1] = module->info.entity.version.major;
+//        pktout[2] = module->info.entity.version.minor;
+//        pktout[3] = BOARD_TYPE_EMS;
+//        
+//        const eEipnetwork_t *ipnetworkstrg;
+//        ee_sharserv_info_deviceinfo_item_get(sharserv_info_ipnet, (const void**)&ipnetworkstrg);
+
+//        pktout[4] = (ipnetworkstrg->ipnetmask>>24) & 0xFF;
+//        pktout[5] = (ipnetworkstrg->ipnetmask>>16) & 0xFF;
+//        pktout[6] = (ipnetworkstrg->ipnetmask>>8)  & 0xFF;
+//        pktout[7] =  ipnetworkstrg->ipnetmask      & 0xFF;
+
+//        pktout[ 8] = (ipnetworkstrg->macaddress>>40) & 0xFF;
+//        pktout[ 9] = (ipnetworkstrg->macaddress>>32) & 0xFF;
+//        pktout[10] = (ipnetworkstrg->macaddress>>24) & 0xFF;
+//        pktout[11] = (ipnetworkstrg->macaddress>>16) & 0xFF;
+//        pktout[12] = (ipnetworkstrg->macaddress>>8)  & 0xFF;
+//        pktout[13] = (ipnetworkstrg->macaddress)     & 0xFF;
+
+//        retval = 2;
+//    } 
+
+//    return retval;
+//}
+
+
+//static uint8_t s_process_SCAN2(uint8_t *pktin, uint8_t *pktout, uint16_t *sizeout)
+//{
+//    // eupdater_info_trace("CORE", "CMD_SCAN2");
+//    
+//    pktout[ 0] = CMD_SCAN2;
+//    
+//    return s_fill_scan2(pktout, sizeout);        
+//}
+
+//static uint8_t s_fill_scan2(uint8_t *pktout, uint16_t *sizeout)
+//{
+//    pktout[ 1] = PROTOCOL3333_VERSION;
+//    
+//    *sizeout = 40+32;
+
+//    const eEipnetwork_t *ipnetworkstrg = NULL;
+//    ee_sharserv_info_deviceinfo_item_get(sharserv_info_ipnet, (const void**)&ipnetworkstrg);
+//    
+//    const eEboardInfo_t* boardinfo = NULL;
+//    ee_sharserv_info_boardinfo_get(&boardinfo);
+//    // now get the board type.
+//    uint8_t boardtype = 255; // use eobrd_ethtype_unknown later on
+//    if(0x11 == boardinfo->info.entity.signature)
+//    {   // old eLoader upto version 2.11 of build date 2015 May 26 11:11. it have info about board type in a string
+//        
+//        if(0 == strcmp((const char*)boardinfo->info.name, "ems4rd"))
+//        {
+//            boardtype = 32; // use eobrd_ethtype_ems4 later on        
+//        }
+//        else if(0 == strcmp((const char*)boardinfo->info.name, "mc4plus"))
+//        {
+//             boardtype = 33; // use eobrd_ethtype_mc4plus later on 
+//        }        
+//    }
+//    else
+//    {   // since eLoader version 2.12 the fiels boardinfo->info.entity.signature contains the board type. 
+//        boardtype = boardinfo->info.entity.signature;
+//    }
+//    
+//    eEprocess_t startup = ee_procNone;
+//    eEprocess_t def2run = ee_procNone;
+//    ee_sharserv_part_proc_startup_get(&startup);
+//    ee_sharserv_part_proc_def2run_get(&def2run);
+//    
+//    pktout[ 2] = (ipnetworkstrg->macaddress>>40) & 0xFF;
+//    pktout[ 3] = (ipnetworkstrg->macaddress>>32) & 0xFF;
+//    pktout[ 4] = (ipnetworkstrg->macaddress>>24) & 0xFF;
+//    pktout[ 5] = (ipnetworkstrg->macaddress>>16) & 0xFF;
+//    pktout[ 6] = (ipnetworkstrg->macaddress>>8)  & 0xFF;
+//    pktout[ 7] = (ipnetworkstrg->macaddress)     & 0xFF;
+//    
+//    pktout[ 8] = boardtype;
+//    pktout[ 9] = startup;
+//    pktout[10] = def2run;
+//    
+//    uint8_t nprocs = 0;
+//    const eEprocess_t *s_proctable = NULL;
+//    ee_sharserv_part_proc_allavailable_get(&s_proctable, &nprocs);
+//    
+//    pktout[11] = nprocs;
+//    
+//    for(uint8_t i=0; i<nprocs; i++)
+//    {
+//        const eEmoduleInfo_t *s_modinfo = NULL;
+//        ee_sharserv_part_proc_get(s_proctable[i], &s_modinfo);
+//        pktout[12+8*i] = s_proctable[i];
+//        pktout[13+8*i] = s_modinfo->info.entity.version.major;
+//        pktout[14+8*i] = s_modinfo->info.entity.version.minor;
+//        uint8_t* builddate = (uint8_t*) &s_modinfo->info.entity.builddate;
+//        pktout[15+8*i] = builddate[0];
+//        pktout[16+8*i] = builddate[1];
+//        pktout[17+8*i] = builddate[2];
+//        pktout[18+8*i] = builddate[3];      
+//    }
+//    
+//    pktout[36] = ee_procApplication;
+//    pktout[37] = 0;
+//    pktout[38] = 0;
+//    pktout[39] = 0;
+//    const void *page = NULL;
+//    ee_sharserv_info_deviceinfo_item_get(sharserv_info_page32, &page);
+//    memcpy(&pktout[40], page, 32);
+//    
+
+//    return 2; // tx back and start countdown
+//}
+
+typedef uint8_t (*uprot_fp_process_t) (eOuprot_opcodes_t, uint8_t *, uint16_t, eOipv4addr_t, uint8_t *, uint16_t, uint16_t *);
+
+
+static uint8_t s_uprot_proc_NONE(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout)
+{  
+    // no reply
+    *sizeout = 0;    
+    return(0);   
 }
 
-static uint8_t s_process_SCAN_legacy(uint8_t *pktin, uint8_t *pktout, uint16_t *sizeout, uint16_t capacityout)
-{
-    uint8_t retval = 0;
+
+static uint8_t s_uprot_proc_UNSUPP(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout)
+{ 
+#if 1
+    // no reply
+    *sizeout = 0;    
+    return(0); 
+#else    
+    eOuprot_cmdREPLY_t *reply =  (eOuprot_cmdREPLY_t*)pktout;        
+    reply->opc = opc;
+    reply->res = uprot_RES_ERR_UNSUPPORTED;
+    reply->protversion = EOUPROT_PROTOCOL_VERSION;
+    reply->sizeofextra = 0;
+    *sizeout = sizeof(eOuprot_cmdREPLY_t);  
     
-    if(capacityout < 14)
-    {
-        *sizeout = 0;
-        retval = 2; 
-    }
-    else
-    {
-        *sizeout = 14;
-        
-        eEmoduleInfo_t* module=(eEmoduleInfo_t*)(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET);
-
-        pktout[0] = CMD_SCAN;
-        pktout[1] = module->info.entity.version.major;
-        pktout[2] = module->info.entity.version.minor;
-        pktout[3] = BOARD_TYPE_EMS;
-        
-        const eEipnetwork_t *ipnetworkstrg;
-        ee_sharserv_info_deviceinfo_item_get(sharserv_info_ipnet, (const void**)&ipnetworkstrg);
-
-        pktout[4] = (ipnetworkstrg->ipnetmask>>24) & 0xFF;
-        pktout[5] = (ipnetworkstrg->ipnetmask>>16) & 0xFF;
-        pktout[6] = (ipnetworkstrg->ipnetmask>>8)  & 0xFF;
-        pktout[7] =  ipnetworkstrg->ipnetmask      & 0xFF;
-
-        pktout[ 8] = (ipnetworkstrg->macaddress>>40) & 0xFF;
-        pktout[ 9] = (ipnetworkstrg->macaddress>>32) & 0xFF;
-        pktout[10] = (ipnetworkstrg->macaddress>>24) & 0xFF;
-        pktout[11] = (ipnetworkstrg->macaddress>>16) & 0xFF;
-        pktout[12] = (ipnetworkstrg->macaddress>>8)  & 0xFF;
-        pktout[13] = (ipnetworkstrg->macaddress)     & 0xFF;
-
-        retval = 2;
-    } 
-
-    return retval;
+    return 1;
+#endif    
 }
 
 
-static uint8_t s_process_SCAN2(uint8_t *pktin, uint8_t *pktout, uint16_t *sizeout)
-{
-    // eupdater_info_trace("CORE", "CMD_SCAN2");
-    
-    pktout[ 0] = CMD_SCAN2;
-    
-    return s_fill_scan2(pktout, sizeout);        
-}
 
-static uint8_t s_fill_scan2(uint8_t *pktout, uint16_t *sizeout)
+static uint16_t s_discover_fill(eOuprot_cmd_DISCOVER_REPLY_t *reply, eOuprot_opcodes_t opcode2use, uint16_t sizeofreply2use)
 {
-    pktout[ 1] = PROTOCOL3333_VERSION;
+    uint16_t size = sizeof(eOuprot_cmd_DISCOVER_REPLY_t);  
     
-    *sizeout = 40+32;
 
+    reply->reply.opc = opcode2use;
+    reply->reply.res = uprot_RES_OK;
+    reply->reply.protversion = EOUPROT_PROTOCOL_VERSION;
+    reply->reply.sizeofextra = sizeofreply2use - sizeof(eOuprot_cmdREPLY_t);   
+
+    // ok, now i fill the values
+    
     const eEipnetwork_t *ipnetworkstrg = NULL;
     ee_sharserv_info_deviceinfo_item_get(sharserv_info_ipnet, (const void**)&ipnetworkstrg);
     
@@ -714,7 +834,7 @@ static uint8_t s_fill_scan2(uint8_t *pktout, uint16_t *sizeout)
         }        
     }
     else
-    {   // since eLoader version 2.12 the fiels boardinfo->info.entity.signature contains the board type. 
+    {   // after eLoader version 2.12 the fields boardinfo->info.entity.signature contains the board type. 
         boardtype = boardinfo->info.entity.signature;
     }
     
@@ -723,49 +843,153 @@ static uint8_t s_fill_scan2(uint8_t *pktout, uint16_t *sizeout)
     ee_sharserv_part_proc_startup_get(&startup);
     ee_sharserv_part_proc_def2run_get(&def2run);
     
-    pktout[ 2] = (ipnetworkstrg->macaddress>>40) & 0xFF;
-    pktout[ 3] = (ipnetworkstrg->macaddress>>32) & 0xFF;
-    pktout[ 4] = (ipnetworkstrg->macaddress>>24) & 0xFF;
-    pktout[ 5] = (ipnetworkstrg->macaddress>>16) & 0xFF;
-    pktout[ 6] = (ipnetworkstrg->macaddress>>8)  & 0xFF;
-    pktout[ 7] = (ipnetworkstrg->macaddress)     & 0xFF;
-    
-    pktout[ 8] = boardtype;
-    pktout[ 9] = startup;
-    pktout[10] = def2run;
-    
     uint8_t nprocs = 0;
     const eEprocess_t *s_proctable = NULL;
     ee_sharserv_part_proc_allavailable_get(&s_proctable, &nprocs);
     
-    pktout[11] = nprocs;
+    reply->boardtype = boardtype;
+    reply->unused[0] = EOUPROT_VALUE_OF_UNUSED_BYTE;
+    reply->capabilities = eouprot_get_capabilities(eApplication, EOUPROT_PROTOCOL_VERSION);;
+    reply->mac48[0] = (ipnetworkstrg->macaddress>>40) & 0xFF;
+    reply->mac48[1] = (ipnetworkstrg->macaddress>>32) & 0xFF;
+    reply->mac48[2] = (ipnetworkstrg->macaddress>>24) & 0xFF;
+    reply->mac48[3] = (ipnetworkstrg->macaddress>>16) & 0xFF;
+    reply->mac48[4] = (ipnetworkstrg->macaddress>>8)  & 0xFF;
+    reply->mac48[5] = (ipnetworkstrg->macaddress)     & 0xFF;
+    reply->processes.numberofthem = nprocs;
+    reply->processes.startup = startup;
+    reply->processes.def2run = def2run;
+    reply->processes.runningnow = eApplication;
     
-    for(uint8_t i=0; i<nprocs; i++)
+    for(uint8_t i=0; i<3; i++)
     {
         const eEmoduleInfo_t *s_modinfo = NULL;
         ee_sharserv_part_proc_get(s_proctable[i], &s_modinfo);
-        pktout[12+8*i] = s_proctable[i];
-        pktout[13+8*i] = s_modinfo->info.entity.version.major;
-        pktout[14+8*i] = s_modinfo->info.entity.version.minor;
-        uint8_t* builddate = (uint8_t*) &s_modinfo->info.entity.builddate;
-        pktout[15+8*i] = builddate[0];
-        pktout[16+8*i] = builddate[1];
-        pktout[17+8*i] = builddate[2];
-        pktout[18+8*i] = builddate[3];      
+        reply->processes.info[i].type = s_proctable[i];
+        reply->processes.info[i].filler[0] = EOUPROT_VALUE_OF_UNUSED_BYTE;
+        reply->processes.info[i].version.major = s_modinfo->info.entity.version.major;
+        reply->processes.info[i].version.minor = s_modinfo->info.entity.version.minor;
+        memcpy(&reply->processes.info[i].date, &s_modinfo->info.entity.builddate, sizeof(eOdate_t));
+        
+        reply->processes.info[i].compilationdate.year = 1999;
+        reply->processes.info[i].compilationdate.month = 9;
+        reply->processes.info[i].compilationdate.day = 9;
+        reply->processes.info[i].compilationdate.hour = 9;
+        reply->processes.info[i].compilationdate.min = 9;
+        
+        volatile eEmoduleExtendedInfo_t * extinfo = (volatile eEmoduleExtendedInfo_t*)(s_modinfo->info.rom.addr+EENV_MODULEINFO_OFFSET);            
+        if(ee_res_OK == ee_is_extendemoduleinfo_valid((eEmoduleExtendedInfo_t*)extinfo))
+        {
+            eo_common_compiler_string_to_date((const char*)extinfo->compilationdatetime, &reply->processes.info[i].compilationdate);
+        }
+      
     }
-    
-    pktout[36] = ee_procApplication;
-    pktout[37] = 0;
-    pktout[38] = 0;
-    pktout[39] = 0;
+
+    // now boardinfo32
     const void *page = NULL;
     ee_sharserv_info_deviceinfo_item_get(sharserv_info_page32, &page);
-    memcpy(&pktout[40], page, 32);
+    memcpy(reply->boardinfo32, page, 32);   
     
-
-    return 2; // tx back and start countdown
+    return size;
 }
 
+
+// both uprot_OPC_DISCOVER and uprot_OPC_LEGACY_SCAN. the only difference is that the reply to the former is more structured
+static uint8_t s_uprot_proc_DISCOVER(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout)
+{    
+    if(eobool_false == eouprot_can_process_opcode(eApplication, EOUPROT_PROTOCOL_VERSION, opc, 0))
+    {
+        return(s_uprot_proc_UNSUPP(opc, pktin, pktinsize, remaddr, pktout, capacityout, sizeout));
+    }
+        
+    const eEmoduleInfo_t* module = (const eEmoduleInfo_t*)(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET);
+
+          
+    
+    if(uprot_OPC_LEGACY_SCAN == opc)
+    {    
+        const uint8_t BOARD_TYPE_EMS = 0x0A;
+        // eupdater_info_trace("CORE", "CMD_SCAN");
+        *sizeout = 14;
+        
+        pktout[ 0] = uprot_OPC_LEGACY_SCAN;
+        pktout[ 1] = module->info.entity.version.major;
+        pktout[ 2] = module->info.entity.version.minor;
+        pktout[ 3] = BOARD_TYPE_EMS;
+        
+        const eEipnetwork_t *ipnetworkstrg;
+        ee_sharserv_info_deviceinfo_item_get(sharserv_info_ipnet, (const void**)&ipnetworkstrg);
+
+        pktout[ 4] = (ipnetworkstrg->ipnetmask>>24) & 0xFF;
+        pktout[ 5] = (ipnetworkstrg->ipnetmask>>16) & 0xFF;
+        pktout[ 6] = (ipnetworkstrg->ipnetmask>>8)  & 0xFF;
+        pktout[ 7] =  ipnetworkstrg->ipnetmask      & 0xFF;
+
+        pktout[ 8] = (ipnetworkstrg->macaddress>>40) & 0xFF;
+        pktout[ 9] = (ipnetworkstrg->macaddress>>32) & 0xFF;
+        pktout[10] = (ipnetworkstrg->macaddress>>24) & 0xFF;
+        pktout[11] = (ipnetworkstrg->macaddress>>16) & 0xFF;
+        pktout[12] = (ipnetworkstrg->macaddress>>8)  & 0xFF;
+        pktout[13] = (ipnetworkstrg->macaddress)     & 0xFF;        
+    }
+    else
+    {
+        // prepare the reply.
+        eOuprot_cmd_DISCOVER_REPLY_t *reply = (eOuprot_cmd_DISCOVER_REPLY_t*) pktout;        
+        *sizeout = s_discover_fill(reply, uprot_OPC_DISCOVER, sizeof(eOuprot_cmd_DISCOVER_REPLY_t));
+    }
+    
+    return 1;    
+}
+
+
+
+
+static uint8_t s_uprot_proc_RESTART(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout)
+{
+    if(eobool_false == eouprot_can_process_opcode(eApplication, EOUPROT_PROTOCOL_VERSION, opc, 0))
+    {
+        return(s_uprot_proc_UNSUPP(opc, pktin, pktinsize, remaddr, pktout, capacityout, sizeout));
+    }
+    
+    ee_sharserv_sys_restart();
+
+    // no reply
+    *sizeout = 0;   
+    return(0);      
+}
+
+static uint8_t s_appl_parse(uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout)
+{  
+    eOuprot_opcodes_t opc = uprot_OPC_NONE;    
+    uprot_fp_process_t process = s_uprot_proc_NONE;
+    
+    switch(pktin[0])
+    {        
+        case uprot_OPC_LEGACY_SCAN:
+        case uprot_OPC_DISCOVER:
+        {
+            opc = (sizeof(eOuprot_cmd_LEGACY_SCAN_t) == pktinsize) ? uprot_OPC_LEGACY_SCAN : uprot_OPC_DISCOVER;
+            process = s_uprot_proc_DISCOVER;           
+        } break;
+               
+        case uprot_OPC_RESTART:
+        {            
+            opc = uprot_OPC_RESTART; 
+            process = s_uprot_proc_RESTART;
+        } break;
+ 
+        default:
+        {
+            opc = uprot_OPC_NONE;
+            process = s_uprot_proc_NONE;
+        } break;
+        
+    }
+    
+    
+    return(process(opc, pktin, pktinsize, remaddr, pktout, capacityout, sizeout));
+}
 
 
 // --------------------------------------------------------------------------------------------------------------------
