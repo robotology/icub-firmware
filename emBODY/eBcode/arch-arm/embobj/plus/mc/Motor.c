@@ -16,6 +16,20 @@
 /////////////////////////////////////////////////////////
 // Motor
 
+static void send_debug_message(char *message, uint8_t jid, uint16_t par16, uint64_t par64)
+{
+
+    eOerrmanDescriptor_t errdes = {0};
+
+    errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
+    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+    errdes.sourceaddress    = jid;
+    errdes.par16            = par16;
+    errdes.par64            = par64;
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, message, NULL, &errdes);
+
+}
+
 static void Motor_new_state_req(Motor *o, icubCanProto_controlmode_t control_mode)
 {
     o->control_mode_req = control_mode;
@@ -91,11 +105,12 @@ static void Motor_config_2FOC(Motor* o, eOmc_motor_config_t* config)
     //uint32_t max_current = 5000;
     uint32_t max_current = config->currentLimits.peakCurrent;
     
-    #define HAS_QE      0x0001
-    #define HAS_HALL    0x0002
-    #define HAS_TSENS   0x0004
-    #define USE_INDEX   0x0008
-
+    #define HAS_QE         0x0001
+    #define HAS_HALL       0x0002
+    #define HAS_TSENS      0x0004
+    #define USE_INDEX      0x0008
+    #define HAS_SPEED_QE   0x0010
+    
     //uint8_t can_motor_config[6];
     
     o->can_motor_config[0] = 0; // HAS_QE|HAS_HALL;
@@ -104,6 +119,7 @@ static void Motor_config_2FOC(Motor* o, eOmc_motor_config_t* config)
     if (config->hasHallSensor)          o->can_motor_config[0] |= HAS_HALL;
     if (config->hasRotorEncoderIndex)   o->can_motor_config[0] |= USE_INDEX;
     if (config->hasTempSensor)          o->can_motor_config[0] |= HAS_TSENS;
+    if (config->hasSpeedEncoder)        o->can_motor_config[0] |= HAS_SPEED_QE;
     
     *(int16_t*)(o->can_motor_config+1) = config->rotorEncoderResolution;
     *(int16_t*)(o->can_motor_config+3) = config->rotorIndexOffset;
@@ -686,6 +702,20 @@ void Motor_update_state_fbk(Motor* o, void* state) //
     o->pwm_fbk             = state_msg->pwm_fbk;
     o->qe_state.bitmask    = state_msg->qe_state;
     o->not_calibrated      = o->qe_state.bits.not_calibrated;
+    
+    /*
+    if (o->control_mode==icubCanProto_controlmode_hwFault || o->fault_state.bitmask)
+    {
+        static int cnt[5] = {0,1000,2000,3000,4000};
+        
+        if (++cnt[o->ID] >= 4000)
+        {
+            cnt[o->ID] = 0;
+            
+            send_debug_message("2FOC error state", o->ID, o->control_mode, o->fault_state.bitmask);
+        }
+    }
+    */
 }
 
 void Motor_actuate(Motor* motor, uint8_t N) //

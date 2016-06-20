@@ -1195,7 +1195,8 @@ static const eOmc_motor_t s_motor_default_value =
         .hasRotorEncoder =           eobool_false,
         .hasRotorEncoderIndex =      eobool_false,
         .rotorEncoderType =          0,
-        .filler02 =                  {0},
+        .hasSpeedEncoder =           eobool_false,
+        .filler01 =                  {0},
         .limitsofrotor =
         {
             .max = 0,
