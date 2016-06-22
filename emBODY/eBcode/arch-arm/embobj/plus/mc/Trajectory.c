@@ -61,6 +61,19 @@ void Trajectory_set_pos_raw(Trajectory *o, float p0)
     o->bVelocityMove = eobool_false;
 }
 
+void Trajectory_set_vel_raw(Trajectory *o, float v0)
+{    
+    o->xTimer = o->xT = 0.0f;
+    
+    o->vX = 0.0f;
+    o->vV = v0;
+    o->vA = 0.0f;
+    
+    o->vTimer = o->vT = 0.0f;
+    
+    o->bVelocityMove = eobool_true;
+}
+
 void Trajectory_set_pos_end(Trajectory *o, /*float x0,*/ float xStar, float velAvg)
 {
     //if (velAvg == 0.0f) return FALSE;

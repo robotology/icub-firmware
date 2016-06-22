@@ -49,6 +49,7 @@ extern void Trajectory_config_limits(Trajectory *o, float pos_min, float pos_max
 extern void Trajectory_set_pos_end(Trajectory *o, float p1, float avg_vel);
 extern void Trajectory_set_vel_end(Trajectory *o, float v1, float avg_acc);
 extern void Trajectory_set_pos_raw(Trajectory *o, float p0);
+extern void Trajectory_set_vel_raw(Trajectory *o, float v0);
 
 extern int8_t Trajectory_do_step(Trajectory *o, float *p, float *v, float *a);
 

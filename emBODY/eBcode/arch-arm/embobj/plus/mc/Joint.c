@@ -124,7 +124,7 @@ void Joint_config(Joint* o, uint8_t ID, eOmc_joint_config_t* config)
     o->pos_min = config->limitsofjoint.min;
     o->pos_max = config->limitsofjoint.max;
     o->vel_max = config->maxvelocityofjoint;
-    o->acc_max = 65535;
+    o->acc_max = 10000000.0f;
     
     o->tcKstiff  = 0.001f*(CTRL_UNITS)(config->impedance.stiffness);
     o->tcKdamp   = 0.001f*CTRL_LOOP_FREQUENCY*(CTRL_UNITS)(config->impedance.damping);
@@ -579,6 +579,16 @@ CTRL_UNITS Joint_do_vel_control(Joint* o)
             break;
         }
         case eomc_controlmode_velocity:
+        {
+            if (WatchDog_check_expired(&o->vel_ref_wdog))
+            {
+                o->vel_ref = ZERO;
+            }
+            
+            o->output = o->vel_ref;
+            
+            break;
+        }
         case eomc_controlmode_mixed:
         {            
             if (WatchDog_check_expired(&o->vel_ref_wdog))
@@ -782,13 +792,15 @@ BOOL Joint_set_pos_ref_in_calibType6(Joint* o, CTRL_UNITS pos_ref, CTRL_UNITS ve
 
 BOOL Joint_set_vel_ref(Joint* o, CTRL_UNITS vel_ref, CTRL_UNITS acc_ref)
 {
+    WatchDog_rearm(&o->vel_ref_wdog);
+    
     if ((o->control_mode != eomc_controlmode_velocity) && (o->control_mode != eomc_controlmode_mixed))
     {
         return FALSE;
     }
     
     LIMIT(vel_ref, o->vel_max);
-    LIMIT(acc_ref, o->acc_max);
+    //LIMIT(acc_ref, o->acc_max);
     
     if (acc_ref == 0.0f)
     {
@@ -797,7 +809,10 @@ BOOL Joint_set_vel_ref(Joint* o, CTRL_UNITS vel_ref, CTRL_UNITS acc_ref)
         return TRUE;
     }
     
-    Trajectory_set_vel_end(&o->trajectory, vel_ref, acc_ref);
+    o->vel_ref = vel_ref;
+    
+    Trajectory_set_vel_raw(&o->trajectory, vel_ref);
+    //Trajectory_set_vel_end(&o->trajectory, vel_ref, acc_ref);
     
     return TRUE;
 }
