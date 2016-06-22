@@ -74,7 +74,6 @@
 
 HAL_EE_DECLARE_VAR_IN_EE(strain_EE_cfg, strain_eeprom_data_t);
 
-
 static const strain_eeprom_data_t strain_EE_cfg_default = 
 {
   0x0,           // EE_B_EEErased             :1
@@ -137,13 +136,17 @@ static const strain_eeprom_data_t strain_EE_cfg_default =
   0x0000 // Checksum
 };
 
+
+
+
+
 const version_srcCode_info_t strain_srcCode_info =
 {
 	//fw_ExeFile
 	{
 		0x3, //version
 		0x0, //release
-		0x4  //build
+		0x5  //build
 	},
 	//canProtocol
 	{
@@ -164,16 +167,38 @@ void strain_config_init(strain_config_data_t *strain_cfg)
 	strain_cfg->save_eeprom_atonce = 1;
 }
 
-void strain_config_saveInEE(strain_eeprom_data_t *ee_data_ptr )
+uint8_t strain_config_saveInEE(strain_eeprom_data_t *ee_data_ptr, uint8_t enableCheckWrite)
 {
 
     EE_address_t strain_ee_cfg_addr;
+    strain_eeprom_data_t ee_data_tmp = {0};
+    uint8_t ret;
 
 
     HAL_EE_GET_ADDR(strain_ee_cfg_addr, strain_EE_cfg);
 
     hal_eeprom_write((uint8_t*)ee_data_ptr, strain_ee_cfg_addr, sizeof(strain_eeprom_data_t));
 
+    if(!enableCheckWrite)
+    {
+        return 1;
+    }
+    
+    ret  = strain_config_readFromEE(&ee_data_tmp);
+    if(0 == ret)
+    {
+        return 0;
+    }
+        
+    ret = memcmp(ee_data_ptr, &ee_data_tmp, sizeof(strain_eeprom_data_t));
+    if(0 == ret)
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
 }
 
 
