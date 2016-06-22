@@ -77,6 +77,7 @@ typedef enum
     hal_spiencoder_typeAEA      = 0, 
     hal_spiencoder_typeAMO      = 1, 
     hal_spiencoder_typeCHAINof2 = 2,
+    hal_spiencoder_typeCHAINof3 = 3,
     hal_spiencoder_typeNONE     = 255
 } hal_spiencoder_type_t;
 

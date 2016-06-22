@@ -61,7 +61,7 @@ extern void MController_config_Jje(float **Jje); //
 extern void MController_update_motor_state_fbk(uint8_t m, void* state);
 extern void MController_update_joint_torque_fbk(uint8_t j, CTRL_UNITS trq_fbk); //
 //extern void MController_update_absEncoder_fbk(uint8_t e, int32_t position); //
-extern void MController_update_absEncoder_fbk(uint8_t e, uint16_t* positions); //
+extern void MController_update_absEncoder_fbk(uint8_t e, uint32_t* positions); //
 
 extern void MController_invalid_absEncoder_fbk(uint8_t e, eOencoderreader_errortype_t error_type);
 

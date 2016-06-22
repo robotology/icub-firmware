@@ -1145,6 +1145,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub\EoError.c</FilePath>
             </File>
+            <File>
+              <FileName>EoManagement.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub\EoManagement.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2395,6 +2400,11 @@
               <FileName>EoError.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub\EoError.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoManagement.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub\EoManagement.c</FilePath>
             </File>
           </Files>
         </Group>

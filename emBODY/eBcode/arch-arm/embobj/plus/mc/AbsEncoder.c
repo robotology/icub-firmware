@@ -97,7 +97,7 @@ void AbsEncoder_config(AbsEncoder* o, uint8_t ID/*, eOmc_EncoderType_t type*/, i
 //        return;
 //    }
     
-    AbsEncoder_config_resolution(o, (float)resolution);
+    AbsEncoder_config_resolution(o, resolution);
     
     if (!o->fake)
     {
@@ -112,7 +112,7 @@ void AbsEncoder_config(AbsEncoder* o, uint8_t ID/*, eOmc_EncoderType_t type*/, i
     o->state.bits.not_configured = FALSE;
 }
 
-void AbsEncoder_config_resolution(AbsEncoder* o, float resolution)
+void AbsEncoder_config_resolution(AbsEncoder* o, int32_t resolution)
 {
     if (!o->fake)
     {
