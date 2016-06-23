@@ -21,6 +21,8 @@
 
 #include "hal_led.h"
 
+#include "hal_trace.h"
+
 MController* smc = NULL;
 
 static char invert_matrix(float** M, float** I, char n);
@@ -39,6 +41,13 @@ static void send_debug_message(char *message, uint8_t jid, uint16_t par16, uint6
     errdes.par64            = par64;
     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, message, NULL, &errdes);
 }
+
+static char s_trace_string[128] = {0};
+
+extern const eOmn_serv_configuration_t s_serv_config_mc_v3_0B1;
+extern const eOmn_serv_configuration_t s_serv_config_mc_eb7_eb9;
+extern const eOmn_serv_configuration_t s_serv_config_mc_eb1_eb3;
+
 
 MController* MController_new(uint8_t nJoints, uint8_t nEncods) //
 {
@@ -103,6 +112,8 @@ MController* MController_new(uint8_t nJoints, uint8_t nEncods) //
     }
     
     MController_init();
+    
+    MController_config_board(&s_serv_config_mc_eb1_eb3);
         
     return o;
 }
@@ -124,6 +135,8 @@ void MController_init() //
         o->set_dim[i] = 1;
         
         o->j2s[i] = i;
+        
+        o->e2s[i] = i;
 
         o->jos[i][0] = i;
         
@@ -169,12 +182,64 @@ void MController_deinit()
     MController_init();
 }
 
+static uint8_t getNumberOfSets(const eOmn_4jomo_coupling_t *jomoCouplingInfo)
+{
+    uint8_t n=0;
+    for(uint8_t i=0; i<MAX_JOINTS_PER_BOARD; i++)
+    {
+        if((jomoCouplingInfo->joint2set[i] != eomn_jointSetNum_none) && (jomoCouplingInfo->joint2set[i] > n))
+        {
+            n = jomoCouplingInfo->joint2set[i];
+        }
+    }
+    n+=1;
+    return (n);
+}
+
+static void updatedSetsMap(const eOmn_4jomo_coupling_t *jomoCouplingInfo)
+{
+    for(uint8_t i=0; i<MAX_JOINTS_PER_BOARD; i++)
+    {
+        if(eomn_jointSetNum_none == jomoCouplingInfo->joint2set[i])
+            continue; //leave init values
+        o->j2s[i] = o->m2s[i] = o->e2s[i] = jomoCouplingInfo->joint2set[i];
+    }
+}
+
+static void debug_printsMatrix(float **m)
+{
+    snprintf(s_trace_string, sizeof(s_trace_string), "----- START -----");
+    hal_trace_puts(s_trace_string);
+    
+    for(uint8_t r=0; r<4; r++)
+    {
+        snprintf(s_trace_string, sizeof(s_trace_string), "%.4f  %.4f  %.4f  %.4f", m[r][0], m[r][1], m[r][2], m[r][3]);
+        hal_trace_puts(s_trace_string);
+    }
+    
+    snprintf(s_trace_string, sizeof(s_trace_string), "----- END -----");
+    hal_trace_puts(s_trace_string);
+
+}
+
+static void copyMatrix(float **dst, const eOmn_4x4_matrix_t src)
+{
+    for(uint8_t r=0; r<MAX_JOINTS_PER_BOARD; r++)
+    {
+        for(uint8_t c=0; c<MAX_JOINTS_PER_BOARD; c++)
+        {
+            dst[r][c] = eo_common_Q17_14_to_float(src[r][c]);
+        }
+    }
+}
+
 //void MController_config_board(uint8_t part_type, uint8_t actuation_type)
 void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
 {
     MController *o = smc;
     
     EOconstarray* carray = NULL;
+    const eOmn_4jomo_coupling_t *jomoCouplingInfo = NULL;
     
     switch (brd_cfg->type)
     {
@@ -183,6 +248,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
             o->part_type = brd_cfg->data.mc.foc_based.boardtype4mccontroller;
             o->nSets = o->nEncods = o->nJoints = brd_cfg->data.mc.foc_based.arrayofjomodescriptors.head.size;
             o->actuation_type = HARDWARE_2FOC;
+            jomoCouplingInfo = &(brd_cfg->data.mc.foc_based.jomocoupling);
             break;
         
         case eomn_serv_MC_mc4plusmais:
@@ -190,6 +256,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
             o->part_type = brd_cfg->data.mc.mc4plusmais_based.boardtype4mccontroller;
             o->nSets = o->nEncods = o->nJoints = brd_cfg->data.mc.mc4plusmais_based.arrayofjomodescriptors.head.size;
             o->actuation_type = HARDWARE_MC4p;
+            jomoCouplingInfo = &(brd_cfg->data.mc.mc4plusmais_based.jomocoupling);
             break;
         
         case eomn_serv_MC_mc4plus:
@@ -197,6 +264,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
             o->part_type = brd_cfg->data.mc.mc4plus_based.boardtype4mccontroller;
             o->nSets = o->nEncods = o->nJoints = brd_cfg->data.mc.mc4plus_based.arrayofjomodescriptors.head.size;
             o->actuation_type = HARDWARE_MC4p;
+            jomoCouplingInfo = &(brd_cfg->data.mc.mc4plus_based.jomocoupling);
             break;
         
         default:
@@ -283,10 +351,23 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
     switch (o->part_type)
     {
     case emscontroller_board_ANKLE:                   //= 1,    //2FOC
-        o->nSets   = 2;
+    {
+        //o->nSets   = 2;
+        o->nSets = getNumberOfSets(jomoCouplingInfo);
+        Jmj = o->Jmj;
+        Sje = o->Sje;
+        
+        copyMatrix(Jmj, jomoCouplingInfo->joint2motor);
+        copyMatrix(Sje, jomoCouplingInfo->joint2encoder);
+        
+        updatedSetsMap(jomoCouplingInfo);
     
-        //invert_matrix(Jjm, Jmj, 2);
-    
+        debug_printsMatrix(Jmj);
+        debug_printsMatrix(Sje);
+        snprintf(s_trace_string, sizeof(s_trace_string), "J2S %d  %d  %d  %d", o->j2s[0], o->j2s[1], o->j2s[2],o->j2s[3]);
+        hal_trace_puts(s_trace_string);
+        
+        
         for (int k = 0; k<o->nJoints; ++k)
         {            
             o->joint[k].CAN_DO_TRQ_CTRL = TRUE;
@@ -296,12 +377,14 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
             o->jointSet[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
             o->jointSet[k].CAN_DO_TRQ_CTRL = TRUE;
             
-            o->j2s[k] = o->m2s[k] = o->e2s[k] = k;
+            //o->j2s[k] = o->m2s[k] = o->e2s[k] = k; see  updatedSetsMap(jomoCouplingInfo);
         }
         
         break;
+    }
     
     case emscontroller_board_CER_UPPER_ARM:               //= 17,    //2FOC
+    {
         o->nSets   = 4;
         
         for (int k = 0; k<o->nJoints; ++k)
@@ -315,11 +398,13 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
             
             o->j2s[k] = o->m2s[k] = o->e2s[k] = k;
         }
-        
+    }   
         break;
 
     case emscontroller_board_UPPERLEG:                //= 2,    //2FOC
-        o->nSets   = 4;
+    {
+        //o->nSets   = 4;
+        o->nSets = getNumberOfSets(jomoCouplingInfo);
     
         Jjm = o->Jjm;
         Sjm = o->Sjm;
@@ -338,14 +423,16 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
             o->jointSet[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
             o->jointSet[k].CAN_DO_TRQ_CTRL = TRUE;
             
-            o->j2s[k] = o->m2s[k] = o->e2s[k] = k;
+            //o->j2s[k] = o->m2s[k] = o->e2s[k] = k; see 
         }
-    
+         updatedSetsMap(jomoCouplingInfo);
+    }
         break;
         
     case emscontroller_board_WAIST:                   //= 3,    //2FOC
     {    
-        o->nSets   = 1;
+        //o->nSets   = 1;
+        o->nSets = getNumberOfSets(jomoCouplingInfo);
 
         // |j0|   |   0.5   0.5    0   |   |m0|
         // |j1| = |  -0.5   0.5    0   | * |m1|
@@ -354,6 +441,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         Sjm = o->Sjm;
         Jjm = o->Jjm;
         Jmj = o->Jmj;
+        Sje = o->Sje;
         
         float alfa = 22.0f/80.0f;
     
@@ -376,7 +464,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
             o->joint[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
             o->motor[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
             
-            o->j2s[k] = o->m2s[k] = o->e2s[k] = 0;
+            //o->j2s[k] = o->m2s[k] = o->e2s[k] = 0; see updatedSetsMap(jomoCouplingInfo);
         }
         
         o->jointSet[0].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
@@ -386,17 +474,19 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
     }
     case emscontroller_board_SHOULDER:                //= 4,    //2FOC
     {
-        o->nSets   = 2;
+        //o->nSets   = 2;
+        o->nSets = getNumberOfSets(jomoCouplingInfo);
         
         Sjm = o->Sjm;
         Jjm = o->Jjm;
         Jmj = o->Jmj;
+        Sje = o->Sje;
         
         // |j0|    | 1     0       0   |   |m0|
         // |j1|  = | 1   40/65     0   | * |m1|
         // |j2|    | 0  -40/65   40/65 |   |m2|
 
-        float alfa = 40.0f/65.0f;
+        float alfa = 40.0f/65.0f; //IMPORTANT: alfa must have the same value of variable alfa in EOtheBoardConfig.c
     
         Sjm[0][0] =  1.0f; Sjm[0][1] =  0.0f; Sjm[0][2] =  0.0f; Sjm[0][3] =  0.0f;
         Sjm[1][0] =  1.0f; Sjm[1][1] =  alfa; Sjm[1][2] =  0.0f; Sjm[1][3] =  0.0f;
@@ -406,24 +496,36 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         for (int j=0; j<4; ++j)
             for (int m=0; m<4; ++m)
                 Jjm[j][m] = Sjm[j][m];
+
+//        MOVE TO EOtheboardconfig
+//        // beware: the 3rd joint is considered independent in position control
+//        //invert_matrix(Jjm, Jmj, 4);
+//        Jmj[1][0] = -1.0f/alfa; Jmj[1][1] =  1.0f/alfa;
+//        Jmj[2][2] =  1.0f/alfa;
+//        
+//        #if defined(ICUB_MEC_V1) || defined(ICUB_GENOVA04)
+//        // |j0|   |  1     0    0   |   |e0|     
+//        // |j1| = |  0     1    0   | * |e1|
+//        // |j2|   |  1    -1  40/65 |   |e2|
+//        //Sje = o->Sje;
+//        Sje[2][0] = 1.0f; Sje[2][1] = -1.0f; Sje[2][2] = alfa;
+//        #endif
         
-        // beware: the 3rd joint is considered independent in position control
-        //invert_matrix(Jjm, Jmj, 4);
-        Jmj[1][0] = -1.0f/alfa; Jmj[1][1] =  1.0f/alfa;
-        Jmj[2][2] =  1.0f/alfa;
+//        o->j2s[0] = o->m2s[0] = o->e2s[0] = 0;
+//        o->j2s[1] = o->m2s[1] = o->e2s[1] = 0;
+//        o->j2s[2] = o->m2s[2] = o->e2s[2] = 0;
+//        o->j2s[3] = o->m2s[3] = o->e2s[3] = 1;
         
-        #if defined(ICUB_MEC_V1) || defined(ICUB_GENOVA04)
-        // |j0|   |  1     0    0   |   |e0|     
-        // |j1| = |  0     1    0   | * |e1|
-        // |j2|   |  1    -1  40/65 |   |e2|
-        Sje = o->Sje;
-        Sje[2][0] = 1.0f; Sje[2][1] = -1.0f; Sje[2][2] = alfa;
-        #endif
         
-        o->j2s[0] = o->m2s[0] = o->e2s[0] = 0;
-        o->j2s[1] = o->m2s[1] = o->e2s[1] = 0;
-        o->j2s[2] = o->m2s[2] = o->e2s[2] = 0;
-        o->j2s[3] = o->m2s[3] = o->e2s[3] = 1;
+        copyMatrix(Jmj, jomoCouplingInfo->joint2motor);
+        copyMatrix(Sje, jomoCouplingInfo->joint2encoder);
+        
+        updatedSetsMap(jomoCouplingInfo);
+                
+        debug_printsMatrix(Jmj);
+        debug_printsMatrix(Sje);
+        snprintf(s_trace_string, sizeof(s_trace_string), "J2S %d  %d  %d  %d", o->j2s[0], o->j2s[1], o->j2s[2],o->j2s[3]);
+        hal_trace_puts(s_trace_string);
         
         for (int k=0; k<o->nJoints; ++k)
         {
@@ -441,6 +543,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         break;
     }
     case emscontroller_board_CER_WAIST:               //= 15,   //2FOC
+    {
         o->nSets   = 2;
 
         o->j2s[0] = o->m2s[0] = o->e2s[0] = 0;
@@ -469,8 +572,10 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         o->jointSet[0].special_limit = WAIST_TRIFID_LIMIT;
     
         break;
+    }
         
     case emscontroller_board_CER_LOWER_ARM:               //= 12,   //MC4plus
+    {
         o->nSets   = 2;
 
         o->j2s[0] = o->m2s[0] = o->e2s[0] = 0;
@@ -506,6 +611,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         AbsEncoder_config_divisor(o->absEncoder+3, 64);
         
         break;
+    }
         
     case emscontroller_board_CER_BASE:                //= 21    //2FOC
     {
@@ -526,6 +632,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         break;
     
     case emscontroller_board_CER_NECK:                   //= 22,    //mc4plus
+    {
         o->nSets   = 2;
     
         for (int k = 0; k<o->nJoints; ++k)
@@ -543,8 +650,10 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         }
         
         break;
+    }
     
     case emscontroller_board_CER_HAND:                   //= 14, 16,    //mc2plus
+    {
         o->nSets   = 2;
         o->nEncods = 6;
     
@@ -581,6 +690,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         }
         
         break;    
+    }
     
     case emscontroller_board_HEAD_neckpitch_neckroll:      //= 5,    //MC4plus
     {
@@ -625,11 +735,13 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
     }
     case emscontroller_board_HEAD_neckyaw_eyes:       //=6,      //MC4plus
     {
-        o->nSets   = 3;
+        //o->nSets   = 3;
+        o->nSets = getNumberOfSets(jomoCouplingInfo);
         
         Sjm = o->Sjm;
         Jjm = o->Jjm;
         Jmj = o->Jmj;
+        Sje = o->Sje;//identity matrix
         
         //motor to joint
         
@@ -647,25 +759,64 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
             for (int m=0; m<4; ++m)
                 Jjm[j][m] = Sjm[j][m];
         
+//        MOVED IN EOtheBoardConfig.c
+//        //inverted matrix: joint to motor
+//        // |m0|    | 1     0       0      0 |    |j0|
+//        // |m1|  = | 0     1       0      0 |  * |j1|
+//        // |m2|    | 0     0       1     -1 |    |j2|
+//        // |m3|    | 0     0       1      1 |    |j2|
+//        
+//        Jmj[0][0] =  1.0f; Jmj[0][1] =  0.0f; Jmj[0][2] =  0.0f; Jmj[0][3] =  0.0f;
+//        Jmj[1][0] =  0.0f; Jmj[1][1] =  1.0f; Jmj[1][2] =  0.0f; Jmj[1][3] =  0.0f;
+//        Jmj[2][0] =  0.0f; Jmj[2][1] =  0.0f; Jmj[2][2] =  1.0f; Jmj[2][3] = -1.0f;
+//        Jmj[3][0] =  0.0f; Jmj[3][1] =  0.0f; Jmj[3][2] =  1.0f; Jmj[3][3] =  1.0f;
+//        
+//        
+//        
+//        //joint, motor, encoder to set
+//        o->j2s[0] = o->m2s[0] = o->e2s[0] = 0;
+//        o->j2s[1] = o->m2s[1] = o->e2s[1] = 1;
+//        o->j2s[2] = o->m2s[2] = o->e2s[2] = 2;
+//        o->j2s[3] = o->m2s[3] = o->e2s[3] = 2;
 
-        //inverted matrix: joint to motor
-        // |m0|    | 1     0       0      0 |    |j0|
-        // |m1|  = | 0     1       0      0 |  * |j1|
-        // |m2|    | 0     0       1     -1 |    |j2|
-        // |m3|    | 0     0       1      1 |    |j2|
+
+
+
+
+
+
+//        for(uint8_t r=0; r<MAX_JOINTS_PER_BOARD; r++)
+//        {
+//            for(uint8_t c=0; c<MAX_JOINTS_PER_BOARD; c++)
+//            {
+//                Jmj[r][c] = eo_common_Q17_14_to_float(jomoCouplingInfo->joint2motor[r][c]);
+//                Sje[r][c] = eo_common_Q17_14_to_float(jomoCouplingInfo->joint2encoder[r][c]);
+//            }
+//        }
         
-        Jmj[0][0] =  1.0f; Jmj[0][1] =  0.0f; Jmj[0][2] =  0.0f; Jmj[0][3] =  0.0f;
-        Jmj[1][0] =  0.0f; Jmj[1][1] =  1.0f; Jmj[1][2] =  0.0f; Jmj[1][3] =  0.0f;
-        Jmj[2][0] =  0.0f; Jmj[2][1] =  0.0f; Jmj[2][2] =  1.0f; Jmj[2][3] = -1.0f;
-        Jmj[3][0] =  0.0f; Jmj[3][1] =  0.0f; Jmj[3][2] =  1.0f; Jmj[3][3] =  1.0f;
+        
+        copyMatrix(Jmj, jomoCouplingInfo->joint2motor);
+        copyMatrix(Sje, jomoCouplingInfo->joint2encoder);
         
         
         
-        //joint, motor, encoder to set
-        o->j2s[0] = o->m2s[0] = o->e2s[0] = 0;
-        o->j2s[1] = o->m2s[1] = o->e2s[1] = 1;
-        o->j2s[2] = o->m2s[2] = o->e2s[2] = 2;
-        o->j2s[3] = o->m2s[3] = o->e2s[3] = 2;
+        for(uint8_t i=0; i<MAX_JOINTS_PER_BOARD; i++)
+        {
+            if(eomn_jointSetNum_none == jomoCouplingInfo->joint2set[i])
+                continue; //leave init values
+            o->j2s[i] = o->m2s[i] = o->e2s[i] = jomoCouplingInfo->joint2set[i];
+        }
+        
+        
+        /////////////////////////////////////////////////////////////////////////
+        /////////////////////////////////////////////////////////////////////////
+         /////////////////////////DEBUG PRINTS
+        debug_printsMatrix(Jmj);
+        debug_printsMatrix(Sje);
+        snprintf(s_trace_string, sizeof(s_trace_string), "J2S%d  %d  %d  %d", o->j2s[0], o->j2s[1], o->j2s[2],o->j2s[3]);
+        hal_trace_puts(s_trace_string);
+
+        
         
         for (int k=0; k<o->nJoints; ++k)
         {
