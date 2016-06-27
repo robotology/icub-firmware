@@ -26,6 +26,8 @@
 #include "string.h"
 #include "EoCommon.h"
 
+#include "EoBoards.h"
+
 #include "EOtheMemoryPool.h"
 #include "EOtheErrormanager.h"
 
@@ -826,11 +828,11 @@ static uint16_t s_discover_fill(eOuprot_cmd_DISCOVER_REPLY_t *reply, eOuprot_opc
         
         if(0 == strcmp((const char*)boardinfo->info.name, "ems4rd"))
         {
-            boardtype = 32; // use eobrd_ethtype_ems4 later on        
+            boardtype = eobrd_ethtype_ems4; // use eobrd_ethtype_ems4 later on        
         }
         else if(0 == strcmp((const char*)boardinfo->info.name, "mc4plus"))
         {
-             boardtype = 33; // use eobrd_ethtype_mc4plus later on 
+             boardtype = eobrd_ethtype_mc4plus; // use eobrd_ethtype_mc4plus later on 
         }        
     }
     else
@@ -882,6 +884,9 @@ static uint16_t s_discover_fill(eOuprot_cmd_DISCOVER_REPLY_t *reply, eOuprot_opc
         {
             eo_common_compiler_string_to_date((const char*)extinfo->compilationdatetime, &reply->processes.info[i].compilationdate);
         }
+        
+        reply->processes.info[i].rom_addr_kb = s_modinfo->info.rom.addr / 1024;
+        reply->processes.info[i].rom_size_kb = s_modinfo->info.rom.size / 1024;  
       
     }
 
