@@ -91,6 +91,7 @@ static uint8_t s_uprot_proc_EEPROM_ERASE(eOuprot_opcodes_t opc, uint8_t *pktin, 
 static uint8_t s_uprot_proc_EEPROM_READ(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout);
 static uint8_t s_uprot_proc_JUMP2UPDATER(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout);
 static uint8_t s_uprot_proc_PAGE(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout);
+static uint8_t s_uprot_proc_JUMP2ADDRESS(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout);
 static uint8_t s_uprot_proc_LEGACY_MAC_SET(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout);
 static uint8_t s_uprot_proc_LEGACY_IP_MASK_SET(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout);
 
@@ -269,6 +270,12 @@ extern uint8_t updater_core_uprot_parse(uint8_t *pktin, uint16_t pktinsize, eOip
         {
             opc = uprot_OPC_PAGE_GET;
             process = s_uprot_proc_PAGE;  
+        } break;
+        
+        case uprot_OPC_JUMP2ADDRESS:
+        {
+            opc = uprot_OPC_JUMP2ADDRESS;
+            process = s_uprot_proc_JUMP2ADDRESS;              
         } break;
                  
         // kept but ... maybe useless
@@ -1457,6 +1464,27 @@ static uint8_t s_uprot_proc_PAGE(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t
     
     
     return ret;          
+}
+
+static uint8_t s_uprot_proc_JUMP2ADDRESS(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout)
+{    
+    if(eobool_false == eouprot_can_process_opcode(s_running_process, EOUPROT_PROTOCOL_VERSION, opc, 0))
+    {
+        return(s_uprot_proc_UNSUPP(opc, pktin, pktinsize, remaddr, pktout, capacityout, sizeout));
+    }   
+
+    eOuprot_cmd_JUMP2ADDRESS_t  * cmd = (eOuprot_cmd_JUMP2ADDRESS_t*) pktin;
+
+    // can we jump to address? if so, i request it and i restart.
+    
+    if(ee_res_OK == ee_sharserv_sys_canjump(EENV_ROMSTART+cmd->address))
+    {
+        ee_sharserv_ipc_gotoproc_clr();
+        ee_sharserv_ipc_jump2addr_set(EENV_ROMSTART+cmd->address);
+        ee_sharserv_sys_restart();
+    }
+    
+    return 0;     
 }
 
 
