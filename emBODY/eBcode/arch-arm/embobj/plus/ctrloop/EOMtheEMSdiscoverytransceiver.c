@@ -909,8 +909,22 @@ static uint8_t s_uprot_proc_DISCOVER(eOuprot_opcodes_t opc, uint8_t *pktin, uint
         
     const eEmoduleInfo_t* module = (const eEmoduleInfo_t*)(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET);
 
-          
+    if(opc == uprot_OPC_DISCOVER)
+    {
+        // prepare the reply.
+        eOuprot_cmd_DISCOVER_REPLY_t *reply = (eOuprot_cmd_DISCOVER_REPLY_t*) pktout;    
+        if(capacityout > sizeof(eOuprot_cmd_DISCOVER_REPLY_t))
+        {   // yes, we have enough capacity to reply           
+            *sizeout = s_discover_fill(reply, uprot_OPC_DISCOVER, sizeof(eOuprot_cmd_DISCOVER_REPLY_t));
+            return 1; 
+        }
+        else
+        {   // i must reply with old protocol because i dont have enough capacity
+            opc = uprot_OPC_LEGACY_SCAN;
+        }
+    }
     
+                 
     if(uprot_OPC_LEGACY_SCAN == opc)
     {    
         const uint8_t BOARD_TYPE_EMS = 0x0A;
@@ -936,12 +950,6 @@ static uint8_t s_uprot_proc_DISCOVER(eOuprot_opcodes_t opc, uint8_t *pktin, uint
         pktout[11] = (ipnetworkstrg->macaddress>>16) & 0xFF;
         pktout[12] = (ipnetworkstrg->macaddress>>8)  & 0xFF;
         pktout[13] = (ipnetworkstrg->macaddress)     & 0xFF;        
-    }
-    else
-    {
-        // prepare the reply.
-        eOuprot_cmd_DISCOVER_REPLY_t *reply = (eOuprot_cmd_DISCOVER_REPLY_t*) pktout;        
-        *sizeout = s_discover_fill(reply, uprot_OPC_DISCOVER, sizeof(eOuprot_cmd_DISCOVER_REPLY_t));
     }
     
     return 1;    
