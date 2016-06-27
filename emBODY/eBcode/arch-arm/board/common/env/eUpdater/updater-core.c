@@ -44,6 +44,7 @@
 
 #include "EoUpdaterProtocol.h"
 
+#include "EoBoards.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -446,7 +447,10 @@ static uint8_t s_uprot_proc_CANGATEWAY(eOuprot_opcodes_t opc, uint8_t *pktin, ui
     // no reply for now ...
     *sizeout = 0;   
     return(0);    
-    
+#else
+    // no reply at all ...
+    *sizeout = 0;   
+    return(0);       
 #endif
 }
 
@@ -881,11 +885,11 @@ static uint16_t s_discover_fill(eOuprot_cmd_DISCOVER_REPLY_t *reply, eOuprot_opc
         
         if(0 == strcmp((const char*)boardinfo->info.name, "ems4rd"))
         {
-            boardtype = 32; // use eobrd_ethtype_ems4 later on        
+            boardtype = eobrd_ethtype_ems4; // use eobrd_ethtype_ems4 later on        
         }
         else if(0 == strcmp((const char*)boardinfo->info.name, "mc4plus"))
         {
-             boardtype = 33; // use eobrd_ethtype_mc4plus later on 
+             boardtype = eobrd_ethtype_mc4plus; // use eobrd_ethtype_mc4plus later on 
         }        
     }
     else
@@ -937,6 +941,9 @@ static uint16_t s_discover_fill(eOuprot_cmd_DISCOVER_REPLY_t *reply, eOuprot_opc
         {
             eo_common_compiler_string_to_date((const char*)extinfo->compilationdatetime, &reply->processes.info[i].compilationdate);
         }
+       
+        reply->processes.info[i].rom_addr_kb = s_modinfo->info.rom.addr / 1024;
+        reply->processes.info[i].rom_size_kb = s_modinfo->info.rom.size / 1024;  
       
     }
 
