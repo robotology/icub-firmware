@@ -76,7 +76,7 @@ typedef struct
     sharserv_base_initmode_t    initmode;   
 } sharserv_mode_t;
 
-enum { sharserv_base_ipc_userdefdata_maxsize = 20 }; // max size of user-defined data that is possible to pass between e-processes
+enum { sharserv_base_ipc_userdefdata_maxsize = 15 }; // max size of user-defined data that is possible to pass between e-processes
 
 
 typedef enum
@@ -180,6 +180,11 @@ extern eEresult_t ee_sharserv_ipc_userdefdata_clr(void);
 extern eEresult_t ee_sharserv_sys_storage_get(const eEstorage_t *strg, void *data, uint32_t size);
 extern eEresult_t ee_sharserv_sys_storage_set(const eEstorage_t *strg, const void *data, uint32_t size);
 extern eEresult_t ee_sharserv_sys_storage_clr(const eEstorage_t *strg, const uint32_t size);
+
+
+extern eEresult_t ee_sharserv_ipc_jump2addr_get(uint32_t *addr);			
+extern eEresult_t ee_sharserv_ipc_jump2addr_set(uint32_t addr);
+extern eEresult_t ee_sharserv_ipc_jump2addr_clr(void);
 
 
 // - part: offers partition table services
