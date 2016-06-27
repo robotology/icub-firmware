@@ -655,6 +655,18 @@ static void s_loader_eval_jump_request_from_an_eproc(void)
 //        s_loader_attempt_jump(ee_procUpdater, LOADER_ADR_INVALID);
         
     }
+    
+    uint32_t address2jump = 0;
+    if(ee_res_OK == ee_sharserv_ipc_jump2addr_get(&address2jump))
+    {
+        ee_sharserv_ipc_jump2addr_clr();
+           
+        if(ee_res_OK == ee_sharserv_sys_canjump(address2jump))
+        {
+            ee_sharserv_sys_jumpnow(address2jump);
+        }   
+       
+    }    
 }
 
 
