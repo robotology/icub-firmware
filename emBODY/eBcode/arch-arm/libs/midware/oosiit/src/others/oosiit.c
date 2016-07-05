@@ -108,8 +108,8 @@ extern       uint64_t *oosiit_params_ram64data = NULL;
 extern       uint32_t *oosiit_params_stdlib32data = NULL;
 // the time of the system expressed in ticks
 extern volatile uint64_t oosiit_time = 0;
-// the duration in nanosec of each unity of the systick register
-extern uint32_t oosiit_ns_per_unit_of_systick = 0;
+// the duration in picosec of each unity of the systick register
+extern uint64_t oosiit_picosec_per_unit_of_systick = 0;
 // the max number of unity of the systick register
 extern uint32_t oosiit_num_units_of_systick = 0;
 
@@ -791,29 +791,28 @@ extern uint64_t oosiit_time_get(void)
 extern uint64_t oosiit_microtime_get(void)
 {
     uint64_t microsecs;
-    uint64_t nanosecs;
+    uint64_t tmp;
     volatile uint32_t reg0xE000E018 = *((volatile uint32_t *)0xE000E018);
     
     // add to microsecs the content of register systick_current_value_reg properly scaled.
-    // if it is equal to systick_reload_value_reg, then extranano = 0;
-    // if it is equal to 1, then extranano = ... (ticktime*1000)/(systick_reload_value_reg+1)
 
-    nanosecs = oosiit_ns_per_unit_of_systick * (oosiit_num_units_of_systick - reg0xE000E018);
-    microsecs = (oosiit_time * oosiit_cfg_in_use->ticktime) + nanosecs/1000LL;
+    // tmp is in pico
+    tmp = oosiit_picosec_per_unit_of_systick * (oosiit_num_units_of_systick - reg0xE000E018);
+    tmp /= 1000000LL; // now micro
+    microsecs = (oosiit_time * oosiit_cfg_in_use->ticktime) + tmp;
 
     return(microsecs);    
 }
 
 extern uint64_t oosiit_nanotime_get(void)
 {
-    uint64_t nanosecs;// = osiit_time * osiit_params_cfg->ticktime * 1000;
+    uint64_t nanosecs;
     volatile uint32_t reg0xE000E018 = *((volatile uint32_t *)0xE000E018);
 
     // add to nanosecs the content of register systick_current_value_reg properly scaled.
-    // if it is equal to systick_reload_value_reg, then extranano = 0;
-    // if it is equal to 1, then extranano = ... (ticktime*1000)/(systick_reload_value_reg+1)
 
-    nanosecs = oosiit_ns_per_unit_of_systick * (oosiit_num_units_of_systick - reg0xE000E018);
+    nanosecs = oosiit_picosec_per_unit_of_systick * (oosiit_num_units_of_systick - reg0xE000E018);
+    nanosecs /= 1000; // before it was pico, now it is nano
     nanosecs += (oosiit_time * oosiit_cfg_in_use->ticktime * 1000LL);
 
     return(nanosecs);
@@ -2121,15 +2120,15 @@ static __INLINE oosiit_result_t s_oosiit_advtmr_valid(oosiit_objptr_t op)
 static __INLINE oosiit_result_t s_oosiit_microtime_get(uint32_t* low, uint32_t* high)
 {
     uint64_t microsecs;
-    uint64_t nanosecs;
+    uint64_t tmp;
     volatile uint32_t reg0xE000E018 = *((volatile uint32_t *)0xE000E018);
     
     // add to microsecs the content of register systick_current_value_reg properly scaled.
-    // if it is equal to systick_reload_value_reg, then extranano = 0;
-    // if it is equal to 1, then extranano = ... (ticktime*1000)/(systick_reload_value_reg+1)
 
-    nanosecs = oosiit_ns_per_unit_of_systick * (oosiit_num_units_of_systick - reg0xE000E018);
-    microsecs = (oosiit_time * oosiit_cfg_in_use->ticktime) + nanosecs/1000LL;
+    // tmp is in pico
+    tmp = oosiit_picosec_per_unit_of_systick * (oosiit_num_units_of_systick - reg0xE000E018);
+    tmp /= 1000000LL;   // now in micro
+    microsecs = (oosiit_time * oosiit_cfg_in_use->ticktime) + tmp;
     
     *low = microsecs & 0xffffffff;
     *high = (microsecs >> 32) & 0xffffffff;
@@ -2140,14 +2139,15 @@ static __INLINE oosiit_result_t s_oosiit_microtime_get(uint32_t* low, uint32_t* 
 
 static __INLINE oosiit_result_t s_oosiit_nanotime_get(uint32_t* low, uint32_t* high)
 {
-    uint64_t nanosecs;// = osiit_time * osiit_params_cfg->ticktime * 1000;
+    uint64_t nanosecs;
     volatile uint32_t reg0xE000E018 = *((volatile uint32_t *)0xE000E018);
 
     // add to nanosecs the content of register systick_current_value_reg properly scaled.
     // if it is equal to systick_reload_value_reg, then extranano = 0;
     // if it is equal to 1, then extranano = ... (ticktime*1000)/(systick_reload_value_reg+1)
 
-    nanosecs = oosiit_ns_per_unit_of_systick * (oosiit_num_units_of_systick - reg0xE000E018);
+    nanosecs = oosiit_picosec_per_unit_of_systick * (oosiit_num_units_of_systick - reg0xE000E018);
+    nanosecs /= 1000LL; // before it was pico, now it is nano
     nanosecs += (oosiit_time * oosiit_cfg_in_use->ticktime * 1000LL);
 
     *low = nanosecs & 0xffffffff;

@@ -72,7 +72,7 @@ extern "C" {
 
 //  <h> version
 //  <o> major           <0-255> 
-#define EOMTHEEMSAPPLCFG_VERSION_MAJOR          2
+#define EOMTHEEMSAPPLCFG_VERSION_MAJOR          222
 //  <o> minor           <0-255> 
 #define EOMTHEEMSAPPLCFG_VERSION_MINOR          45
 //  </h>version
@@ -657,7 +657,7 @@ extern "C" {
 
 //  <o> RX task priority <2-251>
 //  <i> default: 247
-#define EOMTHEEMSAPPLCFG_RUNOBJ_TASK_RX_PRIORITYof   247
+#define EOMTHEEMSAPPLCFG_RUNOBJ_TASK_RX_PRIORITYof   249
 
 //  <o> DO task priority <2-251>
 //  <i> default: 248
@@ -665,7 +665,7 @@ extern "C" {
 
 //  <o> TX task priority <2-251>
 //  <i> default: 249
-#define EOMTHEEMSAPPLCFG_RUNOBJ_TASK_TX_PRIORITYof   249
+#define EOMTHEEMSAPPLCFG_RUNOBJ_TASK_TX_PRIORITYof   247
 
 //  </h>priorities 
 

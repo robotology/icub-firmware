@@ -245,7 +245,8 @@ extern void rt_iit_dynamic_mode_init(const oosiit_cfg_t *cfg)
 
     os_trv        = ((uint32_t)(((double)oosiit_cfg_in_use->cpufreq*(double)oosiit_cfg_in_use->ticktime)/1E6)-1);
     oosiit_num_units_of_systick = (os_trv+1);
-    oosiit_ns_per_unit_of_systick = ((uint32_t)oosiit_cfg_in_use->ticktime*1000)/(uint32_t)(oosiit_num_units_of_systick);
+    double tmp = ((double)oosiit_cfg_in_use->ticktime*1000000.0)/(double)(oosiit_num_units_of_systick);
+    oosiit_picosec_per_unit_of_systick = (uint32_t)tmp;
     os_flags      = 1; //oosiit_cfg_in_use->priviledgeMode; 
 
     os_clockrate  =  oosiit_cfg_in_use->ticktime;
@@ -347,7 +348,8 @@ extern void rt_iit_params_init(void)
 
     os_trv        = ((uint32_t)(((double)oosiit_cfg_in_use->cpufreq*(double)oosiit_cfg_in_use->ticktime)/1E6)-1);
     oosiit_num_units_of_systick = (os_trv+1);
-    oosiit_ns_per_unit_of_systick = ((uint32_t)oosiit_cfg_in_use->ticktime*1000)/(uint32_t)(oosiit_num_units_of_systick);
+    double tmp = ((double)oosiit_cfg_in_use->ticktime*1000000.0)/(double)(oosiit_num_units_of_systick);
+    oosiit_picosec_per_unit_of_systick = (uint32_t)tmp;    
     os_flags      = 1; //oosiit_cfg_in_use->priviledgeMode; 
 
     os_clockrate  =  oosiit_cfg_in_use->ticktime;

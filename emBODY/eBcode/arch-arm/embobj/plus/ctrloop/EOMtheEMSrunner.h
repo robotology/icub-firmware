@@ -88,6 +88,16 @@ typedef enum
 } eOemsrunner_mode_t;
 
 
+typedef struct
+{
+    eOreltime_t         period;
+    eOreltime_t         rxstartafter;
+    eOreltime_t         dostartafter;
+    eOreltime_t         txstartafter;
+    eOreltime_t         safetygap;
+} eOemsrunner_timing_t;
+
+
 /**	@typedef    typedef struct eOemsrunner_cfg_t 
  	@brief      Contains the configuration for the EOMtheEMSrunner. 
  **/
@@ -110,31 +120,10 @@ typedef struct
     uint8_t             defaultTXdecimationfactor;
 } eOemsrunner_cfg_t;
 
-typedef struct
-{
-    eOreltime_t         period;
-    eOreltime_t         rxstartafter;
-    eOreltime_t         dostartafter;
-    eOreltime_t         txstartafter;
-    eOreltime_t         safetygap;
-} eOemsrunner_timing_t;
 
-typedef struct
-{
-    uint64_t    numberofperiods;
-    uint64_t    cumulativeabsoluteerrorinperiod;  
-    uint32_t    meanofabsoluteerrorinperiod;
-    uint32_t    movingmeanofabsoluteerrorinperiod;
-    uint32_t    maxabsoluteerrorinperiod;
-    uint32_t    minabsoluteerrorinperiod;  
-    uint32_t    executionoverflows[eo_emsrunner_task_numberof];
-    uint32_t    datagrams_failed_to_go_in_txsocket;
-	uint32_t 	average_et[eo_emsrunner_task_numberof];
-	uint32_t 	max_et[eo_emsrunner_task_numberof];
-	uint32_t 	min_et[eo_emsrunner_task_numberof];
-	
-} eOemsrunner_diagnosticsinfo_t;
-    
+
+
+
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
 extern const eOemsrunner_cfg_t eom_emsrunner_DefaultCfg; // = {.taskpriority = {250, 251, 252}, .taskstacksize = {1024, 1024, 1024}, 
@@ -169,6 +158,10 @@ extern eObool_t eom_emsrunner_CycleHasJustTransmittedRegulars(EOMtheEMSrunner *p
 
 extern eOresult_t eom_emsrunner_SetTiming(EOMtheEMSrunner *p, const eOemsrunner_timing_t *timing);
 
+extern uint64_t eom_emsrunner_Get_IterationNumber(EOMtheEMSrunner *p);
+
+extern eOreltime_t eom_emsrunner_Get_Period(EOMtheEMSrunner *p);
+
 // start 
 extern eOresult_t eom_emsrunner_Start(EOMtheEMSrunner *p);
 
@@ -178,19 +171,17 @@ extern eOresult_t eom_emsrunner_GracefulStopAndGoTo(EOMtheEMSrunner *p, eOsmEven
 
 extern EOMtask * eom_emsrunner_GetTask(EOMtheEMSrunner *p, eOemsrunner_taskid_t id);
 
-eObool_t eom_emsrunner_SafeDurationExpired(EOMtheEMSrunner *p, eOemsrunner_taskid_t taskid);
+extern eObool_t eom_emsrunner_SafeDurationExpired(EOMtheEMSrunner *p, eOemsrunner_taskid_t taskid);
 
-eObool_t eom_emsrunner_OverflownToNextTask(EOMtheEMSrunner *p, eOemsrunner_taskid_t taskid);
+extern eObool_t eom_emsrunner_OverflownToNextTask(EOMtheEMSrunner *p, eOemsrunner_taskid_t taskid);
 
 extern eOresult_t eom_emsrunner_SetMode(EOMtheEMSrunner *p, eOemsrunner_mode_t mode);
 
 extern void eom_emsrunner_OnUDPpacketTransmitted(EOMtheEMSrunner *p);
 
-//this func copies internal diagnostic values in memory pointed by dgn_ptr
-extern eOresult_t eom_emsrunner_GetDiagnosticsInfo(EOMtheEMSrunner *p, eOemsrunner_diagnosticsinfo_t *dgn_ptr);
+extern eObool_t eom_runner_cansafelyexecute(EOMtheEMSrunner *p, eOemsrunner_taskid_t taskid);
 
-//this function returns pointer to internal memory containing diagnostics info
-extern eOemsrunner_diagnosticsinfo_t* eom_emsrunner_GetDiagnosticsInfoHandle(EOMtheEMSrunner *p);
+
 /** @}            
     end of group eom_EOMtheEMSrunner  
  **/
