@@ -984,7 +984,7 @@ static uint8_t s_uprot_proc_CANGATEWAY(eOuprot_opcodes_t opc, uint8_t *pktin, ui
     
     reply->opc = uprot_OPC_CANGATEWAY;
     reply->protversion = EOUPROT_PROTOCOL_VERSION;
-    reply->res = uprot_RES_ERR_FAILED;
+    reply->res = uprot_RES_ERR_TRYAGAIN;
     reply->sizeofextra = 0;
 
     // we send a ko message.
