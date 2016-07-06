@@ -1125,7 +1125,7 @@ void MController_update_absEncoder_fbk(uint8_t e, uint32_t* positions) //
         AbsEncoder_update(enc++, (uint16_t)positions[k]);
     }
     
-    MController_update_joint_torque_fbk(e, AbsEncoder_position(smc->absEncoder+(e*smc->multi_encs+2)));
+    //MController_update_joint_torque_fbk(e, AbsEncoder_position(smc->absEncoder+(e*smc->multi_encs+2)));
     
     /*
     static int repeat[2] = {0,500};
