@@ -374,7 +374,7 @@ BOOL Joint_manage_cable_constraint(Joint* o)
 {    
     BOOL opening_intention = (o->pos_err < ZERO);
     
-    //BOOL opening_action = (o->pos_fbk < o->cable_constr.last_joint_pos);
+    BOOL opening_action = (o->pos_fbk < o->cable_constr.last_joint_pos);
     
     o->cable_constr.last_joint_pos = o->pos_fbk;
     
@@ -387,8 +387,6 @@ BOOL Joint_manage_cable_constraint(Joint* o)
     else
     {
         if (o->pos_fbk_from_motors > o->cable_constr.motor_pos_max) return TRUE;
-        
-        if (o->trq_fbk > o->cable_constr.max_tension) return TRUE;
     }
     
     return FALSE;

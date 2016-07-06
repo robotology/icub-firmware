@@ -359,7 +359,7 @@ extern eOresult_t eo_encoderreader_GetPrimaryEncoder(EOtheEncoderReader *p, uint
 }
 
 
-extern eOresult_t eo_encoderreader_Read(EOtheEncoderReader *p, uint8_t position, eOencoderreader_valueInfo_t *primary, eOencoderreader_valueInfo_t *secondary)
+extern eOresult_t eo_encoderreader_Read(EOtheEncoderReader *p, uint8_t position, uint32_t *primary, uint32_t *secondary,  eOencoderreader_errortype_t *error1, eOencoderreader_errortype_t *error2)
 {
     if(NULL == p)
     {
@@ -376,7 +376,19 @@ extern eOresult_t eo_encoderreader_Read(EOtheEncoderReader *p, uint8_t position,
         return(eores_NOK_generic);
     }
 
-    eOresult_t res = eo_appEncReader_GetValue(s_eo_theencoderreader.reader, position, primary, secondary); 
+    eOappEncReader_errortype_t err1;
+    eOappEncReader_errortype_t err2;
+    eOresult_t res = eo_appEncReader_GetValue(s_eo_theencoderreader.reader, position, primary, secondary, &err1, &err2); 
+    
+    if(NULL != error1)
+    {
+        *error1 = (eOencoderreader_errortype_t)err1;
+    }
+
+    if(NULL != error2)
+    {
+        *error1 = (eOencoderreader_errortype_t)err2;
+    }
     
     return(res);
 }
@@ -524,12 +536,15 @@ static void s_eo_encoderreader_read_encoders(void* p)
     
     for(i=0; i< s_eo_theencoderreader.numofjomos; i++)
     {
-        eOencoderreader_valueInfo_t primary, secondary;
+        uint32_t primary = 0;
+        uint32_t secondary = 0;
+        eOappEncReader_errortype_t err1;
+        eOappEncReader_errortype_t err2;
 
-        eOresult_t res = eo_appEncReader_GetValue(s_eo_theencoderreader.reader, i, &primary, &secondary);
+        eOresult_t res = eo_appEncReader_GetValue(s_eo_theencoderreader.reader, i, &primary, &secondary, &err1, &err2);
         
-        s_eo_theencoderreader.errors[i] = primary.errortype;
-        if(err_NONE != primary.errortype)
+        s_eo_theencoderreader.errors[i] = (eOencoderreader_errortype_t)err1;
+        if(err_NONE != err1)
         {
             eo_common_byte_bitset(&s_eo_theencoderreader.failuremask, i);
             readingisok = eobool_false;

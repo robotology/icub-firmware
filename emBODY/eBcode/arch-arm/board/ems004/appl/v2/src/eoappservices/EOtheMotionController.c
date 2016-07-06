@@ -204,7 +204,7 @@ extern EOtheMotionController* eo_motioncontrol_Initialise(void)
     
     p->id32ofregulars = eo_array_New(motioncontrol_maxRegulars, sizeof(uint32_t), NULL);
     
-    p->ctrlobjs.thecontroller = MController_new(eo_motcon_standardJOMOs, 6/*eo_motcon_standardJOMOs*/);
+    p->ctrlobjs.thecontroller = MController_new(eo_motcon_standardJOMOs, eo_motcon_standardJOMOs);
     p->ctrlobjs.theencoderreader = eo_encoderreader_Initialise();
             
     p->ctrlobjs.themais = eo_mais_Initialise();
@@ -1245,6 +1245,7 @@ static eOresult_t s_eo_motioncontrol_updatedPositionsFromEncoders(EOtheMotionCon
 {
 
     eOresult_t res = eores_OK;
+    uint8_t error_mask = 0; 
     
     // wait for the encoders for some time
     for (uint8_t i=0; i<30; ++i)
@@ -1260,33 +1261,31 @@ static eOresult_t s_eo_motioncontrol_updatedPositionsFromEncoders(EOtheMotionCon
     
     if(eobool_false == eo_encoderreader_IsReadingAvailable(eo_encoderreader_GetHandle()))
     {
-        for(uint8_t i=0; i<p->numofjomos; i++)
-        {
-            MController_timeout_absEncoder_fbk(i);
-        }
-        
         return(eores_NOK_timeout);
     }
     
     // read the encoders        
     for(uint8_t i=0; i<p->numofjomos; i++)
     {
-        eOencoderreader_valueInfo_t primary, secondary;
+        uint32_t extra = 0;
+        uint32_t enc_value = 0;
+        eOencoderreader_errortype_t error_type;
         const eOmn_serv_jomo_descriptor_t *jomodes = (eOmn_serv_jomo_descriptor_t*) eo_constarray_At(p->ctrlobjs.jomodescriptors, i);   
         
-        res = eo_encoderreader_Read(eo_encoderreader_GetHandle(), i, &primary, &secondary);
+        res = eo_encoderreader_Read(eo_encoderreader_GetHandle(), i, &enc_value, &extra, &error_type, NULL);
         if (res != eores_OK)
         {
-            MController_invalid_absEncoder_fbk(i, primary.errortype);
+            error_mask |= 1<<(i<<1);
+            MController_invalid_absEncoder_fbk(i, error_type);
             res = eores_NOK_generic;
         }
         else
         {
-            MController_update_absEncoder_fbk(i, primary.value);
+            MController_update_absEncoder_fbk(i, (uint16_t*)&enc_value);
         
             if(eomn_serv_mc_sensor_pos_atmotor == jomodes->extrasensor.pos) 
             {
-                MController_update_motor_pos_fbk(i, (int32_t)secondary.value[0]);
+                MController_update_motor_pos_fbk(i, extra);
             }
         }
     } 

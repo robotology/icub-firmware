@@ -99,7 +99,7 @@ extern void AbsEncoder_calibrate_fake(AbsEncoder* o);
 extern void AbsEncoder_update(AbsEncoder* o, uint16_t position);
 extern void AbsEncoder_invalid(AbsEncoder* o, eOencoderreader_errortype_t error_type);
 
-extern void AbsEncoder_config_resolution(AbsEncoder* o, int32_t resolution);
+extern void AbsEncoder_config_resolution(AbsEncoder* o, float resolution);
 extern void AbsEncoder_config_divisor(AbsEncoder* o, int32_t divisor);
 
 extern void AbsEncoder_timeout(AbsEncoder* o);

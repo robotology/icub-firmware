@@ -6,10 +6,6 @@
 
 #include "EOemsControllerCfg.h"
 
-#include "EOtheErrorManager.h"
-
-#include "EoError.h"
-
 #include "EOtheEntities.h"
 
 #include "Joint.h"
@@ -27,19 +23,6 @@ static char invert_matrix(float** M, float** I, char n);
 //static void MController_config_motor_set(MController* o);
 //static void MController_config_encoder_set(MController* o);
 
-static void send_debug_message(char *message, uint8_t jid, uint16_t par16, uint64_t par64)
-{
-
-    eOerrmanDescriptor_t errdes = {0};
-
-    errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
-    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-    errdes.sourceaddress    = jid;
-    errdes.par16            = par16;
-    errdes.par64            = par64;
-    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, message, NULL, &errdes);
-}
-
 MController* MController_new(uint8_t nJoints, uint8_t nEncods) //
 {
     if (!smc) smc = NEW(MController, 1);
@@ -55,13 +38,11 @@ MController* MController_new(uint8_t nJoints, uint8_t nEncods) //
     o->jointSet = JointSet_new(MAX_JOINTS_PER_BOARD);
     
     o->set_dim     = NEW(uint8_t, MAX_JOINTS_PER_BOARD);
-    o->enc_set_dim = NEW(uint8_t, MAX_JOINTS_PER_BOARD);
-    //o->enc_set_dim = NEW(uint8_t, MAX_ENCODS_PER_BOARD);
+    o->enc_set_dim = NEW(uint8_t, MAX_ENCODS_PER_BOARD);
     
     o->jos = NEW(uint8_t*, MAX_JOINTS_PER_BOARD);
     o->mos = NEW(uint8_t*, MAX_MOTORS_PER_BOARD);
-    o->eos = NEW(uint8_t*, MAX_JOINTS_PER_BOARD);
-    //o->eos = NEW(uint8_t*, MAX_ENCODS_PER_BOARD);
+    o->eos = NEW(uint8_t*, MAX_ENCODS_PER_BOARD);
     
     o->j2s = NEW(uint8_t, MAX_JOINTS_PER_BOARD);
     o->m2s = NEW(uint8_t, MAX_MOTORS_PER_BOARD);
@@ -96,8 +77,7 @@ MController* MController_new(uint8_t nJoints, uint8_t nEncods) //
         o->Jmj[i] = NEW(float, MAX_JOINTS_PER_BOARD);
     }
     
-    //for (int i=0; i<MAX_ENCODS_PER_BOARD; ++i)
-    for (int i=0; i<MAX_JOINTS_PER_BOARD; ++i)
+    for (int i=0; i<MAX_ENCODS_PER_BOARD; ++i)
     {
         o->eos[i] = NEW(uint8_t, MAX_ENCODS_PER_BOARD);
     }
@@ -138,10 +118,6 @@ void MController_init() //
         }
         
         Joint_init(o->joint+i);
-        
-        o->enc_set_dim[i] = 1;
-        
-        o->eos[i][0] = i;
     }
     
     for (int i=0; i<MAX_MOTORS_PER_BOARD; ++i)
@@ -160,6 +136,10 @@ void MController_init() //
     
     for (int i=0; i<MAX_ENCODS_PER_BOARD; ++i)
     {
+        o->enc_set_dim[i] = 1;
+        
+        o->eos[i][0] = i;
+        
         AbsEncoder_init(o->absEncoder+i);
     }
 }
@@ -546,20 +526,17 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
     
     case emscontroller_board_CER_HAND:                   //= 14, 16,    //mc2plus
         o->nSets   = 2;
-        o->nEncods = 6;
+        o->nEncods = 4;
     
-        o->multi_encs = 3;
+        o->multi_encs = 2;
     
         Sje = o->Sje;
 
-        //Sje[0][0] = -1.0f; Sje[0][1] = 1.0f; Sje[0][2] = 0.0f; Sje[0][3] =  0.0f; Sje[0][4] = 0.0f; Sje[0][5] = 0.0f;
-        //Sje[1][0] =  0.0f; Sje[1][1] = 0.0f; Sje[1][2] = 0.0f; Sje[1][3] = -1.0f; Sje[1][4] = 1.0f; Sje[1][5] = 0.0f;
+        Sje[0][0] = -1.0f; Sje[0][1] =  1.0f;  Sje[0][2] =  0.0f; Sje[0][3] = 0.0f;
+        Sje[1][0] =  0.0f; Sje[1][1] =  0.0f;  Sje[1][2] = -1.0f; Sje[1][3] = 1.0f;
 
-        Sje[0][0] = -1; Sje[0][1] = 1; Sje[0][2] = 0; Sje[0][3] =  0; Sje[0][4] = 0; Sje[0][5] = 0;
-        Sje[1][0] =  0; Sje[1][1] = 0; Sje[1][2] = 0; Sje[1][3] = -1; Sje[1][4] = 1; Sje[1][5] = 0;
-    
-        o->e2s[0] = o->e2s[1] = o->e2s[2] = 0;
-        o->e2s[3] = o->e2s[4] = o->e2s[5] = 1;
+        o->e2s[0] = o->e2s[1] = 0;
+        o->e2s[2] = o->e2s[3] = 1;
     
         for (int k = 0; k<o->nJoints; ++k)
         {            
@@ -571,7 +548,6 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
             
             o->jointSet[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
             o->jointSet[k].CAN_DO_TRQ_CTRL = FALSE;
-            o->jointSet[k].USE_SPEED_FBK_FROM_MOTORS = FALSE;
             
             o->j2s[k] = o->m2s[k] = k;
             
@@ -838,25 +814,6 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         return;
     }
     
-    //check multi encoder compatibility
-    //currently all joint of same board have the the same number of multiple encoder. so i use j0
-    const eOmn_serv_jomo_descriptor_t *jomodes = (eOmn_serv_jomo_descriptor_t*) eo_constarray_At(carray, 0);
-    uint8_t cfg_multienc = (uint8_t) eomn_mc_sensor_getnumofcomponets((eOmn_serv_mc_sensor_type_t)jomodes->sensor.type);
-    if(o->multi_encs != cfg_multienc)
-    {
-        eOerrmanDescriptor_t errdes;
-        char str[50];
-        snprintf(str, sizeof(str), "multiEnc check: par16=mc par64=cfg");
-        errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag04);
-        errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-        errdes.sourceaddress    = 0;
-        errdes.par16            = o->multi_encs;
-        errdes.par64            = cfg_multienc;
-        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, str, NULL, &errdes);
-    
-    }
-    
-    
     for (int s=0; s<o->nSets; ++s) o->enc_set_dim[s] = 0;
     
     for (int e=0; e<o->nEncods; ++e)
@@ -922,9 +879,8 @@ void MController_config_joint(int j, eOmc_joint_config_t* config) //
     }
     else if (o->part_type==emscontroller_board_CER_HAND)
     {
-        AbsEncoder_config(o->absEncoder+j*3,   j, /*(eOmc_EncoderType_t)config->jntEncoderType,*/ config->jntEncoderResolution, AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
-        AbsEncoder_config(o->absEncoder+j*3+1, j, /*(eOmc_EncoderType_t)config->jntEncoderType,*/ config->jntEncoderResolution, AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
-        AbsEncoder_config(o->absEncoder+j*3+2, j, /*(eOmc_EncoderType_t)config->jntEncoderType,*/ config->jntEncoderResolution, AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
+        AbsEncoder_config(o->absEncoder+j*2,   j, /*(eOmc_EncoderType_t)config->jntEncoderType,*/ config->jntEncoderResolution, AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
+        AbsEncoder_config(o->absEncoder+j*2+1, j, /*(eOmc_EncoderType_t)config->jntEncoderType,*/ config->jntEncoderResolution, AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
     }
     else
     {
@@ -1116,27 +1072,14 @@ void MController_update_joint_torque_fbk(uint8_t j, CTRL_UNITS trq_fbk) //
     Joint_update_torque_fbk(smc->joint+j, trq_fbk);
 }
 
-void MController_update_absEncoder_fbk(uint8_t e, uint32_t* positions) //
+void MController_update_absEncoder_fbk(uint8_t e, uint16_t* positions) //
 {
     AbsEncoder* enc = smc->absEncoder + e*smc->multi_encs;
     
     for (int k=0; k<smc->multi_encs; ++k)
     {
-        AbsEncoder_update(enc++, (uint16_t)positions[k]);
+        AbsEncoder_update(enc++, positions[k]);
     }
-    
-    //MController_update_joint_torque_fbk(e, AbsEncoder_position(smc->absEncoder+(e*smc->multi_encs+2)));
-    
-    /*
-    static int repeat[2] = {0,500};
-    
-    if (++repeat[e]>=1000)
-    {
-        repeat[e] = 0;
-        
-        send_debug_message("Torque", e, smc->joint[e].trq_fbk, 0);
-    }
-    */
 }
 
 void MController_update_motor_state_fbk(uint8_t m, void* state)
