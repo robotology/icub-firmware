@@ -972,6 +972,29 @@ static uint8_t s_uprot_proc_RESTART(eOuprot_opcodes_t opc, uint8_t *pktin, uint1
     return(0);      
 }
 
+
+static uint8_t s_uprot_proc_CANGATEWAY(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout)
+{
+    if(eobool_false == eouprot_can_process_opcode(eApplication, EOUPROT_PROTOCOL_VERSION, opc, 0))
+    {
+        return(s_uprot_proc_UNSUPP(opc, pktin, pktinsize, remaddr, pktout, capacityout, sizeout));
+    }
+
+    eOuprot_cmdREPLY_t * reply = (eOuprot_cmdREPLY_t*) pktout;
+    
+    reply->opc = uprot_OPC_CANGATEWAY;
+    reply->protversion = EOUPROT_PROTOCOL_VERSION;
+    reply->res = uprot_RES_ERR_FAILED;
+    reply->sizeofextra = 0;
+
+    // we send a ko message.
+    *sizeout = sizeof(eOuprot_cmdREPLY_t);   
+    
+    // we force a restart to eUpdater
+    return(1);      
+}
+
+
 static uint8_t s_appl_parse(uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout)
 {  
     eOuprot_opcodes_t opc = uprot_OPC_NONE;    
@@ -985,7 +1008,14 @@ static uint8_t s_appl_parse(uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t rem
             opc = (sizeof(eOuprot_cmd_LEGACY_SCAN_t) == pktinsize) ? uprot_OPC_LEGACY_SCAN : uprot_OPC_DISCOVER;
             process = s_uprot_proc_DISCOVER;           
         } break;
-               
+
+        case uprot_OPC_LEGACY_CANGATEWAY:
+        case uprot_OPC_CANGATEWAY:
+        {
+            opc = (sizeof(eOuprot_cmd_LEGACY_CANGATEWAY_t) == pktinsize) ? uprot_OPC_LEGACY_CANGATEWAY : uprot_OPC_CANGATEWAY;
+            process = s_uprot_proc_CANGATEWAY;           
+        } break;
+        
         case uprot_OPC_RESTART:
         {            
             opc = uprot_OPC_RESTART; 
