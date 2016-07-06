@@ -204,6 +204,137 @@ static const EOconstvector * s_eo_theservices_the_vectorof_EPcfgs = &s_eo_theser
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
+#warning used to test spichainof3: remove code under TEST_SPICHAINOF3
+
+#undef TEST_SPICHAINOF3
+#if defined(TEST_SPICHAINOF3)
+#include "EOmcController.h"
+ 
+static const eOmn_serv_configuration_t s_serv_config_mc_cer_hand_xx =
+{   // eb10
+    .type       = eomn_serv_MC_mc4plus,
+    .filler     = {0},
+    .data.mc.mc4plus_based = 
+    {
+        .boardtype4mccontroller = emscontroller_board_CER_HAND,
+        .filler                 = {0},
+        .arrayofjomodescriptors =
+        {
+            .head   = 
+            {
+                .capacity       = 4,
+                .itemsize       = sizeof(eOmn_serv_jomo_descriptor_t),
+                .size           = 2,
+                .internalmem    = 0                    
+            },
+            .data   =
+            {
+                { // joint 0: first
+                    .actuator.pwm   =
+                    {
+                        .port   = eomn_serv_mc_port_mc4plus_pwmP3         
+                    },
+                    .sensor         =
+                    {
+                        .type   = eomn_serv_mc_sensor_encoder_spichainof3,
+                        .port   = eomn_serv_mc_port_mc4plus_spiP10,
+                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                        //.type   = eomn_serv_mc_sensor_none,
+                        //.port   = 0, 
+                        //.pos    = eomn_serv_mc_sensor_pos_none
+                    },
+                    .extrasensor    =
+                    {
+                        .type   = eomn_serv_mc_sensor_encoder_inc,
+                        .port   = eomn_serv_mc_port_mc4plus_qencP3,
+                        .pos    = eomn_serv_mc_sensor_pos_atmotor
+                    }
+                },
+                { // joint 1
+                    .actuator.pwm   =
+                    {
+                        .port   = eomn_serv_mc_port_mc4plus_pwmP2             
+                    },
+                    .sensor         =
+                    {
+                        .type   = eomn_serv_mc_sensor_encoder_spichainof3,
+                        .port   = eomn_serv_mc_port_mc4plus_spiP11,
+                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                        //.type   = eomn_serv_mc_sensor_none,
+                        //.port   = 0, 
+                        //.pos    = eomn_serv_mc_sensor_pos_none
+                    },
+                    .extrasensor    =
+                    {
+                        .type   = eomn_serv_mc_sensor_encoder_inc,
+                        .port   = eomn_serv_mc_port_mc4plus_qencP2,
+                        .pos    = eomn_serv_mc_sensor_pos_atmotor
+                        
+                    }
+                },                
+                { // joint 2
+                    .actuator.pwm   =
+                    {
+                        .port   = eomn_serv_mc_port_none
+                    },
+                    .sensor         =
+                    {
+                        .type   = eomn_serv_mc_sensor_none,
+                        .port   = 0, 
+                        .pos    = eomn_serv_mc_sensor_pos_none
+                    },
+                    .extrasensor    =
+                    {
+                        .type   = eomn_serv_mc_sensor_none,
+                        .port   = 0, 
+                        .pos    = eomn_serv_mc_sensor_pos_none
+                    }
+                },                
+                { // joint 3
+                    .actuator.pwm   =
+                    {
+                        .port   = eomn_serv_mc_port_none                          
+                    },
+                    .sensor         =
+                    {
+                        .type   = eomn_serv_mc_sensor_none,
+                        .port   = 0, 
+                        .pos    = eomn_serv_mc_sensor_pos_none
+                    },
+                    .extrasensor    =
+                    {
+                       .type   = eomn_serv_mc_sensor_none,
+                        .port   = 0, 
+                        .pos    = eomn_serv_mc_sensor_pos_none
+                    }
+                }            
+            }
+        },
+        .jomocoupling       =
+        {
+            .joint2set      = 
+            {   // each joint is on a different set 
+                0, 1, 2, 3 
+            },
+            .joint2motor    = 
+            {   // zero matrix: use matrix embedded in controller and seecetd by boardtype4mccontroller
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) }        
+            },
+            .joint2encoder  = 
+            {   // identical matrix
+                { EO_COMMON_FLOAT_TO_Q17_14(1.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(1.0f) } 
+            }  
+        }         
+    }
+ 
+};
+#endif
 
 extern EOtheServices* eo_services_Initialise(eOipv4addr_t ipaddress)
 {
@@ -234,6 +365,26 @@ extern EOtheServices* eo_services_Initialise(eOipv4addr_t ipaddress)
     
     // we initialise the services
     s_eo_services_initialise(p);
+
+
+#if defined(TEST_SPICHAINOF3)
+    {
+    
+        eOmn_service_cmmnds_command_t command = 
+        {
+            0           
+        };
+        
+        command.operation = eomn_serv_operation_verifyactivate;
+        command.category = eomn_serv_category_mc;
+        memcpy(&command.parameter.configuration, &s_serv_config_mc_cer_hand_xx, sizeof(s_serv_config_mc_cer_hand_xx));
+        
+    
+        // ok, we have received a command for a given service. we ask the object theservices to manage the thing
+    
+        eo_services_ProcessCommand(eo_services_GetHandle(), &command);
+    }
+#endif
 
 #if defined(TESTRTC_IS_ACTIVE)    
     testRTC_init();

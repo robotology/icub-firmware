@@ -41,6 +41,8 @@
 #include "EoManagement.h"
 #include "hal_spiencoder.h"
 
+#include "EOtheEncoderReader.h"
+
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
@@ -88,7 +90,7 @@ extern eOresult_t eo_appEncReader_StartRead(EOappEncReader *p);
 
 extern eObool_t eo_appEncReader_isReady(EOappEncReader *p);  
 
-extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, uint32_t *primaryvalue, uint32_t *secondaryvalue, eOappEncReader_errortype_t *etype1, eOappEncReader_errortype_t *etype2);
+extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOencoderreader_valueInfo_t *primary, eOencoderreader_valueInfo_t *secondary);
 
 extern eOresult_t eo_appEncReader_Diagnostics_Enable(EOappEncReader *p, eObool_t on);
 

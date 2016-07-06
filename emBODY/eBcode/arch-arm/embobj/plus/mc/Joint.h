@@ -27,6 +27,7 @@ typedef struct
     int32_t motor_pos_min;
     int32_t motor_pos_max;
     CTRL_UNITS last_joint_pos;
+    int32_t max_tension;
 } CableConstraintData;
 
 typedef enum
