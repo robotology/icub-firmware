@@ -103,7 +103,7 @@ static uint8_t s_app_core_manage_cmd(uint8_t *pktin, uint8_t *pktout, uint16_t c
 
 //static uint8_t s_app_core_manage_cmd2(uint8_t *pktin, uint16_t pktinsize, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout);
 
-static uint8_t s_appl_parse(uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout);
+static uint8_t s_appl_parse(uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout, eOipv4port_t *port);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -259,12 +259,14 @@ static eObool_t s_parse_and_form(uint8_t *data, uint8_t size, eOipv4addr_t remad
     
     if(1)
     {   // it can be a eth-loader protocol
+        
+        eOipv4port_t port = s_emsdiscoverytransceiver_singleton.cfg.hostipv4port;
        
         //uint8_t r = s_app_core_manage_cmd(data, txdata, s_emsdiscoverytransceiver_singleton.cfg.txpktcapacity, &txsize);
         
         //uint8_t r = s_app_core_manage_cmd2(data, size, txdata, s_emsdiscoverytransceiver_singleton.cfg.txpktcapacity, &txsize);
         
-        uint8_t r = s_appl_parse(data, size, remaddr, txdata, s_emsdiscoverytransceiver_singleton.cfg.txpktcapacity, &txsize);
+        uint8_t r = s_appl_parse(data, size, remaddr, txdata, s_emsdiscoverytransceiver_singleton.cfg.txpktcapacity, &txsize, &port);
         
         
         
@@ -309,7 +311,7 @@ static eObool_t s_parse_and_form(uint8_t *data, uint8_t size, eOipv4addr_t remad
             // there is a msg to send back
             eo_packet_Size_Set(s_emsdiscoverytransceiver_singleton.replypkt, txsize); 
             eo_packet_Addressing_Set(s_emsdiscoverytransceiver_singleton.replypkt, 
-                                     address, s_emsdiscoverytransceiver_singleton.cfg.hostipv4port);   
+                                     address, port);   
         }                
                
     }
@@ -995,7 +997,7 @@ static uint8_t s_uprot_proc_CANGATEWAY(eOuprot_opcodes_t opc, uint8_t *pktin, ui
 }
 
 
-static uint8_t s_appl_parse(uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout)
+static uint8_t s_appl_parse(uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout, eOipv4port_t *port)
 {  
     eOuprot_opcodes_t opc = uprot_OPC_NONE;    
     uprot_fp_process_t process = s_uprot_proc_NONE;
@@ -1006,26 +1008,30 @@ static uint8_t s_appl_parse(uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t rem
         case uprot_OPC_DISCOVER:
         {
             opc = (sizeof(eOuprot_cmd_LEGACY_SCAN_t) == pktinsize) ? uprot_OPC_LEGACY_SCAN : uprot_OPC_DISCOVER;
-            process = s_uprot_proc_DISCOVER;           
+            process = s_uprot_proc_DISCOVER;    
+            *port = s_emsdiscoverytransceiver_singleton.cfg.hostipv4port;            
         } break;
 
         case uprot_OPC_LEGACY_CANGATEWAY:
         case uprot_OPC_CANGATEWAY:
         {
             opc = (sizeof(eOuprot_cmd_LEGACY_CANGATEWAY_t) == pktinsize) ? uprot_OPC_LEGACY_CANGATEWAY : uprot_OPC_CANGATEWAY;
-            process = s_uprot_proc_CANGATEWAY;           
+            process = s_uprot_proc_CANGATEWAY; 
+            *port = 3334;            
         } break;
         
         case uprot_OPC_RESTART:
         {            
             opc = uprot_OPC_RESTART; 
             process = s_uprot_proc_RESTART;
+            *port = s_emsdiscoverytransceiver_singleton.cfg.hostipv4port;
         } break;
  
         default:
         {
             opc = uprot_OPC_NONE;
             process = s_uprot_proc_NONE;
+            *port = s_emsdiscoverytransceiver_singleton.cfg.hostipv4port;
         } break;
         
     }
