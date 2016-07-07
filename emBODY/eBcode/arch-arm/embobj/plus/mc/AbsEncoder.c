@@ -413,11 +413,10 @@ void AbsEncoder_update(AbsEncoder* o, uint16_t position)
         o->velocity = (7*o->velocity) >> 3;
     }
         
-    //every second
-    
-    eOemsrunner_diagnosticsinfo_t* runner_info = eom_emsrunner_GetDiagnosticsInfoHandle(eom_emsrunner_GetHandle());
-    
-    if ((runner_info->numberofperiods % 1000) == 0)
+    // every second
+    uint64_t iteration = eom_emsrunner_Get_IterationNumber(eom_emsrunner_GetHandle());
+    eOreltime_t period = eom_emsrunner_Get_Period(eom_emsrunner_GetHandle());
+    if ((iteration % period) == 0)
     {
         if (o->spike_cnt > 0)
         {                

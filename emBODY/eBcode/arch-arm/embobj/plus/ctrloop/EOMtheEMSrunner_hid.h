@@ -50,9 +50,29 @@ extern "C" {
 
 // - #define used with hidden struct ----------------------------------------------------------------------------------
 
-//#define EVIEWER_ENABLED
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
+
+
+
+typedef struct
+{
+    eOabstime_t         timestarted;
+    eOabstime_t         timestopped;
+    eOabstime_t         duration[2];    // 0 is current iteration, 1 is previous iteration
+    volatile eObool_t   isexecuting;
+    volatile eObool_t   isabout2overflow;
+    volatile eObool_t   isoverflown;
+} eOemsrunner_tasktiming_t;
+
+
+typedef struct
+{
+    eObool_t                    cycleisrunning;
+    uint64_t                    iterationnumber;
+    eOemsrunner_tasktiming_t    tasktiming[eo_emsrunner_task_numberof];    
+} eOemsrunner_cycletiming_t;
+
 
 /** @struct     EOMtheEMSrunner_hid
     @brief      Hidden definition. Implements private data used only internally by the 
@@ -61,151 +81,49 @@ extern "C" {
  **/  
 struct EOMtheEMSrunner_hid 
 {
-    eOemsrunner_cfg_t   cfg;
-    EOMtask*            task[eo_emsrunner_task_numberof];
-    eOsmEventsEMSappl_t event;
-    osal_timer_t*       osaltimer;
-    eObool_t            cycleisrunning;
-    eObool_t            safeDurationExpired[eo_emsrunner_task_numberof]; 
-    eObool_t            overflownToNextTask[eo_emsrunner_task_numberof]; 
-    hal_timer_t         haltimer_start[eo_emsrunner_task_numberof];
-    hal_timer_t         haltimer_alert[eo_emsrunner_task_numberof];
-    uint16_t            numofrxpackets;
-    uint16_t            numofrxrops;
-    uint16_t            numoftxpackets;
-    uint16_t            numoftxrops;
-    eOemsrunner_mode_t  mode;
-    uint8_t             numofpacketsinsidesocket;
-    osal_semaphore_t*   waitudptxisdone;
-    osal_task_t*        osaltaskipnetexec;
-    uint64_t            iterationnumber;
-    uint8_t             usedTXdecimationfactor;
-    eObool_t            itisaTXcycle;
+    eOemsrunner_cfg_t           cfg;
+    EOMtask*                    task[eo_emsrunner_task_numberof];
+    eOsmEventsEMSappl_t         event;
+    osal_timer_t*               osaltimer;
+    hal_timer_t                 haltimer_start[eo_emsrunner_task_numberof];
+    hal_timer_t                 haltimer_safestop[eo_emsrunner_task_numberof];
+    uint16_t                    numofrxpackets;
+    uint16_t                    numofrxrops;
+    uint16_t                    numoftxpackets;
+    uint16_t                    numoftxrops;
+    eOemsrunner_mode_t          mode;
+    uint8_t                     numofpacketsinsidesocket;
+    osal_semaphore_t*           waitudptxisdone;
+    osal_task_t*                osaltaskipnetexec;
+    uint8_t                     usedTXdecimationfactor;
     eOtransmitter_ropsnumber_t  txropsnumberincycle;
-    uint8_t             txcan1frames;
-    uint8_t             txcan2frames;
+    uint8_t                     txcan1frames;
+    uint8_t                     txcan2frames;
+    eOemsrunner_cycletiming_t   cycletiming;
 };
 
 
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
+// so that we can see it on uvision
 extern void tskEMSrunRX(void *p);
 extern void tskEMSrunDO(void *p);
 extern void tskEMSrunTX(void *p);
 
 
-#if defined(EVIEWER_ENABLED)
-void evRXstart(void);
-void evRXalert(void);
-void evDOstart(void);
-void evDOalert(void);
-void evTXstart(void);
-void evTXalert(void);
-void usrDef_RUNRecRopframe(void);
-#endif
-
-// default function for RX: it calls _beforedatagramreception(), _datagramreception(), _afterdatagramreception()
-extern void eom_emsrunner_hid_userdef_taskRX_activity(EOMtheEMSrunner *p);
-
-// default function for RX or TX: there is a transceiver error
+// default overridable function (weakly defined) for: transceiver error
 extern void eom_emsrunner_hid_userdef_onemstransceivererror(EOMtheEMStransceiver *p);
 
-// default function for RX-before-datagram-reception: it is empty.
-extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(EOMtheEMSrunner *p);
-// default function for RX-datagram-reception: it repeates upto xx times: get a pkt, call the transceiver, verifies if a quit evt has arrived.
-extern void eom_emsrunner_hid_userdef_taskRX_activity_datagramreception(EOMtheEMSrunner *p);
-// default function for RX-after-datagram-reception
-extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOMtheEMSrunner *p);
-
-
-extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p);
-
-
-extern void eom_emsrunner_hid_userdef_taskTX_activity(EOMtheEMSrunner *p);
-
-extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission(EOMtheEMSrunner *p);
-extern void eom_emsrunner_hid_userdef_taskTX_activity_datagramtransmission(EOMtheEMSrunner *p);
-extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(EOMtheEMSrunner *p);
-
-
-extern void eom_emsrunner_hid_userdef_onexecutionoverflow(EOMtheEMSrunner *p, eOemsrunner_taskid_t taskid, uint64_t starttime, uint64_t nowtime);
-
+// default overridable function (weakly defined) for: failed transmission
 extern void eom_emsrunner_hid_userdef_onfailedtransmission(EOMtheEMSrunner *p);
 
-
-// - inline functions
-
-extern inline eObool_t eom_runner_hid_cansafelyexecute(EOMtheEMSrunner *p, eOemsrunner_taskid_t taskid)
-{
-    eObool_t ret = eobool_false;
-
-    switch(p->mode)
-    {
-        case eo_emsrunner_mode_besteffort:
-        {
-            ret = eobool_true;
-        } break;
-        
-        case eo_emsrunner_mode_softrealtime:
-        {
-            ret = (eobool_false == p->safeDurationExpired[taskid]) ? (eobool_true) : (eobool_false);
-        } break; 
-        
-        case eo_emsrunner_mode_hardrealtime:
-        {
-            ret = (eobool_false == p->safeDurationExpired[taskid]) ? (eobool_true) : (eobool_false);
-        } break;  
-
-        default:
-        {
-            ret = eobool_false;
-        } break;
-        
-    }   
-    
-    return(ret);
-    
-}
-
-
-extern inline eObool_t eom_runner_hid_signaloverflow(EOMtheEMSrunner *p, eOemsrunner_taskid_t taskid)
-{
-    eObool_t ret = eobool_false;
-
-    switch(p->mode)
-    {
-        case eo_emsrunner_mode_besteffort:
-//        {
-//            ret = eobool_false;
-//        } break;
-        
-        case eo_emsrunner_mode_softrealtime:
-        case eo_emsrunner_mode_hardrealtime:
-        {
-            ret = p->overflownToNextTask[taskid];
-        } break;  
-
-        default:
-        {
-            ret = eobool_false;
-        } break;
-        
-    }   
-    
-    return(ret);
-    
-}
-
-extern inline void eom_runner_hid_overflow_set(EOMtheEMSrunner *p, eOemsrunner_taskid_t taskid)
-{
-    p->overflownToNextTask[taskid] = eobool_true;
-}
-
-extern inline void eom_runner_hid_overflow_reset(EOMtheEMSrunner *p, eOemsrunner_taskid_t taskid)
-{
-    p->overflownToNextTask[taskid] = eobool_false;
-}
+// default overridable functions (weakly defined) for: rx, do, tx
+extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(EOMtheEMSrunner *p);
+extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOMtheEMSrunner *p);
+extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p);
+extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission(EOMtheEMSrunner *p);
+extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(EOMtheEMSrunner *p);
 
 
 #ifdef __cplusplus

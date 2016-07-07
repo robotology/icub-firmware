@@ -64,8 +64,8 @@ extern       uint32_t *oosiit_params_stdlib32data;
 
 // the time of the system expressed in ticks
 extern volatile uint64_t oosiit_time;
-// the duration in nanosec of each unity of the systick register
-extern uint32_t oosiit_ns_per_unit_of_systick;
+// the duration in picosec of each unity of the systick register. we use picosec to avoid precision problems.
+extern uint64_t oosiit_picosec_per_unit_of_systick;
 // the max number of unity of the systick register
 extern uint32_t oosiit_num_units_of_systick;
 
