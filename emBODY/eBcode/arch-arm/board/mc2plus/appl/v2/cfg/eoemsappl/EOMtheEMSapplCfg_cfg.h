@@ -72,22 +72,22 @@ extern "C" {
 
 //  <h> version
 //  <o> major           <0-255> 
-#define EOMTHEEMSAPPLCFG_VERSION_MAJOR          0
+#define EOMTHEEMSAPPLCFG_VERSION_MAJOR          1
 //  <o> minor           <0-255> 
-#define EOMTHEEMSAPPLCFG_VERSION_MINOR          3
+#define EOMTHEEMSAPPLCFG_VERSION_MINOR          4
 //  </h>version
 
 //  <h> build date
 //  <o> year            <2010-2020> 
 #define EOMTHEEMSAPPLCFG_BUILDDATE_YEAR         2016
 //  <o> month           <1-12> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_MONTH        5
+#define EOMTHEEMSAPPLCFG_BUILDDATE_MONTH        7
 //  <o> day             <1-31> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          27
+#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          7
 //  <o> hour            <0-23> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         10
+#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         14
 //  <o> minute          <0-59> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          18
+#define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          28
 //  </h>build date
 
 // </h>Info 
@@ -657,7 +657,7 @@ extern "C" {
 
 //  <o> RX task priority <2-251>
 //  <i> default: 247
-#define EOMTHEEMSAPPLCFG_RUNOBJ_TASK_RX_PRIORITYof   247
+#define EOMTHEEMSAPPLCFG_RUNOBJ_TASK_RX_PRIORITYof   249
 
 //  <o> DO task priority <2-251>
 //  <i> default: 248
@@ -665,7 +665,7 @@ extern "C" {
 
 //  <o> TX task priority <2-251>
 //  <i> default: 249
-#define EOMTHEEMSAPPLCFG_RUNOBJ_TASK_TX_PRIORITYof   249
+#define EOMTHEEMSAPPLCFG_RUNOBJ_TASK_TX_PRIORITYof   247
 
 //  </h>priorities 
 
