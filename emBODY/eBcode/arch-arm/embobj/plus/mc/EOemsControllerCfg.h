@@ -73,6 +73,8 @@ extern "C" {
 #define PWM_OUTPUT_LIMIT_2FOC 10000
 #define PWM_OUTPUT_LIMIT      0x7FFF //32767 
 
+#define SPRING_MAX_TENSION    0x1F00
+
 #define MAX_NAXLES 4
 
 #define USE_FLOAT_CTRL_UNITS

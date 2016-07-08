@@ -100,8 +100,6 @@ typedef struct // Joint
     CTRL_UNITS acc_ref;
     CTRL_UNITS trq_ref;
     
-    CTRL_UNITS vel_dir_ref;
-    
     CTRL_UNITS pos_fbk;
     CTRL_UNITS vel_fbk;
     CTRL_UNITS trq_fbk;    

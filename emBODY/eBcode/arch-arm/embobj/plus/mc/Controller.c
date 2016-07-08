@@ -552,11 +552,11 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
     
         Sje = o->Sje;
 
-        //Sje[0][0] = -1.0f; Sje[0][1] = 1.0f; Sje[0][2] = 0.0f; Sje[0][3] =  0.0f; Sje[0][4] = 0.0f; Sje[0][5] = 0.0f;
-        //Sje[1][0] =  0.0f; Sje[1][1] = 0.0f; Sje[1][2] = 0.0f; Sje[1][3] = -1.0f; Sje[1][4] = 1.0f; Sje[1][5] = 0.0f;
-
         Sje[0][0] = -1; Sje[0][1] = 1; Sje[0][2] = 0; Sje[0][3] =  0; Sje[0][4] = 0; Sje[0][5] = 0;
         Sje[1][0] =  0; Sje[1][1] = 0; Sje[1][2] = 0; Sje[1][3] = -1; Sje[1][4] = 1; Sje[1][5] = 0;
+    
+        //Sje[0][0] =  0; Sje[0][1] = 0; Sje[0][2] = 1; Sje[0][3] =  0; Sje[0][4] = 0; Sje[0][5] = 0;
+        //Sje[1][0] =  0; Sje[1][1] = 0; Sje[1][2] = 0; Sje[1][3] =  0; Sje[1][4] = 0; Sje[1][5] = 1;
     
         o->e2s[0] = o->e2s[1] = o->e2s[2] = 0;
         o->e2s[3] = o->e2s[4] = o->e2s[5] = 1;
@@ -1125,7 +1125,9 @@ void MController_update_absEncoder_fbk(uint8_t e, uint32_t* positions) //
         AbsEncoder_update(enc++, (uint16_t)positions[k]);
     }
     
-    //MController_update_joint_torque_fbk(e, AbsEncoder_position(smc->absEncoder+(e*smc->multi_encs+2)));
+#ifdef R1_HAND
+    
+    MController_update_joint_torque_fbk(e, AbsEncoder_position(smc->absEncoder+(e*smc->multi_encs+2)));
     
     /*
     static int repeat[2] = {0,500};
@@ -1137,6 +1139,7 @@ void MController_update_absEncoder_fbk(uint8_t e, uint32_t* positions) //
         send_debug_message("Torque", e, smc->joint[e].trq_fbk, 0);
     }
     */
+#endif
 }
 
 void MController_update_motor_state_fbk(uint8_t m, void* state)
@@ -1401,8 +1404,6 @@ void MController_get_pid_state(int j, eOmc_joint_status_ofpid_t* pid_state, BOOL
 void MController_get_motor_state(int m, eOmc_motor_status_t* motor_status)
 {
     Motor_get_state(smc->motor+m, motor_status);
-    
-    //motor_status->basic.mot_position = AbsEncoder_position(&(smc->absEncoder[m*3+2]));
 }
 
 void MController_update_motor_pos_fbk(int m, int32_t position_raw)

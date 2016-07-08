@@ -172,10 +172,8 @@ void JointSet_do_odometry(JointSet* o) //
         int es, e;
         
         for (es=0; es<E; ++es)
-        //for (es=0; es<6; ++es)
         {    
             e = o->encoders_of_set[es];
-            //e = es;
             
             if (AbsEncoder_is_fake(o->absEncoder+e))
             {
@@ -207,10 +205,8 @@ void JointSet_do_odometry(JointSet* o) //
             o->joint[j].vel_fbk = ZERO;
             
             for (es=0; es<E; ++es)
-            //for (es=0; es<6; ++es)
             {
                 e = o->encoders_of_set[es];
-                //e = es;
                 
                 o->joint[j].pos_fbk += Sje[j][e] * pos[e];
                 o->joint[j].vel_fbk += Sje[j][e] * vel[e];
@@ -930,7 +926,7 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
                 return;
             }
 
-            AbsEncoder_config_resolution(o->absEncoder+e, computedJntEncoderResolution);
+            AbsEncoder_config_resolution(o->absEncoder+e, EOK_CLIP_INT32(computedJntEncoderResolution));
             
             //Now I need to re-init absEncoder because I chenged maisConversionFactor, therefore the values returned by EOappEncoreReder are changed.
             o->absEncoder[e].state.bits.not_initialized = TRUE;
@@ -1015,7 +1011,7 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
                 return;
             }
 
-            AbsEncoder_config_resolution(o->absEncoder+e, computedJntEncoderResolution);
+            AbsEncoder_config_resolution(o->absEncoder+e, EOK_CLIP_INT32(computedJntEncoderResolution));
             
             //Now I need to re init absEncoder because I chenged hallADCConversionFactor, therefore the values returned by EOappEncoreReder are changed.
             o->absEncoder[e].state.bits.not_initialized = TRUE;
@@ -1094,10 +1090,11 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             Motor_set_run(o->motor+e);
             Motor_uncalibrate(o->motor+e);
             
-            o->joint[e].cable_constr.max_tension = 0x1F00;
+            o->joint[e].cable_constr.max_tension = SPRING_MAX_TENSION;
             
             o->joint[e].cable_calib.pwm         = calibrator->params.type11.pwm;
             o->joint[e].cable_calib.cable_range = calibrator->params.type11.cable_range;
+            
             o->joint[e].cable_calib.delta       = 900;//calibrator->params.type11.delta;
             o->joint[e].cable_calib.target      = o->joint[e].pos_fbk + o->joint[e].cable_calib.delta;
             

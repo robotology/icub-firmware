@@ -58,7 +58,7 @@ void Trajectory_set_pos_raw(Trajectory *o, float p0)
     
     o->vTimer = o->vT = 0.0f;
     
-    o->bVelocityMove = eobool_false;
+    o->bVelocityMove = FALSE;
 }
 
 void Trajectory_set_vel_raw(Trajectory *o, float v0)
@@ -71,7 +71,7 @@ void Trajectory_set_vel_raw(Trajectory *o, float v0)
     
     o->vTimer = o->vT = 0.0f;
     
-    o->bVelocityMove = eobool_true;
+    o->bVelocityMove = TRUE;
 }
 
 void Trajectory_set_pos_end(Trajectory *o, /*float x0,*/ float xStar, float velAvg)
@@ -124,7 +124,7 @@ void Trajectory_set_pos_end(Trajectory *o, /*float x0,*/ float xStar, float velA
 
 void Trajectory_set_vel_end(Trajectory *o, float vStar, float accAvg)
 {
-    o->bVelocityMove = eobool_true;
+    o->bVelocityMove = TRUE;
 
     //LIMIT(vStar, o->vel_max)
     
@@ -168,7 +168,7 @@ void Trajectory_stop(Trajectory *o, int32_t pos)
 
 void Trajectory_velocity_stop(Trajectory *o)
 {
-    o->bVelocityMove = eobool_false;
+    o->bVelocityMove = FALSE;
     
     o->vTimer = o->vT = 0.0f;
 
