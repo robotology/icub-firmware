@@ -1004,7 +1004,7 @@ static const eOmn_serv_configuration_t s_serv_config_sk_skin_cer_hand =
             .protocol   = { .major = 0, .minor = 0 }  // in case of {0, 0} the can discovery is not done but the verify will be ok. for normal case use: {1, 0}   
         },
         .numofpatches   = 2,
-        .canmapskin[0] = { 0x1000, 0x0000 },
+        .canmapskin[0] = { 0x0020, 0x0000 },
         .canmapskin[1] = { 0x0000, 0x0000 },
         .canmapskin[2] = {0},
         .canmapskin[3] = {0}
