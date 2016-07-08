@@ -63,7 +63,8 @@ extern const ipal_cfg_t*  const         eupdater_ipal_cfg;
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
-// empty-section
+
+//extern void updater_core_trace(const char *caller, char *format, ...);
  
 
 /** @}            

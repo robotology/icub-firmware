@@ -37,15 +37,26 @@
 #undef _START_CANGTW_WHEN_STAY_FOREVER_
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
-// empty-section
+
+typedef struct
+{
+    uint16_t        t_can_stabilisation;
+    uint16_t        t_wait_ff_reply;    
+    eObool_t        send_ff;
+    eObool_t        clear_can_onentry_gtw;
+    eObool_t        send_ack;
+} cangtw_parameters_t;
 
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
+
+
+extern const cangtw_parameters_t * eupdater_cangtw_get_parameters(void);
 
 extern void eupdater_cangtw_init(void);
 
 extern eOresult_t eupdater_cangtw_block_until_startup(void);
 
-extern void eupdater_cangtw_start(eOipv4addr_t remipaddr);
+extern void eupdater_cangtw_start(eOipv4addr_t remipaddr, const cangtw_parameters_t *params);
 
 extern eOipv4port_t eupdater_cangtw_get_remote_port(void);
 

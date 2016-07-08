@@ -68,6 +68,8 @@ typedef struct                                      // 24B
     uint8_t                 free2useflag;
     uint8_t                 free2usesize;
     uint8_t                 free2usedata[shalbase_ipc_userdefdata_maxsize];
+    uint8_t                 jump2flag;
+    uint32_t                jump2address;
 } baseIPCdata_t;            EECOMMON_VERIFYsizeof(baseIPCdata_t, 24);
 
 typedef struct                                      // 40B
@@ -324,6 +326,46 @@ extern eEresult_t shalbase_ipc_userdefdata_clr(void)
     s_shalbase_IPCdataStored.ipcdata.free2useflag  = FLAG_KO;
     s_shalbase_IPCdataStored.ipcdata.free2usesize  = 0;
     memset((void*)s_shalbase_IPCdataStored.ipcdata.free2usedata, 0, shalbase_ipc_userdefdata_maxsize);
+    
+    return(ee_res_OK);
+}
+
+
+
+extern eEresult_t shalbase_ipc_jump2addr_get(uint32_t *addr)
+{
+    if(ee_true != s_shalbase_ipc_ram_is_valid())
+    {
+        return(ee_res_NOK_generic); 
+    }
+    
+    if(FLAG_OK != s_shalbase_IPCdataStored.ipcdata.jump2flag)
+    {
+        return(ee_res_NOK_generic);
+    }
+    else
+    {
+        *addr = (s_shalbase_IPCdataStored.ipcdata.jump2address);
+        return(ee_res_OK);
+    }
+
+}
+
+extern eEresult_t shalbase_ipc_jump2addr_set(uint32_t addr)
+{
+    s_shalbase_ipc_ram_set_valid();
+    s_shalbase_IPCdataStored.ipcdata.jump2flag      = FLAG_OK;
+    s_shalbase_IPCdataStored.ipcdata.jump2address   = addr;
+    
+    return(ee_res_OK);
+}
+
+
+extern eEresult_t shalbase_ipc_jump2addr_clr(void)
+{
+    s_shalbase_ipc_ram_set_valid();
+    s_shalbase_IPCdataStored.ipcdata.jump2flag      = FLAG_KO;
+    s_shalbase_IPCdataStored.ipcdata.jump2address   = 0;
     
     return(ee_res_OK);
 }

@@ -353,6 +353,20 @@ extern eEresult_t ee_sharserv_ipc_userdefdata_clr(void)
     return(shalbase_ipc_userdefdata_clr());
 }
 
+extern eEresult_t ee_sharserv_ipc_jump2addr_get(uint32_t *addr)
+{
+    return(shalbase_ipc_jump2addr_get(addr));
+}
+			
+extern eEresult_t ee_sharserv_ipc_jump2addr_set(uint32_t addr)
+{
+    return(shalbase_ipc_jump2addr_set(addr));
+}
+
+extern eEresult_t ee_sharserv_ipc_jump2addr_clr(void)
+{
+    return(shalbase_ipc_jump2addr_clr());
+}
 
 extern eEresult_t ee_sharserv_sys_canjump(uint32_t addr)
 {

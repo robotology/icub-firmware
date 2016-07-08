@@ -66,7 +66,7 @@
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
-enum { shalbase_ipc_userdefdata_maxsize = 20 }; // max size of user-defined data that is possible to pass between e-processes
+enum { shalbase_ipc_userdefdata_maxsize = 15 }; // max size of user-defined data that is possible to pass between e-processes
  
 typedef enum
 {
@@ -97,6 +97,11 @@ extern eEresult_t shalbase_ipc_gotoproc_clr(void);
 extern eEresult_t shalbase_ipc_userdefdata_get(uint8_t *data, uint8_t *size, const uint8_t maxsize);		
 extern eEresult_t shalbase_ipc_userdefdata_set(uint8_t *data, uint8_t size);
 extern eEresult_t shalbase_ipc_userdefdata_clr(void);
+
+
+extern eEresult_t shalbase_ipc_jump2addr_get(uint32_t *addr);			
+extern eEresult_t shalbase_ipc_jump2addr_set(uint32_t addr);
+extern eEresult_t shalbase_ipc_jump2addr_clr(void);
 
 // offers some system services (through hal)
 extern eEresult_t shalbase_system_canjump(uint32_t addr);

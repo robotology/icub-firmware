@@ -75,8 +75,7 @@ typedef enum
     event_cangtw_can2_rec     = 0x00000004,
 
     event_cangtw_start        = 0x00000008,
-    event_cangtw_blmsg1       = 0x00000010,
-    event_cangtw_blmsg2       = 0x00000020,
+    event_cangtw_canstable    = 0x00000010,
     event_cangtw_go2run       = 0x00000040
 } eupdater_cangtw_task_event_t;
 
