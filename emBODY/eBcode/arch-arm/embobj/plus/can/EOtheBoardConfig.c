@@ -990,6 +990,27 @@ static const eOmn_serv_configuration_t s_serv_config_as_strain_cer_upper_arm =
     }    
 };
 
+
+
+static const eOmn_serv_configuration_t s_serv_config_sk_skin_cer_hand =   
+{   // eb10 / eb11
+    .type       = eomn_serv_SK_skin,
+    .filler     = {0},
+    .data.sk.skin = 
+    {
+        .version    =
+        {
+            .firmware   = { .major = 0, .minor = 0, .build = 0 },
+            .protocol   = { .major = 0, .minor = 0 }  // in case of {0, 0} the can discovery is not done but the verify will be ok. for normal case use: {1, 0}   
+        },
+        .numofpatches   = 2,
+        .canmapskin[0] = { 0x1000, 0x0000 },
+        .canmapskin[1] = { 0x0000, 0x0000 },
+        .canmapskin[2] = {0},
+        .canmapskin[3] = {0}
+    }    
+};    
+
 static const eOmn_serv_configuration_t s_serv_config_mc_cer_neck =
 {   // eb10
     .type       = eomn_serv_MC_mc4plus,
@@ -3256,7 +3277,21 @@ extern const eOmn_serv_configuration_t * eoboardconfig_code2skin_serv_configurat
 #elif   defined(ICUB_MEC_V3)
     // so far not supported
 #elif   defined(CER)    
-    // so far not supported
+    switch(code)
+    {
+        case 9:
+        case 7:
+        {   
+            ret = &s_serv_config_sk_skin_cer_hand; 
+        } break;         
+        
+        default:    
+        {   // all the others
+            ret = NULL;
+        } break;
+    
+    }
+
 #endif
     
     return(ret);        
