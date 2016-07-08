@@ -814,7 +814,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\Obj\</OutputDirectory>
-          <OutputName>eUpdaterCANgtw_ems4rd</OutputName>
+          <OutputName>emsUpdater</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>1</CreateHexFile>
@@ -847,7 +847,7 @@
           <AfterMake>
             <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name>cmd.exe /C copy .\Obj\eUpdaterCANgtw_ems4rd.hex ..\bin\eUpdaterCANgtw_ems4rd.hex</UserProg1Name>
+            <UserProg1Name>cmd.exe /C copy .\Obj\emsUpdater.hex ..\bin\emsUpdater.hex</UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
