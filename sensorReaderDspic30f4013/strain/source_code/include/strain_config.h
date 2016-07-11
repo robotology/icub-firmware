@@ -48,14 +48,14 @@ typedef struct
   
   // configurazioni relative ai canali analogici
   uint8_t EE_AN_ActiveChannels[ANALOG_CHANEL_NUM];  // sequenza di acquisizione canali 0 se canale non usato
-  uint8_t EE_AN_SelectedChannel;     // canale attualmente attivo
+  uint8_t  dummy_EE_AN_SelectedChannel;     // canale attualmente attivo. MOVED TO strain_runtime_data_t. IT IS NOT A PERMANENT DATA
   uint16_t  EE_AN_ChannelScanningTime; // tempo di scansione dei canali in 100aia di usec
   uint16_t  EE_AN_ChannelOffset[6];    // DAC generated offset
-  uint16_t  EE_AN_ChannelValue[ANALOG_CHANEL_NUM];    // ADC values
+  uint16_t  dummy_EE_AN_ChannelValue[ANALOG_CHANEL_NUM];    // ADC values MOVED TO strain_runtime_data_t. IT IS NOT A PERMANENT DATA
 
   // torque/force
-  int16_t  EE_TF_TorqueValue[3];      // Torque values
-  int16_t  EE_TF_ForceValue[3];       // Force values
+  int16_t  dummy_EE_TF_TorqueValue[3];      // Torque values MOVED TO strain_runtime_data_t. IT IS NOT A PERMANENT DATA
+  int16_t  dummy_EE_TF_ForceValue[3];       // Force values MOVED TO strain_runtime_data_t. IT IS NOT A PERMANENT DATA
 
   int16_t           EE_TF_TMatrix[6][6];       // SG2TF Transformation Matrix
 
@@ -87,6 +87,14 @@ typedef struct
 	uint8_t 		 save_eeprom_atonce; //if values 1, every change in eeprom data, will be save immediately in eeprom
 
 }strain_config_data_t;
+
+typedef struct 
+{
+  uint8_t     selectedChannel;     // canale attualmente attivo
+  uint16_t    channelValue[ANALOG_CHANEL_NUM];    // ADC values
+  int16_t     torqueValue[3];      // Torque values 
+  int16_t     forceValue[3];       // Force values
+}strain_runtime_data_t;
     
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------
 // empty-section
@@ -103,12 +111,13 @@ extern void strain_config_init(strain_config_data_t *strain_cfg);
 
 
 /**
-  * @fn     extern void strain_config_config_saveInEE(strain_eeprom_data_t *ee_data_ptr );
+  * @fn     extern uint8_t strain_config_saveInEE(strain_eeprom_data_t *ee_data_ptr, uint8_t enableCheckWrite);
   * @brief  copies datas pointed by ee_boardConfig_data_ptr of size ee_boardConfig_size words to the eeprom
+            If enableCheckWrite is equal to 1, then the function checks if write was successfull.
   * @param        ee_data_ptr: pointer to bard config datas to copy
-  * @retval none
+  * @retval return 1 if write was saccessfull, 0 otherwise
   */
-extern void strain_config_saveInEE(strain_eeprom_data_t *ee_data_ptr );
+extern uint8_t strain_config_saveInEE(strain_eeprom_data_t *ee_data_ptr, uint8_t enableCheckWrite);
 
 
 /**

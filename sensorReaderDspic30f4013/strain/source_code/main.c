@@ -110,6 +110,7 @@ _FBORPOR(MCLR_EN & PWRT_64 & PBOR_ON & BORV20);  // BOR 2.7V POR 64msec @@@ now 
 extern version_srcCode_info_t *strain_srcCode_info_ptr;
 
 strain_config_data_t strain_cfg;
+strain_runtime_data_t runtimedata;
 
 
 /*Al these global varibles are used to modify application behaviour and they can be modified by can messages*/
@@ -182,7 +183,7 @@ int main(void)
 	res = strain_config_readFromEE(&strain_cfg.ee_data);
     if(0 == res)// eeprom has been erased
     {
-        strain_config_saveInEE(&strain_cfg.ee_data);
+        strain_config_saveInEE(&strain_cfg.ee_data, 0);
     }
 // IIR filter not used	
 //	// IIR filter coefs
@@ -351,20 +352,20 @@ static void s_calculate_and_send_data(void)
     icubCanProto_strain_torqueSaturationInfo_t torqueSaturationInfo = {0};
   
    // 1) get saturation info
-   forceSaturationInfo.saturationInChannel_0 = getSaturationInfo((uint16_t)(strain_cfg.ee_data.EE_AN_ChannelValue[0]+HEX_VALC) );
-   forceSaturationInfo.saturationInChannel_1 = getSaturationInfo((uint16_t)(strain_cfg.ee_data.EE_AN_ChannelValue[1]+HEX_VALC) );
-   forceSaturationInfo.saturationInChannel_2 = getSaturationInfo((uint16_t)(strain_cfg.ee_data.EE_AN_ChannelValue[2]+HEX_VALC) );
+   forceSaturationInfo.saturationInChannel_0 = getSaturationInfo((uint16_t)(runtimedata.channelValue[0]+HEX_VALC) );
+   forceSaturationInfo.saturationInChannel_1 = getSaturationInfo((uint16_t)(runtimedata.channelValue[1]+HEX_VALC) );
+   forceSaturationInfo.saturationInChannel_2 = getSaturationInfo((uint16_t)(runtimedata.channelValue[2]+HEX_VALC) );
    
-   torqueSaturationInfo.saturationInChannel_3 = getSaturationInfo((uint16_t)(strain_cfg.ee_data.EE_AN_ChannelValue[3]+HEX_VALC) );
-   torqueSaturationInfo.saturationInChannel_4 = getSaturationInfo((uint16_t)(strain_cfg.ee_data.EE_AN_ChannelValue[4]+HEX_VALC) );
-   torqueSaturationInfo.saturationInChannel_5 = getSaturationInfo((uint16_t)(strain_cfg.ee_data.EE_AN_ChannelValue[5]+HEX_VALC) );
+   torqueSaturationInfo.saturationInChannel_3 = getSaturationInfo((uint16_t)(runtimedata.channelValue[3]+HEX_VALC) );
+   torqueSaturationInfo.saturationInChannel_4 = getSaturationInfo((uint16_t)(runtimedata.channelValue[4]+HEX_VALC) );
+   torqueSaturationInfo.saturationInChannel_5 = getSaturationInfo((uint16_t)(runtimedata.channelValue[5]+HEX_VALC) );
   
     
     if(( *((uint8_t*)&forceSaturationInfo) + *((uint8_t*)&torqueSaturationInfo) ) > 0 )
         saturation=1; //at least one channel is saturating
 
     // 2) calculate data for calibrated values
-    VectorAdd (6,(fractional*) u_resultval, (fractional*)strain_cfg.ee_data.EE_AN_ChannelValue, strain_cfg.ee_data.EE_CalibrationTare); // ChannelValue = ChannelValue + CalibrationTare 
+    VectorAdd (6,(fractional*) u_resultval, (fractional*)runtimedata.channelValue, strain_cfg.ee_data.EE_CalibrationTare); // ChannelValue = ChannelValue + CalibrationTare 
 
     //MatrixMultiply (int numRows1,int numCols1Rows2,int numCols2,fractional* dstM,fractional* srcM1,fractional* srcM2, torque_value = Tmatrix * channel value)
     MatrixMultiply(6,6,1,&s_resultval[0],&strain_cfg.ee_data.EE_TF_TMatrix[0][0],(int*) &u_resultval[0]);
@@ -379,12 +380,12 @@ static void s_calculate_and_send_data(void)
     
     
     // 3) prepare uncalibrated data to send
-	ForceDataUncalib[0] = strain_cfg.ee_data.EE_AN_ChannelValue[0]+HEX_VALC;
-    ForceDataUncalib[1] = strain_cfg.ee_data.EE_AN_ChannelValue[1]+HEX_VALC;
-    ForceDataUncalib[2] = strain_cfg.ee_data.EE_AN_ChannelValue[2]+HEX_VALC;
-    TorqueDataUncalib[0] = strain_cfg.ee_data.EE_AN_ChannelValue[3]+HEX_VALC;
-    TorqueDataUncalib[1] = strain_cfg.ee_data.EE_AN_ChannelValue[4]+HEX_VALC;
-    TorqueDataUncalib[2] = strain_cfg.ee_data.EE_AN_ChannelValue[5]+HEX_VALC;
+	ForceDataUncalib[0] = runtimedata.channelValue[0]+HEX_VALC;
+    ForceDataUncalib[1] = runtimedata.channelValue[1]+HEX_VALC;
+    ForceDataUncalib[2] = runtimedata.channelValue[2]+HEX_VALC;
+    TorqueDataUncalib[0] = runtimedata.channelValue[3]+HEX_VALC;
+    TorqueDataUncalib[1] = runtimedata.channelValue[4]+HEX_VALC;
+    TorqueDataUncalib[2] = runtimedata.channelValue[5]+HEX_VALC;
 
     // 4) prepare calibrating data to send
     if(saturation == 0) //no saturation
@@ -479,7 +480,7 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 				hal_can_boardFilter_set(hal_can_portCAN1, strain_cfg.ee_data.EE_CAN_BoardAddress);    
 				if (strain_cfg.save_eeprom_atonce)
 				{
-					strain_config_saveInEE(&strain_cfg.ee_data);
+					strain_config_saveInEE(&strain_cfg.ee_data, 0);
 					//strain_IIRFilter_saveInEE(); Filter IIR not used
 				}
 			}
@@ -572,16 +573,16 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 		{
 			if(msg->CAN_Per_Msg_PayLoad[1] < 6)
 			{
-                hal_timer_interrupt_disa(hal_timerT1);// stop timer to avoid rece condition on strain_cfg.ee_data.EE_AN_ChannelValue
+                hal_timer_interrupt_disa(hal_timerT1);// stop timer to avoid rece condition on runtimedata.channelValue
                 hal_timer_stop(hal_timerT1);
 				if(msg->CAN_Per_Msg_PayLoad[2] == 0)
 				{
 					Txdata[0] = ICUBCANPROTO_POL_AS_CMD__GET_CH_ADC; 
 					Txdata[1] = msg->CAN_Per_Msg_PayLoad[1];  
 					Txdata[2] = msg->CAN_Per_Msg_PayLoad[2];
-					VectorAdd (6, (fractional*)strain_cfg.ee_data.EE_AN_ChannelValue, (fractional*)strain_cfg.ee_data.EE_AN_ChannelValue, strain_cfg.ee_data.EE_CalibrationTare);
-					Txdata[3] = (strain_cfg.ee_data.EE_AN_ChannelValue[msg->CAN_Per_Msg_PayLoad[1]]+HEX_VALC) >> 8; 
-					Txdata[4] = (strain_cfg.ee_data.EE_AN_ChannelValue[msg->CAN_Per_Msg_PayLoad[1]]+HEX_VALC) & 0xFF; 
+					VectorAdd (6, (fractional*)runtimedata.channelValue, (fractional*)runtimedata.channelValue, strain_cfg.ee_data.EE_CalibrationTare);
+					Txdata[3] = (runtimedata.channelValue[msg->CAN_Per_Msg_PayLoad[1]]+HEX_VALC) >> 8; 
+					Txdata[4] = (runtimedata.channelValue[msg->CAN_Per_Msg_PayLoad[1]]+HEX_VALC) & 0xFF; 
 					*datalen=5;
 				}
 				else
@@ -590,13 +591,13 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 					Txdata[1] = msg->CAN_Per_Msg_PayLoad[1];  
 					Txdata[2] = msg->CAN_Per_Msg_PayLoad[2];
 					
-					VectorAdd (6, (fractional*)strain_cfg.ee_data.EE_AN_ChannelValue, (fractional*)strain_cfg.ee_data.EE_AN_ChannelValue, strain_cfg.ee_data.EE_CalibrationTare);
+					VectorAdd (6, (fractional*)runtimedata.channelValue, (fractional*)runtimedata.channelValue, strain_cfg.ee_data.EE_CalibrationTare);
 
-					MatrixMultiply(6,6,1,&strain_cfg.ee_data.EE_TF_TorqueValue[0],&strain_cfg.ee_data.EE_TF_TMatrix[0][0],(int*) &strain_cfg.ee_data.EE_AN_ChannelValue[0]); // fractional* srcM2 
+					MatrixMultiply(6,6,1,&runtimedata.torqueValue[0],&strain_cfg.ee_data.EE_TF_TMatrix[0][0],(int*) &runtimedata.channelValue[0]); // fractional* srcM2 
 			        
-					VectorAdd (6, (fractional*)strain_cfg.ee_data.EE_TF_TorqueValue, (fractional*)strain_cfg.ee_data.EE_TF_TorqueValue, CurrentTare);
-					Txdata[3] = (strain_cfg.ee_data.EE_TF_TorqueValue[msg->CAN_Per_Msg_PayLoad[1]]+HEX_VALC) >> 8; 
-					Txdata[4] = (strain_cfg.ee_data.EE_TF_TorqueValue[msg->CAN_Per_Msg_PayLoad[1]]+HEX_VALC) & 0xFF; 
+					VectorAdd (6, (fractional*)runtimedata.torqueValue, (fractional*)runtimedata.torqueValue, CurrentTare);
+					Txdata[3] = (runtimedata.torqueValue[msg->CAN_Per_Msg_PayLoad[1]]+HEX_VALC) >> 8; 
+					Txdata[4] = (runtimedata.torqueValue[msg->CAN_Per_Msg_PayLoad[1]]+HEX_VALC) & 0xFF; 
 					*datalen=5;
 				} 
                 hal_timer_start(hal_timerT1);                
@@ -719,7 +720,7 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 			{
 				for (i=0; i<6; i++)
 				{
-					strain_cfg.ee_data.EE_CalibrationTare[i]=-(strain_cfg.ee_data.EE_AN_ChannelValue[i]);
+					strain_cfg.ee_data.EE_CalibrationTare[i]=-(runtimedata.channelValue[i]);
 				}
 			}     
 			else if (msg->CAN_Per_Msg_PayLoad[1]==2)
@@ -758,8 +759,8 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
                 uint16_t value[ANALOG_CHANEL_NUM] = {0};
                 int16_t result[ANALOG_CHANEL_NUM] = {0};
                 
-                hal_timer_interrupt_disa(hal_timerT1);// stop timer to avoid rece condition on strain_cfg.ee_data.EE_AN_ChannelValue
-                memcpy((uint8_t*)value, strain_cfg.ee_data.EE_AN_ChannelValue, 2*6);
+                hal_timer_interrupt_disa(hal_timerT1);// stop timer to avoid rece condition on runtimedata.channelValue
+                memcpy((uint8_t*)value, runtimedata.channelValue, 2*6);
 
 				VectorAdd (6, (fractional*)value, (fractional*)value, strain_cfg.ee_data.EE_CalibrationTare);
 
@@ -906,13 +907,20 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 		case ICUBCANPROTO_POL_AS_CMD__SAVE2EE: // Save configuration data to EE
 								// 0x205 len 1  data 9 
 		{
-			eeprom_status=1;
-			strain_config_saveInEE(&strain_cfg.ee_data);
+			uint8_t writeisok = 3;
+			writeisok = strain_config_saveInEE(&strain_cfg.ee_data, 1);
+            if(writeisok)
+            {
+                eeprom_status=1;
+            }
+
 			//strain_IIRFilter_saveInEE(); // IIR filter not used
 			
 			// todo: checksum calcuation
+			Txdata[0] = ICUBCANPROTO_POL_AS_CMD__SAVE2EE; 
+            Txdata[1] = writeisok;
+            *datalen=2;
 			
-			*datalen=0;
 		break;
 		}
 		
@@ -983,14 +991,14 @@ static void s_parse_can_pollingMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *d
 			if(msg->CAN_Per_Msg_PayLoad[1]==0)
 			{ 
 				mux_enable=0;
-				strain_cfg.ee_data.EE_AN_SelectedChannel=0;
-				hal_strain_mux_channelSelect(strain_cfg.ee_data.EE_AN_SelectedChannel); 
+				runtimedata.selectedChannel=0;
+				hal_strain_mux_channelSelect(runtimedata.selectedChannel); 
 			}
 			else
 			{
 				mux_enable=1;
-				strain_cfg.ee_data.EE_AN_SelectedChannel=0;
-				hal_strain_mux_channelSelect(strain_cfg.ee_data.EE_AN_SelectedChannel);
+				runtimedata.selectedChannel=0;
+				hal_strain_mux_channelSelect(runtimedata.selectedChannel);
 			}
 			*datalen=0; 
 		break;
@@ -1085,7 +1093,7 @@ static void s_parse_can_loaderMsg(hal_canmsg_t *msg, uint8_t *Txdata, int8_t *da
 				if (addinfo_part==7)
 				{
 					addinfo_part=0;
-					strain_config_saveInEE(&strain_cfg.ee_data);
+					strain_config_saveInEE(&strain_cfg.ee_data, 0);
 					//strain_IIRFilter_saveInEE(); IIR filter not used
 				}
 				else
@@ -1129,7 +1137,7 @@ static void s_timer1_callback(void)
   // LED_ON;
 
   // channel active
-  if (strain_cfg.ee_data.EE_AN_SelectedChannel <= muxed_chans)
+  if (runtimedata.selectedChannel <= muxed_chans)
 	 {
 		// read from ADC.
 		//strain_cfg.ee_data.EE_AN_ChannelOffset[0] is the value to set int DAC, but it is meaningless.
@@ -1138,50 +1146,50 @@ static void s_timer1_callback(void)
 				
 		adc-=HEX_VALC;
 
-		strain_cfg.ee_data.EE_AN_ChannelValue[strain_cfg.ee_data.EE_AN_SelectedChannel] = adc;
+		runtimedata.channelValue[runtimedata.selectedChannel] = adc;
         //IIR filter not used
 		/* if (filter_enable)
 	    {
 
 			// IIR LPFilter durata circa 4uSec 
-	    	IIRTransposed( 1, (fractional*) &strain_cfg.ee_data.EE_AN_ChannelValue[strain_cfg.ee_data.EE_AN_SelectedChannel], 
-	      	(fractional*) &adc, &iirt[strain_cfg.ee_data.EE_AN_SelectedChannel]);
+	    	IIRTransposed( 1, (fractional*) &runtimedata.channelValue[runtimedata.selectedChannel], 
+	      	(fractional*) &adc, &iirt[runtimedata.selectedChannel]);
 
 		}
 
 		else
 		{
-			strain_cfg.ee_data.EE_AN_ChannelValue[strain_cfg.ee_data.EE_AN_SelectedChannel] = adc;
+			runtimedata.channelValue[runtimedata.selectedChannel] = adc;
 		}*/
 	}
 	
 
 	// select next channel 
-	if (strain_cfg.ee_data.EE_AN_SelectedChannel >= muxed_chans+3)
+	if (runtimedata.selectedChannel >= muxed_chans+3)
 	{
-		strain_cfg.ee_data.EE_AN_SelectedChannel=0;
+		runtimedata.selectedChannel=0;
 	}
 	else
 	{  
-		strain_cfg.ee_data.EE_AN_SelectedChannel++;
+		runtimedata.selectedChannel++;
 	}
-	if (strain_cfg.ee_data.EE_AN_SelectedChannel==0) 
+	if (runtimedata.selectedChannel==0) 
 	{
 		TEST_PIN_ON; 
 	}
-  	//if (!mux_enable) strain_cfg.ee_data.EE_AN_SelectedChannel=0;
+  	//if (!mux_enable) runtimedata.selectedChannel=0;
 
 	
-	if (strain_cfg.ee_data.EE_AN_SelectedChannel <= muxed_chans)
+	if (runtimedata.selectedChannel <= muxed_chans)
 	{
-		hal_strain_mux_channelSelect(strain_cfg.ee_data.EE_AN_SelectedChannel);
+		hal_strain_mux_channelSelect(runtimedata.selectedChannel);
 		// set the correct DAC value for the next reading
-		hal_strain_AD_setDAC_getADC((uint8_t)PDM_NORMAL, strain_cfg.ee_data.EE_AN_ChannelOffset[strain_cfg.ee_data.EE_AN_SelectedChannel], &adc);
+		hal_strain_AD_setDAC_getADC((uint8_t)PDM_NORMAL, strain_cfg.ee_data.EE_AN_ChannelOffset[runtimedata.selectedChannel], &adc);
 	}
  	
 	TEST_PIN_OFF; 
 
-	if( (strain_cfg.ee_data.EE_AN_SelectedChannel== muxed_chans+1) && (can_enable) )
+	if( (runtimedata.selectedChannel== muxed_chans+1) && (can_enable) )
 	{
 		s_calculate_and_send_data();
 	} 
