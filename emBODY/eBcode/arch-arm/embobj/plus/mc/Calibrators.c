@@ -142,7 +142,12 @@ static eOresult_t JointSet_do_wait_calibration_6_singleJoint(JointSet *o, int in
                 *calibrationCompleted = TRUE;
                 
                 Motor* m_ptr = o->motor + o->motors_of_set[indexSet];
-                Motor_calibrate_withOffset(m_ptr, m_ptr->pos_fbk);//the offset is the current position
+                int32_t offset = m_ptr->pos_raw_fbk/m_ptr->GEARBOX;
+                Motor_calibrate_withOffset(m_ptr, offset);
+                
+//                char info[80];
+//                snprintf(info, 80,"Calib offset is %d", offset);
+//                JointSet_send_debug_message(info, j_ptr->ID);
                 
                 for (int k=0; k<*(o->pN); ++k)
                 {

@@ -315,7 +315,7 @@ void Motor_config_friction(Motor* o, float Bemf, float Ktau) //
 void Motor_calibrate_withOffset(Motor* o, int32_t offset) //
 {
     o->pos_calib_offset = offset;
-    
+    o->pos_fbk_old = 0;
     Motor_set_run(o);
     
     if(o->HARDWARE_TYPE == HARDWARE_MC4p)
