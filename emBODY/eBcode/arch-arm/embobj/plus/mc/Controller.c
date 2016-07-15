@@ -912,6 +912,8 @@ void MController_config_joint(int j, eOmc_joint_config_t* config) //
     
     Joint_config(o->joint+j, j, config);
     
+    MController_config_vel_pid(j, &config->pidvelocity);
+    
     Motor_config_trqPID(o->motor+j, &(config->pidtorque));
     Motor_config_filter(o->motor+j,   config->tcfiltertype);
     Motor_config_friction(o->motor+j, config->motor_params.bemf_value, config->motor_params.ktau_value);
@@ -1419,12 +1421,10 @@ void MController_update_motor_current_fbk(int m, int16_t current)
 void MController_config_pos_pid(int j, eOmc_PID_t *pid_conf)
 {
     Joint* joint = smc->joint+j;
-
-    //joint->scKstill = pid_conf->ki;
     
     joint->scKpos   = pid_conf->kp;
-    joint->scKvel   = pid_conf->kd;
-    joint->scKstill = pid_conf->ki;
+    joint->scKvel   = pid_conf->kff;
+    joint->scKstill = 0.1f*joint->scKpos;
     
     PID_config(&(joint->posPID), pid_conf);
 }
@@ -1432,15 +1432,23 @@ void MController_config_pos_pid(int j, eOmc_PID_t *pid_conf)
 void MController_config_vel_pid(int j, eOmc_PID_t *pid_conf)
 {
     Joint* joint = smc->joint+j;
+    Motor* motor = smc->motor+j;
     
-    //joint->scKvel   = pid_conf->kp;
-    //joint->scKpos   = pid_conf->ki;
+    pid_conf->control_law = 0;
     
-    //joint->scKpos   = pid_conf->kp;
-    //joint->scKvel   = pid_conf->kd;
-    //joint->scKstill = pid_conf->ki;
-    
-    PID_config(&(joint->velPID), pid_conf);
+    switch (pid_conf->control_law)
+    {
+        case 1:
+            PID_config(&(joint->velPID), pid_conf);
+            break;
+        
+        case 2:
+            Motor_config_velPID(motor, pid_conf);
+            break;
+        
+        default:
+            break;
+    }
 }
 
 void MController_config_trq_pid(int m, eOmc_PID_t *pid_conf)

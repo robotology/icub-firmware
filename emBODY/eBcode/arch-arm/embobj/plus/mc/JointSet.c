@@ -16,6 +16,8 @@
 
 #include "Calibrators.h"
 
+static void JointSet_set_inner_control_flags(JointSet* o);
+
 JointSet* JointSet_new(uint8_t n) //
 {
     JointSet* o = NEW(JointSet, n);
@@ -268,6 +270,8 @@ BOOL JointSet_do_check_faults(JointSet* o)
         }
         
         o->control_mode = eomc_controlmode_hwFault;
+        
+        JointSet_set_inner_control_flags(o);
     }
     else if (o->external_fault)
     {
@@ -282,6 +286,8 @@ BOOL JointSet_do_check_faults(JointSet* o)
         }
         
         o->control_mode = eomc_controlmode_idle;
+        
+        JointSet_set_inner_control_flags(o);
     }
     
     return fault;
@@ -323,8 +329,6 @@ void JointSet_do(JointSet* o)
         JointSet_do_wait_calibration(o);
     }
 }
-
-static void JointSet_set_inner_control_flags(JointSet* o);
 
 BOOL JointSet_set_control_mode(JointSet* o, eOmc_controlmode_command_t control_mode)
 {

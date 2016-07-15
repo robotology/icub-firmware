@@ -215,6 +215,8 @@ extern void Motor_config_max_currents(Motor* o, eOmc_current_limits_params_t* cu
 extern void Motor_config_current_PID(Motor* o, eOmc_PID_t* pidcurrent);
 
 extern void Motor_config_trqPID(Motor* o, eOmc_PID_t* pid); //
+extern void Motor_config_velPID(Motor* o, eOmc_PID_t *pid); //
+
 extern void Motor_config_filter(Motor* o, uint8_t filter); //
 extern void Motor_config_friction(Motor* o, float Bemf, float Ktau); //
 extern void Motor_calibrate_withOffset(Motor* o, int32_t offset); //

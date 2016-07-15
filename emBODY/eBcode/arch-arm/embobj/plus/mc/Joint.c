@@ -93,15 +93,13 @@ void Joint_init(Joint* o)
     o->eo_joint_ptr = NULL;
     
     Joint_reset_calibration_data(o);
-    
-    //SpeedController_init(o->speedController);
 }
 
 void Joint_reset_calibration_data(Joint* o)
 {
     memset(&o->running_calibration, 0, sizeof(jointCalibrationData));
+    
     o->running_calibration.type = eomc_calibration_typeUndefined;
-
 }
 
 void Joint_config(Joint* o, uint8_t ID, eOmc_joint_config_t* config)
@@ -109,15 +107,10 @@ void Joint_config(Joint* o, uint8_t ID, eOmc_joint_config_t* config)
     o->ID = ID;
     
     PID_config(&o->posPID, &config->pidposition);
-    PID_config(&o->velPID, &config->pidvelocity);
-    
-    //o->scKvel   = config->pidvelocity.kp;
-    //o->scKpos   = config->pidvelocity.ki;
-    //o->scKstill = config->pidposition.ki;
-    
+        
     o->scKpos   = config->pidposition.kp;
-    o->scKvel   = config->pidposition.kd;
-    o->scKstill = config->pidposition.ki;
+    o->scKvel   = config->pidposition.kff;
+    o->scKstill = 0.1f*o->scKpos;
     
     o->pos_min = config->limitsofjoint.min;
     o->pos_max = config->limitsofjoint.max;
@@ -128,11 +121,11 @@ void Joint_config(Joint* o, uint8_t ID, eOmc_joint_config_t* config)
     o->tcKdamp   = 0.001f*CTRL_LOOP_FREQUENCY*(CTRL_UNITS)(config->impedance.damping);
     o->tcKoffset = config->impedance.offset;
     
-    o->Kadmitt = (o->tcKstiff == ZERO) ? ZERO: (1.0f/o->tcKstiff); 
+    o->Kadmitt = (o->tcKstiff == ZERO) ? ZERO : (1.0f/o->tcKstiff); 
     
     Trajectory_config_limits(&o->trajectory, o->pos_min, o->pos_max, o->vel_max, o->acc_max);
     
-    WatchDog_set_base_time_msec(&o->vel_ref_wdog, 200/*config->velocitysetpointtimeout*/);
+    WatchDog_set_base_time_msec(&o->vel_ref_wdog, config->velocitysetpointtimeout);
     WatchDog_rearm(&o->vel_ref_wdog);
     
     // TODOALE joint admittance missing
@@ -285,9 +278,6 @@ void Joint_update_odometry_fbk(Joint* o, CTRL_UNITS pos_fbk, CTRL_UNITS vel_fbk)
 
 void Joint_update_torque_fbk(Joint* o, CTRL_UNITS trq_fbk)
 {
-    // VALE: commented see issue 66 icub-firmware https://github.com/robotology/icub-firmware/issues/66
-    //if ((trq_fbk == o->trq_fbk) && (trq_fbk == 0.0f)) return;
-    
     o->trq_fbk = trq_fbk;
     
     WatchDog_rearm(&o->trq_fbk_wdog);
@@ -455,12 +445,14 @@ CTRL_UNITS Joint_do_pwm_control(Joint* o)
 //                break;
 //            }
             
-            if( (o->running_calibration.type == eomc_calibration_type7_hall_sensor) || 
-                ((o->running_calibration.type == eomc_calibration_type6_mais) && (o->running_calibration.data.type6.is_active == FALSE)) )
+            if ((o->running_calibration.type == eomc_calibration_type7_hall_sensor) || 
+               ((o->running_calibration.type == eomc_calibration_type6_mais) && 
+                (o->running_calibration.data.type6.is_active == FALSE)))
             {
                 o->output = ZERO;
                 break;
             }
+            
             Trajectory_do_step(&o->trajectory, &o->pos_ref, &o->vel_ref, &o->acc_ref);
         
             CTRL_UNITS pos_err_old = o->pos_err;
@@ -632,13 +624,13 @@ CTRL_UNITS Joint_do_vel_control(Joint* o)
                 }
                 else
                 {
-                    o->vel_ref += o->scKpos*o->pos_err;
+                    o->vel_ref = o->scKvel * o->vel_ref + o->scKpos*o->pos_err;
                 }
                 break;
                 
             case eomc_controlmode_velocity: // RAW
                 o->pos_err = ZERO;
-                // o->vel_ref = o->vel_ref;
+                o->vel_ref = o->scKvel * o->vel_ref;
                 break;
             
             default:

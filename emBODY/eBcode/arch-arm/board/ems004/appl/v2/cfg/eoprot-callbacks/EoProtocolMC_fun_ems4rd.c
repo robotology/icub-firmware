@@ -239,7 +239,6 @@ extern void eoprot_fun_UPDT_mc_joint_config_pidposition(const EOnv* nv, const eO
 {
     eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
     eOmc_PID_t *pid = (eOmc_PID_t*)rd->data;
-    //float rescaler = 1.0f/(float)(1<<pid->scale);
 
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
     
@@ -258,7 +257,6 @@ extern void eoprot_fun_UPDT_mc_joint_config_pidvelocity(const EOnv* nv, const eO
 {
     eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
     eOmc_PID_t *pid = (eOmc_PID_t*)rd->data;
-    //float rescaler = 1.0f/(float)(1<<pid->scale);
 
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
     

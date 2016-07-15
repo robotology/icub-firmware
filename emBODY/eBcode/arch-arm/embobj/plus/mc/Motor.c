@@ -48,7 +48,6 @@ static void Motor_hardStopCalbData_reset(Motor* o)
     memset(&o->hardstop_calibdata, 0, sizeof(HardStopCalibData));
     //explicit reset calib
     o->hardstop_calibdata.u.bits.iscalibrating = 0;
-
 }
 
 static void Motor_config_current_PID_2FOC(Motor* o, eOmc_PID_t* pidcurrent)
@@ -74,11 +73,33 @@ static void Motor_config_current_PID_2FOC(Motor* o, eOmc_PID_t* pidcurrent)
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdPid, id32);
 }
 
+static void Motor_config_velocity_PID_2FOC(Motor* o, eOmc_PID_t* pidcurrent)
+{
+    int8_t KpKiKdKs[7];
+    
+    //((int16_t*)KpKiKdKs)[0] = config->pidvelocity.kp;    //Kp
+    //((int16_t*)KpKiKdKs)[1] = config->pidvelocity.ki;    //Ki
+    //((int16_t*)KpKiKdKs)[2] = config->pidvelocity.kd;    //Kd (unused in 2FOC)
+    //           KpKiKdKs [6] = config->pidvelocity.scale; // shift
+        
+    ((int16_t*)KpKiKdKs)[0] =  0x0C; //Kp
+    ((int16_t*)KpKiKdKs)[1] =  0x10; //Ki
+    ((int16_t*)KpKiKdKs)[2] =  0x00; //Kd (unused in 2FOC)
+               KpKiKdKs [6] =  0x0A; // shift
+        
+    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, o->ID, 0);
+    
+    eOcanprot_command_t cmdPid;
+    cmdPid.class = eocanprot_msgclass_pollingMotorControl;
+    cmdPid.type = ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID;
+    cmdPid.value = KpKiKdKs;
+    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdPid, id32);
+}
+
 static void Motor_config_max_currents_2FOC(Motor* o, eOmc_current_limits_params_t* current_params)
 {    
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, o->ID, 0);
     
-    //uint32_t max_current = 5000;
     uint32_t max_current = current_params->peakCurrent;
     
     eOcanprot_command_t cmdMaxCurrent;
@@ -102,7 +123,6 @@ static void Motor_config_2FOC(Motor* o, eOmc_motor_config_t* config)
     //((int16_t*)KpKiKdKs)[2] =  0; //Kd (unused in 2FOC)
     //           KpKiKdKs [6] = 10; // shift
     
-    //uint32_t max_current = 5000;
     uint32_t max_current = config->currentLimits.peakCurrent;
     
     #define HAS_QE         0x0001
@@ -111,9 +131,7 @@ static void Motor_config_2FOC(Motor* o, eOmc_motor_config_t* config)
     #define USE_INDEX      0x0008
     #define HAS_SPEED_QE   0x0010
     
-    //uint8_t can_motor_config[6];
-    
-    o->can_motor_config[0] = 0; // HAS_QE|HAS_HALL;
+    o->can_motor_config[0] = 0;
     
     if (config->hasRotorEncoder)        o->can_motor_config[0] |= HAS_QE;
     if (config->hasHallSensor)          o->can_motor_config[0] |= HAS_HALL;
@@ -251,6 +269,7 @@ void Motor_config(Motor* o, uint8_t ID, eOmc_motor_config_t* config) //
     else if (o->HARDWARE_TYPE == HARDWARE_MC4p)
     {
         //Motor_config_MC4p(o->ID, config);
+
         o->control_mode = icubCanProto_controlmode_idle;
         hal_motor_disable((hal_motor_t)o->actuatorPort);
     }    
@@ -289,6 +308,14 @@ void Motor_config_current_PID(Motor* o, eOmc_PID_t* pidcurrent)
     if (o->HARDWARE_TYPE == HARDWARE_2FOC)
     {
         Motor_config_current_PID_2FOC(o, pidcurrent);
+    }
+}
+
+void Motor_config_velPID(Motor* o, eOmc_PID_t* pidvelocity)
+{
+    if (o->HARDWARE_TYPE == HARDWARE_2FOC)
+    {
+        Motor_config_velocity_PID_2FOC(o, pidvelocity);
     }
 }
 
