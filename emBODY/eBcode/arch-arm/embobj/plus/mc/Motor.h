@@ -141,6 +141,7 @@ typedef struct //Motor
     BOOL HAS_TEMP_SENSOR;
     int16_t temperature_max;
     int16_t temperature_fbk;
+    uint16_t overcurrent_cnt;
 
     int32_t pwm_max;
     int32_t pwm_fbk;
@@ -255,6 +256,7 @@ extern void Motor_set_overcurrent_fault(Motor* o);
 extern void Motor_set_i2t_fault(Motor* o);
 
 extern void Motor_raise_fault_overcurrent(Motor* o);
+extern void Motor_reset_fault_overcurrent(Motor* o);
 extern void Motor_raise_fault_i2t(Motor* o);
 extern void Motor_raise_fault_external(Motor* o);
 extern BOOL Motor_is_external_fault(Motor* o);

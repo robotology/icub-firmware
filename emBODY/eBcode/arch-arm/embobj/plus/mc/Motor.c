@@ -669,11 +669,19 @@ BOOL Motor_check_faults(Motor* o) //
 
 void Motor_raise_fault_overcurrent(Motor* o)
 {
-    hal_motor_disable((hal_motor_t)o->actuatorPort);
+    if (++o->overcurrent_cnt > MOTOR_OVERCURRENT_MAX_CNT)
+    {
+        hal_motor_disable((hal_motor_t)o->actuatorPort);
     
-    o->fault_state.bits.OverCurrentFailure = TRUE;
+        o->fault_state.bits.OverCurrentFailure = TRUE;
     
-    o->control_mode = icubCanProto_controlmode_hwFault;
+        o->control_mode = icubCanProto_controlmode_hwFault;
+    }
+}
+
+void Motor_reset_fault_overcurrent(Motor* o)
+{
+    o->overcurrent_cnt = 0;
 }
 
 void Motor_raise_fault_i2t(Motor* o)

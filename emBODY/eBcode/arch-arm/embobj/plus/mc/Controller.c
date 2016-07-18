@@ -1526,6 +1526,11 @@ void MController_motor_raise_fault_overcurrent(int m)
     Motor_raise_fault_overcurrent(smc->motor+m);
 }
 
+void MController_motor_reset_fault_overcurrent(int m)
+{
+    Motor_reset_fault_overcurrent(smc->motor+m);
+}
+
 //void MController_motor_raise_fault_external(int m)
 //{
 //    Motor_raise_fault_external(smc->motor+m);

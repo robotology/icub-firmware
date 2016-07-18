@@ -296,6 +296,10 @@ static void s_eo_currents_watchdog_CheckSpike(uint8_t motor, int16_t value)
                 
         MController_motor_raise_fault_overcurrent(motor);
     }
+    else
+    {
+        MController_motor_reset_fault_overcurrent(motor);
+    }
     
     return;
 }
