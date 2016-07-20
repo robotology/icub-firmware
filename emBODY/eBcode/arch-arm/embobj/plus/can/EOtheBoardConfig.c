@@ -1755,8 +1755,8 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_base =
 
 #if defined(ICUB_MEC_V3)
 
-static const eOmn_serv_configuration_t s_serv_config_mc_v3_0B0 =
-{   // eb12 or 0B0
+static const eOmn_serv_configuration_t s_serv_config_mc_v3_EB20 =
+{   // EB20 ADDR.20
     .type       = eomn_serv_MC_mc4plus,
     .filler     = {0},
     .data.mc.mc4plus_based = 
@@ -1874,8 +1874,8 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_0B0 =
 
 
 
-static const eOmn_serv_configuration_t s_serv_config_mc_v3_0B1 =
-{   // eb13 or 0B1
+static const eOmn_serv_configuration_t s_serv_config_mc_v3_EB21 =
+{   // EB21
     .type       = eomn_serv_MC_mc4plus,
     .filler     = {0},
     .data.mc.mc4plus_based = 
@@ -1992,8 +1992,8 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_0B1 =
 };
 
 
-static const eOmn_serv_configuration_t s_serv_config_mc_v3_0B7 =
-{   // eb14 or 0B7f
+static const eOmn_serv_configuration_t s_serv_config_mc_v3_EB22 =
+{   // EB22 ADDR .22
     .type       = eomn_serv_MC_mc4plus,
     .filler     = {0},
     .data.mc.mc4plus_based = 
@@ -2109,8 +2109,8 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_0B7 =
     }
 };
 
-static const eOmn_serv_configuration_t s_serv_config_mc_v3_0B9 =
-{   // eb15 or 0B9
+static const eOmn_serv_configuration_t s_serv_config_mc_v3_EB23 =
+{   // EB23 ==> ADDR .23
     .type       = eomn_serv_MC_mc4plus,
     .filler     = {0},
     .data.mc.mc4plus_based = 
@@ -2228,8 +2228,8 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_0B9 =
 
 
 
-static const eOmn_serv_configuration_t s_serv_config_mc_v3_1B2_2B2 =
-{
+static const eOmn_serv_configuration_t s_serv_config_mc_v3_EB24_EB27 =
+{  //EB24 ADDR .24 (left arm ) and EB27 ADDR .27 (right arm)
     .type       = eomn_serv_MC_mc4plus,
     .filler     = {0},
     .data.mc.mc4plus_based = 
@@ -2346,8 +2346,8 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_1B2_2B2 =
 };
 
 
-static const eOmn_serv_configuration_t s_serv_config_mc_v3_1B3_2B3 =
-{
+static const eOmn_serv_configuration_t s_serv_config_mc_v3_EB25_EB28 =
+{ //EB25 ADDR .25 (left arm) and EB28 ADDR .28 (right arm)
     .type       = eomn_serv_MC_mc4plusmais,
     .filler     = {0},
     .data.mc.mc4plusmais_based = 
@@ -2478,8 +2478,8 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_1B3_2B3 =
 };
 
 
-static const eOmn_serv_configuration_t s_serv_config_mc_v3_1B4_2B4 =
-{   // .16 or .19 (cshape)
+static const eOmn_serv_configuration_t s_serv_config_mc_v3_EB26_EB29 =
+{   // EB26 ADDR .26 (left arm) and EB29 ADDR .29 (right arm)
     .type       = eomn_serv_MC_mc4plusmais,
     .filler     = {0},
     .data.mc.mc4plusmais_based = 
@@ -2947,32 +2947,40 @@ static const eOmn_serv_configuration_t * const s_serv_config_mc_V2[maxboards_V2]
 
 
 #if defined(ICUB_MEC_V3)
-enum {maxboards_V3 = 22};
+enum {maxboards_V3 = 30};
 static const eOmn_serv_configuration_t * const s_serv_config_mc_V3[maxboards_V3] =
 {   // there are only ....   
-    &s_serv_config_mc_v3_0B9,       // board ip.1, 0b9, face 4 lips
-    &s_serv_config_mc_v3_0B7,       // board ip.2, 0b7, face eyelids + jaw
-    &s_serv_config_mc_v3_0B1,       // board ip.3, 0b1, head neck yaw + 3 eyes
-    &s_serv_config_mc_v3_0B0,       // board ip.4, 0b0, head neck pitch + neck roll
-    NULL, 
-    NULL,
-    &s_serv_config_mc_v3_1B2_2B2,   // board ip.7, 1b2, left forearm: wrist (wrist coupled 1b2m1, wrist coupled 1b2m0, pronosupination 1b2m2), finger abduction
-    &s_serv_config_mc_v3_1B3_2B3,   // board ip.8, 1b3, left forearm: thumb (abduction, proximal, distal), index proximal
-    &s_serv_config_mc_v3_1B4_2B4,   // board ip.9, 1b4, left forearm:  little fingers, medium (distal, proximal), index distal
-    NULL,
-    NULL,
-    &s_serv_config_mc_v3_1B2_2B2,   // board ip.12, 2b2, right forearm: wrist (wrist coupled 1b2m1, wrist coupled 1b2m0, pronosupination 1b2m2), finger abduction,
-    &s_serv_config_mc_v3_1B3_2B3,   // board ip.13, 2b3, right forearm: thumb (abduction, proximal, distal), index proximal
-    &s_serv_config_mc_v3_1B4_2B4,   // board ip.14, 2b4, right forearm:  little fingers, medium (distal, proximal), index distal 
-    NULL, 
-    NULL, 
-    NULL, 
-    NULL, 
-    NULL, 
-    NULL, 
-    NULL, 
-    &s_serv_config_mc_cer_testOfmc2plus // moved at address .22
-    //&s_serv_config_mc_cer_testOfmc2plus_withmais TEST_ON_BENCH
+/*0*/    NULL,
+/*1*/    NULL,
+/*2*/    NULL,
+/*3*/    NULL,
+/*4*/    NULL, 
+/*5*/    NULL,
+/*6*/    NULL,
+/*7*/    NULL,
+/*8*/    NULL,
+/*9*/    NULL,
+/*10*/   NULL,
+/*11*/   NULL,
+/*12*/   NULL,
+/*13*/   NULL,
+/*14*/   NULL, 
+/*15*/   NULL, 
+/*16*/   NULL, 
+/*17*/   NULL, 
+/*18*/   NULL, 
+/*19*/   &s_serv_config_mc_v3_EB20,            // head neck pitch + neck roll IPaddr .20
+/*20*/   &s_serv_config_mc_v3_EB21,            // neck and 3 eyes. IPaddr .21
+/*21*/   &s_serv_config_mc_v3_EB22,            // Yaw+eyelisd AND SKIN. IPaddr .22 
+/*22*/   &s_serv_config_mc_v3_EB23,            // lips.  IPaddr .23
+/*23*/   &s_serv_config_mc_v3_EB24_EB27,       // wrist and finger abduction IPaddr .24 (left arm)
+/*24*/   &s_serv_config_mc_v3_EB25_EB28,       // thumb (abduction, proximal, distal), index proximal IPaddr .25 (left arm)
+/*25*/   &s_serv_config_mc_v3_EB26_EB29,       // little fingers, medium (distal, proximal), index distal IP addr 26 (left arm)
+/*26*/   &s_serv_config_mc_v3_EB24_EB27,       // wrist and finger abduction IPaddr .24 (right arm)
+/*27*/   &s_serv_config_mc_v3_EB25_EB28,       // thumb (abduction, proximal, distal), index proximal IPaddr .28 (right arm)
+/*28*/   &s_serv_config_mc_v3_EB26_EB29,       // little fingers, medium (distal, proximal), index distal IP addr 29 (right arm)
+/*29*/   &s_serv_config_mc_cer_testOfmc2plus   // moved at address .29
+        //&s_serv_config_mc_cer_testOfmc2plus_withmais TEST_ON_BENCH
 };
 #endif
 
@@ -3255,7 +3263,6 @@ extern const eOmn_serv_configuration_t * eoboardconfig_code2skin_serv_configurat
     
     }
 #elif   defined(ICUB_MEC_V3)
-    // so far not supported
 #elif   defined(CER)    
 #endif
     
