@@ -64,9 +64,9 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
-static void s_eo_currents_watchdog_CheckSpike(uint8_t joint, int16_t value);
+//static void s_eo_currents_watchdog_CheckSpike(uint8_t joint, int16_t value);
 static void s_eo_currents_watchdog_CheckI2T(uint8_t joint, int16_t value);
-static void s_eo_currents_watchdog_UpdateMotorCurrents(uint8_t joint, int16_t value);
+//static void s_eo_currents_watchdog_UpdateMotorCurrents(uint8_t joint, int16_t value);
 EO_static_inline uint32_t s_eo_currents_watchdog_averageCalc_addValue(uint8_t motor, int16_t value);
 EO_static_inline void s_eo_currents_watchdog_averageCalc_reset(uint8_t motor);
 EO_static_inline eObool_t s_eo_currents_watchdog_averageCalc_collectDataIsCompleted(uint8_t motor);
@@ -203,10 +203,13 @@ extern void eo_currents_watchdog_Tick(EOCurrentsWatchdog* p, int16_t voltage, in
         current_value = currents[i];
         
         //Update currents broadcasted
-        s_eo_currents_watchdog_UpdateMotorCurrents(i, current_value);
+        //s_eo_currents_watchdog_UpdateMotorCurrents(i, current_value);
+        MController_update_motor_current_fbk(i, current_value);
         
+        // moved into s_eo_currents_watchdog_UpdateMotorCurrents
         //error flags signalling is done internally
-        s_eo_currents_watchdog_CheckSpike(i, current_value);
+        //s_eo_currents_watchdog_CheckSpike(i, current_value);
+        
         //VALE: I disabled check I2T until I have nominal and peack current values
         s_eo_currents_watchdog_CheckI2T(i, current_value);
         
@@ -276,9 +279,9 @@ extern void eo_currents_watchdog_Tick(EOCurrentsWatchdog* p, int16_t voltage, in
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
+/*
 static void s_eo_currents_watchdog_UpdateMotorCurrents(uint8_t motor, int16_t value)
 {
-    //eo_emsController_AcquireMotorCurrent(motor, value);
     MController_update_motor_current_fbk(motor, value);
 }
 
@@ -303,6 +306,7 @@ static void s_eo_currents_watchdog_CheckSpike(uint8_t motor, int16_t value)
     
     return;
 }
+*/
 
 static void s_eo_currents_watchdog_CheckI2T(uint8_t motor, int16_t value)
 {

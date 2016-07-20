@@ -106,10 +106,6 @@ extern int16_t MController_config_motor_pwm_limit(int m, int16_t pwm_limit);
 extern void MController_update_motor_odometry_fbk_can(int m, void* data);
 
 extern void MController_motor_raise_fault_i2t(int m);
-extern void MController_motor_raise_fault_overcurrent(int m);
-extern void MController_motor_reset_fault_overcurrent(int m);
-//extern void MController_motor_raise_fault_external(int m);
-//extern BOOL MController_motor_is_external_fault(int m);
 
 ////////////////////////////////////////////////////////////////////////
 

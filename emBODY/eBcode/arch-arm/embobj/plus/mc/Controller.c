@@ -530,7 +530,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
     
         for (int k = 0; k<o->nJoints; ++k)
         {            
-            o->joint[k].dead_zone = 400;
+            o->joint[k].dead_zone = 0;
             
             o->joint[k].CAN_DO_TRQ_CTRL = FALSE;
             o->joint[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
@@ -1434,6 +1434,10 @@ void MController_config_vel_pid(int j, eOmc_PID_t *pid_conf)
     Joint* joint = smc->joint+j;
     Motor* motor = smc->motor+j;
     
+    Motor_config_velPID(motor, pid_conf);
+    PID_config(&(joint->velPID), pid_conf);
+    
+    /*
     pid_conf->control_law = 0;
     
     switch (pid_conf->control_law)
@@ -1449,6 +1453,7 @@ void MController_config_vel_pid(int j, eOmc_PID_t *pid_conf)
         default:
             break;
     }
+    */
 }
 
 void MController_config_trq_pid(int m, eOmc_PID_t *pid_conf)
@@ -1521,33 +1526,4 @@ void MController_motor_raise_fault_i2t(int m)
     Motor_raise_fault_i2t(smc->motor+m);
 }
 
-void MController_motor_raise_fault_overcurrent(int m)
-{
-    Motor_raise_fault_overcurrent(smc->motor+m);
-}
-
-void MController_motor_reset_fault_overcurrent(int m)
-{
-    Motor_reset_fault_overcurrent(smc->motor+m);
-}
-
-//void MController_motor_raise_fault_external(int m)
-//{
-//    Motor_raise_fault_external(smc->motor+m);
-//}
-
-//BOOL MController_motor_is_external_fault(int m)
-//{
-//    return Motor_is_external_fault(smc->motor+m);
-//}
-
 ////////////////////////////////////////////////////////////////////////////////
-
-
-////VALE: debug function. I'll remove it ASAP
-//void MController_updated_debug_current_info(int j, int32_t avgCurrent, int32_t accum_Ep)
-//{
-//    Joint *j_ptr= smc->joint+j;
-//    Joint_update_debug_current_info(j_ptr, avgCurrent, accum_Ep);
-//    
-//}

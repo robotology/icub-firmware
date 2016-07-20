@@ -229,7 +229,10 @@ void Motor_config(Motor* o, uint8_t ID, eOmc_motor_config_t* config) //
     o->pos_min = config->limitsofrotor.min;
     o->pos_max = config->limitsofrotor.max;    
     o->vel_max = config->maxvelocityofmotor;
+    
     o->Iqq_max = config->pidcurrent.limitonoutput;
+    
+    o->Iqq_ovl = config->currentLimits.overloadCurrent;
     
     config->pwmLimit = Motor_config_pwm_limit(o, config->pwmLimit);
  
@@ -273,7 +276,7 @@ void Motor_config_encoder(Motor* o, int32_t resolution)
 
 void Motor_config_max_currents(Motor* o, eOmc_current_limits_params_t* current_params)
 {
-    o->Iqq_max = current_params->nominalCurrent;
+    o->Iqq_ovl = current_params->overloadCurrent;
     
     if (o->HARDWARE_TYPE == HARDWARE_2FOC)
     {
@@ -667,21 +670,13 @@ BOOL Motor_check_faults(Motor* o) //
     return o->hardware_fault;
 }
 
-void Motor_raise_fault_overcurrent(Motor* o)
+static void Motor_raise_fault_overcurrent(Motor* o)
 {
-    if (++o->overcurrent_cnt > MOTOR_OVERCURRENT_MAX_CNT)
-    {
-        hal_motor_disable((hal_motor_t)o->actuatorPort);
+    hal_motor_disable((hal_motor_t)o->actuatorPort);
     
-        o->fault_state.bits.OverCurrentFailure = TRUE;
+    o->fault_state.bits.OverCurrentFailure = TRUE;
     
-        o->control_mode = icubCanProto_controlmode_hwFault;
-    }
-}
-
-void Motor_reset_fault_overcurrent(Motor* o)
-{
-    o->overcurrent_cnt = 0;
+    o->control_mode = icubCanProto_controlmode_hwFault;
 }
 
 void Motor_raise_fault_i2t(Motor* o)
@@ -937,7 +932,10 @@ void Motor_update_pos_fbk(Motor* o, int32_t position_raw)
 
 void Motor_update_current_fbk(Motor* o, int16_t current)
 {
-    if (abs(current) > o->Iqq_peak_fbk) o->Iqq_peak_fbk = abs(current);
+    if (abs(o->Iqq_fbk + current)/2 > o->Iqq_ovl)
+    {
+        Motor_raise_fault_overcurrent(o);
+    }
     
     o->Iqq_fbk = current;
 }
@@ -1026,22 +1024,3 @@ void Motor_reset(Motor *o)
     //o->control_mode_req;
 }
 
-/*
-void Motor_update_temperature_fbk(Motor* o, int16_t temperature_fbk) { o->temperature_fbk = temperature_fbk; }
-void Motor_update_pos_raw_fbk(Motor* o, int32_t pos_raw_fbk) { o->pos_raw_fbk = pos_raw_fbk; }
-void Motor_update_vel_raw_fbk(Motor* o, int32_t vel_raw_fbk) { o->vel_raw_fbk = vel_raw_fbk; }
-void Motor_update_pwm_fbk(Motor* o, int16_t pwm_fbk) { o->pwm_fbk = pwm_fbk; }
-void Motor_update_Iqq_fbk(Motor* o, int16_t Iqq_fbk) { o->Iqq_fbk = Iqq_fbk; }
-void Motor_update_pos_fbk(Motor* o, int32_t pos_fbk) { o->pos_fbk = pos_fbk; }
-void Motor_update_vel_fbk(Motor* o, int32_t vel_fbk) { o->vel_fbk = vel_fbk; }
-void Motor_update_trq_fbk(Motor* o, CTRL_UNITS trq_fbk) { o->trq_fbk = trq_fbk; }
-
-int16_t Motor_get_temperature_fbk(Motor* o) { return o->temperature_fbk; }
-int32_t Motor_get_pos_raw_fbk(Motor* o) { return o->pos_raw_fbk; }
-int32_t Motor_get_vel_raw_fbk(Motor* o) { return o->vel_raw_fbk; }
-int16_t Motor_get_pwm_fbk(Motor* o) { return o->pwm_fbk; }
-int16_t Motor_get_Iqq_fbk(Motor* o) { return o->Iqq_fbk; }
-int32_t Motor_get_pos_fbk(Motor* o) { return o->pos_fbk; }
-int32_t Motor_get_vel_fbk(Motor* o) { return o->vel_fbk; }
-CTRL_UNITS Motor_get_trq_fbk(Motor* o) { return o->trq_fbk; }
-*/

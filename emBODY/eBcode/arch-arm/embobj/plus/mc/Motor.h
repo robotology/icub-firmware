@@ -141,7 +141,6 @@ typedef struct //Motor
     BOOL HAS_TEMP_SENSOR;
     int16_t temperature_max;
     int16_t temperature_fbk;
-    uint16_t overcurrent_cnt;
 
     int32_t pwm_max;
     int32_t pwm_fbk;
@@ -171,7 +170,7 @@ typedef struct //Motor
     int32_t Iqq_max;
     int32_t Iqq_ref;
     int32_t Iqq_fbk;
-    int32_t Iqq_peak_fbk;
+    int32_t Iqq_ovl;
     int32_t Iqq_err;
     
     CTRL_UNITS trq_max;
@@ -252,11 +251,8 @@ extern void Motor_get_state(Motor* o, eOmc_motor_status_t* motor_status);
 extern void Motor_update_pos_fbk(Motor* o, int32_t position_raw);
 extern void Motor_update_current_fbk(Motor* o, int16_t current);
 
-extern void Motor_set_overcurrent_fault(Motor* o);
 extern void Motor_set_i2t_fault(Motor* o);
 
-extern void Motor_raise_fault_overcurrent(Motor* o);
-extern void Motor_reset_fault_overcurrent(Motor* o);
 extern void Motor_raise_fault_i2t(Motor* o);
 extern void Motor_raise_fault_external(Motor* o);
 extern BOOL Motor_is_external_fault(Motor* o);
@@ -266,7 +262,6 @@ extern BOOL Motor_is_running(Motor* o);
 ////////////////////////////////////////////////////////////////////////////
 extern void Motor_config_gearbox_ratio(Motor* o, int32_t gearbox_ratio);
 extern int16_t Motor_config_pwm_limit(Motor* o, int16_t pwm_limit);
-extern void Motor_set_overcurrent_fault(Motor* o);
 ////////////////////////////////////////////////////////////////////////////
 /*
 extern void Motor_update_temperature_fbk(Motor* o, int16_t temperature_fbk);
