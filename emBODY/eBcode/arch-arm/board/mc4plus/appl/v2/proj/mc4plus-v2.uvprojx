@@ -1141,6 +1141,11 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub\EoUpdaterProtocol.c</FilePath>
             </File>
+            <File>
+              <FileName>EoMotionControl.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub\EoMotionControl.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2384,6 +2389,11 @@
               <FileName>EoUpdaterProtocol.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub\EoUpdaterProtocol.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoMotionControl.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub\EoMotionControl.c</FilePath>
             </File>
           </Files>
         </Group>

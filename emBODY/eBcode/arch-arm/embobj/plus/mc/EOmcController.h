@@ -32,31 +32,32 @@ extern "C" {
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
-typedef enum
-{
-    emscontroller_board_DONTCARE                = 16,
-    emscontroller_board_NO_CONTROL              = 0,
-    emscontroller_board_ANKLE                   = 1,    //2FOC
-    emscontroller_board_UPPERLEG                = 2,    //2FOC
-    emscontroller_board_WAIST                   = 3,    //2FOC
-    emscontroller_board_SHOULDER                = 4,    //2FOC
-    emscontroller_board_HEAD_neckpitch_neckroll = 5,    //MC4plus
-    emscontroller_board_HEAD_neckyaw_eyes       = 6,    //MC4plus
-    emscontroller_board_FACE_eyelids_jaw        = 7,    //MC4plus
-    emscontroller_board_4jointsNotCoupled       = 8,    //MC4plus this is the new name of emscontroller_board_FACE_lips
-    emscontroller_board_HAND_thumb              = 9,    //MC4plus
-    emscontroller_board_HAND_2                  = 10,   //MC4plus
-    emscontroller_board_FOREARM                 = 11,   //MC4plus
-    
-    // CER
-    
-    emscontroller_board_CER_LOWER_ARM         = 12,   //MC4plus
-    emscontroller_board_CER_HAND              = 14,   //MC2plus
-	emscontroller_board_CER_WAIST             = 15,   //2FOC
-	emscontroller_board_CER_UPPER_ARM         = 17,   //2FOC
-    emscontroller_board_CER_BASE              = 21,   //2FOC
-    emscontroller_board_CER_NECK              = 22    //MC4plus
-} eOemscontroller_board_t;
+// marco.accame: use eOmc_ctrlboard_t instead
+//typedef enum
+//{
+//    eomc_ctrlboard_DONTCARE                = 16,
+//    eomc_ctrlboard_NO_CONTROL              = 0,
+//    eomc_ctrlboard_ANKLE                   = 1,    //2FOC
+//    eomc_ctrlboard_UPPERLEG                = 2,    //2FOC
+//    eomc_ctrlboard_WAIST                   = 3,    //2FOC
+//    eomc_ctrlboard_SHOULDER                = 4,    //2FOC
+//    eomc_ctrlboard_HEAD_neckpitch_neckroll = 5,    //MC4plus
+//    eomc_ctrlboard_HEAD_neckyaw_eyes       = 6,    //MC4plus
+//    eomc_ctrlboard_FACE_eyelids_jaw        = 7,    //MC4plus
+//    eomc_ctrlboard_4jointsNotCoupled       = 8,    //MC4plus this is the new name of eomc_ctrlboard_FACE_lips
+//    eomc_ctrlboard_HAND_thumb              = 9,    //MC4plus
+//    eomc_ctrlboard_HAND_2                  = 10,   //MC4plus
+//    eomc_ctrlboard_FOREARM                 = 11,   //MC4plus
+//    
+//    // CER
+//    
+//    eomc_ctrlboard_CER_LOWER_ARM         = 12,   //MC4plus
+//    eomc_ctrlboard_CER_HAND              = 14,   //MC2plus
+//	eomc_ctrlboard_CER_WAIST             = 15,   //2FOC
+//	eomc_ctrlboard_CER_UPPER_ARM         = 17,   //2FOC
+//    eomc_ctrlboard_CER_BASE              = 21,   //2FOC
+//    eomc_ctrlboard_CER_NECK              = 22    //MC4plus
+//} eOeomc_ctrlboard_t;
 
 
 typedef enum
