@@ -63,9 +63,9 @@ typedef enum
 
 typedef struct
 {
-    uint32_t                                value[eomn_serv_mc_sensor_nuomofcomp_max];
+    uint32_t                                value[eomc_encoders_maxnumberofcomponents];
     eOencoderreader_errortype_t             errortype;
-    eOmn_serv_mc_sensor_nuomofcomponents_t  composedof;
+    uint8_t                                 composedof;
 } eOencoderreader_valueInfo_t;
 
 //typedef eOresult_t (*eOencoderreader_onendofoperation_fun_t) (EOtheEncoderReader* p, eObool_t operationisok);
@@ -86,10 +86,10 @@ extern EOtheEncoderReader* eo_encoderreader_GetHandle(void);
 
 // it verifies if the service as defined in te configuration is possible (is there a good strain board or not?), it executes a callback
 // (which may send a confirmation to the entity which asked fot verification), and then it may activate the strain service by calling  eo_encoderreader_Activate().
-extern eOresult_t eo_encoderreader_Verify(EOtheEncoderReader *p, const eOmn_serv_arrayof_4jomodescriptors_t * jomodes, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify);
+extern eOresult_t eo_encoderreader_Verify(EOtheEncoderReader *p, const eOmc_arrayof_4jomodescriptors_t * jomodes, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify);
 
 // it activates the service by loading the service configuration
-extern eOresult_t eo_encoderreader_Activate(EOtheEncoderReader *p, const eOmn_serv_arrayof_4jomodescriptors_t * jomodes);
+extern eOresult_t eo_encoderreader_Activate(EOtheEncoderReader *p, const eOmc_arrayof_4jomodescriptors_t * jomodes);
 
 // it deactivates service.
 extern eOresult_t eo_encoderreader_Deactivate(EOtheEncoderReader *p);
@@ -104,7 +104,7 @@ extern eOresult_t eo_encoderreader_Read(EOtheEncoderReader *p, uint8_t position,
 
 extern eOresult_t eo_encoderreader_Diagnostics_Tick(EOtheEncoderReader* p);
 
-extern eOresult_t eo_encoderreader_GetPrimaryEncoder(EOtheEncoderReader *p, uint8_t position, eOmn_serv_mc_sensor_t *encoder);
+extern eOresult_t eo_encoderreader_GetPrimaryEncoder(EOtheEncoderReader *p, uint8_t position, eOmc_encoder_descriptor_t *encoder);
 
 
 /** @}            

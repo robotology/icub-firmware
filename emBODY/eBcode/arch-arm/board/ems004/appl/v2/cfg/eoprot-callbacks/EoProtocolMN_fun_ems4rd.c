@@ -108,10 +108,10 @@ extern void eoprot_fun_INIT_mn_comm_status(const EOnv* nv)
     
     // 1. init the management protocol version
     
-    eOmn_version_t* mnversion = &status->managementprotocolversion;
+    eOversion_t* version = &status->managementprotocolversion;
     
-    mnversion->major = eoprot_version_mn_major;
-    mnversion->minor = eoprot_version_mn_minor;
+    version->major = eoprot_version_mn_major;
+    version->minor = eoprot_version_mn_minor;
     
     
     // 2. init the transceiver

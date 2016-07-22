@@ -49,8 +49,8 @@
 
 typedef struct
 {                                       
-    eOmn_serv_mc_sensor_t       primary;
-    eOmn_serv_mc_sensor_t       secondary;
+    eOmc_encoder_descriptor_t   encoder1des;
+    eOmc_encoder_descriptor_t   encoder2des;
 } eOappEncReader_jomoconfig_t;
 
 
