@@ -290,6 +290,16 @@ extern void eoprot_fun_INIT_mn_appl_status(const EOnv* nv)
     // run mode
     status.runmode = applrunMode__default;    
     
+    status.boardtype = eobrd_ethtype_unknown;
+    
+#if defined(USE_EMS4RD)
+    status.boardtype = eobrd_ethtype_ems4;
+#elif defined(USE_MC4PLUS)
+    status.boardtype = eobrd_ethtype_mc4plus;
+#elif defined(USE_MC2PLUS)
+    status.boardtype = eobrd_ethtype_mc2plus;
+#endif
+    
     // set it
     eo_nv_Set(nv, &status, eobool_true, eo_nv_upd_dontdo);
 }
