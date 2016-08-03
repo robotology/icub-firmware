@@ -192,6 +192,7 @@ extern hal_result_t hal_pwm_interrupt_enable(hal_motor_t id);
  **/
 extern hal_result_t hal_pwm_interrupt_disable(hal_motor_t id);
 
+extern hal_bool_t hal_motor_external_fault_active(void);
 
 extern int16_t hal_motor_pwmget(hal_motor_t id);
 

@@ -516,6 +516,17 @@ BOOL Motor_check_faults(Motor* o) //
         o->hardware_fault = TRUE;
     }
     
+    if (o->HARDWARE_TYPE == HARDWARE_MC4p)
+    {
+        //o->fault_state.bits.ExternalFaultAsserted = hal_motor_external_fault_active(); //hal_motor_externalfaulted();
+        o->fault_state.bits.ExternalFaultAsserted = hal_motor_externalfaulted();
+    }
+    
+    if (o->fault_state.bits.ExternalFaultAsserted)
+    {
+        o->control_mode_req = icubCanProto_controlmode_idle;
+    }
+    
     BOOL can_dead        = FALSE;
     BOOL wrong_ctrl_mode = FALSE;
     
@@ -548,29 +559,25 @@ BOOL Motor_check_faults(Motor* o) //
             o->can_dead = FALSE;
         }
     }
-    else if (o->HARDWARE_TYPE == HARDWARE_MC4p)
+    
+    if (!o->fault_state.bits.ExternalFaultAsserted && !o->hardware_fault)
     {
-        o->fault_state.bits.ExternalFaultAsserted = hal_motor_externalfaulted();
-        
-        if (o->hardware_fault || o->fault_state.bits.ExternalFaultAsserted)
-        {
-            hal_motor_disable((hal_motor_t)o->actuatorPort);
-        }
+        o->fault_state_prec.bitmask = 0;
+        o->wrong_ctrl_mode = FALSE;
+        o->can_dead = FALSE;
+           
+        return FALSE;
     }
     
-    if (o->fault_state.bits.ExternalFaultAsserted)
+    
+    // fault or external fault
+    
+    if (o->HARDWARE_TYPE == HARDWARE_MC4p)
     {
-        o->control_mode_req = icubCanProto_controlmode_idle;
+        hal_motor_disable((hal_motor_t)o->actuatorPort);
     }
-    else
-    {
-        if (!o->hardware_fault)
-        {
-            o->fault_state_prec.bitmask = 0;
 
-            return FALSE;
-        }
-    }
+    // DIAGNOSTICS MESSAGES
     
     if (++o->diagnostics_refresh > 5*CTRL_LOOP_FREQUENCY_INT)
     {
@@ -969,6 +976,7 @@ BOOL Motor_is_external_fault(Motor* o)
     }
     else if (o->HARDWARE_TYPE == HARDWARE_MC4p)
     {
+        //return hal_motor_external_fault_active(); //hal_motor_externalfaulted();
         return hal_motor_externalfaulted();
     }
     

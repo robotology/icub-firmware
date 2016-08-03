@@ -595,6 +595,12 @@ extern hal_bool_t hal_motor_externalfaulted(void)
     return(s_hal_motor_theinternals.externalfaultpressed);
 }
 
+extern hal_bool_t hal_motor_external_fault_active(void)
+{
+    static hal_gpio_t fault_pin = {.port = hal_gpio_portA, .pin = hal_gpio_pin4};
+    
+    return(hal_gpio_getval(fault_pin) == hal_gpio_valHIGH);
+}
 
 extern hal_result_t hal_motor_enable(hal_motor_t id)
 {
@@ -773,6 +779,10 @@ void TIM1_BRK_TIM9_IRQHandler(void)
 #endif
       s_hal_motor_theinternals.externalfaultpressed = hal_true;
       TIM_ClearITPendingBit(TIM1, TIM_IT_Break);
+  }
+  else
+  {
+      s_hal_motor_theinternals.externalfaultpressed = hal_false;
   }
 }
 
