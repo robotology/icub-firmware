@@ -55,6 +55,8 @@
 
 //#define TEST_ON_BENCH   1
 
+#define PROT_2FOC_MAJOR 1
+#define PROT_2FOC_MINOR 5
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -410,7 +412,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_eb3 =
         .version   =
         {
             .firmware   = { .major = 0, .minor = 0, .build = 0 },
-            .protocol   = { .major = 1, .minor = 4 }
+            .protocol   = { .major = PROT_2FOC_MAJOR, .minor = PROT_2FOC_MINOR }
         },
         .filler                 = {0},
         .arrayofjomodescriptors =
@@ -646,7 +648,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb5 =
         .version   =
         {
             .firmware   = { .major = 0, .minor = 0, .build = 0 },
-            .protocol   = { .major = 1, .minor = 4 }
+            .protocol   = { .major = PROT_2FOC_MAJOR, .minor = PROT_2FOC_MINOR }
         },
         .filler                 = {0},
         .arrayofjomodescriptors =
@@ -759,7 +761,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb6_eb8 =
         .version   =
         {
             .firmware   = { .major = 0, .minor = 0, .build = 0 },
-            .protocol   = { .major = 1, .minor = 4 }
+            .protocol   = { .major = PROT_2FOC_MAJOR, .minor = PROT_2FOC_MINOR }
         },
         .filler                 = {0},
         .arrayofjomodescriptors =
@@ -889,7 +891,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb7_eb9 =
         .version   =
         {
             .firmware   = { .major = 0, .minor = 0, .build = 0 },
-            .protocol   = { .major = 1, .minor = 4 }
+            .protocol   = { .major = PROT_2FOC_MAJOR, .minor = PROT_2FOC_MINOR }
         },
         .filler                 = {0},
         .arrayofjomodescriptors =
@@ -1255,7 +1257,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_waist =
         .version    =
         {
             .firmware   = { .major = 0, .minor = 0, .build = 0 },
-            .protocol   = { .major = 1, .minor = 4 }
+            .protocol   = { .major = PROT_2FOC_MAJOR, .minor = PROT_2FOC_MINOR }
         },
         .filler                 = {0},
         .arrayofjomodescriptors =
@@ -1389,7 +1391,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_upper_arm =
         .version    =
         {
             .firmware   = { .major = 0, .minor = 0, .build = 0 },
-            .protocol   = { .major = 1, .minor = 4 }
+            .protocol   = { .major = PROT_2FOC_MAJOR, .minor = PROT_2FOC_MINOR }
         },
         .filler                 = {0},
         .arrayofjomodescriptors =
@@ -1640,7 +1642,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_base =
         .version    =
         {
             .firmware   = { .major = 0, .minor = 0, .build = 0 },
-            .protocol   = { .major = 1, .minor = 4 }
+            .protocol   = { .major = PROT_2FOC_MAJOR, .minor = PROT_2FOC_MINOR }
         },
         .filler                 = {0},
         .arrayofjomodescriptors =

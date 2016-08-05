@@ -123,7 +123,7 @@ static void Motor_config_2FOC(Motor* o, eOmc_motor_config_t* config)
     //((int16_t*)KpKiKdKs)[2] =  0; //Kd (unused in 2FOC)
     //           KpKiKdKs [6] = 10; // shift
     
-    uint32_t max_current = config->currentLimits.peakCurrent;
+    //uint32_t max_current = config->currentLimits.peakCurrent;
     
     #define HAS_QE         0x0001
     #define HAS_HALL       0x0002
@@ -155,7 +155,8 @@ static void Motor_config_2FOC(Motor* o, eOmc_motor_config_t* config)
     eOcanprot_command_t cmdMaxCurrent;
     cmdMaxCurrent.class = eocanprot_msgclass_pollingMotorControl;
     cmdMaxCurrent.type = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT;
-    cmdMaxCurrent.value = &max_current;
+    //cmdMaxCurrent.value = &max_current;
+    cmdMaxCurrent.value = &(config->currentLimits);
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdMaxCurrent, id32);
 
     eOcanprot_command_t cmdMotorConfig;

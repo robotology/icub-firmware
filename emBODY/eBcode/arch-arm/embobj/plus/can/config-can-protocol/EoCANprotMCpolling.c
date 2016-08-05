@@ -490,13 +490,11 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_MAX_VELOCITY(eOcanpr
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_CURRENT_LIMIT(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
-    // NOTE: eo-protocol uses 16 bits for current (sign+value), while icubcanprotocol uses 32bits.
-    // in here we should not use negative currents, nevertheless we convert the value correctly
-    eOmeas_current_t *eomeasCurrent = (eOmeas_current_t*)descriptor->cmd.value;
-    int32_t maxcurrent = *eomeasCurrent;
-    s_former_POL_MC_prepare_frame(descriptor, frame, 5, ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT);    
-    // now i prepare data[1] -> data[4]   
-    *((int32_t*)(&frame->data[1])) = maxcurrent;    
+    eOmc_current_limits_params_t *current_limits = (eOmc_current_limits_params_t*)descriptor->cmd.value;
+    s_former_POL_MC_prepare_frame(descriptor, frame, 8, ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT);    
+    *((int16_t*)(&frame->data[2])) = current_limits->nominalCurrent;    
+    *((int16_t*)(&frame->data[4])) = current_limits->peakCurrent;
+    *((int16_t*)(&frame->data[6])) = current_limits->overloadCurrent;
     return(eores_OK);
 }
 
