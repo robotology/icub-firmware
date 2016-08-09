@@ -34,7 +34,7 @@
 #include "EOtheCANmapping.h"
 #include "EOappEncodersReader.h"
 
-#include "EOmcController.h"
+//#include "EOmcController.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
