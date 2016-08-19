@@ -38,7 +38,7 @@
 
 #include "EOMtheEMSappl.h"
 
-#include "EOmcController.h"
+//#include "EOmcController.h"
 #include "Controller.h"
 
 #include "hal_sys.h"
@@ -371,7 +371,7 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
         uint8_t i = 0;
         for(i=0; i<numofjomos; i++)
         {
-            const eOmn_serv_jomo_descriptor_t *jomodes = (eOmn_serv_jomo_descriptor_t*) eo_constarray_At(p->ctrlobjs.jomodescriptors, i);
+            const eOmc_jomo_descriptor_t *jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(p->ctrlobjs.jomodescriptors, i);
             eo_common_hlfword_bitset(&p->sharedcan.discoverytarget.canmap[jomodes->actuator.foc.canloc.port], jomodes->actuator.foc.canloc.addr);         
         }
                 
@@ -625,7 +625,7 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
             // load the can mapping 
             for(i=0; i<numofjomos; i++)
             {
-                const eOmn_serv_jomo_descriptor_t *jomodes = (eOmn_serv_jomo_descriptor_t*) eo_constarray_At(p->ctrlobjs.jomodescriptors, i);
+                const eOmc_jomo_descriptor_t *jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(p->ctrlobjs.jomodescriptors, i);
                 
                 eObrd_canproperties_t prop = {0};
                 
@@ -643,7 +643,7 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
             // load the entity mapping.
             for(i=0; i<numofjomos; i++)
             {
-                const eOmn_serv_jomo_descriptor_t *jomodes = (eOmn_serv_jomo_descriptor_t*) eo_constarray_At(p->ctrlobjs.jomodescriptors, i);
+                const eOmc_jomo_descriptor_t *jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(p->ctrlobjs.jomodescriptors, i);
                 
                 eOcanmap_entitydescriptor_t des = {0};
                 
@@ -658,7 +658,7 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
             eo_canmap_ConfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, p->sharedcan.entitydescriptor);        
 
             // init the encoders
-            eo_encoderreader_Activate(eo_encoderreader_GetHandle(), (const eOmn_serv_arrayof_4jomodescriptors_t *) p->ctrlobjs.jomodescriptors);
+            eo_encoderreader_Activate(eo_encoderreader_GetHandle(), (const eOmc_arrayof_4jomodescriptors_t *) p->ctrlobjs.jomodescriptors);
 
             
             // init the emscontroller.
@@ -667,9 +667,9 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
             // it should have a _Initialise(), a _GetHandle(), a _Config(cfg) and a _Deconfig().
 //            if(NULL == p->ctrlobjs.thecontroller)
 //            {
-//                //p->ctrlobjs.thecontroller = eo_emsController_Init((eOemscontroller_board_t)p->service.servconfig.data.mc.foc_based.boardtype4mccontroller, emscontroller_actuation_2FOC, numofjomos);
+//                //p->ctrlobjs.thecontroller = eo_emsController_Init((eOeomc_ctrlboard_t)p->service.servconfig.data.mc.foc_based.boardtype4mccontroller, emscontroller_actuation_2FOC, numofjomos);
 //                p->ctrlobjs.thecontroller = MController_new(numofjomos, numofjomos);
-//                //MController_config_board((eOemscontroller_board_t)p->service.servconfig.data.mc.foc_based.boardtype4mccontroller, HARDWARE_2FOC);                
+//                //MController_config_board((eOeomc_ctrlboard_t)p->service.servconfig.data.mc.foc_based.boardtype4mccontroller, HARDWARE_2FOC);                
 //                MController_config_board(&p->service.servconfig);
 //            }
             
@@ -818,14 +818,14 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
             // it should have a _Initialise(), a _GetHandle(), a _Config(cfg) and a _Deconfig().
 //            if(NULL == p->ctrlobjs.thecontroller)
 //            {
-////                eOemscontroller_board_t controller_type;
+////                eOeomc_ctrlboard_t controller_type;
 ////                if(eo_motcon_mode_mc4plus == p->service.servconfig.type)
 ////                {
-////                    controller_type = (eOemscontroller_board_t)p->service.servconfig.data.mc.mc4plus_based.boardtype4mccontroller;
+////                    controller_type = (eOeomc_ctrlboard_t)p->service.servconfig.data.mc.mc4plus_based.boardtype4mccontroller;
 ////                }
 ////                else //eomn_serv_MC_mc4plusmais
 ////                {
-////                    controller_type = (eOemscontroller_board_t)p->service.servconfig.data.mc.mc4plusmais_based.boardtype4mccontroller;
+////                    controller_type = (eOeomc_ctrlboard_t)p->service.servconfig.data.mc.mc4plusmais_based.boardtype4mccontroller;
 ////                }
 //                //p->ctrlobjs.thecontroller = eo_emsController_Init(controller_type, emscontroller_actuation_LOCAL, numofjomos);
 //                p->ctrlobjs.thecontroller = MController_new(numofjomos, 4);   
@@ -843,15 +843,15 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
             // b1. init the port mapping
             for(i=0; i<numofjomos; i++)
             {
-                const eOmn_serv_jomo_descriptor_t *jomodes = (eOmn_serv_jomo_descriptor_t*) eo_constarray_At(p->ctrlobjs.jomodescriptors, i);            
-                p->ctrlobjs.pwmport[i] = (jomodes->actuator.pwm.port == eomn_serv_mc_port_none) ? (hal_motorNONE) : ((hal_motor_t)jomodes->actuator.pwm.port);                
+                const eOmc_jomo_descriptor_t *jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(p->ctrlobjs.jomodescriptors, i);            
+                p->ctrlobjs.pwmport[i] = (jomodes->actuator.pwm.port == eobrd_port_none) ? (hal_motorNONE) : ((hal_motor_t)jomodes->actuator.pwm.port);                
             }
             
             // c. low level init for motors and adc           
             s_eo_motioncontrol_mc4plusbased_hal_init_motors_adc_feedbacks();
 
             // d. init the encoders            
-            eo_encoderreader_Activate(eo_encoderreader_GetHandle(), (const eOmn_serv_arrayof_4jomodescriptors_t *) p->ctrlobjs.jomodescriptors);
+            eo_encoderreader_Activate(eo_encoderreader_GetHandle(), (const eOmc_arrayof_4jomodescriptors_t *) p->ctrlobjs.jomodescriptors);
 
             
             // e. activate interrupt line for quad_enc indexes check
@@ -1272,7 +1272,7 @@ static eOresult_t s_eo_motioncontrol_updatedPositionsFromEncoders(EOtheMotionCon
     for(uint8_t i=0; i<p->numofjomos; i++)
     {
         eOencoderreader_valueInfo_t primary, secondary;
-        const eOmn_serv_jomo_descriptor_t *jomodes = (eOmn_serv_jomo_descriptor_t*) eo_constarray_At(p->ctrlobjs.jomodescriptors, i);   
+        const eOmc_jomo_descriptor_t *jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(p->ctrlobjs.jomodescriptors, i);   
 
         res = eo_encoderreader_Read(eo_encoderreader_GetHandle(), i, &primary, &secondary);
         if (res != eores_OK)
@@ -1284,7 +1284,7 @@ static eOresult_t s_eo_motioncontrol_updatedPositionsFromEncoders(EOtheMotionCon
         {
             MController_update_absEncoder_fbk(i, primary.value);
         
-            if(eomn_serv_mc_sensor_pos_atmotor == jomodes->extrasensor.pos) 
+            if(eomc_pos_atmotor == jomodes->encoder2.pos) 
             {
                 MController_update_motor_pos_fbk(i, (int32_t)secondary.value[0]);
             }

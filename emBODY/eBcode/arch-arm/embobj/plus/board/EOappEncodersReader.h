@@ -81,7 +81,7 @@ extern EOappEncReader* eo_appEncReader_Initialise(void);
 
 extern EOappEncReader* eo_appEncReader_GetHandle(void);
 
-extern eOresult_t eo_appEncReader_Activate(EOappEncReader *p, const eOmn_serv_arrayof_4jomodescriptors_t *arrayofjomodes);
+extern eOresult_t eo_appEncReader_Activate(EOappEncReader *p, const eOmc_arrayof_4jomodescriptors_t *arrayofjomodes);
 
 extern eOresult_t eo_appEncReader_Deactivate(EOappEncReader *p);
 
@@ -90,7 +90,7 @@ extern eOresult_t eo_appEncReader_StartRead(EOappEncReader *p);
 
 extern eObool_t eo_appEncReader_isReady(EOappEncReader *p);  
 
-extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOencoderreader_valueInfo_t *primary, eOencoderreader_valueInfo_t *secondary);
+extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOencoderreader_valueInfo_t *value1, eOencoderreader_valueInfo_t *value2);
 
 extern eOresult_t eo_appEncReader_Diagnostics_Enable(EOappEncReader *p, eObool_t on);
 

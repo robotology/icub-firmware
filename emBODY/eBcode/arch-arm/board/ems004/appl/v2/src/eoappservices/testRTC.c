@@ -32,7 +32,7 @@
 
 #include "EOtheBoardConfig.h"
 
-#include "EOmcController.h"
+//#include "EOmcController.h"
 
 #include "EOtheServices.h"
 
@@ -152,7 +152,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_eb3_zeroprotocol =
     .filler     = {0},
     .data.mc.foc_based = 
     {
-        .boardtype4mccontroller = emscontroller_board_SHOULDER,
+        .boardtype4mccontroller = eomc_ctrlboard_SHOULDER,
         .version   =
         {
             .firmware   = { .major = 0, .minor = 0, .build = 0 },
@@ -164,7 +164,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_eb3_zeroprotocol =
             .head   = 
             {
                 .capacity       = 4,
-                .itemsize       = sizeof(eOmn_serv_jomo_descriptor_t),
+                .itemsize       = sizeof(eOmc_jomo_descriptor_t),
                 .size           = 4,
                 .internalmem    = 0                    
             },
@@ -177,17 +177,17 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_eb3_zeroprotocol =
                         .addr           = 1,
                         .insideindex    = eobrd_caninsideindex_first                             
                     },
-                    .sensor         =
+                    .encoder1         =
                     {
-                        .type   = eomn_serv_mc_sensor_encoder_aea,
-                        .port   = eomn_serv_mc_port_ems_spiP6, // hal_encoder1   
-                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                        .type   = eomc_enc_aea,
+                        .port   = eobrd_port_emsP6, // hal_encoder1   
+                        .pos    = eomc_pos_atjoint
                     },
-                    .extrasensor    =
+                    .encoder2    =
                     {
-                        .type   = eomn_serv_mc_sensor_none,
-                        .port   = eomn_serv_mc_port_none,
-                        .pos    = eomn_serv_mc_sensor_pos_none
+                        .type   = eomc_enc_none,
+                        .port   = eobrd_port_none,
+                        .pos    = eomc_pos_none
                     }
                 },
                 { // joint 1
@@ -197,17 +197,17 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_eb3_zeroprotocol =
                         .addr           = 2,
                         .insideindex    = eobrd_caninsideindex_first                             
                     },
-                    .sensor         =
+                    .encoder1         =
                     {
-                        .type   = eomn_serv_mc_sensor_encoder_aea,
-                        .port   = eomn_serv_mc_port_ems_spiP7, // hal_encoder4
-                        .pos    = eomn_serv_mc_sensor_pos_atjoint                            
+                        .type   = eomc_enc_aea,
+                        .port   = eobrd_port_emsP7, // hal_encoder4
+                        .pos    = eomc_pos_atjoint                            
                     },
-                    .extrasensor    =
+                    .encoder2    =
                     {
-                        .type   = eomn_serv_mc_sensor_none,
-                        .port   = eomn_serv_mc_port_none,
-                        .pos    = eomn_serv_mc_sensor_pos_none
+                        .type   = eomc_enc_none,
+                        .port   = eobrd_port_none,
+                        .pos    = eomc_pos_none
                     }
                 },                    
                 { // joint 2
@@ -217,17 +217,17 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_eb3_zeroprotocol =
                         .addr           = 3,
                         .insideindex    = eobrd_caninsideindex_first                             
                     },
-                    .sensor         =
+                    .encoder1         =
                     {
-                        .type   = eomn_serv_mc_sensor_encoder_aea,
-                        .port   = eomn_serv_mc_port_ems_spiP8, // hal_encoder2  
-                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                        .type   = eomc_enc_aea,
+                        .port   = eobrd_port_emsP8, // hal_encoder2  
+                        .pos    = eomc_pos_atjoint
                     },
-                    .extrasensor    =
+                    .encoder2    =
                     {
-                        .type   = eomn_serv_mc_sensor_none,
-                        .port   = eomn_serv_mc_port_none,
-                        .pos    = eomn_serv_mc_sensor_pos_none
+                        .type   = eomc_enc_none,
+                        .port   = eobrd_port_none,
+                        .pos    = eomc_pos_none
                     }
                 },               
                 { // joint 3
@@ -237,17 +237,17 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_eb3_zeroprotocol =
                         .addr           = 4,
                         .insideindex    = eobrd_caninsideindex_first                             
                     },
-                    .sensor         =
+                    .encoder1         =
                     {
-                        .type   = eomn_serv_mc_sensor_encoder_aea,
-                        .port   = eomn_serv_mc_port_ems_spiP9,    // hal_encoder5 
-                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                        .type   = eomc_enc_aea,
+                        .port   = eobrd_port_emsP9,    // hal_encoder5 
+                        .pos    = eomc_pos_atjoint
                     },
-                    .extrasensor    =
+                    .encoder2    =
                     {
-                        .type   = eomn_serv_mc_sensor_none,
-                        .port   = eomn_serv_mc_port_none,
-                        .pos    = eomn_serv_mc_sensor_pos_none
+                        .type   = eomc_enc_none,
+                        .port   = eobrd_port_none,
+                        .pos    = eomc_pos_none
                     }
                 }                    
             }   
@@ -265,7 +265,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_eb3_zeroprotocol =
                 { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
                 { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) }        
             },
-            .joint2encoder  = 
+            .encoder2joint  = 
             {   // identical matrix
                 { EO_COMMON_FLOAT_TO_Q17_14(1.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
                 { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
@@ -282,7 +282,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_fake_aea =
     .filler     = {0},
     .data.mc.foc_based = 
     {
-        .boardtype4mccontroller = emscontroller_board_SHOULDER,
+        .boardtype4mccontroller = eomc_ctrlboard_SHOULDER,
         .version   =
         {
             .firmware   = { .major = 0, .minor = 0, .build = 0 },
@@ -294,7 +294,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_fake_aea =
             .head   = 
             {
                 .capacity       = 4,
-                .itemsize       = sizeof(eOmn_serv_jomo_descriptor_t),
+                .itemsize       = sizeof(eOmc_jomo_descriptor_t),
                 .size           = 4,
                 .internalmem    = 0                    
             },
@@ -307,17 +307,17 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_fake_aea =
                         .addr           = 1,
                         .insideindex    = eobrd_caninsideindex_first                             
                     },
-                    .sensor         =
+                    .encoder1         =
                     {
-                        .type   = eomn_serv_mc_sensor_encoder_aea,
-                        .port   = eomn_serv_mc_port_ems_spiP10,    
-                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                        .type   = eomc_enc_aea,
+                        .port   = eobrd_port_emsP10,    
+                        .pos    = eomc_pos_atjoint
                     },
-                    .extrasensor    =
+                    .encoder2    =
                     {
-                        .type   = eomn_serv_mc_sensor_none,
-                        .port   = eomn_serv_mc_port_none,
-                        .pos    = eomn_serv_mc_sensor_pos_none
+                        .type   = eomc_enc_none,
+                        .port   = eobrd_port_none,
+                        .pos    = eomc_pos_none
                     }
                 },
                 { // joint 1
@@ -327,17 +327,17 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_fake_aea =
                         .addr           = 2,
                         .insideindex    = eobrd_caninsideindex_first                             
                     },
-                    .sensor         =
+                    .encoder1         =
                     {
-                        .type   = eomn_serv_mc_sensor_encoder_aea,
-                        .port   = eomn_serv_mc_port_ems_spiP7, // hal_encoder4
-                        .pos    = eomn_serv_mc_sensor_pos_atjoint                            
+                        .type   = eomc_enc_aea,
+                        .port   = eobrd_port_emsP7, // hal_encoder4
+                        .pos    = eomc_pos_atjoint                            
                     },
-                    .extrasensor    =
+                    .encoder2    =
                     {
-                        .type   = eomn_serv_mc_sensor_none,
-                        .port   = eomn_serv_mc_port_none,
-                        .pos    = eomn_serv_mc_sensor_pos_none
+                        .type   = eomc_enc_none,
+                        .port   = eobrd_port_none,
+                        .pos    = eomc_pos_none
                     }
                 },                    
                 { // joint 2
@@ -347,17 +347,17 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_fake_aea =
                         .addr           = 3,
                         .insideindex    = eobrd_caninsideindex_first                             
                     },
-                    .sensor         =
+                    .encoder1         =
                     {
-                        .type   = eomn_serv_mc_sensor_encoder_aea,
-                        .port   = eomn_serv_mc_port_ems_spiP8, // hal_encoder2  
-                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                        .type   = eomc_enc_aea,
+                        .port   = eobrd_port_emsP8, // hal_encoder2  
+                        .pos    = eomc_pos_atjoint
                     },
-                    .extrasensor    =
+                    .encoder2    =
                     {
-                        .type   = eomn_serv_mc_sensor_none,
-                        .port   = eomn_serv_mc_port_none,
-                        .pos    = eomn_serv_mc_sensor_pos_none
+                        .type   = eomc_enc_none,
+                        .port   = eobrd_port_none,
+                        .pos    = eomc_pos_none
                     }
                 },               
                 { // joint 3
@@ -367,17 +367,17 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_fake_aea =
                         .addr           = 4,
                         .insideindex    = eobrd_caninsideindex_first                             
                     },
-                    .sensor         =
+                    .encoder1         =
                     {
-                        .type   = eomn_serv_mc_sensor_encoder_aea,
-                        .port   = eomn_serv_mc_port_ems_spiP9,    // hal_encoder5 
-                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                        .type   = eomc_enc_aea,
+                        .port   = eobrd_port_emsP9,    // hal_encoder5 
+                        .pos    = eomc_pos_atjoint
                     },
-                    .extrasensor    =
+                    .encoder2    =
                     {
-                        .type   = eomn_serv_mc_sensor_none,
-                        .port   = eomn_serv_mc_port_none,
-                        .pos    = eomn_serv_mc_sensor_pos_none
+                        .type   = eomc_enc_none,
+                        .port   = eobrd_port_none,
+                        .pos    = eomc_pos_none
                     }
                 }                    
             }   
@@ -395,7 +395,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_fake_aea =
                 { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
                 { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) }        
             },
-            .joint2encoder  = 
+            .encoder2joint  = 
             {   // identical matrix
                 { EO_COMMON_FLOAT_TO_Q17_14(1.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
                 { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
@@ -413,7 +413,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_fake_amo =
     .filler     = {0},
     .data.mc.foc_based = 
     {
-        .boardtype4mccontroller = emscontroller_board_SHOULDER,
+        .boardtype4mccontroller = eomc_ctrlboard_SHOULDER,
         .version   =
         {
             .firmware   = { .major = 0, .minor = 0, .build = 0 },
@@ -425,7 +425,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_fake_amo =
             .head   = 
             {
                 .capacity       = 4,
-                .itemsize       = sizeof(eOmn_serv_jomo_descriptor_t),
+                .itemsize       = sizeof(eOmc_jomo_descriptor_t),
                 .size           = 4,
                 .internalmem    = 0                    
             },
@@ -438,17 +438,17 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_fake_amo =
                         .addr           = 1,
                         .insideindex    = eobrd_caninsideindex_first                             
                     },
-                    .sensor         =
+                    .encoder1         =
                     {
-                        .type   = eomn_serv_mc_sensor_encoder_amo,
-                        .port   = eomn_serv_mc_port_ems_spiP6,    
-                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                        .type   = eomc_enc_amo,
+                        .port   = eobrd_port_emsP6,    
+                        .pos    = eomc_pos_atjoint
                     },
-                    .extrasensor    =
+                    .encoder2    =
                     {
-                        .type   = eomn_serv_mc_sensor_none,
-                        .port   = eomn_serv_mc_port_none,
-                        .pos    = eomn_serv_mc_sensor_pos_none
+                        .type   = eomc_enc_none,
+                        .port   = eobrd_port_none,
+                        .pos    = eomc_pos_none
                     }
                 },
                 { // joint 1
@@ -458,17 +458,17 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_fake_amo =
                         .addr           = 2,
                         .insideindex    = eobrd_caninsideindex_first                             
                     },
-                    .sensor         =
+                    .encoder1         =
                     {
-                        .type   = eomn_serv_mc_sensor_encoder_amo,
-                        .port   = eomn_serv_mc_port_ems_spiP7, // hal_encoder4
-                        .pos    = eomn_serv_mc_sensor_pos_atjoint                            
+                        .type   = eomc_enc_amo,
+                        .port   = eobrd_port_emsP7, // hal_encoder4
+                        .pos    = eomc_pos_atjoint                            
                     },
-                    .extrasensor    =
+                    .encoder2    =
                     {
-                        .type   = eomn_serv_mc_sensor_none,
-                        .port   = eomn_serv_mc_port_none,
-                        .pos    = eomn_serv_mc_sensor_pos_none
+                        .type   = eomc_enc_none,
+                        .port   = eobrd_port_none,
+                        .pos    = eomc_pos_none
                     }
                 },                    
                 { // joint 2
@@ -478,17 +478,17 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_fake_amo =
                         .addr           = 3,
                         .insideindex    = eobrd_caninsideindex_first                             
                     },
-                    .sensor         =
+                    .encoder1         =
                     {
-                        .type   = eomn_serv_mc_sensor_encoder_amo,
-                        .port   = eomn_serv_mc_port_ems_spiP8, // hal_encoder2  
-                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                        .type   = eomc_enc_amo,
+                        .port   = eobrd_port_emsP8, // hal_encoder2  
+                        .pos    = eomc_pos_atjoint
                     },
-                    .extrasensor    =
+                    .encoder2    =
                     {
-                        .type   = eomn_serv_mc_sensor_none,
-                        .port   = eomn_serv_mc_port_none,
-                        .pos    = eomn_serv_mc_sensor_pos_none
+                        .type   = eomc_enc_none,
+                        .port   = eobrd_port_none,
+                        .pos    = eomc_pos_none
                     }
                 },               
                 { // joint 3
@@ -498,17 +498,17 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_fake_amo =
                         .addr           = 4,
                         .insideindex    = eobrd_caninsideindex_first                             
                     },
-                    .sensor         =
+                    .encoder1         =
                     {
-                        .type   = eomn_serv_mc_sensor_encoder_amo,
-                        .port   = eomn_serv_mc_port_ems_spiP9,    // hal_encoder5 
-                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                        .type   = eomc_enc_amo,
+                        .port   = eobrd_port_emsP9,    // hal_encoder5 
+                        .pos    = eomc_pos_atjoint
                     },
-                    .extrasensor    =
+                    .encoder2    =
                     {
-                        .type   = eomn_serv_mc_sensor_none,
-                        .port   = eomn_serv_mc_port_none,
-                        .pos    = eomn_serv_mc_sensor_pos_none
+                        .type   = eomc_enc_none,
+                        .port   = eobrd_port_none,
+                        .pos    = eomc_pos_none
                     }
                 }                    
             }   
@@ -526,7 +526,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_fake_amo =
                 { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
                 { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) }        
             },
-            .joint2encoder  = 
+            .encoder2joint  = 
             {   // identical matrix
                 { EO_COMMON_FLOAT_TO_Q17_14(1.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
                 { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
@@ -544,7 +544,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_fake_inc =
     .filler     = {0},
     .data.mc.foc_based = 
     {
-        .boardtype4mccontroller = emscontroller_board_SHOULDER,
+        .boardtype4mccontroller = eomc_ctrlboard_SHOULDER,
         .version   =
         {
             .firmware   = { .major = 0, .minor = 0, .build = 0 },
@@ -556,7 +556,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_fake_inc =
             .head   = 
             {
                 .capacity       = 4,
-                .itemsize       = sizeof(eOmn_serv_jomo_descriptor_t),
+                .itemsize       = sizeof(eOmc_jomo_descriptor_t),
                 .size           = 4,
                 .internalmem    = 0                    
             },
@@ -569,17 +569,17 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_fake_inc =
                         .addr           = 1,
                         .insideindex    = eobrd_caninsideindex_first                             
                     },
-                    .sensor         =
+                    .encoder1         =
                     {
-                        .type   = eomn_serv_mc_sensor_encoder_inc,
-                        .port   = eomn_serv_mc_port_mc4plus_qencP2,    
-                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                        .type   = eomc_enc_qenc,
+                        .port   = eobrd_port_mc4plusP2,    
+                        .pos    = eomc_pos_atjoint
                     },
-                    .extrasensor    =
+                    .encoder2    =
                     {
-                        .type   = eomn_serv_mc_sensor_none,
-                        .port   = eomn_serv_mc_port_none,
-                        .pos    = eomn_serv_mc_sensor_pos_none
+                        .type   = eomc_enc_none,
+                        .port   = eobrd_port_none,
+                        .pos    = eomc_pos_none
                     }
                 },
                 { // joint 1
@@ -589,17 +589,17 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_fake_inc =
                         .addr           = 2,
                         .insideindex    = eobrd_caninsideindex_first                             
                     },
-                    .sensor         =
+                    .encoder1         =
                     {
-                        .type   = eomn_serv_mc_sensor_encoder_inc,
-                        .port   = eomn_serv_mc_port_mc4plus_qencP3, // hal_encoder4
-                        .pos    = eomn_serv_mc_sensor_pos_atjoint                            
+                        .type   = eomc_enc_qenc,
+                        .port   = eobrd_port_mc4plusP3, 
+                        .pos    = eomc_pos_atjoint                            
                     },
-                    .extrasensor    =
+                    .encoder2    =
                     {
-                        .type   = eomn_serv_mc_sensor_none,
-                        .port   = eomn_serv_mc_port_none,
-                        .pos    = eomn_serv_mc_sensor_pos_none
+                        .type   = eomc_enc_none,
+                        .port   = eobrd_port_none,
+                        .pos    = eomc_pos_none
                     }
                 },                    
                 { // joint 2
@@ -609,17 +609,17 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_fake_inc =
                         .addr           = 3,
                         .insideindex    = eobrd_caninsideindex_first                             
                     },
-                    .sensor         =
+                    .encoder1         =
                     {
-                        .type   = eomn_serv_mc_sensor_encoder_inc,
-                        .port   = eomn_serv_mc_port_mc4plus_qencP4, // hal_encoder2  
-                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                        .type   = eomc_enc_qenc,
+                        .port   = eobrd_port_mc4plusP4, 
+                        .pos    = eomc_pos_atjoint
                     },
-                    .extrasensor    =
+                    .encoder2    =
                     {
-                        .type   = eomn_serv_mc_sensor_none,
-                        .port   = eomn_serv_mc_port_none,
-                        .pos    = eomn_serv_mc_sensor_pos_none
+                        .type   = eomc_enc_none,
+                        .port   = eobrd_port_none,
+                        .pos    = eomc_pos_none
                     }
                 },               
                 { // joint 3
@@ -629,17 +629,17 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_fake_inc =
                         .addr           = 4,
                         .insideindex    = eobrd_caninsideindex_first                             
                     },
-                    .sensor         =
+                    .encoder1         =
                     {
-                        .type   = eomn_serv_mc_sensor_encoder_inc,
-                        .port   = eomn_serv_mc_port_mc4plus_qencP5,    // hal_encoder5 
-                        .pos    = eomn_serv_mc_sensor_pos_atjoint
+                        .type   = eomc_enc_qenc,
+                        .port   = eobrd_port_mc4plusP5,   
+                        .pos    = eomc_pos_atjoint
                     },
-                    .extrasensor    =
+                    .encoder2    =
                     {
-                        .type   = eomn_serv_mc_sensor_none,
-                        .port   = eomn_serv_mc_port_none,
-                        .pos    = eomn_serv_mc_sensor_pos_none
+                        .type   = eomc_enc_none,
+                        .port   = eobrd_port_none,
+                        .pos    = eomc_pos_none
                     }
                 }                    
             }   
@@ -657,7 +657,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_fake_inc =
                 { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
                 { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) }        
             },
-            .joint2encoder  = 
+            .encoder2joint  = 
             {   // identical matrix
                 { EO_COMMON_FLOAT_TO_Q17_14(1.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
                 { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },

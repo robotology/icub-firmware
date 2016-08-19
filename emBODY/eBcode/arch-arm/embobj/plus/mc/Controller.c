@@ -205,11 +205,11 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
     
     for (int k=0; k<o->nJoints; ++k)
     {
-        const eOmn_serv_jomo_descriptor_t *jomodes = (eOmn_serv_jomo_descriptor_t*) eo_constarray_At(carray, k);
+        const eOmc_jomo_descriptor_t *jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(carray, k);
         
-        switch(jomodes->sensor.type)
+        switch(jomodes->encoder1.type)
         {
-            case eomn_serv_mc_sensor_encoder_spichainof2:
+            case eomc_enc_spichainof2:
             {
                 for (int e=0; e<2; ++e)
                 {
@@ -218,7 +218,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
                 }
                 break;
             }
-            case eomn_serv_mc_sensor_encoder_spichainof3:
+            case eomc_enc_spichainof3:
             {
                 for (int e=0; e<3; ++e)
                 {
@@ -227,21 +227,21 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
                 }
                 break;
             }                
-            case eomn_serv_mc_sensor_encoder_aea:
+            case eomc_enc_aea:
             {
                 o->absEncoder[k].type = eomc_encoder_AEA;
                 o->absEncoder[k].fake = FALSE;
                 break;
             }
             
-            case eomn_serv_mc_sensor_mais:
+            case eomc_enc_mais:
             {
                 o->absEncoder[k].type = eomc_encoder_MAIS;
                 o->absEncoder[k].fake = FALSE;
                 break;
             }
             
-            case eomn_serv_mc_sensor_encoder_absanalog:
+            case eomc_enc_absanalog:
             {
                 o->absEncoder[k].type = eomc_encoder_HALL_ADC;
                 o->absEncoder[k].fake = FALSE;
@@ -282,7 +282,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
     
     switch (o->part_type)
     {
-    case emscontroller_board_ANKLE:                   //= 1,    //2FOC
+    case eomc_ctrlboard_ANKLE:                   //= 1,    //2FOC
         o->nSets   = 2;
     
         //invert_matrix(Jjm, Jmj, 2);
@@ -301,7 +301,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         
         break;
     
-    case emscontroller_board_CER_UPPER_ARM:               //= 17,    //2FOC
+    case eomc_ctrlboard_CER_UPPER_ARM:               //= 17,    //2FOC
         o->nSets   = 4;
         
         for (int k = 0; k<o->nJoints; ++k)
@@ -318,7 +318,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         
         break;
 
-    case emscontroller_board_UPPERLEG:                //= 2,    //2FOC
+    case eomc_ctrlboard_UPPERLEG:                //= 2,    //2FOC
         o->nSets   = 4;
     
         Jjm = o->Jjm;
@@ -343,7 +343,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
     
         break;
         
-    case emscontroller_board_WAIST:                   //= 3,    //2FOC
+    case eomc_ctrlboard_WAIST:                   //= 3,    //2FOC
     {    
         o->nSets   = 1;
 
@@ -384,7 +384,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         
         break;
     }
-    case emscontroller_board_SHOULDER:                //= 4,    //2FOC
+    case eomc_ctrlboard_SHOULDER:                //= 4,    //2FOC
     {
         o->nSets   = 2;
         
@@ -440,7 +440,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         
         break;
     }
-    case emscontroller_board_CER_WAIST:               //= 15,   //2FOC
+    case eomc_ctrlboard_CER_WAIST:               //= 15,   //2FOC
         o->nSets   = 2;
 
         o->j2s[0] = o->m2s[0] = o->e2s[0] = 0;
@@ -470,7 +470,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
     
         break;
         
-    case emscontroller_board_CER_LOWER_ARM:               //= 12,   //MC4plus
+    case eomc_ctrlboard_CER_LOWER_ARM:               //= 12,   //MC4plus
         o->nSets   = 2;
 
         o->j2s[0] = o->m2s[0] = o->e2s[0] = 0;
@@ -507,7 +507,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         
         break;
         
-    case emscontroller_board_CER_BASE:                //= 21    //2FOC
+    case eomc_ctrlboard_CER_BASE:                //= 21    //2FOC
     {
         o->nSets   = 4;
         
@@ -525,7 +525,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
     }
         break;
     
-    case emscontroller_board_CER_NECK:                   //= 22,    //mc4plus
+    case eomc_ctrlboard_CER_NECK:                   //= 22,    //mc4plus
         o->nSets   = 2;
     
         for (int k = 0; k<o->nJoints; ++k)
@@ -544,7 +544,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         
         break;
     
-    case emscontroller_board_CER_HAND:                   //= 14, 16,    //mc2plus
+    case eomc_ctrlboard_CER_HAND:                   //= 14, 16,    //mc2plus
         o->nSets   = 2;
         o->nEncods = 6;
     
@@ -582,7 +582,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         
         break;    
     
-    case emscontroller_board_HEAD_neckpitch_neckroll:      //= 5,    //MC4plus
+    case eomc_ctrlboard_HEAD_neckpitch_neckroll:      //= 5,    //MC4plus
     {
         o->nSets   = 1;
 
@@ -623,7 +623,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         
         break;
     }
-    case emscontroller_board_HEAD_neckyaw_eyes:       //=6,      //MC4plus
+    case eomc_ctrlboard_HEAD_neckyaw_eyes:       //=6,      //MC4plus
     {
         o->nSets   = 3;
         
@@ -686,7 +686,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         break;
     }
 
-    case emscontroller_board_HAND_thumb:                  //= 9,    //MC4plus
+    case eomc_ctrlboard_HAND_thumb:                  //= 9,    //MC4plus
     {
         /*
         NOTE: (VALE)
@@ -750,8 +750,8 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
     }    
     break;
     
-    case emscontroller_board_FACE_eyelids_jaw:        //= 7,    //MC4plus
-    case emscontroller_board_4jointsNotCoupled:               //= 8,    //MC4plus
+    case eomc_ctrlboard_FACE_eyelids_jaw:        //= 7,    //MC4plus
+    case eomc_ctrlboard_4jointsNotCoupled:               //= 8,    //MC4plus
         o->nSets   = 4;
         
         for (int k = 0; k<o->nJoints; ++k)
@@ -766,10 +766,10 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
             o->j2s[k] = o->m2s[k] = o->e2s[k] = k;
         }
         break;
-    case emscontroller_board_HAND_2:                  //= 10,   //MC4plus
+    case eomc_ctrlboard_HAND_2:                  //= 10,   //MC4plus
         break;
     
-    case emscontroller_board_FOREARM:                 //= 11,   //MC4plus
+    case eomc_ctrlboard_FOREARM:                 //= 11,   //MC4plus
     {
         o->nSets   = 3;
         
@@ -840,8 +840,8 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
     
     //check multi encoder compatibility
     //currently all joint of same board have the the same number of multiple encoder. so i use j0
-    const eOmn_serv_jomo_descriptor_t *jomodes = (eOmn_serv_jomo_descriptor_t*) eo_constarray_At(carray, 0);
-    uint8_t cfg_multienc = (uint8_t) eomn_mc_sensor_getnumofcomponets((eOmn_serv_mc_sensor_type_t)jomodes->sensor.type);
+    const eOmc_jomo_descriptor_t *jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(carray, 0);
+    uint8_t cfg_multienc = (uint8_t) eomc_encoder_get_numberofcomponents((eOmc_encoder_t)jomodes->encoder1.type);
     if(o->multi_encs != cfg_multienc)
     {
         eOerrmanDescriptor_t errdes;
@@ -916,11 +916,11 @@ void MController_config_joint(int j, eOmc_joint_config_t* config) //
     Motor_config_filter(o->motor+j,   config->tcfiltertype);
     Motor_config_friction(o->motor+j, config->motor_params.bemf_value, config->motor_params.ktau_value);
     
-    if (j==3 && o->part_type==emscontroller_board_CER_LOWER_ARM)
+    if (j==3 && o->part_type==eomc_ctrlboard_CER_LOWER_ARM)
     {
         AbsEncoder_config(o->absEncoder+j, j, /*(eOmc_EncoderType_t)config->jntEncoderType,*/ config->jntEncoderResolution, 64*AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
     }
-    else if (o->part_type==emscontroller_board_CER_HAND)
+    else if (o->part_type==eomc_ctrlboard_CER_HAND)
     {
         AbsEncoder_config(o->absEncoder+j*3,   j, /*(eOmc_EncoderType_t)config->jntEncoderType,*/ config->jntEncoderResolution, AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
         AbsEncoder_config(o->absEncoder+j*3+1, j, /*(eOmc_EncoderType_t)config->jntEncoderType,*/ config->jntEncoderResolution, AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);

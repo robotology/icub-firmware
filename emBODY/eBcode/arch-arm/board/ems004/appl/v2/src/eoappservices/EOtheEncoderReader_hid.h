@@ -51,7 +51,7 @@ struct EOtheEncoderReader_hid
     eOservice_core_t                        service;
     eOservice_diagnostics_t                 diagnostics;
     
-    eOmn_serv_arrayof_4jomodescriptors_t    arrayofjomodes;
+    eOmc_arrayof_4jomodescriptors_t    arrayofjomodes;
 
     EOtimer*                                waitreadtimer;
     uint8_t                                 numofjomos;
