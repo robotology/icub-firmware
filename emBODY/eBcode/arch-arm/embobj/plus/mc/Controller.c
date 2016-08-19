@@ -448,7 +448,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         
         Sjm = o->Sjm;
         Jjm = o->Jjm;
-
+        Jmj = o->Jmj;
         
         float alfa = 22.0f/80.0f;
     
@@ -477,6 +477,13 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
     {
         Sjm = o->Sjm;
         Jjm = o->Jjm;
+        Jmj = o->Jmj;
+        #if defined(ICUB_MEC_V1) || defined(ICUB_GENOVA04)
+        // |j0|   |  1     0    0   |   |e0|     
+        // |j1| = |  0     1    0   | * |e1|
+        // |j2|   |  1    -1  40/65 |   |e2|
+        Sje = o->Sje;
+        #endif
         
         // |j0|    | 1     0       0   |   |m0|
         // |j1|  = | 1   40/65     0   | * |m1|
@@ -669,6 +676,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
 
         Sjm = o->Sjm;
         Jjm = o->Jjm;
+        Jmj = o->Jmj;
         
         //motor to joint
         
