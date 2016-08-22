@@ -511,13 +511,13 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_eb3 =
         .jomocoupling       =
         {
             .joint2set      = 
-            {   
+            {   // 2 joint sets: js0 = (j0, j1, j2), js1 = (j3)  
                 eomc_jointSetNum_zero, eomc_jointSetNum_zero, eomc_jointSetNum_zero, eomc_jointSetNum_one
             },
             .joint2motor    = 
-            {   // zero matrix: use matrix embedded in controller and seecetd by boardtype4mccontroller
+            {   
                 { EO_COMMON_FLOAT_TO_Q17_14(1.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
-                { EO_COMMON_FLOAT_TO_Q17_14(-1.0f/alfa),EO_COMMON_FLOAT_TO_Q17_14(1.0f/alfa),EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(-1.0f/alfa),EO_COMMON_FLOAT_TO_Q17_14(1.0f/alfa),EO_COMMON_FLOAT_TO_Q17_14(0.0f),   EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
                 { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(1.0f/alfa),EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
                 { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(1.0f) }        
             },
@@ -739,8 +739,8 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb5 =
                 eomc_jointSetNum_zero, eomc_jointSetNum_zero, eomc_jointSetNum_zero, eomc_jointSetNum_none 
             },
             .joint2motor    = 
-            {   // zero matrix: use matrix embedded in controller and seecetd by boardtype4mccontroller
-                { EO_COMMON_FLOAT_TO_Q17_14(0.5f),      EO_COMMON_FLOAT_TO_Q17_14(-0.5f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+            {   // identical matrix
+                { EO_COMMON_FLOAT_TO_Q17_14(0.5f),      EO_COMMON_FLOAT_TO_Q17_14(-0.5f),   EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
                 { EO_COMMON_FLOAT_TO_Q17_14(0.5f),      EO_COMMON_FLOAT_TO_Q17_14(0.5f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
                 { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
                 { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(1.0f) }        
@@ -1109,7 +1109,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_neck =
                 eomc_jointSetNum_zero, eomc_jointSetNum_one, eomc_jointSetNum_none, eomc_jointSetNum_none 
             },
             .joint2motor    = 
-            {   // zero matrix: use matrix embedded in controller and seecetd by boardtype4mccontroller
+            {   // identical matrix
                 { EO_COMMON_FLOAT_TO_Q17_14(1.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
                 { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
                 { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
@@ -1156,9 +1156,6 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_hand =
                         .type   = eomc_enc_spichainof3,
                         .port   = eobrd_port_mc2plusP10,
                         .pos    = eomc_pos_atjoint
-                        //.type   = eomc_enc_none,
-                        //.port   = 0, 
-                        //.pos    = eomc_pos_none
                     },
                     .encoder2    =
                     {
@@ -1177,9 +1174,6 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_hand =
                         .type   = eomc_enc_spichainof3,
                         .port   = eobrd_port_mc2plusP11,
                         .pos    = eomc_pos_atjoint
-                        //.type   = eomc_enc_none,
-                        //.port   = 0, 
-                        //.pos    = eomc_pos_none
                     },
                     .encoder2    =
                     {
@@ -1231,14 +1225,14 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_hand =
         {
             .joint2set      = 
             {   // each joint is on a different set 
-                0, 1, 2, 3 
+                eomc_jointSetNum_zero, eomc_jointSetNum_one, eomc_jointSetNum_none, eomc_jointSetNum_none
             },
             .joint2motor    = 
-            {   // zero matrix: use matrix embedded in controller and seecetd by boardtype4mccontroller
-                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
-                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
-                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
-                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) }        
+            {   // identical matrix
+                { EO_COMMON_FLOAT_TO_Q17_14(1.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(1.0f) }        
             },
             .encoder2joint  = 
             {   // identical matrix
@@ -1369,7 +1363,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_waist =
                 eomc_jointSetNum_zero, eomc_jointSetNum_zero, eomc_jointSetNum_zero, eomc_jointSetNum_one 
             },
             .joint2motor    = 
-            {   // zero matrix: use matrix embedded in controller and seecetd by boardtype4mccontroller
+            {   
                 { EO_COMMON_FLOAT_TO_Q17_14(1.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
                 { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
                 { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
@@ -1499,7 +1493,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_upper_arm =
                 eomc_jointSetNum_zero, eomc_jointSetNum_one, eomc_jointSetNum_two, eomc_jointSetNum_three
             },
             .joint2motor    = 
-            {   // zero matrix: use matrix embedded in controller and seecetd by boardtype4mccontroller
+            {   // identical matrix
                 { EO_COMMON_FLOAT_TO_Q17_14(1.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
                 { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
                 { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
@@ -1613,7 +1607,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_lower_arm =
         .jomocoupling       =
         {
             .joint2set      = 
-            {   // each joint is on a different set 
+            {   // 2 joint sets: js0 = (j0, j1, j2), js1 = (j3) 
                 eomc_jointSetNum_zero, eomc_jointSetNum_zero, eomc_jointSetNum_zero, eomc_jointSetNum_one 
             },
             .joint2motor    = 
@@ -1750,7 +1744,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_base =
                 eomc_jointSetNum_zero,  eomc_jointSetNum_one, eomc_jointSetNum_two, eomc_jointSetNum_three
             },
             .joint2motor    = 
-            {   // zero matrix: use matrix embedded in controller and seecetd by boardtype4mccontroller
+            {   // identical matrix
                 { EO_COMMON_FLOAT_TO_Q17_14(1.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
                 { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
                 { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
@@ -1869,11 +1863,11 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_EB20 =
         .jomocoupling       =
         {
             .joint2set      = 
-            {   
+            {   // 1 joint set: js0 = (j0, j1)      
                 eomc_jointSetNum_zero, eomc_jointSetNum_zero, eomc_jointSetNum_none, eomc_jointSetNum_none 
             },
             .joint2motor    = 
-            {   // zero matrix: use matrix embedded in controller and seecetd by boardtype4mccontroller
+            {   
                 { EO_COMMON_FLOAT_TO_Q17_14(1.0f),      EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
                 { EO_COMMON_FLOAT_TO_Q17_14(-1.0f),     EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
                 { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
@@ -1969,7 +1963,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_EB21 =
                 { // joint 3: left-eye
                     .actuator.pwm   =
                     {
-                        .port   = 2  // eomn_serv_mc_port_mc4plus_pwmP4 is hal_motor3=2 ?? verify!                          
+                        .port   = eobrd_port_mc4plusP4                          
                     },
                     .encoder1         =
                     {
@@ -1989,7 +1983,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_EB21 =
         .jomocoupling       =
         {
             .joint2set      = 
-            { //joint 2 and 3 are coupled
+            {   // 3 joint sets: js0 = (j0), js1 = (j1), js2 = (j2, j3) -> joints 2 and 3 are coupled
                 eomc_jointSetNum_zero, eomc_jointSetNum_one, eomc_jointSetNum_two, eomc_jointSetNum_two 
             },
             
@@ -2001,7 +1995,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_EB21 =
             
             
             .joint2motor    = 
-            {   // zero matrix: use matrix embedded in controller and seecetd by boardtype4mccontroller
+            {   
                 { EO_COMMON_FLOAT_TO_Q17_14(1.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
                 { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
                 { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(-1.0f) },
@@ -2115,11 +2109,11 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_EB22 =
         .jomocoupling       =
         {
             .joint2set      = 
-            {   // each joint is on a different set 
+            {   // two joint sets: js0 = (j0), js1 = (j1)   
                 eomc_jointSetNum_zero, eomc_jointSetNum_one, eomc_jointSetNum_none, eomc_jointSetNum_none 
             },
             .joint2motor    = 
-            {   // zero matrix: use matrix embedded in controller and seecetd by boardtype4mccontroller
+            {   // identical matrix
                 { EO_COMMON_FLOAT_TO_Q17_14(1.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
                 { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
                 { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
@@ -2232,11 +2226,11 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_EB23 =
         .jomocoupling       =
         {
             .joint2set      = 
-            {   // each joint is on a different set 
+            {   // 4 joint sets all with a single joint
                 eomc_jointSetNum_zero, eomc_jointSetNum_one, eomc_jointSetNum_two, eomc_jointSetNum_three
             },
             .joint2motor    = 
-            {   // zero matrix: use matrix embedded in controller and seecetd by boardtype4mccontroller
+            {   // identical matrix
                 { EO_COMMON_FLOAT_TO_Q17_14(1.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
                 { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
                 { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
@@ -2351,11 +2345,11 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_EB24_EB27 =
         .jomocoupling       =
         {
             .joint2set      = 
-            {   // each joint is on a different set 
+            {   // 3 joint sets: js0 = (j0), js1 = (j1, j2), js2 = (j3) -> joints 1 and 2 are coupled   
                 eomc_jointSetNum_zero, eomc_jointSetNum_one, eomc_jointSetNum_one, eomc_jointSetNum_two
             },
             .joint2motor    = 
-            {   // zero matrix: use matrix embedded in controller and seecetd by boardtype4mccontroller
+            {   
                 { EO_COMMON_FLOAT_TO_Q17_14(1.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
                 { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
                 { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(-1.0f),   EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
@@ -2483,11 +2477,11 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_EB25_EB28 =
         .jomocoupling       =
         {
             .joint2set      = 
-            {   // each joint is on a different set 
+            {   // 3 joint sets: js0 = (j0, j1), js1 = (j2), js2 = (j3) -> joints 0 and 1 are coupled   
                 eomc_jointSetNum_zero, eomc_jointSetNum_zero, eomc_jointSetNum_one, eomc_jointSetNum_two
             },
             .joint2motor    = 
-            {   // zero matrix: use matrix embedded in controller and seecetd by boardtype4mccontroller
+            {   
                 { EO_COMMON_FLOAT_TO_Q17_14(1.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
                 { EO_COMMON_FLOAT_TO_Q17_14(-1.0f),     EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
                 { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
@@ -2619,11 +2613,11 @@ static const eOmn_serv_configuration_t s_serv_config_mc_v3_EB26_EB29 =
                eomc_jointSetNum_zero, eomc_jointSetNum_one, eomc_jointSetNum_two, eomc_jointSetNum_three
             },
             .joint2motor    = 
-            {   // zero matrix: use matrix embedded in controller and seecetd by boardtype4mccontroller
+            {   // identical matrix
                 { EO_COMMON_FLOAT_TO_Q17_14(1.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
                 { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
                 { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
-                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) }        
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(1.0f) }        
             },
             .encoder2joint  = 
             {   // identical matrix
@@ -2732,44 +2726,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_testOfmc2plus =
                         .port   = eobrd_port_mc4plusP5,  
                         .pos    = eomc_pos_atmotor
                     }
-                } 
- /*               { // joint 2
-                    .actuator.pwm   =
-                    {
-                        .port   = eobrd_port_none
-                    },
-                    .encoder1         =
-                    {
-                        .type   = eomc_enc_none,
-                        .port   = 0, 
-                        .pos    = eomc_pos_none
-                    },
-                    .encoder2    =
-                    {
-                        .type   = eomc_enc_none,
-                        .port   = 0, 
-                        .pos    = eomc_pos_none
-                    }
-                },                
-                { // joint 3
-                    .actuator.pwm   =
-                    {
-                        .port   = eobrd_port_none                          
-                    },
-                    .encoder1         =
-                    {
-                        .type   = eomc_enc_none,
-                        .port   = 0, 
-                        .pos    = eomc_pos_none
-                    },
-                    .encoder2    =
-                    {
-                       .type   = eomc_enc_none,
-                        .port   = 0, 
-                        .pos    = eomc_pos_none
-                    }
-                }*/            
-                
+                }                
             }
         },
         .jomocoupling       =
@@ -2779,11 +2736,11 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_testOfmc2plus =
                 0, 1, 2, 3 
             },
             .joint2motor    = 
-            {   // zero matrix: use matrix embedded in controller and seecetd by boardtype4mccontroller
-                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
-                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
-                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
-                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) }        
+            {   // identical matrix
+                { EO_COMMON_FLOAT_TO_Q17_14(1.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(1.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f) },
+                { EO_COMMON_FLOAT_TO_Q17_14(0.0f),      EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(0.0f),    EO_COMMON_FLOAT_TO_Q17_14(1.0f) }        
             },
             .encoder2joint  = 
             {   // identical matrix
