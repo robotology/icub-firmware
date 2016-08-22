@@ -62,16 +62,6 @@
 #include "EOtheServices.h"
 
 
-//#if !defined(EOSERVICES_USE_RUNTIME_ACTIVATION)
-//// used only for activation at bootstrap ... dont use it for runtime config .. they are disabled ...
-//extern eOresult_t eo_services_Activate(EOtheServices *p);
-
-////extern eObool_t eo_services_startupactivation_AllActivated(EOtheServices *p);
-////extern eOresult_t eo_services_startupactivation_SendFailureReport(EOtheServices *p);
-
-//    #error DONT UNDEF EOSERVICES_USE_RUNTIME_ACTIVATION
-//#endif
-
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
@@ -84,7 +74,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
 
-//#define EOSERVICES_USE_RUNTIME_ACTIVATION
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables. deprecated: better using _get(), _set() on static variables 
@@ -134,19 +123,6 @@ static eOresult_t s_services_callback_afterverify_motioncontrol(EOaService* p, e
 static eOresult_t s_eo_services_alert_afterverify_service(eObool_t operationisok, eOmn_serv_category_t category, eOmn_serv_type_t type, eOservice_type_t servtype);
 
 
-//#if !defined(EOSERVICES_USE_RUNTIME_ACTIVATION)
-// 
-//// functions used for activation at startup .... you may undef them out
-//static void s_services_startupactivation_activate_services_deferred(void);
-//static void s_services_startupactivation_activate_services_now(void *p);
-//static eOresult_t s_services_startupactivation_after_verify_motion(EOaService* p, eObool_t operationisok);
-//static eOresult_t s_services_startupactivation_after_verify_mais(EOaService* p, eObool_t operationisok);
-//static eOresult_t s_services_startupactivation_after_verify_strain(EOaService* p, eObool_t operationisok);
-//static eOresult_t s_services_startupactivation_after_verify_skin(EOaService* p, eObool_t operationisok);
-//static eOresult_t s_services_startupactivation_after_verify_inertials(EOaService* p, eObool_t operationisok);
-// 
-//#endif
-
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -165,7 +141,8 @@ static EOtheServices s_eo_theservices =
     {
         .allactivated       = eobool_false,
         .failedservice      = eo_service_none,
-    }
+    },
+    .mcservicetype  = eomn_serv_NONE
 };
 
 static const char s_eobj_ownname[] = "EOtheServices";
@@ -370,95 +347,6 @@ extern eOresult_t eo_services_ProcessCommand(EOtheServices *p, eOmn_service_cmmn
 
 
 
-//#if !defined(EOSERVICES_USE_RUNTIME_ACTIVATION)
-//// it is the previous eo_services_StartLegacyMode()
-//extern eOresult_t eo_services_Activate(EOtheServices *p)
-//{
-//    if((NULL == p))
-//    {
-//        return(eores_NOK_nullpointer);
-//    }
-//   
-//    // activation is done by a timer which will expire in 100 ms.
-//    s_services_startupactivation_activate_services_deferred();
-// 
-//    return(eores_OK);
-//}
-// 
-////extern eObool_t eo_services_startupactivation_AllActivated(EOtheServices *p)
-////{    
-////    if(NULL == p)
-////    {
-////        return(eobool_false);
-////    }    
-////        
-////    return(s_eo_theservices.startupactivationstate.allactivated);    
-////}
-////  
-////  
-////  
-//// extern eOresult_t eo_services_startupactivation_SendFailureReport(EOtheServices *p)
-////{    
-////    if(NULL == p)
-////    {
-////        return(eores_NOK_nullpointer);
-////    }
-////  
-////    if(eobool_true == p->allactivated)
-////    {
-////        // so far dont send any OK report
-////        return(eores_OK);
-////    }
-////        
-////    switch(s_eo_theservices.startupactivationstate.failedservice)
-////    {
-////        case eo_service_mc:
-////        {
-////            eo_motioncontrol_SendReport(eo_motioncontrol_GetHandle());
-////        } break;
-////  
-////        case eo_service_strain:
-////        {
-////            eo_strain_SendReport(eo_strain_GetHandle());
-////        } break;
-////        
-////        case eo_service_mais:
-////        {
-////            eo_mais_SendReport(eo_mais_GetHandle());            
-////        } break; 
-////  
-////        case eo_service_skin:
-////        {
-////            eo_skin_SendReport(eo_skin_GetHandle());
-////        } break;   
-////   
-////   
-////        case eo_service_inertial:
-////        {
-////            eo_inertials2_SendReport(eo_inertials2_GetHandle());   
-////        } break;        
-////        
-////        case eo_service_none:
-////        {
-////            // send message that the services are not verified yet.           
-////            eOerrmanDescriptor_t errorDescriptor = {0};
-////            errorDescriptor.sourceaddress = eo_errman_sourcedevice_localboard;
-////            errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_services_not_verified_yet);
-////            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errorDescriptor);            
-////        } break;
-////        
-////        default:
-////        {
-////            
-////        } break;
-////        
-////    }
-////        
-////    return(eores_OK);    
-////}
-//   
-//#endif
-
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
@@ -657,6 +545,8 @@ extern eOresult_t eo_service_hid_AddRegulars(EOarray* id32ofregulars, eOmn_serv_
     
     return(eores_OK);     
 }
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
@@ -835,7 +725,7 @@ static eOresult_t s_services_callback_afterverify_motioncontrol(EOaService* p, e
         eo_motioncontrol_Deactivate(eo_motioncontrol_GetHandle());
     }
     
-    s_eo_services_alert_afterverify_service(operationisok, eomn_serv_category_mc, eomn_serv_MC_generic, eo_service_mc);
+    s_eo_services_alert_afterverify_service(operationisok, eomn_serv_category_mc, s_eo_theservices.mcservicetype, eo_service_mc);
     
     return(eores_OK);
 }
@@ -852,14 +742,16 @@ static eOresult_t s_eo_services_process_verifyactivate(EOtheServices *p, eOmn_se
     {   
         case eomn_serv_category_mc:
         {
+            s_eo_theservices.mcservicetype = config->type;
+            
+            if(eomn_serv_MC_generic == config->type)
+            {   // we use local config for motion-control also if we have eomn_serv_MC_generic ...
+                uselocalconfig = eobool_true;
+            }                       
+            
             if(eobool_true == uselocalconfig)
             {
-#undef TEST_14APR16 
-#if defined(TEST_14APR16)        
-                config = eoboardconfig_code2motion_serv_configuration(1); // eb2
-#else
                 config = eoboardconfig_code2motion_serv_configuration(s_eo_theservices.board);
-#endif 
                 
                 errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_mc_using_onboard_config);
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errorDescriptor);                            
@@ -1359,187 +1251,6 @@ static eOresult_t s_eo_services_stop(EOtheServices *p, eOmn_serv_category_t cate
 }
 
 
-
-//#if !defined(EOSERVICES_USE_RUNTIME_ACTIVATION)
-// 
-//static void s_services_startupactivation_activate_services_deferred(void)
-//{
-//    EOaction_strg astrg = {0};
-//    EOaction *act = (EOaction*)&astrg;
-//    
-//    eo_action_SetCallback(act, s_services_startupactivation_activate_services_now, NULL, eov_callbackman_GetTask(eov_callbackman_GetHandle())); 
-//    
-//    eo_timer_Start(s_eo_theservices.timer, eok_abstimeNOW, 100*eok_reltime1ms, eo_tmrmode_ONESHOT, act);          
-//}
-// 
-// 
-//static void s_services_startupactivation_activate_services_now(void *p)
-//{
-//    // depending on the board number we have something to do which is different
-//    // at first we do motion control, then strain, then skin, then inertials.
-//    
-//    const eOmn_serv_configuration_t * servcfg = NULL;
-//    
-//    if(NULL != (servcfg = eoboardconfig_code2motion_serv_configuration(s_eo_theservices.board)))
-//    {
-//        eo_motioncontrol_Verify(eo_motioncontrol_GetHandle(), servcfg, s_services_startupactivation_after_verify_motion, eobool_true); 
-//    }
-//    else if(NULL != (servcfg = eoboardconfig_code2mais_serv_configuration(s_eo_theservices.board)))
-//    {
-//        eo_mais_Verify(eo_mais_GetHandle(), servcfg, s_services_startupactivation_after_verify_mais, eobool_true); 
-//    }
-//    else if(NULL != (servcfg = eoboardconfig_code2strain_serv_configuration(s_eo_theservices.board)))
-//    {
-//        eo_strain_Verify(eo_strain_GetHandle(), servcfg, s_services_startupactivation_after_verify_strain, eobool_true); 
-//    }
-//    else if(NULL != (servcfg = eoboardconfig_code2skin_serv_configuration(s_eo_theservices.board)))
-//    {
-//        eo_skin_Verify(eo_skin_GetHandle(), servcfg, s_services_startupactivation_after_verify_skin, eobool_true); 
-//    }
-//    else if(NULL != (servcfg = eoboardconfig_code2inertials_serv_configuration(s_eo_theservices.board)))
-//    {
-//        eo_inertials2_Verify(eo_inertials2_GetHandle(), servcfg, s_services_startupactivation_after_verify_inertials, eobool_true); 
-//    } 
-//    else
-//    {   // nothing else to verify .. actually none is activated but in here tehre was nothing to activate
-//        s_eo_theservices.startupactivationstate.allactivated = eobool_true;
-//    }    
-//}
-// 
-// 
-//static eOresult_t s_services_startupactivation_after_verify_motion(EOaService* p, eObool_t operationisok)
-//{
-//    if(eobool_false == operationisok)
-//    {
-//        s_eo_theservices.startupactivationstate.failedservice = eo_service_mc;
-//        return(eores_OK);
-//    }
-//    
-//    const eOmn_serv_configuration_t * servcfg = NULL;
-//    
-//    if(NULL != (servcfg = eoboardconfig_code2mais_serv_configuration(s_eo_theservices.board)))
-//    {
-//        eo_mais_Verify(eo_mais_GetHandle(), servcfg, s_services_startupactivation_after_verify_mais, eobool_true); 
-//    }
-//    else if(NULL != (servcfg = eoboardconfig_code2strain_serv_configuration(s_eo_theservices.board)))
-//    {
-//        eo_strain_Verify(eo_strain_GetHandle(), servcfg, s_services_startupactivation_after_verify_strain, eobool_true); 
-//    }
-//    else if(NULL != (servcfg = eoboardconfig_code2skin_serv_configuration(s_eo_theservices.board)))
-//    {
-//        eo_skin_Verify(eo_skin_GetHandle(), servcfg, s_services_startupactivation_after_verify_skin, eobool_true); 
-//    }
-//    else if(NULL != (servcfg = eoboardconfig_code2inertials_serv_configuration(s_eo_theservices.board)))
-//    {
-//        eo_inertials2_Verify(eo_inertials2_GetHandle(), servcfg, s_services_startupactivation_after_verify_inertials, eobool_true); 
-//    }
-//    else
-//    {   // nothing else to verify ..
-//        s_eo_theservices.startupactivationstate.allactivated = eobool_true;
-//    }
-//    
-//    return(eores_OK);
-//}
-// 
-// 
-//static eOresult_t s_services_startupactivation_after_verify_mais(EOaService* p, eObool_t operationisok)
-//{
-//    if(eobool_false == operationisok)
-//    {
-//        s_eo_theservices.startupactivationstate.failedservice = eo_service_mais;
-//        return(eores_OK);
-//    }
-//         
-//    const eOmn_serv_configuration_t * servcfg = NULL;
-//    
-//    if(NULL != (servcfg = eoboardconfig_code2strain_serv_configuration(s_eo_theservices.board)))
-//    {
-//        eo_strain_Verify(eo_strain_GetHandle(), servcfg, s_services_startupactivation_after_verify_strain, eobool_true); 
-//    }
-//    else if(NULL != (servcfg = eoboardconfig_code2skin_serv_configuration(s_eo_theservices.board)))
-//    {
-//        eo_skin_Verify(eo_skin_GetHandle(), servcfg, s_services_startupactivation_after_verify_skin, eobool_true); 
-//    }
-//    else if(NULL != (servcfg = eoboardconfig_code2inertials_serv_configuration(s_eo_theservices.board)))
-//    {
-//        eo_inertials2_Verify(eo_inertials2_GetHandle(), servcfg, s_services_startupactivation_after_verify_inertials, eobool_true); 
-//    }              
-//    else
-//    {   // nothing else to verify ..
-//        s_eo_theservices.startupactivationstate.allactivated = eobool_true;
-//    }    
-//   
-//    return(eores_OK);
-//}
-// 
-// 
-//static eOresult_t s_services_startupactivation_after_verify_strain(EOaService* p, eObool_t operationisok)
-//{
-//    if(eobool_false == operationisok)
-//    {
-//        s_eo_theservices.startupactivationstate.failedservice = eo_service_strain;
-//        return(eores_OK);
-//    }
-//    
-//    
-//    const eOmn_serv_configuration_t * servcfg = NULL;
-//    
-//    if(NULL != (servcfg = eoboardconfig_code2skin_serv_configuration(s_eo_theservices.board)))
-//    {
-//        eo_skin_Verify(eo_skin_GetHandle(), servcfg, s_services_startupactivation_after_verify_skin, eobool_true); 
-//    }
-//    else if(NULL != (servcfg = eoboardconfig_code2inertials_serv_configuration(s_eo_theservices.board)))
-//    {
-//        eo_inertials2_Verify(eo_inertials2_GetHandle(), servcfg, s_services_startupactivation_after_verify_inertials, eobool_true); 
-//    }              
-//    else
-//    {   // nothing else to verify ..
-//        s_eo_theservices.startupactivationstate.allactivated = eobool_true;
-//    }    
-//   
-//    return(eores_OK);
-//}
-// 
-// 
-//static eOresult_t s_services_startupactivation_after_verify_skin(EOaService* p, eObool_t operationisok)
-//{
-//    if(eobool_false == operationisok)
-//    {
-//        s_eo_theservices.startupactivationstate.failedservice = eo_service_skin;
-//        return(eores_OK);
-//    }
-//    
-//    const eOmn_serv_configuration_t * servcfg = NULL;
-//    
-//    if(NULL != (servcfg = eoboardconfig_code2inertials_serv_configuration(s_eo_theservices.board)))
-//    {
-//        eo_inertials2_Verify(eo_inertials2_GetHandle(), servcfg, s_services_startupactivation_after_verify_inertials, eobool_true); 
-//    }              
-//    else
-//    {   // nothing else to verify .. 
-//        s_eo_theservices.startupactivationstate.allactivated = eobool_true;
-//    }        
-// 
-//    return(eores_OK);
-//}
-// 
-// 
-//static eOresult_t s_services_startupactivation_after_verify_inertials(EOaService* p, eObool_t operationisok)
-//{
-//    if(eobool_false == operationisok)
-//    {
-//        s_eo_theservices.startupactivationstate.failedservice = eo_service_inertial;
-//        return(eores_OK);
-//    }
-//    
-//    // nothing else to verify .. 
-//    s_eo_theservices.startupactivationstate.allactivated = eobool_true;
-//   
-//   
-//    return(eores_OK);
-//}
-// 
-//#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

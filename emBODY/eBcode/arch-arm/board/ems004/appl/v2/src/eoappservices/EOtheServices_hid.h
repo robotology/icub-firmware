@@ -105,6 +105,7 @@ struct EOtheServices_hid
     eObool_t            running[eomn_serv_categories_numberof];  
     eOipv4addr_t        ipaddress;    
     eOservice_startupactivation_state_t startupactivationstate;
+    uint8_t             mcservicetype;
 }; 
 
 
