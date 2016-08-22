@@ -753,7 +753,11 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
             
             // do something with the mc4s....
             
-            p->ctrlobjs.themc4boards = eo_mc4boards_Initialise(NULL);            
+            p->ctrlobjs.themc4boards = eo_mc4boards_Initialise(NULL);       
+
+            eo_mc4boards_LoadShifts(eo_mc4boards_GetHandle(), p->service.servconfig.data.mc.mc4_based.mc4shifts);   
+            eo_mc4boards_LoadBroadcastFlags(eo_mc4boards_GetHandle(), p->service.servconfig.data.mc.mc4_based.broadcastflags);    
+            
             eo_mc4boards_Config(eo_mc4boards_GetHandle());
             
             // init others

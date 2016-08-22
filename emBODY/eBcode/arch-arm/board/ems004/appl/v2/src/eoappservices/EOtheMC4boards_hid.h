@@ -48,16 +48,23 @@ typedef struct
     icubCanProto_position_t min_mc4_motor_pos;
 } eOmc4boards_conv_encoder_t;
 
+typedef struct
+{
+    icubCanProto_velocityShift_t    velshift;
+    icubCanProto_estimShift_t       estimshifts;
+    uint32_t                        broadcastpolicy;
+} eOmc4boards_cansettings_t;   
+
 struct EOtheMC4boards_hid
 {
     eObool_t                    initted;
     eObool_t                    therearemc4s;
     uint8_t                     numofjomos;
-    eOmc4boards_config_t        config;
-    eOmc4boards_config_t        config2use;
     eOcanprot_command_t         command;
     eObool_t                    configured;
     eOmc4boards_conv_encoder_t  convencoder[12];
+    eOmc4boards_config2_t       config2;
+    eOmc4boards_cansettings_t   cansettings;
 }; 
 
 

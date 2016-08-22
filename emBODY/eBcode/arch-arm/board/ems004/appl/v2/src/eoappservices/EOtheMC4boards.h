@@ -39,6 +39,7 @@
 #include "EoCommon.h"
 #include "iCubCanProto_types.h"
 #include "EoMeasures.h"
+#include "EoMotionControl.h"
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
@@ -55,25 +56,10 @@ typedef float eOmc4boards_conv_encoder_offset_t;  /**< expressed in idegree  */
 
 typedef struct
 {
-    icubCanProto_velocityShift_t    velshift;
-    icubCanProto_estimShift_t       estimshifts;
-} eOmc4boards_shiftvalues_t;   
+    eOmc_mc4shifts_t        shifts;
+    uint16_t                broadcastflags; // use an | combination of (1<<x) where x is a value from eOmc_mc4broadcast_t    
+} eOmc4boards_config2_t;
 
-
-enum { eoemc4boards_broadcastpolicylistsize = 4 };
-typedef struct
-{
-    uint8_t values[eoemc4boards_broadcastpolicylistsize];
-} eOmc4boards_broadcastpolicy_t;       
-    
-
-
-
-typedef struct
-{    
-    eOmc4boards_broadcastpolicy_t   broadcastpolicy;  
-    eOmc4boards_shiftvalues_t       shiftvalues;       
-} eOmc4boards_config_t;
 
 typedef enum
 {
@@ -88,7 +74,11 @@ typedef enum
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-extern EOtheMC4boards* eo_mc4boards_Initialise(const eOmc4boards_config_t *cfg);
+extern EOtheMC4boards* eo_mc4boards_Initialise(const eOmc4boards_config2_t *cfg2);
+
+extern eOresult_t eo_mc4boards_LoadShifts(EOtheMC4boards *p, eOmc_mc4shifts_t shifts);
+
+extern eOresult_t eo_mc4boards_LoadBroadcastFlags(EOtheMC4boards *p, uint16_t flags);
 
 extern EOtheMC4boards* eo_mc4boards_GetHandle(void);
 

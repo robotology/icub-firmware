@@ -556,7 +556,11 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb2_eb4 =
         },
         .mc4shifts =
         {
-            0  
+            .velocity               = 8,
+            .estimJointVelocity     = 5,
+            .estimJointAcceleration = 5,
+            .estimMotorVelocity     = 1,
+            .estimMotorAcceleration = 1
         },
         .mc4joints =
         {
@@ -634,7 +638,8 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb2_eb4 =
                 .addr           = 14,
                 .insideindex    = eobrd_caninsideindex_none                    
             }              
-        }
+        },
+        .broadcastflags = (1<<eomc_mc4broadcast_position) | (1<<eomc_mc4broadcast_status) | (1<<eomc_mc4broadcast_print) | (1<<eomc_mc4broadcast_pidvalues)
     }    
 };    
 

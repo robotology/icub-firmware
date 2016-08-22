@@ -85,29 +85,17 @@ static eObool_t s_eo_mc4boards_foundone(void);
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static const eOmc4boards_config_t s_eo_mc4boards_defaultconfig =
-{
-    .broadcastpolicy    =
+static const eOmc4boards_config2_t s_eo_mc4boards_defaultconfig2 =
+{   
+    .shifts =
     {
-        .values     = 
-        { 
-            ICUBCANPROTO_PER_MC_MSG__POSITION, 
-            ICUBCANPROTO_PER_MC_MSG__STATUS, 
-            ICUBCANPROTO_PER_MC_MSG__PRINT, 
-            ICUBCANPROTO_PER_MC_MSG__PID_VAL        
-        }   
+        .velocity               = 8,
+        .estimJointVelocity     = 5,
+        .estimJointAcceleration = 5,
+        .estimMotorVelocity     = 1,
+        .estimMotorAcceleration = 1
     },
-    .shiftvalues    =
-    {    // these values could in future be transmitted by robotInterface. so far they are the correct values in the xml files of eth robots. they are equal for all joints
-        .velshift                           = 8,        //  param VELOCITY.Shifts               
-        .estimshifts  =
-        {
-            .estimShiftJointVel             = 5,        // param VELOCITY.JNT_speed_estimation           
-            .estimShiftJointAcc             = 5,        // param VELOCITY.JNT_accel_estimation             
-            .estimShiftMotorVel             = 1,        // param VELOCITY.MOT_speed_estimation      
-            .estimShiftMotorAcc             = 1         // param VELOCITY.MOT_accer_estimation    
-        }
-    }
+    .broadcastflags = (1<<eomc_mc4broadcast_position) | (1<<eomc_mc4broadcast_status) | (1<<eomc_mc4broadcast_print) | (1<<eomc_mc4broadcast_pidvalues)    
 };
 
 static EOtheMC4boards s_eo_themc4boards = 
@@ -115,11 +103,11 @@ static EOtheMC4boards s_eo_themc4boards =
     .initted            = eobool_false,
     .therearemc4s       = eobool_false,
     .numofjomos         = 0,
-    .config             = {0},
-    .config2use         = {0},
     .command            = {0},
     .configured         = eobool_false,
-    .convencoder        = {0}
+    .convencoder        = {0},
+    .config2            = {0},
+    .cansettings        = {0}
 };
 
 //static const char s_eobj_ownname[] = "EOtheMC4boards";
@@ -130,7 +118,7 @@ static EOtheMC4boards s_eo_themc4boards =
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern EOtheMC4boards* eo_mc4boards_Initialise(const eOmc4boards_config_t *cfg)
+extern EOtheMC4boards* eo_mc4boards_Initialise(const eOmc4boards_config2_t *cfg2)
 {
     if(eobool_true == s_eo_themc4boards.initted)
     {
@@ -147,38 +135,20 @@ extern EOtheMC4boards* eo_mc4boards_Initialise(const eOmc4boards_config_t *cfg)
     }
     else
     {
+        uint8_t i;
+        
         s_eo_themc4boards.therearemc4s = eobool_true;
         
-        if(NULL == cfg)
+        if(NULL == cfg2)
         {
-            cfg = &s_eo_mc4boards_defaultconfig;
+            cfg2 = &s_eo_mc4boards_defaultconfig2;
         }
         
-        memcpy(&s_eo_themc4boards.config, cfg, sizeof(eOmc4boards_config_t));
+        memcpy(&s_eo_themc4boards.config2, cfg2, sizeof(eOmc4boards_config2_t));
         
-        // init .config2use
-        // shiftvalues are not changed
-        memset(&s_eo_themc4boards.config2use, 0, sizeof(eOmc4boards_config_t));
-        // shiftvalues are not changed
-        memcpy(&s_eo_themc4boards.config2use.shiftvalues, &s_eo_themc4boards.config.shiftvalues, sizeof(eOmc4boards_shiftvalues_t));
-        // however we transform broadcast policies into flags
-        uint8_t i;
-        for(i=0; i<eoemc4boards_broadcastpolicylistsize; i++)
-        {
-            if(0 == s_eo_themc4boards.config.broadcastpolicy.values[i])
-            {
-                continue;
-            }
-            
-            if(s_eo_themc4boards.config.broadcastpolicy.values[i] < 9)
-            {
-                s_eo_themc4boards.config2use.broadcastpolicy.values[0] |= (1 <<(s_eo_themc4boards.config.broadcastpolicy.values[i]-1));
-            }
-            else if(s_eo_themc4boards.config.broadcastpolicy.values[i] < 17)
-            {
-                s_eo_themc4boards.config2use.broadcastpolicy.values[1] |= (1<<(s_eo_themc4boards.config.broadcastpolicy.values[i]-1));
-            }        
-        }
+        eo_mc4boards_LoadShifts(&s_eo_themc4boards, cfg2->shifts);
+        eo_mc4boards_LoadBroadcastFlags(&s_eo_themc4boards, cfg2->broadcastflags);
+        
         
         s_eo_themc4boards.numofjomos = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);      
         
@@ -208,6 +178,63 @@ extern eObool_t eo_mc4boards_AreThere(EOtheMC4boards *p)
     return(s_eo_themc4boards.therearemc4s);
 }
 
+
+extern eOresult_t eo_mc4boards_LoadShifts(EOtheMC4boards *p, eOmc_mc4shifts_t shifts)
+{   
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    if(eobool_false == s_eo_themc4boards.therearemc4s)
+    {   // nothing to do because we dont have a mc4 board
+        return(eores_OK);
+    }
+    
+       
+    // now, i do things. 
+    
+    s_eo_themc4boards.config2.shifts = shifts;
+    
+    
+    s_eo_themc4boards.cansettings.velshift = shifts.velocity;
+    s_eo_themc4boards.cansettings.estimshifts.estimShiftJointAcc = shifts.estimJointAcceleration;
+    s_eo_themc4boards.cansettings.estimshifts.estimShiftJointVel = shifts.estimJointVelocity;
+    s_eo_themc4boards.cansettings.estimshifts.estimShiftMotorAcc = shifts.estimMotorAcceleration;
+    s_eo_themc4boards.cansettings.estimshifts.estimShiftMotorVel = shifts.estimMotorVelocity;
+    
+    return(eores_OK);       
+}
+
+
+extern eOresult_t eo_mc4boards_LoadBroadcastFlags(EOtheMC4boards *p, uint16_t flags)
+{   
+    if(NULL == p)
+    {
+        return(eores_NOK_nullpointer);
+    }
+    
+    if(eobool_false == s_eo_themc4boards.therearemc4s)
+    {   // nothing to do because we dont have a mc4 board
+        return(eores_OK);
+    }
+    
+       
+    // now, i do things. 
+    s_eo_themc4boards.config2.broadcastflags = flags;
+    
+    s_eo_themc4boards.cansettings.broadcastpolicy = 0;
+    
+    uint8_t tmp = flags & 0xff;
+    tmp >>= 1;
+    s_eo_themc4boards.cansettings.broadcastpolicy =  tmp;
+
+    // ....
+    
+    return(eores_OK);       
+}
+
+
 extern eOresult_t eo_mc4boards_BroadcastStart(EOtheMC4boards *p)
 {   
     if(NULL == p)
@@ -226,7 +253,7 @@ extern eOresult_t eo_mc4boards_BroadcastStart(EOtheMC4boards *p)
     // set broadcast policy to what in configuration
     s_eo_themc4boards.command.class = eocanprot_msgclass_pollingMotorControl;    
     s_eo_themc4boards.command.type  = ICUBCANPROTO_POL_MC_CMD__SET_BCAST_POLICY;
-    s_eo_themc4boards.command.value = &s_eo_themc4boards.config2use.broadcastpolicy;    
+    s_eo_themc4boards.command.value = &s_eo_themc4boards.cansettings.broadcastpolicy;    
     uint8_t i = 0;
     for(i=0; i<s_eo_themc4boards.numofjomos; i++)
     {
@@ -255,7 +282,7 @@ extern eOresult_t eo_mc4boards_BroadcastStop(EOtheMC4boards *p)
     // now, i do things. 
     
     // set broadcast policy to silence
-    eOmc4boards_broadcastpolicy_t silence = {0};
+    uint32_t silence = 0;
     s_eo_themc4boards.command.class = eocanprot_msgclass_pollingMotorControl;    
     s_eo_themc4boards.command.type  = ICUBCANPROTO_POL_MC_CMD__SET_BCAST_POLICY;
     s_eo_themc4boards.command.value = &silence;    
@@ -338,14 +365,14 @@ extern eOresult_t eo_mc4boards_Config(EOtheMC4boards *p)
     
         // 1. velocity shift
         s_eo_themc4boards.command.type  = ICUBCANPROTO_POL_MC_CMD__SET_VEL_SHIFT;
-        s_eo_themc4boards.command.value = &s_eo_themc4boards.config2use.shiftvalues.velshift;    
+        s_eo_themc4boards.command.value = &s_eo_themc4boards.cansettings.velshift;    
         // ok, now i send the value to the relevant address
         eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &s_eo_themc4boards.command, id32);
 
         // 2. speed estim shifts
         s_eo_themc4boards.command.type  = ICUBCANPROTO_POL_MC_CMD__SET_SPEED_ESTIM_SHIFT;
         //s_eo_themc4boards.command.value = &estimshift;    
-        s_eo_themc4boards.command.value = &s_eo_themc4boards.config2use.shiftvalues.estimshifts; 
+        s_eo_themc4boards.command.value = &s_eo_themc4boards.cansettings.estimshifts; 
         eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &s_eo_themc4boards.command, id32);     
     }
     
@@ -450,13 +477,13 @@ extern icubCanProto_velocity_t eo_mc4boards_Convert_Velocity_toCAN(EOtheMC4board
         case eomc4_velocitycontext_toCAN_signed:
         {   // it is a normal conversion: we convert to ticks/ms and the we apply the shift fatcor
             temp /= 1000.0f;                                                    // from ticks/sec to ticks/ms
-            temp *= (1 << s_eo_themc4boards.config2use.shiftvalues.velshift);   // apply the shift for canbus;
+            temp *= (1 << s_eo_themc4boards.cansettings.velshift);   // apply the shift for canbus;
         } break;
         
         case eomc4_velocitycontext_toCAN_unsigned:
         {   // it is a normal conversion: we convert to ticks/ms and the we apply the shift fatcor
             temp /= 1000.0f;                                                    // from ticks/sec to ticks/ms
-            temp *= (1 << s_eo_themc4boards.config2use.shiftvalues.velshift);   // apply the shift for canbus;
+            temp *= (1 << s_eo_themc4boards.cansettings.velshift);   // apply the shift for canbus;
             temp = __fabs(temp);
         } break;        
 
@@ -489,7 +516,7 @@ extern eOmeas_velocity_t eo_mc4boards_Convert_Velocity_fromCAN(EOtheMC4boards *p
     }
     
     float temp = 1000.0f * (float) vel;     // from ticks/ms to ticks/sec
-    temp /= (1 << s_eo_themc4boards.config2use.shiftvalues.estimshifts.estimShiftJointVel); // now we divide by (1 << estim shift vel joint)
+    temp /= (1 << s_eo_themc4boards.cansettings.estimshifts.estimShiftJointVel); // now we divide by (1 << estim shift vel joint)
     temp /= s_eo_themc4boards.convencoder[joint].factor; // now we transform into icubdeg/sec
 
 
@@ -538,7 +565,7 @@ extern eOmeas_acceleration_t eo_mc4boards_Convert_Acceleration_fromCAN(EOtheMC4b
     }
     // it is OK to divide by the 2^(estimShiftJointVel + estimShiftJointAcc). The MC4 shifts left by this sum of terms.
     float temp = 1000000.0f * (float)acc;   // from ticks/ms^2 to ticks/sec^2
-    temp /= (1 << (s_eo_themc4boards.config2use.shiftvalues.estimshifts.estimShiftJointVel + s_eo_themc4boards.config2use.shiftvalues.estimshifts.estimShiftJointAcc)); // now we divide by (1 << estim shift vel + acc)
+    temp /= (1 << (s_eo_themc4boards.cansettings.estimshifts.estimShiftJointVel + s_eo_themc4boards.cansettings.estimshifts.estimShiftJointAcc)); // now we divide by (1 << estim shift vel + acc)
     temp /= s_eo_themc4boards.convencoder[joint].factor; // now we transform into icubdeg/sec^2
 
     temp = EOMC4BOARDS_CLIP_INT32(temp);
@@ -560,7 +587,7 @@ extern icubCanProto_acceleration_t eo_mc4boards_Convert_Acceleration_toCAN(EOthe
 
     float temp = (float)acc * (s_eo_themc4boards.convencoder[joint].factor); // transform from icubdeg/sec^2 to ticks/sec^2
     temp /= (1000000.0f); // transform from ticks/sec^2 to ticks/ms^2
-    temp *= (1 << s_eo_themc4boards.config2use.shiftvalues.velshift); // apply the shift for canbus  
+    temp *= (1 << s_eo_themc4boards.cansettings.velshift); // apply the shift for canbus  
     
     temp = EOMC4BOARDS_CLIP_INT16(temp);   
     
