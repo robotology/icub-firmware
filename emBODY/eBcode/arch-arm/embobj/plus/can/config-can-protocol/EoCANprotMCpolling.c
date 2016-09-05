@@ -788,6 +788,49 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_MOTOR_CONFIG(eOcanpr
 }
 
 
+extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_POS_STICTION_PARAMS(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
+{
+    eOmc_PID_t *pid = (eOmc_PID_t*) descriptor->cmd.value;
+    s_former_POL_MC_prepare_frame(descriptor, frame, 5, ICUBCANPROTO_POL_MC_CMD__SET_POS_STICTION_PARAMS);
+    *((int16_t*)(&frame->data[1])) = (int16_t) pid->stiction_up_val;
+    *((int16_t*)(&frame->data[3])) = (int16_t) pid->stiction_down_val;
+    return(eores_OK); 
+
+}
+//extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__SET_POS_STICTION_PARAMS(eOcanframe_t *frame, eOcanport_t port);//unused
+
+extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__GET_POS_STICTION_PARAMS(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
+{
+    s_former_POL_MC_prepare_frame(descriptor, frame, 1, ICUBCANPROTO_POL_MC_CMD__GET_POS_STICTION_PARAMS);
+    return(eores_OK);
+}
+extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_POS_STICTION_PARAMS(eOcanframe_t *frame, eOcanport_t port)
+{
+    return(s_parser_POL_MC_CMD_getpid_etc(frame, port, ICUBCANPROTO_POL_MC_CMD__GET_POS_STICTION_PARAMS));
+}
+
+extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_TORQUE_STICTION_PARAMS(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
+{
+    eOmc_PID_t *pid = (eOmc_PID_t*) descriptor->cmd.value;
+    s_former_POL_MC_prepare_frame(descriptor, frame, 5, ICUBCANPROTO_POL_MC_CMD__SET_TORQUE_STICTION_PARAMS);
+    *((int16_t*)(&frame->data[1])) = (int16_t) pid->stiction_up_val;
+    *((int16_t*)(&frame->data[3])) = (int16_t) pid->stiction_down_val;
+    return(eores_OK);
+}
+//extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__SET_TORQUE_STICTION_PARAMS(eOcanframe_t *frame, eOcanport_t port);//unused
+
+extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__GET_TORQUE_STICTION_PARAMS(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
+{
+    s_former_POL_MC_prepare_frame(descriptor, frame, 1, ICUBCANPROTO_POL_MC_CMD__GET_POS_STICTION_PARAMS);
+    return(eores_OK);
+}
+extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_TORQUE_STICTION_PARAMS(eOcanframe_t *frame, eOcanport_t port)
+{
+    return(s_parser_POL_MC_CMD_getpid_etc(frame, port, ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_STICTION_PARAMS));
+}
+
+
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
@@ -966,8 +1009,8 @@ static eOresult_t s_parser_POL_MC_CMD_getposition(eOcanframe_t *frame, eOcanport
 }
 
 
-// cmd can be: ICUBCANPROTO_POL_MC_CMD__GET_POS_PID, ICUBCANPROTO_POL_MC_CMD__GET_POS_PIDLIMITS, 
-//             ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_PID, ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_PIDLIMITS
+// cmd can be: ICUBCANPROTO_POL_MC_CMD__GET_POS_PID, ICUBCANPROTO_POL_MC_CMD__GET_POS_PIDLIMITS, ICUBCANPROTO_POL_MC_CMD__GET_POS_STICTION_PARAMS
+//             ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_PID, ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_PIDLIMITS, ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_STICTION_PARAMS
 static eOresult_t s_parser_POL_MC_CMD_getpid_etc(eOcanframe_t *frame, eOcanport_t port, uint8_t type)
 {    
     eOprotIndex_t index = EOK_uint08dummy;  
@@ -989,11 +1032,13 @@ static eOresult_t s_parser_POL_MC_CMD_getpid_etc(eOcanframe_t *frame, eOcanport_
     switch(type)
     {
         case ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_PID:
-        case ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_PIDLIMITS:     tag = eoprot_tag_mc_joint_config_pidtorque;  
+        case ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_PIDLIMITS:
+        case ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_STICTION_PARAMS:    tag = eoprot_tag_mc_joint_config_pidtorque;  
         break;
 
         case ICUBCANPROTO_POL_MC_CMD__GET_POS_PID:
-        case ICUBCANPROTO_POL_MC_CMD__GET_POS_PIDLIMITS:        tag = eoprot_tag_mc_joint_config_pidposition;  
+        case ICUBCANPROTO_POL_MC_CMD__GET_POS_PIDLIMITS:
+        case ICUBCANPROTO_POL_MC_CMD__GET_POS_STICTION_PARAMS:       tag = eoprot_tag_mc_joint_config_pidposition;  
         break; 
 
         default:                                                tag = eoprot_tag_none;
@@ -1030,12 +1075,17 @@ static eOresult_t s_parser_POL_MC_CMD_getpid_etc(eOcanframe_t *frame, eOcanport_
         pid->ki = *((int16_t*)&frame->data[3]);
         pid->kd = *((int16_t*)&frame->data[5]); 
     }
-    else// no need to verify that type value is a LIMITS i already did it in the switch-case part.
+    else if((ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_PIDLIMITS == type) || (ICUBCANPROTO_POL_MC_CMD__GET_POS_PIDLIMITS == type))
     {
         pid->offset = *((int16_t*)(&frame->data[1]));
         pid->limitonoutput = *((int16_t*)(&frame->data[3]));
         pid->limitonintegral = *((int16_t*)(&frame->data[5]));  
-    }    
+    }
+    else // no need to verify that type value is a LIMITS i already did it in the switch-case part.
+    {
+        pid->stiction_up_val   = *((int16_t*)&frame->data[1]);
+        pid->stiction_down_val = *((int16_t*)&frame->data[3]);
+    }
     
 
     

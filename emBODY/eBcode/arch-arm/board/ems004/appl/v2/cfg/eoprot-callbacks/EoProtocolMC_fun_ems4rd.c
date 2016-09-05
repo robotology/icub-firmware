@@ -180,6 +180,11 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
         command.type  = ICUBCANPROTO_POL_MC_CMD__SET_POS_PIDLIMITS;
         command.value = &cfg->pidposition;
         eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32); 
+        
+        command.type  = ICUBCANPROTO_POL_MC_CMD__SET_POS_STICTION_PARAMS;
+        command.value = &cfg->pidposition;
+        eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32); 
+
 
 
         // 2) send torque pid
@@ -190,6 +195,11 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
         command.type  = ICUBCANPROTO_POL_MC_CMD__SET_TORQUE_PIDLIMITS;
         command.value = &cfg->pidtorque;
         eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);     
+        
+        command.type  = ICUBCANPROTO_POL_MC_CMD__SET_TORQUE_STICTION_PARAMS;
+        command.value = &cfg->pidposition;
+        eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32); 
+
         
         // 3) send velocity pid: currently is not send: neither MC4 nor 2foc use pid velocity.
         
@@ -1606,7 +1616,9 @@ static void s_onpid(const EOnv* nv, const eOropdescriptor_t* rd, pid_type_t type
     static const uint8_t cmd_set_pidlimits[2] = {ICUBCANPROTO_POL_MC_CMD__SET_POS_PIDLIMITS, ICUBCANPROTO_POL_MC_CMD__SET_TORQUE_PIDLIMITS};
     static const uint8_t cmd_get_pid[2] = {ICUBCANPROTO_POL_MC_CMD__GET_POS_PID, ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_PID};
     static const uint8_t cmd_get_pidlimits[2] = {ICUBCANPROTO_POL_MC_CMD__GET_POS_PIDLIMITS, ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_PIDLIMITS};
-        
+    static const uint8_t cmd_set_stiction[2] = {ICUBCANPROTO_POL_MC_CMD__SET_POS_STICTION_PARAMS, ICUBCANPROTO_POL_MC_CMD__SET_TORQUE_STICTION_PARAMS};
+    static const uint8_t cmd_get_stiction[2] = {ICUBCANPROTO_POL_MC_CMD__GET_POS_STICTION_PARAMS, ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_STICTION_PARAMS};
+    
     eOmc_PID_t *pid = (eOmc_PID_t*)rd->data;
     eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
     
@@ -1621,6 +1633,10 @@ static void s_onpid(const EOnv* nv, const eOropdescriptor_t* rd, pid_type_t type
         eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);    
         
         command.type  = cmd_set_pidlimits[type]; // ICUBCANPROTO_POL_MC_CMD__SET_POS_PIDLIMITS or ..
+        command.value = pid;
+        eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32); 
+        
+        command.type  = cmd_set_stiction[type]; // ICUBCANPROTO_POL_MC_CMD__SET_POS_STICTION_PARAMS or ..
         command.value = pid;
         eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32); 
         
@@ -1643,7 +1659,7 @@ static void s_onpid(const EOnv* nv, const eOropdescriptor_t* rd, pid_type_t type
             eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
             return;
         }
-        param->p08_1 = 2;       // we expect two can frames
+        param->p08_1 = 3;       // we expect two can frames
         param->p08_2 = 0;       // and we havent received any yet
 
         command.type  = cmd_get_pid[type]; // ICUBCANPROTO_POL_MC_CMD__GET_POS_PID or ..
@@ -1651,6 +1667,10 @@ static void s_onpid(const EOnv* nv, const eOropdescriptor_t* rd, pid_type_t type
         eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);    
         
         command.type  = cmd_get_pidlimits[type]; // ICUBCANPROTO_POL_MC_CMD__GET_POS_PIDLIMITS or ..
+        command.value = NULL;
+        eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32); 
+        
+        command.type  = cmd_get_stiction[type]; // ICUBCANPROTO_POL_MC_CMD__GET_POS_STICTION_PARAMS or ..
         command.value = NULL;
         eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32); 
         
