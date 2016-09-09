@@ -26,6 +26,7 @@ extern "C" {
 #include "EoCommon.h"
 
 #include "EOtheEncoderReader.h"
+#include "EoMotionControl.h"
 
 #include "EOemsControllerCfg.h"
 
@@ -55,7 +56,7 @@ typedef struct //AbsEncoder
     //int32_t offset;
     //int32_t delta;
     
-    eOmc_EncoderType_t type;
+    eOmc_encoder_t type;
 
     uint32_t partial_timer;
     int32_t  partial_space;

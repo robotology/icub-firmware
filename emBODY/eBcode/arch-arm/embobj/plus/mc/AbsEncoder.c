@@ -48,7 +48,7 @@ void AbsEncoder_init(AbsEncoder* o)
 {
     o->ID = 0;
     
-    o->type = eomc_encoder_NONE;
+    o->type = eomc_enc_aea;
     
     o->spike_cnt_limit = 32767;
     o->spike_mag_limit = 32767;
@@ -95,7 +95,7 @@ void AbsEncoder_destroy(AbsEncoder* o)
     DELETE(o);
 }
 
-void AbsEncoder_config(AbsEncoder* o, uint8_t ID/*, eOmc_EncoderType_t type*/, int32_t resolution, int16_t spike_mag_limit, uint16_t spike_cnt_limit)
+void AbsEncoder_config(AbsEncoder* o, uint8_t ID/*, eOmc_encoder_t type*/, int32_t resolution, int16_t spike_mag_limit, uint16_t spike_cnt_limit)
 {
     o->ID = ID;
     
@@ -275,12 +275,12 @@ static void AbsEncoder_position_init(AbsEncoder* o, uint16_t position)
     
     switch(o->type)
     {
-        case eomc_encoder_AEA:
+        case eomc_enc_aea:
             AbsEncoder_position_init_aea(o, position);
             break;
         
-        case eomc_encoder_MAIS:
-        case eomc_encoder_HALL_ADC:
+        case eomc_enc_mais:
+        case eomc_enc_absanalog:
             AbsEncoder_position_init_others(o, position);
             break;
             
@@ -594,7 +594,7 @@ static void AbsEncoder_send_error(uint8_t id, eOerror_value_MC_t err_id, uint64_
 BOOL AbsEncoder_is_in_fault(AbsEncoder* o)
 {
     
-    if(eomc_encoder_MAIS == o->type)
+    if(eomc_enc_mais == o->type)
     {
         if(!eo_mais_isAlive(eo_mais_GetHandle()))
         {

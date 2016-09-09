@@ -42,7 +42,7 @@ extern "C" {
 
 #include "EoCommon.h"
 #include "EoProtocol.h"
-
+#include "EoMotionControl.h"
 #include "hal_spiencoder.h"
 
 #include "EOtheServices.h"

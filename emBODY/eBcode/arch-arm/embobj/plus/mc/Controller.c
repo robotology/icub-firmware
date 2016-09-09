@@ -20,7 +20,6 @@
 
 #include "EOtheMemoryPool.h"
 
-//#include "EOmcController.h"
 
 #include "EOemsControllerCfg.h"
 
@@ -316,7 +315,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
             {
                 for (int e=0; e<2; ++e)
                 {
-                    o->absEncoder[k*2+e].type = eomc_encoder_AEA;
+                    o->absEncoder[k*2+e].type = eomc_enc_aea;
                     o->absEncoder[k*2+e].fake = FALSE;
                 }
                 break;
@@ -325,35 +324,35 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
             {
                 for (int e=0; e<3; ++e)
                 {
-                    o->absEncoder[k*3+e].type = eomc_encoder_AEA;
+                    o->absEncoder[k*3+e].type = eomc_enc_aea;
                     o->absEncoder[k*3+e].fake = FALSE;
                 }
                 break;
             }                
             case eomc_enc_aea:
             {
-                o->absEncoder[k].type = eomc_encoder_AEA;
+                o->absEncoder[k].type = eomc_enc_aea;
                 o->absEncoder[k].fake = FALSE;
                 break;
             }
             
             case eomc_enc_mais:
             {
-                o->absEncoder[k].type = eomc_encoder_MAIS;
+                o->absEncoder[k].type = eomc_enc_mais;
                 o->absEncoder[k].fake = FALSE;
                 break;
             }
             
             case eomc_enc_absanalog:
             {
-                o->absEncoder[k].type = eomc_encoder_HALL_ADC;
+                o->absEncoder[k].type = eomc_enc_absanalog;
                 o->absEncoder[k].fake = FALSE;
                 break;
             }
             default:
             {
                 o->absEncoder[k].fake = TRUE;
-                o->absEncoder[k].type = eomc_encoder_NONE;
+                o->absEncoder[k].type = eomc_enc_aea;
                 break;
             }
         };
@@ -911,7 +910,7 @@ void MController_config_joint(int j, eOmc_joint_config_t* config) //
     
     if (j==3 && o->part_type==eomc_ctrlboard_CER_LOWER_ARM)
     {
-        AbsEncoder_config(o->absEncoder+j, j, /*(eOmc_EncoderType_t)config->jntEncoderType,*/ config->jntEncoderResolution, 64*AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
+        AbsEncoder_config(o->absEncoder+j, j, /*(eOmc_encoder_t)config->jntEncoderType,*/ config->jntEncoderResolution, 64*AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
     }
     else if (j==1 && o->part_type==eomc_ctrlboard_CER_NECK)
     {
@@ -919,15 +918,15 @@ void MController_config_joint(int j, eOmc_joint_config_t* config) //
     }
     else if (o->part_type==eomc_ctrlboard_CER_HAND)
     {
-        AbsEncoder_config(o->absEncoder+j*3,   j, /*(eOmc_EncoderType_t)config->jntEncoderType,*/ config->jntEncoderResolution, AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
-        AbsEncoder_config(o->absEncoder+j*3+1, j, /*(eOmc_EncoderType_t)config->jntEncoderType,*/ config->jntEncoderResolution, AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
-        AbsEncoder_config(o->absEncoder+j*3+2, j, /*(eOmc_EncoderType_t)config->jntEncoderType,*/ config->jntEncoderResolution, AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
+        AbsEncoder_config(o->absEncoder+j*3,   j, /*(eOmc_encoder_t)config->jntEncoderType,*/ config->jntEncoderResolution, AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
+        AbsEncoder_config(o->absEncoder+j*3+1, j, /*(eOmc_encoder_t)config->jntEncoderType,*/ config->jntEncoderResolution, AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
+        AbsEncoder_config(o->absEncoder+j*3+2, j, /*(eOmc_encoder_t)config->jntEncoderType,*/ config->jntEncoderResolution, AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
     }
     else
     {
         int16_t spike_mag_limit;
         uint16_t spike_cnt_limit;
-        if((config->jntEncoderType == eomc_encoder_MAIS) || (config->jntEncoderType == eomc_encoder_HALL_ADC))
+        if((config->jntEncoderType == eomc_enc_mais) || (config->jntEncoderType == eomc_enc_absanalog))
         {
             spike_mag_limit = 0;
             spike_cnt_limit = 0;
@@ -938,7 +937,7 @@ void MController_config_joint(int j, eOmc_joint_config_t* config) //
             spike_cnt_limit = AEA_DEFAULT_SPIKE_CNT_LIMIT;
         }
             
-        AbsEncoder_config(o->absEncoder+j, j, /*(eOmc_EncoderType_t)config->jntEncoderType,*/ config->jntEncoderResolution, spike_mag_limit, spike_cnt_limit);
+        AbsEncoder_config(o->absEncoder+j, j, /*(eOmc_encoder_t)config->jntEncoderType,*/ config->jntEncoderResolution, spike_mag_limit, spike_cnt_limit);
     }
 }
 
