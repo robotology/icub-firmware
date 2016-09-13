@@ -428,8 +428,21 @@ extern void Motor_do_calibration_hard_stop(Motor* o)
     {
         o->output = 0;
         o->pos_calib_offset = (o->pos_fbk - o->hardstop_calibdata.zero);
+        //reset value of position
+        o->pos_fbk = o->pos_fbk - o->pos_calib_offset;
+        o->pos_fbk_old = 0;
+        
+        //debug code
+        char message[150];
+        snprintf(message, sizeof(message), "Hw lim reached: cp%d cz%d co%d", o->pos_fbk, o->hardstop_calibdata.zero, o->pos_calib_offset);
+        send_debug_message(message, o->ID, 0, 0);
+        
+        
+       
         o->not_calibrated = FALSE;
         Motor_hardStopCalbData_reset(o);
+        
+        
     }
     else
     {
