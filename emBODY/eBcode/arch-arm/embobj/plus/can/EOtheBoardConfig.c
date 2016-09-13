@@ -1046,7 +1046,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_neck =
                         .pos    = eomc_pos_none
                     }
                 },
-                { // joint 1: second ==> neck roll
+                { // joint 1: second ==> neck yaw
                     .actuator.pwm   =
                     {
                         .port   = eobrd_port_mc4plusP2              
@@ -1058,7 +1058,7 @@ static const eOmn_serv_configuration_t s_serv_config_mc_cer_neck =
                         .pos    = eomc_pos_atjoint
                     },
                     .encoder2    =
-                    {
+                    {   
                         .type   = eomc_enc_none,
                         .port   = 0, 
                         .pos    = eomc_pos_none
