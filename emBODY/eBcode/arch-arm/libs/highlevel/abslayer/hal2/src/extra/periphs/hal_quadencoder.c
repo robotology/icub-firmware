@@ -68,11 +68,12 @@
 
 //#define ENCODER_PPR 28672-1// 14400-1 //(for LCORE with 900cpr disk and x4 interpolation)
 #define ENCODER_PPR (256*1000)
-#define ENCODER_START_VAL (3000000)
-#define ENCODER1_TIMER TIM3
-#define ENCODER2_TIMER TIM2
-#define ENCODER3_TIMER TIM4
-#define ENCODER4_TIMER TIM5
+#define ENCODER_START_VAL_TIM32BIT (3000000)
+#define ENCODER_START_VAL_TIM16BIT (32000)
+#define ENCODER1_TIMER TIM3 //16 bits
+#define ENCODER2_TIMER TIM2 //32 bits
+#define ENCODER3_TIMER TIM4 //16 bits
+#define ENCODER4_TIMER TIM5 //32 bits
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -201,7 +202,7 @@ static hal_result_t s_hal_quadencoder_init_all(void)
  // TIM_ClearFlag(ENCODER1_TIMER, TIM_FLAG_Update);
  // TIM_ITConfig(ENCODER2_TIMER, TIM_IT_Update, ENABLE);
   //Reset counter
-  ENCODER1_TIMER->CNT = ENCODER_START_VAL;
+  ENCODER1_TIMER->CNT = ENCODER_START_VAL_TIM16BIT;
   
   TIM_Cmd(ENCODER1_TIMER, ENABLE);
 
@@ -259,7 +260,7 @@ static hal_result_t s_hal_quadencoder_init_all(void)
   TIM_ClearFlag(ENCODER2_TIMER, TIM_FLAG_Update);
   TIM_ITConfig(ENCODER2_TIMER, TIM_IT_Update, ENABLE);
   //Reset counter
-  ENCODER2_TIMER->CNT = ENCODER_START_VAL;
+  ENCODER2_TIMER->CNT = ENCODER_START_VAL_TIM32BIT;
   
   TIM_Cmd(ENCODER2_TIMER, ENABLE);
 }
@@ -308,7 +309,7 @@ static hal_result_t s_hal_quadencoder_init_all(void)
  // TIM_ClearFlag(ENCODER3_TIMER, TIM_FLAG_Update);
  // TIM_ITConfig(ENCODER3_TIMER, TIM_IT_Update, ENABLE);
   //Reset counter
-  ENCODER3_TIMER->CNT = ENCODER_START_VAL;
+  ENCODER3_TIMER->CNT = ENCODER_START_VAL_TIM16BIT;
   
   TIM_Cmd(ENCODER3_TIMER, ENABLE);
 }
@@ -357,7 +358,7 @@ static hal_result_t s_hal_quadencoder_init_all(void)
  // TIM_ClearFlag(ENCODER4_TIMER, TIM_FLAG_Update);
  // TIM_ITConfig(ENCODER4_TIMER, TIM_IT_Update, ENABLE);
   //Reset counter
-  ENCODER4_TIMER->CNT = ENCODER_START_VAL;
+  ENCODER4_TIMER->CNT = ENCODER_START_VAL_TIM32BIT;
   
   TIM_Cmd(ENCODER4_TIMER, ENABLE);
 }	
@@ -505,7 +506,7 @@ extern hal_result_t hal_quadencoder_init(hal_quadencoder_t id)
             // TIM_ClearFlag(ENCODER1_TIMER, TIM_FLAG_Update);
             // TIM_ITConfig(ENCODER2_TIMER, TIM_IT_Update, ENABLE);
             //Reset counter
-            ENCODER1_TIMER->CNT = ENCODER_START_VAL;
+            ENCODER1_TIMER->CNT = ENCODER_START_VAL_TIM16BIT;
               
             TIM_Cmd(ENCODER1_TIMER, ENABLE);
             break;
@@ -571,7 +572,7 @@ extern hal_result_t hal_quadencoder_init(hal_quadencoder_t id)
             // TIM_ClearFlag(ENCODER2_TIMER, TIM_FLAG_Update);
             // TIM_ITConfig(ENCODER2_TIMER, TIM_IT_Update, ENABLE);
             //Reset counter
-            ENCODER2_TIMER->CNT = ENCODER_START_VAL;
+            ENCODER2_TIMER->CNT = ENCODER_START_VAL_TIM32BIT;
               
             TIM_Cmd(ENCODER2_TIMER, ENABLE);
             break;
@@ -622,7 +623,7 @@ extern hal_result_t hal_quadencoder_init(hal_quadencoder_t id)
              // TIM_ClearFlag(ENCODER3_TIMER, TIM_FLAG_Update);
              // TIM_ITConfig(ENCODER3_TIMER, TIM_IT_Update, ENABLE);
              //Reset counter
-             ENCODER3_TIMER->CNT = ENCODER_START_VAL;
+             ENCODER3_TIMER->CNT = ENCODER_START_VAL_TIM16BIT;
               
              TIM_Cmd(ENCODER3_TIMER, ENABLE);
              break;
@@ -672,7 +673,7 @@ extern hal_result_t hal_quadencoder_init(hal_quadencoder_t id)
              // TIM_ClearFlag(ENCODER4_TIMER, TIM_FLAG_Update);
              // TIM_ITConfig(ENCODER4_TIMER, TIM_IT_Update, ENABLE);
              //Reset counter
-             ENCODER4_TIMER->CNT = ENCODER_START_VAL;
+             ENCODER4_TIMER->CNT = ENCODER_START_VAL_TIM32BIT;
               
              TIM_Cmd(ENCODER4_TIMER, ENABLE);
              break;
@@ -821,16 +822,16 @@ extern void hal_quadencoder_reset_counter(hal_quadencoder_t id)
     switch (id)
     {
         case 0:
-            TIM_SetCounter(ENCODER1_TIMER,ENCODER_START_VAL);
+            TIM_SetCounter(ENCODER1_TIMER,ENCODER_START_VAL_TIM16BIT);
             break;
         case 1:
-            TIM_SetCounter(ENCODER2_TIMER,ENCODER_START_VAL);
+            TIM_SetCounter(ENCODER2_TIMER,ENCODER_START_VAL_TIM32BIT);
             break;
         case 2:
-            TIM_SetCounter(ENCODER3_TIMER,ENCODER_START_VAL);
+            TIM_SetCounter(ENCODER3_TIMER,ENCODER_START_VAL_TIM16BIT);
             break;
         case 3:
-            TIM_SetCounter(ENCODER4_TIMER,ENCODER_START_VAL);
+            TIM_SetCounter(ENCODER4_TIMER,ENCODER_START_VAL_TIM16BIT);
             break;
         default:
             break;
