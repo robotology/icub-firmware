@@ -878,6 +878,11 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
         }
         case eomc_calibration_type5_hard_stops:
         {
+//            //Debug code
+//            char message[150];
+//            snprintf(message, sizeof(message), "calib cmd rec: pwm%d cz%d", calibrator->params.type5.pwmlimit, calibrator->params.type5.calibrationZero);
+//            JointSet_send_debug_message(message, e);
+            
             BOOL ret = Motor_calibrate_moving2Hardstop(o->motor+e, calibrator->params.type5.pwmlimit, calibrator->params.type5.calibrationZero);
             
             if(!ret)
