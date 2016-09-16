@@ -831,7 +831,7 @@ extern void hal_quadencoder_reset_counter(hal_quadencoder_t id)
             TIM_SetCounter(ENCODER3_TIMER,ENCODER_START_VAL_TIM16BIT);
             break;
         case 3:
-            TIM_SetCounter(ENCODER4_TIMER,ENCODER_START_VAL_TIM16BIT);
+            TIM_SetCounter(ENCODER4_TIMER,ENCODER_START_VAL_TIM32BIT);
             break;
         default:
             break;
