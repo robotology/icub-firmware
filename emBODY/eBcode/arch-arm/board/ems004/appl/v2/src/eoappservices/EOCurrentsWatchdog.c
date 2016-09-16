@@ -210,7 +210,6 @@ extern void eo_currents_watchdog_Tick(EOCurrentsWatchdog* p, int16_t voltage, in
         //error flags signalling is done internally
         //s_eo_currents_watchdog_CheckSpike(i, current_value);
         
-        //VALE: I disabled check I2T until I have nominal and peack current values
         s_eo_currents_watchdog_CheckI2T(i, current_value);
         
 

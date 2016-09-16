@@ -480,20 +480,20 @@ const eOcanprot_functions_t s_eo_canprot_functions_pollingMotorControl[] =
         .parser     = NULL
     }, 
     {   // 093      ICUBCANPROTO_POL_MC_CMD__SET_POS_STICTION_PARAMS
-        .former     = NULL,
+        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_POS_STICTION_PARAMS,
         .parser     = NULL
     },        
     {   // 094      ICUBCANPROTO_POL_MC_CMD__GET_POS_STICTION_PARAMS        
-        .former     = NULL,
-        .parser     = NULL
+        .former     = eocanprotMCpolling_former_POL_MC_CMD__GET_POS_STICTION_PARAMS,
+        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__GET_POS_STICTION_PARAMS
     },
     {   // 095      ICUBCANPROTO_POL_MC_CMD__SET_TORQUE_STICTION_PARAMS
-        .former     = NULL,
+        .former     = eocanprotMCpolling_former_POL_MC_CMD__SET_TORQUE_STICTION_PARAMS,
         .parser     = NULL
     },
     {   // 096      ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_STICTION_PARAMS
-        .former     = NULL,
-        .parser     = NULL
+        .former     = eocanprotMCpolling_former_POL_MC_CMD__GET_TORQUE_STICTION_PARAMS,
+        .parser     = eocanprotMCpolling_parser_POL_MC_CMD__GET_TORQUE_STICTION_PARAMS
     },
     {   // 097      ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_PARAMS 
         .former     = NULL,

@@ -600,6 +600,9 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
             o->jointSet[k].MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
             o->jointSet[k].CAN_DO_TRQ_CTRL = FALSE;
         }
+        
+        AbsEncoder_config_divisor(o->absEncoder+1, 125);
+        
         break;
     }
     
@@ -905,6 +908,10 @@ void MController_config_joint(int j, eOmc_joint_config_t* config) //
     if (j==3 && o->part_type==eomc_ctrlboard_CER_LOWER_ARM)
     {
         AbsEncoder_config(o->absEncoder+j, j, /*(eOmc_EncoderType_t)config->jntEncoderType,*/ config->jntEncoderResolution, 64*AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
+    }
+    else if (j==1 && o->part_type==eomc_ctrlboard_CER_NECK)
+    {
+        AbsEncoder_config(o->absEncoder+j, j, /*(eOmc_EncoderType_t)config->jntEncoderType,*/ config->jntEncoderResolution,125*AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
     }
     else if (o->part_type==eomc_ctrlboard_CER_HAND)
     {
