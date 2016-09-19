@@ -1269,52 +1269,6 @@ extern void eoprot_fun_UPDT_mc_motor_config_rotorencoder(const EOnv* nv, const e
         MController_config_motor_encoder(jxx, *rotenc);
     }
 }
-
-#if defined(EOMOTIONCONTROL_DONTREDEFINE_JOINTCOUPLING_CALLBACK)
-//#warning INFO: EOMOTIONCONTROL_DONTREDEFINE_JOINTCOUPLING_CALLBACK is defined, thus we are not using eo_emsController_set_Jacobian() etc
-#else
-// f-marker-begin
-extern void eoprot_fun_UPDT_mc_controller_config_jointcoupling(const EOnv* nv, const eOropdescriptor_t* rd)
-{   // not for mc4can
-    eOmc_jointcouplingmatrix_t *mat = (eOmc_jointcouplingmatrix_t*)rd->data;    
-
-    eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
-    
-    if((eo_motcon_mode_foc = mcmode) || (eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode))
-    {
-   
-        /*
-        float Ji[4][4];
-        
-        for (int i=0; i<4; ++i)
-        {
-            for (int j=0; j<4; ++j)
-            {
-                Ji[i][j]=(float)((*mat)[i][j])/16384.0f;
-            }
-        }
-        */
-        
-        MController_set_Jacobian(*mat);
-            
-        eOerrmanDescriptor_t errdes = {0};
-        errdes.code                 = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag00);
-        errdes.param                = 0;
-        errdes.sourcedevice         = eo_errman_sourcedevice_localboard;
-        errdes.sourceaddress        = 0;  
-        //char *str = NULL;
-        char str[eomn_info_status_extra_sizeof] = {0};
-     
-        for (int i=0; i<4; ++i)
-        {
-            snprintf(str, sizeof(str), "r%d: %f %f %f %f", i, Ji[i][0], Ji[i][1], Ji[i][2], Ji[i][3]);             
-            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, str, NULL, &errdes);    
-        }   
-    }
-}
-#endif
-
-
 // -- entity motor
 
 
