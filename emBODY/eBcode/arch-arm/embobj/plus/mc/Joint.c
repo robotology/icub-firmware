@@ -137,6 +137,11 @@ void Joint_config(Joint* o, uint8_t ID, eOmc_joint_config_t* config)
     o->scKvel   = config->pidposition.kff;
     o->scKstill = 0.1f*o->scKpos;
     
+    o->pos_min_soft = config->userlimits.min;
+    o->pos_max_soft = config->userlimits.max;    
+    o->pos_min_hard = config->hardwarelimits.min;
+    o->pos_max_hard = config->hardwarelimits.max;
+    
     o->pos_min = config->userlimits.min;
     o->pos_max = config->userlimits.max;
 
@@ -156,6 +161,20 @@ void Joint_config(Joint* o, uint8_t ID, eOmc_joint_config_t* config)
     
     // TODOALE joint admittance missing
     o->Kadmitt = ZERO;
+    
+    
+    
+    eOerrmanDescriptor_t errdes = {0};
+    char message[150];
+    
+    snprintf(message, sizeof(message), "CFG HW LIMITS: max=%.2f, min=%.2f",o->pos_min_hard, o->pos_max_hard);
+
+    errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
+    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+    errdes.sourceaddress    = o->ID;
+    errdes.par16            = 0;
+    errdes.par64            = 0;
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, message, NULL, &errdes);
 }
 
 void Joint_destroy(Joint* o)
@@ -382,17 +401,8 @@ void Joint_set_limits(Joint* o, CTRL_UNITS pos_min, CTRL_UNITS pos_max)
     Trajectory_config_limits(&o->trajectory, pos_min, pos_max, 0.0f, 0.0f);
 }
 
-void Joint_set_hardware_limit(Joint* o, CTRL_UNITS hard_limit)
+void Joint_set_hardware_limit(Joint* o)
 {
-    if (hard_limit <= o->pos_min_soft)
-    {
-        o->pos_min_hard = hard_limit;
-    }
-    else if (hard_limit >= o->pos_max_soft)
-    {
-        o->pos_max_hard = hard_limit;
-    }
-    
     o->use_hard_limit = TRUE;
     
     Joint_set_limits(o, o->pos_min_hard, o->pos_max_hard);

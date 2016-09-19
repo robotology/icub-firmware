@@ -914,7 +914,7 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
                 return;
             }
             
-            Joint_set_hardware_limit(o->joint+e, calibrator->params.type5.calibrationZero);
+            Joint_set_hardware_limit(o->joint+e);
             
             AbsEncoder_calibrate_fake(o->absEncoder+e);
             o->calibration_in_progress = (eOmc_calibration_type_t)calibrator->type;
@@ -1121,7 +1121,7 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             
             o->calibration_timeout = 0;
             
-            Joint_set_hardware_limit(o->joint+e, calibrator->params.type10.calibrationZero);
+            Joint_set_hardware_limit(o->joint+e);
             
             Motor_calibrate_withOffset(o->motor+e, 0);
             Motor_set_run(o->motor+e);
