@@ -206,8 +206,8 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
         // marco.accame TODO: (tag FIX_CALIB_MC4) manage max and min limits as in new_fw_ems ...
         // 4) set max/min limits... they will be used during calibration phase
 
-        eo_mc4boards_Convert_minJointPos_Set(mc4boards, jxx, cfg->limitsofjoint.min);
-        eo_mc4boards_Convert_maxJointPos_Set(mc4boards, jxx, cfg->limitsofjoint.max);
+        eo_mc4boards_Convert_minJointPos_Set(mc4boards, jxx, cfg->userlimits.min);
+        eo_mc4boards_Convert_maxJointPos_Set(mc4boards, jxx, cfg->userlimits.max);
  
         // 5) set vel timeout
         command.type  = ICUBCANPROTO_POL_MC_CMD__SET_VEL_TIMEOUT;
@@ -385,7 +385,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_impedance(const EOnv* nv, const eOro
 
 
 // f-marker-begin
-extern void eoprot_fun_UPDT_mc_joint_config_limitsofjoint(const EOnv* nv, const eOropdescriptor_t* rd)
+extern void eoprot_fun_UPDT_mc_joint_config_userlimits(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOmeas_position_limits_t *limitsofjoint = (eOmeas_position_limits_t*)rd->data;
     eOprotIndex_t jxx = eoprot_ID2index(rd->id32);

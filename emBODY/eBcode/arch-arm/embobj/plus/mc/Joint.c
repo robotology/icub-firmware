@@ -137,13 +137,9 @@ void Joint_config(Joint* o, uint8_t ID, eOmc_joint_config_t* config)
     o->scKvel   = config->pidposition.kff;
     o->scKstill = 0.1f*o->scKpos;
     
-    o->pos_min_soft = config->limitsofjoint.min;
-    o->pos_max_soft = config->limitsofjoint.max;    
-    o->pos_min_hard = config->limitsofjoint.min;
-    o->pos_max_hard = config->limitsofjoint.max;
-    
-    o->pos_min = config->limitsofjoint.min;
-    o->pos_max = config->limitsofjoint.max;
+    o->pos_min = config->userlimits.min;
+    o->pos_max = config->userlimits.max;
+
     o->vel_max = config->maxvelocityofjoint;
     o->acc_max = 10000000.0f;
     
