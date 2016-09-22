@@ -209,19 +209,41 @@ static uint8_t getNumberOfSets(const eOmc_4jomo_coupling_t *jomoCouplingInfo)
     return (n);
 }
 
-static void updateEntity2SetMaps(const eOmc_4jomo_coupling_t *jomoCouplingInfo)
+static void updateEntity2SetMaps(const eOmc_4jomo_coupling_t *jomoCouplingInfo,  EOconstarray* carray)
 {
     MController *o = smc;
     for(uint8_t i=0; i<MAX_JOINTS_PER_BOARD; i++)
     {
         if(eomc_jointSetNum_none == jomoCouplingInfo->joint2set[i])
             continue; //leave init values
-        o->j2s[i] = o->m2s[i] = o->e2s[i] = jomoCouplingInfo->joint2set[i];
+        o->j2s[i] = o->m2s[i] = jomoCouplingInfo->joint2set[i];
     }
+    
+    //in the following code I fill data in e2s vector.
+    //in almost all boards, for each joint j:  (o->j2s[j] == o->e2s[j]== o->m2s[j] == jomoCouplingInfo->joint2set[j] ) is true
+    //but in CER HAND board we have only two joints and three encoder of each joint; therefore the e2s={0,0,0, 1,1,1}
+    //The following code fills data in e2s vecotor keeping in mind the CER hand board expection.
+    uint8_t currentpos = 0;
+    const eOmc_jomo_descriptor_t *jomodes ;
+    for(uint8_t j=0; j<o->nJoints; j++)
+    {
+        jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(carray, j);
+        uint8_t multi_enc = (uint8_t) eomc_encoder_get_numberofcomponents((eOmc_encoder_t)jomodes->encoder1.type);
+        for(uint8_t i=currentpos; i<multi_enc; i++)
+        {
+            o->e2s[i] = jomoCouplingInfo->joint2set[i];
+        }
+        currentpos += multi_enc+1;
+    }
+    
+    //currently all joint of same board have the the same number of multiple encoder. so i use j0
+    jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(carray, 0);
+    o->multi_encs = (uint8_t) eomc_encoder_get_numberofcomponents((eOmc_encoder_t)jomodes->encoder1.type);
+    o->nEncods = o->multi_encs *o->nJoints;
 }
 
-#if 0
-static void debug_printsMatrix(float **m)
+
+static void debug_printsMatrix4X4(float **m)
 {
     snprintf(s_trace_string, sizeof(s_trace_string), "----- START -----");
     hal_trace_puts(s_trace_string);
@@ -236,36 +258,309 @@ static void debug_printsMatrix(float **m)
     hal_trace_puts(s_trace_string);
 
 }
-#endif
 
-static void copyMatrix(float **dst, const eOmc_4x4_matrix_t src)
+static void debug_printsMatrix4X6(float **m)
 {
-    for(uint8_t r=0; r<MAX_JOINTS_PER_BOARD; r++)
+    snprintf(s_trace_string, sizeof(s_trace_string), "----- START -----");
+    hal_trace_puts(s_trace_string);
+    
+    for(uint8_t r=0; r<4; r++)
     {
-        for(uint8_t c=0; c<MAX_JOINTS_PER_BOARD; c++)
+        snprintf(s_trace_string, sizeof(s_trace_string), "%.4f  %.4f  %.4f  %.4f  %.4f  %.4f", m[r][0], m[r][1], m[r][2], m[r][3], m[r][4], m[r][5]);
+        hal_trace_puts(s_trace_string);
+    }
+    
+    snprintf(s_trace_string, sizeof(s_trace_string), "----- END -----");
+    hal_trace_puts(s_trace_string);
+
+}
+
+static void copyMatrix(float **dst, eOq17_14_t** src, uint8_t rownum, uint8_t colnum)
+{
+    for(uint8_t r=0; r<rownum; r++)
+    {
+        for(uint8_t c=0; c<colnum; c++)
         {
             dst[r][c] = eo_common_Q17_14_to_float(src[r][c]);
         }
     }
 }
 
-static void get_jomo_coupling_info(const eOmc_4jomo_coupling_t *jomoCouplingInfo)
+
+static void debug_dump_coupling_data(const eOmc_4jomo_coupling_t *jomoCouplingInfo)
+{
+     MController *o = smc;
+    
+    snprintf(s_trace_string, sizeof(s_trace_string), "Numofj=%d nEncs=%d multienc=%d\n", o->nJoints, o->nEncods, o->multi_encs);
+    hal_trace_puts(s_trace_string);
+    
+    snprintf(s_trace_string, sizeof(s_trace_string), "MATRIX Jmj");
+    hal_trace_puts(s_trace_string);
+    debug_printsMatrix4X4(o->Jmj);
+    
+     snprintf(s_trace_string, sizeof(s_trace_string), "MATRIX Jjm");
+    hal_trace_puts(s_trace_string);
+    debug_printsMatrix4X4(o->Jjm);
+    
+     snprintf(s_trace_string, sizeof(s_trace_string), "MATRIX Sje");
+    hal_trace_puts(s_trace_string);
+    debug_printsMatrix4X6(o->Sje);
+    
+     snprintf(s_trace_string, sizeof(s_trace_string), "MATRIX Sjm");
+    hal_trace_puts(s_trace_string);
+    debug_printsMatrix4X4(o->Sjm);
+    
+
+    snprintf(s_trace_string, sizeof(s_trace_string), "J2S:  %d  %d  %d  %d\n", o->j2s[0], o->j2s[1], o->j2s[2], o->j2s[3]);
+    hal_trace_puts(s_trace_string);
+    
+    snprintf(s_trace_string, sizeof(s_trace_string), "m2s:  %d  %d  %d  %d\n", o->m2s[0], o->m2s[1], o->m2s[2], o->m2s[3]);
+    hal_trace_puts(s_trace_string);
+    
+    snprintf(s_trace_string, sizeof(s_trace_string), "e2s:  %d  %d  %d  %d  %d  %d\n", o->e2s[0], o->e2s[1], o->e2s[2], o->e2s[3], o->e2s[4], o->e2s[5]);
+    hal_trace_puts(s_trace_string);
+    
+    
+    for(int i=0; i<o->nJoints; i++)
+    {
+        snprintf(s_trace_string, sizeof(s_trace_string), "\nCFG JOINTSET %d", i);
+        hal_trace_puts(s_trace_string);
+        
+        snprintf(s_trace_string, sizeof(s_trace_string), "trq=%d  %s  mspeed=%d \n", jomoCouplingInfo->jsetcfg[i].candotorquecontrol,
+                  eomc_pidoutputtype2string(jomoCouplingInfo->jsetcfg[i].pidoutputtype, eobool_false), 
+                 jomoCouplingInfo->jsetcfg[i].usespeedfeedbackfrommotors);
+        hal_trace_puts(s_trace_string);
+        
+       const eOmc_jointSet_constraints_t *constr = &jomoCouplingInfo->jsetcfg[i].constraints;           
+        snprintf(s_trace_string, sizeof(s_trace_string), "%s  %.2f  %.2f\n", 
+                    eomc_jsetconstraint2string(constr->type, eobool_false),constr->param1, constr->param2);
+        hal_trace_puts(s_trace_string);
+    }
+
+
+}
+static void get_jomo_coupling_info(const eOmc_4jomo_coupling_t *jomoCouplingInfo, EOconstarray* carray)
 {
     MController *o = smc;
     
     o->nSets = getNumberOfSets(jomoCouplingInfo);
 
-    copyMatrix(o->Jmj, jomoCouplingInfo->joint2motor);
-    copyMatrix(o->Sje, jomoCouplingInfo->encoder2joint);
+    copyMatrix(o->Jmj, (eOq17_14_t**)jomoCouplingInfo->joint2motor, MAX_JOINTS_PER_BOARD, MAX_JOINTS_PER_BOARD );
+    copyMatrix(o->Jjm, (eOq17_14_t**)jomoCouplingInfo->motor2joint, MAX_JOINTS_PER_BOARD, MAX_JOINTS_PER_BOARD );
+    copyMatrix(o->Sje, (eOq17_14_t**)jomoCouplingInfo->encoder2joint, MAX_JOINTS_PER_BOARD, MAX_ENCODS_PER_BOARD);
+    copyMatrix(o->Sjm, (eOq17_14_t**)jomoCouplingInfo->motor2joint, MAX_JOINTS_PER_BOARD, MAX_JOINTS_PER_BOARD );
 
-    updateEntity2SetMaps(jomoCouplingInfo);
+    updateEntity2SetMaps(jomoCouplingInfo, carray);
 
 //    debug_printsMatrix(o->Jmj);
 //    debug_printsMatrix(o->Sje);
 //    snprintf(s_trace_string, sizeof(s_trace_string), "J2S %d  %d  %d  %d", o->j2s[0], o->j2s[1], o->j2s[2],o->j2s[3]);
 //    hal_trace_puts(s_trace_string);
 
+    
+    debug_dump_coupling_data(jomoCouplingInfo);
 }
+
+
+
+void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
+{
+    MController *o = smc;
+    
+    EOconstarray* carray = NULL;
+    const eOmc_4jomo_coupling_t *jomoCouplingInfo = NULL;
+    
+    switch (brd_cfg->type)
+    {
+        case eomn_serv_MC_foc:
+            carray = eo_constarray_Load((EOarray*)&brd_cfg->data.mc.foc_based.arrayofjomodescriptors);
+            o->nSets = o->nEncods = o->nJoints = brd_cfg->data.mc.foc_based.arrayofjomodescriptors.head.size;
+            o->actuation_type = HARDWARE_2FOC;
+            jomoCouplingInfo = &(brd_cfg->data.mc.foc_based.jomocoupling);
+            break;
+        
+        case eomn_serv_MC_mc4plusmais:
+            carray = eo_constarray_Load((EOarray*)&brd_cfg->data.mc.mc4plusmais_based.arrayofjomodescriptors);
+            o->nSets = o->nEncods = o->nJoints = brd_cfg->data.mc.mc4plusmais_based.arrayofjomodescriptors.head.size;
+            o->actuation_type = HARDWARE_MC4p;
+            jomoCouplingInfo = &(brd_cfg->data.mc.mc4plusmais_based.jomocoupling);
+            break;
+        
+        case eomn_serv_MC_mc4plus:
+            carray = eo_constarray_Load((EOarray*)&brd_cfg->data.mc.mc4plus_based.arrayofjomodescriptors);
+            o->nSets = o->nEncods = o->nJoints = brd_cfg->data.mc.mc4plus_based.arrayofjomodescriptors.head.size;
+            o->actuation_type = HARDWARE_MC4p;
+            jomoCouplingInfo = &(brd_cfg->data.mc.mc4plus_based.jomocoupling);
+            break;
+        
+        default:
+            return;
+    }
+    
+    for (int k=0; k<o->nJoints; ++k)
+    {
+        const eOmc_jomo_descriptor_t *jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(carray, k);
+        
+        switch(jomodes->encoder1.type)
+        {
+            case eomc_enc_spichainof2:
+            {
+                for (int e=0; e<2; ++e)
+                {
+                    o->absEncoder[k*2+e].type = eomc_enc_aea;
+                    o->absEncoder[k*2+e].fake = FALSE;
+                }
+                break;
+            }
+            case eomc_enc_spichainof3:
+            {
+                for (int e=0; e<3; ++e)
+                {
+                    o->absEncoder[k*3+e].type = eomc_enc_aea;
+                    o->absEncoder[k*3+e].fake = FALSE;
+                }
+                break;
+            }                
+            case eomc_enc_aea:
+            {
+                o->absEncoder[k].type = eomc_enc_aea;
+                o->absEncoder[k].fake = FALSE;
+                break;
+            }
+            
+            case eomc_enc_mais:
+            {
+                o->absEncoder[k].type = eomc_enc_mais;
+                o->absEncoder[k].fake = FALSE;
+                break;
+            }
+            
+            case eomc_enc_absanalog:
+            {
+                o->absEncoder[k].type = eomc_enc_absanalog;
+                o->absEncoder[k].fake = FALSE;
+                break;
+            }
+            default:
+            {
+                o->absEncoder[k].fake = TRUE;
+                o->absEncoder[k].type = eomc_enc_aea;
+                break;
+            }
+        };
+        
+        o->motor[k].HARDWARE_TYPE = o->actuation_type;
+        
+        switch(o->motor[k].HARDWARE_TYPE)
+        {
+            case HARDWARE_MC4p:
+                o->motor[k].actuatorPort = jomodes->actuator.pwm.port;
+                break;
+            
+            case HARDWARE_2FOC:
+                o->motor[k].actuatorPort = jomodes->actuator.foc.canloc.addr-1;
+                break;
+
+            default:
+                return;
+        }
+        
+        o->joint[k].eo_joint_ptr = eo_entities_GetJoint(eo_entities_GetHandle(), k);
+    }
+    
+    #warning Matrici accoppiamento identita' vanno beneo devo mettere ptr a null???
+    //attualemnte se i ptr alle matrici di accoppiamento sono nulli allora significa che non c'e accopiamento.
+    //posso invece usare le matrici identita?
+    
+//    float **Jjm = NULL; //o->Jjm;
+//    float **Jmj = NULL; //o->Jmj;
+//  
+//    float **Sjm = NULL; //o->Sjm;
+//    float **Sje = NULL; //o->Sje;
+    
+    
+    
+    get_jomo_coupling_info(jomoCouplingInfo, carray);
+    
+
+    
+
+    //controllo inutile==> lo rimuovo!
+    
+//    //check multi encoder compatibility
+//    //currently all joint of same board have the the same number of multiple encoder. so i use j0
+//    const eOmc_jomo_descriptor_t *jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(carray, 0);
+//    uint8_t cfg_multienc = (uint8_t) eomc_encoder_get_numberofcomponents((eOmc_encoder_t)jomodes->encoder1.type);
+//    if(o->multi_encs != cfg_multienc)
+//    {
+//        eOerrmanDescriptor_t errdes;
+//        char str[50];
+//        snprintf(str, sizeof(str), "multiEnc check: par16=mc par64=cfg");
+//        errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag04);
+//        errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+//        errdes.sourceaddress    = 0;
+//        errdes.par16            = o->multi_encs;
+//        errdes.par64            = cfg_multienc;
+//        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, str, NULL, &errdes);
+//    
+//    }
+    
+    
+    for (int s=0; s<o->nSets; ++s) o->enc_set_dim[s] = 0;
+    
+    for (int e=0; e<o->nEncods; ++e)
+    {
+        int s = o->e2s[e];
+
+        o->eos[s][(o->enc_set_dim[s])++] = e;
+    }
+    
+    for (int s=0; s<o->nSets; ++s) o->set_dim[s] = 0;
+ 
+    for (int m=0; m<o->nJoints; ++m)
+    {
+        int s = o->m2s[m];
+
+        o->mos[s][(o->set_dim[s])++] = m;
+    }
+    
+    for (int s=0; s<o->nSets; ++s) o->set_dim[s] = 0;
+ 
+    for (int j=0; j<o->nJoints; ++j)
+    {
+        int s = o->j2s[j];
+
+        o->jos[s][(o->set_dim[s])++] = j;
+    }
+    
+    for (int s=0; s<o->nSets; ++s)
+    {
+        JointSet_config
+        (
+            o->jointSet+s,
+            o->set_dim+s,
+            o->enc_set_dim+s,
+            o->jos[s],
+            o->mos[s],
+            o->eos[s],
+            o->joint, 
+            o->motor, 
+            o->absEncoder,
+            o->Jjm,
+            o->Jmj,
+            o->Sje,
+            o->Sjm
+        );
+        
+        o->jointSet[s].led = (hal_led_t)(hal_led1 + s);
+    }
+}
+
+
+
+
+
+#if 0
 
 //void MController_config_board(uint8_t part_type, uint8_t actuation_type)
 void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
@@ -896,6 +1191,10 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         o->jointSet[s].led = (hal_led_t)(hal_led1 + s);
     }
 }
+
+#endif
+
+
 void MController_config_joint(int j, eOmc_joint_config_t* config) //
 {
     MController *o = smc;
