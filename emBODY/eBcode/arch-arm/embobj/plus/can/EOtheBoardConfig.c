@@ -3178,7 +3178,7 @@ extern const eOmn_serv_configuration_t * eoboardconfig_code2strain_serv_configur
 extern const eOmn_serv_configuration_t * eoboardconfig_code2mais_serv_configuration(uint32_t code)
 {
     const eOmn_serv_configuration_t * ret = NULL;
-
+#if 0
 #if     defined(ICUB_MEC_V1) | defined(ICUB_MEC_V2)      
     switch(code)
     {
@@ -3220,7 +3220,7 @@ extern const eOmn_serv_configuration_t * eoboardconfig_code2mais_serv_configurat
 #elif   defined(CER)    
     // so far not supported
 #endif
-    
+#endif
     return(ret);  
 }
 
