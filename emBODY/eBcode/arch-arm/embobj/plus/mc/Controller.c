@@ -275,11 +275,11 @@ static void debug_printsMatrix4X6(float **m)
 
 }
 
-static void copyMatrix(float **dst, eOq17_14_t** src, uint8_t rownum, uint8_t colnum)
+static void copyMatrix4X4(float **dst, const eOmc_4x4_matrix_t src)
 {
-    for(uint8_t r=0; r<rownum; r++)
+    for(uint8_t r=0; r<MAX_JOINTS_PER_BOARD; r++)
     {
-        for(uint8_t c=0; c<colnum; c++)
+        for(uint8_t c=0; c<MAX_JOINTS_PER_BOARD; c++)
         {
             dst[r][c] = eo_common_Q17_14_to_float(src[r][c]);
         }
@@ -287,15 +287,28 @@ static void copyMatrix(float **dst, eOq17_14_t** src, uint8_t rownum, uint8_t co
 }
 
 
-static void debug_dump_coupling_data(const eOmc_4jomo_coupling_t *jomoCouplingInfo)
+static void copyMatrix4X6(float **dst, const eOmc_4x6_matrix_t src)
+{
+    for(uint8_t r=0; r<MAX_JOINTS_PER_BOARD; r++)
+    {
+        for(uint8_t c=0; c<MAX_ENCODS_PER_BOARD; c++)
+        {
+            dst[r][c] = eo_common_Q17_14_to_float(src[r][c]);
+        }
+    }
+}
+
+extern void debug_dump_coupling_data(const eOmc_4jomo_coupling_t *jomoCouplingInfo)
 {
      MController *o = smc;
     
-    snprintf(s_trace_string, sizeof(s_trace_string), "Numofj=%d nEncs=%d multienc=%d\n", o->nJoints, o->nEncods, o->multi_encs);
-    hal_trace_puts(s_trace_string);
+    snprintf(s_trace_string, sizeof(s_trace_string), "Numofj=%d nEncs=%d multienc=%d numofsets=%d\n", o->nJoints, o->nEncods, o->multi_encs, o->nSets);
+    //hal_trace_puts(s_trace_string);
+    eo_errman_Trace(eo_errman_GetHandle(), s_trace_string, "pippo");
     
     snprintf(s_trace_string, sizeof(s_trace_string), "MATRIX Jmj");
-    hal_trace_puts(s_trace_string);
+    //hal_trace_puts(s_trace_string);
+    eo_errman_Trace(eo_errman_GetHandle(), s_trace_string, "nn");
     debug_printsMatrix4X4(o->Jmj);
     
      snprintf(s_trace_string, sizeof(s_trace_string), "MATRIX Jjm");
@@ -327,7 +340,7 @@ static void debug_dump_coupling_data(const eOmc_4jomo_coupling_t *jomoCouplingIn
         hal_trace_puts(s_trace_string);
         
         snprintf(s_trace_string, sizeof(s_trace_string), "trq=%d  %s  mspeed=%d \n", jomoCouplingInfo->jsetcfg[i].candotorquecontrol,
-                  eomc_pidoutputtype2string(jomoCouplingInfo->jsetcfg[i].pidoutputtype, eobool_false), 
+                  eomc_pidoutputtype2string((eOmc_pidoutputtype_t)(jomoCouplingInfo->jsetcfg[i].pidoutputtype), eobool_false), 
                  jomoCouplingInfo->jsetcfg[i].usespeedfeedbackfrommotors);
         hal_trace_puts(s_trace_string);
         
@@ -345,18 +358,12 @@ static void get_jomo_coupling_info(const eOmc_4jomo_coupling_t *jomoCouplingInfo
     
     o->nSets = getNumberOfSets(jomoCouplingInfo);
 
-    copyMatrix(o->Jmj, (eOq17_14_t**)jomoCouplingInfo->joint2motor, MAX_JOINTS_PER_BOARD, MAX_JOINTS_PER_BOARD );
-    copyMatrix(o->Jjm, (eOq17_14_t**)jomoCouplingInfo->motor2joint, MAX_JOINTS_PER_BOARD, MAX_JOINTS_PER_BOARD );
-    copyMatrix(o->Sje, (eOq17_14_t**)jomoCouplingInfo->encoder2joint, MAX_JOINTS_PER_BOARD, MAX_ENCODS_PER_BOARD);
-    copyMatrix(o->Sjm, (eOq17_14_t**)jomoCouplingInfo->motor2joint, MAX_JOINTS_PER_BOARD, MAX_JOINTS_PER_BOARD );
+    copyMatrix4X4(o->Jmj, jomoCouplingInfo->joint2motor);
+    copyMatrix4X4(o->Jjm, jomoCouplingInfo->motor2joint);
+    copyMatrix4X6(o->Sje, jomoCouplingInfo->encoder2joint);
+    copyMatrix4X4(o->Sjm, jomoCouplingInfo->motor2joint);
 
     updateEntity2SetMaps(jomoCouplingInfo, carray);
-
-//    debug_printsMatrix(o->Jmj);
-//    debug_printsMatrix(o->Sje);
-//    snprintf(s_trace_string, sizeof(s_trace_string), "J2S %d  %d  %d  %d", o->j2s[0], o->j2s[1], o->j2s[2],o->j2s[3]);
-//    hal_trace_puts(s_trace_string);
-
     
     debug_dump_coupling_data(jomoCouplingInfo);
 }
