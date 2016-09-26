@@ -561,7 +561,7 @@ extern "C" {
 
 //  <o> capacity of a single rop            <8-512:8>
 //  <i> default: 256
-#define EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPCAPACITY  256  
+#define EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPCAPACITY  384  
 
 
 //  <o> max number of regular rops          <1-64>
