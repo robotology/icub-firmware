@@ -79,7 +79,7 @@ void JointSet_init(JointSet* o) //
     
     o->is_calibrated = FALSE;
     
-    o->special_constraint = NO_CONSTRAINT;
+    o->special_constraint = eomc_jsetconstraint_none;
     
     o->calibration_in_progress = eomc_calibration_typeUndefined;
     
@@ -667,11 +667,11 @@ void JointSet_do_pwm_control(JointSet* o)
     
     switch (o->special_constraint)
     {
-        case TRIFID_CONSTRAINT:
+        case eomc_jsetconstraint_trifid:
             JointSet_manage_trifid_constraint(o);
             break;
         
-        case CER_HAND_CONSTRAINT:
+        case eomc_jsetconstraint_cerhand:
             JointSet_manage_cable_constraint(o);
             break;
 
@@ -716,7 +716,7 @@ static void JointSet_do_vel_control(JointSet* o)
     
     switch (o->special_constraint)
     {
-        case TRIFID_CONSTRAINT:
+        case eomc_jsetconstraint_trifid:
             JointSet_manage_trifid_constraint(o);
             break;
         

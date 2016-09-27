@@ -346,12 +346,62 @@ extern void debug_dump_coupling_data(const eOmc_4jomo_coupling_t *jomoCouplingIn
         
        const eOmc_jointSet_constraints_t *constr = &jomoCouplingInfo->jsetcfg[i].constraints;           
         snprintf(s_trace_string, sizeof(s_trace_string), "%s  %.2f  %.2f\n", 
-                    eomc_jsetconstraint2string(constr->type, eobool_false),constr->param1, constr->param2);
+                    eomc_jsetconstraint2string((eOmc_jsetconstraint_t)(constr->type), eobool_false),constr->param1, constr->param2);
         hal_trace_puts(s_trace_string);
     }
 
 
 }
+
+static void update_jointAndMotor_withJointset_constraints(void)
+{
+    //currently I use constarint to set configuration info that can not be set by xml.
+    //In the future, (I hope ASAP) following parameters will be  set by xml file, so I'll remove this function
+    // now I could not change xml configuration without change yarp interface....
+    
+    MController *o = smc;
+    for(int s=0; s<o->nSets; s++)
+    {
+        if(o->jointSet[s].special_constraint == eomc_jsetconstraint_cerhand)
+        {
+            for(int i=0; i<o->set_dim[s]; i++)
+            {
+                int j = o->jos[s][i];
+                o->joint[j].dead_zone = 400;
+            }
+        }
+    }
+}
+
+static void update_jointAndMotor_withJointSet_configuration(void)
+{
+    MController *o = smc;
+    for(int s=0; s<o->nSets; s++)
+    {
+        JointSet * js_ptr = &o->jointSet[s];
+        
+        for(int i=0; i<o->set_dim[s]; i++)
+        {
+            int j = o->jos[s][i];
+            o->joint[j].CAN_DO_TRQ_CTRL = js_ptr->CAN_DO_TRQ_CTRL;
+            o->joint[j].MOTOR_CONTROL_TYPE = js_ptr->MOTOR_CONTROL_TYPE;
+            
+        }
+        
+        for(int k=0; k<o->set_dim[s]; k++)
+        {
+            int m = o->mos[s][k];
+            o->motor[m].MOTOR_CONTROL_TYPE = js_ptr->MOTOR_CONTROL_TYPE;
+        }
+    }
+    
+    
+    //provisional function. see comment inside
+    update_jointAndMotor_withJointset_constraints();
+
+}
+
+
 static void get_jomo_coupling_info(const eOmc_4jomo_coupling_t *jomoCouplingInfo, EOconstarray* carray)
 {
     MController *o = smc;
@@ -365,6 +415,22 @@ static void get_jomo_coupling_info(const eOmc_4jomo_coupling_t *jomoCouplingInfo
 
     updateEntity2SetMaps(jomoCouplingInfo, carray);
     
+    const eOmc_jointset_configuration_t   *jsetcfg = &jomoCouplingInfo->jsetcfg[0];
+    
+    for(int s=0; s<o->nSets; s++)
+    {
+        o->jointSet[s].CAN_DO_TRQ_CTRL = jsetcfg[s].candotorquecontrol;
+        o->jointSet[s].MOTOR_CONTROL_TYPE = jsetcfg[s].pidoutputtype;
+
+        o->jointSet[s].special_constraint = (eOmc_jsetconstraint_t)jsetcfg[s].constraints.type;
+        o->jointSet[s].special_limit = jsetcfg[s].constraints.param1;
+        //NOTE: jsetcfg[s].constraints.param2 is not used currently. It is reserved for future use
+        
+    }   
+        
+        
+    update_jointAndMotor_withJointSet_configuration();
+
     debug_dump_coupling_data(jomoCouplingInfo);
 }
 
