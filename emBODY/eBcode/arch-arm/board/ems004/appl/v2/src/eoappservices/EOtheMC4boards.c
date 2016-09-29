@@ -608,23 +608,10 @@ extern icubCanProto_stiffness_t eo_mc4boards_Convert_impedanceStiffness_I2S(EOth
     }
     float factor = s_eo_themc4boards.convencoder[joint].factor;
 
-    int32_t tmpstiff = (int32_t)stiff;
-    
-    if(stiff > INT32_MAX)
-    {
-        tmpstiff = INT32_MAX;
-    }
-    else
-    {
-        tmpstiff = (int32_t)stiff;
-    }
-    //arriva espresso in icubdegree e devo trasformarlo nelle tacche di encoder.
-    //inoltre lo divido per mille perche' su robot interface e' moltiplicato per 1000 per avere piu' precisione possibile
-    //return((icubCanProto_stiffness_t)(((i_stiff / factor)) /1000.0) );
-    
+    //arriva espresso in microN/icubdegree e devo trasformarlo in  n Nm*10^4/tacche (dove Nm*10^4 sono decimi di milli newtons)
     
     icubCanProto_stiffness_t ret;
-    float v = tmpstiff / factor /1000.0f;
+    float v = stiff / factor /100.0f;
     if ( v >0 ) ret = (icubCanProto_stiffness_t)(v);
     else ret = -((icubCanProto_stiffness_t)(-v));
         
@@ -638,7 +625,7 @@ extern eOmeas_stiffness_t eo_mc4boards_Convert_impedanceStiffness_S2I(EOtheMC4bo
         return(0);
     }
    
-    float ret  = stiff*s_eo_themc4boards.convencoder[joint].factor*1000;  
+    float ret  = stiff*s_eo_themc4boards.convencoder[joint].factor*100;  
 
     if(ret<0)
         ret = -ret;
@@ -655,20 +642,10 @@ extern icubCanProto_damping_t eo_mc4boards_Convert_impedanceDamping_I2S(EOtheMC4
         return(0);
     }
     
-    int32_t tmpdamping = (int32_t)damping;;
-    if(damping > INT32_MAX)
-    {
-        tmpdamping = INT32_MAX;
-    }
-    else
-    {
-        tmpdamping = (int32_t)damping;
-    }
-    
-    //arriva espresso in icubdegree e devo trasformarlo nelle tacche di encoder.
-    //qui non divido per 1000 perche' devo esprimerlo al millisec.
+    //arriva espresso in microN/ideg/sec e devo trasformarlo in Nm*10^4/tacche/millisec (dove Nm*10^4 sono decimi di milli newtons)
+    //quindi damping_can = damping *100 /1000/factor;
     icubCanProto_damping_t ret;
-    float v = tmpdamping / s_eo_themc4boards.convencoder[joint].factor;
+    float v = damping / 10 / s_eo_themc4boards.convencoder[joint].factor;
     if ( v >0 ) ret = (icubCanProto_damping_t)(v);
     else ret = -((icubCanProto_damping_t)(-v));
         
@@ -682,7 +659,7 @@ extern eOmeas_damping_t       eo_mc4boards_Convert_impedanceDamping_S2I(EOtheMC4
         return(0);
     }
    
-    float ret  = damping*s_eo_themc4boards.convencoder[joint].factor;  
+    float ret  = damping*s_eo_themc4boards.convencoder[joint].factor*10;  
 
     if(ret<0)
         ret = -ret;
@@ -699,7 +676,9 @@ extern icubCanProto_torque_t eo_mc4boards_Convert_torque_I2S(EOtheMC4boards *p, 
 //    {   
 //        return(0);
 //    }
-    icubCanProto_torque_t ret = EOMC4BOARDS_CLIP_INT16(torque);
+    //*torque contains value in micro Nm.
+    //MC4 boards use torque values in Nm/10000 (decimi di milliNm)
+    icubCanProto_torque_t ret = EOMC4BOARDS_CLIP_INT16(torque/100);
     return(ret);   
 }
 
@@ -710,7 +689,7 @@ extern eOmeas_torque_t eo_mc4boards_Convert_torque_S2I(EOtheMC4boards *p, uint8_
 //    {   
 //        return(0);
 //    }
-    return((eOmeas_torque_t)torque);
+    return((eOmeas_torque_t)torque*100);
 }
 
 
