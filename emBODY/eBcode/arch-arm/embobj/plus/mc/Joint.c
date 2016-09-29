@@ -147,8 +147,8 @@ void Joint_config(Joint* o, uint8_t ID, eOmc_joint_config_t* config)
     o->vel_max = config->maxvelocityofjoint;
     o->acc_max = 10000000.0f;
     
-    o->tcKstiff  = 0.001f*(CTRL_UNITS)(config->impedance.stiffness);
-    o->tcKdamp   = 0.001f*CTRL_LOOP_FREQUENCY*(CTRL_UNITS)(config->impedance.damping);
+    o->tcKstiff  = (CTRL_UNITS)(config->impedance.stiffness);
+    o->tcKdamp   = CTRL_LOOP_FREQUENCY*(CTRL_UNITS)(config->impedance.damping);
     o->tcKoffset = config->impedance.offset;
     
     o->Kadmitt = (o->tcKstiff == ZERO) ? ZERO : (1.0f/o->tcKstiff); 
@@ -732,8 +732,8 @@ CTRL_UNITS Joint_do_vel_control(Joint* o)
 
 void Joint_set_impedance(Joint* o, eOmc_impedance_t* impedance)
 {
-    o->tcKstiff  = 0.001f*(CTRL_UNITS)(impedance->stiffness);
-    o->tcKdamp   = 0.001f*CTRL_LOOP_FREQUENCY*(CTRL_UNITS)(impedance->damping);
+    o->tcKstiff  = (CTRL_UNITS)(impedance->stiffness);
+    o->tcKdamp   = CTRL_LOOP_FREQUENCY*(CTRL_UNITS)(impedance->damping);
     o->tcKoffset = impedance->offset;
     
     if (o->tcKstiff != 0.0f)
@@ -748,8 +748,8 @@ void Joint_set_impedance(Joint* o, eOmc_impedance_t* impedance)
 
 void Joint_get_impedance(Joint* o, eOmc_impedance_t* impedance)
 {
-    impedance->stiffness = (eOmeas_stiffness_t)(1000.0f*o->tcKstiff);
-    impedance->damping   = (eOmeas_damping_t)(1000.0f*CTRL_LOOP_PERIOD*o->tcKdamp);
+    impedance->stiffness = (eOmeas_stiffness_t)(o->tcKstiff);
+    impedance->damping   = (eOmeas_damping_t)(CTRL_LOOP_PERIOD*o->tcKdamp);
     impedance->offset    = (eOmeas_torque_t)(o->tcKoffset);
 }
 
