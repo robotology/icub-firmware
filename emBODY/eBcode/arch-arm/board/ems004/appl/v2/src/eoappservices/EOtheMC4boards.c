@@ -611,7 +611,7 @@ extern icubCanProto_stiffness_t eo_mc4boards_Convert_impedanceStiffness_I2S(EOth
     //arriva espresso in microN/icubdegree e devo trasformarlo in  n Nm*10^4/tacche (dove Nm*10^4 sono decimi di milli newtons)
     
     icubCanProto_stiffness_t ret;
-    float v = stiff / factor /100.0f;
+    float v = (stiff*100.0f) / factor;
     if ( v >0 ) ret = (icubCanProto_stiffness_t)(v);
     else ret = -((icubCanProto_stiffness_t)(-v));
         
@@ -625,7 +625,7 @@ extern eOmeas_stiffness_t eo_mc4boards_Convert_impedanceStiffness_S2I(EOtheMC4bo
         return(0);
     }
    
-    float ret  = stiff*s_eo_themc4boards.convencoder[joint].factor*100;  
+    float ret  = (stiff*s_eo_themc4boards.convencoder[joint].factor)/100.0f;  
 
     if(ret<0)
         ret = -ret;
