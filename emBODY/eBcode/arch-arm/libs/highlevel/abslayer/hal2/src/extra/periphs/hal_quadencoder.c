@@ -68,7 +68,7 @@
 
 //#define ENCODER_PPR 28672-1// 14400-1 //(for LCORE with 900cpr disk and x4 interpolation)
 #define ENCODER_PPR (256*1000)
-#define ENCODER_START_VAL_TIM32BIT (3000000)
+#define ENCODER_START_VAL_TIM32BIT (262144) /*262144 = 2^18*/
 #define ENCODER_START_VAL_TIM16BIT (32000)
 #define ENCODER1_TIMER TIM3 //16 bits
 #define ENCODER2_TIMER TIM2 //32 bits
