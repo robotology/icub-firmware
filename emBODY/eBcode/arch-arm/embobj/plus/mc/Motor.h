@@ -166,6 +166,7 @@ typedef struct //Motor
     
     int32_t calib_pwm;
     
+		int32_t pos_raw_cal_fbk;
     int32_t pos_raw_fbk;
     int32_t vel_raw_fbk;
     

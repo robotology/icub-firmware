@@ -31,6 +31,7 @@
 #include "EOtheErrorManager.h"
 #include "EoError.h"
 
+
 /////////////////////////////////////////////////////////
 // Motor
 
@@ -827,11 +828,11 @@ void Motor_set_pwm_ref(Motor* o, int32_t pwm_ref)
 {
     if (o->pos_min != o->pos_max)
     {        
-        if ((o->pos_fbk < o->pos_min) && (pwm_ref < 0))
+        if ((o->pos_raw_cal_fbk < o->pos_min) && (pwm_ref < 0))
         {
             o->output = o->pwm_ref = 0;
         }
-        else if ((o->pos_fbk > o->pos_max) && (pwm_ref > 0))
+        else if ((o->pos_raw_cal_fbk > o->pos_max) && (pwm_ref > 0))
         {
             o->output = o->pwm_ref = 0;
         }
@@ -850,11 +851,11 @@ void Motor_set_Iqq_ref(Motor* o, int32_t Iqq_ref)
 {
     if (o->pos_min != o->pos_max)
     {        
-        if ((o->pos_fbk < o->pos_min) && (Iqq_ref < 0))
+        if ((o->pos_raw_cal_fbk < o->pos_min) && (Iqq_ref < 0))
         {
             o->output = o->Iqq_ref = 0;
         }
-        else if ((o->pos_fbk > o->pos_max) && (Iqq_ref > 0))
+        else if ((o->pos_raw_cal_fbk > o->pos_max) && (Iqq_ref > 0))
         {
             o->output = o->Iqq_ref = 0;
         }
@@ -873,11 +874,11 @@ void Motor_set_vel_ref(Motor* o, int32_t vel_ref)
 {
     if (o->pos_min != o->pos_max)
     {        
-        if ((o->pos_fbk < o->pos_min) && (vel_ref < 0))
+        if ((o->pos_raw_cal_fbk < o->pos_min) && (vel_ref < 0))
         {
             o->output = o->vel_ref = 0;
         }
-        else if ((o->pos_fbk > o->pos_max) && (vel_ref > 0))
+        else if ((o->pos_raw_cal_fbk > o->pos_max) && (vel_ref > 0))
         {
             o->output = o->vel_ref = 0;
         }
@@ -916,7 +917,7 @@ void Motor_get_pid_state(Motor* o, eOmc_joint_status_ofpid_t* pid_state)
 
 void Motor_get_state(Motor* o, eOmc_motor_status_t* motor_status)
 {
-    motor_status->basic.mot_position = o->pos_raw_fbk;
+    motor_status->basic.mot_position = o->pos_raw_cal_fbk;
     motor_status->basic.mot_velocity = o->vel_raw_fbk;
 
     //motor_status->basic.mot_position = o->pos_fbk;
@@ -941,6 +942,7 @@ void Motor_update_odometry_fbk_can(Motor* o, CanOdometry2FocMsg* can_msg) //
     
     o->pos_raw_fbk = can_msg->position;
     o->pos_fbk = o->pos_raw_fbk/o->GEARBOX - o->pos_calib_offset;
+    o->pos_raw_cal_fbk = o->pos_raw_fbk - o->pos_calib_offset*o->GEARBOX; 
 }
 
 void Motor_update_pos_fbk(Motor* o, int32_t position_raw)
@@ -965,6 +967,7 @@ void Motor_update_pos_fbk(Motor* o, int32_t position_raw)
     //update velocity
     o->vel_fbk = delta*CTRL_LOOP_FREQUENCY_INT;
     o->vel_raw_fbk = o->vel_fbk*o->GEARBOX;
+    o->pos_raw_cal_fbk = o->pos_fbk*o->GEARBOX;
 }
 
 void Motor_update_current_fbk(Motor* o, int16_t current)
@@ -1037,6 +1040,7 @@ void Motor_reset(Motor *o)
     o->pwm_fbk=ZERO;
     o->pwm_ref=ZERO;
 
+    o->pos_raw_cal_fbk=ZERO;
     o->pos_raw_fbk=ZERO;
     o->vel_raw_fbk=ZERO;
 
