@@ -229,11 +229,11 @@ static void updateEntity2SetMaps(const eOmc_4jomo_coupling_t *jomoCouplingInfo, 
     {
         jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(carray, j);
         uint8_t multi_enc = (uint8_t) eomc_encoder_get_numberofcomponents((eOmc_encoder_t)jomodes->encoder1.type);
-        for(uint8_t i=currentpos; i<multi_enc; i++)
+        for(uint8_t i=currentpos; i<currentpos+multi_enc; i++)
         {
-            o->e2s[i] = jomoCouplingInfo->joint2set[i];
+            o->e2s[i] = jomoCouplingInfo->joint2set[j];
         }
-        currentpos += multi_enc+1;
+        currentpos += multi_enc;
     }
     
     //currently all joint of same board have the the same number of multiple encoder. so i use j0
