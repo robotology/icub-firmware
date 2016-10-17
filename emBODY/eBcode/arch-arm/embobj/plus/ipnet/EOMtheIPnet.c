@@ -140,7 +140,7 @@ const eOmipnet_cfg_addr_t eom_ipnet_addr_DefaultCfg =
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#undef START_IPAL_INSIDE_eom_ipnet_Initialise
+#define START_IPAL_INSIDE_eom_ipnet_Initialise
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -151,6 +151,7 @@ static void s_eom_ipnet_ipal_start(void);
 
 static void e_eom_ipnet_signal_new_frame_is_available(void);
 
+static void s_eom_ipnet_tsktick_startup(EOMtask *rt, uint32_t n);
 static void s_eom_ipnet_tsktick_forever(EOMtask *rt, uint32_t n);
 
 static void s_eom_ipnet_tskproc_startup(EOMtask *rt, uint32_t n);
@@ -242,6 +243,12 @@ extern EOMtheIPnet * eom_ipnet_Initialise(const eOmipnet_cfg_t *ipnetcfg,
         // already initialised
         return(&s_eom_theipnet);
     }
+    
+    char str[128];
+    char ipv4str[20] = {0};
+    eo_common_ipv4addr_to_string(addrcfg->ipaddr, ipv4str, sizeof(ipv4str));
+    snprintf(str, sizeof(str), "_Initialise() executing for IP: %s", ipv4str);
+    eo_errman_Trace(eo_errman_GetHandle(), str, s_eobj_ownname);  
     
 
     if(NULL == ipnetcfg)
@@ -360,7 +367,7 @@ extern EOMtheIPnet * eom_ipnet_Initialise(const eOmipnet_cfg_t *ipnetcfg,
 #if defined(IPNET_TICK_PERIODIC) 
     // and task which ticks the timers. it is a periodic task
     s_eom_theipnet.tsktick = eom_task_New(eom_mtask_Periodic, ipnetcfg->tickpriority, ipnetcfg->tickstacksize,
-                                          NULL, s_eom_ipnet_tsktick_forever,
+                                          s_eom_ipnet_tsktick_startup, s_eom_ipnet_tsktick_forever,
                                           0, s_eom_theipnet.ipcfg.sys_timetick,
                                           NULL, 
                                           eom_ipnettick,
@@ -370,7 +377,7 @@ extern EOMtheIPnet * eom_ipnet_Initialise(const eOmipnet_cfg_t *ipnetcfg,
     // this solution is  not really periodic, but it can be good enough because we just need to increment some delays for tcp/ip retransmission.
     // we use this solution in the particular case of the object EOMtheEMSrunner with hw timer (but not with osaltimer) to avoid the ipnettick to delay start of rx task
     s_eom_theipnet.tsktick = eom_task_New(eom_mtask_EventDriven, ipnetcfg->tickpriority, ipnetcfg->tickstacksize,
-                                          NULL, s_eom_ipnet_tsktick_forever,
+                                          s_eom_ipnet_tsktick_startup, s_eom_ipnet_tsktick_forever,
                                           0, s_eom_theipnet.ipcfg.sys_timetick,
                                           NULL, 
                                           eom_ipnettick,
@@ -387,7 +394,12 @@ extern EOMtheIPnet * eom_ipnet_Initialise(const eOmipnet_cfg_t *ipnetcfg,
     eventviewer_load(ev_mark1, fn_mark1);
     eventviewer_load(ev_mark2, fn_mark2);
     eventviewer_load(ev_ipnetarp, fn_ipnetarp);
-#endif                                          
+#endif   
+   
+
+    snprintf(str, sizeof(str), "_Initialise() just executed for IP: %s", ipv4str);
+    eo_errman_Trace(eo_errman_GetHandle(), str, s_eobj_ownname); 
+    
     return(&s_eom_theipnet);
 }    
 
@@ -1094,8 +1106,11 @@ static void e_eom_ipnet_signal_new_frame_is_available(void)
 }
 
 
-/*  @brief      the body of tsktick.
- **/
+static void s_eom_ipnet_tsktick_startup(EOMtask *rt, uint32_t n)
+{// to allow the call of any code here inside, you must increase the stack size of this task.
+    // eo_errman_Trace(eo_errman_GetHandle(), "called _tsktick_startup()", s_eobj_ownname);
+}
+
 static void s_eom_ipnet_tsktick_forever(EOMtask *rt, uint32_t n)
 {
 // we call the ipal_sys_timetick_increment() at regular intervals even if teh ipnet is not active. the reason is that the timeout of teh stack must be computed anyway 
@@ -1132,6 +1147,8 @@ static void s_eom_ipnet_ipal_start(void)
     
     // start the ipal
     ipal_sys_start();       
+    
+    eo_errman_Trace(eo_errman_GetHandle(), "ipal_sys_start() just called", s_eobj_ownname);
 }
 
 
@@ -1143,6 +1160,8 @@ static void s_eom_ipnet_tskproc_startup(EOMtask *rt, uint32_t n)
 #if     !defined(START_IPAL_INSIDE_eom_ipnet_Initialise)
     s_eom_ipnet_ipal_start();
 #endif
+    
+    eo_errman_Trace(eo_errman_GetHandle(), "called _tskproc_startup()", s_eobj_ownname);
 }
 
 /*  @brief      the body of tsktproc.

@@ -173,17 +173,16 @@ extern EOMtheEMStransceiver * eom_emstransceiver_Initialise(const eOemstransceiv
     s_eom_emstransceiver_update_diagnosticsinfo();
     
    
-    //#warning --> marco.accame: so far the dispatcher uses capacity = 16. maybe we can increase the number.
     eOinfodispatcher_cfg_t config = {0};
     config.capacity     = 24; // 16 or or eo_sizecntnr_dynamic ....
     config.transmitter  = eo_transceiver_GetTransmitter(eom_emstransceiver_GetTransceiver(eom_emstransceiver_GetHandle()));
     eo_infodispatcher_Initialise(&config);    
     
     
-    char str[eomn_info_status_extra_sizeof];
-    uint8_t *ipaddr = (uint8_t*) &cfg->hostipv4addr;
-    snprintf(str, sizeof(str), "EOMtheEMStransceiver <-> %d.%d.%d.%d, %d", ipaddr[0], ipaddr[1], ipaddr[2], ipaddr[3], cfg->hostipv4port);
-    eo_errman_Info(eo_errman_GetHandle(), str, s_eobj_ownname, &eo_errman_DescrRunningHappily);    
+//    char str[eomn_info_status_extra_sizeof];
+//    uint8_t *ipaddr = (uint8_t*) &cfg->hostipv4addr;
+//    snprintf(str, sizeof(str), "exiting _Initialise(). host is %d.%d.%d.%d:%d", ipaddr[0], ipaddr[1], ipaddr[2], ipaddr[3], cfg->hostipv4port);
+//    eo_errman_Trace(eo_errman_GetHandle(), str, s_eobj_ownname);    
     
     return(&s_emstransceiver_singleton);
 }

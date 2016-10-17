@@ -263,7 +263,7 @@ extern "C" {
 
 //  <o> tick task stack size <128-256:128>
 //  <i> default: 128
-#define IPNET_TMP_STACK2   128
+#define IPNET_TMP_STACK2   256
 
 
 //  <o> tick task period     <0=> as specified in ipal_cfg->sys_timetick in ipal_cfg.h
