@@ -54,7 +54,9 @@ typedef struct
 typedef struct
 {   
     hal_res_fp_int32_voidp_t                init;   // init(id, void* initpar)
+    hal_res_fp_int32_t                      deinit; // deinit(id)
     hal_res_fp_int32_voidp_voidp_voidp_t    read;   // read(id, int32_t* angratex, int32_t* angratey, int32_t* angratez)
+    hal_res_fp_int32_voidp_voidp_voidp_t    readraw;   // read(id, int16_t* x, int16_t* y, int16_t* z)
 } hal_gyroscope_driver_fun_t;
 
 typedef struct
