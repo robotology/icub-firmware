@@ -111,10 +111,12 @@ typedef struct
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
+static void s_hl_chip_st_l3g4200d_initted_clr(void);
 static void s_hl_chip_st_l3g4200d_initted_set(void);
-static hl_boolval_t s_hl_chip_st_l3g4200d_initted_is(void);
+static hl_bool_t s_hl_chip_st_l3g4200d_initted_is(void);
 
 static hl_result_t s_hl_chip_st_l3g4200d_hw_init(const hl_chip_st_l3g4200d_cfg_t *cfg, hl_chip_st_l3g4200d_internal_item_t* intitem);
+static hl_result_t s_hl_chip_st_l3g4200d_hw_deinit(hl_i2c_t id, hl_chip_st_l3g4200d_internal_item_t *intitem);
 
 static int32_t s_hl_chip_st_l3g4200d_convert(int32_t v);
 
@@ -148,6 +150,37 @@ static hl_chip_st_l3g4200d_theinternals_t s_hl_chip_st_l3g4200d_theinternals =
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
+
+
+extern hl_result_t hl_chip_st_l3g4200d_deinit(hl_i2c_t i2cid)
+{
+    hl_chip_st_l3g4200d_internal_item_t *intitem = s_hl_chip_st_l3g4200d_theinternals.items[0];
+     
+  
+    if(hl_false == s_hl_chip_st_l3g4200d_initted_is())
+    {
+        return(hl_res_OK);
+    }  
+
+    // if it does not have ram yet, then attempt to allocate it.
+    if(NULL == intitem)
+    {
+        // those of you scared of heap may use static ram
+        //intitem = s_hl_chip_st_l3g4200d_theinternals.items[0] = hl_sys_heap_new(sizeof(hl_chip_st_l3g4200d_internal_item_t));  
+        intitem = s_hl_chip_st_l3g4200d_theinternals.items[0] = &hl_chip_st_l3g4200d_theonlyitem;
+    }  
+    
+
+    if(hl_res_OK != s_hl_chip_st_l3g4200d_hw_deinit(i2cid, intitem))
+    {
+        return(hl_res_NOK_generic);
+    }
+    
+    
+    s_hl_chip_st_l3g4200d_initted_clr();
+
+    return(hl_res_OK);
+}
 
 
 extern hl_result_t hl_chip_st_l3g4200d_init(const hl_chip_st_l3g4200d_cfg_t *cfg)
@@ -212,7 +245,7 @@ extern hl_result_t hl_chip_st_l3g4200d_temp_get(int8_t* temp)
     return(hl_res_OK);
 }
 
-extern hl_result_t hl_chip_st_l3g4200d_angrate_get(int32_t* xar, int32_t* yar, int32_t* zar)
+extern hl_result_t hl_chip_st_l3g4200d_get(int16_t* x, int16_t* y, int16_t* z)
 {
     hl_result_t res = hl_res_NOK_generic; 
     hl_chip_st_l3g4200d_internal_item_t *intitem = s_hl_chip_st_l3g4200d_theinternals.items[0];
@@ -220,12 +253,12 @@ extern hl_result_t hl_chip_st_l3g4200d_angrate_get(int32_t* xar, int32_t* yar, i
 
     uint8_t datal = 0;
     uint8_t datah = 0;
-    int32_t tmp;
+    int16_t tmp;
 
     
-    *xar = 0;
-    *yar = 0;
-    *zar = 0;
+    *x = 0;
+    *y = 0;
+    *z = 0;
 
 #if     !defined(HL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)
     if(hl_false == s_hl_chip_st_l3g4200d_initted_is())
@@ -241,23 +274,46 @@ extern hl_result_t hl_chip_st_l3g4200d_angrate_get(int32_t* xar, int32_t* yar, i
     regaddr.bytes.one = REGADR_ARXH;
     res = hl_i2c_read(i2cid, I2CADDRESS, regaddr, &datah, 1);
     tmp = (int16_t)((datah << 8) | datal);    
-    *xar = s_hl_chip_st_l3g4200d_convert(tmp);
+    *x = tmp;
     
     regaddr.bytes.one = REGADR_ARYL;
     res = hl_i2c_read(i2cid, I2CADDRESS, regaddr, &datal, 1);
     regaddr.bytes.one = REGADR_ARYH;
     res = hl_i2c_read(i2cid, I2CADDRESS, regaddr, &datah, 1);
     tmp = (int16_t)((datah << 8) | datal);    
-    *yar = s_hl_chip_st_l3g4200d_convert(tmp);    
+    *y = tmp;    
 
     regaddr.bytes.one = REGADR_ARZL;
     res = hl_i2c_read(i2cid, I2CADDRESS, regaddr, &datal, 1);
     regaddr.bytes.one = REGADR_ARZH;
     res = hl_i2c_read(i2cid, I2CADDRESS, regaddr, &datah, 1);
     tmp = (int16_t)((datah << 8) | datal);    
-    *zar = s_hl_chip_st_l3g4200d_convert(tmp);
+    *z = tmp;
     
     res = res;
+   
+    return(hl_res_OK);
+    
+}
+
+
+
+extern hl_result_t hl_chip_st_l3g4200d_angrate_get(int32_t* xar, int32_t* yar, int32_t* zar)
+{
+    int16_t x = 0;
+    int16_t y = 0;
+    int16_t z  =0;
+    
+    hl_result_t res = hl_chip_st_l3g4200d_get(&x, &y, &z);
+    
+    if(hl_res_OK != res)
+    {
+        return(res);
+    }
+    
+    *xar = s_hl_chip_st_l3g4200d_convert(x);
+    *yar = s_hl_chip_st_l3g4200d_convert(y);
+    *zar = s_hl_chip_st_l3g4200d_convert(z);
    
     return(hl_res_OK);
 }
@@ -277,6 +333,12 @@ extern hl_result_t hl_chip_st_l3g4200d_angrate_get(int32_t* xar, int32_t* yar, i
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
+
+
+static void s_hl_chip_st_l3g4200d_initted_clr(void)
+{
+    s_hl_chip_st_l3g4200d_theinternals.initted = hl_false;
+}
 
 
 static void s_hl_chip_st_l3g4200d_initted_set(void)
@@ -389,6 +451,13 @@ static hl_result_t s_hl_chip_st_l3g4200d_hw_init(const hl_chip_st_l3g4200d_cfg_t
 
     return(hl_res_OK);
 }
+
+static hl_result_t s_hl_chip_st_l3g4200d_hw_deinit(hl_i2c_t id, hl_chip_st_l3g4200d_internal_item_t *intitem)
+{   
+    // i do nothing
+    return(hl_res_OK);
+}
+
 
 
 static int32_t s_hl_chip_st_l3g4200d_convert(int32_t v)
