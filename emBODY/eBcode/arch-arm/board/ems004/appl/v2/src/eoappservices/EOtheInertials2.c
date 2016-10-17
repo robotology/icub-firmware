@@ -43,6 +43,8 @@
 
 #include "EOVtheCallbackManager.h"
 
+#include "EOtheMEMS.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -194,6 +196,8 @@ extern EOtheInertials2* eo_inertials2_Initialise(void)
     memcpy(&p->sensorsconfig, &s_eo_default_inertialconfig, sizeof(eOas_inertial_config_t));
     p->fifoofinertialdata = eo_vector_New(sizeof(eOas_inertial_data_t), 32, NULL, 0, NULL, NULL);
     
+    eo_mems_Initialise(NULL);
+    
     p->diagnostics.reportTimer = eo_timer_New();
     p->diagnostics.errorType = eo_errortype_error;
     p->diagnostics.errorDescriptor.sourceaddress = eo_errman_sourcedevice_localboard;
@@ -309,7 +313,9 @@ extern eOresult_t eo_inertials2_Verify(EOtheInertials2 *p, const eOmn_serv_confi
     // now i get all the sensors.
     memcpy(p->arrayofsensors, &servcfg->data.as.inertial.arrayofsensors, sizeof(eOas_inertial_arrayof_sensors_t));
     
-    // so far we dont care about verifying sensors which are local ...
+    // so far we dont care about verifying sensors which are local ... 
+    // noooooooooooo, we do it now
+    #warning falllllllllllllllllllllllllooooooooooooooooo
     
     // now i must build the canmaps ... but only for discovery
     uint8_t numofsensors = eo_array_Size(p->arrayofsensors);    
