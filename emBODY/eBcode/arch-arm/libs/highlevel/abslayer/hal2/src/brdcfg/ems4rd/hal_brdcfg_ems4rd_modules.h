@@ -83,7 +83,7 @@
 #define     HAL_USE_EEPROM
 #define     HAL_USE_SPIENCODER
 #define     HAL_USE_ETHTRANSCEIVER
-#undef  HAL_USE_GYROSCOPE
+#define     HAL_USE_GYROSCOPE
 #define     HAL_USE_LED
 #define     HAL_USE_MUX
 #define     HAL_USE_SWITCH
