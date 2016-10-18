@@ -63,7 +63,9 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+#define NOID16 0xffff
+#define NOID08 0xff
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -154,8 +156,8 @@ static EOtheInertials2 s_eo_theinertials2 =
     .canmap_mtb_active          = {0},
     .ethmap_mems_active         = 0,
     
-    .fromcan2id                 = {99},
-    .frommems2id                = {99},
+    .fromcan2id                 = {NOID16},
+    .frommems2id                = {NOID16},
     .memsparam                  = {255},
     .memsconfig                 = {0},  
 
@@ -194,8 +196,8 @@ extern EOtheInertials2* eo_inertials2_Initialise(void)
     p->canmap_mtb_gyros_ext[0] = p->canmap_mtb_gyros_ext[1] = 0;
     p->canmap_mtb_active[0]    = p->canmap_mtb_active[1]    = 0;
     p->ethmap_mems_active = 0;
-    memset(p->fromcan2id, 99, sizeof(p->fromcan2id));       // non va bene mi trovo un id che e' 0x6363 (99d = 63h)
-    memset(p->frommems2id, 99, sizeof(p->frommems2id));     // non va bene mi trovo un id che e' 0x6363 (99d = 63h)
+    memset(p->fromcan2id, NOID08, sizeof(p->fromcan2id));       
+    memset(p->frommems2id, NOID08, sizeof(p->frommems2id));     
     memset(p->memsparam, 255, sizeof(p->memsparam));
     
     p->inertial2 = NULL;
@@ -723,22 +725,51 @@ extern eOresult_t eo_inertials2_Tick(EOtheInertials2 *p, eObool_t resetstatus)
     eOas_inertial_data_t *data = &p->inertial2->status.data;
     memset(data, 0, sizeof(eOas_inertial_data_t)); 
     
-    if(eobool_true == eo_vector_Empty(p->fifoofinertialdata))
+    static volatile uint32_t ciao = 0;
+    eOmems_sensor_t sensor = mems_gyroscope_l3g4200;
+    // if we have a mems, then if we have a fifoofinertialdata, then NOID16
+    if(eores_OK == eo_mems_Get(eo_mems_GetHandle(), data, eok_reltimeZERO, &sensor, NULL))
     {
-        // just reset the status->data 
-        data->id = 999;
-        data->timestamp = eov_sys_LifeTimeGet(eov_sys_GetHandle());           
+        //eo_errman_Trace(eo_errman_GetHandle(), "tx mems", s_eobj_ownname);
+        ciao++;
+        // ok, i adjust the id
+        uint8_t index = (mems_gyroscope_l3g4200 == sensor) ? (mems_gyro) : (mems_accel);
+        data->id = p->frommems2id[index];
     }
-    else
+    else if(eobool_false == eo_vector_Empty(p->fifoofinertialdata))
     {
-        // else ... retrieve the item from fifoofinertialdata, copy it into status->data and remove it from fifoofinertialdata 
         eOas_inertial_data_t * item = (eOas_inertial_data_t*) eo_vector_Front(p->fifoofinertialdata);
         if(NULL != item)
         {
             memcpy(data, item, sizeof(eOas_inertial_data_t));   
             eo_vector_PopFront(p->fifoofinertialdata);   
-        }
+            eo_errman_Trace(eo_errman_GetHandle(), "tx mtb", s_eobj_ownname);
+        }        
     }
+    else
+    {
+        // just reset the status->data 
+        data->id = NOID16;
+        data->timestamp = eov_sys_LifeTimeGet(eov_sys_GetHandle());          
+    }
+         
+    
+//    if(eobool_true == eo_vector_Empty(p->fifoofinertialdata))
+//    {
+//        // just reset the status->data 
+//        data->id = NOID16;
+//        data->timestamp = eov_sys_LifeTimeGet(eov_sys_GetHandle());           
+//    }
+//    else
+//    {
+//        // else ... retrieve the item from fifoofinertialdata, copy it into status->data and remove it from fifoofinertialdata 
+//        eOas_inertial_data_t * item = (eOas_inertial_data_t*) eo_vector_Front(p->fifoofinertialdata);
+//        if(NULL != item)
+//        {
+//            memcpy(data, item, sizeof(eOas_inertial_data_t));   
+//            eo_vector_PopFront(p->fifoofinertialdata);   
+//        }
+//    }
     
     return(eores_OK);        
 }
@@ -845,7 +876,7 @@ extern eOresult_t eo_inertials2_AcceptCANframe(EOtheInertials2 *p, eOas_inertial
     loc.addr = EOCANPROT_FRAME_GET_SOURCE(frame);    
     loc.insideindex = eobrd_caninsideindex_none;
     
-    uint16_t id = 999;
+    uint16_t id = NOID16;
 
     if(eobool_false == s_eo_inertials2_get_id(loc, type, &id))
     {
@@ -1153,9 +1184,9 @@ static void s_eo_inertials2_build_maps(EOtheInertials2* p, uint64_t enablemask)
 {
     uint8_t numofsensors = eo_array_Size(p->arrayofsensors);    
   
-    // at first we disable all. 0x6363 ...........
-    memset(p->fromcan2id, 99, sizeof(p->fromcan2id));
-    memset(p->frommems2id, 99, sizeof(p->frommems2id));
+    // at first we disable all. 
+    memset(p->fromcan2id, NOID08, sizeof(p->fromcan2id));
+    memset(p->frommems2id, NOID08, sizeof(p->frommems2id));
     memset(p->memsparam, 255, sizeof(p->memsparam));
     
     memset(p->canmap_mtb_active, 0, sizeof(p->canmap_mtb_active));
@@ -1216,7 +1247,7 @@ static void s_eo_inertials2_build_maps(EOtheInertials2* p, uint64_t enablemask)
                     p->frommems2id[n] = i;  
                     #warning --> later on we could get hal_gyroscope_range* from ... a specific param or from des->on.eth.id ....
                     p->memsparam[n] = hal_gyroscope_range_500dps;     
-                    p->memsconfig[n].acquisitionrate = 0;
+                    p->memsconfig[n].acquisitionrate = p->sensorsconfig.datarate * EOK_reltime1ms;
                     p->memsconfig[n].sensor = mems_gyroscope_l3g4200;
                     p->memsconfig[n].properties.gyroscope.range = hal_gyroscope_range_500dps;
                 }
@@ -1355,13 +1386,13 @@ static eObool_t s_eo_inertials2_get_id(eObrd_canlocation_t loc, eOas_inertial_ty
     
     *id = candidates[index];
     
-    if((99 == *id) && (eoas_inertial_accel_mtb_int == type))
+    if((NOID16 == *id) && (eoas_inertial_accel_mtb_int == type))
     {
         // it is possible that we have have configured an external accel ... try assigning it
         *id = candidates[eoas_inertial_accel_mtb_ext-eoas_inertial_accel_mtb_int];
     }
     
-    if(99 == *id)
+    if(NOID16 == *id)
     {
         return(eobool_false);
     }
