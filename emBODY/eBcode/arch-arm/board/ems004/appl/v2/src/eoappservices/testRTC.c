@@ -901,6 +901,8 @@ static void s_services_test_mc_multiplesteps(void *arg)
 // --------------------------------------------------------------------------------------------------------------------
 // inertials mems gyro
 
+#include "EOtheInertials2.h"
+
 
 static const eOmn_serv_configuration_t s_serv_config_as_inertial_test_gyro =
 {   
@@ -910,8 +912,8 @@ static const eOmn_serv_configuration_t s_serv_config_as_inertial_test_gyro =
     {
         .mtbversion    =
         {
-            .firmware   = { .major = 0, .minor = 0, .build = 0 },
-            .protocol   = { .major = 0, .minor = 0 }  // in case of {0, 0} the can discovery is not done but the verify will be ok. for normal case use: {1, 0}  
+            .firmware   = { .major = 2, .minor = 17, .build = 0 },
+            .protocol   = { .major = 1, .minor = 0 }  // in case of {0, 0} the can discovery is not done but the verify will be ok. for normal case use: {1, 0}  
         },
         
         .arrayofsensors =
@@ -927,7 +929,7 @@ static const eOmn_serv_configuration_t s_serv_config_as_inertial_test_gyro =
             {
                 {   // mtb
                     .type   = eoas_inertial_accel_mtb_int,
-                    .on.can = { .place = eobrd_place_can, .port = eOcanport1, .addr = 1 }
+                    .on.can = { .place = eobrd_place_can, .port = eOcanport1, .addr = 7 }
                 },                                
                 {   // gyro ....
                     .type   = eoas_inertial_gyros_ems_st_l3g4200d,
@@ -946,8 +948,8 @@ static const eOmn_serv_configuration_t s_serv_config_as_inertial_test_accel =
     {
         .mtbversion    =
         {
-            .firmware   = { .major = 0, .minor = 0, .build = 0 },
-            .protocol   = { .major = 0, .minor = 0 }  // in case of {0, 0} the can discovery is not done but the verify will be ok. for normal case use: {1, 0}  
+            .firmware   = { .major = 2, .minor = 17, .build = 0 },
+            .protocol   = { .major = 1, .minor = 0 }  // in case of {0, 0} the can discovery is not done but the verify will be ok. for normal case use: {1, 0}  
         },
         
         .arrayofsensors =
@@ -963,7 +965,7 @@ static const eOmn_serv_configuration_t s_serv_config_as_inertial_test_accel =
             {
                 {   // mtb
                     .type   = eoas_inertial_accel_mtb_int,
-                    .on.can = { .place = eobrd_place_can, .port = eOcanport1, .addr = 1 }
+                    .on.can = { .place = eobrd_place_can, .port = eOcanport1, .addr = 7 }
                 },                                
                 {   // gyro ....
                     .type   = eoas_inertial_accel_ems_st_lis3x,
@@ -992,36 +994,45 @@ static void s_services_test_inertials_multiplesteps(void *arg)
     if(1 == step)
     {
         s_services_test_stop(arg);
+        
+        services_stop_ANY_service_now = 0;
         eo_action_SetEvent(s_act, emsconfigurator_evt_userdef03, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));    
-        eo_timer_Start(s_timer, eok_abstimeNOW, 3*eok_reltime1sec, eo_tmrmode_ONESHOT, s_act);    
+        eo_timer_Start(s_timer, eok_abstimeNOW, 1*eok_reltime1sec, eo_tmrmode_ONESHOT, s_act);    
     }
     else if(2 == step)
-    {
-        s_services_test_verifyactivate(s_test_config_ko);
+    {   // verify-activate
+        s_services_test_verifyactivate(s_test_config_ok);
+        
+        services_stop_ANY_service_now = 0;
         eo_action_SetEvent(s_act, emsconfigurator_evt_userdef03, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));    
-        eo_timer_Start(s_timer, eok_abstimeNOW, 3*eok_reltime1sec, eo_tmrmode_ONESHOT, s_act);          
+        eo_timer_Start(s_timer, eok_abstimeNOW, 1*eok_reltime1sec, eo_tmrmode_ONESHOT, s_act);              
     }
     else if(3 == step)
-    {  
-        // the previous was not activated .... hence, start will fail        
-        s_services_test_start(arg);
+    {   // inertials config  
+        eOas_inertial_config_t config = {0};
+        config.datarate = 10; // ms
+        config.enabled = 0x3; // enable the first two
+        eo_inertials2_Config(eo_inertials2_GetHandle(), &config);
         
-        // prepare to stop it ... by setting a flag which the runner will process and call 
         services_stop_ANY_service_now = 0;
         eo_action_SetCallback(s_act, s_services_test_mc_stop, NULL, eov_callbackman_GetTask(eov_callbackman_GetHandle())); 
-        eo_timer_Start(s_timer, eok_abstimeNOW, 3*eok_reltime1sec, eo_tmrmode_ONESHOT, s_act); 
+        eo_timer_Start(s_timer, eok_abstimeNOW, 1*eok_reltime1sec, eo_tmrmode_ONESHOT, s_act); 
     }
     else if(4 == step)
-    {
+    {   // service start        
+        s_services_test_start(arg);
+        
         services_stop_ANY_service_now = 0;
-        s_services_test_verifyactivate(s_test_config_ok);
         eo_action_SetEvent(s_act, emsconfigurator_evt_userdef03, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));    
-        eo_timer_Start(s_timer, eok_abstimeNOW, 3*eok_reltime1sec, eo_tmrmode_ONESHOT, s_act);    
+        eo_timer_Start(s_timer, eok_abstimeNOW, 1*eok_reltime1sec, eo_tmrmode_ONESHOT, s_act);    
     }
     else if(5 == step)
-    {
+    {   // inertials enable        
+        eo_inertials2_Transmission(eo_inertials2_GetHandle(), eobool_true);
+        
         services_stop_ANY_service_now = 0;
-        s_services_test_start(arg);
+        eo_action_SetEvent(s_act, emsconfigurator_evt_userdef03, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));    
+        eo_timer_Start(s_timer, eok_abstimeNOW, 30*eok_reltime1sec, eo_tmrmode_ONESHOT, s_act);   
     }  
     else if(6 == step)
     {
