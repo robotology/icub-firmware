@@ -29,6 +29,8 @@
 #include "EoProtocol.h"
 #include "EOtheServices_hid.h"
 
+#include "EOtheMEMS.h"
+
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
 
@@ -39,6 +41,7 @@
 
 enum { inertials_maxRegulars = 2 }; // there cannot be more than 1 inertials object, and typically not more than 1 signalled variable.
 
+enum { mems_gyro = 0, mems_accel = 1 , mems_numberofthem = 2 };
 
 struct EOtheInertials_hid
 {
@@ -58,9 +61,14 @@ struct EOtheInertials_hid
     uint16_t                                canmap_mtb_accel_ext[2];
     uint16_t                                canmap_mtb_gyros_ext[2];
     uint16_t                                canmap_mtb_active[2];
+    uint8_t                                 ethmap_mems_active;
     
     uint16_t                                fromcan2id[2][16][3];   // 2 ports, 15 addresses (0->14), 3 kinds on mtb ... use mtb-eoas_inertial_accel_mtb_int
 
+    uint16_t                                frommems2id[mems_numberofthem];
+    uint8_t                                 memsparam[mems_numberofthem];
+    
+    eOmems_sensor_cfg_t                     memsconfig[mems_numberofthem];
     // the inertial at the end
     eOas_inertial_t*                        inertial2;  
     EOarray*                                id32ofregulars;

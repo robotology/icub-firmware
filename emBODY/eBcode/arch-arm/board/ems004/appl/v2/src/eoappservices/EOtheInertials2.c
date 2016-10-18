@@ -82,6 +82,8 @@
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
+static eOresult_t s_eo_inertials2_verify_local_sensors(EOtheInertials2 *p, const eOmn_serv_configuration_t * servcfg);
+
 static eOresult_t s_eo_inertials2_TXstart(EOtheInertials2 *p);
 
 static eOresult_t s_eo_inertials2_TXstop(EOtheInertials2 *p);
@@ -150,8 +152,12 @@ static EOtheInertials2 s_eo_theinertials2 =
     .canmap_mtb_accel_ext       = {0},
     .canmap_mtb_gyros_ext       = {0},
     .canmap_mtb_active          = {0},
+    .ethmap_mems_active         = 0,
     
     .fromcan2id                 = {99},
+    .frommems2id                = {99},
+    .memsparam                  = {255},
+    .memsconfig                 = {0},  
 
     .inertial2                  = NULL,
     .id32ofregulars             = NULL
@@ -187,8 +193,11 @@ extern EOtheInertials2* eo_inertials2_Initialise(void)
     p->canmap_mtb_accel_ext[0] = p->canmap_mtb_accel_ext[1] = 0;
     p->canmap_mtb_gyros_ext[0] = p->canmap_mtb_gyros_ext[1] = 0;
     p->canmap_mtb_active[0]    = p->canmap_mtb_active[1]    = 0;
-    memset(p->fromcan2id, 99, sizeof(p->fromcan2id));
-
+    p->ethmap_mems_active = 0;
+    memset(p->fromcan2id, 99, sizeof(p->fromcan2id));       // non va bene mi trovo un id che e' 0x6363 (99d = 63h)
+    memset(p->frommems2id, 99, sizeof(p->frommems2id));     // non va bene mi trovo un id che e' 0x6363 (99d = 63h)
+    memset(p->memsparam, 255, sizeof(p->memsparam));
+    
     p->inertial2 = NULL;
     p->id32ofregulars = eo_array_New(inertials_maxRegulars, sizeof(uint32_t), NULL);
     p->arrayofsensors = eo_array_New(eOas_inertials_maxnumber, sizeof(eOas_inertial_descriptor_t), NULL);
@@ -265,6 +274,8 @@ extern eOresult_t eo_inertials2_SendReport(EOtheInertials2 *p)
 
 extern eOresult_t eo_inertials2_Verify(EOtheInertials2 *p, const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify)
 {
+    eOresult_t res = eores_NOK_generic;
+    
     if((NULL == p) || (NULL == servcfg))
     {
         p->service.state = eomn_serv_state_failureofverify;
@@ -301,21 +312,27 @@ extern eOresult_t eo_inertials2_Verify(EOtheInertials2 *p, const eOmn_serv_confi
 
     p->service.onverify = onverify;
     p->service.activateafterverify = activateafterverify;
+    
+    // i get all the sensors.
+    memcpy(p->arrayofsensors, &servcfg->data.as.inertial.arrayofsensors, sizeof(eOas_inertial_arrayof_sensors_t));
+    
+    
+    // at first we verify sensors which are local (if any)
+    
+    if(eores_OK != (res = s_eo_inertials2_verify_local_sensors(p, servcfg)))
+    {        
+        return res;        
+    }
+    
 
-
+    // then ... those on can
     p->sharedcan.discoverytarget.info.type = eobrd_cantype_mtb;
     p->sharedcan.discoverytarget.info.protocol.major = servcfg->data.as.inertial.mtbversion.protocol.major; 
     p->sharedcan.discoverytarget.info.protocol.minor = servcfg->data.as.inertial.mtbversion.protocol.minor;
     p->sharedcan.discoverytarget.info.firmware.major = servcfg->data.as.inertial.mtbversion.firmware.major; 
     p->sharedcan.discoverytarget.info.firmware.minor = servcfg->data.as.inertial.mtbversion.firmware.minor;
     p->sharedcan.discoverytarget.info.firmware.build = servcfg->data.as.inertial.mtbversion.firmware.build;   
-
-    // now i get all the sensors.
-    memcpy(p->arrayofsensors, &servcfg->data.as.inertial.arrayofsensors, sizeof(eOas_inertial_arrayof_sensors_t));
     
-    // so far we dont care about verifying sensors which are local ... 
-    // noooooooooooo, we do it now
-    #warning falllllllllllllllllllllllllooooooooooooooooo
     
     // now i must build the canmaps ... but only for discovery
     uint8_t numofsensors = eo_array_Size(p->arrayofsensors);    
@@ -929,6 +946,75 @@ extern eObool_t eocanprotINperiodic_redefinable_SkipParsingOf_ANY_PERIODIC_INERT
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
+static eOresult_t s_eo_inertials2_verify_local_sensors(EOtheInertials2 *p, const eOmn_serv_configuration_t * servcfg)
+{
+    eOresult_t res = eores_OK;
+    uint64_t errormask = 0; // at most i have eOas_inertials_maxnumber = 48 items
+    uint8_t numoferrors = 0;
+    uint8_t numofsensors = eo_array_Size(p->arrayofsensors);    
+    for(uint8_t i=0; i<numofsensors; i++)
+    {
+        eOas_inertial_descriptor_t *des = (eOas_inertial_descriptor_t*) eo_array_At(p->arrayofsensors, i);
+        if(NULL != des)
+        {
+            if(eobrd_place_eth == des->on.any.place)
+            {
+                // it can be ... eoas_inertial_gyros_ems_st_l3g4200d only
+                if((eoas_inertial_gyros_ems_st_l3g4200d == des->type) && (eobool_true == eo_mems_IsSensorSupported(eo_mems_GetHandle(), mems_gyroscope_l3g4200)))
+                {
+                    // ok, verify is ok . we keep res = eores_OK.
+                }
+//                else if((eoas_inertial_accel_ems_st_lis3x == des->type) && (hal_true == hal_accelometer_supported_is(hal_acceleromter1)))
+//                {
+//                }    
+                else
+                {
+                    // we dont support it ... must do something
+                    res = eores_NOK_generic; 
+                    eo_common_dword_bitset(&errormask, i);
+                    numoferrors ++;
+                }
+            }
+        }
+    }
+
+    if(eores_OK == res)
+    {
+        // must enable .... 
+    }
+    else
+    {        
+        p->diagnostics.errorDescriptor.sourcedevice       = eo_errman_sourcedevice_localboard;
+        p->diagnostics.errorDescriptor.sourceaddress      = 0;
+        p->diagnostics.errorDescriptor.par16              = numoferrors;
+        p->diagnostics.errorDescriptor.par64              = 0;
+       
+        EOaction_strg astrg = {0};
+        EOaction *act = (EOaction*)&astrg;
+        eo_action_SetCallback(act, s_eo_inertials2_send_periodic_error_report, p, eov_callbackman_GetTask(eov_callbackman_GetHandle()));        
+        
+        p->diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_inertials_failed_unsupportedsensor);
+        p->diagnostics.errorType = eo_errortype_error;                
+        eo_errman_Error(eo_errman_GetHandle(), p->diagnostics.errorType, NULL, s_eobj_ownname, &p->diagnostics.errorDescriptor);
+        
+        if(0 != p->diagnostics.reportPeriod)
+        {
+            p->diagnostics.errorCallbackCount = EOK_int08dummy;
+            eo_timer_Start(p->diagnostics.reportTimer, eok_abstimeNOW, p->diagnostics.reportPeriod, eo_tmrmode_FOREVER, act);   
+        }  
+        
+        p->service.state = eomn_serv_state_failureofverify;
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_inertials, p->service.state);
+        if(NULL != p->service.onverify)
+        {
+            p->service.onverify(p, eobool_false); 
+        }    
+             
+    }
+        
+    return(res);
+}
+
 
 static eOresult_t s_eo_inertials2_TXstart(EOtheInertials2 *p)
 { 
@@ -937,16 +1023,25 @@ static eOresult_t s_eo_inertials2_TXstart(EOtheInertials2 *p)
         return(eores_OK);
     }    
     
-    if((0 == p->canmap_mtb_active[0]) && (0 == p->canmap_mtb_active[1]))
-    {   // no mtb boards configured
+    if((0 == p->canmap_mtb_active[0]) && (0 == p->canmap_mtb_active[1]) && (0 == p->ethmap_mems_active))
+    {   // no mtb boards or onboard sensors configured
         return(eores_OK);
     } 
     
     if(0 == p->sensorsconfig.enabled)
-    {   // no mtb boards enabled
+    {   // no mtb boards or local mems enabled
         return(eores_OK);
     } 
-  
+    
+    #warning add a proper call to EOtheMEMS .... to config and start the acquisition.    
+
+    if(eobool_true == eo_common_byte_bitcheck(p->ethmap_mems_active, mems_gyro))
+    {
+        eo_mems_Config(eo_mems_GetHandle(), &p->memsconfig[mems_gyro]);
+        eo_mems_Start(eo_mems_GetHandle());
+    }                        
+
+   
  
     icubCanProto_inertial_config_t canprotoconfig = {0};
     
@@ -995,7 +1090,7 @@ static eOresult_t s_eo_inertials2_TXstop(EOtheInertials2 *p)
     if(eobool_false == p->configured)
     {   // nothing to do because we dont have a configured service 
         return(eores_OK);
-    }    
+    }     
 
     icubCanProto_inertial_config_t canprotoconfig = {0};
     
@@ -1021,6 +1116,11 @@ static eOresult_t s_eo_inertials2_TXstop(EOtheInertials2 *p)
             }
         }
     }
+    
+    
+    // stop the mems
+    #warning -> do a proper call to EOtheMEMS to stop the acquisition ...
+    eo_mems_Stop(eo_mems_GetHandle());
 
     // send up diagnostics
     // debug -> "Object EOtheInertials2 has programmed the mtb. In param16 in msb there is the mode, in lsb there is datarate"    
@@ -1053,13 +1153,16 @@ static void s_eo_inertials2_build_maps(EOtheInertials2* p, uint64_t enablemask)
 {
     uint8_t numofsensors = eo_array_Size(p->arrayofsensors);    
   
-    // at first we disable all.
+    // at first we disable all. 0x6363 ...........
     memset(p->fromcan2id, 99, sizeof(p->fromcan2id));
+    memset(p->frommems2id, 99, sizeof(p->frommems2id));
+    memset(p->memsparam, 255, sizeof(p->memsparam));
+    
     memset(p->canmap_mtb_active, 0, sizeof(p->canmap_mtb_active));
     memset(p->canmap_mtb_accel_int, 0, sizeof(p->canmap_mtb_accel_int));
     memset(p->canmap_mtb_accel_ext, 0, sizeof(p->canmap_mtb_accel_ext));
     memset(p->canmap_mtb_gyros_ext, 0, sizeof(p->canmap_mtb_gyros_ext));
-    
+    p->ethmap_mems_active = 0;
 
     for(uint8_t i=0; i<numofsensors; i++)
     {
@@ -1102,6 +1205,21 @@ static void s_eo_inertials2_build_maps(EOtheInertials2* p, uint64_t enablemask)
                     } break;
                 }
                 
+            }
+            else if(eobrd_place_eth == des->on.any.place)
+            {           
+                uint8_t n = (eoas_inertial_gyros_ems_st_l3g4200d == des->type) ? (mems_gyro) : (mems_accel);  
+
+                if(mems_gyro == n)
+                {
+                    eo_common_byte_bitset(&p->ethmap_mems_active, n);                
+                    p->frommems2id[n] = i;  
+                    #warning --> later on we could get hal_gyroscope_range* from ... a specific param or from des->on.eth.id ....
+                    p->memsparam[n] = hal_gyroscope_range_500dps;     
+                    p->memsconfig[n].acquisitionrate = 0;
+                    p->memsconfig[n].sensor = mems_gyroscope_l3g4200;
+                    p->memsconfig[n].properties.gyroscope.range = hal_gyroscope_range_500dps;
+                }
             }
         }
     }    
