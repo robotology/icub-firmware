@@ -215,6 +215,7 @@ void Motor_init(Motor* o) //
 
     o->GEARBOX = 1;
     
+    o->not_init = TRUE;
     o->not_calibrated = TRUE;
     
     o->control_mode           = icubCanProto_controlmode_notConfigured;
@@ -378,6 +379,7 @@ BOOL Motor_calibrate_moving2Hardstop(Motor* o, int32_t pwm, int32_t zero) //
 
 extern void Motor_uncalibrate(Motor* o)
 {
+    o->not_init = TRUE;
     o->not_calibrated = TRUE;
 
     if (o->HARDWARE_TYPE == HARDWARE_2FOC)
@@ -951,7 +953,11 @@ void Motor_update_pos_fbk(Motor* o, int32_t position_raw)
     
     int32_t pos_fbk = o->pos_raw_fbk/o->GEARBOX - o->pos_calib_offset;
       
-    if (o->pos_fbk_old == 0) o->pos_fbk_old = pos_fbk; 
+    if (o->not_init)
+    {
+        o->not_init = FALSE;
+        o->pos_fbk_old = pos_fbk; 
+    }
     
     //direction of movement changes depending on the sign
     int32_t delta = o->enc_sign * (pos_fbk - o->pos_fbk_old);
@@ -1061,6 +1067,7 @@ void Motor_reset(Motor *o)
     o->output=ZERO;
 
     o->not_calibrated = TRUE;
+    o->not_init = TRUE;
 
     //o->control_mode = ???
     //o->control_mode_req;
