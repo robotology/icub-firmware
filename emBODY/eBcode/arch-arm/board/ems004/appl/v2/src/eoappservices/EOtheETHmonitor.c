@@ -370,22 +370,22 @@ static void s_eo_ethmonitor_taskworker_run(EOMtask *rt, uint32_t n)
         return;
     }
     
-    const osal_reltime_t wait = osal_reltimeZERO;
-    //const osal_reltime_t wait = osal_reltimeINFINITE;
+    //const osal_reltime_t wait = osal_reltimeZERO;
+    const osal_reltime_t wait = osal_reltimeINFINITE;
     
     // begin of activity.
     if(eores_OK == eo_sharedhw_Obtain(eo_sharedhw_GetHandle(), eosharedhw_resource_I2C3, wait))
     {   // if the semaphore is busy ... i dont want to wait 
         // i protect the whole funtion because ... only one query out of three does not use i2c3 ..
-        eo_errman_Trace(eo_errman_GetHandle(), "i2c3 is taken", s_eobj_ownname);
+        //eo_errman_Trace(eo_errman_GetHandle(), "TAKEN i2c3", s_eobj_ownname);
         s_eo_ethmonitor_query_micrel();
-        eo_errman_Trace(eo_errman_GetHandle(), "i2c3 is released", s_eobj_ownname);
+        //eo_errman_Trace(eo_errman_GetHandle(), "RELEASED i2c3", s_eobj_ownname);
         
         eo_sharedhw_Release(eo_sharedhw_GetHandle(), eosharedhw_resource_I2C3);
     }
     else
     {
-        eo_errman_Trace(eo_errman_GetHandle(), "i2c3 is busy", s_eobj_ownname); 
+        //eo_errman_Trace(eo_errman_GetHandle(), "BUSY i2c3", s_eobj_ownname); 
     }
     
     // end of activity
