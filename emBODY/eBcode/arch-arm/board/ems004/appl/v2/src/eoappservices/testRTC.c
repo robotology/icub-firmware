@@ -77,20 +77,60 @@
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static void s_services_test_mc_multiplesteps(void *arg);
+#if defined(TESTRTC_IS_ACTIVE)
 
-static void s_eo_services_test(void);
+static void s_eo_services_test_initialise(void);
 
+
+
+static void s_services_test_verifyactivate(const eOmn_serv_configuration_t* cfg);
+static void s_services_test_start(void *arg);
 static void s_services_test_stop(void *arg);
+static void s_services_test_stop_everything(void *arg);
 
+
+static void s_services_test_mc_init(void);
+static void s_services_test_mc_multiplesteps(void *arg);
+static void s_services_test_mc_stop(void *par);
+
+
+
+static void s_services_test_inertials_init(void);
+static void s_services_test_inertials_multiplesteps(void *arg);
+static void s_services_test_inertials_stop(void *par);
+
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
+#if defined(TESTRTC_IS_ACTIVE)
+
+// in here we decide if we want to test mc or inertials ...
+//static const eOmn_serv_category_t s_service_under_test = eomn_serv_category_mc; 
+static const eOmn_serv_category_t s_service_under_test = eomn_serv_category_inertials;
+
+
+// the rest are service variables
+
 static EOtimer *s_timer = NULL;
 
-static volatile uint8_t services_stop_MC_service_now = 0;
+static eOmn_service_cmmnds_command_t s_command = {0};
+
+
+static volatile uint8_t services_stop_ANY_service_now = 0;
+
+
+static eOcallback_t s_service_tick = NULL;
+
+static const eOmn_serv_configuration_t* s_test_config_ok = NULL;
+static const eOmn_serv_configuration_t* s_test_config_ko = NULL;
+
+static EOaction_strg s_astrg = {0};
+static EOaction *s_act = (EOaction*)&s_astrg;
+
+#endif
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -106,10 +146,10 @@ extern void testRTC_init(void)
         s_timer = eo_timer_New();
     }
     
-    services_stop_MC_service_now = 0;
+    services_stop_ANY_service_now = 0;
     
-    s_eo_services_test();
-    
+    s_eo_services_test_initialise();
+       
 #endif    
 }
 
@@ -117,9 +157,9 @@ extern void testRTC_RUN_tick(void)
 {
 #if defined(TESTRTC_IS_ACTIVE)
 
-    if(1 == services_stop_MC_service_now)
+    if(1 == services_stop_ANY_service_now)
     {
-        services_stop_MC_service_now = 0;
+        services_stop_ANY_service_now = 0;
         s_services_test_stop(NULL);
     }
     
@@ -130,7 +170,10 @@ extern void testRTC_CFG_tick(void)
 {
 #if defined(TESTRTC_IS_ACTIVE)
     
-    s_services_test_mc_multiplesteps(NULL);  
+    if(NULL != s_service_tick)
+    {
+        s_service_tick(NULL);
+    }
     
 #endif    
 }
@@ -139,11 +182,96 @@ extern void testRTC_CFG_tick(void)
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+
+#if defined(TESTRTC_IS_ACTIVE) 
+extern void eom_emsconfigurator_hid_userdef_ProcessUserdef03Event(EOMtheEMSconfigurator* p)
+{
+    testRTC_CFG_tick();
+}
+#endif
+
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
+
+
+#if defined(TESTRTC_IS_ACTIVE)
+
+static void s_eo_services_test_initialise(void)
+{
+    
+    switch(s_service_under_test)
+    {
+        default:
+        case eomn_serv_category_mc:
+        {                         
+            s_services_test_mc_init();             
+        } break;
+        
+        case eomn_serv_category_inertials:
+        {
+            s_services_test_inertials_init();            
+        } break;
+
+    }       
+    
+    eo_action_SetEvent(s_act, emsconfigurator_evt_userdef03, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));    
+    eo_timer_Start(s_timer, eok_abstimeNOW, 3*eok_reltime1sec, eo_tmrmode_ONESHOT, s_act);     
+}
+
+
+static void s_services_test_verifyactivate(const eOmn_serv_configuration_t* cfg)
+{       
+    s_command.category = s_service_under_test;
+    s_command.operation = eomn_serv_operation_verifyactivate;
+    memcpy(&s_command.parameter.configuration, cfg, sizeof(eOmn_serv_configuration_t));
+        
+    // ok, we have received a command for a given service. we ask the object theservices to manage the thing
+    
+    eo_services_ProcessCommand(eo_services_GetHandle(), &s_command);    
+}
+
+
+static void s_services_test_start(void *arg)
+{        
+    s_command.category = s_service_under_test;
+    s_command.operation = eomn_serv_operation_start;
+    memset(&s_command.parameter.configuration, 0, sizeof(eOmn_serv_configuration_t));
+        
+    // ok, we have received a command for a given service. we ask the object theservices to manage the thing
+    
+    eo_services_ProcessCommand(eo_services_GetHandle(), &s_command);    
+}
+
+
+static void s_services_test_stop(void *arg)
+{        
+    s_command.category = s_service_under_test;
+    s_command.operation = eomn_serv_operation_stop;
+    memset(&s_command.parameter.configuration, 0, sizeof(eOmn_serv_configuration_t));
+        
+    // ok, we have received a command for a given service. we ask the object theservices to manage the thing
+    
+    eo_services_ProcessCommand(eo_services_GetHandle(), &s_command);    
+}
+
+static void s_services_test_stop_everything(void *arg)
+{
+    services_stop_ANY_service_now = 1;
+    eo_action_SetEvent(s_act, emsconfigurator_evt_userdef03, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));    
+    eo_timer_Start(s_timer, eok_abstimeNOW, 3*eok_reltime1sec, eo_tmrmode_ONESHOT, s_act);    
+}
+
+
+
+
+// -----------------------------------------------------------------------------------------------------------
+// motion control ....
+
+
 
 
 static const eOmn_serv_configuration_t s_serv_config_mc_eb1_eb3_zeroprotocol =
@@ -668,59 +796,18 @@ static const eOmn_serv_configuration_t s_serv_config_mc_eb1_fake_inc =
     }
 };
 
-static eOmn_service_cmmnds_command_t s_command = {0};
-
-static const eOmn_serv_configuration_t* s_test_config_ok = NULL;
-static const eOmn_serv_configuration_t* s_test_config_ko = &s_serv_config_mc_eb1_fake_inc;
 
 
-static void s_services_test_activate(const eOmn_serv_configuration_t* cfg)
+static void s_services_test_mc_init(void)
 {
-        
-    s_command.category = eomn_serv_category_mc;
-    s_command.operation = eomn_serv_operation_verifyactivate;
-    memcpy(&s_command.parameter.configuration, cfg, sizeof(eOmn_serv_configuration_t));
-        
-    // ok, we have received a command for a given service. we ask the object theservices to manage the thing
-    
-    eo_services_ProcessCommand(eo_services_GetHandle(), &s_command);    
+    s_test_config_ko = &s_serv_config_mc_eb1_fake_inc;
+    s_test_config_ok = &s_serv_config_mc_eb1_eb3_zeroprotocol;               
+    s_service_tick = s_services_test_mc_multiplesteps;    
 }
-
-static void s_services_test_start(void *arg)
-{
-        
-    s_command.category = eomn_serv_category_mc;
-    s_command.operation = eomn_serv_operation_start;
-    memset(&s_command.parameter.configuration, 0, sizeof(eOmn_serv_configuration_t));
-        
-    // ok, we have received a command for a given service. we ask the object theservices to manage the thing
-    
-    eo_services_ProcessCommand(eo_services_GetHandle(), &s_command);    
-}
-
-
-static void s_services_test_stop(void *arg)
-{
-        
-    s_command.category = eomn_serv_category_mc;
-    s_command.operation = eomn_serv_operation_stop;
-    memset(&s_command.parameter.configuration, 0, sizeof(eOmn_serv_configuration_t));
-        
-    // ok, we have received a command for a given service. we ask the object theservices to manage the thing
-    
-    eo_services_ProcessCommand(eo_services_GetHandle(), &s_command);    
-}
-
-
-static EOaction_strg s_astrg = {0};
-static EOaction *s_act = (EOaction*)&s_astrg;
-
 
 static void s_services_test_mc_stop(void *par)
 {
-    services_stop_MC_service_now = 1;
-    eo_action_SetEvent(s_act, emsconfigurator_evt_userdef03, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));    
-    eo_timer_Start(s_timer, eok_abstimeNOW, 3*eok_reltime1sec, eo_tmrmode_ONESHOT, s_act);    
+    s_services_test_stop_everything(NULL);
 }
 
 static void s_services_test_mc_multiplesteps(void *arg)
@@ -739,7 +826,7 @@ static void s_services_test_mc_multiplesteps(void *arg)
     }
     else if(2 == step)
     {
-        s_services_test_activate(s_test_config_ko);
+        s_services_test_verifyactivate(s_test_config_ko);
         eo_action_SetEvent(s_act, emsconfigurator_evt_userdef03, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));    
         eo_timer_Start(s_timer, eok_abstimeNOW, 3*eok_reltime1sec, eo_tmrmode_ONESHOT, s_act);          
     }
@@ -748,26 +835,26 @@ static void s_services_test_mc_multiplesteps(void *arg)
         s_services_test_start(arg);
         
         // prepare to stop it ... by setting a flag which the runner will process and call 
-        services_stop_MC_service_now = 0;
+        services_stop_ANY_service_now = 0;
         eo_action_SetCallback(s_act, s_services_test_mc_stop, NULL, eov_callbackman_GetTask(eov_callbackman_GetHandle())); 
         eo_timer_Start(s_timer, eok_abstimeNOW, 3*eok_reltime1sec, eo_tmrmode_ONESHOT, s_act); 
     }
     else if(4 == step)
     {
-        services_stop_MC_service_now = 0;
-        s_services_test_activate(s_test_config_ok);
+        services_stop_ANY_service_now = 0;
+        s_services_test_verifyactivate(s_test_config_ok);
         eo_action_SetEvent(s_act, emsconfigurator_evt_userdef03, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));    
         eo_timer_Start(s_timer, eok_abstimeNOW, 3*eok_reltime1sec, eo_tmrmode_ONESHOT, s_act);    
     }
     else if(5 == step)
     {
-        services_stop_MC_service_now = 0;
+        services_stop_ANY_service_now = 0;
         s_services_test_start(arg);
     }
 
 #else
     
-    // this is a test for simple activate() and start() in case of not fully working deactivate() of mc, as it is at the data of 16 may 2016
+    // this is a test for simple activate() and start()
     static uint8_t step = 0;
     
     step++;
@@ -780,7 +867,7 @@ static void s_services_test_mc_multiplesteps(void *arg)
     }
     else if(2 == step)
     {
-        s_services_test_activate(s_test_config_ok);
+        s_services_test_verifyactivate(s_test_config_ok);
         eo_action_SetEvent(s_act, emsconfigurator_evt_userdef03, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));    
         eo_timer_Start(s_timer, eok_abstimeNOW, 3*eok_reltime1sec, eo_tmrmode_ONESHOT, s_act);          
     }
@@ -789,20 +876,20 @@ static void s_services_test_mc_multiplesteps(void *arg)
         s_services_test_start(arg);
         
         // prepare to stop it ... by setting a flag which the runner will process and call 
-        services_stop_MC_service_now = 0;
+        services_stop_ANY_service_now = 0;
         eo_action_SetCallback(s_act, s_services_test_mc_stop, NULL, eov_callbackman_GetTask(eov_callbackman_GetHandle())); 
         eo_timer_Start(s_timer, eok_abstimeNOW, 3*eok_reltime1sec, eo_tmrmode_ONESHOT, s_act); 
     }
     else if(4 == step)
     {
-        services_stop_MC_service_now = 0;
-        s_services_test_activate(s_test_config_ok);
+        services_stop_ANY_service_now = 0;
+        s_services_test_verifyactivate(s_test_config_ok);
         eo_action_SetEvent(s_act, emsconfigurator_evt_userdef03, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));    
         eo_timer_Start(s_timer, eok_abstimeNOW, 3*eok_reltime1sec, eo_tmrmode_ONESHOT, s_act);    
     }
     else if(5 == step)
     {
-        services_stop_MC_service_now = 0;
+        services_stop_ANY_service_now = 0;
         s_services_test_start(arg);
     }    
     
@@ -811,24 +898,146 @@ static void s_services_test_mc_multiplesteps(void *arg)
 }
 
 
+// --------------------------------------------------------------------------------------------------------------------
+// inertials mems gyro
 
-static void s_eo_services_test(void)
+
+static const eOmn_serv_configuration_t s_serv_config_as_inertial_test_gyro =
+{   
+    .type       = eomn_serv_AS_inertials,
+    .filler     = {0},
+    .data.as.inertial = 
+    {
+        .mtbversion    =
+        {
+            .firmware   = { .major = 0, .minor = 0, .build = 0 },
+            .protocol   = { .major = 0, .minor = 0 }  // in case of {0, 0} the can discovery is not done but the verify will be ok. for normal case use: {1, 0}  
+        },
+        
+        .arrayofsensors =
+        {
+            .head   = 
+            {
+                .capacity       = eOas_inertials_maxnumber,
+                .itemsize       = sizeof(eOas_inertial_descriptor_t),
+                .size           = 2,
+                .internalmem    = 0                    
+            },
+            .data   =
+            {
+                {   // mtb
+                    .type   = eoas_inertial_accel_mtb_int,
+                    .on.can = { .place = eobrd_place_can, .port = eOcanport1, .addr = 1 }
+                },                                
+                {   // gyro ....
+                    .type   = eoas_inertial_gyros_ems_st_l3g4200d,
+                    .on.eth = { .place = eobrd_place_eth, .id = 0 }
+                }              
+            }                
+        }
+    }    
+};
+
+static const eOmn_serv_configuration_t s_serv_config_as_inertial_test_accel =
+{   
+    .type       = eomn_serv_AS_inertials,
+    .filler     = {0},
+    .data.as.inertial = 
+    {
+        .mtbversion    =
+        {
+            .firmware   = { .major = 0, .minor = 0, .build = 0 },
+            .protocol   = { .major = 0, .minor = 0 }  // in case of {0, 0} the can discovery is not done but the verify will be ok. for normal case use: {1, 0}  
+        },
+        
+        .arrayofsensors =
+        {
+            .head   = 
+            {
+                .capacity       = eOas_inertials_maxnumber,
+                .itemsize       = sizeof(eOas_inertial_descriptor_t),
+                .size           = 2,
+                .internalmem    = 0                    
+            },
+            .data   =
+            {
+                {   // mtb
+                    .type   = eoas_inertial_accel_mtb_int,
+                    .on.can = { .place = eobrd_place_can, .port = eOcanport1, .addr = 1 }
+                },                                
+                {   // gyro ....
+                    .type   = eoas_inertial_accel_ems_st_lis3x,
+                    .on.eth = { .place = eobrd_place_eth, .id = 0 }
+                }              
+            }                
+        }
+    }    
+};
+
+static void s_services_test_inertials_init(void)
 {
+    s_test_config_ok = &s_serv_config_as_inertial_test_gyro; 
+    s_test_config_ko = &s_serv_config_as_inertial_test_accel;
+    s_service_tick = s_services_test_inertials_multiplesteps;    
+}
+
+
+static void s_services_test_inertials_multiplesteps(void *arg)
+{
+    // this is a test for fully working activate() /  deactivate()
+    static uint8_t step = 0;
     
-    s_test_config_ok = &s_serv_config_mc_eb1_eb3_zeroprotocol; // board eb1, with no check of can boards
+    step++;
     
-    // start a timer of 1 seconds which will activate verify a service of motioncontrol for board eb1
-    
-    
-    //eo_action_SetCallback(act, s_services_test_mc_multiplesteps, NULL, eov_callbackman_GetTask(eov_callbackman_GetHandle())); 
-    
-    eo_action_SetEvent(s_act, emsconfigurator_evt_userdef03, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));    
-    eo_timer_Start(s_timer, eok_abstimeNOW, 3*eok_reltime1sec, eo_tmrmode_ONESHOT, s_act);     
+    if(1 == step)
+    {
+        s_services_test_stop(arg);
+        eo_action_SetEvent(s_act, emsconfigurator_evt_userdef03, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));    
+        eo_timer_Start(s_timer, eok_abstimeNOW, 3*eok_reltime1sec, eo_tmrmode_ONESHOT, s_act);    
+    }
+    else if(2 == step)
+    {
+        s_services_test_verifyactivate(s_test_config_ko);
+        eo_action_SetEvent(s_act, emsconfigurator_evt_userdef03, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));    
+        eo_timer_Start(s_timer, eok_abstimeNOW, 3*eok_reltime1sec, eo_tmrmode_ONESHOT, s_act);          
+    }
+    else if(3 == step)
+    {  
+        // the previous was not activated .... hence, start will fail        
+        s_services_test_start(arg);
+        
+        // prepare to stop it ... by setting a flag which the runner will process and call 
+        services_stop_ANY_service_now = 0;
+        eo_action_SetCallback(s_act, s_services_test_mc_stop, NULL, eov_callbackman_GetTask(eov_callbackman_GetHandle())); 
+        eo_timer_Start(s_timer, eok_abstimeNOW, 3*eok_reltime1sec, eo_tmrmode_ONESHOT, s_act); 
+    }
+    else if(4 == step)
+    {
+        services_stop_ANY_service_now = 0;
+        s_services_test_verifyactivate(s_test_config_ok);
+        eo_action_SetEvent(s_act, emsconfigurator_evt_userdef03, eom_emsconfigurator_GetTask(eom_emsconfigurator_GetHandle()));    
+        eo_timer_Start(s_timer, eok_abstimeNOW, 3*eok_reltime1sec, eo_tmrmode_ONESHOT, s_act);    
+    }
+    else if(5 == step)
+    {
+        services_stop_ANY_service_now = 0;
+        s_services_test_start(arg);
+    }  
+    else if(6 == step)
+    {
+        s_services_test_stop_everything(NULL);
+    }
+}
+
+
+static void s_services_test_inertials_stop(void *par)
+{   
+    s_services_test_stop_everything(NULL);   
 }
 
 
 
-
+#endif // TESTRTC_IS_ACTIVE
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

@@ -28,7 +28,6 @@
 #include "EOtheCANdiscovery2.h"
 #include "EOtheETHmonitor.h"
 
-#include "testRTC.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -106,14 +105,8 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdef02Event(EOMtheEMSconfi
 }
 
 
-#if defined(TESTRTC_IS_ACTIVE) 
-extern void eom_emsconfigurator_hid_userdef_ProcessUserdef03Event(EOMtheEMSconfigurator* p)
-{
-    testRTC_CFG_tick();
-}
-#endif
 
-#undef 
+#undef TEST_000
 
 #if defined(TEST_000)
 
