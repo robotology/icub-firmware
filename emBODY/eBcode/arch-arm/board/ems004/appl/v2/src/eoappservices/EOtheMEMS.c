@@ -63,7 +63,7 @@
 
 const eOmems_cfg_t eo_mems_DefaultCfg = 
 {
-    .priority           = 10,
+    .priority           = 11,
     .stacksize          = 1024
 };
 
@@ -220,7 +220,7 @@ extern eOresult_t eo_mems_Config(EOtheMEMS *p, eOmems_sensor_cfg_t *cfg)
 }
 
 
-extern eOresult_t eo_mems_Get(EOtheMEMS *p, eOas_inertial_data_t* data, eOreltime_t timeout, uint16_t* remaining)
+extern eOresult_t eo_mems_Get(EOtheMEMS *p, eOas_inertial_data_t* data, eOreltime_t timeout, eOmems_sensor_t *sensor, uint16_t* remaining)
 {
     if((NULL == p) || (NULL == data))
     {
@@ -247,6 +247,10 @@ extern eOresult_t eo_mems_Get(EOtheMEMS *p, eOas_inertial_data_t* data, eOreltim
                 memcpy(data, front, sizeof(eOas_inertial_data_t));
                 eo_vector_PopFront(p->fifoofinertialdata);
                 res = eores_OK;
+                if(NULL != sensor)
+                {
+                    *sensor = data->id;
+                }
                 if(NULL != remaining)
                 {
                     *remaining = eo_vector_Size(p->fifoofinertialdata);
@@ -373,11 +377,11 @@ static void s_eo_mems_taskworker_run(EOMtask *rt, uint32_t t)
         const osal_reltime_t wait = osal_reltimeINFINITE;
         if(eores_OK == eo_sharedhw_Obtain(eo_sharedhw_GetHandle(), eosharedhw_resource_I2C3, wait))
         {   
-            eo_errman_Trace(eo_errman_GetHandle(), "i2c3 is taken for init", s_eobj_ownname);
+            //eo_errman_Trace(eo_errman_GetHandle(), "i2c3 is taken for init", s_eobj_ownname);
             
             s_eo_mems_init_gyro();
             
-            eo_errman_Trace(eo_errman_GetHandle(), "i2c3 is released for init", s_eobj_ownname);            
+            //eo_errman_Trace(eo_errman_GetHandle(), "i2c3 is released after init", s_eobj_ownname);            
             eo_sharedhw_Release(eo_sharedhw_GetHandle(), eosharedhw_resource_I2C3);
         }        
     }
@@ -395,9 +399,9 @@ static void s_eo_mems_taskworker_run(EOMtask *rt, uint32_t t)
         // begin of activity.
         if(eores_OK == eo_sharedhw_Obtain(eo_sharedhw_GetHandle(), eosharedhw_resource_I2C3, wait))
         {   
-            eo_errman_Trace(eo_errman_GetHandle(), "i2c3 is taken", s_eobj_ownname);
+            //eo_errman_Trace(eo_errman_GetHandle(), "i2c3 is taken for read", s_eobj_ownname);
             ok = s_eo_mems_read_gyro(&data);
-            eo_errman_Trace(eo_errman_GetHandle(), "i2c3 is released", s_eobj_ownname);            
+            //eo_errman_Trace(eo_errman_GetHandle(), "i2c3 is released after read", s_eobj_ownname);            
             eo_sharedhw_Release(eo_sharedhw_GetHandle(), eosharedhw_resource_I2C3);
         }
         else
@@ -430,13 +434,13 @@ static void s_eo_mems_taskworker_run(EOMtask *rt, uint32_t t)
         const osal_reltime_t wait = osal_reltimeINFINITE;
         if(eores_OK == eo_sharedhw_Obtain(eo_sharedhw_GetHandle(), eosharedhw_resource_I2C3, wait))
         {   
-            eo_errman_Trace(eo_errman_GetHandle(), "i2c3 is taken for deinit", s_eobj_ownname);
+            //eo_errman_Trace(eo_errman_GetHandle(), "i2c3 is taken for deinit", s_eobj_ownname);
             
             s_eo_mems_deinit_gyro();
             
             p->enabled = eobool_false;
             
-            eo_errman_Trace(eo_errman_GetHandle(), "i2c3 is released for init", s_eobj_ownname);            
+            //eo_errman_Trace(eo_errman_GetHandle(), "i2c3 is released after init", s_eobj_ownname);            
             eo_sharedhw_Release(eo_sharedhw_GetHandle(), eosharedhw_resource_I2C3);
         }        
     }    
@@ -476,17 +480,16 @@ static eObool_t s_eo_mems_read_gyro(eOas_inertial_data_t *data)
     int16_t y = 0;
     int16_t z = 0;
     
-    hal_result_t res = hal_gyroscope_readraw(hal_gyroscope1, &data->x, &data->y, &data->z);
+    hal_result_t res = hal_gyroscope_readraw(hal_gyroscope1, &x, &y, &z);
     
     if(hal_res_OK == res)
     {
         data->timestamp = eov_sys_LifeTimeGet(eov_sys_GetHandle());
-        data->id = eoas_inertial_accel_ems_st_lis3x;
+        data->id = mems_gyroscope_l3g4200;
         data->x = x;
         data->y = y;
         data->z = z;        
-        ok = eobool_true;
-        
+        ok = eobool_true;        
     }
 
     p->newresultsavailable = ok;    
