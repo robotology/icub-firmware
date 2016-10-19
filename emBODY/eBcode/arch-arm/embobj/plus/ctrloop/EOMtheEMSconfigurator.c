@@ -96,7 +96,7 @@ static void s_eom_emsconfigurator_task_run(EOMtask *p, uint32_t t);
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-//static const char s_eobj_ownname[] = "EOMtheEMSconfigurator";
+static const char s_eobj_ownname[] = "EOMtheEMSconfigurator";
 
  
 static EOMtheEMSconfigurator s_emsconfigurator_singleton = 
@@ -211,6 +211,16 @@ extern void tskEMScfg(void *p)
     eom_task_Start(p);
 } 
 
+__weak extern void eom_emsconfigurator_hid_userdef_ProcessTimeout(EOMtheEMSconfigurator* p)
+{
+    
+}
+
+
+__weak extern void eom_emsconfigurator_hid_userdef_ProcessTickEvent(EOMtheEMSconfigurator* p)
+{
+    
+}
 
 __weak extern void eom_emsconfigurator_hid_userdef_DoJustAfterPacketParsing(EOMtheEMSconfigurator *p)
 {
@@ -258,6 +268,8 @@ static void s_eom_emsconfigurator_task_startup(EOMtask *p, uint32_t t)
 //    EOMtheEMSapplCfg* emscfg = eom_emsapplcfg_GetHandle();
 //    eom_ipnet_ResolveIP_TEST(eom_ipnet_GetHandle(), emscfg->applcfg.hostipv4addr, 5*EOK_reltime1sec);
 //#endif
+    
+    eo_errman_Trace(eo_errman_GetHandle(), "called _task_startup()", s_eobj_ownname);
 }
 
 
@@ -272,11 +284,17 @@ static void s_eom_emsconfigurator_task_run(EOMtask *p, uint32_t t)
     uint16_t numberoftxrops = 0;
     eOabstime_t txtimeofrxropframe = 0;
     eOresult_t res;
+    
+    // we have a ... timeout event
+    if(0 == evt)
+    {
+        eom_emsconfigurator_hid_userdef_ProcessTimeout(&s_emsconfigurator_singleton); 
+    }
 
     // we have a tick event
     if(eobool_true == eo_common_event_check(evt, emsconfigurator_evt_tick))
     {
-       
+        eom_emsconfigurator_hid_userdef_ProcessTickEvent(&s_emsconfigurator_singleton);       
     }    
 
     if(eobool_true == eo_common_event_check(evt, emsconfigurator_evt_go2error))
@@ -300,7 +318,7 @@ static void s_eom_emsconfigurator_task_run(EOMtask *p, uint32_t t)
             // we must transmit only if there are rops inside. the sequence number is incremented only if there are any rops.
             if(numberoftxrops > 0)
             { 
-                res = eom_emssocket_Transmit(eom_emssocket_GetHandle(), txpkt);
+                res = eom_emssocket_Transmit(eom_emssocket_GetHandle(), txpkt, 5*EOK_reltime1sec);
             }
         }
         else

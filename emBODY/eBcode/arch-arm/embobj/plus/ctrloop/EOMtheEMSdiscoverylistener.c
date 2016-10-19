@@ -235,6 +235,8 @@ static void s_eom_emsdiscoverylistener_task_startup(EOMtask *p, uint32_t t)
     
     eo_socketdtg_Open(s_emsdiscoverylistener_singleton.socket, s_emsdiscoverylistener_singleton.cfg.localport, eo_sktdir_TXRX, eobool_false, 
                       NULL, onrx, NULL);   
+    
+    eo_errman_Trace(eo_errman_GetHandle(), "called _task_startup()", s_eobj_ownname);
                                 
 }
 

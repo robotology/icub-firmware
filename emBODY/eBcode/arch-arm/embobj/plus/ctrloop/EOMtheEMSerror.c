@@ -220,6 +220,7 @@ extern void eom_emserror_OnError_userdefined_call(eOerrmanErrorType_t errtype, c
 static void s_eom_emserror_task_startup(EOMtask *p, uint32_t t)
 {
     // dont do anything. the ems-socket, ems-transceiver etc have been already initted by the EOMtheEMSappl
+    eo_errman_Trace(eo_errman_GetHandle(), "called _task_startup()", s_eobj_ownname);
 }
 
 
@@ -256,7 +257,7 @@ static void s_eom_emserror_task_run(EOMtask *p, uint32_t t)
             // we must transmit only if there are rops inside. the sequence number is incremented only if there are any rops.
             if(numberoftxrops > 0)
             { 
-                res = eom_emssocket_Transmit(eom_emssocket_GetHandle(), txpkt);
+                res = eom_emssocket_Transmit(eom_emssocket_GetHandle(), txpkt, 5*EOK_reltime1sec);
             }
         }
     

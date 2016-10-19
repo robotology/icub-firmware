@@ -204,7 +204,14 @@ extern void eom_emstransceiver_callback_incaseoferror_invalidframe(EOreceiver *r
  **/
 
 static void s_eom_emsappl_main_init(void)
-{      
+{  
+    char str[96];
+    snprintf(str, sizeof(str), "just started the user-defined function s_eom_emsappl_main_init()");
+    eo_errman_Trace(eo_errman_GetHandle(), str, "eom_sys_Start()");  
+
+    snprintf(str, sizeof(str), "s_eom_emsappl_main_init() is about to init EOtheLEDpulser + EOMtheEMSappl");
+    eo_errman_Trace(eo_errman_GetHandle(), str, "eom_sys_Start()");     
+    
     // init leds via the EOtheLEDpulser object
     eOledpulser_cfg_t ledpulsercfg =  
     {
@@ -221,17 +228,10 @@ static void s_eom_emsappl_main_init(void)
     // init the ems application
     EOMtheEMSapplCfg* emscfg = eom_emsapplcfg_GetHandle();    
     eom_emsappl_Initialise(&emscfg->applcfg);
-      
-    // set the led reserved for link
-    if(eores_OK == eom_ipnet_ResolveIP(eom_ipnet_GetHandle(), emscfg->applcfg.hostipv4addr, 5*EOK_reltime100ms))
-    {
-        // set led0 to ON
-       eo_ledpulser_On(eo_ledpulser_GetHandle(), eo_ledpulser_led_zero);
-    }
-    else
-    {
-        eo_ledpulser_Off(eo_ledpulser_GetHandle(), eo_ledpulser_led_zero);
-    }
+
+
+    snprintf(str, sizeof(str), "quitting the user-defined function s_eom_emsappl_main_init()");
+    eo_errman_Trace(eo_errman_GetHandle(), str, "eom_sys_Start()");  
 }
 
 

@@ -73,23 +73,35 @@ typedef struct
     int32_t     zar;
 } hal_gyroscope_angularrate_t;
 
+typedef enum
+{
+    hal_gyroscope_range_250dps     = 0,
+    hal_gyroscope_range_500dps     = 1,
+    hal_gyroscope_range_2000dps    = 2   
+} hal_gyroscope_range_t;
+
 
 /** @typedef    typedef enum hal_gyroscope_cfg_t 
     @brief      hal_gyroscope_cfg_t contains the configuration for the sensor.
  **/
 typedef struct
 {
-    uint8_t         dummy;
+    hal_gyroscope_range_t   range;
 } hal_gyroscope_cfg_t;
 
  
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
-extern const hal_gyroscope_cfg_t hal_gyroscope_cfg_default; // = { .dummy = 0 };
+extern const hal_gyroscope_cfg_t hal_gyroscope_cfg_default; // = { .range = hal_gyroscope_range_250dps };
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
+
+extern hal_bool_t hal_gyroscope_supported_is(hal_gyroscope_t id);
+
+
+extern hal_result_t hal_gyroscope_deinit(hal_gyroscope_t id);
 
 /** @fn			extern hal_result_t hal_gyroscope_init(hal_gyroscope_t id, const hal_gyroscope_cfg_t *cfg)
     @brief  	this function initializes a given gyro sensor 
@@ -103,6 +115,8 @@ extern const hal_gyroscope_cfg_t hal_gyroscope_cfg_default; // = { .dummy = 0 };
 extern hal_result_t hal_gyroscope_init(hal_gyroscope_t id, const hal_gyroscope_cfg_t *cfg);
 
 
+
+
 /** @fn			extern hal_result_t hal_gyroscope_read(hal_gyroscope_t id, hal_device_gyroscope_degree_t* degrees)
     @brief  	this function reads temperatures on a given sensor.
     @param  	sensor	        the sensor
@@ -110,6 +124,11 @@ extern hal_result_t hal_gyroscope_init(hal_gyroscope_t id, const hal_gyroscope_c
     @return 	hal_res_NOK_generic on error else hal_res_OK
   */
 extern hal_result_t hal_gyroscope_read(hal_gyroscope_t id, hal_gyroscope_angularrate_t* angrate);
+
+extern hal_result_t hal_gyroscope_readraw(hal_gyroscope_t id, int16_t *x, int16_t *y, int16_t *z);
+
+
+
 
 
 /** @}            

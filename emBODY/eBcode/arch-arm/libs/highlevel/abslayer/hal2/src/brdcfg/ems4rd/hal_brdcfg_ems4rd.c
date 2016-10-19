@@ -205,7 +205,7 @@
     
     const hl_chip_st_l3g4200d_cfg_t l3g4200dcfg =
     {
-        .i2cid      = hl_i2c1,
+        .i2cid      = hl_i2c3,
         .range      = hl_chip_st_l3g4200d_range_250dps       
     };
     
@@ -655,7 +655,7 @@
     static const hl_chip_st_lis3x_cfg_t lis3xcfg =
     {
         .chip       = hl_chip_st_lis3x_chip_autodetect,
-        .i2cid      = hl_i2c1,
+        .i2cid      = hl_i2c3,
         .range      = hl_chip_st_lis3x_range_2g
     };
     
@@ -1027,11 +1027,21 @@
     {
         return((hal_result_t)hl_chip_st_l3g4200d_init((const hl_chip_st_l3g4200d_cfg_t*)p));
     }
+    
+    static hal_result_t s_gyro_deinit(int32_t id)
+    {
+        return((hal_result_t)hl_chip_st_l3g4200d_deinit(l3g4200dcfg.i2cid));
+    }
 
     static hal_result_t s_gyro_read(int32_t id, void* x, void* y, void* z)
     {
         return((hal_result_t)hl_chip_st_l3g4200d_angrate_get((int32_t*)x, (int32_t*)y, (int32_t*)z));
-    }    
+    } 
+
+    static hal_result_t s_gyro_readraw(int32_t id, void* x, void* y, void* z)
+    {
+        return((hal_result_t)hl_chip_st_l3g4200d_get((int16_t*)x, (int16_t*)y, (int16_t*)z));
+    }     
     
     extern const hal_gyroscope_boardconfig_t hal_gyroscope__theboardconfig =
     {
@@ -1046,7 +1056,9 @@
                 .fun    =
                 {
                     .init       = s_gyro_init,
-                    .read       = s_gyro_read                    
+                    .deinit     = s_gyro_deinit,
+                    .read       = s_gyro_read,
+                    .readraw    = s_gyro_readraw
                 }
             }
         }

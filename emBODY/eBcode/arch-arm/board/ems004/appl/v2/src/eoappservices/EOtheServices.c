@@ -53,6 +53,8 @@
 
 #include "EOtheBOARDtransceiver.h"
 
+#include "EOtheSharedHW.h"
+
 #include "testRTC.h"
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -190,6 +192,8 @@ extern EOtheServices* eo_services_Initialise(eOipv4addr_t ipaddress)
     }
     EOtheServices *p = &s_eo_theservices;
     
+    eo_errman_Trace(eo_errman_GetHandle(), "eo_services_Initialise() starts", s_eobj_ownname);  
+    
     p->initted = eobool_true;
     p->nvset = eom_emstransceiver_GetNVset(eom_emstransceiver_GetHandle()); 
     p->timer = eo_timer_New();
@@ -215,6 +219,8 @@ extern EOtheServices* eo_services_Initialise(eOipv4addr_t ipaddress)
 #if defined(TESTRTC_IS_ACTIVE)    
     testRTC_init();
 #endif
+    
+    eo_errman_Trace(eo_errman_GetHandle(), "eo_services_Initialise() is over", s_eobj_ownname);
     
     return(&s_eo_theservices);
 }
@@ -626,8 +632,12 @@ static void s_eo_services_initialise(EOtheServices *p)
         // can-discovery
         eo_candiscovery2_Initialise(NULL);        
     } 
+    
+    {   // D. shared hw
+        eo_sharedhw_Initialise(NULL);        
+    }
 
-    {   // D. ethmonitor: init and start
+    {   // E. ethmonitor: init and start
         eo_ethmonitor_Initialise(NULL);        
         eo_ethmonitor_Start(eo_ethmonitor_GetHandle());
     }

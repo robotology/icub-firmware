@@ -150,6 +150,10 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(
     // because eom_emsrunner_CycleHasJustTransmittedRegulars() keeps memory of previous tx cycle.
     eo_skin_Tick(eo_skin_GetHandle(), prevTXhadRegulars); 
     
+#if defined(TESTRTC_IS_ACTIVE)
+#warning ---------------> just for test
+    prevTXhadRegulars = eobool_true;
+#endif
     eo_inertials2_Tick(eo_inertials2_GetHandle(), prevTXhadRegulars); 
     
     eo_ethmonitor_Tick(eo_ethmonitor_GetHandle());

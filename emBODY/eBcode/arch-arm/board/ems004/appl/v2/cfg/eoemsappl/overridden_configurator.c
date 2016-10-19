@@ -28,7 +28,6 @@
 #include "EOtheCANdiscovery2.h"
 #include "EOtheETHmonitor.h"
 
-#include "testRTC.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -106,12 +105,92 @@ extern void eom_emsconfigurator_hid_userdef_ProcessUserdef02Event(EOMtheEMSconfi
 }
 
 
-#if defined(TESTRTC_IS_ACTIVE) 
-extern void eom_emsconfigurator_hid_userdef_ProcessUserdef03Event(EOMtheEMSconfigurator* p)
+
+#undef TEST_000
+
+#if defined(TEST_000)
+
+extern void eom_emsconfigurator_hid_userdef_ProcessTickEvent(EOMtheEMSconfigurator* p)
 {
-    testRTC_CFG_tick();
+    eo_errman_Trace(eo_errman_GetHandle(), "tick of cfg", NULL);     
 }
-#endif
+
+
+#include "hal_gyroscope.h"
+#include "hal_sys.h"
+#include "EOtheSharedHW.h"
+
+const char s_object[] = "EoTheGyroReader";
+
+extern void eom_emsconfigurator_hid_userdef_ProcessTimeout(EOMtheEMSconfigurator* p)
+{
+    return;
+    const int freq = 2;
+    
+    static uint32_t times = 0;
+    char s[100] = {0};
+    hal_result_t res;
+
+    
+    if(0 == times)
+    {
+        // init
+        hal_gyroscope_cfg_t config;
+        config.range = hal_gyroscope_range_2000dps;
+        const char * ranges[] = {"0250dps", "0500dps", "2000dps"};
+        
+        eo_sharedhw_Initialise(NULL);
+        
+        if(eores_OK == eo_sharedhw_Obtain(eo_sharedhw_GetHandle(), eosharedhw_resource_I2C3, eok_reltimeZERO))
+        {   // if the semaphore is busy ... i dont want to wait 
+            res = hal_gyroscope_init(hal_gyroscope1, &config);   
+
+            eo_sharedhw_Release(eo_sharedhw_GetHandle(), eosharedhw_resource_I2C3);            
+            
+            snprintf(s, sizeof(s), "GYRO iter %d -> init of gyro w/ range %s: %s", times, ranges[config.range], (hal_res_OK == res) ? "OK" : "KO");    
+            eo_errman_Trace(eo_errman_GetHandle(), s, s_object);   
+        }
+        else
+        {
+            // we cannot init .... i dont incremnet times ...
+            snprintf(s, sizeof(s), "GYRO iter %d -> i2c3 is busy: i dont init for now", times); 
+            eo_errman_Trace(eo_errman_GetHandle(), s, s_object); 
+            return;            
+        }       
+    }
+    else if(0 == (times % freq))
+    {
+        int16_t x;
+        int16_t y;
+        int16_t z;
+        hal_gyroscope_angularrate_t ang;
+        
+//        const osal_reltime_t wait = osal_reltimeZERO;
+        const eOreltime_t wait = eok_reltimeINFINITE;
+                
+        if(eores_OK == eo_sharedhw_Obtain(eo_sharedhw_GetHandle(), eosharedhw_resource_I2C3, wait))
+        {   // if the semaphore is busy ... i dont want to wait 
+            eo_errman_Trace(eo_errman_GetHandle(), "i2c3 is taken", s_object);
+            res = hal_gyroscope_readraw(hal_gyroscope1, &x, &y, &z);   
+            res = hal_gyroscope_read(hal_gyroscope1, &ang); 
+            eo_errman_Trace(eo_errman_GetHandle(), "i2c3 is released", s_object);            
+            eo_sharedhw_Release(eo_sharedhw_GetHandle(), eosharedhw_resource_I2C3); 
+            
+            snprintf(s, sizeof(s), "GYRO iter %d -> %s w/ raw = (%d %d %d) md/s = (%d %d %d)", times, (hal_res_OK == res) ? "OK" : "KO", x, y, z, ang.xar, ang.yar, ang.zar);
+            eo_errman_Trace(eo_errman_GetHandle(), s, s_object); 
+        }
+        else
+        {
+            // we cannot init .... i dont incremnet times ...
+            snprintf(s, sizeof(s), "GYRO iter %d -> i2c3 is busy: i dont read at this iteration", times);
+            eo_errman_Trace(eo_errman_GetHandle(), s, s_object);           
+        }                      
+    }
+    
+    times++;
+}
+
+#endif // TEST_000
 
 // marco.accame on 20 oct 2015: this function is triggered if function eom_emssocket_Transmit() inside the task 
 // of EOMtheEMSconfigurator it there is a failure to transmit a UDP packet.

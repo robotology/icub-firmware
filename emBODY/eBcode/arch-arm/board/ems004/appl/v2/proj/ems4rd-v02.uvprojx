@@ -874,6 +874,16 @@
               <FileType>1</FileType>
               <FilePath>..\src\eoappservices\EOwatchdog.c</FilePath>
             </File>
+            <File>
+              <FileName>EOtheSharedHW.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\eoappservices\EOtheSharedHW.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOtheMEMS.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\eoappservices\EOtheMEMS.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2201,6 +2211,16 @@
               <FileName>EOwatchdog.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\eoappservices\EOwatchdog.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOtheSharedHW.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\eoappservices\EOtheSharedHW.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOtheMEMS.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\eoappservices\EOtheMEMS.c</FilePath>
             </File>
           </Files>
         </Group>

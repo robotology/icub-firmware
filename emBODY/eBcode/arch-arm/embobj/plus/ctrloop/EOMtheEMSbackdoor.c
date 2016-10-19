@@ -316,7 +316,9 @@ static void s_eom_emsbackdoor_task_startup(EOMtask *p, uint32_t t)
     eo_action_SetEvent(onrx, emsbackdoor_evt_packet_received, p);
     
     eo_socketdtg_Open(s_emsbackdoor_singleton.socket, s_emsbackdoor_singleton.cfg.localport, eo_sktdir_TXRX, eobool_false, 
-                      NULL, onrx, NULL);   
+                      NULL, onrx, NULL);  
+
+    eo_errman_Trace(eo_errman_GetHandle(), "called _task_startup()", s_eobj_ownname);
                                 
 }
 

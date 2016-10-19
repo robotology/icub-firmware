@@ -74,20 +74,20 @@ extern "C" {
 //  <o> major           <0-255> 
 #define EOMTHEEMSAPPLCFG_VERSION_MAJOR          2
 //  <o> minor           <0-255> 
-#define EOMTHEEMSAPPLCFG_VERSION_MINOR          54
+#define EOMTHEEMSAPPLCFG_VERSION_MINOR          55
 //  </h>version
 
 //  <h> build date
 //  <o> year            <2010-2020> 
 #define EOMTHEEMSAPPLCFG_BUILDDATE_YEAR         2016
 //  <o> month           <1-12> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_MONTH        9
+#define EOMTHEEMSAPPLCFG_BUILDDATE_MONTH        10
 //  <o> day             <1-31> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          29
+#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          19
 //  <o> hour            <0-23> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         16
+#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         13
 //  <o> minute          <0-59> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          15
+#define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          36
 //  </h>build date
 
 // </h>Info 
@@ -127,7 +127,7 @@ extern "C" {
 //  <o> on error   <0=>   redefine __weak eom_emsapplcfg_hid_userdef_OnError() 
 #define sdfefe004       0
 //  <o> printf on debug window enabled   <0=>   false  <1=>   true
-#define EOMTHEEMSAPPLCFG_HALTRACE_ENABLED    0
+#define EOMTHEEMSAPPLCFG_HALTRACE_ENABLED    1
 //  </h>error manager
 
 
@@ -263,7 +263,7 @@ extern "C" {
 
 //  <o> tick task stack size <128-256:128>
 //  <i> default: 128
-#define IPNET_TMP_STACK2   128
+#define IPNET_TMP_STACK2   256
 
 
 //  <o> tick task period     <0=> as specified in ipal_cfg->sys_timetick in ipal_cfg.h

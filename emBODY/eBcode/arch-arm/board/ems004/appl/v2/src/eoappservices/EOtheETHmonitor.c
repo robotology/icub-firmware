@@ -32,6 +32,8 @@
 
 #include "hl_eth.h"
 
+#include "EOtheSharedHW.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -111,6 +113,7 @@ typedef struct
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
+static void s_eo_ethmonitor_taskworker_startup(EOMtask *rt, uint32_t n);
 
 static void s_eo_ethmonitor_taskworker_run(EOMtask *rt, uint32_t n);
 
@@ -169,12 +172,14 @@ extern EOtheETHmonitor* eo_ethmonitor_Initialise(const eOethmonitor_cfg_t *cfg)
     
     // create all synch data (semaphore, results, etc)
     
+    eo_sharedhw_Initialise(NULL);
+    
     s_eo_theethmonitor.semaphoreworker = osal_semaphore_new(1, 1);
 
     // start the periodic task
     
     s_eo_theethmonitor.taskworker = eom_task_New(   eom_mtask_Periodic, cfg->priority, cfg->stacksize,
-                                                    NULL, s_eo_ethmonitor_taskworker_run,
+                                                    s_eo_ethmonitor_taskworker_startup, s_eo_ethmonitor_taskworker_run,
                                                     0, cfg->period,
                                                     NULL, 
                                                     eo_ethmonitor,
@@ -343,6 +348,12 @@ void eo_ethmonitor(void *p)
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
+
+static void s_eo_ethmonitor_taskworker_startup(EOMtask *rt, uint32_t n)
+{
+    eo_errman_Trace(eo_errman_GetHandle(), "called _taskworker_startup()", s_eobj_ownname);
+}
+
 static void s_eo_ethmonitor_taskworker_run(EOMtask *rt, uint32_t n)
 {
     // in here we query the micrel switch but we must: (1) be enabled to do that, and (2) wait for a semaphore which lock access to result data
@@ -353,15 +364,29 @@ static void s_eo_ethmonitor_taskworker_run(EOMtask *rt, uint32_t n)
         return;
     }
     
-    // we wait for the availability of the semaphore. at endo of processing we release it
+    // we wait for the availability of the semaphore. at end of processing we release it
     if(osal_res_OK != osal_semaphore_decrement(s_eo_theethmonitor.semaphoreworker, osal_reltimeINFINITE))
     {
         return;
     }
     
-    // begin of activity.
+    //const osal_reltime_t wait = osal_reltimeZERO;
+    const osal_reltime_t wait = osal_reltimeINFINITE;
     
-    s_eo_ethmonitor_query_micrel();
+    // begin of activity.
+    if(eores_OK == eo_sharedhw_Obtain(eo_sharedhw_GetHandle(), eosharedhw_resource_I2C3, wait))
+    {   // if the semaphore is busy ... i dont want to wait 
+        // i protect the whole funtion because ... only one query out of three does not use i2c3 ..
+        //eo_errman_Trace(eo_errman_GetHandle(), "TAKEN i2c3", s_eobj_ownname);
+        s_eo_ethmonitor_query_micrel();
+        //eo_errman_Trace(eo_errman_GetHandle(), "RELEASED i2c3", s_eobj_ownname);
+        
+        eo_sharedhw_Release(eo_sharedhw_GetHandle(), eosharedhw_resource_I2C3);
+    }
+    else
+    {
+        //eo_errman_Trace(eo_errman_GetHandle(), "BUSY i2c3", s_eobj_ownname); 
+    }
     
     // end of activity
     
@@ -402,6 +427,7 @@ static void s_eo_ethmonitor_query_micrel(void)
 //    s_eo_ethmonitor_print_timeoflife("QUERY");
     
 //    start = eov_sys_LifeTimeGet(eov_sys_GetHandle());
+    // i read it from smi w/ hl_eth_smi_read(). it quick ...
     hal_ethtransceiver_phy_linkupmask(&mask);
 //    stop = eov_sys_LifeTimeGet(eov_sys_GetHandle());
 //    delta = stop - start;
@@ -417,19 +443,25 @@ static void s_eo_ethmonitor_query_micrel(void)
     s_eo_theethmonitor.portstatus[2].on = eobool_true;
     
 //    start = eov_sys_LifeTimeGet(eov_sys_GetHandle());
+
+    // i read w/ hl_i2c_read over i2c3    
     hal_ethtransceiver_phy_status(phys, 3);
+    
 //    stop = eov_sys_LifeTimeGet(eov_sys_GetHandle());
 //    delta = stop - start;
 //    s_eo_ethmonitor_print_delta("hal_ethtransceiver_phy_status(phys, 2)", delta);
+
 
     
     for(i=0; i<eOethmonitor_numberofports; i++)
     {
         if(eobool_true == s_eo_theethmonitor.portstatus[i].on)
         {
+            
             memcpy(&s_eo_theethmonitor.portstatus[i].phy, &phys[i], sizeof(hal_ethtransceiver_phystatus_t));
             
 //            start = eov_sys_LifeTimeGet(eov_sys_GetHandle());
+            // i read w/ hl_i2c_read over i2c3 
             hal_ethtransceiver_phy_errorinfo(i, hal_ethtransceiver_phyerror_rxCrc, &s_eo_theethmonitor.portstatus[i].rxcrc); 
 //            stop = eov_sys_LifeTimeGet(eov_sys_GetHandle());            
 //            delta = stop - start;

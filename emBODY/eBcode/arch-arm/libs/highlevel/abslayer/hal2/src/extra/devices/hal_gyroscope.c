@@ -27,6 +27,18 @@
 // - middleware interface: contains hl, stm32 etc. --------------------------------------------------------------------
 //#include "hal_middleware_interface.h"
 
+#if !defined(HAL_USE_GYROSCOPE)
+
+#include "hal_gyroscope.h"
+
+extern hal_bool_t hal_gyroscope_supported_is(hal_gyroscope_t id) { return hal_false; }
+extern hal_result_t hal_gyroscope_init(hal_gyroscope_t id, const hal_gyroscope_cfg_t *cfg) { return hal_res_NOK_generic; }
+extern hal_result_t hal_gyroscope_read(hal_gyroscope_t id, hal_gyroscope_angularrate_t* angrate) { return hal_res_NOK_generic; }
+extern hal_result_t hal_gyroscope_readraw(hal_gyroscope_t id, int16_t *x, int16_t *y, int16_t *z) { return hal_res_NOK_generic; }
+
+#endif
+
+
 #ifdef HAL_USE_GYROSCOPE
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -41,13 +53,13 @@
 
 #include "hl_bits.h"
 
-
+#include "hl_chip_st_l3g4200d.h"
  
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "hal_gyroscope.h"
+
 
 
 
@@ -70,9 +82,9 @@
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
-extern const hal_gyroscope_cfg_t hal_gyroscope_cfg_default  = 
+const hal_gyroscope_cfg_t hal_gyroscope_cfg_default  = 
 { 
-    .dummy = 0 
+    .range = hal_gyroscope_range_250dps
 };
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -96,10 +108,12 @@ typedef struct
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static hal_boolval_t s_hal_gyroscope_supported_is(hal_gyroscope_t id);
+static hal_bool_t s_hal_gyroscope_supported_is(hal_gyroscope_t id);
 static void s_hal_gyroscope_initted_set(hal_gyroscope_t id);
-static hal_boolval_t s_hal_gyroscope_initted_is(hal_gyroscope_t id);
+static void s_hal_gyroscope_initted_clr(hal_gyroscope_t id);
+static hal_bool_t s_hal_gyroscope_initted_is(hal_gyroscope_t id);
 
+static hal_result_t s_hal_gyroscope_hw_deinit(hal_gyroscope_t id);
 static hal_result_t s_hal_gyroscope_hw_init(hal_gyroscope_t id, const hal_gyroscope_cfg_t *cfg);
 
 
@@ -125,6 +139,43 @@ static hal_gyroscope_theinternals_t s_hal_gyroscope_theinternals =
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
+extern hal_bool_t hal_gyroscope_supported_is(hal_gyroscope_t id)
+{
+    return(s_hal_gyroscope_supported_is(id));
+}
+
+
+extern hal_result_t hal_gyroscope_deinit(hal_gyroscope_t id)
+{
+    hal_gyroscope_internal_item_t *intitem = s_hal_gyroscope_theinternals.items[HAL_gyroscope_id2index(id)];
+
+    if(hal_false == s_hal_gyroscope_supported_is(id))
+    {
+        return(hal_res_NOK_generic);
+    }
+
+    if(hal_false == s_hal_gyroscope_initted_is(id))
+    {   // already deinitted
+        return(hal_res_OK);
+    }  
+    
+    if(NULL == intitem)
+    {
+        intitem = s_hal_gyroscope_theinternals.items[HAL_gyroscope_id2index(id)] = hal_heap_new(sizeof(hal_gyroscope_internal_item_t));
+        // minimal initialisation of the internal item
+        // nothing to init.      
+    }  
+
+    if(hal_res_OK != s_hal_gyroscope_hw_deinit(id))
+    {
+        return(hal_res_NOK_generic);
+    }
+    
+    s_hal_gyroscope_initted_clr(id);
+
+    return(hal_res_OK);    
+    
+}
 
 extern hal_result_t hal_gyroscope_init(hal_gyroscope_t id, const hal_gyroscope_cfg_t *cfg)
 {
@@ -188,6 +239,43 @@ extern hal_result_t hal_gyroscope_init(hal_gyroscope_t id, const hal_gyroscope_c
 //     
 //     return(r);  
 // }
+
+extern hal_result_t hal_gyroscope_readraw(hal_gyroscope_t id, int16_t *x, int16_t *y, int16_t *z)
+{
+    hal_result_t res = hal_res_NOK_generic; 
+
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_VALIDITY_CHECK)     
+    if(hal_true != s_hal_gyroscope_initted_is(id))
+    {
+        return(hal_res_NOK_generic);
+    } 
+#endif
+    
+#if     !defined(HAL_BEH_REMOVE_RUNTIME_PARAMETER_CHECK)    
+    if((NULL == x) || (NULL == y) || (NULL == z))
+    {
+        return(hal_res_NOK_generic);
+    }
+#endif
+    
+    *x = 0;
+    *y = 0;
+    *z = 0;
+    int16_t xar = 0;
+    int16_t yar = 0;
+    int16_t zar = 0;
+       
+    res = hal_gyroscope__theboardconfig.driver[HAL_gyroscope_id2index(id)].fun.readraw(id, &xar, &yar, &zar);
+    
+    if(hal_res_OK == res)
+    {
+        *x = xar; //  factor is about 8.75 or 35/4
+        *y = yar;
+        *z = zar;        
+    }
+    
+    return(res);
+}
     
 
 extern hal_result_t hal_gyroscope_read(hal_gyroscope_t id, hal_gyroscope_angularrate_t* angrate)
@@ -245,9 +333,9 @@ extern hal_result_t hal_gyroscope_read(hal_gyroscope_t id, hal_gyroscope_angular
 // --------------------------------------------------------------------------------------------------------------------
 
 
-static hal_boolval_t s_hal_gyroscope_supported_is(hal_gyroscope_t id)
+static hal_bool_t s_hal_gyroscope_supported_is(hal_gyroscope_t id)
 {
-    return((hal_boolval_t)hl_bits_word_bitcheck(hal_gyroscope__theboardconfig.supportedmask, HAL_gyroscope_id2index(id)) );
+    return((hal_bool_t)hl_bits_word_bitcheck(hal_gyroscope__theboardconfig.supportedmask, HAL_gyroscope_id2index(id)) );
 }
 
 static void s_hal_gyroscope_initted_set(hal_gyroscope_t id)
@@ -255,17 +343,52 @@ static void s_hal_gyroscope_initted_set(hal_gyroscope_t id)
     hl_bits_word_bitset(&s_hal_gyroscope_theinternals.inittedmask, HAL_gyroscope_id2index(id));
 }
 
-static hal_boolval_t s_hal_gyroscope_initted_is(hal_gyroscope_t id)
+static void s_hal_gyroscope_initted_clr(hal_gyroscope_t id)
 {
-    return((hal_boolval_t)hl_bits_word_bitcheck(s_hal_gyroscope_theinternals.inittedmask, HAL_gyroscope_id2index(id)));
+    hl_bits_word_bitclear(&s_hal_gyroscope_theinternals.inittedmask, HAL_gyroscope_id2index(id));
+}
+
+static hal_bool_t s_hal_gyroscope_initted_is(hal_gyroscope_t id)
+{
+    return((hal_bool_t)hl_bits_word_bitcheck(s_hal_gyroscope_theinternals.inittedmask, HAL_gyroscope_id2index(id)));
+}
+
+
+static hal_result_t s_hal_gyroscope_hw_deinit(hal_gyroscope_t id)
+{    
+
+    if((NULL != hal_gyroscope__theboardconfig.driver[HAL_gyroscope_id2index(id)].fun.deinit))
+    {
+        return(hal_gyroscope__theboardconfig.driver[HAL_gyroscope_id2index(id)].fun.deinit(id));
+    }
+    else
+    {
+        return(hal_res_NOK_generic);
+    }
 }
 
 
 static hal_result_t s_hal_gyroscope_hw_init(hal_gyroscope_t id, const hal_gyroscope_cfg_t *cfg)
 {
+    const hl_chip_st_l3g4200d_cfg_t *cc = (const hl_chip_st_l3g4200d_cfg_t *)hal_gyroscope__theboardconfig.driver[HAL_gyroscope_id2index(id)].cfg.initpar;
+    
+    hl_chip_st_l3g4200d_cfg_t config;
+    config.i2cid = cc->i2cid;
+    switch(cfg->range)
+    {
+        default: config.range = cc->range; break;
+        case hal_gyroscope_range_250dps: config.range = hl_chip_st_l3g4200d_range_250dps; break;
+        case hal_gyroscope_range_500dps: config.range = hl_chip_st_l3g4200d_range_500dps; break;
+        case hal_gyroscope_range_2000dps: config.range = hl_chip_st_l3g4200d_range_2000dps; break;
+    }
+    
+//    if((NULL != hal_gyroscope__theboardconfig.driver[HAL_gyroscope_id2index(id)].fun.init) && (NULL != hal_gyroscope__theboardconfig.driver[HAL_gyroscope_id2index(id)].fun.read))
+//    {
+//        return(hal_gyroscope__theboardconfig.driver[HAL_gyroscope_id2index(id)].fun.init(id, hal_gyroscope__theboardconfig.driver[HAL_gyroscope_id2index(id)].cfg.initpar));
+//    }
     if((NULL != hal_gyroscope__theboardconfig.driver[HAL_gyroscope_id2index(id)].fun.init) && (NULL != hal_gyroscope__theboardconfig.driver[HAL_gyroscope_id2index(id)].fun.read))
     {
-        return(hal_gyroscope__theboardconfig.driver[HAL_gyroscope_id2index(id)].fun.init(id, hal_gyroscope__theboardconfig.driver[HAL_gyroscope_id2index(id)].cfg.initpar));
+        return(hal_gyroscope__theboardconfig.driver[HAL_gyroscope_id2index(id)].fun.init(id, &config));
     }
     else
     {

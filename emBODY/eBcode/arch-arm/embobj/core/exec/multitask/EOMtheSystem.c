@@ -205,10 +205,7 @@ extern EOMtheSystem* eom_sys_GetHandle(void)
 
 extern void eom_sys_Start(EOMtheSystem *p, eOvoid_fp_void_t userinit_fn)
 {
-
     eo_errman_Assert(eo_errman_GetHandle(), (NULL != p), "eom_sys_Start(): NULL handle", s_eobj_ownname, &eo_errman_DescrWrongParamLocal);
-
-
     s_eom_sys_start(userinit_fn);
 }
 
@@ -245,32 +242,22 @@ static eOresult_t s_eom_sys_start(eOvoid_fp_void_t userinit_fn)
 
 static void s_eom_thecreation(void)
 {
-    const uint16_t *myused = NULL;
-    const uint16_t *myfree = NULL;
-    char str[64];
-    // we are in osal, now
-
+    char str[96];
+    
+    snprintf(str, sizeof(str), "OSAL::tskinit: just started");
+    eo_errman_Trace(eo_errman_GetHandle(), str, s_eobj_ownname);
+    
+    snprintf(str, sizeof(str), "OSAL::tskinit: about to init EOMtheTimerManager + EOMtheCallbackManager");
+    eo_errman_Trace(eo_errman_GetHandle(), str, s_eobj_ownname);
 
     // start the services offered by embobj: timer manager and callback manager
 
     eom_timerman_Initialise(s_eom_system.tmrmancfg);
-
     eom_callbackman_Initialise(s_eom_system.cbkmancfg);
-
-    osal_info_entities_get_stats(&myused, &myfree);
-
-#if 0    
-    snprintf(str, sizeof(str), "uses %d task, %d stack, %d timers, %d mutexes, %d semaphores, %d messageboxes, %d messages", 
-                                    myused[osal_info_entity_task], 
-                                    myused[osal_info_entity_globalstack], 
-                                    myused[osal_info_entity_timer], 
-                                    myused[osal_info_entity_mutex], 
-                                    myused[osal_info_entity_semaphore], 
-                                    myused[osal_info_entity_messagequeue],
-                                    myused[osal_info_entity_message]);
-
-    eo_errman_Info(eo_errman_GetHandle(), str, s_eobj_ownname, NULL);
-#endif
+    
+            
+    snprintf(str, sizeof(str), "OSAL::tskinit: calling user-defined function");
+    eo_errman_Trace(eo_errman_GetHandle(), str, s_eobj_ownname);
     
     // run user defined initialisation ...
     if(NULL != s_eom_system.user_init_fn)
@@ -278,12 +265,12 @@ static void s_eom_thecreation(void)
         s_eom_system.user_init_fn();
     }
     
-    snprintf(str, sizeof(str), "EOMtheSystem: init task completed, system running");
-    eo_errman_Info(eo_errman_GetHandle(), str, s_eobj_ownname, &eo_errman_DescrRunningHappily);
-    //eOerrmanDescriptor_t desc = {0};
-    //memcpy(&desc, &eo_errman_DescrRunningHappily, sizeof(desc));
-    //desc.param = 0;
-    //eo_errman_Info(eo_errman_GetHandle(), NULL, s_eobj_ownname, &desc);
+    snprintf(str, sizeof(str), "OSAL::tskinit: has finished user-defined function");
+    eo_errman_Trace(eo_errman_GetHandle(), str, s_eobj_ownname);
+    
+    
+    snprintf(str, sizeof(str), "OSAL::tskinit: about to stop itself and start scheduling");
+    eo_errman_Trace(eo_errman_GetHandle(), str, s_eobj_ownname);
 }
 
 

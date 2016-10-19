@@ -263,9 +263,11 @@ extern void eom_emsapplcfg_hid_userdef_OnError(eOerrmanErrorType_t errtype, cons
     {
         uint64_t tt = eov_sys_LifeTimeGet(eov_sys_GetHandle());
         uint32_t sec = tt/(1000*1000);
-        uint32_t msec = tt%(1000*1000);
-        msec /= 1000;
-        snprintf(str, sizeof(str), "[%s] at s%d m%d %s in tsk %d: %s", err, sec, msec, eobjstr, taskid, info);
+        uint32_t tmp = tt%(1000*1000);
+        uint32_t msec = tmp / 1000;
+        uint32_t usec = tmp % 1000;
+                
+        snprintf(str, sizeof(str), "[%s] @ s%d m%d u%d %s in tsk %d: %s", err, sec, msec, usec, eobjstr, taskid, info);
         hal_trace_puts(str);
     }
     if(errtype <= eo_errortype_error)
