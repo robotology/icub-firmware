@@ -864,6 +864,16 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOwatchdog.c</FilePath>
             </File>
+            <File>
+              <FileName>EOtheMEMS.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheMEMS.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOtheSharedHW.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheSharedHW.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -910,7 +920,7 @@
                 <vShortEn>2</vShortEn>
                 <vShortWch>2</vShortWch>
                 <v6Lto>0</v6Lto>
-                <v6WtE>0</v6WtE>
+                <v6WtE>2</v6WtE>
                 <v6Rtti>2</v6Rtti>
                 <VariousControls>
                   <MiscControls></MiscControls>
@@ -1298,7 +1308,7 @@
                 <vShortEn>2</vShortEn>
                 <vShortWch>2</vShortWch>
                 <v6Lto>0</v6Lto>
-                <v6WtE>0</v6WtE>
+                <v6WtE>2</v6WtE>
                 <v6Rtti>2</v6Rtti>
                 <VariousControls>
                   <MiscControls></MiscControls>
@@ -2185,6 +2195,16 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOwatchdog.c</FilePath>
             </File>
+            <File>
+              <FileName>EOtheMEMS.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheMEMS.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOtheSharedHW.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheSharedHW.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2551,7 +2571,7 @@
                 <vShortEn>2</vShortEn>
                 <vShortWch>2</vShortWch>
                 <v6Lto>0</v6Lto>
-                <v6WtE>0</v6WtE>
+                <v6WtE>2</v6WtE>
                 <v6Rtti>2</v6Rtti>
                 <VariousControls>
                   <MiscControls></MiscControls>
