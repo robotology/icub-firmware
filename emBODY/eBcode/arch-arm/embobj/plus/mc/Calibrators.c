@@ -21,7 +21,7 @@
 #include "CalibrationHelperData.h"
 #include "hal_adc.h"
 
-#define CALIB_TYPE_6_POS_TRHESHOLD 546 //546=3 degree //91.02f // = 0.5 degree
+#define CALIB_TYPE_6_POS_TRHESHOLD 1820 //2730 //546=3 degree //91.02f // = 0.5 degree
 
 BOOL JointSet_do_wait_calibration_3(JointSet* o)
 {
@@ -232,6 +232,9 @@ static eOresult_t JointSet_do_wait_calibration_7_singleJoint(Joint *j, Motor* m,
             {
                 *calibrationCompleted = TRUE;
                 jCalib7data_ptr->state = calibtype7_st_finished;
+//                char info[80];
+//                sprintf(info,"calib7:completed!");
+//                JointSet_send_debug_message(info, j->ID);
             }
          }    
         break;
