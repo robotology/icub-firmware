@@ -1453,8 +1453,10 @@ static uint32_t s_eo_appEncReader_rescale2icubdegrees(uint32_t val_raw, uint8_t 
         divider = -divider;
     }
 
-    retval = (float)val_raw * 65535.0f / divider;
+    uint64_t aux = (uint64_t)val_raw* 65535;
+    //retval = (float)val_raw * 65535.0f / divider;
     
+    retval = aux /divider;
     return(retval);
 
 }
