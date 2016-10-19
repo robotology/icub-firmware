@@ -32,6 +32,7 @@
 #include "hal_gyroscope.h"
 
 extern hal_bool_t hal_gyroscope_supported_is(hal_gyroscope_t id) { return hal_false; }
+extern hal_result_t hal_gyroscope_deinit(hal_gyroscope_t id) { return hal_res_NOK_generic; }
 extern hal_result_t hal_gyroscope_init(hal_gyroscope_t id, const hal_gyroscope_cfg_t *cfg) { return hal_res_NOK_generic; }
 extern hal_result_t hal_gyroscope_read(hal_gyroscope_t id, hal_gyroscope_angularrate_t* angrate) { return hal_res_NOK_generic; }
 extern hal_result_t hal_gyroscope_readraw(hal_gyroscope_t id, int16_t *x, int16_t *y, int16_t *z) { return hal_res_NOK_generic; }
