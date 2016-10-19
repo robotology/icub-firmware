@@ -725,13 +725,11 @@ extern eOresult_t eo_inertials2_Tick(EOtheInertials2 *p, eObool_t resetstatus)
     eOas_inertial_data_t *data = &p->inertial2->status.data;
     memset(data, 0, sizeof(eOas_inertial_data_t)); 
     
-    static volatile uint32_t ciao = 0;
     eOmems_sensor_t sensor = mems_gyroscope_l3g4200;
     // if we have a mems, then if we have a fifoofinertialdata, then NOID16
     if(eores_OK == eo_mems_Get(eo_mems_GetHandle(), data, eok_reltimeZERO, &sensor, NULL))
     {
         //eo_errman_Trace(eo_errman_GetHandle(), "tx mems", s_eobj_ownname);
-        ciao++;
         // ok, i adjust the id
         uint8_t index = (mems_gyroscope_l3g4200 == sensor) ? (mems_gyro) : (mems_accel);
         data->id = p->frommems2id[index];
@@ -743,7 +741,7 @@ extern eOresult_t eo_inertials2_Tick(EOtheInertials2 *p, eObool_t resetstatus)
         {
             memcpy(data, item, sizeof(eOas_inertial_data_t));   
             eo_vector_PopFront(p->fifoofinertialdata);   
-            eo_errman_Trace(eo_errman_GetHandle(), "tx mtb", s_eobj_ownname);
+            //eo_errman_Trace(eo_errman_GetHandle(), "tx mtb", s_eobj_ownname);
         }        
     }
     else
@@ -804,19 +802,29 @@ extern eOresult_t eo_inertials2_Config(EOtheInertials2 *p, eOas_inertial_config_
     
     // then we check enabled mask and datarate
        
-    if(p->sensorsconfig.datarate < 10)
+    uint8_t originalrate = p->sensorsconfig.datarate;
+    if(p->sensorsconfig.datarate < 5)
     {
-        p->sensorsconfig.datarate = 10;
-        // send up diagnostics
-        // warning -> "Object EOtheInertials2 has changed the requested datarate."         
+        p->sensorsconfig.datarate = 5;        
     }
     
     if(p->sensorsconfig.datarate > 200)
     {
-        p->sensorsconfig.datarate = 200;
-        // send up diagnostics
-        // warning -> "Object EOtheInertials2 has changed the requested datarate."             
+        p->sensorsconfig.datarate = 200;          
     }
+    
+    if(originalrate != p->sensorsconfig.datarate)
+    {
+        eOerrmanDescriptor_t errdes = {0};
+        errdes.sourcedevice       = eo_errman_sourcedevice_localboard;
+        errdes.sourceaddress      = 0;
+        errdes.par16              = (originalrate << 8) | (p->sensorsconfig.datarate);
+        errdes.par64              = 0;        
+        errdes.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_inertials_changed_requestedrate);
+        p->diagnostics.errorType = eo_errortype_warning;                
+        eo_errman_Error(eo_errman_GetHandle(), p->diagnostics.errorType, NULL, s_eobj_ownname, &errdes);        
+    }
+        
     
     // now ... we need to change the masks according to p->sensorsconfig.maskofenabled
     
@@ -1064,8 +1072,6 @@ static eOresult_t s_eo_inertials2_TXstart(EOtheInertials2 *p)
         return(eores_OK);
     } 
     
-    #warning add a proper call to EOtheMEMS .... to config and start the acquisition.    
-
     if(eobool_true == eo_common_byte_bitcheck(p->ethmap_mems_active, mems_gyro))
     {
         eo_mems_Config(eo_mems_GetHandle(), &p->memsconfig[mems_gyro]);
@@ -1245,11 +1251,18 @@ static void s_eo_inertials2_build_maps(EOtheInertials2* p, uint64_t enablemask)
                 {
                     eo_common_byte_bitset(&p->ethmap_mems_active, n);                
                     p->frommems2id[n] = i;  
-                    #warning --> later on we could get hal_gyroscope_range* from ... a specific param or from des->on.eth.id ....
                     p->memsparam[n] = hal_gyroscope_range_500dps;     
+                    if((des->on.eth.id > 0) && (des->on.eth.id < 4))
+                    {   // hack to change the range
+                        p->memsparam[n] = (hal_gyroscope_range_t) ((uint8_t)(des->on.eth.id)-1);
+                    }
                     p->memsconfig[n].acquisitionrate = p->sensorsconfig.datarate * EOK_reltime1ms;
                     p->memsconfig[n].sensor = mems_gyroscope_l3g4200;
-                    p->memsconfig[n].properties.gyroscope.range = hal_gyroscope_range_500dps;
+                    p->memsconfig[n].properties.gyroscope.range = p->memsparam[n];
+                }
+                else 
+                {
+                    // ethmap_mems_active stays unset, hence EOtheMEMS will not be started 
                 }
             }
         }

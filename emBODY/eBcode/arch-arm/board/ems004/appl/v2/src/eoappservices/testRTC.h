@@ -45,7 +45,7 @@
 
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
-#define TESTRTC_IS_ACTIVE
+#undef TESTRTC_IS_ACTIVE
 
 
    
