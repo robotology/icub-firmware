@@ -73,6 +73,10 @@ struct EOtheInertials_hid
     eOas_inertial_t*                        inertial2;  
     EOarray*                                id32ofregulars;
     EOarray*                                arrayofsensors;
+    uint16_t                                not_heardof_target[2];
+    uint16_t                                not_heardof_status[2];
+    uint32_t                                not_heardof_counter;
+    eObool_t                                transmissionisactive;
 }; 
 
 

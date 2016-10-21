@@ -102,6 +102,11 @@ static eObool_t s_eo_inertials2_isID32relevant(uint32_t id32);
 
 static eObool_t s_eo_inertials2_get_id(eObrd_canlocation_t loc, eOas_inertial_type_t type, uint16_t *id);
 
+static void s_eo_inertials2_presenceofcanboards_reset(EOtheInertials2 *p);
+static void s_eo_inertials2_presenceofcanboards_start(EOtheInertials2 *p);
+static void s_eo_inertials2_presenceofcanboards_touch(EOtheInertials2 *p, eObrd_canlocation_t loc);
+static void s_eo_inertials2_presenceofcanboards_tick(EOtheInertials2 *p);
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
@@ -144,6 +149,8 @@ static EOtheInertials2 s_eo_theinertials2 =
         .ondiscoverystop        = {0},
         .command                = {0}, 
     },
+    
+    .numofmtbs                  = 0,
 
     .sensorsconfig              = {0},  
     .fifoofinertialdata         = NULL,
@@ -162,7 +169,11 @@ static EOtheInertials2 s_eo_theinertials2 =
     .memsconfig                 = {0},  
 
     .inertial2                  = NULL,
-    .id32ofregulars             = NULL
+    .id32ofregulars             = NULL,
+    .arrayofsensors             = NULL,
+    .not_heardof_status         = {0},
+    .not_heardof_counter        = 0,
+    .transmissionisactive       = eobool_false
 };
 
 
@@ -200,6 +211,8 @@ extern EOtheInertials2* eo_inertials2_Initialise(void)
     memset(p->frommems2id, NOID08, sizeof(p->frommems2id));     
     memset(p->memsparam, 255, sizeof(p->memsparam));
     
+    s_eo_inertials2_presenceofcanboards_reset(p);
+    
     p->inertial2 = NULL;
     p->id32ofregulars = eo_array_New(inertials_maxRegulars, sizeof(uint32_t), NULL);
     p->arrayofsensors = eo_array_New(eOas_inertials_maxnumber, sizeof(eOas_inertial_descriptor_t), NULL);
@@ -217,6 +230,7 @@ extern EOtheInertials2* eo_inertials2_Initialise(void)
     p->service.initted = eobool_true;    
     p->service.active = eobool_false;
     p->service.started = eobool_false;
+    p->transmissionisactive = eobool_false;
     p->service.state = eomn_serv_state_idle;
     eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_inertials, p->service.state);
     
@@ -713,6 +727,11 @@ extern eOresult_t eo_inertials2_Tick(EOtheInertials2 *p, eObool_t resetstatus)
     {   // nothing to do because we dont have a configured service 
         return(eores_OK);
     }    
+    
+    if(eobool_true == p->transmissionisactive)
+    {
+        s_eo_inertials2_presenceofcanboards_tick(p);
+    }
 
     if(eobool_false == resetstatus)
     {   // nothing to do because we cannot overwrite the status of inertial 
@@ -750,25 +769,7 @@ extern eOresult_t eo_inertials2_Tick(EOtheInertials2 *p, eObool_t resetstatus)
         data->id = NOID16;
         data->timestamp = eov_sys_LifeTimeGet(eov_sys_GetHandle());          
     }
-         
-    
-//    if(eobool_true == eo_vector_Empty(p->fifoofinertialdata))
-//    {
-//        // just reset the status->data 
-//        data->id = NOID16;
-//        data->timestamp = eov_sys_LifeTimeGet(eov_sys_GetHandle());           
-//    }
-//    else
-//    {
-//        // else ... retrieve the item from fifoofinertialdata, copy it into status->data and remove it from fifoofinertialdata 
-//        eOas_inertial_data_t * item = (eOas_inertial_data_t*) eo_vector_Front(p->fifoofinertialdata);
-//        if(NULL != item)
-//        {
-//            memcpy(data, item, sizeof(eOas_inertial_data_t));   
-//            eo_vector_PopFront(p->fifoofinertialdata);   
-//        }
-//    }
-    
+                 
     return(eores_OK);        
 }
 
@@ -920,6 +921,8 @@ extern eOresult_t eo_inertials2_AcceptCANframe(EOtheInertials2 *p, eOas_inertial
     // ok, now we can pushback data into the fifoofinertialdata
     
     eo_vector_PushBack(p->fifoofinertialdata, &data);
+    
+    s_eo_inertials2_presenceofcanboards_touch(p, loc);
     
     return(eores_OK);      
 }
@@ -1077,8 +1080,6 @@ static eOresult_t s_eo_inertials2_TXstart(EOtheInertials2 *p)
         eo_mems_Config(eo_mems_GetHandle(), &p->memsconfig[mems_gyro]);
         eo_mems_Start(eo_mems_GetHandle());
     }                        
-
-   
  
     icubCanProto_inertial_config_t canprotoconfig = {0};
     
@@ -1118,6 +1119,9 @@ static eOresult_t s_eo_inertials2_TXstart(EOtheInertials2 *p)
         }
     }
     
+    p->transmissionisactive = eobool_true;
+    s_eo_inertials2_presenceofcanboards_start(p);
+    
     return(eores_OK);   
 }
 
@@ -1156,11 +1160,11 @@ static eOresult_t s_eo_inertials2_TXstop(EOtheInertials2 *p)
     
     
     // stop the mems
-    #warning -> do a proper call to EOtheMEMS to stop the acquisition ...
     eo_mems_Stop(eo_mems_GetHandle());
 
-    // send up diagnostics
-    // debug -> "Object EOtheInertials2 has programmed the mtb. In param16 in msb there is the mode, in lsb there is datarate"    
+
+    p->transmissionisactive = eobool_false;
+    s_eo_inertials2_presenceofcanboards_reset(p);
                
     return(eores_OK);
 }
@@ -1258,7 +1262,7 @@ static void s_eo_inertials2_build_maps(EOtheInertials2* p, uint64_t enablemask)
                     }
                     p->memsconfig[n].acquisitionrate = p->sensorsconfig.datarate * EOK_reltime1ms;
                     p->memsconfig[n].sensor = mems_gyroscope_l3g4200;
-                    p->memsconfig[n].properties.gyroscope.range = p->memsparam[n];
+                    p->memsconfig[n].properties.gyroscope.range = (hal_gyroscope_range_t)p->memsparam[n];
                 }
                 else 
                 {
@@ -1412,6 +1416,66 @@ static eObool_t s_eo_inertials2_get_id(eObrd_canlocation_t loc, eOas_inertial_ty
         
     return(eobool_true);
 }
+
+
+static void s_eo_inertials2_presenceofcanboards_reset(EOtheInertials2 *p)
+{
+    memset(p->not_heardof_target, 0, sizeof(p->not_heardof_target));
+    memset(p->not_heardof_status, 0, sizeof(p->not_heardof_status));
+    p->not_heardof_counter = 0;
+}
+
+
+static void s_eo_inertials2_presenceofcanboards_start(EOtheInertials2 *p)
+{
+    // prepare not_heardof_target ... it is equal to canmap_mtb_active in or with those
+    // boards which are searched in discovery
+    
+    if(0 == (p->sharedcan.discoverytarget.info.protocol.major + p->sharedcan.discoverytarget.info.protocol.minor +
+             p->sharedcan.discoverytarget.info.firmware.major + p->sharedcan.discoverytarget.info.firmware.minor + p->sharedcan.discoverytarget.info.firmware.build))
+    {
+        memset(p->not_heardof_target, 0, sizeof(p->not_heardof_status));
+    }
+    else
+    {
+        memcpy(p->not_heardof_target, p->canmap_mtb_active, sizeof(p->not_heardof_status));
+    }
+    
+    memcpy(p->not_heardof_status, p->not_heardof_target, sizeof(p->not_heardof_status));
+    p->not_heardof_counter = 0;
+}
+
+
+static void s_eo_inertials2_presenceofcanboards_touch(EOtheInertials2 *p, eObrd_canlocation_t loc)
+{
+    eo_common_hlfword_bitclear(&p->not_heardof_status[loc.port], loc.addr);
+}
+
+
+static void s_eo_inertials2_presenceofcanboards_tick(EOtheInertials2 *p)
+{
+    if((p->not_heardof_counter++) > 1000)
+    {        
+        if((0 != p->not_heardof_status[0]) || (0 != p->not_heardof_status[1]))
+        {
+            eOerrmanDescriptor_t errdes = {0};
+            errdes.sourcedevice       = eo_errman_sourcedevice_localboard;
+            errdes.sourceaddress      = 0;
+            errdes.par16              = eobrd_mtb;
+            errdes.par64              = (p->not_heardof_status[0] << 16) | p->not_heardof_status[1];        
+            errdes.code = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_boards_lostcontact);
+            p->diagnostics.errorType = eo_errortype_warning;                
+            eo_errman_Error(eo_errman_GetHandle(), p->diagnostics.errorType, NULL, s_eobj_ownname, &errdes);
+        } 
+
+        memcpy(p->not_heardof_status, p->not_heardof_target, sizeof(p->not_heardof_status));
+        p->not_heardof_counter = 0;    
+    }
+}
+
+
+
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
