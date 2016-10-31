@@ -239,6 +239,9 @@ static void updateEntity2SetMaps(const eOmc_4jomo_coupling_t *jomoCouplingInfo, 
     //currently all joint of same board have the the same number of multiple encoder. so i use j0
     jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(carray, 0);
     o->multi_encs = (uint8_t) eomc_encoder_get_numberofcomponents((eOmc_encoder_t)jomodes->encoder1.type);
+    #warning VALE: horrible work around about multi_encs
+    if (o->multi_encs == 0) //when in encoder1 xml group there is none.
+        o->multi_encs = 1;
     o->nEncods = o->multi_encs *o->nJoints;
 }
 
@@ -606,6 +609,32 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         o->jos[s][(o->set_dim[s])++] = j;
     }
     
+		//////////////////// VALE
+		float **Sje_aux = NULL;
+    //verifico che Sje sia la matrice identita' 4x4
+        eOboolvalues_t isIdentityMatrix = eobool_true;
+		for (int i=0; i<MAX_JOINTS_PER_BOARD; ++i)
+        {
+            for (int k=0; k<MAX_ENCODS_PER_BOARD; ++k)
+            {
+                if(i==k)
+                {
+                    if(o->Sje[i][k]  != 1.0f)
+                        isIdentityMatrix = eobool_false;
+                }
+                else
+                {
+                    if(o->Sje[i][k]  != 0.0f)
+                        isIdentityMatrix = eobool_false;
+                }
+            }
+        }
+        
+        if(!isIdentityMatrix)
+            Sje_aux = o->Sje;
+		//////////////////////////////
+		
+		
     for (int s=0; s<o->nSets; ++s)
     {
         JointSet_config
@@ -621,7 +650,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
             o->absEncoder,
             o->Jjm,
             o->Jmj,
-            o->Sje,
+            Sje_aux,//o->Sje,
             o->Sjm
         );
         
