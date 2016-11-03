@@ -229,6 +229,9 @@ static void updateEntity2SetMaps(const eOmc_4jomo_coupling_t *jomoCouplingInfo, 
     {
         jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(carray, j);
         uint8_t multi_enc = (uint8_t) eomc_encoder_get_numberofcomponents((eOmc_encoder_t)jomodes->encoder1.type);
+        #warning VALE2: horrible work around about multi_encs
+        if (multi_enc == 0) //when in encoder1 xml group there is none.
+            multi_enc = 1;
         for(uint8_t i=currentpos; i<currentpos+multi_enc; i++)
         {
             o->e2s[i] = jomoCouplingInfo->joint2set[j];
