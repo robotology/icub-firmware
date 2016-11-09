@@ -898,7 +898,7 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
 //            char message[150];
 //            snprintf(message, sizeof(message), "calib cmd rec: pwm%d cz%d", calibrator->params.type5.pwmlimit, calibrator->params.type5.calibrationZero);
 //            JointSet_send_debug_message(message, e);
-            
+            o->calibration_timeout = 0;
             BOOL ret = Motor_calibrate_moving2Hardstop(o->motor+e, calibrator->params.type5.pwmlimit, calibrator->params.type5.calibrationZero);
             
             if(!ret)
@@ -943,7 +943,7 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             //if I'm here I can perform calib type 6.
             
             // 2) set state
-            
+            o->calibration_timeout = 0;
             o->calibration_in_progress = eomc_calibration_typeMixed;
             o->joint[e].running_calibration.type = (eOmc_calibration_type_t)calibrator->type;
             o->joint[e].running_calibration.data.type6.is_active = TRUE;
@@ -994,6 +994,7 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             //1) check params: nothinh to do
             
             // 2) set state
+            o->calibration_timeout = 0;
             o->calibration_in_progress = eomc_calibration_typeMixed;
             o->joint[e].running_calibration.type = (eOmc_calibration_type_t)calibrator->type;
             o->joint[e].running_calibration.data.type7.state = calibtype7_st_inited;
