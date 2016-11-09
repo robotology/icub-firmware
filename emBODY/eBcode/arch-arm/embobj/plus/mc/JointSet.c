@@ -761,6 +761,22 @@ static void JointSet_do_wait_calibration(JointSet* o)
         }
         else
         {
+            //first of all I need to restore rotor limits if i was doing mais calib
+            if(eomc_calibration_typeMixed == o->calibration_in_progress)
+            {
+                for (int k=0;  k<*(o->pN); ++k)
+                {
+                    int m = o->motors_of_set[k];
+                    int j = o->joints_of_set[k];
+                    Joint* j_ptr = o->joint+j;
+                    if(eomc_calibration_type6_mais == j_ptr->running_calibration.type)
+                    {                
+                        //restore rotor limits
+                        o->motor[m].pos_min = j_ptr->running_calibration.data.type6.rotorposmin;
+                        o->motor[m].pos_max = j_ptr->running_calibration.data.type6.rotorposmax;
+                    }
+                }
+            }    
             o->calibration_in_progress = eomc_calibration_typeUndefined;
         
             o->control_mode = eomc_controlmode_notConfigured;

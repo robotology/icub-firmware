@@ -127,6 +127,11 @@ static eOresult_t JointSet_do_wait_calibration_6_singleJoint(JointSet *o, int in
             {
                 return(eores_NOK_generic);
             }
+            //Vale: shall I to save limits for all moors in the set? maybe not...
+            j_ptr->running_calibration.data.type6.rotorposmin = o->motor[indexSet].pos_min;
+            j_ptr->running_calibration.data.type6.rotorposmax = o->motor[indexSet].pos_max;
+            o->motor[indexSet].pos_min = 0;
+            o->motor[indexSet].pos_max = 0;
             
             BOOL ret = Joint_set_pos_ref_in_calibType6(j_ptr, jCalib6Data_ptr->targetpos, jCalib6Data_ptr->velocity);
             if(!ret)
@@ -134,7 +139,10 @@ static eOresult_t JointSet_do_wait_calibration_6_singleJoint(JointSet *o, int in
                 char info[50];
                 snprintf(info, 50,"error in Joint_set_pos_ref_in_calibType6");
                 JointSet_send_debug_message(info, j_ptr->ID);
-
+                //restore rotor limits
+                o->motor[indexSet].pos_min = j_ptr->running_calibration.data.type6.rotorposmin;
+                o->motor[indexSet].pos_max = j_ptr->running_calibration.data.type6.rotorposmax;
+    
                 return(eores_NOK_generic);
             }
             
@@ -176,6 +184,9 @@ static eOresult_t JointSet_do_wait_calibration_6_singleJoint(JointSet *o, int in
                     Motor_set_idle(o->motor+ m);
                 }
             }
+                //restore rotor limits
+                o->motor[indexSet].pos_min = j_ptr->running_calibration.data.type6.rotorposmin;
+                o->motor[indexSet].pos_max = j_ptr->running_calibration.data.type6.rotorposmax;
         }
         break;
         
