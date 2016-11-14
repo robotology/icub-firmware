@@ -547,9 +547,9 @@ extern eEresult_t ee_sharserv_info_boardinfo_get(const eEboardInfo_t** boardinfo
     return(shalinfo_boardinfo_get(boardinfo));
 }
 
-extern eEresult_t ee_sharserv_info_deviceinfo_clr(void)
+extern eEresult_t ee_sharserv_info_deviceinfo_clr(uint8_t keepcontentofpages)
 {
-    return(shalinfo_deviceinfo_clr());
+    return(shalinfo_deviceinfo_clr(keepcontentofpages));
 }
 
 extern eEresult_t ee_sharserv_info_deviceinfo_get(const ee_sharserv_info_deviceinfo_t** deviceinfo)

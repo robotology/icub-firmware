@@ -325,7 +325,7 @@ extern eEresult_t shalinfo_init(void)
     if(ee_false == s_shalinfo_storage_is_valid(deviceinfo))
     {
         // first time we run ... or we have read an old device. i reset it. then someone shall impose the correct value
-        shalinfo_deviceinfo_clr();
+        shalinfo_deviceinfo_clr(1); // we however keep the content of pages. because we want them to be permanent.
     }    
 
 
@@ -379,7 +379,7 @@ extern eEresult_t shalinfo_boardinfo_synchronise(const eEboardInfo_t* boardinfo)
 
         // it sets the mac address, the ip, the netmask according to the boardinfo.identifier
         // and also initialises the other device info parts
-        shalinfo_deviceinfo_clr();
+        shalinfo_deviceinfo_clr(1); // but we dont clear the pages.
     }
 
 
@@ -408,7 +408,7 @@ extern eEresult_t shalinfo_boardinfo_get(const eEboardInfo_t** boardinfo)
 
 
 
-extern eEresult_t shalinfo_deviceinfo_clr(void)
+extern eEresult_t shalinfo_deviceinfo_clr(uint8_t keepcontentofpages)
 {
     eEresult_t res = ee_res_OK;
     infoDeviceInfoStorage_t* infodeviceinfo = s_shalinfo_permanent_deviceinfo_get();
@@ -417,7 +417,10 @@ extern eEresult_t shalinfo_deviceinfo_clr(void)
     s_shalinfo_ipnetwork_default_set(&infodeviceinfo->data.ipnetwork);
     s_shalinfo_can1network_default_set(&infodeviceinfo->data.can1network);
     s_shalinfo_can2network_default_set(&infodeviceinfo->data.can2network);
-    s_shalinfo_pages_default_set(&infodeviceinfo->data.page08[0]);
+    if(1 != keepcontentofpages)
+    {
+        s_shalinfo_pages_default_set(&infodeviceinfo->data.page08[0]);
+    }
 
     // set it valid
     const eEentity_t* ROMentity = &s_shalinfo_moduleinfo.info.entity;
