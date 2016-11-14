@@ -96,13 +96,13 @@ const eEmoduleExtendedInfo_t eupdater_modinfo_extended __attribute__((at(EENV_ME
                 .version    = 
                 { 
                     .major = 2, 
-                    .minor = 22
+                    .minor = 23
                 },  
                 .builddate  = 
                 {
                     .year  = 2016,
                     .month = 11,
-                    .day   = 11,
+                    .day   = 14,
                     .hour  = 15,
                     .min   = 14
                 }

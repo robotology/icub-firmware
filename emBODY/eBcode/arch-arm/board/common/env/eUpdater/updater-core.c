@@ -46,6 +46,9 @@
 
 #include "EoBoards.h"
 
+#include "EOtheARMenvironment.h"
+#include "EOVtheEnvironment.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -315,12 +318,47 @@ extern uint8_t updater_core_uprot_parse(uint8_t *pktin, uint16_t pktinsize, eOip
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
+#define _EEPROM_ERASE_KEEP_INFO32_
+
+#define _EEPROM_ERASE_INIT_AFTERWARDS_
 
 //#if     !defined(_MAINTAINER_APPL_)
 static eEresult_t s_sys_eeprom_erase(void)
 {
+    eEresult_t r = ee_res_OK;
+    
+#if defined(_EEPROM_ERASE_KEEP_INFO32_)    
+    const void *page = NULL;
+    uint8_t thepage32[32] = {0};    
+    ee_sharserv_info_deviceinfo_item_get(sharserv_info_page32, &page);
+    memcpy(thepage32, page, 32); 
+#endif
+    
     eEstorage_t strg = { .type = ee_strg_eeprom, .size = EENV_MEMMAP_SHARSERV_STGSIZE, .addr = EENV_MEMMAP_SHARSERV_STGADDR};
-    return(ee_sharserv_sys_storage_clr(&strg, EENV_MEMMAP_SHARSERV_STGSIZE));  
+    r = ee_sharserv_sys_storage_clr(&strg, EENV_MEMMAP_SHARSERV_STGSIZE);
+    
+#if defined(_EEPROM_ERASE_INIT_AFTERWARDS_)
+    sharserv_mode_t sharservmode = 
+    {
+        .onerror    = NULL,
+        .initmode   = sharserv_base_initmode_forcestorageinit
+    };    
+    r = ee_sharserv_init(&sharservmode);    
+//    const eEmoduleInfo_t * loader_info = (const eEmoduleInfo_t*)(EENV_ROMSTART+EENV_MODULEINFO_OFFSET);      
+//    ee_sharserv_part_proc_synchronise(ee_procLoader, loader_info);
+    eov_env_SharedData_Synchronise(eo_armenv_GetHandle());        
+    ee_sharserv_part_proc_def2run_set(ee_procUpdater);
+    ee_sharserv_part_proc_startup_set(ee_procUpdater);
+#endif
+    
+
+#if defined(_EEPROM_ERASE_KEEP_INFO32_)    
+    // ... impose thepage32 again ...    
+    ee_sharserv_info_deviceinfo_item_set(sharserv_info_page32, thepage32);
+#endif
+
+    
+    return r;    
 }
 //#endif
 
