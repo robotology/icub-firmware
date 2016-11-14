@@ -64,6 +64,8 @@ typedef enum
      CTRL_UNITS velocity;
      calibtype6_states state;
      int32_t computedZero;
+     int32_t rotorposmin;
+     int32_t rotorposmax;
  } jointCalibType6Data;
 
 
