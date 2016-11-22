@@ -440,6 +440,15 @@ static void get_jomo_coupling_info(const eOmc_4jomo_coupling_t *jomoCouplingInfo
     debug_dump_coupling_data(jomoCouplingInfo);
 }
 
+eOmc_encoder_t MController_getTypeofEncoderAtJoint(const eOmc_jomo_descriptor_t *jomodes)
+{
+    if(jomodes->encoder1.pos == eomc_pos_atjoint)
+        return(jomodes->encoder1.type);
+    else if(jomodes->encoder2.pos == eomc_pos_atjoint)
+        return(jomodes->encoder2.type);
+    else
+        return (eomc_enc_none);
+}
 
 
 void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
@@ -479,8 +488,8 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
     for (int k=0; k<o->nJoints; ++k)
     {
         const eOmc_jomo_descriptor_t *jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(carray, k);
-        
-        switch(jomodes->encoder1.type)
+        eOmc_encoder_t typeEncJoint = MController_getTypeofEncoderAtJoint(jomodes);
+        switch(typeEncJoint)
         {
             case eomc_enc_spichainof2:
             {
@@ -520,6 +529,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
                 o->absEncoder[k].fake = FALSE;
                 break;
             }
+            case eomc_enc_none:
             default:
             {
                 o->absEncoder[k].fake = TRUE;

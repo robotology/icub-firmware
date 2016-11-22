@@ -70,6 +70,7 @@ typedef struct
     uint32_t                                value[eomc_encoders_maxnumberofcomponents];
     eOencoderreader_errortype_t             errortype;
     uint8_t                                 composedof;
+    eOmc_position_t                         position;
 } eOencoderreader_valueInfo_t;
 
 //typedef eOresult_t (*eOencoderreader_onendofoperation_fun_t) (EOtheEncoderReader* p, eObool_t operationisok);

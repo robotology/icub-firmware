@@ -74,11 +74,9 @@ extern "C" {
 //  <o> major           <0-255> 
 #define EOMTHEEMSAPPLCFG_VERSION_MAJOR          2
 //  <o> minor           <0-255> 
-<<<<<<< HEAD
-#define EOMTHEEMSAPPLCFG_VERSION_MINOR          47
-=======
-#define EOMTHEEMSAPPLCFG_VERSION_MINOR          142
->>>>>>> mc4plus mec v3 ver 2.142: changed version number. I used strange number becuase it isn't official
+
+#define EOMTHEEMSAPPLCFG_VERSION_MINOR          143
+
 //  </h>version
 
 //  <h> build date
