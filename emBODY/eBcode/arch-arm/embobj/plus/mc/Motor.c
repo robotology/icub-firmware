@@ -458,6 +458,7 @@ extern void Motor_do_calibration_hard_stop(Motor* o)
 void Motor_set_run(Motor* o) //
 {
     icubCanProto_controlmode_t control_mode;
+    char message[150];
     
     switch (o->MOTOR_CONTROL_TYPE)
     {
@@ -474,7 +475,11 @@ void Motor_set_run(Motor* o) //
             break;
         
         default:
+        {
+            snprintf(message, sizeof(message), "Motor_set_run: unknown control type par16=type par64=hwtype" );
+            send_debug_message(message, o->ID , o->MOTOR_CONTROL_TYPE, o->HARDWARE_TYPE);
             return;
+        }
     }
     
     if (o->HARDWARE_TYPE == HARDWARE_2FOC)
@@ -487,8 +492,13 @@ void Motor_set_run(Motor* o) //
         hal_motor_reenable_break_interrupts();
         
         hal_motor_enable((hal_motor_t)o->actuatorPort);
-        
+
         o->control_mode = control_mode;
+    }
+    else
+    {
+         snprintf(message, sizeof(message), "Motor_set_run: unknown hw type. par16=type par64=hwtype" );
+         send_debug_message(message, o->ID , o->MOTOR_CONTROL_TYPE, o->HARDWARE_TYPE);
     }
 }
 
