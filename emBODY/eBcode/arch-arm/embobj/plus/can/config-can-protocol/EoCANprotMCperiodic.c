@@ -160,6 +160,33 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__POSITION(eOcanframe_t *
 }
 
 
+extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__MOTOR_POSITION(eOcanframe_t *frame, eOcanport_t port)
+{
+    // this frame is from mc4 only, thus ... it manages two joints.
+    // i retrieve the two joints related to the can frame. 
+    eOprotIndex_t motorindex = 0;
+    eOmc_motor_t *motor = NULL;
+    icubCanProto_position_t pos = 0;
+        
+    uint8_t j=0;
+    // the two motors have ...
+    const eObrd_caninsideindex_t insideindex[2] = {eobrd_caninsideindex_first, eobrd_caninsideindex_second};
+    const uint8_t offset[2] = {0, 4};
+    for(j=0; j<2; j++)
+    {
+        if(NULL == (motor = s_eocanprotMCperiodic_get_entity(eoprot_entity_mc_motor, frame, port, insideindex[j], &motorindex)))
+        {
+            return(eores_OK);        
+        }
+        
+        pos = *((icubCanProto_position_t*)&(frame->data[offset[j]])); 
+        motor->status.basic.mot_position = pos;
+    }
+
+    return(eores_OK);       
+}
+
+
 extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__PID_VAL(eOcanframe_t *frame, eOcanport_t port)
 {
     // this frame is from mc4 only, thus ...
