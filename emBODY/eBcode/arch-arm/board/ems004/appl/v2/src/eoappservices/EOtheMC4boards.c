@@ -225,7 +225,7 @@ extern eOresult_t eo_mc4boards_LoadBroadcastFlags(EOtheMC4boards *p, uint16_t fl
     
     s_eo_themc4boards.cansettings.broadcastpolicy = 0;
     
-    uint8_t tmp = flags & 0xff;
+    uint16_t tmp = flags & 0xffff;
     tmp >>= 1;
     s_eo_themc4boards.cansettings.broadcastpolicy =  tmp;
 
