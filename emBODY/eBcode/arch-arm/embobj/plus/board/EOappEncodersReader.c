@@ -266,7 +266,7 @@ extern eOresult_t eo_appEncReader_Activate(EOappEncReader *p, const eOmc_arrayof
 
     errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
     errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-    char message [150];
+    
     
     
     for(uint8_t i=0; i<eOappEncReader_jomos_maxnumberof; i++)
@@ -275,18 +275,21 @@ extern eOresult_t eo_appEncReader_Activate(EOappEncReader *p, const eOmc_arrayof
         p->config.jomoconfig[i].encoder1des = jomodes->encoder1;
         p->config.jomoconfig[i].encoder2des = jomodes->encoder2;
         errdes.sourceaddress    = i;
-        uint8_t isconnected1 = 0;
-        uint8_t isconnected2 = 0;
-        
-        if(CHECK_ENC_IS_CONNECTED(jomodes->encoder1.type, jomodes->encoder1.port))
-            isconnected1 = 1;
-        if(CHECK_ENC_IS_CONNECTED(jomodes->encoder2.type, jomodes->encoder2.port))
-            isconnected2 = 1;
-            
-        snprintf(message, sizeof(message), "e1:t=%d p=%d at=%d c=%d;e2: t=%d p=%d at=%d c=%d", 
-                jomodes->encoder1.type, jomodes->encoder1.port, jomodes->encoder1.pos, isconnected1, 
-                jomodes->encoder2.type, jomodes->encoder2.port, jomodes->encoder2.pos, isconnected2);
-        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, message, NULL, &errdes);
+//        ////DEBUG
+//        char message [150];
+//        uint8_t isconnected1 = 0;
+//        uint8_t isconnected2 = 0;
+//        
+//        if(CHECK_ENC_IS_CONNECTED(jomodes->encoder1.type, jomodes->encoder1.port))
+//            isconnected1 = 1;
+//        if(CHECK_ENC_IS_CONNECTED(jomodes->encoder2.type, jomodes->encoder2.port))
+//            isconnected2 = 1;
+//            
+//        snprintf(message, sizeof(message), "e1:t=%d p=%d at=%d c=%d;e2: t=%d p=%d at=%d c=%d", 
+//                jomodes->encoder1.type, jomodes->encoder1.port, jomodes->encoder1.pos, isconnected1, 
+//                jomodes->encoder2.type, jomodes->encoder2.port, jomodes->encoder2.pos, isconnected2);
+//        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, message, NULL, &errdes);
+//        ////end
     }
 
     
