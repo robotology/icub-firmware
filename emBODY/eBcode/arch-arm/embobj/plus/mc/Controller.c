@@ -246,6 +246,38 @@ static void updateEntity2SetMaps(const eOmc_4jomo_coupling_t *jomoCouplingInfo, 
     if (o->multi_encs == 0) //when in encoder1 xml group there is none.
         o->multi_encs = 1;
     o->nEncods = o->multi_encs *o->nJoints;
+    
+    for (int s=0; s<o->nSets; ++s) o->enc_set_dim[s] = 0;
+    
+    for (int e=0; e<o->nEncods; ++e)
+    {
+        int s = o->e2s[e];
+
+        o->eos[s][(o->enc_set_dim[s])++] = e;
+    }
+    
+    for (int s=0; s<o->nSets; ++s) o->set_dim[s] = 0;
+ 
+    for (int m=0; m<o->nJoints; ++m)
+    {
+        int s = o->m2s[m];
+
+        o->mos[s][(o->set_dim[s])++] = m;
+    }
+    
+    for (int s=0; s<o->nSets; ++s) o->set_dim[s] = 0;
+ 
+    for (int j=0; j<o->nJoints; ++j)
+    {
+        int s = o->j2s[j];
+
+        o->jos[s][(o->set_dim[s])++] = j;
+    }
+    
+    
+    
+    
+    
 }
 
 
@@ -400,7 +432,19 @@ static void update_jointAndMotor_withJointSet_configuration(void)
             o->motor[m].MOTOR_CONTROL_TYPE = js_ptr->MOTOR_CONTROL_TYPE;
         }
     }
-    
+//    /////DEBUG
+//    char message[150];
+//    snprintf(message, sizeof(message), "j:%d %d %d %d m:%d %d %d %d", 
+//        o->joint[0].MOTOR_CONTROL_TYPE, 
+//        o->joint[1].MOTOR_CONTROL_TYPE,
+//        o->joint[2].MOTOR_CONTROL_TYPE,
+//        o->joint[3].MOTOR_CONTROL_TYPE,
+//        o->motor[0].MOTOR_CONTROL_TYPE, 
+//        o->motor[1].MOTOR_CONTROL_TYPE,
+//        o->motor[2].MOTOR_CONTROL_TYPE,
+//        o->motor[3].MOTOR_CONTROL_TYPE);
+//    send_debug_message(message, 0, 0, 0);
+//    /////end
     
     //provisional function. see comment inside
     update_jointAndMotor_withJointset_constraints();
@@ -436,8 +480,12 @@ static void get_jomo_coupling_info(const eOmc_4jomo_coupling_t *jomoCouplingInfo
         
         
     update_jointAndMotor_withJointSet_configuration();
-
-    debug_dump_coupling_data(jomoCouplingInfo);
+    
+    char message[180];
+    snprintf(message, sizeof(message), "J2S:%d %d %d %d;T:%d,%d,%d,%d", o->j2s[0], o->j2s[1], o->j2s[2], o->j2s[3],
+        o->jointSet[0].MOTOR_CONTROL_TYPE, o->jointSet[1].MOTOR_CONTROL_TYPE, o->jointSet[2].MOTOR_CONTROL_TYPE, o->jointSet[3].MOTOR_CONTROL_TYPE);
+    send_debug_message(message,0,0,0);
+    //debug_dump_coupling_data(jomoCouplingInfo);
 }
 
 eOmc_encoder_t MController_getTypeofEncoderAtJoint(const eOmc_jomo_descriptor_t *jomodes)
@@ -594,33 +642,33 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
 //    
 //    }
     
-    
-    for (int s=0; s<o->nSets; ++s) o->enc_set_dim[s] = 0;
-    
-    for (int e=0; e<o->nEncods; ++e)
-    {
-        int s = o->e2s[e];
+  //moved in get_jomo_coupling_info  
+//    for (int s=0; s<o->nSets; ++s) o->enc_set_dim[s] = 0;
+//    
+//    for (int e=0; e<o->nEncods; ++e)
+//    {
+//        int s = o->e2s[e];
 
-        o->eos[s][(o->enc_set_dim[s])++] = e;
-    }
-    
-    for (int s=0; s<o->nSets; ++s) o->set_dim[s] = 0;
- 
-    for (int m=0; m<o->nJoints; ++m)
-    {
-        int s = o->m2s[m];
+//        o->eos[s][(o->enc_set_dim[s])++] = e;
+//    }
+//    
+//    for (int s=0; s<o->nSets; ++s) o->set_dim[s] = 0;
+// 
+//    for (int m=0; m<o->nJoints; ++m)
+//    {
+//        int s = o->m2s[m];
 
-        o->mos[s][(o->set_dim[s])++] = m;
-    }
-    
-    for (int s=0; s<o->nSets; ++s) o->set_dim[s] = 0;
- 
-    for (int j=0; j<o->nJoints; ++j)
-    {
-        int s = o->j2s[j];
+//        o->mos[s][(o->set_dim[s])++] = m;
+//    }
+//    
+//    for (int s=0; s<o->nSets; ++s) o->set_dim[s] = 0;
+// 
+//    for (int j=0; j<o->nJoints; ++j)
+//    {
+//        int s = o->j2s[j];
 
-        o->jos[s][(o->set_dim[s])++] = j;
-    }
+//        o->jos[s][(o->set_dim[s])++] = j;
+//    }
     
 		//////////////////// VALE
 		float **Sje_aux = NULL;
@@ -1320,39 +1368,24 @@ void MController_config_joint(int j, eOmc_joint_config_t* config) //
     
     Motor_config_trqPID(o->motor+j, &(config->pidtorque));
     Motor_config_filter(o->motor+j,   config->tcfiltertype);
-    Motor_config_friction(o->motor+j, config->motor_params.bemf_value, config->motor_params.ktau_value);
+    Motor_config_friction(o->motor+j, config->motor_params.bemf_value, config->motor_params.ktau_value);   
     
-    if (j==3 && o->part_type==eomc_ctrlboard_CER_LOWER_ARM)
+    int16_t spike_mag_limit;
+    uint16_t spike_cnt_limit;
+    if((config->jntEncoderType == eomc_enc_mais) || (config->jntEncoderType == eomc_enc_absanalog))
     {
-        AbsEncoder_config(o->absEncoder+j, j, /*(eOmc_encoder_t)config->jntEncoderType,*/ config->jntEncoderResolution, 64*AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
-    }
-    else if (j==1 && o->part_type==eomc_ctrlboard_CER_NECK)
-    {
-        AbsEncoder_config(o->absEncoder+j, j, /*(eOmc_EncoderType_t)config->jntEncoderType,*/ config->jntEncoderResolution,125*AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
-    }
-    else if (o->part_type==eomc_ctrlboard_CER_HAND)
-    {
-        AbsEncoder_config(o->absEncoder+j*3,   j, /*(eOmc_encoder_t)config->jntEncoderType,*/ config->jntEncoderResolution, AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
-        AbsEncoder_config(o->absEncoder+j*3+1, j, /*(eOmc_encoder_t)config->jntEncoderType,*/ config->jntEncoderResolution, AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
-        AbsEncoder_config(o->absEncoder+j*3+2, j, /*(eOmc_encoder_t)config->jntEncoderType,*/ config->jntEncoderResolution, AEA_DEFAULT_SPIKE_MAG_LIMIT, AEA_DEFAULT_SPIKE_CNT_LIMIT);
+        spike_mag_limit = 0;
+        spike_cnt_limit = 0;
     }
     else
     {
-        int16_t spike_mag_limit;
-        uint16_t spike_cnt_limit;
-        if((config->jntEncoderType == eomc_enc_mais) || (config->jntEncoderType == eomc_enc_absanalog))
-        {
-            spike_mag_limit = 0;
-            spike_cnt_limit = 0;
-        }
-        else
-        {
-            spike_mag_limit = AEA_DEFAULT_SPIKE_MAG_LIMIT;
-            spike_cnt_limit = AEA_DEFAULT_SPIKE_CNT_LIMIT;
-        }
-            
-        AbsEncoder_config(o->absEncoder+j, j, /*(eOmc_encoder_t)config->jntEncoderType,*/ config->jntEncoderResolution, spike_mag_limit, spike_cnt_limit);
+          #define AEA_MIN_SPIKE 16 //4 bitsof zero padding(aea use 12 bits)
+          spike_cnt_limit = AEA_DEFAULT_SPIKE_CNT_LIMIT;
+          spike_mag_limit = AEA_MIN_SPIKE << config->jntEncNumOfNoiseBits;
     }
+        
+    AbsEncoder_config(o->absEncoder+j, j, /*(eOmc_encoder_t)config->jntEncoderType,*/ config->jntEncoderResolution, spike_mag_limit, spike_cnt_limit);
+
 }
 
 void MController_config_motor(int m, eOmc_motor_config_t* config) //
