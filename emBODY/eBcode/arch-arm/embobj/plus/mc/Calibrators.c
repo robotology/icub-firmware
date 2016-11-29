@@ -175,12 +175,24 @@ static eOresult_t JointSet_do_wait_calibration_6_singleJoint(JointSet *o, int in
                 *calibrationCompleted = TRUE;
                 
                 Motor* m_ptr = o->motor + o->motors_of_set[indexSet];
-                int32_t offset = m_ptr->pos_raw_fbk/m_ptr->GEARBOX;
-                Motor_calibrate_withOffset(m_ptr, offset);
+                m_ptr->pos_calib_offset = m_ptr->pos_fbk;
+                //reset value of position
+                m_ptr->pos_fbk = m_ptr->pos_fbk - m_ptr->pos_calib_offset;
+                m_ptr->not_init = TRUE;
                 
+//                /////Debug code
+//                char message[150];
+//                snprintf(message, sizeof(message), "c6M:pos reached: cp%d co%d", m_ptr->pos_fbk, m_ptr->pos_calib_offset);
+//                JointSet_send_debug_message(message, m_ptr->ID);
+                
+                m_ptr->not_calibrated = FALSE;
+                
+                
+                /////Debug code
 //                char info[80];
 //                snprintf(info, 80,"Calib offset is %d", offset);
 //                JointSet_send_debug_message(info, j_ptr->ID);
+                /////ended
                 
                 for (int k=0; k<*(o->pN); ++k)
                 {
