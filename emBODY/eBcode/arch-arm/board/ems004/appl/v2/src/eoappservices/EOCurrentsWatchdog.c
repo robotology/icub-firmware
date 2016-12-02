@@ -175,14 +175,14 @@ extern eOresult_t eo_currents_watchdog_UpdateCurrentLimits(EOCurrentsWatchdog* p
     s_eo_currents_watchdog.I2T_threshold[motor] = (float)((pc*pc) - s_eo_currents_watchdog.nominalCurrent2[motor]); 
     
     
-    eOerrmanDescriptor_t errdes = {0};
-    errdes.code                 = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag00);
-    errdes.par16                = motor;
-    errdes.sourcedevice         = eo_errman_sourcedevice_localboard;
-    errdes.sourceaddress        = 0;  
+//    eOerrmanDescriptor_t errdes = {0};
+//    errdes.code                 = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag00);
+//    errdes.par16                = motor;
+//    errdes.sourcedevice         = eo_errman_sourcedevice_localboard;
+//    errdes.sourceaddress        = 0;  
 
-    snprintf(str, sizeof(str), "nc2=%.4f I2T=%.4f", s_eo_currents_watchdog.nominalCurrent2[motor], s_eo_currents_watchdog.I2T_threshold[motor]);
-    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, str, NULL, &errdes);
+//    snprintf(str, sizeof(str), "nc2=%.4f I2T=%.4f", s_eo_currents_watchdog.nominalCurrent2[motor], s_eo_currents_watchdog.I2T_threshold[motor]);
+//    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, str, NULL, &errdes);
     return(eores_OK);
 }
 
