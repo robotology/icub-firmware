@@ -22,7 +22,7 @@
 #include "hal_adc.h"
 
 #define CALIB_TYPE_6_POS_TRHESHOLD 730 //= 4 deg //1820 //2730 //546=3 degree //91.02f // = 0.5 degree
-
+#define CALIB_TYPE_6_7_POS_ERROR_TRHESHOLD 14563 //= 80 deg express in icubDeg
 BOOL JointSet_do_wait_calibration_3(JointSet* o)
 {
     BOOL calibrated = TRUE;
@@ -103,13 +103,15 @@ static eOresult_t JointSet_do_wait_calibration_6_singleJoint(JointSet *o, int in
         case calibtype6_st_absEncoderCalibrated:
         {
             //if the current position (computed with calib param of abs encoder) is out of limits range, I'll put joint in fault
+            //the limit range is very big. this check should save us from wrong calib params.
             int32_t curr_pos = AbsEncoder_position(e_ptr);
-            if((curr_pos > j_ptr->pos_max+CALIB_TYPE_6_POS_TRHESHOLD) || (curr_pos < j_ptr->pos_min-CALIB_TYPE_6_POS_TRHESHOLD))
+
+            if((curr_pos > j_ptr->pos_max+CALIB_TYPE_6_7_POS_ERROR_TRHESHOLD) || (curr_pos < j_ptr->pos_min-CALIB_TYPE_6_7_POS_ERROR_TRHESHOLD))
             {
                 
                 jCalib6Data_ptr->is_active = FALSE;
                 char info[80];
-                sprintf(info,"calib 6: outLim: cp%d mx%.1f mn%.1f",curr_pos, j_ptr->pos_max, j_ptr->pos_min);
+                sprintf(info,"calib 6:outLim: cp%d mx%.1f mn%.1f",curr_pos, j_ptr->pos_max, j_ptr->pos_min);
                 JointSet_send_debug_message(info, j_ptr->ID);
 
                 return(eores_NOK_generic);
@@ -253,7 +255,7 @@ static eOresult_t JointSet_do_wait_calibration_7_singleJoint(Joint *j, Motor* m,
         case calibtype7_st_jntCheckLimits:
         {
             int32_t curr_pos = AbsEncoder_position(e);
-            if((curr_pos > j->pos_max+CALIB_TYPE_6_POS_TRHESHOLD) || (curr_pos < j->pos_min-CALIB_TYPE_6_POS_TRHESHOLD))
+            if((curr_pos > j->pos_max+CALIB_TYPE_6_7_POS_ERROR_TRHESHOLD) || (curr_pos < j->pos_min-CALIB_TYPE_6_7_POS_ERROR_TRHESHOLD))
             {
                 //// debug code
                 char info[80];
