@@ -82,6 +82,7 @@ void JointSet_init(JointSet* o) //
     o->special_constraint = NO_CONSTRAINT;
     
     o->calibration_in_progress = eomc_calibration_typeUndefined;
+    
 }
 
 void JointSet_config //
@@ -253,8 +254,6 @@ BOOL JointSet_do_check_faults(JointSet* o)
         if (Motor_check_faults(o->motor+o->motors_of_set[k]))
         {
             fault = TRUE;
-            
-            // traditional confusion among joints, motors and encoders: I don't like it
             o->joint[o->joints_of_set[k]].control_mode = eomc_controlmode_hwFault;
         }
         
@@ -263,14 +262,21 @@ BOOL JointSet_do_check_faults(JointSet* o)
             o->external_fault = TRUE;
         }
     }
-    
+    BOOL encoder_fault = FALSE;
     for (int k=0; k<E; ++k)
     {
-        if (AbsEncoder_is_in_fault(o->absEncoder+o->encoders_of_set[k]))
+        AbsEncoder* enc = o->absEncoder+o->encoders_of_set[k];
+        if (AbsEncoder_is_in_fault(enc))
         {
             fault = TRUE;
-            
-            // traditional confusion among joints, motors and encoders: I don't like it
+            encoder_fault = TRUE;
+        }
+    }
+    //if an encoder of this set is in fault ten set hw fault on each joint of this set.
+    if(encoder_fault)
+    {
+        for (int k=0; k<N; ++k)
+        {
             o->joint[o->joints_of_set[k]].control_mode = eomc_controlmode_hwFault;
         }
     }
