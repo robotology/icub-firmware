@@ -64,6 +64,8 @@ typedef enum
      CTRL_UNITS velocity;
      calibtype6_states state;
      int32_t computedZero;
+     int32_t rotorposmin;
+     int32_t rotorposmax;
  } jointCalibType6Data;
 
 
@@ -109,6 +111,13 @@ typedef struct // Joint
     CTRL_UNITS pos_max;
     CTRL_UNITS vel_max;
     CTRL_UNITS acc_max;
+
+    BOOL use_hard_limit;
+    
+    CTRL_UNITS pos_min_soft;
+    CTRL_UNITS pos_max_soft;    
+    CTRL_UNITS pos_min_hard;
+    CTRL_UNITS pos_max_hard;
     
     CTRL_UNITS output_lim;
     
@@ -193,6 +202,7 @@ extern int8_t Joint_check_limits(Joint* o);
 extern int8_t Joint_pushing_limit(Joint* o);
 
 extern void Joint_set_limits(Joint* o, CTRL_UNITS pos_min, CTRL_UNITS pos_max);
+extern void Joint_set_hardware_limit(Joint* o, CTRL_UNITS hard_limit);
 
 extern BOOL Joint_manage_cable_constraint(Joint* o);
 

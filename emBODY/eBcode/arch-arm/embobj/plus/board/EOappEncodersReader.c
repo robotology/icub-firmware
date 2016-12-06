@@ -1396,22 +1396,18 @@ static uint32_t s_eo_appEncReader_rescale2icubdegrees(uint32_t val_raw, uint8_t 
 
     // this is the correct code: we divide by the encoderconversionfactor ...
     // formulas are:
-    // in xml file there is GENERAL:Encoders = td expressed in [ticks/deg]
-    // robotInterface sets joint->config.encoderconversionfactor = (td / idegconv), expressed in [ticks/icubdeg]
-    // idegconv = 182.044 = (64*1024/360) is the conversion from degrees to icubdeg and is expressed as [icubdeg/deg]
-    // thus, to obtain the icub-degress in here we must divide the reading of the encoder expressed in [ticks] by
-    // divider = joint->config.encoderconversionfactor.
+    // in xml file there is GENERAL:Encoders = tidegconv = 182.044 = (64*1024/360) is the conversion from degrees to icubdeg and is expressed as [icubdeg/deg]
+    // In joint->config.jntEncoderResolution and motor->config.rotorEncoderResolution there are the resolutions of joint and motor encoders,
+    // that is number of ticks per round angle.
+    // 
+    // Thus, to obtain the icub-degress in here we must divide the reading of the encoder expressed in [ticks] by
+    // divider and multiply for 65535. (divider is joint->config.jntEncoderResolution or motor->config.rotorEncoderResolution)
 
-    // this code does apply also to AEA encoders. 
-    // so far the hal_spiencoder_get_value() has retrieved ticks with a resulution of 64K ticks / 360 degrees (the upscale from 16K to 64 is done internally)
-    // in such a case the GENERAL:Encoders value in xml must be 182.044, so that divider = 1.
-    // in cases where we want to apply a motor-reduction (e.g., in eyelids there is 100/42 between the aea and the joint) we may put it inside this parameter.
-    
     // moreover .... if the encoderconversionfactor is negative, then i assume it is positive. because its sign is managed internally in the ems-controller
 
 
     uint32_t retval = val_raw;
-    float divider = 1.0f;
+    int32_t divider = 1;
 
     
     if(eomc_pos_atjoint == pos)
@@ -1423,7 +1419,6 @@ static uint32_t s_eo_appEncReader_rescale2icubdegrees(uint32_t val_raw, uint8_t 
             return(2000);
         }
         
-        /*divider = eo_common_Q17_14_to_float(joint->config.DEPRECATED_encoderconversionfactor); NO MORE NEEDED */
         divider = joint->config.jntEncoderResolution;
     }
     else if(eomc_pos_atmotor == pos)
@@ -1453,8 +1448,9 @@ static uint32_t s_eo_appEncReader_rescale2icubdegrees(uint32_t val_raw, uint8_t 
         divider = -divider;
     }
 
-    retval = (float)val_raw * 65535.0f / divider;
+    uint64_t aux = (uint64_t)val_raw* 65535;
     
+    retval = aux /divider;
     return(retval);
 
 }

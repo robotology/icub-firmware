@@ -21,8 +21,8 @@
 #include "CalibrationHelperData.h"
 #include "hal_adc.h"
 
-#define CALIB_TYPE_6_POS_TRHESHOLD 546 //546=3 degree //91.02f // = 0.5 degree
-
+#define CALIB_TYPE_6_POS_TRHESHOLD 730 //= 4 deg //1820 //2730 //546=3 degree //91.02f // = 0.5 degree
+#define CALIB_TYPE_6_7_POS_ERROR_TRHESHOLD 14563 //= 80 deg express in icubDeg
 BOOL JointSet_do_wait_calibration_3(JointSet* o)
 {
     BOOL calibrated = TRUE;
@@ -84,6 +84,7 @@ static eOresult_t JointSet_do_wait_calibration_6_singleJoint(JointSet *o, int in
     *calibrationCompleted = FALSE;   
     //get poiter to the joint to calibrate
     Joint* j_ptr = o->joint + o->joints_of_set[indexSet];
+    Motor* m_ptr = o->motor + o->motors_of_set[indexSet];
     
     //get the encoder of joint to calibrate
     AbsEncoder* e_ptr = o->absEncoder+ o->encoders_of_set[indexSet];
@@ -102,13 +103,15 @@ static eOresult_t JointSet_do_wait_calibration_6_singleJoint(JointSet *o, int in
         case calibtype6_st_absEncoderCalibrated:
         {
             //if the current position (computed with calib param of abs encoder) is out of limits range, I'll put joint in fault
+            //the limit range is very big. this check should save us from wrong calib params.
             int32_t curr_pos = AbsEncoder_position(e_ptr);
-            if((curr_pos > j_ptr->pos_max+CALIB_TYPE_6_POS_TRHESHOLD) || (curr_pos < j_ptr->pos_min-CALIB_TYPE_6_POS_TRHESHOLD))
+
+            if((curr_pos > j_ptr->pos_max+CALIB_TYPE_6_7_POS_ERROR_TRHESHOLD) || (curr_pos < j_ptr->pos_min-CALIB_TYPE_6_7_POS_ERROR_TRHESHOLD))
             {
                 
                 jCalib6Data_ptr->is_active = FALSE;
                 char info[80];
-                sprintf(info,"calib 6: outLim: cp%d mx%.1f mn%.1f",curr_pos, j_ptr->pos_max, j_ptr->pos_min);
+                sprintf(info,"calib 6:outLim: cp%d mx%.1f mn%.1f",curr_pos, j_ptr->pos_max, j_ptr->pos_min);
                 JointSet_send_debug_message(info, j_ptr->ID);
 
                 return(eores_NOK_generic);
@@ -127,6 +130,17 @@ static eOresult_t JointSet_do_wait_calibration_6_singleJoint(JointSet *o, int in
             {
                 return(eores_NOK_generic);
             }
+            //Vale: shall I to save limits for all moors in the set? maybe not...
+            j_ptr->running_calibration.data.type6.rotorposmin = m_ptr->pos_min;
+            j_ptr->running_calibration.data.type6.rotorposmax = m_ptr->pos_max;
+            m_ptr->pos_min = 0;
+            m_ptr->pos_max = 0;
+            
+//            /////Debug code
+//            char info[80];
+//            sprintf(info,"calib 6: changed rlim of m %d", m_ptr->ID);
+//            JointSet_send_debug_message(info, j_ptr->ID);
+//            //////ended
             
             BOOL ret = Joint_set_pos_ref_in_calibType6(j_ptr, jCalib6Data_ptr->targetpos, jCalib6Data_ptr->velocity);
             if(!ret)
@@ -134,7 +148,10 @@ static eOresult_t JointSet_do_wait_calibration_6_singleJoint(JointSet *o, int in
                 char info[50];
                 snprintf(info, 50,"error in Joint_set_pos_ref_in_calibType6");
                 JointSet_send_debug_message(info, j_ptr->ID);
-
+                //restore rotor limits
+                m_ptr->pos_min = j_ptr->running_calibration.data.type6.rotorposmin;
+                m_ptr->pos_max = j_ptr->running_calibration.data.type6.rotorposmax;
+    
                 return(eores_NOK_generic);
             }
             
@@ -160,12 +177,24 @@ static eOresult_t JointSet_do_wait_calibration_6_singleJoint(JointSet *o, int in
                 *calibrationCompleted = TRUE;
                 
                 Motor* m_ptr = o->motor + o->motors_of_set[indexSet];
-                int32_t offset = m_ptr->pos_raw_fbk/m_ptr->GEARBOX;
-                Motor_calibrate_withOffset(m_ptr, offset);
+                m_ptr->pos_calib_offset = m_ptr->pos_fbk;
+                //reset value of position
+                m_ptr->pos_fbk = m_ptr->pos_fbk - m_ptr->pos_calib_offset;
+                m_ptr->not_init = TRUE;
                 
+//                /////Debug code
+//                char message[150];
+//                snprintf(message, sizeof(message), "c6M:pos reached: cp%d co%d", m_ptr->pos_fbk, m_ptr->pos_calib_offset);
+//                JointSet_send_debug_message(message, m_ptr->ID);
+                
+                m_ptr->not_calibrated = FALSE;
+                
+                
+                /////Debug code
 //                char info[80];
 //                snprintf(info, 80,"Calib offset is %d", offset);
 //                JointSet_send_debug_message(info, j_ptr->ID);
+                /////ended
                 
                 for (int k=0; k<*(o->pN); ++k)
                 {
@@ -175,7 +204,16 @@ static eOresult_t JointSet_do_wait_calibration_6_singleJoint(JointSet *o, int in
                     Joint_motion_reset(o->joint+ j);
                     Motor_set_idle(o->motor+ m);
                 }
+                //restore rotor limits
+                m_ptr->pos_min = j_ptr->running_calibration.data.type6.rotorposmin;
+                m_ptr->pos_max = j_ptr->running_calibration.data.type6.rotorposmax;
+//                /////Debug code 
+//                char info[80];
+//                sprintf(info,"calib 6: restore rlim of m %d", m_ptr->ID);
+//                JointSet_send_debug_message(info, j_ptr->ID);
+//                ////ended
             }
+                
         }
         break;
         
@@ -217,7 +255,7 @@ static eOresult_t JointSet_do_wait_calibration_7_singleJoint(Joint *j, Motor* m,
         case calibtype7_st_jntCheckLimits:
         {
             int32_t curr_pos = AbsEncoder_position(e);
-            if((curr_pos > j->pos_max+CALIB_TYPE_6_POS_TRHESHOLD) || (curr_pos < j->pos_min-CALIB_TYPE_6_POS_TRHESHOLD))
+            if((curr_pos > j->pos_max+CALIB_TYPE_6_7_POS_ERROR_TRHESHOLD) || (curr_pos < j->pos_min-CALIB_TYPE_6_7_POS_ERROR_TRHESHOLD))
             {
                 //// debug code
                 char info[80];
@@ -232,6 +270,9 @@ static eOresult_t JointSet_do_wait_calibration_7_singleJoint(Joint *j, Motor* m,
             {
                 *calibrationCompleted = TRUE;
                 jCalib7data_ptr->state = calibtype7_st_finished;
+//                char info[80];
+//                sprintf(info,"calib7:completed!");
+//                JointSet_send_debug_message(info, j->ID);
             }
          }    
         break;

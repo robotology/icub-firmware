@@ -148,13 +148,13 @@ static const eEmoduleExtendedInfo_t s_loader_info_extended __attribute__((at(EEN
                 .version    = 
                 { 
                     .major = 2, 
-                    .minor = 20
+                    .minor = 21
                 },  
                 .builddate  = 
                 {
                     .year  = 2016,
-                    .month = 7,
-                    .day   = 11,
+                    .month = 11,
+                    .day   = 14,
                     .hour  = 14,
                     .min   = 30
                 }

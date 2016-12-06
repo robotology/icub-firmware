@@ -31,6 +31,7 @@
 #include "EOtheErrorManager.h"
 #include "EoError.h"
 
+
 /////////////////////////////////////////////////////////
 // Motor
 
@@ -214,6 +215,7 @@ void Motor_init(Motor* o) //
 
     o->GEARBOX = 1;
     
+    o->not_init = TRUE;
     o->not_calibrated = TRUE;
     
     o->control_mode           = icubCanProto_controlmode_notConfigured;
@@ -230,6 +232,8 @@ void Motor_init(Motor* o) //
     WatchDog_init(&o->can_2FOC_alive_wdog);
     
     Motor_hardStopCalbData_reset(o);
+    
+    o->outOfLimitsSignaled = FALSE;
 }
 
 void Motor_config(Motor* o, uint8_t ID, eOmc_motor_config_t* config) //
@@ -342,7 +346,7 @@ void Motor_config_friction(Motor* o, float Bemf, float Ktau) //
 void Motor_calibrate_withOffset(Motor* o, int32_t offset) //
 {
     o->pos_calib_offset = offset;
-    o->pos_fbk_old = 0;
+    o->not_init = TRUE;
     Motor_set_run(o);
     
     if(o->HARDWARE_TYPE == HARDWARE_MC4p)
@@ -377,6 +381,7 @@ BOOL Motor_calibrate_moving2Hardstop(Motor* o, int32_t pwm, int32_t zero) //
 
 extern void Motor_uncalibrate(Motor* o)
 {
+    o->not_init = TRUE;
     o->not_calibrated = TRUE;
 
     if (o->HARDWARE_TYPE == HARDWARE_2FOC)
@@ -430,7 +435,7 @@ extern void Motor_do_calibration_hard_stop(Motor* o)
         o->pos_calib_offset = (o->pos_fbk - o->hardstop_calibdata.zero);
         //reset value of position
         o->pos_fbk = o->pos_fbk - o->pos_calib_offset;
-        o->pos_fbk_old = 0;
+        o->not_init = TRUE;
         
 //        //debug code
 //        char message[150];
@@ -827,22 +832,38 @@ void Motor_set_pwm_ref(Motor* o, int32_t pwm_ref)
 {
     if (o->pos_min != o->pos_max)
     {        
-        if ((o->pos_fbk < o->pos_min) && (pwm_ref < 0))
+        if ((o->pos_raw_cal_fbk < o->pos_min) && (pwm_ref < 0))
         {
             o->output = o->pwm_ref = 0;
+            if(!o->outOfLimitsSignaled)
+            {
+                char message [180]; 
+                snprintf(message, sizeof(message),"Motor reached min limit.Can't move with neg pwm" );
+                send_debug_message(message, o->ID, pwm_ref, o->pos_raw_cal_fbk);
+                o->outOfLimitsSignaled = TRUE;
+            }
         }
-        else if ((o->pos_fbk > o->pos_max) && (pwm_ref > 0))
+        else if ((o->pos_raw_cal_fbk > o->pos_max) && (pwm_ref > 0))
         {
             o->output = o->pwm_ref = 0;
+            if(!o->outOfLimitsSignaled)
+            {
+                char message [180]; 
+                snprintf(message, sizeof(message),"Motor reached max limit.Can't move with pos pwm" );
+                send_debug_message(message, o->ID, pwm_ref, o->pos_raw_cal_fbk);
+                o->outOfLimitsSignaled = TRUE;
+            }
         }
         else
         {
             o->output = o->pwm_ref = CUT(pwm_ref, o->pwm_max);
+            o->outOfLimitsSignaled = FALSE;
         }
     }
     else
     {
         o->output = o->pwm_ref = CUT(pwm_ref, o->pwm_max);
+        o->outOfLimitsSignaled = FALSE;
     }
 }
 
@@ -850,11 +871,11 @@ void Motor_set_Iqq_ref(Motor* o, int32_t Iqq_ref)
 {
     if (o->pos_min != o->pos_max)
     {        
-        if ((o->pos_fbk < o->pos_min) && (Iqq_ref < 0))
+        if ((o->pos_raw_cal_fbk < o->pos_min) && (Iqq_ref < 0))
         {
             o->output = o->Iqq_ref = 0;
         }
-        else if ((o->pos_fbk > o->pos_max) && (Iqq_ref > 0))
+        else if ((o->pos_raw_cal_fbk > o->pos_max) && (Iqq_ref > 0))
         {
             o->output = o->Iqq_ref = 0;
         }
@@ -873,11 +894,11 @@ void Motor_set_vel_ref(Motor* o, int32_t vel_ref)
 {
     if (o->pos_min != o->pos_max)
     {        
-        if ((o->pos_fbk < o->pos_min) && (vel_ref < 0))
+        if ((o->pos_raw_cal_fbk < o->pos_min) && (vel_ref < 0))
         {
             o->output = o->vel_ref = 0;
         }
-        else if ((o->pos_fbk > o->pos_max) && (vel_ref > 0))
+        else if ((o->pos_raw_cal_fbk > o->pos_max) && (vel_ref > 0))
         {
             o->output = o->vel_ref = 0;
         }
@@ -916,7 +937,7 @@ void Motor_get_pid_state(Motor* o, eOmc_joint_status_ofpid_t* pid_state)
 
 void Motor_get_state(Motor* o, eOmc_motor_status_t* motor_status)
 {
-    motor_status->basic.mot_position = o->pos_raw_fbk;
+    motor_status->basic.mot_position = o->pos_raw_cal_fbk;
     motor_status->basic.mot_velocity = o->vel_raw_fbk;
 
     //motor_status->basic.mot_position = o->pos_fbk;
@@ -941,6 +962,7 @@ void Motor_update_odometry_fbk_can(Motor* o, CanOdometry2FocMsg* can_msg) //
     
     o->pos_raw_fbk = can_msg->position;
     o->pos_fbk = o->pos_raw_fbk/o->GEARBOX - o->pos_calib_offset;
+    o->pos_raw_cal_fbk = o->pos_raw_fbk - o->pos_calib_offset*o->GEARBOX; 
 }
 
 void Motor_update_pos_fbk(Motor* o, int32_t position_raw)
@@ -949,7 +971,11 @@ void Motor_update_pos_fbk(Motor* o, int32_t position_raw)
     
     int32_t pos_fbk = o->pos_raw_fbk/o->GEARBOX - o->pos_calib_offset;
       
-    if (o->pos_fbk_old == 0) o->pos_fbk_old = pos_fbk; 
+    if (o->not_init)
+    {
+        o->not_init = FALSE;
+        o->pos_fbk_old = pos_fbk; 
+    }
     
     //direction of movement changes depending on the sign
     int32_t delta = o->enc_sign * (pos_fbk - o->pos_fbk_old);
@@ -965,6 +991,7 @@ void Motor_update_pos_fbk(Motor* o, int32_t position_raw)
     //update velocity
     o->vel_fbk = delta*CTRL_LOOP_FREQUENCY_INT;
     o->vel_raw_fbk = o->vel_fbk*o->GEARBOX;
+    o->pos_raw_cal_fbk = o->pos_fbk*o->GEARBOX;
 }
 
 void Motor_update_current_fbk(Motor* o, int16_t current)
@@ -1037,6 +1064,7 @@ void Motor_reset(Motor *o)
     o->pwm_fbk=ZERO;
     o->pwm_ref=ZERO;
 
+    o->pos_raw_cal_fbk=ZERO;
     o->pos_raw_fbk=ZERO;
     o->vel_raw_fbk=ZERO;
 
@@ -1057,6 +1085,7 @@ void Motor_reset(Motor *o)
     o->output=ZERO;
 
     o->not_calibrated = TRUE;
+    o->not_init = TRUE;
 
     //o->control_mode = ???
     //o->control_mode_req;

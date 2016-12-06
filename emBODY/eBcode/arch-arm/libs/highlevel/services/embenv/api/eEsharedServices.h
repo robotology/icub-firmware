@@ -233,7 +233,7 @@ extern eEresult_t ee_sharserv_info_boardinfo_synchronise(const eEboardInfo_t* bo
 // others just get it.
 extern eEresult_t ee_sharserv_info_boardinfo_get(const eEboardInfo_t** boardinfo);
 
-extern eEresult_t ee_sharserv_info_deviceinfo_clr(void);
+extern eEresult_t ee_sharserv_info_deviceinfo_clr(uint8_t keepcontentofpages);
 extern eEresult_t ee_sharserv_info_deviceinfo_get(const ee_sharserv_info_deviceinfo_t** deviceinfo);
 extern eEresult_t ee_sharserv_info_deviceinfo_set(const ee_sharserv_info_deviceinfo_t* deviceinfo);
 

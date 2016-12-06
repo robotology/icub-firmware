@@ -126,9 +126,9 @@ extern eOsizecntnr_t eom_emssocket_NumberOfReceivedPackets(EOMtheEMSsocket *p);
 
 extern eOresult_t eom_emssocket_Receive(EOMtheEMSsocket *p, EOpacket** rxpkt, eOsizecntnr_t* remaining);  
 
-extern eOresult_t eom_emssocket_Connect(EOMtheEMSsocket *p, eOipv4addr_t remaddr); 
+extern eOresult_t eom_emssocket_Connect(EOMtheEMSsocket *p, eOipv4addr_t remaddr, eOreltime_t timeout); 
 
-extern eOresult_t eom_emssocket_Transmit(EOMtheEMSsocket *p, EOpacket* txpkt);   
+extern eOresult_t eom_emssocket_Transmit(EOMtheEMSsocket *p, EOpacket* txpkt, eOreltime_t timeout);   
 
 
 

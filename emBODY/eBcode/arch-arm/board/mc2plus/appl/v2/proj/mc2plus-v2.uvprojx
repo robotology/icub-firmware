@@ -10,7 +10,7 @@
       <TargetName>mc2plus</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>5060183::V5.06 update 2 (build 183)::ARMCC</pCCUsed>
+      <pCCUsed>5060300::V5.06 update 3 (build 300)::ARMCC</pCCUsed>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32F407IG</Device>
@@ -330,6 +330,7 @@
             <vShortWch>1</vShortWch>
             <v6Lto>0</v6Lto>
             <v6WtE>0</v6WtE>
+            <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>-DUSE_MC2PLUS -DUSE_OLD_BUGGY_MODE_TO_SEND_UP_FULLSCALE_WITH_INVERTED_BYTES</MiscControls>
               <Define>CER R1_HAND</Define>
@@ -347,6 +348,7 @@
             <NoWarn>0</NoWarn>
             <uSurpInc>1</uSurpInc>
             <useXO>0</useXO>
+            <uClangAs>0</uClangAs>
             <VariousControls>
               <MiscControls>--cpreproc</MiscControls>
               <Define></Define>
@@ -862,6 +864,16 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOwatchdog.c</FilePath>
             </File>
+            <File>
+              <FileName>EOtheMEMS.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheMEMS.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOtheSharedHW.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheSharedHW.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -908,7 +920,8 @@
                 <vShortEn>2</vShortEn>
                 <vShortWch>2</vShortWch>
                 <v6Lto>0</v6Lto>
-                <v6WtE>0</v6WtE>
+                <v6WtE>2</v6WtE>
+                <v6Rtti>2</v6Rtti>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -926,6 +939,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
+                <uClangAs>2</uClangAs>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -1294,7 +1308,8 @@
                 <vShortEn>2</vShortEn>
                 <vShortWch>2</vShortWch>
                 <v6Lto>0</v6Lto>
-                <v6WtE>0</v6WtE>
+                <v6WtE>2</v6WtE>
+                <v6Rtti>2</v6Rtti>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -1312,6 +1327,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
+                <uClangAs>2</uClangAs>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -1645,6 +1661,7 @@
             <vShortWch>1</vShortWch>
             <v6Lto>0</v6Lto>
             <v6WtE>0</v6WtE>
+            <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>-DUSE_MC4PLUS</MiscControls>
               <Define>NOT_ICUB_GENOVA04 ICUB_DARMSTADT01 USE_PROTO_PROXY</Define>
@@ -1662,6 +1679,7 @@
             <NoWarn>0</NoWarn>
             <uSurpInc>1</uSurpInc>
             <useXO>0</useXO>
+            <uClangAs>0</uClangAs>
             <VariousControls>
               <MiscControls>--cpreproc</MiscControls>
               <Define></Define>
@@ -2177,6 +2195,16 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOwatchdog.c</FilePath>
             </File>
+            <File>
+              <FileName>EOtheMEMS.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheMEMS.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOtheSharedHW.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheSharedHW.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2543,7 +2571,8 @@
                 <vShortEn>2</vShortEn>
                 <vShortWch>2</vShortWch>
                 <v6Lto>0</v6Lto>
-                <v6WtE>0</v6WtE>
+                <v6WtE>2</v6WtE>
+                <v6Rtti>2</v6Rtti>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>
@@ -2561,6 +2590,7 @@
                 <NoWarn>2</NoWarn>
                 <uSurpInc>2</uSurpInc>
                 <useXO>2</useXO>
+                <uClangAs>2</uClangAs>
                 <VariousControls>
                   <MiscControls></MiscControls>
                   <Define></Define>

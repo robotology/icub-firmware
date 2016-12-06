@@ -80,6 +80,15 @@ extern const hl_chip_st_l3g4200d_cfg_t hl_chip_st_l3g4200d_cfg_default; // = { .
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
 
+/** @fn			extern hl_result_t hl_chip_st_l3g4200d_deinit(hl_i2c_t i2cid)
+    @brief  	this function de-initializes a l3g4200d gyro chip 
+    @param  	i2cid        the ic2 bus
+    @return 	hl_res_NOK_generic on error else hl_res_OK
+  */
+extern hl_result_t hl_chip_st_l3g4200d_deinit(hl_i2c_t i2cid);
+
+
+
 /** @fn			extern hl_result_t hl_chip_st_l3g4200d_init(const hl_chip_st_l3g4200d_cfg_t *cfg)
     @brief  	this function initializes a l3g4200d gyro chip 
     @param  	cfg 	        pointer to configuration data
@@ -96,11 +105,21 @@ extern hl_result_t hl_chip_st_l3g4200d_init(const hl_chip_st_l3g4200d_cfg_t *cfg
 extern hl_result_t hl_chip_st_l3g4200d_temp_get(int8_t* temp);
 
 
+
+/** @fn			extern hl_result_t hl_chip_st_l3g4200d_get(int16_t* x, int16_t* y, int16_t* z)
+    @brief  	this function reads raw values on x, y, and z axis. the range is retretrieve by *r.
+    @return 	hl_res_NOK_generic on error else hl_res_OK
+  */
+extern hl_result_t hl_chip_st_l3g4200d_get(int16_t* x, int16_t* y, int16_t* z);
+
+
+
 /** @fn			extern hl_result_t hl_chip_st_l3g4200d_angrate_get(int32_t* xar, int32_t* yar, int32_t* zar)
     @brief  	this function reads angular rates on x, y, and z axis in milli-deg/sec
     @return 	hl_res_NOK_generic on error else hl_res_OK
   */
 extern hl_result_t hl_chip_st_l3g4200d_angrate_get(int32_t* xar, int32_t* yar, int32_t* zar);
+
 
 
 /** @}            

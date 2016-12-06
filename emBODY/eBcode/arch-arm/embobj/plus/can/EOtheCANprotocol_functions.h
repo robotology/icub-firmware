@@ -315,6 +315,8 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__2FOC(eOcanframe_t *fram
 
 extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__POSITION(eOcanframe_t *frame, eOcanport_t port);
 
+extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__MOTOR_POSITION(eOcanframe_t *frame, eOcanport_t port);
+
 extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__PID_VAL(eOcanframe_t *frame, eOcanport_t port);
 
 extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__STATUS(eOcanframe_t *frame, eOcanport_t port);

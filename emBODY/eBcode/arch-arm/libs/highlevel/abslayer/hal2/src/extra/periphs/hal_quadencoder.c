@@ -68,12 +68,13 @@
 
 //#define ENCODER_PPR 28672-1// 14400-1 //(for LCORE with 900cpr disk and x4 interpolation)
 #define ENCODER_PPR (256*1000)
-#define ENCODER_START_VAL_TIM32BIT (3000000)
+#define ENCODER_START_VAL_TIM32BIT (262144) /*262144 = 2^18*/
 #define ENCODER_START_VAL_TIM16BIT (32000)
 #define ENCODER1_TIMER TIM3 //16 bits
 #define ENCODER2_TIMER TIM2 //32 bits
 #define ENCODER3_TIMER TIM4 //16 bits
 #define ENCODER4_TIMER TIM5 //32 bits
+#define ENCODER_RESET_VAL (3000000)
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -573,6 +574,7 @@ extern hal_result_t hal_quadencoder_init(hal_quadencoder_t id)
             // TIM_ITConfig(ENCODER2_TIMER, TIM_IT_Update, ENABLE);
             //Reset counter
             ENCODER2_TIMER->CNT = ENCODER_START_VAL_TIM32BIT;
+            ENCODER2_TIMER->ARR = ENCODER_RESET_VAL;
               
             TIM_Cmd(ENCODER2_TIMER, ENABLE);
             break;
@@ -674,6 +676,7 @@ extern hal_result_t hal_quadencoder_init(hal_quadencoder_t id)
              // TIM_ITConfig(ENCODER4_TIMER, TIM_IT_Update, ENABLE);
              //Reset counter
              ENCODER4_TIMER->CNT = ENCODER_START_VAL_TIM32BIT;
+             ENCODER4_TIMER->ARR = ENCODER_RESET_VAL;
               
              TIM_Cmd(ENCODER4_TIMER, ENABLE);
              break;

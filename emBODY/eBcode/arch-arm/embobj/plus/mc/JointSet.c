@@ -82,6 +82,7 @@ void JointSet_init(JointSet* o) //
     o->special_constraint = NO_CONSTRAINT;
     
     o->calibration_in_progress = eomc_calibration_typeUndefined;
+    
 }
 
 void JointSet_config //
@@ -253,8 +254,6 @@ BOOL JointSet_do_check_faults(JointSet* o)
         if (Motor_check_faults(o->motor+o->motors_of_set[k]))
         {
             fault = TRUE;
-            
-            // traditional confusion among joints, motors and encoders: I don't like it
             o->joint[o->joints_of_set[k]].control_mode = eomc_controlmode_hwFault;
         }
         
@@ -263,14 +262,21 @@ BOOL JointSet_do_check_faults(JointSet* o)
             o->external_fault = TRUE;
         }
     }
-    
+    BOOL encoder_fault = FALSE;
     for (int k=0; k<E; ++k)
     {
-        if (AbsEncoder_is_in_fault(o->absEncoder+o->encoders_of_set[k]))
+        AbsEncoder* enc = o->absEncoder+o->encoders_of_set[k];
+        if (AbsEncoder_is_in_fault(enc))
         {
             fault = TRUE;
-            
-            // traditional confusion among joints, motors and encoders: I don't like it
+            encoder_fault = TRUE;
+        }
+    }
+    //if an encoder of this set is in fault ten set hw fault on each joint of this set.
+    if(encoder_fault)
+    {
+        for (int k=0; k<N; ++k)
+        {
             o->joint[o->joints_of_set[k]].control_mode = eomc_controlmode_hwFault;
         }
     }
@@ -761,6 +767,22 @@ static void JointSet_do_wait_calibration(JointSet* o)
         }
         else
         {
+            //first of all I need to restore rotor limits if i was doing mais calib
+            if(eomc_calibration_typeMixed == o->calibration_in_progress)
+            {
+                for (int k=0;  k<*(o->pN); ++k)
+                {
+                    int m = o->motors_of_set[k];
+                    int j = o->joints_of_set[k];
+                    Joint* j_ptr = o->joint+j;
+                    if(eomc_calibration_type6_mais == j_ptr->running_calibration.type)
+                    {                
+                        //restore rotor limits
+                        o->motor[m].pos_min = j_ptr->running_calibration.data.type6.rotorposmin;
+                        o->motor[m].pos_max = j_ptr->running_calibration.data.type6.rotorposmax;
+                    }
+                }
+            }    
             o->calibration_in_progress = eomc_calibration_typeUndefined;
         
             o->control_mode = eomc_controlmode_notConfigured;
@@ -882,7 +904,7 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
 //            char message[150];
 //            snprintf(message, sizeof(message), "calib cmd rec: pwm%d cz%d", calibrator->params.type5.pwmlimit, calibrator->params.type5.calibrationZero);
 //            JointSet_send_debug_message(message, e);
-            
+            o->calibration_timeout = 0;
             BOOL ret = Motor_calibrate_moving2Hardstop(o->motor+e, calibrator->params.type5.pwmlimit, calibrator->params.type5.calibrationZero);
             
             if(!ret)
@@ -891,6 +913,9 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
                 o->control_mode = jointSet_controlMode_old;
                 return;
             }
+            
+            Joint_set_hardware_limit(o->joint+e, calibrator->params.type5.calibrationZero);
+            
             AbsEncoder_calibrate_fake(o->absEncoder+e);
             o->calibration_in_progress = (eOmc_calibration_type_t)calibrator->type;
             break;
@@ -924,7 +949,7 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             //if I'm here I can perform calib type 6.
             
             // 2) set state
-            
+            o->calibration_timeout = 0;
             o->calibration_in_progress = eomc_calibration_typeMixed;
             o->joint[e].running_calibration.type = (eOmc_calibration_type_t)calibrator->type;
             o->joint[e].running_calibration.data.type6.is_active = TRUE;
@@ -975,6 +1000,7 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             //1) check params: nothinh to do
             
             // 2) set state
+            o->calibration_timeout = 0;
             o->calibration_in_progress = eomc_calibration_typeMixed;
             o->joint[e].running_calibration.type = (eOmc_calibration_type_t)calibrator->type;
             o->joint[e].running_calibration.data.type7.state = calibtype7_st_inited;
@@ -1094,6 +1120,8 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             o->calibration_in_progress = (eOmc_calibration_type_t)calibrator->type;
             
             o->calibration_timeout = 0;
+            
+            Joint_set_hardware_limit(o->joint+e, calibrator->params.type10.calibrationZero);
             
             Motor_calibrate_withOffset(o->motor+e, 0);
             Motor_set_run(o->motor+e);

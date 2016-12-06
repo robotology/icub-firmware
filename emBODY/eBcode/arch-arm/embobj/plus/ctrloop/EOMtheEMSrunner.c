@@ -709,6 +709,7 @@ static eObool_t s_eom_emsrunner_timing_is_compatible(const eOemsrunner_cfg_t *cf
 static void s_eom_emsrunner_taskRX_startup(EOMtask *p, uint32_t t)
 {
     // nothing to do
+    eo_errman_Trace(eo_errman_GetHandle(), "called _taskRX_startup()", s_eobj_ownname);
 }
 
 
@@ -818,6 +819,7 @@ static void s_eom_emsrunner_userdef_taskRX_activity_datagramreception(EOMtheEMSr
 static void s_eom_emsrunner_taskDO_startup(EOMtask *p, uint32_t t)
 {
     // nothing to do
+    eo_errman_Trace(eo_errman_GetHandle(), "called _taskDO_startup()", s_eobj_ownname);
 }
 
 
@@ -865,6 +867,7 @@ static void s_eom_emsrunner_taskDO_run(EOMtask *p, uint32_t t)
 static void s_eom_emsrunner_taskTX_startup(EOMtask *p, uint32_t t)
 {
     // nothing to do
+    eo_errman_Trace(eo_errman_GetHandle(), "called _taskTX_startup()", s_eobj_ownname);
 }
 
 
@@ -1003,7 +1006,7 @@ static void s_eom_emsrunner_userdef_taskTX_activity_datagramtransmission(EOMtheE
         {
             if(numberoftxrops > 0)
             {
-                eOresult_t restx = eom_emssocket_Transmit(eom_emssocket_GetHandle(), txpkt);
+                eOresult_t restx = eom_emssocket_Transmit(eom_emssocket_GetHandle(), txpkt, 5*EOK_reltime1sec);
                 if(eores_OK == restx)
                 {
                     p->numoftxrops += numberoftxrops;

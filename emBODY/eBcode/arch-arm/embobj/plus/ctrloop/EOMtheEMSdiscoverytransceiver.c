@@ -103,13 +103,18 @@ static uint8_t s_app_core_manage_cmd(uint8_t *pktin, uint8_t *pktout, uint16_t c
 
 //static uint8_t s_app_core_manage_cmd2(uint8_t *pktin, uint16_t pktinsize, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout);
 
-static uint8_t s_appl_parse(uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout, eOipv4port_t *port);
+static uint8_t s_appl_parse(uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout, eOipv4port_t *port, eObool_t *restart);
+
+
+static uint16_t s_add_description(char *data, uint16_t capacity, const char *prefix);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
 //static const char s_eobj_ownname[] = "EOMtheEMSdiscoverytransceiver";
+
+static eObool_t s_restart = eobool_false;
 
  
 static EOMtheEMSdiscoverytransceiver s_emsdiscoverytransceiver_singleton = 
@@ -266,7 +271,9 @@ static eObool_t s_parse_and_form(uint8_t *data, uint8_t size, eOipv4addr_t remad
         
         //uint8_t r = s_app_core_manage_cmd2(data, size, txdata, s_emsdiscoverytransceiver_singleton.cfg.txpktcapacity, &txsize);
         
-        uint8_t r = s_appl_parse(data, size, remaddr, txdata, s_emsdiscoverytransceiver_singleton.cfg.txpktcapacity, &txsize, &port);
+        eObool_t  restart2updater = eobool_true;
+        
+        uint8_t r = s_appl_parse(data, size, remaddr, txdata, s_emsdiscoverytransceiver_singleton.cfg.txpktcapacity, &txsize, &port, &restart2updater);
         
         
         
@@ -284,8 +291,11 @@ static eObool_t s_parse_and_form(uint8_t *data, uint8_t size, eOipv4addr_t remad
                 }
                 
                 // timer di shutdown
-                eo_action_SetCallback(action, s_callback_shutdown2updater, NULL, NULL);
-                eo_timer_Start(s_emsdiscoverytransceiver_singleton.shutdowntmr, eok_abstimeNOW, 50*eok_reltime1ms, eo_tmrmode_ONESHOT, action);                             
+                if(eobool_true == restart2updater)
+                {
+                    eo_action_SetCallback(action, s_callback_shutdown2updater, NULL, NULL);
+                    eo_timer_Start(s_emsdiscoverytransceiver_singleton.shutdowntmr, eok_abstimeNOW, 50*eok_reltime1ms, eo_tmrmode_ONESHOT, action);  
+                }
             
             } break;
             
@@ -913,6 +923,11 @@ static uint8_t s_uprot_proc_DISCOVER(eOuprot_opcodes_t opc, uint8_t *pktin, uint
 
     if(opc == uprot_OPC_DISCOVER)
     {
+        eOuprot_cmd_DISCOVER_t * cmd = (eOuprot_cmd_DISCOVER_t*)pktin;
+        // shall i restart? let's read it
+        s_restart = (1 == cmd->jump2updater) ? (eobool_true) : (eobool_false);
+        //s_restart = eobool_true;
+        
         // prepare the reply.
         eOuprot_cmd_DISCOVER_REPLY_t *reply = (eOuprot_cmd_DISCOVER_REPLY_t*) pktout;    
         if(capacityout > sizeof(eOuprot_cmd_DISCOVER_REPLY_t))
@@ -924,6 +939,10 @@ static uint8_t s_uprot_proc_DISCOVER(eOuprot_opcodes_t opc, uint8_t *pktin, uint
         {   // i must reply with old protocol because i dont have enough capacity
             opc = uprot_OPC_LEGACY_SCAN;
         }
+    }
+    else
+    {
+        s_restart = eobool_true;
     }
     
                  
@@ -958,6 +977,86 @@ static uint8_t s_uprot_proc_DISCOVER(eOuprot_opcodes_t opc, uint8_t *pktin, uint
 }
 
 
+
+static uint8_t s_uprot_proc_MOREINFO(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout)
+{       
+    if(eobool_false == eouprot_can_process_opcode(eApplication, EOUPROT_PROTOCOL_VERSION, opc, 0))
+    {
+        return(s_uprot_proc_UNSUPP(opc, pktin, pktinsize, remaddr, pktout, capacityout, sizeout));
+    }
+    
+    eOuprot_cmd_MOREINFO_t * cmd = (eOuprot_cmd_MOREINFO_t*)pktin;
+    // shall i restart? let's read it asap
+    s_restart = (1 == cmd->jump2updater) ? (eobool_true) : (eobool_false);
+    s_restart = eobool_false;
+    
+    // prepare the reply.
+    eOuprot_cmd_MOREINFO_REPLY_t *reply = (eOuprot_cmd_MOREINFO_REPLY_t*) pktout;
+    
+    // surely there is the discover part.
+    if(capacityout > sizeof(eOuprot_cmd_MOREINFO_REPLY_t))
+    {   // yes, we have enough capacity to reply    
+        *sizeout = s_discover_fill(&reply->discover, uprot_OPC_MOREINFO, sizeof(eOuprot_cmd_MOREINFO_REPLY_t));
+    }
+    else
+    {
+        return(s_uprot_proc_UNSUPP(opc, pktin, pktinsize, remaddr, pktout, capacityout, sizeout));
+    }    
+    
+
+    // but there may be also the description
+    reply->hasdescription = cmd->plusdescription;
+       
+    if(1 == reply->hasdescription)
+    {
+        // 1. add the description in reply->description
+        //const char *prefix = (eobool_false == s_restart) ? "MOREINFO-APP\r\n" : "MOREINFO-UPD\r\n";
+        const char *prefix = "MOREINFO-APP\r\n";
+
+        uint16_t sizeofdescription = s_add_description((char*)reply->description, capacityout - sizeof(eOuprot_cmd_MOREINFO_REPLY_t), prefix);
+        
+        // 2. increase some sizes  
+        reply->discover.reply.sizeofextra += sizeofdescription;
+        *sizeout += sizeofdescription;                
+    }   
+
+    return 1;     
+    
+//    // surely there is the discover part.
+//    const eEmoduleInfo_t* module = NULL;
+//    
+//    // shall i restart? let's read it
+//    s_restart = (1 == cmd->jump2updater) ? (eobool_true) : (eobool_false);
+//    
+//    if(eobool_true == s_restart)
+//    {
+//        module = (const eEmoduleInfo_t*)(EENV_MEMMAP_EUPDATER_ROMADDR+EENV_MODULEINFO_OFFSET);
+//    }
+//    else
+//    {
+//        module = (const eEmoduleInfo_t*)(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET);
+//    }
+//    
+
+//    
+//   
+
+//    // now i prepare the reply. i must see if capacity is big enough to fill .... 
+//    // 1. reply->discover (of type eOuprot_cmd_DISCOVER_REPLY_t) 
+//    // 2. reply->description[] if cmd->plusdescription is 1.  
+//    
+//    if(capacityout > sizeof(eOuprot_cmd_MOREINFO_REPLY_t))
+//    {   // yes, we have enough capacity to reply    
+//        *sizeout = s_discover_fill(&reply->discover, uprot_OPC_MOREINFO, sizeof(eOuprot_cmd_MOREINFO_REPLY_t));
+//    }
+//    else
+//    {
+//        return(s_uprot_proc_UNSUPP(opc, pktin, pktinsize, remaddr, pktout, capacityout, sizeout));
+//    }
+        
+    
+//    return 1;    
+}
 
 
 static uint8_t s_uprot_proc_RESTART(eOuprot_opcodes_t opc, uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout)
@@ -997,10 +1096,13 @@ static uint8_t s_uprot_proc_CANGATEWAY(eOuprot_opcodes_t opc, uint8_t *pktin, ui
 }
 
 
-static uint8_t s_appl_parse(uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout, eOipv4port_t *port)
+static uint8_t s_appl_parse(uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t remaddr, uint8_t *pktout, uint16_t capacityout, uint16_t *sizeout, eOipv4port_t *port, eObool_t *restart)
 {  
     eOuprot_opcodes_t opc = uprot_OPC_NONE;    
     uprot_fp_process_t process = s_uprot_proc_NONE;
+    
+    
+    *restart = s_restart = eobool_false;
     
     switch(pktin[0])
     {        
@@ -1012,6 +1114,15 @@ static uint8_t s_appl_parse(uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t rem
             *port = s_emsdiscoverytransceiver_singleton.cfg.hostipv4port;            
         } break;
 
+        case uprot_OPC_LEGACY_PROCS:
+        case uprot_OPC_MOREINFO:
+        {
+            opc = (sizeof(eOuprot_cmd_LEGACY_PROCS_t) == pktinsize) ? uprot_OPC_LEGACY_PROCS : uprot_OPC_MOREINFO;
+            process = s_uprot_proc_MOREINFO;    
+            *port = s_emsdiscoverytransceiver_singleton.cfg.hostipv4port;            
+        } break;
+
+        
         case uprot_OPC_LEGACY_CANGATEWAY:
         case uprot_OPC_CANGATEWAY:
         {
@@ -1037,8 +1148,113 @@ static uint8_t s_appl_parse(uint8_t *pktin, uint16_t pktinsize, eOipv4addr_t rem
     }
     
     
-    return(process(opc, pktin, pktinsize, remaddr, pktout, capacityout, sizeout));
+    uint8_t ret = process(opc, pktin, pktinsize, remaddr, pktout, capacityout, sizeout);
+    
+    // s_restart is changed inside process()
+    *restart = s_restart;
+    
+    return ret;
 }
+
+#define MYABS(x) ( ((x)>0) ? (x) : (0) )
+static uint16_t s_add_description(char *data, uint16_t capacity, const char *prefix)
+{
+    uint16_t size = 0;
+        
+    size+=snprintf(data+size, MYABS(capacity-size), "%s", prefix);
+    
+    return size;
+
+    uint8_t num_procs = 0;
+    const eEprocess_t *s_proctable = NULL;
+    const eEmoduleInfo_t *s_modinfo = NULL;
+    
+    const eEmoduleInfo_t *sharserv = ee_sharserv_moduleinfo_get();
+    const eEmoduleInfo_t *strsharserv = ee_sharserv_storage_moduleinfo_get();
+    
+    if((strsharserv->info.entity.version.major != sharserv->info.entity.version.major) || (strsharserv->info.entity.version.minor != sharserv->info.entity.version.minor))
+    {
+        size+=snprintf(data+size, MYABS(capacity-size), "EEPROM contains sharserv version different from that of this process. it has:\r\n");
+        size+=snprintf(data+size, MYABS(capacity-size), "eeprom version\t%d.%d %d/%d/%d %d:%.2d\r\n", 
+                strsharserv->info.entity.version.major, 
+                strsharserv->info.entity.version.minor,
+                strsharserv->info.entity.builddate.month,
+                strsharserv->info.entity.builddate.day,
+                strsharserv->info.entity.builddate.year,
+                strsharserv->info.entity.builddate.hour,
+                strsharserv->info.entity.builddate.min
+            );  
+        size+=snprintf(data+size, MYABS(capacity-size), "process version\t%d.%d %d/%d/%d %d:%.2d\r\n", 
+                sharserv->info.entity.version.major, 
+                sharserv->info.entity.version.minor,
+                sharserv->info.entity.builddate.month,
+                sharserv->info.entity.builddate.day,
+                sharserv->info.entity.builddate.year,
+                sharserv->info.entity.builddate.hour,
+                sharserv->info.entity.builddate.min
+            );                       
+    }
+    
+    if(ee_res_NOK_generic == ee_sharserv_storage_isvalid())
+    {
+        size+=snprintf(data+size, MYABS(capacity-size), "*** EEPROM FORMAT IS NOT VALID\r\n");
+        size+=snprintf(data+size, MYABS(capacity-size), "*** CANNOT GIVE PARTITION INFO\r\n");              
+        size+=snprintf(data+size, MYABS(capacity-size), "*** BYE BYE\r\n"); 
+        size+=snprintf(data+size, MYABS(capacity-size), "\n");                    
+    }                        
+    else if (ee_res_OK == ee_sharserv_part_proc_allavailable_get(&s_proctable, &num_procs))
+    {        
+        volatile eEmoduleExtendedInfo_t* extinfo = NULL;    
+        eEprocess_t defproc;
+        eEprocess_t startup;
+        eEprocess_t indexofrunning = ee_procApplication; //(eobool_false == s_restart) ? ee_procApplication : ee_procUpdater;
+            
+        ee_sharserv_part_proc_def2run_get(&defproc);
+        ee_sharserv_part_proc_startup_get(&startup);
+                    
+        // processes
+        for (uint8_t i=0; i<num_procs; ++i) 
+        {
+            ee_sharserv_part_proc_get(s_proctable[i], &s_modinfo);
+
+            size+=snprintf(data+size, MYABS(capacity-size), "*** e-process #%d \r\n", i);
+            size+=snprintf(data+size, MYABS(capacity-size), "props %s%s%s \r\n", defproc==i?"DEF ":"", startup==i?"START ":"", indexofrunning==i?"RUNNING ":"" ) ;
+
+            size+=snprintf(data+size, MYABS(capacity-size), "name  %s\r\n", s_modinfo->info.name);
+            size+=snprintf(data+size, MYABS(capacity-size), "vers  %d.%d\r\n", 
+                s_modinfo->info.entity.version.major, 
+                s_modinfo->info.entity.version.minor
+            );
+            size+=snprintf(data+size, MYABS(capacity-size), "date  %s %.2d %d %d:%.2d\r\n", 
+                ee_common_get_month_string(s_modinfo->info.entity.builddate),
+                s_modinfo->info.entity.builddate.day,                    
+                s_modinfo->info.entity.builddate.year,
+                s_modinfo->info.entity.builddate.hour,
+                s_modinfo->info.entity.builddate.min
+            );
+            
+            extinfo = (volatile eEmoduleExtendedInfo_t*)(s_modinfo->info.rom.addr+EENV_MODULEINFO_OFFSET);
+            
+            if(ee_res_OK == ee_is_extendemoduleinfo_valid((eEmoduleExtendedInfo_t*)extinfo))
+            {
+                size+=snprintf(data+size, MYABS(capacity-size), "built %s\r\n", 
+                    extinfo->compilationdatetime
+                );                        
+            }
+            else
+            {
+                size+=snprintf(data+size, MYABS(capacity-size), "built unknown date\r\n"
+                );    
+            }
+
+            size+=snprintf(data+size, MYABS(capacity-size), "rom   @+%dKB, s=%dKB\r\n", (s_modinfo->info.rom.addr-EENV_ROMSTART+1023)/1024, (s_modinfo->info.rom.size+1023)/1024);
+        }
+
+    }
+    
+    return size;
+}
+
 
 
 // --------------------------------------------------------------------------------------------------------------------

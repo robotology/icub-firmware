@@ -116,9 +116,9 @@
    	#define EENV_MEMMAP_EAPPLICATION_ROMADDR        (EENV_ROMSTART + 0)              
    	#define EENV_MEMMAP_EAPPLICATION_ROMSIZE        (EENV_ROMSIZE-EENV_MEMMAP_SHARSERV_ROMSIZE)
 #else
-    // the application starts from top of e-updater until ... 384k. 
+    // the application starts from top of e-updater until ... 512k. 
 	#define EENV_MEMMAP_EAPPLICATION_ROMADDR        (EENV_MEMMAP_EUPDATER_ROMADDR + EENV_MEMMAP_EUPDATER_ROMSIZE)
-    #define EENV_MEMMAP_EAPPLICATION_ROMSIZE        (256*1024)
+    #define EENV_MEMMAP_EAPPLICATION_ROMSIZE        (384*1024)
 #endif
 #define EENV_MEMMAP_EAPPLICATION_RAMADDR            (EENV_RAMSTART) 
 #define EENV_MEMMAP_EAPPLICATION_RAMSIZE            (EENV_RAMSIZE-EENV_MEMMAP_SHARSERV_RAMSIZE)

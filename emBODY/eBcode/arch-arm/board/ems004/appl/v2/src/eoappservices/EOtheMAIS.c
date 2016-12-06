@@ -165,7 +165,7 @@ extern EOtheMAIS* eo_mais_Initialise(void)
     {
         .diagncfg = 
         {
-            .numoffailures = 1000,
+            .numoffailures = 40000,
             .functiononfailure = s_eo_mais_send_diagnostic_on_transmissioninterruption,
         },
         .period = 10 /*deafult transmission period of mais*/  *100 /*convert in microsec*/ *10 /*before signal error i would wait 10 times mais transmission period*/

@@ -182,16 +182,6 @@ extern eOresult_t eom_emssocket_Open(EOMtheEMSsocket *p, EOaction* withactiononr
             p->active = eobool_true;
         }
         
-        if(eobool_true == p->active)
-        {
-            char str[32];
-            snprintf(str, sizeof(str), "main socket listens on %d", p->cfg.localport);
-            eo_errman_Info(eo_errman_GetHandle(), str, s_eobj_ownname, &eo_errman_DescrRunningHappily);
-            //eOerrmanDescriptor_t desc = {0};
-            //memcpy(&desc, &eo_errman_DescrRunningHappily, sizeof(desc));
-            //desc.param = 0;
-            //eo_errman_Info(eo_errman_GetHandle(), NULL, s_eobj_ownname, &desc);                                             
-        }
     }                        
                             
     return(res);
@@ -275,7 +265,8 @@ extern eOresult_t eom_emssocket_Receive(EOMtheEMSsocket *p, EOpacket** rxpkt, eO
     return(res);  
 }
 
-extern eOresult_t eom_emssocket_Connect(EOMtheEMSsocket *p, eOipv4addr_t remaddr)
+
+extern eOresult_t eom_emssocket_Connect(EOMtheEMSsocket *p, eOipv4addr_t remaddr, eOreltime_t timeout)
 {
     eOresult_t res = eores_OK;
     
@@ -289,7 +280,7 @@ extern eOresult_t eom_emssocket_Connect(EOMtheEMSsocket *p, eOipv4addr_t remaddr
         p->connected2host = eobool_false;
         p->hostaddress    = remaddr;
         
-        res = eom_ipnet_ResolveIP(eom_ipnet_GetHandle(), remaddr, 5*EOK_reltime1sec);
+        res = eom_ipnet_ResolveIP(eom_ipnet_GetHandle(), remaddr, timeout);
  
         if(eores_OK != res)
         {
@@ -302,7 +293,7 @@ extern eOresult_t eom_emssocket_Connect(EOMtheEMSsocket *p, eOipv4addr_t remaddr
 }
 
 
-extern eOresult_t eom_emssocket_Transmit(EOMtheEMSsocket *p, EOpacket* txpkt)
+extern eOresult_t eom_emssocket_Transmit(EOMtheEMSsocket *p, EOpacket* txpkt, eOreltime_t timeout)
 {
     eOresult_t res;
     eOipv4addr_t remaddr;
@@ -320,10 +311,9 @@ extern eOresult_t eom_emssocket_Transmit(EOMtheEMSsocket *p, EOpacket* txpkt)
     
     eo_packet_Addressing_Get(txpkt, &remaddr, &remport);
     
-
     if((eobool_false == p->connected2host) || (remaddr != p->hostaddress))
     {
-        res = eom_emssocket_Connect(p, remaddr);
+        res = eom_emssocket_Connect(p, remaddr, timeout);
         if(eores_OK != res)
         {
             return(res);

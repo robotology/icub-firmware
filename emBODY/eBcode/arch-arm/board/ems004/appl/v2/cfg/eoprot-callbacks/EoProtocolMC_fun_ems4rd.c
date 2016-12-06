@@ -1231,7 +1231,9 @@ extern void eoprot_fun_UPDT_mc_joint_inputs_externallymeasuredtorque(const EOnv*
     } // marker
     else if(eo_motcon_mode_mc4 == mcmode)
     {
-        eOmeas_torque_t trq = EO_CLIP_INT16(*torque);
+        //*torque contains value in micro Nm.
+        //MC4 boards use torque values in Nm/10000
+        eOmeas_torque_t trq = EO_CLIP_INT16((*torque) / 100);        
         icubCanProto_torque_t icub_torque = trq + 0x8000;
         eo_virtualstrain_SetTorque(eo_virtualstrain_GetHandle(), jxx, icub_torque);        
     }

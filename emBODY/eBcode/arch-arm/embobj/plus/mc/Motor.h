@@ -166,6 +166,7 @@ typedef struct //Motor
     
     int32_t calib_pwm;
     
+    int32_t pos_raw_cal_fbk;
     int32_t pos_raw_fbk;
     int32_t vel_raw_fbk;
     
@@ -200,6 +201,7 @@ typedef struct //Motor
     
     PID trqPID;
     
+    BOOL not_init;
     BOOL not_calibrated;
     BOOL hardware_fault;
     
@@ -220,6 +222,7 @@ typedef struct //Motor
     // 2FOC specific data
     WatchDog can_2FOC_alive_wdog;
     uint8_t can_motor_config[6];
+    BOOL outOfLimitsSignaled;
 
 } Motor;
 

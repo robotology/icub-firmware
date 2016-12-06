@@ -117,7 +117,7 @@ extern eEresult_t shalinfo_boardinfo_get(const eEboardInfo_t** boardinfo);
 
 // - device-info services: it is about information used by all the e-processes. for instance mac address, ip address etc.
 
-extern eEresult_t shalinfo_deviceinfo_clr(void);
+extern eEresult_t shalinfo_deviceinfo_clr(uint8_t keepcontentofpages);
 extern eEresult_t shalinfo_deviceinfo_get(const shalinfo_deviceinfo_t** deviceinfo);
 extern eEresult_t shalinfo_deviceinfo_set(const shalinfo_deviceinfo_t* deviceinfo);
 

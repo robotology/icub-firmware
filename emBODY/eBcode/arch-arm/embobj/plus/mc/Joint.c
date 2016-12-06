@@ -45,6 +45,13 @@ void Joint_init(Joint* o)
     o->pos_max = ZERO;
     o->vel_max = ZERO;
     o->acc_max = ZERO;
+
+    o->pos_min_soft = ZERO;
+    o->pos_max_soft = ZERO;
+    o->pos_min_hard = ZERO;
+    o->pos_max_hard = ZERO;
+    
+    o->use_hard_limit = FALSE;
     
     o->output_lim = ZERO;
     
@@ -130,13 +137,18 @@ void Joint_config(Joint* o, uint8_t ID, eOmc_joint_config_t* config)
     o->scKvel   = config->pidposition.kff;
     o->scKstill = 0.1f*o->scKpos;
     
+    o->pos_min_soft = config->limitsofjoint.min;
+    o->pos_max_soft = config->limitsofjoint.max;    
+    o->pos_min_hard = config->limitsofjoint.min;
+    o->pos_max_hard = config->limitsofjoint.max;
+    
     o->pos_min = config->limitsofjoint.min;
     o->pos_max = config->limitsofjoint.max;
     o->vel_max = config->maxvelocityofjoint;
     o->acc_max = 10000000.0f;
     
-    o->tcKstiff  = 0.001f*(CTRL_UNITS)(config->impedance.stiffness);
-    o->tcKdamp   = 0.001f*CTRL_LOOP_FREQUENCY*(CTRL_UNITS)(config->impedance.damping);
+    o->tcKstiff  = (CTRL_UNITS)(config->impedance.stiffness);
+    o->tcKdamp   = (CTRL_UNITS)(config->impedance.damping);
     o->tcKoffset = config->impedance.offset;
     
     o->Kadmitt = (o->tcKstiff == ZERO) ? ZERO : (1.0f/o->tcKstiff); 
@@ -374,6 +386,22 @@ void Joint_set_limits(Joint* o, CTRL_UNITS pos_min, CTRL_UNITS pos_max)
     Trajectory_config_limits(&o->trajectory, pos_min, pos_max, 0.0f, 0.0f);
 }
 
+void Joint_set_hardware_limit(Joint* o, CTRL_UNITS hard_limit)
+{
+    if (hard_limit <= o->pos_min_soft)
+    {
+        o->pos_min_hard = hard_limit;
+    }
+    else if (hard_limit >= o->pos_max_soft)
+    {
+        o->pos_max_hard = hard_limit;
+    }
+    
+    o->use_hard_limit = TRUE;
+    
+    Joint_set_limits(o, o->pos_min_hard, o->pos_max_hard);
+}
+
 BOOL Joint_manage_cable_constraint(Joint* o)
 {    
     BOOL opening_intention = (o->pos_err < ZERO);
@@ -482,7 +510,20 @@ CTRL_UNITS Joint_do_pwm_control(Joint* o)
             {
                 o->trq_err = o->trq_ref = ZERO;
                 
-                if ((o->pos_min != o->pos_max) && ((o->pos_fbk < o->pos_min - POS_LIMIT_MARGIN) || (o->pos_fbk > o->pos_max + POS_LIMIT_MARGIN))) 
+                if (o->use_hard_limit)
+                {
+                    if (o->control_mode != eomc_controlmode_calib)
+                    {
+                        if (o->pos_fbk > o->pos_min_soft && o->pos_fbk < o->pos_max_soft)
+                        {
+                            o->use_hard_limit = FALSE;
+                            
+                            Joint_set_limits(o, o->pos_min_soft, o->pos_max_soft);
+                        }
+                    }
+                }
+                
+                if ((o->pos_min != o->pos_max) && ((o->pos_fbk < o->pos_min_hard - POS_LIMIT_MARGIN) || (o->pos_fbk > o->pos_max_hard + POS_LIMIT_MARGIN))) 
                 {
                     o->output = ZERO;
                 }
@@ -511,7 +552,7 @@ CTRL_UNITS Joint_do_pwm_control(Joint* o)
             }
             else
             {
-                o->trq_ref = o->tcKoffset + o->tcKstiff*o->pos_err + o->tcKdamp*(o->pos_err - pos_err_old);
+                o->trq_ref = o->tcKoffset + o->tcKstiff*o->pos_err - o->tcKdamp*o->vel_fbk;
                 o->trq_err = o->trq_ref - o->trq_fbk;
                 
                 o->output = o->trq_ref;
@@ -691,8 +732,8 @@ CTRL_UNITS Joint_do_vel_control(Joint* o)
 
 void Joint_set_impedance(Joint* o, eOmc_impedance_t* impedance)
 {
-    o->tcKstiff  = 0.001f*(CTRL_UNITS)(impedance->stiffness);
-    o->tcKdamp   = 0.001f*CTRL_LOOP_FREQUENCY*(CTRL_UNITS)(impedance->damping);
+    o->tcKstiff  = (CTRL_UNITS)(impedance->stiffness);
+    o->tcKdamp   = (CTRL_UNITS)(impedance->damping);
     o->tcKoffset = impedance->offset;
     
     if (o->tcKstiff != 0.0f)
@@ -707,8 +748,8 @@ void Joint_set_impedance(Joint* o, eOmc_impedance_t* impedance)
 
 void Joint_get_impedance(Joint* o, eOmc_impedance_t* impedance)
 {
-    impedance->stiffness = (eOmeas_stiffness_t)(1000.0f*o->tcKstiff);
-    impedance->damping   = (eOmeas_damping_t)(1000.0f*CTRL_LOOP_PERIOD*o->tcKdamp);
+    impedance->stiffness = (eOmeas_stiffness_t)(o->tcKstiff);
+    impedance->damping   = (eOmeas_damping_t)(o->tcKdamp);
     impedance->offset    = (eOmeas_torque_t)(o->tcKoffset);
 }
 
