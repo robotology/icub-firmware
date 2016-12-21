@@ -471,6 +471,7 @@ static void get_jomo_coupling_info(const eOmc_4jomo_coupling_t *jomoCouplingInfo
     {
         o->jointSet[s].CAN_DO_TRQ_CTRL = jsetcfg[s].candotorquecontrol;
         o->jointSet[s].MOTOR_CONTROL_TYPE = jsetcfg[s].pidoutputtype;
+        o->jointSet[s].USE_SPEED_FBK_FROM_MOTORS = jsetcfg[s].usespeedfeedbackfrommotors;
 
         o->jointSet[s].special_constraint = (eOmc_jsetconstraint_t)jsetcfg[s].constraints.type;
         o->jointSet[s].special_limit = jsetcfg[s].constraints.param1;
