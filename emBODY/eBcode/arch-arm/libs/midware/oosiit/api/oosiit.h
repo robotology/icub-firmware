@@ -292,18 +292,27 @@ extern uint64_t* oosiit_memory_getstack(uint16_t bytes);
 extern oosiit_result_t oosiit_sys_start(oosiit_task_properties_t* tskinit, oosiit_task_properties_t* tskidle);
 
 
-/** @fn         extern oosiit_result_t oosiit_sys_suspend(void)
-    @brief      disable scheduling. 
+/** @fn         extern uint32_t oosiit_sys_timeofnextevent(void)
+    @brief      tells how long to next event (delay timeout or timer expiry). 
+    @return     the number of ticks to next event (0 if called from an ISR) 
+ **/ 
+extern uint32_t oosiit_sys_timeofnextevent(void); 
+
+
+/** @fn         extern oosiit_result_t oosiit_sys_suspend(uint32_t *timeofnextevent)
+    @brief      suspends scheduling. 
+    @param      timeofnextevent     if non-NULL it keeps the time in system ticks from the moment of this call to the next expected system event
     @return     if succesuful oosiit_res_OK, otherwise it returns oosiit_res_NOK (for instance if called from within an ISR)
  **/ 
-extern oosiit_result_t oosiit_sys_suspend(void); 
+extern oosiit_result_t oosiit_sys_suspend(uint32_t *timeofnextevent); 
 
 
-/** @fn         extern oosiit_result_t oosiit_sys_resume(void)
-    @brief      disable scheduling. 
+/** @fn         extern oosiit_result_t oosiit_sys_resume(uint32_t timeofsuspension)
+    @brief      resume scheduling and changes system time and all events (delays and timers). 
+    @param      timeofsuspension    time spent from suspension (in system ticks)
     @return     if succesuful oosiit_res_OK, otherwise it returns oosiit_res_NOK (for instance if called from within an ISR)
  **/
-extern oosiit_result_t oosiit_sys_resume(void);
+extern oosiit_result_t oosiit_sys_resume(uint32_t timeofsuspension);
 
 
 /** @fn         extern void oosiit_sys_error(oosiit_error_code_t errorcode)

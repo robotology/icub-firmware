@@ -1,12 +1,12 @@
 /*----------------------------------------------------------------------------
- *      RL-ARM - RTX
+ *      CMSIS-RTOS  -  RTX
  *----------------------------------------------------------------------------
  *      Name:    RT_TYPEDEF.H
  *      Purpose: Type Definitions
- *      Rev.:    V4.73
+ *      Rev.:    V4.79
  *----------------------------------------------------------------------------
  *
- * Copyright (c) 1999-2009 KEIL, 2009-2013 ARM Germany GmbH
+ * Copyright (c) 1999-2009 KEIL, 2009-2015 ARM Germany GmbH
  * All rights reserved.
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -76,7 +76,8 @@ typedef struct OS_TCB {
   void   *extdata;                // IIT-EXT: added
 
   /* Hardware dependant part: specific for CM processor                      */
-  U8     stack_frame;             /* Stack frame: 0=Basic, 1=Extended        */
+  U8     stack_frame;             /* Stack frame: 0=Basic, 1=Extended,       */
+                                  /* (2=VFP/D16 stacked, 4=NEON/D32 stacked) */
   U16    priv_stack;              /* Private stack size, 0= system assigned  */
   U32    tsk_stack;               /* Current task Stack pointer (R13)        */
   U32    *stack;                  /* Pointer to Task Stack memory block      */
@@ -166,8 +167,8 @@ typedef struct OS_BM {
 } *P_BM;
 
 /* Definitions */
-#define __TRUE          1
-#define __FALSE         0
+#define __TRUE          1U
+#define __FALSE         0U
 
 // IIT-EXT: added to remove a warning about redefinition of NULL
 #ifndef NULL

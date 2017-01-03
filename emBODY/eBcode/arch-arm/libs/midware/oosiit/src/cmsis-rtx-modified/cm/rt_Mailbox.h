@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------
- *      RL-ARM - RTX
+ *      CMSIS-RTOS  -  RTX
  *----------------------------------------------------------------------------
  *      Name:    RT_MAILBOX.H
  *      Purpose: Implements waits and wake-ups for mailbox messages
@@ -41,8 +41,6 @@ extern void      isr_mbx_send (OS_ID mailbox, void *p_msg);
 extern OS_RESULT isr_mbx_receive (OS_ID mailbox, void **message);
 extern void      rt_mbx_psh   (P_MCB p_CB,    void *p_msg);
 
-
 /*----------------------------------------------------------------------------
  * end of file
  *---------------------------------------------------------------------------*/
-

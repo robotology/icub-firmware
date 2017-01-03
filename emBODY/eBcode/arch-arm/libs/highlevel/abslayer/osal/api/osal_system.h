@@ -122,8 +122,38 @@ extern void osal_system_scheduling_suspend(void);
     @brief      Restarts the scheduling.
                 This function can safely be called inside an ISR
                 In case the OSAL has not started yet, this function can be safely called and simply does nothing. 
- **/
+ **/ 
 extern void osal_system_scheduling_restart(void);
+
+
+/** @fn         extern osal_reltime_t osal_system_timeofnextevent(void)
+    @brief      It tells the time (in usec) before the next known event of the system. An event may be a scheduled timer or a 
+                scheduled wake up of a task. This function can be used in the idles task to tell the system that we can go to sleep 
+                for some time by calling function osal_system_suspend() and then maybe ... low power mode (but beware of ISR handling).
+                This function can safely be called inside an ISR even if it should not be called inside an ISR at all.
+                In case the OSAL has not started yet, this function can be safely called and simply does nothing. 
+    @return     The time to next event.
+ **/ 
+extern osal_reltime_t osal_system_timeofnextevent(void);
+    
+    
+/** @fn         extern osal_reltime_t osal_system_timeofnextevent(void)
+    @brief      It send the system in suspended mode and tells the time (in usec) before the next known event of the system. 
+                The suspended mode is useful to act in tickless mode.
+                This function can safely be called inside an ISR even if it should not be called inside an ISR at all.
+                In case the OSAL has not started yet, this function can be safely called and simply does nothing. 
+    @return     The time to next event.
+ **/     
+extern osal_reltime_t osal_system_suspend(void);
+
+
+/** @fn         extern void osal_system_resume(osal_reltime_t timeslept)
+    @brief      It resumes the system from suspended mode and adjusts the system events with the passed time. 
+                This resume function cna be used together osal_system_suspend() to act in tickless mode.
+                This function can safely be called inside an ISR even if it should not be called inside an ISR at all.
+                In case the OSAL has not started yet, this function can be safely called and simply does nothing. 
+ **/ 
+extern void osal_system_resume(osal_reltime_t timeslept);
 
 
 

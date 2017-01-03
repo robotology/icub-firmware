@@ -231,6 +231,38 @@ void rt_iit_advtmr_init(void)
    }
 }
 
+U32 rt_iit_advtmr_next(void)
+{
+    if(NULL == os_iit_advtmr.next)
+    {
+        return(0xffffffff);
+    }
+    
+    return(os_iit_advtmr.tcnt);    
+}
+
+void rt_iit_advtmr_resume_from_sleep(U32 sleep_time)
+{
+
+   if (os_iit_advtmr.next == NULL) {
+      return;
+   }
+
+    U32 delta = sleep_time;
+    if (delta >= os_iit_advtmr.tcnt) {
+      delta   -= os_iit_advtmr.tcnt;
+      os_iit_advtmr.tcnt = 1U;
+      while (os_iit_advtmr.next) {
+        rt_iit_advtmr_tick();
+        if (delta == 0U) { break; }
+        delta--;
+      }
+    } else {
+      os_iit_advtmr.tcnt -= delta;
+    }
+
+}
+
 void rt_iit_advtmr_tick (void) {
    /* Decrement delta count of timer list head. Timers having the value of   */
    /* zero are removed from the list and the callback function is called.    */

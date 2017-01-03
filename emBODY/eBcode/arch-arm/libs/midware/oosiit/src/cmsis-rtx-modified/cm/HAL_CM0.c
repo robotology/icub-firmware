@@ -1,5 +1,5 @@
 /*----------------------------------------------------------------------------
- *      RL-ARM - RTX
+ *      CMSIS-RTOS  -  RTX
  *----------------------------------------------------------------------------
  *      Name:    HAL_CM0.C
  *      Purpose: Hardware Abstraction Layer for Cortex-M0
@@ -106,7 +106,7 @@ PrivilegedA
 
 /*--------------------------- _free_box -------------------------------------*/
 
-__asm int _free_box (void *box_mem, void *box) {
+__asm U32 _free_box (void *box_mem, void *box) {
    /* Function wrapper for Unprivileged/Privileged mode. */
         LDR     R3,=__cpp(rt_free_box)
         MOV     R12,R3
@@ -298,4 +298,3 @@ __asm void OS_Tick_Handler (void) {
 /*----------------------------------------------------------------------------
  * end of file
  *---------------------------------------------------------------------------*/
-

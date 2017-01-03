@@ -178,8 +178,9 @@ SVC_1_1(svc_oosiit_memory_getstack,     uint64_t*,          uint16_t,           
 SVC_2_1(svc_oosiit_sys_start,           uint32_t,    oosiit_task_properties_t*, oosiit_task_properties_t*,                              RET_uint32_t);
 //SVC_2_0(svc_oosiit_sys_start,           void,    oosiit_task_properties_t*, oosiit_task_properties_t*,                       RET_int32_t);
 SVC_4_1(svc_oosiit_sys_init_user,       oosiit_result_t,    FAKE_VOID_FP_VOID,  uint8_t,                void*,          uint16_t,       RET_int32_t);
-SVC_0_1(svc_oosiit_sys_suspend,         oosiit_result_t,                                                                                RET_int32_t);
-SVC_0_1(svc_oosiit_sys_resume,          oosiit_result_t,                                                                                RET_int32_t);
+SVC_1_1(svc_oosiit_sys_timeofnextevent, oosiit_result_t,    uint32_t*,                                                                  RET_int32_t);
+SVC_1_1(svc_oosiit_sys_suspend,         oosiit_result_t,    uint32_t*,                                                                  RET_int32_t);
+SVC_1_1(svc_oosiit_sys_resume,          oosiit_result_t,    uint32_t,                                                                   RET_int32_t);
 
 
 // - task
@@ -494,8 +495,23 @@ extern oosiit_result_t oosiit_sys_init(void (*inittskfn)(void), uint8_t inittskp
     return(oosiit_res_OK);
 }
 
+extern uint32_t oosiit_sys_timeofnextevent(void)
+{        
+    uint32_t tt = 0;
+    
+    if(0 != __get_IPSR()) 
+    {   // inside isr
+        return(0);
+    } 
+    else
+    {   // call svc
+        __svc_oosiit_sys_timeofnextevent(&tt);
+    }
+    
+    return(tt);    
+}
 
-extern oosiit_result_t oosiit_sys_suspend(void)
+extern oosiit_result_t oosiit_sys_suspend(uint32_t *timeofnextevent)
 {
     if(0 != __get_IPSR()) 
     {   // inside isr
@@ -503,14 +519,14 @@ extern oosiit_result_t oosiit_sys_suspend(void)
     } 
     else
     {   // call svc
-        __svc_oosiit_sys_suspend();
+        __svc_oosiit_sys_suspend(timeofnextevent);
     }
     
     return(oosiit_res_OK);
 }
 
 
-extern oosiit_result_t oosiit_sys_resume(void)
+extern oosiit_result_t oosiit_sys_resume(uint32_t timeofsuspension)
 {
     if(0 != __get_IPSR()) 
     {   // inside isr
@@ -518,7 +534,7 @@ extern oosiit_result_t oosiit_sys_resume(void)
     } 
     else
     {   // call svc
-        __svc_oosiit_sys_resume();
+        __svc_oosiit_sys_resume(timeofsuspension);
     }
     
     return(oosiit_res_OK);
@@ -1491,21 +1507,45 @@ extern oosiit_result_t svc_oosiit_sys_init_user(FAKE_VOID_FP_VOID inittskfn, uin
     return(oosiit_res_OK);
 }
 
-extern oosiit_result_t svc_oosiit_sys_suspend(void)
+
+extern oosiit_result_t svc_oosiit_sys_timeofnextevent(uint32_t *timeofnextevent)
 {
     rt_iit_dbg_svc_enter();
     //#warning --> now rtx has a new rt_suspend() ...
-    rt_tsk_lock();
+    // rt_tsk_lock();
+    uint32_t tt = rt_iit_timeofnextevent(0);
+    
+    if(NULL != timeofnextevent)
+    {
+        *timeofnextevent = tt;
+    }
     
     rt_iit_dbg_svc_exit();
     return(oosiit_res_OK);
 }
 
-extern oosiit_result_t svc_oosiit_sys_resume(void)
+extern oosiit_result_t svc_oosiit_sys_suspend(uint32_t *timeofnextevent)
+{
+    rt_iit_dbg_svc_enter();
+    //#warning --> now rtx has a new rt_suspend() ...
+    // rt_tsk_lock();
+    uint32_t tt = rt_iit_timeofnextevent(1); // or ... rt_suspend();
+    
+    if(NULL != timeofnextevent)
+    {
+        *timeofnextevent = tt;
+    }
+    
+    rt_iit_dbg_svc_exit();
+    return(oosiit_res_OK);
+}
+
+extern oosiit_result_t svc_oosiit_sys_resume(uint32_t timeofsuspension)
 {
     rt_iit_dbg_svc_enter();
     //#warning --> now rtx has a new rt_resume() ...
-    rt_tsk_unlock();
+   // rt_tsk_unlock();
+    rt_resume(timeofsuspension);
     
     rt_iit_dbg_svc_exit();
     return(oosiit_res_OK);
