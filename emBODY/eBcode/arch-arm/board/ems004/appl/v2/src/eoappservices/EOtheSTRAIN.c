@@ -656,6 +656,22 @@ extern eOresult_t eo_strain_SetDataRate(EOtheSTRAIN *p, uint8_t datarate)
 }
 
 
+extern uint8_t eo_strain_GetDataRate(EOtheSTRAIN *p)
+{
+    if(NULL == p)
+    {
+        return(0);
+    }
+    
+
+    if(NULL == p->strain)
+    {
+        return(0);
+    }
+  
+    return(p->strain->config.datarate);    
+}
+
 
 extern eOresult_t eo_strain_GetFullScale(EOtheSTRAIN *p, eOservice_onendofoperation_fun_t overrideonfullscaleready)
 {   

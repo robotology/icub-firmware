@@ -92,7 +92,7 @@ static eOresult_t s_eocanprotASperiodic_parser_process_maisvalue(eOcanframe_t *f
 
 static void s_former_PER_AS_prepare_frame(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame, uint8_t len, uint8_t type);
 
-static void s_eocanprotASperiodic_strain_saturation_handler(eOcanframe_t *frame, eOcanport_t port, strainProcessMode_t mode, uint16_t msg_counter);
+static void s_eocanprotASperiodic_strain_saturation_handler(eOcanframe_t *frame, eOcanport_t port, strainProcessMode_t mode);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -365,13 +365,13 @@ static eOresult_t s_eocanprotASperiodic_parser_process_forcetorque(eOcanframe_t 
        count_message = 0; 
     }
 #else
-    static uint16_t counter = 0;
-    counter++;
-    
-    if (counter > 2000) // stays for 1 second...
-        counter = 0;
+//    static uint16_t counter = 0;
+//    counter++;
+//    
+//    if (counter > 2000) // stays for 1 second...
+//        counter = 0;
    
-    s_eocanprotASperiodic_strain_saturation_handler(frame, port, mode, counter);
+    s_eocanprotASperiodic_strain_saturation_handler(frame, port, mode);
 #endif
     
     return(eores_OK);
@@ -413,10 +413,17 @@ static void s_former_PER_AS_prepare_frame(eOcanprot_descriptor_t *descriptor, eO
     frame->size         = len;
 }
 
-static void s_eocanprotASperiodic_strain_saturation_handler(eOcanframe_t *frame, eOcanport_t port, strainProcessMode_t mode, uint16_t msg_counter)
+static void s_eocanprotASperiodic_strain_saturation_handler(eOcanframe_t *frame, eOcanport_t port, strainProcessMode_t mode)
 {
     static uint16_t upper_saturations[6] = {0};
     static uint16_t lower_saturations[6] = {0};
+    
+    static uint32_t counter = 0;
+    
+    counter ++;
+    
+    uint8_t strainTXrate = eo_strain_GetDataRate(eo_strain_GetHandle()); // in ms. get it from strain object ....
+    uint32_t numberofmessagesin1second = 2000*strainTXrate; // strai sends 2 msgs (1 for force and 1 for torque) every strainTXrate milli.
     
     //there's saturation
     if (frame->size == 7)
@@ -484,11 +491,16 @@ static void s_eocanprotASperiodic_strain_saturation_handler(eOcanframe_t *frame,
         }    
     
     }
-    //send statistics every second (n.b. --> 2 CAN msgs from STRAIN every ms), but only if something happened
-    if (msg_counter == 2000)
-    { 
-        //send saturation message for every channel, if any
-        for (uint8_t i = 0; i < 6; i++)
+    
+ 
+    if((numberofmessagesin1second > 0) && (counter >= numberofmessagesin1second))
+    {   // ok, 1 second has expired (or better: so many messages have arrived for 1 second). 
+            
+        // reset counter    
+        counter = 0;
+            
+        // send saturation message for every channel, if any
+        for(uint8_t i = 0; i < 6; i++)
         {
             eOerrmanDescriptor_t errdes = {0};
             if (upper_saturations[i] != 0 || lower_saturations[i] != 0)
