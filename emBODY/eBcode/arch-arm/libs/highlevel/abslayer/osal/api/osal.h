@@ -17,9 +17,12 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-
 #ifndef _OSAL_H_
 #define _OSAL_H_
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
@@ -71,6 +74,10 @@
 /** @}            
     end of group hal  
  **/
+ 
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

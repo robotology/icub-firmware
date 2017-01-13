@@ -20,17 +20,20 @@
 #ifndef _OSAL_MESSAGEQUEUE_H_
 #define _OSAL_MESSAGEQUEUE_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       osal_messagequeue.h
-	@brief      This header file implements public interface to the os abstraction layer: message queue
-	@author     marco.accame@iit.it
-	@date       12/05/2011
+    @brief      This header file implements public interface to the os abstraction layer: message queue
+    @author     marco.accame@iit.it
+    @date       12/05/2011
 **/
 
 /* @defgroup osal_base OS abstraction layer: message queue
      cre vre ver verv cew
     
-    @{		
+    @{        
  **/
 
 
@@ -150,6 +153,10 @@ extern osal_result_t osal_messagequeue_delete(osal_messagequeue_t *mq);
 /* @}            
     end of group osal_messagequeue  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

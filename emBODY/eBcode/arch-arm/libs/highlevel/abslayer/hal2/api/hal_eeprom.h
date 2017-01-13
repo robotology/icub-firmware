@@ -21,6 +21,10 @@
 #ifndef _HAL_EEPROM_H_
 #define _HAL_EEPROM_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       hal_eeprom.h
@@ -159,6 +163,10 @@ extern hal_bool_t hal_eeprom_address_is_valid(hal_eeprom_t id, uint32_t addr);
 /** @}            
     end of group doxy_group_hal_eeprom  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

@@ -22,6 +22,10 @@
 #ifndef _HAL_MUX_H_
 #define _HAL_MUX_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       hal_mux.h
@@ -130,6 +134,10 @@ extern hal_result_t hal_mux_get_cs(hal_mux_t id, hal_gpio_t* cs);
 /** @}            
     end of group doxy_group_hal_mux  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

@@ -20,17 +20,20 @@
 #ifndef _IPAL_IGMP_H_
 #define _IPAL_IGMP_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       ipal_igmp.h
-	@brief      This header file implements public interface to the ip abstraction layer: base services and types 
-	@author     marco.accame@iit.it
-	@date       12/12/2011
+    @brief      This header file implements public interface to the ip abstraction layer: base services and types 
+    @author     marco.accame@iit.it
+    @date       12/12/2011
 **/
 
 /* @defgroup ipal_igmp IP abstraction layer: igmp
     cercecvecve.
     
-    @{		
+    @{        
  **/
 
 
@@ -89,6 +92,11 @@ extern ipal_result_t ipal_igmp_leave(ipal_ipv4addr_t group);
 /* @}            
     end of group ipal_igmp  
  **/
+ 
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+
 
 #endif  // include-guard
 

@@ -21,6 +21,10 @@
 #ifndef _HAL_TERMOMETER_H_
 #define _HAL_TERMOMETER_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       hal_termometer.h
@@ -110,6 +114,10 @@ extern hal_result_t hal_termometer_read(hal_termometer_t id, hal_termometer_degr
 /** @}            
     end of group doxy_group_hal_termometer  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

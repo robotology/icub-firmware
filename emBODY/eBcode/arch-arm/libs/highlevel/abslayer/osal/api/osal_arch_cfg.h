@@ -17,9 +17,12 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-
 #ifndef _OSAL_ARCH_CFG_H_
 #define _OSAL_ARCH_CFG_H_
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
@@ -64,6 +67,10 @@ typedef osal_arch_arm_cfg_t osal_arch_cfg_t;
 /** @}            
     end of group osal_arch_cfg_generic  
  **/
+ 
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

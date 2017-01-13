@@ -20,17 +20,20 @@
 #ifndef _IPAL_SYS_H_
 #define _IPAL_SYS_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       ipal_sys.h
-	@brief      This header file implements public interface to the ip abstraction layer: sys 
-	@author     marco.accame@iit.it
-	@date       12/12/2011
+    @brief      This header file implements public interface to the ip abstraction layer: sys 
+    @author     marco.accame@iit.it
+    @date       12/12/2011
 **/
 
 /* @defgroup ipal_sys IP abstraction layer: sys
     cercecvecve.
     
-    @{		
+    @{        
  **/
 
 
@@ -94,6 +97,10 @@ extern ipal_reltime_t ipal_sys_timetick_get(void);
 /* @}            
     end of group ipal_sys  
  **/
+ 
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

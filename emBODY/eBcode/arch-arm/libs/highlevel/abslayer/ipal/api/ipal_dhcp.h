@@ -20,17 +20,20 @@
 #ifndef _IPAL_DHCP_H_
 #define _IPAL_DHCP_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       ipal_dhcp.h
-	@brief      This header file implements public interface to the ip abstraction layer: dhcp 
-	@author     marco.accame@iit.it
-	@date       12/12/2011
+    @brief      This header file implements public interface to the ip abstraction layer: dhcp 
+    @author     marco.accame@iit.it
+    @date       12/12/2011
 **/
 
 /* @defgroup ipal_dhcp IP abstraction layer: dhcp
     cercecvecve.
     
-    @{		
+    @{        
  **/
 
 
@@ -87,6 +90,11 @@ extern ipal_result_t ipal_dhcp_restart(void);
 /* @}            
     end of group ipal_dhcp  
  **/
+ 
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+
 
 #endif  // include-guard
 

@@ -25,6 +25,10 @@
 #ifndef _HAL_MOTORCTL_H_
 #define _HAL_MOTORCTL_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       hal_dc_motorctl.h
@@ -243,6 +247,10 @@ extern hal_result_t hal_motor_reenable_break_interrupts(void);
 /** @}            
     end of group doxy_group_hal_pwm  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

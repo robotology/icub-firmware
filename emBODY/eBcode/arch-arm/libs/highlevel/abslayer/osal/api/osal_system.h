@@ -20,17 +20,20 @@
 #ifndef _OSAL_SYSTEM_H_
 #define _OSAL_SYSTEM_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       osal_system.h
-	@brief      This header file implements public interface to the os abstraction layer: system
-	@author     marco.accame@iit.it
-	@date       12/05/2011
+    @brief      This header file implements public interface to the os abstraction layer: system
+    @author     marco.accame@iit.it
+    @date       12/05/2011
 **/
 
 /* @defgroup osal_system OS abstraction layer: system
     cxecevcevce
     
-    @{		
+    @{  
  **/
 
 
@@ -161,6 +164,10 @@ extern void osal_system_resume(osal_reltime_t timeslept);
     end of group osal_system  
  **/
 
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
 #endif  // include-guard
 
 

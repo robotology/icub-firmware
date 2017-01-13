@@ -20,17 +20,20 @@
 #ifndef _IPAL_FTP_H_
 #define _IPAL_FTP_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       ipal_ftp.h
-	@brief      This header file implements public interface to the ip abstraction layer: ftp 
-	@author     marco.accame@iit.it
-	@date       12/12/2011
+    @brief      This header file implements public interface to the ip abstraction layer: ftp 
+    @author     marco.accame@iit.it
+    @date       12/12/2011
 **/
 
 /* @defgroup ipal_ftp IP abstraction layer: ftp
     cercecvecve.
     
-    @{		
+    @{        
  **/
 
 
@@ -87,6 +90,11 @@ extern ipal_result_t ipal_ftp_restart(void);
 /* @}            
     end of group ipal_ftp  
  **/
+ 
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+
 
 #endif  // include-guard
 

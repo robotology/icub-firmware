@@ -21,6 +21,10 @@
 #ifndef _HAL_MPU_NAME_STM32F407IG_H_
 #define _HAL_MPU_NAME_STM32F407IG_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       hal_mpu_name_stm32f407ig_.h
@@ -172,6 +176,10 @@ typedef enum
 /** @}            
     end of group doxy_group_hal_mpu_name_stm32f407ig_  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

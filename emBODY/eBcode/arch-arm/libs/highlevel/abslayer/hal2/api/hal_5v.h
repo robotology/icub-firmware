@@ -21,6 +21,11 @@
 #ifndef _HAL_5V_H_
 #define _HAL_5V_H_
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       hal_5v.h
@@ -95,6 +100,10 @@ extern hal_result_t hal_5v_off(void);
 /** @}            
     end of group doxy_group_hal_5v  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

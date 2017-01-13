@@ -21,6 +21,10 @@
 #ifndef _HAL_I2C_H_
 #define _HAL_I2C_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       hal_i2c.h
@@ -195,6 +199,10 @@ extern hal_result_t hal_i2c_standby(hal_i2c_t id, hal_i2c_devaddr_t devaddr);
 /** @}            
     end of group doxy_group_hal_i2c  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

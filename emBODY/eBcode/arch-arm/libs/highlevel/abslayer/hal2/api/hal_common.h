@@ -21,6 +21,10 @@
 #ifndef _HAL_COMMON_H_
 #define _HAL_COMMON_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       hal_common.h
@@ -310,6 +314,10 @@ typedef hal_void_fp_err_ccharp_t hal_errorhandler_t;
 /** @}            
     end of group doxy_group_hal_common  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

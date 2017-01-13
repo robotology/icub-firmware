@@ -21,6 +21,10 @@
 #ifndef _HAL_ETH_H_
 #define _HAL_ETH_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       hal_eth.h
@@ -305,6 +309,10 @@ extern hal_result_t hal_eth_get_errors_info(uint8_t phynum, hal_eth_phy_errors_i
 /** @}            
     end of group doxy_group_hal_eth  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

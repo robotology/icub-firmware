@@ -21,6 +21,10 @@
 #ifndef _HAL_ETHTRANSCEIVER_H_
 #define _HAL_ETHTRANSCEIVER_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       hal_ethtransceiver.h
@@ -199,6 +203,10 @@ extern hal_result_t hal_ethtransceiver_phy_errorinfo(uint8_t phynum, hal_ethtran
 /** @}            
     end of group arm_hal_ethtransceiver  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

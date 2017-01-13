@@ -26,6 +26,10 @@
 #ifndef _HAL_QUADENCODER_H_
 #define _HAL_QUADENCODER_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - external dependencies --------------------------------------------------------------------------------------------
 
 #include "hal_common.h"
@@ -103,6 +107,9 @@ extern void hal_quadencoder_init_indexes_flags(void);
   */
 extern hal_bool_t hal_quadencoder_is_index_found(hal_quadencoder_t id);
 
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif // include-guard
 

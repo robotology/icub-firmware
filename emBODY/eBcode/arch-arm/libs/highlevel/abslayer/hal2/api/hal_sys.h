@@ -29,6 +29,11 @@
     @date       09/09/2011
 **/
 
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+    
 /** @defgroup doxy_group_hal_sys HAL system
 
     The HAL ...
@@ -250,6 +255,10 @@ extern void hal_sys_atomic_bitwiseAND(volatile uint32_t *value, uint32_t mask);
 /** @}            
     end of group doxy_group_hal_sys  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

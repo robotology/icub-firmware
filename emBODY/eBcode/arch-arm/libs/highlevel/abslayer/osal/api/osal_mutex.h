@@ -20,16 +20,19 @@
 #ifndef _OSAL_MUTEX_H_
 #define _OSAL_MUTEX_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       osal_mutex.h
-	@brief      This header file implements public interface to the os abstraction layer: mutex
-	@author     marco.accame@iit.it
-	@date       12/05/2011
+    @brief      This header file implements public interface to the os abstraction layer: mutex
+    @author     marco.accame@iit.it
+    @date       12/05/2011
 **/
 
 /* @defgroup osal_base OS abstraction layer: mutex
     crecvrecverdec    
-    @{		
+    @{        
  **/
 
 
@@ -100,6 +103,10 @@ extern osal_result_t osal_mutex_delete(osal_mutex_t *mutex);
 /* @}            
     end of group osal_mutex  
  **/
+ 
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

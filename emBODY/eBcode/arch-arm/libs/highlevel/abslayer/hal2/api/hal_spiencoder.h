@@ -22,6 +22,10 @@
 #ifndef _HAL_SPIENCODER_H_
 #define _HAL_SPIENCODER_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       hal_spiencoder.h
@@ -273,6 +277,10 @@ extern hal_result_t hal_spiencoder_deinit(hal_spiencoder_t id);
 /** @}            
     end of group doxy_group_hal_spiencoder  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

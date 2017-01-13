@@ -21,6 +21,10 @@
 #ifndef _HAL_CAN_H_
 #define _HAL_CAN_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       hal_can.h
@@ -332,6 +336,10 @@ extern hal_result_t hal_can_getstatus(hal_can_t id, hal_can_status_t *status);
 /** @}            
     end of group doxy_group_hal_can  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

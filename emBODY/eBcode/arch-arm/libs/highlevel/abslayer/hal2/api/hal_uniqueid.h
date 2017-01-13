@@ -21,6 +21,10 @@
 #ifndef _HAL_UNIQUEID_H_
 #define _HAL_UNIQUEID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       hal_uniqueid.h
@@ -121,6 +125,10 @@ extern hal_uniqueid_macaddr_t hal_uniqueid_macaddr_get(void);
 /** @}            
     end of group hal_uniqueid  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

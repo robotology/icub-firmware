@@ -20,17 +20,20 @@
 #ifndef _OSAL_TIMER_H_
 #define _OSAL_TIMER_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       osal_timer.h
-	@brief      This header file implements public interface to the os abstraction layer, timer
-	@author     marco.accame@iit.it
-	@date       12/05/2011
+    @brief      This header file implements public interface to the os abstraction layer, timer
+    @author     marco.accame@iit.it
+    @date       12/05/2011
 **/
 
 /* @defgroup osal_timer OS abstraction layer: timer
     crcrcrm.
     
-    @{		
+    @{        
  **/
 
 
@@ -152,6 +155,10 @@ extern osal_result_t osal_timer_delete(osal_timer_t *timer);
 /* @}            
     end of group osal_timer  
  **/
+ 
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

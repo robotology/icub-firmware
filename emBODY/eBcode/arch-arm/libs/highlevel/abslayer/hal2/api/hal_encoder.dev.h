@@ -22,6 +22,10 @@
 #ifndef _HAL_ENCODER_H_
 #define _HAL_ENCODER_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       hal_encoder.h
@@ -176,6 +180,10 @@ extern hal_result_t hal_encoder_get_frame(hal_encoder_t id, uint8_t* bytes);
 /** @}            
     end of group doxy_group_hal_encoder  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

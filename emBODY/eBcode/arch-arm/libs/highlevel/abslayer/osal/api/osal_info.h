@@ -20,17 +20,20 @@
 #ifndef _OSAL_INFO_H_
 #define _OSAL_INFO_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       osal_info.h
-	@brief      This header file implements public interface to the os abstraction layer: info
-	@author     marco.accame@iit.it
-	@date       12/05/2011
+    @brief      This header file implements public interface to the os abstraction layer: info
+    @author     marco.accame@iit.it
+    @date       12/05/2011
 **/
 
 /* @defgroup osal_info OS abstraction layer: info
     cxecevcevce
     
-    @{		
+    @{        
  **/
 
 
@@ -124,6 +127,10 @@ extern osal_abstime_t osal_info_idletime_get(void);
 /* @}            
     end of group osal_info  
  **/
+ 
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 
