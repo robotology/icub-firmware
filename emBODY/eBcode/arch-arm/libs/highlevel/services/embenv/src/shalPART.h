@@ -20,6 +20,9 @@
 #ifndef _SHALPART_H_
 #define _SHALPART_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       shalPART.h
     @brief      This header file implements public interface to the shalPART shared library.
@@ -137,6 +140,10 @@ extern eEresult_t shalpart_proc_def2run_set(eEprocess_t proc);
 /** @}            
     end of group shal_part 
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

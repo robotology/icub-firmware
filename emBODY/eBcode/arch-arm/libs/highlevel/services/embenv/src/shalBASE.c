@@ -22,6 +22,11 @@
     @date       05/07/2010
 **/
 
+
+//#ifdef __cplusplus                                          
+//#warning ::: __cplusplus is defined: this file is COMPILED IN C++ MODE           
+//#endif
+
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
@@ -30,7 +35,11 @@
 #pragma O0
 #endif
 
+
+#include "embOBJporting.h"
+
 #include "hal.h"
+
 #include "string.h"
 #include "eEmemorymap.h" 
 
@@ -70,13 +79,13 @@ typedef struct                                      // 24B
     uint8_t                 free2usedata[shalbase_ipc_userdefdata_maxsize];
     uint8_t                 jump2flag;
     uint32_t                jump2address;
-} baseIPCdata_t;            EECOMMON_VERIFYsizeof(baseIPCdata_t, 24);
+} baseIPCdata_t;            EECOMMON_VERIFYsizeof(baseIPCdata_t, 24)
 
 typedef struct                                      // 40B
 {
     shalbaseDataHeader_t    head;                   // 16B
     baseIPCdata_t           ipcdata;                // 24B
-} baseIPCdataStorage_t;     EECOMMON_VERIFYsizeof(baseIPCdataStorage_t, 40);
+} baseIPCdataStorage_t;     EECOMMON_VERIFYsizeof(baseIPCdataStorage_t, 40)
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -135,8 +144,14 @@ static void s_shalbase_ipc_ram_initialise(void);
 
 typedef uint8_t verify_size_t[(SHALBASE_RAMSIZE > sizeof(baseIPCdataStorage_t)) ? (1) : (-1)];
 
+#if (__ARMCC_VERSION > 6000000)
+#error ::: change for compiler arm v6 [placing data at a particular ram address]
+// something like: 
+// static volatile baseIPCdataStorage_t s_shalbase_IPCdataStored       __attribute__((section(".ARM.__at_0x2001ffc0")));
+#endif
+
 // this variable is placed in NZI section. it is used for ipc
-static volatile baseIPCdataStorage_t s_shalbase_IPCdataStored      __attribute__((at(SHALBASE_RAMADDR)));
+static volatile baseIPCdataStorage_t s_shalbase_IPCdataStored       __attribute__((at(SHALBASE_RAMADDR)));
 
 
 // - module info ------------------------------------------------------------------------------------------------------
@@ -144,53 +159,53 @@ static volatile baseIPCdataStorage_t s_shalbase_IPCdataStored      __attribute__
 
 static const eEmoduleInfo_t s_shalbase_moduleinfo =
 {
-    .info           =
+    EO_INIT(.info)
     {
-        .entity     =
+        EO_INIT(.entity)
         {
-            .type       = ee_entity_statlib,
-            .signature  = ee_shalSharServ | SHALBASE_SIGN,
-            .version    = 
+            EO_INIT(.type)      ee_entity_statlib,
+            EO_INIT(.signature) ee_shalSharServ | SHALBASE_SIGN,
+            EO_INIT(.version) 
             { 
-                .major = SHALBASE_VER_MAJOR, 
-                .minor = SHALBASE_VER_MINOR
+                EO_INIT(.major) SHALBASE_VER_MAJOR, 
+                EO_INIT(.minor) SHALBASE_VER_MINOR
             },  
-            .builddate  = 
+            EO_INIT(.builddate) 
             {
-                .year  = SHALBASE_BUILDDATE_YEAR,
-                .month = SHALBASE_BUILDDATE_MONTH,
-                .day   = SHALBASE_BUILDDATE_DAY,
-                .hour  = SHALBASE_BUILDDATE_HOUR,
-                .min   = SHALBASE_BUILDDATE_MIN
+                EO_INIT(.year)  SHALBASE_BUILDDATE_YEAR,
+                EO_INIT(.month) SHALBASE_BUILDDATE_MONTH,
+                EO_INIT(.day)   SHALBASE_BUILDDATE_DAY,
+                EO_INIT(.hour)  SHALBASE_BUILDDATE_HOUR,
+                EO_INIT(.min)   SHALBASE_BUILDDATE_MIN
             }
         },
-        .rom        = 
+        EO_INIT(.rom) 
         {   
-            .addr   = SHALBASE_ROMADDR,
-            .size   = SHALBASE_ROMSIZE
+            EO_INIT(.addr)  SHALBASE_ROMADDR,
+            EO_INIT(.size)  SHALBASE_ROMSIZE
         },
-        .ram        = 
+        EO_INIT(.ram) 
         {   
-            .addr   = SHALBASE_RAMADDR,
-            .size   = SHALBASE_RAMSIZE
+            EO_INIT(.addr)  SHALBASE_RAMADDR,
+            EO_INIT(.size)  SHALBASE_RAMSIZE
         },
-        .storage    = 
+        EO_INIT(.storage) 
         {
-            .type   = SHALBASE_STGTYPE,
-            .size   = SHALBASE_STGSIZE,
-            .addr   = SHALBASE_STGADDR
+            EO_INIT(.type)  SHALBASE_STGTYPE,
+            EO_INIT(.size)  SHALBASE_STGSIZE,
+            EO_INIT(.addr)  SHALBASE_STGADDR
         },
-        .communication  = ee_commtype_none,
-        .name           = SHALBASE_NAME
+        EO_INIT(.communication)     ee_commtype_none,
+        EO_INIT(.name)              SHALBASE_NAME
     },
-    .protocols  =
+    EO_INIT(.protocols)
     {
-        .udpprotversion  = { .major = 0, .minor = 0},
-        .can1protversion = { .major = 0, .minor = 0},
-        .can2protversion = { .major = 0, .minor = 0},
-        .gtwprotversion  = { .major = 0, .minor = 0}
+        EO_INIT(.udpprotversion)    { EO_INIT(.major) 0, EO_INIT(.minor) 0},
+        EO_INIT(.can1protversion)   { EO_INIT(.major) 0, EO_INIT(.minor) 0},
+        EO_INIT(.can2protversion)   { EO_INIT(.major) 0, EO_INIT(.minor) 0},
+        EO_INIT(.gtwprotversion)    { EO_INIT(.major) 0, EO_INIT(.minor) 0}
     },
-    .extra      = {0}
+    EO_INIT(.extra) {0}
 };
 
 

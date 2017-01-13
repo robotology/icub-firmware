@@ -22,9 +22,15 @@
     @date       07/05/2011
 **/
 
+//#ifdef __cplusplus                                          
+//#warning ::: __cplusplus is defined: this file is COMPILED IN C++ MODE           
+//#endif
+
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
+
+#include "embOBJporting.h"
 
 #include "string.h"
 #include "eEmemorymap.h" 
@@ -75,14 +81,14 @@ typedef struct              // numer of bytes depends on many things. it is 792 
     eEmoduleInfo_t          procInfo[ee_procMaxNum];    // the process info
     eEmoduleInfo_t          shalInfo[ee_shalMaxNum];    // the shallib info
     // 24 + 64*8 + 64*4 =   792
-} partTable_t;              EECOMMON_VERIFYsizeof(partTable_t, 792);
+} partTable_t;              EECOMMON_VERIFYsizeof(partTable_t, 792)
 
 
 typedef struct              // 808B 
 {
     shalbaseDataHeader_t    head;   // 16B
     partTable_t             data;   // 792B
-} partTableStorage_t;       EECOMMON_VERIFYsizeof(partTableStorage_t, 808);
+} partTableStorage_t;       EECOMMON_VERIFYsizeof(partTableStorage_t, 808)
 
 
 
@@ -146,53 +152,53 @@ static volatile partTableStorage_t s_shalpart_tableStored = {0};
 
 static const eEmoduleInfo_t s_shalpart_moduleinfo =
 {
-    .info           =
+    EO_INIT(.info)
     {
-        .entity     =
+        EO_INIT(.entity)
         {
-            .type       = ee_entity_statlib,
-            .signature  = ee_shalSharServ | SHALPART_SIGN,
-            .version    = 
+            EO_INIT(.type)      ee_entity_statlib,
+            EO_INIT(.signature) ee_shalSharServ | SHALPART_SIGN,
+            EO_INIT(.version) 
             { 
-                .major = SHALPART_VER_MAJOR, 
-                .minor = SHALPART_VER_MINOR
+                EO_INIT(.major)     SHALPART_VER_MAJOR, 
+                EO_INIT(.minor)     SHALPART_VER_MINOR
             },  
-            .builddate  = 
+            EO_INIT(.builddate) 
             {
-                .year  = SHALPART_BUILDDATE_YEAR,
-                .month = SHALPART_BUILDDATE_MONTH,
-                .day   = SHALPART_BUILDDATE_DAY,
-                .hour  = SHALPART_BUILDDATE_HOUR,
-                .min   = SHALPART_BUILDDATE_MIN
+                EO_INIT(.year) SHALPART_BUILDDATE_YEAR,
+                EO_INIT(.month) SHALPART_BUILDDATE_MONTH,
+                EO_INIT(.day) SHALPART_BUILDDATE_DAY,
+                EO_INIT(.hour) SHALPART_BUILDDATE_HOUR,
+                EO_INIT(.min) SHALPART_BUILDDATE_MIN
             }
         },
-        .rom        = 
+        EO_INIT(.rom) 
         {   
-            .addr   = SHALPART_ROMADDR,
-            .size   = SHALPART_ROMSIZE
+            EO_INIT(.addr)  SHALPART_ROMADDR,
+            EO_INIT(.size)  SHALPART_ROMSIZE
         },
-        .ram        = 
+        EO_INIT(.ram) 
         {   
-            .addr   = SHALPART_RAMADDR,
-            .size   = SHALPART_RAMSIZE
+            EO_INIT(.addr)  SHALPART_RAMADDR,
+            EO_INIT(.size)  SHALPART_RAMSIZE
         },
-        .storage    = 
+        EO_INIT(.storage) 
         {
-            .type   = SHALPART_STGTYPE,
-            .size   = SHALPART_STGSIZE,
-            .addr   = SHALPART_STGADDR
+            EO_INIT(.type)  SHALPART_STGTYPE,
+            EO_INIT(.size)  SHALPART_STGSIZE,
+            EO_INIT(.addr)  SHALPART_STGADDR
         },
-        .communication  = ee_commtype_none,
-        .name           = SHALPART_NAME
+        EO_INIT(.communication) ee_commtype_none,
+        EO_INIT(.name)          SHALPART_NAME
     },
-    .protocols  =
+    EO_INIT(.protocols)
     {
-        .udpprotversion  = { .major = 0, .minor = 0},
-        .can1protversion = { .major = 0, .minor = 0},
-        .can2protversion = { .major = 0, .minor = 0},
-        .gtwprotversion  = { .major = 0, .minor = 0}
+        EO_INIT(.udpprotversion)    { EO_INIT(.major) 0, EO_INIT(.minor) 0},
+        EO_INIT(.can1protversion)   { EO_INIT(.major) 0, EO_INIT(.minor) 0},
+        EO_INIT(.can2protversion)   { EO_INIT(.major) 0, EO_INIT(.minor) 0},
+        EO_INIT(.gtwprotversion)    { EO_INIT(.major) 0, EO_INIT(.minor) 0}
     },
-    .extra      = {0}
+    EO_INIT(.extra) {0}
 };
 
 

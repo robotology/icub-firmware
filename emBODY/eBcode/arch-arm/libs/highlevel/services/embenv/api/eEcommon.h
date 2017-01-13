@@ -20,6 +20,10 @@
 #ifndef _EECOMMON_H_
 #define _EECOMMON_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       eEcommon.h
@@ -162,7 +166,7 @@ typedef struct
     uint32_t            day   : 5;     /**< the day from 1 to 31 */
     uint32_t            hour  : 5;     /**< the hour from 0 to 23 */
     uint32_t            min   : 6;     /**< the minute from 0 to 59 */
-} eEdate_t;             EECOMMON_VERIFYsizeof(eEdate_t, 4);
+} eEdate_t;             EECOMMON_VERIFYsizeof(eEdate_t, 4)
 
 
 /** @typedef    typedef struct eEversion_t
@@ -173,7 +177,7 @@ typedef struct
 {
     uint8_t             major;          /**< major number   */ 
     uint8_t             minor;          /**< minor number  */  
-} eEversion_t;          EECOMMON_VERIFYsizeof(eEversion_t, 2);
+} eEversion_t;          EECOMMON_VERIFYsizeof(eEversion_t, 2)
 
 
 /** @typedef    typedef enum eEmoduleType_t
@@ -197,7 +201,7 @@ typedef struct
 {
     uint32_t            addr;               /**< the address of memory */
     uint32_t            size;               /**< the size of memory */
-} eEsysmemory_t;        EECOMMON_VERIFYsizeof(eEsysmemory_t, 8);
+} eEsysmemory_t;        EECOMMON_VERIFYsizeof(eEsysmemory_t, 8)
 
 
 /** @typedef    typedef enum eEstorageType_t
@@ -221,7 +225,7 @@ typedef struct
     uint32_t            type   : 2;         /**< the type of storage medium: use eEstorageType_t */
     uint32_t            size   : 30;        /**< the size of storage medium */
     uint32_t            addr   : 32;        /**< the starting address of storage medium */
-} eEstorage_t;          EECOMMON_VERIFYsizeof(eEstorage_t, 8);
+} eEstorage_t;          EECOMMON_VERIFYsizeof(eEstorage_t, 8)
 
 
 /** @typedef    typedef enum eEcommunicationType_t
@@ -251,7 +255,7 @@ typedef struct
     eEversion_t         can1protversion;    /**< the protocol version of the can1 communication (non-zero if exists) */
     eEversion_t         can2protversion;    /**< the protocol version of the can2 communication (non-zero if exists) */
     eEversion_t         gtwprotversion;    /**< the protocol version of the gtw communication (non-zero if exists) */
-} eEprotocolInfo_t;     EECOMMON_VERIFYsizeof(eEprotocolInfo_t, 8);
+} eEprotocolInfo_t;     EECOMMON_VERIFYsizeof(eEprotocolInfo_t, 8)
 
 
 /** @typedef    typedef struct eEipnetwork_t
@@ -263,7 +267,7 @@ typedef struct
     eEmacaddr_t         macaddress;         /**< the mac address */
     eEipaddr_t          ipaddress;          /**< the ip address */
     eEipaddr_t          ipnetmask;          /**< the netmask */
-} eEipnetwork_t;        EECOMMON_VERIFYsizeof(eEipnetwork_t, 16);
+} eEipnetwork_t;        EECOMMON_VERIFYsizeof(eEipnetwork_t, 16)
 
 
 
@@ -274,7 +278,7 @@ typedef struct
 typedef struct          // 4 BYTES
 {
     eEcanaddr_t         idcan;
-} eEcannetwork_t;       EECOMMON_VERIFYsizeof(eEcannetwork_t, 4);
+} eEcannetwork_t;       EECOMMON_VERIFYsizeof(eEcannetwork_t, 4)
 
 
 /** @typedef    typedef enum eEtypeOfEntity_t
@@ -305,7 +309,7 @@ typedef struct
     eEenum08_t          signature;          /**< the signature of the entity. use enum values in eEprocess_t or eEsharlib_t or eEboard_t etc. */
     eEversion_t         version;            /**< the version of the entity w/ major + minor */
     eEdate_t            builddate;          /**< the build date of the entity */
-} eEentity_t;           EECOMMON_VERIFYsizeof(eEentity_t, 8);
+} eEentity_t;           EECOMMON_VERIFYsizeof(eEentity_t, 8)
 
 
 /** @typedef    typedef struct eEinfo_t
@@ -320,7 +324,7 @@ typedef struct
     eEstorage_t         storage;            /**< the storage available to the entity */
     uint8_t             communication;      /**< the supported communication types: use enum eEcommunicationType_t in | combination */
     uint8_t             name[15];           /**< a string containing a descriptive name of the entity */
-} eEinfo_t;             EECOMMON_VERIFYsizeof(eEinfo_t, 48);
+} eEinfo_t;             EECOMMON_VERIFYsizeof(eEinfo_t, 48)
         
 
 /** @typedef    typedef struct eEinfoBoard_t
@@ -332,7 +336,7 @@ typedef struct
     eEinfo_t            info;               /**< the extended info for the generic module   */
     uint64_t            uniqueid;           /**< a unique id for the board                  */
     uint8_t             extra[8];           /**< extra space for other information          */
-} eEboardInfo_t;        EECOMMON_VERIFYsizeof(eEboardInfo_t, 64);
+} eEboardInfo_t;        EECOMMON_VERIFYsizeof(eEboardInfo_t, 64)
 
 
 
@@ -345,7 +349,7 @@ typedef struct
     eEinfo_t            info;               /**< the extended info for the generic module                   */
     eEprotocolInfo_t    protocols;          /**< information on communication capabilities of the sw module */
     uint8_t             extra[8];           /**< extra space for other information.          */
-} eEmoduleInfo_t;       EECOMMON_VERIFYsizeof(eEmoduleInfo_t, 64);
+} eEmoduleInfo_t;       EECOMMON_VERIFYsizeof(eEmoduleInfo_t, 64)
 
 
 typedef struct                   
@@ -353,7 +357,7 @@ typedef struct
     eEmoduleInfo_t      moduleinfo;                 /**< normal moduleinfo. fill field extra[] with "EXT" to tell that it is a eEmoduleExtendedInfo_t object */
     char                compilationdatetime[24];    // it must keep macro expansion __DATE__ " " __TIME__ which is in format: Dec 01 2001 16:32:59
     uint8_t             userdefined[40];
-} eEmoduleExtendedInfo_t; EECOMMON_VERIFYsizeof(eEmoduleExtendedInfo_t, 128);
+} eEmoduleExtendedInfo_t; EECOMMON_VERIFYsizeof(eEmoduleExtendedInfo_t, 128)
 
 /** @typedef    typedef enum eEprocess_t
     @brief      eEprocess_t keep the allowed eProcesses in embENV.
@@ -408,7 +412,7 @@ typedef struct
     eEstorage_t         strg_ro_shar_brd;   /**< the storage is read only, shared, and keeps board info: board info */
     eEstorage_t         strg_rw_shar_brd;   /**< the storage is read write, shared, and its content depends on boards: device info */
     eEstorage_t         strg_rw_priv_app;   /**< the storage is read write, private, and its content depends on application: applic info */
-} eEbasicPartable_t;    EECOMMON_VERIFYsizeof(eEbasicPartable_t, 40);
+} eEbasicPartable_t;    EECOMMON_VERIFYsizeof(eEbasicPartable_t, 40)
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
@@ -429,6 +433,10 @@ extern eEresult_t ee_common_ipnetwork_clr(eEipnetwork_t* ntw, uint64_t uniqueid)
     end of group embenv 
  **/
 
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
 #endif  // include-guard
 
 

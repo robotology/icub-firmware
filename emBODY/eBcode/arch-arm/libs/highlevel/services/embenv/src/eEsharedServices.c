@@ -16,9 +16,15 @@
  * Public License for more details
 */
 
+//#ifdef __cplusplus                                          
+//#warning ::: __cplusplus is defined: this file is COMPILED IN C++ MODE           
+//#endif
+
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
+
+#include "embOBJporting.h"
 
 #include "string.h"
 #include "stdlib.h"
@@ -28,6 +34,8 @@
 #include "shalBASE.h"
 #include "shalPART.h"
 #include "shalINFO.h"
+
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -55,8 +63,8 @@ static void s_on_error(void)
 
 const sharserv_mode_t sharserv_mode_default =
 {
-    .onerror    = s_on_error,
-    .initmode   = sharserv_base_initmode_dontforcestorageinit  
+    EO_INIT(.onerror)       s_on_error,
+    EO_INIT(.initmode)      sharserv_base_initmode_dontforcestorageinit  
 };
 
 
@@ -99,9 +107,9 @@ static eEboolval_t s_sharserv_storage_is_valid(eEmoduleInfo_t* stored);
 
 const eEstorage_t s_sharserv_strg_info =
 {
-    .type   = ee_strg_eeprom,
-    .size   = sizeof(eEmoduleInfo_t),
-    .addr   = EENV_MEMMAP_SHARSERV_OWN_STGADDR    
+    EO_INIT(.type)      ee_strg_eeprom,
+    EO_INIT(.size)      sizeof(eEmoduleInfo_t),
+    EO_INIT(.addr)      EENV_MEMMAP_SHARSERV_OWN_STGADDR    
 };
 
 static eEmoduleInfo_t s_sharserv_moduleinfo_eeprom = {0};
@@ -116,53 +124,53 @@ static eEmoduleInfo_t s_sharserv_moduleinfo_eeprom = {0};
 
 static const eEmoduleInfo_t s_sharserv_moduleinfo   SHARSERV_MODULEINFO_PLACED_AT =
 {
-    .info           =
+    EO_INIT(.info)
     {
-        .entity     =
+        EO_INIT(.entity)
         {
-            .type       = SHARSERV_TYPE,
-            .signature  = ee_shalSharServ,
-            .version    = 
+            EO_INIT(.type)      SHARSERV_TYPE,
+            EO_INIT(.signature) ee_shalSharServ,
+            EO_INIT(.version) 
             { 
-                .major = SHARSERV_VER_MAJOR, 
-                .minor = SHARSERV_VER_MINOR
+                EO_INIT(.major) SHARSERV_VER_MAJOR, 
+                EO_INIT(.minor) SHARSERV_VER_MINOR
             },  
-            .builddate  = 
+            EO_INIT(.builddate) 
             {
-                .year  = SHARSERV_BUILDDATE_YEAR,
-                .month = SHARSERV_BUILDDATE_MONTH,
-                .day   = SHARSERV_BUILDDATE_DAY,
-                .hour  = SHARSERV_BUILDDATE_HOUR,
-                .min   = SHARSERV_BUILDDATE_MIN
+                EO_INIT(.year)  SHARSERV_BUILDDATE_YEAR,
+                EO_INIT(.month) SHARSERV_BUILDDATE_MONTH,
+                EO_INIT(.day)   SHARSERV_BUILDDATE_DAY,
+                EO_INIT(.hour) SHARSERV_BUILDDATE_HOUR,
+                EO_INIT(.min)   SHARSERV_BUILDDATE_MIN
             }
         },
-        .rom        = 
+        EO_INIT(.rom) 
         {   
-            .addr   = SHARSERV_ROMADDR,
-            .size   = SHARSERV_ROMSIZE
+            EO_INIT(.addr)  SHARSERV_ROMADDR,
+            EO_INIT(.size)  SHARSERV_ROMSIZE
         },
-        .ram        = 
+        EO_INIT(.ram) 
         {   
-            .addr   = SHARSERV_RAMADDR,
-            .size   = SHARSERV_RAMSIZE
+            EO_INIT(.addr)  SHARSERV_RAMADDR,
+            EO_INIT(.size)  SHARSERV_RAMSIZE
         },
-        .storage    = 
+        EO_INIT(.storage) 
         {
-            .type   = SHARSERV_STGTYPE,
-            .size   = SHARSERV_STGSIZE,
-            .addr   = SHARSERV_STGADDR
+            EO_INIT(.type)  SHARSERV_STGTYPE,
+            EO_INIT(.size)  SHARSERV_STGSIZE,
+            EO_INIT(.addr)  SHARSERV_STGADDR
         },
-        .communication  = ee_commtype_none,
-        .name           = SHARSERV_NAME
+        EO_INIT(.communication)     ee_commtype_none,
+        EO_INIT(.name)              SHARSERV_NAME
     },
-    .protocols  =
+    EO_INIT(.protocols)
     {
-        .udpprotversion  = { .major = 0, .minor = 0},
-        .can1protversion = { .major = 0, .minor = 0},
-        .can2protversion = { .major = 0, .minor = 0},
-        .gtwprotversion  = { .major = 0, .minor = 0}
+        EO_INIT(.udpprotversion)    { EO_INIT(.major) 0, EO_INIT(.minor) 0},
+        EO_INIT(.can1protversion)   { EO_INIT(.major) 0, EO_INIT(.minor) 0},
+        EO_INIT(.can2protversion)   { EO_INIT(.major) 0, EO_INIT(.minor) 0},
+        EO_INIT(.gtwprotversion)    { EO_INIT(.major) 0, EO_INIT(.minor) 0}
     },
-    .extra      = {0}
+    EO_INIT(.extra) {0}
 };
 
 // --------------------------------------------------------------------------------------------------------------------
