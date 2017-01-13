@@ -101,31 +101,34 @@ static void s_eo_encoderreader_read_encoders(void* p);
 
 static EOtheEncoderReader s_eo_theencoderreader = 
 {
-    .service = 
+    EO_INIT(.service) 
     {
-        .servconfig             = { .type = eomn_serv_NONE },
-        .initted                = eobool_false,
-        .active                 = eobool_false,
-        .activateafterverify    = eobool_false,
-        .started                = eobool_false,
-        .onverify               = NULL             
+        EO_INIT(.initted)               eobool_false,
+        EO_INIT(.active)                eobool_false,
+        EO_INIT(.activateafterverify)   eobool_false,
+        EO_INIT(.started)               eobool_false,
+        EO_INIT(.onverify)              NULL,
+        EO_INIT(.state)                 eomn_serv_state_notsupported,
+        EO_INIT(.tmpcfg)                NULL,
+        EO_INIT(.servconfig)            { EO_INIT(.type) eomn_serv_NONE },
     },
-    .diagnostics = 
+    EO_INIT(.diagnostics) 
     {
-        .reportTimer            = NULL,
-        .reportPeriod           = 0, // 10*EOK_reltime1sec, // with 0 we dont periodically report
-        .errorDescriptor        = {0},
-        .errorType              = eo_errortype_info,
-        .errorCallbackCount     = 0,
-        .repetitionOKcase       = 0 // 10 // with 0 we transmit report only once at succesful activation
-    },     
-    .arrayofjomodes             = { 0 },   
-    .waitreadtimer              = NULL,
-    .numofjomos                 = 0,
-    .numofencoders              = 0,
-    .errors                     = {encreader_err_NONE},
-    .failuremask                = 0,
-    .reader                     = NULL
+        EO_INIT(.reportTimer)           NULL,
+        EO_INIT(.reportPeriod)          0, // 10*EOK_reltime1sec, // with 0 we dont periodically report
+        EO_INIT(.errorDescriptor)       {0},
+        EO_INIT(.errorType)             eo_errortype_info,
+        EO_INIT(.errorCallbackCount)    0, 
+        EO_INIT(.repetitionOKcase)      0 // 10 // with 0 we transmit report only once at succesful activation
+    }, 
+    
+    EO_INIT(.arrayofjomodes)            { 0 },   
+    EO_INIT(.waitreadtimer)             NULL,
+    EO_INIT(.numofjomos)                0,
+    EO_INIT(.numofencoders)             0,
+    EO_INIT(.errors)                    {encreader_err_NONE},
+    EO_INIT(.failuremask)               0,
+    EO_INIT(.reader)                    NULL
 };
 
 static const char s_eobj_ownname[] = "EOtheEncoderReader";
@@ -337,7 +340,7 @@ extern eOresult_t eo_encoderreader_GetPrimaryEncoder(EOtheEncoderReader *p, uint
     
 
     
-    EOconstarray* carray = eo_constarray_Load((EOarray*)&s_eo_theencoderreader.arrayofjomodes);
+    EOconstarray* carray = eo_constarray_Load((const EOarray*)&s_eo_theencoderreader.arrayofjomodes);
     
     eOmc_jomo_descriptor_t *jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(carray, position);
     
@@ -402,7 +405,7 @@ static eOresult_t s_eo_encoderreader_onstop_verifyreading(void *par, eObool_t re
 {
     const eOmc_arrayof_4jomodescriptors_t * jomodes = (const eOmc_arrayof_4jomodescriptors_t *)par;
     
-    EOconstarray* carray = eo_constarray_Load((EOarray*)jomodes);    
+    EOconstarray* carray = eo_constarray_Load((const EOarray*)jomodes);    
 
 #if defined(EO_ENCODERREADER_ACTIVATE_EVEN_IF_READING_FAILS)
     eObool_t activateit = s_eo_theencoderreader.service.activateafterverify; 
@@ -500,7 +503,7 @@ static void s_eo_encoderreader_init_ereader(const eOmc_arrayof_4jomodescriptors_
 {   
     memcpy(&s_eo_theencoderreader.arrayofjomodes, jomodes, sizeof(eOmc_arrayof_4jomodescriptors_t));
     
-    EOconstarray* carray = eo_constarray_Load((EOarray*)&s_eo_theencoderreader.arrayofjomodes);
+    EOconstarray* carray = eo_constarray_Load((const EOarray*)&s_eo_theencoderreader.arrayofjomodes);
 
     uint8_t numofjomos = eo_constarray_Size(carray);
     s_eo_theencoderreader.numofjomos = numofjomos;

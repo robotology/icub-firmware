@@ -22,7 +22,9 @@
 #ifndef _EOTHEETHMONITOR_HID_H_
 #define _EOTHEETHMONITOR_HID_H_
 
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 // - external dependencies --------------------------------------------------------------------------------------------
@@ -72,7 +74,11 @@ struct EOtheETHmonitor_hid
 void eo_ethmonitor(void *p);
 
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

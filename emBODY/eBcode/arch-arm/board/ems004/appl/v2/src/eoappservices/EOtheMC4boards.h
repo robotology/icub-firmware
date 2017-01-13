@@ -21,6 +21,10 @@
 #ifndef _EOTHEMC4BOARDS_H_
 #define _EOTHEMC4BOARDS_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       EOtheMC4boards.h
@@ -133,7 +137,11 @@ extern eOmeas_torque_t eo_mc4boards_Convert_torque_S2I(EOtheMC4boards *p, uint8_
     end of group eo_EOtheMC4boards
  **/
 
-#endif  // include-guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

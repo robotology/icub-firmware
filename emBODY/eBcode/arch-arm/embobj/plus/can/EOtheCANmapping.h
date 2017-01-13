@@ -96,7 +96,7 @@ typedef struct
 {
     eObrd_canproperties_t       props;
     uint8_t                     indexofentity[2];   /**< at most two entities per board. use eObrd_caninsideindex_t for addressing array and use eOcanmap_entityindex_t as its value. */
-} eOcanmap_board_t;             EO_VERIFYsizeof(eOcanmap_board_t, 6); 
+} eOcanmap_board_t;             EO_VERIFYsizeof(eOcanmap_board_t, 6) 
 
 
 /**	@typedef    typedef struct eOcanmap_board_extended_t 
@@ -106,7 +106,7 @@ typedef struct
 {
     eOcanmap_board_t            board;
     eObrd_info_t                detected;
-} eOcanmap_board_extended_t;    EO_VERIFYsizeof(eOcanmap_board_extended_t, 12); 
+} eOcanmap_board_extended_t;    EO_VERIFYsizeof(eOcanmap_board_extended_t, 12) 
 
 
 /**	@typedef    typedef struct eOcanmap_entitydescriptor_t 

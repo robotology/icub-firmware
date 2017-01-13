@@ -63,8 +63,8 @@
 
 const eOmems_cfg_t eo_mems_DefaultCfg = 
 {
-    .priority           = 11,
-    .stacksize          = 1024
+    EO_INIT(.priority)          11,
+    EO_INIT(.stacksize)         1024
 };
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -102,20 +102,20 @@ static eObool_t s_eo_mems_deinit_gyro(void);
 
 static EOtheMEMS s_eo_themems = 
 {
-    .fifoofinertialdata     = NULL,
-    .semaphorefifo          = NULL,
-    .initted                = eobool_false,
-    .enabled                = eobool_false,
-    .newresultsavailable    = eobool_false,
-    .taskworker             = NULL,
-    .ticktimer              = NULL,
-    .config                 = 
+    EO_INIT(.fifoofinertialdata)    NULL,
+    EO_INIT(.semaphorefifo)         NULL,
+    EO_INIT(.initted)               eobool_false,
+    EO_INIT(.enabled)               eobool_false,
+    EO_INIT(.newresultsavailable)   eobool_false,
+    EO_INIT(.taskworker)            NULL,
+    EO_INIT(.ticktimer)             NULL,
+    EO_INIT(.config) 
     {
-        .sensor = mems_gyroscope_l3g4200,
-        .properties.gyroscope.range = hal_gyroscope_range_500dps,
-        .acquisitionrate = 50
+        EO_INIT(.sensor)                        mems_gyroscope_l3g4200,
+        EO_INIT(.properties.gyroscope.range)    hal_gyroscope_range_500dps,
+        EO_INIT(.acquisitionrate)               50
     },
-    .sensorisinitted        = eobool_false
+    EO_INIT(.sensorisinitted)       eobool_false
 };
 
 static const char s_eobj_ownname[] = "EOtheMEMS";
@@ -249,7 +249,7 @@ extern eOresult_t eo_mems_Get(EOtheMEMS *p, eOas_inertial_data_t* data, eOreltim
                 res = eores_OK;
                 if(NULL != sensor)
                 {
-                    *sensor = data->id;
+                    *sensor = (mems_gyroscope_l3g4200 == data->id) ? (mems_gyroscope_l3g4200) : (mems_gyroscope_l3g4200);
                 }
                 if(NULL != remaining)
                 {
@@ -338,7 +338,7 @@ extern eOresult_t eo_mems_Stop(EOtheMEMS *p)
 // name of the task as it is shown in uvision
 void eo_mems(void *p)
 {
-     eom_task_Start(p);
+     eom_task_Start((EOMtask*)p);
 }
 
 

@@ -26,7 +26,7 @@
 #include "EoCommon.h"
 
 #include "EOtheMemoryPool.h"
-#include "EOtheErrormanager.h"
+#include "EOtheErrorManager.h"
 
 
 #include "EOMtheEMStransceiver.h"
@@ -86,21 +86,21 @@
 
 const eOemsrunner_cfg_t eom_emsrunner_DefaultCfg = 
 {
-    .taskpriority               = {250,   251,    252},  
-    .taskstacksize              = {2048,  1024,   2048},
-    .haltimerstart              = {hal_timer2, hal_timer3, hal_timer4},    
-    .haltimeralert              = {hal_timer5, hal_timer6, hal_timer7},  
-    .period                     = 1000,  
-    .execRXafter                = 0, 
-    .safeRXexecutiontime        = 300,
-    .execDOafter                = 400, 
-    .safeDOexecutiontime        = 250,
-    .execTXafter                = 700,
-    .safeTXexecutiontime        = 250,    
-    .maxnumofRXpackets          = 3,
-    .maxnumofTXpackets          = 1,
-    .modeatstartup              = eo_emsrunner_mode_besteffort, //eo_emsrunner_mode_softrealtime //eo_emsrunner_mode_besteffort //eo_emsrunner_mode_softrealtime
-    .defaultTXdecimationfactor  = 1
+    EO_INIT(.taskpriority)              {250,   251,    252},  
+    EO_INIT(.taskstacksize)             {2048,  1024,   2048},
+    EO_INIT(.haltimerstart)             {hal_timer2, hal_timer3, hal_timer4},    
+    EO_INIT(.haltimeralert)             {hal_timer5, hal_timer6, hal_timer7},  
+    EO_INIT(.period)                    1000,  
+    EO_INIT(.execRXafter)               0, 
+    EO_INIT(.safeRXexecutiontime)       300,
+    EO_INIT(.execDOafter)               400, 
+    EO_INIT(.safeDOexecutiontime)       250,
+    EO_INIT(.execTXafter)               700,
+    EO_INIT(.safeTXexecutiontime)       250,    
+    EO_INIT(.maxnumofRXpackets)         3,
+    EO_INIT(.maxnumofTXpackets)         1,
+    EO_INIT(.modeatstartup)             eo_emsrunner_mode_besteffort, //eo_emsrunner_mode_softrealtime //eo_emsrunner_mode_besteffort //eo_emsrunner_mode_softrealtime
+    EO_INIT(.defaultTXdecimationfactor) 1
 };
 
 
@@ -187,25 +187,25 @@ static const char s_eobj_ownname[] = "EOMtheEMSrunner";
  
 static EOMtheEMSrunner s_theemsrunner = 
 {
-    .cfg                    = {0},
-    .task                   = {NULL, NULL, NULL},
-    .event                  = eo_sm_emsappl_EVdummy,
-    .osaltimer              = NULL,
-    .haltimer_start         = {hal_timer2, hal_timer3, hal_timer4},
-    .haltimer_safestop         = {hal_timer5, hal_timer6, hal_timer7},
-    .numofrxpackets         = 0,  
-    .numofrxrops            = 0,
-    .numoftxpackets         = 0,
-    .numoftxrops            = 0,
-    .mode                   = eo_emsrunner_mode_softrealtime,
-    .numofpacketsinsidesocket = 0,
-    .waitudptxisdone        = NULL,
-    .osaltaskipnetexec      = NULL,
-    .usedTXdecimationfactor = 1,
-    .txropsnumberincycle    = {0, 0, 0},
-    .txcan1frames           = 0,
-    .txcan2frames           = 0,
-    .cycletiming            = { .cycleisrunning = eobool_false, .iterationnumber = 0, { {.timestarted = 0, .timestopped = 0, .duration = {0, 0}, .isexecuting = eobool_false, .isabout2overflow = eobool_false, .isoverflown = eobool_false} } } 
+    EO_INIT(.cfg)                   {0},
+    EO_INIT(.task)                  {NULL, NULL, NULL},
+    EO_INIT(.event)                 eo_sm_emsappl_EVdummy,
+    EO_INIT(.osaltimer)             NULL,
+    EO_INIT(.haltimer_start)        {hal_timer2, hal_timer3, hal_timer4},
+    EO_INIT(.haltimer_safestop)     {hal_timer5, hal_timer6, hal_timer7},
+    EO_INIT(.numofrxpackets)        0,  
+    EO_INIT(.numofrxrops)           0,
+    EO_INIT(.numoftxpackets)        0,
+    EO_INIT(.numoftxrops)           0,
+    EO_INIT(.mode)                  eo_emsrunner_mode_softrealtime,
+    EO_INIT(.numofpacketsinsidesocket) 0,
+    EO_INIT(.waitudptxisdone)       NULL,
+    EO_INIT(.osaltaskipnetexec)     NULL,
+    EO_INIT(.usedTXdecimationfactor) 1,
+    EO_INIT(.txropsnumberincycle)   {0, 0, 0},
+    EO_INIT(.txcan1frames)          0,
+    EO_INIT(.txcan2frames)          0,
+    EO_INIT(.cycletiming)           { EO_INIT(.cycleisrunning) eobool_false, EO_INIT(.iterationnumber) 0, { {EO_INIT(.timestarted) 0, EO_INIT(.timestopped) 0, EO_INIT(.duration) {0, 0}, EO_INIT(.isexecuting) eobool_false, EO_INIT(.isabout2overflow) eobool_false, EO_INIT(.isoverflown) eobool_false} } } 
 };
 
 
@@ -548,32 +548,32 @@ extern void eom_emsrunner_OnUDPpacketTransmitted(EOMtheEMSrunner *p)
 extern void tskEMSrunRX(void *p)
 {
     // do here whatever you like before startup() is executed and then forever()
-    eom_task_Start(p);
+    eom_task_Start((EOMtask*)p);
 } 
 
 
 extern void tskEMSrunDO(void *p)
 {
     // do here whatever you like before startup() is executed and then forever()
-    eom_task_Start(p);
+    eom_task_Start((EOMtask*)p);
 } 
 
 
 extern void tskEMSrunTX(void *p)
 {
     // do here whatever you like before startup() is executed and then forever()
-    eom_task_Start(p);
+    eom_task_Start((EOMtask*)p);
 } 
 
 
 
-__weak extern void eom_emsrunner_hid_userdef_onemstransceivererror(EOMtheEMStransceiver *p)
+EO_weak extern void eom_emsrunner_hid_userdef_onemstransceivererror(EOMtheEMStransceiver *p)
 {
 
 }
 
 
-__weak extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(EOMtheEMSrunner *p)
+EO_weak extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramreception(EOMtheEMSrunner *p)
 {
     eObool_t itissafetoquit_asap = eobool_false;
     
@@ -588,7 +588,7 @@ __weak extern void eom_emsrunner_hid_userdef_taskRX_activity_beforedatagramrecep
 }
 
 
-__weak extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOMtheEMSrunner *p)
+EO_weak extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramreception(EOMtheEMSrunner *p)
 {
     eObool_t itissafetoquit_asap = eobool_false;
     
@@ -603,7 +603,7 @@ __weak extern void eom_emsrunner_hid_userdef_taskRX_activity_afterdatagramrecept
 }
 
 
-__weak extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
+EO_weak extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
 {
     eObool_t itissafetoquit_asap = eobool_false;
     
@@ -619,7 +619,7 @@ __weak extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
 
 
 
-__weak extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission(EOMtheEMSrunner *p)
+EO_weak extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtransmission(EOMtheEMSrunner *p)
 {
     eObool_t itissafetoquit_asap = eobool_false;
     
@@ -636,7 +636,7 @@ __weak extern void eom_emsrunner_hid_userdef_taskTX_activity_beforedatagramtrans
 
 
 
-__weak extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(EOMtheEMSrunner *p)
+EO_weak extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(EOMtheEMSrunner *p)
 {
     eObool_t itissafetoquit_asap = eobool_false;
     
@@ -652,7 +652,7 @@ __weak extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransm
 
 
 
-__weak extern void eom_emsrunner_hid_userdef_onfailedtransmission(EOMtheEMSrunner *p)
+EO_weak extern void eom_emsrunner_hid_userdef_onfailedtransmission(EOMtheEMSrunner *p)
 {
     char str[64];
     eOerrmanErrorType_t errortype = (eo_emsrunner_mode_hardrealtime == p->mode) ? (eo_errortype_error) : (eo_errortype_warning);
@@ -1115,12 +1115,12 @@ static void s_eom_emsrunner_6HALTIMERS_start_periodic_timer_safestop_check(void 
     
     hal_timer_cfg_t periodic_cfg  = 
     {
-        .prescaler          = hal_timer_prescalerAUTO,         
-        .countdown          = 0,
-        .priority           = hal_int_priority02,
-        .mode               = hal_timer_mode_periodic,
-        .callback_on_exp    = NULL,
-        .arg                = NULL
+        EO_INIT(.prescaler)         hal_timer_prescalerAUTO,         
+        EO_INIT(.countdown)         0,
+        EO_INIT(.priority)          hal_int_priority02,
+        EO_INIT(.mode)              hal_timer_mode_periodic,
+        EO_INIT(.callback_on_exp)   NULL,
+        EO_INIT(.arg)               NULL
     }; 
 
     periodic_cfg.countdown         = s_theemsrunner.cfg.period;
@@ -1137,12 +1137,12 @@ static void s_eom_emsrunner_6HALTIMERS_start_periodic_timer_execute_task(void *a
     
     hal_timer_cfg_t periodic_cfg  = 
     {
-        .prescaler          = hal_timer_prescalerAUTO,         
-        .countdown          = 0,
-        .priority           = hal_int_priority02,
-        .mode               = hal_timer_mode_periodic,
-        .callback_on_exp    = NULL,
-        .arg                = NULL
+        EO_INIT(.prescaler)         hal_timer_prescalerAUTO,         
+        EO_INIT(.countdown)         0,
+        EO_INIT(.priority)          hal_int_priority02,
+        EO_INIT(.mode)              hal_timer_mode_periodic,
+        EO_INIT(.callback_on_exp)   NULL,
+        EO_INIT(.arg)               NULL
     }; 
 
     periodic_cfg.countdown         = s_theemsrunner.cfg.period;
@@ -1289,15 +1289,16 @@ static void s_eom_emsrunner_6HALTIMERS_start(EOMtheEMSrunner *p)
     {
         eOemsrunner_cfg_t* cfg = &p->cfg;
         
-        hal_timer_cfg_t oneshot_cfg  = 
+        hal_timer_cfg_t oneshot_cfg = 
         {
-            .prescaler          = hal_timer_prescalerAUTO,         
-            .countdown          = 0,
-            .priority           = hal_int_priority02,
-            .mode               = hal_timer_mode_oneshot,
-            .callback_on_exp    = s_eom_emsrunner_6HALTIMERS_start_periodic_timer_execute_task,
-            .arg                = NULL
+            EO_INIT(.prescaler)         hal_timer_prescalerAUTO,         
+            EO_INIT(.countdown)         0,
+            EO_INIT(.priority)          hal_int_priority02,
+            EO_INIT(.mode)              hal_timer_mode_oneshot,
+            EO_INIT(.callback_on_exp)   s_eom_emsrunner_6HALTIMERS_start_periodic_timer_execute_task,
+            EO_INIT(.arg)               NULL
         }; 
+        
                
         
         // timer for task rx
@@ -1418,7 +1419,4 @@ extern eObool_t eom_runner_cansafelyexecute(EOMtheEMSrunner *p, eOemsrunner_task
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------
-
-
-
 

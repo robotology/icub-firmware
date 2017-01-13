@@ -134,7 +134,7 @@ static eOcanmap_board_extended_t ** s_eo_canmap_canmapcfg_boards[2] =
 {   
     (eOcanmap_board_extended_t **)&s_eo_canmap_boards_can1,   
     (eOcanmap_board_extended_t **)&s_eo_canmap_boards_can2
-};  EO_VERIFYsizeof(s_eo_canmap_canmapcfg_boards, 2*sizeof(eOcanmap_board_extended_t **));   
+};  EO_VERIFYsizeof(s_eo_canmap_canmapcfg_boards, 2*sizeof(eOcanmap_board_extended_t **))   
 
 
 static eOcanmap_board_extended_t * s_eo_canmap_boards_mc_jomo[eocanmap_joints_maxnumberof] = {NULL};
@@ -183,16 +183,16 @@ static eOcanmap_board_extended_t ** s_eo_canmap_canmapcfg_skin[eocanmap_skins_ma
 
 static EOtheCANmapping s_eo_canmap_singleton = 
 {
-	.config             =
+	EO_INIT(.config)
     {   
         0
     },
-    .canmapping             = NULL,
-    .entitylocation         = NULL,
-    .skinlocation           = NULL,
-    .numofskinboardsindex   = {0, 0},
-//    .arrayofboardlocations  = {0},
-    .tobedefined            = 0
+    EO_INIT(.canmapping) NULL,
+    EO_INIT(.entitylocation) NULL,
+    EO_INIT(.skinlocation) NULL,
+    EO_INIT(.numofskinboardsindex) {0, 0},
+//    EO_INIT(.arrayofboardlocations) {0},
+    EO_INIT(.tobedefined) 0
 };
 
 
@@ -968,7 +968,7 @@ extern eOresult_t eo_canmap_GetEntityLocation(EOtheCANmapping *p, eOprotID32_t i
 //    uint64_t    b13 : 4;
 //    uint64_t    b14 : 4;
 //    uint64_t    b15 : 4;
-//} eOcanmap_compact_address_list_t;  EO_VERIFYsizeof(eOcanmap_compact_address_list_t, 8); 
+//} eOcanmap_compact_address_list_t;  EO_VERIFYsizeof(eOcanmap_compact_address_list_t, 8) 
 //
 //extern eOresult_t eo_canmap_GetCompactAddressList(EOtheCANmapping *p, eOcanport_t port, eOcanmap_compact_address_list_t *addresslist, uint8_t *numofboards)
 //{

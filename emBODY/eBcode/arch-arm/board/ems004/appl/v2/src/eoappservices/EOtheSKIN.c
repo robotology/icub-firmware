@@ -21,6 +21,9 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
+#include "EOtheServices.h"
+#include "EOtheServices_hid.h"
+
 #include "stdlib.h"
 #include "string.h"
 
@@ -96,39 +99,41 @@ static eObool_t s_eo_skin_isID32relevant(uint32_t id32);
         
 static EOtheSKIN s_eo_theskin = 
 {
-    .service = 
+    EO_INIT(.service) 
     {
-        .servconfig             = { .type = eomn_serv_NONE },
-        .initted                = eobool_false,
-        .active                 = eobool_false,
-        .activateafterverify    = eobool_false,
-        .started                = eobool_false,
-        .onverify               = NULL,
-        .state                  = eomn_serv_state_notsupported       
+        EO_INIT(.initted)               eobool_false,
+        EO_INIT(.active)                eobool_false,
+        EO_INIT(.activateafterverify)   eobool_false,
+        EO_INIT(.started)               eobool_false,
+        EO_INIT(.onverify)              NULL,
+        EO_INIT(.state)                 eomn_serv_state_notsupported,
+        EO_INIT(.tmpcfg)                NULL,
+        EO_INIT(.servconfig)            { EO_INIT(.type) eomn_serv_NONE },
     },
-    .diagnostics = 
+    EO_INIT(.diagnostics) 
     {
-        .reportTimer            = NULL,
-        .reportPeriod           = 0, // 10*EOK_reltime1sec, // with 0 we dont periodically report
-        .errorDescriptor        = {0},
-        .errorType              = eo_errortype_info,
-        .errorCallbackCount     = 0,
-        .repetitionOKcase       = 0 // 10 // with 0 we transmit report only once at succesful activation
+        EO_INIT(.reportTimer)           NULL,
+        EO_INIT(.reportPeriod)          0, // 10*EOK_reltime1sec, // with 0 we dont periodically report
+        EO_INIT(.errorDescriptor)       {0},
+        EO_INIT(.errorType)             eo_errortype_info,
+        EO_INIT(.errorCallbackCount)    0, 
+        EO_INIT(.repetitionOKcase)      0 // 10 // with 0 we transmit report only once at succesful activation
     },     
-    .sharedcan =
+    EO_INIT(.sharedcan)
     {
-        .boardproperties        = NULL,
-        .entitydescriptor       = NULL,
-        .discoverytarget        = {0},
-        .ondiscoverystop        = {0},
-        .command                = {0}, 
-    },
-    .patchisrunning             = { eobool_false },    
-    .numofskinpatches           = 0,
-    .numofmtbs                  = 0,    
-    .rxdata                     = { NULL },
-    .skinpatches                = { NULL },
-    .id32ofregulars             = NULL
+        EO_INIT(.boardproperties)       NULL,
+        EO_INIT(.entitydescriptor)      NULL,
+        EO_INIT(.discoverytarget)       {0},
+        EO_INIT(.ondiscoverystop)       {0},
+        EO_INIT(.command)               {0}, 
+    },   
+    
+    EO_INIT(.patchisrunning)            { eobool_false },    
+    EO_INIT(.numofskinpatches)          0,
+    EO_INIT(.numofmtbs)                 0,    
+    EO_INIT(.rxdata)                    { NULL },
+    EO_INIT(.skinpatches)               { NULL },
+    EO_INIT(.id32ofregulars)            NULL
 };
 
 static const char s_eobj_ownname[] = "EOtheSKIN";
@@ -432,19 +437,15 @@ extern eOresult_t eo_skin_Activate(EOtheSKIN *p, const eOmn_serv_configuration_t
         }
         
         // now i must add all the mtb boards. i iterate per patch and then per canbus
-        
-        eObrd_canproperties_t prop = 
-        {
-            .type               = eobrd_cantype_mtb, 
-            .location           = { .port = 0, .addr = 0, .insideindex = eobrd_caninsideindex_none },
-            .requiredprotocol   = { .major = servcfg->data.sk.skin.version.protocol.major, .minor = servcfg->data.sk.skin.version.protocol.minor }
-        };  
-        
-        eOcanmap_entitydescriptor_t des = 
-        {
-            .location   = { .port = 0, .addr = 0, .insideindex = eobrd_caninsideindex_none },
-            .index      = entindexNONE
-        };        
+        eObrd_canproperties_t prop = {0};
+        prop.type = eobrd_cantype_mtb;
+        prop.location.port = 0;
+        prop.location.addr = 0;
+        prop.location.insideindex = eobrd_caninsideindex_none;
+        prop.requiredprotocol.major = servcfg->data.sk.skin.version.protocol.major;
+        prop.requiredprotocol.minor = servcfg->data.sk.skin.version.protocol.minor;
+                          
+        eOcanmap_entitydescriptor_t des = {0};      
         
         p->numofmtbs = 0;
         
@@ -690,7 +691,7 @@ extern eOresult_t eo_skin_SetMode(EOtheSKIN *p, uint8_t patchindex, eOsk_sigmode
         return(eores_NOK_generic);
     }
         
-    p->sharedcan.command.class = eocanprot_msgclass_pollingSkin;    
+    p->sharedcan.command.clas = eocanprot_msgclass_pollingSkin;    
     p->sharedcan.command.type  = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;
     p->sharedcan.command.value = NULL;   
 
@@ -725,7 +726,7 @@ extern eOresult_t eo_skin_SetMode(EOtheSKIN *p, uint8_t patchindex, eOsk_sigmode
         case eosk_sigmode_signal_oldway:
         {
             // we need to change the class and type as well
-            p->sharedcan.command.class = eocanprot_msgclass_pollingSkin;    
+            p->sharedcan.command.clas = eocanprot_msgclass_pollingSkin;    
             p->sharedcan.command.type  = ICUBCANPROTO_POL_SK_CMD__TACT_SETUP;
             p->sharedcan.command.value = NULL;     
             // and now we send the command to all the skin boards
@@ -758,7 +759,7 @@ extern eOresult_t eo_skin_SetMode(EOtheSKIN *p, uint8_t patchindex, eOsk_sigmode
 //                {
 //                    eOicubCanProto_msgCommand_t msgCmd2 = 
 //                    {
-//                        EO_INIT(.class) icubCanProto_msgCmdClass_skinBoard,
+//                        EO_INIT(.clas) icubCanProto_msgCmdClass_skinBoard,
 //                        EO_INIT(.cmdId) ICUBCANPROTO_POL_SK_CMD__TACT_SETUP2
 //                    };
 //                    
@@ -806,12 +807,12 @@ extern eOresult_t eo_skin_SetBoardsConfig(EOtheSKIN *p, uint8_t patchindex, eOsk
     
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_skin, eoprot_entity_sk_skin, patchindex, eoprot_tag_none);
     
-    icubCanProto_skinboard_config_t canProto_skcfg = {.skintype = icubCanProto_skinType__withtempcomp, .period = 0, .noload = 0};
+    icubCanProto_skinboard_config_t canProto_skcfg;
     canProto_skcfg.skintype = (icubCanProto_skinType_t)brdcfg->cfg.skintype; 
     canProto_skcfg.period   = brdcfg->cfg.period;
     canProto_skcfg.noload   = brdcfg->cfg.noload;
     
-    p->sharedcan.command.class = eocanprot_msgclass_pollingSkin;    
+    p->sharedcan.command.clas = eocanprot_msgclass_pollingSkin;    
     p->sharedcan.command.type  = ICUBCANPROTO_POL_SK_CMD__SET_BRD_CFG;
     p->sharedcan.command.value = &canProto_skcfg; 
 //    #error --> change so that we send the command to all boards of given address .... if they are in patch....
@@ -857,7 +858,7 @@ extern eOresult_t eo_skin_SetTrianglesConfig(EOtheSKIN *p, uint8_t patchindex, e
     canProto_trgscfg.CDCoffset = trgcfg->cfg.CDCoffset;
     
     
-    p->sharedcan.command.class = eocanprot_msgclass_pollingSkin;    
+    p->sharedcan.command.clas = eocanprot_msgclass_pollingSkin;    
     p->sharedcan.command.type  = ICUBCANPROTO_POL_SK_CMD__SET_TRIANG_CFG;
     p->sharedcan.command.value = &canProto_trgscfg; 
     
@@ -1040,7 +1041,7 @@ static eOresult_t s_eo_skin_TXstop(EOtheSKIN *p)
     // now, i do things. 
     
     icubCanProto_as_sigmode_t sigmode = icubCanProto_as_sigmode_dontsignal;
-    p->sharedcan.command.class = eocanprot_msgclass_pollingSkin;
+    p->sharedcan.command.clas = eocanprot_msgclass_pollingSkin;
     p->sharedcan.command.type  = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;       
     p->sharedcan.command.value = &sigmode;
 

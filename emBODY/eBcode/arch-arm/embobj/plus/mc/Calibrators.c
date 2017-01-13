@@ -259,7 +259,7 @@ static eOresult_t JointSet_do_wait_calibration_7_singleJoint(Joint *j, Motor* m,
             {
                 //// debug code
                 char info[80];
-                sprintf(info,"calib7:outLim: cp%d mx%.1f mn%.1f",curr_pos, j->pos_max, j->pos_min);
+                snprintf(info, sizeof(info), "calib7:outLim: cp%d mx%.1f mn%.1f",curr_pos, j->pos_max, j->pos_min);
                 JointSet_send_debug_message(info, j->ID);
                 ////debug code ended
 

@@ -110,19 +110,19 @@ extern void eo_emsController_hid_userdef_config_motor(EOemsController* ctrl, uin
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, motor, 0);
     
     eOcanprot_command_t cmdPid;
-    cmdPid.class = eocanprot_msgclass_pollingMotorControl;
+    cmdPid.clas = eocanprot_msgclass_pollingMotorControl;
     cmdPid.type = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID;
     cmdPid.value = KpKiKdKs;
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdPid, id32);
     
     eOcanprot_command_t cmdMaxCurrent;
-    cmdMaxCurrent.class = eocanprot_msgclass_pollingMotorControl;
+    cmdMaxCurrent.clas = eocanprot_msgclass_pollingMotorControl;
     cmdMaxCurrent.type = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT;
     cmdMaxCurrent.value = &max_current;
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdMaxCurrent, id32);
 
     eOcanprot_command_t cmdMotorConfig;
-    cmdMotorConfig.class = eocanprot_msgclass_pollingMotorControl;
+    cmdMotorConfig.clas = eocanprot_msgclass_pollingMotorControl;
     cmdMotorConfig.type = ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_CONFIG;
     cmdMotorConfig.value = motor_config;
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdMotorConfig, id32);      
@@ -136,7 +136,7 @@ extern void eo_emsController_hid_userdef_set_motor_idle(EOemsController* ctrl, u
 
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, motor, 0);
     eOcanprot_command_t command = {0};
-    command.class = eocanprot_msgclass_pollingMotorControl;
+    command.clas = eocanprot_msgclass_pollingMotorControl;
     command.type  = ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE;
     command.value = &controlmode_2foc;
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);
@@ -150,7 +150,7 @@ extern void eo_emsController_hid_userdef_force_motor_idle(EOemsController* ctrl,
     
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, motor, 0);
     eOcanprot_command_t command = {0};
-    command.class = eocanprot_msgclass_pollingMotorControl;
+    command.clas = eocanprot_msgclass_pollingMotorControl;
     command.type  = ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE;
     command.value = &controlmode_2foc;
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);
@@ -168,7 +168,7 @@ extern void eo_emsController_hid_userdef_set_motor_running(EOemsController* ctrl
     
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, motor, 0);
     eOcanprot_command_t command = {0};
-    command.class = eocanprot_msgclass_pollingMotorControl;
+    command.clas = eocanprot_msgclass_pollingMotorControl;
     command.type  = ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE;
     command.value = &controlmode_2foc;
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);

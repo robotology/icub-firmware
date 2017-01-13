@@ -84,7 +84,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-__weak extern eObool_t eocanprotINperiodic_redefinable_SkipParsingOf_ANY_PERIODIC_INERTIAL_MSG(eOcanframe_t *frame, eOcanport_t port)
+EO_weak extern eObool_t eocanprotINperiodic_redefinable_SkipParsingOf_ANY_PERIODIC_INERTIAL_MSG(eOcanframe_t *frame, eOcanport_t port)
 {
     return(eobool_false);
 }

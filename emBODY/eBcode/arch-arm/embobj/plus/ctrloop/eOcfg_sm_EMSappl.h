@@ -20,7 +20,9 @@
 #ifndef _EOCFG_SM_EMSAPPL_H_
 #define _EOCFG_SM_EMSAPPL_H_
 
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 /** @file       eOcfg_sm_EMSappl.h
@@ -105,6 +107,10 @@ extern const eOsm_cfg_t * eo_cfg_sm_EMSappl_Get(void);
 /** @}            
     end of group eo_theex2smconfig  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

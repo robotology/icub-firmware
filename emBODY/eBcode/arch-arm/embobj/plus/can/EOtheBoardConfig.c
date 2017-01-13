@@ -34,7 +34,6 @@
 #include "EOtheCANmapping.h"
 #include "EOappEncodersReader.h"
 
-//#include "EOmcController.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -62,7 +61,11 @@
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-
+#ifdef __cplusplus
+#error DONT USE C++ for this file. Use --c99 instead.
+#else
+#warning GOOD: using --c99 for this file which is full of ...
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions

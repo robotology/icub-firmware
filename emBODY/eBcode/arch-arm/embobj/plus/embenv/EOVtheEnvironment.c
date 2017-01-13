@@ -72,7 +72,7 @@ static const char s_eobj_ownname[] = "EOVtheEnvironment";
 
 static EOVtheEnvironment s_eov_environment = 
 {
-    .vtable     = {NULL}
+    EO_INIT(.vtable)    {NULL}
 };
 
 
@@ -97,7 +97,7 @@ extern eOresult_t eov_env_SharedData_Synchronise(EOVtheEnvironmentDerived *p)
     EOVtheEnvironment *env;
     eOres_fp_voidp_t fptr;
 
-    if(NULL == (env = eo_common_getbaseobject(p))) 
+    if(NULL == (env = (EOVtheEnvironment*)eo_common_getbaseobject(p))) 
     {
         return(eores_NOK_nullpointer);    
     }
@@ -114,7 +114,7 @@ extern eOresult_t eov_env_ProcessOffset_Get(EOVtheEnvironmentDerived *p, uint32_
     EOVtheEnvironment *env;
     eOres_fp_voidp_uint32p_t fptr;
 
-    if(NULL == (env = eo_common_getbaseobject(p))) 
+    if(NULL == (env = (EOVtheEnvironment*)eo_common_getbaseobject(p))) 
     {
         return(eores_NOK_nullpointer);    
     }
@@ -132,7 +132,7 @@ extern eOresult_t eov_env_RunningEprocess_Get(EOVtheEnvironmentDerived *p, eEpro
     EOVtheEnvironment *env;
     eOres_fp_voidp_uint8p_t fptr;
 
-    if(NULL == (env = eo_common_getbaseobject(p))) 
+    if(NULL == (env = (EOVtheEnvironment*)eo_common_getbaseobject(p))) 
     {
         return(eores_NOK_nullpointer);    
     }
@@ -149,7 +149,7 @@ extern eOresult_t eov_env_IPnetwork_Get(EOVtheEnvironmentDerived *p, const eEipn
     EOVtheEnvironment *env;
     eOres_fp_voidp_cvoidpp_t fptr;
 
-    if(NULL == (env = eo_common_getbaseobject(p))) 
+    if(NULL == (env = (EOVtheEnvironment*)eo_common_getbaseobject(p))) 
     {
         return(eores_NOK_nullpointer);    
     }
@@ -166,7 +166,7 @@ extern eOresult_t eov_env_CANnetworks_Get(EOVtheEnvironmentDerived *p, const eEc
     EOVtheEnvironment *env;
     eOres_fp_voidp_cvoidpp_uint8p_t fptr;
 
-    if(NULL == (env = eo_common_getbaseobject(p))) 
+    if(NULL == (env = (EOVtheEnvironment*)eo_common_getbaseobject(p))) 
     {
         return(eores_NOK_nullpointer);    
     }
@@ -204,11 +204,11 @@ extern EOVtheEnvironment * eov_env_hid_Initialise(eOres_fp_voidp_t shareddata_sy
     eo_errman_Assert(eo_errman_GetHandle(), NULL != eproc_get, "eov_env_hid_Initialise(): NULL eproc_get", s_eobj_ownname, &eo_errman_DescrWrongParamLocal);
 
 
-    s_eov_environment.vtable[VF00_env_shareddata_sync]          = shareddata_sync;
-    s_eov_environment.vtable[VF01_env_proc_offset_get]          = proc_offset_get;
-    s_eov_environment.vtable[VF02_env_ipnet_get]                = ipnet_get;
-    s_eov_environment.vtable[VF03_env_cannets_get]              = cannets_get;
-    s_eov_environment.vtable[VF04_env_eproc_get]                = eproc_get;
+    s_eov_environment.vtable[VF00_env_shareddata_sync]          = (void*) shareddata_sync;
+    s_eov_environment.vtable[VF01_env_proc_offset_get]          = (void*) proc_offset_get;
+    s_eov_environment.vtable[VF02_env_ipnet_get]                = (void*) ipnet_get;
+    s_eov_environment.vtable[VF03_env_cannets_get]              = (void*) cannets_get;
+    s_eov_environment.vtable[VF04_env_eproc_get]                = (void*) eproc_get;
 
 
     return(&s_eov_environment);   

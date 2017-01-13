@@ -21,6 +21,10 @@
 #ifndef _EOTHEMEMS_H_
 #define _EOTHEMEMS_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       EOtheMEMS.h
@@ -114,7 +118,11 @@ extern eOresult_t eo_mems_Stop(EOtheMEMS *p);
     end of group eo_EOtheMEMS
  **/
 
-#endif  // include-guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

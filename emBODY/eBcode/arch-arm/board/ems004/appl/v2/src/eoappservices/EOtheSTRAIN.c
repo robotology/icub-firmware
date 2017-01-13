@@ -21,6 +21,8 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
+#include "EOtheServices_hid.h"
+
 #include "stdlib.h"
 #include "string.h"
 
@@ -100,37 +102,39 @@ static void s_eo_strain_send_diagnostic_on_transmissioninterruption(void);
 
 static EOtheSTRAIN s_eo_thestrain = 
 {
-    .service = 
+    EO_INIT(.service) 
     {
-        .servconfig             = { .type = eomn_serv_NONE },
-        .initted                = eobool_false,
-        .active                 = eobool_false,
-        .activateafterverify    = eobool_false,
-        .started                = eobool_false,
-        .onverify               = NULL,
-        .state                  = eomn_serv_state_notsupported         
+        EO_INIT(.initted)               eobool_false,
+        EO_INIT(.active)                eobool_false,
+        EO_INIT(.activateafterverify)   eobool_false,
+        EO_INIT(.started)               eobool_false,
+        EO_INIT(.onverify)              NULL,
+        EO_INIT(.state)                 eomn_serv_state_notsupported,
+        EO_INIT(.tmpcfg)                NULL,
+        EO_INIT(.servconfig)            { EO_INIT(.type) eomn_serv_NONE },
     },
-    .diagnostics = 
+    EO_INIT(.diagnostics) 
     {
-        .reportTimer            = NULL,
-        .reportPeriod           = 0, // 10*EOK_reltime1sec, // with 0 we dont periodically report
-        .errorDescriptor        = {0},
-        .errorType              = eo_errortype_info,
-        .errorCallbackCount     = 0,
-        .repetitionOKcase       = 0 // 10 // with 0 we transmit report only once at succesful activation
+        EO_INIT(.reportTimer)           NULL,
+        EO_INIT(.reportPeriod)          0, // 10*EOK_reltime1sec, // with 0 we dont periodically report
+        EO_INIT(.errorDescriptor)       {0},
+        EO_INIT(.errorType)             eo_errortype_info,
+        EO_INIT(.errorCallbackCount)    0, 
+        EO_INIT(.repetitionOKcase)      0 // 10 // with 0 we transmit report only once at succesful activation
     },     
-    .sharedcan =
+    EO_INIT(.sharedcan)
     {
-        .boardproperties        = NULL,
-        .entitydescriptor       = NULL,
-        .discoverytarget        = {0},
-        .ondiscoverystop        = {0},
-        .command                = {0}, 
+        EO_INIT(.boardproperties)       NULL,
+        EO_INIT(.entitydescriptor)      NULL,
+        EO_INIT(.discoverytarget)       {0},
+        EO_INIT(.ondiscoverystop)       {0},
+        EO_INIT(.command)               {0}, 
     },
-    .id32                       = eo_prot_ID32dummy,   
-    .overrideonfullscaleready   = NULL,
-    .strain                     = NULL,
-    .id32ofregulars             = NULL
+    EO_INIT(.id32)                      eo_prot_ID32dummy,   
+    EO_INIT(.overrideonfullscaleready)  NULL,
+    EO_INIT(.strain)                    NULL,
+    EO_INIT(.id32ofregulars)            NULL,
+    EO_INIT(.watchdog)                  NULL
 };
 
 static const char s_eobj_ownname[] = "EOtheSTRAIN";
@@ -164,16 +168,14 @@ extern EOtheSTRAIN* eo_strain_Initialise(void)
     
     p->overrideonfullscaleready = NULL;
     
-    eOwatchdog_cfg_t wd_cfg =
-    {
-        .diagncfg = 
-        {
-            .numoffailures = 1000,
-            .functiononfailure = s_eo_strain_send_diagnostic_on_transmissioninterruption,
-        },
-        .period = 10 /*deafult transmission period of strain*/  *100 /*convert in microsec*/ *10 /*before signal error i would wait 10 times strain transmission period*/
+    eOwatchdog_cfg_t wd_cfg = {0};
     
-    };
+    //wd_cfg.period = 10 /*deafult transmission period of strain*/  *100 /*convert in microsec*/ *10 /*before signal error i would wait 10 times strain transmission period*/;
+    wd_cfg.period = 10*1000*10; // marco.accame: there are 1000 usce in 1 ms.
+    wd_cfg.diagncfg.numoffailures = 1000;
+    wd_cfg.diagncfg.functiononfailure = s_eo_strain_send_diagnostic_on_transmissioninterruption;
+   
+
     p->watchdog = eo_watchdog_new(&wd_cfg);
     
     p->diagnostics.reportTimer = eo_timer_New();
@@ -382,23 +384,26 @@ extern eOresult_t eo_strain_Activate(EOtheSTRAIN *p, const eOmn_serv_configurati
             
         
         // now... use the servcfg
-        eObrd_canproperties_t prop = 
-        {
-            .type               = eobrd_cantype_strain, 
-            .location           = { .port = servcfg->data.as.strain.canloc.port, .addr = servcfg->data.as.strain.canloc.addr, .insideindex = eobrd_caninsideindex_none },
-            .requiredprotocol   = { .major = servcfg->data.as.strain.version.protocol.major, .minor = servcfg->data.as.strain.version.protocol.minor }
-        };       
+        eObrd_canproperties_t prop = {0};
+        prop.type = eobrd_cantype_strain;
+        prop.location.port = servcfg->data.as.strain.canloc.port;
+        prop.location.addr = servcfg->data.as.strain.canloc.addr;
+        prop.location.insideindex = eobrd_caninsideindex_none;
+        prop.requiredprotocol.major = servcfg->data.as.strain.version.protocol.major;
+        prop.requiredprotocol.minor = servcfg->data.as.strain.version.protocol.minor;
+       
         eo_vector_PushBack(p->sharedcan.boardproperties, &prop);
         
         // load the can mapping ... make an UnloadBoards()
         eo_canmap_LoadBoards(eo_canmap_GetHandle(), p->sharedcan.boardproperties); 
         
         // load the entity mapping.
-        eOcanmap_entitydescriptor_t des = 
-        {
-            .location   = { .port = servcfg->data.as.strain.canloc.port, .addr = servcfg->data.as.strain.canloc.addr, .insideindex = eobrd_caninsideindex_none },
-            .index      = entindex00 // we have only one strain
-        };
+        eOcanmap_entitydescriptor_t des = {0};
+        des.location.port = servcfg->data.as.strain.canloc.port;
+        des.location.addr = servcfg->data.as.strain.canloc.addr;
+        des.location.insideindex = eobrd_caninsideindex_none;
+        des.index = entindex00; // we have only one strain
+
         eo_vector_PushBack(p->sharedcan.entitydescriptor, &des);
         
         eo_canmap_ConfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_analogsensors, eoprot_entity_as_strain, p->sharedcan.entitydescriptor);   
@@ -601,7 +606,7 @@ extern eOresult_t eo_strain_SetMode(EOtheSTRAIN *p, eOas_strainmode_t mode)
           
     // now, i do things. 
 
-    p->sharedcan.command.class = eocanprot_msgclass_pollingAnalogSensor;
+    p->sharedcan.command.clas = eocanprot_msgclass_pollingAnalogSensor;
     p->sharedcan.command.type  = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;
     p->sharedcan.command.value = &mode;
     
@@ -643,14 +648,14 @@ extern eOresult_t eo_strain_SetDataRate(EOtheSTRAIN *p, uint8_t datarate)
           
     // now, i do things. 
 
-    p->sharedcan.command.class = eocanprot_msgclass_pollingAnalogSensor;
+    p->sharedcan.command.clas = eocanprot_msgclass_pollingAnalogSensor;
     p->sharedcan.command.type  = ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE;
     p->sharedcan.command.value = &datarate;
    
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &p->sharedcan.command, p->id32);
 
-    eo_watchdog_updateconfigperiod(p->watchdog, datarate*10*100); //I multiply *10 ==> so I wait a period ten tiems bigger than datarate befor signal error
-                                                                               //I multiply *100 ==> datarate is in millisec while period is in microsecs.
+   //eo_watchdog_updateconfigperiod(p->watchdog, datarate*10*100); //I multiply *10 ==> so I wait a period ten tiems bigger than datarate befor signal error
+   eo_watchdog_updateconfigperiod(p->watchdog, datarate*10*1000); // marco.accame: trhere are 1000 usce in 1 ms.                                                                           //I multiply *100 ==> datarate is in millisec while period is in microsecs.
     
     return(eores_OK); 
 }
@@ -733,7 +738,7 @@ extern eOresult_t eo_strain_notifymeOnNewReceivedData(EOtheSTRAIN *p)
 
 extern void eoprot_fun_INIT_as_strain_config(const EOnv* nv)
 {
-    eOas_strain_config_t* straincfg = eo_nv_RAM(nv);
+    eOas_strain_config_t* straincfg = (eOas_strain_config_t*) eo_nv_RAM(nv);
     
     straincfg->datarate = 10;
     straincfg->mode = eoas_strainmode_acquirebutdonttx;
@@ -743,7 +748,7 @@ extern void eoprot_fun_INIT_as_strain_config(const EOnv* nv)
 
 extern void eoprot_fun_INIT_as_strain_status(const EOnv* nv)
 {
-    eOas_strain_status_t *status = eo_nv_RAM(nv);
+    eOas_strain_status_t *status = (eOas_strain_status_t*) eo_nv_RAM(nv);
     uint8_t capacity = 0;
     uint8_t itemsize = 0;
     uint8_t size = 0;
@@ -791,7 +796,7 @@ extern eObool_t eocanprotASpolling_redefinable_alert_reception_of_POL_AS_CMD__GE
     {   // send a request for next channel
         channel++;
         
-        p->sharedcan.command.class = eocanprot_msgclass_pollingAnalogSensor;
+        p->sharedcan.command.clas = eocanprot_msgclass_pollingAnalogSensor;
         p->sharedcan.command.type  = ICUBCANPROTO_POL_AS_CMD__GET_FULL_SCALES;
         p->sharedcan.command.value = &channel;
         
@@ -836,7 +841,7 @@ extern eObool_t eocanprotASpolling_redefinable_alert_reception_of_POL_AS_CMD__GE
 //    eo_strain_SetDataRate(&s_eo_thestrain, datarate);  
 //    
 //    // set txmode
-//    p->sharedcan.command.class = eocanprot_msgclass_pollingAnalogSensor;    
+//    p->sharedcan.command.clas = eocanprot_msgclass_pollingAnalogSensor;    
 //    p->sharedcan.command.type  = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;
 //    p->sharedcan.command.value = &mode;                       
 //    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &p->sharedcan.command, p->id32);
@@ -872,7 +877,7 @@ static eOresult_t s_eo_strain_SendTXmode(EOtheSTRAIN *p)
 
      
     // set txmode
-    p->sharedcan.command.class = eocanprot_msgclass_pollingAnalogSensor;    
+    p->sharedcan.command.clas = eocanprot_msgclass_pollingAnalogSensor;    
     p->sharedcan.command.type  = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;
     p->sharedcan.command.value = &cfg->mode;                       
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &p->sharedcan.command, p->id32);
@@ -895,7 +900,7 @@ static eOresult_t s_eo_strain_TXstart(EOtheSTRAIN *p)
           
     eOenum08_t mode = eoas_strainmode_txcalibrateddatacontinuously;
     
-    p->sharedcan.command.class = eocanprot_msgclass_pollingAnalogSensor;    
+    p->sharedcan.command.clas = eocanprot_msgclass_pollingAnalogSensor;    
     p->sharedcan.command.type  = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;
     p->sharedcan.command.value = &mode;                       
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &p->sharedcan.command, p->id32);
@@ -918,7 +923,7 @@ static eOresult_t s_eo_strain_TXstop(EOtheSTRAIN *p)
     
     eOenum08_t mode = eoas_strainmode_acquirebutdonttx;       
 
-    p->sharedcan.command.class = eocanprot_msgclass_pollingAnalogSensor;    
+    p->sharedcan.command.clas = eocanprot_msgclass_pollingAnalogSensor;    
     p->sharedcan.command.type  = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;
     p->sharedcan.command.value = &mode;                       
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &p->sharedcan.command, p->id32);
@@ -953,7 +958,7 @@ static void s_eo_thestrain_startGetFullScales(void)
     // at the end of that, the full scale is signalled to  robotInterface
     
     uint8_t channel = 0;
-    p->sharedcan.command.class = eocanprot_msgclass_pollingAnalogSensor;
+    p->sharedcan.command.clas = eocanprot_msgclass_pollingAnalogSensor;
     p->sharedcan.command.type  = ICUBCANPROTO_POL_AS_CMD__GET_FULL_SCALES;
     p->sharedcan.command.value = &channel;
 

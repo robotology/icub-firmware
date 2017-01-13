@@ -236,7 +236,7 @@ extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__MOTION_DONE(eOcanframe_t
     eOprotIndex_t index = EOK_uint08dummy; 
     
     // retrieve the joint related to the frame    
-    if(NULL == (joint = s_eocanprotMCpolling_get_entity(eoprot_entity_mc_joint, frame, port, &index)))
+    if(NULL == (joint = (eOmc_joint_t*) s_eocanprotMCpolling_get_entity(eoprot_entity_mc_joint, frame, port, &index)))
     {
         return(eores_OK);        
     }   
@@ -760,7 +760,7 @@ extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_OPENLOOP_PARAMS(eOca
 {    
     eOmc_joint_t *joint = NULL;
     
-    if(NULL == (joint = s_eocanprotMCpolling_get_entity(eoprot_entity_mc_joint, frame, port, NULL)))
+    if(NULL == (joint = (eOmc_joint_t*) s_eocanprotMCpolling_get_entity(eoprot_entity_mc_joint, frame, port, NULL)))
     {
         return(eores_OK);        
     }

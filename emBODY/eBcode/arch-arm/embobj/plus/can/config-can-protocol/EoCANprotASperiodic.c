@@ -162,7 +162,7 @@ extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__UNCALIBFORCE_VECTOR_DEB
     eOas_strain_t *strain = NULL;
     eOprotIndex_t index = EOK_uint08dummy;
     
-    if(NULL == (strain = s_eocanprotASperiodic_get_entity(eoprot_endpoint_analogsensors, eoprot_entity_as_strain, frame, port, &index)))
+    if(NULL == (strain = (eOas_strain_t*) s_eocanprotASperiodic_get_entity(eoprot_endpoint_analogsensors, eoprot_entity_as_strain, frame, port, &index)))
     {
         return(eores_OK);  
     }    
@@ -180,7 +180,7 @@ extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__UNCALIBTORQUE_VECTOR_DE
     eOas_strain_t *strain = NULL;
     eOprotIndex_t index = EOK_uint08dummy;
     
-    if(NULL == (strain = s_eocanprotASperiodic_get_entity(eoprot_endpoint_analogsensors, eoprot_entity_as_strain, frame, port, &index)))
+    if(NULL == (strain = (eOas_strain_t*) s_eocanprotASperiodic_get_entity(eoprot_endpoint_analogsensors, eoprot_entity_as_strain, frame, port, &index)))
     {
         return(eores_OK);  
     }    
@@ -291,7 +291,7 @@ static eOresult_t s_eocanprotASperiodic_parser_process_forcetorque(eOcanframe_t 
     eOas_strain_t *strain = NULL;
     eOprotIndex_t index = EOK_uint08dummy;
     
-    if(NULL == (strain = s_eocanprotASperiodic_get_entity(eoprot_endpoint_analogsensors, eoprot_entity_as_strain, frame, port, &index)))
+    if(NULL == (strain = (eOas_strain_t*) s_eocanprotASperiodic_get_entity(eoprot_endpoint_analogsensors, eoprot_entity_as_strain, frame, port, &index)))
     {
         return(eores_OK);  
     }    
@@ -384,7 +384,7 @@ static eOresult_t s_eocanprotASperiodic_parser_process_maisvalue(eOcanframe_t *f
     eOas_mais_t *mais = NULL;
     eOprotIndex_t index = EOK_uint08dummy;
     
-    if(NULL == (mais = s_eocanprotASperiodic_get_entity(eoprot_endpoint_analogsensors, eoprot_entity_as_mais, frame, port, &index)))
+    if(NULL == (mais = (eOas_mais_t*) s_eocanprotASperiodic_get_entity(eoprot_endpoint_analogsensors, eoprot_entity_as_mais, frame, port, &index)))
     {
         return(eores_OK);  
     }  

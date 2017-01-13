@@ -115,7 +115,7 @@ static void s_eom_emstransceiver_update_diagnosticsinfo(void);
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static const char s_eobj_ownname[] = "EOMtheEMStransceiver";
+//static const char s_eobj_ownname[] = "EOMtheEMStransceiver";
 
  
 static EOMtheEMStransceiver s_emstransceiver_singleton = 
@@ -126,13 +126,7 @@ static EOMtheEMStransceiver s_emstransceiver_singleton =
 
 static eOemstransceiver_diagnosticsinfo_t s_eom_emstransceiver_diagnosticsinfo =
 {
-    .rxinvalidropframes                     = 0,
-    .rxseqnumwrong                          = 0,
-    .lostreplies                            = 0,
-    .failuresinloadofreplyropframe          = 0,
-    .txropframeistoobigforthepacket         = 0,
-    .cannotloadropinregulars                = 0,
-    .cannotloadropinoccasionals             = 0    
+    0
 };
 
 // --------------------------------------------------------------------------------------------------------------------

@@ -22,6 +22,10 @@
 #ifndef _EOTHEEMASAPPLBODY_H_
 #define _EOTHEEMASAPPLBODY_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       EOtheEMSApplBody.h
@@ -164,7 +168,11 @@ extern eOresult_t eo_emsapplBody_SendDiscoveryFailureReport(EOtheEMSapplBody *p)
     end of group eo_TheEmsAppBody
  **/
 
-#endif  // include-guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

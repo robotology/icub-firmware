@@ -91,7 +91,7 @@ extern EOMmutex* eom_mutex_New(void)
     EOMmutex *retptr = NULL;    
 
     // i get the memory for the multitask mutex object
-    retptr = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOMmutex), 1);
+    retptr = (EOMmutex*) eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOMmutex), 1);
     
     // i get the base mutex
     retptr->mutex = eov_mutex_hid_New();

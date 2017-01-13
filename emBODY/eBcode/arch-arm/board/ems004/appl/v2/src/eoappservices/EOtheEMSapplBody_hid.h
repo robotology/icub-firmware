@@ -22,6 +22,9 @@
 #ifndef _EOTHEEMASAPPLBODY_HID_H_
 #define _EOTHEEMASAPPLBODY_HID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // - doxy -------------------------------------------------------------------------------------------------------------
 /* @file       EOtheEMSApplBody_hid.h
@@ -74,7 +77,11 @@ struct EOtheEMSapplBody_hid
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

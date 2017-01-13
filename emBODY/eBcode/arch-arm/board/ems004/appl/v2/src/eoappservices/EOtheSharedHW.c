@@ -56,10 +56,7 @@
 // - definition (and initialisation) of extern variables. deprecated: better using _get(), _set() on static variables 
 // --------------------------------------------------------------------------------------------------------------------
 
-const eOsharedhw_cfg_t eo_sharedhw_DefaultCfg = 
-{
-    .dummy  = 0
-};
+const eOsharedhw_cfg_t eo_sharedhw_DefaultCfg = { 0 };
 
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
@@ -78,8 +75,8 @@ const eOsharedhw_cfg_t eo_sharedhw_DefaultCfg =
 
 static EOtheSharedHW s_eo_thesharedhw = 
 {
-    .semaphores             = {NULL},
-    .initted                = eobool_false
+    EO_INIT(.semaphores)            {NULL},
+    EO_INIT(.initted)               eobool_false
 };
 
 //static const char s_eobj_ownname[] = "EOtheSharedHW";

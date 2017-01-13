@@ -64,7 +64,7 @@
 
 const eOarmenv_cfg_t eo_armenv_DefaultCfg = 
 {
-    .dummy              = 0
+    0
 };
 
 
@@ -99,13 +99,13 @@ static const char s_eobj_ownname[] = "EOtheARMenvironment";
 static EOtheARMenvironment s_the_armenv = 
 {
     // the base object
-    .env            = NULL,
+    EO_INIT(.env)           NULL,
     // other stuff
-    .modinfo        = NULL,
-    .brdinfo        = NULL,
-    .devinfo        = NULL,
-    .codeprocoffset = 0,
-    .eprocess       = ee_procNone
+    EO_INIT(.modinfo)       NULL,
+    EO_INIT(.brdinfo)       NULL,
+    EO_INIT(.devinfo)       NULL,
+    EO_INIT(.codeprocoffset)0,
+    EO_INIT(.eprocess)      ee_procNone
 };
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -382,11 +382,10 @@ static void s_eo_armenv_sharedservices_init(void)
     if(ee_res_OK == ee_sharserv_isvalid())
     {
         // init sharserv
-        sharserv_mode_t sharservmode = 
-        {
-            .onerror    = NULL,
-            .initmode   = sharserv_base_initmode_forcestorageinit
-        };
+        sharserv_mode_t sharservmode;
+        sharservmode.onerror    = NULL;
+        sharservmode.initmode   = sharserv_base_initmode_forcestorageinit;
+  
         
         if(ee_res_OK != ee_sharserv_init(&sharservmode))
         {
@@ -446,8 +445,4 @@ static void s_eo_armenv_sharedservices_init(void)
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------
-
-
-
-
 

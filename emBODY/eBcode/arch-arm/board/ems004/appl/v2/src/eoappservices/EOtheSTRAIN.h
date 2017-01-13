@@ -21,6 +21,10 @@
 #ifndef _EOTHESTRAIN_H_
 #define _EOTHESTRAIN_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       EOtheSTRAIN.h
@@ -100,7 +104,11 @@ extern eOresult_t eo_strain_notifymeOnNewReceivedData(EOtheSTRAIN *p);
     end of group eo_EOtheSTRAIN
  **/
 
-#endif  // include-guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

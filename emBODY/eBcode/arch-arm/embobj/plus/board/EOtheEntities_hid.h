@@ -22,8 +22,9 @@
 #ifndef _EOTHEENTITIES_HID_H_
 #define _EOTHEENTITIES_HID_H_
 
-
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // - external dependencies --------------------------------------------------------------------------------------------
 // empty-section
@@ -66,6 +67,9 @@ struct EOtheEntities_hid
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 // empty section
 
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif
 
 #endif  // include guard
 

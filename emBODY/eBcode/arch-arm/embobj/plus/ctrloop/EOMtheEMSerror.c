@@ -24,7 +24,7 @@
 #include "EoCommon.h"
 
 #include "EOtheMemoryPool.h"
-#include "EOtheErrormanager.h"
+#include "EOtheErrorManager.h"
 
 
 #include "EOMtheEMStransceiver.h"
@@ -193,11 +193,11 @@ extern eOresult_t eom_emserror_SetFatalError(EOMtheEMSerror *p, const eOerrmanDe
 extern void tskEMSerr(void *p)
 {
     // do here whatever you like before startup() is executed and then forever()
-    eom_task_Start(p);
+    eom_task_Start((EOMtask*)p);
 } 
 
 
-__weak extern void eom_emserror_hid_userdef_DoJustAfterPacketReceived(EOMtheEMSerror *p, EOpacket *rxpkt)
+EO_weak extern void eom_emserror_hid_userdef_DoJustAfterPacketReceived(EOMtheEMSerror *p, EOpacket *rxpkt)
 {
 
 } 
@@ -208,7 +208,7 @@ extern void eom_emserror_OnError_userdefined_call(eOerrmanErrorType_t errtype, c
     // very important info: in november 2014 i rewrote the error handling mechanism and i put the overridable error
     // funtion of EOtheErrorManager inside the object EOMtheEMSappl. the new function sends ROPs inside the standard socket.                     
     // the previous overridable function was this eom_emserror_OnError_userdefined_call().
-    // thus, i have removed the __weak keyword so that if anybody has defined it elsewhere the linker gives error.
+    // thus, i have removed the EO_weak keyword so that if anybody has defined it elsewhere the linker gives error.
 }
 
 
@@ -387,8 +387,4 @@ static void s_eom_emserror_task_run(EOMtask *p, uint32_t t)
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------
-
-
-
-
 

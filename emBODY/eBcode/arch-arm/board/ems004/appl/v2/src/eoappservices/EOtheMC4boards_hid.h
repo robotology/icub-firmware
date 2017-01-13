@@ -22,7 +22,9 @@
 #ifndef _EOTHEMC4BOARDS_HID_H_
 #define _EOTHEMC4BOARDS_HID_H_
 
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 // - external dependencies --------------------------------------------------------------------------------------------
@@ -60,8 +62,8 @@ struct EOtheMC4boards_hid
     eObool_t                    initted;
     eObool_t                    therearemc4s;
     uint8_t                     numofjomos;
-    eOcanprot_command_t         command;
     eObool_t                    configured;
+    eOcanprot_command_t         command;    
     eOmc4boards_conv_encoder_t  convencoder[12];
     eOmc4boards_config2_t       config2;
     eOmc4boards_cansettings_t   cansettings;
@@ -72,7 +74,11 @@ struct EOtheMC4boards_hid
 // empty section
 
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

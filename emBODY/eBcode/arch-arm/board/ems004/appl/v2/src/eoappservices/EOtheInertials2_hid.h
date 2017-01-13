@@ -22,6 +22,10 @@
 #ifndef _EOTHEINERTIALS2_HID_H_
 #define _EOTHEINERTIALS2_HID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
@@ -64,10 +68,8 @@ struct EOtheInertials_hid
     uint8_t                                 ethmap_mems_active;
     
     uint16_t                                fromcan2id[2][16][3];   // 2 ports, 15 addresses (0->14), 3 kinds on mtb ... use mtb-eoas_inertial_accel_mtb_int
-
     uint16_t                                frommems2id[mems_numberofthem];
-    uint8_t                                 memsparam[mems_numberofthem];
-    
+    uint8_t                                 memsparam[mems_numberofthem];    
     eOmems_sensor_cfg_t                     memsconfig[mems_numberofthem];
     // the inertial at the end
     eOas_inertial_t*                        inertial2;  
@@ -84,7 +86,11 @@ struct EOtheInertials_hid
 // empty section
 
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

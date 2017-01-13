@@ -22,6 +22,10 @@
 #ifndef _EOAPPENCODERSREADER_H_
 #define _EOAPPENCODERSREADER_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       EOappEncodersReader.h
@@ -104,6 +108,11 @@ extern eOresult_t eo_appEncReader_UpdatedHallAdcOffset(EOappEncReader *p, uint8_
 /** @}            
     end of group eo_app_encodersReader
  **/
+ 
+ 
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

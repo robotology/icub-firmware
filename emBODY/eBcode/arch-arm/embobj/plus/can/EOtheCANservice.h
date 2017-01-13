@@ -132,7 +132,7 @@ extern eOresult_t eo_canserv_SendCommandToLocation(EOtheCANservice *p, eOcanprot
     @param      port            The can port
     @return     eores_OK if the parsing is successful, eores_NOK_nullpointer in case of NULL parameters, eores_NOK_generic if the frame is not recognised.  
  **/
-// of eOcanprot_descriptor_t we need fill only ...class, type, and value
+// of eOcanprot_descriptor_t we need fill only ...clas, type, and value
 extern eOresult_t eo_canserv_SendCommandToEntity(EOtheCANservice *p, eOcanprot_command_t *command, eOprotID32_t id32); 
 
 extern eOresult_t eo_canserv_SendCommandToAllBoardsInEntity(EOtheCANservice *p, eOcanprot_command_t *command, eOprotID32_t id32);

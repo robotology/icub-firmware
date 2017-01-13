@@ -85,7 +85,7 @@ static eOresult_t s_eom_task_tsk_set_event(EOVtaskDerived *t, eOevent_t evt);
 // virtual
 static eOresult_t s_eom_task_isr_send_message(EOVtaskDerived *t, eOmessage_t msg);
 // virtual
-extern eOresult_t s_eom_task_tsk_send_message(EOVtaskDerived *t, eOmessage_t msg, eOreltime_t tout);
+static eOresult_t s_eom_task_tsk_send_message(EOVtaskDerived *t, eOmessage_t msg, eOreltime_t tout);
 // virtual
 static eOresult_t s_eom_task_isr_exec_callback(EOVtaskDerived *t, eOcallback_t cbk, void *arg);
 // virtual
@@ -132,7 +132,7 @@ extern EOMtask * eom_task_New(eOmtaskType_t type, uint8_t priority, uint16_t sta
     eo_errman_Assert(eo_errman_GetHandle(), (0 != stacksize), "eom_task_New(): 0 stacksize", s_eobj_ownname, &eo_errman_DescrWrongParamLocal);
     
     // get a new multitask task
-    retptr = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOMtask), 1);
+    retptr = (EOMtask*) eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOMtask), 1);
 
     // get the base task. its vtable shall be initted depending on its kind
     retptr->tsk = eov_task_hid_New();

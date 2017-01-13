@@ -21,6 +21,10 @@
 #ifndef _EOTHESKIN_H_
 #define _EOTHESKIN_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       EOtheSKIN.h
@@ -99,7 +103,11 @@ extern eOresult_t eo_skin_AcceptCANframe(EOtheSKIN *p, eOcanframe_t *frame, eOca
     end of group eo_EOtheSKIN
  **/
 
-#endif  // include-guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

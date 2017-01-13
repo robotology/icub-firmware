@@ -21,6 +21,10 @@
 #ifndef _EOCURRENTSWATCHDOG_H_
 #define _EOCURRENTSWATCHDOG_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       EOCurrentsWatchdog.h
@@ -72,7 +76,11 @@ extern eOresult_t eo_currents_watchdog_UpdateCurrentLimits(EOCurrentsWatchdog* p
     end of group eo_EOCurrentsWatchdog
  **/
 
-#endif  // include-guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

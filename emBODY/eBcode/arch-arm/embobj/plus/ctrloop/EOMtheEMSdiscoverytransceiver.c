@@ -29,7 +29,7 @@
 #include "EoBoards.h"
 
 #include "EOtheMemoryPool.h"
-#include "EOtheErrormanager.h"
+#include "EOtheErrorManager.h"
 
 #include "EOaction.h"
 
@@ -1165,94 +1165,93 @@ static uint16_t s_add_description(char *data, uint16_t capacity, const char *pre
     
     return size;
 
-    uint8_t num_procs = 0;
-    const eEprocess_t *s_proctable = NULL;
-    const eEmoduleInfo_t *s_modinfo = NULL;
-    
-    const eEmoduleInfo_t *sharserv = ee_sharserv_moduleinfo_get();
-    const eEmoduleInfo_t *strsharserv = ee_sharserv_storage_moduleinfo_get();
-    
-    if((strsharserv->info.entity.version.major != sharserv->info.entity.version.major) || (strsharserv->info.entity.version.minor != sharserv->info.entity.version.minor))
-    {
-        size+=snprintf(data+size, MYABS(capacity-size), "EEPROM contains sharserv version different from that of this process. it has:\r\n");
-        size+=snprintf(data+size, MYABS(capacity-size), "eeprom version\t%d.%d %d/%d/%d %d:%.2d\r\n", 
-                strsharserv->info.entity.version.major, 
-                strsharserv->info.entity.version.minor,
-                strsharserv->info.entity.builddate.month,
-                strsharserv->info.entity.builddate.day,
-                strsharserv->info.entity.builddate.year,
-                strsharserv->info.entity.builddate.hour,
-                strsharserv->info.entity.builddate.min
-            );  
-        size+=snprintf(data+size, MYABS(capacity-size), "process version\t%d.%d %d/%d/%d %d:%.2d\r\n", 
-                sharserv->info.entity.version.major, 
-                sharserv->info.entity.version.minor,
-                sharserv->info.entity.builddate.month,
-                sharserv->info.entity.builddate.day,
-                sharserv->info.entity.builddate.year,
-                sharserv->info.entity.builddate.hour,
-                sharserv->info.entity.builddate.min
-            );                       
-    }
-    
-    if(ee_res_NOK_generic == ee_sharserv_storage_isvalid())
-    {
-        size+=snprintf(data+size, MYABS(capacity-size), "*** EEPROM FORMAT IS NOT VALID\r\n");
-        size+=snprintf(data+size, MYABS(capacity-size), "*** CANNOT GIVE PARTITION INFO\r\n");              
-        size+=snprintf(data+size, MYABS(capacity-size), "*** BYE BYE\r\n"); 
-        size+=snprintf(data+size, MYABS(capacity-size), "\n");                    
-    }                        
-    else if (ee_res_OK == ee_sharserv_part_proc_allavailable_get(&s_proctable, &num_procs))
-    {        
-        volatile eEmoduleExtendedInfo_t* extinfo = NULL;    
-        eEprocess_t defproc;
-        eEprocess_t startup;
-        eEprocess_t indexofrunning = ee_procApplication; //(eobool_false == s_restart) ? ee_procApplication : ee_procUpdater;
-            
-        ee_sharserv_part_proc_def2run_get(&defproc);
-        ee_sharserv_part_proc_startup_get(&startup);
-                    
-        // processes
-        for (uint8_t i=0; i<num_procs; ++i) 
-        {
-            ee_sharserv_part_proc_get(s_proctable[i], &s_modinfo);
-
-            size+=snprintf(data+size, MYABS(capacity-size), "*** e-process #%d \r\n", i);
-            size+=snprintf(data+size, MYABS(capacity-size), "props %s%s%s \r\n", defproc==i?"DEF ":"", startup==i?"START ":"", indexofrunning==i?"RUNNING ":"" ) ;
-
-            size+=snprintf(data+size, MYABS(capacity-size), "name  %s\r\n", s_modinfo->info.name);
-            size+=snprintf(data+size, MYABS(capacity-size), "vers  %d.%d\r\n", 
-                s_modinfo->info.entity.version.major, 
-                s_modinfo->info.entity.version.minor
-            );
-            size+=snprintf(data+size, MYABS(capacity-size), "date  %s %.2d %d %d:%.2d\r\n", 
-                ee_common_get_month_string(s_modinfo->info.entity.builddate),
-                s_modinfo->info.entity.builddate.day,                    
-                s_modinfo->info.entity.builddate.year,
-                s_modinfo->info.entity.builddate.hour,
-                s_modinfo->info.entity.builddate.min
-            );
-            
-            extinfo = (volatile eEmoduleExtendedInfo_t*)(s_modinfo->info.rom.addr+EENV_MODULEINFO_OFFSET);
-            
-            if(ee_res_OK == ee_is_extendemoduleinfo_valid((eEmoduleExtendedInfo_t*)extinfo))
-            {
-                size+=snprintf(data+size, MYABS(capacity-size), "built %s\r\n", 
-                    extinfo->compilationdatetime
-                );                        
-            }
-            else
-            {
-                size+=snprintf(data+size, MYABS(capacity-size), "built unknown date\r\n"
-                );    
-            }
-
-            size+=snprintf(data+size, MYABS(capacity-size), "rom   @+%dKB, s=%dKB\r\n", (s_modinfo->info.rom.addr-EENV_ROMSTART+1023)/1024, (s_modinfo->info.rom.size+1023)/1024);
-        }
-
-    }
-    
-    return size;
+//    uint8_t num_procs = 0;
+//    const eEprocess_t *s_proctable = NULL;
+//    const eEmoduleInfo_t *s_modinfo = NULL;
+//    
+//    const eEmoduleInfo_t *sharserv = ee_sharserv_moduleinfo_get();
+//    const eEmoduleInfo_t *strsharserv = ee_sharserv_storage_moduleinfo_get();
+//    
+//    if((strsharserv->info.entity.version.major != sharserv->info.entity.version.major) || (strsharserv->info.entity.version.minor != sharserv->info.entity.version.minor))
+//    {
+//        size+=snprintf(data+size, MYABS(capacity-size), "EEPROM contains sharserv version different from that of this process. it has:\r\n");
+//        size+=snprintf(data+size, MYABS(capacity-size), "eeprom version\t%d.%d %d/%d/%d %d:%.2d\r\n", 
+//                strsharserv->info.entity.version.major, 
+//                strsharserv->info.entity.version.minor,
+//                strsharserv->info.entity.builddate.month,
+//                strsharserv->info.entity.builddate.day,
+//                strsharserv->info.entity.builddate.year,
+//                strsharserv->info.entity.builddate.hour,
+//                strsharserv->info.entity.builddate.min
+//            );  
+//        size+=snprintf(data+size, MYABS(capacity-size), "process version\t%d.%d %d/%d/%d %d:%.2d\r\n", 
+//                sharserv->info.entity.version.major, 
+//                sharserv->info.entity.version.minor,
+//                sharserv->info.entity.builddate.month,
+//                sharserv->info.entity.builddate.day,
+//                sharserv->info.entity.builddate.year,
+//                sharserv->info.entity.builddate.hour,
+//                sharserv->info.entity.builddate.min
+//            );                       
+//    }
+//    
+//    if(ee_res_NOK_generic == ee_sharserv_storage_isvalid())
+//    {
+//        size+=snprintf(data+size, MYABS(capacity-size), "*** EEPROM FORMAT IS NOT VALID\r\n");
+//        size+=snprintf(data+size, MYABS(capacity-size), "*** CANNOT GIVE PARTITION INFO\r\n");              
+//        size+=snprintf(data+size, MYABS(capacity-size), "*** BYE BYE\r\n"); 
+//        size+=snprintf(data+size, MYABS(capacity-size), "\n");                    
+//    }                        
+//    else if (ee_res_OK == ee_sharserv_part_proc_allavailable_get(&s_proctable, &num_procs))
+//    {        
+//        volatile eEmoduleExtendedInfo_t* extinfo = NULL;    
+//        eEprocess_t defproc;
+//        eEprocess_t startup;
+//        eEprocess_t indexofrunning = ee_procApplication; //(eobool_false == s_restart) ? ee_procApplication : ee_procUpdater;
+//            
+//        ee_sharserv_part_proc_def2run_get(&defproc);
+//        ee_sharserv_part_proc_startup_get(&startup);
+//                    
+//        // processes
+//        for (uint8_t i=0; i<num_procs; ++i) 
+//        {
+//            ee_sharserv_part_proc_get(s_proctable[i], &s_modinfo);
+// 
+//            size+=snprintf(data+size, MYABS(capacity-size), "*** e-process #%d \r\n", i);
+//            size+=snprintf(data+size, MYABS(capacity-size), "props %s%s%s \r\n", defproc==i?"DEF ":"", startup==i?"START ":"", indexofrunning==i?"RUNNING ":"" ) ;
+// 
+//            size+=snprintf(data+size, MYABS(capacity-size), "name  %s\r\n", s_modinfo->info.name);
+//            size+=snprintf(data+size, MYABS(capacity-size), "vers  %d.%d\r\n", 
+//                s_modinfo->info.entity.version.major, 
+//                s_modinfo->info.entity.version.minor
+//            );
+//            size+=snprintf(data+size, MYABS(capacity-size), "date  %s %.2d %d %d:%.2d\r\n", 
+//                ee_common_get_month_string(s_modinfo->info.entity.builddate),
+//                s_modinfo->info.entity.builddate.day,                    
+//                s_modinfo->info.entity.builddate.year,
+//                s_modinfo->info.entity.builddate.hour,
+//                s_modinfo->info.entity.builddate.min
+//            );
+//            
+//            extinfo = (volatile eEmoduleExtendedInfo_t*)(s_modinfo->info.rom.addr+EENV_MODULEINFO_OFFSET);
+//            
+//            if(ee_res_OK == ee_is_extendemoduleinfo_valid((eEmoduleExtendedInfo_t*)extinfo))
+//            {
+//                size+=snprintf(data+size, MYABS(capacity-size), "built %s\r\n", 
+//                    extinfo->compilationdatetime
+//                );                        
+//            }
+//            else
+//            {
+//                size+=snprintf(data+size, MYABS(capacity-size), "built unknown date\r\n"
+//                );    
+//            }
+// 
+//            size+=snprintf(data+size, MYABS(capacity-size), "rom   @+%dKB, s=%dKB\r\n", (s_modinfo->info.rom.addr-EENV_ROMSTART+1023)/1024, (s_modinfo->info.rom.size+1023)/1024);
+// 
+//    }
+//    
+//    return size;
 }
 
 

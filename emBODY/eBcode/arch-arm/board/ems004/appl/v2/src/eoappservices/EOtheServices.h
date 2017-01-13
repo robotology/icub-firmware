@@ -21,6 +21,10 @@
 #ifndef _EOTHESERVICES_H_
 #define _EOTHESERVICES_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       EOtheServices.h
@@ -93,7 +97,11 @@ extern eOmn_serv_state_t eo_service_GetState(EOtheServices *p, eOmn_serv_categor
     end of group eo_EOtheServices
  **/
 
-#endif  // include-guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

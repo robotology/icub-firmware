@@ -21,6 +21,10 @@
 #ifndef _EOTHECANDISCOVERY2_H_
 #define _EOTHECANDISCOVERY2_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       EOtheCANdiscovery2.h
@@ -67,13 +71,13 @@ typedef struct
 {   // 6+2*2=10
     eObrd_info_t                info;  
     uint16_t                    canmap[eOcanports_number];  // use bitmap of required can addresses.
-} eOcandiscovery_target_t;      EO_VERIFYsizeof(eOcandiscovery_target_t, 10);
+} eOcandiscovery_target_t;      EO_VERIFYsizeof(eOcandiscovery_target_t, 10)
 
 typedef struct
 {
     eObrd_info_t                info;       // the board info as given by the get-fw-version-reply message
     uint16_t                    time;       // the time in ms after the start of search when the get-fw-version-reply message has arrived
-} eOcandiscovery_board_t;       EO_VERIFYsizeof(eOcandiscovery_board_t, 8);
+} eOcandiscovery_board_t;       EO_VERIFYsizeof(eOcandiscovery_board_t, 8)
 
 typedef struct
 {
@@ -86,7 +90,7 @@ typedef struct
     uint16_t                    differentfirmwareversion[eOcanports_number]; // contain the bitmask of not equal fw version (there is a 1 if and only if fw detected != fw required
     uint16_t                    differentprotocolversion[eOcanports_number]; // contain the bitmask of not equal prot version (there is a 1 if and only if prot detected != prot required   
     eOcandiscovery_board_t      boards[eOcanports_number][15];      // contains the board information as given by the the get-fw-version replies + detection relative time in ms
-} eOcandiscovery_detection_t;   EO_VERIFYsizeof(eOcandiscovery_detection_t, 264);
+} eOcandiscovery_detection_t;   EO_VERIFYsizeof(eOcandiscovery_detection_t, 264)
    
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------
 
@@ -126,7 +130,11 @@ extern const eOcandiscovery_detection_t* eo_candiscovery2_GetDetection(EOtheCANd
     end of group eo_EOtheCANdiscovery2
  **/
 
-#endif  // include-guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

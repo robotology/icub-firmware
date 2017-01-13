@@ -130,30 +130,30 @@ static eOresult_t s_eo_appEncReader_Diagnostics_Config(EOappEncReader *p, eo_app
 
 static EOappEncReader s_eo_theappencreader =
 {
-    .initted                = eobool_false,
-    .active                 = eobool_false,
-    .totalnumberofencoders  = 0,
-    .stream_map             = NULL,
-    .config                 = {0},
-    .SPI_streams            = {{.type = hal_spiencoder_typeNONE, .numberof = 0, .maxsupported = 0, .isacquiring = eobool_false, .id = {hal_spiencoderNONE}}},
-    .diagnostics            =
+    EO_INIT(.initted                ) eobool_false,
+    EO_INIT(.active                 ) eobool_false,
+    EO_INIT(.totalnumberofencoders  ) 0,
+    EO_INIT(.stream_map             ) NULL,
+    EO_INIT(.config                 ) {0},
+    EO_INIT(.SPI_streams            ) {{EO_INIT(.type ) hal_spiencoder_typeNONE, EO_INIT(.numberof ) 0, EO_INIT(.maxsupported ) 0, EO_INIT(.isacquiring ) eobool_false, EO_INIT(.id ) {hal_spiencoderNONE}}},
+    EO_INIT(.diagnostics            )
     {
-        .config = 
+        EO_INIT(.config ) 
         {
-            .jomomask       = 0,
-            .periodOKreport = 0,
-            .periodKOreport = 0,
-            .errorled       = eo_ledpulser_led_none,
-            .errorgpio      = { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE }
+            EO_INIT(.jomomask       ) 0,
+            EO_INIT(.periodOKreport ) 0,
+            EO_INIT(.periodKOreport ) 0,
+            EO_INIT(.errorled       ) eo_ledpulser_led_none,
+            EO_INIT(.errorgpio      ) { EO_INIT(.port ) hal_gpio_portNONE, EO_INIT(.pin ) hal_gpio_pinNONE }
         },
-        .par64              = 0,
-        .par16              = 0
+        EO_INIT(.par64              ) 0,
+        EO_INIT(.par16              ) 0
     },
-    .maisCoversionFactors   = {1.0, 1.0, 1.0, 1.0},
-    .hallAdcConversionData  = 
+    EO_INIT(.maisCoversionFactors   ) {1.0, 1.0, 1.0, 1.0},
+    EO_INIT(.hallAdcConversionData  ) 
     {
-        .offsets            = {0,   0,   0,   0},
-        .factors            = {1.0, 1.0, 1.0, 1.0}
+        EO_INIT(.factors            ) {1.0f, 1.0f, 1.0f, 1.0f},
+        EO_INIT(.offsets            ) {0,   0,   0,   0}
     }
 };
 
@@ -243,7 +243,7 @@ extern eOresult_t eo_appEncReader_Activate(EOappEncReader *p, const eOmc_arrayof
         return(eores_NOK_nullpointer);
     }   
 
-    EOconstarray* carray = eo_constarray_Load((EOarray*)arrayofjomodes);
+    EOconstarray* carray = eo_constarray_Load((const EOarray*)arrayofjomodes);
     
     if(eobool_true == s_eo_theappencreader.active)
     {
@@ -379,16 +379,15 @@ extern eOresult_t eo_appEncReader_Diagnostics_Enable(EOappEncReader *p, eObool_t
         return(eores_NOK_nullpointer);
     }
     
-    eo_appEncReader_diagnostics_cfg_t config =
-    {
-        .jomomask = 0x0f,
-        .periodOKreport = 0,
-        .periodKOreport = 1,
-        //.errorled = eo_ledpulser_led_five,
-        //.errorgpio = { .port = hal_gpio_portC, .pin = hal_gpio_pin13 }  
-        .errorled = eo_ledpulser_led_none,
-        .errorgpio = { .port = hal_gpio_portNONE, .pin = hal_gpio_pinNONE }          
-    };
+    eo_appEncReader_diagnostics_cfg_t config;
+
+    config.jomomask = 0x0f;
+    config.periodOKreport = 0;
+    config.periodKOreport = 1;
+    config.errorled = eo_ledpulser_led_none;
+    config.errorgpio.port = hal_gpio_portNONE;
+    config.errorgpio.pin = hal_gpio_pinNONE;        
+
     
     if(eobool_false == on)
     {
@@ -1065,13 +1064,10 @@ static eObool_t s_eo_prepare_SPI_streams(EOappEncReader *p)
 
 
 static void s_eo_deconfigure_SPI_encoders(EOappEncReader *p)
-{
-    #warning TODO: make some tests about initting and deinitting hal etc.
-        
+{        
     s_eo_appEncReader_deinit_halSPIencoders(p);
         
     s_eo_clear_SPI_streams(p);
-
 }
 
 static eObool_t s_eo_configure_SPI_encoders(EOappEncReader *p)
@@ -1113,7 +1109,12 @@ static void s_eo_appEncReader_deinit_halSPIencoders(EOappEncReader *p)
 
 static void s_eo_appEncReader_init_halSPIencoders(EOappEncReader *p)
 {
-	hal_spiencoder_cfg_t config = {.priority = hal_int_priorityNONE, .callback_on_rx = NULL, .arg = NULL, .type = hal_spiencoder_typeNONE, .reg_address = 0, .sdata_precheck = hal_false};
+	hal_spiencoder_cfg_t config;
+    config.priority = hal_int_priorityNONE;
+    config.callback_on_rx = NULL; 
+    config.arg = NULL;;
+    config.reg_address = 0;
+    config.sdata_precheck = hal_false;
     
     for(uint8_t i=0; i < hal_spiencoder_streams_number; i++)
     {
@@ -1412,7 +1413,7 @@ static uint32_t s_eo_appEncReader_rescale2icubdegrees(uint32_t val_raw, uint8_t 
     
     if(eomc_pos_atjoint == pos)
     {
-        eOmc_joint_t *joint = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, jomo);
+        eOmc_joint_t *joint = (eOmc_joint_t*) eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, jomo);
                 
         if(NULL == joint)
         {
@@ -1423,7 +1424,7 @@ static uint32_t s_eo_appEncReader_rescale2icubdegrees(uint32_t val_raw, uint8_t 
     }
     else if(eomc_pos_atmotor == pos)
     {
-        eOmc_motor_t *motor = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, jomo);
+        eOmc_motor_t *motor = (eOmc_motor_t*) eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, jomo);
                 
         if(NULL == motor)
         {
@@ -1552,11 +1553,11 @@ static hal_spiencoder_type_t s_eo_appEncReader_map_encodertype_to_halspiencodert
     
     switch(encodertype)
     {
-        case eomc_enc_aea:           ret = hal_spiencoder_typeAEA;       break;
-        case eomc_enc_amo:           ret = hal_spiencoder_typeAMO;       break;
-        case eomc_enc_spichainof2:   ret = hal_spiencoder_typeCHAINof2;  break;
-        case eomc_enc_spichainof3:   ret = hal_spiencoder_typeCHAINof3;  break;
-        default:                                        ret = hal_spiencoder_typeNONE;      break;
+        case eomc_enc_aea:              ret = hal_spiencoder_typeAEA;       break;
+        case eomc_enc_amo:              ret = hal_spiencoder_typeAMO;       break;
+        case eomc_enc_spichainof2:      ret = hal_spiencoder_typeCHAINof2;  break;
+        case eomc_enc_spichainof3:      ret = hal_spiencoder_typeCHAINof3;  break;
+        default:                        ret = hal_spiencoder_typeNONE;      break;
     }
     
     return(ret);

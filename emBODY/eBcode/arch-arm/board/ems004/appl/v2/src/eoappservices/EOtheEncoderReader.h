@@ -21,6 +21,10 @@
 #ifndef _EOTHEENCODERREADER_H_
 #define _EOTHEENCODERREADER_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       EOtheEncoderReader.h
@@ -111,7 +115,11 @@ extern eOresult_t eo_encoderreader_GetPrimaryEncoder(EOtheEncoderReader *p, uint
     end of group eo_EOtheEncoderReader
  **/
 
-#endif  // include-guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

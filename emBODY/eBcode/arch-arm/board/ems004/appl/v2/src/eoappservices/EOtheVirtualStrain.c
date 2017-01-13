@@ -83,14 +83,13 @@
 
 static EOtheVirtualStrain s_eo_thevirtualstrain = 
 {
-    .initted                    = eobool_false,
-//    .itismc4can                 = eobool_false,
-    .location                   = {0},
-    .torques                    = {0},
-    .thereisanewvalueoftorque   = eobool_false,
-    .countbetweentwoupdates     = 0,
-    .countwatchdog              = 0,
-    .command                    = {0}
+    EO_INIT(.initted)                   eobool_false,
+    EO_INIT(.location)                  {0},
+    EO_INIT(.torques)                   {0},
+    EO_INIT(.thereisanewvalueoftorque)  eobool_false,
+    EO_INIT(.countbetweentwoupdates)    0,
+    EO_INIT(.countwatchdog)             0,
+    EO_INIT(.command)                   {0}
 };
 
 
@@ -108,20 +107,7 @@ extern EOtheVirtualStrain* eo_virtualstrain_Initialise(void)
     {
         return(&s_eo_thevirtualstrain);
     }
-        
-//    EOtheEMSapplBody* emsappbody_ptr = eo_emsapplBody_GetHandle();
-//    eOmn_appl_runMode_t runmode = eo_emsapplBody_GetAppRunMode(emsappbody_ptr);
-    
-//    if((applrunMode__mc4Only == runmode) || (applrunMode__skinAndMc4 == runmode))
-//    {
-//        s_eo_thevirtualstrain.itismc4can = eobool_true;
-//    }
-//    else
-//    {
-//        s_eo_thevirtualstrain.itismc4can = eobool_false;
-//    }
-    
-
+            
     s_eo_thevirtualstrain.location.port = eOcanport1;   // or one can read the location of the first joint ... as in next two lines
     //eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, 0, eoprot_tag_none);
     //eo_canmap_GetEntityLocation(eo_canmap_GetHandle(), id32, &s_eo_thevirtualstrain.location, NULL, NULL);    
@@ -135,7 +121,7 @@ extern EOtheVirtualStrain* eo_virtualstrain_Initialise(void)
     s_eo_thevirtualstrain.countbetweentwoupdates = 0;
     s_eo_thevirtualstrain.countwatchdog =0;
     
-    s_eo_thevirtualstrain.command.class = eocanprot_msgclass_periodicAnalogSensor;    
+    s_eo_thevirtualstrain.command.clas = eocanprot_msgclass_periodicAnalogSensor;    
     s_eo_thevirtualstrain.command.type  = 0;
     s_eo_thevirtualstrain.command.value = NULL;
     

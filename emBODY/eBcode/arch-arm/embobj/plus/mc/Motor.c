@@ -86,7 +86,7 @@ static void Motor_config_current_PID_2FOC(Motor* o, eOmc_PID_t* pidcurrent)
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, o->ID, 0);
     
     eOcanprot_command_t cmdPid;
-    cmdPid.class = eocanprot_msgclass_pollingMotorControl;
+    cmdPid.clas = eocanprot_msgclass_pollingMotorControl;
     cmdPid.type = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID;
     cmdPid.value = KpKiKdKs;
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdPid, id32);
@@ -109,7 +109,7 @@ static void Motor_config_velocity_PID_2FOC(Motor* o, eOmc_PID_t* pidvelocity)
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, o->ID, 0);
     
     eOcanprot_command_t cmdPid;
-    cmdPid.class = eocanprot_msgclass_pollingMotorControl;
+    cmdPid.clas = eocanprot_msgclass_pollingMotorControl;
     cmdPid.type = ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID;
     cmdPid.value = KpKiKdKs;
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdPid, id32);
@@ -122,7 +122,7 @@ static void Motor_config_max_currents_2FOC(Motor* o, eOmc_current_limits_params_
     uint32_t max_current = current_params->peakCurrent;
     
     eOcanprot_command_t cmdMaxCurrent;
-    cmdMaxCurrent.class = eocanprot_msgclass_pollingMotorControl;
+    cmdMaxCurrent.clas = eocanprot_msgclass_pollingMotorControl;
     cmdMaxCurrent.type = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT;
     cmdMaxCurrent.value = &max_current;
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdMaxCurrent, id32);
@@ -166,20 +166,20 @@ static void Motor_config_2FOC(Motor* o, eOmc_motor_config_t* config)
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, o->ID, 0);
     
     eOcanprot_command_t cmdPid;
-    cmdPid.class = eocanprot_msgclass_pollingMotorControl;
+    cmdPid.clas = eocanprot_msgclass_pollingMotorControl;
     cmdPid.type = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID;
     cmdPid.value = KpKiKdKs;
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdPid, id32);
         
     eOcanprot_command_t cmdMaxCurrent;
-    cmdMaxCurrent.class = eocanprot_msgclass_pollingMotorControl;
+    cmdMaxCurrent.clas = eocanprot_msgclass_pollingMotorControl;
     cmdMaxCurrent.type = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT;
     //cmdMaxCurrent.value = &max_current;
     cmdMaxCurrent.value = &(config->currentLimits);
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdMaxCurrent, id32);
 
     eOcanprot_command_t cmdMotorConfig;
-    cmdMotorConfig.class = eocanprot_msgclass_pollingMotorControl;
+    cmdMotorConfig.clas = eocanprot_msgclass_pollingMotorControl;
     cmdMotorConfig.type = ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_CONFIG;
     cmdMotorConfig.value = o->can_motor_config;
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdMotorConfig, id32);
@@ -189,7 +189,7 @@ static void Motor_set_control_mode_2FOC(uint8_t motor, icubCanProto_controlmode_
 {
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, motor, 0);
     eOcanprot_command_t command = {0};
-    command.class = eocanprot_msgclass_pollingMotorControl;
+    command.clas = eocanprot_msgclass_pollingMotorControl;
     command.type  = ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE;
     command.value = &control_mode;
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);
@@ -290,7 +290,7 @@ void Motor_config_encoder(Motor* o, int32_t resolution)
         eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, o->ID, 0);
         
         eOcanprot_command_t cmdMotorConfig;
-        cmdMotorConfig.class = eocanprot_msgclass_pollingMotorControl;
+        cmdMotorConfig.clas = eocanprot_msgclass_pollingMotorControl;
         cmdMotorConfig.type = ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_CONFIG;
         cmdMotorConfig.value = o->can_motor_config;
         eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdMotorConfig, id32);  
@@ -388,7 +388,7 @@ extern void Motor_uncalibrate(Motor* o)
     {
         eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, o->ID, 0);
         eOcanprot_command_t command = {0};
-        command.class = eocanprot_msgclass_pollingMotorControl;
+        command.clas = eocanprot_msgclass_pollingMotorControl;
         command.type  = ICUBCANPROTO_POL_MC_CMD__CALIBRATE_ENCODER;
         eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);
     }
@@ -803,7 +803,7 @@ void Motor_actuate(Motor* motor, uint8_t N) //
         }
     
         eOcanprot_command_t command = {0};
-        command.class = eocanprot_msgclass_periodicMotorControl;    
+        command.clas = eocanprot_msgclass_periodicMotorControl;    
         command.type  = ICUBCANPROTO_PER_MC_MSG__EMSTO2FOC_DESIRED_CURRENT;
         command.value = output;
     

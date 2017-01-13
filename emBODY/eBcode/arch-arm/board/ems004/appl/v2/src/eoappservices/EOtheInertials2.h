@@ -21,6 +21,10 @@
 #ifndef _EOTHEINERTIALS2_H_
 #define _EOTHEINERTIALS2_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       EOtheInertials2.h
@@ -94,7 +98,11 @@ extern eOresult_t eo_inertials2_AcceptCANframe(EOtheInertials2 *p, eOas_inertial
     end of group eo_EOtheInertials
  **/
 
-#endif  // include-guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

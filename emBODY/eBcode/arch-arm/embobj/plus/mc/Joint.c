@@ -501,7 +501,7 @@ CTRL_UNITS Joint_do_pwm_control(Joint* o)
             
             Trajectory_do_step(&o->trajectory, &o->pos_ref, &o->vel_ref, &o->acc_ref);
         
-            CTRL_UNITS pos_err_old = o->pos_err;
+            //CTRL_UNITS pos_err_old = o->pos_err;
         
             o->pos_err = o->pos_ref - o->pos_fbk;
             o->vel_err = o->vel_ref - o->vel_fbk;

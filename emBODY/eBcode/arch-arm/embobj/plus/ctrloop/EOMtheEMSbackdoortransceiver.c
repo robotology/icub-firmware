@@ -27,7 +27,7 @@
 #include "EoCommon.h"
 
 #include "EOtheMemoryPool.h"
-#include "EOtheErrormanager.h"
+#include "EOtheErrorManager.h"
 
 
 #include "OPCprotocolManager.h"
@@ -211,7 +211,7 @@ extern eOresult_t eom_emsbackdoortransceiver_FormSignal(EOMtheEMSbackdoortransce
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-//__weak extern opcprotman_cfg_t* eom_emsbackdoortransceiver_hid_userdef_get_OPCprotocolManager_cfg(void)
+//EO_weak extern opcprotman_cfg_t* eom_emsbackdoortransceiver_hid_userdef_get_OPCprotocolManager_cfg(void)
 //{
 //    return(NULL);
 //}

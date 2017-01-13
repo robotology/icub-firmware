@@ -21,6 +21,8 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
+#include "EOtheServices_hid.h"
+
 #include "stdlib.h"
 #include "string.h"
 
@@ -83,7 +85,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 // empty-section
 
-#warning marco.accame: remember to process the tags 'marco.accame.TODO'
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of static functions
@@ -123,55 +124,55 @@ static eOresult_t s_eo_motioncontrol_updatedPositionsFromEncoders(EOtheMotionCon
 
 static EOtheMotionController s_eo_themotcon = 
 {
-    .service = 
+    EO_INIT(.service) 
     {
-        .tmpcfg                 = NULL,
-        .servconfig             = { .type = eomn_serv_NONE },
-        .initted                = eobool_false,
-        .active                 = eobool_false,
-        .activateafterverify    = eobool_false,
-        .started                = eobool_false,
-        .onverify               = NULL,
-        .state                  = eomn_serv_state_notsupported         
+        EO_INIT(.initted)               eobool_false,
+        EO_INIT(.active)                eobool_false,
+        EO_INIT(.activateafterverify)   eobool_false,
+        EO_INIT(.started)               eobool_false,
+        EO_INIT(.onverify)              NULL,
+        EO_INIT(.state)                 eomn_serv_state_notsupported,
+        EO_INIT(.tmpcfg)                NULL,
+        EO_INIT(.servconfig)            { EO_INIT(.type) eomn_serv_NONE },
     },
-    .diagnostics = 
+    EO_INIT(.diagnostics) 
     {
-        .reportTimer            = NULL,
-        .reportPeriod           = 0, // 10*EOK_reltime1sec, // with 0 we dont periodically report
-        .errorDescriptor        = {0},
-        .errorType              = eo_errortype_info,
-        .errorCallbackCount     = 0,
-        .repetitionOKcase       = 0 // 10 // with 0 we transmit report only once at succesful activation
+        EO_INIT(.reportTimer)           NULL,
+        EO_INIT(.reportPeriod)          0, // 10*EOK_reltime1sec, // with 0 we dont periodically report
+        EO_INIT(.errorDescriptor)       {0},
+        EO_INIT(.errorType)             eo_errortype_info,
+        EO_INIT(.errorCallbackCount)    0, 
+        EO_INIT(.repetitionOKcase)      0 // 10 // with 0 we transmit report only once at succesful activation
     },     
-    .sharedcan =
+    EO_INIT(.sharedcan)
     {
-        .boardproperties        = NULL,
-        .entitydescriptor       = NULL,
-        .discoverytarget        = {0},
-        .ondiscoverystop        = {0},
-        .command                = {0}, 
-    },
+        EO_INIT(.boardproperties)       NULL,
+        EO_INIT(.entitydescriptor)      NULL,
+        EO_INIT(.discoverytarget)       {0},
+        EO_INIT(.ondiscoverystop)       {0},
+        EO_INIT(.command)               {0}, 
+    }, 
     
-    .numofjomos                 = 0,
+    EO_INIT(.numofjomos)                0,
     
-    .ctrlobjs =
+    EO_INIT(.ctrlobjs)
     {
-        .servconfigmais         = {0},
-        .themais                = NULL,
-        .themc4boards           = NULL,
+        EO_INIT(.themc4boards)          NULL,
+        EO_INIT(.servconfigmais)        {0},
+        EO_INIT(.themais)               NULL,
         
-        .jomodescriptors        = NULL,
-        .thecontroller          = NULL,
-        .theencoderreader       = NULL,
+        EO_INIT(.jomodescriptors)       NULL,
+        EO_INIT(.thecontroller)         NULL,
+        EO_INIT(.theencoderreader)      NULL,
 
 
-        .pwmvalue               = {0},
-        .pwmport                = {hal_motorNONE},
-        .currents               = {0},
-        .voltage                = 0
+        EO_INIT(.pwmvalue)              {0},
+        EO_INIT(.pwmport)               {hal_motorNONE},
+        EO_INIT(.currents)              {0},
+        EO_INIT(.voltage)               0
     },
 
-    .id32ofregulars             = NULL
+    EO_INIT(.id32ofregulars)            NULL
 };
 
 static const char s_eobj_ownname[] = "EOtheMotionController";
@@ -352,7 +353,7 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
     
     if(eo_motcon_mode_foc == p->service.servconfig.type)
     {
-        p->ctrlobjs.jomodescriptors = eo_constarray_Load((EOarray*)&p->service.servconfig.data.mc.foc_based.arrayofjomodescriptors);
+        p->ctrlobjs.jomodescriptors = eo_constarray_Load((const EOarray*)&p->service.servconfig.data.mc.foc_based.arrayofjomodescriptors);
         
         p->service.onverify = onverify;
         p->service.activateafterverify = activateafterverify;
@@ -418,7 +419,7 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
     }
     else if(eo_motcon_mode_mc4plus == p->service.servconfig.type)
     {
-        p->ctrlobjs.jomodescriptors = eo_constarray_Load((EOarray*)&p->service.servconfig.data.mc.mc4plus_based.arrayofjomodescriptors);
+        p->ctrlobjs.jomodescriptors = eo_constarray_Load((const EOarray*)&p->service.servconfig.data.mc.mc4plus_based.arrayofjomodescriptors);
         
         // marco.accame.TODO: fix it. we must be sure that in encoder-reader the read from adc is ok during its _Verify()
         // for now this call is inside eo_motioncontrol_Activate(), just before eo_encoderreader_Activate() ... 
@@ -434,7 +435,7 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
     }
     else if(eo_motcon_mode_mc4plusmais == p->service.servconfig.type)
     {
-        p->ctrlobjs.jomodescriptors = eo_constarray_Load((EOarray*)&p->service.servconfig.data.mc.mc4plusmais_based.arrayofjomodescriptors);
+        p->ctrlobjs.jomodescriptors = eo_constarray_Load((const EOarray*)&p->service.servconfig.data.mc.mc4plusmais_based.arrayofjomodescriptors);
         
         // marco.accame.TODO: fix it. we must be sure that in encoder-reader the read from adc is ok during its _Verify()
         // marco.accame: it is required to read adc values if the encoder is absanalog (aka adc).
@@ -603,7 +604,7 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
     if(eo_motcon_mode_foc == p->service.servconfig.type)
     {
 
-        p->ctrlobjs.jomodescriptors = eo_constarray_Load((EOarray*)&p->service.servconfig.data.mc.foc_based.arrayofjomodescriptors);
+        p->ctrlobjs.jomodescriptors = eo_constarray_Load((const EOarray*)&p->service.servconfig.data.mc.foc_based.arrayofjomodescriptors);
         
         uint8_t numofjomos = eo_constarray_Size(p->ctrlobjs.jomodescriptors);
         
@@ -779,11 +780,11 @@ extern eOresult_t eo_motioncontrol_Activate(EOtheMotionController *p, const eOmn
         
         if(eo_motcon_mode_mc4plus == p->service.servconfig.type)
         {
-            p->ctrlobjs.jomodescriptors = eo_constarray_Load((EOarray*)&p->service.servconfig.data.mc.mc4plus_based.arrayofjomodescriptors);
+            p->ctrlobjs.jomodescriptors = eo_constarray_Load((const EOarray*)&p->service.servconfig.data.mc.mc4plus_based.arrayofjomodescriptors);
         }
         else //eomn_serv_MC_mc4plusmais
         {
-            p->ctrlobjs.jomodescriptors = eo_constarray_Load((EOarray*)&p->service.servconfig.data.mc.mc4plusmais_based.arrayofjomodescriptors);
+            p->ctrlobjs.jomodescriptors = eo_constarray_Load((const EOarray*)&p->service.servconfig.data.mc.mc4plusmais_based.arrayofjomodescriptors);
         }
         
         uint8_t numofjomos = eo_constarray_Size(p->ctrlobjs.jomodescriptors);
@@ -1066,148 +1067,14 @@ extern eOresult_t eo_motioncontrol_Stop(EOtheMotionController *p)
 // - in here i put the functions used to initialise the values in ram of the joints and motors ... better in here rather than elsewhere.
 
 static const eOmc_joint_t s_joint_default_value =
-{
-    .config =             
-    {
-        .pidposition =
-        {
-            .kp =                    0,
-            .ki =                    0,
-            .kd =                    0,
-            .limitonintegral =       0,
-            .limitonoutput =         0,
-            .scale =                 0,
-            .offset =                0,
-            .kff =                   0,
-            .stiction_up_val =       0,
-            .stiction_down_val =     0,
-            .filler =                {0}
-        },
-        .pidvelocity =
-        {
-            .kp =                    0,
-            .ki =                    0,
-            .kd =                    0,
-            .limitonintegral =       0,
-            .limitonoutput =         0,
-            .scale =                 0,
-            .offset =                0,
-            .kff =                   0,
-            .stiction_up_val =       0,
-            .stiction_down_val =     0,
-            .filler =                {0}
-        },
-        .pidtorque =
-        {
-            .kp =                    0,
-            .ki =                    0,
-            .kd =                    0,
-            .limitonintegral =       0,
-            .limitonoutput =         0,
-            .scale =                 0,
-            .offset =                0,
-            .kff =                   0,
-            .stiction_up_val =       0,
-            .stiction_down_val =     0,
-            .filler =                {0}
-        }, 
-        .limitsofjoint =
-        {
-            .min =                   0,
-            .max =                   0
-        },
-        .impedance =
-        {
-            .stiffness =             0,
-            .damping =               0,
-            .offset =                0          
-        },               
-        .maxvelocityofjoint =        0,
-        .motor_params =
-        {
-            .bemf_value =            0,
-            .ktau_value =            0,
-            .bemf_scale =            0,
-            .ktau_scale =            0,
-            .filler02 =              {0}
-        },
-        .velocitysetpointtimeout =   0,
-        .tcfiltertype =              0,
-        .jntEncoderType =            0,
-        .filler04 =                  {0}
-    },
-    .status =                       
-    {
-        .core =
-        {        
-            .measures =
-            {
-                .meas_position =          0,
-                .meas_velocity =          0,
-                .meas_acceleration =      0,
-                .meas_torque =            0
-            },
-            .ofpid =                     {0},
-            .modes = 
-            {
-                .controlmodestatus =        eomc_controlmode_notConfigured,
-                .interactionmodestatus =    eOmc_interactionmode_stiff,
-                .ismotiondone =             eobool_false,
-                .filler =                   {0}
-            }
-        },
-        .target = {0}
-    },
-    .inputs =                        {0},
-    .cmmnds =                       
-    {
-        .calibration =               {0},
-        .setpoint =                  {0},
-        .stoptrajectory =            0,
-        .controlmode =               eomc_controlmode_cmd_switch_everything_off,
-        .interactionmode =           eOmc_interactionmode_stiff,
-        .filler =                    {0}        
-    }
-}; 
+{   // to simplify we set everything to zero and then we edit eoprot_fun_INIT_mc_joint*() functions 
+    0
+};
+
 
 static const eOmc_motor_t s_motor_default_value =
-{
-    .config =             
-    {
-        .pidcurrent =
-        {
-            .kp =                    0,
-            .ki =                    0,
-            .kd =                    0,
-            .limitonintegral =       0,
-            .limitonoutput =         0,
-            .scale =                 0,
-            .offset =                0,
-            .kff =                   0,
-            .stiction_up_val =       0,
-            .stiction_down_val =     0,
-            .filler =                {0}
-        },
-        .gearboxratio =              0,
-        .rotorEncoderResolution =    0,
-        .maxvelocityofmotor =        0,
-        .currentLimits =             {0},
-        .rotorIndexOffset =          0,
-        .motorPoles =                0,
-        .hasHallSensor =             eobool_false,
-        .hasTempSensor =             eobool_false,
-        .hasRotorEncoder =           eobool_false,
-        .hasRotorEncoderIndex =      eobool_false,
-        .rotorEncoderType =          0,
-        .hasSpeedEncoder =           eobool_false,
-        .filler01 =                  {0},
-        .limitsofrotor =
-        {
-            .max = 0,
-            .min = 0
-        }
-    },
-    .status =                       {0}
+{   // to simplify we set everything to zero and then we edit eoprot_fun_INIT_mc_motor*() functions
+    0
 }; 
 
 
@@ -1221,6 +1088,9 @@ extern void eoprot_fun_INIT_mc_joint_status(const EOnv* nv)
 {
     eOmc_joint_status_t *sta = (eOmc_joint_status_t*)eo_nv_RAM(nv);
     memmove(sta, &s_joint_default_value.status, sizeof(eOmc_joint_status_t));
+    
+    sta->core.modes.controlmodestatus = eomc_controlmode_notConfigured;
+    sta->core.modes.interactionmodestatus = eOmc_interactionmode_stiff;
 }
 
 extern void eoprot_fun_INIT_mc_motor_config(const EOnv* nv)

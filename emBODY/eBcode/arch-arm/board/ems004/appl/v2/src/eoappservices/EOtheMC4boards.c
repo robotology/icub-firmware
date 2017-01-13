@@ -32,7 +32,7 @@
 #include "EOtheCANservice.h"
 #include "EOtheCANmapping.h"
 #include "EOtheCANprotocol.h"
-
+#include "math.h"
 
 
 #include "EOMtheEMSappl.h"
@@ -55,11 +55,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
+// empty-section
 
-// i clip in bounf [-INTxx_MAX, +INTxx_MAX] rather than [INTxx_MIN, INTxx_MAX] because we have a symmetic range and if we invert
-// teh clip we still have a valid positive/negative value. reason is that INTxx_MIN is -2^xx and INTxx_MAX is 2^xx-1 ...
-#define EOMC4BOARDS_CLIP_INT32(i32)             ( ((i32)>INT32_MAX) ? (INT32_MAX) : ( ((i32)<(-INT32_MAX)) ? (-INT32_MAX) : (i32) )  )
-#define EOMC4BOARDS_CLIP_INT16(i16)             ( ((i16)>INT16_MAX) ? (INT16_MAX) : ( ((i16)<(-INT16_MAX)) ? (-INT16_MAX) : (i16) )  )
 
 
 
@@ -87,27 +84,27 @@ static eObool_t s_eo_mc4boards_foundone(void);
 
 static const eOmc4boards_config2_t s_eo_mc4boards_defaultconfig2 =
 {   
-    .shifts =
+    EO_INIT(.shifts)
     {
-        .velocity               = 8,
-        .estimJointVelocity     = 5,
-        .estimJointAcceleration = 5,
-        .estimMotorVelocity     = 1,
-        .estimMotorAcceleration = 1
+        EO_INIT(.velocity)                  8,
+        EO_INIT(.estimJointVelocity)        5,
+        EO_INIT(.estimJointAcceleration)    5,
+        EO_INIT(.estimMotorVelocity)        1,
+        EO_INIT(.estimMotorAcceleration)    1
     },
-    .broadcastflags = (1<<eomc_mc4broadcast_position) | (1<<eomc_mc4broadcast_status) | (1<<eomc_mc4broadcast_print) | (1<<eomc_mc4broadcast_pidvalues)    
+    EO_INIT(.broadcastflags)    (1<<eomc_mc4broadcast_position) | (1<<eomc_mc4broadcast_status) | (1<<eomc_mc4broadcast_print) | (1<<eomc_mc4broadcast_pidvalues)    
 };
 
 static EOtheMC4boards s_eo_themc4boards = 
 {
-    .initted            = eobool_false,
-    .therearemc4s       = eobool_false,
-    .numofjomos         = 0,
-    .command            = {0},
-    .configured         = eobool_false,
-    .convencoder        = {0},
-    .config2            = {0},
-    .cansettings        = {0}
+    EO_INIT(.initted)           eobool_false,
+    EO_INIT(.therearemc4s)      eobool_false,
+    EO_INIT(.numofjomos)        0,
+    EO_INIT(.configured)        eobool_false,
+    EO_INIT(.command)           {0},    
+    EO_INIT(.convencoder)       {0},
+    EO_INIT(.config2)           {0},
+    EO_INIT(.cansettings)       {0}
 };
 
 //static const char s_eobj_ownname[] = "EOtheMC4boards";
@@ -251,7 +248,7 @@ extern eOresult_t eo_mc4boards_BroadcastStart(EOtheMC4boards *p)
     // now, i do things. 
     
     // set broadcast policy to what in configuration
-    s_eo_themc4boards.command.class = eocanprot_msgclass_pollingMotorControl;    
+    s_eo_themc4boards.command.clas = eocanprot_msgclass_pollingMotorControl;    
     s_eo_themc4boards.command.type  = ICUBCANPROTO_POL_MC_CMD__SET_BCAST_POLICY;
     s_eo_themc4boards.command.value = &s_eo_themc4boards.cansettings.broadcastpolicy;    
     uint8_t i = 0;
@@ -283,7 +280,7 @@ extern eOresult_t eo_mc4boards_BroadcastStop(EOtheMC4boards *p)
     
     // set broadcast policy to silence
     uint32_t silence = 0;
-    s_eo_themc4boards.command.class = eocanprot_msgclass_pollingMotorControl;    
+    s_eo_themc4boards.command.clas = eocanprot_msgclass_pollingMotorControl;    
     s_eo_themc4boards.command.type  = ICUBCANPROTO_POL_MC_CMD__SET_BCAST_POLICY;
     s_eo_themc4boards.command.value = &silence;    
     uint8_t i = 0;
@@ -356,7 +353,7 @@ extern eOresult_t eo_mc4boards_Config(EOtheMC4boards *p)
 
           
     // now, i do things. 
-    s_eo_themc4boards.command.class = eocanprot_msgclass_pollingMotorControl;    
+    s_eo_themc4boards.command.clas = eocanprot_msgclass_pollingMotorControl;    
     uint8_t i = 0;
 
     for(i=0; i<s_eo_themc4boards.numofjomos; i++)
@@ -437,7 +434,7 @@ extern eOmeas_position_t eo_mc4boards_Convert_Position_fromCAN(EOtheMC4boards *p
     }
     
     float temp = (((float)pos / s_eo_themc4boards.convencoder[joint].factor) - s_eo_themc4boards.convencoder[joint].offset);
-    temp = EOMC4BOARDS_CLIP_INT32(temp);
+    temp = EO_CLIP_INT32(temp);
     
     return((eOmeas_position_t)temp);
 }
@@ -451,7 +448,7 @@ extern icubCanProto_position_t eo_mc4boards_Convert_Position_toCAN(EOtheMC4board
     }
     
     float temp = (((float)pos + s_eo_themc4boards.convencoder[joint].offset) * s_eo_themc4boards.convencoder[joint].factor);
-    temp = EOMC4BOARDS_CLIP_INT32(temp);
+    temp = EO_CLIP_INT32(temp);
     
     return((icubCanProto_position_t)temp); 
 }
@@ -484,14 +481,14 @@ extern icubCanProto_velocity_t eo_mc4boards_Convert_Velocity_toCAN(EOtheMC4board
         {   // it is a normal conversion: we convert to ticks/ms and the we apply the shift fatcor
             temp /= 1000.0f;                                                    // from ticks/sec to ticks/ms
             temp *= (1 << s_eo_themc4boards.cansettings.velshift);   // apply the shift for canbus;
-            temp = __fabs(temp);
+            temp = fabsf(temp);
         } break;        
 
         case eomc4_velocitycontext_toCAN_positionsetpoint:
         {   // it is a special case
             // revised accame&randazzo on 8oct15: it is ok to divide by 10 ... see function canBusMotionControl::setRefSpeedsraw()
             // the value is absolute because the direction of movement is given by the sign of position setpoint
-            temp = __fabs(temp) / 10.0;        
+            temp = fabsf(temp) / 10.0f;        
         } break;
         
         default:
@@ -501,7 +498,7 @@ extern icubCanProto_velocity_t eo_mc4boards_Convert_Velocity_toCAN(EOtheMC4board
         
     }
     
-    temp = EOMC4BOARDS_CLIP_INT16(temp);
+    temp = EO_CLIP_INT16(temp);
     
     return((icubCanProto_velocity_t)temp);    
 }
@@ -520,7 +517,7 @@ extern eOmeas_velocity_t eo_mc4boards_Convert_Velocity_fromCAN(EOtheMC4boards *p
     temp /= s_eo_themc4boards.convencoder[joint].factor; // now we transform into icubdeg/sec
 
 
-    temp = EOMC4BOARDS_CLIP_INT32(temp);
+    temp = EO_CLIP_INT32(temp);
     
     return((eOmeas_velocity_t) temp);
 }
@@ -568,7 +565,7 @@ extern eOmeas_acceleration_t eo_mc4boards_Convert_Acceleration_fromCAN(EOtheMC4b
     temp /= (1 << (s_eo_themc4boards.cansettings.estimshifts.estimShiftJointVel + s_eo_themc4boards.cansettings.estimshifts.estimShiftJointAcc)); // now we divide by (1 << estim shift vel + acc)
     temp /= s_eo_themc4boards.convencoder[joint].factor; // now we transform into icubdeg/sec^2
 
-    temp = EOMC4BOARDS_CLIP_INT32(temp);
+    temp = EO_CLIP_INT32(temp);
     
     return((eOmeas_acceleration_t)temp);
 }
@@ -589,7 +586,7 @@ extern icubCanProto_acceleration_t eo_mc4boards_Convert_Acceleration_toCAN(EOthe
     temp /= (1000000.0f); // transform from ticks/sec^2 to ticks/ms^2
     temp *= (1 << s_eo_themc4boards.cansettings.velshift); // apply the shift for canbus  
     
-    temp = EOMC4BOARDS_CLIP_INT16(temp);   
+    temp = EO_CLIP_INT16(temp);   
     
     return((icubCanProto_acceleration_t)temp);       
 }
@@ -678,7 +675,7 @@ extern icubCanProto_torque_t eo_mc4boards_Convert_torque_I2S(EOtheMC4boards *p, 
 //    }
     //*torque contains value in micro Nm.
     //MC4 boards use torque values in Nm/10000 (decimi di milliNm)
-    icubCanProto_torque_t ret = EOMC4BOARDS_CLIP_INT16(torque/100);
+    icubCanProto_torque_t ret = EO_CLIP_INT16(torque/100);
     return(ret);   
 }
 

@@ -27,7 +27,7 @@
 
 #include "AbsEncoder.h"
 
-#include "EOtheMais.h"
+#include "EOtheMAIS.h"
 
 /////////////////////////////////////////////////////////
 // AbsEncoder

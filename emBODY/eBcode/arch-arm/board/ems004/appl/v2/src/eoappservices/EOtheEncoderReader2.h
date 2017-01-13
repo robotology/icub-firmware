@@ -18,8 +18,15 @@
 
 
 // - include guard ----------------------------------------------------------------------------------------------------
+
+#error ::: use EOtheEncoderReader.h instead
+
 #ifndef _EOTHEENCODERREADER2_H_
 #define _EOTHEENCODERREADER2_H_
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
@@ -93,7 +100,11 @@ extern eOresult_t eo_encoderreader2_Read(EOtheEncoderReader2 *p, uint8_t jomo, h
     end of group eo_EOtheEncoderReader2
  **/
 
-#endif  // include-guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

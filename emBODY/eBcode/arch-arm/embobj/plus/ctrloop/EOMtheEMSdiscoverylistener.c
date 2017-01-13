@@ -25,7 +25,7 @@
 #include "EoCommon.h"
 
 #include "EOtheMemoryPool.h"
-#include "EOtheErrormanager.h"
+#include "EOtheErrorManager.h"
 
 
 
@@ -211,11 +211,11 @@ extern EOMtask * eom_emsdiscoverylistener_GetTask(EOMtheEMSdiscoverylistener *p)
 extern void tskEMSlis(void *p)
 {
     // do here whatever you like before startup() is executed and then forever()
-    eom_task_Start(p);
+    eom_task_Start((EOMtask*)p);
 } 
 
 
-// __weak extern void eom_emsdiscoverylistener_hid_userdef_DoJustAfterPacketParsing(EOMtheEMSdiscoverylistener *p)
+// EO_weak extern void eom_emsdiscoverylistener_hid_userdef_DoJustAfterPacketParsing(EOMtheEMSdiscoverylistener *p)
 // {
 
 // } 

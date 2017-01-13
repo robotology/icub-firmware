@@ -59,9 +59,9 @@
 
 const eOmcallbackman_cfg_t eom_callbackman_DefaultCfg = 
 {
-    .priority   = 202, 
-    .stacksize  = 512, 
-    .queuesize  = 16
+    EO_INIT(.priority)  202, 
+    EO_INIT(.stacksize) 512, 
+    EO_INIT(.queuesize) 16
 };
 
 
@@ -89,8 +89,8 @@ static const char s_eobj_ownname[] = "EOMtheCallbackManager";
  
 static EOMtheCallbackManager s_eom_callbackmanager = 
 {
-    .vcm    = NULL,
-    .tsk    = NULL
+    EO_INIT(.vcm)   NULL,
+    EO_INIT(.tsk)   NULL
 }; 
 
 
@@ -122,8 +122,8 @@ extern EOMtheCallbackManager * eom_callbackman_Initialise(const eOmcallbackman_c
                                              cbkmancfg->stacksize,
                                              NULL,
                                              s_eom_callbackman_tsk_aftercallbackorontimeout, 
-                                             cbkmancfg->queuesize,
-                                             eok_reltimeINFINITE, 
+                                             (uint32_t)cbkmancfg->queuesize,
+                                             (eOreltime_t)eok_reltimeINFINITE, 
                                              NULL,
                                              sys_cbackman,
                                              "cbkman"
@@ -176,7 +176,7 @@ extern EOMtask * eom_callbackman_GetTask(EOMtheCallbackManager *p)
 
 void sys_cbackman(void *p)
 {
-    eom_task_Start(p);
+    eom_task_Start((EOMtask*)p);
 } 
 
 

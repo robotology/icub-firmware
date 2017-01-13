@@ -63,9 +63,9 @@
 
 const eOmtimerman_cfg_t eom_timerman_DefaultCfg = 
 {
-    .priority           = 240, 
-    .stacksize          = 512, 
-    .messagequeuesize   = 8
+    EO_INIT(.priority)          240, 
+    EO_INIT(.stacksize)         512, 
+    EO_INIT(.messagequeuesize)  8
 };
 
 
@@ -99,8 +99,8 @@ static const char s_eobj_ownname[] = "EOMtheTimerManager";
  
 static EOMtheTimerManager s_eom_thetimermanager = 
 {
-    .tmrman     = NULL,             // tmrman
-    .tskproc    = NULL              // tskproc
+    EO_INIT(.tmrman)    NULL,             // tmrman
+    EO_INIT(.tskproc)   NULL              // tskproc
 }; 
 
 
@@ -224,7 +224,7 @@ static eOresult_t s_eom_timerman_OnNewTimer(EOVtheTimerManager* tm, EOtimer *t)
     }
 
 // no need to protect data structures of the timer manager    
-//    if(eores_OK != eom_mutex_Take(tm->mutex, eok_reltimeINFINITE))
+//    if(eores_OK != eom_mutex_Take((EOMmutex*)tm->mutex, eok_reltimeINFINITE))
 //    {
 //        // cannot lock it ... bye bye
 //         return(eores_NOK_generic);
@@ -246,7 +246,7 @@ static eOresult_t s_eom_timerman_OnNewTimer(EOVtheTimerManager* tm, EOtimer *t)
     
     
 //    // unlock the manager
-//    eom_mutex_Release(tm->mutex);
+//    eom_mutex_Release((EOMmutex*)tm->mutex);
 
     return(res);  
    
@@ -269,20 +269,20 @@ static eOresult_t s_eom_timerman_OnDelTimer(EOVtheTimerManager* tm, EOtimer *t)
     }
 
 // no need to protect data structures of the timer manager    
-//    if(eores_OK != eom_mutex_Take(tm->mutex, eok_reltimeINFINITE))
+//    if(eores_OK != eom_mutex_Take((EOMmutex*)tm->mutex, eok_reltimeINFINITE))
 //    {
 //        // cannot lock it ... bye bye
 //         return(eores_NOK_generic);
 //    }
     
     // delete the osal timer
-    osal_timer_delete(t->envir.osaltimer);
+    osal_timer_delete((osal_timer_t*)t->envir.osaltimer);
     t->status = EOTIMER_STATUS_IDLE;
     t->envir.osaltimer = NULL;
         
     
 //    // unlock the manager
-//    eom_mutex_Release(tm->mutex);
+//    eom_mutex_Release((EOMmutex*)tm->mutex);
 
     return(eores_OK);  
    
@@ -314,8 +314,8 @@ static eOresult_t s_eom_timerman_AddTimer(EOVtheTimerManager* tm, EOtimer *t)
     }
 
     
-//    if(eores_OK != eov_mutex_Take(tm->mutex, eok_reltimeINFINITE)) 
-    if(eores_OK != eom_mutex_Take(tm->mutex, eok_reltimeINFINITE))
+//    if(eores_OK != eov_mutex_Take((EOMmutex*)tm->mutex, eok_reltimeINFINITE)) 
+    if(eores_OK != eom_mutex_Take((EOMmutex*)tm->mutex, eok_reltimeINFINITE))
     {
         // cannot lock it ... bye bye
          return(eores_NOK_generic);
@@ -328,7 +328,7 @@ static eOresult_t s_eom_timerman_AddTimer(EOVtheTimerManager* tm, EOtimer *t)
     onexpi.cbk      = s_eom_timerman_OnExpiry;
     onexpi.par      = t;
 
-    res = (eOresult_t)osal_timer_start(t->envir.osaltimer, &timing, &onexpi, osal_callerTSK);
+    res = (eOresult_t)osal_timer_start((osal_timer_t*)t->envir.osaltimer, &timing, &onexpi, osal_callerTSK);
     
     if(eores_OK == res)
     {
@@ -341,8 +341,8 @@ static eOresult_t s_eom_timerman_AddTimer(EOVtheTimerManager* tm, EOtimer *t)
     
     
     // unlock the manager
-    //eov_mutex_Release(tm->mutex);
-    eom_mutex_Release(tm->mutex);
+    //eov_mutex_Release((EOMmutex*)tm->mutex);
+    eom_mutex_Release((EOMmutex*)tm->mutex);
 
     return(res);  
    
@@ -360,8 +360,8 @@ static eOresult_t s_eom_timerman_RemTimer(EOVtheTimerManager* tm, EOtimer *t)
   
 
   
-    //if(eores_OK != eov_mutex_Take(tm->mutex, eok_reltimeINFINITE)) 
-    if(eores_OK != eom_mutex_Take(tm->mutex, eok_reltimeINFINITE))
+    //if(eores_OK != eov_mutex_Take((EOMmutex*)tm->mutex, eok_reltimeINFINITE)) 
+    if(eores_OK != eom_mutex_Take((EOMmutex*)tm->mutex, eok_reltimeINFINITE))
     {
         return(eores_NOK_generic);
     }
@@ -370,7 +370,7 @@ static eOresult_t s_eom_timerman_RemTimer(EOVtheTimerManager* tm, EOtimer *t)
     //osaltimer = t->envir.osaltimer;
     
     // stop the osal timer. operation is null safe.
-    osal_timer_stop(t->envir.osaltimer, osal_callerTSK);
+    osal_timer_stop((osal_timer_t*)t->envir.osaltimer, osal_callerTSK);
 
         
     // reset the values of the timer but do not set envir.osaltimer to NULL
@@ -379,8 +379,8 @@ static eOresult_t s_eom_timerman_RemTimer(EOVtheTimerManager* tm, EOtimer *t)
     //t->osaltimer = osaltimer;
 
     // unlock the manager
-    // eov_mutex_Release(tm->mutex);
-    eom_mutex_Release(tm->mutex);
+    // eov_mutex_Release((EOMmutex*)tm->mutex);
+    eom_mutex_Release((EOMmutex*)tm->mutex);
 
     return(eores_OK);
 }
@@ -389,7 +389,7 @@ static eOresult_t s_eom_timerman_RemTimer(EOVtheTimerManager* tm, EOtimer *t)
 // name of the task as it is shown in uvision
 void sys_timerman(void *p)
 {
-    eom_task_Start(p);
+    eom_task_Start((EOMtask*)p);
 }
 
 
@@ -426,8 +426,7 @@ static void s_eom_timerman_ProcessExpiry(eOmessage_t msg)
     //osaltimer = t->osaltimer;
  
     // get the mutex of the timer manager.  
-//    if(eores_OK != eov_mutex_Take(s_eom_thetimermanager.tmrman->mutex, eok_reltimeINFINITE)) 
-    if(eores_OK != eom_mutex_Take(s_eom_thetimermanager.tmrman->mutex, eok_reltimeINFINITE)) 
+    if(eores_OK != eom_mutex_Take((EOMmutex*)s_eom_thetimermanager.tmrman->mutex, eok_reltimeINFINITE)) 
     {
         return;
     }
@@ -448,8 +447,7 @@ static void s_eom_timerman_ProcessExpiry(eOmessage_t msg)
 
 
     // release the mutex of the timer manager
-    //eov_mutex_Release(s_eom_thetimermanager.tmrman->mutex);
-    eom_mutex_Release(s_eom_thetimermanager.tmrman->mutex);
+    eom_mutex_Release((EOMmutex*)s_eom_thetimermanager.tmrman->mutex);
     
     return;
 }

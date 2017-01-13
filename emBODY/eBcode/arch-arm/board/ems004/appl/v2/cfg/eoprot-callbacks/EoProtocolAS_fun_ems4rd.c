@@ -40,7 +40,7 @@
 
 #include "EOMtheEMSappl.h"
 
-#include "EOtheCANService.h"
+#include "EOtheCANservice.h"
 
 
 #include "EoProtocol.h"

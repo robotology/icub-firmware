@@ -23,7 +23,9 @@
 #define _EOTHEMAIS_HID_H_
 
 
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
@@ -59,7 +61,11 @@ struct EOtheMAIS_hid
 // empty section
 
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

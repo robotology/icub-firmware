@@ -43,10 +43,11 @@
 
 MController* smc = NULL;
 
-static char invert_matrix(float** M, float** I, char n);
+//static char invert_matrix(float** M, float** I, char n);
 //static void MController_config_motor_set(MController* o);
 //static void MController_config_encoder_set(MController* o);
 
+#if 0
 static void send_debug_message(char *message, uint8_t jid, uint16_t par16, uint64_t par64)
 {
 
@@ -59,8 +60,9 @@ static void send_debug_message(char *message, uint8_t jid, uint16_t par16, uint6
     errdes.par64            = par64;
     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, message, NULL, &errdes);
 }
+#endif
 
-static char s_trace_string[128] = {0};
+//static char s_trace_string[128] = {0};
 
 MController* MController_new(uint8_t nJoints, uint8_t nEncods) //
 {
@@ -219,6 +221,7 @@ static void updateEntity2SetMaps(const eOmc_4jomo_coupling_t *jomoCouplingInfo)
     }
 }
 
+#if 0
 static void debug_printsMatrix(float **m)
 {
     snprintf(s_trace_string, sizeof(s_trace_string), "----- START -----");
@@ -234,6 +237,7 @@ static void debug_printsMatrix(float **m)
     hal_trace_puts(s_trace_string);
 
 }
+#endif
 
 static void copyMatrix(float **dst, const eOmc_4x4_matrix_t src)
 {
@@ -275,7 +279,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
     switch (brd_cfg->type)
     {
         case eomn_serv_MC_foc:
-            carray = eo_constarray_Load((EOarray*)&brd_cfg->data.mc.foc_based.arrayofjomodescriptors);
+            carray = eo_constarray_Load((const EOarray*)&brd_cfg->data.mc.foc_based.arrayofjomodescriptors);
             o->part_type = brd_cfg->data.mc.foc_based.boardtype4mccontroller;
             o->nSets = o->nEncods = o->nJoints = brd_cfg->data.mc.foc_based.arrayofjomodescriptors.head.size;
             o->actuation_type = HARDWARE_2FOC;
@@ -283,7 +287,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
             break;
         
         case eomn_serv_MC_mc4plusmais:
-            carray = eo_constarray_Load((EOarray*)&brd_cfg->data.mc.mc4plusmais_based.arrayofjomodescriptors);
+            carray = eo_constarray_Load((const EOarray*)&brd_cfg->data.mc.mc4plusmais_based.arrayofjomodescriptors);
             o->part_type = brd_cfg->data.mc.mc4plusmais_based.boardtype4mccontroller;
             o->nSets = o->nEncods = o->nJoints = brd_cfg->data.mc.mc4plusmais_based.arrayofjomodescriptors.head.size;
             o->actuation_type = HARDWARE_MC4p;
@@ -291,7 +295,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
             break;
         
         case eomn_serv_MC_mc4plus:
-            carray = eo_constarray_Load((EOarray*)&brd_cfg->data.mc.mc4plus_based.arrayofjomodescriptors);
+            carray = eo_constarray_Load((const EOarray*)&brd_cfg->data.mc.mc4plus_based.arrayofjomodescriptors);
             o->part_type = brd_cfg->data.mc.mc4plus_based.boardtype4mccontroller;
             o->nSets = o->nEncods = o->nJoints = brd_cfg->data.mc.mc4plus_based.arrayofjomodescriptors.head.size;
             o->actuation_type = HARDWARE_MC4p;
@@ -304,7 +308,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
     
     for (int k=0; k<o->nJoints; ++k)
     {
-        const eOmc_jomo_descriptor_t *jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(carray, k);
+        const eOmc_jomo_descriptor_t *jomodes = (const eOmc_jomo_descriptor_t*) eo_constarray_At(carray, k);
         
         switch(jomodes->encoder1.type)
         {
@@ -827,7 +831,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
     
     //check multi encoder compatibility
     //currently all joint of same board have the the same number of multiple encoder. so i use j0
-    const eOmc_jomo_descriptor_t *jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(carray, 0);
+    const eOmc_jomo_descriptor_t *jomodes = (const eOmc_jomo_descriptor_t*) eo_constarray_At(carray, 0);
     uint8_t cfg_multienc = (uint8_t) eomc_encoder_get_numberofcomponents((eOmc_encoder_t)jomodes->encoder1.type);
     if(o->multi_encs != cfg_multienc)
     {
@@ -1267,6 +1271,7 @@ static void MController_config_encoder_set(MController *o)
 #define FOR(i) for (int i=0; i<n; ++i)
 #define SCAN(r,c) FOR(r) FOR(c)
 
+#if 0
 static char invert_matrix(float** M, float** I, char n)
 {
     float B[MAX_JOINTS_PER_BOARD][MAX_JOINTS_PER_BOARD];
@@ -1342,6 +1347,7 @@ static char invert_matrix(float** M, float** I, char n)
     
     return 1;
 }
+#endif
 
 void MController_calibrate(uint8_t e, eOmc_calibrator_t *calibrator)
 {
@@ -1509,7 +1515,7 @@ int16_t MController_config_motor_pwm_limit(int m, int16_t pwm_limit)
 
 void MController_update_motor_odometry_fbk_can(int m, void* data)
 {
-    Motor_update_odometry_fbk_can(smc->motor+m, data);
+    Motor_update_odometry_fbk_can(smc->motor+m, (CanOdometry2FocMsg*)data);
 }
 
 void MController_motor_raise_fault_i2t(int m)

@@ -23,7 +23,9 @@
 #define _EOTHESERVICES_HID_H_
 
 
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
@@ -50,14 +52,14 @@
 // maybe move them into _hid.h
 typedef struct
 {
-    const eOmn_serv_configuration_t*        tmpcfg;
-    eOmn_serv_configuration_t               servconfig;
     eObool_t                                initted;
     eObool_t                                active;  
     eObool_t                                activateafterverify;
     eObool_t                                started;
     eOservice_onendofoperation_fun_t        onverify;
     eOmn_serv_state_t                       state;
+    const eOmn_serv_configuration_t*        tmpcfg;
+    eOmn_serv_configuration_t               servconfig;
 } eOservice_core_t;    
 
 typedef struct
@@ -112,13 +114,15 @@ struct EOtheServices_hid
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 
 extern eOresult_t eo_service_hid_SynchServiceState(EOtheServices *p, eOmn_serv_category_t category, eOmn_serv_state_t servstate);
-
 extern eOresult_t eo_service_hid_SetRegulars(EOarray* id32ofregulars, eOmn_serv_arrayof_id32_t* arrayofid32, eObool_t (*isID32relevant)(uint32_t), uint8_t* numberofthem);
-
 extern eOresult_t eo_service_hid_AddRegulars(EOarray* id32ofregulars, eOmn_serv_arrayof_id32_t* arrayofid32, eObool_t (*isID32relevant)(uint32_t), uint8_t* numberofthem);
 
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 
