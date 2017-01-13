@@ -165,22 +165,22 @@ namespace embot
             void release(void *) {  };                       
         };  
 
-        class Timer
-        {
-        public:
-            Timer(){};
-            ~Timer(){};
-            bool config(void) { return true; };                         
-        };
-        
-        class theTimerManager
-        {
-        public:
-            theTimerManager(){};
-            ~theTimerManager(){};
-            bool add(Timer &t) { return true; };     
-            bool rem(Timer &t) { return true; };                       
-        };    
+//        class Timer
+//        {
+//        public:
+//            Timer(){};
+//            ~Timer(){};
+//            bool config(void) { return true; };                         
+//        };
+//        
+//        class theTimerManager
+//        {
+//        public:
+//            theTimerManager(){};
+//            ~theTimerManager(){};
+//            bool add(Timer &t) { return true; };     
+//            bool rem(Timer &t) { return true; };                       
+//        };    
 
         class theStorage
         {
