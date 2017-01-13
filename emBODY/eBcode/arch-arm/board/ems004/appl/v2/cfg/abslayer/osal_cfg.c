@@ -40,6 +40,8 @@
 #include "EOtheErrorManager.h"
 #include "EoError.h"
 
+#include "embOBJporting.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -74,33 +76,33 @@ static void s_osal_cfg_on_idle(void);
 
 const osal_cfg_t osal_cfg = 
 {   
-    .rtostype               = (osal_rtostype_t)OSAL_RTOSTYPE,          // uint8_t         rtostype;
-    .memorymodel            = (osal_memorymodel_t)OSAL_MEMMODEL,
-    .cpufam                 = (osal_cpufamily_t)OSAL_CPUFAM,            // uint8_t         cpufam;                                 
-    .cpufreq                = OSAL_CPUFREQ,           // uint32_t        cpufreq; 
-    .prio                   = OSAL_PRIO,                                          
-    .tick                   = (osal_reltime_t)OSAL_TICK,              // uint32_t        tick;                                   
-    .launcherstacksize      = OSAL_LAUNSTKSIZE,       // uint16_t        launcherstacksize;                     
-    .idlestacksize          = OSAL_IDLESTKSIZE,       // uint16_t        idlestacksize;
-    .roundrobin             = (osal_bool_t)OSAL_RROBIN,            // uint8_t         roundrobin;
-    .roundrobintick         = OSAL_RROBINTICK,        // uint32_t        roundrobintick;
+    EO_INIT(.rtostype)              (osal_rtostype_t)OSAL_RTOSTYPE,          // uint8_t         rtostype;
+    EO_INIT(.memorymodel)           (osal_memorymodel_t)OSAL_MEMMODEL,
+    EO_INIT(.prio)                  OSAL_PRIO,                                          
+    EO_INIT(.cpufam)                (osal_cpufamily_t)OSAL_CPUFAM,            // uint8_t         cpufam;                                 
+    EO_INIT(.cpufreq)               OSAL_CPUFREQ,           // uint32_t        cpufreq; 
+    EO_INIT(.tick)                  (osal_reltime_t)OSAL_TICK,              // uint32_t        tick;                                   
+    EO_INIT(.launcherstacksize)     OSAL_LAUNSTKSIZE,       // uint16_t        launcherstacksize;                     
+    EO_INIT(.idlestacksize)         OSAL_IDLESTKSIZE,       // uint16_t        idlestacksize;
+    EO_INIT(.roundrobin)            (osal_bool_t)OSAL_RROBIN,            // uint8_t         roundrobin;
+    EO_INIT(.roundrobintick)        OSAL_RROBINTICK,        // uint32_t        roundrobintick;
     
-    .tasknum                = OSAL_TASKNUM,           // uint8_t         tasknum;
-    .globalstacksize        = OSAL_GLOBSTKSIZE,       // uint16_t        globalstacksize;
-    .timernum               = OSAL_TIMERNUM,          // uint8_t         timernum;
-    .mutexnum               = OSAL_MUTEXNUM,          // uint8_t         mutexnum;
-    .semaphorenum           = OSAL_SEMAPHORENUM,      // uint8_t         semaphorenum;
-    .mqueuenum              = OSAL_MQUEUENUM,         
-    .mqueueelemnum          = OSAL_MQUEUEELEMNUM, 
-    .arch                   =
+    EO_INIT(.tasknum)               OSAL_TASKNUM,           // uint8_t         tasknum;
+    EO_INIT(.globalstacksize)       OSAL_GLOBSTKSIZE,       // uint16_t        globalstacksize;
+    EO_INIT(.timernum)              OSAL_TIMERNUM,          // uint8_t         timernum;
+    EO_INIT(.mutexnum)              OSAL_MUTEXNUM,          // uint8_t         mutexnum;
+    EO_INIT(.semaphorenum)          OSAL_SEMAPHORENUM,      // uint8_t         semaphorenum;
+    EO_INIT(.mqueuenum)             OSAL_MQUEUENUM,         
+    EO_INIT(.mqueueelemnum)         OSAL_MQUEUEELEMNUM, 
+    EO_INIT(.arch)
     {
-        .nothingsofar                   = 0
+        EO_INIT(.nothingsofar)      0
     },      
-    .extfn                  = 
+    EO_INIT(.extfn)
     {
-        .hal_sys_irqn_priority_set      = NULL,
-        .usr_on_fatal_error             = s_osal_cfg_on_fatal_error, 
-        .usr_on_idle                    = s_osal_cfg_on_idle
+        EO_INIT(.hal_sys_irqn_priority_set)     NULL,
+        EO_INIT(.usr_on_fatal_error)            s_osal_cfg_on_fatal_error, 
+        EO_INIT(.usr_on_idle)                   s_osal_cfg_on_idle
     }
 };
 
@@ -112,7 +114,7 @@ static void s_osal_cfg_on_fatal_error(void* task, osal_fatalerror_t errorcode, c
 {
     uint8_t tskid = 0;
     char str[64];    
-    osal_task_id_get(task, &tskid);
+    osal_task_id_get((osal_task_t*)task, &tskid);
     snprintf(str, sizeof(str), "osalerror %d taskid %d: %s", errorcode, tskid, errormsg);
     
     if(eobool_true == eo_errman_IsErrorHandlerConfigured(eo_errman_GetHandle()))
