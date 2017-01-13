@@ -19,11 +19,15 @@
 #ifndef MC_ABS_ENCODER_H___
 #define MC_ABS_ENCODER_H___
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "EoCommon.h"
 
 #include "EOtheEncoderReader.h"
 
-#include "EOEmsControllerCfg.h"
+#include "EOemsControllerCfg.h"
 
 /////////////////////////////////////////////////////////
 // AbsEncoder
@@ -140,7 +144,14 @@ extern void AbsEncoder_still_check_reset(AbsEncoder* o);
 extern void AbsEncoder_start_hard_stop_calibrate(AbsEncoder* o, int32_t hard_stop_zero);
 extern BOOL AbsEncoder_is_hard_stop_calibrating(AbsEncoder* o);
 extern void AbsEncoder_calibrate_in_hard_stop(AbsEncoder* o);
-#endif
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
+
+
 
 // AbsEncoder
 /////////////////////////////////////////////////////////

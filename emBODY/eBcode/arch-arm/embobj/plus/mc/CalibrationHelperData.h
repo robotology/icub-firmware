@@ -19,6 +19,10 @@
 #ifndef MC_CALIBRATION_HELPER_DATA_H___
 #define MC_CALIBRATION_HELPER_DATA_H___
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "EOemsControllerCfg.h"
 
 typedef struct // TripodCalib
@@ -38,4 +42,11 @@ typedef struct // CableCalib
     int32_t cable_range;
 } CableCalib;
 
-#endif
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
+
+
