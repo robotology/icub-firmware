@@ -185,7 +185,10 @@ static void s_eom_timerman_OnExpiry(osal_timer_t *osaltmr, void *tmr)
 
     if(eo_actypeEvent == t->onexpiry.actiontype)
     {
-        osal_eventflag_set(t->onexpiry.data.evt.event, ((EOMtask*)t->onexpiry.data.evt.totask)->osaltask, osal_callerISR);
+        if(NULL != t->onexpiry.data.evt.totask)
+        {
+            osal_eventflag_set(t->onexpiry.data.evt.event, ((EOMtask*)t->onexpiry.data.evt.totask)->osaltask, osal_callerISR);
+        }
 
         if(EOTIMER_MODE_ONESHOT == t->mode) 
         {
