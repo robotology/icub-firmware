@@ -30,6 +30,8 @@ namespace embot { namespace common {
     
     using fpCallback = void (*)(void *);
     using fpWorker = void (*)(void);
+    
+    using fp_int8_par_uint32 = std::int8_t (*)(std::uint32_t);
 
     typedef std::uint32_t relTime;  // expressed in usec. it is used to express relative time. 0 means: 0 usec from ...
     
