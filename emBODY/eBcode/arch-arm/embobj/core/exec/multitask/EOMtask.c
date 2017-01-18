@@ -110,6 +110,292 @@ static char s_eom_task_count = 0;
 
 #undef PRINT_TASK_ADDITIONAL_INFO
 
+extern EOMtask * eom_task_New1(void)
+{
+    EOMtask *retptr = NULL;
+
+    
+    // get a new multitask task
+    retptr = (EOMtask*) eo_mempool_New(eo_mempool_GetHandle(), sizeof(EOMtask));
+
+    // get the base task. its vtable shall be initted depending on its kind
+    retptr->tsk = eov_task_hid_New();
+
+	retptr->extdata = NULL;
+
+    // not yet created
+    retptr->osaltask = NULL;
+
+
+    s_eom_task_count ++;
+    
+    return(retptr);
+}
+
+extern eOresult_t eom_task_Init1(EOMtask *p, eOmtaskType_t type, uint8_t priority, uint16_t stacksize,
+                                       void (*startup_fn)(EOMtask *tsk, uint32_t zero),
+                                       void (*run_fn)(EOMtask *tsk, uint32_t evtmsgper), 
+                                       uint32_t queuesizeORalleventsmask, eOreltime_t timeoutORperiod,
+                                       void *extdata,
+                                       void (*nameofthetask_fn)(void *tsk),
+                                       const char *name)
+{
+    
+    EOMtask * retptr = p;
+    
+    if(NULL != retptr->osaltask)
+    {   // already initted ...
+        return eores_NOK_generic;
+    }
+    
+    
+    retptr->extdata = extdata;
+
+                          
+    // initialisations which depend on the type of task
+    switch(type)
+    {
+        case eom_mtask_UserDefined:
+        {   // accepts evt but their processing is user-defined
+
+            retptr->type            = eom_mtask_UserDefined;
+            retptr->osalrun         = s_eom_task_userdefined;
+
+            retptr->ustime          = 0;
+            retptr->waitmask        = 0;
+            retptr->maxmessages     = 0;
+            retptr->messagequeue    = NULL;
+            retptr->argumentqueue   = NULL;
+
+            eov_task_hid_SetVTABLE( retptr->tsk, 
+                                    (eOvoid_fp_voidp_uint32_t)startup_fn, (eOvoid_fp_voidp_uint32_t)run_fn,
+                                    s_eom_task_isr_set_event, s_eom_task_tsk_set_event,
+                                    NULL, NULL,
+                                    NULL, NULL,
+                                    s_eom_task_get_id
+                                  );
+#if defined(PRINT_TASK_ADDITIONAL_INFO)
+            snprintf(typestr, sizeof(typestr), "%s", "user-def");
+#endif
+        } break;
+
+        case eom_mtask_EventDriven:
+        {   // accepts evt only and their processing is internally defined
+
+            retptr->type            = eom_mtask_EventDriven;
+            retptr->osalrun         = s_eom_task_anyevt_driven_loop;
+
+            retptr->ustime          = timeoutORperiod;
+            retptr->waitmask        = 0;
+            retptr->maxmessages     = 0;
+            retptr->messagequeue    = NULL;
+            retptr->argumentqueue   = NULL;
+            
+            eov_task_hid_SetVTABLE( retptr->tsk, 
+                                    (eOvoid_fp_voidp_uint32_t)startup_fn, (eOvoid_fp_voidp_uint32_t)run_fn,
+                                    s_eom_task_isr_set_event, s_eom_task_tsk_set_event,
+                                    NULL, NULL,
+                                    NULL, NULL,
+                                    s_eom_task_get_id
+                                  );
+#if defined(PRINT_TASK_ADDITIONAL_INFO)
+            snprintf(typestr, sizeof(typestr), "%s", "evt-drvn");
+#endif
+        } break;
+
+        case eom_mtask_OnAllEventsDriven:
+        {   // accepts evt only and their processing is internally defined
+
+            retptr->type            = eom_mtask_OnAllEventsDriven;
+            retptr->osalrun         = s_eom_task_allevt_driven_loop;
+
+            retptr->ustime          = timeoutORperiod;
+            retptr->waitmask        = queuesizeORalleventsmask;
+            retptr->maxmessages     = 0;
+            retptr->messagequeue    = NULL;
+            retptr->argumentqueue   = NULL;
+            
+            eov_task_hid_SetVTABLE( retptr->tsk, 
+                                    (eOvoid_fp_voidp_uint32_t)startup_fn, (eOvoid_fp_voidp_uint32_t)run_fn,
+                                    s_eom_task_isr_set_event, s_eom_task_tsk_set_event,
+                                    NULL, NULL,
+                                    NULL, NULL,
+                                    s_eom_task_get_id
+                                  );
+
+#if defined(PRINT_TASK_ADDITIONAL_INFO)
+            snprintf(typestr, sizeof(typestr), "%s", "evt-drvn");
+#endif
+        } break;
+
+        case eom_mtask_MessageDriven:
+        {   // accepts msg only and their processing is internally defined
+
+            retptr->type            = eom_mtask_MessageDriven;
+            retptr->osalrun         = s_eom_task_msg_driven_loop;
+
+            retptr->ustime          = timeoutORperiod;
+            retptr->waitmask        = 0;
+            retptr->maxmessages     = (0 == queuesizeORalleventsmask) ? (1) : (queuesizeORalleventsmask);   // cannot be zero.
+            retptr->messagequeue    = osal_messagequeue_new(retptr->maxmessages);
+            retptr->argumentqueue   = NULL;
+
+            // osal may return NULL
+            eo_errman_Assert(eo_errman_GetHandle(), (NULL != retptr->messagequeue), "eom_task_New(): osal gives NULL m-messagequeue", s_eobj_ownname, &eo_errman_DescrRuntimeErrorLocal);
+
+            eov_task_hid_SetVTABLE( retptr->tsk, 
+                                    (eOvoid_fp_voidp_uint32_t)startup_fn, (eOvoid_fp_voidp_uint32_t)run_fn,
+                                    NULL, NULL,
+                                    s_eom_task_isr_send_message, s_eom_task_tsk_send_message,
+                                    NULL, NULL,
+                                    s_eom_task_get_id
+                                  );
+
+#if defined(PRINT_TASK_ADDITIONAL_INFO)
+            snprintf(typestr, sizeof(typestr), "%s", "msg-drvn");
+#endif
+        } break;
+
+        case eom_mtask_CallbackDriven:
+        {   // accepts only activity requests (via the message queue) and its execution is internally defined
+
+            retptr->type            = eom_mtask_CallbackDriven;
+            retptr->osalrun         = s_eom_task_cbk_driven_loop;
+
+            retptr->ustime          = timeoutORperiod;
+            retptr->waitmask        = 0;
+            retptr->maxmessages     = (0 == queuesizeORalleventsmask) ? (1) : (queuesizeORalleventsmask);   // cannot be zero.
+            retptr->messagequeue    = osal_messagequeue_new(retptr->maxmessages);
+            retptr->argumentqueue   = osal_messagequeue_new(retptr->maxmessages);
+
+            // osal may return NULL
+            eo_errman_Assert(eo_errman_GetHandle(), (NULL != retptr->messagequeue),   "eom_task_New(): osal gives NULL cb-messagequeue", s_eobj_ownname, &eo_errman_DescrRuntimeErrorLocal);
+            eo_errman_Assert(eo_errman_GetHandle(), (NULL != retptr->argumentqueue), "eom_task_New(): osal gives NULL cb-argumentqueue", s_eobj_ownname, &eo_errman_DescrRuntimeErrorLocal);
+
+            eov_task_hid_SetVTABLE( retptr->tsk, 
+                                    (eOvoid_fp_voidp_uint32_t)startup_fn, (eOvoid_fp_voidp_uint32_t)run_fn,
+                                    NULL, NULL,
+                                    NULL, NULL,
+                                    s_eom_task_isr_exec_callback, s_eom_task_tsk_exec_callback,
+                                    s_eom_task_get_id
+                                  );
+
+#if defined(PRINT_TASK_ADDITIONAL_INFO)
+            snprintf(typestr, sizeof(typestr), "%s", "actv-drvn");
+#endif
+        } break;
+
+        case eom_mtask_Periodic:
+        {   // does not accepts msg, evt or cbk. it only executes a fixed avtivity at regular interval of time
+
+            retptr->type            = eom_mtask_Periodic;
+            retptr->osalrun         = s_eom_task_periodic_loop;
+
+            retptr->ustime          = timeoutORperiod;
+            retptr->waitmask        = 0;
+            retptr->maxmessages     = 0;
+            retptr->messagequeue    = NULL;
+            retptr->argumentqueue   = NULL;
+
+            eov_task_hid_SetVTABLE( retptr->tsk, 
+                                    (eOvoid_fp_voidp_uint32_t)startup_fn, (eOvoid_fp_voidp_uint32_t)run_fn,
+                                    NULL, NULL,
+                                    NULL, NULL,
+                                    NULL, NULL,
+                                    s_eom_task_get_id
+                                  );
+
+#if defined(PRINT_TASK_ADDITIONAL_INFO)
+            snprintf(typestr, sizeof(typestr), "%s", "periodic");
+#endif
+        } break;
+
+                
+        default:
+        {
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, "eom_task_New(): unsupported type", s_eobj_ownname, &eo_errman_DescrWrongParamLocal);
+        } break;
+    }
+
+
+    
+    // now i create the osal task
+
+    // adjust the parameters. with osal there is no need to retrieve stack memory as stack is reserved by osal_task_new()
+
+    if((priority<osal_prio_usrtsk_max) && (priority>osal_prio_usrtsk_min))
+    {
+        retptr->priority =  priority;   
+    }
+    else
+    {
+        retptr->priority = (priority<osal_prio_usrtsk_min) ? (osal_prio_usrtsk_min) : (osal_prio_usrtsk_max);
+    }
+
+    stacksize = (stacksize+7)/8;
+    stacksize *= 8;
+
+
+
+    if(NULL != nameofthetask_fn)
+    {
+        retptr->osaltask = osal_task_new(nameofthetask_fn, retptr, retptr->priority, stacksize); // fn, arg, prio, stksize
+        osal_task_extdata_set(retptr->osaltask, retptr);
+    }
+    else
+    {
+        retptr->osaltask = osal_task_new(retptr->osalrun, retptr, retptr->priority, stacksize);
+        osal_task_extdata_set(retptr->osaltask, retptr);
+    }
+
+    // osaltask must not be NULL, thus i check it.
+    eo_errman_Assert(eo_errman_GetHandle(), (NULL != retptr->osaltask), "eom_task_New(): osal gives NULL osaltask", s_eobj_ownname, &eo_errman_DescrRuntimeErrorLocal);
+
+    s_eom_task_count ++;
+#if defined(PRINT_TASK_ADDITIONAL_INFO)
+    char str[128] = {0};
+    osal_task_id_t id = 0;
+    osal_task_id_get(retptr->osaltask, &id);
+    snprintf(str, sizeof(str), "#%d: %s, id %d, pr %d, %s", s_eom_task_count, name, id, priority, typestr);
+    eo_errman_Info(eo_errman_GetHandle(), str, s_eobj_ownname, NULL);
+#endif
+    // ok. everything is done. when the rtos will start, then the run function of the task will be executed
+   
+    return eores_OK;
+}
+
+
+extern void eom_task_Delete(EOMtask *p)
+{
+    if(NULL == p)
+    {
+        return;
+    }   
+
+    if(NULL != p->osaltask)
+    {
+        osal_task_delete(p->osaltask);
+        p->osaltask = NULL;
+    }    
+
+
+    if(NULL != p->messagequeue)
+    {
+        osal_messagequeue_delete(p->messagequeue);
+        p->messagequeue = NULL;
+    }        
+    
+    if(NULL != p->argumentqueue)
+    {
+        osal_messagequeue_delete(p->argumentqueue);
+        p->argumentqueue = NULL;
+    }
+    
+    eov_task_hid_Delete(p->tsk);
+    
+    memset(p, 0, sizeof(EOMtask));
+}
+
 extern EOMtask * eom_task_New(eOmtaskType_t type, uint8_t priority, uint16_t stacksize,
                                        void (*startup_fn)(EOMtask *tsk, uint32_t zero),
                                        void (*run_fn)(EOMtask *tsk, uint32_t evtmsgper), 
@@ -132,7 +418,7 @@ extern EOMtask * eom_task_New(eOmtaskType_t type, uint8_t priority, uint16_t sta
     eo_errman_Assert(eo_errman_GetHandle(), (0 != stacksize), "eom_task_New(): 0 stacksize", s_eobj_ownname, &eo_errman_DescrWrongParamLocal);
     
     // get a new multitask task
-    retptr = (EOMtask*) eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOMtask), 1);
+    retptr = (EOMtask*) eo_mempool_New(eo_mempool_GetHandle(), sizeof(EOMtask));
 
     // get the base task. its vtable shall be initted depending on its kind
     retptr->tsk = eov_task_hid_New();
