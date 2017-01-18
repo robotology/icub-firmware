@@ -667,6 +667,46 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>embot</GroupName>
+          <Files>
+            <File>
+              <FileName>embot_common.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\embot\embot_common.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_sys.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\embot\embot_sys.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_sys_Task.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\embot\embot_sys_Task.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_sys_theCallbackManager.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\embot\embot_sys_theCallbackManager.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_sys_theScheduler.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\embot\embot_sys_theScheduler.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_sys_theTimerManager.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\embot\embot_sys_theTimerManager.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_sys_Timer.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\embot\embot_sys_Timer.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
           <GroupOption>
             <CommonProperty>
@@ -1068,7 +1108,7 @@
               <MiscControls>--cpp11</MiscControls>
               <Define>STM32F40_41xxx HL_USE_BRD_MCBSTM32F400</Define>
               <Undefine></Undefine>
-              <IncludePath>..\cmsis-cfg;..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\cmsis\api;..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\lowlevel\hl-core-tests\app-test\cmsis;..\..\..\..\midware\hl-plus-tests\app-test\core;..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\app-test;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask;..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\api</IncludePath>
+              <IncludePath>..\cmsis-cfg;..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\hl-core\cmsis\api;..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\lowlevel\hl-core-tests\app-test\cmsis;..\..\..\..\midware\hl-plus-tests\app-test\core;..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\app-test;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask;..\..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\hal2\api;..\embot</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1446,6 +1486,46 @@
               <FileName>EOMtheTimerManager.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask\EOMtheTimerManager.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>embot</GroupName>
+          <Files>
+            <File>
+              <FileName>embot_common.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\embot\embot_common.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_sys.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\embot\embot_sys.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_sys_Task.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\embot\embot_sys_Task.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_sys_theCallbackManager.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\embot\embot_sys_theCallbackManager.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_sys_theScheduler.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\embot\embot_sys_theScheduler.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_sys_theTimerManager.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\embot\embot_sys_theTimerManager.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_sys_Timer.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\embot\embot_sys_Timer.cpp</FilePath>
             </File>
           </Files>
         </Group>

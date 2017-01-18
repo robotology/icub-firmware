@@ -51,7 +51,6 @@
 #include "test-singleton.h"
 #include "test-namespaces.h"
 
-#include "some-classes.h"
 
 #include <new>
 
@@ -72,6 +71,10 @@ extern "C" {
 
 
 
+
+// this one is enough for embot namespace embot{ common{}, sys{} }
+
+#include "embot.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -275,15 +278,15 @@ void startup_tskevt(embot::sys::Task *tsk, void *param)
     eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_seven, EOK_reltime1sec, 0);
 }
 
-void onevent(embot::sys::Task *tsk, embot::sys::Task::Event evt, void *param)
+void onevent(embot::sys::Task *tsk, embot::common::Event evt, void *param)
 {
     tsk = tsk;
     evt = evt;   
     
     
-    static embot::Time t1 = 0;
+    static embot::common::Time t1 = 0;
     
-    static embot::Time prev = 0;
+    static embot::common::Time prev = 0;
     
     t1 = embot::sys::timeNow();
     t1 = t1;
@@ -306,15 +309,15 @@ void onevent(embot::sys::Task *tsk, embot::sys::Task::Event evt, void *param)
 //    a = a;
 }
 
-void onmessage(embot::sys::Task *tsk, embot::sys::Task::Message msg, void *param)
+void onmessage(embot::sys::Task *tsk, embot::common::Message msg, void *param)
 {
     tsk = tsk;
     msg = msg;
 
 
-    static embot::Time t1 = 0;
+    static embot::common::Time t1 = 0;
     
-    static embot::Time prev = 0;
+    static embot::common::Time prev = 0;
     
     t1 = embot::sys::timeNow();
     t1 = t1;
@@ -336,9 +339,9 @@ void periodicactivity(embot::sys::Task *tsk, void *param)
     tsk = tsk;
     
     static uint32_t times = 0;
-    static embot::Time tthis = 0;
-    static embot::Time tmsg = 0;
-    static embot::Time now = 0;
+    static embot::common::Time tthis = 0;
+    static embot::common::Time tmsg = 0;
+    static embot::common::Time now = 0;
     
     helper_t *h = static_cast<helper_t*>(param);
     
