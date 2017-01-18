@@ -42,9 +42,27 @@ static const led_data_t s_led_data[8] =
     {GPIOH, 3, 3}
 };
 
+static uint8_t s_led_onmask = 0;
 
-extern void board_led_init(void) 
+
+extern int8_t board_led_init(uint8_t led, const void *dummyparam)
 {
+    board_led_global_init();
+
+    return 0;
+}    
+
+extern int8_t board_led_global_init(void) 
+{
+    static uint8_t initted = 0;
+    
+    if(1 == initted)
+    {
+        return 0;
+    }
+    
+    initted = 1;
+    
     // Enable clock for GPIOG, GPIOH and GPIOI                                 
     RCC->AHB1ENR |= (1UL << 6) | (1UL << 7) | (1UL << 8) ;
 
@@ -78,21 +96,46 @@ extern void board_led_init(void)
     GPIOI->OSPEEDR |=  (2UL << 2*10);
     GPIOI->PUPDR   &= ~(3UL << 2*10);
     GPIOI->PUPDR   |=  (1UL << 2*10); 
+    
+    s_led_onmask = 0;
+    
+    return 0;
 }
 
 
-extern void board_led_on(board_led_t led)
+extern int8_t board_led_on(board_led_t led)
 {
     //GPIOI->BSRRL = 1UL << 10; // pin 10 port I
     s_led_data[led].port->BSRRL = 1UL << s_led_data[led].pin;
+    
+    s_led_onmask |= (1 << led);
+    
+    return 0;
 }
 
 
-extern void board_led_off(board_led_t led) 
-{
-    
+extern int8_t board_led_off(board_led_t led) 
+{    
      //GPIOI->BSRRH = 1UL << 10; // pin 10 port I
      s_led_data[led].port->BSRRH = 1UL << s_led_data[led].pin;
+    
+    s_led_onmask &= ~(1 << led);
+    
+    return 0;
+}
+
+extern int8_t board_led_toggle(board_led_t led)
+{
+    if((1<<led) == (s_led_onmask & (1 << led) ))
+    {   // it is on
+        board_led_off(led);
+    }
+    else
+    {
+        board_led_on(led);
+    }
+    
+    return 0;
 }
 
 
