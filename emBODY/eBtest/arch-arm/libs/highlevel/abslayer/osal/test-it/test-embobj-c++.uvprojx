@@ -704,6 +704,11 @@
               <FileType>8</FileType>
               <FilePath>..\embot\embot_sys_Timer.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_sys_theJumper.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\embot\embot_sys_theJumper.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1071,7 +1076,7 @@
               <OCR_RVCT9>
                 <Type>0</Type>
                 <StartAddress>0x20000000</StartAddress>
-                <Size>0x20000</Size>
+                <Size>0x1ffe0</Size>
               </OCR_RVCT9>
               <OCR_RVCT10>
                 <Type>0</Type>
@@ -1083,8 +1088,8 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>4</Optim>
-            <oTime>1</oTime>
+            <Optim>1</Optim>
+            <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>0</OneElfS>
             <Strict>0</Strict>
@@ -1526,6 +1531,11 @@
               <FileName>embot_sys_Timer.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\embot\embot_sys_Timer.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_sys_theJumper.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\embot\embot_sys_theJumper.cpp</FilePath>
             </File>
           </Files>
         </Group>

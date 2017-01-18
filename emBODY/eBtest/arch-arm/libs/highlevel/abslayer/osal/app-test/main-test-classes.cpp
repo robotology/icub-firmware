@@ -76,6 +76,8 @@ extern "C" {
 
 #include "embot.h"
 
+#include "embot_sys_theJumper.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -119,6 +121,8 @@ void task_led(void *);
 void task_wrk(void *param);
 
 void wedobusinessinhere(void);
+
+static int8_t jump2address(uint32_t addr);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -174,7 +178,23 @@ void onFatal(void)
 
 int main(void) 
 {
-
+    embot::sys::theJumper& thejumper = embot::sys::theJumper::getInstance();
+    embot::sys::theJumper::Config cfgJumper(NVIC_SystemReset, jump2address);
+    thejumper.init(cfgJumper);
+    uint32_t address = 0;
+    bool found = thejumper.eval(address, false);
+    if(found)
+    {
+        uint8_t ciao = 0;
+        address = address;
+        // could not jump to address .... why?
+        thejumper.jump(address);
+    }
+    
+    thejumper.set(0x1+address);
+    
+    thejumper.restart();
+    
     // cmsis init
     SystemInit(); 
     // configuration of priority: not needed
@@ -638,6 +658,35 @@ void wedobusinessinhere(void)
     res =  res;
     
     delete emee;       
+}
+
+
+
+static int8_t jump2address(uint32_t addr)
+{
+#if 1
+    return 0;
+#else
+    volatile uint32_t jumpaddr;
+    void (*app_fn)(void) = NULL;
+
+//    if(hl_res_NOK_generic == hl_sys_canjump(addr))
+//    {
+//        return(hl_res_NOK_generic);
+//    }
+
+    // prepare jump address 
+    jumpaddr = *(volatile uint32_t*) (addr + 4);
+    // prepare jumping function
+    app_fn = (void (*)(void)) jumpaddr;
+    // initialize user application's stack pointer 
+    __set_MSP(*(volatile uint32_t*) addr);
+    // jump.
+    app_fn(); 
+    
+    // never in here.
+    return(0); 
+#endif    
 }
 
 
