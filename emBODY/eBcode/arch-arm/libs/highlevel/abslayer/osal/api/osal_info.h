@@ -74,7 +74,7 @@ typedef enum
     osal_info_entity_mutex          = 3,
     osal_info_entity_semaphore      = 4,
     osal_info_entity_messagequeue   = 5,
-    osal_info_entity_message        = 6,     
+    osal_info_entity_message        = 6     
 } osal_info_entity_t;
 
 enum { osal_info_entity_numberof = osal_info_entity_message+1 }; // put the max in osal_info_entity_t + 1
