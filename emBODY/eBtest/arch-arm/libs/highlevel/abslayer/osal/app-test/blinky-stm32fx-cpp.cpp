@@ -139,7 +139,7 @@ int main(void)
     //NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
     
     // init the leds
-    board_led_init();
+    board_led_global_init();
      
     // init the event viewer.
     eventviewer_init(); 
