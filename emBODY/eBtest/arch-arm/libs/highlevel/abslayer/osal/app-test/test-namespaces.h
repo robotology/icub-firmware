@@ -79,15 +79,15 @@ namespace embot
                 uint32_t size;
                 uint32_t type_etc;                
             };
-            EEPROM(){};
-            ~EEPROM(){};
-            bool init(const EEPROM::Config &config) { if(0 == config.size){ return false; } return true; };
-            bool uninit() { return true; };
-            bool isInitialised() { return true; };
-            virtual bool read(uint32_t address, uint32_t size, uint8_t *data) { return true; };     
-            virtual bool write(uint32_t address, uint32_t size, const uint8_t *data) { return true; };  
-            virtual bool erase(uint32_t address, uint32_t size) { return true; };  
-            virtual bool erase() { return true; };             
+            EEPROM(){}
+            ~EEPROM(){}
+            bool init(const EEPROM::Config &config) { if(0 == config.size){ return false; } return true; }
+            bool uninit() { return true; }
+            bool isInitialised() { return true; }
+            virtual bool read(uint32_t address, uint32_t size, uint8_t *data) { return true; }     
+            virtual bool write(uint32_t address, uint32_t size, const uint8_t *data) { return true; }  
+            virtual bool erase(uint32_t address, uint32_t size) { return true; }  
+            virtual bool erase() { return true; }             
         };  
 
         class emulEEPROM : public if2hw::storage
@@ -107,11 +107,11 @@ namespace embot
                 };
                 Config(emulPlace _place, uint32_t _addressofzero, uint32_t _capacity, uint32_t _pagesize) {
                     load(_place, _addressofzero, _capacity, _pagesize); 
-                };                    
+                }                    
                 void load(emulPlace _place, uint32_t _addressofzero, uint32_t _capacity, uint32_t _pagesize) { 
                     place = _place; addressofzero = _addressofzero; capacity = _capacity; pagesize = _pagesize; 
-                };                    
-                void reset() { load(emulPlace::nowhere, 0, 0, 0); };                    
+                }                    
+                void reset() { load(emulPlace::nowhere, 0, 0, 0); }                    
             };
             emulEEPROM();
             ~emulEEPROM();
@@ -136,7 +136,7 @@ namespace embot
         public:
             display(){};
             ~display(){};
-            bool show(uint8_t *data, uint16_t sizex, int16_t sizey) { return true; };            
+            bool show(uint8_t *data, uint16_t sizex, int16_t sizey) { return true; }           
         };
         
     }    
@@ -150,10 +150,10 @@ namespace embot
         class theEnvironment
         {
         public:
-            theEnvironment(){};
-            ~theEnvironment(){};
-            bool init(void) { return true; };     
-            bool start(void) { return true; };                       
+            theEnvironment(){}
+            ~theEnvironment(){}
+            bool init(void) { return true; }    
+            bool start(void) { return true; }                      
         };
         
         class theHeap
@@ -161,8 +161,8 @@ namespace embot
         public:
             theHeap(){};
             ~theHeap(){};
-            void * get(void) { return nullptr; };     
-            void release(void *) {  };                       
+            void * get(void) { return nullptr; }     
+            void release(void *) {  }                       
         };  
 
 //        class Timer

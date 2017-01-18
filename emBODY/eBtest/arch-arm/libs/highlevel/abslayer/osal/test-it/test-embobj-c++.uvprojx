@@ -450,14 +450,14 @@
               <FilePath>..\app-test\test-singleton.cpp</FilePath>
             </File>
             <File>
-              <FileName>test-namespaces.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\app-test\test-namespaces.cpp</FilePath>
-            </File>
-            <File>
               <FileName>some-classes.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\app-test\some-classes.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>test-namespaces.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\app-test\test-namespaces.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -568,31 +568,6 @@
               <FileName>EOlist.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOlist.c</FilePath>
-            </File>
-            <File>
-              <FileName>EONmutex.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EONmutex.c</FilePath>
-            </File>
-            <File>
-              <FileName>EONtask.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EONtask.c</FilePath>
-            </File>
-            <File>
-              <FileName>EONtheCallbackManager.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EONtheCallbackManager.c</FilePath>
-            </File>
-            <File>
-              <FileName>EONtheSystem.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EONtheSystem.c</FilePath>
-            </File>
-            <File>
-              <FileName>EONtheTimerManager.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EONtheTimerManager.c</FilePath>
             </File>
             <File>
               <FileName>EOpacket.c</FileName>
@@ -1068,8 +1043,8 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>1</Optim>
-            <oTime>0</oTime>
+            <Optim>4</Optim>
+            <oTime>1</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>0</OneElfS>
             <Strict>0</Strict>
@@ -1158,14 +1133,14 @@
               <FilePath>..\app-test\test-singleton.cpp</FilePath>
             </File>
             <File>
-              <FileName>test-namespaces.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\app-test\test-namespaces.cpp</FilePath>
-            </File>
-            <File>
               <FileName>some-classes.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\app-test\some-classes.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>test-namespaces.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\app-test\test-namespaces.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1326,31 +1301,6 @@
               <FileName>EOlist.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOlist.c</FilePath>
-            </File>
-            <File>
-              <FileName>EONmutex.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EONmutex.c</FilePath>
-            </File>
-            <File>
-              <FileName>EONtask.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EONtask.c</FilePath>
-            </File>
-            <File>
-              <FileName>EONtheCallbackManager.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EONtheCallbackManager.c</FilePath>
-            </File>
-            <File>
-              <FileName>EONtheSystem.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EONtheSystem.c</FilePath>
-            </File>
-            <File>
-              <FileName>EONtheTimerManager.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EONtheTimerManager.c</FilePath>
             </File>
             <File>
               <FileName>EOpacket.c</FileName>

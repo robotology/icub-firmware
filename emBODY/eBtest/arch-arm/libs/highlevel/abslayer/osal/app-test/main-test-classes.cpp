@@ -57,7 +57,9 @@
 
 #include <cstring>
 
-#include "EOVtheCallbackManager.h"
+//#include "EOVtheCallbackManager.h"
+
+#include "EOtheLEDpulser.h"
 
 
 #ifdef __cplusplus
@@ -105,7 +107,7 @@ extern "C" {
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static void s_osal_init(void);
+//static void s_osal_init(void);
 
 static void s_osal_starter(void);
 
@@ -136,6 +138,26 @@ void ciao(void*p)
     dd = dd;
 }
 
+void onIdle(void)
+{
+    // called every time inside a for(;;){}
+    static volatile uint8_t ii = 0;
+    ii++;
+    
+//    embot::sys::theScheduler & system = embot::sys::theScheduler::getInstance(); 
+//    embot::sys::Task *tsk1 = system.getTask();
+//    tsk1 = tsk1;
+    
+    return;
+}
+
+void onFatal(void)
+{
+    uint8_t ciao = 0;
+    ciao =  ciao;
+    return;
+}
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
@@ -156,22 +178,45 @@ int main(void)
     //NVIC_PriorityGroupConfig(NVIC_PriorityGroup_4);
     
     // init the leds
-    board_led_init();
+    board_led_global_init();
      
     // init the event viewer.
     eventviewer_init(); 
     
-    EOaction_strg strg;
-    EOaction *act = (EOaction*)&strg;
-    eo_action_SetCallback(act, ciao, NULL, eov_callbackman_GetTask(eov_callbackman_GetHandle()));  
     
-    embot::sys::Timer *tmr = new embot::sys::Timer;
-    const embot::relTime countdown = 1000*1000;
-    tmr->start(countdown, embot::sys::Timer::Mode::forever, act);
+    
+//    EOaction_strg strg;
+//    EOaction *act = (EOaction*)&strg;
+//    eo_action_SetCallback(act, ciao, NULL, eov_callbackman_GetTask(eov_callbackman_GetHandle()));  
+//    
+//    embot::sys::Timer *tmr = new embot::sys::Timer;
+//    const embot::relTime countdown = 1000*1000;
+//    tmr->start(countdown, embot::sys::Timer::Mode::forever, act);
 
-    
-    s_osal_init();
+//    
+//    s_osal_init();
         
+    
+    embot::sys::theScheduler &thesystem = embot::sys::theScheduler::getInstance();
+ 
+#if 0 
+    thesystem.setTiming(168*1000*1000, 1000);
+    thesystem.setOnIdle(onIdle, 512);
+    thesystem.setOnFatalError(onFatal);
+    thesystem.setLauncher(s_osal_starter, 2048);
+#else
+    embot::sys::theScheduler::Config cfg;
+    cfg.launcher = s_osal_starter;
+    cfg.launcherstacksize = 2048;
+    cfg.onidle = onIdle;
+    cfg.onidlestacksize = 512;
+    cfg.onfatalerror = onFatal;
+    
+    thesystem.init(cfg);
+#endif
+
+
+    thesystem.start();
     
     osal_system_start(s_osal_starter);
    
@@ -193,26 +238,132 @@ int main(void)
 // - definition of static functions 
 // -------------------------------------------------------------------------------------------------------------------- 
 
-static void s_osal_init(void)
-{
-    uint32_t ram08size = 0;
-    uint64_t *ram08data = NULL;
-    
-    osal_base_memory_getsize(osal_cfgMINEX, &ram08size);
-    
-    if(0 != ram08size)
-    {
-        // what about osal_base_memory_new() ???? yes, we can use it
-        ram08data = (uint64_t*)(uint64_t*)osal_base_memory_new(ram08size);
-    }
+//static void s_osal_init(void)
+//{
+//    uint32_t ram08size = 0;
+//    uint64_t *ram08data = NULL;
+//    
+//    osal_base_memory_getsize(osal_cfgMINEX, &ram08size);
+//    
+//    if(0 != ram08size)
+//    {
+//        // what about osal_base_memory_new() ???? yes, we can use it
+//        ram08data = (uint64_t*)(uint64_t*)osal_base_memory_new(ram08size);
+//    }
 
-    osal_base_initialise(osal_cfgMINEX, ram08data);      
-  
+//    osal_base_initialise(osal_cfgMINEX, ram08data);      
+//  
+//}
+
+embot::sys::EventTask *taskevt = nullptr;
+embot::sys::MessageTask *taskmsg = nullptr;
+
+typedef struct
+{
+    embot::sys::EventTask *taskevt;
+    embot::sys::MessageTask *taskmsg;
+} helper_t;
+
+helper_t helper = {nullptr, nullptr};
+
+void startup_tskevt(embot::sys::Task *tsk, void *param)
+{
+    uint8_t ss = tsk->getPriority();
+    ss = ss;
+    tsk = tsk;
+    
+    eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_seven, EOK_reltime1sec, 0);
+}
+
+void onevent(embot::sys::Task *tsk, embot::sys::Task::Event evt, void *param)
+{
+    tsk = tsk;
+    evt = evt;   
+    
+    
+    static embot::Time t1 = 0;
+    
+    static embot::Time prev = 0;
+    
+    t1 = embot::sys::timeNow();
+    t1 = t1;
+       
+    static uint64_t delta = 0;
+    delta = t1 - prev;
+    
+    delta = delta;
+    
+    prev = t1;
+    
+    if(0x10000000 == evt)
+    {   
+        evt = evt; 
+    }
+   
+    
+//    embot::sys::EventTask * t = dynamic_cast<embot::sys::EventTask *>(tsk);    
+//    int a = t->getPP();
+//    a = a;
+}
+
+void onmessage(embot::sys::Task *tsk, embot::sys::Task::Message msg, void *param)
+{
+    tsk = tsk;
+    msg = msg;
+
+
+    static embot::Time t1 = 0;
+    
+    static embot::Time prev = 0;
+    
+    t1 = embot::sys::timeNow();
+    t1 = t1;
+       
+    static uint64_t delta = 0;
+    delta = t1 - prev;
+    
+    delta = delta;
+    
+    prev = t1;
+
+    embot::sys::Task *tsk1 = embot::sys::taskRunning();
+    tsk1 = tsk1;
 }
 
 
+void periodicactivity(embot::sys::Task *tsk, void *param)
+{
+    tsk = tsk;
+    
+    static uint32_t times = 0;
+    static embot::Time tthis = 0;
+    static embot::Time tmsg = 0;
+    static embot::Time now = 0;
+    
+    helper_t *h = static_cast<helper_t*>(param);
+    
+    times++;  
+    //h->taskevt->setEvent(times);    
+    taskevt->setEvent(times);
+    
+    //taskmsg->setMessage(times, 10*1000);
+    h->taskmsg->setMessage(times, 10*1000);
+    times++;
+    //taskmsg->setMessage(times, 10*1000);  
+//    h->taskmsg->setMessage(times, 10*1000);  
+
+    tthis = tsk->timeOfTrigger();  
+    tthis = tthis;    
+    tmsg = h->taskmsg->timeOfTrigger();
+    tmsg = tmsg;
+    
+    now = embot::sys::timeNow();
+    now = now;
+}
+
 static void s_osal_starter(void)
 {
+#if 0
     // launch some tasks.
     osal_task_properties_t tskprop = {0};
     
@@ -234,7 +385,70 @@ static void s_osal_starter(void)
     tskprop.stacksize = 2*1024;
     
     s_taskWRK = osal_task_new1(&tskprop); 
-    s_taskWRK = s_taskWRK;    
+    s_taskWRK = s_taskWRK;  
+#else
+
+    embot::sys::theTimerManager& tmrman = embot::sys::theTimerManager::getInstance();
+
+    embot::sys::theTimerManager::Config tmrmanconfig;
+
+    tmrman.init(tmrmanconfig);
+    tmrman.start();
+    
+    embot::sys::theCallbackManager& cbkman = embot::sys::theCallbackManager::getInstance();
+    cbkman.start();
+
+    taskevt = new embot::sys::EventTask;
+    
+    taskevt->init(startup_tskevt, onevent, 1024, 20, 1000*1000);    
+    
+    taskmsg = new embot::sys::MessageTask(nullptr, onmessage, 1024, 24, 8, 1000*1000);
+    
+//    embot::sys::Task * t = dynamic_cast<embot::sys::Task *>(task);        
+//    delete t;    
+//    task = task;
+
+
+    helper.taskevt = taskevt;
+    helper.taskmsg = taskmsg;
+
+    embot::sys::PeriodicTask *taskper = new embot::sys::PeriodicTask;
+    
+    
+    taskper->init(nullptr, periodicactivity, 1024, 30, 100*1000, &helper);
+    
+
+
+    embot::sys::Task *tsk1 = embot::sys::taskRunning();
+    tsk1 = tsk1;
+    
+    embot::sys::Timer *tmr = new embot::sys::Timer;
+    
+    embot::sys::Action action;
+    embot::sys::Action::EventToTask evt2tsk;
+    evt2tsk.event = 0x10000000;
+    evt2tsk.task = taskevt;
+//    evt2tsk.task = NULL;
+    action.set(evt2tsk);
+    
+    tmr->start(1000*1000, embot::sys::Timer::Type::forever, action);
+    
+    
+    
+    eOledpulser_cfg_t ledconfig = {0};
+    
+    ledconfig.led_enable_mask   = (1 << eo_ledpulser_led_zero) | (1 << eo_ledpulser_led_one) | (1 << eo_ledpulser_led_two) | (1 << eo_ledpulser_led_three) | 
+                                  (1 << eo_ledpulser_led_four) | (1 << eo_ledpulser_led_five) | (1 << eo_ledpulser_led_six) | (1 << eo_ledpulser_led_seven);
+    ledconfig.led_init          = board_led_init;
+    ledconfig.led_on            = (eOint8_fp_uint8_t) board_led_on;
+    ledconfig.led_off           = (eOint8_fp_uint8_t) board_led_off;
+    ledconfig.led_toggle        = (eOint8_fp_uint8_t) board_led_toggle;
+    
+    eo_ledpulser_Initialise(&ledconfig);
+    
+
+
+#endif
 
     return;
 }
