@@ -20,7 +20,20 @@
 #ifndef _HAL_CFG_H_
 #define _HAL_CFG_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+    
+
+    
 #include "hal_core_cfg.h"
+
+#include "hal_core.h"    
+extern const hal_cfg_t hal_cfg;
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 
 #endif  // include-guard
