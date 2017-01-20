@@ -588,6 +588,8 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
                 break;
             }
         };
+
+
         
         o->motor[k].HARDWARE_TYPE = o->actuation_type;
         
@@ -1394,6 +1396,7 @@ void MController_config_joint(int j, eOmc_joint_config_t* config) //
 void MController_config_motor(int m, eOmc_motor_config_t* config) //
 {
     Motor_config(smc->motor+m, m, config);
+    AbsEncoder_config_divisor(smc->absEncoder+m, config->gearboxratio2);
 }
 
 void MController_config_motor_friction(int m, eOmc_motor_params_t* friction) //

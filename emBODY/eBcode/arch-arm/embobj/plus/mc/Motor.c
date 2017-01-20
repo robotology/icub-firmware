@@ -214,6 +214,7 @@ void Motor_init(Motor* o) //
     memset(o, 0, sizeof(Motor));
 
     o->GEARBOX = 1;
+    o->GEARBOX_E2J = 1;
     
     o->not_init = TRUE;
     o->not_calibrated = TRUE;
@@ -243,6 +244,7 @@ void Motor_config(Motor* o, uint8_t ID, eOmc_motor_config_t* config) //
     //o->HARDWARE_TYPE      = hardware_type;
     //o->MOTOR_CONTROL_TYPE = motor_control_type;
     o->GEARBOX            = config->gearboxratio;
+    o->GEARBOX_E2J        = config->gearboxratio2;
     o->HAS_TEMP_SENSOR    = config->hasTempSensor;
     
     o->enc_sign = config->rotorEncoderResolution >= 0 ? 1 : -1; 

@@ -159,6 +159,7 @@ typedef struct //Motor
     uint8_t MOTOR_CONTROL_TYPE;
 
     int16_t GEARBOX;
+    int16_t GEARBOX_E2J;
 
     BOOL HAS_TEMP_SENSOR;
     int16_t temperature_max;
