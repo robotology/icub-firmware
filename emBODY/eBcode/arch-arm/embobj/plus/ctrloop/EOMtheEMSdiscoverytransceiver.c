@@ -41,6 +41,8 @@
 
 #include "EoUpdaterProtocol.h"
 
+#include "EOVtheCallbackManager.h"
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -158,7 +160,9 @@ extern EOMtheEMSdiscoverytransceiver * eom_emsdiscoverytransceiver_Initialise(co
         s_emsdiscoverytransceiver_singleton.dbgshutdowntmr = eo_timer_New();
         EOaction_strg astg = {0};
         EOaction *action = (EOaction*)&astg;
-        eo_action_SetCallback(action, s_callback_shutdown2updater, NULL, NULL);
+        EOVtaskDerived *executingtask = NULL; // if NULL the EOtheTimerManager will directly execute the action. it is ok for small sized callbacks
+        //EOVtaskDerived *executingtask = eov_callbackman_GetTask(eov_callbackman_GetHandle());
+        eo_action_SetCallback(action, s_callback_shutdown2updater, NULL, executingtask);
         eo_timer_Start(s_emsdiscoverytransceiver_singleton.dbgshutdowntmr, eok_abstimeNOW, s_emsdiscoverytransceiver_singleton.cfg.dbgshutdowntime, eo_tmrmode_ONESHOT, action);                             
     }   
 
@@ -293,7 +297,9 @@ static eObool_t s_parse_and_form(uint8_t *data, uint8_t size, eOipv4addr_t remad
                 // timer di shutdown
                 if(eobool_true == restart2updater)
                 {
-                    eo_action_SetCallback(action, s_callback_shutdown2updater, NULL, NULL);
+                    EOVtaskDerived *executingtask = NULL; // if NULL the EOtheTimerManager will directly execute the action. it is ok for small sized callbacks
+                    //EOVtaskDerived *executingtask = eov_callbackman_GetTask(eov_callbackman_GetHandle());
+                    eo_action_SetCallback(action, s_callback_shutdown2updater, NULL, executingtask);
                     eo_timer_Start(s_emsdiscoverytransceiver_singleton.shutdowntmr, eok_abstimeNOW, 50*eok_reltime1ms, eo_tmrmode_ONESHOT, action);  
                 }
             
