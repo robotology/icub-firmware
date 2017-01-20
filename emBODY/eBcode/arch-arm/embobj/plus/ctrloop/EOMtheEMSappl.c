@@ -895,7 +895,10 @@ extern void eo_cfg_sm_EMSappl_hid_on_entry_RUN(EOsm *s)
     //eo_action_Clear(&ontxdone);
 
     eo_action_SetCallback(ontxdone, (eOcallback_t)eom_emsrunner_OnUDPpacketTransmitted, eom_emsrunner_GetHandle(), NULL);
-    // the socket does not alert anybody when it receives a pkt, but will alert the sending task, so that it knows that it can stop wait
+    // the socket does not alert anybody when it receives a pkt, but will alert the sending task, so that it knows that it can stop wait.
+    // the alert is done by a callback, eom_emsrunner_OnUDPpacketTransmitted(), which executed by the sender of the packet directly.
+    // this funtion is executed with eo_action_Execute(s->socket->ontransmission) inside the EOMtheIPnet object
+    // for this reason we call eo_action_SetCallback(....., exectask = NULL_); IT MUST NOT BE the callback-manager!!!!
     eom_emssocket_Open(eom_emssocket_GetHandle(), NULL, ontxdone);
     
     // we activate the runner
