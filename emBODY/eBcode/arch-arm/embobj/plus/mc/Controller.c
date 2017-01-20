@@ -42,11 +42,13 @@
 
 MController* smc = NULL;
 
+#include "stdio.h"
+
 //static char invert_matrix(float** M, float** I, char n);
 //static void MController_config_motor_set(MController* o);
 //static void MController_config_encoder_set(MController* o);
 
-#if 0
+
 static void send_debug_message(char *message, uint8_t jid, uint16_t par16, uint64_t par64)
 {
 
@@ -59,9 +61,9 @@ static void send_debug_message(char *message, uint8_t jid, uint16_t par16, uint6
     errdes.par64            = par64;
     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, message, NULL, &errdes);
 }
-#endif
 
-//static char s_trace_string[128] = {0};
+
+static char s_trace_string[128] = {0};
 
 MController* MController_new(uint8_t nJoints, uint8_t nEncods) //
 {
