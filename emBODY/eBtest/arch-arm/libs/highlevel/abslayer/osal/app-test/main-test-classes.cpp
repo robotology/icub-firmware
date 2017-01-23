@@ -614,7 +614,7 @@ void wedobusinessinhere(void)
     delete env;
     
     
-    
+#if 0    
     embot::hw::EEPROM *eeprom = new embot::hw::EEPROM;
     
     embot::sys::theStorage& storage = embot::sys::theStorage::getInstance();
@@ -657,7 +657,9 @@ void wedobusinessinhere(void)
     res = storage1.read(0, 16, buffer);
     res =  res;
     
-    delete emee;       
+    delete emee;  
+
+#endif
 }
 
 
