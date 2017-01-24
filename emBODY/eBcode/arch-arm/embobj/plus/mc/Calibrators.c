@@ -393,9 +393,15 @@ BOOL JointSet_do_wait_calibration_8(JointSet* o)
         o->motor[o->motors_of_set[1]].pos_fbk = o->tripod_calib.zero;
         o->motor[o->motors_of_set[2]].pos_fbk = o->tripod_calib.zero;
 
+        o->motor[o->motors_of_set[0]].not_init = FALSE;
+        o->motor[o->motors_of_set[1]].not_init = FALSE;
+        o->motor[o->motors_of_set[2]].not_init = FALSE;
+        
         o->motor[o->motors_of_set[0]].pos_fbk_old = o->motor[o->motors_of_set[0]].pos_fbk;
         o->motor[o->motors_of_set[1]].pos_fbk_old = o->motor[o->motors_of_set[1]].pos_fbk;
         o->motor[o->motors_of_set[2]].pos_fbk_old = o->motor[o->motors_of_set[2]].pos_fbk;
+
+
         
         return TRUE;
     }
@@ -484,6 +490,10 @@ BOOL JointSet_do_wait_calibration_9(JointSet* o)
         o->motor[o->motors_of_set[0]].pos_fbk = o->tripod_calib.zero;
         o->motor[o->motors_of_set[1]].pos_fbk = o->tripod_calib.zero;
         o->motor[o->motors_of_set[2]].pos_fbk = o->tripod_calib.zero;
+        
+        o->motor[o->motors_of_set[0]].not_init = FALSE;
+        o->motor[o->motors_of_set[1]].not_init = FALSE;
+        o->motor[o->motors_of_set[2]].not_init = FALSE;
 
         o->motor[o->motors_of_set[0]].pos_fbk_old = o->motor[o->motors_of_set[0]].pos_fbk;
         o->motor[o->motors_of_set[1]].pos_fbk_old = o->motor[o->motors_of_set[1]].pos_fbk;

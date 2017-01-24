@@ -346,6 +346,7 @@ void Motor_config_friction(Motor* o, float Bemf, float Ktau) //
 void Motor_calibrate_withOffset(Motor* o, int32_t offset) //
 {
     o->pos_calib_offset = offset;
+    o->pos_fbk_old = 0;
     o->not_init = TRUE;
     Motor_set_run(o);
     
@@ -381,7 +382,7 @@ BOOL Motor_calibrate_moving2Hardstop(Motor* o, int32_t pwm, int32_t zero) //
 
 extern void Motor_uncalibrate(Motor* o)
 {
-    o->not_init = TRUE;
+    //o->not_init = TRUE;
     o->not_calibrated = TRUE;
 
     if (o->HARDWARE_TYPE == HARDWARE_2FOC)
@@ -435,6 +436,7 @@ extern void Motor_do_calibration_hard_stop(Motor* o)
         o->pos_calib_offset = (o->pos_fbk - o->hardstop_calibdata.zero);
         //reset value of position
         o->pos_fbk = o->pos_fbk - o->pos_calib_offset;
+        o->pos_fbk_old = 0;
         o->not_init = TRUE;
         
 //        //debug code
@@ -971,7 +973,8 @@ void Motor_update_pos_fbk(Motor* o, int32_t position_raw)
     
     int32_t pos_fbk = o->pos_raw_fbk/o->GEARBOX - o->pos_calib_offset;
       
-    if (o->not_init)
+    //if (o->not_init)
+    if (o->pos_fbk_old == 0)
     {
         o->not_init = FALSE;
         o->pos_fbk_old = pos_fbk; 
