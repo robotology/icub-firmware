@@ -78,6 +78,10 @@ extern "C" {
 
 #include "embot_sys_theJumper.h"
 
+#include "embot_i2h.h"
+
+#include "embot_sys_theStorage.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -123,6 +127,17 @@ void task_wrk(void *param);
 void wedobusinessinhere(void);
 
 static int8_t jump2address(uint32_t addr);
+
+
+static bool hw_strg_init(void);
+static bool hw_strg_isinitted(void);
+static bool hw_strg_isaddressvalid(uint32_t adr);
+static uint32_t hw_strg_getbaseaddress(void);
+static uint32_t hw_strg_getsize(void);
+static bool hw_strg_fullerase(void);
+static bool hw_strg_erase(uint32_t addr, uint32_t size);
+static bool hw_strg_read(uint32_t addr, uint32_t size, void *data);
+static bool hw_strg_write(uint32_t addr, uint32_t size, const void *data);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -188,12 +203,12 @@ int main(void)
         uint8_t ciao = 0;
         address = address;
         // could not jump to address .... why?
-        thejumper.jump(address);
+//        thejumper.jump(address);
     }
     
-    thejumper.set(0x1+address);
+//    thejumper.set(0x1+address);
     
-    thejumper.restart();
+//    thejumper.restart();
     
     // cmsis init
     SystemInit(); 
@@ -469,6 +484,38 @@ static void s_osal_starter(void)
     
     eo_ledpulser_Initialise(&ledconfig);
     
+    
+    // init the storage.
+    
+    embot::i2h::cifStorage::cFun ccc = {nullptr};
+    ccc.isinitted = hw_strg_isinitted;
+    ccc.isaddressvalid = hw_strg_isaddressvalid;
+    ccc.getbaseaddress = hw_strg_getbaseaddress;
+    ccc.getsize = hw_strg_getsize;
+    ccc.fullerase = hw_strg_fullerase;
+    ccc.erase = hw_strg_erase;
+    ccc.read = hw_strg_read;
+    ccc.write = hw_strg_write;
+    
+    hw_strg_init();
+    
+    embot::i2h::cifStorage *cifstrg = new embot::i2h::cifStorage(ccc);
+    
+    embot::sys::theStorage &thestrg = embot::sys::theStorage::getInstance();
+    thestrg.init(cifstrg);
+    
+    uint32_t base = thestrg.getBaseAddress();
+    
+    uint8_t buffer[32] = {0};
+    uint8_t rr[32] = {0};
+    buffer[0] = buffer[2] = 9;
+    
+    thestrg.write(base+0, 8, buffer);
+    
+    thestrg.read(base+0, 8, rr);
+    
+    buffer[1] = 1;
+    
 
 
 #endif
@@ -689,6 +736,106 @@ static int8_t jump2address(uint32_t addr)
     // never in here.
     return(0); 
 #endif    
+}
+
+// implementation of hw-storage
+
+static uint8_t hw_strg_initted = 0;
+static const uint32_t hs_strg_start = 0x20000000 + 1024*64;
+static const uint32_t hs_strg_size = 1024;
+
+static bool hw_strg_init(void)
+{    
+    hw_strg_initted = true;
+    return hw_strg_initted;
+}
+static bool hw_strg_isinitted(void)
+{    
+    return hw_strg_initted;
+}
+
+static bool hw_strg_isaddressvalid(uint32_t adr)
+{
+    if((adr < hs_strg_start) || (adr > hs_strg_start+hs_strg_size) )
+    {
+        return false;
+    }
+    return true;
+}
+
+static uint32_t hw_strg_getbaseaddress(void)
+{   
+    return hs_strg_start;
+}
+
+static uint32_t hw_strg_getsize(void)
+{ 
+    return hs_strg_size;
+}
+
+static bool hw_strg_fullerase(void)
+{
+    void *st = (void*) hs_strg_start;
+    memset(st, hs_strg_size, 0xff);
+    
+    return true;
+}
+
+static bool hw_strg_erase(uint32_t addr, uint32_t size)
+{
+    if(false == hw_strg_isaddressvalid(addr))
+    {
+        return false;
+    }
+    if(false == hw_strg_isaddressvalid(addr+size))
+    {
+        return false;
+    }
+    
+    void *st = (void*) addr;
+    memset(st, size, 0xff);
+    return true;
+}
+
+static bool hw_strg_read(uint32_t addr, uint32_t size, void *data)
+{
+    if(false == hw_strg_isaddressvalid(addr))
+    {
+        return false;
+    }
+    if(false == hw_strg_isaddressvalid(addr+size))
+    {
+        return false;
+    }
+    if(NULL == data)
+    {
+        return false;
+    }
+    
+    void *st = (void*) addr;
+    memcpy(data, st, size); 
+    
+    return true;
+}
+
+static bool hw_strg_write(uint32_t addr, uint32_t size, const void *data)
+{
+    if(false == hw_strg_isaddressvalid(addr))
+    {
+        return false;
+    }
+    if(false == hw_strg_isaddressvalid(addr+size))
+    {
+        return false;
+    }
+    if(NULL == data)
+    {
+        return false;
+    }
+    
+    void *st = (void*) addr;
+    memcpy(st, data, size);     
+    return true;
 }
 
 

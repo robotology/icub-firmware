@@ -46,7 +46,7 @@ namespace embot { namespace i2h {
     public:
 //        la fccio derivata. poi metto nel costruttore o nel load una serie di funzioni. magari una struct const alle funzioni.
         using fp_isinitted = bool (*)(void); 
-        using fp_isaddressvalid = bool (*)(void); 
+        using fp_isaddressvalid = bool (*)(std::uint32_t); 
         using fp_getbaseaddress = std::uint32_t (*)(void); 
         using fp_getsize = std::uint32_t (*)(void); 
         using fp_fullerase = bool (*)(void); 
@@ -66,19 +66,19 @@ namespace embot { namespace i2h {
             fp_write            write;            
         };
         
-        cifStorage(const cFun *cfun);
+        cifStorage(const cFun &cfun);
         
         virtual bool isInitted();
-        virtual bool isAddressValid(std::uint32_t address) = 0;
-        virtual std::uint32_t getBaseAddress() = 0;
-        virtual std::uint32_t getSize() = 0;   
-        virtual bool fullerase() = 0;  
-        virtual bool erase(std::uint32_t address, std::uint32_t size) = 0;        
-        virtual bool read(std::uint32_t address, std::uint32_t size, void *data) = 0;
-        virtual bool write(std::uint32_t address, std::uint32_t size, const void *data) = 0;       
+        virtual bool isAddressValid(std::uint32_t address);
+        virtual std::uint32_t getBaseAddress();
+        virtual std::uint32_t getSize();   
+        virtual bool fullerase();  
+        virtual bool erase(std::uint32_t address, std::uint32_t size);        
+        virtual bool read(std::uint32_t address, std::uint32_t size, void *data);
+        virtual bool write(std::uint32_t address, std::uint32_t size, const void *data);       
 
       private:         
-        cFun *cif;        
+        cFun cif;        
     };
 
     

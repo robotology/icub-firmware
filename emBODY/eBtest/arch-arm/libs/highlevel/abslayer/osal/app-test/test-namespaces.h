@@ -182,37 +182,37 @@ namespace embot
 //            bool rem(Timer &t) { return true; };                       
 //        };    
 
-        class theStorage
-        {
-        public:
-            static theStorage& getInstance()
-            {
-                static theStorage* p = new theStorage();
-                return *p;
-            }
-            
-        public:
-            bool load(embot::if2hw::storage &strg);
-            bool read(uint32_t address, uint32_t size, uint8_t *data);    
-            bool write(uint32_t address, uint32_t size, const uint8_t *data);   
-            bool erase(uint32_t address, uint32_t size);  
-            bool erase();        
+//        class theStorage
+//        {
+//        public:
+//            static theStorage& getInstance()
+//            {
+//                static theStorage* p = new theStorage();
+//                return *p;
+//            }
+//            
+//        public:
+//            bool load(embot::if2hw::storage &strg);
+//            bool read(uint32_t address, uint32_t size, uint8_t *data);    
+//            bool write(uint32_t address, uint32_t size, const uint8_t *data);   
+//            bool erase(uint32_t address, uint32_t size);  
+//            bool erase();        
 
-        private:
-            theStorage();  
+//        private:
+//            theStorage();  
 
-        public:
-            // remove copy constructors
-            theStorage(const theStorage&) = delete;
-            theStorage(theStorage&) = delete;
-            // remove copy assignment operator
-            void operator=(const theStorage&) = delete;
-            void operator=(theStorage&) = delete;
+//        public:
+//            // remove copy constructors
+//            theStorage(const theStorage&) = delete;
+//            theStorage(theStorage&) = delete;
+//            // remove copy assignment operator
+//            void operator=(const theStorage&) = delete;
+//            void operator=(theStorage&) = delete;
 
-        private:    
-            struct Impl;
-            Impl *pImpl;        
-        };          
+//        private:    
+//            struct Impl;
+//            Impl *pImpl;        
+//        };          
                 
         
     }
