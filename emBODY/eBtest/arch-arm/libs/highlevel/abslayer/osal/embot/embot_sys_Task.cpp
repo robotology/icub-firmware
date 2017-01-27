@@ -228,7 +228,18 @@ bool embot::sys::EventTask::init(Task::fpStartup startup, Task::fpOnEvent oneven
     pImpl0->startupFP0 = startup;
     pImpl0->oneventFP0 = onevent;
     pImpl0->param = param;
-    eom_task_Init1(pImpl0->eomtask0, eom_mtask_EventDriven, priority, stacksize, pImpl0->startup0, pImpl0->eventrun0, 0, timeout, this, NULL, NULL);
+    eom_task_Init1(pImpl0->eomtask0, 
+                    eom_mtask_EventDriven, 
+                    static_cast<uint8_t>(priority), 
+                    static_cast<uint16_t>(stacksize),
+                    static_cast<void (*) (EOMtask*, uint32_t)>(pImpl0->startup0),
+                    static_cast<void (*) (EOMtask*, uint32_t)>(pImpl0->eventrun0),
+                    static_cast<uint32_t>(0), 
+                    static_cast<eOreltime_t>(timeout),
+                    static_cast<void*>(this), 
+                    static_cast<void (*) (void*)>(NULL),
+                    static_cast<const char *>(NULL)
+                   );
     
     return true;    
 }
@@ -302,7 +313,20 @@ bool embot::sys::MessageTask::init(Task::fpStartup startup, Task::fpOnMessage on
     pImpl0->startupFP0 = startup;
     pImpl0->onmessageFP0 = onmessage;
     pImpl0->param = param;
-    eom_task_Init1(pImpl0->eomtask0, eom_mtask_MessageDriven, priority, stacksize, pImpl0->startup0, pImpl0->messagerun0, messagequeuecapacity, timeout, this, NULL, NULL);        
+    //eom_task_Init1(pImpl0->eomtask0, eom_mtask_MessageDriven, priority, stacksize, pImpl0->startup0, pImpl0->messagerun0, messagequeuecapacity, timeout, this, NULL, NULL);        
+    eom_task_Init1(pImpl0->eomtask0, 
+                    eom_mtask_MessageDriven, 
+                    static_cast<uint8_t>(priority), 
+                    static_cast<uint16_t>(stacksize),
+                    static_cast<void (*) (EOMtask*, uint32_t)>(pImpl0->startup0),
+                    static_cast<void (*) (EOMtask*, uint32_t)>(pImpl0->messagerun0),
+                    static_cast<uint32_t>(messagequeuecapacity), 
+                    static_cast<eOreltime_t>(timeout),
+                    static_cast<void*>(this), 
+                    static_cast<void (*) (void*)>(NULL),
+                    static_cast<const char *>(NULL)
+                   );
+    
     return true;    
 }
 
@@ -366,7 +390,20 @@ bool embot::sys::PeriodicTask::init(Task::fpStartup startup, Task::fpPeriodicAct
     pImpl0->startupFP0 = startup;
     pImpl0->periodicFP0 = periodicactivity;
     pImpl0->param = param;
-    eom_task_Init1(pImpl0->eomtask0, eom_mtask_Periodic, priority, stacksize, pImpl0->startup0, pImpl0->periodicrun0, 0, period, this, NULL, NULL);        
+    //eom_task_Init1(pImpl0->eomtask0, eom_mtask_Periodic, priority, stacksize, pImpl0->startup0, pImpl0->periodicrun0, 0, period, this, NULL, NULL);        
+    eom_task_Init1(pImpl0->eomtask0, 
+                    eom_mtask_Periodic, 
+                    static_cast<uint8_t>(priority), 
+                    static_cast<uint16_t>(stacksize),
+                    static_cast<void (*) (EOMtask*, uint32_t)>(pImpl0->startup0),
+                    static_cast<void (*) (EOMtask*, uint32_t)>(pImpl0->periodicrun0),
+                    static_cast<uint32_t>(0), 
+                    static_cast<eOreltime_t>(period),
+                    static_cast<void*>(this), 
+                    static_cast<void (*) (void*)>(NULL),
+                    static_cast<const char *>(NULL)
+                   );
+    
     return true;    
 }
 
