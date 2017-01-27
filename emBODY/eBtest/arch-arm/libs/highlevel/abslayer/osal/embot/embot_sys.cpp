@@ -29,7 +29,10 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "osal.h"
+#include "stdlib.h"
 #include "EOMtask.h"
+
+#include <new>
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -64,6 +67,53 @@ namespace embot { namespace sys {
     }
 
 }} // namespace embot { namespace sys {
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - c code required by osal
+// --------------------------------------------------------------------------------------------------------------------
+
+extern "C" void* osal_ext_calloc(uint32_t s, uint32_t n)
+{
+    void* ret = calloc(s, n);
+    return(ret);
+}
+
+extern "C" void* osal_ext_realloc(void* m, uint32_t s)
+{
+    void* ret = realloc(m, s);
+    return(ret);
+}
+
+extern "C" void osal_ext_free(void* m)
+{
+    free(m);
+}
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - override of new / delete etc w/ osal funtions
+// --------------------------------------------------------------------------------------------------------------------
+
+
+void *operator new(std::size_t size) throw(std::bad_alloc)
+{
+    void* ptr = osal_base_memory_new(size);
+    return ptr;
+}
+
+void* operator new(std::size_t size, const std::nothrow_t& nothrow_value) throw()
+{
+    void* ptr = osal_base_memory_new(size);
+    return ptr;    
+}
+
+
+void operator delete(void* mem) throw ()
+{
+    osal_base_memory_del(mem);
+}
+
     
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
