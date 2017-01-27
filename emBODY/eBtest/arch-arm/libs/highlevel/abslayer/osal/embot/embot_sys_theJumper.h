@@ -25,6 +25,8 @@
 
 #include "embot_sys.h"
 
+#include <new>
+
 namespace embot { namespace sys {
     
     
@@ -52,11 +54,12 @@ namespace embot { namespace sys {
         bool eval(std::uint32_t &address, bool jumpnow = false);
         bool jump(std::uint32_t address);
         bool set(std::uint32_t address);
-        bool theJumper::restart();
+        bool restart();
         
 
     private:
-        theJumper();  
+        theJumper(); 
+        void *operator new(std::size_t size) throw(std::bad_alloc);    
 
     public:
         // remove copy constructors and copy assignment operators
