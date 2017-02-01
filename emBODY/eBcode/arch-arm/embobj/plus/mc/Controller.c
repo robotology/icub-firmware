@@ -1384,12 +1384,10 @@ void MController_config_joint(int j, eOmc_joint_config_t* config) //
     }
     else
     {
-          #define AEA_MIN_SPIKE 16 //4 bitsof zero padding(aea use 12 bits)
           spike_cnt_limit = AEA_DEFAULT_SPIKE_CNT_LIMIT;
-          spike_mag_limit = AEA_MIN_SPIKE << config->jntEncNumOfNoiseBits;
     }
         
-    AbsEncoder_config(o->absEncoder+j, j, /*(eOmc_encoder_t)config->jntEncoderType,*/ config->jntEncoderResolution, spike_mag_limit, spike_cnt_limit);
+    AbsEncoder_config(o->absEncoder+j, j, /*(eOmc_encoder_t)config->jntEncoderType,*/ config->jntEncoderResolution, config->jntEncNumOfNoiseBits, spike_cnt_limit);
 
 }
 

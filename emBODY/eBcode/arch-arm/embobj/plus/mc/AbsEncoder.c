@@ -32,6 +32,10 @@
 /////////////////////////////////////////////////////////
 // AbsEncoder
 
+
+#define AEA_MIN_SPIKE 16 //4 bitsof zero padding(aea use 12 bits)
+          
+
 AbsEncoder* AbsEncoder_new(uint8_t n)
 {
     AbsEncoder *o = NEW(AbsEncoder, n);
@@ -56,6 +60,7 @@ void AbsEncoder_init(AbsEncoder* o)
     //o->sign = 0;
     o->mul = 0;
     o->div = 1;
+    o->numofnoisebits = 0;
     
     o->fake = FALSE;
     
@@ -95,7 +100,7 @@ void AbsEncoder_destroy(AbsEncoder* o)
     DELETE(o);
 }
 
-void AbsEncoder_config(AbsEncoder* o, uint8_t ID/*, eOmc_encoder_t type*/, int32_t resolution, int16_t spike_mag_limit, uint16_t spike_cnt_limit)
+void AbsEncoder_config(AbsEncoder* o, uint8_t ID/*, eOmc_encoder_t type*/, int32_t resolution, uint8_t numofnoisebits, uint16_t spike_cnt_limit)
 {
     o->ID = ID;
     
@@ -119,7 +124,11 @@ void AbsEncoder_config(AbsEncoder* o, uint8_t ID/*, eOmc_encoder_t type*/, int32
     
     if (!o->fake)
     {
-        o->spike_mag_limit = spike_mag_limit;
+        o->numofnoisebits = numofnoisebits;
+        
+        
+        #define AEA_MIN_SPIKE 16 //4 bitsof zero padding(aea use 12 bits)           
+        o->spike_mag_limit = (AEA_MIN_SPIKE << o->numofnoisebits)*o->div;
         o->spike_cnt_limit = spike_cnt_limit;
     }
     else
@@ -147,6 +156,8 @@ void AbsEncoder_config_resolution(AbsEncoder* o, float resolution)
 extern void AbsEncoder_config_divisor(AbsEncoder* o, int32_t divisor)
 {
     o->div = divisor;
+    
+    o->spike_mag_limit = (AEA_MIN_SPIKE << o->numofnoisebits)*o->div;
 }
 
 void AbsEncoder_start_hard_stop_calibrate(AbsEncoder* o, int32_t hard_stop_zero)
