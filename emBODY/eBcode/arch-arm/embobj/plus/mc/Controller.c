@@ -1386,8 +1386,12 @@ void MController_config_joint(int j, eOmc_joint_config_t* config) //
     {
           spike_cnt_limit = AEA_DEFAULT_SPIKE_CNT_LIMIT;
     }
-        
-    AbsEncoder_config(o->absEncoder+j, j, /*(eOmc_encoder_t)config->jntEncoderType,*/ config->jntEncoderResolution, config->jntEncNumOfNoiseBits, spike_cnt_limit);
+    
+    
+    for(int e=0; e< o->multi_encs; e++)
+        AbsEncoder_config(o->absEncoder+j*o->multi_encs+e,   j, /*(eOmc_EncoderType_t)config->jntEncoderType,*/ config->jntEncoderResolution, config->jntEncNumOfNoiseBits, spike_cnt_limit);
+    
+    //AbsEncoder_config(o->absEncoder+j, j, /*(eOmc_encoder_t)config->jntEncoderType,*/ config->jntEncoderResolution, config->jntEncNumOfNoiseBits, spike_cnt_limit);
 
 }
 
