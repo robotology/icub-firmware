@@ -1375,21 +1375,21 @@ void MController_config_joint(int j, eOmc_joint_config_t* config) //
     Motor_config_filter(o->motor+j,   config->tcfiltertype);
     Motor_config_friction(o->motor+j, config->motor_params.bemf_value, config->motor_params.ktau_value);   
     
-    int16_t spike_mag_limit;
-    uint16_t spike_cnt_limit;
-    if((config->jntEncoderType == eomc_enc_mais) || (config->jntEncoderType == eomc_enc_absanalog))
-    {
-        spike_mag_limit = 0;
-        spike_cnt_limit = 0;
-    }
-    else
-    {
-          spike_cnt_limit = AEA_DEFAULT_SPIKE_CNT_LIMIT;
-    }
+//    int16_t spike_mag_limit;
+//    uint16_t spike_cnt_limit;
+//    if((config->jntEncoderType == eomc_enc_mais) || (config->jntEncoderType == eomc_enc_absanalog))
+//    {
+//        spike_mag_limit = 0;
+//        spike_cnt_limit = 0;
+//    }
+//    else
+//    {
+//          spike_cnt_limit = AEA_DEFAULT_SPIKE_CNT_LIMIT;
+//    }
     
     
     for(int e=0; e< o->multi_encs; e++)
-        AbsEncoder_config(o->absEncoder+j*o->multi_encs+e,   j, /*(eOmc_EncoderType_t)config->jntEncoderType,*/ config->jntEncoderResolution, config->jntEncNumOfNoiseBits, spike_cnt_limit);
+        AbsEncoder_config(o->absEncoder+j*o->multi_encs+e,   j, config->jntEncoderResolution, config->jntEncNumOfNoiseBits);
     
     //AbsEncoder_config(o->absEncoder+j, j, /*(eOmc_encoder_t)config->jntEncoderType,*/ config->jntEncoderResolution, config->jntEncNumOfNoiseBits, spike_cnt_limit);
 

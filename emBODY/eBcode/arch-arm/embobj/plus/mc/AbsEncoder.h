@@ -115,7 +115,7 @@ extern AbsEncoder* AbsEncoder_new(uint8_t n);
 extern void AbsEncoder_init(AbsEncoder* o);
 extern void AbsEncoder_destroy(AbsEncoder* o);
 
-extern void AbsEncoder_config(AbsEncoder* o, uint8_t ID/*, eOmc_EncoderType_t type*/, int32_t resolution, uint8_t numofnoisebits, uint16_t spike_cnt_limit);
+extern void AbsEncoder_config(AbsEncoder* o, uint8_t ID, int32_t resolution, uint8_t numofnoisebits);
 extern void AbsEncoder_calibrate_absolute(AbsEncoder* o, int32_t offset, int32_t zero);
 extern void AbsEncoder_calibrate_fake(AbsEncoder* o);
 
