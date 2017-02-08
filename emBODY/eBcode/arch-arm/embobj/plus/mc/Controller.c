@@ -231,7 +231,7 @@ static void updateEntity2SetMaps(const eOmc_4jomo_coupling_t *jomoCouplingInfo, 
     {
         jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(carray, j);
         uint8_t multi_enc = (uint8_t) eomc_encoder_get_numberofcomponents((eOmc_encoder_t)jomodes->encoder1.type);
-        #warning VALE2: horrible work around about multi_encs
+        //VALE2: horrible work around about multi_encs
         if (multi_enc == 0) //when in encoder1 xml group there is none.
             multi_enc = 1;
         for(uint8_t i=currentpos; i<currentpos+multi_enc; i++)
@@ -244,7 +244,7 @@ static void updateEntity2SetMaps(const eOmc_4jomo_coupling_t *jomoCouplingInfo, 
     //currently all joint of same board have the the same number of multiple encoder. so i use j0
     jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(carray, 0);
     o->multi_encs = (uint8_t) eomc_encoder_get_numberofcomponents((eOmc_encoder_t)jomodes->encoder1.type);
-    #warning VALE: horrible work around about multi_encs
+    //VALE: horrible work around about multi_encs
     if (o->multi_encs == 0) //when in encoder1 xml group there is none.
         o->multi_encs = 1;
     o->nEncods = o->multi_encs *o->nJoints;
@@ -484,10 +484,10 @@ static void get_jomo_coupling_info(const eOmc_4jomo_coupling_t *jomoCouplingInfo
         
     update_jointAndMotor_withJointSet_configuration();
     
-    char message[180];
-    snprintf(message, sizeof(message), "J2S:%d %d %d %d;T:%d,%d,%d,%d", o->j2s[0], o->j2s[1], o->j2s[2], o->j2s[3],
-        o->jointSet[0].MOTOR_CONTROL_TYPE, o->jointSet[1].MOTOR_CONTROL_TYPE, o->jointSet[2].MOTOR_CONTROL_TYPE, o->jointSet[3].MOTOR_CONTROL_TYPE);
-    send_debug_message(message,0,0,0);
+//    char message[180];
+//    snprintf(message, sizeof(message), "J2S:%d %d %d %d;T:%d,%d,%d,%d", o->j2s[0], o->j2s[1], o->j2s[2], o->j2s[3],
+//        o->jointSet[0].MOTOR_CONTROL_TYPE, o->jointSet[1].MOTOR_CONTROL_TYPE, o->jointSet[2].MOTOR_CONTROL_TYPE, o->jointSet[3].MOTOR_CONTROL_TYPE);
+//    send_debug_message(message,0,0,0);
     //debug_dump_coupling_data(jomoCouplingInfo);
 }
 
@@ -610,95 +610,37 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         o->joint[k].eo_joint_ptr = eo_entities_GetJoint(eo_entities_GetHandle(), k);
     }
     
-    #warning Matrici accoppiamento identita' vanno beneo devo mettere ptr a null???
-    //attualemnte se i ptr alle matrici di accoppiamento sono nulli allora significa che non c'e accopiamento.
-    //posso invece usare le matrici identita?
-    
-//    float **Jjm = NULL; //o->Jjm;
-//    float **Jmj = NULL; //o->Jmj;
-//  
-//    float **Sjm = NULL; //o->Sjm;
-//    float **Sje = NULL; //o->Sje;
-    
-    
     
     get_jomo_coupling_info(jomoCouplingInfo, carray);
     
+    //Now i need to check if encoder2joint matrix is identity matrix or not.
+    //If it is an identity matrix, it means this jointset doesn't use encoders coupling, else otherwise.
+    //if this set use encoders coupling, i need to pass the encoders coupling matrix to JointSet_config, 
+    //else i pass NULL.
 
+    float **Sje_aux = NULL;
     
-
-    //controllo inutile==> lo rimuovo!
-    
-//    //check multi encoder compatibility
-//    //currently all joint of same board have the the same number of multiple encoder. so i use j0
-//    const eOmc_jomo_descriptor_t *jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(carray, 0);
-//    uint8_t cfg_multienc = (uint8_t) eomc_encoder_get_numberofcomponents((eOmc_encoder_t)jomodes->encoder1.type);
-//    if(o->multi_encs != cfg_multienc)
-//    {
-//        eOerrmanDescriptor_t errdes;
-//        char str[50];
-//        snprintf(str, sizeof(str), "multiEnc check: par16=mc par64=cfg");
-//        errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag04);
-//        errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-//        errdes.sourceaddress    = 0;
-//        errdes.par16            = o->multi_encs;
-//        errdes.par64            = cfg_multienc;
-//        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, str, NULL, &errdes);
-//    
-//    }
-    
-  //moved in get_jomo_coupling_info  
-//    for (int s=0; s<o->nSets; ++s) o->enc_set_dim[s] = 0;
-//    
-//    for (int e=0; e<o->nEncods; ++e)
-//    {
-//        int s = o->e2s[e];
-
-//        o->eos[s][(o->enc_set_dim[s])++] = e;
-//    }
-//    
-//    for (int s=0; s<o->nSets; ++s) o->set_dim[s] = 0;
-// 
-//    for (int m=0; m<o->nJoints; ++m)
-//    {
-//        int s = o->m2s[m];
-
-//        o->mos[s][(o->set_dim[s])++] = m;
-//    }
-//    
-//    for (int s=0; s<o->nSets; ++s) o->set_dim[s] = 0;
-// 
-//    for (int j=0; j<o->nJoints; ++j)
-//    {
-//        int s = o->j2s[j];
-
-//        o->jos[s][(o->set_dim[s])++] = j;
-//    }
-    
-		//////////////////// VALE
-		float **Sje_aux = NULL;
-    //verifico che Sje sia la matrice identita' 4x4
-        eOboolvalues_t isIdentityMatrix = eobool_true;
-		for (int i=0; i<MAX_JOINTS_PER_BOARD; ++i)
+    eOboolvalues_t isIdentityMatrix = eobool_true;
+    for (int i=0; i<MAX_JOINTS_PER_BOARD; ++i)
+    {
+        for (int k=0; k<MAX_ENCODS_PER_BOARD; ++k)
         {
-            for (int k=0; k<MAX_ENCODS_PER_BOARD; ++k)
+            if(i==k)
             {
-                if(i==k)
-                {
-                    if(o->Sje[i][k]  != 1.0f)
-                        isIdentityMatrix = eobool_false;
-                }
-                else
-                {
-                    if(o->Sje[i][k]  != 0.0f)
-                        isIdentityMatrix = eobool_false;
-                }
+                if(o->Sje[i][k]  != 1.0f)
+                    isIdentityMatrix = eobool_false;
+            }
+            else
+            {
+                if(o->Sje[i][k]  != 0.0f)
+                    isIdentityMatrix = eobool_false;
             }
         }
+    }
         
-        if(!isIdentityMatrix)
-            Sje_aux = o->Sje;
-		//////////////////////////////
+    if(!isIdentityMatrix)
+        Sje_aux = o->Sje;
+
 		
 		
     for (int s=0; s<o->nSets; ++s)
@@ -716,7 +658,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
             o->absEncoder,
             o->Jjm,
             o->Jmj,
-            Sje_aux,//o->Sje,
+            Sje_aux,
             o->Sjm
         );
         
