@@ -101,7 +101,7 @@ bool embot::sys::Timer::start(common::relTime countdown, Type type, Action &onex
         case Action::Type::executecallback:
         {
             totask = eov_callbackman_GetTask(eov_callbackman_GetHandle());
-            eo_action_SetCallback(action, onexpiry.cbk.callback, onexpiry.cbk.arg, totask);
+            eo_action_SetCallback(action, onexpiry.cbk.callback.callback, onexpiry.cbk.callback.arg, totask);
         } break;  
         
         default:
