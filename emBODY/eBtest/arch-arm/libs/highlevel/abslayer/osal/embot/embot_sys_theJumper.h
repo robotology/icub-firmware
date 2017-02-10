@@ -41,19 +41,23 @@ namespace embot { namespace sys {
         }
         
     public:
-        struct Config
-        {
-            embot::common::fpWorker             restart;
-            embot::common::fp_int8_par_uint32   jump2;    
-            Config() : restart(nullptr), jump2(nullptr) {}
-            Config(embot::common::fpWorker _restart, embot::common::fp_int8_par_uint32 _jump2) : restart(_restart), jump2(_jump2) {}
-        }; 
         
-        bool init(Config &config);
+        enum class Command { none = 0, jump = 1, stay = 2};
         
-        bool eval(std::uint32_t &address, bool jumpnow = false);
-        bool jump(std::uint32_t address);
-        bool set(std::uint32_t address);
+//        struct Config
+//        {
+//            embot::common::fpWorker             restart;
+//            embot::common::fp_bool_par_uint32   jump2;    
+//            Config() : restart(nullptr), jump2(nullptr) {}
+//            Config(embot::common::fpWorker _restart, embot::common::fp_bool_par_uint32 _jump2) : restart(_restart), jump2(_jump2) {}
+//        }; 
+//        
+//        bool init(Config &config);        
+        
+        bool set(Command command, std::uint32_t param);
+        Command get(std::uint32_t& param);
+        bool jump(std::uint32_t address);   
+        
         bool restart();
         
 
