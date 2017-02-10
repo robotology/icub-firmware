@@ -51,7 +51,7 @@ namespace embot { namespace sys {
     {
         return osal_system_abstime_get();
     }
-    
+        
     Task* taskRunning()
     {
         osal_task_t *p = osal_task_get(osal_callerAUTOdetect);
