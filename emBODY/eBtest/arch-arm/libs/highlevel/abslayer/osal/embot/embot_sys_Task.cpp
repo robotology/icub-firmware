@@ -165,6 +165,11 @@ void * embot::sys::Task::getEOMtask()
     return pImpl0->eomtask0;
 }
 
+void embot::sys::registerNameOfTask(void *p)
+{
+    eom_task_Start(reinterpret_cast<EOMtask*>(p));    
+}
+
 
 // - class EventTask
 
@@ -175,10 +180,10 @@ embot::sys::EventTask::EventTask()
 }
 
 
-embot::sys::EventTask::EventTask(Task::fpStartup startup, Task::fpOnEvent onevent, std::uint32_t stacksize, Priority priority, common::relTime timeout, void *param)
+embot::sys::EventTask::EventTask(Task::fpStartup startup, Task::fpOnEvent onevent, std::uint32_t stacksize, Priority priority, common::relTime timeout, void *param, Task::fpNameOfTask nameoftask)
 {
     pImpl0->taskParent = this;    
-    init(startup, onevent, stacksize, priority, timeout, param);  
+    init(startup, onevent, stacksize, priority, timeout, param, nameoftask);  
 }
 
 
@@ -223,7 +228,7 @@ bool embot::sys::EventTask::setMessage(embot::common::Message message, common::r
 }
 
 
-bool embot::sys::EventTask::init(Task::fpStartup startup, Task::fpOnEvent onevent, std::uint32_t stacksize, Priority priority, common::relTime timeout, void *param)
+bool embot::sys::EventTask::init(Task::fpStartup startup, Task::fpOnEvent onevent, std::uint32_t stacksize, Priority priority, common::relTime timeout, void *param, Task::fpNameOfTask nameoftask)
 {
     pImpl0->startupFP0 = startup;
     pImpl0->oneventFP0 = onevent;
@@ -237,12 +242,13 @@ bool embot::sys::EventTask::init(Task::fpStartup startup, Task::fpOnEvent oneven
                     static_cast<uint32_t>(0), 
                     static_cast<eOreltime_t>(timeout),
                     static_cast<void*>(this), 
-                    static_cast<void (*) (void*)>(NULL),
+                    static_cast<void (*) (void*)>(nameoftask),
                     static_cast<const char *>(NULL)
                    );
     
     return true;    
 }
+
 
 
 //int EventTask::getPP()
@@ -262,10 +268,10 @@ embot::sys::MessageTask::MessageTask()
 }
 
 
-embot::sys::MessageTask::MessageTask(Task::fpStartup startup, Task::fpOnMessage onmessage, std::uint32_t stacksize, Priority priority, std::uint8_t messagequeuecapacity, common::relTime timeout, void *param)
+embot::sys::MessageTask::MessageTask(Task::fpStartup startup, Task::fpOnMessage onmessage, std::uint32_t stacksize, Priority priority, std::uint8_t messagequeuecapacity, common::relTime timeout, void *param, Task::fpNameOfTask nameoftask)
 {
     pImpl0->taskParent = this;     
-    init(startup, onmessage, stacksize, priority, messagequeuecapacity, timeout, param); 
+    init(startup, onmessage, stacksize, priority, messagequeuecapacity, timeout, param, nameoftask); 
 }
 
 
@@ -308,7 +314,7 @@ bool embot::sys::MessageTask::setMessage(embot::common::Message message, common:
 }
 
 
-bool embot::sys::MessageTask::init(Task::fpStartup startup, Task::fpOnMessage onmessage, std::uint32_t stacksize, Priority priority, std::uint8_t messagequeuecapacity, common::relTime timeout, void *param)
+bool embot::sys::MessageTask::init(Task::fpStartup startup, Task::fpOnMessage onmessage, std::uint32_t stacksize, Priority priority, std::uint8_t messagequeuecapacity, common::relTime timeout, void *param, Task::fpNameOfTask nameoftask)
 {
     pImpl0->startupFP0 = startup;
     pImpl0->onmessageFP0 = onmessage;
@@ -323,7 +329,7 @@ bool embot::sys::MessageTask::init(Task::fpStartup startup, Task::fpOnMessage on
                     static_cast<uint32_t>(messagequeuecapacity), 
                     static_cast<eOreltime_t>(timeout),
                     static_cast<void*>(this), 
-                    static_cast<void (*) (void*)>(NULL),
+                    static_cast<void (*) (void*)>(nameoftask),
                     static_cast<const char *>(NULL)
                    );
     
@@ -340,10 +346,10 @@ embot::sys::PeriodicTask::PeriodicTask()
 }
 
 
-embot::sys::PeriodicTask::PeriodicTask(Task::fpStartup startup, Task::fpPeriodicActivity periodicactivity, std::uint32_t stacksize, Priority priority, common::relTime period, void *param)
+embot::sys::PeriodicTask::PeriodicTask(Task::fpStartup startup, Task::fpPeriodicActivity periodicactivity, std::uint32_t stacksize, Priority priority, common::relTime period, void *param, Task::fpNameOfTask nameoftask)
 {
     pImpl0->taskParent = this;     
-    init(startup, periodicactivity, stacksize, priority, period, param); 
+    init(startup, periodicactivity, stacksize, priority, period, param, nameoftask); 
 }
 
 
@@ -385,7 +391,7 @@ bool embot::sys::PeriodicTask::setMessage(embot::common::Message message, common
 }
 
 
-bool embot::sys::PeriodicTask::init(Task::fpStartup startup, Task::fpPeriodicActivity periodicactivity, std::uint32_t stacksize, Priority priority, common::relTime period, void *param)
+bool embot::sys::PeriodicTask::init(Task::fpStartup startup, Task::fpPeriodicActivity periodicactivity, std::uint32_t stacksize, Priority priority, common::relTime period, void *param, Task::fpNameOfTask nameoftask)
 {
     pImpl0->startupFP0 = startup;
     pImpl0->periodicFP0 = periodicactivity;
@@ -400,7 +406,7 @@ bool embot::sys::PeriodicTask::init(Task::fpStartup startup, Task::fpPeriodicAct
                     static_cast<uint32_t>(0), 
                     static_cast<eOreltime_t>(period),
                     static_cast<void*>(this), 
-                    static_cast<void (*) (void*)>(NULL),
+                    static_cast<void (*) (void*)>(nameoftask),
                     static_cast<const char *>(NULL)
                    );
     

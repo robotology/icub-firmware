@@ -27,7 +27,9 @@
 
 namespace embot { namespace sys {
         
-        
+
+    void registerNameOfTask(void *p); 
+    
     class Task
     {
     public:
@@ -35,6 +37,7 @@ namespace embot { namespace sys {
         enum class Type { undefined = -1, eventTrigger = 1, messageTrigger = 3, periodicTrigger = 5 };
         typedef std::uint8_t Priority; // lower is ... lower 
         
+        using fpNameOfTask = void (*)(void *);
         using fpStartup = void (*)(Task *, void *);                
         using fpOnEvent = void (*)(Task *, common::Event, void *);
         using fpOnMessage = void (*)(Task *, common::Message, void *);
@@ -49,9 +52,8 @@ namespace embot { namespace sys {
         
         virtual bool setEvent(common::Event event) = 0;
         virtual bool setMessage(common::Message message, common::relTime timeout = common::timeWaitForever) = 0;
-        
-        void* getEOMtask();
-        
+                
+        void* getEOMtask();        
         common::Time timeOfTrigger();
         
     protected:        
@@ -65,10 +67,10 @@ namespace embot { namespace sys {
     public:
                     
         EventTask();
-        EventTask(Task::fpStartup startup, Task::fpOnEvent onevent, std::uint32_t stacksize, Priority priority, common::relTime timeout, void *param = nullptr);
+        EventTask(Task::fpStartup startup, Task::fpOnEvent onevent, std::uint32_t stacksize, Priority priority, common::relTime timeout, void *param = nullptr, fpNameOfTask nameoftask = nullptr);
         ~EventTask();
     
-        bool init(Task::fpStartup startup, Task::fpOnEvent onevent, std::uint32_t stacksize, Priority priority, common::relTime timeout, void *param = nullptr);
+        bool init(Task::fpStartup startup, Task::fpOnEvent onevent, std::uint32_t stacksize, Priority priority, common::relTime timeout, void *param = nullptr, fpNameOfTask nameoftask = nullptr);
     
         virtual Type getType();
         virtual Priority getPriority();
@@ -76,6 +78,7 @@ namespace embot { namespace sys {
         
         virtual bool setEvent(common::Event event);  
         virtual bool setMessage(common::Message message, common::relTime timeout = common::timeWaitForever);
+
            
     };
         
@@ -85,10 +88,10 @@ namespace embot { namespace sys {
     public:
         
         MessageTask();
-        MessageTask(Task::fpStartup startup, Task::fpOnMessage onmessage, std::uint32_t stacksize, Priority priority, std::uint8_t messagequeuecapacity, common::relTime timeout, void *param = nullptr);
+        MessageTask(Task::fpStartup startup, Task::fpOnMessage onmessage, std::uint32_t stacksize, Priority priority, std::uint8_t messagequeuecapacity, common::relTime timeout, void *param = nullptr, fpNameOfTask nameoftask = nullptr);
         ~MessageTask();
     
-        bool init(Task::fpStartup startup, Task::fpOnMessage onmessage, std::uint32_t stacksize, Priority priority, std::uint8_t messagequeuecapacity, common::relTime timeout, void *param = nullptr);
+        bool init(Task::fpStartup startup, Task::fpOnMessage onmessage, std::uint32_t stacksize, Priority priority, std::uint8_t messagequeuecapacity, common::relTime timeout, void *param = nullptr, fpNameOfTask nameoftask = nullptr);
     
         virtual Type getType();
         virtual Priority getPriority();
@@ -96,6 +99,7 @@ namespace embot { namespace sys {
         
         virtual bool setEvent(common::Event event);  
         virtual bool setMessage(common::Message message, common::relTime timeout = common::timeWaitForever);
+
            
     };
 
@@ -105,10 +109,10 @@ namespace embot { namespace sys {
     public:
         
         PeriodicTask();
-        PeriodicTask(Task::fpStartup startup, Task::fpPeriodicActivity periodicactivity, std::uint32_t stacksize, Priority priority, common::relTime period, void *param = nullptr);
+        PeriodicTask(Task::fpStartup startup, Task::fpPeriodicActivity periodicactivity, std::uint32_t stacksize, Priority priority, common::relTime period, void *param = nullptr, fpNameOfTask nameoftask = nullptr);
         ~PeriodicTask();
     
-        bool init(Task::fpStartup startup, Task::fpPeriodicActivity periodicactivity, std::uint32_t stacksize, Priority priority, common::relTime period, void *param = nullptr);
+        bool init(Task::fpStartup startup, Task::fpPeriodicActivity periodicactivity, std::uint32_t stacksize, Priority priority, common::relTime period, void *param = nullptr, fpNameOfTask nameoftask = nullptr);
     
         virtual Type getType();
         virtual Priority getPriority();
@@ -116,6 +120,7 @@ namespace embot { namespace sys {
         
         virtual bool setEvent(common::Event event);  
         virtual bool setMessage(common::Message message, common::relTime timeout = common::timeWaitForever);
+
            
     };
     

@@ -34,21 +34,27 @@ namespace embot { namespace sys {
         
         struct EventToTask
         {
-            common::Event   event;
-            Task*           task;            
+            common::Event       event;
+            Task*               task;  
+            EventToTask(common::Event e, Task* t) : event(e), task(t) {}  
+            EventToTask() : event(0), task(nullptr) {}                 
         };
         
         struct MessageToTask
         {
-            common::Message message;
-            Task*           task;            
+            common::Message     message;
+            Task*               task;
+            MessageToTask(common::Message m, Task* t) : message(m), task(t) {}   
+            MessageToTask() : message(0), task(nullptr) {}                  
         };
         
         struct ExecuteCallback
         {
-            common::fpCallback    callback;
-            void*           arg;
-            Task*           task;            
+            common::Callback    callback;
+            Task*               task; 
+            ExecuteCallback(common::fpCallback c, void *a, Task *t) : callback(c, a), task(t) {}  
+            ExecuteCallback(common::Callback cbk, Task *t) : callback(cbk), task(t) {}                
+            ExecuteCallback() : callback(nullptr, nullptr), task(nullptr) {}               
         };  
         
         Type            type;
@@ -61,22 +67,25 @@ namespace embot { namespace sys {
         
         
         Action(){ clear(); } 
+        Action(const ExecuteCallback &c) { set(c); }
+        Action(const MessageToTask &m) { set(m); }
+        Action(const EventToTask &e) { set(e); }
         
         void clear() { type = Type::none; }
         
-        void set(EventToTask &e)
+        void set(const EventToTask &e)
         {
             type = Type::event2task;
             evt = e;           
         }
         
-        void set(MessageToTask &m)
+        void set(const MessageToTask &m)
         {
             type = Type::message2task;
             msg = m;           
         }
         
-        void set(ExecuteCallback &c)
+        void set(const ExecuteCallback &c)
         {
             type = Type::executecallback;
             cbk = c;           
