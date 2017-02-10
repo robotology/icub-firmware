@@ -206,6 +206,11 @@ bool embot::sys::theScheduler::isStarted()
     return pImpl->started;
 }
 
+embot::common::relTime embot::sys::theScheduler::getTick()
+{
+    return pImpl->osalConfig.tick;
+}
+
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

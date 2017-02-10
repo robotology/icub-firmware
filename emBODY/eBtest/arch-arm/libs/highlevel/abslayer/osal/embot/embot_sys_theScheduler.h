@@ -64,7 +64,8 @@ namespace embot { namespace sys {
         void start();    // it does not return ... unless the scheduler is already started
         
         bool isStarted();
-
+        
+        common::relTime getTick();
 
     private:
         theScheduler();  
