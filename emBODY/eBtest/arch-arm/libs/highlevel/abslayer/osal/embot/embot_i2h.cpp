@@ -105,7 +105,7 @@ std::uint32_t cifStorage::getBaseAddress()
 {
     if(!isInitted())
     {
-        return false;
+        return 0;
     }
     
     return cif.getbaseaddress();    
@@ -115,7 +115,7 @@ std::uint32_t cifStorage::getSize()
 {
     if(!isInitted())
     {
-        return false;
+        return 0;
     }
     
     return cif.getsize();    

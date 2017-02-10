@@ -44,10 +44,7 @@
 
 namespace embot { namespace common {
     
-    const relTime timeWaitNone = 0;
-    const relTime time1millisec = 1000;
-    const relTime time1second = 1000000;
-    const relTime timeWaitForever = 0xffffffff;
+
     
 }} // namespace embot { namespace common {
 
