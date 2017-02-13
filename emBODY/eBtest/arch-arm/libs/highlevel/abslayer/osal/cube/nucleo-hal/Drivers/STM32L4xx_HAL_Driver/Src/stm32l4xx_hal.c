@@ -156,7 +156,7 @@ __IO uint32_t uwTick;
   *
   * @retval HAL status
   */
-HAL_StatusTypeDef HAL_Init(uint8_t plus_systick)
+HAL_StatusTypeDef HAL_Init(void)
 {
   /* Configure Flash prefetch, Instruction cache, Data cache */
   /* Default configuration at reset is:                      */
@@ -178,16 +178,9 @@ HAL_StatusTypeDef HAL_Init(uint8_t plus_systick)
   /* Set Interrupt Group Priority */
   HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
 
-#if defined(ACEMORISED)
-  if(1 == plus_systick)
-  {   
   /* Use SysTick as time base source and configure 1ms tick (default clock after Reset is MSI) */
-  HAL_InitTick(TICK_INT_PRIORITY);      
-  }
-#else
-  /* Use SysTick as time base source and configure 1ms tick (default clock after Reset is MSI) */
-  HAL_InitTick(TICK_INT_PRIORITY);   
-#endif   
+  HAL_InitTick(TICK_INT_PRIORITY);
+
   /* Init the low level hardware */
   HAL_MspInit();
 

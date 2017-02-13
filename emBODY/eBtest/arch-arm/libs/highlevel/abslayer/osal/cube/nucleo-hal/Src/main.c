@@ -58,10 +58,6 @@ void Error_Handler(void);
 
 /* USER CODE BEGIN 0 */
 
-/* USER CODE END 0 */
-
-
-
 void HAL_SYSTICK_Callback(void)
 {
     static uint32_t times = 0;
@@ -73,14 +69,7 @@ void HAL_SYSTICK_Callback(void)
     }
 }
 
-
-
-
-
-
-
-
-
+/* USER CODE END 0 */
 
 int main(void)
 {
@@ -92,17 +81,11 @@ int main(void)
   /* MCU Configuration----------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  uint8_t plus_systick = 0;
-  HAL_Init(plus_systick);
+  HAL_Init();
 
   /* Configure the system clock */
   SystemClock_Config();
-   
-#if defined(ACEMORISED)    
-    // acemorised
-    HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq()/1000);
-#endif
-    
+
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART2_UART_Init();
@@ -180,10 +163,8 @@ void SystemClock_Config(void)
 
     /**Configure the Systick interrupt time 
     */
-#if defined(ACEMORISED)  
-#else  
   HAL_SYSTICK_Config(HAL_RCC_GetHCLKFreq()/1000);
-#endif
+
     /**Configure the Systick 
     */
   HAL_SYSTICK_CLKSourceConfig(SYSTICK_CLKSOURCE_HCLK);

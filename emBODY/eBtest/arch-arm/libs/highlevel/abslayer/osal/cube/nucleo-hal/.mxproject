@@ -1,7 +1,7 @@
 [PreviousGenFiles]
-HeaderPath=C:/ace/nucleo-tests/cube/nucleo-hal/Inc
+HeaderPath=C:/ace/icub-firmware/emBODY/eBtest/arch-arm/libs/highlevel/abslayer/osal/cube/nucleo-hal/Inc
 HeaderFiles=gpio.h;usart.h;stm32l4xx_it.h;stm32l4xx_hal_conf.h;main.h;
-SourcePath=C:/ace/nucleo-tests/cube/nucleo-hal/Src
+SourcePath=C:/ace/icub-firmware/emBODY/eBtest/arch-arm/libs/highlevel/abslayer/osal/cube/nucleo-hal/Src
 SourceFiles=gpio.h;usart.h;stm32l4xx_it.h;stm32l4xx_hal_conf.h;main.h;gpio.c;usart.c;stm32l4xx_it.c;stm32l4xx_hal_msp.c;main.c;
 
 [PreviousLibFiles]
