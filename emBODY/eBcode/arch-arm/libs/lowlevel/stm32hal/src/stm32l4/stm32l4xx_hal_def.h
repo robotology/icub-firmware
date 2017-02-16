@@ -171,10 +171,6 @@ typedef enum
 */
 #define __RAM_FUNC HAL_StatusTypeDef
 
-#elif defined(__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050)
-// IIT-EXT
-#define __RAM_FUNC HAL_StatusTypeDef
-
 #elif defined ( __ICCARM__ )
 /* ICCARM Compiler
    ---------------
@@ -190,9 +186,6 @@ typedef enum
 */
 #define __RAM_FUNC HAL_StatusTypeDef  __attribute__((section(".RamFunc")))
 
-#else
-
-#error ucwwevcerv
 #endif
 
 /** 

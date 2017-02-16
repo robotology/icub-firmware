@@ -33,8 +33,13 @@
   */
 /* Includes ------------------------------------------------------------------*/
 
-#include "stm32hal.h"
-#include "../../stm32l4/stm32l4xx_hal.h"
+
+#if defined(USE_STM32HAL)
+   #include "stm32hal.h"
+   #include "../../stm32l4/stm32l4xx_hal.h"
+#else
+    #include "stm32l4xx_hal.h"
+#endif
 
 extern void Error_Handler(void);
 /* USER CODE BEGIN 0 */

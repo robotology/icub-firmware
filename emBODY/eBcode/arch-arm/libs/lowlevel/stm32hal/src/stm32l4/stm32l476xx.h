@@ -180,9 +180,8 @@ typedef enum
 /**
   * @}
   */
-// IIT-EXT
-//#include "../../../../../CMSIS/Include/core_cm4.h"             /* Cortex-M4 processor and core peripherals */
-#include "core_cm4.h" 
+
+#include "core_cm4.h"             /* Cortex-M4 processor and core peripherals */
 #include "system_stm32l4xx.h"
 #include <stdint.h>
 

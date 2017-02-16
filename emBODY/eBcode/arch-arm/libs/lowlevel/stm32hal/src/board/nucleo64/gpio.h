@@ -40,13 +40,12 @@
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#if 0
-//  #include "stm32l4xx_hal.h"
-//  #include "main.h"
+#if defined(USE_STM32HAL)
+    #include "stm32hal.h"
 #else
-#include "stm32hal.h"
+    #include "stm32l4xx_hal.h"
+    #include "main.h"
 #endif
-
 
 /* USER CODE BEGIN Includes */
 

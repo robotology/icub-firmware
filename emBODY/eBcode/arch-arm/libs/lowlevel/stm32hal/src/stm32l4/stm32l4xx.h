@@ -1,5 +1,3 @@
-
-
 /**
   ******************************************************************************
   * @file    stm32l4xx.h
@@ -12,8 +10,8 @@
   *          is using in the C source code, usually in main.c. This file contains:
   *           - Configuration section that allows to select:
   *              - The STM32L4xx device used in the target application
-  *              - To use or not the peripheralâ€™s drivers in application code(i.e.
-  *                code will be based on direct access to peripheralâ€™s registers
+  *              - To use or not the peripheral’s drivers in application code(i.e.
+  *                code will be based on direct access to peripheral’s registers
   *                rather than drivers API), this option is controlled by
   *                "#define USE_HAL_DRIVER"
   *
@@ -213,8 +211,13 @@ typedef enum
   */
 
 #if defined (USE_HAL_DRIVER)
- //#include "../../../../../../src/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal.h" //IIT-EXT
+
+#if defined(USE_STM32HAL)
  #include "../src/stm32l4/stm32l4xx_hal.h" //IIT-EXT
+#else
+ #include "stm32l4xx_hal.h"
+#endif
+
 #endif /* USE_HAL_DRIVER */
 
 #ifdef __cplusplus
