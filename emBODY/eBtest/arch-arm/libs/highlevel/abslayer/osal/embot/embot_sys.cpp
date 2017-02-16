@@ -51,6 +51,11 @@ namespace embot { namespace sys {
     {
         return osal_system_abstime_get();
     }
+    
+    common::relTime tickPeriod()
+    {
+        return osal_info_get_tick();
+    }
         
     Task* taskRunning()
     {

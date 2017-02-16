@@ -65,7 +65,7 @@ namespace embot { namespace sys {
         
         bool isStarted();
         
-        common::relTime getTick();
+//        common::relTime getTick();
 
     private:
         theScheduler();  

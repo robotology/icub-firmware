@@ -27,7 +27,7 @@
 namespace embot { namespace sys {
 
     common::Time timeNow();
-    
+    common::relTime tickPeriod();
                  
     class Task;      
     Task* taskRunning();
