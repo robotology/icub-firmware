@@ -23,11 +23,13 @@
 
 #include "embot_hw.h"
 
-#include "bsp.h"
-#include "gpio.h"
-
-#include "stm32l4xx_hal.h"
-
+#if defined(USE_STM32HAL)
+#include "stm32hal.h"
+#else
+    #include "bsp.h"
+    #include "gpio.h"
+    #include "stm32l4xx_hal.h"
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
