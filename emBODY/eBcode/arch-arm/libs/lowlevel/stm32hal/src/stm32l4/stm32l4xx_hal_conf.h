@@ -8,15 +8,13 @@
 extern "C" {
 #endif
 
-
-#include "../../api/stm32hal_define.h"
+// IIT-EXT path is referred to stm32hal/api
+#include "stm32hal_define.h" 
 
 
 #if     defined(STM32HAL_BOARD_NUCLEO64)
-
-//    #include "../../../src/board/nucleo64/stm32l4xx_hal_conf_nucleo64.h"
-    
-     #include "../src/board/nucleo64/stm32l4xx_hal_conf_nucleo64.h" // parto da api
+    // IIT-EXT path is referred to stm32hal/api
+     #include "../src/board/nucleo64/inc/stm32l4xx_hal_conf_nucleo64.h" 
 
 #else
         #error pls define a BOARD
