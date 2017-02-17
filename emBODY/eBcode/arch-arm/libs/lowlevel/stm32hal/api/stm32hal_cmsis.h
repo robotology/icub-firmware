@@ -13,25 +13,25 @@ extern "C" {
 
 #if defined(STM32L476xx)
 
-#include "../src/stm32l4/stm32l4xx.h"
-#include "../src/stm32l4/system_stm32l4xx.h"
+#include "../src/stm32l4/inc/stm32l4xx.h"
+#include "../src/stm32l4/inc/system_stm32l4xx.h"
 
-#include "../src/stm32l4/arm_common_tables.h"
-#include "../src/stm32l4/arm_const_structs.h"
-#include "../src/stm32l4/arm_math.h"
-#include "../src/stm32l4/cmsis_armcc.h"
-//#include "../src/stm32l4/cmsis_armcc_V6.h"
-//#include "../src/stm32l4/cmsis_gcc.h"
-//#include "../src/stm32l4/core_cm0.h"
-//#include "../src/stm32l4/core_cm0plus.h"
-//#include "../src/stm32l4/core_cm3.h"
-#include "../src/stm32l4/core_cm4.h"
-//#include "../src/stm32l4/core_cm7.h"
-#include "../src/stm32l4/core_cmFunc.h"
-#include "../src/stm32l4/core_cmInstr.h"
-#include "../src/stm32l4/core_cmSimd.h"
-//#include "../src/stm32l4/core_sc000.h"
-//#include "../src/stm32l4/core_sc300.h"
+#include "../src/stm32l4/inc/arm_common_tables.h"
+#include "../src/stm32l4/inc/arm_const_structs.h"
+#include "../src/stm32l4/inc/arm_math.h"
+#include "../src/stm32l4/inc/cmsis_armcc.h"
+//#include "../src/stm32l4/inc/cmsis_armcc_V6.h"
+//#include "../src/stm32l4/inc/cmsis_gcc.h"
+//#include "../src/stm32l4/inc/core_cm0.h"
+//#include "../src/stm32l4/inc/core_cm0plus.h"
+//#include "../src/stm32l4/inc/core_cm3.h"
+#include "../src/stm32l4/inc/core_cm4.h"
+//#include "../src/stm32l4/inc/core_cm7.h"
+#include "../src/stm32l4/inc/core_cmFunc.h"
+#include "../src/stm32l4/inc/core_cmInstr.h"
+#include "../src/stm32l4/inc/core_cmSimd.h"
+//#include "../src/stm32l4/inc/core_sc000.h"
+//#include "../src/stm32l4/inc/core_sc300.h"
 
 #else
     #error STM32HAL: the MPU is undefined (e.g., STM32L476xx) 
