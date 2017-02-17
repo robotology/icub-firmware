@@ -176,7 +176,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\system_stm32l4xx.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\system_stm32l4xx.c</PathWithFileName>
       <FilenameWithoutPath>system_stm32l4xx.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -196,7 +196,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -208,7 +208,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_adc.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_adc.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_adc.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -220,7 +220,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_adc_ex.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_adc_ex.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_adc_ex.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -232,7 +232,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_can.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_can.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_can.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -244,7 +244,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_comp.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_comp.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_comp.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -256,7 +256,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_cortex.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_cortex.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_cortex.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -268,7 +268,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_crc.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_crc.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_crc.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -280,7 +280,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_crc_ex.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_crc_ex.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_crc_ex.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -292,7 +292,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_cryp.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_cryp.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_cryp.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -304,7 +304,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_cryp_ex.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_cryp_ex.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_cryp_ex.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -316,7 +316,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_dac.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_dac.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_dac.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -328,7 +328,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_dac_ex.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_dac_ex.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_dac_ex.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -340,7 +340,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_dfsdm.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_dfsdm.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_dfsdm.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -352,7 +352,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_dma.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_dma.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_dma.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -364,7 +364,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_firewall.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_firewall.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_firewall.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -376,7 +376,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_flash.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_flash.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_flash.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -388,7 +388,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_flash_ex.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_flash_ex.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_flash_ex.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -400,7 +400,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_flash_ramfunc.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_flash_ramfunc.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_flash_ramfunc.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -412,7 +412,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_gpio.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_gpio.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_gpio.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -424,7 +424,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_hcd.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_hcd.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_hcd.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -436,7 +436,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_i2c.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_i2c.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_i2c.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -448,7 +448,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_i2c_ex.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_i2c_ex.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_i2c_ex.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -460,7 +460,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_irda.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_irda.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_irda.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -472,7 +472,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_iwdg.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_iwdg.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_iwdg.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -484,7 +484,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_lcd.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_lcd.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_lcd.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -496,7 +496,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_lptim.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_lptim.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_lptim.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -508,7 +508,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_nand.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_nand.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_nand.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -520,7 +520,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_nor.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_nor.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_nor.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -532,7 +532,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_opamp.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_opamp.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_opamp.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -544,7 +544,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_opamp_ex.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_opamp_ex.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_opamp_ex.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -556,7 +556,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_pcd.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_pcd.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_pcd.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -568,7 +568,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_pcd_ex.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_pcd_ex.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_pcd_ex.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -580,7 +580,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_pwr.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_pwr.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_pwr.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -592,7 +592,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_pwr_ex.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_pwr_ex.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_pwr_ex.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -604,7 +604,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_qspi.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_qspi.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_qspi.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -616,7 +616,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_rcc.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_rcc.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_rcc.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -628,7 +628,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_rcc_ex.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_rcc_ex.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_rcc_ex.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -640,7 +640,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_rng.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_rng.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_rng.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -652,7 +652,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_rtc.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_rtc.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_rtc.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -664,7 +664,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_rtc_ex.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_rtc_ex.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_rtc_ex.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -676,7 +676,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_sai.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_sai.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_sai.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -688,7 +688,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_sd.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_sd.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_sd.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -700,7 +700,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_smartcard.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_smartcard.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_smartcard.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -712,7 +712,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_smartcard_ex.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_smartcard_ex.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_smartcard_ex.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -724,7 +724,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_smbus.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_smbus.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_smbus.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -736,7 +736,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_spi.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_spi.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_spi.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -748,7 +748,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_spi_ex.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_spi_ex.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_spi_ex.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -760,7 +760,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_sram.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_sram.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_sram.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -772,7 +772,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_swpmi.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_swpmi.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_swpmi.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -784,7 +784,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_tim.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_tim.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_tim.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -796,7 +796,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_tim_ex.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_tim_ex.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_tim_ex.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -808,7 +808,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_tsc.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_tsc.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_tsc.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -820,7 +820,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_uart.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_uart.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_uart.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -832,7 +832,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_uart_ex.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_uart_ex.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_uart_ex.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -844,7 +844,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_usart.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_usart.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_usart.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -856,7 +856,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\stm32l4\stm32l4xx_hal_wwdg.c</PathWithFileName>
+      <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_wwdg.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_wwdg.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -876,7 +876,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\board\nucleo64\stm32l4xx_hal_conf_nucleo64.h</PathWithFileName>
+      <PathWithFileName>..\src\board\nucleo64\inc\stm32l4xx_hal_conf_nucleo64.h</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_conf_nucleo64.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -888,7 +888,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\board\nucleo64\gpio.c</PathWithFileName>
+      <PathWithFileName>..\src\board\nucleo64\src\gpio.c</PathWithFileName>
       <FilenameWithoutPath>gpio.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -900,7 +900,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\board\nucleo64\usart.c</PathWithFileName>
+      <PathWithFileName>..\src\board\nucleo64\src\usart.c</PathWithFileName>
       <FilenameWithoutPath>usart.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -912,7 +912,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\board\nucleo64\stm32l4xx_hal_msp.c</PathWithFileName>
+      <PathWithFileName>..\src\board\nucleo64\src\stm32l4xx_hal_msp.c</PathWithFileName>
       <FilenameWithoutPath>stm32l4xx_hal_msp.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -924,7 +924,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\board\nucleo64\bsp_nucleo.c</PathWithFileName>
+      <PathWithFileName>..\src\board\nucleo64\src\bsp_nucleo.c</PathWithFileName>
       <FilenameWithoutPath>bsp_nucleo.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
