@@ -335,7 +335,7 @@
               <MiscControls>--cpp11</MiscControls>
               <Define>USE_STM32HAL STM32HAL_BOARD_NUCLEO64</Define>
               <Undefine></Undefine>
-              <IncludePath>..\src-plus;..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask;..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\libs\highlevel\abslayer\osal\embot;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api</IncludePath>
+              <IncludePath>..\src-plus;..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask;..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\eBcode\arch-arm\embot\common;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\sys;..\..\..\..\..\..\eBcode\arch-arm\embot</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -496,81 +496,6 @@
               <FileName>eventviewer.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\src\eventviewer.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>embot</GroupName>
-          <Files>
-            <File>
-              <FileName>embot_common.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\libs\highlevel\abslayer\osal\embot\embot_common.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_i2h.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\libs\highlevel\abslayer\osal\embot\embot_i2h.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_sys.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\libs\highlevel\abslayer\osal\embot\embot_sys.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_sys_Task.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\libs\highlevel\abslayer\osal\embot\embot_sys_Task.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_sys_theCallbackManager.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\libs\highlevel\abslayer\osal\embot\embot_sys_theCallbackManager.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_sys_theJumper.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\libs\highlevel\abslayer\osal\embot\embot_sys_theJumper.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_sys_theScheduler.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\libs\highlevel\abslayer\osal\embot\embot_sys_theScheduler.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_sys_theStorage.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\libs\highlevel\abslayer\osal\embot\embot_sys_theStorage.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_sys_theTimerManager.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\libs\highlevel\abslayer\osal\embot\embot_sys_theTimerManager.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_sys_Timer.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\libs\highlevel\abslayer\osal\embot\embot_sys_Timer.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_FlashStorage.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\libs\highlevel\abslayer\osal\embot\embot_hw_FlashStorage.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\libs\highlevel\abslayer\osal\embot\embot_hw.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_app_theBootloader.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\libs\highlevel\abslayer\osal\embot\embot_app_theBootloader.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_app_theCANboardInfo.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\libs\highlevel\abslayer\osal\embot\embot_app_theCANboardInfo.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -852,6 +777,81 @@
               <FileName>EOMmutex.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask\EOMmutex.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>embot</GroupName>
+          <Files>
+            <File>
+              <FileName>embot_common.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\common\embot_common.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_theBootloader.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_theBootloader.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_theCANboardInfo.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_theCANboardInfo.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_i2h.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\i2h\embot_i2h.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_FlashStorage.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_FlashStorage.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_sys.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\embot_sys.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_sys_Task.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\embot_sys_Task.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_sys_theCallbackManager.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\embot_sys_theCallbackManager.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_sys_theJumper.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\embot_sys_theJumper.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_sys_theScheduler.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\embot_sys_theScheduler.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_sys_theStorage.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\embot_sys_theStorage.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_sys_theTimerManager.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\embot_sys_theTimerManager.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_sys_Timer.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\embot_sys_Timer.cpp</FilePath>
             </File>
           </Files>
         </Group>
