@@ -23,8 +23,6 @@
 
 #include "stm32hal.h"
 
-//#include "../../stm32l4/stm32l4xx.h"
-
 
 #include "string.h"
 
