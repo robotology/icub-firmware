@@ -16,9 +16,9 @@ extern "C" {
 #include "../src/stm32l4/inc/stm32l4xx.h"
 #include "../src/stm32l4/inc/system_stm32l4xx.h"
 
-#include "../src/stm32l4/inc/arm_common_tables.h"
-#include "../src/stm32l4/inc/arm_const_structs.h"
-#include "../src/stm32l4/inc/arm_math.h"
+//#include "../src/stm32l4/inc/arm_common_tables.h"
+//#include "../src/stm32l4/inc/arm_const_structs.h"
+//#include "../src/stm32l4/inc/arm_math.h"
 #include "../src/stm32l4/inc/cmsis_armcc.h"
 //#include "../src/stm32l4/inc/cmsis_armcc_V6.h"
 //#include "../src/stm32l4/inc/cmsis_gcc.h"
