@@ -382,12 +382,12 @@
             <File>
               <FileName>main-application.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\libs\highlevel\abslayer\osal\cube\nucleo-hal\src-plus\main-application.cpp</FilePath>
+              <FilePath>../src/main-application.cpp</FilePath>
             </File>
             <File>
               <FileName>slim_retarget_io.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\libs\highlevel\abslayer\osal\cube\nucleo-hal\src-plus\slim_retarget_io.c</FilePath>
+              <FilePath>../src/slim_retarget_io.c</FilePath>
             </File>
           </Files>
         </Group>

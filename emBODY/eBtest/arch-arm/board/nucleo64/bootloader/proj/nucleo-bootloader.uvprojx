@@ -382,7 +382,7 @@
             <File>
               <FileName>main-bootloader.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\libs\highlevel\abslayer\osal\cube\nucleo-hal\src-plus\main-bootloader.cpp</FilePath>
+              <FilePath>../src/main-bootloader.cpp</FilePath>
             </File>
           </Files>
         </Group>
