@@ -864,7 +864,7 @@
   </Group>
 
   <Group>
-    <GroupName>bsp-nucleo</GroupName>
+    <GroupName>bsp-nucleo64</GroupName>
     <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
@@ -924,8 +924,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\board\nucleo64\src\bsp_nucleo.c</PathWithFileName>
-      <FilenameWithoutPath>bsp_nucleo.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\board\nucleo64\src\bsp_nucleo64.c</PathWithFileName>
+      <FilenameWithoutPath>bsp_nucleo64.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

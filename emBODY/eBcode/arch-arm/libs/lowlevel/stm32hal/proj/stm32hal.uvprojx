@@ -672,7 +672,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>bsp-nucleo</GroupName>
+          <GroupName>bsp-nucleo64</GroupName>
           <Files>
             <File>
               <FileName>stm32l4xx_hal_conf_nucleo64.h</FileName>
@@ -695,9 +695,9 @@
               <FilePath>..\src\board\nucleo64\src\stm32l4xx_hal_msp.c</FilePath>
             </File>
             <File>
-              <FileName>bsp_nucleo.c</FileName>
+              <FileName>bsp_nucleo64.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\src\board\nucleo64\src\bsp_nucleo.c</FilePath>
+              <FilePath>..\src\board\nucleo64\src\bsp_nucleo64.c</FilePath>
             </File>
           </Files>
         </Group>
