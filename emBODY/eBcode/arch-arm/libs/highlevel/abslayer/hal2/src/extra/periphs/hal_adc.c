@@ -92,7 +92,7 @@
 #define CURRENT_FULLSCALE           5000
 
 #define AN_REDUCTION_FACTOR         (float) (3.0/5.0)
-#define CUR_REDUCTION_FACTOR        (float) (3.2/5.0)
+#define CUR_REDUCTION_FACTOR        (float) (3.2f/5.0f)
 #define TVAUX_REDUCTION_FACTOR      (float) (3.0/5.0)
 #define TVIN_REDUCTION_FACTOR       (float) (1.0/21.0)    
     
@@ -929,6 +929,8 @@ extern uint16_t hal_adc_get_current_motor_raw(uint8_t motor)
 
 extern hal_dma_current_t hal_adc_get_current_motor_mA(uint8_t motor)
 {
+    static const float CURRENT_SCALE = ((float)CURRENT_FULLSCALE/CUR_REDUCTION_FACTOR)/((float)ADC_CHANNEL_RESOLUTION/2.0f);
+    
     // marco.accame: best thing is to verify vs initialisation of the assocaited adc peripheral, but for now we accept this check.
     if(hal_false == hal_motor_supported_is((hal_motor_t)motor))
     {
@@ -939,7 +941,7 @@ extern hal_dma_current_t hal_adc_get_current_motor_mA(uint8_t motor)
     if ((motor == 0) || (motor == 1)) motor = !motor;
     
     //rescaling from -5000mA to 5000mA and applying the reduction factor
-    int16_t result = ((1.0/CUR_REDUCTION_FACTOR) * CURRENT_FULLSCALE * (AnalogMotorsInput[motor*2 + 1] - hCurOffset[motor] - ADC_CHANNEL_RESOLUTION/2))/(ADC_CHANNEL_RESOLUTION/2);
+    int16_t result = (int16_t)(CURRENT_SCALE * (float)(AnalogMotorsInput[motor*2 + 1] - hCurOffset[motor]));
     
 	return	result;
 }
@@ -1106,6 +1108,56 @@ static void s_hal_adc_current_OffsetCalibration(void)
   ADC_EOCOnEachRegularChannelCmd(ADC1, DISABLE);
   ADC_EOCOnEachRegularChannelCmd(ADC3, DISABLE);    
   
+  int32_t offset[4] = {0, 0, 0, 0};
+    
+  /* ADC Channel used for current reading are read 
+     in order to get zero currents ADC values*/ 
+  for(conv_index = 0; conv_index < NB_CALIBRATION_CONVERSIONS; conv_index++)
+  {
+    //while the conversions are not ended, wait..how to know that?
+    //while ((DMA_GetFlagStatus(DMA_STREAM0, DMA_IT_TCIF0) == RESET) || (DMA_GetFlagStatus(DMA_STREAM2, DMA_IT_TCIF2) == RESET)) { };
+    //while ((DMA_GetFIFOStatus(DMA_STREAM0) != DMA_FIFOStatus_Full ) ||  (DMA_GetFIFOStatus(DMA_STREAM0) !=  DMA_FIFOStatus_Full)) { };
+      
+    //don't really know if this is the right way to do that
+    while (!ADC_GetFlagStatus(ADC1, ADC_FLAG_EOC)) { attempts ++; if (attempts>=100) break;} 
+    attempts = 0;
+
+    offset[0] +=  AnalogMotorsInput[1];
+    offset[1] +=  AnalogMotorsInput[3];
+    
+    ADC_ClearFlag(ADC1, ADC_FLAG_EOC);
+    
+    while (!ADC_GetFlagStatus(ADC3, ADC_FLAG_EOC)) { attempts ++; if (attempts>=100) break;}
+    attempts = 0;
+    
+    offset[2] +=  AnalogMotorsInput[5];
+    offset[3] +=  AnalogMotorsInput[7];
+      
+    ADC_ClearFlag(ADC3, ADC_FLAG_EOC);
+  }
+  
+  hCurOffset[0] = (offset[0] + NB_CALIBRATION_CONVERSIONS/2) / NB_CALIBRATION_CONVERSIONS;
+  hCurOffset[1] = (offset[1] + NB_CALIBRATION_CONVERSIONS/2) / NB_CALIBRATION_CONVERSIONS;
+  hCurOffset[2] = (offset[2] + NB_CALIBRATION_CONVERSIONS/2) / NB_CALIBRATION_CONVERSIONS;
+  hCurOffset[3] = (offset[3] + NB_CALIBRATION_CONVERSIONS/2) / NB_CALIBRATION_CONVERSIONS;
+  
+  //hCurOffset[0] = (hCurOffset[0] >> 4) - ADC_CHANNEL_RESOLUTION/2; // offset is the difference between the initial values and saturationvalue/2 (which represents 0mA)
+  //hCurOffset[1] = (hCurOffset[1] >> 4) - ADC_CHANNEL_RESOLUTION/2;
+  //hCurOffset[2] = (hCurOffset[2] >> 4) - ADC_CHANNEL_RESOLUTION/2;
+  //hCurOffset[3] = (hCurOffset[3] >> 4) - ADC_CHANNEL_RESOLUTION/2;
+
+}
+
+#if 0
+static void s_hal_adc_current_OffsetCalibration(void)
+{
+  uint8_t conv_index;
+  static uint8_t attempts = 0;
+  
+  //I want EOC flag only at the end of the all the group of conversions, for both ADCs    
+  ADC_EOCOnEachRegularChannelCmd(ADC1, DISABLE);
+  ADC_EOCOnEachRegularChannelCmd(ADC3, DISABLE);    
+  
   /* ADC Channel used for current reading are read 
      in order to get zero currents ADC values*/ 
   for(conv_index = 0; conv_index < NB_CALIBRATION_CONVERSIONS; conv_index++)
@@ -1140,6 +1192,7 @@ static void s_hal_adc_current_OffsetCalibration(void)
   hCurOffset[3] = (hCurOffset[3] >> 4) - ADC_CHANNEL_RESOLUTION/2;
 
 }
+#endif
 
 static void s_hal_adc_current_OffsetCalibration_old(void)
 {

@@ -407,7 +407,7 @@ static void update_jointAndMotor_withJointset_constraints(void)
             for(int i=0; i<o->set_dim[s]; i++)
             {
                 int j = o->jos[s][i];
-                o->joint[j].dead_zone = 400;
+                o->joint[j].dead_zone = 400.0f;
             }
         }
     }
@@ -562,6 +562,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
             }                
             case eomc_enc_aea:
             {
+                o->joint[k].dead_zone = 9.0f;
                 o->absEncoder[k].type = eomc_enc_aea;
                 o->absEncoder[k].fake = FALSE;
                 break;

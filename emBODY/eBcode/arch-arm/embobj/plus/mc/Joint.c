@@ -39,7 +39,7 @@ Joint* Joint_new(uint8_t n)
 
 void Joint_init(Joint* o)
 {
-    o->dead_zone = 0;
+    o->dead_zone = ZERO;
     
     o->pos_min = ZERO;
     o->pos_max = ZERO;
@@ -535,25 +535,30 @@ CTRL_UNITS Joint_do_pwm_control(Joint* o)
                 }
                 else
                 {
-                    if (abs((int)o->pos_err)>o->dead_zone)
+                    if (o->pos_err > o->dead_zone)
                     {
-                        if (o->pos_err > ZERO)
-                        {
-                            o->pos_err -= o->dead_zone;
-                        }
-                        else
-                        {
-                            o->pos_err += o->dead_zone;
-                        }
-                        
-                        o->output = PID_do_out(&o->posPID, o->pos_err);
+                        o->pos_err -= o->dead_zone;
                     }
+                    else if (o->pos_err < -o->dead_zone)
+                    {
+                        o->pos_err += o->dead_zone;
+                    }
+                    else
+                    {
+                        o->pos_err = ZERO;
+                    }
+                        
+                    o->output = PID_do_out(&o->posPID, o->pos_err);
+                    
+                    /*
+                    pid should be reset with zero error and non reversible joints
                     else
                     {
                         PID_reset(&o->posPID);
                         
                         o->output = 0;
                     }
+                    */
                 }
             }
             else

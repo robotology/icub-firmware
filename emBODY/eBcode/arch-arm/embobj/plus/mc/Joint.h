@@ -106,10 +106,10 @@ typedef struct // Joint
 {
     uint8_t ID;
     
-    int16_t dead_zone;
-    
     PID posPID;
     PID velPID;
+    
+    CTRL_UNITS dead_zone;
     
     CTRL_UNITS pos_min;
     CTRL_UNITS pos_max;
