@@ -74,20 +74,20 @@ extern "C" {
 //  <o> major           <0-255> 
 #define EOMTHEEMSAPPLCFG_VERSION_MAJOR          1
 //  <o> minor           <0-255> 
-#define EOMTHEEMSAPPLCFG_VERSION_MINOR          14
+#define EOMTHEEMSAPPLCFG_VERSION_MINOR          116
 //  </h>version
 
 //  <h> build date
 //  <o> year            <2010-2020> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_YEAR         2016
+#define EOMTHEEMSAPPLCFG_BUILDDATE_YEAR         2017
 //  <o> month           <1-12> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_MONTH        12
+#define EOMTHEEMSAPPLCFG_BUILDDATE_MONTH        2
 //  <o> day             <1-31> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          6
+#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          7
 //  <o> hour            <0-23> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         13
+#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         12
 //  <o> minute          <0-59> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          40
+#define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          30
 //  </h>build date
 
 // </h>Info 
@@ -561,7 +561,7 @@ extern "C" {
 
 //  <o> capacity of a single rop            <8-512:8>
 //  <i> default: 256
-#define EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPCAPACITY  256  
+#define EOMTHEEMSAPPLCFG_TRANSCEIVER_ROPCAPACITY  384  
 
 
 //  <o> max number of regular rops          <1-64>

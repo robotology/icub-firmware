@@ -91,9 +91,9 @@ extern "C" {
 
 #define USE_FLOAT_CTRL_UNITS
 
-#define NO_CONSTRAINT        0
-#define CER_HAND_CONSTRAINT  2
-#define TRIFID_CONSTRAINT    3
+//#define NO_CONSTRAINT        0
+//#define CER_HAND_CONSTRAINT  2
+//#define TRIFID_CONSTRAINT    3
 
 #define WAIST_TRIFID_LIMIT  400000
 #define WRIST_TRIFID_LIMIT  500000 //1130000

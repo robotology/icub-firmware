@@ -106,10 +106,10 @@ typedef struct // Joint
 {
     uint8_t ID;
     
-    int16_t dead_zone;
-    
     PID posPID;
     PID velPID;
+    
+    CTRL_UNITS dead_zone;
     
     CTRL_UNITS pos_min;
     CTRL_UNITS pos_max;
@@ -206,7 +206,7 @@ extern int8_t Joint_check_limits(Joint* o);
 extern int8_t Joint_pushing_limit(Joint* o);
 
 extern void Joint_set_limits(Joint* o, CTRL_UNITS pos_min, CTRL_UNITS pos_max);
-extern void Joint_set_hardware_limit(Joint* o, CTRL_UNITS hard_limit);
+extern void Joint_set_hardware_limit(Joint* o);
 
 extern BOOL Joint_manage_cable_constraint(Joint* o);
 

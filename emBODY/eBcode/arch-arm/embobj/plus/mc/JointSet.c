@@ -79,7 +79,7 @@ void JointSet_init(JointSet* o) //
     
     o->is_calibrated = FALSE;
     
-    o->special_constraint = NO_CONSTRAINT;
+    o->special_constraint = eomc_jsetconstraint_none;
     
     o->calibration_in_progress = eomc_calibration_typeUndefined;
     
@@ -667,11 +667,11 @@ void JointSet_do_pwm_control(JointSet* o)
     
     switch (o->special_constraint)
     {
-        case TRIFID_CONSTRAINT:
+        case eomc_jsetconstraint_trifid:
             JointSet_manage_trifid_constraint(o);
             break;
         
-        case CER_HAND_CONSTRAINT:
+        case eomc_jsetconstraint_cerhand:
             JointSet_manage_cable_constraint(o);
             break;
 
@@ -716,7 +716,7 @@ static void JointSet_do_vel_control(JointSet* o)
     
     switch (o->special_constraint)
     {
-        case TRIFID_CONSTRAINT:
+        case eomc_jsetconstraint_trifid:
             JointSet_manage_trifid_constraint(o);
             break;
         
@@ -914,7 +914,7 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
                 return;
             }
             
-            Joint_set_hardware_limit(o->joint+e, calibrator->params.type5.calibrationZero);
+            Joint_set_hardware_limit(o->joint+e);
             
             AbsEncoder_calibrate_fake(o->absEncoder+e);
             o->calibration_in_progress = (eOmc_calibration_type_t)calibrator->type;
@@ -965,7 +965,7 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             // 3) calculate new joint encoder factor and param_zero
             eOmc_joint_config_t *jconfig = &o->joint[e].eo_joint_ptr->config;
            
-            float computedJntEncoderResolution = (float)(calibrator->params.type6.vmax - calibrator->params.type6.vmin) / (float) (jconfig->limitsofjoint.max  - jconfig->limitsofjoint.min);
+            float computedJntEncoderResolution = (float)(calibrator->params.type6.vmax - calibrator->params.type6.vmin) / (float) (jconfig->userlimits.max  - jconfig->userlimits.min);
             
             eOresult_t res = eo_appEncReader_UpdatedMaisConversionFactors(eo_appEncReader_GetHandle(), e, computedJntEncoderResolution);
             if(eores_OK != res)
@@ -983,7 +983,7 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             //Now I need to re-init absEncoder because I chenged maisConversionFactor, therefore the values returned by EOappEncoreReder are changed.
             o->absEncoder[e].state.bits.not_initialized = TRUE;
 
-            float computedJntEncoderZero =  - (float)(jconfig->limitsofjoint.min) + ((float)(calibrator->params.type6.vmin) / computedJntEncoderResolution);
+            float computedJntEncoderZero =  - (float)(jconfig->userlimits.min) + ((float)(calibrator->params.type6.vmin) / computedJntEncoderResolution);
             o->joint[e].running_calibration.data.type6.computedZero = computedJntEncoderZero;
 
             o->joint[e].running_calibration.data.type6.targetpos = target_pos / computedJntEncoderResolution - computedJntEncoderZero; //convert target pos from mais unit to icub deegre
@@ -1013,7 +1013,7 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             
             // 2) calculate new joint encoder factor and param_zero
             eOmc_joint_config_t *jconfig = &o->joint[e].eo_joint_ptr->config;
-            float computedJntEncoderResolution = (float)(calibrator->params.type7.vmax - calibrator->params.type7.vmin) / (float) (jconfig->limitsofjoint.max  - jconfig->limitsofjoint.min);
+            float computedJntEncoderResolution = (float)(calibrator->params.type7.vmax - calibrator->params.type7.vmin) / (float) (jconfig->userlimits.max  - jconfig->userlimits.min);
             
             
             //In some cases, position returned by encoder reader is bigger than 65535, therefore I need to rescale this value into range [0, 65535] in order to work with AbsEncoder object.
@@ -1069,7 +1069,7 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             //Now I need to re init absEncoder because I chenged hallADCConversionFactor, therefore the values returned by EOappEncoreReder are changed.
             o->absEncoder[e].state.bits.not_initialized = TRUE;
             
-            float computedJntEncoderZero =  (((float)calibrator->params.type7.vmin) / computedJntEncoderResolution) - ((float)(jconfig->limitsofjoint.min)) - offset;
+            float computedJntEncoderZero =  (((float)calibrator->params.type7.vmin) / computedJntEncoderResolution) - ((float)(jconfig->userlimits.min)) - offset;
 
             
             o->joint[e].running_calibration.data.type7.computedZero = computedJntEncoderZero;
@@ -1121,7 +1121,7 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             
             o->calibration_timeout = 0;
             
-            Joint_set_hardware_limit(o->joint+e, calibrator->params.type10.calibrationZero);
+            Joint_set_hardware_limit(o->joint+e);
             
             Motor_calibrate_withOffset(o->motor+e, 0);
             Motor_set_run(o->motor+e);

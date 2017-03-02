@@ -118,6 +118,8 @@ static eObool_t s_eo_motioncontrol_isID32relevant(uint32_t id32);
 
 static eOresult_t s_eo_motioncontrol_updatedPositionsFromEncoders(EOtheMotionController *p);
 
+static eOresult_t s_eo_motioncontrol_updatePositionFromEncoder(uint8_t index, eOencoderreader_valueInfo_t *encoder);
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
@@ -1109,7 +1111,6 @@ extern void eoprot_fun_INIT_mc_motor_status(const EOnv* nv)
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
-
 /*This function gets values from encoders at joints and at motors(if present)and updates the motionController engine.
 returns:
  - eores_NOK_timeout if readings are not available
@@ -1145,24 +1146,20 @@ static eOresult_t s_eo_motioncontrol_updatedPositionsFromEncoders(EOtheMotionCon
     // read the encoders        
     for(uint8_t i=0; i<p->numofjomos; i++)
     {
-        eOencoderreader_valueInfo_t primary, secondary;
+        eOencoderreader_valueInfo_t encoder1, encoder2;
         const eOmc_jomo_descriptor_t *jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(p->ctrlobjs.jomodescriptors, i);   
 
-        res = eo_encoderreader_Read(eo_encoderreader_GetHandle(), i, &primary, &secondary);
-        if (res != eores_OK)
+        res = eo_encoderreader_Read(eo_encoderreader_GetHandle(), i, &encoder1, &encoder2);
+        
+        if(eores_OK != s_eo_motioncontrol_updatePositionFromEncoder(i, &encoder1))
         {
-            MController_invalid_absEncoder_fbk(i, primary.errortype);
             res = eores_NOK_generic;
         }
-        else
+        if(eores_OK != s_eo_motioncontrol_updatePositionFromEncoder(i, &encoder2))
         {
-            MController_update_absEncoder_fbk(i, primary.value);
-        
-            if(eomc_pos_atmotor == jomodes->encoder2.pos) 
-            {
-                MController_update_motor_pos_fbk(i, (int32_t)secondary.value[0]);
-            }
+            res = eores_NOK_generic;
         }
+        
     } 
     return(res);
 
@@ -1628,7 +1625,7 @@ static eObool_t s_eo_motioncontrol_mc4based_variableisproxied(eOnvID32_t id)
         {
             case eoprot_tag_mc_joint_config_pidposition:
             case eoprot_tag_mc_joint_config_pidtorque:
-            case eoprot_tag_mc_joint_config_limitsofjoint:
+            case eoprot_tag_mc_joint_config_userlimits:
             case eoprot_tag_mc_joint_config_impedance:
             case eoprot_tag_mc_joint_status_core_modes_ismotiondone:
             {
@@ -1718,6 +1715,32 @@ static eObool_t s_eo_motioncontrol_isID32relevant(uint32_t id32)
     return(eobool_false); 
 }
 
+
+static eOresult_t s_eo_motioncontrol_updatePositionFromEncoder(uint8_t index, eOencoderreader_valueInfo_t *encoder)
+{
+    eOresult_t res = eores_OK;
+    if(encoder->position == eomc_pos_atjoint)
+    {
+        if(encoder->errortype != 0)
+        {
+            MController_invalid_absEncoder_fbk(index, encoder->errortype);
+            res = eores_NOK_generic;
+        }
+        else
+        {
+            MController_update_absEncoder_fbk(index, encoder->value);
+        }
+    }
+    else if(encoder->position == eomc_pos_atmotor)
+    {
+        MController_update_motor_pos_fbk(index, (int32_t)encoder->value[0]);
+    }
+    else
+    {
+        //do nothing;
+    }
+    return res;
+}    
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)

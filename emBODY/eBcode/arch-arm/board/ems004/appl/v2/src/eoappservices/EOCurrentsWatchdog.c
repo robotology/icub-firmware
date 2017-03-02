@@ -171,8 +171,9 @@ extern eOresult_t eo_currents_watchdog_UpdateCurrentLimits(EOCurrentsWatchdog* p
     //calculate nominalCurrent^2 and I2T_thershold
     eOmeas_current_t nc = s_eo_currents_watchdog.themotors[motor]->config.currentLimits.nominalCurrent;
     eOmeas_current_t pc = s_eo_currents_watchdog.themotors[motor]->config.currentLimits.peakCurrent;
-    s_eo_currents_watchdog.nominalCurrent2[motor] = (float)(nc*nc);
-    s_eo_currents_watchdog.I2T_threshold[motor] = (float)((pc*pc) - s_eo_currents_watchdog.nominalCurrent2[motor]); 
+    s_eo_currents_watchdog.nominalCurrent2[motor] = (float)nc*(float)nc;
+    static const float I2TIME = 3.0f;
+    s_eo_currents_watchdog.I2T_threshold[motor] = I2TIME*((float)pc*(float)pc - s_eo_currents_watchdog.nominalCurrent2[motor]); 
     
 //    char str[eomn_info_status_extra_sizeof];    
 //    eOerrmanDescriptor_t errdes = {0};
@@ -309,33 +310,48 @@ static void s_eo_currents_watchdog_CheckSpike(uint8_t motor, int16_t value)
 
 static void s_eo_currents_watchdog_CheckI2T(uint8_t motor, int16_t value)
 {
-    // apply a simple LOW-PASS filter and if the value is above a threshold signal the error
+    float I = value;
     
-    // IMPLEMENTATION OF LOW-PASSFILTER TO CHECK I2T INSIDE 2FOC FW
-    /*
-    if (!MotorConfig.has_tsens)
+    s_eo_currents_watchdog.accomulatorEp[motor] += 0.001f*(I*I - s_eo_currents_watchdog.nominalCurrent2[motor]);
+    
+    if (s_eo_currents_watchdog.accomulatorEp[motor] < 0.0f) s_eo_currents_watchdog.accomulatorEp[motor] = 0.0f;
+
+    // 2) check if current Ep is bigger than threshold then rais fault
+    if( s_eo_currents_watchdog.accomulatorEp[motor] > s_eo_currents_watchdog.I2T_threshold[motor])
     {
-        //static const long I2T_LIMIT = ((long)(sMaxCurrent/100)*(long)(sMaxCurrent/100))*(UDEF_I2T_LIMIT*UDEF_I2T_LIMIT);
-        long I2 = __builtin_mulss(I2Tdata.IQMeasured,I2Tdata.IQMeasured);
-
-        I2 -= I2Tacc;
-        I2 >>= 15;
-        I2Tacc += I2;
-
-        if (I2Tacc > sI2Tlimit)
+        s_eo_currents_watchdog.motorinI2Tfault[motor] = eobool_true;
+        
+        MController_motor_raise_fault_i2t(motor);
+    }
+    else
+    {
+        //I need to raise I2T fault until the current system energy is not littler than I2T threshold divided 2. (we decided so....)
+        if(s_eo_currents_watchdog.motorinI2Tfault[motor])
         {
-            //The temperature grew too much. Protect!
-            SysError.I2TFailure = TRUE;
-            FaultConditionsHandler();
+            if(s_eo_currents_watchdog.accomulatorEp[motor] > (0.5f*s_eo_currents_watchdog.I2T_threshold[motor]))
+            {
+                MController_motor_raise_fault_i2t(motor);
+            }
+            else
+            {
+                eOerrmanDescriptor_t errdes = {0};
+                errdes.code                 = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag00);
+                errdes.par16                = motor;
+                errdes.sourcedevice         = eo_errman_sourcedevice_localboard;
+                errdes.sourceaddress        = 0;  
+                char str[100];
+                snprintf(str, sizeof(str), "Ep < I2T/2: now it is possible put in idle the motor");
+                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, str, NULL, &errdes);
+                
+                s_eo_currents_watchdog.motorinI2Tfault[motor] = eobool_false;
+            }
         }
     }
-    */
-    //int32_t i2 = (int32_t) (value * value);
-    
-    //s_eo_currents_watchdog.filter_reg[motor] += (float) (i2 - s_eo_currents_watchdog.filter_reg[joint]) / FILTER_WINDOW;
-    
-    
-    
+}
+
+#if 0
+static void s_eo_currents_watchdog_CheckI2T(uint8_t motor, int16_t value)
+{    
     //change sign to check absolute value
     if (value < 0)
         value = -value;
@@ -356,11 +372,6 @@ static void s_eo_currents_watchdog_CheckI2T(uint8_t motor, int16_t value)
     {
         s_eo_currents_watchdog.accomulatorEp[motor] = 0;
     }
-    
-    //debug in order to send value to robot interface
-    //MController_updated_debug_current_info(motor, averageCurrent, s_eo_currents_watchdog.accomulatorEp[motor]);
-    
-    
 
     // 2) check if current Ep is bigger than threshold then rais fault
     if( s_eo_currents_watchdog.accomulatorEp[motor] > s_eo_currents_watchdog.I2T_threshold[motor])
@@ -398,6 +409,8 @@ static void s_eo_currents_watchdog_CheckI2T(uint8_t motor, int16_t value)
     s_eo_currents_watchdog_averageCalc_reset(motor);
 
 }
+#endif
+
 #define I2T_CHECK_USE_AVERAGE_CURRENT
 
 #ifdef I2T_CHECK_USE_AVERAGE_CURRENT 

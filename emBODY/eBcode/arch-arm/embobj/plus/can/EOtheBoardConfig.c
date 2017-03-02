@@ -75,7 +75,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
-
+#if 0
 #if     defined(ICUB_MEC_V1) | defined(ICUB_MEC_V2) | defined(ICUB_MEC_V3)
 
 static const eOmn_serv_configuration_t s_serv_config_as_mais =  
@@ -2998,6 +2998,7 @@ static const eOmn_serv_configuration_t * const s_serv_config_mc_CER[maxboards_CE
     &s_serv_config_mc_cer_base       // ip addr  21    
 };
 #endif
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables
@@ -3080,7 +3081,7 @@ extern const eOemsrunner_timing_t * eoboardconfig_code2ctrlooptiming(uint32_t co
 extern const eOmn_serv_configuration_t * eoboardconfig_code2motion_serv_configuration(uint32_t code)
 {
     const eOmn_serv_configuration_t * ret = NULL;
-
+#if 0
 #if     defined(ICUB_MEC_V1) | defined(ICUB_MEC_V2)   
     if(code < maxboards_V2)
     {   // boards from eb1 to eb11
@@ -3097,7 +3098,7 @@ extern const eOmn_serv_configuration_t * eoboardconfig_code2motion_serv_configur
         ret= s_serv_config_mc_CER[code];
     }
 #endif    
-
+#endif
     return(ret);        
 }
 
@@ -3106,6 +3107,7 @@ extern const eOmn_serv_configuration_t * eoboardconfig_code2strain_serv_configur
 {
     const eOmn_serv_configuration_t * ret = NULL;
 
+#if 0
 
 #if     defined(ICUB_MEC_V1) | defined(ICUB_MEC_V2)     
     switch(code)
@@ -3167,7 +3169,8 @@ extern const eOmn_serv_configuration_t * eoboardconfig_code2strain_serv_configur
 
     }
 #endif
-    
+
+#endif
     return(ret);    
 }
 
@@ -3175,7 +3178,7 @@ extern const eOmn_serv_configuration_t * eoboardconfig_code2strain_serv_configur
 extern const eOmn_serv_configuration_t * eoboardconfig_code2mais_serv_configuration(uint32_t code)
 {
     const eOmn_serv_configuration_t * ret = NULL;
-
+#if 0
 #if     defined(ICUB_MEC_V1) | defined(ICUB_MEC_V2)      
     switch(code)
     {
@@ -3217,7 +3220,7 @@ extern const eOmn_serv_configuration_t * eoboardconfig_code2mais_serv_configurat
 #elif   defined(CER)    
     // so far not supported
 #endif
-    
+#endif
     return(ret);  
 }
 
@@ -3225,7 +3228,8 @@ extern const eOmn_serv_configuration_t * eoboardconfig_code2mais_serv_configurat
 extern const eOmn_serv_configuration_t * eoboardconfig_code2skin_serv_configuration(uint32_t code)
 {
     const eOmn_serv_configuration_t * ret = NULL;
-    
+
+#if 0
 #if     defined(ICUB_MEC_V1) | defined(ICUB_MEC_V2)       
     switch(code)
     {
@@ -3250,7 +3254,7 @@ extern const eOmn_serv_configuration_t * eoboardconfig_code2skin_serv_configurat
 #elif   defined(ICUB_MEC_V3)
 #elif   defined(CER)    
 #endif
-    
+#endif
     return(ret);        
 }
 
@@ -3258,7 +3262,7 @@ extern const eOmn_serv_configuration_t * eoboardconfig_code2skin_serv_configurat
 extern const eOmn_serv_configuration_t * eoboardconfig_code2inertials_serv_configuration(uint32_t code)
 {
     const eOmn_serv_configuration_t * ret = NULL;
-
+#if 0
 #if     defined(ICUB_MEC_V1) | defined(ICUB_MEC_V2)   
     switch(code)
     {
@@ -3285,7 +3289,7 @@ extern const eOmn_serv_configuration_t * eoboardconfig_code2inertials_serv_confi
 #elif   defined(CER)    
     // so far not supported
 #endif
-    
+#endif
     return(ret);        
 }
 

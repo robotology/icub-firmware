@@ -75,7 +75,7 @@ typedef struct // JointSet
     
     BOOL external_fault;
     
-    uint8_t special_constraint;
+    eOmc_jsetconstraint_t special_constraint;
     
     int32_t special_limit;
     

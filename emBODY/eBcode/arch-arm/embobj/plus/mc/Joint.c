@@ -39,7 +39,7 @@ Joint* Joint_new(uint8_t n)
 
 void Joint_init(Joint* o)
 {
-    o->dead_zone = 0;
+    o->dead_zone = ZERO;
     
     o->pos_min = ZERO;
     o->pos_max = ZERO;
@@ -137,13 +137,14 @@ void Joint_config(Joint* o, uint8_t ID, eOmc_joint_config_t* config)
     o->scKvel   = config->pidposition.kff;
     o->scKstill = 0.1f*o->scKpos;
     
-    o->pos_min_soft = config->limitsofjoint.min;
-    o->pos_max_soft = config->limitsofjoint.max;    
-    o->pos_min_hard = config->limitsofjoint.min;
-    o->pos_max_hard = config->limitsofjoint.max;
+    o->pos_min_soft = config->userlimits.min;
+    o->pos_max_soft = config->userlimits.max;    
+    o->pos_min_hard = config->hardwarelimits.min;
+    o->pos_max_hard = config->hardwarelimits.max;
     
-    o->pos_min = config->limitsofjoint.min;
-    o->pos_max = config->limitsofjoint.max;
+    o->pos_min = config->userlimits.min;
+    o->pos_max = config->userlimits.max;
+
     o->vel_max = config->maxvelocityofjoint;
     o->acc_max = 10000000.0f;
     
@@ -160,6 +161,20 @@ void Joint_config(Joint* o, uint8_t ID, eOmc_joint_config_t* config)
     
     // TODOALE joint admittance missing
     o->Kadmitt = ZERO;
+    
+    
+    
+    eOerrmanDescriptor_t errdes = {0};
+    char message[150];
+    
+    snprintf(message, sizeof(message), "CFG HW LIMITS: max=%.2f, min=%.2f",o->pos_min_hard, o->pos_max_hard);
+
+    errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
+    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+    errdes.sourceaddress    = o->ID;
+    errdes.par16            = 0;
+    errdes.par64            = 0;
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, message, NULL, &errdes);
 }
 
 void Joint_destroy(Joint* o)
@@ -386,17 +401,8 @@ void Joint_set_limits(Joint* o, CTRL_UNITS pos_min, CTRL_UNITS pos_max)
     Trajectory_config_limits(&o->trajectory, pos_min, pos_max, 0.0f, 0.0f);
 }
 
-void Joint_set_hardware_limit(Joint* o, CTRL_UNITS hard_limit)
+void Joint_set_hardware_limit(Joint* o)
 {
-    if (hard_limit <= o->pos_min_soft)
-    {
-        o->pos_min_hard = hard_limit;
-    }
-    else if (hard_limit >= o->pos_max_soft)
-    {
-        o->pos_max_hard = hard_limit;
-    }
-    
     o->use_hard_limit = TRUE;
     
     Joint_set_limits(o, o->pos_min_hard, o->pos_max_hard);
@@ -529,25 +535,30 @@ CTRL_UNITS Joint_do_pwm_control(Joint* o)
                 }
                 else
                 {
-                    if (abs((int)o->pos_err)>o->dead_zone)
+                    if (o->pos_err > o->dead_zone)
                     {
-                        if (o->pos_err > ZERO)
-                        {
-                            o->pos_err -= o->dead_zone;
-                        }
-                        else
-                        {
-                            o->pos_err += o->dead_zone;
-                        }
-                        
-                        o->output = PID_do_out(&o->posPID, o->pos_err);
+                        o->pos_err -= o->dead_zone;
                     }
+                    else if (o->pos_err < -o->dead_zone)
+                    {
+                        o->pos_err += o->dead_zone;
+                    }
+                    else
+                    {
+                        o->pos_err = ZERO;
+                    }
+                        
+                    o->output = PID_do_out(&o->posPID, o->pos_err);
+                    
+                    /*
+                    pid should be reset with zero error and non reversible joints
                     else
                     {
                         PID_reset(&o->posPID);
                         
                         o->output = 0;
                     }
+                    */
                 }
             }
             else

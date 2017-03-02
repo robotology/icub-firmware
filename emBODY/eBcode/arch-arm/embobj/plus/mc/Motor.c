@@ -214,6 +214,7 @@ void Motor_init(Motor* o) //
     memset(o, 0, sizeof(Motor));
 
     o->GEARBOX = 1;
+    o->GEARBOX_E2J = 1;
     
     o->not_init = TRUE;
     o->not_calibrated = TRUE;
@@ -243,6 +244,7 @@ void Motor_config(Motor* o, uint8_t ID, eOmc_motor_config_t* config) //
     //o->HARDWARE_TYPE      = hardware_type;
     //o->MOTOR_CONTROL_TYPE = motor_control_type;
     o->GEARBOX            = config->gearboxratio;
+    o->GEARBOX_E2J        = config->gearboxratio2;
     o->HAS_TEMP_SENSOR    = config->hasTempSensor;
     
     o->enc_sign = config->rotorEncoderResolution >= 0 ? 1 : -1; 
@@ -458,6 +460,7 @@ extern void Motor_do_calibration_hard_stop(Motor* o)
 void Motor_set_run(Motor* o) //
 {
     icubCanProto_controlmode_t control_mode;
+    char message[150];
     
     switch (o->MOTOR_CONTROL_TYPE)
     {
@@ -474,7 +477,11 @@ void Motor_set_run(Motor* o) //
             break;
         
         default:
+        {
+            snprintf(message, sizeof(message), "Motor_set_run: unknown control type par16=type par64=hwtype" );
+            send_debug_message(message, o->ID , o->MOTOR_CONTROL_TYPE, o->HARDWARE_TYPE);
             return;
+        }
     }
     
     if (o->HARDWARE_TYPE == HARDWARE_2FOC)
@@ -487,8 +494,13 @@ void Motor_set_run(Motor* o) //
         hal_motor_reenable_break_interrupts();
         
         hal_motor_enable((hal_motor_t)o->actuatorPort);
-        
+
         o->control_mode = control_mode;
+    }
+    else
+    {
+         snprintf(message, sizeof(message), "Motor_set_run: unknown hw type. par16=type par64=hwtype" );
+         send_debug_message(message, o->ID , o->MOTOR_CONTROL_TYPE, o->HARDWARE_TYPE);
     }
 }
 
