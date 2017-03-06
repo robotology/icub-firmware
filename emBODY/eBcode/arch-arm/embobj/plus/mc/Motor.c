@@ -489,6 +489,11 @@ void Motor_set_run(Motor* o) //
         o->control_mode = control_mode;
     }
 }
+void Motor_clear_ext_fault(Motor *o)
+{
+ if(o->HARDWARE_TYPE == HARDWARE_MC4p)
+    hal_motor_reenable_break_interrupts();
+}
 
 void Motor_set_idle(Motor* o) //
 {
