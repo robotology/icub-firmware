@@ -164,17 +164,17 @@ void Joint_config(Joint* o, uint8_t ID, eOmc_joint_config_t* config)
     
     
     
-    eOerrmanDescriptor_t errdes = {0};
-    char message[150];
-    
-    snprintf(message, sizeof(message), "CFG HW LIMITS: max=%.2f, min=%.2f",o->pos_min_hard, o->pos_max_hard);
+//    eOerrmanDescriptor_t errdes = {0};
+//    char message[150];
+//    
+//    snprintf(message, sizeof(message), "CFG HW LIMITS: max=%.2f, min=%.2f",o->pos_min_hard, o->pos_max_hard);
 
-    errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
-    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-    errdes.sourceaddress    = o->ID;
-    errdes.par16            = 0;
-    errdes.par64            = 0;
-    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, message, NULL, &errdes);
+//    errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
+//    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+//    errdes.sourceaddress    = o->ID;
+//    errdes.par16            = 0;
+//    errdes.par64            = 0;
+//    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, message, NULL, &errdes);
 }
 
 void Joint_destroy(Joint* o)
