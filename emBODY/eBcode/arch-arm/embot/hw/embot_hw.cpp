@@ -205,6 +205,13 @@ namespace embot { namespace hw { namespace sys {
         SCB->VTOR = FLASH_BASE | (offset & (uint32_t)0x1FFFFF80);        
     }
 
+
+    void delay(embot::common::Time t)
+    {   
+        bsp_delay(t);
+    }
+    
+
 }}} // namespace embot { namespace hw { namespace sys { 
 
 

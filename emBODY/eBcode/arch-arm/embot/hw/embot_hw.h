@@ -86,6 +86,8 @@ namespace embot { namespace hw { namespace sys {
     
     void relocatevectortable(std::uint32_t offset);
     
+    void delay(embot::common::Time t);
+    
 }}} // namespace embot { namespace hw { namespace sys {
 
 
