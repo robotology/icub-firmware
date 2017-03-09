@@ -28,7 +28,7 @@ static void userdeflauncher(void* param);
 static void loop_startup(void *param);
 static void loop_activity(void *param);
 
-#define USE_HW_CAN
+#undef USE_HW_CAN
 
 int main(void)
 {   

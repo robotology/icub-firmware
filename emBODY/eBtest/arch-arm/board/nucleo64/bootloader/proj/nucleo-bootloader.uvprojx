@@ -409,6 +409,11 @@
               <FileType>5</FileType>
               <FilePath>..\cfg\stm32hal_stg.h</FilePath>
             </File>
+            <File>
+              <FileName>stm32hal_external.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\stm32hal_external.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
