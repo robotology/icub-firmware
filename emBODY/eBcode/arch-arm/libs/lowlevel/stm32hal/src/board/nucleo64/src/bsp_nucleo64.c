@@ -74,6 +74,8 @@ void SystemClock_Config(void);
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
+
+
 #if defined(ST32HAL_REMOVE_CODE)
 
 #include "osal.h"
@@ -100,19 +102,21 @@ void HAL_IncTick(void)
 
 uint32_t HAL_GetTick(void)
 {
-    osal_abstime_t t = osal_system_ticks_abstime_get() / 1000; // now t is expressed in millisec
-    return (uint32_t)t;
 //  return uwTick;
+    
+//    osal_abstime_t t = osal_system_ticks_abstime_get() / 1000; // now t is expressed in millisec
+//    return (uint32_t)t;
+    return(stm32hal_external_ticks1ms_get());
 }
 
-// exactly as implemented in stm32l4xx_hal.c
 void HAL_Delay(uint32_t Delay)
 {
-  uint32_t tickstart = 0;
-  tickstart = HAL_GetTick();
-  while((HAL_GetTick() - tickstart) < Delay)
-  {
-  }
+//  uint32_t tickstart = 0;
+//  tickstart = HAL_GetTick();
+//  while((HAL_GetTick() - tickstart) < Delay)
+//  {
+//  }
+    bsp_delay(1000*Delay);
 }
 
 void HAL_SuspendTick(void)
@@ -218,6 +222,53 @@ extern bool bsp_sys_jump2address(uint32_t address)
     // never in here.
     return(0); 
 #endif     
+}
+
+// it should use 4 cycles per iteration: subs 1, and bne 3. however, we have 1.25 gain of cortex, and access to flash whcih may slows it.
+__asm static void s_hl_sys_asm_xnumARMv7ops(uint32_t numberof) 
+{
+   align
+dowaitloop
+   subs r0,r0,#1
+   bne dowaitloop
+   bx lr 
+   align    
+}
+
+extern void bsp_delay(uint64_t t)
+{   
+    static uint64_t s_hl_sys_numofops1sec = 0;
+    static uint32_t s_hl_sys_used_systemcoreclock = 0;
+    if(s_hl_sys_used_systemcoreclock != SystemCoreClock)
+    {
+
+        // to occupy a millisec i execute an operation for a number of times which depends on: 
+        // SystemCoreClock, cortex gain(1.25 dmips/mhz), flash access, etc.
+        // to overcome all this i just consider SystemCoreClock w/out 1.25 gain and i measures
+        // extra gain with on a simple assembly function which should take 4 cycles per iteration (?).      
+        //s_hl_sys_numofops1sec = (5*(SystemCoreClock)) / 4; 
+        s_hl_sys_used_systemcoreclock = SystemCoreClock;
+        s_hl_sys_numofops1sec = SystemCoreClock;
+        
+        // with art technology enabled the flash is seen as fast as the cpu. wow. 
+        s_hl_sys_numofops1sec /= 3;             
+
+
+        // at this point i normalise the variable to keep not the nymber of operations for 1 sec,
+        // but for 1024*1024 microsec. by doing so, later on i shift by 20 instead of using a division. 
+        s_hl_sys_numofops1sec <<= 20;
+        s_hl_sys_numofops1sec /= 1000000;
+    }
+    
+    
+    volatile uint64_t num = s_hl_sys_numofops1sec * t;
+    num >>= 20; 
+    //num -= offset; //we may remove some cycles to compensates for previous instructions, but ... we dont do it. it depends on c compiler optimisation 
+    if(0 == num)
+    {
+        return;
+    }
+    s_hl_sys_asm_xnumARMv7ops((uint32_t)num);
 }
 
 

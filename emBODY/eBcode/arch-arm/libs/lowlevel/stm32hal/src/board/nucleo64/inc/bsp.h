@@ -37,6 +37,8 @@ extern void bsp_sys_reset(void);
 
 extern bool bsp_sys_jump2address(uint32_t address);
     
+extern void bsp_delay(uint64_t t);
+    
 
 enum { bsp_led0 = 0, bsp_led_none = 255 };
 

@@ -1,5 +1,6 @@
 
 
+
 // - include guard ----------------------------------------------------------------------------------------------------
 #ifndef _STM32HAL_BSP_H_
 #define _STM32HAL_BSP_H_
@@ -9,6 +10,11 @@ extern "C" {
 #endif
 
 #include "stm32hal_define.h"
+    
+#include "stdint.h"    
+
+// define externally ....
+extern uint32_t stm32hal_external_ticks1ms_get(void);
 
 
 #if defined(STM32HAL_BOARD_NUCLEO64)
