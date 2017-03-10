@@ -150,34 +150,18 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>33</LineNumber>
+          <LineNumber>145</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134244726</Address>
+          <Address>134231554</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>C:\ace\icub-firmware\emBODY\eBtest\arch-arm\libs\highlevel\abslayer\osal\cube\nucleo-hal\src-plus\main-bootloader.cpp</Filename>
+          <Filename>../src/main-bootloader.cpp</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\nucleo_hal\../../../../libs/highlevel/abslayer/osal/cube/nucleo-hal/src-plus/main-bootloader.cpp\33</Expression>
-        </Bp>
-        <Bp>
-          <Number>1</Number>
-          <Type>0</Type>
-          <LineNumber>77</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134231592</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>C:\ace\icub-firmware\emBODY\eBtest\arch-arm\libs\highlevel\abslayer\osal\cube\nucleo-hal\src-plus\main-bootloader.cpp</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\nucleo_hal\../../../../libs/highlevel/abslayer/osal/cube/nucleo-hal/src-plus/main-bootloader.cpp\77</Expression>
+          <Expression>\\nucleo_hal\../src/main-bootloader.cpp\145</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -189,14 +173,14 @@
         <Ww>
           <count>1</count>
           <WinNumber>1</WinNumber>
-          <ItemText>FLASH</ItemText>
+          <ItemText>pImpl-&gt;buffer.data</ItemText>
         </Ww>
       </WatchWindow1>
       <MemoryWindow1>
         <Mm>
           <WinNumber>1</WinNumber>
           <SubType>0</SubType>
-          <ItemText>s_nzi_ram</ItemText>
+          <ItemText>pImpl-&gt;buffer.data</ItemText>
           <AccSizeX>0</AccSizeX>
         </Mm>
       </MemoryWindow1>
@@ -214,7 +198,7 @@
       <DebugFlag>
         <trace>0</trace>
         <periodic>1</periodic>
-        <aLwin>0</aLwin>
+        <aLwin>1</aLwin>
         <aCover>0</aCover>
         <aSer1>0</aSer1>
         <aSer2>0</aSer2>
@@ -251,7 +235,7 @@
 
   <Group>
     <GroupName>main</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -884,6 +868,18 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\embot_sys_Timer.cpp</PathWithFileName>
       <FilenameWithoutPath>embot_sys_Timer.cpp</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>8</GroupNumber>
+      <FileNumber>49</FileNumber>
+      <FileType>8</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_FlashBurner.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_FlashBurner.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
