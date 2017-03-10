@@ -16,6 +16,8 @@
 
 #include "embot_app_theBootloader.h"
 
+#include "embot_hw_FlashBurner.h"
+
 struct ActivityParam
 {
     uint32_t blinkingperiod;
@@ -26,6 +28,8 @@ static void bl_activity(void* param);
 void periodic_activity(embot::sys::Task *tsk, void *param);
 
 static ActivityParam activity_param = {0};
+
+//static embot::hw::FlashBurner *fb = nullptr;
 
 
 int main(void)
@@ -113,6 +117,8 @@ static void bl_activity(void* param)
         canbrdinfo.setCANaddress(2);
     }
     
+    //fb = new embot::hw::FlashBurner;
+        
 }
 
 
@@ -130,6 +136,50 @@ void periodic_activity(embot::sys::Task *tsk, void *param)
         x++;
         // we stop countdown and we stay in bootloader w/ reduced frequency of ....
         x = x; 
+#if 0        
+        static std::uint8_t data[40] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27};
+        static std::uint32_t size = 6;
+        static std::uint32_t adr = embot::hw::sys::addressOfApplication;
+        static std::uint8_t *dd = data;
+        
+        if(1 == x)
+        {
+            size = 6;
+            fb->add(adr, size, dd);    
+            adr += size;  
+            dd += size;
+        }
+        else if(2 == x)
+        {
+            size = 6;  
+            fb->add(adr, size, dd);    
+            adr += size;  
+            dd += size;            
+        }
+        else if(3 == x)
+        {
+            size = 4; 
+            fb->add(adr, size, dd);    
+            adr = embot::hw::sys::addressOfApplication+2048;  
+            dd += size;                        
+        }
+        else if(4 == x)
+        {
+            size = 6;
+            fb->add(adr, size, dd);    
+            adr += size;  
+            dd += size;
+            size = 6;  
+            fb->add(adr, size, dd);    
+            adr += size;  
+            dd += size;    
+            size = 4; 
+            fb->add(adr, size, dd); 
+            adr = embot::hw::sys::addressOfApplication+2048;  
+            dd += size;             
+        }
+        
+#endif        
     }    
 }
 
