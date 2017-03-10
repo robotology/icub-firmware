@@ -22,13 +22,13 @@ extern "C" {
 //   <o> stack size         <0x0-0xFFFFFFFF:8>
 //   <i> define how much stack you want.
 #ifndef STM32HAL_STG_STACKSIZE
-    #define STM32HAL_STG_STACKSIZE      0x00004000
+    #define STM32HAL_STG_STACKSIZE      0x00002000
 #endif
 
 //   <o> heap size         <0x0-0xFFFFFFFF:8>
 //   <i> define how much heap you want.
 #ifndef STM32HAL_STG_HEAPSIZE
-    #define STM32HAL_STG_HEAPSIZE      0x00010000
+    #define STM32HAL_STG_HEAPSIZE      0x00008000
 #endif
 
 // </h>SYS module

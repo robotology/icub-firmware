@@ -74,7 +74,7 @@ namespace embot { namespace hw { namespace sys {
     const std::uint32_t addressOfStorage        = 0x0801F000;
     const std::uint32_t maxsizeOfStorage        = 4*1024;
     const std::uint32_t addressOfApplication    = 0x08020000;
-    const std::uint32_t maxsizeOfApplication    = 384*1024;
+    const std::uint32_t maxsizeOfApplication    = 128*1024;
     
     std::uint32_t clock();
     

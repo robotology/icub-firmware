@@ -56,7 +56,7 @@ int main(void)
 
 
     // description: by pressing btn we toggle the status of led on/off at release. 
-    // when the led is on it actually pulses at 10 hz
+    // when the led is on it actually pulses at 4 hz
     // we use funtion HAL_Delay() 
     
 
@@ -74,9 +74,9 @@ int main(void)
                 
         if(ledON)
         {
-            HAL_Delay(25); 
+            HAL_Delay(50); 
             evEntityId_t prev = eventviewer_switch_to(ev_ID_first_usrdef);
-            embot::hw::sys::delay(25*1000);
+            embot::hw::sys::delay(50*1000);
             eventviewer_switch_to(prev);
             
             embot::hw::bsp::led_toggle(embot::hw::bsp::LED::zero);
