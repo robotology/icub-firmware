@@ -77,7 +77,7 @@ void embot::app::theApplication::execute(Config &config)
     pImpl->config = config;
     
     // now we init the hw, we start the scheduler, we start a countdown with sys restart at the end ... we exec the activity ...
-    embot::hw::sys::relocatevectortable(embot::hw::sys::addressOfApplication - embot::hw::sys::startOfFLASH);
+    //embot::hw::sys::relocatevectortable(embot::hw::sys::addressOfApplication - embot::hw::sys::startOfFLASH);
     
     embot::hw::bsp::init();
     
