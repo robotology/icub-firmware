@@ -280,6 +280,8 @@ extern BOOL Motor_is_external_fault(Motor* o);
 extern BOOL Motor_is_in_fault(Motor* o);
 extern BOOL Motor_is_running(Motor* o);
 
+void Motor_clear_ext_fault(Motor *o);
+
 ////////////////////////////////////////////////////////////////////////////
 extern void Motor_config_gearbox_ratio(Motor* o, int32_t gearbox_ratio);
 extern int16_t Motor_config_pwm_limit(Motor* o, int16_t pwm_limit);
