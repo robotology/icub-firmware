@@ -79,7 +79,9 @@ void embot::app::theApplication::execute(Config &config)
     // now we init the hw, we start the scheduler, we start a countdown with sys restart at the end ... we exec the activity ...
     embot::hw::sys::relocatevectortable(embot::hw::sys::addressOfApplication - embot::hw::sys::startOfFLASH);
     
-    embot::hw::bsp::init();
+    embot::hw::bsp::Config cc;
+    cc.get1mstick = embot::sys::millisecondsNow;
+    embot::hw::bsp::init(cc);
     
     
     embot::sys::theScheduler &thesystem = embot::sys::theScheduler::getInstance();
@@ -110,6 +112,7 @@ void embot::app::theApplication::Impl::onfatal(void)
 {
     
 }
+
 
 void embot::app::theApplication::Impl::osalstarter(void)
 {

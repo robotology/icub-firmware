@@ -48,13 +48,13 @@ static void userdeflauncher(void* param)
 {
     bool pressed = false;
     
-    embot::hw::bsp::btn_init(embot::hw::bsp::BTN::zero);
+    embot::hw::button::init(embot::hw::button::BTN::zero);
     
-    pressed = embot::hw::bsp::btn_ispressed(embot::hw::bsp::BTN::zero);   
+    pressed = embot::hw::button::pressed(embot::hw::button::BTN::zero);   
     pressed = pressed;
     
     
-    pressed = embot::hw::bsp::btn_ispressed(embot::hw::bsp::BTN::zero);
+    pressed = embot::hw::button::pressed(embot::hw::button::BTN::zero);
     pressed = pressed;
     
 
@@ -62,10 +62,10 @@ static void userdeflauncher(void* param)
     eOledpulser_cfg_t ledconfig = {0};
     
     ledconfig.led_enable_mask   = (1 << eo_ledpulser_led_zero);
-    ledconfig.led_init          = reinterpret_cast<eOint8_fp_uint8_cvoidp_t>(embot::hw::bsp::led_init_par); // (eOint8_fp_uint8_cvoidp_t) embot::hw::bsp::led_init_par;
-    ledconfig.led_on            = reinterpret_cast<eOint8_fp_uint8_t>(embot::hw::bsp::led_on);
-    ledconfig.led_off           = reinterpret_cast<eOint8_fp_uint8_t>(embot::hw::bsp::led_off);
-    ledconfig.led_toggle        = reinterpret_cast<eOint8_fp_uint8_t>(embot::hw::bsp::led_toggle);
+    ledconfig.led_init          = reinterpret_cast<eOint8_fp_uint8_cvoidp_t>(embot::hw::led::init_legacy); // (eOint8_fp_uint8_cvoidp_t) embot::hw::bsp::led_init_par;
+    ledconfig.led_on            = reinterpret_cast<eOint8_fp_uint8_t>(embot::hw::led::on);
+    ledconfig.led_off           = reinterpret_cast<eOint8_fp_uint8_t>(embot::hw::led::off);
+    ledconfig.led_toggle        = reinterpret_cast<eOint8_fp_uint8_t>(embot::hw::led::toggle);
     
     eo_ledpulser_Initialise(&ledconfig);    
     
@@ -108,7 +108,7 @@ void periodic_activity(embot::sys::Task *tsk, void *param)
     x++;
     x = x;   
 
-    if(1 == bsp_button_pressed(bsp_btn0))
+    if(true == embot::hw::button::pressed(embot::hw::button::BTN::zero))
     {
         // we go back to bootloader
         embot::sys::theJumper& thejumper = embot::sys::theJumper::getInstance();

@@ -30,11 +30,11 @@
 
 #include <cstring>
 
-#if defined(USE_STM32HAL)
+//#if defined(USE_STM32HAL)
 #include "stm32hal.h" 
-#else
-#include "stm32l4xx_hal.h" 
-#endif
+//#else
+//#include "stm32l4xx_hal.h" 
+//#endif
 
 
 // --------------------------------------------------------------------------------------------------------------------

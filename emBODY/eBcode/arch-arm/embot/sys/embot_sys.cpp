@@ -52,6 +52,12 @@ namespace embot { namespace sys {
         return osal_system_abstime_get();
     }
     
+    std::uint32_t millisecondsNow()
+    {
+        osal_abstime_t t = osal_system_ticks_abstime_get() / 1000; // now t is expressed in millisec
+        return static_cast<std::uint32_t>(t);        
+    }
+    
     common::relTime tickPeriod()
     {
         return osal_info_get_tick();

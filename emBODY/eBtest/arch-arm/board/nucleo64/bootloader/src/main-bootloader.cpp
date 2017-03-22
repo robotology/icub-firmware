@@ -90,15 +90,17 @@ static void bl_activity(void* param)
     eOledpulser_cfg_t ledconfig = {0};
     
     ledconfig.led_enable_mask   = (1 << eo_ledpulser_led_zero);
-    ledconfig.led_init          = bsp_led_init;
-    ledconfig.led_on            = (eOint8_fp_uint8_t) bsp_led_on;
-    ledconfig.led_off           = (eOint8_fp_uint8_t) bsp_led_off;
-    ledconfig.led_toggle        = (eOint8_fp_uint8_t) bsp_led_toggle;
+    ledconfig.led_init          = reinterpret_cast<eOint8_fp_uint8_cvoidp_t>(embot::hw::led::init_legacy);
+    ledconfig.led_on            = reinterpret_cast<eOint8_fp_uint8_t>(embot::hw::led::on); 
+    ledconfig.led_off           = reinterpret_cast<eOint8_fp_uint8_t>(embot::hw::led::off);
+    ledconfig.led_toggle        = reinterpret_cast<eOint8_fp_uint8_t>(embot::hw::led::toggle);
     
     eo_ledpulser_Initialise(&ledconfig);    
 
     eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_zero, period, 0);  
 
+    
+    embot::hw::button::init(embot::hw::button::BTN::zero);
 
     // also start a periodic task which checks ....
     embot::sys::PeriodicTask *taskper = new embot::sys::PeriodicTask;        
@@ -126,7 +128,7 @@ static void bl_activity(void* param)
 void periodic_activity(embot::sys::Task *tsk, void *param)
 {
     static uint32_t x = 0;
-    if(1 == bsp_button_pressed(bsp_btn0))
+    if(true == embot::hw::button::pressed(embot::hw::button::BTN::zero))
     {
         embot::app::theBootloader & bootloader = embot::app::theBootloader::getInstance();
         bootloader.stopcountdown();

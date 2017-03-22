@@ -26,11 +26,16 @@
 
 namespace embot { namespace common {
 
-    using Time = std::uint64_t;
-    //typedef std::uint64_t Time;     // expressed in usec. it keeps the time of the system since embot::sys::theScheduler::start().
+
+    using fpWorker      = void (*)(void);
+    using fpCallback    = void (*)(void *);
+    using fpGetU32      = std::uint32_t (*)(void);
+    using fpParU32      = void (*)(std::uint32_t);
+    using fpBoolParU32  = bool (*)(std::uint32_t);
+    using fpI08ParU32   = std::int8_t (*)(std::uint32_t);
     
-    using fpCallback = void (*)(void *);
-    using fpWorker = void (*)(void);
+//    using fp_int8_par_uint32 = std::int8_t (*)(std::uint32_t);
+//    using fp_bool_par_uint32 = bool (*)(std::uint32_t);
     
     struct Callback
     {
@@ -40,11 +45,8 @@ namespace embot { namespace common {
         Callback(fpCallback _cbk, void *_arg) : callback(_cbk), arg(_arg) {}
     };
     
-    using fp_int8_par_uint32 = std::int8_t (*)(std::uint32_t);
-    using fp_bool_par_uint32 = bool (*)(std::uint32_t);
-
-    using relTime = std::uint32_t;
-    //typedef std::uint32_t relTime;  // expressed in usec. it is used to express relative time. 0 means: 0 usec from ...
+    using Time          = std::uint64_t;    // expressed in usec.  expresses absolute time    
+    using relTime       = std::uint32_t;    // expressed in usec. it is used to express relative time. 0 means: 0 usec from ...
     
     const relTime timeWaitNone      = 0;
     const relTime time1microsec     = 1;    
@@ -52,12 +54,20 @@ namespace embot { namespace common {
     const relTime time1second       = 1000000;
     const relTime timeWaitForever   = 0xffffffff;
     
-    //typedef std::uint32_t Event;
-    //typedef std::uint32_t Message;
     using Event = std::uint32_t;
     using Message = std::uint32_t;
-    
+            
 } } // namespace embot { namespace common
+
+
+namespace embot { namespace common { namespace bit {
+    
+    void set(std::uint32_t &value, std::uint8_t pos);
+    void clear(std::uint32_t &value, std::uint8_t pos);
+    void toggle(std::uint32_t &value, std::uint8_t pos);
+    bool check(const std::uint32_t value, std::uint8_t pos);
+   
+} } } // namespace embot { namespace common { namespace bit
 
 
 #endif  // include-guard

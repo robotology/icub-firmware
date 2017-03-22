@@ -23,10 +23,6 @@
 
 #include "embot_app_theBootloader.h"
 
-#include "embot.h"
-
-
-#include <new>
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -35,8 +31,12 @@
 
 #include "embot_sys_theJumper.h"
 #include "embot_sys_Timer.h"
-
 #include "embot_hw.h"
+#include "embot.h"
+#include "osal.h"
+
+#include <new>
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -117,8 +117,9 @@ void embot::app::theBootloader::execute(Config &config)
     pImpl->config = config;
     
     // now we init the hw, we start the scheduler at 1 ms, we start a countdown with sys restart at the end ... we exec the activity ...
-    
-    embot::hw::bsp::init();
+    embot::hw::bsp::Config cc;
+    cc.get1mstick = embot::sys::millisecondsNow;
+    embot::hw::bsp::init(cc);
     
   
     //pImpl->resetTimer = new embot::sys::Timer;
@@ -196,6 +197,7 @@ void embot::app::theBootloader::Impl::osalstarter(void)
     }
       
 }
+
 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------

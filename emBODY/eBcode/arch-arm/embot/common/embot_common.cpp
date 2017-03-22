@@ -50,5 +50,35 @@ namespace embot { namespace common {
 
 
 
+namespace embot { namespace common { namespace bit {
+    
+    void set(std::uint32_t &value, std::uint8_t pos)
+    {
+        value |= (1<<pos);    
+    }
+    
+    
+    void clear(std::uint32_t &value, std::uint8_t pos)
+    {
+        value &= (~(1<<pos));
+    }
+    
+    void toggle(std::uint32_t &value, std::uint8_t pos)
+    {
+        value ^= (1<<pos);
+    }
+    
+    bool check(const std::uint32_t value, std::uint8_t pos)
+    {
+        if(value & (1<<pos))
+        {
+            return true;
+        }
+        return false;
+    }
+   
+} } } // namespace embot { namespace common { namespace bit
+
+
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 
