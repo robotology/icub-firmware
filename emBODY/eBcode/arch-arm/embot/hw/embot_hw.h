@@ -23,9 +23,7 @@
 #define _EMBOT_HW_H_
 
 #include "embot_common.h"
-#include "embot_i2h.h"
 
-#include <cstring>
 
 namespace embot { namespace hw {
     
@@ -34,47 +32,90 @@ namespace embot { namespace hw {
     const result_t resOK   = 0;
     const result_t resNOK  = -1;
     
+    
+    struct GPIO
+    {   // generic gpio descriptor: every micro has a port and a pin. 
+        void*           port;
+        std::uint32_t   pin;
+    };
+    
 }} // namespace embot { namespace hw {
+
+
 
 namespace embot { namespace hw { namespace bsp {
     
-        
-    bool isinitted();
+    struct Config
+    {
+        embot::common::fpGetU32     get1mstick; 
+        Config() : get1mstick(nullptr) {}
+        Config(embot::common::fpGetU32 _get1mstick) : get1mstick(_get1mstick) {}
+    }; 
     
-    result_t init();
+        
+    bool initialised();
+    
+    result_t init(const Config &config);
+        
       
 }}} // namespace embot { namespace hw { namespace bsp {
 
 
 
-namespace embot { namespace hw { namespace bsp {
 
-    // we need at least one init where to initialise everything related to the board ...
-    // we also may need some unique labels ... for instance led0 etc ...
+namespace embot { namespace hw { namespace led {
     
-    enum class LED { zero = 0, one = 1, two = 2, three = 3, none = 255 };
-    enum class BTN { zero = 0, one = 1, two = 2, three = 3, none = 255 };
+    // the namespace ::led can be used as template for development of simple hw features.
+    // follow these rules:
+    //
+    // 1. if more that one entity is [may be] available, define an enum with always: none and maxnumberof
+    // 2. expose a bool returning supported() function
+    // 3. expose a bool returning initialised() funtion
+    // 4. expose a result_t returning init() function
+    // 5. design the needed functions. they shall return embot::hw::result_t (0 is ok, negative is bad).
     
-    result_t led_init_par(LED led, const void *par);
-    result_t led_init(LED led);
-    result_t led_on(LED led);
-    result_t led_off(LED led);
-    result_t led_toggle(LED led);
+    enum class LED { zero = 0, one = 1, two = 2, three = 3, four = 4, five = 5, six = 6, seven = 7, none = 32, maxnumberof = 8 };
+
+    bool supported(LED led);
     
-    result_t btn_init(BTN btn);
-    bool btn_ispressed(BTN btn);
+    bool initialised(LED led);
+        
+    result_t init(LED led);
+    result_t on(LED led);
+    result_t off(LED led);
+    result_t toggle(LED led);
+        
+    result_t init_legacy(LED led, const void *par);
+       
+}}} // namespace embot { namespace hw { namespace led 
+
+
+
+namespace embot { namespace hw { namespace button {
     
-}}} // namespace embot { namespace hw { namespace bsp 
+    enum class BTN { zero = 0, one = 1, two = 2, three = 3, four = 4, five = 5, six = 6, seven = 7, none = 32, maxnumberof = 8 };
+
+    bool supported(BTN btn);
+    
+    bool initialised(BTN btn);
+        
+    result_t init(BTN btn);
+        
+    bool pressed(BTN btn);
+       
+}}} // namespace embot { namespace hw { namespace button 
+
+
 
 namespace embot { namespace hw { namespace sys {
-    
-    const std::uint32_t startOfFLASH            = 0x08000000;
-    const std::uint32_t addressOfBootloader     = 0x08000000;
-    const std::uint32_t maxsizeOfBootloader     = 124*1024;
-    const std::uint32_t addressOfStorage        = 0x0801F000;
-    const std::uint32_t maxsizeOfStorage        = 4*1024;
-    const std::uint32_t addressOfApplication    = 0x08020000;
-    const std::uint32_t maxsizeOfApplication    = 128*1024;
+      
+    extern const std::uint32_t startOfFLASH;
+    extern const std::uint32_t addressOfBootloader;
+    extern const std::uint32_t maxsizeOfBootloader;
+    extern const std::uint32_t addressOfStorage;
+    extern const std::uint32_t maxsizeOfStorage;
+    extern const std::uint32_t addressOfApplication;
+    extern const std::uint32_t maxsizeOfApplication;
     
     std::uint32_t clock();
     
@@ -100,7 +141,7 @@ namespace embot { namespace hw { namespace can {
         std::uint8_t        size;
         std::uint8_t        filler[3];
         std::uint8_t        data[8];  
-        Frame() : id(0), size(0) { std::memset(data, 0, sizeof(data)); }
+        Frame() : id(0), size(0) { std::uint64_t *d = reinterpret_cast<std::uint64_t*>(data); *d = 0; }
     };
     
     enum class Port { one = 0, two = 1 };
