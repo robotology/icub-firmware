@@ -61,11 +61,35 @@ namespace embot { namespace common {
 
 
 namespace embot { namespace common { namespace bit {
+        
+    template<typename T>
+    void set(T &value, std::uint8_t pos)
+    {
+        value |= (static_cast<T>(1)<<pos);
+    }
     
-    void set(std::uint32_t &value, std::uint8_t pos);
-    void clear(std::uint32_t &value, std::uint8_t pos);
-    void toggle(std::uint32_t &value, std::uint8_t pos);
-    bool check(const std::uint32_t value, std::uint8_t pos);
+    template<typename T>
+    void clear(T &value, std::uint8_t pos)
+    {
+        value &= (~(static_cast<T>(1)<<pos));
+    }
+    
+    template<typename T>
+    void toggle(T &value, std::uint8_t pos)
+    {
+        value ^= (static_cast<T>(1)<<pos);
+    }
+    
+    template<typename T>
+    bool check(const T value, std::uint8_t pos)
+    {
+        if(value & (static_cast<T>(1)<<pos))
+        {
+            return true;
+        }
+        return false;
+    }    
+    
    
 } } } // namespace embot { namespace common { namespace bit
 
