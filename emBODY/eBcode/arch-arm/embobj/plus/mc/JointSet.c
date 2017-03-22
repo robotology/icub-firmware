@@ -1015,31 +1015,7 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             eOmc_joint_config_t *jconfig = &o->joint[e].eo_joint_ptr->config;
             float computedJntEncoderResolution = (float)(calibrator->params.type7.vmax - calibrator->params.type7.vmin) / (float) (jconfig->userlimits.max  - jconfig->userlimits.min);
             
-            
-            //In some cases, position returned by encoder reader is bigger than 65535, therefore I need to rescale this value into range [0, 65535] in order to work with AbsEncoder object.
-            float jmin = ((float)calibrator->params.type7.vmin)/computedJntEncoderResolution;
-            float jmax = ((float)calibrator->params.type7.vmax)/computedJntEncoderResolution;
-            
-            #define ROUND_ANGLE_IDEGREE 65535.0f
-            int32_t offset;
-            if((jmin > ROUND_ANGLE_IDEGREE) && (jmax > ROUND_ANGLE_IDEGREE))
-            {
-                offset = 65535;
-                
-            }
-            else if((jmin < ROUND_ANGLE_IDEGREE) && (jmax < ROUND_ANGLE_IDEGREE))
-            {
-                offset = 0;
-            }
-            else
-            {
-                ////debug code 
-                char info[50];
-                snprintf(info, 50, "error calib 7 computing encoder factor");
-                JointSet_send_debug_message(info, e);
-                ////debug code ended
-                return;
-            }
+            int32_t offset = (((float)calibrator->params.type7.vmin)/computedJntEncoderResolution) - jconfig->limitsofjoint.min;
             
             eOresult_t res = eo_appEncReader_UpdatedHallAdcOffset(eo_appEncReader_GetHandle(), e, offset);
             if(eores_OK != res)

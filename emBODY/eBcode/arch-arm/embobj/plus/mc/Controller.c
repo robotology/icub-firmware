@@ -768,7 +768,10 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
         switch(o->motor[k].HARDWARE_TYPE)
         {
             case HARDWARE_MC4p:
+            {
                 o->motor[k].actuatorPort = jomodes->actuator.pwm.port;
+                Motor_clear_ext_fault(&(o->motor[k]));
+            }
                 break;
             
             case HARDWARE_2FOC:

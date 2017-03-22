@@ -180,6 +180,7 @@ static eOresult_t JointSet_do_wait_calibration_6_singleJoint(JointSet *o, int in
                 m_ptr->pos_calib_offset = m_ptr->pos_fbk;
                 //reset value of position
                 m_ptr->pos_fbk = m_ptr->pos_fbk - m_ptr->pos_calib_offset;
+                m_ptr->pos_fbk_old = 0;
                 m_ptr->not_init = TRUE;
                 
 //                /////Debug code
