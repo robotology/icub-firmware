@@ -213,9 +213,9 @@ typedef enum
 #if defined (USE_HAL_DRIVER)
 
 #if defined(USE_STM32HAL)
- #include "../src/stm32l4/inc/stm32l4xx_hal.h" //IIT-EXT path is referred to stm32hal/api
+    #include "../src/stm32l4/inc/stm32l4xx_hal.h" //IIT-EXT path is referred to stm32hal/api
 #else
- #include "stm32l4xx_hal.h"
+    #include "stm32l4xx_hal.h"
 #endif
 
 #endif /* USE_HAL_DRIVER */
