@@ -35,8 +35,7 @@
 
 
 #if defined(USE_STM32HAL)
-   #include "stm32hal.h"
-   //#include "../src/stm32l4/inc/stm32l4xx_hal.h"
+    #include "stm32hal.h"
 #else
     #include "stm32l4xx_hal.h"
 #endif
