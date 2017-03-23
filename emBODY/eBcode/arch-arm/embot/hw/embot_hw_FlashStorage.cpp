@@ -30,11 +30,9 @@
 
 #include <cstring>
 
-//#if defined(USE_STM32HAL)
+
 #include "stm32hal.h" 
-//#else
-//#include "stm32l4xx_hal.h" 
-//#endif
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -56,7 +54,7 @@ struct embot::hw::FlashStorage::Impl
         {
              pagestart = embot::hw::sys::addressOfStorage;
         }
-        pagenumber = (pagestart - embot::hw::sys::startOfFLASH) / 2048; // pages in here are of size 2k.
+        pagenumber = (pagestart - embot::hw::sys::startOfFLASH) / 2048; 
         
         pagesize = _pagesize;
         if(pagesize > 2048)
