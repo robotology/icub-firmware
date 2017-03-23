@@ -192,6 +192,7 @@ embot::app::can::theCANservice::theCANservice()
 }
 
 namespace embot{ namespace app { namespace can {
+    
 static void callback_ontxframe(void *arg)
 {
 //do something
@@ -256,36 +257,40 @@ std::uint8_t embot::app::can::theCANservice::sizeOfTXqueue()
     return hw::can::outputqueuesize(hw::can::Port::one);
 }
 
-bool embot::app::can::theCANservice::parse()
-{    
-    uint8_t size = hw::can::inputqueuesize(hw::can::Port::one);
-   
-    
-    for(uint8_t i=0; i<size; i++)
+bool embot::app::can::theCANservice::parse_core(uint8_t numofframes, uint8_t &remaining)
+{
+    for(uint8_t i=0; i<numofframes; i++)
     {
         hw::can::Frame canframe;
-        uint8_t remaining;
         hw::result_t res = hw::can::get(hw::can::Port::one, canframe, remaining);
         if(hw::resNOK == res)
             return false;
         
         //copy can frame into app frame
         app::can::Frame appframe;
-        appframe.id = canframe.id;
-        appframe.size = canframe.size;
-        memcpy(appframe.data, canframe.data, appframe.size);
-        
+        canFrame2appFrame(canframe, appframe);      
         pImpl->config.protocol->parse(appframe);
     }
     return true;
 }
+
+bool embot::app::can::theCANservice::parse()
+{    
+    uint8_t size = hw::can::inputqueuesize(hw::can::Port::one);
+    uint8_t remaining =0;
+    return (parse_core(size, remaining));
+}
         
 bool embot::app::can::theCANservice::parse(std::uint8_t maxnumber, std::uint8_t &remaining)
 { 
+    uint8_t size = hw::can::inputqueuesize(hw::can::Port::one);
+    uint8_t frame2read = 0;
+    if(maxnumber>size)
+        frame2read = size;
+    else
+        frame2read = maxnumber;
     
-    embot::app::can::Frame frame;
-    pImpl->config.protocol->parse(frame);
-    return true;
+    return (parse_core(size, remaining));
 }
 
 
@@ -297,19 +302,17 @@ bool embot::app::can::theCANservice::add(embot::app::can::Message &msg, embot::a
     hw::can::Frame canframe;
     
     //convert appframe into can frame
-    canframe.id = appframe.id;
-    canframe.size = appframe.size;
-    memcpy(canframe.data, appframe.data, canframe.size);
-    
+    appFrame2canFrame(appframe, canframe);
     hw::result_t res = hw::can::put(hw::can::Port::one, canframe);
     if(hw::resNOK == res)
         return false;
-    
-    return true;
+    else
+        return true;
 }        
 
 bool embot::app::can::theCANservice::transmit(embot::common::relTime timeout, std::uint8_t &transmitted)
 {   
+    #warning VALE: the check of timeout in theCANservice::transmit is not implemented!!!
     tx_ended = 0;   
     hw::result_t res = hw::can::transmit(hw::can::Port::one);
     if(hw::resNOK == res)

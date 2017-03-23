@@ -126,6 +126,7 @@ namespace embot { namespace app { namespace can {
                 
     private:
         theCANservice(); 
+        bool parse_core(std::uint8_t numofframes, std::uint8_t &remaining);
   
     public:
         // remove copy constructors and copy assignment operators

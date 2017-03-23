@@ -313,41 +313,7 @@ namespace embot { namespace hw { namespace can {
         sFilterConfig.FilterActivation = ENABLE;
         sFilterConfig.BankNumber = 14;
 
-        #warning vale ho tolto il filtro
-//        if(HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig) != HAL_OK)
-//        {
-//        /* Filter configuration Error */
-//           return resNOK;
-//        }
-        
-//        /////////test
-//        volatile int size = 100;
-//        size = s_Qtx->size();
-//        Frame f;
-//        f.id = 2;
-//        f.size =
-//        f.data[0] = 't';
-//        f.data[1] = 'e';
-//        f.data[2] = 's';
-//        f.data[3] = 't';
-//        f.data[4] = 0;
 
-//        s_Qtx->push_back(f);
-//        size = s_Qtx->size();
-//        f.data[4] = 1;
-//        s_Qtx->push_back(f);
-//        
-//        vector<Frame>::iterator b = s_Qtx->begin();
-//        s_Qtx->erase(b);
-//        
-//        size = s_Qtx->size();
-//        
-//        b = s_rxQ->begin();
-//        s_rxQ->erase(b);
-//        
-//        size = s_Qtx->size();
-//        
-//        size=size;
         
         return resOK;
     }
@@ -439,7 +405,6 @@ namespace embot { namespace hw { namespace can {
 
     static result_t s_transmit(Port p)
     {
-        volatile int size = s_Qtx->size();
         if(0 == s_Qtx->size())
         {
             __HAL_CAN_DISABLE_IT(&hcan1, CAN_IT_TME);
@@ -457,17 +422,12 @@ namespace embot { namespace hw { namespace can {
         hcan1.pTxMsg->DLC = frame.size;
         memcpy(hcan1.pTxMsg->Data, frame.data, frame.size);
 
-        
+        //2) remove the frame from tx queue
         vector<Frame>::iterator b = s_Qtx->begin();
         s_Qtx->erase(b);
         
-        size = s_Qtx->size();
-        size=size;
-        //2) transmit frame
-        
-        //RIMOSSO PER DEBUG
+        //3) transmit frame
         HAL_StatusTypeDef res = HAL_CAN_Transmit_IT(&hcan1);
-        //HAL_StatusTypeDef res = HAL_OK;
         //the only possible return values are HAL_BUSY or HAL_OK
         if(res == HAL_BUSY)
         {
@@ -482,7 +442,6 @@ namespace embot { namespace hw { namespace can {
             s_config.ontxframe.callback(s_config.ontxframe.arg);
         }
             
-        
         return resOK;
     }
     
@@ -504,6 +463,11 @@ namespace embot { namespace hw { namespace can {
         {
             return resNOK;
         } 
+        if(s_rxQ->empty())
+        {
+            remaining = 0;
+            return resNOK;
+        }
         
         frame = s_rxQ->front();
         
@@ -549,10 +513,7 @@ namespace embot { namespace hw { namespace can {
 
 void HAL_CAN_TxCpltCallback(CAN_HandleTypeDef* hcan)
 {
-    static int pippo = 0;
-    pippo = pippo;
     embot::hw::can::s_transmit(embot::hw::can::Port::one);
-
 }
 
 void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan)
