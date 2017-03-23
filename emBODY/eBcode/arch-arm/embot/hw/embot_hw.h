@@ -132,6 +132,24 @@ namespace embot { namespace hw { namespace sys {
 }}} // namespace embot { namespace hw { namespace sys {
 
 
+namespace embot { namespace hw { namespace flash {
+      
+    extern const std::uint32_t startOfFLASH;
+    extern const std::uint32_t sizeOfFLASH;
+    extern const std::uint32_t sizeOfPAGE;
+    extern const std::uint32_t maxNumOfPAGEs;
+    
+    bool isaddressvalid(std::uint32_t address);    
+    std::uint32_t address2page(std::uint32_t address); // returns [0, maxNumOfPAGEs). if address not valid, it returns maxNumOfPAGEs.
+    
+    bool erase(std::uint32_t page);
+    bool erase(std::uint32_t address, std::uint32_t size);
+    bool read(std::uint32_t address, std::uint32_t size, void *data);
+    bool write(std::uint32_t address, std::uint32_t size, const void *data);
+    
+}}} // namespace embot { namespace hw { namespace flash {
+
+
 
 namespace embot { namespace hw { namespace can {
     
