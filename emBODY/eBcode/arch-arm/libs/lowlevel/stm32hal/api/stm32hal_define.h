@@ -69,7 +69,7 @@ extern "C" {
 
 #elif   defined(STM32HAL_BOARD_MTB4)
     
-    #error STM32HAL: code for STM32HAL_BOARD_MTB4 is to be added
+    #warning STM32HAL: code for STM32HAL_BOARD_MTB4 is to be added and macro changed
 
     #if !defined(USE_STM32HAL)
     #define USE_STM32HAL
@@ -81,9 +81,15 @@ extern "C" {
     #endif
 
     // it has a STM32L4xxxx mpu
-    #if !defined(STM32L4xxxx)
-    #define STM32L4xxxx
-    #endif				
+    #warning change STM32L476xx  into ...
+    #if !defined(STM32L476xx)
+    #define STM32L476xx
+    #endif	
+
+    // of type STM32L4    
+    #if !defined(STM32HAL_STM32L4xx)
+    #define STM32HAL_STM32L4xx
+    #endif    
 				
 #elif   defined(STM32HAL_BOARD_STRAIN2)
 				#error STM32HAL: code for STM32HAL_BOARD_STRAIN2 is to be added

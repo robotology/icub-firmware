@@ -62,7 +62,8 @@ extern void stm32hal_bsp_init(void);
 	
 #elif 	defined(STM32HAL_BOARD_MTB4)	
 
-#include "../src/board/mtb4/inc/bsp.h"
+// this is taken from what cube-mx generates 
+#include "../src/board/mtb4/inc/stm32l4xx_hal_conf_mtb4.h"
 
 #else
     #error STM32HAL: you must define a STM32HAL_BOARD_something
