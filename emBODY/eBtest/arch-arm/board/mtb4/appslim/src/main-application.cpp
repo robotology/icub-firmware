@@ -106,19 +106,23 @@ int main(void)
     // led zero (red) always pulses at 1 hz                                 
     // led one (blue) pulses at 1 hz every five seconds for five seconds.  
     
-    // RED      _[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_
-    // BLUE     _[]_[]_[]_[]_[]________________[]_[]_[]_[]_[]________________[]_[]_[]_[]_[]________________[]_[]_[]_[]_[]________________[]_[]_[]_[]_[]_
+    // RED      []_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_[]_
+    // BLUE     []_[]_[]_[]_[]________________[]_[]_[]_[]_[]________________[]_[]_[]_[]_[]________________[]_[]_[]_[]_[]________________[]_[]_[]_[]_[]_
 
     
     embot::hw::led::init(embot::hw::led::LED::zero);
     embot::hw::led::init(embot::hw::led::LED::one);
     
     static bool led1ON = true;
-    static uint32_t mask32 = 0x00;    
+    static uint32_t mask32 = 0x01;    
     static uint32_t count = 0;
     static const uint32_t PERIOD = 10;
     
     led1ON = embot::common::bit::check(mask32, 0);  
+    
+    embot::hw::led::on(embot::hw::led::LED::zero);  
+
+    embot::hw::led::on(embot::hw::led::LED::one);
     
     for(;;)
     {
@@ -127,7 +131,7 @@ int main(void)
 
         embot::hw::led::toggle(embot::hw::led::LED::zero);
         
-        if(PERIOD == count++)
+        if(PERIOD == ++count)
         {
             // in here, i want to demonstrate functions of the embot::common::bit namespace which do bit manipulation of all integer types: 8, 16, 32, 64 bit long
             count = 0;
