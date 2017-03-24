@@ -170,8 +170,9 @@ namespace embot { namespace hw { namespace can {
         std::uint8_t                txcapacity;
         std::uint8_t                rxcapacity;
         embot::common::Callback     ontxframe; 
+        embot::common::Callback     txqueueempty; 
         embot::common::Callback     onrxframe;
-        Config() : txcapacity(8), rxcapacity(8), ontxframe(nullptr, nullptr), onrxframe(nullptr, nullptr) {}
+        Config() : txcapacity(8), rxcapacity(8), ontxframe(nullptr, nullptr), txqueueempty(nullptr, nullptr), onrxframe(nullptr, nullptr) {}
     };
     
     bool supported(Port p);
@@ -193,6 +194,8 @@ namespace embot { namespace hw { namespace can {
     std::uint8_t inputqueuesize(Port p);
     
     result_t get(Port p, Frame &frame, std::uint8_t &remaining);
+    
+    void rxHandler(Port p);
     
     
 }}} // namespace embot { namespace hw { namespace can {

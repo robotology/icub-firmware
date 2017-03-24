@@ -67,11 +67,11 @@ namespace embot { namespace app { namespace can {
     }; 
 
 
-    class StrainProtocol: public Protocol
+    class SkinProtocol: public Protocol
     {
     public:
-        StrainProtocol();
-        ~StrainProtocol();
+        SkinProtocol();
+        ~SkinProtocol();
      
         bool init();
         
@@ -112,9 +112,9 @@ namespace embot { namespace app { namespace can {
         
         bool init(Config &config);
         
-        std::uint8_t sizeOfRXqueue();
+        std::uint8_t sizeOfRXqueue();//current size, no max size of config, right?
         
-        std::uint8_t sizeOfTXqueue();
+        std::uint8_t sizeOfTXqueue();//current size, no max size of config, right?
         
         bool parse();
         
@@ -126,6 +126,7 @@ namespace embot { namespace app { namespace can {
                 
     private:
         theCANservice(); 
+        bool parse_core(std::uint8_t numofframes, std::uint8_t &remaining);
   
     public:
         // remove copy constructors and copy assignment operators
