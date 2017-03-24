@@ -1,8 +1,7 @@
 /**
   ******************************************************************************
-  * File Name          : stm32l4xx_hal_msp.c
-  * Description        : This file provides code for the MSP Initialization 
-  *                      and de-Initialization codes.
+  * @file    stm32l4xx_it.h
+  * @brief   This file contains the headers of the interrupt handlers.
   ******************************************************************************
   *
   * COPYRIGHT(c) 2017 STMicroelectronics
@@ -31,64 +30,50 @@
   *
   ******************************************************************************
   */
-/* Includes ------------------------------------------------------------------*/
 
-// IIT-EXT
-#if defined(USE_STM32HAL)
-    #include "stm32hal.h"
-#else
-    #include "stm32l4xx_hal.h"
+/* Define to prevent recursive inclusion -------------------------------------*/
+#ifndef __STM32L4xx_IT_H
+#define __STM32L4xx_IT_H
+
+#ifdef __cplusplus
+ extern "C" {
+#endif 
+
+/* Includes ------------------------------------------------------------------*/
+/* Exported types ------------------------------------------------------------*/
+/* Exported constants --------------------------------------------------------*/
+/* Exported macro ------------------------------------------------------------*/
+/* Exported functions ------------------------------------------------------- */
+
+void NMI_Handler(void);
+void HardFault_Handler(void);
+void MemManage_Handler(void);
+void BusFault_Handler(void);
+void UsageFault_Handler(void);
+void SVC_Handler(void);
+void DebugMon_Handler(void);
+void PendSV_Handler(void);
+void SysTick_Handler(void);
+void DMA1_Channel4_IRQHandler(void);
+void DMA1_Channel5_IRQHandler(void);
+void DMA1_Channel6_IRQHandler(void);
+void DMA1_Channel7_IRQHandler(void);
+void CAN1_TX_IRQHandler(void);
+void CAN1_RX0_IRQHandler(void);
+void I2C1_EV_IRQHandler(void);
+void I2C1_ER_IRQHandler(void);
+void I2C2_EV_IRQHandler(void);
+void I2C2_ER_IRQHandler(void);
+void USART1_IRQHandler(void);
+void USART2_IRQHandler(void);
+void TIM6_DAC_IRQHandler(void);
+void DMA2_Channel6_IRQHandler(void);
+void DMA2_Channel7_IRQHandler(void);
+
+#ifdef __cplusplus
+}
 #endif
 
-extern void Error_Handler(void);
-/* USER CODE BEGIN 0 */
-
-/* USER CODE END 0 */
-/**
-  * Initializes the Global MSP.
-  */
-void HAL_MspInit(void)
-{
-  /* USER CODE BEGIN MspInit 0 */
-
-  /* USER CODE END MspInit 0 */
-
-  __HAL_RCC_SYSCFG_CLK_ENABLE();
-  __HAL_RCC_PWR_CLK_ENABLE();
-
-  HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
-
-  /* System interrupt init*/
-  /* MemoryManagement_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(MemoryManagement_IRQn, 0, 0);
-  /* BusFault_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(BusFault_IRQn, 0, 0);
-  /* UsageFault_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(UsageFault_IRQn, 0, 0);
-  /* SVCall_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(SVCall_IRQn, 0, 0);
-  /* DebugMonitor_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DebugMonitor_IRQn, 0, 0);
-  /* PendSV_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(PendSV_IRQn, 0, 0);
-  /* SysTick_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
-
-  /* USER CODE BEGIN MspInit 1 */
-
-  /* USER CODE END MspInit 1 */
-}
-
-/* USER CODE BEGIN 1 */
-
-/* USER CODE END 1 */
-
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
+#endif /* __STM32L4xx_IT_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

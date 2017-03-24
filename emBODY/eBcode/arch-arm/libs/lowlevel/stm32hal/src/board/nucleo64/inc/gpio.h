@@ -40,6 +40,7 @@
 #endif
 
 /* Includes ------------------------------------------------------------------*/
+// IIT-EXT
 #if defined(USE_STM32HAL)
     #include "stm32hal.h"
 #else

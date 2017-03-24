@@ -787,6 +787,51 @@
               <FileType>1</FileType>
               <FilePath>..\src\board\mtb4\src\bsp_mtb4.c</FilePath>
             </File>
+            <File>
+              <FileName>adc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\mtb4\src\adc.c</FilePath>
+            </File>
+            <File>
+              <FileName>can.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\mtb4\src\can.c</FilePath>
+            </File>
+            <File>
+              <FileName>dma.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\mtb4\src\dma.c</FilePath>
+            </File>
+            <File>
+              <FileName>gpio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\mtb4\src\gpio.c</FilePath>
+            </File>
+            <File>
+              <FileName>i2c.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\mtb4\src\i2c.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32l4xx_hal_msp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\mtb4\src\stm32l4xx_hal_msp.c</FilePath>
+            </File>
+            <File>
+              <FileName>tim.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\mtb4\src\tim.c</FilePath>
+            </File>
+            <File>
+              <FileName>usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\mtb4\src\usart.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32l4xx_it.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\mtb4\src\stm32l4xx_it.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -869,16 +914,16 @@
       <pCCUsed>5060422::V5.06 update 4 (build 422)::ARMCC</pCCUsed>
       <TargetOption>
         <TargetCommonOption>
-          <Device>STM32L476RGTx</Device>
+          <Device>STM32L443RCIx</Device>
           <Vendor>STMicroelectronics</Vendor>
           <PackID>Keil.STM32L4xx_DFP.1.4.0</PackID>
           <PackURL>http://www.keil.com/pack</PackURL>
-          <Cpu>IRAM(0x20000000-0x20017FFF) IRAM2(0x10000000-0x10007FFF) IROM(0x8000000-0x80FFFFF) CLOCK(8000000) FPU2 CPUTYPE("Cortex-M4")</Cpu>
+          <Cpu>IRAM(0x20000000,0x00010000) IROM(0x08000000,0x00040000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
           <StartupFile></StartupFile>
-          <FlashDriverDll></FlashDriverDll>
-          <DeviceId></DeviceId>
-          <RegisterFile></RegisterFile>
+          <FlashDriverDll>UL2CM3(-S0 -C0 -P0 -FD20000000 -FC1000 -FN1 -FF0STM32L4xx_256 -FS08000000 -FL040000 -FP0($$Device:STM32L443RCIx$Flash\STM32L4xx_256.FLM))</FlashDriverDll>
+          <DeviceId>0</DeviceId>
+          <RegisterFile>$$Device:STM32L443RCIx$Device\Include\stm32l4xx.h</RegisterFile>
           <MemoryEnv></MemoryEnv>
           <Cmp></Cmp>
           <Asm></Asm>
@@ -888,7 +933,7 @@
           <SLE66CMisc></SLE66CMisc>
           <SLE66AMisc></SLE66AMisc>
           <SLE66LinkerMisc></SLE66LinkerMisc>
-          <SFDFile>$$Device:STM32L476RGTx$SVD\STM32L4x6.svd</SFDFile>
+          <SFDFile>$$Device:STM32L443RCIx$SVD\STM32L4x3.svd</SFDFile>
           <bCustSvd>0</bCustSvd>
           <UseEnv>0</UseEnv>
           <BinPath></BinPath>
@@ -965,11 +1010,11 @@
         </CommonProperty>
         <DllOption>
           <SimDllName>SARMCM3.DLL</SimDllName>
-          <SimDllArguments>-REMAP -MPU</SimDllArguments>
+          <SimDllArguments> -REMAP -MPU</SimDllArguments>
           <SimDlgDll>DCM.DLL</SimDlgDll>
           <SimDlgDllArguments>-pCM4</SimDlgDllArguments>
           <TargetDllName>SARMCM3.DLL</TargetDllName>
-          <TargetDllArguments>-MPU</TargetDllArguments>
+          <TargetDllArguments> -MPU</TargetDllArguments>
           <TargetDlgDll>TCM.DLL</TargetDlgDll>
           <TargetDlgDllArguments>-pCM4</TargetDlgDllArguments>
         </DllOption>
@@ -989,11 +1034,11 @@
             <RunIndependent>0</RunIndependent>
             <UpdateFlashBeforeDebugging>1</UpdateFlashBeforeDebugging>
             <Capability>1</Capability>
-            <DriverSelection>4107</DriverSelection>
+            <DriverSelection>4096</DriverSelection>
           </Flash1>
           <bUseTDR>1</bUseTDR>
           <Flash2>BIN\UL2CM3.DLL</Flash2>
-          <Flash3></Flash3>
+          <Flash3>"" ()</Flash3>
           <Flash4></Flash4>
           <pFcarmOut></pFcarmOut>
           <pFcarmGrp></pFcarmGrp>
@@ -1039,7 +1084,7 @@
             <hadXRAM>0</hadXRAM>
             <uocXRam>0</uocXRam>
             <RvdsVP>2</RvdsVP>
-            <hadIRAM2>1</hadIRAM2>
+            <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
             <useUlib>0</useUlib>
@@ -1099,12 +1144,12 @@
               <IRAM>
                 <Type>0</Type>
                 <StartAddress>0x20000000</StartAddress>
-                <Size>0x18000</Size>
+                <Size>0x10000</Size>
               </IRAM>
               <IROM>
                 <Type>1</Type>
                 <StartAddress>0x8000000</StartAddress>
-                <Size>0x100000</Size>
+                <Size>0x40000</Size>
               </IROM>
               <XRAM>
                 <Type>0</Type>
@@ -1129,7 +1174,7 @@
               <OCR_RVCT4>
                 <Type>1</Type>
                 <StartAddress>0x8000000</StartAddress>
-                <Size>0x100000</Size>
+                <Size>0x40000</Size>
               </OCR_RVCT4>
               <OCR_RVCT5>
                 <Type>1</Type>
@@ -1154,12 +1199,12 @@
               <OCR_RVCT9>
                 <Type>0</Type>
                 <StartAddress>0x20000000</StartAddress>
-                <Size>0x18000</Size>
+                <Size>0x10000</Size>
               </OCR_RVCT9>
               <OCR_RVCT10>
                 <Type>0</Type>
-                <StartAddress>0x10000000</StartAddress>
-                <Size>0x8000</Size>
+                <StartAddress>0x0</StartAddress>
+                <Size>0x0</Size>
               </OCR_RVCT10>
             </OnChipMemories>
             <RvctStartVector></RvctStartVector>
@@ -1175,7 +1220,7 @@
             <PlainCh>0</PlainCh>
             <Ropi>0</Ropi>
             <Rwpi>0</Rwpi>
-            <wLevel>1</wLevel>
+            <wLevel>2</wLevel>
             <uThumb>0</uThumb>
             <uSurpInc>1</uSurpInc>
             <uC99>0</uC99>
@@ -1642,6 +1687,51 @@
               <FileName>bsp_mtb4.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\board\mtb4\src\bsp_mtb4.c</FilePath>
+            </File>
+            <File>
+              <FileName>adc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\mtb4\src\adc.c</FilePath>
+            </File>
+            <File>
+              <FileName>can.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\mtb4\src\can.c</FilePath>
+            </File>
+            <File>
+              <FileName>dma.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\mtb4\src\dma.c</FilePath>
+            </File>
+            <File>
+              <FileName>gpio.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\mtb4\src\gpio.c</FilePath>
+            </File>
+            <File>
+              <FileName>i2c.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\mtb4\src\i2c.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32l4xx_hal_msp.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\mtb4\src\stm32l4xx_hal_msp.c</FilePath>
+            </File>
+            <File>
+              <FileName>tim.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\mtb4\src\tim.c</FilePath>
+            </File>
+            <File>
+              <FileName>usart.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\mtb4\src\usart.c</FilePath>
+            </File>
+            <File>
+              <FileName>stm32l4xx_it.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\mtb4\src\stm32l4xx_it.c</FilePath>
             </File>
           </Files>
         </Group>

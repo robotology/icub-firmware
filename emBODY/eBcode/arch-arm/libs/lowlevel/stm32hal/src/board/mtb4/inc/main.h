@@ -1,8 +1,7 @@
 /**
   ******************************************************************************
-  * File Name          : stm32l4xx_hal_msp.c
-  * Description        : This file provides code for the MSP Initialization 
-  *                      and de-Initialization codes.
+  * File Name          : main.h
+  * Description        : This file contains the common defines of the application
   ******************************************************************************
   *
   * COPYRIGHT(c) 2017 STMicroelectronics
@@ -31,64 +30,60 @@
   *
   ******************************************************************************
   */
-/* Includes ------------------------------------------------------------------*/
+/* Define to prevent recursive inclusion -------------------------------------*/
+#ifndef __MAIN_H
+#define __MAIN_H
+  /* Includes ------------------------------------------------------------------*/
 
-// IIT-EXT
-#if defined(USE_STM32HAL)
-    #include "stm32hal.h"
-#else
-    #include "stm32l4xx_hal.h"
-#endif
+/* USER CODE BEGIN Includes */
 
-extern void Error_Handler(void);
-/* USER CODE BEGIN 0 */
+/* USER CODE END Includes */
 
-/* USER CODE END 0 */
-/**
-  * Initializes the Global MSP.
-  */
-void HAL_MspInit(void)
-{
-  /* USER CODE BEGIN MspInit 0 */
+/* Private define ------------------------------------------------------------*/
 
-  /* USER CODE END MspInit 0 */
+#define BNO055_BOOT_Pin GPIO_PIN_13
+#define BNO055_BOOT_GPIO_Port GPIOC
+#define BNO055_INT_Pin GPIO_PIN_10
+#define BNO055_INT_GPIO_Port GPIOC
+#define BNO055_RESET_Pin GPIO_PIN_12
+#define BNO055_RESET_GPIO_Port GPIOC
+#define EN_OSC_Pin GPIO_PIN_11
+#define EN_OSC_GPIO_Port GPIOA
+#define SDA0_Pin GPIO_PIN_8
+#define SDA0_GPIO_Port GPIOA
+#define LED_RED_Pin GPIO_PIN_9
+#define LED_RED_GPIO_Port GPIOC
+#define ANALOG_0_Pin GPIO_PIN_0
+#define ANALOG_0_GPIO_Port GPIOC
+#define LED_BLUE_Pin GPIO_PIN_8
+#define LED_BLUE_GPIO_Port GPIOC
+#define SDA3_Pin GPIO_PIN_5
+#define SDA3_GPIO_Port GPIOA
+#define CAN1_SHDN_Pin GPIO_PIN_0
+#define CAN1_SHDN_GPIO_Port GPIOB
+#define SDA2_Pin GPIO_PIN_6
+#define SDA2_GPIO_Port GPIOA
+#define CAN1_STB_Pin GPIO_PIN_1
+#define CAN1_STB_GPIO_Port GPIOB
+#define PG_3V3_Pin GPIO_PIN_13
+#define PG_3V3_GPIO_Port GPIOB
+#define SCK0_Pin GPIO_PIN_4
+#define SCK0_GPIO_Port GPIOA
+#define SDA1_Pin GPIO_PIN_7
+#define SDA1_GPIO_Port GPIOA
+#define POWER_TSENSOR1_Pin GPIO_PIN_11
+#define POWER_TSENSOR1_GPIO_Port GPIOB
+/* USER CODE BEGIN Private defines */
 
-  __HAL_RCC_SYSCFG_CLK_ENABLE();
-  __HAL_RCC_PWR_CLK_ENABLE();
-
-  HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
-
-  /* System interrupt init*/
-  /* MemoryManagement_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(MemoryManagement_IRQn, 0, 0);
-  /* BusFault_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(BusFault_IRQn, 0, 0);
-  /* UsageFault_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(UsageFault_IRQn, 0, 0);
-  /* SVCall_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(SVCall_IRQn, 0, 0);
-  /* DebugMonitor_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DebugMonitor_IRQn, 0, 0);
-  /* PendSV_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(PendSV_IRQn, 0, 0);
-  /* SysTick_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
-
-  /* USER CODE BEGIN MspInit 1 */
-
-  /* USER CODE END MspInit 1 */
-}
-
-/* USER CODE BEGIN 1 */
-
-/* USER CODE END 1 */
+/* USER CODE END Private defines */
 
 /**
   * @}
-  */
+  */ 
 
 /**
   * @}
-  */
+*/ 
 
+#endif /* __MAIN_H */
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

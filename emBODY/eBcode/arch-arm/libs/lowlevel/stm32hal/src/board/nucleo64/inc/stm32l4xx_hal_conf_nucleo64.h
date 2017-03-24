@@ -36,10 +36,12 @@
 #ifndef __STM32L4xx_HAL_CONF_NUCLEO64_H
 #define __STM32L4xx_HAL_CONF_NUCLEO64_H
 
+// IIT-EXT
 #if !defined(USE_STM32HAL)
     #error USE_STM32HAL must be defined
 #endif
 
+// IIT-EXT
 #if !defined(STM32HAL_BOARD_NUCLEO64)
     #error STM32HAL_BOARD_NUCLEO64 must be defined
 #endif

@@ -36,14 +36,11 @@
 #ifndef __STM32L4xx_HAL_CONF_MTB4_H
 #define __STM32L4xx_HAL_CONF_MTB4_H
 
-
-
-#warning IT IS JUST A TEST ................
-
+// IIT-EXT
 #if !defined(USE_STM32HAL)
     #error USE_STM32HAL must be defined
 #endif
-
+// IIT-EXT
 #if !defined(STM32HAL_BOARD_MTB4)
     #error STM32HAL_BOARD_MTB4 must be defined
 #endif
@@ -53,12 +50,51 @@
  extern "C" {
 #endif
 
+#include "main.h" 
+/* Exported types ------------------------------------------------------------*/
+/* Exported constants --------------------------------------------------------*/
 
+/* ########################## Module Selection ############################## */
+/**
+  * @brief This is the list of modules to be used in the HAL driver 
+  */
 
 #define HAL_MODULE_ENABLED  
-
+#define HAL_ADC_MODULE_ENABLED
+#define HAL_CAN_MODULE_ENABLED
+/*#define HAL_COMP_MODULE_ENABLED   */
+/*#define HAL_CRC_MODULE_ENABLED   */
+/*#define HAL_CRYP_MODULE_ENABLED   */
+/*#define HAL_DAC_MODULE_ENABLED   */
+/*#define HAL_DCMI_MODULE_ENABLED   */
+/*#define HAL_DMA2D_MODULE_ENABLED   */
+/*#define HAL_DFSDM_MODULE_ENABLED   */
+/*#define HAL_FIREWALL_MODULE_ENABLED   */
+/*#define HAL_HCD_MODULE_ENABLED   */
+/*#define HAL_I2S_MODULE_ENABLED   */
+/*#define HAL_IRDA_MODULE_ENABLED   */
+/*#define HAL_IWDG_MODULE_ENABLED   */
+/*#define HAL_LCD_MODULE_ENABLED   */
+/*#define HAL_LPTIM_MODULE_ENABLED   */
+/*#define HAL_NAND_MODULE_ENABLED   */
+/*#define HAL_NOR_MODULE_ENABLED   */
+/*#define HAL_OPAMP_MODULE_ENABLED   */
+/*#define HAL_PCD_MODULE_ENABLED   */
+/*#define HAL_QSPI_MODULE_ENABLED   */
+/*#define HAL_RNG_MODULE_ENABLED   */
+/*#define HAL_RTC_MODULE_ENABLED   */
+/*#define HAL_SAI_MODULE_ENABLED   */
+/*#define HAL_SD_MODULE_ENABLED   */
+/*#define HAL_SMBUS_MODULE_ENABLED   */
+/*#define HAL_SMARTCARD_MODULE_ENABLED   */
+/*#define HAL_SPI_MODULE_ENABLED   */
+/*#define HAL_SRAM_MODULE_ENABLED   */
+/*#define HAL_SWPMI_MODULE_ENABLED   */
+#define HAL_TIM_MODULE_ENABLED
+/*#define HAL_TSC_MODULE_ENABLED   */
 #define HAL_UART_MODULE_ENABLED
-
+/*#define HAL_USART_MODULE_ENABLED   */
+/*#define HAL_WWDG_MODULE_ENABLED   */
 #define HAL_GPIO_MODULE_ENABLED
 #define HAL_I2C_MODULE_ENABLED
 #define HAL_DMA_MODULE_ENABLED
@@ -74,7 +110,7 @@
   *        (when HSE is used as system clock source, directly or through the PLL).  
   */
 #if !defined  (HSE_VALUE) 
-  #define HSE_VALUE    ((uint32_t)8000000U) /*!< Value of the External oscillator in Hz */
+  #define HSE_VALUE    ((uint32_t)10000000U) /*!< Value of the External oscillator in Hz */
 #endif /* HSE_VALUE */
 
 #if !defined  (HSE_STARTUP_TIMEOUT)
@@ -145,7 +181,7 @@
   *        frequency.
   */
 #if !defined  (EXTERNAL_SAI2_CLOCK_VALUE)
-  #define EXTERNAL_SAI2_CLOCK_VALUE    ((uint32_t)2097000U) /*!< Value of the SAI2 External clock source in Hz*/
+  #define EXTERNAL_SAI2_CLOCK_VALUE    ((uint32_t)48000U) /*!< Value of the SAI2 External clock source in Hz*/
 #endif /* EXTERNAL_SAI2_CLOCK_VALUE */
 
 /* Tip: To avoid modifying this file each time you need to use different HSE,
@@ -159,7 +195,7 @@
 #define  VDD_VALUE					  ((uint32_t)3300U) /*!< Value of VDD in mv */           
 #define  TICK_INT_PRIORITY            ((uint32_t)0U)    /*!< tick interrupt priority */            
 #define  USE_RTOS                     0U     
-#define  PREFETCH_ENABLE              1U
+#define  PREFETCH_ENABLE              0U
 #define  INSTRUCTION_CACHE_ENABLE     1U
 #define  DATA_CACHE_ENABLE            1U
 
@@ -168,7 +204,7 @@
   * @brief Uncomment the line below to expanse the "assert_param" macro in the 
   *        HAL drivers code
   */
-/* #define USE_FULL_ASSERT    1U */
+// #define USE_FULL_ASSERT    1U 
 
 /* ################## SPI peripheral configuration ########################## */
 
@@ -185,7 +221,7 @@
   */
   // IIT-EXT: i consider stm32hal/api as the starting point 
 #ifdef HAL_RCC_MODULE_ENABLED
-  #include "../src/stm32l4/inc/stm32l4xx_hal_rcc.h" 
+  #include "../src/stm32l4/inc/stm32l4xx_hal_rcc.h"
 #endif /* HAL_RCC_MODULE_ENABLED */
 
 #ifdef HAL_GPIO_MODULE_ENABLED
