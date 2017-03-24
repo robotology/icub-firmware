@@ -84,38 +84,39 @@ namespace embot { namespace hw { namespace led {
     struct bspmap_t
     {
         std::uint32_t       mask;
+        GPIO_PinState       on;
+        GPIO_PinState       off;
         embot::hw::GPIO     gpio[static_cast<uint8_t>(LED::maxnumberof)];
     };
     
     // const support maps
     #if     defined(STM32HAL_BOARD_NUCLEO64)    
-    
+        
     static const bspmap_t bspmap = 
     {
         0x00000001,
+        GPIO_PIN_SET, GPIO_PIN_RESET,
         {
             {LD2_GPIO_Port, LD2_Pin},
             {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}
         }        
     };
-//        static const std::uint32_t              mask = 0x00000001;
-//        static const embot::hw::GPIO            gpiomap[] =    
-//        { 
-//            {LD2_GPIO_Port, LD2_Pin} 
-//        };
+   
+
     #elif   defined(STM32HAL_BOARD_MTB4)
-//        static const std::uint32_t              mask = 0;
-//        static const embot::hw::GPIO            gpiomap[] =    
-//        { 
-//            {nullptr, 0} 
-//        };
-        #warning embot::hw::led::mask and embot::hw::led::gpiomap[] must be filled 
+    
+    static const bspmap_t bspmap = 
+    {
+        0x00000003,
+        GPIO_PIN_RESET, GPIO_PIN_SET,
+        {
+            {LED_RED_GPIO_Port, LED_RED_Pin},
+            {LED_BLUE_GPIO_Port, LED_BLUE_Pin},
+            {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}
+        }        
+    };
+
     #else
-//        static const std::uint32_t              mask = 0;
-//        static const embot::hw::GPIO            gpiomap[] =    
-//        { 
-//            {nullptr, 0} 
-//        };
         #warning embot::hw::led::mask and embot::hw::led::gpiomap[] must be filled    
     #endif
       
@@ -189,7 +190,7 @@ namespace embot { namespace hw { namespace led {
             return resNOK;
         }  
         const embot::hw::GPIO *gpio = &bspmap.gpio[led2index(led)];       
-        HAL_GPIO_WritePin(static_cast<GPIO_TypeDef*>(gpio->port), static_cast<uint16_t>(gpio->pin), GPIO_PIN_SET);
+        HAL_GPIO_WritePin(static_cast<GPIO_TypeDef*>(gpio->port), static_cast<uint16_t>(gpio->pin), bspmap.on);
         return resOK;        
     }
     
@@ -200,7 +201,7 @@ namespace embot { namespace hw { namespace led {
             return resNOK;
         }  
         const embot::hw::GPIO *gpio = &bspmap.gpio[led2index(led)];       
-        HAL_GPIO_WritePin(static_cast<GPIO_TypeDef*>(gpio->port), static_cast<uint16_t>(gpio->pin), GPIO_PIN_RESET);
+        HAL_GPIO_WritePin(static_cast<GPIO_TypeDef*>(gpio->port), static_cast<uint16_t>(gpio->pin), bspmap.off);
         return resOK;          
     }
     
@@ -225,6 +226,7 @@ namespace embot { namespace hw { namespace button {
     struct bspmap_t
     {
         std::uint32_t       mask;
+        GPIO_PinState       pressed;
         embot::hw::GPIO     gpio[static_cast<uint8_t>(BTN::maxnumberof)];
     };
 
@@ -234,6 +236,7 @@ namespace embot { namespace hw { namespace button {
     static const bspmap_t bspmap = 
     {
         0x00000001,
+        GPIO_PIN_RESET,
         {
             {B1_GPIO_Port, B1_Pin},
             {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}
@@ -241,15 +244,26 @@ namespace embot { namespace hw { namespace button {
     };    
 
     #elif   defined(STM32HAL_BOARD_MTB4)
-        #warning bspmap must be filled 
+    
+    static const bspmap_t bspmap = 
+    {
+        0x00000000,
+        GPIO_PIN_RESET,
+        {
+            {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}
+        }        
+    };
+    
     #else
+    
     static const bspmap_t bspmap = 
     {
         0x00000000,
         {
-            {nullptr, 0, nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}
+            {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}
         }        
-    };  
+    }; 
+    
     #endif
       
     // initialised mask
@@ -312,12 +326,12 @@ namespace embot { namespace hw { namespace button {
     {
         if(!initialised(btn))
         {
-            return resNOK;
+            return false;
         }  
         const embot::hw::GPIO *gpio = &bspmap.gpio[btn2index(btn)];       
         
         GPIO_PinState b1state = HAL_GPIO_ReadPin(static_cast<GPIO_TypeDef*>(gpio->port), static_cast<uint16_t>(gpio->pin));    
-        return (GPIO_PIN_RESET == b1state) ? (true) : (false);         
+        return (bspmap.pressed == b1state) ? (true) : (false);         
     }
     
     
@@ -329,6 +343,7 @@ namespace embot { namespace hw { namespace sys {
     
     
 #if     defined(STM32HAL_BOARD_NUCLEO64)
+    
     const std::uint32_t startOfFLASH            = 0x08000000;
     const std::uint32_t addressOfBootloader     = 0x08000000;
     const std::uint32_t maxsizeOfBootloader     = 124*1024;
@@ -336,8 +351,17 @@ namespace embot { namespace hw { namespace sys {
     const std::uint32_t maxsizeOfStorage        = 4*1024;
     const std::uint32_t addressOfApplication    = 0x08020000;
     const std::uint32_t maxsizeOfApplication    = 128*1024;
+    
 #elif   defined(STM32HAL_BOARD_MTB4)
-
+    
+    const std::uint32_t startOfFLASH            = 0x08000000;
+    const std::uint32_t addressOfBootloader     = 0x08000000;
+    const std::uint32_t maxsizeOfBootloader     = 124*1024;
+    const std::uint32_t addressOfStorage        = 0x0801F000;
+    const std::uint32_t maxsizeOfStorage        = 4*1024;
+    const std::uint32_t addressOfApplication    = 0x08020000;
+    const std::uint32_t maxsizeOfApplication    = 128*1024;
+    
 #endif
 
  
@@ -450,12 +474,19 @@ namespace embot { namespace hw { namespace flash {
       
     
 #if     defined(STM32HAL_BOARD_NUCLEO64)
+    
     const std::uint32_t startOfFLASH            = 0x08000000;
     const std::uint32_t sizeOfFLASH             = 1024*1024;
     const std::uint32_t sizeOfPAGE              = 2*1024;
     const std::uint32_t maxNumOfPAGEs           = 512; 
+    
 #elif   defined(STM32HAL_BOARD_MTB4)
 
+    const std::uint32_t startOfFLASH            = 0x08000000;
+    const std::uint32_t sizeOfFLASH             = 256*1024;
+    const std::uint32_t sizeOfPAGE              = 2*1024;
+    const std::uint32_t maxNumOfPAGEs           = 128;     
+    
 #endif    
     
     bool isaddressvalid(std::uint32_t address)
