@@ -86,10 +86,11 @@ typedef enum
     @brief      contains poiters to callback functions invoked in respective IRQHandlers
  **/
 typedef struct
-{
-    void (*onRx)(CAN_HandleTypeDef* hcan);
-    void (*onTx)(CAN_HandleTypeDef* hcan);
-    void (*onError)(CAN_HandleTypeDef* hcan);
+{   // we use void* instead of CAN_HandleTypeDef* because ... thus type is decleared in stm32l4xx_hal_can.h which is  
+    // include by cube-mx only if it defines can peripherals (thus HAL_CAN_MODULE_ENABLED is defined).
+    void (*onRx)(void* hcan);
+    void (*onTx)(void* hcan);
+    void (*onError)(void* hcan);
 } stm32hal_can_configCallback_t;
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
