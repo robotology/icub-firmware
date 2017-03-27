@@ -1,17 +1,17 @@
 
 //VALE ; removed api hal library. When i'll do library, I'll restore this file and I'll update stm32hal_bsp.h
-//#include "stm32hal.h" // to see bsp_* functions and types
+#include "stm32hal.h" // to see bsp_* functions and types
 //I include following files
-#warning VALE: Am I sure i need these includes here???
-#include "main.h"
-#include "stm32l4xx_hal.h"
-#include "adc.h"
-#include "can.h"
-#include "dma.h"
-#include "i2c.h"
-#include "tim.h"
-#include "usart.h"
-#include "gpio.h"
+//#warning VALE: Am I sure i need these includes here???
+//#include "main.h"
+//#include "stm32l4xx_hal.h"
+//#include "adc.h"
+//#include "can.h"
+//#include "dma.h"
+//#include "i2c.h"
+//#include "tim.h"
+//#include "usart.h"
+//#include "gpio.h"
 
 
 #include "EOtheLEDpulser.h"
@@ -109,6 +109,10 @@ void periodic_activity(embot::sys::Task *tsk, void *param)
     can::theCANservice & myCANsrv_singleton = embot::app::can::theCANservice::getInstance();
     bool res = myCANsrv_singleton.parse();
     
+    
+    uint8_t txframes=0;
+    myCANsrv_singleton.transmit(0,txframes);
+
     static uint8_t count=0;
     uint8_t aux=0;
 
@@ -139,7 +143,7 @@ void periodic_activity(embot::sys::Task *tsk, void *param)
     aux+=16;can_msg.value = &aux;
     res = myCANsrv_singleton.add(can_msg, dest);
      
-    uint8_t txframes=0;
+    //uint8_t txframes=0;
     if(tx_ended)
     {
 

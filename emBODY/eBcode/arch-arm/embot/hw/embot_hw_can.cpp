@@ -74,6 +74,99 @@ namespace embot { namespace hw { namespace can {
     {
         return static_cast<unsigned int>(p);
     }
+    
+    
+    
+    static void s_transmit(CAN_HandleTypeDef* hcan)
+    {
+        if(0 == s_Qtx->size())
+        {
+            __HAL_CAN_DISABLE_IT(hcan, CAN_IT_TME);
+            if(nullptr != s_config.txqueueempty.callback)
+            {
+                s_config.txqueueempty.callback(s_config.txqueueempty.arg);
+            }
+            return; // resOK;
+        }
+        
+        Frame& frame = s_Qtx->front();
+        
+        //1) copy frame to hal memory
+        hcan->pTxMsg->StdId = frame.id & 0x7FF;
+        hcan->pTxMsg->DLC = frame.size;
+        memcpy(hcan->pTxMsg->Data, frame.data, frame.size);
+
+        //2) remove the frame from tx queue
+        vector<Frame>::iterator b = s_Qtx->begin();
+        s_Qtx->erase(b);
+        
+        //3) transmit frame
+        HAL_StatusTypeDef res = HAL_CAN_Transmit_IT(hcan);
+        //the only possible return values are HAL_BUSY or HAL_OK
+        if(res == HAL_BUSY)
+        {
+            uint8_t testonly =0;
+            //this means that can is transmitting a frame, so when it finish it advertises me by IRQ handler;
+            //i should never be here.
+            testonly=testonly;
+        }
+       
+        if(nullptr != s_config.ontxframe.callback)
+        {
+            s_config.ontxframe.callback(s_config.ontxframe.arg);
+        }
+            
+        return; // resOK;
+    }
+    
+    static void txHandler(CAN_HandleTypeDef* hcan)
+    {
+        //this function is called inside IRQ handler of stm32hal, so hcan could be can1 or can2.
+        //therefore i need to check that the interrupt is on the peritherical I already initted.
+        
+        if( (hcan == (&hcan1)) && initted(Port::one) )
+            s_transmit(hcan);
+        
+        //currently I have not can2!
+    }
+    
+    static void rxHandler(CAN_HandleTypeDef* hcan)
+    {
+        //to make better
+        if(hcan != (&hcan1))
+            return;
+        
+        if(false == initted(Port::one))
+        {
+            return;
+        }
+        
+        Frame rxframe;
+        
+        rxframe.id = hcan->pRxMsg->StdId;
+        rxframe.size = hcan->pRxMsg->DLC;
+        memcpy(rxframe.data, hcan->pRxMsg->Data, rxframe.size);
+        
+        
+        if(s_rxQ->size() == s_config.rxcapacity)
+        {
+            //remove the oldest frame
+             s_rxQ->erase(s_rxQ->begin());
+        }
+        s_rxQ->push_back(rxframe);
+        
+        if(nullptr != s_config.onrxframe.callback)
+        {
+            s_config.onrxframe.callback(s_config.onrxframe.arg);
+        }
+        
+    }
+    
+    static void s_errorHandler(CAN_HandleTypeDef* hcan)
+    {
+        static uint32_t error_count=0;
+        error_count++;
+    }
 
     bool embot::hw::can::supported(Port p)
     {
@@ -139,13 +232,21 @@ namespace embot { namespace hw { namespace can {
         
         }
 
+        //////// configure IRQ handler
+        stm32hal_can_configCallback_t  embot_can_irqHandlers;
+        embot_can_irqHandlers.onRx = rxHandler;
+        embot_can_irqHandlers.onTx = txHandler;
+        embot_can_irqHandlers.onError = s_errorHandler;
+
+        stm32hal_can_configureIRQcallback(&embot_can_irqHandlers);
         
+        s_initted[port2index(p)] = true;
         return resOK;
     }
 
     result_t embot::hw::can::enable(Port p)
     {
-        if(true == initted(p))
+        if(false == initted(p))
         {
             return resNOK;
         }  
@@ -163,7 +264,7 @@ namespace embot { namespace hw { namespace can {
     
     result_t embot::hw::can::disable(Port p)
     {
-        if(true == initted(p))
+        if(false == initted(p))
         {
             return resNOK;
         }  
@@ -179,7 +280,7 @@ namespace embot { namespace hw { namespace can {
 
     result_t embot::hw::can::put(Port p, const Frame &frame)
     {
-        if(true == initted(p))
+        if(false == initted(p))
         {
             return resNOK;
         }  
@@ -203,7 +304,7 @@ namespace embot { namespace hw { namespace can {
 
     std::uint8_t embot::hw::can::outputqueuesize(Port p)
     {
-        if(true == initted(p))
+        if(false == initted(p))
         {
             return 0;
         }  
@@ -216,7 +317,7 @@ namespace embot { namespace hw { namespace can {
     
     std::uint8_t embot::hw::can::inputqueuesize(Port p)
     {
-        if(true == initted(p))
+        if(false == initted(p))
         {
             return 0;
         }  
@@ -228,66 +329,35 @@ namespace embot { namespace hw { namespace can {
         return size;
     }
 
-    static result_t s_transmit(Port p)
-    {
-        if(0 == s_Qtx->size())
-        {
-            __HAL_CAN_DISABLE_IT(&hcan1, CAN_IT_TME);
-            if(nullptr != s_config.txqueueempty.callback)
-            {
-                s_config.txqueueempty.callback(s_config.txqueueempty.arg);
-            }
-            return resOK;
-        }
-        
-        Frame& frame = s_Qtx->front();
-        
-        //1) copy frame to hal memory
-        hcan1.pTxMsg->StdId = frame.id & 0x7FF;
-        hcan1.pTxMsg->DLC = frame.size;
-        memcpy(hcan1.pTxMsg->Data, frame.data, frame.size);
-
-        //2) remove the frame from tx queue
-        vector<Frame>::iterator b = s_Qtx->begin();
-        s_Qtx->erase(b);
-        
-        //3) transmit frame
-        HAL_StatusTypeDef res = HAL_CAN_Transmit_IT(&hcan1);
-        //the only possible return values are HAL_BUSY or HAL_OK
-        if(res == HAL_BUSY)
-        {
-            uint8_t testonly =0;
-            //this means that can is transmitting a frame, so when it finish it advertises me by IRQ handler;
-            //i should never be here.
-            testonly=testonly;
-        }
-       
-        if(nullptr != s_config.ontxframe.callback)
-        {
-            s_config.ontxframe.callback(s_config.ontxframe.arg);
-        }
-            
-        return resOK;
-    }
+    
     
     result_t embot::hw::can::transmit(Port p)
     {
-        if(true == initted(p))
+        if(false == initted(p))
         {
             return resNOK;
         } 
 
-         return (embot::hw::can::s_transmit(p));
+        if(Port::one == p)
+        {
+            embot::hw::can::s_transmit(&hcan1);
+            return resOK;
+        }
+        else
+        {
+            return resNOK;
+        }
     }
     
    
 
     result_t embot::hw::can::get(Port p, Frame &frame, std::uint8_t &remaining)
     {
-        if(true == initted(p))
+        if(false == initted(p))
         {
             return resNOK;
         } 
+        
         if(s_rxQ->empty())
         {
             remaining = 0;
@@ -305,50 +375,7 @@ namespace embot { namespace hw { namespace can {
         
     }
 
-    void embot::hw::can::rxHandler(Port p)
-    {
-        if(true == initted(p))
-        {
-            return;
-        }
-        
-        Frame rxframe;
-        
-        rxframe.id = hcan1.pRxMsg->StdId;
-        rxframe.size = hcan1.pRxMsg->DLC;
-        memcpy(rxframe.data, hcan1.pRxMsg->Data, rxframe.size);
-        
-        
-        if(s_rxQ->size() == s_config.rxcapacity)
-        {
-            //remove the oldest frame
-             s_rxQ->erase(s_rxQ->begin());
-        }
-        s_rxQ->push_back(rxframe);
-        
-        if(nullptr != s_config.onrxframe.callback)
-        {
-            s_config.onrxframe.callback(s_config.onrxframe.arg);
-        }
-        
-    }
+    
     
 }}} // namespace embot { namespace hw { namespace can {
-    
 
-void HAL_CAN_TxCpltCallback(CAN_HandleTypeDef* hcan)
-{
-    embot::hw::can::s_transmit(embot::hw::can::Port::one);
-}
-
-void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan)
-{
-    embot::hw::can::rxHandler(embot::hw::can::Port::one);
-}
-
-void HAL_CAN_ErrorCallback(CAN_HandleTypeDef *hcan)
-{
-    static uint32_t errors;
-    
-    errors++;
-}

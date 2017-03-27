@@ -82,12 +82,27 @@ typedef enum
 } stm32hal_res_t;
 
 
+/** @typedef    typedef struct stm32hal_can_configCallback_t
+    @brief      contains poiters to callback functions invoked in respective IRQHandlers
+ **/
+typedef struct
+{
+    void (*onRx)(CAN_HandleTypeDef* hcan);
+    void (*onTx)(CAN_HandleTypeDef* hcan);
+    void (*onError)(CAN_HandleTypeDef* hcan);
+} stm32hal_can_configCallback_t;
+
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
 
 // it inits the stm32hal with a proper configuration, it inits the bsp. if cfg is NULL, then a default value is used
 // return value 0 is ok. 
 extern stm32hal_res_t stm32hal_init(const stm32hal_config_t *cfg);
+
+
+// it configures CAN IRQ handlers
+// return value 0 is ok. 
+extern stm32hal_res_t stm32hal_can_configureIRQcallback(const stm32hal_can_configCallback_t *cfgCallback);
 
 
 /** @}            

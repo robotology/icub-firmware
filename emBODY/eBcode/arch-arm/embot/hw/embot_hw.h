@@ -195,7 +195,6 @@ namespace embot { namespace hw { namespace can {
     
     result_t get(Port p, Frame &frame, std::uint8_t &remaining);
     
-    void rxHandler(Port p);
     
     
 }}} // namespace embot { namespace hw { namespace can {
