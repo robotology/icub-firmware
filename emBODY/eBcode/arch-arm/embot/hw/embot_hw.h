@@ -162,8 +162,7 @@ namespace embot { namespace hw { namespace can {
         Frame() : id(0), size(0) { std::uint64_t *d = reinterpret_cast<std::uint64_t*>(data); *d = 0; }
     };
     
-    enum class Port { one = 0, two = 1 };
-    enum class PortNumber { value = 2 };
+    enum class Port { one = 0, two = 1, none = 32, maxnumberof = 2};
     
     struct Config
     {
@@ -177,7 +176,7 @@ namespace embot { namespace hw { namespace can {
     
     bool supported(Port p);
     
-    bool initted(Port p);
+    bool initialised(Port p);
     
     result_t init(Port p, const Config &config);
     
