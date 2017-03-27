@@ -45,9 +45,92 @@ using namespace std;
 // - all the rest
 // --------------------------------------------------------------------------------------------------------------------
 
+#if     !defined(HAL_CAN_MODULE_ENABLED)
 
+// in here we manage the case of no can module being present in stm32hal
 
 namespace embot { namespace hw { namespace can {
+
+    bool supported(Port p) { return false; }
+    
+    bool initialised(Port p) { return false; }
+    
+    result_t init(Port p, const Config &config) { return resNOK; }
+    
+    result_t enable(Port p)  { return resNOK; }
+    
+    result_t disable(Port p)  { return resNOK; }
+    
+    result_t put(Port p, const Frame &frame)  { return resNOK; }
+    
+    std::uint8_t outputqueuesize(Port p)  { return 0; }
+    
+    result_t transmit(Port p)  { return resNOK; }
+    
+    std::uint8_t inputqueuesize(Port p)  { return 0; }
+    
+    result_t get(Port p, Frame &frame, std::uint8_t &remaining)  { return resNOK; }    
+    
+}}} // namespace embot { namespace hw { namespace can {
+
+#elif   defined(HAL_CAN_MODULE_ENABLED)
+
+namespace embot { namespace hw { namespace can {
+    
+    
+    struct bspmap_t
+    {
+        std::uint32_t       mask;
+    };
+    
+    // const support maps
+    #if     defined(STM32HAL_BOARD_NUCLEO64)    
+    
+    // yes ... if STM32HAL_BOARD_NUCLEO64 is defined we are never in here because HAL_CAN_MODULE_ENABLED is not defined ... but it is just a reminder
+    static const bspmap_t bspmap = 
+    {
+        0x00000000
+    };
+   
+
+    #elif   defined(STM32HAL_BOARD_MTB4)
+    
+    static const bspmap_t bspmap = 
+    {
+        0x00000001
+    };
+
+    #else
+        #warning embot::hw::can::bspmask must be filled    
+    #endif
+      
+    // initialised mask       
+    static std::uint32_t initialisedmask = 0;
+    
+    std::uint8_t port2index(Port port)
+    {   // use it only after verification of supported() ...
+        return static_cast<uint8_t>(port);
+    }
+        
+    bool supported(Port p)
+    {
+        if((Port::none == p) || (Port::maxnumberof == p))
+        {
+            return false;
+        }
+        return embot::common::bit::check(bspmap.mask, port2index(p));
+    }
+    
+    bool initialised(Port p)
+    {
+        if(Port::none == p)
+        {
+            return false;
+        }
+        return embot::common::bit::check(initialisedmask, port2index(p));
+    }    
+    
+    
 /**
   * @brief  Enable the specified CAN interrupt.
   * @param  __HANDLE__: CAN handle.
@@ -56,9 +139,9 @@ namespace embot { namespace hw { namespace can {
   */
 #define __HAL_CAN_IS_ENABLE_IT(__HANDLE__, __INTERRUPT__) ((((__HANDLE__)->Instance->IER) & (__INTERRUPT__)) == (__INTERRUPT__))
 
-    const bool s_supported[static_cast<unsigned int>(PortNumber::value)] = {true, false};
+//    const bool s_supported[static_cast<unsigned int>(PortNumber::value)] = {true, false};
         
-    static bool s_initted[static_cast<unsigned int>(PortNumber::value)] = {false, false};
+//    static bool s_initted[static_cast<unsigned int>(PortNumber::value)] = {false, false};
     
     
     static Config s_config;    
@@ -70,14 +153,9 @@ namespace embot { namespace hw { namespace can {
     static CanTxMsgTypeDef        TxMessage;
     static CanRxMsgTypeDef        RxMessage;
     
-    uint8_t port2index(Port p)
-    {
-        return static_cast<unsigned int>(p);
-    }
     
-    
-    
-    static void s_transmit(CAN_HandleTypeDef* hcan)
+
+    static void s_transmit(CAN_HandleTypeDef *hcan)
     {
         if(0 == s_Qtx->size())
         {
@@ -119,24 +197,26 @@ namespace embot { namespace hw { namespace can {
         return; // resOK;
     }
     
-    static void txHandler(CAN_HandleTypeDef* hcan)
+    static void txHandler(void* par)
     {
+        CAN_HandleTypeDef *hcan = reinterpret_cast<CAN_HandleTypeDef*>(par);
         //this function is called inside IRQ handler of stm32hal, so hcan could be can1 or can2.
         //therefore i need to check that the interrupt is on the peritherical I already initted.
         
-        if( (hcan == (&hcan1)) && initted(Port::one) )
+        if( (hcan == (&hcan1)) && initialised(Port::one) )
             s_transmit(hcan);
         
         //currently I have not can2!
     }
     
-    static void rxHandler(CAN_HandleTypeDef* hcan)
+    static void rxHandler(void* par)
     {
+        CAN_HandleTypeDef *hcan = reinterpret_cast<CAN_HandleTypeDef*>(par);
         //to make better
         if(hcan != (&hcan1))
             return;
         
-        if(false == initted(Port::one))
+        if(false == initialised(Port::one))
         {
             return;
         }
@@ -162,21 +242,14 @@ namespace embot { namespace hw { namespace can {
         
     }
     
-    static void s_errorHandler(CAN_HandleTypeDef* hcan)
+    static void s_errorHandler(void* par)
     {
+        CAN_HandleTypeDef *hcan = reinterpret_cast<CAN_HandleTypeDef*>(par);
+        hcan = hcan;
         static uint32_t error_count=0;
         error_count++;
     }
 
-    bool embot::hw::can::supported(Port p)
-    {
-        return s_supported[port2index(p)];
-    }
-    
-    bool embot::hw::can::initted(Port p)
-    {
-        return s_initted[port2index(p)];
-    }
 
     
     result_t embot::hw::can::init(Port p, const Config &config)
@@ -186,7 +259,7 @@ namespace embot { namespace hw { namespace can {
             return resNOK;
         }
         
-        if(true == initted(p))
+        if(true == initialised(p))
         {
             return resOK;
         }
@@ -240,13 +313,14 @@ namespace embot { namespace hw { namespace can {
 
         stm32hal_can_configureIRQcallback(&embot_can_irqHandlers);
         
-        s_initted[port2index(p)] = true;
+        embot::common::bit::set(initialisedmask, port2index(p));
+
         return resOK;
     }
 
     result_t embot::hw::can::enable(Port p)
     {
-        if(false == initted(p))
+        if(false == initialised(p))
         {
             return resNOK;
         }  
@@ -264,7 +338,7 @@ namespace embot { namespace hw { namespace can {
     
     result_t embot::hw::can::disable(Port p)
     {
-        if(false == initted(p))
+        if(false == initialised(p))
         {
             return resNOK;
         }  
@@ -280,7 +354,7 @@ namespace embot { namespace hw { namespace can {
 
     result_t embot::hw::can::put(Port p, const Frame &frame)
     {
-        if(false == initted(p))
+        if(false == initialised(p))
         {
             return resNOK;
         }  
@@ -304,7 +378,7 @@ namespace embot { namespace hw { namespace can {
 
     std::uint8_t embot::hw::can::outputqueuesize(Port p)
     {
-        if(false == initted(p))
+        if(false == initialised(p))
         {
             return 0;
         }  
@@ -317,7 +391,7 @@ namespace embot { namespace hw { namespace can {
     
     std::uint8_t embot::hw::can::inputqueuesize(Port p)
     {
-        if(false == initted(p))
+        if(false == initialised(p))
         {
             return 0;
         }  
@@ -333,7 +407,7 @@ namespace embot { namespace hw { namespace can {
     
     result_t embot::hw::can::transmit(Port p)
     {
-        if(false == initted(p))
+        if(false == initialised(p))
         {
             return resNOK;
         } 
@@ -353,7 +427,7 @@ namespace embot { namespace hw { namespace can {
 
     result_t embot::hw::can::get(Port p, Frame &frame, std::uint8_t &remaining)
     {
-        if(false == initted(p))
+        if(false == initialised(p))
         {
             return resNOK;
         } 
@@ -378,4 +452,13 @@ namespace embot { namespace hw { namespace can {
     
     
 }}} // namespace embot { namespace hw { namespace can {
+
+#endif //defined(HAL_CAN_MODULE_ENABLED)
+
+
+    
+
+
+
+// - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 
