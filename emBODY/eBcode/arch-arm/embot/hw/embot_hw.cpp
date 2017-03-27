@@ -713,7 +713,10 @@ namespace embot { namespace hw { namespace can {
         sFilterConfig.FilterFIFOAssignment = 0;
         sFilterConfig.FilterActivation = ENABLE;
         sFilterConfig.BankNumber = 14;
-
+        if(HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig) != HAL_OK)
+        {
+        
+        }
 
         
         return resOK;
