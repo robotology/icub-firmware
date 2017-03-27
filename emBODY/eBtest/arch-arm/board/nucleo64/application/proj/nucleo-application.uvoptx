@@ -715,7 +715,7 @@
 
   <Group>
     <GroupName>embot</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -920,6 +920,30 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_theLoop.cpp</PathWithFileName>
       <FilenameWithoutPath>embot_app_theLoop.cpp</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>8</GroupNumber>
+      <FileNumber>52</FileNumber>
+      <FileType>8</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_can.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_can.cpp</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>8</GroupNumber>
+      <FileNumber>53</FileNumber>
+      <FileType>8</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_sys.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_sys.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
