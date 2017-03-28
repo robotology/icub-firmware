@@ -25,6 +25,8 @@
 
 #include "embot_sys.h"
 
+#include "embot_hw.h"
+
 namespace embot { namespace app { namespace can {
     
     enum class Clas { pollingMotorControl = 0, periodicMotorControl = 1, pollingAnalogSensor = 2, periodicAnalogSensor = 3, pollingSkin = 4, periodicInertialSensor = 5, bootloader = 7 };
@@ -39,13 +41,13 @@ namespace embot { namespace app { namespace can {
     
     using Address = std::uint8_t;   // so far it is only an id and in here it is mostly 0.
     
-    struct Frame            // however, it is better to define it inside embot::hw::can 
-    {
-        std::uint32_t       id;
-        std::uint8_t        size;
-        std::uint8_t        filler[3];
-        std::uint8_t        data[8];        
-    };
+//    struct Frame            // however, it is better to define it inside embot::hw::can 
+//    {
+//        std::uint32_t       id;
+//        std::uint8_t        size;
+//        std::uint8_t        filler[3];
+//        std::uint8_t        data[8];        
+//    };
      
 }}}
 
@@ -59,11 +61,11 @@ namespace embot { namespace app { namespace can {
 //        virtual ~Protocol();
              
         // it calls the action associated to ...
-        virtual bool parse(const embot::app::can::Frame &frame) = 0;
+        virtual bool parse(const embot::hw::can::Frame &frame) = 0;
         // it only returns the message and the sender. the caller will manage the action associated.
-        virtual bool parse(const embot::app::can::Frame &frame, embot::app::can::Message &message, const embot::app::can::Address &address) = 0;
+        virtual bool parse(const embot::hw::can::Frame &frame, embot::app::can::Message &message, const embot::app::can::Address &address) = 0;
         // the caller takes the frame and adds it to the ...
-        virtual bool form(const embot::app::can::Message &message, const embot::app::can::Address &address, embot::app::can::Frame &frame) = 0;           
+        virtual bool form(const embot::app::can::Message &message, const embot::app::can::Address &address, embot::hw::can::Frame &frame) = 0;           
     }; 
 
 
@@ -75,9 +77,9 @@ namespace embot { namespace app { namespace can {
      
         bool init();
         
-        virtual bool parse(const embot::app::can::Frame &frame);
-        virtual bool parse(const embot::app::can::Frame &frame, embot::app::can::Message &message, const embot::app::can::Address &address);
-        virtual bool form(const embot::app::can::Message &message, const embot::app::can::Address &address, embot::app::can::Frame &frame);    
+        virtual bool parse(const embot::hw::can::Frame &frame);
+        virtual bool parse(const embot::hw::can::Frame &frame, embot::app::can::Message &message, const embot::app::can::Address &address);
+        virtual bool form(const embot::app::can::Message &message, const embot::app::can::Address &address, embot::hw::can::Frame &frame);    
 
     private:        
         struct Impl;

@@ -45,20 +45,7 @@ using namespace embot;
 static uint8_t n_txframes=0;
 uint8_t tx_ended = 1;
 
-static void canFrame2appFrame(embot::hw::can::Frame &canframe, embot::app::can::Frame &appframe)
-{
-    appframe.id = canframe.id;
-    appframe.size = canframe.size;
-    memcpy(appframe.data, canframe.data, appframe.size);
-}
 
-
-static void appFrame2canFrame(const embot::app::can::Frame &appframe, embot::hw::can::Frame &canframe)
-{
-   canframe.id = appframe.id;
-   canframe.size = appframe.size;
-   memcpy(canframe.data, appframe.data, canframe.size);
-}
 
 namespace embot { namespace app { namespace can {
     
@@ -98,24 +85,24 @@ bool embot::app::can::SkinProtocol::init()
 }
 
 
-bool embot::app::can::SkinProtocol::parse(const embot::app::can::Frame &frame)
+bool embot::app::can::SkinProtocol::parse(const embot::hw::can::Frame &frame)
 {
-    hw::can::Frame canframe;
-    appFrame2canFrame(frame, canframe);
+    hw::can::Frame canframe = frame;
+
     canframe.data[0]++;
     hw::result_t res = hw::can::put(hw::can::Port::one, canframe);
     res = res;
     return true;
 }
 
-bool embot::app::can::SkinProtocol::parse(const embot::app::can::Frame &frame, embot::app::can::Message &message, const embot::app::can::Address &address)
+bool embot::app::can::SkinProtocol::parse(const embot::hw::can::Frame &frame, embot::app::can::Message &message, const embot::app::can::Address &address)
 {
     
     return true;
 }
 
 
-bool embot::app::can::SkinProtocol::form(const embot::app::can::Message &message, const embot::app::can::Address &address, embot::app::can::Frame &frame)
+bool embot::app::can::SkinProtocol::form(const embot::app::can::Message &message, const embot::app::can::Address &address, embot::hw::can::Frame &frame)
 {
     frame.id = address;
     switch (message.type)
@@ -265,11 +252,8 @@ bool embot::app::can::theCANservice::parse_core(uint8_t numofframes, uint8_t &re
         hw::result_t res = hw::can::get(hw::can::Port::one, canframe, remaining);
         if(hw::resNOK == res)
             return false;
-        
-        //copy can frame into app frame
-        app::can::Frame appframe;
-        canFrame2appFrame(canframe, appframe);      
-        pImpl->config.protocol->parse(appframe);
+    
+        pImpl->config.protocol->parse(canframe);
     }
     return true;
 }
@@ -296,14 +280,11 @@ bool embot::app::can::theCANservice::parse(std::uint8_t maxnumber, std::uint8_t 
 
 bool embot::app::can::theCANservice::add(embot::app::can::Message &msg, embot::app::can::Address &toaddress)
 {  
-    embot::app::can::Frame appframe; 
-    pImpl->config.protocol->form(msg, toaddress, appframe); 
+    embot::hw::can::Frame frame; 
+    pImpl->config.protocol->form(msg, toaddress, frame); 
     
-    hw::can::Frame canframe;
-    
-    //convert appframe into can frame
-    appFrame2canFrame(appframe, canframe);
-    hw::result_t res = hw::can::put(hw::can::Port::one, canframe);
+
+    hw::result_t res = hw::can::put(hw::can::Port::one, frame);
     if(hw::resNOK == res)
         return false;
     else
