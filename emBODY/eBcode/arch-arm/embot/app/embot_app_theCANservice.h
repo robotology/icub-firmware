@@ -33,8 +33,8 @@ namespace embot { namespace app { namespace can {
 
     struct Message
     {
-        std::uint8_t    clas;       // use embot::app::can:Clas
-        std::uint8_t    type;       // use they are: ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID, etc.
+        std::uint8_t    clas;       // use embot::app::canprotocol:Clas
+        std::uint8_t    type;       // use ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID, etc.
         std::uint16_t   filler16;
         void*           value;        
     };
