@@ -557,7 +557,7 @@ namespace embot { namespace app { namespace canprotocol {
             
         bool Message_mcpoll_GET_ADDITIONAL_INFO::reply(embot::hw::can::Frame &frame, const std::uint8_t sender, const ReplyInfo &replyinfo)
         {
-            if(counter >= 4)
+            if(counter >= nreplies)
             {
                 return false;
             }

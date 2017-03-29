@@ -184,7 +184,18 @@ bool get_canframe(embot::hw::can::Frame &frame)
                                         dd, 5);
             embot::app::canprotocol::frame_set_size(frame, 6);     
         }
-        else
+        else if(16 == cnt)
+        {
+
+            embot::app::canprotocol::frame_set_sender(frame, 0); // the sender is eth board
+            embot::app::canprotocol::frame_set_clascmddestinationdata(frame, 
+                                        embot::app::canprotocol::Clas::pollingMotorControl, static_cast<std::uint8_t>(embot::app::canprotocol::mcpollCMD::GET_ADDITIONAL_INFO),
+                                        6, // to the board
+                                        nullptr, 0);
+            embot::app::canprotocol::frame_set_size(frame, 1);              
+            
+        }
+        else 
         {
             ret = false;  
         }    
@@ -426,6 +437,34 @@ bool s_process_set_additional_info(const embot::hw::can::Frame &frame, embot::hw
 }
 
 
+bool s_process_get_additional_info(const embot::hw::can::Frame &frame, embot::hw::can::Frame &reply)
+{
+    uint8_t sender = embot::app::canprotocol::frame2sender(frame);
+    sender = sender;   
+
+    embot::app::canprotocol::Message_mcpoll_GET_ADDITIONAL_INFO::ReplyInfo rep;
+    for(int j=0; j<32; j++)
+    {
+        rep.info32[j] = j+1;
+    }
+    
+    embot::app::canprotocol::Message_mcpoll_GET_ADDITIONAL_INFO msg;
+
+    msg.load(frame);
+    
+    std::uint8_t s = msg.data.sizeofdatainframe;
+    s = s; 
+    bool ret = false;    
+    std::uint8_t num = msg.numberofreplies();
+    for(int i=0; i<num; i++)
+    {
+        ret = msg.reply(reply, 6, rep);
+    }
+    
+    return ret;          
+}
+
+
 void periodic_activity(embot::sys::Task *tsk, void *param)
 {
     static uint32_t x = 0;
@@ -495,6 +534,10 @@ void periodic_activity(embot::sys::Task *tsk, void *param)
                 if(embot::app::canprotocol::mcpollCMD::SET_ADDITIONAL_INFO == cmd)
                 {
                     transmit = s_process_set_additional_info(frame, reply);
+                }
+                else if(embot::app::canprotocol::mcpollCMD::GET_ADDITIONAL_INFO == cmd)
+                {
+                    transmit = s_process_get_additional_info(frame, reply);
                 }
                 
             }

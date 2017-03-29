@@ -395,7 +395,7 @@ namespace embot { namespace app { namespace canprotocol {
         
         struct ReplyInfo
         {
-            const char      info32[32];      
+            char    info32[32];      
         };
         
                 
