@@ -150,82 +150,18 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>442</LineNumber>
+          <LineNumber>645</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134232350</Address>
+          <Address>134235758</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>../src/main-bootloader.cpp</Filename>
+          <Filename>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_canprotocol.cpp</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\nucleo_hal\../src/main-bootloader.cpp\442</Expression>
-        </Bp>
-        <Bp>
-          <Number>1</Number>
-          <Type>0</Type>
-          <LineNumber>406</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134232246</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>../src/main-bootloader.cpp</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\nucleo_hal\../src/main-bootloader.cpp\406</Expression>
-        </Bp>
-        <Bp>
-          <Number>2</Number>
-          <Type>0</Type>
-          <LineNumber>397</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134232218</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>../src/main-bootloader.cpp</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\nucleo_hal\../src/main-bootloader.cpp\397</Expression>
-        </Bp>
-        <Bp>
-          <Number>3</Number>
-          <Type>0</Type>
-          <LineNumber>267</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134232522</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>../src/main-bootloader.cpp</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\nucleo_hal\../src/main-bootloader.cpp\267</Expression>
-        </Bp>
-        <Bp>
-          <Number>4</Number>
-          <Type>0</Type>
-          <LineNumber>435</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134232332</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>../src/main-bootloader.cpp</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\nucleo_hal\../src/main-bootloader.cpp\435</Expression>
+          <Expression>\\nucleo_hal\../../../../../../eBcode/arch-arm/embot/app/embot_app_canprotocol.cpp\645</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -239,17 +175,19 @@
         <Ww>
           <count>0</count>
           <WinNumber>2</WinNumber>
-          <ItemText>frame</ItemText>
+          <ItemText>receivedmask</ItemText>
+        </Ww>
+        <Ww>
+          <count>1</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>cumulativeinfo32,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>2</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>msg</ItemText>
         </Ww>
       </WatchWindow2>
-      <MemoryWindow1>
-        <Mm>
-          <WinNumber>1</WinNumber>
-          <SubType>0</SubType>
-          <ItemText>msg.info.data</ItemText>
-          <AccSizeX>0</AccSizeX>
-        </Mm>
-      </MemoryWindow1>
       <MemoryWindow2>
         <Mm>
           <WinNumber>2</WinNumber>
@@ -539,6 +477,22 @@
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>0</BreakIfRCount>
           <Filename>../src/main-bootloader.cpp</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
+        <Bp>
+          <Number>7</Number>
+          <Type>0</Type>
+          <LineNumber>645</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>0</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>0</BreakIfRCount>
+          <Filename>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_canprotocol.cpp</Filename>
           <ExecCommand></ExecCommand>
           <Expression></Expression>
         </Bp>
@@ -1278,7 +1232,7 @@
       <GroupNumber>8</GroupNumber>
       <FileNumber>51</FileNumber>
       <FileType>8</FileType>
-      <tvExp>1</tvExp>
+      <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_can.cpp</PathWithFileName>

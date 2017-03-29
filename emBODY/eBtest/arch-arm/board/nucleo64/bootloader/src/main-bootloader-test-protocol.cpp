@@ -140,6 +140,8 @@ static embot::hw::can::Frame s_canframe;
 
 bool get_canframe(embot::hw::can::Frame &frame)
 {
+    static const uint32_t start = 20;
+    
     static uint32_t cnt = 0;
     
     static uint32_t cc = 0;
@@ -157,7 +159,39 @@ bool get_canframe(embot::hw::can::Frame &frame)
     
     std::uint8_t data[8] = {0};
     
-    if(0 == cnt)
+    
+    if(cnt < start)
+    {
+        // test the additionalinfo        
+        if(cnt < 16)
+        {
+            std::uint8_t counter = cnt % 8;
+            std::uint8_t adder = cnt / 8;
+            adder *= 128;
+            const static char info32[32] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31};
+            // SET_ADDITIONAL_INFO   
+                
+            if(cnt >= 8)
+            {
+                adder = adder;
+            }
+            std::uint8_t dd[5] = {0};
+            dd[0] = counter; dd[1] = adder+info32[4*counter+0]; dd[2] = adder+info32[4*counter+1]; dd[3] = adder+info32[4*counter+2]; dd[4] = adder+info32[4*counter+3];   
+            embot::app::canprotocol::frame_set_sender(frame, 0); // the sender is eth board
+            embot::app::canprotocol::frame_set_clascmddestinationdata(frame, 
+                                        embot::app::canprotocol::Clas::pollingMotorControl, static_cast<std::uint8_t>(embot::app::canprotocol::mcpollCMD::SET_ADDITIONAL_INFO),
+                                        6, // to the board
+                                        dd, 5);
+            embot::app::canprotocol::frame_set_size(frame, 6);     
+        }
+        else
+        {
+            ret = false;  
+        }    
+    
+              
+    }    
+    else if((start+0) == cnt)
     {
         // BROADCAST        
         embot::app::canprotocol::frame_set_sender(frame, 0); // the sender is eth board
@@ -167,7 +201,7 @@ bool get_canframe(embot::hw::can::Frame &frame)
                                     nullptr, 0);
         embot::app::canprotocol::frame_set_size(frame, 1); 
     }
-    else if(1 == cnt)
+    else if((start+1) == cnt)
     {
         // BOARD
         data[0] = 0;
@@ -178,7 +212,7 @@ bool get_canframe(embot::hw::can::Frame &frame)
                                     data, 1);  
         embot::app::canprotocol::frame_set_size(frame, 2);                                     
     }
-    else if(!stop)
+    else if((cnt > (start+1)) && (!stop))
     {
         if(0 == (cc%4))
         {
@@ -212,7 +246,7 @@ bool get_canframe(embot::hw::can::Frame &frame)
             stop = true;
         }
     }
-    else if(stop)
+    else if((cnt > (start+1)) && (stop))
     {
         static bool first = true;
         if(first)
@@ -272,9 +306,9 @@ bool s_process_broadcast(const embot::hw::can::Frame &frame, embot::hw::can::Fra
 
     embot::app::canprotocol::Message_bldr_BROADCAST::ReplyInfo replyinfo;
     replyinfo.board = embot::app::canprotocol::Board::mtb4;
-    replyinfo.major = 1;
-    replyinfo.minor = 0;
-    replyinfo.build = 255;
+    replyinfo.firmware.major = 1;
+    replyinfo.firmware.minor = 0;
+    replyinfo.firmware.build = 255;
         
     ret = msg.reply(reply, myaddress, replyinfo);
     return ret;    
@@ -375,7 +409,21 @@ bool s_process_end(const embot::hw::can::Frame &frame, embot::hw::can::Frame &re
 
 
 
+bool s_process_set_additional_info(const embot::hw::can::Frame &frame, embot::hw::can::Frame &reply)
+{
+    uint8_t sender = embot::app::canprotocol::frame2sender(frame);
+    sender = sender;    
+    
+    embot::app::canprotocol::Message_mcpoll_SET_ADDITIONAL_INFO2 msg;
 
+    msg.load(frame);
+    
+    std::uint8_t s = msg.data.sizeofdatainframe;
+    s = s; 
+    bool ret = false;    
+    ret = msg.reply();
+    return ret;          
+}
 
 
 void periodic_activity(embot::sys::Task *tsk, void *param)
@@ -401,39 +449,54 @@ void periodic_activity(embot::sys::Task *tsk, void *param)
             embot::app::canprotocol::Clas cls = embot::app::canprotocol::frame2clas(frame);
             std::uint8_t cm = embot::app::canprotocol::frame2cmd(frame);
             
-            embot::app::canprotocol::bldrCMD cmd = static_cast<embot::app::canprotocol::bldrCMD>(cm);
-            
-            switch(cmd)
+            if(embot::app::canprotocol::Clas::bootloader == cls)
             {
-                case embot::app::canprotocol::bldrCMD::BROADCAST:
-                {
-                    transmit = s_process_broadcast(frame, reply);
-                } break;
+            
+                embot::app::canprotocol::bldrCMD cmd = static_cast<embot::app::canprotocol::bldrCMD>(cm);
                 
-                case embot::app::canprotocol::bldrCMD::BOARD:
+                switch(cmd)
                 {
-                    transmit = s_process_board(frame, reply);
-                } break;  
+                    case embot::app::canprotocol::bldrCMD::BROADCAST:
+                    {
+                        transmit = s_process_broadcast(frame, reply);
+                    } break;
+                    
+                    case embot::app::canprotocol::bldrCMD::BOARD:
+                    {
+                        transmit = s_process_board(frame, reply);
+                    } break;  
 
-                case embot::app::canprotocol::bldrCMD::ADDRESS:
-                {
-                    transmit = s_process_address(frame, reply);
-                } break;    
+                    case embot::app::canprotocol::bldrCMD::ADDRESS:
+                    {
+                        transmit = s_process_address(frame, reply);
+                    } break;    
 
-                case embot::app::canprotocol::bldrCMD::START:
-                {
-                    transmit = s_process_start(frame, reply);
-                } break;  
+                    case embot::app::canprotocol::bldrCMD::START:
+                    {
+                        transmit = s_process_start(frame, reply);
+                    } break;  
 
-                case embot::app::canprotocol::bldrCMD::DATA:
-                {
-                    transmit = s_process_data(frame, reply);
-                } break;  
+                    case embot::app::canprotocol::bldrCMD::DATA:
+                    {
+                        transmit = s_process_data(frame, reply);
+                    } break;  
 
-                case embot::app::canprotocol::bldrCMD::END:
+                    case embot::app::canprotocol::bldrCMD::END:
+                    {
+                        transmit = s_process_end(frame, reply);
+                    } break;                
+                }
+            }
+            else if(embot::app::canprotocol::Clas::pollingMotorControl == cls)
+            {
+                
+                embot::app::canprotocol::mcpollCMD cmd = static_cast<embot::app::canprotocol::mcpollCMD>(cm);
+        
+                if(embot::app::canprotocol::mcpollCMD::SET_ADDITIONAL_INFO == cmd)
                 {
-                    transmit = s_process_end(frame, reply);
-                } break;                
+                    transmit = s_process_set_additional_info(frame, reply);
+                }
+                
             }
             
             if(true == transmit)

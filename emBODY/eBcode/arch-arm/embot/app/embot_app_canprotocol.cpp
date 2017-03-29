@@ -325,11 +325,11 @@ namespace embot { namespace app { namespace canprotocol {
         {
             std::uint8_t dd[7] = {0};
             dd[0] = static_cast<std::uint8_t>(replyinfo.board);
-            dd[1] = replyinfo.major;
-            dd[2] = replyinfo.minor;
-            dd[3] = replyinfo.build;
+            dd[1] = replyinfo.firmware.major;
+            dd[2] = replyinfo.firmware.minor;
+            dd[3] = replyinfo.firmware.build;
             
-            std::uint8_t datalen = (255 == replyinfo.build) ? (3) : (4);
+            std::uint8_t datalen = (Process::bootloader == replyinfo.process) ? (3) : (4);
             
             frame_set_sender(frame, sender);
             frame_set_clascmddestinationdata(frame, Clas::bootloader, static_cast<std::uint8_t>(bldrCMD::BROADCAST), data.from, dd, datalen);
@@ -498,7 +498,161 @@ namespace embot { namespace app { namespace canprotocol {
         bool Message_anypoll_SETID::reply()
         {
             return false;
-        }          
+        }   
+        
+        
+        bool Message_base_GET_FIRMWARE_VERSION::load(const embot::hw::can::Frame &frame)
+        {
+            Message::set(frame);  
+            
+            if(this->cmd != frame2cmd(frame))
+            {
+                return false; 
+            }
+            
+            info.requiredprotocol.major = data.datainframe[0];
+            info.requiredprotocol.minor = data.datainframe[1];
+          
+            return true;         
+        }                    
+            
+        bool Message_base_GET_FIRMWARE_VERSION::reply(embot::hw::can::Frame &frame, const std::uint8_t sender, const ReplyInfo &replyinfo)
+        {
+            frame_set_sender(frame, sender);
+            char dd[7] = {0};
+            dd[0] = static_cast<std::uint8_t>(replyinfo.board);
+            dd[1] = replyinfo.firmware.major;
+            dd[2] = replyinfo.firmware.minor;
+            dd[3] = replyinfo.firmware.build;
+            dd[4] = replyinfo.protocol.major;
+            dd[5] = replyinfo.protocol.minor;
+            dd[6] = ((replyinfo.protocol.major == info.requiredprotocol.major) && (replyinfo.protocol.minor >= info.requiredprotocol.minor) ) ? (1) : (0);;
+                       
+            frame_set_clascmddestinationdata(frame, this->cls, this->cmd, data.from, dd, 7);
+            frame_set_size(frame, 8);
+            return true;
+        } 
+
+
+        bool Message_mcpoll_GET_ADDITIONAL_INFO::load(const embot::hw::can::Frame &frame)
+        {
+            Message::set(frame);  
+            
+            if(static_cast<std::uint8_t>(mcpollCMD::GET_ADDITIONAL_INFO) != frame2cmd(frame))
+            {
+                return false; 
+            }
+            
+            info.thereisnothing = 0;
+            
+            counter = 0;
+          
+            return true;         
+        }     
+
+        std::uint8_t Message_mcpoll_GET_ADDITIONAL_INFO::numberofreplies()
+        {
+            return nreplies;
+        }    
+            
+        bool Message_mcpoll_GET_ADDITIONAL_INFO::reply(embot::hw::can::Frame &frame, const std::uint8_t sender, const ReplyInfo &replyinfo)
+        {
+            if(counter >= 4)
+            {
+                return false;
+            }
+            
+            frame_set_sender(frame, sender);
+            char dd[7] = {0};
+            dd[0] = counter;
+            dd[1] = replyinfo.info32[4*counter];
+            dd[2] = replyinfo.info32[4*counter+1];
+            dd[3] = replyinfo.info32[4*counter+2];
+            dd[4] = replyinfo.info32[4*counter+3];
+
+                       
+            frame_set_clascmddestinationdata(frame, Clas::pollingMotorControl, static_cast<std::uint8_t>(mcpollCMD::GET_ADDITIONAL_INFO), data.from, dd, 5);
+            frame_set_size(frame, 6);
+            
+            counter ++;
+            
+            return true;
+        }   
+        
+
+        bool Message_mcpoll_SET_ADDITIONAL_INFO::load(const embot::hw::can::Frame &frame)
+        {
+            Message::set(frame);  
+            
+            if(static_cast<std::uint8_t>(mcpollCMD::SET_ADDITIONAL_INFO) != frame2cmd(frame))
+            {
+                return false; 
+            }
+            
+            std::uint8_t counter = data.datainframe[0];
+            if(counter > 7)
+            {
+                info.offset = 255;
+                return false;
+            }
+            
+            info.offset = 4*counter;
+            info.info04[0] = data.datainframe[1];
+            info.info04[1] = data.datainframe[2];
+            info.info04[2] = data.datainframe[3];
+            info.info04[3] = data.datainframe[4];
+            
+            return true;         
+        }     
+               
+        bool Message_mcpoll_SET_ADDITIONAL_INFO::reply()
+        {
+            return false;
+        }   
+
+
+        
+        char Message_mcpoll_SET_ADDITIONAL_INFO2::cumulativeinfo32[32] = {0};
+        std::uint8_t Message_mcpoll_SET_ADDITIONAL_INFO2::receivedmask = 0;
+        
+        bool Message_mcpoll_SET_ADDITIONAL_INFO2::load(const embot::hw::can::Frame &frame)
+        {
+            Message::set(frame);  
+            
+            if(static_cast<std::uint8_t>(mcpollCMD::SET_ADDITIONAL_INFO) != frame2cmd(frame))
+            {
+                return false; 
+            }
+            
+            std::uint8_t counter = data.datainframe[0];
+            if(counter > 7)
+            {
+                return false;
+            }
+            
+            if(0 == counter)
+            {
+                info.valid = false;
+                receivedmask = 0;
+                std::memset(cumulativeinfo32, 0, sizeof(cumulativeinfo32));                
+            }
+            
+            embot::common::bit::set(receivedmask, counter);
+            std::memmove(&cumulativeinfo32[4*counter], &data.datainframe[1], 4);
+            
+            if(0xff == receivedmask)
+            {
+                std::memmove(info.info32, cumulativeinfo32, sizeof(info.info32));
+                info.valid = true;
+            }
+                        
+            return true;         
+        }     
+               
+        bool Message_mcpoll_SET_ADDITIONAL_INFO2::reply()
+        {
+            return false;
+        }         
         
 }}} // namespace embot { namespace app { namespace canprotocol {
 
