@@ -31,13 +31,18 @@ namespace embot { namespace app { namespace canprotocol {
     
     enum class Clas { pollingMotorControl = 0, periodicMotorControl = 1, pollingAnalogSensor = 2, periodicAnalogSensor = 3, pollingSkin = 4, periodicInertialSensor = 5, bootloader = 7, none = 255 };
 
-    enum class bldrCMD { BROADCAST = 0xff, BOARD = 0x00, ADDRESS = 0x01, START = 0x02, DATA = 0x03, END = 0x04, SETID = 0x32 };
+    enum class bldrCMD { none = 0xfe, BROADCAST = 0xff, BOARD = 0x00, ADDRESS = 0x01, START = 0x02, DATA = 0x03, END = 0x04, SETID = 0x32 };
     
-    enum class anypollCMD { SETID = 0x32 };
+    enum class anypollCMD { none = 0xfe, SETID = 0x32 };
     
-    enum class mcpollCMD { GET_ADDITIONAL_INFO = 12, SET_ADDITIONAL_INFO = 13, GET_FIRMWARE_VERSION = 91 };
+    enum class mcpollCMD { none = 0xfe, GET_ADDITIONAL_INFO = 12, SET_ADDITIONAL_INFO = 13, SET_BOARD_ID = 50, GET_FIRMWARE_VERSION = 91, };
     
-    enum class aspollCMD { GET_FIRMWARE_VERSION = 0x1C };
+    enum class aspollCMD { none = 0xfe, GET_FIRMWARE_VERSION = 0x1C, SET_BOARD_ADX = 0x32 };
+    
+    bldrCMD cmd2bldr(std::uint8_t cmd);
+    aspollCMD cmd2aspoll(std::uint8_t cmd);
+    mcpollCMD cmd2mcpoll(std::uint8_t cmd);
+    anypollCMD cmd2anypoll(std::uint8_t cmd);
     
     
     enum class Board { mtb = 0x05, strain = 0x06, mais = 0x07, mtb4 = 0x66, strain2 = 0x67, unknown = 0xff };

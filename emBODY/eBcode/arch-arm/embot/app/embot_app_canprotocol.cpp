@@ -44,6 +44,71 @@
 
 namespace embot { namespace app { namespace canprotocol {
     
+    
+    bldrCMD cmd2bldr(std::uint8_t cmd)
+    {
+        if(cmd <= static_cast<std::uint8_t>(bldrCMD::END))
+        {
+            return static_cast<bldrCMD>(cmd);
+        }
+        else if(cmd == static_cast<std::uint8_t>(bldrCMD::BROADCAST))
+        {
+            return bldrCMD::BROADCAST;
+        }         
+        else if(cmd == static_cast<std::uint8_t>(bldrCMD::SETID))
+        {
+            return bldrCMD::SETID;
+        }
+        return bldrCMD::none;  
+    }
+    
+    aspollCMD cmd2aspoll(std::uint8_t cmd)
+    {
+        if(cmd == static_cast<std::uint8_t>(aspollCMD::SET_BOARD_ADX))
+        {
+            return aspollCMD::SET_BOARD_ADX;
+        }         
+        else if(cmd == static_cast<std::uint8_t>(aspollCMD::GET_FIRMWARE_VERSION))
+        {
+            return aspollCMD::GET_FIRMWARE_VERSION;
+        }
+        return aspollCMD::none; 
+    }
+    
+    mcpollCMD cmd2mcpoll(std::uint8_t cmd)
+    {
+        if(cmd == static_cast<std::uint8_t>(mcpollCMD::GET_ADDITIONAL_INFO))
+        {
+            return mcpollCMD::GET_ADDITIONAL_INFO;
+        }
+        else if(cmd == static_cast<std::uint8_t>(mcpollCMD::SET_ADDITIONAL_INFO))
+        {
+            return mcpollCMD::SET_ADDITIONAL_INFO;
+        }
+        else if(cmd == static_cast<std::uint8_t>(mcpollCMD::SET_BOARD_ID))
+        {
+            return mcpollCMD::SET_BOARD_ID;
+        }
+        else if(cmd == static_cast<std::uint8_t>(mcpollCMD::GET_FIRMWARE_VERSION))
+        {
+            return mcpollCMD::GET_FIRMWARE_VERSION;
+        }
+        return mcpollCMD::none;  
+    }
+    
+    anypollCMD cmd2anypoll(std::uint8_t cmd)
+    {
+        if(cmd == static_cast<std::uint8_t>(anypollCMD::SETID))
+        {
+            return anypollCMD::SETID;
+        }
+        return anypollCMD::none;  
+    }
+    
+    
+    
+    
+    
     Clas frame2clas(const embot::hw::can::Frame &frame)
     {
         std::uint8_t t = (frame.id & 0x00000700) >> 8;

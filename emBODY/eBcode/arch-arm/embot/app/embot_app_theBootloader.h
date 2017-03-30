@@ -54,12 +54,23 @@ namespace embot { namespace app {
         
         //enum class Command { none = 0, jump = 1, stay = 2};
         
-        embot::sys::theJumper::Command getcommand(std::uint32_t &parameter);
-        bool jump(std::uint32_t address);
+        embot::sys::theJumper::Command getcommand(std::uint32_t &parameter);         
+        bool jump(std::uint32_t address); // it just jumps to address returned by getcommand(). it must be used only if embot::hw was not initialised, hence before ::execute()...
         
-        void execute(Config &config); // the activity and after countdown we jump ... it never returns ..
+        // this function never returns ....
+        // it inits embot::hw, the osal, it starts countdown timer and executes a user-defined task ... if countdown timer is not stopped 
+        // its expiry callback calls the same code inside restart2application() 
+        void execute(Config &config); 
         
-        bool stopcountdown(); // unless someone decide to stop the countdown
+        // it can be used by a user-defined task started by execute() to stop the countdown, and stay in the process forever or until ... call of restart2application();
+        bool stopcountdown(); 
+        
+        // we can call it to start (again, maybe after it was stoopped) teh countdown. we can use this with 100 ms timeout so that we can send back an ack to canlaoder and then restart
+        bool startcountdown(embot::common::relTime countdown); 
+        
+        // it is used to force a jump to the application but passing through a restart of the mpu. 
+        // IMPORTANT: you can use this after the ::execute() function is called.
+        bool restart2application(); // used when the bootloader has already stopped the countdown and after fw update wants to jump to application
 
     private:
         theBootloader(); 

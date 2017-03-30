@@ -18,6 +18,9 @@
 
 #include "embot_hw_FlashBurner.h"
 
+#include "embot_app_bootloader_theCANparser.h"
+
+
 struct ActivityParam
 {
     uint32_t blinkingperiod;
@@ -31,7 +34,9 @@ static ActivityParam activity_param = {0};
 
 //static embot::hw::FlashBurner *fb = nullptr;
 
-#define TEST_BL_CANFRAME
+#undef TEST_BL_CANFRAME
+
+#define FINAL_BOOTLOADER
 
 int main(void)
 { 
@@ -80,6 +85,98 @@ int main(void)
 }
 
 
+#if defined(FINAL_BOOTLOADER)
+
+
+void onevent(embot::sys::Task *t, embot::common::Event evt, void *p)
+{    
+//    if(0x00000001 == evt)
+    {
+        
+        // 1. get the frame ... ehi, use the button. or the timeout
+        
+        embot::hw::can::Frame frame;
+        embot::hw::can::Frame frameout;
+        embot::app::bootloader::theCANparser &canparser = embot::app::bootloader::theCANparser::getInstance();
+        
+        if(true == canparser.process(frame, frameout))
+        {
+            // send the frameout
+        }
+   
+        
+    }
+    
+}
+
+static void bl_activity(void* param)
+{
+    
+    ActivityParam* pp = (ActivityParam*) param;
+    
+    uint32_t period = 0;
+    
+    if(nullptr != pp)
+    {
+        period = pp->blinkingperiod;
+    }
+    
+    eOledpulser_cfg_t ledconfig = {0};
+    
+    ledconfig.led_enable_mask   = (1 << eo_ledpulser_led_zero);
+    ledconfig.led_init          = reinterpret_cast<eOint8_fp_uint8_cvoidp_t>(embot::hw::led::init_legacy);
+    ledconfig.led_on            = reinterpret_cast<eOint8_fp_uint8_t>(embot::hw::led::on); 
+    ledconfig.led_off           = reinterpret_cast<eOint8_fp_uint8_t>(embot::hw::led::off);
+    ledconfig.led_toggle        = reinterpret_cast<eOint8_fp_uint8_t>(embot::hw::led::toggle);
+    
+    eo_ledpulser_Initialise(&ledconfig);    
+
+    eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_zero, period, 0);  
+
+    
+    embot::hw::button::init(embot::hw::button::BTN::zero);
+
+    // also start a periodic task which checks .... if button is pressed .... so far for test only
+    embot::sys::PeriodicTask *taskper = new embot::sys::PeriodicTask;        
+    taskper->init(nullptr, periodic_activity, 1024, 30, 100*1000, nullptr);
+    
+    // init the storage object ....
+    
+    embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance();
+    
+    canbrdinfo.synch(embot::app::theCANboardInfo::Type::mtb3, 1);
+    
+    uint8_t adr = canbrdinfo.getCANaddress();
+    adr = adr;
+    if(1 == adr)
+    {
+        canbrdinfo.setCANaddress(2);
+    }
+    
+    
+    // start can activity with a decent rx buffer (8 is fine) and a decent tx buffer (8 is fine).
+    // set a given event at rx of can frame, say 0x00000001.
+    #warning TODO: start can services.
+    
+    // start the principal event-based task with a good stack size. it must be enough to host te processing of can frames.
+    // the action is triggered if an event of rx can frame is received, say 0x00000001.
+    
+    // in its inside we retrieve a can frame.
+    // we call the bool tx = obj.process(rxframe, txframe)
+    // if tx is true we transmit.
+    
+    embot::app::bootloader::theCANparser &canparser = embot::app::bootloader::theCANparser::getInstance();
+    embot::app::bootloader::theCANparser::Config config;
+    canparser.initialise(config);
+    
+    
+    embot::sys::EventTask* task = new embot::sys::EventTask;
+    
+    task->init(nullptr, onevent, 4*1024, 200, 100*1000, nullptr, nullptr);
+    
+}
+
+#else
 
 static void bl_activity(void* param)
 {
@@ -125,10 +222,9 @@ static void bl_activity(void* param)
         canbrdinfo.setCANaddress(2);
     }
     
-    //fb = new embot::hw::FlashBurner;
-        
+    
 }
-
+#endif
 
 
 #if defined(TEST_BL_CANFRAME)

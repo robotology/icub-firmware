@@ -938,6 +938,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_canprotocol.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_app_bootloader_theCANparser.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_bootloader_theCANparser.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1894,6 +1899,11 @@
               <FileName>embot_app_canprotocol.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_canprotocol.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_bootloader_theCANparser.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_bootloader_theCANparser.cpp</FilePath>
             </File>
           </Files>
         </Group>

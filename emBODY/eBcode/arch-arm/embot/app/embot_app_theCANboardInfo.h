@@ -46,9 +46,17 @@ namespace embot { namespace app {
             std::uint32_t       key;
             std::uint8_t        canaddress;
             std::uint8_t        boardtype;
-            std::uint8_t        ffu[2];
+            std::uint8_t        bootloaderVmajor;
+            std::uint8_t        bootloaderVminor;
             std::uint8_t        info32[32];
-            std::uint8_t        tobefilled[24];
+            std::uint8_t        applmajor;
+            std::uint8_t        applicationVmajor;
+            std::uint8_t        applicationVminor;
+            std::uint8_t        applicationVbuild;
+            std::uint8_t        protocolVmajor;
+            std::uint8_t        protocolVminor;
+            
+            std::uint8_t        tobefilled[18];
         }; 
         
         enum class Type { none = 255, mtb3 = 33, strain2 = 22};

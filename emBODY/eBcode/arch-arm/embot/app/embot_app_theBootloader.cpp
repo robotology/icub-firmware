@@ -48,6 +48,7 @@ struct embot::app::theBootloader::Impl
 {    
     Config config;
     embot::sys::Timer *resetTimer;
+    embot::sys::Action action;
     
     Impl() 
     {              
@@ -64,7 +65,7 @@ struct embot::app::theBootloader::Impl
         return s_data_impl;
     }
     
-    static void restart(void *p);
+    static void restart2application(void *p);
     
     static void onidle(void);
     
@@ -110,6 +111,16 @@ bool embot::app::theBootloader::jump(std::uint32_t address)
     
     return false;
 }
+
+
+bool embot::app::theBootloader::restart2application()
+{
+    embot::sys::theJumper &thejumper = embot::sys::theJumper::getInstance();
+    thejumper.set(embot::sys::theJumper::Command::jump, embot::hw::sys::addressOfApplication);
+    thejumper.restart();   
+    
+    return false;
+}
    
         
 void embot::app::theBootloader::execute(Config &config)
@@ -120,10 +131,7 @@ void embot::app::theBootloader::execute(Config &config)
     embot::hw::bsp::Config cc;
     cc.get1mstick = embot::sys::millisecondsNow;
     embot::hw::bsp::init(cc);
-    
-  
-    //pImpl->resetTimer = new embot::sys::Timer;
-    
+          
     embot::sys::theScheduler &thesystem = embot::sys::theScheduler::getInstance();
     embot::sys::theScheduler::Config cfg;
     cfg.launcher = embot::app::theBootloader::Impl::osalstarter;
@@ -146,11 +154,26 @@ bool embot::app::theBootloader::stopcountdown()
     
     return true;
 }
+  
+
+bool embot::app::theBootloader::startcountdown(embot::common::relTime countdown)
+{    
+    pImpl->resetTimer->stop();
     
+    if(0 == countdown)
+    {
+        restart2application();
+        return false;
+    }
+    
+//    embot::sys::Action action(embot::sys::Action::ExecuteCallback(restart2application, nullptr, nullptr));    
+    pImpl->resetTimer->start(countdown, embot::sys::Timer::Type::oneshot, pImpl->action);
+    
+    return true;
+}    
 
 
-
-void embot::app::theBootloader::Impl::restart(void *p)
+void embot::app::theBootloader::Impl::restart2application(void *p)
 {
     embot::sys::theJumper &thejumper = embot::sys::theJumper::getInstance();
     thejumper.set(embot::sys::theJumper::Command::jump, embot::hw::sys::addressOfApplication);
@@ -184,11 +207,12 @@ void embot::app::theBootloader::Impl::osalstarter(void)
     
     handle2bootloader.pImpl->resetTimer = new embot::sys::Timer;
     
-    embot::sys::Action action(embot::sys::Action::ExecuteCallback(restart, nullptr, nullptr));
+    handle2bootloader.pImpl->action.set(embot::sys::Action::ExecuteCallback(restart2application, nullptr, nullptr));
+    
     
     if(handle2bootloader.pImpl->config.countdown > 0)
     {
-        handle2bootloader.pImpl->resetTimer->start(handle2bootloader.pImpl->config.countdown, embot::sys::Timer::Type::oneshot, action);
+        handle2bootloader.pImpl->resetTimer->start(handle2bootloader.pImpl->config.countdown, embot::sys::Timer::Type::oneshot, handle2bootloader.pImpl->action);
     }
 
     if (nullptr != handle2bootloader.pImpl->config.userdeflauncher.callback)
