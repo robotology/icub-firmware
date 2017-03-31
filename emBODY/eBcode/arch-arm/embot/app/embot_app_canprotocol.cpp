@@ -55,9 +55,9 @@ namespace embot { namespace app { namespace canprotocol {
         {
             return bldrCMD::BROADCAST;
         }         
-        else if(cmd == static_cast<std::uint8_t>(bldrCMD::SETID))
+        else if(cmd == static_cast<std::uint8_t>(bldrCMD::SETCANADDRESS))
         {
-            return bldrCMD::SETID;
+            return bldrCMD::SETCANADDRESS;
         }
         return bldrCMD::none;  
     }
@@ -518,16 +518,16 @@ namespace embot { namespace app { namespace canprotocol {
         }  
         
         
-        bool Message_bldr_SETID::load(const embot::hw::can::Frame &frame)
+        bool Message_bldr_SETCANADDRESS::load(const embot::hw::can::Frame &frame)
         {
             Message::set(frame);  
             
-            if(static_cast<std::uint8_t>(bldrCMD::SETID) != frame2cmd(frame))
+            if(static_cast<std::uint8_t>(bldrCMD::SETCANADDRESS) != frame2cmd(frame))
             {
                 return false; 
             }
             
-            info.id = data.datainframe[0];
+            info.address = data.datainframe[0];
             info.randominvalidmask = 0x0000;
             if(3 == frame.size)
             {
@@ -539,31 +539,32 @@ namespace embot { namespace app { namespace canprotocol {
             return true;         
         }                    
             
-        bool Message_bldr_SETID::reply()
+        bool Message_bldr_SETCANADDRESS::reply()
         {
             return false;
         }    
         
         
+//        bool Message_anypoll_SETID::load(const embot::hw::can::Frame &frame)
+//        {
+//            Message::set(frame);  
+//            
+//            if(static_cast<std::uint8_t>(anypollCMD::SETID) != frame2cmd(frame))
+//            {
+//                return false; 
+//            }
+//            
+//            info.id = data.datainframe[0];
+//          
+//            return true;         
+//        }                    
+//            
+//        bool Message_anypoll_SETID::reply()
+//        {
+//            return false;
+//        }         
         
-        bool Message_anypoll_SETID::load(const embot::hw::can::Frame &frame)
-        {
-            Message::set(frame);  
-            
-            if(static_cast<std::uint8_t>(anypollCMD::SETID) != frame2cmd(frame))
-            {
-                return false; 
-            }
-            
-            info.id = data.datainframe[0];
-          
-            return true;         
-        }                    
-            
-        bool Message_anypoll_SETID::reply()
-        {
-            return false;
-        }   
+       
         
         
         bool Message_base_GET_FIRMWARE_VERSION::load(const embot::hw::can::Frame &frame)
@@ -717,7 +718,29 @@ namespace embot { namespace app { namespace canprotocol {
         bool Message_mcpoll_SET_ADDITIONAL_INFO2::reply()
         {
             return false;
-        }         
+        }    
+
+
+
+        bool Message_base_SET_ID::load(const embot::hw::can::Frame &frame)
+        {
+            Message::set(frame);  
+            
+            if(this->cmd != frame2cmd(frame))
+            {
+                return false; 
+            }
+            
+            info.address = data.datainframe[0];
+          
+            return true;         
+        }                    
+            
+        bool Message_base_SET_ID::reply()
+        {
+            return false;
+        }   
+        
         
 }}} // namespace embot { namespace app { namespace canprotocol {
 

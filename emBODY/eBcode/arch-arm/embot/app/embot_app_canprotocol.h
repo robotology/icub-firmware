@@ -31,7 +31,7 @@ namespace embot { namespace app { namespace canprotocol {
     
     enum class Clas { pollingMotorControl = 0, periodicMotorControl = 1, pollingAnalogSensor = 2, periodicAnalogSensor = 3, pollingSkin = 4, periodicInertialSensor = 5, bootloader = 7, none = 255 };
 
-    enum class bldrCMD { none = 0xfe, BROADCAST = 0xff, BOARD = 0x00, ADDRESS = 0x01, START = 0x02, DATA = 0x03, END = 0x04, SETID = 0x32 };
+    enum class bldrCMD { none = 0xfe, BROADCAST = 0xff, BOARD = 0x00, ADDRESS = 0x01, START = 0x02, DATA = 0x03, END = 0x04, SETCANADDRESS = 0x32 };
     
     enum class anypollCMD { none = 0xfe, SETID = 0x32 };
     
@@ -292,20 +292,20 @@ namespace embot { namespace app { namespace canprotocol {
     };  
     
     
-    class Message_bldr_SETID : public Message
+    class Message_bldr_SETCANADDRESS : public Message
     {
         public:
             
         struct Info
         { 
-            std::uint8_t    id;                 // if id is 255, then the board assign it randomly as best as it can.
+            std::uint8_t    address;            // if id is 255, then the board assign it randomly as best as it can.
             std::uint16_t   randominvalidmask;  // but not assign if address is set inside this mask
-            Info() : id(0), randominvalidmask(0) {}
+            Info() : address(0), randominvalidmask(0) {}
         };
         
         Info info;
         
-        Message_bldr_SETID(){}
+        Message_bldr_SETCANADDRESS(){}
             
         bool load(const embot::hw::can::Frame &frame);
             
@@ -313,27 +313,7 @@ namespace embot { namespace app { namespace canprotocol {
         
     };
         
-    
-    class Message_anypoll_SETID : public Message
-    {
-        public:
-            
-        struct Info
-        { 
-            std::uint8_t    id;  
-            Info() : id(0) {}
-        };
-        
-        Info info;
-        
-        Message_anypoll_SETID(){}
-            
-        bool load(const embot::hw::can::Frame &frame);
-            
-        bool reply();   // none
-        
-    };
-    
+   
  
     class Message_base_GET_FIRMWARE_VERSION : public Message
     {
@@ -479,7 +459,75 @@ namespace embot { namespace app { namespace canprotocol {
             
         static char cumulativeinfo32[32];
         static std::uint8_t receivedmask;
-    };       
+    };  
+
+
+    
+//    class Message_anypoll_SETID : public Message
+//    {
+//        public:
+//            
+//        struct Info
+//        { 
+//            std::uint8_t    id;  
+//            Info() : id(0) {}
+//        };
+//        
+//        Info info;
+//        
+//        Message_anypoll_SETID(){}
+//            
+//        bool load(const embot::hw::can::Frame &frame);
+//            
+//        bool reply();   // none
+//        
+//    };  
+
+
+    class Message_base_SET_ID : public Message
+    {
+        public:
+            
+        struct Info
+        { 
+            std::uint8_t    address;      
+            Info() : address(0) {}
+        };
+        
+        
+        Info info;
+        
+                
+        Message_base_SET_ID(Clas cl, std::uint8_t cm) : cls(cl), cmd(cm) {}
+            
+        bool load(const embot::hw::can::Frame &frame);
+            
+        bool reply();    
+            
+        protected:
+            
+        Clas            cls;
+        std::uint8_t    cmd;                 
+    };   
+    
+    class Message_aspoll_SET_BOARD_ADX : public Message_base_SET_ID
+    {
+        public:
+            
+        Message_aspoll_SET_BOARD_ADX() : 
+            Message_base_SET_ID(Clas::pollingAnalogSensor, static_cast<std::uint8_t>(aspollCMD::SET_BOARD_ADX)) {}
+       
+    }; 
+
+    class Message_mcpoll_SET_BOARD_ID : public Message_base_SET_ID
+    {
+        public:
+            
+        Message_mcpoll_SET_BOARD_ID() : 
+            Message_base_SET_ID(Clas::pollingMotorControl, static_cast<std::uint8_t>(mcpollCMD::SET_BOARD_ID)) {}
+       
+    }; 
+    
     
 }}} // namespace embot { namespace app { namespace canprotocol {
 
