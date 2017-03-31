@@ -464,9 +464,10 @@ namespace embot { namespace app { namespace canprotocol {
         bool Message_bldr_START::reply(embot::hw::can::Frame &frame, const std::uint8_t sender, const bool ok)
         {
             frame_set_sender(frame, sender);
-            char dd[2] = {0x02, 0x01};
-            frame_set_clascmddestinationdata(frame, Clas::bootloader, static_cast<std::uint8_t>(bldrCMD::START), data.from, dd, 2);
-            frame_set_size(frame, 3);
+            char dd[1] = {1};
+            dd[0] = (true == ok) ? (1) : (0);
+            frame_set_clascmddestinationdata(frame, Clas::bootloader, static_cast<std::uint8_t>(bldrCMD::START), data.from, dd, 1);
+            frame_set_size(frame, 2);
             return true;
         }  
         
@@ -488,7 +489,8 @@ namespace embot { namespace app { namespace canprotocol {
         bool Message_bldr_DATA::reply(embot::hw::can::Frame &frame, const std::uint8_t sender, const bool ok)
         {
             frame_set_sender(frame, sender);
-            char dd[1] = {ok};
+            char dd[1] = {1};
+            dd[0] = (true == ok) ? (1) : (0);
             frame_set_clascmddestinationdata(frame, Clas::bootloader, static_cast<std::uint8_t>(bldrCMD::DATA), data.from, dd, 1);
             frame_set_size(frame, 2);
             return true;
@@ -511,7 +513,8 @@ namespace embot { namespace app { namespace canprotocol {
         bool Message_bldr_END::reply(embot::hw::can::Frame &frame, const std::uint8_t sender, const bool ok)
         {
             frame_set_sender(frame, sender);
-            char dd[1] = {0x1};
+            char dd[1] = {1};
+            dd[0] = (true == ok) ? (1) : (0);
             frame_set_clascmddestinationdata(frame, Clas::bootloader, static_cast<std::uint8_t>(bldrCMD::END), data.from, dd, 1);
             frame_set_size(frame, 2);
             return true;

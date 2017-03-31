@@ -37,6 +37,7 @@ static ActivityParam activity_param = {0};
 #undef TEST_BL_CANFRAME
 
 #define FINAL_BOOTLOADER
+#define TEST_FINAL_BOOTLOADER
 
 int main(void)
 { 
@@ -87,6 +88,11 @@ int main(void)
 
 #if defined(FINAL_BOOTLOADER)
 
+#if defined(TEST_FINAL_BOOTLOADER)
+
+bool get_canframe(embot::hw::can::Frame &frame);
+#endif
+
 
 void onevent(embot::sys::Task *t, embot::common::Event evt, void *p)
 {    
@@ -99,9 +105,13 @@ void onevent(embot::sys::Task *t, embot::common::Event evt, void *p)
         embot::hw::can::Frame frameout;
         embot::app::bootloader::theCANparser &canparser = embot::app::bootloader::theCANparser::getInstance();
         
-        if(true == canparser.process(frame, frameout))
+        bool rx = get_canframe(frame);
+        if(true == rx)
         {
-            // send the frameout
+            if(true == canparser.process(frame, frameout))
+            {
+                // send the frameout
+            }
         }
    
         
@@ -227,7 +237,7 @@ static void bl_activity(void* param)
 #endif
 
 
-#if defined(TEST_BL_CANFRAME)
+#if defined(TEST_BL_CANFRAME) || defined(TEST_FINAL_BOOTLOADER)
 
 #include "embot_app_canprotocol.h"
 
