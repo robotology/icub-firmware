@@ -129,6 +129,10 @@ namespace embot { namespace hw { namespace sys {
     
     void delay(embot::common::Time t);
     
+    std::uint32_t random();
+    std::uint32_t minrandom();
+    std::uint32_t maxrandom();
+    
 }}} // namespace embot { namespace hw { namespace sys {
 
 
