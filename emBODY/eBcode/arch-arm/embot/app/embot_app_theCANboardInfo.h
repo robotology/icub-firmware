@@ -75,8 +75,9 @@ namespace embot { namespace app {
         static const std::uint32_t sizeOfUserSpace = 128+256+512; 
         
         // but we can read / write particular areas of max size sizeOfUserSpace. we can use it for storing matrices or ... whatever we want, as long as we dont do mess
-        bool write(std::uint32_t address, std::uint32_t size, const void *data);
-        bool read(std::uint32_t address, std::uint32_t size, void *data);
+        bool userdatawrite(std::uint32_t address, std::uint32_t size, const void *data);
+        bool userdataread(std::uint32_t address, std::uint32_t size, void *data);
+        bool userdataerase();
         
     private:
         theCANboardInfo(); 

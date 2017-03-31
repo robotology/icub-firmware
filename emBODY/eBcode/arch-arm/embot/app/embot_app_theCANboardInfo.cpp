@@ -128,14 +128,21 @@ bool embot::app::theCANboardInfo::setCANaddress(std::uint8_t adr)
 }
 
 
-bool embot::app::theCANboardInfo::write(std::uint32_t address, std::uint32_t size, const void *data)
+bool embot::app::theCANboardInfo::userdatawrite(std::uint32_t address, std::uint32_t size, const void *data)
 {
-    return pImpl->flashstorage->write(pImpl->userdataaddress, size, data);    
+    return pImpl->flashstorage->write(pImpl->userdataaddress+address, size, data);    
 }
 
-bool embot::app::theCANboardInfo::read(std::uint32_t address, std::uint32_t size, void *data)
+bool embot::app::theCANboardInfo::userdataread(std::uint32_t address, std::uint32_t size, void *data)
 {
-    return pImpl->flashstorage->read(pImpl->userdataaddress, size, data);    
+    return pImpl->flashstorage->read(pImpl->userdataaddress+address, size, data);    
+}
+
+bool embot::app::theCANboardInfo::userdataerase()
+{
+    return false;
+    #warning TOBEDONE: implement selected parts of a flash page or ... chose a different page for user-def storage ....
+    //pImpl->flashstorage->erase(pImpl->userdataaddress, sizeOfUserSpace);    
 }
 
 
