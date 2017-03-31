@@ -58,6 +58,8 @@ struct embot::app::bootloader::theCANparser::Impl
     // add an object which gets and sends packets.
     // add an object canboardinfo to get/set info (can address, etc.)
     // think of something which stores info about the running process (version, board type, etc.). maybe an object or a rom mapped variable.
+    
+    const std::uint32_t InvalidFLASHaddress = 0xffffffff;
 
     enum class State { Idle = 0, Connected = 1, Updating = 2};
     
@@ -72,6 +74,13 @@ struct embot::app::bootloader::theCANparser::Impl
     embot::app::canprotocol::versionOfFIRMWARE version;
     embot::app::canprotocol::Board board;
     std::uint8_t canaddress;
+    
+    embot::app::canprotocol::Message_bldr_ADDRESS::Info curr_blrdAddressInfo;
+    std::uint8_t curr_blrdAddress_datalenreceivedsofar;
+    
+    bool eraseAPPLstorage;
+    
+    embot::hw::FlashBurner* flashburner;
 
     Impl() 
     {              
@@ -86,6 +95,14 @@ struct embot::app::bootloader::theCANparser::Impl
         version.minor = 0;
         version.build = 255;
         board = embot::app::canprotocol::Board::unknown;
+        
+        eraseAPPLstorage = false;
+        
+        curr_blrdAddressInfo.address = InvalidFLASHaddress;
+        curr_blrdAddressInfo.datalen = 0;
+        curr_blrdAddress_datalenreceivedsofar = 0;
+        
+        flashburner = new embot::hw::FlashBurner;
        
     }
     
@@ -94,11 +111,70 @@ struct embot::app::bootloader::theCANparser::Impl
         state = newstate;
     }
     
+    bool setcanaddress(const std::uint8_t adr, const std::uint16_t randominvalidmask)
+    {
+        embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance();
+        // i reinforce a reading from storage. just for safety. in here we are dealing w/ can address change and i want to be sure.
+        canaddress = canbrdinfo.getCANaddress();
+        
+        std::uint8_t target = adr;
+        
+        if(0xff == adr)
+        {
+            // compute a new random address. use the randoinvalid mask to filter out the undesired values. for sure 0x8001.
+            std::uint16_t mask = randominvalidmask;
+            mask |= 0x8001;
+            if(0xffff == mask)
+            {   // hei, nothing is good for you.
+                return false;
+            }
+            
+            bool ok = false;
+            for(std::uint16_t i=0; i<250; i++)
+            {
+                target = (embot::hw::sys::random()-embot::hw::sys::minrandom()) & 0xf;
+               
+                if(false == embot::common::bit::check(mask, target))
+                {
+                    ok = true;
+                    break;                    
+                }
+            }
+            
+            if(!ok)
+            {
+                return false;
+            }
+        }
+        
+        // always check that is is not 0 or 0xf
+        if((0 == target) || (0xf == target))
+        {
+            return false;
+        }
+            
+        
+        if(canaddress != target)
+        {
+            canbrdinfo.setCANaddress(target);
+            canaddress = canbrdinfo.getCANaddress();
+        }
+        
+        return (target == canaddress);
+    }
+    
+    
     bool process(const embot::hw::can::Frame &frame, embot::hw::can::Frame &reply);
     
-    bool process_bl_broadcast(const embot::hw::can::Frame &frame, embot::hw::can::Frame &reply);
+    bool process_bl_broadcast(const embot::hw::can::Frame &frame, embot::hw::can::Frame &reply);    
+    bool process_bl_board(const embot::hw::can::Frame &frame, embot::hw::can::Frame &reply);
+    bool process_bl_address(const embot::hw::can::Frame &frame, embot::hw::can::Frame &reply);
+    bool process_bl_data(const embot::hw::can::Frame &frame, embot::hw::can::Frame &reply);
+    bool process_bl_start(const embot::hw::can::Frame &frame, embot::hw::can::Frame &reply);
+    bool process_bl_end(const embot::hw::can::Frame &frame, embot::hw::can::Frame &reply);
     
-    
+    bool process_setid(const embot::app::canprotocol::Clas cl, const std::uint8_t cm, const embot::hw::can::Frame &frame, embot::hw::can::Frame &reply);
+    bool process_bl_setcanaddress(const embot::hw::can::Frame &frame, embot::hw::can::Frame &reply);
         
 };
 
@@ -138,57 +214,95 @@ bool embot::app::bootloader::theCANparser::Impl::process(const embot::hw::can::F
         
         case Impl::State::Connected:
         {
-            // only bldrCMD::BOARD, aspollCMD::SET_BOARD_ADX, mcpollCMD::SET_BOARD_ID
-            if((cls == embot::app::canprotocol::Clas::bootloader) && (cmd == static_cast<std::uint8_t>(embot::app::canprotocol::bldrCMD::BOARD)))
+            // only bldrCMD::BOARD (it moves to state updating), bldrCMD::BROADCAST, bldrCMD::SETCANADDRESS, mcpollCMD::SET_BOARD_ID, aspollCMD::SET_BOARD_ADX,
+            
+            switch(cls)
             {
-                // process_frame_board()
+                case embot::app::canprotocol::Clas::bootloader:
+                {
+                    if(static_cast<std::uint8_t>(embot::app::canprotocol::bldrCMD::BOARD) == cmd)
+                    {
+                        txframe = process_bl_board(frame, reply);                
+                        // then go to update.
+                        setstate(Impl::State::Updating);
+                    }
+                    else if(static_cast<std::uint8_t>(embot::app::canprotocol::bldrCMD::BROADCAST) == cmd)
+                    {
+                        txframe = process_bl_broadcast(frame, reply);                                
+                    }
+                    else if(static_cast<std::uint8_t>(embot::app::canprotocol::bldrCMD::SETCANADDRESS) == cmd)
+                    {
+                        txframe = process_bl_setcanaddress(frame, reply);                
+                    }                                
+                } break;
                 
-                // then go to update.
-                setstate(Impl::State::Updating);
+                case embot::app::canprotocol::Clas::pollingMotorControl:
+                {
+                    if(static_cast<std::uint8_t>(embot::app::canprotocol::mcpollCMD::SET_BOARD_ID) == cmd)
+                    {
+                        txframe = process_setid(cls, cmd, frame, reply);
+                    }
+                    
+                } break;
+                
+                case embot::app::canprotocol::Clas::pollingAnalogSensor:
+                {
+                    if(static_cast<std::uint8_t>(embot::app::canprotocol::aspollCMD::SET_BOARD_ADX) == cmd)
+                    {
+                        txframe = process_setid(cls, cmd, frame, reply);
+                    }                    
+                } break;
+                
+                default:
+                {
+                }  break;   
             }
-            else if((cls == embot::app::canprotocol::Clas::pollingMotorControl) && (cmd == static_cast<std::uint8_t>(embot::app::canprotocol::mcpollCMD::SET_BOARD_ID)))
-            {
-                // process_frame_change_address()
-                
-                // dont change state
-            }
-            else if((cls == embot::app::canprotocol::Clas::pollingAnalogSensor) && (cmd == static_cast<std::uint8_t>(embot::app::canprotocol::aspollCMD::SET_BOARD_ADX)))
-            {
-                // process_frame_change_address()
-                
-                // dont change state
-            } 
             
         } break;
 
         case Impl::State::Updating:
         {
-            // only bldrCMD::ADDRESS, bldrCMD::DATA, bldrCMD::START, bldrCMD::END
-            if((cls == embot::app::canprotocol::Clas::bootloader) && (cmd == static_cast<std::uint8_t>(embot::app::canprotocol::bldrCMD::ADDRESS)))
+            // we are in firmware-updating mode. any non specific command will be ignored.
+            // only: bldrCMD::ADDRESS, bldrCMD::DATA, bldrCMD::START, bldrCMD::END
+            // the correct flux would be: { ADDRESS, { DATA }_as_specified_in_address_frame }_as_many_as_lines_in_the_hex_file, START, END.
+            // BUT: the canLoader will take care of having a correct flux. only check is: the reply of DATA when it receives the correct number of 
+            // bytes. if any wrong one (or lost) the bootloader will fail the fw-udpate but will not be corrupted itself. 
+            // conclusion: we keep everything in a single state Impl::State::Updating.
+            
+            if(embot::app::canprotocol::Clas::bootloader == cls)
             {
-                // process_frame_address()
-                
-            }
-            else if((cls == embot::app::canprotocol::Clas::bootloader) && (cmd == static_cast<std::uint8_t>(embot::app::canprotocol::bldrCMD::DATA)))
-            {
-                // process_frame_data()
-                
-            }
-            else if((cls == embot::app::canprotocol::Clas::bootloader) && (cmd == static_cast<std::uint8_t>(embot::app::canprotocol::bldrCMD::START)))
-            {
-                // process_frame_start()
+                switch(cmd)
+                {
+                    case static_cast<std::uint8_t>(embot::app::canprotocol::bldrCMD::ADDRESS):
+                    {   // first of the typical sequence for a hex row of 16 bytes. the row is: address, data, data, data 
+                        txframe = process_bl_address(frame, reply);
+                    } break;
+                    
+                    case static_cast<std::uint8_t>(embot::app::canprotocol::bldrCMD::DATA):
+                    {   // successive of the typical sequence for a hex row of 16 bytes. the row is: address, data, data, data 
+                        txframe = process_bl_data(frame, reply);
+                    } break;
+                    
+                    case static_cast<std::uint8_t>(embot::app::canprotocol::bldrCMD::START):
+                    {   // only one of such messages: it tells that the hew rows are over. time to flush rx data into flash
+                        txframe = process_bl_start(frame, reply);
+                    } break;                    
+                    
+                    case static_cast<std::uint8_t>(embot::app::canprotocol::bldrCMD::END):
+                    {   // only one of such messages: it tells that fw update is over. time to restart.                        
+                        txframe = process_bl_end(frame, reply);
+                        // simplest and maybe safest way to send ack and restart later is to restart the countdown with 100 ms timeout. 
+                        embot::app::theBootloader &bl  = embot::app::theBootloader::getInstance();
+                        bl.startcountdown(100*embot::common::time1millisec);                        
+                    } break;  
+                    
+                    default:
+                    {
+                    }  break;                       
+                }
 
             }
-            else if((cls == embot::app::canprotocol::Clas::bootloader) && (cmd == static_cast<std::uint8_t>(embot::app::canprotocol::bldrCMD::END)))
-            {
-                // process_frame_end()
-                
-                // send reply, and then ... force a jump to application after the reply has been sent. 
-                // we could define a callback on tx of teh next can frame ... no.
-                // simplest and maybe safest way is to plan a restart in 100 ms. 
-                embot::app::theBootloader &bl  = embot::app::theBootloader::getInstance();
-                bl.startcountdown(100*embot::common::time1millisec);
-            }             
+
         } break;
 
         
@@ -200,6 +314,8 @@ bool embot::app::bootloader::theCANparser::Impl::process(const embot::hw::can::F
     
     return txframe;
 }
+
+
 
 bool embot::app::bootloader::theCANparser::Impl::process_bl_broadcast(const embot::hw::can::Frame &frame, embot::hw::can::Frame &reply)
 {
@@ -215,6 +331,114 @@ bool embot::app::bootloader::theCANparser::Impl::process_bl_broadcast(const embo
         
     return msg.reply(reply, canaddress, replyinfo);        
 }
+
+
+bool embot::app::bootloader::theCANparser::Impl::process_bl_board(const embot::hw::can::Frame &frame, embot::hw::can::Frame &reply)
+{
+    embot::app::canprotocol::Message_bldr_BOARD msg;
+    msg.load(frame);
+    
+    // get the eraseeeprom info.    
+    eraseAPPLstorage = (1 == msg.info.eepromerase) ? (true) : (false);
+    
+    // we may erase flash (and eeprom now) but ... we wait.
+            
+    return msg.reply(reply, canaddress);        
+}
+
+bool embot::app::bootloader::theCANparser::Impl::process_bl_address(const embot::hw::can::Frame &frame, embot::hw::can::Frame &reply)
+{
+    embot::app::canprotocol::Message_bldr_ADDRESS msg;
+    msg.load(frame);
+    
+    // use what received ...    
+    curr_blrdAddressInfo.address = msg.info.address;
+    curr_blrdAddressInfo.datalen = msg.info.datalen;
+    curr_blrdAddress_datalenreceivedsofar = 0;
+    
+    return msg.reply();        
+}
+
+
+bool embot::app::bootloader::theCANparser::Impl::process_bl_data(const embot::hw::can::Frame &frame, embot::hw::can::Frame &reply)
+{
+    embot::app::canprotocol::Message_bldr_DATA msg;
+    msg.load(frame);
+    
+    // use what received ...       
+    if((curr_blrdAddress_datalenreceivedsofar+msg.info.size) <= curr_blrdAddressInfo.datalen)
+    {   // ok, i can pass data to the flashburner
+        
+        // the flashburner object takes care of accepting data, to buffer it in efficient modes, and to write it to flash.
+        // the first time it needs to write a page of flash, it also erases all the flash pages used by the application.
+        flashburner->add(curr_blrdAddressInfo.address+curr_blrdAddress_datalenreceivedsofar, msg.info.size, msg.info.data);
+        
+        // now i increment data received so far.
+        curr_blrdAddress_datalenreceivedsofar += msg.info.size;
+        
+        if(curr_blrdAddress_datalenreceivedsofar == curr_blrdAddressInfo.datalen)
+        {   // i send ok only if the bytes receive so far are exactly equal to the ones we are expecting in total
+            return msg.reply(reply, canaddress, true); 
+        }
+        
+        return false;
+    }
+    
+    // do i return nothing or a nack??? i send nothing.
+    return false;    
+}
+
+
+bool embot::app::bootloader::theCANparser::Impl::process_bl_start(const embot::hw::can::Frame &frame, embot::hw::can::Frame &reply)
+{        
+    embot::app::canprotocol::Message_bldr_START msg;
+    msg.load(frame);
+    
+    // it flushes ...   
+    flashburner->flush();
+    
+    // it erases userdefineddata 
+    if(true == eraseAPPLstorage)
+    {
+        eraseAPPLstorage = false;
+        embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance();
+        canbrdinfo.userdataerase();
+    }
+        
+    return msg.reply(reply, canaddress, true);
+}
+
+
+bool embot::app::bootloader::theCANparser::Impl::process_bl_end(const embot::hw::can::Frame &frame, embot::hw::can::Frame &reply)
+{
+    embot::app::canprotocol::Message_bldr_END msg;
+    msg.load(frame);
+        
+    return msg.reply(reply, canaddress, true);
+}
+
+
+bool embot::app::bootloader::theCANparser::Impl::process_setid(const embot::app::canprotocol::Clas cl, const std::uint8_t cm, const embot::hw::can::Frame &frame, embot::hw::can::Frame &reply)
+{
+    embot::app::canprotocol::Message_base_SET_ID msg(cl, cm);
+    msg.load(frame);
+      
+    setcanaddress(msg.info.address, 0x0000);
+            
+    return msg.reply();        
+}
+
+bool embot::app::bootloader::theCANparser::Impl::process_bl_setcanaddress(const embot::hw::can::Frame &frame, embot::hw::can::Frame &reply)
+{
+    embot::app::canprotocol::Message_bldr_SETCANADDRESS msg;
+    msg.load(frame);
+      
+    
+    setcanaddress(msg.info.address, msg.info.randominvalidmask);
+            
+    return msg.reply();        
+}
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
