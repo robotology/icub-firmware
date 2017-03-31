@@ -37,7 +37,7 @@ static ActivityParam activity_param = {0};
 #undef TEST_BL_CANFRAME
 
 #define FINAL_BOOTLOADER
-#define TEST_FINAL_BOOTLOADER
+//#define TEST_FINAL_BOOTLOADER
 
 int main(void)
 { 
@@ -95,7 +95,10 @@ bool get_canframe(embot::hw::can::Frame &frame);
 
 
 void onevent(embot::sys::Task *t, embot::common::Event evt, void *p)
-{    
+{  
+
+#if defined(TEST_FINAL_BOOTLOADER)
+    
 //    if(0x00000001 == evt)
     {
         
@@ -116,7 +119,38 @@ void onevent(embot::sys::Task *t, embot::common::Event evt, void *p)
    
         
     }
-    
+#else
+
+    if(0x00000001 == evt)
+    {        
+        // 1. get the frame ... ehi, use the button. or the timeout
+        
+        embot::hw::can::Frame frame;
+        embot::hw::can::Frame frameout;
+        std::uint8_t remaining = 0;
+        if(embot::hw::resOK == embot::hw::can::get(embot::hw::can::Port::one, frame, remaining))
+        {
+            embot::app::bootloader::theCANparser &canparser = embot::app::bootloader::theCANparser::getInstance();
+            if(true == canparser.process(frame, frameout))
+            {
+                // send the frameout
+                embot::hw::can::put(embot::hw::can::Port::one, frameout);
+                embot::hw::can::transmit(embot::hw::can::Port::one);
+            }
+
+            if(remaining > 0)
+            {
+                embot::sys::Task* tsk = embot::sys::taskRunning();
+                if(nullptr != tsk)
+                {
+                    tsk->setEvent(0x00000001);  
+                }                    
+            }
+        }        
+    }
+
+
+#endif    
 }
 
 static void bl_activity(void* param)
