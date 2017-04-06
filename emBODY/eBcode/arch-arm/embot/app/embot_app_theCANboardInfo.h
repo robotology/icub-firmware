@@ -25,6 +25,8 @@
 
 #include "embot_sys.h"
 
+#include "embot_app_canprotocol.h"
+
 
 namespace embot { namespace app {
     
@@ -59,11 +61,12 @@ namespace embot { namespace app {
             std::uint8_t        tobefilled[18];
         }; 
         
-        enum class Type { none = 255, mtb3 = 33, strain2 = 22};
         
         bool erase();
         
-        bool synch(Type type, std::uint8_t adr);
+        bool synch(embot::app::canprotocol::Board type, embot::app::canprotocol::versionOfBOOTLOADER version, std::uint8_t adr, const char *defInfo32);
+        
+        bool synch(embot::app::canprotocol::versionOfAPPLICATION application, embot::app::canprotocol::versionOfCANPROTOCOL protocol);
         
         bool get(StoredInfo &info);
         bool set(const StoredInfo &info);

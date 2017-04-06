@@ -79,7 +79,7 @@ bool embot::app::theCANboardInfo::erase()
 }
    
  
-bool embot::app::theCANboardInfo::synch(Type type, std::uint8_t adr)
+bool embot::app::theCANboardInfo::synch(embot::app::canprotocol::Board type, embot::app::canprotocol::versionOfBOOTLOADER version, std::uint8_t adr, const char *defInfo32)
 {
     bool ret = false;
     // at first we read. if what we read is not nice, then we write again
@@ -92,11 +92,72 @@ bool embot::app::theCANboardInfo::synch(Type type, std::uint8_t adr)
         strd.key = validityKey;
         strd.boardtype = static_cast<std::uint8_t>(type);
         strd.canaddress = adr;  
+        strd.bootloaderVmajor = version.major;
+        strd.bootloaderVminor = version.minor;
+        if(nullptr != defInfo32)
+        {
+            std::memmove(strd.info32, defInfo32, sizeof(strd.info32));
+        }
+        
         ret = set(strd);
+    }
+    else if((strd.boardtype != static_cast<std::uint8_t>(type)) || (version.major != strd.bootloaderVmajor) || (version.minor != strd.bootloaderVminor))
+    {
+        // make sure that the board type is the one we want. with the address we give
+        strd.boardtype = static_cast<std::uint8_t>(type);
+        strd.canaddress = adr;  
+        strd.bootloaderVmajor = version.major;
+        strd.bootloaderVminor = version.minor;
+        if(nullptr != defInfo32)
+        {
+            std::memmove(strd.info32, defInfo32, sizeof(strd.info32));
+        }
+        
+        ret = set(strd);        
     }
     
     return ret;
 }
+
+
+bool embot::app::theCANboardInfo::synch(embot::app::canprotocol::versionOfAPPLICATION application, embot::app::canprotocol::versionOfCANPROTOCOL protocol)
+{
+    bool ret = false;
+    // at first we read. if what we read is not nice, then we write again
+    StoredInfo strd = {0};
+    ret = get(strd);
+    
+    if(validityKey != strd.key)
+    {
+        std::memset(&strd, 0, sizeof(strd));
+        strd.key = validityKey;
+        strd.boardtype = static_cast<std::uint8_t>(embot::app::canprotocol::Board::unknown);
+        strd.canaddress = 1;  
+        strd.bootloaderVmajor = 0;
+        strd.bootloaderVminor = 0;
+        strd.applicationVmajor = application.major;
+        strd.applicationVminor = application.minor;
+        strd.applicationVbuild = application.build;
+        strd.protocolVmajor = protocol.major;
+        strd.protocolVminor = protocol.minor;
+        
+        ret = set(strd);
+    }
+    else if((protocol.major != strd.protocolVmajor) || (protocol.minor != strd.protocolVminor) || 
+            (application.major != strd.applicationVmajor) || (application.minor != strd.applicationVminor) || (application.build != strd.applicationVbuild))
+    {
+        strd.applicationVmajor = application.major;
+        strd.applicationVminor = application.minor;
+        strd.applicationVbuild = application.build;
+        strd.protocolVmajor = protocol.major;
+        strd.protocolVminor = protocol.minor;
+        
+        ret = set(strd);        
+    }
+    
+    return ret;
+}
+
 
 
 bool embot::app::theCANboardInfo::get(StoredInfo &info)
