@@ -163,7 +163,7 @@ namespace embot { namespace hw { namespace can {
         std::uint8_t        size;
         std::uint8_t        filler[3];
         std::uint8_t        data[8];  
-        Frame() : id(0), size(0) { std::uint64_t *d = reinterpret_cast<std::uint64_t*>(data); *d = 0; }
+        Frame() : id(0), size(0) { std::uint64_t *d = reinterpret_cast<std::uint64_t*>(data); *d = 0; filler[0] = filler[1] = filler[2] = 0; }
     };
     
     enum class Port { one = 0, two = 1, none = 32, maxnumberof = 2};
