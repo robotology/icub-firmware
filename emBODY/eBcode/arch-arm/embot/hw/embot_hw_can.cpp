@@ -75,6 +75,18 @@ namespace embot { namespace hw { namespace can {
 
 #elif   defined(HAL_CAN_MODULE_ENABLED)
 
+// - stm32hal.lib needs those two handlers being compiled in here.
+
+void CAN1_TX_IRQHandler(void)
+{
+    HAL_CAN_IRQHandler(&hcan1);
+}
+
+void CAN1_RX0_IRQHandler(void)
+{
+    HAL_CAN_IRQHandler(&hcan1);
+}
+
 namespace embot { namespace hw { namespace can {
     
     
@@ -153,7 +165,36 @@ namespace embot { namespace hw { namespace can {
     static CanTxMsgTypeDef        TxMessage;
     static CanRxMsgTypeDef        RxMessage;
     
-    
+    static void s_transmit_noirq(CAN_HandleTypeDef *hcan)
+    {
+        std::uint32_t size = s_Qtx->size();
+        
+        if(0 == size)
+        {
+            if(nullptr != s_config.txqueueempty.callback)
+            {
+                s_config.txqueueempty.callback(s_config.txqueueempty.arg);
+            }
+            return; // resOK;
+        }
+        
+        for(std::uint32_t i=0; i<size; i++)
+        {
+            const Frame& frame = s_Qtx->at(i);
+            hcan->pTxMsg->StdId = frame.id & 0x7FF;
+            hcan->pTxMsg->DLC = frame.size;
+            std::memmove(hcan->pTxMsg->Data, frame.data, sizeof(hcan->pTxMsg->Data));
+            HAL_StatusTypeDef res = HAL_CAN_Transmit(hcan, 1);
+            if((HAL_OK == res) && (nullptr != s_config.ontxframe.callback))
+            {
+                s_config.ontxframe.callback(s_config.ontxframe.arg);
+            }            
+        }
+        
+        s_Qtx->clear();
+                    
+        return; // resOK;
+    }    
 
     static void s_transmit(CAN_HandleTypeDef *hcan)
     {
@@ -381,10 +422,13 @@ namespace embot { namespace hw { namespace can {
         if(false == initialised(p))
         {
             return 0;
-        }  
+        } 
+
+        uint8_t tx_is_enabled = __HAL_CAN_IS_ENABLE_IT(&hcan1, CAN_IT_TME); 
         
         __HAL_CAN_DISABLE_IT(&hcan1, CAN_IT_TME);
         uint8_t size = s_Qtx->size();
+        if(tx_is_enabled)
         __HAL_CAN_ENABLE_IT(&hcan1, CAN_IT_TME);
         return size;
     }
@@ -414,7 +458,8 @@ namespace embot { namespace hw { namespace can {
 
         if(Port::one == p)
         {
-            embot::hw::can::s_transmit(&hcan1);
+           // embot::hw::can::s_transmit(&hcan1);
+            embot::hw::can::s_transmit_noirq(&hcan1);
             return resOK;
         }
         else
@@ -432,21 +477,25 @@ namespace embot { namespace hw { namespace can {
             return resNOK;
         } 
         
-        if(s_rxQ->empty())
+        bool empty = true;
+        
+        __HAL_CAN_DISABLE_IT(&hcan1, CAN_IT_FMP0);
+        empty = s_rxQ->empty();
+        __HAL_CAN_ENABLE_IT(&hcan1, CAN_IT_FMP0);
+        
+        if(empty)
         {
             remaining = 0;
             return resNOK;
         }
         
-        frame = s_rxQ->front();
-        
         __HAL_CAN_DISABLE_IT(&hcan1, CAN_IT_FMP0);
+        frame = s_rxQ->front();        
         s_rxQ->erase(s_rxQ->begin());
         remaining = s_rxQ->size();
         __HAL_CAN_ENABLE_IT(&hcan1, CAN_IT_FMP0);
         
-        return resOK;
-        
+        return resOK;        
     }
 
     
