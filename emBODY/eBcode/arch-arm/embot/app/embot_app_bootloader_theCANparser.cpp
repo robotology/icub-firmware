@@ -80,6 +80,8 @@ struct embot::app::bootloader::theCANparser::Impl
     
     bool eraseAPPLstorage;
     
+    embot::hw::can::Frame reply;
+    
     embot::hw::FlashBurner* flashburner;
 
     Impl() 
@@ -94,13 +96,15 @@ struct embot::app::bootloader::theCANparser::Impl
         version.major = 0;
         version.minor = 0;
         version.build = 255;
-        board = embot::app::canprotocol::Board::unknown;
+        board = embot::app::canprotocol::Board::unknown;      
         
         eraseAPPLstorage = false;
         
         curr_blrdAddressInfo.address = InvalidFLASHaddress;
         curr_blrdAddressInfo.datalen = 0;
         curr_blrdAddress_datalenreceivedsofar = 0;
+        version.build = 255;
+        
         
         flashburner = new embot::hw::FlashBurner;
        
@@ -164,24 +168,31 @@ struct embot::app::bootloader::theCANparser::Impl
     }
     
     
-    bool process(const embot::hw::can::Frame &frame, embot::hw::can::Frame &reply);
+    bool process(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);
     
-    bool process_bl_broadcast(const embot::hw::can::Frame &frame, embot::hw::can::Frame &reply);    
-    bool process_bl_board(const embot::hw::can::Frame &frame, embot::hw::can::Frame &reply);
-    bool process_bl_address(const embot::hw::can::Frame &frame, embot::hw::can::Frame &reply);
-    bool process_bl_data(const embot::hw::can::Frame &frame, embot::hw::can::Frame &reply);
-    bool process_bl_start(const embot::hw::can::Frame &frame, embot::hw::can::Frame &reply);
-    bool process_bl_end(const embot::hw::can::Frame &frame, embot::hw::can::Frame &reply);
+    bool process_bl_broadcast(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);    
+    bool process_bl_board(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);
+    bool process_bl_address(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);
+    bool process_bl_data(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);
+    bool process_bl_start(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);
+    bool process_bl_end(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);
+    bool process_bl_getadditionalinfo(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);
+    bool process_bl_setadditionalinfo(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);
     
-    bool process_setid(const embot::app::canprotocol::Clas cl, const std::uint8_t cm, const embot::hw::can::Frame &frame, embot::hw::can::Frame &reply);
-    bool process_bl_setcanaddress(const embot::hw::can::Frame &frame, embot::hw::can::Frame &reply);
+    bool process_setid(const embot::app::canprotocol::Clas cl, const std::uint8_t cm, const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);
+    bool process_bl_setcanaddress(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);
         
 };
 
 
-bool embot::app::bootloader::theCANparser::Impl::process(const embot::hw::can::Frame &frame, embot::hw::can::Frame &reply)
+bool embot::app::bootloader::theCANparser::Impl::process(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
 {
     txframe = false;
+    
+    if(false == embot::app::canprotocol::frameis4board(frame, canaddress))
+    {
+        return false;
+    }
     
     if(countdownIsActive)
     {   // do it as quick as possible
@@ -194,6 +205,7 @@ bool embot::app::bootloader::theCANparser::Impl::process(const embot::hw::can::F
     cls = embot::app::canprotocol::frame2clas(frame);
     cmd = embot::app::canprotocol::frame2cmd(frame);
     
+    replies.clear();
     
     // only some states can handle them.
     
@@ -204,10 +216,16 @@ bool embot::app::bootloader::theCANparser::Impl::process(const embot::hw::can::F
             // only bldrCMD::BROADCAST
             if((cls == embot::app::canprotocol::Clas::bootloader) && (cmd == static_cast<std::uint8_t>(embot::app::canprotocol::bldrCMD::BROADCAST)))
             {
-                txframe = process_bl_broadcast(frame, reply);
+                txframe = process_bl_broadcast(frame, replies);
                                 
                 // then go to connected.
                 setstate(Impl::State::Connected);
+            }
+            else if(static_cast<std::uint8_t>(embot::app::canprotocol::bldrCMD::BOARD) == cmd)
+            {
+                txframe = process_bl_board(frame, replies);                
+                // then go to update.
+                setstate(Impl::State::Updating);
             }
              
         } break;
@@ -222,25 +240,33 @@ bool embot::app::bootloader::theCANparser::Impl::process(const embot::hw::can::F
                 {
                     if(static_cast<std::uint8_t>(embot::app::canprotocol::bldrCMD::BOARD) == cmd)
                     {
-                        txframe = process_bl_board(frame, reply);                
+                        txframe = process_bl_board(frame, replies);                
                         // then go to update.
                         setstate(Impl::State::Updating);
                     }
                     else if(static_cast<std::uint8_t>(embot::app::canprotocol::bldrCMD::BROADCAST) == cmd)
                     {
-                        txframe = process_bl_broadcast(frame, reply);                                
+                        txframe = process_bl_broadcast(frame, replies);                                
                     }
                     else if(static_cast<std::uint8_t>(embot::app::canprotocol::bldrCMD::SETCANADDRESS) == cmd)
                     {
-                        txframe = process_bl_setcanaddress(frame, reply);                
-                    }                                
+                        txframe = process_bl_setcanaddress(frame, replies);                
+                    } 
+                    else if(static_cast<std::uint8_t>(embot::app::canprotocol::bldrCMD::GET_ADDITIONAL_INFO) == cmd)
+                    {
+                        txframe = process_bl_getadditionalinfo(frame, replies);                
+                    } 
+                    else if(static_cast<std::uint8_t>(embot::app::canprotocol::bldrCMD::SET_ADDITIONAL_INFO) == cmd)
+                    {
+                        txframe = process_bl_setadditionalinfo(frame, replies);                
+                    }                     
                 } break;
                 
                 case embot::app::canprotocol::Clas::pollingMotorControl:
                 {
                     if(static_cast<std::uint8_t>(embot::app::canprotocol::mcpollCMD::SET_BOARD_ID) == cmd)
                     {
-                        txframe = process_setid(cls, cmd, frame, reply);
+                        txframe = process_setid(cls, cmd, frame, replies);
                     }
                     
                 } break;
@@ -249,7 +275,7 @@ bool embot::app::bootloader::theCANparser::Impl::process(const embot::hw::can::F
                 {
                     if(static_cast<std::uint8_t>(embot::app::canprotocol::aspollCMD::SET_BOARD_ADX) == cmd)
                     {
-                        txframe = process_setid(cls, cmd, frame, reply);
+                        txframe = process_setid(cls, cmd, frame, replies);
                     }                    
                 } break;
                 
@@ -275,22 +301,22 @@ bool embot::app::bootloader::theCANparser::Impl::process(const embot::hw::can::F
                 {
                     case static_cast<std::uint8_t>(embot::app::canprotocol::bldrCMD::ADDRESS):
                     {   // first of the typical sequence for a hex row of 16 bytes. the row is: address, data, data, data 
-                        txframe = process_bl_address(frame, reply);
+                        txframe = process_bl_address(frame, replies);
                     } break;
                     
                     case static_cast<std::uint8_t>(embot::app::canprotocol::bldrCMD::DATA):
                     {   // successive of the typical sequence for a hex row of 16 bytes. the row is: address, data, data, data 
-                        txframe = process_bl_data(frame, reply);
+                        txframe = process_bl_data(frame, replies);
                     } break;
                     
                     case static_cast<std::uint8_t>(embot::app::canprotocol::bldrCMD::START):
                     {   // only one of such messages: it tells that the hew rows are over. time to flush rx data into flash
-                        txframe = process_bl_start(frame, reply);
+                        txframe = process_bl_start(frame, replies);
                     } break;                    
                     
                     case static_cast<std::uint8_t>(embot::app::canprotocol::bldrCMD::END):
                     {   // only one of such messages: it tells that fw update is over. time to restart.                        
-                        txframe = process_bl_end(frame, reply);
+                        txframe = process_bl_end(frame, replies);
                         // simplest and maybe safest way to send ack and restart later is to restart the countdown with 100 ms timeout. 
                         embot::app::theBootloader &bl  = embot::app::theBootloader::getInstance();
                         bl.startcountdown(100*embot::common::time1millisec);                        
@@ -312,28 +338,39 @@ bool embot::app::bootloader::theCANparser::Impl::process(const embot::hw::can::F
         } break;
     }    
     
+    
     return txframe;
 }
 
 
 
-bool embot::app::bootloader::theCANparser::Impl::process_bl_broadcast(const embot::hw::can::Frame &frame, embot::hw::can::Frame &reply)
+bool embot::app::bootloader::theCANparser::Impl::process_bl_broadcast(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
 {
     embot::app::canprotocol::Message_bldr_BROADCAST msg;
     msg.load(frame);
     
+    embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance();
+    embot::app::theCANboardInfo::StoredInfo strd = {0};
+    canbrdinfo.get(strd);
+    
     embot::app::canprotocol::Message_bldr_BROADCAST::ReplyInfo replyinfo;
-    replyinfo.board = embot::app::canprotocol::Board::mtb4;
+    replyinfo.board = static_cast<embot::app::canprotocol::Board>(strd.boardtype);
     replyinfo.process = embot::app::canprotocol::Process::bootloader;
-    replyinfo.firmware.major = version.major;
-    replyinfo.firmware.minor = version.minor;
+    replyinfo.firmware.major = strd.bootloaderVmajor;
+    replyinfo.firmware.minor = strd.bootloaderVminor;
     replyinfo.firmware.build = 255;
         
-    return msg.reply(reply, canaddress, replyinfo);        
+    if(true == msg.reply(reply, canaddress, replyinfo))
+    {
+        replies.push_back(reply);
+        return true;
+    }        
+    
+    return false;
 }
 
 
-bool embot::app::bootloader::theCANparser::Impl::process_bl_board(const embot::hw::can::Frame &frame, embot::hw::can::Frame &reply)
+bool embot::app::bootloader::theCANparser::Impl::process_bl_board(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
 {
     embot::app::canprotocol::Message_bldr_BOARD msg;
     msg.load(frame);
@@ -343,10 +380,16 @@ bool embot::app::bootloader::theCANparser::Impl::process_bl_board(const embot::h
     
     // we may erase flash (and eeprom now) but ... we wait.
             
-    return msg.reply(reply, canaddress);        
+    if(true == msg.reply(reply, canaddress))
+    {
+        replies.push_back(reply);
+        return true;
+    }        
+    
+    return false;       
 }
 
-bool embot::app::bootloader::theCANparser::Impl::process_bl_address(const embot::hw::can::Frame &frame, embot::hw::can::Frame &reply)
+bool embot::app::bootloader::theCANparser::Impl::process_bl_address(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
 {
     embot::app::canprotocol::Message_bldr_ADDRESS msg;
     msg.load(frame);
@@ -360,7 +403,7 @@ bool embot::app::bootloader::theCANparser::Impl::process_bl_address(const embot:
 }
 
 
-bool embot::app::bootloader::theCANparser::Impl::process_bl_data(const embot::hw::can::Frame &frame, embot::hw::can::Frame &reply)
+bool embot::app::bootloader::theCANparser::Impl::process_bl_data(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
 {
     embot::app::canprotocol::Message_bldr_DATA msg;
     msg.load(frame);
@@ -378,7 +421,13 @@ bool embot::app::bootloader::theCANparser::Impl::process_bl_data(const embot::hw
         
         if(curr_blrdAddress_datalenreceivedsofar == curr_blrdAddressInfo.datalen)
         {   // i send ok only if the bytes receive so far are exactly equal to the ones we are expecting in total
-            return msg.reply(reply, canaddress, true); 
+            
+            if(true == msg.reply(reply, canaddress, true))
+            {
+                replies.push_back(reply);
+                return true;
+            }            
+            return false;                
         }
         
         return false;
@@ -389,7 +438,7 @@ bool embot::app::bootloader::theCANparser::Impl::process_bl_data(const embot::hw
 }
 
 
-bool embot::app::bootloader::theCANparser::Impl::process_bl_start(const embot::hw::can::Frame &frame, embot::hw::can::Frame &reply)
+bool embot::app::bootloader::theCANparser::Impl::process_bl_start(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
 {        
     embot::app::canprotocol::Message_bldr_START msg;
     msg.load(frame);
@@ -405,20 +454,71 @@ bool embot::app::bootloader::theCANparser::Impl::process_bl_start(const embot::h
         canbrdinfo.userdataerase();
     }
         
-    return msg.reply(reply, canaddress, true);
+    if(true == msg.reply(reply, canaddress, true))
+    {
+        replies.push_back(reply);
+        return true;
+    } 
+    return false;    
 }
 
 
-bool embot::app::bootloader::theCANparser::Impl::process_bl_end(const embot::hw::can::Frame &frame, embot::hw::can::Frame &reply)
+bool embot::app::bootloader::theCANparser::Impl::process_bl_end(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
 {
     embot::app::canprotocol::Message_bldr_END msg;
     msg.load(frame);
         
-    return msg.reply(reply, canaddress, true);
+    if(true == msg.reply(reply, canaddress, true))
+    {
+        replies.push_back(reply);
+        return true;
+    } 
+    return false;     
+}
+
+bool embot::app::bootloader::theCANparser::Impl::process_bl_getadditionalinfo(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
+{
+    embot::app::canprotocol::Message_bldr_GET_ADDITIONAL_INFO msg;
+    msg.load(frame);
+    
+    embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance();
+    embot::app::theCANboardInfo::StoredInfo strd = {0};
+    canbrdinfo.get(strd);
+    
+    embot::app::canprotocol::Message_bldr_GET_ADDITIONAL_INFO::ReplyInfo replyinfo;
+    std::memmove(replyinfo.info32, strd.info32, sizeof(replyinfo.info32)); 
+   
+    std::uint8_t nreplies = msg.numberofreplies();
+    for(std::uint8_t i=0; i<nreplies; i++)
+    {
+        if(true == msg.reply(reply, canaddress, replyinfo))
+        {
+            replies.push_back(reply);
+        }
+    }
+    return true;
+        
 }
 
 
-bool embot::app::bootloader::theCANparser::Impl::process_setid(const embot::app::canprotocol::Clas cl, const std::uint8_t cm, const embot::hw::can::Frame &frame, embot::hw::can::Frame &reply)
+bool embot::app::bootloader::theCANparser::Impl::process_bl_setadditionalinfo(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
+{
+    embot::app::canprotocol::Message_bldr_SET_ADDITIONAL_INFO2 msg;
+    msg.load(frame);
+    
+    if(true == msg.info.valid)
+    {   // we have received all the 8 messages in order (important is that the one with data[1] = 0 is the first)
+        embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance();
+        embot::app::theCANboardInfo::StoredInfo strd = {0};
+        canbrdinfo.get(strd);    
+        std::memmove(strd.info32, msg.info.info32, sizeof(strd.info32));
+        canbrdinfo.set(strd);
+    }
+    return false;        
+}
+
+
+bool embot::app::bootloader::theCANparser::Impl::process_setid(const embot::app::canprotocol::Clas cl, const std::uint8_t cm, const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
 {
     embot::app::canprotocol::Message_base_SET_ID msg(cl, cm);
     msg.load(frame);
@@ -428,7 +528,7 @@ bool embot::app::bootloader::theCANparser::Impl::process_setid(const embot::app:
     return msg.reply();        
 }
 
-bool embot::app::bootloader::theCANparser::Impl::process_bl_setcanaddress(const embot::hw::can::Frame &frame, embot::hw::can::Frame &reply)
+bool embot::app::bootloader::theCANparser::Impl::process_bl_setcanaddress(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
 {
     embot::app::canprotocol::Message_bldr_SETCANADDRESS msg;
     msg.load(frame);
@@ -470,6 +570,7 @@ bool embot::app::bootloader::theCANparser::initialise(Config &config)
         pImpl->canaddress = storedinfo.canaddress;
         pImpl->version.major = storedinfo.bootloaderVmajor;
         pImpl->version.minor = storedinfo.bootloaderVminor;
+        pImpl->version.build = 0;
         pImpl->board = static_cast<embot::app::canprotocol::Board>(storedinfo.boardtype);        
     }
       
@@ -479,9 +580,9 @@ bool embot::app::bootloader::theCANparser::initialise(Config &config)
   
 
 
-bool embot::app::bootloader::theCANparser::process(const embot::hw::can::Frame &frame, embot::hw::can::Frame &reply)
+bool embot::app::bootloader::theCANparser::process(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
 {    
-    return pImpl->process(frame, reply);
+    return pImpl->process(frame, replies);
 }
 
 
