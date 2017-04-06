@@ -35,6 +35,8 @@
 #include "embot.h"
 #include "osal.h"
 
+#include "EOtheLEDpulser.h"
+
 #include <new>
 
 
@@ -151,6 +153,8 @@ void embot::app::theBootloader::execute(Config &config)
 bool embot::app::theBootloader::stopcountdown()
 {    
     pImpl->resetTimer->stop();
+    eo_ledpulser_Stop(eo_ledpulser_GetHandle(), eo_ledpulser_led_zero);
+    eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_zero, 2*EOK_reltime1sec, 0);
     
     return true;
 }
