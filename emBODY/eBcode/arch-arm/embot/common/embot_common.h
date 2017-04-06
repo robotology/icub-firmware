@@ -94,6 +94,39 @@ namespace embot { namespace common { namespace bit {
 } } } // namespace embot { namespace common { namespace bit
 
 
+namespace embot { namespace common { namespace msk {
+        
+    template<typename T>
+    void set(T &dst, const T msk)
+    {
+        dst |= msk;
+    }
+    
+    template<typename T>
+    void clear(T &dst, const T msk)
+    {
+        dst &= (~(msk));
+    }
+    
+    template<typename T>
+    void toggle(T &dst, const T msk)
+    {
+        dst ^= (msk);
+    }
+    
+    template<typename T>
+    bool check(const T value, const T msk)
+    {
+        if(msk == (value & msk))
+        {
+            return true;
+        }
+        return false;
+    }    
+    
+   
+} } } // namespace embot { namespace common { namespace msk
+
 #endif  // include-guard
 
 
