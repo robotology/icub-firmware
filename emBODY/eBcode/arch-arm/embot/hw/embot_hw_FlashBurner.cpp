@@ -42,7 +42,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
   
-#define TEST_DONT_USE_FLASH
+//#define TEST_DONT_USE_FLASH
   
 struct embot::hw::FlashBurner::Impl
 {    
@@ -138,7 +138,9 @@ struct embot::hw::FlashBurner::Impl
         volatile uint32_t xx =  HAL_FLASH_GetError();       
         xx= xx;
 #endif        
-        HAL_FLASH_Lock();                    
+        HAL_FLASH_Lock();  
+
+        return true;
     }
     
     
