@@ -35,9 +35,12 @@
   ******************************************************************************
   */
 /* Includes ------------------------------------------------------------------*/
-#include "stm32l4xx_hal.h"
-#include "stm32l4xx.h"
-#include "stm32l4xx_it.h"
+
+//IIT-EXT removed stm32l4* includes and using the proper stm32hal.h file.
+//#include "stm32l4xx_hal.h"
+//#include "stm32l4xx.h"
+//#include "stm32l4xx_it.h"
+#include "stm32hal.h"
 
 /* USER CODE BEGIN 0 */
 
