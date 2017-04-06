@@ -59,17 +59,30 @@ static uint32_t s_stm32hal_bps_dummy_tick1msget(void);
 // --------------------------------------------------------------------------------------------------------------------
 
 
+//static stm32hal_config_t s_stm32hal_bsp_config =
+//{
+//    .tick1ms_get = s_stm32hal_bps_dummy_tick1msget,
+//    .initbsp = true
+//};
+
+//static  stm32hal_can_configCallback_t s_stm32hal_can_CfgCallback = 
+//{
+//    .onRx = NULL,
+//    .onTx = NULL,
+//    .onError = NULL
+//};
+
 static stm32hal_config_t s_stm32hal_bsp_config =
 {
-    .tick1ms_get = s_stm32hal_bps_dummy_tick1msget,
-    .initbsp = true
+    s_stm32hal_bps_dummy_tick1msget,
+    true
 };
 
 static  stm32hal_can_configCallback_t s_stm32hal_can_CfgCallback = 
 {
-    .onRx = NULL,
-    .onTx = NULL,
-    .onError = NULL
+    NULL,
+    NULL,
+    NULL
 };
 
 
@@ -82,11 +95,17 @@ extern void stm32hal_bsp_init(void);
 
 extern stm32hal_res_t stm32hal_init(const stm32hal_config_t *cfg)
 {
+//    static const stm32hal_config_t s_config = 
+//    {
+//        .tick1ms_get = s_stm32hal_bps_dummy_tick1msget,
+//        .initbsp = true
+//    };
+    
     static const stm32hal_config_t s_config = 
     {
-        .tick1ms_get = s_stm32hal_bps_dummy_tick1msget,
-        .initbsp = true
-    };
+        s_stm32hal_bps_dummy_tick1msget,
+        true
+    };    
     
     if(NULL == cfg)
     {
