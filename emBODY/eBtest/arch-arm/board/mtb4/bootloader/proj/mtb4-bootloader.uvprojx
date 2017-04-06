@@ -873,6 +873,21 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_flash.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_app_canprotocol.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_canprotocol.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_bootloader_theCANparser.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_bootloader_theCANparser.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>slim_retarget_io.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\slim_retarget_io.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1075,11 +1090,11 @@
             <RunIndependent>0</RunIndependent>
             <UpdateFlashBeforeDebugging>1</UpdateFlashBeforeDebugging>
             <Capability>1</Capability>
-            <DriverSelection>4107</DriverSelection>
+            <DriverSelection>4096</DriverSelection>
           </Flash1>
           <bUseTDR>1</bUseTDR>
           <Flash2>BIN\UL2CM3.DLL</Flash2>
-          <Flash3></Flash3>
+          <Flash3>"" ()</Flash3>
           <Flash4></Flash4>
           <pFcarmOut></pFcarmOut>
           <pFcarmGrp></pFcarmGrp>
@@ -1261,7 +1276,7 @@
             <PlainCh>0</PlainCh>
             <Ropi>0</Ropi>
             <Rwpi>0</Rwpi>
-            <wLevel>1</wLevel>
+            <wLevel>2</wLevel>
             <uThumb>0</uThumb>
             <uSurpInc>1</uSurpInc>
             <uC99>0</uC99>
@@ -1814,6 +1829,21 @@
               <FileName>embot_hw_flash.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_flash.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_canprotocol.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_canprotocol.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_bootloader_theCANparser.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_bootloader_theCANparser.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>slim_retarget_io.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\slim_retarget_io.c</FilePath>
             </File>
           </Files>
         </Group>
