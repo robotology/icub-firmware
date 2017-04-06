@@ -54,7 +54,15 @@ namespace embot { namespace app { namespace canprotocol {
         else if(cmd == static_cast<std::uint8_t>(bldrCMD::BROADCAST))
         {
             return bldrCMD::BROADCAST;
-        }         
+        } 
+        else if(cmd == static_cast<std::uint8_t>(bldrCMD::GET_ADDITIONAL_INFO))
+        {
+            return bldrCMD::GET_ADDITIONAL_INFO;
+        }
+        else if(cmd == static_cast<std::uint8_t>(bldrCMD::SET_ADDITIONAL_INFO))
+        {
+            return bldrCMD::SET_ADDITIONAL_INFO;
+        }        
         else if(cmd == static_cast<std::uint8_t>(bldrCMD::SETCANADDRESS))
         {
             return bldrCMD::SETCANADDRESS;
@@ -77,15 +85,7 @@ namespace embot { namespace app { namespace canprotocol {
     
     mcpollCMD cmd2mcpoll(std::uint8_t cmd)
     {
-        if(cmd == static_cast<std::uint8_t>(mcpollCMD::GET_ADDITIONAL_INFO))
-        {
-            return mcpollCMD::GET_ADDITIONAL_INFO;
-        }
-        else if(cmd == static_cast<std::uint8_t>(mcpollCMD::SET_ADDITIONAL_INFO))
-        {
-            return mcpollCMD::SET_ADDITIONAL_INFO;
-        }
-        else if(cmd == static_cast<std::uint8_t>(mcpollCMD::SET_BOARD_ID))
+        if(cmd == static_cast<std::uint8_t>(mcpollCMD::SET_BOARD_ID))
         {
             return mcpollCMD::SET_BOARD_ID;
         }
@@ -167,6 +167,25 @@ namespace embot { namespace app { namespace canprotocol {
         return(t);
     }
     
+    bool frameis4board(const embot::hw::can::Frame &frame, const std::uint8_t boardaddress)
+    {
+        if(frameisperiodic(frame))
+        {   // we dont accept any periodic
+            return false;
+        }
+        // for all others destination is in id
+        std::uint8_t t = (frame.id & 0x0000000F); 
+        if(0xf == t)
+        {   // broadcast
+            return true;
+        }
+        if((0xf & boardaddress) == t)
+        {   // matches the address
+            return true;
+        }
+        return false;        
+    }
+    
     std::uint8_t frame2cmd(const embot::hw::can::Frame &frame)
     {  
         if(frameisperiodic(frame))
@@ -180,7 +199,7 @@ namespace embot { namespace app { namespace canprotocol {
         return (frame.data[0] & 0x7F);
     }
     
-    const std::uint8_t frame2datasize(const embot::hw::can::Frame &frame)
+    std::uint8_t frame2datasize(const embot::hw::can::Frame &frame)
     {  
         if(0 == frame.size)
         {
@@ -535,7 +554,7 @@ namespace embot { namespace app { namespace canprotocol {
             if(3 == frame.size)
             {
                 info.randominvalidmask = data.datainframe[2];
-                info.randominvalidmask << 8;
+                info.randominvalidmask <<= 8;
                 info.randominvalidmask |= data.datainframe[1];
             }
           
@@ -603,11 +622,11 @@ namespace embot { namespace app { namespace canprotocol {
         } 
 
 
-        bool Message_mcpoll_GET_ADDITIONAL_INFO::load(const embot::hw::can::Frame &frame)
+        bool Message_bldr_GET_ADDITIONAL_INFO::load(const embot::hw::can::Frame &frame)
         {
             Message::set(frame);  
             
-            if(static_cast<std::uint8_t>(mcpollCMD::GET_ADDITIONAL_INFO) != frame2cmd(frame))
+            if(static_cast<std::uint8_t>(bldrCMD::GET_ADDITIONAL_INFO) != frame2cmd(frame))
             {
                 return false; 
             }
@@ -619,12 +638,12 @@ namespace embot { namespace app { namespace canprotocol {
             return true;         
         }     
 
-        std::uint8_t Message_mcpoll_GET_ADDITIONAL_INFO::numberofreplies()
+        std::uint8_t Message_bldr_GET_ADDITIONAL_INFO::numberofreplies()
         {
             return nreplies;
         }    
             
-        bool Message_mcpoll_GET_ADDITIONAL_INFO::reply(embot::hw::can::Frame &frame, const std::uint8_t sender, const ReplyInfo &replyinfo)
+        bool Message_bldr_GET_ADDITIONAL_INFO::reply(embot::hw::can::Frame &frame, const std::uint8_t sender, const ReplyInfo &replyinfo)
         {
             if(counter >= nreplies)
             {
@@ -640,7 +659,7 @@ namespace embot { namespace app { namespace canprotocol {
             dd[4] = replyinfo.info32[4*counter+3];
 
                        
-            frame_set_clascmddestinationdata(frame, Clas::pollingMotorControl, static_cast<std::uint8_t>(mcpollCMD::GET_ADDITIONAL_INFO), data.from, dd, 5);
+            frame_set_clascmddestinationdata(frame, Clas::bootloader, static_cast<std::uint8_t>(bldrCMD::GET_ADDITIONAL_INFO), data.from, dd, 5);
             frame_set_size(frame, 6);
             
             counter ++;
@@ -649,11 +668,11 @@ namespace embot { namespace app { namespace canprotocol {
         }   
         
 
-        bool Message_mcpoll_SET_ADDITIONAL_INFO::load(const embot::hw::can::Frame &frame)
+        bool Message_bldr_SET_ADDITIONAL_INFO::load(const embot::hw::can::Frame &frame)
         {
             Message::set(frame);  
             
-            if(static_cast<std::uint8_t>(mcpollCMD::SET_ADDITIONAL_INFO) != frame2cmd(frame))
+            if(static_cast<std::uint8_t>(bldrCMD::SET_ADDITIONAL_INFO) != frame2cmd(frame))
             {
                 return false; 
             }
@@ -674,21 +693,21 @@ namespace embot { namespace app { namespace canprotocol {
             return true;         
         }     
                
-        bool Message_mcpoll_SET_ADDITIONAL_INFO::reply()
+        bool Message_bldr_SET_ADDITIONAL_INFO::reply()
         {
             return false;
         }   
 
 
         
-        char Message_mcpoll_SET_ADDITIONAL_INFO2::cumulativeinfo32[32] = {0};
-        std::uint8_t Message_mcpoll_SET_ADDITIONAL_INFO2::receivedmask = 0;
+        char Message_bldr_SET_ADDITIONAL_INFO2::cumulativeinfo32[32] = {0};
+        std::uint8_t Message_bldr_SET_ADDITIONAL_INFO2::receivedmask = 0;
         
-        bool Message_mcpoll_SET_ADDITIONAL_INFO2::load(const embot::hw::can::Frame &frame)
+        bool Message_bldr_SET_ADDITIONAL_INFO2::load(const embot::hw::can::Frame &frame)
         {
             Message::set(frame);  
             
-            if(static_cast<std::uint8_t>(mcpollCMD::SET_ADDITIONAL_INFO) != frame2cmd(frame))
+            if(static_cast<std::uint8_t>(bldrCMD::SET_ADDITIONAL_INFO) != frame2cmd(frame))
             {
                 return false; 
             }
@@ -709,6 +728,8 @@ namespace embot { namespace app { namespace canprotocol {
             embot::common::bit::set(receivedmask, counter);
             std::memmove(&cumulativeinfo32[4*counter], &data.datainframe[1], 4);
             
+            info.valid = false;
+            
             if(0xff == receivedmask)
             {
                 std::memmove(info.info32, cumulativeinfo32, sizeof(info.info32));
@@ -718,7 +739,7 @@ namespace embot { namespace app { namespace canprotocol {
             return true;         
         }     
                
-        bool Message_mcpoll_SET_ADDITIONAL_INFO2::reply()
+        bool Message_bldr_SET_ADDITIONAL_INFO2::reply()
         {
             return false;
         }    

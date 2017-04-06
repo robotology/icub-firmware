@@ -31,11 +31,11 @@ namespace embot { namespace app { namespace canprotocol {
     
     enum class Clas { pollingMotorControl = 0, periodicMotorControl = 1, pollingAnalogSensor = 2, periodicAnalogSensor = 3, pollingSkin = 4, periodicInertialSensor = 5, bootloader = 7, none = 255 };
 
-    enum class bldrCMD { none = 0xfe, BROADCAST = 0xff, BOARD = 0x00, ADDRESS = 0x01, START = 0x02, DATA = 0x03, END = 0x04, SETCANADDRESS = 0x32 };
+    enum class bldrCMD { none = 0xfe, BROADCAST = 0xff, BOARD = 0x00, ADDRESS = 0x01, START = 0x02, DATA = 0x03, END = 0x04, GET_ADDITIONAL_INFO = 12, SET_ADDITIONAL_INFO = 13, SETCANADDRESS = 0x32 };
     
     enum class anypollCMD { none = 0xfe, SETID = 0x32 };
     
-    enum class mcpollCMD { none = 0xfe, GET_ADDITIONAL_INFO = 12, SET_ADDITIONAL_INFO = 13, SET_BOARD_ID = 50, GET_FIRMWARE_VERSION = 91, };
+    enum class mcpollCMD { none = 0xfe, SET_BOARD_ID = 50, GET_FIRMWARE_VERSION = 91, };
     
     enum class aspollCMD { none = 0xfe, GET_FIRMWARE_VERSION = 0x1C, SET_BOARD_ADX = 0x32 };
     
@@ -49,12 +49,32 @@ namespace embot { namespace app { namespace canprotocol {
     
     enum class Process { bootloader = 0, application = 1, unknown = 0xff };
     
+    
+    
+    struct versionOfBOOTLOADER
+    {
+        std::uint8_t    major;
+        std::uint8_t    minor;
+        versionOfBOOTLOADER() : major(0), minor(0) {};
+        versionOfBOOTLOADER(std::uint8_t ma, std::uint8_t mi) : major(ma), minor(mi) {};
+    };
+    
+    struct versionOfAPPLICATION
+    {
+        std::uint8_t    major;
+        std::uint8_t    minor;
+        std::uint8_t    build;
+        versionOfAPPLICATION() : major(0), minor(0), build(0) {};
+        versionOfAPPLICATION(std::uint8_t ma, std::uint8_t mi, std::uint8_t bu) : major(ma), minor(mi), build(bu) {};
+    };    
+    
     struct versionOfFIRMWARE
     {
         std::uint8_t    major;
         std::uint8_t    minor;
         std::uint8_t    build;
         versionOfFIRMWARE() : major(0), minor(0), build(0) {};
+        versionOfFIRMWARE(std::uint8_t ma, std::uint8_t mi, std::uint8_t bu) : major(ma), minor(mi), build(bu) {};
     };
     
     struct versionOfCANPROTOCOL
@@ -62,12 +82,13 @@ namespace embot { namespace app { namespace canprotocol {
         std::uint8_t    major;
         std::uint8_t    minor;
         versionOfCANPROTOCOL() : major(0), minor(0) {};
+        versionOfCANPROTOCOL(std::uint8_t ma, std::uint8_t mi) : major(ma), minor(mi) {};
     };
     
     Clas frame2clas(const embot::hw::can::Frame &frame);
     std::uint8_t frame2cmd(const embot::hw::can::Frame &frame);
     
-    // all teh rest
+    // all the rest
     std::uint8_t frame2sender(const embot::hw::can::Frame &frame);
     
     bool frameisbootloader(const embot::hw::can::Frame &frame);
@@ -79,8 +100,11 @@ namespace embot { namespace app { namespace canprotocol {
     std::uint8_t frame2destination(const embot::hw::can::Frame &frame);
     
     
+    bool frameis4board(const embot::hw::can::Frame &frame, const std::uint8_t boardaddress);
     
-    const std::uint8_t frame2datasize(const embot::hw::can::Frame &frame);
+    
+    
+    std::uint8_t frame2datasize(const embot::hw::can::Frame &frame);
     
     std::uint8_t* frame2databuffer(embot::hw::can::Frame &frame);
     
@@ -291,6 +315,102 @@ namespace embot { namespace app { namespace canprotocol {
         
     };  
     
+
+    class Message_bldr_GET_ADDITIONAL_INFO : public Message
+    {
+        public:
+            
+        struct Info
+        { 
+            std::uint8_t    thereisnothing;  
+            Info() : thereisnothing(0) {}
+        };
+        
+        Info info;
+        
+        struct ReplyInfo
+        {
+            char    info32[32];      
+        };
+        
+                
+        Message_bldr_GET_ADDITIONAL_INFO() : counter(0) {}
+            
+        bool load(const embot::hw::can::Frame &frame);
+         
+        // we have multiple frames ... best way is to pass a vector which is resized according to the needs.
+        // but ... memory allocation, heap, embedded systems ... i prefer to give back a frame at a time.            
+        std::uint8_t numberofreplies();
+        // i give the frames in order until max number.    
+        bool reply(embot::hw::can::Frame &frame, const std::uint8_t sender, const ReplyInfo &replyinfo);  
+
+        private:
+        
+        std::uint8_t counter;
+        const std::uint8_t nreplies = 8;
+    };    
+
+    class Message_bldr_SET_ADDITIONAL_INFO : public Message
+    {
+        public:
+            
+        struct Info
+        {
+            std::uint8_t    offset;     // 0, 4, 8, 16, 20, 24, 28. 255 is a non-valid value 
+            char            info04[4];  
+            Info() : offset(255) { }
+        };
+        
+        Info info;
+        
+                
+        Message_bldr_SET_ADDITIONAL_INFO() {}
+            
+        bool load(const embot::hw::can::Frame &frame);
+         
+        // we need to receive 8 frames to be able to have a complete 32 bytes long info32. we operate in memory-less mode.
+        // each time we recover only a fraction of info32[].
+        // we could operate differently, but maybe for later: use of a static char info32[32] array and a static flag08.
+        // when we received counter = 0, then we reset info32[] and flag08. then we fill the 4 bytes into info32 and set the
+        // bit of pos counter. when all bits are on, we fill Info::info32[] and set Info::ready = true.
+            
+        bool reply(); // none 
+
+    };  
+
+
+    class Message_bldr_SET_ADDITIONAL_INFO2 : public Message
+    {
+        public:
+            
+        struct Info
+        {
+            bool        valid;     
+            char        info32[32];  
+            Info() : valid(false) { }
+        };
+        
+        Info info;
+        
+                
+        Message_bldr_SET_ADDITIONAL_INFO2() {}
+            
+        bool load(const embot::hw::can::Frame &frame);
+         
+        // we need to receive 8 frames to be able to have a complete 32 bytes long info32. we operate in memory-less mode.
+        // each time we recover only a fraction of info32[].
+        // we could operate differently, but maybe for later: use of a static char info32[32] array and a static flag08.
+        // when we received counter = 0, then we reset info32[] and flag08. then we fill the 4 bytes into info32 and set the
+        // bit of pos counter. when all bits are on, we fill Info::info32[] and set Info::ready = true.
+            
+        bool reply(); // none 
+            
+        private:
+            
+        static char cumulativeinfo32[32];
+        static std::uint8_t receivedmask;
+    };  
+
     
     class Message_bldr_SETCANADDRESS : public Message
     {
@@ -365,101 +485,6 @@ namespace embot { namespace app { namespace canprotocol {
             Message_base_GET_FIRMWARE_VERSION(Clas::pollingAnalogSensor, static_cast<std::uint8_t>(aspollCMD::GET_FIRMWARE_VERSION)) {}
        
     }; 
-
-    class Message_mcpoll_GET_ADDITIONAL_INFO : public Message
-    {
-        public:
-            
-        struct Info
-        { 
-            std::uint8_t    thereisnothing;  
-            Info() : thereisnothing(0) {}
-        };
-        
-        Info info;
-        
-        struct ReplyInfo
-        {
-            char    info32[32];      
-        };
-        
-                
-        Message_mcpoll_GET_ADDITIONAL_INFO() : counter(0) {}
-            
-        bool load(const embot::hw::can::Frame &frame);
-         
-        // we have multiple frames ... best way is to pass a vector which is resized according to the needs.
-        // but ... memory allocation, heap, embedded systems ... i prefer to give back a frame at a time.            
-        std::uint8_t numberofreplies();
-        // i give the frames in order until max number.    
-        bool reply(embot::hw::can::Frame &frame, const std::uint8_t sender, const ReplyInfo &replyinfo);  
-
-        private:
-        
-        std::uint8_t counter;
-        const std::uint8_t nreplies = 8;
-    };    
-
-    class Message_mcpoll_SET_ADDITIONAL_INFO : public Message
-    {
-        public:
-            
-        struct Info
-        {
-            std::uint8_t    offset;     // 0, 4, 8, 16, 20, 24, 28. 255 is a non-valid value 
-            char            info04[4];  
-            Info() : offset(255) { }
-        };
-        
-        Info info;
-        
-                
-        Message_mcpoll_SET_ADDITIONAL_INFO() {}
-            
-        bool load(const embot::hw::can::Frame &frame);
-         
-        // we need to receive 8 frames to be able to have a complete 32 bytes long info32. we operate in memory-less mode.
-        // each time we recover only a fraction of info32[].
-        // we could operate differently, but maybe for later: use of a static char info32[32] array and a static flag08.
-        // when we received counter = 0, then we reset info32[] and flag08. then we fill the 4 bytes into info32 and set the
-        // bit of pos counter. when all bits are on, we fill Info::info32[] and set Info::ready = true.
-            
-        bool reply(); // none 
-
-    };  
-
-
-    class Message_mcpoll_SET_ADDITIONAL_INFO2 : public Message
-    {
-        public:
-            
-        struct Info
-        {
-            bool        valid;     
-            char        info32[32];  
-            Info() : valid(false) { }
-        };
-        
-        Info info;
-        
-                
-        Message_mcpoll_SET_ADDITIONAL_INFO2() {}
-            
-        bool load(const embot::hw::can::Frame &frame);
-         
-        // we need to receive 8 frames to be able to have a complete 32 bytes long info32. we operate in memory-less mode.
-        // each time we recover only a fraction of info32[].
-        // we could operate differently, but maybe for later: use of a static char info32[32] array and a static flag08.
-        // when we received counter = 0, then we reset info32[] and flag08. then we fill the 4 bytes into info32 and set the
-        // bit of pos counter. when all bits are on, we fill Info::info32[] and set Info::ready = true.
-            
-        bool reply(); // none 
-            
-        private:
-            
-        static char cumulativeinfo32[32];
-        static std::uint8_t receivedmask;
-    };  
 
 
     
