@@ -28,7 +28,7 @@
 #include "embot_sys.h"
 
 
-//#include <vector>
+#include <vector>
 
 namespace embot { namespace app { namespace bootloader {
            
@@ -60,7 +60,7 @@ namespace embot { namespace app { namespace bootloader {
         // thus we dont need to use a vector ... but if we decide to support multiple replies ... 
         // in any case, if we must transmit we return true
         //bool process(const embot::hw::can::Frame &frame, vector<embot::hw::can::Frame> &replies);
-        bool process(const embot::hw::can::Frame &frame, embot::hw::can::Frame &reply);
+        bool process(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);
 
     private:
         theCANparser(); 
