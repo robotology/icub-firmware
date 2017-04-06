@@ -24,6 +24,7 @@
 #include "embot_common.h"
 
 #include "embot_sys.h"
+#include "embot_hw.h"
 
 
 
@@ -40,12 +41,43 @@ namespace embot { namespace app {
         }
                
     public:
+        
+        struct StackSizes
+        {   
+            std::uint16_t       tasksysteminit;
+            std::uint16_t       taskonidle; 
+            StackSizes() : tasksysteminit(2048), taskonidle(512) {}  
+            StackSizes(std::uint16_t sys, std::uint16_t idl) : tasksysteminit(sys), taskonidle(idl) {}                 
+        };
+        
+        struct UserDefOperations
+        {   
+            embot::common::Callback     atsysteminit;
+            embot::common::Callback     onidle; 
+            embot::common::Callback     onfatalerror;
+            UserDefOperations() : atsysteminit(nullptr, nullptr), onidle(nullptr, nullptr), onfatalerror(nullptr, nullptr) {}
+            UserDefOperations(const embot::common::Callback &atsys, const embot::common::Callback &onid, const embot::common::Callback &onerr) : 
+                        atsysteminit(atsys), onidle(onid), onfatalerror(onerr) 
+                        {}                   
+        };
+        
         struct Config
-        {
+        {            
             embot::common::relTime              osaltickperiod;
-            embot::common::Callback             userdeflauncher;
-            Config() : osaltickperiod(embot::common::time1millisec), userdeflauncher(nullptr, nullptr) {}
-            Config(embot::common::relTime _osaltickperiod, embot::common::fpCallback _userdeflauncher, void* _param) : osaltickperiod(_osaltickperiod), userdeflauncher(_userdeflauncher, _param) {}
+            StackSizes                          stacksizes;
+            UserDefOperations                   operations;
+            std::uint32_t                       addressofapplication;
+            Config() :
+                        osaltickperiod(embot::common::time1millisec),
+                        // for structs we rely on their default ctor
+                        addressofapplication(embot::hw::sys::addressOfApplication)
+                        {}
+            Config(embot::common::relTime _osaltickperiod, const StackSizes &_stacksizes, const UserDefOperations &_operations, std::uint32_t address = embot::hw::sys::addressOfApplication) :
+                        osaltickperiod(_osaltickperiod), 
+                        stacksizes(_stacksizes), 
+                        operations(_operations),
+                        addressofapplication(address)            
+                        {}
         }; 
                       
         void execute(Config &config); // it never returns ..

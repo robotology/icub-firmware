@@ -46,9 +46,8 @@ struct embot::app::theApplication::Impl
     Config config;
     
     Impl() 
-    {              
-        config.userdeflauncher.callback = nullptr;
-        config.userdeflauncher.arg = nullptr;
+    {
+
     }
             
     static void onidle(void);    
@@ -77,26 +76,32 @@ void embot::app::theApplication::execute(Config &config)
     pImpl->config = config;
     
     // now we init the hw, we start the scheduler, we start a countdown with sys restart at the end ... we exec the activity ...
-    //embot::hw::sys::relocatevectortable(embot::hw::sys::addressOfApplication - embot::hw::sys::startOfFLASH);
+    if(pImpl->config.addressofapplication > embot::hw::sys::startOfFLASH)
+    {
+        std::uint32_t vectorlocation = pImpl->config.addressofapplication - embot::hw::sys::startOfFLASH;
+        if(0 != vectorlocation)
+        {
+            embot::hw::sys::relocatevectortable(vectorlocation);
+        }
+    }
     
     embot::hw::bsp::Config cc;
     cc.get1mstick = embot::sys::millisecondsNow;
     embot::hw::bsp::init(cc);
     
     
-    embot::sys::theScheduler &thesystem = embot::sys::theScheduler::getInstance();
+    embot::sys::theScheduler &thescheduler = embot::sys::theScheduler::getInstance();
     embot::sys::theScheduler::Config cfg;
     cfg.launcher = embot::app::theApplication::Impl::osalstarter;
-    cfg.launcherstacksize = 2048;
+    cfg.launcherstacksize = pImpl->config.stacksizes.tasksysteminit;
     cfg.onidle = embot::app::theApplication::Impl::onidle;
-//    cfg.onidle = onIdle;
-    cfg.onidlestacksize = 512;
+    cfg.onidlestacksize = pImpl->config.stacksizes.taskonidle;
     cfg.onfatalerror = embot::app::theApplication::Impl::onfatal;
     cfg.clockfrequency = embot::hw::sys::clock();
     cfg.ticktime = config.osaltickperiod;
     
-    thesystem.init(cfg);
-    thesystem.start();    
+    thescheduler.init(cfg);
+    thescheduler.start();    
 
     for(;;);
 }
@@ -105,18 +110,26 @@ void embot::app::theApplication::execute(Config &config)
 
 void embot::app::theApplication::Impl::onidle(void)
 {
-    
+    embot::app::theApplication &handle = embot::app::theApplication::getInstance();
+    if(nullptr != handle.pImpl->config.operations.onidle.callback)
+    {
+        handle.pImpl->config.operations.onidle.callback(handle.pImpl->config.operations.onidle.arg);
+    }    
 }
 
 void embot::app::theApplication::Impl::onfatal(void)
 {
-    
+    embot::app::theApplication &handle = embot::app::theApplication::getInstance();
+    if(nullptr != handle.pImpl->config.operations.onfatalerror.callback)
+    {
+        handle.pImpl->config.operations.onfatalerror.callback(handle.pImpl->config.operations.onfatalerror.arg);
+    }     
 }
 
 
 void embot::app::theApplication::Impl::osalstarter(void)
 {
-    embot::app::theApplication &handle  = embot::app::theApplication::getInstance();
+    embot::app::theApplication &handle = embot::app::theApplication::getInstance();
     
     embot::sys::theTimerManager& tmrman = embot::sys::theTimerManager::getInstance();
 
@@ -129,9 +142,9 @@ void embot::app::theApplication::Impl::osalstarter(void)
     cbkman.start();    
     
 
-    if (nullptr != handle.pImpl->config.userdeflauncher.callback)
+    if(nullptr != handle.pImpl->config.operations.atsysteminit.callback)
     {
-        handle.pImpl->config.userdeflauncher.callback(handle.pImpl->config.userdeflauncher.arg);
+        handle.pImpl->config.operations.atsysteminit.callback(handle.pImpl->config.operations.atsysteminit.arg);
     }
       
 }
