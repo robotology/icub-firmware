@@ -138,7 +138,6 @@ namespace embot { namespace app { namespace canprotocol {
         {
             case Clas::pollingMotorControl:         ret = true;     break;
             case Clas::pollingAnalogSensor:         ret = true;     break;
-            case Clas::pollingSkin:                 ret = true;     break;
             default:                                ret = false;    break;            
         }
         return ret;
@@ -152,6 +151,7 @@ namespace embot { namespace app { namespace canprotocol {
             case Clas::periodicMotorControl:        ret = true;     break;
             case Clas::periodicAnalogSensor:        ret = true;     break;
             case Clas::periodicInertialSensor:      ret = true;     break;
+            case Clas::periodicSkin:                ret = true;     break;
             default:                                ret = false;    break;            
         }
         return ret;
@@ -242,8 +242,7 @@ namespace embot { namespace app { namespace canprotocol {
         switch(cls)
         {
             case Clas::pollingMotorControl:
-            case Clas::pollingAnalogSensor: 
-            case Clas::pollingSkin:      
+            case Clas::pollingAnalogSensor:   
             case Clas::bootloader:
             {
                 // destination is in id-0xf, cmd is in data[0]
@@ -274,7 +273,8 @@ namespace embot { namespace app { namespace canprotocol {
 
             case Clas::periodicMotorControl:
             case Clas::periodicAnalogSensor: 
-            case Clas::periodicInertialSensor:      
+            case Clas::periodicInertialSensor:    
+            case Clas::periodicSkin:                    
             {
                 // destination is not present, cmd is in 0x0000000F
                 frame.id &= ~0x0000000F;

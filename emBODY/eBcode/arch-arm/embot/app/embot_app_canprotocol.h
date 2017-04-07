@@ -29,7 +29,7 @@
 
 namespace embot { namespace app { namespace canprotocol {
     
-    enum class Clas { pollingMotorControl = 0, periodicMotorControl = 1, pollingAnalogSensor = 2, periodicAnalogSensor = 3, pollingSkin = 4, periodicInertialSensor = 5, bootloader = 7, none = 255 };
+    enum class Clas { pollingMotorControl = 0, periodicMotorControl = 1, pollingAnalogSensor = 2, periodicAnalogSensor = 3, periodicSkin = 4, periodicInertialSensor = 5, bootloader = 7, none = 255 };
 
     enum class bldrCMD { none = 0xfe, BROADCAST = 0xff, BOARD = 0x00, ADDRESS = 0x01, START = 0x02, DATA = 0x03, END = 0x04, GET_ADDITIONAL_INFO = 12, SET_ADDITIONAL_INFO = 13, SETCANADDRESS = 0x32 };
     
