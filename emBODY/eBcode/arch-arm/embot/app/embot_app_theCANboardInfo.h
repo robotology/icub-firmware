@@ -51,14 +51,13 @@ namespace embot { namespace app {
             std::uint8_t        bootloaderVmajor;
             std::uint8_t        bootloaderVminor;
             std::uint8_t        info32[32];
-            std::uint8_t        applmajor;
             std::uint8_t        applicationVmajor;
             std::uint8_t        applicationVminor;
             std::uint8_t        applicationVbuild;
             std::uint8_t        protocolVmajor;
             std::uint8_t        protocolVminor;
             
-            std::uint8_t        tobefilled[18];
+            std::uint8_t        tobefilled[3];  // to make the size of struct ... multiple of 8.
         }; 
         
         

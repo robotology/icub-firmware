@@ -33,10 +33,15 @@ static const embot::app::theApplication::StackSizes stacksizes =  { 2048, 512 };
 
 static const embot::app::theApplication::UserDefOperations operations = { atsysteminit, onidle, {nullptr, nullptr} };
 
+#if defined(APPL_TESTZEROOFFSET)
+static const std::uint32_t address = embot::hw::sys::addressOfBootloader;
+#else
+static const std::uint32_t address = embot::hw::sys::addressOfApplication;
+#endif
 
 int main(void)
 { 
-    embot::app::theApplication::Config config(embot::common::time1millisec, stacksizes, operations, embot::hw::sys::addressOfApplication);
+    embot::app::theApplication::Config config(embot::common::time1millisec, stacksizes, operations, address);
     embot::app::theApplication &appl = embot::app::theApplication::getInstance();    
     
     appl.execute(config);  
@@ -126,8 +131,6 @@ static void eventbasedtask_init(embot::sys::Task *t, void *p)
 
 static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::Event evt, void *p)
 {  
-
-#warning BUTUSEISSETEVT for checking teh event 
     
     if(evRXcanframe == evt)
     {        
