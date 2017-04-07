@@ -55,6 +55,7 @@ namespace embot { namespace common {
     const relTime timeWaitForever   = 0xffffffff;
     
     using Event = std::uint32_t;
+    using EventMask = std::uint32_t;
     using Message = std::uint32_t;
             
 } } // namespace embot { namespace common
@@ -97,27 +98,27 @@ namespace embot { namespace common { namespace bit {
 namespace embot { namespace common { namespace msk {
         
     template<typename T>
-    void set(T &dst, const T msk)
+    void set(T &value, const T flags)
     {
-        dst |= msk;
+        value |= flags;
     }
     
     template<typename T>
-    void clear(T &dst, const T msk)
+    void clear(T &value, const T flags)
     {
-        dst &= (~(msk));
+        value &= (~(flags));
     }
     
     template<typename T>
-    void toggle(T &dst, const T msk)
+    void toggle(T &value, const T flags)
     {
-        dst ^= (msk);
+        value ^= (flags);
     }
     
     template<typename T>
-    bool check(const T value, const T msk)
+    bool check(const T value, const T flags)
     {
-        if(msk == (value & msk))
+        if(flags == (value & flags))
         {
             return true;
         }

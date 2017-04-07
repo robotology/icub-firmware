@@ -94,7 +94,7 @@ struct embot::sys::Task::Impl0
         
         if(nullptr != t->pImpl0->oneventFP0)
         {
-            t->pImpl0->oneventFP0(t, static_cast<embot::common::Event>(evtmsgper), t->pImpl0->param); 
+            t->pImpl0->oneventFP0(t, static_cast<embot::common::EventMask>(evtmsgper), t->pImpl0->param); 
         }    
     }  
 

@@ -39,7 +39,7 @@ namespace embot { namespace sys {
         
         using fpNameOfTask = void (*)(void *);
         using fpStartup = void (*)(Task *, void *);                
-        using fpOnEvent = void (*)(Task *, common::Event, void *);
+        using fpOnEvent = void (*)(Task *, common::EventMask, void *);
         using fpOnMessage = void (*)(Task *, common::Message, void *);
         using fpPeriodicActivity = void (*)(Task *, void *);
                              
