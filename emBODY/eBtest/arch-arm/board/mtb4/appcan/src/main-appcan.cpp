@@ -75,10 +75,14 @@ static void userdeflauncher(void* param)
 
 
 
-static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::Event evt, void *p);
+static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask evtmsk, void *p);
 static void eventbasedtask_init(embot::sys::Task *t, void *p);
 
 static const embot::common::Event evRXcanframe = 0x00000001;
+static const embot::common::Event evSKINprocess = 0x00000002;
+static const embot::common::Event evIMUprocess = 0x00000004;
+
+static const std::uint8_t maxOUTcanframes = 48;
 
 static embot::sys::EventTask* eventbasedtask = nullptr;
 
@@ -87,8 +91,7 @@ static void alerteventbasedtask(void *arg);
 static std::vector<embot::hw::can::Frame> outframes;
 
 static void start_evt_based(void)
-{
- 
+{ 
     // start task waiting for can messages. 
     eventbasedtask = new embot::sys::EventTask;  
     const embot::common::relTime waitEventTimeout = 50*1000; //50*1000; //5*1000*1000;    
@@ -103,7 +106,7 @@ static void start_evt_based(void)
     // before the eventbasedtask is created.
     embot::hw::result_t r = embot::hw::resNOK;
     embot::hw::can::Config canconfig; // default is tx/rxcapacity=8
-    canconfig.txcapacity = 12;
+    canconfig.txcapacity = maxOUTcanframes;
     canconfig.onrxframe = embot::common::Callback(alerteventbasedtask, nullptr); 
     r = embot::hw::can::init(embot::hw::can::Port::one, canconfig);
     r = r;
@@ -124,40 +127,84 @@ static void eventbasedtask_init(embot::sys::Task *t, void *p)
     embot::hw::result_t r = embot::hw::can::enable(embot::hw::can::Port::one);  
     r = r;  
 
-    outframes.reserve(12);
+    outframes.reserve(maxOUTcanframes);
+    #warning --> we should init the objects which holds outframes with maxOUTcanframes ... so that no more than maxOUTcanframes are pushed_back
 }
     
 
 
-static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::Event evt, void *p)
-{  
+static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask eventmask, void *p)
+{     
+    if(0 == eventmask)
+    {   // timeout ... 
+        return;
+    }
     
-    if(evRXcanframe == evt)
+    // we clear the frames to be trasmitted
+    outframes.clear();      
+    
+    
+    if(true == embot::common::msk::check(eventmask, evRXcanframe))
     {        
         embot::hw::can::Frame frame;
-        std::uint8_t remaining = 0;
-        if(embot::hw::resOK == embot::hw::can::get(embot::hw::can::Port::one, frame, remaining))
-        {
-            outframes.clear();            
-            embot::app::application::theCANparserBasic &canparser = embot::app::application::theCANparserBasic::getInstance();
-            if(true == canparser.process(frame, outframes))
-            {
-                std::uint8_t num = outframes.size();
-                for(std::uint8_t i=0; i<num; i++)
-                {
-                    embot::hw::can::put(embot::hw::can::Port::one, outframes[i]);                                       
-                }
-
-                embot::hw::can::transmit(embot::hw::can::Port::one);
-                
+        std::uint8_t remainingINrx = 0;
+        if(embot::hw::resOK == embot::hw::can::get(embot::hw::can::Port::one, frame, remainingINrx))
+        {            
+            embot::app::application::theCANparserBasic &canparserbasic = embot::app::application::theCANparserBasic::getInstance();
+            // process w/ the basic parser, if not recognised call the parse specific of the board
+            if(true == canparserbasic.process(frame, outframes))
+            {                   
             }
+//            else if(true == canparsermtb4.process(frame, outframe)
+//            {               
+//            }
+            
 
-            if(remaining > 0)
+            
+            if(remainingINrx > 0)
             {
                 eventbasedtask->setEvent(evRXcanframe);                 
             }
         }        
     }
+    
+    if(true == embot::common::msk::check(eventmask, evSKINprocess))
+    {
+        // we operate on the skin triangles by calling a skin.process(outframes);
+        // the evSKprocess is emitted  by:
+        // 1. a periodic timer started at the reception of a specific message.
+        // 2. internally to skin.process() if a new tick is required
+
+        // the .process(outframes) will do whatever it needs to do and it may emit some 
+        // can frames for transmission. the can frames can be up to 16x2 = 32.
+        // hence, how many packets? max of replies = 8 + max of broadcast = 32 --> 40.
+        
+    }
+    
+    if(true == embot::common::msk::check(eventmask, evIMUprocess))
+    {
+        // we operate on the IMU  by calling a imu.process(outframes);
+        // the evIMUprocess is emitted  by:
+        // 1. a periodic timer started at the reception of a specific message.
+        // 2. internally to imu.process() if a new tick is required (the IMU is read with DMA, whose interrupt triggers a send-event
+
+        // the .process(outframes) will do whatever it needs to do and it may emit some 
+        // can frames for transmission. the can frames can be up to ?.
+        // hence, how many packets? 40 + ? = 48.
+        
+    }
+    
+    // if we have any packet we transmit them
+    std::uint8_t num = outframes.size();
+    if(num > 0)
+    {
+        for(std::uint8_t i=0; i<num; i++)
+        {
+            embot::hw::can::put(embot::hw::can::Port::one, outframes[i]);                                       
+        }
+
+        embot::hw::can::transmit(embot::hw::can::Port::one);  
+    } 
  
 }
 
