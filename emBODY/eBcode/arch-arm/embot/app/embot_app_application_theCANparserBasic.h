@@ -52,6 +52,7 @@ namespace embot { namespace app { namespace application {
         
         bool initialise(Config &config); 
         
+        // returns true if the canframe has been recognised. if so, any reply is sent if replies.size() > 0
         bool process(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);
 
     private:

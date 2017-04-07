@@ -53,6 +53,7 @@ struct embot::app::application::theCANparserBasic::Impl
     Config config;
     
     bool txframe;
+    bool recognised;
     
     embot::app::canprotocol::Clas cls;
     std::uint8_t cmd;
@@ -68,7 +69,8 @@ struct embot::app::application::theCANparserBasic::Impl
     
 
     Impl() 
-    {              
+    {   
+        recognised = false;        
         txframe = false;
         cls = embot::app::canprotocol::Clas::none;
         cmd = 0;
@@ -151,17 +153,19 @@ struct embot::app::application::theCANparserBasic::Impl
 bool embot::app::application::theCANparserBasic::Impl::process(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
 {
     txframe = false;
+    recognised = false;
     
     if(false == embot::app::canprotocol::frameis4board(frame, canaddress))
     {
-        return false;
+        recognised = false;
+        return recognised;
     }
         
     // now get cls and cmd
     cls = embot::app::canprotocol::frame2clas(frame);
     cmd = embot::app::canprotocol::frame2cmd(frame);
     
-    replies.clear();
+//    replies.clear(); i dont want to clear because we may have others inside which i dont want to lose
     
     // the basic can handle only some messages ...
     
@@ -173,25 +177,30 @@ bool embot::app::application::theCANparserBasic::Impl::process(const embot::hw::
 
             if(static_cast<std::uint8_t>(embot::app::canprotocol::bldrCMD::BOARD) == cmd)
             {
-                txframe = process_bl_board_appl(frame, replies);      
+                txframe = process_bl_board_appl(frame, replies);   
+                recognised = true;
                 // then restart ...
                 embot::hw::sys::reset();
             }
             else if(static_cast<std::uint8_t>(embot::app::canprotocol::bldrCMD::BROADCAST) == cmd)
             {
-                txframe = process_bl_broadcast_appl(frame, replies);                                
+                txframe = process_bl_broadcast_appl(frame, replies);   
+                recognised = true;                
             }
             else if(static_cast<std::uint8_t>(embot::app::canprotocol::bldrCMD::SETCANADDRESS) == cmd)
             {
-                txframe = process_bl_setcanaddress(frame, replies);                
+                txframe = process_bl_setcanaddress(frame, replies);  
+                recognised = true;                
             } 
             else if(static_cast<std::uint8_t>(embot::app::canprotocol::bldrCMD::GET_ADDITIONAL_INFO) == cmd)
             {
-                txframe = process_bl_getadditionalinfo(frame, replies);                
+                txframe = process_bl_getadditionalinfo(frame, replies);   
+                recognised = true;                
             } 
             else if(static_cast<std::uint8_t>(embot::app::canprotocol::bldrCMD::SET_ADDITIONAL_INFO) == cmd)
             {
-                txframe = process_bl_setadditionalinfo(frame, replies);                
+                txframe = process_bl_setadditionalinfo(frame, replies);
+                recognised = true;                
             }                     
              
         } break;
@@ -203,10 +212,12 @@ bool embot::app::application::theCANparserBasic::Impl::process(const embot::hw::
             if(static_cast<std::uint8_t>(embot::app::canprotocol::aspollCMD::SET_BOARD_ADX) == cmd)
             {
                 txframe = process_setid(cls, cmd, frame, replies);
+                recognised = true;
             }
             else if(static_cast<std::uint8_t>(embot::app::canprotocol::aspollCMD::GET_FIRMWARE_VERSION) == cmd)
             {
                 txframe = process_getfirmwareversion(cls, cmd, frame, replies);
+                recognised = true;
             }
  
         } break;
@@ -217,10 +228,12 @@ bool embot::app::application::theCANparserBasic::Impl::process(const embot::hw::
             if(static_cast<std::uint8_t>(embot::app::canprotocol::mcpollCMD::SET_BOARD_ID) == cmd)
             {
                 txframe = process_setid(cls, cmd, frame, replies);
+                recognised = true;
             }
             else if(static_cast<std::uint8_t>(embot::app::canprotocol::mcpollCMD::GET_FIRMWARE_VERSION) == cmd)
             {
                 txframe = process_getfirmwareversion(cls, cmd, frame, replies);
+                recognised = true;
             }
  
         } break;
@@ -228,11 +241,12 @@ bool embot::app::application::theCANparserBasic::Impl::process(const embot::hw::
         default:
         {
             txframe = false;
+            recognised = false;
         } break;
     }    
     
     
-    return txframe;
+    return recognised;
 }
 
 
