@@ -888,6 +888,16 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\slim_retarget_io.c</FilePath>
             </File>
+            <File>
+              <FileName>embot_app_application_theCANparserMTB.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_application_theCANparserMTB.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_application_theSkin.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_application_theSkin.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1864,6 +1874,16 @@
               <FileName>slim_retarget_io.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\slim_retarget_io.c</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_application_theCANparserMTB.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_application_theCANparserMTB.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_application_theSkin.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_application_theSkin.cpp</FilePath>
             </File>
           </Files>
         </Group>

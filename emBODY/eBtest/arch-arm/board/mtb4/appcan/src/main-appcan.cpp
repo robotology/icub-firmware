@@ -16,6 +16,9 @@
 
 #include "embot_app_application_theCANparserBasic.h"
 
+#include "embot_app_application_theCANparserMTB.h"
+
+#include "embot_app_application_theSkin.h"
 
 
 
@@ -97,10 +100,20 @@ static void start_evt_based(void)
     const embot::common::relTime waitEventTimeout = 50*1000; //50*1000; //5*1000*1000;    
     eventbasedtask->init(eventbasedtask_init, eventbasedtask_onevent, 4*1024, 200, waitEventTimeout, nullptr, nullptr);    
         
-    // start canparser
-    embot::app::application::theCANparserBasic &canparser = embot::app::application::theCANparserBasic::getInstance();
-    embot::app::application::theCANparserBasic::Config config;
-    canparser.initialise(config);  
+    // start canparser basic + mtb
+    embot::app::application::theCANparserBasic &canparserbasic = embot::app::application::theCANparserBasic::getInstance();
+    embot::app::application::theCANparserBasic::Config configbasic;
+    canparserbasic.initialise(configbasic);  
+    
+    embot::app::application::theCANparserMTB &canparsermtb = embot::app::application::theCANparserMTB::getInstance();
+    embot::app::application::theCANparserMTB::Config configmtb;
+    canparsermtb.initialise(configmtb);  
+    
+    embot::app::application::theSkin &theskin = embot::app::application::theSkin::getInstance();
+    embot::app::application::theSkin::Config configskin;
+    configskin.tickevent = evSKINprocess;
+    configskin.totask = eventbasedtask;
+    theskin.initialise(configskin);      
 
     // finally start can. i keep it as last because i dont want that the isr-handler calls its onrxframe() 
     // before the eventbasedtask is created.
@@ -151,15 +164,14 @@ static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask
         if(embot::hw::resOK == embot::hw::can::get(embot::hw::can::Port::one, frame, remainingINrx))
         {            
             embot::app::application::theCANparserBasic &canparserbasic = embot::app::application::theCANparserBasic::getInstance();
+            embot::app::application::theCANparserMTB &canparsermtb = embot::app::application::theCANparserMTB::getInstance();
             // process w/ the basic parser, if not recognised call the parse specific of the board
             if(true == canparserbasic.process(frame, outframes))
             {                   
             }
-//            else if(true == canparsermtb4.process(frame, outframe)
-//            {               
-//            }
-            
-
+            else if(true == canparsermtb.process(frame, outframes))
+            {               
+            }
             
             if(remainingINrx > 0)
             {
@@ -170,6 +182,9 @@ static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask
     
     if(true == embot::common::msk::check(eventmask, evSKINprocess))
     {
+        embot::app::application::theSkin &theskin = embot::app::application::theSkin::getInstance();
+        theskin.tick(outframes);
+        
         // we operate on the skin triangles by calling a skin.process(outframes);
         // the evSKprocess is emitted  by:
         // 1. a periodic timer started at the reception of a specific message.
