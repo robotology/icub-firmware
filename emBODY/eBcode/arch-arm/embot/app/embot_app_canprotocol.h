@@ -37,7 +37,7 @@ namespace embot { namespace app { namespace canprotocol {
     
     enum class mcpollCMD { none = 0xfe, SET_BOARD_ID = 50, GET_FIRMWARE_VERSION = 91, };
     
-    enum class aspollCMD { none = 0xfe, GET_FIRMWARE_VERSION = 0x1C, SET_BOARD_ADX = 0x32 };
+    enum class aspollCMD { none = 0xfe, SET_TXMODE = 0x07, GET_FIRMWARE_VERSION = 0x1C, SET_BOARD_ADX = 0x32, SKIN_SET_BRD_CFG = 77, SKIN_SET_TRIANG_CFG = 80 };
     
     bldrCMD cmd2bldr(std::uint8_t cmd);
     aspollCMD cmd2aspoll(std::uint8_t cmd);
@@ -487,27 +487,6 @@ namespace embot { namespace app { namespace canprotocol {
     }; 
 
 
-    
-//    class Message_anypoll_SETID : public Message
-//    {
-//        public:
-//            
-//        struct Info
-//        { 
-//            std::uint8_t    id;  
-//            Info() : id(0) {}
-//        };
-//        
-//        Info info;
-//        
-//        Message_anypoll_SETID(){}
-//            
-//        bool load(const embot::hw::can::Frame &frame);
-//            
-//        bool reply();   // none
-//        
-//    };  
-
 
     class Message_base_SET_ID : public Message
     {
@@ -553,6 +532,81 @@ namespace embot { namespace app { namespace canprotocol {
        
     }; 
     
+    
+    class Message_aspoll_SET_TXMODE : public Message
+    {
+        public:
+            
+        Board board;    // strain, strain2, mtb, mtb4 (but also mais could be ...).
+            
+        // use it if we have a Board::strain or Board::strain2
+        enum class StrainMode { txCalibrated = 0, acquireOnly = 1, txUncalibrated = 3, txAll = 4, none = 254 };
+            
+        struct Info
+        { 
+            bool            transmit;  
+            StrainMode      strainmode;            
+            Info() : transmit(false), strainmode(StrainMode::none) {}
+        };
+        
+        Info info;
+        
+        Message_aspoll_SET_TXMODE(Board brd) : board(brd) {}
+            
+        bool load(const embot::hw::can::Frame &frame);
+            
+        bool reply();   // none
+        
+    };
+    
+    
+    class Message_aspoll_SKIN_SET_BRDCFG : public Message
+    {
+        public:
+            
+        enum class SkinType { withTemperatureCompensation = 0, palmFingerTip = 1, withoutTempCompensation = 2, none = 254 };
+                        
+        struct Info
+        { 
+            SkinType                    skintype;  
+            std::uint8_t                noload; 
+            embot::common::relTime      txperiod;              
+            Info() : skintype(SkinType::none), noload(0), txperiod(50*embot::common::time1millisec) {}
+        };
+        
+        Info info;
+        
+        Message_aspoll_SKIN_SET_BRDCFG() {}
+            
+        bool load(const embot::hw::can::Frame &frame);
+            
+        bool reply();   // none
+        
+    };    
+    
+    class Message_aspoll_SKIN_SET_TRIANG_CFG : public Message
+    {
+        public:
+            
+        struct Info
+        { 
+            std::uint8_t                trgStart;  
+            std::uint8_t                trgEnd;  
+            std::uint8_t                shift; 
+            std::uint8_t                flags;
+            std::uint8_t                cdcOffset;
+            Info() : trgStart(0), trgEnd(0), shift(0), flags(0), cdcOffset(0) {}
+        };
+        
+        Info info;
+        
+        Message_aspoll_SKIN_SET_TRIANG_CFG() {}
+            
+        bool load(const embot::hw::can::Frame &frame);
+            
+        bool reply();   // none
+        
+    };   
     
 }}} // namespace embot { namespace app { namespace canprotocol {
 

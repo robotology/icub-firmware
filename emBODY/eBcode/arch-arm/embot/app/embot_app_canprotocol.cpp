@@ -565,29 +565,7 @@ namespace embot { namespace app { namespace canprotocol {
         {
             return false;
         }    
-        
-        
-//        bool Message_anypoll_SETID::load(const embot::hw::can::Frame &frame)
-//        {
-//            Message::set(frame);  
-//            
-//            if(static_cast<std::uint8_t>(anypollCMD::SETID) != frame2cmd(frame))
-//            {
-//                return false; 
-//            }
-//            
-//            info.id = data.datainframe[0];
-//          
-//            return true;         
-//        }                    
-//            
-//        bool Message_anypoll_SETID::reply()
-//        {
-//            return false;
-//        }         
-        
-       
-        
+               
         
         bool Message_base_GET_FIRMWARE_VERSION::load(const embot::hw::can::Frame &frame)
         {
@@ -763,8 +741,145 @@ namespace embot { namespace app { namespace canprotocol {
         bool Message_base_SET_ID::reply()
         {
             return false;
-        }   
+        } 
+
+
+       
+        bool Message_aspoll_SET_TXMODE::load(const embot::hw::can::Frame &frame)
+        {
+            Message::set(frame);  
+            
+            if(static_cast<std::uint8_t>(aspollCMD::SET_TXMODE) != frame2cmd(frame))
+            {
+                return false; 
+            }
+            
+            switch(board)
+            {
+                case Board::mtb:
+                case Board::mtb4:
+                {
+                    // according to protocol, we may have 0 (icubCanProto_as_sigmode_signal) or 1 (icubCanProto_as_sigmode_dontsignal)
+                    info.transmit = (0 == data.datainframe[0]) ? true : false;
+                    info.strainmode = StrainMode::none;
+                } break;
+                
+                case Board::strain:
+                case Board::strain2:
+                {
+                    // according to protocol, we may have 0 (eoas_strainmode_txcalibrateddatacontinuously), 1 (eoas_strainmode_acquirebutdonttx),
+                    // 3 (eoas_strainmode_txuncalibrateddatacontinuously), or 4 (eoas_strainmode_txalldatacontinuously)
+                    if(0 == data.datainframe[0])    
+                    {
+                        info.transmit = true;                        
+                        info.strainmode = StrainMode::txCalibrated;
+                    }
+                    else if(1 == data.datainframe[0])       
+                    {
+                        info.transmit = false;
+                        info.strainmode = StrainMode::acquireOnly;
+                    }
+                    else if(3 == data.datainframe[0])       
+                    {
+                        info.transmit = true;  
+                        info.strainmode = StrainMode::txUncalibrated;
+                    }
+                    else if(4 == data.datainframe[0])       
+                    {
+                        info.transmit = true;  
+                        info.strainmode = StrainMode::txAll;
+                    }
+                    else                            
+                    {       
+                        info.transmit = false;  
+                        info.strainmode = StrainMode::none;  
+                    }                        
+                } break;   
+
+                default:
+                {
+                    info.transmit = false;  
+                    info.strainmode = StrainMode::none;                      
+                } break;
+            }
+          
+            return true;         
+        }                    
+            
+        bool Message_aspoll_SET_TXMODE::reply()
+        {
+            return false;
+        } 
         
+
+        bool Message_aspoll_SKIN_SET_BRDCFG::load(const embot::hw::can::Frame &frame)
+        {
+            Message::set(frame);  
+            
+            if(static_cast<std::uint8_t>(aspollCMD::SKIN_SET_BRD_CFG) != frame2cmd(frame))
+            {
+                return false; 
+            }
+            
+            switch(data.datainframe[0])
+            {
+                case static_cast<std::uint8_t>(SkinType::withTemperatureCompensation):
+                {
+                    info.skintype = SkinType::withTemperatureCompensation;
+                } break;
+                
+                case static_cast<std::uint8_t>(SkinType::palmFingerTip):
+                {
+                    info.skintype = SkinType::palmFingerTip;
+                } break;
+                
+                case static_cast<std::uint8_t>(SkinType::withoutTempCompensation):
+                {
+                    info.skintype = SkinType::withoutTempCompensation;
+                } break;
+                
+                default:
+                {
+                    info.skintype = SkinType::none;
+                } break;                                
+            }
+            
+            info.txperiod = data.datainframe[1];
+            info.noload = data.datainframe[2];
+          
+            return true;         
+        } 
+        
+            
+        bool Message_aspoll_SKIN_SET_BRDCFG::reply()
+        {
+            return false;
+        }  
+
+
+        bool Message_aspoll_SKIN_SET_TRIANG_CFG::load(const embot::hw::can::Frame &frame)
+        {
+            Message::set(frame);  
+            
+            if(static_cast<std::uint8_t>(aspollCMD::SKIN_SET_TRIANG_CFG) != frame2cmd(frame))
+            {
+                return false; 
+            }
+            
+            info.trgStart = data.datainframe[0];
+            info.trgEnd= data.datainframe[1];
+            info.shift = data.datainframe[2];
+            info.flags = data.datainframe[3];
+            info.cdcOffset = data.datainframe[4] | static_cast<std::uint16_t>(data.datainframe[5]) << 8;
+         
+            return true;         
+        } 
+        
+            
+        bool Message_aspoll_SKIN_SET_TRIANG_CFG::reply()
+        {
+            return false;
+        }           
         
 }}} // namespace embot { namespace app { namespace canprotocol {
 
