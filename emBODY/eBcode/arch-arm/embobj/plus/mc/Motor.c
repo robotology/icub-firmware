@@ -981,11 +981,13 @@ void Motor_update_odometry_fbk_can(Motor* o, CanOdometry2FocMsg* can_msg) //
     
     o->pos_raw_fbk = can_msg->position;
     o->pos_fbk = o->pos_raw_fbk/o->GEARBOX - o->pos_calib_offset;
-    o->pos_raw_cal_fbk = o->pos_raw_fbk - o->pos_calib_offset*o->GEARBOX; 
+    o->pos_raw_cal_fbk = o->pos_raw_fbk - o->pos_calib_offset*o->GEARBOX;
 }
 
 void Motor_update_pos_fbk(Motor* o, int32_t position_raw)
 {
+    if (o->HARDWARE_TYPE == HARDWARE_2FOC) return;
+    
     o->pos_raw_fbk = position_raw;
     
     int32_t pos_fbk = o->pos_raw_fbk/o->GEARBOX - o->pos_calib_offset;
@@ -1012,6 +1014,26 @@ void Motor_update_pos_fbk(Motor* o, int32_t position_raw)
     o->vel_fbk = delta*CTRL_LOOP_FREQUENCY_INT;
     o->vel_raw_fbk = o->vel_fbk*o->GEARBOX;
     o->pos_raw_cal_fbk = o->pos_fbk*o->GEARBOX;
+    
+    /*
+    {
+        static int timer[] = {0,250,500,750};
+        
+        int m = o->ID;
+                
+        if (++timer[m]>=1000)
+        {
+            timer[m] = 0;
+            static eOerrmanDescriptor_t descriptor = {0};
+            descriptor.par16 = m;
+            descriptor.par64 = ((int64_t)(o->vel_fbk))<<32 | (int64_t)(o->vel_raw_fbk);
+            descriptor.sourcedevice = eo_errman_sourcedevice_localboard;
+            descriptor.sourceaddress = 0;
+            descriptor.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &descriptor);
+        }
+    }
+    */
 }
 
 void Motor_update_current_fbk(Motor* o, int16_t current)
