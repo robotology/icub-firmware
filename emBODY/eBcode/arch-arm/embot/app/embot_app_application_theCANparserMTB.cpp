@@ -167,15 +167,17 @@ bool embot::app::application::theCANparserMTB::Impl::process_set_txmode(const em
     embot::app::canprotocol::Message_aspoll_SET_TXMODE msg(embot::app::canprotocol::Board::mtb4);
     msg.load(frame);
     
+    embot::app::application::theSkin &theskin = embot::app::application::theSkin::getInstance();    
+    
     if(true == msg.info.transmit)
     {
-        
+        theskin.start();        
     }
-      
-    #warning TODO: retrieve the mode and call theSkin object. 
-    // if it must start, the object will start a timer which sends an event to mai task wich will calle theSkin::tick() which puts data on can frames.
-    // if it must stop, the object will stop teh timer
-            
+    else
+    {
+        theskin.stop();     
+    }
+                  
     return msg.reply();        
 }
 
