@@ -27,6 +27,8 @@
 
 #include <cstring>
 
+#include <vector>
+
 namespace embot { namespace app { namespace canprotocol {
     
     enum class Clas { pollingMotorControl = 0, periodicMotorControl = 1, pollingAnalogSensor = 2, periodicAnalogSensor = 3, periodicSkin = 4, periodicInertialSensor = 5, bootloader = 7, none = 255 };
@@ -38,6 +40,11 @@ namespace embot { namespace app { namespace canprotocol {
     enum class mcpollCMD { none = 0xfe, SET_BOARD_ID = 50, GET_FIRMWARE_VERSION = 91, };
     
     enum class aspollCMD { none = 0xfe, SET_TXMODE = 0x07, GET_FIRMWARE_VERSION = 0x1C, SET_BOARD_ADX = 0x32, SKIN_SET_BRD_CFG = 77, SKIN_SET_TRIANG_CFG = 80 };
+    
+    enum class mcperCMD { PRINT = 6 };
+    
+    enum class skperCMD { TRG00 = 0, TRG01 = 1, TRG02 = 2, TRG03 = 3, TRG04 = 4, TRG05 = 5, TRG06 = 6, TRG07 = 7, TRG08 = 8, TRG09 = 9, 
+                          TRG10 = 10, TRG11 = 11, TRG12 = 12, TRG13 = 13, TRG14 = 14, TRG15 = 15 };
     
     bldrCMD cmd2bldr(std::uint8_t cmd);
     aspollCMD cmd2aspoll(std::uint8_t cmd);
@@ -172,7 +179,7 @@ namespace embot { namespace app { namespace canprotocol {
         void clear();
         
         // it fills data structures with passed values. it creates a frame. it sets valid = true. after that, if valid == true one can use the frame for tx
-        void set(std::uint8_t fr, std::uint8_t t, Clas cl, std::uint8_t ty, const void *dat, std::uint8_t siz);
+        void set(std::uint8_t fr, std::uint8_t t, Clas cl, std::uint8_t cm, const void *dat, std::uint8_t siz);
         
         bool isvalid();
                 
@@ -593,9 +600,9 @@ namespace embot { namespace app { namespace canprotocol {
             std::uint8_t                trgStart;  
             std::uint8_t                trgEnd;  
             std::uint8_t                shift; 
-            std::uint8_t                flags;
-            std::uint8_t                cdcOffset;
-            Info() : trgStart(0), trgEnd(0), shift(0), flags(0), cdcOffset(0) {}
+            bool                        enabled;
+            std::uint16_t               cdcOffset;
+            Info() : trgStart(0), trgEnd(0), shift(0), enabled(false), cdcOffset(0) {}
         };
         
         Info info;
@@ -607,6 +614,62 @@ namespace embot { namespace app { namespace canprotocol {
         bool reply();   // none
         
     };   
+    
+    
+    class Message_skper_TRG : public Message
+    {
+        public:
+            
+        struct Info
+        { 
+            std::uint8_t                the12s[12];
+            std::uint16_t               outofrangemaskofthe12s;         // bit in pos x is 1 if the12s[x] is out of range.
+            std::uint8_t                errorintriangle;                // 0 no error, 1 error of no ack, 2 error of none connected. 
+            std::uint8_t                trianglenum;
+            std::uint8_t                canaddress;
+            Info() : trianglenum(0), canaddress(0), outofrangemaskofthe12s(0), errorintriangle(0) { std::memset(the12s, 0, sizeof(the12s)); }
+        };
+        
+        Info info;
+        
+        Message_skper_TRG() {}
+            
+        bool load(const Info& inf);
+            
+        bool get(embot::hw::can::Frame &frame0, embot::hw::can::Frame &frame1);        
+    };
+
+    class Message_mcper_PRINT : public Message
+    {
+        public:
+            
+        struct Info
+        { 
+            char                        text[31];   // 30 chars + '0' : at most 5 can messages ('0' is not transmitted)
+            std::uint8_t                canaddress;
+            Info() : canaddress(0) { std::memset(text, 0, sizeof(text)); }
+        };
+        
+        Info info;
+        
+        Message_mcper_PRINT() : framecounter(0), nframes(0), nchars(0) {}
+            
+        bool load(const Info& inf);
+            
+       // bool get(std::vector<embot::hw::can::Frame> &frames); 
+            
+        std::uint8_t numberofframes();
+        bool get(embot::hw::can::Frame &outframe);  
+
+        private:
+        
+        std::uint8_t nframes;    
+        std::uint8_t framecounter;    
+        std::uint8_t nchars;           
+        static std::uint8_t textIDmod4;  // 0, 1, 2, 3, 0, 1, 2, etc      
+    };   
+
+    
     
 }}} // namespace embot { namespace app { namespace canprotocol {
 

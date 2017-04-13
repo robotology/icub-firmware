@@ -368,18 +368,21 @@ namespace embot { namespace app { namespace canprotocol {
         } 
         
 
-        void Message::set(std::uint8_t fr, std::uint8_t t, Clas cl, std::uint8_t ty, const void *dat, std::uint8_t siz)
+        void Message::set(std::uint8_t fr, std::uint8_t t, Clas cl, std::uint8_t cm, const void *dat, std::uint8_t siz)
         {
+            data.clas = cl;
+            data.cmd = cm;
             data.from = fr;
             data.to = t;
-            data.clas = cl;
-            data.cmd = ty;
+            // we miss: data.datainframe and data.sizeofdatainframe .... but we compute them by loading something into the frame and ....
             // ok, now frame ...
             std::memset(&frame, 0, sizeof(frame));
             
             frame_set_sender(frame, data.from);
-            frame_set_clascmddestinationdata(frame, data.clas, data.cmd, data.to, data.datainframe, data.sizeofdatainframe);
+            frame_set_clascmddestinationdata(frame, data.clas, data.cmd, data.to, dat, siz);
+            frame_set_size(frame, siz);
             
+            // ok, now we can compute ... data.datainframe and data.sizeofdatainframe
             data.datainframe = frame2databuffer(frame);
             data.sizeofdatainframe = frame2datasize(frame);
             
@@ -844,7 +847,7 @@ namespace embot { namespace app { namespace canprotocol {
                 } break;                                
             }
             
-            info.txperiod = data.datainframe[1];
+            info.txperiod = 1000*data.datainframe[1]; // transform from msec into usec
             info.noload = data.datainframe[2];
           
             return true;         
@@ -869,7 +872,7 @@ namespace embot { namespace app { namespace canprotocol {
             info.trgStart = data.datainframe[0];
             info.trgEnd= data.datainframe[1];
             info.shift = data.datainframe[2];
-            info.flags = data.datainframe[3];
+            info.enabled = embot::common::bit::check(data.datainframe[3], 0);
             info.cdcOffset = data.datainframe[4] | static_cast<std::uint16_t>(data.datainframe[5]) << 8;
          
             return true;         
@@ -879,8 +882,91 @@ namespace embot { namespace app { namespace canprotocol {
         bool Message_aspoll_SKIN_SET_TRIANG_CFG::reply()
         {
             return false;
-        }           
+        }   
+
+
+
+
+            
+        bool Message_skper_TRG::load(const Info& inf)
+        {
+            info = inf;
+          
+            return true;
+        }
+            
+        bool Message_skper_TRG::get(embot::hw::can::Frame &frame0, embot::hw::can::Frame &frame1)
+        {
+            std::uint8_t data[8] = {0};
+            data[0] = 0x40;
+            std::memmove(&data[1], &info.the12s[0], 7);
+            Message::set(info.canaddress, 0xf, Clas::periodicSkin, info.trianglenum, data, 8);
+            std::memmove(&frame0, &frame, sizeof(embot::hw::can::Frame));
+            
+            data[0] = 0xC0;
+            std::memmove(&data[1], &info.the12s[7], 5);
+            data[6] = data[7] = 0; // so far ....
+            Message::set(info.canaddress, 0xf, Clas::periodicSkin, info.trianglenum, data, 8);
+            std::memmove(&frame1, &frame, sizeof(embot::hw::can::Frame));
+            
+            return true;
+        }  
+
+
         
+        std::uint8_t Message_mcper_PRINT::textIDmod4 = 0;
+        
+        bool Message_mcper_PRINT::load(const Info& inf)
+        {
+            info = inf;  
+            nchars = std::strlen(info.text);
+            nframes = (std::strlen(info.text) + 5) / 6;   
+            framecounter = 0;  
+            textIDmod4++;
+            textIDmod4 %= 4;
+            
+            return (nframes>0) ? true : false;
+        }
+        
+        std::uint8_t Message_mcper_PRINT::numberofframes()
+        {       
+            return nframes;
+        }
+            
+        bool Message_mcper_PRINT::get(embot::hw::can::Frame &outframe)
+        {
+            if((0 == nframes) || (framecounter >= nframes))
+            {
+                return false;
+            }
+            
+            bool lastframe = ((framecounter+1) == nframes) ? true : false;
+            
+            std::uint8_t charsinframe = 6;
+            if(lastframe)
+            {
+                charsinframe = nchars - 6*framecounter; // less than 6                    
+            }
+            
+            if(charsinframe > 6)
+            {   // just because i am a paranoic
+                charsinframe = 6;
+            }
+            
+            std::uint8_t data[8] = {0};
+            data[0] = lastframe ? (static_cast<std::uint8_t>(mcperCMD::PRINT) + 128) : (static_cast<std::uint8_t>(mcperCMD::PRINT));
+            data[1] = ((textIDmod4 << 4) & 0xF0) | (framecounter & 0x0F);
+            std::memmove(&data[2], &info.text[6*framecounter], charsinframe);
+            
+            // ok, increment framecounter
+            framecounter ++;
+            
+            Message::set(info.canaddress, 0xf, Clas::periodicMotorControl, static_cast<std::uint8_t>(mcperCMD::PRINT), data, 2+charsinframe);
+            std::memmove(&outframe, &frame, sizeof(embot::hw::can::Frame));
+                        
+            return true;
+        }            
+
 }}} // namespace embot { namespace app { namespace canprotocol {
 
 
