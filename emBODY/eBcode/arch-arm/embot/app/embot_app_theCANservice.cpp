@@ -119,7 +119,7 @@ bool embot::app::can::SkinProtocol::form(const embot::app::can::Message &message
         }break;
         case 1:
         {
-            frame.size = 3;
+            frame.size = 4;
             frame.data[0] = 'E';
             frame.data[1] = 'N';
             frame.data[2] = 'D';

@@ -215,11 +215,8 @@ namespace embot { namespace hw { namespace can {
         hcan->pTxMsg->DLC = frame.size;
         memcpy(hcan->pTxMsg->Data, frame.data, frame.size);
 
-        //2) remove the frame from tx queue
-        vector<Frame>::iterator b = s_Qtx->begin();
-        s_Qtx->erase(b);
         
-        //3) transmit frame
+        //2) transmit frame
         HAL_StatusTypeDef res = HAL_CAN_Transmit_IT(hcan);
         //the only possible return values are HAL_BUSY or HAL_OK
         if(res == HAL_BUSY)
@@ -230,6 +227,10 @@ namespace embot { namespace hw { namespace can {
             testonly=testonly;
         }
        
+        //3) remove the frame from tx queue
+        vector<Frame>::iterator b = s_Qtx->begin();
+        s_Qtx->erase(b);
+        
         if(nullptr != s_config.ontxframe.callback)
         {
             s_config.ontxframe.callback(s_config.ontxframe.arg);
