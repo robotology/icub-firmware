@@ -1719,6 +1719,10 @@ static eObool_t s_eo_motioncontrol_isID32relevant(uint32_t id32)
 static eOresult_t s_eo_motioncontrol_updatePositionFromEncoder(uint8_t index, eOencoderreader_valueInfo_t *encoder)
 {
     eOresult_t res = eores_OK;
+    
+    if(encoder->errortype == encreader_err_NOTCONNECTED) //skyp if the encoder is not connected (i.e is on 2foc.)
+        return res;
+        
     if(encoder->position == eomc_pos_atjoint)
     {
         if(encoder->errortype != 0)

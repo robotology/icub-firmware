@@ -712,6 +712,7 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
     else
     {
         valueinfo1->value[0] = ENCODER_VALUE_NOT_SUPPORTED;
+        valueinfo1->errortype = encreader_err_NOTCONNECTED;
     }
     
     // check existence for extra encoder
@@ -888,6 +889,7 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
     else
     {
         valueinfo2->value[0] = ENCODER_VALUE_NOT_SUPPORTED;
+        valueinfo2->errortype = encreader_err_NOTCONNECTED;
     }
     
     // return value based only on the reading of the primary encoder ... mah ... non sarebbe meglio usare una funzione dedicata al primary ed una la value2? pensaci.

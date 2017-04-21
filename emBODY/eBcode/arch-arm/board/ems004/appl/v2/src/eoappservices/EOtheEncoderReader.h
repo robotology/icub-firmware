@@ -59,10 +59,11 @@ typedef struct EOtheEncoderReader_hid EOtheEncoderReader;
 
 typedef enum
 {
-    encreader_err_NONE      = 0,
-    encreader_err_READING   = 1,
-    encreader_err_PARITY    = 2,
-    encreader_err_CHIP      = 3
+    encreader_err_NONE          = 0,
+    encreader_err_READING       = 1,
+    encreader_err_PARITY        = 2,
+    encreader_err_CHIP          = 3, 
+    encreader_err_NOTCONNECTED  = 4 /* this error happens when the encoder type is none or encoder is not local, for example it is connected to 2foc board */
 } eOencoderreader_errortype_t;
 
 typedef struct

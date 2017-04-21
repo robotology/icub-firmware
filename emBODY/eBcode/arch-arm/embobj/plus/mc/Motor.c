@@ -986,8 +986,12 @@ void Motor_update_odometry_fbk_can(Motor* o, CanOdometry2FocMsg* can_msg) //
 
 void Motor_update_pos_fbk(Motor* o, int32_t position_raw)
 {
-    if (o->HARDWARE_TYPE == HARDWARE_2FOC) return;
-    
+    //if (o->HARDWARE_TYPE == HARDWARE_2FOC) return; removed workaround
+    //Note: this function should be call only to update motor position read by a connected encoder, ie 
+    //the encoder is read by this board and not by 2foc.
+    //in case of joint controlled by ems+2foc, the motor encoder is connected to 2foc and the 2foc sends motor position to ems by can message. 
+    //see Motor_update_odometry_fbk_can function.
+
     o->pos_raw_fbk = position_raw;
     
     int32_t pos_fbk = o->pos_raw_fbk/o->GEARBOX - o->pos_calib_offset;
