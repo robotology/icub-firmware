@@ -81,13 +81,13 @@ extern "C" {
 //  <o> year            <2010-2020> 
 #define EOMTHEEMSAPPLCFG_BUILDDATE_YEAR         2017
 //  <o> month           <1-12> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_MONTH        3
+#define EOMTHEEMSAPPLCFG_BUILDDATE_MONTH        4
 //  <o> day             <1-31> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          22
+#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          27
 //  <o> hour            <0-23> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         15
+#define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         14
 //  <o> minute          <0-59> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          42
+#define EOMTHEEMSAPPLCFG_BUILDDATE_MIN          12
 //  </h>build date
 
 // </h>Info 
