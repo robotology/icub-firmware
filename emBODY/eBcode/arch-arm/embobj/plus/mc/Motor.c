@@ -234,7 +234,7 @@ void Motor_init(Motor* o) //
     
     Motor_hardStopCalbData_reset(o);
     
-    o->outOfLimitsSignaled = FALSE;
+    //o->outOfLimitsSignaled = FALSE;
 }
 
 void Motor_config(Motor* o, uint8_t ID, eOmc_motor_config_t* config) //
@@ -854,35 +854,35 @@ void Motor_set_pwm_ref(Motor* o, int32_t pwm_ref)
         if ((o->pos_raw_cal_fbk < o->pos_min) && (pwm_ref < 0))
         {
             o->output = o->pwm_ref = 0;
-            if(!o->outOfLimitsSignaled)
-            {
-                char message [180]; 
-                snprintf(message, sizeof(message),"Motor reached min limit.Can't move with neg pwm" );
-                send_debug_message(message, o->ID, pwm_ref, o->pos_raw_cal_fbk);
-                o->outOfLimitsSignaled = TRUE;
-            }
+//            if(!o->outOfLimitsSignaled)
+//            {
+//                char message [180]; 
+//                snprintf(message, sizeof(message),"Motor reached min limit.Can't move with neg pwm" );
+//                send_debug_message(message, o->ID, pwm_ref, o->pos_raw_cal_fbk);
+//                o->outOfLimitsSignaled = TRUE;
+//            }
         }
         else if ((o->pos_raw_cal_fbk > o->pos_max) && (pwm_ref > 0))
         {
             o->output = o->pwm_ref = 0;
-            if(!o->outOfLimitsSignaled)
-            {
-                char message [180]; 
-                snprintf(message, sizeof(message),"Motor reached max limit.Can't move with pos pwm" );
-                send_debug_message(message, o->ID, pwm_ref, o->pos_raw_cal_fbk);
-                o->outOfLimitsSignaled = TRUE;
-            }
+//            if(!o->outOfLimitsSignaled)
+//            {
+//                char message [180]; 
+//                snprintf(message, sizeof(message),"Motor reached max limit.Can't move with pos pwm" );
+//                send_debug_message(message, o->ID, pwm_ref, o->pos_raw_cal_fbk);
+//                o->outOfLimitsSignaled = TRUE;
+//            }
         }
         else
         {
             o->output = o->pwm_ref = CUT(pwm_ref, o->pwm_max);
-            o->outOfLimitsSignaled = FALSE;
+            //o->outOfLimitsSignaled = FALSE;
         }
     }
     else
     {
         o->output = o->pwm_ref = CUT(pwm_ref, o->pwm_max);
-        o->outOfLimitsSignaled = FALSE;
+        //o->outOfLimitsSignaled = FALSE;
     }
 }
 
