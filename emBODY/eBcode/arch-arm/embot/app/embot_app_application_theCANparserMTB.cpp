@@ -140,7 +140,7 @@ bool embot::app::application::theCANparserMTB::Impl::process(const embot::hw::ca
 
 bool embot::app::application::theCANparserMTB::Impl::process_set_brdcfg(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
 {
-    embot::app::canprotocol::Message_aspoll_SKIN_SET_BRDCFG msg;
+    embot::app::canprotocol::Message_aspoll_SKIN_SET_BRD_CFG msg;
     msg.load(frame);
       
     embot::app::application::theSkin &theskin = embot::app::application::theSkin::getInstance();    
