@@ -11,23 +11,41 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-#include "stdint.h"
-    
-void ServiceAD7147Isr(unsigned char Channel);
-void TrianglesInit(unsigned char Channel);
-void SetCDCoffsetOnAllTriangles(unsigned char Channel, uint16_t cdcOffset);
     
 
-extern void ad7147_init(void);
-extern void ad7147_acquire(void);
-extern uint16_t * ad7147_get12valuesoftriangle(uint8_t trg); 
+// - external dependencies --------------------------------------------------------------------------------------------
     
+#include "if2hw_common.h"
+    
+    
+
+// - public #define  --------------------------------------------------------------------------------------------------
+    
+#define triangles_max_num   16
+#define MAXVAL 255
+#define MINVAL   0
+#define NOLOAD 245
+  
+    
+// - declaration of public user-defined types -------------------------------------------------------------------------
+    
+enum 
+{
+    ad7147_triangles_numberof = 16,
+    ad7147_dots_numberof = 12,  // in each triangle
+    ad7147_dot_value_max = 255,
+    ad7147_dot_value_min = 0,
+    ad7147_dot_value_noload = 245    
+};
+    
+#if defined(if2hw_common_AD7147_USE_EXTERNALCONTROLTYPES)
+// in this case we decide what to uses
+#else
 
 typedef struct error_cap
 {
-    uint16_t error_outofrange;
-    uint16_t error;
+    unsigned int error_outofrange;
+    unsigned int error;
 } error_cap;
 
 enum Errors
@@ -40,17 +58,61 @@ enum Errors
 
 typedef struct
 {
-    uint16_t                    shift;
-    uint8_t                     indexInSet; //triangle index in set
-    uint8_t                     setNum; //equal to sda num
-    uint16_t                    isToUpdate; //if =1 triangle needs to be recalibrated
-    uint16_t                    CDCoffset;
+    unsigned int                    shift;
+    unsigned int                    indexInSet; //triangle index in set
+    unsigned int                    setNum; //equal to sda num
+    unsigned int                    isToUpdate; //if =1 triangle needs to be recalibrated
+    unsigned int                   CDCoffset;
 }triangle_cfg_t;
 
-#define triangles_max_num   16
-#define MAXVAL 255
-#define MINVAL   0
-#define NOLOAD 245
+#endif // defined(if2hw_common_AD7147_USE_EXTERNALCONTROLTYPES)
+
+
+
+// - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
+
+#if defined(if2hw_common_AD7147_USE_EXTERNALDATA)
+
+// we dont have AD7147Registers and CapOffset. 
+// use ad7147_get12rawvaluesoftriangle() and ad7147_get12capoffsetsoftriangle() to retrieve their values
+
+#else
+
+extern if2hw_data_ad7147_t AD7147Registers[16][12];	// il primo campo rappresenta il numero dei canali (non c'e' +)
+extern if2hw_data_ad7147_t CapOffset[16][12];
+
+#endif
+
+#if defined(if2hw_common_AD7147_USE_EXTERNALCONTROLTYPES)
+
+// we dont have teh tringle config because we manage that externally
+
+#else
+
+extern triangle_cfg_t triangle_cfg_list[16];
+extern error_cap err[16];
+
+#endif
+
+
+// - declaration of extern public functions ---------------------------------------------------------------------------
+  
+// legacy api
+void ServiceAD7147Isr(unsigned char Channel);
+void TrianglesInit(unsigned char Channel, uint8_t applycdcoffset);
+void SetCDCoffsetOnAllTriangles(unsigned char Channel, if2hw_data_ad7147_t cdcOffset);
+     
+ 
+// new api
+extern void ad7147_init(if2hw_data_ad7147_t ext_rawvalues[][12], if2hw_data_ad7147_t ext_capoffsets[][12]);
+extern void ad7147_calibrate(void);
+extern void ad7147_set_cdcoffset(uint8_t trg, uint16_t cdcoffset);
+extern uint16_t ad7147_gettrianglesconnectedmask();
+extern void ad7147_acquire(void);
+extern uint8_t ad7147_istriangleconnected(uint8_t trg);
+extern if2hw_data_ad7147_t * ad7147_get12rawvaluesoftriangle(uint8_t trg); 
+extern if2hw_data_ad7147_t * ad7147_get12capoffsetsoftriangle(uint8_t trg);
+
 
 #ifdef __cplusplus
 }       // closing brace for extern "C"

@@ -13,6 +13,11 @@
  *
  ******************************************************************************/
 
+
+#include "if2hw_common.h"
+
+#include "AD7147.h"
+
 #include "AD7147RegMap.h"
 #include "I2C_Multi_SDA.h"
 #include "stdint.h"
@@ -28,22 +33,31 @@
 //unsigned char ReadViaI2C(unsigned char Channel, unsigned char DeviceAddress, const unsigned int RegisterStartAddress, const unsigned char NumberOfRegistersToRead, unsigned int *DataBuffer, const unsigned int OffsetInBuffer);
 //Local functions
 //===============
-void ConfigAD7147(unsigned char Channel,    unsigned int i, unsigned int pw_control_val, unsigned int * convalue); //i is the number of the triangle
-void ConfigAD7147_THREE(unsigned char Channel,unsigned int i,unsigned int pw_control_val, unsigned int *convalue);
-void ConfigAD7147_ALL(unsigned char Channel,unsigned int i, unsigned int pw_control_val, unsigned int * convalue); //i is the number of the triangle
-void ConfigAD7147_onSdaX(unsigned char Channel, unsigned char setNum, unsigned char indexInSet, unsigned int pw_control_val, uint16_t cdcoffset);
+
+// acemor: move them into 
+
+#include "AD7147_Configuration.h"
+
+//void ConfigAD7147(unsigned char Channel,    unsigned int i, unsigned int pw_control_val, unsigned int * convalue); //i is the number of the triangle
+//void ConfigAD7147_THREE(unsigned char Channel,unsigned int i,unsigned int pw_control_val, unsigned int *convalue);
+//void ConfigAD7147_ALL(unsigned char Channel,unsigned int i, unsigned int pw_control_val, unsigned int * convalue); //i is the number of the triangle
+//void ConfigAD7147_onSdaX(unsigned char Channel, unsigned char setNum, unsigned char indexInSet, unsigned int pw_control_val, uint16_t cdcoffset);
 
 
 //Recal of variables from other C files
 //-------------------------------------
-extern const uint8_t AD7147_ADD[4];
+// acemor: use proper .h file (in this case: #include "AD7147.h").
+//extern const uint8_t AD7147_ADD[4];
+
+// moved in here as they belong to configuration.
+const uint8_t AD7147_ADD[4] = {0x2c, 0x2d, 0x2e, 0x2f};
 
 //---------------------
 //Function definitions
 //---------------------
-void ConfigAD7147_T(unsigned char Channel, unsigned int i,unsigned int pw_control_val, unsigned int * convalue)
+void ConfigAD7147_T(unsigned char Channel, unsigned int i,unsigned int pw_control_val, if2hw_data_ad7147_t * convalue)
 {
-	unsigned int ConfigBuffer[12];
+	if2hw_data_i2cmultisda_t ConfigBuffer[12] = {0};
 	//=============================================
 	//= Stage 0 - CIN0 Single-Ended(+) =
 	//=============================================
@@ -228,9 +242,9 @@ void ConfigAD7147_T(unsigned char Channel, unsigned int i,unsigned int pw_contro
 	WriteViaI2C(Channel,AD7147_ADD[i],STAGE_CAL_EN, 1, ConfigBuffer, STAGE_CAL_EN);
 }
 
-void ConfigAD7147(unsigned char Channel, unsigned int i,unsigned int pw_control_val, unsigned int * convalue)
+void ConfigAD7147(unsigned char Channel, unsigned int i,unsigned int pw_control_val, if2hw_data_ad7147_t * convalue)
 {
-	unsigned int ConfigBuffer[12];
+	if2hw_data_i2cmultisda_t ConfigBuffer[12] = {0};
 	//=============================================
 	//= Stage 0 - CIN0 Single-Ended(+) =
 	//=============================================
@@ -419,11 +433,12 @@ void ConfigAD7147(unsigned char Channel, unsigned int i,unsigned int pw_control_
 
 
 
-void ConfigAD7147_onSdaX(unsigned char Channel, unsigned char setNum, unsigned char indexInSet, unsigned int pw_control_val, uint16_t cdcoffset/*unsigned int * cdcOffset*/)
+void ConfigAD7147_onSdaX(unsigned char Channel, unsigned char setNum, unsigned char indexInSet, unsigned int pw_control_val, if2hw_data_ad7147_t cdcoffset/*unsigned int * cdcOffset*/)
 {
     i2c_sda_num_t sdaNum = (i2c_sda_num_t)setNum;
     
-	unsigned int ConfigBuffer[12];
+	if2hw_data_i2cmultisda_t ConfigBuffer[12] = {0};
+    
 	//=============================================
 	//= Stage 0 - CIN0 Single-Ended(+) =
 	//=============================================
@@ -620,9 +635,9 @@ void ConfigAD7147_onSdaX(unsigned char Channel, unsigned char setNum, unsigned c
 } */
 
 
-void ConfigAD7147_ALL(unsigned char Channel,unsigned int i,unsigned int pw_control_val, unsigned int *convalue)
+void ConfigAD7147_ALL(unsigned char Channel,unsigned int i,unsigned int pw_control_val, if2hw_data_ad7147_t *convalue)
 {
-	unsigned int ConfigBuffer[12];
+	if2hw_data_i2cmultisda_t ConfigBuffer[12] = {0};
 	
 	//=============================================
 	//= Stage 0 - Connected to Vbias
@@ -667,9 +682,9 @@ void ConfigAD7147_ALL(unsigned char Channel,unsigned int i,unsigned int pw_contr
 	WriteViaI2C(Channel,AD7147_ADD[i],STAGE_CAL_EN, 1, ConfigBuffer, STAGE_CAL_EN);
 }
 
-void ConfigAD7147_THREE(unsigned char Channel,unsigned int i,unsigned int pw_control_val, unsigned int *convalue)
+void ConfigAD7147_THREE(unsigned char Channel,unsigned int i,unsigned int pw_control_val, if2hw_data_ad7147_t *convalue)
 {
-	unsigned int ConfigBuffer[12];
+	if2hw_data_i2cmultisda_t ConfigBuffer[12] = {0};
 	
 	//=============================================
 	//= Stage 0 - Connected to Vbias
@@ -739,9 +754,9 @@ void ConfigAD7147_THREE(unsigned char Channel,unsigned int i,unsigned int pw_con
 	ConfigBuffer[STAGE_CAL_EN]=0x0FFF;//0x0FFF;
 	WriteViaI2C(Channel,AD7147_ADD[i],STAGE_CAL_EN, 1, ConfigBuffer, STAGE_CAL_EN);
 }
-void ConfigAD7147_FINGERTIP(unsigned char Channel,unsigned int i,unsigned int pw_control_val, unsigned int *convalue)
+void ConfigAD7147_FINGERTIP(unsigned char Channel,unsigned int i,unsigned int pw_control_val, if2hw_data_ad7147_t *convalue)
 {
-	unsigned int ConfigBuffer[12];
+	if2hw_data_i2cmultisda_t ConfigBuffer[12] = {0};
 	
 	//=============================================
 	//= Stage 0 - Connected to Vbias
@@ -800,3 +815,5 @@ void ConfigAD7147_FINGERTIP(unsigned char Channel,unsigned int i,unsigned int pw
 	ConfigBuffer[STAGE_CAL_EN]=0x0FFF;//0x0FFF;
 	WriteViaI2C(Channel,AD7147_ADD[i],STAGE_CAL_EN, 1, ConfigBuffer, STAGE_CAL_EN);
 }
+
+
