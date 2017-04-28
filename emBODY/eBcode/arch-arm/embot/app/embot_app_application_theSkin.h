@@ -55,7 +55,7 @@ namespace embot { namespace app { namespace application {
         
         bool initialise(Config &config);   
 
-        bool config(embot::app::canprotocol::Message_aspoll_SKIN_SET_BRDCFG::Info &brdcfg);
+        bool config(embot::app::canprotocol::Message_aspoll_SKIN_SET_BRD_CFG::Info &brdcfg);
         bool config(embot::app::canprotocol::Message_aspoll_SKIN_SET_TRIANG_CFG::Info &trgcfg);
         
         bool start();
