@@ -832,6 +832,11 @@
               <FileType>1</FileType>
               <FilePath>..\src\board\mtb4\src\stm32l4xx_it.c</FilePath>
             </File>
+            <File>
+              <FileName>rng.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\mtb4\src\rng.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1782,6 +1787,11 @@
                   </Cads>
                 </FileArmAds>
               </FileOption>
+            </File>
+            <File>
+              <FileName>rng.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\mtb4\src\rng.c</FilePath>
             </File>
           </Files>
         </Group>

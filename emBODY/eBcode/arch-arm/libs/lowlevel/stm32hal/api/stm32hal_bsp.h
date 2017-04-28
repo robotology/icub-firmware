@@ -70,6 +70,7 @@ extern void stm32hal_bsp_init(void);
 #include "../src/board/mtb4/inc/dma.h"
 #include "../src/board/mtb4/inc/gpio.h"
 #include "../src/board/mtb4/inc/i2c.h"
+#include "../src/board/mtb4/inc/rng.h"
 #include "../src/board/mtb4/inc/main.h"
 #include "../src/board/mtb4/inc/tim.h"
 #include "../src/board/mtb4/inc/usart.h"
