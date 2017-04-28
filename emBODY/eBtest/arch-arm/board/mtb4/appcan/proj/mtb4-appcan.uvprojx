@@ -903,6 +903,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_application_theCANtracer.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_tools.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\tools\embot_tools.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -922,6 +927,11 @@
               <FileName>AD7147_Configuration.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\others\AD7147_Configuration.c</FilePath>
+            </File>
+            <File>
+              <FileName>if2hw_common.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\others\if2hw_common.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1311,7 +1321,7 @@
             <PlainCh>0</PlainCh>
             <Ropi>0</Ropi>
             <Rwpi>0</Rwpi>
-            <wLevel>1</wLevel>
+            <wLevel>2</wLevel>
             <uThumb>0</uThumb>
             <uSurpInc>1</uSurpInc>
             <uC99>0</uC99>
@@ -1327,7 +1337,7 @@
               <MiscControls>--cpp11</MiscControls>
               <Define>STM32HAL_BOARD_MTB4 APPL_TESTZEROOFFSET</Define>
               <Undefine></Undefine>
-              <IncludePath>..\src-plus;..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask;..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\eBcode\arch-arm\embot\common;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\sys;..\..\..\..\..\..\eBcode\arch-arm\embot;..\src\others</IncludePath>
+              <IncludePath>..\src-plus;..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask;..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\eBcode\arch-arm\embot\common;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\sys;..\..\..\..\..\..\eBcode\arch-arm\embot;..\src\others;..\..\..\..\..\..\eBcode\arch-arm\embot\tools</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1358,7 +1368,7 @@
             <TextAddressRange>0x08000000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile>.\mtb4-application0offset-fat.sct</ScatterFile>
+            <ScatterFile>.\mtb4-application0offset.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc>--diag_suppress=L6329</Misc>
@@ -1895,6 +1905,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_application_theCANtracer.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_tools.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\tools\embot_tools.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1982,6 +1997,11 @@
               <FileName>AD7147_Configuration.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\others\AD7147_Configuration.c</FilePath>
+            </File>
+            <File>
+              <FileName>if2hw_common.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\others\if2hw_common.c</FilePath>
             </File>
           </Files>
         </Group>
