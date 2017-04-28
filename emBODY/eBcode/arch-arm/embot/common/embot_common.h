@@ -34,9 +34,6 @@ namespace embot { namespace common {
     using fpBoolParU32  = bool (*)(std::uint32_t);
     using fpI08ParU32   = std::int8_t (*)(std::uint32_t);
     
-//    using fp_int8_par_uint32 = std::int8_t (*)(std::uint32_t);
-//    using fp_bool_par_uint32 = bool (*)(std::uint32_t);
-    
     struct Callback
     {
         fpCallback  callback;
@@ -58,7 +55,7 @@ namespace embot { namespace common {
     using EventMask = std::uint32_t;
     using Message = std::uint32_t;
             
-} } // namespace embot { namespace common
+} } // namespace embot { namespace common {
 
 
 namespace embot { namespace common { namespace bit {
@@ -89,9 +86,36 @@ namespace embot { namespace common { namespace bit {
             return true;
         }
         return false;
-    }    
-    
-   
+    } 
+
+    std::uint8_t countU08(const std::uint8_t value);
+    std::uint8_t countU16(const std::uint16_t value);
+    std::uint8_t countU32(const std::uint32_t value);
+    std::uint8_t countU64(const std::uint64_t value);
+
+    template<typename T>
+    std::uint8_t count(const T value)
+    {
+        if(1 == sizeof(value))
+        {
+            return countU08(value);
+        }
+        else if(2 == sizeof(value))
+        {
+            return countU16(value);
+        }
+        else if(4 == sizeof(value))
+        {
+            return countU32(value);
+        }
+        else if(8 == sizeof(value))
+        {
+            return countU64(value);
+        }
+        
+        return 0;
+    }        
+       
 } } } // namespace embot { namespace common { namespace bit
 
 
