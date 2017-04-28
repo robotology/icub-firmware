@@ -170,14 +170,14 @@ dowaitloop
     {   
         ss_bsp_delay(t);
     }
-        
+      
+    static const std::uint32_t maxRANDmask = 0x3ff; // 1023    
     std::uint32_t random()
-    {   // it is the content of the systick register ... always present in cortex-m BUT ... random only if systick is ryunning.
-        // moreover... not much random. at least it is roughly uniformely distributed inside [0, 1023]. 
-        // but because it is based on a running counter it has a temporal correlation.
-        // it would be much better exploiting a rng peripheral ...
-        volatile std::uint32_t reg0xE000E018 = *((volatile uint32_t *)0xE000E018);
-        return reg0xE000E018 & 0x3ff;
+    {
+        std::uint32_t v = 0;        
+        HAL_StatusTypeDef ret = HAL_RNG_GenerateRandomNumber(&hrng, &v);
+        ret = ret;        
+        return v & maxRANDmask;
     }
     
     std::uint32_t minrandom()
@@ -187,7 +187,7 @@ dowaitloop
     
     std::uint32_t maxrandom()
     {
-        return 0x3ff;
+        return maxRANDmask;
     }
     
 
