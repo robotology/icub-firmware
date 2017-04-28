@@ -62,8 +62,8 @@ namespace embot { namespace app { namespace canprotocol {
     {
         std::uint8_t    major;
         std::uint8_t    minor;
-        versionOfBOOTLOADER() : major(0), minor(0) {};
-        versionOfBOOTLOADER(std::uint8_t ma, std::uint8_t mi) : major(ma), minor(mi) {};
+        versionOfBOOTLOADER() : major(0), minor(0) {}
+        versionOfBOOTLOADER(std::uint8_t ma, std::uint8_t mi) : major(ma), minor(mi) {}
     };
     
     struct versionOfAPPLICATION
@@ -71,8 +71,8 @@ namespace embot { namespace app { namespace canprotocol {
         std::uint8_t    major;
         std::uint8_t    minor;
         std::uint8_t    build;
-        versionOfAPPLICATION() : major(0), minor(0), build(0) {};
-        versionOfAPPLICATION(std::uint8_t ma, std::uint8_t mi, std::uint8_t bu) : major(ma), minor(mi), build(bu) {};
+        versionOfAPPLICATION() : major(0), minor(0), build(0) {}
+        versionOfAPPLICATION(std::uint8_t ma, std::uint8_t mi, std::uint8_t bu) : major(ma), minor(mi), build(bu) {}
     };    
     
     struct versionOfFIRMWARE
@@ -80,16 +80,16 @@ namespace embot { namespace app { namespace canprotocol {
         std::uint8_t    major;
         std::uint8_t    minor;
         std::uint8_t    build;
-        versionOfFIRMWARE() : major(0), minor(0), build(0) {};
-        versionOfFIRMWARE(std::uint8_t ma, std::uint8_t mi, std::uint8_t bu) : major(ma), minor(mi), build(bu) {};
+        versionOfFIRMWARE() : major(0), minor(0), build(0) {}
+        versionOfFIRMWARE(std::uint8_t ma, std::uint8_t mi, std::uint8_t bu) : major(ma), minor(mi), build(bu) {}
     };
     
     struct versionOfCANPROTOCOL
     {
         std::uint8_t    major;
         std::uint8_t    minor;
-        versionOfCANPROTOCOL() : major(0), minor(0) {};
-        versionOfCANPROTOCOL(std::uint8_t ma, std::uint8_t mi) : major(ma), minor(mi) {};
+        versionOfCANPROTOCOL() : major(0), minor(0) {}
+        versionOfCANPROTOCOL(std::uint8_t ma, std::uint8_t mi) : major(ma), minor(mi) {}
     };
     
     Clas frame2clas(const embot::hw::can::Frame &frame);
@@ -567,11 +567,11 @@ namespace embot { namespace app { namespace canprotocol {
     };
     
     
-    class Message_aspoll_SKIN_SET_BRDCFG : public Message
+    class Message_aspoll_SKIN_SET_BRD_CFG : public Message
     {
         public:
             
-        enum class SkinType { withTemperatureCompensation = 0, palmFingerTip = 1, withoutTempCompensation = 2, none = 254 };
+        enum class SkinType { withTemperatureCompensation = 0, palmFingerTip = 1, withoutTempCompensation = 2, testmodeRAW = 7, none = 254 };
                         
         struct Info
         { 
@@ -583,7 +583,7 @@ namespace embot { namespace app { namespace canprotocol {
         
         Info info;
         
-        Message_aspoll_SKIN_SET_BRDCFG() {}
+        Message_aspoll_SKIN_SET_BRD_CFG() {}
             
         bool load(const embot::hw::can::Frame &frame);
             
@@ -620,14 +620,17 @@ namespace embot { namespace app { namespace canprotocol {
     {
         public:
             
+        enum class ErrorInTriangleBit { noack = 0, notconnected = 1 };
+            
         struct Info
         { 
             std::uint8_t                the12s[12];
             std::uint16_t               outofrangemaskofthe12s;         // bit in pos x is 1 if the12s[x] is out of range.
-            std::uint8_t                errorintriangle;                // 0 no error, 1 error of no ack, 2 error of none connected. 
+            std::uint16_t               notconnectedmaskofthe12s;       // 0 no error, 1 error of no ack, 2 error of none connected. 
+            std::uint16_t               notackmaskofthe12s;
             std::uint8_t                trianglenum;
             std::uint8_t                canaddress;
-            Info() : trianglenum(0), canaddress(0), outofrangemaskofthe12s(0), errorintriangle(0) { std::memset(the12s, 0, sizeof(the12s)); }
+            Info() : trianglenum(0), canaddress(0), outofrangemaskofthe12s(0), notconnectedmaskofthe12s(0), notackmaskofthe12s(0) { std::memset(the12s, 0, sizeof(the12s)); }
         };
         
         Info info;

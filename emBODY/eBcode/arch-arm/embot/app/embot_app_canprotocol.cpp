@@ -815,7 +815,7 @@ namespace embot { namespace app { namespace canprotocol {
         } 
         
 
-        bool Message_aspoll_SKIN_SET_BRDCFG::load(const embot::hw::can::Frame &frame)
+        bool Message_aspoll_SKIN_SET_BRD_CFG::load(const embot::hw::can::Frame &frame)
         {
             Message::set(frame);  
             
@@ -841,6 +841,11 @@ namespace embot { namespace app { namespace canprotocol {
                     info.skintype = SkinType::withoutTempCompensation;
                 } break;
                 
+                case static_cast<std::uint8_t>(SkinType::testmodeRAW):
+                {
+                    info.skintype = SkinType::testmodeRAW;
+                } break;
+                
                 default:
                 {
                     info.skintype = SkinType::none;
@@ -854,7 +859,7 @@ namespace embot { namespace app { namespace canprotocol {
         } 
         
             
-        bool Message_aspoll_SKIN_SET_BRDCFG::reply()
+        bool Message_aspoll_SKIN_SET_BRD_CFG::reply()
         {
             return false;
         }  
@@ -905,7 +910,21 @@ namespace embot { namespace app { namespace canprotocol {
             
             data[0] = 0xC0;
             std::memmove(&data[1], &info.the12s[7], 5);
-            data[6] = data[7] = 0; // so far ....
+            // now outofrange and error flags
+            std::uint8_t errorflags = 0; 
+            // bit ErrorInTriangleBit::noack is set if any bit inside notackmaskofthe12s is set.
+            if(0 != info.notackmaskofthe12s)
+            {
+                embot::common::bit::set(errorflags, static_cast<std::uint8_t>(ErrorInTriangleBit::noack)); 
+            }
+            // bit ErrorInTriangleBit::notconnected is set if all 12 bits inside notconnectedmaskofthe12s are set.
+            if(12 == embot::common::bit::countU16(info.notconnectedmaskofthe12s))
+            {
+                embot::common::bit::set(errorflags, static_cast<std::uint8_t>(ErrorInTriangleBit::notconnected)); 
+            }            
+            data[6] = static_cast<std::uint8_t>((info.outofrangemaskofthe12s & 0x0ff0) >> 4);
+            data[7] = static_cast<std::uint8_t>((info.outofrangemaskofthe12s & 0x000f) << 4) | (errorflags & 0x0f);
+            
             Message::set(info.canaddress, 0xf, Clas::periodicSkin, info.trianglenum, data, 8);
             std::memmove(&frame1, &frame, sizeof(embot::hw::can::Frame));
             
