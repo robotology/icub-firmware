@@ -52,7 +52,7 @@ namespace embot { namespace app { namespace canprotocol {
     anypollCMD cmd2anypoll(std::uint8_t cmd);
     
     
-    enum class Board { mtb = 0x05, strain = 0x06, mais = 0x07, mtb4 = 0x66, strain2 = 0x67, unknown = 0xff };
+    enum class Board { mtb = 5, strain = 6, mais = 7, mtb4 = 11, strain2 = 12, none = 254, unknown = 0xff };
     
     enum class Process { bootloader = 0, application = 1, unknown = 0xff };
     
