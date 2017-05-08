@@ -346,23 +346,23 @@ namespace embot { namespace app { namespace canprotocol {
             
         void Message::set(const embot::hw::can::Frame &fr)
         {
-            frame = fr;
+            canframe = fr;
             
-            data.clas = frame2clas(frame);
-            data.cmd = frame2cmd(frame);
-            data.from = frame2sender(frame);
-            data.to = frame2destination(frame);              
-            data.datainframe = frame2databuffer(frame);
-            data.sizeofdatainframe = frame2datasize(frame);   
+            candata.clas = frame2clas(canframe);
+            candata.cmd = frame2cmd(canframe);
+            candata.from = frame2sender(canframe);
+            candata.to = frame2destination(canframe);              
+            candata.datainframe = frame2databuffer(canframe);
+            candata.sizeofdatainframe = frame2datasize(canframe);   
 
             valid = true;
         }
         
         void Message::clear()
         {
-            data.reset();
+            candata.reset();
             
-            std::memset(&frame, 0, sizeof(frame));
+            std::memset(&canframe, 0, sizeof(canframe));
             
             valid = false;
         } 
@@ -370,21 +370,21 @@ namespace embot { namespace app { namespace canprotocol {
 
         void Message::set(std::uint8_t fr, std::uint8_t t, Clas cl, std::uint8_t cm, const void *dat, std::uint8_t siz)
         {
-            data.clas = cl;
-            data.cmd = cm;
-            data.from = fr;
-            data.to = t;
-            // we miss: data.datainframe and data.sizeofdatainframe .... but we compute them by loading something into the frame and ....
-            // ok, now frame ...
-            std::memset(&frame, 0, sizeof(frame));
+            candata.clas = cl;
+            candata.cmd = cm;
+            candata.from = fr;
+            candata.to = t;
+            // we miss: candata.datainframe and candata.sizeofdatainframe .... but we compute them by loading something into the canframe and ....
+            // ok, now canframe ...
+            std::memset(&canframe, 0, sizeof(canframe));
             
-            frame_set_sender(frame, data.from);
-            frame_set_clascmddestinationdata(frame, data.clas, data.cmd, data.to, dat, siz);
-            frame_set_size(frame, siz);
+            frame_set_sender(canframe, candata.from);
+            frame_set_clascmddestinationdata(canframe, candata.clas, candata.cmd, candata.to, dat, siz);
+            frame_set_size(canframe, siz);
             
-            // ok, now we can compute ... data.datainframe and data.sizeofdatainframe
-            data.datainframe = frame2databuffer(frame);
-            data.sizeofdatainframe = frame2datasize(frame);
+            // ok, now we can compute ... candata.datainframe and candata.sizeofdatainframe
+            candata.datainframe = frame2databuffer(canframe);
+            candata.sizeofdatainframe = frame2datasize(canframe);
             
             valid = true;
         }
@@ -396,11 +396,11 @@ namespace embot { namespace app { namespace canprotocol {
 
 
             
-        bool Message_bldr_BROADCAST::load(const embot::hw::can::Frame &frame)
+        bool Message_bldr_BROADCAST::load(const embot::hw::can::Frame &inframe)
         {
-            Message::set(frame); 
+            Message::set(inframe); 
             
-            if(static_cast<std::uint8_t>(bldrCMD::BROADCAST) != frame2cmd(frame))
+            if(static_cast<std::uint8_t>(bldrCMD::BROADCAST) != frame2cmd(inframe))
             {
                 return false; 
             }
@@ -408,7 +408,7 @@ namespace embot { namespace app { namespace canprotocol {
             return true;
         }  
 
-        bool Message_bldr_BROADCAST::reply(embot::hw::can::Frame &frame, const std::uint8_t sender, const ReplyInfo &replyinfo)
+        bool Message_bldr_BROADCAST::reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo)
         {
             std::uint8_t dd[7] = {0};
             dd[0] = static_cast<std::uint8_t>(replyinfo.board);
@@ -418,49 +418,49 @@ namespace embot { namespace app { namespace canprotocol {
             
             std::uint8_t datalen = (Process::bootloader == replyinfo.process) ? (3) : (4);
             
-            frame_set_sender(frame, sender);
-            frame_set_clascmddestinationdata(frame, Clas::bootloader, static_cast<std::uint8_t>(bldrCMD::BROADCAST), data.from, dd, datalen);
-            frame_set_size(frame, datalen+1);
+            frame_set_sender(outframe, sender);
+            frame_set_clascmddestinationdata(outframe, Clas::bootloader, static_cast<std::uint8_t>(bldrCMD::BROADCAST), candata.from, dd, datalen);
+            frame_set_size(outframe, datalen+1);
             return true;
         }            
         
     
             
-        bool Message_bldr_BOARD::load(const embot::hw::can::Frame &frame)
+        bool Message_bldr_BOARD::load(const embot::hw::can::Frame &inframe)
         {
-            Message::set(frame);
+            Message::set(inframe);
             
-            if(static_cast<std::uint8_t>(bldrCMD::BOARD) != frame2cmd(frame))
+            if(static_cast<std::uint8_t>(bldrCMD::BOARD) != frame2cmd(inframe))
             {
                 return false; 
             }
             
-            info.eepromerase = data.datainframe[0];   
+            info.eepromerase = candata.datainframe[0];   
 
             return true;
         }                    
         
-        bool Message_bldr_BOARD::reply(embot::hw::can::Frame &frame, const std::uint8_t sender)
+        bool Message_bldr_BOARD::reply(embot::hw::can::Frame &outframe, const std::uint8_t sender)
         {
-            frame_set_sender(frame, sender);
-            frame_set_clascmddestinationdata(frame, Clas::bootloader, static_cast<std::uint8_t>(bldrCMD::BOARD), data.from, nullptr, 0);
-            frame_set_size(frame, 1);
+            frame_set_sender(outframe, sender);
+            frame_set_clascmddestinationdata(outframe, Clas::bootloader, static_cast<std::uint8_t>(bldrCMD::BOARD), candata.from, nullptr, 0);
+            frame_set_size(outframe, 1);
             return true;
         }     
     
 
             
-        bool Message_bldr_ADDRESS::load(const embot::hw::can::Frame &frame)
+        bool Message_bldr_ADDRESS::load(const embot::hw::can::Frame &inframe)
         {
-            Message::set(frame);  
+            Message::set(inframe);  
             
-            if(static_cast<std::uint8_t>(bldrCMD::ADDRESS) != frame2cmd(frame))
+            if(static_cast<std::uint8_t>(bldrCMD::ADDRESS) != frame2cmd(inframe))
             {
                 return false; 
             }
             
-            info.datalen = data.datainframe[0];
-            info.address = data.datainframe[1] | (static_cast<std::uint32_t>(data.datainframe[2]) << 8) | (static_cast<std::uint32_t>(data.datainframe[4]) << 16) | (static_cast<std::uint32_t>(data.datainframe[5]) << 24);
+            info.datalen = candata.datainframe[0];
+            info.address = candata.datainframe[1] | (static_cast<std::uint32_t>(candata.datainframe[2]) << 8) | (static_cast<std::uint32_t>(candata.datainframe[4]) << 16) | (static_cast<std::uint32_t>(candata.datainframe[5]) << 24);
             
             return true;         
         }                    
@@ -471,11 +471,11 @@ namespace embot { namespace app { namespace canprotocol {
         } 
 
         
-        bool Message_bldr_START::load(const embot::hw::can::Frame &frame)
+        bool Message_bldr_START::load(const embot::hw::can::Frame &inframe)
         {
-            Message::set(frame);  
+            Message::set(inframe);  
             
-            if(static_cast<std::uint8_t>(bldrCMD::START) != frame2cmd(frame))
+            if(static_cast<std::uint8_t>(bldrCMD::START) != frame2cmd(inframe))
             {
                 return false; 
             }
@@ -483,48 +483,48 @@ namespace embot { namespace app { namespace canprotocol {
             return true;         
         }                    
 
-        bool Message_bldr_START::reply(embot::hw::can::Frame &frame, const std::uint8_t sender, const bool ok)
+        bool Message_bldr_START::reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const bool ok)
         {
-            frame_set_sender(frame, sender);
+            frame_set_sender(outframe, sender);
             char dd[1] = {1};
             dd[0] = (true == ok) ? (1) : (0);
-            frame_set_clascmddestinationdata(frame, Clas::bootloader, static_cast<std::uint8_t>(bldrCMD::START), data.from, dd, 1);
-            frame_set_size(frame, 2);
+            frame_set_clascmddestinationdata(outframe, Clas::bootloader, static_cast<std::uint8_t>(bldrCMD::START), candata.from, dd, 1);
+            frame_set_size(outframe, 2);
             return true;
         }  
         
-        bool Message_bldr_DATA::load(const embot::hw::can::Frame &frame)
+        bool Message_bldr_DATA::load(const embot::hw::can::Frame &inframe)
         {
-            Message::set(frame);  
+            Message::set(inframe);  
             
-            if(static_cast<std::uint8_t>(bldrCMD::DATA) != frame2cmd(frame))
+            if(static_cast<std::uint8_t>(bldrCMD::DATA) != frame2cmd(inframe))
             {
                 return false; 
             }
             
-            info.size = data.sizeofdatainframe;
-            info.data = &data.datainframe[0];
+            info.size = candata.sizeofdatainframe;
+            info.data = &candata.datainframe[0];
             
             return true;         
         }   
 
-        bool Message_bldr_DATA::reply(embot::hw::can::Frame &frame, const std::uint8_t sender, const bool ok)
+        bool Message_bldr_DATA::reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const bool ok)
         {
-            frame_set_sender(frame, sender);
+            frame_set_sender(outframe, sender);
             char dd[1] = {1};
             dd[0] = (true == ok) ? (1) : (0);
-            frame_set_clascmddestinationdata(frame, Clas::bootloader, static_cast<std::uint8_t>(bldrCMD::DATA), data.from, dd, 1);
-            frame_set_size(frame, 2);
+            frame_set_clascmddestinationdata(outframe, Clas::bootloader, static_cast<std::uint8_t>(bldrCMD::DATA), candata.from, dd, 1);
+            frame_set_size(outframe, 2);
             return true;
         }              
         
 
             
-        bool Message_bldr_END::load(const embot::hw::can::Frame &frame)
+        bool Message_bldr_END::load(const embot::hw::can::Frame &inframe)
         {
-            Message::set(frame);  
+            Message::set(inframe);  
             
-            if(static_cast<std::uint8_t>(bldrCMD::END) != frame2cmd(frame))
+            if(static_cast<std::uint8_t>(bldrCMD::END) != frame2cmd(inframe))
             {
                 return false; 
             }
@@ -532,33 +532,33 @@ namespace embot { namespace app { namespace canprotocol {
             return true;         
         }                    
             
-        bool Message_bldr_END::reply(embot::hw::can::Frame &frame, const std::uint8_t sender, const bool ok)
+        bool Message_bldr_END::reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const bool ok)
         {
-            frame_set_sender(frame, sender);
+            frame_set_sender(outframe, sender);
             char dd[1] = {1};
             dd[0] = (true == ok) ? (1) : (0);
-            frame_set_clascmddestinationdata(frame, Clas::bootloader, static_cast<std::uint8_t>(bldrCMD::END), data.from, dd, 1);
-            frame_set_size(frame, 2);
+            frame_set_clascmddestinationdata(outframe, Clas::bootloader, static_cast<std::uint8_t>(bldrCMD::END), candata.from, dd, 1);
+            frame_set_size(outframe, 2);
             return true;
         }  
         
         
-        bool Message_bldr_SETCANADDRESS::load(const embot::hw::can::Frame &frame)
+        bool Message_bldr_SETCANADDRESS::load(const embot::hw::can::Frame &inframe)
         {
-            Message::set(frame);  
+            Message::set(inframe);  
             
-            if(static_cast<std::uint8_t>(bldrCMD::SETCANADDRESS) != frame2cmd(frame))
+            if(static_cast<std::uint8_t>(bldrCMD::SETCANADDRESS) != frame2cmd(inframe))
             {
                 return false; 
             }
             
-            info.address = data.datainframe[0];
+            info.address = candata.datainframe[0];
             info.randominvalidmask = 0x0000;
-            if(3 == frame.size)
+            if(3 == inframe.size)
             {
-                info.randominvalidmask = data.datainframe[2];
+                info.randominvalidmask = candata.datainframe[2];
                 info.randominvalidmask <<= 8;
-                info.randominvalidmask |= data.datainframe[1];
+                info.randominvalidmask |= candata.datainframe[1];
             }
           
             return true;         
@@ -570,24 +570,24 @@ namespace embot { namespace app { namespace canprotocol {
         }    
                
         
-        bool Message_base_GET_FIRMWARE_VERSION::load(const embot::hw::can::Frame &frame)
+        bool Message_base_GET_FIRMWARE_VERSION::load(const embot::hw::can::Frame &inframe)
         {
-            Message::set(frame);  
+            Message::set(inframe);  
             
-            if(this->cmd != frame2cmd(frame))
+            if(this->cmd != frame2cmd(inframe))
             {
                 return false; 
             }
             
-            info.requiredprotocol.major = data.datainframe[0];
-            info.requiredprotocol.minor = data.datainframe[1];
+            info.requiredprotocol.major = candata.datainframe[0];
+            info.requiredprotocol.minor = candata.datainframe[1];
           
             return true;         
         }                    
             
-        bool Message_base_GET_FIRMWARE_VERSION::reply(embot::hw::can::Frame &frame, const std::uint8_t sender, const ReplyInfo &replyinfo)
+        bool Message_base_GET_FIRMWARE_VERSION::reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo)
         {
-            frame_set_sender(frame, sender);
+            frame_set_sender(outframe, sender);
             char dd[7] = {0};
             dd[0] = static_cast<std::uint8_t>(replyinfo.board);
             dd[1] = replyinfo.firmware.major;
@@ -597,17 +597,17 @@ namespace embot { namespace app { namespace canprotocol {
             dd[5] = replyinfo.protocol.minor;
             dd[6] = ((replyinfo.protocol.major == info.requiredprotocol.major) && (replyinfo.protocol.minor >= info.requiredprotocol.minor) ) ? (1) : (0);;
                        
-            frame_set_clascmddestinationdata(frame, this->cls, this->cmd, data.from, dd, 7);
-            frame_set_size(frame, 8);
+            frame_set_clascmddestinationdata(outframe, this->cls, this->cmd, candata.from, dd, 7);
+            frame_set_size(outframe, 8);
             return true;
         } 
 
 
-        bool Message_bldr_GET_ADDITIONAL_INFO::load(const embot::hw::can::Frame &frame)
+        bool Message_bldr_GET_ADDITIONAL_INFO::load(const embot::hw::can::Frame &inframe)
         {
-            Message::set(frame);  
+            Message::set(inframe);  
             
-            if(static_cast<std::uint8_t>(bldrCMD::GET_ADDITIONAL_INFO) != frame2cmd(frame))
+            if(static_cast<std::uint8_t>(bldrCMD::GET_ADDITIONAL_INFO) != frame2cmd(inframe))
             {
                 return false; 
             }
@@ -624,14 +624,14 @@ namespace embot { namespace app { namespace canprotocol {
             return nreplies;
         }    
             
-        bool Message_bldr_GET_ADDITIONAL_INFO::reply(embot::hw::can::Frame &frame, const std::uint8_t sender, const ReplyInfo &replyinfo)
+        bool Message_bldr_GET_ADDITIONAL_INFO::reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo)
         {
             if(counter >= nreplies)
             {
                 return false;
             }
             
-            frame_set_sender(frame, sender);
+            frame_set_sender(outframe, sender);
             char dd[7] = {0};
             dd[0] = counter;
             dd[1] = replyinfo.info32[4*counter];
@@ -640,8 +640,8 @@ namespace embot { namespace app { namespace canprotocol {
             dd[4] = replyinfo.info32[4*counter+3];
 
                        
-            frame_set_clascmddestinationdata(frame, Clas::bootloader, static_cast<std::uint8_t>(bldrCMD::GET_ADDITIONAL_INFO), data.from, dd, 5);
-            frame_set_size(frame, 6);
+            frame_set_clascmddestinationdata(outframe, Clas::bootloader, static_cast<std::uint8_t>(bldrCMD::GET_ADDITIONAL_INFO), candata.from, dd, 5);
+            frame_set_size(outframe, 6);
             
             counter ++;
             
@@ -649,16 +649,16 @@ namespace embot { namespace app { namespace canprotocol {
         }   
         
 
-        bool Message_bldr_SET_ADDITIONAL_INFO::load(const embot::hw::can::Frame &frame)
+        bool Message_bldr_SET_ADDITIONAL_INFO::load(const embot::hw::can::Frame &inframe)
         {
-            Message::set(frame);  
+            Message::set(inframe);  
             
-            if(static_cast<std::uint8_t>(bldrCMD::SET_ADDITIONAL_INFO) != frame2cmd(frame))
+            if(static_cast<std::uint8_t>(bldrCMD::SET_ADDITIONAL_INFO) != frame2cmd(inframe))
             {
                 return false; 
             }
             
-            std::uint8_t counter = data.datainframe[0];
+            std::uint8_t counter = candata.datainframe[0];
             if(counter > 7)
             {
                 info.offset = 255;
@@ -666,10 +666,10 @@ namespace embot { namespace app { namespace canprotocol {
             }
             
             info.offset = 4*counter;
-            info.info04[0] = data.datainframe[1];
-            info.info04[1] = data.datainframe[2];
-            info.info04[2] = data.datainframe[3];
-            info.info04[3] = data.datainframe[4];
+            info.info04[0] = candata.datainframe[1];
+            info.info04[1] = candata.datainframe[2];
+            info.info04[2] = candata.datainframe[3];
+            info.info04[3] = candata.datainframe[4];
             
             return true;         
         }     
@@ -684,16 +684,16 @@ namespace embot { namespace app { namespace canprotocol {
         char Message_bldr_SET_ADDITIONAL_INFO2::cumulativeinfo32[32] = {0};
         std::uint8_t Message_bldr_SET_ADDITIONAL_INFO2::receivedmask = 0;
         
-        bool Message_bldr_SET_ADDITIONAL_INFO2::load(const embot::hw::can::Frame &frame)
+        bool Message_bldr_SET_ADDITIONAL_INFO2::load(const embot::hw::can::Frame &inframe)
         {
-            Message::set(frame);  
+            Message::set(inframe);  
             
-            if(static_cast<std::uint8_t>(bldrCMD::SET_ADDITIONAL_INFO) != frame2cmd(frame))
+            if(static_cast<std::uint8_t>(bldrCMD::SET_ADDITIONAL_INFO) != frame2cmd(inframe))
             {
                 return false; 
             }
             
-            std::uint8_t counter = data.datainframe[0];
+            std::uint8_t counter = candata.datainframe[0];
             if(counter > 7)
             {
                 return false;
@@ -707,7 +707,7 @@ namespace embot { namespace app { namespace canprotocol {
             }
             
             embot::common::bit::set(receivedmask, counter);
-            std::memmove(&cumulativeinfo32[4*counter], &data.datainframe[1], 4);
+            std::memmove(&cumulativeinfo32[4*counter], &candata.datainframe[1], 4);
             
             info.valid = false;
             
@@ -727,16 +727,16 @@ namespace embot { namespace app { namespace canprotocol {
 
 
 
-        bool Message_base_SET_ID::load(const embot::hw::can::Frame &frame)
+        bool Message_base_SET_ID::load(const embot::hw::can::Frame &inframe)
         {
-            Message::set(frame);  
+            Message::set(inframe);  
             
-            if(this->cmd != frame2cmd(frame))
+            if(this->cmd != frame2cmd(inframe))
             {
                 return false; 
             }
             
-            info.address = data.datainframe[0];
+            info.address = candata.datainframe[0];
           
             return true;         
         }                    
@@ -748,11 +748,11 @@ namespace embot { namespace app { namespace canprotocol {
 
 
        
-        bool Message_aspoll_SET_TXMODE::load(const embot::hw::can::Frame &frame)
+        bool Message_aspoll_SET_TXMODE::load(const embot::hw::can::Frame &inframe)
         {
-            Message::set(frame);  
+            Message::set(inframe);  
             
-            if(static_cast<std::uint8_t>(aspollCMD::SET_TXMODE) != frame2cmd(frame))
+            if(static_cast<std::uint8_t>(aspollCMD::SET_TXMODE) != frame2cmd(inframe))
             {
                 return false; 
             }
@@ -763,7 +763,7 @@ namespace embot { namespace app { namespace canprotocol {
                 case Board::mtb4:
                 {
                     // according to protocol, we may have 0 (icubCanProto_as_sigmode_signal) or 1 (icubCanProto_as_sigmode_dontsignal)
-                    info.transmit = (0 == data.datainframe[0]) ? true : false;
+                    info.transmit = (0 == candata.datainframe[0]) ? true : false;
                     info.strainmode = StrainMode::none;
                 } break;
                 
@@ -772,22 +772,22 @@ namespace embot { namespace app { namespace canprotocol {
                 {
                     // according to protocol, we may have 0 (eoas_strainmode_txcalibrateddatacontinuously), 1 (eoas_strainmode_acquirebutdonttx),
                     // 3 (eoas_strainmode_txuncalibrateddatacontinuously), or 4 (eoas_strainmode_txalldatacontinuously)
-                    if(0 == data.datainframe[0])    
+                    if(0 == candata.datainframe[0])    
                     {
                         info.transmit = true;                        
                         info.strainmode = StrainMode::txCalibrated;
                     }
-                    else if(1 == data.datainframe[0])       
+                    else if(1 == candata.datainframe[0])       
                     {
                         info.transmit = false;
                         info.strainmode = StrainMode::acquireOnly;
                     }
-                    else if(3 == data.datainframe[0])       
+                    else if(3 == candata.datainframe[0])       
                     {
                         info.transmit = true;  
                         info.strainmode = StrainMode::txUncalibrated;
                     }
-                    else if(4 == data.datainframe[0])       
+                    else if(4 == candata.datainframe[0])       
                     {
                         info.transmit = true;  
                         info.strainmode = StrainMode::txAll;
@@ -815,16 +815,16 @@ namespace embot { namespace app { namespace canprotocol {
         } 
         
 
-        bool Message_aspoll_SKIN_SET_BRD_CFG::load(const embot::hw::can::Frame &frame)
+        bool Message_aspoll_SKIN_SET_BRD_CFG::load(const embot::hw::can::Frame &inframe)
         {
-            Message::set(frame);  
+            Message::set(inframe);  
             
-            if(static_cast<std::uint8_t>(aspollCMD::SKIN_SET_BRD_CFG) != frame2cmd(frame))
+            if(static_cast<std::uint8_t>(aspollCMD::SKIN_SET_BRD_CFG) != frame2cmd(inframe))
             {
                 return false; 
             }
             
-            switch(data.datainframe[0])
+            switch(candata.datainframe[0])
             {
                 case static_cast<std::uint8_t>(SkinType::withTemperatureCompensation):
                 {
@@ -852,8 +852,8 @@ namespace embot { namespace app { namespace canprotocol {
                 } break;                                
             }
             
-            info.txperiod = 1000*data.datainframe[1]; // transform from msec into usec
-            info.noload = data.datainframe[2];
+            info.txperiod = 1000*candata.datainframe[1]; // transform from msec into usec
+            info.noload = candata.datainframe[2];
           
             return true;         
         } 
@@ -865,20 +865,20 @@ namespace embot { namespace app { namespace canprotocol {
         }  
 
 
-        bool Message_aspoll_SKIN_SET_TRIANG_CFG::load(const embot::hw::can::Frame &frame)
+        bool Message_aspoll_SKIN_SET_TRIANG_CFG::load(const embot::hw::can::Frame &inframe)
         {
-            Message::set(frame);  
+            Message::set(inframe);  
             
-            if(static_cast<std::uint8_t>(aspollCMD::SKIN_SET_TRIANG_CFG) != frame2cmd(frame))
+            if(static_cast<std::uint8_t>(aspollCMD::SKIN_SET_TRIANG_CFG) != frame2cmd(inframe))
             {
                 return false; 
             }
             
-            info.trgStart = data.datainframe[0];
-            info.trgEnd= data.datainframe[1];
-            info.shift = data.datainframe[2];
-            info.enabled = embot::common::bit::check(data.datainframe[3], 0);
-            info.cdcOffset = data.datainframe[4] | static_cast<std::uint16_t>(data.datainframe[5]) << 8;
+            info.trgStart = candata.datainframe[0];
+            info.trgEnd= candata.datainframe[1];
+            info.shift = candata.datainframe[2];
+            info.enabled = embot::common::bit::check(candata.datainframe[3], 0);
+            info.cdcOffset = candata.datainframe[4] | static_cast<std::uint16_t>(candata.datainframe[5]) << 8;
          
             return true;         
         } 
@@ -900,16 +900,16 @@ namespace embot { namespace app { namespace canprotocol {
             return true;
         }
             
-        bool Message_skper_TRG::get(embot::hw::can::Frame &frame0, embot::hw::can::Frame &frame1)
+        bool Message_skper_TRG::get(embot::hw::can::Frame &outframe0, embot::hw::can::Frame &outframe1)
         {
-            std::uint8_t data[8] = {0};
-            data[0] = 0x40;
-            std::memmove(&data[1], &info.the12s[0], 7);
-            Message::set(info.canaddress, 0xf, Clas::periodicSkin, info.trianglenum, data, 8);
-            std::memmove(&frame0, &frame, sizeof(embot::hw::can::Frame));
+            std::uint8_t data08[8] = {0};
+            data08[0] = 0x40;
+            std::memmove(&data08[1], &info.the12s[0], 7);
+            Message::set(info.canaddress, 0xf, Clas::periodicSkin, info.trianglenum, data08, 8);
+            std::memmove(&outframe0, &canframe, sizeof(embot::hw::can::Frame));
             
-            data[0] = 0xC0;
-            std::memmove(&data[1], &info.the12s[7], 5);
+            data08[0] = 0xC0;
+            std::memmove(&data08[1], &info.the12s[7], 5);
             // now outofrange and error flags
             std::uint8_t errorflags = 0; 
             // bit ErrorInTriangleBit::noack is set if any bit inside notackmaskofthe12s is set.
@@ -922,11 +922,11 @@ namespace embot { namespace app { namespace canprotocol {
             {
                 embot::common::bit::set(errorflags, static_cast<std::uint8_t>(ErrorInTriangleBit::notconnected)); 
             }            
-            data[6] = static_cast<std::uint8_t>((info.outofrangemaskofthe12s & 0x0ff0) >> 4);
-            data[7] = static_cast<std::uint8_t>((info.outofrangemaskofthe12s & 0x000f) << 4) | (errorflags & 0x0f);
+            data08[6] = static_cast<std::uint8_t>((info.outofrangemaskofthe12s & 0x0ff0) >> 4);
+            data08[7] = static_cast<std::uint8_t>((info.outofrangemaskofthe12s & 0x000f) << 4) | (errorflags & 0x0f);
             
-            Message::set(info.canaddress, 0xf, Clas::periodicSkin, info.trianglenum, data, 8);
-            std::memmove(&frame1, &frame, sizeof(embot::hw::can::Frame));
+            Message::set(info.canaddress, 0xf, Clas::periodicSkin, info.trianglenum, data08, 8);
+            std::memmove(&outframe1, &canframe, sizeof(embot::hw::can::Frame));
             
             return true;
         }  
@@ -972,19 +972,86 @@ namespace embot { namespace app { namespace canprotocol {
                 charsinframe = 6;
             }
             
-            std::uint8_t data[8] = {0};
-            data[0] = lastframe ? (static_cast<std::uint8_t>(mcperCMD::PRINT) + 128) : (static_cast<std::uint8_t>(mcperCMD::PRINT));
-            data[1] = ((textIDmod4 << 4) & 0xF0) | (framecounter & 0x0F);
-            std::memmove(&data[2], &info.text[6*framecounter], charsinframe);
+            std::uint8_t data08[8] = {0};
+            data08[0] = lastframe ? (static_cast<std::uint8_t>(mcperCMD::PRINT) + 128) : (static_cast<std::uint8_t>(mcperCMD::PRINT));
+            data08[1] = ((textIDmod4 << 4) & 0xF0) | (framecounter & 0x0F);
+            std::memmove(&data08[2], &info.text[6*framecounter], charsinframe);
             
             // ok, increment framecounter
             framecounter ++;
             
-            Message::set(info.canaddress, 0xf, Clas::periodicMotorControl, static_cast<std::uint8_t>(mcperCMD::PRINT), data, 2+charsinframe);
-            std::memmove(&outframe, &frame, sizeof(embot::hw::can::Frame));
+            Message::set(info.canaddress, 0xf, Clas::periodicMotorControl, static_cast<std::uint8_t>(mcperCMD::PRINT), data08, 2+charsinframe);
+            std::memmove(&outframe, &canframe, sizeof(embot::hw::can::Frame));
                         
             return true;
-        }            
+        }  
+
+
+        bool Message_aspoll_ACC_GYRO_SETUP::load(const embot::hw::can::Frame &inframe)
+        {
+            Message::set(inframe);  
+            
+            if(static_cast<std::uint8_t>(aspollCMD::ACC_GYRO_SETUP) != frame2cmd(inframe))
+            {
+                return false; 
+            }
+            
+            info.maskoftypes = candata.datainframe[0];
+            info.txperiod = 1000*candata.datainframe[1]; // transform from msec into usec
+          
+            return true;         
+        } 
+        
+            
+        bool Message_aspoll_ACC_GYRO_SETUP::reply()
+        {
+            return false;
+        } 
+
+
+        bool Message_isper_DIGITAL_GYROSCOPE::load(const Info& inf)
+        {
+            info = inf;
+          
+            return true;
+        }
+            
+        bool Message_isper_DIGITAL_GYROSCOPE::get(embot::hw::can::Frame &outframe)
+        {
+            std::uint8_t data08[8] = {0};
+            data08[0] = static_cast<std::uint8_t>((info.x & 0x0f));
+            data08[1] = static_cast<std::uint8_t>((info.x & 0xf0) >> 8);
+            data08[2] = static_cast<std::uint8_t>((info.y & 0x0f));
+            data08[3] = static_cast<std::uint8_t>((info.y & 0xf0) >> 8);  
+            data08[4] = static_cast<std::uint8_t>((info.z & 0x0f));
+            data08[5] = static_cast<std::uint8_t>((info.z & 0xf0) >> 8);            
+            Message::set(info.canaddress, 0xf, Clas::periodicInertialSensor, static_cast<std::uint8_t>(isperCMD::DIGITAL_GYROSCOPE), data08, 6);
+            std::memmove(&outframe, &canframe, sizeof(embot::hw::can::Frame));
+                        
+            return true;
+        }  
+
+        bool Message_isper_DIGITAL_ACCELEROMETER::load(const Info& inf)
+        {
+            info = inf;
+          
+            return true;
+        }
+            
+        bool Message_isper_DIGITAL_ACCELEROMETER::get(embot::hw::can::Frame &outframe)
+        {
+            std::uint8_t data08[8] = {0};
+            data08[0] = static_cast<std::uint8_t>((info.x & 0x0f));
+            data08[1] = static_cast<std::uint8_t>((info.x & 0xf0) >> 8);
+            data08[2] = static_cast<std::uint8_t>((info.y & 0x0f));
+            data08[3] = static_cast<std::uint8_t>((info.y & 0xf0) >> 8);  
+            data08[4] = static_cast<std::uint8_t>((info.z & 0x0f));
+            data08[5] = static_cast<std::uint8_t>((info.z & 0xf0) >> 8);            
+            Message::set(info.canaddress, 0xf, Clas::periodicInertialSensor, static_cast<std::uint8_t>(isperCMD::DIGITAL_ACCELEROMETER), data08, 6);
+            std::memmove(&outframe, &canframe, sizeof(embot::hw::can::Frame));
+                        
+            return true;
+        }          
 
 }}} // namespace embot { namespace app { namespace canprotocol {
 

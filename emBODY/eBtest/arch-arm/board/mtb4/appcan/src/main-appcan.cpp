@@ -19,7 +19,7 @@
 #include "embot_app_application_theCANparserMTB.h"
 
 #include "embot_app_application_theSkin.h"
-
+#include "embot_app_application_theIMU.h"
 
 
 static const embot::app::canprotocol::versionOfAPPLICATION vAP = {2, 2, 20};
@@ -113,7 +113,14 @@ static void start_evt_based(void)
     embot::app::application::theSkin::Config configskin;
     configskin.tickevent = evSKINprocess;
     configskin.totask = eventbasedtask;
-    theskin.initialise(configskin);      
+    theskin.initialise(configskin);   
+
+
+    embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance();
+    embot::app::application::theIMU::Config configimu;
+    configimu.tickevent = evIMUprocess;
+    configimu.totask = eventbasedtask;
+    theimu.initialise(configimu); 
 
     // finally start can. i keep it as last because i dont want that the isr-handler calls its onrxframe() 
     // before the eventbasedtask is created.
@@ -198,6 +205,9 @@ static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask
     
     if(true == embot::common::msk::check(eventmask, evIMUprocess))
     {
+        
+        embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance();
+        theimu.tick(outframes);
         // we operate on the IMU  by calling a imu.process(outframes);
         // the evIMUprocess is emitted  by:
         // 1. a periodic timer started at the reception of a specific message.

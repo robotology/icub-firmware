@@ -40,6 +40,7 @@
 
 #include "embot_app_application_theSkin.h"
 
+#include "embot_app_application_theIMU.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -77,6 +78,7 @@ struct embot::app::application::theCANparserMTB::Impl
     bool process_set_brdcfg(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);   
     bool process_set_trgcfg(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);      
     bool process_set_txmode(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);
+    bool process_set_accgyrosetup(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);
           
 };
 
@@ -120,6 +122,11 @@ bool embot::app::application::theCANparserMTB::Impl::process(const embot::hw::ca
                 txframe = process_set_txmode(frame, replies);
                 recognised = true;
             }
+            else if(static_cast<std::uint8_t>(embot::app::canprotocol::aspollCMD::ACC_GYRO_SETUP) == cmd)
+            { 
+                txframe = process_set_accgyrosetup(frame, replies);
+                recognised = true;                
+            }
  
         } break;
 
@@ -144,7 +151,7 @@ bool embot::app::application::theCANparserMTB::Impl::process_set_brdcfg(const em
     msg.load(frame);
       
     embot::app::application::theSkin &theskin = embot::app::application::theSkin::getInstance();    
-    theskin.config(msg.info);
+    theskin.configure(msg.info);
             
     return msg.reply();        
 }
@@ -156,7 +163,19 @@ bool embot::app::application::theCANparserMTB::Impl::process_set_trgcfg(const em
     msg.load(frame);
       
     embot::app::application::theSkin &theskin = embot::app::application::theSkin::getInstance();    
-    theskin.config(msg.info);
+    theskin.configure(msg.info);
+    
+    return msg.reply();        
+}
+
+
+bool embot::app::application::theCANparserMTB::Impl::process_set_accgyrosetup(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
+{
+    embot::app::canprotocol::Message_aspoll_ACC_GYRO_SETUP msg;
+    msg.load(frame);
+      
+    embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance();    
+    theimu.configure(msg.info);
     
     return msg.reply();        
 }

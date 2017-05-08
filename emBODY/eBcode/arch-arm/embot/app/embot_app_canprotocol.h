@@ -39,12 +39,14 @@ namespace embot { namespace app { namespace canprotocol {
     
     enum class mcpollCMD { none = 0xfe, SET_BOARD_ID = 50, GET_FIRMWARE_VERSION = 91, };
     
-    enum class aspollCMD { none = 0xfe, SET_TXMODE = 0x07, GET_FIRMWARE_VERSION = 0x1C, SET_BOARD_ADX = 0x32, SKIN_SET_BRD_CFG = 77, SKIN_SET_TRIANG_CFG = 80 };
+    enum class aspollCMD { none = 0xfe, SET_TXMODE = 0x07, GET_FIRMWARE_VERSION = 0x1C, SET_BOARD_ADX = 0x32, SKIN_SET_BRD_CFG = 77, ACC_GYRO_SETUP = 79, SKIN_SET_TRIANG_CFG = 80 };
     
     enum class mcperCMD { PRINT = 6 };
     
     enum class skperCMD { TRG00 = 0, TRG01 = 1, TRG02 = 2, TRG03 = 3, TRG04 = 4, TRG05 = 5, TRG06 = 6, TRG07 = 7, TRG08 = 8, TRG09 = 9, 
                           TRG10 = 10, TRG11 = 11, TRG12 = 12, TRG13 = 13, TRG14 = 14, TRG15 = 15 };
+    
+    enum class isperCMD { DIGITAL_GYROSCOPE = 0, DIGITAL_ACCELEROMETER = 1 };
     
     bldrCMD cmd2bldr(std::uint8_t cmd);
     aspollCMD cmd2aspoll(std::uint8_t cmd);
@@ -151,7 +153,7 @@ namespace embot { namespace app { namespace canprotocol {
     {
     public:
         
-        struct Data
+        struct CanData
         {
             std::uint8_t            from;
             std::uint8_t            to;
@@ -159,15 +161,15 @@ namespace embot { namespace app { namespace canprotocol {
             std::uint8_t            cmd;       // use they are: ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID, etc.
             std::uint8_t*           datainframe;
             std::uint8_t            sizeofdatainframe;  
-            Data() { reset(); }
+            CanData() { reset(); }
             void reset() { from = 0; to = 0; clas = Clas::none; cmd = 0; datainframe = nullptr; sizeofdatainframe = 0; } 
         };
 
     public:        
         
         bool                    valid;
-        Data                    data;
-        embot::hw::can::Frame   frame;
+        CanData                 candata;
+        embot::hw::can::Frame   canframe;
     
               
         Message() { clear(); }
@@ -212,8 +214,8 @@ namespace embot { namespace app { namespace canprotocol {
                     
         Message_bldr_BROADCAST(){}
             
-        bool load(const embot::hw::can::Frame &frame);            
-        bool reply(embot::hw::can::Frame &frame, const std::uint8_t sender, const ReplyInfo &replyinfo);   // boardtype, etc.
+        bool load(const embot::hw::can::Frame &inframe);            
+        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);   // boardtype, etc.
         
     };
     
@@ -231,9 +233,9 @@ namespace embot { namespace app { namespace canprotocol {
         
         Message_bldr_BOARD(){}
             
-        bool load(const embot::hw::can::Frame &frame);
+        bool load(const embot::hw::can::Frame &inframe);
             
-        bool reply(embot::hw::can::Frame &frame, const std::uint8_t sender);   // ack/nack        
+        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender);   // ack/nack        
     };
     
     
@@ -252,7 +254,7 @@ namespace embot { namespace app { namespace canprotocol {
                     
         Message_bldr_ADDRESS(){}
             
-        bool load(const embot::hw::can::Frame &frame); 
+        bool load(const embot::hw::can::Frame &inframe); 
             
         bool reply();   // none
         
@@ -273,9 +275,9 @@ namespace embot { namespace app { namespace canprotocol {
         
         Message_bldr_START(){}
             
-        bool load(const embot::hw::can::Frame &frame);
+        bool load(const embot::hw::can::Frame &inframe);
             
-        bool reply(embot::hw::can::Frame &frame, const std::uint8_t sender, const bool ok);   // ack/nack
+        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const bool ok);   // ack/nack
         
     };   
 
@@ -295,9 +297,9 @@ namespace embot { namespace app { namespace canprotocol {
                     
         Message_bldr_DATA(){}
             
-        bool load(const embot::hw::can::Frame &frame);
+        bool load(const embot::hw::can::Frame &inframe);
             
-        bool reply(embot::hw::can::Frame &frame, const std::uint8_t sender, const bool ok);  //ack but only when te cumulative Info::size reach Message_bldr_ADDRESS::Info::datalen
+        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const bool ok);  //ack but only when te cumulative Info::size reach Message_bldr_ADDRESS::Info::datalen
         
     }; 
 
@@ -316,9 +318,9 @@ namespace embot { namespace app { namespace canprotocol {
         
         Message_bldr_END(){}
             
-        bool load(const embot::hw::can::Frame &frame);
+        bool load(const embot::hw::can::Frame &inframe);
             
-        bool reply(embot::hw::can::Frame &frame, const std::uint8_t sender, const bool ok);  //ack/nack
+        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const bool ok);  //ack/nack
         
     };  
     
@@ -343,13 +345,13 @@ namespace embot { namespace app { namespace canprotocol {
                 
         Message_bldr_GET_ADDITIONAL_INFO() : counter(0) {}
             
-        bool load(const embot::hw::can::Frame &frame);
+        bool load(const embot::hw::can::Frame &inframe);
          
         // we have multiple frames ... best way is to pass a vector which is resized according to the needs.
         // but ... memory allocation, heap, embedded systems ... i prefer to give back a frame at a time.            
         std::uint8_t numberofreplies();
         // i give the frames in order until max number.    
-        bool reply(embot::hw::can::Frame &frame, const std::uint8_t sender, const ReplyInfo &replyinfo);  
+        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);  
 
         private:
         
@@ -373,7 +375,7 @@ namespace embot { namespace app { namespace canprotocol {
                 
         Message_bldr_SET_ADDITIONAL_INFO() {}
             
-        bool load(const embot::hw::can::Frame &frame);
+        bool load(const embot::hw::can::Frame &inframe);
          
         // we need to receive 8 frames to be able to have a complete 32 bytes long info32. we operate in memory-less mode.
         // each time we recover only a fraction of info32[].
@@ -402,7 +404,7 @@ namespace embot { namespace app { namespace canprotocol {
                 
         Message_bldr_SET_ADDITIONAL_INFO2() {}
             
-        bool load(const embot::hw::can::Frame &frame);
+        bool load(const embot::hw::can::Frame &inframe);
          
         // we need to receive 8 frames to be able to have a complete 32 bytes long info32. we operate in memory-less mode.
         // each time we recover only a fraction of info32[].
@@ -434,7 +436,7 @@ namespace embot { namespace app { namespace canprotocol {
         
         Message_bldr_SETCANADDRESS(){}
             
-        bool load(const embot::hw::can::Frame &frame);
+        bool load(const embot::hw::can::Frame &inframe);
             
         bool reply();   // none
         
@@ -465,9 +467,9 @@ namespace embot { namespace app { namespace canprotocol {
                 
         Message_base_GET_FIRMWARE_VERSION(Clas cl, std::uint8_t cm) : cls(cl), cmd(cm) {}
             
-        bool load(const embot::hw::can::Frame &frame);
+        bool load(const embot::hw::can::Frame &inframe);
             
-        bool reply(embot::hw::can::Frame &frame, const std::uint8_t sender, const ReplyInfo &replyinfo);    
+        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);    
             
         protected:
             
@@ -511,7 +513,7 @@ namespace embot { namespace app { namespace canprotocol {
                 
         Message_base_SET_ID(Clas cl, std::uint8_t cm) : cls(cl), cmd(cm) {}
             
-        bool load(const embot::hw::can::Frame &frame);
+        bool load(const embot::hw::can::Frame &inframe);
             
         bool reply();    
             
@@ -560,7 +562,7 @@ namespace embot { namespace app { namespace canprotocol {
         
         Message_aspoll_SET_TXMODE(Board brd) : board(brd) {}
             
-        bool load(const embot::hw::can::Frame &frame);
+        bool load(const embot::hw::can::Frame &inframe);
             
         bool reply();   // none
         
@@ -585,7 +587,7 @@ namespace embot { namespace app { namespace canprotocol {
         
         Message_aspoll_SKIN_SET_BRD_CFG() {}
             
-        bool load(const embot::hw::can::Frame &frame);
+        bool load(const embot::hw::can::Frame &inframe);
             
         bool reply();   // none
         
@@ -609,7 +611,7 @@ namespace embot { namespace app { namespace canprotocol {
         
         Message_aspoll_SKIN_SET_TRIANG_CFG() {}
             
-        bool load(const embot::hw::can::Frame &frame);
+        bool load(const embot::hw::can::Frame &inframe);
             
         bool reply();   // none
         
@@ -630,7 +632,7 @@ namespace embot { namespace app { namespace canprotocol {
             std::uint16_t               notackmaskofthe12s;
             std::uint8_t                trianglenum;
             std::uint8_t                canaddress;
-            Info() : trianglenum(0), canaddress(0), outofrangemaskofthe12s(0), notconnectedmaskofthe12s(0), notackmaskofthe12s(0) { std::memset(the12s, 0, sizeof(the12s)); }
+            Info() { std::memset(the12s, 0, sizeof(the12s)); trianglenum = canaddress = outofrangemaskofthe12s = notconnectedmaskofthe12s = notackmaskofthe12s = 0;}
         };
         
         Info info;
@@ -639,7 +641,7 @@ namespace embot { namespace app { namespace canprotocol {
             
         bool load(const Info& inf);
             
-        bool get(embot::hw::can::Frame &frame0, embot::hw::can::Frame &frame1);        
+        bool get(embot::hw::can::Frame &outframe0, embot::hw::can::Frame &outframe1);        
     };
 
     class Message_mcper_PRINT : public Message
@@ -650,12 +652,12 @@ namespace embot { namespace app { namespace canprotocol {
         { 
             char                        text[31];   // 30 chars + '0' : at most 5 can messages ('0' is not transmitted)
             std::uint8_t                canaddress;
-            Info() : canaddress(0) { std::memset(text, 0, sizeof(text)); }
+            Info() { std::memset(text, 0, sizeof(text)); canaddress = 0; }
         };
         
         Info info;
         
-        Message_mcper_PRINT() : framecounter(0), nframes(0), nchars(0) {}
+        Message_mcper_PRINT() { framecounter = nframes = nchars = 0; }
             
         bool load(const Info& inf);
             
@@ -670,8 +672,84 @@ namespace embot { namespace app { namespace canprotocol {
         std::uint8_t framecounter;    
         std::uint8_t nchars;           
         static std::uint8_t textIDmod4;  // 0, 1, 2, 3, 0, 1, 2, etc      
-    };   
+    }; 
 
+    class Message_aspoll_ACC_GYRO_SETUP : public Message
+    {
+        public:
+            
+        enum class InertialTypeBit { analogaccelerometer = 0, 
+                                     internaldigitalaccelerometer = 1, 
+                                     externaldigitalgyroscope = 2, 
+                                     externaldigitalaccelerometer = 3, 
+                                     none = 255 };
+        
+        enum class InertialType {   none = 0, 
+                                    analogaccelerometer = 0x01, 
+                                    internaldigitalaccelerometer = 0x02, 
+                                    externaldigitalgyroscope = 0x04, 
+                                    externaldigitalaccelerometer = 0x08 };
+        
+        struct Info
+        { 
+            std::uint8_t                maskoftypes;  
+            embot::common::relTime      txperiod;              
+            Info() : maskoftypes(0), txperiod(50*embot::common::time1millisec) {}
+        };
+        
+        Info info;
+        
+        Message_aspoll_ACC_GYRO_SETUP() {}
+            
+        bool load(const embot::hw::can::Frame &inframe);
+            
+        bool reply();   // none
+        
+    };     
+
+    class Message_isper_DIGITAL_GYROSCOPE : public Message
+    {
+        public:
+            
+        struct Info
+        { 
+            std::uint8_t                canaddress;
+            std::int16_t                x;
+            std::int16_t                y;
+            std::int16_t                z;
+            Info() : canaddress(0), x(0), y(0), z(0) { }
+        };
+        
+        Info info;
+        
+        Message_isper_DIGITAL_GYROSCOPE() {}
+            
+        bool load(const Info& inf);
+            
+        bool get(embot::hw::can::Frame &outframe);        
+    };
+    
+    class Message_isper_DIGITAL_ACCELEROMETER : public Message
+    {
+        public:
+                        
+        struct Info
+        { 
+            std::uint8_t                canaddress;
+            std::int16_t                x;
+            std::int16_t                y;
+            std::int16_t                z;
+            Info() : canaddress(0), x(0), y(0), z(0) { }
+        };
+        
+        Info info;
+        
+        Message_isper_DIGITAL_ACCELEROMETER() {}
+            
+        bool load(const Info& inf);
+            
+        bool get(embot::hw::can::Frame &outframe);        
+    };    
     
     
 }}} // namespace embot { namespace app { namespace canprotocol {

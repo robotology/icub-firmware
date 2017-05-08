@@ -485,7 +485,7 @@ bool embot::app::application::theSkin::initialise(Config &config)
 }
   
 
-bool embot::app::application::theSkin::config(embot::app::canprotocol::Message_aspoll_SKIN_SET_BRD_CFG::Info &brdcfg)
+bool embot::app::application::theSkin::configure(embot::app::canprotocol::Message_aspoll_SKIN_SET_BRD_CFG::Info &brdcfg)
 {
     pImpl->boardconfig = brdcfg;
     
@@ -510,7 +510,7 @@ bool embot::app::application::theSkin::config(embot::app::canprotocol::Message_a
 }
 
 
-bool embot::app::application::theSkin::config(embot::app::canprotocol::Message_aspoll_SKIN_SET_TRIANG_CFG::Info &trgcfg)
+bool embot::app::application::theSkin::configure(embot::app::canprotocol::Message_aspoll_SKIN_SET_TRIANG_CFG::Info &trgcfg)
 { 
     return pImpl->configtriangles(trgcfg);
 }
