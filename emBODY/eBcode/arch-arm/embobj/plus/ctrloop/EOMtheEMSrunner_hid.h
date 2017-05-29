@@ -100,6 +100,7 @@ struct EOMtheEMSrunner_hid
     uint8_t                     txcan1frames;
     uint8_t                     txcan2frames;
     eOemsrunner_cycletiming_t   cycletiming;
+    eObool_t                    isrunning;
 };
 
 

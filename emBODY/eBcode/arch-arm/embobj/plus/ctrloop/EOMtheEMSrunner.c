@@ -205,7 +205,8 @@ static EOMtheEMSrunner s_theemsrunner =
     EO_INIT(.txropsnumberincycle)   {0, 0, 0},
     EO_INIT(.txcan1frames)          0,
     EO_INIT(.txcan2frames)          0,
-    EO_INIT(.cycletiming)           { EO_INIT(.cycleisrunning) eobool_false, EO_INIT(.iterationnumber) 0, { {EO_INIT(.timestarted) 0, EO_INIT(.timestopped) 0, EO_INIT(.duration) {0, 0}, EO_INIT(.isexecuting) eobool_false, EO_INIT(.isabout2overflow) eobool_false, EO_INIT(.isoverflown) eobool_false} } } 
+    EO_INIT(.cycletiming)           { EO_INIT(.cycleisrunning) eobool_false, EO_INIT(.iterationnumber) 0, { {EO_INIT(.timestarted) 0, EO_INIT(.timestopped) 0, EO_INIT(.duration) {0, 0}, EO_INIT(.isexecuting) eobool_false, EO_INIT(.isabout2overflow) eobool_false, EO_INIT(.isoverflown) eobool_false} } },
+    EO_INIT(.isrunning)             eobool_false
 };
 
 
@@ -297,6 +298,8 @@ extern EOMtheEMSrunner * eom_emsrunner_Initialise(const eOemsrunner_cfg_t *cfg)
     eventviewer_load(ev_meas_tx_stop, meas_tx_stop);
 #endif
 
+    s_theemsrunner.isrunning = eobool_false;
+
     return(&s_theemsrunner);
 }
 
@@ -313,6 +316,15 @@ extern EOMtheEMSrunner* eom_emsrunner_GetHandle(void)
     }
 }
 
+extern eObool_t eom_emsrunner_IsRunning(EOMtheEMSrunner *p)
+{
+    if(NULL == p)
+    {
+        return(eobool_false);
+    }   
+
+    return p->isrunning;    
+}
 
 extern EOMtask * eom_emsrunner_GetTask(EOMtheEMSrunner *p, eOemsrunner_taskid_t id)
 {
@@ -444,6 +456,8 @@ extern eOresult_t eom_emsrunner_Start(EOMtheEMSrunner *p)
     // now i start the timers for rx, do, tx and also for guards ...    
     s_eom_emsrunner_6HALTIMERS_start(p);
     
+    p->isrunning = eobool_true;
+    
     return(eores_OK);
 }
 
@@ -459,7 +473,9 @@ extern eOresult_t eom_emsrunner_Stop(EOMtheEMSrunner *p)
     EOtransmitter * transmitter = eo_transceiver_GetTransmitter(eom_emstransceiver_GetTransceiver(eom_emstransceiver_GetHandle()));    
     eo_transmitter_TXdecimation_Set(transmitter, 1, 1, 1);
         
-    s_eom_emsrunner_6HALTIMERS_stop();    
+    s_eom_emsrunner_6HALTIMERS_stop(); 
+
+    p->isrunning = eobool_false;    
 
     return(eores_OK);    
 }
