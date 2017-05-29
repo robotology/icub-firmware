@@ -43,6 +43,8 @@
 
 #include "EOVtheCallbackManager.h"
 
+#include "EOMtheEMSrunner.h"
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -868,7 +870,7 @@ static uint16_t s_discover_fill(eOuprot_cmd_DISCOVER_REPLY_t *reply, eOuprot_opc
     ee_sharserv_part_proc_allavailable_get(&s_proctable, &nprocs);
     
     reply->boardtype = boardtype;
-    reply->unused[0] = EOUPROT_VALUE_OF_UNUSED_BYTE;
+    reply->unused[0] = (eobool_true == eom_emsrunner_IsRunning(eom_emsrunner_GetHandle())) ? 0x01 : (0x00);
     reply->capabilities = eouprot_get_capabilities(eApplication, EOUPROT_PROTOCOL_VERSION);;
     reply->mac48[0] = (ipnetworkstrg->macaddress>>40) & 0xFF;
     reply->mac48[1] = (ipnetworkstrg->macaddress>>32) & 0xFF;
