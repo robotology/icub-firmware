@@ -57,8 +57,8 @@ struct EOtheEncoderReader_hid
     EOtimer*                                waitreadtimer;
     uint8_t                                 numofjomos;
     uint8_t                                 numofencoders;
-    eOencoderreader_errortype_t             errors[eOappEncReader_jomos_maxnumberof];
-    uint8_t                                 failuremask;
+    uint8_t                                 failuremask2[2];
+    eOencoderreader_errortype_t             errors2[2][eOappEncReader_jomos_maxnumberof];
     EOappEncReader*                         reader;
 }; 
 

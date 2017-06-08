@@ -34,6 +34,8 @@
 
 #include "EOtheSharedHW.h"
 
+#include "EOMtheEMSrunner.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -496,6 +498,7 @@ static void s_eo_ethmonitor_process_resultsofquery(void)
     
     for(i=0; i<eOethmonitor_numberofports; i++)
     {
+        uint64_t applstate = (eobool_true == eom_emsrunner_IsRunning(eom_emsrunner_GetHandle())) ? (0x3000000000000000) : (0x1000000000000000);
         if(eobool_true == s_eo_theethmonitor.portstatus[i].on)
         {
             if(eobool_false == s_eo_theethmonitor.portstatus[i].previouson)
@@ -504,7 +507,7 @@ static void s_eo_ethmonitor_process_resultsofquery(void)
                 errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
                 errdes.sourceaddress    = 0;
                 errdes.par16            = i;
-                errdes.par64            = 0;
+                errdes.par64            = applstate;
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);                
             }
             
@@ -514,7 +517,7 @@ static void s_eo_ethmonitor_process_resultsofquery(void)
                 errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
                 errdes.sourceaddress    = 0;
                 errdes.par16            = i;
-                errdes.par64            = s_eo_theethmonitor.portstatus[i].rxcrc.value;    
+                errdes.par64            = applstate | (s_eo_theethmonitor.portstatus[i].rxcrc.value & 0xffffffff);    
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);                
             }
         }
@@ -526,7 +529,7 @@ static void s_eo_ethmonitor_process_resultsofquery(void)
                 errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
                 errdes.sourceaddress    = 0;
                 errdes.par16            = i;
-                errdes.par64            = 0;
+                errdes.par64            = applstate;
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);                
             }            
         }

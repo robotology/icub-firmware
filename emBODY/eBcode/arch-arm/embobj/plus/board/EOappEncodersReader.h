@@ -63,19 +63,6 @@ enum { eOappEncReader_jomos_maxnumberof = 4 };
 enum { eOappEncReader_encoders_maxnumberof = 2*eOappEncReader_jomos_maxnumberof }; 
 
 
-/** @typedef    enum eOappEncReader_errortype_t
-    @brief      contains the error typed detected by the encoder reader. 
- **/
-typedef enum
-{
-    err_NONE            = 0,
-    err_onReadFromSpi   = 1,
-    err_onParityError   = 2,
-    err_onInvalidValue  = 3
-} eOappEncReader_errortype_t;
-
-
-
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------
 // empty-section
 

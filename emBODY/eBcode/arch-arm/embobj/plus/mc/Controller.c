@@ -494,9 +494,9 @@ static void get_jomo_coupling_info(const eOmc_4jomo_coupling_t *jomoCouplingInfo
 eOmc_encoder_t MController_getTypeofEncoderAtJoint(const eOmc_jomo_descriptor_t *jomodes)
 {
     if(jomodes->encoder1.pos == eomc_pos_atjoint)
-        return(jomodes->encoder1.type);
+        return((eOmc_encoder_t)jomodes->encoder1.type);
     else if(jomodes->encoder2.pos == eomc_pos_atjoint)
-        return(jomodes->encoder2.type);
+        return((eOmc_encoder_t)jomodes->encoder2.type);
     else
         return (eomc_enc_none);
 }

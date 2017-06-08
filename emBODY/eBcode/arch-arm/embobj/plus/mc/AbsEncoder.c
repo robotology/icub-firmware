@@ -359,16 +359,23 @@ void AbsEncoder_invalid(AbsEncoder* o, eOencoderreader_errortype_t error_type)
     
     switch (error_type)
     {
-        case encreader_err_READING:
-            o->fault_state.bits.data_error = TRUE;
+        case encreader_err_NOTCONNECTED:
+        case encreader_err_NONE:
             break;
-        case encreader_err_PARITY:
+        
+        // all other cases are errors: AEA_PARITY, AEA_CHIP, AEA_READING have their tx_error, chip_error, data_error. all others: are data_error. 
+        case encreader_err_AEA_PARITY:
             o->fault_state.bits.tx_error = TRUE;
             break;
-        case encreader_err_CHIP:
+        case encreader_err_AEA_CHIP:
             o->fault_state.bits.chip_error = TRUE;
+            break;        
+        case encreader_err_AEA_READING:
+            o->fault_state.bits.data_error = TRUE;
             break;
+        
         default:
+            o->fault_state.bits.data_error = TRUE;
             break;
     }
         

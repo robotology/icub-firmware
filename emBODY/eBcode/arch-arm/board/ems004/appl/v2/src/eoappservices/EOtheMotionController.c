@@ -1111,11 +1111,13 @@ extern void eoprot_fun_INIT_mc_motor_status(const EOnv* nv)
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
-/*This function gets values from encoders at joints and at motors(if present)and updates the motionController engine.
-returns:
- - eores_NOK_timeout if readings are not available
- - eores_NOK_generic if an error occurred during reading at least one encoder 
- - eores_OK in case of success*/
+
+/*  This function gets values from encoders at joints and at motors(if present)and updates the motionController engine.
+    returns:
+    - eores_NOK_timeout if readings are not available
+    - eores_NOK_generic if an error occurred during reading at least one encoder 
+    - eores_OK in case of success
+ */
 static eOresult_t s_eo_motioncontrol_updatedPositionsFromEncoders(EOtheMotionController *p)
 {
 
@@ -1149,8 +1151,8 @@ static eOresult_t s_eo_motioncontrol_updatedPositionsFromEncoders(EOtheMotionCon
         eOencoderreader_valueInfo_t encoder1, encoder2;
         const eOmc_jomo_descriptor_t *jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(p->ctrlobjs.jomodescriptors, i);   
 
-        res = eo_encoderreader_Read(eo_encoderreader_GetHandle(), i, &encoder1, &encoder2);
-        
+        eo_encoderreader_Read(eo_encoderreader_GetHandle(), i, &encoder1, &encoder2);
+                   
         if(eores_OK != s_eo_motioncontrol_updatePositionFromEncoder(i, &encoder1))
         {
             res = eores_NOK_generic;
@@ -1161,6 +1163,9 @@ static eOresult_t s_eo_motioncontrol_updatedPositionsFromEncoders(EOtheMotionCon
         }
         
     } 
+    
+    eo_encoderreader_Diagnostics_Tick(eo_encoderreader_GetHandle());
+    
     return(res);
 
 }
@@ -1720,12 +1725,14 @@ static eOresult_t s_eo_motioncontrol_updatePositionFromEncoder(uint8_t index, eO
 {
     eOresult_t res = eores_OK;
     
-    if(encoder->errortype == encreader_err_NOTCONNECTED) //skyp if the encoder is not connected (i.e is on 2foc.)
+    if(encoder->errortype == encreader_err_NOTCONNECTED) // skip if the encoder is not connected (i.e is on 2foc.)
+    {
         return res;
+    }
         
     if(encoder->position == eomc_pos_atjoint)
     {
-        if(encoder->errortype != 0)
+        if(encoder->errortype != encreader_err_NONE)
         {
             MController_invalid_absEncoder_fbk(index, encoder->errortype);
             res = eores_NOK_generic;
