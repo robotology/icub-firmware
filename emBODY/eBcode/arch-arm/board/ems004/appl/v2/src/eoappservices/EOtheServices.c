@@ -43,7 +43,7 @@
 
 #include "EOVtheCallbackManager.h"
 
-#include "EOtheBoardConfig.h"
+//#include "EOtheBoardConfig.h"
 
 #include "EoError.h"
 
@@ -761,7 +761,8 @@ static eOresult_t s_eo_services_process_verifyactivate(EOtheServices *p, eOmn_se
             
             if(eobool_true == uselocalconfig)
             {
-                config = eoboardconfig_code2motion_serv_configuration(s_eo_theservices.board);
+                //config = eoboardconfig_code2motion_serv_configuration(s_eo_theservices.board);
+                config = NULL;
                 
                 errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_mc_using_onboard_config);
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errorDescriptor);                            
@@ -775,7 +776,8 @@ static eOresult_t s_eo_services_process_verifyactivate(EOtheServices *p, eOmn_se
         {
             if(eobool_true == uselocalconfig)
             {
-                config = eoboardconfig_code2inertials_serv_configuration(s_eo_theservices.board);
+                //config = eoboardconfig_code2inertials_serv_configuration(s_eo_theservices.board);
+                config = NULL;
                 
                 errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_inertials_using_onboard_config);
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errorDescriptor);                    
@@ -787,7 +789,8 @@ static eOresult_t s_eo_services_process_verifyactivate(EOtheServices *p, eOmn_se
         {
             if(eobool_true == uselocalconfig)  
             {
-                config = eoboardconfig_code2strain_serv_configuration(s_eo_theservices.board);
+                //config = eoboardconfig_code2strain_serv_configuration(s_eo_theservices.board);
+                config = NULL;
                 
                 errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_strain_using_onboard_config);
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errorDescriptor);                    
@@ -799,7 +802,8 @@ static eOresult_t s_eo_services_process_verifyactivate(EOtheServices *p, eOmn_se
         {
             if(eobool_true == uselocalconfig)  
             {
-                config = eoboardconfig_code2mais_serv_configuration(s_eo_theservices.board);
+                //config = eoboardconfig_code2mais_serv_configuration(s_eo_theservices.board);
+                config = NULL;
                 
                 errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_mais_using_onboard_config);
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errorDescriptor);                    
@@ -811,7 +815,8 @@ static eOresult_t s_eo_services_process_verifyactivate(EOtheServices *p, eOmn_se
         {
             if(eobool_true == uselocalconfig)  
             {
-                config = eoboardconfig_code2skin_serv_configuration(s_eo_theservices.board);
+                //config = eoboardconfig_code2skin_serv_configuration(s_eo_theservices.board);
+                config = NULL;
                 
                 errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_skin_using_onboard_config);
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errorDescriptor);                    

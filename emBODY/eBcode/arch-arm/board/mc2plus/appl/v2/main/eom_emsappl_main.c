@@ -40,7 +40,6 @@
 #include "EOMtheEMSapplCfg.h"
 #include "EOMtheEMSappl.h"
 
-#include "emBODYrobot.h"
 
 #include "EOtheLEDpulser.h"
 

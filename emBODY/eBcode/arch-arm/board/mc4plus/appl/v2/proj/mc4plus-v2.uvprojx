@@ -15,7 +15,7 @@
         <TargetCommonOption>
           <Device>STM32F407IG</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F4xx_DFP.2.10.0</PackID>
+          <PackID>Keil.STM32F4xx_DFP.2.11.0</PackID>
           <PackURL>http://www.keil.com/pack</PackURL>
           <Cpu>IRAM(0x20000000-0x2001FFFF) IRAM2(0x10000000-0x1000FFFF) IROM(0x8000000-0x80FFFFF) CLOCK(25000000) CPUTYPE("Cortex-M4") FPU2</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -792,8 +792,18 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>services</GroupName>
+          <GroupName>appl-services</GroupName>
           <Files>
+            <File>
+              <FileName>EOtheEntities.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\embobj\plus\board\EOtheEntities.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOappEncodersReader.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\embobj\plus\board\EOappEncodersReader.c</FilePath>
+            </File>
             <File>
               <FileName>EOtheCANdiscovery2.c</FileName>
               <FileType>1</FileType>
@@ -840,11 +850,6 @@
               <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheETHmonitor.c</FilePath>
             </File>
             <File>
-              <FileName>EOtheBoardConfig.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\can\EOtheBoardConfig.c</FilePath>
-            </File>
-            <File>
               <FileName>EOtheSTRAIN.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheSTRAIN.c</FilePath>
@@ -875,9 +880,6 @@
               <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheSharedHW.c</FilePath>
             </File>
           </Files>
-        </Group>
-        <Group>
-          <GroupName>board-cfg</GroupName>
         </Group>
         <Group>
           <GroupName>eo-motor-controller</GroupName>
@@ -1188,16 +1190,6 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>embody-robot</GroupName>
-          <Files>
-            <File>
-              <FileName>emBODYrobot.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\highlevel\services\embodyrobot\emBODYrobot.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>eoprot-can</GroupName>
           <Files>
             <File>
@@ -1249,21 +1241,6 @@
               <FileName>EoCANprotISperiodic.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\embobj\plus\can\config-can-protocol\EoCANprotISperiodic.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>eo-board</GroupName>
-          <Files>
-            <File>
-              <FileName>EOtheEntities.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\board\EOtheEntities.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOappEncodersReader.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\board\EOappEncodersReader.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2123,8 +2100,18 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>services</GroupName>
+          <GroupName>appl-services</GroupName>
           <Files>
+            <File>
+              <FileName>EOtheEntities.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\embobj\plus\board\EOtheEntities.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOappEncodersReader.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\embobj\plus\board\EOappEncodersReader.c</FilePath>
+            </File>
             <File>
               <FileName>EOtheCANdiscovery2.c</FileName>
               <FileType>1</FileType>
@@ -2171,11 +2158,6 @@
               <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheETHmonitor.c</FilePath>
             </File>
             <File>
-              <FileName>EOtheBoardConfig.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\can\EOtheBoardConfig.c</FilePath>
-            </File>
-            <File>
               <FileName>EOtheSTRAIN.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheSTRAIN.c</FilePath>
@@ -2206,9 +2188,6 @@
               <FilePath>..\..\..\..\ems004\appl\v2\src\eoappservices\EOtheSharedHW.c</FilePath>
             </File>
           </Files>
-        </Group>
-        <Group>
-          <GroupName>board-cfg</GroupName>
         </Group>
         <Group>
           <GroupName>eo-motor-controller</GroupName>
@@ -2451,16 +2430,6 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>embody-robot</GroupName>
-          <Files>
-            <File>
-              <FileName>emBODYrobot.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\libs\highlevel\services\embodyrobot\emBODYrobot.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
           <GroupName>eoprot-can</GroupName>
           <Files>
             <File>
@@ -2512,21 +2481,6 @@
               <FileName>EoCANprotISperiodic.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\embobj\plus\can\config-can-protocol\EoCANprotISperiodic.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>eo-board</GroupName>
-          <Files>
-            <File>
-              <FileName>EOtheEntities.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\board\EOtheEntities.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOappEncodersReader.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\board\EOappEncodersReader.c</FilePath>
             </File>
           </Files>
         </Group>
