@@ -58,7 +58,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - typedef with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+#define REMOVE_TO_AVOID_COMPILATION_WARNING
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -67,10 +68,12 @@
 //static void s_eo_currents_watchdog_CheckSpike(uint8_t joint, int16_t value);
 static void s_eo_currents_watchdog_CheckI2T(uint8_t joint, int16_t value);
 //static void s_eo_currents_watchdog_UpdateMotorCurrents(uint8_t joint, int16_t value);
+#if defined(REMOVE_TO_AVOID_COMPILATION_WARNING)
+#else
 EO_static_inline uint32_t s_eo_currents_watchdog_averageCalc_addValue(uint8_t motor, int16_t value);
 EO_static_inline void s_eo_currents_watchdog_averageCalc_reset(uint8_t motor);
 EO_static_inline eObool_t s_eo_currents_watchdog_averageCalc_collectDataIsCompleted(uint8_t motor);
-
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -411,6 +414,10 @@ static void s_eo_currents_watchdog_CheckI2T(uint8_t motor, int16_t value)
 }
 #endif
 
+
+#if defined(REMOVE_TO_AVOID_COMPILATION_WARNING)
+#else
+
 #define I2T_CHECK_USE_AVERAGE_CURRENT
 
 #ifdef I2T_CHECK_USE_AVERAGE_CURRENT 
@@ -472,7 +479,7 @@ EO_static_inline eObool_t s_eo_currents_watchdog_averageCalc_collectDataIsComple
 
 #endif //I2T_CHECK_USE_AVERAGE_CURRENT 
 
-
+#endif //REMOVE_TO_AVOID_COMPILATION_WARNING
 
 
 // --------------------------------------------------------------------------------------------------------------------
