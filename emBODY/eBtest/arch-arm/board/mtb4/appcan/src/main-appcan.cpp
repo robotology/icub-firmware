@@ -22,7 +22,7 @@
 #include "embot_app_application_theIMU.h"
 
 
-static const embot::app::canprotocol::versionOfAPPLICATION vAP = {2, 2, 20};
+static const embot::app::canprotocol::versionOfAPPLICATION vAP = {1, 0 , 1};
 static const embot::app::canprotocol::versionOfCANPROTOCOL vCP = {2, 0};
 
 static void userdeflauncher(void* param);
@@ -192,12 +192,12 @@ static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask
         embot::app::application::theSkin &theskin = embot::app::application::theSkin::getInstance();
         theskin.tick(outframes);
         
-        // we operate on the skin triangles by calling a skin.process(outframes);
-        // the evSKprocess is emitted  by:
+        // we operate on the skin triangles by calling a skin.tick(outframes);
+        // the evSKINprocess is emitted  by:
         // 1. a periodic timer started at the reception of a specific message.
-        // 2. internally to skin.process() if a new tick is required
 
-        // the .process(outframes) will do whatever it needs to do and it may emit some 
+
+        // the .tick(outframes) will do whatever it needs to do and it may emit some 
         // can frames for transmission. the can frames can be up to 16x2 = 32.
         // hence, how many packets? max of replies = 8 + max of broadcast = 32 --> 40.
         
