@@ -48,7 +48,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\obj\</OutputDirectory>
-          <OutputName>nucleo-hal</OutputName>
+          <OutputName>mtb4</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>1</CreateHexFile>
@@ -335,7 +335,7 @@
               <MiscControls>--cpp11</MiscControls>
               <Define>STM32HAL_BOARD_MTB4</Define>
               <Undefine></Undefine>
-              <IncludePath>..\src-plus;..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask;..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\eBcode\arch-arm\embot\common;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\sys;..\..\..\..\..\..\eBcode\arch-arm\embot</IncludePath>
+              <IncludePath>..\src-plus;..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask;..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\eBcode\arch-arm\embot\common;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\sys;..\..\..\..\..\..\eBcode\arch-arm\embot;..\src\others</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
