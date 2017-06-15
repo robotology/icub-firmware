@@ -133,6 +133,11 @@ dowaitloop
     
     bool canjump2address(std::uint32_t address)
     {
+        volatile std::uint32_t * firstword32 = reinterpret_cast<volatile std::uint32_t *>(address);
+        if(0xffffffff == *firstword32)
+        {   // so far i disable only the jumpt to erase flash
+            return false;
+        }
         return true;
     }
     
