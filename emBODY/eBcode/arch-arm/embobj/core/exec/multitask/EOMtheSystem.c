@@ -59,18 +59,30 @@
 
 const eOmempool_alloc_config_t eom_thesystem_mempool_alloc_config_heaposal =
 {
-    .heap =
+    EO_INIT(.pool)
     {
-        .allocate       = osal_base_memory_new,
-        .reallocate     = osal_base_memory_realloc,
-        .release        = osal_base_memory_del
+        EO_INIT(.size08)        0,
+        EO_INIT(.data08)        NULL,
+        EO_INIT(.size16)        0,
+        EO_INIT(.data16)        NULL,
+        EO_INIT(.size32)        0,
+        EO_INIT(.data32)        NULL,
+        EO_INIT(.size64)        0,
+        EO_INIT(.data64)        NULL
+    },
+    EO_INIT(.heap)
+    {
+        EO_INIT(.allocate)      osal_base_memory_new,
+        EO_INIT(.reallocate)    osal_base_memory_realloc,
+        EO_INIT(.release)       osal_base_memory_del
     }
 };
 
+
 const eOmempool_cfg_t eom_thesystem_mempool_cfg_osal = 
 {
-    .mode               = eo_mempool_alloc_dynamic, // we use static allcoation
-    .conf               = &eom_thesystem_mempool_alloc_config_heaposal    
+    EO_INIT(.mode)      eo_mempool_alloc_dynamic, // we use static allcoation
+    EO_INIT(.conf)      &eom_thesystem_mempool_alloc_config_heaposal    
 };
 
 
@@ -86,7 +98,7 @@ const eOmempool_cfg_t eom_thesystem_mempool_cfg_osal =
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static eOresult_t s_eom_sys_start(void (*init_fn)(void));
+static eOresult_t s_eom_sys_start(eOvoid_fp_void_t userinit_fn);
 
 static void s_eom_thecreation(void);
 
@@ -102,11 +114,11 @@ static const char s_eobj_ownname[] = "EOMtheSystem";
 
 static EOMtheSystem s_eom_system = 
 {
-    .thevsys        = NULL,               // thevsys
-    .osalcfg        = NULL,               // osalcfg
-    .tmrmancfg      = NULL,               // tmrmancfg
-    .cbkmancfg      = NULL,               // cbkmancfg
-    .user_init_fn   = NULL                // user_init_fn
+    EO_INIT(.thevsys)       NULL,               // thevsys
+    EO_INIT(.osalcfg)       NULL,               // osalcfg
+    EO_INIT(.tmrmancfg)     NULL,               // tmrmancfg
+    EO_INIT(.cbkmancfg)     NULL,               // cbkmancfg
+    EO_INIT(.user_init_fn)  NULL                // user_init_fn
 };
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -162,26 +174,12 @@ extern EOMtheSystem * eom_sys_Initialise(const eOmsystem_cfg_t *syscfg,
         hal_sys_vectortable_relocate(syscfg->codespaceoffset);
     }    
 
-
-//    // initialise fsal
-//    if(NULL != syscfg->fsalcfg)
-//    {
-//        fsal_memory_getsize(syscfg->fsalcfg, &ram04size);
-//        
-//        if(0 != ram04size)
-//        {
-//            ram04data = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, ram04size, 1);
-//        }
-//    
-//        fsal_initialise(syscfg->fsalcfg, ram04data);
-//    }
-
  
     // initialise osal
     osal_base_memory_getsize(s_eom_system.osalcfg, &ram08size);
     if(0 != ram08size)
     {
-        ram08data = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_64bit, ram08size, 1);
+        ram08data = (uint64_t*) eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_64bit, ram08size, 1);
     }
 
     osal_base_initialise(s_eom_system.osalcfg, ram08data);
@@ -293,7 +291,4 @@ static EOVtaskDerived* s_eom_gettask(void)
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------
-
-
-
 

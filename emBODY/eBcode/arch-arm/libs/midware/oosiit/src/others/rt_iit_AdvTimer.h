@@ -1,3 +1,5 @@
+
+
 /*
  * Copyright (C) 2012 iCub Facility - Istituto Italiano di Tecnologia
  * Author:  Marco Accame
@@ -130,6 +132,10 @@ extern OS_RESULT isr_iit_advtmr_delete(OS_ID timer);
 
 
 extern void rt_iit_advtmr_init(void);
+
+extern U32 rt_iit_advtmr_next(void);
+extern void rt_iit_advtmr_resume_from_sleep(U32 sleep_time);
+
 extern void  rt_iit_advtmr_tick(void);
 
 extern void rt_iit_advtmr_synchronise(U64 oldtime); 
@@ -148,6 +154,4 @@ extern void rt_advtmr_psh (OS_ID timer, U32 mode);
 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
-
-
 

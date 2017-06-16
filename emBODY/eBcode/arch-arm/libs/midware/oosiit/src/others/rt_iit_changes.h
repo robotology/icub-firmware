@@ -174,6 +174,8 @@ extern OS_RESULT rt_iit_tsk_prio (OS_TPTR taskp, U8 new_prio);
 extern OS_RESULT rt_iit_tsk_delete (OS_TPTR taskp);
 extern void* rt_iit_tsk_perthread_libspace_get(OS_TPTR taskp);
 
+extern U32 rt_iit_timeofnextevent(U8 andsuspend);
+
 // - init routines -
 extern void rt_iit_dynamic_mode_init(const oosiit_cfg_t *cfg);
 extern void rt_iit_params_init(void);

@@ -106,7 +106,7 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__2FOC(eOcanframe_t *fram
     eOmc_motor_t *motor = NULL;
     eOprotIndex_t motorindex = EOK_uint08dummy;
     
-    if(NULL == (motor = s_eocanprotMCperiodic_get_entity(eoprot_entity_mc_motor, frame, port, eobrd_caninsideindex_first, &motorindex)))
+    if(NULL == (motor = (eOmc_motor_t*) s_eocanprotMCperiodic_get_entity(eoprot_entity_mc_motor, frame, port, eobrd_caninsideindex_first, &motorindex)))
     {
         if(eobool_true == s_eocanprotMCperiodic_is_from_unused2foc_in_eb5(frame, port))
         {   // the board eb5 has an additional 1foc board which sends a can frame of this kind but it does not serve any motor
@@ -147,7 +147,7 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__POSITION(eOcanframe_t *
     const uint8_t offset[2] = {0, 4};
     for(j=0; j<2; j++)
     {
-        if(NULL == (joint = s_eocanprotMCperiodic_get_entity(eoprot_entity_mc_joint, frame, port, insideindex[j], &jointindex)))
+        if(NULL == (joint = (eOmc_joint_t*) s_eocanprotMCperiodic_get_entity(eoprot_entity_mc_joint, frame, port, insideindex[j], &jointindex)))
         {
             return(eores_OK);        
         }
@@ -174,7 +174,7 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__MOTOR_POSITION(eOcanfra
     const uint8_t offset[2] = {0, 4};
     for(j=0; j<2; j++)
     {
-        if(NULL == (motor = s_eocanprotMCperiodic_get_entity(eoprot_entity_mc_motor, frame, port, insideindex[j], &motorindex)))
+        if(NULL == (motor = (eOmc_motor_t*) s_eocanprotMCperiodic_get_entity(eoprot_entity_mc_motor, frame, port, insideindex[j], &motorindex)))
         {
             return(eores_OK);        
         }
@@ -201,12 +201,12 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__PID_VAL(eOcanframe_t *f
     const uint8_t offset[2] = {0, 2};    
     for(j=0; j<2; j++)
     {
-        if(NULL == (joint = s_eocanprotMCperiodic_get_entity(eoprot_entity_mc_joint, frame, port, insideindex[j], &jointindex)))
+        if(NULL == (joint = (eOmc_joint_t*) s_eocanprotMCperiodic_get_entity(eoprot_entity_mc_joint, frame, port, insideindex[j], &jointindex)))
         {
             return(eores_OK);        
         }
         #if 1
-            #warning CAVEAT: jstatus->ofpid.output is now an int16_t and the can frame should have a int16_t ... however it works like that
+            //#warning CAVEAT: jstatus->ofpid.output is now an int16_t and the can frame should have a int16_t ... however it works like that
             // marco.accame on 02apr15: i ahve seen together with marco.randazzo that the mc4 send uint16, thus in here there is a double error which make things work 
             // see s_eo_icubCanProto_parser_per_mb_cmd__pidVal() in ems4rd-v01.uvproj
             joint->status.core.ofpid.legacy.output = *((uint16_t*)&(frame->data[offset[j]]));
@@ -243,7 +243,7 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__STATUS(eOcanframe_t *fr
     {   
         // in case we have a 2foc ... i treat the first joint only   
         // first joint: use eobrd_caninsideindex_first and gets the first 2 bytes of the frame         
-        if(NULL == (joint = s_eocanprotMCperiodic_get_entity(eoprot_entity_mc_joint, frame, port, eobrd_caninsideindex_first, &jointindex)))
+        if(NULL == (joint = (eOmc_joint_t*) s_eocanprotMCperiodic_get_entity(eoprot_entity_mc_joint, frame, port, eobrd_caninsideindex_first, &jointindex)))
         {
             if(eobool_true == s_eocanprotMCperiodic_is_from_unused2foc_in_eb5(frame, port))
             {
@@ -280,14 +280,14 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__STATUS(eOcanframe_t *fr
         for(j=0; j<2; j++) // 2 joints ....
         {                       
             // joint i-th
-            if(NULL == (joint = s_eocanprotMCperiodic_get_entity(eoprot_entity_mc_joint, frame, port, insideindex[j], &jointindex)))
+            if(NULL == (joint = (eOmc_joint_t*) s_eocanprotMCperiodic_get_entity(eoprot_entity_mc_joint, frame, port, insideindex[j], &jointindex)))
             {
                 return(eores_OK);        
             }  
             // manage controlmode
             if(eores_OK != s_eocanprotMCperiodic_convert_icubCanProtoControlMode2eOmcControlMode((icubCanProto_controlmode_t) frame->data[offset[j]], &eomc_controlmode))
             {
-                #warning -> TODO: add diagnostics about not found control mode as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
+                //#warning -> TODO: add diagnostics about not found control mode as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()
                 return(eores_OK);    
             }
             
@@ -321,7 +321,7 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__CURRENT(eOcanframe_t *f
     const uint8_t offset[2] = {0, 2};    
     for(m=0; m<2; m++)
     {
-        if(NULL == (motor = s_eocanprotMCperiodic_get_entity(eoprot_entity_mc_motor, frame, port, insideindex[m], &motorindex)))
+        if(NULL == (motor = (eOmc_motor_t*) s_eocanprotMCperiodic_get_entity(eoprot_entity_mc_motor, frame, port, insideindex[m], &motorindex)))
         {
             return(eores_OK);        
         }        
@@ -363,7 +363,7 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__VELOCITY(eOcanframe_t *
     const uint8_t offsetacceleration[2] = {2, 6}; 
     for(j=0; j<2; j++)
     {
-        if(NULL == (joint = s_eocanprotMCperiodic_get_entity(eoprot_entity_mc_joint, frame, port, insideindex[j], &jointindex)))
+        if(NULL == (joint = (eOmc_joint_t*) s_eocanprotMCperiodic_get_entity(eoprot_entity_mc_joint, frame, port, insideindex[j], &jointindex)))
         {
             return(eores_OK);        
         }
@@ -396,7 +396,7 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__PID_ERROR(eOcanframe_t 
     const uint8_t offsettrq[2] = {4, 6}; 
     for(j=0; j<2; j++)
     {
-        if(NULL == (joint = s_eocanprotMCperiodic_get_entity(eoprot_entity_mc_joint, frame, port, insideindex[j], &jointindex)))
+        if(NULL == (joint = (eOmc_joint_t*) s_eocanprotMCperiodic_get_entity(eoprot_entity_mc_joint, frame, port, insideindex[j], &jointindex)))
         {
             return(eores_OK);        
         }
@@ -435,7 +435,7 @@ extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__ADDITIONAL_STATUS(eOcan
     eOmc_interactionmode_t tmp = eOmc_interactionmode_stiff;
     for(j=0; j<2; j++)
     {
-        if(NULL == (joint = s_eocanprotMCperiodic_get_entity(eoprot_entity_mc_joint, frame, port, insideindex[j], &jointindex)))
+        if(NULL == (joint = (eOmc_joint_t*) s_eocanprotMCperiodic_get_entity(eoprot_entity_mc_joint, frame, port, insideindex[j], &jointindex)))
         {
             return(eores_OK);        
         }

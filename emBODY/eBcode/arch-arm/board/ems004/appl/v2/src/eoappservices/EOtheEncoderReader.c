@@ -101,31 +101,34 @@ static void s_eo_encoderreader_read_encoders(void* p);
 
 static EOtheEncoderReader s_eo_theencoderreader = 
 {
-    .service = 
+    EO_INIT(.service) 
     {
-        .servconfig             = { .type = eomn_serv_NONE },
-        .initted                = eobool_false,
-        .active                 = eobool_false,
-        .activateafterverify    = eobool_false,
-        .started                = eobool_false,
-        .onverify               = NULL             
+        EO_INIT(.initted)               eobool_false,
+        EO_INIT(.active)                eobool_false,
+        EO_INIT(.activateafterverify)   eobool_false,
+        EO_INIT(.started)               eobool_false,
+        EO_INIT(.onverify)              NULL,
+        EO_INIT(.state)                 eomn_serv_state_notsupported,
+        EO_INIT(.tmpcfg)                NULL,
+        EO_INIT(.servconfig)            { EO_INIT(.type) eomn_serv_NONE },
     },
-    .diagnostics = 
+    EO_INIT(.diagnostics) 
     {
-        .reportTimer            = NULL,
-        .reportPeriod           = 0, // 10*EOK_reltime1sec, // with 0 we dont periodically report
-        .errorDescriptor        = {0},
-        .errorType              = eo_errortype_info,
-        .errorCallbackCount     = 0,
-        .repetitionOKcase       = 0 // 10 // with 0 we transmit report only once at succesful activation
-    },     
-    .arrayofjomodes             = { 0 },   
-    .waitreadtimer              = NULL,
-    .numofjomos                 = 0,
-    .numofencoders              = 0,
-    .errors                     = {encreader_err_NONE},
-    .failuremask                = 0,
-    .reader                     = NULL
+        EO_INIT(.reportTimer)           NULL,
+        EO_INIT(.reportPeriod)          0, // 10*EOK_reltime1sec, // with 0 we dont periodically report
+        EO_INIT(.errorDescriptor)       {0},
+        EO_INIT(.errorType)             eo_errortype_info,
+        EO_INIT(.errorCallbackCount)    0, 
+        EO_INIT(.repetitionOKcase)      0 // 10 // with 0 we transmit report only once at succesful activation
+    }, 
+    
+    EO_INIT(.arrayofjomodes)            { 0 },   
+    EO_INIT(.waitreadtimer)             NULL,
+    EO_INIT(.numofjomos)                0,
+    EO_INIT(.numofencoders)             0,
+    EO_INIT(.failuremask2)              {0},
+    EO_INIT(.errors2)                   {{encreader_err_NONE}, {encreader_err_NONE}},
+    EO_INIT(.reader)                    NULL
 };
 
 static const char s_eobj_ownname[] = "EOtheEncoderReader";
@@ -337,7 +340,7 @@ extern eOresult_t eo_encoderreader_GetPrimaryEncoder(EOtheEncoderReader *p, uint
     
 
     
-    EOconstarray* carray = eo_constarray_Load((EOarray*)&s_eo_theencoderreader.arrayofjomodes);
+    EOconstarray* carray = eo_constarray_Load((const EOarray*)&s_eo_theencoderreader.arrayofjomodes);
     
     eOmc_jomo_descriptor_t *jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(carray, position);
     
@@ -402,7 +405,7 @@ static eOresult_t s_eo_encoderreader_onstop_verifyreading(void *par, eObool_t re
 {
     const eOmc_arrayof_4jomodescriptors_t * jomodes = (const eOmc_arrayof_4jomodescriptors_t *)par;
     
-    EOconstarray* carray = eo_constarray_Load((EOarray*)jomodes);    
+    EOconstarray* carray = eo_constarray_Load((const EOarray*)jomodes);    
 
 #if defined(EO_ENCODERREADER_ACTIVATE_EVEN_IF_READING_FAILS)
     eObool_t activateit = s_eo_theencoderreader.service.activateafterverify; 
@@ -418,20 +421,29 @@ static eOresult_t s_eo_encoderreader_onstop_verifyreading(void *par, eObool_t re
     s_eo_theencoderreader.diagnostics.errorDescriptor.sourcedevice     = eo_errman_sourcedevice_localboard;
     s_eo_theencoderreader.diagnostics.errorDescriptor.sourceaddress    = 0;
     
-    // in par16 i put: number of joint in msb and failure mask in lsb
+    // in par16 = [N3|N2|N1|N0] i put: number of joint in N3, 0 in N2, failure mask of secondary in N1, failure mask of primary in N0
     s_eo_theencoderreader.diagnostics.errorDescriptor.par16 = 0;
-    uint16_t mask = s_eo_theencoderreader.failuremask;
-    s_eo_theencoderreader.diagnostics.errorDescriptor.par16 |= ((s_eo_theencoderreader.numofjomos<<8)|(mask));
+    uint16_t tmp16 = 0;
+    tmp16 = ((uint16_t)s_eo_theencoderreader.numofjomos << 12) & 0xf000;
+    s_eo_theencoderreader.diagnostics.errorDescriptor.par16 |= tmp16;
+    tmp16 = ((uint16_t)s_eo_theencoderreader.failuremask2[1] << 4) & 0x00f0;  
+    s_eo_theencoderreader.diagnostics.errorDescriptor.par16 |= tmp16;
+    tmp16 = ((uint16_t)s_eo_theencoderreader.failuremask2[0] ) & 0x000f;  
+    s_eo_theencoderreader.diagnostics.errorDescriptor.par16 |= tmp16;
     
-    // in par64 i put in each byte: (port|error) of each primary joint
+    // in par64 = [N15|N14|N13|N12|N11|N10|N09|N08|N07|N06|N05|N04|N03|N02|N01|N00] i put:
+    // in nibbles N00-N03 i put error codes of primary
+    // in nibbles N04-N07 i put error codes of secondary
     s_eo_theencoderreader.diagnostics.errorDescriptor.par64 = 0;    
     for(uint8_t i=0; i<s_eo_theencoderreader.numofjomos; i++)
     {
-        eOmc_jomo_descriptor_t *jdes = (eOmc_jomo_descriptor_t*) eo_constarray_At(carray, i);
-        uint8_t port = jdes->encoder1.port;
-        uint8_t err = s_eo_theencoderreader.errors[i];
-        uint64_t value = (((port&0xf)<<4) | (err&0xf)) & 0xff;
-        s_eo_theencoderreader.diagnostics.errorDescriptor.par64 |= (value<<(i*8));
+        uint64_t value = 0;
+        //eOmc_jomo_descriptor_t *jdes = (eOmc_jomo_descriptor_t*) eo_constarray_At(carray, i);
+        //uint8_t port = jdes->encoder1.port;
+        value = (s_eo_theencoderreader.errors2[0][i] & 0xf) << (i*4);
+        s_eo_theencoderreader.diagnostics.errorDescriptor.par64 |= value; 
+        value = (s_eo_theencoderreader.errors2[1][i] & 0xf) << (16+i*4);
+        s_eo_theencoderreader.diagnostics.errorDescriptor.par64 |= value; 
     }
     
 
@@ -500,7 +512,7 @@ static void s_eo_encoderreader_init_ereader(const eOmc_arrayof_4jomodescriptors_
 {   
     memcpy(&s_eo_theencoderreader.arrayofjomodes, jomodes, sizeof(eOmc_arrayof_4jomodescriptors_t));
     
-    EOconstarray* carray = eo_constarray_Load((EOarray*)&s_eo_theencoderreader.arrayofjomodes);
+    EOconstarray* carray = eo_constarray_Load((const EOarray*)&s_eo_theencoderreader.arrayofjomodes);
 
     uint8_t numofjomos = eo_constarray_Size(carray);
     s_eo_theencoderreader.numofjomos = numofjomos;
@@ -519,21 +531,40 @@ static void s_eo_encoderreader_read_encoders(void* p)
     
     uint8_t i = 0;
     
-    memset(&s_eo_theencoderreader.errors, encreader_err_NONE, sizeof(s_eo_theencoderreader.errors));
-    s_eo_theencoderreader.failuremask = 0;
+    memset(&s_eo_theencoderreader.errors2, encreader_err_NONE, sizeof(s_eo_theencoderreader.errors2));
+    s_eo_theencoderreader.failuremask2[0] = s_eo_theencoderreader.failuremask2[1] = 0;
     
     for(i=0; i< s_eo_theencoderreader.numofjomos; i++)
     {
-        eOencoderreader_valueInfo_t primary, secondary;
-
-        eOresult_t res = eo_appEncReader_GetValue(s_eo_theencoderreader.reader, i, &primary, &secondary);
+        eOencoderreader_valueInfo_t primary;
+        eOencoderreader_valueInfo_t secondary;
         
-        s_eo_theencoderreader.errors[i] = primary.errortype;
-        if(err_NONE != primary.errortype)
+        primary.errortype = encreader_err_NONE;
+        secondary.errortype = encreader_err_NONE;
+
+        eo_appEncReader_GetValue(s_eo_theencoderreader.reader, i, &primary, &secondary);
+        
+        
+        s_eo_theencoderreader.errors2[0][i] = primary.errortype; 
+        s_eo_theencoderreader.errors2[1][i] = secondary.errortype;
+        
+        // ok, now i check both primary and secondary. 
+        // encreader_err_NOTCONNECTED is not an error. 
+        // it should be an error if we have that in both primary and secondary, but ... nevermind for now because not all teh encoders are manged by this object. sic.
+        // we consider everything but NONE and NOTCONNECTED.
+        
+        if((encreader_err_NONE != primary.errortype) && (encreader_err_NOTCONNECTED != primary.errortype))
         {
-            eo_common_byte_bitset(&s_eo_theencoderreader.failuremask, i);
-            readingisok = eobool_false;
-        }   
+            eo_common_byte_bitset(&s_eo_theencoderreader.failuremask2[0], i);
+            readingisok = eobool_false;            
+        }
+        
+        if((encreader_err_NONE != secondary.errortype) && (encreader_err_NOTCONNECTED != secondary.errortype))
+        {
+            eo_common_byte_bitset(&s_eo_theencoderreader.failuremask2[1], i);
+            readingisok = eobool_false;            
+        }
+        
         // so far we assume that we have so many encoders as joints ...
         s_eo_theencoderreader.numofencoders ++;        
     }

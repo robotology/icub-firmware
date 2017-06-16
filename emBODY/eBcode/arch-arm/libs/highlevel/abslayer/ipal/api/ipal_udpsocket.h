@@ -20,17 +20,20 @@
 #ifndef _IPAL_UDPSOCKET_H_
 #define _IPAL_UDPSOCKET_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       ipal_udpsocket.h
-	@brief      This header file implements public interface to the ip abstraction layer: base services and types 
-	@author     marco.accame@iit.it
-	@date       12/12/2011
+    @brief      This header file implements public interface to the ip abstraction layer: base services and types 
+    @author     marco.accame@iit.it
+    @date       12/12/2011
 **/
 
 /* @defgroup ipal_udpsocket IP abstraction layer: udp socket
     cercecvecve.
     
-    @{		
+    @{        
  **/
 
 
@@ -215,6 +218,10 @@ extern ipal_result_t ipal_udpsocket_recv(ipal_udpsocket_t* skt, ipal_udp_recv_fn
     end of group ipal_udpsocket  
  **/
 
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
 #endif  // include-guard
 
 

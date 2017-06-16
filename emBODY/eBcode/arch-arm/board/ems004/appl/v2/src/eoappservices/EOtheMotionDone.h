@@ -21,6 +21,10 @@
 #ifndef _EOTHEMOTIONDONE_H_
 #define _EOTHEMOTIONDONE_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       EOtheMotionDone.h
@@ -69,7 +73,11 @@ extern eOresult_t eo_motiondone_Tick(EOtheMotionDone *p);
     end of group eo_EOtheMotionDone
  **/
 
-#endif  // include-guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

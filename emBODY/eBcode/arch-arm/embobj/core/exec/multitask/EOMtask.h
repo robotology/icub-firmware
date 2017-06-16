@@ -132,7 +132,7 @@ typedef enum
                                 @e eom_mtask_MessageDriven or @eom_mtask_CallbackDriven. In such a case, if the value is wrongly set 
                                 to zero, the queue will be created with size one.
     @param      timeoutORperiod It specifies the timeout or the period depending on the type of task. 
-	@param		extdata         It contains a pointer to external data which can be used by the startup_fn() and run_fn() functions.
+    @param        extdata         It contains a pointer to external data which can be used by the startup_fn() and run_fn() functions.
     @param      nameofthetask_fn In case it is not NULL, then uVision 4 by Keil shall show the name of the function in its graphical
                                 task monitor. This function shall be be defined to contain eom_task_Start((EOMtask*)tsk) as only instruction, 
                                 where tsk is the argument of the function.
@@ -144,10 +144,22 @@ extern EOMtask * eom_task_New(eOmtaskType_t type, uint8_t priority, uint16_t sta
                                        void (*startup_fn)(EOMtask *tsk, uint32_t zero),
                                        void (*run_fn)(EOMtask *tsk, uint32_t evtmsgper), 
                                        uint32_t queuesizeORalleventsmask, eOreltime_t timeoutORperiod,
-									   void *extdata,
+                                       void *extdata,
                                        void (*nameofthetask_fn)(void *tsk),
                                        const char *name);
-
+                                       
+extern EOMtask * eom_task_New1(void);
+                                       
+extern eOresult_t eom_task_Init1(EOMtask *p, eOmtaskType_t type, uint8_t priority, uint16_t stacksize,
+                                       void (*startup_fn)(EOMtask *tsk, uint32_t zero),
+                                       void (*run_fn)(EOMtask *tsk, uint32_t evtmsgper), 
+                                       uint32_t queuesizeORalleventsmask, eOreltime_t timeoutORperiod,
+                                       void *extdata,
+                                       void (*nameofthetask_fn)(void *tsk),
+                                       const char *name);
+                                       
+extern void eom_task_Delete(EOMtask *p);
+                                       
 
 /** @fn         extern void eom_task_Start(EOMtask *p) 
     @brief      To be called inside nameofthetask_fn() as only instruction.

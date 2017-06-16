@@ -113,67 +113,69 @@ static void s_eo_inertials2_presenceofcanboards_tick(EOtheInertials2 *p);
 
 static const eOas_inertial_config_t s_eo_default_inertialconfig =
 {
-    .datarate               = 50,
-    .filler                 = {0},
-    .enabled                = 0
+    EO_INIT(.datarate)              50,
+    EO_INIT(.filler)                {0},
+    EO_INIT(.enabled)               0
 };
 
 
 
 static EOtheInertials2 s_eo_theinertials2 = 
 {
-    .service = 
+    EO_INIT(.service) 
     {
-        .servconfig             = { .type = eomn_serv_NONE },
-        .initted                = eobool_false,
-        .active                 = eobool_false,
-        .activateafterverify    = eobool_false,
-        .started                = eobool_false,
-        .onverify               = NULL,
-        .state                  = eomn_serv_state_notsupported          
+        EO_INIT(.initted)               eobool_false,
+        EO_INIT(.active)                eobool_false,
+        EO_INIT(.activateafterverify)   eobool_false,
+        EO_INIT(.started)               eobool_false,
+        EO_INIT(.onverify)              NULL,
+        EO_INIT(.state)                 eomn_serv_state_notsupported,
+        EO_INIT(.tmpcfg)                NULL,
+        EO_INIT(.servconfig)            { EO_INIT(.type) eomn_serv_NONE },
     },
-    .diagnostics = 
+    EO_INIT(.diagnostics) 
     {
-        .reportTimer            = NULL,
-        .reportPeriod           = 0, // 10*EOK_reltime1sec, // with 0 we dont periodically report
-        .errorDescriptor        = {0},
-        .errorType              = eo_errortype_info,
-        .errorCallbackCount     = 0,
-        .repetitionOKcase       = 0 // 10 // with 0 we transmit report only once at succesful activation
+        EO_INIT(.reportTimer)           NULL,
+        EO_INIT(.reportPeriod)          0, // 10*EOK_reltime1sec, // with 0 we dont periodically report
+        EO_INIT(.errorDescriptor)       {0},
+        EO_INIT(.errorType)             eo_errortype_info,
+        EO_INIT(.errorCallbackCount)    0, 
+        EO_INIT(.repetitionOKcase)      0 // 10 // with 0 we transmit report only once at succesful activation
     },     
-    .sharedcan =
+    EO_INIT(.sharedcan)
     {
-        .boardproperties        = NULL,
-        .entitydescriptor       = NULL,
-        .discoverytarget        = {0},
-        .ondiscoverystop        = {0},
-        .command                = {0}, 
-    },
+        EO_INIT(.boardproperties)       NULL,
+        EO_INIT(.entitydescriptor)      NULL,
+        EO_INIT(.discoverytarget)       {0},
+        EO_INIT(.ondiscoverystop)       {0},
+        EO_INIT(.command)               {0}, 
+    },   
     
-    .numofmtbs                  = 0,
+    EO_INIT(.numofmtbs)                 0,
 
-    .sensorsconfig              = {0},  
-    .fifoofinertialdata         = NULL,
+    EO_INIT(.sensorsconfig)             {0},  
+    EO_INIT(.fifoofinertialdata)        NULL,
     
-    .configured                 = eobool_false,
+    EO_INIT(.configured)                eobool_false,
     
-    .canmap_mtb_accel_int       = {0},
-    .canmap_mtb_accel_ext       = {0},
-    .canmap_mtb_gyros_ext       = {0},
-    .canmap_mtb_active          = {0},
-    .ethmap_mems_active         = 0,
+    EO_INIT(.canmap_mtb_accel_int)      {0},
+    EO_INIT(.canmap_mtb_accel_ext)      {0},
+    EO_INIT(.canmap_mtb_gyros_ext)      {0},
+    EO_INIT(.canmap_mtb_active)         {0},
+    EO_INIT(.ethmap_mems_active)        0,
     
-    .fromcan2id                 = {NOID16},
-    .frommems2id                = {NOID16},
-    .memsparam                  = {255},
-    .memsconfig                 = {0},  
+    EO_INIT(.fromcan2id)                {NOID16},
+    EO_INIT(.frommems2id)               {NOID16},
+    EO_INIT(.memsparam)                 {255},
+    EO_INIT(.memsconfig)                { {mems_gyroscope_l3g4200, hal_gyroscope_range_250dps, 0} },  
 
-    .inertial2                  = NULL,
-    .id32ofregulars             = NULL,
-    .arrayofsensors             = NULL,
-    .not_heardof_status         = {0},
-    .not_heardof_counter        = 0,
-    .transmissionisactive       = eobool_false
+    EO_INIT(.inertial2)                 NULL,
+    EO_INIT(.id32ofregulars)            NULL,
+    EO_INIT(.arrayofsensors)            NULL,
+    EO_INIT(.not_heardof_target)        {0},
+    EO_INIT(.not_heardof_status)        {0},
+    EO_INIT(.not_heardof_counter)       0,
+    EO_INIT(.transmissionisactive)      eobool_false
 };
 
 
@@ -502,18 +504,16 @@ extern eOresult_t eo_inertials2_Activate(EOtheInertials2 *p, const eOmn_serv_con
     
     // now i must add all the mtb boards. i iterate per canbus
     
-    eObrd_canproperties_t prop = 
-    {
-        .type               = eobrd_cantype_mtb, 
-        .location           = { .port = 0, .addr = 0, .insideindex = eobrd_caninsideindex_none },
-        .requiredprotocol   = { .major = servcfg->data.as.inertial.mtbversion.protocol.major, .minor = servcfg->data.as.inertial.mtbversion.protocol.minor }
-    };  
+    eObrd_canproperties_t prop = {0};
+    prop.type = eobrd_cantype_mtb;
+    prop.location.port = 0; prop.location.addr = 0; prop.location.insideindex = eobrd_caninsideindex_none;
+    prop.requiredprotocol.major = servcfg->data.as.inertial.mtbversion.protocol.major;
+    prop.requiredprotocol.minor = servcfg->data.as.inertial.mtbversion.protocol.minor;
+
     
-    eOcanmap_entitydescriptor_t des = 
-    {
-        .location   = { .port = 0, .addr = 0, .insideindex = eobrd_caninsideindex_none },
-        .index      = entindex00
-    };        
+    eOcanmap_entitydescriptor_t des = {0};
+    des.location.port = 0; des.location.addr = 0; des.location.insideindex = eobrd_caninsideindex_none;
+    des.index = entindex00;
     
     
     // now i get all the sensors.
@@ -937,7 +937,7 @@ extern eOresult_t eo_inertials2_AcceptCANframe(EOtheInertials2 *p, eOas_inertial
 
 extern void eoprot_fun_INIT_as_inertials_config(const EOnv* nv)
 {
-    eOas_inertial_config_t* config = eo_nv_RAM(nv);
+    eOas_inertial_config_t* config = (eOas_inertial_config_t*) eo_nv_RAM(nv);
     
     config->datarate = s_eo_default_inertialconfig.datarate;
     config->enabled = s_eo_default_inertialconfig.enabled;
@@ -946,7 +946,7 @@ extern void eoprot_fun_INIT_as_inertials_config(const EOnv* nv)
 
 extern void eoprot_fun_INIT_as_inertials_status(const EOnv* nv)
 {
-    eOas_inertial_status_t *status = eo_nv_RAM(nv);  
+    eOas_inertial_status_t* status = (eOas_inertial_status_t*) eo_nv_RAM(nv);  
     
     status->data.timestamp = 0;
     status->data.id = 999;
@@ -1086,7 +1086,7 @@ static eOresult_t s_eo_inertials2_TXstart(EOtheInertials2 *p)
     canprotoconfig.period = p->sensorsconfig.datarate;
     canprotoconfig.enabledsensors = icubCanProto_inertial_sensorflag_none;
     
-    p->sharedcan.command.class = eocanprot_msgclass_pollingAnalogSensor;
+    p->sharedcan.command.clas = eocanprot_msgclass_pollingAnalogSensor;
     p->sharedcan.command.type  = ICUBCANPROTO_POL_SK_CMD__ACC_GYRO_SETUP;
     p->sharedcan.command.value = &canprotoconfig;
 
@@ -1138,7 +1138,7 @@ static eOresult_t s_eo_inertials2_TXstop(EOtheInertials2 *p)
     canprotoconfig.enabledsensors   = icubCanProto_inertial_sensorflag_none;
     canprotoconfig.period           = p->sensorsconfig.datarate;
 
-    p->sharedcan.command.class = eocanprot_msgclass_pollingAnalogSensor;
+    p->sharedcan.command.clas = eocanprot_msgclass_pollingAnalogSensor;
     p->sharedcan.command.type  = ICUBCANPROTO_POL_SK_CMD__ACC_GYRO_SETUP;
     p->sharedcan.command.value = &canprotoconfig;
     

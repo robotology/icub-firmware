@@ -19,6 +19,10 @@
 #ifndef MC_JOINT___
 #define MC_JOINT___
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "EoCommon.h"
 
 #include "EOemsControllerCfg.h"
@@ -102,10 +106,10 @@ typedef struct // Joint
 {
     uint8_t ID;
     
-    int16_t dead_zone;
-    
     PID posPID;
     PID velPID;
+    
+    CTRL_UNITS dead_zone;
     
     CTRL_UNITS pos_min;
     CTRL_UNITS pos_max;
@@ -202,7 +206,7 @@ extern int8_t Joint_check_limits(Joint* o);
 extern int8_t Joint_pushing_limit(Joint* o);
 
 extern void Joint_set_limits(Joint* o, CTRL_UNITS pos_min, CTRL_UNITS pos_max);
-extern void Joint_set_hardware_limit(Joint* o, CTRL_UNITS hard_limit);
+extern void Joint_set_hardware_limit(Joint* o);
 
 extern BOOL Joint_manage_cable_constraint(Joint* o);
 
@@ -230,4 +234,11 @@ extern BOOL Joint_set_pos_ref_in_calibType6(Joint* o, CTRL_UNITS pos_ref, CTRL_U
 
 //VALE: debug function. I'll remove it ASAP
 //extern void Joint_update_debug_current_info(Joint *o, int32_t avgCurrent, int32_t accum_Ep);
-#endif
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
+
+

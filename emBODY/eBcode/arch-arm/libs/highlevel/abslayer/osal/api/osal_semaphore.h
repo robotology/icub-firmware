@@ -20,17 +20,20 @@
 #ifndef _OSAL_SEMAPHORE_H_
 #define _OSAL_SEMAPHORE_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       osal_sempahore.h
-	@brief      This header file implements public interface to the os abstraction layer: semaphore
-	@author     marco.accame@iit.it
-	@date       12/05/2011
+    @brief      This header file implements public interface to the os abstraction layer: semaphore
+    @author     marco.accame@iit.it
+    @date       12/05/2011
 **/
 
 /* @defgroup osal_semaphore OS abstraction layer: semaphore
     cxece
     
-    @{		
+    @{  
  **/
 
 
@@ -116,6 +119,9 @@ extern osal_result_t osal_semaphore_delete(osal_semaphore_t *sem);
 /* @}            
     end of group osal_semaphore  
  **/
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

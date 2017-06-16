@@ -21,6 +21,10 @@
 #ifndef _HAL_TIMER_H_
 #define _HAL_TIMER_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       hal_timer.h
@@ -264,6 +268,10 @@ extern hal_result_t hal_timer_offset_write(hal_timer_t id, hal_nanotime_t offset
 /** @}            
     end of group doxy_group_hal_timer  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

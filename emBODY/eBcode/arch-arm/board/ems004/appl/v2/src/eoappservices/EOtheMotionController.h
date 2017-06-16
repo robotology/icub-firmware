@@ -21,6 +21,10 @@
 #ifndef _EOTHEMOTIONCONTROLLER_H_
 #define _EOTHEMOTIONCONTROLLER_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       EOtheMotionController.h
@@ -100,7 +104,11 @@ extern eOresult_t eo_motioncontrol_Stop(EOtheMotionController *p);
     end of group eo_EOtheMotionController
  **/
 
-#endif  // include-guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

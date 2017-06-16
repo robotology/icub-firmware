@@ -22,6 +22,10 @@
 #ifndef MC_MOTOR_H___
 #define MC_MOTOR_H___
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "EoCommon.h"
 #include "EoMotionControl.h"
 #include "EOtheCANprotocol.h"
@@ -155,6 +159,7 @@ typedef struct //Motor
     uint8_t MOTOR_CONTROL_TYPE;
 
     int16_t GEARBOX;
+    int16_t GEARBOX_E2J;
 
     BOOL HAS_TEMP_SENSOR;
     int16_t temperature_max;
@@ -222,7 +227,7 @@ typedef struct //Motor
     // 2FOC specific data
     WatchDog can_2FOC_alive_wdog;
     uint8_t can_motor_config[6];
-    BOOL outOfLimitsSignaled;
+    //BOOL outOfLimitsSignaled;
 
 } Motor;
 
@@ -306,7 +311,14 @@ extern int32_t Motor_get_vel_fbk(Motor* o);
 extern CTRL_UNITS Motor_get_trq_fbk(Motor* o);
 */
 
-#endif
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
+
+
 
 // Motor
 /////////////////////////////////////////////////////////

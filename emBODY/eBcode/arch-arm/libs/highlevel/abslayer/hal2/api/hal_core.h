@@ -21,6 +21,10 @@
 #ifndef _HAL_CORE_H_
 #define _HAL_CORE_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       hal_core.h
@@ -121,6 +125,10 @@ const hal_core_cfg_t* hal_core_cfg_get(void);
 /** @}            
     end of group doxy_group_hal_core  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

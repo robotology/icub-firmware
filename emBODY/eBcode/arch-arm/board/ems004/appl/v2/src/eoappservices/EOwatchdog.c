@@ -64,25 +64,28 @@ static void s_eo_watchdog_diagnosticconfig(EOwatchdog* wd, eOwatchdog_cfg_t *cfg
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
+
 static const eOwatchdog_cfg_t cfg_default = 
-{
-    .diagncfg = 
+{    
+    EO_INIT(.period)                1000000, 
+    EO_INIT(.diagncfg) 
     {
-        .numoffailures = 0,
-        .functiononfailure = NULL,
-    },
-    .period = 100000 //1 sec
+        EO_INIT(.numoffailures)     0,
+        EO_INIT(.functiononfailure) NULL,
+    }
+
 }; 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
+
 extern EOwatchdog* eo_watchdog_new(eOwatchdog_cfg_t *cfg)
 {
     EOwatchdog *retptr = NULL;    
 
     // I get the memory for the object
-    retptr = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOwatchdog), 1);
+    retptr = (EOwatchdog*) eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOwatchdog), 1);
     
     s_eo_watchdog_configure(retptr, cfg);
     
@@ -204,6 +207,7 @@ extern eOresult_t eo_watchdog_stop(EOwatchdog* wd)
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
+
 static void s_eo_watchdog_configure(EOwatchdog* wd, eOwatchdog_cfg_t *cfg)
 {
     

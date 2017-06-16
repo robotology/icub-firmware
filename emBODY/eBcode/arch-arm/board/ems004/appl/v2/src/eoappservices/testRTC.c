@@ -30,7 +30,7 @@
 
 #include "EoProtocolMN.h"
 
-#include "EOtheBoardConfig.h"
+//#include "EOtheBoardConfig.h"
 
 //#include "EOmcController.h"
 

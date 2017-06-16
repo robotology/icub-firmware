@@ -20,17 +20,20 @@
 #ifndef _OSAL_TASK_H_
 #define _OSAL_TASK_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       osal_task.h
-	@brief      This header file implements public interface to the os abstraction layer: task
-	@author     marco.accame@iit.it
-	@date       12/05/2011
+    @brief      This header file implements public interface to the os abstraction layer: task
+    @author     marco.accame@iit.it
+    @date       12/05/2011
 **/
 
 /* @defgroup osal_task OS abstraction layer: task
     xecxwexcwe.
     
-    @{		
+    @{        
  **/
 
 
@@ -225,6 +228,10 @@ extern osal_result_t osal_task_delete(osal_task_t *tsk);
 /* @}            
     end of group osal_task  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

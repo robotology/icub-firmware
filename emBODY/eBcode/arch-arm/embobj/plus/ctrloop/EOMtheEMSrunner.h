@@ -149,6 +149,7 @@ extern EOMtheEMSrunner * eom_emsrunner_Initialise(const eOemsrunner_cfg_t *emsru
  **/
 extern EOMtheEMSrunner * eom_emsrunner_GetHandle(void);
 
+extern eObool_t eom_emsrunner_IsRunning(EOMtheEMSrunner *p);
 
 extern eOresult_t eom_emsrunner_Set_TXdecimationFactor(EOMtheEMSrunner *p, uint8_t txdecimationfactor);
 

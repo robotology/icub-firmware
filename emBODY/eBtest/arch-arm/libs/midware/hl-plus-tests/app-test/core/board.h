@@ -21,6 +21,10 @@
 #ifndef _BRD_MCBSTM32X_H_
 #define _BRD_MCBSTM32X_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "stdint.h"
 
 // #if     defined(USE_BRD_MCBSTM32_C)
@@ -43,6 +47,13 @@ typedef enum
 extern void board_led_init(void);
 extern void board_led_on(board_led_t led);
 extern void board_led_off(board_led_t led);
+
+
+#warning USING core/board.h 
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 
 #endif

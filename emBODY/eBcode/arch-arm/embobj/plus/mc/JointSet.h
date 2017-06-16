@@ -19,6 +19,10 @@
 #ifndef MC_JOINT_SET___
 #define MC_JOINT_SET___
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "EoCommon.h"
 
 #include "EOemsControllerCfg.h"
@@ -71,7 +75,7 @@ typedef struct // JointSet
     
     BOOL external_fault;
     
-    uint8_t special_constraint;
+    eOmc_jsetconstraint_t special_constraint;
     
     int32_t special_limit;
     
@@ -118,4 +122,11 @@ extern void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibr
 extern void JointSet_do_pwm_control(JointSet* o);
     
 extern void JointSet_send_debug_message(char *message, uint8_t jid);
-#endif
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
+
+

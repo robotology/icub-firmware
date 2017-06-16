@@ -339,12 +339,12 @@ extern EOVtheIPnet * eov_ipnet_hid_Initialise(uint8_t maxdgramsocks, EOVmutexDer
 //    eo_errman_Assert(eo_errman_GetHandle(), NULL != gettask_fn, "gettask_fn() is NULL", s_eobj_ownname, NULL);
 
     // initialise vtable
-    s_ipnet.vtable[VF00_attach]              = attach_fn;
-    s_ipnet.vtable[VF01_detach]              = detach_fn;
-    s_ipnet.vtable[VF02_alert]               = alert_fn;
-    s_ipnet.vtable[VF03_arp]                 = arp_fn;
-    s_ipnet.vtable[VF04_waitpacket]          = waitpacket_fn;
-//    s_ipnet.vtable[VF05_gettask]             = gettask_fn;
+    s_ipnet.vtable[VF00_attach]              = (void*)attach_fn;
+    s_ipnet.vtable[VF01_detach]              = (void*)detach_fn;
+    s_ipnet.vtable[VF02_alert]               = (void*)alert_fn;
+    s_ipnet.vtable[VF03_arp]                 = (void*)arp_fn;
+    s_ipnet.vtable[VF04_waitpacket]          = (void*)waitpacket_fn;
+//    s_ipnet.vtable[VF05_gettask]             = (void*)gettask_fn;
  
     // i get activedgramsocksptrlist list. it keeps pointers to socket objects.
     s_ipnet.activedgramsocksptrlist = (0 == maxdgramsocks) ? (NULL) : (eo_list_New(sizeof(EOsocketDatagram *), maxdgramsocks, NULL, 0, NULL, NULL));

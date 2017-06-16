@@ -77,6 +77,8 @@
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
+static void s_eoprot_ep_mn_fun_apply_config(uint32_t period, uint16_t rxtime, uint16_t dotime, uint16_t txtime, uint8_t txratedivider);
+
 static void s_eoprot_ep_mn_fun_apply_config_txratedivider(uint8_t txratedivider);
 
 
@@ -287,9 +289,7 @@ extern void eoprot_fun_INIT_mn_appl_status(const EOnv* nv)
     
     // curr state
     status.currstate = applstate_config;
-    // run mode
-    status.runmode = applrunMode__default;    
-    
+
     status.boardtype = eobrd_ethtype_unknown;
     
 #if defined(USE_EMS4RD)
@@ -311,7 +311,13 @@ extern void eoprot_fun_UPDT_mn_appl_config(const EOnv* nv, const eOropdescriptor
     if(1000 != cfg->cycletime)
     {
         cfg->cycletime = 1000;
-        //#warning marco.accame: send up a warning about unsuppported feature
+    }
+    
+    if((cfg->maxtimeRX + cfg->maxtimeDO + cfg->maxtimeTX) > cfg->cycletime)
+    {
+        cfg->maxtimeRX = cfg->cycletime/3;
+        cfg->maxtimeDO = cfg->cycletime/3;
+        cfg->maxtimeTX = cfg->cycletime - cfg->maxtimeRX - cfg->maxtimeDO;        
     }
     
     if(0 == cfg->txratedivider)
@@ -319,7 +325,7 @@ extern void eoprot_fun_UPDT_mn_appl_config(const EOnv* nv, const eOropdescriptor
         cfg->txratedivider = 1;
     }
     
-    s_eoprot_ep_mn_fun_apply_config_txratedivider(cfg->txratedivider);   
+    s_eoprot_ep_mn_fun_apply_config(cfg->cycletime, cfg->maxtimeRX, cfg->maxtimeDO, cfg->maxtimeTX, cfg->txratedivider);   
 }
 
 
@@ -853,9 +859,32 @@ static void s_eoprot_ep_mn_fun_apply_config_txratedivider(uint8_t txratedivider)
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_management, eoprot_entity_mn_appl, 0, eoprot_tag_mn_appl_status);
     eOmn_appl_status_t *status = (eOmn_appl_status_t*)eoprot_variable_ramof_get(eoprot_board_localboard, id32);
     status->txdecimationfactor = txratedivider;   
+   
+    eom_emsrunner_Set_TXdecimationFactor(eom_emsrunner_GetHandle(), txratedivider);    
+}
+
+static void s_eoprot_ep_mn_fun_apply_config(uint32_t period, uint16_t rxtime, uint16_t dotime, uint16_t txtime, uint8_t txratedivider)
+{
+    eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_management, eoprot_entity_mn_appl, 0, eoprot_tag_mn_appl_status);
+    eOmn_appl_status_t *status = (eOmn_appl_status_t*)eoprot_variable_ramof_get(eoprot_board_localboard, id32);
+
+    status->cloop_timings[0] = rxtime;
+    status->cloop_timings[1] = dotime;
+    status->cloop_timings[2] = txtime;
+    status->txdecimationfactor = txratedivider;   
+    
+    eOemsrunner_timing_t timing = {0};
+    timing.period = period; 
+    timing.safetygap = 0;
+    timing.rxstartafter = 0;
+    timing.dostartafter = rxtime;    
+    timing.txstartafter = rxtime + dotime;
+    
+    eom_emsrunner_SetTiming(eom_emsrunner_GetHandle(), &timing); 
     
     eom_emsrunner_Set_TXdecimationFactor(eom_emsrunner_GetHandle(), txratedivider);    
 }
+
 
 
 // --------------------------------------------------------------------------------------------------------------------

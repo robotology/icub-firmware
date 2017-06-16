@@ -20,17 +20,20 @@
 #ifndef _IPAL_TELNET_H_
 #define _IPAL_TELNET_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       ipal_telnet.h
-	@brief      This header file implements public interface to the ip abstraction layer: telnet 
-	@author     marco.accame@iit.it
-	@date       12/12/2011
+    @brief      This header file implements public interface to the ip abstraction layer: telnet 
+    @author     marco.accame@iit.it
+    @date       12/12/2011
 **/
 
 /* @defgroup ipal_telnet IP abstraction layer: telnet
     cercecvecve.
     
-    @{		
+    @{        
  **/
 
 
@@ -87,6 +90,10 @@ extern ipal_result_t ipal_telnet_restart(void);
 /* @}            
     end of group ipal_telnet  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

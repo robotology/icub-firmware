@@ -20,17 +20,20 @@
 #ifndef _IPAL_TCPSOCKET_H_
 #define _IPAL_TCPSOCKET_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       ipal_tcpsocket.h
-	@brief      This header file implements public interface to the ip abstraction layer: tcp socket 
-	@author     marco.accame@iit.it
-	@date       12/12/2011
+    @brief      This header file implements public interface to the ip abstraction layer: tcp socket 
+    @author     marco.accame@iit.it
+    @date       12/12/2011
 **/
 
 /* @defgroup ipal_tcpsocket IP abstraction layer: tcp socket
     the tcp sockets are not implemented.
     
-    @{		
+    @{        
  **/
 
 
@@ -71,6 +74,10 @@ typedef struct ipal_tcpsocket_opaque_t ipal_tcpsocket_t;
     end of group ipal_tcpsocket  
  **/
 
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
 #endif  // include-guard
 
 

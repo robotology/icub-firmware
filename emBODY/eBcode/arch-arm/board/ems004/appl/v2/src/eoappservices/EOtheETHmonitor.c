@@ -34,6 +34,8 @@
 
 #include "EOtheSharedHW.h"
 
+#include "EOMtheEMSrunner.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -52,8 +54,8 @@
 
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
-// --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+#undef USE_ethmonitor_verifyTXropframe
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -62,9 +64,9 @@
 
 const eOethmonitor_cfg_t eo_ethmonitor_DefaultCfg = 
 {
-    .priority           = 10,
-    .stacksize          = 1024,
-    .period             = 100*EOK_reltime1ms
+    EO_INIT(.priority)      10,
+    EO_INIT(.stacksize)     1024,
+    EO_INIT(.period)        100*EOK_reltime1ms
 };
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -125,7 +127,9 @@ static void s_eo_ethmonitor_process_resultsofquery(void);
 
 //static void s_eo_ethmonitor_print_timeoflife(const char *prefix);
 
+#if defined(USE_ethmonitor_verifyTXropframe)
 static void s_eo_ethmonitor_verifyTXropframe(hl_eth_frame_t* frame);
+#endif
 
 static void s_eo_ethmonitor_verifyTXropframe_DUMMY(hl_eth_frame_t* frame);
 
@@ -138,16 +142,18 @@ static void s_eo_ethmonitor_send_error_sequencenumber(void);
 
 static EOtheETHmonitor s_eo_theethmonitor = 
 {
-    .initted                = eobool_false,
-    .enabled                = eobool_false,
-    .newresultsavailable    = eobool_false,
-    .taskworker             = NULL,
-    .semaphoreworker        = NULL,
-    .alertsemaphore         = NULL,
-    .task2alert             = NULL,
-    .alertevent             = 0,
-    .upmask                 = 0,                 
-    .portstatus             = {0}
+    EO_INIT(.initted)                   eobool_false,
+    EO_INIT(.enabled)                   eobool_false,
+    EO_INIT(.newresultsavailable)       eobool_false,
+    EO_INIT(.taskworker)                NULL,
+    EO_INIT(.semaphoreworker)           NULL,
+    EO_INIT(.alertsemaphore)            NULL,
+    EO_INIT(.task2alert)                NULL,
+    EO_INIT(.alertevent)                0,
+    EO_INIT(.upmask)                    0,                 
+    EO_INIT(.lastsequencenumbererror)   0,
+    EO_INIT(.lastnumberofseqnumbererrors) 0,
+    EO_INIT(.portstatus)                {0}
 };
 
 static const char s_eobj_ownname[] = "EOtheETHmonitor";
@@ -339,7 +345,7 @@ extern eOresult_t eo_ethmonitor_Stop(EOtheETHmonitor *p)
 // name of the task as it is shown in uvision
 void eo_ethmonitor(void *p)
 {
-     eom_task_Start(p);
+     eom_task_Start((EOMtask*)p);
 }
 
 
@@ -492,6 +498,7 @@ static void s_eo_ethmonitor_process_resultsofquery(void)
     
     for(i=0; i<eOethmonitor_numberofports; i++)
     {
+        uint64_t applstate = (eobool_true == eom_emsrunner_IsRunning(eom_emsrunner_GetHandle())) ? (0x3000000000000000) : (0x1000000000000000);
         if(eobool_true == s_eo_theethmonitor.portstatus[i].on)
         {
             if(eobool_false == s_eo_theethmonitor.portstatus[i].previouson)
@@ -500,7 +507,7 @@ static void s_eo_ethmonitor_process_resultsofquery(void)
                 errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
                 errdes.sourceaddress    = 0;
                 errdes.par16            = i;
-                errdes.par64            = 0;
+                errdes.par64            = applstate;
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);                
             }
             
@@ -510,7 +517,7 @@ static void s_eo_ethmonitor_process_resultsofquery(void)
                 errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
                 errdes.sourceaddress    = 0;
                 errdes.par16            = i;
-                errdes.par64            = s_eo_theethmonitor.portstatus[i].rxcrc.value;    
+                errdes.par64            = applstate | (s_eo_theethmonitor.portstatus[i].rxcrc.value & 0xffffffff);    
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);                
             }
         }
@@ -522,7 +529,7 @@ static void s_eo_ethmonitor_process_resultsofquery(void)
                 errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
                 errdes.sourceaddress    = 0;
                 errdes.par16            = i;
-                errdes.par64            = 0;
+                errdes.par64            = applstate;
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);                
             }            
         }
@@ -559,6 +566,8 @@ static void s_eo_ethmonitor_verifyTXropframe_DUMMY(hl_eth_frame_t* frame)
 {
 }
 
+// uncomment to use
+#if defined(USE_ethmonitor_verifyTXropframe)
 static void s_eo_ethmonitor_verifyTXropframe(hl_eth_frame_t* frame)
 {    
     eth_udp_pkt_t *udp = (eth_udp_pkt_t*)&frame->datafirstbyte[0];
@@ -601,6 +610,7 @@ static void s_eo_ethmonitor_verifyTXropframe(hl_eth_frame_t* frame)
     }
           
 }
+#endif
 
 static void s_eo_ethmonitor_send_error_sequencenumber(void)
 {    

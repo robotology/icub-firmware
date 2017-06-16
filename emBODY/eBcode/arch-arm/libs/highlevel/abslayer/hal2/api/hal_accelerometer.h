@@ -21,6 +21,10 @@
 #ifndef _HAL_ACCELEROMETER_H_
 #define _HAL_ACCELEROMETER_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       hal_accelerometer.h
@@ -115,6 +119,10 @@ extern hal_result_t hal_accelerometer_read(hal_accelerometer_t id, hal_accelerom
 /** @}            
     end of group doxy_group_hal_accelerometer  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

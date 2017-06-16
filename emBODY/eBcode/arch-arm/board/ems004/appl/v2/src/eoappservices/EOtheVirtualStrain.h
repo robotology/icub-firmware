@@ -21,6 +21,10 @@
 #ifndef _EOTHEVIRTUALSTRAIN_H_
 #define _EOTHEVIRTUALSTRAIN_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       EOtheVirtualStrain.h
@@ -71,7 +75,11 @@ extern eOresult_t eo_virtualstrain_Tick(EOtheVirtualStrain *p);
     end of group eo_EOtheVirtualStrain
  **/
 
-#endif  // include-guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

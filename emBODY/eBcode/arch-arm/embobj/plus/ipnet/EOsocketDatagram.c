@@ -111,7 +111,7 @@ extern EOsocketDatagram* eo_socketdtg_New(uint8_t dtg_in_num, uint16_t dtg_in_si
     EOsocketDatagram *retptr = NULL;    
 
     // i get the memory for the object
-    retptr = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOsocketDatagram), 1);
+    retptr = (EOsocketDatagram*) eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOsocketDatagram), 1);
 
     eo_errman_Assert(eo_errman_GetHandle(), (0 != (dtg_in_num+dtg_out_num)), "eo_socketdtg_New() needs at least one pkt queue", s_eobj_ownname, NULL);
 

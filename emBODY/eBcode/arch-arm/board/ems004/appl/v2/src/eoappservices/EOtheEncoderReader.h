@@ -21,6 +21,10 @@
 #ifndef _EOTHEENCODERREADER_H_
 #define _EOTHEENCODERREADER_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       EOtheEncoderReader.h
@@ -38,7 +42,7 @@
 
 #include "EoCommon.h"
 #include "EoProtocol.h"
-
+#include "EoMotionControl.h"
 #include "hal_spiencoder.h"
 
 #include "EOtheServices.h"
@@ -55,10 +59,18 @@ typedef struct EOtheEncoderReader_hid EOtheEncoderReader;
 
 typedef enum
 {
-    encreader_err_NONE      = 0,
-    encreader_err_READING   = 1,
-    encreader_err_PARITY    = 2,
-    encreader_err_CHIP      = 3
+    encreader_err_NONE                  = 0,
+    encreader_err_AEA_READING           = 1,
+    encreader_err_AEA_PARITY            = 2,
+    encreader_err_AEA_CHIP              = 3,
+    encreader_err_QENC_GENERIC          = 4,
+    encreader_err_ABSANALOG_GENERIC     = 5,
+    encreader_err_MAIS_GENERIC          = 6,
+    encreader_err_SPICHAINOF2_GENERIC   = 7,
+    encreader_err_SPICHAINOF3_GENERIC   = 8,
+    encreader_err_AMO_GENERIC           = 9,    
+    encreader_err_GENERIC               = 14,    
+    encreader_err_NOTCONNECTED          = 15 /* this error happens when the encoder type is none or encoder is not local, for example it is connected to 2foc board */
 } eOencoderreader_errortype_t;
 
 typedef struct
@@ -66,6 +78,7 @@ typedef struct
     uint32_t                                value[eomc_encoders_maxnumberofcomponents];
     eOencoderreader_errortype_t             errortype;
     uint8_t                                 composedof;
+    eOmc_position_t                         position;
 } eOencoderreader_valueInfo_t;
 
 //typedef eOresult_t (*eOencoderreader_onendofoperation_fun_t) (EOtheEncoderReader* p, eObool_t operationisok);
@@ -111,7 +124,11 @@ extern eOresult_t eo_encoderreader_GetPrimaryEncoder(EOtheEncoderReader *p, uint
     end of group eo_EOtheEncoderReader
  **/
 
-#endif  // include-guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

@@ -72,19 +72,19 @@
 
 static EOtheEntities s_eo_theentities = 
 {
-    .initted        = eobool_false,
-    .joints         = {NULL},
-    .motors         = {NULL},
-    .skins          = {NULL},
-    .strains        = {NULL},
-    .maises         = {NULL},
-    .inertials      = {NULL},
-    .numofjoints    = 0,
-    .numofmotors    = 0,
-    .numofskins     = 0,
-    .numofstrains   = 0,
-    .numofmaises    = 0,
-    .numofinertials = 0
+    EO_INIT(.initted        ) eobool_false,
+    EO_INIT(.joints         ) {NULL},
+    EO_INIT(.motors         ) {NULL},
+    EO_INIT(.skins          ) {NULL},
+    EO_INIT(.strains        ) {NULL},
+    EO_INIT(.maises         ) {NULL},
+    EO_INIT(.inertials      ) {NULL},
+    EO_INIT(.numofjoints    ) 0,
+    EO_INIT(.numofmotors    ) 0,
+    EO_INIT(.numofskins     ) 0,
+    EO_INIT(.numofstrains   ) 0,
+    EO_INIT(.numofmaises    ) 0,
+    EO_INIT(.numofinertials ) 0
 };
 
 //static const char s_eobj_ownname[] = "EOtheEntities";
@@ -134,7 +134,7 @@ extern eOresult_t eo_entities_Reset(EOtheEntities *p)
     s_eo_theentities.numofjoints = 0;
     for(i=0; i<max; i++)
     {
-        s_eo_theentities.joints[i] = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, (eOprotIndex_t)i);
+        s_eo_theentities.joints[i] = (eOmc_joint_t*) eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, (eOprotIndex_t)i);
     }
     
     // motors
@@ -143,7 +143,7 @@ extern eOresult_t eo_entities_Reset(EOtheEntities *p)
     if(max>eoprotwrap_max_motors) max = eoprotwrap_max_motors;
     for(i=0; i<max; i++)
     {
-        s_eo_theentities.motors[i] = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, (eOprotIndex_t)i);
+        s_eo_theentities.motors[i] = (eOmc_motor_t*) eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, (eOprotIndex_t)i);
     } 
     
     // skins
@@ -152,7 +152,7 @@ extern eOresult_t eo_entities_Reset(EOtheEntities *p)
     if(max>eoprotwrap_max_skins) max = eoprotwrap_max_skins;
     for(i=0; i<max; i++)
     {
-        s_eo_theentities.skins[i] = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_skin, eoprot_entity_sk_skin, (eOprotIndex_t)i);
+        s_eo_theentities.skins[i] = (eOsk_skin_t*) eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_skin, eoprot_entity_sk_skin, (eOprotIndex_t)i);
     }  
     
     // strains
@@ -161,7 +161,7 @@ extern eOresult_t eo_entities_Reset(EOtheEntities *p)
     if(max>eoprotwrap_max_strains) max = eoprotwrap_max_strains;
     for(i=0; i<max; i++)
     {
-        s_eo_theentities.strains[i] = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_strain, (eOprotIndex_t)i);
+        s_eo_theentities.strains[i] = (eOas_strain_t*) eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_strain, (eOprotIndex_t)i);
     }  
     
     // maises
@@ -170,7 +170,7 @@ extern eOresult_t eo_entities_Reset(EOtheEntities *p)
     if(max>eoprotwrap_max_maises) max = eoprotwrap_max_maises;
     for(i=0; i<max; i++)
     {
-        s_eo_theentities.maises[i] = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_mais, (eOprotIndex_t)i);
+        s_eo_theentities.maises[i] = (eOas_mais_t*) eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_mais, (eOprotIndex_t)i);
     }    
 
 
@@ -180,7 +180,7 @@ extern eOresult_t eo_entities_Reset(EOtheEntities *p)
     if(max>eoprotwrap_max_inertials) max = eoprotwrap_max_inertials;
     for(i=0; i<max; i++)
     {
-        s_eo_theentities.inertials[i] = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_inertial, (eOprotIndex_t)i);
+        s_eo_theentities.inertials[i] = (eOas_inertial_t*) eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_inertial, (eOprotIndex_t)i);
     } 
     
     return(eores_OK);

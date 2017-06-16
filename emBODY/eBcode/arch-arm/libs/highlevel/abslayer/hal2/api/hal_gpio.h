@@ -21,6 +21,10 @@
 #ifndef _HAL_GPIO_H_
 #define _HAL_GPIO_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       hal_gpio.h
@@ -224,6 +228,10 @@ extern hal_gpio_val_t hal_gpio_getval(hal_gpio_t gpio);
 /** @}            
     end of group doxy_group_hal_gpio  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

@@ -21,6 +21,10 @@
 #ifndef _HAL_GYROSCOPE_H_
 #define _HAL_GYROSCOPE_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       hal_gyroscope.h
@@ -134,6 +138,10 @@ extern hal_result_t hal_gyroscope_readraw(hal_gyroscope_t id, int16_t *x, int16_
 /** @}            
     end of group doxy_group_hal_gyroscope  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

@@ -21,6 +21,11 @@
 #ifndef _EOWATCHDOG_H_
 #define _EOWATCHDOG_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+    
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       EOwatchdog.h
@@ -49,9 +54,9 @@ typedef struct EOwatchdog_hid EOwatchdog;
 typedef struct
 {
     uint16_t            numoffailures;
-    eOvoid_fp_void_t    functiononfailure; //this function is invoked inside _check function at first failure and every "numoffailures" failures consecutive
-    
+    eOvoid_fp_void_t    functiononfailure; //this function is invoked inside _check function at first failure and every "numoffailures" failures consecutive    
 } eOwatchdog_diagnostics_cfg_t;
+
 typedef struct
 {
     eOreltime_t                     period; //time expressed in microsec
@@ -96,9 +101,12 @@ extern eObool_t eo_watchdog_check(EOwatchdog* wd);
 /** @}            
     end of group eo_EOwatchdog
  **/
+ 
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif
 
 #endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
-
 

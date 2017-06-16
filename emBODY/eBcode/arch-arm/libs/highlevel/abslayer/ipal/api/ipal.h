@@ -19,16 +19,20 @@
 #ifndef _IPAL_H_
 #define _IPAL_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /** @file       ipal.h
-	@brief      This header file implements public interface to the ip abstraction layer 
-	@author     marco.accame@iit.it
-	@date       12/12/2011
+    @brief      This header file implements public interface to the ip abstraction layer 
+    @author     marco.accame@iit.it
+    @date       12/12/2011
 **/
 
 /* @defgroup ipal IP abstraction layer
     cercecvecve.
     
-    @{		
+    @{        
  **/
 
 // - external dependencies --------------------------------------------------------------------------------------------
@@ -59,6 +63,11 @@
 /* @}            
     end of group ipal  
  **/
+ 
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+
 
 #endif  // include-guard
 

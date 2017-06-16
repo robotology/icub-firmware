@@ -1045,6 +1045,14 @@ static uint8_t s_uprot_proc_DISCOVER(eOuprot_opcodes_t opc, uint8_t *pktin, uint
     }
     else
     {
+#if defined(_MAINTAINER_APPL_)     
+        eOuprot_cmd_DISCOVER_t *cmd = (eOuprot_cmd_DISCOVER_t*) pktin;        
+        if(1 == cmd->jump2updater)
+        {            
+            ee_sharserv_ipc_gotoproc_set(ee_procUpdater);
+            ee_sharserv_sys_restart();            
+        }        
+#endif        
         // prepare the reply.
         eOuprot_cmd_DISCOVER_REPLY_t *reply = (eOuprot_cmd_DISCOVER_REPLY_t*) pktout;        
         *sizeout = s_discover_fill(reply, uprot_OPC_DISCOVER, sizeof(eOuprot_cmd_DISCOVER_REPLY_t));

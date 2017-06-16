@@ -86,7 +86,7 @@ extern EOsocket* eo_socket_New(void)
     EOsocket *retptr = NULL;    
 
     // i get the memory for the object
-    retptr = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOsocket), 1);
+    retptr = (EOsocket*) eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, sizeof(EOsocket), 1);
 
  
     // i create the two actions even if we may not use them

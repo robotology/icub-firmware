@@ -43,7 +43,7 @@
 
 #include "EOVtheCallbackManager.h"
 
-#include "EOtheBoardConfig.h"
+//#include "EOtheBoardConfig.h"
 
 #include "EoError.h"
 
@@ -132,19 +132,19 @@ static eOresult_t s_eo_services_alert_afterverify_service(eObool_t operationisok
     
 static EOtheServices s_eo_theservices = 
 {
-    .initted            = eobool_false,
-    .nvset              = NULL,
-    .timer              = NULL,
-    .board              = eo_prot_BRDdummy,
-    .mnservice          = NULL,
-    .running            = {eobool_false},
-    .ipaddress          = 0,
-    .startupactivationstate = 
+    EO_INIT(.initted)       eobool_false,
+    EO_INIT(.nvset)         NULL,
+    EO_INIT(.timer)         NULL,
+    EO_INIT(.board)         eo_prot_BRDdummy,
+    EO_INIT(.mnservice)     NULL,
+    EO_INIT(.running)       {eobool_false},
+    EO_INIT(.ipaddress)     0,
+    EO_INIT(.startupactivationstate) 
     {
-        .allactivated       = eobool_false,
-        .failedservice      = eo_service_none,
+        EO_INIT(.allactivated)  eobool_false,
+        EO_INIT(.failedservice)     eo_service_none,
     },
-    .mcservicetype  = eomn_serv_NONE
+    EO_INIT(.mcservicetype) eomn_serv_NONE
 };
 
 static const char s_eobj_ownname[] = "EOtheServices";
@@ -153,27 +153,27 @@ static const char s_eobj_ownname[] = "EOtheServices";
 static const eOprot_EPcfg_t s_eo_theservices_theEPcfgsOthersMAX[] =
 {  
     {           
-        .endpoint           = eoprot_endpoint_motioncontrol,
-        .numberofentities   = {12, 12, 1, 0, 0, 0, 0}     
+        EO_INIT(.endpoint)          eoprot_endpoint_motioncontrol,
+        EO_INIT(.numberofentities)  {12, 12, 1, 0, 0, 0, 0}     
     },     
     {        
-        .endpoint           = eoprot_endpoint_analogsensors,
-        .numberofentities   = {1, 1, 1, 1, 0, 0, 0}        
+        EO_INIT(.endpoint)          eoprot_endpoint_analogsensors,
+        EO_INIT(.numberofentities)  {1, 1, 1, 1, 0, 0, 0}        
     },
     {        
-        .endpoint           = eoprot_endpoint_skin,
-        .numberofentities   = {2, 0, 0, 0, 0, 0, 0}        
+        EO_INIT(.endpoint)          eoprot_endpoint_skin,
+        EO_INIT(.numberofentities)  {2, 0, 0, 0, 0, 0, 0}        
     }     
 };
 
 static const EOconstvector s_eo_theservices_vectorof_EPcfg_max = 
 {
-    .capacity       = sizeof(s_eo_theservices_theEPcfgsOthersMAX)/sizeof(eOprot_EPcfg_t),
-    .size           = sizeof(s_eo_theservices_theEPcfgsOthersMAX)/sizeof(eOprot_EPcfg_t),
-    .item_size      = sizeof(eOprot_EPcfg_t),
-    .dummy          = 0,
-    .stored_items   = (void*)s_eo_theservices_theEPcfgsOthersMAX,
-    .functions      = NULL   
+    EO_INIT(.capacity )     sizeof(s_eo_theservices_theEPcfgsOthersMAX)/sizeof(eOprot_EPcfg_t),
+    EO_INIT(.size)          sizeof(s_eo_theservices_theEPcfgsOthersMAX)/sizeof(eOprot_EPcfg_t),
+    EO_INIT(.item_size)     sizeof(eOprot_EPcfg_t),
+    EO_INIT(.dummy)         0,
+    EO_INIT(.stored_items)  (void*)s_eo_theservices_theEPcfgsOthersMAX,
+    EO_INIT(.functions)     NULL   
 };
 
 static const EOconstvector * s_eo_theservices_the_vectorof_EPcfgs = &s_eo_theservices_vectorof_EPcfg_max;
@@ -201,7 +201,7 @@ extern EOtheServices* eo_services_Initialise(eOipv4addr_t ipaddress)
     
     p->startupactivationstate.allactivated = eobool_false;
     p->startupactivationstate.failedservice = eo_service_none;
-    p->mnservice = eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_management, eoprot_entity_mn_service, 0);
+    p->mnservice = (eOmn_service_t*) eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_management, eoprot_entity_mn_service, 0);
     
     p->ipaddress = ipaddress;
     
@@ -361,7 +361,7 @@ extern eOresult_t eo_services_ProcessCommand(EOtheServices *p, eOmn_service_cmmn
 
 extern void eoprot_fun_INIT_mn_service_wholeitem(const EOnv* nv)
 {    
-    eOmn_service_t* mnservice = eo_nv_RAM(nv);
+    eOmn_service_t* mnservice = (eOmn_service_t*) eo_nv_RAM(nv);
     
     // we init the stateofservice with eomn_serv_state_notsupported. 
     // the _Initialise() funtion of mais, strain etc (if called) will change it to eomn_serv_state_idle
@@ -612,7 +612,7 @@ static void s_eo_services_initialise(EOtheServices *p)
         // so far i do in here what i need without any container
              
         // can-services
-        eOcanserv_cfg_t config = {.mode = eocanserv_mode_straight};   
+        eOcanserv_cfg_t config;   
         
         config.mode                 = eocanserv_mode_straight;
         config.canstabilizationtime = 7*eok_reltime1sec;
@@ -735,7 +735,7 @@ static eOresult_t s_services_callback_afterverify_motioncontrol(EOaService* p, e
         eo_motioncontrol_Deactivate(eo_motioncontrol_GetHandle());
     }
     
-    s_eo_services_alert_afterverify_service(operationisok, eomn_serv_category_mc, s_eo_theservices.mcservicetype, eo_service_mc);
+    s_eo_services_alert_afterverify_service(operationisok, eomn_serv_category_mc, (eOmn_serv_type_t) s_eo_theservices.mcservicetype, eo_service_mc);
     
     return(eores_OK);
 }
@@ -761,7 +761,8 @@ static eOresult_t s_eo_services_process_verifyactivate(EOtheServices *p, eOmn_se
             
             if(eobool_true == uselocalconfig)
             {
-                config = eoboardconfig_code2motion_serv_configuration(s_eo_theservices.board);
+                //config = eoboardconfig_code2motion_serv_configuration(s_eo_theservices.board);
+                config = NULL;
                 
                 errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_mc_using_onboard_config);
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errorDescriptor);                            
@@ -775,7 +776,8 @@ static eOresult_t s_eo_services_process_verifyactivate(EOtheServices *p, eOmn_se
         {
             if(eobool_true == uselocalconfig)
             {
-                config = eoboardconfig_code2inertials_serv_configuration(s_eo_theservices.board);
+                //config = eoboardconfig_code2inertials_serv_configuration(s_eo_theservices.board);
+                config = NULL;
                 
                 errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_inertials_using_onboard_config);
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errorDescriptor);                    
@@ -787,7 +789,8 @@ static eOresult_t s_eo_services_process_verifyactivate(EOtheServices *p, eOmn_se
         {
             if(eobool_true == uselocalconfig)  
             {
-                config = eoboardconfig_code2strain_serv_configuration(s_eo_theservices.board);
+                //config = eoboardconfig_code2strain_serv_configuration(s_eo_theservices.board);
+                config = NULL;
                 
                 errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_strain_using_onboard_config);
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errorDescriptor);                    
@@ -799,7 +802,8 @@ static eOresult_t s_eo_services_process_verifyactivate(EOtheServices *p, eOmn_se
         {
             if(eobool_true == uselocalconfig)  
             {
-                config = eoboardconfig_code2mais_serv_configuration(s_eo_theservices.board);
+                //config = eoboardconfig_code2mais_serv_configuration(s_eo_theservices.board);
+                config = NULL;
                 
                 errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_mais_using_onboard_config);
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errorDescriptor);                    
@@ -811,7 +815,8 @@ static eOresult_t s_eo_services_process_verifyactivate(EOtheServices *p, eOmn_se
         {
             if(eobool_true == uselocalconfig)  
             {
-                config = eoboardconfig_code2skin_serv_configuration(s_eo_theservices.board);
+                //config = eoboardconfig_code2skin_serv_configuration(s_eo_theservices.board);
+                config = NULL;
                 
                 errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_skin_using_onboard_config);
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errorDescriptor);                    
@@ -1265,6 +1270,4 @@ static eOresult_t s_eo_services_stop(EOtheServices *p, eOmn_serv_category_t cate
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------
-
-
 

@@ -27,10 +27,14 @@
 
 #include "AbsEncoder.h"
 
-#include "EOtheMais.h"
+#include "EOtheMAIS.h"
 
 /////////////////////////////////////////////////////////
 // AbsEncoder
+
+
+#define AEA_MIN_SPIKE 16 //4 bitsof zero padding(aea use 12 bits)
+          
 
 AbsEncoder* AbsEncoder_new(uint8_t n)
 {
@@ -48,7 +52,7 @@ void AbsEncoder_init(AbsEncoder* o)
 {
     o->ID = 0;
     
-    o->type = eomc_encoder_NONE;
+    o->type = eomc_enc_aea;
     
     o->spike_cnt_limit = 32767;
     o->spike_mag_limit = 32767;
@@ -56,6 +60,7 @@ void AbsEncoder_init(AbsEncoder* o)
     //o->sign = 0;
     o->mul = 0;
     o->div = 1;
+    o->numofnoisebits = 0;
     
     o->fake = FALSE;
     
@@ -94,8 +99,23 @@ void AbsEncoder_destroy(AbsEncoder* o)
 {
     DELETE(o);
 }
+//this function set spikes limits values based of encoder type
+void s_AbsEncoder_set_spikes_limis(AbsEncoder* o)
+{
+    if((o->type == eomc_enc_mais) || (o->type == eomc_enc_absanalog))
+    {
+        o->spike_mag_limit = 0;
+        o->spike_cnt_limit = 0;
+    }
+    else
+    {
+        #define AEA_MIN_SPIKE 16 //4 bitsof zero padding(aea use 12 bits)           
+        o->spike_mag_limit = (AEA_MIN_SPIKE << o->numofnoisebits)*o->div;
+        o->spike_cnt_limit = AEA_DEFAULT_SPIKE_CNT_LIMIT;
+    }
+}
 
-void AbsEncoder_config(AbsEncoder* o, uint8_t ID/*, eOmc_EncoderType_t type*/, int32_t resolution, int16_t spike_mag_limit, uint16_t spike_cnt_limit)
+void AbsEncoder_config(AbsEncoder* o, uint8_t ID, int32_t resolution, uint8_t numofnoisebits)
 {
     o->ID = ID;
     
@@ -119,8 +139,9 @@ void AbsEncoder_config(AbsEncoder* o, uint8_t ID/*, eOmc_EncoderType_t type*/, i
     
     if (!o->fake)
     {
-        o->spike_mag_limit = spike_mag_limit;
-        o->spike_cnt_limit = spike_cnt_limit;
+        o->numofnoisebits = numofnoisebits;
+
+        s_AbsEncoder_set_spikes_limis(o);
     }
     else
     {
@@ -147,6 +168,10 @@ void AbsEncoder_config_resolution(AbsEncoder* o, float resolution)
 extern void AbsEncoder_config_divisor(AbsEncoder* o, int32_t divisor)
 {
     o->div = divisor;
+    
+    //i need to re config spikes limits because they depend on divisor also.
+    if (!o->fake)
+        s_AbsEncoder_set_spikes_limis(o);
 }
 
 void AbsEncoder_start_hard_stop_calibrate(AbsEncoder* o, int32_t hard_stop_zero)
@@ -275,12 +300,12 @@ static void AbsEncoder_position_init(AbsEncoder* o, uint16_t position)
     
     switch(o->type)
     {
-        case eomc_encoder_AEA:
+        case eomc_enc_aea:
             AbsEncoder_position_init_aea(o, position);
             break;
         
-        case eomc_encoder_MAIS:
-        case eomc_encoder_HALL_ADC:
+        case eomc_enc_mais:
+        case eomc_enc_absanalog:
             AbsEncoder_position_init_others(o, position);
             break;
             
@@ -334,16 +359,23 @@ void AbsEncoder_invalid(AbsEncoder* o, eOencoderreader_errortype_t error_type)
     
     switch (error_type)
     {
-        case encreader_err_READING:
-            o->fault_state.bits.data_error = TRUE;
+        case encreader_err_NOTCONNECTED:
+        case encreader_err_NONE:
             break;
-        case encreader_err_PARITY:
+        
+        // all other cases are errors: AEA_PARITY, AEA_CHIP, AEA_READING have their tx_error, chip_error, data_error. all others: are data_error. 
+        case encreader_err_AEA_PARITY:
             o->fault_state.bits.tx_error = TRUE;
             break;
-        case encreader_err_CHIP:
+        case encreader_err_AEA_CHIP:
             o->fault_state.bits.chip_error = TRUE;
+            break;        
+        case encreader_err_AEA_READING:
+            o->fault_state.bits.data_error = TRUE;
             break;
+        
         default:
+            o->fault_state.bits.data_error = TRUE;
             break;
     }
         
@@ -594,7 +626,7 @@ static void AbsEncoder_send_error(uint8_t id, eOerror_value_MC_t err_id, uint64_
 BOOL AbsEncoder_is_in_fault(AbsEncoder* o)
 {
     
-    if(eomc_encoder_MAIS == o->type)
+    if(eomc_enc_mais == o->type)
     {
         if(!eo_mais_isAlive(eo_mais_GetHandle()))
         {

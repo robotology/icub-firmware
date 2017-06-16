@@ -387,7 +387,7 @@ static eEboardInfo_t s_loader_boardinfo =
     .extra          = {0}
 };
 
-#elif   defined(boardMC4PLUS)
+#elif (emBODYrobot_BOARD_NAME == boardMC4PLUS)
 
 static eEboardInfo_t s_loader_boardinfo =                        
 {
@@ -434,7 +434,7 @@ static eEboardInfo_t s_loader_boardinfo =
     .extra          = {0}
 };
 
-#elif   defined(boardMC2PLUS)
+#elif (emBODYrobot_BOARD_NAME == boardMC2PLUS)
 
 static eEboardInfo_t s_loader_boardinfo =                        
 {

@@ -21,6 +21,10 @@
 #ifndef _HAL_SWITCH_H_
 #define _HAL_SWITCH_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       hal_switch.h
@@ -110,6 +114,10 @@ extern hal_bool_t hal_switch_started_is(void);
 /** @}            
     end of group doxy_group_hal_switch  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

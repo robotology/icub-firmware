@@ -27,6 +27,10 @@
 #ifndef _HAL_ADC_H_
 #define _HAL_ADC_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 
@@ -147,6 +151,10 @@ extern hal_result_t hal_adc_init(hal_adc_t adc, const hal_adc_cfg_t *cfg);
 /** @}            
     end of group doxy_group_hal_adc  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

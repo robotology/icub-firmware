@@ -21,6 +21,10 @@
 #ifndef _HAL_BASE_H_
 #define _HAL_BASE_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       hal_base.h
@@ -166,6 +170,10 @@ extern void hal_base_heap_delete(void* mem);
 /** @}            
     end of group doxy_group_hal_base  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

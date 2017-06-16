@@ -21,6 +21,10 @@
 #ifndef _EOTHESTRAIN_H_
 #define _EOTHESTRAIN_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       EOtheSTRAIN.h
@@ -91,6 +95,7 @@ extern eOresult_t eo_strain_GetFullScale(EOtheSTRAIN *p, eOservice_onendofoperat
 extern eOresult_t eo_strain_Set(EOtheSTRAIN *p, eOas_strain_config_t *cfg);
 extern eOresult_t eo_strain_SetMode(EOtheSTRAIN *p, eOas_strainmode_t mode);
 extern eOresult_t eo_strain_SetDataRate(EOtheSTRAIN *p, uint8_t datarate);
+extern uint8_t eo_strain_GetDataRate(EOtheSTRAIN *p);
 
 extern eOresult_t eo_strain_notifymeOnNewReceivedData(EOtheSTRAIN *p);
 
@@ -99,7 +104,11 @@ extern eOresult_t eo_strain_notifymeOnNewReceivedData(EOtheSTRAIN *p);
     end of group eo_EOtheSTRAIN
  **/
 
-#endif  // include-guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

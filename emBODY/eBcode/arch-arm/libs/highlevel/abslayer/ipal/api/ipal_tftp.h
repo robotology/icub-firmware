@@ -20,17 +20,20 @@
 #ifndef _IPAL_TFTP_H_
 #define _IPAL_TFTP_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       ipal_tftp.h
-	@brief      This header file implements public interface to the ip abstraction layer: tftp 
-	@author     marco.accame@iit.it
-	@date       12/12/2011
+    @brief      This header file implements public interface to the ip abstraction layer: tftp 
+    @author     marco.accame@iit.it
+    @date       12/12/2011
 **/
 
 /* @defgroup ipal_tftp IP abstraction layer: tftp
     cercecvecve.
     
-    @{		
+    @{        
  **/
 
 
@@ -87,6 +90,10 @@ extern ipal_result_t ipal_tftp_restart(void);
 /* @}            
     end of group ipal_tftp  
  **/
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
 
 #endif  // include-guard
 

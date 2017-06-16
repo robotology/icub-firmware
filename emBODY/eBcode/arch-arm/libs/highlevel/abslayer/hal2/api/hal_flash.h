@@ -21,6 +21,10 @@
 #ifndef _HAL_FLASH_H_
 #define _HAL_FLASH_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       hal_flash.h
@@ -169,6 +173,10 @@ extern uint32_t hal_flash_get_pageaddr(uint32_t addr);
 /** @}            
     end of group doxy_group_hal_flash  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

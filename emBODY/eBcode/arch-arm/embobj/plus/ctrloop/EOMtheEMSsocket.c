@@ -26,7 +26,7 @@
 #include "EoCommon.h"
 
 #include "EOtheMemoryPool.h"
-#include "EOtheErrormanager.h"
+#include "EOtheErrorManager.h"
 #include "EOMtheIPnet.h"
 
 #include "EOsocketDatagram.h"

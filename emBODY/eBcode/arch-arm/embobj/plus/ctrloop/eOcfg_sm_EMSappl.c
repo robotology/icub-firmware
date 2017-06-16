@@ -152,19 +152,19 @@ typedef enum
 static const eOsmState_t s_smcfg_EMSappl_states_table_global[] = 
 { 
     {   // index00State_CFG
-        .name           = "stCFG",                                         
-        .on_entry_fn    = eo_cfg_sm_EMSappl_hid_on_entry_CFG,                   
-        .on_exit_fn     = eo_cfg_sm_EMSappl_hid_on_exit_CFG                  
+        EO_INIT(.name)          "stCFG",                                         
+        EO_INIT(.on_entry_fn)   eo_cfg_sm_EMSappl_hid_on_entry_CFG,                   
+        EO_INIT(.on_exit_fn)    eo_cfg_sm_EMSappl_hid_on_exit_CFG                  
     },
     {   // index01State_RUN
-        .name           = "stRUN",                               
-        .on_entry_fn    = eo_cfg_sm_EMSappl_hid_on_entry_RUN,                
-        .on_exit_fn     = eo_cfg_sm_EMSappl_hid_on_exit_RUN                
+        EO_INIT(.name)          "stRUN",                               
+        EO_INIT(.on_entry_fn)   eo_cfg_sm_EMSappl_hid_on_entry_RUN,                
+        EO_INIT(.on_exit_fn)    eo_cfg_sm_EMSappl_hid_on_exit_RUN                
     },
     {   // index02State_ERR
-        .name           = "stERR",                              
-        .on_entry_fn    = eo_cfg_sm_EMSappl_hid_on_entry_ERR,               
-        .on_exit_fn     = eo_cfg_sm_EMSappl_hid_on_exit_ERR                
+        EO_INIT(.name)          "stERR",                              
+        EO_INIT(.on_entry_fn)   eo_cfg_sm_EMSappl_hid_on_entry_ERR,               
+        EO_INIT(.on_exit_fn)    eo_cfg_sm_EMSappl_hid_on_exit_ERR                
     }
 };
 
@@ -224,31 +224,31 @@ enum
 static const eOsmTransition_t s_smcfg_EMSappl_trans_table_global[] = 
 { 
     {   // transition marked as (1) in the picture EOtheSMCfgEMSappl.jpg
-        .curr               = index00State_CFG,                                 
-        .next               = index01State_RUN,                                  
-        .evt                = eo_sm_emsappl_EVgo2run,                             
-        .on_transition_fn   = eo_cfg_sm_EMSappl_hid_on_trans_CFG_EVgo2run               
+        EO_INIT(.curr)              index00State_CFG,                                 
+        EO_INIT(.next)              index01State_RUN,                                  
+        EO_INIT(.evt)               eo_sm_emsappl_EVgo2run,                             
+        EO_INIT(.on_transition_fn)  eo_cfg_sm_EMSappl_hid_on_trans_CFG_EVgo2run               
     },
 
     {   // transition marked as (2) in the picture EOtheSMCfgEMSappl.jpg
-        .curr               = index00State_CFG,                                 
-        .next               = index02State_ERR,                                  
-        .evt                = eo_sm_emsappl_EVgo2err,                             
-        .on_transition_fn   = eo_cfg_sm_EMSappl_hid_on_trans_CFG_EVgo2err               
+        EO_INIT(.curr)              index00State_CFG,                                 
+        EO_INIT(.next)              index02State_ERR,                                  
+        EO_INIT(.evt)               eo_sm_emsappl_EVgo2err,                             
+        EO_INIT(.on_transition_fn)  eo_cfg_sm_EMSappl_hid_on_trans_CFG_EVgo2err               
     },
     
     {   // transition marked as (3) in the picture EOtheSMCfgEMSappl.jpg
-        .curr               = index01State_RUN,                                 
-        .next               = index00State_CFG,                                  
-        .evt                = eo_sm_emsappl_EVgo2cfg,                             
-        .on_transition_fn   = eo_cfg_sm_EMSappl_hid_on_trans_RUN_EVgo2cfg               
+        EO_INIT(.curr)              index01State_RUN,                                 
+        EO_INIT(.next)              index00State_CFG,                                  
+        EO_INIT(.evt)               eo_sm_emsappl_EVgo2cfg,                             
+        EO_INIT(.on_transition_fn)  eo_cfg_sm_EMSappl_hid_on_trans_RUN_EVgo2cfg               
     },
  
     {   // transition marked as (4) in the picture EOtheSMCfgEMSappl.jpg
-        .curr               = index01State_RUN,                                 
-        .next               = index02State_ERR,                                  
-        .evt                = eo_sm_emsappl_EVgo2err,                             
-        .on_transition_fn   = eo_cfg_sm_EMSappl_hid_on_trans_RUN_EVgo2err               
+        EO_INIT(.curr)              index01State_RUN,                                 
+        EO_INIT(.next)              index02State_ERR,                                  
+        EO_INIT(.evt)               eo_sm_emsappl_EVgo2err,                             
+        EO_INIT(.on_transition_fn)  eo_cfg_sm_EMSappl_hid_on_trans_RUN_EVgo2err               
     }     
 };
 
@@ -362,15 +362,15 @@ enum
  **/
 static const eOsm_cfg_t s_theconfiguration =    
 {
-    .nstates                = s_states_number,  
-    .ntrans                 = s_trans_number, 
-    .maxevts                = s_events_number,                                         
-    .initstate              = s_initial_state,
-    .sizeofdynamicdata      = s_dynamicdata_size,     
-    .states                 = s_smcfg_EMSappl_states_table_global,          
-    .transitions            = s_smcfg_EMSappl_trans_table_global,                          
-    .init_fn                = eo_cfg_sm_EMSappl_hid_init,
-    .resetdynamicdata_fn    = eo_cfg_sm_EMSappl_hid_reset
+    EO_INIT(.nstates)               s_states_number,  
+    EO_INIT(.ntrans)                s_trans_number, 
+    EO_INIT(.maxevts)               s_events_number,                                         
+    EO_INIT(.initstate)             s_initial_state,
+    EO_INIT(.sizeofdynamicdata)     s_dynamicdata_size,     
+    EO_INIT(.states)                s_smcfg_EMSappl_states_table_global,          
+    EO_INIT(.transitions)           s_smcfg_EMSappl_trans_table_global,                          
+    EO_INIT(.init_fn)               eo_cfg_sm_EMSappl_hid_init,
+    EO_INIT(.resetdynamicdata_fn)   eo_cfg_sm_EMSappl_hid_reset
 }; 
 
 
@@ -403,28 +403,28 @@ extern const eOsm_cfg_t * eo_cfg_sm_EMSappl_Get(void)
 
 
 // -- init
-__weak extern void eo_cfg_sm_EMSappl_hid_init(EOsm *s)
+EO_weak extern void eo_cfg_sm_EMSappl_hid_init(EOsm *s)
 {
     //eOsmDynamicDataEMSappl_t *ram = eo_sm_GetDynamicData(s);
 }  
 
 // -- reset
-__weak extern void eo_cfg_sm_EMSappl_hid_reset(EOsm *s)
+EO_weak extern void eo_cfg_sm_EMSappl_hid_reset(EOsm *s)
 {
     //eOsmDynamicDataEMSappl_t *ram = eo_sm_GetDynamicData(s);
 }  
 
 
 // -- on entry
-__weak extern void eo_cfg_sm_EMSappl_hid_on_entry_CFG(EOsm *s)
+EO_weak extern void eo_cfg_sm_EMSappl_hid_on_entry_CFG(EOsm *s)
 {
     //eOsmDynamicDataEMSappl_t *ram = eo_sm_GetDynamicData(s);
 }  
-__weak extern void eo_cfg_sm_EMSappl_hid_on_entry_RUN(EOsm *s)
+EO_weak extern void eo_cfg_sm_EMSappl_hid_on_entry_RUN(EOsm *s)
 {
     //eOsmDynamicDataEMSappl_t *ram = eo_sm_GetDynamicData(s);
 }  
-__weak extern void eo_cfg_sm_EMSappl_hid_on_entry_ERR(EOsm *s)
+EO_weak extern void eo_cfg_sm_EMSappl_hid_on_entry_ERR(EOsm *s)
 {
     //eOsmDynamicDataEMSappl_t *ram = eo_sm_GetDynamicData(s);
 }  
@@ -432,15 +432,15 @@ __weak extern void eo_cfg_sm_EMSappl_hid_on_entry_ERR(EOsm *s)
 
 
 // -- on exit 
-__weak extern void eo_cfg_sm_EMSappl_hid_on_exit_CFG(EOsm *s)
+EO_weak extern void eo_cfg_sm_EMSappl_hid_on_exit_CFG(EOsm *s)
 {
     //eOsmDynamicDataEMSappl_t *ram = eo_sm_GetDynamicData(s);
 }  
-__weak extern void eo_cfg_sm_EMSappl_hid_on_exit_RUN(EOsm *s)
+EO_weak extern void eo_cfg_sm_EMSappl_hid_on_exit_RUN(EOsm *s)
 {
 
 }
-__weak extern void eo_cfg_sm_EMSappl_hid_on_exit_ERR(EOsm *s)
+EO_weak extern void eo_cfg_sm_EMSappl_hid_on_exit_ERR(EOsm *s)
 {
     //eOsmDynamicDataEMSappl_t *ram = eo_sm_GetDynamicData(s);
 }  
@@ -449,20 +449,20 @@ __weak extern void eo_cfg_sm_EMSappl_hid_on_exit_ERR(EOsm *s)
 
 // -- on trans
 
-__weak extern void eo_cfg_sm_EMSappl_hid_on_trans_CFG_EVgo2run(EOsm *s)
+EO_weak extern void eo_cfg_sm_EMSappl_hid_on_trans_CFG_EVgo2run(EOsm *s)
 {
     //eOsmDynamicDataEMSappl_t *ram = eo_sm_GetDynamicData(s);
 }  
-__weak extern void eo_cfg_sm_EMSappl_hid_on_trans_CFG_EVgo2err(EOsm *s)
+EO_weak extern void eo_cfg_sm_EMSappl_hid_on_trans_CFG_EVgo2err(EOsm *s)
 {
     //eOsmDynamicDataEMSappl_t *ram = eo_sm_GetDynamicData(s);
 }  
 
-__weak extern void eo_cfg_sm_EMSappl_hid_on_trans_RUN_EVgo2cfg(EOsm *s)
+EO_weak extern void eo_cfg_sm_EMSappl_hid_on_trans_RUN_EVgo2cfg(EOsm *s)
 {
     //eOsmDynamicDataEMSappl_t *ram = eo_sm_GetDynamicData(s);
 }  
-__weak extern void eo_cfg_sm_EMSappl_hid_on_trans_RUN_EVgo2err(EOsm *s)
+EO_weak extern void eo_cfg_sm_EMSappl_hid_on_trans_RUN_EVgo2err(EOsm *s)
 {
     //eOsmDynamicDataEMSappl_t *ram = eo_sm_GetDynamicData(s);
 }  

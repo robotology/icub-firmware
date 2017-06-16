@@ -155,7 +155,7 @@ extern eOresult_t eocanprotASpolling_former_POL_AS_CMD__GET_FULL_SCALES(eOcanpro
 }
 
 
-__weak extern eObool_t eocanprotASpolling_redefinable_alert_reception_of_POL_AS_CMD__GET_FULL_SCALES(uint8_t channel,  uint16_t *data, eOas_strain_t* strain)
+EO_weak extern eObool_t eocanprotASpolling_redefinable_alert_reception_of_POL_AS_CMD__GET_FULL_SCALES(uint8_t channel,  uint16_t *data, eOas_strain_t* strain)
 {
     // if anybody wants to redefine this, it must make return eobool_true, so the caller knows it has been redefined
     return(eobool_false);
@@ -171,7 +171,7 @@ extern eOresult_t eocanprotASpolling_parser_POL_AS_CMD__GET_FULL_SCALES(eOcanfra
     eOas_strain_t *strain = NULL;
     eOprotIndex_t index = EOK_uint08dummy;
     
-    if(NULL == (strain = s_eocanprotASpolling_get_entity(eoprot_endpoint_analogsensors, eoprot_entity_as_strain, frame, port, &index)))
+    if(NULL == (strain = (eOas_strain_t*) s_eocanprotASpolling_get_entity(eoprot_endpoint_analogsensors, eoprot_entity_as_strain, frame, port, &index)))
     {
         return(eores_OK);  
     }      
@@ -406,7 +406,7 @@ static void* s_eocanprotASpolling_get_entity(eOprotEndpoint_t endpoint, eOprot_e
 //        
 //        eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_analogsensors, eoprot_entity_as_strain, index, 0);
 //        eOcanprot_command_t command = {0};
-//        command.class = eocanprot_msgclass_pollingAnalogSensor;
+//        command.clas = eocanprot_msgclass_pollingAnalogSensor;
 //        command.type  = ICUBCANPROTO_POL_AS_CMD__GET_FULL_SCALES;
 //        command.value = &channel;
 //        

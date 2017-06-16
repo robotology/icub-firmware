@@ -170,7 +170,7 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
         eo_mc4boards_Convert_encoderoffset_Set(mc4boards, jxx, 0); //->>> moved to the calibrators.
       
         eOcanprot_command_t command = {0};
-        command.class = eocanprot_msgclass_pollingMotorControl;
+        command.clas = eocanprot_msgclass_pollingMotorControl;
         
         // 1) send pid position 
         command.type  = ICUBCANPROTO_POL_MC_CMD__SET_POS_PID;
@@ -206,8 +206,8 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
         // marco.accame TODO: (tag FIX_CALIB_MC4) manage max and min limits as in new_fw_ems ...
         // 4) set max/min limits... they will be used during calibration phase
 
-        eo_mc4boards_Convert_minJointPos_Set(mc4boards, jxx, cfg->limitsofjoint.min);
-        eo_mc4boards_Convert_maxJointPos_Set(mc4boards, jxx, cfg->limitsofjoint.max);
+        eo_mc4boards_Convert_minJointPos_Set(mc4boards, jxx, cfg->userlimits.min);
+        eo_mc4boards_Convert_maxJointPos_Set(mc4boards, jxx, cfg->userlimits.max);
  
         // 5) set vel timeout
         command.type  = ICUBCANPROTO_POL_MC_CMD__SET_VEL_TIMEOUT;
@@ -331,7 +331,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_impedance(const EOnv* nv, const eOro
     else if(eo_motcon_mode_mc4 == mcmode)
     {   
         eOcanprot_command_t command = {0};
-        command.class = eocanprot_msgclass_pollingMotorControl;
+        command.clas = eocanprot_msgclass_pollingMotorControl;
 
         if(eo_ropcode_set == rd->ropcode)
         {    
@@ -385,7 +385,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_impedance(const EOnv* nv, const eOro
 
 
 // f-marker-begin
-extern void eoprot_fun_UPDT_mc_joint_config_limitsofjoint(const EOnv* nv, const eOropdescriptor_t* rd)
+extern void eoprot_fun_UPDT_mc_joint_config_userlimits(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOmeas_position_limits_t *limitsofjoint = (eOmeas_position_limits_t*)rd->data;
     eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
@@ -399,7 +399,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_limitsofjoint(const EOnv* nv, const 
     else if(eo_motcon_mode_mc4 == mcmode)
     {
         eOcanprot_command_t command = {0};
-        command.class = eocanprot_msgclass_pollingMotorControl;    
+        command.clas = eocanprot_msgclass_pollingMotorControl;    
 
         if(eo_ropcode_set == rd->ropcode)
         {    
@@ -471,7 +471,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_velocitysetpointtimeout(const EOnv* 
     else if(eo_motcon_mode_mc4 == mcmode)
     {
         eOcanprot_command_t command = {0};
-        command.class = eocanprot_msgclass_pollingMotorControl;    
+        command.clas = eocanprot_msgclass_pollingMotorControl;    
         command.type  = ICUBCANPROTO_POL_MC_CMD__SET_VEL_TIMEOUT;
         command.value = time;
         eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);        
@@ -495,7 +495,7 @@ extern void eoprot_fun_UPDT_mc_joint_status_core_modes_ismotiondone(const EOnv* 
         {   
             // must send a get motion done request to the mc4 board and then ... activate the proxy for the reply to robotInterface            
             eOcanprot_command_t command = {0};
-            command.class = eocanprot_msgclass_pollingMotorControl;
+            command.clas = eocanprot_msgclass_pollingMotorControl;
             command.type = ICUBCANPROTO_POL_MC_CMD__MOTION_DONE;
             command.value = NULL; 
         
@@ -597,7 +597,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
     {
         EOtheMC4boards *mc4boards = eo_mc4boards_GetHandle();
         eOcanprot_command_t command = {0};
-        command.class = eocanprot_msgclass_pollingMotorControl;    
+        command.clas = eocanprot_msgclass_pollingMotorControl;    
         command.type  = 0;
         command.value = NULL;
 
@@ -775,7 +775,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_stoptrajectory(const EOnv* nv, const
     else if(eo_motcon_mode_mc4 == mcmode)
     {
         eOcanprot_command_t command = {0};
-        command.class = eocanprot_msgclass_pollingMotorControl;    
+        command.clas = eocanprot_msgclass_pollingMotorControl;    
         command.type  = ICUBCANPROTO_POL_MC_CMD__STOP_TRAJECTORY;
         command.value = NULL;
         eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);        
@@ -813,11 +813,11 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
     else if(eo_motcon_mode_mc4 == mcmode)
     {
         EOtheMC4boards *mc4boards = eo_mc4boards_GetHandle();
-        icubCanProto_calibrator_t iCubCanProtCalibrator = {.type = icubCanProto_calibration_type0_hard_stops}; // all the rest is 0
+        icubCanProto_calibrator_t iCubCanProtCalibrator = { EO_INIT(.type) icubCanProto_calibration_type0_hard_stops, {0}};
         iCubCanProtCalibrator.type = (icubCanProto_calibration_type_t)calibrator->type;
         
         eOcanprot_command_t command = {0};
-        command.class = eocanprot_msgclass_pollingMotorControl;    
+        command.clas = eocanprot_msgclass_pollingMotorControl;    
         command.type  = ICUBCANPROTO_POL_MC_CMD__CALIBRATE_ENCODER;
         command.value = &iCubCanProtCalibrator;   
               
@@ -845,7 +845,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
                        maxpos_icubCanProtValue = pos_icubCanProtValue;
                    }
                    eOcanprot_command_t command_limit = {0};
-                   command_limit.class = eocanprot_msgclass_pollingMotorControl;
+                   command_limit.clas = eocanprot_msgclass_pollingMotorControl;
                    command_limit.type  = ICUBCANPROTO_POL_MC_CMD__SET_MIN_POSITION;
                    command_limit.value = &minpos_icubCanProtValue;
                    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command_limit, rd->id32); 
@@ -884,7 +884,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
                        maxpos_icubCanProtValue = pos_icubCanProtValue;
                    }
                    eOcanprot_command_t command_limit = {0};
-                   command_limit.class = eocanprot_msgclass_pollingMotorControl;
+                   command_limit.clas = eocanprot_msgclass_pollingMotorControl;
                    command_limit.type  = ICUBCANPROTO_POL_MC_CMD__SET_MIN_POSITION;
                    command_limit.value = &minpos_icubCanProtValue;
                    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command_limit, rd->id32); 
@@ -916,7 +916,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
                        maxpos_icubCanProtValue = pos_icubCanProtValue;
                    }
                    eOcanprot_command_t command_limit = {0};
-                   command_limit.class = eocanprot_msgclass_pollingMotorControl;
+                   command_limit.clas = eocanprot_msgclass_pollingMotorControl;
                    command_limit.type  = ICUBCANPROTO_POL_MC_CMD__SET_MIN_POSITION;
                    command_limit.value = &minpos_icubCanProtValue;
                    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command_limit, rd->id32); 
@@ -956,7 +956,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
                        maxpos_icubCanProtValue = pos_icubCanProtValue;
                    }
                    eOcanprot_command_t command_limit = {0};
-                   command_limit.class = eocanprot_msgclass_pollingMotorControl;
+                   command_limit.clas = eocanprot_msgclass_pollingMotorControl;
                    command_limit.type  = ICUBCANPROTO_POL_MC_CMD__SET_MIN_POSITION;
                    command_limit.value = &minpos_icubCanProtValue;
                    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command_limit, rd->id32); 
@@ -1026,7 +1026,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
                        max_joint_pos_icubCanProtValue = pos_icubCanProtValue;
                    }
                    eOcanprot_command_t command_limit = {0};
-                   command_limit.class = eocanprot_msgclass_pollingMotorControl;
+                   command_limit.clas = eocanprot_msgclass_pollingMotorControl;
                    command_limit.type  = ICUBCANPROTO_POL_MC_CMD__SET_MIN_POSITION;
                    command_limit.value = &min_joint_pos_icubCanProtValue;
                    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command_limit, rd->id32); 
@@ -1078,7 +1078,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
                        maxpos_icubCanProtValue = pos_icubCanProtValue;
                    }
                    eOcanprot_command_t command_limit = {0};
-                   command_limit.class = eocanprot_msgclass_pollingMotorControl;
+                   command_limit.clas = eocanprot_msgclass_pollingMotorControl;
                    command_limit.type  = ICUBCANPROTO_POL_MC_CMD__SET_MIN_POSITION;
                    command_limit.value = &minpos_icubCanProtValue;
                    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command_limit, rd->id32); 
@@ -1119,7 +1119,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_calibration(const EOnv* nv, const eO
                        maxpos_icubCanProtValue = pos_icubCanProtValue;
                    }
                    eOcanprot_command_t command_limit = {0};
-                   command_limit.class = eocanprot_msgclass_pollingMotorControl;
+                   command_limit.clas = eocanprot_msgclass_pollingMotorControl;
                    command_limit.type  = ICUBCANPROTO_POL_MC_CMD__SET_MIN_POSITION;
                    command_limit.value = &minpos_icubCanProtValue;
                    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command_limit, rd->id32); 
@@ -1169,7 +1169,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_controlmode(const EOnv* nv, const eO
             return;
         }        
         eOcanprot_command_t command = {0};
-        command.class = eocanprot_msgclass_pollingMotorControl;    
+        command.clas = eocanprot_msgclass_pollingMotorControl;    
         command.type  = ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE;
         command.value = &icubcanProto_controlmode;   
         
@@ -1208,7 +1208,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_interactionmode(const EOnv* nv, cons
         }    
         
         eOcanprot_command_t command = {0};
-        command.class = eocanprot_msgclass_pollingMotorControl;    
+        command.clas = eocanprot_msgclass_pollingMotorControl;    
         command.type  = ICUBCANPROTO_POL_MC_CMD__SET_INTERACTION_MODE;
         command.value = &icub_interactionmode;   
                   
@@ -1269,52 +1269,6 @@ extern void eoprot_fun_UPDT_mc_motor_config_rotorencoder(const EOnv* nv, const e
         MController_config_motor_encoder(jxx, *rotenc);
     }
 }
-
-#if defined(EOMOTIONCONTROL_DONTREDEFINE_JOINTCOUPLING_CALLBACK)
-#warning INFO: EOMOTIONCONTROL_DONTREDEFINE_JOINTCOUPLING_CALLBACK is defined, thus we are not using eo_emsController_set_Jacobian() etc
-#else
-// f-marker-begin
-extern void eoprot_fun_UPDT_mc_controller_config_jointcoupling(const EOnv* nv, const eOropdescriptor_t* rd)
-{   // not for mc4can
-    eOmc_jointcouplingmatrix_t *mat = (eOmc_jointcouplingmatrix_t*)rd->data;    
-
-    eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
-    
-    if((eo_motcon_mode_foc = mcmode) || (eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode))
-    {
-   
-        /*
-        float Ji[4][4];
-        
-        for (int i=0; i<4; ++i)
-        {
-            for (int j=0; j<4; ++j)
-            {
-                Ji[i][j]=(float)((*mat)[i][j])/16384.0f;
-            }
-        }
-        */
-        
-        MController_set_Jacobian(*mat);
-            
-        eOerrmanDescriptor_t errdes = {0};
-        errdes.code                 = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag00);
-        errdes.param                = 0;
-        errdes.sourcedevice         = eo_errman_sourcedevice_localboard;
-        errdes.sourceaddress        = 0;  
-        //char *str = NULL;
-        char str[eomn_info_status_extra_sizeof] = {0};
-     
-        for (int i=0; i<4; ++i)
-        {
-            snprintf(str, sizeof(str), "r%d: %f %f %f %f", i, Ji[i][0], Ji[i][1], Ji[i][2], Ji[i][3]);             
-            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, str, NULL, &errdes);    
-        }   
-    }
-}
-#endif
-
-
 // -- entity motor
 
 
@@ -1327,7 +1281,7 @@ extern void eoprot_fun_UPDT_mc_motor_config(const EOnv* nv, const eOropdescripto
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
     
     eOcanprot_command_t command = {0};
-    command.class = eocanprot_msgclass_pollingMotorControl;
+    command.clas = eocanprot_msgclass_pollingMotorControl;
         
     if(eo_motcon_mode_foc == mcmode)
     {
@@ -1407,7 +1361,7 @@ extern void eoprot_fun_UPDT_mc_motor_config_pidcurrent(const EOnv* nv, const eOr
         eOmc_PID_t *pid = (eOmc_PID_t*)rd->data;
         
         eOcanprot_command_t command = {0};
-        command.class = eocanprot_msgclass_pollingMotorControl;
+        command.clas = eocanprot_msgclass_pollingMotorControl;
            
         // send current pid
         command.type  = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID;
@@ -1440,7 +1394,7 @@ extern void eoprot_fun_UPDT_mc_motor_config_currentlimits(const EOnv* nv, const 
     {
         //  send the can message to relevant board
         eOcanprot_command_t command = {0};
-        command.class = eocanprot_msgclass_pollingMotorControl;
+        command.clas = eocanprot_msgclass_pollingMotorControl;
         command.type  = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT;
         command.value = &curr;
         eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);
@@ -1458,7 +1412,7 @@ extern void eoprot_fun_UPDT_mc_motor_config_currentlimits(const EOnv* nv, const 
         // just send the can message to relevant board
        //  send the can message to relevant board
         eOcanprot_command_t command = {0};
-        command.class = eocanprot_msgclass_pollingMotorControl;
+        command.clas = eocanprot_msgclass_pollingMotorControl;
         command.type  = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT;
         command.value = &curr;
         eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);
@@ -1485,7 +1439,7 @@ extern void eoprot_fun_UPDT_mc_motor_config_pwmlimit(const EOnv* nv, const eOrop
             icubCanProto_pwm_t icubcan_pwm = *pwm_limit; //eOmeas_pwm_t and icubCanProto_pwm_t are defined like int16
         
             eOcanprot_command_t command = {0};
-            command.class = eocanprot_msgclass_pollingMotorControl;
+            command.clas = eocanprot_msgclass_pollingMotorControl;
             command.type  = ICUBCANPROTO_POL_MC_CMD__SET_PWM_LIMIT;
             command.value = &icubcan_pwm;
             eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);
@@ -1625,7 +1579,7 @@ static void s_onpid(const EOnv* nv, const eOropdescriptor_t* rd, pid_type_t type
     eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
     
     eOcanprot_command_t command = {0};
-    command.class = eocanprot_msgclass_pollingMotorControl;    
+    command.clas = eocanprot_msgclass_pollingMotorControl;    
     
     // if set, we just send two commands
     if(eo_ropcode_set == rd->ropcode)

@@ -563,7 +563,7 @@ extern void osal_system_scheduling_suspend(void)
 {
     if(osal_info_status_running == s_osal_info_status)
     {   // order is important in here
-        oosiit_sys_suspend();
+        oosiit_sys_suspend(NULL);
         s_osal_info_status = osal_info_status_suspended;
     }
 }
@@ -573,7 +573,41 @@ extern void osal_system_scheduling_restart(void)
     if(osal_info_status_suspended == s_osal_info_status)
     {   // order is important in here
         s_osal_info_status = osal_info_status_running;
-        oosiit_sys_resume();
+        oosiit_sys_resume(0);
+    }
+}
+
+
+extern osal_reltime_t osal_system_timeofnextevent(void)
+{
+    osal_reltime_t nextevent = 0;
+    if(osal_info_status_running == s_osal_info_status)
+    {   
+        nextevent = oosiit_sys_timeofnextevent();
+    }
+    
+    return(s_osal_usec_in_tick*nextevent);    
+}
+
+
+extern osal_reltime_t osal_system_suspend(void)
+{
+    osal_reltime_t nextevent = 0;
+    if(osal_info_status_running == s_osal_info_status)
+    {   // order is important in here
+        oosiit_sys_suspend(&nextevent);
+        s_osal_info_status = osal_info_status_suspended;
+    }
+    
+    return(s_osal_usec_in_tick*nextevent);
+}
+
+extern void osal_system_resume(osal_reltime_t timeslept)
+{
+    if(osal_info_status_suspended == s_osal_info_status)
+    {   // order is important in here
+        s_osal_info_status = osal_info_status_running;
+        oosiit_sys_resume(timeslept/s_osal_usec_in_tick);
     }
 }
 

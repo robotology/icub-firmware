@@ -21,6 +21,10 @@
 #ifndef _EOTHEMAIS_H_
 #define _EOTHEMAIS_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       EOtheMAIS.h
@@ -104,7 +108,11 @@ extern eObool_t eo_mais_isAlive(EOtheMAIS *p);
     end of group eo_EOtheMAIS
  **/
 
-#endif  // include-guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

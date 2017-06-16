@@ -21,6 +21,10 @@
 #ifndef _EOTHEETHMONITOR_H_
 #define _EOTHEETHMONITOR_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       EOtheETHmonitor.h
@@ -81,7 +85,11 @@ extern eOresult_t eo_ethmonitor_Stop(EOtheETHmonitor *p);
     end of group eo_EOtheETHmonitor
  **/
 
-#endif  // include-guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

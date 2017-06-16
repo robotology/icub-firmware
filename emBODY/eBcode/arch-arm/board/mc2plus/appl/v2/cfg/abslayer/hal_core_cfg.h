@@ -20,6 +20,12 @@
 #ifndef _HAL_CORE_CFG_H_
 #define _HAL_CORE_CFG_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+    
+
+    
 // --------------------------------------------------------------------------------------------------------------------
 //-------- <<< Use Configuration Wizard in Context Menu >>> -----------------------------------------------------------
 // --------------------------------------------------------------------------------------------------------------------
@@ -87,18 +93,18 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-#define HALCAN1capacityofrxfifoofframes     20 //120
-#define HALCAN1capacityoftxfifoofframes     60 //160
-#define HALCAN1capacityoftxfifohighprio     0
 
 
-#define HALCAN2capacityofrxfifoofframes     32 //132
-#define HALCAN2capacityoftxfifoofframes     16 //116
-#define HALCAN2capacityoftxfifohighprio     0
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
+
+
+
 
 

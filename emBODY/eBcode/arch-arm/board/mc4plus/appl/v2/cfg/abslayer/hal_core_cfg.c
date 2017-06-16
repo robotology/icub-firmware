@@ -38,6 +38,7 @@
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
+#include "hal_core.h"
 #include "hal_core_cfg.h"
 
 
@@ -49,45 +50,35 @@ static void myheap_delete(void* mem);
 
 const hal_core_cfg_t hal_cfg = 
 {   
-    .basecfg    =
+    EO_INIT(.basecfg)
     {
-        .extfn                  =
+        EO_INIT(.extfn)
         {
-            .usr_on_fatal_error                 = s_hal_core_cfg_on_fatalerror,
-            .osal_system_scheduling_suspend     = NULL,
-            .osal_system_scheduling_restart     = NULL,
-            .ext_heap_new                       = myheap_new,
-            .ext_heap_delete                    = myheap_delete
+            EO_INIT(.usr_on_fatal_error)                s_hal_core_cfg_on_fatalerror,
+            EO_INIT(.osal_system_scheduling_suspend)    NULL,
+            EO_INIT(.osal_system_scheduling_restart)    NULL,
+            EO_INIT(.ext_heap_new)                      myheap_new,
+            EO_INIT(.ext_heap_delete)                   myheap_delete
         } 
     },
-    .mpucfg     =
+    EO_INIT(.mpucfg)
     {
-        .dummy                  = 0
+        EO_INIT(.dummy) 0
     },
-    .flashcfg   =
+    EO_INIT(.flashcfg)
     {
-        .dummy                  = 0
+        EO_INIT(.dummy) 0
     },
-    .syscfg     =
+    EO_INIT(.syscfg)
     {
-        .stacksize              = HAL_SYS_CFG_STACKSIZE,
-        .heapsize               = HAL_SYS_CFG_HEAPSIZE,
+        EO_INIT(.stacksize)             HAL_SYS_CFG_STACKSIZE,
+        EO_INIT(.heapsize)              HAL_SYS_CFG_HEAPSIZE,
     }        
 };
 
 
 const hal_core_cfg_t *hal_coreCFGptr = &hal_cfg;
 
-
-// void SysTick_Handler(void)
-// {
-//     hal_void_fp_void_t systickhandler = hal_sys_systick_gethandler();
-
-//     if(NULL != systickhandler)
-//     {
-//         systickhandler();
-//     }
-// }
 
 #include "hal_trace.h"
 #include "hal_led.h"

@@ -45,7 +45,7 @@
 #include "EOtheSKIN.h"
 #include "EOtheInertials2.h"
 #include "EOtheETHmonitor.h"
-#include "EOtheBoardConfig.h"
+//#include "EOtheBoardConfig.h"
 #include "EOVtheCallbackManager.h"
 
 
@@ -74,8 +74,8 @@
 // we need to define it ... even if it is useless. we shall remove it later on
 const EOVtheEMSapplCfgBody theapplbodyconfig = 
 {
-    .type               =   0,
-    .thetrueconfig      =   NULL
+    EO_INIT(.type)          0,
+    EO_INIT(.thetrueconfig) NULL
 };
 
 

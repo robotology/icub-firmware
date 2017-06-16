@@ -22,7 +22,9 @@
 #ifndef _EOTHEMOTIONCONTROLLER_HID_H_
 #define _EOTHEMOTIONCONTROLLER_HID_H_
 
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 // - external dependencies --------------------------------------------------------------------------------------------
@@ -48,30 +50,6 @@
 
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
-
-
-//typedef struct
-//{
-//    MController*                            thecontroller;
-//    EOtheEncoderReader*                     theencoderreader;    
-//} eOmotioncontroller_objs_foc_t;
-
-//typedef struct
-//{
-//    eOmn_serv_configuration_t               servconfigmais;
-//    EOtheMAIS*                              themais;  
-//    EOtheMC4boards*                         themc4boards;    
-//} eOmotioncontroller_objs_mc4_t;
-
-//typedef struct
-//{
-//    MController*                            thecontroller;
-//    EOtheEncoderReader*                     theencoderreader; 
-//    int16_t                                 pwmvalue[hal_motors_number];    // at most i can manage 4 motors
-//    hal_motor_t                             pwmport[hal_motors_number];
-//    hal_dma_current_t                       currents[hal_motors_number];    // in ma
-//    int16_t                                 voltage;                        // in mv   
-//} eOmotioncontroller_objs_mc4plus_t;
 
 
 
@@ -108,17 +86,8 @@ struct EOtheMotionController_hid
     eOservice_diagnostics_t                 diagnostics;
     eOservice_cantools_t                    sharedcan;  
     
-    uint8_t                                 numofjomos;
-    
-    eOmotioncontroller_objs_t               ctrlobjs;
-         
-//    // they are for foc-based mc only
-//    eOmotioncontroller_objs_foc_t           mcfoc;    
-//    // they are for mc4-based mc only
-//    eOmotioncontroller_objs_mc4_t           mcmc4; 
-//    // they are for mc4plus only
-//    eOmotioncontroller_objs_mc4plus_t       mcmc4plus;
-    
+    uint8_t                                 numofjomos;    
+    eOmotioncontroller_objs_t               ctrlobjs;             
     EOarray*                                id32ofregulars;
 }; 
 
@@ -127,7 +96,11 @@ struct EOtheMotionController_hid
 // empty section
 
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

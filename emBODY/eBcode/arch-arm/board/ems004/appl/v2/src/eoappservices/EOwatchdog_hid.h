@@ -22,6 +22,9 @@
 #ifndef _EOWATCHDOG_HID_H_
 #define _EOWATCHDOG_HID_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // - external dependencies --------------------------------------------------------------------------------------------
 // empty-section
@@ -46,7 +49,11 @@ struct EOwatchdog_hid
 // empty section
 
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

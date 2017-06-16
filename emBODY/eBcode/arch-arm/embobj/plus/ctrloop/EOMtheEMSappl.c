@@ -34,7 +34,7 @@
 #include "EOMtheSystem.h"
 #include "EOVtheSystem.h"
 #include "EOtheMemoryPool.h"
-#include "EOtheErrormanager.h"
+#include "EOtheErrorManager.h"
 #include "EoError.h"
 #include "EOMtheIPnet.h"
 
@@ -145,15 +145,15 @@ static const char s_eobj_ownname[] = "EOMtheEMSappl";
  
 static EOMtheEMSappl s_emsappl_singleton = 
 {
-    .sm             = NULL,
-    .cfg            =
+    EO_INIT(.sm)            NULL,
+    EO_INIT(.cfg)
     { 
-        .emsappinfo     = NULL,
-        .hostipv4addr   = EO_COMMON_IPV4ADDR(10, 0, 0, 254) 
+        EO_INIT(.emsappinfo)        NULL,
+        EO_INIT(.hostipv4addr)      EO_COMMON_IPV4ADDR(10, 0, 1, 254)
     },
-    .initted            = 0,
-    .blockingsemaphore  = NULL,
-    .onerrormutex       = NULL    
+    EO_INIT(.initted)               0,
+    EO_INIT(.blockingsemaphore)     NULL,
+    EO_INIT(.onerrormutex)          NULL    
 };
 
 
@@ -438,37 +438,37 @@ extern eOresult_t eom_emsappl_Transmit_OccasionalROP(EOMtheEMSappl *p, eOropdesc
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-__weak extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
+EO_weak extern void eom_emsappl_hid_userdef_initialise(EOMtheEMSappl* p)
 {
     p = p;
 }
 
-__weak extern void eom_emsappl_hid_userdef_on_entry_CFG(EOMtheEMSappl* p)
+EO_weak extern void eom_emsappl_hid_userdef_on_entry_CFG(EOMtheEMSappl* p)
 {
 
 }
 
-__weak extern void eom_emsappl_hid_userdef_on_exit_CFG(EOMtheEMSappl* p)
+EO_weak extern void eom_emsappl_hid_userdef_on_exit_CFG(EOMtheEMSappl* p)
 {
 
 }
 
-__weak extern void eom_emsappl_hid_userdef_on_entry_ERR(EOMtheEMSappl* p)
+EO_weak extern void eom_emsappl_hid_userdef_on_entry_ERR(EOMtheEMSappl* p)
 {
 
 }
 
-__weak extern void eom_emsappl_hid_userdef_on_exit_ERR(EOMtheEMSappl* p)
+EO_weak extern void eom_emsappl_hid_userdef_on_exit_ERR(EOMtheEMSappl* p)
 {
 
 }
 
-__weak extern void eom_emsappl_hid_userdef_on_entry_RUN(EOMtheEMSappl* p)
+EO_weak extern void eom_emsappl_hid_userdef_on_entry_RUN(EOMtheEMSappl* p)
 {
 
 }
 
-__weak extern void eom_emsappl_hid_userdef_on_exit_RUN(EOMtheEMSappl* p)
+EO_weak extern void eom_emsappl_hid_userdef_on_exit_RUN(EOMtheEMSappl* p)
 {
 
 }
@@ -895,7 +895,10 @@ extern void eo_cfg_sm_EMSappl_hid_on_entry_RUN(EOsm *s)
     //eo_action_Clear(&ontxdone);
 
     eo_action_SetCallback(ontxdone, (eOcallback_t)eom_emsrunner_OnUDPpacketTransmitted, eom_emsrunner_GetHandle(), NULL);
-    // the socket does not alert anybody when it receives a pkt, but will alert the sending task, so that it knows that it can stop wait
+    // the socket does not alert anybody when it receives a pkt, but will alert the sending task, so that it knows that it can stop wait.
+    // the alert is done by a callback, eom_emsrunner_OnUDPpacketTransmitted(), which executed by the sender of the packet directly.
+    // this funtion is executed with eo_action_Execute(s->socket->ontransmission) inside the EOMtheIPnet object
+    // for this reason we call eo_action_SetCallback(....., exectask = NULL_); IT MUST NOT BE the callback-manager!!!!
     eom_emssocket_Open(eom_emssocket_GetHandle(), NULL, ontxdone);
     
     // we activate the runner
@@ -924,6 +927,4 @@ extern void eo_cfg_sm_EMSappl_hid_on_exit_RUN(EOsm *s)
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------
-
-
 

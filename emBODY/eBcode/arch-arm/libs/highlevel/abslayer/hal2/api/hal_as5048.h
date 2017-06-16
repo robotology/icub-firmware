@@ -16,6 +16,15 @@
  * Public License for more details
 */
 
+// - include guard ----------------------------------------------------------------------------------------------------
+
+#ifndef _HAL_AS5048_H_
+#define _HAL_AS5048_H_
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /* @file       as5048.h
@@ -52,3 +61,11 @@ void as5048_init(uint8_t sensorID);
 * Return         : the 14 bit value of the encoder 
 *******************************************************************************/
 uint16_t * as5048_read(uint8_t sensorID, uint16_t mask); 
+
+
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+
+#endif  // include-guard

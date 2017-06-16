@@ -17,9 +17,12 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-
 #ifndef _OSAL_ARCH_CFG_ARM_H_
 #define _OSAL_ARCH_CFG_ARM_H_
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
@@ -40,7 +43,8 @@
 
 
 // - external dependencies --------------------------------------------------------------------------------------------
-// empty-section
+
+#include "stdint.h"
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
@@ -70,6 +74,10 @@ typedef struct
 /** @}            
     end of group osal_arch_cfg_arm  
  **/
+ 
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

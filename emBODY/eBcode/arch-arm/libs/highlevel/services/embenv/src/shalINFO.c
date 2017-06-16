@@ -22,11 +22,17 @@
     @date       03/11/2011
 **/
 
+
+//#ifdef __cplusplus                                          
+//#warning ::: __cplusplus is defined: this file is COMPILED IN C++ MODE           
+//#endif
+
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
 
+#include "embOBJporting.h"
 
 #include "string.h"
 #include "eEmemorymap.h" 
@@ -64,7 +70,7 @@ typedef struct              // 80B
 {
     shalbaseDataHeader_t    head;                   // 16B
     eEboardInfo_t           data;                   // 64B
-} infoBoardInfoStorage_t;   EECOMMON_VERIFYsizeof(infoBoardInfoStorage_t, 80);
+} infoBoardInfoStorage_t;   EECOMMON_VERIFYsizeof(infoBoardInfoStorage_t, 80)
 
 
 
@@ -72,7 +78,7 @@ typedef struct              // 272B
 {
     shalbaseDataHeader_t    head;                   // 16B
     shalinfo_deviceinfo_t   data;                   // 256B
-} infoDeviceInfoStorage_t;  EECOMMON_VERIFYsizeof(infoDeviceInfoStorage_t, 272);
+} infoDeviceInfoStorage_t;  EECOMMON_VERIFYsizeof(infoDeviceInfoStorage_t, 272)
 
 
 
@@ -143,16 +149,16 @@ static eEboolval_t s_shalinfo_storage_is_valid(void* storage);
 
 const eEstorage_t s_shalinfo_strg_boardinfo =
 {
-    .type   = SHALINFO_STGTYPE,
-    .size   = sizeof(infoBoardInfoStorage_t),
-    .addr   = SHALINFO_STGADDR    
+    EO_INIT(.type)  SHALINFO_STGTYPE,
+    EO_INIT(.size)  sizeof(infoBoardInfoStorage_t),
+    EO_INIT(.addr)  SHALINFO_STGADDR    
 };
 
 const eEstorage_t s_shalinfo_strg_deviceinfo =
 {
-    .type   = SHALINFO_STGTYPE,
-    .size   = sizeof(infoDeviceInfoStorage_t),
-    .addr   = SHALINFO_STGADDR + sizeof(infoBoardInfoStorage_t)    
+    EO_INIT(.type)  SHALINFO_STGTYPE,
+    EO_INIT(.size)  sizeof(infoDeviceInfoStorage_t),
+    EO_INIT(.addr)  SHALINFO_STGADDR + sizeof(infoBoardInfoStorage_t)    
 };
 
 
@@ -161,47 +167,47 @@ const eEstorage_t s_shalinfo_strg_deviceinfo =
 
 static const eEboardInfo_t s_shalinfo_boardinfo_default =                        
 {
-    .info           =
+    EO_INIT(.info)
     {
-        .entity     =
+        EO_INIT(.entity)
         {
-            .type       = ee_entity_board,
-            .signature  = 0x11,
-            .version    = 
+            EO_INIT(.type )     ee_entity_board,
+            EO_INIT(.signature) 0x11,
+            EO_INIT(.version) 
             { 
-                .major = 0, 
-                .minor = 0
+                EO_INIT(.major) 0, 
+                EO_INIT(.minor) 0
             },  
-            .builddate  = 
+            EO_INIT(.builddate) 
             {
-                .year  = 2000,
-                .month = 1,
-                .day   = 1,
-                .hour  = 0,
-                .min   = 0
+                EO_INIT(.year)  2000,
+                EO_INIT(.month) 1,
+                EO_INIT(.day)   1,
+                EO_INIT(.hour)  0,
+                EO_INIT(.min)   0
             }
         },
-        .rom        = 
+        EO_INIT(.rom) 
         {   
-            .addr   = EENV_ROMSTART,
-            .size   = EENV_ROMSIZE
+            EO_INIT(.addr)  EENV_ROMSTART,
+            EO_INIT(.size)  EENV_ROMSIZE
         },
-        .ram        = 
+        EO_INIT(.ram) 
         {   
-            .addr   = EENV_RAMSTART,
-            .size   = EENV_RAMSIZE
+            EO_INIT(.addr)  EENV_RAMSTART,
+            EO_INIT(.size)  EENV_RAMSIZE
         },
-        .storage    = 
+        EO_INIT(.storage) 
         {
-            .type   = ee_strg_eeprom,
-            .size   = EENV_STGSIZE,
-            .addr   = EENV_STGSTART
+            EO_INIT(.type)  ee_strg_eeprom,
+            EO_INIT(.size)  EENV_STGSIZE,
+            EO_INIT(.addr)  EENV_STGSTART
         },
-        .communication  = ee_commtype_none,
-        .name           = "dummy"
+        EO_INIT(.communication) ee_commtype_none,
+        EO_INIT(.name) "dummy"
     },
-    .uniqueid       = 0,
-    .extra          = {0}
+    EO_INIT(.uniqueid)  0,
+    EO_INIT(.extra) {0}
 };
 
 
@@ -219,53 +225,53 @@ static volatile infoDeviceInfoStorage_t s_shalinfo_deviceinfoStored = {0};
 
 static const eEmoduleInfo_t s_shalinfo_moduleinfo =
 {
-    .info           =
+    EO_INIT(.info)
     {
-        .entity     =
+        EO_INIT(.entity)
         {
-            .type       = ee_entity_statlib,
-            .signature  = ee_shalSharServ | SHALINFO_SIGN,
-            .version    = 
+            EO_INIT(.type)      ee_entity_statlib,
+            EO_INIT(.signature) ee_shalSharServ | SHALINFO_SIGN,
+            EO_INIT(.version) 
             { 
-                .major = SHALINFO_VER_MAJOR, 
-                .minor = SHALINFO_VER_MINOR
+                EO_INIT(.major) SHALINFO_VER_MAJOR, 
+                EO_INIT(.minor) SHALINFO_VER_MINOR
             },  
-            .builddate  = 
+            EO_INIT(.builddate) 
             {
-                .year  = SHALINFO_BUILDDATE_YEAR,
-                .month = SHALINFO_BUILDDATE_MONTH,
-                .day   = SHALINFO_BUILDDATE_DAY,
-                .hour  = SHALINFO_BUILDDATE_HOUR,
-                .min   = SHALINFO_BUILDDATE_MIN
+                EO_INIT(.year)  SHALINFO_BUILDDATE_YEAR,
+                EO_INIT(.month) SHALINFO_BUILDDATE_MONTH,
+                EO_INIT(.day)   SHALINFO_BUILDDATE_DAY,
+                EO_INIT(.hour)  SHALINFO_BUILDDATE_HOUR,
+                EO_INIT(.min)   SHALINFO_BUILDDATE_MIN
             }
         },
-        .rom        = 
+        EO_INIT(.rom) 
         {   
-            .addr   = SHALINFO_ROMADDR,
-            .size   = SHALINFO_ROMSIZE
+            EO_INIT(.addr)  SHALINFO_ROMADDR,
+            EO_INIT(.size)  SHALINFO_ROMSIZE
         },
-        .ram        = 
+        EO_INIT(.ram) 
         {   
-            .addr   = SHALINFO_RAMADDR,
-            .size   = SHALINFO_RAMSIZE
+            EO_INIT(.addr)  SHALINFO_RAMADDR,
+            EO_INIT(.size)  SHALINFO_RAMSIZE
         },
-        .storage    = 
+        EO_INIT(.storage) 
         {
-            .type   = SHALINFO_STGTYPE,
-            .size   = SHALINFO_STGSIZE,
-            .addr   = SHALINFO_STGADDR
+            EO_INIT(.type)  SHALINFO_STGTYPE,
+            EO_INIT(.size)  SHALINFO_STGSIZE,
+            EO_INIT(.addr)  SHALINFO_STGADDR
         },
-        .communication  = ee_commtype_none,
-        .name           = SHALINFO_NAME
+        EO_INIT(.communication)     ee_commtype_none,
+        EO_INIT(.name)              SHALINFO_NAME
     },
-    .protocols  =
+    EO_INIT(.protocols )
     {
-        .udpprotversion  = { .major = 0, .minor = 0},
-        .can1protversion = { .major = 0, .minor = 0},
-        .can2protversion = { .major = 0, .minor = 0},
-        .gtwprotversion  = { .major = 0, .minor = 0}
+        EO_INIT(.udpprotversion)    { EO_INIT(.major ) 0, EO_INIT(.minor ) 0},
+        EO_INIT(.can1protversion)   { EO_INIT(.major ) 0, EO_INIT(.minor ) 0},
+        EO_INIT(.can2protversion)   { EO_INIT(.major ) 0, EO_INIT(.minor ) 0},
+        EO_INIT(.gtwprotversion)    { EO_INIT(.major ) 0, EO_INIT(.minor ) 0}
     },
-    .extra      = {0}                
+    EO_INIT(.extra) {0}                
 };
                                                                              
 // --------------------------------------------------------------------------------------------------------------------

@@ -17,19 +17,22 @@
 */
 // - include guard ----------------------------------------------------------------------------------------------------
 #ifndef _IPAL_ARP_H_
-#define _IPAL_ARPH_
+#define _IPAL_ARP_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       ipal_arp.h
-	@brief      This header file implements public interface to the ip abstraction layer: arp 
-	@author     marco.accame@iit.it
-	@date       12/12/2011
+    @brief      This header file implements public interface to the ip abstraction layer: arp 
+    @author     marco.accame@iit.it
+    @date       12/12/2011
 **/
 
 /* @defgroup ipal_arp IP abstraction layer: arp
     cercecvecve.
     
-    @{		
+    @{        
  **/
 
 
@@ -105,6 +108,11 @@ extern ipal_result_t ipal_arp_request(ipal_ipv4addr_t ip, ipal_arp_cachemode_t c
 /* @}            
     end of group ipal_arp  
  **/
+ 
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+
 
 #endif  // include-guard
 

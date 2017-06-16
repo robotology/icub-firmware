@@ -20,17 +20,20 @@
 #ifndef _OSAL_ARCH_ARM_H_
 #define _OSAL_ARCH_ARM_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       osal_arch_arm.h
-	@brief      This header file implements public interface to the os abstraction layer: arch arm
-	@author     marco.accame@iit.it
-	@date       12/05/2011
+    @brief      This header file implements public interface to the os abstraction layer: arch arm
+    @author     marco.accame@iit.it
+    @date       12/05/2011
 **/
 
 /* @defgroup osal_arch_arm OS abstraction layer: arch arm
     cecece.
     
-    @{		
+    @{        
  **/
 
 
@@ -127,6 +130,10 @@ extern void osal_arch_arm_armc99stdlib_mutex_release(void *m);
 /* @}            
     end of group osal_arch_cfg  
  **/
+ 
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

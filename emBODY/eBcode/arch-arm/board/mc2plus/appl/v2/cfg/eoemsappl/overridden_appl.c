@@ -46,7 +46,6 @@
 #include "EOtheSKIN.h"
 #include "EOtheInertials2.h"
 #include "EOtheETHmonitor.h"
-#include "EOtheBoardConfig.h"
 #include "EOVtheCallbackManager.h"
 
 

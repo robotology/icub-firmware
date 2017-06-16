@@ -21,6 +21,10 @@
 #ifndef _BRD_MCBSTM32X_H_
 #define _BRD_MCBSTM32X_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "stdint.h"
 
 #if     defined(HL_USE_BRD_MCBSTM32)
@@ -54,9 +58,19 @@ typedef enum
     board_led_6, board_led_7
 } board_led_t;
 
-extern void board_led_init(void);
-extern void board_led_on(board_led_t led);
-extern void board_led_off(board_led_t led);
+extern int8_t board_led_global_init(void);
+
+extern int8_t board_led_init(uint8_t led, const void *dummyparam);
+
+extern int8_t board_led_on(board_led_t led);
+extern int8_t board_led_off(board_led_t led);
+extern int8_t board_led_toggle(board_led_t led);
+
+#warning USING cmsis/board.h 
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 
 #endif

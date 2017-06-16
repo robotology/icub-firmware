@@ -20,6 +20,9 @@
 #ifndef _SHALBASE_H_
 #define _SHALBASE_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       shalBASE.h
     @brief      This header file implements public interface to the shalBASE shared library.
@@ -124,13 +127,13 @@ typedef struct
     uint8_t                 dummy;
     uint16_t                datalen;                // 2B. counted after the datacrc32. if 0, crc32 is not used
     uint32_t                datacrc32;              // 4B
-} shalbaseDataCtrl_t;       EECOMMON_VERIFYsizeof(shalbaseDataCtrl_t, 8);
+} shalbaseDataCtrl_t;       EECOMMON_VERIFYsizeof(shalbaseDataCtrl_t, 8)
 
 typedef struct                                      // 16B
 {
     shalbaseDataCtrl_t      datactrl;
     eEentity_t              entity;                 // 8B
-} shalbaseDataHeader_t;     EECOMMON_VERIFYsizeof(shalbaseDataHeader_t, 16); 
+} shalbaseDataHeader_t;     EECOMMON_VERIFYsizeof(shalbaseDataHeader_t, 16)
 
 extern eEboolval_t shalbase_hid_storage_is_valid(void* storage, const eEentity_t* refentity);
 
@@ -143,6 +146,10 @@ extern void shalbase_hid_storage_set_invalid(void* storage, const eEentity_t* re
     end of group shal_base 
  **/
 
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
 #endif  // include-guard
 
 

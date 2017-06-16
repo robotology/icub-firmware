@@ -101,9 +101,9 @@ struct EOMtheIPnet_hid
     EOpacket                        *rxpacket;              /*< contains the temporary packet received by the network */
     eOreltime_t                     maxwaittime;            /*< a generic wait time */
     osal_messagequeue_t             *dgramsocketready2tx;   /*< a fifo containing pointers of the datagram sockets which need to tx a packet  */
-    ipal_cfg_t               		ipcfg;                  /*< the ipal configuration */
     eObool_t                        taskwakeuponrxframe;    /*< tells to send an evt to tskproc when there is a received eth frame */
     eObool_t                        active;
+    ipal_cfg_t                      ipcfg;                  /*< the ipal configuration */
 }; 
 
 

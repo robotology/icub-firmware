@@ -86,7 +86,7 @@ static void Motor_config_current_PID_2FOC(Motor* o, eOmc_PID_t* pidcurrent)
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, o->ID, 0);
     
     eOcanprot_command_t cmdPid;
-    cmdPid.class = eocanprot_msgclass_pollingMotorControl;
+    cmdPid.clas = eocanprot_msgclass_pollingMotorControl;
     cmdPid.type = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID;
     cmdPid.value = KpKiKdKs;
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdPid, id32);
@@ -109,7 +109,7 @@ static void Motor_config_velocity_PID_2FOC(Motor* o, eOmc_PID_t* pidvelocity)
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, o->ID, 0);
     
     eOcanprot_command_t cmdPid;
-    cmdPid.class = eocanprot_msgclass_pollingMotorControl;
+    cmdPid.clas = eocanprot_msgclass_pollingMotorControl;
     cmdPid.type = ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID;
     cmdPid.value = KpKiKdKs;
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdPid, id32);
@@ -122,7 +122,7 @@ static void Motor_config_max_currents_2FOC(Motor* o, eOmc_current_limits_params_
     uint32_t max_current = current_params->peakCurrent;
     
     eOcanprot_command_t cmdMaxCurrent;
-    cmdMaxCurrent.class = eocanprot_msgclass_pollingMotorControl;
+    cmdMaxCurrent.clas = eocanprot_msgclass_pollingMotorControl;
     cmdMaxCurrent.type = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT;
     cmdMaxCurrent.value = &max_current;
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdMaxCurrent, id32);
@@ -166,20 +166,20 @@ static void Motor_config_2FOC(Motor* o, eOmc_motor_config_t* config)
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, o->ID, 0);
     
     eOcanprot_command_t cmdPid;
-    cmdPid.class = eocanprot_msgclass_pollingMotorControl;
+    cmdPid.clas = eocanprot_msgclass_pollingMotorControl;
     cmdPid.type = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID;
     cmdPid.value = KpKiKdKs;
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdPid, id32);
         
     eOcanprot_command_t cmdMaxCurrent;
-    cmdMaxCurrent.class = eocanprot_msgclass_pollingMotorControl;
+    cmdMaxCurrent.clas = eocanprot_msgclass_pollingMotorControl;
     cmdMaxCurrent.type = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT;
     //cmdMaxCurrent.value = &max_current;
     cmdMaxCurrent.value = &(config->currentLimits);
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdMaxCurrent, id32);
 
     eOcanprot_command_t cmdMotorConfig;
-    cmdMotorConfig.class = eocanprot_msgclass_pollingMotorControl;
+    cmdMotorConfig.clas = eocanprot_msgclass_pollingMotorControl;
     cmdMotorConfig.type = ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_CONFIG;
     cmdMotorConfig.value = o->can_motor_config;
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdMotorConfig, id32);
@@ -189,7 +189,7 @@ static void Motor_set_control_mode_2FOC(uint8_t motor, icubCanProto_controlmode_
 {
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, motor, 0);
     eOcanprot_command_t command = {0};
-    command.class = eocanprot_msgclass_pollingMotorControl;
+    command.clas = eocanprot_msgclass_pollingMotorControl;
     command.type  = ICUBCANPROTO_POL_MC_CMD__SET_CONTROL_MODE;
     command.value = &control_mode;
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);
@@ -214,6 +214,7 @@ void Motor_init(Motor* o) //
     memset(o, 0, sizeof(Motor));
 
     o->GEARBOX = 1;
+    o->GEARBOX_E2J = 1;
     
     o->not_init = TRUE;
     o->not_calibrated = TRUE;
@@ -233,7 +234,7 @@ void Motor_init(Motor* o) //
     
     Motor_hardStopCalbData_reset(o);
     
-    o->outOfLimitsSignaled = FALSE;
+    //o->outOfLimitsSignaled = FALSE;
 }
 
 void Motor_config(Motor* o, uint8_t ID, eOmc_motor_config_t* config) //
@@ -243,6 +244,7 @@ void Motor_config(Motor* o, uint8_t ID, eOmc_motor_config_t* config) //
     //o->HARDWARE_TYPE      = hardware_type;
     //o->MOTOR_CONTROL_TYPE = motor_control_type;
     o->GEARBOX            = config->gearboxratio;
+    o->GEARBOX_E2J        = config->gearboxratio2;
     o->HAS_TEMP_SENSOR    = config->hasTempSensor;
     
     o->enc_sign = config->rotorEncoderResolution >= 0 ? 1 : -1; 
@@ -290,7 +292,7 @@ void Motor_config_encoder(Motor* o, int32_t resolution)
         eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, o->ID, 0);
         
         eOcanprot_command_t cmdMotorConfig;
-        cmdMotorConfig.class = eocanprot_msgclass_pollingMotorControl;
+        cmdMotorConfig.clas = eocanprot_msgclass_pollingMotorControl;
         cmdMotorConfig.type = ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_CONFIG;
         cmdMotorConfig.value = o->can_motor_config;
         eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdMotorConfig, id32);  
@@ -346,6 +348,7 @@ void Motor_config_friction(Motor* o, float Bemf, float Ktau) //
 void Motor_calibrate_withOffset(Motor* o, int32_t offset) //
 {
     o->pos_calib_offset = offset;
+    o->pos_fbk_old = 0;
     o->not_init = TRUE;
     Motor_set_run(o);
     
@@ -381,14 +384,14 @@ BOOL Motor_calibrate_moving2Hardstop(Motor* o, int32_t pwm, int32_t zero) //
 
 extern void Motor_uncalibrate(Motor* o)
 {
-    o->not_init = TRUE;
+    //o->not_init = TRUE;
     o->not_calibrated = TRUE;
 
     if (o->HARDWARE_TYPE == HARDWARE_2FOC)
     {
         eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, o->ID, 0);
         eOcanprot_command_t command = {0};
-        command.class = eocanprot_msgclass_pollingMotorControl;
+        command.clas = eocanprot_msgclass_pollingMotorControl;
         command.type  = ICUBCANPROTO_POL_MC_CMD__CALIBRATE_ENCODER;
         eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);
     }
@@ -435,6 +438,7 @@ extern void Motor_do_calibration_hard_stop(Motor* o)
         o->pos_calib_offset = (o->pos_fbk - o->hardstop_calibdata.zero);
         //reset value of position
         o->pos_fbk = o->pos_fbk - o->pos_calib_offset;
+        o->pos_fbk_old = 0;
         o->not_init = TRUE;
         
 //        //debug code
@@ -456,6 +460,7 @@ extern void Motor_do_calibration_hard_stop(Motor* o)
 void Motor_set_run(Motor* o) //
 {
     icubCanProto_controlmode_t control_mode;
+    char message[150];
     
     switch (o->MOTOR_CONTROL_TYPE)
     {
@@ -472,7 +477,11 @@ void Motor_set_run(Motor* o) //
             break;
         
         default:
+        {
+            snprintf(message, sizeof(message), "Motor_set_run: unknown control type par16=type par64=hwtype" );
+            send_debug_message(message, o->ID , o->MOTOR_CONTROL_TYPE, o->HARDWARE_TYPE);
             return;
+        }
     }
     
     if (o->HARDWARE_TYPE == HARDWARE_2FOC)
@@ -485,8 +494,13 @@ void Motor_set_run(Motor* o) //
         hal_motor_reenable_break_interrupts();
         
         hal_motor_enable((hal_motor_t)o->actuatorPort);
-        
+
         o->control_mode = control_mode;
+    }
+    else
+    {
+         snprintf(message, sizeof(message), "Motor_set_run: unknown hw type. par16=type par64=hwtype" );
+         send_debug_message(message, o->ID , o->MOTOR_CONTROL_TYPE, o->HARDWARE_TYPE);
     }
 }
 void Motor_clear_ext_fault(Motor *o)
@@ -808,7 +822,7 @@ void Motor_actuate(Motor* motor, uint8_t N) //
         }
     
         eOcanprot_command_t command = {0};
-        command.class = eocanprot_msgclass_periodicMotorControl;    
+        command.clas = eocanprot_msgclass_periodicMotorControl;    
         command.type  = ICUBCANPROTO_PER_MC_MSG__EMSTO2FOC_DESIRED_CURRENT;
         command.value = output;
     
@@ -840,35 +854,35 @@ void Motor_set_pwm_ref(Motor* o, int32_t pwm_ref)
         if ((o->pos_raw_cal_fbk < o->pos_min) && (pwm_ref < 0))
         {
             o->output = o->pwm_ref = 0;
-            if(!o->outOfLimitsSignaled)
-            {
-                char message [180]; 
-                snprintf(message, sizeof(message),"Motor reached min limit.Can't move with neg pwm" );
-                send_debug_message(message, o->ID, pwm_ref, o->pos_raw_cal_fbk);
-                o->outOfLimitsSignaled = TRUE;
-            }
+//            if(!o->outOfLimitsSignaled)
+//            {
+//                char message [180]; 
+//                snprintf(message, sizeof(message),"Motor reached min limit.Can't move with neg pwm" );
+//                send_debug_message(message, o->ID, pwm_ref, o->pos_raw_cal_fbk);
+//                o->outOfLimitsSignaled = TRUE;
+//            }
         }
         else if ((o->pos_raw_cal_fbk > o->pos_max) && (pwm_ref > 0))
         {
             o->output = o->pwm_ref = 0;
-            if(!o->outOfLimitsSignaled)
-            {
-                char message [180]; 
-                snprintf(message, sizeof(message),"Motor reached max limit.Can't move with pos pwm" );
-                send_debug_message(message, o->ID, pwm_ref, o->pos_raw_cal_fbk);
-                o->outOfLimitsSignaled = TRUE;
-            }
+//            if(!o->outOfLimitsSignaled)
+//            {
+//                char message [180]; 
+//                snprintf(message, sizeof(message),"Motor reached max limit.Can't move with pos pwm" );
+//                send_debug_message(message, o->ID, pwm_ref, o->pos_raw_cal_fbk);
+//                o->outOfLimitsSignaled = TRUE;
+//            }
         }
         else
         {
             o->output = o->pwm_ref = CUT(pwm_ref, o->pwm_max);
-            o->outOfLimitsSignaled = FALSE;
+            //o->outOfLimitsSignaled = FALSE;
         }
     }
     else
     {
         o->output = o->pwm_ref = CUT(pwm_ref, o->pwm_max);
-        o->outOfLimitsSignaled = FALSE;
+        //o->outOfLimitsSignaled = FALSE;
     }
 }
 
@@ -967,16 +981,23 @@ void Motor_update_odometry_fbk_can(Motor* o, CanOdometry2FocMsg* can_msg) //
     
     o->pos_raw_fbk = can_msg->position;
     o->pos_fbk = o->pos_raw_fbk/o->GEARBOX - o->pos_calib_offset;
-    o->pos_raw_cal_fbk = o->pos_raw_fbk - o->pos_calib_offset*o->GEARBOX; 
+    o->pos_raw_cal_fbk = o->pos_raw_fbk - o->pos_calib_offset*o->GEARBOX;
 }
 
 void Motor_update_pos_fbk(Motor* o, int32_t position_raw)
 {
+    //if (o->HARDWARE_TYPE == HARDWARE_2FOC) return; removed workaround
+    //Note: this function should be call only to update motor position read by a connected encoder, ie 
+    //the encoder is read by this board and not by 2foc.
+    //in case of joint controlled by ems+2foc, the motor encoder is connected to 2foc and the 2foc sends motor position to ems by can message. 
+    //see Motor_update_odometry_fbk_can function.
+
     o->pos_raw_fbk = position_raw;
     
     int32_t pos_fbk = o->pos_raw_fbk/o->GEARBOX - o->pos_calib_offset;
       
-    if (o->not_init)
+    //if (o->not_init)
+    if (o->pos_fbk_old == 0)
     {
         o->not_init = FALSE;
         o->pos_fbk_old = pos_fbk; 
@@ -997,6 +1018,26 @@ void Motor_update_pos_fbk(Motor* o, int32_t position_raw)
     o->vel_fbk = delta*CTRL_LOOP_FREQUENCY_INT;
     o->vel_raw_fbk = o->vel_fbk*o->GEARBOX;
     o->pos_raw_cal_fbk = o->pos_fbk*o->GEARBOX;
+    
+    /*
+    {
+        static int timer[] = {0,250,500,750};
+        
+        int m = o->ID;
+                
+        if (++timer[m]>=1000)
+        {
+            timer[m] = 0;
+            static eOerrmanDescriptor_t descriptor = {0};
+            descriptor.par16 = m;
+            descriptor.par64 = ((int64_t)(o->vel_fbk))<<32 | (int64_t)(o->vel_raw_fbk);
+            descriptor.sourcedevice = eo_errman_sourcedevice_localboard;
+            descriptor.sourceaddress = 0;
+            descriptor.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &descriptor);
+        }
+    }
+    */
 }
 
 void Motor_update_current_fbk(Motor* o, int16_t current)

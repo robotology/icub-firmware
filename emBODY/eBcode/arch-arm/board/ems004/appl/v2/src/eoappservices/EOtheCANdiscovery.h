@@ -16,10 +16,16 @@
  * Public License for more details
 */
 
+#error ::: DONT USE IT: USE EOtheCANdiscovery2 INSTEAD
 
 // - include guard ----------------------------------------------------------------------------------------------------
 #ifndef _EOTHECANDISCOVERY_H_
 #define _EOTHECANDISCOVERY_H_
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
@@ -86,7 +92,11 @@ extern eObool_t eo_candiscovery_areCanBoardsReady(EOtheCANdiscovery *p, uint32_t
     end of group eo_EOtheCANdiscovery
  **/
 
-#endif  // include-guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

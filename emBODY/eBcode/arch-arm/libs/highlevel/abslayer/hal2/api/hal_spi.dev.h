@@ -21,6 +21,10 @@
 #ifndef _HAL_SPI_H_
 #define _HAL_SPI_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       hal_spi.h
@@ -270,6 +274,10 @@ extern hal_result_t hal_spi_set_isrtxframe(hal_spi_t id, const uint8_t* txframe)
 /** @}            
     end of group doxy_group_hal_spi  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

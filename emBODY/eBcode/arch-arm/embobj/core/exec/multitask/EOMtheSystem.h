@@ -69,7 +69,7 @@ extern "C" {
 typedef struct
 {
     uint32_t                    codespaceoffset;
-    const hal_cfg_t*            halcfg;
+    const hal_core_cfg_t*       halcfg;
     const osal_cfg_t*           osalcfg;
     const void*                 fsalcfg; // good thing to remove the fsal, as on sourceforge it does not appear yet
 } eOmsystem_cfg_t;

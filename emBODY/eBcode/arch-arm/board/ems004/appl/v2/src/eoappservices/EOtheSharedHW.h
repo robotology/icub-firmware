@@ -21,6 +21,10 @@
 #ifndef _EOTHESHAREDHW_H_
 #define _EOTHESHAREDHW_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       EOtheSharedHW.h
@@ -98,7 +102,11 @@ extern eOresult_t eo_sharedhw_Release(EOtheSharedHW *p, eOsharedhw_resource_t re
     end of group eo_EOtheSharedHW
  **/
 
-#endif  // include-guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

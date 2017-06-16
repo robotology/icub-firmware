@@ -16,13 +16,16 @@
  * Public License for more details
 */
 
+#error ::: DONT USE IT: USE EOtheCANdiscovery2 INSTEAD
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
 #ifndef _EOTHECANDISCOVERY_HID_H_
 #define _EOTHECANDISCOVERY_HID_H_
 
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 // - external dependencies --------------------------------------------------------------------------------------------
@@ -59,7 +62,11 @@ struct EOtheCANdiscovery_hid
 // empty section
 
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

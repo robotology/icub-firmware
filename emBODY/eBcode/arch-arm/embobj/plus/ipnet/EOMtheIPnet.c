@@ -43,6 +43,8 @@
 #include "ipal.h"
 #include "hal_sys.h"
 
+//#include "EOMmutex_hid.h" 
+
 
 #define ARP_NEWMODE
 //#define TEST_ARP
@@ -79,8 +81,6 @@ evEntityId_t evprev_ipnetarp;
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "EOMtheIPnet_hid.h" 
-#include "EOMmutex_hid.h" 
-//#include "OPCprotocolManager_Cfg.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -92,47 +92,47 @@ evEntityId_t evprev_ipnetarp;
 
 #define _MAXTOKENS_SEM_CMD_  2  // but as it is used as a binary semaphore, then 1 would be enough 
 
-
+    
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
 eOmipnet_diagnosticsinfo_t eom_ipnet_diagnosticsInfo  =
 {
-    .datagrams_failed_to_go_in_rxfifo                       = 0,
-    .datagrams_failed_to_go_in_txosalqueue                  = 0,
-    .datagrams_failed_to_be_retrieved_from_txfifo           = 0,
-    .datagrams_failed_to_be_sent_by_ipal                    = 0    
+    EO_INIT(.datagrams_failed_to_go_in_rxfifo)              0,
+    EO_INIT(.datagrams_failed_to_go_in_txosalqueue)         0,
+    EO_INIT(.datagrams_failed_to_be_retrieved_from_txfifo)  0,
+    EO_INIT(.datagrams_failed_to_be_sent_by_ipal)           0    
 };
 
 
 const eOmipnet_cfg_t eom_ipnet_DefaultCfg = 
 { 
-    .procpriority               = 220, 
-    .procstacksize              = 1024, 
-    .procmaxidletime            = 20000, 
-    .procwakeuponrxframe        = eobool_true, 
-    .tickpriority               = 219, 
-    .tickstacksize              = 128
+    EO_INIT(.procpriority)              220, 
+    EO_INIT(.procstacksize)             1024, 
+    EO_INIT(.procmaxidletime)           20000, 
+    EO_INIT(.procwakeuponrxframe)       eobool_true, 
+    EO_INIT(.tickpriority)              219, 
+    EO_INIT(.tickstacksize)             128
 };
 
 const eOmipnet_cfg_dtgskt_t eom_ipnet_dtgskt_DefaultCfg = 
 {   
-    .numberofsockets            = 2, 
-    .maxdatagramenqueuedintx    = 8
+    EO_INIT(.numberofsockets)           2, 
+    EO_INIT(.maxdatagramenqueuedintx)   8
 };
  
 const eOmipnet_cfg_dtgskt_t eom_ipnet_dtgskt_NOsocketCfg = 
 {
-    .numberofsockets            = 0, 
-    .maxdatagramenqueuedintx    = 0
+    EO_INIT(.numberofsockets)           0, 
+    EO_INIT(.maxdatagramenqueuedintx)   0
 };
 
 const eOmipnet_cfg_addr_t eom_ipnet_addr_DefaultCfg = 
 {
-    .macaddr                    = 0,
-    .ipaddr                     = 0,
-    .ipmask                     = 0
+    EO_INIT(.macaddr)                   0,
+    EO_INIT(.ipaddr)                    0,
+    EO_INIT(.ipmask)                    0
 };
 
 
@@ -198,32 +198,36 @@ static const char s_eobj_ownname[] = "EOMtheIPnet";
 
 static EOMtheIPnet s_eom_theipnet = 
 {
-    .ipnet                  = NULL,                               // ipnet
-    .tskproc                = NULL,                               // tskproc
-    .tsktick                = NULL,                               // tsktick
-    .cmd                    =
-                            {
-                                .mtxcaller      = NULL, 
-                                .opcode         = cmdDoNONE, 
-                                .repeatcmd      = 0,
-                                .result         = 0,
-                                .par16b         = 0,
-                                .par32b         = 0,
-                                .par32x         = 0,
-                                .par64x         = 0,
-                                .tout           = 0, 
-                                .blockingsemaphore = NULL, 
+    EO_INIT(.ipnet)                 NULL,                               // ipnet
+    EO_INIT(.tskproc)               NULL,                               // tskproc
+    EO_INIT(.tsktick)               NULL,                               // tsktick
+    EO_INIT(.cmd)
+    {
+        EO_INIT(.mtxcaller)         NULL, 
+        EO_INIT(.opcode)            cmdDoNONE, 
+        EO_INIT(.repeatcmd)         0,
+        EO_INIT(.result)            0,
+        EO_INIT(.par16b)            0,
+        EO_INIT(.par32b)            0,
+        EO_INIT(.par32x)            0,
+        EO_INIT(.par64x)            0,
+        EO_INIT(.tout)              0, 
+        EO_INIT(.blockingsemaphore) NULL, 
 #if defined(IPNET_HAS_NON_BLOCKING_COMMAND)
-                                .busysemaphore  = NULL,
+        EO_INIT(.busysemaphore)     NULL,
 #endif
-                                .stoptmr        = NULL,
-                                .stopact        = NULL
-                            },   // cmd
-    .rxpacket               = NULL,                                
-    .maxwaittime            = 0,                                  // maxwaittime 
-    .dgramsocketready2tx    = NULL,                               // dgramsocketready2tx  
-//    .ipcfg                  = {0},                                // ipcfg
-    .taskwakeuponrxframe    = eobool_false
+        EO_INIT(.stoptmr)           NULL,
+        EO_INIT(.stopact)           NULL
+    },   // cmd
+    EO_INIT(.rxpacket)              NULL,                                
+    EO_INIT(.maxwaittime)           0,                                  // maxwaittime 
+    EO_INIT(.dgramsocketready2tx)   NULL,      
+    EO_INIT(.taskwakeuponrxframe)   eobool_false,
+    EO_INIT(.active)                eobool_false
+//    ,EO_INIT(.ipcfg)
+//    {
+//        0
+//    } 
 };
 
 
@@ -1047,7 +1051,7 @@ static eOresult_t s_eom_ipnet_WaitPacket(EOVtheIPnet* ip, EOsocketDerived *s, eO
     // - the semaphore is incremented by one each time the ipnet received a packet for this particular socket.
     if(NULL != bs->blkgethandle)
     {
-        if(osal_res_OK == osal_semaphore_decrement(bs->blkgethandle, tout))
+        if(osal_res_OK == osal_semaphore_decrement((osal_semaphore_t*)bs->blkgethandle, tout))
         {
             res = eores_OK;
         }
@@ -1078,13 +1082,13 @@ static eOresult_t s_eom_ipnet_WaitPacket(EOVtheIPnet* ip, EOsocketDerived *s, eO
 // name of the task as it is shown in uvision
 void eom_ipnetproc(void *p)
 {
-    eom_task_Start(p);
+    eom_task_Start((EOMtask*)p);
 }
 
 // name of the task as it is shown in uvision
 void eom_ipnettick(void *p)
 {
-     eom_task_Start(p);
+     eom_task_Start((EOMtask*)p);
 }
 
 
@@ -1131,7 +1135,7 @@ static void s_eom_ipnet_ipal_start(void)
     ipal_base_memory_getsize(&s_eom_theipnet.ipcfg, &ram32sizeip);
     if(0 != ram32sizeip)
     {
-        ram32dataip = eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, ram32sizeip, 1);
+        ram32dataip = (uint32_t*) eo_mempool_GetMemory(eo_mempool_GetHandle(), eo_mempool_align_32bit, ram32sizeip, 1);
     }
 
     if(eobool_true == s_eom_theipnet.taskwakeuponrxframe)
@@ -1327,7 +1331,7 @@ static void s_eom_ipnet_OnReceptionDatagram(void *arg, ipal_udpsocket_t *skt, ip
     if(eobool_true == dtgskt->socket->block2wait4packet)
     {
         // unblock the reception
-        osal_semaphore_increment(dtgskt->socket->blkgethandle, osal_callerTSK);
+        osal_semaphore_increment((osal_semaphore_t*)dtgskt->socket->blkgethandle, osal_callerTSK);
     }
 
   
@@ -1688,7 +1692,7 @@ static void s_eom_ipnet_process_transmission_datagram(void)
                 {   // transmit the datagram
                     ipalpkt.data = ditem->data;
                     ipalpkt.size = ditem->size;
-                    if(ipal_res_OK == ipal_udpsocket_sendto(s->socket->skthandle, &ipalpkt, ditem->remoteaddr, ditem->remoteport))
+                    if(ipal_res_OK == ipal_udpsocket_sendto((ipal_udpsocket_t*)s->socket->skthandle, &ipalpkt, ditem->remoteaddr, ditem->remoteport))
                     {
                         // remove the datagram being transmitted
                         eo_fifo_Rem(s->dgramfifooutput, s_eom_theipnet.maxwaittime);
@@ -1772,7 +1776,7 @@ static eObool_t s_eom_ipnet_attach_rqst_dtgsocket(EOVtheIPnet *vip, EOsocketData
     {
         eOsizecntnr_t maxtokens;
         eo_fifo_Capacity(dgmskt->dgramfifoinput, &maxtokens, eok_reltimeINFINITE);
-        dgmskt->socket->blkgethandle = osal_semaphore_new(maxtokens+1, 0);
+        dgmskt->socket->blkgethandle = (void*)osal_semaphore_new(maxtokens+1, 0);
         eo_errman_Assert(eo_errman_GetHandle(), (NULL != dgmskt->socket->blkgethandle), "s_eom_ipnet_attach_rqst_dtgsocket(): blkgethandle is not created by osal", s_eobj_ownname, &eo_errman_DescrRuntimeErrorLocal);
     }    
     
@@ -1791,9 +1795,10 @@ static eObool_t s_eom_ipnet_attach_rqst_dtgsocket(EOVtheIPnet *vip, EOsocketData
  **/
 static void s_eom_ipnet_attach_proc_dtgsocket(EOsocketDatagram *dtgs)
 {
-    const ipal_tos_t tos = {.precedence = ipal_prec_priority, .lowdelay = 1, .highthroughput = 1, .highreliability = 1, .unused = 0};
+    ipal_tos_t tos;
+    tos.precedence = ipal_prec_priority; tos.lowdelay = 1; tos.highthroughput = 1; tos.highreliability = 1; tos.unused = 0;
     
-    EOsocket *s = eo_common_getbaseobject(dtgs);
+    EOsocket *s = (EOsocket*) eo_common_getbaseobject(dtgs);
  
     // reset the command
     s_eom_theipnet.cmd.result = 0;
@@ -1808,12 +1813,12 @@ static void s_eom_ipnet_attach_proc_dtgsocket(EOsocketDatagram *dtgs)
         return;
     }
 
-    if(ipal_res_OK != ipal_udpsocket_bind(s->skthandle, IPAL_ipv4addr_INADDR_ANY, s->localport))
+    if(ipal_res_OK != ipal_udpsocket_bind((ipal_udpsocket_t*)s->skthandle, IPAL_ipv4addr_INADDR_ANY, s->localport))
     {
         return;
     }
 
-    if(ipal_res_OK != ipal_udpsocket_recv(s->skthandle, s_eom_ipnet_OnReceptionDatagram, dtgs))
+    if(ipal_res_OK != ipal_udpsocket_recv((ipal_udpsocket_t*)s->skthandle, s_eom_ipnet_OnReceptionDatagram, dtgs))
     {
         return;
     }
@@ -1882,7 +1887,7 @@ static void s_eom_ipnet_detach_proc_dtgsocket(EOsocketDatagram *dtgs)
 {
     EOlist *socks = s_eom_theipnet.ipnet->activedgramsocksptrlist;
     
-    EOsocket *s = eo_common_getbaseobject(dtgs);
+    EOsocket *s = (EOsocket*) eo_common_getbaseobject(dtgs);
 
     // reset the command
     s_eom_theipnet.cmd.result = 0;
@@ -1891,7 +1896,7 @@ static void s_eom_ipnet_detach_proc_dtgsocket(EOsocketDatagram *dtgs)
 
 
     // close and delete the osal socket
-    ipal_udpsocket_delete(s->skthandle);
+    ipal_udpsocket_delete((ipal_udpsocket_t*)s->skthandle);
 
     // clear data structure
     s->skthandle = NULL;

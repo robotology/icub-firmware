@@ -21,6 +21,10 @@
 #ifndef _HAL_TRACE_H_
 #define _HAL_TRACE_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       hal_trace.h
@@ -118,6 +122,10 @@ extern int hal_trace_puts(const char * str);
  /** @}            
     end of group doxy_group_hal_trace  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

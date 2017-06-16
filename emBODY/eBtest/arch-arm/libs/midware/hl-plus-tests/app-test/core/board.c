@@ -16,7 +16,8 @@
  * Public License for more details
 */
 
-#include "board.h"
+//#include "board.h"
+
 #if     defined(HL_USE_BRD_MCBSTM32)
     #include "brd_mcbstm32.c"
 #elif     defined(HL_USE_BRD_MCBSTM32C)

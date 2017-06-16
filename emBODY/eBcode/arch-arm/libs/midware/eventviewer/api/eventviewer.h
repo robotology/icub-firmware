@@ -18,9 +18,12 @@
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-
 #ifndef _EVENTVIEWER_H_
 #define _EVENTVIEWER_H_
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
@@ -144,6 +147,10 @@ extern evEntityId_t eventviewer_switch_to(evEntityId_t id);
  /** @}            
     end of group eventviewer  
  **/
+ 
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

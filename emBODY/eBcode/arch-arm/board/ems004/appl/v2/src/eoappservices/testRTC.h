@@ -21,6 +21,10 @@
 #ifndef _TESTRTC_H_
 #define _TESTRTC_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       testRTC.h
@@ -67,7 +71,11 @@ extern void testRTC_CFG_tick(void);
     end of group cecew
  **/
 
-#endif  // include-guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

@@ -587,6 +587,123 @@ extern BIT os_lock;
 extern BIT os_psh_flag;
 extern U8  pend_flags;
 
+// it contains the standard function rt_suspend() 
+U32 rt_iit_timeofnextevent(U8 andsuspend)
+{
+  /* Suspend OS scheduler */
+  U32 delta = 0xFFFFU;
+//#ifdef __CMSIS_RTOS
+//  U32 sleep;
+//#endif
+
+
+  if(1 == andsuspend)
+  {
+    rt_tsk_lock();
+  }
+  
+  if (os_dly.p_dlnk) {
+    delta = os_dly.delta_time;
+  }
+//#ifdef __CMSIS_RTOS
+//  sleep = sysUserTimerWakeupTime();
+//  if (sleep < delta) { delta = sleep; }
+//#else
+//  if (os_tmr.next) {
+//    if (os_tmr.tcnt < delta) delta = os_tmr.tcnt;
+//  }
+//#endif
+  
+  // we get next advanced timer time ...
+  
+  U32 nexttimer = rt_iit_advtmr_next();
+
+  // it returns either a tick or 0xffffffff
+  if(nexttimer < delta)
+  {
+      delta = nexttimer;
+  }
+
+  return (delta);    
+      
+}
+
+
+// overridden function
+U32 rt_suspend (void) {
+  return (rt_iit_timeofnextevent(1));
+}
+
+
+
+void rt_resume (U32 sleep_time) {
+  /* Resume OS scheduler after suspend */
+  P_TCB next;
+  U32   delta;
+
+  os_tsk.run->state = READY;
+  rt_put_rdy_first (os_tsk.run);
+
+  os_robin.task = NULL;
+
+  /* Update delays. */
+  if (os_dly.p_dlnk) {
+    delta = sleep_time;
+    if (delta >= os_dly.delta_time) {
+      delta   -= os_dly.delta_time;
+      os_time += os_dly.delta_time;
+      oosiit_time += os_dly.delta_time;
+      os_dly.delta_time = 1U;
+      while (os_dly.p_dlnk) {
+        // rt_dec_dly();
+        iitchanged_rt_dec_dly();
+        if (delta == 0U) { break; }
+        delta--;
+        os_time++;
+        oosiit_time++;
+      }
+    } else {
+      os_time           +=      delta;
+      oosiit_time       +=      delta;
+      os_dly.delta_time -= (TIME_t)delta; // IIT-EXT: made delta_time of type TIME_t
+    }
+  } else {
+    os_time += sleep_time;
+    oosiit_time += sleep_time;
+  }
+
+//  /* Check the user timers. */
+//#ifdef __CMSIS_RTOS
+//  sysUserTimerUpdate(sleep_time);
+//#else
+//  if (os_tmr.next) {
+//    delta = sleep_time;
+//    if (delta >= os_tmr.tcnt) {
+//      delta   -= os_tmr.tcnt;
+//      os_tmr.tcnt = 1U;
+//      while (os_tmr.next) {
+//        rt_tmr_tick();
+//        if (delta == 0U) { break; }
+//        delta--;
+//      }
+//    } else {
+//      os_tmr.tcnt -= delta;
+//    }
+//  }
+//#endif
+  
+  // check the advtimers
+  
+  rt_iit_advtmr_resume_from_sleep(sleep_time);
+  
+
+  /* Switch back to highest ready task */
+  next = rt_get_first (&os_rdy);
+  rt_switch_req (next);
+
+  rt_tsk_unlock();
+}
+
 void rt_tsk_lock (void) {
   /* Prevent task switching by locking out scheduler */
   // IIT-EXT: we need to read the register in order to clear bit 16, the COUNTFLAG
@@ -596,11 +713,11 @@ void rt_tsk_lock (void) {
   if (os_tick_irqn < 0) {
     OS_LOCK();
     os_lock = __TRUE;
-    OS_UNPEND (&pend_flags);
+    OS_UNPEND(pend_flags);
   } else {
     OS_X_LOCK(os_tick_irqn);
     os_lock = __TRUE;
-    OS_X_UNPEND (&pend_flags);
+    OS_X_UNPEND(pend_flags);
   }
 }
 
@@ -620,12 +737,12 @@ void rt_tsk_unlock (void) {
   if (os_tick_irqn < 0) {
     OS_UNLOCK();
     os_lock = __FALSE;
-    OS_PEND (pend_flags, os_psh_flag);
+    OS_PEND(pend_flags, os_psh_flag);
     os_psh_flag = __FALSE;
   } else {
-    OS_X_UNLOCK(os_tick_irqn);
+   OS_X_UNLOCK((U32)os_tick_irqn);
     os_lock = __FALSE;
-    OS_X_PEND (pend_flags, os_psh_flag);
+    OS_X_PEND(pend_flags, os_psh_flag);
     os_psh_flag = __FALSE;
   }
   
@@ -723,10 +840,10 @@ void rt_pop_req (void) {
       /* Must be of SCB type */
       rt_iit_sem_psh((P_SCB)p_CB); // IIT-EXT: it was: rt_sem_psh ((P_SCB)p_CB)
     } // else ... error
-    if (++idx == os_psq->size) idx = 0;
+    if (++idx == os_psq->size) { idx = 0U; }
     rt_dec (&os_psq->count);
   }
-  os_psq->last = idx;
+  os_psq->last = (U8)idx;
 
   next = rt_get_first (&os_rdy);
   rt_switch_req (next);
@@ -739,7 +856,7 @@ void rt_pop_req (void) {
 #ifdef __CMSIS_RTOS
 extern void sysTimerTick(void);
 #endif
-// made as much consistent as possible with version V4.73
+// made as much consistent as possible with version V4.81
 void rt_systick (void) {
   /* Check for system clock update, suspend running task. */
   P_TCB next;
@@ -814,7 +931,7 @@ OS_RESULT iitchanged_rt_mut_wait (OS_ID mutex, TIME_t timeout) {
   /* Wait for a mutex, continue when mutex is free. */
   P_MUCB p_MCB = mutex;
 
-  if (p_MCB->level == 0) {
+  if (p_MCB->level == 0U) {
     p_MCB->owner  = os_tsk.run;
     p_MCB->p_mlnk = os_tsk.run->p_mlnk;
     os_tsk.run->p_mlnk = p_MCB; 
@@ -826,7 +943,7 @@ inc:p_MCB->level++;
     return (OS_R_OK);
   }
   /* Mutex owned by another task, wait until released. */
-  if (timeout == 0) {
+  if (timeout == 0U) {
     return (OS_R_TMO);
   }
   /* Raise the owner task priority if lower than current priority. */
@@ -914,7 +1031,7 @@ wkup: p_tcb->events &= ~event_flags;
       rt_rmv_dly (p_tcb);
       p_tcb->state   = READY;
 #ifdef __CMSIS_RTOS
-      rt_ret_val2(p_tcb, 0x08/*osEventSignal*/, p_tcb->waits); 
+      rt_ret_val2(p_tcb, 0x08U/*osEventSignal*/, p_tcb->waits); 
 #else
       rt_ret_val (p_tcb, OS_R_EVT);
 #endif
@@ -981,7 +1098,7 @@ rdy:  p_CB->events &= ~event_flags;
       rt_rmv_dly (p_CB);
       p_CB->state   = READY;
 #ifdef __CMSIS_RTOS
-      rt_ret_val2(p_CB, 0x08/*osEventSignal*/, p_CB->waits); 
+      rt_ret_val2(p_CB, 0x08U/*osEventSignal*/, p_CB->waits); 
 #else
       rt_ret_val (p_CB, OS_R_EVT);
 #endif
@@ -997,12 +1114,12 @@ void iitchanged_rt_mbx_init (OS_ID mailbox, U16 numofmessages) {
   P_MCB p_MCB = mailbox;
 
   p_MCB->cb_type = MCB;
-  p_MCB->state   = 0;
-  p_MCB->isr_st  = 0;
+  p_MCB->state   = 0U;
+  p_MCB->isr_st  = 0U;
   p_MCB->p_lnk   = NULL;
-  p_MCB->first   = 0;
-  p_MCB->last    = 0;
-  p_MCB->count   = 0;
+  p_MCB->first   = 0U;
+  p_MCB->last    = 0U;
+  p_MCB->count   = 0U;
   p_MCB->size    = numofmessages;
 }
 
@@ -1065,11 +1182,11 @@ OS_RESULT iitchanged_rt_mbx_send (OS_ID mailbox, void *p_msg, TIME_t timeout) {
   P_MCB p_MCB = mailbox;
   P_TCB p_TCB;
 
-  if ((p_MCB->p_lnk != NULL) && (p_MCB->state == 1)) {
+  if ((p_MCB->p_lnk != NULL) && (p_MCB->state == 1U)) {
     /* A task is waiting for message */
     p_TCB = rt_get_first ((P_XCB)p_MCB);
 #ifdef __CMSIS_RTOS
-    rt_ret_val2(p_TCB, 0x10/*osEventMessage*/, (U32)p_msg);
+    rt_ret_val2(p_TCB, 0x10U/*osEventMessage*/, (U32)p_msg);
 #else
     *p_TCB->msg = p_msg;
     rt_ret_val (p_TCB, OS_R_MBX);
@@ -1083,7 +1200,7 @@ OS_RESULT iitchanged_rt_mbx_send (OS_ID mailbox, void *p_msg, TIME_t timeout) {
       /* No free message entry, wait for one. If message queue is full, */
       /* then no task is waiting for message. The 'p_MCB->p_lnk' list   */
       /* pointer can now be reused for send message waits task list.    */
-      if (timeout == 0) {
+      if (timeout == 0U) {
         return (OS_R_TMO);
       }
       if (p_MCB->p_lnk != NULL) {
@@ -1094,7 +1211,7 @@ OS_RESULT iitchanged_rt_mbx_send (OS_ID mailbox, void *p_msg, TIME_t timeout) {
         os_tsk.run->p_lnk  = NULL;
         os_tsk.run->p_rlnk = (P_TCB)p_MCB;
         /* Task is waiting to send a message */      
-        p_MCB->state = 2;
+        p_MCB->state = 2U;
       }
       os_tsk.run->msg = p_msg;
       iitchanged_rt_block (timeout, WAIT_MBX);
@@ -1104,7 +1221,7 @@ OS_RESULT iitchanged_rt_mbx_send (OS_ID mailbox, void *p_msg, TIME_t timeout) {
     p_MCB->msg[p_MCB->first] = p_msg;
     rt_inc (&p_MCB->count);
     if (++p_MCB->first == p_MCB->size) {
-      p_MCB->first = 0;
+      p_MCB->first = 0U;
     }
   }
   return (OS_R_OK);
@@ -1122,19 +1239,19 @@ OS_RESULT iitchanged_rt_mbx_wait (OS_ID mailbox, void **message, TIME_t timeout)
   if (p_MCB->count) {
     *message = p_MCB->msg[p_MCB->last];
     if (++p_MCB->last == p_MCB->size) {
-      p_MCB->last = 0;
+      p_MCB->last = 0U;
     }
-    if ((p_MCB->p_lnk != NULL) && (p_MCB->state == 2)) {
+    if ((p_MCB->p_lnk != NULL) && (p_MCB->state == 2U)) {
       /* A task is waiting to send message */
       p_TCB = rt_get_first ((P_XCB)p_MCB);
 #ifdef __CMSIS_RTOS
-      rt_ret_val(p_TCB, 0/*osOK*/);
+      rt_ret_val(p_TCB, 0U/*osOK*/);
 #else
       rt_ret_val(p_TCB, OS_R_OK);
 #endif
       p_MCB->msg[p_MCB->first] = p_TCB->msg;
       if (++p_MCB->first == p_MCB->size) {
-        p_MCB->first = 0;
+        p_MCB->first = 0U;
       }
       rt_rmv_dly (p_TCB);
       rt_dispatch (p_TCB);
@@ -1145,7 +1262,7 @@ OS_RESULT iitchanged_rt_mbx_wait (OS_ID mailbox, void **message, TIME_t timeout)
     return (OS_R_OK);
   }
   /* No message available: wait for one */
-  if (timeout == 0) {
+  if (timeout == 0U) {
     return (OS_R_TMO);
   }
   if (p_MCB->p_lnk != NULL) {
@@ -1156,7 +1273,7 @@ OS_RESULT iitchanged_rt_mbx_wait (OS_ID mailbox, void **message, TIME_t timeout)
     os_tsk.run->p_lnk = NULL;
     os_tsk.run->p_rlnk = (P_TCB)p_MCB;
     /* Task is waiting to receive a message */      
-    p_MCB->state = 1;
+    p_MCB->state = 1U;
   }
   iitchanged_rt_block(timeout, WAIT_MBX);
 #ifndef __CMSIS_RTOS
@@ -1262,7 +1379,7 @@ OS_RESULT iitchanged_rt_sem_send (OS_ID semaphore) {
     /* A task is waiting for token */
     p_TCB = rt_get_first ((P_XCB)p_SCB);
 #ifdef __CMSIS_RTOS
-    rt_ret_val(p_TCB, 1);
+    rt_ret_val(p_TCB, 1U);
 #else
     rt_ret_val(p_TCB, OS_R_SEM);
 #endif
@@ -1321,7 +1438,7 @@ void iitchanged_rt_sem_psh (void *p) {
     rt_rmv_dly (p_TCB);
     p_TCB->state   = READY;
 #ifdef __CMSIS_RTOS
-    rt_ret_val(p_TCB, 1);
+    rt_ret_val(p_TCB, 1U);
 #else
     rt_ret_val(p_TCB, OS_R_SEM);
 #endif
@@ -1351,7 +1468,7 @@ OS_RESULT rt_iit_sem_delete (OS_ID semaphore) {
     rt_put_prio (&os_rdy, p_TCB);
   }
 
-  if (os_rdy.p_lnk && (os_rdy.p_lnk->prio > os_tsk.run->prio)) {
+  if ((os_rdy.p_lnk != NULL) && (os_rdy.p_lnk->prio > os_tsk.run->prio)) {
     /* preempt running task */
     rt_put_prio (&os_rdy, os_tsk.run);
     os_tsk.run->state = READY;
@@ -1555,6 +1672,7 @@ OS_TPTR rt_iit_tsk_create (FUNCP task, void *taskfnarg, void *taskstackdata, osi
   task_context->msg = taskfnarg;
   /* For 'size == 0' system allocates the user stack from the memory pool. */
   // was: rt_init_context (task_context, prio_stksz & 0xFF, task);
+  // and then it became: rt_init_context (task_context, (U8)(prio_stksz & 0xFFU), task);
   rt_init_context (task_context, prio, task);
 
   /* Find a free entry in 'os_active_TCB' table. */
@@ -1583,7 +1701,7 @@ OS_RESULT rt_iit_tsk_delete (OS_TPTR taskp) {
   
   task_id = task_context->task_id;
 
-  if (task_id == 0 || task_id == os_tsk.run->task_id) {
+  if ((task_id == 0U) || (task_id == os_tsk.run->task_id)) {
     /* Terminate itself. */
     os_tsk.run->state     = INACTIVE;
     os_tsk.run->tsk_stack = rt_get_PSP ();
@@ -1595,7 +1713,7 @@ OS_RESULT rt_iit_tsk_delete (OS_TPTR taskp) {
         /* A task is waiting for mutex. */
         p_TCB = rt_get_first ((P_XCB)p_MCB);
 #ifdef __CMSIS_RTOS
-        rt_ret_val(p_TCB, 0/*osOK*/);
+        rt_ret_val(p_TCB, 0U/*osOK*/);
 #else
         rt_ret_val(p_TCB, OS_R_MUT); 
 #endif
@@ -1603,19 +1721,23 @@ OS_RESULT rt_iit_tsk_delete (OS_TPTR taskp) {
         p_TCB->state = READY;
         rt_put_prio (&os_rdy, p_TCB);
         /* A waiting task becomes the owner of this mutex. */
-        p_MCB0 = p_MCB;
-        p_MCB->level  = 1;
+        p_MCB0 = p_MCB->p_mlnk;
+        p_MCB->level  = 1U;
         p_MCB->owner  = p_TCB;
         p_MCB->p_mlnk = p_TCB->p_mlnk;
         p_TCB->p_mlnk = p_MCB; 
-        p_MCB = p_MCB0->p_mlnk;
+        p_MCB = p_MCB0;
       }
       else {
-        p_MCB = p_MCB->p_mlnk;
+        p_MCB0 = p_MCB->p_mlnk;
+        p_MCB->level  = 0U;
+        p_MCB->owner  = NULL;
+        p_MCB->p_mlnk = NULL;
+        p_MCB = p_MCB0;
       }
     }
     if(NULL != os_active_TCB)
-        os_active_TCB[os_tsk.run->task_id-1] = NULL;
+        os_active_TCB[os_tsk.run->task_id-1U] = NULL;
     if(NULL != mp_stk)
         rt_free_box (mp_stk, os_tsk.run->stack);
     else
@@ -1657,27 +1779,31 @@ OS_RESULT rt_iit_tsk_delete (OS_TPTR taskp) {
         /* A task is waiting for mutex. */
         p_TCB = rt_get_first ((P_XCB)p_MCB);
 #ifdef __CMSIS_RTOS
-        rt_ret_val(p_TCB, 0/*osOK*/);
+        rt_ret_val (p_TCB, 0/*osOK*/);
 #else
-        rt_ret_val(p_TCB, OS_R_MUT); 
+        rt_ret_val (p_TCB, OS_R_MUT); 
 #endif
         rt_rmv_dly (p_TCB);
         p_TCB->state = READY;
         rt_put_prio (&os_rdy, p_TCB);
         /* A waiting task becomes the owner of this mutex. */
-        p_MCB0 = p_MCB;
-        p_MCB->level  = 1;
+        p_MCB0 = p_MCB->p_mlnk;
+        p_MCB->level  = 1U;
         p_MCB->owner  = p_TCB;
         p_MCB->p_mlnk = p_TCB->p_mlnk;
         p_TCB->p_mlnk = p_MCB; 
-        p_MCB = p_MCB0->p_mlnk;
+        p_MCB = p_MCB0;
       }
       else {
-        p_MCB = p_MCB->p_mlnk;
+        p_MCB0 = p_MCB->p_mlnk;
+        p_MCB->level  = 0U;
+        p_MCB->owner  = NULL;
+        p_MCB->p_mlnk = NULL;
+        p_MCB = p_MCB0;
       }
     }
     if(NULL != os_active_TCB)
-        os_active_TCB[task_id-1] = NULL;
+        os_active_TCB[task_id-1U] = NULL;
     if(NULL != mp_stk)
         rt_free_box (mp_stk, task_context->stack);
     else
@@ -1785,14 +1911,14 @@ void rt_iit_sys_start(oosiit_task_properties_t* inittsk, oosiit_task_properties_
     
     rt_iit_advtmr_init();	            // IIT-EXT: initialising advanced timers
     
-    /* Intitialize SVC and PendSV */
+#ifndef __CMSIS_RTOS
+    /* Initialize SVC and PendSV */
     rt_svc_init ();
 
-#ifndef __CMSIS_RTOS
-    /* Intitialize and start system clock timer */
+    /* Initialize and start system clock timer */
     os_tick_irqn = os_tick_init ();
     if (os_tick_irqn >= 0) {
-        OS_X_INIT(os_tick_irqn);
+        OS_X_INIT((U32)os_tick_irqn);
     }
 
     rt_psh_req();					    // IIT-EXT: just to force a pendsv call after this function call
@@ -1883,7 +2009,7 @@ void iitchanged_rt_dec_dly (void) {
     return;
   }
   os_dly.delta_time--;
-  while ((os_dly.delta_time == 0) && (os_dly.p_dlnk != NULL)) {
+  while ((os_dly.delta_time == 0U) && (os_dly.p_dlnk != NULL)) {
     p_rdy = os_dly.p_dlnk;
     if (p_rdy->p_rlnk != NULL) {
       /* Task is really enqueued, remove task from semaphore/mailbox */
@@ -1904,7 +2030,7 @@ void iitchanged_rt_dec_dly (void) {
     p_rdy->state   = READY;
     os_dly.p_dlnk = p_rdy->p_dlnk;
     if (p_rdy->p_dlnk != NULL) {
-      p_rdy->p_dlnk->p_blnk =  (P_TCB)&os_dly;
+      p_rdy->p_dlnk->p_blnk = (P_TCB)&os_dly;
       p_rdy->p_dlnk = NULL;
     }
     p_rdy->p_blnk = NULL;
@@ -1934,7 +2060,7 @@ void rt_chk_robin (void) {
   if (os_robin.task != os_rdy.p_lnk) {
     /* New task was suspended, reset Round Robin timeout. */
     os_robin.task = os_rdy.p_lnk;
-    os_robin.time = oosiit_time + os_robin.tout - 1;
+    os_robin.time = oosiit_time + os_robin.tout - 1U;
   }
   if (os_robin.time == oosiit_time) {
     /* Round Robin timeout has expired, swap Robin tasks. */

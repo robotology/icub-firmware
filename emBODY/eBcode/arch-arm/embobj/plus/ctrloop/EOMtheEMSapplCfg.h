@@ -94,7 +94,7 @@ typedef const struct
     eOemserror_cfg_t                errobjcfg;                  /**<   */
     eOemsconfigurator_cfg_t         cfgobjcfg;                  /**<   */
     eOemsrunner_cfg_t               runobjcfg;                  /**<   */
-    EOVtheEMSapplCfgBody*           applbodycfg;
+    const EOVtheEMSapplCfgBody*     applbodycfg;
 } EOMtheEMSapplCfg;        
 
 
@@ -107,6 +107,8 @@ typedef const struct
 extern const eEmoduleExtendedInfo_t eom_emsapplcfg_modinfo_extended;
 
 //extern const uint32_t eom_emsapplcfg_extra;
+
+extern const EOVtheEMSapplCfgBody theapplbodyconfig;
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 

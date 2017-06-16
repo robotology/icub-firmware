@@ -21,6 +21,10 @@
 #ifndef _EOTHEENTITIES_H_
 #define _EOTHEENTITIES_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       EOtheEntities.h
@@ -105,6 +109,11 @@ extern eOsk_status_t * eo_entities_GetSkinStatus(EOtheEntities *p, eOprotIndex_t
 /** @}            
     end of group eo_EOtheEntities
  **/
+
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif
 
 #endif  // include-guard
 

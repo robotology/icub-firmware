@@ -19,6 +19,10 @@
 #ifndef MC_TRAJECTORY_H___
 #define MC_TRAJECTORY_H___
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #include "EoCommon.h"
 
 #include "EOemsControllerCfg.h"
@@ -81,5 +85,12 @@ extern int32_t Trajectory_get_acc_ref(Trajectory *o);
 
 extern BOOL Trajectory_is_done(Trajectory* o);
 
-#endif
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
+
+
 

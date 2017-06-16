@@ -23,7 +23,9 @@
 #define _EOTHEVIRTUALSTRAIN_HID_H_
 
 
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
@@ -43,7 +45,6 @@
 struct EOtheVirtualStrain_hid
 {
     eObool_t            initted;
-//    eObool_t            itismc4can;
     eObrd_canlocation_t location;
     uint16_t            torques[6];
     eObool_t            thereisanewvalueoftorque;
@@ -57,7 +58,11 @@ struct EOtheVirtualStrain_hid
 // empty section
 
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

@@ -25,7 +25,7 @@
 #include "EoCommon.h"
 
 #include "EOtheMemoryPool.h"
-#include "EOtheErrormanager.h"
+#include "EOtheErrorManager.h"
 #include "osal_semaphore.h"
 
 
@@ -293,11 +293,11 @@ extern eOresult_t eom_emsbackdoor_Signal(EOMtheEMSbackdoor *p, uint16_t var , eO
 extern void tskEMSbackdoor(void *p)
 {
     // do here whatever you like before startup() is executed and then forever()
-    eom_task_Start(p);
+    eom_task_Start((EOMtask*)p);
 } 
 
 
-// __weak extern void eom_emsbackdoor_hid_userdef_DoJustAfterPacketParsing(EOMtheEMSbackdoor *p)
+// EO_weak extern void eom_emsbackdoor_hid_userdef_DoJustAfterPacketParsing(EOMtheEMSbackdoor *p)
 // {
 
 // } 

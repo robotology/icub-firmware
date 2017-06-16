@@ -20,17 +20,20 @@
 #ifndef _IPAL_BASE_H_
 #define _IPAL_BASE_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       ipal_base.h
-	@brief      This header file implements public interface to the ip abstraction layer: base services and types 
-	@author     marco.accame@iit.it
-	@date       12/12/2011
+    @brief      This header file implements public interface to the ip abstraction layer: base services and types 
+    @author     marco.accame@iit.it
+    @date       12/12/2011
 **/
 
 /* @defgroup ipal_base IP abstraction layer: base services and types
     cercecvecve.
     
-    @{		
+    @{        
  **/
 
 
@@ -375,6 +378,11 @@ extern ipal_result_t ipal_base_initialise(const ipal_cfg_t *cfg, uint32_t *data0
 /* @}            
     end of group ipal_base  
  **/
+ 
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+
 
 #endif  // include-guard
 

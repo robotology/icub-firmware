@@ -20,17 +20,20 @@
 #ifndef _OSAL_BASE_H_
 #define _OSAL_BASE_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       osal_base.h
-	@brief      This header file implements public interface to the os abstraction layer: base services and types
-	@author     marco.accame@iit.it
-	@date       12/05/2011
+    @brief      This header file implements public interface to the os abstraction layer: base services and types
+    @author     marco.accame@iit.it
+    @date       12/05/2011
 **/
 
 /* @defgroup osal_base OS abstraction layer: base services and types
     The OSAL is an abstraction layer towards a real-time operative system.
     
-    @{		
+    @{        
  **/
 
 
@@ -393,6 +396,10 @@ extern osal_result_t osal_base_initialise(const osal_cfg_t *cfg, uint64_t *data0
 /* @}            
     end of group osal_base  
  **/
+ 
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

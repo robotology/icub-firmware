@@ -64,12 +64,12 @@
 
 const eOcanserv_cfg_t eo_canserv_DefaultCfg = 
 {    
-    .mode                   = eocanserv_mode_ondemand,
-    .canstabilizationtime   = 7*OSAL_reltime1sec,
-    .rxqueuesize            = {64, 64},
-    .txqueuesize            = {64, 64},
-    .onrxcallback           = {NULL, NULL},
-    .onrxargument           = {NULL, NULL}
+    EO_INIT(.mode                   ) eocanserv_mode_ondemand,
+    EO_INIT(.canstabilizationtime   ) 7*OSAL_reltime1sec,
+    EO_INIT(.rxqueuesize            ) {64, 64},
+    EO_INIT(.txqueuesize            ) {64, 64},
+    EO_INIT(.onrxcallback           ) {NULL, NULL},
+    EO_INIT(.onrxargument           ) {NULL, NULL}
 };
 
 
@@ -101,10 +101,10 @@ static eOresult_t s_eo_canserv_SendCommand(EOtheCANservice *p, eOcanprot_descrip
  
 static EOtheCANservice s_eo_canserv_singleton = 
 {    
-    .initted            = eobool_false,
-    .isactive           = {eobool_false, eobool_false},
-	.config             = {.mode = eocanserv_mode_straight, .canstabilizationtime = 0, .rxqueuesize = {0}, .txqueuesize = {0}, .onrxcallback = {NULL}, .onrxargument = {NULL}},
-    .locktilltxall      = {0}
+    EO_INIT(.initted)           eobool_false,
+    EO_INIT(.isactive)          {eobool_false, eobool_false},
+    EO_INIT(.config)           {EO_INIT(.mode) eocanserv_mode_straight, EO_INIT(.canstabilizationtime) 0, EO_INIT(.rxqueuesize ) {0}, EO_INIT(.txqueuesize) {0}, EO_INIT(.onrxcallback) {NULL}, EO_INIT(.onrxargument) {NULL}},
+    EO_INIT(.locktilltxall)     {0}
 };
 
 
@@ -416,7 +416,7 @@ extern eOresult_t eo_canserv_SendCommandToEntity(EOtheCANservice *p, eOcanprot_c
     
     // now i complete the descriptor
     //eOcanport_t port = (eOcanport_t)descriptor.loc.port; 
-    descriptor.cmd.class = command->class;
+    descriptor.cmd.clas = command->clas;
     descriptor.cmd.type = command->type;
     descriptor.cmd.value = command->value;
     
@@ -468,7 +468,7 @@ extern eOresult_t eo_canserv_SendCommandToAllBoardsInEntity(EOtheCANservice *p, 
     
     // now i complete the descriptor
     //eOcanport_t port = (eOcanport_t)descriptor.loc.port; 
-    descriptor.cmd.class = command->class;
+    descriptor.cmd.clas = command->clas;
     descriptor.cmd.type = command->type;
     descriptor.cmd.value = command->value;
         
@@ -726,7 +726,7 @@ static eOresult_t s_eo_canserv_SendCommand(EOtheCANservice *p, eOcanprot_descrip
     if(eores_OK != eo_canprot_Form(eo_canprot_GetHandle(), descriptor, &frame))
     {   // error ...
         errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_formingfailure);
-        errdes.par16                = (descriptor->cmd.class << 8) | (descriptor->cmd.type);
+        errdes.par16                = (descriptor->cmd.clas << 8) | (descriptor->cmd.type);
         errdes.par64                = 0;
         errdes.sourcedevice         = (eOcanport1 == descriptor->loc.port) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
         errdes.sourceaddress        = descriptor->loc.addr;           

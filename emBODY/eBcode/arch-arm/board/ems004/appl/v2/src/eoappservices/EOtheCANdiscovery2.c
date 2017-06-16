@@ -72,8 +72,8 @@
 
 const eOcandiscovery_cfg_t eo_candiscovery_default_cfg = 
 { 
-    .period     = 100*1000, 
-    .timeout    = 3*1000*1000 
+    EO_INIT(.period)        100*1000, 
+    EO_INIT(.timeout)       3*1000*1000 
 };
 
 
@@ -127,27 +127,16 @@ static eObool_t s_eo_isProtocolVersionCompatible(const eObrd_protocolversion_t* 
 
 static EOtheCANdiscovery2 s_eo_thecandiscovery2 = 
 {
-    .initted                            = eobool_false,
-    .config                             = {0},
-    .discoverytimer                     = NULL,
+    EO_INIT(.initted)                           eobool_false,
+    EO_INIT(.config)                            {0},
+    EO_INIT(.discoverytimer)                    NULL,
 
-    .discoverymaxretries                = 10,
+    EO_INIT(.discoverymaxretries)               10,
     
-    .searchstatus                       = {0},
-    .target                             = {0},
-    .onstop                             = {0},
-    .detection                          =
-    {
-        .allhavereplied                 = eobool_false,        
-        .atleastonereplyisincompatible  = eobool_false,
-        .duration                       = 0,
-        .replies                        = {0},
-        .incompatibilities              = {0},
-        .differentboardtype             = {0},
-        .differentfirmwareversion       = {0},
-        .differentprotocolversion       = {0},
-        .boards                         = {0}
-    }
+    EO_INIT(.searchstatus)                      {0},
+    EO_INIT(.target)                            {0},
+    EO_INIT(.onstop)                            {0},
+    EO_INIT(.detection)                         {0}
 };
 
 static const char s_eobj_ownname[] = "EOtheCANdiscovery2";
@@ -366,7 +355,8 @@ extern eObool_t eo_candiscovery2_IsSearchOK(EOtheCANdiscovery2 *p)
         return(eobool_false);
     }   
 
-    eObool_t allboardsareok = (eobool_false == s_eo_thecandiscovery2.detection.incompatibilities) ? (eobool_true) : (eobool_false);
+    uint16_t incompatibilitiesInBothCAN = s_eo_thecandiscovery2.detection.incompatibilities[0] | s_eo_thecandiscovery2.detection.incompatibilities[1];
+    eObool_t allboardsareok = (0x0000 == incompatibilitiesInBothCAN) ? (eobool_true) : (eobool_false);
     
     if((eobool_true == s_eo_thecandiscovery2.detection.allhavereplied) && (eobool_true == allboardsareok))
     {   
@@ -775,7 +765,8 @@ static eObool_t s_eo_candiscovery2_search(void)
             {   // valid addresses are [1, 14]
                 if((eobool_true == eo_common_hlfword_bitcheck(s_eo_thecandiscovery2.target.canmap[i], j)) && (eobool_false == eo_common_hlfword_bitcheck(s_eo_thecandiscovery2.detection.replies[i], j)))
                 {
-                    eObrd_canlocation_t location = {.port = i, .addr = j, .insideindex = eobrd_caninsideindex_none};
+                    eObrd_canlocation_t location = {0};
+                    location.port = i; location.addr = j; location.insideindex = eobrd_caninsideindex_none;
                     s_eo_candiscovery2_getFWversion(s_eo_thecandiscovery2.target.info.type, location, s_eo_thecandiscovery2.target.info.protocol);
                     allFound = eobool_false;
                 }        
@@ -809,7 +800,7 @@ static eOresult_t s_eo_candiscovery2_getFWversion(uint8_t boardtype, eObrd_canlo
         case eobrd_cantype_foc:
         {
             found = eobool_true;
-            command.class = eocanprot_msgclass_pollingMotorControl;
+            command.clas = eocanprot_msgclass_pollingMotorControl;
             command.type  = ICUBCANPROTO_POL_MC_CMD__GET_FIRMWARE_VERSION;            
         } break;
         
@@ -818,7 +809,7 @@ static eOresult_t s_eo_candiscovery2_getFWversion(uint8_t boardtype, eObrd_canlo
         case eobrd_cantype_mtb:
         {
             found = eobool_true;
-            command.class = eocanprot_msgclass_pollingAnalogSensor;
+            command.clas = eocanprot_msgclass_pollingAnalogSensor;
             command.type  = ICUBCANPROTO_POL_AS_CMD__GET_FW_VERSION;         
         } break;
         

@@ -20,6 +20,10 @@
 #ifndef _EESHAREDSERVICES_H_
 #define _EESHAREDSERVICES_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       eEsharedServices.c
@@ -100,7 +104,7 @@ typedef struct                      // 256B
     uint8_t                         page32[32];     //032B
     uint8_t                         page64[64];     //064B
     uint8_t                         page128[128];   //128B
-} ee_sharserv_info_deviceinfo_t;    EECOMMON_VERIFYsizeof(ee_sharserv_info_deviceinfo_t, 256);
+} ee_sharserv_info_deviceinfo_t;    EECOMMON_VERIFYsizeof(ee_sharserv_info_deviceinfo_t, 256)
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
@@ -241,6 +245,9 @@ extern eEresult_t ee_sharserv_info_deviceinfo_item_clr(ee_sharserv_info_devicein
 extern eEresult_t ee_sharserv_info_deviceinfo_item_get(ee_sharserv_info_deviceinfo_item_t item, const void** data);
 extern eEresult_t ee_sharserv_info_deviceinfo_item_set(ee_sharserv_info_deviceinfo_item_t item, const void* data);
 
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

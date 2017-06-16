@@ -21,6 +21,8 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
+#include "EOtheServices_hid.h"
+
 #include "stdlib.h"
 #include "string.h"
 
@@ -97,38 +99,40 @@ static void s_eo_mais_send_diagnostic_on_transmissioninterruption(void);
 
 static EOtheMAIS s_eo_themais = 
 {
-    .service = 
+    EO_INIT(.service) 
     {
-        .servconfig             = { .type = eomn_serv_NONE },
-        .initted                = eobool_false,
-        .active                 = eobool_false,
-        .activateafterverify    = eobool_false,
-        .started                = eobool_false,
-        .onverify               = NULL,
-        .state                  = eomn_serv_state_notsupported
+        EO_INIT(.initted)               eobool_false,
+        EO_INIT(.active)                eobool_false,
+        EO_INIT(.activateafterverify)   eobool_false,
+        EO_INIT(.started)               eobool_false,
+        EO_INIT(.onverify)              NULL,
+        EO_INIT(.state)                 eomn_serv_state_notsupported,
+        EO_INIT(.tmpcfg)                NULL,
+        EO_INIT(.servconfig)            { EO_INIT(.type) eomn_serv_NONE },
     },
-    .diagnostics = 
+    EO_INIT(.diagnostics) 
     {
-        .reportTimer            = NULL,
-        .reportPeriod           = 0, // 10*EOK_reltime1sec, // with 0 we dont periodically report
-        .errorDescriptor        = {0},
-        .errorType              = eo_errortype_info,
-        .errorCallbackCount     = 0, 
-        .repetitionOKcase       = 0 // 10 // with 0 we transmit report only once at succesful activation
+        EO_INIT(.reportTimer)           NULL,
+        EO_INIT(.reportPeriod)          0, // 10*EOK_reltime1sec, // with 0 we dont periodically report
+        EO_INIT(.errorDescriptor)       {0},
+        EO_INIT(.errorType)             eo_errortype_info,
+        EO_INIT(.errorCallbackCount)    0, 
+        EO_INIT(.repetitionOKcase)      0 // 10 // with 0 we transmit report only once at succesful activation
     },     
-    .sharedcan =
+    EO_INIT(.sharedcan)
     {
-        .boardproperties        = NULL,
-        .entitydescriptor       = NULL,
-        .discoverytarget        = {0},
-        .ondiscoverystop        = {0},
-        .command                = {0}, 
-    },    
+        EO_INIT(.boardproperties)       NULL,
+        EO_INIT(.entitydescriptor)      NULL,
+        EO_INIT(.discoverytarget)       {0},
+        EO_INIT(.ondiscoverystop)       {0},
+        EO_INIT(.command)               {0}, 
+    },   
 
-    .id32                       = eo_prot_ID32dummy,  
-    .mais                       = NULL,
-    .id32ofregulars             = NULL,
-    .numberofowners             = 0    
+    EO_INIT(.id32)                      eo_prot_ID32dummy,  
+    EO_INIT(.mais)                      NULL,
+    EO_INIT(.id32ofregulars)            NULL,
+    EO_INIT(.numberofowners)            0,
+    EO_INIT(.watchdog)                  NULL
 };
 
 static const char s_eobj_ownname[] = "EOtheMAIS";
@@ -161,16 +165,12 @@ extern EOtheMAIS* eo_mais_Initialise(void)
     p->id32ofregulars = eo_array_New(mais_maxRegulars, sizeof(uint32_t), NULL);
     p->numberofowners = 0;
     
-     eOwatchdog_cfg_t wd_cfg =
-    {
-        .diagncfg = 
-        {
-            .numoffailures = 40000,
-            .functiononfailure = s_eo_mais_send_diagnostic_on_transmissioninterruption,
-        },
-        .period = 10 /*deafult transmission period of mais*/  *100 /*convert in microsec*/ *10 /*before signal error i would wait 10 times mais transmission period*/
+    eOwatchdog_cfg_t wd_cfg = {0};
+    wd_cfg.diagncfg.numoffailures = 40000;
+    wd_cfg.diagncfg.functiononfailure = s_eo_mais_send_diagnostic_on_transmissioninterruption;
+    //wd_cfg.period = 10 /*deafult transmission period of mais*/  *100 /*convert in microsec*/ *10 /*before signal error i would wait 10 times mais transmission period*/;
+    wd_cfg.period = 10*1000*10; // marco.accame ... there are 1000 usec in 1 ms.
     
-    };
     p->watchdog = eo_watchdog_new(&wd_cfg);
     
     p->diagnostics.reportTimer = eo_timer_New();
@@ -451,23 +451,26 @@ extern eOresult_t eo_mais_Activate(EOtheMAIS *p, const eOmn_serv_configuration_t
             
         
         // now... use the servcfg
-        eObrd_canproperties_t prop = 
-        {
-            .type               = eobrd_cantype_mais, 
-            .location           = { .port = servcfg->data.as.mais.canloc.port, .addr = servcfg->data.as.mais.canloc.addr, .insideindex = eobrd_caninsideindex_none },
-            .requiredprotocol   = { .major = servcfg->data.as.mais.version.protocol.major, .minor = servcfg->data.as.mais.version.protocol.minor }
-        };       
+        eObrd_canproperties_t prop = {0};
+        prop.type = eobrd_cantype_mais;
+        prop.location.port = servcfg->data.as.mais.canloc.port;
+        prop.location.addr = servcfg->data.as.mais.canloc.addr;
+        prop.location.insideindex = eobrd_caninsideindex_none;
+        prop.requiredprotocol.major = servcfg->data.as.mais.version.protocol.major;
+        prop.requiredprotocol.minor = servcfg->data.as.mais.version.protocol.minor;
+        
         eo_vector_PushBack(p->sharedcan.boardproperties, &prop);
         
         // load the can mapping ... make an UnloadBoards()
         eo_canmap_LoadBoards(eo_canmap_GetHandle(), p->sharedcan.boardproperties); 
         
         // load the entity mapping.
-        eOcanmap_entitydescriptor_t des = 
-        {
-            .location   = { .port = servcfg->data.as.mais.canloc.port, .addr = servcfg->data.as.mais.canloc.addr, .insideindex = eobrd_caninsideindex_none },
-            .index      = entindex00 // we have only one mais
-        };
+        eOcanmap_entitydescriptor_t des = {0};
+        des.location.port = servcfg->data.as.mais.canloc.port;
+        des.location.addr = servcfg->data.as.mais.canloc.addr;
+        des.location.insideindex = eobrd_caninsideindex_none;
+        des.index = entindex00; // we have only one mais        
+        
         eo_vector_PushBack(p->sharedcan.entitydescriptor, &des);
         
         eo_canmap_ConfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_analogsensors, eoprot_entity_as_mais, p->sharedcan.entitydescriptor);   
@@ -689,7 +692,7 @@ extern eOresult_t eo_mais_SetMode(EOtheMAIS *p, eOas_maismode_t mode)
 //    }     
 
     // ok, now we do something.
-    p->sharedcan.command.class = eocanprot_msgclass_pollingAnalogSensor;
+    p->sharedcan.command.clas = eocanprot_msgclass_pollingAnalogSensor;
     p->sharedcan.command.type  = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE;
     p->sharedcan.command.value = &mode;
     
@@ -728,16 +731,16 @@ extern eOresult_t eo_mais_SetDataRate(EOtheMAIS *p, uint8_t datarate)
 
     // ok, now we do something.     
  
-    p->sharedcan.command.class = eocanprot_msgclass_pollingAnalogSensor;
+    p->sharedcan.command.clas = eocanprot_msgclass_pollingAnalogSensor;
     p->sharedcan.command.type  = ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE;
     p->sharedcan.command.value = &datarate;
     
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &p->sharedcan.command, p->id32);    
     
     
-    eo_watchdog_updateconfigperiod(p->watchdog, datarate*10*100); //I multiply *10 ==> so I wait a period ten tiems bigger than datarate befor signal error
-                                                                               //I multiply *100 ==> datarate is in millisec while period is in microsecs.
-    
+//    eo_watchdog_updateconfigperiod(p->watchdog, datarate*10*100); //I multiply *10 ==> so I wait a period ten tiems bigger than datarate befor signal error
+//                                                                               //I multiply *100 ==> datarate is in millisec while period is in microsecs.
+    eo_watchdog_updateconfigperiod(p->watchdog, datarate*10*1000);; // marco.accame ... there are 1000 usec in 1 ms.
     return(eores_OK);  
 }
 
@@ -763,7 +766,7 @@ extern eOresult_t eo_mais_SetResolution(EOtheMAIS *p, eOas_maisresolution_t reso
 
     // ok, now we do something.     
  
-    p->sharedcan.command.class = eocanprot_msgclass_pollingAnalogSensor;
+    p->sharedcan.command.clas = eocanprot_msgclass_pollingAnalogSensor;
     p->sharedcan.command.type  = ICUBCANPROTO_POL_AS_CMD__SET_RESOLUTION;
     p->sharedcan.command.value = &resolution;
     
@@ -818,7 +821,7 @@ extern eObool_t eo_mais_isAlive(EOtheMAIS *p)
 
 extern void eoprot_fun_INIT_as_mais_config(const EOnv* nv)
 {
-    eOas_mais_config_t* maiscfg = eo_nv_RAM(nv);
+    eOas_mais_config_t* maiscfg = (eOas_mais_config_t*) eo_nv_RAM(nv);
     
     maiscfg->datarate = 10;
     maiscfg->mode = eoas_maismode_txdatacontinuously;
@@ -828,7 +831,7 @@ extern void eoprot_fun_INIT_as_mais_config(const EOnv* nv)
 
 extern void eoprot_fun_INIT_as_mais_status(const EOnv* nv)
 {
-    eOas_mais_status_t *status = eo_nv_RAM(nv);  
+    eOas_mais_status_t *status = (eOas_mais_status_t*) eo_nv_RAM(nv);  
     
     // marco.accame: i init as for eoas_maisresolution_08 
     //               the array the15values can be initted for size 0 or 15 as i now use teh proper eo_array_Assign() method

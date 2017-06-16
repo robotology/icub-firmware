@@ -20,17 +20,20 @@
 #ifndef _OSAL_EVENTFLAG_H_
 #define _OSAL_EVENTFLAG_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       osal_eventflag.h
-	@brief      This header file implements public interface to the os abstraction layer: event flag
-	@author     marco.accame@iit.it
-	@date       12/05/2011
+    @brief      This header file implements public interface to the os abstraction layer: event flag
+    @author     marco.accame@iit.it
+    @date       12/05/2011
 **/
 
 /* @defgroup osal_eventflag OS abstraction layer: event flag
     cecercer
     
-    @{		
+    @{        
  **/
 
 
@@ -107,6 +110,10 @@ extern osal_eventflag_t osal_eventflag_getany(osal_reltime_t tout);
 /* @}            
     end of group osal_eventflag  
  **/
+ 
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

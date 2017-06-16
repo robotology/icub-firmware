@@ -20,6 +20,9 @@
 #ifndef _SHALINFO_H_
 #define _SHALINFO_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 /** @file       shalINFO.h
     @brief      This header file implements public interface to the shalINFO library.
@@ -89,7 +92,7 @@ typedef struct                  // 256B
     uint8_t                     page32[32];     //032B
     uint8_t                     page64[64];     //064B
     uint8_t                     page128[128];   //128B
-} shalinfo_deviceinfo_t;        EECOMMON_VERIFYsizeof(shalinfo_deviceinfo_t, 256);
+} shalinfo_deviceinfo_t;        EECOMMON_VERIFYsizeof(shalinfo_deviceinfo_t, 256)
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
@@ -133,6 +136,10 @@ extern eEresult_t shalinfo_deviceinfo_part_set(shalinfo_deviceinfo_part_t part, 
 /** @}            
     end of group shal_info 
  **/
+ 
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

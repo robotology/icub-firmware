@@ -21,6 +21,10 @@
 #ifndef _HAL_WATCHDOG_H_
 #define _HAL_WATCHDOG_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       hal_watchdog.h
@@ -124,6 +128,10 @@ extern hal_result_t hal_watchdog_refresh(hal_watchdog_t id);
 /** @}            
     end of group hal_watchdog  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

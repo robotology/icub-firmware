@@ -22,7 +22,9 @@
 #ifndef _EOTHEENCODERREADER_HID_H_
 #define _EOTHEENCODERREADER_HID_H_
 
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
 // - external dependencies --------------------------------------------------------------------------------------------
@@ -51,13 +53,12 @@ struct EOtheEncoderReader_hid
     eOservice_core_t                        service;
     eOservice_diagnostics_t                 diagnostics;
     
-    eOmc_arrayof_4jomodescriptors_t    arrayofjomodes;
-
+    eOmc_arrayof_4jomodescriptors_t         arrayofjomodes;
     EOtimer*                                waitreadtimer;
     uint8_t                                 numofjomos;
     uint8_t                                 numofencoders;
-    eOencoderreader_errortype_t             errors[eOappEncReader_jomos_maxnumberof];
-    uint8_t                                 failuremask;
+    uint8_t                                 failuremask2[2];
+    eOencoderreader_errortype_t             errors2[2][eOappEncReader_jomos_maxnumberof];
     EOappEncReader*                         reader;
 }; 
 
@@ -66,7 +67,11 @@ struct EOtheEncoderReader_hid
 // empty section
 
 
-#endif  // include guard
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

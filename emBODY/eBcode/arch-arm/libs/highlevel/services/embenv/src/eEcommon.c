@@ -22,6 +22,11 @@
     @date       11/20/2013
 **/
 
+
+//#ifdef __cplusplus                                          
+//#warning ::: __cplusplus is defined: this file is COMPILED IN C++ MODE           
+//#endif
+
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
@@ -29,8 +34,6 @@
 
 #include "stdint.h"
 #include "string.h"
-
-
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -82,8 +85,6 @@
 
 extern eEresult_t ee_common_ipnetwork_clr(eEipnetwork_t* ntw, uint64_t uniqueid)
 {
-//     uint8_t ip3 = uniqueid & 0xff;
-//     uint8_t ip4 = (uniqueid>>8) & 0xff;
     const uint8_t ip3 = EECOMMON_ipaddr_def3;
     const uint8_t ip4 = EECOMMON_ipaddr_def4;    
     if(NULL == ntw)

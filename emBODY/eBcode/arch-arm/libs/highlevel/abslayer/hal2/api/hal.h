@@ -21,6 +21,10 @@
 #ifndef _HAL_H_
 #define _HAL_H_
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // - doxy begin -------------------------------------------------------------------------------------------------------
 
 /** @file       hal.h
@@ -103,6 +107,10 @@
 /** @}            
     end of group doxy_group_hal  
  **/
+
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include-guard
 

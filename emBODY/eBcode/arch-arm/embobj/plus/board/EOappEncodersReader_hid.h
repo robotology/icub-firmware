@@ -23,6 +23,10 @@
 #define _EOAPPENCODERSREADER_HID_H_
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+    
 // - doxy -------------------------------------------------------------------------------------------------------------
 /* @file       EOappEncodersReader.h
     @brief     This file provides hidden interface to encodersReader obj.
@@ -77,7 +81,6 @@ typedef struct
 } eOappEncReader_hallAdc_conversionData_t;
 
 
-enum { AEAerror_NONE = 0,  AEAerror_SPI = 1, AEAerror_CRC = 2, AEAerror_CHIP = 3 }; // it goes inside each nibble of par16 
 typedef struct
 {   // so far only for AEA and primary encoder
     uint8_t             jomomask;
@@ -91,8 +94,8 @@ typedef struct
 typedef struct
 {   // so far only for AEA and primary encoder
     eo_appEncReader_diagnostics_cfg_t       config;
-    uint64_t                                par64;
-    uint16_t                                par16;
+    uint64_t                                par64[2];
+    uint16_t                                par16[2];
 } eo_appEncReader_diagnostics_t;
 
 
@@ -105,7 +108,7 @@ struct EOappEncReader_hid
     eOappEncReader_cfg_t                    config;       
     eOappEncReader_stream_t                 SPI_streams[hal_spiencoder_streams_number];  // SPI streams; must be coherent with what inside cfg
     eo_appEncReader_diagnostics_t           diagnostics;
-    float                                   maisCoversionFactors[eOappEncReader_jomos_maxnumberof];
+    float                                   maisConversionFactors[eOappEncReader_jomos_maxnumberof];
     eOappEncReader_hallAdc_conversionData_t hallAdcConversionData;
 }; 
 
@@ -113,6 +116,9 @@ struct EOappEncReader_hid
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 // empty-section
 
+#ifdef __cplusplus
+}       // closing brace for extern "C"
+#endif 
 
 #endif  // include guard
 
