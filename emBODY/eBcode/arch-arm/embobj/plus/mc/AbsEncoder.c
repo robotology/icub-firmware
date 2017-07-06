@@ -301,6 +301,7 @@ static void AbsEncoder_position_init(AbsEncoder* o, uint16_t position)
     switch(o->type)
     {
         case eomc_enc_aea:
+        case eomc_enc_amo:
             AbsEncoder_position_init_aea(o, position);
             break;
         
