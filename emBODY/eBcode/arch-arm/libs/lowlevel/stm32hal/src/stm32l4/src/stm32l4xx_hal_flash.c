@@ -2,8 +2,8 @@
   ******************************************************************************
   * @file    stm32l4xx_hal_flash.c
   * @author  MCD Application Team
-  * @version V1.6.0 
-  * @date    28-October-2016
+  * @version V1.7.2 
+  * @date    16-June-2017
   * @brief   FLASH HAL module driver.
   *          This file provides firmware functions to manage the following 
   *          functionalities of the internal FLASH memory:
@@ -77,7 +77,7 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; COPYRIGHT(c) 2016 STMicroelectronics</center></h2>
+  * <h2><center>&copy; COPYRIGHT(c) 2017 STMicroelectronics</center></h2>
   *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted provided that the following conditions are met:
@@ -319,7 +319,8 @@ void HAL_FLASH_IRQHandler(void)
 
   /* If the operation is completed, disable the PG, PNB, MER1, MER2 and PER Bit */
   CLEAR_BIT(FLASH->CR, (FLASH_CR_PG | FLASH_CR_MER1 | FLASH_CR_PER | FLASH_CR_PNB));
-#if defined (STM32L471xx) || defined (STM32L475xx) || defined (STM32L476xx) || defined (STM32L485xx) || defined (STM32L486xx)
+#if defined (STM32L471xx) || defined (STM32L475xx) || defined (STM32L476xx) || defined (STM32L485xx) || defined (STM32L486xx) || \
+    defined (STM32L496xx) || defined (STM32L4A6xx)
   CLEAR_BIT(FLASH->CR, FLASH_CR_MER2);
 #endif
   
@@ -336,7 +337,7 @@ void HAL_FLASH_IRQHandler(void)
      (__HAL_FLASH_GET_FLAG(FLASH_FLAG_MISERR)) || (__HAL_FLASH_GET_FLAG(FLASH_FLAG_FASTERR)) || 
      (__HAL_FLASH_GET_FLAG(FLASH_FLAG_RDERR))  || (__HAL_FLASH_GET_FLAG(FLASH_FLAG_OPTVERR)) ||
 #if defined (STM32L431xx) || defined (STM32L432xx) || defined (STM32L433xx) || defined (STM32L442xx) || defined (STM32L443xx) || \
-    defined (STM32L451xx) || defined (STM32L452xx) || defined (STM32L462xx)
+    defined (STM32L451xx) || defined (STM32L452xx) || defined (STM32L462xx) || defined (STM32L496xx) || defined (STM32L4A6xx)
      (__HAL_FLASH_GET_FLAG(FLASH_FLAG_ECCD))   || (__HAL_FLASH_GET_FLAG(FLASH_FLAG_PEMPTY)))
 #else
      (__HAL_FLASH_GET_FLAG(FLASH_FLAG_ECCD)))
@@ -499,6 +500,12 @@ __weak void HAL_FLASH_OperationErrorCallback(uint32_t ReturnValue)
   */
 HAL_StatusTypeDef HAL_FLASH_Unlock(void)
 {
+
+#if defined(STM32L451xx) || defined(STM32L452xx) || defined(STM32L462xx)
+  /* Clear OPTVERR bit when initially improperly raised */
+  __HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_OPTVERR); 
+#endif
+
   if(READ_BIT(FLASH->CR, FLASH_CR_LOCK) != RESET)
   {
     /* Authorize the FLASH Registers access */
@@ -641,13 +648,13 @@ HAL_StatusTypeDef FLASH_WaitForLastOperation(uint32_t Timeout)
      Even if the FLASH operation fails, the BUSY flag will be reset and an error
      flag will be set */
     
-  uint32_t timeout = HAL_GetTick() + Timeout;
+  uint32_t tickstart = HAL_GetTick();
      
   while(__HAL_FLASH_GET_FLAG(FLASH_FLAG_BSY)) 
   { 
     if(Timeout != HAL_MAX_DELAY)
     {
-      if(HAL_GetTick() >= timeout)
+      if((HAL_GetTick() - tickstart) >= Timeout)
       {
         return HAL_TIMEOUT;
       }
@@ -660,7 +667,7 @@ HAL_StatusTypeDef FLASH_WaitForLastOperation(uint32_t Timeout)
      (__HAL_FLASH_GET_FLAG(FLASH_FLAG_MISERR)) || (__HAL_FLASH_GET_FLAG(FLASH_FLAG_FASTERR)) || 
      (__HAL_FLASH_GET_FLAG(FLASH_FLAG_RDERR))  || (__HAL_FLASH_GET_FLAG(FLASH_FLAG_OPTVERR)) ||
 #if defined (STM32L431xx) || defined (STM32L432xx) || defined (STM32L433xx) || defined (STM32L442xx) || defined (STM32L443xx) || \
-    defined (STM32L451xx) || defined (STM32L452xx) || defined (STM32L462xx)
+    defined (STM32L451xx) || defined (STM32L452xx) || defined (STM32L462xx) || defined (STM32L496xx) || defined (STM32L4A6xx)
      (__HAL_FLASH_GET_FLAG(FLASH_FLAG_ECCD))   || (__HAL_FLASH_GET_FLAG(FLASH_FLAG_PEMPTY)))
 #else
      (__HAL_FLASH_GET_FLAG(FLASH_FLAG_ECCD)))
@@ -745,7 +752,7 @@ static void FLASH_SetErrorCode(void)
   }
 
 #if defined (STM32L431xx) || defined (STM32L432xx) || defined (STM32L433xx) || defined (STM32L442xx) || defined (STM32L443xx) || \
-    defined (STM32L451xx) || defined (STM32L452xx) || defined (STM32L462xx)
+    defined (STM32L451xx) || defined (STM32L452xx) || defined (STM32L462xx) || defined (STM32L496xx) || defined (STM32L4A6xx)
   if(__HAL_FLASH_GET_FLAG(FLASH_FLAG_PEMPTY))
   { 
     pFlash.ErrorCode |= HAL_FLASH_ERROR_PEMPTY;

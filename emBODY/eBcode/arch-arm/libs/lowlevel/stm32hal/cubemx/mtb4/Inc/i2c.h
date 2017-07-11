@@ -4,6 +4,11 @@
   * Description        : This file provides code for the configuration
   *                      of the I2C instances.
   ******************************************************************************
+  ** This notice applies to any and all portions of this file
+  * that are not between comment pairs USER CODE BEGIN and
+  * USER CODE END. Other portions of this file, whether 
+  * inserted by the user or by software development tools
+  * are owned by their respective copyright owners.
   *
   * COPYRIGHT(c) 2017 STMicroelectronics
   *
@@ -53,7 +58,7 @@ extern I2C_HandleTypeDef hi2c2;
 
 /* USER CODE END Private defines */
 
-extern void Error_Handler(void);
+extern void _Error_Handler(char *, int);
 
 void MX_I2C1_Init(void);
 void MX_I2C2_Init(void);

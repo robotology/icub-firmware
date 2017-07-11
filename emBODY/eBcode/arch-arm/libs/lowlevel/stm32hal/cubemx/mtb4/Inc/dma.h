@@ -4,6 +4,11 @@
   * Description        : This file contains all the function prototypes for
   *                      the dma.c file
   ******************************************************************************
+  ** This notice applies to any and all portions of this file
+  * that are not between comment pairs USER CODE BEGIN and
+  * USER CODE END. Other portions of this file, whether 
+  * inserted by the user or by software development tools
+  * are owned by their respective copyright owners.
   *
   * COPYRIGHT(c) 2017 STMicroelectronics
   *
@@ -44,7 +49,7 @@
 #include "main.h"
 
 /* DMA memory to memory transfer handles -------------------------------------*/
-extern void Error_Handler(void);
+extern void _Error_Handler(char*, int);
 
 /* USER CODE BEGIN Includes */
 

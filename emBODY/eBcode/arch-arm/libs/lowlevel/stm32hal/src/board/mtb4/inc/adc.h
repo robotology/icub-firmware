@@ -4,6 +4,11 @@
   * Description        : This file provides code for the configuration
   *                      of the ADC instances.
   ******************************************************************************
+  ** This notice applies to any and all portions of this file
+  * that are not between comment pairs USER CODE BEGIN and
+  * USER CODE END. Other portions of this file, whether 
+  * inserted by the user or by software development tools
+  * are owned by their respective copyright owners.
   *
   * COPYRIGHT(c) 2017 STMicroelectronics
   *
@@ -43,7 +48,7 @@
 #if defined(USE_STM32HAL)
     #include "stm32hal.h"
 #else
-    #include "stm32l4xx_hal.h"
+#include "stm32l4xx_hal.h"
 #endif
 #include "main.h"
 
@@ -57,7 +62,7 @@ extern ADC_HandleTypeDef hadc1;
 
 /* USER CODE END Private defines */
 
-extern void Error_Handler(void);
+extern void _Error_Handler(char *, int);
 
 void MX_ADC1_Init(void);
 
