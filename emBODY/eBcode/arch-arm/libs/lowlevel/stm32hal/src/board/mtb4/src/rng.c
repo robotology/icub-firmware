@@ -66,7 +66,7 @@ void HAL_RNG_MspInit(RNG_HandleTypeDef* rngHandle)
   /* USER CODE BEGIN RNG_MspInit 0 */
 
   /* USER CODE END RNG_MspInit 0 */
-    /* Peripheral clock enable */
+    /* RNG clock enable */
     __HAL_RCC_RNG_CLK_ENABLE();
   /* USER CODE BEGIN RNG_MspInit 1 */
 

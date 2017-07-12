@@ -80,7 +80,7 @@ void HAL_CAN_MspInit(CAN_HandleTypeDef* canHandle)
   /* USER CODE BEGIN CAN1_MspInit 0 */
 
   /* USER CODE END CAN1_MspInit 0 */
-    /* Peripheral clock enable */
+    /* CAN1 clock enable */
     __HAL_RCC_CAN1_CLK_ENABLE();
   
     /**CAN1 GPIO Configuration    
