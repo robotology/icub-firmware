@@ -61,8 +61,17 @@ namespace embot { namespace hw { namespace flash {
     const std::uint32_t startOfFLASH            = 0x08000000;
     const std::uint32_t sizeOfFLASH             = 256*1024;
     const std::uint32_t sizeOfPAGE              = 2*1024;
-    const std::uint32_t maxNumOfPAGEs           = 128;     
+    const std::uint32_t maxNumOfPAGEs           = 128;    
     
+#elif   defined(STM32HAL_BOARD_STRAIN2)
+
+    const std::uint32_t startOfFLASH            = 0x08000000;
+    const std::uint32_t sizeOfFLASH             = 256*1024;
+    const std::uint32_t sizeOfPAGE              = 2*1024;
+    const std::uint32_t maxNumOfPAGEs           = 128;     
+
+#else
+    #error embot::hw::flash::startOfFLASH etc must be defined 
 #endif    
     
     bool isaddressvalid(std::uint32_t address)

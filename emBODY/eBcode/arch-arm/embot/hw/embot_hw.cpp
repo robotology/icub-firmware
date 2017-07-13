@@ -118,8 +118,20 @@ namespace embot { namespace hw { namespace led {
         }        
     };
 
+    #elif   defined(STM32HAL_BOARD_STRAIN2)
+    
+    static const bspmap_t bspmap = 
+    {
+        0x00000000,
+        GPIO_PIN_RESET, GPIO_PIN_SET,
+        {
+            {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, 
+            {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}
+        }        
+    };
+    
     #else
-        #warning embot::hw::led::mask and embot::hw::led::gpiomap[] must be filled    
+        #error embot::hw::led::mask and embot::hw::led::gpiomap[] must be filled    
     #endif
       
     // initialised mask
@@ -247,6 +259,17 @@ namespace embot { namespace hw { namespace button {
     };    
 
     #elif   defined(STM32HAL_BOARD_MTB4)
+    
+    static const bspmap_t bspmap = 
+    {
+        0x00000000,
+        GPIO_PIN_RESET,
+        {
+            {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}
+        }        
+    };
+
+    #elif   defined(STM32HAL_BOARD_STRAIN2)
     
     static const bspmap_t bspmap = 
     {

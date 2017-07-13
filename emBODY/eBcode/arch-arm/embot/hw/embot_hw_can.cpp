@@ -112,8 +112,15 @@ namespace embot { namespace hw { namespace can {
         0x00000001
     };
 
+    #elif   defined(STM32HAL_BOARD_STRAIN2)
+    
+    static const bspmap_t bspmap = 
+    {
+        0x00000001
+    };
+
     #else
-        #warning embot::hw::can::bspmask must be filled    
+        #error embot::hw::can::bspmask must be filled    
     #endif
       
     // initialised mask       
