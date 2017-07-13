@@ -24,7 +24,13 @@ extern "C" {
     // we also need some ll includes
     #include "../src/stm32l4/inc/stm32l4xx_ll_gpio.h"
     
-
+#elif   defined(STM32HAL_BOARD_STRAIN2)
+    
+    // IIT-EXT path is referred to stm32hal/api
+    #include "../src/board/strain2/inc/stm32l4xx_hal_conf_strain2.h"   
+    // we also need some ll includes
+    #include "../src/stm32l4/inc/stm32l4xx_ll_gpio.h"
+    
 #else
     
         #error pls define a BOARD
