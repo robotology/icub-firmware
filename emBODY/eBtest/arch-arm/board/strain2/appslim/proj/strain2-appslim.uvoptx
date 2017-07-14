@@ -200,6 +200,38 @@
           <ExecCommand></ExecCommand>
           <Expression></Expression>
         </Bp>
+        <Bp>
+          <Number>3</Number>
+          <Type>0</Type>
+          <LineNumber>197</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>0</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>0</BreakIfRCount>
+          <Filename>..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\startup\stm32hal.startup.strain2.s</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
+        <Bp>
+          <Number>4</Number>
+          <Type>0</Type>
+          <LineNumber>199</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>0</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>0</BreakIfRCount>
+          <Filename>..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\startup\stm32hal.startup.strain2.s</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
       </Breakpoint>
       <WatchWindow1>
         <Ww>
@@ -424,34 +456,34 @@
         <Bp>
           <Number>1</Number>
           <Type>0</Type>
-          <LineNumber>130</LineNumber>
+          <LineNumber>197</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134235678</Address>
+          <Address>134218308</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>../src/main-application.cpp</Filename>
+          <Filename>..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\startup\stm32hal.startup.strain2.s</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\strain2\../src/main-application.cpp\130</Expression>
+          <Expression>\\strain2\../../../../../../eBcode/arch-arm/libs/lowlevel/stm32hal/startup/stm32hal.startup.strain2.s\197</Expression>
         </Bp>
         <Bp>
           <Number>2</Number>
           <Type>0</Type>
-          <LineNumber>144</LineNumber>
+          <LineNumber>199</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134235740</Address>
+          <Address>134218312</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>../src/main-application.cpp</Filename>
+          <Filename>..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\startup\stm32hal.startup.strain2.s</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\strain2\../src/main-application.cpp\144</Expression>
+          <Expression>\\strain2\../../../../../../eBcode/arch-arm/libs/lowlevel/stm32hal/startup/stm32hal.startup.strain2.s\199</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
