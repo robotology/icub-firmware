@@ -31,22 +31,66 @@
 
 namespace embot { namespace app { namespace canprotocol {
     
-    enum class Clas { pollingMotorControl = 0, periodicMotorControl = 1, pollingAnalogSensor = 2, periodicAnalogSensor = 3, periodicSkin = 4, periodicInertialSensor = 5, bootloader = 7, none = 255 };
-
-    enum class bldrCMD { none = 0xfe, BROADCAST = 0xff, BOARD = 0x00, ADDRESS = 0x01, START = 0x02, DATA = 0x03, END = 0x04, GET_ADDITIONAL_INFO = 12, SET_ADDITIONAL_INFO = 13, SETCANADDRESS = 0x32 };
+    enum class Clas { none = 0xfe, pollingMotorControl = 0, periodicMotorControl = 1, pollingAnalogSensor = 2, periodicAnalogSensor = 3, periodicSkin = 4, periodicInertialSensor = 5, bootloader = 7 };
     
     enum class anypollCMD { none = 0xfe, SETID = 0x32 };
     
+    // Clas::pollingMotorControl (0)
     enum class mcpollCMD { none = 0xfe, SET_BOARD_ID = 50, GET_FIRMWARE_VERSION = 91, };
     
-    enum class aspollCMD { none = 0xfe, SET_TXMODE = 0x07, GET_FIRMWARE_VERSION = 0x1C, SET_BOARD_ADX = 0x32, SKIN_SET_BRD_CFG = 77, ACC_GYRO_SETUP = 79, SKIN_SET_TRIANG_CFG = 80 };
+    // Clas::periodicMotorControl (1)
+    enum class mcperCMD { none = 0xfe, PRINT = 6 };
+
+  
+    // Clas::pollingAnalogSensor (2)
+    enum class aspollCMD {  none = 0xfe, 
+                            SET_TXMODE = 0x07, GET_FIRMWARE_VERSION = 0x1C, SET_BOARD_ADX = 0x32,                           // basic
+                            SKIN_SET_BRD_CFG = 77, ACC_GYRO_SETUP = 79, SKIN_SET_TRIANG_CFG = 80,                           // skin         
+                            SET_CANDATARATE = 0x08,                                                                         // strain, mais  
+                            GET_FULL_SCALES = 0x18,                                                                         // strain   
+                            SET_FULL_SCALES = 0x17,                                                                         // strain canloader  
+                            SAVE2EE = 0x09, GET_EEPROM_STATUS = 0x1B,                                                       // strain canloader
+                            SET_SERIAL_NO = 0x19, GET_SERIAL_NO = 0x1A,                                                     // strain canloader
+                            GET_AMP_GAIN = 0x1D, SET_AMP_GAIN = 0x1E,                                                       // 6sg ... sg6_get_amp_gain(), sg6_set_amp_gain()
+                            GET_CH_ADC = 0x0C,                                                                              // strain canloader
+                            SET_CH_DAC_offset = 0x04, GET_CH_DAC_offset = 0x0B,                                             // strain canloader
+                            SET_MATRIX_RC = 0x03, GET_MATRIX_RC = 0x0A,                                                     // strain canloader
+                            SET_MATRIX_G = 0x11, GET_MATRIX_G = 0x12,                                                       // strain canloader                                               
+                            SET_CALIB_TARE_bias = 0x13, GET_CALIB_TARE_bias = 0x14,                                         // strain canloader 
+                            SET_CURR_TARE_bias = 0x15, GET_CURR_TARE_bias = 0x16,                                           // strain canloader 
+
+    // TBD: ... maybe not for strain2                    
+                            SET_RESOLUTION = 0x10                                                                           // mais
+    };
     
-    enum class mcperCMD { PRINT = 6 };
+    // missing opcodes from ems application and from canloader are:
+    // SET_IIR = 0x01
+    // SELECT_ACTIVE_CH = 0x05
+    // FILTER_EN = 0x0D
+    // MUX_EN = 0x0E
+    // MUX_NUM = 0x0F
+    // 
     
-    enum class skperCMD { TRG00 = 0, TRG01 = 1, TRG02 = 2, TRG03 = 3, TRG04 = 4, TRG05 = 5, TRG06 = 6, TRG07 = 7, TRG08 = 8, TRG09 = 9, 
+
+    // Clas::periodicAnalogSensor (3) 
+    enum class asperCMD {   none = 0xfe, 
+                            DONTUSEIT_DIGITAL_GYROSCOPE = 0, DONTUSEIT_DIGITAL_ACCELEROMETER = 1,        
+                            UNCALIBFORCE_VECTOR_DEBUGMODE = 0x08, UNCALIBTORQUE_VECTOR_DEBUGMODE = 0x09,                    // strain 
+                            FORCE_VECTOR = 0x0A, TORQUE_VECTOR = 0x0B,                                                      // strain
+    // TBD: ... maybe not for strain2       
+                            HES0TO6 = 0x0C, HES7TO14 = 0x0D                                                                 // mais
+    };
+    
+    // Clas::periodicSkin (4) 
+    enum class skperCMD { none = 0xfe, TRG00 = 0, TRG01 = 1, TRG02 = 2, TRG03 = 3, TRG04 = 4, TRG05 = 5, TRG06 = 6, TRG07 = 7, TRG08 = 8, TRG09 = 9, 
                           TRG10 = 10, TRG11 = 11, TRG12 = 12, TRG13 = 13, TRG14 = 14, TRG15 = 15 };
     
-    enum class isperCMD { DIGITAL_GYROSCOPE = 0, DIGITAL_ACCELEROMETER = 1 };
+    // Clas::periodicInertialSensor (5) 
+    enum class isperCMD { none = 0xfe, DIGITAL_GYROSCOPE = 0, DIGITAL_ACCELEROMETER = 1 };
+    
+    // Clas::bootloader (7)    
+    enum class bldrCMD { none = 0xfe, BROADCAST = 0xff, BOARD = 0x00, ADDRESS = 0x01, START = 0x02, DATA = 0x03, END = 0x04, GET_ADDITIONAL_INFO = 12, SET_ADDITIONAL_INFO = 13, SETCANADDRESS = 0x32 };
+
     
     bldrCMD cmd2bldr(std::uint8_t cmd);
     aspollCMD cmd2aspoll(std::uint8_t cmd);
@@ -615,7 +659,509 @@ namespace embot { namespace app { namespace canprotocol {
             
         bool reply();   // none
         
-    };   
+    };  
+
+
+    class Message_aspoll_SET_CANDATARATE : public Message
+    {
+        public:
+                        
+            
+        struct Info
+        { 
+            embot::common::relTime  txperiod;;           
+            Info() : txperiod(10*embot::common::time1millisec) {}
+        };
+        
+        Info info;
+        
+        Message_aspoll_SET_CANDATARATE() {}
+            
+        bool load(const embot::hw::can::Frame &inframe);
+            
+        bool reply();   // none
+            
+    };    
+    
+
+    class Message_aspoll_SET_FULL_SCALES : public Message
+    {
+        public:
+                        
+            
+        struct Info
+        { 
+            std::uint8_t    channel;
+            std::uint16_t   fullscale;            
+            Info() : channel(0), fullscale(0) {}
+        };
+        
+        Info info;
+        
+        Message_aspoll_SET_FULL_SCALES() {}
+            
+        bool load(const embot::hw::can::Frame &inframe);
+            
+        bool reply();   // none
+            
+    };    
+    
+    
+    class Message_aspoll_GET_FULL_SCALES : public Message
+    {
+        public:
+                                    
+        struct Info
+        { 
+            std::uint8_t  channel;           
+            Info() : channel(0) {}
+        };
+        
+        struct ReplyInfo
+        {
+            std::uint8_t        channel;
+            std::uint16_t       fullscale;
+            ReplyInfo() : channel(0), fullscale(0) {}          
+        };        
+        
+        Info info;
+        
+        Message_aspoll_GET_FULL_SCALES() {}
+            
+        bool load(const embot::hw::can::Frame &inframe);
+            
+        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
+    };  
+    
+    
+    class Message_aspoll_GET_AMP_GAIN : public Message
+    {
+        public:
+                                    
+        struct Info
+        { 
+            std::uint8_t  channel;           
+            Info() : channel(0) {}
+        };
+        
+        struct ReplyInfo
+        {
+            std::uint8_t        channel;
+            std::uint16_t       gain1;
+            std::uint16_t       gain2;
+            ReplyInfo() : channel(0), gain1(0), gain2(0) {}          
+        };        
+        
+        Info info;
+        
+        Message_aspoll_GET_AMP_GAIN() {}
+            
+        bool load(const embot::hw::can::Frame &inframe);
+            
+        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
+    };  
+
+    class Message_aspoll_SET_AMP_GAIN : public Message
+    {
+        public:
+                        
+            
+        struct Info
+        { 
+            std::uint8_t        channel;
+            std::uint16_t       gain1;
+            std::uint16_t       gain2;           
+            Info() : channel(0), gain1(0), gain2(0) {}
+        };
+        
+        Info info;
+        
+        Message_aspoll_SET_AMP_GAIN() {}
+            
+        bool load(const embot::hw::can::Frame &inframe);
+            
+        bool reply();   // none
+            
+    }; 
+    
+    class Message_aspoll_GET_CH_DAC_offset : public Message
+    {
+        public:
+                                    
+        struct Info
+        { 
+            std::uint8_t  channel;           
+            Info() : channel(0) {}
+        };
+        
+        struct ReplyInfo
+        {
+            std::uint8_t        channel;
+            std::uint16_t       offset;
+            ReplyInfo() : channel(0), offset(0) {}          
+        };        
+        
+        Info info;
+        
+        Message_aspoll_GET_CH_DAC_offset() {}
+            
+        bool load(const embot::hw::can::Frame &inframe);
+            
+        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
+    };  
+
+    
+    class Message_aspoll_SET_CH_DAC_offset : public Message
+    {
+        public:
+                        
+            
+        struct Info
+        { 
+            std::uint8_t        channel;
+            std::uint16_t       offset;         
+            Info() : channel(0), offset(0) {}
+        };
+        
+        Info info;
+        
+        Message_aspoll_SET_CH_DAC_offset() {}
+            
+        bool load(const embot::hw::can::Frame &inframe);
+            
+        bool reply();   // none
+            
+    };
+
+
+    class Message_aspoll_SET_MATRIX_RC : public Message
+    {
+        public:
+                        
+            
+        struct Info
+        { 
+            std::uint8_t        row;
+            std::uint8_t        col;
+            std::uint16_t       value;         
+            Info() : row(0), col(0), value(0) {}
+        };
+        
+        Info info;
+        
+        Message_aspoll_SET_MATRIX_RC() {}
+            
+        bool load(const embot::hw::can::Frame &inframe);
+            
+        bool reply();   // none
+            
+    };      
+    
+    class Message_aspoll_SET_MATRIX_G : public Message
+    {
+        public:
+                        
+            
+        struct Info
+        { 
+            std::uint8_t        gain;       
+            Info() : gain(0) {}
+        };
+        
+        Info info;
+        
+        Message_aspoll_SET_MATRIX_G() {}
+            
+        bool load(const embot::hw::can::Frame &inframe);
+            
+        bool reply();   // none
+            
+    }; 
+
+
+    class Message_aspoll_SET_CALIB_TARE_bias : public Message
+    {
+        public:
+             
+        enum class Mode { def = 1, reset = 0, useval = 2, unknown = 255 };        
+            
+        struct Info
+        { 
+            Mode                mode;
+            std::uint8_t        channel;
+            std::uint16_t       value;         
+            Info() : mode(Mode::def), channel(0), value(0) {}
+        };
+        
+        Info info;
+        
+        Message_aspoll_SET_CALIB_TARE_bias() {}
+            
+        bool load(const embot::hw::can::Frame &inframe);
+            
+        bool reply();   // none
+            
+    };    
+
+    class Message_aspoll_GET_CALIB_TARE_bias : public Message
+    {
+        public:
+             
+        struct Info
+        { 
+            std::uint8_t    channel; 
+            Info() : channel(0) {}
+        };
+        
+        struct ReplyInfo
+        {
+            std::uint8_t        channel;
+            std::uint16_t       value;
+            ReplyInfo() : channel(0), value(0) {}          
+        };         
+        
+        Info info;
+        
+        Message_aspoll_GET_CALIB_TARE_bias() {}
+            
+        bool load(const embot::hw::can::Frame &inframe);
+            
+        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);
+            
+    };         
+
+    class Message_aspoll_SET_CURR_TARE_bias : public Message
+    {
+        public:
+             
+        enum class Mode { def = 1, reset = 0, useval = 2, unknown = 255 };        
+            
+        struct Info
+        { 
+            Mode                mode;
+            std::uint8_t        channel;
+            std::uint16_t       value;         
+            Info() : mode(Mode::def), channel(0), value(0) {}
+        };
+        
+        Info info;
+        
+        Message_aspoll_SET_CURR_TARE_bias() {}
+            
+        bool load(const embot::hw::can::Frame &inframe);
+            
+        bool reply();   // none
+            
+    };    
+
+    class Message_aspoll_GET_CURR_TARE_bias : public Message
+    {
+        public:
+             
+        struct Info
+        { 
+            std::uint8_t    channel; 
+            Info() : channel(0) {}
+        };
+        
+        struct ReplyInfo
+        {
+            std::uint8_t        channel;
+            std::uint16_t       value;
+            ReplyInfo() : channel(0), value(0) {}          
+        };         
+        
+        Info info;
+        
+        Message_aspoll_GET_CURR_TARE_bias() {}
+            
+        bool load(const embot::hw::can::Frame &inframe);
+            
+        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);
+            
+    };      
+    
+    class Message_aspoll_GET_CH_ADC : public Message
+    {
+        public:
+                                    
+        struct Info
+        { 
+            std::uint8_t    channel;   
+            bool            getrawvalue;
+            Info() : channel(0), getrawvalue(true) {}
+        };
+        
+        struct ReplyInfo
+        {
+            std::uint8_t        channel;
+            bool                valueisraw;
+            std::uint16_t       adcvalue;
+            ReplyInfo() : channel(0), valueisraw(true), adcvalue(0) {}          
+        };        
+        
+        Info info;
+        
+        Message_aspoll_GET_CH_ADC() {}
+            
+        bool load(const embot::hw::can::Frame &inframe);
+            
+        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
+    };  
+    
+
+    class Message_aspoll_GET_MATRIX_RC : public Message
+    {
+        public:
+                                    
+        struct Info
+        { 
+            std::uint8_t    row;   
+            std::uint8_t    col;
+            Info() : row(0), col(0) {}
+        };
+        
+        struct ReplyInfo
+        {
+            std::uint8_t        row;
+            std::uint8_t        col;
+            std::uint16_t       value;         
+            ReplyInfo() : row(0), col(0), value(0) {}          
+        };        
+        
+        Info info;
+        
+        Message_aspoll_GET_MATRIX_RC() {}
+            
+        bool load(const embot::hw::can::Frame &inframe);
+            
+        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
+    }; 
+
+
+    class Message_aspoll_GET_MATRIX_G : public Message
+    {
+        public:
+                                    
+        struct Info
+        { 
+            std::uint8_t    nothing;   
+            Info() : nothing(0) {}
+        };
+        
+        struct ReplyInfo
+        {
+            std::uint8_t    gain;       
+            ReplyInfo() : gain(0) {}          
+        };        
+        
+        Info info;
+        
+        Message_aspoll_GET_MATRIX_G() {}
+            
+        bool load(const embot::hw::can::Frame &inframe);
+            
+        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
+    };          
+    
+    class Message_aspoll_SAVE2EE : public Message
+    {
+        public:
+                                    
+        struct Info
+        { 
+            std::uint8_t  nothing;           
+            Info() : nothing(0) {}
+        };
+        
+        struct ReplyInfo
+        {
+            bool ok;
+            ReplyInfo() : ok(true) {}          
+        };        
+        
+        Info info;
+        
+        Message_aspoll_SAVE2EE() {}
+            
+        bool load(const embot::hw::can::Frame &inframe);
+            
+        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
+    };  
+    
+    
+    class Message_aspoll_GET_EEPROM_STATUS : public Message
+    {
+        public:
+                                    
+        struct Info
+        { 
+            std::uint8_t  nothing;           
+            Info() : nothing(0) {}
+        };
+        
+        struct ReplyInfo
+        {
+            bool saved;
+            ReplyInfo() : saved(true) {}          
+        };        
+        
+        Info info;
+        
+        Message_aspoll_GET_EEPROM_STATUS() {}
+            
+        bool load(const embot::hw::can::Frame &inframe);
+            
+        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
+    };  
+
+
+    class Message_aspoll_SET_SERIAL_NO : public Message
+    {
+        public:
+                        
+            
+        struct Info
+        { 
+            std::uint8_t serial[7];        
+            Info() {}
+        };
+        
+        Info info;
+        
+        Message_aspoll_SET_SERIAL_NO() {}
+            
+        bool load(const embot::hw::can::Frame &inframe);
+            
+        bool reply();   // none
+            
+    };
+
+
+    class Message_aspoll_GET_SERIAL_NO : public Message
+    {
+        public:
+                                    
+        struct Info
+        { 
+            std::uint8_t nothing;           
+            Info() : nothing(0) {}
+        };
+        
+        struct ReplyInfo
+        {
+            std::uint8_t        serial[7];
+            ReplyInfo() {}          
+        };        
+        
+        Info info;
+        
+        Message_aspoll_GET_SERIAL_NO() {}
+            
+        bool load(const embot::hw::can::Frame &inframe);
+            
+        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
+    };      
     
     
     class Message_skper_TRG : public Message
@@ -749,7 +1295,100 @@ namespace embot { namespace app { namespace canprotocol {
         bool load(const Info& inf);
             
         bool get(embot::hw::can::Frame &outframe);        
+    }; 
+
+
+    class Message_asper_UNCALIBFORCE_VECTOR_DEBUGMODE : public Message
+    {
+        public:
+            
+        struct Info
+        { 
+            std::uint8_t                canaddress;
+            std::int16_t                x;
+            std::int16_t                y;
+            std::int16_t                z;
+            Info() : canaddress(0), x(0), y(0), z(0) { }
+        };
+        
+        Info info;
+        
+        Message_asper_UNCALIBFORCE_VECTOR_DEBUGMODE() {}
+            
+        bool load(const Info& inf);
+            
+        bool get(embot::hw::can::Frame &outframe);        
     };    
+    
+    
+    class Message_asper_UNCALIBTORQUE_VECTOR_DEBUGMODE : public Message
+    {
+        public:
+            
+        struct Info
+        { 
+            std::uint8_t                canaddress;
+            std::int16_t                x;
+            std::int16_t                y;
+            std::int16_t                z;
+            Info() : canaddress(0), x(0), y(0), z(0) { }
+        };
+        
+        Info info;
+        
+        Message_asper_UNCALIBTORQUE_VECTOR_DEBUGMODE() {}
+            
+        bool load(const Info& inf);
+            
+        bool get(embot::hw::can::Frame &outframe);        
+    };    
+
+    
+    class Message_asper_FORCE_VECTOR : public Message
+    {
+        public:
+            
+        struct Info
+        { 
+            std::uint8_t                canaddress;
+            std::int16_t                x;
+            std::int16_t                y;
+            std::int16_t                z;
+            Info() : canaddress(0), x(0), y(0), z(0) { }
+        };
+        
+        Info info;
+        
+        Message_asper_FORCE_VECTOR() {}
+            
+        bool load(const Info& inf);
+            
+        bool get(embot::hw::can::Frame &outframe);        
+    };    
+    
+    
+    class Message_asper_TORQUE_VECTOR : public Message
+    {
+        public:
+            
+        struct Info
+        { 
+            std::uint8_t                canaddress;
+            std::int16_t                x;
+            std::int16_t                y;
+            std::int16_t                z;
+            Info() : canaddress(0), x(0), y(0), z(0) { }
+        };
+        
+        Info info;
+        
+        Message_asper_TORQUE_VECTOR() {}
+            
+        bool load(const Info& inf);
+            
+        bool get(embot::hw::can::Frame &outframe);        
+    };    
+
     
     
 }}} // namespace embot { namespace app { namespace canprotocol {

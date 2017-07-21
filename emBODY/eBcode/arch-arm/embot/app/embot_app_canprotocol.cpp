@@ -891,8 +891,341 @@ namespace embot { namespace app { namespace canprotocol {
 
 
 
-
+        bool Message_aspoll_SET_CANDATARATE::load(const embot::hw::can::Frame &inframe)
+        {
+            Message::set(inframe);  
             
+            if(static_cast<std::uint8_t>(aspollCMD::SET_CANDATARATE) != frame2cmd(inframe))
+            {
+                return false; 
+            }
+            
+            std::uint8_t rate = candata.datainframe[0];
+            info.txperiod = rate * embot::common::time1millisec;
+          
+            return true;         
+        }                    
+            
+        bool Message_aspoll_SET_CANDATARATE::reply()
+        {
+            return false;
+        } 
+        
+        bool Message_aspoll_SET_FULL_SCALES::load(const embot::hw::can::Frame &inframe)
+        {
+            Message::set(inframe);  
+            
+            if(static_cast<std::uint8_t>(aspollCMD::SET_FULL_SCALES) != frame2cmd(inframe))
+            {
+                return false; 
+            }
+            
+            info.channel = candata.datainframe[0];
+            info.fullscale = static_cast<std::uint16_t>(candata.datainframe[1]) << 8 + static_cast<std::uint16_t>(candata.datainframe[2]);
+          
+            return true;         
+        }                    
+            
+        bool Message_aspoll_SET_FULL_SCALES::reply()
+        {
+            return false;
+        } 
+        
+        
+        bool Message_aspoll_SET_AMP_GAIN::load(const embot::hw::can::Frame &inframe)
+        {
+            Message::set(inframe);  
+            
+            if(static_cast<std::uint8_t>(aspollCMD::SET_AMP_GAIN) != frame2cmd(inframe))
+            {
+                return false; 
+            }
+            
+            info.channel = candata.datainframe[0];
+            info.gain1 = static_cast<std::uint16_t>(candata.datainframe[1]) << 8 + static_cast<std::uint16_t>(candata.datainframe[2]);
+            info.gain2 = static_cast<std::uint16_t>(candata.datainframe[3]) << 8 + static_cast<std::uint16_t>(candata.datainframe[4]);
+          
+            return true;         
+        }                    
+            
+        bool Message_aspoll_SET_AMP_GAIN::reply()
+        {
+            return false;
+        }         
+        
+        
+        bool Message_aspoll_SET_CH_DAC_offset::load(const embot::hw::can::Frame &inframe)
+        {
+            Message::set(inframe);  
+            
+            if(static_cast<std::uint8_t>(aspollCMD::SET_CH_DAC_offset) != frame2cmd(inframe))
+            {
+                return false; 
+            }
+            
+            info.channel = candata.datainframe[0];
+            info.offset = static_cast<std::uint16_t>(candata.datainframe[1]) << 8 + static_cast<std::uint16_t>(candata.datainframe[2]);
+          
+            return true;         
+        }                    
+            
+        bool Message_aspoll_SET_CH_DAC_offset::reply()
+        {
+            return false;
+        }       
+        
+        bool Message_aspoll_SET_MATRIX_RC::load(const embot::hw::can::Frame &inframe)
+        {
+            Message::set(inframe);  
+            
+            if(static_cast<std::uint8_t>(aspollCMD::SET_MATRIX_RC) != frame2cmd(inframe))
+            {
+                return false; 
+            }
+            
+            info.row = candata.datainframe[0];
+            info.col = candata.datainframe[1];
+            info.value = static_cast<std::uint16_t>(candata.datainframe[2]) << 8 + static_cast<std::uint16_t>(candata.datainframe[3]);
+          
+            return true;         
+        }                    
+            
+        bool Message_aspoll_SET_MATRIX_RC::reply()
+        {
+            return false;
+        }   
+
+
+        bool Message_aspoll_SET_CALIB_TARE_bias::load(const embot::hw::can::Frame &inframe)
+        {
+            Message::set(inframe);  
+            
+            if(static_cast<std::uint8_t>(aspollCMD::SET_CALIB_TARE_bias) != frame2cmd(inframe))
+            {
+                return false; 
+            }
+            
+            // now ... i look at the mode. not even at the length.
+            
+            switch(candata.datainframe[0])
+            {
+                case 0:
+                {
+                    info.mode = Mode::reset;
+                } break;
+                
+                case 1:
+                {
+                    info.mode = Mode::def;
+                } break;  
+
+                case 2:
+                {
+                    info.mode = Mode::useval;
+                } break;
+
+                default:
+                {
+                    info.mode = Mode::unknown;
+                } break;                   
+            }
+            
+            if(Mode::unknown == info.mode)
+            {
+                return false;
+            }
+            
+            if(Mode::useval == info.mode)
+            {
+                info.channel = candata.datainframe[1];
+                info.value = static_cast<std::uint16_t>(candata.datainframe[2]) << 8 + static_cast<std::uint16_t>(candata.datainframe[3]);
+            }
+            
+            return true;         
+        }                    
+            
+        bool Message_aspoll_SET_CALIB_TARE_bias::reply()
+        {
+            return false;
+        } 
+
+
+        bool Message_aspoll_GET_CALIB_TARE_bias::load(const embot::hw::can::Frame &inframe)
+        {
+            Message::set(inframe); 
+            
+            if(static_cast<std::uint8_t>(aspollCMD::GET_CALIB_TARE_bias) != frame2cmd(inframe))
+            {
+                return false; 
+            }
+
+            return true;
+        }  
+
+        bool Message_aspoll_GET_CALIB_TARE_bias::reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo)
+        {
+            std::uint8_t dd[7] = {0};
+            dd[0] = replyinfo.channel;
+            dd[1] = (replyinfo.value >> 8) & 0xff;      // important note: the strain uses big endianess ... 
+            dd[2] = replyinfo.value & 0xff;             
+                        
+            std::uint8_t datalen = 3;
+            
+            frame_set_sender(outframe, sender);
+            frame_set_clascmddestinationdata(outframe, Clas::pollingAnalogSensor, static_cast<std::uint8_t>(aspollCMD::GET_CALIB_TARE_bias), candata.from, dd, datalen);
+            frame_set_size(outframe, datalen+1);
+            return true;
+        }            
+
+
+
+        bool Message_aspoll_SET_CURR_TARE_bias::load(const embot::hw::can::Frame &inframe)
+        {
+            Message::set(inframe);  
+            
+            if(static_cast<std::uint8_t>(aspollCMD::SET_CURR_TARE_bias) != frame2cmd(inframe))
+            {
+                return false; 
+            }
+            
+            // now ... i look at the mode. not even at the length.
+            
+            switch(candata.datainframe[0])
+            {
+                case 0:
+                {
+                    info.mode = Mode::reset;
+                } break;
+                
+                case 1:
+                {
+                    info.mode = Mode::def;
+                } break;  
+
+                case 2:
+                {
+                    info.mode = Mode::useval;
+                } break;
+
+                default:
+                {
+                    info.mode = Mode::unknown;
+                } break;                   
+            }
+            
+            if(Mode::unknown == info.mode)
+            {
+                return false;
+            }
+            
+            if(Mode::useval == info.mode)
+            {
+                info.channel = candata.datainframe[1];
+                info.value = static_cast<std::uint16_t>(candata.datainframe[2]) << 8 + static_cast<std::uint16_t>(candata.datainframe[3]);
+            }
+            
+            return true;         
+        }                    
+            
+        bool Message_aspoll_SET_CURR_TARE_bias::reply()
+        {
+            return false;
+        }   
+
+
+        bool Message_aspoll_GET_CURR_TARE_bias::load(const embot::hw::can::Frame &inframe)
+        {
+            Message::set(inframe); 
+            
+            if(static_cast<std::uint8_t>(aspollCMD::GET_CURR_TARE_bias) != frame2cmd(inframe))
+            {
+                return false; 
+            }
+
+            return true;
+        }  
+
+        bool Message_aspoll_GET_CURR_TARE_bias::reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo)
+        {
+            std::uint8_t dd[7] = {0};
+            dd[0] = replyinfo.channel;
+            dd[1] = (replyinfo.value >> 8) & 0xff;      // important note: the strain uses big endianess ... 
+            dd[2] = replyinfo.value & 0xff;             
+                        
+            std::uint8_t datalen = 3;
+            
+            frame_set_sender(outframe, sender);
+            frame_set_clascmddestinationdata(outframe, Clas::pollingAnalogSensor, static_cast<std::uint8_t>(aspollCMD::GET_CURR_TARE_bias), candata.from, dd, datalen);
+            frame_set_size(outframe, datalen+1);
+            return true;
+        }          
+        
+        bool Message_aspoll_SET_MATRIX_G::load(const embot::hw::can::Frame &inframe)
+        {
+            Message::set(inframe);  
+            
+            if(static_cast<std::uint8_t>(aspollCMD::SET_MATRIX_G) != frame2cmd(inframe))
+            {
+                return false; 
+            }
+            
+            info.gain = candata.datainframe[0];
+          
+            return true;         
+        }                    
+            
+        bool Message_aspoll_SET_MATRIX_G::reply()
+        {
+            return false;
+        }    
+        
+        
+        bool Message_aspoll_SET_SERIAL_NO::load(const embot::hw::can::Frame &inframe)
+        {
+            Message::set(inframe);  
+            
+            if(static_cast<std::uint8_t>(aspollCMD::SET_SERIAL_NO) != frame2cmd(inframe))
+            {
+                return false; 
+            }
+            
+            std::memmove(info.serial, &candata.datainframe[0], sizeof(info.serial));
+          
+            return true;         
+        }                    
+            
+        bool Message_aspoll_SET_SERIAL_NO::reply()
+        {
+            return false;
+        } 
+
+
+        bool Message_aspoll_GET_SERIAL_NO::load(const embot::hw::can::Frame &inframe)
+        {
+            Message::set(inframe); 
+            
+            if(static_cast<std::uint8_t>(aspollCMD::GET_SERIAL_NO) != frame2cmd(inframe))
+            {
+                return false; 
+            }
+
+            return true;
+        }  
+
+        bool Message_aspoll_GET_SERIAL_NO::reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo)
+        {
+            std::uint8_t dd[7] = {0};
+            std::memmove(dd, replyinfo.serial, sizeof(replyinfo.serial));
+
+            std::uint8_t datalen = sizeof(replyinfo.serial);
+            
+            frame_set_sender(outframe, sender);
+            frame_set_clascmddestinationdata(outframe, Clas::pollingAnalogSensor, static_cast<std::uint8_t>(aspollCMD::GET_SERIAL_NO), candata.from, dd, datalen);
+            frame_set_size(outframe, datalen+1);
+            return true;
+        }        
+        
+        
         bool Message_skper_TRG::load(const Info& inf)
         {
             info = inf;
@@ -1051,7 +1384,328 @@ namespace embot { namespace app { namespace canprotocol {
             std::memmove(&outframe, &canframe, sizeof(embot::hw::can::Frame));
                         
             return true;
+        }   
+
+
+
+        bool Message_asper_UNCALIBFORCE_VECTOR_DEBUGMODE::load(const Info& inf)
+        {
+            info = inf;
+          
+            return true;
+        }
+            
+        bool Message_asper_UNCALIBFORCE_VECTOR_DEBUGMODE::get(embot::hw::can::Frame &outframe)
+        {
+            std::uint8_t data08[8] = {0};
+            data08[0] = static_cast<std::uint8_t>((info.x & 0x0f));
+            data08[1] = static_cast<std::uint8_t>((info.x & 0xf0) >> 8);
+            data08[2] = static_cast<std::uint8_t>((info.y & 0x0f));
+            data08[3] = static_cast<std::uint8_t>((info.y & 0xf0) >> 8);  
+            data08[4] = static_cast<std::uint8_t>((info.z & 0x0f));
+            data08[5] = static_cast<std::uint8_t>((info.z & 0xf0) >> 8);            
+            Message::set(info.canaddress, 0xf, Clas::periodicAnalogSensor, static_cast<std::uint8_t>(asperCMD::UNCALIBFORCE_VECTOR_DEBUGMODE), data08, 6);
+            std::memmove(&outframe, &canframe, sizeof(embot::hw::can::Frame));
+                        
+            return true;
+        }  
+
+ 
+
+
+        bool Message_asper_UNCALIBTORQUE_VECTOR_DEBUGMODE::load(const Info& inf)
+        {
+            info = inf;
+          
+            return true;
+        }
+            
+        bool Message_asper_UNCALIBTORQUE_VECTOR_DEBUGMODE::get(embot::hw::can::Frame &outframe)
+        {
+            std::uint8_t data08[8] = {0};
+            data08[0] = static_cast<std::uint8_t>((info.x & 0x0f));
+            data08[1] = static_cast<std::uint8_t>((info.x & 0xf0) >> 8);
+            data08[2] = static_cast<std::uint8_t>((info.y & 0x0f));
+            data08[3] = static_cast<std::uint8_t>((info.y & 0xf0) >> 8);  
+            data08[4] = static_cast<std::uint8_t>((info.z & 0x0f));
+            data08[5] = static_cast<std::uint8_t>((info.z & 0xf0) >> 8);            
+            Message::set(info.canaddress, 0xf, Clas::periodicAnalogSensor, static_cast<std::uint8_t>(asperCMD::UNCALIBTORQUE_VECTOR_DEBUGMODE), data08, 6);
+            std::memmove(&outframe, &canframe, sizeof(embot::hw::can::Frame));
+                        
+            return true;
         }          
+        
+        
+        bool Message_asper_FORCE_VECTOR::load(const Info& inf)
+        {
+            info = inf;
+          
+            return true;
+        }
+            
+        bool Message_asper_FORCE_VECTOR::get(embot::hw::can::Frame &outframe)
+        {
+            std::uint8_t data08[8] = {0};
+            data08[0] = static_cast<std::uint8_t>((info.x & 0x0f));
+            data08[1] = static_cast<std::uint8_t>((info.x & 0xf0) >> 8);
+            data08[2] = static_cast<std::uint8_t>((info.y & 0x0f));
+            data08[3] = static_cast<std::uint8_t>((info.y & 0xf0) >> 8);  
+            data08[4] = static_cast<std::uint8_t>((info.z & 0x0f));
+            data08[5] = static_cast<std::uint8_t>((info.z & 0xf0) >> 8);            
+            Message::set(info.canaddress, 0xf, Clas::periodicAnalogSensor, static_cast<std::uint8_t>(asperCMD::FORCE_VECTOR), data08, 6);
+            std::memmove(&outframe, &canframe, sizeof(embot::hw::can::Frame));
+                        
+            return true;
+        }  
+
+ 
+
+
+        bool Message_asper_TORQUE_VECTOR::load(const Info& inf)
+        {
+            info = inf;
+          
+            return true;
+        }
+            
+        bool Message_asper_TORQUE_VECTOR::get(embot::hw::can::Frame &outframe)
+        {
+            std::uint8_t data08[8] = {0};
+            data08[0] = static_cast<std::uint8_t>((info.x & 0x0f));
+            data08[1] = static_cast<std::uint8_t>((info.x & 0xf0) >> 8);
+            data08[2] = static_cast<std::uint8_t>((info.y & 0x0f));
+            data08[3] = static_cast<std::uint8_t>((info.y & 0xf0) >> 8);  
+            data08[4] = static_cast<std::uint8_t>((info.z & 0x0f));
+            data08[5] = static_cast<std::uint8_t>((info.z & 0xf0) >> 8);            
+            Message::set(info.canaddress, 0xf, Clas::periodicAnalogSensor, static_cast<std::uint8_t>(asperCMD::TORQUE_VECTOR), data08, 6);
+            std::memmove(&outframe, &canframe, sizeof(embot::hw::can::Frame));
+                        
+            return true;
+        }  
+        
+        
+        
+        
+        bool Message_aspoll_GET_FULL_SCALES::load(const embot::hw::can::Frame &inframe)
+        {
+            Message::set(inframe); 
+            
+            if(static_cast<std::uint8_t>(aspollCMD::GET_FULL_SCALES) != frame2cmd(inframe))
+            {
+                return false; 
+            }
+
+            return true;
+        }  
+
+        bool Message_aspoll_GET_FULL_SCALES::reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo)
+        {
+            std::uint8_t dd[7] = {0};
+            dd[0] = replyinfo.channel;
+            dd[1] = (replyinfo.fullscale >> 8) & 0xff;      // important note: the strain uses big endianess ... 
+            dd[2] = replyinfo.fullscale & 0xff;             // both embobjStrain and teh ems use a wrong conversion ... they both exchange the bytes .... so at teh end the fullscale is correct 
+                        
+            std::uint8_t datalen = 3;
+            
+            frame_set_sender(outframe, sender);
+            frame_set_clascmddestinationdata(outframe, Clas::pollingAnalogSensor, static_cast<std::uint8_t>(aspollCMD::GET_FULL_SCALES), candata.from, dd, datalen);
+            frame_set_size(outframe, datalen+1);
+            return true;
+        }   
+
+        bool Message_aspoll_GET_AMP_GAIN::load(const embot::hw::can::Frame &inframe)
+        {
+            Message::set(inframe); 
+            
+            if(static_cast<std::uint8_t>(aspollCMD::GET_AMP_GAIN) != frame2cmd(inframe))
+            {
+                return false; 
+            }
+
+            return true;
+        }  
+
+        bool Message_aspoll_GET_AMP_GAIN::reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo)
+        {
+            std::uint8_t dd[7] = {0};
+            dd[0] = replyinfo.channel;
+            dd[1] = (replyinfo.gain1 >> 8) & 0xff;      // important note: the strain uses big endianess ... 
+            dd[2] = replyinfo.gain1 & 0xff;             
+            dd[3] = (replyinfo.gain2 >> 8) & 0xff;      // important note: the strain uses big endianess ... 
+            dd[4] = replyinfo.gain2 & 0xff;             
+            
+            std::uint8_t datalen = 5;
+            
+            frame_set_sender(outframe, sender);
+            frame_set_clascmddestinationdata(outframe, Clas::pollingAnalogSensor, static_cast<std::uint8_t>(aspollCMD::GET_AMP_GAIN), candata.from, dd, datalen);
+            frame_set_size(outframe, datalen+1);
+            return true;
+        }  
+        
+        
+        
+        bool Message_aspoll_GET_CH_DAC_offset::load(const embot::hw::can::Frame &inframe)
+        {
+            Message::set(inframe); 
+            
+            if(static_cast<std::uint8_t>(aspollCMD::GET_CH_DAC_offset) != frame2cmd(inframe))
+            {
+                return false; 
+            }
+
+            return true;
+        }  
+
+        bool Message_aspoll_GET_CH_DAC_offset::reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo)
+        {
+            std::uint8_t dd[7] = {0};
+            dd[0] = replyinfo.channel;
+            dd[1] = (replyinfo.offset >> 8) & 0xff;      // important note: the strain uses big endianess ... 
+            dd[2] = replyinfo.offset & 0xff;                   
+            
+            std::uint8_t datalen = 3;
+            
+            frame_set_sender(outframe, sender);
+            frame_set_clascmddestinationdata(outframe, Clas::pollingAnalogSensor, static_cast<std::uint8_t>(aspollCMD::GET_CH_DAC_offset), candata.from, dd, datalen);
+            frame_set_size(outframe, datalen+1);
+            return true;
+        }  
+        
+
+        bool Message_aspoll_GET_MATRIX_RC::load(const embot::hw::can::Frame &inframe)
+        {
+            Message::set(inframe); 
+            
+            if(static_cast<std::uint8_t>(aspollCMD::GET_MATRIX_RC) != frame2cmd(inframe))
+            {
+                return false; 
+            }
+
+            return true;
+        }  
+
+        bool Message_aspoll_GET_MATRIX_RC::reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo)
+        {
+            std::uint8_t dd[7] = {0};
+            dd[0] = replyinfo.row;
+            dd[1] = replyinfo.col;
+            dd[2] = (replyinfo.value >> 8) & 0xff;      // important note: the strain uses big endianess ... 
+            dd[3] = replyinfo.value & 0xff;                   
+            
+            std::uint8_t datalen = 4;
+            
+            frame_set_sender(outframe, sender);
+            frame_set_clascmddestinationdata(outframe, Clas::pollingAnalogSensor, static_cast<std::uint8_t>(aspollCMD::GET_MATRIX_RC), candata.from, dd, datalen);
+            frame_set_size(outframe, datalen+1);
+            return true;
+        }  
+        
+        bool Message_aspoll_GET_MATRIX_G::load(const embot::hw::can::Frame &inframe)
+        {
+            Message::set(inframe); 
+            
+            if(static_cast<std::uint8_t>(aspollCMD::GET_MATRIX_G) != frame2cmd(inframe))
+            {
+                return false; 
+            }
+
+            return true;
+        }  
+
+        bool Message_aspoll_GET_MATRIX_G::reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo)
+        {
+            std::uint8_t dd[7] = {0};
+            dd[0] = replyinfo.gain;      
+            
+            std::uint8_t datalen = 1;
+            
+            frame_set_sender(outframe, sender);
+            frame_set_clascmddestinationdata(outframe, Clas::pollingAnalogSensor, static_cast<std::uint8_t>(aspollCMD::GET_MATRIX_G), candata.from, dd, datalen);
+            frame_set_size(outframe, datalen+1);
+            return true;
+        }  
+        
+        
+        bool Message_aspoll_GET_CH_ADC::load(const embot::hw::can::Frame &inframe)
+        {
+            Message::set(inframe); 
+            
+            if(static_cast<std::uint8_t>(aspollCMD::GET_CH_ADC) != frame2cmd(inframe))
+            {
+                return false; 
+            }
+
+            return true;
+        }  
+
+        bool Message_aspoll_GET_CH_ADC::reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo)
+        {
+            std::uint8_t dd[7] = {0};
+            dd[0] = replyinfo.channel;
+            dd[1] = replyinfo.valueisraw;
+            dd[2] = (replyinfo.adcvalue >> 8) & 0xff;      // important note: the strain uses big endianess ... 
+            dd[3] = replyinfo.adcvalue & 0xff;             
+
+            
+            std::uint8_t datalen = 4;
+            
+            frame_set_sender(outframe, sender);
+            frame_set_clascmddestinationdata(outframe, Clas::pollingAnalogSensor, static_cast<std::uint8_t>(aspollCMD::GET_CH_ADC), candata.from, dd, datalen);
+            frame_set_size(outframe, datalen+1);
+            return true;
+        }        
+
+        bool Message_aspoll_GET_EEPROM_STATUS::load(const embot::hw::can::Frame &inframe)
+        {
+            Message::set(inframe); 
+            
+            if(static_cast<std::uint8_t>(aspollCMD::GET_EEPROM_STATUS) != frame2cmd(inframe))
+            {
+                return false; 
+            }
+
+            return true;
+        }  
+
+        bool Message_aspoll_GET_EEPROM_STATUS::reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo)
+        {
+            std::uint8_t dd[7] = {0};
+            dd[0] = replyinfo.saved;
+                        
+            std::uint8_t datalen = 1;
+            
+            frame_set_sender(outframe, sender);
+            frame_set_clascmddestinationdata(outframe, Clas::pollingAnalogSensor, static_cast<std::uint8_t>(aspollCMD::GET_EEPROM_STATUS), candata.from, dd, datalen);
+            frame_set_size(outframe, datalen+1);
+            return true;
+        }  
+
+
+        bool Message_aspoll_SAVE2EE::load(const embot::hw::can::Frame &inframe)
+        {
+            Message::set(inframe); 
+            
+            if(static_cast<std::uint8_t>(aspollCMD::SAVE2EE) != frame2cmd(inframe))
+            {
+                return false; 
+            }
+
+            return true;
+        }  
+
+        bool Message_aspoll_SAVE2EE::reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo)
+        {
+            std::uint8_t dd[7] = {0};
+            dd[0] = replyinfo.ok;
+                        
+            std::uint8_t datalen = 1;
+            
+            frame_set_sender(outframe, sender);
+            frame_set_clascmddestinationdata(outframe, Clas::pollingAnalogSensor, static_cast<std::uint8_t>(aspollCMD::SAVE2EE), candata.from, dd, datalen);
+            frame_set_size(outframe, datalen+1);
+            return true;
+        }         
+        
 
 }}} // namespace embot { namespace app { namespace canprotocol {
 
