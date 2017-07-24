@@ -16,9 +16,9 @@
 
 #include "embot_app_application_theCANparserBasic.h"
 
-//#include "embot_app_application_theCANparserMTB.h"
+#include "embot_app_application_theCANparserSTRAIN.h"
 
-//#include "embot_app_application_theSkin.h"
+#include "embot_app_application_theSTRAIN.h"
 //#include "embot_app_application_theIMU.h"
 
 
@@ -57,23 +57,10 @@ static void start_evt_based(void);
 
 static void userdeflauncher(void* param)
 {
-//    eOledpulser_cfg_t ledconfig = {0};
-//    
-//    ledconfig.led_enable_mask   = (1 << eo_ledpulser_led_zero);
-//    ledconfig.led_init          = reinterpret_cast<eOint8_fp_uint8_cvoidp_t>(embot::hw::led::init_legacy); // (eOint8_fp_uint8_cvoidp_t) embot::hw::bsp::led_init_par;
-//    ledconfig.led_on            = reinterpret_cast<eOint8_fp_uint8_t>(embot::hw::led::on);
-//    ledconfig.led_off           = reinterpret_cast<eOint8_fp_uint8_t>(embot::hw::led::off);
-//    ledconfig.led_toggle        = reinterpret_cast<eOint8_fp_uint8_t>(embot::hw::led::toggle);
-//    
-//    eo_ledpulser_Initialise(&ledconfig);  
-//    eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_zero, 1000*1000, 0);    
-        
     embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance();
     canbrdinfo.synch(vAP, vCP);
-    
-    
-    start_evt_based();
-      
+        
+    start_evt_based();      
 }
 
 
@@ -82,8 +69,7 @@ static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask
 static void eventbasedtask_init(embot::sys::Task *t, void *p);
 
 static const embot::common::Event evRXcanframe = 0x00000001;
-//static const embot::common::Event evSKINprocess = 0x00000002;
-//static const embot::common::Event evIMUprocess = 0x00000004;
+static const embot::common::Event evSTRAINprocess = 0x00000002;
 
 static const std::uint8_t maxOUTcanframes = 48;
 
@@ -106,9 +92,9 @@ static void start_evt_based(void)
     canparserbasic.initialise(configbasic);  
     
     // start canparser strain2
-//    embot::app::application::theCANparserSTRAIN &canparserstr = embot::app::application::theCANparserSTRAIN::getInstance();
-//    embot::app::application::theCANparserSTRAIN::Config configstr;
-//    canparserstr.initialise(configstr);  
+    embot::app::application::theCANparserSTRAIN &canparserstr = embot::app::application::theCANparserSTRAIN::getInstance();
+    embot::app::application::theCANparserSTRAIN::Config configstr;
+    canparserstr.initialise(configstr);  
     
 //    embot::app::application::theSkin &theskin = embot::app::application::theSkin::getInstance();
 //    embot::app::application::theSkin::Config configskin;
@@ -117,11 +103,11 @@ static void start_evt_based(void)
 //    theskin.initialise(configskin);   
 
 
-//    embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance();
-//    embot::app::application::theIMU::Config configimu;
-//    configimu.tickevent = evIMUprocess;
-//    configimu.totask = eventbasedtask;
-//    theimu.initialise(configimu); 
+    embot::app::application::theSTRAIN &thestrain = embot::app::application::theSTRAIN::getInstance();
+    embot::app::application::theSTRAIN::Config configstrain;
+    configstrain.tickevent = evSTRAINprocess;
+    configstrain.totask = eventbasedtask;
+    thestrain.initialise(configstrain); 
 
     // finally start can. i keep it as last because i dont want that the isr-handler calls its onrxframe() 
     // before the eventbasedtask is created.
@@ -172,14 +158,14 @@ static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask
         if(embot::hw::resOK == embot::hw::can::get(embot::hw::can::Port::one, frame, remainingINrx))
         {            
             embot::app::application::theCANparserBasic &canparserbasic = embot::app::application::theCANparserBasic::getInstance();
-//            embot::app::application::theCANparserMTB &canparsermtb = embot::app::application::theCANparserMTB::getInstance();
+            embot::app::application::theCANparserSTRAIN &canparserstrain = embot::app::application::theCANparserSTRAIN::getInstance();
             // process w/ the basic parser, if not recognised call the parse specific of the board
             if(true == canparserbasic.process(frame, outframes))
             {                   
             }
-//            else if(true == canparsermtb.process(frame, outframes))
-//            {               
-//            }
+            else if(true == canparserstrain.process(frame, outframes))
+            {               
+            }
             
             if(remainingINrx > 0)
             {
@@ -188,37 +174,13 @@ static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask
         }        
     }
     
-//    if(true == embot::common::msk::check(eventmask, evSKINprocess))
-//    {
-//        embot::app::application::theSkin &theskin = embot::app::application::theSkin::getInstance();
-//        theskin.tick(outframes);
-//        
-//        // we operate on the skin triangles by calling a skin.tick(outframes);
-//        // the evSKINprocess is emitted  by:
-//        // 1. a periodic timer started at the reception of a specific message.
-// 
-// 
-//        // the .tick(outframes) will do whatever it needs to do and it may emit some 
-//        // can frames for transmission. the can frames can be up to 16x2 = 32.
-//        // hence, how many packets? max of replies = 8 + max of broadcast = 32 --> 40.
-//        
-//    }
     
-//    if(true == embot::common::msk::check(eventmask, evIMUprocess))
-//    {
-//        
-//        embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance();
-//        theimu.tick(outframes);
-//        // we operate on the IMU  by calling a imu.process(outframes);
-//        // the evIMUprocess is emitted  by:
-//        // 1. a periodic timer started at the reception of a specific message.
-//        // 2. internally to imu.process() if a new tick is required (the IMU is read with DMA, whose interrupt triggers a send-event
-// 
-//        // the .process(outframes) will do whatever it needs to do and it may emit some 
-//        // can frames for transmission. the can frames can be up to ?.
-//        // hence, how many packets? 40 + ? = 48.
-//        
-//    }
+    if(true == embot::common::msk::check(eventmask, evSTRAINprocess))
+    {
+        
+        embot::app::application::theSTRAIN &thestrain = embot::app::application::theSTRAIN::getInstance();
+        thestrain.tick(outframes);        
+    }
     
     // if we have any packet we transmit them
     std::uint8_t num = outframes.size();

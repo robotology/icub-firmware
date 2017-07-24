@@ -44,8 +44,9 @@ namespace embot { namespace app { namespace canprotocol {
   
     // Clas::pollingAnalogSensor (2)
     enum class aspollCMD {  none = 0xfe, 
-                            SET_TXMODE = 0x07, GET_FIRMWARE_VERSION = 0x1C, SET_BOARD_ADX = 0x32,                           // basic
-                            SKIN_SET_BRD_CFG = 77, ACC_GYRO_SETUP = 79, SKIN_SET_TRIANG_CFG = 80,                           // skin         
+                            GET_FIRMWARE_VERSION = 0x1C, SET_BOARD_ADX = 0x32,                                              // basic
+                            SET_TXMODE = 0x07,                                                                              // mtb, strain 
+                            SKIN_SET_BRD_CFG = 77, ACC_GYRO_SETUP = 79, SKIN_SET_TRIANG_CFG = 80,                           // mtb         
                             SET_CANDATARATE = 0x08,                                                                         // strain, mais  
                             GET_FULL_SCALES = 0x18,                                                                         // strain   
                             SET_FULL_SCALES = 0x17,                                                                         // strain canloader  
