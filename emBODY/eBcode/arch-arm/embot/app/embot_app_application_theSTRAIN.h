@@ -55,7 +55,28 @@ namespace embot { namespace app { namespace application {
         
         bool initialise(Config &config);   
 
-        bool configure(embot::common::Time txperiod);
+        bool configure(embot::common::Time txperiod);        
+        bool configure(embot::app::canprotocol::Message_aspoll_SET_SERIAL_NO::Info &info);
+        bool configure(embot::app::canprotocol::Message_aspoll_SET_FULL_SCALES::Info &info);
+        bool configure(embot::app::canprotocol::Message_aspoll_SET_CH_DAC_offset::Info &info);
+        bool set(embot::app::canprotocol::Message_aspoll_SET_MATRIX_RC::Info &info);
+        bool set(embot::app::canprotocol::Message_aspoll_SET_MATRIX_G::Info &info);
+        bool set(embot::app::canprotocol::Message_aspoll_SET_CALIB_TARE_bias::Info &info);
+        bool set(embot::app::canprotocol::Message_aspoll_SET_CURR_TARE_bias::Info &info);
+        bool set(embot::app::canprotocol::Message_aspoll_SET_AMP_GAIN::Info &info);
+        
+        bool save2eeprom();
+        
+        bool get_serial(embot::app::canprotocol::Message_aspoll_GET_SERIAL_NO::ReplyInfo &replyinfo);
+        bool get_fullscale(std::uint8_t channel, std::uint16_t &value);
+        bool get_eepromstatus(bool &saved);
+        bool get_adc(std::uint8_t channel, bool useraw, std::uint16_t &value);
+        bool get_offset(std::uint8_t channel, std::uint16_t &value);
+        bool get(embot::app::canprotocol::Message_aspoll_GET_MATRIX_RC::ReplyInfo &replyinfo);
+        bool get(embot::app::canprotocol::Message_aspoll_GET_MATRIX_G::ReplyInfo &replyinfo);
+        bool get(embot::app::canprotocol::Message_aspoll_GET_CALIB_TARE_bias::ReplyInfo &replyinfo);
+        bool get(embot::app::canprotocol::Message_aspoll_GET_CURR_TARE_bias::ReplyInfo &replyinfo);
+        bool get(embot::app::canprotocol::Message_aspoll_GET_AMP_GAIN::ReplyInfo &replyinfo);
         
         bool start();
         bool stop();        

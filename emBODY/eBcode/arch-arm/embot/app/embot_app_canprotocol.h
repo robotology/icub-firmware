@@ -1124,7 +1124,7 @@ namespace embot { namespace app { namespace canprotocol {
             
         struct Info
         { 
-            std::uint8_t serial[7];        
+            char serial[7];        
             Info() {}
         };
         
@@ -1151,7 +1151,7 @@ namespace embot { namespace app { namespace canprotocol {
         
         struct ReplyInfo
         {
-            std::uint8_t        serial[7];
+            char        serial[7];
             ReplyInfo() {}          
         };        
         
