@@ -670,7 +670,7 @@ namespace embot { namespace app { namespace canprotocol {
             
         struct Info
         { 
-            embot::common::relTime  txperiod;;           
+            embot::common::relTime  txperiod;           
             Info() : txperiod(10*embot::common::time1millisec) {}
         };
         
