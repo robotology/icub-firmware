@@ -168,12 +168,12 @@ bool embot::app::application::theCANparserSTRAIN::Impl::process(const embot::hw:
                 txframe = process_get_ch_adc(frame, replies);
                 recognised = true;                
             }  
-            else if(static_cast<std::uint8_t>(embot::app::canprotocol::aspollCMD::GET_CH_DAC_offset) == cmd)
+            else if(static_cast<std::uint8_t>(embot::app::canprotocol::aspollCMD::GET_CH_DAC) == cmd)
             { 
                 txframe = process_get_offset(frame, replies);
                 recognised = true;                
             }
-            else if(static_cast<std::uint8_t>(embot::app::canprotocol::aspollCMD::SET_CH_DAC_offset) == cmd)
+            else if(static_cast<std::uint8_t>(embot::app::canprotocol::aspollCMD::SET_CH_DAC) == cmd)
             { 
                 txframe = process_set_offset(frame, replies);
                 recognised = true;                
@@ -198,22 +198,22 @@ bool embot::app::application::theCANparserSTRAIN::Impl::process(const embot::hw:
                 txframe = process_set_matrix_gain(frame, replies);
                 recognised = true;                
             }    
-            else if(static_cast<std::uint8_t>(embot::app::canprotocol::aspollCMD::GET_CALIB_TARE_bias) == cmd)
+            else if(static_cast<std::uint8_t>(embot::app::canprotocol::aspollCMD::GET_CALIB_TARE) == cmd)
             { 
                 txframe = process_get_calib_bias(frame, replies);
                 recognised = true;                
             }
-            else if(static_cast<std::uint8_t>(embot::app::canprotocol::aspollCMD::SET_CALIB_TARE_bias) == cmd)
+            else if(static_cast<std::uint8_t>(embot::app::canprotocol::aspollCMD::SET_CALIB_TARE) == cmd)
             { 
                 txframe = process_set_calib_bias(frame, replies);
                 recognised = true;                
             }              
-            else if(static_cast<std::uint8_t>(embot::app::canprotocol::aspollCMD::GET_CURR_TARE_bias) == cmd)
+            else if(static_cast<std::uint8_t>(embot::app::canprotocol::aspollCMD::GET_CURR_TARE) == cmd)
             { 
                 txframe = process_get_curr_bias(frame, replies);
                 recognised = true;                
             }
-            else if(static_cast<std::uint8_t>(embot::app::canprotocol::aspollCMD::SET_CURR_TARE_bias) == cmd)
+            else if(static_cast<std::uint8_t>(embot::app::canprotocol::aspollCMD::SET_CURR_TARE) == cmd)
             { 
                 txframe = process_set_curr_bias(frame, replies);
                 recognised = true;                
@@ -435,9 +435,9 @@ bool embot::app::application::theCANparserSTRAIN::Impl::process_get_ch_adc(const
     embot::app::application::theSTRAIN &thestrain = embot::app::application::theSTRAIN::getInstance();    
     
     replyinfo.channel = msg.info.channel;
-    replyinfo.valueisraw = msg.info.getrawvalue;   
+    replyinfo.valueiscalibrated = msg.info.getcalibrated;   
 
-    thestrain.get_adc(replyinfo.channel, replyinfo.valueisraw, replyinfo.adcvalue);
+    thestrain.get_adc(replyinfo);
     
     embot::hw::can::Frame frame0;
     if(true == msg.reply(frame0, canaddress, replyinfo))
@@ -452,7 +452,7 @@ bool embot::app::application::theCANparserSTRAIN::Impl::process_get_ch_adc(const
 
 bool embot::app::application::theCANparserSTRAIN::Impl::process_set_offset(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
 {
-    embot::app::canprotocol::Message_aspoll_SET_CH_DAC_offset msg;
+    embot::app::canprotocol::Message_aspoll_SET_CH_DAC msg;
     msg.load(frame);
     
     embot::app::application::theSTRAIN &thestrain = embot::app::application::theSTRAIN::getInstance();    
@@ -464,10 +464,10 @@ bool embot::app::application::theCANparserSTRAIN::Impl::process_set_offset(const
 
 bool embot::app::application::theCANparserSTRAIN::Impl::process_get_offset(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
 {
-    embot::app::canprotocol::Message_aspoll_GET_CH_DAC_offset msg;
+    embot::app::canprotocol::Message_aspoll_GET_CH_DAC msg;
     msg.load(frame);
     
-    embot::app::canprotocol::Message_aspoll_GET_CH_DAC_offset::ReplyInfo replyinfo;
+    embot::app::canprotocol::Message_aspoll_GET_CH_DAC::ReplyInfo replyinfo;
     
     embot::app::application::theSTRAIN &thestrain = embot::app::application::theSTRAIN::getInstance();    
     
@@ -556,7 +556,7 @@ bool embot::app::application::theCANparserSTRAIN::Impl::process_get_matrix_gain(
 
 bool embot::app::application::theCANparserSTRAIN::Impl::process_set_calib_bias(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
 {
-    embot::app::canprotocol::Message_aspoll_SET_CALIB_TARE_bias msg;
+    embot::app::canprotocol::Message_aspoll_SET_CALIB_TARE msg;
     msg.load(frame);
     
     embot::app::application::theSTRAIN &thestrain = embot::app::application::theSTRAIN::getInstance();    
@@ -568,10 +568,10 @@ bool embot::app::application::theCANparserSTRAIN::Impl::process_set_calib_bias(c
 
 bool embot::app::application::theCANparserSTRAIN::Impl::process_get_calib_bias(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
 {
-    embot::app::canprotocol::Message_aspoll_GET_CALIB_TARE_bias msg;
+    embot::app::canprotocol::Message_aspoll_GET_CALIB_TARE msg;
     msg.load(frame);
     
-    embot::app::canprotocol::Message_aspoll_GET_CALIB_TARE_bias::ReplyInfo replyinfo;
+    embot::app::canprotocol::Message_aspoll_GET_CALIB_TARE::ReplyInfo replyinfo;
     
     embot::app::application::theSTRAIN &thestrain = embot::app::application::theSTRAIN::getInstance();    
     
@@ -591,7 +591,7 @@ bool embot::app::application::theCANparserSTRAIN::Impl::process_get_calib_bias(c
 
 bool embot::app::application::theCANparserSTRAIN::Impl::process_set_curr_bias(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
 {
-    embot::app::canprotocol::Message_aspoll_SET_CURR_TARE_bias msg;
+    embot::app::canprotocol::Message_aspoll_SET_CURR_TARE msg;
     msg.load(frame);
     
     embot::app::application::theSTRAIN &thestrain = embot::app::application::theSTRAIN::getInstance();    
@@ -603,10 +603,10 @@ bool embot::app::application::theCANparserSTRAIN::Impl::process_set_curr_bias(co
 
 bool embot::app::application::theCANparserSTRAIN::Impl::process_get_curr_bias(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
 {
-    embot::app::canprotocol::Message_aspoll_GET_CURR_TARE_bias msg;
+    embot::app::canprotocol::Message_aspoll_GET_CURR_TARE msg;
     msg.load(frame);
     
-    embot::app::canprotocol::Message_aspoll_GET_CURR_TARE_bias::ReplyInfo replyinfo;
+    embot::app::canprotocol::Message_aspoll_GET_CURR_TARE::ReplyInfo replyinfo;
     
     embot::app::application::theSTRAIN &thestrain = embot::app::application::theSTRAIN::getInstance();    
     

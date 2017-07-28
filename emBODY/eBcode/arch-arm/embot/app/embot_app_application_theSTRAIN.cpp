@@ -58,6 +58,184 @@ struct embot::app::application::theSTRAIN::Impl
 { 
     
     static const std::uint32_t validityKey = 0x7777dead;
+    
+    // it is a holder of config data which is eventally saved to eeprom. 
+    // this struct is without methods so thta i am sure its sizeof() is the sum of the variables. 
+    // this struct it is managed by the StrainConfig class
+    struct strainConfigData_t
+    {   
+        std::uint32_t       key;
+        char                serial[8];              // the serial number of the strain           
+        std::int16_t        fullscale[6];           // the fullscales of the measuraments
+        std::int16_t        tare[6];                // the stored tare
+        std::uint16_t       offset[6];              // the offset generated with the dac
+        std::uint8_t        matrixgain;             // the gain to be applied to the matrix as an unsigned integer value
+        std::int16_t        matrix[6][6];           // transformation matrix from the 6 strain-gauge values to the 6 force-torque values  
+        std::uint16_t       gainofamplifier[2][6];  // the gains used by .... 6sg maybe?                    
+    };
+        
+    class StrainConfigData
+    {   // only eepromread() and eepromwrite() operate on eeprom
+        public:
+            
+        strainConfigData_t      data;           // we save it in eeprom when requested
+        bool                    synched;        // true if data is equal to what is in eeprom
+
+        // methods
+        
+        bool clear()
+        {
+            std::memset(&data, 0, sizeof(data));
+            data.key = validityKey;
+            synched = false;
+            return synched;
+        }
+        
+        StrainConfigData()
+        {
+            clear();
+        }
+        
+        ~StrainConfigData() {}
+            
+        void setmatrixidentity()
+        {   // value 0x7fff is close to 1 = 1-2^(-15)            
+            std::memset(data.matrix, 0, sizeof(data.matrix));
+            data.matrix[0][0] = data.matrix[1][1] = data.matrix[2][2] = data.matrix[3][3] = data.matrix[4][4] = data.matrix[5][5] = 0x7fff;
+        }
+        
+        void setmatrixgain(std::uint8_t g)
+        {            
+            data.matrixgain = g;
+        }
+        
+        void setmatrix(std::uint8_t r, std::uint8_t c, std::uint16_t value)
+        {   
+            if((r<6) && (c<6))
+            {
+                data.matrix[r][c] = value;
+            }
+        }
+        
+        bool setdefault()
+        {
+            clear();
+            data.key = validityKey;
+            std::snprintf(data.serial, sizeof(data.serial), "SN0000");
+            data.fullscale[0] = data.fullscale[1] = data.fullscale[2] = data.fullscale[3] = data.fullscale[4] = data.fullscale[5] = 0x7fff;
+            setmatrixidentity();
+            setmatrixgain(1);
+            std::memset(data.gainofamplifier, 1, sizeof(data.gainofamplifier)); 
+            synched = false;
+            return synched;
+        }
+        
+        bool eepromread()
+        {
+            embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance();
+            canbrdinfo.userdataread(0, sizeof(data), &data);
+            synched = true;
+            
+            if(validityKey != data.key)
+            {   // if it is not valid, then ... set default and impose validity key      
+                setdefault();
+                data.key = validityKey;
+                eepromwrite();
+            }
+                        
+            return synched;
+        }
+        
+        bool eepromwrite()
+        {
+            data.key = validityKey;
+            embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance(); 
+            canbrdinfo.userdatawrite(0, sizeof(data), &data);
+            synched = true;
+            return synched;
+        }
+        
+        void setserial(const char *str) 
+        {
+            std::snprintf(data.serial, sizeof(data.serial), "%s", str);
+            synched = false;
+        }
+        
+        const char * getserial()
+        {
+            return data.serial;
+        }
+        
+        std::int16_t getfullscale(std::uint8_t channel)
+        {
+            if(channel < 6)
+                return data.fullscale[channel];
+            else
+                return 0;
+        }
+        
+        void setfullscale(std::uint8_t channel, std::int16_t value)
+        {
+            if(channel < 6)
+            {
+                data.fullscale[channel] = value;
+                synched = false;
+            }
+        }
+        
+        void setoffset(std::uint8_t channel, std::uint16_t value)
+        {
+            if(channel < 6)
+            {
+                data.offset[channel] = value;
+                synched = false;
+            }
+        }
+        
+    };
+    
+    
+    // it is a holder of volatile data used in runtime. we use tha same approach as for config data
+    struct StrainRuntimeData_t
+    {
+        std::int16_t        tare[6];    // the tare (offset) as measured in runtime
+        // add all useful data in here.
+        
+        // methods
+        void clear() { std::memset(tare, 0, sizeof(tare)); }       
+        StrainRuntimeData_t() { clear(); }
+    };
+    
+    class StrainRuntimeData
+    {
+        public:
+
+        StrainRuntimeData_t     data;   
+        
+        // methods
+        
+        bool clear()
+        {
+            data.clear();
+            return true;
+        }
+        
+        StrainRuntimeData()
+        {
+            clear();
+        }
+        
+        ~StrainRuntimeData() {}
+            
+        bool setdefault()
+        {
+            clear();
+            return true;
+        }
+                
+    };    
+    
+    
     struct StrainStoredInfo
     {   
         std::uint32_t       key;
@@ -153,6 +331,9 @@ struct embot::app::application::theSTRAIN::Impl
     // i put in here some values proper of the STRAIN. they may be many.... hence better to organise them in a struct later on.
     
     
+    StrainRuntimeData runtimedata;
+    StrainConfigData configdata;
+    
 
     Impl() 
     {   
@@ -168,6 +349,9 @@ struct embot::app::application::theSTRAIN::Impl
         
         strainstoredinfo.reset();
         infosavedoneeprom = false;
+        
+        configdata.clear();
+        runtimedata.clear();
         
     }
     
@@ -233,7 +417,11 @@ bool embot::app::application::theSTRAIN::Impl::fill(embot::app::canprotocol::Mes
 
 bool embot::app::application::theSTRAIN::Impl::acquisition()
 {
-    #warning TODO: perform hw acquisition of all FT values
+    #warning TODO: perform hw acquisition of all adc values and computation of ft values. 
+    
+    // formula is:
+    // torqueforce = M * (adcvalue + calibtare ) + currtare
+    // each of teh 6 adc values is acquired one at a time after we have applied a proper dac-offset[] value
 
     
     static std::int16_t vf = 0;
@@ -311,20 +499,9 @@ bool embot::app::application::theSTRAIN::initialise(Config &config)
     embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance();
     pImpl->canaddress = canbrdinfo.getCANaddress();
     
-    // retrieve strainstoredinfo
-    canbrdinfo.userdataread(0, sizeof(pImpl->strainstoredinfo), &pImpl->strainstoredinfo);
-    // if it is not valid, then ... set default and impose validity key
-    if(pImpl->validityKey != pImpl->strainstoredinfo.key)
-    {
-        pImpl->strainstoredinfo.reset();        
-        pImpl->strainstoredinfo.setdefault();
-        pImpl->strainstoredinfo.key = pImpl->validityKey;
-        canbrdinfo.userdatawrite(0, sizeof(pImpl->strainstoredinfo), &pImpl->strainstoredinfo);
-        
-        canbrdinfo.userdataread(0, sizeof(pImpl->strainstoredinfo), &pImpl->strainstoredinfo);
-    }
-    
-    pImpl->infosavedoneeprom = true;
+    // read from eeprom and make sure it is coherent data (first ever time we init eeprom)
+    pImpl->configdata.eepromread();
+    pImpl->runtimedata.clear();
      
     return true;
 }
@@ -337,7 +514,7 @@ bool embot::app::application::theSTRAIN::configure(embot::common::Time txperiod)
     {
         stop();
     }
-    
+    #warning: think to move txperiod in runtimedata.
     pImpl->txperiod = txperiod;
 
 //    // if the rate is not zero: start acquisition
@@ -353,31 +530,16 @@ bool embot::app::application::theSTRAIN::configure(embot::common::Time txperiod)
 
 bool embot::app::application::theSTRAIN::configure(embot::app::canprotocol::Message_aspoll_SET_SERIAL_NO::Info &info)
 {
-//    // if ticking: stop it
-//    if(true == pImpl->ticking)
-//    {
-//        stop();
-//    }
+    // original strain code saves the value in ram only. it is saved in eeprom only when the message save2eeprom arrives    
+    pImpl->configdata.setserial(info.serial);
     
-    embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance();
-    
-    // retrieve strainstoredinfo
-    canbrdinfo.userdataread(0, sizeof(pImpl->strainstoredinfo), &pImpl->strainstoredinfo);    
-    pImpl->strainstoredinfo.setserial(info.serial);
-    canbrdinfo.userdatawrite(0, sizeof(pImpl->strainstoredinfo), &pImpl->strainstoredinfo);
-
     return true;    
 }
 
 
 bool embot::app::application::theSTRAIN::get_serial(embot::app::canprotocol::Message_aspoll_GET_SERIAL_NO::ReplyInfo &replyinfo)
-{    
-   
-    embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance();
-    
-    // retrieve strainstoredinfo
-    canbrdinfo.userdataread(0, sizeof(pImpl->strainstoredinfo), &pImpl->strainstoredinfo);    
-    std::snprintf(replyinfo.serial, sizeof(replyinfo.serial), pImpl->strainstoredinfo.serial);
+{      
+    std::snprintf(replyinfo.serial, sizeof(replyinfo.serial), pImpl->configdata.getserial());
    
     return true;    
 }
@@ -386,28 +548,27 @@ bool embot::app::application::theSTRAIN::get_fullscale(std::uint8_t channel, std
 {    
     if(channel >= 6 )
     {
+        value = 0;
         return false;
     }
+       
+    #warning: fix the problem uint16 vs int16
+    value = pImpl->configdata.getfullscale(channel);
     
-    embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance();
-    
-    // retrieve strainstoredinfo
-    canbrdinfo.userdataread(0, sizeof(pImpl->strainstoredinfo), &pImpl->strainstoredinfo);    
-    value = pImpl->strainstoredinfo.fullscales[channel];
     return true;    
 }
 
 
-bool embot::app::application::theSTRAIN::get_adc(std::uint8_t channel, bool useraw, std::uint16_t &value)
+bool embot::app::application::theSTRAIN::get_adc(embot::app::canprotocol::Message_aspoll_GET_CH_ADC::ReplyInfo &replyinfo)
 {    
-    if(channel >= 6 )
+    if(replyinfo.channel >= 6 )
     {
         return false;
     }
     
     embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance();
 
-    value = 0x1234;
+    replyinfo.adcvalue = 0x1234;
     
     return true;    
 }
@@ -459,23 +620,15 @@ bool embot::app::application::theSTRAIN::save2eeprom()
     return true;    
 }
 
-bool embot::app::application::theSTRAIN::configure(embot::app::canprotocol::Message_aspoll_SET_CH_DAC_offset::Info &info)
+bool embot::app::application::theSTRAIN::configure(embot::app::canprotocol::Message_aspoll_SET_CH_DAC::Info &info)
 {  
     if(info.channel >= 6 )
     {
         return false;
     } 
-    
-    embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance();
    
-    // manage:
-
-    std::uint16_t o = info.offset;
-
-//    // retrieve strainstoredinfo
-//    canbrdinfo.userdataread(0, sizeof(pImpl->strainstoredinfo), &pImpl->strainstoredinfo);    
-//    pImpl->strainstoredinfo.setfullscale(info.channel, info.fullscale);
-//    canbrdinfo.userdatawrite(0, sizeof(pImpl->strainstoredinfo), &pImpl->strainstoredinfo);
+  
+    pImpl->configdata.setoffset(info.channel, info.offset);
 
     return true;    
 }
@@ -545,7 +698,7 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::Message_a
     return true;    
 }
 
-bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::Message_aspoll_GET_CALIB_TARE_bias::ReplyInfo &replyinfo)
+bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::Message_aspoll_GET_CALIB_TARE::ReplyInfo &replyinfo)
 {  
     if(replyinfo.channel >= 6)
     {
@@ -560,7 +713,7 @@ bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::Message_as
 }
 
 
-bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::Message_aspoll_SET_CALIB_TARE_bias::Info &info)
+bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::Message_aspoll_SET_CALIB_TARE::Info &info)
 { 
     if(info.channel >= 6)
     {
@@ -574,23 +727,27 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::Message_a
 
     switch(info.mode)
     {
-        case embot::app::canprotocol::Message_aspoll_SET_CALIB_TARE_bias::Mode::useval:
+        case embot::app::canprotocol::Message_aspoll_SET_CALIB_TARE::Mode::setchannelwithvalue:
         {
             pImpl->strainstoredinfo.calib_bias[info.channel] = info.value;
         } break;            
 
-        case embot::app::canprotocol::Message_aspoll_SET_CALIB_TARE_bias::Mode::reset:
+        case embot::app::canprotocol::Message_aspoll_SET_CALIB_TARE::Mode::everychannelreset:
         {
-            pImpl->strainstoredinfo.calib_bias[info.channel] = 0;
+            std::memset(pImpl->strainstoredinfo.calib_bias, 0, sizeof(pImpl->strainstoredinfo.calib_bias));
         } break;
 
-        case embot::app::canprotocol::Message_aspoll_SET_CALIB_TARE_bias::Mode::def:
+        case embot::app::canprotocol::Message_aspoll_SET_CALIB_TARE::Mode::everychannelnegativeofadc:
         {
-            pImpl->strainstoredinfo.calib_bias[info.channel] = 1; // TBD: set proper value for this case
+            #warning tbd
+            for(int i=0; i<6; i++)
+            {
+                pImpl->strainstoredinfo.calib_bias[i] = -1;
+            }
         } break;    
 
         default:
-        case embot::app::canprotocol::Message_aspoll_SET_CALIB_TARE_bias::Mode::unknown:
+        case embot::app::canprotocol::Message_aspoll_SET_CALIB_TARE::Mode::unknown:
         {
             ret = false;
         } break;        
@@ -606,7 +763,7 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::Message_a
 }
 
 
-bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::Message_aspoll_GET_CURR_TARE_bias::ReplyInfo &replyinfo)
+bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::Message_aspoll_GET_CURR_TARE::ReplyInfo &replyinfo)
 {  
     if(replyinfo.channel >= 6)
     {
@@ -621,7 +778,7 @@ bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::Message_as
 }
 
 
-bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::Message_aspoll_SET_CURR_TARE_bias::Info &info)
+bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::Message_aspoll_SET_CURR_TARE::Info &info)
 { 
     if(info.channel >= 6)
     {
@@ -635,23 +792,27 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::Message_a
 
     switch(info.mode)
     {
-        case embot::app::canprotocol::Message_aspoll_SET_CURR_TARE_bias::Mode::useval:
+        case embot::app::canprotocol::Message_aspoll_SET_CURR_TARE::Mode::setchannelwithvalue:
         {
             pImpl->strainstoredinfo.curr_bias[info.channel] = info.value;
         } break;            
 
-        case embot::app::canprotocol::Message_aspoll_SET_CURR_TARE_bias::Mode::reset:
+        case embot::app::canprotocol::Message_aspoll_SET_CURR_TARE::Mode::everychannelreset:
         {
-            pImpl->strainstoredinfo.curr_bias[info.channel] = 0;
+            std::memset(pImpl->strainstoredinfo.curr_bias, 0, sizeof(pImpl->strainstoredinfo.curr_bias));
         } break;
 
-        case embot::app::canprotocol::Message_aspoll_SET_CURR_TARE_bias::Mode::def:
+        case embot::app::canprotocol::Message_aspoll_SET_CURR_TARE::Mode::everychannelnegativeoftorque:
         {
-            pImpl->strainstoredinfo.curr_bias[info.channel] = 1; // TBD: set proper value for this case
+            #warning TBD
+            for(int i=0; i<6; i++)
+            {                
+                pImpl->strainstoredinfo.curr_bias[info.channel] = -1; 
+            }
         } break;    
 
         default:
-        case embot::app::canprotocol::Message_aspoll_SET_CURR_TARE_bias::Mode::unknown:
+        case embot::app::canprotocol::Message_aspoll_SET_CURR_TARE::Mode::unknown:
         {
             ret = false;
         } break;        

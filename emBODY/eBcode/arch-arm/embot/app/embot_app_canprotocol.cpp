@@ -954,11 +954,11 @@ namespace embot { namespace app { namespace canprotocol {
         }         
         
         
-        bool Message_aspoll_SET_CH_DAC_offset::load(const embot::hw::can::Frame &inframe)
+        bool Message_aspoll_SET_CH_DAC::load(const embot::hw::can::Frame &inframe)
         {
             Message::set(inframe);  
             
-            if(static_cast<std::uint8_t>(aspollCMD::SET_CH_DAC_offset) != frame2cmd(inframe))
+            if(static_cast<std::uint8_t>(aspollCMD::SET_CH_DAC) != frame2cmd(inframe))
             {
                 return false; 
             }
@@ -969,7 +969,7 @@ namespace embot { namespace app { namespace canprotocol {
             return true;         
         }                    
             
-        bool Message_aspoll_SET_CH_DAC_offset::reply()
+        bool Message_aspoll_SET_CH_DAC::reply()
         {
             return false;
         }       
@@ -996,11 +996,11 @@ namespace embot { namespace app { namespace canprotocol {
         }   
 
 
-        bool Message_aspoll_SET_CALIB_TARE_bias::load(const embot::hw::can::Frame &inframe)
+        bool Message_aspoll_SET_CALIB_TARE::load(const embot::hw::can::Frame &inframe)
         {
             Message::set(inframe);  
             
-            if(static_cast<std::uint8_t>(aspollCMD::SET_CALIB_TARE_bias) != frame2cmd(inframe))
+            if(static_cast<std::uint8_t>(aspollCMD::SET_CALIB_TARE) != frame2cmd(inframe))
             {
                 return false; 
             }
@@ -1011,17 +1011,17 @@ namespace embot { namespace app { namespace canprotocol {
             {
                 case 0:
                 {
-                    info.mode = Mode::reset;
+                    info.mode = Mode::everychannelreset;
                 } break;
                 
                 case 1:
                 {
-                    info.mode = Mode::def;
+                    info.mode = Mode::everychannelnegativeofadc;
                 } break;  
 
                 case 2:
                 {
-                    info.mode = Mode::useval;
+                    info.mode = Mode::setchannelwithvalue;
                 } break;
 
                 default:
@@ -1035,7 +1035,7 @@ namespace embot { namespace app { namespace canprotocol {
                 return false;
             }
             
-            if(Mode::useval == info.mode)
+            if(Mode::setchannelwithvalue == info.mode)
             {
                 info.channel = candata.datainframe[1];
                 info.value = static_cast<std::uint16_t>(candata.datainframe[2]) << 8 + static_cast<std::uint16_t>(candata.datainframe[3]);
@@ -1044,25 +1044,27 @@ namespace embot { namespace app { namespace canprotocol {
             return true;         
         }                    
             
-        bool Message_aspoll_SET_CALIB_TARE_bias::reply()
+        bool Message_aspoll_SET_CALIB_TARE::reply()
         {
             return false;
         } 
 
 
-        bool Message_aspoll_GET_CALIB_TARE_bias::load(const embot::hw::can::Frame &inframe)
+        bool Message_aspoll_GET_CALIB_TARE::load(const embot::hw::can::Frame &inframe)
         {
             Message::set(inframe); 
             
-            if(static_cast<std::uint8_t>(aspollCMD::GET_CALIB_TARE_bias) != frame2cmd(inframe))
+            if(static_cast<std::uint8_t>(aspollCMD::GET_CALIB_TARE) != frame2cmd(inframe))
             {
                 return false; 
             }
+            
+            info.channel = candata.datainframe[0];
 
             return true;
         }  
 
-        bool Message_aspoll_GET_CALIB_TARE_bias::reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo)
+        bool Message_aspoll_GET_CALIB_TARE::reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo)
         {
             std::uint8_t dd[7] = {0};
             dd[0] = replyinfo.channel;
@@ -1072,18 +1074,18 @@ namespace embot { namespace app { namespace canprotocol {
             std::uint8_t datalen = 3;
             
             frame_set_sender(outframe, sender);
-            frame_set_clascmddestinationdata(outframe, Clas::pollingAnalogSensor, static_cast<std::uint8_t>(aspollCMD::GET_CALIB_TARE_bias), candata.from, dd, datalen);
+            frame_set_clascmddestinationdata(outframe, Clas::pollingAnalogSensor, static_cast<std::uint8_t>(aspollCMD::GET_CALIB_TARE), candata.from, dd, datalen);
             frame_set_size(outframe, datalen+1);
             return true;
         }            
 
 
 
-        bool Message_aspoll_SET_CURR_TARE_bias::load(const embot::hw::can::Frame &inframe)
+        bool Message_aspoll_SET_CURR_TARE::load(const embot::hw::can::Frame &inframe)
         {
             Message::set(inframe);  
             
-            if(static_cast<std::uint8_t>(aspollCMD::SET_CURR_TARE_bias) != frame2cmd(inframe))
+            if(static_cast<std::uint8_t>(aspollCMD::SET_CURR_TARE) != frame2cmd(inframe))
             {
                 return false; 
             }
@@ -1094,17 +1096,17 @@ namespace embot { namespace app { namespace canprotocol {
             {
                 case 0:
                 {
-                    info.mode = Mode::reset;
+                    info.mode = Mode::everychannelreset;
                 } break;
                 
                 case 1:
                 {
-                    info.mode = Mode::def;
+                    info.mode = Mode::everychannelnegativeoftorque;
                 } break;  
 
                 case 2:
                 {
-                    info.mode = Mode::useval;
+                    info.mode = Mode::setchannelwithvalue;
                 } break;
 
                 default:
@@ -1118,7 +1120,7 @@ namespace embot { namespace app { namespace canprotocol {
                 return false;
             }
             
-            if(Mode::useval == info.mode)
+            if(Mode::setchannelwithvalue == info.mode)
             {
                 info.channel = candata.datainframe[1];
                 info.value = static_cast<std::uint16_t>(candata.datainframe[2]) << 8 + static_cast<std::uint16_t>(candata.datainframe[3]);
@@ -1127,25 +1129,27 @@ namespace embot { namespace app { namespace canprotocol {
             return true;         
         }                    
             
-        bool Message_aspoll_SET_CURR_TARE_bias::reply()
+        bool Message_aspoll_SET_CURR_TARE::reply()
         {
             return false;
         }   
 
 
-        bool Message_aspoll_GET_CURR_TARE_bias::load(const embot::hw::can::Frame &inframe)
+        bool Message_aspoll_GET_CURR_TARE::load(const embot::hw::can::Frame &inframe)
         {
             Message::set(inframe); 
             
-            if(static_cast<std::uint8_t>(aspollCMD::GET_CURR_TARE_bias) != frame2cmd(inframe))
+            if(static_cast<std::uint8_t>(aspollCMD::GET_CURR_TARE) != frame2cmd(inframe))
             {
                 return false; 
             }
+            
+            info.channel = candata.datainframe[0];
 
             return true;
         }  
 
-        bool Message_aspoll_GET_CURR_TARE_bias::reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo)
+        bool Message_aspoll_GET_CURR_TARE::reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo)
         {
             std::uint8_t dd[7] = {0};
             dd[0] = replyinfo.channel;
@@ -1155,7 +1159,7 @@ namespace embot { namespace app { namespace canprotocol {
             std::uint8_t datalen = 3;
             
             frame_set_sender(outframe, sender);
-            frame_set_clascmddestinationdata(outframe, Clas::pollingAnalogSensor, static_cast<std::uint8_t>(aspollCMD::GET_CURR_TARE_bias), candata.from, dd, datalen);
+            frame_set_clascmddestinationdata(outframe, Clas::pollingAnalogSensor, static_cast<std::uint8_t>(aspollCMD::GET_CURR_TARE), candata.from, dd, datalen);
             frame_set_size(outframe, datalen+1);
             return true;
         }          
@@ -1494,6 +1498,8 @@ namespace embot { namespace app { namespace canprotocol {
             {
                 return false; 
             }
+            
+            info.channel = candata.datainframe[0];
 
             return true;
         }  
@@ -1521,6 +1527,8 @@ namespace embot { namespace app { namespace canprotocol {
             {
                 return false; 
             }
+            
+            info.channel = candata.datainframe[0];
 
             return true;
         }  
@@ -1544,19 +1552,21 @@ namespace embot { namespace app { namespace canprotocol {
         
         
         
-        bool Message_aspoll_GET_CH_DAC_offset::load(const embot::hw::can::Frame &inframe)
+        bool Message_aspoll_GET_CH_DAC::load(const embot::hw::can::Frame &inframe)
         {
             Message::set(inframe); 
             
-            if(static_cast<std::uint8_t>(aspollCMD::GET_CH_DAC_offset) != frame2cmd(inframe))
+            if(static_cast<std::uint8_t>(aspollCMD::GET_CH_DAC) != frame2cmd(inframe))
             {
                 return false; 
             }
+            
+            info.channel = candata.datainframe[0];
 
             return true;
         }  
 
-        bool Message_aspoll_GET_CH_DAC_offset::reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo)
+        bool Message_aspoll_GET_CH_DAC::reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo)
         {
             std::uint8_t dd[7] = {0};
             dd[0] = replyinfo.channel;
@@ -1566,7 +1576,7 @@ namespace embot { namespace app { namespace canprotocol {
             std::uint8_t datalen = 3;
             
             frame_set_sender(outframe, sender);
-            frame_set_clascmddestinationdata(outframe, Clas::pollingAnalogSensor, static_cast<std::uint8_t>(aspollCMD::GET_CH_DAC_offset), candata.from, dd, datalen);
+            frame_set_clascmddestinationdata(outframe, Clas::pollingAnalogSensor, static_cast<std::uint8_t>(aspollCMD::GET_CH_DAC), candata.from, dd, datalen);
             frame_set_size(outframe, datalen+1);
             return true;
         }  
@@ -1580,6 +1590,9 @@ namespace embot { namespace app { namespace canprotocol {
             {
                 return false; 
             }
+            
+            info.row = candata.datainframe[0];
+            info.col = candata.datainframe[1];
 
             return true;
         }  
@@ -1634,6 +1647,9 @@ namespace embot { namespace app { namespace canprotocol {
             {
                 return false; 
             }
+            
+            info.channel =  candata.datainframe[0];
+            info.getcalibrated = (0 == candata.datainframe[1]) ? false : true;
 
             return true;
         }  
@@ -1642,7 +1658,7 @@ namespace embot { namespace app { namespace canprotocol {
         {
             std::uint8_t dd[7] = {0};
             dd[0] = replyinfo.channel;
-            dd[1] = replyinfo.valueisraw;
+            dd[1] = (true == replyinfo.valueiscalibrated) ? (1) : (0);
             dd[2] = (replyinfo.adcvalue >> 8) & 0xff;      // important note: the strain uses big endianess ... 
             dd[3] = replyinfo.adcvalue & 0xff;             
 
@@ -1662,7 +1678,7 @@ namespace embot { namespace app { namespace canprotocol {
             if(static_cast<std::uint8_t>(aspollCMD::GET_EEPROM_STATUS) != frame2cmd(inframe))
             {
                 return false; 
-            }
+            }            
 
             return true;
         }  
@@ -1670,7 +1686,7 @@ namespace embot { namespace app { namespace canprotocol {
         bool Message_aspoll_GET_EEPROM_STATUS::reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo)
         {
             std::uint8_t dd[7] = {0};
-            dd[0] = replyinfo.saved;
+            dd[0] = (true == replyinfo.saved) ? 1 : 0;
                         
             std::uint8_t datalen = 1;
             
@@ -1696,7 +1712,7 @@ namespace embot { namespace app { namespace canprotocol {
         bool Message_aspoll_SAVE2EE::reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo)
         {
             std::uint8_t dd[7] = {0};
-            dd[0] = replyinfo.ok;
+            dd[0] = (true == replyinfo.ok) ? 1 : 0;
                         
             std::uint8_t datalen = 1;
             

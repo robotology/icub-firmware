@@ -54,11 +54,11 @@ namespace embot { namespace app { namespace canprotocol {
                             SET_SERIAL_NO = 0x19, GET_SERIAL_NO = 0x1A,                                                     // strain canloader
                             GET_AMP_GAIN = 0x1D, SET_AMP_GAIN = 0x1E,                                                       // 6sg ... sg6_get_amp_gain(), sg6_set_amp_gain()
                             GET_CH_ADC = 0x0C,                                                                              // strain canloader
-                            SET_CH_DAC_offset = 0x04, GET_CH_DAC_offset = 0x0B,                                             // strain canloader
+                            SET_CH_DAC = 0x04, GET_CH_DAC = 0x0B,                                                           // strain canloader
                             SET_MATRIX_RC = 0x03, GET_MATRIX_RC = 0x0A,                                                     // strain canloader
                             SET_MATRIX_G = 0x11, GET_MATRIX_G = 0x12,                                                       // strain canloader                                               
-                            SET_CALIB_TARE_bias = 0x13, GET_CALIB_TARE_bias = 0x14,                                         // strain canloader 
-                            SET_CURR_TARE_bias = 0x15, GET_CURR_TARE_bias = 0x16,                                           // strain canloader 
+                            SET_CALIB_TARE = 0x13, GET_CALIB_TARE = 0x14,                                                   // strain canloader 
+                            SET_CURR_TARE = 0x15, GET_CURR_TARE = 0x16,                                                     // strain canloader 
 
     // TBD: ... maybe not for strain2                    
                             SET_RESOLUTION = 0x10                                                                           // mais
@@ -785,7 +785,7 @@ namespace embot { namespace app { namespace canprotocol {
             
     }; 
     
-    class Message_aspoll_GET_CH_DAC_offset : public Message
+    class Message_aspoll_GET_CH_DAC : public Message
     {
         public:
                                     
@@ -804,7 +804,7 @@ namespace embot { namespace app { namespace canprotocol {
         
         Info info;
         
-        Message_aspoll_GET_CH_DAC_offset() {}
+        Message_aspoll_GET_CH_DAC() {}
             
         bool load(const embot::hw::can::Frame &inframe);
             
@@ -812,7 +812,7 @@ namespace embot { namespace app { namespace canprotocol {
     };  
 
     
-    class Message_aspoll_SET_CH_DAC_offset : public Message
+    class Message_aspoll_SET_CH_DAC : public Message
     {
         public:
                         
@@ -826,7 +826,7 @@ namespace embot { namespace app { namespace canprotocol {
         
         Info info;
         
-        Message_aspoll_SET_CH_DAC_offset() {}
+        Message_aspoll_SET_CH_DAC() {}
             
         bool load(const embot::hw::can::Frame &inframe);
             
@@ -880,23 +880,23 @@ namespace embot { namespace app { namespace canprotocol {
     }; 
 
 
-    class Message_aspoll_SET_CALIB_TARE_bias : public Message
+    class Message_aspoll_SET_CALIB_TARE : public Message
     {
         public:
              
-        enum class Mode { def = 1, reset = 0, useval = 2, unknown = 255 };        
+        enum class Mode { everychannelreset = 0, everychannelnegativeofadc = 1, setchannelwithvalue = 2, unknown = 255 };        
             
         struct Info
         { 
             Mode                mode;
             std::uint8_t        channel;
             std::uint16_t       value;         
-            Info() : mode(Mode::def), channel(0), value(0) {}
+            Info() : mode(Mode::everychannelreset), channel(0), value(0) {}
         };
         
         Info info;
         
-        Message_aspoll_SET_CALIB_TARE_bias() {}
+        Message_aspoll_SET_CALIB_TARE() {}
             
         bool load(const embot::hw::can::Frame &inframe);
             
@@ -904,7 +904,7 @@ namespace embot { namespace app { namespace canprotocol {
             
     };    
 
-    class Message_aspoll_GET_CALIB_TARE_bias : public Message
+    class Message_aspoll_GET_CALIB_TARE : public Message
     {
         public:
              
@@ -923,7 +923,7 @@ namespace embot { namespace app { namespace canprotocol {
         
         Info info;
         
-        Message_aspoll_GET_CALIB_TARE_bias() {}
+        Message_aspoll_GET_CALIB_TARE() {}
             
         bool load(const embot::hw::can::Frame &inframe);
             
@@ -931,23 +931,23 @@ namespace embot { namespace app { namespace canprotocol {
             
     };         
 
-    class Message_aspoll_SET_CURR_TARE_bias : public Message
+    class Message_aspoll_SET_CURR_TARE : public Message
     {
         public:
              
-        enum class Mode { def = 1, reset = 0, useval = 2, unknown = 255 };        
+        enum class Mode { everychannelreset = 0, everychannelnegativeoftorque = 1, setchannelwithvalue = 2, unknown = 255 };        
             
         struct Info
         { 
             Mode                mode;
             std::uint8_t        channel;
             std::uint16_t       value;         
-            Info() : mode(Mode::def), channel(0), value(0) {}
+            Info() : mode(Mode::everychannelreset), channel(0), value(0) {}
         };
         
         Info info;
         
-        Message_aspoll_SET_CURR_TARE_bias() {}
+        Message_aspoll_SET_CURR_TARE() {}
             
         bool load(const embot::hw::can::Frame &inframe);
             
@@ -955,7 +955,7 @@ namespace embot { namespace app { namespace canprotocol {
             
     };    
 
-    class Message_aspoll_GET_CURR_TARE_bias : public Message
+    class Message_aspoll_GET_CURR_TARE : public Message
     {
         public:
              
@@ -974,7 +974,7 @@ namespace embot { namespace app { namespace canprotocol {
         
         Info info;
         
-        Message_aspoll_GET_CURR_TARE_bias() {}
+        Message_aspoll_GET_CURR_TARE() {}
             
         bool load(const embot::hw::can::Frame &inframe);
             
@@ -989,16 +989,16 @@ namespace embot { namespace app { namespace canprotocol {
         struct Info
         { 
             std::uint8_t    channel;   
-            bool            getrawvalue;
-            Info() : channel(0), getrawvalue(true) {}
+            bool            getcalibrated;
+            Info() : channel(0), getcalibrated(true) {}
         };
         
         struct ReplyInfo
         {
             std::uint8_t        channel;
-            bool                valueisraw;
+            bool                valueiscalibrated;
             std::uint16_t       adcvalue;
-            ReplyInfo() : channel(0), valueisraw(true), adcvalue(0) {}          
+            ReplyInfo() : channel(0), valueiscalibrated(true), adcvalue(0) {}          
         };        
         
         Info info;
