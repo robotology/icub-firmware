@@ -99,8 +99,8 @@ static std::vector<embot::hw::can::Frame> outframes;
 static void bl_activity(void* param)
 {
     // manage the led blinking
-    ActivityParam* pp = (ActivityParam*) param;    
-    uint32_t period = 0;    
+//    ActivityParam* pp = (ActivityParam*) param;    
+//    uint32_t period = 0;    
 //    if(nullptr != pp)
 //    {
 //        period = pp->blinkingperiod;
