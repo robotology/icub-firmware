@@ -94,15 +94,9 @@ static void start_evt_based(void)
     // start canparser strain2
     embot::app::application::theCANparserSTRAIN &canparserstr = embot::app::application::theCANparserSTRAIN::getInstance();
     embot::app::application::theCANparserSTRAIN::Config configstr;
-    canparserstr.initialise(configstr);  
-    
-//    embot::app::application::theSkin &theskin = embot::app::application::theSkin::getInstance();
-//    embot::app::application::theSkin::Config configskin;
-//    configskin.tickevent = evSKINprocess;
-//    configskin.totask = eventbasedtask;
-//    theskin.initialise(configskin);   
+    canparserstr.initialise(configstr);    
 
-
+    // start application for strain2
     embot::app::application::theSTRAIN &thestrain = embot::app::application::theSTRAIN::getInstance();
     embot::app::application::theSTRAIN::Config configstrain;
     configstrain.tickevent = evSTRAINprocess;

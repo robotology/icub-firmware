@@ -36,6 +36,7 @@
 #include "embot_sys_Action.h"
 #include "embot_hw.h"
 #include "embot_app_canprotocol.h"
+#include "embot_app_canprotocol_motor_periodic.h"
 
 #include <cstdio>
 
@@ -119,8 +120,8 @@ embot::common::relTime embot::app::application::theCANtracer::stop(const std::st
 
 bool embot::app::application::theCANtracer::print(const std::string &text, std::vector<embot::hw::can::Frame> &frames)
 { 
-    embot::app::canprotocol::Message_mcper_PRINT msg;
-    embot::app::canprotocol::Message_mcper_PRINT::Info info;
+    embot::app::canprotocol::motor::periodic::Message_PRINT msg;
+    embot::app::canprotocol::motor::periodic::Message_PRINT::Info info;
 
     info.canaddress = pImpl->config.canaddress;
     std::snprintf(info.text, sizeof(info.text), "%s", text.c_str());

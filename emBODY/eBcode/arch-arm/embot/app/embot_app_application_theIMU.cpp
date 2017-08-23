@@ -36,6 +36,7 @@
 #include "embot_sys_Action.h"
 #include "embot_hw.h"
 #include "embot_app_canprotocol.h"
+#include "embot_app_canprotocol_inertial_periodic.h"
 
 #include <cstdio>
 
@@ -77,7 +78,7 @@ struct embot::app::application::theIMU::Impl
     embot::sys::Timer *ticktimer;
     embot::sys::Action action;
     
-    embot::app::canprotocol::Message_aspoll_ACC_GYRO_SETUP::Info accgyroinfo;
+    embot::app::canprotocol::analog::polling::Message_ACC_GYRO_SETUP::Info accgyroinfo;
     
 
     
@@ -115,13 +116,13 @@ struct embot::app::application::theIMU::Impl
     
     bool tick(std::vector<embot::hw::can::Frame> &replies);
     
-    bool configure(embot::app::canprotocol::Message_aspoll_ACC_GYRO_SETUP::Info &ag);
+    bool configure(embot::app::canprotocol::analog::polling::Message_ACC_GYRO_SETUP::Info &ag);
     
     bool acquisition();
     
     
-    bool fill(embot::app::canprotocol::Message_isper_DIGITAL_ACCELEROMETER::Info &info);
-    bool fill(embot::app::canprotocol::Message_isper_DIGITAL_GYROSCOPE::Info &info);
+    bool fill(embot::app::canprotocol::inertial::periodic::Message_DIGITAL_ACCELEROMETER::Info &info);
+    bool fill(embot::app::canprotocol::inertial::periodic::Message_DIGITAL_GYROSCOPE::Info &info);
                       
 };
 
@@ -143,7 +144,7 @@ bool embot::app::application::theIMU::Impl::stop()
 }
 
 
-bool embot::app::application::theIMU::Impl::fill(embot::app::canprotocol::Message_isper_DIGITAL_ACCELEROMETER::Info &info)
+bool embot::app::application::theIMU::Impl::fill(embot::app::canprotocol::inertial::periodic::Message_DIGITAL_ACCELEROMETER::Info &info)
 {
     bool ret = true;
     
@@ -156,7 +157,7 @@ bool embot::app::application::theIMU::Impl::fill(embot::app::canprotocol::Messag
 }
 
 
-bool embot::app::application::theIMU::Impl::fill(embot::app::canprotocol::Message_isper_DIGITAL_GYROSCOPE::Info &info)
+bool embot::app::application::theIMU::Impl::fill(embot::app::canprotocol::inertial::periodic::Message_DIGITAL_GYROSCOPE::Info &info)
 {
     bool ret = true;
 
@@ -208,8 +209,8 @@ bool embot::app::application::theIMU::Impl::tick(std::vector<embot::hw::can::Fra
                                             
     if(true == accelEnabled)
     {
-        embot::app::canprotocol::Message_isper_DIGITAL_ACCELEROMETER msg;
-        embot::app::canprotocol::Message_isper_DIGITAL_ACCELEROMETER::Info accelinfo;
+        embot::app::canprotocol::inertial::periodic::Message_DIGITAL_ACCELEROMETER msg;
+        embot::app::canprotocol::inertial::periodic::Message_DIGITAL_ACCELEROMETER::Info accelinfo;
         if(true == fill(accelinfo))
         {
             msg.load(accelinfo);
@@ -220,8 +221,8 @@ bool embot::app::application::theIMU::Impl::tick(std::vector<embot::hw::can::Fra
     
     if(true == gyrosEnabled)
     {
-        embot::app::canprotocol::Message_isper_DIGITAL_GYROSCOPE msg;
-        embot::app::canprotocol::Message_isper_DIGITAL_GYROSCOPE::Info gyrosinfo;
+        embot::app::canprotocol::inertial::periodic::Message_DIGITAL_GYROSCOPE msg;
+        embot::app::canprotocol::inertial::periodic::Message_DIGITAL_GYROSCOPE::Info gyrosinfo;
         if(true == fill(gyrosinfo))
         {
             msg.load(gyrosinfo);
@@ -262,7 +263,7 @@ bool embot::app::application::theIMU::initialise(Config &config)
 }
 
 
-bool embot::app::application::theIMU::configure(embot::app::canprotocol::Message_aspoll_ACC_GYRO_SETUP::Info &ag)
+bool embot::app::application::theIMU::configure(embot::app::canprotocol::analog::polling::Message_ACC_GYRO_SETUP::Info &ag)
 {
     // if ticking: stop it
     if(true == pImpl->ticking)
@@ -274,15 +275,15 @@ bool embot::app::application::theIMU::configure(embot::app::canprotocol::Message
     pImpl->accgyroinfo = ag;
     
     // get some settings from it.    
-//    static const std::uint8_t accelmask =   static_cast<std::uint8_t>(embot::app::canprotocol::Message_aspoll_ACC_GYRO_SETUP::InertialType::analogaccelerometer) |
-//                                            static_cast<std::uint8_t>(embot::app::canprotocol::Message_aspoll_ACC_GYRO_SETUP::InertialType::internaldigitalaccelerometer) |
-//                                            static_cast<std::uint8_t>(embot::app::canprotocol::Message_aspoll_ACC_GYRO_SETUP::InertialType::externaldigitalaccelerometer) ;                                        
-//    static const std::uint8_t gyrosmask =   static_cast<std::uint8_t>(embot::app::canprotocol::Message_aspoll_ACC_GYRO_SETUP::InertialType::externaldigitalgyroscope);  
+//    static const std::uint8_t accelmask =   static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::Message_ACC_GYRO_SETUP::InertialType::analogaccelerometer) |
+//                                            static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::Message_ACC_GYRO_SETUP::InertialType::internaldigitalaccelerometer) |
+//                                            static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::Message_ACC_GYRO_SETUP::InertialType::externaldigitalaccelerometer) ;                                        
+//    static const std::uint8_t gyrosmask =   static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::Message_ACC_GYRO_SETUP::InertialType::externaldigitalgyroscope);  
                                                    
-    pImpl->accelEnabled =   embot::common::bit::check(pImpl->accgyroinfo.maskoftypes, static_cast<std::uint8_t>(embot::app::canprotocol::Message_aspoll_ACC_GYRO_SETUP::InertialTypeBit::analogaccelerometer))             ||
-                            embot::common::bit::check(pImpl->accgyroinfo.maskoftypes, static_cast<std::uint8_t>(embot::app::canprotocol::Message_aspoll_ACC_GYRO_SETUP::InertialTypeBit::internaldigitalaccelerometer))    ||
-                            embot::common::bit::check(pImpl->accgyroinfo.maskoftypes, static_cast<std::uint8_t>(embot::app::canprotocol::Message_aspoll_ACC_GYRO_SETUP::InertialTypeBit::externaldigitalaccelerometer));                                               
-    pImpl->gyrosEnabled =   embot::common::bit::check(pImpl->accgyroinfo.maskoftypes, static_cast<std::uint8_t>(embot::app::canprotocol::Message_aspoll_ACC_GYRO_SETUP::InertialTypeBit::externaldigitalgyroscope));   
+    pImpl->accelEnabled =   embot::common::bit::check(pImpl->accgyroinfo.maskoftypes, static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::Message_ACC_GYRO_SETUP::InertialTypeBit::analogaccelerometer))             ||
+                            embot::common::bit::check(pImpl->accgyroinfo.maskoftypes, static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::Message_ACC_GYRO_SETUP::InertialTypeBit::internaldigitalaccelerometer))    ||
+                            embot::common::bit::check(pImpl->accgyroinfo.maskoftypes, static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::Message_ACC_GYRO_SETUP::InertialTypeBit::externaldigitalaccelerometer));                                               
+    pImpl->gyrosEnabled =   embot::common::bit::check(pImpl->accgyroinfo.maskoftypes, static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::Message_ACC_GYRO_SETUP::InertialTypeBit::externaldigitalgyroscope));   
     
     // if there is something to acquire and the rate is not zero: start acquisition
             

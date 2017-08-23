@@ -11,6 +11,7 @@
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <pCCUsed>5060422::V5.06 update 4 (build 422)::ARMCC</pCCUsed>
+      <uAC6>0</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32L476RGTx</Device>
@@ -874,11 +875,6 @@
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_flash.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_app_canprotocol.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_canprotocol.cpp</FilePath>
-            </File>
-            <File>
               <FileName>embot_app_bootloader_theCANparser.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_bootloader_theCANparser.cpp</FilePath>
@@ -887,6 +883,16 @@
               <FileName>slim_retarget_io.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\slim_retarget_io.c</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_canprotocol.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_canprotocol.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_canprotocol_bootloader.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_canprotocol_bootloader.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -967,7 +973,8 @@
       <TargetName>mtb4-btl-ulpro</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>5060422::V5.06 update 4 (build 422)::ARMCC</pCCUsed>
+      <pCCUsed>5060528::V5.06 update 5 (build 528)::ARMCC</pCCUsed>
+      <uAC6>0</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32L433RCIx</Device>
@@ -1831,11 +1838,6 @@
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_flash.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_app_canprotocol.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_canprotocol.cpp</FilePath>
-            </File>
-            <File>
               <FileName>embot_app_bootloader_theCANparser.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_bootloader_theCANparser.cpp</FilePath>
@@ -1844,6 +1846,16 @@
               <FileName>slim_retarget_io.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\slim_retarget_io.c</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_canprotocol.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_canprotocol.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_canprotocol_bootloader.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_canprotocol_bootloader.cpp</FilePath>
             </File>
           </Files>
         </Group>

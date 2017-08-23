@@ -366,8 +366,8 @@ struct embot::app::application::theSTRAIN::Impl
     bool acquisition();
     
     
-    bool fill(embot::app::canprotocol::Message_asper_FORCE_VECTOR::Info &info);
-    bool fill(embot::app::canprotocol::Message_asper_TORQUE_VECTOR::Info &info);
+    bool fill(embot::app::canprotocol::analog::periodic::Message_FORCE_VECTOR::Info &info);
+    bool fill(embot::app::canprotocol::analog::periodic::Message_TORQUE_VECTOR::Info &info);
                       
 };
 
@@ -389,7 +389,7 @@ bool embot::app::application::theSTRAIN::Impl::stop()
 }
 
 
-bool embot::app::application::theSTRAIN::Impl::fill(embot::app::canprotocol::Message_asper_FORCE_VECTOR::Info &info)
+bool embot::app::application::theSTRAIN::Impl::fill(embot::app::canprotocol::analog::periodic::Message_FORCE_VECTOR::Info &info)
 {
     bool ret = true;
     
@@ -402,7 +402,7 @@ bool embot::app::application::theSTRAIN::Impl::fill(embot::app::canprotocol::Mes
 }
 
 
-bool embot::app::application::theSTRAIN::Impl::fill(embot::app::canprotocol::Message_asper_TORQUE_VECTOR::Info &info)
+bool embot::app::application::theSTRAIN::Impl::fill(embot::app::canprotocol::analog::periodic::Message_TORQUE_VECTOR::Info &info)
 {
     bool ret = true;
 
@@ -452,20 +452,20 @@ bool embot::app::application::theSTRAIN::Impl::tick(std::vector<embot::hw::can::
     embot::hw::can::Frame frame;   
                                             
     
-    embot::app::canprotocol::Message_asper_FORCE_VECTOR::Info forceinfo;
+    embot::app::canprotocol::analog::periodic::Message_FORCE_VECTOR::Info forceinfo;
     if(true == fill(forceinfo))
     {
-        embot::app::canprotocol::Message_asper_FORCE_VECTOR msg;
+        embot::app::canprotocol::analog::periodic::Message_FORCE_VECTOR msg;
         msg.load(forceinfo);
         msg.get(frame);
         replies.push_back(frame);
     }            
 
     
-    embot::app::canprotocol::Message_asper_TORQUE_VECTOR::Info torqueinfo;
+    embot::app::canprotocol::analog::periodic::Message_TORQUE_VECTOR::Info torqueinfo;
     if(true == fill(torqueinfo))
     {
-        embot::app::canprotocol::Message_asper_TORQUE_VECTOR msg;
+        embot::app::canprotocol::analog::periodic::Message_TORQUE_VECTOR msg;
         msg.load(torqueinfo);
         msg.get(frame);
         replies.push_back(frame);
@@ -528,7 +528,7 @@ bool embot::app::application::theSTRAIN::configure(embot::common::Time txperiod)
 }
 
 
-bool embot::app::application::theSTRAIN::configure(embot::app::canprotocol::Message_aspoll_SET_SERIAL_NO::Info &info)
+bool embot::app::application::theSTRAIN::configure(embot::app::canprotocol::analog::polling::Message_SET_SERIAL_NO::Info &info)
 {
     // original strain code saves the value in ram only. it is saved in eeprom only when the message save2eeprom arrives    
     pImpl->configdata.setserial(info.serial);
@@ -537,7 +537,7 @@ bool embot::app::application::theSTRAIN::configure(embot::app::canprotocol::Mess
 }
 
 
-bool embot::app::application::theSTRAIN::get_serial(embot::app::canprotocol::Message_aspoll_GET_SERIAL_NO::ReplyInfo &replyinfo)
+bool embot::app::application::theSTRAIN::get_serial(embot::app::canprotocol::analog::polling::Message_GET_SERIAL_NO::ReplyInfo &replyinfo)
 {      
     std::snprintf(replyinfo.serial, sizeof(replyinfo.serial), pImpl->configdata.getserial());
    
@@ -559,7 +559,7 @@ bool embot::app::application::theSTRAIN::get_fullscale(std::uint8_t channel, std
 }
 
 
-bool embot::app::application::theSTRAIN::get_adc(embot::app::canprotocol::Message_aspoll_GET_CH_ADC::ReplyInfo &replyinfo)
+bool embot::app::application::theSTRAIN::get_adc(embot::app::canprotocol::analog::polling::Message_GET_CH_ADC::ReplyInfo &replyinfo)
 {    
     if(replyinfo.channel >= 6 )
     {
@@ -588,7 +588,7 @@ bool embot::app::application::theSTRAIN::get_offset(std::uint8_t channel, std::u
     return true;    
 }
 
-bool embot::app::application::theSTRAIN::configure(embot::app::canprotocol::Message_aspoll_SET_FULL_SCALES::Info &info)
+bool embot::app::application::theSTRAIN::configure(embot::app::canprotocol::analog::polling::Message_SET_FULL_SCALES::Info &info)
 {    
     embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance();
     
@@ -620,7 +620,7 @@ bool embot::app::application::theSTRAIN::save2eeprom()
     return true;    
 }
 
-bool embot::app::application::theSTRAIN::configure(embot::app::canprotocol::Message_aspoll_SET_CH_DAC::Info &info)
+bool embot::app::application::theSTRAIN::configure(embot::app::canprotocol::analog::polling::Message_SET_CH_DAC::Info &info)
 {  
     if(info.channel >= 6 )
     {
@@ -634,7 +634,7 @@ bool embot::app::application::theSTRAIN::configure(embot::app::canprotocol::Mess
 }
 
 
-bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::Message_aspoll_GET_MATRIX_RC::ReplyInfo &replyinfo)
+bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::polling::Message_GET_MATRIX_RC::ReplyInfo &replyinfo)
 {    
     if((replyinfo.row >= 6) || (replyinfo.col >= 6))
     {
@@ -649,7 +649,7 @@ bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::Message_as
 }
 
 
-bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::Message_aspoll_SET_MATRIX_RC::Info &info)
+bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::polling::Message_SET_MATRIX_RC::Info &info)
 {  
     if((info.row >= 6) || (info.col >= 6))
     {
@@ -671,7 +671,7 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::Message_a
 }
 
 
-bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::Message_aspoll_GET_MATRIX_G::ReplyInfo &replyinfo)
+bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::polling::Message_GET_MATRIX_G::ReplyInfo &replyinfo)
 {        
     embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance();
 
@@ -681,7 +681,7 @@ bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::Message_as
 }
 
 
-bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::Message_aspoll_SET_MATRIX_G::Info &info)
+bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::polling::Message_SET_MATRIX_G::Info &info)
 {  
 
     embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance();
@@ -698,7 +698,7 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::Message_a
     return true;    
 }
 
-bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::Message_aspoll_GET_CALIB_TARE::ReplyInfo &replyinfo)
+bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::polling::Message_GET_CALIB_TARE::ReplyInfo &replyinfo)
 {  
     if(replyinfo.channel >= 6)
     {
@@ -713,7 +713,7 @@ bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::Message_as
 }
 
 
-bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::Message_aspoll_SET_CALIB_TARE::Info &info)
+bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::polling::Message_SET_CALIB_TARE::Info &info)
 { 
     if(info.channel >= 6)
     {
@@ -727,17 +727,17 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::Message_a
 
     switch(info.mode)
     {
-        case embot::app::canprotocol::Message_aspoll_SET_CALIB_TARE::Mode::setchannelwithvalue:
+        case embot::app::canprotocol::analog::polling::Message_SET_CALIB_TARE::Mode::setchannelwithvalue:
         {
             pImpl->strainstoredinfo.calib_bias[info.channel] = info.value;
         } break;            
 
-        case embot::app::canprotocol::Message_aspoll_SET_CALIB_TARE::Mode::everychannelreset:
+        case embot::app::canprotocol::analog::polling::Message_SET_CALIB_TARE::Mode::everychannelreset:
         {
             std::memset(pImpl->strainstoredinfo.calib_bias, 0, sizeof(pImpl->strainstoredinfo.calib_bias));
         } break;
 
-        case embot::app::canprotocol::Message_aspoll_SET_CALIB_TARE::Mode::everychannelnegativeofadc:
+        case embot::app::canprotocol::analog::polling::Message_SET_CALIB_TARE::Mode::everychannelnegativeofadc:
         {
             #warning tbd
             for(int i=0; i<6; i++)
@@ -747,7 +747,7 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::Message_a
         } break;    
 
         default:
-        case embot::app::canprotocol::Message_aspoll_SET_CALIB_TARE::Mode::unknown:
+        case embot::app::canprotocol::analog::polling::Message_SET_CALIB_TARE::Mode::unknown:
         {
             ret = false;
         } break;        
@@ -763,7 +763,7 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::Message_a
 }
 
 
-bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::Message_aspoll_GET_CURR_TARE::ReplyInfo &replyinfo)
+bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::polling::Message_GET_CURR_TARE::ReplyInfo &replyinfo)
 {  
     if(replyinfo.channel >= 6)
     {
@@ -778,7 +778,7 @@ bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::Message_as
 }
 
 
-bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::Message_aspoll_SET_CURR_TARE::Info &info)
+bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::polling::Message_SET_CURR_TARE::Info &info)
 { 
     if(info.channel >= 6)
     {
@@ -792,17 +792,17 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::Message_a
 
     switch(info.mode)
     {
-        case embot::app::canprotocol::Message_aspoll_SET_CURR_TARE::Mode::setchannelwithvalue:
+        case embot::app::canprotocol::analog::polling::Message_SET_CURR_TARE::Mode::setchannelwithvalue:
         {
             pImpl->strainstoredinfo.curr_bias[info.channel] = info.value;
         } break;            
 
-        case embot::app::canprotocol::Message_aspoll_SET_CURR_TARE::Mode::everychannelreset:
+        case embot::app::canprotocol::analog::polling::Message_SET_CURR_TARE::Mode::everychannelreset:
         {
             std::memset(pImpl->strainstoredinfo.curr_bias, 0, sizeof(pImpl->strainstoredinfo.curr_bias));
         } break;
 
-        case embot::app::canprotocol::Message_aspoll_SET_CURR_TARE::Mode::everychannelnegativeoftorque:
+        case embot::app::canprotocol::analog::polling::Message_SET_CURR_TARE::Mode::everychannelnegativeoftorque:
         {
             #warning TBD
             for(int i=0; i<6; i++)
@@ -812,7 +812,7 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::Message_a
         } break;    
 
         default:
-        case embot::app::canprotocol::Message_aspoll_SET_CURR_TARE::Mode::unknown:
+        case embot::app::canprotocol::analog::polling::Message_SET_CURR_TARE::Mode::unknown:
         {
             ret = false;
         } break;        
@@ -828,7 +828,7 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::Message_a
 }
 
 
-bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::Message_aspoll_GET_AMP_GAIN::ReplyInfo &replyinfo)
+bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::polling::Message_GET_AMP_GAIN::ReplyInfo &replyinfo)
 {  
     if(replyinfo.channel >= 6)
     {
@@ -844,7 +844,7 @@ bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::Message_as
 }
 
 
-bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::Message_aspoll_SET_AMP_GAIN::Info &info)
+bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::polling::Message_SET_AMP_GAIN::Info &info)
 { 
     if(info.channel >= 6)
     {

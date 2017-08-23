@@ -28,6 +28,8 @@
 #include "embot_sys.h"
 
 #include "embot_app_canprotocol.h"
+#include "embot_app_canprotocol_analog_polling.h"
+#include "embot_app_canprotocol_analog_periodic.h"
 
 
 #include <vector>
@@ -55,7 +57,7 @@ namespace embot { namespace app { namespace application {
         
         bool initialise(Config &config);   
 
-        bool configure(embot::app::canprotocol::Message_aspoll_ACC_GYRO_SETUP::Info &cfg);
+        bool configure(embot::app::canprotocol::analog::polling::Message_ACC_GYRO_SETUP::Info &cfg);
         
         bool start();
         bool stop();        

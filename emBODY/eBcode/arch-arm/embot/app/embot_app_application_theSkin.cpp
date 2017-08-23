@@ -36,6 +36,9 @@
 #include "embot_sys_Action.h"
 #include "embot_hw.h"
 #include "embot_app_canprotocol.h"
+#include "embot_app_canprotocol_skin_periodic.h"
+#include "embot_app_canprotocol_analog_polling.h"
+#include "embot_app_canprotocol_analog_periodic.h"
 
 #include <cstdio>
 
@@ -117,9 +120,9 @@ struct embot::app::application::theSkin::Impl
     embot::sys::Timer *ticktimer;
     embot::sys::Action action;
     
-    embot::app::canprotocol::Message_aspoll_SKIN_SET_BRD_CFG::Info boardconfig;
+    embot::app::canprotocol::analog::polling::Message_SKIN_SET_BRD_CFG::Info boardconfig;
     
-    embot::app::canprotocol::Message_aspoll_SKIN_SET_TRIANG_CFG::Info triangleconfigcommand;
+    embot::app::canprotocol::analog::polling::Message_SKIN_SET_TRIANG_CFG::Info triangleconfigcommand;
     
     Triangles triangles;
 
@@ -131,7 +134,7 @@ struct embot::app::application::theSkin::Impl
         forcecalibration = false;
 
         ticktimer = new embot::sys::Timer;   
-        boardconfig.skintype = embot::app::canprotocol::Message_aspoll_SKIN_SET_BRD_CFG::SkinType::withTemperatureCompensation;
+        boardconfig.skintype = embot::app::canprotocol::analog::polling::Message_SKIN_SET_BRD_CFG::SkinType::withTemperatureCompensation;
         boardconfig.txperiod = 50*embot::common::time1millisec;   
         boardconfig.noload = ad7147_dot_value_noload;        
 
@@ -148,18 +151,18 @@ struct embot::app::application::theSkin::Impl
     
     bool tick(std::vector<embot::hw::can::Frame> &replies);
     
-    bool configtriangles(embot::app::canprotocol::Message_aspoll_SKIN_SET_TRIANG_CFG::Info &trgcfg);
+    bool configtriangles(embot::app::canprotocol::analog::polling::Message_SKIN_SET_TRIANG_CFG::Info &trgcfg);
     
     bool calibrate();
     
-    bool fill(embot::app::canprotocol::Message_skper_TRG::Info &info, const std::uint8_t trg);
+    bool fill(embot::app::canprotocol::skin::periodic::Message_TRG::Info &info, const std::uint8_t trg);
     
     int computedrift(std::uint8_t trg, std::uint8_t dot);
                   
 };
 
 
-bool embot::app::application::theSkin::Impl::configtriangles(embot::app::canprotocol::Message_aspoll_SKIN_SET_TRIANG_CFG::Info &trgcfg)
+bool embot::app::application::theSkin::Impl::configtriangles(embot::app::canprotocol::analog::polling::Message_SKIN_SET_TRIANG_CFG::Info &trgcfg)
 {    
     triangleconfigcommand = trgcfg;
     
@@ -243,7 +246,7 @@ int embot::app::application::theSkin::Impl::computedrift(std::uint8_t trg, std::
     
     switch(boardconfig.skintype)
     {        
-        case embot::app::canprotocol::Message_aspoll_SKIN_SET_BRD_CFG::SkinType::withTemperatureCompensation:
+        case embot::app::canprotocol::analog::polling::Message_SKIN_SET_BRD_CFG::SkinType::withTemperatureCompensation:
         {
             gain = triangles.GAIN[dot];  
             Tpad_base = triangles.capoffsets[trg][6]; // in original mtb3 code there is ADCRESULT_S6 which is defined as 6
@@ -259,7 +262,7 @@ int embot::app::application::theSkin::Impl::computedrift(std::uint8_t trg, std::
             }     
         } break;
         
-        case embot::app::canprotocol::Message_aspoll_SKIN_SET_BRD_CFG::SkinType::palmFingerTip:
+        case embot::app::canprotocol::analog::polling::Message_SKIN_SET_BRD_CFG::SkinType::palmFingerTip:
         {
             gain = triangles.GAIN_PALM[dot];  // in original mtb3 code GAIN_PALM[] is ... all zero, hence drift is ZERO! 
             Tpad_base = triangles.capoffsets[trg][11]; // in original mtb3 code there is ADCRESULT_S11 which is defined as 11
@@ -276,8 +279,8 @@ int embot::app::application::theSkin::Impl::computedrift(std::uint8_t trg, std::
         } break;
         
         default:
-        case embot::app::canprotocol::Message_aspoll_SKIN_SET_BRD_CFG::SkinType::testmodeRAW:
-        case embot::app::canprotocol::Message_aspoll_SKIN_SET_BRD_CFG::SkinType::withoutTempCompensation:
+        case embot::app::canprotocol::analog::polling::Message_SKIN_SET_BRD_CFG::SkinType::testmodeRAW:
+        case embot::app::canprotocol::analog::polling::Message_SKIN_SET_BRD_CFG::SkinType::withoutTempCompensation:
         {
             drift = 0;
         } break;                
@@ -287,7 +290,7 @@ int embot::app::application::theSkin::Impl::computedrift(std::uint8_t trg, std::
 }
 
 
-bool embot::app::application::theSkin::Impl::fill(embot::app::canprotocol::Message_skper_TRG::Info &info, const std::uint8_t trg)
+bool embot::app::application::theSkin::Impl::fill(embot::app::canprotocol::skin::periodic::Message_TRG::Info &info, const std::uint8_t trg)
 {
     bool ret = true;
     if2hw_data_ad7147_t *the12rawvalues = ad7147_get12rawvaluesoftriangle(trg);
@@ -305,7 +308,7 @@ bool embot::app::application::theSkin::Impl::fill(embot::app::canprotocol::Messa
     std::memset(info.the12s, 0, sizeof(info.the12s));
     
     
-    if(embot::app::canprotocol::Message_aspoll_SKIN_SET_BRD_CFG::SkinType::testmodeRAW == boardconfig.skintype)
+    if(embot::app::canprotocol::analog::polling::Message_SKIN_SET_BRD_CFG::SkinType::testmodeRAW == boardconfig.skintype)
     {   // just copy what is into the rawvalues. just the lsb...
         for(std::uint8_t i=0; i<dotNumberOf; i++)
         {
@@ -424,8 +427,8 @@ bool embot::app::application::theSkin::Impl::tick(std::vector<embot::hw::can::Fr
     
     // acquire and transmit ...
     
-    embot::app::canprotocol::Message_skper_TRG msg;
-    embot::app::canprotocol::Message_skper_TRG::Info info;
+    embot::app::canprotocol::skin::periodic::Message_TRG msg;
+    embot::app::canprotocol::skin::periodic::Message_TRG::Info info;
     for(std::uint8_t t=0; t<trgNumberOf; t++)
     {
         if(true == embot::common::bit::check(triangles.activemask, t))
@@ -485,7 +488,7 @@ bool embot::app::application::theSkin::initialise(Config &config)
 }
   
 
-bool embot::app::application::theSkin::configure(embot::app::canprotocol::Message_aspoll_SKIN_SET_BRD_CFG::Info &brdcfg)
+bool embot::app::application::theSkin::configure(embot::app::canprotocol::analog::polling::Message_SKIN_SET_BRD_CFG::Info &brdcfg)
 {
     pImpl->boardconfig = brdcfg;
     
@@ -510,7 +513,7 @@ bool embot::app::application::theSkin::configure(embot::app::canprotocol::Messag
 }
 
 
-bool embot::app::application::theSkin::configure(embot::app::canprotocol::Message_aspoll_SKIN_SET_TRIANG_CFG::Info &trgcfg)
+bool embot::app::application::theSkin::configure(embot::app::canprotocol::analog::polling::Message_SKIN_SET_TRIANG_CFG::Info &trgcfg)
 { 
     return pImpl->configtriangles(trgcfg);
 }

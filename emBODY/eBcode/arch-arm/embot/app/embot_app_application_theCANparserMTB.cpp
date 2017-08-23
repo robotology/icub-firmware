@@ -35,6 +35,8 @@
 
 #include "embot_hw.h"
 #include "embot_app_canprotocol.h"
+#include "embot_app_canprotocol_analog_polling.h"
+#include "embot_app_canprotocol_analog_periodic.h"
 
 #include "embot_app_theCANboardInfo.h"
 
@@ -106,23 +108,23 @@ bool embot::app::application::theCANparserMTB::Impl::process(const embot::hw::ca
         
         case embot::app::canprotocol::Clas::pollingAnalogSensor:
         {
-            // only embot::app::canprotocol::aspollCMD::SKIN_SET_BRD_CFG, SKIN_SET_TRIANG_CFG, SET_TXMODE            
-            if(static_cast<std::uint8_t>(embot::app::canprotocol::aspollCMD::SKIN_SET_BRD_CFG) == cmd)
+            // only embot::app::canprotocol::analog::polling::CMD::SKIN_SET_BRD_CFG, SKIN_SET_TRIANG_CFG, SET_TXMODE            
+            if(static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::CMD::SKIN_SET_BRD_CFG) == cmd)
             {
                 txframe = process_set_brdcfg(frame, replies);
                 recognised = true;
             }
-            else if(static_cast<std::uint8_t>(embot::app::canprotocol::aspollCMD::SKIN_SET_TRIANG_CFG) == cmd)
+            else if(static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::CMD::SKIN_SET_TRIANG_CFG) == cmd)
             {
                 txframe = process_set_trgcfg(frame, replies);
                 recognised = true;
             }
-            else if(static_cast<std::uint8_t>(embot::app::canprotocol::aspollCMD::SET_TXMODE) == cmd)
+            else if(static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::CMD::SET_TXMODE) == cmd)
             {
                 txframe = process_set_txmode(frame, replies);
                 recognised = true;
             }
-            else if(static_cast<std::uint8_t>(embot::app::canprotocol::aspollCMD::ACC_GYRO_SETUP) == cmd)
+            else if(static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::CMD::ACC_GYRO_SETUP) == cmd)
             { 
                 txframe = process_set_accgyrosetup(frame, replies);
                 recognised = true;                
@@ -147,7 +149,7 @@ bool embot::app::application::theCANparserMTB::Impl::process(const embot::hw::ca
 
 bool embot::app::application::theCANparserMTB::Impl::process_set_brdcfg(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
 {
-    embot::app::canprotocol::Message_aspoll_SKIN_SET_BRD_CFG msg;
+    embot::app::canprotocol::analog::polling::Message_SKIN_SET_BRD_CFG msg;
     msg.load(frame);
       
     embot::app::application::theSkin &theskin = embot::app::application::theSkin::getInstance();    
@@ -159,7 +161,7 @@ bool embot::app::application::theCANparserMTB::Impl::process_set_brdcfg(const em
 
 bool embot::app::application::theCANparserMTB::Impl::process_set_trgcfg(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
 {
-    embot::app::canprotocol::Message_aspoll_SKIN_SET_TRIANG_CFG msg;
+    embot::app::canprotocol::analog::polling::Message_SKIN_SET_TRIANG_CFG msg;
     msg.load(frame);
       
     embot::app::application::theSkin &theskin = embot::app::application::theSkin::getInstance();    
@@ -171,7 +173,7 @@ bool embot::app::application::theCANparserMTB::Impl::process_set_trgcfg(const em
 
 bool embot::app::application::theCANparserMTB::Impl::process_set_accgyrosetup(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
 {
-    embot::app::canprotocol::Message_aspoll_ACC_GYRO_SETUP msg;
+    embot::app::canprotocol::analog::polling::Message_ACC_GYRO_SETUP msg;
     msg.load(frame);
       
     embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance();    
@@ -183,7 +185,7 @@ bool embot::app::application::theCANparserMTB::Impl::process_set_accgyrosetup(co
 
 bool embot::app::application::theCANparserMTB::Impl::process_set_txmode(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
 {
-    embot::app::canprotocol::Message_aspoll_SET_TXMODE msg(embot::app::canprotocol::Board::mtb4);
+    embot::app::canprotocol::analog::polling::Message_SET_TXMODE msg(embot::app::canprotocol::Board::mtb4);
     msg.load(frame);
     
     embot::app::application::theSkin &theskin = embot::app::application::theSkin::getInstance();    
