@@ -220,7 +220,7 @@ extern void ad7147_set_cdcoffset(uint8_t trg, uint16_t cdcoffset)
 }
 
 
-extern uint16_t ad7147_gettrianglesconnectedmask()
+extern uint16_t ad7147_gettrianglesconnectedmask(void)
 {
     return triangleconnectionmask;
 }

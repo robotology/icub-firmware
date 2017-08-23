@@ -319,8 +319,9 @@ unsigned char WriteByteI2C_onSdaX(unsigned char Channel, i2c_sda_num_t sdaNum,
         if2hw_data_i2cmultisda_t *DataBuffer, const unsigned int OffsetInBuffer) {
             
     unsigned int DataToWrite;
-    unsigned char LowByteAddress, HighByteAddress;
-    unsigned char LowByteData, HighByteData;
+//    unsigned char LowByteAddress, HighByteAddress;
+    unsigned char LowByteData;
+//    unsigned char HighByteData;
     unsigned char r, AcknError;
     unsigned char DeviceAddressHeader;
 

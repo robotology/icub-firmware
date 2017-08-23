@@ -107,7 +107,7 @@ void SetCDCoffsetOnAllTriangles(unsigned char Channel, if2hw_data_ad7147_t cdcOf
 extern void ad7147_init(if2hw_data_ad7147_t ext_rawvalues[][12], if2hw_data_ad7147_t ext_capoffsets[][12]);
 extern void ad7147_calibrate(void);
 extern void ad7147_set_cdcoffset(uint8_t trg, uint16_t cdcoffset);
-extern uint16_t ad7147_gettrianglesconnectedmask();
+extern uint16_t ad7147_gettrianglesconnectedmask(void);
 extern void ad7147_acquire(void);
 extern uint8_t ad7147_istriangleconnected(uint8_t trg);
 extern if2hw_data_ad7147_t * ad7147_get12rawvaluesoftriangle(uint8_t trg); 
