@@ -220,7 +220,7 @@ bool embot::hw::FlashStorage::write(std::uint32_t address, std::uint32_t size, c
     
     HAL_FLASH_Unlock();
     
-    uint32_t tmpadr = address;
+    uint32_t tmpadr = pImpl->pagestart;
     uint32_t n64bitwords = pImpl->pagesize / 8;
     for(uint16_t i=0; i<n64bitwords; i++)
     {
