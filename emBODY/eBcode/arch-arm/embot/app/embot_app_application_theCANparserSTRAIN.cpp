@@ -289,7 +289,7 @@ bool embot::app::application::theCANparserSTRAIN::Impl::process_set_txmode(const
     
     if(true == msg.info.transmit)
     {
-        thestrain.start();        
+        thestrain.start(msg.info.strainmode);        
     }
     else
     {

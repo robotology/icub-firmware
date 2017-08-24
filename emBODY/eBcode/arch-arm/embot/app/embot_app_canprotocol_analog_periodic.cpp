@@ -89,12 +89,12 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
     bool Message_UNCALIBFORCE_VECTOR_DEBUGMODE::get(embot::hw::can::Frame &outframe)
     {
         std::uint8_t data08[8] = {0};
-        data08[0] = static_cast<std::uint8_t>((info.x & 0x0f));
-        data08[1] = static_cast<std::uint8_t>((info.x & 0xf0) >> 8);
-        data08[2] = static_cast<std::uint8_t>((info.y & 0x0f));
-        data08[3] = static_cast<std::uint8_t>((info.y & 0xf0) >> 8);  
-        data08[4] = static_cast<std::uint8_t>((info.z & 0x0f));
-        data08[5] = static_cast<std::uint8_t>((info.z & 0xf0) >> 8);            
+        data08[0] = static_cast<std::uint8_t>((info.x & 0x00ff));
+        data08[1] = static_cast<std::uint8_t>((info.x & 0xff00) >> 8);
+        data08[2] = static_cast<std::uint8_t>((info.y & 0x00ff));
+        data08[3] = static_cast<std::uint8_t>((info.y & 0xff00) >> 8);  
+        data08[4] = static_cast<std::uint8_t>((info.z & 0x00ff));
+        data08[5] = static_cast<std::uint8_t>((info.z & 0xff00) >> 8);            
         Message::set(info.canaddress, 0xf, Clas::periodicAnalogSensor, static_cast<std::uint8_t>(CMD::UNCALIBFORCE_VECTOR_DEBUGMODE), data08, 6);
         std::memmove(&outframe, &canframe, sizeof(embot::hw::can::Frame));
                     
@@ -114,12 +114,12 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
     bool Message_UNCALIBTORQUE_VECTOR_DEBUGMODE::get(embot::hw::can::Frame &outframe)
     {
         std::uint8_t data08[8] = {0};
-        data08[0] = static_cast<std::uint8_t>((info.x & 0x0f));
-        data08[1] = static_cast<std::uint8_t>((info.x & 0xf0) >> 8);
-        data08[2] = static_cast<std::uint8_t>((info.y & 0x0f));
-        data08[3] = static_cast<std::uint8_t>((info.y & 0xf0) >> 8);  
-        data08[4] = static_cast<std::uint8_t>((info.z & 0x0f));
-        data08[5] = static_cast<std::uint8_t>((info.z & 0xf0) >> 8);            
+        data08[0] = static_cast<std::uint8_t>((info.x & 0x00ff));
+        data08[1] = static_cast<std::uint8_t>((info.x & 0xff00) >> 8);
+        data08[2] = static_cast<std::uint8_t>((info.y & 0x00ff));
+        data08[3] = static_cast<std::uint8_t>((info.y & 0xff00) >> 8);  
+        data08[4] = static_cast<std::uint8_t>((info.z & 0x00ff));
+        data08[5] = static_cast<std::uint8_t>((info.z & 0xff00) >> 8);           
         Message::set(info.canaddress, 0xf, Clas::periodicAnalogSensor, static_cast<std::uint8_t>(CMD::UNCALIBTORQUE_VECTOR_DEBUGMODE), data08, 6);
         std::memmove(&outframe, &canframe, sizeof(embot::hw::can::Frame));
                     
@@ -137,12 +137,12 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
     bool Message_FORCE_VECTOR::get(embot::hw::can::Frame &outframe)
     {
         std::uint8_t data08[8] = {0};
-        data08[0] = static_cast<std::uint8_t>((info.x & 0x0f));
-        data08[1] = static_cast<std::uint8_t>((info.x & 0xf0) >> 8);
-        data08[2] = static_cast<std::uint8_t>((info.y & 0x0f));
-        data08[3] = static_cast<std::uint8_t>((info.y & 0xf0) >> 8);  
-        data08[4] = static_cast<std::uint8_t>((info.z & 0x0f));
-        data08[5] = static_cast<std::uint8_t>((info.z & 0xf0) >> 8);            
+        data08[0] = static_cast<std::uint8_t>((info.x & 0x00ff));
+        data08[1] = static_cast<std::uint8_t>((info.x & 0xff00) >> 8);
+        data08[2] = static_cast<std::uint8_t>((info.y & 0x00ff));
+        data08[3] = static_cast<std::uint8_t>((info.y & 0xff00) >> 8);  
+        data08[4] = static_cast<std::uint8_t>((info.z & 0x00ff));
+        data08[5] = static_cast<std::uint8_t>((info.z & 0xff00) >> 8);            
         Message::set(info.canaddress, 0xf, Clas::periodicAnalogSensor, static_cast<std::uint8_t>(CMD::FORCE_VECTOR), data08, 6);
         std::memmove(&outframe, &canframe, sizeof(embot::hw::can::Frame));
                     
@@ -162,12 +162,12 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
     bool Message_TORQUE_VECTOR::get(embot::hw::can::Frame &outframe)
     {
         std::uint8_t data08[8] = {0};
-        data08[0] = static_cast<std::uint8_t>((info.x & 0x0f));
-        data08[1] = static_cast<std::uint8_t>((info.x & 0xf0) >> 8);
-        data08[2] = static_cast<std::uint8_t>((info.y & 0x0f));
-        data08[3] = static_cast<std::uint8_t>((info.y & 0xf0) >> 8);  
-        data08[4] = static_cast<std::uint8_t>((info.z & 0x0f));
-        data08[5] = static_cast<std::uint8_t>((info.z & 0xf0) >> 8);            
+        data08[0] = static_cast<std::uint8_t>((info.x & 0x00ff));
+        data08[1] = static_cast<std::uint8_t>((info.x & 0xff00) >> 8);
+        data08[2] = static_cast<std::uint8_t>((info.y & 0x00ff));
+        data08[3] = static_cast<std::uint8_t>((info.y & 0xff00) >> 8);  
+        data08[4] = static_cast<std::uint8_t>((info.z & 0x00ff));
+        data08[5] = static_cast<std::uint8_t>((info.z & 0xff00) >> 8);            
         Message::set(info.canaddress, 0xf, Clas::periodicAnalogSensor, static_cast<std::uint8_t>(CMD::TORQUE_VECTOR), data08, 6);
         std::memmove(&outframe, &canframe, sizeof(embot::hw::can::Frame));
                     

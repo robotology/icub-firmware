@@ -80,7 +80,7 @@ namespace embot { namespace app { namespace application {
         bool get(embot::app::canprotocol::analog::polling::Message_GET_CURR_TARE::ReplyInfo &replyinfo);
         bool get(embot::app::canprotocol::analog::polling::Message_GET_AMP_GAIN::ReplyInfo &replyinfo);
         
-        bool start();
+        bool start(embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode &mode);
         bool stop();        
         bool tick(std::vector<embot::hw::can::Frame> &replies);
 

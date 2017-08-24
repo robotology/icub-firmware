@@ -223,7 +223,8 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         info.trgEnd= candata.datainframe[1];
         info.shift = candata.datainframe[2];
         info.enabled = embot::common::bit::check(candata.datainframe[3], 0);
-        info.cdcOffset = candata.datainframe[4] | static_cast<std::uint16_t>(candata.datainframe[5]) << 8;
+        // little endian ...
+        info.cdcOffset = candata.datainframe[4] | (static_cast<std::uint16_t>(candata.datainframe[5]) << 8);
      
         return true;         
     } 
@@ -266,7 +267,8 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         }
         
         info.channel = candata.datainframe[0];
-        info.fullscale = static_cast<std::uint16_t>(candata.datainframe[1]) << 8 + static_cast<std::uint16_t>(candata.datainframe[2]);
+        // big endian ...
+        info.fullscale = (static_cast<std::uint16_t>(candata.datainframe[1]) << 8) | static_cast<std::uint16_t>(candata.datainframe[2]);
       
         return true;         
     }                    
@@ -287,8 +289,9 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         }
         
         info.channel = candata.datainframe[0];
-        info.gain1 = static_cast<std::uint16_t>(candata.datainframe[1]) << 8 + static_cast<std::uint16_t>(candata.datainframe[2]);
-        info.gain2 = static_cast<std::uint16_t>(candata.datainframe[3]) << 8 + static_cast<std::uint16_t>(candata.datainframe[4]);
+        // big endian ...
+        info.gain1 = (static_cast<std::uint16_t>(candata.datainframe[1]) << 8) | static_cast<std::uint16_t>(candata.datainframe[2]);
+        info.gain2 = (static_cast<std::uint16_t>(candata.datainframe[3]) << 8) | static_cast<std::uint16_t>(candata.datainframe[4]);
       
         return true;         
     }                    
@@ -309,7 +312,8 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         }
         
         info.channel = candata.datainframe[0];
-        info.offset = static_cast<std::uint16_t>(candata.datainframe[1]) << 8 + static_cast<std::uint16_t>(candata.datainframe[2]);
+        // big endian ...
+        info.offset = (static_cast<std::uint16_t>(candata.datainframe[1]) << 8) | static_cast<std::uint16_t>(candata.datainframe[2]);
       
         return true;         
     }                    
@@ -330,7 +334,8 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
         info.row = candata.datainframe[0];
         info.col = candata.datainframe[1];
-        info.value = static_cast<std::uint16_t>(candata.datainframe[2]) << 8 + static_cast<std::uint16_t>(candata.datainframe[3]);
+        // big endian ...
+        info.value = (static_cast<std::uint16_t>(candata.datainframe[2]) << 8) | static_cast<std::uint16_t>(candata.datainframe[3]);
       
         return true;         
     }                    
@@ -383,7 +388,8 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         if(Mode::setchannelwithvalue == info.mode)
         {
             info.channel = candata.datainframe[1];
-            info.value = static_cast<std::uint16_t>(candata.datainframe[2]) << 8 + static_cast<std::uint16_t>(candata.datainframe[3]);
+            // big endian ...
+            info.value = (static_cast<std::uint16_t>(candata.datainframe[2]) << 8) | static_cast<std::uint16_t>(candata.datainframe[3]);
         }
         
         return true;         
@@ -468,7 +474,8 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         if(Mode::setchannelwithvalue == info.mode)
         {
             info.channel = candata.datainframe[1];
-            info.value = static_cast<std::uint16_t>(candata.datainframe[2]) << 8 + static_cast<std::uint16_t>(candata.datainframe[3]);
+            // big endian ...
+            info.value = (static_cast<std::uint16_t>(candata.datainframe[2]) << 8) | static_cast<std::uint16_t>(candata.datainframe[3]);
         }
         
         return true;         
