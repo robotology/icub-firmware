@@ -275,9 +275,9 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         struct ReplyInfo
         {
             std::uint8_t        channel;
+            std::uint16_t       gain0;
             std::uint16_t       gain1;
-            std::uint16_t       gain2;
-            ReplyInfo() : channel(0), gain1(0), gain2(0) {}          
+            ReplyInfo() : channel(0), gain0(0), gain1(0) {}          
         };        
         
         Info info;
@@ -297,9 +297,9 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         struct Info
         { 
             std::uint8_t        channel;
-            std::uint16_t       gain1;
-            std::uint16_t       gain2;           
-            Info() : channel(0), gain1(0), gain2(0) {}
+            std::uint16_t       gain0;
+            std::uint16_t       gain1;           
+            Info() : channel(0), gain0(0), gain1(0) {}
         };
         
         Info info;
@@ -462,7 +462,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
     {
         public:
              
-        enum class Mode { everychannelreset = 0, everychannelnegativeoftorque = 1, setchannelwithvalue = 2, unknown = 255 };        
+        enum class Mode { everychannelreset = 0, everychannelnegativeoftorqueforce = 1, setchannelwithvalue = 2, unknown = 255 };        
             
         struct Info
         { 

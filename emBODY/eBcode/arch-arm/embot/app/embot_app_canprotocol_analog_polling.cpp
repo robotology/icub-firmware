@@ -290,8 +290,8 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
         info.channel = candata.datainframe[0];
         // big endian ...
-        info.gain1 = (static_cast<std::uint16_t>(candata.datainframe[1]) << 8) | static_cast<std::uint16_t>(candata.datainframe[2]);
-        info.gain2 = (static_cast<std::uint16_t>(candata.datainframe[3]) << 8) | static_cast<std::uint16_t>(candata.datainframe[4]);
+        info.gain0 = (static_cast<std::uint16_t>(candata.datainframe[1]) << 8) | static_cast<std::uint16_t>(candata.datainframe[2]);
+        info.gain1 = (static_cast<std::uint16_t>(candata.datainframe[3]) << 8) | static_cast<std::uint16_t>(candata.datainframe[4]);
       
         return true;         
     }                    
@@ -452,7 +452,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
             
             case 1:
             {
-                info.mode = Mode::everychannelnegativeoftorque;
+                info.mode = Mode::everychannelnegativeoftorqueforce;
             } break;  
 
             case 2:
@@ -630,10 +630,10 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
     {
         std::uint8_t dd[7] = {0};
         dd[0] = replyinfo.channel;
-        dd[1] = (replyinfo.gain1 >> 8) & 0xff;      // important note: the strain uses big endianess ... 
-        dd[2] = replyinfo.gain1 & 0xff;             
-        dd[3] = (replyinfo.gain2 >> 8) & 0xff;      // important note: the strain uses big endianess ... 
-        dd[4] = replyinfo.gain2 & 0xff;             
+        dd[1] = (replyinfo.gain0 >> 8) & 0xff;      // important note: the strain uses big endianess ... 
+        dd[2] = replyinfo.gain0 & 0xff;             
+        dd[3] = (replyinfo.gain1 >> 8) & 0xff;      // important note: the strain uses big endianess ... 
+        dd[4] = replyinfo.gain1 & 0xff;             
         
         std::uint8_t datalen = 5;
         
