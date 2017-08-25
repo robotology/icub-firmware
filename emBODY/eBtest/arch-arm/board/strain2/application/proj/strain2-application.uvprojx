@@ -944,6 +944,16 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_application_theSTRAIN.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_app_application_theCANparserIMU.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_application_theCANparserIMU.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_application_theIMU.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_application_theIMU.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2049,6 +2059,16 @@
               <FileName>embot_app_application_theSTRAIN.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_application_theSTRAIN.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_application_theCANparserIMU.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_application_theCANparserIMU.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_application_theIMU.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_application_theIMU.cpp</FilePath>
             </File>
           </Files>
         </Group>

@@ -16,9 +16,10 @@
 
 #include "embot_app_application_theCANparserBasic.h"
 
-#include "embot_app_application_theCANparserMTB.h"
-
+#include "embot_app_application_theCANparserSkin.h"
 #include "embot_app_application_theSkin.h"
+
+#include "embot_app_application_theCANparserIMU.h"
 #include "embot_app_application_theIMU.h"
 
 
@@ -100,14 +101,19 @@ static void start_evt_based(void)
     const embot::common::relTime waitEventTimeout = 50*1000; //50*1000; //5*1000*1000;    
     eventbasedtask->init(eventbasedtask_init, eventbasedtask_onevent, 4*1024, 200, waitEventTimeout, nullptr, nullptr);    
         
-    // start canparser basic + mtb
+    // start canparser basic + skin + imu
     embot::app::application::theCANparserBasic &canparserbasic = embot::app::application::theCANparserBasic::getInstance();
-    embot::app::application::theCANparserBasic::Config configbasic;
-    canparserbasic.initialise(configbasic);  
+    embot::app::application::theCANparserBasic::Config configparserbasic;
+    canparserbasic.initialise(configparserbasic);  
     
-    embot::app::application::theCANparserMTB &canparsermtb = embot::app::application::theCANparserMTB::getInstance();
-    embot::app::application::theCANparserMTB::Config configmtb;
-    canparsermtb.initialise(configmtb);  
+    embot::app::application::theCANparserSkin &canparserskin = embot::app::application::theCANparserSkin::getInstance();
+    embot::app::application::theCANparserSkin::Config configparserskin;
+    canparserskin.initialise(configparserskin);  
+    
+    
+    embot::app::application::theCANparserIMU &canparserimu = embot::app::application::theCANparserIMU::getInstance();
+    embot::app::application::theCANparserIMU::Config configparserimu;
+    canparserimu.initialise(configparserimu);      
     
     embot::app::application::theSkin &theskin = embot::app::application::theSkin::getInstance();
     embot::app::application::theSkin::Config configskin;
@@ -171,12 +177,16 @@ static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask
         if(embot::hw::resOK == embot::hw::can::get(embot::hw::can::Port::one, frame, remainingINrx))
         {            
             embot::app::application::theCANparserBasic &canparserbasic = embot::app::application::theCANparserBasic::getInstance();
-            embot::app::application::theCANparserMTB &canparsermtb = embot::app::application::theCANparserMTB::getInstance();
+            embot::app::application::theCANparserSkin &canparserskin = embot::app::application::theCANparserSkin::getInstance();
+            embot::app::application::theCANparserIMU &canparserimu = embot::app::application::theCANparserIMU::getInstance();
             // process w/ the basic parser, if not recognised call the parse specific of the board
             if(true == canparserbasic.process(frame, outframes))
             {                   
             }
-            else if(true == canparsermtb.process(frame, outframes))
+            else if(true == canparserskin.process(frame, outframes))
+            {               
+            }
+            else if(true == canparserimu.process(frame, outframes))
             {               
             }
             

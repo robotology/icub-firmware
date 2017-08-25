@@ -885,14 +885,24 @@
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\slim_retarget_io.c</FilePath>
             </File>
             <File>
-              <FileName>embot_app_application_theCANparserMTB.cpp</FileName>
+              <FileName>embot_app_application_theCANparserSkin.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_application_theCANparserMTB.cpp</FilePath>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_application_theCANparserSkin.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_app_application_theSkin.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_application_theSkin.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_application_theCANparserIMU.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_application_theCANparserIMU.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_application_theIMU.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_application_theIMU.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_app_application_theCANtracer.cpp</FileName>
@@ -903,11 +913,6 @@
               <FileName>embot_tools.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\tools\embot_tools.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_app_application_theIMU.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_application_theIMU.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_app_canprotocol.cpp</FileName>
@@ -1928,14 +1933,24 @@
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\slim_retarget_io.c</FilePath>
             </File>
             <File>
-              <FileName>embot_app_application_theCANparserMTB.cpp</FileName>
+              <FileName>embot_app_application_theCANparserSkin.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_application_theCANparserMTB.cpp</FilePath>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_application_theCANparserSkin.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_app_application_theSkin.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_application_theSkin.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_application_theCANparserIMU.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_application_theCANparserIMU.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_application_theIMU.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_application_theIMU.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_app_application_theCANtracer.cpp</FileName>
@@ -1946,11 +1961,6 @@
               <FileName>embot_tools.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\tools\embot_tools.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_app_application_theIMU.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_application_theIMU.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_app_canprotocol.cpp</FileName>

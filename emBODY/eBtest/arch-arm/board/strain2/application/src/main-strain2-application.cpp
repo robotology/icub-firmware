@@ -17,9 +17,10 @@
 #include "embot_app_application_theCANparserBasic.h"
 
 #include "embot_app_application_theCANparserSTRAIN.h"
+#include "embot_app_application_theCANparserIMU.h"
 
 #include "embot_app_application_theSTRAIN.h"
-//#include "embot_app_application_theIMU.h"
+#include "embot_app_application_theIMU.h"
 
 
 static const embot::app::canprotocol::versionOfAPPLICATION vAP = {1, 0 , 3};
@@ -92,9 +93,14 @@ static void start_evt_based(void)
     canparserbasic.initialise(configbasic);  
     
     // start canparser strain2
-    embot::app::application::theCANparserSTRAIN &canparserstr = embot::app::application::theCANparserSTRAIN::getInstance();
-    embot::app::application::theCANparserSTRAIN::Config configstr;
-    canparserstr.initialise(configstr);    
+    embot::app::application::theCANparserSTRAIN &canparserstrain = embot::app::application::theCANparserSTRAIN::getInstance();
+    embot::app::application::theCANparserSTRAIN::Config configparserstrain;
+    canparserstrain.initialise(configparserstrain);  
+    
+    // start canparser imu
+    embot::app::application::theCANparserIMU &canparserimu = embot::app::application::theCANparserIMU::getInstance();
+    embot::app::application::theCANparserIMU::Config configparserimu;
+    canparserimu.initialise(configparserimu);      
 
     // start application for strain2
     embot::app::application::theSTRAIN &thestrain = embot::app::application::theSTRAIN::getInstance();
@@ -153,11 +159,15 @@ static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask
         {            
             embot::app::application::theCANparserBasic &canparserbasic = embot::app::application::theCANparserBasic::getInstance();
             embot::app::application::theCANparserSTRAIN &canparserstrain = embot::app::application::theCANparserSTRAIN::getInstance();
+            embot::app::application::theCANparserIMU &canparserimu = embot::app::application::theCANparserIMU::getInstance();
             // process w/ the basic parser, if not recognised call the parse specific of the board
             if(true == canparserbasic.process(frame, outframes))
             {                   
             }
             else if(true == canparserstrain.process(frame, outframes))
+            {               
+            }
+            else if(true == canparserimu.process(frame, outframes))
             {               
             }
             

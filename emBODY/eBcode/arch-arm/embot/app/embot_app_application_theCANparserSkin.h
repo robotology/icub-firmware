@@ -18,8 +18,8 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef _EMBOT_APP_APPLICATION_THECANPARSERMTB_H_
-#define _EMBOT_APP_APPLICATION_THECANPARSERMTB_H_
+#ifndef _EMBOT_APP_APPLICATION_THECANPARSERSKIN_H_
+#define _EMBOT_APP_APPLICATION_THECANPARSERSKIN_H_
 
 #include "embot_common.h"
 
@@ -32,12 +32,12 @@
 
 namespace embot { namespace app { namespace application {
            
-    class theCANparserMTB
+    class theCANparserSkin
     {
     public:
-        static theCANparserMTB& getInstance()
+        static theCANparserSkin& getInstance()
         {
-            static theCANparserMTB* p = new theCANparserMTB();
+            static theCANparserSkin* p = new theCANparserSkin();
             return *p;
         }
         
@@ -56,14 +56,14 @@ namespace embot { namespace app { namespace application {
         bool process(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);
 
     private:
-        theCANparserMTB(); 
+        theCANparserSkin(); 
 
     public:
         // remove copy constructors and copy assignment operators
-        theCANparserMTB(const theCANparserMTB&) = delete;
-        theCANparserMTB(theCANparserMTB&) = delete;
-        void operator=(const theCANparserMTB&) = delete;
-        void operator=(theCANparserMTB&) = delete;
+        theCANparserSkin(const theCANparserSkin&) = delete;
+        theCANparserSkin(theCANparserSkin&) = delete;
+        void operator=(const theCANparserSkin&) = delete;
+        void operator=(theCANparserSkin&) = delete;
 
     private:    
         struct Impl;
