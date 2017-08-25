@@ -71,7 +71,7 @@ struct embot::app::application::theSTRAIN::Impl
         std::uint16_t       offset[6];              // the offset generated with the dac
         std::uint8_t        matrixgain;             // the gain to be applied to the matrix as an unsigned integer value
         std::int16_t        matrix[6][6];           // transformation matrix from the 6 strain-gauge values to the 6 force-torque values  
-        std::uint16_t       gainofamplifier[2][6];  // the gains used by .... 6sg maybe?                    
+        std::uint16_t       gainofamplifier[6][2];  // the gains used by .... 6sg maybe?                    
     };
         
     class StrainConfigData
@@ -102,11 +102,13 @@ struct embot::app::application::theSTRAIN::Impl
         {   // value 0x7fff is close to 1 = 1-2^(-15)            
             std::memset(data.matrix, 0, sizeof(data.matrix));
             data.matrix[0][0] = data.matrix[1][1] = data.matrix[2][2] = data.matrix[3][3] = data.matrix[4][4] = data.matrix[5][5] = 0x7fff;
+            synched = false;
         }
         
         void matrixgain_set(std::uint8_t g)
         {            
             data.matrixgain = g;
+            synched = false;
         }
         
         void matrix_set(std::uint8_t r, std::uint8_t c, std::uint16_t value)
@@ -114,6 +116,7 @@ struct embot::app::application::theSTRAIN::Impl
             if((r<6) && (c<6))
             {
                 data.matrix[r][c] = value;
+                synched = false;
             }
         }
         
@@ -126,7 +129,7 @@ struct embot::app::application::theSTRAIN::Impl
             std::memset(data.tare, 0, sizeof(data.tare)); 
             matrix_set_identity();
             matrixgain_set(1);
-            std::memset(data.gainofamplifier, 1, sizeof(data.gainofamplifier)); 
+            for(int i=0; i<6; i++) for(int j=0; j<2; j++) data.gainofamplifier[i][j] = 1;
             synched = false;
             return synched;
         }
@@ -208,6 +211,16 @@ struct embot::app::application::theSTRAIN::Impl
             }
         }
         
+        void gainofamplifier_set(std::uint8_t channel, std::uint16_t g0, std::uint16_t g1)
+        {
+            if(channel < 6)
+            {
+                data.gainofamplifier[channel][0] = g0;
+                data.gainofamplifier[channel][1] = g1;
+                synched = false;
+            }            
+        }
+        
     };
     
     #warning -> complete content of StrainRuntimeData_t 
@@ -231,6 +244,7 @@ struct embot::app::application::theSTRAIN::Impl
         
         std::int16_t        tare[6];            // the tare (offset) as measured in runtime
         std::uint16_t       adcvalue[6];        // the values as acquired by the adc. it is uint16_t in original strain code
+        std::int16_t        torqueforce[6];
         
         
         TripleValue force;
@@ -243,6 +257,7 @@ struct embot::app::application::theSTRAIN::Impl
         void clear() { 
             std::memset(tare, 0, sizeof(tare)); 
             std::memset(adcvalue, 0, sizeof(adcvalue));
+            std::memset(torqueforce, 0, sizeof(torqueforce));
             force.reset();
             torque.reset();
             TXcalibData = false; 
@@ -472,13 +487,20 @@ bool embot::app::application::theSTRAIN::Impl::acquisition()
     // formula is:
     // torqueforce = M * (adcvalue + calibtare ) + currtare
     
-    runtimedata.data.torque.x = runtimedata.data.adcvalue[0] & 0xfff7;
-    runtimedata.data.torque.y = runtimedata.data.adcvalue[1] & 0xfff7;
-    runtimedata.data.torque.z = runtimedata.data.adcvalue[2] & 0xfff7;
+    runtimedata.data.torqueforce[0] = runtimedata.data.adcvalue[0] & 0xfff7;
+    runtimedata.data.torqueforce[1] = runtimedata.data.adcvalue[1] & 0xfff7;
+    runtimedata.data.torqueforce[2] = runtimedata.data.adcvalue[2] & 0xfff7;
+    runtimedata.data.torqueforce[3] = runtimedata.data.adcvalue[3] & 0xfffc;
+    runtimedata.data.torqueforce[4] = runtimedata.data.adcvalue[4] & 0xfffc;
+    runtimedata.data.torqueforce[4] = runtimedata.data.adcvalue[5] & 0xfffc;
     
-    runtimedata.data.force.x = runtimedata.data.adcvalue[3] & 0xfffc;
-    runtimedata.data.force.y = runtimedata.data.adcvalue[4] & 0xfffc;
-    runtimedata.data.force.z = runtimedata.data.adcvalue[5] & 0xfffc;
+    runtimedata.data.torque.x = runtimedata.data.torqueforce[0];
+    runtimedata.data.torque.y = runtimedata.data.torqueforce[1];
+    runtimedata.data.torque.z = runtimedata.data.torqueforce[2];
+    
+    runtimedata.data.force.x = runtimedata.data.torqueforce[3];
+    runtimedata.data.force.y = runtimedata.data.torqueforce[4];
+    runtimedata.data.force.z = runtimedata.data.torqueforce[5];
     
     
     return true;
@@ -629,12 +651,43 @@ bool embot::app::application::theSTRAIN::get_adc(embot::app::canprotocol::analog
 {    
     if(replyinfo.channel >= 6 )
     {
+        replyinfo.adcvalue = 0;
         return false;
     }
     
-    embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance();
+    #warning -> VERY IMPORTANT: should we perform an acquisition or ... just get the buffered value? THINK of IT!
+        // moreover: acquire but dont tx mode could be useful?
+    
+    // we perform an acquisition ...
+    
+    pImpl->acquisition();
+        
+    std::uint16_t v = 0;
+    
+    if(true == replyinfo.valueiscalibrated)
+    {        
+        switch(replyinfo.channel)
+        {   
+            // torque
+            case 0:     v = pImpl->runtimedata.data.torque.x;   break;
+            case 1:     v = pImpl->runtimedata.data.torque.y;   break;
+            case 2:     v = pImpl->runtimedata.data.torque.z;   break;
+            // force
+            case 3:     v = pImpl->runtimedata.data.force.x;    break;
+            case 4:     v = pImpl->runtimedata.data.force.y;    break;
+            case 5:     v = pImpl->runtimedata.data.force.z;    break;
+            // impossible ...
+            default:    v = 0;                                  break;
+        }
 
-    replyinfo.adcvalue = 0x1234;
+    }
+    else
+    {
+       v = pImpl->runtimedata.data.adcvalue[replyinfo.channel]; 
+    }
+    
+    
+    replyinfo.adcvalue = v;
     
     return true;    
 }
@@ -644,12 +697,11 @@ bool embot::app::application::theSTRAIN::get_offset(std::uint8_t channel, std::u
 {    
     if(channel >= 6 )
     {
+        value = 0;
         return false;
     }
     
-    embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance();
-
-    value = 0x1234;
+    value = pImpl->configdata.data.offset[channel];
     
     return true;    
 }
@@ -694,6 +746,7 @@ bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::po
 {    
     if((replyinfo.row >= 6) || (replyinfo.col >= 6))
     {
+        replyinfo.value = 0;
         return false;
     }
     
@@ -739,6 +792,7 @@ bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::po
 {  
     if(replyinfo.channel >= 6)
     {
+        replyinfo.value = 0;
         return false;
     } 
 
@@ -774,10 +828,12 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::p
 
         case embot::app::canprotocol::analog::polling::Message_SET_CALIB_TARE::Mode::everychannelnegativeofadc:
         {
-            #warning tbd
+            pImpl->acquisition();
+            
             for(int i=0; i<6; i++)
             {
-                pImpl->configdata.tare_set(i, -1);
+                #warning -> TODO: adcvalue is u16 ... and tare is s16 ??
+                pImpl->configdata.tare_set(i, -pImpl->runtimedata.data.adcvalue[i]);
             }
         } break;    
 
@@ -797,6 +853,7 @@ bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::po
 {  
     if(replyinfo.channel >= 6)
     {
+        replyinfo.value = 0;
         return false;
     }     
  
@@ -829,12 +886,15 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::p
             std::memset(pImpl->runtimedata.data.tare, 0, sizeof(pImpl->runtimedata.data.tare));
         } break;
 
-        case embot::app::canprotocol::analog::polling::Message_SET_CURR_TARE::Mode::everychannelnegativeoftorque:
+        case embot::app::canprotocol::analog::polling::Message_SET_CURR_TARE::Mode::everychannelnegativeoftorqueforce:
         {
-            #warning TBD
+            pImpl->acquisition();
+            
+            #warning TODO: verify what we have to assign in SET_CURR_TARE
+            
             for(int i=0; i<6; i++)
             {                
-                pImpl->runtimedata.data.tare[info.channel] = -1; 
+                pImpl->runtimedata.data.tare[i] = - (pImpl->runtimedata.data.torqueforce[i] - pImpl->runtimedata.data.tare[i]); 
             }
         } break;    
 
@@ -853,11 +913,12 @@ bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::po
 {  
     if(replyinfo.channel >= 6)
     {
+        replyinfo.gain0 = replyinfo.gain1 = 0;
         return false;
     }     
 
-    replyinfo.gain1 = pImpl->configdata.data.gainofamplifier[0][replyinfo.channel];
-    replyinfo.gain2 = pImpl->configdata.data.gainofamplifier[1][replyinfo.channel];
+    replyinfo.gain0 = pImpl->configdata.data.gainofamplifier[replyinfo.channel][0];
+    replyinfo.gain1 = pImpl->configdata.data.gainofamplifier[replyinfo.channel][1];
     
     return true;    
 }
@@ -870,8 +931,7 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::p
         return false;
     }     
 
-    pImpl->configdata.data.gainofamplifier[0][info.channel] = info.gain1;
-    pImpl->configdata.data.gainofamplifier[1][info.channel] = info.gain2;
+    pImpl->configdata.gainofamplifier_set(info.channel, info.gain0, info.gain1);
    
     return true;    
 }

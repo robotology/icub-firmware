@@ -72,9 +72,7 @@ struct embot::app::application::theCANparserSTRAIN::Impl
    
     bool process(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);
     
-    
-//    bool process_set_brdcfg(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);   
-//    bool process_set_trgcfg(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);      
+        
     bool process_set_txmode(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);
     bool process_set_serial(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);
     bool process_get_serial(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);
@@ -460,6 +458,7 @@ bool embot::app::application::theCANparserSTRAIN::Impl::process_set_offset(const
                   
     return msg.reply();        
 }
+
 
 bool embot::app::application::theCANparserSTRAIN::Impl::process_get_offset(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
 {
