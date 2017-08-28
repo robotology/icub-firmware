@@ -207,7 +207,6 @@ namespace embot { namespace hw { namespace can {
     {
         if(0 == s_Qtx->size())
         {
-            __HAL_CAN_DISABLE_IT(hcan, CAN_IT_TME);
             if(nullptr != s_config.txqueueempty.callback)
             {
                 s_config.txqueueempty.callback(s_config.txqueueempty.arg);
@@ -226,21 +225,21 @@ namespace embot { namespace hw { namespace can {
         //2) transmit frame
         HAL_StatusTypeDef res = HAL_CAN_Transmit_IT(hcan);
         //the only possible return values are HAL_BUSY or HAL_OK
-        if(res == HAL_BUSY)
+        if(res == HAL_OK)
         {
-            uint8_t testonly =0;
-            //this means that can is transmitting a frame, so when it finish it advertises me by IRQ handler;
-            //i should never be here.
-            testonly=testonly;
-        }
-       
-        //3) remove the frame from tx queue
+            //3) if transmission is ok, than I remove the frame from tx queue
         vector<Frame>::iterator b = s_Qtx->begin();
         s_Qtx->erase(b);
-        
         if(nullptr != s_config.ontxframe.callback)
         {
             s_config.ontxframe.callback(s_config.ontxframe.arg);
+        }
+        }
+        else
+        {
+            ;
+            //3) if transmission is not ok, than I leave frame in queue.
+            //NOTE: improve management of max num of attempts of transmission.
         }
             
         return; // resOK;
@@ -253,8 +252,9 @@ namespace embot { namespace hw { namespace can {
         //therefore i need to check that the interrupt is on the peritherical I already initted.
         
         if( (hcan == (&hcan1)) && initialised(Port::one) )
+    {
             s_transmit(hcan);
-        
+    }
         //currently I have not can2!
     }
     
@@ -466,8 +466,8 @@ namespace embot { namespace hw { namespace can {
 
         if(Port::one == p)
         {
-           // embot::hw::can::s_transmit(&hcan1);
-            embot::hw::can::s_transmit_noirq(&hcan1);
+            embot::hw::can::s_transmit(&hcan1);
+            //embot::hw::can::s_transmit_noirq(&hcan1);
             return resOK;
         }
         else
