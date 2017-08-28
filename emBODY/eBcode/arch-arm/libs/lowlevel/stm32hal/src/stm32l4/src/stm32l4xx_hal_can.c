@@ -744,6 +744,9 @@ HAL_StatusTypeDef HAL_CAN_Transmit_IT(CAN_HandleTypeDef* hcan)
       /* Process Unlocked */
       __HAL_UNLOCK(hcan);
       
+      //IIT_CHANGE
+      hcan->Instance->sTxMailBox[transmitmailbox].TIR |= CAN_TI0R_TXRQ;
+           
       /* Enable interrupts: */
       /*  - Enable Error warning Interrupt */
       /*  - Enable Error passive Interrupt */
@@ -759,7 +762,13 @@ HAL_StatusTypeDef HAL_CAN_Transmit_IT(CAN_HandleTypeDef* hcan)
                                 CAN_IT_TME  );
       
       /* Request transmission */
-      hcan->Instance->sTxMailBox[transmitmailbox].TIR |= CAN_TI0R_TXRQ;
+      //IIT_CHANGE
+//      hcan->Instance->sTxMailBox[transmitmailbox].TIR |= CAN_TI0R_TXRQ;
+    }
+    else
+    {
+      __HAL_UNLOCK(hcan);
+      return HAL_BUSY;
     }
   }
   else
