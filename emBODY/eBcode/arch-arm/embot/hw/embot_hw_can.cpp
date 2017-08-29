@@ -507,6 +507,96 @@ namespace embot { namespace hw { namespace can {
     }
 
     
+    result_t setfilters(Port p, std::uint8_t address)
+    {
+        if(false ==  supported(p))
+        {
+            return resNOK;
+        } 
+        
+         /* Configure the CAN Filter for message of class polling sensor */
+        CAN_FilterConfTypeDef sFilterConfig;
+        sFilterConfig.FilterNumber = 0;
+        sFilterConfig.FilterMode = CAN_FILTERMODE_IDLIST;
+        sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
+        sFilterConfig.FilterIdHigh = (0x200 | address) << 5;
+        sFilterConfig.FilterIdLow = 0x0000;
+        sFilterConfig.FilterMaskIdHigh = 0x0000;
+        sFilterConfig.FilterMaskIdLow = 0x0000;
+        sFilterConfig.FilterFIFOAssignment = 0;
+        sFilterConfig.FilterActivation = ENABLE;
+        sFilterConfig.BankNumber = 0;
+        if(HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig) != HAL_OK)
+        {
+            return resNOK;
+        }
+        
+        sFilterConfig.FilterNumber = 1;
+        sFilterConfig.FilterIdHigh = 0x20F << 5;
+        sFilterConfig.FilterIdLow = 0x0000;
+        sFilterConfig.FilterMaskIdHigh = 0x0000;
+        sFilterConfig.FilterMaskIdLow = 0x0000;
+        sFilterConfig.FilterActivation = ENABLE;
+        sFilterConfig.BankNumber = 0;
+        if(HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig) != HAL_OK)
+        {
+            return resNOK;
+        }
+        
+         /* Configure the CAN Filter for message of class bootloader sensor */
+        sFilterConfig.FilterNumber = 2;
+        sFilterConfig.FilterIdHigh = (0x700 | address) << 5;
+        sFilterConfig.FilterIdLow = 0x0000;
+        sFilterConfig.FilterMaskIdHigh = 0x0000;
+        sFilterConfig.FilterMaskIdLow = 0x0000;
+        sFilterConfig.FilterActivation = ENABLE;
+        sFilterConfig.BankNumber = 1;
+        if(HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig) != HAL_OK)
+        {
+            return resNOK;
+        }
+        
+        sFilterConfig.FilterNumber = 3;
+        sFilterConfig.FilterIdHigh = 0x70F << 5;
+        sFilterConfig.FilterIdLow = 0x0000;
+        sFilterConfig.FilterMaskIdHigh = 0x0000;
+        sFilterConfig.FilterMaskIdLow = 0x0000;
+        sFilterConfig.FilterActivation = ENABLE;
+        sFilterConfig.BankNumber = 1;
+        if(HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig) != HAL_OK)
+        {
+            return resNOK;
+        }
+
+
+        /* Configure the CAN Filter for message of class bootloader sensor */
+        sFilterConfig.FilterNumber = 4;
+        sFilterConfig.FilterIdHigh = (0x000 | address) << 5;
+        sFilterConfig.FilterIdLow = 0x0000;
+        sFilterConfig.FilterMaskIdHigh = 0x0000;
+        sFilterConfig.FilterMaskIdLow = 0x0000;
+        sFilterConfig.FilterActivation = ENABLE;
+        sFilterConfig.BankNumber = 2;
+        if(HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig) != HAL_OK)
+        {
+            return resNOK;
+        }
+        
+        sFilterConfig.FilterNumber = 5;
+        sFilterConfig.FilterIdHigh = 0x00F << 5;
+        sFilterConfig.FilterIdLow = 0x0000;
+        sFilterConfig.FilterMaskIdHigh = 0x0000;
+        sFilterConfig.FilterMaskIdLow = 0x0000;
+        sFilterConfig.FilterActivation = ENABLE;
+        sFilterConfig.BankNumber = 2;
+        if(HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig) != HAL_OK)
+        {
+            return resNOK;
+        }
+        
+        return resOK;   
+    }
+    
     
 }}} // namespace embot { namespace hw { namespace can {
 
