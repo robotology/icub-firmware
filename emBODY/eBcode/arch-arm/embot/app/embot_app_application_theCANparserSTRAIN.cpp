@@ -55,7 +55,6 @@ struct embot::app::application::theCANparserSTRAIN::Impl
     
     embot::app::canprotocol::Clas cls;
     std::uint8_t cmd;    
-    std::uint8_t canaddress;
         
     embot::hw::can::Frame reply;
     
@@ -65,8 +64,7 @@ struct embot::app::application::theCANparserSTRAIN::Impl
         recognised = false;        
         txframe = false;
         cls = embot::app::canprotocol::Clas::none;
-        cmd = 0;        
-        canaddress = 0;        
+        cmd = 0;               
     }
     
    
@@ -104,7 +102,7 @@ bool embot::app::application::theCANparserSTRAIN::Impl::process(const embot::hw:
     txframe = false;
     recognised = false;
     
-    if(false == embot::app::canprotocol::frameis4board(frame, canaddress))
+    if(false == embot::app::canprotocol::frameis4board(frame, embot::app::theCANboardInfo::getInstance().cachedCANaddress()))
     {
         recognised = false;
         return recognised;
@@ -334,7 +332,7 @@ bool embot::app::application::theCANparserSTRAIN::Impl::process_get_serial(const
     thestrain.get_serial(replyinfo);
         
     embot::hw::can::Frame frame0;
-    if(true == msg.reply(frame0, canaddress, replyinfo))
+    if(true == msg.reply(frame0, embot::app::theCANboardInfo::getInstance().cachedCANaddress(), replyinfo))
     {
         replies.push_back(frame0);
         return true;
@@ -381,7 +379,7 @@ bool embot::app::application::theCANparserSTRAIN::Impl::process_get_fullscales(c
     thestrain.get_fullscale(msg.info.channel, replyinfo.fullscale);
         
     embot::hw::can::Frame frame0;
-    if(true == msg.reply(frame0, canaddress, replyinfo))
+    if(true == msg.reply(frame0, embot::app::theCANboardInfo::getInstance().cachedCANaddress(), replyinfo))
     {
         replies.push_back(frame0);
         return true;
@@ -402,7 +400,7 @@ bool embot::app::application::theCANparserSTRAIN::Impl::process_get_eeprom_statu
     thestrain.get_eepromstatus(replyinfo.saved);
         
     embot::hw::can::Frame frame0;
-    if(true == msg.reply(frame0, canaddress, replyinfo))
+    if(true == msg.reply(frame0, embot::app::theCANboardInfo::getInstance().cachedCANaddress(), replyinfo))
     {
         replies.push_back(frame0);
         return true;
@@ -425,7 +423,7 @@ bool embot::app::application::theCANparserSTRAIN::Impl::process_save2ee(const em
     replyinfo.ok = thestrain.save2eeprom();
                   
     embot::hw::can::Frame frame0;
-    if(true == msg.reply(frame0, canaddress, replyinfo))
+    if(true == msg.reply(frame0, embot::app::theCANboardInfo::getInstance().cachedCANaddress(), replyinfo))
     {
         replies.push_back(frame0);
         return true;
@@ -449,7 +447,7 @@ bool embot::app::application::theCANparserSTRAIN::Impl::process_get_ch_adc(const
     thestrain.get_adc(replyinfo);
     
     embot::hw::can::Frame frame0;
-    if(true == msg.reply(frame0, canaddress, replyinfo))
+    if(true == msg.reply(frame0, embot::app::theCANboardInfo::getInstance().cachedCANaddress(), replyinfo))
     {
         replies.push_back(frame0);
         return true;
@@ -485,7 +483,7 @@ bool embot::app::application::theCANparserSTRAIN::Impl::process_get_offset(const
     thestrain.get_offset(replyinfo.channel, replyinfo.offset);
         
     embot::hw::can::Frame frame0;
-    if(true == msg.reply(frame0, canaddress, replyinfo))
+    if(true == msg.reply(frame0, embot::app::theCANboardInfo::getInstance().cachedCANaddress(), replyinfo))
     {
         replies.push_back(frame0);
         return true;
@@ -521,7 +519,7 @@ bool embot::app::application::theCANparserSTRAIN::Impl::process_get_matrix_value
     thestrain.get(replyinfo);
         
     embot::hw::can::Frame frame0;
-    if(true == msg.reply(frame0, canaddress, replyinfo))
+    if(true == msg.reply(frame0, embot::app::theCANboardInfo::getInstance().cachedCANaddress(), replyinfo))
     {
         replies.push_back(frame0);
         return true;
@@ -554,7 +552,7 @@ bool embot::app::application::theCANparserSTRAIN::Impl::process_get_matrix_gain(
     thestrain.get(replyinfo);
         
     embot::hw::can::Frame frame0;
-    if(true == msg.reply(frame0, canaddress, replyinfo))
+    if(true == msg.reply(frame0, embot::app::theCANboardInfo::getInstance().cachedCANaddress(), replyinfo))
     {
         replies.push_back(frame0);
         return true;
@@ -589,7 +587,7 @@ bool embot::app::application::theCANparserSTRAIN::Impl::process_get_calib_bias(c
     thestrain.get(replyinfo);
         
     embot::hw::can::Frame frame0;
-    if(true == msg.reply(frame0, canaddress, replyinfo))
+    if(true == msg.reply(frame0, embot::app::theCANboardInfo::getInstance().cachedCANaddress(), replyinfo))
     {
         replies.push_back(frame0);
         return true;
@@ -624,7 +622,7 @@ bool embot::app::application::theCANparserSTRAIN::Impl::process_get_curr_bias(co
     thestrain.get(replyinfo);
         
     embot::hw::can::Frame frame0;
-    if(true == msg.reply(frame0, canaddress, replyinfo))
+    if(true == msg.reply(frame0, embot::app::theCANboardInfo::getInstance().cachedCANaddress(), replyinfo))
     {
         replies.push_back(frame0);
         return true;
@@ -659,7 +657,7 @@ bool embot::app::application::theCANparserSTRAIN::Impl::process_get_amp_gain(con
     thestrain.get(replyinfo);
         
     embot::hw::can::Frame frame0;
-    if(true == msg.reply(frame0, canaddress, replyinfo))
+    if(true == msg.reply(frame0, embot::app::theCANboardInfo::getInstance().cachedCANaddress(), replyinfo))
     {
         replies.push_back(frame0);
         return true;
@@ -694,7 +692,7 @@ bool embot::app::application::theCANparserSTRAIN::Impl::process_get_strain2_ampl
     thestrain.get(replyinfo);
         
     embot::hw::can::Frame frame0;
-    if(true == msg.reply(frame0, canaddress, replyinfo))
+    if(true == msg.reply(frame0, embot::app::theCANboardInfo::getInstance().cachedCANaddress(), replyinfo))
     {
         replies.push_back(frame0);
         return true;
@@ -722,12 +720,7 @@ embot::app::application::theCANparserSTRAIN::theCANparserSTRAIN()
 bool embot::app::application::theCANparserSTRAIN::initialise(Config &config)
 {
     pImpl->config = config;
-    
-    embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance();
-    
-    // retrieve address
-    pImpl->canaddress = canbrdinfo.getCANaddress();
-    
+        
     return true;
 }
   

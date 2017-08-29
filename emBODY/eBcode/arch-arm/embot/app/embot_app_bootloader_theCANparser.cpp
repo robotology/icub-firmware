@@ -76,7 +76,6 @@ struct embot::app::bootloader::theCANparser::Impl
     
     embot::app::canprotocol::versionOfFIRMWARE version;
     embot::app::canprotocol::Board board;
-    std::uint8_t canaddress;
     
     embot::app::canprotocol::bootloader::Message_ADDRESS::Info curr_blrdAddressInfo;
     std::uint8_t curr_blrdAddress_datalenreceivedsofar;
@@ -95,7 +94,6 @@ struct embot::app::bootloader::theCANparser::Impl
         cls = embot::app::canprotocol::Clas::none;
         cmd = 0;
         
-        canaddress = 0;
         version.major = 0;
         version.minor = 0;
         version.build = 255;
@@ -122,7 +120,7 @@ struct embot::app::bootloader::theCANparser::Impl
     {
         embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance();
         // i reinforce a reading from storage. just for safety. in here we are dealing w/ can address change and i want to be sure.
-        canaddress = canbrdinfo.getCANaddress();
+        std::uint8_t canaddress = canbrdinfo.getCANaddress();
         
         std::uint8_t target = adr;
         
@@ -163,10 +161,14 @@ struct embot::app::bootloader::theCANparser::Impl
         
         if(canaddress != target)
         {
+            if(embot::hw::resOK != embot::hw::can::setfilters(embot::hw::can::Port::one, target))
+            {
+                return false;
+            }
             canbrdinfo.setCANaddress(target);
             canaddress = canbrdinfo.getCANaddress();
         }
-        
+                        
         return (target == canaddress);
     }
     
@@ -192,7 +194,7 @@ bool embot::app::bootloader::theCANparser::Impl::process(const embot::hw::can::F
 {
     txframe = false;
     
-    if(false == embot::app::canprotocol::frameis4board(frame, canaddress))
+    if(false == embot::app::canprotocol::frameis4board(frame, embot::app::theCANboardInfo::getInstance().cachedCANaddress()))
     {
         return false;
     }
@@ -363,7 +365,7 @@ bool embot::app::bootloader::theCANparser::Impl::process_bl_broadcast(const embo
     replyinfo.firmware.minor = strd.bootloaderVminor;
     replyinfo.firmware.build = 255;
         
-    if(true == msg.reply(reply, canaddress, replyinfo))
+    if(true == msg.reply(reply, embot::app::theCANboardInfo::getInstance().cachedCANaddress(), replyinfo))
     {
         replies.push_back(reply);
         return true;
@@ -383,7 +385,7 @@ bool embot::app::bootloader::theCANparser::Impl::process_bl_board(const embot::h
     
     // we may erase flash (and eeprom now) but ... we wait.
             
-    if(true == msg.reply(reply, canaddress))
+    if(true == msg.reply(reply, embot::app::theCANboardInfo::getInstance().cachedCANaddress()))
     {
         replies.push_back(reply);
         return true;
@@ -425,7 +427,7 @@ bool embot::app::bootloader::theCANparser::Impl::process_bl_data(const embot::hw
         if(curr_blrdAddress_datalenreceivedsofar == curr_blrdAddressInfo.datalen)
         {   // i send ok only if the bytes receive so far are exactly equal to the ones we are expecting in total
             
-            if(true == msg.reply(reply, canaddress, true))
+            if(true == msg.reply(reply, embot::app::theCANboardInfo::getInstance().cachedCANaddress(), true))
             {
                 replies.push_back(reply);
                 return true;
@@ -457,7 +459,7 @@ bool embot::app::bootloader::theCANparser::Impl::process_bl_start(const embot::h
         canbrdinfo.userdataerase();
     }
         
-    if(true == msg.reply(reply, canaddress, true))
+    if(true == msg.reply(reply, embot::app::theCANboardInfo::getInstance().cachedCANaddress(), true))
     {
         replies.push_back(reply);
         return true;
@@ -471,7 +473,7 @@ bool embot::app::bootloader::theCANparser::Impl::process_bl_end(const embot::hw:
     embot::app::canprotocol::bootloader::Message_END msg;
     msg.load(frame);
         
-    if(true == msg.reply(reply, canaddress, true))
+    if(true == msg.reply(reply, embot::app::theCANboardInfo::getInstance().cachedCANaddress(), true))
     {
         replies.push_back(reply);
         return true;
@@ -494,7 +496,7 @@ bool embot::app::bootloader::theCANparser::Impl::process_bl_getadditionalinfo(co
     std::uint8_t nreplies = msg.numberofreplies();
     for(std::uint8_t i=0; i<nreplies; i++)
     {
-        if(true == msg.reply(reply, canaddress, replyinfo))
+        if(true == msg.reply(reply, embot::app::theCANboardInfo::getInstance().cachedCANaddress(), replyinfo))
         {
             replies.push_back(reply);
         }
@@ -570,7 +572,6 @@ bool embot::app::bootloader::theCANparser::initialise(Config &config)
     embot::app::theCANboardInfo::StoredInfo storedinfo;
     if(true == canbrdinfo.get(storedinfo))
     {
-        pImpl->canaddress = storedinfo.canaddress;
         pImpl->version.major = storedinfo.bootloaderVmajor;
         pImpl->version.minor = storedinfo.bootloaderVminor;
         pImpl->version.build = 0;

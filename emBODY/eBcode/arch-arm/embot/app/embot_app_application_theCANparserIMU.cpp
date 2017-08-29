@@ -57,7 +57,7 @@ struct embot::app::application::theCANparserIMU::Impl
     
     embot::app::canprotocol::Clas cls;
     std::uint8_t cmd;    
-    std::uint8_t canaddress;
+
         
     embot::hw::can::Frame reply;
     
@@ -67,8 +67,7 @@ struct embot::app::application::theCANparserIMU::Impl
         recognised = false;        
         txframe = false;
         cls = embot::app::canprotocol::Clas::none;
-        cmd = 0;        
-        canaddress = 0;        
+        cmd = 0;              
     }
     
    
@@ -83,7 +82,7 @@ bool embot::app::application::theCANparserIMU::Impl::process(const embot::hw::ca
     txframe = false;
     recognised = false;
     
-    if(false == embot::app::canprotocol::frameis4board(frame, canaddress))
+    if(false == embot::app::canprotocol::frameis4board(frame, embot::app::theCANboardInfo::getInstance().cachedCANaddress()))
     {
         recognised = false;
         return recognised;
@@ -156,12 +155,7 @@ embot::app::application::theCANparserIMU::theCANparserIMU()
 bool embot::app::application::theCANparserIMU::initialise(Config &config)
 {
     pImpl->config = config;
-    
-    embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance();
-    
-    // retrieve address
-    pImpl->canaddress = canbrdinfo.getCANaddress();
-    
+        
     return true;
 }
   

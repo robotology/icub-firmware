@@ -66,7 +66,6 @@ struct embot::app::application::theCANparserBasic::Impl
     embot::app::canprotocol::versionOfCANPROTOCOL canprotocol;
     embot::app::canprotocol::versionOfFIRMWARE version;
     embot::app::canprotocol::Board board;
-    std::uint8_t canaddress;
     
 
     
@@ -80,7 +79,6 @@ struct embot::app::application::theCANparserBasic::Impl
         cls = embot::app::canprotocol::Clas::none;
         cmd = 0;
         
-        canaddress = 0;
         version.major = version.minor = version.build = 0;
         canprotocol.major = canprotocol.minor = 0;
         board = embot::app::canprotocol::Board::unknown;               
@@ -91,7 +89,7 @@ struct embot::app::application::theCANparserBasic::Impl
     {
         embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance();
         // i reinforce a reading from storage. just for safety. in here we are dealing w/ can address change and i want to be sure.
-        canaddress = canbrdinfo.getCANaddress();
+        std::uint8_t canaddress = canbrdinfo.getCANaddress();
         
         std::uint8_t target = adr;
         
@@ -132,15 +130,15 @@ struct embot::app::application::theCANparserBasic::Impl
         
         if(canaddress != target)
         {
+            if(embot::hw::resOK != embot::hw::can::setfilters(embot::hw::can::Port::one, target))
+            {
+                return false;
+            }
             canbrdinfo.setCANaddress(target);
             canaddress = canbrdinfo.getCANaddress();
         }
-        
-        embot::hw::result_t r = embot::hw::can::setfilters(embot::hw::can::Port::one, canaddress);
-        if(r == embot::hw::resOK)
-            return (target == canaddress);
-        else
-            return false;
+                        
+        return (target == canaddress);
     }
     
     
@@ -164,7 +162,7 @@ bool embot::app::application::theCANparserBasic::Impl::process(const embot::hw::
     txframe = false;
     recognised = false;
     
-    if(false == embot::app::canprotocol::frameis4board(frame, canaddress))
+    if(false == embot::app::canprotocol::frameis4board(frame, embot::app::theCANboardInfo::getInstance().cachedCANaddress()))
     {
         recognised = false;
         return recognised;
@@ -276,7 +274,7 @@ bool embot::app::application::theCANparserBasic::Impl::process_bl_broadcast_appl
     replyinfo.firmware.minor = strd.applicationVminor;
     replyinfo.firmware.build = strd.applicationVbuild;
         
-    if(true == msg.reply(reply, canaddress, replyinfo))
+    if(true == msg.reply(reply, embot::app::theCANboardInfo::getInstance().cachedCANaddress(), replyinfo))
     {
         replies.push_back(reply);
         return true;
@@ -313,7 +311,7 @@ bool embot::app::application::theCANparserBasic::Impl::process_bl_getadditionali
     std::uint8_t nreplies = msg.numberofreplies();
     for(std::uint8_t i=0; i<nreplies; i++)
     {
-        if(true == msg.reply(reply, canaddress, replyinfo))
+        if(true == msg.reply(reply, embot::app::theCANboardInfo::getInstance().cachedCANaddress(), replyinfo))
         {
             replies.push_back(reply);
         }
@@ -362,7 +360,7 @@ bool embot::app::application::theCANparserBasic::Impl::process_getfirmwareversio
     replyinfo.firmware = version;
     replyinfo.protocol = canprotocol;
     
-    if(true == msg.reply(reply, canaddress, replyinfo))
+    if(true == msg.reply(reply, embot::app::theCANboardInfo::getInstance().cachedCANaddress(), replyinfo))
     {            
         replies.push_back(reply);
         return true;
@@ -409,7 +407,6 @@ bool embot::app::application::theCANparserBasic::initialise(Config &config)
     embot::app::theCANboardInfo::StoredInfo storedinfo;
     if(true == canbrdinfo.get(storedinfo))
     {
-        pImpl->canaddress = storedinfo.canaddress;
         pImpl->version.major = storedinfo.applicationVmajor;
         pImpl->version.minor = storedinfo.applicationVminor;
         pImpl->version.build = storedinfo.applicationVbuild;
