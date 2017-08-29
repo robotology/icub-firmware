@@ -136,7 +136,8 @@ static void bl_activity(void* param)
     canconfig.txcapacity = 12;
     canconfig.onrxframe = embot::common::Callback(alerteventbasedtask, nullptr); 
     r = embot::hw::can::init(embot::hw::can::Port::one, canconfig);
-    r = r;
+    r = embot::hw::can::setfilters(embot::hw::can::Port::one, embot::app::theCANboardInfo::getInstance().getCANaddress());
+    r = r;    
 }
 
 

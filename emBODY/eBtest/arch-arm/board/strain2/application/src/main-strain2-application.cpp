@@ -116,6 +116,7 @@ static void start_evt_based(void)
     canconfig.txcapacity = maxOUTcanframes;
     canconfig.onrxframe = embot::common::Callback(alerteventbasedtask, nullptr); 
     r = embot::hw::can::init(embot::hw::can::Port::one, canconfig);
+    r = embot::hw::can::setfilters(embot::hw::can::Port::one, embot::app::theCANboardInfo::getInstance().getCANaddress());
     r = r;
 }
 
