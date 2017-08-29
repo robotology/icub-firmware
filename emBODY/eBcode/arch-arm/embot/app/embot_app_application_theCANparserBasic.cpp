@@ -136,7 +136,11 @@ struct embot::app::application::theCANparserBasic::Impl
             canaddress = canbrdinfo.getCANaddress();
         }
         
-        return (target == canaddress);
+        embot::hw::result_t r = embot::hw::can::setfilters(embot::hw::can::Port::one, canaddress);
+        if(r == embot::hw::resOK)
+            return (target == canaddress);
+        else
+            return false;
     }
     
     

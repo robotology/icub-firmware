@@ -198,6 +198,8 @@ namespace embot { namespace hw { namespace can {
     
     result_t get(Port p, Frame &frame, std::uint8_t &remaining);
     
+    result_t setfilters(Port p, std::uint8_t address);
+    
     
     
 }}} // namespace embot { namespace hw { namespace can {
