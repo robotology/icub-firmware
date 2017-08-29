@@ -73,6 +73,10 @@ namespace embot { namespace app {
         std::uint8_t getCANaddress();
         bool setCANaddress(std::uint8_t adr);
         
+        // the cached can address is refreshed at very call of: synch(), setCANaddress(), getCANaddress(), set().
+        // it can be used by the application or by the various parsers to get access to teh can address without making a direct read from storage.        
+        std::uint8_t cachedCANaddress();
+        
         // todo: we could use two different pages for board and userspace. but we should share the buffer ...
         static const std::uint32_t sizeOfUserSpace = 128+256+512; 
         

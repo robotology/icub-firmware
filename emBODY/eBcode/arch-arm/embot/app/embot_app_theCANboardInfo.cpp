@@ -44,7 +44,8 @@
 
 
 struct embot::app::theCANboardInfo::Impl
-{    
+{
+    std::uint8_t cachedcanaddress;    
     embot::hw::FlashStorage *flashstorage;
     const std::uint32_t userdataaddress = embot::hw::sys::addressOfStorage + 1024 - embot::app::theCANboardInfo::sizeOfUserSpace;
     std::uint64_t buffer[1024/sizeof(std::uint64_t)];
@@ -52,7 +53,8 @@ struct embot::app::theCANboardInfo::Impl
     {              
         flashstorage = new embot::hw::FlashStorage(embot::hw::sys::addressOfStorage, 1024, buffer); 
         embot::sys::theStorage &thestrg = embot::sys::theStorage::getInstance();
-        thestrg.init(flashstorage);   
+        thestrg.init(flashstorage); 
+        cachedcanaddress = 255;        
     }
 };
 
@@ -116,6 +118,8 @@ bool embot::app::theCANboardInfo::synch(embot::app::canprotocol::Board type, emb
         ret = set(strd);        
     }
     
+    pImpl->cachedcanaddress = strd.canaddress;
+    
     return ret;
 }
 
@@ -155,6 +159,8 @@ bool embot::app::theCANboardInfo::synch(embot::app::canprotocol::versionOfAPPLIC
         ret = set(strd);        
     }
     
+    pImpl->cachedcanaddress = strd.canaddress;
+    
     return ret;
 }
 
@@ -168,7 +174,12 @@ bool embot::app::theCANboardInfo::get(StoredInfo &info)
 
 bool embot::app::theCANboardInfo::set(const StoredInfo &info)
 {
-    return pImpl->flashstorage->write(embot::hw::sys::addressOfStorage, sizeof(StoredInfo), &info);
+    bool r = pImpl->flashstorage->write(embot::hw::sys::addressOfStorage, sizeof(StoredInfo), &info);
+    if(true == r)
+    {
+        pImpl->cachedcanaddress = info.canaddress;
+    }
+    return r;
 }
  
  
@@ -176,7 +187,19 @@ std::uint8_t embot::app::theCANboardInfo::getCANaddress()
 {
     StoredInfo strd = {0};
     get(strd); 
+    pImpl->cachedcanaddress = strd.canaddress;
     return strd.canaddress;
+}
+
+
+std::uint8_t embot::app::theCANboardInfo::cachedCANaddress()
+{
+    if(255 == pImpl->cachedcanaddress)
+    {
+        pImpl->cachedcanaddress = getCANaddress();
+    }
+    
+    return pImpl->cachedcanaddress;
 }
 
 
@@ -185,7 +208,13 @@ bool embot::app::theCANboardInfo::setCANaddress(std::uint8_t adr)
     StoredInfo strd = {0};
     get(strd); 
     strd.canaddress = adr;
-    return set(strd);   
+    bool r = set(strd); 
+    if(true == r)
+    {
+        pImpl->cachedcanaddress = strd.canaddress;
+    }
+    
+    return r;
 }
 
 
