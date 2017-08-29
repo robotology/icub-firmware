@@ -923,6 +923,20 @@ bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::po
     return true;    
 }
 
+bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::polling::Message_STRAIN2_AMPLIFIER_CFG1_GET::ReplyInfo &replyinfo)
+{  
+    if(replyinfo.channel >= 6)
+    {
+//        replyinfo.gain0 = replyinfo.gain1 = 0;
+        return false;
+    }     
+
+    #warning TBD
+    
+    return true;    
+}
+
+
 
 bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::polling::Message_SET_AMP_GAIN::Info &info)
 { 
@@ -932,6 +946,20 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::p
     }     
 
     pImpl->configdata.gainofamplifier_set(info.channel, info.gain0, info.gain1);
+   
+    return true;    
+}
+
+
+bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::polling::Message_STRAIN2_AMPLIFIER_CFG1_SET::Info &info)
+{ 
+    if(info.channel >= 6)
+    {
+        return false;
+    }     
+
+    #warning TBD
+    //pImpl->configdata.gainofamplifier_set(info.channel, info.gain0, info.gain1);
    
     return true;    
 }

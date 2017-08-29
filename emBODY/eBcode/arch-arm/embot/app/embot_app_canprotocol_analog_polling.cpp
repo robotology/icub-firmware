@@ -224,7 +224,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         info.shift = candata.datainframe[2];
         info.enabled = embot::common::bit::check(candata.datainframe[3], 0);
         // little endian ...
-        info.cdcOffset = candata.datainframe[4] | (static_cast<std::uint16_t>(candata.datainframe[5]) << 8);
+        info.cdcOffset = static_cast<std::uint16_t>(candata.datainframe[4]) | (static_cast<std::uint16_t>(candata.datainframe[5]) << 8);
      
         return true;         
     } 
@@ -835,6 +835,74 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
     bool Message_ACC_GYRO_SETUP::reply()
     {
         return false;
+    } 
+
+
+
+    bool Message_STRAIN2_AMPLIFIER_CFG1_SET::load(const embot::hw::can::Frame &inframe)
+    {
+        Message::set(inframe);  
+        
+        if(static_cast<std::uint8_t>(CMD::STRAIN2_AMPLIFIER_CFG1_SET) != frame2cmd(inframe))
+        {
+            return false; 
+        }
+        
+        info.set = (candata.datainframe[0] & 0xF0) >> 4;
+        info.channel = (candata.datainframe[0] & 0x0F);
+        
+        // little endian
+        info.GD = static_cast<std::uint16_t>(candata.datainframe[1]) | (static_cast<std::uint16_t>(candata.datainframe[2]) << 8);  
+        info.GI = (candata.datainframe[3] & 0xF0) >> 4;
+        info.S = (candata.datainframe[3] & 0x80) >> 3;
+        info.GO = (candata.datainframe[3] & 0x07);
+        info.Voffsetcoarse = candata.datainframe[4];
+        // little endian
+        info.Vzerodac = static_cast<std::uint16_t>(candata.datainframe[5]) | (static_cast<std::uint16_t>(candata.datainframe[6]) << 8);
+        
+        return true;         
+    }                    
+        
+    bool Message_STRAIN2_AMPLIFIER_CFG1_SET::reply()
+    {
+        return false;
+    } 
+
+
+
+    bool Message_STRAIN2_AMPLIFIER_CFG1_GET::load(const embot::hw::can::Frame &inframe)
+    {
+        Message::set(inframe); 
+        
+        if(static_cast<std::uint8_t>(CMD::STRAIN2_AMPLIFIER_CFG1_GET) != frame2cmd(inframe))
+        {
+            return false; 
+        }
+        
+        info.set = (candata.datainframe[0] & 0xF0) >> 4;
+        info.channel = (candata.datainframe[0] & 0x0F);
+
+        return true;
+    }  
+
+    bool Message_STRAIN2_AMPLIFIER_CFG1_GET::reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo)
+    {
+        std::uint8_t dd[7] = {0};
+
+        dd[0] = (static_cast<std::uint8_t>(replyinfo.set) << 4) | (replyinfo.channel & 0x0F);                  
+        dd[1] = (replyinfo.GD & 0xff);                  // important note: in here we use little endian order ...
+        dd[2] = (replyinfo.GD >> 8) & 0xff;  
+        dd[3] = (static_cast<std::uint8_t>(replyinfo.GI) << 4) | (static_cast<std::uint8_t>(replyinfo.S) << 3) | (static_cast<std::uint8_t>(replyinfo.GO) & 0x7);
+        dd[4] = replyinfo.Voffsetcoarse;
+        dd[5] = (replyinfo.Vzerodac & 0xff);            // important note: in here we use little endian order ...
+        dd[6] = (replyinfo.Vzerodac >> 8) & 0xff;  
+        
+        std::uint8_t datalen = 7;
+        
+        frame_set_sender(outframe, sender);
+        frame_set_clascmddestinationdata(outframe, Clas::pollingAnalogSensor, static_cast<std::uint8_t>(CMD::STRAIN2_AMPLIFIER_CFG1_GET), candata.from, dd, datalen);
+        frame_set_size(outframe, datalen+1);
+        return true;
     }     
     
         

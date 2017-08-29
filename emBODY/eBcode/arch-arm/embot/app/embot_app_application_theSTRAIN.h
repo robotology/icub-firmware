@@ -66,6 +66,7 @@ namespace embot { namespace app { namespace application {
         bool set(embot::app::canprotocol::analog::polling::Message_SET_CALIB_TARE::Info &info);
         bool set(embot::app::canprotocol::analog::polling::Message_SET_CURR_TARE::Info &info);
         bool set(embot::app::canprotocol::analog::polling::Message_SET_AMP_GAIN::Info &info);
+        bool set(embot::app::canprotocol::analog::polling::Message_STRAIN2_AMPLIFIER_CFG1_SET::Info &info);
         
         bool save2eeprom();
         
@@ -79,6 +80,7 @@ namespace embot { namespace app { namespace application {
         bool get(embot::app::canprotocol::analog::polling::Message_GET_CALIB_TARE::ReplyInfo &replyinfo);
         bool get(embot::app::canprotocol::analog::polling::Message_GET_CURR_TARE::ReplyInfo &replyinfo);
         bool get(embot::app::canprotocol::analog::polling::Message_GET_AMP_GAIN::ReplyInfo &replyinfo);
+        bool get(embot::app::canprotocol::analog::polling::Message_STRAIN2_AMPLIFIER_CFG1_GET::ReplyInfo &replyinfo);
         
         bool start(embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode &mode);
         bool stop();        

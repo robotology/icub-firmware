@@ -61,9 +61,14 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         SET_BOARD_ADX = 0x32,                           // basic management
         
 
-        SKIN_SET_BRD_CFG = 77,                          // used to configure the skin data in mtb + its tx rate
-        ACC_GYRO_SETUP = 79,                            // used to configure the inertial data in mtb + its tx rate
-        SKIN_SET_TRIANG_CFG = 80,                       // used to configure the skin data in mtb  
+        SKIN_SET_BRD_CFG = 77,                          // 0x4D used to configure the skin data in mtb + its tx rate
+        ACC_GYRO_SETUP = 79,                            // 0x4F used to configure the inertial data in mtb + its tx rate
+        SKIN_SET_TRIANG_CFG = 80,                       // 0x50 used to configure the skin data in mtb  
+        
+        
+        // messages used for strain2: setting of the size amplifier (gains + offsets)
+        STRAIN2_AMPLIFIER_CFG1_SET = 0x20,              // config of the amplifier transfer function (gains + offsets). 
+        STRAIN2_AMPLIFIER_CFG1_GET = 0x21               // config of the amplifier transfer function (gains + offsets).        
     };
     
     
@@ -76,7 +81,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
     // - message SET_RESOLUTION (0x10) is not implemented yet because only mais uses it.
     // - messages SET_IIR = 0x01, SELECT_ACTIVE_CH = 0x05, FILTER_EN = 0x0D, MUX_EN = 0x0E, MUX_NUM = 0x0F are not implemented 
     //   because they seem to be unúsed in strain.
-    // - there are hole in values: 2, [0x1d, 0x31], [0x33, 76], [81, ->], where we can add extra messages to configure new boards.
+    // - there are hole in values: 2, [0x1d, 0x31], [0x33, 0x4C], [0x51, ->], where we can add extra messages to configure new boards.
     
     
     // some utilities    
@@ -723,8 +728,95 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
             
         bool reply();   // none
         
-    };     
+    };  
 
+
+    class Message_STRAIN2_AMPLIFIER_CFG1_SET : public Message
+    {
+        public:
+                 
+        // format of the 7 remaining bytes (B = byte, N = nibble)
+        //  [1          ][2         ][3         ][4         ][5             ][6             ][7             ]
+        //   set channel  GD                      GI S GO     Voffsetcoarse    Vzerodac
+        //  B1-N1 -> set: it is the set of all possible 0, 1, 2 configuration set. value 15 means: default value inside the micro
+        //  B1-N0 -> channel: it is one of the six channels 0, 1, 2, 3, 4, 5.
+        //  B2,B3 -> fine gain GD using little endian ordering.
+        //  B4-N1 -> front end gain GI.
+        //  B4-N0 -> bit 0x8 gives the sign S (0 is +1), bits 0x7 give the output gain GO
+        //  Vout = ( ( (1-2*S)*Vin + Voffsetcoarse )*GI + Vzerodac )*GD*G0
+        //  the values to use for GD, GI, S, GO, Voffsetcoarse, and Vzerodac are those found in the datasheet of 
+        //  the programmable amplifier PGA308 by Texas Instruments.        
+        
+        struct Info
+        { 
+            std::uint8_t        set         : 4;
+            std::uint8_t        channel     : 4;
+            std::uint16_t       GD;
+            std::uint8_t        GI          : 4; 
+            std::uint8_t        S           : 1;
+            std::uint8_t        GO          : 3; 
+            std::uint8_t        Voffsetcoarse;
+            std::uint16_t       Vzerodac;
+            Info() : set(0), channel(0), GD(0), GI(0), S(0), GO(0), Voffsetcoarse(0), Vzerodac(0) {}
+        };
+        
+        Info info;
+        
+        Message_STRAIN2_AMPLIFIER_CFG1_SET() {}
+            
+        bool load(const embot::hw::can::Frame &inframe);
+            
+        bool reply();   // none            
+    }; 
+
+    
+    class Message_STRAIN2_AMPLIFIER_CFG1_GET : public Message
+    {
+        public:
+                 
+        // format of the 7 remaining bytes (B = byte, N = nibble)
+        //  [1          ][2         ][3         ][4         ][5             ][6             ][7             ]
+        //   set channel  GD                      GI S GO     Voffsetcoarse    Vzerodac
+        //  B1-N1 -> set: it is the set of all possible 0, 1, 2 configuration set. value 15 means: default value inside the micro
+        //  B1-N0 -> channel: it is one of the six channels 0, 1, 2, 3, 4, 5.
+        //  B2,B3 -> fine gain GD using little endian ordering.
+        //  B4-N1 -> front end gain GI.
+        //  B4-N0 -> bit 0x8 gives the sign S (0 is +1), bits 0x7 give the output gain GO
+        //  Vout = ( ( (1-2*S)*Vin + Voffsetcoarse )*GI + Vzerodac )*GD*G0
+        //  the values to use for GD, GI, S, GO, Voffsetcoarse, and Vzerodac are those found in the datasheet of 
+        //  the programmable amplifier PGA308 by Texas Instruments.        
+
+
+        struct Info
+        { 
+            std::uint8_t        set         : 4;
+            std::uint8_t        channel     : 4;        
+            Info() : set(0), channel(0) {}
+        };
+        
+        struct ReplyInfo
+        { 
+            std::uint8_t        set         : 4;
+            std::uint8_t        channel     : 4;
+            std::uint16_t       GD;
+            std::uint8_t        GI          : 4; 
+            std::uint8_t        S           : 1;
+            std::uint8_t        GO          : 3; 
+            std::uint8_t        Voffsetcoarse;
+            std::uint16_t       Vzerodac;
+            ReplyInfo() : set(0), channel(0), GD(0), GI(0), S(0), GO(0), Voffsetcoarse(0), Vzerodac(0) {}
+        };
+        
+        Info info;
+        
+        
+        Message_STRAIN2_AMPLIFIER_CFG1_GET() {}
+            
+        bool load(const embot::hw::can::Frame &inframe);
+            
+        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
+    }; 
+    
     
 }}}}} // namespace embot { namespace app { namespace canprotocol { namespace analog { namespace polling {
     
