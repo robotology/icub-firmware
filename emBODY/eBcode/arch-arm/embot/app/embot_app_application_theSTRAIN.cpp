@@ -56,32 +56,126 @@
     
 struct embot::app::application::theSTRAIN::Impl
 { 
+    static const std::uint8_t numOfChannels = 6;
+    static const std::uint8_t numOfSets = 3;
+    
+    // the new amplifier is the PGA308 by Texas Instruments. It has a completly different configuration
+    // we use for it the compact form of the can message
+    struct amplifierConfig_t
+    { 
+        embot::app::canprotocol::analog::polling::PGA308cfg1    pga308cfg1;   
+        
+        void factoryreset() {
+            pga308cfg1.GD = 1;
+            pga308cfg1.GI = 1;
+            pga308cfg1.GO = 1;
+            pga308cfg1.S = 1;
+            pga308cfg1.Voffsetcoarse = 1;
+            pga308cfg1.Vzerodac = 1;
+        }
+        
+        amplifierConfig_t() { factoryreset(); }
+    };
+    
+    
+    // the old amplifier just had an offset. the 6sg also had two gains.
+    // MAYBE: we should think to reuse these three values to set the whole pga308cfg1 a simpler way for the sake of canloader 
+    struct amplifier0Config_t
+    {   
+        std::uint16_t       offset;             // the offset generated with the dac  
+        std::uint16_t       gain[2];            // the gains used by .... 6sg maybe?                
+    }; 
+
+    
+    // the matrix transformation which is done after adc acquisition    
+    // tf = M * (adc + tare)
+    // then tf can also be corrected with an extra tare which is set in runtime: TF = tf + tare_set_in_runtime
+    // the 6 values of TF are those transmitted to the host.
+    // in here are also stored fullscale (and gain?) which are queried and used by the remote host to compensate the received TF values
+    struct transformerConfig_t
+    {
+        std::uint8_t                dummy;          // just to remove a hole
+        std::uint8_t                gain;           // the gain managed with GET_MATRIX_G / SET_MATRIX_G which is NOT USED INSIDE THE MPU        
+        std::uint16_t               fullscale[6];   // the fullscale of the measurements: NOT USED INSIDE THE MPU
+        embot::common::dsp::Q15     tare[6];        // in format 1Q15: the stored tare
+        embot::common::dsp::Q15     matrix[6*6];    // in format 1Q15: transformation matrix from the 6 strain-gauge values to the 6 force-torque values        
+    };
+    
+    
+    // the complete configuration for the transformer and the six amplifiers
+    struct setOfConfig_t
+    {
+        transformerConfig_t     transformer;            // the config of the transformer from dacs to torqueforce array
+        amplifier0Config_t      amplifiers0[6];         // the OLD config of the amplifiers from strain gauge to values given to dacs 
+        amplifierConfig_t       amplifiers[6];          // the NEW config of the amplifiers from strain gauge to values given to dacs          
+    };
     
     static const std::uint32_t validityKey = 0x7777dead;
+    
+    
     
     // it is a holder of config data which is eventally saved to eeprom. 
     // this struct is without methods so that i am sure its sizeof() is the sum of the variables. 
     // this struct it is managed by the StrainConfig class
     struct strainConfigData_t
     {   
-        std::uint32_t       key;
-        char                serial[8];              // the serial number of the strain           
-        std::int16_t        fullscale[6];           // the fullscales of the measuraments
-        std::int16_t        tare[6];                // the stored tare
-        std::uint16_t       offset[6];              // the offset generated with the dac
-        std::uint8_t        matrixgain;             // the gain to be applied to the matrix as an unsigned integer value
-        std::int16_t        matrix[6][6];           // transformation matrix from the 6 strain-gauge values to the 6 force-torque values  
-        std::uint16_t       gainofamplifier[6][2];  // the gains used by .... 6sg maybe?                    
-    };
+        std::uint32_t           key;
+        char                    serial[8];              // the serial number of the strain      
+        setOfConfig_t           set[numOfSets];         // the three configurations sets. so far only one is supported
+    };  
         
+    
+    // the class which manages the configuration data which is also stored in eeprom
     class StrainConfigData
-    {   // only eepromread() and eepromwrite() operate on eeprom
+    {   
+        private:
+        
+        
+        // data contains what is also stored in eeprom. only eepromread() and eepromwrite() operate on eeprom
+        // and take care to set synched to true. there are methods used to modify data which also set synched 
+        // to false. HENCE: DO NOT CHANGE data by hand. 
+        strainConfigData_t                      data;           // we save it in eeprom when requested
+        bool                                    synched;        // true if data is equal to what is in eeprom
+        
+        private:
+        
+        embot::common::dsp::q15::matrix transfQ15matrix[numOfSets];
+        embot::common::dsp::q15::matrix transfQ15tare[numOfSets];
+
         public:
             
-        strainConfigData_t      data;           // we save it in eeprom when requested
-        bool                    synched;        // true if data is equal to what is in eeprom
-
+        
         // methods
+        
+        bool isEEPROMsynched()
+        {
+            return synched;
+        }
+        
+        bool EEPROM_read()
+        {
+            embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance();
+            canbrdinfo.userdataread(0, sizeof(data), &data);
+            synched = true;
+            
+            if(validityKey != data.key)
+            {   // if it is not valid, then ... set default and impose validity key      
+                def_values();
+                data.key = validityKey;
+                EEPROM_write();
+            }
+                        
+            return synched;
+        }
+        
+        bool EEPROM_write()
+        {
+            data.key = validityKey;
+            embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance(); 
+            canbrdinfo.userdatawrite(0, sizeof(data), &data);
+            synched = true;
+            return synched;
+        }
         
         bool clear()
         {
@@ -94,71 +188,18 @@ struct embot::app::application::theSTRAIN::Impl
         StrainConfigData()
         {
             clear();
+            
+            for(int s=0; s<numOfSets; s++)
+            {
+                transfQ15matrix[s].load(6, 6, data.set[s].transformer.matrix);
+                transfQ15tare[s].load(6, 1, data.set[s].transformer.tare);
+            }
         }
         
         ~StrainConfigData() {}
             
-        void matrix_set_identity()
-        {   // value 0x7fff is close to 1 = 1-2^(-15)            
-            std::memset(data.matrix, 0, sizeof(data.matrix));
-            data.matrix[0][0] = data.matrix[1][1] = data.matrix[2][2] = data.matrix[3][3] = data.matrix[4][4] = data.matrix[5][5] = 0x7fff;
-            synched = false;
-        }
-        
-        void matrixgain_set(std::uint8_t g)
-        {            
-            data.matrixgain = g;
-            synched = false;
-        }
-        
-        void matrix_set(std::uint8_t r, std::uint8_t c, std::uint16_t value)
-        {   
-            if((r<6) && (c<6))
-            {
-                data.matrix[r][c] = value;
-                synched = false;
-            }
-        }
-        
-        bool def_values()
-        {
-            clear();
-            data.key = validityKey;
-            std::snprintf(data.serial, sizeof(data.serial), "SN0000");
-            data.fullscale[0] = data.fullscale[1] = data.fullscale[2] = data.fullscale[3] = data.fullscale[4] = data.fullscale[5] = 0x7fff;
-            std::memset(data.tare, 0, sizeof(data.tare)); 
-            matrix_set_identity();
-            matrixgain_set(1);
-            for(int i=0; i<6; i++) for(int j=0; j<2; j++) data.gainofamplifier[i][j] = 1;
-            synched = false;
-            return synched;
-        }
-        
-        bool eeprom_read()
-        {
-            embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance();
-            canbrdinfo.userdataread(0, sizeof(data), &data);
-            synched = true;
             
-            if(validityKey != data.key)
-            {   // if it is not valid, then ... set default and impose validity key      
-                def_values();
-                data.key = validityKey;
-                eeprom_write();
-            }
-                        
-            return synched;
-        }
-        
-        bool eeprom_write()
-        {
-            data.key = validityKey;
-            embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance(); 
-            canbrdinfo.userdatawrite(0, sizeof(data), &data);
-            synched = true;
-            return synched;
-        }
-        
+                    
         void serial_set(const char *str) 
         {
             std::snprintf(data.serial, sizeof(data.serial), "%s", str);
@@ -169,56 +210,242 @@ struct embot::app::application::theSTRAIN::Impl
         {
             return data.serial;
         }
-        
-        std::int16_t fullscale_get(std::uint8_t channel)
+                        
+        void amplifiers_set(std::uint8_t set, std::uint8_t channel, const embot::app::canprotocol::analog::polling::PGA308cfg1 &cfg1)
         {
-            if(channel < 6)
-                return data.fullscale[channel];
-            else
-                return 0;
+            if((channel < 6) && (set < numOfSets))
+            {
+                data.set[set].amplifiers[channel].pga308cfg1 = cfg1;
+                synched = false;
+            }
+        } 
+        
+        bool amplifiers_get(std::uint8_t set, std::uint8_t channel, embot::app::canprotocol::analog::polling::PGA308cfg1 &cfg1)
+        {
+            bool ret = false;
+            if((channel < 6) && (set < numOfSets))
+            {
+                cfg1 = data.set[set].amplifiers[channel].pga308cfg1 = cfg1;
+                ret = true;
+            }
+            
+            return ret;
+        } 
+
+        void amplifiers_reset(std::uint8_t set, std::uint8_t channel)
+        {
+            if((channel < 6) && (set < numOfSets))
+            {
+                data.set[set].amplifiers[channel].factoryreset();
+                synched = false;
+            }
+        }         
+          
+        const embot::common::dsp::q15::matrix& transformer_matrix_handle(std::uint8_t set)
+        {
+            if(set >= numOfSets)
+            {
+                set = 0;
+            }
+            return transfQ15matrix[set];
         }
         
-        void fullscale_set(std::uint8_t channel, std::int16_t value)
+        const embot::common::dsp::q15::matrix& transformer_tare_handle(std::uint8_t set)
         {
-            if(channel < 6)
+            if(set >= numOfSets)
             {
-                data.fullscale[channel] = value;
+                set = 0;
+            }
+            return transfQ15tare[set];
+        }
+        
+        void transformer_matrix_fill_identity(std::uint8_t set)
+        {
+            if(set < numOfSets)
+            {
+                transfQ15matrix[set].diagonal(embot::common::dsp::q15::posOneNearly);
                 synched = false;
             }
         }
         
-        void tare_set(std::uint8_t channel, std::int16_t value)
+        void transformer_matrix_fill_diagonal(std::uint8_t set, embot::common::dsp::Q15 value)
         {
-            if(channel < 6)
+            if(set < numOfSets)
             {
-                data.tare[channel] = value;
+                transfQ15matrix[set].diagonal(value);
                 synched = false;
             }
         }
         
-        void tare_clear()
+        void transformer_gain_set(std::uint8_t set, std::uint8_t g)
+        { 
+            if(set < numOfSets)
+            {            
+                data.set[set].transformer.gain = g;
+                synched = false;
+            }
+        }
+        
+        std::uint8_t transformer_gain_get(std::uint8_t set)
         {
-            std::memset(data.tare, 0, sizeof(data.tare));
+            std::uint8_t g = 0;           
+            if(set < numOfSets)
+            {            
+                g = data.set[set].transformer.gain;
+            }
+            return g;
+        }
+        
+        void transformer_matrix_set(std::uint8_t set, std::uint8_t r, std::uint8_t c, embot::common::dsp::Q15 value)
+        {   
+            if((set < numOfSets) && (r < 6) && (c < 6))
+            {
+                transfQ15matrix[set].set(r, c, value);
+                synched = false;
+            }
+        }
+        
+        embot::common::dsp::Q15 transformer_matrix_get(std::uint8_t set, std::uint8_t r, std::uint8_t c)
+        { 
+            embot::common::dsp::Q15 v = embot::common::dsp::q15::zero;
+            
+            if((set < numOfSets) && (r < 6) && (c < 6))
+            {
+                v = transfQ15matrix[set].get(r, c);
+            }
+            
+            return v;
+        }
+        
+        void transformer_tare_fill(std::uint8_t set, embot::common::dsp::Q15 value)
+        {
+            if(set < numOfSets)
+            {                
+                transfQ15tare[set].fill(value);
+                synched = false;
+            }
+        }
+        
+        void transformer_tare_set(std::uint8_t set, std::uint8_t channel, embot::common::dsp::Q15 value)
+        { 
+            if((set < numOfSets) && (channel < 6))
+            {
+                transfQ15tare[set].set(channel, 1, value);
+                synched = false;
+            }
+        }
+        
+        embot::common::dsp::Q15 transformer_tare_get(std::uint8_t set, std::uint8_t channel)
+        {
+            embot::common::dsp::Q15 v = embot::common::dsp::q15::zero;
+            if((set < numOfSets) && (channel < 6))
+            {
+                v = transfQ15tare[set].get(channel, 1);
+            }            
+            return v;
+        }        
+        
+        bool def_values()
+        {
+            clear();
+            
+            data.key = validityKey;
+            std::snprintf(data.serial, sizeof(data.serial), "SN0000");            
+            // and now the set   
+            for(int s=0; s<numOfSets; s++)
+            {
+                // transformer
+                transformer_gain_set(s, 1);
+                transformer_fullscale_fill(s, 0x7fff);
+                transformer_tare_fill(s, embot::common::dsp::q15::zero);
+                transformer_matrix_fill_diagonal(s, embot::common::dsp::q15::posOneNearly);
+                transformer_gain_set(s, 1);
+                
+                for(int chn=0; chn<6; chn++)
+                {
+                    // amplifier0
+                    amplifier0_offset_set(s, chn, 0);
+                    amplifier0_gains_set(s, chn, 1, 1);
+                    // amplifier
+                    amplifiers_reset(s, chn);
+                }
+            }
+            
+                        
             synched = false;
+            return synched;
         }
         
-        void offset_set(std::uint8_t channel, std::uint16_t value)
+        
+        std::uint16_t transformer_fullscale_get(std::uint8_t set, std::uint8_t channel)
         {
-            if(channel < 6)
+            if((set < numOfSets) && (channel < 6))
             {
-                data.offset[channel] = value;
+                return data.set[set].transformer.fullscale[channel];
+            }
+            else
+            {
+                return 0;
+            }
+        }
+        
+        void transformer_fullscale_set(std::uint8_t set, std::uint8_t channel, std::uint16_t value)
+        {
+            if((set < numOfSets) && (channel < 6))
+            {
+                data.set[set].transformer.fullscale[channel] = value;
+                synched = false;
+            }
+        } 
+
+        void transformer_fullscale_fill(std::uint8_t set, std::uint16_t value)
+        {
+            for(int channel=0; channel<6; channel++)
+            {
+                transformer_fullscale_set(set, channel, value); 
+            }
+        }        
+        
+        void amplifier0_offset_set(std::uint8_t set, std::uint8_t channel, std::uint16_t value)
+        {
+            if((set < numOfSets) && (channel < 6))
+            {
+                data.set[set].amplifiers0[channel].offset = value;
                 synched = false;
             }
         }
         
-        void gainofamplifier_set(std::uint8_t channel, std::uint16_t g0, std::uint16_t g1)
+        std::uint16_t amplifier0_offset_get(std::uint8_t set, std::uint8_t channel)
         {
-            if(channel < 6)
+            std::uint16_t value = 0;
+            if((set < numOfSets) && (channel < 6))
             {
-                data.gainofamplifier[channel][0] = g0;
-                data.gainofamplifier[channel][1] = g1;
+                value = data.set[set].amplifiers0[channel].offset;                
+            }
+            
+            return value;
+        }
+        
+        void amplifier0_gains_set(std::uint8_t set, std::uint8_t channel, std::uint16_t g0, std::uint16_t g1)
+        {
+            if((set < numOfSets) && (channel < 6))
+            {
+                data.set[set].amplifiers0[channel].gain[0] = g0;
+                data.set[set].amplifiers0[channel].gain[1] = g1;
                 synched = false;
             }            
+        }
+        
+        bool amplifier0_gains_get(std::uint8_t set, std::uint8_t channel, std::uint16_t &g0, std::uint16_t &g1)
+        {
+            bool ret = false;
+            if((set < numOfSets) && (channel < 6))
+            {
+                g0 = data.set[set].amplifiers0[channel].gain[0];
+                g0 = data.set[set].amplifiers0[channel].gain[1];
+                ret =  true;
+            }  
+            return ret;            
         }
         
     };
@@ -229,32 +456,41 @@ struct embot::app::application::theSTRAIN::Impl
     // pity that armcc does not supporst std::tuple<>
     struct TripleValue
     {
-        std::int16_t    x;
-        std::int16_t    y;
-        std::int16_t    z;
+        std::uint16_t    x;
+        std::uint16_t    y;
+        std::uint16_t    z;
         void reset() { x = y = z = 0; }
-        void set(std::int16_t xx, std::int16_t yy, std::int16_t zz) { x = xx; y = yy; z = zz; }
+        void set(std::uint16_t xx, std::uint16_t yy, std::uint16_t zz) { x = xx; y = yy; z = zz; }
         TripleValue() { reset(); } 
     };     
     
     // it is a holder of volatile data used in runtime. we use the same approach as for config data
     struct StrainRuntimeData_t
     {
-        embot::common::Time txperiod;
+        embot::common::Time         txperiod;
         
-        std::int16_t        tare[6];            // the tare (offset) as measured in runtime
-        std::uint16_t       adcvalue[6];        // the values as acquired by the adc. it is uint16_t in original strain code
-        std::int16_t        torqueforce[6];
+        std::uint16_t               adcvalue[6];        // the values as acquired by the adc... but scaled to full 64k range. original strain had 16-bit adc   
         
+        embot::common::dsp::Q15     q15value[6];        // same as adcvalue but in q15 format       
+        embot::common::dsp::Q15     tare[6];            // the tare applied as a last correction. it is always ::zero unless changed with SET_CURR_TARE
+        embot::common::dsp::Q15     torqueforce[6];
         
-        TripleValue force;
-        TripleValue torque;
+        // the calibrated values for torque and force. they are raw values, not in dsp::Q15 format
+        TripleValue                 torque;
+        TripleValue                 force;
         
         bool TXcalibData;
         bool TXuncalibData;
         
+        bool adcsaturation;        
+        embot::app::canprotocol::analog::periodic::ADCsaturation saturationonchannel[6];
+
+        
+        
+        
         // methods
         void clear() { 
+            std::memset(q15value, 0, sizeof(q15value)); 
             std::memset(tare, 0, sizeof(tare)); 
             std::memset(adcvalue, 0, sizeof(adcvalue));
             std::memset(torqueforce, 0, sizeof(torqueforce));
@@ -262,17 +498,79 @@ struct embot::app::application::theSTRAIN::Impl
             torque.reset();
             TXcalibData = false; 
             TXuncalibData = false; 
+            adcsaturation =  false;
+            std::memset(saturationonchannel, static_cast<std::uint8_t>(embot::app::canprotocol::analog::periodic::ADCsaturation::NONE), sizeof(saturationonchannel));
         }       
         StrainRuntimeData_t() { clear(); }
     };
+
     
     class StrainRuntimeData
     {
         public:
 
-        StrainRuntimeData_t     data;   
+        StrainRuntimeData_t data;   
+        
+        // used for the sake of matrix-based calculation
+        embot::common::dsp::q15::matrix currtareQ15vector;
+        embot::common::dsp::q15::matrix torqueforceQ15vector;
+        embot::common::dsp::q15::matrix adcvalueQ15vector;
+        
+                        
+        static const std::uint16_t ADCsaturationLow = 1000;
+        static const std::uint16_t ADCsaturationHigh = 64000;
+        
         
         // methods
+        
+        bool check_adcsaturation()
+        {
+            data.adcsaturation =  false;
+            std::memset(data.saturationonchannel, static_cast<std::uint8_t>(embot::app::canprotocol::analog::periodic::ADCsaturation::NONE), sizeof(data.saturationonchannel));
+
+
+            
+            for(int channel=0; channel<6; channel++)
+            {
+                data.saturationonchannel[channel] = embot::app::canprotocol::analog::periodic::ADCsaturation::NONE;
+                
+                if(data.adcvalue[channel] < ADCsaturationLow)
+                {;
+                    data.saturationonchannel[channel] = embot::app::canprotocol::analog::periodic::ADCsaturation::LOW;                    
+                    data.adcsaturation = true;                
+                }
+                else if(data.adcvalue[channel] > ADCsaturationHigh)
+                {
+                    data.saturationonchannel[channel] = embot::app::canprotocol::analog::periodic::ADCsaturation::HIGH;
+                    data.adcsaturation = true;                 
+                }               
+            }
+            
+            return data.adcsaturation;           
+        }
+        
+        void tare_fill(embot::common::dsp::Q15 value)
+        {    
+            currtareQ15vector.fill(value);
+        }
+        
+        void tare_set(std::uint8_t channel, embot::common::dsp::Q15 value)
+        { 
+            if(channel<6)
+            {
+                data.tare[channel] = value;
+            }
+        }
+        
+        embot::common::dsp::Q15 tare_get(std::uint8_t channel)
+        {
+            if(channel<6)
+            {
+                return data.tare[channel];
+            }
+            
+            return embot::common::dsp::q15::zero;            
+        }
         
         bool clear()
         {
@@ -283,6 +581,10 @@ struct embot::app::application::theSTRAIN::Impl
         StrainRuntimeData()
         {
             clear();
+            
+            torqueforceQ15vector.load(6, 1, data.torqueforce);
+            currtareQ15vector.load(6, 1, data.tare);
+            adcvalueQ15vector.load(6, 1, data.q15value);
         }
         
         ~StrainRuntimeData() {}
@@ -292,12 +594,11 @@ struct embot::app::application::theSTRAIN::Impl
             clear();
             return true;
         }
-                
+                        
     };    
     
     
-   
-    
+       
       
     Config config;
            
@@ -307,14 +608,7 @@ struct embot::app::application::theSTRAIN::Impl
     embot::sys::Timer *ticktimer;
     embot::sys::Action action;
         
-    
-//    StrainStoredInfo strainstoredinfo;
-//    bool infosavedoneeprom;
-    
-    std::uint8_t canaddress;
-       
-       
-    
+                     
     // i put in here some values proper of the STRAIN. they may be many.... hence better to organise them in a struct later on.
     
     
@@ -323,12 +617,14 @@ struct embot::app::application::theSTRAIN::Impl
     
 
     Impl() 
-    {   
+    {
+
+//        defaultAmplifConfig.factoryreset();        
+        
         ticking = false;  
 
         ticktimer = new embot::sys::Timer;   
 
-        canaddress = 0;  
                 
         configdata.clear();
         runtimedata.clear();
@@ -345,6 +641,8 @@ struct embot::app::application::theSTRAIN::Impl
     bool configure();
     
     bool acquisition();
+    
+    bool processing();
     
     bool fill(embot::app::canprotocol::analog::periodic::Message_UNCALIBFORCE_VECTOR_DEBUGMODE::Info &info);
     bool fill(embot::app::canprotocol::analog::periodic::Message_UNCALIBTORQUE_VECTOR_DEBUGMODE::Info &info);
@@ -416,10 +714,23 @@ bool embot::app::application::theSTRAIN::Impl::fill(embot::app::canprotocol::ana
 {
     bool ret = true;
     
-    info.canaddress = canaddress;
+    info.canaddress = embot::app::theCANboardInfo::getInstance().cachedCANaddress();
     info.x = runtimedata.data.adcvalue[3];
     info.y = runtimedata.data.adcvalue[4];
     info.z = runtimedata.data.adcvalue[5];
+    
+    info.adcsaturationispresent = runtimedata.data.adcsaturation;
+    if(true == runtimedata.data.adcsaturation)
+    {
+        info.adcsaturationinfo.thereissaturation =  true;
+        info.adcsaturationinfo.channel[0] = runtimedata.data.saturationonchannel[3];
+        info.adcsaturationinfo.channel[1] = runtimedata.data.saturationonchannel[4];
+        info.adcsaturationinfo.channel[2] = runtimedata.data.saturationonchannel[5];
+    }
+    else
+    {
+        info.adcsaturationinfo.reset();
+    }
          
     return ret;    
 }
@@ -429,10 +740,23 @@ bool embot::app::application::theSTRAIN::Impl::fill(embot::app::canprotocol::ana
 {
     bool ret = true;
 
-    info.canaddress = canaddress;
+    info.canaddress = embot::app::theCANboardInfo::getInstance().cachedCANaddress();
     info.x = runtimedata.data.adcvalue[0];
     info.y = runtimedata.data.adcvalue[1];
     info.z = runtimedata.data.adcvalue[2];
+
+    info.adcsaturationispresent = runtimedata.data.adcsaturation;
+    if(true == runtimedata.data.adcsaturation)
+    {
+        info.adcsaturationinfo.thereissaturation =  true;
+        info.adcsaturationinfo.channel[0] = runtimedata.data.saturationonchannel[0];
+        info.adcsaturationinfo.channel[1] = runtimedata.data.saturationonchannel[1];
+        info.adcsaturationinfo.channel[2] = runtimedata.data.saturationonchannel[2];
+    }
+    else
+    {
+        info.adcsaturationinfo.reset();
+    }
     
     return ret;    
 }
@@ -441,11 +765,24 @@ bool embot::app::application::theSTRAIN::Impl::fill(embot::app::canprotocol::ana
 {
     bool ret = true;
     
-    info.canaddress = canaddress;
+    info.canaddress = embot::app::theCANboardInfo::getInstance().cachedCANaddress();
     info.x = runtimedata.data.force.x;
     info.y = runtimedata.data.force.y;
     info.z = runtimedata.data.force.z;
-         
+    
+    info.adcsaturationispresent = runtimedata.data.adcsaturation;
+    if(true == runtimedata.data.adcsaturation)
+    {
+        info.adcsaturationinfo.thereissaturation =  true;
+        info.adcsaturationinfo.channel[0] = runtimedata.data.saturationonchannel[3];
+        info.adcsaturationinfo.channel[1] = runtimedata.data.saturationonchannel[4];
+        info.adcsaturationinfo.channel[2] = runtimedata.data.saturationonchannel[5];
+    }
+    else
+    {
+        info.adcsaturationinfo.reset();
+    }
+    
     return ret;    
 }
 
@@ -454,11 +791,24 @@ bool embot::app::application::theSTRAIN::Impl::fill(embot::app::canprotocol::ana
 {
     bool ret = true;
 
-    info.canaddress = canaddress;
+    info.canaddress = embot::app::theCANboardInfo::getInstance().cachedCANaddress();
     info.x = runtimedata.data.torque.x;
     info.y = runtimedata.data.torque.y;
     info.z = runtimedata.data.torque.z;
     
+    info.adcsaturationispresent = runtimedata.data.adcsaturation;
+    if(true == runtimedata.data.adcsaturation)
+    {
+        info.adcsaturationinfo.thereissaturation =  true;
+        info.adcsaturationinfo.channel[0] = runtimedata.data.saturationonchannel[0];
+        info.adcsaturationinfo.channel[1] = runtimedata.data.saturationonchannel[1];
+        info.adcsaturationinfo.channel[2] = runtimedata.data.saturationonchannel[2];
+    }
+    else
+    {
+        info.adcsaturationinfo.reset();
+    }
+
     return ret;    
 }
 
@@ -467,9 +817,9 @@ bool embot::app::application::theSTRAIN::Impl::acquisition()
 {
     #warning TODO: perform hw acquisition of all adc values and computation of ft values. 
     
-
     
-    // acquire from adc and put inside adcvalue
+    // 1. acquire from adc and put inside adcvalue
+    
     runtimedata.data.adcvalue[0]++;
     runtimedata.data.adcvalue[1]++;
     runtimedata.data.adcvalue[2]++;
@@ -478,30 +828,63 @@ bool embot::app::application::theSTRAIN::Impl::acquisition()
     runtimedata.data.adcvalue[5]++;
     
     
-    // prepare uncalib data
-    // so far just adcvalue[]
+    // 2 convert adcvalue[] into q15value[]. also checck vs saturation
+    for(int i=0; i<6; i++)
+    {
+        runtimedata.data.q15value[i] = embot::common::dsp::q15::U16toQ15(runtimedata.data.adcvalue[i]);
+    }
+    
+    runtimedata.check_adcsaturation();
+    
+    return true;
+}
 
+
+bool embot::app::application::theSTRAIN::Impl::processing()
+{
+    // we work on set 0
+    const std::uint8_t set = 0;
     
-    // prepare calib data
+    // in adcvalue[] we performed adc acquisition, in value[] we put the q15 values and we also have checkd vs adc saturation
     
-    // formula is:
-    // torqueforce = M * (adcvalue + calibtare ) + currtare
     
-    runtimedata.data.torqueforce[0] = runtimedata.data.adcvalue[0] & 0xfff7;
-    runtimedata.data.torqueforce[1] = runtimedata.data.adcvalue[1] & 0xfff7;
-    runtimedata.data.torqueforce[2] = runtimedata.data.adcvalue[2] & 0xfff7;
-    runtimedata.data.torqueforce[3] = runtimedata.data.adcvalue[3] & 0xfffc;
-    runtimedata.data.torqueforce[4] = runtimedata.data.adcvalue[4] & 0xfffc;
-    runtimedata.data.torqueforce[4] = runtimedata.data.adcvalue[5] & 0xfffc;
+    // now prepare calib data: it will be inside the triples: runtimedata.data.torque and runtimedata.data.force 
     
-    runtimedata.data.torque.x = runtimedata.data.torqueforce[0];
-    runtimedata.data.torque.y = runtimedata.data.torqueforce[1];
-    runtimedata.data.torque.z = runtimedata.data.torqueforce[2];
+        
+    // apply formula: torqueforce = M * (adcvalue + calibtare) + currtare
     
-    runtimedata.data.force.x = runtimedata.data.torqueforce[3];
-    runtimedata.data.force.y = runtimedata.data.torqueforce[4];
-    runtimedata.data.force.z = runtimedata.data.torqueforce[5];
+    bool q15saturated =  false;
     
+    const embot::common::dsp::q15::matrix& handleCalibMatrixQ15 = configdata.transformer_matrix_handle(set);     
+    const embot::common::dsp::q15::matrix& handleCalibTareQ15 = configdata.transformer_tare_handle(set);   
+        
+    embot::common::dsp::Q15 q15tmpvector[6];
+    embot::common::dsp::q15::matrix tmpQ15vector(6, 1, q15tmpvector);
+    
+    
+    embot::common::dsp::q15::add(runtimedata.adcvalueQ15vector, handleCalibTareQ15, tmpQ15vector, q15saturated);
+    embot::common::dsp::q15::multiply(handleCalibMatrixQ15, tmpQ15vector, runtimedata.torqueforceQ15vector, q15saturated);
+    embot::common::dsp::q15::add(runtimedata.torqueforceQ15vector, runtimedata.currtareQ15vector, runtimedata.torqueforceQ15vector, q15saturated);
+    
+    // copy 
+    
+    // now in torqueforceQ15vector (runtimedata.data.torqueforce[]) we have the result ... 
+    
+    // if we did have saturation ... we send old safe data.
+   
+    // if we are ok, we use what in runtimedata.data.torqueforce[] to compute safe data and data to send
+    // data2send = safedata = 0x8000 + torqueforce
+   
+    if(false == runtimedata.data.adcsaturation)
+    {
+        runtimedata.data.torque.set(embot::common::dsp::q15::Q15toU16(runtimedata.data.torqueforce[0]), embot::common::dsp::q15::Q15toU16(runtimedata.data.torqueforce[1]), embot::common::dsp::q15::Q15toU16(runtimedata.data.torqueforce[2]));
+        runtimedata.data.force.set(embot::common::dsp::q15::Q15toU16(runtimedata.data.torqueforce[3]), embot::common::dsp::q15::Q15toU16(runtimedata.data.torqueforce[4]), embot::common::dsp::q15::Q15toU16(runtimedata.data.torqueforce[5]));
+    }
+    else
+    {
+        // we dont update so that in runtimedata.data.torque and runtimedata.data.force there are always valid value
+    }
+        
     
     return true;
 }
@@ -514,8 +897,11 @@ bool embot::app::application::theSTRAIN::Impl::tick(std::vector<embot::hw::can::
         return false;
     }
         
-    // perform acquisition
+    // adc acquisition
     acquisition();
+    
+    // processing of acquired data
+    processing();
     
     embot::hw::can::Frame frame;  
 
@@ -589,12 +975,8 @@ bool embot::app::application::theSTRAIN::initialise(Config &config)
     
     pImpl->action.set(embot::sys::Action::EventToTask(pImpl->config.tickevent, pImpl->config.totask));
 
-    // retrieve address    
-    embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance();
-    pImpl->canaddress = canbrdinfo.getCANaddress();
-    
     // read from eeprom and make sure it is coherent data (first ever time we init eeprom)
-    pImpl->configdata.eeprom_read();
+    pImpl->configdata.EEPROM_read();
     pImpl->runtimedata.clear();
      
     return true;
@@ -640,8 +1022,8 @@ bool embot::app::application::theSTRAIN::get_fullscale(std::uint8_t channel, std
         return false;
     }
        
-    #warning: fix the problem uint16 vs int16
-    value = pImpl->configdata.fullscale_get(channel);
+    const std::uint8_t set = 0;
+    value = pImpl->configdata.transformer_fullscale_get(set, channel);
 
     return true;    
 }
@@ -655,17 +1037,17 @@ bool embot::app::application::theSTRAIN::get_adc(embot::app::canprotocol::analog
         return false;
     }
     
-    #warning -> VERY IMPORTANT: should we perform an acquisition or ... just get the buffered value? THINK of IT!
-        // moreover: acquire but dont tx mode could be useful?
-    
-    // we perform an acquisition ...
-    
+    // we perform an acquisition ...    
     pImpl->acquisition();
+    
         
     std::uint16_t v = 0;
     
     if(true == replyinfo.valueiscalibrated)
-    {        
+    {
+        // we call processing() because the calibration is not done inside acquisition() 
+        pImpl->processing();
+        
         switch(replyinfo.channel)
         {   
             // torque
@@ -701,7 +1083,9 @@ bool embot::app::application::theSTRAIN::get_offset(std::uint8_t channel, std::u
         return false;
     }
     
-    value = pImpl->configdata.data.offset[channel];
+    const std::uint8_t set = 0;
+    
+    value = pImpl->configdata.amplifier0_offset_get(set, channel);
     
     return true;    
 }
@@ -709,21 +1093,22 @@ bool embot::app::application::theSTRAIN::get_offset(std::uint8_t channel, std::u
 bool embot::app::application::theSTRAIN::configure(embot::app::canprotocol::analog::polling::Message_SET_FULL_SCALES::Info &info)
 {       
     // original strain code saves the value in ram only. it is saved in eeprom only when the message save2eeprom arrives     
-    pImpl->configdata.fullscale_set(info.channel, info.fullscale);
+    const std::uint8_t set = 0;
+    pImpl->configdata.transformer_fullscale_set(set, info.channel, info.fullscale);
 
     return true;    
 }
 
 bool embot::app::application::theSTRAIN::get_eepromstatus(bool &saved)
 {    
-    saved = pImpl->configdata.synched;
+    saved = pImpl->configdata.isEEPROMsynched();
     return true;    
 }
 
 
 bool embot::app::application::theSTRAIN::save2eeprom()
 {    
-    pImpl->configdata.eeprom_write();
+    pImpl->configdata.EEPROM_write();
 
     return true;    
 }
@@ -735,8 +1120,9 @@ bool embot::app::application::theSTRAIN::configure(embot::app::canprotocol::anal
         return false;
     } 
    
-    // original strain code saves the value in ram only. it is saved in eeprom only when the message save2eeprom arrives     
-    pImpl->configdata.offset_set(info.channel, info.offset);
+    // original strain code saves the value in ram only. it is saved in eeprom only when the message save2eeprom arrives  
+    const std::uint8_t set = 0;    
+    pImpl->configdata.amplifier0_offset_set(set, info.channel, info.offset);
 
     return true;    
 }
@@ -749,8 +1135,8 @@ bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::po
         replyinfo.value = 0;
         return false;
     }
-    
-    replyinfo.value = pImpl->configdata.data.matrix[replyinfo.row][replyinfo.col];
+    const std::uint8_t set = 0;
+    replyinfo.value = static_cast<std::uint16_t>(pImpl->configdata.transformer_matrix_get(set, replyinfo.row, replyinfo.col));
     
     return true;    
 }
@@ -763,8 +1149,9 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::p
         return false;
     }
     
-    // original strain code saves the value in ram only. it is saved in eeprom only when the message save2eeprom arrives     
-    pImpl->configdata.matrix_set(info.row, info.col, info.value);
+    // original strain code saves the value in ram only. it is saved in eeprom only when the message save2eeprom arrives  
+    const std::uint8_t set = 0;    
+    pImpl->configdata.transformer_matrix_set(set, info.row, info.col, static_cast<embot::common::dsp::Q15>(info.value));
 
     return true;    
 }
@@ -774,8 +1161,9 @@ bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::po
 {        
     embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance();
 
-    replyinfo.gain =  pImpl->configdata.data.matrixgain;
-    
+    const std::uint8_t set = 0;
+    replyinfo.gain =  pImpl->configdata.transformer_gain_get(set);
+        
     return true;    
 }
 
@@ -783,7 +1171,8 @@ bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::po
 bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::polling::Message_SET_MATRIX_G::Info &info)
 {  
     // original strain code saves the value in ram only. it is saved in eeprom only when the message save2eeprom arrives     
-    pImpl->configdata.matrixgain_set(info.gain);
+    const std::uint8_t set = 0;
+    pImpl->configdata.transformer_gain_set(set, info.gain);
 
     return true;    
 }
@@ -796,7 +1185,8 @@ bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::po
         return false;
     } 
 
-    replyinfo.value = pImpl->configdata.data.tare[replyinfo.channel];
+    const std::uint8_t set = 0;
+    replyinfo.value = static_cast<std::uint16_t>(pImpl->configdata.transformer_tare_get(set, replyinfo.channel));
 
     return true;    
 }
@@ -810,30 +1200,32 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::p
     }     
 
     // original strain code saves the value in ram only. it is saved in eeprom only when the message save2eeprom arrives
-            
-    // manage:
+    const std::uint8_t set = 0;        
+
     bool ret = true;
 
+    
     switch(info.mode)
     {
         case embot::app::canprotocol::analog::polling::Message_SET_CALIB_TARE::Mode::setchannelwithvalue:
         {
-            pImpl->configdata.tare_set(info.channel, info.value);
+            pImpl->configdata.transformer_tare_set(set, info.channel, static_cast<embot::common::dsp::Q15>(info.value));
         } break;            
 
         case embot::app::canprotocol::analog::polling::Message_SET_CALIB_TARE::Mode::everychannelreset:
         {
-            pImpl->configdata.tare_clear();
+            pImpl->configdata.transformer_tare_fill(set, embot::common::dsp::q15::zero);
         } break;
 
         case embot::app::canprotocol::analog::polling::Message_SET_CALIB_TARE::Mode::everychannelnegativeofadc:
         {
+            // get latest adcvalue[] 
             pImpl->acquisition();
             
             for(int i=0; i<6; i++)
             {
-                #warning -> TODO: adcvalue is u16 ... and tare is s16 ??
-                pImpl->configdata.tare_set(i, -pImpl->runtimedata.data.adcvalue[i]);
+                embot::common::dsp::Q15 value = embot::common::dsp::q15::U16toQ15(pImpl->runtimedata.data.adcvalue[i]);
+                pImpl->configdata.transformer_tare_set(set, i, embot::common::dsp::q15::opposite(value));
             }
         } break;    
 
@@ -857,7 +1249,7 @@ bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::po
         return false;
     }     
  
-    replyinfo.value =  pImpl->runtimedata.data.tare[replyinfo.channel];
+    replyinfo.value =  static_cast<std::uint16_t>(pImpl->runtimedata.tare_get(replyinfo.channel));
     
     return true;    
 }
@@ -869,32 +1261,41 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::p
     {
         return false;
     }     
-
  
-    // manage:
+
     bool ret = true;
 
     switch(info.mode)
     {
         case embot::app::canprotocol::analog::polling::Message_SET_CURR_TARE::Mode::setchannelwithvalue:
         {
-            pImpl->runtimedata.data.tare[info.channel] = info.value;
+            pImpl->runtimedata.tare_set(info.channel, static_cast<embot::common::dsp::Q15>(info.value));
         } break;            
 
         case embot::app::canprotocol::analog::polling::Message_SET_CURR_TARE::Mode::everychannelreset:
         {
-            std::memset(pImpl->runtimedata.data.tare, 0, sizeof(pImpl->runtimedata.data.tare));
+            pImpl->runtimedata.tare_fill(embot::common::dsp::q15::zero);
         } break;
 
         case embot::app::canprotocol::analog::polling::Message_SET_CURR_TARE::Mode::everychannelnegativeoftorqueforce:
         {
-            pImpl->acquisition();
+            // we need to assign the runtimedata.data.tare[] with:  
+            // currtare = -tq, where tq = ( M * (adc + calibtare) )
+            // after acquisition() + processing we compute runtimedata.data.torqueforce[] to be:
+            // torqueforce = M * (adc + calibtare) + runtimedata.data.tare
+            // hence, we do that:
+            // 1. we clear runtimedata.data.tare[] to be zero.
+            // 2. we call processing()
+            // 3. we assign runtimedata.data.tare[] with the opposite of runtimedata.data.torqueforce[] 
+            // THE RESULT OF THIS OPERATION IS that we after the assignement of the currtare have a zero runtimedata.data.torqueforce 
             
-            #warning TODO: verify what we have to assign in SET_CURR_TARE
+            pImpl->runtimedata.tare_fill(embot::common::dsp::q15::zero);
+            pImpl->acquisition();
+            pImpl->processing();
             
             for(int i=0; i<6; i++)
             {                
-                pImpl->runtimedata.data.tare[i] = - (pImpl->runtimedata.data.torqueforce[i] - pImpl->runtimedata.data.tare[i]); 
+                pImpl->runtimedata.data.tare[i] = embot::common::dsp::q15::opposite(pImpl->runtimedata.data.torqueforce[i]); 
             }
         } break;    
 
@@ -915,10 +1316,10 @@ bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::po
     {
         replyinfo.gain0 = replyinfo.gain1 = 0;
         return false;
-    }     
+    }   
 
-    replyinfo.gain0 = pImpl->configdata.data.gainofamplifier[replyinfo.channel][0];
-    replyinfo.gain1 = pImpl->configdata.data.gainofamplifier[replyinfo.channel][1];
+    const std::uint8_t set = 0;
+    pImpl->configdata.amplifier0_gains_get(set, replyinfo.channel, replyinfo.gain0, replyinfo.gain1);    
     
     return true;    
 }
@@ -927,12 +1328,16 @@ bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::po
 {  
     if(replyinfo.channel >= 6)
     {
-//        replyinfo.gain0 = replyinfo.gain1 = 0;
         return false;
-    }     
-
-    #warning TBD
+    }  
     
+    if(replyinfo.set >= 3)
+    {   
+        return false;
+    }
+    
+    pImpl->configdata.amplifiers_get(replyinfo.set, replyinfo.channel, replyinfo.cfg1);
+//    replyinfo.cfg1 = pImpl->configdata.data.set[replyinfo.set].amplifiers[replyinfo.channel].pga308cfg1;    
     return true;    
 }
 
@@ -945,21 +1350,56 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::p
         return false;
     }     
 
-    pImpl->configdata.gainofamplifier_set(info.channel, info.gain0, info.gain1);
+    const std::uint8_t set = 0;
+    pImpl->configdata.amplifier0_gains_set(set, info.channel, info.gain0, info.gain1);
    
     return true;    
 }
 
+
+bool  embot::app::application::theSTRAIN::resetamplifier(embot::app::canprotocol::analog::polling::Message_STRAIN2_AMPLIFIER_RESET::Info &info)
+{ 
+    if(info.channel >= 6)
+    {
+        return false;
+    }   
+
+    if(info.set >= 3)
+    {   
+        return false;
+    }
+    
+    
+    pImpl->configdata.amplifiers_reset(info.set, info.channel);
+    
+    if(0 == info.set)
+    {    
+        #warning TODO: apply to the HW (amplifier reset)
+    }
+   
+    return true;    
+}
 
 bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::polling::Message_STRAIN2_AMPLIFIER_CFG1_SET::Info &info)
 { 
     if(info.channel >= 6)
     {
         return false;
-    }     
+    }   
 
-    #warning TBD
-    //pImpl->configdata.gainofamplifier_set(info.channel, info.gain0, info.gain1);
+    if(info.set >= 3)
+    {   
+        return false;
+    }
+    
+    
+    pImpl->configdata.amplifiers_set(info.set, info.channel, info.cfg1);
+  
+    if(0 == info.set)
+    {    
+        #warning TODO: apply to the HW (amplifier cfg1)
+    }    
+    
    
     return true;    
 }
