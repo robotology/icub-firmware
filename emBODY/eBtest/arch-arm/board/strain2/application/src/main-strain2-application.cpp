@@ -139,12 +139,62 @@ static void eventbasedtask_init(embot::sys::Task *t, void *p)
     #warning --> we should init the objects which holds outframes with maxOUTcanframes ... so that no more than maxOUTcanframes are pushed_back
 }
     
+#if 0
+static std::int16_t mat1[3*3] = {0};
+static std::int16_t vec1[3*2] = {0};
+static std::int16_t vec2[3*2] = {0};
 
+embot::common::dsp::q15::matrix ma1;
+embot::common::dsp::q15::matrix ma2;
+embot::common::dsp::q15::matrix ma3;
+#endif
 
 static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask eventmask, void *p)
 {     
     if(0 == eventmask)
     {   // timeout ... 
+#if 0        
+            ma1.load(3, 3, mat1);
+            ma1.diagonal(embot::common::dsp::q15::negOneHalf);
+            //ma1.fill(embot::common::dsp::q15::posOneHalf);
+        
+            ma2.load(3, 2, vec1);
+            ma2.fill(embot::common::dsp::q15::posOneHalf);
+            
+            ma3.load(3, 2, vec2);
+            ma3.clear();
+        
+            bool saturated =  false;
+            embot::common::dsp::q15::multiply(ma1, ma2, ma3, saturated);
+            saturated = saturated;
+        
+        double res = embot::common::dsp::q15::convert(ma3.get(0, 0));
+        res = res;
+        embot::common::dsp::Q15 v = 0;
+        v = embot::common::dsp::q15::convert(-0.500, saturated);
+        res = embot::common::dsp::q15::convert(v);
+        v = embot::common::dsp::q15::convert(-0.250, saturated);
+        res = embot::common::dsp::q15::convert(v);
+        v = embot::common::dsp::q15::convert(-0.125, saturated);
+        res = embot::common::dsp::q15::convert(v);       
+        v = embot::common::dsp::q15::posOneNearly;
+        res = embot::common::dsp::q15::convert(v);
+        res =  res;
+        
+        v = embot::common::dsp::q15::opposite(v);
+        res = embot::common::dsp::q15::convert(v);
+        res = res;
+        
+        v = embot::common::dsp::q15::negOne;
+        res = embot::common::dsp::q15::convert(v);
+        v = embot::common::dsp::q15::opposite(v);
+        res = embot::common::dsp::q15::convert(v); 
+        v = embot::common::dsp::q15::opposite(v);
+        res = embot::common::dsp::q15::convert(v);        
+        
+        res = embot::common::dsp::q15::convert(v);
+        v = v;
+#endif
         return;
     }
     
