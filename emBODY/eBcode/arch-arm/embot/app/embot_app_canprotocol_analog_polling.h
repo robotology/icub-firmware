@@ -66,9 +66,10 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         SKIN_SET_TRIANG_CFG = 80,                       // 0x50 used to configure the skin data in mtb  
         
         
-        // messages used for strain2: setting of the size amplifier (gains + offsets)
-        STRAIN2_AMPLIFIER_CFG1_SET = 0x20,              // config of the amplifier transfer function (gains + offsets). 
-        STRAIN2_AMPLIFIER_CFG1_GET = 0x21               // config of the amplifier transfer function (gains + offsets).        
+        // messages used for strain2: 
+        STRAIN2_AMPLIFIER_RESET = 0x20,                 // reset the amplifier (transfer function + others) to default factory values. 
+        STRAIN2_AMPLIFIER_CFG1_SET = 0x21,              // config of the amplifier transfer function (gains + offsets). 
+        STRAIN2_AMPLIFIER_CFG1_GET = 0x22               // config of the amplifier transfer function (gains + offsets).        
     };
     
     
@@ -730,34 +731,59 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
     };  
 
+    // format of the 7 remaining bytes (B = byte, N = nibble)
+    //  [1          ][2         ][3         ][4         ][5             ][6             ][7             ]
+    //   set channel  GD                      GI S GO     Voffsetcoarse    Vzerodac
+    //  B1-N1 -> set: it is the set of all possible 0, 1, 2 configuration set. value 15 means: default value inside the micro
+    //  B1-N0 -> channel: it is one of the six channels 0, 1, 2, 3, 4, 5.
+    //  B2,B3 -> fine gain GD using little endian ordering.
+    //  B4-N1 -> front end gain GI.
+    //  B4-N0 -> bit 0x8 gives the sign S (0 is +1), bits 0x7 give the output gain GO
+    //  Vout = ( ( (1-2*S)*Vin + Voffsetcoarse )*GI + Vzerodac )*GD*G0
+    //  the values to use for GD, GI, S, GO, Voffsetcoarse, and Vzerodac are those found in the datasheet of 
+    //  the programmable amplifier PGA308 by Texas Instruments.  
+    
+    struct PGA308cfg1
+    { 
+        std::uint16_t       GD;
+        std::uint8_t        GI          : 4; 
+        std::uint8_t        S           : 1;
+        std::uint8_t        GO          : 3; 
+        std::uint8_t        Voffsetcoarse;
+        std::uint16_t       Vzerodac;
+        PGA308cfg1() : GD(0), GI(0), S(0), GO(0), Voffsetcoarse(0), Vzerodac(0) {}
+    };  
 
+    class Message_STRAIN2_AMPLIFIER_RESET : public Message
+    {
+        public:
+                         
+        struct Info
+        {
+            std::uint8_t        set         : 4;
+            std::uint8_t        channel     : 4;            
+            Info() : set(0), channel(0) {}
+        };
+        
+        Info info;
+        
+        Message_STRAIN2_AMPLIFIER_RESET() {}
+            
+        bool load(const embot::hw::can::Frame &inframe);
+            
+        bool reply();   // none            
+    };     
+    
     class Message_STRAIN2_AMPLIFIER_CFG1_SET : public Message
     {
         public:
-                 
-        // format of the 7 remaining bytes (B = byte, N = nibble)
-        //  [1          ][2         ][3         ][4         ][5             ][6             ][7             ]
-        //   set channel  GD                      GI S GO     Voffsetcoarse    Vzerodac
-        //  B1-N1 -> set: it is the set of all possible 0, 1, 2 configuration set. value 15 means: default value inside the micro
-        //  B1-N0 -> channel: it is one of the six channels 0, 1, 2, 3, 4, 5.
-        //  B2,B3 -> fine gain GD using little endian ordering.
-        //  B4-N1 -> front end gain GI.
-        //  B4-N0 -> bit 0x8 gives the sign S (0 is +1), bits 0x7 give the output gain GO
-        //  Vout = ( ( (1-2*S)*Vin + Voffsetcoarse )*GI + Vzerodac )*GD*G0
-        //  the values to use for GD, GI, S, GO, Voffsetcoarse, and Vzerodac are those found in the datasheet of 
-        //  the programmable amplifier PGA308 by Texas Instruments.        
-        
+                         
         struct Info
-        { 
+        {
             std::uint8_t        set         : 4;
-            std::uint8_t        channel     : 4;
-            std::uint16_t       GD;
-            std::uint8_t        GI          : 4; 
-            std::uint8_t        S           : 1;
-            std::uint8_t        GO          : 3; 
-            std::uint8_t        Voffsetcoarse;
-            std::uint16_t       Vzerodac;
-            Info() : set(0), channel(0), GD(0), GI(0), S(0), GO(0), Voffsetcoarse(0), Vzerodac(0) {}
+            std::uint8_t        channel     : 4;            
+            PGA308cfg1          cfg1;
+            Info() : set(0), channel(0) {}
         };
         
         Info info;
@@ -773,19 +799,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
     class Message_STRAIN2_AMPLIFIER_CFG1_GET : public Message
     {
         public:
-                 
-        // format of the 7 remaining bytes (B = byte, N = nibble)
-        //  [1          ][2         ][3         ][4         ][5             ][6             ][7             ]
-        //   set channel  GD                      GI S GO     Voffsetcoarse    Vzerodac
-        //  B1-N1 -> set: it is the set of all possible 0, 1, 2 configuration set. value 15 means: default value inside the micro
-        //  B1-N0 -> channel: it is one of the six channels 0, 1, 2, 3, 4, 5.
-        //  B2,B3 -> fine gain GD using little endian ordering.
-        //  B4-N1 -> front end gain GI.
-        //  B4-N0 -> bit 0x8 gives the sign S (0 is +1), bits 0x7 give the output gain GO
-        //  Vout = ( ( (1-2*S)*Vin + Voffsetcoarse )*GI + Vzerodac )*GD*G0
-        //  the values to use for GD, GI, S, GO, Voffsetcoarse, and Vzerodac are those found in the datasheet of 
-        //  the programmable amplifier PGA308 by Texas Instruments.        
-
+                       
 
         struct Info
         { 
@@ -795,16 +809,11 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         };
         
         struct ReplyInfo
-        { 
+        {
             std::uint8_t        set         : 4;
-            std::uint8_t        channel     : 4;
-            std::uint16_t       GD;
-            std::uint8_t        GI          : 4; 
-            std::uint8_t        S           : 1;
-            std::uint8_t        GO          : 3; 
-            std::uint8_t        Voffsetcoarse;
-            std::uint16_t       Vzerodac;
-            ReplyInfo() : set(0), channel(0), GD(0), GI(0), S(0), GO(0), Voffsetcoarse(0), Vzerodac(0) {}
+            std::uint8_t        channel     : 4;            
+            PGA308cfg1          cfg1;
+            ReplyInfo() : set(0), channel(0) {}
         };
         
         Info info;

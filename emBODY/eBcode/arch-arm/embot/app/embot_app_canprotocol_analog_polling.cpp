@@ -56,20 +56,22 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         static const std::uint64_t aspollmask256[4] = 
         {
             // bits 0-63
-            (1ULL << static_cast<std::uint8_t>(CMD::SET_BOARD_ADX))             | (1ULL << static_cast<std::uint8_t>(CMD::GET_FIRMWARE_VERSION))  | 
-            (1ULL << static_cast<std::uint8_t>(CMD::SET_TXMODE))                | (1ULL << static_cast<std::uint8_t>(CMD::SET_CANDATARATE))       | 
+            (1ULL << static_cast<std::uint8_t>(CMD::SET_BOARD_ADX))             | (1ULL << static_cast<std::uint8_t>(CMD::GET_FIRMWARE_VERSION))        | 
+            (1ULL << static_cast<std::uint8_t>(CMD::SET_TXMODE))                | (1ULL << static_cast<std::uint8_t>(CMD::SET_CANDATARATE))             | 
             (1ULL << static_cast<std::uint8_t>(CMD::GET_FULL_SCALES))           | 
-            (1ULL << static_cast<std::uint8_t>(CMD::SET_FULL_SCALES))           | (1ULL << static_cast<std::uint8_t>(CMD::SAVE2EE))               |
-            (1ULL << static_cast<std::uint8_t>(CMD::GET_EEPROM_STATUS))         | (1ULL << static_cast<std::uint8_t>(CMD::SET_SERIAL_NO))         |
-            (1ULL << static_cast<std::uint8_t>(CMD::GET_SERIAL_NO))             | (1ULL << static_cast<std::uint8_t>(CMD::GET_AMP_GAIN))          |    
-            (1ULL << static_cast<std::uint8_t>(CMD::SET_AMP_GAIN))              | (1ULL << static_cast<std::uint8_t>(CMD::GET_CH_ADC))            |
-            (1ULL << static_cast<std::uint8_t>(CMD::SET_CH_DAC))                | (1ULL << static_cast<std::uint8_t>(CMD::GET_CH_DAC))            |
-            (1ULL << static_cast<std::uint8_t>(CMD::SET_MATRIX_RC))             | (1ULL << static_cast<std::uint8_t>(CMD::GET_MATRIX_RC))         |
-            (1ULL << static_cast<std::uint8_t>(CMD::SET_MATRIX_G))              | (1ULL << static_cast<std::uint8_t>(CMD::GET_MATRIX_G))          |                
-            (1ULL << static_cast<std::uint8_t>(CMD::SET_CALIB_TARE))            | (1ULL << static_cast<std::uint8_t>(CMD::GET_CALIB_TARE))        |
-            (1ULL << static_cast<std::uint8_t>(CMD::SET_CURR_TARE))             | (1ULL << static_cast<std::uint8_t>(CMD::GET_CURR_TARE))         ,
+            (1ULL << static_cast<std::uint8_t>(CMD::SET_FULL_SCALES))           | (1ULL << static_cast<std::uint8_t>(CMD::SAVE2EE))                     |
+            (1ULL << static_cast<std::uint8_t>(CMD::GET_EEPROM_STATUS))         | (1ULL << static_cast<std::uint8_t>(CMD::SET_SERIAL_NO))               |
+            (1ULL << static_cast<std::uint8_t>(CMD::GET_SERIAL_NO))             | (1ULL << static_cast<std::uint8_t>(CMD::GET_AMP_GAIN))                |    
+            (1ULL << static_cast<std::uint8_t>(CMD::SET_AMP_GAIN))              | (1ULL << static_cast<std::uint8_t>(CMD::GET_CH_ADC))                  |
+            (1ULL << static_cast<std::uint8_t>(CMD::SET_CH_DAC))                | (1ULL << static_cast<std::uint8_t>(CMD::GET_CH_DAC))                  |
+            (1ULL << static_cast<std::uint8_t>(CMD::SET_MATRIX_RC))             | (1ULL << static_cast<std::uint8_t>(CMD::GET_MATRIX_RC))               |
+            (1ULL << static_cast<std::uint8_t>(CMD::SET_MATRIX_G))              | (1ULL << static_cast<std::uint8_t>(CMD::GET_MATRIX_G))                |                
+            (1ULL << static_cast<std::uint8_t>(CMD::SET_CALIB_TARE))            | (1ULL << static_cast<std::uint8_t>(CMD::GET_CALIB_TARE))              |
+            (1ULL << static_cast<std::uint8_t>(CMD::SET_CURR_TARE))             | (1ULL << static_cast<std::uint8_t>(CMD::GET_CURR_TARE))               |
+            (1ULL << static_cast<std::uint8_t>(CMD::STRAIN2_AMPLIFIER_RESET))   | 
+            (1ULL << static_cast<std::uint8_t>(CMD::STRAIN2_AMPLIFIER_CFG1_SET))| (1ULL << static_cast<std::uint8_t>(CMD::STRAIN2_AMPLIFIER_CFG1_GET))  ,
             // bits 64-127
-            (1ULL << (static_cast<std::uint8_t>(CMD::SKIN_SET_BRD_CFG)-64))     | (1ULL << (static_cast<std::uint8_t>(CMD::ACC_GYRO_SETUP)-64))   |
+            (1ULL << (static_cast<std::uint8_t>(CMD::SKIN_SET_BRD_CFG)-64))     | (1ULL << (static_cast<std::uint8_t>(CMD::ACC_GYRO_SETUP)-64))         |
             (1ULL << (static_cast<std::uint8_t>(CMD::SKIN_SET_TRIANG_CFG)-64)),
             // bits 128-191    
             0, 
@@ -838,7 +840,27 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
     } 
 
 
-
+    bool Message_STRAIN2_AMPLIFIER_RESET::load(const embot::hw::can::Frame &inframe)
+    {
+        Message::set(inframe);  
+        
+        if(static_cast<std::uint8_t>(CMD::STRAIN2_AMPLIFIER_RESET) != frame2cmd(inframe))
+        {
+            return false; 
+        }
+        
+        info.set = (candata.datainframe[0] & 0xF0) >> 4;
+        info.channel = (candata.datainframe[0] & 0x0F);
+        
+        return true;         
+    }                    
+        
+    bool Message_STRAIN2_AMPLIFIER_RESET::reply()
+    {
+        return false;
+    } 
+    
+    
     bool Message_STRAIN2_AMPLIFIER_CFG1_SET::load(const embot::hw::can::Frame &inframe)
     {
         Message::set(inframe);  
@@ -852,13 +874,13 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         info.channel = (candata.datainframe[0] & 0x0F);
         
         // little endian
-        info.GD = static_cast<std::uint16_t>(candata.datainframe[1]) | (static_cast<std::uint16_t>(candata.datainframe[2]) << 8);  
-        info.GI = (candata.datainframe[3] & 0xF0) >> 4;
-        info.S = (candata.datainframe[3] & 0x80) >> 3;
-        info.GO = (candata.datainframe[3] & 0x07);
-        info.Voffsetcoarse = candata.datainframe[4];
+        info.cfg1.GD = static_cast<std::uint16_t>(candata.datainframe[1]) | (static_cast<std::uint16_t>(candata.datainframe[2]) << 8);  
+        info.cfg1.GI = (candata.datainframe[3] & 0xF0) >> 4;
+        info.cfg1.S = (candata.datainframe[3] & 0x80) >> 3;
+        info.cfg1.GO = (candata.datainframe[3] & 0x07);
+        info.cfg1.Voffsetcoarse = candata.datainframe[4];
         // little endian
-        info.Vzerodac = static_cast<std::uint16_t>(candata.datainframe[5]) | (static_cast<std::uint16_t>(candata.datainframe[6]) << 8);
+        info.cfg1.Vzerodac = static_cast<std::uint16_t>(candata.datainframe[5]) | (static_cast<std::uint16_t>(candata.datainframe[6]) << 8);
         
         return true;         
     }                    
@@ -890,12 +912,12 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         std::uint8_t dd[7] = {0};
 
         dd[0] = (static_cast<std::uint8_t>(replyinfo.set) << 4) | (replyinfo.channel & 0x0F);                  
-        dd[1] = (replyinfo.GD & 0xff);                  // important note: in here we use little endian order ...
-        dd[2] = (replyinfo.GD >> 8) & 0xff;  
-        dd[3] = (static_cast<std::uint8_t>(replyinfo.GI) << 4) | (static_cast<std::uint8_t>(replyinfo.S) << 3) | (static_cast<std::uint8_t>(replyinfo.GO) & 0x7);
-        dd[4] = replyinfo.Voffsetcoarse;
-        dd[5] = (replyinfo.Vzerodac & 0xff);            // important note: in here we use little endian order ...
-        dd[6] = (replyinfo.Vzerodac >> 8) & 0xff;  
+        dd[1] = (replyinfo.cfg1.GD & 0xff);                  // important note: in here we use little endian order ...
+        dd[2] = (replyinfo.cfg1.GD >> 8) & 0xff;  
+        dd[3] = (static_cast<std::uint8_t>(replyinfo.cfg1.GI) << 4) | (static_cast<std::uint8_t>(replyinfo.cfg1.S) << 3) | (static_cast<std::uint8_t>(replyinfo.cfg1.GO) & 0x7);
+        dd[4] = replyinfo.cfg1.Voffsetcoarse;
+        dd[5] = (replyinfo.cfg1.Vzerodac & 0xff);            // important note: in here we use little endian order ...
+        dd[6] = (replyinfo.cfg1.Vzerodac >> 8) & 0xff;  
         
         std::uint8_t datalen = 7;
         
