@@ -79,12 +79,7 @@ struct embot::app::application::theIMU::Impl
     embot::sys::Action action;
     
     embot::app::canprotocol::analog::polling::Message_ACC_GYRO_SETUP::Info accgyroinfo;
-    
-
-    
-    
-    std::uint8_t canaddress;
-    
+        
     
     bool accelEnabled;
     bool gyrosEnabled;    
@@ -106,7 +101,6 @@ struct embot::app::application::theIMU::Impl
         gyrosValue.reset();
         gyrosEnabled = false;
 
-        canaddress = 0;  
         
     }
     
@@ -148,7 +142,7 @@ bool embot::app::application::theIMU::Impl::fill(embot::app::canprotocol::inerti
 {
     bool ret = true;
     
-    info.canaddress = canaddress;
+    info.canaddress = embot::app::theCANboardInfo::getInstance().cachedCANaddress();
     info.x = accelValue.x;
     info.y = accelValue.y;
     info.z = accelValue.z;
@@ -161,7 +155,7 @@ bool embot::app::application::theIMU::Impl::fill(embot::app::canprotocol::inerti
 {
     bool ret = true;
 
-    info.canaddress = canaddress;
+    info.canaddress = embot::app::theCANboardInfo::getInstance().cachedCANaddress();
     info.x = gyrosValue.x;
     info.y = gyrosValue.y;
     info.z = gyrosValue.z;
@@ -253,12 +247,7 @@ bool embot::app::application::theIMU::initialise(Config &config)
     pImpl->config = config;
     
     pImpl->action.set(embot::sys::Action::EventToTask(pImpl->config.tickevent, pImpl->config.totask));
-
-    // retrieve address    
-    embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance();
-    pImpl->canaddress = canbrdinfo.getCANaddress();
-    
- 
+     
     return true;
 }
 
