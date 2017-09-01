@@ -126,7 +126,6 @@ struct embot::app::application::theSkin::Impl
     
     Triangles triangles;
 
-    std::uint8_t canaddress;
 
     Impl() 
     {   
@@ -136,9 +135,7 @@ struct embot::app::application::theSkin::Impl
         ticktimer = new embot::sys::Timer;   
         boardconfig.skintype = embot::app::canprotocol::analog::polling::Message_SKIN_SET_BRD_CFG::SkinType::withTemperatureCompensation;
         boardconfig.txperiod = 50*embot::common::time1millisec;   
-        boardconfig.noload = ad7147_dot_value_noload;        
-
-        canaddress = 0;  
+        boardconfig.noload = ad7147_dot_value_noload;         
 
         triangles.activemask = 0xffff; 
         triangles.connectedmask = 0xffff;
@@ -300,7 +297,7 @@ bool embot::app::application::theSkin::Impl::fill(embot::app::canprotocol::skin:
         return false;
     }
     
-    info.canaddress = canaddress;
+    info.canaddress = embot::app::theCANboardInfo::getInstance().cachedCANaddress();
     info.trianglenum = trg;
     info.outofrangemaskofthe12s = 0;        // none
     info.notackmaskofthe12s = 0;            // none
@@ -473,9 +470,6 @@ bool embot::app::application::theSkin::initialise(Config &config)
     
     pImpl->action.set(embot::sys::Action::EventToTask(pImpl->config.tickevent, pImpl->config.totask));
 
-    // retrieve address    
-    embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance();
-    pImpl->canaddress = canbrdinfo.getCANaddress();
     
     pImpl->triangles.activemask = 0xffff;
     
