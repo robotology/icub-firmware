@@ -60,7 +60,20 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
 namespace embot { namespace app { namespace canprotocol { namespace analog { namespace periodic {
         
 
-    // the management of commands    
+    // the management of commands   
+
+    enum class ADCsaturation { NONE = 0, LOW = 1, HIGH = 2 };
+    
+    struct ADCsaturationInfo
+    {
+        bool            thereissaturation;
+        ADCsaturation   channel[3]; 
+
+        void reset() { thereissaturation = false;  channel[0] = channel[1] = channel[2] = ADCsaturation::NONE; }     
+        ADCsaturationInfo() { reset(); }          
+    };
+     
+    std::uint8_t convert2protocolbyte(ADCsaturationInfo &info);   
     
     class Message_UNCALIBFORCE_VECTOR_DEBUGMODE : public Message
     {
@@ -69,10 +82,12 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         struct Info
         { 
             std::uint8_t                canaddress;
-            std::int16_t                x;
-            std::int16_t                y;
-            std::int16_t                z;
-            Info() : canaddress(0), x(0), y(0), z(0) { }
+            bool                        adcsaturationispresent;
+            ADCsaturationInfo           adcsaturationinfo;
+            std::uint16_t               x;
+            std::uint16_t               y;
+            std::uint16_t               z;
+            Info() : canaddress(0), adcsaturationispresent(false), x(0), y(0), z(0) { }
         };
         
         Info info;
@@ -92,10 +107,12 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         struct Info
         { 
             std::uint8_t                canaddress;
-            std::int16_t                x;
-            std::int16_t                y;
-            std::int16_t                z;
-            Info() : canaddress(0), x(0), y(0), z(0) { }
+            bool                        adcsaturationispresent;
+            ADCsaturationInfo           adcsaturationinfo;
+            std::uint16_t               x;
+            std::uint16_t               y;
+            std::uint16_t               z;
+            Info() : canaddress(0), adcsaturationispresent(false), x(0), y(0), z(0) { }
         };
         
         Info info;
@@ -115,10 +132,12 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         struct Info
         { 
             std::uint8_t                canaddress;
-            std::int16_t                x;
-            std::int16_t                y;
-            std::int16_t                z;
-            Info() : canaddress(0), x(0), y(0), z(0) { }
+            bool                        adcsaturationispresent;
+            ADCsaturationInfo           adcsaturationinfo;
+            std::uint16_t               x;
+            std::uint16_t               y;
+            std::uint16_t               z;
+            Info() : canaddress(0), adcsaturationispresent(false), x(0), y(0), z(0) { }
         };
         
         Info info;
@@ -138,10 +157,12 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         struct Info
         { 
             std::uint8_t                canaddress;
-            std::int16_t                x;
-            std::int16_t                y;
-            std::int16_t                z;
-            Info() : canaddress(0), x(0), y(0), z(0) { }
+            bool                        adcsaturationispresent;
+            ADCsaturationInfo           adcsaturationinfo;            
+            std::uint16_t               x;
+            std::uint16_t               y;
+            std::uint16_t               z;
+            Info() : canaddress(0), adcsaturationispresent(false), x(0), y(0), z(0) { }
         };
         
         Info info;

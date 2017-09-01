@@ -42,8 +42,6 @@
 // - all the rest
 // --------------------------------------------------------------------------------------------------------------------
 
-
-    
     
 namespace embot { namespace app { namespace canprotocol { namespace analog { namespace periodic {
     
@@ -76,7 +74,30 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
     std::uint8_t convert(CMD cmd)
     {
         return static_cast<std::uint8_t>(cmd);
-    }      
+    } 
+
+
+    struct ADCsaturationInfoFormatted
+    {
+        std::uint8_t    atleastinonechannel     :2;
+        std::uint8_t    first                   :2;
+        std::uint8_t    second                  :2;
+        std::uint8_t    third                   :2; 
+        ADCsaturationInfoFormatted() : atleastinonechannel(0), first(0), second(0), third(0) {}      
+    };
+ 
+    std::uint8_t convert2protocolbyte(ADCsaturationInfo &info)
+    {
+        std::uint8_t byte = 0;
+        ADCsaturationInfoFormatted ff;
+        ff.atleastinonechannel = (true == info.thereissaturation) ? (1) : (0);
+        ff.first = static_cast<std::uint8_t>(info.channel[0]);
+        ff.second = static_cast<std::uint8_t>(info.channel[1]);
+        ff.third = static_cast<std::uint8_t>(info.channel[2]);
+        std::memmove(&byte, &ff, 1);
+        
+        return byte;
+    }    
     
 
     bool Message_UNCALIBFORCE_VECTOR_DEBUGMODE::load(const Info& inf)
@@ -94,8 +115,17 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         data08[2] = static_cast<std::uint8_t>((info.y & 0x00ff));
         data08[3] = static_cast<std::uint8_t>((info.y & 0xff00) >> 8);  
         data08[4] = static_cast<std::uint8_t>((info.z & 0x00ff));
-        data08[5] = static_cast<std::uint8_t>((info.z & 0xff00) >> 8);            
-        Message::set(info.canaddress, 0xf, Clas::periodicAnalogSensor, static_cast<std::uint8_t>(CMD::UNCALIBFORCE_VECTOR_DEBUGMODE), data08, 6);
+        data08[5] = static_cast<std::uint8_t>((info.z & 0xff00) >> 8);     
+        data08[6] = 0;
+        std::uint8_t size = 6;
+        
+        if(true == info.adcsaturationispresent)
+        {
+            size = 7;
+            data08[6] = convert2protocolbyte(info.adcsaturationinfo);
+        }
+        
+        Message::set(info.canaddress, 0xf, Clas::periodicAnalogSensor, static_cast<std::uint8_t>(CMD::UNCALIBFORCE_VECTOR_DEBUGMODE), data08, size);
         std::memmove(&outframe, &canframe, sizeof(embot::hw::can::Frame));
                     
         return true;
@@ -119,8 +149,17 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         data08[2] = static_cast<std::uint8_t>((info.y & 0x00ff));
         data08[3] = static_cast<std::uint8_t>((info.y & 0xff00) >> 8);  
         data08[4] = static_cast<std::uint8_t>((info.z & 0x00ff));
-        data08[5] = static_cast<std::uint8_t>((info.z & 0xff00) >> 8);           
-        Message::set(info.canaddress, 0xf, Clas::periodicAnalogSensor, static_cast<std::uint8_t>(CMD::UNCALIBTORQUE_VECTOR_DEBUGMODE), data08, 6);
+        data08[5] = static_cast<std::uint8_t>((info.z & 0xff00) >> 8);  
+        data08[6] = 0;
+        std::uint8_t size = 6;
+        
+        if(true == info.adcsaturationispresent)
+        {
+            size = 7;
+            data08[6] = convert2protocolbyte(info.adcsaturationinfo);
+        }
+        
+        Message::set(info.canaddress, 0xf, Clas::periodicAnalogSensor, static_cast<std::uint8_t>(CMD::UNCALIBTORQUE_VECTOR_DEBUGMODE), data08, size);
         std::memmove(&outframe, &canframe, sizeof(embot::hw::can::Frame));
                     
         return true;
@@ -142,8 +181,18 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         data08[2] = static_cast<std::uint8_t>((info.y & 0x00ff));
         data08[3] = static_cast<std::uint8_t>((info.y & 0xff00) >> 8);  
         data08[4] = static_cast<std::uint8_t>((info.z & 0x00ff));
-        data08[5] = static_cast<std::uint8_t>((info.z & 0xff00) >> 8);            
-        Message::set(info.canaddress, 0xf, Clas::periodicAnalogSensor, static_cast<std::uint8_t>(CMD::FORCE_VECTOR), data08, 6);
+        data08[5] = static_cast<std::uint8_t>((info.z & 0xff00) >> 8);  
+        data08[6] = 0;
+        std::uint8_t size = 6;
+        
+        if(true == info.adcsaturationispresent)
+        {
+            size = 7;
+            data08[6] = convert2protocolbyte(info.adcsaturationinfo);
+        }
+
+        
+        Message::set(info.canaddress, 0xf, Clas::periodicAnalogSensor, static_cast<std::uint8_t>(CMD::FORCE_VECTOR), data08, size);
         std::memmove(&outframe, &canframe, sizeof(embot::hw::can::Frame));
                     
         return true;
@@ -167,8 +216,18 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         data08[2] = static_cast<std::uint8_t>((info.y & 0x00ff));
         data08[3] = static_cast<std::uint8_t>((info.y & 0xff00) >> 8);  
         data08[4] = static_cast<std::uint8_t>((info.z & 0x00ff));
-        data08[5] = static_cast<std::uint8_t>((info.z & 0xff00) >> 8);            
-        Message::set(info.canaddress, 0xf, Clas::periodicAnalogSensor, static_cast<std::uint8_t>(CMD::TORQUE_VECTOR), data08, 6);
+        data08[5] = static_cast<std::uint8_t>((info.z & 0xff00) >> 8);   
+        data08[6] = 0;
+        std::uint8_t size = 6;
+        
+        if(true == info.adcsaturationispresent)
+        {
+            size = 7;
+            data08[6] = convert2protocolbyte(info.adcsaturationinfo);
+        }
+
+        
+        Message::set(info.canaddress, 0xf, Clas::periodicAnalogSensor, static_cast<std::uint8_t>(CMD::TORQUE_VECTOR), data08, size);
         std::memmove(&outframe, &canframe, sizeof(embot::hw::can::Frame));
                     
         return true;
