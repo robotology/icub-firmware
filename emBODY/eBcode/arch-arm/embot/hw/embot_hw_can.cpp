@@ -75,17 +75,7 @@ namespace embot { namespace hw { namespace can {
 
 #elif   defined(HAL_CAN_MODULE_ENABLED)
 
-// - stm32hal.lib needs those two handlers being compiled in here.
 
-void CAN1_TX_IRQHandler(void)
-{
-    HAL_CAN_IRQHandler(&hcan1);
-}
-
-void CAN1_RX0_IRQHandler(void)
-{
-    HAL_CAN_IRQHandler(&hcan1);
-}
 
 namespace embot { namespace hw { namespace can {
     
@@ -245,22 +235,20 @@ namespace embot { namespace hw { namespace can {
         return; // resOK;
     }
     
-    static void txHandler(void* par)
+    void callbackOnTXcompletion(CAN_HandleTypeDef* hcan)
     {
-        CAN_HandleTypeDef *hcan = reinterpret_cast<CAN_HandleTypeDef*>(par);
         //this function is called inside IRQ handler of stm32hal, so hcan could be can1 or can2.
         //therefore i need to check that the interrupt is on the peritherical I already initted.
         
         if( (hcan == (&hcan1)) && initialised(Port::one) )
-    {
+        {
             s_transmit(hcan);
-    }
+        }
         //currently I have not can2!
     }
     
-    static void rxHandler(void* par)
+    void callbackOnRXcompletion(CAN_HandleTypeDef* hcan)
     {
-        CAN_HandleTypeDef *hcan = reinterpret_cast<CAN_HandleTypeDef*>(par);
         //to make better
         if(hcan != (&hcan1))
             return;
@@ -280,7 +268,7 @@ namespace embot { namespace hw { namespace can {
         if(s_rxQ->size() == s_config.rxcapacity)
         {
             //remove the oldest frame
-             s_rxQ->erase(s_rxQ->begin());
+            s_rxQ->erase(s_rxQ->begin());
         }
         s_rxQ->push_back(rxframe);
         
@@ -291,11 +279,10 @@ namespace embot { namespace hw { namespace can {
         
     }
     
-    static void s_errorHandler(void* par)
+    void callbackOnError(CAN_HandleTypeDef* hcan)
     {
-        CAN_HandleTypeDef *hcan = reinterpret_cast<CAN_HandleTypeDef*>(par);
         hcan = hcan;
-        static uint32_t error_count=0;
+        static uint32_t error_count = 0;
         error_count++;
     }
 
@@ -325,7 +312,7 @@ namespace embot { namespace hw { namespace can {
         hcan1.pRxMsg = &RxMessage;
     
         
-        //init peripheral
+        // init peripheral
         MX_CAN1_Init();
         
         // do whatever else is required .... for instance... init the buffers.
@@ -353,14 +340,6 @@ namespace embot { namespace hw { namespace can {
         {
         
         }
-
-        //////// configure IRQ handler
-        stm32hal_can_configCallback_t  embot_can_irqHandlers;
-        embot_can_irqHandlers.onRx = rxHandler;
-        embot_can_irqHandlers.onTx = txHandler;
-        embot_can_irqHandlers.onError = s_errorHandler;
-
-        stm32hal_can_configureIRQcallback(&embot_can_irqHandlers);
         
         embot::common::bit::set(initialisedmask, port2index(p));
 
@@ -391,7 +370,6 @@ namespace embot { namespace hw { namespace can {
         {
             return resNOK;
         }  
-
 
         // do whatever is needed
         
@@ -599,6 +577,39 @@ namespace embot { namespace hw { namespace can {
     
     
 }}} // namespace embot { namespace hw { namespace can {
+
+
+// - stm32hal.lib needs some handlers being compiled in here: IRQ handlers and callbacks.
+
+
+void CAN1_TX_IRQHandler(void)
+{
+    HAL_CAN_IRQHandler(&hcan1);
+}
+
+void CAN1_RX0_IRQHandler(void)
+{
+    HAL_CAN_IRQHandler(&hcan1);
+}
+
+
+// these functions must be re-defined. they are weakly defined in the stm32hal.lib 
+
+void HAL_CAN_TxCpltCallback(CAN_HandleTypeDef* hcan)
+{
+    embot::hw::can::callbackOnTXcompletion(hcan);
+}
+
+void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan)
+{
+    embot::hw::can::callbackOnRXcompletion(hcan);
+}
+
+void HAL_CAN_ErrorCallback(CAN_HandleTypeDef *hcan)
+{
+    embot::hw::can::callbackOnError(hcan);
+}
+
 
 #endif //defined(HAL_CAN_MODULE_ENABLED)
 
