@@ -1,3 +1,7 @@
+
+// IIT-EXT: don't compile it: keep it only for reference
+#error DON'T COMPILE ME
+
 /**
   ******************************************************************************
   * File Name          : main.c
@@ -43,7 +47,6 @@
 #include "dma.h"
 #include "i2c.h"
 #include "rng.h"
-#include "rtc.h"
 #include "tim.h"
 #include "usart.h"
 #include "gpio.h"
@@ -68,11 +71,27 @@ char Firmware_vers = 0;
 char Revision_vers = 0;
 char Build_number  = 0;
 
+#define LED_ON    HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
+#define LED_OFF   HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_SET);
+
 uint8_t can_message = 0;
 uint16_t count = 0;
+uint8_t REG_count = 0;
+uint8_t REG_GO = 0;
+uint8_t REG_tran = 0;
+uint8_t REG_OK = 0;
+uint8_t REG_Value = 0;
+#define SAMPLES 10
+uint8_t REG_max_count = SAMPLES;     
+uint16_t REG_value_tran[SAMPLES];
+uint8_t CHANNEL=1;
+uint8_t REGISTER=RAM_CFG0;
+uint8_t PGA308_StartCalib=1;
 
-uint16_t Temperature_code;
-uint32_t Temperature_board;
+uint16_t Temperature_TOPcode;
+uint32_t Temperature_TOPboard;
+uint16_t Temperature_BOTcode;
+uint32_t Temperature_BOTboard;
 uint8_t Temp_int;
 uint8_t Temp_dec;
 
@@ -81,8 +100,13 @@ uint8_t bit_count=0;
 uint8_t byte_count=0;
 uint8_t bit_count_rel=0;
 uint8_t PGA308_channel;
+
 extern uint8_t PGA308_BufferTx[PGA308_DimBufferTX];
 extern uint16_t adc_values[6];           // contains all ADC channels conversion
+extern uint8_t PGA308_StartComm;
+
+//uint16_t PGA308register = 0;
+fifo PGA308_CoarseOffset = {0};
 
 uint16_t Gain;
 
@@ -97,9 +121,14 @@ void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
 void TIMER_Init(void);
+void TIMER_PROG(uint16_t value);
 void TEMPERATURE(void);
 void BNO055(void);
 void BNO055_UART(void);
+void SelfCalibration(uint8_t channel, uint8_t reg);
+void PGA_CoarseOffset_Calib(uint8_t channel, uint16_t DAC_OUT);
+void PGA_FineOffset_Calib(uint8_t channel, uint16_t DAC_OUT);
+void PGA_StableRegister(uint16_t REGISTER);
 //void calcMean();
 
 /* USER CODE END PFP */
@@ -141,17 +170,16 @@ int main(void)
   MX_I2C1_Init();
   MX_I2C2_Init();
   MX_USART2_UART_Init();
-  MX_RTC_Init();
   MX_TIM7_Init();
+  MX_TIM16_Init();
+  MX_TIM15_Init();
   MX_RNG_Init();
 
   /* USER CODE BEGIN 2 */
-	CAN_Config();
 	TIMER_Init();  
-  Si705x_init(1);
+  CAN_Config();
+	Si705x_init(1);
   //BNO055_init();
-	PGA308_init();
-	//HAL_ADC_Start_IT(&hadc1);
 	
   /* USER CODE END 2 */
 
@@ -165,41 +193,53 @@ int main(void)
     Error_Handler();
   }
   
+  PGA308_init();
+  //PGA308_DefaultConfig();
   
-  for(PGA308_channel=1; PGA308_channel<=6; PGA308_channel++){
-    PGA308_OneWireWrite(PGA308_channel, SFTC, 0x0050);      // SFTC Register - Software Lock Mode  (datasheet page 72)
-    HAL_Delay(100);
-    PGA308_OneWireWrite(PGA308_channel, GDAC, 0x0000);      //
-    HAL_Delay(100);
-    PGA308_OneWireWrite(PGA308_channel, ZDAC, 0x4000);      //
-    HAL_Delay(100);
-    PGA308_OneWireWrite(PGA308_channel, CFG0, 0x0000);      //
-    HAL_Delay(100);
-    PGA308_OneWireWrite(PGA308_channel, CFG1, 0x0000);      //
-    HAL_Delay(100);
-    PGA308_OneWireWrite(PGA308_channel, CFG2, 0x0000);      //
-    HAL_Delay(100);
-  }
-  
-  HAL_Delay(200);
+  HAL_Delay(100);
   HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc_values, 6);
   
+  HAL_Delay(1000);
   
-  //PGA308_channel=1;
+  REGISTER=RAM_CFG0;
+  //REGISTER=RAM_GDAC;
   
   while (1)
   {
-    
-    //PGA308_OneWireWrite(1, 0, 0x4000);      //
-    //HAL_Delay(100);
-    
-    //HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc_values, 6);
-    //HAL_Delay(1);
     //CANBUS();
     TEMPERATURE();
     //BNO055();
     //BNO055_UART();
-    HAL_Delay(100);
+    
+    if(PGA308_StartCalib){
+      TIMER_PROG(1000);
+      PGA308_StartCalib=0;
+      PGA308_DefaultConfig();
+    }
+    else
+    {
+      if(REG_OK==0) {SelfCalibration(CHANNEL, REGISTER);}
+      else{
+        if(CHANNEL<6) {
+          REG_OK=0;
+          CHANNEL++;
+        }
+        else{
+          if(REGISTER==RAM_CFG0){
+            HAL_Delay(100);
+            REGISTER=RAM_ZDAC;
+            REG_OK=0;
+            CHANNEL=1;
+          }
+          else if(REGISTER==RAM_ZDAC){
+            TIMER_PROG(10000);
+            REGISTER=RAM_GDAC;
+          }
+        }
+      }
+    }
+    HAL_Delay(10);
+    
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
@@ -220,12 +260,10 @@ void SystemClock_Config(void)
 
     /**Initializes the CPU, AHB and APB busses clocks 
     */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI48|RCC_OSCILLATORTYPE_HSI
-                              |RCC_OSCILLATORTYPE_LSI;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI48|RCC_OSCILLATORTYPE_HSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSI48State = RCC_HSI48_ON;
   RCC_OscInitStruct.HSICalibrationValue = 16;
-  RCC_OscInitStruct.LSIState = RCC_LSI_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
@@ -246,16 +284,14 @@ void SystemClock_Config(void)
     _Error_Handler(__FILE__, __LINE__);
   }
 
-  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_RTC|RCC_PERIPHCLK_USART1
-                              |RCC_PERIPHCLK_USART2|RCC_PERIPHCLK_I2C1
-                              |RCC_PERIPHCLK_I2C2|RCC_PERIPHCLK_RNG
-                              |RCC_PERIPHCLK_ADC;
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART1|RCC_PERIPHCLK_USART2
+                              |RCC_PERIPHCLK_I2C1|RCC_PERIPHCLK_I2C2
+                              |RCC_PERIPHCLK_RNG|RCC_PERIPHCLK_ADC;
   PeriphClkInit.Usart1ClockSelection = RCC_USART1CLKSOURCE_PCLK2;
   PeriphClkInit.Usart2ClockSelection = RCC_USART2CLKSOURCE_PCLK1;
   PeriphClkInit.I2c1ClockSelection = RCC_I2C1CLKSOURCE_PCLK1;
   PeriphClkInit.I2c2ClockSelection = RCC_I2C2CLKSOURCE_PCLK1;
   PeriphClkInit.AdcClockSelection = RCC_ADCCLKSOURCE_SYSCLK;
-  PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_LSI;
   PeriphClkInit.RngClockSelection = RCC_RNGCLKSOURCE_HSI48;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
   {
@@ -296,10 +332,108 @@ void HAL_SYSTICK_Callback(void)
 // Timers initialization
 // -----------------------------------------------------------------------------------------------------------------------------
 void TIMER_Init(void){
-	HAL_TIM_IRQHandler(&htim6);
-	HAL_TIM_IRQHandler(&htim7);
-  //HAL_TIM_Base_Start_IT(&htim6);    // 100us
-	//HAL_TIM_Base_Start_IT(&htim7);    // 100us
+  __HAL_TIM_CLEAR_IT(&htim6, TIM_IT_UPDATE);
+  __HAL_TIM_CLEAR_IT(&htim7, TIM_IT_UPDATE);
+  __HAL_TIM_CLEAR_IT(&htim15, TIM_IT_UPDATE);
+  __HAL_TIM_CLEAR_IT(&htim16, TIM_IT_UPDATE);
+  
+	HAL_TIM_Base_Start_IT(&htim16);
+}
+
+// -----------------------------------------------------------------------------------------------------------------------------
+// FT Sensor Self-Calibration for any channel, by using coarse and fine offset tuning
+// -----------------------------------------------------------------------------------------------------------------------------
+void SelfCalibration(uint8_t channel, uint8_t reg){
+  uint16_t DAC_OUT;
+  
+  if      (channel==1)  {DAC_OUT=adc_measure.STRAIN1;}
+  else if (channel==2)  {DAC_OUT=adc_measure.STRAIN2;}
+  else if (channel==3)  {DAC_OUT=adc_measure.STRAIN3;}
+  else if (channel==4)  {DAC_OUT=adc_measure.STRAIN4;}
+  else if (channel==5)  {DAC_OUT=adc_measure.STRAIN5;}
+  else if (channel==6)  {DAC_OUT=adc_measure.STRAIN6;}
+  
+  if(reg==RAM_CFG0){
+    PGA_CoarseOffset_Calib(channel, DAC_OUT);                         // Coarse calibration using CFG0.OS register
+    PGA_StableRegister(PGA308[channel].CFG0_OS);                      // Check if value is stable or not
+    if(REG_Value){                                                    // If value is not stable yet, write a better value in CFG0.OS
+      PGA308[channel].CFG0 = ((PGA308[channel].CFG0 & 0xFF00) | PGA308[channel].CFG0_OS);
+      PGA308_WriteRegister(channel, reg, PGA308[channel].CFG0);
+    }
+  }
+  
+  if(reg==RAM_ZDAC){
+    PGA_FineOffset_Calib(channel, DAC_OUT);                           // Fine calibration using ZDAC register
+    PGA_StableRegister(PGA308[channel].ZDAC);                         // Check if value is stable or not
+    if(REG_Value){                                                    // If value is not stable yet, write a better value in ZDAC
+      PGA308_WriteRegister(channel, reg, PGA308[channel].ZDAC);
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------------------------------------------------------
+// PGA308 Coarse Offset Calibration - Register CFG0.OS
+// -----------------------------------------------------------------------------------------------------------------------------
+void PGA_CoarseOffset_Calib(uint8_t channel, uint16_t DAC_OUT){
+  if(DAC_OUT < 4300){                         // 4096 metà scala dell'ADC, metto diverso per poter poi calibrare finemente col Zero DAC
+    if(PGA308[channel].CFG0_OS>>7 == 0) { 
+      if(PGA308[channel].CFG0_OS<0x64)  {PGA308[channel].CFG0_OS++;}
+    }
+    else{
+      if( (PGA308[channel].CFG0_OS & 0x7F) > 0)   {PGA308[channel].CFG0_OS--;}
+      else                                        {PGA308[channel].CFG0_OS=0x00;}
+    }
+  }
+  else{
+    if(PGA308[channel].CFG0_OS>>7 == 0) {
+      if( (PGA308[channel].CFG0_OS & 0x7F) > 0)   {PGA308[channel].CFG0_OS--;} 
+      else                                        {PGA308[channel].CFG0_OS=0x80;}
+    }
+    else{
+      if( (PGA308[channel].CFG0_OS & 0x7F)<0x64)  {PGA308[channel].CFG0_OS++;}
+    }
+  }
+}
+
+// -----------------------------------------------------------------------------------------------------------------------------
+// PGA308 Fine Offset Calibration - Register ZDAC
+// -----------------------------------------------------------------------------------------------------------------------------
+void PGA_FineOffset_Calib(uint8_t channel, uint16_t DAC_OUT){
+  if(DAC_OUT < 4096){                         // 4096 metà scala dell'ADC
+    if(PGA308[channel].ZDAC > 0x0000)  {PGA308[channel].ZDAC--;}
+  }
+  else{
+    if(PGA308[channel].ZDAC < 0xFFFF)  {PGA308[channel].ZDAC++;}
+  }
+}
+
+// -----------------------------------------------------------------------------------------------------------------------------
+// PGA308 Check the stability of register values
+// -----------------------------------------------------------------------------------------------------------------------------
+void PGA_StableRegister(uint16_t REGISTER){
+  uint8_t i;
+  REG_value_tran[REG_count]=REGISTER;
+  if(REG_count < REG_max_count) {REG_count++;}
+  else                          {REG_count=0; REG_GO=1;}
+  
+  for(i=0; i<REG_max_count; i++){
+    if(REG_value_tran[i] > REG_value_tran[REG_max_count]){
+      if( (REG_value_tran[i] - REG_value_tran[REG_max_count]) <= 1){
+        REG_tran++;
+      }
+    }
+    else{
+      if( REG_value_tran[REG_max_count] - (REG_value_tran[i]) <= 1){
+        REG_tran++;
+      }
+    }
+  }
+  
+  if(REG_GO){
+    if(REG_tran != REG_max_count) {REG_Value=1;}
+    else                          {REG_Value=0; REG_OK=1; REG_GO=0;}
+  }
+  REG_tran=0;
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------
@@ -311,13 +445,14 @@ void CANBUS(void){
     {
       hcan1.pTxMsg->StdId   = 0x621;              // Polling
       hcan1.pTxMsg->Data[0] = 0xFF;               // Firmware version message
-      hcan1.pTxMsg->Data[1] = 0x00;               // Board type
-      hcan1.pTxMsg->Data[2] = Firmware_vers;      // Firmware version
-      hcan1.pTxMsg->Data[3] = Revision_vers;      // Revision version
-      hcan1.pTxMsg->Data[4] = Build_number;       // Build number
-      hcan1.pTxMsg->Data[5] = 0x00;
-      hcan1.pTxMsg->Data[6] = Temperature_board>>8;
-      hcan1.pTxMsg->Data[7] = Temperature_board;
+      //hcan1.pTxMsg->Data[1] = 0x00;               // Board type
+      hcan1.pTxMsg->Data[1] = Firmware_vers;      // Firmware version
+      hcan1.pTxMsg->Data[2] = Revision_vers;      // Revision version
+      hcan1.pTxMsg->Data[3] = Build_number;       // Build number
+      hcan1.pTxMsg->Data[4] = PGA308[1].CFG0_OS>>8;
+      hcan1.pTxMsg->Data[5] = PGA308[1].CFG0_OS;
+      hcan1.pTxMsg->Data[6] = 0;
+      hcan1.pTxMsg->Data[7] = 0;
       HAL_CAN_Transmit_IT(&hcan1);
       can_message = 1;
     }
@@ -351,10 +486,43 @@ void CANBUS(void){
       hcan1.pTxMsg->Data[6] = ((adc_measure.STRAIN6)>>8) & 0x000000FF;
       hcan1.pTxMsg->Data[7] = adc_measure.STRAIN6 & 0x000000FF;
       HAL_CAN_Transmit_IT(&hcan1);
+      can_message = 3;
+    }
+    break;
+    
+    case 0x03:  
+    {
+      hcan1.pTxMsg->StdId   = 0x621;              // Polling
+      hcan1.pTxMsg->Data[0] = 0xFF;               // Firmware version message
+      hcan1.pTxMsg->Data[1] = 0x03;               // Board type
+      hcan1.pTxMsg->Data[2] = Temperature_TOPboard>>8;
+      hcan1.pTxMsg->Data[3] = Temperature_TOPboard;
+      hcan1.pTxMsg->Data[4] = Temperature_BOTboard>>8;
+      hcan1.pTxMsg->Data[5] = Temperature_BOTboard;
+      hcan1.pTxMsg->Data[6] = 0;
+      hcan1.pTxMsg->Data[7] = 0;
+      HAL_CAN_Transmit_IT(&hcan1);
       can_message = 0;
     }
     break;
-                
+     
+    case 0x10:  
+    {
+      hcan1.pTxMsg->StdId   = 0x621;              // Polling
+      hcan1.pTxMsg->Data[0] = 0xFF;               // Firmware version message
+      //hcan1.pTxMsg->Data[1] = 0x00;               // Board type
+      hcan1.pTxMsg->Data[1] = Firmware_vers;      // Firmware version
+      hcan1.pTxMsg->Data[2] = Revision_vers;      // Revision version
+      hcan1.pTxMsg->Data[3] = Build_number;       // Build number
+      hcan1.pTxMsg->Data[4] = PGA308[1].CFG0_OS>>8;
+      hcan1.pTxMsg->Data[5] = PGA308[1].CFG0_OS;
+      hcan1.pTxMsg->Data[6] = 0;
+      hcan1.pTxMsg->Data[7] = 0;
+      HAL_CAN_Transmit_IT(&hcan1);
+      can_message = 0;
+    }
+    break;
+    
     default:    
     {
     }
@@ -390,10 +558,11 @@ void BNO055_UART(void){
 void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *I2cHandle)
 {
   if(I2cHandle->Instance==I2C1){
-    HAL_I2C_Master_Receive_DMA(&hi2c1, (uint16_t)Si705x_I2C_ADDRESS, (uint8_t*)Si705x_I2C_RxBuffer, sizeof(Si705x_I2C_RxBuffer));
+    HAL_I2C_Master_Receive_DMA(&hi2c1, (uint16_t)Si705x_I2C_ADDRESS, (uint8_t*)Si705x_I2C1_RxBuffer, sizeof(Si705x_I2C1_RxBuffer));
   }
   if(I2cHandle->Instance==I2C2){
-    HAL_I2C_Master_Receive_DMA(&hi2c2, (uint16_t)BNO055_I2C_ADDRESS, (uint8_t*)BNO055_RxBuffer, sizeof(BNO055_RxBuffer));
+    HAL_I2C_Master_Receive_DMA(&hi2c2, (uint16_t)Si705x_I2C_ADDRESS, (uint8_t*)Si705x_I2C2_RxBuffer, sizeof(Si705x_I2C2_RxBuffer));
+    //HAL_I2C_Master_Receive_DMA(&hi2c2, (uint16_t)BNO055_I2C_ADDRESS, (uint8_t*)BNO055_RxBuffer, sizeof(BNO055_RxBuffer));
     
   }
 }
@@ -401,11 +570,12 @@ void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *I2cHandle)
 void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *I2cHandle)
 {
   if(I2cHandle->Instance==I2C1){
-    Temperature_code = (Si705x_I2C_RxBuffer[0]<<8) + Si705x_I2C_RxBuffer[1];
-    Temperature_board = ((17572*Temperature_code)/65536) - 4685;  // HEX temperature in degrees Celsius (x100)
+    Temperature_BOTcode = (Si705x_I2C1_RxBuffer[0]<<8) + Si705x_I2C1_RxBuffer[1];
+    Temperature_BOTboard = ((17572*Temperature_BOTcode)/65536) - 4685;  // HEX temperature in degrees Celsius (x100)
   }
   if(I2cHandle->Instance==I2C2){
-    
+    Temperature_TOPcode = (Si705x_I2C2_RxBuffer[0]<<8) + Si705x_I2C2_RxBuffer[1];
+    Temperature_TOPboard = ((17572*Temperature_TOPcode)/65536) - 4685;  // HEX temperature in degrees Celsius (x100)
   }
 }
 
@@ -451,13 +621,59 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim){
         bit_count=0;
         bit_count_rel=0;
         byte_count=0;
+        HAL_TIM_Base_Start_IT(&htim15);
+        REG_Value=0;
       }
     }
 	}
   
-	if(htim->Instance==TIM7){        // timer 10ms
-		
+	if(htim->Instance==TIM7){        // timer 100ms
+    if(bit_count_rel==0){       // START condition of One-Wire Protocol
+      PGA308_BitValue(PGA308_channel, LOW);
+      bit_count_rel++;
+    }
+    else if(bit_count_rel==9){   // STOP condition of One-Wire Protocol
+      PGA308_BitValue(PGA308_channel, HIGH);
+      bit_count_rel=0;
+      byte_count++;
+    }
+    else{                       // Transmission of One-Wire Protocol
+      if(bit_count<16){
+        if(((PGA308_BufferTx[byte_count])>>(bit_count_rel-1)) & 0x01){
+          PGA308_BitValue(PGA308_channel, HIGH);
+        }
+        else{
+          PGA308_BitValue(PGA308_channel, LOW);
+        }
+        bit_count++;
+        bit_count_rel++;
+      }
+      else{
+        PGA308_BitValue(PGA308_channel, HIGH);
+        HAL_TIM_Base_Stop_IT(&htim7);
+        bit_count=0;
+        bit_count_rel=0;
+        byte_count=0;
+        HAL_TIM_Base_Start_IT(&htim15);
+        can_message=0x10;
+      }
+    }
 	}
+  
+  if(htim->Instance==TIM15){        // timer 20ms
+    PGA308_StartComm=0;
+    HAL_TIM_Base_Stop_IT(&htim15);
+	}
+  
+  if(htim->Instance==TIM16){        // timer xxx ms 
+    HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+	}
+}
+
+
+void TIMER_PROG(uint16_t value){     // example: value=10000 -> 1s, value=1000 -> 100ms, value=100 -> 10ms  
+  htim16.Init.Period = value;
+  HAL_TIM_Base_Init(&htim16);
 }
 
 
@@ -511,6 +727,10 @@ void calcMean(){
   mean.STRAIN6 = mean.STRAIN6 / nr_adc_sample;
 }
 
+
+void CheckTransient(){
+
+}
 
 
 /* USER CODE END 4 */

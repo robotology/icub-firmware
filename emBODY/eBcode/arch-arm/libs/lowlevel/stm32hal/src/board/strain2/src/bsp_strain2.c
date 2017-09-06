@@ -92,12 +92,13 @@ extern void stm32hal_bsp_init(void)
     MX_TIM6_Init();
     MX_CAN1_Init();
     MX_USART1_UART_Init();
-    MX_ADC1_Init();
+// IIT-EXT: this funtion is called inside embot::hw::adc::init()   MX_ADC1_Init();
     MX_I2C1_Init();
     MX_I2C2_Init();
     MX_USART2_UART_Init();
-    MX_RTC_Init();
     MX_TIM7_Init();
+    MX_TIM16_Init();
+    MX_TIM15_Init();
     MX_RNG_Init();
 
  }
@@ -136,18 +137,17 @@ int main(void)
   MX_I2C1_Init();
   MX_I2C2_Init();
   MX_USART2_UART_Init();
-  MX_RTC_Init();
   MX_TIM7_Init();
+  MX_TIM16_Init();
+  MX_TIM15_Init();
   MX_RNG_Init();
 
   /* USER CODE BEGIN 2 */
-    CAN_Config();
-    TIMER_Init();  
-  Si705x_init(1);
+	TIMER_Init();  
+  CAN_Config();
+	Si705x_init(1);
   //BNO055_init();
-    PGA308_init();
-    //HAL_ADC_Start_IT(&hadc1);
-    
+	
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -160,41 +160,53 @@ int main(void)
     Error_Handler();
   }
   
+  PGA308_init();
+  //PGA308_DefaultConfig();
   
-  for(PGA308_channel=1; PGA308_channel<=6; PGA308_channel++){
-    PGA308_OneWireWrite(PGA308_channel, SFTC, 0x0050);      // SFTC Register - Software Lock Mode  (datasheet page 72)
-    HAL_Delay(100);
-    PGA308_OneWireWrite(PGA308_channel, GDAC, 0x0000);      //
-    HAL_Delay(100);
-    PGA308_OneWireWrite(PGA308_channel, ZDAC, 0x4000);      //
-    HAL_Delay(100);
-    PGA308_OneWireWrite(PGA308_channel, CFG0, 0x0000);      //
-    HAL_Delay(100);
-    PGA308_OneWireWrite(PGA308_channel, CFG1, 0x0000);      //
-    HAL_Delay(100);
-    PGA308_OneWireWrite(PGA308_channel, CFG2, 0x0000);      //
-    HAL_Delay(100);
-  }
-  
-  HAL_Delay(200);
+  HAL_Delay(100);
   HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc_values, 6);
   
+  HAL_Delay(1000);
   
-  //PGA308_channel=1;
+  REGISTER=RAM_CFG0;
+  //REGISTER=RAM_GDAC;
   
   while (1)
   {
-    
-    //PGA308_OneWireWrite(1, 0, 0x4000);      //
-    //HAL_Delay(100);
-    
-    //HAL_ADC_Start_DMA(&hadc1, (uint32_t*)adc_values, 6);
-    //HAL_Delay(1);
     //CANBUS();
     TEMPERATURE();
     //BNO055();
     //BNO055_UART();
-    HAL_Delay(100);
+    
+    if(PGA308_StartCalib){
+      TIMER_PROG(1000);
+      PGA308_StartCalib=0;
+      PGA308_DefaultConfig();
+    }
+    else
+    {
+      if(REG_OK==0) {SelfCalibration(CHANNEL, REGISTER);}
+      else{
+        if(CHANNEL<6) {
+          REG_OK=0;
+          CHANNEL++;
+        }
+        else{
+          if(REGISTER==RAM_CFG0){
+            HAL_Delay(100);
+            REGISTER=RAM_ZDAC;
+            REG_OK=0;
+            CHANNEL=1;
+          }
+          else if(REGISTER==RAM_ZDAC){
+            TIMER_PROG(10000);
+            REGISTER=RAM_GDAC;
+          }
+        }
+      }
+    }
+    HAL_Delay(10);
+    
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
@@ -241,12 +253,11 @@ STM32HAL_BSP_STATIC_SCOPE void SystemClock_Config(void)
 
     /**Initializes the CPU, AHB and APB busses clocks 
     */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI48|RCC_OSCILLATORTYPE_HSI
-                              |RCC_OSCILLATORTYPE_LSI;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI48|RCC_OSCILLATORTYPE_HSI;
+    
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSI48State = RCC_HSI48_ON;
   RCC_OscInitStruct.HSICalibrationValue = 16;
-  RCC_OscInitStruct.LSIState = RCC_LSI_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
@@ -267,16 +278,14 @@ STM32HAL_BSP_STATIC_SCOPE void SystemClock_Config(void)
     _Error_Handler(__FILE__, __LINE__);
   }
 
-  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_RTC|RCC_PERIPHCLK_USART1
-                              |RCC_PERIPHCLK_USART2|RCC_PERIPHCLK_I2C1
-                              |RCC_PERIPHCLK_I2C2|RCC_PERIPHCLK_RNG
-                              |RCC_PERIPHCLK_ADC;
+  PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART1|RCC_PERIPHCLK_USART2
+                              |RCC_PERIPHCLK_I2C1|RCC_PERIPHCLK_I2C2
+                              |RCC_PERIPHCLK_RNG|RCC_PERIPHCLK_ADC;
   PeriphClkInit.Usart1ClockSelection = RCC_USART1CLKSOURCE_PCLK2;
   PeriphClkInit.Usart2ClockSelection = RCC_USART2CLKSOURCE_PCLK1;
   PeriphClkInit.I2c1ClockSelection = RCC_I2C1CLKSOURCE_PCLK1;
   PeriphClkInit.I2c2ClockSelection = RCC_I2C2CLKSOURCE_PCLK1;
   PeriphClkInit.AdcClockSelection = RCC_ADCCLKSOURCE_SYSCLK;
-  PeriphClkInit.RTCClockSelection = RCC_RTCCLKSOURCE_LSI;
   PeriphClkInit.RngClockSelection = RCC_RNGCLKSOURCE_HSI48;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
   {

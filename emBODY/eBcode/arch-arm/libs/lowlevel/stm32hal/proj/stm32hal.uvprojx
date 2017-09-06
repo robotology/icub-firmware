@@ -952,19 +952,9 @@
               <FilePath>..\src\board\strain2\src\rng.c</FilePath>
             </File>
             <File>
-              <FileName>rtc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\board\strain2\src\rtc.c</FilePath>
-            </File>
-            <File>
               <FileName>stm32l4xx_hal_msp.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\board\strain2\src\stm32l4xx_hal_msp.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32l4xx_it.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\board\strain2\src\stm32l4xx_it.c</FilePath>
             </File>
             <File>
               <FileName>tim.c</FileName>
@@ -2047,19 +2037,9 @@
               <FilePath>..\src\board\strain2\src\rng.c</FilePath>
             </File>
             <File>
-              <FileName>rtc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\board\strain2\src\rtc.c</FilePath>
-            </File>
-            <File>
               <FileName>stm32l4xx_hal_msp.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\board\strain2\src\stm32l4xx_hal_msp.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32l4xx_it.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\board\strain2\src\stm32l4xx_it.c</FilePath>
             </File>
             <File>
               <FileName>tim.c</FileName>
@@ -3142,19 +3122,9 @@
               <FilePath>..\src\board\strain2\src\rng.c</FilePath>
             </File>
             <File>
-              <FileName>rtc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\board\strain2\src\rtc.c</FilePath>
-            </File>
-            <File>
               <FileName>stm32l4xx_hal_msp.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\board\strain2\src\stm32l4xx_hal_msp.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32l4xx_it.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\board\strain2\src\stm32l4xx_it.c</FilePath>
             </File>
             <File>
               <FileName>tim.c</FileName>

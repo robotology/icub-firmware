@@ -60,6 +60,9 @@ extern void _Error_Handler(char*, int);
 
 /* USER CODE END Includes */
 
+// IIT-EXT     
+extern DMA_HandleTypeDef hdma_adc1;
+
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

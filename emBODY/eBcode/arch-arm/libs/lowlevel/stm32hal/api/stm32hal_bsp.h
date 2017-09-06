@@ -90,7 +90,6 @@ extern void stm32hal_bsp_init(void);
 #include "../src/board/strain2/inc/i2c.h"
 #include "../src/board/strain2/inc/main.h"
 #include "../src/board/strain2/inc/rng.h"
-#include "../src/board/strain2/inc/rtc.h"
 #include "../src/board/strain2/inc/tim.h"
 #include "../src/board/strain2/inc/usart.h"
 
