@@ -1,4 +1,5 @@
 
+#undef TEST_ADC
 
 //#include "EOtheLEDpulser.h"
 #include "embot_app_canprotocol.h"
@@ -80,6 +81,35 @@ static void alerteventbasedtask(void *arg);
 
 static std::vector<embot::hw::can::Frame> outframes;
 
+#if defined(TEST_ADC)
+
+// test adc
+static std::uint16_t bufferSix[6] = {0};
+
+static volatile std::uint8_t adcdmadone = 0;
+
+static void adcdmadone_set(void *p)
+{
+     adcdmadone = 1;
+}
+
+static void adcdmadone_clr(void *p)
+{
+    adcdmadone = 0;
+}
+
+static bool adcdmadone_isset()
+{
+    if(0 == adcdmadone)
+    {
+        return false;
+    }
+    
+    return true;
+}
+
+#endif // defined(TEST_ADC)
+
 static void start_evt_based(void)
 { 
     // start task waiting for can messages. 
@@ -118,6 +148,14 @@ static void start_evt_based(void)
     r = embot::hw::can::init(embot::hw::can::Port::one, canconfig);
     r = embot::hw::can::setfilters(embot::hw::can::Port::one, embot::app::theCANboardInfo::getInstance().getCANaddress());
     r = r;
+    
+#if defined(TEST_ADC)   
+    embot::hw::adc::Config adcConf;
+    adcConf.numberofitems = 6;
+    adcConf.destination = bufferSix;
+    adcConf.oncompletion.callback = adcdmadone_set;
+    embot::hw::adc::init(embot::hw::adc::Port::one, adcConf);
+#endif // #if defined(TEST_ADC)
 }
 
 
@@ -149,10 +187,49 @@ embot::common::dsp::q15::matrix ma2;
 embot::common::dsp::q15::matrix ma3;
 #endif
 
+#if defined(TEST_ADC)
+static embot::common::Time delta = 0;
+static std::uint16_t items[6] = {0};
+#endif // #if defined(TEST_ADC)
+
 static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask eventmask, void *p)
 {     
     if(0 == eventmask)
     {   // timeout ... 
+
+#if defined(TEST_ADC)
+        
+        adcdmadone_clr(nullptr);
+        
+        embot::common::Time starttime = embot::sys::timeNow();
+        embot::common::Time endtime = starttime;
+        
+        embot::hw::adc::start(embot::hw::adc::Port::one);
+     
+        for(;;)
+        {
+            if(true == adcdmadone_isset())
+            {
+                endtime = embot::sys::timeNow();
+                break;
+            }
+        }
+        
+        delta = endtime - starttime;
+        delta = delta;
+        
+        if(delta > 666)
+        {
+            endtime ++; 
+            starttime ++;            
+        }
+        
+        
+        std::memset(items, 0xff, sizeof(items)); 
+        embot::hw::adc::get(embot::hw::adc::Port::one, items);
+        
+#endif  // #if defined(TEST_ADC)           
+
 #if 0        
             ma1.load(3, 3, mat1);
             ma1.diagonal(embot::common::dsp::q15::negOneHalf);
