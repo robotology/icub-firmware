@@ -90,7 +90,7 @@ extern void stm32hal_bsp_init(void)
     MX_GPIO_Init();
     MX_DMA_Init();
     MX_TIM6_Init();
-    MX_CAN1_Init();
+// IIT-EXT: this funtion is called inside embot::hw::can::init()   MX_CAN1_Init();
     MX_USART1_UART_Init();
     MX_I2C1_Init();
     MX_I2C2_Init();

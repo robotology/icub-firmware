@@ -65,12 +65,6 @@ static uint32_t s_stm32hal_bps_dummy_tick1msget(void);
 //    .initbsp = true
 //};
 
-//static  stm32hal_can_configCallback_t s_stm32hal_can_CfgCallback = 
-//{
-//    .onRx = NULL,
-//    .onTx = NULL,
-//    .onError = NULL
-//};
 
 static stm32hal_config_t s_stm32hal_bsp_config =
 {
@@ -78,12 +72,7 @@ static stm32hal_config_t s_stm32hal_bsp_config =
     true
 };
 
-static  stm32hal_can_configCallback_t s_stm32hal_can_CfgCallback = 
-{
-    NULL,
-    NULL,
-    NULL
-};
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -131,49 +120,6 @@ extern stm32hal_res_t stm32hal_init(const stm32hal_config_t *cfg)
 }
 
 
-extern stm32hal_res_t stm32hal_can_configureIRQcallback(const stm32hal_can_configCallback_t *cfgCallback)
-{
-    s_stm32hal_can_CfgCallback.onRx = cfgCallback->onRx;
-    s_stm32hal_can_CfgCallback.onTx = cfgCallback->onTx;
-    s_stm32hal_can_CfgCallback.onError = cfgCallback->onError;
-    
-    return stm32hal_res_OK;
-}
-
-
-
-
-
-
-void HAL_CAN_TxCpltCallback(CAN_HandleTypeDef* hcan)
-{
-    if(NULL != s_stm32hal_can_CfgCallback.onTx)
-        s_stm32hal_can_CfgCallback.onTx(hcan);
-}
-
-/**
-  * @brief  Reception complete callback in non-blocking mode.
-  * @param  hcan: pointer to a CAN_HandleTypeDef structure that contains
-  *         the configuration information for the specified CAN.
-  * @retval None
-  */
-void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan)
-{
-    if(NULL != s_stm32hal_can_CfgCallback.onRx)
-        s_stm32hal_can_CfgCallback.onRx(hcan);
-}
-
-/**
-  * @brief  Error CAN callback.
-  * @param  hcan: pointer to a CAN_HandleTypeDef structure that contains
-  *         the configuration information for the specified CAN.
-  * @retval None
-  */
-void HAL_CAN_ErrorCallback(CAN_HandleTypeDef *hcan)
-{
-    if(NULL != s_stm32hal_can_CfgCallback.onError)
-    s_stm32hal_can_CfgCallback.onError(hcan);
-}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
