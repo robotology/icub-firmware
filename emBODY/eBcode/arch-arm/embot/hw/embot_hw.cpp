@@ -122,10 +122,10 @@ namespace embot { namespace hw { namespace led {
     
     static const bspmap_t bspmap = 
     {
-        0x00000000,
+        0x00000001,
         GPIO_PIN_RESET, GPIO_PIN_SET,
         {
-            {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, 
+            {LED_GPIO_Port, LED_Pin}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, 
             {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}
         }        
     };
