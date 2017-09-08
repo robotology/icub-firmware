@@ -24,6 +24,7 @@
 #include "EOtheErrorManager.h"
 #include "EoError.h"
 #include "EOappEncodersReader.h"
+#include "EOtheEntities.h"
 
 #include "Joint.h"
 #include "Motor.h"
@@ -1138,6 +1139,33 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             
             o->calibration_timeout = 0;
             
+            break;
+        }
+        case eomc_calibration_type12_absolute_sensor:
+        {
+            //1) Take absolute value of calibation parametr
+            int32_t abs_raw = (calibrator->params.type12.rawValueAtZeroPos > 0) ? calibrator->params.type12.rawValueAtZeroPos : -calibrator->params.type12.rawValueAtZeroPos;
+            // 2) calculate offset
+            int32_t offset = abs_raw - TICKS_PER_HALF_REVOLUTION;
+            // 3) find out sign of zero
+            int32_t zero;
+            eOmc_joint_config_t *jointcfg = eo_entities_GetJointConfig(eo_entities_GetHandle(), e);
+            if(jointcfg->jntEncoderResolution > 0)
+                zero = TICKS_PER_HALF_REVOLUTION;
+            else
+                zero = -TICKS_PER_HALF_REVOLUTION;
+            // 4) call calibration function
+            
+            ////debug code
+            char info[80];
+            snprintf(info, sizeof(info), "CALIB 12: offset=%d zero=%d ", offset, zero);
+            JointSet_send_debug_message(info, e);
+            ////debug code ended
+            AbsEncoder_calibrate_absolute(o->absEncoder+e, offset, zero);
+            
+            Motor_calibrate_withOffset(o->motor+e, 0);
+            o->calibration_in_progress = (eOmc_calibration_type_t)calibrator->type;
+
             break;
         }
         
