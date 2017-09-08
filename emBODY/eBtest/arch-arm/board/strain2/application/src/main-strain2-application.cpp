@@ -23,6 +23,8 @@
 #include "embot_app_application_theSTRAIN.h"
 #include "embot_app_application_theIMU.h"
 
+//#include "embot_hw_onewire.h"
+
 
 static const embot::app::canprotocol::versionOfAPPLICATION vAP = {1, 0 , 3};
 static const embot::app::canprotocol::versionOfCANPROTOCOL vCP = {2, 0};
@@ -172,6 +174,13 @@ static void eventbasedtask_init(embot::sys::Task *t, void *p)
 {
     embot::hw::result_t r = embot::hw::can::enable(embot::hw::can::Port::one);  
     r = r;  
+    
+//    embot::hw::onewire::Config con;
+//    con.preamble = 0x55;
+//    con.usepreamble = true;
+//    con.rate = embot::hw::onewire::Rate::tenKbps;
+//    con.gpio.load(W_STRAIN1_GPIO_Port, W_STRAIN1_Pin);
+//    embot::hw::onewire::init(embot::hw::onewire::Channel::one, con);
 
     outframes.reserve(maxOUTcanframes);
     #warning --> we should init the objects which holds outframes with maxOUTcanframes ... so that no more than maxOUTcanframes are pushed_back
@@ -196,6 +205,8 @@ static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask
 {     
     if(0 == eventmask)
     {   // timeout ... 
+        
+//        embot::hw::onewire::write(embot::hw::onewire::Channel::one, 0x66, 0xabcd);
 
 #if defined(TEST_ADC)
         
