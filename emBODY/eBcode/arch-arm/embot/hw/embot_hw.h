@@ -37,6 +37,11 @@ namespace embot { namespace hw {
     {   // generic gpio descriptor: every micro has a port and a pin. 
         void*           port;
         std::uint32_t   pin;
+        
+        void load(void *po, std::uint32_t pi) { port = po; pin = pi; } 
+        GPIO(void *po, std::uint32_t pi) { load(po, pi); }
+        GPIO() { load(nullptr, 0); }
+        bool isvalid() { if((nullptr == port) || (0 == pin)) { return false; } return true; }       
     };
     
 }} // namespace embot { namespace hw {
