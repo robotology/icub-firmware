@@ -44,6 +44,8 @@ namespace embot { namespace hw {
         bool isvalid() { if((nullptr == port) || (0 == pin)) { return false; } return true; }       
     };
     
+    enum class CLOCK { sys = 0, pclk1 = 1, pclk2 = 2, none = 32, maxnumberof = 3 };
+    
 }} // namespace embot { namespace hw {
 
 
