@@ -921,7 +921,7 @@
       <GroupNumber>2</GroupNumber>
       <FileNumber>38</FileNumber>
       <FileType>1</FileType>
-      <tvExp>0</tvExp>
+      <tvExp>1</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
       <PathWithFileName>..\src\stm32l4\src\stm32l4xx_hal_rcc.c</PathWithFileName>
