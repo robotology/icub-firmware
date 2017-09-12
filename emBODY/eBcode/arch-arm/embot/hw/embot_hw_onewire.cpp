@@ -22,8 +22,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "embot_hw_onewire.h"
-#include "stm32hal.h"
-#include "embot_sys.h"
+
 
 
 
@@ -31,6 +30,9 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
+#include "stm32hal.h"
+#include "embot_sys.h"
+#include "embot_hw_timer.h"
 #include <cstring>
 #include <vector>
 
@@ -144,7 +146,7 @@ namespace embot { namespace hw { namespace onewire {
     static PrivateData s_privatedata;;
     
    
- 
+
 
     void gpio_configure_out(const embot::hw::GPIO &gpio)
     {
@@ -165,33 +167,33 @@ namespace embot { namespace hw { namespace onewire {
     }
     
     
-    void callbackOnTick(TIM_HandleTypeDef *htim)
+    void callbackOnTick(void *arg)
     {
-       // the timer callback executes this code. now we do actions depending on what is inside s_privatedata. 
+        // the timer callback executes this code. now we do actions depending on what is inside s_privatedata. 
+              
+        // we just need to set the gpio low or high depending on bits64 value.
+        // we do it for max bitsnumber values.
        
-       // we just need to set the gpio low or high depending on bits64 value.
-       // we do it for max bitsnumber values.
-       
-       if(s_privatedata.bitindex < s_privatedata.bitsnumber)
-       {
+        if(s_privatedata.bitindex < s_privatedata.bitsnumber)
+        {
             // set s_privatedata.bitindex
             bool high = embot::common::bit::check(s_privatedata.bits64, s_privatedata.bitindex);
             gpio_out_set(s_privatedata.activegpio, (true == high) ? (GPIO_PIN_SET) : (GPIO_PIN_RESET));
             s_privatedata.bitindex++;
-       }
-       else if(s_privatedata.bitindex >= s_privatedata.bitsnumber)
-       {
+        }
+        else if(s_privatedata.bitindex >= s_privatedata.bitsnumber)
+        {
             // we are after the last stop bit .... we return.
             gpio_out_set(s_privatedata.activegpio, GPIO_PIN_SET);
             s_privatedata.bitsnumber = 0;
             s_privatedata.bitindex = 0;
             s_privatedata.bits64 = 0xffffffffffffffff; // just in case.
            
-            HAL_TIM_Base_Stop_IT(htim);           
+            embot::hw::timer::stop(embot::hw::timer::Timer::six);            
             s_privatedata.transaction_isrunning = false;     
             s_privatedata.activegpio.load(nullptr, 0);    
             s_privatedata.activechannel = Channel::none;           
-       }
+        }
       
     }
     
@@ -219,7 +221,12 @@ namespace embot { namespace hw { namespace onewire {
         
         if(false == s_privatedata.tim6_initted)
         {
-            MX_TIM6_Init();
+            embot::hw::timer::Config cc;
+            cc.time = embot::common::time1millisec / static_cast<std::uint32_t>(config.rate);
+            cc.mode = embot::hw::timer::Mode::periodic;
+            cc.onexpiry.callback = callbackOnTick;
+            cc.onexpiry.arg = nullptr;
+            embot::hw::timer::init(embot::hw::timer::Timer::six, cc);
             s_privatedata.tim6_initted = true;
             s_privatedata.transaction_isrunning = false;
             s_privatedata.activechannel = Channel::none;
@@ -284,10 +291,10 @@ namespace embot { namespace hw { namespace onewire {
         }
         
         // ok: the timer starts.
-        HAL_TIM_Base_Start_IT(&htim6);
+        embot::hw::timer::start(embot::hw::timer::Timer::six);
         
         
-        embot::common::relTime start = embot::sys::timeNow();
+        embot::common::Time start = embot::sys::timeNow();
         result_t res = resOK;
         for(;;)
         {
@@ -299,7 +306,7 @@ namespace embot { namespace hw { namespace onewire {
             {
                 res = resNOK;
                 // stop timer, set bit high
-                HAL_TIM_Base_Stop_IT(&htim6);
+                embot::hw::timer::stop(embot::hw::timer::Timer::six);
                 gpio_out_set(s_privatedata.config[channel2index(c)].gpio, GPIO_PIN_SET);
                 s_privatedata.activegpio.load(nullptr, 0);
 
@@ -321,24 +328,6 @@ namespace embot { namespace hw { namespace onewire {
 
 
 // - stm32hal.lib needs some handlers being compiled in here: IRQ handlers and callbacks.
-
-
-void TIM6_DAC_IRQHandler(void)
-{
-    HAL_TIM_IRQHandler(&htim6);
-}
-
-
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-{
-    if(TIM6 != htim->Instance)
-    { 
-        return;
-    }
-    
-    embot::hw::onewire::callbackOnTick(htim);
-  
-}
 
 
 #endif //else .... !defined(HAL_GPIO_MODULE_ENABLED) || !defined(HAL_TIM_MODULE_ENABLED) ! defined(STM32HAL_BOARD_STRAIN2)
