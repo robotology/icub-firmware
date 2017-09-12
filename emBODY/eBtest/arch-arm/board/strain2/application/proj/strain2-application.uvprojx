@@ -964,6 +964,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_onewire.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_timer.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_timer.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2089,6 +2094,11 @@
               <FileName>embot_hw_onewire.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_onewire.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_timer.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_timer.cpp</FilePath>
             </File>
           </Files>
         </Group>
