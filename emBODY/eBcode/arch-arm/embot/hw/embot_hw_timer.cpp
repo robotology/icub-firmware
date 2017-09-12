@@ -54,7 +54,7 @@ namespace embot { namespace hw { namespace timer {
     bool initialised(Timer t)                                                                { return false; }
     result_t init(Timer t, const Config &config)                                             { return resNOK; }
     bool isrunning(Timer t)                                                                  { return false; }
-    result_t start(Timer t, const Mode &mode)                                               { return resNOK; }
+    result_t start(Timer t, const Mode &mode)                                                { return resNOK; }
     result_t stop(Timer t)                                                                   { return resNOK; }
     
 }}} // namespace embot { namespace hw { namespace timer {
@@ -78,11 +78,12 @@ namespace embot { namespace hw { namespace timer {
     // const support maps
 #if     defined(STM32HAL_BOARD_STRAIN2)    
     
-    static const std::uint8_t numberofsupported = 2;
+    static const std::uint8_t numberofsupported = 4;
     
     static const bspmap_t bspmap = 
     {
-        0x00000060  // means... only Timer::six (5) and Timer::seven (6)
+        (1 << static_cast<std::uint32_t>(Timer::six))       | (1 << static_cast<std::uint32_t>(Timer::seven)) | 
+        (1 << static_cast<std::uint32_t>(Timer::fifteen))   | (1 << static_cast<std::uint32_t>(Timer::sixteen))
     };
 
     static const std::uint8_t map2compactarray[static_cast<unsigned int>(Timer::maxnumberof)] = 
@@ -90,7 +91,9 @@ namespace embot { namespace hw { namespace timer {
         255, 255, 255, 255, 255,
         0,  // Timer::six
         1,  // Timer::seven
-        255, 255, 255, 255, 255, 255, 255, 255, 255        
+        255, 255, 255, 255, 255, 255, 255, 
+        2,  // Timer::fifteen 
+        3   // Timer::sixteen        
     };
    
 #else
@@ -159,13 +162,17 @@ namespace embot { namespace hw { namespace timer {
         embot::hw::CLOCK    clock;        
         TIM_TypeDef*        TIMx;
         TIM_HandleTypeDef*  phandletimx;
+        bool                isonepulse;
+        bool                mastermode;
     };
 
 #if     defined(STM32HAL_BOARD_STRAIN2)    
     static const stm32_tim_mapping s_stm32_tim_mapping[numberofsupported] = 
     { 
-        { embot::hw::CLOCK::sys, TIM6, &htim6 }, 
-        { embot::hw::CLOCK::sys, TIM7, &htim7 } 
+        { embot::hw::CLOCK::sys, TIM6, &htim6, false, true }, 
+        { embot::hw::CLOCK::sys, TIM7, &htim7, false, true },
+        { embot::hw::CLOCK::sys, TIM15, &htim15, true, false },
+        { embot::hw::CLOCK::sys, TIM16, &htim16, false, false }        
     };   
 #else
     static const stm32_tim_mapping s_stm32_tim_mapping[1] = { {embot::hw::CLOCK::none, nullptr, nullptr } };
@@ -269,17 +276,30 @@ namespace embot { namespace hw { namespace timer {
         stm32data->phandletimx->Init.RepetitionCounter = 0;
         stm32data->phandletimx->Init.Period = pars.period-1;
 
-
-        if (HAL_TIM_Base_Init(stm32data->phandletimx) != HAL_OK)
-        {
-            _Error_Handler(__FILE__, __LINE__);
+        
+        if(true == stm32data->isonepulse)
+        {   // e.g., for tim15: use HAL_TIM_OnePulse_Init() and dont use HAL_TIM_Base_Init().
+            if (HAL_TIM_OnePulse_Init(stm32data->phandletimx, TIM_OPMODE_REPETITIVE) != HAL_OK)
+            {
+                _Error_Handler(__FILE__, __LINE__);
+            }
+        } 
+        else
+        {   // normal case            
+            if (HAL_TIM_Base_Init(stm32data->phandletimx) != HAL_OK)
+            {
+                _Error_Handler(__FILE__, __LINE__);
+            }
         }
 
-        sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
-        sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
-        if (HAL_TIMEx_MasterConfigSynchronization(stm32data->phandletimx, &sMasterConfig) != HAL_OK)
+        if(true == stm32data->mastermode)
         {
-            _Error_Handler(__FILE__, __LINE__);
+            sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+            sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+            if (HAL_TIMEx_MasterConfigSynchronization(stm32data->phandletimx, &sMasterConfig) != HAL_OK)
+            {
+                _Error_Handler(__FILE__, __LINE__);
+            }
         }
 
     }   
@@ -522,6 +542,16 @@ void TIM7_IRQHandler(void)
     manageInterrupt(embot::hw::timer::Timer::seven, &htim7);    
 }
 
+void TIM1_BRK_TIM15_IRQHandler(void)
+{
+    manageInterrupt(embot::hw::timer::Timer::fifteen, &htim15);
+}
+
+void TIM1_UP_TIM16_IRQHandler(void)
+{
+    manageInterrupt(embot::hw::timer::Timer::sixteen, &htim16);
+}
+
 
 #else
 
@@ -535,6 +565,15 @@ void TIM7_IRQHandler(void)
     HAL_TIM_IRQHandler(&htim7);
 }
 
+void TIM1_BRK_TIM15_IRQHandler(void)
+{
+    HAL_TIM_IRQHandler(&htim15);
+}
+
+void TIM1_UP_TIM16_IRQHandler(void)
+{
+   HAL_TIM_IRQHandler(&htim16);
+}
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
@@ -545,7 +584,15 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     else if(TIM7 == htim->Instance)
     { 
         embot::hw::timer::callbackOnTick(embot::hw::timer::Timer::seven); 
-    }         
+    } 
+    else if(TIM15 == htim->Instance)
+    { 
+        embot::hw::timer::callbackOnTick(embot::hw::timer::Timer::fifteen); 
+    }
+    else if(TIM16 == htim->Instance)
+    { 
+        embot::hw::timer::callbackOnTick(embot::hw::timer::Timer::sixteen); 
+    }     
 }
 
 #endif
