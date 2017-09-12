@@ -838,6 +838,10 @@ static void JointSet_do_wait_calibration(JointSet* o)
         case eomc_calibration_type11_cer_hands:
             o->is_calibrated = JointSet_do_wait_calibration_11(o);
             break;
+        
+        case eomc_calibration_type12_absolute_sensor:
+            o->is_calibrated = JointSet_do_wait_calibration_12(o);
+            break;
             
         case eomc_calibration_typeMixed:
             o->is_calibrated = JointSet_do_wait_calibration_mixed(o);
@@ -1143,22 +1147,29 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
         }
         case eomc_calibration_type12_absolute_sensor:
         {
+            int32_t offset;
+            int32_t zero;
             //1) Take absolute value of calibation parametr
             int32_t abs_raw = (calibrator->params.type12.rawValueAtZeroPos > 0) ? calibrator->params.type12.rawValueAtZeroPos : -calibrator->params.type12.rawValueAtZeroPos;
             // 2) calculate offset
-            int32_t offset = abs_raw - TICKS_PER_HALF_REVOLUTION;
+            if(abs_raw >= TICKS_PER_HALF_REVOLUTION)
+                offset = abs_raw - TICKS_PER_HALF_REVOLUTION;
+            else
+                offset = abs_raw + TICKS_PER_HALF_REVOLUTION;
+            
             // 3) find out sign of zero
-            int32_t zero;
             eOmc_joint_config_t *jointcfg = eo_entities_GetJointConfig(eo_entities_GetHandle(), e);
             if(jointcfg->jntEncoderResolution > 0)
                 zero = TICKS_PER_HALF_REVOLUTION;
             else
                 zero = -TICKS_PER_HALF_REVOLUTION;
+            
+            zero+=calibrator->params.type12.calibrationDelta;  //this parameter should contain only the delta
             // 4) call calibration function
             
             ////debug code
             char info[80];
-            snprintf(info, sizeof(info), "CALIB 12: offset=%d zero=%d ", offset, zero);
+            snprintf(info, sizeof(info), "CALIB 12 j %d: offset=%d zero=%d ", e, offset, zero);
             JointSet_send_debug_message(info, e);
             ////debug code ended
             AbsEncoder_calibrate_absolute(o->absEncoder+e, offset, zero);
