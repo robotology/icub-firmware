@@ -1,5 +1,15 @@
 
+#undef TEST_ENABLED
+
 #undef TEST_ADC
+#undef TEST_TIM
+#undef TEST_ONEWIRE
+#undef TEST_DSP
+
+#if defined(TEST_ENABLED)
+void tests_launcher_init();
+void tests_tick();
+#endif // #if defined(TEST_ENABLED)
 
 //#include "EOtheLEDpulser.h"
 #include "embot_app_canprotocol.h"
@@ -23,7 +33,8 @@
 #include "embot_app_application_theSTRAIN.h"
 #include "embot_app_application_theIMU.h"
 
-//#include "embot_hw_onewire.h"
+#include "embot_hw_onewire.h"
+#include "embot_hw_timer.h"
 
 
 static const embot::app::canprotocol::versionOfAPPLICATION vAP = {1, 0 , 3};
@@ -83,34 +94,7 @@ static void alerteventbasedtask(void *arg);
 
 static std::vector<embot::hw::can::Frame> outframes;
 
-#if defined(TEST_ADC)
 
-// test adc
-static std::uint16_t bufferSix[6] = {0};
-
-static volatile std::uint8_t adcdmadone = 0;
-
-static void adcdmadone_set(void *p)
-{
-     adcdmadone = 1;
-}
-
-static void adcdmadone_clr(void *p)
-{
-    adcdmadone = 0;
-}
-
-static bool adcdmadone_isset()
-{
-    if(0 == adcdmadone)
-    {
-        return false;
-    }
-    
-    return true;
-}
-
-#endif // defined(TEST_ADC)
 
 static void start_evt_based(void)
 { 
@@ -150,14 +134,10 @@ static void start_evt_based(void)
     r = embot::hw::can::init(embot::hw::can::Port::one, canconfig);
     r = embot::hw::can::setfilters(embot::hw::can::Port::one, embot::app::theCANboardInfo::getInstance().getCANaddress());
     r = r;
-    
-#if defined(TEST_ADC)   
-    embot::hw::adc::Config adcConf;
-    adcConf.numberofitems = 6;
-    adcConf.destination = bufferSix;
-    adcConf.oncompletion.callback = adcdmadone_set;
-    embot::hw::adc::init(embot::hw::adc::Port::one, adcConf);
-#endif // #if defined(TEST_ADC)
+
+#if defined(TEST_ENABLED)
+    tests_launcher_init();
+#endif // #if defined(TEST_ENABLED)    
 }
 
 
@@ -170,119 +150,26 @@ static void alerteventbasedtask(void *arg)
 }
 
 
+
+
 static void eventbasedtask_init(embot::sys::Task *t, void *p)
 {
     embot::hw::result_t r = embot::hw::can::enable(embot::hw::can::Port::one);  
-    r = r;  
+    r = r;     
     
-//    embot::hw::onewire::Config con;
-//    con.preamble = 0x55;
-//    con.usepreamble = true;
-//    con.rate = embot::hw::onewire::Rate::tenKbps;
-//    con.gpio.load(W_STRAIN1_GPIO_Port, W_STRAIN1_Pin);
-//    embot::hw::onewire::init(embot::hw::onewire::Channel::one, con);
-
     outframes.reserve(maxOUTcanframes);
     #warning --> we should init the objects which holds outframes with maxOUTcanframes ... so that no more than maxOUTcanframes are pushed_back
 }
     
-#if 0
-static std::int16_t mat1[3*3] = {0};
-static std::int16_t vec1[3*2] = {0};
-static std::int16_t vec2[3*2] = {0};
 
-embot::common::dsp::q15::matrix ma1;
-embot::common::dsp::q15::matrix ma2;
-embot::common::dsp::q15::matrix ma3;
-#endif
-
-#if defined(TEST_ADC)
-static embot::common::Time delta = 0;
-static std::uint16_t items[6] = {0};
-#endif // #if defined(TEST_ADC)
 
 static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask eventmask, void *p)
 {     
     if(0 == eventmask)
     {   // timeout ... 
-        
-//        embot::hw::onewire::write(embot::hw::onewire::Channel::one, 0x66, 0xabcd);
-
-#if defined(TEST_ADC)
-        
-        adcdmadone_clr(nullptr);
-        
-        embot::common::Time starttime = embot::sys::timeNow();
-        embot::common::Time endtime = starttime;
-        
-        embot::hw::adc::start(embot::hw::adc::Port::one);
-     
-        for(;;)
-        {
-            if(true == adcdmadone_isset())
-            {
-                endtime = embot::sys::timeNow();
-                break;
-            }
-        }
-        
-        delta = endtime - starttime;
-        delta = delta;
-        
-        if(delta > 666)
-        {
-            endtime ++; 
-            starttime ++;            
-        }
-        
-        
-        std::memset(items, 0xff, sizeof(items)); 
-        embot::hw::adc::get(embot::hw::adc::Port::one, items);
-        
-#endif  // #if defined(TEST_ADC)           
-
-#if 0        
-            ma1.load(3, 3, mat1);
-            ma1.diagonal(embot::common::dsp::q15::negOneHalf);
-            //ma1.fill(embot::common::dsp::q15::posOneHalf);
-        
-            ma2.load(3, 2, vec1);
-            ma2.fill(embot::common::dsp::q15::posOneHalf);
-            
-            ma3.load(3, 2, vec2);
-            ma3.clear();
-        
-            bool saturated =  false;
-            embot::common::dsp::q15::multiply(ma1, ma2, ma3, saturated);
-            saturated = saturated;
-        
-        double res = embot::common::dsp::q15::convert(ma3.get(0, 0));
-        res = res;
-        embot::common::dsp::Q15 v = 0;
-        v = embot::common::dsp::q15::convert(-0.500, saturated);
-        res = embot::common::dsp::q15::convert(v);
-        v = embot::common::dsp::q15::convert(-0.250, saturated);
-        res = embot::common::dsp::q15::convert(v);
-        v = embot::common::dsp::q15::convert(-0.125, saturated);
-        res = embot::common::dsp::q15::convert(v);       
-        v = embot::common::dsp::q15::posOneNearly;
-        res = embot::common::dsp::q15::convert(v);
-        res =  res;
-        
-        v = embot::common::dsp::q15::opposite(v);
-        res = embot::common::dsp::q15::convert(v);
-        res = res;
-        
-        v = embot::common::dsp::q15::negOne;
-        res = embot::common::dsp::q15::convert(v);
-        v = embot::common::dsp::q15::opposite(v);
-        res = embot::common::dsp::q15::convert(v); 
-        v = embot::common::dsp::q15::opposite(v);
-        res = embot::common::dsp::q15::convert(v);        
-        
-        res = embot::common::dsp::q15::convert(v);
-        v = v;
-#endif
+#if defined(TEST_ENABLED)        
+        tests_tick();  
+#endif // #if defined(TEST_ENABLED)        
         return;
     }
     
@@ -346,6 +233,260 @@ static void userdefonidle(void* param)
     cnt++;
 }
 
+
+// - all the tests are in here
+
+#if defined(TEST_ENABLED)
+
+#if defined(TEST_ADC)
+
+// test adc
+static std::uint16_t bufferSix[6] = {0};
+
+static volatile std::uint8_t adcdmadone = 0;
+
+static void adcdmadone_set(void *p)
+{
+     adcdmadone = 1;
+}
+
+static void adcdmadone_clr(void *p)
+{
+    adcdmadone = 0;
+}
+
+static bool adcdmadone_isset()
+{
+    if(0 == adcdmadone)
+    {
+        return false;
+    }
+    
+    return true;
+}
+
+static embot::common::Time delta = 0;
+static std::uint16_t items[6] = {0};
+
+#endif // #if defined(TEST_ADC)
+
+
+
+#if defined(TEST_TIM)
+
+embot::hw::timer::Timer timer2use = embot::hw::timer::Timer::six;
+static const std::uint32_t maxpulses = 10;
+static std::uint64_t tt0 = 0;
+static std::uint64_t del =0;
+static std::int64_t diff =0;
+void toggleled(void*)
+{
+    static std::uint32_t count = 0;
+    static std::uint8_t on = 0;
+    static std::uint32_t num = 0;
+    if(count == 5000)
+    {
+        
+        std::uint64_t tt1 = embot::sys::timeNow();
+        
+        del = tt1 - tt0;
+        del = del;
+        
+        diff = del - 500000;
+        
+        tt0 = tt1;
+        
+        if(0 == on)
+        {
+            embot::hw::led::off(embot::hw::led::LED::zero); 
+            on = 1;
+        }
+        else 
+        {
+            embot::hw::led::on(embot::hw::led::LED::zero);
+            on = 0;
+            num++;
+        }
+        //embot::hw::led::toggle(embot::hw::led::LED::zero);
+        count = 0;
+    }
+    count ++;
+    
+    if(num >= maxpulses)
+    {
+        static std::uint8_t x = 0;
+        num = 0;
+        embot::hw::timer::stop(timer2use);
+        embot::hw::timer::Config con;
+        con.onexpiry.callback = toggleled;
+        if(0 == x)
+        {
+            con.time = embot::common::time1microsec * 50;
+            embot::hw::timer::configure(timer2use, con);
+            x = 1;
+        }
+        else
+        {
+            con.time = embot::common::time1microsec * 100;
+            embot::hw::timer::configure(timer2use, con);
+            x = 0;
+        }
+        embot::hw::timer::start(timer2use);
+    }
+}
+
+void test_tim_init(void)
+{
+    embot::hw::led::init(embot::hw::led::LED::zero);
+    
+    embot::hw::led::on(embot::hw::led::LED::zero); 
+    embot::hw::led::off(embot::hw::led::LED::zero); 
+    
+    embot::hw::timer::Config con;
+    con.time = embot::common::time1microsec * 100;
+    con.onexpiry.callback = toggleled;
+    embot::hw::timer::init(timer2use, con);
+    embot::hw::timer::start(timer2use);
+}
+
+#endif // defined(TEST_TIM)
+
+
+#if defined(TEST_ONEWIRE)  
+
+    embot::hw::onewire::Config con;
+    con.preamble = 0x55;
+    con.usepreamble = true;
+    con.rate = embot::hw::onewire::Rate::tenKbps;
+    con.gpio.load(W_STRAIN1_GPIO_Port, W_STRAIN1_Pin);
+    embot::hw::onewire::init(embot::hw::onewire::Channel::one, con);
+
+#endif
+
+
+#if defined(TEST_DSP)
+static std::int16_t mat1[3*3] = {0};
+static std::int16_t vec1[3*2] = {0};
+static std::int16_t vec2[3*2] = {0};
+
+embot::common::dsp::q15::matrix ma1;
+embot::common::dsp::q15::matrix ma2;
+embot::common::dsp::q15::matrix ma3;
+#endif // #if defined(TEST_DSP)
+
+
+void tests_launcher_init()
+{
+#if defined(TEST_ADC)   
+    embot::hw::adc::Config adcConf;
+    adcConf.numberofitems = 6;
+    adcConf.destination = bufferSix;
+    adcConf.oncompletion.callback = adcdmadone_set;
+    embot::hw::adc::init(embot::hw::adc::Port::one, adcConf);
+#endif // #if defined(TEST_ADC)
+    
+    
+#if defined(TEST_TIM)    
+    test_tim_init();
+#endif
+
+    
+    
+    
+}
+
+
+
+void tests_tick() 
+{
+#if defined(TEST_ADC)
+        
+    adcdmadone_clr(nullptr);
+    
+    embot::common::Time starttime = embot::sys::timeNow();
+    embot::common::Time endtime = starttime;
+    
+    embot::hw::adc::start(embot::hw::adc::Port::one);
+ 
+    for(;;)
+    {
+        if(true == adcdmadone_isset())
+        {
+            endtime = embot::sys::timeNow();
+            break;
+        }
+    }
+    
+    delta = endtime - starttime;
+    delta = delta;
+    
+    if(delta > 666)
+    {
+        endtime ++; 
+        starttime ++;            
+    }
+    
+    
+    std::memset(items, 0xff, sizeof(items)); 
+    embot::hw::adc::get(embot::hw::adc::Port::one, items);
+        
+#endif  // #if defined(TEST_ADC)   
+
+
+#if defined(TEST_ONEWIRE) 
+    
+        embot::hw::onewire::write(embot::hw::onewire::Channel::one, 0x66, 0xabcd);
+    
+#endif // #if defined(TEST_ONEWIRE)  
+
+#if defined(TEST_DSP)
+        
+    ma1.load(3, 3, mat1);
+    ma1.diagonal(embot::common::dsp::q15::negOneHalf);
+    //ma1.fill(embot::common::dsp::q15::posOneHalf);
+
+    ma2.load(3, 2, vec1);
+    ma2.fill(embot::common::dsp::q15::posOneHalf);
+
+    ma3.load(3, 2, vec2);
+    ma3.clear();
+
+    bool saturated =  false;
+    embot::common::dsp::q15::multiply(ma1, ma2, ma3, saturated);
+    saturated = saturated;
+
+    double res = embot::common::dsp::q15::convert(ma3.get(0, 0));
+    res = res;
+    embot::common::dsp::Q15 v = 0;
+    v = embot::common::dsp::q15::convert(-0.500, saturated);
+    res = embot::common::dsp::q15::convert(v);
+    v = embot::common::dsp::q15::convert(-0.250, saturated);
+    res = embot::common::dsp::q15::convert(v);
+    v = embot::common::dsp::q15::convert(-0.125, saturated);
+    res = embot::common::dsp::q15::convert(v);       
+    v = embot::common::dsp::q15::posOneNearly;
+    res = embot::common::dsp::q15::convert(v);
+    res =  res;
+
+    v = embot::common::dsp::q15::opposite(v);
+    res = embot::common::dsp::q15::convert(v);
+    res = res;
+
+    v = embot::common::dsp::q15::negOne;
+    res = embot::common::dsp::q15::convert(v);
+    v = embot::common::dsp::q15::opposite(v);
+    res = embot::common::dsp::q15::convert(v); 
+    v = embot::common::dsp::q15::opposite(v);
+    res = embot::common::dsp::q15::convert(v);        
+
+    res = embot::common::dsp::q15::convert(v);
+    v = v;
+    
+#endif // #if defined(TEST_DSP)    
+    
+}
+
+#endif // #if defined(TEST_ENABLED)
 
 ///
 
