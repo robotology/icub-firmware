@@ -45,6 +45,39 @@ using namespace std;
 // - all the rest
 // --------------------------------------------------------------------------------------------------------------------
 
+namespace embot { namespace hw { namespace gpio {
+
+#if     !defined(HAL_GPIO_MODULE_ENABLED)
+
+    result_t configure(const GPIO &g, Mode m)      { return resNOK; }      
+    result_t set(const GPIO &g, State s)        { return resNOK; }
+    
+#else    
+   
+    result_t configure(const GPIO &g, Mode m)
+    {
+        if(m == Mode::OUTPUTopendrain)
+        {
+            LL_GPIO_SetPinMode(static_cast<GPIO_TypeDef *>(g.port), g.pin, LL_GPIO_MODE_OUTPUT);		
+            LL_GPIO_SetPinOutputType(static_cast<GPIO_TypeDef *>(g.port), g.pin, LL_GPIO_OUTPUT_OPENDRAIN);
+        }
+        else if(m == Mode::OUTPUTpushpull)
+        {
+            LL_GPIO_SetPinMode(static_cast<GPIO_TypeDef *>(g.port), g.pin, LL_GPIO_MODE_OUTPUT);		
+            LL_GPIO_SetPinOutputType(static_cast<GPIO_TypeDef *>(g.port), g.pin, LL_GPIO_OUTPUT_PUSHPULL);            
+        }
+        return resOK;
+    }  
+    
+    result_t set(const GPIO &g, State s)
+    {
+        HAL_GPIO_WritePin(static_cast<GPIO_TypeDef *>(g.port), g.pin, static_cast<GPIO_PinState>(s));    
+        return resOK;        
+    }
+    
+#endif
+       
+}}} // namespace embot { namespace hw { namespace gpio     
 
 
 namespace embot { namespace hw { namespace bsp {
@@ -85,10 +118,10 @@ namespace embot { namespace hw { namespace led {
 
     struct bspmap_t
     {
-        std::uint32_t       mask;
-        GPIO_PinState       on;
-        GPIO_PinState       off;
-        embot::hw::GPIO     gpio[static_cast<uint8_t>(LED::maxnumberof)];
+        std::uint32_t               mask;
+        GPIO_PinState               on;
+        GPIO_PinState               off;
+        embot::hw::gpio::GPIO       gpio[static_cast<uint8_t>(LED::maxnumberof)];
     };
     
     // const support maps
@@ -204,7 +237,7 @@ namespace embot { namespace hw { namespace led {
         {
             return resNOK;
         }  
-        const embot::hw::GPIO *gpio = &bspmap.gpio[led2index(led)];       
+        const embot::hw::gpio::GPIO *gpio = &bspmap.gpio[led2index(led)];       
         HAL_GPIO_WritePin(static_cast<GPIO_TypeDef*>(gpio->port), static_cast<uint16_t>(gpio->pin), bspmap.on);
         return resOK;        
     }
@@ -215,7 +248,7 @@ namespace embot { namespace hw { namespace led {
         {
             return resNOK;
         }  
-        const embot::hw::GPIO *gpio = &bspmap.gpio[led2index(led)];       
+        const embot::hw::gpio::GPIO *gpio = &bspmap.gpio[led2index(led)];       
         HAL_GPIO_WritePin(static_cast<GPIO_TypeDef*>(gpio->port), static_cast<uint16_t>(gpio->pin), bspmap.off);
         return resOK;          
     }
@@ -226,7 +259,7 @@ namespace embot { namespace hw { namespace led {
         {
             return resNOK;
         }  
-        const embot::hw::GPIO *gpio = &bspmap.gpio[led2index(led)];       
+        const embot::hw::gpio::GPIO *gpio = &bspmap.gpio[led2index(led)];       
         HAL_GPIO_TogglePin(static_cast<GPIO_TypeDef*>(gpio->port), static_cast<uint16_t>(gpio->pin));
         return resOK;          
     }
@@ -240,9 +273,9 @@ namespace embot { namespace hw { namespace button {
     
     struct bspmap_t
     {
-        std::uint32_t       mask;
-        GPIO_PinState       pressed;
-        embot::hw::GPIO     gpio[static_cast<uint8_t>(BTN::maxnumberof)];
+        std::uint32_t           mask;
+        GPIO_PinState           pressed;
+        embot::hw::gpio::GPIO   gpio[static_cast<uint8_t>(BTN::maxnumberof)];
     };
 
     // const support maps
@@ -354,7 +387,7 @@ namespace embot { namespace hw { namespace button {
         {
             return false;
         }  
-        const embot::hw::GPIO *gpio = &bspmap.gpio[btn2index(btn)];       
+        const embot::hw::gpio::GPIO *gpio = &bspmap.gpio[btn2index(btn)];       
         
         GPIO_PinState b1state = HAL_GPIO_ReadPin(static_cast<GPIO_TypeDef*>(gpio->port), static_cast<uint16_t>(gpio->pin));    
         return (bspmap.pressed == b1state) ? (true) : (false);         

@@ -44,7 +44,7 @@ namespace embot { namespace hw { namespace onewire {
     
     struct Config
     {
-        embot::hw::GPIO             gpio;               // the one which is to be modulated 
+        embot::hw::gpio::GPIO       gpio;               // the one which is to be modulated 
         Rate                        rate;               // the rate of the modulation
         bool                        usepreamble;        // if true we use it
         std::uint8_t                preamble;           // the preamble to be sent before reg and value.
