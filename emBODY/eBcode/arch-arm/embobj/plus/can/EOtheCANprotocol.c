@@ -639,7 +639,7 @@ const eOcanprot_functions_t s_eo_canprot_functions_periodicMotorControl[] =
     },
     {   // 009      ICUBCANPROTO_PER_MC_MSG__DEBUG
         EO_INIT(.former) NULL,
-        EO_INIT(.parser) NULL
+        EO_INIT(.parser) eocanprotMCperiodic_parser_PER_MC_MSG__DEBUG
     },
     {   // 010      ICUBCANPROTO_PER_MC_MSG__MOTOR_POSITION
         EO_INIT(.former) NULL,
