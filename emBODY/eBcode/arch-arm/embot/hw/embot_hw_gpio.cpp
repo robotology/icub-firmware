@@ -21,7 +21,7 @@
 // - public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "embot_hw.h"
+#include "embot_hw_gpio.h"
 #include "stm32hal.h"
 
 
@@ -44,9 +44,40 @@ using namespace std;
 // --------------------------------------------------------------------------------------------------------------------
 // - all the rest
 // --------------------------------------------------------------------------------------------------------------------
-  
 
+namespace embot { namespace hw { namespace gpio {
 
+#if     !defined(HAL_GPIO_MODULE_ENABLED)
+
+    result_t configure(const GPIO &g, Mode m)      { return resNOK; }      
+    result_t set(const GPIO &g, State s)        { return resNOK; }
+    
+#else    
+   
+    result_t configure(const GPIO &g, Mode m)
+    {
+        if(m == Mode::OUTPUTopendrain)
+        {
+            LL_GPIO_SetPinMode(static_cast<GPIO_TypeDef *>(g.port), g.pin, LL_GPIO_MODE_OUTPUT);		
+            LL_GPIO_SetPinOutputType(static_cast<GPIO_TypeDef *>(g.port), g.pin, LL_GPIO_OUTPUT_OPENDRAIN);
+        }
+        else if(m == Mode::OUTPUTpushpull)
+        {
+            LL_GPIO_SetPinMode(static_cast<GPIO_TypeDef *>(g.port), g.pin, LL_GPIO_MODE_OUTPUT);		
+            LL_GPIO_SetPinOutputType(static_cast<GPIO_TypeDef *>(g.port), g.pin, LL_GPIO_OUTPUT_PUSHPULL);            
+        }
+        return resOK;
+    }  
+    
+    result_t set(const GPIO &g, State s)
+    {
+        HAL_GPIO_WritePin(static_cast<GPIO_TypeDef *>(g.port), g.pin, static_cast<GPIO_PinState>(s));    
+        return resOK;        
+    }
+    
+#endif
+       
+}}} // namespace embot { namespace hw { namespace gpio     
 
 
 

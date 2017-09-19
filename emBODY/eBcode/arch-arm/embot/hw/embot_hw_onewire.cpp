@@ -74,6 +74,8 @@ using namespace std;
 // the implementation uses one timer, TIM6, which gives timing for writing over a one-wire interface
 // each channel uses a well defined gpio
 
+// we implement one wire communication using a interrrupt-driven bit-banging technique, where timing is done using a dedicated hw timer
+
 namespace embot { namespace hw { namespace onewire {
         
     struct bspmap_t
@@ -142,7 +144,7 @@ namespace embot { namespace hw { namespace onewire {
         PrivateData() { tickingTimerIsInitted = false; transaction_isrunning = false; activechannel = Channel::none; }
     };
     
-    static PrivateData s_privatedata;;
+    static PrivateData s_privatedata;
     
    
 
@@ -239,6 +241,10 @@ namespace embot { namespace hw { namespace onewire {
         }
 
         // prepare the buffer, start the tim. wait until we are done. impose a timeout of ... however
+        
+        #warning VERY IMPORTAT: revert bit order 
+        
+        reg = reg & 0x0f; // make sure only the least significant nibble is kept. + most-significant-bit must be 0 for write operations
         
         if(true == s_privatedata.config[channel2index(c)].usepreamble)
         {            

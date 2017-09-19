@@ -19,46 +19,36 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef _EMBOT_HW_FLASH_BURNER_H_
-#define _EMBOT_HW_FLASH_BURNER_H_
+#ifndef _EMBOT_HW_BSP_H_
+#define _EMBOT_HW_BSP_H_
 
 #include "embot_common.h"
-#include "embot_i2h.h"
 #include "embot_hw.h"
-#include "embot_hw_sys.h"
 
-namespace embot { namespace hw {
+
+namespace embot { namespace hw { namespace bsp {
     
-    class FlashBurner
+    struct Config
     {
-    public:
+        embot::common::fpGetU32     get1mstick; 
+        Config() : get1mstick(nullptr) {}
+        Config(embot::common::fpGetU32 _get1mstick) : get1mstick(_get1mstick) {}
+    }; 
+    
         
-        FlashBurner(std::uint32_t start = embot::hw::sys::addressOfApplication, std::uint32_t size = embot::hw::sys::maxsizeOfApplication, std::uint32_t buffersize = 2048, std::uint64_t *buffer = nullptr);
-        ~FlashBurner();
-     
-        // it adds inside a buffer the specified data. the object will write according to internal rules.
-        bool add(std::uint32_t address, std::uint32_t size, const void *data);
-        // it forces a write of the content of the buffer.
-        bool flush();
+    bool initialised();
+    
+    result_t init(const Config &config);
         
-        //bool erase();
-        
-        bool isAddressValid(std::uint32_t address);
       
+}}} // namespace embot { namespace hw { namespace bsp {
 
-    private:        
-        struct Impl;
-        Impl *pImpl;         
-    };
 
-}} // namespace embot { namespace hw {
 
 
 #endif  // include-guard
 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
-
-
 
 

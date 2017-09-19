@@ -21,7 +21,7 @@
 // - public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "embot_hw.h"
+#include "embot_hw_sys.h"
 #include "stm32hal.h"
 
 
@@ -134,9 +134,28 @@ dowaitloop
     
 #endif
     
-    std::uint32_t clock()
+    std::uint32_t clock(CLOCK clk)
     {
-        return SystemCoreClock;
+        std::uint32_t value = 0;
+        switch(clk)
+        {
+            case embot::hw::sys::CLOCK::pclk1:
+            {
+                value = HAL_RCC_GetPCLK1Freq();
+            } break;
+            
+            case embot::hw::sys::CLOCK::pclk2:
+            {
+                value = HAL_RCC_GetPCLK2Freq();
+            } break;
+            
+            default:
+            case embot::hw::sys::CLOCK::syscore:
+            {
+                value = HAL_RCC_GetHCLKFreq();
+            } break;            
+        }   
+        return value;
     }
     
     void reset()

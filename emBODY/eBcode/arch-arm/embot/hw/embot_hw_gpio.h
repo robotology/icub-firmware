@@ -19,21 +19,37 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef _EMBOT_HW_H_
-#define _EMBOT_HW_H_
+#ifndef _EMBOT_HW_GPIO_H_
+#define _EMBOT_HW_GPIO_H_
 
 #include "embot_common.h"
+#include "embot_hw.h"
 
 
-namespace embot { namespace hw {
-    
-    using result_t = std::int8_t;
-    
-    const result_t resOK   = 0;
-    const result_t resNOK  = -1;
-    
-}} // namespace embot { namespace hw {
 
+namespace embot { namespace hw { namespace gpio {
+    
+    struct GPIO
+    {   // generic gpio descriptor: every micro has a port and a pin. 
+        void*           port;
+        std::uint32_t   pin;
+        
+        void load(void *po, std::uint32_t pi) { port = po; pin = pi; } 
+        GPIO(void *po, std::uint32_t pi) { load(po, pi); }
+        GPIO() { load(nullptr, 0); }
+        bool isvalid() const { if((nullptr == port) || (0 == pin)) { return false; } return true; }       
+    };
+    
+    
+    enum class State { RESET = 0, SET = 1 };
+    
+    enum class Mode { OUTPUTopendrain = 0, OUTPUTpushpull = 1 };
+    
+    result_t configure(const GPIO &g, Mode m);
+    
+    result_t set(const GPIO &g, State s);
+       
+}}} // namespace embot { namespace hw { namespace gpio 
 
 
 

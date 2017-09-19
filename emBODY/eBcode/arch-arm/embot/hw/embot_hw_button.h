@@ -19,20 +19,27 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef _EMBOT_HW_H_
-#define _EMBOT_HW_H_
+#ifndef _EMBOT_HW_BUTTON_H_
+#define _EMBOT_HW_BUTTON_H_
 
 #include "embot_common.h"
+#include "embot_hw.h"
 
 
-namespace embot { namespace hw {
+
+namespace embot { namespace hw { namespace button {
     
-    using result_t = std::int8_t;
+    enum class BTN { zero = 0, one = 1, two = 2, three = 3, four = 4, five = 5, six = 6, seven = 7, none = 32, maxnumberof = 8 };
+
+    bool supported(BTN btn);
     
-    const result_t resOK   = 0;
-    const result_t resNOK  = -1;
-    
-}} // namespace embot { namespace hw {
+    bool initialised(BTN btn);
+        
+    result_t init(BTN btn);
+        
+    bool pressed(BTN btn);
+       
+}}} // namespace embot { namespace hw { namespace button 
 
 
 

@@ -24,7 +24,7 @@
 
 #include "embot_common.h"
 #include "embot_hw.h"
-
+#include "embot_hw_gpio.h"
 
 namespace embot { namespace hw { namespace onewire {
  

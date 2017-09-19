@@ -29,6 +29,9 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
+
+#include "embot_hw_sys.h"
+
 #include <cstring>
 #include <vector>
 
@@ -159,49 +162,31 @@ namespace embot { namespace hw { namespace timer {
         
     struct stm32_tim_mapping
     {
-        embot::hw::CLOCK    clock;        
-        TIM_TypeDef*        TIMx;
-        TIM_HandleTypeDef*  phandletimx;
-        bool                isonepulse;
-        bool                mastermode;
+        embot::hw::sys::CLOCK   clock;        
+        TIM_TypeDef*            TIMx;
+        TIM_HandleTypeDef*      phandletimx;
+        bool                    isonepulse;
+        bool                    mastermode;
     };
 
 #if     defined(STM32HAL_BOARD_STRAIN2)    
     static const stm32_tim_mapping s_stm32_tim_mapping[numberofsupported] = 
     { 
-        { embot::hw::CLOCK::sys, TIM6, &htim6, false, true }, 
-        { embot::hw::CLOCK::sys, TIM7, &htim7, false, true },
-        { embot::hw::CLOCK::sys, TIM15, &htim15, true, false },
-        { embot::hw::CLOCK::sys, TIM16, &htim16, false, false }        
+        { embot::hw::sys::CLOCK::syscore, TIM6,  &htim6,  false, true }, 
+        { embot::hw::sys::CLOCK::syscore, TIM7,  &htim7,  false, true },
+        { embot::hw::sys::CLOCK::syscore, TIM15, &htim15, true,  false },
+        { embot::hw::sys::CLOCK::syscore, TIM16, &htim16, false, false }        
     };   
 #else
-    static const stm32_tim_mapping s_stm32_tim_mapping[1] = { {embot::hw::CLOCK::none, nullptr, nullptr } };
+    static const stm32_tim_mapping s_stm32_tim_mapping[1] = { {embot::hw::sys::CLOCK::none, nullptr, nullptr } };
 #endif 
     
     // retrieves the values to be put inside the stm32 register
     void compute(Timer t, const stm32_tim_mapping *stm32data, const embot::common::relTime time, stm32_tim_registervalues &pars, embot::common::relTime &effectivetime)
-    {
-        uint32_t referencespeed = HAL_RCC_GetSysClockFreq(); 
-        
-        // actually for some timers it could also be HAL_RCC_GetPCLK1Freq() or HAL_RCC_GetPCLK2Freq()
-        switch(stm32data->clock)
-        {
-            case embot::hw::CLOCK::pclk1:
-            {
-                referencespeed = HAL_RCC_GetPCLK1Freq();
-            } break;
-            
-            case embot::hw::CLOCK::pclk2:
-            {
-                referencespeed = HAL_RCC_GetPCLK2Freq();
-            } break;
-            
-            default:
-            case embot::hw::CLOCK::sys:
-            {
-                referencespeed = HAL_RCC_GetSysClockFreq();
-            } break;            
-        }   
+    {        
+        // for some timers referencespeed could also be HAL_RCC_GetSysClockFreq() or HAL_RCC_GetPCLK1Freq() or HAL_RCC_GetPCLK2Freq()
+        // i embed teh choice into that into embot::hw::sys::clock()
+        uint32_t referencespeed = embot::hw::sys::clock(stm32data->clock);
         
         effectivetime = time;
 

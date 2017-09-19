@@ -21,7 +21,7 @@
 // - public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "embot_hw.h"
+#include "embot_hw_bsp.h"
 #include "stm32hal.h"
 
 
@@ -46,6 +46,36 @@ using namespace std;
 // --------------------------------------------------------------------------------------------------------------------
   
 
+namespace embot { namespace hw { namespace bsp {
+    
+    static bool initted = false; 
+
+    bool initialised()
+    {
+        return initted;
+    }
+
+    result_t init(const Config &config)
+    {
+        if(true == embot::hw::bsp::initialised())
+        {
+            return resOK;
+        }
+        
+        // put whatwever is required for ...
+        
+        stm32hal_config_t cfg;
+        cfg.tick1ms_get = config.get1mstick;
+        cfg.initbsp = true;
+        
+        stm32hal_init(&cfg);
+        
+        initted = true;
+        return resOK;
+    }
+    
+
+}}} // namespace embot { namespace hw { namespace bsp {
 
 
 

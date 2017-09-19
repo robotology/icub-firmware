@@ -19,46 +19,34 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef _EMBOT_HW_FLASH_BURNER_H_
-#define _EMBOT_HW_FLASH_BURNER_H_
+#ifndef _EMBOT_HW_FLASH_H_
+#define _EMBOT_HW_FLASH_H_
 
 #include "embot_common.h"
-#include "embot_i2h.h"
-#include "embot_hw.h"
-#include "embot_hw_sys.h"
 
-namespace embot { namespace hw {
-    
-    class FlashBurner
-    {
-    public:
-        
-        FlashBurner(std::uint32_t start = embot::hw::sys::addressOfApplication, std::uint32_t size = embot::hw::sys::maxsizeOfApplication, std::uint32_t buffersize = 2048, std::uint64_t *buffer = nullptr);
-        ~FlashBurner();
-     
-        // it adds inside a buffer the specified data. the object will write according to internal rules.
-        bool add(std::uint32_t address, std::uint32_t size, const void *data);
-        // it forces a write of the content of the buffer.
-        bool flush();
-        
-        //bool erase();
-        
-        bool isAddressValid(std::uint32_t address);
+
+namespace embot { namespace hw { namespace flash {
       
+    extern const std::uint32_t startOfFLASH;
+    extern const std::uint32_t sizeOfFLASH;
+    extern const std::uint32_t sizeOfPAGE;
+    extern const std::uint32_t maxNumOfPAGEs;
+    
+    bool isaddressvalid(std::uint32_t address);    
+    std::uint32_t address2page(std::uint32_t address); // returns [0, maxNumOfPAGEs). if address not valid, it returns maxNumOfPAGEs.
+    
+    bool erase(std::uint32_t page);
+    bool erase(std::uint32_t address, std::uint32_t size);
+    bool read(std::uint32_t address, std::uint32_t size, void *data);
+    bool write(std::uint32_t address, std::uint32_t size, const void *data);
+    
+}}} // namespace embot { namespace hw { namespace flash {
 
-    private:        
-        struct Impl;
-        Impl *pImpl;         
-    };
-
-}} // namespace embot { namespace hw {
 
 
 #endif  // include-guard
 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
-
-
 
 
