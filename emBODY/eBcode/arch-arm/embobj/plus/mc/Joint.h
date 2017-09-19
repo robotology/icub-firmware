@@ -48,7 +48,7 @@ typedef struct
 {
     int32_t motor_pos_min;
     int32_t motor_pos_max;
-    CTRL_UNITS last_joint_pos;
+    //CTRL_UNITS last_joint_pos;
     int32_t max_tension;
 } CableConstraintData;
 
@@ -170,6 +170,7 @@ typedef struct // Joint
     BOOL trq_control_active;
     BOOL CAN_DO_TRQ_CTRL;
     
+    BOOL not_reversible;
     CableConstraintData cable_constr;
     CableCalib          cable_calib;  
     

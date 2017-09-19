@@ -117,6 +117,8 @@ void Joint_init(Joint* o)
     
     o->eo_joint_ptr = NULL;
     
+    o->not_reversible = FALSE;
+    
     Joint_reset_calibration_data(o);
 }
 
@@ -410,15 +412,9 @@ void Joint_set_hardware_limit(Joint* o)
 
 BOOL Joint_manage_cable_constraint(Joint* o)
 {    
-    BOOL opening_intention = (o->pos_err < ZERO);
+    //BOOL opening_intention = (o->pos_err < ZERO);
     
-    //BOOL opening_action = (o->pos_fbk < o->cable_constr.last_joint_pos);
-    
-    o->cable_constr.last_joint_pos = o->pos_fbk;
-    
-    //if (opening_intention && !opening_action) return TRUE;
-    
-    if (opening_intention)
+    if (o->pos_err < ZERO)
     {
         if (o->pos_fbk_from_motors < o->cable_constr.motor_pos_min) return TRUE;
     }
@@ -538,27 +534,30 @@ CTRL_UNITS Joint_do_pwm_control(Joint* o)
                     if (o->pos_err > o->dead_zone)
                     {
                         o->pos_err -= o->dead_zone;
+                        
+                        o->output = PID_do_out(&o->posPID, o->pos_err);
                     }
                     else if (o->pos_err < -o->dead_zone)
                     {
                         o->pos_err += o->dead_zone;
+                        
+                        o->output = PID_do_out(&o->posPID, o->pos_err);
                     }
                     else
                     {
                         o->pos_err = ZERO;
-                    }
                         
-                    o->output = PID_do_out(&o->posPID, o->pos_err);
-                    
-                    /*
-                    pid should be reset with zero error and non reversible joints
-                    else
-                    {
-                        PID_reset(&o->posPID);
+                        if (o->not_reversible)
+                        {
+                            PID_reset(&o->posPID);
                         
-                        o->output = 0;
+                            o->output = 0;
+                        }
+                        else
+                        {
+                            o->output = PID_do_out(&o->posPID, o->pos_err);
+                        }
                     }
-                    */
                 }
             }
             else

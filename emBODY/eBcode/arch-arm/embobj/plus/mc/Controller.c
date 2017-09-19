@@ -408,6 +408,7 @@ static void update_jointAndMotor_withJointset_constraints(void)
             {
                 int j = o->jos[s][i];
                 o->joint[j].dead_zone = 400.0f;
+                o->joint[j].not_reversible = TRUE;
             }
         }
     }
@@ -1528,23 +1529,13 @@ void MController_update_absEncoder_fbk(uint8_t e, uint32_t* positions) //
     
     for (int k=0; k<smc->multi_encs; ++k)
     {
-        AbsEncoder_update(enc++, (uint16_t)positions[k]);
+        AbsEncoder_update(enc + k, (uint16_t)positions[k]);
     }
     
 #ifdef R1_HAND
     
-    MController_update_joint_torque_fbk(e, AbsEncoder_position(smc->absEncoder+(e*smc->multi_encs+2)));
+    MController_update_joint_torque_fbk(e, AbsEncoder_position(enc + 2));
     
-    /*
-    static int repeat[2] = {0,500};
-    
-    if (++repeat[e]>=1000)
-    {
-        repeat[e] = 0;
-        
-        send_debug_message("Torque", e, smc->joint[e].trq_fbk, 0);
-    }
-    */
 #endif
 }
 

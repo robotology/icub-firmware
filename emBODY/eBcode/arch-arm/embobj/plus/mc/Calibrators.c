@@ -595,7 +595,7 @@ BOOL JointSet_do_wait_calibration_11(JointSet* o)
         {
             if (o->calibration_wait)
             {
-                if (pj->pos_fbk_from_motors > -2*pj->cable_calib.delta)
+                if ((pj->trq_fbk > pj->cable_constr.max_tension/16) || (pj->pos_fbk_from_motors > -2*pj->cable_calib.delta))
                 {
                     Motor_set_pwm_ref(pm, -pj->cable_calib.pwm);
                 }
@@ -608,13 +608,7 @@ BOOL JointSet_do_wait_calibration_11(JointSet* o)
                 
                 calibrated = FALSE;
             }
-            else if (pj->pos_fbk < pj->cable_calib.target)
-            {
-                Motor_set_pwm_ref(pm, pj->cable_calib.pwm);
-            
-                calibrated = FALSE;
-            }
-            else
+            else if ((pj->trq_fbk > pj->cable_constr.max_tension/4) || (pj->pos_fbk >= pj->cable_calib.target))
             {
                 Motor_set_pwm_ref(pm, 0);
             
@@ -624,8 +618,12 @@ BOOL JointSet_do_wait_calibration_11(JointSet* o)
                 
                 pj->cable_constr.motor_pos_min = pj->pos_fbk_from_motors -       L *pj->cable_calib.cable_range;
                 pj->cable_constr.motor_pos_max = pj->pos_fbk_from_motors + (1.0f-L)*pj->cable_calib.cable_range;
-                
-                pj->cable_constr.last_joint_pos = pj->pos_fbk;
+            }
+            else
+            {
+                Motor_set_pwm_ref(pm, pj->cable_calib.pwm);
+            
+                calibrated = FALSE;
             }
         }
         else

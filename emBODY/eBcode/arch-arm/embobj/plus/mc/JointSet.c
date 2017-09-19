@@ -139,8 +139,8 @@ void JointSet_do_odometry(JointSet* o) //
             {
                 m = o->motors_of_set[ms];
         
-                o->joint[j].pos_fbk_from_motors += Sjm[j][m] * o->motor[m].pos_fbk;
-                o->joint[j].vel_fbk_from_motors += Sjm[j][m] * o->motor[m].vel_fbk;
+                o->joint[j].pos_fbk_from_motors += Sjm[j][m] * (float)o->motor[m].pos_fbk;
+                o->joint[j].vel_fbk_from_motors += Sjm[j][m] * (float)o->motor[m].vel_fbk;
             }
         }
     }
@@ -150,8 +150,8 @@ void JointSet_do_odometry(JointSet* o) //
         {
             j = o->joints_of_set[js];
             
-            o->joint[j].pos_fbk_from_motors = o->motor[j].pos_fbk;
-            o->joint[j].vel_fbk_from_motors = o->motor[j].vel_fbk;
+            o->joint[j].pos_fbk_from_motors = (float)o->motor[j].pos_fbk;
+            o->joint[j].vel_fbk_from_motors = (float)o->motor[j].vel_fbk;
         }
     }
     
