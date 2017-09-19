@@ -51,7 +51,9 @@
 
 #include "stm32hal.h" 
 #include "embot_hw.h"
-     
+#include "embot_hw_bsp.h"
+#include "embot_hw_led.h"
+#include "embot_hw_sys.h"    
 
 #if     defined(APPSLIM_STM32HAL_TICK_SYSTICK)
     

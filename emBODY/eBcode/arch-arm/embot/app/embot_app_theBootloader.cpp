@@ -32,6 +32,8 @@
 #include "embot_sys_theJumper.h"
 #include "embot_sys_Timer.h"
 #include "embot_hw.h"
+#include "embot_hw_sys.h"
+#include "embot_hw_bsp.h"
 #include "embot.h"
 #include "osal.h"
 
@@ -141,7 +143,7 @@ void embot::app::theBootloader::execute(Config &config)
     cfg.onidle = embot::app::theBootloader::Impl::onidle;
     cfg.onidlestacksize = 512;
     cfg.onfatalerror = embot::app::theBootloader::Impl::onfatal;
-    cfg.clockfrequency = embot::hw::sys::clock();
+    cfg.clockfrequency = embot::hw::sys::clock(embot::hw::sys::CLOCK::syscore);
     
     thesystem.init(cfg);
     thesystem.start();    

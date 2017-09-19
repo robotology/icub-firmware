@@ -6,8 +6,12 @@
 
 #include "embot.h"
 
-#include "stm32hal.h" // to see bsp_led_init etc
+#include "stm32hal.h" 
 #include "embot_hw.h"
+#include "embot_hw_bsp.h"
+#include "embot_hw_sys.h"
+#include "embot_hw_led.h"
+#include "embot_hw_can.h"
 
 #include "embot_hw_FlashStorage.h"
 #include "embot_sys_theStorage.h"

@@ -805,16 +805,6 @@
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\i2h\embot_i2h.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_hw.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_FlashStorage.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_FlashStorage.cpp</FilePath>
-            </File>
-            <File>
               <FileName>embot_sys.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\embot_sys.cpp</FilePath>
@@ -853,26 +843,6 @@
               <FileName>embot_sys_Timer.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\embot_sys_Timer.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_FlashBurner.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_FlashBurner.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_can.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_can.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_sys.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_sys.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_flash.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_flash.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_app_canprotocol.cpp</FileName>
@@ -954,6 +924,51 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_application_theIMU.cpp</FilePath>
             </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>embot-hw</GroupName>
+          <Files>
+            <File>
+              <FileName>embot_hw.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_sys.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_sys.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_bsp.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_bsp.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_FlashStorage.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_FlashStorage.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_FlashBurner.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_FlashBurner.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_can.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_can.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_flash.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_flash.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_pga308.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_pga308.cpp</FilePath>
+            </File>
             <File>
               <FileName>embot_hw_adc.cpp</FileName>
               <FileType>8</FileType>
@@ -969,10 +984,25 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_timer.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_gpio.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_gpio.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_led.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_led.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_button.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_button.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>others</GroupName>
+          <GroupName>other-hw</GroupName>
           <GroupOption>
             <CommonProperty>
               <UseCPPCompiler>0</UseCPPCompiler>
@@ -1936,16 +1966,6 @@
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\i2h\embot_i2h.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_hw.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_FlashStorage.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_FlashStorage.cpp</FilePath>
-            </File>
-            <File>
               <FileName>embot_sys.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\embot_sys.cpp</FilePath>
@@ -1984,26 +2004,6 @@
               <FileName>embot_sys_Timer.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\embot_sys_Timer.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_FlashBurner.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_FlashBurner.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_can.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_can.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_sys.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_sys.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_flash.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_flash.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_app_canprotocol.cpp</FileName>
@@ -2085,6 +2085,51 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_application_theIMU.cpp</FilePath>
             </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>embot-hw</GroupName>
+          <Files>
+            <File>
+              <FileName>embot_hw.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_sys.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_sys.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_bsp.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_bsp.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_FlashStorage.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_FlashStorage.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_FlashBurner.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_FlashBurner.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_can.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_can.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_flash.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_flash.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_pga308.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_pga308.cpp</FilePath>
+            </File>
             <File>
               <FileName>embot_hw_adc.cpp</FileName>
               <FileType>8</FileType>
@@ -2100,10 +2145,25 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_timer.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_gpio.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_gpio.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_led.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_led.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_button.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_button.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
-          <GroupName>others</GroupName>
+          <GroupName>other-hw</GroupName>
           <GroupOption>
             <CommonProperty>
               <UseCPPCompiler>0</UseCPPCompiler>

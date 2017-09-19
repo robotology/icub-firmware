@@ -24,6 +24,7 @@
 #include "embot_sys_theJumper.h"
 
 #include "embot_hw.h"
+#include "embot_hw_sys.h"
 
 #include <new>
 

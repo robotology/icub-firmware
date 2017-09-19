@@ -37,6 +37,7 @@
 #include "embot_sys_Timer.h"
 
 #include "embot_hw.h"
+#include "embot_hw_sys.h"
 #include "embot_app_canprotocol.h"
 #include "embot_app_canprotocol_bootloader.h"
 #include "embot_app_canprotocol_motor_periodic.h"

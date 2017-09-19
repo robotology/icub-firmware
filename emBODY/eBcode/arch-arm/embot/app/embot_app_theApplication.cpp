@@ -31,6 +31,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "embot_hw.h"
+#include "embot_hw_sys.h"
+#include "embot_hw_bsp.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -97,7 +99,7 @@ void embot::app::theApplication::execute(Config &config)
     cfg.onidle = embot::app::theApplication::Impl::onidle;
     cfg.onidlestacksize = pImpl->config.stacksizes.taskonidle;
     cfg.onfatalerror = embot::app::theApplication::Impl::onfatal;
-    cfg.clockfrequency = embot::hw::sys::clock();
+    cfg.clockfrequency = embot::hw::sys::clock(embot::hw::sys::CLOCK::syscore);
     cfg.ticktime = config.osaltickperiod;
     
     thescheduler.init(cfg);

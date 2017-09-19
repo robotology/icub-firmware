@@ -24,7 +24,7 @@
 
 #include "embot_common.h"
 
-#include "embot_hw.h"
+#include "embot_hw_can.h"
 
 
 

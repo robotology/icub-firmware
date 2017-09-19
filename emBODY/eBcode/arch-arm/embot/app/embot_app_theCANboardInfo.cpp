@@ -36,6 +36,7 @@
 #include "embot_hw_FlashStorage.h"
 #include "embot_sys_theStorage.h"
 #include "embot_hw.h"
+#include "embot_hw_sys.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++

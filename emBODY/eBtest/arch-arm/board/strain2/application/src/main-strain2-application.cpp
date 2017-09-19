@@ -19,6 +19,7 @@ void tests_tick();
 
 #include "stm32hal.h" // to see bsp_led_init etc
 #include "embot_hw.h"
+#include "embot_hw_sys.h"
 
 #include "embot_hw_FlashStorage.h"
 #include "embot_sys_theStorage.h"
