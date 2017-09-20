@@ -232,7 +232,7 @@ bool embot::app::theCANboardInfo::userdataread(std::uint32_t address, std::uint3
 bool embot::app::theCANboardInfo::userdataerase()
 {
     return false;
-    #warning TOBEDONE: implement selected parts of a flash page or ... chose a different page for user-def storage ....
+    //#warning TOBEDONE: implement selected parts of a flash page or ... chose a different page for user-def storage ....
     //pImpl->flashstorage->erase(pImpl->userdataaddress, sizeOfUserSpace);    
 }
 

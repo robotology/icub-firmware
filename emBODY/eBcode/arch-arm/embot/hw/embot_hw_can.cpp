@@ -162,6 +162,8 @@ namespace embot { namespace hw { namespace can {
     static CanTxMsgTypeDef        TxMessage;
     static CanRxMsgTypeDef        RxMessage;
     
+#if 0 
+// not used anymore: removed to avoid compiler warnings
     static void s_transmit_noirq(CAN_HandleTypeDef *hcan)
     {
         std::uint32_t size = s_Qtx->size();
@@ -192,7 +194,8 @@ namespace embot { namespace hw { namespace can {
                     
         return; // resOK;
     }    
-
+#endif
+    
     static void s_transmit(CAN_HandleTypeDef *hcan)
     {
         if(0 == s_Qtx->size())
