@@ -55,6 +55,8 @@ namespace embot { namespace hw { namespace sys {
     std::uint32_t minrandom();
     std::uint32_t maxrandom();
     
+    int puts(const char* str);
+    
 }}} // namespace embot { namespace hw { namespace sys {
 
 

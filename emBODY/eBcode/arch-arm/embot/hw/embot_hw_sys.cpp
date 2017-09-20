@@ -227,6 +227,29 @@ dowaitloop
         return maxRANDmask;
     }
     
+    int puts(const char* str) 
+    {    
+ 
+        if(nullptr == str)
+        {
+            return(0);
+        }
+
+    
+        std::uint32_t ch;
+        int num = 0;
+        while('\0' != (ch = *str))
+        {
+            ITM_SendChar(ch);
+            str++;
+            num++;
+        }
+         
+        ITM_SendChar('\n');
+        return(++num);    
+    }
+
+    
 
 }}} // namespace embot { namespace hw { namespace sys { 
 
