@@ -135,7 +135,7 @@ static void start_evt_based(void)
     r = embot::hw::can::init(embot::hw::can::Port::one, canconfig);
     r = embot::hw::can::setfilters(embot::hw::can::Port::one, embot::app::theCANboardInfo::getInstance().getCANaddress());
     r = r;
-
+    
 #if defined(TEST_ENABLED)
     tests_launcher_init();
 #endif // #if defined(TEST_ENABLED)    
@@ -159,7 +159,7 @@ static void eventbasedtask_init(embot::sys::Task *t, void *p)
     r = r;     
     
     outframes.reserve(maxOUTcanframes);
-    #warning --> we should init the objects which holds outframes with maxOUTcanframes ... so that no more than maxOUTcanframes are pushed_back
+    //#warning --> we should init the objects which holds outframes with maxOUTcanframes ... so that no more than maxOUTcanframes are pushed_back
 }
     
 
@@ -353,16 +353,6 @@ void test_tim_init(void)
 #endif // defined(TEST_TIM)
 
 
-#if defined(TEST_ONEWIRE)  
-
-    embot::hw::onewire::Config con;
-    con.preamble = 0x55;
-    con.usepreamble = true;
-    con.rate = embot::hw::onewire::Rate::tenKbps;
-    con.gpio.load(W_STRAIN1_GPIO_Port, W_STRAIN1_Pin);
-    embot::hw::onewire::init(embot::hw::onewire::Channel::one, con);
-
-#endif
 
 
 #if defined(TEST_DSP)
@@ -392,7 +382,16 @@ void tests_launcher_init()
 #endif
 
     
-    
+#if defined(TEST_ONEWIRE)  
+
+    embot::hw::onewire::Config con;
+    con.preamble = 0x55;
+    con.usepreamble = true;
+    con.rate = embot::hw::onewire::Rate::tenKbps;
+    con.gpio.load(W_STRAIN1_GPIO_Port, W_STRAIN1_Pin);
+    embot::hw::onewire::init(embot::hw::onewire::Channel::one, con);
+
+#endif    
     
 }
 
@@ -436,7 +435,7 @@ void tests_tick()
 
 #if defined(TEST_ONEWIRE) 
     
-        embot::hw::onewire::write(embot::hw::onewire::Channel::one, 0x66, 0xabcd);
+        embot::hw::onewire::write(embot::hw::onewire::Channel::one, 0x07, 0x1248);
     
 #endif // #if defined(TEST_ONEWIRE)  
 
