@@ -147,8 +147,8 @@ namespace embot { namespace hw { namespace onewire {
     static PrivateData s_privatedata;
     
    
-
-
+    // used just for test...
+    // static std::uint8_t testbuffer[40] = {0};
    
     void callbackOnTick(void *arg)
     {
@@ -162,6 +162,7 @@ namespace embot { namespace hw { namespace onewire {
             // set s_privatedata.bitindex
             bool high = embot::common::bit::check(s_privatedata.bits64, s_privatedata.bitindex);
             embot::hw::gpio::set(s_privatedata.activegpio, (true == high) ? (embot::hw::gpio::State::SET) : (embot::hw::gpio::State::RESET));
+            //testbuffer[s_privatedata.bitindex] = high;
             s_privatedata.bitindex++;
         }
         else if(s_privatedata.bitindex >= s_privatedata.bitsnumber)
@@ -231,7 +232,44 @@ namespace embot { namespace hw { namespace onewire {
         return s_privatedata.transaction_isrunning;
     }
  
+
+/*  
+    from datasheet of texas instruments PGA308, Figure 4-2. One-Wire Protocol Timing Diagram
+    Write to PGA308 Register Timing
+
+
+bit pos 0   1   2   3   4   5   6   7   8   9   10  11  12  13  14  15  16  17  18  19
+            ---     ---     ---     ---     ===     --- --- --- ---                 ===
+        STA| 1 | 0 | 1 | 0 | 1 | 0 | 1 | 0 |STO|STA|P00|P01|P02|P03| 0 | 0 | 0 | 0 |STO
+        ===     ---     ---     ---     ---     === --- --- --- --- --- --- --- --- 
     
+            initialization byte (55h)               register write command for RAM             
+
+               
+bit pos 20  21  22  23  24  25  26  27  28  29  30  31  32  33  34  35  36  37  38  39    
+            --- --- --- --- --- --- --- --- ===     --- --- --- --- --- --- --- --- ===
+        STA|D00|D01|D02|D03|D04|D05|D06|D07|STO|STA|D08|D09|D10|D11|D12|D13|D14|D15|STO
+        === --- --- --- --- --- --- --- ---     === --- --- --- --- --- --- --- --- 
+
+
+            register data (8 LSBs)                  register data (8 MSBs)               
+    
+    constant part:
+    STA(0) are in positions:    00, 10, 20, 30
+    STO(1) are in positions:    09, 19, 29, 39
+    0x55 is in positions:       [01-08]
+    so far, ordered with bitpos 0 at right (as in memory):
+    (1000 0000 0010 0000 0000 1000 0000 0010 1010 1010)b = 0x80200802aa
+    
+    variable part:
+    reg is in positions:        [11-18] but its first nibble is actually in [11-14] 
+    [D00-D07] are in positions: [21-28]
+    [D08-D15]                   [31-38]
+    
+
+ */    
+ 
+    #define USEBITS64PRECOMPUTED
 
     result_t write(Channel c, std::uint8_t reg, std::uint16_t value, embot::common::relTime timeout)
     {
@@ -241,29 +279,50 @@ namespace embot { namespace hw { namespace onewire {
         }
 
         // prepare the buffer, start the tim. wait until we are done. impose a timeout of ... however
-        
-        #warning VERY IMPORTAT: revert bit order 
-        
-        reg = reg & 0x0f; // make sure only the least significant nibble is kept. + most-significant-bit must be 0 for write operations
-        
+                        
         if(true == s_privatedata.config[channel2index(c)].usepreamble)
-        {            
+        {  
+
+            std::uint64_t msk64 = 0; 
+            
+#if defined(USEBITS64PRECOMPUTED) 
+            // it has stop bits in positions 9, 19, 29, 39 and 0x55 in positions [1-8] 
+            s_privatedata.bits64 = 0x80200802aa;    
+#else  
+            i dont use this code anymore
+            // i set all bits to zero.            
             s_privatedata.bits64 = 0;
-            // set bits 9, 19, 29, 39
+            
+            // clr start bits: 0, 10, 20, 30
+            // dont do that: they already have zero value
+            
+            // set stop bits: 9, 19, 29, 39
             embot::common::bit::set(s_privatedata.bits64, 9);
             embot::common::bit::set(s_privatedata.bits64, 19);
             embot::common::bit::set(s_privatedata.bits64, 29);
             embot::common::bit::set(s_privatedata.bits64, 39);
-            // set the four masks: 0x55 << 1, etc.
-            std::uint64_t msk64 = 0;
+            
+            // assign 0x55 to bits [1-8]            
             msk64 = static_cast<std::uint64_t>(0x55) << 1;
             embot::common::msk::set(s_privatedata.bits64, msk64);
+            
+            // so far we have 0x80200802aa (confirmed with the debugger)
+#endif
+
+            // assign reg & 0x0f to bits [11-18] 
             msk64 = static_cast<std::uint64_t>(reg & 0x0f) << 11;
             embot::common::msk::set(s_privatedata.bits64, msk64);
+            
+            // assign value & 0xff to bits [21-28]
             msk64 = static_cast<std::uint64_t>(value & 0xff) << 21;
             embot::common::msk::set(s_privatedata.bits64, msk64);
+            
+            // assign (value >> 8) & 0xff to bits [31-38]
             msk64 = static_cast<std::uint64_t>((value >> 8) & 0xff) << 31;
-            embot::common::msk::set(s_privatedata.bits64, msk64);
+            embot::common::msk::set(s_privatedata.bits64, msk64);            
+
+            
+
             s_privatedata.bitindex = 0;
             s_privatedata.bitsnumber = 40;    
 
