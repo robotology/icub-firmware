@@ -56,23 +56,40 @@ namespace embot { namespace hw { namespace gpio {
    
     result_t configure(const GPIO &g, Mode m)
     {
+        // caveat: HAL_GPIO_* use u16, and all macros are u16, whereas LL_GPIO_* use u32 
         if(m == Mode::OUTPUTopendrain)
         {
-            LL_GPIO_SetPinMode(static_cast<GPIO_TypeDef *>(g.port), g.pin, LL_GPIO_MODE_OUTPUT);		
-            LL_GPIO_SetPinOutputType(static_cast<GPIO_TypeDef *>(g.port), g.pin, LL_GPIO_OUTPUT_OPENDRAIN);
+            LL_GPIO_SetPinMode(static_cast<GPIO_TypeDef *>(g.port), static_cast<std::uint32_t>(g.pin), LL_GPIO_MODE_OUTPUT);		
+            LL_GPIO_SetPinOutputType(static_cast<GPIO_TypeDef *>(g.port), static_cast<std::uint32_t>(g.pin), LL_GPIO_OUTPUT_OPENDRAIN);
         }
         else if(m == Mode::OUTPUTpushpull)
         {
-            LL_GPIO_SetPinMode(static_cast<GPIO_TypeDef *>(g.port), g.pin, LL_GPIO_MODE_OUTPUT);		
-            LL_GPIO_SetPinOutputType(static_cast<GPIO_TypeDef *>(g.port), g.pin, LL_GPIO_OUTPUT_PUSHPULL);            
+            LL_GPIO_SetPinMode(static_cast<GPIO_TypeDef *>(g.port), static_cast<std::uint32_t>(g.pin), LL_GPIO_MODE_OUTPUT);		
+            LL_GPIO_SetPinOutputType(static_cast<GPIO_TypeDef *>(g.port), static_cast<std::uint32_t>(g.pin), LL_GPIO_OUTPUT_PUSHPULL);            
         }
         return resOK;
     }  
     
     result_t set(const GPIO &g, State s)
     {
+        if(false == g.isvalid())
+        {
+            return resNOK;
+        }
         HAL_GPIO_WritePin(static_cast<GPIO_TypeDef *>(g.port), g.pin, static_cast<GPIO_PinState>(s));    
         return resOK;        
+    }
+    
+    State get(const GPIO &g)
+    {
+        if(false == g.isvalid())
+        {
+            return State::RESET;
+        }
+
+        GPIO_PinState s = HAL_GPIO_ReadPin(static_cast<GPIO_TypeDef *>(g.port), g.pin);    
+        
+        return static_cast<State>(s);        
     }
     
 #endif

@@ -32,7 +32,7 @@ namespace embot { namespace hw { namespace gpio {
     struct GPIO
     {   // generic gpio descriptor: every micro has a port and a pin. 
         void*           port;
-        std::uint32_t   pin;
+        std::uint16_t   pin;
         
         void load(void *po, std::uint32_t pi) { port = po; pin = pi; } 
         GPIO(void *po, std::uint32_t pi) { load(po, pi); }
@@ -48,6 +48,8 @@ namespace embot { namespace hw { namespace gpio {
     result_t configure(const GPIO &g, Mode m);
     
     result_t set(const GPIO &g, State s);
+    
+    State get(const GPIO &g);
        
 }}} // namespace embot { namespace hw { namespace gpio 
 

@@ -29,7 +29,7 @@
 
 namespace embot { namespace hw { namespace button {
     
-    enum class BTN { zero = 0, one = 1, two = 2, three = 3, four = 4, five = 5, six = 6, seven = 7, none = 32, maxnumberof = 8 };
+    enum class BTN { one = 0, two = 1, three = 2, four = 3, five = 4, six = 5, seven = 6, eight = 7, none = 32, maxnumberof = 8 };
 
     bool supported(BTN btn);
     

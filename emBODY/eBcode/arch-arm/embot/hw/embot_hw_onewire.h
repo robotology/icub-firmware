@@ -38,7 +38,7 @@ namespace embot { namespace hw { namespace onewire {
     // but we should use six timers (dont tell me that one hw timer is enough if every channel use the same rate!), make write() read()
     // methods not bloking but with a callback at end of transaction, etc....    
     
-    enum class Channel { zero = 0, one = 1, two = 2, three = 3, four = 4, five = 5, none = 32, all = 33, maxnumberof = 6};    
+    enum class Channel { one = 0, two = 1, three = 2, four = 3, five = 4, six = 5, none = 32, all = 33, maxnumberof = 6};    
     
     enum class Rate { tenKbps = 10, twentyKbps = 20, fortyKbps = 40, fiftyKbps = 50, onehundredKbps = 100 };
     

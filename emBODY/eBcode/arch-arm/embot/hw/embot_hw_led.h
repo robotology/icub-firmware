@@ -38,7 +38,7 @@ namespace embot { namespace hw { namespace led {
     // 4. expose a result_t returning init() function
     // 5. design the needed functions. they shall return embot::hw::result_t (0 is ok, negative is bad).
     
-    enum class LED { zero = 0, one = 1, two = 2, three = 3, four = 4, five = 5, six = 6, seven = 7, none = 32, maxnumberof = 8 };
+    enum class LED { one = 0, two = 1, three = 2, four = 3, five = 4, six = 5, seven = 6, eight = 7, none = 32, maxnumberof = 8 };
 
     bool supported(LED led);
     
