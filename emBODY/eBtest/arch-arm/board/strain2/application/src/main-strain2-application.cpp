@@ -1,9 +1,10 @@
 
 #undef TEST_ENABLED
 
-#undef TEST_ADC
-#undef TEST_TIM
-#undef TEST_ONEWIRE
+#undef TEST_HW_PGA308
+#undef TEST_HW_ADC
+#undef TEST_HW_TIM
+#undef TEST_HW_ONEWIRE
 #undef TEST_DSP
 
 #if defined(TEST_ENABLED)
@@ -36,6 +37,8 @@ void tests_tick();
 
 #include "embot_hw_onewire.h"
 #include "embot_hw_timer.h"
+#include "embot_hw_pga308.h"
+#include "embot_hw_adc.h"
 
 
 static const embot::app::canprotocol::versionOfAPPLICATION vAP = {1, 0 , 3};
@@ -239,7 +242,7 @@ static void userdefonidle(void* param)
 
 #if defined(TEST_ENABLED)
 
-#if defined(TEST_ADC)
+#if defined(TEST_HW_ADC)
 
 // test adc
 static std::uint16_t bufferSix[6] = {0};
@@ -269,11 +272,11 @@ static bool adcdmadone_isset()
 static embot::common::Time delta = 0;
 static std::uint16_t items[6] = {0};
 
-#endif // #if defined(TEST_ADC)
+#endif // #if defined(TEST_HW_ADC)
 
 
 
-#if defined(TEST_TIM)
+#if defined(TEST_HW_TIM)
 
 embot::hw::timer::Timer timer2use = embot::hw::timer::Timer::six;
 static const std::uint32_t maxpulses = 10;
@@ -350,7 +353,7 @@ void test_tim_init(void)
     embot::hw::timer::start(timer2use);
 }
 
-#endif // defined(TEST_TIM)
+#endif // defined(TEST_HW_TIM)
 
 
 
@@ -368,21 +371,68 @@ embot::common::dsp::q15::matrix ma3;
 
 void tests_launcher_init()
 {
-#if defined(TEST_ADC)   
+    
+#if defined(TEST_HW_PGA308)
+    
+    embot::hw::PGA308::Config pga308cfg;
+        
+    // common settings
+    pga308cfg.powerongpio = embot::hw::gpio::GPIO(EN_2V8_GPIO_Port, EN_2V8_Pin);
+    pga308cfg.poweronstate = embot::hw::gpio::State::SET;
+    pga308cfg.onewireconfig.rate = embot::hw::onewire::Rate::tenKbps;
+    pga308cfg.onewireconfig.usepreamble =  true;
+    pga308cfg.onewireconfig.preamble = 0x55;
+    
+    // from embot::hw::PGA308::one to embot::hw::PGA308::six
+    
+    // embot::hw::PGA308::zero
+    pga308cfg.onewirechannel = embot::hw::onewire::Channel::one;
+    pga308cfg.onewireconfig.gpio = embot::hw::gpio::GPIO(W_STRAIN1_GPIO_Port, W_STRAIN1_Pin);
+    embot::hw::PGA308::init(embot::hw::PGA308::Amplifier::one, pga308cfg);
+    
+    // embot::hw::PGA308::two
+    pga308cfg.onewirechannel = embot::hw::onewire::Channel::two;
+    pga308cfg.onewireconfig.gpio = embot::hw::gpio::GPIO(W_STRAIN2_GPIO_Port, W_STRAIN2_Pin);
+    embot::hw::PGA308::init(embot::hw::PGA308::Amplifier::two, pga308cfg);
+    
+    // embot::hw::PGA308::three
+    pga308cfg.onewirechannel = embot::hw::onewire::Channel::three;
+    pga308cfg.onewireconfig.gpio = embot::hw::gpio::GPIO(W_STRAIN3_GPIO_Port, W_STRAIN3_Pin);
+    embot::hw::PGA308::init(embot::hw::PGA308::Amplifier::three, pga308cfg);
+        
+    // embot::hw::PGA308::four
+    pga308cfg.onewirechannel = embot::hw::onewire::Channel::four;
+    pga308cfg.onewireconfig.gpio = embot::hw::gpio::GPIO(W_STRAIN4_GPIO_Port, W_STRAIN4_Pin);
+    embot::hw::PGA308::init(embot::hw::PGA308::Amplifier::four, pga308cfg);    
+    
+    // embot::hw::PGA308::five
+    pga308cfg.onewirechannel = embot::hw::onewire::Channel::five;
+    pga308cfg.onewireconfig.gpio = embot::hw::gpio::GPIO(W_STRAIN5_GPIO_Port, W_STRAIN5_Pin);
+    embot::hw::PGA308::init(embot::hw::PGA308::Amplifier::five, pga308cfg);     
+
+    // embot::hw::PGA308::six
+    pga308cfg.onewirechannel = embot::hw::onewire::Channel::six;
+    pga308cfg.onewireconfig.gpio = embot::hw::gpio::GPIO(W_STRAIN6_GPIO_Port, W_STRAIN6_Pin);
+    embot::hw::PGA308::init(embot::hw::PGA308::Amplifier::six, pga308cfg);   
+    
+#endif    
+    
+    
+#if defined(TEST_HW_ADC)   
     embot::hw::adc::Config adcConf;
     adcConf.numberofitems = 6;
     adcConf.destination = bufferSix;
     adcConf.oncompletion.callback = adcdmadone_set;
     embot::hw::adc::init(embot::hw::adc::Port::one, adcConf);
-#endif // #if defined(TEST_ADC)
+#endif // #if defined(TEST_HW_ADC)
     
     
-#if defined(TEST_TIM)    
+#if defined(TEST_HW_TIM)    
     test_tim_init();
 #endif
 
     
-#if defined(TEST_ONEWIRE)  
+#if defined(TEST_HW_ONEWIRE)  
 
     embot::hw::onewire::Config con;
     con.preamble = 0x55;
@@ -399,7 +449,7 @@ void tests_launcher_init()
 
 void tests_tick() 
 {
-#if defined(TEST_ADC)
+#if defined(TEST_HW_ADC)
         
     adcdmadone_clr(nullptr);
     
@@ -430,14 +480,14 @@ void tests_tick()
     std::memset(items, 0xff, sizeof(items)); 
     embot::hw::adc::get(embot::hw::adc::Port::one, items);
         
-#endif  // #if defined(TEST_ADC)   
+#endif  // #if defined(TEST_HW_ADC)   
 
 
-#if defined(TEST_ONEWIRE) 
+#if defined(TEST_HW_ONEWIRE) 
     
         embot::hw::onewire::write(embot::hw::onewire::Channel::one, 0x07, 0x1248);
     
-#endif // #if defined(TEST_ONEWIRE)  
+#endif // #if defined(TEST_HW_ONEWIRE)  
 
 #if defined(TEST_DSP)
         
