@@ -112,8 +112,8 @@ int main(void)
     // BLUE     []_[]_[]_[]_[]________________[]_[]_[]_[]_[]________________[]_[]_[]_[]_[]________________[]_[]_[]_[]_[]________________[]_[]_[]_[]_[]_
 
     
-    embot::hw::led::init(embot::hw::led::LED::zero);
     embot::hw::led::init(embot::hw::led::LED::one);
+    embot::hw::led::init(embot::hw::led::LED::two);
     
     static bool led1ON = true;
     static uint32_t mask32 = 0x01;    
@@ -122,16 +122,16 @@ int main(void)
     
     led1ON = embot::common::bit::check(mask32, 0);  
     
-    embot::hw::led::on(embot::hw::led::LED::zero);  
+    embot::hw::led::on(embot::hw::led::LED::one);  
 
-    embot::hw::led::on(embot::hw::led::LED::one);
+    embot::hw::led::on(embot::hw::led::LED::two);
     
     for(;;)
     {
 
         embot::hw::sys::delay(500*1000);  
 
-        embot::hw::led::toggle(embot::hw::led::LED::zero);
+        embot::hw::led::toggle(embot::hw::led::LED::one);
         
         if(PERIOD == ++count)
         {
@@ -143,11 +143,11 @@ int main(void)
                 
         if(true == led1ON)
         {                                        
-            embot::hw::led::toggle(embot::hw::led::LED::one);
+            embot::hw::led::toggle(embot::hw::led::LED::two);
         } 
         else
         {
-            embot::hw::led::off(embot::hw::led::LED::one);
+            embot::hw::led::off(embot::hw::led::LED::two);
         }    
                     
     }
