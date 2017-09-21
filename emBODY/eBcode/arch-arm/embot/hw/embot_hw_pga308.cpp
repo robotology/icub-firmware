@@ -131,20 +131,14 @@ namespace embot { namespace hw { namespace PGA308 {
     };
 
     struct PrivateData
-    {
-
-        std::uint32_t none;
-    
-        Config config[static_cast<unsigned int>(Amplifier::maxnumberof)];
-        
-        TransferFunctionConfig  transfunctconfig[static_cast<unsigned int>(Amplifier::maxnumberof)];
-        
-        Registers registers[static_cast<unsigned int>(Amplifier::maxnumberof)];
-        
-        PrivateData() { none = 0;}
+    {    
+        Config config[static_cast<unsigned int>(Amplifier::maxnumberof)];        
+        TransferFunctionConfig  transfunctconfig[static_cast<unsigned int>(Amplifier::maxnumberof)];        
+        Registers registers[static_cast<unsigned int>(Amplifier::maxnumberof)];        
+        PrivateData() { }
     };
     
-    static PrivateData s_privatedata;;
+    static PrivateData s_privatedata;
     
 
     result_t setdefault(Amplifier a)
@@ -177,7 +171,7 @@ namespace embot { namespace hw { namespace PGA308 {
         set(a, RegisterAddress::CFG2, s_privatedata.registers[index].CFG2.value);
             
             
-        // i shoudl read and verify but until reading is not supported i dont verify
+        // i should read and verify but until reading is not supported i dont verify
         return resOK;
     }        
    
@@ -201,16 +195,28 @@ namespace embot { namespace hw { namespace PGA308 {
             return resNOK;
         }
         
+        if(false == config.powerongpio.isvalid())
+        {
+            return resNOK;
+        }
+        
+        // power on: dont do it if another amplifier has alredy done it.
+        if(config.poweronstate != embot::hw::gpio::get(config.powerongpio))
+        {
+            embot::hw::gpio::set(config.powerongpio, config.poweronstate); 
+        }
+        
+        
         // init onewire ..
         embot::hw::onewire::init(config.onewirechannel, config.onewireconfig);
+        
+        // must set it to initialsied in order to use setdefault
+        embot::common::bit::set(initialisedmask, amplifier2index(a));
         
         
         // load the default settings of pga308. i use the         
         setdefault(a);
         
-        
-        embot::common::bit::set(initialisedmask, amplifier2index(a));
-
         return resOK;
     }
     

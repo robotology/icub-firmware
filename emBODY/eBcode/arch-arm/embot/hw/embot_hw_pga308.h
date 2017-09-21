@@ -25,20 +25,21 @@
 #include "embot_common.h"
 #include "embot_hw.h"
 #include "embot_hw_onewire.h"
-
+#include "embot_hw_gpio.h"
 
 namespace embot { namespace hw { namespace PGA308 {
      
     
-    enum class Amplifier { zero = 0, one = 1, two = 2, three = 3, four = 4, five = 5, none = 32, all = 33, maxnumberof = 6};
+    enum class Amplifier { one = 0, two = 1, three = 2, four = 3, five = 4, six = 5, none = 32, all = 33, maxnumberof = 6};
     
     
     struct Config
     {   // each amplifier uses a separate channel of onewire communication
+        embot::hw::gpio::GPIO           powerongpio; 
+        embot::hw::gpio::State          poweronstate; 
         embot::hw::onewire::Channel     onewirechannel;
-        embot::hw::onewire::Config      onewireconfig;
-        
-        Config() : onewirechannel(embot::hw::onewire::Channel::zero) {}
+        embot::hw::onewire::Config      onewireconfig;          
+        Config() : powerongpio(nullptr, 0), poweronstate(embot::hw::gpio::State::SET), onewirechannel(embot::hw::onewire::Channel::one) {}
     };
     
     
@@ -284,6 +285,9 @@ namespace embot { namespace hw { namespace PGA308 {
     
     // inits onewire, set default value of registers 
     result_t init(Amplifier a, const Config &config);
+    
+    // sets default again
+    result_t setdefault(Amplifier a);
 
     // loads a transfer function (maybe obtained over can bus from the canloader)   
     result_t set(Amplifier a, const TransferFunctionConfig &tfconfig);
