@@ -268,6 +268,11 @@ namespace embot { namespace hw { namespace adc {
             return resNOK;
         }
         
+        if(true == s_adc_isrunning)
+        {
+            stop(p);
+        }
+        
         s_adc_isrunning = true;
         HAL_ADC_Start_DMA(&hadc1, (uint32_t*)s_config.destination, s_config.numberofitems);
         
@@ -281,8 +286,12 @@ namespace embot { namespace hw { namespace adc {
         {
             return resNOK;
         } 
-
-        HAL_ADC_Stop_DMA(&hadc1);  
+        
+        if(true == s_adc_isrunning)
+        {
+            HAL_ADC_Stop_DMA(&hadc1);  
+            s_adc_isrunning = false;  
+        }
 
         s_adc_isrunning = false;        
 
