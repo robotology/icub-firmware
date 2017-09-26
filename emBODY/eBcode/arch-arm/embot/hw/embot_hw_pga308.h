@@ -27,6 +27,8 @@
 #include "embot_hw_onewire.h"
 #include "embot_hw_gpio.h"
 
+#include "embot_app_canprotocol_analog_polling.h"
+
 namespace embot { namespace hw { namespace PGA308 {
      
     
@@ -227,6 +229,16 @@ namespace embot { namespace hw { namespace PGA308 {
         // o = (Vcoarseoffset*GI + Vzerodac)*GD*GO
         
         TransferFunctionConfig() : GD(0), GI(0), muxsign(0), GO(0), Vcoarseoffset(0), Vzerodac(0) {}
+            
+        void load(const embot::app::canprotocol::analog::polling::PGA308cfg1 &protcfg)
+        {
+            GD = protcfg.GD;
+            GI = protcfg.GI;
+            muxsign = protcfg.S;
+            GO = protcfg.GO;
+            Vcoarseoffset = protcfg.Voffsetcoarse;
+            Vzerodac = protcfg.Vzerodac;        
+        }
         
         void setDefault() 
         {
