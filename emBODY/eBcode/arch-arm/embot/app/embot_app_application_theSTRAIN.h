@@ -50,8 +50,9 @@ namespace embot { namespace app { namespace application {
         struct Config
         {
             embot::common::Event    tickevent;
+            embot::common::Event    datareadyevent;
             embot::sys::Task*       totask;
-            Config() : tickevent(0), totask(nullptr) {}
+            Config() : tickevent(0), datareadyevent(0), totask(nullptr) {}
         }; 
         
         
@@ -86,6 +87,7 @@ namespace embot { namespace app { namespace application {
         bool start(embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode &mode);
         bool stop();        
         bool tick(std::vector<embot::hw::can::Frame> &replies);
+        bool processdata(std::vector<embot::hw::can::Frame> &replies);
 
     private:
         theSTRAIN(); 

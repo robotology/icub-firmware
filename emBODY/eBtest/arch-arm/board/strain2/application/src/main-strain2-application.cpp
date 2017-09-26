@@ -88,7 +88,9 @@ static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask
 static void eventbasedtask_init(embot::sys::Task *t, void *p);
 
 static const embot::common::Event evRXcanframe = 0x00000001;
-static const embot::common::Event evSTRAINprocess = 0x00000002;
+static const embot::common::Event evSTRAINtick = 0x00000002;
+static const embot::common::Event evSTRAINdataready = 0x00000004;
+
 
 static const std::uint8_t maxOUTcanframes = 48;
 
@@ -125,7 +127,8 @@ static void start_evt_based(void)
     // start application for strain2
     embot::app::application::theSTRAIN &thestrain = embot::app::application::theSTRAIN::getInstance();
     embot::app::application::theSTRAIN::Config configstrain;
-    configstrain.tickevent = evSTRAINprocess;
+    configstrain.tickevent = evSTRAINtick;
+    configstrain.datareadyevent = evSTRAINdataready;
     configstrain.totask = eventbasedtask;
     thestrain.initialise(configstrain); 
 
@@ -208,10 +211,14 @@ static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask
         }        
     }
     
+    if(true == embot::common::msk::check(eventmask, evSTRAINdataready))
+    {        
+        embot::app::application::theSTRAIN &thestrain = embot::app::application::theSTRAIN::getInstance();
+        thestrain.processdata(outframes);        
+    }
     
-    if(true == embot::common::msk::check(eventmask, evSTRAINprocess))
-    {
-        
+    if(true == embot::common::msk::check(eventmask, evSTRAINtick))
+    {        
         embot::app::application::theSTRAIN &thestrain = embot::app::application::theSTRAIN::getInstance();
         thestrain.tick(outframes);        
     }

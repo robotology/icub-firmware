@@ -73,13 +73,14 @@ struct embot::app::application::theSTRAIN::Impl
     { 
         embot::app::canprotocol::analog::polling::PGA308cfg1    pga308cfg1;   
         
+        #warning -> must retrieve the default values from embot::hw::PGA308. maybe add a proper converter
         void factoryreset() {
-            pga308cfg1.GD = 1;
-            pga308cfg1.GI = 1;
-            pga308cfg1.GO = 1;
-            pga308cfg1.S = 1;
-            pga308cfg1.Voffsetcoarse = 1;
-            pga308cfg1.Vzerodac = 1;
+            pga308cfg1.GD = 0x4000;
+            pga308cfg1.GI = 4;
+            pga308cfg1.GO = 6;
+            pga308cfg1.S = 0;
+            pga308cfg1.Voffsetcoarse = 0;
+            pga308cfg1.Vzerodac = 0;
         }
         
         amplifierConfig_t() { factoryreset(); }
@@ -476,6 +477,7 @@ struct embot::app::application::theSTRAIN::Impl
     {
         embot::common::Time         txperiod;
         
+        std::uint16_t               dmabuffer[6]; 
         std::uint16_t               adcvalue[6];        // the values as acquired by the adc... but scaled to full 64k range. original strain had 16-bit adc   
         
         embot::common::dsp::Q15     q15value[6];        // same as adcvalue but in q15 format       
@@ -499,6 +501,7 @@ struct embot::app::application::theSTRAIN::Impl
         void clear() { 
             std::memset(q15value, 0, sizeof(q15value)); 
             std::memset(tare, 0, sizeof(tare)); 
+            std::memset(dmabuffer, 0, sizeof(dmabuffer));
             std::memset(adcvalue, 0, sizeof(adcvalue));
             std::memset(torqueforce, 0, sizeof(torqueforce));
             force.reset();
@@ -609,6 +612,8 @@ struct embot::app::application::theSTRAIN::Impl
     Config config;
            
     bool ticking;
+    embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode txmode;
+    volatile bool adcdataisready;
     
     
     embot::sys::Timer *ticktimer;
@@ -628,6 +633,7 @@ struct embot::app::application::theSTRAIN::Impl
 //        defaultAmplifConfig.factoryreset();        
         
         ticking = false;  
+        txmode = embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode::acquireOnly; // even better is to use none
 
         ticktimer = new embot::sys::Timer;   
 
@@ -635,7 +641,9 @@ struct embot::app::application::theSTRAIN::Impl
         configdata.clear();
         runtimedata.clear();
         
-        runtimedata.data.txperiod = 50*embot::common::time1millisec;            
+        runtimedata.data.txperiod = 50*embot::common::time1millisec;       
+
+        adcdataisready = false;        
     }
     
    
@@ -643,10 +651,15 @@ struct embot::app::application::theSTRAIN::Impl
     bool stop();
     
     bool tick(std::vector<embot::hw::can::Frame> &replies);
+    bool processdata(std::vector<embot::hw::can::Frame> &replies);
     
     bool configure();
     
-    bool acquisition();
+    bool acquisition_start();
+    bool acquisition_waituntilcompletion(embot::common::relTime timeout);
+    bool acquisition_retrieve();
+    
+    bool acquisition_oneshot(embot::common::relTime timeout = embot::common::time1millisec, bool restartifitwasticking = true);
     
     bool processing();
     
@@ -654,6 +667,19 @@ struct embot::app::application::theSTRAIN::Impl
     bool fill(embot::app::canprotocol::analog::periodic::Message_UNCALIBTORQUE_VECTOR_DEBUGMODE::Info &info);
     bool fill(embot::app::canprotocol::analog::periodic::Message_FORCE_VECTOR::Info &info);
     bool fill(embot::app::canprotocol::analog::periodic::Message_TORQUE_VECTOR::Info &info);
+    
+    
+    static void alertdataisready(void *p)
+    {
+        embot::app::application::theSTRAIN::Impl *mypImpl = reinterpret_cast<embot::app::application::theSTRAIN::Impl*>(p);
+        
+        if(true == mypImpl->ticking)
+        {
+            mypImpl->config.totask->setEvent(mypImpl->config.datareadyevent);
+        }
+        
+        mypImpl->adcdataisready = true;                            
+    }
                       
 };
 
@@ -664,13 +690,15 @@ bool embot::app::application::theSTRAIN::Impl::start(embot::app::canprotocol::an
     if(true == ticking)
     {
         ticktimer->stop();
-        ticking =  false;
+        ticking = false;
     }
     
     runtimedata.data.TXcalibData = false;
     runtimedata.data.TXuncalibData = false;
+        
+    txmode = mode;
     
-    switch(mode)
+    switch(txmode)
     {
         case embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode::txCalibrated:
         {
@@ -818,28 +846,85 @@ bool embot::app::application::theSTRAIN::Impl::fill(embot::app::canprotocol::ana
     return ret;    
 }
 
-
-bool embot::app::application::theSTRAIN::Impl::acquisition()
+bool embot::app::application::theSTRAIN::Impl::acquisition_start()
 {
-    #warning TODO: perform hw acquisition of all adc values and computation of ft values. 
+    std::memset(runtimedata.data.dmabuffer, 0xff, sizeof(runtimedata.data.dmabuffer));    
+    adcdataisready = false;
+    embot::hw::adc::start(embot::hw::adc::Port::one);    
+    return true;
+}
+
+bool embot::app::application::theSTRAIN::Impl::acquisition_waituntilcompletion(embot::common::relTime timeout)
+{
+    embot::common::Time now = embot::sys::timeNow();
+    embot::common::Time endtime = now + timeout;
     
+//    embot::common::Time start = now;
+//    static embot::common::Time delta = 0;
+     // delta is 429 usec
+
     
-    // 1. acquire from adc and put inside adcvalue
+    bool ret = true;
     
-    runtimedata.data.adcvalue[0]++;
-    runtimedata.data.adcvalue[1]++;
-    runtimedata.data.adcvalue[2]++;
-    runtimedata.data.adcvalue[3]++;
-    runtimedata.data.adcvalue[4]++;
-    runtimedata.data.adcvalue[5]++;
+    for(;;)
+    {
+        if(true == adcdataisready)
+        {
+            break;
+        }
+       now = embot::sys::timeNow();
+       if(now > endtime)
+       {
+           ret = false;
+           break;
+       }                   
+    }
     
+//    delta = now - start;
     
-    // 2 convert adcvalue[] into q15value[]. also checck vs saturation
+    return ret;
+}
+
+
+bool embot::app::application::theSTRAIN::Impl::acquisition_oneshot(embot::common::relTime timeout, bool restartifitwasticking)
+{    
+    bool itwasticking = ticking;    
+    
+    if(true == itwasticking)
+    {
+        stop();
+    }           
+    // we perform a new acquisition in blocking mode
+    acquisition_start();    
+    acquisition_waituntilcompletion(timeout);      
+    acquisition_retrieve();    
+    
+    if((true == itwasticking) && (true == restartifitwasticking))
+    {
+        start(txmode);     
+    }
+    
+    return true;    
+}
+
+
+
+
+bool embot::app::application::theSTRAIN::Impl::acquisition_retrieve()
+{
+
+    // 1. acquire from adc and put inside adcvalue    
+    std::memmove(runtimedata.data.adcvalue, runtimedata.data.dmabuffer, sizeof(runtimedata.data.adcvalue));
+       
+    
+    // 2. convert adcvalue[] into q15value[]
     for(int i=0; i<6; i++)
     {
+        runtimedata.data.adcvalue[i] <<= 4; // adc value is 12 bits. we need to scale it to 64k
         runtimedata.data.q15value[i] = embot::common::dsp::q15::U16toQ15(runtimedata.data.adcvalue[i]);
     }
     
+    // 3. also check vs saturation
     runtimedata.check_adcsaturation();
     
     return true;
@@ -896,15 +981,15 @@ bool embot::app::application::theSTRAIN::Impl::processing()
 }
 
 
-bool embot::app::application::theSTRAIN::Impl::tick(std::vector<embot::hw::can::Frame> &replies)
+bool embot::app::application::theSTRAIN::Impl::processdata(std::vector<embot::hw::can::Frame> &replies)
 {   
     if(false == ticking)
     {
         return false;
     }
         
-    // adc acquisition
-    acquisition();
+    // retreve acquired adc values
+    acquisition_retrieve();
     
     // processing of acquired data
     processing();
@@ -958,6 +1043,20 @@ bool embot::app::application::theSTRAIN::Impl::tick(std::vector<embot::hw::can::
     
    
        
+    return true;        
+    
+}
+
+bool embot::app::application::theSTRAIN::Impl::tick(std::vector<embot::hw::can::Frame> &replies)
+{   
+    if(false == ticking)
+    {
+        return false;
+    }
+        
+    // start adc acquisition
+    acquisition_start();
+             
     return true;    
 }
 
@@ -974,6 +1073,22 @@ embot::app::application::theSTRAIN::theSTRAIN()
 
 }
 
+//static void dmaiscomplete(void *p)
+//{
+//    // copy data by mildly getting a mutex
+//    // alert the task ...
+//    
+//    static std::uint32_t ii = 0;
+//    ii++;
+//    
+//    embot::app::application::theSTRAIN::Impl *pImpl = reinterpret_cast<embot::app::application::theSTRAIN::Impl*>(p);
+//    
+//    //embot::sys::Action::EventToTask(pImpl->config.tickevent, pImpl->config.totask
+//    
+//    pImpl->config.totask->setEvent(pImpl->config.datareadyevent);
+//    
+//    //embot::hw::adc::get(embot::hw::adc::Port::one, items);
+//}
          
 bool embot::app::application::theSTRAIN::initialise(Config &config)
 {
@@ -1029,21 +1144,35 @@ bool embot::app::application::theSTRAIN::initialise(Config &config)
     pga308cfg.onewirechannel = embot::hw::onewire::Channel::six;
     pga308cfg.onewireconfig.gpio = embot::hw::gpio::GPIO(W_STRAIN6_GPIO_Port, W_STRAIN6_Pin);
     embot::hw::PGA308::init(embot::hw::PGA308::Amplifier::six, pga308cfg);   
+    
+    
+    // now i must apply the values on eeprom pImpl->configdata.EEPROM_read
+    // #warning TODO: apply eeprom values to PGA308 ... all channels.
+    embot::hw::PGA308::TransferFunctionConfig tfc;    
+    for(int i=0; i<6; i++)
+    {
+        embot::app::canprotocol::analog::polling::PGA308cfg1 pga308cfg1;
+        pImpl->configdata.amplifiers_get(0, i, pga308cfg1); 
+        tfc.load(pga308cfg1);    
+        embot::hw::PGA308::set(static_cast<embot::hw::PGA308::Amplifier>(i), tfc);                
+    }
         
     
     // ADC
-    #warning TODO: decide how to acquire ....
+//    #warning TODO: decide how to acquire ....
     // some thougths ... the adc takes many micro-sconds (> 200)
     // 1.   periodic. tick() is called at tx period. it just triggers the start of adc.
     //      the adc callback sends a acquired event to this object.
     //      this object gets the data generated by the adc (hei, protect with a mutex: object waits, the isr does not wait and 
     //      if busy it does not write.) by calling a new funtion called processdata() whcih does what tick() does now.
     //      .... 
-//    embot::hw::adc::Config adcConf;
-//    adcConf.numberofitems = 6;
-//    adcConf.destination = bufferSix;
-//    adcConf.oncompletion.callback = adcdmadone_set;
-//    embot::hw::adc::init(embot::hw::adc::Port::one, adcConf);
+    embot::hw::adc::Config adcConf;
+    adcConf.numberofitems = 6;
+    adcConf.destination = pImpl->runtimedata.data.dmabuffer;
+    adcConf.oncompletion.callback = pImpl->alertdataisready;
+    adcConf.oncompletion.arg = pImpl;
+    embot::hw::adc::init(embot::hw::adc::Port::one, adcConf);
+    pImpl->adcdataisready = false;
      
     return true;
 }
@@ -1103,15 +1232,14 @@ bool embot::app::application::theSTRAIN::get_adc(embot::app::canprotocol::analog
         return false;
     }
     
-    // we perform an acquisition ...    
-    pImpl->acquisition();
-    
+    // it acquire once. it also restarts if required.
+    pImpl->acquisition_oneshot();
         
     std::uint16_t v = 0;
     
     if(true == replyinfo.valueiscalibrated)
     {
-        // we call processing() because the calibration is not done inside acquisition() 
+        // we call processing() because the calibration is not done inside acquisition_retrieve() 
         pImpl->processing();
         
         switch(replyinfo.channel)
@@ -1136,6 +1264,7 @@ bool embot::app::application::theSTRAIN::get_adc(embot::app::canprotocol::analog
     
     
     replyinfo.adcvalue = v;
+    
     
     return true;    
 }
@@ -1284,15 +1413,16 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::p
         } break;
 
         case embot::app::canprotocol::analog::polling::Message_SET_CALIB_TARE::Mode::everychannelnegativeofadc:
-        {
-            // get latest adcvalue[] 
-            pImpl->acquisition();
+        {                        
+            // it acquire once. it also restarts if required.
+            pImpl->acquisition_oneshot();
             
             for(int i=0; i<6; i++)
             {
                 embot::common::dsp::Q15 value = embot::common::dsp::q15::U16toQ15(pImpl->runtimedata.data.adcvalue[i]);
                 pImpl->configdata.transformer_tare_set(set, i, embot::common::dsp::q15::opposite(value));
-            }
+            }         
+            
         } break;    
 
         default:
@@ -1356,7 +1486,10 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::p
             // THE RESULT OF THIS OPERATION IS that we after the assignement of the currtare have a zero runtimedata.data.torqueforce 
             
             pImpl->runtimedata.tare_fill(embot::common::dsp::q15::zero);
-            pImpl->acquisition();
+                        
+            // it acquires once. it also restarts periodic acquisition if it was active.
+            pImpl->acquisition_oneshot();
+
             pImpl->processing();
             
             for(int i=0; i<6; i++)
@@ -1438,10 +1571,12 @@ bool  embot::app::application::theSTRAIN::resetamplifier(embot::app::canprotocol
     
     pImpl->configdata.amplifiers_reset(info.set, info.channel);
     
-    if(0 == info.set)
-    {    
-        #warning TODO: apply to the HW (amplifier reset)
-    }
+    embot::hw::PGA308::setdefault(static_cast<embot::hw::PGA308::Amplifier>(info.channel));
+    
+//    if(0 == info.set)
+//    {    
+//        #warning TODO: apply to the HW (amplifier reset)
+//    }
    
     return true;    
 }
@@ -1460,11 +1595,15 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::p
     
     
     pImpl->configdata.amplifiers_set(info.set, info.channel, info.cfg1);
+    
+    embot::hw::PGA308::TransferFunctionConfig tfc;
+    tfc.load(info.cfg1);    
+    embot::hw::PGA308::set(static_cast<embot::hw::PGA308::Amplifier>(info.channel), tfc);
   
-    if(0 == info.set)
-    {    
-        #warning TODO: apply to the HW (amplifier cfg1)
-    }    
+//    if(0 == info.set)
+//    {    
+//        #warning TODO: apply to the HW (amplifier cfg1)
+//    }    
     
    
     return true;    
@@ -1486,6 +1625,11 @@ bool embot::app::application::theSTRAIN::stop()
 bool embot::app::application::theSTRAIN::tick(std::vector<embot::hw::can::Frame> &replies)
 {   
     return pImpl->tick(replies);
+}
+
+bool embot::app::application::theSTRAIN::processdata(std::vector<embot::hw::can::Frame> &replies)
+{   
+    return pImpl->processdata(replies);
 }
 
 
