@@ -19,8 +19,8 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef _EB_COMMON_H_
-#define _EB_COMMON_H_
+#ifndef _EMBOT_COMMON_H_
+#define _EMBOT_COMMON_H_
 
 #include <cstdint>
 #include <cstring>
