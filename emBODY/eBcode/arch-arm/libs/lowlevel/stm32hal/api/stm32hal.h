@@ -70,8 +70,8 @@ extern "C" {
  **/
 typedef struct
 {
-    uint32_t (*tick1ms_get)(void);  // required by some stm32 functions to generate a proper 1 ms delay. use osal or nticks incremented by systick
-    bool initbsp;
+    void (*tick1ms_init)(void);     // called by stm32 internals whenever it changes the clock
+    uint32_t (*tick1ms_get)(void);  // required by some stm32 functions to generate a proper 1 ms delay. 
 } stm32hal_config_t;
 
 

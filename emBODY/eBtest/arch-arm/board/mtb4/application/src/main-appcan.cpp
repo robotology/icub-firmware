@@ -5,6 +5,8 @@
 #include "embot_app_theCANboardInfo.h"
 
 #include "embot.h"
+#include "embot_common.h"
+#include "embot_binary.h"
 
 #include "stm32hal.h" 
 #include "embot_hw.h"
@@ -176,7 +178,7 @@ static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask
     outframes.clear();      
     
     
-    if(true == embot::common::msk::check(eventmask, evRXcanframe))
+    if(true == embot::binary::mask::check(eventmask, evRXcanframe))
     {        
         embot::hw::can::Frame frame;
         std::uint8_t remainingINrx = 0;
@@ -203,7 +205,7 @@ static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask
         }        
     }
     
-    if(true == embot::common::msk::check(eventmask, evSKINprocess))
+    if(true == embot::binary::mask::check(eventmask, evSKINprocess))
     {
         embot::app::application::theSkin &theskin = embot::app::application::theSkin::getInstance();
         theskin.tick(outframes);
@@ -219,7 +221,7 @@ static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask
         
     }
     
-    if(true == embot::common::msk::check(eventmask, evIMUprocess))
+    if(true == embot::binary::mask::check(eventmask, evIMUprocess))
     {
         
         embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance();

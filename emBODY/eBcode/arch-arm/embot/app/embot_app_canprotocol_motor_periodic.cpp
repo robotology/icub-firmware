@@ -31,6 +31,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "embot.h"
+#include "embot_common.h"
+#include "embot_binary.h"
 
 #include <cstring>
 
@@ -61,7 +63,7 @@ namespace embot { namespace app { namespace canprotocol { namespace motor { name
             return CMD::none;
         }
 
-        if(true == embot::common::bit::check(mcpermask16, cmd))
+        if(true == embot::binary::bit::check(mcpermask16, cmd))
         {
             return static_cast<CMD>(cmd);          
         }

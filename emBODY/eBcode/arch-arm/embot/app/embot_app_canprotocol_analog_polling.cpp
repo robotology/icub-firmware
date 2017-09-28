@@ -31,6 +31,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "embot.h"
+#include "embot_common.h"
+#include "embot_binary.h"
 
 #include <cstring>
 
@@ -81,7 +83,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
 
         std::uint8_t ind = cmd >> 6;
         std::uint8_t pos = cmd & 0x3f;
-        if(true == embot::common::bit::check(aspollmask256[ind], pos))
+        if(true == embot::binary::bit::check(aspollmask256[ind], pos))
         {
             return static_cast<CMD>(cmd);            
         }
@@ -224,7 +226,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         info.trgStart = candata.datainframe[0];
         info.trgEnd= candata.datainframe[1];
         info.shift = candata.datainframe[2];
-        info.enabled = embot::common::bit::check(candata.datainframe[3], 0);
+        info.enabled = embot::binary::bit::check(candata.datainframe[3], 0);
         // little endian ...
         info.cdcOffset = static_cast<std::uint16_t>(candata.datainframe[4]) | (static_cast<std::uint16_t>(candata.datainframe[5]) << 8);
      

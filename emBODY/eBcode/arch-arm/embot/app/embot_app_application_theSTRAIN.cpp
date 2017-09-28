@@ -36,6 +36,8 @@
 
 #include "embot.h"
 #include "embot_common.h"
+#include "embot_binary.h"
+#include "embot_dsp.h"
 
 #include "embot_hw.h"
 #include "embot_hw_can.h"
@@ -106,8 +108,8 @@ struct embot::app::application::theSTRAIN::Impl
         std::uint8_t                dummy;          // just to remove a hole
         std::uint8_t                gain;           // the gain managed with GET_MATRIX_G / SET_MATRIX_G which is NOT USED INSIDE THE MPU        
         std::uint16_t               fullscale[6];   // the fullscale of the measurements: NOT USED INSIDE THE MPU
-        embot::common::dsp::Q15     tare[6];        // in format 1Q15: the stored tare
-        embot::common::dsp::Q15     matrix[6*6];    // in format 1Q15: transformation matrix from the 6 strain-gauge values to the 6 force-torque values        
+        embot::dsp::Q15             tare[6];        // in format 1Q15: the stored tare
+        embot::dsp::Q15             matrix[6*6];    // in format 1Q15: transformation matrix from the 6 strain-gauge values to the 6 force-torque values        
     };
     
     
@@ -148,8 +150,8 @@ struct embot::app::application::theSTRAIN::Impl
         
         private:
         
-        embot::common::dsp::q15::matrix transfQ15matrix[numOfSets];
-        embot::common::dsp::q15::matrix transfQ15tare[numOfSets];
+        embot::dsp::q15::matrix transfQ15matrix[numOfSets];
+        embot::dsp::q15::matrix transfQ15tare[numOfSets];
 
         public:
             
@@ -250,7 +252,7 @@ struct embot::app::application::theSTRAIN::Impl
             }
         }         
           
-        const embot::common::dsp::q15::matrix& transformer_matrix_handle(std::uint8_t set)
+        const embot::dsp::q15::matrix& transformer_matrix_handle(std::uint8_t set)
         {
             if(set >= numOfSets)
             {
@@ -259,7 +261,7 @@ struct embot::app::application::theSTRAIN::Impl
             return transfQ15matrix[set];
         }
         
-        const embot::common::dsp::q15::matrix& transformer_tare_handle(std::uint8_t set)
+        const embot::dsp::q15::matrix& transformer_tare_handle(std::uint8_t set)
         {
             if(set >= numOfSets)
             {
@@ -272,12 +274,12 @@ struct embot::app::application::theSTRAIN::Impl
         {
             if(set < numOfSets)
             {
-                transfQ15matrix[set].diagonal(embot::common::dsp::q15::posOneNearly);
+                transfQ15matrix[set].diagonal(embot::dsp::q15::posOneNearly);
                 synched = false;
             }
         }
         
-        void transformer_matrix_fill_diagonal(std::uint8_t set, embot::common::dsp::Q15 value)
+        void transformer_matrix_fill_diagonal(std::uint8_t set, embot::dsp::Q15 value)
         {
             if(set < numOfSets)
             {
@@ -305,7 +307,7 @@ struct embot::app::application::theSTRAIN::Impl
             return g;
         }
         
-        void transformer_matrix_set(std::uint8_t set, std::uint8_t r, std::uint8_t c, embot::common::dsp::Q15 value)
+        void transformer_matrix_set(std::uint8_t set, std::uint8_t r, std::uint8_t c, embot::dsp::Q15 value)
         {   
             if((set < numOfSets) && (r < 6) && (c < 6))
             {
@@ -314,9 +316,9 @@ struct embot::app::application::theSTRAIN::Impl
             }
         }
         
-        embot::common::dsp::Q15 transformer_matrix_get(std::uint8_t set, std::uint8_t r, std::uint8_t c)
+        embot::dsp::Q15 transformer_matrix_get(std::uint8_t set, std::uint8_t r, std::uint8_t c)
         { 
-            embot::common::dsp::Q15 v = embot::common::dsp::q15::zero;
+            embot::dsp::Q15 v = embot::dsp::q15::zero;
             
             if((set < numOfSets) && (r < 6) && (c < 6))
             {
@@ -326,7 +328,7 @@ struct embot::app::application::theSTRAIN::Impl
             return v;
         }
         
-        void transformer_tare_fill(std::uint8_t set, embot::common::dsp::Q15 value)
+        void transformer_tare_fill(std::uint8_t set, embot::dsp::Q15 value)
         {
             if(set < numOfSets)
             {                
@@ -335,7 +337,7 @@ struct embot::app::application::theSTRAIN::Impl
             }
         }
         
-        void transformer_tare_set(std::uint8_t set, std::uint8_t channel, embot::common::dsp::Q15 value)
+        void transformer_tare_set(std::uint8_t set, std::uint8_t channel, embot::dsp::Q15 value)
         { 
             if((set < numOfSets) && (channel < 6))
             {
@@ -344,9 +346,9 @@ struct embot::app::application::theSTRAIN::Impl
             }
         }
         
-        embot::common::dsp::Q15 transformer_tare_get(std::uint8_t set, std::uint8_t channel)
+        embot::dsp::Q15 transformer_tare_get(std::uint8_t set, std::uint8_t channel)
         {
-            embot::common::dsp::Q15 v = embot::common::dsp::q15::zero;
+            embot::dsp::Q15 v = embot::dsp::q15::zero;
             if((set < numOfSets) && (channel < 6))
             {
                 v = transfQ15tare[set].get(channel, 1);
@@ -366,8 +368,8 @@ struct embot::app::application::theSTRAIN::Impl
                 // transformer
                 transformer_gain_set(s, 1);
                 transformer_fullscale_fill(s, 0x7fff);
-                transformer_tare_fill(s, embot::common::dsp::q15::zero);
-                transformer_matrix_fill_diagonal(s, embot::common::dsp::q15::posOneNearly);
+                transformer_tare_fill(s, embot::dsp::q15::zero);
+                transformer_matrix_fill_diagonal(s, embot::dsp::q15::posOneNearly);
                 transformer_gain_set(s, 1);
                 
                 for(int chn=0; chn<6; chn++)
@@ -480,9 +482,9 @@ struct embot::app::application::theSTRAIN::Impl
         std::uint16_t               dmabuffer[6]; 
         std::uint16_t               adcvalue[6];        // the values as acquired by the adc... but scaled to full 64k range. original strain had 16-bit adc   
         
-        embot::common::dsp::Q15     q15value[6];        // same as adcvalue but in q15 format       
-        embot::common::dsp::Q15     tare[6];            // the tare applied as a last correction. it is always ::zero unless changed with SET_CURR_TARE
-        embot::common::dsp::Q15     torqueforce[6];
+        embot::dsp::Q15     q15value[6];        // same as adcvalue but in q15 format       
+        embot::dsp::Q15     tare[6];            // the tare applied as a last correction. it is always ::zero unless changed with SET_CURR_TARE
+        embot::dsp::Q15     torqueforce[6];
         
         // the calibrated values for torque and force. they are raw values, not in dsp::Q15 format
         TripleValue                 torque;
@@ -522,9 +524,9 @@ struct embot::app::application::theSTRAIN::Impl
         StrainRuntimeData_t data;   
         
         // used for the sake of matrix-based calculation
-        embot::common::dsp::q15::matrix currtareQ15vector;
-        embot::common::dsp::q15::matrix torqueforceQ15vector;
-        embot::common::dsp::q15::matrix adcvalueQ15vector;
+        embot::dsp::q15::matrix currtareQ15vector;
+        embot::dsp::q15::matrix torqueforceQ15vector;
+        embot::dsp::q15::matrix adcvalueQ15vector;
         
                         
         static const std::uint16_t ADCsaturationLow = 1000;
@@ -559,12 +561,12 @@ struct embot::app::application::theSTRAIN::Impl
             return data.adcsaturation;           
         }
         
-        void tare_fill(embot::common::dsp::Q15 value)
+        void tare_fill(embot::dsp::Q15 value)
         {    
             currtareQ15vector.fill(value);
         }
         
-        void tare_set(std::uint8_t channel, embot::common::dsp::Q15 value)
+        void tare_set(std::uint8_t channel, embot::dsp::Q15 value)
         { 
             if(channel<6)
             {
@@ -572,14 +574,14 @@ struct embot::app::application::theSTRAIN::Impl
             }
         }
         
-        embot::common::dsp::Q15 tare_get(std::uint8_t channel)
+        embot::dsp::Q15 tare_get(std::uint8_t channel)
         {
             if(channel<6)
             {
                 return data.tare[channel];
             }
             
-            return embot::common::dsp::q15::zero;            
+            return embot::dsp::q15::zero;            
         }
         
         bool clear()
@@ -921,7 +923,7 @@ bool embot::app::application::theSTRAIN::Impl::acquisition_retrieve()
     for(int i=0; i<6; i++)
     {
         runtimedata.data.adcvalue[i] <<= 4; // adc value is 12 bits. we need to scale it to 64k
-        runtimedata.data.q15value[i] = embot::common::dsp::q15::U16toQ15(runtimedata.data.adcvalue[i]);
+        runtimedata.data.q15value[i] = embot::dsp::q15::U16toQ15(runtimedata.data.adcvalue[i]);
     }
     
     // 3. also check vs saturation
@@ -946,16 +948,16 @@ bool embot::app::application::theSTRAIN::Impl::processing()
     
     bool q15saturated =  false;
     
-    const embot::common::dsp::q15::matrix& handleCalibMatrixQ15 = configdata.transformer_matrix_handle(set);     
-    const embot::common::dsp::q15::matrix& handleCalibTareQ15 = configdata.transformer_tare_handle(set);   
+    const embot::dsp::q15::matrix& handleCalibMatrixQ15 = configdata.transformer_matrix_handle(set);     
+    const embot::dsp::q15::matrix& handleCalibTareQ15 = configdata.transformer_tare_handle(set);   
         
-    embot::common::dsp::Q15 q15tmpvector[6];
-    embot::common::dsp::q15::matrix tmpQ15vector(6, 1, q15tmpvector);
+    embot::dsp::Q15 q15tmpvector[6];
+    embot::dsp::q15::matrix tmpQ15vector(6, 1, q15tmpvector);
     
     
-    embot::common::dsp::q15::add(runtimedata.adcvalueQ15vector, handleCalibTareQ15, tmpQ15vector, q15saturated);
-    embot::common::dsp::q15::multiply(handleCalibMatrixQ15, tmpQ15vector, runtimedata.torqueforceQ15vector, q15saturated);
-    embot::common::dsp::q15::add(runtimedata.torqueforceQ15vector, runtimedata.currtareQ15vector, runtimedata.torqueforceQ15vector, q15saturated);
+    embot::dsp::q15::add(runtimedata.adcvalueQ15vector, handleCalibTareQ15, tmpQ15vector, q15saturated);
+    embot::dsp::q15::multiply(handleCalibMatrixQ15, tmpQ15vector, runtimedata.torqueforceQ15vector, q15saturated);
+    embot::dsp::q15::add(runtimedata.torqueforceQ15vector, runtimedata.currtareQ15vector, runtimedata.torqueforceQ15vector, q15saturated);
     
     // copy 
     
@@ -968,8 +970,8 @@ bool embot::app::application::theSTRAIN::Impl::processing()
    
     if(false == runtimedata.data.adcsaturation)
     {
-        runtimedata.data.torque.set(embot::common::dsp::q15::Q15toU16(runtimedata.data.torqueforce[0]), embot::common::dsp::q15::Q15toU16(runtimedata.data.torqueforce[1]), embot::common::dsp::q15::Q15toU16(runtimedata.data.torqueforce[2]));
-        runtimedata.data.force.set(embot::common::dsp::q15::Q15toU16(runtimedata.data.torqueforce[3]), embot::common::dsp::q15::Q15toU16(runtimedata.data.torqueforce[4]), embot::common::dsp::q15::Q15toU16(runtimedata.data.torqueforce[5]));
+        runtimedata.data.torque.set(embot::dsp::q15::Q15toU16(runtimedata.data.torqueforce[0]), embot::dsp::q15::Q15toU16(runtimedata.data.torqueforce[1]), embot::dsp::q15::Q15toU16(runtimedata.data.torqueforce[2]));
+        runtimedata.data.force.set(embot::dsp::q15::Q15toU16(runtimedata.data.torqueforce[3]), embot::dsp::q15::Q15toU16(runtimedata.data.torqueforce[4]), embot::dsp::q15::Q15toU16(runtimedata.data.torqueforce[5]));
     }
     else
     {
@@ -1346,7 +1348,7 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::p
     
     // original strain code saves the value in ram only. it is saved in eeprom only when the message save2eeprom arrives  
     const std::uint8_t set = 0;    
-    pImpl->configdata.transformer_matrix_set(set, info.row, info.col, static_cast<embot::common::dsp::Q15>(info.value));
+    pImpl->configdata.transformer_matrix_set(set, info.row, info.col, static_cast<embot::dsp::Q15>(info.value));
 
     return true;    
 }
@@ -1404,12 +1406,12 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::p
     {
         case embot::app::canprotocol::analog::polling::Message_SET_CALIB_TARE::Mode::setchannelwithvalue:
         {
-            pImpl->configdata.transformer_tare_set(set, info.channel, static_cast<embot::common::dsp::Q15>(info.value));
+            pImpl->configdata.transformer_tare_set(set, info.channel, static_cast<embot::dsp::Q15>(info.value));
         } break;            
 
         case embot::app::canprotocol::analog::polling::Message_SET_CALIB_TARE::Mode::everychannelreset:
         {
-            pImpl->configdata.transformer_tare_fill(set, embot::common::dsp::q15::zero);
+            pImpl->configdata.transformer_tare_fill(set, embot::dsp::q15::zero);
         } break;
 
         case embot::app::canprotocol::analog::polling::Message_SET_CALIB_TARE::Mode::everychannelnegativeofadc:
@@ -1419,8 +1421,8 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::p
             
             for(int i=0; i<6; i++)
             {
-                embot::common::dsp::Q15 value = embot::common::dsp::q15::U16toQ15(pImpl->runtimedata.data.adcvalue[i]);
-                pImpl->configdata.transformer_tare_set(set, i, embot::common::dsp::q15::opposite(value));
+                embot::dsp::Q15 value = embot::dsp::q15::U16toQ15(pImpl->runtimedata.data.adcvalue[i]);
+                pImpl->configdata.transformer_tare_set(set, i, embot::dsp::q15::opposite(value));
             }         
             
         } break;    
@@ -1465,12 +1467,12 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::p
     {
         case embot::app::canprotocol::analog::polling::Message_SET_CURR_TARE::Mode::setchannelwithvalue:
         {
-            pImpl->runtimedata.tare_set(info.channel, static_cast<embot::common::dsp::Q15>(info.value));
+            pImpl->runtimedata.tare_set(info.channel, static_cast<embot::dsp::Q15>(info.value));
         } break;            
 
         case embot::app::canprotocol::analog::polling::Message_SET_CURR_TARE::Mode::everychannelreset:
         {
-            pImpl->runtimedata.tare_fill(embot::common::dsp::q15::zero);
+            pImpl->runtimedata.tare_fill(embot::dsp::q15::zero);
         } break;
 
         case embot::app::canprotocol::analog::polling::Message_SET_CURR_TARE::Mode::everychannelnegativeoftorqueforce:
@@ -1485,7 +1487,7 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::p
             // 3. we assign runtimedata.data.tare[] with the opposite of runtimedata.data.torqueforce[] 
             // THE RESULT OF THIS OPERATION IS that we after the assignement of the currtare have a zero runtimedata.data.torqueforce 
             
-            pImpl->runtimedata.tare_fill(embot::common::dsp::q15::zero);
+            pImpl->runtimedata.tare_fill(embot::dsp::q15::zero);
                         
             // it acquires once. it also restarts periodic acquisition if it was active.
             pImpl->acquisition_oneshot();
@@ -1494,7 +1496,7 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::p
             
             for(int i=0; i<6; i++)
             {                
-                pImpl->runtimedata.data.tare[i] = embot::common::dsp::q15::opposite(pImpl->runtimedata.data.torqueforce[i]); 
+                pImpl->runtimedata.data.tare[i] = embot::dsp::q15::opposite(pImpl->runtimedata.data.torqueforce[i]); 
             }
         } break;    
 

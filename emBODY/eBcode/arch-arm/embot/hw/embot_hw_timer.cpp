@@ -37,6 +37,7 @@
 
 using namespace std;
 
+#include "embot_binary.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -129,7 +130,7 @@ namespace embot { namespace hw { namespace timer {
         {
             return false;
         }
-        return embot::common::bit::check(bspmap.mask, timer2index(t));
+        return embot::binary::bit::check(bspmap.mask, timer2index(t));
     }
     
     bool initialised(Timer t)
@@ -138,7 +139,7 @@ namespace embot { namespace hw { namespace timer {
         {
             return false;
         }
-        return embot::common::bit::check(initialisedmask, timer2index(t));
+        return embot::binary::bit::check(initialisedmask, timer2index(t));
     } 
 
     
@@ -405,7 +406,7 @@ namespace embot { namespace hw { namespace timer {
         s_privatedata[compindex].isrunning = false;
         s_privatedata[compindex].config = config;
         
-        embot::common::bit::set(initialisedmask, timer2index(t));
+        embot::binary::bit::set(initialisedmask, timer2index(t));
         
         configure(t, config);    
 

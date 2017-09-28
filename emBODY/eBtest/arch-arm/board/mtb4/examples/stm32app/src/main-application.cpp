@@ -53,22 +53,26 @@ void SysTick_Handler(void)
     s_1mstickcount++;
 }
 
+static void tick1msecinit(void)
+{
+    HAL_SYSTICK_Config(SystemCoreClock/1000);
+}
+    
 static uint32_t tick1msecget(void)
 {
-    static bool started = false;
-    if(!started)
-    {
-        started = true;
-        HAL_SYSTICK_Config(SystemCoreClock/1000);
-    }
     return (uint32_t)s_1mstickcount;
 }
 
 #else
 
+static void tick1msecinit(void)
+{   
+}
+
 static uint32_t tick1msecget(void)
-{
-    return 0;
+{   // one must always provide one function which counts forward
+    static uint32_t n = 0;
+    return n++;
 }
 
 #endif
@@ -77,15 +81,15 @@ static uint32_t tick1msecget(void)
 
 int main(void)
 { 
-
-    // init the stm32hal
+    // init the stm32hal: 
+    // give one funtion which init the 1 ms tick, 
+    // give one funtion which returns the number of ticks, 
     stm32hal_config_t cfg = {0};
+    cfg.tick1ms_init = tick1msecinit;
     cfg.tick1ms_get = tick1msecget;
-    cfg.initbsp = true;
         
     stm32hal_init(&cfg);    
     
-
 #if     defined(APPSLIM_DO_NOTHING)
     
     // description: do nothing but executing a dummy loop
@@ -111,8 +115,7 @@ int main(void)
     for(;;)
     {
         
-        // delay of 500 ms 
-        
+        // delay of 500 ms: it is ok only if the 1 ms tick is correctly initted         
         HAL_Delay(500);
         
         if(1 == flagON)

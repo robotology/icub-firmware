@@ -29,6 +29,8 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
+#include "embot_binary.h"
+
 #include <cstring>
 #include <vector>
 
@@ -127,7 +129,7 @@ namespace embot { namespace hw { namespace can {
         {
             return false;
         }
-        return embot::common::bit::check(bspmap.mask, port2index(p));
+        return embot::binary::bit::check(bspmap.mask, port2index(p));
     }
     
     bool initialised(Port p)
@@ -136,7 +138,7 @@ namespace embot { namespace hw { namespace can {
         {
             return false;
         }
-        return embot::common::bit::check(initialisedmask, port2index(p));
+        return embot::binary::bit::check(initialisedmask, port2index(p));
     }    
     
     
@@ -344,7 +346,7 @@ namespace embot { namespace hw { namespace can {
         
         }
         
-        embot::common::bit::set(initialisedmask, port2index(p));
+        embot::binary::bit::set(initialisedmask, port2index(p));
 
         return resOK;
     }

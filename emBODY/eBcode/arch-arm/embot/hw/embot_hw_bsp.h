@@ -30,9 +30,10 @@ namespace embot { namespace hw { namespace bsp {
     
     struct Config
     {
+        embot::common::fpWorker     init1mstick;
         embot::common::fpGetU32     get1mstick; 
-        Config() : get1mstick(nullptr) {}
-        Config(embot::common::fpGetU32 _get1mstick) : get1mstick(_get1mstick) {}
+        Config() : init1mstick(nullptr), get1mstick(nullptr) {}
+        Config(embot::common::fpWorker _init1mstick, embot::common::fpGetU32 _get1mstick) : init1mstick(_init1mstick), get1mstick(_get1mstick) {}
     }; 
     
         

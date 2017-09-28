@@ -32,6 +32,7 @@
 #include <cstring>
 #include <vector>
 
+#include "embot_binary.h"
 #include "embot_hw_gpio.h"
 #include "embot_hw_bsp.h"
 
@@ -118,7 +119,7 @@ namespace embot { namespace hw { namespace led {
         {
             return false;
         }
-        return embot::common::bit::check(bspmap.mask, led2index(led));
+        return embot::binary::bit::check(bspmap.mask, led2index(led));
     }
     
     bool initialised(LED led)
@@ -127,7 +128,7 @@ namespace embot { namespace hw { namespace led {
         {
             return false;
         }
-        return embot::common::bit::check(initialisedmask, led2index(led));
+        return embot::binary::bit::check(initialisedmask, led2index(led));
     }
         
     
@@ -151,7 +152,7 @@ namespace embot { namespace hw { namespace led {
             return resNOK;
         }
                 
-        embot::common::bit::set(initialisedmask, led2index(led));
+        embot::binary::bit::set(initialisedmask, led2index(led));
         
         // we just switch it off        
         embot::hw::led::off(led);

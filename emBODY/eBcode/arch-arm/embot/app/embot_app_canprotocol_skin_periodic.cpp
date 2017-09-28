@@ -30,6 +30,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "embot.h"
+#include "embot_common.h"
+#include "embot_binary.h"
 
 #include <cstring>
 
@@ -89,12 +91,12 @@ namespace embot { namespace app { namespace canprotocol { namespace skin { names
         // bit ErrorInTriangleBit::noack is set if any bit inside notackmaskofthe12s is set.
         if(0 != info.notackmaskofthe12s)
         {
-            embot::common::bit::set(errorflags, static_cast<std::uint8_t>(ErrorInTriangleBit::noack)); 
+            embot::binary::bit::set(errorflags, static_cast<std::uint8_t>(ErrorInTriangleBit::noack)); 
         }
         // bit ErrorInTriangleBit::notconnected is set if all 12 bits inside notconnectedmaskofthe12s are set.
-        if(12 == embot::common::bit::countU16(info.notconnectedmaskofthe12s))
+        if(12 == embot::binary::bit::count(info.notconnectedmaskofthe12s))
         {
-            embot::common::bit::set(errorflags, static_cast<std::uint8_t>(ErrorInTriangleBit::notconnected)); 
+            embot::binary::bit::set(errorflags, static_cast<std::uint8_t>(ErrorInTriangleBit::notconnected)); 
         }            
         data08[6] = static_cast<std::uint8_t>((info.outofrangemaskofthe12s & 0x0ff0) >> 4);
         data08[7] = static_cast<std::uint8_t>((info.outofrangemaskofthe12s & 0x000f) << 4) | (errorflags & 0x0f);

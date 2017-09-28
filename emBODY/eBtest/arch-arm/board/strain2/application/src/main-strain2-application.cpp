@@ -18,6 +18,10 @@ void tests_tick();
 
 #include "embot.h"
 
+#include "embot_common.h"
+#include "embot_binary.h"
+#include "embot_dsp.h"
+
 #include "stm32hal.h" // to see bsp_led_init etc
 #include "embot_hw.h"
 #include "embot_hw_sys.h"
@@ -184,7 +188,7 @@ static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask
     outframes.clear();      
     
     
-    if(true == embot::common::msk::check(eventmask, evRXcanframe))
+    if(true == embot::binary::mask::check(eventmask, evRXcanframe))
     {        
         embot::hw::can::Frame frame;
         std::uint8_t remainingINrx = 0;
@@ -211,13 +215,13 @@ static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask
         }        
     }
     
-    if(true == embot::common::msk::check(eventmask, evSTRAINdataready))
+    if(true == embot::binary::mask::check(eventmask, evSTRAINdataready))
     {        
         embot::app::application::theSTRAIN &thestrain = embot::app::application::theSTRAIN::getInstance();
         thestrain.processdata(outframes);        
     }
     
-    if(true == embot::common::msk::check(eventmask, evSTRAINtick))
+    if(true == embot::binary::mask::check(eventmask, evSTRAINtick))
     {        
         embot::app::application::theSTRAIN &thestrain = embot::app::application::theSTRAIN::getInstance();
         thestrain.tick(outframes);        
@@ -370,9 +374,9 @@ static std::int16_t mat1[3*3] = {0};
 static std::int16_t vec1[3*2] = {0};
 static std::int16_t vec2[3*2] = {0};
 
-embot::common::dsp::q15::matrix ma1;
-embot::common::dsp::q15::matrix ma2;
-embot::common::dsp::q15::matrix ma3;
+embot::dsp::q15::matrix ma1;
+embot::dsp::q15::matrix ma2;
+embot::dsp::q15::matrix ma3;
 #endif // #if defined(TEST_DSP)
 
 
@@ -499,44 +503,44 @@ void tests_tick()
 #if defined(TEST_DSP)
         
     ma1.load(3, 3, mat1);
-    ma1.diagonal(embot::common::dsp::q15::negOneHalf);
-    //ma1.fill(embot::common::dsp::q15::posOneHalf);
+    ma1.diagonal(embot::dsp::q15::negOneHalf);
+    //ma1.fill(embot::dsp::q15::posOneHalf);
 
     ma2.load(3, 2, vec1);
-    ma2.fill(embot::common::dsp::q15::posOneHalf);
+    ma2.fill(embot::dsp::q15::posOneHalf);
 
     ma3.load(3, 2, vec2);
     ma3.clear();
 
     bool saturated =  false;
-    embot::common::dsp::q15::multiply(ma1, ma2, ma3, saturated);
+    embot::dsp::q15::multiply(ma1, ma2, ma3, saturated);
     saturated = saturated;
 
-    double res = embot::common::dsp::q15::convert(ma3.get(0, 0));
+    double res = embot::dsp::q15::convert(ma3.get(0, 0));
     res = res;
-    embot::common::dsp::Q15 v = 0;
-    v = embot::common::dsp::q15::convert(-0.500, saturated);
-    res = embot::common::dsp::q15::convert(v);
-    v = embot::common::dsp::q15::convert(-0.250, saturated);
-    res = embot::common::dsp::q15::convert(v);
-    v = embot::common::dsp::q15::convert(-0.125, saturated);
-    res = embot::common::dsp::q15::convert(v);       
-    v = embot::common::dsp::q15::posOneNearly;
-    res = embot::common::dsp::q15::convert(v);
+    embot::dsp::Q15 v = 0;
+    v = embot::dsp::q15::convert(-0.500, saturated);
+    res = embot::dsp::q15::convert(v);
+    v = embot::dsp::q15::convert(-0.250, saturated);
+    res = embot::dsp::q15::convert(v);
+    v = embot::dsp::q15::convert(-0.125, saturated);
+    res = embot::dsp::q15::convert(v);       
+    v = embot::dsp::q15::posOneNearly;
+    res = embot::dsp::q15::convert(v);
     res =  res;
 
-    v = embot::common::dsp::q15::opposite(v);
-    res = embot::common::dsp::q15::convert(v);
+    v = embot::dsp::q15::opposite(v);
+    res = embot::dsp::q15::convert(v);
     res = res;
 
-    v = embot::common::dsp::q15::negOne;
-    res = embot::common::dsp::q15::convert(v);
-    v = embot::common::dsp::q15::opposite(v);
-    res = embot::common::dsp::q15::convert(v); 
-    v = embot::common::dsp::q15::opposite(v);
-    res = embot::common::dsp::q15::convert(v);        
+    v = embot::dsp::q15::negOne;
+    res = embot::dsp::q15::convert(v);
+    v = embot::dsp::q15::opposite(v);
+    res = embot::dsp::q15::convert(v); 
+    v = embot::dsp::q15::opposite(v);
+    res = embot::dsp::q15::convert(v);        
 
-    res = embot::common::dsp::q15::convert(v);
+    res = embot::dsp::q15::convert(v);
     v = v;
     
 #endif // #if defined(TEST_DSP)    

@@ -35,6 +35,8 @@
 #include <cstring>
 #include <vector>
 
+#include "embot_binary.h"
+
 using namespace std;
 
 
@@ -120,7 +122,7 @@ namespace embot { namespace hw { namespace button {
         {
             return false;
         }
-        return embot::common::bit::check(bspmap.mask, btn2index(btn));
+        return embot::binary::bit::check(bspmap.mask, btn2index(btn));
     }
     
     bool initialised(BTN btn)
@@ -129,7 +131,7 @@ namespace embot { namespace hw { namespace button {
         {
             return false;
         }
-        return embot::common::bit::check(initialisedmask, btn2index(btn));
+        return embot::binary::bit::check(initialisedmask, btn2index(btn));
     }
         
     
@@ -153,7 +155,7 @@ namespace embot { namespace hw { namespace button {
             return resNOK;
         }
                 
-        embot::common::bit::set(initialisedmask, btn2index(btn));
+        embot::binary::bit::set(initialisedmask, btn2index(btn));
                 
         return resOK;        
     }

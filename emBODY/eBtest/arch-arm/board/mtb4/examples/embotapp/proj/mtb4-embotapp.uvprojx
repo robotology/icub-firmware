@@ -488,6 +488,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\embot\common\embot_common.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_binary.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\embot\binary\embot_binary.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -916,9 +921,9 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>--cpp11</MiscControls>
-              <Define>STM32HAL_BOARD_MTB4 APPSLIM_DONTRELOCATEVECTORTABLE APPSLIM_STM32HAL_TICK_NONE</Define>
+              <Define>STM32HAL_BOARD_MTB4 APPSLIM_DONTRELOCATEVECTORTABLE APPSLIM_STM32HAL_TICK_SYSTICK</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\..\eBcode\arch-arm\embot\common;..\..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\..\eBcode\arch-arm\embot\sys;..\..\..\..\..\..\..\eBcode\arch-arm\embot</IncludePath>
+              <IncludePath>..\..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\..\eBcode\arch-arm\embot\common;..\..\..\..\..\..\..\eBcode\arch-arm\embot\binary;..\..\..\..\..\..\..\eBcode\arch-arm\embot\hw</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1069,6 +1074,11 @@
               <FileName>embot_common.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\embot\common\embot_common.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_binary.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\..\eBcode\arch-arm\embot\binary\embot_binary.cpp</FilePath>
             </File>
           </Files>
         </Group>

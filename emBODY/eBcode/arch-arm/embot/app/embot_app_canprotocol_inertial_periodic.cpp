@@ -31,6 +31,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "embot.h"
+#include "embot_common.h"
+#include "embot_binary.h"
 
 #include <cstring>
 
@@ -65,7 +67,7 @@ namespace embot { namespace app { namespace canprotocol { namespace inertial { n
             return CMD::none;
         }
 
-        if(true == embot::common::bit::check(ispermask16, cmd))
+        if(true == embot::binary::bit::check(ispermask16, cmd))
         {
             return static_cast<CMD>(cmd);          
         }

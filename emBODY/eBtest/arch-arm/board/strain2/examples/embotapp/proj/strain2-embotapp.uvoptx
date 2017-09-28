@@ -212,7 +212,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>0</BreakIfRCount>
-          <Filename>..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\startup\stm32hal.startup.strain2.s</Filename>
+          <Filename>C:\ace\icub-firmware\emBODY\eBtest\eBcode\arch-arm\libs\lowlevel\stm32hal\startup\stm32hal.startup.strain2.s</Filename>
           <ExecCommand></ExecCommand>
           <Expression></Expression>
         </Bp>
@@ -228,7 +228,23 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>0</BreakIfRCount>
-          <Filename>..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\startup\stm32hal.startup.strain2.s</Filename>
+          <Filename>C:\ace\icub-firmware\emBODY\eBtest\eBcode\arch-arm\libs\lowlevel\stm32hal\startup\stm32hal.startup.strain2.s</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
+        </Bp>
+        <Bp>
+          <Number>5</Number>
+          <Type>0</Type>
+          <LineNumber>102</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>0</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>0</BreakIfRCount>
+          <Filename>../src/main-application.cpp</Filename>
           <ExecCommand></ExecCommand>
           <Expression></Expression>
         </Bp>
@@ -307,7 +323,7 @@
   </Target>
 
   <Target>
-    <TargetName>strain2-appslim-0offset</TargetName>
+    <TargetName>strain2-app-0offset</TargetName>
     <ToolsetNumber>0x4</ToolsetNumber>
     <ToolsetName>ARM-ADS</ToolsetName>
     <TargetOption>
@@ -465,7 +481,7 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\startup\stm32hal.startup.strain2.s</Filename>
+          <Filename>C:\ace\icub-firmware\emBODY\eBtest\eBcode\arch-arm\libs\lowlevel\stm32hal\startup\stm32hal.startup.strain2.s</Filename>
           <ExecCommand></ExecCommand>
           <Expression>\\strain2\../../../../../../eBcode/arch-arm/libs/lowlevel/stm32hal/startup/stm32hal.startup.strain2.s\197</Expression>
         </Bp>
@@ -481,9 +497,25 @@
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\startup\stm32hal.startup.strain2.s</Filename>
+          <Filename>C:\ace\icub-firmware\emBODY\eBtest\eBcode\arch-arm\libs\lowlevel\stm32hal\startup\stm32hal.startup.strain2.s</Filename>
           <ExecCommand></ExecCommand>
           <Expression>\\strain2\../../../../../../eBcode/arch-arm/libs/lowlevel/stm32hal/startup/stm32hal.startup.strain2.s\199</Expression>
+        </Bp>
+        <Bp>
+          <Number>3</Number>
+          <Type>0</Type>
+          <LineNumber>102</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>0</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>0</BreakIfRCount>
+          <Filename>../src/main-application.cpp</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression></Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -592,7 +624,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\lib\stm32hal.strain2.lib</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\lib\stm32hal.strain2.lib</PathWithFileName>
       <FilenameWithoutPath>stm32hal.strain2.lib</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -604,7 +636,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\startup\stm32hal.startup.strain2.s</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\startup\stm32hal.startup.strain2.s</PathWithFileName>
       <FilenameWithoutPath>stm32hal.startup.strain2.s</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -644,8 +676,20 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\embot\common\embot_common.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\..\..\eBcode\arch-arm\embot\common\embot_common.cpp</PathWithFileName>
       <FilenameWithoutPath>embot_common.cpp</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>4</GroupNumber>
+      <FileNumber>6</FileNumber>
+      <FileType>8</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\..\eBcode\arch-arm\embot\binary\embot_binary.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_binary.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -659,25 +703,13 @@
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>5</GroupNumber>
-      <FileNumber>6</FileNumber>
-      <FileType>8</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw.cpp</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>5</GroupNumber>
       <FileNumber>7</FileNumber>
       <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_bsp.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw_bsp.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -688,8 +720,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_sys.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw_sys.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_bsp.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_bsp.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -700,7 +732,19 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_led.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_sys.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_sys.cpp</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>5</GroupNumber>
+      <FileNumber>10</FileNumber>
+      <FileType>8</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_led.cpp</PathWithFileName>
       <FilenameWithoutPath>embot_hw_led.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>

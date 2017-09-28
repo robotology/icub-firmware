@@ -50,7 +50,10 @@
 // - includes
 
 #include "stm32hal.h" 
-#include "embot_hw.h"
+    
+#include "embot_common.h"
+#include "embot_binary.h"
+    
 #include "embot_hw_bsp.h"
 #include "embot_hw_led.h"
 #include "embot_hw_sys.h"    
@@ -64,27 +67,33 @@ void SysTick_Handler(void)
     s_1mstickcount++;
 }
 
+static void tick1msecinit(void)
+{
+    HAL_SYSTICK_Config(SystemCoreClock/1000);
+}
+    
 static uint32_t tick1msecget(void)
 {
-    static bool started = false;
-    if(!started)
-    {
-        started = true;
-        HAL_SYSTICK_Config(SystemCoreClock/1000);
-    }
     return (uint32_t)s_1mstickcount;
 }
 
 #else
 
+static void tick1msecinit(void)
+{   
+}
+
 static uint32_t tick1msecget(void)
-{
-    return 0;
+{   // one must always provide one function which counts forward
+    static uint32_t n = 0;
+    return n++;
 }
 
 #endif
 
-  
+
+static void some_other_demonstrations(void);
+
 
 int main(void)
 { 
@@ -92,9 +101,8 @@ int main(void)
     embot::hw::sys::relocatevectortable(embot::hw::sys::addressOfApplication - embot::hw::sys::startOfFLASH);   
 #endif
     
-    embot::hw::bsp::Config bspconfig(tick1msecget);    
-    embot::hw::bsp::init(bspconfig);
-    
+    embot::hw::bsp::Config bspconfig(tick1msecinit, tick1msecget);     
+    embot::hw::bsp::init(bspconfig);    
 
 #if     defined(APPSLIM_DO_NOTHING)
     
@@ -120,7 +128,7 @@ int main(void)
     static uint32_t count = 0;
     static const uint32_t PERIOD = 10;
     
-    led1ON = embot::common::bit::check(mask32, 0); 
+    led1ON = embot::binary::bit::check(mask32, 0); 
 
     
     embot::hw::led::on(embot::hw::led::LED::one);  
@@ -130,16 +138,18 @@ int main(void)
     for(;;)
     {
 
-        embot::hw::sys::delay(500*1000);  
+        embot::hw::sys::delay(250*1000);  
+        HAL_Delay(250);
 
         embot::hw::led::toggle(embot::hw::led::LED::one);
         
         if(PERIOD == ++count)
         {
-            // in here, i want to demonstrate functions of the embot::common::bit namespace which do bit manipulation of all integer types: 8, 16, 32, 64 bit long
+            // in here, i want to demonstrate functions of the embot::binary::bit namespace which does bit manipulation of all integer types: 8, 16, 32, 64 bit long
             count = 0;
-            embot::common::bit::toggle(mask32, 0);              
-            led1ON = embot::common::bit::check(mask32, 0);                 
+            embot::binary::bit::toggle(mask32, 0);              
+            led1ON = embot::binary::bit::check(mask32, 0);     
+            some_other_demonstrations();
         }
                 
         if(true == led1ON)
@@ -156,6 +166,62 @@ int main(void)
 #endif
     
 }
+
+// other static functions
+
+static void some_other_demonstrations(void)
+{
+    // i want to count how many bits are set.
+    const uint64_t themask64 = 0x1000000000110011; // surely five
+    const uint32_t themask32 = 0x11000011; // surely four
+    const uint16_t themask16 = 0x1011; // surely three
+    const uint8_t themask08 = 0x11; // surely two
+    
+    uint8_t numberofonebits = 0;
+    
+    numberofonebits = embot::binary::bit::count(themask64);
+    numberofonebits = embot::binary::bit::count(themask32);
+    numberofonebits = embot::binary::bit::count(themask16);
+    numberofonebits = embot::binary::bit::count(themask08);
+    numberofonebits = numberofonebits;
+    
+    
+    // i want to manipulate group of bits: nibbles
+    // it is useful to assign nibbles in a position, to clear them
+    
+    uint64_t destination = 0;
+    bool equal = false;
+    embot::binary::nibble::assign(destination, 0x3, 4);
+    destination = destination;
+    
+    embot::binary::nibble::assign(destination, 0xf, 3);
+    destination = destination;
+        
+    equal = embot::binary::nibble::check(destination, 0x3, 4);
+    equal = equal;
+    
+    embot::binary::nibble::assign(destination, 0x0, 4);
+    destination = destination;    
+    
+    equal = embot::binary::nibble::check(destination, 0x3, 4);
+    equal = equal;
+
+    // i want to manipulate group of bits: masks of any form
+    
+    uint64_t msk = 0x010101;
+    destination = 0;
+    embot::binary::mask::set(destination, msk);
+    destination = destination;
+    equal = embot::binary::mask::check(destination, msk);
+    equal = equal;
+    embot::binary::mask::toggle(destination, static_cast<uint64_t>(0x111111));
+    embot::binary::mask::toggle(destination, msk);
+    embot::binary::mask::toggle(destination, msk);
+    embot::binary::mask::toggle(destination, msk);
+    destination = destination;
+
+}
+
 
 
 

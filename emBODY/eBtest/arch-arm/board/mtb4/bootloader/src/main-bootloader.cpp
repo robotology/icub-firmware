@@ -6,6 +6,9 @@
 
 #include "embot.h"
 
+#include "embot_common.h"
+#include "embot_binary.h"
+
 #include "stm32hal.h" // to see bsp_led_init etc
 
 #include "embot_i2h.h"
@@ -165,7 +168,7 @@ static void eventbasedtask_init(embot::sys::Task *t, void *p)
 static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::Event evt, void *p)
 {  
     
-    if(true == embot::common::msk::check(evt, evRXcanframe))
+    if(true == embot::binary::mask::check(evt, evRXcanframe))
     {        
         embot::hw::can::Frame frame;
         std::uint8_t remaining = 0;

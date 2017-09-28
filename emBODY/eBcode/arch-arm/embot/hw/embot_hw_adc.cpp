@@ -34,6 +34,8 @@
 
 using namespace std;
 
+#include "embot_binary.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -109,7 +111,7 @@ namespace embot { namespace hw { namespace adc {
         {
             return false;
         }
-        return embot::common::bit::check(bspmap.mask, port2index(p));
+        return embot::binary::bit::check(bspmap.mask, port2index(p));
     }
     
     bool initialised(Port p)
@@ -118,7 +120,7 @@ namespace embot { namespace hw { namespace adc {
         {
             return false;
         }
-        return embot::common::bit::check(initialisedmask, port2index(p));
+        return embot::binary::bit::check(initialisedmask, port2index(p));
     }    
 
     
@@ -179,7 +181,7 @@ namespace embot { namespace hw { namespace adc {
         // init internal variables        
         s_adc_isrunning = false;
         
-        embot::common::bit::set(initialisedmask, port2index(p));
+        embot::binary::bit::set(initialisedmask, port2index(p));
 
         return resOK;
     }

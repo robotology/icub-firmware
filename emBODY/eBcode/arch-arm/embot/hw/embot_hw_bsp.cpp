@@ -62,11 +62,10 @@ namespace embot { namespace hw { namespace bsp {
             return resOK;
         }
         
-        // put whatwever is required for ...
-        
-        stm32hal_config_t cfg;
+        // put whatwever is required for ...        
+        stm32hal_config_t cfg = {0};
+        cfg.tick1ms_init = config.init1mstick;
         cfg.tick1ms_get = config.get1mstick;
-        cfg.initbsp = true;
         
         stm32hal_init(&cfg);
         

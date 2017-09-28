@@ -30,6 +30,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "embot.h"
+#include "embot_common.h"
+#include "embot_binary.h"
 
 #include <new>
 #include "embot_sys_Timer.h"
@@ -269,10 +271,10 @@ bool embot::app::application::theIMU::configure(embot::app::canprotocol::analog:
 //                                            static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::Message_ACC_GYRO_SETUP::InertialType::externaldigitalaccelerometer) ;                                        
 //    static const std::uint8_t gyrosmask =   static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::Message_ACC_GYRO_SETUP::InertialType::externaldigitalgyroscope);  
                                                    
-    pImpl->accelEnabled =   embot::common::bit::check(pImpl->accgyroinfo.maskoftypes, static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::Message_ACC_GYRO_SETUP::InertialTypeBit::analogaccelerometer))             ||
-                            embot::common::bit::check(pImpl->accgyroinfo.maskoftypes, static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::Message_ACC_GYRO_SETUP::InertialTypeBit::internaldigitalaccelerometer))    ||
-                            embot::common::bit::check(pImpl->accgyroinfo.maskoftypes, static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::Message_ACC_GYRO_SETUP::InertialTypeBit::externaldigitalaccelerometer));                                               
-    pImpl->gyrosEnabled =   embot::common::bit::check(pImpl->accgyroinfo.maskoftypes, static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::Message_ACC_GYRO_SETUP::InertialTypeBit::externaldigitalgyroscope));   
+    pImpl->accelEnabled =   embot::binary::bit::check(pImpl->accgyroinfo.maskoftypes, static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::Message_ACC_GYRO_SETUP::InertialTypeBit::analogaccelerometer))             ||
+                            embot::binary::bit::check(pImpl->accgyroinfo.maskoftypes, static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::Message_ACC_GYRO_SETUP::InertialTypeBit::internaldigitalaccelerometer))    ||
+                            embot::binary::bit::check(pImpl->accgyroinfo.maskoftypes, static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::Message_ACC_GYRO_SETUP::InertialTypeBit::externaldigitalaccelerometer));                                               
+    pImpl->gyrosEnabled =   embot::binary::bit::check(pImpl->accgyroinfo.maskoftypes, static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::Message_ACC_GYRO_SETUP::InertialTypeBit::externaldigitalgyroscope));   
     
     // if there is something to acquire and the rate is not zero: start acquisition
             

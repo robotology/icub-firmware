@@ -38,6 +38,7 @@
 
 using namespace std;
 
+#include "embot_binary.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -112,7 +113,7 @@ namespace embot { namespace hw { namespace onewire {
         {
             return false;
         }
-        return embot::common::bit::check(bspmap.mask, channel2index(c));
+        return embot::binary::bit::check(bspmap.mask, channel2index(c));
     }
     
     bool initialised(Channel c)
@@ -121,7 +122,7 @@ namespace embot { namespace hw { namespace onewire {
         {
             return false;
         }
-        return embot::common::bit::check(initialisedmask, channel2index(c));
+        return embot::binary::bit::check(initialisedmask, channel2index(c));
     }    
 
     
@@ -160,7 +161,7 @@ namespace embot { namespace hw { namespace onewire {
         if(s_privatedata.bitindex < s_privatedata.bitsnumber)
         {
             // set s_privatedata.bitindex
-            bool high = embot::common::bit::check(s_privatedata.bits64, s_privatedata.bitindex);
+            bool high = embot::binary::bit::check(s_privatedata.bits64, s_privatedata.bitindex);
             embot::hw::gpio::set(s_privatedata.activegpio, (true == high) ? (embot::hw::gpio::State::SET) : (embot::hw::gpio::State::RESET));
             //testbuffer[s_privatedata.bitindex] = high;
             s_privatedata.bitindex++;
@@ -217,7 +218,7 @@ namespace embot { namespace hw { namespace onewire {
         }
         
         
-        embot::common::bit::set(initialisedmask, channel2index(c));
+        embot::binary::bit::set(initialisedmask, channel2index(c));
 
         return resOK;
     }
@@ -297,29 +298,29 @@ bit pos 20  21  22  23  24  25  26  27  28  29  30  31  32  33  34  35  36  37  
             // dont do that: they already have zero value
             
             // set stop bits: 9, 19, 29, 39
-            embot::common::bit::set(s_privatedata.bits64, 9);
-            embot::common::bit::set(s_privatedata.bits64, 19);
-            embot::common::bit::set(s_privatedata.bits64, 29);
-            embot::common::bit::set(s_privatedata.bits64, 39);
+            embot::binary::bit::set(s_privatedata.bits64, 9);
+            embot::binary::bit::set(s_privatedata.bits64, 19);
+            embot::binary::bit::set(s_privatedata.bits64, 29);
+            embot::binary::bit::set(s_privatedata.bits64, 39);
             
             // assign 0x55 to bits [1-8]            
             msk64 = static_cast<std::uint64_t>(0x55) << 1;
-            embot::common::msk::set(s_privatedata.bits64, msk64);
+            embot::binary::mask::set(s_privatedata.bits64, msk64);
             
             // so far we have 0x80200802aa (confirmed with the debugger)
 #endif
 
             // assign reg & 0x0f to bits [11-18] 
             msk64 = static_cast<std::uint64_t>(reg & 0x0f) << 11;
-            embot::common::msk::set(s_privatedata.bits64, msk64);
+            embot::binary::mask::set(s_privatedata.bits64, msk64);
             
             // assign value & 0xff to bits [21-28]
             msk64 = static_cast<std::uint64_t>(value & 0xff) << 21;
-            embot::common::msk::set(s_privatedata.bits64, msk64);
+            embot::binary::mask::set(s_privatedata.bits64, msk64);
             
             // assign (value >> 8) & 0xff to bits [31-38]
             msk64 = static_cast<std::uint64_t>((value >> 8) & 0xff) << 31;
-            embot::common::msk::set(s_privatedata.bits64, msk64);            
+            embot::binary::mask::set(s_privatedata.bits64, msk64);            
 
             
 

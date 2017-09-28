@@ -51,6 +51,7 @@
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
+static void s_stm32hal_bps_dummy_tick1msinit(void);
 static uint32_t s_stm32hal_bps_dummy_tick1msget(void);
 
 
@@ -59,17 +60,11 @@ static uint32_t s_stm32hal_bps_dummy_tick1msget(void);
 // --------------------------------------------------------------------------------------------------------------------
 
 
-//static stm32hal_config_t s_stm32hal_bsp_config =
-//{
-//    .tick1ms_get = s_stm32hal_bps_dummy_tick1msget,
-//    .initbsp = true
-//};
-
 
 static stm32hal_config_t s_stm32hal_bsp_config =
 {
-    s_stm32hal_bps_dummy_tick1msget,
-    true
+    s_stm32hal_bps_dummy_tick1msinit,
+    s_stm32hal_bps_dummy_tick1msget
 };
 
 
@@ -84,16 +79,12 @@ extern void stm32hal_bsp_init(void);
 
 extern stm32hal_res_t stm32hal_init(const stm32hal_config_t *cfg)
 {
-//    static const stm32hal_config_t s_config = 
-//    {
-//        .tick1ms_get = s_stm32hal_bps_dummy_tick1msget,
-//        .initbsp = true
-//    };
+
     
     static const stm32hal_config_t s_config = 
     {
-        s_stm32hal_bps_dummy_tick1msget,
-        true
+        s_stm32hal_bps_dummy_tick1msinit,
+        s_stm32hal_bps_dummy_tick1msget
     };    
     
     if(NULL == cfg)
@@ -103,16 +94,16 @@ extern stm32hal_res_t stm32hal_init(const stm32hal_config_t *cfg)
     
     memmove(&s_stm32hal_bsp_config, cfg, sizeof(s_stm32hal_bsp_config));
     
+    if(NULL == s_stm32hal_bsp_config.tick1ms_init)
+    {
+        s_stm32hal_bsp_config.tick1ms_init = s_stm32hal_bps_dummy_tick1msinit;
+    }
+    
     if(NULL == s_stm32hal_bsp_config.tick1ms_get)
     {
         s_stm32hal_bsp_config.tick1ms_get = s_stm32hal_bps_dummy_tick1msget;
     }
-    
-    if(false == s_stm32hal_bsp_config.initbsp)
-    {
-        return stm32hal_res_OK;
-    }
-    
+        
     // defined in the specific board-xxxx section
     stm32hal_bsp_init();    
     
@@ -124,6 +115,11 @@ extern stm32hal_res_t stm32hal_init(const stm32hal_config_t *cfg)
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
+
+
+static void s_stm32hal_bps_dummy_tick1msinit(void)
+{
+}
 
 static uint32_t s_stm32hal_bps_dummy_tick1msget(void)
 {
@@ -155,7 +151,11 @@ HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
 //  HAL_NVIC_SetPriority(SysTick_IRQn, TickPriority ,0);
 //
 //  /* Return function status */
-  return HAL_OK;
+    
+    // it is never NULL
+    s_stm32hal_bsp_config.tick1ms_init();
+    
+    return HAL_OK;
 }
 
 void HAL_IncTick(void)
@@ -167,15 +167,8 @@ uint32_t HAL_GetTick(void)
 {
 //  return uwTick;
     
-//    osal_abstime_t t = osal_system_ticks_abstime_get() / 1000; // now t is expressed in millisec
-//    return (uint32_t)t;
-    
-    if(NULL != s_stm32hal_bsp_config.tick1ms_get)
-    {
-        return s_stm32hal_bsp_config.tick1ms_get();
-    }
-    
-    return 0;
+    // it is never NULL
+    return s_stm32hal_bsp_config.tick1ms_get();
 }
 
 

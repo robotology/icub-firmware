@@ -34,6 +34,7 @@
 
 using namespace std;
 
+#include "embot_binary.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -106,7 +107,7 @@ namespace embot { namespace hw { namespace PGA308 {
         {
             return false;
         }
-        return embot::common::bit::check(bspmap.mask, amplifier2index(a));
+        return embot::binary::bit::check(bspmap.mask, amplifier2index(a));
     }
     
     bool initialised(Amplifier a)
@@ -115,7 +116,7 @@ namespace embot { namespace hw { namespace PGA308 {
         {
             return false;
         }
-        return embot::common::bit::check(initialisedmask, amplifier2index(a));
+        return embot::binary::bit::check(initialisedmask, amplifier2index(a));
     }    
 
     
@@ -211,7 +212,7 @@ namespace embot { namespace hw { namespace PGA308 {
         embot::hw::onewire::init(config.onewirechannel, config.onewireconfig);
         
         // must set it to initialsied in order to use setdefault
-        embot::common::bit::set(initialisedmask, amplifier2index(a));
+        embot::binary::bit::set(initialisedmask, amplifier2index(a));
         
         
         // load the default settings of pga308. i use the         

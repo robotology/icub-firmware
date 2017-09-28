@@ -31,6 +31,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "embot.h"
+#include "embot_common.h"
+#include "embot_binary.h"
 
 #include <cstring>
 
@@ -72,7 +74,7 @@ namespace embot { namespace app { namespace canprotocol { namespace bootloader {
         
         std::uint8_t ind = cmd >> 6;
         std::uint8_t pos = cmd & 0x3f;
-        if(true == embot::common::bit::check(blmask256[ind], pos))
+        if(true == embot::binary::bit::check(blmask256[ind], pos))
         {
             return static_cast<CMD>(cmd);            
         }
@@ -363,7 +365,7 @@ namespace embot { namespace app { namespace canprotocol { namespace bootloader {
             std::memset(cumulativeinfo32, 0, sizeof(cumulativeinfo32));                
         }
         
-        embot::common::bit::set(receivedmask, counter);
+        embot::binary::bit::set(receivedmask, counter);
         std::memmove(&cumulativeinfo32[4*counter], &candata.datainframe[1], 4);
         
         info.valid = false;

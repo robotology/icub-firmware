@@ -50,11 +50,13 @@
 // - includes
 
 #include "stm32hal.h" 
-#include "embot_hw.h"
-#include "embot_hw_sys.h"
+    
+#include "embot_common.h"
+#include "embot_binary.h"
+    
 #include "embot_hw_bsp.h"
 #include "embot_hw_led.h"
-    
+#include "embot_hw_sys.h"
 
 #if     defined(APPSLIM_STM32HAL_TICK_SYSTICK)
     
@@ -65,27 +67,34 @@ void SysTick_Handler(void)
     s_1mstickcount++;
 }
 
+static void tick1msecinit(void)
+{
+    HAL_SYSTICK_Config(SystemCoreClock/1000);
+}
+    
 static uint32_t tick1msecget(void)
 {
-    static bool started = false;
-    if(!started)
-    {
-        started = true;
-        HAL_SYSTICK_Config(SystemCoreClock/1000);
-    }
     return (uint32_t)s_1mstickcount;
 }
 
 #else
 
+static void tick1msecinit(void)
+{   
+}
+
 static uint32_t tick1msecget(void)
-{
-    return 0;
+{   // one must always provide one function which counts forward
+    static uint32_t n = 0;
+    return n++;
 }
 
 #endif
 
-  
+
+
+static void some_other_demonstrations(void);
+
 
 int main(void)
 { 
@@ -93,7 +102,7 @@ int main(void)
     embot::hw::sys::relocatevectortable(embot::hw::sys::addressOfApplication - embot::hw::sys::startOfFLASH);   
 #endif
     
-    embot::hw::bsp::Config bspconfig(tick1msecget);    
+    embot::hw::bsp::Config bspconfig(tick1msecinit, tick1msecget);    
     embot::hw::bsp::init(bspconfig);
     
 
@@ -113,42 +122,45 @@ int main(void)
     // BLUE     []_[]_[]_[]_[]________________[]_[]_[]_[]_[]________________[]_[]_[]_[]_[]________________[]_[]_[]_[]_[]________________[]_[]_[]_[]_[]_
 
     
-    embot::hw::led::init(embot::hw::led::LED::zero);
     embot::hw::led::init(embot::hw::led::LED::one);
+    embot::hw::led::init(embot::hw::led::LED::two);
     
     static bool led1ON = true;
     static uint32_t mask32 = 0x01;    
     static uint32_t count = 0;
     static const uint32_t PERIOD = 10;
     
-    led1ON = embot::common::bit::check(mask32, 0);  
-    
-    embot::hw::led::on(embot::hw::led::LED::zero);  
+    led1ON = embot::binary::bit::check(mask32, 0); 
 
-    embot::hw::led::on(embot::hw::led::LED::one);
+    
+    embot::hw::led::on(embot::hw::led::LED::one);  
+
+    embot::hw::led::on(embot::hw::led::LED::two);
     
     for(;;)
     {
 
-        embot::hw::sys::delay(500*1000);  
+        embot::hw::sys::delay(250*1000);  
+        HAL_Delay(250);
 
-        embot::hw::led::toggle(embot::hw::led::LED::zero);
+        embot::hw::led::toggle(embot::hw::led::LED::one);
         
         if(PERIOD == ++count)
         {
-            // in here, i want to demonstrate functions of the embot::common::bit namespace which do bit manipulation of all integer types: 8, 16, 32, 64 bit long
+            // in here, i want to demonstrate functions of the embot::binary::bit namespace which does bit manipulation of all integer types: 8, 16, 32, 64 bit long
             count = 0;
-            embot::common::bit::toggle(mask32, 0);              
-            led1ON = embot::common::bit::check(mask32, 0);                 
+            embot::binary::bit::toggle(mask32, 0);              
+            led1ON = embot::binary::bit::check(mask32, 0);     
+            some_other_demonstrations();
         }
                 
         if(true == led1ON)
         {                                        
-            embot::hw::led::toggle(embot::hw::led::LED::one);
+            embot::hw::led::toggle(embot::hw::led::LED::two);
         } 
         else
         {
-            embot::hw::led::off(embot::hw::led::LED::one);
+            embot::hw::led::off(embot::hw::led::LED::two);
         }    
                     
     }
@@ -157,7 +169,12 @@ int main(void)
     
 }
 
+// other static functions
 
+static void some_other_demonstrations(void)
+{
+    
+}
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

@@ -30,6 +30,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "embot.h"
+#include "embot_common.h"
+#include "embot_binary.h"
 
 #include <new>
 #include "embot_sys_Timer.h"
@@ -75,9 +77,9 @@ struct TriangleErr
 {
     std::uint16_t   mask;   // bits 0-11 are for outofrange of the dot. bits 12, 13, 14 are for future use. bit 15 is error
     void reset() { mask = 0; } 
-    void set_error() { embot::common::bit::set(mask, 15); }    // error is in bit 15
-    void set_outofrange(std::uint8_t dot) { if(dot < dotNumberOf) { embot::common::bit::set(mask, dot); } }
-    bool is_error() { return embot::common::bit::check(mask, 15); }
+    void set_error() { embot::binary::bit::set(mask, 15); }    // error is in bit 15
+    void set_outofrange(std::uint8_t dot) { if(dot < dotNumberOf) { embot::binary::bit::set(mask, dot); } }
+    bool is_error() { return embot::binary::bit::check(mask, 15); }
     std::uint16_t get_outofrangemask() { return mask & 0x0fff; }
     TriangleErr() : mask(0) {}
 };
@@ -173,11 +175,11 @@ bool embot::app::application::theSkin::Impl::configtriangles(embot::app::canprot
                 
         if(true == triangleconfigcommand.enabled)
         {
-            embot::common::bit::set(triangles.activemask, i);
+            embot::binary::bit::set(triangles.activemask, i);
         }
         else
         {
-            embot::common::bit::clear(triangles.activemask, i);
+            embot::binary::bit::clear(triangles.activemask, i);
         }
         
         // we process shift and cdcoffset even if we have enabled == false ... as the old mtb3 application does
@@ -344,23 +346,23 @@ bool embot::app::application::theSkin::Impl::fill(embot::app::canprotocol::skin:
         // check vs a strange value (original comment: if the sensor is far from the limits -> taxel could be broken)
         if((value <= -(UP_LIMIT<<1)) || (value >= (BOT_LIMIT << 1)))
         {
-            embot::common::bit::set(info.outofrangemaskofthe12s, i);  
+            embot::binary::bit::set(info.outofrangemaskofthe12s, i);  
         }                    
     
         // check if any errors on rawvalues[i]              
         if(0xffff == the12rawvalues[i])
         {
-            embot::common::bit::set(info.notconnectedmaskofthe12s, i);                    
+            embot::binary::bit::set(info.notconnectedmaskofthe12s, i);                    
         }
         else if((0 == the12rawvalues[i]) && (0 != the12capoffsets[i]))
         {
-            embot::common::bit::set(info.notackmaskofthe12s, i);                    
+            embot::binary::bit::set(info.notackmaskofthe12s, i);                    
         }
     }
     
     
 //    bool triangleISnotconnected = false;
-//    if(dotNumberOf == embot::common::bit::count(info.notconnectedmaskofthe12s))
+//    if(dotNumberOf == embot::binary::bit::count(info.notconnectedmaskofthe12s))
 //    {
 //        triangleISnotconnected = true;
 //    }  
@@ -428,7 +430,7 @@ bool embot::app::application::theSkin::Impl::tick(std::vector<embot::hw::can::Fr
     embot::app::canprotocol::skin::periodic::Message_TRG::Info info;
     for(std::uint8_t t=0; t<trgNumberOf; t++)
     {
-        if(true == embot::common::bit::check(triangles.activemask, t))
+        if(true == embot::binary::bit::check(triangles.activemask, t))
         {                
             if(true == fill(info, t))
             {

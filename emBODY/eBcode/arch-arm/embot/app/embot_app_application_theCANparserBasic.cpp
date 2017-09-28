@@ -30,6 +30,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "embot.h"
+#include "embot_common.h"
+#include "embot_binary.h"
 
 #include <new>
 
@@ -109,7 +111,7 @@ struct embot::app::application::theCANparserBasic::Impl
             {
                 target = (embot::hw::sys::random()-embot::hw::sys::minrandom()) & 0xf;
                
-                if(false == embot::common::bit::check(mask, target))
+                if(false == embot::binary::bit::check(mask, target))
                 {
                     ok = true;
                     break;                    
