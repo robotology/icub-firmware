@@ -120,7 +120,8 @@ int main(void)
     static uint32_t count = 0;
     static const uint32_t PERIOD = 10;
     
-    led1ON = embot::common::bit::check(mask32, 0);  
+    led1ON = embot::common::bit::check(mask32, 0); 
+
     
     embot::hw::led::on(embot::hw::led::LED::one);  
 
