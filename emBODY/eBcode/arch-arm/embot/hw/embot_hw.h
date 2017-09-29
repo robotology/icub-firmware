@@ -27,10 +27,10 @@
 
 namespace embot { namespace hw {
     
-    using result_t = std::int8_t;
+    enum class result_t { OK = 0, NOK = -1 };
     
-    const result_t resOK   = 0;
-    const result_t resNOK  = -1;
+    const result_t resOK   = result_t::OK;
+    const result_t resNOK  = result_t::NOK;
     
 }} // namespace embot { namespace hw {
 
