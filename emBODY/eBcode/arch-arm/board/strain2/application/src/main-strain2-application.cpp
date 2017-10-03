@@ -6,6 +6,7 @@
 #undef TEST_HW_TIM
 #undef TEST_HW_ONEWIRE
 #undef TEST_DSP
+#define TEST_HW_SI7051
 
 #if defined(TEST_ENABLED)
 void tests_launcher_init();
@@ -43,6 +44,13 @@ void tests_tick();
 #include "embot_hw_timer.h"
 #include "embot_hw_pga308.h"
 #include "embot_hw_adc.h"
+
+#if defined(TEST_SI_ORIG)
+#include "embot_hw_si705x.h"
+#else
+#include "embot_hw_si7051.h"
+#endif
+
 
 
 static const embot::app::canprotocol::versionOfAPPLICATION vAP = {1, 0 , 3};
@@ -383,6 +391,18 @@ embot::dsp::q15::matrix ma3;
 void tests_launcher_init()
 {
     
+#if defined(TEST_HW_SI7051)
+       
+#if defined(TEST_SI_ORIG)
+    embot::hw::SI705X::Config si705xconfig;    
+    embot::hw::SI705X::init(embot::hw::SI705X::Sensor::one, si705xconfig);      
+#else
+    embot::hw::SI7051::Config si7051config;    
+    embot::hw::SI7051::init(embot::hw::SI7051::Sensor::one, si7051config);   
+#endif    
+    
+#endif
+    
 #if defined(TEST_HW_PGA308)
     
     embot::hw::PGA308::Config pga308cfg;
@@ -460,6 +480,28 @@ void tests_launcher_init()
 
 void tests_tick() 
 {
+#if defined(TEST_HW_SI7051)
+    
+    embot::common::Time starttime = embot::sys::timeNow();
+    embot::common::Time endtime = starttime;
+    
+#if defined(TEST_SI_ORIG)
+    embot::hw::SI705X::Temperature temp;    
+    embot::hw::SI705X::get(embot::hw::SI705X::Sensor::one, temp);  
+#else    
+    embot::hw::SI7051::Temperature temp;    
+    embot::hw::SI7051::get(embot::hw::SI7051::Sensor::one, temp);        
+#endif
+
+    endtime = embot::sys::timeNow();
+    
+    static embot::common::Time delta = 0;
+    delta = endtime - starttime;
+    delta = delta;
+    
+#endif
+    
+    
 #if defined(TEST_HW_ADC)
         
     adcdmadone_clr(nullptr);
