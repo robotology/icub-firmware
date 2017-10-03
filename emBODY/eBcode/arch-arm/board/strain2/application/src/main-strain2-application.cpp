@@ -1,5 +1,5 @@
 
-#undef TEST_ENABLED
+#define TEST_ENABLED
 
 #undef TEST_HW_PGA308
 #undef TEST_HW_ADC
@@ -45,10 +45,17 @@ void tests_tick();
 #include "embot_hw_pga308.h"
 #include "embot_hw_adc.h"
 
+
+#include "embot_hw_bsp_strain2.h"
+
 #if defined(TEST_SI_ORIG)
-#include "embot_hw_si705x.h"
+//#include "embot_hw_si705x.h"
 #else
 #include "embot_hw_si7051.h"
+
+const embot::hw::SI7051::Sensor SI7051sensor = embot::hw::bsp::strain2::termometerSGAUGES;
+const embot::hw::SI7051::Config SI7051config = embot::hw::bsp::strain2::termometerSGAUGESconfig;
+
 #endif
 
 
@@ -321,16 +328,16 @@ void toggleled(void*)
         
         if(0 == on)
         {
-            embot::hw::led::off(embot::hw::led::LED::zero); 
+            embot::hw::led::off(embot::hw::led::LED::one); 
             on = 1;
         }
         else 
         {
-            embot::hw::led::on(embot::hw::led::LED::zero);
+            embot::hw::led::on(embot::hw::led::LED::one);
             on = 0;
             num++;
         }
-        //embot::hw::led::toggle(embot::hw::led::LED::zero);
+        //embot::hw::led::toggle(embot::hw::led::LED::one);
         count = 0;
     }
     count ++;
@@ -360,10 +367,10 @@ void toggleled(void*)
 
 void test_tim_init(void)
 {
-    embot::hw::led::init(embot::hw::led::LED::zero);
+    embot::hw::led::init(embot::hw::led::LED::one);
     
-    embot::hw::led::on(embot::hw::led::LED::zero); 
-    embot::hw::led::off(embot::hw::led::LED::zero); 
+    embot::hw::led::on(embot::hw::led::LED::one); 
+    embot::hw::led::off(embot::hw::led::LED::one); 
     
     embot::hw::timer::Config con;
     con.time = embot::common::time1microsec * 100;
@@ -397,8 +404,7 @@ void tests_launcher_init()
     embot::hw::SI705X::Config si705xconfig;    
     embot::hw::SI705X::init(embot::hw::SI705X::Sensor::one, si705xconfig);      
 #else
-    embot::hw::SI7051::Config si7051config;    
-    embot::hw::SI7051::init(embot::hw::SI7051::Sensor::one, si7051config);   
+    embot::hw::SI7051::init(SI7051sensor, SI7051config);   
 #endif    
     
 #endif
@@ -476,7 +482,12 @@ void tests_launcher_init()
     
 }
 
-
+void counter(void *p)
+{
+    static int count = 0;
+    
+    count++;
+}
 
 void tests_tick() 
 {
@@ -490,7 +501,31 @@ void tests_tick()
     embot::hw::SI705X::get(embot::hw::SI705X::Sensor::one, temp);  
 #else    
     embot::hw::SI7051::Temperature temp;    
-    embot::hw::SI7051::get(embot::hw::SI7051::Sensor::one, temp);        
+
+    const int ntimes = 1000;
+    embot::common::Callback cbk(counter, nullptr);
+    int num = 0;
+    for(int i=0; i<ntimes; i++)
+    {
+#if 0        
+        if(true == embot::hw::SI7051::isalive(SI7051sensor))
+        {
+            num++;
+        }
+#else        
+        embot::hw::SI7051::acquisition(SI7051sensor, cbk);
+        
+        for(;;)
+        {
+            if(true == embot::hw::SI7051::isready(SI7051sensor))
+            {
+                break;
+            }
+        }
+        
+        embot::hw::SI7051::read(SI7051sensor, temp);    
+#endif        
+    }
 #endif
 
     endtime = embot::sys::timeNow();
@@ -498,6 +533,8 @@ void tests_tick()
     static embot::common::Time delta = 0;
     delta = endtime - starttime;
     delta = delta;
+    num = num;
+    // 7 millisec each
     
 #endif
     
