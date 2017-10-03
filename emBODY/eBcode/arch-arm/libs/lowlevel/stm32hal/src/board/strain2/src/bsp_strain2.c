@@ -91,11 +91,11 @@ extern void stm32hal_bsp_init(void)
     MX_DMA_Init();
 // IIT-EXT: this funtion is called inside embot::hw::timer::init()    MX_TIM6_Init();
 // IIT-EXT: this funtion is called inside embot::hw::can::init()   MX_CAN1_Init();
-    MX_USART1_UART_Init();
+// IIT-EXT: this peripheral is not used:        MX_USART1_UART_Init();
 // IIT-EXT: this funtion is called inside embot::hw::adc::init()   MX_ADC1_Init();
-    MX_I2C1_Init();
-    MX_I2C2_Init();
-    MX_USART2_UART_Init();
+// IIT-EXT: this funtion is called inside embot::hw::i2c::init()    MX_I2C1_Init();
+// IIT-EXT: this funtion is called inside embot::hw::i2c::init()    MX_I2C2_Init();
+// IIT-EXT: this peripheral is not used:        MX_USART2_UART_Init();
 // IIT-EXT: this funtion is called inside embot::hw::timer::init()    MX_TIM7_Init();
 // IIT-EXT: this funtion is called inside embot::hw::timer::init()    MX_TIM16_Init();
 // IIT-EXT: this funtion is called inside embot::hw::timer::init()    MX_TIM15_Init();
