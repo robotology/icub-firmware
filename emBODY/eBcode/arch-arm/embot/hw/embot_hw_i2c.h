@@ -27,7 +27,7 @@
 
 
 
-
+// see also https://www.i2c-bus.org/
 
 namespace embot { namespace hw { namespace i2c {
     
@@ -35,22 +35,28 @@ namespace embot { namespace hw { namespace i2c {
     
     struct Config
     {   
-        std::uint32_t       dummy;         
-        Config() : dummy(0) {}
+        std::uint32_t   speed; 
+        Config(std::uint32_t s) : speed(s) {}        
+        Config() : speed(400000) {}
     };
+    
     
     bool supported(Bus b);
     
     bool initialised(Bus b);
     
     result_t init(Bus b, const Config &config);
-
     
-    bool ping(Bus b, std::uint8_t adr, std::uint8_t retries = 3, embot::common::relTime timeout = 10*embot::common::time1millisec);
-    
-    result_t read(Bus b, std::uint8_t adr, std::uint8_t reg, void *data, std::uint8_t size, embot::common::Callback oncompletion);
-    
+    // if a transaction is ongoing, hence the bus cannot be used.
     bool isbusy(Bus b);
+    
+    // check is the device is present
+    bool ping(Bus b, std::uint8_t adr, std::uint8_t retries = 3, embot::common::relTime timeout = embot::common::time1millisec);
+    
+    // it asks to device with address adr the content of the register reg (so far only 8 bit addressing, sic).
+    // at the end of transaction, the result is put in data and the callback oncompletion is called. 
+    result_t read(Bus b, std::uint8_t adr, std::uint8_t reg, embot::common::Data &destination, embot::common::Callback oncompletion);
+    
 
 }}} // namespace embot { namespace hw { namespace i2c {
     

@@ -40,6 +40,9 @@ using namespace std;
 
 extern DMA_HandleTypeDef hdma_i2c1_tx;
 extern DMA_HandleTypeDef hdma_i2c1_rx;
+extern DMA_HandleTypeDef hdma_i2c2_tx;
+extern DMA_HandleTypeDef hdma_i2c2_rx;
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -61,7 +64,7 @@ namespace embot { namespace hw { namespace i2c {
     result_t init(Bus b, const Config &config)                                                      { return resNOK; }
     
     bool ping(Bus b, std::uint8_t adr, std::uint8_t retries, embot::common::relTime timeout)        { return false; }       
-    result_t read(Bus b, std::uint8_t adr, std::uint8_t reg, void *data, std::uint8_t size, embot::common::Callback oncompletion, embot::common::relTime timeout) { return resNOK; }
+    result_t read(Bus b, std::uint8_t adr, std::uint8_t reg, embot::common::Data &destination, embot::common::Callback oncompletion) { return resNOK; }
     bool isbusy(Bus b)                                                                              { return false; }
 
 }}} // namespace embot { namespace hw { namespace i2c {
@@ -167,8 +170,18 @@ namespace embot { namespace hw { namespace i2c {
         }
         
         s_privatedata.config[bus2index(b)] = config;
-                        
 
+#if     defined(STM32HAL_BOARD_STRAIN2)   
+        if(b == Bus::one)
+        {            
+            MX_I2C1_Init();
+        }
+        else if(b == Bus::two)
+        {
+            MX_I2C2_Init();
+        }                        
+#endif
+        
         embot::binary::bit::set(initialisedmask, bus2index(b));
                 
         return resOK;
@@ -188,14 +201,18 @@ namespace embot { namespace hw { namespace i2c {
         }
         
         std::uint8_t index = bus2index(b);
+        
+        s_privatedata.busy[index] = true;
                 
         HAL_StatusTypeDef status = HAL_I2C_IsDeviceReady(s_stm32_i2c_mapping[index].phandlei2cx, adr, retries, timeout/1000);
+        
+        s_privatedata.busy[index] = false;
         
         return (HAL_OK == status) ? true : false;       
     }
 
     
-    result_t read(Bus b, std::uint8_t adr, std::uint8_t reg, void *data, std::uint8_t size, embot::common::Callback oncompletion)
+    result_t read(Bus b, std::uint8_t adr, std::uint8_t reg, embot::common::Data &destination, embot::common::Callback oncompletion)
     {
         if(false == initialised(b))
         {
@@ -207,13 +224,18 @@ namespace embot { namespace hw { namespace i2c {
             return resNOK;
         }
         
+        if(false == destination.isvalid())
+        {
+            return resNOK;
+        }
+        
         std::uint8_t index = bus2index(b);
         
         s_privatedata.adr[index] = adr;
         s_privatedata.oncompletion[index] = oncompletion;
         s_privatedata.busy[index] = true;
-        s_privatedata.rxdata[index] = data;
-        s_privatedata.rxsize[index] = size;
+        s_privatedata.rxdata[index] = destination.pointer;
+        s_privatedata.rxsize[index] = destination.size;
         
         HAL_I2C_Master_Transmit_DMA(s_stm32_i2c_mapping[index].phandlei2cx, adr, static_cast<std::uint8_t*>(&reg), 1);
                 
@@ -235,12 +257,6 @@ namespace embot { namespace hw { namespace i2c {
 }}} // namespace embot { namespace hw { namespace i2c {
 
 
-#if defined(TEST_SI_ORIG)
-
-#warning ATTENZIONE: TEST_SI_ORIG defined ....
-
-#else
-
     
 void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *I2cHandle)
 {
@@ -249,20 +265,32 @@ void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *I2cHandle)
         std::uint8_t index = 0;
         HAL_I2C_Master_Receive_DMA(&hi2c1, embot::hw::i2c::s_privatedata.adr[index], static_cast<std::uint8_t*>(embot::hw::i2c::s_privatedata.rxdata[index]), embot::hw::i2c::s_privatedata.rxsize[index]);
     }
+    if(I2cHandle->Instance==I2C2)
+    {   
+        std::uint8_t index = 1;
+        HAL_I2C_Master_Receive_DMA(&hi2c2, embot::hw::i2c::s_privatedata.adr[index], static_cast<std::uint8_t*>(embot::hw::i2c::s_privatedata.rxdata[index]), embot::hw::i2c::s_privatedata.rxsize[index]);
+    }
 }
 
 void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *I2cHandle)
 {
-    if(I2cHandle->Instance==I2C1)
+    std::uint8_t index = 0;
+    
+    if(I2cHandle->Instance == I2C1)
     {
-        std::uint8_t index = 0;
-        
-        if(nullptr != embot::hw::i2c::s_privatedata.oncompletion[index].callback)
-        {
-            embot::hw::i2c::s_privatedata.oncompletion[index].callback(embot::hw::i2c::s_privatedata.oncompletion[index].arg);
-        }
-        embot::hw::i2c::s_privatedata.busy[index] = false;
+       index = 0;
     }
+    else if(I2cHandle->Instance == I2C2)
+    {
+       index = 1;
+    }
+        
+    if(nullptr != embot::hw::i2c::s_privatedata.oncompletion[index].callback)
+    {
+        embot::hw::i2c::s_privatedata.oncompletion[index].callback(embot::hw::i2c::s_privatedata.oncompletion[index].arg);
+    }
+    embot::hw::i2c::s_privatedata.busy[index] = false;
+
 }    
     
     
@@ -324,7 +352,64 @@ void DMA1_Channel7_IRQHandler(void)
   /* USER CODE END DMA1_Channel7_IRQn 1 */
 }
 
-#endif
+
+
+/**
+* @brief This function handles DMA1 channel4 global interrupt.
+*/
+void DMA1_Channel4_IRQHandler(void)
+{
+  /* USER CODE BEGIN DMA1_Channel4_IRQn 0 */
+
+  /* USER CODE END DMA1_Channel4_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_i2c2_tx);
+  /* USER CODE BEGIN DMA1_Channel4_IRQn 1 */
+
+  /* USER CODE END DMA1_Channel4_IRQn 1 */
+}
+
+/**
+* @brief This function handles DMA1 channel5 global interrupt.
+*/
+void DMA1_Channel5_IRQHandler(void)
+{
+  /* USER CODE BEGIN DMA1_Channel5_IRQn 0 */
+
+  /* USER CODE END DMA1_Channel5_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_i2c2_rx);
+  /* USER CODE BEGIN DMA1_Channel5_IRQn 1 */
+
+  /* USER CODE END DMA1_Channel5_IRQn 1 */
+}
+
+/**
+* @brief This function handles I2C2 event interrupt.
+*/
+void I2C2_EV_IRQHandler(void)
+{
+  /* USER CODE BEGIN I2C2_EV_IRQn 0 */
+
+  /* USER CODE END I2C2_EV_IRQn 0 */
+  HAL_I2C_EV_IRQHandler(&hi2c2);
+  /* USER CODE BEGIN I2C2_EV_IRQn 1 */
+
+  /* USER CODE END I2C2_EV_IRQn 1 */
+}
+
+/**
+* @brief This function handles I2C2 error interrupt.
+*/
+void I2C2_ER_IRQHandler(void)
+{
+  /* USER CODE BEGIN I2C2_ER_IRQn 0 */
+
+  /* USER CODE END I2C2_ER_IRQn 0 */
+  HAL_I2C_ER_IRQHandler(&hi2c2);
+  /* USER CODE BEGIN I2C2_ER_IRQn 1 */
+
+  /* USER CODE END I2C2_ER_IRQn 1 */
+}
+
 
 #endif //defined(HAL_I2C_MODULE_ENABLED)
 

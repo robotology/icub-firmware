@@ -43,6 +43,16 @@ namespace embot { namespace common {
         Callback(fpCallback _cbk, void *_arg) : callback(_cbk), arg(_arg) {}
     };
     
+    struct Data
+    {
+        void * pointer;
+        std::uint32_t size;
+        Data() : pointer(nullptr), size(0) {}
+        Data(void *p, std::uint32_t s) : pointer(p), size(s) {}
+        void load(void *p, std::uint32_t s) { pointer = p; size = s; }
+        bool isvalid() { if((nullptr != pointer) && (0 != size)){ return true; } else { return false; } }
+    };
+    
     using Time          = std::uint64_t;    // expressed in usec.  expresses absolute time    
     using relTime       = std::uint32_t;    // expressed in usec. it is used to express relative time. 0 means: 0 usec from ...
     

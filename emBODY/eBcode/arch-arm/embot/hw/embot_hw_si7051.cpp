@@ -38,8 +38,6 @@ using namespace std;
 #include "embot_hw_sys.h"
 
 
-extern DMA_HandleTypeDef hdma_i2c1_tx;
-extern DMA_HandleTypeDef hdma_i2c1_rx;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -116,17 +114,48 @@ namespace embot { namespace hw { namespace SI7051 {
         return embot::binary::bit::check(initialisedmask, sensor2index(s));
     }    
 
+    struct Acquisition
+    {
+        volatile bool done;
+        volatile bool ongoing;
+        Temperature temp;
+        std::uint8_t rxdata[2];
+        embot::common::Callback userdefCBK;  
+        void clear() { done = false; ongoing = false; temp = 0; rxdata[0] = rxdata[1] = 0; userdefCBK.callback = nullptr; userdefCBK.arg = nullptr; }         
+    };
     
     struct PrivateData
     {    
         Config config[static_cast<unsigned int>(Sensor::maxnumberof)];        
-
+        Acquisition acquisition[static_cast<unsigned int>(Sensor::maxnumberof)];
         PrivateData() { }
     };
     
+    
+    static const std::uint8_t i2caddress = 0x80;
+    static const std::uint8_t registerTtemperatureRead = 0xE3;
+    
     static PrivateData s_privatedata;
     
-          
+    static void sharedCBK(void *p)
+    {
+        Acquisition *acq = reinterpret_cast<Acquisition*>(p);        
+        
+        std::uint16_t value = (acq->rxdata[0]<<8) + acq->rxdata[1];
+               
+        std::int32_t res = ( (17572 * static_cast<std::int32_t>(value) ) >> 16) - 4685;
+        res /= 10;
+        
+        acq->temp = static_cast<std::int16_t>(res);
+        acq->ongoing = false;
+        acq->done = true;
+        
+        if(nullptr != acq->userdefCBK.callback)
+        {
+            acq->userdefCBK.callback(acq->userdefCBK.arg);
+        }
+    }
+              
     result_t init(Sensor s, const Config &config)
     {
         if(false == supported(s))
@@ -139,80 +168,130 @@ namespace embot { namespace hw { namespace SI7051 {
             return resOK;
         }
         
-        s_privatedata.config[sensor2index(s)] = config;
-                        
-        
+        std::uint8_t index = sensor2index(s);
+                
         // init i2c ..
         embot::hw::i2c::init(config.i2cbus, config.i2cconfig);
         
-        bool present = embot::hw::i2c::ping(config.i2cbus, 0x80);
+        if(false == embot::hw::i2c::ping(config.i2cbus, i2caddress))
+        {
+            return resNOK;
+        }
         
-        present = present;
-            
-
+        s_privatedata.config[index] = config;
+        s_privatedata.acquisition[index].clear();
+        
         embot::binary::bit::set(initialisedmask, sensor2index(s));
                 
         return resOK;
     }
+
+    bool isbusbusy(Sensor s)
+    {
+        if(false == initialised(s))
+        {
+            return false;
+        } 
+
+        std::uint8_t index = sensor2index(s);  
+        return embot::hw::i2c::isbusy(s_privatedata.config[index].i2cbus);             
+    }
     
+    bool isacquiring(Sensor s)
+    {
+        if(false == initialised(s))
+        {
+            return false;
+        } 
+
+        std::uint8_t index = sensor2index(s);        
+        return s_privatedata.acquisition[index].ongoing;     
+    }
     
-    
-    result_t get(Sensor s, Temperature &temp)
+    result_t acquisition(Sensor s, const embot::common::Callback &oncompletion)
     {
         if(false == initialised(s))
         {
             return resNOK;
         } 
 
-        std::uint8_t index = sensor2index(s);     
-        result_t r = resOK;
-         
-        std::uint16_t value = 0;
-        std::uint8_t rxdata[2] = {0};
-        // must read via i2c in blocking way
-        embot::common::Callback cbk;
-        embot::hw::i2c::read(s_privatedata.config[index].i2cbus, 0x80, 0xE3, rxdata, 2, cbk);
+        std::uint8_t index = sensor2index(s);
         
-        for(;;)
+        if(true == s_privatedata.acquisition[index].ongoing)
         {
-            if(false == embot::hw::i2c::isbusy(s_privatedata.config[index].i2cbus))
-            {
-                break;
-            }            
+            return resNOK;
         }
         
-// 
-//        
-//        // in polling
-//#if !defined(TEST_HAL_DMA)               
-//        std::uint32_t tout = 5;
-//        HAL_I2C_Master_Transmit(&hi2c1, 0x80, &txdata, 1, tout);        
-//        HAL_I2C_Master_Receive(&hi2c1, 0x80, &rxdata[0], 2, tout);
-//#else
-//        
-//        embot::hw::SI7051::done = false;
-//        HAL_I2C_Master_Transmit_DMA(&hi2c1, (uint16_t)0x80, &txdata, 1);
-//        
-//        for(;;)
-//        {
-//            if(true == embot::hw::SI7051::done)
-//            {
-//                break;
-//            }            
-//        }
-//        
-//        embot::hw::SI7051::tempcode = (embot::hw::SI7051::rxdata[0]<<8) + embot::hw::SI7051::rxdata[1];
-//#endif        
+        // i2c must not be busy
+        if(true == embot::hw::i2c::isbusy(s_privatedata.config[index].i2cbus))
+        {
+            return resNOK;
+        }
+                
+        s_privatedata.acquisition[index].clear();
+        s_privatedata.acquisition[index].ongoing = true;
+        s_privatedata.acquisition[index].done = false;
+        s_privatedata.acquisition[index].userdefCBK = oncompletion;
         
-        value = (rxdata[0]<<8) + rxdata[1];
-               
-        std::int32_t res = ( (17572 * static_cast<std::int32_t>(value) ) >> 16) - 4685;
-        res /= 10;
+        // ok, now i trigger i2c.
+        embot::common::Callback cbk(sharedCBK, &s_privatedata.acquisition[index]);
+        embot::common::Data data = embot::common::Data(&s_privatedata.acquisition[index].rxdata[0], 2);
+        embot::hw::i2c::read(s_privatedata.config[index].i2cbus, i2caddress, registerTtemperatureRead, data, cbk);
         
-        temp = static_cast<std::int16_t>(res);
         
-        return r;        
+        return resOK;
     }
+    
+    bool isalive(Sensor s)
+    {
+        if(false == initialised(s))
+        {
+            return false;
+        } 
+
+        std::uint8_t index = sensor2index(s);
+        
+        if(true == embot::hw::i2c::isbusy(s_privatedata.config[index].i2cbus))
+        {
+            return false;
+        }
+
+        return embot::hw::i2c::ping(s_privatedata.config[index].i2cbus, i2caddress);        
+    }
+
+    
+    bool isready(Sensor s)
+    {
+        if(false == initialised(s))
+        {
+            return false;
+        } 
+
+        std::uint8_t index = sensor2index(s);
+
+        return s_privatedata.acquisition[index].done;        
+    }
+    
+    
+    result_t read(Sensor s, Temperature &temp)
+    {
+        if(false == initialised(s))
+        {
+            return resNOK;
+        } 
+
+        if(false == isready(s))
+        {
+            return resNOK;
+        }
+        
+        std::uint8_t index = sensor2index(s);
+        temp = s_privatedata.acquisition[index].temp;
+  
+        return resOK;        
+    }
+    
+    
 
  
 }}} // namespace embot { namespace hw { namespace SI7051 {

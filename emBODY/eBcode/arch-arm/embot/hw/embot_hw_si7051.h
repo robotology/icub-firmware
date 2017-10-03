@@ -28,34 +28,44 @@
 
 #include "embot_hw_i2c.h"
 
-
     
 namespace embot { namespace hw { namespace SI7051 {
-     
-    
+         
     enum class Sensor { one = 0, two = 1, none = 32, maxnumberof = 2 };
-    
-    
+        
     struct Config
-    {   // each sensor uses a separate channel of i2c communication
+    {   // each sensor uses a separate channel of i2c communication and the same i2c address (sic)
         embot::hw::i2c::Bus             i2cbus;
-        embot::hw::i2c::Config          i2cconfig;          
-        Config() : i2cbus(embot::hw::i2c::Bus::one) {}
+        embot::hw::i2c::Config          i2cconfig; 
+        Config(embot::hw::i2c::Bus b, const embot::hw::i2c::Config &c) : i2cbus(b), i2cconfig(c) {}        
+        Config() : i2cbus(embot::hw::i2c::Bus::one), i2cconfig(400000) {}
     };
     
-    // in 0.1 Celsius Degrees
-    using Temperature = std::int16_t;
     
+    using Temperature = std::int16_t; // in 0.1 Celsius Degrees
     
-    
+        
     bool supported(Sensor s);
     
     bool initialised(Sensor s);
     
     result_t init(Sensor s, const Config &config);
-    
-    result_t get(Sensor s, Temperature &temp);
         
+    bool isalive(Sensor s);
+    
+    bool isbusbusy(Sensor s);
+    
+    // usage 1: 
+    // a. we call acquistion() with a callback. 
+    // b. at expiry of the callback we verify with isready() and then we read with read().
+    // usage 2:
+    // a. we call acquistion() without a callback.
+    // b. we loop until isready() returns true.
+    // c. we read with read()
+    result_t acquisition(Sensor s, const embot::common::Callback &oncompletion = embot::common::Callback(nullptr, nullptr));
+    bool isacquiring(Sensor s);
+    bool isready(Sensor s);
+    result_t read(Sensor s, Temperature &temp);        
  
 }}} // namespace embot { namespace hw { namespace SI7051 {
     
