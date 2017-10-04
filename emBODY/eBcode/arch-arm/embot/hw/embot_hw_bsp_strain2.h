@@ -28,6 +28,7 @@
 
 #include "embot_hw_led.h"
 #include "embot_hw_si7051.h"
+#include "embot_hw_bno055.h"
 
 namespace embot { namespace hw { namespace bsp { namespace strain2 {
     
@@ -43,6 +44,11 @@ namespace embot { namespace hw { namespace bsp { namespace strain2 {
         
     const embot::hw::SI7051::Sensor termometerCASE = embot::hw::SI7051::Sensor::two;
     const embot::hw::SI7051::Config termometerCASEconfig = embot::hw::SI7051::Config(embot::hw::i2c::Bus::two, configI2Ctwo);   
+    
+    
+    const embot::hw::BNO055::Sensor imuBOSCH = embot::hw::BNO055::Sensor::one;
+    const embot::hw::BNO055::Config imuBOSCHconfig = embot::hw::BNO055::Config(embot::hw::i2c::Bus::two, configI2Ctwo);   
+        
       
 }}}} // namespace embot { namespace hw { namespace bsp { namespace strain2 {
 

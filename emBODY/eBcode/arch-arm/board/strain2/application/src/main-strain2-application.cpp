@@ -6,7 +6,8 @@
 #undef TEST_HW_TIM
 #undef TEST_HW_ONEWIRE
 #undef TEST_DSP
-#define TEST_HW_SI7051
+#undef TEST_HW_SI7051
+#define TEST_HW_BNO055
 
 #if defined(TEST_ENABLED)
 void tests_launcher_init();
@@ -397,16 +398,12 @@ embot::dsp::q15::matrix ma3;
 
 void tests_launcher_init()
 {
+#if defined(TEST_HW_BNO055)
+    embot::hw::BNO055::init(embot::hw::bsp::strain2::imuBOSCH, embot::hw::bsp::strain2::imuBOSCHconfig); 
+#endif
     
-#if defined(TEST_HW_SI7051)
-       
-#if defined(TEST_SI_ORIG)
-    embot::hw::SI705X::Config si705xconfig;    
-    embot::hw::SI705X::init(embot::hw::SI705X::Sensor::one, si705xconfig);      
-#else
-    embot::hw::SI7051::init(SI7051sensor, SI7051config);   
-#endif    
-    
+#if defined(TEST_HW_SI7051)       
+    embot::hw::SI7051::init(SI7051sensor, SI7051config);       
 #endif
     
 #if defined(TEST_HW_PGA308)
@@ -491,15 +488,56 @@ void counter(void *p)
 
 void tests_tick() 
 {
+    
+#if defined(TEST_HW_BNO055)
+    //embot::hw::BNO055::init(embot::hw::bsp::strain2::imuBOSCH, embot::hw::bsp::strain2::imuBOSCHconfig); 
+    
+    embot::common::Time starttime = embot::sys::timeNow();
+    embot::common::Time endtime = starttime;
+    
+    std::uint8_t value = 0;
+    std::uint8_t values[4] = {0};
+    embot::common::Data data;
+    const int ntimes = 1;
+    embot::common::Callback cbk(counter, nullptr);
+    int num = 0;
+    for(int i=0; i<ntimes; i++)
+    {
+      
+        embot::hw::BNO055::acquisition(embot::hw::bsp::strain2::imuBOSCH, cbk);
+        
+        for(;;)
+        {
+            if(true == embot::hw::BNO055::isready(embot::hw::bsp::strain2::imuBOSCH))
+            {
+                break;
+            }
+        }
+        
+        //embot::hw::BNO055::read(embot::hw::bsp::strain2::imuBOSCH, value);   
+        embot::hw::BNO055::read(embot::hw::bsp::strain2::imuBOSCH, data); 
+        value = value;    
+    }
+
+
+    endtime = embot::sys::timeNow();
+    
+    static embot::common::Time delta = 0;
+    delta = endtime - starttime;
+    delta = delta;
+    num = num;   
+    // 4.5 ms per acquisire 18 byte: acc, mag, gyr ciascono una tripla di int16 = 2 * 3 * 3 = 18.    
+    
+    
+#endif
+    
+    
 #if defined(TEST_HW_SI7051)
     
     embot::common::Time starttime = embot::sys::timeNow();
     embot::common::Time endtime = starttime;
     
-#if defined(TEST_SI_ORIG)
-    embot::hw::SI705X::Temperature temp;    
-    embot::hw::SI705X::get(embot::hw::SI705X::Sensor::one, temp);  
-#else    
+  
     embot::hw::SI7051::Temperature temp;    
 
     const int ntimes = 1000;
@@ -526,7 +564,7 @@ void tests_tick()
         embot::hw::SI7051::read(SI7051sensor, temp);    
 #endif        
     }
-#endif
+
 
     endtime = embot::sys::timeNow();
     

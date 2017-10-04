@@ -819,25 +819,25 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>407</LineNumber>
+          <LineNumber>176</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134256878</Address>
+          <Address>134263760</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>../src/main-strain2-application.cpp</Filename>
+          <Filename>..\..\..\..\embot\hw\embot_hw_bno055.cpp</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\strain2\../src/main-strain2-application.cpp\407</Expression>
+          <Expression>\\strain2\../../../../embot/hw/embot_hw_bno055.cpp\176</Expression>
         </Bp>
         <Bp>
           <Number>1</Number>
           <Type>0</Type>
-          <LineNumber>526</LineNumber>
+          <LineNumber>518</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134256768</Address>
+          <Address>134256794</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -846,7 +846,7 @@
           <BreakIfRCount>1</BreakIfRCount>
           <Filename>../src/main-strain2-application.cpp</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\strain2\../src/main-strain2-application.cpp\526</Expression>
+          <Expression>\\strain2\../src/main-strain2-application.cpp\518</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -864,6 +864,16 @@
           <count>2</count>
           <WinNumber>1</WinNumber>
           <ItemText>delta,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>3</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>s_privatedata.acquisition</ItemText>
+        </Ww>
+        <Ww>
+          <count>4</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>rr,0x0A</ItemText>
         </Ww>
       </WatchWindow1>
       <MemoryWindow1>
@@ -1945,6 +1955,18 @@
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
+    <File>
+      <GroupNumber>9</GroupNumber>
+      <FileNumber>80</FileNumber>
+      <FileType>8</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\embot\hw\embot_hw_bno055.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_bno055.cpp</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
   </Group>
 
   <Group>
@@ -1955,7 +1977,7 @@
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>10</GroupNumber>
-      <FileNumber>80</FileNumber>
+      <FileNumber>81</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1967,7 +1989,7 @@
     </File>
     <File>
       <GroupNumber>10</GroupNumber>
-      <FileNumber>81</FileNumber>
+      <FileNumber>82</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1979,7 +2001,7 @@
     </File>
     <File>
       <GroupNumber>10</GroupNumber>
-      <FileNumber>82</FileNumber>
+      <FileNumber>83</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -1991,7 +2013,7 @@
     </File>
     <File>
       <GroupNumber>10</GroupNumber>
-      <FileNumber>83</FileNumber>
+      <FileNumber>84</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
