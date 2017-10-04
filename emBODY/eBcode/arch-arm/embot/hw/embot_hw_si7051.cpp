@@ -43,7 +43,6 @@ using namespace std;
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
 // --------------------------------------------------------------------------------------------------------------------
 
-#define TEST_HAL_DMA
 
 // --------------------------------------------------------------------------------------------------------------------
 // - all the rest
@@ -133,7 +132,7 @@ namespace embot { namespace hw { namespace SI7051 {
     
     
     static const std::uint8_t i2caddress = 0x80;
-    static const std::uint8_t registerTtemperatureRead = 0xE3;
+    static const std::uint8_t registerTemperatureRead = 0xE3;
     
     static PrivateData s_privatedata;
     
@@ -236,7 +235,7 @@ namespace embot { namespace hw { namespace SI7051 {
         // ok, now i trigger i2c.
         embot::common::Callback cbk(sharedCBK, &s_privatedata.acquisition[index]);
         embot::common::Data data = embot::common::Data(&s_privatedata.acquisition[index].rxdata[0], 2);
-        embot::hw::i2c::read(s_privatedata.config[index].i2cbus, i2caddress, registerTtemperatureRead, data, cbk);
+        embot::hw::i2c::read(s_privatedata.config[index].i2cbus, i2caddress, registerTemperatureRead, data, cbk);
         
         
         return resOK;
