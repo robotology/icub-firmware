@@ -395,11 +395,57 @@ embot::dsp::q15::matrix ma2;
 embot::dsp::q15::matrix ma3;
 #endif // #if defined(TEST_DSP)
 
+void ciao(void *p)
+{
+    static uint32_t io = 0;
+    io++;
+}
 
 void tests_launcher_init()
 {
 #if defined(TEST_HW_BNO055)
     embot::hw::BNO055::init(embot::hw::bsp::strain2::imuBOSCH, embot::hw::bsp::strain2::imuBOSCHconfig); 
+    std::uint8_t value = 0;
+//    embot::hw::BNO055::read(embot::hw::bsp::strain2::imuBOSCH, embot::hw::BNO055::Register::CHIP_ID, value, 100*1000*1000);
+    value = value;
+    value = 0;
+    std::uint8_t dat08[16] = {0};
+    embot::common::Data data(dat08, 8);
+    
+    embot::hw::BNO055::Info info;
+    embot::hw::BNO055::get(embot::hw::bsp::strain2::imuBOSCH, info, embot::common::time1second);
+    
+    bool val = info.isvalid();
+    val = val;
+    
+    embot::hw::BNO055::read(embot::hw::bsp::strain2::imuBOSCH, embot::hw::BNO055::Register::CHIP_ID, data, embot::common::time1second);
+    dat08[0] = dat08[0];
+
+    std::memset(dat08, 0, sizeof(dat08));
+    embot::common::Callback cbk(ciao, nullptr);
+    embot::hw::BNO055::read(embot::hw::bsp::strain2::imuBOSCH, embot::hw::BNO055::Register::CHIP_ID, data, cbk);
+    for(;;)
+    {
+        if(true == embot::hw::BNO055::isready(embot::hw::bsp::strain2::imuBOSCH))
+        {
+            break;
+        }        
+    }
+    
+    
+    const embot::hw::BNO055::Mode mode2use = embot::hw::BNO055::Mode::NDOF; // NDOF // AMG // IMU //NDOF_FMC_OFF
+    std::memset(dat08, 0, sizeof(dat08));
+    
+    embot::hw::BNO055::read(embot::hw::bsp::strain2::imuBOSCH, embot::hw::BNO055::Register::DATASET_START, data, embot::common::time1second);    
+    embot::hw::BNO055::write(embot::hw::bsp::strain2::imuBOSCH, embot::hw::BNO055::Register::OPR_MODE, static_cast<std::uint8_t>(mode2use), embot::common::time1second);
+    embot::hw::BNO055::read(embot::hw::bsp::strain2::imuBOSCH, embot::hw::BNO055::Register::DATASET_START, data, embot::common::time1second);
+    embot::hw::BNO055::read(embot::hw::bsp::strain2::imuBOSCH, embot::hw::BNO055::Register::DATASET_START, data, embot::common::time1second);
+    
+    
+    
+    //embot::hw::BNO055::start(embot::hw::bsp::strain2::imuBOSCH);
+//    embot::hw::BNO055::set(embot::hw::bsp::strain2::imuBOSCH, embot::hw::BNO055::Mode::NDOF);
+    embot::hw::sys::delay(10*1000);
 #endif
     
 #if defined(TEST_HW_SI7051)       
@@ -492,19 +538,32 @@ void tests_tick()
 #if defined(TEST_HW_BNO055)
     //embot::hw::BNO055::init(embot::hw::bsp::strain2::imuBOSCH, embot::hw::bsp::strain2::imuBOSCHconfig); 
     
+//    static embot::hw::BNO055::Triple acc;
+//    static embot::hw::BNO055::Triple mag;
+//    static embot::hw::BNO055::Triple gyr;
+    
     embot::common::Time starttime = embot::sys::timeNow();
     embot::common::Time endtime = starttime;
     
     std::uint8_t value = 0;
-    std::uint8_t values[4] = {0};
+    std::uint8_t values[32] = {0};
     embot::common::Data data;
-    const int ntimes = 1;
+    const int ntimes = 1000;
     embot::common::Callback cbk(counter, nullptr);
+    
+    embot::hw::BNO055::Fulldata fulldata;
     int num = 0;
     for(int i=0; i<ntimes; i++)
     {
       
-        embot::hw::BNO055::acquisition(embot::hw::bsp::strain2::imuBOSCH, cbk);
+//        embot::hw::BNO055::acquisition(embot::hw::bsp::strain2::imuBOSCH, embot::hw::BNO055::regSTARTDATA, 18, cbk);
+        
+        data.load(values, 18);
+//        embot::hw::BNO055::read(embot::hw::bsp::strain2::imuBOSCH, embot::hw::BNO055::Register::DATA_START, data, cbk);
+        
+//        embot::hw::BNO055::read(embot::hw::bsp::strain2::imuBOSCH, embot::hw::BNO055::Register::DATASET_START, data, 100*1000);
+        
+        embot::hw::BNO055::acquisition(embot::hw::bsp::strain2::imuBOSCH, embot::hw::BNO055::DataSet::FULL, cbk);
         
         for(;;)
         {
@@ -514,8 +573,14 @@ void tests_tick()
             }
         }
         
-        //embot::hw::BNO055::read(embot::hw::bsp::strain2::imuBOSCH, value);   
-        embot::hw::BNO055::read(embot::hw::bsp::strain2::imuBOSCH, data); 
+        
+        embot::hw::BNO055::read(embot::hw::bsp::strain2::imuBOSCH, fulldata);
+        
+  
+//        embot::hw::BNO055::read(embot::hw::bsp::strain2::imuBOSCH, data); 
+//        acc.load(data.get(0));
+//        mag.load(data.get(6));
+//        gyr.load(data.get(12));
         value = value;    
     }
 
@@ -526,7 +591,9 @@ void tests_tick()
     delta = endtime - starttime;
     delta = delta;
     num = num;   
-    // 4.5 ms per acquisire 18 byte: acc, mag, gyr ciascono una tripla di int16 = 2 * 3 * 3 = 18.    
+    // 4.5 ms per acquisire 18 byte: acc, mag, gyr ciascono una tripla di int16 = 2 * 3 * 3 = 18.  
+
+    // boh, 2 ms per fulldata .....
     
     
 #endif
@@ -536,8 +603,7 @@ void tests_tick()
     
     embot::common::Time starttime = embot::sys::timeNow();
     embot::common::Time endtime = starttime;
-    
-  
+      
     embot::hw::SI7051::Temperature temp;    
 
     const int ntimes = 1000;

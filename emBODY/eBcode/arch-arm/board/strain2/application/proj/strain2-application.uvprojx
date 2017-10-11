@@ -1120,6 +1120,16 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>bosch-driver</GroupName>
+          <Files>
+            <File>
+              <FileName>bno055.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\bosch-driver\bno055.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
           <GroupOption>
             <CommonProperty>
@@ -1522,7 +1532,7 @@
               <MiscControls>--cpp11</MiscControls>
               <Define>STM32HAL_BOARD_STRAIN2 APPL_TESTZEROOFFSET TEST_SI_ORIG_NO</Define>
               <Undefine></Undefine>
-              <IncludePath>..\src-plus;..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask;..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\eBcode\arch-arm\embot\common;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\sys;..\..\..\..\..\..\eBcode\arch-arm\embot;..\src\others;..\..\..\..\..\..\eBcode\arch-arm\embot\tools;..\..\..\..\..\..\eBcode\arch-arm\embot\binary;..\..\..\..\..\..\eBcode\arch-arm\embot\dsp</IncludePath>
+              <IncludePath>..\src-plus;..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask;..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\eBcode\arch-arm\embot\common;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\sys;..\..\..\..\..\..\eBcode\arch-arm\embot;..\src\others;..\..\..\..\..\..\eBcode\arch-arm\embot\tools;..\..\..\..\..\..\eBcode\arch-arm\embot\binary;..\..\..\..\..\..\eBcode\arch-arm\embot\dsp;..\src\bosch-driver</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -2302,6 +2312,16 @@
               <FileName>if2hw_common.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\others\if2hw_common.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>bosch-driver</GroupName>
+          <Files>
+            <File>
+              <FileName>bno055.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\bosch-driver\bno055.c</FilePath>
             </File>
           </Files>
         </Group>
