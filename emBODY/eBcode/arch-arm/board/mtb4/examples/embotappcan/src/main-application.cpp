@@ -66,6 +66,11 @@ static bool s_retrieveCANframes(void);
 static bool s_transmitCANframes(embot::common::relTime timeout, embot::common::relTime reactivity);
 
 
+static void s_tick1msecinit(void);
+static uint32_t s_tick1msecget(void);
+
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - some constant variables. DONT USE MACROS !!!!!
 // --------------------------------------------------------------------------------------------------------------------
@@ -87,6 +92,8 @@ static const embot::common::relTime timeoutforCANtx = 10*embot::common::time1mil
 static volatile bool aCANframeIsHere = false;
 static volatile bool allCANframesHaveGONE = false;
 
+static volatile uint64_t s_1mstickcount = 0;
+
 // --------------------------------------------------------------------------------------------------------------------
 // - the main
 // --------------------------------------------------------------------------------------------------------------------
@@ -97,7 +104,7 @@ int main(void)
 { 
     // we init the BSP: we dont use any timing system. 
     // we cannot use embot::hw::bsp::now() or embot::hw::sys::now() but only embot::hw::sys::delay()
-    const embot::hw::bsp::stm32halConfig stm32c(nullptr, nullptr);
+    const embot::hw::bsp::stm32halConfig stm32c(s_tick1msecinit, s_tick1msecget);
     embot::hw::bsp::Config cc(stm32c, nullptr); 
     embot::hw::bsp::init(cc);  
     
@@ -144,6 +151,23 @@ int main(void)
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions
 // --------------------------------------------------------------------------------------------------------------------
+
+
+    
+void SysTick_Handler(void)
+{
+    s_1mstickcount++;
+}
+
+static void s_tick1msecinit(void)
+{
+    HAL_SYSTICK_Config(SystemCoreClock/1000);
+}
+    
+static uint32_t s_tick1msecget(void)
+{
+    return (uint32_t)s_1mstickcount;
+}
 
 
 
