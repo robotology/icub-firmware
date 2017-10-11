@@ -40,6 +40,14 @@ namespace embot { namespace hw { namespace i2c {
         Config() : speed(400000) {}
     };
     
+    struct Descriptor
+    {
+        Bus     bus;
+        Config  config;
+        Descriptor() : bus(Bus::none), config(400000) {}
+        Descriptor(Bus b, std::uint32_t s) : bus(b), config(s) {}
+    };
+    
     
     bool supported(Bus b);
     
@@ -47,16 +55,28 @@ namespace embot { namespace hw { namespace i2c {
     
     result_t init(Bus b, const Config &config);
     
-    // if a transaction is ongoing, hence the bus cannot be used.
+    // if a transaction is ongoing the bus cannot be used.
     bool isbusy(Bus b);
     
     // check is the device is present
     bool ping(Bus b, std::uint8_t adr, std::uint8_t retries = 3, embot::common::relTime timeout = embot::common::time1millisec);
     
-    // it asks to device with address adr the content of the register reg (so far only 8 bit addressing, sic).
-    // at the end of transaction, the result is put in data and the callback oncompletion is called. 
-    result_t read(Bus b, std::uint8_t adr, std::uint8_t reg, embot::common::Data &destination, embot::common::Callback oncompletion);
+   
+    // not blocking read. we read from register reg a total of destination.size bytes
+    // at the end of transaction, data is copied into destination.pointer and oncompletion.callback() is called (if non nullptr). 
+    result_t read(Bus b, std::uint8_t adr, std::uint8_t reg, embot::common::Data &destination, const embot::common::Callback &oncompletion);
     
+    // blocking read. we read from register reg a total of destination.size bytes and we wait until a timeout. 
+    // if result is resOK, destination.pointer contains the data; if resNOKtimeout, the timeout expired. if resNOK the operation was not even started 
+    result_t read(Bus b, std::uint8_t adr, std::uint8_t reg, embot::common::Data &destination, embot::common::relTime timeout);
+        
+    // not blocking write. we write in register reg the content.size byte pointed by content.pointer.
+    // when the write is done, the function oncompletion.callback() is called to alert the user.
+    result_t write(Bus b, std::uint8_t adr, std::uint8_t reg, const embot::common::Data &content, const embot::common::Callback &oncompletion = embot::common::Callback(nullptr, nullptr));
+    
+    // blocking write. we write in register reg thethe content.size byte pointed by content.pointer and we wait until a timeout.
+    // if result is resOK, the operation is successful. if resNOKtimeout, the timeout expired. if resNOK the operation was not even started
+    result_t write(Bus b, std::uint8_t adr, std::uint8_t reg, const embot::common::Data &content, embot::common::relTime timeout);    
 
 }}} // namespace embot { namespace hw { namespace i2c {
     
