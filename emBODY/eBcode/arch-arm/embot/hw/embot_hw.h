@@ -27,10 +27,11 @@
 
 namespace embot { namespace hw {
     
-    enum class result_t { OK = 0, NOK = -1 };
+    enum class result_t { OK = 0, NOK = -1, NOKtimeout = -2 };
     
-    const result_t resOK   = result_t::OK;
-    const result_t resNOK  = result_t::NOK;
+    const result_t resOK            = result_t::OK;
+    const result_t resNOK           = result_t::NOK;
+    const result_t resNOKtimeout    = result_t::NOKtimeout;
     
 }} // namespace embot { namespace hw {
 
