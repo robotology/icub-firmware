@@ -170,9 +170,9 @@ namespace embot { namespace hw { namespace SI7051 {
         std::uint8_t index = sensor2index(s);
                 
         // init i2c ..
-        embot::hw::i2c::init(config.i2cbus, config.i2cconfig);
+        embot::hw::i2c::init(config.i2cdes.bus, config.i2cdes.config);
         
-        if(false == embot::hw::i2c::ping(config.i2cbus, i2caddress))
+        if(false == embot::hw::i2c::ping(config.i2cdes.bus, i2caddress))
         {
             return resNOK;
         }
@@ -193,7 +193,7 @@ namespace embot { namespace hw { namespace SI7051 {
         } 
 
         std::uint8_t index = sensor2index(s);  
-        return embot::hw::i2c::isbusy(s_privatedata.config[index].i2cbus);             
+        return embot::hw::i2c::isbusy(s_privatedata.config[index].i2cdes.bus);             
     }
     
     bool isacquiring(Sensor s)
@@ -222,7 +222,7 @@ namespace embot { namespace hw { namespace SI7051 {
         }
         
         // i2c must not be busy
-        if(true == embot::hw::i2c::isbusy(s_privatedata.config[index].i2cbus))
+        if(true == embot::hw::i2c::isbusy(s_privatedata.config[index].i2cdes.bus))
         {
             return resNOK;
         }
@@ -235,7 +235,7 @@ namespace embot { namespace hw { namespace SI7051 {
         // ok, now i trigger i2c.
         embot::common::Callback cbk(sharedCBK, &s_privatedata.acquisition[index]);
         embot::common::Data data = embot::common::Data(&s_privatedata.acquisition[index].rxdata[0], 2);
-        embot::hw::i2c::read(s_privatedata.config[index].i2cbus, i2caddress, registerTemperatureRead, data, cbk);
+        embot::hw::i2c::read(s_privatedata.config[index].i2cdes.bus, i2caddress, registerTemperatureRead, data, cbk);
         
         
         return resOK;
@@ -250,12 +250,12 @@ namespace embot { namespace hw { namespace SI7051 {
 
         std::uint8_t index = sensor2index(s);
         
-        if(true == embot::hw::i2c::isbusy(s_privatedata.config[index].i2cbus))
+        if(true == embot::hw::i2c::isbusy(s_privatedata.config[index].i2cdes.bus))
         {
             return false;
         }
 
-        return embot::hw::i2c::ping(s_privatedata.config[index].i2cbus, i2caddress);        
+        return embot::hw::i2c::ping(s_privatedata.config[index].i2cdes.bus, i2caddress);        
     }
 
     

@@ -35,10 +35,10 @@ namespace embot { namespace hw { namespace SI7051 {
         
     struct Config
     {   // each sensor uses a separate channel of i2c communication and the same i2c address (sic)
-        embot::hw::i2c::Bus             i2cbus;
-        embot::hw::i2c::Config          i2cconfig; 
-        Config(embot::hw::i2c::Bus b, const embot::hw::i2c::Config &c) : i2cbus(b), i2cconfig(c) {}        
-        Config() : i2cbus(embot::hw::i2c::Bus::one), i2cconfig(400000) {}
+        embot::hw::i2c::Descriptor      i2cdes;        
+        Config(embot::hw::i2c::Bus b, std::uint32_t s) : i2cdes(b, s) {}        
+        Config() : i2cdes(embot::hw::i2c::Bus::one, 400000) {}
+        Config(const embot::hw::i2c::Descriptor &des) : i2cdes(des) {}
     };
     
     
