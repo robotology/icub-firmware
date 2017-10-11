@@ -49,7 +49,9 @@ namespace embot { namespace hw { namespace sys {
     
     void relocatevectortable(std::uint32_t offset);
     
-    void delay(embot::common::Time t);
+    void delay(embot::common::relTime t);
+    
+    embot::common::Time now();
     
     std::uint32_t random();
     std::uint32_t minrandom();

@@ -34,6 +34,8 @@
 
 using namespace std;
 
+#include "embot_hw_bsp.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -202,8 +204,12 @@ dowaitloop
         SCB->VTOR = FLASH_BASE | (offset & (uint32_t)0x1FFFFF80);        
     }
 
+    embot::common::Time now()
+    {
+        return embot::hw::bsp::now();        
+    }
 
-    void delay(embot::common::Time t)
+    void delay(embot::common::relTime t)
     {   
         ss_bsp_delay(t);
     }
