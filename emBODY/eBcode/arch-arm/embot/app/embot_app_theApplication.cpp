@@ -87,8 +87,8 @@ void embot::app::theApplication::execute(Config &config)
         }
     }
     
-    embot::hw::bsp::Config cc;
-    cc.get1mstick = embot::sys::millisecondsNow;
+    const embot::hw::bsp::stm32halConfig stm32c(nullptr, embot::sys::millisecondsNow);
+    embot::hw::bsp::Config cc(stm32c, embot::sys::timeNow);
     embot::hw::bsp::init(cc);
     
     

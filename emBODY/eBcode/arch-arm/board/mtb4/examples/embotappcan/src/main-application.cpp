@@ -95,9 +95,11 @@ static volatile bool allCANframesHaveGONE = false;
 
 int main(void)
 { 
-    // we init the BSP    
-    embot::hw::bsp::Config bspconfig(nullptr, nullptr);     
-    embot::hw::bsp::init(bspconfig);    
+    // we init the BSP: we dont use any timing system. 
+    // we cannot use embot::hw::bsp::now() or embot::hw::sys::now() but only embot::hw::sys::delay()
+    const embot::hw::bsp::stm32halConfig stm32c(nullptr, nullptr);
+    embot::hw::bsp::Config cc(stm32c, nullptr); 
+    embot::hw::bsp::init(cc);  
     
     
     // we init some LEDs    

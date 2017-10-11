@@ -101,8 +101,9 @@ int main(void)
     embot::hw::sys::relocatevectortable(embot::hw::sys::addressOfApplication - embot::hw::sys::startOfFLASH);   
 #endif
     
-    embot::hw::bsp::Config bspconfig(tick1msecinit, tick1msecget);     
-    embot::hw::bsp::init(bspconfig);    
+    const embot::hw::bsp::stm32halConfig stm32c(tick1msecinit, tick1msecget);
+    embot::hw::bsp::Config cc(stm32c, nullptr); 
+    embot::hw::bsp::init(cc);   
 
 #if     defined(APPSLIM_DO_NOTHING)
     
