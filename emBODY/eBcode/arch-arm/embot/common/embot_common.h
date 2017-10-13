@@ -76,7 +76,7 @@ namespace embot { namespace common {
 
     template<typename T>
     struct Triple
-    {
+    {   // unluckily arm does not fully support c++11, hence the std::tuple<> is missing
         T   x;
         T   y;
         T   z;
@@ -89,7 +89,7 @@ namespace embot { namespace common {
 
     template<typename T>
     struct Quadruple
-    {
+    {   // unluckily arm does not fully support c++11, hence the std::tuple<> is missing
         T   w;
         T   x;
         T   y;
