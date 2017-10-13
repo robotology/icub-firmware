@@ -196,14 +196,15 @@ namespace embot { namespace hw { namespace i2c {
     }
     
     
-    bool ping(Bus b, std::uint8_t adr, std::uint8_t retries, embot::common::relTime timeout)
+    bool ping(Bus b, std::uint8_t adr, embot::common::relTime timeout)
     {
         if(false == initialised(b))
         {
             return false;
         } 
-                
-        if(true == isbusy(b))
+          
+        embot::common::relTime remaining = timeout;
+        if(true == isbusy(b, timeout, remaining))
         {
             return false;
         }
@@ -212,7 +213,7 @@ namespace embot { namespace hw { namespace i2c {
         
         s_privatedata.transaction[index].ongoing = true;
                 
-        HAL_StatusTypeDef status = HAL_I2C_IsDeviceReady(s_stm32_i2c_mapping[index].phandlei2cx, adr, retries, timeout/1000);
+        HAL_StatusTypeDef status = HAL_I2C_IsDeviceReady(s_stm32_i2c_mapping[index].phandlei2cx, adr, 1, remaining/1000);
         
         s_privatedata.transaction[index].ongoing = false;
         
@@ -226,17 +227,17 @@ namespace embot { namespace hw { namespace i2c {
         {
             return resNOK;
         } 
+        
+        if(false == destination.isvalid())
+        {
+            return resNOK;
+        }     
                 
         if(true == isbusy(b))
         {
             return resNOK;
         }
-        
-        if(false == destination.isvalid())
-        {
-            return resNOK;
-        }        
-                
+                           
         return s_read(b, adr, reg, destination, oncompletion);
     }
     
@@ -246,80 +247,27 @@ namespace embot { namespace hw { namespace i2c {
         {
             return resNOK;
         } 
-                
-        if(true == isbusy(b))
-        {
-            return resNOK;
-        }
-        
+             
         if(false == destination.isvalid())
         {
             return resNOK;
         }
         
+        embot::common::relTime remaining = timeout;       
+        if(true == isbusy(b, timeout, remaining))
+        {
+            return resNOK;
+        }
+                        
         result_t r = s_read(b, adr, reg, destination);
         
         if(resOK == r)
         {
-            r = s_wait(b, timeout);
-        }
-        
+            r = s_wait(b, remaining);
+        }        
         return r;                      
     }
     
-    
-//    result_t write(Bus b, std::uint8_t adr, std::uint8_t reg, std::uint8_t value, const embot::common::Callback &oncompletion)
-//    {
-//        if(false == initialised(b))
-//        {
-//            return resNOK;
-//        } 
-//                
-//        if(true == isbusy(b))
-//        {
-//            return resNOK;
-//        }
-//                
-//        std::uint8_t index = bus2index(b);        
-//        s_privatedata.transaction[index].adr = adr;
-//        s_privatedata.transaction[index].oncompletion = oncompletion;
-//        s_privatedata.transaction[index].ongoing = true;
-//        s_privatedata.transaction[index].recdata.clear();
-//        s_privatedata.transaction[index].txbuffer[0] = reg;
-//        s_privatedata.transaction[index].txbuffer[1] = value;
-//        s_privatedata.transaction[index].txbuffersize = 2;
-//        HAL_I2C_Master_Transmit_DMA(s_stm32_i2c_mapping[index].phandlei2cx, adr, static_cast<std::uint8_t*>(s_privatedata.transaction[index].txbuffer), s_privatedata.transaction[index].txbuffersize);        
-//                
-//        return resOK;
-//    }    
-
-
-//    result_t write(Bus b, std::uint8_t adr, std::uint8_t reg, std::uint8_t value, embot::common::relTime timeout)
-//    {
-//        if(false == initialised(b))
-//        {
-//            return resNOK;
-//        } 
-//        
-//        if(true == isbusy(b))
-//        {
-//            return resNOK;
-//        }        
-//        
-//        std::uint8_t index = bus2index(b);        
-//        s_privatedata.transaction[index].adr = adr;
-//        s_privatedata.transaction[index].oncompletion.clear();
-//        s_privatedata.transaction[index].ongoing = true;
-//        s_privatedata.transaction[index].recdata.clear();
-//        s_privatedata.transaction[index].txbuffer[0] = reg;
-//        s_privatedata.transaction[index].txbuffer[1] = value;
-//        s_privatedata.transaction[index].txbuffersize = 2;        
-//        HAL_I2C_Master_Transmit_DMA(s_stm32_i2c_mapping[index].phandlei2cx, adr, static_cast<std::uint8_t*>(s_privatedata.transaction[index].txbuffer), s_privatedata.transaction[index].txbuffersize);        
-//  
-//        return s_wait(b, timeout);
-//    }
-    
-
 
     result_t write(Bus b, std::uint8_t adr, std::uint8_t reg, const embot::common::Data &content, const embot::common::Callback &oncompletion)
     {
@@ -354,7 +302,8 @@ namespace embot { namespace hw { namespace i2c {
             return resNOK;
         }
         
-        if(true == isbusy(b))
+        embot::common::relTime remaining = timeout;
+        if(true == isbusy(b, timeout, remaining))
         {
             return resNOK;
         }        
@@ -363,7 +312,7 @@ namespace embot { namespace hw { namespace i2c {
         
         if(resOK == r)
         {
-            r = s_wait(b, timeout);
+            r = s_wait(b, remaining);
         }
         
         return r;
@@ -379,6 +328,46 @@ namespace embot { namespace hw { namespace i2c {
 
         return s_privatedata.transaction[bus2index(b)].ongoing;     
     }
+
+    
+    bool isbusy(Bus b, embot::common::relTime timeout, embot::common::relTime &remaining)
+    {
+        if(false == initialised(b))
+        {
+            return false;
+        } 
+
+        if(0 == timeout)
+        {
+            remaining = timeout;
+            return s_privatedata.transaction[bus2index(b)].ongoing;   
+        }
+       
+        
+        embot::common::Time deadline = embot::hw::sys::now() + timeout;
+        
+        bool res = true;
+        for(;;)
+        {
+            std::int64_t rem = deadline - embot::hw::sys::now();
+            
+            if(rem <= 0)
+            {   
+                remaining = 0;
+                res = true;
+                break;
+            }
+            else if(false == s_privatedata.transaction[bus2index(b)].ongoing)
+            {
+                remaining = static_cast<embot::common::relTime>(rem);
+                res = false;   
+                break;                
+            }
+            
+        }
+        
+        return res;        
+    }    
     
     void ontransactionterminated(std::uint8_t index)
     {

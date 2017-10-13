@@ -57,17 +57,20 @@ namespace embot { namespace hw { namespace i2c {
     
     // if a transaction is ongoing the bus cannot be used.
     bool isbusy(Bus b);
+    // we also have a version w/ timeout. use it carefully!
+    bool isbusy(Bus b, embot::common::relTime timeout, embot::common::relTime &remaining);
     
-    // check is the device is present
-    bool ping(Bus b, std::uint8_t adr, std::uint8_t retries = 3, embot::common::relTime timeout = embot::common::time1millisec);
-    
-   
+    // check is the device is present.
+    // it internally calls isbusy(timeout, remaining)
+    bool ping(Bus b, std::uint8_t adr, embot::common::relTime timeout = 3*embot::common::time1millisec);
+        
     // not blocking read. we read from register reg a total of destination.size bytes
     // at the end of transaction, data is copied into destination.pointer and oncompletion.callback() is called (if non nullptr). 
     result_t read(Bus b, std::uint8_t adr, std::uint8_t reg, embot::common::Data &destination, const embot::common::Callback &oncompletion);
     
     // blocking read. we read from register reg a total of destination.size bytes and we wait until a timeout. 
-    // if result is resOK, destination.pointer contains the data; if resNOKtimeout, the timeout expired. if resNOK the operation was not even started 
+    // if result is resOK, destination.pointer contains the data; if resNOKtimeout, the timeout expired. if resNOK the operation was not even started
+    // the functions internally waits until not busy for the timeout ... however, please check isbusy() outside. 
     result_t read(Bus b, std::uint8_t adr, std::uint8_t reg, embot::common::Data &destination, embot::common::relTime timeout);
         
     // not blocking write. we write in register reg the content.size byte pointed by content.pointer.
@@ -76,6 +79,7 @@ namespace embot { namespace hw { namespace i2c {
     
     // blocking write. we write in register reg thethe content.size byte pointed by content.pointer and we wait until a timeout.
     // if result is resOK, the operation is successful. if resNOKtimeout, the timeout expired. if resNOK the operation was not even started
+    // the functions internally waits until not busy for the timeout ... however, please check isbusy() outside.
     result_t write(Bus b, std::uint8_t adr, std::uint8_t reg, const embot::common::Data &content, embot::common::relTime timeout);    
 
 }}} // namespace embot { namespace hw { namespace i2c {
