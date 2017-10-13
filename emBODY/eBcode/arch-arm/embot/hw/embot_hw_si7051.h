@@ -43,29 +43,34 @@ namespace embot { namespace hw { namespace SI7051 {
     
     
     using Temperature = std::int16_t; // in 0.1 Celsius Degrees
-    
-        
+            
     bool supported(Sensor s);
     
     bool initialised(Sensor s);
     
     result_t init(Sensor s, const Config &config);
         
-    bool isalive(Sensor s);
     
-    bool isbusbusy(Sensor s);
+    // after that init() returns resOK we can check if it is alive. we can specify a timeout
+    bool isalive(Sensor s, embot::common::relTime timeout = 3*embot::common::time1millisec);
     
-    // usage 1: 
-    // a. we call acquistion() with a callback. 
-    // b. at expiry of the callback we verify with isready() and then we read with read().
-    // usage 2:
-    // a. we call acquistion() without a callback.
-    // b. we loop until isready() returns true.
-    // c. we read with read()
-    result_t acquisition(Sensor s, const embot::common::Callback &oncompletion = embot::common::Callback(nullptr, nullptr));
+    // we must check that nobody is using the sensor, maybe in non-blocking mode some time earlier
     bool isacquiring(Sensor s);
-    bool isready(Sensor s);
-    result_t read(Sensor s, Temperature &temp);        
+    
+    // we check isacquiring() but also if any other device is using i2c bus
+    bool canacquire(Sensor s);    
+    
+    
+    // we start acquisition of temperature.
+    // if returns resOK, we know that acquisition is over if it is called oncompletion() or when operationdone() is true;
+    result_t acquisition(Sensor s, const embot::common::Callback &oncompletion = embot::common::Callback(nullptr, nullptr));
+
+    // it tells if a previous operation of acquisition is over
+    bool operationdone(Sensor s);
+    
+    // ok, now we can read temperature previously acquired
+    result_t read(Sensor s, Temperature &temp);   
+
  
 }}} // namespace embot { namespace hw { namespace SI7051 {
     

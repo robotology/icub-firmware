@@ -185,16 +185,6 @@ namespace embot { namespace hw { namespace SI7051 {
         return resOK;
     }
 
-    bool isbusbusy(Sensor s)
-    {
-        if(false == initialised(s))
-        {
-            return false;
-        } 
-
-        std::uint8_t index = sensor2index(s);  
-        return embot::hw::i2c::isbusy(s_privatedata.config[index].i2cdes.bus);             
-    }
     
     bool isacquiring(Sensor s)
     {
@@ -207,25 +197,32 @@ namespace embot { namespace hw { namespace SI7051 {
         return s_privatedata.acquisition[index].ongoing;     
     }
     
-    result_t acquisition(Sensor s, const embot::common::Callback &oncompletion)
+    
+    bool canacquire(Sensor s)
     {
         if(false == initialised(s))
         {
-            return resNOK;
+            return false;
         } 
 
-        std::uint8_t index = sensor2index(s);
+        std::uint8_t index = sensor2index(s);  
         
         if(true == s_privatedata.acquisition[index].ongoing)
         {
-            return resNOK;
+            return false;
         }
         
-        // i2c must not be busy
-        if(true == embot::hw::i2c::isbusy(s_privatedata.config[index].i2cdes.bus))
+        return !embot::hw::i2c::isbusy(s_privatedata.config[index].i2cdes.bus);             
+    }    
+    
+    result_t acquisition(Sensor s, const embot::common::Callback &oncompletion)
+    {
+        if(false == canacquire(s))
         {
             return resNOK;
         }
+        
+        std::uint8_t index = sensor2index(s);
                 
         s_privatedata.acquisition[index].clear();
         s_privatedata.acquisition[index].ongoing = true;
@@ -236,40 +233,30 @@ namespace embot { namespace hw { namespace SI7051 {
         embot::common::Callback cbk(sharedCBK, &s_privatedata.acquisition[index]);
         embot::common::Data data = embot::common::Data(&s_privatedata.acquisition[index].rxdata[0], 2);
         embot::hw::i2c::read(s_privatedata.config[index].i2cdes.bus, i2caddress, registerTemperatureRead, data, cbk);
-        
-        
+                
         return resOK;
     }
     
-    bool isalive(Sensor s)
+    bool isalive(Sensor s, embot::common::relTime timeout)
     {
         if(false == initialised(s))
         {
             return false;
         } 
-
         std::uint8_t index = sensor2index(s);
-        
-        if(true == embot::hw::i2c::isbusy(s_privatedata.config[index].i2cdes.bus))
-        {
-            return false;
-        }
-
-        return embot::hw::i2c::ping(s_privatedata.config[index].i2cdes.bus, i2caddress);        
+        return embot::hw::i2c::ping(s_privatedata.config[index].i2cdes.bus, i2caddress, timeout);  
     }
 
     
-    bool isready(Sensor s)
+    bool operationdone(Sensor s)
     {
         if(false == initialised(s))
         {
             return false;
         } 
 
-        std::uint8_t index = sensor2index(s);
-
-        return s_privatedata.acquisition[index].done;        
-    }
+        return s_privatedata.acquisition[sensor2index(s)].done;        
+    } 
     
     
     result_t read(Sensor s, Temperature &temp)
@@ -279,7 +266,7 @@ namespace embot { namespace hw { namespace SI7051 {
             return resNOK;
         } 
 
-        if(false == isready(s))
+        if(false == operationdone(s))
         {
             return resNOK;
         }

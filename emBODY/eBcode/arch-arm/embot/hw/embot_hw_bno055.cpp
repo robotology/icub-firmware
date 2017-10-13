@@ -59,9 +59,19 @@ namespace embot { namespace hw { namespace BNO055 {
     bool supported(Sensor s)                                                                        { return false; }
     bool initialised(Sensor s)                                                                      { return false; }
     result_t init(Sensor s, const Config &config)                                                   { return resNOK; }
+    bool isalive(Sensor s, embot::common::relTime timeout)                                          { return false; }
+    result_t get(Sensor s, Info &info, embot::common::relTime timeout)                              { return resNOK; }
+    result_t set(Sensor s, Mode m, embot::common::relTime timeout)                                  { return resNOK; }
+    bool isacquiring(Sensor s)                                                                      { return false; }
+    bool canacquire(Sensor s)                                                                       { return false; }
+    result_t acquisition(Sensor s, Set set, const embot::common::Callback &oncompletion)            { return resNOK; }
+    bool operationdone(Sensor s)                                                                    { return false; }
+    result_t read(Sensor s, Data &data)                                                             { return resNOK; }
+    result_t write(Sensor s, embot::hw::BNO055::Register reg, std::uint8_t value, const embot::common::relTime timeout){ return resNOK; }
+    result_t write(Sensor s, embot::hw::BNO055::Register reg, std::uint8_t value, const embot::common::Callback &oncompletion){ return resNOK; }
+    result_t read(Sensor s, embot::hw::BNO055::Register reg, embot::common::Data &data, const embot::common::relTime timeout){ return resNOK; }
+    result_t read(Sensor s, embot::hw::BNO055::Register reg, embot::common::Data &data, const embot::common::Callback &oncompletion){ return resNOK; }
     
-    result_t get(Sensor s, Temperature &temp)                                                       { return resNOK; }
-
 }}} // namespace embot { namespace hw { namespace BNO055 {
 
 
@@ -79,7 +89,7 @@ namespace embot { namespace hw { namespace BNO055 {
     #if     defined(STM32HAL_BOARD_STRAIN2)        
     static const bspmap_t bspmap = 
     {
-        0x00000001  // means... 1 sensors
+        0x00000001  // means... 1 sensor only
     };   
     #else
     static const bspmap_t bspmap = 
@@ -162,7 +172,7 @@ namespace embot { namespace hw { namespace BNO055 {
     static result_t s_writeregister(Sensor s, std::uint8_t reg, std::uint8_t val, const embot::common::Callback &oncompletion);
     static void s_sharedCBK(void *p);
     
-    // sttaic functions used for testing
+    // static functions used for testing
     static result_t s_start(Sensor s);
             
     result_t init(Sensor s, const Config &config)
@@ -185,7 +195,7 @@ namespace embot { namespace hw { namespace BNO055 {
         // init i2c ..
         embot::hw::i2c::init(config.i2cdes.bus, config.i2cdes.config);
         
-        if(false == embot::hw::i2c::ping(config.i2cdes.bus, i2caddress))
+        if(false == embot::hw::i2c::ping(config.i2cdes.bus, i2caddress, 3*embot::common::time1millisec))
         {
             return resNOK;
         }
@@ -198,17 +208,44 @@ namespace embot { namespace hw { namespace BNO055 {
         return resOK;
     }
 
-    bool isbusbusy(Sensor s)
+
+
+    bool isalive(Sensor s, embot::common::relTime timeout)
     {
         if(false == initialised(s))
         {
             return false;
         } 
+        std::uint8_t index = sensor2index(s);
+        return embot::hw::i2c::ping(s_privatedata.config[index].i2cdes.bus, i2caddress, timeout);  
+    }        
 
-        std::uint8_t index = sensor2index(s);  
-        return embot::hw::i2c::isbusy(s_privatedata.config[index].i2cdes.bus);             
+
+    
+    result_t get(Sensor s, Info &info, embot::common::relTime timeout)
+    {
+        embot::common::Data data(&info, sizeof(info));
+        result_t r = read(s, embot::hw::BNO055::Register::CHIP_ID, data, timeout);  
+        return r;        
     }
     
+    
+    result_t set(Sensor s, Mode m, embot::common::relTime timeout)
+    { 
+        if(false == initialised(s))
+        {
+            return resNOK;
+        }  
+        
+        if((Mode::none == m) || (Mode::maxnumberof == m))
+        {
+            return resNOK;
+        }
+               
+        return write(s, Register::OPR_MODE, static_cast<std::uint8_t>(m), timeout);                                       
+    } 
+
+
     bool isacquiring(Sensor s)
     {
         if(false == initialised(s))
@@ -218,80 +255,153 @@ namespace embot { namespace hw { namespace BNO055 {
 
         std::uint8_t index = sensor2index(s);        
         return s_privatedata.acquisition[index].ongoing;     
+    }    
+    
+        
+    bool canacquire(Sensor s)
+    {
+        if(false == initialised(s))
+        {
+            return false;
+        } 
+
+        std::uint8_t index = sensor2index(s);  
+        
+        if(true == s_privatedata.acquisition[index].ongoing)
+        {
+            return false;
+        }
+        
+        return !embot::hw::i2c::isbusy(s_privatedata.config[index].i2cdes.bus);             
     }
     
-//    result_t read(Sensor s, embot::hw::BNO055::Register reg, const embot::common::Callback &oncompletion)
-//    {
-//        if(false == initialised(s))
-//        {
-//            return resNOK;
-//        } 
+    
+    
+    result_t acquisition(Sensor s, Set set, const embot::common::Callback &oncompletion)
+    {        
+        if(false == canacquire(s))
+        {
+            return resNOK;
+        }
+        
+        // ok, start a read of nbytes which will go into buffer[]
+        const std::uint8_t nbytes = static_cast<std::uint8_t>(set);
+        const Register reg = Register::DATASET_START;
+        
+        std::uint8_t index = sensor2index(s);
+        
+        s_privatedata.acquisition[index].startread(nbytes, oncompletion); 
+                       
+        // now i trigger i2c.
+        embot::common::Callback cbk(s_sharedCBK, &s_privatedata.acquisition[index]);
+        return embot::hw::i2c::read(s_privatedata.config[index].i2cdes.bus, i2caddress, static_cast<std::uint8_t>(reg), s_privatedata.acquisition[index].data, cbk);        
+    } 
+    
 
-//        std::uint8_t index = sensor2index(s);
-//        
-//        if(true == s_privatedata.acquisition[index].ongoing)
-//        {
-//            return resNOK;
-//        }
-//        
-//        // i2c must not be busy
-//        if(true == embot::hw::i2c::isbusy(s_privatedata.config[index].i2cdes.bus))
-//        {
-//            return resNOK;
-//        }
-//                
-//        s_privatedata.acquisition[index].clear();
-//        s_privatedata.acquisition[index].ongoing = true;
-//        s_privatedata.acquisition[index].done = false;
-//        s_privatedata.acquisition[index].userdefCBK = oncompletion;
-//        s_privatedata.acquisition[index].data.size = 1; // one byte only.
-//        
-////        s_privatedata.acquisition[index].startread(1, oncompletion);
-//        
-//        // ok, now i trigger i2c.
-//        embot::common::Callback cbk(s_sharedCBK, &s_privatedata.acquisition[index]);
-//        embot::hw::i2c::read(s_privatedata.config[index].i2cdes.bus, i2caddress, static_cast<std::uint8_t>(reg), s_privatedata.acquisition[index].data, cbk);
-//                
-//        return resOK;        
-//    }
+    
+    result_t acquisition(Sensor s, Set set, Data &data, const embot::common::Callback &oncompletion)
+    {        
+        if(false == canacquire(s))
+        {
+            return resNOK;
+        }
+        
+        std::uint8_t index = sensor2index(s);
+        
+        const std::uint8_t nbytes = static_cast<std::uint8_t>(set);        
+        // ok, start a read of nbytes only (not all sizeof(data)) which will go into data
+        embot::common::Data da(&data, nbytes);
+                
+        s_privatedata.acquisition[index].startread(da, oncompletion); 
+                       
+        // now i trigger i2c.
+        embot::common::Callback cbk(s_sharedCBK, &s_privatedata.acquisition[index]);
+        return embot::hw::i2c::read(s_privatedata.config[index].i2cdes.bus, i2caddress, static_cast<std::uint8_t>(Register::DATASET_START), s_privatedata.acquisition[index].data, cbk);        
+    } 
     
     
-//    result_t read(Sensor s, embot::hw::BNO055::Register reg, std::uint8_t &value, const embot::common::relTime timeout)
-//    {
-//        if(false == initialised(s))
-//        {
-//            return resNOK;
-//        } 
+    bool operationdone(Sensor s)
+    {
+        if(false == initialised(s))
+        {
+            return false;
+        } 
 
-//        std::uint8_t index = sensor2index(s);
-//        
-//        if(true == s_privatedata.acquisition[index].ongoing)
-//        {
-//            return resNOK;
-//        }
-//        
-//        // i2c must not be busy
-//        if(true == embot::hw::i2c::isbusy(s_privatedata.config[index].i2cdes.bus))
-//        {
-//            return resNOK;
-//        }
-//                
-////        s_privatedata.acquisition[index].clear();
-////        s_privatedata.acquisition[index].ongoing = true;
-////        s_privatedata.acquisition[index].done = false;
-////        s_privatedata.acquisition[index].userdefCBK.clear();
-////        s_privatedata.acquisition[index].data.size = 1; // one byte only.
-//        
-//        s_privatedata.acquisition[index].startread(1);   // one byte only, no user callback
-//        
-//        // ok, now i trigger i2c in blocking mode
-//        result_t r = embot::hw::i2c::read(s_privatedata.config[index].i2cdes.bus, i2caddress, static_cast<std::uint8_t>(reg), s_privatedata.acquisition[index].data, timeout);
-//        s_privatedata.acquisition[index].stop();
-//        value = s_privatedata.acquisition[index].data.U08(0);
-//        
-//        return r;        
-//    }        
+        return s_privatedata.acquisition[sensor2index(s)].done;        
+    } 
+
     
+    result_t read(Sensor s, Data &data)
+    { 
+        if(false == initialised(s))
+        {
+            return resNOK;
+        } 
+
+        if(false == operationdone(s))
+        {
+            return resNOK;
+        }
+        
+        std::uint8_t index = sensor2index(s);
+        data.load(s_privatedata.acquisition[index].data.pointer);
+        
+        return resOK;   
+    } 
+
+
+    result_t write(Sensor s, embot::hw::BNO055::Register reg, std::uint8_t value, const embot::common::relTime timeout)
+    {
+        if(false == initialised(s))
+        {
+            return resNOK;
+        } 
+        
+        std::uint8_t index = sensor2index(s);
+        
+        // i2c must not be used by another device (eg. termometer or ...).
+        embot::common::relTime remaining = timeout;
+        if(true == embot::hw::i2c::isbusy(s_privatedata.config[index].i2cdes.bus, timeout, remaining))
+        {
+            return resNOK;
+        }
+        
+        // if (when) i2c is not busy (anymore), we just hope there is no another task using the bno055 ...
+        // we however just do the check         
+        if(true == s_privatedata.acquisition[index].ongoing)
+        {
+            return resNOK;
+        }
+        
+        return s_programregister(s, static_cast<std::uint8_t>(reg), value, remaining);                         
+    }
+
+    
+    result_t write(Sensor s, embot::hw::BNO055::Register reg, std::uint8_t value, const embot::common::Callback &oncompletion)
+    {
+        if(false == initialised(s))
+        {
+            return resNOK;
+        } 
+
+        std::uint8_t index = sensor2index(s);
+
+        // i2c must not be busy
+        if(true == embot::hw::i2c::isbusy(s_privatedata.config[index].i2cdes.bus))
+        {
+            return resNOK;
+        } 
+        
+        if(true == s_privatedata.acquisition[index].ongoing)
+        {
+            return resNOK;
+        }
+        
+        return s_writeregister(s, static_cast<std::uint8_t>(reg), value, oncompletion);                         
+    }        
+       
+
+        
     result_t read(Sensor s, embot::hw::BNO055::Register reg, embot::common::Data &data, const embot::common::relTime timeout)
     {
         if(false == initialised(s))
@@ -301,13 +411,16 @@ namespace embot { namespace hw { namespace BNO055 {
 
         std::uint8_t index = sensor2index(s);
         
-        if(true == s_privatedata.acquisition[index].ongoing)
+        // i2c must not be used by another device (eg. termometer or ...).
+        embot::common::relTime remaining = timeout;
+        if(true == embot::hw::i2c::isbusy(s_privatedata.config[index].i2cdes.bus, timeout, remaining))
         {
             return resNOK;
         }
         
-        // i2c must not be busy
-        if(true == embot::hw::i2c::isbusy(s_privatedata.config[index].i2cdes.bus))
+        // if (when) i2c is not busy (anymore), we just hope there is no another task using the bno055 ...
+        // we however just do the check         
+        if(true == s_privatedata.acquisition[index].ongoing)
         {
             return resNOK;
         }
@@ -331,13 +444,13 @@ namespace embot { namespace hw { namespace BNO055 {
 
         std::uint8_t index = sensor2index(s);
         
-        if(true == s_privatedata.acquisition[index].ongoing)
-        {
-            return resNOK;
-        }
-        
         // i2c must not be busy
         if(true == embot::hw::i2c::isbusy(s_privatedata.config[index].i2cdes.bus))
+        {
+            return resNOK;
+        } 
+        
+        if(true == s_privatedata.acquisition[index].ongoing)
         {
             return resNOK;
         }
@@ -351,287 +464,7 @@ namespace embot { namespace hw { namespace BNO055 {
         return resOK;        
     }
     
-    
-    result_t get(Sensor s, Info &info, embot::common::relTime timeout)
-    {
-        embot::common::Data data(&info, sizeof(info));
-        result_t r = read(s, embot::hw::BNO055::Register::CHIP_ID, data, timeout);  
-        return r;        
-    }
 
-    result_t acquisition(Sensor s, DataSet dataset, const embot::common::Callback &oncompletion)
-    {
-        if(false == initialised(s))
-        {
-            return resNOK;
-        } 
-
-        std::uint8_t index = sensor2index(s);
-        
-        if(true == s_privatedata.acquisition[index].ongoing)
-        {
-            return resNOK;
-        }
-        
-        // i2c must not be busy
-        if(true == embot::hw::i2c::isbusy(s_privatedata.config[index].i2cdes.bus))
-        {
-            return resNOK;
-        }
-        
-        // start a read of nbytes which will go into buffer[]
-        const std::uint8_t nbytes = static_cast<std::uint8_t>(dataset);
-        const Register reg = Register::DATASET_START;
-        
-        s_privatedata.acquisition[index].startread(nbytes, oncompletion); 
-                       
-        // ok, now i trigger i2c.
-        embot::common::Callback cbk(s_sharedCBK, &s_privatedata.acquisition[index]);
-        embot::hw::i2c::read(s_privatedata.config[index].i2cdes.bus, i2caddress, static_cast<std::uint8_t>(reg), s_privatedata.acquisition[index].data, cbk);
-                
-        return resOK;          
-    }
-    
-    result_t acquisition(Sensor s, std::uint8_t reg, std::uint8_t size, const embot::common::Callback &oncompletion)
-    {
-        if(false == initialised(s))
-        {
-            return resNOK;
-        } 
-
-        std::uint8_t index = sensor2index(s);
-        
-        if(true == s_privatedata.acquisition[index].ongoing)
-        {
-            return resNOK;
-        }
-        
-        // i2c must not be busy
-        if(true == embot::hw::i2c::isbusy(s_privatedata.config[index].i2cdes.bus))
-        {
-            return resNOK;
-        }
-                
-        s_privatedata.acquisition[index].clear();
-        s_privatedata.acquisition[index].ongoing = true;
-        s_privatedata.acquisition[index].done = false;
-        s_privatedata.acquisition[index].userdefCBK = oncompletion;
-        s_privatedata.acquisition[index].data.size = size; // more bytes
-        
-        s_privatedata.acquisition[index].startread(size, oncompletion);
-        
-        // ok, now i trigger i2c.
-        embot::common::Callback cbk(s_sharedCBK, &s_privatedata.acquisition[index]);
-        embot::hw::i2c::read(s_privatedata.config[index].i2cdes.bus, i2caddress, reg, s_privatedata.acquisition[index].data, cbk);
-        
-        
-        return resOK;
-    }
-    
-    result_t set(Sensor s, Mode m, embot::common::relTime timeout)
-    {        
-        if(false == initialised(s))
-        {
-            return resNOK;
-        } 
-        
-        if((Mode::none == m) || (Mode::maxnumberof == m))
-        {
-            return resNOK;
-        }
-
-        std::uint8_t index = sensor2index(s);
-        
-        if(true == s_privatedata.acquisition[index].ongoing)
-        {
-            return resNOK;
-        }
-        
-        // i2c must not be busy
-        if(true == embot::hw::i2c::isbusy(s_privatedata.config[index].i2cdes.bus))
-        {
-            return resNOK;
-        } 
-        
-        return s_programregister(s, static_cast<std::uint8_t>(Register::OPR_MODE), static_cast<std::uint8_t>(m), timeout);                                        
-    }
-    
-    result_t write(Sensor s, embot::hw::BNO055::Register reg, std::uint8_t value, const embot::common::relTime timeout)
-    {
-        if(false == initialised(s))
-        {
-            return resNOK;
-        } 
-
-        std::uint8_t index = sensor2index(s);
-        
-        if(true == s_privatedata.acquisition[index].ongoing)
-        {
-            return resNOK;
-        }
-        
-        // i2c must not be busy
-        if(true == embot::hw::i2c::isbusy(s_privatedata.config[index].i2cdes.bus))
-        {
-            return resNOK;
-        } 
-        
-        return s_programregister(s, static_cast<std::uint8_t>(reg), value, timeout);                         
-    }
-    
-    result_t write(Sensor s, embot::hw::BNO055::Register reg, std::uint8_t value, const embot::common::Callback &oncompletion)
-    {
-        if(false == initialised(s))
-        {
-            return resNOK;
-        } 
-
-        std::uint8_t index = sensor2index(s);
-        
-        if(true == s_privatedata.acquisition[index].ongoing)
-        {
-            return resNOK;
-        }
-        
-        // i2c must not be busy
-        if(true == embot::hw::i2c::isbusy(s_privatedata.config[index].i2cdes.bus))
-        {
-            return resNOK;
-        } 
-        
-        return s_writeregister(s, static_cast<std::uint8_t>(reg), value, oncompletion);                         
-    }    
-    
-    
-    bool isalive(Sensor s)
-    {
-        if(false == initialised(s))
-        {
-            return false;
-        } 
-
-        std::uint8_t index = sensor2index(s);
-        
-        if(true == embot::hw::i2c::isbusy(s_privatedata.config[index].i2cdes.bus))
-        {
-            return false;
-        }
-
-        return embot::hw::i2c::ping(s_privatedata.config[index].i2cdes.bus, i2caddress);        
-    }
-
-    
-    bool isready(Sensor s)
-    {
-        if(false == initialised(s))
-        {
-            return false;
-        } 
-
-        std::uint8_t index = sensor2index(s);
-
-        return s_privatedata.acquisition[index].done;        
-    }
-    
-    
-    result_t read(Sensor s, std::uint8_t &value)
-    {
-        if(false == initialised(s))
-        {
-            return resNOK;
-        } 
-
-        if(false == isready(s))
-        {
-            return resNOK;
-        }
-        
-        std::uint8_t index = sensor2index(s);
-        
-        if(true != s_privatedata.acquisition[index].data.isvalid())
-        {
-            return resNOK;
-        }
-        
-        value = s_privatedata.acquisition[index].data.U08(0);
-  
-        return resOK;        
-    }
-    
-
-    result_t read(Sensor s, embot::common::Data &data)
-    {
-        if(false == initialised(s))
-        {
-            return resNOK;
-        } 
-
-        if(false == isready(s))
-        {
-            return resNOK;
-        }
-        
-        std::uint8_t index = sensor2index(s);
-        data = s_privatedata.acquisition[index].data;
-        
-        return resOK;        
-    }  
-
-//    result_t read(Sensor s, Fulldata &fulldata)
-//    { 
-//        if(false == initialised(s))
-//        {
-//            return resNOK;
-//        } 
-
-//        if(false == isready(s))
-//        {
-//            return resNOK;
-//        }
-//        
-//        std::uint8_t index = sensor2index(s);
-//        fulldata.load(s_privatedata.acquisition[index].data.pointer);
-//        
-//        return resOK;   
-//    }  
-
-    result_t read(Sensor s, Fulldata &fulldata)
-    { 
-        if(false == initialised(s))
-        {
-            return resNOK;
-        } 
-
-        if(false == isready(s))
-        {
-            return resNOK;
-        }
-        
-        std::uint8_t index = sensor2index(s);
-        fulldata.load(s_privatedata.acquisition[index].data.pointer);
-        
-        return resOK;   
-    }    
-    
-
-//    result_t read(Sensor s, Triple &triple)
-//    {
-//        if(false == initialised(s))
-//        {
-//            return resNOK;
-//        } 
-
-//        if(false == isready(s))
-//        {
-//            return resNOK;
-//        }
-//        
-//        std::uint8_t index = sensor2index(s);
-
-//        
-//        return resOK;        
-//    } 
-    
     
     static void s_powerOFF(void)
     {
@@ -682,71 +515,7 @@ namespace embot { namespace hw { namespace BNO055 {
         acq->stop();
     }
     
-    // static functions used to test the peripheral
-    
-    static result_t s_start(Sensor s)
-    {
-        if(false == initialised(s))
-        {
-            return resNOK;
-        } 
 
-        std::uint8_t index = sensor2index(s);
-        
-        if(true == s_privatedata.acquisition[index].ongoing)
-        {
-            return resNOK;
-        }
-        
-        // i2c must not be busy
-        if(true == embot::hw::i2c::isbusy(s_privatedata.config[index].i2cdes.bus))
-        {
-            return resNOK;
-        } 
-
-        const std::uint8_t range02g = 0x0c;
-        const std::uint8_t range04g = 0x0d;
-        const std::uint8_t range08g = 0x0e;
-        const std::uint8_t range16g = 0x0f;
-        s_programregister(s, static_cast<std::uint8_t>(Register::PAGE_ID), 0x01, 20*embot::common::time1millisec);        
-        s_programregister(s, 0x08, range02g, 20*embot::common::time1millisec);          
-        s_programregister(s, static_cast<std::uint8_t>(Register::PAGE_ID), 0x00, 20*embot::common::time1millisec);  
-
-        // unit_sel: 0x80 is m/sec^2, 0x81 is mg
-        s_programregister(s, 0x3B, 0x81, 20*embot::common::time1millisec);        
-
-        // i set the content of some registers:
-        // reg_PWR_MODE 0x3E, bits [1,0]        -> power mode
-        // value:
-        //        #define BNO055_POWER_MODE_NORMAL	    (0X00)
-        //        #define BNO055_POWER_MODE_LOWPOWER    (0X01)
-        //        #define BNO055_POWER_MODE_SUSPEND	    (0X02)
-        // use: BNO055_POWER_MODE_NORMAL 0x02
-        //
-        // reg_OPR_MODE 0x3D, bits [3,0]        -> operation mode
-        // value:       
-        //        #define BNO055_OPERATION_MODE_CONFIG			(0X00)
-        //        #define BNO055_OPERATION_MODE_ACCONLY			(0X01)
-        //        #define BNO055_OPERATION_MODE_MAGONLY			(0X02)
-        //        #define BNO055_OPERATION_MODE_GYRONLY			(0X03)
-        //        #define BNO055_OPERATION_MODE_ACCMAG			(0X04)
-        //        #define BNO055_OPERATION_MODE_ACCGYRO			(0X05)
-        //        #define BNO055_OPERATION_MODE_MAGGYRO			(0X06)
-        //        #define BNO055_OPERATION_MODE_AMG				(0X07)
-        //        #define BNO055_OPERATION_MODE_IMUPLUS			(0X08)
-        //        #define BNO055_OPERATION_MODE_COMPASS			(0X09)
-        //        #define BNO055_OPERATION_MODE_M4G				(0X0A)
-        //        #define BNO055_OPERATION_MODE_NDOF_FMC_OFF    (0X0B)
-        //        #define BNO055_OPERATION_MODE_NDOF		    (0X0C)
-        // use: BNO055_OPERATION_MODE_AMG 0x07
-        
-        // provo a scrivere su registro ... il valore ...
-        
-        s_programregister(s, static_cast<std::uint8_t>(Register::OPR_MODE), 0x07, 20*embot::common::time1millisec);
-                
-        
-        return resOK;
-    }    
     
 }}} // namespace embot { namespace hw { namespace BNO055 {
 
