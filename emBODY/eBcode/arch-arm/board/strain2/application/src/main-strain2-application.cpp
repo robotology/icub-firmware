@@ -1,5 +1,5 @@
 
-#define TEST_ENABLED
+#undef TEST_ENABLED
 
 #undef TEST_HW_PGA308
 #undef TEST_HW_ADC
@@ -7,7 +7,7 @@
 #undef TEST_HW_ONEWIRE
 #undef TEST_DSP
 #undef TEST_HW_SI7051
-#define TEST_HW_BNO055
+#undef TEST_HW_BNO055
 
 #if defined(TEST_ENABLED)
 void tests_launcher_init();
@@ -405,10 +405,7 @@ void tests_launcher_init()
 {
 #if defined(TEST_HW_BNO055)
     embot::hw::BNO055::init(embot::hw::bsp::strain2::imuBOSCH, embot::hw::bsp::strain2::imuBOSCHconfig); 
-    std::uint8_t value = 0;
-//    embot::hw::BNO055::read(embot::hw::bsp::strain2::imuBOSCH, embot::hw::BNO055::Register::CHIP_ID, value, 100*1000*1000);
-    value = value;
-    value = 0;
+
     std::uint8_t dat08[16] = {0};
     embot::common::Data data(dat08, 8);
     
@@ -426,7 +423,7 @@ void tests_launcher_init()
     embot::hw::BNO055::read(embot::hw::bsp::strain2::imuBOSCH, embot::hw::BNO055::Register::CHIP_ID, data, cbk);
     for(;;)
     {
-        if(true == embot::hw::BNO055::isready(embot::hw::bsp::strain2::imuBOSCH))
+        if(true == embot::hw::BNO055::operationdone(embot::hw::bsp::strain2::imuBOSCH))
         {
             break;
         }        
@@ -441,10 +438,6 @@ void tests_launcher_init()
     embot::hw::BNO055::read(embot::hw::bsp::strain2::imuBOSCH, embot::hw::BNO055::Register::DATASET_START, data, embot::common::time1second);
     embot::hw::BNO055::read(embot::hw::bsp::strain2::imuBOSCH, embot::hw::BNO055::Register::DATASET_START, data, embot::common::time1second);
     
-    
-    
-    //embot::hw::BNO055::start(embot::hw::bsp::strain2::imuBOSCH);
-//    embot::hw::BNO055::set(embot::hw::bsp::strain2::imuBOSCH, embot::hw::BNO055::Mode::NDOF);
     embot::hw::sys::delay(10*1000);
 #endif
     
@@ -536,11 +529,6 @@ void tests_tick()
 {
     
 #if defined(TEST_HW_BNO055)
-    //embot::hw::BNO055::init(embot::hw::bsp::strain2::imuBOSCH, embot::hw::bsp::strain2::imuBOSCHconfig); 
-    
-//    static embot::hw::BNO055::Triple acc;
-//    static embot::hw::BNO055::Triple mag;
-//    static embot::hw::BNO055::Triple gyr;
     
     embot::common::Time starttime = embot::sys::timeNow();
     embot::common::Time endtime = starttime;
@@ -551,36 +539,43 @@ void tests_tick()
     const int ntimes = 1000;
     embot::common::Callback cbk(counter, nullptr);
     
-    embot::hw::BNO055::Fulldata fulldata;
+#define MODE_DIRECT
+    
+    embot::hw::BNO055::Data datafull;
+    embot::common::Triple<float> acc;
+    embot::common::Triple<float> gyr;
+    embot::common::Triple<float> eul;
+    std::uint8_t calibmag = 0;
+    std::uint8_t calibacc = 0;
     int num = 0;
     for(int i=0; i<ntimes; i++)
     {
       
-//        embot::hw::BNO055::acquisition(embot::hw::bsp::strain2::imuBOSCH, embot::hw::BNO055::regSTARTDATA, 18, cbk);
-        
-        data.load(values, 18);
-//        embot::hw::BNO055::read(embot::hw::bsp::strain2::imuBOSCH, embot::hw::BNO055::Register::DATA_START, data, cbk);
-        
-//        embot::hw::BNO055::read(embot::hw::bsp::strain2::imuBOSCH, embot::hw::BNO055::Register::DATASET_START, data, 100*1000);
-        
-        embot::hw::BNO055::acquisition(embot::hw::bsp::strain2::imuBOSCH, embot::hw::BNO055::DataSet::FULL, cbk);
+        #if defined(MODE_DIRECT)
+        embot::hw::BNO055::acquisition(embot::hw::bsp::strain2::imuBOSCH, embot::hw::BNO055::Set::FULL, datafull, cbk);
+        #else
+        embot::hw::BNO055::acquisition(embot::hw::bsp::strain2::imuBOSCH, embot::hw::BNO055::Set::FULL, cbk);
+        #endif
+                
         
         for(;;)
         {
-            if(true == embot::hw::BNO055::isready(embot::hw::bsp::strain2::imuBOSCH))
+            if(true == embot::hw::BNO055::operationdone(embot::hw::bsp::strain2::imuBOSCH))
             {
                 break;
             }
         }
         
+        #if defined(MODE_DIRECT)
+        #else
+        embot::hw::BNO055::read(embot::hw::bsp::strain2::imuBOSCH, datafull);
+        #endif        
         
-        embot::hw::BNO055::read(embot::hw::bsp::strain2::imuBOSCH, fulldata);
-        
-  
-//        embot::hw::BNO055::read(embot::hw::bsp::strain2::imuBOSCH, data); 
-//        acc.load(data.get(0));
-//        mag.load(data.get(6));
-//        gyr.load(data.get(12));
+        datafull.getACC(acc);
+        datafull.getGYR(gyr);
+        datafull.getEUL(eul);
+        calibacc = datafull.calibrationOfACC();
+        calibmag = datafull.calibrationOfMAG();
         value = value;    
     }
 
@@ -591,7 +586,6 @@ void tests_tick()
     delta = endtime - starttime;
     delta = delta;
     num = num;   
-    // 4.5 ms per acquisire 18 byte: acc, mag, gyr ciascono una tripla di int16 = 2 * 3 * 3 = 18.  
 
     // boh, 2 ms per fulldata .....
     
@@ -611,24 +605,19 @@ void tests_tick()
     int num = 0;
     for(int i=0; i<ntimes; i++)
     {
-#if 0        
-        if(true == embot::hw::SI7051::isalive(SI7051sensor))
-        {
-            num++;
-        }
-#else        
+   
         embot::hw::SI7051::acquisition(SI7051sensor, cbk);
         
         for(;;)
         {
-            if(true == embot::hw::SI7051::isready(SI7051sensor))
+            if(true == embot::hw::SI7051::operationdone(SI7051sensor))
             {
                 break;
             }
         }
         
         embot::hw::SI7051::read(SI7051sensor, temp);    
-#endif        
+     
     }
 
 
