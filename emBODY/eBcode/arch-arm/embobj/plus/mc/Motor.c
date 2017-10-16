@@ -163,6 +163,8 @@ static void Motor_config_2FOC(Motor* o, eOmc_motor_config_t* config)
     
     o->can_motor_config[5] = config->motorPoles;
     
+    //TO COMPLETE: o->can_motor_config[6] = o->enc_tolerance/ bla bla;
+
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, o->ID, 0);
     
     eOcanprot_command_t cmdPid;
@@ -214,7 +216,6 @@ void Motor_init(Motor* o) //
     memset(o, 0, sizeof(Motor));
 
     o->GEARBOX = 1;
-    o->GEARBOX_E2J = 1;
     
     o->not_init = TRUE;
     o->not_calibrated = TRUE;
@@ -243,11 +244,16 @@ void Motor_config(Motor* o, uint8_t ID, eOmc_motor_config_t* config) //
     o->ID                 = ID;
     //o->HARDWARE_TYPE      = hardware_type;
     //o->MOTOR_CONTROL_TYPE = motor_control_type;
-    o->GEARBOX            = config->gearboxratio;
-    o->GEARBOX_E2J        = config->gearboxratio2;
+    o->GEARBOX            = config->gearbox_M2J;
     o->HAS_TEMP_SENSOR    = config->hasTempSensor;
     
     o->enc_sign = config->rotorEncoderResolution >= 0 ? 1 : -1; 
+    
+    
+    
+    //in this case tolarance is the numeber of encoder units lost each complete rotation
+    //send can message to 2foc
+    o->enc_tolerance = config->rotEncTolerance; //maybe this field is not necessary
     
     o->temperature_max = config->temperatureLimit;
 
@@ -1030,9 +1036,9 @@ void Motor_update_current_fbk(Motor* o, int16_t current)
     o->Iqq_fbk = current;
 }
 
-void Motor_config_gearbox_ratio(Motor* o, int32_t gearbox_ratio)
+void Motor_config_gearbox_M2J(Motor* o, float32_t gearbox_M2J)
 {
-    o->GEARBOX = gearbox_ratio;
+    o->GEARBOX = gearbox_M2J;
 }
 
 int16_t Motor_config_pwm_limit(Motor* o, int16_t pwm_limit)

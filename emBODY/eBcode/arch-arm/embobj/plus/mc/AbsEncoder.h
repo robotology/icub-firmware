@@ -70,8 +70,9 @@ typedef struct //AbsEncoder
     
     int32_t zero;
     //int32_t sign;
-    int32_t mul,div;
-    uint8_t numofnoisebits;
+    int32_t mul;
+    float32_t div;
+    float32_t toleranceCfg;
     
     int32_t distance;
     int32_t velocity;
@@ -115,7 +116,7 @@ extern AbsEncoder* AbsEncoder_new(uint8_t n);
 extern void AbsEncoder_init(AbsEncoder* o);
 extern void AbsEncoder_destroy(AbsEncoder* o);
 
-extern void AbsEncoder_config(AbsEncoder* o, uint8_t ID, int32_t resolution, uint8_t numofnoisebits);
+extern void AbsEncoder_config(AbsEncoder* o, uint8_t ID, int32_t resolution, float32_t tolerance);
 extern void AbsEncoder_calibrate_absolute(AbsEncoder* o, int32_t offset, int32_t zero);
 extern void AbsEncoder_calibrate_fake(AbsEncoder* o);
 
@@ -124,7 +125,7 @@ extern void AbsEncoder_update(AbsEncoder* o, uint16_t position);
 extern void AbsEncoder_invalid(AbsEncoder* o, eOencoderreader_errortype_t error_type);
 
 extern void AbsEncoder_config_resolution(AbsEncoder* o, float resolution);
-extern void AbsEncoder_config_divisor(AbsEncoder* o, int32_t divisor);
+extern void AbsEncoder_config_divisor(AbsEncoder* o, float32_t divisor);
 
 extern void AbsEncoder_timeout(AbsEncoder* o);
 
