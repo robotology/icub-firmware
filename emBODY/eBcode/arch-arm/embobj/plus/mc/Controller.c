@@ -1815,6 +1815,11 @@ void MController_update_motor_current_fbk(int m, int16_t current)
     Motor_update_current_fbk(smc->motor+m, current);
 }
 
+void MController_update_joint_targets(int j)
+{
+    Joint_update_status_reference(smc->joint+j);
+}
+
 void MController_config_pos_pid(int j, eOmc_PID_t *pid_conf)
 {
     Joint* joint = smc->joint+j;

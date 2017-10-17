@@ -64,6 +64,8 @@ void Trajectory_set_pos_raw(Trajectory *o, float p0)
 {
     if (o->pos_min != o->pos_max) LIMIT2(o->pos_min, p0, o->pos_max)
     
+    o->target_pos = p0;
+    
     o->xX = p0;
     o->xV = 0.0f;
     o->xA = 0.0f;
@@ -82,6 +84,8 @@ void Trajectory_set_pos_raw(Trajectory *o, float p0)
 void Trajectory_set_vel_raw(Trajectory *o, float v0)
 {    
     o->xTimer = o->xT = 0.0f;
+    
+    o->target_vel = v0;
     
     o->vX = 0.0f;
     o->vV = v0;
@@ -107,6 +111,8 @@ void Trajectory_set_pos_end(Trajectory *o, /*float x0,*/ float xStar, float velA
     ///////////
     
     float D = xStar - o->xX;
+    
+    o->target_pos = (float)xStar;
     
     if ((velAvg>0.0f) ^ (D>0.0f)) velAvg = -velAvg;
     
@@ -143,6 +149,8 @@ void Trajectory_set_pos_end(Trajectory *o, /*float x0,*/ float xStar, float velA
 void Trajectory_set_vel_end(Trajectory *o, float vStar, float accAvg)
 {
     o->bVelocityMove = TRUE;
+    
+    o->target_vel = vStar;
 
     //LIMIT(vStar, o->vel_max)
     
@@ -195,6 +203,7 @@ void Trajectory_velocity_stop(Trajectory *o)
     //o->xA += o->vA;
 
     o->vX = o->vV = o->vA = 0.0f;    
+    o->target_vel = 0;
 }
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -303,4 +312,13 @@ int32_t Trajectory_get_vel_ref(Trajectory* o)
 int32_t Trajectory_get_acc_ref(Trajectory* o)
 {
     return (int32_t)(o->xA + o->vA);
+}
+
+extern float Trajectory_get_target_position(Trajectory* o)
+{
+    return o->target_pos;
+}
+extern float Trajectory_get_target_velocity(Trajectory* o)
+{
+    return o->target_vel;
 }

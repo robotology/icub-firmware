@@ -205,32 +205,37 @@ void Joint_motion_reset(Joint *o)
     
     o->output = ZERO;
 }
-static void Joint_update_status_reference(Joint* o, eOmc_controlmode_command_t control_mode)
-{
-    switch (control_mode)
+void Joint_update_status_reference(Joint* o)
+{    
+    switch (o->control_mode)
     {
-        case eomc_controlmode_cmd_force_idle:
-        case eomc_controlmode_cmd_idle:
+        case eomc_controlmode_idle:
+        case eomc_controlmode_notConfigured:
+        case eomc_controlmode_configured:
             break;
-        case eomc_controlmode_cmd_mixed:
-            o->eo_joint_ptr->status.target.trgt_velocity = o->vel_ref;
-            o->eo_joint_ptr->status.target.trgt_position = o->pos_ref;
+        
+        case eomc_controlmode_mixed:
+        case eomc_controlmode_velocity_pos:
+            o->eo_joint_ptr->status.target.trgt_velocity = Trajectory_get_target_velocity(&(o->trajectory));
+            o->eo_joint_ptr->status.target.trgt_position = Trajectory_get_target_position(&(o->trajectory));
             break;
-        case eomc_controlmode_cmd_velocity:
-            o->eo_joint_ptr->status.target.trgt_velocity = o->vel_ref;
+        case eomc_controlmode_velocity:
+        case eomc_controlmode_impedance_vel:
+            o->eo_joint_ptr->status.target.trgt_velocity = Trajectory_get_target_velocity(&(o->trajectory));
             break;
-        case eomc_controlmode_cmd_position:
-            o->eo_joint_ptr->status.target.trgt_position = o->pos_ref;
+        case eomc_controlmode_position:
+        case eomc_controlmode_impedance_pos:
+            o->eo_joint_ptr->status.target.trgt_position = Trajectory_get_target_position(&(o->trajectory));
             break;
-        case eomc_controlmode_cmd_direct:
-            o->eo_joint_ptr->status.target.trgt_positionraw = o->pos_ref;
+        case eomc_controlmode_direct:
+            o->eo_joint_ptr->status.target.trgt_positionraw = Trajectory_get_target_position(&(o->trajectory));
             break;
                 
-        case eomc_controlmode_cmd_openloop:
+        case eomc_controlmode_openloop:
             o->eo_joint_ptr->status.target.trgt_openloop = o->out_ref;
             break;
 
-        case eomc_controlmode_cmd_torque:
+        case eomc_controlmode_torque:
             o->eo_joint_ptr->status.target.trgt_torque = o->trq_ref;
             break;
             
@@ -288,7 +293,7 @@ BOOL Joint_set_control_mode(Joint* o, eOmc_controlmode_command_t control_mode)
     
     Joint_motion_reset(o);
     
-    Joint_update_status_reference(o, control_mode);
+    Joint_update_status_reference(o);
     
     return TRUE;
 }

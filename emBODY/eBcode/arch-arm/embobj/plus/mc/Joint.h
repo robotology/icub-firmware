@@ -199,6 +199,7 @@ extern void Joint_motion_reset(Joint *o);
 
 extern void Joint_update_odometry_fbk(Joint* o, CTRL_UNITS pos_fbk, CTRL_UNITS vel_fbk);
 extern void Joint_update_torque_fbk(Joint* o, CTRL_UNITS trq_fbk);
+extern void Joint_update_status_reference(Joint* o);
 
 extern BOOL Joint_check_faults(Joint* o);
 extern void Joint_clear_faults(Joint* o);
