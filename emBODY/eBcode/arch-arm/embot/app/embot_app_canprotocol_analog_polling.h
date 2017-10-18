@@ -22,6 +22,7 @@
 #define _EMBOT_APP_CANPROTOCOL_ANALOG_POLLING_H_
 
 #include "embot_common.h"
+#include "embot_binary.h"
 
 #include "embot_app_canprotocol.h"
 
@@ -70,7 +71,16 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         STRAIN2_AMPLIFIER_RESET = 0x20,                 // reset the amplifier (transfer function + others) to default factory values. 
         STRAIN2_AMPLIFIER_CFG1_SET = 0x21,              // config of the amplifier transfer function (gains + offsets). 
         STRAIN2_AMPLIFIER_CFG1_GET = 0x22,              // config of the amplifier transfer function (gains + offsets). 
-        STRAIN2_AMPLIFIER_AUTOCALIB = 0x23              // it starts a calibration procedure for the amplifier(s). 
+        STRAIN2_AMPLIFIER_AUTOCALIB = 0x23,             // it starts a calibration procedure for the amplifier(s). 
+        
+        // messages used for IMU and TERMOMETER sensors (strain2 + mtb4)
+        IMU_CONFIG_SET = 0x24,
+        IMU_CONFIG_GET = 0x25,
+        IMU_TRANSMIT = 0x26,
+        
+        TERMOMETER_CONFIG_SET = 0x27,
+        TERMOMETER_CONFIG_GET = 0x28,
+        TERMOMETER_TRANSMIT = 0x29        
     };
     
     
@@ -83,7 +93,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
     // - message SET_RESOLUTION (0x10) is not implemented yet because only mais uses it.
     // - messages SET_IIR = 0x01, SELECT_ACTIVE_CH = 0x05, FILTER_EN = 0x0D, MUX_EN = 0x0E, MUX_NUM = 0x0F are not implemented 
     //   because they seem to be unúsed in strain.
-    // - there are hole in values: 2, [0x1d, 0x31], [0x33, 0x4C], [0x51, ->], where we can add extra messages to configure new boards.
+    // - there are hole in values: 2, [0x1f, 0x31], [0x33, 0x4C], [0x51, ->], where we can add extra messages to configure new boards.
     
     
     // some utilities    
@@ -877,6 +887,86 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
             
         bool reply();   // none            
     }; 
+    
+    enum class imuFusion { enabled = 0, none = 33 }; // later on 
+    
+    class Message_IMU_CONFIG_SET : public Message
+    {
+        public:
+            
+                                    
+        struct Info
+        {
+            std::uint16_t sensormask;       // combination of ... 0x0001 << embot::app::canprotocol::analog::imuSensor values
+            imuFusion fusion;                  // with an enum we can add later on as many options we want. 
+            std::uint32_t ffu_ranges_measureunits;
+            Info() : sensormask(0), fusion(imuFusion::none), ffu_ranges_measureunits(0) {}
+            void enable(embot::app::canprotocol::analog::imuSensor s) 
+            { 
+                if(embot::app::canprotocol::analog::imuSensor::none != s)
+                    embot::binary::bit::set(sensormask, static_cast<std::uint8_t>(s)); 
+            }
+        };
+        
+        Info info;
+        
+        Message_IMU_CONFIG_SET() {}
+            
+        bool load(const embot::hw::can::Frame &inframe);
+            
+        bool reply();   // none
+            
+    }; 
+
+    class Message_IMU_CONFIG_GET : public Message
+    {
+        public:
+                                    
+        struct Info
+        { 
+            std::uint8_t nothing;           
+            Info() : nothing(0) {}
+        };
+        
+        struct ReplyInfo
+        {
+            std::uint16_t sensormask;       // combination of ... 0x0001 << embot::app::canprotocol::analog::imuSensor values
+            imuFusion fusion;                  // with an enum we can add later on as many options we want. 
+            std::uint32_t ffu_ranges_measureunits;
+            ReplyInfo() : sensormask(0), fusion(imuFusion::none), ffu_ranges_measureunits(0) {}        
+        };        
+        
+        Info info;
+        
+        Message_IMU_CONFIG_GET() {}
+            
+        bool load(const embot::hw::can::Frame &inframe);
+            
+        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
+    };  
+    
+    class Message_IMU_TRANSMIT : public Message
+    {
+        public:
+        
+        // format is data[0] = millisec
+                        
+        struct Info
+        {
+            bool transmit;
+            embot::common::relTime  txperiod;   // if 0, dont transmit. else use usec value.         
+            Info() : transmit(false), txperiod(0) {}
+        };
+        
+        Info info;
+        
+        Message_IMU_TRANSMIT() {}
+            
+        bool load(const embot::hw::can::Frame &inframe);
+            
+        bool reply();   // none
+        
+    };    
     
     
     

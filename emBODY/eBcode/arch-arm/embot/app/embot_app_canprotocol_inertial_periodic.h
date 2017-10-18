@@ -32,7 +32,8 @@ namespace embot { namespace app { namespace canprotocol { namespace inertial { n
     enum class CMD { 
         none = 0xfe, 
         
-        DIGITAL_GYROSCOPE = 0, DIGITAL_ACCELEROMETER = 1
+        DIGITAL_GYROSCOPE = 0, DIGITAL_ACCELEROMETER = 1,
+        IMU_TRIPLE = 2, IMU_QUATERNION = 3, IMU_STATUS = 4
     };
     
     // NOTES
@@ -48,6 +49,7 @@ namespace embot { namespace app { namespace canprotocol { namespace inertial { n
 
   
 namespace embot { namespace app { namespace canprotocol { namespace inertial { namespace periodic {
+    
         
     // the management of commands        
     
@@ -94,6 +96,78 @@ namespace embot { namespace app { namespace canprotocol { namespace inertial { n
             
         bool get(embot::hw::can::Frame &outframe);        
     }; 
+    
+    
+    class Message_IMU_TRIPLE : public Message
+    {
+        public:
+                    
+        struct Info
+        {
+            std::uint8_t                                canaddress;
+            std::uint8_t                                seqnumber;
+            embot::app::canprotocol::analog::imuSensor  sensor;
+            embot::common::Triple<std::int16_t>         value;
+            Info() : canaddress(0), seqnumber(0), sensor(embot::app::canprotocol::analog::imuSensor::none) { value.reset(); }
+        };
+        
+        Info info;
+        
+        Message_IMU_TRIPLE() {}
+            
+        bool load(const Info& inf);
+            
+        bool get(embot::hw::can::Frame &outframe);        
+    };
+    
+    
+    class Message_IMU_QUATERNION : public Message
+    {
+        public:
+            
+
+        struct Info
+        {
+            std::uint8_t                            canaddress;
+            embot::common::Quadruple<std::int16_t>  value;
+            Info() : canaddress(0) { value.reset(); }
+        };
+        
+        Info info;
+        
+        Message_IMU_QUATERNION() {}
+            
+        bool load(const Info& inf);
+            
+        bool get(embot::hw::can::Frame &outframe);        
+    };  
+    
+
+    class Message_IMU_STATUS : public Message
+    {
+        public:
+            
+        enum class Calibration { none = 0, poor = 1, medium = 2, good = 3};
+            
+        struct Info
+        {
+            std::uint8_t                            canaddress;
+            std::uint8_t                            seqnumber;
+            Calibration                             gyrcalib; 
+            Calibration                             acccalib;
+            Calibration                             magcalib;
+            embot::common::relTime                  acquisitiontime; 
+            Info() : canaddress(0), seqnumber(0), gyrcalib(Calibration::none), acccalib(Calibration::none), magcalib(Calibration::none), acquisitiontime(0)  { }
+        };
+        
+        Info info;
+        
+        Message_IMU_STATUS() {}
+            
+        bool load(const Info& inf);
+            
+        bool get(embot::hw::can::Frame &outframe);        
+    };      
     
 }}}}} // namespace embot { namespace app { namespace canprotocol { namespace inertial { namespace periodic {    
 

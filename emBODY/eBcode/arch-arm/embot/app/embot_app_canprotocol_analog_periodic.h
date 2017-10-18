@@ -34,7 +34,8 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         none = 0xfe, 
         
         UNCALIBFORCE_VECTOR_DEBUGMODE = 0x08, UNCALIBTORQUE_VECTOR_DEBUGMODE = 0x09,                    // strain 
-        FORCE_VECTOR = 0x0A, TORQUE_VECTOR = 0x0B                                                       // strain
+        FORCE_VECTOR = 0x0A, TORQUE_VECTOR = 0x0B,                                                      // strain
+        TERMOMETER_MEASURE = 0x0E
     };
     
     // NOTES

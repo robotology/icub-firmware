@@ -55,10 +55,11 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
     CMD convert(std::uint8_t cmd)
     {
-        static const std::uint16_t aspermask16 =    (1 << static_cast<std::uint8_t>(CMD::UNCALIBFORCE_VECTOR_DEBUGMODE))   |
-                                                    (1 << static_cast<std::uint8_t>(CMD::UNCALIBTORQUE_VECTOR_DEBUGMODE))  |   
-                                                    (1 << static_cast<std::uint8_t>(CMD::FORCE_VECTOR))                    |
-                                                    (1 << static_cast<std::uint8_t>(CMD::TORQUE_VECTOR));
+        static const std::uint16_t aspermask16 =    (1 << static_cast<std::uint8_t>(CMD::UNCALIBFORCE_VECTOR_DEBUGMODE))    |
+                                                    (1 << static_cast<std::uint8_t>(CMD::UNCALIBTORQUE_VECTOR_DEBUGMODE))   |   
+                                                    (1 << static_cast<std::uint8_t>(CMD::FORCE_VECTOR))                     |
+                                                    (1 << static_cast<std::uint8_t>(CMD::TORQUE_VECTOR))                    |
+                                                    (1 << static_cast<std::uint8_t>(CMD::TERMOMETER_MEASURE));
 
         if(cmd > 15)
         {

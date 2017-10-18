@@ -50,8 +50,10 @@ namespace embot { namespace app { namespace application {
         struct Config
         {
             embot::common::Event    tickevent;
+            embot::common::Event    datareadyevent;
             embot::sys::Task*       totask;
-            Config() : tickevent(0), totask(nullptr) {}
+            Config() : tickevent(0), datareadyevent(0), totask(nullptr) {}
+            Config(embot::common::Event _te, embot::common::Event _de, embot::sys::Task* _ts) : tickevent(_te), datareadyevent(_de), totask(_ts) {}    
         }; 
         
         
@@ -61,7 +63,8 @@ namespace embot { namespace app { namespace application {
         
         bool start();
         bool stop();        
-        bool tick(std::vector<embot::hw::can::Frame> &replies);
+        bool tick(std::vector<embot::hw::can::Frame> &replies);        
+        bool processdata(std::vector<embot::hw::can::Frame> &replies);
 
     private:
         theIMU(); 

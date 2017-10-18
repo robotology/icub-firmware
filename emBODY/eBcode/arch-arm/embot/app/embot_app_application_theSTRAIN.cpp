@@ -461,19 +461,7 @@ struct embot::app::application::theSTRAIN::Impl
         
     };
     
-
-    
-    // pity that armcc does not supporst std::tuple<>
-    struct TripleValue
-    {
-        std::uint16_t    x;
-        std::uint16_t    y;
-        std::uint16_t    z;
-        void reset() { x = y = z = 0; }
-        void set(std::uint16_t xx, std::uint16_t yy, std::uint16_t zz) { x = xx; y = yy; z = zz; }
-        TripleValue() { reset(); } 
-    };     
-    
+        
     // it is a holder of volatile data used in runtime. we use the same approach as for config data
     struct StrainRuntimeData_t
     {
@@ -487,8 +475,8 @@ struct embot::app::application::theSTRAIN::Impl
         embot::dsp::Q15     torqueforce[6];
         
         // the calibrated values for torque and force. they are raw values, not in dsp::Q15 format
-        TripleValue                 torque;
-        TripleValue                 force;
+        embot::common::Triple<std::uint16_t>    torque;
+        embot::common::Triple<std::uint16_t>    force;
         
         bool TXcalibData;
         bool TXuncalibData;

@@ -107,10 +107,13 @@ static void userdeflauncher(void* param)
 static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask evtmsk, void *p);
 static void eventbasedtask_init(embot::sys::Task *t, void *p);
 
-static const embot::common::Event evRXcanframe = 0x00000001;
-static const embot::common::Event evSTRAINtick = 0x00000002;
-static const embot::common::Event evSTRAINdataready = 0x00000004;
-
+static const embot::common::Event evRXcanframe = 0x00000001 << 0;
+static const embot::common::Event evSTRAINtick = 0x00000001 << 1;
+static const embot::common::Event evSTRAINdataready = 0x00000001 << 2;
+static const embot::common::Event evIMUtick = 0x00000001 << 3;
+static const embot::common::Event evIMUdataready = 0x00000001 << 4;
+static const embot::common::Event evTEMPtick = 0x00000001 << 5;
+static const embot::common::Event evTEMPdataready = 0x00000001 << 6;
 
 static const std::uint8_t maxOUTcanframes = 48;
 
@@ -134,7 +137,7 @@ static void start_evt_based(void)
     embot::app::application::theCANparserBasic::Config configbasic;
     canparserbasic.initialise(configbasic);  
     
-    // start canparser strain2
+    // start canparser strain
     embot::app::application::theCANparserSTRAIN &canparserstrain = embot::app::application::theCANparserSTRAIN::getInstance();
     embot::app::application::theCANparserSTRAIN::Config configparserstrain;
     canparserstrain.initialise(configparserstrain);  
@@ -144,13 +147,15 @@ static void start_evt_based(void)
     embot::app::application::theCANparserIMU::Config configparserimu;
     canparserimu.initialise(configparserimu);      
 
-    // start application for strain2
+    // start agent of strain
     embot::app::application::theSTRAIN &thestrain = embot::app::application::theSTRAIN::getInstance();
-    embot::app::application::theSTRAIN::Config configstrain;
-    configstrain.tickevent = evSTRAINtick;
-    configstrain.datareadyevent = evSTRAINdataready;
-    configstrain.totask = eventbasedtask;
+    embot::app::application::theSTRAIN::Config configstrain(evSTRAINtick, evSTRAINdataready, eventbasedtask);
     thestrain.initialise(configstrain); 
+        
+    // start agent of imu
+    embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance();
+    embot::app::application::theIMU::Config configimu(evIMUtick, evIMUdataready, eventbasedtask);
+    theimu.initialise(configimu);     
 
     // finally start can. i keep it as last because i dont want that the isr-handler calls its onrxframe() 
     // before the eventbasedtask is created.
@@ -231,17 +236,31 @@ static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask
         }        
     }
     
-    if(true == embot::binary::mask::check(eventmask, evSTRAINdataready))
-    {        
-        embot::app::application::theSTRAIN &thestrain = embot::app::application::theSTRAIN::getInstance();
-        thestrain.processdata(outframes);        
-    }
     
     if(true == embot::binary::mask::check(eventmask, evSTRAINtick))
     {        
         embot::app::application::theSTRAIN &thestrain = embot::app::application::theSTRAIN::getInstance();
         thestrain.tick(outframes);        
     }
+            
+    if(true == embot::binary::mask::check(eventmask, evSTRAINdataready))
+    {        
+        embot::app::application::theSTRAIN &thestrain = embot::app::application::theSTRAIN::getInstance();
+        thestrain.processdata(outframes);        
+    }
+    
+    if(true == embot::binary::mask::check(eventmask, evIMUtick))
+    {        
+        embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance();
+        theimu.tick(outframes);        
+    }   
+    
+    if(true == embot::binary::mask::check(eventmask, evIMUdataready))
+    {        
+        embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance();
+        theimu.processdata(outframes);        
+    }
+     
     
     // if we have any packet we transmit them
     std::uint8_t num = outframes.size();

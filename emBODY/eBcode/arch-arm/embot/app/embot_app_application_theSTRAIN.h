@@ -53,6 +53,7 @@ namespace embot { namespace app { namespace application {
             embot::common::Event    datareadyevent;
             embot::sys::Task*       totask;
             Config() : tickevent(0), datareadyevent(0), totask(nullptr) {}
+            Config(embot::common::Event _te, embot::common::Event _de, embot::sys::Task* _ts) : tickevent(_te), datareadyevent(_de), totask(_ts) {}
         }; 
         
         

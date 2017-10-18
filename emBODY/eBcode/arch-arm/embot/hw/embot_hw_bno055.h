@@ -126,6 +126,19 @@ namespace embot { namespace hw { namespace BNO055 {
         std::uint8_t                            calibstatus;
         std::uint8_t                            systemstatus;  
         Data() { temperature = 0; calibstatus = 0; systemstatus = 0; }
+        void reset() 
+        {
+            acc.reset();
+            mag.reset();
+            gyr.reset();
+            eul.reset();
+            qua.reset();
+            lia.reset();
+            grv.reset();
+            temperature = 0;
+            calibstatus = 0;
+            systemstatus = 0;
+        }
         void load(void *mem) 
         {
             std::uint8_t *m = reinterpret_cast<std::uint8_t*>(mem); 

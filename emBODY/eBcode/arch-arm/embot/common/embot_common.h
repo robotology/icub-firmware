@@ -81,8 +81,8 @@ namespace embot { namespace common {
         T   y;
         T   z;
         Triple() { reset(); }
-        Triple(T _x, T _y, T _z) { load(_x, _y, _z); }
-        void load(T _x, T _y, T _z) { x = _x; y = _y; z = _z; }  
+        Triple(T _x, T _y, T _z) { set(_x, _y, _z); }
+        void set(T _x, T _y, T _z) { x = _x; y = _y; z = _z; }  
         void reset() { x = 0; y = 0; z = 0; }
         void load(void *littleendianmemory) { T *p = reinterpret_cast<T*>(littleendianmemory); x = p[0]; y = p[1]; z = p[2]; }
     }; 
@@ -95,8 +95,8 @@ namespace embot { namespace common {
         T   y;
         T   z;
         Quadruple() { reset(); }
-        Quadruple(T _w, T _x, T _y, T _z) { load(_w, _x, _y, _z); }
-        void load(T _w, T _x, T _y, T _z) { w = _w; x = _x; y = _y; z = _z; }  
+        Quadruple(T _w, T _x, T _y, T _z) { set(_w, _x, _y, _z); }
+        void set(T _w, T _x, T _y, T _z) { w = _w; x = _x; y = _y; z = _z; }  
         void reset() { w = 0; x = 0; y = 0; z = 0; }
         void load(void *littleendianmemory) { T *p = reinterpret_cast<T*>(littleendianmemory); w = p[0]; x = p[1]; y = p[2]; z = p[3]; }
     };     

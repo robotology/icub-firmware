@@ -58,23 +58,45 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         static const std::uint64_t aspollmask256[4] = 
         {
             // bits 0-63
-            (1ULL << static_cast<std::uint8_t>(CMD::SET_BOARD_ADX))             | (1ULL << static_cast<std::uint8_t>(CMD::GET_FIRMWARE_VERSION))        | 
-            (1ULL << static_cast<std::uint8_t>(CMD::SET_TXMODE))                | (1ULL << static_cast<std::uint8_t>(CMD::SET_CANDATARATE))             | 
-            (1ULL << static_cast<std::uint8_t>(CMD::GET_FULL_SCALES))           | 
-            (1ULL << static_cast<std::uint8_t>(CMD::SET_FULL_SCALES))           | (1ULL << static_cast<std::uint8_t>(CMD::SAVE2EE))                     |
-            (1ULL << static_cast<std::uint8_t>(CMD::GET_EEPROM_STATUS))         | (1ULL << static_cast<std::uint8_t>(CMD::SET_SERIAL_NO))               |
-            (1ULL << static_cast<std::uint8_t>(CMD::GET_SERIAL_NO))             | (1ULL << static_cast<std::uint8_t>(CMD::GET_AMP_GAIN))                |    
-            (1ULL << static_cast<std::uint8_t>(CMD::SET_AMP_GAIN))              | (1ULL << static_cast<std::uint8_t>(CMD::GET_CH_ADC))                  |
-            (1ULL << static_cast<std::uint8_t>(CMD::SET_CH_DAC))                | (1ULL << static_cast<std::uint8_t>(CMD::GET_CH_DAC))                  |
-            (1ULL << static_cast<std::uint8_t>(CMD::SET_MATRIX_RC))             | (1ULL << static_cast<std::uint8_t>(CMD::GET_MATRIX_RC))               |
-            (1ULL << static_cast<std::uint8_t>(CMD::SET_MATRIX_G))              | (1ULL << static_cast<std::uint8_t>(CMD::GET_MATRIX_G))                |                
-            (1ULL << static_cast<std::uint8_t>(CMD::SET_CALIB_TARE))            | (1ULL << static_cast<std::uint8_t>(CMD::GET_CALIB_TARE))              |
-            (1ULL << static_cast<std::uint8_t>(CMD::SET_CURR_TARE))             | (1ULL << static_cast<std::uint8_t>(CMD::GET_CURR_TARE))               |
-            (1ULL << static_cast<std::uint8_t>(CMD::STRAIN2_AMPLIFIER_RESET))   | 
-            (1ULL << static_cast<std::uint8_t>(CMD::STRAIN2_AMPLIFIER_CFG1_SET))| (1ULL << static_cast<std::uint8_t>(CMD::STRAIN2_AMPLIFIER_CFG1_GET))  ,
+            (1ULL << static_cast<std::uint8_t>(CMD::SET_BOARD_ADX))                 | 
+            (1ULL << static_cast<std::uint8_t>(CMD::GET_FIRMWARE_VERSION))          | 
+            (1ULL << static_cast<std::uint8_t>(CMD::SET_TXMODE))                    | 
+            (1ULL << static_cast<std::uint8_t>(CMD::SET_CANDATARATE))               | 
+            (1ULL << static_cast<std::uint8_t>(CMD::GET_FULL_SCALES))               | 
+            (1ULL << static_cast<std::uint8_t>(CMD::SET_FULL_SCALES))               | 
+            (1ULL << static_cast<std::uint8_t>(CMD::SAVE2EE))                       |
+            (1ULL << static_cast<std::uint8_t>(CMD::GET_EEPROM_STATUS))             | 
+            (1ULL << static_cast<std::uint8_t>(CMD::SET_SERIAL_NO))                 |
+            (1ULL << static_cast<std::uint8_t>(CMD::GET_SERIAL_NO))                 | 
+            (1ULL << static_cast<std::uint8_t>(CMD::GET_AMP_GAIN))                  |    
+            (1ULL << static_cast<std::uint8_t>(CMD::SET_AMP_GAIN))                  | 
+            (1ULL << static_cast<std::uint8_t>(CMD::GET_CH_ADC))                    |
+            (1ULL << static_cast<std::uint8_t>(CMD::SET_CH_DAC))                    | 
+            (1ULL << static_cast<std::uint8_t>(CMD::GET_CH_DAC))                    |
+            (1ULL << static_cast<std::uint8_t>(CMD::SET_MATRIX_RC))                 | 
+            (1ULL << static_cast<std::uint8_t>(CMD::GET_MATRIX_RC))                 |
+            (1ULL << static_cast<std::uint8_t>(CMD::SET_MATRIX_G))                  | 
+            (1ULL << static_cast<std::uint8_t>(CMD::GET_MATRIX_G))                  |                
+            (1ULL << static_cast<std::uint8_t>(CMD::SET_CALIB_TARE))                | 
+            (1ULL << static_cast<std::uint8_t>(CMD::GET_CALIB_TARE))                |
+            (1ULL << static_cast<std::uint8_t>(CMD::SET_CURR_TARE))                 | 
+            (1ULL << static_cast<std::uint8_t>(CMD::GET_CURR_TARE))                 |
+            (1ULL << static_cast<std::uint8_t>(CMD::STRAIN2_AMPLIFIER_RESET))       | 
+            (1ULL << static_cast<std::uint8_t>(CMD::STRAIN2_AMPLIFIER_CFG1_SET))    | 
+            (1ULL << static_cast<std::uint8_t>(CMD::STRAIN2_AMPLIFIER_CFG1_GET))    |
+            (1ULL << static_cast<std::uint8_t>(CMD::STRAIN2_AMPLIFIER_AUTOCALIB))   |
+                
+            (1ULL << static_cast<std::uint8_t>(CMD::IMU_CONFIG_SET))                |
+            (1ULL << static_cast<std::uint8_t>(CMD::IMU_CONFIG_GET))                |
+            (1ULL << static_cast<std::uint8_t>(CMD::IMU_TRANSMIT))                  |
+            (1ULL << static_cast<std::uint8_t>(CMD::TERMOMETER_CONFIG_SET))         |
+            (1ULL << static_cast<std::uint8_t>(CMD::TERMOMETER_CONFIG_GET))         |
+            (1ULL << static_cast<std::uint8_t>(CMD::TERMOMETER_TRANSMIT))           ,
+
             // bits 64-127
-            (1ULL << (static_cast<std::uint8_t>(CMD::SKIN_SET_BRD_CFG)-64))     | (1ULL << (static_cast<std::uint8_t>(CMD::ACC_GYRO_SETUP)-64))         |
-            (1ULL << (static_cast<std::uint8_t>(CMD::SKIN_SET_TRIANG_CFG)-64)),
+            (1ULL << (static_cast<std::uint8_t>(CMD::SKIN_SET_BRD_CFG)-64))         | 
+            (1ULL << (static_cast<std::uint8_t>(CMD::ACC_GYRO_SETUP)-64))           |
+            (1ULL << (static_cast<std::uint8_t>(CMD::SKIN_SET_TRIANG_CFG)-64))      ,
             // bits 128-191    
             0, 
             // bits 191-255
@@ -927,7 +949,86 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         frame_set_clascmddestinationdata(outframe, Clas::pollingAnalogSensor, static_cast<std::uint8_t>(CMD::STRAIN2_AMPLIFIER_CFG1_GET), candata.from, dd, datalen);
         frame_set_size(outframe, datalen+1);
         return true;
-    }     
+    }  
+
+
+    bool Message_IMU_CONFIG_SET::load(const embot::hw::can::Frame &inframe)
+    {
+        Message::set(inframe);  
+        
+        if(static_cast<std::uint8_t>(CMD::IMU_CONFIG_SET) != frame2cmd(inframe))
+        {
+            return false; 
+        }
+        
+        // little endian
+        info.sensormask = static_cast<std::uint16_t>(candata.datainframe[0]) | (static_cast<std::uint16_t>(candata.datainframe[1]) << 8);
+        info.fusion = imuFusion::enabled;
+        if(candata.datainframe[2] == static_cast<std::uint8_t>(imuFusion::none))
+        {
+            info.fusion = imuFusion::none;
+        }
+        // little endian
+        std::memmove(&info.ffu_ranges_measureunits, &candata.datainframe[3], 4);
+                
+        return true;         
+    }                    
+        
+    bool Message_IMU_CONFIG_SET::reply()
+    {
+        return false;
+    }   
+
+
+    bool Message_IMU_CONFIG_GET::load(const embot::hw::can::Frame &inframe)
+    {
+        Message::set(inframe); 
+        
+        if(static_cast<std::uint8_t>(CMD::IMU_CONFIG_GET) != frame2cmd(inframe))
+        {
+            return false; 
+        }
+        
+        return true;
+    }  
+
+    bool Message_IMU_CONFIG_GET::reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo)
+    {
+        std::uint8_t dd[7] = {0};
+
+        dd[0] = (replyinfo.sensormask & 0xff);              // important note: in here we use little endian order ...                                
+        dd[1] = (replyinfo.sensormask >> 8) & 0xff; 
+        dd[2] = static_cast<std::uint8_t>(replyinfo.fusion);  
+        std::memmove(&dd[3], &replyinfo.ffu_ranges_measureunits, 4);  
+        
+        std::uint8_t datalen = 7;
+        
+        frame_set_sender(outframe, sender);
+        frame_set_clascmddestinationdata(outframe, Clas::pollingAnalogSensor, static_cast<std::uint8_t>(CMD::IMU_CONFIG_GET), candata.from, dd, datalen);
+        frame_set_size(outframe, datalen+1);
+        return true;
+    }
+
+
+    bool Message_IMU_TRANSMIT::load(const embot::hw::can::Frame &inframe)
+    {
+        Message::set(inframe);  
+        
+        if(static_cast<std::uint8_t>(CMD::IMU_TRANSMIT) != frame2cmd(inframe))
+        {
+            return false; 
+        }
+        
+        // just one byte.
+        info.transmit = (0 == candata.datainframe[0]) ? false : true;
+        info.txperiod = embot::common::time1millisec * static_cast<embot::common::relTime>(candata.datainframe[0]);
+        return true;         
+    }                    
+        
+    bool Message_IMU_TRANSMIT::reply()
+    {
+        return false;
+    }       
     
         
 }}}}} // namespace embot { namespace app { namespace canprotocol { namespace analog { namespace polling {
