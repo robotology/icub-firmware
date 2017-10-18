@@ -278,7 +278,8 @@ extern eOresult_t eo_mais_Verify(EOtheMAIS *p, const eOmn_serv_configuration_t *
         
         eObool_t verificationOK = eobool_false;
         
-        if(0 == memcmp(&p->service.servconfig, servcfg, sizeof(eOmn_serv_configuration_t)))
+        //if(0 == memcmp(&p->service.servconfig, servcfg, sizeof(eOmn_serv_configuration_t)))
+        if(0 == memcmp(&p->service.servconfig.data.as.mais, &servcfg->data.as.mais, sizeof(eOmn_serv_config_data_as_mais_t)))
         {
             verificationOK = eobool_true;
         }
@@ -420,7 +421,8 @@ extern eOresult_t eo_mais_Activate(EOtheMAIS *p, const eOmn_serv_configuration_t
         
         eObool_t verificationOK = eobool_false;
         
-        if(0 == memcmp(&p->service.servconfig, servcfg, sizeof(eOmn_serv_configuration_t)))
+        //if(0 == memcmp(&p->service.servconfig, servcfg, sizeof(eOmn_serv_configuration_t)))
+        if(0 == memcmp(&p->service.servconfig.data.as.mais, &servcfg->data.as.mais, sizeof(eOmn_serv_config_data_as_mais_t)))
         {
             verificationOK = eobool_true;
         }
