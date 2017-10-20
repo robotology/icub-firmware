@@ -906,6 +906,10 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
                 if(embot::app::canprotocol::analog::imuSensor::none != s)
                     embot::binary::bit::set(sensormask, static_cast<std::uint8_t>(s)); 
             }
+            bool enabled(embot::app::canprotocol::analog::imuSensor s)
+            {
+                return embot::binary::bit::check(sensormask, static_cast<std::uint8_t>(s));
+            }
         };
         
         Info info;

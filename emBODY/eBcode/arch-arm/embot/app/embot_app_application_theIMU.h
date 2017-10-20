@@ -60,8 +60,11 @@ namespace embot { namespace app { namespace application {
         bool initialise(Config &config);   
 
         bool configure(embot::app::canprotocol::analog::polling::Message_ACC_GYRO_SETUP::Info &cfg);
+        bool start();  
         
-        bool start();
+        bool configure(embot::app::canprotocol::analog::polling::Message_IMU_CONFIG_SET::Info &info);
+        bool start(embot::common::relTime period);
+ 
         bool stop();        
         bool tick(std::vector<embot::hw::can::Frame> &replies);        
         bool processdata(std::vector<embot::hw::can::Frame> &replies);

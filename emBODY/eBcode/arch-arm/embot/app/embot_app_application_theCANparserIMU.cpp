@@ -73,7 +73,9 @@ struct embot::app::application::theCANparserIMU::Impl
    
     bool process(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);
     
-    bool process_set_accgyrosetup(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);          
+    bool process_set_accgyrosetup(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);
+    bool process_set_imu_config(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);  
+    bool process_imu_transmit(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);    
 };
 
 
@@ -100,10 +102,20 @@ bool embot::app::application::theCANparserIMU::Impl::process(const embot::hw::ca
         
         case embot::app::canprotocol::Clas::pollingAnalogSensor:
         {
-            // only ACC_GYRO_SETUP used for the inertials ...
+            // only a few used for the inertials ...
             if(static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::CMD::ACC_GYRO_SETUP) == cmd)
             { 
                 txframe = process_set_accgyrosetup(frame, replies);
+                recognised = true;                
+            }
+            else if(static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::CMD::IMU_CONFIG_SET) == cmd)
+            { 
+                txframe = process_set_imu_config(frame, replies);
+                recognised = true;                
+            }
+            else if(static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::CMD::IMU_TRANSMIT) == cmd)
+            { 
+                txframe = process_imu_transmit(frame, replies);
                 recognised = true;                
             }
  
@@ -134,6 +146,36 @@ bool embot::app::application::theCANparserIMU::Impl::process_set_accgyrosetup(co
     return msg.reply();        
 }
 
+bool embot::app::application::theCANparserIMU::Impl::process_set_imu_config(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
+{
+    embot::app::canprotocol::analog::polling::Message_IMU_CONFIG_SET msg;
+    msg.load(frame);
+      
+    embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance();    
+    theimu.configure(msg.info);
+    
+    return msg.reply();        
+}
+
+bool embot::app::application::theCANparserIMU::Impl::process_imu_transmit(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
+{
+    embot::app::canprotocol::analog::polling::Message_IMU_TRANSMIT msg;
+    msg.load(frame);
+      
+    embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance(); 
+    
+    if((true == msg.info.transmit) && (msg.info.txperiod > 0))
+    {
+        theimu.start(msg.info.txperiod);
+    }
+    else
+    {
+        theimu.stop();        
+    }
+    
+    
+    return msg.reply();        
+}
 
 
 

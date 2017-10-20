@@ -257,7 +257,7 @@ namespace embot { namespace app { namespace canprotocol { namespace shared {
 
 namespace embot { namespace app { namespace canprotocol { namespace analog {
 
-    enum class imuSensor { acc = 0, mag = 1, gyr = 2, eul = 3, quad = 4, lia = 5, grv = 6, status = 15, none = 16 };
+    enum class imuSensor { acc = 0, mag = 1, gyr = 2, eul = 3, qua = 4, lia = 5, grv = 6, status = 15, none = 16 };
 
 }}}} // namespace embot { namespace app { namespace canprotocol { namespace analog {
 

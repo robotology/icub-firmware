@@ -79,19 +79,16 @@ struct embot::app::application::theIMU::Impl
     
     struct canRevisitedConfig
     {
-        //embot::app::canprotocol::analog::polling::Message_ACC_GYRO_SETUP::Info  accgyroinfo;
-        bool accelEnabled;
-        bool gyrosEnabled;  
-        std::uint16_t maskofenabled;
+        embot::app::canprotocol::analog::polling::Message_IMU_CONFIG_SET::Info  imuinfo;
+        embot::common::relTime txperiod;
         canRevisitedConfig() { reset(); } 
         void reset()
         {
-//            accgyroinfo.maskoftypes = 0;
-//            accgyroinfo.txperiod = 50*embot::common::time1millisec;
-            accelEnabled = false;       
-            gyrosEnabled = false;
-            maskofenabled = 0;
-        }            
+            counter = 0;
+            imuinfo.sensormask = 0;
+            txperiod = 50*embot::common::time1millisec;
+        }
+        std::uint8_t counter;
     };
     
     
@@ -136,6 +133,7 @@ struct embot::app::application::theIMU::Impl
 
     bool legacymode;    // if true we work with the old protocol mode.
     canLegacyConfig canlegacyconfig;
+    canRevisitedConfig canrevisitedconfig;
     
    
     Impl() 
@@ -157,11 +155,14 @@ struct embot::app::application::theIMU::Impl
     bool tick(std::vector<embot::hw::can::Frame> &replies);
     bool processdata(std::vector<embot::hw::can::Frame> &replies);
     
-    bool configure(embot::app::canprotocol::analog::polling::Message_ACC_GYRO_SETUP::Info &ag);
+//    bool configure(embot::app::canprotocol::analog::polling::Message_ACC_GYRO_SETUP::Info &ag);
     
     
     bool fill(embot::app::canprotocol::inertial::periodic::Message_DIGITAL_ACCELEROMETER::Info &info);
     bool fill(embot::app::canprotocol::inertial::periodic::Message_DIGITAL_GYROSCOPE::Info &info);
+    
+    bool fill(embot::app::canprotocol::inertial::periodic::Message_IMU_TRIPLE::Info &info);
+    
     
     
     // imu support
@@ -194,8 +195,14 @@ bool embot::app::application::theIMU::Impl::start()
         ticking = true;    
         return true;
     }
+    else
+    {
+        canrevisitedconfig.counter = 0;
+        ticktimer->start(canrevisitedconfig.txperiod, embot::sys::Timer::Type::forever, action);
+        ticking = true;    
+        return true;        
+    }
     
-    return false;
 }
 
 
@@ -232,7 +239,33 @@ bool embot::app::application::theIMU::Impl::fill(embot::app::canprotocol::inerti
     return ret;    
 }
 
+bool embot::app::application::theIMU::Impl::fill(embot::app::canprotocol::inertial::periodic::Message_IMU_TRIPLE::Info &info)
+{
+    bool ret = true;
 
+    info.canaddress = embot::app::theCANboardInfo::getInstance().cachedCANaddress();
+    
+    switch(info.sensor)
+    {
+        case embot::app::canprotocol::analog::imuSensor::acc:
+        {
+            info.value = imuacquisition.data.acc;            
+        } break;
+        
+        case embot::app::canprotocol::analog::imuSensor::gyr:
+        {
+            info.value = imuacquisition.data.gyr;            
+        } break;
+        
+        default:
+        {
+            info.value.reset();            
+        } break;        
+        
+    }
+        
+    return ret;    
+}
 
 
 bool embot::app::application::theIMU::Impl::tick(std::vector<embot::hw::can::Frame> &replies)
@@ -251,7 +284,10 @@ bool embot::app::application::theIMU::Impl::tick(std::vector<embot::hw::can::Fra
     }
     else //  new mode
     {
-        
+        if(0 == canrevisitedconfig.imuinfo.sensormask)
+        {
+            return false;  
+        }        
     }
     
     
@@ -303,7 +339,117 @@ bool embot::app::application::theIMU::Impl::processdata(std::vector<embot::hw::c
                 replies.push_back(frame);
             }            
         }
-    }    
+    }
+    else
+    {
+        canrevisitedconfig.counter++;
+        
+        embot::app::canprotocol::inertial::periodic::Message_IMU_TRIPLE msg;
+        embot::app::canprotocol::inertial::periodic::Message_IMU_TRIPLE::Info info;  
+
+        
+        info.canaddress = embot::app::theCANboardInfo::getInstance().cachedCANaddress();   
+        info.seqnumber = canrevisitedconfig.counter;        
+        
+        // evaluate what to tx
+        if(true == canrevisitedconfig.imuinfo.enabled(embot::app::canprotocol::analog::imuSensor::acc))
+        {
+            // generate a acc message with canrevisitedconfig.imuinfo.counter
+            info.sensor = embot::app::canprotocol::analog::imuSensor::acc;
+            info.value = imuacquisition.data.acc;
+            
+            msg.load(info);
+            msg.get(frame);
+            replies.push_back(frame);                      
+        }
+        
+        if(true == canrevisitedconfig.imuinfo.enabled(embot::app::canprotocol::analog::imuSensor::mag))
+        {
+            // generate a mag message with canrevisitedconfig.counter
+            info.sensor = embot::app::canprotocol::analog::imuSensor::mag;
+            info.value = imuacquisition.data.mag;
+            
+            msg.load(info);
+            msg.get(frame);
+            replies.push_back(frame);           
+        }        
+
+        if(true == canrevisitedconfig.imuinfo.enabled(embot::app::canprotocol::analog::imuSensor::gyr))
+        {
+            // generate a gyr message with canrevisitedconfig.counter
+            info.sensor = embot::app::canprotocol::analog::imuSensor::gyr;
+            info.value = imuacquisition.data.gyr;
+            
+            msg.load(info);
+            msg.get(frame);
+            replies.push_back(frame);               
+        } 
+        
+        if(true == canrevisitedconfig.imuinfo.enabled(embot::app::canprotocol::analog::imuSensor::eul))
+        {
+            // generate a eul message with canrevisitedconfig.counter
+            info.sensor = embot::app::canprotocol::analog::imuSensor::eul;
+            info.value = imuacquisition.data.eul;
+            
+            msg.load(info);
+            msg.get(frame);
+            replies.push_back(frame);               
+        }
+        
+        if(true == canrevisitedconfig.imuinfo.enabled(embot::app::canprotocol::analog::imuSensor::lia))
+        {
+            // generate a lia message with canrevisitedconfig.counter
+            info.sensor = embot::app::canprotocol::analog::imuSensor::lia;
+            info.value = imuacquisition.data.lia;
+            
+            msg.load(info);
+            msg.get(frame);
+            replies.push_back(frame);               
+        }
+
+        if(true == canrevisitedconfig.imuinfo.enabled(embot::app::canprotocol::analog::imuSensor::grv))
+        {
+
+            info.sensor = embot::app::canprotocol::analog::imuSensor::grv;
+            info.value = imuacquisition.data.grv;
+            
+            msg.load(info);
+            msg.get(frame);
+            replies.push_back(frame);               
+        }  
+
+        if(true == canrevisitedconfig.imuinfo.enabled(embot::app::canprotocol::analog::imuSensor::qua))
+        {
+            
+            embot::app::canprotocol::inertial::periodic::Message_IMU_QUATERNION msg;
+            embot::app::canprotocol::inertial::periodic::Message_IMU_QUATERNION::Info info;  
+
+            info.canaddress = embot::app::theCANboardInfo::getInstance().cachedCANaddress();    
+            info.value = imuacquisition.data.qua;
+            
+            msg.load(info);
+            msg.get(frame);
+            replies.push_back(frame);               
+        }          
+
+        if(true == canrevisitedconfig.imuinfo.enabled(embot::app::canprotocol::analog::imuSensor::status))
+        {
+            
+            embot::app::canprotocol::inertial::periodic::Message_IMU_STATUS msg;
+            embot::app::canprotocol::inertial::periodic::Message_IMU_STATUS::Info info;  
+
+            info.canaddress = embot::app::theCANboardInfo::getInstance().cachedCANaddress();    
+            info.seqnumber = canrevisitedconfig.counter;
+            info.acquisitiontime = imuacquisition.duration;
+            info.acccalib = static_cast<embot::app::canprotocol::inertial::periodic::Message_IMU_STATUS::Calibration>(imuacquisition.data.calibrationOfACC());
+            info.magcalib = static_cast<embot::app::canprotocol::inertial::periodic::Message_IMU_STATUS::Calibration>(imuacquisition.data.calibrationOfMAG());
+            info.gyrcalib = static_cast<embot::app::canprotocol::inertial::periodic::Message_IMU_STATUS::Calibration>(imuacquisition.data.calibrationOfGYR());
+            
+            msg.load(info);
+            msg.get(frame);
+            replies.push_back(frame);               
+        }      
+    }
          
     return true;           
 }
@@ -400,6 +546,29 @@ bool embot::app::application::theIMU::configure(embot::app::canprotocol::analog:
 
 bool embot::app::application::theIMU::start()
 {    
+    return pImpl->start();
+}
+
+bool embot::app::application::theIMU::configure(embot::app::canprotocol::analog::polling::Message_IMU_CONFIG_SET::Info &info)
+{
+    // if ticking: stop it
+    if(true == pImpl->ticking)
+    {
+        stop();
+    }
+    
+    // we are not in legacy mode:
+    pImpl->legacymode = false;
+    
+    // copy new configuration
+    pImpl->canrevisitedconfig.imuinfo = info;
+    
+    return true;    
+}
+
+bool embot::app::application::theIMU::start(embot::common::relTime period)
+{      
+    pImpl->canrevisitedconfig.txperiod = period;
     return pImpl->start();
 }
 
