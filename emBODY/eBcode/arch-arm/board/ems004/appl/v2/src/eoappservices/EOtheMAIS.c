@@ -288,7 +288,8 @@ extern eOresult_t eo_mais_Verify(EOtheMAIS *p, const eOmn_serv_configuration_t *
         {
             iscompatible = eobool_false;
         } 
-        if((servcfg->data.as.mais.version.protocol.major != 0) && (servcfg->data.as.mais.version.protocol.minor != 0))
+
+        if((servcfg->data.as.mais.version.protocol.major != 0) || (servcfg->data.as.mais.version.protocol.minor != 0))
         {
             // check also the protocol
             if(servcfg->data.as.mais.version.protocol.major != p->service.servconfig.data.as.mais.version.protocol.major)
@@ -300,7 +301,7 @@ extern eOresult_t eo_mais_Verify(EOtheMAIS *p, const eOmn_serv_configuration_t *
                 iscompatible = eobool_false;
             }
         }
-        if((servcfg->data.as.mais.version.firmware.major != 0) && (servcfg->data.as.mais.version.firmware.minor != 0)  && (servcfg->data.as.mais.version.firmware.build != 0))
+        if((servcfg->data.as.mais.version.firmware.major != 0) || (servcfg->data.as.mais.version.firmware.minor != 0)  || (servcfg->data.as.mais.version.firmware.build != 0))
         {
             // check also the firmaware
             if(servcfg->data.as.mais.version.firmware.major != p->service.servconfig.data.as.mais.version.firmware.major)
@@ -472,7 +473,8 @@ extern eOresult_t eo_mais_Activate(EOtheMAIS *p, const eOmn_serv_configuration_t
         {
             iscompatible = eobool_false;
         } 
-        if((servcfg->data.as.mais.version.protocol.major != 0) && (servcfg->data.as.mais.version.protocol.minor != 0))
+
+        if((servcfg->data.as.mais.version.protocol.major != 0) || (servcfg->data.as.mais.version.protocol.minor != 0))
         {
             // check also the protocol
             if(servcfg->data.as.mais.version.protocol.major != p->service.servconfig.data.as.mais.version.protocol.major)
@@ -484,7 +486,7 @@ extern eOresult_t eo_mais_Activate(EOtheMAIS *p, const eOmn_serv_configuration_t
                 iscompatible = eobool_false;
             }
         }
-        if((servcfg->data.as.mais.version.firmware.major != 0) && (servcfg->data.as.mais.version.firmware.minor != 0)  && (servcfg->data.as.mais.version.firmware.build != 0))
+        if((servcfg->data.as.mais.version.firmware.major != 0) || (servcfg->data.as.mais.version.firmware.minor != 0)  || (servcfg->data.as.mais.version.firmware.build != 0))
         {
             // check also the firmaware
             if(servcfg->data.as.mais.version.firmware.major != p->service.servconfig.data.as.mais.version.firmware.major)
