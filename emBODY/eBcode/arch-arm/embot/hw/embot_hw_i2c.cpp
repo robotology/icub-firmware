@@ -85,7 +85,12 @@ namespace embot { namespace hw { namespace i2c {
     static const bspmap_t bspmap = 
     {
         0x00000003  // means... 2 buses
-    };   
+    };  
+    #elif   defined(STM32HAL_BOARD_MTB4)        
+    static const bspmap_t bspmap = 
+    {
+        0x00000003  // means... 2 buses
+    };     
     #else
     static const bspmap_t bspmap = 
     {
@@ -131,6 +136,12 @@ namespace embot { namespace hw { namespace i2c {
         { &hi2c1 },
         { &hi2c2 }         
     };
+#elif   defined(STM32HAL_BOARD_MTB4)       
+    static const stm32_i2c_mapping s_stm32_i2c_mapping[static_cast<unsigned int>(Bus::maxnumberof)] =
+    {
+        { &hi2c1 },
+        { &hi2c2 }         
+    };    
 #else
     static const stm32_i2c_mapping s_stm32_i2c_mapping[static_cast<unsigned int>(Bus::maxnumberof)] =
     {
@@ -187,7 +198,16 @@ namespace embot { namespace hw { namespace i2c {
         else if(b == Bus::two)
         {
             MX_I2C2_Init();
-        }                        
+        } 
+#elif   defined(STM32HAL_BOARD_MTB4)   
+        if(b == Bus::one)
+        {            
+            MX_I2C1_Init();
+        }
+        else if(b == Bus::two)
+        {
+            MX_I2C2_Init();
+        }         
 #endif
         
         embot::binary::bit::set(initialisedmask, bus2index(b));

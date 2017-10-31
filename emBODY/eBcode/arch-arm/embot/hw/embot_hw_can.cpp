@@ -88,7 +88,9 @@ namespace embot { namespace hw { namespace can {
     };
     
     // const support maps
-    #if     defined(STM32HAL_BOARD_NUCLEO64)    
+    #if     defined(STM32HAL_BOARD_NUCLEO64) 
+
+    #define STM32HAL_HAS_CAN1 
     
     // yes ... if STM32HAL_BOARD_NUCLEO64 is defined we are never in here because HAL_CAN_MODULE_ENABLED is not defined ... but it is just a reminder
     static const bspmap_t bspmap = 
@@ -99,12 +101,16 @@ namespace embot { namespace hw { namespace can {
 
     #elif   defined(STM32HAL_BOARD_MTB4)
     
+    #define STM32HAL_HAS_CAN1 
+    
     static const bspmap_t bspmap = 
     {
         0x00000001
     };
 
     #elif   defined(STM32HAL_BOARD_STRAIN2)
+    
+    #define STM32HAL_HAS_CAN1 
     
     static const bspmap_t bspmap = 
     {
@@ -586,6 +592,7 @@ namespace embot { namespace hw { namespace can {
 
 // - stm32hal.lib needs some handlers being compiled in here: IRQ handlers and callbacks.
 
+#if defined(STM32HAL_HAS_CAN1)
 
 void CAN1_TX_IRQHandler(void)
 {
@@ -596,6 +603,8 @@ void CAN1_RX0_IRQHandler(void)
 {
     HAL_CAN_IRQHandler(&hcan1);
 }
+
+#endif
 
 
 // these functions must be re-defined. they are weakly defined in the stm32hal.lib 

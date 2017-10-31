@@ -90,7 +90,12 @@ namespace embot { namespace hw { namespace BNO055 {
     static const bspmap_t bspmap = 
     {
         0x00000001  // means... 1 sensor only
-    };   
+    }; 
+    #elif   defined(STM32HAL_BOARD_MTB4)        
+    static const bspmap_t bspmap = 
+    {
+        0x00000001  // means... 1 sensor only
+    };      
     #else
     static const bspmap_t bspmap = 
     {
@@ -149,31 +154,26 @@ namespace embot { namespace hw { namespace BNO055 {
         PrivateData() { }
     };
     
-    // power-on-reset wait time. 650 ms is enough, datsheet say, before the device can talk over i2c. but much better to be devil-compliant ;-).
+    // power-on-reset wait time. 650 ms is enough, datasheet say, before the device can talk over i2c. but much better to be devil-compliant ;-).
     static const embot::common::relTime PORtime = 666*embot::common::time1millisec;
     static const std::uint8_t i2caddress = 0x52;
-    static const std::uint8_t registerCHIP_ID = 0x00;
-    static const std::uint8_t registerSTARTDATA = 0x08;
-    
+
     #if     defined(STM32HAL_BOARD_STRAIN2)
         static const embot::hw::gpio::GPIO gpioBOOT(BNO055_BOOT_GPIO_Port, BNO055_BOOT_Pin);
         static const embot::hw::gpio::GPIO gpioRESET(BNO055_RESET_GPIO_Port, BNO055_RESET_Pin);
     #elif   defined(STM32HAL_BOARD_MTB4)
-        #warning --> MUST define the BOOT and RESET GPIOs  whh now are notvalid 
-        static const embot::hw::gpio::GPIO gpioBOOT;
-        static const embot::hw::gpio::GPIO gpioRESET;            
+        static const embot::hw::gpio::GPIO gpioBOOT(BNO055_BOOT_GPIO_Port, BNO055_BOOT_Pin);
+        static const embot::hw::gpio::GPIO gpioRESET(BNO055_RESET_GPIO_Port, BNO055_RESET_Pin);          
     #endif
     
     static PrivateData s_privatedata;
     
-    static void s_powerOFF(void);    
+//    static void s_powerOFF(void);    
     static void s_powerON(embot::common::relTime waittime);    
     static result_t s_programregister(Sensor s, std::uint8_t reg, std::uint8_t val, embot::common::relTime timeout);    
     static result_t s_writeregister(Sensor s, std::uint8_t reg, std::uint8_t val, const embot::common::Callback &oncompletion);
     static void s_sharedCBK(void *p);
     
-    // static functions used for testing
-    static result_t s_start(Sensor s);
             
     result_t init(Sensor s, const Config &config)
     {
@@ -466,11 +466,11 @@ namespace embot { namespace hw { namespace BNO055 {
     
 
     
-    static void s_powerOFF(void)
-    {
-        embot::hw::gpio::set(gpioBOOT, embot::hw::gpio::State::RESET);
-        embot::hw::gpio::set(gpioRESET, embot::hw::gpio::State::RESET);        
-    }
+//    static void s_powerOFF(void)
+//    {
+//        embot::hw::gpio::set(gpioBOOT, embot::hw::gpio::State::RESET);
+//        embot::hw::gpio::set(gpioRESET, embot::hw::gpio::State::RESET);        
+//    }
     
     static void s_powerON(embot::common::relTime waittime)
     {        
@@ -480,13 +480,13 @@ namespace embot { namespace hw { namespace BNO055 {
         embot::hw::sys::delay(waittime);         
     }
     
-    static result_t s_programregister_safe(Sensor s, std::uint8_t reg, std::uint8_t val, embot::common::relTime timeout)
-    {
-        std::uint8_t index = sensor2index(s);   
-        embot::common::Data data(&val, 1);        
-        result_t r = embot::hw::i2c::write(s_privatedata.config[index].i2cdes.bus, i2caddress, reg, data, timeout);                
-        return r;
-    }
+//    static result_t s_programregister_safe(Sensor s, std::uint8_t reg, std::uint8_t val, embot::common::relTime timeout)
+//    {
+//        std::uint8_t index = sensor2index(s);   
+//        embot::common::Data data(&val, 1);        
+//        result_t r = embot::hw::i2c::write(s_privatedata.config[index].i2cdes.bus, i2caddress, reg, data, timeout);                
+//        return r;
+//    }
 
     
     static result_t s_programregister(Sensor s, std::uint8_t reg, std::uint8_t val, embot::common::relTime timeout)

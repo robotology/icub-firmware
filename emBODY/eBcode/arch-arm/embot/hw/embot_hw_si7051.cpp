@@ -79,7 +79,12 @@ namespace embot { namespace hw { namespace SI7051 {
     static const bspmap_t bspmap = 
     {
         0x00000003  // means... 2 sensors
-    };   
+    };  
+    #elif   defined(STM32HAL_BOARD_MTB4)        
+    static const bspmap_t bspmap = 
+    {
+        0x00000003  // means... 2 sensors
+    };     
     #else
     static const bspmap_t bspmap = 
     {

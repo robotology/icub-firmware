@@ -80,7 +80,12 @@ namespace embot { namespace hw { namespace timer {
     };
     
     // const support maps
-#if     defined(STM32HAL_BOARD_STRAIN2)    
+#if     defined(STM32HAL_BOARD_STRAIN2)   
+
+    #define STM32HAL_HAS_TIM6
+    #define STM32HAL_HAS_TIM7
+    #define STM32HAL_HAS_TIM15
+    #define STM32HAL_HAS_TIM16
     
     static const std::uint8_t numberofsupported = 4;
     
@@ -99,7 +104,31 @@ namespace embot { namespace hw { namespace timer {
         2,  // Timer::fifteen 
         3   // Timer::sixteen        
     };
-   
+
+#elif   defined(STM32HAL_BOARD_MTB4)    
+    
+    #define STM32HAL_HAS_TIM6
+    #undef STM32HAL_HAS_TIM7
+    #undef STM32HAL_HAS_TIM15
+    #undef STM32HAL_HAS_TIM16    
+    
+    static const std::uint8_t numberofsupported = 1;
+    
+    static const bspmap_t bspmap = 
+    {
+        (1 << static_cast<std::uint32_t>(Timer::six))
+    };
+
+    static const std::uint8_t map2compactarray[static_cast<unsigned int>(Timer::maxnumberof)] = 
+    {   // each pos keeps either 255 or a valid index to the set of valid timers without holes 
+        255, 255, 255, 255, 255,
+        0,  // Timer::six
+        255,  // Timer::seven
+        255, 255, 255, 255, 255, 255, 255, 
+        255,  // Timer::fifteen 
+        255   // Timer::sixteen        
+    };
+    
 #else
     
     static const std::uint8_t numberofsupported = 1; // cannot be 1 because ...
@@ -177,7 +206,12 @@ namespace embot { namespace hw { namespace timer {
         { embot::hw::sys::CLOCK::syscore, TIM7,  &htim7,  false, true },
         { embot::hw::sys::CLOCK::syscore, TIM15, &htim15, true,  false },
         { embot::hw::sys::CLOCK::syscore, TIM16, &htim16, false, false }        
-    };   
+    }; 
+#elif   defined(STM32HAL_BOARD_MTB4)    
+    static const stm32_tim_mapping s_stm32_tim_mapping[numberofsupported] = 
+    { 
+        { embot::hw::sys::CLOCK::syscore, TIM6,  &htim6,  false, true }       
+    };     
 #else
     static const stm32_tim_mapping s_stm32_tim_mapping[1] = { {embot::hw::sys::CLOCK::none, nullptr, nullptr } };
 #endif 
@@ -518,48 +552,65 @@ void manageInterrupt(embot::hw::timer::Timer t, TIM_HandleTypeDef *htim)
     }   
 } 
 
+
+
+#if defined(STM32HAL_HAS_TIM6)
 void TIM6_DAC_IRQHandler(void)
 {
     manageInterrupt(embot::hw::timer::Timer::six, &htim6);
 }
+#endif
 
+#if defined(STM32HAL_HAS_TIM7)
 void TIM7_IRQHandler(void)
 {
     manageInterrupt(embot::hw::timer::Timer::seven, &htim7);    
 }
+#endif
 
+#if defined(STM32HAL_HAS_TIM15)
 void TIM1_BRK_TIM15_IRQHandler(void)
 {
     manageInterrupt(embot::hw::timer::Timer::fifteen, &htim15);
 }
+#endif
 
+#if defined(STM32HAL_HAS_TIM16)
 void TIM1_UP_TIM16_IRQHandler(void)
 {
     manageInterrupt(embot::hw::timer::Timer::sixteen, &htim16);
 }
-
+#endif
 
 #else
 
+#if defined(STM32HAL_HAS_TIM6)
 void TIM6_DAC_IRQHandler(void)
 {
     HAL_TIM_IRQHandler(&htim6);
 }
+#endif
 
+#if defined(STM32HAL_HAS_TIM7)
 void TIM7_IRQHandler(void)
 {
     HAL_TIM_IRQHandler(&htim7);
 }
+#endif
 
+#if defined(STM32HAL_HAS_TIM15)
 void TIM1_BRK_TIM15_IRQHandler(void)
 {
     HAL_TIM_IRQHandler(&htim15);
 }
+#endif
 
+#if defined(STM32HAL_HAS_TIM16)
 void TIM1_UP_TIM16_IRQHandler(void)
 {
    HAL_TIM_IRQHandler(&htim16);
 }
+#endif
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
