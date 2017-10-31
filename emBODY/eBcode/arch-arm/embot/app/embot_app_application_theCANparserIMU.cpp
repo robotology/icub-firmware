@@ -74,7 +74,8 @@ struct embot::app::application::theCANparserIMU::Impl
     bool process(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);
     
     bool process_set_accgyrosetup(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);
-    bool process_set_imu_config(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);  
+    bool process_set_imu_config(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies); 
+    bool process_get_imu_config(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);    
     bool process_imu_transmit(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);    
 };
 
@@ -111,6 +112,11 @@ bool embot::app::application::theCANparserIMU::Impl::process(const embot::hw::ca
             else if(static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::CMD::IMU_CONFIG_SET) == cmd)
             { 
                 txframe = process_set_imu_config(frame, replies);
+                recognised = true;                
+            }
+            else if(static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::CMD::IMU_CONFIG_GET) == cmd)
+            { 
+                txframe = process_get_imu_config(frame, replies);
                 recognised = true;                
             }
             else if(static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::CMD::IMU_TRANSMIT) == cmd)
@@ -156,6 +162,28 @@ bool embot::app::application::theCANparserIMU::Impl::process_set_imu_config(cons
     
     return msg.reply();        
 }
+
+bool embot::app::application::theCANparserIMU::Impl::process_get_imu_config(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
+{
+    embot::app::canprotocol::analog::polling::Message_IMU_CONFIG_GET msg;
+    msg.load(frame);
+    
+    embot::app::canprotocol::analog::polling::Message_IMU_CONFIG_GET::ReplyInfo replyinfo;
+      
+    embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance(); 
+    
+    theimu.get(replyinfo);
+
+    embot::hw::can::Frame frame0;
+    if(true == msg.reply(frame0, embot::app::theCANboardInfo::getInstance().cachedCANaddress(), replyinfo))
+    {
+        replies.push_back(frame0);
+        return true;
+    }  
+    
+    return false;         
+}
+  
 
 bool embot::app::application::theCANparserIMU::Impl::process_imu_transmit(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
 {

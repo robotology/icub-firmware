@@ -888,7 +888,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         bool reply();   // none            
     }; 
     
-    enum class imuFusion { enabled = 0, none = 33 }; // later on 
+    enum class imuFusion { enabled = 1, none = 33 }; // later on we can add the types of fusion we want
     
     class Message_IMU_CONFIG_SET : public Message
     {

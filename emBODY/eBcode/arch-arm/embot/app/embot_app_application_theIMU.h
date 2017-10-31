@@ -63,6 +63,7 @@ namespace embot { namespace app { namespace application {
         bool start();  
         
         bool configure(embot::app::canprotocol::analog::polling::Message_IMU_CONFIG_SET::Info &info);
+        bool get(embot::app::canprotocol::analog::polling::Message_IMU_CONFIG_GET::ReplyInfo &info);
         bool start(embot::common::relTime period);
  
         bool stop();        

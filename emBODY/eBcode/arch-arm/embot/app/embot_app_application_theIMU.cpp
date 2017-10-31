@@ -566,6 +566,16 @@ bool embot::app::application::theIMU::configure(embot::app::canprotocol::analog:
     return true;    
 }
 
+bool embot::app::application::theIMU::get(embot::app::canprotocol::analog::polling::Message_IMU_CONFIG_GET::ReplyInfo &info)
+{    
+    // copy configuration
+    info.sensormask = pImpl->canrevisitedconfig.imuinfo.sensormask;
+    info.fusion = pImpl->canrevisitedconfig.imuinfo.fusion;
+    info.ffu_ranges_measureunits = pImpl->canrevisitedconfig.imuinfo.ffu_ranges_measureunits;    
+
+    return true;    
+}
+
 bool embot::app::application::theIMU::start(embot::common::relTime period)
 {      
     pImpl->canrevisitedconfig.txperiod = period;
