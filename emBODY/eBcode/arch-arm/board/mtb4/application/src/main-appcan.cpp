@@ -88,9 +88,14 @@ static void userdeflauncher(void* param)
 static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask evtmsk, void *p);
 static void eventbasedtask_init(embot::sys::Task *t, void *p);
 
-static const embot::common::Event evRXcanframe = 0x00000001;
-static const embot::common::Event evSKINprocess = 0x00000002;
-static const embot::common::Event evIMUprocess = 0x00000004;
+static const embot::common::Event evRXcanframe = 0x00000001 << 0;
+static const embot::common::Event evSKINprocess = 0x00000001 << 1;
+
+static const embot::common::Event evIMUtick = 0x00000001 << 3;
+static const embot::common::Event evIMUdataready = 0x00000001 << 4;
+static const embot::common::Event evTEMPtick = 0x00000001 << 5;
+static const embot::common::Event evTEMPdataready = 0x00000001 << 6;
+
 
 static const std::uint8_t maxOUTcanframes = 48;
 
@@ -107,32 +112,32 @@ static void start_evt_based(void)
     const embot::common::relTime waitEventTimeout = 50*1000; //50*1000; //5*1000*1000;    
     eventbasedtask->init(eventbasedtask_init, eventbasedtask_onevent, 4*1024, 200, waitEventTimeout, nullptr, nullptr);    
         
-    // start canparser basic + skin + imu
+    // start canparser basic
     embot::app::application::theCANparserBasic &canparserbasic = embot::app::application::theCANparserBasic::getInstance();
     embot::app::application::theCANparserBasic::Config configparserbasic;
     canparserbasic.initialise(configparserbasic);  
     
+    // start canparser skin
     embot::app::application::theCANparserSkin &canparserskin = embot::app::application::theCANparserSkin::getInstance();
     embot::app::application::theCANparserSkin::Config configparserskin;
     canparserskin.initialise(configparserskin);  
     
-    
+    // start canparser imu
     embot::app::application::theCANparserIMU &canparserimu = embot::app::application::theCANparserIMU::getInstance();
     embot::app::application::theCANparserIMU::Config configparserimu;
     canparserimu.initialise(configparserimu);      
     
+    // start agent of skin 
     embot::app::application::theSkin &theskin = embot::app::application::theSkin::getInstance();
     embot::app::application::theSkin::Config configskin;
     configskin.tickevent = evSKINprocess;
     configskin.totask = eventbasedtask;
     theskin.initialise(configskin);   
 
-
+    // start agent of imu
     embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance();
-    embot::app::application::theIMU::Config configimu;
-    configimu.tickevent = evIMUprocess;
-    configimu.totask = eventbasedtask;
-    theimu.initialise(configimu); 
+    embot::app::application::theIMU::Config configimu(evIMUtick, evIMUdataready, eventbasedtask);
+    theimu.initialise(configimu);   
 
     // finally start can. i keep it as last because i dont want that the isr-handler calls its onrxframe() 
     // before the eventbasedtask is created.
@@ -162,7 +167,6 @@ static void eventbasedtask_init(embot::sys::Task *t, void *p)
     r = r;  
 
     outframes.reserve(maxOUTcanframes);
-    #warning --> we should init the objects which holds outframes with maxOUTcanframes ... so that no more than maxOUTcanframes are pushed_back
 }
     
 
@@ -220,22 +224,18 @@ static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask
         // hence, how many packets? max of replies = 8 + max of broadcast = 32 --> 40.
         
     }
-    
-    if(true == embot::binary::mask::check(eventmask, evIMUprocess))
-    {
         
+    if(true == embot::binary::mask::check(eventmask, evIMUtick))
+    {        
         embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance();
-        theimu.tick(outframes);
-        // we operate on the IMU  by calling a imu.process(outframes);
-        // the evIMUprocess is emitted  by:
-        // 1. a periodic timer started at the reception of a specific message.
-        // 2. internally to imu.process() if a new tick is required (the IMU is read with DMA, whose interrupt triggers a send-event
-
-        // the .process(outframes) will do whatever it needs to do and it may emit some 
-        // can frames for transmission. the can frames can be up to ?.
-        // hence, how many packets? 40 + ? = 48.
-        
-    }
+        theimu.tick(outframes);        
+    }   
+    
+    if(true == embot::binary::mask::check(eventmask, evIMUdataready))
+    {        
+        embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance();
+        theimu.processdata(outframes);        
+    }    
     
     // if we have any packet we transmit them
     std::uint8_t num = outframes.size();
