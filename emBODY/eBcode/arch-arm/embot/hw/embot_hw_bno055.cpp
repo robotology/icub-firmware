@@ -187,7 +187,7 @@ namespace embot { namespace hw { namespace BNO055 {
             return resOK;
         }
         
-        // ower on and wait until the i2c is working. datasheet say: POR time > 650 ms.
+        // power on and wait until the i2c is working. datasheet say: POR time > 650 ms.
         s_powerON(PORtime);
         
         std::uint8_t index = sensor2index(s);

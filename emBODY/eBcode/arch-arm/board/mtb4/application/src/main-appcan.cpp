@@ -29,7 +29,7 @@
 #include "embot_app_application_theIMU.h"
 
 
-static const embot::app::canprotocol::versionOfAPPLICATION vAP = {1, 0 , 1};
+static const embot::app::canprotocol::versionOfAPPLICATION vAP = {1, 1 , 0};
 static const embot::app::canprotocol::versionOfCANPROTOCOL vCP = {2, 0};
 
 static void userdeflauncher(void* param);

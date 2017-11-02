@@ -568,6 +568,13 @@ bool embot::app::bootloader::theCANparser::initialise(Config &config)
     pImpl->setstate(Impl::State::Idle);
     pImpl->countdownIsActive = true;
     
+    if(true == config.usedbyapplication)
+    {
+            // fai qualcosa.
+        
+        
+    }
+    
     embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance();
     
     // retrieve version of bootloader + address

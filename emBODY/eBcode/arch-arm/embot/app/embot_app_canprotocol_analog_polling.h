@@ -61,6 +61,9 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
 
         SET_BOARD_ADX = 0x32,                           // basic management
         
+        
+        
+        SKIN_OBSOLETE_TACT_SETUP = 76, // 0x4C
 
         SKIN_SET_BRD_CFG = 77,                          // 0x4D used to configure the skin data in mtb + its tx rate
         ACC_GYRO_SETUP = 79,                            // 0x4F used to configure the inertial data in mtb + its tx rate
@@ -157,6 +160,36 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
     };
     
+    
+    class Message_SKIN_OBSOLETE_TACT_SETUP : public Message
+    {   // marco.accame on 02 nov 17: this message is obsolete. in here i implement only the features used by an old test program.
+        // as such:
+        // D0: opcode (=0x4c)
+        // D1-nib0: resolution fixed to 8 bit (=0x1)
+        // D1-nib1: conf fixed to SINGLE (=0x0)
+        // D2: accuracy fixe to high (=0x01)
+        // D3: period fixed to the default one of 40 ms (=0x01)
+        // [D4, D5]: cdc offset in little endian FIXED = 0x2200
+        // [D6, D7]: not used in here. it contains the value of teh period in case D3 is = 0x03. 
+        public:
+            
+
+        struct Info
+        { 
+            std::uint16_t               cdcOffset;  
+            embot::common::relTime      txperiod;              
+            Info() : cdcOffset(0x2200), txperiod(40*embot::common::time1millisec) {}
+        };
+        
+        Info info;
+        
+        Message_SKIN_OBSOLETE_TACT_SETUP() {}
+            
+        bool load(const embot::hw::can::Frame &inframe);
+            
+        bool reply();   // none
+        
+    };    
     
     class Message_SKIN_SET_BRD_CFG : public Message
     {

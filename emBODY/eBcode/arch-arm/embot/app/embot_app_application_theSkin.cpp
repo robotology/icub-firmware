@@ -131,20 +131,25 @@ struct embot::app::application::theSkin::Impl
 
     Impl() 
     {   
+        ticktimer = new embot::sys::Timer; 
+
+        setdefault();                
+    }
+    
+   
+    void setdefault()
+    {
         ticking = false;  
         forcecalibration = false;
 
-        ticktimer = new embot::sys::Timer;   
         boardconfig.skintype = embot::app::canprotocol::analog::polling::Message_SKIN_SET_BRD_CFG::SkinType::withTemperatureCompensation;
         boardconfig.txperiod = 50*embot::common::time1millisec;   
         boardconfig.noload = ad7147_dot_value_noload;         
 
         triangles.activemask = 0xffff; 
-        triangles.connectedmask = 0xffff;
-        
+        triangles.connectedmask = 0xffff;        
     }
     
-   
     bool start();
     bool stop();
     
@@ -509,9 +514,46 @@ bool embot::app::application::theSkin::configure(embot::app::canprotocol::analog
 }
 
 
+
 bool embot::app::application::theSkin::configure(embot::app::canprotocol::analog::polling::Message_SKIN_SET_TRIANG_CFG::Info &trgcfg)
 { 
     return pImpl->configtriangles(trgcfg);
+}
+
+bool embot::app::application::theSkin::configure(embot::app::canprotocol::analog::polling::Message_SKIN_OBSOLETE_TACT_SETUP::Info &tactsetup)
+{    
+    if(true == pImpl->ticking)
+    {
+        // stop
+        stop();
+    }
+    
+    pImpl->setdefault();
+    
+    pImpl->boardconfig.txperiod = tactsetup.txperiod;
+    
+    
+    for(std::uint8_t i=0; i<trgNumberOf; i++)
+    {                       
+        // we process cdcoffset even if we have enabled == false ... as the old mtb3 application does
+
+        if(pImpl->triangles.config[i].cdcoffset != tactsetup.cdcOffset)
+        {
+            pImpl->triangles.config[i].cdcoffset = tactsetup.cdcOffset;
+            ad7147_set_cdcoffset(i, pImpl->triangles.config[i].cdcoffset); 
+        }
+    }
+         
+    pImpl->calibrate();    
+    
+    // config board w/ default values.
+    // config all triangles w/ default values.
+    // set calib with cdcfoffset
+    // start tx at 40 ms.
+    
+    start();
+    
+    return true;    
 }
 
 

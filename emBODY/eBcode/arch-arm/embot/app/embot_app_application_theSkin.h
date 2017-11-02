@@ -60,6 +60,8 @@ namespace embot { namespace app { namespace application {
         bool configure(embot::app::canprotocol::analog::polling::Message_SKIN_SET_BRD_CFG::Info &brdcfg);
         bool configure(embot::app::canprotocol::analog::polling::Message_SKIN_SET_TRIANG_CFG::Info &trgcfg);
         
+        bool configure(embot::app::canprotocol::analog::polling::Message_SKIN_OBSOLETE_TACT_SETUP::Info &tactsetup);
+        
         bool start();
         bool stop();        
         bool tick(std::vector<embot::hw::can::Frame> &replies);

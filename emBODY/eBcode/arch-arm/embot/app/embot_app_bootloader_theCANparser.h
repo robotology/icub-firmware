@@ -47,8 +47,8 @@ namespace embot { namespace app { namespace bootloader {
     public:
         struct Config
         {
-            std::uint32_t   dummy;
-            Config() : dummy(0) {}
+            bool usedbyapplication;
+            Config() : usedbyapplication(false) {}
         }; 
         
         enum class Event { rxcanframe = 0};

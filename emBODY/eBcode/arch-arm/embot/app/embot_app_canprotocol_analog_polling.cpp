@@ -94,6 +94,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
             (1ULL << static_cast<std::uint8_t>(CMD::TERMOMETER_TRANSMIT))           ,
 
             // bits 64-127
+            (1ULL << (static_cast<std::uint8_t>(CMD::SKIN_OBSOLETE_TACT_SETUP)-64)) | 
             (1ULL << (static_cast<std::uint8_t>(CMD::SKIN_SET_BRD_CFG)-64))         | 
             (1ULL << (static_cast<std::uint8_t>(CMD::ACC_GYRO_SETUP)-64))           |
             (1ULL << (static_cast<std::uint8_t>(CMD::SKIN_SET_TRIANG_CFG)-64))      ,
@@ -184,6 +185,32 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
     {
         return false;
     } 
+    
+       
+
+    bool Message_SKIN_OBSOLETE_TACT_SETUP::load(const embot::hw::can::Frame &inframe)
+    {
+        Message::set(inframe);  
+        
+        if(static_cast<std::uint8_t>(CMD::SKIN_OBSOLETE_TACT_SETUP) != frame2cmd(inframe))
+        {
+            return false; 
+        }
+        
+        info.txperiod = 40*embot::common::time1millisec;
+        info.cdcOffset = 0x2200; //static_cast<std::uint16_t>(candata.datainframe[3]) | (static_cast<std::uint16_t>(candata.datainframe[4]) << 8);
+      
+        return true;         
+    } 
+    
+        
+    bool Message_SKIN_OBSOLETE_TACT_SETUP::reply()
+    {
+        return false;
+    }  
+    
+
+    
     
 
     bool Message_SKIN_SET_BRD_CFG::load(const embot::hw::can::Frame &inframe)
