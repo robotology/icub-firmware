@@ -22,7 +22,7 @@
   </DaveTm>
 
   <Target>
-    <TargetName>mtb4-updtbtl-ulpro</TargetName>
+    <TargetName>strain2-updtbtl-ulpro</TargetName>
     <ToolsetNumber>0x4</ToolsetNumber>
     <ToolsetName>ARM-ADS</ToolsetName>
     <TargetOption>
@@ -249,7 +249,7 @@
   </Target>
 
   <Target>
-    <TargetName>mtb4-updtbtl-0offset</TargetName>
+    <TargetName>strain2-updtbtl-0offset</TargetName>
     <ToolsetNumber>0x4</ToolsetNumber>
     <ToolsetName>ARM-ADS</ToolsetName>
     <TargetOption>
@@ -534,8 +534,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\lib\stm32hal.mtb4.lib</PathWithFileName>
-      <FilenameWithoutPath>stm32hal.mtb4.lib</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\lib\stm32hal.strain2.lib</PathWithFileName>
+      <FilenameWithoutPath>stm32hal.strain2.lib</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
