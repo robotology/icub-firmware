@@ -29,6 +29,8 @@
 
 #include "embot_sys.h"
 
+#include "embot_app_canprotocol.h"
+
 
 #include <vector>
 
@@ -47,8 +49,8 @@ namespace embot { namespace app { namespace bootloader {
     public:
         struct Config
         {
-            bool usedbyapplication;
-            Config() : usedbyapplication(false) {}
+            embot::app::canprotocol::Process owner;
+            Config() : owner(embot::app::canprotocol::Process::bootloader) {}
         }; 
         
         enum class Event { rxcanframe = 0};

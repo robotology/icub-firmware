@@ -109,8 +109,7 @@ struct embot::app::bootloader::theCANparser::Impl
         version.build = 255;
         
         
-        flashburner = new embot::hw::FlashBurner;
-       
+        flashburner = nullptr;       
     }
     
     void setstate(State newstate)
@@ -362,10 +361,21 @@ bool embot::app::bootloader::theCANparser::Impl::process_bl_broadcast(const embo
     
     embot::app::canprotocol::bootloader::Message_BROADCAST::ReplyInfo replyinfo;
     replyinfo.board = static_cast<embot::app::canprotocol::Board>(strd.boardtype);
-    replyinfo.process = embot::app::canprotocol::Process::bootloader;
-    replyinfo.firmware.major = strd.bootloaderVmajor;
-    replyinfo.firmware.minor = strd.bootloaderVminor;
-    replyinfo.firmware.build = 255;
+    
+    if(embot::app::canprotocol::Process::application == config.owner)
+    {
+        replyinfo.process = embot::app::canprotocol::Process::application;
+        replyinfo.firmware.major = strd.applicationVmajor;
+        replyinfo.firmware.minor = strd.applicationVminor;
+        replyinfo.firmware.build = strd.applicationVbuild;        
+    }
+    else
+    {
+        replyinfo.process = embot::app::canprotocol::Process::bootloader;
+        replyinfo.firmware.major = strd.bootloaderVmajor;
+        replyinfo.firmware.minor = strd.bootloaderVminor;
+        replyinfo.firmware.build = 255;
+    }
         
     if(true == msg.reply(reply, embot::app::theCANboardInfo::getInstance().cachedCANaddress(), replyinfo))
     {
@@ -566,14 +576,40 @@ bool embot::app::bootloader::theCANparser::initialise(Config &config)
 {
     pImpl->config = config;
     pImpl->setstate(Impl::State::Idle);
-    pImpl->countdownIsActive = true;
-    
-    if(true == config.usedbyapplication)
+        
+    if(embot::app::canprotocol::Process::unknown == pImpl->config.owner)
     {
-            // fai qualcosa.
-        
-        
+        pImpl->config.owner = embot::app::canprotocol::Process::bootloader;
     }
+
+    if(embot::app::canprotocol::Process::application == pImpl->config.owner)
+    {
+        pImpl->countdownIsActive = false;            
+    }
+    else
+    {
+        pImpl->countdownIsActive = true;            
+    }    
+           
+    if(nullptr == pImpl->flashburner)
+    {
+        std::uint32_t flashstart = embot::hw::sys::addressOfApplication;
+        std::uint32_t flashsize = embot::hw::sys::maxsizeOfApplication;
+
+        if(embot::app::canprotocol::Process::application == pImpl->config.owner)
+        {
+            flashstart = embot::hw::sys::addressOfBootloader;
+            flashsize = embot::hw::sys::maxsizeOfBootloader;            
+        }
+        else
+        {
+            flashstart = embot::hw::sys::addressOfApplication;
+            flashsize = embot::hw::sys::maxsizeOfApplication;            
+        }
+        
+        pImpl->flashburner = new embot::hw::FlashBurner(flashstart, flashsize);
+    }        
+    
     
     embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance();
     
@@ -581,10 +617,21 @@ bool embot::app::bootloader::theCANparser::initialise(Config &config)
     embot::app::theCANboardInfo::StoredInfo storedinfo;
     if(true == canbrdinfo.get(storedinfo))
     {
-        pImpl->version.major = storedinfo.bootloaderVmajor;
-        pImpl->version.minor = storedinfo.bootloaderVminor;
-        pImpl->version.build = 0;
-        pImpl->board = static_cast<embot::app::canprotocol::Board>(storedinfo.boardtype);        
+        pImpl->board = static_cast<embot::app::canprotocol::Board>(storedinfo.boardtype);
+        
+
+        if(embot::app::canprotocol::Process::application == pImpl->config.owner)
+        {
+            pImpl->version.major = storedinfo.applicationVmajor;
+            pImpl->version.minor = storedinfo.applicationVminor;
+            pImpl->version.build = storedinfo.applicationVbuild; 
+        }            
+        else
+        {
+            pImpl->version.major = storedinfo.bootloaderVmajor;
+            pImpl->version.minor = storedinfo.bootloaderVminor;
+            pImpl->version.build = 0;   
+        }
     }
       
     
