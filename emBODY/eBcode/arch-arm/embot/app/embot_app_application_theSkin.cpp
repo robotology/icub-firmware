@@ -170,7 +170,15 @@ bool embot::app::application::theSkin::Impl::configtriangles(embot::app::canprot
 {    
     triangleconfigcommand = trgcfg;
     
-    if((triangleconfigcommand.trgStart > 15) || (triangleconfigcommand.trgEnd > 15) || (triangleconfigcommand.trgStart > triangleconfigcommand.trgEnd))
+    
+    // start and end must be in order (start <= end).
+    if(triangleconfigcommand.trgStart > triangleconfigcommand.trgEnd)
+    {
+        return false;
+    }
+    
+    // start is always positive as it is a uint8_t. end must be lower than triangle max number (end < 16). 
+    if(triangleconfigcommand.trgEnd >= trgNumberOf)
     {
         return false;
     }
@@ -415,10 +423,10 @@ bool embot::app::application::theSkin::Impl::tick(std::vector<embot::hw::can::Fr
 //    tr.print(std::string("ciao uomo, come stai? io bene!xxx devo dire. anche se il protocollo tronca oltre xxx"), replies);
 #endif  
     
-    embot::app::application::theCANtracer &tr = embot::app::application::theCANtracer::getInstance(); 
-    tr.start();
+//    embot::app::application::theCANtracer &tr = embot::app::application::theCANtracer::getInstance(); 
+//    tr.start();
     ad7147_acquire();  
-    tr.stop(std::string("u"), replies);       
+//    tr.stop(std::string("u"), replies);       
 
 #if 1
     
