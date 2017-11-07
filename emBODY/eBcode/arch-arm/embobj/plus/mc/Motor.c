@@ -647,7 +647,7 @@ BOOL Motor_check_faults(Motor* o) //
         MotorFaultState fault_state;
         fault_state.bitmask = o->fault_state.bitmask;
         
-        if (o->fault_state.bits.ExternalFaultAsserted & !o->fault_state_prec.bits.ExternalFaultAsserted)
+        if (o->fault_state.bits.ExternalFaultAsserted && !o->fault_state_prec.bits.ExternalFaultAsserted)
         {
             Motor_send_error(o->ID, eoerror_value_MC_motor_external_fault, 0);
             fault_state.bits.ExternalFaultAsserted = FALSE;
@@ -687,7 +687,7 @@ BOOL Motor_check_faults(Motor* o) //
             fault_state.bitmask &= ~CAN_GENERIC_ERROR;
         }
                 
-        if (o->fault_state.bits.EncoderFault & !o->fault_state_prec.bits.EncoderFault)
+        if (o->fault_state.bits.EncoderFault && !o->fault_state_prec.bits.EncoderFault)
         {
             if (o->qe_state.bits.dirty)
             {
