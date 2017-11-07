@@ -149,6 +149,7 @@ static void Motor_config_2FOC(Motor* o, eOmc_motor_config_t* config)
     #define HAS_TSENS      0x0004
     #define USE_INDEX      0x0008
     #define HAS_SPEED_QE   0x0010
+    #define ENA_VERBOSE    0x0020
     
     o->can_motor_config[0] = 0;
     
@@ -157,13 +158,14 @@ static void Motor_config_2FOC(Motor* o, eOmc_motor_config_t* config)
     if (config->hasRotorEncoderIndex)   o->can_motor_config[0] |= USE_INDEX;
     if (config->hasTempSensor)          o->can_motor_config[0] |= HAS_TSENS;
     if (config->hasSpeedEncoder)        o->can_motor_config[0] |= HAS_SPEED_QE;
+    if (config->verbose)                o->can_motor_config[0] |= ENA_VERBOSE;
     
     *(int16_t*)(o->can_motor_config+1) = config->rotorEncoderResolution;
     *(int16_t*)(o->can_motor_config+3) = config->rotorIndexOffset;
     
     o->can_motor_config[5] = config->motorPoles;
     
-    //TO COMPLETE: o->can_motor_config[6] = o->enc_tolerance/ bla bla;
+    //ALE TO COMPLETE: o->can_motor_config[6] = o->enc_tolerance/ bla bla;
 
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, o->ID, 0);
     
@@ -253,7 +255,7 @@ void Motor_config(Motor* o, uint8_t ID, eOmc_motor_config_t* config) //
     
     //in this case tolarance is the numeber of encoder units lost each complete rotation
     //send can message to 2foc
-    o->enc_tolerance = config->rotEncTolerance; //maybe this field is not necessary
+    o->enc_tolerance = config->rotEncTolerance; //maybe this field is not necessary //ALE
     
     o->temperature_max = config->temperatureLimit;
 

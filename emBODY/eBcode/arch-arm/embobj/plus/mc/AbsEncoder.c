@@ -132,10 +132,10 @@ void s_AbsEncoder_set_spikes_limis(AbsEncoder* o)
 
         case(eomc_enc_amo):
         {
-            //TO COMPLETE...
+            
             int32_t toleranceIDeg = o->toleranceCfg * 65535 /360 ;
             o->spike_mag_limit = toleranceIDeg *o->div;
-            o->spike_cnt_limit = AEA_DEFAULT_SPIKE_CNT_LIMIT;
+            o->spike_cnt_limit = AEA_DEFAULT_SPIKE_CNT_LIMIT; //ALE ??
             snprintf(message, sizeof(message), "AMO: tol%.3f, div%.3f spikel%lu", o->toleranceCfg, o->div, o->spike_mag_limit);
         }break;        
         
