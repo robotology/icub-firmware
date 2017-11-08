@@ -165,7 +165,7 @@ static void Motor_config_2FOC(Motor* o, eOmc_motor_config_t* config)
     
     o->can_motor_config[5] = config->motorPoles;
     
-    //ALE TO COMPLETE: o->can_motor_config[6] = o->enc_tolerance/ bla bla;
+    o->can_motor_config[6] = (int)(o->enc_tolerance*10.0f);
 
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, o->ID, 0);
     
