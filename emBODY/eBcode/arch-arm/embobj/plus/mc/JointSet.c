@@ -1149,8 +1149,11 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
         {
             int32_t offset;
             int32_t zero;
+            eOmc_joint_config_t *jointcfg = eo_entities_GetJointConfig(eo_entities_GetHandle(), e);
             //1) Take absolute value of calibation parametr
             int32_t abs_raw = (calibrator->params.type12.rawValueAtZeroPos > 0) ? calibrator->params.type12.rawValueAtZeroPos : -calibrator->params.type12.rawValueAtZeroPos;
+            // 1.1) update abs_raw with gearbox_E2J
+            abs_raw = abs_raw * jointcfg->gearbox_E2J; 
             // 2) calculate offset
             if(abs_raw >= TICKS_PER_HALF_REVOLUTION)
                 offset = abs_raw - TICKS_PER_HALF_REVOLUTION;
@@ -1158,11 +1161,11 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
                 offset = abs_raw + TICKS_PER_HALF_REVOLUTION;
             
             // 3) find out sign of zero
-            eOmc_joint_config_t *jointcfg = eo_entities_GetJointConfig(eo_entities_GetHandle(), e);
+            
             if(jointcfg->jntEncoderResolution > 0)
-                zero = TICKS_PER_HALF_REVOLUTION;
+                zero = TICKS_PER_HALF_REVOLUTION /jointcfg->gearbox_E2J;
             else
-                zero = -TICKS_PER_HALF_REVOLUTION;
+                zero = -TICKS_PER_HALF_REVOLUTION /jointcfg->gearbox_E2J;
             
             zero+=calibrator->params.type12.calibrationDelta;  //this parameter should contain only the delta
             // 4) call calibration function
