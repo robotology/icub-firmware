@@ -276,7 +276,7 @@ namespace embot { namespace hw { namespace adc {
         }
         
         s_adc_isrunning = true;
-        HAL_ADC_Start_DMA(&hadc1, (uint32_t*)s_config.destination, s_config.numberofitems);
+        HAL_ADC_Start_DMA(&hadc1, (uint32_t*)s_config.destination, s_config.numberofitems*static_cast<uint8_t>(s_config.itemsize));
         
         return resOK;           
     }
