@@ -36,6 +36,10 @@ using namespace std;
 
 #include "embot_binary.h"
 
+#include "embot_sys.h"
+
+#include "embot_hw_sys.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
 // --------------------------------------------------------------------------------------------------------------------
@@ -52,7 +56,7 @@ using namespace std;
 
 
 
-namespace embot { namespace hw { namespace pga308 {
+namespace embot { namespace hw { namespace PGA308 {
 
     bool supported(Amplifier a)                                                                         { return false; }
     bool initialised(Amplifier a)                                                                       { return false; }
@@ -66,7 +70,7 @@ namespace embot { namespace hw { namespace pga308 {
     result_t set(Amplifier a, const RegisterAddress address, const std::uint16_t value)                 { return resNOK; }
     result_t get(Amplifier a, const RegisterAddress address, std::uint16_t &value)                      { return false; }
 
-}}} // namespace embot { namespace hw { namespace pga308 {
+}}} // namespace embot { namespace hw { namespace PGA308 {
 
 #elif   defined(EMBOT_PGA308_ENABLED)
 
@@ -164,7 +168,7 @@ namespace embot { namespace hw { namespace PGA308 {
         s_privatedata.transfunctconfig[index].obtain(s_privatedata.registers[index].CFG0, s_privatedata.registers[index].ZDAC, s_privatedata.registers[index].GDAC);
         
         // now transmit them all
-        set(a, RegisterAddress::SFTC, s_privatedata.registers[index].SFTC.value);
+        set(a, RegisterAddress::SFTC, s_privatedata.registers[index].SFTC.value);        
         set(a, RegisterAddress::ZDAC, s_privatedata.registers[index].ZDAC.value);
         set(a, RegisterAddress::GDAC, s_privatedata.registers[index].GDAC.value);
         set(a, RegisterAddress::CFG0, s_privatedata.registers[index].CFG0.value);
@@ -201,23 +205,31 @@ namespace embot { namespace hw { namespace PGA308 {
             return resNOK;
         }
         
-        // power on: dont do it if another amplifier has alredy done it.
-        if(config.poweronstate != embot::hw::gpio::get(config.powerongpio))
-        {
-            embot::hw::gpio::set(config.powerongpio, config.poweronstate); 
-        }
-        
         
         // init onewire ..
         embot::hw::onewire::init(config.onewirechannel, config.onewireconfig);
         
+        
+        // power on: dont do it if another amplifier has alredy done it.
+        if(config.poweronstate != embot::hw::gpio::get(config.powerongpio))
+        {
+            embot::hw::gpio::set(config.powerongpio, config.poweronstate); 
+            embot::hw::sys::delay(25*1000);
+        }
+                
+        
         // must set it to initialsied in order to use setdefault
         embot::binary::bit::set(initialisedmask, amplifier2index(a));
         
-        
+        //embot::common::Time start = embot::sys::timeNow();
         // load the default settings of pga308. i use the         
         setdefault(a);
-        
+        //static volatile embot::common::Time delta = 0;
+        //delta = embot::sys::timeNow() - start;
+        //delta = delta;
+        // some timing ... 
+        // - setdefault() takes 24829 usec = ~25ms
+        // - set(register value) takes 4106 usec = ~4ms
         return resOK;
     }
     
@@ -436,8 +448,8 @@ namespace embot { namespace hw { namespace PGA308 {
         
         return r;        
     }
+    
 
- 
 }}} // namespace embot { namespace hw { namespace pga308 {
 
 
