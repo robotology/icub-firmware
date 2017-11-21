@@ -334,7 +334,15 @@ namespace embot { namespace hw { namespace PGA308 {
         
         float valueOfGD()
         {
-            return 0.33333f + (static_cast<float>(GD) * 0.66666f) / 65536.0f;
+            //return 0.33333f + (static_cast<float>(GD) * 0.66666f) / 65536.0f;
+            //return (1.0f + static_cast<float>(GD)/32768.0f)/3.0f;
+            return valueOfGD(GD);
+        }
+        
+        float valueOfGD(std::uint16_t x)
+        {
+            //return 0.33333f + (static_cast<float>(GD) * 0.66666f) / 65536.0f;
+            return (1.0f + static_cast<float>(x)/32768.0f)/3.0f;
         }
 
         float valueOfCOR()
@@ -353,13 +361,21 @@ namespace embot { namespace hw { namespace PGA308 {
         float valueOfFineOffset()
         {
             return static_cast<float>(VREF)*(1.0f/65536.0f)*(32768.0f - static_cast<float>(Vzerodac));
+            //return static_cast<float>(VREF)*(0.0000152587890625f)*(32768.0f - static_cast<float>(Vzerodac));
         }        
         
         float alpha()
         {
-            float v = valueOfGD()*valueOfGO()*valueOfGI();
-            return (0 == muxsign) ? v : -v;
+            //float v = valueOfGD()*valueOfGO()*valueOfGI();
+            //return (0 == muxsign) ? v : -v;
+            return alpha(GD);
         }
+        
+        float alpha(std::uint16_t x)
+        {
+            float v = valueOfGD(x)*valueOfGO()*valueOfGI();
+            return (0 == muxsign) ? v : -v;
+        }        
         
         float beta()
         {
@@ -390,6 +406,41 @@ namespace embot { namespace hw { namespace PGA308 {
             Vcoarseoffset = Y;
             Vzerodac = Z;
         }
+        
+        bool setalpha(float a)
+        {
+            float xgd = 98304.0f * (a/(valueOfGI()*valueOfGO()) - (1.0f/3.0f));
+            std::int32_t x = static_cast<std::int32_t>(std::floor(xgd + 0.5f));
+            if((x >= 65536) || (x < 0))
+            {
+                return false;
+            }
+            GD = static_cast<std::uint16_t>(x);
+            return true;
+        }
+        
+        bool setbeta(float b)
+        {
+            float yco = b / (alpha() * valueOfCOR());
+            std::int32_t y = static_cast<std::int32_t>(std::floor(yco + 0.5f));
+            if((y >= 256) || (y < 0))
+            {
+                return false;
+            }
+            //std::uint8_t prevCO = Vcoarseoffset;
+            Vcoarseoffset = static_cast<std::uint8_t>(y);
+            // now we compute the fine adjustment
+            float zco = ( static_cast<float>(y) * valueOfCOR() + 0.5f*static_cast<float>(VREF)/valueOfGI() - b/alpha() ) / ( (static_cast<float>(VREF)/65536.0f)/valueOfGI() );
+            std::int32_t z = static_cast<std::int32_t>(std::floor(zco + 0.5f));
+            if((z >= 65536) || (z < 0))
+            {
+                return false;
+            }
+            Vcoarseoffset = static_cast<std::uint8_t>(y);
+            Vzerodac = static_cast<std::uint16_t>(z);
+            
+            return true;
+        }        
     };  
     
     
