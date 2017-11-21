@@ -26,6 +26,7 @@
 #include "embot_hw.h"
 #include "embot_hw_onewire.h"
 #include "embot_hw_gpio.h"
+#include <cmath>
 
 #include "embot_app_canprotocol_analog_polling.h"
 
@@ -51,7 +52,7 @@ namespace embot { namespace hw { namespace PGA308 {
     struct ZDACregister
     {   
         std::uint16_t value;
-        static const std::uint16_t Default = 0x0000;
+        static const std::uint16_t Default = 0x8000;
         
         // ZDAC Register: Zero DAC Register (Fine Offset Adjust)
         // bit:         15      14      13      12      11      10      09      08      07      06      05      04      03      02      01      00
@@ -97,10 +98,10 @@ namespace embot { namespace hw { namespace PGA308 {
     {
         std::uint16_t value;
         
-        static const std::uint8_t DefaultGO = 0x06;     // output gain = 6.0
-        static const std::uint8_t DefaultMUX = 0x01;    // VIN1= VINPositive, VIN2= VINNegative
+        static const std::uint8_t DefaultGO = 0x06;     // output gain = 6.0 (0x06) OR 2.0 (0x00)
+        static const std::uint8_t DefaultMUX = 0x00;    // VIN1= VINPositive, VIN2= VINNegative
         static const std::uint8_t DefaultGI = 0x04;     // input gain = 16     
-        static const std::uint8_t DefaultOS = 0x00;     // coarse offset = 0 [mV]
+        static const std::uint8_t DefaultOS = 0x20;     // coarse offset  // 0x25 0x8A
         
         // CFG0 Output Amplifier Gain Select, Front-End PGA Mux & Gain Select, Coarse Offset Adjust on Front-End PGA
         // bit:         15      14      13      12      11      10      09      08      07      06      05      04      03      02      01      00
@@ -160,18 +161,22 @@ namespace embot { namespace hw { namespace PGA308 {
         
         void set(std::uint16_t cfg1) { value = cfg1; }
         
-        void setDefault() { value = CFG1register::Default; }
+        void setDefault() { value = Default; }
     };    
 
     struct CFG2register
     {
         std::uint16_t value;        
-        static const std::uint16_t Default = 0x0000;
+        static const std::uint16_t Default = 0x0400;
         
         // CFG2 Register: Configuration Register 2
         // bit:         15      14      13      12      11      10      09      08      07      06      05      04      03      02      01      00
         // content:     OWD     OWD-OFF DIS-OUT NOW     COSVR1  COSVR0  RESERVD DOUTSEL DOUT    SD      RESERVD RESERVD RESERVD RESERVD RESERVD RESERVD
         // COSVR:       00 -> ; 01-> ; 10 -> ; 11 -> ;
+        // with COSVR = 01b, as in our Default ... we have: 
+        // - Coarse Offset Range = [2.4, 3.6] V
+        // - Coarse Offset Resolution = (1/128)(VREF)(0.0427)
+        // - Coarse Offset Range = (±100mV)(VREF/3)
         CFG2register() { value = 0; }
         
         CFG2register(std::uint16_t v) : value(v) {} 
@@ -180,7 +185,7 @@ namespace embot { namespace hw { namespace PGA308 {
         
         void set(std::uint16_t cfg2) { value = cfg2; }
         
-        void setDefault() { value = CFG1register::Default; }
+        void setDefault() { value = Default; }
     };  
     
     
@@ -209,9 +214,12 @@ namespace embot { namespace hw { namespace PGA308 {
     };    
     
             
-    
+
     struct TransferFunctionConfig
-    { 
+    {
+                
+        static const std::uint16_t VREF = 8192;    // the allowed values are in range [0, VREF).  it must be constant ...   
+        
         std::uint16_t       GD;                     // gain DAC. values are [0.333333333, 0.999989824]                     
         std::uint8_t        GI          : 4;        // front end gain. from 0000b to 1101b: {4 6 8 12 16 32 64 100 200 400 480 600 800 960 1200 1600}
         std::uint8_t        muxsign     : 1;        // the sign: 0 is +, 1 is -
@@ -219,14 +227,29 @@ namespace embot { namespace hw { namespace PGA308 {
         std::uint8_t        Vcoarseoffset;
         std::uint16_t       Vzerodac;
         
-        
         enum class Parameter { GD = 0, GI = 1, muxsign = 2, GO = 3, Vcoarseoffset = 4, Vzerodac = 5 };
         
-        // the formula is:
+        // the formulas are:
+        //
+        // from Vin to Vout
         // Vout = ((muxsign*Vin + Vcoarseoffset)*GI + Vzerodac)*GD*GO
-        // Vout = g * Vin + o
-        // g = muxsign*GI*GD*GO 
-        // o = (Vcoarseoffset*GI + Vzerodac)*GD*GO
+        // Vout = alpha * Vin + beta
+        // alpha = muxsign*GI*GD*GO 
+        // beta = (Vcoarseoffset*GI + Vzerodac)*GD*GO
+        // 
+        // we use only three variables x, y, z and we keep the other fixed to default ...
+        // x -> content of register GDAC (.GD)
+        // y -> content of register CFG0.OS (.Vcoarseoffset)
+        // z -> content of register ZDAC (.Vzerodac)
+        // we thus have:
+        // alpha(x) = valueOf(GI) * valueOf(GO) * ((1/3) + ((2/3)/64k) * x)
+        // beta(x, y, z) = alpha(x) * ((1/128)*VREF*COSVR*y + (1/valueOf(GI))*VREF*(1/64k)(32k - z))
+        // for some operations we need to represent Vout as a function only of y and z, hence
+        // Vout = a * y + b * z + c
+        // a = (d/dy) Vout = (d/dy) beta = alpha(x)*(1/128)*VREF*COSVR
+        // b = (d/dz) Vout = (d/dz) beta = - alpha(x)*(1/valueOf(GI))*VREF*(1/64k)
+        // c = Vout - a*y - b*z
+        
         
         TransferFunctionConfig() : GD(0), GI(0), muxsign(0), GO(0), Vcoarseoffset(0), Vzerodac(0) {}
             
@@ -238,6 +261,16 @@ namespace embot { namespace hw { namespace PGA308 {
             GO = protcfg.GO;
             Vcoarseoffset = protcfg.Voffsetcoarse;
             Vzerodac = protcfg.Vzerodac;        
+        }
+        
+        void get(embot::app::canprotocol::analog::polling::PGA308cfg1 &protcfg)
+        {
+            protcfg.GD = GD;
+            protcfg.GI = GI;
+            protcfg.S = muxsign;
+            protcfg.GO = GO;
+            protcfg.Voffsetcoarse = Vcoarseoffset;
+            protcfg.Vzerodac = Vzerodac;        
         }
         
         void setDefault() 
@@ -285,6 +318,77 @@ namespace embot { namespace hw { namespace PGA308 {
         void load(const GDACregister &gdac)
         {
             GD = gdac.value;           
+        }
+        
+        float valueOfGI()
+        {
+            static const std::uint16_t mapGI2val[16] = {4, 6, 8, 12, 16, 32, 64, 100, 200, 400, 480, 600, 800, 960, 1200, 1600};
+            return static_cast<float>(mapGI2val[GI]);
+        }
+        
+        float valueOfGO()
+        {
+            static const float mapGO2val[8] = {2.0f, 2.4f, 3.0f, 3.6f, 4.0f, 4.5f, 6.0f, 1.0f};
+            return mapGO2val[GO];
+        }  
+        
+        float valueOfGD()
+        {
+            return 0.33333f + (static_cast<float>(GD) * 0.66666f) / 65536.0f;
+        }
+
+        float valueOfCOR()
+        {
+            //static const float mapCOSVR2val[4] = {0.064f, 0.0427f, 0.0320f, 0.0256f};     
+            //std::uint8_t cosvr2 = 1;
+            //return static_cast<float>(VREF)*(1.0f/128.0f)*mapCOSVR2val[cosvr2];
+            return 2.7328f;
+        } 
+
+        float valueOfCoarseOffset()
+        {
+            return valueOfCOR()*static_cast<float>(Vcoarseoffset);   
+        }
+        
+        float valueOfFineOffset()
+        {
+            return static_cast<float>(VREF)*(1.0f/65536.0f)*(32768.0f - static_cast<float>(Vzerodac));
+        }        
+        
+        float alpha()
+        {
+            float v = valueOfGD()*valueOfGO()*valueOfGI();
+            return (0 == muxsign) ? v : -v;
+        }
+        
+        float beta()
+        {
+            float gi = valueOfGI();            
+            return alpha()*(valueOfCoarseOffset() + valueOfFineOffset()/gi);            
+        }
+        
+        void computeOffsetParams(const std::uint16_t vout, float &a, float &b, float &c)
+        {
+            // a = (d/dy) Vout = (d/dy) beta = alpha(x)*(1/128)*VREF*COSVR = alpha(x) * COR
+            // b = (d/dz) Vout = (d/dz) beta = - alpha(x)*(1/valueOf(GI))*VREF*(1/64k)
+            // c = Vout - a*y - b*z
+            a = alpha() * valueOfCOR();
+            b = - (alpha()*static_cast<float>(VREF)/valueOfGI())/65536.0f;
+            c = static_cast<float>(vout) - a*static_cast<float>(Vcoarseoffset) - b*static_cast<float>(Vzerodac);                      
+        }
+        
+        void alignVOUT(const std::uint16_t vout, const std::uint16_t target, std::uint8_t &Y, std::uint16_t &Z)
+        {
+            float a, b, c;
+            computeOffsetParams(vout, a, b, c);
+            float y = (target - c - b*static_cast<float>(Vzerodac))/a;
+            // must round y ... 
+            Y = static_cast<std::uint8_t>(std::floor(y + 0.5f));
+            // must apply Y to ...
+            float z = (target - c - a*static_cast<float>(Y))/b;
+            Z = static_cast<std::uint16_t>(std::floor(z + 0.5f));
+            Vcoarseoffset = Y;
+            Vzerodac = Z;
         }
     };  
     
