@@ -202,7 +202,7 @@ namespace embot { namespace hw { namespace onewire {
         // MX_GPIO_Init();
         // however, we must config it as output and put it high 
         embot::hw::gpio::configure(config.gpio, embot::hw::gpio::Mode::OUTPUTopendrain);
-        embot::hw::gpio::set(s_privatedata.activegpio, embot::hw::gpio::State::SET);
+        embot::hw::gpio::set(config.gpio, embot::hw::gpio::State::SET);
         
         if(false == s_privatedata.tickingTimerIsInitted)
         {
