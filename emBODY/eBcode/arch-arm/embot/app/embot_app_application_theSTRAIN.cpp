@@ -75,14 +75,10 @@ struct embot::app::application::theSTRAIN::Impl
     { 
         embot::app::canprotocol::analog::polling::PGA308cfg1    pga308cfg1;   
         
-        #warning -> must retrieve the default values from embot::hw::PGA308. maybe add a proper converter
         void factoryreset() {
-            pga308cfg1.GD = 0x4000;
-            pga308cfg1.GI = 4;
-            pga308cfg1.GO = 6;
-            pga308cfg1.S = 0;
-            pga308cfg1.Voffsetcoarse = 0;
-            pga308cfg1.Vzerodac = 0;
+            embot::hw::PGA308::TransferFunctionConfig tfc;
+            tfc.setDefault();
+            tfc.get(pga308cfg1);
         }
         
         amplifierConfig_t() { factoryreset(); }
@@ -236,7 +232,7 @@ struct embot::app::application::theSTRAIN::Impl
             bool ret = false;
             if((channel < 6) && (set < numOfSets))
             {
-                cfg1 = data.set[set].amplifiers[channel].pga308cfg1 = cfg1;
+                cfg1 = data.set[set].amplifiers[channel].pga308cfg1;
                 ret = true;
             }
             
@@ -535,7 +531,7 @@ struct embot::app::application::theSTRAIN::Impl
                 data.saturationonchannel[channel] = embot::app::canprotocol::analog::periodic::ADCsaturation::NONE;
                 
                 if(data.adcvalue[channel] < ADCsaturationLow)
-                {;
+                {
                     data.saturationonchannel[channel] = embot::app::canprotocol::analog::periodic::ADCsaturation::LOW;                    
                     data.adcsaturation = true;                
                 }
@@ -599,6 +595,7 @@ struct embot::app::application::theSTRAIN::Impl
 
    
       
+    embot::common::Time debugtime;
     Config config;
            
     bool ticking;
@@ -620,7 +617,9 @@ struct embot::app::application::theSTRAIN::Impl
     Impl() 
     {
 
-//        defaultAmplifConfig.factoryreset();        
+//        defaultAmplifConfig.factoryreset();     
+
+        debugtime = 0;
         
         ticking = false;  
         txmode = embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode::acquireOnly; // even better is to use none
@@ -905,12 +904,12 @@ bool embot::app::application::theSTRAIN::Impl::acquisition_retrieve()
 
     // 1. acquire from adc and put inside adcvalue    
     std::memmove(runtimedata.data.adcvalue, runtimedata.data.dmabuffer, sizeof(runtimedata.data.adcvalue));
-       
     
+
     // 2. convert adcvalue[] into q15value[]
     for(int i=0; i<6; i++)
     {
-        runtimedata.data.adcvalue[i] <<= 4; // adc value is 12 bits. we need to scale it to 64k
+        runtimedata.data.adcvalue[i] <<= 3; // adc value is 13 bits. we need to scale it to 64k
         runtimedata.data.q15value[i] = embot::dsp::q15::U16toQ15(runtimedata.data.adcvalue[i]);
     }
     
@@ -970,19 +969,30 @@ bool embot::app::application::theSTRAIN::Impl::processing()
     return true;
 }
 
-
+// some timings ... 
+// - from start of adc acquisition until calling of this function: ~638usec
+// - from start of adc acquisition until after acquisition_retrieve() inside this function: ~664usec 
+// - from start of adc acquisition until after processing() inside this function, case of calib mode: ~1041usec 
+// - from start of adc acquisition until end of this function, case of calib mode: ~1164usec 
 bool embot::app::application::theSTRAIN::Impl::processdata(std::vector<embot::hw::can::Frame> &replies)
 {   
     if(false == ticking)
     {
         return false;
     }
+    
+//    embot::common::Time start = debugtime;
+//    debugtime = embot::sys::timeNow() - start;
         
     // retreve acquired adc values
     acquisition_retrieve();
     
+//    debugtime = embot::sys::timeNow() - start;
+    
     // processing of acquired data
     processing();
+    
+//    debugtime = embot::sys::timeNow() - start;    
     
     embot::hw::can::Frame frame;  
 
@@ -1031,7 +1041,7 @@ bool embot::app::application::theSTRAIN::Impl::processdata(std::vector<embot::hw
     }
 
     
-   
+//    debugtime = embot::sys::timeNow() - start; 
        
     return true;        
     
@@ -1043,6 +1053,8 @@ bool embot::app::application::theSTRAIN::Impl::tick(std::vector<embot::hw::can::
     {
         return false;
     }
+    
+    debugtime = embot::sys::timeNow();
         
     // start adc acquisition
     acquisition_start();
@@ -1100,7 +1112,7 @@ bool embot::app::application::theSTRAIN::initialise(Config &config)
     pga308cfg.powerongpio = embot::hw::gpio::GPIO(EN_2V8_GPIO_Port, EN_2V8_Pin);
     pga308cfg.poweronstate = embot::hw::gpio::State::SET;
     pga308cfg.onewireconfig.rate = embot::hw::onewire::Rate::tenKbps;
-    pga308cfg.onewireconfig.usepreamble =  true;
+    pga308cfg.onewireconfig.usepreamble = true;
     pga308cfg.onewireconfig.preamble = 0x55;
     
     // from embot::hw::PGA308::one to embot::hw::PGA308::six
@@ -1548,7 +1560,13 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::p
 
 bool  embot::app::application::theSTRAIN::resetamplifier(embot::app::canprotocol::analog::polling::Message_STRAIN2_AMPLIFIER_RESET::Info &info)
 { 
-    if(info.channel >= 6)
+    bool allchannels = false;
+    if(0x0f == info.channel)
+    {
+        // it is ok. we do on every channel
+        allchannels = true;
+    }    
+    else if(info.channel >= 6)
     {
         return false;
     }   
@@ -1558,10 +1576,42 @@ bool  embot::app::application::theSTRAIN::resetamplifier(embot::app::canprotocol
         return false;
     }
     
+    if(true == allchannels)
+    {
+        for(std::uint8_t i=0; i<6; i++)
+        {
+            // i reset amplifier settings to default
+            pImpl->configdata.amplifiers_reset(info.set, i);
+            
+            // i retrieve the current settings (they are default now).
+            embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
+            pImpl->configdata.amplifiers_get(info.set, i, cfg1); 
+            
+            // i apply them to the pga308.
+            embot::hw::PGA308::TransferFunctionConfig tfc;
+            tfc.load(cfg1);    
+            embot::hw::PGA308::set(static_cast<embot::hw::PGA308::Amplifier>(i), tfc);
+        }        
+    }
+    else
+    {
     
-    pImpl->configdata.amplifiers_reset(info.set, info.channel);
-    
-    embot::hw::PGA308::setdefault(static_cast<embot::hw::PGA308::Amplifier>(info.channel));
+        // i reset amplifier settings to default
+        pImpl->configdata.amplifiers_reset(info.set, info.channel);
+        
+        // i retrieve the current settings (they are default now).
+        embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
+        pImpl->configdata.amplifiers_get(info.set, info.channel, cfg1); 
+        
+        // i apply them to the pga308.
+        embot::hw::PGA308::TransferFunctionConfig tfc;
+        tfc.load(cfg1);    
+        embot::hw::PGA308::set(static_cast<embot::hw::PGA308::Amplifier>(info.channel), tfc);
+        
+    }
+
+// setdefault is not really ok because it changes everything, not just the amplifier settings
+//    embot::hw::PGA308::setdefault(static_cast<embot::hw::PGA308::Amplifier>(info.channel));
     
 //    if(0 == info.set)
 //    {    
@@ -1573,7 +1623,13 @@ bool  embot::app::application::theSTRAIN::resetamplifier(embot::app::canprotocol
 
 bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::polling::Message_STRAIN2_AMPLIFIER_CFG1_SET::Info &info)
 { 
-    if(info.channel >= 6)
+    bool allchannels = false;
+    if(0x0f == info.channel)
+    {
+        // it is ok. we do on every channel
+        allchannels = true;
+    }    
+    else if(info.channel >= 6)
     {
         return false;
     }   
@@ -1584,17 +1640,144 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::p
     }
     
     
-    pImpl->configdata.amplifiers_set(info.set, info.channel, info.cfg1);
-    
-    embot::hw::PGA308::TransferFunctionConfig tfc;
-    tfc.load(info.cfg1);    
-    embot::hw::PGA308::set(static_cast<embot::hw::PGA308::Amplifier>(info.channel), tfc);
+    if(true == allchannels)
+    {
+        for(std::uint8_t i=0; i<6; i++)
+        {
+            pImpl->configdata.amplifiers_set(info.set, i, info.cfg1);
+            
+            embot::hw::PGA308::TransferFunctionConfig tfc;
+            tfc.load(info.cfg1);    
+            embot::hw::PGA308::set(static_cast<embot::hw::PGA308::Amplifier>(i), tfc);
+        }        
+    }
+    else
+    {    
+        pImpl->configdata.amplifiers_set(info.set, info.channel, info.cfg1);
+        
+        embot::hw::PGA308::TransferFunctionConfig tfc;
+        tfc.load(info.cfg1);    
+        embot::hw::PGA308::set(static_cast<embot::hw::PGA308::Amplifier>(info.channel), tfc);
+    }
   
 //    if(0 == info.set)
 //    {    
 //        #warning TODO: apply to the HW (amplifier cfg1)
 //    }    
     
+   
+    return true;    
+}
+
+
+bool embot::app::application::theSTRAIN::autocalib(embot::app::canprotocol::analog::polling::Message_STRAIN2_AMPLIFIER_AUTOCALIB::Info &info, std::uint8_t &okmask, std::uint32_t &mae)
+{
+    std::uint8_t channelmask = 0;
+    if(0x0f == info.channel)
+    {
+        // it is ok. we do on every channel
+        channelmask = 0x3f;
+    }
+    else if(info.channel >= 6)
+    {
+        return false;
+    }
+    else
+    {
+        embot::binary::bit::set(channelmask, info.channel); 
+    }
+
+    if(info.set >= 3)
+    {   
+        return false;
+    }
+    
+
+    // acquire for some times to acquire the measure
+    const std::uint8_t Ntimes = 2;
+    std::uint32_t measure[6] = {0};
+    for(std::uint8_t a=0; a<Ntimes; a++)
+    {
+        // it acquire once. it also restarts if required.        
+        pImpl->acquisition_oneshot();
+        for(std::uint8_t c=0; c<6; c++)
+        {
+            std::uint16_t tmp = pImpl->runtimedata.data.adcvalue[c] >> 3;
+            measure[c] += tmp;
+        }
+    }
+
+    for(std::uint8_t c=0; c<6; c++)
+    {
+        if(Ntimes > 0)
+        {
+            measure[c] /= Ntimes;
+        }
+    }
+    
+    
+    // perform alignment to target
+    for(std::uint8_t i=0; i<6; i++)
+    {
+        if(true == embot::binary::bit::check(channelmask, i))
+        {
+            embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
+            pImpl->configdata.amplifiers_get(0, i, cfg1);
+        
+            embot::hw::PGA308::TransferFunctionConfig tfc;
+            tfc.load(cfg1);  
+            std::uint8_t Y = 0;
+            std::uint16_t Z = 0;
+            tfc.alignVOUT(static_cast<std::uint16_t>(measure[i]), (info.target >> 3), Y, Z);
+            embot::hw::PGA308::set(static_cast<embot::hw::PGA308::Amplifier>(i), tfc);   
+
+            tfc.get(cfg1);
+            pImpl->configdata.amplifiers_set(0, i, cfg1);                               
+        }
+    }
+    
+    mae = 0;
+    okmask = 0;
+    std::uint8_t num = 0;
+    
+    // perform measure again to compute the error
+    std::memset(measure, 0, sizeof(measure));
+    for(std::uint8_t a=0; a<Ntimes; a++)
+    {
+        // it acquire once. it also restarts if required.        
+        pImpl->acquisition_oneshot();
+        for(std::uint8_t c=0; c<6; c++)
+        {
+            std::uint16_t tmp = pImpl->runtimedata.data.adcvalue[c] >> 3;
+            measure[c] += tmp;
+        }
+    }
+
+    for(std::uint8_t c=0; c<6; c++)
+    {
+        if(Ntimes > 0)
+        {
+            measure[c] /= Ntimes;
+        }
+        if(true == embot::binary::bit::check(channelmask, c))
+        {
+            num++;
+            std::int32_t mm = measure[c] - (info.target >> 3);
+            if(mm < 0)
+            {
+                mm = -mm;
+            }
+            mae += mm;
+            if(mm < (info.tolerance >> 3))
+            {
+                embot::binary::bit::set(okmask, c);
+            }                       
+        }       
+    }
+    if(num > 0)
+    {
+        mae /= num;
+    }
    
     return true;    
 }

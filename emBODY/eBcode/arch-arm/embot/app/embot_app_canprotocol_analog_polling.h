@@ -805,7 +805,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         struct Info
         {
             std::uint8_t        set         : 4;
-            std::uint8_t        channel     : 4;            
+            std::uint8_t        channel     : 4;    // if 0xf we mean every channel            
             Info() : set(0), channel(0) {}
         };
         
@@ -825,7 +825,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         struct Info
         {
             std::uint8_t        set         : 4;
-            std::uint8_t        channel     : 4;            
+            std::uint8_t        channel     : 4;    // if 0xf we mean every channel            
             PGA308cfg1          cfg1;
             Info() : set(0), channel(0) {}
         };
@@ -848,7 +848,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         struct Info
         { 
             std::uint8_t        set         : 4;
-            std::uint8_t        channel     : 4;        
+            std::uint8_t        channel     : 4;    // if 0xf we mean every channel     
             Info() : set(0), channel(0) {}
         };
         
@@ -876,41 +876,25 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
     {
         public:
             
-        enum class OPCODE { 
-            stop = 0,   // sent towards strain: 
-                        // when received, the strains stops its activity and sends a say opcode with state = STATE::success/failure
-            start = 1,  // sent towards strain: 
-                        // when received, the strains starts autocalib in terms described by set, channel, calibmode, and time (timeout) 
-                        // at the end of operations it sends a say opcode with state = STATE::success/failure
-            ask = 2,    // sent towards strain: when received, the strain sends a say opcode 
-            say = 3     // sent by strain:
-                        // as a reply to a ask: in state it puts current situation and time tells how long (in case of STATE::ongoing/success/failure). 
-                        // it is also sent at the end of a calib acctivity
-        };
-        
-        enum class CALIBMODE { parallel = 0 };
-        
-        enum class STATE { neutral = 0, ongoing = 1, success = 2, failure = 3 };
-        
-        
-        // note: first release of command will allow to start an autocalib in simple mode:
-        // - for all channels in parallel,
-        // - with a timeout of 60 seconds.
-        // - with a say message at the end.
-        // - it is not possible to stop an ongoing operation or to ask the status.
-                         
         struct Info
-        {   // use 7 bytes (1 is used by protocol opcode)
-            std::uint8_t        set         : 4;        // 
-            std::uint8_t        channel     : 4;        // if 0xf: every channel    
-            std::uint8_t        opcode      : 2;        // use OPCODE        
-            std::uint8_t        calibmode   : 2;        // use CALIBMODE    
-            std::uint8_t        ffu1        : 4;
-            std::uint32_t       time;                   // in millisec. it can be a timeout if OPCODE::start. or time of activity if OPCODE::say
-            std::uint8_t        state       : 4;  
-            std::uint8_t        ffu2        : 4;            
-            Info() : set(0), channel(0) {}
+        { 
+            std::uint8_t        set         : 4;
+            std::uint8_t        channel     : 4;    // if 0xf we mean every channel
+            std::uint16_t       target;             // in range [0, 64k). half scale if 32k    
+            std::uint16_t       tolerance;          // it must be abs(measure - target) < tolerance            
+            Info() : set(0), channel(0xf), target(32*1024), tolerance(100) {}
         };
+        
+        struct ReplyInfo
+        {
+            std::uint8_t        set         : 4;
+            std::uint8_t        channel     : 4;            
+            std::uint8_t        resultmask;     // in pos i-th the boolean result of channel i-th
+            std::uint32_t       mae;            // the mean square error for the channel(s) after autocalib = SUM_ch( abs(meas_ch - target) ) / numchannels
+            ReplyInfo() : set(0), channel(0xf), resultmask(0) {}
+        };        
+            
+        
         
         Info info;
         
@@ -918,7 +902,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
             
         bool load(const embot::hw::can::Frame &inframe);
             
-        bool reply();   // none            
+        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);          
     }; 
     
     enum class imuFusion { enabled = 1, none = 33 }; // later on we can add the types of fusion we want
