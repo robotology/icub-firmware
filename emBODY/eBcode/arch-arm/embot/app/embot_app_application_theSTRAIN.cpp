@@ -905,6 +905,22 @@ bool embot::app::application::theSTRAIN::Impl::acquisition_retrieve()
     // 1. acquire from adc and put inside adcvalue    
     std::memmove(runtimedata.data.adcvalue, runtimedata.data.dmabuffer, sizeof(runtimedata.data.adcvalue));
     
+#if 0
+
+    // compute the input before amplification. it should be more or less stable irrespectively if alpah and beta values ...
+    static float vinput[6] = {0.0f};
+    
+    for(int j=0; j<6; j++)
+    {
+        embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
+        configdata.amplifiers_get(0, j, cfg1);
+        
+        embot::hw::PGA308::TransferFunctionConfig tfc;
+        tfc.load(cfg1);  
+        vinput[j] = (static_cast<float>(runtimedata.data.adcvalue[j]) - tfc.beta()) / tfc.alpha();
+    }
+
+#endif    
 
     // 2. convert adcvalue[] into q15value[]
     for(int i=0; i<6; i++)
@@ -1537,10 +1553,65 @@ bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::po
         return false;
     }
     
-    pImpl->configdata.amplifiers_get(replyinfo.set, replyinfo.channel, replyinfo.cfg1);
-//    replyinfo.cfg1 = pImpl->configdata.data.set[replyinfo.set].amplifiers[replyinfo.channel].pga308cfg1;    
+    pImpl->configdata.amplifiers_get(replyinfo.set, replyinfo.channel, replyinfo.cfg1); 
     return true;    
 }
+
+
+bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::polling::Message_STRAIN2_AMPLIFIER_GAINOFFSET_GET::ReplyInfo &replyinfo)
+{  
+    if(replyinfo.channel >= 6)
+    {
+        return false;
+    }  
+    
+    if(replyinfo.set >= 3)
+    {   
+        return false;
+    }
+    
+    embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
+    pImpl->configdata.amplifiers_get(replyinfo.set, replyinfo.channel, cfg1); 
+    
+    // now i transform into alpha, beta.
+    embot::hw::PGA308::TransferFunctionConfig tfc;
+    tfc.load(cfg1);  
+    float alpha = tfc.alpha() * 100.0f;     // represent in 0.01 ticks
+    float beta = tfc.beta() * 8;            // move from [0, 8k) into [0, 64k)
+    replyinfo.gain = static_cast<std::uint16_t>(std::floor(alpha));
+    replyinfo.offset = static_cast<std::uint16_t>(std::floor(beta));
+    
+    return true;    
+}
+
+
+bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::polling::Message_STRAIN2_AMPLIFIER_GAINLIMITS_GET::ReplyInfo &replyinfo)
+{  
+    if(replyinfo.channel >= 6)
+    {
+        return false;
+    }  
+    
+    if(replyinfo.set >= 3)
+    {   
+        return false;
+    }
+    
+    embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
+    pImpl->configdata.amplifiers_get(replyinfo.set, replyinfo.channel, cfg1); 
+    
+    // now i retrieve limits of alpha.
+    embot::hw::PGA308::TransferFunctionConfig tfc;
+    tfc.load(cfg1);  
+    float low = tfc.alpha(0) * 100.0f;     
+    float high = tfc.alpha(64*1024-1) * 100.f;  
+    replyinfo.lowestgain = static_cast<std::uint16_t>(std::floor(low));
+    replyinfo.highestgain = static_cast<std::uint16_t>(std::floor(high));
+    
+    return true;    
+}
+
+
 
 
 
@@ -1610,14 +1681,6 @@ bool  embot::app::application::theSTRAIN::resetamplifier(embot::app::canprotocol
         
     }
 
-// setdefault is not really ok because it changes everything, not just the amplifier settings
-//    embot::hw::PGA308::setdefault(static_cast<embot::hw::PGA308::Amplifier>(info.channel));
-    
-//    if(0 == info.set)
-//    {    
-//        #warning TODO: apply to the HW (amplifier reset)
-//    }
-   
     return true;    
 }
 
@@ -1659,12 +1722,6 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::p
         tfc.load(info.cfg1);    
         embot::hw::PGA308::set(static_cast<embot::hw::PGA308::Amplifier>(info.channel), tfc);
     }
-  
-//    if(0 == info.set)
-//    {    
-//        #warning TODO: apply to the HW (amplifier cfg1)
-//    }    
-    
    
     return true;    
 }
@@ -1781,6 +1838,85 @@ bool embot::app::application::theSTRAIN::autocalib(embot::app::canprotocol::anal
    
     return true;    
 }
+
+
+bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::polling::Message_STRAIN2_AMPLIFIER_GAINOFFSET_SET::Info &info, float &alpha, float &beta)
+{ 
+    bool allchannels = false;
+    if(0x0f == info.channel)
+    {
+        // it is ok. we do on every channel
+        allchannels = true;
+    }    
+    else if(info.channel >= 6)
+    {
+        return false;
+    }   
+
+    if(info.set >= 3)
+    {   
+        return false;
+    }
+    
+    
+    if(true == allchannels)
+    {
+        for(std::uint8_t i=0; i<6; i++)
+        {
+            embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
+            pImpl->configdata.amplifiers_get(info.set, i, cfg1);
+        
+            embot::hw::PGA308::TransferFunctionConfig tfc;
+            tfc.load(cfg1);  
+            if(false == tfc.setalpha(static_cast<float>(info.gain)/100.f))
+            {
+                return false;
+            }
+            if(false == tfc.setbeta(static_cast<float>(info.offset)/8.f))
+            {
+                return false;
+            }
+            
+            alpha = tfc.alpha();
+            beta = tfc.beta();
+            
+            embot::hw::PGA308::set(static_cast<embot::hw::PGA308::Amplifier>(i), tfc);   
+
+            tfc.get(cfg1);
+            pImpl->configdata.amplifiers_set(info.set, i, cfg1);                  
+        }        
+    }
+    else
+    {    
+        
+            embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
+            pImpl->configdata.amplifiers_get(info.set, info.channel, cfg1);
+        
+            embot::hw::PGA308::TransferFunctionConfig tfc;
+            tfc.load(cfg1);  
+            if(false == tfc.setalpha(static_cast<float>(info.gain)/100.f))
+            {
+                return false;
+            }
+            if(false == tfc.setbeta(static_cast<float>(info.offset)/8.f))
+            {
+                return false;
+            }
+            
+            alpha = tfc.alpha();
+            beta = tfc.beta();
+            
+            embot::hw::PGA308::set(static_cast<embot::hw::PGA308::Amplifier>(info.channel), tfc);   
+
+            tfc.get(cfg1);
+            pImpl->configdata.amplifiers_set(info.set, info.channel, cfg1);                                       
+        
+    }
+  
+   
+    return true;    
+}
+
 
 
 bool embot::app::application::theSTRAIN::start(embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode &mode)

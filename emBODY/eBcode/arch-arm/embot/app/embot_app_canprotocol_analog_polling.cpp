@@ -85,6 +85,9 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
             (1ULL << static_cast<std::uint8_t>(CMD::STRAIN2_AMPLIFIER_CFG1_SET))    | 
             (1ULL << static_cast<std::uint8_t>(CMD::STRAIN2_AMPLIFIER_CFG1_GET))    |
             (1ULL << static_cast<std::uint8_t>(CMD::STRAIN2_AMPLIFIER_AUTOCALIB))   |
+            (1ULL << static_cast<std::uint8_t>(CMD::STRAIN2_AMPLIFIER_GAINOFFSET_SET))    | 
+            (1ULL << static_cast<std::uint8_t>(CMD::STRAIN2_AMPLIFIER_GAINOFFSET_GET))    |
+            (1ULL << static_cast<std::uint8_t>(CMD::STRAIN2_AMPLIFIER_GAINLIMITS_GET))    |
                 
             (1ULL << static_cast<std::uint8_t>(CMD::IMU_CONFIG_SET))                |
             (1ULL << static_cast<std::uint8_t>(CMD::IMU_CONFIG_GET))                |
@@ -1013,7 +1016,102 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         frame_set_clascmddestinationdata(outframe, Clas::pollingAnalogSensor, static_cast<std::uint8_t>(CMD::STRAIN2_AMPLIFIER_AUTOCALIB), candata.from, dd, datalen);
         frame_set_size(outframe, datalen+1);
         return true;
-    }      
+    }  
+
+
+    bool Message_STRAIN2_AMPLIFIER_GAINOFFSET_SET::load(const embot::hw::can::Frame &inframe)
+    {
+        Message::set(inframe);  
+        
+        if(static_cast<std::uint8_t>(CMD::STRAIN2_AMPLIFIER_GAINOFFSET_SET) != frame2cmd(inframe))
+        {
+            return false; 
+        }
+        
+        info.set = (candata.datainframe[0] & 0xF0) >> 4;
+        info.channel = (candata.datainframe[0] & 0x0F);        
+        info.mode = candata.datainframe[1];
+        // little endian
+        info.gain = static_cast<std::uint16_t>(candata.datainframe[2]) | (static_cast<std::uint16_t>(candata.datainframe[3]) << 8);  
+        // little endian
+        info.offset = static_cast<std::uint16_t>(candata.datainframe[4]) | (static_cast<std::uint16_t>(candata.datainframe[5]) << 8);
+        
+        return true;         
+    }                    
+        
+    bool Message_STRAIN2_AMPLIFIER_GAINOFFSET_SET::reply()
+    {
+        return false;
+    } 
+
+
+
+    bool Message_STRAIN2_AMPLIFIER_GAINOFFSET_GET::load(const embot::hw::can::Frame &inframe)
+    {
+        Message::set(inframe); 
+        
+        if(static_cast<std::uint8_t>(CMD::STRAIN2_AMPLIFIER_GAINOFFSET_GET) != frame2cmd(inframe))
+        {
+            return false; 
+        }
+        
+        info.set = (candata.datainframe[0] & 0xF0) >> 4;
+        info.channel = (candata.datainframe[0] & 0x0F);
+
+        return true;
+    }  
+
+    bool Message_STRAIN2_AMPLIFIER_GAINOFFSET_GET::reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo)
+    {
+        std::uint8_t dd[7] = {0};
+
+        dd[0] = (static_cast<std::uint8_t>(replyinfo.set) << 4) | (replyinfo.channel & 0x0F);                  
+        dd[1] = static_cast<std::uint8_t>(replyinfo.gain & 0xff);               // important note: in here we use little endian order ...
+        dd[2] = static_cast<std::uint8_t>((replyinfo.gain >> 8) & 0xff);        // important note: in here we use little endian order ... 
+        dd[3] = static_cast<std::uint8_t>(replyinfo.offset & 0xff);             // important note: in here we use little endian order ...
+        dd[4] = static_cast<std::uint8_t>((replyinfo.offset >> 8) & 0xff);      // important note: in here we use little endian order ... 
+        
+        std::uint8_t datalen = 5;
+        
+        frame_set_sender(outframe, sender);
+        frame_set_clascmddestinationdata(outframe, Clas::pollingAnalogSensor, static_cast<std::uint8_t>(CMD::STRAIN2_AMPLIFIER_GAINOFFSET_GET), candata.from, dd, datalen);
+        frame_set_size(outframe, datalen+1);
+        return true;
+    }     
+
+
+    bool Message_STRAIN2_AMPLIFIER_GAINLIMITS_GET::load(const embot::hw::can::Frame &inframe)
+    {
+        Message::set(inframe); 
+        
+        if(static_cast<std::uint8_t>(CMD::STRAIN2_AMPLIFIER_GAINLIMITS_GET) != frame2cmd(inframe))
+        {
+            return false; 
+        }
+        
+        info.set = (candata.datainframe[0] & 0xF0) >> 4;
+        info.channel = (candata.datainframe[0] & 0x0F);
+
+        return true;
+    }  
+
+    bool Message_STRAIN2_AMPLIFIER_GAINLIMITS_GET::reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo)
+    {
+        std::uint8_t dd[7] = {0};
+
+        dd[0] = (static_cast<std::uint8_t>(replyinfo.set) << 4) | (replyinfo.channel & 0x0F);                  
+        dd[1] = static_cast<std::uint8_t>(replyinfo.lowestgain & 0xff);                 // important note: in here we use little endian order ...
+        dd[2] = static_cast<std::uint8_t>((replyinfo.lowestgain >> 8) & 0xff);          // important note: in here we use little endian order ... 
+        dd[3] = static_cast<std::uint8_t>(replyinfo.highestgain & 0xff);                // important note: in here we use little endian order ...
+        dd[4] = static_cast<std::uint8_t>((replyinfo.highestgain >> 8) & 0xff);         // important note: in here we use little endian order ... 
+        
+        std::uint8_t datalen = 5;
+        
+        frame_set_sender(outframe, sender);
+        frame_set_clascmddestinationdata(outframe, Clas::pollingAnalogSensor, static_cast<std::uint8_t>(CMD::STRAIN2_AMPLIFIER_GAINLIMITS_GET), candata.from, dd, datalen);
+        frame_set_size(outframe, datalen+1);
+        return true;
+    }     
 
 
     bool Message_IMU_CONFIG_SET::load(const embot::hw::can::Frame &inframe)

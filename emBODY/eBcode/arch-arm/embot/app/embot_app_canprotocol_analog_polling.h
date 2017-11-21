@@ -76,6 +76,10 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         STRAIN2_AMPLIFIER_CFG1_GET = 0x22,              // config of the amplifier transfer function (gains + offsets). 
         STRAIN2_AMPLIFIER_AUTOCALIB = 0x23,             // it starts a calibration procedure for the amplifier(s). 
         
+        STRAIN2_AMPLIFIER_GAINOFFSET_SET = 0x2A,        // simple set of gain and offset in transfer funtion of amplifier. vout = gain*vin + offset
+        STRAIN2_AMPLIFIER_GAINOFFSET_GET = 0x2B,        // simple get of gain and offset in transfer funtion of amplifier. 
+        STRAIN2_AMPLIFIER_GAINLIMITS_GET = 0x2C,        // retrieve the limits of the gain
+        
         // messages used for IMU and TERMOMETER sensors (strain2 + mtb4)
         IMU_CONFIG_SET = 0x24,
         IMU_CONFIG_GET = 0x25,
@@ -904,6 +908,94 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
             
         bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);          
     }; 
+    
+    
+    class Message_STRAIN2_AMPLIFIER_GAINOFFSET_SET : public Message
+    {
+        public:
+                         
+        struct Info
+        {
+            std::uint8_t        set         : 4;
+            std::uint8_t        channel     : 4;    // if 0xf we mean every channel            
+            std::uint8_t        mode;               // if 0: beta is the target offset. if 1 beta is the target output and an autocalib is performed
+            std::uint16_t       gain;               // it is the gain, only positive, where each step is a gaintick of 0.01. a value of 0xffff means default gain.
+            std::uint16_t       offset;             // if offset/target output it is in range [0, 64k). a value of 0xffff means default offset or half scale output
+            Info() : set(0), channel(0), mode(0), gain(0xffff), offset(0xffff) {}
+        };
+        
+        Info info;
+        
+        Message_STRAIN2_AMPLIFIER_GAINOFFSET_SET() {}
+            
+        bool load(const embot::hw::can::Frame &inframe);
+            
+        bool reply();   // none            
+    }; 
+
+    
+    class Message_STRAIN2_AMPLIFIER_GAINOFFSET_GET : public Message
+    {
+        public:
+                       
+        struct Info
+        { 
+            std::uint8_t        set         : 4;
+            std::uint8_t        channel     : 4;    // if 0xf we mean every channel     
+            Info() : set(0), channel(0) {}
+        };
+        
+        struct ReplyInfo
+        {
+            std::uint8_t        set         : 4;
+            std::uint8_t        channel     : 4;            
+            std::uint16_t       gain;         
+            std::uint16_t       offset;
+            ReplyInfo() : set(0), channel(0), gain(0), offset(0) {}
+        };
+        
+        Info info;
+        
+        
+        Message_STRAIN2_AMPLIFIER_GAINOFFSET_GET() {}
+            
+        bool load(const embot::hw::can::Frame &inframe);
+            
+        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
+    }; 
+    
+    class Message_STRAIN2_AMPLIFIER_GAINLIMITS_GET : public Message
+    {
+        public:
+                       
+        struct Info
+        { 
+            std::uint8_t        set         : 4;
+            std::uint8_t        channel     : 4;    // if 0xf we mean every channel     
+            Info() : set(0), channel(0) {}
+        };
+        
+        struct ReplyInfo
+        {
+            std::uint8_t        set         : 4;
+            std::uint8_t        channel     : 4;
+            std::uint16_t       highestgain;    // in ticks = 0.01            
+            std::uint16_t       lowestgain;     // in ticks = 0.01         
+            ReplyInfo() : set(0), channel(0), highestgain(0), lowestgain(0) {}
+        };
+        
+        Info info;
+        
+        
+        Message_STRAIN2_AMPLIFIER_GAINLIMITS_GET() {}
+            
+        bool load(const embot::hw::can::Frame &inframe);
+            
+        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
+    };     
+
+    
+    
     
     enum class imuFusion { enabled = 1, none = 33 }; // later on we can add the types of fusion we want
     
