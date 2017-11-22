@@ -85,13 +85,13 @@ struct embot::app::application::theSTRAIN::Impl
     };
     
     
-    // the old amplifier just had an offset. the 6sg also had two gains.
-    // MAYBE: we should think to reuse these three values to set the whole pga308cfg1 a simpler way for the sake of canloader 
-    struct amplifier0Config_t
-    {   
-        std::uint16_t       offset;             // the offset generated with the dac  
-        std::uint16_t       gain[2];            // the gains used by .... 6sg maybe?                
-    }; 
+//    // the old amplifier just had an offset. the 6sg also had two gains.
+//    // MAYBE: we should think to reuse these three values to set the whole pga308cfg1 a simpler way for the sake of canloader 
+//    struct amplifier0Config_t
+//    {   
+//        std::uint16_t       offset;             // the offset generated with the dac  
+//        std::uint16_t       gain[2];            // the gains used by .... 6sg maybe?                
+//    }; 
 
     
     // the matrix transformation which is done after adc acquisition    
@@ -113,7 +113,7 @@ struct embot::app::application::theSTRAIN::Impl
     struct setOfConfig_t
     {
         transformerConfig_t     transformer;            // the config of the transformer from dacs to torqueforce array
-        amplifier0Config_t      amplifiers0[6];         // the OLD config of the amplifiers from strain gauge to values given to dacs 
+//        amplifier0Config_t      amplifiers0[6];         // the OLD config of the amplifiers from strain gauge to values given to dacs 
         amplifierConfig_t       amplifiers[6];          // the NEW config of the amplifiers from strain gauge to values given to dacs          
     };
     
@@ -370,9 +370,9 @@ struct embot::app::application::theSTRAIN::Impl
                 
                 for(int chn=0; chn<6; chn++)
                 {
-                    // amplifier0
-                    amplifier0_offset_set(s, chn, 0);
-                    amplifier0_gains_set(s, chn, 1, 1);
+//                    // amplifier0
+//                    amplifier0_offset_set(s, chn, 0);
+//                    amplifier0_gains_set(s, chn, 1, 1);
                     // amplifier
                     amplifiers_reset(s, chn);
                 }
@@ -413,47 +413,47 @@ struct embot::app::application::theSTRAIN::Impl
             }
         }        
         
-        void amplifier0_offset_set(std::uint8_t set, std::uint8_t channel, std::uint16_t value)
-        {
-            if((set < numOfSets) && (channel < 6))
-            {
-                data.set[set].amplifiers0[channel].offset = value;
-                synched = false;
-            }
-        }
-        
-        std::uint16_t amplifier0_offset_get(std::uint8_t set, std::uint8_t channel)
-        {
-            std::uint16_t value = 0;
-            if((set < numOfSets) && (channel < 6))
-            {
-                value = data.set[set].amplifiers0[channel].offset;                
-            }
-            
-            return value;
-        }
-        
-        void amplifier0_gains_set(std::uint8_t set, std::uint8_t channel, std::uint16_t g0, std::uint16_t g1)
-        {
-            if((set < numOfSets) && (channel < 6))
-            {
-                data.set[set].amplifiers0[channel].gain[0] = g0;
-                data.set[set].amplifiers0[channel].gain[1] = g1;
-                synched = false;
-            }            
-        }
-        
-        bool amplifier0_gains_get(std::uint8_t set, std::uint8_t channel, std::uint16_t &g0, std::uint16_t &g1)
-        {
-            bool ret = false;
-            if((set < numOfSets) && (channel < 6))
-            {
-                g0 = data.set[set].amplifiers0[channel].gain[0];
-                g0 = data.set[set].amplifiers0[channel].gain[1];
-                ret =  true;
-            }  
-            return ret;            
-        }
+//        void amplifier0_offset_set(std::uint8_t set, std::uint8_t channel, std::uint16_t value)
+//        {
+//            if((set < numOfSets) && (channel < 6))
+//            {
+//                data.set[set].amplifiers0[channel].offset = value;
+//                synched = false;
+//            }
+//        }
+//        
+//        std::uint16_t amplifier0_offset_get(std::uint8_t set, std::uint8_t channel)
+//        {
+//            std::uint16_t value = 0;
+//            if((set < numOfSets) && (channel < 6))
+//            {
+//                value = data.set[set].amplifiers0[channel].offset;                
+//            }
+//            
+//            return value;
+//        }
+//        
+//        void amplifier0_gains_set(std::uint8_t set, std::uint8_t channel, std::uint16_t g0, std::uint16_t g1)
+//        {
+//            if((set < numOfSets) && (channel < 6))
+//            {
+//                data.set[set].amplifiers0[channel].gain[0] = g0;
+//                data.set[set].amplifiers0[channel].gain[1] = g1;
+//                synched = false;
+//            }            
+//        }
+//        
+//        bool amplifier0_gains_get(std::uint8_t set, std::uint8_t channel, std::uint16_t &g0, std::uint16_t &g1)
+//        {
+//            bool ret = false;
+//            if((set < numOfSets) && (channel < 6))
+//            {
+//                g0 = data.set[set].amplifiers0[channel].gain[0];
+//                g0 = data.set[set].amplifiers0[channel].gain[1];
+//                ret =  true;
+//            }  
+//            return ret;            
+//        }
         
     };
     
@@ -907,7 +907,7 @@ bool embot::app::application::theSTRAIN::Impl::acquisition_retrieve()
     
 #if 0
 
-    // compute the input before amplification. it should be more or less stable irrespectively if alpah and beta values ...
+    // compute the input before amplification. it should be more or less stable irrespectively if alpha and beta values ...
     static float vinput[6] = {0.0f};
     
     for(int j=0; j<6; j++)
@@ -1296,9 +1296,19 @@ bool embot::app::application::theSTRAIN::get_offset(std::uint8_t channel, std::u
         return false;
     }
     
-    const std::uint8_t set = 0;
+    const std::uint8_t set = 0;   
+
+    // it was: value = pImpl->configdata.amplifier0_offset_get(set, channel);
     
-    value = pImpl->configdata.amplifier0_offset_get(set, channel);
+    // it returns the beta   
+    embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
+    pImpl->configdata.amplifiers_get(set, channel, cfg1); 
+    
+    // now i retrieve beta.
+    embot::hw::PGA308::TransferFunctionConfig tfc;
+    tfc.load(cfg1);  
+    float beta = tfc.beta() * 8;            // move from [0, 8k) into [0, 64k)
+    value = static_cast<std::uint16_t>(std::floor(beta));
     
     return true;    
 }
@@ -1335,8 +1345,25 @@ bool embot::app::application::theSTRAIN::configure(embot::app::canprotocol::anal
    
     // original strain code saves the value in ram only. it is saved in eeprom only when the message save2eeprom arrives  
     const std::uint8_t set = 0;    
-    pImpl->configdata.amplifier0_offset_set(set, info.channel, info.offset);
+        
+    // it was: pImpl->configdata.amplifier0_offset_set(set, info.channel, info.offset);
+    
+    // i assign a beta ....
+    
+    embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
+    pImpl->configdata.amplifiers_get(set, info.channel, cfg1);
 
+    embot::hw::PGA308::TransferFunctionConfig tfc;
+    tfc.load(cfg1);  
+
+    if(true == tfc.setbeta(static_cast<float>(info.offset)/8.f))
+    {
+        embot::hw::PGA308::set(static_cast<embot::hw::PGA308::Amplifier>(info.channel), tfc);   
+
+        tfc.get(cfg1);
+        pImpl->configdata.amplifiers_set(set, info.channel, cfg1);                
+    }
+            
     return true;    
 }
 
@@ -1536,7 +1563,17 @@ bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::po
     }   
 
     const std::uint8_t set = 0;
-    pImpl->configdata.amplifier0_gains_get(set, replyinfo.channel, replyinfo.gain0, replyinfo.gain1);    
+    // it was: pImpl->configdata.amplifier0_gains_get(set, replyinfo.channel, replyinfo.gain0, replyinfo.gain1);    
+    // but now we retrieve alpha:
+    
+    embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
+    pImpl->configdata.amplifiers_get(set, replyinfo.channel, cfg1); 
+
+    embot::hw::PGA308::TransferFunctionConfig tfc;
+    tfc.load(cfg1);  
+    float alpha = tfc.alpha() * 100.0f;     // represent in 0.01 ticks
+    replyinfo.gain0 = static_cast<std::uint16_t>(std::floor(alpha));
+    replyinfo.gain1 = 1;    
     
     return true;    
 }
@@ -1573,7 +1610,7 @@ bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::po
     embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
     pImpl->configdata.amplifiers_get(replyinfo.set, replyinfo.channel, cfg1); 
     
-    // now i transform into alpha, beta.
+    // now i retrieve alpha and beta
     embot::hw::PGA308::TransferFunctionConfig tfc;
     tfc.load(cfg1);  
     float alpha = tfc.alpha() * 100.0f;     // represent in 0.01 ticks
@@ -1623,8 +1660,21 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::p
     }     
 
     const std::uint8_t set = 0;
-    pImpl->configdata.amplifier0_gains_set(set, info.channel, info.gain0, info.gain1);
-   
+    // it was: pImpl->configdata.amplifier0_gains_set(set, info.channel, info.gain0, info.gain1);
+    // but now we impose alpha:
+    
+    embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
+    pImpl->configdata.amplifiers_get(set, info.channel, cfg1);
+
+    embot::hw::PGA308::TransferFunctionConfig tfc;
+    tfc.load(cfg1);  
+    if(true == tfc.setalpha(static_cast<float>(info.gain0)/100.f))
+    {
+        embot::hw::PGA308::set(static_cast<embot::hw::PGA308::Amplifier>(info.channel), tfc);   
+        tfc.get(cfg1);
+        pImpl->configdata.amplifiers_set(set, info.channel, cfg1);           
+    }
+              
     return true;    
 }
 
