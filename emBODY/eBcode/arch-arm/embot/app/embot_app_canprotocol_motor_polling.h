@@ -46,9 +46,9 @@ namespace embot { namespace app { namespace canprotocol { namespace motor { name
     //   note that in class analog polling we also support a SET_BOARD_ADX of the same value (0x32) only because there is a
     //   ICUBCANPROTO_POL_AS_CMD__GET_FW_VERSION. it would have been much better having a single command in class bootloader. 
     //   well: i added a canprotocol::bootloader::CMD::SETCANADDRESS as well.
-    // - command ICUBCANPROTO_POL_MC_CMD__GET_FIRMWARE_VERSION (91) is suppurted as well its (sic!) dual command in analog polling
+    // - command ICUBCANPROTO_POL_MC_CMD__GET_FIRMWARE_VERSION (91) is supported as well its (sic!) dual command in analog polling
     //   class ICUBCANPROTO_POL_AS_CMD__GET_FW_VERSION (0x1c = 28). even in this case a single command in class bootloader would have been
-    //   a better choice. in this case i dod not implement it.   
+    //   a better choice. in this case i did not implement it.   
     
     // some utilities
     bool supported(std::uint8_t cmd);        
