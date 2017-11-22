@@ -847,7 +847,7 @@ static eObool_t s_eo_isFirmwareVersionCompatible(const eObrd_firmwareversion_t* 
 
 static eObool_t s_eo_isProtocolVersionCompatible(const eObrd_protocolversion_t* target, const eObrd_protocolversion_t* detected)
 {
-    if((detected->major != target->major) || (detected->minor < target->minor))    
+    if((detected->major != target->major) || (detected->minor != target->minor))    
     {
         return(eobool_false);
     }
