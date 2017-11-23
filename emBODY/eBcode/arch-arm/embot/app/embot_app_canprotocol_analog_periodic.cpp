@@ -59,7 +59,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
                                                     (1 << static_cast<std::uint8_t>(CMD::UNCALIBTORQUE_VECTOR_DEBUGMODE))   |   
                                                     (1 << static_cast<std::uint8_t>(CMD::FORCE_VECTOR))                     |
                                                     (1 << static_cast<std::uint8_t>(CMD::TORQUE_VECTOR))                    |
-                                                    (1 << static_cast<std::uint8_t>(CMD::TERMOMETER_MEASURE));
+                                                    (1 << static_cast<std::uint8_t>(CMD::THERMOMETER_MEASURE));
 
         if(cmd > 15)
         {

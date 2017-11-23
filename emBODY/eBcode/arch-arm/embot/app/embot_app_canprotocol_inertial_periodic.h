@@ -33,7 +33,8 @@ namespace embot { namespace app { namespace canprotocol { namespace inertial { n
         none = 0xfe, 
         
         DIGITAL_GYROSCOPE = 0, DIGITAL_ACCELEROMETER = 1,
-        IMU_TRIPLE = 2, IMU_QUATERNION = 3, IMU_STATUS = 4
+        // NEW messages:
+        IMU_TRIPLE = 3, IMU_QUATERNION = 4, IMU_STATUS = 5
     };
     
     // NOTES

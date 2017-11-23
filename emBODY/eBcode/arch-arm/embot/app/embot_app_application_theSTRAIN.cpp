@@ -1554,31 +1554,7 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::p
 }
 
 
-bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::polling::Message_GET_AMP_GAIN::ReplyInfo &replyinfo)
-{  
-    if(replyinfo.channel >= 6)
-    {
-        replyinfo.gain0 = replyinfo.gain1 = 0;
-        return false;
-    }   
-
-    const std::uint8_t set = 0;
-    // it was: pImpl->configdata.amplifier0_gains_get(set, replyinfo.channel, replyinfo.gain0, replyinfo.gain1);    
-    // but now we retrieve alpha:
-    
-    embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
-    pImpl->configdata.amplifiers_get(set, replyinfo.channel, cfg1); 
-
-    embot::hw::PGA308::TransferFunctionConfig tfc;
-    tfc.load(cfg1);  
-    float alpha = tfc.alpha() * 100.0f;     // represent in 0.01 ticks
-    replyinfo.gain0 = static_cast<std::uint16_t>(std::floor(alpha));
-    replyinfo.gain1 = 1;    
-    
-    return true;    
-}
-
-bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::polling::Message_STRAIN2_AMPLIFIER_CFG1_GET::ReplyInfo &replyinfo)
+bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::polling::Message_AMPLIFIER_PGA308_CFG1_GET::ReplyInfo &replyinfo)
 {  
     if(replyinfo.channel >= 6)
     {
@@ -1595,7 +1571,7 @@ bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::po
 }
 
 
-bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::polling::Message_STRAIN2_AMPLIFIER_GAINOFFSET_GET::ReplyInfo &replyinfo)
+bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::polling::Message_AMPLIFIER_GAINOFFSET_GET::ReplyInfo &replyinfo)
 {  
     if(replyinfo.channel >= 6)
     {
@@ -1622,7 +1598,7 @@ bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::po
 }
 
 
-bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::polling::Message_STRAIN2_AMPLIFIER_GAINLIMITS_GET::ReplyInfo &replyinfo)
+bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::polling::Message_AMPLIFIER_RANGE_OF_GAIN_GET::ReplyInfo &replyinfo)
 {  
     if(replyinfo.channel >= 6)
     {
@@ -1642,44 +1618,41 @@ bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::po
     tfc.load(cfg1);  
     float low = tfc.alpha(0) * 100.0f;     
     float high = tfc.alpha(64*1024-1) * 100.f;  
-    replyinfo.lowestgain = static_cast<std::uint16_t>(std::floor(low));
-    replyinfo.highestgain = static_cast<std::uint16_t>(std::floor(high));
+    replyinfo.lowest = static_cast<std::uint16_t>(std::floor(low));
+    replyinfo.highest = static_cast<std::uint16_t>(std::floor(high));
     
     return true;    
 }
 
 
-
-
-
-bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::polling::Message_SET_AMP_GAIN::Info &info)
-{ 
-    if(info.channel >= 6)
+bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::polling::Message_AMPLIFIER_RANGE_OF_OFFSET_GET::ReplyInfo &replyinfo)
+{  
+    if(replyinfo.channel >= 6)
     {
         return false;
-    }     
-
-    const std::uint8_t set = 0;
-    // it was: pImpl->configdata.amplifier0_gains_set(set, info.channel, info.gain0, info.gain1);
-    // but now we impose alpha:
+    }  
     
-    embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
-    pImpl->configdata.amplifiers_get(set, info.channel, cfg1);
-
-    embot::hw::PGA308::TransferFunctionConfig tfc;
-    tfc.load(cfg1);  
-    if(true == tfc.setalpha(static_cast<float>(info.gain0)/100.f))
-    {
-        embot::hw::PGA308::set(static_cast<embot::hw::PGA308::Amplifier>(info.channel), tfc);   
-        tfc.get(cfg1);
-        pImpl->configdata.amplifiers_set(set, info.channel, cfg1);           
+    if(replyinfo.set >= 3)
+    {   
+        return false;
     }
-              
+    
+//    embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
+//    pImpl->configdata.amplifiers_get(replyinfo.set, replyinfo.channel, cfg1); 
+//     
+//    // now i retrieve limits of beta.
+//    embot::hw::PGA308::TransferFunctionConfig tfc;
+//    tfc.load(cfg1);  
+//    float low = tfc.alpha(0) * 100.0f;     
+//    float high = tfc.alpha(64*1024-1) * 100.f;  
+    replyinfo.lowest = 0;
+    replyinfo.highest = 0xffff;
+    
     return true;    
 }
 
 
-bool  embot::app::application::theSTRAIN::resetamplifier(embot::app::canprotocol::analog::polling::Message_STRAIN2_AMPLIFIER_RESET::Info &info)
+bool  embot::app::application::theSTRAIN::resetamplifier(embot::app::canprotocol::analog::polling::Message_AMPLIFIER_RESET::Info &info)
 { 
     bool allchannels = false;
     if(0x0f == info.channel)
@@ -1734,7 +1707,7 @@ bool  embot::app::application::theSTRAIN::resetamplifier(embot::app::canprotocol
     return true;    
 }
 
-bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::polling::Message_STRAIN2_AMPLIFIER_CFG1_SET::Info &info)
+bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::polling::Message_AMPLIFIER_PGA308_CFG1_SET::Info &info)
 { 
     bool allchannels = false;
     if(0x0f == info.channel)
@@ -1777,7 +1750,7 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::p
 }
 
 
-bool embot::app::application::theSTRAIN::autocalib(embot::app::canprotocol::analog::polling::Message_STRAIN2_AMPLIFIER_AUTOCALIB::Info &info, std::uint8_t &okmask, std::uint32_t &mae)
+bool embot::app::application::theSTRAIN::autocalib(embot::app::canprotocol::analog::polling::Message_AMPLIFIER_OFFSET_AUTOCALIB::Info &info, std::uint8_t &okmask, std::uint32_t &mae)
 {
     std::uint8_t channelmask = 0;
     if(0x0f == info.channel)
@@ -1800,10 +1773,14 @@ bool embot::app::application::theSTRAIN::autocalib(embot::app::canprotocol::anal
     }
     
 
-    // acquire for some times to acquire the measure
-    const std::uint8_t Ntimes = 2;
+    // acquire for some times to get the measure
+    std::uint8_t Nsamples = info.samples2average;
+    if(0 == Nsamples)
+    {
+        Nsamples = 4;
+    }
     std::uint32_t measure[6] = {0};
-    for(std::uint8_t a=0; a<Ntimes; a++)
+    for(std::uint8_t a=0; a<Nsamples; a++)
     {
         // it acquire once. it also restarts if required.        
         pImpl->acquisition_oneshot();
@@ -1816,9 +1793,9 @@ bool embot::app::application::theSTRAIN::autocalib(embot::app::canprotocol::anal
 
     for(std::uint8_t c=0; c<6; c++)
     {
-        if(Ntimes > 0)
+        if(Nsamples > 0)
         {
-            measure[c] /= Ntimes;
+            measure[c] /= Nsamples;
         }
     }
     
@@ -1849,7 +1826,7 @@ bool embot::app::application::theSTRAIN::autocalib(embot::app::canprotocol::anal
     
     // perform measure again to compute the error
     std::memset(measure, 0, sizeof(measure));
-    for(std::uint8_t a=0; a<Ntimes; a++)
+    for(std::uint8_t a=0; a<Nsamples; a++)
     {
         // it acquire once. it also restarts if required.        
         pImpl->acquisition_oneshot();
@@ -1862,9 +1839,9 @@ bool embot::app::application::theSTRAIN::autocalib(embot::app::canprotocol::anal
 
     for(std::uint8_t c=0; c<6; c++)
     {
-        if(Ntimes > 0)
+        if(Nsamples > 0)
         {
-            measure[c] /= Ntimes;
+            measure[c] /= Nsamples;
         }
         if(true == embot::binary::bit::check(channelmask, c))
         {
@@ -1890,7 +1867,7 @@ bool embot::app::application::theSTRAIN::autocalib(embot::app::canprotocol::anal
 }
 
 
-bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::polling::Message_STRAIN2_AMPLIFIER_GAINOFFSET_SET::Info &info, float &alpha, float &beta)
+bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::polling::Message_AMPLIFIER_GAINOFFSET_SET::Info &info, float &alpha, float &beta)
 { 
     bool allchannels = false;
     if(0x0f == info.channel)

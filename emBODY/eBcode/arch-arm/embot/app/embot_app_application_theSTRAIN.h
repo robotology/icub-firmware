@@ -67,10 +67,9 @@ namespace embot { namespace app { namespace application {
         bool set(embot::app::canprotocol::analog::polling::Message_SET_MATRIX_G::Info &info);
         bool set(embot::app::canprotocol::analog::polling::Message_SET_CALIB_TARE::Info &info);
         bool set(embot::app::canprotocol::analog::polling::Message_SET_CURR_TARE::Info &info);
-        bool set(embot::app::canprotocol::analog::polling::Message_SET_AMP_GAIN::Info &info);
-        bool resetamplifier(embot::app::canprotocol::analog::polling::Message_STRAIN2_AMPLIFIER_RESET::Info &info);
-        bool set(embot::app::canprotocol::analog::polling::Message_STRAIN2_AMPLIFIER_CFG1_SET::Info &info);
-        bool set(embot::app::canprotocol::analog::polling::Message_STRAIN2_AMPLIFIER_GAINOFFSET_SET::Info &info, float &alpha, float &beta);
+        bool resetamplifier(embot::app::canprotocol::analog::polling::Message_AMPLIFIER_RESET::Info &info);
+        bool set(embot::app::canprotocol::analog::polling::Message_AMPLIFIER_PGA308_CFG1_SET::Info &info);
+        bool set(embot::app::canprotocol::analog::polling::Message_AMPLIFIER_GAINOFFSET_SET::Info &info, float &alpha, float &beta);
         
         bool save2eeprom();
         
@@ -83,12 +82,12 @@ namespace embot { namespace app { namespace application {
         bool get(embot::app::canprotocol::analog::polling::Message_GET_MATRIX_G::ReplyInfo &replyinfo);
         bool get(embot::app::canprotocol::analog::polling::Message_GET_CALIB_TARE::ReplyInfo &replyinfo);
         bool get(embot::app::canprotocol::analog::polling::Message_GET_CURR_TARE::ReplyInfo &replyinfo);
-        bool get(embot::app::canprotocol::analog::polling::Message_GET_AMP_GAIN::ReplyInfo &replyinfo);
-        bool get(embot::app::canprotocol::analog::polling::Message_STRAIN2_AMPLIFIER_CFG1_GET::ReplyInfo &replyinfo);
-        bool get(embot::app::canprotocol::analog::polling::Message_STRAIN2_AMPLIFIER_GAINOFFSET_GET::ReplyInfo &replyinfo);
-        bool get(embot::app::canprotocol::analog::polling::Message_STRAIN2_AMPLIFIER_GAINLIMITS_GET::ReplyInfo &replyinfo);
+        bool get(embot::app::canprotocol::analog::polling::Message_AMPLIFIER_PGA308_CFG1_GET::ReplyInfo &replyinfo);
+        bool get(embot::app::canprotocol::analog::polling::Message_AMPLIFIER_GAINOFFSET_GET::ReplyInfo &replyinfo);
+        bool get(embot::app::canprotocol::analog::polling::Message_AMPLIFIER_RANGE_OF_GAIN_GET::ReplyInfo &replyinfo);
+        bool get(embot::app::canprotocol::analog::polling::Message_AMPLIFIER_RANGE_OF_OFFSET_GET::ReplyInfo &replyinfo);
         
-        bool autocalib(embot::app::canprotocol::analog::polling::Message_STRAIN2_AMPLIFIER_AUTOCALIB::Info &info, std::uint8_t &okmask, std::uint32_t &mae);
+        bool autocalib(embot::app::canprotocol::analog::polling::Message_AMPLIFIER_OFFSET_AUTOCALIB::Info &info, std::uint8_t &okmask, std::uint32_t &mae);
         
         bool start(embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode &mode);
         bool stop();        

@@ -33,7 +33,8 @@ namespace embot { namespace app { namespace canprotocol { namespace bootloader {
         none = 0xfe, 
         
         BOARD = 0x00, ADDRESS = 0x01, START = 0x02, DATA = 0x03, END = 0x04, 
-        GET_ADDITIONAL_INFO = 12, SET_ADDITIONAL_INFO = 13, SETCANADDRESS = 0x32,         
+        GET_ADDITIONAL_INFO = 0x0C, SET_ADDITIONAL_INFO = 0x0D, 
+        SETCANADDRESS = 0x32,       // NEW message         
         BROADCAST = 0xff        
     };
 

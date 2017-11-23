@@ -34,16 +34,14 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         none = 0xfe, 
         
         SET_MATRIX_RC = 0x03,                           // used by canloader to configure strain
-        SET_CH_DAC = 0x04,                              // used by canloader to configure strain
+        SET_CH_DAC = 0x04,                              // used by canloader to configure strain. in strain2 it manages beta (see AMPLIFIER_GAINOFFSET_SET)
         SET_TXMODE = 0x07,                              // used to start tx of data for mtb or strain
         SET_CANDATARATE = 0x08,                         // used to configure strain or mais tx rate
         SAVE2EE = 0x09,                                 // used by canloader to configure strain
         GET_MATRIX_RC = 0x0A,                           // used by canloader to configure strain
-        GET_CH_DAC = 0x0B,                              // used by canloader to configure strain
-        GET_CH_ADC = 0x0C,                              // used by canloader to configure strain
-        
-              
-
+        GET_CH_DAC = 0x0B,                              // used by canloader to configure strain. in strain2 it manages beta (see AMPLIFIER_GAINOFFSET_GET)
+        GET_CH_ADC = 0x0C,                              // used by canloader to configure strain. 
+                      
         SET_MATRIX_G = 0x11,                            // used by canloader to configure strain
         GET_MATRIX_G = 0x12,                            // used by canloader to configure strain                                                                                                      
         SET_CALIB_TARE = 0x13,                          // used by canloader to configure strain
@@ -55,39 +53,51 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         SET_SERIAL_NO = 0x19,                           // used by canloader to configure strain
         GET_SERIAL_NO = 0x1A,                           // used by canloader for strain
         GET_EEPROM_STATUS = 0x1B,                       // used by canloader to configure strain
-        GET_FIRMWARE_VERSION = 0x1C,                    // basic management.
-        GET_AMP_GAIN = 0x1D,                            // used by canloader to configure 6sg 
-        SET_AMP_GAIN = 0x1E,                            // used by canloader to configure 6sg
+        GET_FIRMWARE_VERSION = 0x1C,                    // basic management.        
 
-        SET_BOARD_ADX = 0x32,                           // basic management
-        
-        
-        
-        SKIN_OBSOLETE_TACT_SETUP = 76, // 0x4C
+        // NEW messages used for a generic AMPLIFIER with a linear transfer function: Vout = gain * Vin + offset. range of Vout is [0, 64k) 
+        // these messages are used by strain2 (but not by strain)
+        AMPLIFIER_RESET = 0x1D,                         // reset the amplifier (transfer function + others) to default factory values. 
+        AMPLIFIER_RANGE_OF_GAIN_GET = 0x1E,             // retrieve the allowed limits of the gain 
+        AMPLIFIER_RANGE_OF_OFFSET_GET = 0x1F,           // retrieve the allowed limits of the offset        
+        AMPLIFIER_GAINOFFSET_GET = 0x20,                // get of both gain and offset.   
+        AMPLIFIER_GAINOFFSET_SET = 0x21,                // set of both gain and offset.  we cannot set them one by one because in PGA308 the offset depends on the gain 
+        AMPLIFIER_OFFSET_AUTOCALIB = 0x22,              // it imposes the value of offset (but not of gain) which produces Vout = Vtarget.
 
-        SKIN_SET_BRD_CFG = 77,                          // 0x4D used to configure the skin data in mtb + its tx rate
-        ACC_GYRO_SETUP = 79,                            // 0x4F used to configure the inertial data in mtb + its tx rate
-        SKIN_SET_TRIANG_CFG = 80,                       // 0x50 used to configure the skin data in mtb  
+        // RESERVED: { 0x23, 0x24, 0x25, 0x26, 0x27, 0x28, 0x29 } for possible new generic commands for the amplifier
+        
+        // NEW messages used for managing a specific AMPLIFIER. This is the PGA308 used by the strain2 
+        AMPLIFIER_PGA308_CFG1_GET = 0x2A,               // of registers of the pg3308 registers managing the amplifier transfer function (gains + offsets).    
+        AMPLIFIER_PGA308_CFG1_SET = 0x2B,               // of registers of the pg3308 registers managing the amplifier transfer function (gains + offsets). 
+
+        // RESERVED: {0x2C, 0x2D, 0x2E, 0x2F, 0x30, 0x31} for possible new commands specific for extra config of PGA308 or for any new amplifier
+
+
+        // basic management for all analog-sensor boards
+        SET_BOARD_ADX = 0x32,                      
         
         
-        // messages used for strain2: 
-        STRAIN2_AMPLIFIER_RESET = 0x20,                 // reset the amplifier (transfer function + others) to default factory values. 
-        STRAIN2_AMPLIFIER_CFG1_SET = 0x21,              // config of the amplifier transfer function (gains + offsets). 
-        STRAIN2_AMPLIFIER_CFG1_GET = 0x22,              // config of the amplifier transfer function (gains + offsets). 
-        STRAIN2_AMPLIFIER_AUTOCALIB = 0x23,             // it starts a calibration procedure for the amplifier(s). 
+        // NEW messages used for IMU and THERMOMETER sensors (strain2 + mtb4)
+        IMU_CONFIG_GET = 0x33,
+        IMU_CONFIG_SET = 0x34,
+        IMU_TRANSMIT = 0x35,
+        // RESERVED: { 0x36, 0x37 } for possible new IMU commands
         
-        STRAIN2_AMPLIFIER_GAINOFFSET_SET = 0x2A,        // simple set of gain and offset in transfer funtion of amplifier. vout = gain*vin + offset
-        STRAIN2_AMPLIFIER_GAINOFFSET_GET = 0x2B,        // simple get of gain and offset in transfer funtion of amplifier. 
-        STRAIN2_AMPLIFIER_GAINLIMITS_GET = 0x2C,        // retrieve the limits of the gain
+        // NEW messages used for THERMOMETER sensors (strain2 + mtb4)
+        THERMOMETER_CONFIG_GET = 0x38,
+        THERMOMETER_CONFIG_SET = 0x39,
+        THERMOMETER_TRANSMIT = 0x3A,        
+        // RESERVED: { 0x3B, 0x3C } for possible new THERMOMETER commands
         
-        // messages used for IMU and TERMOMETER sensors (strain2 + mtb4)
-        IMU_CONFIG_SET = 0x24,
-        IMU_CONFIG_GET = 0x25,
-        IMU_TRANSMIT = 0x26,
+        // HOLE: [0x3D, ... , 0x4B]. there are 15 free values ...
         
-        TERMOMETER_CONFIG_SET = 0x27,
-        TERMOMETER_CONFIG_GET = 0x28,
-        TERMOMETER_TRANSMIT = 0x29        
+        // skin messages + legacy acc-gyro messages
+        SKIN_OBSOLETE_TACT_SETUP = 0x4C,                  // 0x4C obsolete, but we support it in a basic form
+        SKIN_SET_BRD_CFG = 0x4D,                          // 0x4D used to configure the skin data in mtb + its tx rate
+        ACC_GYRO_SETUP = 0x4F,                            // 0x4F used to configure the inertial data in mtb + its tx rate
+        SKIN_SET_TRIANG_CFG = 0x50                        // 0x50 used to configure the skin data in mtb
+
+        // HOLE: [0x51, ... , 0xFD]. there are 173 free values.
     };
     
     
@@ -315,57 +325,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
     };  
     
-    
-    class Message_GET_AMP_GAIN : public Message
-    {
-        public:
-                                    
-        struct Info
-        { 
-            std::uint8_t  channel;           
-            Info() : channel(0) {}
-        };
-        
-        struct ReplyInfo
-        {
-            std::uint8_t        channel;
-            std::uint16_t       gain0;
-            std::uint16_t       gain1;
-            ReplyInfo() : channel(0), gain0(0), gain1(0) {}          
-        };        
-        
-        Info info;
-        
-        Message_GET_AMP_GAIN() {}
-            
-        bool load(const embot::hw::can::Frame &inframe);
-            
-        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
-    };  
-
-    class Message_SET_AMP_GAIN : public Message
-    {
-        public:
-                        
-            
-        struct Info
-        { 
-            std::uint8_t        channel;
-            std::uint16_t       gain0;
-            std::uint16_t       gain1;           
-            Info() : channel(0), gain0(0), gain1(0) {}
-        };
-        
-        Info info;
-        
-        Message_SET_AMP_GAIN() {}
-            
-        bool load(const embot::hw::can::Frame &inframe);
-            
-        bool reply();   // none
-            
-    }; 
-    
+       
     class Message_GET_CH_DAC : public Message
     {
         public:
@@ -802,7 +762,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         PGA308cfg1() : GD(0), GI(0), S(0), GO(0), Voffsetcoarse(0), Vzerodac(0) {}
     };  
 
-    class Message_STRAIN2_AMPLIFIER_RESET : public Message
+    class Message_AMPLIFIER_RESET : public Message
     {
         public:
                          
@@ -815,14 +775,14 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
         Info info;
         
-        Message_STRAIN2_AMPLIFIER_RESET() {}
+        Message_AMPLIFIER_RESET() {}
             
         bool load(const embot::hw::can::Frame &inframe);
             
         bool reply();   // none            
     };     
     
-    class Message_STRAIN2_AMPLIFIER_CFG1_SET : public Message
+    class Message_AMPLIFIER_PGA308_CFG1_SET : public Message
     {
         public:
                          
@@ -836,7 +796,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
         Info info;
         
-        Message_STRAIN2_AMPLIFIER_CFG1_SET() {}
+        Message_AMPLIFIER_PGA308_CFG1_SET() {}
             
         bool load(const embot::hw::can::Frame &inframe);
             
@@ -844,7 +804,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
     }; 
 
     
-    class Message_STRAIN2_AMPLIFIER_CFG1_GET : public Message
+    class Message_AMPLIFIER_PGA308_CFG1_GET : public Message
     {
         public:
                        
@@ -867,7 +827,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         Info info;
         
         
-        Message_STRAIN2_AMPLIFIER_CFG1_GET() {}
+        Message_AMPLIFIER_PGA308_CFG1_GET() {}
             
         bool load(const embot::hw::can::Frame &inframe);
             
@@ -876,17 +836,21 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
     
     
     
-    class Message_STRAIN2_AMPLIFIER_AUTOCALIB : public Message
+    class Message_AMPLIFIER_OFFSET_AUTOCALIB : public Message
     {
         public:
+            
+        enum class Mode { oneshot = 0 };
             
         struct Info
         { 
             std::uint8_t        set         : 4;
             std::uint8_t        channel     : 4;    // if 0xf we mean every channel
+            Mode                mode;               // it contains the way the autocalib behaves. so far it is only: oneshot
             std::uint16_t       target;             // in range [0, 64k). half scale if 32k    
-            std::uint16_t       tolerance;          // it must be abs(measure - target) < tolerance            
-            Info() : set(0), channel(0xf), target(32*1024), tolerance(100) {}
+            std::uint16_t       tolerance;          // it must be abs(measure - target) < tolerance
+            std::uint8_t        samples2average;    // it specifies how many adc sample to read for getting the average value. if 0 a default is used.            
+            Info() : set(0), channel(0xf), mode(Mode::oneshot), target(32*1024), tolerance(100), samples2average(0) {}
         };
         
         struct ReplyInfo
@@ -902,7 +866,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
         Info info;
         
-        Message_STRAIN2_AMPLIFIER_AUTOCALIB() {}
+        Message_AMPLIFIER_OFFSET_AUTOCALIB() {}
             
         bool load(const embot::hw::can::Frame &inframe);
             
@@ -910,7 +874,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
     }; 
     
     
-    class Message_STRAIN2_AMPLIFIER_GAINOFFSET_SET : public Message
+    class Message_AMPLIFIER_GAINOFFSET_SET : public Message
     {
         public:
                          
@@ -926,7 +890,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
         Info info;
         
-        Message_STRAIN2_AMPLIFIER_GAINOFFSET_SET() {}
+        Message_AMPLIFIER_GAINOFFSET_SET() {}
             
         bool load(const embot::hw::can::Frame &inframe);
             
@@ -934,7 +898,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
     }; 
 
     
-    class Message_STRAIN2_AMPLIFIER_GAINOFFSET_GET : public Message
+    class Message_AMPLIFIER_GAINOFFSET_GET : public Message
     {
         public:
                        
@@ -957,14 +921,14 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         Info info;
         
         
-        Message_STRAIN2_AMPLIFIER_GAINOFFSET_GET() {}
+        Message_AMPLIFIER_GAINOFFSET_GET() {}
             
         bool load(const embot::hw::can::Frame &inframe);
             
         bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
     }; 
     
-    class Message_STRAIN2_AMPLIFIER_GAINLIMITS_GET : public Message
+    class Message_AMPLIFIER_RANGE_OF_GAIN_GET : public Message
     {
         public:
                        
@@ -979,15 +943,15 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         {
             std::uint8_t        set         : 4;
             std::uint8_t        channel     : 4;
-            std::uint16_t       highestgain;    // in ticks = 0.01            
-            std::uint16_t       lowestgain;     // in ticks = 0.01         
-            ReplyInfo() : set(0), channel(0), highestgain(0), lowestgain(0) {}
+            std::uint16_t       highest;    // in ticks = 0.01            
+            std::uint16_t       lowest;     // in ticks = 0.01         
+            ReplyInfo() : set(0), channel(0), highest(0), lowest(0) {}
         };
         
         Info info;
         
         
-        Message_STRAIN2_AMPLIFIER_GAINLIMITS_GET() {}
+        Message_AMPLIFIER_RANGE_OF_GAIN_GET() {}
             
         bool load(const embot::hw::can::Frame &inframe);
             
@@ -995,6 +959,36 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
     };     
 
     
+    class Message_AMPLIFIER_RANGE_OF_OFFSET_GET : public Message
+    {
+        public:
+                       
+        struct Info
+        { 
+            std::uint8_t        set         : 4;
+            std::uint8_t        channel     : 4;    // if 0xf we mean every channel     
+            Info() : set(0), channel(0) {}
+        };
+        
+        struct ReplyInfo
+        {
+            std::uint8_t        set         : 4;
+            std::uint8_t        channel     : 4;
+            std::uint16_t       highest;    // in value            
+            std::uint16_t       lowest;     // in value         
+            ReplyInfo() : set(0), channel(0), highest(0), lowest(0) {}
+        };
+        
+        Info info;
+        
+        
+        Message_AMPLIFIER_RANGE_OF_OFFSET_GET() {}
+            
+        bool load(const embot::hw::can::Frame &inframe);
+            
+        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
+    };     
+
     
     
     enum class imuFusion { enabled = 1, none = 33 }; // later on we can add the types of fusion we want
