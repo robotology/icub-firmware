@@ -37,9 +37,11 @@ void tests_tick();
 
 #include "embot_app_application_theCANparserSTRAIN.h"
 #include "embot_app_application_theCANparserIMU.h"
+#include "embot_app_application_theCANparserTHERMO.h"
 
 #include "embot_app_application_theSTRAIN.h"
 #include "embot_app_application_theIMU.h"
+#include "embot_app_application_theTHERMO.h"
 
 #include "embot_hw_onewire.h"
 #include "embot_hw_timer.h"
@@ -48,6 +50,8 @@ void tests_tick();
 
 
 #include "embot_hw_bsp_strain2.h"
+
+#if defined(TEST_ENABLED)
 
 #if defined(TEST_SI_ORIG)
 //#include "embot_hw_si705x.h"
@@ -58,10 +62,10 @@ const embot::hw::SI7051::Sensor SI7051sensor = embot::hw::bsp::strain2::termomet
 const embot::hw::SI7051::Config SI7051config = embot::hw::bsp::strain2::termometerSGAUGESconfig;
 
 #endif
+#endif // TEST_ENABLED
 
 
-
-static const embot::app::canprotocol::versionOfAPPLICATION vAP = {1, 2 , 1};
+static const embot::app::canprotocol::versionOfAPPLICATION vAP = {1, 3 , 0};
 static const embot::app::canprotocol::versionOfCANPROTOCOL vCP = {2, 0};
 
 static void userdeflauncher(void* param);
@@ -112,8 +116,8 @@ static const embot::common::Event evSTRAINtick = 0x00000001 << 1;
 static const embot::common::Event evSTRAINdataready = 0x00000001 << 2;
 static const embot::common::Event evIMUtick = 0x00000001 << 3;
 static const embot::common::Event evIMUdataready = 0x00000001 << 4;
-static const embot::common::Event evTEMPtick = 0x00000001 << 5;
-static const embot::common::Event evTEMPdataready = 0x00000001 << 6;
+static const embot::common::Event evTHERMOtick = 0x00000001 << 5;
+static const embot::common::Event evTHERMOdataready = 0x00000001 << 6;
 
 static const std::uint8_t maxOUTcanframes = 48;
 
@@ -147,6 +151,11 @@ static void start_evt_based(void)
     embot::app::application::theCANparserIMU::Config configparserimu;
     canparserimu.initialise(configparserimu);      
 
+    // start canparser thermo
+    embot::app::application::theCANparserTHERMO &canparserthermo = embot::app::application::theCANparserTHERMO::getInstance();
+    embot::app::application::theCANparserTHERMO::Config configparserthermo;
+    canparserthermo.initialise(configparserthermo); 
+    
     // start agent of strain
     embot::app::application::theSTRAIN &thestrain = embot::app::application::theSTRAIN::getInstance();
     embot::app::application::theSTRAIN::Config configstrain(evSTRAINtick, evSTRAINdataready, eventbasedtask);
@@ -156,6 +165,11 @@ static void start_evt_based(void)
     embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance();
     embot::app::application::theIMU::Config configimu(evIMUtick, evIMUdataready, eventbasedtask);
     theimu.initialise(configimu);     
+    
+    // start agent of thermo
+    embot::app::application::theTHERMO &thethermo = embot::app::application::theTHERMO::getInstance();
+    embot::app::application::theTHERMO::Config configthermo(evTHERMOtick, evTHERMOdataready, eventbasedtask);
+    thethermo.initialise(configthermo);         
 
     // finally start can. i keep it as last because i dont want that the isr-handler calls its onrxframe() 
     // before the eventbasedtask is created.
@@ -218,6 +232,7 @@ static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask
             embot::app::application::theCANparserBasic &canparserbasic = embot::app::application::theCANparserBasic::getInstance();
             embot::app::application::theCANparserSTRAIN &canparserstrain = embot::app::application::theCANparserSTRAIN::getInstance();
             embot::app::application::theCANparserIMU &canparserimu = embot::app::application::theCANparserIMU::getInstance();
+            embot::app::application::theCANparserTHERMO &canparserthermo = embot::app::application::theCANparserTHERMO::getInstance();
             // process w/ the basic parser, if not recognised call the parse specific of the board
             if(true == canparserbasic.process(frame, outframes))
             {                   
@@ -226,6 +241,9 @@ static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask
             {               
             }
             else if(true == canparserimu.process(frame, outframes))
+            {               
+            }
+            else if(true == canparserthermo.process(frame, outframes))
             {               
             }
             
@@ -261,6 +279,17 @@ static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask
         theimu.processdata(outframes);        
     }
      
+    if(true == embot::binary::mask::check(eventmask, evTHERMOtick))
+    {        
+        embot::app::application::theTHERMO &thethermo = embot::app::application::theTHERMO::getInstance();
+        thethermo.tick(outframes);        
+    }   
+    
+    if(true == embot::binary::mask::check(eventmask, evTHERMOdataready))
+    {        
+        embot::app::application::theTHERMO &thethermo = embot::app::application::theTHERMO::getInstance();
+        thethermo.processdata(outframes);        
+    }
     
     // if we have any packet we transmit them
     std::uint8_t num = outframes.size();
