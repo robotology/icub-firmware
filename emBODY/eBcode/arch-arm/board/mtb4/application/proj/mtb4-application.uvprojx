@@ -914,6 +914,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_application_theCANparserIMU.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_app_application_theCANparserTHERMO.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\app\embot_app_application_theCANparserTHERMO.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -943,6 +948,11 @@
               <FileName>embot_app_application_theIMU.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_application_theIMU.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_application_theTHERMO.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\app\embot_app_application_theTHERMO.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -2090,6 +2100,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_application_theCANparserIMU.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_app_application_theCANparserTHERMO.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\app\embot_app_application_theCANparserTHERMO.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2119,6 +2134,11 @@
               <FileName>embot_app_application_theIMU.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_application_theIMU.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_application_theTHERMO.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\app\embot_app_application_theTHERMO.cpp</FilePath>
             </File>
           </Files>
         </Group>
