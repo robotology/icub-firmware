@@ -235,6 +235,36 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
                     
         return true;
     }  
+    
+
+    bool Message_THERMOMETER_MEASURE::load(const Info& inf)
+    {
+        info = inf;
+      
+        return true;
+    }
+        
+    bool Message_THERMOMETER_MEASURE::get(embot::hw::can::Frame &outframe)
+    {
+        std::uint8_t data08[8] = {0};
+        data08[0] = info.mask & 0x03;
+        if(embot::binary::bit::check(info.mask, 0))
+        {
+            data08[1] = static_cast<std::uint8_t>((info.temp0 & 0x00ff));           // little endian
+            data08[2] = static_cast<std::uint8_t>((info.temp0 & 0xff00) >> 8);      // little endian
+        }
+        if(embot::binary::bit::check(info.mask, 1))
+        {
+            data08[3] = static_cast<std::uint8_t>((info.temp1 & 0x00ff));           // little endian 
+            data08[4] = static_cast<std::uint8_t>((info.temp1 & 0xff00) >> 8);      // little endian
+        }
+        std::uint8_t size = 5;
+               
+        Message::set(info.canaddress, 0xf, Clas::periodicAnalogSensor, static_cast<std::uint8_t>(CMD::THERMOMETER_MEASURE), data08, size);
+        std::memmove(&outframe, &canframe, sizeof(embot::hw::can::Frame));
+                    
+        return true;
+    }      
         
 }}}}} // namespace embot { namespace app { namespace canprotocol { namespace analog { namespace periodic {
     

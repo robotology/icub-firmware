@@ -174,7 +174,31 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         bool load(const Info& inf);
             
         bool get(embot::hw::can::Frame &outframe);        
+    };
+
+
+    class Message_THERMOMETER_MEASURE : public Message
+    {
+        public:
+            
+        struct Info
+        { 
+            std::uint8_t                canaddress;
+            std::uint8_t                mask;   // 0x00, 0x01, 0x02 or 0x03
+            std::int16_t                temp0;  // in 0.1 Celsius Degrees
+            std::int16_t                temp1;  // in 0.1 Celsius Degrees
+            Info() : canaddress(0), temp0(0), temp1(0) { }
+        };
+        
+        Info info;
+        
+        Message_THERMOMETER_MEASURE() {}
+            
+        bool load(const Info& inf);
+            
+        bool get(embot::hw::can::Frame &outframe);        
     };    
+        
     
 }}}}} // namespace embot { namespace app { namespace canprotocol { namespace analog { namespace periodic {    
 

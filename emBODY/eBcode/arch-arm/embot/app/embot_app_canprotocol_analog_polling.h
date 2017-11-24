@@ -1075,7 +1075,74 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
     };    
     
+
+
+    class Message_THERMOMETER_CONFIG_SET : public Message
+    {
+        public:
+            
+                                    
+        struct Info
+        {
+            std::uint8_t sensormask;       // none or at most two ... 
+            Info() : sensormask(0){}
+        };
+        
+        Info info;
+        
+        Message_THERMOMETER_CONFIG_SET() {}
+            
+        bool load(const embot::hw::can::Frame &inframe);
+            
+        bool reply();   // none
+            
+    }; 
+
+    class Message_THERMOMETER_CONFIG_GET : public Message
+    {
+        public:
+                                    
+        struct Info
+        { 
+            std::uint8_t nothing;           
+            Info() : nothing(0) {}
+        };
+        
+        struct ReplyInfo
+        {
+            std::uint8_t sensormask;       
+            ReplyInfo() : sensormask(0) {}        
+        };        
+        
+        Info info;
+        
+        Message_THERMOMETER_CONFIG_GET() {}
+            
+        bool load(const embot::hw::can::Frame &inframe);
+            
+        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
+    };  
     
+    class Message_THERMOMETER_TRANSMIT : public Message
+    {
+        public:
+        
+        // format is data[0] = seconds                        
+        struct Info
+        {
+            bool transmit;
+            embot::common::relTime  txperiod;   // if 0, dont transmit. else use usec value.         
+            Info() : transmit(false), txperiod(0) {}
+        };
+        
+        Info info;
+        
+        Message_THERMOMETER_TRANSMIT() {}
+            
+        bool load(const embot::hw::can::Frame &inframe);
+            
+        bool reply();   // none        
+    };        
     
 }}}}} // namespace embot { namespace app { namespace canprotocol { namespace analog { namespace polling {
     

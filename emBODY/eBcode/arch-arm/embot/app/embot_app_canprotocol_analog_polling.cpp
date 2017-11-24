@@ -1176,7 +1176,77 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         return false;
     }       
     
+
+
+    bool Message_THERMOMETER_CONFIG_SET::load(const embot::hw::can::Frame &inframe)
+    {
+        Message::set(inframe);  
         
+        if(static_cast<std::uint8_t>(CMD::THERMOMETER_CONFIG_SET) != frame2cmd(inframe))
+        {
+            return false; 
+        }
+        
+        // little endian
+        info.sensormask = candata.datainframe[0];
+
+        return true;         
+    }                    
+        
+    bool Message_THERMOMETER_CONFIG_SET::reply()
+    {
+        return false;
+    }   
+
+
+    bool Message_THERMOMETER_CONFIG_GET::load(const embot::hw::can::Frame &inframe)
+    {
+        Message::set(inframe); 
+        
+        if(static_cast<std::uint8_t>(CMD::THERMOMETER_CONFIG_GET) != frame2cmd(inframe))
+        {
+            return false; 
+        }
+        
+        return true;
+    }  
+
+    bool Message_THERMOMETER_CONFIG_GET::reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo)
+    {
+        std::uint8_t dd[7] = {0};
+
+        dd[0] = replyinfo.sensormask;                                          
+
+        std::uint8_t datalen = 1;
+        
+        frame_set_sender(outframe, sender);
+        frame_set_clascmddestinationdata(outframe, Clas::pollingAnalogSensor, static_cast<std::uint8_t>(CMD::THERMOMETER_CONFIG_GET), candata.from, dd, datalen);
+        frame_set_size(outframe, datalen+1);
+        return true;
+    }
+
+
+    bool Message_THERMOMETER_TRANSMIT::load(const embot::hw::can::Frame &inframe)
+    {
+        Message::set(inframe);  
+        
+        if(static_cast<std::uint8_t>(CMD::THERMOMETER_TRANSMIT) != frame2cmd(inframe))
+        {
+            return false; 
+        }
+        
+        // just one byte.
+        info.transmit = (0 == candata.datainframe[0]) ? false : true;
+        info.txperiod = embot::common::time1second * static_cast<embot::common::relTime>(candata.datainframe[0]);
+        return true;         
+    }                    
+        
+    bool Message_THERMOMETER_TRANSMIT::reply()
+    {
+        return false;
+    }   
+
+    
 }}}}} // namespace embot { namespace app { namespace canprotocol { namespace analog { namespace polling {
     
     
