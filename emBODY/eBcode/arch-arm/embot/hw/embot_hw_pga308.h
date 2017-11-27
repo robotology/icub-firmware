@@ -98,9 +98,12 @@ namespace embot { namespace hw { namespace PGA308 {
     {
         std::uint16_t value;
         
-        static const std::uint8_t DefaultGO = 0x06;     // output gain = 6.0 (0x06) OR 2.0 (0x00)
+        static const std::uint8_t DefaultGO = 0x06;             // output gain = 6.0 (0x06) OR 2.0 (0x00)        
+        static const std::uint8_t DefaultGO_g_32_96 = 0x06;     // output gain = 6.0 (0x06)
+        static const std::uint8_t DefaultGO_g_16_80 = 0x02;     // output gain = 3.0 (0x02)
+        static const std::uint8_t DefaultGO_g_11_75 = 0x00;     // output gain = 3.0 (0x00)
         static const std::uint8_t DefaultMUX = 0x00;    // VIN1= VINPositive, VIN2= VINNegative
-        static const std::uint8_t DefaultGI = 0x04;     // input gain = 16     
+        static const std::uint8_t DefaultGI = 0x04;     // input gain = 16          
         static const std::uint8_t DefaultOS = 0x20;     // coarse offset  // 0x25 0x8A
         
         // CFG0 Output Amplifier Gain Select, Front-End PGA Mux & Gain Select, Coarse Offset Adjust on Front-End PGA
