@@ -316,7 +316,7 @@ bool embot::app::bootloader::theCANparser::Impl::process(const embot::hw::can::F
                     } break;
                     
                     case static_cast<std::uint8_t>(embot::app::canprotocol::bootloader::CMD::START):
-                    {   // only one of such messages: it tells that the hew rows are over. time to flush rx data into flash
+                    {   // only one of such messages: it tells that the hex rows are over. time to flush rx data into flash
                         txframe = process_bl_start(frame, replies);
                     } break;                    
                     
@@ -468,7 +468,7 @@ bool embot::app::bootloader::theCANparser::Impl::process_bl_start(const embot::h
     {
         eraseAPPLstorage = false;
         embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance();
-        canbrdinfo.userdataerase();
+        canbrdinfo.erase();
     }
         
     if(true == msg.reply(reply, embot::app::theCANboardInfo::getInstance().cachedCANaddress(), true))
