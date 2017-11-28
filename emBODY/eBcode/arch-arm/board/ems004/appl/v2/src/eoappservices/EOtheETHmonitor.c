@@ -508,7 +508,7 @@ static void s_eo_ethmonitor_process_resultsofquery(void)
                 errdes.sourceaddress    = 0;
                 errdes.par16            = i;
                 errdes.par64            = applstate;
-                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);                
+                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);                
             }
             
             if((1 == s_eo_theethmonitor.portstatus[i].rxcrc.validvalue) && (s_eo_theethmonitor.portstatus[i].rxcrc.value != 0))
@@ -530,7 +530,7 @@ static void s_eo_ethmonitor_process_resultsofquery(void)
                 errdes.sourceaddress    = 0;
                 errdes.par16            = i;
                 errdes.par64            = applstate;
-                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);                
+                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);                
             }            
         }
     }
