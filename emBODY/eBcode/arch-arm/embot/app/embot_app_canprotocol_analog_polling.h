@@ -39,7 +39,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         SET_CANDATARATE = 0x08,                         // used to configure strain or mais tx rate
         SAVE2EE = 0x09,                                 // used by canloader to configure strain
         GET_MATRIX_RC = 0x0A,                           // used by canloader to configure strain
-        GET_CH_DAC = 0x0B,                              // used by canloader to configure strain. in strain2 it manages beta (see AMPLIFIER_GAINOFFSET_GET)
+        GET_CH_DAC = 0x0B,                              // used by canloader to configure strain. in strain2 it manages offset (see AMPLIFIER_GAINOFFSET_GET)
         GET_CH_ADC = 0x0C,                              // used by canloader to configure strain. 
                       
         SET_MATRIX_G = 0x11,                            // used by canloader to configure strain
@@ -56,7 +56,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         GET_FIRMWARE_VERSION = 0x1C,                    // basic management.        
 
         // NEW messages used for a generic AMPLIFIER with a linear transfer function: Vout = gain * Vin + offset. range of Vout is [0, 64k) 
-        // these messages are used by strain2 (but not by strain)
+        // these messages are used by strain2 (but not by strain). 
         AMPLIFIER_RESET = 0x1D,                         // reset the amplifier (transfer function + others) to default factory values. 
         AMPLIFIER_RANGE_OF_GAIN_GET = 0x1E,             // retrieve the allowed limits of the gain 
         AMPLIFIER_RANGE_OF_OFFSET_GET = 0x1F,           // retrieve the allowed limits of the offset        

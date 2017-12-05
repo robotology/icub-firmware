@@ -948,6 +948,7 @@ bool embot::app::application::theSTRAIN::Impl::processing()
     
         
     // apply formula: torqueforce = M * (adcvalue + calibtare) + currtare
+    // default values are: M = IdentityMatrix(0x7fff); calibtare = Vector(0); currtare = Vector(0)
     
     bool q15saturated =  false;
     
