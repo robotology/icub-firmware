@@ -308,7 +308,14 @@ extern eOresult_t eo_ethmonitor_Start(EOtheETHmonitor *p)
     
     s_eo_theethmonitor.enabled = eobool_true;
           
-    
+    eOerrmanDescriptor_t errdes = {0};
+    errdes.code             = eoerror_code_get(eoerror_category_ETHmonitor, eoerror_value_ETHMON_juststarted);
+    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+    errdes.sourceaddress    = 0;
+    errdes.par16            = 0;
+    errdes.par64            = 0;
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes); 
+        
     return(eores_OK);
 }
 
@@ -357,7 +364,7 @@ void eo_ethmonitor(void *p)
 
 static void s_eo_ethmonitor_taskworker_startup(EOMtask *rt, uint32_t n)
 {
-    eo_errman_Trace(eo_errman_GetHandle(), "called _taskworker_startup()", s_eobj_ownname);
+    eo_errman_Trace(eo_errman_GetHandle(), "called _taskworker_startup()", s_eobj_ownname);      
 }
 
 static void s_eo_ethmonitor_taskworker_run(EOMtask *rt, uint32_t n)
