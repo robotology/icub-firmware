@@ -31,6 +31,8 @@
 #include "embot_app_application_theCANparserTHERMO.h"
 #include "embot_app_application_theTHERMO.h"
 
+#include "embot_hw_bsp_mtb4.h"
+
 
 static const embot::app::canprotocol::versionOfAPPLICATION vAP = {1, 2 , 0};
 static const embot::app::canprotocol::versionOfCANPROTOCOL vCP = {2, 0};
@@ -144,12 +146,12 @@ static void start_evt_based(void)
 
     // start agent of imu
     embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance();
-    embot::app::application::theIMU::Config configimu(evIMUtick, evIMUdataready, eventbasedtask);
+    embot::app::application::theIMU::Config configimu(embot::hw::bsp::mtb4::imuBOSCH, embot::hw::bsp::mtb4::imuBOSCHconfig, evIMUtick, evIMUdataready, eventbasedtask);
     theimu.initialise(configimu);   
 
     // start agent of thermo
     embot::app::application::theTHERMO &thethermo = embot::app::application::theTHERMO::getInstance();
-    embot::app::application::theTHERMO::Config configthermo(evTHERMOtick, evTHERMOdataready, eventbasedtask);
+    embot::app::application::theTHERMO::Config configthermo(embot::hw::bsp::mtb4::thermometer, embot::hw::bsp::mtb4::thermometerconfig, evTHERMOtick, evTHERMOdataready, eventbasedtask);
     thethermo.initialise(configthermo);         
     
     // finally start can. i keep it as last because i dont want that the isr-handler calls its onrxframe() 

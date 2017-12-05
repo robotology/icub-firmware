@@ -24,6 +24,7 @@
 
 #include "embot_common.h"
 #include "embot_hw.h"
+#include "stm32hal.h"
 
 
 namespace embot { namespace hw { namespace bsp {

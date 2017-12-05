@@ -31,6 +31,8 @@
 #include "embot_app_canprotocol_analog_periodic.h"
 #include "embot_app_canprotocol_analog_polling.h"
 
+#include "embot_hw_pga308.h"
+
 
 #include <vector>
 
@@ -49,11 +51,19 @@ namespace embot { namespace app { namespace application {
     public:
         struct Config
         {
-            embot::common::Event    tickevent;
-            embot::common::Event    datareadyevent;
-            embot::sys::Task*       totask;
+//            embot::hw::PGA308::Config   pgaconfig[6];   
+            embot::common::Event        tickevent;
+            embot::common::Event        datareadyevent;
+            embot::sys::Task*           totask;
             Config() : tickevent(0), datareadyevent(0), totask(nullptr) {}
-            Config(embot::common::Event _te, embot::common::Event _de, embot::sys::Task* _ts) : tickevent(_te), datareadyevent(_de), totask(_ts) {}
+            Config(embot::common::Event _te, embot::common::Event _de, embot::sys::Task* _ts) : 
+                tickevent(_te), datareadyevent(_de), totask(_ts) 
+            { }                
+//            Config(const embot::hw::PGA308::Config * _pc, embot::common::Event _te, embot::common::Event _de, embot::sys::Task* _ts) : 
+//                tickevent(_te), datareadyevent(_de), totask(_ts) 
+//            { 
+//                if(nullptr != _pc)  std::memmove(pgaconfig, _pc, sizeof(pgaconfig)); 
+//            }
         }; 
         
         

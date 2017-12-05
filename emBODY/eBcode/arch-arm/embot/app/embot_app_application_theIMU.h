@@ -31,6 +31,8 @@
 #include "embot_app_canprotocol_analog_polling.h"
 #include "embot_app_canprotocol_analog_periodic.h"
 
+#include "embot_hw_bno055.h"
+
 
 #include <vector>
 
@@ -49,11 +51,23 @@ namespace embot { namespace app { namespace application {
     public:
         struct Config
         {
-            embot::common::Event    tickevent;
-            embot::common::Event    datareadyevent;
-            embot::sys::Task*       totask;
-            Config() : tickevent(0), datareadyevent(0), totask(nullptr) {}
-            Config(embot::common::Event _te, embot::common::Event _de, embot::sys::Task* _ts) : tickevent(_te), datareadyevent(_de), totask(_ts) {}    
+            embot::hw::BNO055::Sensor   sensor;
+            embot::hw::BNO055::Config   sensorconfig;
+            embot::common::Event        tickevent;
+            embot::common::Event        datareadyevent;
+            embot::sys::Task*           totask;
+            Config() :  
+                sensor(embot::hw::BNO055::Sensor::one), 
+                sensorconfig(embot::hw::BNO055::Config(embot::hw::i2c::Descriptor(embot::hw::i2c::Bus::two, 400000))), 
+                tickevent(0), datareadyevent(0), totask(nullptr) 
+                {}
+            Config(embot::hw::BNO055::Sensor _s, const embot::hw::BNO055::Config& _sc, embot::common::Event _te, embot::common::Event _de, embot::sys::Task* _ts) :     
+                sensor(_s),
+                sensorconfig(_sc),
+                tickevent(_te), 
+                datareadyevent(_de), 
+                totask(_ts) 
+                {}    
         }; 
         
         

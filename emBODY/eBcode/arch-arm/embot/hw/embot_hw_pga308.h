@@ -34,8 +34,7 @@ namespace embot { namespace hw { namespace PGA308 {
      
     
     enum class Amplifier { one = 0, two = 1, three = 2, four = 3, five = 4, six = 5, none = 32, all = 33, maxnumberof = 6};
-    
-    
+        
     struct Config
     {   // each amplifier uses a separate channel of onewire communication
         embot::hw::gpio::GPIO           powerongpio; 
@@ -43,6 +42,13 @@ namespace embot { namespace hw { namespace PGA308 {
         embot::hw::onewire::Channel     onewirechannel;
         embot::hw::onewire::Config      onewireconfig;          
         Config() : powerongpio(nullptr, 0), poweronstate(embot::hw::gpio::State::SET), onewirechannel(embot::hw::onewire::Channel::one) {}
+        Config(const embot::hw::gpio::GPIO &_pon, const embot::hw::gpio::State _ps, const embot::hw::onewire::Channel _owch, const embot::hw::onewire::Config &_owco)
+        {
+            powerongpio = _pon;
+            poweronstate = _ps;
+            onewirechannel = _owch;
+            onewireconfig = _owco;           
+        }            
     };
     
     

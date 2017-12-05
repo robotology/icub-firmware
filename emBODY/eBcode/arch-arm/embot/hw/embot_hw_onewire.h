@@ -49,6 +49,13 @@ namespace embot { namespace hw { namespace onewire {
         bool                        usepreamble;        // if true we use it
         std::uint8_t                preamble;           // the preamble to be sent before reg and value.
         Config() : gpio(nullptr, 0), rate(Rate::tenKbps), usepreamble(true), preamble(0x55) {}
+        Config(const embot::hw::gpio::GPIO &_g, Rate _r) 
+        {
+            gpio = _g;
+            rate = _r;
+            usepreamble =  true;
+            preamble = 0x55;
+        }
     };
     
     bool supported(Channel c);

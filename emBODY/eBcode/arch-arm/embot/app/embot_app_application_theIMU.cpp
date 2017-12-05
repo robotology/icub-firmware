@@ -459,7 +459,7 @@ bool embot::app::application::theIMU::Impl::acquisition_start()
 {
     imuacquisition.onstart();
     embot::common::Callback cbk(alertdataisready, this);
-    embot::hw::BNO055::acquisition(embot::hw::bsp::strain2::imuBOSCH, embot::hw::BNO055::Set::FULL, imuacquisition.data, cbk); 
+    embot::hw::BNO055::acquisition(config.sensor, embot::hw::BNO055::Set::FULL, imuacquisition.data, cbk); 
     return true;
 }
 
@@ -498,10 +498,9 @@ bool embot::app::application::theIMU::initialise(Config &config)
     pImpl->config = config;
     
     pImpl->action.set(embot::sys::Action::EventToTask(pImpl->config.tickevent, pImpl->config.totask));
-  
-//    #warning TODO: remove embot::hw::bsp::strain2 namespace from objects which cna be used by many boards and put ... embot::hw::bsp::board    
-    embot::hw::BNO055::init(embot::hw::bsp::strain2::imuBOSCH, embot::hw::bsp::strain2::imuBOSCHconfig); 
-    embot::hw::BNO055::set(embot::hw::bsp::strain2::imuBOSCH, embot::hw::BNO055::Mode::NDOF, 5*embot::common::time1millisec);
+   
+    embot::hw::BNO055::init(pImpl->config.sensor, pImpl->config.sensorconfig); 
+    embot::hw::BNO055::set(pImpl->config.sensor, embot::hw::BNO055::Mode::NDOF, 5*embot::common::time1millisec);
      
     return true;
 }

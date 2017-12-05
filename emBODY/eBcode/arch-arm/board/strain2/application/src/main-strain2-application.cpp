@@ -163,12 +163,12 @@ static void start_evt_based(void)
         
     // start agent of imu
     embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance();
-    embot::app::application::theIMU::Config configimu(evIMUtick, evIMUdataready, eventbasedtask);
+    embot::app::application::theIMU::Config configimu(embot::hw::bsp::strain2::imuBOSCH, embot::hw::bsp::strain2::imuBOSCHconfig, evIMUtick, evIMUdataready, eventbasedtask);
     theimu.initialise(configimu);     
     
     // start agent of thermo
     embot::app::application::theTHERMO &thethermo = embot::app::application::theTHERMO::getInstance();
-    embot::app::application::theTHERMO::Config configthermo(evTHERMOtick, evTHERMOdataready, eventbasedtask);
+    embot::app::application::theTHERMO::Config configthermo(embot::hw::bsp::strain2::thermometerSGAUGES, embot::hw::bsp::strain2::thermometerSGAUGESconfig, evTHERMOtick, evTHERMOdataready, eventbasedtask);
     thethermo.initialise(configthermo);         
 
     // finally start can. i keep it as last because i dont want that the isr-handler calls its onrxframe() 

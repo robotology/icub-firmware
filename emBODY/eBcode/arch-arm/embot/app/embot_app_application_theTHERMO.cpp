@@ -53,8 +53,6 @@
 
 #include "embot_hw_si7051.h"
 
-const embot::hw::SI7051::Sensor SI7051sensor = embot::hw::bsp::strain2::termometerSGAUGES;
-const embot::hw::SI7051::Config SI7051config = embot::hw::bsp::strain2::termometerSGAUGESconfig;
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -237,14 +235,14 @@ bool embot::app::application::theTHERMO::Impl::acquisition_start()
 {
     tempacquisition.onstart();
     embot::common::Callback cbk(alertdataisready, this);
-    embot::hw::SI7051::acquisition(SI7051sensor, cbk);
+    embot::hw::SI7051::acquisition(config.sensor, cbk);
     return true;
 }
 
 
 bool embot::app::application::theTHERMO::Impl::acquisition_retrieve()
 {
-    embot::hw::SI7051::read(SI7051sensor, tempacquisition.temperature);           
+    embot::hw::SI7051::read(config.sensor, tempacquisition.temperature);           
     return true;
 }
 
@@ -274,7 +272,7 @@ bool embot::app::application::theTHERMO::initialise(Config &config)
     
     pImpl->action.set(embot::sys::Action::EventToTask(pImpl->config.tickevent, pImpl->config.totask));
   
-    embot::hw::SI7051::init(SI7051sensor, SI7051config); 
+    embot::hw::SI7051::init(pImpl->config.sensor, pImpl->config.sensorconfig); 
      
     return true;
 }
