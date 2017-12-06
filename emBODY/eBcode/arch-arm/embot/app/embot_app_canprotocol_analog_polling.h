@@ -856,10 +856,13 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         struct ReplyInfo
         {
             std::uint8_t        set         : 4;
-            std::uint8_t        channel     : 4;            
-            std::uint8_t        resultmask;     // in pos i-th the boolean result of channel i-th
-            std::uint32_t       mae;            // the mean square error for the channel(s) after autocalib = SUM_ch( abs(meas_ch - target) ) / numchannels
-            ReplyInfo() : set(0), channel(0xf), resultmask(0) {}
+            std::uint8_t        channel     : 4; 
+            std::uint8_t        noisychannelmask;   // pos i-th is 1 if abs(maxADC-minADC) > tolerance amongst the samples2average acquisitions. bit 7 set to 1 if first measure, bit 6 if final measure           
+            std::uint8_t        algorithmOKmask;    // in pos i-th the boolean result of channel i-th w/ respect to application of algorithm. if it fails, no changes in channel. if ok: changes are applied.          
+            std::uint8_t        finalmeasureOKmask; // in pos i-th the boolean result of channel i-th after autocalib w/ respect to abs(measure - target) < tolerance. 
+            std::uint8_t        ffu;                // for future use
+            std::uint16_t       mae;                // the mean square error for the channel(s) after autocalib = SUM_ch( abs(meas_ch - target) ) / numchannels. if > 64k we saturate.
+            ReplyInfo() : set(0), channel(0xf), noisychannelmask(0), algorithmOKmask(0), finalmeasureOKmask(0), ffu(0), mae(0) {}
         };        
             
         

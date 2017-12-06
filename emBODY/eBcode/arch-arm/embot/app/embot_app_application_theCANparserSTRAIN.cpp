@@ -744,7 +744,7 @@ bool embot::app::application::theCANparserSTRAIN::Impl::process_set_strain2_ampl
     replyinfo.channel = msg.info.channel;
     
 
-    thestrain.autocalib(msg.info, replyinfo.resultmask, replyinfo.mae);
+    thestrain.autocalib(msg.info, replyinfo.noisychannelmask, replyinfo.algorithmOKmask, replyinfo.finalmeasureOKmask, replyinfo.mae);
     
     embot::hw::can::Frame frame0;
     if(true == msg.reply(frame0, embot::app::theCANboardInfo::getInstance().cachedCANaddress(), replyinfo))

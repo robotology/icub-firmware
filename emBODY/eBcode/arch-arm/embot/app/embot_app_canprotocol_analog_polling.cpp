@@ -878,7 +878,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         // little endian
         info.cfg1.GD = static_cast<std::uint16_t>(candata.datainframe[1]) | (static_cast<std::uint16_t>(candata.datainframe[2]) << 8);  
         info.cfg1.GI = (candata.datainframe[3] & 0xF0) >> 4;
-        info.cfg1.S = (candata.datainframe[3] & 0x80) >> 3;
+        info.cfg1.S = (candata.datainframe[3] & 0x08) >> 3;
         info.cfg1.GO = (candata.datainframe[3] & 0x07);
         info.cfg1.Voffsetcoarse = candata.datainframe[4];
         // little endian
@@ -953,14 +953,16 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
     {
         std::uint8_t dd[7] = {0};
 
-        dd[0] = (static_cast<std::uint8_t>(replyinfo.set) << 4) | (replyinfo.channel & 0x0F);                  
-        dd[1] = replyinfo.resultmask;             
-        dd[2] = (replyinfo.mae & 0x000000ff);  
-        dd[3] = (replyinfo.mae & 0x0000ff00) >> 8;
-        dd[4] = (replyinfo.mae & 0x00ff0000) >> 16;
-        dd[5] = (replyinfo.mae & 0xff000000) >> 24;           
+        dd[0] = (static_cast<std::uint8_t>(replyinfo.set) << 4) | (replyinfo.channel & 0x0F);  
+        dd[1] = replyinfo.noisychannelmask;
+        dd[2] = replyinfo.algorithmOKmask;        
+        dd[3] = replyinfo.finalmeasureOKmask;
+        dd[4] = 0;
+        dd[5] = (replyinfo.mae & 0x000000ff);  
+        dd[6] = (replyinfo.mae & 0x0000ff00) >> 8;
+          
         
-        std::uint8_t datalen = 6;
+        std::uint8_t datalen = 7;
         
         frame_set_sender(outframe, sender);
         frame_set_clascmddestinationdata(outframe, Clas::pollingAnalogSensor, static_cast<std::uint8_t>(CMD::AMPLIFIER_OFFSET_AUTOCALIB), candata.from, dd, datalen);

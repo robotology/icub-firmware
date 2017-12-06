@@ -1751,7 +1751,7 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::p
 }
 
 
-bool embot::app::application::theSTRAIN::autocalib(embot::app::canprotocol::analog::polling::Message_AMPLIFIER_OFFSET_AUTOCALIB::Info &info, std::uint8_t &okmask, std::uint32_t &mae)
+bool embot::app::application::theSTRAIN::autocalib(embot::app::canprotocol::analog::polling::Message_AMPLIFIER_OFFSET_AUTOCALIB::Info &info, std::uint8_t &noisychannelmask, std::uint8_t &algorithmOKmask, std::uint8_t &finalmeasureOKmask, std::uint16_t &mae)
 {
     std::uint8_t channelmask = 0;
     if(0x0f == info.channel)
@@ -1773,6 +1773,7 @@ bool embot::app::application::theSTRAIN::autocalib(embot::app::canprotocol::anal
         return false;
     }
     
+    noisychannelmask = 0;
 
     // acquire for some times to get the measure
     std::uint8_t Nsamples = info.samples2average;
@@ -1781,6 +1782,11 @@ bool embot::app::application::theSTRAIN::autocalib(embot::app::canprotocol::anal
         Nsamples = 4;
     }
     std::uint32_t measure[6] = {0};
+    std::uint16_t _max[6] = {0};
+    std::uint16_t _min[6] = {0xffff};
+    std::memset(_max, 0, sizeof(_max));
+    std::memset(_min, 0xff, sizeof(_min));
+    
     for(std::uint8_t a=0; a<Nsamples; a++)
     {
         // it acquire once. it also restarts if required.        
@@ -1789,18 +1795,37 @@ bool embot::app::application::theSTRAIN::autocalib(embot::app::canprotocol::anal
         {
             std::uint16_t tmp = pImpl->runtimedata.data.adcvalue[c] >> 3;
             measure[c] += tmp;
+            if(tmp<=_min[c])
+            {
+                _min[c] = tmp;
+            }
+            if(tmp>=_max[c])
+            {
+                _max[c] = tmp;
+            }
         }
     }
 
+    std::uint16_t delta = 0;
     for(std::uint8_t c=0; c<6; c++)
     {
         if(Nsamples > 0)
         {
             measure[c] /= Nsamples;
         }
+        
+        delta = _max[c] - _min[c];
+        
+        if(delta > (info.tolerance >> 3))
+        {
+            embot::binary::bit::set(noisychannelmask, 7);            
+            embot::binary::bit::set(noisychannelmask, c);            
+        }
     }
     
+
     
+    algorithmOKmask = 0;
     // perform alignment to target
     for(std::uint8_t i=0; i<6; i++)
     {
@@ -1813,20 +1838,28 @@ bool embot::app::application::theSTRAIN::autocalib(embot::app::canprotocol::anal
             tfc.load(cfg1);  
             std::uint8_t Y = 0;
             std::uint16_t Z = 0;
-            tfc.alignVOUT(static_cast<std::uint16_t>(measure[i]), (info.target >> 3), Y, Z);
-            embot::hw::PGA308::set(static_cast<embot::hw::PGA308::Amplifier>(i), tfc);   
-
-            tfc.get(cfg1);
-            pImpl->configdata.amplifiers_set(0, i, cfg1);                               
+            if(true == tfc.alignVOUT(static_cast<std::uint16_t>(measure[i]), (info.target >> 3), Y, Z))
+            {
+                embot::hw::PGA308::set(static_cast<embot::hw::PGA308::Amplifier>(i), tfc);   
+                tfc.get(cfg1);
+                pImpl->configdata.amplifiers_set(0, i, cfg1); 
+                
+                embot::binary::bit::set(algorithmOKmask, i);
+            }
+            else
+            {                                
+            }
         }
     }
     
-    mae = 0;
-    okmask = 0;
+    std::uint32_t mae32 = 0;
+    finalmeasureOKmask = 0;
     std::uint8_t num = 0;
     
     // perform measure again to compute the error
     std::memset(measure, 0, sizeof(measure));
+    std::memset(_max, 0, sizeof(_max));
+    std::memset(_min, 0xff, sizeof(_min));
     for(std::uint8_t a=0; a<Nsamples; a++)
     {
         // it acquire once. it also restarts if required.        
@@ -1835,11 +1868,24 @@ bool embot::app::application::theSTRAIN::autocalib(embot::app::canprotocol::anal
         {
             std::uint16_t tmp = pImpl->runtimedata.data.adcvalue[c] >> 3;
             measure[c] += tmp;
+            if(tmp<=_min[c])
+            {
+                _min[c] = tmp;
+            }
+            if(tmp>=_max[c])
+            {
+                _max[c] = tmp;
+            }
         }
     }
 
     for(std::uint8_t c=0; c<6; c++)
     {
+        if((_max[c] - _min[c]) > (info.tolerance >> 3))
+        {
+            embot::binary::bit::set(noisychannelmask, 6);            
+            embot::binary::bit::set(noisychannelmask, c);            
+        }
         if(Nsamples > 0)
         {
             measure[c] /= Nsamples;
@@ -1852,16 +1898,25 @@ bool embot::app::application::theSTRAIN::autocalib(embot::app::canprotocol::anal
             {
                 mm = -mm;
             }
-            mae += mm;
+            mae32 += mm;
             if(mm < (info.tolerance >> 3))
             {
-                embot::binary::bit::set(okmask, c);
+                embot::binary::bit::set(finalmeasureOKmask, c);
             }                       
         }       
     }
     if(num > 0)
     {
-        mae /= num;
+        mae32 /= num;
+    }
+    
+    if(mae32 >= 0xffff)
+    {
+        mae = 0xffff;
+    }
+    else
+    {
+        mae = mae32 & 0xffff;
     }
    
     return true;    

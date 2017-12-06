@@ -97,7 +97,7 @@ namespace embot { namespace app { namespace application {
         bool get(embot::app::canprotocol::analog::polling::Message_AMPLIFIER_RANGE_OF_GAIN_GET::ReplyInfo &replyinfo);
         bool get(embot::app::canprotocol::analog::polling::Message_AMPLIFIER_RANGE_OF_OFFSET_GET::ReplyInfo &replyinfo);
         
-        bool autocalib(embot::app::canprotocol::analog::polling::Message_AMPLIFIER_OFFSET_AUTOCALIB::Info &info, std::uint8_t &okmask, std::uint32_t &mae);
+        bool autocalib(embot::app::canprotocol::analog::polling::Message_AMPLIFIER_OFFSET_AUTOCALIB::Info &info, std::uint8_t &noisychannelmask, std::uint8_t &algorithmOKmask, std::uint8_t &finalmeasureOKmask, std::uint16_t &mae);
         
         bool start(embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode &mode);
         bool stop();        
