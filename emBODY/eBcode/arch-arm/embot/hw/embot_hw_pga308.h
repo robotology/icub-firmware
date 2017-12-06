@@ -398,22 +398,32 @@ namespace embot { namespace hw { namespace PGA308 {
             // b = (d/dz) Vout = (d/dz) beta = - alpha(x)*(1/valueOf(GI))*VREF*(1/64k)
             // c = Vout - a*y - b*z
             a = alpha() * valueOfCOR();
-            b = - (alpha()*static_cast<float>(VREF)/valueOfGI())/65536.0f;
+            b = - (alpha()*static_cast<float>(VREF)/valueOfGI())/65536.0f; // valueOfGI() is always != 0
             c = static_cast<float>(vout) - a*static_cast<float>(Vcoarseoffset) - b*static_cast<float>(Vzerodac);                      
         }
         
-        void alignVOUT(const std::uint16_t vout, const std::uint16_t target, std::uint8_t &Y, std::uint16_t &Z)
+        bool alignVOUT(const std::uint16_t vout, const std::uint16_t target, std::uint8_t &Y, std::uint16_t &Z)
         {
             float a, b, c;
             computeOffsetParams(vout, a, b, c);
-            float y = (target - c - b*static_cast<float>(Vzerodac))/a;
+            float y = (target - c - b*static_cast<float>(Vzerodac))/a;  // a is always != 0
+            if((y > 255.0f) || (y < 0.0f))
+            {
+                return false;
+            }
             // must round y ... 
             Y = static_cast<std::uint8_t>(std::floor(y + 0.5f));
             // must apply Y to ...
             float z = (target - c - a*static_cast<float>(Y))/b;
+            if((z > 65535.0f) || (z < 0.0f))
+            {
+                return false;
+            }
             Z = static_cast<std::uint16_t>(std::floor(z + 0.5f));
             Vcoarseoffset = Y;
             Vzerodac = Z;
+            
+            return true;
         }
         
         bool setalpha(float a)
