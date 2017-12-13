@@ -102,7 +102,7 @@ void AbsEncoder_destroy(AbsEncoder* o)
 //this function set spikes limits values based of encoder type
 void s_AbsEncoder_set_spikes_limis(AbsEncoder* o)
 {
-    char message[150];
+    //char message[150];
     switch(o->type)
     {
         case(eomc_enc_mais):
@@ -110,7 +110,7 @@ void s_AbsEncoder_set_spikes_limis(AbsEncoder* o)
         {
             o->spike_mag_limit = 0;
             o->spike_cnt_limit = 0;
-            snprintf(message, sizeof(message), "mais or absAnalog");
+            //snprintf(message, sizeof(message), "mais or absAnalog");
         }break;
 
         case(eomc_enc_aea):
@@ -127,7 +127,7 @@ void s_AbsEncoder_set_spikes_limis(AbsEncoder* o)
             
             o->spike_cnt_limit = AEA_DEFAULT_SPIKE_CNT_LIMIT;
             
-            snprintf(message, sizeof(message), "ABSE aea:tol%.3f, div%.3f spikel%lu", o->toleranceCfg, o->div, o->spike_mag_limit);
+            //snprintf(message, sizeof(message), "ABSE aea:tol%.3f, div%.3f spikel%lu", o->toleranceCfg, o->div, o->spike_mag_limit);
         }break; 
 
         case(eomc_enc_amo):
@@ -136,25 +136,25 @@ void s_AbsEncoder_set_spikes_limis(AbsEncoder* o)
             int32_t toleranceIDeg = o->toleranceCfg * 65535 /360 ;
             o->spike_mag_limit = toleranceIDeg *o->div;
             o->spike_cnt_limit = AEA_DEFAULT_SPIKE_CNT_LIMIT; //ALE ??
-            snprintf(message, sizeof(message), "AMO: tol%.3f, div%.3f spikel%lu", o->toleranceCfg, o->div, o->spike_mag_limit);
+            //snprintf(message, sizeof(message), "AMO: tol%.3f, div%.3f spikel%lu", o->toleranceCfg, o->div, o->spike_mag_limit);
         }break;        
         
         default:
         {
             o->spike_mag_limit = 0;
             o->spike_cnt_limit = 0;
-            snprintf(message, sizeof(message), "abs type unknown. spike =0 ");
+            //snprintf(message, sizeof(message), "abs type unknown. spike =0 ");
         };
     };
     
-    eOerrmanDescriptor_t errdes = {0};
+//    eOerrmanDescriptor_t errdes = {0};
 
-    errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag02);
-    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-    errdes.sourceaddress    = o->ID;
-    errdes.par16            = 0;
-    errdes.par64            = 0;
-    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, message, NULL, &errdes);
+//    errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag02);
+//    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+//    errdes.sourceaddress    = o->ID;
+//    errdes.par16            = 0;
+//    errdes.par64            = 0;
+//    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, message, NULL, &errdes);
 }
 
 void AbsEncoder_config(AbsEncoder* o, uint8_t ID, int32_t resolution, float32_t tolerance)

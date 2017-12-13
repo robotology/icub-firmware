@@ -1347,9 +1347,9 @@ void MController_config_joint(int j, eOmc_joint_config_t* config) //
         AbsEncoder_config_divisor(smc->absEncoder+j, config->gearbox_E2J);
     }
     
-    char message[100];
-    snprintf(message, sizeof(message), "Gearbox_E2J is %.5f", config->gearbox_E2J);
-    send_debug_message(message, j, 0, 0);
+//    char message[100];
+//    snprintf(message, sizeof(message), "Gearbox_E2J is %.5f", config->gearbox_E2J);
+//    send_debug_message(message, j, 0, 0);
 
 }
 
