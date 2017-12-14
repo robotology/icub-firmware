@@ -123,7 +123,7 @@ extern BOOL MController_set_joint_pos_raw(int j, CTRL_UNITS pos_ref);
 extern BOOL MController_set_joint_trq_ref(int j, CTRL_UNITS trq_ref);
 extern BOOL MController_set_joint_out_ref(int j, CTRL_UNITS out_ref);
 extern void MController_stop_joint(int j);
-extern void MController_config_motor_gearbox_ratio(int m, int32_t gearbox_ratio);
+extern void MController_config_motor_gearbox_M2J(int m, float32_t gearbox_M2J);
 extern void MController_config_motor_encoder(int m, int32_t resolution);
 extern int16_t MController_config_motor_pwm_limit(int m, int16_t pwm_limit);
 extern void MController_update_motor_odometry_fbk_can(int m, void* data);

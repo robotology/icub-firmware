@@ -158,8 +158,7 @@ typedef struct //Motor
     // POS_CONTROLLED_MOTOR 4
     uint8_t MOTOR_CONTROL_TYPE;
 
-    int16_t GEARBOX;
-    int16_t GEARBOX_E2J;
+    CTRL_UNITS GEARBOX;
 
     BOOL HAS_TEMP_SENSOR;
     int16_t temperature_max;
@@ -185,6 +184,7 @@ typedef struct //Motor
     
     int32_t pos_fbk_old;
     int32_t enc_sign;
+    float32_t enc_tolerance;
     
     int32_t vel_max;
     int32_t vel_ref;
@@ -226,7 +226,7 @@ typedef struct //Motor
 
     // 2FOC specific data
     WatchDog can_2FOC_alive_wdog;
-    uint8_t can_motor_config[6];
+    uint8_t can_motor_config[7];
     //BOOL outOfLimitsSignaled;
 
 } Motor;
@@ -288,7 +288,7 @@ extern BOOL Motor_is_running(Motor* o);
 void Motor_clear_ext_fault(Motor *o);
 
 ////////////////////////////////////////////////////////////////////////////
-extern void Motor_config_gearbox_ratio(Motor* o, int32_t gearbox_ratio);
+extern void Motor_config_gearbox_M2J(Motor* o, float32_t gearbox_M2J);
 extern int16_t Motor_config_pwm_limit(Motor* o, int16_t pwm_limit);
 ////////////////////////////////////////////////////////////////////////////
 /*

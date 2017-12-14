@@ -164,7 +164,7 @@ void Joint_config(Joint* o, uint8_t ID, eOmc_joint_config_t* config)
     // TODOALE joint admittance missing
     o->Kadmitt = ZERO;
     
-    
+    o->dead_zone = config->deadzone;
     
 //    eOerrmanDescriptor_t errdes = {0};
 //    char message[150];

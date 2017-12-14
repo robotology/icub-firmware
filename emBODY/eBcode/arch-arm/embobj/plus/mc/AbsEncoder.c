@@ -60,7 +60,7 @@ void AbsEncoder_init(AbsEncoder* o)
     //o->sign = 0;
     o->mul = 0;
     o->div = 1;
-    o->numofnoisebits = 0;
+    o->toleranceCfg = 0.0;
     
     o->fake = FALSE;
     
@@ -102,20 +102,62 @@ void AbsEncoder_destroy(AbsEncoder* o)
 //this function set spikes limits values based of encoder type
 void s_AbsEncoder_set_spikes_limis(AbsEncoder* o)
 {
-    if((o->type == eomc_enc_mais) || (o->type == eomc_enc_absanalog))
+    //char message[150];
+    switch(o->type)
     {
-        o->spike_mag_limit = 0;
-        o->spike_cnt_limit = 0;
-    }
-    else
-    {
-        #define AEA_MIN_SPIKE 16 //4 bitsof zero padding(aea use 12 bits)           
-        o->spike_mag_limit = (AEA_MIN_SPIKE << o->numofnoisebits)*o->div;
-        o->spike_cnt_limit = AEA_DEFAULT_SPIKE_CNT_LIMIT;
-    }
+        case(eomc_enc_mais):
+        case(eomc_enc_absanalog):
+        {
+            o->spike_mag_limit = 0;
+            o->spike_cnt_limit = 0;
+            //snprintf(message, sizeof(message), "mais or absAnalog");
+        }break;
+
+        case(eomc_enc_aea):
+        case(eomc_enc_spichainof2):
+        case(eomc_enc_spichainof3):
+        {
+            int32_t toleranceIDeg = o->toleranceCfg * 65535 /360 ;
+            #define AEA_MIN_SPIKE 16 //iDegree 
+            /* Note: AEA has 12 bits of resolution, so we pad with four zero to transform from AEA unit to iDegree */
+            if(toleranceIDeg < AEA_MIN_SPIKE)
+                o->spike_mag_limit = AEA_MIN_SPIKE * o->div;
+            else
+                o->spike_mag_limit = toleranceIDeg *o->div;
+            
+            o->spike_cnt_limit = AEA_DEFAULT_SPIKE_CNT_LIMIT;
+            
+            //snprintf(message, sizeof(message), "ABSE aea:tol%.3f, div%.3f spikel%lu", o->toleranceCfg, o->div, o->spike_mag_limit);
+        }break; 
+
+        case(eomc_enc_amo):
+        {
+            
+            int32_t toleranceIDeg = o->toleranceCfg * 65535 /360 ;
+            o->spike_mag_limit = toleranceIDeg *o->div;
+            o->spike_cnt_limit = AEA_DEFAULT_SPIKE_CNT_LIMIT; //ALE ??
+            //snprintf(message, sizeof(message), "AMO: tol%.3f, div%.3f spikel%lu", o->toleranceCfg, o->div, o->spike_mag_limit);
+        }break;        
+        
+        default:
+        {
+            o->spike_mag_limit = 0;
+            o->spike_cnt_limit = 0;
+            //snprintf(message, sizeof(message), "abs type unknown. spike =0 ");
+        };
+    };
+    
+//    eOerrmanDescriptor_t errdes = {0};
+
+//    errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag02);
+//    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+//    errdes.sourceaddress    = o->ID;
+//    errdes.par16            = 0;
+//    errdes.par64            = 0;
+//    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, message, NULL, &errdes);
 }
 
-void AbsEncoder_config(AbsEncoder* o, uint8_t ID, int32_t resolution, uint8_t numofnoisebits)
+void AbsEncoder_config(AbsEncoder* o, uint8_t ID, int32_t resolution, float32_t tolerance)
 {
     o->ID = ID;
     
@@ -139,8 +181,7 @@ void AbsEncoder_config(AbsEncoder* o, uint8_t ID, int32_t resolution, uint8_t nu
     
     if (!o->fake)
     {
-        o->numofnoisebits = numofnoisebits;
-
+       o->toleranceCfg = tolerance;
         s_AbsEncoder_set_spikes_limis(o);
     }
     else
@@ -165,7 +206,7 @@ void AbsEncoder_config_resolution(AbsEncoder* o, float resolution)
     }
 }
 
-extern void AbsEncoder_config_divisor(AbsEncoder* o, int32_t divisor)
+extern void AbsEncoder_config_divisor(AbsEncoder* o, float32_t divisor)
 {
     o->div = divisor;
     

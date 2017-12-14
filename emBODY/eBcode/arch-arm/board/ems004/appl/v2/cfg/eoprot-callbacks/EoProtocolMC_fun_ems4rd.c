@@ -1227,16 +1227,16 @@ extern void eoprot_fun_UPDT_mc_joint_inputs_externallymeasuredtorque(const EOnv*
 
 
 // f-marker-begin
-extern void eoprot_fun_UPDT_mc_motor_config_gearboxratio(const EOnv* nv, const eOropdescriptor_t* rd)
+extern void eoprot_fun_UPDT_mc_motor_config_gearbox_M2J(const EOnv* nv, const eOropdescriptor_t* rd)
 {   // not for mc4can
     eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
-    int32_t *gbxratio = (int32_t*)rd->data;
+    float32_t *gbxratio = (float32_t*)rd->data;
 
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
     
     if((eo_motcon_mode_foc == mcmode) || (eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode))
     {
-        MController_config_motor_gearbox_ratio(jxx, *gbxratio);
+        MController_config_motor_gearbox_M2J(jxx, *gbxratio);
     }
 }
 
