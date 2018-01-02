@@ -117,10 +117,10 @@ enum { eocanprot_classperiodic_msgtypes_maxnumberof = 16, eocanprot_classpolling
  **/ 
 typedef struct
 {
-    uint8_t     clas;       /**< use eOcanprot_msgclass_t */
-    uint8_t     type;       /**< they are: ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID, etc. */
-    uint16_t    filler16;   /**< to make explicit the alingment that teh compiler does */
-    void*       value;      /**< keeps a pointer to the value to be put inside the can frame */   
+    uint8_t     clas;               /**< use eOcanprot_msgclass_t */
+    uint8_t     type;               /**< they are: ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID, etc. */
+    eOversion_t protocolversion;    /**< so that it can support different protocol versions */
+    void*       value;              /**< keeps a pointer to the value to be put inside the can frame */   
 } eOcanprot_command_t;
 
 
