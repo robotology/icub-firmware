@@ -351,6 +351,13 @@ BOOL Joint_check_faults(Joint* o)
         }
     }
     
+    if ((o->pos_min != o->pos_max) && ((o->pos_fbk < o->pos_min_hard - POS_LIMIT_MARGIN) || (o->pos_fbk > o->pos_max_hard + POS_LIMIT_MARGIN))) 
+    {
+        o->fault_state.bits.hard_limit_reached = TRUE;
+            
+        o->control_mode = eomc_controlmode_hwFault;
+    }
+    
     if (o->control_mode != eomc_controlmode_hwFault) return FALSE;
 
     if (++o->diagnostics_refresh > 5*CTRL_LOOP_FREQUENCY_INT)
@@ -369,6 +376,17 @@ BOOL Joint_check_faults(Joint* o)
             descriptor.sourcedevice = eo_errman_sourcedevice_localboard;
             descriptor.sourceaddress = 0;
             descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_axis_torque_sens);
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
+        }
+        
+        if (o->fault_state.bits.hard_limit_reached && !o->fault_state_prec.bits.hard_limit_reached)
+        {   
+            static eOerrmanDescriptor_t descriptor = {0};
+            descriptor.par16 = o->ID;
+            descriptor.par64 = 0;
+            descriptor.sourcedevice = eo_errman_sourcedevice_localboard;
+            descriptor.sourceaddress = 0;
+            descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_joint_hard_limit);
             eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
         }
         

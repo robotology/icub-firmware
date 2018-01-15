@@ -38,6 +38,7 @@ typedef union
     struct
     {
         uint8_t torque_sensor_timeout:1;
+        uint8_t hard_limit_reached:1;
     } bits;
         
     uint8_t bitmask;
