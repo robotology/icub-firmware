@@ -45,6 +45,9 @@
 #include "embot_hw_adc.h"
 
 
+#include "embot_hw_sys.h"
+
+
 #include "embot_sys_Timer.h"
 #include "embot_sys_Action.h"
 
@@ -480,7 +483,7 @@ struct embot::app::application::theSTRAIN::Impl
         bool adcsaturation;        
         embot::app::canprotocol::analog::periodic::ADCsaturation saturationonchannel[6];
 
-        
+        std::uint8_t adcfailures;
         
         
         // methods
@@ -495,6 +498,7 @@ struct embot::app::application::theSTRAIN::Impl
             TXcalibData = false; 
             TXuncalibData = false; 
             adcsaturation =  false;
+            adcfailures = 0;
             std::memset(saturationonchannel, static_cast<std::uint8_t>(embot::app::canprotocol::analog::periodic::ADCsaturation::NONE), sizeof(saturationonchannel));
         }       
         StrainRuntimeData_t() { clear(); }
@@ -648,7 +652,7 @@ struct embot::app::application::theSTRAIN::Impl
     bool acquisition_waituntilcompletion(embot::common::relTime timeout);
     bool acquisition_retrieve();
     
-    bool acquisition_oneshot(embot::common::relTime timeout = embot::common::time1millisec, bool restartifitwasticking = true);
+    bool acquisition_oneshot(embot::common::relTime timeout = 3*embot::common::time1millisec, bool restartifitwasticking = true);
     
     bool processing();
     
@@ -837,6 +841,8 @@ bool embot::app::application::theSTRAIN::Impl::fill(embot::app::canprotocol::ana
 
 bool embot::app::application::theSTRAIN::Impl::acquisition_start()
 {
+    runtimedata.data.adcfailures = 0;
+    
     std::memset(runtimedata.data.dmabuffer, 0xff, sizeof(runtimedata.data.dmabuffer));    
     adcdataisready = false;
     embot::hw::adc::start(embot::hw::adc::Port::one);    
@@ -861,12 +867,12 @@ bool embot::app::application::theSTRAIN::Impl::acquisition_waituntilcompletion(e
         {
             break;
         }
-       now = embot::sys::timeNow();
-       if(now > endtime)
-       {
+        now = embot::sys::timeNow();
+        if(now > endtime)
+        {
            ret = false;
            break;
-       }                   
+        }                   
     }
     
 //    delta = now - start;
@@ -885,15 +891,15 @@ bool embot::app::application::theSTRAIN::Impl::acquisition_oneshot(embot::common
     }           
     // we perform a new acquisition in blocking mode
     acquisition_start();    
-    acquisition_waituntilcompletion(timeout);      
-    acquisition_retrieve();    
+    bool ret = acquisition_waituntilcompletion(timeout);     
+        acquisition_retrieve();    
     
     if((true == itwasticking) && (true == restartifitwasticking))
     {
         start(txmode);     
     }
     
-    return true;    
+    return ret;    
 }
 
 
@@ -904,27 +910,17 @@ bool embot::app::application::theSTRAIN::Impl::acquisition_retrieve()
 
     // 1. acquire from adc and put inside adcvalue    
     std::memmove(runtimedata.data.adcvalue, runtimedata.data.dmabuffer, sizeof(runtimedata.data.adcvalue));
-    
-#if 0
-
-    // compute the input before amplification. it should be more or less stable irrespectively if alpha and beta values ...
-    static float vinput[6] = {0.0f};
-    
-    for(int j=0; j<6; j++)
-    {
-        embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
-        configdata.amplifiers_get(0, j, cfg1);
-        
-        embot::hw::PGA308::TransferFunctionConfig tfc;
-        tfc.load(cfg1);  
-        vinput[j] = (static_cast<float>(runtimedata.data.adcvalue[j]) - tfc.beta()) / tfc.alpha();
-    }
-
-#endif    
+     
 
     // 2. convert adcvalue[] into q15value[]
+
+    runtimedata.data.adcfailures = 0;
     for(int i=0; i<6; i++)
     {
+        if(0xffff == runtimedata.data.adcvalue[i])
+        {
+            runtimedata.data.adcfailures ++;
+        }
         runtimedata.data.adcvalue[i] <<= 3; // adc value is 13 bits. we need to scale it to 64k
         runtimedata.data.q15value[i] = embot::dsp::q15::U16toQ15(runtimedata.data.adcvalue[i]);
     }
@@ -1010,6 +1006,29 @@ bool embot::app::application::theSTRAIN::Impl::processdata(std::vector<embot::hw
     processing();
     
 //    debugtime = embot::sys::timeNow() - start;    
+
+#if 0    
+    if(0 != runtimedata.data.adcfailures)
+    {
+        char ss[8] = {0};
+        snprintf(ss, sizeof(ss), "e%d", runtimedata.data.adcfailures);
+        embot::app::application::theCANtracer &tracer = embot::app::application::theCANtracer::getInstance();
+        tracer.print(ss, replies);
+        runtimedata.data.adcfailures = 0;
+    }
+    else
+    {
+        static uint32_t count = 0;
+        
+        if(0 == (count % 1000))
+        {
+            embot::app::application::theCANtracer &tracer = embot::app::application::theCANtracer::getInstance();
+            tracer.print("tick", replies);            
+        }
+        
+        count++;        
+    }
+#endif
     
     embot::hw::can::Frame frame;  
 
@@ -1192,6 +1211,8 @@ bool embot::app::application::theSTRAIN::initialise(Config &config)
     adcConf.oncompletion.arg = pImpl;
     embot::hw::adc::init(embot::hw::adc::Port::one, adcConf);
     pImpl->adcdataisready = false;
+    
+    embot::app::application::theCANtracer &tracer = embot::app::application::theCANtracer::getInstance();
      
     return true;
 }
@@ -1460,7 +1481,7 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::p
 
         case embot::app::canprotocol::analog::polling::Message_SET_CALIB_TARE::Mode::everychannelnegativeofadc:
         {                        
-            // it acquire once. it also restarts if required.
+            // it acquires once. it also restarts if required.
             pImpl->acquisition_oneshot();
             
             for(int i=0; i<6; i++)
