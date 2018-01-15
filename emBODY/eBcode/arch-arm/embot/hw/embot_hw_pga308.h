@@ -23,6 +23,7 @@
 #define _EMBOT_HW_PGA308_H_
 
 #include "embot_common.h"
+#include "embot_binary.h"
 #include "embot_hw.h"
 #include "embot_hw_onewire.h"
 #include "embot_hw_gpio.h"
@@ -233,7 +234,7 @@ namespace embot { namespace hw { namespace PGA308 {
         std::uint8_t        GI          : 4;        // front end gain. from 0000b to 1101b: {4 6 8 12 16 32 64 100 200 400 480 600 800 960 1200 1600}
         std::uint8_t        muxsign     : 1;        // the sign: 0 is +, 1 is -
         std::uint8_t        GO          : 3;        // output gain. from 000b to 111b: {2.0, 2.4, 3, 3.6, 4.0, 4.5, 6.0, disable-internal-feedback}
-        std::uint8_t        Vcoarseoffset;
+        std::uint8_t        Vcoarseoffset;          // Vcoarseoffset is stored as sign+value and must be in range [-100, +100].
         std::uint16_t       Vzerodac;
         
         enum class Parameter { GD = 0, GI = 1, muxsign = 2, GO = 3, Vcoarseoffset = 4, Vzerodac = 5 };
@@ -361,10 +362,38 @@ namespace embot { namespace hw { namespace PGA308 {
             //return static_cast<float>(VREF)*(1.0f/128.0f)*mapCOSVR2val[cosvr2];
             return 2.7328f;
         } 
-
+        
+        float regvco2value(std::uint8_t co)
+        {   // regvco is inside [-100, +100] in sign-value format
+            std::uint8_t v = co & 0x7f;
+            if(v > 100) { v = 100; }
+            std::uint8_t negative = co >> 7;             
+            return (1 == negative) ? -v : +v;              
+        }
+        
+        std::uint8_t value2regvco(float v)
+        {   // regvco is inside [-100, +100] in sign-value format
+            std:: uint8_t r = 0;
+            if(v > 0)
+            {
+                v = std::floor(v + 0.5f);
+                if(v > +100.0f) { v = +100.0f; }
+                r = static_cast<std::uint8_t>(v);
+            }
+            else
+            {
+                v = -v;
+                v = std::floor(v + 0.5f);
+                if(v > +100.0f) { v = +100.0f; }   
+                r = static_cast<std::uint8_t>(v) | 0x80;                
+            }
+            
+            return r;
+        }
+        
         float valueOfCoarseOffset()
         {
-            return valueOfCOR()*static_cast<float>(Vcoarseoffset);   
+            return valueOfCOR()*regvco2value(Vcoarseoffset);   
         }
         
         float valueOfFineOffset()
@@ -399,7 +428,7 @@ namespace embot { namespace hw { namespace PGA308 {
             // c = Vout - a*y - b*z
             a = alpha() * valueOfCOR();
             b = - (alpha()*static_cast<float>(VREF)/valueOfGI())/65536.0f; // valueOfGI() is always != 0
-            c = static_cast<float>(vout) - a*static_cast<float>(Vcoarseoffset) - b*static_cast<float>(Vzerodac);                      
+            c = static_cast<float>(vout) - a*regvco2value(Vcoarseoffset) - b*static_cast<float>(Vzerodac);                      
         }
         
         bool alignVOUT(const std::uint16_t vout, const std::uint16_t target, std::uint8_t &Y, std::uint16_t &Z)
@@ -407,18 +436,18 @@ namespace embot { namespace hw { namespace PGA308 {
             float a, b, c;
             computeOffsetParams(vout, a, b, c);
             float y = (target - c - b*static_cast<float>(Vzerodac))/a;  // a is always != 0
-            if((y > 255.0f) || (y < 0.0f))
-            {
-                return false;
-            }
-            // must round y ... 
-            Y = static_cast<std::uint8_t>(std::floor(y + 0.5f));
-            // must apply Y to ...
-            float z = (target - c - a*static_cast<float>(Y))/b;
+            
+            // round and limit y ... which must be integer and inside [-100, +100] and            
+            std::uint8_t tmp = value2regvco(y);
+            y = regvco2value(tmp);
+
+            // must apply new y to ...
+            float z = (target - c - a*y)/b;
             if((z > 65535.0f) || (z < 0.0f))
             {
                 return false;
             }
+            Y = value2regvco(y);
             Z = static_cast<std::uint16_t>(std::floor(z + 0.5f));
             Vcoarseoffset = Y;
             Vzerodac = Z;
@@ -441,21 +470,15 @@ namespace embot { namespace hw { namespace PGA308 {
         bool setbeta(float b)
         {
             float yco = b / (alpha() * valueOfCOR());
-            std::int32_t y = static_cast<std::int32_t>(std::floor(yco + 0.5f));
-            if((y >= 256) || (y < 0))
-            {
-                return false;
-            }
-            //std::uint8_t prevCO = Vcoarseoffset;
-            Vcoarseoffset = static_cast<std::uint8_t>(y);
+            std::uint8_t y = value2regvco(yco);
             // now we compute the fine adjustment
-            float zco = ( static_cast<float>(y) * valueOfCOR() + 0.5f*static_cast<float>(VREF)/valueOfGI() - b/alpha() ) / ( (static_cast<float>(VREF)/65536.0f)/valueOfGI() );
+            float zco = ( regvco2value(y) * valueOfCOR() + 0.5f*static_cast<float>(VREF)/valueOfGI() - b/alpha() ) / ( (static_cast<float>(VREF)/65536.0f)/valueOfGI() );
             std::int32_t z = static_cast<std::int32_t>(std::floor(zco + 0.5f));
             if((z >= 65536) || (z < 0))
             {
                 return false;
             }
-            Vcoarseoffset = static_cast<std::uint8_t>(y);
+            Vcoarseoffset = y;
             Vzerodac = static_cast<std::uint16_t>(z);
             
             return true;
