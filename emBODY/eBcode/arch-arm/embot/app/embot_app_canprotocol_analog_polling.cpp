@@ -488,7 +488,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
             
             case 1:
             {
-                info.mode = Mode::everychannelnegativeoftorqueforce;
+                info.mode = Mode::everychannelnegativeofforcetorque;
             } break;  
 
             case 2:

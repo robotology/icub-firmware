@@ -115,7 +115,7 @@ struct embot::app::application::theSTRAIN::Impl
     // the complete configuration for the transformer and the six amplifiers
     struct setOfConfig_t
     {
-        transformerConfig_t     transformer;            // the config of the transformer from dacs to torqueforce array
+        transformerConfig_t     transformer;            // the config of the transformer from dacs to forcetorque array
 //        amplifier0Config_t      amplifiers0[6];         // the OLD config of the amplifiers from strain gauge to values given to dacs 
         amplifierConfig_t       amplifiers[6];          // the NEW config of the amplifiers from strain gauge to values given to dacs          
     };
@@ -471,14 +471,13 @@ struct embot::app::application::theSTRAIN::Impl
         
         embot::dsp::Q15     q15value[6];        // same as adcvalue but in q15 format       
         embot::dsp::Q15     tare[6];            // the tare applied as a last correction. it is always ::zero unless changed with SET_CURR_TARE
-        embot::dsp::Q15     torqueforce[6];
+        embot::dsp::Q15     forcetorque[6];
         
         // the calibrated values for torque and force. they are raw values, not in dsp::Q15 format
         embot::common::Triple<std::uint16_t>    torque;
         embot::common::Triple<std::uint16_t>    force;
         
-        bool TXcalibData;
-        bool TXuncalibData;
+        embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode strainmode;
         
         bool adcsaturation;        
         embot::app::canprotocol::analog::periodic::ADCsaturation saturationonchannel[6];
@@ -492,12 +491,11 @@ struct embot::app::application::theSTRAIN::Impl
             std::memset(tare, 0, sizeof(tare)); 
             std::memset(dmabuffer, 0, sizeof(dmabuffer));
             std::memset(adcvalue, 0, sizeof(adcvalue));
-            std::memset(torqueforce, 0, sizeof(torqueforce));
+            std::memset(forcetorque, 0, sizeof(forcetorque));
             force.reset();
             torque.reset();
-            TXcalibData = false; 
-            TXuncalibData = false; 
-            adcsaturation =  false;
+            strainmode = embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode::none;
+            adcsaturation = false;
             adcfailures = 0;
             std::memset(saturationonchannel, static_cast<std::uint8_t>(embot::app::canprotocol::analog::periodic::ADCsaturation::NONE), sizeof(saturationonchannel));
         }       
@@ -513,7 +511,7 @@ struct embot::app::application::theSTRAIN::Impl
         
         // used for the sake of matrix-based calculation
         embot::dsp::q15::matrix currtareQ15vector;
-        embot::dsp::q15::matrix torqueforceQ15vector;
+        embot::dsp::q15::matrix forcetorqueQ15vector;
         embot::dsp::q15::matrix adcvalueQ15vector;
         
                         
@@ -525,7 +523,7 @@ struct embot::app::application::theSTRAIN::Impl
         
         bool check_adcsaturation()
         {
-            data.adcsaturation =  false;
+            data.adcsaturation = false;
             std::memset(data.saturationonchannel, static_cast<std::uint8_t>(embot::app::canprotocol::analog::periodic::ADCsaturation::NONE), sizeof(data.saturationonchannel));
 
 
@@ -582,7 +580,7 @@ struct embot::app::application::theSTRAIN::Impl
         {
             clear();
             
-            torqueforceQ15vector.load(6, 1, data.torqueforce);
+            forcetorqueQ15vector.load(6, 1, data.forcetorque);
             currtareQ15vector.load(6, 1, data.tare);
             adcvalueQ15vector.load(6, 1, data.q15value);
         }
@@ -603,7 +601,6 @@ struct embot::app::application::theSTRAIN::Impl
     Config config;
            
     bool ticking;
-    embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode txmode;
     volatile bool adcdataisready;
     
     
@@ -626,7 +623,6 @@ struct embot::app::application::theSTRAIN::Impl
         debugtime = 0;
         
         ticking = false;  
-        txmode = embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode::acquireOnly; // even better is to use none
 
         ticktimer = new embot::sys::Timer;   
 
@@ -640,7 +636,7 @@ struct embot::app::application::theSTRAIN::Impl
     }
     
    
-    bool start(embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode &mode);
+    bool start(const embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode mode);
     bool stop();
     
     bool tick(std::vector<embot::hw::can::Frame> &replies);
@@ -658,8 +654,8 @@ struct embot::app::application::theSTRAIN::Impl
     
     bool fill(embot::app::canprotocol::analog::periodic::Message_UNCALIBFORCE_VECTOR_DEBUGMODE::Info &info);
     bool fill(embot::app::canprotocol::analog::periodic::Message_UNCALIBTORQUE_VECTOR_DEBUGMODE::Info &info);
-    bool fill(embot::app::canprotocol::analog::periodic::Message_FORCE_VECTOR::Info &info);
-    bool fill(embot::app::canprotocol::analog::periodic::Message_TORQUE_VECTOR::Info &info);
+    bool fill(const bool calibrated, embot::app::canprotocol::analog::periodic::Message_FORCE_VECTOR::Info &info);
+    bool fill(const bool calibrated, embot::app::canprotocol::analog::periodic::Message_TORQUE_VECTOR::Info &info);
     
     
     static void alertdataisready(void *p)
@@ -678,7 +674,7 @@ struct embot::app::application::theSTRAIN::Impl
 
 
 
-bool embot::app::application::theSTRAIN::Impl::start(embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode &mode)
+bool embot::app::application::theSTRAIN::Impl::start(const embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode mode)
 {    
     if(true == ticking)
     {
@@ -686,37 +682,26 @@ bool embot::app::application::theSTRAIN::Impl::start(embot::app::canprotocol::an
         ticking = false;
     }
     
-    runtimedata.data.TXcalibData = false;
-    runtimedata.data.TXuncalibData = false;
-        
-    txmode = mode;
     
-    switch(txmode)
+    runtimedata.data.strainmode = mode;
+            
+    switch(runtimedata.data.strainmode)
     {
         case embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode::txCalibrated:
-        {
-            runtimedata.data.TXcalibData = true; runtimedata.data.TXuncalibData = false;
-        } break;
-        
         case embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode::txUncalibrated:
-        {
-            runtimedata.data.TXcalibData = false; runtimedata.data.TXuncalibData = true;
-        } break;  
-        
         case embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode::txAll:
         {
-            runtimedata.data.TXcalibData = true; runtimedata.data.TXuncalibData = true;
-        } break; 
-
+            ticking = true; 
+        } break;
+        
         default:
         {
-            runtimedata.data.TXcalibData = false; runtimedata.data.TXuncalibData = false;
+            ticking = false;
         } break;             
     }    
     
-    if((false == runtimedata.data.TXcalibData) && (false == runtimedata.data.TXuncalibData))
+    if(false == ticking)
     {
-        ticking = false;
         return true;        
     }
     
@@ -728,8 +713,7 @@ bool embot::app::application::theSTRAIN::Impl::start(embot::app::canprotocol::an
 
 bool embot::app::application::theSTRAIN::Impl::stop()
 { 
-    runtimedata.data.TXcalibData = false;
-    runtimedata.data.TXuncalibData = false;
+    runtimedata.data.strainmode = embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode::none;
     
     ticktimer->stop();
     ticking = false;    
@@ -742,17 +726,17 @@ bool embot::app::application::theSTRAIN::Impl::fill(embot::app::canprotocol::ana
     bool ret = true;
     
     info.canaddress = embot::app::theCANboardInfo::getInstance().cachedCANaddress();
-    info.x = runtimedata.data.adcvalue[3];
-    info.y = runtimedata.data.adcvalue[4];
-    info.z = runtimedata.data.adcvalue[5];
+    info.x = runtimedata.data.adcvalue[0];
+    info.y = runtimedata.data.adcvalue[1];
+    info.z = runtimedata.data.adcvalue[2];
     
     info.adcsaturationispresent = runtimedata.data.adcsaturation;
     if(true == runtimedata.data.adcsaturation)
     {
         info.adcsaturationinfo.thereissaturation =  true;
-        info.adcsaturationinfo.channel[0] = runtimedata.data.saturationonchannel[3];
-        info.adcsaturationinfo.channel[1] = runtimedata.data.saturationonchannel[4];
-        info.adcsaturationinfo.channel[2] = runtimedata.data.saturationonchannel[5];
+        info.adcsaturationinfo.channel[0] = runtimedata.data.saturationonchannel[0];
+        info.adcsaturationinfo.channel[1] = runtimedata.data.saturationonchannel[1];
+        info.adcsaturationinfo.channel[2] = runtimedata.data.saturationonchannel[2];
     }
     else
     {
@@ -768,35 +752,10 @@ bool embot::app::application::theSTRAIN::Impl::fill(embot::app::canprotocol::ana
     bool ret = true;
 
     info.canaddress = embot::app::theCANboardInfo::getInstance().cachedCANaddress();
-    info.x = runtimedata.data.adcvalue[0];
-    info.y = runtimedata.data.adcvalue[1];
-    info.z = runtimedata.data.adcvalue[2];
+    info.x = runtimedata.data.adcvalue[3];
+    info.y = runtimedata.data.adcvalue[4];
+    info.z = runtimedata.data.adcvalue[5];
 
-    info.adcsaturationispresent = runtimedata.data.adcsaturation;
-    if(true == runtimedata.data.adcsaturation)
-    {
-        info.adcsaturationinfo.thereissaturation =  true;
-        info.adcsaturationinfo.channel[0] = runtimedata.data.saturationonchannel[0];
-        info.adcsaturationinfo.channel[1] = runtimedata.data.saturationonchannel[1];
-        info.adcsaturationinfo.channel[2] = runtimedata.data.saturationonchannel[2];
-    }
-    else
-    {
-        info.adcsaturationinfo.reset();
-    }
-    
-    return ret;    
-}
-
-bool embot::app::application::theSTRAIN::Impl::fill(embot::app::canprotocol::analog::periodic::Message_FORCE_VECTOR::Info &info)
-{
-    bool ret = true;
-    
-    info.canaddress = embot::app::theCANboardInfo::getInstance().cachedCANaddress();
-    info.x = runtimedata.data.force.x;
-    info.y = runtimedata.data.force.y;
-    info.z = runtimedata.data.force.z;
-    
     info.adcsaturationispresent = runtimedata.data.adcsaturation;
     if(true == runtimedata.data.adcsaturation)
     {
@@ -813,15 +772,24 @@ bool embot::app::application::theSTRAIN::Impl::fill(embot::app::canprotocol::ana
     return ret;    
 }
 
-
-bool embot::app::application::theSTRAIN::Impl::fill(embot::app::canprotocol::analog::periodic::Message_TORQUE_VECTOR::Info &info)
+bool embot::app::application::theSTRAIN::Impl::fill(const bool calibrated, embot::app::canprotocol::analog::periodic::Message_FORCE_VECTOR::Info &info)
 {
     bool ret = true;
-
+    
     info.canaddress = embot::app::theCANboardInfo::getInstance().cachedCANaddress();
-    info.x = runtimedata.data.torque.x;
-    info.y = runtimedata.data.torque.y;
-    info.z = runtimedata.data.torque.z;
+    
+    if(true == calibrated)
+    {
+        info.x = runtimedata.data.force.x;
+        info.y = runtimedata.data.force.y;
+        info.z = runtimedata.data.force.z;
+    }
+    else
+    {
+        info.x = runtimedata.data.adcvalue[0];
+        info.y = runtimedata.data.adcvalue[1];
+        info.z = runtimedata.data.adcvalue[2];        
+    }
     
     info.adcsaturationispresent = runtimedata.data.adcsaturation;
     if(true == runtimedata.data.adcsaturation)
@@ -830,6 +798,42 @@ bool embot::app::application::theSTRAIN::Impl::fill(embot::app::canprotocol::ana
         info.adcsaturationinfo.channel[0] = runtimedata.data.saturationonchannel[0];
         info.adcsaturationinfo.channel[1] = runtimedata.data.saturationonchannel[1];
         info.adcsaturationinfo.channel[2] = runtimedata.data.saturationonchannel[2];
+    }
+    else
+    {
+        info.adcsaturationinfo.reset();
+    }
+    
+    return ret;    
+}
+
+
+bool embot::app::application::theSTRAIN::Impl::fill(const bool calibrated, embot::app::canprotocol::analog::periodic::Message_TORQUE_VECTOR::Info &info)
+{
+    bool ret = true;
+
+    info.canaddress = embot::app::theCANboardInfo::getInstance().cachedCANaddress();
+
+    if(true == calibrated)
+    {    
+        info.x = runtimedata.data.torque.x;
+        info.y = runtimedata.data.torque.y;
+        info.z = runtimedata.data.torque.z;
+    }
+    else
+    {
+        info.x = runtimedata.data.adcvalue[3];
+        info.y = runtimedata.data.adcvalue[4];
+        info.z = runtimedata.data.adcvalue[5];        
+    }  
+    
+    info.adcsaturationispresent = runtimedata.data.adcsaturation;
+    if(true == runtimedata.data.adcsaturation)
+    {
+        info.adcsaturationinfo.thereissaturation =  true;
+        info.adcsaturationinfo.channel[0] = runtimedata.data.saturationonchannel[3];
+        info.adcsaturationinfo.channel[1] = runtimedata.data.saturationonchannel[4];
+        info.adcsaturationinfo.channel[2] = runtimedata.data.saturationonchannel[5];
     }
     else
     {
@@ -896,7 +900,7 @@ bool embot::app::application::theSTRAIN::Impl::acquisition_oneshot(embot::common
     
     if((true == itwasticking) && (true == restartifitwasticking))
     {
-        start(txmode);     
+        start(runtimedata.data.strainmode);     
     }
     
     return ret;    
@@ -943,7 +947,7 @@ bool embot::app::application::theSTRAIN::Impl::processing()
     // now prepare calib data: it will be inside the triples: runtimedata.data.torque and runtimedata.data.force 
     
         
-    // apply formula: torqueforce = M * (adcvalue + calibtare) + currtare
+    // apply formula: forcetorque = M * (adcvalue + calibtare) + currtare
     // default values are: M = IdentityMatrix(0x7fff); calibtare = Vector(0); currtare = Vector(0)
     
     bool q15saturated =  false;
@@ -956,26 +960,26 @@ bool embot::app::application::theSTRAIN::Impl::processing()
     
     
     embot::dsp::q15::add(runtimedata.adcvalueQ15vector, handleCalibTareQ15, tmpQ15vector, q15saturated);
-    embot::dsp::q15::multiply(handleCalibMatrixQ15, tmpQ15vector, runtimedata.torqueforceQ15vector, q15saturated);
-    embot::dsp::q15::add(runtimedata.torqueforceQ15vector, runtimedata.currtareQ15vector, runtimedata.torqueforceQ15vector, q15saturated);
+    embot::dsp::q15::multiply(handleCalibMatrixQ15, tmpQ15vector, runtimedata.forcetorqueQ15vector, q15saturated);
+    embot::dsp::q15::add(runtimedata.forcetorqueQ15vector, runtimedata.currtareQ15vector, runtimedata.forcetorqueQ15vector, q15saturated);
     
     // copy 
     
-    // now in torqueforceQ15vector (runtimedata.data.torqueforce[]) we have the result ... 
+    // now in forcetorqueQ15vector (runtimedata.data.forcetorque[]) we have the result ... 
     
     // if we did have saturation ... we send old safe data.
    
-    // if we are ok, we use what in runtimedata.data.torqueforce[] to compute safe data and data to send
-    // data2send = safedata = 0x8000 + torqueforce
+    // if we are ok, we use what in runtimedata.data.forcetorque[] to compute safe data and data to send
+    // data2send = safedata = 0x8000 + forcetorque
    
     if(false == runtimedata.data.adcsaturation)
     {
-        runtimedata.data.torque.set(embot::dsp::q15::Q15toU16(runtimedata.data.torqueforce[0]), embot::dsp::q15::Q15toU16(runtimedata.data.torqueforce[1]), embot::dsp::q15::Q15toU16(runtimedata.data.torqueforce[2]));
-        runtimedata.data.force.set(embot::dsp::q15::Q15toU16(runtimedata.data.torqueforce[3]), embot::dsp::q15::Q15toU16(runtimedata.data.torqueforce[4]), embot::dsp::q15::Q15toU16(runtimedata.data.torqueforce[5]));
+        runtimedata.data.force.set(embot::dsp::q15::Q15toU16(runtimedata.data.forcetorque[0]), embot::dsp::q15::Q15toU16(runtimedata.data.forcetorque[1]), embot::dsp::q15::Q15toU16(runtimedata.data.forcetorque[2]));
+        runtimedata.data.torque.set(embot::dsp::q15::Q15toU16(runtimedata.data.forcetorque[3]), embot::dsp::q15::Q15toU16(runtimedata.data.forcetorque[4]), embot::dsp::q15::Q15toU16(runtimedata.data.forcetorque[5]));
     }
     else
     {
-        // we dont update so that in runtimedata.data.torque and runtimedata.data.force there are always valid value
+        // we dont update so that in runtimedata.data.torque and runtimedata.data.force there are always valid values
     }
         
     
@@ -1031,51 +1035,83 @@ bool embot::app::application::theSTRAIN::Impl::processdata(std::vector<embot::hw
 #endif
     
     embot::hw::can::Frame frame;  
-
-
-    if(true == runtimedata.data.TXuncalibData)
-    {
-        embot::app::canprotocol::analog::periodic::Message_UNCALIBFORCE_VECTOR_DEBUGMODE::Info forceinfo;
-        if(true == fill(forceinfo))
-        {
-            embot::app::canprotocol::analog::periodic::Message_UNCALIBFORCE_VECTOR_DEBUGMODE msg;
-            msg.load(forceinfo);
-            msg.get(frame);
-            replies.push_back(frame);
-        }            
     
-        embot::app::canprotocol::analog::periodic::Message_UNCALIBTORQUE_VECTOR_DEBUGMODE::Info torqueinfo;
-        if(true == fill(torqueinfo))
-        {
-            embot::app::canprotocol::analog::periodic::Message_UNCALIBTORQUE_VECTOR_DEBUGMODE msg;
-            msg.load(torqueinfo);
-            msg.get(frame);
-            replies.push_back(frame);
-        }  
-    }    
-                                            
-
-    if(true == runtimedata.data.TXcalibData)
+    switch(runtimedata.data.strainmode)
     {
-        embot::app::canprotocol::analog::periodic::Message_FORCE_VECTOR::Info forceinfo;
-        if(true == fill(forceinfo))
+        case embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode::txCalibrated:
+        case embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode::txUncalibrated:
         {
-            embot::app::canprotocol::analog::periodic::Message_FORCE_VECTOR msg;
-            msg.load(forceinfo);
-            msg.get(frame);
-            replies.push_back(frame);
-        }            
-    
-        embot::app::canprotocol::analog::periodic::Message_TORQUE_VECTOR::Info torqueinfo;
-        if(true == fill(torqueinfo))
+            bool calibrated = (embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode::txCalibrated == runtimedata.data.strainmode) ? true : false;
+            // we send up two messages A and B which may contain either calib or uncalib data
+            embot::app::canprotocol::analog::periodic::Message_FORCE_VECTOR::Info forceinfo0A;
+            if(true == fill(calibrated, forceinfo0A))
+            {
+                embot::app::canprotocol::analog::periodic::Message_FORCE_VECTOR msg;
+                msg.load(forceinfo0A);
+                msg.get(frame);
+                replies.push_back(frame);
+            }            
+        
+            embot::app::canprotocol::analog::periodic::Message_TORQUE_VECTOR::Info torqueinfo0B;
+            if(true == fill(calibrated, torqueinfo0B))
+            {
+                embot::app::canprotocol::analog::periodic::Message_TORQUE_VECTOR msg;
+                msg.load(torqueinfo0B);
+                msg.get(frame);
+                replies.push_back(frame);
+            }  
+        
+        } break;
+        
+        case embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode::txAll:
         {
-            embot::app::canprotocol::analog::periodic::Message_TORQUE_VECTOR msg;
-            msg.load(torqueinfo);
-            msg.get(frame);
-            replies.push_back(frame);
-        }  
+            // we send up two messages A and B w/ calib data
+            embot::app::canprotocol::analog::periodic::Message_FORCE_VECTOR::Info forceinfo0A;
+            if(true == fill(true, forceinfo0A))
+            {
+                embot::app::canprotocol::analog::periodic::Message_FORCE_VECTOR msg;
+                msg.load(forceinfo0A);
+                msg.get(frame);
+                replies.push_back(frame);
+            }            
+        
+            embot::app::canprotocol::analog::periodic::Message_TORQUE_VECTOR::Info torqueinfo0B;
+            if(true == fill(true, torqueinfo0B))
+            {
+                embot::app::canprotocol::analog::periodic::Message_TORQUE_VECTOR msg;
+                msg.load(torqueinfo0B);
+                msg.get(frame);
+                replies.push_back(frame);
+            }  
+
+            // and we send up two more messages 8 and 9 w/ uncalib data
+            embot::app::canprotocol::analog::periodic::Message_UNCALIBFORCE_VECTOR_DEBUGMODE::Info forceinfo08;
+            if(true == fill(forceinfo08))
+            {
+                embot::app::canprotocol::analog::periodic::Message_UNCALIBFORCE_VECTOR_DEBUGMODE msg;
+                msg.load(forceinfo08);
+                msg.get(frame);
+                replies.push_back(frame);
+            }            
+        
+            embot::app::canprotocol::analog::periodic::Message_UNCALIBTORQUE_VECTOR_DEBUGMODE::Info torqueinfo09;
+            if(true == fill(torqueinfo09))
+            {
+                embot::app::canprotocol::analog::periodic::Message_UNCALIBTORQUE_VECTOR_DEBUGMODE msg;
+                msg.load(torqueinfo09);
+                msg.get(frame);
+                replies.push_back(frame);
+            }              
+            
+        } break;
+        
+        
+        default:
+        {
+        } break;
+        
     }
-
+    
     
 //    debugtime = embot::sys::timeNow() - start; 
        
@@ -1540,17 +1576,17 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::p
             pImpl->runtimedata.tare_fill(embot::dsp::q15::zero);
         } break;
 
-        case embot::app::canprotocol::analog::polling::Message_SET_CURR_TARE::Mode::everychannelnegativeoftorqueforce:
+        case embot::app::canprotocol::analog::polling::Message_SET_CURR_TARE::Mode::everychannelnegativeofforcetorque:
         {
             // we need to assign the runtimedata.data.tare[] with:  
             // currtare = -tq, where tq = ( M * (adc + calibtare) )
-            // after acquisition() + processing we compute runtimedata.data.torqueforce[] to be:
-            // torqueforce = M * (adc + calibtare) + runtimedata.data.tare
+            // after acquisition() + processing we compute runtimedata.data.forcetorque[] to be:
+            // forcetorque = M * (adc + calibtare) + runtimedata.data.tare
             // hence, we do that:
             // 1. we clear runtimedata.data.tare[] to be zero.
             // 2. we call processing()
-            // 3. we assign runtimedata.data.tare[] with the opposite of runtimedata.data.torqueforce[] 
-            // THE RESULT OF THIS OPERATION IS that we after the assignement of the currtare have a zero runtimedata.data.torqueforce 
+            // 3. we assign runtimedata.data.tare[] with the opposite of runtimedata.data.forcetorque[] 
+            // THE RESULT OF THIS OPERATION IS that we after the assignement of the currtare have a zero runtimedata.data.forcetorque 
             
             pImpl->runtimedata.tare_fill(embot::dsp::q15::zero);
                         
@@ -1561,7 +1597,7 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::p
             
             for(int i=0; i<6; i++)
             {                
-                pImpl->runtimedata.data.tare[i] = embot::dsp::q15::opposite(pImpl->runtimedata.data.torqueforce[i]); 
+                pImpl->runtimedata.data.tare[i] = embot::dsp::q15::opposite(pImpl->runtimedata.data.forcetorque[i]); 
             }
         } break;    
 
@@ -2023,7 +2059,7 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::p
 
 
 
-bool embot::app::application::theSTRAIN::start(embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode &mode)
+bool embot::app::application::theSTRAIN::start(const embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode mode)
 {    
     return pImpl->start(mode);
 }

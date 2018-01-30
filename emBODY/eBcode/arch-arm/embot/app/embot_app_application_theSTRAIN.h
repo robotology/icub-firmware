@@ -99,7 +99,7 @@ namespace embot { namespace app { namespace application {
         
         bool autocalib(embot::app::canprotocol::analog::polling::Message_AMPLIFIER_OFFSET_AUTOCALIB::Info &info, std::uint8_t &noisychannelmask, std::uint8_t &algorithmOKmask, std::uint8_t &finalmeasureOKmask, std::uint16_t &mae);
         
-        bool start(embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode &mode);
+        bool start(const embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode mode);
         bool stop();        
         bool tick(std::vector<embot::hw::can::Frame> &replies);
         bool processdata(std::vector<embot::hw::can::Frame> &replies);

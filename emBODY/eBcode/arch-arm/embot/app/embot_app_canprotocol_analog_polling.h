@@ -476,7 +476,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
     {
         public:
              
-        enum class Mode { everychannelreset = 0, everychannelnegativeoftorqueforce = 1, setchannelwithvalue = 2, unknown = 255 };        
+        enum class Mode { everychannelreset = 0, everychannelnegativeofforcetorque = 1, setchannelwithvalue = 2, unknown = 255 };        
             
         struct Info
         { 
