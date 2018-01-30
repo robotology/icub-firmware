@@ -1320,14 +1320,14 @@ bool embot::app::application::theSTRAIN::get_adc(embot::app::canprotocol::analog
         
         switch(replyinfo.channel)
         {   
-            // torque
-            case 0:     v = pImpl->runtimedata.data.torque.x;   break;
-            case 1:     v = pImpl->runtimedata.data.torque.y;   break;
-            case 2:     v = pImpl->runtimedata.data.torque.z;   break;
             // force
-            case 3:     v = pImpl->runtimedata.data.force.x;    break;
-            case 4:     v = pImpl->runtimedata.data.force.y;    break;
-            case 5:     v = pImpl->runtimedata.data.force.z;    break;
+            case 0:     v = pImpl->runtimedata.data.force.x;   break;
+            case 1:     v = pImpl->runtimedata.data.force.y;   break;
+            case 2:     v = pImpl->runtimedata.data.force.z;   break;
+            // torque
+            case 3:     v = pImpl->runtimedata.data.torque.x;    break;
+            case 4:     v = pImpl->runtimedata.data.torque.y;    break;
+            case 5:     v = pImpl->runtimedata.data.torque.z;    break;
             // impossible ...
             default:    v = 0;                                  break;
         }
