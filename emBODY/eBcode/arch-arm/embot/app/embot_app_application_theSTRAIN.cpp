@@ -630,7 +630,7 @@ struct embot::app::application::theSTRAIN::Impl
         configdata.clear();
         runtimedata.clear();
         
-        runtimedata.data.txperiod = 50*embot::common::time1millisec;       
+        runtimedata.data.txperiod = 2*embot::common::time1millisec;       
 
         adcdataisready = false;        
     }
