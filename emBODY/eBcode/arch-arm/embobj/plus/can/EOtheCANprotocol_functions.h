@@ -311,6 +311,8 @@ extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_TORQUE_STICTION_PARA
 
 // - motion control: periodic
 
+extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__DEBUG(eOcanframe_t *frame, eOcanport_t port);
+
 extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__2FOC(eOcanframe_t *frame, eOcanport_t port);
 
 extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__POSITION(eOcanframe_t *frame, eOcanport_t port);

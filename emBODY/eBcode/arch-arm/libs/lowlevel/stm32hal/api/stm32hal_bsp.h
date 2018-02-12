@@ -78,7 +78,23 @@ extern void stm32hal_bsp_init(void);
 
 #include "../src/board/mtb4/inc/stm32l4xx_it.h"
 
+#elif 	defined(STM32HAL_BOARD_STRAIN2)	
 
+// this is taken from what cube-mx generates 
+#include "../src/board/strain2/inc/stm32l4xx_hal_conf_strain2.h"
+
+#include "../src/board/strain2/inc/adc.h"
+#include "../src/board/strain2/inc/can.h"
+#include "../src/board/strain2/inc/dma.h"
+#include "../src/board/strain2/inc/gpio.h"
+#include "../src/board/strain2/inc/i2c.h"
+#include "../src/board/strain2/inc/main.h"
+#include "../src/board/strain2/inc/rng.h"
+#include "../src/board/strain2/inc/tim.h"
+#include "../src/board/strain2/inc/usart.h"
+
+
+#include "../src/board/strain2/inc/stm32l4xx_it.h"
 
 #else
     #error STM32HAL: you must define a STM32HAL_BOARD_something

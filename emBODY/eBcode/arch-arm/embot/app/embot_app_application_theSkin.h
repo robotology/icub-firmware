@@ -28,7 +28,9 @@
 #include "embot_sys.h"
 
 #include "embot_app_canprotocol.h"
-
+#include "embot_app_canprotocol_analog_polling.h"
+#include "embot_app_canprotocol_analog_periodic.h"
+#include "embot_app_canprotocol_skin_periodic.h"
 
 #include <vector>
 
@@ -55,8 +57,10 @@ namespace embot { namespace app { namespace application {
         
         bool initialise(Config &config);   
 
-        bool configure(embot::app::canprotocol::Message_aspoll_SKIN_SET_BRD_CFG::Info &brdcfg);
-        bool configure(embot::app::canprotocol::Message_aspoll_SKIN_SET_TRIANG_CFG::Info &trgcfg);
+        bool configure(embot::app::canprotocol::analog::polling::Message_SKIN_SET_BRD_CFG::Info &brdcfg);
+        bool configure(embot::app::canprotocol::analog::polling::Message_SKIN_SET_TRIANG_CFG::Info &trgcfg);
+        
+        bool configure(embot::app::canprotocol::analog::polling::Message_SKIN_OBSOLETE_TACT_SETUP::Info &tactsetup);
         
         bool start();
         bool stop();        

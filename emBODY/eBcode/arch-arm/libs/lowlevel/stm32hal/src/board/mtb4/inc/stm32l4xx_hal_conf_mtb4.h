@@ -61,6 +61,7 @@
 
 #define HAL_MODULE_ENABLED  
 #define HAL_ADC_MODULE_ENABLED
+/*#define HAL_CRYP_MODULE_ENABLED   */
 #define HAL_CAN_MODULE_ENABLED
 /*#define HAL_COMP_MODULE_ENABLED   */
 /*#define HAL_CRC_MODULE_ENABLED   */
@@ -71,6 +72,7 @@
 /*#define HAL_DFSDM_MODULE_ENABLED   */
 /*#define HAL_FIREWALL_MODULE_ENABLED   */
 /*#define HAL_HCD_MODULE_ENABLED   */
+/*#define HAL_HASH_MODULE_ENABLED   */
 /*#define HAL_I2S_MODULE_ENABLED   */
 /*#define HAL_IRDA_MODULE_ENABLED   */
 /*#define HAL_IWDG_MODULE_ENABLED   */
@@ -81,7 +83,8 @@
 /*#define HAL_OPAMP_MODULE_ENABLED   */
 /*#define HAL_PCD_MODULE_ENABLED   */
 /*#define HAL_QSPI_MODULE_ENABLED   */
-#define HAL_RNG_MODULE_ENABLED   
+/*#define HAL_QSPI_MODULE_ENABLED   */
+#define HAL_RNG_MODULE_ENABLED
 /*#define HAL_RTC_MODULE_ENABLED   */
 /*#define HAL_SAI_MODULE_ENABLED   */
 /*#define HAL_SD_MODULE_ENABLED   */
@@ -204,7 +207,7 @@
   * @brief Uncomment the line below to expanse the "assert_param" macro in the 
   *        HAL drivers code
   */
-// #define USE_FULL_ASSERT    1U 
+/* #define USE_FULL_ASSERT    1U */
 
 /* ################## SPI peripheral configuration ########################## */
 

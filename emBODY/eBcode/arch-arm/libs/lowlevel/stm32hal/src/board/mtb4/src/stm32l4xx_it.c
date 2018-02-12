@@ -1,6 +1,10 @@
 
-//IIT-EXT
-//#warning STM32HAL: IIT removed some handlers: systick, pendsv, svc
+// IIT-EXT: dont compile in the stm32hal.lib.
+//          these handlers will be shadowed by the default ones in the startup.s file unless
+//          explicitely defined and compliled by the application. 
+//          HENCE: copy the handler into the .cpp file which implements the proper embot::hw namespace
+
+#error DONT COMPILE ME IN THE stm32hal.lib 
 
 /**
   ******************************************************************************

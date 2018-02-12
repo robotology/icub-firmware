@@ -38,6 +38,7 @@ typedef union
     struct
     {
         uint8_t torque_sensor_timeout:1;
+        uint8_t hard_limit_reached:1;
     } bits;
         
     uint8_t bitmask;
@@ -48,7 +49,7 @@ typedef struct
 {
     int32_t motor_pos_min;
     int32_t motor_pos_max;
-    CTRL_UNITS last_joint_pos;
+    //CTRL_UNITS last_joint_pos;
     int32_t max_tension;
 } CableConstraintData;
 
@@ -170,6 +171,7 @@ typedef struct // Joint
     BOOL trq_control_active;
     BOOL CAN_DO_TRQ_CTRL;
     
+    BOOL not_reversible;
     CableConstraintData cable_constr;
     CableCalib          cable_calib;  
     
@@ -198,6 +200,7 @@ extern void Joint_motion_reset(Joint *o);
 
 extern void Joint_update_odometry_fbk(Joint* o, CTRL_UNITS pos_fbk, CTRL_UNITS vel_fbk);
 extern void Joint_update_torque_fbk(Joint* o, CTRL_UNITS trq_fbk);
+extern void Joint_update_status_reference(Joint* o);
 
 extern BOOL Joint_check_faults(Joint* o);
 extern void Joint_clear_faults(Joint* o);

@@ -278,7 +278,50 @@ extern eOresult_t eo_mais_Verify(EOtheMAIS *p, const eOmn_serv_configuration_t *
         
         eObool_t verificationOK = eobool_false;
         
-        if(0 == memcmp(&p->service.servconfig, servcfg, sizeof(eOmn_serv_configuration_t)))
+        eObool_t iscompatible = eobool_true;
+        
+        if(servcfg->data.as.mais.canloc.port != p->service.servconfig.data.as.mais.canloc.port)
+        {
+            iscompatible = eobool_false;
+        }
+        if(servcfg->data.as.mais.canloc.addr != p->service.servconfig.data.as.mais.canloc.addr)
+        {
+            iscompatible = eobool_false;
+        } 
+
+        if((servcfg->data.as.mais.version.protocol.major != 0) || (servcfg->data.as.mais.version.protocol.minor != 0))
+        {
+            // check also the protocol
+            if(servcfg->data.as.mais.version.protocol.major != p->service.servconfig.data.as.mais.version.protocol.major)
+            {
+                iscompatible = eobool_false;
+            }
+            if(servcfg->data.as.mais.version.protocol.minor != p->service.servconfig.data.as.mais.version.protocol.minor)
+            {
+                iscompatible = eobool_false;
+            }
+        }
+        if((servcfg->data.as.mais.version.firmware.major != 0) || (servcfg->data.as.mais.version.firmware.minor != 0)  || (servcfg->data.as.mais.version.firmware.build != 0))
+        {
+            // check also the firmaware
+            if(servcfg->data.as.mais.version.firmware.major != p->service.servconfig.data.as.mais.version.firmware.major)
+            {
+                iscompatible = eobool_false;
+            }
+            if(servcfg->data.as.mais.version.firmware.minor != p->service.servconfig.data.as.mais.version.firmware.minor)
+            {
+                iscompatible = eobool_false;
+            }
+            if(servcfg->data.as.mais.version.firmware.build != p->service.servconfig.data.as.mais.version.firmware.build)
+            {
+                iscompatible = eobool_false;
+            }
+        }
+        
+        
+        //if(0 == memcmp(&p->service.servconfig, servcfg, sizeof(eOmn_serv_configuration_t)))
+        //if(0 == memcmp(&p->service.servconfig.data.as.mais, &servcfg->data.as.mais, sizeof(eOmn_serv_config_data_as_mais_t)))
+        if(eobool_true == iscompatible)
         {
             verificationOK = eobool_true;
         }
@@ -420,7 +463,49 @@ extern eOresult_t eo_mais_Activate(EOtheMAIS *p, const eOmn_serv_configuration_t
         
         eObool_t verificationOK = eobool_false;
         
-        if(0 == memcmp(&p->service.servconfig, servcfg, sizeof(eOmn_serv_configuration_t)))
+        eObool_t iscompatible = eobool_true;
+        
+        if(servcfg->data.as.mais.canloc.port != p->service.servconfig.data.as.mais.canloc.port)
+        {
+            iscompatible = eobool_false;
+        }
+        if(servcfg->data.as.mais.canloc.addr != p->service.servconfig.data.as.mais.canloc.addr)
+        {
+            iscompatible = eobool_false;
+        } 
+
+        if((servcfg->data.as.mais.version.protocol.major != 0) || (servcfg->data.as.mais.version.protocol.minor != 0))
+        {
+            // check also the protocol
+            if(servcfg->data.as.mais.version.protocol.major != p->service.servconfig.data.as.mais.version.protocol.major)
+            {
+                iscompatible = eobool_false;
+            }
+            if(servcfg->data.as.mais.version.protocol.minor != p->service.servconfig.data.as.mais.version.protocol.minor)
+            {
+                iscompatible = eobool_false;
+            }
+        }
+        if((servcfg->data.as.mais.version.firmware.major != 0) || (servcfg->data.as.mais.version.firmware.minor != 0)  || (servcfg->data.as.mais.version.firmware.build != 0))
+        {
+            // check also the firmaware
+            if(servcfg->data.as.mais.version.firmware.major != p->service.servconfig.data.as.mais.version.firmware.major)
+            {
+                iscompatible = eobool_false;
+            }
+            if(servcfg->data.as.mais.version.firmware.minor != p->service.servconfig.data.as.mais.version.firmware.minor)
+            {
+                iscompatible = eobool_false;
+            }
+            if(servcfg->data.as.mais.version.firmware.build != p->service.servconfig.data.as.mais.version.firmware.build)
+            {
+                iscompatible = eobool_false;
+            }
+        }        
+        
+        //if(0 == memcmp(&p->service.servconfig, servcfg, sizeof(eOmn_serv_configuration_t)))
+        //if(0 == memcmp(&p->service.servconfig.data.as.mais, &servcfg->data.as.mais, sizeof(eOmn_serv_config_data_as_mais_t)))
+        if(eobool_true == iscompatible)
         {
             verificationOK = eobool_true;
         }

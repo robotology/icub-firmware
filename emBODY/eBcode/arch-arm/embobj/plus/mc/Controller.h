@@ -104,6 +104,7 @@ extern void MController_go_idle(void);
 extern void MController_get_joint_state(int j, eOmc_joint_status_t* joint_state);
 extern void MController_get_pid_state(int j, eOmc_joint_status_ofpid_t* pid_state, BOOL decoupled_pwm);
 extern void MController_get_motor_state(int m, eOmc_motor_status_t* motor_status);
+extern void MController_update_joint_targets(int j);
 extern void MController_update_motor_pos_fbk(int m, int32_t position_raw);
 extern void MController_update_motor_current_fbk(int m, int16_t current);
 extern void MController_config_motor_friction(int m, eOmc_motor_params_t* friction); //
@@ -122,7 +123,7 @@ extern BOOL MController_set_joint_pos_raw(int j, CTRL_UNITS pos_ref);
 extern BOOL MController_set_joint_trq_ref(int j, CTRL_UNITS trq_ref);
 extern BOOL MController_set_joint_out_ref(int j, CTRL_UNITS out_ref);
 extern void MController_stop_joint(int j);
-extern void MController_config_motor_gearbox_ratio(int m, int32_t gearbox_ratio);
+extern void MController_config_motor_gearbox_M2J(int m, float32_t gearbox_M2J);
 extern void MController_config_motor_encoder(int m, int32_t resolution);
 extern int16_t MController_config_motor_pwm_limit(int m, int16_t pwm_limit);
 extern void MController_update_motor_odometry_fbk_can(int m, void* data);

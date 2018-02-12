@@ -19,10 +19,11 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef _EB_COMMON_H_
-#define _EB_COMMON_H_
+#ifndef _EMBOT_COMMON_H_
+#define _EMBOT_COMMON_H_
 
 #include <cstdint>
+#include <cstring>
 
 namespace embot { namespace common {
 
@@ -30,6 +31,7 @@ namespace embot { namespace common {
     using fpWorker      = void (*)(void);
     using fpCallback    = void (*)(void *);
     using fpGetU32      = std::uint32_t (*)(void);
+    using fpGetU64      = std::uint64_t (*)(void);
     using fpParU32      = void (*)(std::uint32_t);
     using fpBoolParU32  = bool (*)(std::uint32_t);
     using fpI08ParU32   = std::int8_t (*)(std::uint32_t);
@@ -40,7 +42,64 @@ namespace embot { namespace common {
         void*       arg;
         Callback() : callback(nullptr), arg(nullptr) {}
         Callback(fpCallback _cbk, void *_arg) : callback(_cbk), arg(_arg) {}
+        void load(fpCallback _cbk, void *_arg) { callback = _cbk; arg = _arg; }
+        void clear() { callback = nullptr; arg = nullptr; }
+        bool isvalid() const { if(nullptr != callback){ return true; } else { return false; } } 
+        void execute() { if(true == isvalid()) { callback(arg); } }
     };
+    
+    struct Data
+    {
+        void * pointer;
+        std::uint32_t size;
+        
+        Data() : pointer(nullptr), size(0) {}
+        Data(void *p, std::uint32_t s) : pointer(p), size(s) {}
+            
+        void load(void *p, std::uint32_t s) { pointer = p; size = s; }
+        void clear() { pointer = nullptr; size = 0; }
+        bool isvalid() const { if((nullptr != pointer) && (0 != size)){ return true; } else { return false; } } 
+        
+        std::uint8_t  * getU08() { return reinterpret_cast<std::uint8_t*>(pointer); }  
+        std::uint16_t * getU16() { return reinterpret_cast<std::uint16_t*>(pointer); } 
+        std::uint32_t * getU32() { return reinterpret_cast<std::uint32_t*>(pointer); } 
+        std::uint64_t * getU64() { return reinterpret_cast<std::uint64_t*>(pointer); } 
+        
+        std::uint8_t  U08(std::uint32_t i) { return getU08()[i]; }      
+        std::uint16_t U16(std::uint32_t i) { return getU16()[i]; }
+        std::uint32_t U32(std::uint32_t i) { return getU32()[i]; }        
+        std::uint64_t U64(std::uint32_t i) { return getU64()[i]; }
+        
+        void * get(std::uint32_t offset = 0) { std::uint8_t *d = getU08(); return &d[offset]; }        
+    };
+    
+
+    template<typename T>
+    struct Triple
+    {   // unluckily arm does not fully support c++11, hence the std::tuple<> is missing
+        T   x;
+        T   y;
+        T   z;
+        Triple() { reset(); }
+        Triple(T _x, T _y, T _z) { set(_x, _y, _z); }
+        void set(T _x, T _y, T _z) { x = _x; y = _y; z = _z; }  
+        void reset() { x = 0; y = 0; z = 0; }
+        void load(void *littleendianmemory) { T *p = reinterpret_cast<T*>(littleendianmemory); x = p[0]; y = p[1]; z = p[2]; }
+    }; 
+
+    template<typename T>
+    struct Quadruple
+    {   // unluckily arm does not fully support c++11, hence the std::tuple<> is missing
+        T   w;
+        T   x;
+        T   y;
+        T   z;
+        Quadruple() { reset(); }
+        Quadruple(T _w, T _x, T _y, T _z) { set(_w, _x, _y, _z); }
+        void set(T _w, T _x, T _y, T _z) { w = _w; x = _x; y = _y; z = _z; }  
+        void reset() { w = 0; x = 0; y = 0; z = 0; }
+        void load(void *littleendianmemory) { T *p = reinterpret_cast<T*>(littleendianmemory); w = p[0]; x = p[1]; y = p[2]; z = p[3]; }
+    };     
     
     using Time          = std::uint64_t;    // expressed in usec.  expresses absolute time    
     using relTime       = std::uint32_t;    // expressed in usec. it is used to express relative time. 0 means: 0 usec from ...
@@ -58,99 +117,6 @@ namespace embot { namespace common {
 } } // namespace embot { namespace common {
 
 
-namespace embot { namespace common { namespace bit {
-        
-    template<typename T>
-    void set(T &value, std::uint8_t pos)
-    {
-        value |= (static_cast<T>(1)<<pos);
-    }
-    
-    template<typename T>
-    void clear(T &value, std::uint8_t pos)
-    {
-        value &= (~(static_cast<T>(1)<<pos));
-    }
-    
-    template<typename T>
-    void toggle(T &value, std::uint8_t pos)
-    {
-        value ^= (static_cast<T>(1)<<pos);
-    }
-    
-    template<typename T>
-    bool check(const T value, std::uint8_t pos)
-    {
-        if(value & (static_cast<T>(1)<<pos))
-        {
-            return true;
-        }
-        return false;
-    } 
-
-    std::uint8_t countU08(const std::uint8_t value);
-    std::uint8_t countU16(const std::uint16_t value);
-    std::uint8_t countU32(const std::uint32_t value);
-    std::uint8_t countU64(const std::uint64_t value);
-
-    template<typename T>
-    std::uint8_t count(const T value)
-    {
-        if(1 == sizeof(value))
-        {
-            return countU08(value);
-        }
-        else if(2 == sizeof(value))
-        {
-            return countU16(value);
-        }
-        else if(4 == sizeof(value))
-        {
-            return countU32(value);
-        }
-        else if(8 == sizeof(value))
-        {
-            return countU64(value);
-        }
-        
-        return 0;
-    }        
-       
-} } } // namespace embot { namespace common { namespace bit
-
-
-namespace embot { namespace common { namespace msk {
-        
-    template<typename T>
-    void set(T &value, const T flags)
-    {
-        value |= flags;
-    }
-    
-    template<typename T>
-    void clear(T &value, const T flags)
-    {
-        value &= (~(flags));
-    }
-    
-    template<typename T>
-    void toggle(T &value, const T flags)
-    {
-        value ^= (flags);
-    }
-    
-    template<typename T>
-    bool check(const T value, const T flags)
-    {
-        if(flags == (value & flags))
-        {
-            return true;
-        }
-        return false;
-    }    
-    
-   
-} } } // namespace embot { namespace common { namespace msk
 
 #endif  // include-guard
 

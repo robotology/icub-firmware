@@ -24,8 +24,12 @@
 #include "embot_common.h"
 
 #include "embot_hw.h"
+#include "embot_hw_sys.h"
+#include "embot_hw_can.h"
 
 #include "embot_sys.h"
+
+#include "embot_app_canprotocol.h"
 
 
 #include <vector>
@@ -45,8 +49,8 @@ namespace embot { namespace app { namespace bootloader {
     public:
         struct Config
         {
-            std::uint32_t   dummy;
-            Config() : dummy(0) {}
+            embot::app::canprotocol::Process owner;
+            Config() : owner(embot::app::canprotocol::Process::bootloader) {}
         }; 
         
         enum class Event { rxcanframe = 0};

@@ -117,6 +117,8 @@ void Joint_init(Joint* o)
     
     o->eo_joint_ptr = NULL;
     
+    o->not_reversible = FALSE;
+    
     Joint_reset_calibration_data(o);
 }
 
@@ -162,7 +164,7 @@ void Joint_config(Joint* o, uint8_t ID, eOmc_joint_config_t* config)
     // TODOALE joint admittance missing
     o->Kadmitt = ZERO;
     
-    
+    o->dead_zone = config->deadzone;
     
 //    eOerrmanDescriptor_t errdes = {0};
 //    char message[150];
@@ -203,32 +205,37 @@ void Joint_motion_reset(Joint *o)
     
     o->output = ZERO;
 }
-static void Joint_update_status_reference(Joint* o, eOmc_controlmode_command_t control_mode)
-{
-    switch (control_mode)
+void Joint_update_status_reference(Joint* o)
+{    
+    switch (o->control_mode)
     {
-        case eomc_controlmode_cmd_force_idle:
-        case eomc_controlmode_cmd_idle:
+        case eomc_controlmode_idle:
+        case eomc_controlmode_notConfigured:
+        case eomc_controlmode_configured:
             break;
-        case eomc_controlmode_cmd_mixed:
-            o->eo_joint_ptr->status.target.trgt_velocity = o->vel_ref;
-            o->eo_joint_ptr->status.target.trgt_position = o->pos_ref;
+        
+        case eomc_controlmode_mixed:
+        case eomc_controlmode_velocity_pos:
+            o->eo_joint_ptr->status.target.trgt_velocity = Trajectory_get_target_velocity(&(o->trajectory));
+            o->eo_joint_ptr->status.target.trgt_position = Trajectory_get_target_position(&(o->trajectory));
             break;
-        case eomc_controlmode_cmd_velocity:
-            o->eo_joint_ptr->status.target.trgt_velocity = o->vel_ref;
+        case eomc_controlmode_velocity:
+        case eomc_controlmode_impedance_vel:
+            o->eo_joint_ptr->status.target.trgt_velocity = Trajectory_get_target_velocity(&(o->trajectory));
             break;
-        case eomc_controlmode_cmd_position:
-            o->eo_joint_ptr->status.target.trgt_position = o->pos_ref;
+        case eomc_controlmode_position:
+        case eomc_controlmode_impedance_pos:
+            o->eo_joint_ptr->status.target.trgt_position = Trajectory_get_target_position(&(o->trajectory));
             break;
-        case eomc_controlmode_cmd_direct:
-            o->eo_joint_ptr->status.target.trgt_positionraw = o->pos_ref;
+        case eomc_controlmode_direct:
+            o->eo_joint_ptr->status.target.trgt_positionraw = Trajectory_get_target_position(&(o->trajectory));
             break;
                 
-        case eomc_controlmode_cmd_openloop:
+        case eomc_controlmode_openloop:
             o->eo_joint_ptr->status.target.trgt_openloop = o->out_ref;
             break;
 
-        case eomc_controlmode_cmd_torque:
+        case eomc_controlmode_torque:
             o->eo_joint_ptr->status.target.trgt_torque = o->trq_ref;
             break;
             
@@ -286,7 +293,7 @@ BOOL Joint_set_control_mode(Joint* o, eOmc_controlmode_command_t control_mode)
     
     Joint_motion_reset(o);
     
-    Joint_update_status_reference(o, control_mode);
+    Joint_update_status_reference(o);
     
     return TRUE;
 }
@@ -344,6 +351,13 @@ BOOL Joint_check_faults(Joint* o)
         }
     }
     
+    if ((o->pos_min != o->pos_max) && ((o->pos_fbk < o->pos_min_hard - POS_LIMIT_MARGIN) || (o->pos_fbk > o->pos_max_hard + POS_LIMIT_MARGIN))) 
+    {
+        o->fault_state.bits.hard_limit_reached = TRUE;
+            
+        o->control_mode = eomc_controlmode_hwFault;
+    }
+    
     if (o->control_mode != eomc_controlmode_hwFault) return FALSE;
 
     if (++o->diagnostics_refresh > 5*CTRL_LOOP_FREQUENCY_INT)
@@ -362,6 +376,17 @@ BOOL Joint_check_faults(Joint* o)
             descriptor.sourcedevice = eo_errman_sourcedevice_localboard;
             descriptor.sourceaddress = 0;
             descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_axis_torque_sens);
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
+        }
+        
+        if (o->fault_state.bits.hard_limit_reached && !o->fault_state_prec.bits.hard_limit_reached)
+        {   
+            static eOerrmanDescriptor_t descriptor = {0};
+            descriptor.par16 = o->ID;
+            descriptor.par64 = 0;
+            descriptor.sourcedevice = eo_errman_sourcedevice_localboard;
+            descriptor.sourceaddress = 0;
+            descriptor.code = eoerror_code_get(eoerror_category_MotionControl, eoerror_value_MC_joint_hard_limit);
             eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &descriptor);
         }
         
@@ -410,15 +435,9 @@ void Joint_set_hardware_limit(Joint* o)
 
 BOOL Joint_manage_cable_constraint(Joint* o)
 {    
-    BOOL opening_intention = (o->pos_err < ZERO);
+    //BOOL opening_intention = (o->pos_err < ZERO);
     
-    //BOOL opening_action = (o->pos_fbk < o->cable_constr.last_joint_pos);
-    
-    o->cable_constr.last_joint_pos = o->pos_fbk;
-    
-    //if (opening_intention && !opening_action) return TRUE;
-    
-    if (opening_intention)
+    if (o->pos_err < ZERO)
     {
         if (o->pos_fbk_from_motors < o->cable_constr.motor_pos_min) return TRUE;
     }
@@ -538,27 +557,30 @@ CTRL_UNITS Joint_do_pwm_control(Joint* o)
                     if (o->pos_err > o->dead_zone)
                     {
                         o->pos_err -= o->dead_zone;
+                        
+                        o->output = PID_do_out(&o->posPID, o->pos_err);
                     }
                     else if (o->pos_err < -o->dead_zone)
                     {
                         o->pos_err += o->dead_zone;
+                        
+                        o->output = PID_do_out(&o->posPID, o->pos_err);
                     }
                     else
                     {
                         o->pos_err = ZERO;
-                    }
                         
-                    o->output = PID_do_out(&o->posPID, o->pos_err);
-                    
-                    /*
-                    pid should be reset with zero error and non reversible joints
-                    else
-                    {
-                        PID_reset(&o->posPID);
+                        if (o->not_reversible)
+                        {
+                            PID_reset(&o->posPID);
                         
-                        o->output = 0;
+                            o->output = 0;
+                        }
+                        else
+                        {
+                            o->output = PID_do_out(&o->posPID, o->pos_err);
+                        }
                     }
-                    */
                 }
             }
             else

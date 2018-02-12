@@ -89,17 +89,20 @@ extern void stm32hal_bsp_init(void)
     /* Initialize all configured peripherals */
     MX_GPIO_Init();
     MX_DMA_Init();
-    MX_TIM6_Init();
-    MX_CAN1_Init();
-    MX_USART1_UART_Init();
-    MX_I2C1_Init();
-    MX_I2C2_Init();
-    MX_USART2_UART_Init();
-    MX_ADC1_Init();
+// IIT-EXT: this funtion is called inside embot::hw::timer::init()    MX_TIM6_Init();
+// IIT-EXT: this funtion is called inside embot::hw::can::init()   MX_CAN1_Init();
+// IIT-EXT: this peripheral is not used:    MX_USART1_UART_Init();
+// IIT-EXT: this funtion is called inside embot::hw::i2c::init()   MX_I2C1_Init();
+// IIT-EXT: this funtion is called inside embot::hw::i2c::init()   MX_I2C2_Init();
+// IIT-EXT: this peripheral is not used:    MX_USART2_UART_Init();
+// IIT-EXT: this peripheral is not used:    MX_ADC1_Init();
     MX_RNG_Init();
   
   
 #if 0    
+int main(void)
+{
+
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
@@ -109,8 +112,16 @@ extern void stm32hal_bsp_init(void)
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
 
+  /* USER CODE BEGIN Init */
+
+  /* USER CODE END Init */
+
   /* Configure the system clock */
   SystemClock_Config();
+
+  /* USER CODE BEGIN SysInit */
+
+  /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
@@ -122,6 +133,7 @@ extern void stm32hal_bsp_init(void)
   MX_I2C2_Init();
   MX_USART2_UART_Init();
   MX_ADC1_Init();
+  MX_RNG_Init();
 
   /* USER CODE BEGIN 2 */
   TIMER_Init();  
@@ -162,6 +174,8 @@ extern void stm32hal_bsp_init(void)
 
   }
   /* USER CODE END 3 */
+
+}
 #endif
 
 
@@ -181,14 +195,14 @@ extern void stm32hal_bsp_init(void)
   * @param  None
   * @retval None
   */
-void Error_Handler(void)
+void _Error_Handler(char * file, int line)
 {
-  /* USER CODE BEGIN Error_Handler */
+  /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
   while(1) 
   {
   }
-  /* USER CODE END Error_Handler */ 
+  /* USER CODE END Error_Handler_Debug */ 
 }
 
 
@@ -214,7 +228,7 @@ STM32HAL_BSP_STATIC_SCOPE void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
   if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
   {
-    Error_Handler();
+    _Error_Handler(__FILE__, __LINE__);
   }
 
     /**Initializes the CPU, AHB and APB busses clocks 
@@ -228,7 +242,7 @@ STM32HAL_BSP_STATIC_SCOPE void SystemClock_Config(void)
 
   if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
   {
-    Error_Handler();
+    _Error_Handler(__FILE__, __LINE__);
   }
 
   PeriphClkInit.PeriphClockSelection = RCC_PERIPHCLK_USART1|RCC_PERIPHCLK_USART2
@@ -249,14 +263,14 @@ STM32HAL_BSP_STATIC_SCOPE void SystemClock_Config(void)
   PeriphClkInit.PLLSAI1.PLLSAI1ClockOut = RCC_PLLSAI1_ADC1CLK;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInit) != HAL_OK)
   {
-    Error_Handler();
+    _Error_Handler(__FILE__, __LINE__);
   }
 
     /**Configure the main internal regulator output voltage 
     */
   if (HAL_PWREx_ControlVoltageScaling(PWR_REGULATOR_VOLTAGE_SCALE1) != HAL_OK)
   {
-    Error_Handler();
+    _Error_Handler(__FILE__, __LINE__);
   }
 
 #if defined(STM32HAL_BSP_REMOVE_CUBEMX_CODE) 

@@ -28,6 +28,10 @@
 #include "embot_sys.h"
 
 #include "embot_app_canprotocol.h"
+#include "embot_app_canprotocol_analog_polling.h"
+#include "embot_app_canprotocol_analog_periodic.h"
+
+#include "embot_hw_bno055.h"
 
 
 #include <vector>
@@ -47,19 +51,38 @@ namespace embot { namespace app { namespace application {
     public:
         struct Config
         {
-            embot::common::Event    tickevent;
-            embot::sys::Task*       totask;
-            Config() : tickevent(0), totask(nullptr) {}
+            embot::hw::BNO055::Sensor   sensor;
+            embot::hw::BNO055::Config   sensorconfig;
+            embot::common::Event        tickevent;
+            embot::common::Event        datareadyevent;
+            embot::sys::Task*           totask;
+            Config() :  
+                sensor(embot::hw::BNO055::Sensor::one), 
+                sensorconfig(embot::hw::BNO055::Config(embot::hw::i2c::Descriptor(embot::hw::i2c::Bus::two, 400000))), 
+                tickevent(0), datareadyevent(0), totask(nullptr) 
+                {}
+            Config(embot::hw::BNO055::Sensor _s, const embot::hw::BNO055::Config& _sc, embot::common::Event _te, embot::common::Event _de, embot::sys::Task* _ts) :     
+                sensor(_s),
+                sensorconfig(_sc),
+                tickevent(_te), 
+                datareadyevent(_de), 
+                totask(_ts) 
+                {}    
         }; 
         
         
         bool initialise(Config &config);   
 
-        bool configure(embot::app::canprotocol::Message_aspoll_ACC_GYRO_SETUP::Info &cfg);
+        bool configure(embot::app::canprotocol::analog::polling::Message_ACC_GYRO_SETUP::Info &cfg);
+        bool start();  
         
-        bool start();
+        bool configure(embot::app::canprotocol::analog::polling::Message_IMU_CONFIG_SET::Info &info);
+        bool get(embot::app::canprotocol::analog::polling::Message_IMU_CONFIG_GET::ReplyInfo &info);
+        bool start(embot::common::relTime period);
+ 
         bool stop();        
-        bool tick(std::vector<embot::hw::can::Frame> &replies);
+        bool tick(std::vector<embot::hw::can::Frame> &replies);        
+        bool processdata(std::vector<embot::hw::can::Frame> &replies);
 
     private:
         theIMU(); 

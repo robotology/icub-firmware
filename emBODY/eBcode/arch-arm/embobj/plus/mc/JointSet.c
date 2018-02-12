@@ -24,6 +24,7 @@
 #include "EOtheErrorManager.h"
 #include "EoError.h"
 #include "EOappEncodersReader.h"
+#include "EOtheEntities.h"
 
 #include "Joint.h"
 #include "Motor.h"
@@ -138,8 +139,8 @@ void JointSet_do_odometry(JointSet* o) //
             {
                 m = o->motors_of_set[ms];
         
-                o->joint[j].pos_fbk_from_motors += Sjm[j][m] * o->motor[m].pos_fbk;
-                o->joint[j].vel_fbk_from_motors += Sjm[j][m] * o->motor[m].vel_fbk;
+                o->joint[j].pos_fbk_from_motors += Sjm[j][m] * (float)o->motor[m].pos_fbk;
+                o->joint[j].vel_fbk_from_motors += Sjm[j][m] * (float)o->motor[m].vel_fbk;
             }
         }
     }
@@ -149,8 +150,8 @@ void JointSet_do_odometry(JointSet* o) //
         {
             j = o->joints_of_set[js];
             
-            o->joint[j].pos_fbk_from_motors = o->motor[j].pos_fbk;
-            o->joint[j].vel_fbk_from_motors = o->motor[j].vel_fbk;
+            o->joint[j].pos_fbk_from_motors = (float)o->motor[j].pos_fbk;
+            o->joint[j].vel_fbk_from_motors = (float)o->motor[j].vel_fbk;
         }
     }
     
@@ -406,7 +407,7 @@ BOOL JointSet_set_control_mode(JointSet* o, eOmc_controlmode_command_t control_m
         break;
     
     case eomc_controlmode_cmd_openloop:
-        //if (o->external_fault) return FALSE;
+        if (o->external_fault) return FALSE;
         for (int k=0; k<N; ++k)
         { 
             Motor_motion_reset(o->motor+o->motors_of_set[k]);
@@ -418,7 +419,7 @@ BOOL JointSet_set_control_mode(JointSet* o, eOmc_controlmode_command_t control_m
         break;
         
     case eomc_controlmode_cmd_torque:
-        //if (o->external_fault) return FALSE;
+        if (o->external_fault) return FALSE;
         for (int k=0; k<N; ++k)
         { 
             Motor_motion_reset(o->motor+o->motors_of_set[k]);
@@ -433,7 +434,7 @@ BOOL JointSet_set_control_mode(JointSet* o, eOmc_controlmode_command_t control_m
     case eomc_controlmode_cmd_mixed:
     case eomc_controlmode_cmd_position:
     case eomc_controlmode_cmd_velocity:
-        //if (o->external_fault) return FALSE;
+        if (o->external_fault) return FALSE;
         for (int k=0; k<N; ++k)
         { 
             Motor_motion_reset(o->motor+o->motors_of_set[k]);
@@ -837,6 +838,10 @@ static void JointSet_do_wait_calibration(JointSet* o)
         case eomc_calibration_type11_cer_hands:
             o->is_calibrated = JointSet_do_wait_calibration_11(o);
             break;
+        
+        case eomc_calibration_type12_absolute_sensor:
+            o->is_calibrated = JointSet_do_wait_calibration_12(o);
+            break;
             
         case eomc_calibration_typeMixed:
             o->is_calibrated = JointSet_do_wait_calibration_mixed(o);
@@ -1138,6 +1143,43 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             
             o->calibration_timeout = 0;
             
+            break;
+        }
+        case eomc_calibration_type12_absolute_sensor:
+        {
+            int32_t offset;
+            int32_t zero;
+            eOmc_joint_config_t *jointcfg = eo_entities_GetJointConfig(eo_entities_GetHandle(), e);
+            //1) Take absolute value of calibation parametr
+            int32_t abs_raw = (calibrator->params.type12.rawValueAtZeroPos > 0) ? calibrator->params.type12.rawValueAtZeroPos : -calibrator->params.type12.rawValueAtZeroPos;
+            // 1.1) update abs_raw with gearbox_E2J
+            abs_raw = abs_raw * jointcfg->gearbox_E2J;
+            // 2) calculate offset
+            if(abs_raw >= TICKS_PER_HALF_REVOLUTION)
+                offset = abs_raw - TICKS_PER_HALF_REVOLUTION;
+            else
+                offset = abs_raw + TICKS_PER_HALF_REVOLUTION;
+            
+            // 3) find out sign of zero
+            
+            if(jointcfg->jntEncoderResolution > 0)
+                zero = TICKS_PER_HALF_REVOLUTION / jointcfg->gearbox_E2J;
+            else
+                zero = -TICKS_PER_HALF_REVOLUTION / jointcfg->gearbox_E2J;
+            
+            zero+=calibrator->params.type12.calibrationDelta;  //this parameter should contain only the delta
+            // 4) call calibration function
+            
+            ////debug code
+            char info[80];
+            snprintf(info, sizeof(info), "CALIB 12 j %d: offset=%d zero=%d ", e, offset, zero);
+            JointSet_send_debug_message(info, e);
+            ////debug code ended
+            AbsEncoder_calibrate_absolute(o->absEncoder+e, offset, zero);
+            
+            Motor_calibrate_withOffset(o->motor+e, 0);
+            o->calibration_in_progress = (eOmc_calibration_type_t)calibrator->type;
+
             break;
         }
         

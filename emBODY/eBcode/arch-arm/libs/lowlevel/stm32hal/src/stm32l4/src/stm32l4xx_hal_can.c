@@ -2,8 +2,8 @@
   ******************************************************************************
   * @file    stm32l4xx_hal_can.c
   * @author  MCD Application Team
-  * @version V1.6.0
-  * @date    28-October-2016
+  * @version V1.7.2
+  * @date    16-June-2017
   * @brief   CAN HAL module driver.
   *          This file provides firmware functions to manage the following 
   *          functionalities of the Controller Area Network (CAN) peripheral:           
@@ -73,7 +73,7 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; COPYRIGHT(c) 2016 STMicroelectronics</center></h2>
+  * <h2><center>&copy; COPYRIGHT(c) 2017 STMicroelectronics</center></h2>
   *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted provided that the following conditions are met:
@@ -366,6 +366,12 @@ HAL_StatusTypeDef HAL_CAN_ConfigFilter(CAN_HandleTypeDef* hcan, CAN_FilterConfTy
   /* Initialisation mode for the filter */
   CAN1->FMR |= (uint32_t)CAN_FMR_FINIT;
   
+#if defined(CAN2)
+  /* Select the start slave bank */
+  CAN1->FMR &= ~((uint32_t)CAN_FMR_CAN2SB);
+  CAN1->FMR |= (uint32_t)(sFilterConfig->BankNumber << 8);
+#endif
+
   /* Filter Deactivation */
   CAN1->FA1R &= ~(uint32_t)filternbrbitpos;
 
@@ -738,6 +744,9 @@ HAL_StatusTypeDef HAL_CAN_Transmit_IT(CAN_HandleTypeDef* hcan)
       /* Process Unlocked */
       __HAL_UNLOCK(hcan);
       
+      //IIT_CHANGE
+      hcan->Instance->sTxMailBox[transmitmailbox].TIR |= CAN_TI0R_TXRQ;
+           
       /* Enable interrupts: */
       /*  - Enable Error warning Interrupt */
       /*  - Enable Error passive Interrupt */
@@ -753,7 +762,13 @@ HAL_StatusTypeDef HAL_CAN_Transmit_IT(CAN_HandleTypeDef* hcan)
                                 CAN_IT_TME  );
       
       /* Request transmission */
-      hcan->Instance->sTxMailBox[transmitmailbox].TIR |= CAN_TI0R_TXRQ;
+      //IIT_CHANGE
+//      hcan->Instance->sTxMailBox[transmitmailbox].TIR |= CAN_TI0R_TXRQ;
+    }
+    else
+    {
+      __HAL_UNLOCK(hcan);
+      return HAL_BUSY;
     }
   }
   else
@@ -916,13 +931,13 @@ HAL_StatusTypeDef HAL_CAN_Receive_IT(CAN_HandleTypeDef* hcan, uint8_t FIFONumber
 
     if(FIFONumber == CAN_FIFO0)
     {
-      /* Enable FIFO 0 message pending Interrupt */
-      __HAL_CAN_ENABLE_IT(hcan, CAN_IT_FMP0);
+      /* Enable FIFO 0 overrun and message pending Interrupt */
+      __HAL_CAN_ENABLE_IT(hcan, CAN_IT_FOV0 | CAN_IT_FMP0);
     }
     else
     {
-      /* Enable FIFO 1 message pending Interrupt */
-      __HAL_CAN_ENABLE_IT(hcan, CAN_IT_FMP1);
+      /* Enable FIFO 1 overrun and message pending Interrupt */
+      __HAL_CAN_ENABLE_IT(hcan, CAN_IT_FOV1 | CAN_IT_FMP1);
     }
     
   }
@@ -1050,6 +1065,30 @@ HAL_StatusTypeDef HAL_CAN_WakeUp(CAN_HandleTypeDef* hcan)
   */
 void HAL_CAN_IRQHandler(CAN_HandleTypeDef* hcan)
 {
+  uint32_t errorcode = HAL_CAN_ERROR_NONE;
+
+  /* Check Overrun flag for FIFO0 */
+  if((__HAL_CAN_GET_FLAG(hcan, CAN_FLAG_FOV0))    &&
+     (__HAL_CAN_GET_IT_SOURCE(hcan, CAN_IT_FOV0)))
+  {
+    /* Set CAN error code to FOV0 error */
+    errorcode |= HAL_CAN_ERROR_FOV0;
+
+    /* Clear FIFO0 Overrun Flag */
+    __HAL_CAN_CLEAR_FLAG(hcan, CAN_FLAG_FOV0);
+  }
+
+  /* Check Overrun flag for FIFO1 */
+  if((__HAL_CAN_GET_FLAG(hcan, CAN_FLAG_FOV1))    &&
+     (__HAL_CAN_GET_IT_SOURCE(hcan, CAN_IT_FOV1)))
+  {
+    /* Set CAN error code to FOV1 error */
+    errorcode |= HAL_CAN_ERROR_FOV1;
+
+    /* Clear FIFO1 Overrun Flag */
+    __HAL_CAN_CLEAR_FLAG(hcan, CAN_FLAG_FOV1);
+  }
+
   /* Check End of transmission flag */
   if(__HAL_CAN_GET_IT_SOURCE(hcan, CAN_IT_TME))
   {
@@ -1077,6 +1116,9 @@ void HAL_CAN_IRQHandler(CAN_HandleTypeDef* hcan)
     /* Call receive function */
     CAN_Receive_IT(hcan, CAN_FIFO1);
   }
+  
+  /* Set error code in handle */
+  hcan->ErrorCode |= errorcode;
   
   /* Check Error Warning Flag */
   if((__HAL_CAN_GET_FLAG(hcan, CAN_FLAG_EWG))    &&
@@ -1152,8 +1194,32 @@ void HAL_CAN_IRQHandler(CAN_HandleTypeDef* hcan)
   {
     /* Clear ERRI bit */
     SET_BIT(hcan->Instance->MSR, CAN_MSR_ERRI);
+
     /* Set the CAN state ready to be able to start again the process */
     hcan->State = HAL_CAN_STATE_READY;
+
+    /* Disable interrupts: */
+    /*  - Disable Error warning Interrupt */
+    /*  - Disable Error passive Interrupt */
+    /*  - Disable Bus-off Interrupt */
+    /*  - Disable Last error code Interrupt */
+    /*  - Disable Error Interrupt */
+    /*  - Disable FIFO 0 message pending Interrupt */
+    /*  - Disable FIFO 0 Overrun Interrupt */
+    /*  - Disable FIFO 1 message pending Interrupt */
+    /*  - Disable FIFO 1 Overrun Interrupt */
+    /*  - Disable Transmit mailbox empty Interrupt */
+    __HAL_CAN_DISABLE_IT(hcan, CAN_IT_EWG |
+                               CAN_IT_EPV |
+                               CAN_IT_BOF |
+                               CAN_IT_LEC |
+                               CAN_IT_ERR |
+                               CAN_IT_FMP0|
+                               CAN_IT_FOV0|
+                               CAN_IT_FMP1|
+                               CAN_IT_FOV1|
+                               CAN_IT_TME  );
+    
     /* Call Error callback function */
     HAL_CAN_ErrorCallback(hcan);
   }  
@@ -1344,16 +1410,16 @@ static HAL_StatusTypeDef CAN_Receive_IT(CAN_HandleTypeDef* hcan, uint8_t FIFONum
   {
     __HAL_CAN_FIFO_RELEASE(hcan, CAN_FIFO0);
     
-    /* Disable FIFO 0 message pending Interrupt */
-    __HAL_CAN_DISABLE_IT(hcan, CAN_IT_FMP0);
+    /* Disable FIFO 0 overrun and message pending Interrupt */
+    __HAL_CAN_DISABLE_IT(hcan, CAN_IT_FOV0 | CAN_IT_FMP0);   
   }
   /* Release FIFO1 */
   else /* FIFONumber == CAN_FIFO1 */
   {
     __HAL_CAN_FIFO_RELEASE(hcan, CAN_FIFO1);
     
-    /* Disable FIFO 1 message pending Interrupt */
-    __HAL_CAN_DISABLE_IT(hcan, CAN_IT_FMP1);
+    /* Disable FIFO 1 overrun and message pending Interrupt */
+    __HAL_CAN_DISABLE_IT(hcan, CAN_IT_FOV1 | CAN_IT_FMP1);
   }
   
   if(hcan->State == HAL_CAN_STATE_BUSY_RX)

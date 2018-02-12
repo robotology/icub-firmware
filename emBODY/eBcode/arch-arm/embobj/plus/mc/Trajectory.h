@@ -37,6 +37,7 @@ typedef struct // Trajectory
     
     //////////////////
     // position
+    float target_pos;
     float xX;
     float xV;
     float xA;
@@ -47,6 +48,7 @@ typedef struct // Trajectory
     //////////////////
     // velocity
     BOOL bVelocityMove;
+    float target_vel;
     
     float vX;
     float vV;
@@ -84,6 +86,10 @@ extern int32_t Trajectory_get_vel_ref(Trajectory *o);
 extern int32_t Trajectory_get_acc_ref(Trajectory *o);
 
 extern BOOL Trajectory_is_done(Trajectory* o);
+
+extern float Trajectory_get_target_position(Trajectory* o);
+extern float Trajectory_get_target_velocity(Trajectory* o);
+
 
 
 #ifdef __cplusplus

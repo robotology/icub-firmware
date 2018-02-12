@@ -25,6 +25,7 @@
 #include "embot_common.h"
 #include "embot_i2h.h"
 #include "embot_hw.h"
+#include "embot_hw_sys.h"
 
 namespace embot { namespace hw {
     

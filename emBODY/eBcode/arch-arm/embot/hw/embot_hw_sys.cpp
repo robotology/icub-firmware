@@ -21,7 +21,7 @@
 // - public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "embot_hw.h"
+#include "embot_hw_sys.h"
 #include "stm32hal.h"
 
 
@@ -33,6 +33,8 @@
 #include <vector>
 
 using namespace std;
+
+#include "embot_hw_bsp.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -67,11 +69,24 @@ namespace embot { namespace hw { namespace sys {
     const std::uint32_t maxsizeOfStorage        = 4*1024;
     const std::uint32_t addressOfApplication    = 0x08020000;
     const std::uint32_t maxsizeOfApplication    = 128*1024;
+
+#elif   defined(STM32HAL_BOARD_STRAIN2)
     
+    const std::uint32_t startOfFLASH            = 0x08000000;
+    const std::uint32_t addressOfBootloader     = 0x08000000;
+    const std::uint32_t maxsizeOfBootloader     = 124*1024;
+    const std::uint32_t addressOfStorage        = 0x0801F000;
+    const std::uint32_t maxsizeOfStorage        = 4*1024;
+    const std::uint32_t addressOfApplication    = 0x08020000;
+    const std::uint32_t maxsizeOfApplication    = 128*1024;
+    
+    
+#else
+    #error you must define some embot::hw::sys constants   
 #endif
 
  
-#if     defined(STM32HAL_BOARD_NUCLEO64) || defined(STM32HAL_BOARD_MTB4)
+#if     defined(STM32HAL_BOARD_NUCLEO64) || defined(STM32HAL_BOARD_MTB4) || defined(STM32HAL_BOARD_STRAIN2)
     
 __asm static void ss_hl_sys_asm_xnumARMv7ops(uint32_t numberof) 
 {
@@ -121,9 +136,28 @@ dowaitloop
     
 #endif
     
-    std::uint32_t clock()
+    std::uint32_t clock(CLOCK clk)
     {
-        return SystemCoreClock;
+        std::uint32_t value = 0;
+        switch(clk)
+        {
+            case embot::hw::sys::CLOCK::pclk1:
+            {
+                value = HAL_RCC_GetPCLK1Freq();
+            } break;
+            
+            case embot::hw::sys::CLOCK::pclk2:
+            {
+                value = HAL_RCC_GetPCLK2Freq();
+            } break;
+            
+            default:
+            case embot::hw::sys::CLOCK::syscore:
+            {
+                value = HAL_RCC_GetHCLKFreq();
+            } break;            
+        }   
+        return value;
     }
     
     void reset()
@@ -170,8 +204,12 @@ dowaitloop
         SCB->VTOR = FLASH_BASE | (offset & (uint32_t)0x1FFFFF80);        
     }
 
+    embot::common::Time now()
+    {
+        return embot::hw::bsp::now();        
+    }
 
-    void delay(embot::common::Time t)
+    void delay(embot::common::relTime t)
     {   
         ss_bsp_delay(t);
     }
@@ -194,6 +232,29 @@ dowaitloop
     {
         return maxRANDmask;
     }
+    
+    int puts(const char* str) 
+    {    
+ 
+        if(nullptr == str)
+        {
+            return(0);
+        }
+
+    
+        std::uint32_t ch;
+        int num = 0;
+        while('\0' != (ch = *str))
+        {
+            ITM_SendChar(ch);
+            str++;
+            num++;
+        }
+         
+        ITM_SendChar('\n');
+        return(++num);    
+    }
+
     
 
 }}} // namespace embot { namespace hw { namespace sys { 

@@ -407,7 +407,7 @@ static void update_jointAndMotor_withJointset_constraints(void)
             for(int i=0; i<o->set_dim[s]; i++)
             {
                 int j = o->jos[s][i];
-                o->joint[j].dead_zone = 400.0f;
+                o->joint[j].not_reversible = TRUE;
             }
         }
     }
@@ -562,7 +562,6 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
             }                
             case eomc_enc_aea:
             {
-                o->joint[k].dead_zone = 9.0f;
                 o->absEncoder[k].type = eomc_enc_aea;
                 o->absEncoder[k].fake = FALSE;
                 break;
@@ -574,6 +573,14 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
                 o->absEncoder[k].fake = FALSE;
                 break;
             }
+
+            case eomc_enc_amo:
+            {
+                o->absEncoder[k].type = eomc_enc_amo;
+                o->absEncoder[k].fake = FALSE;
+                break;
+            }            
+            
             
             case eomc_enc_absanalog:
             {
@@ -1335,16 +1342,20 @@ void MController_config_joint(int j, eOmc_joint_config_t* config) //
     
     
     for(int e=0; e< o->multi_encs; e++)
-        AbsEncoder_config(o->absEncoder+j*o->multi_encs+e,   j, config->jntEncoderResolution, config->jntEncNumOfNoiseBits);
+    {
+        AbsEncoder_config(o->absEncoder+j*o->multi_encs+e,   j, config->jntEncoderResolution, config->jntEncTolerance);
+        AbsEncoder_config_divisor(smc->absEncoder+j, config->gearbox_E2J);
+    }
     
-    //AbsEncoder_config(o->absEncoder+j, j, /*(eOmc_encoder_t)config->jntEncoderType,*/ config->jntEncoderResolution, config->jntEncNumOfNoiseBits, spike_cnt_limit);
+//    char message[100];
+//    snprintf(message, sizeof(message), "Gearbox_E2J is %.5f", config->gearbox_E2J);
+//    send_debug_message(message, j, 0, 0);
 
 }
 
 void MController_config_motor(int m, eOmc_motor_config_t* config) //
 {
     Motor_config(smc->motor+m, m, config);
-    AbsEncoder_config_divisor(smc->absEncoder+m, config->gearboxratio2);
 }
 
 void MController_config_motor_friction(int m, eOmc_motor_params_t* friction) //
@@ -1519,23 +1530,13 @@ void MController_update_absEncoder_fbk(uint8_t e, uint32_t* positions) //
     
     for (int k=0; k<smc->multi_encs; ++k)
     {
-        AbsEncoder_update(enc++, (uint16_t)positions[k]);
+        AbsEncoder_update(enc + k, (uint16_t)positions[k]);
     }
     
 #ifdef R1_HAND
     
-    MController_update_joint_torque_fbk(e, AbsEncoder_position(smc->absEncoder+(e*smc->multi_encs+2)));
+    MController_update_joint_torque_fbk(e, AbsEncoder_position(enc + 2));
     
-    /*
-    static int repeat[2] = {0,500};
-    
-    if (++repeat[e]>=1000)
-    {
-        repeat[e] = 0;
-        
-        send_debug_message("Torque", e, smc->joint[e].trq_fbk, 0);
-    }
-    */
 #endif
 }
 
@@ -1815,6 +1816,11 @@ void MController_update_motor_current_fbk(int m, int16_t current)
     Motor_update_current_fbk(smc->motor+m, current);
 }
 
+void MController_update_joint_targets(int j)
+{
+    Joint_update_status_reference(smc->joint+j);
+}
+
 void MController_config_pos_pid(int j, eOmc_PID_t *pid_conf)
 {
     Joint* joint = smc->joint+j;
@@ -1898,9 +1904,9 @@ void MController_stop_joint(int j)
     Joint_stop(smc->joint+j);
 }
 
-void MController_config_motor_gearbox_ratio(int m, int32_t gearbox_ratio)
+void MController_config_motor_gearbox_M2J(int m, float32_t gearbox_M2J)
 {
-    Motor_config_gearbox_ratio(smc->motor+m, gearbox_ratio);
+    Motor_config_gearbox_M2J(smc->motor+m, gearbox_M2J);
 }
 
 void MController_config_motor_encoder(int m, int32_t resolution)

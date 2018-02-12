@@ -68,7 +68,7 @@ namespace embot { namespace sys {
                     
         EventTask();
         EventTask(Task::fpStartup startup, Task::fpOnEvent onevent, std::uint32_t stacksize, Priority priority, common::relTime timeout, void *param = nullptr, fpNameOfTask nameoftask = nullptr);
-        ~EventTask();
+        virtual ~EventTask();
     
         bool init(Task::fpStartup startup, Task::fpOnEvent onevent, std::uint32_t stacksize, Priority priority, common::relTime timeout, void *param = nullptr, fpNameOfTask nameoftask = nullptr);
     
@@ -89,7 +89,7 @@ namespace embot { namespace sys {
         
         MessageTask();
         MessageTask(Task::fpStartup startup, Task::fpOnMessage onmessage, std::uint32_t stacksize, Priority priority, std::uint8_t messagequeuecapacity, common::relTime timeout, void *param = nullptr, fpNameOfTask nameoftask = nullptr);
-        ~MessageTask();
+        virtual ~MessageTask();
     
         bool init(Task::fpStartup startup, Task::fpOnMessage onmessage, std::uint32_t stacksize, Priority priority, std::uint8_t messagequeuecapacity, common::relTime timeout, void *param = nullptr, fpNameOfTask nameoftask = nullptr);
     
@@ -110,7 +110,7 @@ namespace embot { namespace sys {
         
         PeriodicTask();
         PeriodicTask(Task::fpStartup startup, Task::fpPeriodicActivity periodicactivity, std::uint32_t stacksize, Priority priority, common::relTime period, void *param = nullptr, fpNameOfTask nameoftask = nullptr);
-        ~PeriodicTask();
+        virtual ~PeriodicTask();
     
         bool init(Task::fpStartup startup, Task::fpPeriodicActivity periodicactivity, std::uint32_t stacksize, Priority priority, common::relTime period, void *param = nullptr, fpNameOfTask nameoftask = nullptr);
     

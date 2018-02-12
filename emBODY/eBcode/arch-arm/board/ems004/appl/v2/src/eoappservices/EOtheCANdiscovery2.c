@@ -807,6 +807,8 @@ static eOresult_t s_eo_candiscovery2_getFWversion(uint8_t boardtype, eObrd_canlo
         case eobrd_cantype_mais:
         case eobrd_cantype_strain:
         case eobrd_cantype_mtb:
+        case eobrd_cantype_strain2:
+        case eobrd_cantype_mtb4:
         {
             found = eobool_true;
             command.clas = eocanprot_msgclass_pollingAnalogSensor;
@@ -847,7 +849,7 @@ static eObool_t s_eo_isFirmwareVersionCompatible(const eObrd_firmwareversion_t* 
 
 static eObool_t s_eo_isProtocolVersionCompatible(const eObrd_protocolversion_t* target, const eObrd_protocolversion_t* detected)
 {
-    if((detected->major != target->major) || (detected->minor < target->minor))    
+    if((detected->major != target->major) || (detected->minor != target->minor))    
     {
         return(eobool_false);
     }

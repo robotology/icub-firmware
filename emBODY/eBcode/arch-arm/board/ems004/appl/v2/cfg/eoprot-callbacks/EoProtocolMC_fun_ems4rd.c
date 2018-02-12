@@ -548,43 +548,27 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
         { 
             case eomc_setpoint_position:
             {
-                if(MController_set_joint_pos_ref(jxx, setpoint->to.position.value, setpoint->to.position.withvelocity))
-                {
-                    joint->status.target.trgt_position = setpoint->to.position.value;
-                }
+                MController_set_joint_pos_ref(jxx, setpoint->to.position.value, setpoint->to.position.withvelocity);
             } break;
             
             case eomc_setpoint_positionraw:
             {
-                if(MController_set_joint_pos_raw(jxx, setpoint->to.positionraw.value))
-                {
-                    joint->status.target.trgt_positionraw = setpoint->to.positionraw.value;
-                }
+                MController_set_joint_pos_raw(jxx, setpoint->to.positionraw.value);
             } break;
             
             case eomc_setpoint_velocity:
             {
-                if(MController_set_joint_vel_ref(jxx, setpoint->to.velocity.value, setpoint->to.velocity.withacceleration))
-                {
-                    joint->status.target.trgt_velocity = setpoint->to.velocity.value;
-                }    
+                MController_set_joint_vel_ref(jxx, setpoint->to.velocity.value, setpoint->to.velocity.withacceleration);
             } break;
 
             case eomc_setpoint_torque:
             {
-                if(MController_set_joint_trq_ref(jxx, setpoint->to.torque.value))
-                {
-                    joint->status.target.trgt_torque = setpoint->to.torque.value;
-                }
-
+                MController_set_joint_trq_ref(jxx, setpoint->to.torque.value);
             } break;
 
             case eomc_setpoint_openloop:
             {
-                if(MController_set_joint_out_ref(jxx, setpoint->to.openloop.value))
-                {
-                    joint->status.target.trgt_openloop = setpoint->to.openloop.value;
-                }
+                MController_set_joint_out_ref(jxx, setpoint->to.openloop.value);
             } break;
 
             default:
@@ -592,6 +576,8 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
                 
             } break;
         }
+        
+        MController_update_joint_targets(jxx);
     }
     else if(eo_motcon_mode_mc4 == mcmode)
     {
@@ -1241,16 +1227,16 @@ extern void eoprot_fun_UPDT_mc_joint_inputs_externallymeasuredtorque(const EOnv*
 
 
 // f-marker-begin
-extern void eoprot_fun_UPDT_mc_motor_config_gearboxratio(const EOnv* nv, const eOropdescriptor_t* rd)
+extern void eoprot_fun_UPDT_mc_motor_config_gearbox_M2J(const EOnv* nv, const eOropdescriptor_t* rd)
 {   // not for mc4can
     eOprotIndex_t jxx = eoprot_ID2index(rd->id32);
-    int32_t *gbxratio = (int32_t*)rd->data;
+    float32_t *gbxratio = (float32_t*)rd->data;
 
     eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
     
     if((eo_motcon_mode_foc == mcmode) || (eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode))
     {
-        MController_config_motor_gearbox_ratio(jxx, *gbxratio);
+        MController_config_motor_gearbox_M2J(jxx, *gbxratio);
     }
 }
 

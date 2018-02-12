@@ -89,7 +89,26 @@ extern "C" {
     #endif    
 				
 #elif   defined(STM32HAL_BOARD_STRAIN2)
-				#error STM32HAL: code for STM32HAL_BOARD_STRAIN2 is to be added
+
+    #if !defined(USE_STM32HAL)
+    #define USE_STM32HAL
+    #endif
+
+    // use hal
+    #if !defined(USE_HAL_DRIVER)
+    #define USE_HAL_DRIVER
+    #endif
+
+    // it has a STM32L443xx mpu
+    #if !defined(STM32L443xx)
+    #define STM32L443xx
+    #endif	
+
+    // of type STM32L4    
+    #if !defined(STM32HAL_STM32L4xx)
+    #define STM32HAL_STM32L4xx
+    #endif  
+    
 #else
         #error STM32HAL: you must define a STM32HAL_BOARD_something
 #endif

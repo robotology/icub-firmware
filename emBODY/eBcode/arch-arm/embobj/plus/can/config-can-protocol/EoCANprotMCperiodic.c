@@ -99,6 +99,38 @@ static void s_former_PER_MC_prepare_frame(eOcanprot_descriptor_t *descriptor, eO
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
 
+
+
+
+extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__DEBUG(eOcanframe_t *frame, eOcanport_t port)
+{
+    // i decode this fram only if it comes from 2foc and i discard it if it comes from a mc4.
+    // in date 19 sept 2017 we decided that the 2foc boards would send this diagnostics frame when they find an error of type tbd
+    // as a first case we want to sue it for debugging the case of motor encoder dirty which happens on icub-v3.   
+    
+    eOerrmanDescriptor_t des = {0};
+    
+    eObrd_cantype_t boardtype = s_eocanprotMCperiodic_get_boardtype(frame, port);
+        
+    if(eobrd_cantype_foc == boardtype)
+    {
+        // i just forward the full canframe into a debug message. later on i will add a proper message type.        
+        des.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag02);
+        des.par16 = (frame->id & 0x0fff) | ((frame->size & 0x000f) << 12);
+        des.par64 = eo_common_canframe_data2u64(frame);
+        des.sourcedevice = (eOcanport1 == port) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
+        des.sourceaddress = EOCANPROT_FRAME_GET_SOURCE(frame);
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &des);               
+    
+    }
+    else if(eobrd_cantype_mc4 == boardtype)
+    {   
+        // we have a mc4, ... we just drop it
+    }
+    
+    return(eores_OK); 
+}
+
 extern eOresult_t eocanprotMCperiodic_parser_PER_MC_MSG__2FOC(eOcanframe_t *frame, eOcanport_t port)
 {
     // this can frame is from 2foc only ... as the name of the message says. i dont do the check that the board must be a 2foc

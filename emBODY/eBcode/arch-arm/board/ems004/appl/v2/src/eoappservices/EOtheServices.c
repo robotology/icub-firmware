@@ -642,6 +642,13 @@ static void s_eo_services_initialise(EOtheServices *p)
         eo_ethmonitor_Start(eo_ethmonitor_GetHandle());
     }
     
+    eOerrmanDescriptor_t errdes = {0};
+    errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_runninghappily);
+    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+    errdes.sourceaddress    = 0;
+    errdes.par16            = 0x0000;
+    errdes.par64            = 0;
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);     
 }
 
 

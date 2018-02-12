@@ -283,12 +283,12 @@ extern eOresult_t eo_strain_Verify(EOtheSTRAIN *p, const eOmn_serv_configuration
     p->service.activateafterverify = activateafterverify;
 
 
-    p->sharedcan.discoverytarget.info.type = eobrd_cantype_strain;
-    p->sharedcan.discoverytarget.info.protocol.major = servcfg->data.as.strain.version.protocol.major; 
-    p->sharedcan.discoverytarget.info.protocol.minor = servcfg->data.as.strain.version.protocol.minor;
-    p->sharedcan.discoverytarget.info.firmware.major = servcfg->data.as.strain.version.firmware.major; 
-    p->sharedcan.discoverytarget.info.firmware.minor = servcfg->data.as.strain.version.firmware.minor; 
-    p->sharedcan.discoverytarget.info.firmware.build = servcfg->data.as.strain.version.firmware.build;     
+    p->sharedcan.discoverytarget.info.type = servcfg->data.as.strain.boardtype.type;
+    p->sharedcan.discoverytarget.info.protocol.major = servcfg->data.as.strain.boardtype.protocol.major; 
+    p->sharedcan.discoverytarget.info.protocol.minor = servcfg->data.as.strain.boardtype.protocol.minor;
+    p->sharedcan.discoverytarget.info.firmware.major = servcfg->data.as.strain.boardtype.firmware.major; 
+    p->sharedcan.discoverytarget.info.firmware.minor = servcfg->data.as.strain.boardtype.firmware.minor; 
+    p->sharedcan.discoverytarget.info.firmware.build = servcfg->data.as.strain.boardtype.firmware.build;     
     p->sharedcan.discoverytarget.canmap[servcfg->data.as.strain.canloc.port] = 0x0001 << servcfg->data.as.strain.canloc.addr; 
     
     p->sharedcan.ondiscoverystop.function = s_eo_strain_onstop_search4strain;
@@ -389,8 +389,8 @@ extern eOresult_t eo_strain_Activate(EOtheSTRAIN *p, const eOmn_serv_configurati
         prop.location.port = servcfg->data.as.strain.canloc.port;
         prop.location.addr = servcfg->data.as.strain.canloc.addr;
         prop.location.insideindex = eobrd_caninsideindex_none;
-        prop.requiredprotocol.major = servcfg->data.as.strain.version.protocol.major;
-        prop.requiredprotocol.minor = servcfg->data.as.strain.version.protocol.minor;
+        prop.requiredprotocol.major = servcfg->data.as.strain.boardtype.protocol.major;
+        prop.requiredprotocol.minor = servcfg->data.as.strain.boardtype.protocol.minor;
        
         eo_vector_PushBack(p->sharedcan.boardproperties, &prop);
         
@@ -1030,8 +1030,9 @@ static eOresult_t s_eo_strain_onstop_search4strain(void *par, EOtheCANdiscovery2
     p->diagnostics.errorDescriptor.sourcedevice     = eo_errman_sourcedevice_localboard;
     p->diagnostics.errorDescriptor.sourceaddress    = 0;
     p->diagnostics.errorDescriptor.par16            = (servcfg->data.as.strain.canloc.addr) | (servcfg->data.as.strain.canloc.port << 8);
-    p->diagnostics.errorDescriptor.par64            = (servcfg->data.as.strain.version.firmware.minor)       | (servcfg->data.as.strain.version.firmware.major << 8) |
-                                                      (servcfg->data.as.strain.version.protocol.minor << 16) | (servcfg->data.as.strain.version.protocol.major << 24);    
+    p->diagnostics.errorDescriptor.par64            = ((eobrd_strain2 == servcfg->data.as.strain.boardtype.type) ? (0x0200000000) : (0x0100000000)) |
+                                                      (servcfg->data.as.strain.boardtype.firmware.minor)       | (servcfg->data.as.strain.boardtype.firmware.major << 8) |
+                                                      (servcfg->data.as.strain.boardtype.protocol.minor << 16) | (servcfg->data.as.strain.boardtype.protocol.major << 24);    
     EOaction_strg astrg = {0};
     EOaction *act = (EOaction*)&astrg;
     eo_action_SetCallback(act, s_eo_strain_send_periodic_error_report, p, eov_callbackman_GetTask(eov_callbackman_GetHandle()));

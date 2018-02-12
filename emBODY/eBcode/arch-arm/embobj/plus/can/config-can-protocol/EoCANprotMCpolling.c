@@ -780,10 +780,16 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_INTERACTION_MODE(eOc
     return(eores_OK);  
 }
 
+#define USE_2FOC_PROT_1dot6
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_MOTOR_CONFIG(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
+#if defined(USE_2FOC_PROT_1dot6)
+    s_former_POL_MC_prepare_frame(descriptor, frame, 8, ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_CONFIG);   
+    memcpy(frame->data+1,descriptor->cmd.value,7);
+#else
     s_former_POL_MC_prepare_frame(descriptor, frame, 7, ICUBCANPROTO_POL_MC_CMD__SET_MOTOR_CONFIG);   
     memcpy(frame->data+1,descriptor->cmd.value,6);
+#endif
     return(eores_OK);  
 }
 
@@ -821,7 +827,7 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_TORQUE_STICTION_PARA
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__GET_TORQUE_STICTION_PARAMS(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
-    s_former_POL_MC_prepare_frame(descriptor, frame, 1, ICUBCANPROTO_POL_MC_CMD__GET_POS_STICTION_PARAMS);
+    s_former_POL_MC_prepare_frame(descriptor, frame, 1, ICUBCANPROTO_POL_MC_CMD__GET_TORQUE_STICTION_PARAMS);
     return(eores_OK);
 }
 extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_TORQUE_STICTION_PARAMS(eOcanframe_t *frame, eOcanport_t port)

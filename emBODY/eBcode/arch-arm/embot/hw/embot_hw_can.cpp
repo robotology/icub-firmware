@@ -21,13 +21,15 @@
 // - public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "embot_hw.h"
+#include "embot_hw_can.h"
 #include "stm32hal.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
+
+#include "embot_binary.h"
 
 #include <cstring>
 #include <vector>
@@ -75,17 +77,7 @@ namespace embot { namespace hw { namespace can {
 
 #elif   defined(HAL_CAN_MODULE_ENABLED)
 
-// - stm32hal.lib needs those two handlers being compiled in here.
 
-void CAN1_TX_IRQHandler(void)
-{
-    HAL_CAN_IRQHandler(&hcan1);
-}
-
-void CAN1_RX0_IRQHandler(void)
-{
-    HAL_CAN_IRQHandler(&hcan1);
-}
 
 namespace embot { namespace hw { namespace can {
     
@@ -96,7 +88,9 @@ namespace embot { namespace hw { namespace can {
     };
     
     // const support maps
-    #if     defined(STM32HAL_BOARD_NUCLEO64)    
+    #if     defined(STM32HAL_BOARD_NUCLEO64) 
+
+    #define STM32HAL_HAS_CAN1 
     
     // yes ... if STM32HAL_BOARD_NUCLEO64 is defined we are never in here because HAL_CAN_MODULE_ENABLED is not defined ... but it is just a reminder
     static const bspmap_t bspmap = 
@@ -107,13 +101,24 @@ namespace embot { namespace hw { namespace can {
 
     #elif   defined(STM32HAL_BOARD_MTB4)
     
+    #define STM32HAL_HAS_CAN1 
+    
+    static const bspmap_t bspmap = 
+    {
+        0x00000001
+    };
+
+    #elif   defined(STM32HAL_BOARD_STRAIN2)
+    
+    #define STM32HAL_HAS_CAN1 
+    
     static const bspmap_t bspmap = 
     {
         0x00000001
     };
 
     #else
-        #warning embot::hw::can::bspmask must be filled    
+        #error embot::hw::can::bspmask must be filled    
     #endif
       
     // initialised mask       
@@ -130,7 +135,7 @@ namespace embot { namespace hw { namespace can {
         {
             return false;
         }
-        return embot::common::bit::check(bspmap.mask, port2index(p));
+        return embot::binary::bit::check(bspmap.mask, port2index(p));
     }
     
     bool initialised(Port p)
@@ -139,7 +144,7 @@ namespace embot { namespace hw { namespace can {
         {
             return false;
         }
-        return embot::common::bit::check(initialisedmask, port2index(p));
+        return embot::binary::bit::check(initialisedmask, port2index(p));
     }    
     
     
@@ -165,6 +170,8 @@ namespace embot { namespace hw { namespace can {
     static CanTxMsgTypeDef        TxMessage;
     static CanRxMsgTypeDef        RxMessage;
     
+#if 0 
+// not used anymore: removed to avoid compiler warnings
     static void s_transmit_noirq(CAN_HandleTypeDef *hcan)
     {
         std::uint32_t size = s_Qtx->size();
@@ -195,12 +202,12 @@ namespace embot { namespace hw { namespace can {
                     
         return; // resOK;
     }    
-
+#endif
+    
     static void s_transmit(CAN_HandleTypeDef *hcan)
     {
         if(0 == s_Qtx->size())
         {
-            __HAL_CAN_DISABLE_IT(hcan, CAN_IT_TME);
             if(nullptr != s_config.txqueueempty.callback)
             {
                 s_config.txqueueempty.callback(s_config.txqueueempty.arg);
@@ -219,41 +226,40 @@ namespace embot { namespace hw { namespace can {
         //2) transmit frame
         HAL_StatusTypeDef res = HAL_CAN_Transmit_IT(hcan);
         //the only possible return values are HAL_BUSY or HAL_OK
-        if(res == HAL_BUSY)
+        if(res == HAL_OK)
         {
-            uint8_t testonly =0;
-            //this means that can is transmitting a frame, so when it finish it advertises me by IRQ handler;
-            //i should never be here.
-            testonly=testonly;
-        }
-       
-        //3) remove the frame from tx queue
+            //3) if transmission is ok, than I remove the frame from tx queue
         vector<Frame>::iterator b = s_Qtx->begin();
         s_Qtx->erase(b);
-        
         if(nullptr != s_config.ontxframe.callback)
         {
             s_config.ontxframe.callback(s_config.ontxframe.arg);
+        }
+        }
+        else
+        {
+            ;
+            //3) if transmission is not ok, than I leave frame in queue.
+            //NOTE: improve management of max num of attempts of transmission.
         }
             
         return; // resOK;
     }
     
-    static void txHandler(void* par)
+    void callbackOnTXcompletion(CAN_HandleTypeDef* hcan)
     {
-        CAN_HandleTypeDef *hcan = reinterpret_cast<CAN_HandleTypeDef*>(par);
         //this function is called inside IRQ handler of stm32hal, so hcan could be can1 or can2.
         //therefore i need to check that the interrupt is on the peritherical I already initted.
         
         if( (hcan == (&hcan1)) && initialised(Port::one) )
+        {
             s_transmit(hcan);
-        
+        }
         //currently I have not can2!
     }
     
-    static void rxHandler(void* par)
+    void callbackOnRXcompletion(CAN_HandleTypeDef* hcan)
     {
-        CAN_HandleTypeDef *hcan = reinterpret_cast<CAN_HandleTypeDef*>(par);
         //to make better
         if(hcan != (&hcan1))
             return;
@@ -273,7 +279,7 @@ namespace embot { namespace hw { namespace can {
         if(s_rxQ->size() == s_config.rxcapacity)
         {
             //remove the oldest frame
-             s_rxQ->erase(s_rxQ->begin());
+            s_rxQ->erase(s_rxQ->begin());
         }
         s_rxQ->push_back(rxframe);
         
@@ -284,11 +290,10 @@ namespace embot { namespace hw { namespace can {
         
     }
     
-    static void s_errorHandler(void* par)
+    void callbackOnError(CAN_HandleTypeDef* hcan)
     {
-        CAN_HandleTypeDef *hcan = reinterpret_cast<CAN_HandleTypeDef*>(par);
         hcan = hcan;
-        static uint32_t error_count=0;
+        static uint32_t error_count = 0;
         error_count++;
     }
 
@@ -318,7 +323,7 @@ namespace embot { namespace hw { namespace can {
         hcan1.pRxMsg = &RxMessage;
     
         
-        //init peripheral
+        // init peripheral
         MX_CAN1_Init();
         
         // do whatever else is required .... for instance... init the buffers.
@@ -346,16 +351,8 @@ namespace embot { namespace hw { namespace can {
         {
         
         }
-
-        //////// configure IRQ handler
-        stm32hal_can_configCallback_t  embot_can_irqHandlers;
-        embot_can_irqHandlers.onRx = rxHandler;
-        embot_can_irqHandlers.onTx = txHandler;
-        embot_can_irqHandlers.onError = s_errorHandler;
-
-        stm32hal_can_configureIRQcallback(&embot_can_irqHandlers);
         
-        embot::common::bit::set(initialisedmask, port2index(p));
+        embot::binary::bit::set(initialisedmask, port2index(p));
 
         return resOK;
     }
@@ -384,7 +381,6 @@ namespace embot { namespace hw { namespace can {
         {
             return resNOK;
         }  
-
 
         // do whatever is needed
         
@@ -459,8 +455,8 @@ namespace embot { namespace hw { namespace can {
 
         if(Port::one == p)
         {
-           // embot::hw::can::s_transmit(&hcan1);
-            embot::hw::can::s_transmit_noirq(&hcan1);
+            embot::hw::can::s_transmit(&hcan1);
+            //embot::hw::can::s_transmit_noirq(&hcan1);
             return resOK;
         }
         else
@@ -500,8 +496,134 @@ namespace embot { namespace hw { namespace can {
     }
 
     
+    result_t setfilters(Port p, std::uint8_t address)
+    {
+        if(false ==  supported(p))
+        {
+            return resNOK;
+        } 
+        
+         /* Configure the CAN Filter for message of class polling sensor */
+        CAN_FilterConfTypeDef sFilterConfig;
+        sFilterConfig.FilterNumber = 0;
+        sFilterConfig.FilterMode = CAN_FILTERMODE_IDLIST;
+        sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
+        sFilterConfig.FilterIdHigh = (0x200 | address) << 5;
+        sFilterConfig.FilterIdLow = 0x0000;
+        sFilterConfig.FilterMaskIdHigh = 0x0000;
+        sFilterConfig.FilterMaskIdLow = 0x0000;
+        sFilterConfig.FilterFIFOAssignment = 0;
+        sFilterConfig.FilterActivation = ENABLE;
+        sFilterConfig.BankNumber = 0;
+        if(HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig) != HAL_OK)
+        {
+            return resNOK;
+        }
+        
+        sFilterConfig.FilterNumber = 1;
+        sFilterConfig.FilterIdHigh = 0x20F << 5;
+        sFilterConfig.FilterIdLow = 0x0000;
+        sFilterConfig.FilterMaskIdHigh = 0x0000;
+        sFilterConfig.FilterMaskIdLow = 0x0000;
+        sFilterConfig.FilterActivation = ENABLE;
+        sFilterConfig.BankNumber = 0;
+        if(HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig) != HAL_OK)
+        {
+            return resNOK;
+        }
+        
+         /* Configure the CAN Filter for message of class bootloader sensor */
+        sFilterConfig.FilterNumber = 2;
+        sFilterConfig.FilterIdHigh = (0x700 | address) << 5;
+        sFilterConfig.FilterIdLow = 0x0000;
+        sFilterConfig.FilterMaskIdHigh = 0x0000;
+        sFilterConfig.FilterMaskIdLow = 0x0000;
+        sFilterConfig.FilterActivation = ENABLE;
+        sFilterConfig.BankNumber = 1;
+        if(HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig) != HAL_OK)
+        {
+            return resNOK;
+        }
+        
+        sFilterConfig.FilterNumber = 3;
+        sFilterConfig.FilterIdHigh = 0x70F << 5;
+        sFilterConfig.FilterIdLow = 0x0000;
+        sFilterConfig.FilterMaskIdHigh = 0x0000;
+        sFilterConfig.FilterMaskIdLow = 0x0000;
+        sFilterConfig.FilterActivation = ENABLE;
+        sFilterConfig.BankNumber = 1;
+        if(HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig) != HAL_OK)
+        {
+            return resNOK;
+        }
+
+
+        /* Configure the CAN Filter for message of class bootloader sensor */
+        sFilterConfig.FilterNumber = 4;
+        sFilterConfig.FilterIdHigh = (0x000 | address) << 5;
+        sFilterConfig.FilterIdLow = 0x0000;
+        sFilterConfig.FilterMaskIdHigh = 0x0000;
+        sFilterConfig.FilterMaskIdLow = 0x0000;
+        sFilterConfig.FilterActivation = ENABLE;
+        sFilterConfig.BankNumber = 2;
+        if(HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig) != HAL_OK)
+        {
+            return resNOK;
+        }
+        
+        sFilterConfig.FilterNumber = 5;
+        sFilterConfig.FilterIdHigh = 0x00F << 5;
+        sFilterConfig.FilterIdLow = 0x0000;
+        sFilterConfig.FilterMaskIdHigh = 0x0000;
+        sFilterConfig.FilterMaskIdLow = 0x0000;
+        sFilterConfig.FilterActivation = ENABLE;
+        sFilterConfig.BankNumber = 2;
+        if(HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig) != HAL_OK)
+        {
+            return resNOK;
+        }
+        
+        return resOK;   
+    }
+    
     
 }}} // namespace embot { namespace hw { namespace can {
+
+
+// - stm32hal.lib needs some handlers being compiled in here: IRQ handlers and callbacks.
+
+#if defined(STM32HAL_HAS_CAN1)
+
+void CAN1_TX_IRQHandler(void)
+{
+    HAL_CAN_IRQHandler(&hcan1);
+}
+
+void CAN1_RX0_IRQHandler(void)
+{
+    HAL_CAN_IRQHandler(&hcan1);
+}
+
+#endif
+
+
+// these functions must be re-defined. they are weakly defined in the stm32hal.lib 
+
+void HAL_CAN_TxCpltCallback(CAN_HandleTypeDef* hcan)
+{
+    embot::hw::can::callbackOnTXcompletion(hcan);
+}
+
+void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan)
+{
+    embot::hw::can::callbackOnRXcompletion(hcan);
+}
+
+void HAL_CAN_ErrorCallback(CAN_HandleTypeDef *hcan)
+{
+    embot::hw::can::callbackOnError(hcan);
+}
+
 
 #endif //defined(HAL_CAN_MODULE_ENABLED)
 
