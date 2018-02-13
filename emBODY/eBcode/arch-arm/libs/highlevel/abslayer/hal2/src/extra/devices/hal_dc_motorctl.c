@@ -130,6 +130,8 @@ extern hal_boolval_t hal_motor_supported_is(hal_motor_t id)
 // Motor init with active interrupts on external fault channels. 
 // marco.accame on 4 feb 2016: it is the old function hal_motor_and_adc_init() which had comment: "Motor init with ADC for currents feedback" 
 
+//static GPIO_InitTypeDef GPIO_InitStructure;
+
 extern hal_result_t hal_motor_init(hal_motor_t id, const hal_motor_cfg_t *cfg)
 {
     
@@ -151,7 +153,8 @@ extern hal_result_t hal_motor_init(hal_motor_t id, const hal_motor_cfg_t *cfg)
   	TIM_OCInitTypeDef TIM1_OCInitStructure;
 	TIM_TimeBaseInitTypeDef TIM8_TimeBaseStructure;
   	TIM_OCInitTypeDef TIM8_OCInitStructure;
-  	TIM_BDTRInitTypeDef TIM1_BDTRInitStructure, TIM8_BDTRInitStructure;
+  	TIM_BDTRInitTypeDef TIM1_BDTRInitStructure; 
+    TIM_BDTRInitTypeDef TIM8_BDTRInitStructure;
   	NVIC_InitTypeDef NVIC_InitStructure;
   	GPIO_InitTypeDef GPIO_InitStructure;
     //ADC_InitTypeDef ADC_InitStructure;
@@ -597,7 +600,10 @@ extern hal_bool_t hal_motor_externalfaulted(void)
 
 extern hal_bool_t hal_motor_external_fault_active(void)
 {
-    static hal_gpio_t fault_pin = {.port = hal_gpio_portA, .pin = hal_gpio_pin4};
+    
+    //return(1 == GPIO_ReadInputDataBit(GPIOA, GPIO_PinSource6));
+    
+    static hal_gpio_t fault_pin = {.port = hal_gpio_portA, .pin = hal_gpio_pin6};
     
     return(hal_gpio_getval(fault_pin) == hal_gpio_valHIGH);
 }
@@ -767,23 +773,22 @@ void TIM1_BRK_TIM9_IRQHandler(void)
   - set the flag signalling the fault
   - clear pending bit
   */    
-  // write somewhere disable due to external fault 
-  if(SET == TIM_GetFlagStatus(TIM1, TIM_FLAG_Break))
-  {
-      TIM_ITConfig(TIM1, TIM_IT_Break, DISABLE);
-      hal_motor_disable(hal_motor1);
-      hal_motor_disable(hal_motor2);
+  // write somewhere disable due to external fault
+
+    if(SET == TIM_GetFlagStatus(TIM1, TIM_FLAG_Break))
+    {
+        TIM_ITConfig(TIM1, TIM_IT_Break, DISABLE);
+        hal_motor_disable(hal_motor1);
+        hal_motor_disable(hal_motor2);
 #if (ACTIVE_INTERRUPTS_CHANNELS == 1)
-      hal_motor_disable(hal_motor3);
-      hal_motor_disable(hal_motor4);
+        hal_motor_disable(hal_motor3);
+        hal_motor_disable(hal_motor4);
 #endif
-      s_hal_motor_theinternals.externalfaultpressed = hal_true;
-      TIM_ClearITPendingBit(TIM1, TIM_IT_Break);
-  }
-  else
-  {
-      s_hal_motor_theinternals.externalfaultpressed = hal_false;
-  }
+		
+        TIM_ClearITPendingBit(TIM1, TIM_IT_Break);
+        
+        s_hal_motor_theinternals.externalfaultpressed = hal_true;
+    }
 }
 
 #if (ACTIVE_INTERRUPTS_CHANNELS == 2)

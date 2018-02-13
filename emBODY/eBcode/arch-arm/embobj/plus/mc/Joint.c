@@ -60,7 +60,10 @@ void Joint_init(Joint* o)
     
     o->pos_fbk = ZERO;
     o->vel_fbk = ZERO;
+    o->acc_fbk = ZERO;
     o->trq_fbk = ZERO;
+    
+    o->vel_fbk_old = ZERO;
     
     o->pos_fbk_from_motors = ZERO;
     o->vel_fbk_from_motors = ZERO;
@@ -351,11 +354,14 @@ BOOL Joint_check_faults(Joint* o)
         }
     }
     
-    if ((o->pos_min != o->pos_max) && ((o->pos_fbk < o->pos_min_hard - POS_LIMIT_MARGIN) || (o->pos_fbk > o->pos_max_hard + POS_LIMIT_MARGIN))) 
+    if ((o->control_mode != eomc_controlmode_notConfigured) && (o->control_mode != eomc_controlmode_calib))
     {
-        o->fault_state.bits.hard_limit_reached = TRUE;
+        if ((o->pos_min != o->pos_max) && ((o->pos_fbk < o->pos_min_hard - POS_LIMIT_MARGIN) || (o->pos_fbk > o->pos_max_hard + POS_LIMIT_MARGIN))) 
+        {
+            o->fault_state.bits.hard_limit_reached = TRUE;
             
-        o->control_mode = eomc_controlmode_hwFault;
+            o->control_mode = eomc_controlmode_hwFault;
+        }
     }
     
     if (o->control_mode != eomc_controlmode_hwFault) return FALSE;
@@ -793,7 +799,7 @@ void Joint_get_state(Joint* o, eOmc_joint_status_t* joint_state)
     joint_state->core.modes.ismotiondone             = Trajectory_is_done(&o->trajectory);
     joint_state->core.measures.meas_position         = o->pos_fbk;           
     joint_state->core.measures.meas_velocity         = o->vel_fbk;        
-    joint_state->core.measures.meas_acceleration     = 0; // not implemented      
+    joint_state->core.measures.meas_acceleration     = o->acc_fbk;      
     joint_state->core.measures.meas_torque           = o->trq_fbk;
 }
 

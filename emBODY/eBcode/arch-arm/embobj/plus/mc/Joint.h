@@ -134,7 +134,10 @@ typedef struct // Joint
     
     CTRL_UNITS pos_fbk;
     CTRL_UNITS vel_fbk;
+    CTRL_UNITS acc_fbk;
     CTRL_UNITS trq_fbk;    
+    
+    CTRL_UNITS vel_fbk_old;
     
     CTRL_UNITS pos_fbk_from_motors;
     CTRL_UNITS vel_fbk_from_motors;

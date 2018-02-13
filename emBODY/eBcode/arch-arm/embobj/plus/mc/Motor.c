@@ -465,8 +465,16 @@ extern void Motor_do_calibration_hard_stop(Motor* o)
     }
 }
 
-void Motor_set_run(Motor* o) //
+BOOL Motor_set_run(Motor* o) //
 {
+    if (o->HARDWARE_TYPE == HARDWARE_2FOC)
+    {
+        if (o->fault_state.bits.ExternalFaultAsserted)
+        {
+            return FALSE;
+        }
+    }
+    
     icubCanProto_controlmode_t control_mode;
     char message[150];
     
@@ -488,7 +496,7 @@ void Motor_set_run(Motor* o) //
         {
             snprintf(message, sizeof(message), "Motor_set_run: unknown control type par16=type par64=hwtype" );
             send_debug_message(message, o->ID , o->MOTOR_CONTROL_TYPE, o->HARDWARE_TYPE);
-            return;
+            return FALSE;
         }
     }
     
@@ -510,13 +518,22 @@ void Motor_set_run(Motor* o) //
          snprintf(message, sizeof(message), "Motor_set_run: unknown hw type. par16=type par64=hwtype" );
          send_debug_message(message, o->ID , o->MOTOR_CONTROL_TYPE, o->HARDWARE_TYPE);
     }
+    
+    return TRUE;
 }
-void Motor_clear_ext_fault(Motor *o)
+/*
+BOOL Motor_clear_ext_fault(Motor *o)
 {
- if(o->HARDWARE_TYPE == HARDWARE_MC4p)
-    hal_motor_reenable_break_interrupts();
+    if(o->HARDWARE_TYPE == HARDWARE_MC4p)
+    {
+        hal_motor_reenable_break_interrupts();
+        
+        return TRUE;
+    }
+    
+    return FALSE;
 }
-
+*/
 void Motor_set_idle(Motor* o) //
 {
     if (o->HARDWARE_TYPE == HARDWARE_2FOC)
@@ -580,7 +597,6 @@ BOOL Motor_check_faults(Motor* o) //
     
     if (o->HARDWARE_TYPE == HARDWARE_MC4p)
     {
-        //o->fault_state.bits.ExternalFaultAsserted = hal_motor_external_fault_active(); //hal_motor_externalfaulted();
         o->fault_state.bits.ExternalFaultAsserted = hal_motor_externalfaulted();
     }
     
@@ -756,7 +772,7 @@ void Motor_raise_fault_i2t(Motor* o)
     
     o->control_mode = icubCanProto_controlmode_hwFault;
 }
-
+/*
 void Motor_raise_fault_external(Motor* o)
 {
     hal_motor_disable((hal_motor_t)o->actuatorPort);
@@ -768,7 +784,7 @@ void Motor_raise_fault_external(Motor* o)
         o->control_mode = icubCanProto_controlmode_idle;
     }
 }
-
+*/
 void Motor_motion_reset(Motor *o) //
 {
     PID_reset(&o->trqPID);
@@ -1067,7 +1083,6 @@ BOOL Motor_is_external_fault(Motor* o)
     }
     else if (o->HARDWARE_TYPE == HARDWARE_MC4p)
     {
-        //return hal_motor_external_fault_active(); //hal_motor_externalfaulted();
         return hal_motor_externalfaulted();
     }
     
