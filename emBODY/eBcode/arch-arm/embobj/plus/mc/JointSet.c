@@ -181,10 +181,9 @@ void JointSet_do_odometry(JointSet* o) //
             }
         }
         
-        return;
+        //return;
     }
-    
-    // encoder coupling
+    else // encoder coupling
     {
         int E = *(o->pE);
         
@@ -234,6 +233,14 @@ void JointSet_do_odometry(JointSet* o) //
                 o->joint[j].vel_fbk += Sje[j][e] * vel[e];
             }
         }
+    }
+    
+    // accelerations
+    for (js=0; js<N; ++js)
+    {
+        j = o->joints_of_set[js];
+        o->joint[j].acc_fbk = CTRL_LOOP_FREQUENCY*(o->joint[j].vel_fbk - o->joint[j].vel_fbk_old);
+        o->joint[j].vel_fbk_old = o->joint[j].vel_fbk;
     }
 }
 
@@ -406,6 +413,7 @@ BOOL JointSet_set_control_mode(JointSet* o, eOmc_controlmode_command_t control_m
         }
         break;
     
+    /*
     case eomc_controlmode_cmd_openloop:
         if (o->external_fault) return FALSE;
         for (int k=0; k<N; ++k)
@@ -429,22 +437,31 @@ BOOL JointSet_set_control_mode(JointSet* o, eOmc_controlmode_command_t control_m
             Joint_set_control_mode(o->joint+o->joints_of_set[k], control_mode);
         }    
         break;
+    */
     
+    case eomc_controlmode_cmd_openloop:
+    case eomc_controlmode_cmd_torque:
     case eomc_controlmode_direct:
     case eomc_controlmode_cmd_mixed:
     case eomc_controlmode_cmd_position:
     case eomc_controlmode_cmd_velocity:
-        if (o->external_fault) return FALSE;
+    {        
+        //if (o->external_fault) return FALSE;
+        
         for (int k=0; k<N; ++k)
         { 
             Motor_motion_reset(o->motor+o->motors_of_set[k]);
             Joint_motion_reset(o->joint+o->joints_of_set[k]);
             
-            Motor_set_run(o->motor+o->motors_of_set[k]);
+            if (!Motor_set_run(o->motor+o->motors_of_set[k])) return FALSE;
+        }
+        
+        for (int k=0; k<N; ++k)
+        { 
             Joint_set_control_mode(o->joint+o->joints_of_set[k], control_mode);
         }
         break;
-        
+    }    
     default:
         return FALSE;
     }

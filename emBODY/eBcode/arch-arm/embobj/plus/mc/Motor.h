@@ -249,7 +249,7 @@ extern void Motor_calibrate_withOffset(Motor* o, int32_t offset); //
 extern BOOL Motor_calibrate_moving2Hardstop(Motor* o, int32_t pwm, int32_t zero); //
 extern void Motor_uncalibrate(Motor* o);
 
-extern void Motor_set_run(Motor* o); //
+extern BOOL Motor_set_run(Motor* o); //
 extern void Motor_set_idle(Motor* o); //
 extern void Motor_force_idle(Motor* o); //
 
@@ -280,12 +280,12 @@ extern void Motor_update_current_fbk(Motor* o, int16_t current);
 extern void Motor_set_i2t_fault(Motor* o);
 
 extern void Motor_raise_fault_i2t(Motor* o);
-extern void Motor_raise_fault_external(Motor* o);
+//extern void Motor_raise_fault_external(Motor* o);
 extern BOOL Motor_is_external_fault(Motor* o);
 extern BOOL Motor_is_in_fault(Motor* o);
 extern BOOL Motor_is_running(Motor* o);
 
-void Motor_clear_ext_fault(Motor *o);
+//BOOL Motor_clear_ext_fault(Motor *o);
 
 ////////////////////////////////////////////////////////////////////////////
 extern void Motor_config_gearbox_M2J(Motor* o, float32_t gearbox_M2J);
