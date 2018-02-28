@@ -34,7 +34,7 @@
 #include "ipal.h"
 
 #include "EOMtheSystem.h"
-#include "emBODYrobot.h"
+
 
 
 extern const hal_cfg_t     hal_cfg;
@@ -78,7 +78,7 @@ extern const osal_cfg_t    osal_cfg;
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
-#if (emBODYrobot_BOARD_NAME == boardEMS001)
+#if defined(BOARD_ems001)
 
 //const eEmoduleInfo_t eom_applbasic_info_modinfo __attribute__((at(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
 //{
@@ -131,7 +131,7 @@ extern const osal_cfg_t    osal_cfg;
 //    .extra      = {0}
 //};
 
-#elif (emBODYrobot_BOARD_NAME == boardEMS4RD) | (emBODYrobot_BOARD_NAME == boardMC4PLUS)
+#elif defined(BOARD_ems4) | defined(BOARD_mc4plus) | defined(BOARD_mc2plus)
 
 const eEmoduleExtendedInfo_t eom_applbasic_info_modinfo_extended __attribute__((at(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
 {
@@ -189,7 +189,7 @@ const eEmoduleExtendedInfo_t eom_applbasic_info_modinfo_extended __attribute__((
     .userdefined            = {0}
 };
 #else
-    #error --> specify emBODYrobot_BOARD_NAME
+    #error --> specify BOARD_name
 #endif
 
 const eOmsystem_cfg_t eom_applbasic_info_syscfg =
