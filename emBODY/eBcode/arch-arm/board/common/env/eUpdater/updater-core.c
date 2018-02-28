@@ -36,7 +36,7 @@
 
 #include "eEsharedServices.h"
 
-#include "emBODYrobot.h"
+
 
 #include "eEmemorymap.h"
 

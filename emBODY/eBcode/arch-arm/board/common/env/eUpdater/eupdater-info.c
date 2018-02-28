@@ -28,7 +28,6 @@
 
 #include "eEcommon.h"
 #include "eEmemorymap.h"
-#include "emBODYrobot.h"
 
 #include "hal.h"
 #include "osal.h"
@@ -76,11 +75,11 @@ extern const ipal_cfg_t    ipal_cfg;
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
-#if (emBODYrobot_BOARD_NAME == boardEMS001)
+#if defined(BOARD_ems001)
 
 #error -> add a const eEmoduleInfo_t eupdater_modinfo __attribute__((at(EENV_MEMMAP_EUPDATER_ROMADDR+EENV_MODULEINFO_OFFSET)))""
 
-#elif (emBODYrobot_BOARD_NAME == boardEMS4RD) | (emBODYrobot_BOARD_NAME == boardMC4PLUS) | (emBODYrobot_BOARD_NAME == boardMC2PLUS)
+#elif defined(BOARD_ems4) | defined(BOARD_mc4plus) | defined(BOARD_mc2plus)
 
 
 const eEmoduleExtendedInfo_t eupdater_modinfo_extended __attribute__((at(EENV_MEMMAP_EUPDATER_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
@@ -142,7 +141,7 @@ const eEmoduleExtendedInfo_t eupdater_modinfo_extended __attribute__((at(EENV_ME
 
 
 #else
-    #error --> specify emBODYrobot_BOARD_NAME
+    #error --> specify BOARD_name
 #endif
 
 const eOmsystem_cfg_t eupdater_syscfg =
