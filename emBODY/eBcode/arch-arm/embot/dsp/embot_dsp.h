@@ -43,7 +43,7 @@ namespace embot { namespace dsp { namespace q15 {
     const Q15 posEPSILON = 0x0001;      // 2^(-15) = 0.000030517578125
     const Q15 posOneHalf = 0x4000;      // 2^(-1) = 0.5   
     const Q15 posOneFourth = 0x2000;    // 2^(-2) = 0.25
-    const Q15 posOneEigth = 0x4000;     // 2^(-3) = 0.125
+    const Q15 posOneEigth = 0x1000;     // 2^(-3) = 0.125
     const Q15 posOneNearly = 0x7FFF;    // sum_(i=-1,..,-15)(2^i) = 1-2^(-15) = 0.999969482421875
        
     Q15 convert(const double v, bool &saturated);
