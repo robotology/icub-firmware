@@ -340,7 +340,7 @@ struct embot::app::application::theSTRAIN::Impl
         { 
             if((set < numOfSets) && (channel < 6))
             {
-                transfQ15tare[set].set(channel, 1, value);
+                transfQ15tare[set].set(channel, 0, value);
                 synched = false;
             }
         }
@@ -350,7 +350,7 @@ struct embot::app::application::theSTRAIN::Impl
             embot::dsp::Q15 v = embot::dsp::q15::zero;
             if((set < numOfSets) && (channel < 6))
             {
-                v = transfQ15tare[set].get(channel, 1);
+                v = transfQ15tare[set].get(channel, 0);
             }            
             return v;
         }        
