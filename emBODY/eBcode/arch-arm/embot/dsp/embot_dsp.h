@@ -75,7 +75,7 @@ namespace embot { namespace dsp { namespace q15 {
         void set(std::uint8_t r, std::uint8_t c, Q15 v) { if((r<nrows) && (c<ncols) && (nullptr != data)) { data[c + r*ncols] = v; }  }
         void clear() {  if(nullptr != data) { std::memset(data, 0, sizeof(Q15)*ncols*nrows); }  } 
         void diagonal(Q15 v) { clear(); if(nullptr != data) { std::uint8_t min = (ncols<nrows) ? (ncols) : (nrows); for(int i=0; i<min; i++) data[i+i*ncols] = v; } }
-        void fill(Q15 v) { clear(); if(nullptr != data) { for(int r=0; r<nrows; r++) for(int c=0; c<nrows; c++) data[c+r*ncols] = v; } }
+        void fill(Q15 v) { clear(); if(nullptr != data) { for(int r=0; r<nrows; r++) for(int c=0; c<ncols; c++) data[c+r*ncols] = v; } }
     };
     
     bool multiply(const matrix &m1, const matrix &m2, matrix &res, bool &saturated);
