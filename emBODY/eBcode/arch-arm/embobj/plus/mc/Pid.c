@@ -16,6 +16,7 @@
  * Public License foFITNESSr more details
 */
 
+#include <math.h>
 #include "Pid.h"
 
 PID* PID_new(uint8_t n)
@@ -35,6 +36,40 @@ void PID_init(PID* o)
     memset(o, 0, sizeof(PID));
 }
 
+void PID_config(PID* o, eOmc_PID_t* config)
+{
+    float rescaler = 1.0f/(float)(1<<config->scale);
+    
+    o->Ko__final = config->offset;
+    o->Kp__final = rescaler*config->kp;
+    o->Kd__final = rescaler*config->kd;
+    o->Ki__final = rescaler*config->ki;
+    o->Kff_final = rescaler*config->kff;
+    
+    o->Ki__final *= 0.5f*CTRL_LOOP_PERIOD;
+    o->Kd__final *= CTRL_LOOP_FREQUENCY;
+    
+    o->slope_time_ms = config->slope_time_ms;
+    
+    if (o->slope_time_ms < 1) o->slope_time_ms = 1;
+    
+    float step = 1.0f/(float)o->slope_time_ms;
+    
+    o->Ko__delta = step*(o->Ko__final - o->Ko );
+    o->Kp__delta = step*(o->Kp__final - o->Kp );
+    o->Kd__delta = step*(o->Kd__final - o->Kd );
+    o->Ki__delta = step*(o->Ki__final - o->Ki );
+    o->Kff_delta = step*(o->Kff_final - o->Kff);
+    
+    o->Imax = config->limitonintegral;
+    
+    o->stiction_up   = rescaler*config->stiction_up_val;
+    o->stiction_down = rescaler*config->stiction_down_val;
+  
+    o->out_max = config->limitonoutput;
+}
+
+#if 0
 void PID_config(PID* o, eOmc_PID_t* config)
 {
     float rescaler = 1.0f/(float)(1<<config->scale);
@@ -79,6 +114,7 @@ void PID_config(PID* o, eOmc_PID_t* config)
     }
     
 }
+#endif
 
 void PID_config_friction(PID *o, float Kbemf, float Ktau)
 {
@@ -109,6 +145,40 @@ void PID_get_state(PID* o, float *out, float *err)
 
 float PID_do_out(PID* o, float En)
 {   
+    if (o->slope_time_ms)
+    {
+        if (o->slope_time_ms == 1)
+        {
+            o->Kp  = o->Kp__final;
+            o->Ki  = o->Ki__final;
+            o->Kd  = o->Kd__final;
+            o->Ko  = o->Ko__final;
+            o->Kff = o->Kff_final;
+        }
+        else
+        {
+            o->Kp  += o->Kp__delta;
+            o->Ki  += o->Ki__delta;
+            o->Kd  += o->Kd__delta;
+            o->Ko  += o->Ko__delta;
+            o->Kff += o->Kff_delta;
+        }
+        
+        --o->slope_time_ms;
+        
+        if (o->Kd != 0.0f && o->Kp != 0.0f)
+        {
+            static const float N=10.f;
+        
+            o->A = o->Kd / (o->Kd + o->Kp*N);
+            o->B = (1.0f - o->A)*o->Kd;
+        }
+        else
+        {
+            o->A = o->B = 0.0f;
+        }
+    }
+    
     // proportional
     float out = o->Kp*En;
     

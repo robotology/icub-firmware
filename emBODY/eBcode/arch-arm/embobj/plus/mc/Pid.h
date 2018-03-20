@@ -34,8 +34,20 @@ typedef struct //PID
     float Kp;
     float Kd;
     float Ki;
-    
     float Kff;
+
+    float Ko__delta;
+    float Kp__delta;
+    float Kd__delta;
+    float Ki__delta; 
+    float Kff_delta;
+    
+    float Ko__final;
+    float Kp__final;
+    float Kd__final;
+    float Ki__final;
+    float Kff_final;
+
     float Kbemf;
     float Ktau;
     
@@ -52,6 +64,8 @@ typedef struct //PID
     float out_max;
     float out_lpf;
     float out;
+    
+    uint16_t slope_time_ms;
     
     uint8_t filter;
 } PID; 
