@@ -56,6 +56,7 @@ typedef struct EOtheMC4boards_hid EOtheMC4boards;
 
 typedef float eOmc4boards_conv_encoder_factor_t;  /**< expressed in encoder_ticks/idegree  */
 typedef float eOmc4boards_conv_encoder_offset_t;  /**< expressed in idegree  */
+typedef float eOmc4boards_conv_torque_factor_t;  /**< expressed in torque_ticks/Nm  */
 
 
 typedef struct
