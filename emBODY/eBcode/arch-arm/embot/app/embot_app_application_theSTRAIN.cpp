@@ -1998,47 +1998,61 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::p
         return false;
     }
     
+    bool set2default = (1 == info.mode) ? true : false;
     
     if(true == allchannels)
     {
         for(std::uint8_t i=0; i<6; i++)
         {
-            embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
-            pImpl->configdata.amplifiers_get(info.set, i, cfg1);
-        
-            embot::hw::PGA308::TransferFunctionConfig tfc;
-            tfc.load(cfg1);  
-            if(false == tfc.setalpha(static_cast<float>(info.gain)/100.f))
+            if(false == set2default)
             {
-                return false;
-            }
-            if(false == tfc.setbeta(static_cast<float>(info.offset)/8.f))
-            {
-                return false;
-            }
+                embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
+                pImpl->configdata.amplifiers_get(info.set, i, cfg1);
             
-            alpha = tfc.alpha();
-            beta = tfc.beta();
-            
-            embot::hw::PGA308::set(static_cast<embot::hw::PGA308::Amplifier>(i), tfc);   
+                embot::hw::PGA308::TransferFunctionConfig tfc;
+                tfc.load(cfg1);  
+                if(false == tfc.setalpha(static_cast<float>(info.gain)/100.f))  // info.gain has 0.01 ticks
+                {
+                    return false;
+                }
+                if(false == tfc.setbeta(static_cast<float>(info.offset)/8.f))   // info.offset is in range [0, 64k) and here we need range [0, 8k)
+                {
+                    return false;
+                }
+                
+                alpha = tfc.alpha();
+                beta = tfc.beta();
+                
+                embot::hw::PGA308::set(static_cast<embot::hw::PGA308::Amplifier>(i), tfc);   
 
-            tfc.get(cfg1);
-            pImpl->configdata.amplifiers_set(info.set, i, cfg1);                  
+                tfc.get(cfg1);
+                pImpl->configdata.amplifiers_set(info.set, i, cfg1);    
+            } 
+            else
+            {
+                embot::hw::PGA308::TransferFunctionConfig tfc;
+                tfc.setDefault();
+                embot::hw::PGA308::set(static_cast<embot::hw::PGA308::Amplifier>(i), tfc);
+                embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
+                tfc.get(cfg1);
+                pImpl->configdata.amplifiers_set(info.set, i, cfg1);
+            }    
         }        
     }
     else
-    {    
-        
+    {
+        if(false == set2default)
+        {        
             embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
             pImpl->configdata.amplifiers_get(info.set, info.channel, cfg1);
         
             embot::hw::PGA308::TransferFunctionConfig tfc;
             tfc.load(cfg1);  
-            if(false == tfc.setalpha(static_cast<float>(info.gain)/100.f))
+            if(false == tfc.setalpha(static_cast<float>(info.gain)/100.f))  // info.gain has 0.01 ticks
             {
                 return false;
             }
-            if(false == tfc.setbeta(static_cast<float>(info.offset)/8.f))
+            if(false == tfc.setbeta(static_cast<float>(info.offset)/8.f))   // info.offset is in range [0, 64k) and here we need range [0, 8k)
             {
                 return false;
             }
@@ -2049,7 +2063,17 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::p
             embot::hw::PGA308::set(static_cast<embot::hw::PGA308::Amplifier>(info.channel), tfc);   
 
             tfc.get(cfg1);
-            pImpl->configdata.amplifiers_set(info.set, info.channel, cfg1);                                       
+            pImpl->configdata.amplifiers_set(info.set, info.channel, cfg1);   
+        }
+        else
+        {
+                embot::hw::PGA308::TransferFunctionConfig tfc;
+                tfc.setDefault();
+                embot::hw::PGA308::set(static_cast<embot::hw::PGA308::Amplifier>(info.channel), tfc);
+                embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
+                tfc.get(cfg1);
+                pImpl->configdata.amplifiers_set(info.set, info.channel, cfg1);
+        }    
         
     }
   

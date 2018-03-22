@@ -885,10 +885,10 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         {
             std::uint8_t        set         : 4;
             std::uint8_t        channel     : 4;    // if 0xf we mean every channel            
-            std::uint8_t        mode;               // if 0: beta is the target offset. if 1 beta is the target output and an autocalib is performed
-            std::uint16_t       gain;               // it is the gain, only positive, where each step is a gaintick of 0.01. a value of 0xffff means default gain.
-            std::uint16_t       offset;             // if offset/target output it is in range [0, 64k). a value of 0xffff means default offset or half scale output
-            Info() : set(0), channel(0), mode(0), gain(0xffff), offset(0xffff) {}
+            std::uint8_t        mode;               // if 0: set values with .gain and .offset. if 1: use hw default values
+            std::uint16_t       gain;               // it is the gain, only positive, where each step is a gaintick of 0.01.
+            std::uint16_t       offset;             // it is teh offset and is in range [0, 64k). 
+            Info() : set(0), channel(0), mode(0), gain(1600), offset(32768) {}
         };
         
         Info info;
