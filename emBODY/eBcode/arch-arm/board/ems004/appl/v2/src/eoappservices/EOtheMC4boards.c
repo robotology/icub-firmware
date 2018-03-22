@@ -23,6 +23,7 @@
 
 #include "stdlib.h"
 #include "string.h"
+#include "stdio.h"
 
 #include "EoCommon.h"
 #include "EOtheErrorManager.h"
@@ -76,11 +77,19 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 static eObool_t s_eo_mc4boards_foundone(void);
+static void send_diagnostic_debugmessage(eOerrmanErrorType_t type, eOerror_value_DEB_t value, uint8_t jointnum, uint16_t par16, uint64_t par64, const char* info);
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
+//Definition of constant values about torque conversion.
+static const float MAX_TORQUE_LOWER_ARM_JOINTS = 2.0; //[Nm] . Max value of torque on lower arm joints.
+static const float RESOLUTION_OF_TORQUE_VALUES =  32768.0;//the toruqe values in mc4CAN board are expressed on 16 bits with sign
+static const float TORQUE_FACT_EMS2Nm = 1000000.0; //the ems use micro Nm
+
+
+
 
 static const eOmc4boards_config2_t s_eo_mc4boards_defaultconfig2 =
 {   
@@ -156,6 +165,19 @@ extern EOtheMC4boards* eo_mc4boards_Initialise(const eOmc4boards_config2_t *cfg2
             s_eo_themc4boards.convencoder[i].factor = 1;
             s_eo_themc4boards.convencoder[i].offset = 0;
         }
+        
+        for(i=0; i<s_eo_themc4boards.numofjomos; i++)
+        {
+            //The torque used in ems are expressed in microNm = 1Nm*10^-6
+            //The can boards use RESOLUTION_OF_TORQUE_VALUES like max value of torque. 
+            //Since on lower arm joints the max possible torque is 2Nm and we want the max precision possible
+            //we use this conversion factor from Nm to torque_tick  RESOLUTION_OF_TORQUE_VALUES/MAX_TORQUE_LOWER_ARM_JOINTS
+            //Therefore the conversion factor from microNm to torque_ticks is:
+            s_eo_themc4boards.convtorque[i].factor = (RESOLUTION_OF_TORQUE_VALUES/MAX_TORQUE_LOWER_ARM_JOINTS)/TORQUE_FACT_EMS2Nm;
+        }
+        //char info[150];
+        //snprintf(info, sizeof(info), "Set torque convFactor=%.7f", s_eo_themc4boards.convtorque[0].factor);
+        //send_diagnostic_debugmessage(eo_errortype_debug, eoerror_value_DEB_tag01, 0, 0, 0, info);
     }
 
     s_eo_themc4boards.initted = eobool_true;
@@ -591,11 +613,6 @@ extern icubCanProto_acceleration_t eo_mc4boards_Convert_Acceleration_toCAN(EOthe
     return((icubCanProto_acceleration_t)temp);       
 }
 
-
-// revised by accame&randazzo on 8 oct 2015: stiffness and damping are to be analysed in details. 
-// on can robots the stiffness sent to CAN is NOT divided by 1000 and the damping IS divided by 1000. in here there is the contrary.
-// however, embObjMotionControl does not send the values as they are. it applies a 1000 factor in some cases.
-// maybe everything is ok, but someone should see it in more details.
 extern icubCanProto_stiffness_t eo_mc4boards_Convert_impedanceStiffness_I2S(EOtheMC4boards *p, uint8_t joint, eOmeas_stiffness_t stiff)
 {
     
@@ -604,11 +621,10 @@ extern icubCanProto_stiffness_t eo_mc4boards_Convert_impedanceStiffness_I2S(EOth
         return(0);
     }
     float factor = s_eo_themc4boards.convencoder[joint].factor;
-
-    //arriva espresso in microN/icubdegree e devo trasformarlo in  n Nm*10^4/tacche (dove Nm*10^4 sono decimi di milli newtons)
+    float trq_factor = s_eo_themc4boards.convtorque[joint].factor;
     
     icubCanProto_stiffness_t ret;
-    float v = (stiff*100.0f) / factor;
+    float v = (stiff*trq_factor) / factor;
     if ( v >0 ) ret = (icubCanProto_stiffness_t)(v);
     else ret = -((icubCanProto_stiffness_t)(-v));
         
@@ -621,8 +637,11 @@ extern eOmeas_stiffness_t eo_mc4boards_Convert_impedanceStiffness_S2I(EOtheMC4bo
     {   
         return(0);
     }
-   
-    float ret  = (stiff*s_eo_themc4boards.convencoder[joint].factor)/100.0f;  
+    float factor = s_eo_themc4boards.convencoder[joint].factor;
+    float trq_factor = s_eo_themc4boards.convtorque[joint].factor;
+    float f_stiff = stiff;
+    
+    float ret  = (f_stiff*factor)/trq_factor;  
 
     if(ret<0)
         ret = -ret;
@@ -639,10 +658,12 @@ extern icubCanProto_damping_t eo_mc4boards_Convert_impedanceDamping_I2S(EOtheMC4
         return(0);
     }
     
-    //arriva espresso in microN/ideg/sec e devo trasformarlo in Nm*10^4/tacche/millisec (dove Nm*10^4 sono decimi di milli newtons)
-    //quindi damping_can = damping *100 /1000/factor;
+    float factor = s_eo_themc4boards.convencoder[joint].factor;
+    float trq_factor = s_eo_themc4boards.convtorque[joint].factor;
+    
+    //Note: the damping is expressed in microNm/ideg/sec, while mc4 boards need torque_ticks/enc_tics/millisec
     icubCanProto_damping_t ret;
-    float v = damping / 10 / s_eo_themc4boards.convencoder[joint].factor;
+    float v = damping*trq_factor/factor*1000;
     if ( v >0 ) ret = (icubCanProto_damping_t)(v);
     else ret = -((icubCanProto_damping_t)(-v));
         
@@ -655,8 +676,12 @@ extern eOmeas_damping_t       eo_mc4boards_Convert_impedanceDamping_S2I(EOtheMC4
     {   
         return(0);
     }
-   
-    float ret  = damping*s_eo_themc4boards.convencoder[joint].factor*10;  
+    float factor = s_eo_themc4boards.convencoder[joint].factor;
+    float trq_factor = s_eo_themc4boards.convtorque[joint].factor;
+    float f_damping = damping;
+    
+    //Note: the mc4can boards use damping in torque_ticks/enc_tics/millisec, while ems use microNm/ideg/sec 
+    float ret  = f_damping*factor/trq_factor/1000;  
 
     if(ret<0)
         ret = -ret;
@@ -668,28 +693,48 @@ extern eOmeas_damping_t       eo_mc4boards_Convert_impedanceDamping_S2I(EOtheMC4
 }
 
 extern icubCanProto_torque_t eo_mc4boards_Convert_torque_I2S(EOtheMC4boards *p, uint8_t joint, eOmeas_torque_t torque)
-{
-//    if(joint >= s_eo_themc4boards.numofjomos)
-//    {   
-//        return(0);
+{ 
+    float trq_factor = s_eo_themc4boards.convtorque[joint].factor;
+    float result = torque*trq_factor;
+    int8_t saturation = 0;
+    if(result>EO_INT16_MAX)
+        saturation = 1;
+    else if(result < -EO_INT16_MAX)
+        saturation = -1;
+    else
+        saturation = 0;
+    
+    icubCanProto_torque_t ret = EO_CLIP_INT16(result);
+//    if(joint == 0)
+//    {
+//        char info[200];
+//        snprintf(info, sizeof(info), "TRQ S=%d v=%d t=%.3f r=%.3f", saturation, ret, torque, result);
+//        //snprintf(info, sizeof(info), "trq=%.3f res=%.3f", torque, result);
+//        send_diagnostic_debugmessage(eo_errortype_debug, eoerror_value_DEB_tag01, joint, saturation, 0, info);
 //    }
-    //*torque contains value in micro Nm.
-    //MC4 boards use torque values in Nm/10000 (decimi di milliNm)
-    icubCanProto_torque_t ret = EO_CLIP_INT16(torque/100);
+    
     return(ret);   
 }
 
-// revised: it is ok
 extern eOmeas_torque_t eo_mc4boards_Convert_torque_S2I(EOtheMC4boards *p, uint8_t joint, icubCanProto_torque_t torque)
 {
-//    if(joint >= s_eo_themc4boards.numofjomos)
-//    {   
-//        return(0);
-//    }
-    return((eOmeas_torque_t)torque*100);
+        float trq_factor = s_eo_themc4boards.convtorque[joint].factor;
+
+    return((eOmeas_torque_t)torque/trq_factor);
 }
 
 
+static void send_diagnostic_debugmessage(eOerrmanErrorType_t type, eOerror_value_DEB_t value, uint8_t jointnum, uint16_t par16, uint64_t par64, const char* info)
+{
+    eOerrmanDescriptor_t errdes = {0};
+
+    errdes.code             = eoerror_code_get(eoerror_category_Debug, value);
+    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+    errdes.sourceaddress    = jointnum;
+    errdes.par16            = par16;
+    errdes.par64            = par64;
+    eo_errman_Error(eo_errman_GetHandle(), type, info, NULL, &errdes);
+}
 
 
 // --------------------------------------------------------------------------------------------------------------------

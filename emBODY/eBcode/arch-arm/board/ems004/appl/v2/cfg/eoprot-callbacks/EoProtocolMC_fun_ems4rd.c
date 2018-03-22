@@ -105,6 +105,7 @@ typedef enum
 // -- common functions
 
 static eOmotioncontroller_mode_t s_motorcontrol_getmode(void);
+static void send_diagnostic_debugmessage(eOerrmanErrorType_t type, eOerror_value_DEB_t value, uint8_t jointnum, uint16_t par16, uint64_t par64, const char* info);
 
 
 // -- foc-based functions
@@ -340,6 +341,10 @@ extern void eoprot_fun_UPDT_mc_joint_config_impedance(const EOnv* nv, const eOro
             impedence_icubCanProtValues.stiffness = eo_mc4boards_Convert_impedanceStiffness_I2S(mc4boards, jxx, impedance->stiffness);
             impedence_icubCanProtValues.damping = eo_mc4boards_Convert_impedanceDamping_I2S(mc4boards, jxx, impedance->damping);
             impedence_icubCanProtValues.offset = eo_mc4boards_Convert_torque_I2S(mc4boards, jxx, impedance->offset);
+
+            //char info[200];
+            //snprintf(info, sizeof(info), "s=%.4f ss=%d, d=%.4f ds=%d, o=%.4f, os=%d",  impedance->stiffness, impedence_icubCanProtValues.stiffness, impedance->damping, impedence_icubCanProtValues.damping, impedance->offset, impedence_icubCanProtValues.offset);
+            //send_diagnostic_debugmessage(eo_errortype_debug, eoerror_value_DEB_tag01, (uint8_t)jxx, impedence_icubCanProtValues.offset, impedence_icubCanProtValues.damping, info);
 
             
             command.type  = ICUBCANPROTO_POL_MC_CMD__SET_IMPEDANCE_PARAMS;
@@ -1217,11 +1222,18 @@ extern void eoprot_fun_UPDT_mc_joint_inputs_externallymeasuredtorque(const EOnv*
     } // marker
     else if(eo_motcon_mode_mc4 == mcmode)
     {
-        //*torque contains value in micro Nm.
-        //MC4 boards use torque values in Nm/10000
-        eOmeas_torque_t trq = EO_CLIP_INT16((*torque) / 100);        
-        icubCanProto_torque_t icub_torque = trq + 0x8000;
-        eo_virtualstrain_SetTorque(eo_virtualstrain_GetHandle(), jxx, icub_torque);        
+        eOmeas_torque_t trq = eo_mc4boards_Convert_torque_I2S(eo_mc4boards_GetHandle(), jxx, *torque);
+        
+        icubCanProto_torque_t icub_torque = trq + 0x8000; //to simulate value of strain
+        eo_virtualstrain_SetTorque(eo_virtualstrain_GetHandle(), jxx, icub_torque);  
+        
+        //update value to send back like feedback: it is equal to received input, but limited to 2Nm, because on lower arm joints the max torque possible is 2 Nm
+        //The feedback is read by ITorqueControl::getTorque(..) function 
+        eOmc_joint_status_t *jstatus = NULL;
+        if(NULL != (jstatus = eo_entities_GetJointStatus(eo_entities_GetHandle(), jxx)))
+        {
+            jstatus->core.measures.meas_torque = eo_mc4boards_Convert_torque_S2I(eo_mc4boards_GetHandle(), jxx, trq);
+        }
     }
 }
 

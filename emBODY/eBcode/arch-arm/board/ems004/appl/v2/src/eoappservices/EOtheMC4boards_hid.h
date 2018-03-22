@@ -52,6 +52,11 @@ typedef struct
 
 typedef struct
 {
+    eOmc4boards_conv_torque_factor_t   factor;
+} eOmc4boards_conv_torque_t;
+
+typedef struct
+{
     icubCanProto_velocityShift_t    velshift;
     icubCanProto_estimShift_t       estimshifts;
     uint32_t                        broadcastpolicy;
@@ -65,6 +70,7 @@ struct EOtheMC4boards_hid
     eObool_t                    configured;
     eOcanprot_command_t         command;    
     eOmc4boards_conv_encoder_t  convencoder[12];
+    eOmc4boards_conv_torque_t   convtorque[12];
     eOmc4boards_config2_t       config2;
     eOmc4boards_cansettings_t   cansettings;
 }; 
