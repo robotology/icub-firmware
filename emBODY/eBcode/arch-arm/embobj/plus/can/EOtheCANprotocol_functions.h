@@ -79,6 +79,11 @@ extern eOresult_t eocanprotASpolling_former_POL_AS_CMD__GET_FULL_SCALES(eOcanpro
 extern eOresult_t eocanprotASpolling_parser_POL_AS_CMD__GET_FIRMWARE_VERSION(eOcanframe_t *frame, eOcanport_t port);
 extern eOresult_t eocanprotASpolling_former_POL_AS_CMD__GET_FIRMWARE_VERSION(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame);
 
+extern eOresult_t eocanprotASpolling_former_POL_AS_CMD__IMU_CONFIG_GET(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame);
+extern eOresult_t eocanprotASpolling_parser_POL_AS_CMD__IMU_CONFIG_GET(eOcanframe_t *frame, eOcanport_t port);
+
+extern eOresult_t eocanprotASpolling_former_POL_AS_CMD__IMU_CONFIG_SET(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame);
+
 extern eOresult_t eocanprotASpolling_former_POL_SK_CMD__TACT_SETUP(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame);
 
 extern eOresult_t eocanprotASpolling_former_POL_SK_CMD__SET_BRD_CFG(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame);
@@ -124,7 +129,6 @@ extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__HES0TO6(eOcanframe_t *f
 
 extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__HES7TO14(eOcanframe_t *frame, eOcanport_t port);
 
-
 // - inertial sensors: periodic
 
 // weakly defined
@@ -134,6 +138,11 @@ extern eOresult_t eocanprotINperiodic_parser_PER_IS_MSG__DIGITAL_GYROSCOPE(eOcan
 
 extern eOresult_t eocanprotINperiodic_parser_PER_IS_MSG__DIGITAL_ACCELEROMETER(eOcanframe_t *frame, eOcanport_t port);
 
+extern eOresult_t eocanprotINperiodic_parser_PER_IS_MSG__IMU_TRIPLE(eOcanframe_t *frame, eOcanport_t port);
+
+extern eOresult_t eocanprotINperiodic_parser_PER_IS_MSG__IMU_QUATERNION(eOcanframe_t *frame, eOcanport_t port);
+
+extern eOresult_t eocanprotINperiodic_parser_PER_IS_MSG__IMU_STATUS(eOcanframe_t *frame, eOcanport_t port);
 
 
 // - motion control: polling

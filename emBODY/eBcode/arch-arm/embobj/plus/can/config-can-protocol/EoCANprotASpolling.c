@@ -230,6 +230,21 @@ extern eOresult_t eocanprotASpolling_parser_POL_AS_CMD__GET_FIRMWARE_VERSION(eOc
     return eores_OK;
 }
 
+extern eOresult_t eocanprotASpolling_former_POL_AS_CMD__IMU_CONFIG_GET(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
+{
+    return(eores_OK);
+}
+extern eOresult_t eocanprotASpolling_parser_POL_AS_CMD__IMU_CONFIG_GET(eOcanframe_t *frame, eOcanport_t port)
+{
+    return(eores_OK);
+}
+
+extern eOresult_t eocanprotASpolling_former_POL_AS_CMD__IMU_CONFIG_SET(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
+{
+    return(eores_OK);
+}
+
+
 
 extern eOresult_t eocanprotASpolling_former_POL_SK_CMD__TACT_SETUP(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {

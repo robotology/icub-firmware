@@ -879,11 +879,11 @@ const eOcanprot_functions_t s_eo_canprot_functions_pollingAnalogSensor[] =
         EO_INIT(.parser) NULL
     },  
     {   // 051      
-        EO_INIT(.former) NULL,
-        EO_INIT(.parser) NULL
+        EO_INIT(.former) eocanprotASpolling_former_POL_AS_CMD__IMU_CONFIG_GET,
+        EO_INIT(.parser) eocanprotASpolling_parser_POL_AS_CMD__IMU_CONFIG_GET
     }, 
     {   // 052      
-        EO_INIT(.former) NULL,
+        EO_INIT(.former) eocanprotASpolling_former_POL_AS_CMD__IMU_CONFIG_SET,
         EO_INIT(.parser) NULL
     },  
     {   // 053
@@ -1148,17 +1148,17 @@ const eOcanprot_functions_t s_eo_canprot_functions_periodicInertialSensor[] =
         EO_INIT(.former) NULL,
         EO_INIT(.parser) NULL, //eocanprotINperiodic_parser_PER_IS_MSG__ANALOG_ACCELEROMETER
     },
-    {   // 003
+    {   // 003      ICUBCANPROTO_PER_IS_MSG__IMU_TRIPLE
         EO_INIT(.former) NULL,
-        EO_INIT(.parser) NULL
+        EO_INIT(.parser) eocanprotINperiodic_parser_PER_IS_MSG__IMU_TRIPLE
     },
-    {   // 004
+    {   // 004      ICUBCANPROTO_PER_IS_MSG__IMU_QUATERNION
         EO_INIT(.former) NULL,
-        EO_INIT(.parser) NULL
+        EO_INIT(.parser) eocanprotINperiodic_parser_PER_IS_MSG__IMU_QUATERNION
     },
-    {   // 005
+    {   // 005      ICUBCANPROTO_PER_IS_MSG__IMU_STATUS
         EO_INIT(.former) NULL,
-        EO_INIT(.parser) NULL
+        EO_INIT(.parser) eocanprotINperiodic_parser_PER_IS_MSG__IMU_STATUS
     },
     {   // 006
         EO_INIT(.former) NULL,
