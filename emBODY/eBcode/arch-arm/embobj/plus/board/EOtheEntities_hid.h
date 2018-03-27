@@ -41,9 +41,9 @@ enum
     eoprotwrap_max_joints       = 12, 
     eoprotwrap_max_motors       = 12, 
     eoprotwrap_max_skins        = 2,
-    eoprotwrap_max_strains      = 2,
+    eoprotwrap_max_strains      = 1,
     eoprotwrap_max_maises       = 1,
-    eoprotwrap_max_inertials    = 2
+    eoprotwrap_max_inertials    = 1
 };
 
 struct EOtheEntities_hid
