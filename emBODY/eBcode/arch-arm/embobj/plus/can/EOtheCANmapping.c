@@ -140,7 +140,7 @@ static eOcanmap_board_extended_t ** s_eo_canmap_canmapcfg_boards[2] =
 static eOcanmap_board_extended_t * s_eo_canmap_boards_mc_jomo[eocanmap_joints_maxnumberof] = {NULL};
 static eOcanmap_board_extended_t * s_eo_canmap_boards_as_strain[eocanmap_strains_maxnumberof] = {NULL};
 static eOcanmap_board_extended_t * s_eo_canmap_boards_as_mais[eocanmap_maises_maxnumberof] = {NULL};
-static eOcanmap_board_extended_t * s_eo_canmap_boards_as_extorque[1] = {NULL};
+static eOcanmap_board_extended_t * s_eo_canmap_boards_as_temperature[1] = {NULL};
 static eOcanmap_board_extended_t * s_eo_canmap_boards_as_inertial[eocanmap_inertials_maxnumberof] = {NULL};
 //static eOcanmap_board_extended_t * s_eo_canmap_boards_sk_skin[eocanmap_skins_maxnumberof] = {NULL};
 static eOcanmap_board_extended_t * s_eo_canmap_boards_sk_skin_00[eocanmap_skin_index_boards_maxnumberof] = {NULL};
@@ -156,7 +156,7 @@ static eOcanmap_board_extended_t ** s_eo_canmap_boards_as[] =
 {   
     s_eo_canmap_boards_as_strain,       // strain
     s_eo_canmap_boards_as_mais,         // mais
-    s_eo_canmap_boards_as_extorque,     // extorque are not managed ...
+    s_eo_canmap_boards_as_temperature,  // temperature
     s_eo_canmap_boards_as_inertial      // inertial
 };
 

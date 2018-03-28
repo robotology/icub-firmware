@@ -36,6 +36,7 @@
 #include "EOtheMAIS.h"
 #include "EOtheSKIN.h"
 #include "EOtheInertials2.h"
+#include "EOtheInertials3.h"
 
 #include "EOtheETHmonitor.h"
 
@@ -121,6 +122,7 @@ static eOresult_t s_services_callback_afterverify_skin(EOaService* p, eObool_t o
 static eOresult_t s_services_callback_afterverify_mais(EOaService* p, eObool_t operationisok);
 static eOresult_t s_services_callback_afterverify_strain(EOaService* p, eObool_t operationisok);
 static eOresult_t s_services_callback_afterverify_inertial(EOaService* p, eObool_t operationisok);
+static eOresult_t s_services_callback_afterverify_inertials3(EOaService* p, eObool_t operationisok);
 static eOresult_t s_services_callback_afterverify_motioncontrol(EOaService* p, eObool_t operationisok);
 static eOresult_t s_eo_services_alert_afterverify_service(eObool_t operationisok, eOmn_serv_category_t category, eOmn_serv_type_t type, eOservice_type_t servtype);
 
@@ -150,29 +152,40 @@ static EOtheServices s_eo_theservices =
 static const char s_eobj_ownname[] = "EOtheServices";
 
 
-static const eOprot_EPcfg_t s_eo_theservices_theEPcfgsOthersMAX[] =
-{  
-    {           
-        EO_INIT(.endpoint)          eoprot_endpoint_motioncontrol,
-        EO_INIT(.numberofentities)  {12, 12, 1, 0, 0, 0, 0}     
-    },     
-    {        
-        EO_INIT(.endpoint)          eoprot_endpoint_analogsensors,
-        EO_INIT(.numberofentities)  {1, 1, 1, 1, 0, 0, 0}        
-    },
-    {        
-        EO_INIT(.endpoint)          eoprot_endpoint_skin,
-        EO_INIT(.numberofentities)  {2, 0, 0, 0, 0, 0, 0}        
-    }     
-};
+
+//static const eOprot_EPcfg_t s_eo_theservices_theEPcfgsOthersMAX[] =
+//{  
+//    {           
+//        EO_INIT(.endpoint)          eoprot_endpoint_motioncontrol,
+//        EO_INIT(.numberofentities)  {12, 12, 1, 0, 0, 0, 0}     
+//    },     
+//    {        
+//        EO_INIT(.endpoint)          eoprot_endpoint_analogsensors,
+//        EO_INIT(.numberofentities)  {1, 1, 1, 1, 1, 0, 0}        
+//    },
+//    {        
+//        EO_INIT(.endpoint)          eoprot_endpoint_skin,
+//        EO_INIT(.numberofentities)  {2, 0, 0, 0, 0, 0, 0}        
+//    }     
+//};
+// 
+//static const EOconstvector s_eo_theservices_vectorof_EPcfg_max = 
+//{
+//    EO_INIT(.capacity )     sizeof(s_eo_theservices_theEPcfgsOthersMAX)/sizeof(eOprot_EPcfg_t),
+//    EO_INIT(.size)          sizeof(s_eo_theservices_theEPcfgsOthersMAX)/sizeof(eOprot_EPcfg_t),
+//    EO_INIT(.item_size)     sizeof(eOprot_EPcfg_t),
+//    EO_INIT(.dummy)         0,
+//    EO_INIT(.stored_items)  (void*)s_eo_theservices_theEPcfgsOthersMAX,
+//    EO_INIT(.functions)     NULL   
+//};
 
 static const EOconstvector s_eo_theservices_vectorof_EPcfg_max = 
 {
-    EO_INIT(.capacity )     sizeof(s_eo_theservices_theEPcfgsOthersMAX)/sizeof(eOprot_EPcfg_t),
-    EO_INIT(.size)          sizeof(s_eo_theservices_theEPcfgsOthersMAX)/sizeof(eOprot_EPcfg_t),
+    EO_INIT(.capacity )     sizeof(eoprot_arrayof_maxEPcfgOthers)/sizeof(eOprot_EPcfg_t),
+    EO_INIT(.size)          sizeof(eoprot_arrayof_maxEPcfgOthers)/sizeof(eOprot_EPcfg_t),
     EO_INIT(.item_size)     sizeof(eOprot_EPcfg_t),
     EO_INIT(.dummy)         0,
-    EO_INIT(.stored_items)  (void*)s_eo_theservices_theEPcfgsOthersMAX,
+    EO_INIT(.stored_items)  (void*)eoprot_arrayof_maxEPcfgOthers,
     EO_INIT(.functions)     NULL   
 };
 
@@ -268,6 +281,11 @@ extern eOmn_serv_state_t eo_service_GetState(EOtheServices *p, eOmn_serv_categor
         case eomn_serv_category_inertials:
         {
             state = eo_inertials2_GetServiceState(eo_inertials2_GetHandle());   
+        } break;
+        
+        case eomn_serv_category_inertials3:
+        {
+            state = eo_inertials3_GetServiceState(eo_inertials3_GetHandle());   
         } break;
         
         case eomn_serv_category_skin:
@@ -605,7 +623,8 @@ static void s_eo_services_initialise(EOtheServices *p)
         eo_mais_Initialise();        
         eo_motioncontrol_Initialise();    
         eo_skin_Initialise(); 
-        eo_inertials2_Initialise();               
+        eo_inertials2_Initialise(); 
+        eo_inertials3_Initialise();        
     }
     
     {   // C.  can services and discovery.
@@ -687,6 +706,19 @@ static eOresult_t s_services_callback_afterverify_inertial(EOaService* p, eObool
     }
     
     s_eo_services_alert_afterverify_service(operationisok, eomn_serv_category_inertials, eomn_serv_AS_inertials, eo_service_inertials);
+       
+    return(eores_OK);
+}
+
+static eOresult_t s_services_callback_afterverify_inertials3(EOaService* p, eObool_t operationisok)
+{
+    if(eobool_false == operationisok)
+    {
+        eo_inertials3_SendReport(eo_inertials3_GetHandle());
+        eo_inertials3_Deactivate(eo_inertials3_GetHandle());
+    }
+    
+    s_eo_services_alert_afterverify_service(operationisok, eomn_serv_category_inertials3, eomn_serv_AS_inertials3, eo_service_inertials3);
        
     return(eores_OK);
 }
@@ -790,6 +822,20 @@ static eOresult_t s_eo_services_process_verifyactivate(EOtheServices *p, eOmn_se
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errorDescriptor);                    
             }
             eo_inertials2_Verify(eo_inertials2_GetHandle(), config, s_services_callback_afterverify_inertial, eobool_true);            
+        } break; 
+        
+        
+        case eomn_serv_category_inertials3:
+        {
+            if(eobool_true == uselocalconfig)
+            {
+                //config = eoboardconfig_code2inertials3_serv_configuration(s_eo_theservices.board);
+                config = NULL;
+                
+                errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_inertials3_using_onboard_config);
+                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errorDescriptor);                    
+            }
+            eo_inertials3_Verify(eo_inertials3_GetHandle(), config, s_services_callback_afterverify_inertials3, eobool_true);            
         } break; 
         
         case eomn_serv_category_strain: 
@@ -1030,6 +1076,11 @@ static eOresult_t s_eo_services_process_regsig(EOtheServices *p, eOmn_serv_categ
             res = eo_inertials2_SetRegulars(eo_inertials2_GetHandle(), arrayofid32, &number);
         } break;
         
+        case eomn_serv_category_inertials3:
+        {
+            res = eo_inertials3_SetRegulars(eo_inertials3_GetHandle(), arrayofid32, &number);
+        } break;
+        
         default:
         {
             res = eores_NOK_generic;
@@ -1105,6 +1156,11 @@ static eOresult_t s_eo_services_start(EOtheServices *p, eOmn_serv_category_t cat
         {
             res = eo_inertials2_Start(eo_inertials2_GetHandle());
         } break;
+        
+        case eomn_serv_category_inertials3:
+        {
+            res = eo_inertials3_Start(eo_inertials3_GetHandle());
+        } break;        
         
         default:
         {
@@ -1188,6 +1244,17 @@ static eOresult_t s_eo_services_stop(EOtheServices *p, eOmn_serv_category_t cate
             }
         } break;
         
+        case eomn_serv_category_inertials3:
+        {
+            res = eo_inertials3_Stop(eo_inertials3_GetHandle());
+            eo_inertials3_SetRegulars(eo_inertials3_GetHandle(), NULL, numofregulars);
+            p->running[eomn_serv_category_inertials3] = eobool_false;
+            if(eobool_true == and_deactivate)
+            {
+                eo_inertials3_Deactivate(eo_inertials3_GetHandle());
+            }
+        } break;
+
         case eomn_serv_category_all:
         {
             eo_motioncontrol_Stop(eo_motioncontrol_GetHandle()); 
@@ -1229,6 +1296,14 @@ static eOresult_t s_eo_services_stop(EOtheServices *p, eOmn_serv_category_t cate
             {            
                 eo_inertials2_Deactivate(eo_inertials2_GetHandle());  
             }                
+
+            eo_inertials3_Stop(eo_inertials3_GetHandle());
+            eo_inertials3_SetRegulars(eo_inertials3_GetHandle(), NULL, NULL);  
+            p->running[eomn_serv_category_inertials3] = eobool_false;
+            if(eobool_true == and_deactivate)
+            {            
+                eo_inertials3_Deactivate(eo_inertials3_GetHandle());  
+            } 
             
             // if i dont use the service command to load the rop, then it is safe to remove all rops anyway.
             eo_transceiver_RegularROPs_Clear(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
