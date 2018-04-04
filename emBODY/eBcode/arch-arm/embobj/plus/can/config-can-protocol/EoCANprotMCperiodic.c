@@ -541,7 +541,7 @@ static void* s_eocanprotMCperiodic_get_entity(eOprot_entity_t entity, eOcanframe
     loc.addr = EOCANPROT_FRAME_GET_SOURCE(frame);    
     loc.insideindex = insideindex;
     
-    ii = eo_canmap_GetEntityIndexExtraCheck(eo_canmap_GetHandle(), loc, eoprot_endpoint_motioncontrol, entity);
+    ii = eo_canmap_GetEntityIndex(eo_canmap_GetHandle(), loc, eoprot_endpoint_motioncontrol, entity);
     
     if(EOK_uint08dummy == ii)
     {     
@@ -711,7 +711,7 @@ static void s_former_PER_MC_prepare_frame(eOcanprot_descriptor_t *descriptor, eO
 //    loc.addr = EOCANPROT_FRAME_GET_SOURCE(frame);    
 //    loc.insideindex = insideindex;
 //    
-//    index = eo_canmap_GetEntityIndexExtraCheck(eo_canmap_GetHandle(), loc, eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor);
+//    index = eo_canmap_GetEntityIndex(eo_canmap_GetHandle(), loc, eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor);
 //    
 //    if(EOK_uint08dummy == index)
 //    {     
@@ -739,7 +739,7 @@ static void s_former_PER_MC_prepare_frame(eOcanprot_descriptor_t *descriptor, eO
 //    loc.addr = EOCANPROT_FRAME_GET_SOURCE(frame);    
 //    loc.insideindex = insideindex;
 //    
-//    index = eo_canmap_GetEntityIndexExtraCheck(eo_canmap_GetHandle(), loc, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
+//    index = eo_canmap_GetEntityIndex(eo_canmap_GetHandle(), loc, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
 //    
 //    if(EOK_uint08dummy == index)
 //    {     
@@ -767,7 +767,7 @@ static void s_former_PER_MC_prepare_frame(eOcanprot_descriptor_t *descriptor, eO
 //    loc.addr = EOCANPROT_FRAME_GET_SOURCE(frame);
 //    loc.insideindex = eobrd_caninsideindex_first;  // the 2foc board sends this message for its only motor
 //    
-//    eOprotIndex_t motorindex = eo_canmap_GetEntityIndexExtraCheck(eo_canmap_GetHandle(), loc, eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor);
+//    eOprotIndex_t motorindex = eo_canmap_GetEntityIndex(eo_canmap_GetHandle(), loc, eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor);
 //    
 //    if(EOK_uint08dummy == motorindex)
 //    {

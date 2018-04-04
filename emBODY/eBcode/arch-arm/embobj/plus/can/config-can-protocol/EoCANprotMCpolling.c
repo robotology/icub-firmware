@@ -417,7 +417,7 @@ extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_PWM_LIMIT(eOcanframe
     loc.addr            = EOCANPROT_FRAME_GET_SOURCE(frame);
     loc.insideindex     = EOCANPROT_FRAME_POLLING_MC_GET_INTERNALINDEX(frame);
     
-    index = eo_canmap_GetEntityIndexExtraCheck(eo_canmap_GetHandle(), loc, eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor);
+    index = eo_canmap_GetEntityIndex(eo_canmap_GetHandle(), loc, eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor);
     if(EOK_uint08dummy == index)
     {
         //s_eo_icubCanProto_mb_send_runtime_error_diagnostics(6);
@@ -859,7 +859,7 @@ static void* s_eocanprotMCpolling_get_entity(eOprot_entity_t entity, eOcanframe_
     loc.addr = EOCANPROT_FRAME_GET_SOURCE(frame);    
     loc.insideindex = EOCANPROT_FRAME_POLLING_MC_GET_INTERNALINDEX(frame);
        
-    ii = eo_canmap_GetEntityIndexExtraCheck(eo_canmap_GetHandle(), loc, eoprot_endpoint_motioncontrol, entity);
+    ii = eo_canmap_GetEntityIndex(eo_canmap_GetHandle(), loc, eoprot_endpoint_motioncontrol, entity);
     
     if(EOK_uint08dummy == ii)
     {     
@@ -951,7 +951,7 @@ static eOresult_t s_parser_POL_MC_CMD_getposition(eOcanframe_t *frame, eOcanport
     loc.addr            = EOCANPROT_FRAME_GET_SOURCE(frame);
     loc.insideindex     = EOCANPROT_FRAME_POLLING_MC_GET_INTERNALINDEX(frame);
     
-    index = eo_canmap_GetEntityIndexExtraCheck(eo_canmap_GetHandle(), loc, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
+    index = eo_canmap_GetEntityIndex(eo_canmap_GetHandle(), loc, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
     if(EOK_uint08dummy == index)
     {
         //s_eo_icubCanProto_mb_send_runtime_error_diagnostics(6);
@@ -1026,7 +1026,7 @@ static eOresult_t s_parser_POL_MC_CMD_getpid_etc(eOcanframe_t *frame, eOcanport_
     loc.addr            = EOCANPROT_FRAME_GET_SOURCE(frame);
     loc.insideindex     = EOCANPROT_FRAME_POLLING_MC_GET_INTERNALINDEX(frame);
     
-    index = eo_canmap_GetEntityIndexExtraCheck(eo_canmap_GetHandle(), loc, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
+    index = eo_canmap_GetEntityIndex(eo_canmap_GetHandle(), loc, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
     if(EOK_uint08dummy == index)
     {
         //s_eo_icubCanProto_mb_send_runtime_error_diagnostics(6);
@@ -1120,7 +1120,7 @@ static eOresult_t s_parser_POL_MC_CMD_getimpedance(eOcanframe_t *frame, eOcanpor
     loc.addr            = EOCANPROT_FRAME_GET_SOURCE(frame);
     loc.insideindex     = EOCANPROT_FRAME_POLLING_MC_GET_INTERNALINDEX(frame);
     
-    index = eo_canmap_GetEntityIndexExtraCheck(eo_canmap_GetHandle(), loc, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
+    index = eo_canmap_GetEntityIndex(eo_canmap_GetHandle(), loc, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
     if(EOK_uint08dummy == index)
     {
         //s_eo_icubCanProto_mb_send_runtime_error_diagnostics(6);

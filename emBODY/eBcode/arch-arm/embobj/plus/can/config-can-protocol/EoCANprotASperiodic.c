@@ -265,7 +265,7 @@ static void* s_eocanprotASperiodic_get_entity(eOprotEndpoint_t endpoint, eOprot_
     loc.addr = EOCANPROT_FRAME_GET_SOURCE(frame);    
     loc.insideindex = eobrd_caninsideindex_none;
     
-    ii = eo_canmap_GetEntityIndexExtraCheck(eo_canmap_GetHandle(), loc, endpoint, entity);
+    ii = eo_canmap_GetEntityIndex(eo_canmap_GetHandle(), loc, endpoint, entity);
     
     if(EOK_uint08dummy == ii)
     {     

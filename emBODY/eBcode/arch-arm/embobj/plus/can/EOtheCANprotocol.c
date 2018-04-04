@@ -1359,12 +1359,14 @@ static eOresult_t s_eo_canprot_parse0length(eOcanframe_t *frame, eOcanport_t por
         eObrd_canlocation_t bloc = {0}; 
         bloc.port = port;
         bloc.addr = EOCANPROT_FRAME_GET_SOURCE(frame);
-        const eOcanmap_board_extended_t *board = eo_canmap_GetBoard(eo_canmap_GetHandle(), bloc);
-        if(NULL == board)
+        
+        eObrd_cantype_t btype = eo_canmap_GetBoardType(eo_canmap_GetHandle(), bloc);
+        
+        if(eobrd_cantype_unknown == btype)
         {   // board is not in EOtheCANmapping. it may be that we are in (case 666). 
             return(eores_OK);
         }
-        if((eobrd_cantype_strain == board->board.props.type) || (eobrd_cantype_mais == board->board.props.type))
+        if((eobrd_cantype_strain == btype) || (eobrd_cantype_mais == btype))
         {   // we have a ack sent by strain or mais
             return(eores_OK);
         }
