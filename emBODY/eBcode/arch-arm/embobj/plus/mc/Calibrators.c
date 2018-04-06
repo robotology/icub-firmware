@@ -454,7 +454,9 @@ BOOL JointSet_do_wait_calibration_9(JointSet* o)
         Motor_set_pwm_ref(o->motor+o->motors_of_set[0], o->tripod_calib.pwm);
         Motor_set_pwm_ref(o->motor+o->motors_of_set[1], o->tripod_calib.pwm);
         Motor_set_pwm_ref(o->motor+o->motors_of_set[2], o->tripod_calib.pwm);
+        
         ++o->calibration_wait;
+        
         return FALSE;
     }
     
@@ -462,21 +464,21 @@ BOOL JointSet_do_wait_calibration_9(JointSet* o)
     
     int32_t pos[3];
     
+    BOOL mcalib[3] = {FALSE, FALSE, FALSE };
+    
     for (int ms=0; ms<*(o->pN); ++ms)
     {
         int m = o->motors_of_set[ms];
         
-        if (Motor_is_calibrated(o->motor+m))
+        mcalib[ms] = Motor_is_calibrated(o->motor+m);
+        
+        if (mcalib[ms])
         {
-            Motor_set_pwm_ref(o->motor+m, 0);
-            
             pos[ms] = 0x7FFFFFFF;
         }
         else
         {
             pos[ms] = o->motor[m].pos_fbk - o->tripod_calib.start_pos[ms];
-            
-            //Motor_set_pwm_ref(o->motor+m, o->tripod_calib.pwm);
             
             calibrated = FALSE;
         }
@@ -499,6 +501,10 @@ BOOL JointSet_do_wait_calibration_9(JointSet* o)
         o->motor[o->motors_of_set[0]].pos_fbk_old = o->motor[o->motors_of_set[0]].pos_fbk;
         o->motor[o->motors_of_set[1]].pos_fbk_old = o->motor[o->motors_of_set[1]].pos_fbk;
         o->motor[o->motors_of_set[2]].pos_fbk_old = o->motor[o->motors_of_set[2]].pos_fbk;
+        
+        Motor_set_pwm_ref(o->motor+o->motors_of_set[0], 0);
+        Motor_set_pwm_ref(o->motor+o->motors_of_set[1], 0);
+        Motor_set_pwm_ref(o->motor+o->motors_of_set[2], 0);
         
         return TRUE;
     }
@@ -543,9 +549,9 @@ BOOL JointSet_do_wait_calibration_9(JointSet* o)
         pwm[2] = -pwm[2];
     }
     
-    Motor_set_pwm_ref(o->motor+o->motors_of_set[0], (int32_t)pwm[0]);
-    Motor_set_pwm_ref(o->motor+o->motors_of_set[1], (int32_t)pwm[1]);
-    Motor_set_pwm_ref(o->motor+o->motors_of_set[2], (int32_t)pwm[2]);
+    Motor_set_pwm_ref(o->motor+o->motors_of_set[0], mcalib[0] ? 0 : (int32_t)pwm[0]);
+    Motor_set_pwm_ref(o->motor+o->motors_of_set[1], mcalib[1] ? 0 : (int32_t)pwm[1]);
+    Motor_set_pwm_ref(o->motor+o->motors_of_set[2], mcalib[2] ? 0 : (int32_t)pwm[2]);
 
     return FALSE;
 }

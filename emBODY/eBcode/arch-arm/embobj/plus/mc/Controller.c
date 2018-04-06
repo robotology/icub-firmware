@@ -407,6 +407,17 @@ static void update_jointAndMotor_withJointset_constraints(void)
             for(int i=0; i<o->set_dim[s]; i++)
             {
                 int j = o->jos[s][i];
+                //o->joint[j].dead_zone = 400.0f;
+                o->joint[j].not_reversible = TRUE;
+            }
+        }
+        
+        if(o->jointSet[s].special_constraint == eomc_jsetconstraint_trifid)
+        {
+            for(int i=0; i<o->set_dim[s]; i++)
+            {
+                int j = o->jos[s][i];
+                //o->joint[j].dead_zone = 1.0f;
                 o->joint[j].not_reversible = TRUE;
             }
         }
