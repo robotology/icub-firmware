@@ -126,7 +126,7 @@ static EOtheSTRAIN s_eo_thestrain =
     {
         EO_INIT(.boardproperties)       NULL,
         EO_INIT(.entitydescriptor)      NULL,
-        EO_INIT(.discoverytarget)       {0},
+        EO_INIT(.discoverytargets)      NULL,
         EO_INIT(.ondiscoverystop)       {0},
         EO_INIT(.command)               {0}, 
     },
@@ -162,6 +162,8 @@ extern EOtheSTRAIN* eo_strain_Initialise(void)
     p->sharedcan.boardproperties = eo_vector_New(sizeof(eObrd_canproperties_t), 1, NULL, NULL, NULL, NULL);
     
     p->sharedcan.entitydescriptor = eo_vector_New(sizeof(eOcanmap_entitydescriptor_t), 1, NULL, NULL, NULL, NULL);
+    
+    p->sharedcan.discoverytargets = eo_array_New(1, sizeof(eOcandiscovery_target_t),  NULL);
     
     p->strain = NULL;
     p->id32ofregulars = eo_array_New(strain_maxRegulars, sizeof(uint32_t), NULL);
@@ -282,20 +284,25 @@ extern eOresult_t eo_strain_Verify(EOtheSTRAIN *p, const eOmn_serv_configuration
     p->service.onverify = onverify;
     p->service.activateafterverify = activateafterverify;
 
+    eOcandiscovery_target_t trgt = {0};
 
-    p->sharedcan.discoverytarget.info.type = servcfg->data.as.strain.boardtype.type;
-    p->sharedcan.discoverytarget.info.protocol.major = servcfg->data.as.strain.boardtype.protocol.major; 
-    p->sharedcan.discoverytarget.info.protocol.minor = servcfg->data.as.strain.boardtype.protocol.minor;
-    p->sharedcan.discoverytarget.info.firmware.major = servcfg->data.as.strain.boardtype.firmware.major; 
-    p->sharedcan.discoverytarget.info.firmware.minor = servcfg->data.as.strain.boardtype.firmware.minor; 
-    p->sharedcan.discoverytarget.info.firmware.build = servcfg->data.as.strain.boardtype.firmware.build;     
-    p->sharedcan.discoverytarget.canmap[servcfg->data.as.strain.canloc.port] = 0x0001 << servcfg->data.as.strain.canloc.addr; 
+    trgt.info.type = servcfg->data.as.strain.boardtype.type;
+    trgt.info.protocol.major = servcfg->data.as.strain.boardtype.protocol.major; 
+    trgt.info.protocol.minor = servcfg->data.as.strain.boardtype.protocol.minor;
+    trgt.info.firmware.major = servcfg->data.as.strain.boardtype.firmware.major; 
+    trgt.info.firmware.minor = servcfg->data.as.strain.boardtype.firmware.minor; 
+    trgt.info.firmware.build = servcfg->data.as.strain.boardtype.firmware.build;     
+    trgt.canmap[servcfg->data.as.strain.canloc.port] = 0x0001 << servcfg->data.as.strain.canloc.addr; 
+    
+    // force a cleaned discoverytargets before we add the target
+    eo_array_Reset(p->sharedcan.discoverytargets);
+    eo_array_PushBack(p->sharedcan.discoverytargets, &trgt);
     
     p->sharedcan.ondiscoverystop.function = s_eo_strain_onstop_search4strain;
     p->sharedcan.ondiscoverystop.parameter = (void*)servcfg;
     
     // start discovery
-    eo_candiscovery2_Start(eo_candiscovery2_GetHandle(), &p->sharedcan.discoverytarget, &p->sharedcan.ondiscoverystop);   
+    eo_candiscovery2_Start2(eo_candiscovery2_GetHandle(), p->sharedcan.discoverytargets, &p->sharedcan.ondiscoverystop);   
     
     return(eores_OK);   
 }
@@ -339,6 +346,7 @@ extern eOresult_t eo_strain_Deactivate(EOtheSTRAIN *p)
     
     eo_vector_Clear(p->sharedcan.boardproperties);
     eo_vector_Clear(p->sharedcan.entitydescriptor);
+    eo_array_Reset(p->sharedcan.discoverytargets);
     
     // make sure the timer is not running
     eo_timer_Stop(p->diagnostics.reportTimer);    

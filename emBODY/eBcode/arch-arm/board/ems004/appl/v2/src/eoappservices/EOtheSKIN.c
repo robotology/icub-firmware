@@ -123,7 +123,7 @@ static EOtheSKIN s_eo_theskin =
     {
         EO_INIT(.boardproperties)       NULL,
         EO_INIT(.entitydescriptor)      NULL,
-        EO_INIT(.discoverytarget)       {0},
+        EO_INIT(.discoverytargets)      NULL,
         EO_INIT(.ondiscoverystop)       {0},
         EO_INIT(.command)               {0}, 
     },   
@@ -161,6 +161,8 @@ extern EOtheSKIN* eo_skin_Initialise(void)
     p->sharedcan.boardproperties = eo_vector_New(sizeof(eObrd_canproperties_t), eo_skin_maxnumberofMTBboards, NULL, NULL, NULL, NULL);
     
     p->sharedcan.entitydescriptor = eo_vector_New(sizeof(eOcanmap_entitydescriptor_t), eo_skin_maxnumberofMTBboards, NULL, NULL, NULL, NULL);
+    
+    p->sharedcan.discoverytargets = eo_array_New(1, sizeof(eOcandiscovery_target_t),  NULL);
     
     uint8_t i=0;
     for(i=0; i<eomn_serv_skin_maxpatches; i++)
@@ -279,34 +281,37 @@ extern eOresult_t eo_skin_Verify(EOtheSKIN *p, const eOmn_serv_configuration_t *
       
     p->service.onverify = onverify;
     p->service.activateafterverify = activateafterverify;
+    
+    eOcandiscovery_target_t trgt = {0};
 
-    p->sharedcan.discoverytarget.info.type = eobrd_cantype_mtb;
-    p->sharedcan.discoverytarget.info.protocol.major = servcfg->data.sk.skin.version.protocol.major; 
-    p->sharedcan.discoverytarget.info.protocol.minor = servcfg->data.sk.skin.version.protocol.minor;
-    p->sharedcan.discoverytarget.info.firmware.major = servcfg->data.sk.skin.version.firmware.major; 
-    p->sharedcan.discoverytarget.info.firmware.minor = servcfg->data.sk.skin.version.firmware.minor;    
-    p->sharedcan.discoverytarget.info.firmware.build = servcfg->data.sk.skin.version.firmware.build;    
+
+    trgt.info.type = eobrd_cantype_mtb;
+    trgt.info.protocol.major = servcfg->data.sk.skin.version.protocol.major; 
+    trgt.info.protocol.minor = servcfg->data.sk.skin.version.protocol.minor;
+    trgt.info.firmware.major = servcfg->data.sk.skin.version.firmware.major; 
+    trgt.info.firmware.minor = servcfg->data.sk.skin.version.firmware.minor;    
+    trgt.info.firmware.build = servcfg->data.sk.skin.version.firmware.build;    
     
     // now i must do discovery of the patches. all patches can be at most on the two can buses ...
     // moreover, we cannot have more than .... eo_skin_maxnumberofMTBboards boards
 
-    p->sharedcan.discoverytarget.canmap[eOcanport1] = p->sharedcan.discoverytarget.canmap[eOcanport2] = 0x0000;
+    trgt.canmap[eOcanport1] = trgt.canmap[eOcanport2] = 0x0000;
     uint8_t i=0;
     for(i=0; i<servcfg->data.sk.skin.numofpatches; i++)
     {
-        p->sharedcan.discoverytarget.canmap[eOcanport1] |= servcfg->data.sk.skin.canmapskin[i][eOcanport1];
-        p->sharedcan.discoverytarget.canmap[eOcanport2] |= servcfg->data.sk.skin.canmapskin[i][eOcanport2];
+        trgt.canmap[eOcanport1] |= servcfg->data.sk.skin.canmapskin[i][eOcanport1];
+        trgt.canmap[eOcanport2] |= servcfg->data.sk.skin.canmapskin[i][eOcanport2];
     }
     
-    uint8_t numofboards = eo_common_hlfword_bitsetcount(p->sharedcan.discoverytarget.canmap[eOcanport1]) +
-                          eo_common_hlfword_bitsetcount(p->sharedcan.discoverytarget.canmap[eOcanport2]);
+    uint8_t numofboards = eo_common_hlfword_bitsetcount(trgt.canmap[eOcanport1]) +
+                          eo_common_hlfword_bitsetcount(trgt.canmap[eOcanport2]);
     
     if(numofboards > eo_skin_maxnumberofMTBboards)
     {        
         p->diagnostics.errorDescriptor.sourcedevice       = eo_errman_sourcedevice_localboard;
         p->diagnostics.errorDescriptor.sourceaddress      = 0;
         p->diagnostics.errorDescriptor.par16              = (numofboards << 8) | (eo_skin_maxnumberofMTBboards & 0x00ff);
-        p->diagnostics.errorDescriptor.par64              = (p->sharedcan.discoverytarget.canmap[eOcanport2] << 16) | (p->sharedcan.discoverytarget.canmap[eOcanport1]);
+        p->diagnostics.errorDescriptor.par64              = (trgt.canmap[eOcanport2] << 16) | (trgt.canmap[eOcanport1]);
        
         EOaction_strg astrg = {0};
         EOaction *act = (EOaction*)&astrg;
@@ -331,12 +336,16 @@ extern eOresult_t eo_skin_Verify(EOtheSKIN *p, const eOmn_serv_configuration_t *
         
         return(eores_NOK_generic); 
     }
+    
+    // force a cleaned discoverytargets before we add the target
+    eo_array_Reset(p->sharedcan.discoverytargets);
+    eo_array_PushBack(p->sharedcan.discoverytargets, &trgt);
               
     p->sharedcan.ondiscoverystop.function = s_eo_skin_onstop_search4mtbs;
     p->sharedcan.ondiscoverystop.parameter = (void*)servcfg;
     
     // start discovery   
-    eo_candiscovery2_Start(eo_candiscovery2_GetHandle(), &p->sharedcan.discoverytarget, &p->sharedcan.ondiscoverystop);   
+    eo_candiscovery2_Start2(eo_candiscovery2_GetHandle(), p->sharedcan.discoverytargets, &p->sharedcan.ondiscoverystop);   
    
     return(eores_OK);   
 }
@@ -387,6 +396,7 @@ extern eOresult_t eo_skin_Deactivate(EOtheSKIN *p)
     
     eo_vector_Clear(p->sharedcan.boardproperties);
     eo_vector_Clear(p->sharedcan.entitydescriptor);
+    eo_array_Reset(p->sharedcan.discoverytargets);
     
     // make sure the timer is not running
     eo_timer_Stop(p->diagnostics.reportTimer);  
@@ -1143,6 +1153,12 @@ static eOresult_t s_eo_skin_onstop_search4mtbs(void *par, EOtheCANdiscovery2* cd
 {
     EOtheSKIN* p = &s_eo_theskin;
     const eOmn_serv_configuration_t * servcfg = (const eOmn_serv_configuration_t *)par;
+    const eOcandiscovery_target_t *ptrgt = (const eOcandiscovery_target_t*) eo_array_At(p->sharedcan.discoverytargets, 0);
+    
+    if(NULL == ptrgt)
+    {
+        return eores_NOK_generic;
+    }
 
     if(eobool_true == searchisok)
     {
@@ -1165,7 +1181,7 @@ static eOresult_t s_eo_skin_onstop_search4mtbs(void *par, EOtheCANdiscovery2* cd
     p->diagnostics.errorDescriptor.par16              = servcfg->data.sk.skin.numofpatches;
     p->diagnostics.errorDescriptor.par64              = (servcfg->data.sk.skin.version.firmware.minor)      | (servcfg->data.sk.skin.version.firmware.major << 8)  |
                                                                  (servcfg->data.sk.skin.version.protocol.minor << 16) | (servcfg->data.sk.skin.version.protocol.major << 24) |
-                                                                 ((uint64_t)p->sharedcan.discoverytarget.canmap[eOcanport1] << 32) | ((uint64_t)p->sharedcan.discoverytarget.canmap[eOcanport2] << 48);
+                                                                 ((uint64_t)ptrgt->canmap[eOcanport1] << 32) | ((uint64_t)ptrgt->canmap[eOcanport2] << 48);
    
     EOaction_strg astrg = {0};
     EOaction *act = (EOaction*)&astrg;
@@ -1192,8 +1208,8 @@ static eOresult_t s_eo_skin_onstop_search4mtbs(void *par, EOtheCANdiscovery2* cd
         
         const eOcandiscovery_detection_t* detection = eo_candiscovery2_GetDetection(eo_candiscovery2_GetHandle());
                 
-        uint16_t maskofmissingCAN1 = p->sharedcan.discoverytarget.canmap[0] & (~detection->replies[0]);
-        uint16_t maskofmissingCAN2 = p->sharedcan.discoverytarget.canmap[1] & (~detection->replies[1]);
+        uint16_t maskofmissingCAN1 = ptrgt->canmap[0] & (~detection->replies[0]);
+        uint16_t maskofmissingCAN2 = ptrgt->canmap[1] & (~detection->replies[1]);
         uint16_t maskofincompatibleCAN1 = detection->incompatibilities[0]; 
         uint16_t maskofincompatibleCAN2 = detection->incompatibilities[1]; 
         

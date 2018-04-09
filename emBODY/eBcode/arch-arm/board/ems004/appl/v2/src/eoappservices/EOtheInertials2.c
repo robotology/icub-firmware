@@ -146,7 +146,7 @@ static EOtheInertials2 s_eo_theinertials2 =
     {
         EO_INIT(.boardproperties)       NULL,
         EO_INIT(.entitydescriptor)      NULL,
-        EO_INIT(.discoverytarget)       {0},
+        EO_INIT(.discoverytargets)      NULL,
         EO_INIT(.ondiscoverystop)       {0},
         EO_INIT(.command)               {0}, 
     },   
@@ -203,6 +203,8 @@ extern EOtheInertials2* eo_inertials2_Initialise(void)
     p->sharedcan.boardproperties = eo_vector_New(sizeof(eObrd_canproperties_t), eo_inertials2_maxnumberofMTBboards, NULL, NULL, NULL, NULL);
     
     p->sharedcan.entitydescriptor = eo_vector_New(sizeof(eOcanmap_entitydescriptor_t), eo_inertials2_maxnumberofMTBboards, NULL, NULL, NULL, NULL);
+    
+    p->sharedcan.discoverytargets = eo_array_New(1, sizeof(eOcandiscovery_target_t),  NULL);
     
     p->canmap_mtb_accel_int[0] = p->canmap_mtb_accel_int[1] = 0;
     p->canmap_mtb_accel_ext[0] = p->canmap_mtb_accel_ext[1] = 0;
@@ -342,19 +344,20 @@ extern eOresult_t eo_inertials2_Verify(EOtheInertials2 *p, const eOmn_serv_confi
         return res;        
     }
     
+    eOcandiscovery_target_t trgt = {0};
 
     // then ... those on can
-    p->sharedcan.discoverytarget.info.type = eobrd_cantype_mtb;
-    p->sharedcan.discoverytarget.info.protocol.major = servcfg->data.as.inertial.mtbversion.protocol.major; 
-    p->sharedcan.discoverytarget.info.protocol.minor = servcfg->data.as.inertial.mtbversion.protocol.minor;
-    p->sharedcan.discoverytarget.info.firmware.major = servcfg->data.as.inertial.mtbversion.firmware.major; 
-    p->sharedcan.discoverytarget.info.firmware.minor = servcfg->data.as.inertial.mtbversion.firmware.minor;
-    p->sharedcan.discoverytarget.info.firmware.build = servcfg->data.as.inertial.mtbversion.firmware.build;   
+    trgt.info.type = eobrd_cantype_mtb;
+    trgt.info.protocol.major = servcfg->data.as.inertial.mtbversion.protocol.major; 
+    trgt.info.protocol.minor = servcfg->data.as.inertial.mtbversion.protocol.minor;
+    trgt.info.firmware.major = servcfg->data.as.inertial.mtbversion.firmware.major; 
+    trgt.info.firmware.minor = servcfg->data.as.inertial.mtbversion.firmware.minor;
+    trgt.info.firmware.build = servcfg->data.as.inertial.mtbversion.firmware.build;   
     
     
     // now i must build the canmaps ... but only for discovery
     uint8_t numofsensors = eo_array_Size(p->arrayofsensors);    
-    p->sharedcan.discoverytarget.canmap[eOcanport1] =  p->sharedcan.discoverytarget.canmap[eOcanport2] = 0;
+    trgt.canmap[eOcanport1] =  trgt.canmap[eOcanport2] = 0;
     p->numofmtbs = 0;
     for(uint8_t i=0; i<numofsensors; i++)
     {
@@ -363,13 +366,13 @@ extern eOresult_t eo_inertials2_Verify(EOtheInertials2 *p, const eOmn_serv_confi
         {
             if(eobrd_place_can == des->on.any.place)
             {
-                eo_common_hlfword_bitset(&p->sharedcan.discoverytarget.canmap[des->on.can.port], des->on.can.addr);  
+                eo_common_hlfword_bitset(&trgt.canmap[des->on.can.port], des->on.can.addr);  
             }
         }
     }
     
-    uint8_t numofboards = eo_common_hlfword_bitsetcount(p->sharedcan.discoverytarget.canmap[eOcanport1]) +
-                          eo_common_hlfword_bitsetcount(p->sharedcan.discoverytarget.canmap[eOcanport2]);
+    uint8_t numofboards = eo_common_hlfword_bitsetcount(trgt.canmap[eOcanport1]) +
+                          eo_common_hlfword_bitsetcount(trgt.canmap[eOcanport2]);
     
     if(numofboards > eo_inertials2_maxnumberofMTBboards)
     {
@@ -377,7 +380,7 @@ extern eOresult_t eo_inertials2_Verify(EOtheInertials2 *p, const eOmn_serv_confi
         p->diagnostics.errorDescriptor.sourcedevice       = eo_errman_sourcedevice_localboard;
         p->diagnostics.errorDescriptor.sourceaddress      = 0;
         p->diagnostics.errorDescriptor.par16              = (numofboards << 8) | (eo_inertials2_maxnumberofMTBboards & 0x00ff);
-        p->diagnostics.errorDescriptor.par64              = (p->sharedcan.discoverytarget.canmap[eOcanport2] << 16) | (p->sharedcan.discoverytarget.canmap[eOcanport1]);
+        p->diagnostics.errorDescriptor.par64              = (trgt.canmap[eOcanport2] << 16) | (trgt.canmap[eOcanport1]);
        
         EOaction_strg astrg = {0};
         EOaction *act = (EOaction*)&astrg;
@@ -402,13 +405,15 @@ extern eOresult_t eo_inertials2_Verify(EOtheInertials2 *p, const eOmn_serv_confi
         
         return(eores_NOK_generic); 
     }    
-             
-                  
+
+    // force a cleaned discoverytargets before we add the target
+    eo_array_Reset(p->sharedcan.discoverytargets);    
+    eo_array_PushBack(p->sharedcan.discoverytargets, &trgt);              
     p->sharedcan.ondiscoverystop.function = s_eo_inertials2_onstop_search4mtbs;
     p->sharedcan.ondiscoverystop.parameter = (void*)servcfg;
     
     // start discovery of can boards  
-    eo_candiscovery2_Start(eo_candiscovery2_GetHandle(), &p->sharedcan.discoverytarget, &p->sharedcan.ondiscoverystop);   
+    eo_candiscovery2_Start2(eo_candiscovery2_GetHandle(), p->sharedcan.discoverytargets, &p->sharedcan.ondiscoverystop);   
    
     return(eores_OK);   
 }
@@ -456,6 +461,7 @@ extern eOresult_t eo_inertials2_Deactivate(EOtheInertials2 *p)
     
     eo_vector_Clear(p->sharedcan.boardproperties);
     eo_vector_Clear(p->sharedcan.entitydescriptor);
+    eo_array_Reset(p->sharedcan.discoverytargets);
     
     // make sure the timer is not running
     eo_timer_Stop(p->diagnostics.reportTimer);  
@@ -1279,6 +1285,12 @@ static eOresult_t s_eo_inertials2_onstop_search4mtbs(void *par, EOtheCANdiscover
 {
     const eOmn_serv_configuration_t * servcfg = (const eOmn_serv_configuration_t *)par;
     EOtheInertials2 *p = &s_eo_theinertials2;
+    const eOcandiscovery_target_t *ptrgt = (const eOcandiscovery_target_t*) eo_array_At(p->sharedcan.discoverytargets, 0);
+    
+    if(NULL == ptrgt)
+    {
+        return eores_NOK_generic;
+    }
     
     if(eobool_true == searchisok)
     {
@@ -1301,7 +1313,7 @@ static eOresult_t s_eo_inertials2_onstop_search4mtbs(void *par, EOtheCANdiscover
     p->diagnostics.errorDescriptor.par16             = servcfg->data.sk.skin.numofpatches;
     p->diagnostics.errorDescriptor.par64             = (servcfg->data.sk.skin.version.firmware.minor)       | (servcfg->data.sk.skin.version.firmware.major << 8) |
                                                        (servcfg->data.sk.skin.version.protocol.minor << 16) | (servcfg->data.sk.skin.version.protocol.major << 24) |
-                                                       ((uint64_t)p->sharedcan.discoverytarget.canmap[eOcanport1] << 32) | ((uint64_t)p->sharedcan.discoverytarget.canmap[eOcanport2] << 48);
+                                                       ((uint64_t)ptrgt->canmap[eOcanport1] << 32) | ((uint64_t)ptrgt->canmap[eOcanport2] << 48);
    
     EOaction_strg astrg = {0};
     EOaction *act = (EOaction*)&astrg;
@@ -1328,8 +1340,8 @@ static eOresult_t s_eo_inertials2_onstop_search4mtbs(void *par, EOtheCANdiscover
         
         const eOcandiscovery_detection_t* detection = eo_candiscovery2_GetDetection(eo_candiscovery2_GetHandle());
                 
-        uint16_t maskofmissingCAN1 = p->sharedcan.discoverytarget.canmap[0] & (~detection->replies[0]);
-        uint16_t maskofmissingCAN2 = p->sharedcan.discoverytarget.canmap[1] & (~detection->replies[1]);
+        uint16_t maskofmissingCAN1 = ptrgt->canmap[0] & (~detection->replies[0]);
+        uint16_t maskofmissingCAN2 = ptrgt->canmap[1] & (~detection->replies[1]);
         uint16_t maskofincompatibleCAN1 = detection->incompatibilities[0]; 
         uint16_t maskofincompatibleCAN2 = detection->incompatibilities[1]; 
         
@@ -1431,8 +1443,15 @@ static void s_eo_inertials2_presenceofcanboards_start(EOtheInertials2 *p)
     // prepare not_heardof_target ... it is equal to canmap_mtb_active in or with those
     // boards which are searched in discovery
     
-    if(0 == (p->sharedcan.discoverytarget.info.protocol.major + p->sharedcan.discoverytarget.info.protocol.minor +
-             p->sharedcan.discoverytarget.info.firmware.major + p->sharedcan.discoverytarget.info.firmware.minor + p->sharedcan.discoverytarget.info.firmware.build))
+    const eOcandiscovery_target_t *ptrgt = (const eOcandiscovery_target_t*) eo_array_At(p->sharedcan.discoverytargets, 0);
+    
+    if(NULL == ptrgt)
+    {
+        return;
+    }
+    
+    if(0 == (ptrgt->info.protocol.major + ptrgt->info.protocol.minor +
+             ptrgt->info.firmware.major + ptrgt->info.firmware.minor + ptrgt->info.firmware.build))
     {
         memset(p->not_heardof_target, 0, sizeof(p->not_heardof_status));
     }

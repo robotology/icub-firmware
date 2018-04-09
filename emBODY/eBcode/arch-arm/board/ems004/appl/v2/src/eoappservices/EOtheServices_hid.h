@@ -64,9 +64,9 @@ typedef struct
 
 typedef struct
 {
-    EOvector*                               boardproperties;
-    EOvector*                               entitydescriptor;
-    eOcandiscovery_target_t                 discoverytarget;
+    EOvector*                               boardproperties;    // of eObrd_canproperties_t
+    EOvector*                               entitydescriptor;   // of eOcanmap_entitydescriptor_t
+    EOarray*                                discoverytargets;   // of eOcandiscovery_target_t
     eOcandiscovery_onstop_t                 ondiscoverystop; 
     eOcanprot_command_t                     command;    
 } eOservice_cantools_t; 

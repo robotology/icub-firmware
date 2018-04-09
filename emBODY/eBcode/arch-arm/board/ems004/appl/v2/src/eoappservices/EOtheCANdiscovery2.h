@@ -43,6 +43,7 @@ extern "C" {
 #include "EoCommon.h"
 #include "EoProtocol.h"
 #include "EOtheCANmapping.h"
+#include "EOarray.h"
 
 // - public #define  --------------------------------------------------------------------------------------------------
 // empty-section
@@ -66,6 +67,8 @@ typedef struct
     void*                       parameter;    
 } eOcandiscovery_onstop_t;
 
+
+enum { eo_candiscovery_maxtargets = 3 };
 
 typedef struct
 {   // 6+2*2=10
@@ -103,8 +106,11 @@ extern EOtheCANdiscovery2* eo_candiscovery2_Initialise(const eOcandiscovery_cfg_
 extern EOtheCANdiscovery2* eo_candiscovery2_GetHandle(void);
 
 
-// call it to start the discovery procedure on a given set of can boards which share tyep, fw version, prot version
+// call it to start the discovery procedure on a given set of can boards which share type, fw version, prot version
 extern eOresult_t eo_candiscovery2_Start(EOtheCANdiscovery2 *p, const eOcandiscovery_target_t *target, eOcandiscovery_onstop_t* onstop);
+
+// call it to start the discovery procedure on a some sets formed by {type of board, positions}. we manage up to eo_candiscovery_maxtargets 
+extern eOresult_t eo_candiscovery2_Start2(EOtheCANdiscovery2 *p, EOarray *targets, eOcandiscovery_onstop_t* onstop);
 
 //  call it in the can parser when a board replies to the get-fw-version request
 extern eOresult_t eo_candiscovery2_OneBoardIsFound(EOtheCANdiscovery2 *p, eObrd_canlocation_t loc, eObool_t match, eObrd_info_t *detected);
@@ -121,7 +127,9 @@ extern eOresult_t eo_candiscovery2_SendLatestSearchResults(EOtheCANdiscovery2 *p
 
 extern eObool_t eo_candiscovery2_IsSearchOK(EOtheCANdiscovery2 *p);
 
-extern const eOcandiscovery_target_t* eo_candiscovery2_GetTarget(EOtheCANdiscovery2 *p);
+//extern const eOcandiscovery_target_t* eo_candiscovery2_GetTarget(EOtheCANdiscovery2 *p);
+
+extern const EOarray* eo_candiscovery2_GetTargets(EOtheCANdiscovery2 *p);
 
 
 extern const eOcandiscovery_detection_t* eo_candiscovery2_GetDetection(EOtheCANdiscovery2 *p);
