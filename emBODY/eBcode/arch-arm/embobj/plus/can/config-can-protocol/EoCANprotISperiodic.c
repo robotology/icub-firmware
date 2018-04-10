@@ -35,6 +35,8 @@
 
 #include "EOtheInertials2.h"
 
+#include "EOtheInertials3.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -73,6 +75,7 @@
 //static void* s_eocanprotISperiodic_get_entity(eOprotEndpoint_t endpoint, eOprot_entity_t entity, eOcanframe_t *frame, eOcanport_t port, uint8_t *index);
 
 
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
@@ -85,6 +88,11 @@
 
 
 EO_weak extern eObool_t eocanprotINperiodic_redefinable_SkipParsingOf_ANY_PERIODIC_INERTIAL_MSG(eOcanframe_t *frame, eOcanport_t port)
+{
+    return(eobool_false);
+}
+
+EO_weak extern eObool_t eocanprotINperiodic_redefinable_SkipParsingOf_ANY_PERIODIC_INERTIAL3_MSG(eOcanframe_t *frame, eOcanport_t port)
 {
     return(eobool_false);
 }
@@ -150,16 +158,42 @@ extern eOresult_t eocanprotINperiodic_parser_PER_IS_MSG__DIGITAL_ACCELEROMETER(e
 
 extern eOresult_t eocanprotINperiodic_parser_PER_IS_MSG__IMU_TRIPLE(eOcanframe_t *frame, eOcanport_t port)
 {
+    if(eobool_true == eocanprotINperiodic_redefinable_SkipParsingOf_ANY_PERIODIC_INERTIAL3_MSG(frame, port))
+    {
+        return(eores_OK);
+    }
+    
+    eOas_inertial3_type_t ciao = eoas_inertial3_canproto_to_imu(frame->data[1]);
+    if(eoas_inertial3_unknown != ciao)
+    {
+        eo_inertials3_AcceptCANframe(eo_inertials3_GetHandle(), ciao, frame, port);
+    }
+    
     return(eores_OK);
 }
 
 extern eOresult_t eocanprotINperiodic_parser_PER_IS_MSG__IMU_QUATERNION(eOcanframe_t *frame, eOcanport_t port)
 {
+    if(eobool_true == eocanprotINperiodic_redefinable_SkipParsingOf_ANY_PERIODIC_INERTIAL3_MSG(frame, port))
+    {
+        return(eores_OK);
+    }
+    
+    eo_inertials3_AcceptCANframe(eo_inertials3_GetHandle(), eoas_inertial3_imu_qua, frame, port);
+
     return(eores_OK);
 }
 
 extern eOresult_t eocanprotINperiodic_parser_PER_IS_MSG__IMU_STATUS(eOcanframe_t *frame, eOcanport_t port)
 {
+    if(eobool_true == eocanprotINperiodic_redefinable_SkipParsingOf_ANY_PERIODIC_INERTIAL3_MSG(frame, port))
+    {
+        return(eores_OK);
+    }
+    
+
+    eo_inertials3_AcceptCANframe(eo_inertials3_GetHandle(), eoas_inertial3_imu_status, frame, port);
+
     return(eores_OK);
 }
 

@@ -878,16 +878,16 @@ const eOcanprot_functions_t s_eo_canprot_functions_pollingAnalogSensor[] =
         EO_INIT(.former) NULL,
         EO_INIT(.parser) NULL
     },  
-    {   // 051      
+    {   // 051      ICUBCANPROTO_POL_AS_CMD__IMU_CONFIG_GET      
         EO_INIT(.former) eocanprotASpolling_former_POL_AS_CMD__IMU_CONFIG_GET,
         EO_INIT(.parser) eocanprotASpolling_parser_POL_AS_CMD__IMU_CONFIG_GET
     }, 
-    {   // 052      
+    {   // 052      ICUBCANPROTO_POL_AS_CMD__IMU_CONFIG_SET      
         EO_INIT(.former) eocanprotASpolling_former_POL_AS_CMD__IMU_CONFIG_SET,
         EO_INIT(.parser) NULL
     },  
-    {   // 053
-        EO_INIT(.former) NULL,
+    {   // 053      ICUBCANPROTO_POL_AS_CMD__IMU_TRANSMIT
+        EO_INIT(.former) eocanprotASpolling_former_POL_AS_CMD__IMU_TRANSMIT,
         EO_INIT(.parser) NULL
     }, 
     {   // 054

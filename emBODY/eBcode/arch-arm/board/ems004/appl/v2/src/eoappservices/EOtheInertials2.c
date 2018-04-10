@@ -405,7 +405,7 @@ extern eOresult_t eo_inertials2_Verify(EOtheInertials2 *p, const eOmn_serv_confi
         
         return(eores_NOK_generic); 
     }    
-
+             
     // force a cleaned discoverytargets before we add the target
     eo_array_Reset(p->sharedcan.discoverytargets);    
     eo_array_PushBack(p->sharedcan.discoverytargets, &trgt);              
@@ -904,7 +904,7 @@ extern eOresult_t eo_inertials2_AcceptCANframe(EOtheInertials2 *p, eOas_inertial
     {
         // damn... a loss of can frames
         eOerrmanDescriptor_t des = {0};
-        des.code            = eoerror_code_get(eoerror_category_Skin, eoerror_value_IS_arrayofinertialdataoverflow);
+        des.code            = eoerror_code_get(eoerror_category_InertialSensor, eoerror_value_IS_arrayofinertialdataoverflow);
         des.par16           = (frame->id & 0x0fff) | ((frame->size & 0x000f) << 12);
         des.par64           = eo_common_canframe_data2u64((eOcanframe_t*)frame);
         des.sourceaddress   = EOCANPROT_FRAME_GET_SOURCE(frame);
@@ -1310,10 +1310,8 @@ static eOresult_t s_eo_inertials2_onstop_search4mtbs(void *par, EOtheCANdiscover
 
     p->diagnostics.errorDescriptor.sourcedevice      = eo_errman_sourcedevice_localboard;
     p->diagnostics.errorDescriptor.sourceaddress     = 0;
-    p->diagnostics.errorDescriptor.par16             = servcfg->data.sk.skin.numofpatches;
-    p->diagnostics.errorDescriptor.par64             = (servcfg->data.sk.skin.version.firmware.minor)       | (servcfg->data.sk.skin.version.firmware.major << 8) |
-                                                       (servcfg->data.sk.skin.version.protocol.minor << 16) | (servcfg->data.sk.skin.version.protocol.major << 24) |
-                                                       ((uint64_t)ptrgt->canmap[eOcanport1] << 32) | ((uint64_t)ptrgt->canmap[eOcanport2] << 48);
+    p->diagnostics.errorDescriptor.par16             = 0;
+    p->diagnostics.errorDescriptor.par64             = 0;
    
     EOaction_strg astrg = {0};
     EOaction *act = (EOaction*)&astrg;
