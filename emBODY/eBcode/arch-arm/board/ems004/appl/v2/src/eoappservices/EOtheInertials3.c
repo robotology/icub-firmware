@@ -1102,7 +1102,7 @@ extern eOresult_t eo_inertials3_AcceptCANframe(EOtheInertials3 *p, eOas_inertial
 // -- in here .... so that all things related to Inertial are in a unique place
 
 
-extern void eoprot_fun_INIT_as_inertials3_config(const EOnv* nv)
+extern void eoprot_fun_INIT_as_inertial3_config(const EOnv* nv)
 {
     eOas_inertial3_config_t* config = (eOas_inertial3_config_t*) eo_nv_RAM(nv);
     
@@ -1112,7 +1112,7 @@ extern void eoprot_fun_INIT_as_inertials3_config(const EOnv* nv)
 }
 
 
-extern void eoprot_fun_INIT_as_inertials3_status(const EOnv* nv)
+extern void eoprot_fun_INIT_as_inertial3_status(const EOnv* nv)
 {
     eOas_inertial3_status_t* status = (eOas_inertial3_status_t*) eo_nv_RAM(nv);  
     // must initialise it as an array
@@ -1126,8 +1126,8 @@ extern void eoprot_fun_INIT_as_inertials3_status(const EOnv* nv)
     eo_array_Resize(array, size);
 }
 
-
-extern eObool_t eocanprotINperiodic_redefinable_SkipParsingOf_ANY_PERIODIC3_INERTIAL_MSG(eOcanframe_t *frame, eOcanport_t port)
+                
+extern eObool_t eocanprotINperiodic_redefinable_SkipParsingOf_ANY_PERIODIC_INERTIAL3_MSG(eOcanframe_t *frame, eOcanport_t port)
 {   
     EOtheInertials3 *p = &s_eo_theinertials3;  
     
@@ -1746,7 +1746,7 @@ static void s_eo_inertials3_imu_configure(EOtheInertials3 *p)
     imuconfig.fusionmode = 1;
     
     p->sharedcan.command.clas = eocanprot_msgclass_pollingAnalogSensor;
-    p->sharedcan.command.type  = ICUBCANPROTO_POL_AS_CMD__IMU_CONFIG_GET;
+    p->sharedcan.command.type  = ICUBCANPROTO_POL_AS_CMD__IMU_CONFIG_SET;
     p->sharedcan.command.value = &imuconfig;
     
     eObrd_canlocation_t location = {0};
