@@ -258,7 +258,7 @@ extern eOresult_t eocanprotASpolling_former_POL_AS_CMD__IMU_CONFIG_SET(eOcanprot
 
 extern eOresult_t eocanprotASpolling_former_POL_AS_CMD__IMU_TRANSMIT(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
-    s_former_POL_AS_prepare_frame(descriptor, frame, 3, ICUBCANPROTO_POL_AS_CMD__IMU_CONFIG_SET);    
+    s_former_POL_AS_prepare_frame(descriptor, frame, 3, ICUBCANPROTO_POL_AS_CMD__IMU_TRANSMIT);    
 
     icubCanProto_imu_transmit_t *trs = (icubCanProto_imu_transmit_t*)descriptor->cmd.value;
     frame->data[1] = trs->on; 
