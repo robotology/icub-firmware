@@ -916,7 +916,7 @@ extern eOresult_t eo_canmap_GetEntityLocation(EOtheCANmapping *p, eOprotID32_t i
                     theboard = s_eo_canmap_singleton.entitylocation[ep][entity][index];
                     if(NULL != theboard)
                     {
-                        if(eobrd_cantype_strain == theboard->board.props.type)
+                        if((eobrd_cantype_strain == theboard->board.props.type) || (eobrd_cantype_strain2 == theboard->board.props.type))
                         {   // ok, correct board. we retrieve the info
                             if(NULL != numoflocs)
                             {
@@ -986,7 +986,33 @@ extern eOresult_t eo_canmap_GetEntityLocation(EOtheCANmapping *p, eOprotID32_t i
                         }
                     }                    
                 }                
-            }             
+            }
+            else if(eoprot_entity_as_inertial3 == entity)
+            {
+                if(index < eocanmap_inertials3_maxnumberof)
+                {
+                    theboard = s_eo_canmap_singleton.entitylocation[ep][entity][index];
+                    if(NULL != theboard)
+                    {
+                        if((eobrd_cantype_mtb4 == theboard->board.props.type) || (eobrd_cantype_strain2 == theboard->board.props.type))
+                        {   // ok, correct board. we retrieve the info
+                            if(NULL != numoflocs)
+                            {
+                                *numoflocs = 1;
+                            }
+                            loc->port = theboard->board.props.location.port;
+                            loc->addr = theboard->board.props.location.addr;    
+                            loc->insideindex = eobrd_caninsideindex_none; // if it is eoprot_endpoint_analogsensors we dont care about the inside index
+                            res = eores_OK;                            
+
+                            if(NULL != boardtype)
+                            {
+                                *boardtype = (eObrd_cantype_t)theboard->board.props.type;
+                            }                            
+                        }
+                    }                    
+                }                
+            }                        
         } break;  
         
         case eoprot_endpoint_skin:
@@ -1133,7 +1159,7 @@ static eObool_t s_eocanmap_is_entity_supported(eOprotEndpoint_t ep, eOprotEntity
         
         case eoprot_endpoint_analogsensors:
         {
-            if((eoprot_entity_as_strain == entity) || (eoprot_entity_as_mais == entity) || (eoprot_entity_as_inertial == entity))
+            if((eoprot_entity_as_strain == entity) || (eoprot_entity_as_mais == entity) || (eoprot_entity_as_inertial == entity) || (eoprot_entity_as_inertial3 == entity))
             {
                 ret = eobool_true;
             }                         
