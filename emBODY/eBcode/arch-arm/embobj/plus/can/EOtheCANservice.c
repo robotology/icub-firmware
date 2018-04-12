@@ -405,7 +405,13 @@ extern eOresult_t eo_canserv_SendCommandToEntity(EOtheCANservice *p, eOcanprot_c
    
     if(eores_OK != eo_canmap_GetEntityLocation(eo_canmap_GetHandle(), id32, &descriptor.loc, NULL, NULL))
     {   // error ...
-//        #warning --> put diagnostics
+        eOerrmanDescriptor_t errdes = {0};
+        errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_genericerror);
+        errdes.par16                = 0x0666;
+        errdes.par64                = id32;        
+        errdes.sourcedevice         = eo_errman_sourcedevice_localboard;
+        errdes.sourceaddress        = 0;                                   
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);    
         return(eores_NOK_generic);
     }
     
@@ -456,7 +462,13 @@ extern eOresult_t eo_canserv_SendCommandToAllBoardsInEntity(EOtheCANservice *p, 
     uint8_t numoflocs = 0;
     if(eores_OK != eo_canmap_GetEntityLocation(eo_canmap_GetHandle(), id32, &descriptor.loc, &numoflocs, NULL))
     {   // error ...
-//        #warning --> put diagnostics
+        eOerrmanDescriptor_t errdes = {0};
+        errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_genericerror);
+        errdes.par16                = 0x0999;
+        errdes.par64                = id32;        
+        errdes.sourcedevice         = eo_errman_sourcedevice_localboard;
+        errdes.sourceaddress        = 0;                                   
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);    
         return(eores_NOK_generic);
     }
     
