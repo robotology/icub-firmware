@@ -839,8 +839,6 @@ extern eOresult_t eo_inertials3_Tick(EOtheInertials3 *p, eObool_t resetstatus)
         return(eores_OK);
     }      
 
-    #warning TODO: review the way the data is put into the EOarray (so far single value)    
-    
     // i can update the status of the inertial because the old value has already been transmitted.
         
     // the status data of the inertial entity is in ...
@@ -872,12 +870,18 @@ extern eOresult_t eo_inertials3_Tick(EOtheInertials3 *p, eObool_t resetstatus)
     }
     else if(eobool_false == eo_vector_Empty(p->fifoofinertial3data))
     {
-        eOas_inertial3_data_t * item = (eOas_inertial3_data_t*) eo_vector_Front(p->fifoofinertial3data);
-        if(NULL != item)
+        uint8_t fifosize = eo_vector_Size(p->fifoofinertial3data);
+        uint8_t capacity =  eo_array_Capacity(statusarrayofdata); 
+        uint8_t nitems = (fifosize < capacity) ? fifosize : capacity;
+        for(uint8_t i=0; i<nitems; i++)
         {
-            eo_array_PushBack(statusarrayofdata, item);            
-            eo_vector_PopFront(p->fifoofinertial3data);   
-            //eo_errman_Trace(eo_errman_GetHandle(), "tx mtb", s_eobj_ownname);
+            eOas_inertial3_data_t * item = (eOas_inertial3_data_t*) eo_vector_Front(p->fifoofinertial3data);
+            if(NULL != item)
+            {
+                eo_array_PushBack(statusarrayofdata, item);            
+                eo_vector_PopFront(p->fifoofinertial3data);   
+                //eo_errman_Trace(eo_errman_GetHandle(), "tx mtb", s_eobj_ownname);
+            }  
         }        
     }
     else
@@ -1042,18 +1046,18 @@ extern eOresult_t eo_inertials3_AcceptCANframe(EOtheInertials3 *p, eOas_inertial
         {
             // case of a canframe with [seq|snsr|x-lsb|x-msb|y-lsb|y-msb|z-lsb|z-msb]
             data.seq = frame->data[0];
-            data.x = (int16_t)((frame->data[3]<<8) + frame->data[2]);
-            data.y = (int16_t)((frame->data[5]<<8) + frame->data[4]);
-            data.z = (int16_t)((frame->data[7]<<8) + frame->data[6]);    
+            data.x = (int16_t)(((int16_t)frame->data[3]<<8) + frame->data[2]);
+            data.y = (int16_t)(((int16_t)frame->data[5]<<8) + frame->data[4]);
+            data.z = (int16_t)(((int16_t)frame->data[7]<<8) + frame->data[6]);    
         } break;
         
         case eoas_inertial3_imu_qua:
         {
             // case of a canframe with [w-lsb|w-msb|x-lsb|x-msb|y-lsb|y-msb|z-lsb|z-msb]
-            data.w = (int16_t)((frame->data[1]<<8) + frame->data[0]);
-            data.x = (int16_t)((frame->data[3]<<8) + frame->data[2]);
-            data.y = (int16_t)((frame->data[5]<<8) + frame->data[4]);
-            data.z = (int16_t)((frame->data[7]<<8) + frame->data[6]);   
+            data.w = (int16_t)((int16_t)(frame->data[1]<<8) + frame->data[0]);
+            data.x = (int16_t)((int16_t)(frame->data[3]<<8) + frame->data[2]);
+            data.y = (int16_t)((int16_t)(frame->data[5]<<8) + frame->data[4]);
+            data.z = (int16_t)((int16_t)(frame->data[7]<<8) + frame->data[6]);   
         } break;
         
         case eoas_inertial3_imu_status:
@@ -1088,6 +1092,16 @@ extern eOresult_t eo_inertials3_AcceptCANframe(EOtheInertials3 *p, eOas_inertial
         
     // ok, now we can pushback data into the fifoofinertial3data   
     eo_vector_PushBack(p->fifoofinertial3data, &data);
+    
+#if 0    
+        eOerrmanDescriptor_t des = {0};
+        des.code            = eoerror_code_get(eoerror_category_InertialSensor, eoerror_value_IS_arrayofinertialdataoverflow);
+        des.par16           = (frame->id & 0x0fff) | ((frame->size & 0x000f) << 12);
+        des.par64           = eo_common_canframe_data2u64((eOcanframe_t*)frame);
+        des.sourceaddress   = EOCANPROT_FRAME_GET_SOURCE(frame);
+        des.sourcedevice    = (eOcanport1 == port) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, NULL, &des);  
+#endif
     
     s_eo_inertials3_presenceofcanboards_touch(p, loc);
     
@@ -1716,8 +1730,7 @@ static void s_eo_inertials3_imu_transmission(EOtheInertials3 *p, eObool_t on, ui
 {
 
     icubCanProto_imu_transmit_t transmit = {0};
-    transmit.on = on;
-    transmit.period = period;
+    transmit.period = (eobool_true == on) ? (period) : (0);
     
     p->sharedcan.command.clas = eocanprot_msgclass_pollingAnalogSensor;
     p->sharedcan.command.type  = ICUBCANPROTO_POL_AS_CMD__IMU_TRANSMIT;
