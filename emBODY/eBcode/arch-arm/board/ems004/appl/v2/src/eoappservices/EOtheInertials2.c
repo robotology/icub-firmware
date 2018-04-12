@@ -941,7 +941,7 @@ extern eOresult_t eo_inertials2_AcceptCANframe(EOtheInertials2 *p, eOas_inertial
 // -- in here .... so that all things related to Inertial are in a unique place
 
 
-extern void eoprot_fun_INIT_as_inertials_config(const EOnv* nv)
+extern void eoprot_fun_INIT_as_inertial_config(const EOnv* nv)
 {
     eOas_inertial_config_t* config = (eOas_inertial_config_t*) eo_nv_RAM(nv);
     
@@ -950,7 +950,7 @@ extern void eoprot_fun_INIT_as_inertials_config(const EOnv* nv)
 }
 
 
-extern void eoprot_fun_INIT_as_inertials_status(const EOnv* nv)
+extern void eoprot_fun_INIT_as_inertial_status(const EOnv* nv)
 {
     eOas_inertial_status_t* status = (eOas_inertial_status_t*) eo_nv_RAM(nv);  
     
