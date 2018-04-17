@@ -267,6 +267,28 @@ extern eOresult_t eocanprotASpolling_former_POL_AS_CMD__IMU_TRANSMIT(eOcanprot_d
 }
 
 
+extern eOresult_t eocanprotASpolling_former_POL_AS_CMD__THERMOMETER_CONFIG_SET(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
+{
+    s_former_POL_AS_prepare_frame(descriptor, frame, 2, ICUBCANPROTO_POL_AS_CMD__THERMOMETER_CONFIG_SET);    
+
+    icubCanProto_thermo_config_t *tc = (icubCanProto_thermo_config_t*)descriptor->cmd.value;
+    frame->data[1] = tc->sensormask;
+    
+    return(eores_OK);    
+}
+
+extern eOresult_t eocanprotASpolling_former_POL_AS_CMD__THERMOMETER_TRANSMIT(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
+{
+    s_former_POL_AS_prepare_frame(descriptor, frame, 2, ICUBCANPROTO_POL_AS_CMD__THERMOMETER_TRANSMIT);    
+
+    icubCanProto_thermo_transmit_t *tt = (icubCanProto_thermo_transmit_t*)descriptor->cmd.value;
+    frame->data[1] = tt->periodsec;
+    
+    return(eores_OK);
+}
+
+
+
 
 extern eOresult_t eocanprotASpolling_former_POL_SK_CMD__TACT_SETUP(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {

@@ -35,8 +35,8 @@
 
 #include "EOtheCANmapping.h"
 #include "EOtheMAIS.h"
-
 #include "EOtheSTRAIN.h"
+#include "EOtheTemperatures.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -241,6 +241,21 @@ extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__HES7TO14(eOcanframe_t *
     s_eocanprotASperiodic_parser_process_maisvalue(frame, port, processHES7TO14);
     return(eores_OK);    
 }
+
+
+extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__THERMOMETER_MEASURE(eOcanframe_t *frame, eOcanport_t port)
+{
+    if(eobool_true == eocanprotASperiodic_redefinable_SkipParsingOf_ANY_PERIODIC_THERMOMETER_MSG(frame, port))
+    {
+        return(eores_OK);
+    }    
+
+    eo_temperatures_AcceptCANframe(eo_temperatures_GetHandle(), eoas_temperature_t1, frame, port);
+    
+    return(eores_OK);    
+}
+
+
 
 
 

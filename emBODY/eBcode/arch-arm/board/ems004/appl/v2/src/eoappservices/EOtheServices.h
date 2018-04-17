@@ -55,18 +55,6 @@ typedef struct EOtheServices_hid EOtheServices;
 
 typedef void EOaService;
 
-//typedef enum
-//{
-//    eo_service_NONE             = eomn_serv_NONE,
-//    eo_service_MC_foc           = eomn_serv_MC_foc,
-//    eo_service_MC_mc4           = eomn_serv_MC_mc4,
-//    eo_service_MC_mc4plus       = eomn_serv_MC_mc4plus,
-//    eo_service_MC_mc4plusmais   = eomn_serv_MC_mc4plusmais,
-//    eo_service_MAIS             = eomn_serv_AS_mais,
-//    eo_service_STRAIN           = eomn_serv_AS_strain,    
-//    eo_service_INERTIALS        = eomn_serv_AS_inertials,
-//    eo_service_SKIN             = eomn_serv_SK_skin
-//} eOservice_t;
 
 typedef eOresult_t (*eOservice_onendofoperation_fun_t) (EOaService* p, eObool_t operationisok);
 

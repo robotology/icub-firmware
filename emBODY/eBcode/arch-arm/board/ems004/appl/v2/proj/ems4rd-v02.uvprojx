@@ -311,8 +311,8 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>4</Optim>
-            <oTime>1</oTime>
+            <Optim>1</Optim>
+            <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
             <Strict>0</Strict>
@@ -890,6 +890,11 @@
               <FileName>EOtheInertials3.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\eoappservices\EOtheInertials3.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOtheTemperatures.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\eoappservices\EOtheTemperatures.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2214,6 +2219,11 @@
               <FileName>EOtheInertials3.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\eoappservices\EOtheInertials3.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOtheTemperatures.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\eoappservices\EOtheTemperatures.c</FilePath>
             </File>
           </Files>
         </Group>

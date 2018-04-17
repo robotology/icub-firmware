@@ -1012,7 +1012,33 @@ extern eOresult_t eo_canmap_GetEntityLocation(EOtheCANmapping *p, eOprotID32_t i
                         }
                     }                    
                 }                
-            }                        
+            }
+            else if(eoprot_entity_as_temperature == entity)
+            {
+                if(index < eocanmap_temperatures_maxnumberof)
+                {
+                    theboard = s_eo_canmap_singleton.entitylocation[ep][entity][index];
+                    if(NULL != theboard)
+                    {
+                        if((eobrd_cantype_mtb4 == theboard->board.props.type) || (eobrd_cantype_strain2 == theboard->board.props.type))
+                        {   // ok, correct board. we retrieve the info
+                            if(NULL != numoflocs)
+                            {
+                                *numoflocs = 1;
+                            }
+                            loc->port = theboard->board.props.location.port;
+                            loc->addr = theboard->board.props.location.addr;    
+                            loc->insideindex = eobrd_caninsideindex_none; // if it is eoprot_endpoint_analogsensors we dont care about the inside index
+                            res = eores_OK;                            
+
+                            if(NULL != boardtype)
+                            {
+                                *boardtype = (eObrd_cantype_t)theboard->board.props.type;
+                            }                            
+                        }
+                    }                    
+                }                
+            }                                    
         } break;  
         
         case eoprot_endpoint_skin:
@@ -1212,7 +1238,11 @@ static uint8_t s_eo_canmap_max_entities(eOprotEndpoint_t ep, eOprotEntity_t enti
             else if(eoprot_entity_as_inertial3 == entity)
             {
                 max = eocanmap_inertials3_maxnumberof;
-            }              
+            }  
+            else if(eoprot_entity_as_temperature == entity)
+            {
+                max = eocanmap_temperatures_maxnumberof;
+            }             
         } break;
         
         case eoprot_endpoint_skin:

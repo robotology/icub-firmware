@@ -53,7 +53,7 @@ enum { eo_inertials3_fifocapacity = 32 };
 enum { eo_inertials3_maxsensorsONboard = 4 };
 enum { eo_inertials3_posof_mtb = 0, eo_inertials3_posof_mtb4 = 1, eo_inertials3_posof_strain2 = 2, eo_inertials3_maxTypesOfBoard = 3 };
 
-struct EOtheInertials_hid
+struct EOtheInertials3_hid
 {
     eOservice_core_t                        service;
     eOservice_diagnostics_t                 diagnostics;
@@ -72,21 +72,7 @@ struct EOtheInertials_hid
     eOmems_sensor_cfg_t                     memsconfig[inertials3_mems_numberofthem];
     
     EOvector*                               fifoofinertial3data;    
-    
-//    uint8_t                                fromcan2id[2][16][eo_inertials3_maxsensorsONboard];   // 2 ports, 15 addresses (0->14), several kinds on same board (at most 4)
-    
-    
-#if 0    
-    uint16_t                                canmap_mtb_accel_int[2];
-    uint16_t                                canmap_mtb_accel_ext[2];
-    uint16_t                                canmap_mtb_gyros_ext[2];
-    
-    
-    
 
-    
-#endif  
-  
     // the inertial at the end
     eOas_inertial3_t*                       inertial3;  
     EOarray*                                id32ofregulars;

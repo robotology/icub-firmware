@@ -898,16 +898,16 @@ const eOcanprot_functions_t s_eo_canprot_functions_pollingAnalogSensor[] =
         EO_INIT(.former) NULL,
         EO_INIT(.parser) NULL
     }, 
-    {   // 056      
+    {   // 056      ICUBCANPROTO_POL_AS_CMD__THERMOMETER_CONFIG_GET     
         EO_INIT(.former) NULL,
         EO_INIT(.parser) NULL
     },  
-    {   // 057
-        EO_INIT(.former) NULL,
+    {   // 057      ICUBCANPROTO_POL_AS_CMD__THERMOMETER_CONFIG_SET
+        EO_INIT(.former) eocanprotASpolling_former_POL_AS_CMD__THERMOMETER_CONFIG_SET,
         EO_INIT(.parser) NULL
     }, 
-    {   // 058
-        EO_INIT(.former) NULL,
+    {   // 058      ICUBCANPROTO_POL_AS_CMD__THERMOMETER_TRANSMIT
+        EO_INIT(.former) eocanprotASpolling_former_POL_AS_CMD__THERMOMETER_TRANSMIT,
         EO_INIT(.parser) NULL
     },  
     {   // 059
@@ -1107,9 +1107,9 @@ const eOcanprot_functions_t s_eo_canprot_functions_periodicAnalogSensor[] =
         EO_INIT(.former) NULL,
         EO_INIT(.parser) eocanprotASperiodic_parser_PER_AS_MSG__HES7TO14
     },
-    {   // 014
+    {   // 014      ICUBCANPROTO_PER_AS_MSG__THERMOMETER_MEASURE
         EO_INIT(.former) NULL,
-        EO_INIT(.parser) NULL
+        EO_INIT(.parser) eocanprotASperiodic_parser_PER_AS_MSG__THERMOMETER_MEASURE
     },
     {   // 015
         EO_INIT(.former) NULL,

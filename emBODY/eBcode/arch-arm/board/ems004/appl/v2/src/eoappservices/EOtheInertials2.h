@@ -51,7 +51,7 @@ extern "C" {
  
 // - declaration of public user-defined types ------------------------------------------------------------------------- 
 
-typedef struct EOtheInertials_hid EOtheInertials2;
+typedef struct EOtheInertials2_hid EOtheInertials2;
 
 enum { eo_inertials2_maxnumberofMTBboards = 15 }; // even if they can be up to 28 (the number of allowed can IDs on the two buses).
 

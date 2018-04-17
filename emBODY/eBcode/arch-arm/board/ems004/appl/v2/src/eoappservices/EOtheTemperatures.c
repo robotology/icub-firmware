@@ -49,7 +49,7 @@
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "EOtheInertials3.h"
+#include "EOtheTemperatures.h"
 
 
 
@@ -57,7 +57,7 @@
 // - declaration of extern hidden interface 
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "EOtheInertials3_hid.h"
+#include "EOtheTemperatures_hid.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -84,48 +84,45 @@
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-static eOresult_t s_eo_inertials3_verify_local_sensors(EOtheInertials3 *p, const eOmn_serv_configuration_t * servcfg);
 
-static eOresult_t s_eo_inertials3_TXstart(EOtheInertials3 *p);
+static eOresult_t s_eo_temperatures_TXstart(EOtheTemperatures *p);
 
-static eOresult_t s_eo_inertials3_TXstop(EOtheInertials3 *p);
+static eOresult_t s_eo_temperatures_TXstop(EOtheTemperatures *p);
 
-static eObool_t s_eo_inertials3_activestate_can_accept_canframe(void);
+static eObool_t s_eo_temperatures_activestate_can_accept_canframe(void);
 
-static void s_eo_inertials3_build_maps(EOtheInertials3* p, uint32_t enablemask);
+static void s_eo_temperatures_build_maps(EOtheTemperatures* p, uint32_t enablemask);
 
-static eOresult_t s_eo_inertials3_onstop_search4canboards(void *par, EOtheCANdiscovery2* p, eObool_t searchisok);
+static eOresult_t s_eo_temperatures_onstop_search4canboards(void *par, EOtheCANdiscovery2* p, eObool_t searchisok);
 
-static void s_eo_inertials3_send_periodic_error_report(void *p);
+static void s_eo_temperatures_send_periodic_error_report(void *p);
 
-static eObool_t s_eo_inertials3_isID32relevant(uint32_t id32);
+static eObool_t s_eo_temperatures_isID32relevant(uint32_t id32);
 
-static eObool_t s_eo_inertials3_get_id(eObrd_canlocation_t loc, eOas_inertial3_type_t type, uint8_t *id);
+static eObool_t s_eo_temperatures_get_id(eObrd_canlocation_t loc, eOas_temperature_type_t type, uint8_t *id);
 
-static void s_eo_inertials3_presenceofcanboards_reset(EOtheInertials3 *p);
-static void s_eo_inertials3_presenceofcanboards_build(EOtheInertials3 *p);
-static void s_eo_inertials3_presenceofcanboards_start(EOtheInertials3 *p);
-static void s_eo_inertials3_presenceofcanboards_touch(EOtheInertials3 *p, eObrd_canlocation_t loc);
-static void s_eo_inertials3_presenceofcanboards_tick(EOtheInertials3 *p);
+static void s_eo_temperatures_presenceofcanboards_reset(EOtheTemperatures *p);
+static void s_eo_temperatures_presenceofcanboards_build(EOtheTemperatures *p);
+static void s_eo_temperatures_presenceofcanboards_start(EOtheTemperatures *p);
+static void s_eo_temperatures_presenceofcanboards_touch(EOtheTemperatures *p, eObrd_canlocation_t loc);
+static void s_eo_temperatures_presenceofcanboards_tick(EOtheTemperatures *p);
 
-static void s_eo_inertials3_imu_configure(EOtheInertials3 *p);
-static void s_eo_inertials3_imu_transmission(EOtheInertials3 *p, eObool_t on, uint8_t period);
+static void s_eo_temperatures_chip_configure(EOtheTemperatures *p);
+static void s_eo_temperatures_chip_transmission(EOtheTemperatures *p, eObool_t on, uint8_t period);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
 
-static const eOas_inertial3_config_t s_eo_default_inertial3config =
+static const eOas_temperature_config_t s_eo_default_temperatureconfig =
 {
-    .datarate                       = 50,
-    .numberofitemstofillateachtick  = 0,
-    .filler                         = {0},
+    .datarate                       = 500,
     .enabled                        = 0
 };
 
 
 
-static EOtheInertials3 s_eo_theinertials3 = 
+static EOtheTemperatures s_eo_thetemperature = 
 {
     .service = 
     {
@@ -161,24 +158,10 @@ static EOtheInertials3 s_eo_theinertials3 =
 
     .sensorsconfig              = {0},      
     .canmap_brd_active          = {0},    
-    .ethmap_mems_active         = 0,
+
+    .fifooftemperaturedata        = NULL,
     
-    .frommems2id                = {NOID16},
-    .memsparam                  = {255},
-    .memsconfig                 = { {mems_gyroscope_l3g4200, hal_gyroscope_range_250dps, 0} }, 
-      
-    .fifoofinertial3data        = NULL,
-    
-//    .fromcan2id)                {NOID08},
-        
-    
-#if 0     
-    .canmap_mtb_accel_int)      {0},
-    .canmap_mtb_accel_ext)      {0},
-    .canmap_mtb_gyros_ext)      {0},
-#endif
-    
-    .inertial3                  = NULL,
+    .temperature                  = NULL,
     .id32ofregulars             = NULL,
     .setofboardinfos            = {0},
     .arrayofsensordescriptors   = NULL,
@@ -190,7 +173,7 @@ static EOtheInertials3 s_eo_theinertials3 =
 
 
 
-static const char s_eobj_ownname[] = "EOtheInertials3";
+static const char s_eobj_ownname[] = "EOtheTemperatures";
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -198,9 +181,9 @@ static const char s_eobj_ownname[] = "EOtheInertials3";
 // --------------------------------------------------------------------------------------------------------------------
 
 
-extern EOtheInertials3* eo_inertials3_Initialise(void)
+extern EOtheTemperatures* eo_temperatures_Initialise(void)
 {
-    EOtheInertials3* p = &s_eo_theinertials3;
+    EOtheTemperatures* p = &s_eo_thetemperature;
     if(eobool_true == p->service.initted)
     {
         return(p);
@@ -208,62 +191,55 @@ extern EOtheInertials3* eo_inertials3_Initialise(void)
             
     p->service.servconfig.type = eomn_serv_NONE;
         
-    p->sharedcan.boardproperties = eo_vector_New(sizeof(eObrd_canproperties_t), eo_inertials3_maxnumberofCANboards, NULL, NULL, NULL, NULL);
+    p->sharedcan.boardproperties = eo_vector_New(sizeof(eObrd_canproperties_t), eo_temperatures_maxnumberofCANboards, NULL, NULL, NULL, NULL);
     
-    p->sharedcan.entitydescriptor = eo_vector_New(sizeof(eOcanmap_entitydescriptor_t), eo_inertials3_maxnumberofCANboards, NULL, NULL, NULL, NULL);
+    p->sharedcan.entitydescriptor = eo_vector_New(sizeof(eOcanmap_entitydescriptor_t), eo_temperatures_maxnumberofCANboards, NULL, NULL, NULL, NULL);
     
-    p->sharedcan.discoverytargets = eo_array_New(eOas_inertials3_boardinfos_maxnumber, sizeof(eOcandiscovery_target_t),  NULL);
+    p->sharedcan.discoverytargets = eo_array_New(eOas_temperature_boardinfos_maxnumber, sizeof(eOcandiscovery_target_t),  NULL);
     
     memset(p->canmap_brd_active, 0, sizeof(p->canmap_brd_active));
     p->configured = eobool_false;
     memset(p->numofcanboards, 0, sizeof(p->numofcanboards));
     
-    p->ethmap_mems_active = 0;
-       
-//    memset(p->fromcan2id, NOID08, sizeof(p->fromcan2id));       
-    memset(p->frommems2id, NOID08, sizeof(p->frommems2id));     
-    memset(p->memsparam, 255, sizeof(p->memsparam));
     
-    s_eo_inertials3_presenceofcanboards_reset(p);
+    s_eo_temperatures_presenceofcanboards_reset(p);
     
-    p->inertial3 = NULL;
-    p->id32ofregulars = eo_array_New(inertials3_maxRegulars, sizeof(uint32_t), NULL);
+    p->temperature = NULL;
+    p->id32ofregulars = eo_array_New(temperature_maxRegulars, sizeof(uint32_t), NULL);
     memset(&p->setofboardinfos, 0, sizeof(p->setofboardinfos));
-    p->arrayofsensordescriptors = eo_array_New(eOas_inertials3_descriptors_maxnumber, sizeof(eOas_inertial3_descriptor_t), NULL);
+    p->arrayofsensordescriptors = eo_array_New(eOas_temperature_descriptors_maxnumber, sizeof(eOas_temperature_descriptor_t), NULL);
     
-    memcpy(&p->sensorsconfig, &s_eo_default_inertial3config, sizeof(eOas_inertial3_config_t));
-    p->fifoofinertial3data = eo_vector_New(sizeof(eOas_inertial3_data_t), eo_inertials3_fifocapacity, NULL, 0, NULL, NULL);
-    
-    eo_mems_Initialise(NULL);
-    
+    memcpy(&p->sensorsconfig, &s_eo_default_temperatureconfig, sizeof(eOas_temperature_config_t));
+    p->fifooftemperaturedata = eo_vector_New(sizeof(eOas_temperature_data_t), eo_temperatures_fifocapacity, NULL, 0, NULL, NULL);
+
     p->diagnostics.reportTimer = eo_timer_New();
     p->diagnostics.errorType = eo_errortype_error;
     p->diagnostics.errorDescriptor.sourceaddress = eo_errman_sourcedevice_localboard;
-    p->diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_inertials3_not_verified_yet);  
+    p->diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_temperatures_not_verified_yet);  
     
     p->service.initted = eobool_true;    
     p->service.active = eobool_false;
     p->service.started = eobool_false;
     p->transmissionisactive = eobool_false;
     p->service.state = eomn_serv_state_idle;
-    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_inertials3, p->service.state);
+    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_temperatures, p->service.state);
     
     return(p);   
 }
 
 
-extern EOtheInertials3* eo_inertials3_GetHandle(void)
+extern EOtheTemperatures* eo_temperatures_GetHandle(void)
 {
-    if(eobool_true == s_eo_theinertials3.service.initted)
+    if(eobool_true == s_eo_thetemperature.service.initted)
     {
-        return(&s_eo_theinertials3);
+        return(&s_eo_thetemperature);
     }
     
     return(NULL);
 }
 
 
-extern eOmn_serv_state_t eo_inertials3_GetServiceState(EOtheInertials3 *p)
+extern eOmn_serv_state_t eo_temperatures_GetServiceState(EOtheTemperatures *p)
 {
     if(NULL == p)
     {
@@ -274,7 +250,7 @@ extern eOmn_serv_state_t eo_inertials3_GetServiceState(EOtheInertials3 *p)
 }
 
 
-extern eOresult_t eo_inertials3_SendReport(EOtheInertials3 *p)
+extern eOresult_t eo_temperatures_SendReport(EOtheTemperatures *p)
 {
     if(NULL == p)
     {
@@ -287,7 +263,7 @@ extern eOresult_t eo_inertials3_SendReport(EOtheInertials3 *p)
     
     switch(errorvalue)
     {
-        case eoerror_value_CFG_inertials3_failed_candiscovery:
+        case eoerror_value_CFG_temperatures_failed_candiscovery:
         {
             eo_candiscovery2_SendLatestSearchResults(eo_candiscovery2_GetHandle());            
         } break;
@@ -302,14 +278,14 @@ extern eOresult_t eo_inertials3_SendReport(EOtheInertials3 *p)
 }
 
 
-extern eOresult_t eo_inertials3_Verify(EOtheInertials3 *p, const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify)
+extern eOresult_t eo_temperatures_Verify(EOtheTemperatures *p, const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify)
 {
     eOresult_t res = eores_NOK_generic;
     
     if((NULL == p) || (NULL == servcfg))
     {
         p->service.state = eomn_serv_state_failureofverify;
-        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_inertials3, p->service.state);
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_temperatures, p->service.state);
         if(NULL != onverify)
         {
             onverify(p, eobool_false); 
@@ -317,10 +293,10 @@ extern eOresult_t eo_inertials3_Verify(EOtheInertials3 *p, const eOmn_serv_confi
         return(eores_NOK_nullpointer);
     } 
 
-    if(eomn_serv_AS_inertials3 != servcfg->type)
+    if(eomn_serv_AS_temperatures != servcfg->type)
     {
         p->service.state = eomn_serv_state_failureofverify;
-        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_inertials3, p->service.state);
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_temperatures, p->service.state);
         if(NULL != onverify)
         {
             onverify(p, eobool_false); 
@@ -331,11 +307,11 @@ extern eOresult_t eo_inertials3_Verify(EOtheInertials3 *p, const eOmn_serv_confi
  
     if(eobool_true == p->service.active)
     {
-        eo_inertials3_Deactivate(p);        
+        eo_temperatures_Deactivate(p);        
     }   
     
     p->service.state = eomn_serv_state_verifying; 
-    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_inertials3, p->service.state);    
+    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_temperatures, p->service.state);    
 
     // make sure the timer is not running
     eo_timer_Stop(p->diagnostics.reportTimer);    
@@ -344,16 +320,9 @@ extern eOresult_t eo_inertials3_Verify(EOtheInertials3 *p, const eOmn_serv_confi
     p->service.activateafterverify = activateafterverify;
     
     // i get all the sensors.
-    memcpy(&p->setofboardinfos, &servcfg->data.as.inertial3.setofboardinfos, sizeof(eOas_inertial3_setof_boardinfos_t));
-    memcpy(p->arrayofsensordescriptors, &servcfg->data.as.inertial3.arrayofdescriptor, sizeof(eOas_inertial3_arrayof_descriptors_t));
+    memcpy(&p->setofboardinfos, &servcfg->data.as.temperature.setofboardinfos, sizeof(eOas_temperature_setof_boardinfos_t));
+    memcpy(p->arrayofsensordescriptors, &servcfg->data.as.temperature.arrayofdescriptor, sizeof(eOas_temperature_arrayof_descriptors_t));
     
-    
-    // at first we verify sensors which are local (if any)
-    
-    if(eores_OK != (res = s_eo_inertials3_verify_local_sensors(p, servcfg)))
-    {        
-        return res;        
-    }
     
     // now we deal with sensors on can:
     // step-1: check vs max number of can boards in config
@@ -366,12 +335,12 @@ extern eOresult_t eo_inertials3_Verify(EOtheInertials3 *p, const eOmn_serv_confi
     // the number of sensor descriptors
     uint8_t numofsensors = eo_array_Size(p->arrayofsensordescriptors);
     uint16_t overlappedmap[2] = {0};
-    for(uint8_t b=0; b<eoas_inertial3_supportedboards_numberof(); b++)
+    for(uint8_t b=0; b<eoas_temperature_supportedboards_numberof(); b++)
     {
         eOcandiscovery_target_t trgt = {0};
         eObool_t found = eobool_false;
-        eObrd_cantype_t brdtype = eoas_inertial3_supportedboards_gettype(b);
-        const eObrd_info_t * brdinfo = eoas_inertial3_setof_boardinfos_find(&p->setofboardinfos, brdtype);
+        eObrd_cantype_t brdtype = eoas_temperature_supportedboards_gettype(b);
+        const eObrd_info_t * brdinfo = eoas_temperature_setof_boardinfos_find(&p->setofboardinfos, brdtype);
         if(NULL == brdinfo)
         {   // we dont have this boardtype 
             continue;
@@ -381,7 +350,7 @@ extern eOresult_t eo_inertials3_Verify(EOtheInertials3 *p, const eOmn_serv_confi
         // now i search for this brdtype inside the arrayofsensordescriptors
         for(uint8_t s=0; s<numofsensors; s++)
         {
-            eOas_inertial3_descriptor_t *des = (eOas_inertial3_descriptor_t*) eo_array_At(p->arrayofsensordescriptors, s);
+            eOas_temperature_descriptor_t *des = (eOas_temperature_descriptor_t*) eo_array_At(p->arrayofsensordescriptors, s);
             if(NULL != des)
             {
                 if((eobrd_place_can == des->on.any.place) && (brdtype == des->typeofboard))
@@ -412,9 +381,9 @@ extern eOresult_t eo_inertials3_Verify(EOtheInertials3 *p, const eOmn_serv_confi
        
         EOaction_strg astrg = {0};
         EOaction *act = (EOaction*)&astrg;
-        eo_action_SetCallback(act, s_eo_inertials3_send_periodic_error_report, p, eov_callbackman_GetTask(eov_callbackman_GetHandle()));        
+        eo_action_SetCallback(act, s_eo_temperatures_send_periodic_error_report, p, eov_callbackman_GetTask(eov_callbackman_GetHandle()));        
         
-        p->diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_inertials3_failed_generic);
+        p->diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_temperatures_failed_generic);
         p->diagnostics.errorType = eo_errortype_error;                
         eo_errman_Error(eo_errman_GetHandle(), p->diagnostics.errorType, NULL, s_eobj_ownname, &p->diagnostics.errorDescriptor);
         
@@ -425,7 +394,7 @@ extern eOresult_t eo_inertials3_Verify(EOtheInertials3 *p, const eOmn_serv_confi
         }  
         
         p->service.state = eomn_serv_state_failureofverify;
-        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_inertials3, p->service.state);
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_temperatures, p->service.state);
         if(NULL != onverify)
         {
             onverify(p, eobool_false); 
@@ -438,18 +407,18 @@ extern eOresult_t eo_inertials3_Verify(EOtheInertials3 *p, const eOmn_serv_confi
     
     uint8_t numofboards = eo_common_hlfword_bitsetcount(overlappedmap[eOcanport1]) + eo_common_hlfword_bitsetcount(overlappedmap[eOcanport2]);
     // we check that numofboards is ok.    
-    if(numofboards > eo_inertials3_maxnumberofCANboards)
+    if(numofboards > eo_temperatures_maxnumberofCANboards)
     {        
         p->diagnostics.errorDescriptor.sourcedevice       = eo_errman_sourcedevice_localboard;
         p->diagnostics.errorDescriptor.sourceaddress      = 0;
-        p->diagnostics.errorDescriptor.par16              = (numofboards << 8) | (eo_inertials3_maxnumberofCANboards & 0x00ff);
+        p->diagnostics.errorDescriptor.par16              = (numofboards << 8) | (eo_temperatures_maxnumberofCANboards & 0x00ff);
         p->diagnostics.errorDescriptor.par64              = (overlappedmap[eOcanport2] << 16) | (overlappedmap[eOcanport1]);
        
         EOaction_strg astrg = {0};
         EOaction *act = (EOaction*)&astrg;
-        eo_action_SetCallback(act, s_eo_inertials3_send_periodic_error_report, p, eov_callbackman_GetTask(eov_callbackman_GetHandle()));        
+        eo_action_SetCallback(act, s_eo_temperatures_send_periodic_error_report, p, eov_callbackman_GetTask(eov_callbackman_GetHandle()));        
         
-        p->diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_inertials3_failed_toomanyboards);
+        p->diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_temperatures_failed_toomanyboards);
         p->diagnostics.errorType = eo_errortype_error;                
         eo_errman_Error(eo_errman_GetHandle(), p->diagnostics.errorType, NULL, s_eobj_ownname, &p->diagnostics.errorDescriptor);
         
@@ -460,7 +429,7 @@ extern eOresult_t eo_inertials3_Verify(EOtheInertials3 *p, const eOmn_serv_confi
         }  
         
         p->service.state = eomn_serv_state_failureofverify;
-        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_inertials3, p->service.state);
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_temperatures, p->service.state);
         if(NULL != onverify)
         {
             onverify(p, eobool_false); 
@@ -472,7 +441,7 @@ extern eOresult_t eo_inertials3_Verify(EOtheInertials3 *p, const eOmn_serv_confi
     // step-2: can discovery
     
     
-    p->sharedcan.ondiscoverystop.function = s_eo_inertials3_onstop_search4canboards;
+    p->sharedcan.ondiscoverystop.function = s_eo_temperatures_onstop_search4canboards;
     p->sharedcan.ondiscoverystop.parameter = (void*)servcfg;
     
     // start discovery of can boards  
@@ -482,7 +451,7 @@ extern eOresult_t eo_inertials3_Verify(EOtheInertials3 *p, const eOmn_serv_confi
 }
 
 
-extern eOresult_t eo_inertials3_Deactivate(EOtheInertials3 *p)
+extern eOresult_t eo_temperatures_Deactivate(EOtheTemperatures *p)
 {
     if(NULL == p)
     {
@@ -493,30 +462,30 @@ extern eOresult_t eo_inertials3_Deactivate(EOtheInertials3 *p)
     {
         // i force to eomn_serv_state_idle because it may be that state was eomn_serv_state_verified or eomn_serv_state_failureofverify
         p->service.state = eomn_serv_state_idle; 
-        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_inertials3, p->service.state);
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_temperatures, p->service.state);
         return(eores_OK);        
     } 
     
     if(eobool_true == p->service.started)
     {
-        eo_inertials3_Stop(p);
+        eo_temperatures_Stop(p);
     }
     
-    eo_inertials3_SetRegulars(p, NULL, NULL);
+    eo_temperatures_SetRegulars(p, NULL, NULL);
       
-    eo_canmap_DeconfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_analogsensors, eoprot_entity_as_inertial3, p->sharedcan.entitydescriptor); 
+    eo_canmap_DeconfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_analogsensors, eoprot_entity_as_temperature, p->sharedcan.entitydescriptor); 
     
     eo_canmap_UnloadBoards(eo_canmap_GetHandle(), p->sharedcan.boardproperties);
      
     
-    eo_entities_SetNumOfInertials3(eo_entities_GetHandle(), 0);
+    eo_entities_SetNumOfTemperatures(eo_entities_GetHandle(), 0);
     
-    p->inertial3 = NULL;
+    p->temperature = NULL;
     
     // no need to reset setofboardinfos
     eo_array_Reset(p->arrayofsensordescriptors);
     
-    eo_vector_Clear(p->fifoofinertial3data);
+    eo_vector_Clear(p->fifooftemperaturedata);
                 
     memset(&p->service.servconfig, 0, sizeof(eOmn_serv_configuration_t));
     p->service.servconfig.type = eomn_serv_NONE;
@@ -533,38 +502,38 @@ extern eOresult_t eo_inertials3_Deactivate(EOtheInertials3 *p)
     memset(p->numofcanboards, 0, sizeof(p->numofcanboards));
     p->service.active = eobool_false;    
     p->service.state = eomn_serv_state_idle;
-    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_inertials3, p->service.state);
+    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_temperatures, p->service.state);
     
     return(eores_OK);
 }
 
 
-extern eOresult_t eo_inertials3_Activate(EOtheInertials3 *p, const eOmn_serv_configuration_t * servcfg)
+extern eOresult_t eo_temperatures_Activate(EOtheTemperatures *p, const eOmn_serv_configuration_t * servcfg)
 {
     if((NULL == p) || (NULL == servcfg))
     {
         return(eores_NOK_nullpointer);
     } 
 
-    if(eomn_serv_AS_inertials3 != servcfg->type)
+    if(eomn_serv_AS_temperatures != servcfg->type)
     {
         return(eores_NOK_generic);
     }
     
     if(eobool_true == p->service.active)
     {
-        eo_inertials3_Deactivate(p);        
+        eo_temperatures_Deactivate(p);        
     }   
     
-    eo_entities_SetNumOfInertials3(eo_entities_GetHandle(), 1);
+    eo_entities_SetNumOfTemperatures(eo_entities_GetHandle(), 1);
     
-    if(0 == eo_entities_NumOfInertials3(eo_entities_GetHandle()))
+    if(0 == eo_entities_NumOfTemperatures(eo_entities_GetHandle()))
     {
         p->service.active = eobool_false;
         return(eores_NOK_generic);
     }
     
-    p->inertial3 = eo_entities_GetInertial3(eo_entities_GetHandle(), 0);
+    p->temperature = eo_entities_GetTemperature(eo_entities_GetHandle(), 0);
     
     // now service config stuff
     
@@ -575,13 +544,13 @@ extern eOresult_t eo_inertials3_Activate(EOtheInertials3 *p, const eOmn_serv_con
     #warning TODO: save memory be avoiding the duplication of p->service.servconfig into arrayofsensordescriptors and setofboardinfos
             
     // now i get all the sensors info from ...
-    memcpy(&p->setofboardinfos, &servcfg->data.as.inertial3.setofboardinfos, sizeof(eOas_inertial3_setof_boardinfos_t));
-    memcpy(p->arrayofsensordescriptors, &servcfg->data.as.inertial3.arrayofdescriptor, sizeof(eOas_inertial3_arrayof_descriptors_t));
+    memcpy(&p->setofboardinfos, &servcfg->data.as.temperature.setofboardinfos, sizeof(eOas_temperature_setof_boardinfos_t));
+    memcpy(p->arrayofsensordescriptors, &servcfg->data.as.temperature.arrayofdescriptor, sizeof(eOas_temperature_arrayof_descriptors_t));
     
     
     // now i build maps for check of presence
     
-    s_eo_inertials3_presenceofcanboards_build(p);
+    s_eo_temperatures_presenceofcanboards_build(p);
     
     
     // now i must build the canbusmapping[] for EOtheCANmapping object
@@ -593,7 +562,7 @@ extern eOresult_t eo_inertials3_Activate(EOtheInertials3 *p, const eOmn_serv_con
     
     for(uint8_t i=0; i<numofsensors; i++)
     {
-        eOas_inertial3_descriptor_t *des = (eOas_inertial3_descriptor_t*) eo_array_At(p->arrayofsensordescriptors, i);
+        eOas_temperature_descriptor_t *des = (eOas_temperature_descriptor_t*) eo_array_At(p->arrayofsensordescriptors, i);
         if(NULL != des)
         {
             if(eobrd_place_can == des->on.any.place)
@@ -629,10 +598,10 @@ extern eOresult_t eo_inertials3_Activate(EOtheInertials3 *p, const eOmn_serv_con
         for(uint8_t k=1; k<15; k++)
         {
             if(eobool_true == eo_common_hlfword_bitcheck(canbusmapping[j], k))
-            {   // i pushback. i dont verify vs the capacity of the vector because eo_inertials3_Verify() has already done it
+            {   // i pushback. i dont verify vs the capacity of the vector because eo_temperatures_Verify() has already done it
                 
                 prop.type = boardtypes[j][k];
-                const eObrd_info_t * brdinfo = eoas_inertial3_setof_boardinfos_find(&p->setofboardinfos, (eObrd_cantype_t)prop.type);
+                const eObrd_info_t * brdinfo = eoas_temperature_setof_boardinfos_find(&p->setofboardinfos, (eObrd_cantype_t)prop.type);
                 
                 if(NULL == brdinfo)
                 {
@@ -664,16 +633,16 @@ extern eOresult_t eo_inertials3_Activate(EOtheInertials3 *p, const eOmn_serv_con
     eo_canmap_LoadBoards(eo_canmap_GetHandle(), p->sharedcan.boardproperties); 
     
     // load the entity mapping.
-    eo_canmap_ConfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_analogsensors, eoprot_entity_as_inertial3, p->sharedcan.entitydescriptor);   
+    eo_canmap_ConfigEntity(eo_canmap_GetHandle(), eoprot_endpoint_analogsensors, eoprot_entity_as_temperature, p->sharedcan.entitydescriptor);   
     
     
     // build the maps that can translate a received can message into the id to be put into ...
     // we assume that 
-    s_eo_inertials3_build_maps(p, 0xffffffff);
+    s_eo_temperatures_build_maps(p, 0xffffffff);
     p->configured = eobool_false; // still false
     p->service.active = eobool_true;    
     p->service.state = eomn_serv_state_activated;
-    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_inertials3, p->service.state);    
+    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_temperatures, p->service.state);    
 
     
     return(eores_OK);   
@@ -681,7 +650,7 @@ extern eOresult_t eo_inertials3_Activate(EOtheInertials3 *p, const eOmn_serv_con
 
 
 
-extern eOresult_t eo_inertials3_Start(EOtheInertials3 *p)
+extern eOresult_t eo_temperatures_Start(EOtheTemperatures *p)
 {
     if(NULL == p)
     {
@@ -700,23 +669,23 @@ extern eOresult_t eo_inertials3_Start(EOtheInertials3 *p)
     
 //    if(eobool_true == p->service.started)
 //    {   // if running we stop before
-//        eo_inertials3_Stop(p);
+//        eo_temperatures_Stop(p);
 //    } 
     
 
     // ok, now we do something.    
          
-    //s_eo_inertials3_TXstart(p);
+    //s_eo_temperatures_TXstart(p);
 
     p->service.started = eobool_true;    
     p->service.state = eomn_serv_state_started;
-    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_inertials3, p->service.state);
+    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_temperatures, p->service.state);
     
     
     return(eores_OK);      
 }
 
-extern eOresult_t eo_inertials3_SetRegulars(EOtheInertials3 *p, eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t* numberofthem)
+extern eOresult_t eo_temperatures_SetRegulars(EOtheTemperatures *p, eOmn_serv_arrayof_id32_t* arrayofid32, uint8_t* numberofthem)
 {
     if(NULL == p)
     {
@@ -728,11 +697,11 @@ extern eOresult_t eo_inertials3_SetRegulars(EOtheInertials3 *p, eOmn_serv_arrayo
         return(eores_OK);
     }  
     
-    return(eo_service_hid_SetRegulars(p->id32ofregulars, arrayofid32, s_eo_inertials3_isID32relevant, numberofthem));
+    return(eo_service_hid_SetRegulars(p->id32ofregulars, arrayofid32, s_eo_temperatures_isID32relevant, numberofthem));
 }
 
 
-extern eOresult_t eo_inertials3_Stop(EOtheInertials3 *p)
+extern eOresult_t eo_temperatures_Stop(EOtheTemperatures *p)
 {
     if(NULL == p)
     {
@@ -752,27 +721,25 @@ extern eOresult_t eo_inertials3_Stop(EOtheInertials3 *p)
 
     // ok, now we do something.    
       
-    s_eo_inertials3_TXstop(p);
+    s_eo_temperatures_TXstop(p);
     
                
     p->service.started = eobool_false;
     p->service.state = eomn_serv_state_activated;
-    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_inertials3, p->service.state);
+    eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_temperatures, p->service.state);
     
     // reset the various buffers
-//    eOas_inertial_data_t *data = &p->inertial3->status.data;
-//    memset(data, 0, sizeof(eOas_inertial_data_t)); 
-    eo_vector_Clear(p->fifoofinertial3data);
+    eo_vector_Clear(p->fifooftemperaturedata);
     
     
     // remove all regulars related to inertials entity ... no, dont do that.
-    //eo_inertials3_SetRegulars(p, NULL, NULL);
+    //eo_temperatures_SetRegulars(p, NULL, NULL);
     
     return(eores_OK);     
 }
 
 
-extern eOresult_t eo_inertials3_Transmission(EOtheInertials3 *p, eObool_t on)
+extern eOresult_t eo_temperatures_Transmission(EOtheTemperatures *p, eObool_t on)
 {
     if(NULL == p)
     {
@@ -796,18 +763,18 @@ extern eOresult_t eo_inertials3_Transmission(EOtheInertials3 *p, eObool_t on)
 
     if(eobool_true == on)
     {
-        s_eo_inertials3_TXstart(p);
+        s_eo_temperatures_TXstart(p);
     }
     else
     {
-        s_eo_inertials3_TXstop(p);
+        s_eo_temperatures_TXstop(p);
     }
 
     return(eores_OK);
 }
 
 
-extern eOresult_t eo_inertials3_Tick(EOtheInertials3 *p, eObool_t resetstatus)
+extern eOresult_t eo_temperatures_Tick(EOtheTemperatures *p, eObool_t resetstatus)
 {
     if(NULL == p)
     {
@@ -831,7 +798,7 @@ extern eOresult_t eo_inertials3_Tick(EOtheInertials3 *p, eObool_t resetstatus)
     
     if(eobool_true == p->transmissionisactive)
     {
-        s_eo_inertials3_presenceofcanboards_tick(p);
+        s_eo_temperatures_presenceofcanboards_tick(p);
     }
 
     if(eobool_false == resetstatus)
@@ -843,44 +810,27 @@ extern eOresult_t eo_inertials3_Tick(EOtheInertials3 *p, eObool_t resetstatus)
         
     // the status data of the inertial entity is in ...
     
-    EOarray * statusarrayofdata = (EOarray*) &p->inertial3->status.arrayofdata;
+    EOarray * statusarrayofdata = (EOarray*) &p->temperature->status.arrayofdata;
     
     eo_array_Reset(statusarrayofdata);
-    
-    eOas_inertial3_data_t i3data = {0};
-    
-    eOmems_sensor_t sensor = mems_gyroscope_l3g4200;
-    eOas_inertial_data_t memsdata = {0};
+
+
     // i put new data in status with this rule:
-    // first: if we have a mems i add it; second: if we have something inside fifoofinertial3data.
+    // first: if we have something inside fifooftemperaturedata.
     // if nothing: i set data invalid
-    if(eores_OK == eo_mems_Get(eo_mems_GetHandle(), &memsdata, eok_reltimeZERO, &sensor, NULL))
+    if(eobool_false == eo_vector_Empty(p->fifooftemperaturedata))
     {
-        //eo_errman_Trace(eo_errman_GetHandle(), "tx mems", s_eobj_ownname);
-        // ok, now i fill data
-        uint8_t index = (mems_gyroscope_l3g4200 == sensor) ? (inertials3_mems_gyro) : (inertials3_mems_accel);
-        i3data.id = p->frommems2id[index];
-        i3data.typeofsensor = (mems_gyroscope_l3g4200 == sensor) ? eoas_inertial3_gyros_ems_st_l3g4200d : eoas_inertial3_accel_ems_st_lis3x;
-        i3data.status = 0; // ok so far
-        i3data.timestamp = memsdata.timestamp / 1000; // nothing so far.
-        i3data.x = memsdata.x;
-        i3data.y = memsdata.y;
-        i3data.z = memsdata.z;
-        eo_array_PushBack(statusarrayofdata, &i3data);
-    }
-    else if(eobool_false == eo_vector_Empty(p->fifoofinertial3data))
-    {
-        uint8_t fifosize = eo_vector_Size(p->fifoofinertial3data);
+        uint8_t fifosize = eo_vector_Size(p->fifooftemperaturedata);
         uint8_t capacity =  eo_array_Capacity(statusarrayofdata); 
         uint8_t nitems = (fifosize < capacity) ? fifosize : capacity;
         for(uint8_t i=0; i<nitems; i++)
         {
-            eOas_inertial3_data_t * item = (eOas_inertial3_data_t*) eo_vector_Front(p->fifoofinertial3data);
+            eOas_temperature_data_t * item = (eOas_temperature_data_t*) eo_vector_Front(p->fifooftemperaturedata);
             if(NULL != item)
             {
                 eo_array_PushBack(statusarrayofdata, item);            
-                eo_vector_PopFront(p->fifoofinertial3data);   
-                //eo_errman_Trace(eo_errman_GetHandle(), "tx mtb", s_eobj_ownname);
+                eo_vector_PopFront(p->fifooftemperaturedata);   
+                //eo_errman_Trace(eo_errman_GetHandle(), "tx temp", s_eobj_ownname);
             }  
         }        
     }
@@ -894,7 +844,7 @@ extern eOresult_t eo_inertials3_Tick(EOtheInertials3 *p, eObool_t resetstatus)
 
 
 
-extern eOresult_t eo_inertials3_Config(EOtheInertials3 *p, eOas_inertial3_config_t* config)
+extern eOresult_t eo_temperatures_Config(EOtheTemperatures *p, eOas_temperature_config_t* config)
 {
     if((NULL == p) || (NULL == config))
     {
@@ -923,15 +873,11 @@ extern eOresult_t eo_inertials3_Config(EOtheInertials3 *p, eOas_inertial3_config
     // then we check enabled mask and datarate
        
     uint8_t originalrate = p->sensorsconfig.datarate;
-    if(p->sensorsconfig.datarate < 5)
+    if(p->sensorsconfig.datarate < 20)
     {
-        p->sensorsconfig.datarate = 5;        
+        p->sensorsconfig.datarate = 20;        
     }
     
-    if(p->sensorsconfig.datarate > 200)
-    {
-        p->sensorsconfig.datarate = 200;          
-    }
     
     if(originalrate != p->sensorsconfig.datarate)
     {
@@ -940,7 +886,7 @@ extern eOresult_t eo_inertials3_Config(EOtheInertials3 *p, eOas_inertial3_config
         errdes.sourceaddress      = 0;
         errdes.par16              = (originalrate << 8) | (p->sensorsconfig.datarate);
         errdes.par64              = 0;        
-        errdes.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_inertials3_changed_requestedrate);
+        errdes.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_temperatures_changed_requestedrate);
         p->diagnostics.errorType = eo_errortype_warning;                
         eo_errman_Error(eo_errman_GetHandle(), p->diagnostics.errorType, NULL, s_eobj_ownname, &errdes);        
     }
@@ -948,20 +894,20 @@ extern eOresult_t eo_inertials3_Config(EOtheInertials3 *p, eOas_inertial3_config
     
     // now ... we need to change the masks according to p->sensorsconfig.maskofenabled
     
-    s_eo_inertials3_build_maps(p, p->sensorsconfig.enabled);
+    s_eo_temperatures_build_maps(p, p->sensorsconfig.enabled);
     
     
     p->configured = eobool_true;    
  
     // ok guys: now we transmit the configuration to each one of the sensors which have a non-zero bit inside teh p->config2.enabled mask.
-    // WAIT A MINUTE: we do it inside eo_inertials3_Start() !!!!!!!!!!!!
+    // WAIT A MINUTE: we do it inside eo_temperatures_Start() !!!!!!!!!!!!
 
     
     return(eores_OK);           
 }
 
 
-extern eOresult_t eo_inertials3_AcceptCANframe(EOtheInertials3 *p, eOas_inertial3_type_t type, eOcanframe_t *frame, eOcanport_t port)
+extern eOresult_t eo_temperatures_AcceptCANframe(EOtheTemperatures *p, eOas_temperature_type_t type, eOcanframe_t *frame, eOcanport_t port)
 {
     if(NULL == p)
     {
@@ -984,19 +930,12 @@ extern eOresult_t eo_inertials3_AcceptCANframe(EOtheInertials3 *p, eOas_inertial
         return(eores_OK);
     }  
     
-    if(eobool_false == s_eo_inertials3_activestate_can_accept_canframe())
+    if(eobool_false == s_eo_temperatures_activestate_can_accept_canframe())
     {
         return(eores_OK);
     }
     
-    // VERY IMPORTANT: the MTB can board does not tell whether we have an internal or external accel. it should do that but it does not.
-    // hence, in type we use indifferently eoas_inertial_accel_mtb_int or eoas_inertial_accel_mtb_ext
-    
-    // the inertial entity is in ...
-    //p->inertial2 = p->inertial2;    
-    // however, we dont use it ...
-    // we put what we have inside a fifo of eOas_inertial3_data_t
-    eOas_inertial3_data_t data = {0};
+    eOas_temperature_data_t data = {0};
        
     
     eObrd_canlocation_t loc = {0};    
@@ -1007,11 +946,11 @@ extern eOresult_t eo_inertials3_AcceptCANframe(EOtheInertials3 *p, eOas_inertial
     uint8_t id = NOID08;
 
     
-    if(eobool_true == eo_vector_Full(p->fifoofinertial3data))
+    if(eobool_true == eo_vector_Full(p->fifooftemperaturedata))
     {
         // damn... a loss of can frames
         eOerrmanDescriptor_t des = {0};
-        des.code            = eoerror_code_get(eoerror_category_InertialSensor, eoerror_value_IS_arrayofinertialdataoverflow);
+        des.code            = eoerror_code_get(eoerror_category_InertialSensor, eoerror_value_AS_arrayoftemperaturedataoverflow);
         des.par16           = (frame->id & 0x0fff) | ((frame->size & 0x000f) << 12);
         des.par64           = eo_common_canframe_data2u64((eOcanframe_t*)frame);
         des.sourceaddress   = EOCANPROT_FRAME_GET_SOURCE(frame);
@@ -1019,61 +958,15 @@ extern eOresult_t eo_inertials3_AcceptCANframe(EOtheInertials3 *p, eOas_inertial
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, NULL, &des);    
         
         // BUT dont want to lose NEW data ... i could just call a pop front to remove oldest data
-        //eo_vector_PopFront(p->fifoofinertial3data);  
+        //eo_vector_PopFront(p->fifooftemperaturedata);  
         // BUT .. as i dont want to througth data away, i decide that i put it inside the status.
-        // in short: i call eo_inertials3_Tick(p, true) which already does that        
-        eo_inertials3_Tick(p, eobool_true);      
+        // in short: i call eo_temperatures_Tick(p, true) which already does that        
+        eo_temperatures_Tick(p, eobool_true);      
     }
         
-    switch(type)
-    {
-        case eoas_inertial3_accel_mtb_int:
-        case eoas_inertial3_accel_mtb_ext:
-        case eoas_inertial3_gyros_mtb_ext:
-        {
-            // case of a canframe with [xx|yy|zz]
-            data.x = (int16_t)((frame->data[1]<<8) + frame->data[0]);
-            data.y = (int16_t)((frame->data[3]<<8) + frame->data[2]);
-            data.z = (int16_t)((frame->data[5]<<8) + frame->data[4]);               
-        } break;
-        
-        case eoas_inertial3_imu_acc:     
-        case eoas_inertial3_imu_mag:
-        case eoas_inertial3_imu_gyr:
-        case eoas_inertial3_imu_eul:
-        case eoas_inertial3_imu_lia:
-        case eoas_inertial3_imu_grv:
-        {
-            // case of a canframe with [seq|snsr|x-lsb|x-msb|y-lsb|y-msb|z-lsb|z-msb]
-            data.seq = frame->data[0];
-            data.x = (int16_t)(((int16_t)frame->data[3]<<8) + frame->data[2]);
-            data.y = (int16_t)(((int16_t)frame->data[5]<<8) + frame->data[4]);
-            data.z = (int16_t)(((int16_t)frame->data[7]<<8) + frame->data[6]);    
-        } break;
-        
-        case eoas_inertial3_imu_qua:
-        {
-            // case of a canframe with [w-lsb|w-msb|x-lsb|x-msb|y-lsb|y-msb|z-lsb|z-msb]
-            data.w = (int16_t)((int16_t)(frame->data[1]<<8) + frame->data[0]);
-            data.x = (int16_t)((int16_t)(frame->data[3]<<8) + frame->data[2]);
-            data.y = (int16_t)((int16_t)(frame->data[5]<<8) + frame->data[4]);
-            data.z = (int16_t)((int16_t)(frame->data[7]<<8) + frame->data[6]);   
-        } break;
-        
-        case eoas_inertial3_imu_status:
-        {
-            // case of a canframe with [seq|gyrsta|accsta|magsta|(acquisitiontime32bitusec)]
-            data.seq = frame->data[0];
-            data.status = frame->data[1] + frame->data[2] + frame->data[3];          
-        } break;
-        
-        default:
-        {
-            
-        } break;
-    }
+
     
-    if(eobool_false == s_eo_inertials3_get_id(loc, type, &id))
+    if(eobool_false == s_eo_temperatures_get_id(loc, type, &id))
     {
         // send up diagnostics
         eOerrmanDescriptor_t des = {0};
@@ -1087,11 +980,12 @@ extern eOresult_t eo_inertials3_AcceptCANframe(EOtheInertials3 *p, eOas_inertial
     }
     
     data.typeofsensor = type;
+    data.value = (int16_t)((frame->data[2]<<8) + frame->data[1]);   // data[1] is a mask which tells if the value is in [2][1] or in [4][3] ... but it is always in first position
     data.timestamp =  eov_sys_LifeTimeGet(eov_sys_GetHandle()) / 1000;
     data.id = id;
         
-    // ok, now we can pushback data into the fifoofinertial3data   
-    eo_vector_PushBack(p->fifoofinertial3data, &data);
+    // ok, now we can pushback data into the fifooftemperaturedata   
+    eo_vector_PushBack(p->fifooftemperaturedata, &data);
     
 #if 0    
         eOerrmanDescriptor_t des = {0};
@@ -1103,7 +997,7 @@ extern eOresult_t eo_inertials3_AcceptCANframe(EOtheInertials3 *p, eOas_inertial
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_warning, NULL, NULL, &des);  
 #endif
     
-    s_eo_inertials3_presenceofcanboards_touch(p, loc);
+    s_eo_temperatures_presenceofcanboards_touch(p, loc);
     
     return(eores_OK);      
 }
@@ -1116,23 +1010,22 @@ extern eOresult_t eo_inertials3_AcceptCANframe(EOtheInertials3 *p, eOas_inertial
 // -- in here .... so that all things related to Inertial are in a unique place
 
 
-extern void eoprot_fun_INIT_as_inertial3_config(const EOnv* nv)
+extern void eoprot_fun_INIT_as_temperature_config(const EOnv* nv)
 {
-    eOas_inertial3_config_t* config = (eOas_inertial3_config_t*) eo_nv_RAM(nv);
+    eOas_temperature_config_t* config = (eOas_temperature_config_t*) eo_nv_RAM(nv);
     
-    config->datarate = s_eo_default_inertial3config.datarate;
-    config->enabled = s_eo_default_inertial3config.enabled;
-    config->numberofitemstofillateachtick = 0;
+    config->datarate = s_eo_default_temperatureconfig.datarate;
+    config->enabled = s_eo_default_temperatureconfig.enabled;
 }
 
 
-extern void eoprot_fun_INIT_as_inertial3_status(const EOnv* nv)
+extern void eoprot_fun_INIT_as_temperature_status(const EOnv* nv)
 {
-    eOas_inertial3_status_t* status = (eOas_inertial3_status_t*) eo_nv_RAM(nv);  
+    eOas_temperature_status_t* status = (eOas_temperature_status_t*) eo_nv_RAM(nv);  
     // must initialise it as an array
     
-    uint8_t capacity = eOas_inertials3_data_maxnumber;
-    uint8_t itemsize = sizeof(eOas_inertial3_data_t);
+    uint8_t capacity = eOas_temperature_data_maxnumber;
+    uint8_t itemsize = sizeof(eOas_temperature_data_t);
     uint8_t size = 0;
     EOarray* array = NULL;
 
@@ -1141,9 +1034,9 @@ extern void eoprot_fun_INIT_as_inertial3_status(const EOnv* nv)
 }
 
                 
-extern eObool_t eocanprotINperiodic_redefinable_SkipParsingOf_ANY_PERIODIC_INERTIAL3_MSG(eOcanframe_t *frame, eOcanport_t port)
+extern eObool_t eocanprotASperiodic_redefinable_SkipParsingOf_ANY_PERIODIC_THERMOMETER_MSG(eOcanframe_t *frame, eOcanport_t port)
 {   
-    EOtheInertials3 *p = &s_eo_theinertials3;  
+    EOtheTemperatures *p = &s_eo_thetemperature;  
     
     if(NULL == frame)
     {
@@ -1151,7 +1044,7 @@ extern eObool_t eocanprotINperiodic_redefinable_SkipParsingOf_ANY_PERIODIC_INERT
     }    
     
     // marco.accame:        
-    // i dont want to put data in the fifoofinertial3data when we are not in the control loop.
+    // i dont want to put data in the fifooftemperaturedata when we are not in the control loop.
     // moreover: i put it in its inside only if we have called _Start() 
     
     if(eobool_false == p->service.started)
@@ -1175,85 +1068,16 @@ extern eObool_t eocanprotINperiodic_redefinable_SkipParsingOf_ANY_PERIODIC_INERT
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-static eOresult_t s_eo_inertials3_verify_local_sensors(EOtheInertials3 *p, const eOmn_serv_configuration_t * servcfg)
-{
-    eOresult_t res = eores_OK;
-    
-    uint64_t errormask = 0; // at most i have eOas_inertials3_maxnumber = 48 items
-    uint8_t numoferrors = 0;
-    uint8_t numofsensors = eo_array_Size(p->arrayofsensordescriptors);    
-    for(uint8_t i=0; i<numofsensors; i++)
-    {
-        eOas_inertial3_descriptor_t *des = (eOas_inertial3_descriptor_t*) eo_array_At(p->arrayofsensordescriptors, i);
-        if(NULL != des)
-        {
-            if(eobrd_place_eth == des->on.any.place)
-            {
-                // it can be ... eoas_inertial_gyros_ems_st_l3g4200d only
-                if((eoas_inertial3_gyros_ems_st_l3g4200d == des->typeofsensor) && (eobrd_ems4 == des->typeofboard) && (eobool_true == eo_mems_IsSensorSupported(eo_mems_GetHandle(), mems_gyroscope_l3g4200)))
-                {
-                    // ok, verify is ok . we keep res = eores_OK.
-                }
-//                else if((eoas_inertial_accel_ems_st_lis3x == des->type) && (hal_true == hal_accelometer_supported_is(hal_acceleromter1)))
-//                {
-//                }    
-                else
-                {
-                    // we dont support it ... must do something
-                    res = eores_NOK_generic; 
-                    eo_common_dword_bitset(&errormask, i);
-                    numoferrors ++;
-                }
-            }
-        }
-    }
-
-    if(eores_OK == res)
-    {
-        // must enable .... 
-    }
-    else
-    {        
-        p->diagnostics.errorDescriptor.sourcedevice       = eo_errman_sourcedevice_localboard;
-        p->diagnostics.errorDescriptor.sourceaddress      = 0;
-        p->diagnostics.errorDescriptor.par16              = numoferrors;
-        p->diagnostics.errorDescriptor.par64              = 0;
-       
-        EOaction_strg astrg = {0};
-        EOaction *act = (EOaction*)&astrg;
-        eo_action_SetCallback(act, s_eo_inertials3_send_periodic_error_report, p, eov_callbackman_GetTask(eov_callbackman_GetHandle()));        
-        
-        p->diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_inertials3_failed_unsupportedsensor);
-        p->diagnostics.errorType = eo_errortype_error;                
-        eo_errman_Error(eo_errman_GetHandle(), p->diagnostics.errorType, NULL, s_eobj_ownname, &p->diagnostics.errorDescriptor);
-        
-        if(0 != p->diagnostics.reportPeriod)
-        {
-            p->diagnostics.errorCallbackCount = EOK_int08dummy;
-            eo_timer_Start(p->diagnostics.reportTimer, eok_abstimeNOW, p->diagnostics.reportPeriod, eo_tmrmode_FOREVER, act);   
-        }  
-        
-        p->service.state = eomn_serv_state_failureofverify;
-        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_inertials3, p->service.state);
-        if(NULL != p->service.onverify)
-        {
-            p->service.onverify(p, eobool_false); 
-        }    
-             
-    }
-        
-    return(res);
-}
 
 
-static eOresult_t s_eo_inertials3_TXstart(EOtheInertials3 *p)
+static eOresult_t s_eo_temperatures_TXstart(EOtheTemperatures *p)
 { 
     if(eobool_false == p->configured)
     {   // dont have a configured service
         return(eores_OK);
     }    
     
-    if((0 == p->canmap_brd_active[0]) && (0 == p->canmap_brd_active[1]) && (0 == p->ethmap_mems_active))
+    if((0 == p->canmap_brd_active[0]) && (0 == p->canmap_brd_active[1]))
     {   // no can boards or onboard sensors configured
         return(eores_OK);
     } 
@@ -1262,57 +1086,41 @@ static eOresult_t s_eo_inertials3_TXstart(EOtheInertials3 *p)
     {   // no can boards or local mems enabled
         return(eores_OK);
     } 
-    
-    if(eobool_true == eo_common_byte_bitcheck(p->ethmap_mems_active, inertials3_mems_gyro))
-    {
-        eo_mems_Config(eo_mems_GetHandle(), &p->memsconfig[inertials3_mems_gyro]);
-        eo_mems_Start(eo_mems_GetHandle());
-    }                        
- 
-    
-    #warning create the can message for inertials3 config and place it in another place ...         
-    s_eo_inertials3_imu_configure(p);
+                        
+  
+    s_eo_temperatures_chip_configure(p);
 
-    #warning create the can message for inertials3 tx start and place it in here ...     
-    s_eo_inertials3_imu_transmission(p, eobool_true, p->sensorsconfig.datarate);
+    s_eo_temperatures_chip_transmission(p, eobool_true, p->sensorsconfig.datarate);
     
     
     p->transmissionisactive = eobool_true;
-    s_eo_inertials3_presenceofcanboards_start(p);
+    s_eo_temperatures_presenceofcanboards_start(p);
     
     return(eores_OK);   
 }
 
 
-static eOresult_t s_eo_inertials3_TXstop(EOtheInertials3 *p)
+static eOresult_t s_eo_temperatures_TXstop(EOtheTemperatures *p)
 {
     if(eobool_false == p->configured)
     {   // nothing to do because we dont have a configured service 
         return(eores_OK);
     }     
-
-    #warning create the inetrials3 can message
-    
-    // stop the imus
-    s_eo_inertials3_imu_transmission(p, eobool_false, p->sensorsconfig.datarate);
-    
-    // stop mtbs
-    #warning TODO: s_eo_inertials3_mtb_transmission();
-    
-    // stop the mems
-    eo_mems_Stop(eo_mems_GetHandle());
-
+  
+    // stop the tx
+    s_eo_temperatures_chip_transmission(p, eobool_false, p->sensorsconfig.datarate);
+       
     p->transmissionisactive = eobool_false;
-    s_eo_inertials3_presenceofcanboards_reset(p);
+    s_eo_temperatures_presenceofcanboards_reset(p);
                
     return(eores_OK);
 }
 
 
-//#define EOINERTIALS3_ALWAYS_ACCEPT_CANFRAMES_IN_ACTIVE_MODE
-static eObool_t s_eo_inertials3_activestate_can_accept_canframe(void)
+//#define EOTEMPERATURE3_ALWAYS_ACCEPT_CANFRAMES_IN_ACTIVE_MODE
+static eObool_t s_eo_temperatures_activestate_can_accept_canframe(void)
 {
-#if     defined(EOINERTIALS3_ALWAYS_ACCEPT_CANFRAMES_IN_ACTIVE_MODE)
+#if     defined(EOTEMPERATURE3_ALWAYS_ACCEPT_CANFRAMES_IN_ACTIVE_MODE)
     // in this case the service.active inertials always accepts can frames, even if the run mode is not.
     // it is up to robotInterface to put system in run mode, so that the overflow of fifo is avoided
     return(eobool_true);
@@ -1329,28 +1137,17 @@ static eObool_t s_eo_inertials3_activestate_can_accept_canframe(void)
 }
 
 
-static void s_eo_inertials3_build_maps(EOtheInertials3* p, uint32_t enablemask)
+static void s_eo_temperatures_build_maps(EOtheTemperatures* p, uint32_t enablemask)
 {
     uint8_t numofsensors = eo_array_Size(p->arrayofsensordescriptors);    
   
     // at first we disable all. 
     
     memset(p->canmap_brd_active, 0, sizeof(p->canmap_brd_active));
-    p->ethmap_mems_active = 0;
-    memset(p->frommems2id, NOID08, sizeof(p->frommems2id));
-    memset(p->memsparam, 255, sizeof(p->memsparam));    
-    
-//    memset(p->fromcan2id, NOID08, sizeof(p->fromcan2id));
-
-
-//    memset(p->canmap_mtb_accel_int, 0, sizeof(p->canmap_mtb_accel_int));
-//    memset(p->canmap_mtb_accel_ext, 0, sizeof(p->canmap_mtb_accel_ext));
-//    memset(p->canmap_mtb_gyros_ext, 0, sizeof(p->canmap_mtb_gyros_ext));
-    p->ethmap_mems_active = 0;
 
     for(uint8_t i=0; i<numofsensors; i++)
     {
-        eOas_inertial3_descriptor_t *des = (eOas_inertial3_descriptor_t*) eo_array_At(p->arrayofsensordescriptors, i);
+        eOas_temperature_descriptor_t *des = (eOas_temperature_descriptor_t*) eo_array_At(p->arrayofsensordescriptors, i);
         if(NULL != des)
         {
             eObool_t enabled = eo_common_word_bitcheck(enablemask, i);
@@ -1363,55 +1160,8 @@ static void s_eo_inertials3_build_maps(EOtheInertials3* p, uint32_t enablemask)
             if(eobrd_place_can == des->on.any.place)
             {                
                 eo_common_hlfword_bitset(&p->canmap_brd_active[des->on.can.port], des->on.can.addr); 
-
-                switch(des->typeofsensor)
-                {
-//                    case eoas_inertial_accel_mtb_int:
-//                    {
-//                        p->fromcan2id[des->on.can.port][des->on.can.addr][eoas_inertial_accel_mtb_int-eoas_inertial_accel_mtb_int] = i;
-//                        eo_common_hlfword_bitset(&p->canmap_mtb_accel_int[des->on.can.port], des->on.can.addr);                        
-//                    } break;
-
-//                    case eoas_inertial_accel_mtb_ext:
-//                    {       
-//                        p->fromcan2id[des->on.can.port][des->on.can.addr][eoas_inertial_accel_mtb_ext-eoas_inertial_accel_mtb_int] = i;
-//                        eo_common_hlfword_bitset(&p->canmap_mtb_accel_ext[des->on.can.port], des->on.can.addr);
-//                    } break;  
-                    
-//                    case eoas_inertial_gyros_mtb_ext:
-//                    {                        
-//                        p->fromcan2id[des->on.can.port][des->on.can.addr][eoas_inertial_gyros_mtb_ext-eoas_inertial_accel_mtb_int] = i;
-//                        eo_common_hlfword_bitset(&p->canmap_mtb_gyros_ext[des->on.can.port], des->on.can.addr);                        
-//                    } break; 
-                    
-                    default:
-                    {
-                    } break;
-                }
-                
             }
-            else if(eobrd_place_eth == des->on.any.place)
-            {           
-                uint8_t n = (eoas_inertial3_gyros_ems_st_l3g4200d == des->typeofsensor) ? (inertials3_mems_gyro) : (inertials3_mems_accel);  
 
-                if(inertials3_mems_gyro == n)
-                {
-                    eo_common_byte_bitset(&p->ethmap_mems_active, n);                
-                    p->frommems2id[n] = i;  
-                    p->memsparam[n] = hal_gyroscope_range_500dps;     
-                    if((des->on.eth.id > 0) && (des->on.eth.id < 4))
-                    {   // hack to change the range
-                        p->memsparam[n] = (hal_gyroscope_range_t) ((uint8_t)(des->on.eth.id)-1);
-                    }
-                    p->memsconfig[n].acquisitionrate = p->sensorsconfig.datarate * EOK_reltime1ms;
-                    p->memsconfig[n].sensor = mems_gyroscope_l3g4200;
-                    p->memsconfig[n].properties.gyroscope.range = (hal_gyroscope_range_t)p->memsparam[n];
-                }
-                else 
-                {
-                    // ethmap_mems_active stays unset, hence EOtheMEMS will not be started 
-                }
-            }
         }
     }    
     
@@ -1419,25 +1169,25 @@ static void s_eo_inertials3_build_maps(EOtheInertials3* p, uint32_t enablemask)
 
 
 // it is the last discovery of can boards... 
-static eOresult_t s_eo_inertials3_onstop_search4canboards(void *par, EOtheCANdiscovery2* cd2, eObool_t searchisok)
+static eOresult_t s_eo_temperatures_onstop_search4canboards(void *par, EOtheCANdiscovery2* cd2, eObool_t searchisok)
 {
     const eOmn_serv_configuration_t * servcfg = (const eOmn_serv_configuration_t *)par;
-    EOtheInertials3 *p = &s_eo_theinertials3;
+    EOtheTemperatures *p = &s_eo_thetemperature;
     
     if(eobool_true == searchisok)
     {
         p->service.state = eomn_serv_state_verified;
-        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_inertials3, p->service.state);
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_temperatures, p->service.state);
     }
     else
     {   
         p->service.state = eomn_serv_state_failureofverify;
-        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_inertials3, p->service.state);
+        eo_service_hid_SynchServiceState(eo_services_GetHandle(), eomn_serv_category_temperatures, p->service.state);
     }
     
     if((eobool_true == searchisok) && (eobool_true == p->service.activateafterverify))
     {
-        eo_inertials3_Activate(p, servcfg);        
+        eo_temperatures_Activate(p, servcfg);        
     }
 
     p->diagnostics.errorDescriptor.sourcedevice      = eo_errman_sourcedevice_localboard;
@@ -1447,12 +1197,12 @@ static eOresult_t s_eo_inertials3_onstop_search4canboards(void *par, EOtheCANdis
    
     EOaction_strg astrg = {0};
     EOaction *act = (EOaction*)&astrg;
-    eo_action_SetCallback(act, s_eo_inertials3_send_periodic_error_report, p, eov_callbackman_GetTask(eov_callbackman_GetHandle()));
+    eo_action_SetCallback(act, s_eo_temperatures_send_periodic_error_report, p, eov_callbackman_GetTask(eov_callbackman_GetHandle()));
 
     if(eobool_true == searchisok)
     {        
         p->diagnostics.errorType = eo_errortype_debug;
-        p->diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_inertials3_ok);
+        p->diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_temperatures_ok);
         eo_errman_Error(eo_errman_GetHandle(), p->diagnostics.errorType, NULL, s_eobj_ownname, &p->diagnostics.errorDescriptor);
         
         if((0 != p->diagnostics.repetitionOKcase) && (0 != p->diagnostics.reportPeriod))
@@ -1494,7 +1244,7 @@ static eOresult_t s_eo_inertials3_onstop_search4canboards(void *par, EOtheCANdis
         
         p->diagnostics.errorDescriptor.par64 = ((uint64_t)maskofmissingCAN1) | ((uint64_t)maskofmissingCAN2<<16) | ((uint64_t)maskofincompatibleCAN1<<32) | ((uint64_t)maskofincompatibleCAN2<<32);
         
-        p->diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_inertials3_failed_candiscovery);
+        p->diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_temperatures_failed_candiscovery);
         p->diagnostics.errorType = eo_errortype_error;                
         eo_errman_Error(eo_errman_GetHandle(), p->diagnostics.errorType, NULL, s_eobj_ownname, &p->diagnostics.errorDescriptor);
         
@@ -1515,13 +1265,13 @@ static eOresult_t s_eo_inertials3_onstop_search4canboards(void *par, EOtheCANdis
 }
 
 
-static void s_eo_inertials3_send_periodic_error_report(void *par)
+static void s_eo_temperatures_send_periodic_error_report(void *par)
 {
-    EOtheInertials3* p = (EOtheInertials3*) par;
+    EOtheTemperatures* p = (EOtheTemperatures*) par;
     
     eo_errman_Error(eo_errman_GetHandle(), p->diagnostics.errorType, NULL, s_eobj_ownname, &p->diagnostics.errorDescriptor);
 
-    if(eoerror_value_CFG_inertials3_failed_candiscovery == eoerror_code2value(p->diagnostics.errorDescriptor.code))
+    if(eoerror_value_CFG_temperatures_failed_candiscovery == eoerror_code2value(p->diagnostics.errorDescriptor.code))
     {   // if i dont find some boards, i keep on sending the discovery results up. it is a temporary diagnostics tricks until we use the verification of services at bootstrap
         eo_candiscovery2_SendLatestSearchResults(eo_candiscovery2_GetHandle());
     }
@@ -1536,9 +1286,9 @@ static void s_eo_inertials3_send_periodic_error_report(void *par)
     }
 }
 
-static eObool_t s_eo_inertials3_isID32relevant(uint32_t id32)
+static eObool_t s_eo_temperatures_isID32relevant(uint32_t id32)
 {
-    static const uint32_t mask0 = (((uint32_t)eoprot_endpoint_analogsensors) << 24) | (((uint32_t)eoprot_entity_as_inertial3) << 16);
+    static const uint32_t mask0 = (((uint32_t)eoprot_endpoint_analogsensors) << 24) | (((uint32_t)eoprot_entity_as_temperature) << 16);
     
     if((id32 & mask0) == mask0)
     {
@@ -1548,25 +1298,15 @@ static eObool_t s_eo_inertials3_isID32relevant(uint32_t id32)
     return(eobool_false); 
 }
 
-static eObool_t s_eo_inertials3_get_id(eObrd_canlocation_t loc, eOas_inertial3_type_t type, uint8_t *id)
+static eObool_t s_eo_temperatures_get_id(eObrd_canlocation_t loc, eOas_temperature_type_t type, uint8_t *id)
 {
-    // EOtheInertials3* p = &s_eo_theinertials3;
+    // EOtheTemperatures* p = &s_eo_thetemperature;
     
     eObool_t ret = eobool_true;
     
     switch(type)
     {
-        case eoas_inertial3_accel_mtb_int:
-        case eoas_inertial3_accel_mtb_ext:
-        case eoas_inertial3_gyros_mtb_ext:
-        case eoas_inertial3_imu_acc:     
-        case eoas_inertial3_imu_mag:
-        case eoas_inertial3_imu_gyr:
-        case eoas_inertial3_imu_eul:
-        case eoas_inertial3_imu_qua:
-        case eoas_inertial3_imu_lia:
-        case eoas_inertial3_imu_grv:
-        case eoas_inertial3_imu_status:
+        case eoas_temperature_t1:
         {
             ret = eobool_true;            
         } break;
@@ -1593,52 +1333,6 @@ static eObool_t s_eo_inertials3_get_id(eObrd_canlocation_t loc, eOas_inertial3_t
 
     *id = (loc.port << 4) | loc.addr;
     
-#if 0    
-    uint8_t *candidates = p->fromcan2id[loc.port][loc.addr];
-
-    switch(type)
-    {
-        case eoas_inertial3_accel_mtb_int:
-        {
-            *id = candidates[0];
-        } break;
-        case eoas_inertial3_accel_mtb_ext:
-        {
-            *id = candidates[1];
-        } break;
-        case eoas_inertial3_gyros_mtb_ext:
-        {
-            *id = candidates[2];
-        } break;
-        case eoas_inertial3_imu_acc:
-        {
-            *id = candidates[0];
-        } break;            
-
-        case eoas_inertial3_imu_gyr:
-        {
-            *id = candidates[1];
-        } break;
-        //case eoas_inertial3_imu_eul:
-        //case eoas_inertial3_imu_qua:
-        case eoas_inertial3_imu_lia:
-        {
-            *id = candidates[2];
-        } break;
-        //case eoas_inertial3_imu_grv:
-        case eoas_inertial3_imu_status:
-        {
-            *id = candidates[3];
-        } break;
-        
-        default:
-        {
-            *id = NOID08;
-        }
-    }
-
-#endif
-
 
     if(NOID08 == *id)
     {
@@ -1649,16 +1343,16 @@ static eObool_t s_eo_inertials3_get_id(eObrd_canlocation_t loc, eOas_inertial3_t
 }
 
 
-static void s_eo_inertials3_presenceofcanboards_reset(EOtheInertials3 *p)
+static void s_eo_temperatures_presenceofcanboards_reset(EOtheTemperatures *p)
 {
     memset(p->not_heardof_target, 0, sizeof(p->not_heardof_target));
     memset(p->not_heardof_status, 0, sizeof(p->not_heardof_status));
     p->not_heardof_counter = 0;
 }
 
-static void s_eo_inertials3_presenceofcanboards_build(EOtheInertials3 *p)
+static void s_eo_temperatures_presenceofcanboards_build(EOtheTemperatures *p)
 {
-    s_eo_inertials3_presenceofcanboards_reset(p);
+    s_eo_temperatures_presenceofcanboards_reset(p);
 
     // now i must build the canmaps used to monitor presence 
     uint8_t numofsensors = eo_array_Size(p->arrayofsensordescriptors);   
@@ -1667,7 +1361,7 @@ static void s_eo_inertials3_presenceofcanboards_build(EOtheInertials3 *p)
 
     for(uint8_t i=0; i<numofsensors; i++)
     {
-        eOas_inertial3_descriptor_t *des = (eOas_inertial3_descriptor_t*) eo_array_At(p->arrayofsensordescriptors, i);
+        eOas_temperature_descriptor_t *des = (eOas_temperature_descriptor_t*) eo_array_At(p->arrayofsensordescriptors, i);
         if(NULL != des)
         {
             if(eobrd_place_can == des->on.any.place)
@@ -1679,7 +1373,7 @@ static void s_eo_inertials3_presenceofcanboards_build(EOtheInertials3 *p)
 }
 
 
-static void s_eo_inertials3_presenceofcanboards_start(EOtheInertials3 *p)
+static void s_eo_temperatures_presenceofcanboards_start(EOtheTemperatures *p)
 {
     // prepare not_heardof_target ... it is equal to canmap_brd_active in or with those
     // boards which are searched in discovery
@@ -1699,13 +1393,13 @@ static void s_eo_inertials3_presenceofcanboards_start(EOtheInertials3 *p)
 }
 
 
-static void s_eo_inertials3_presenceofcanboards_touch(EOtheInertials3 *p, eObrd_canlocation_t loc)
+static void s_eo_temperatures_presenceofcanboards_touch(EOtheTemperatures *p, eObrd_canlocation_t loc)
 {
     eo_common_hlfword_bitclear(&p->not_heardof_status[loc.port], loc.addr);
 }
 
 
-static void s_eo_inertials3_presenceofcanboards_tick(EOtheInertials3 *p)
+static void s_eo_temperatures_presenceofcanboards_tick(EOtheTemperatures *p)
 {
     if((p->not_heardof_counter++) > 1000)
     {        
@@ -1726,14 +1420,14 @@ static void s_eo_inertials3_presenceofcanboards_tick(EOtheInertials3 *p)
     }
 }
 
-static void s_eo_inertials3_imu_transmission(EOtheInertials3 *p, eObool_t on, uint8_t period)
+static void s_eo_temperatures_chip_transmission(EOtheTemperatures *p, eObool_t on, uint8_t periodsec)
 {
 
-    icubCanProto_imu_transmit_t transmit = {0};
-    transmit.period = (eobool_true == on) ? (period) : (0);
+    icubCanProto_thermo_transmit_t transmit = {0};
+    transmit.periodsec = (eobool_true == on) ? (periodsec) : (0);
     
     p->sharedcan.command.clas = eocanprot_msgclass_pollingAnalogSensor;
-    p->sharedcan.command.type  = ICUBCANPROTO_POL_AS_CMD__IMU_TRANSMIT;
+    p->sharedcan.command.type  = ICUBCANPROTO_POL_AS_CMD__THERMOMETER_TRANSMIT;
     p->sharedcan.command.value = &transmit;
     
     eObrd_canlocation_t location = {0};
@@ -1753,14 +1447,14 @@ static void s_eo_inertials3_imu_transmission(EOtheInertials3 *p, eObool_t on, ui
     }    
 }
 
-static void s_eo_inertials3_imu_configure(EOtheInertials3 *p)
+static void s_eo_temperatures_chip_configure(EOtheTemperatures *p)
 {
-    icubCanProto_imu_config_t imuconfig = {0};
-    imuconfig.fusionmode = 1;
+    icubCanProto_thermo_config_t tconfig = {0};
+    tconfig.sensormask = 1;
     
     p->sharedcan.command.clas = eocanprot_msgclass_pollingAnalogSensor;
-    p->sharedcan.command.type  = ICUBCANPROTO_POL_AS_CMD__IMU_CONFIG_SET;
-    p->sharedcan.command.value = &imuconfig;
+    p->sharedcan.command.type  = ICUBCANPROTO_POL_AS_CMD__THERMOMETER_CONFIG_SET;
+    p->sharedcan.command.value = &tconfig;
     
     eObrd_canlocation_t location = {0};
     location.insideindex = eobrd_caninsideindex_none;
@@ -1773,21 +1467,21 @@ static void s_eo_inertials3_imu_configure(EOtheInertials3 *p)
             if(eobool_true == eo_common_hlfword_bitcheck(p->canmap_brd_active[port], addr))
             {                                             
                 location.addr = addr;
-                // and now i fill enabledsensors and i send the message
-                imuconfig.enabledsensors = 0; 
+                // and now i fill sensormask and i send the message.... but sensormask is always 1
+                tconfig.sensormask = 0; 
                 for(uint8_t i=0; i<numofsensors; i++)
                 {
-                    eOas_inertial3_descriptor_t *des = (eOas_inertial3_descriptor_t*) eo_array_At(p->arrayofsensordescriptors, i);
+                    eOas_temperature_descriptor_t *des = (eOas_temperature_descriptor_t*) eo_array_At(p->arrayofsensordescriptors, i);
                     if(NULL != des)
                     {
                         if((des->on.any.place == eobrd_place_can) && (des->on.can.port == port) && (des->on.can.addr == addr))
                         {
                             // ok, i have the board. i must enable the sensors 
-                            icubCanProto_imu_sensor_t ps = eoas_inertial3_imu_to_canproto(des->typeofsensor);
-                            if(icubCanProto_imu_none != ps)
-                            {
-                                eo_common_hlfword_bitset(&imuconfig.enabledsensors, ps);
-                            }
+                            icubCanProto_thermo_sensor_t ps = icubCanProto_thermo_t1; // eoas_temperature_chip_to_canproto(des->typeofsensor);
+//                            if(icubCanProto_thermo_none != ps)
+//                            {
+                                eo_common_byte_bitset(&tconfig.sensormask, ps);
+//                            }
                         }
                     }
                 }

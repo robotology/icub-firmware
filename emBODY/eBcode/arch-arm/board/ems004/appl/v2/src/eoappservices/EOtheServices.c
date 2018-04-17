@@ -37,14 +37,13 @@
 #include "EOtheSKIN.h"
 #include "EOtheInertials2.h"
 #include "EOtheInertials3.h"
+#include "EOtheTemperatures.h"
 
 #include "EOtheETHmonitor.h"
 
 #include "EOMtheEMSconfigurator.h"
 
 #include "EOVtheCallbackManager.h"
-
-//#include "EOtheBoardConfig.h"
 
 #include "EoError.h"
 
@@ -123,6 +122,7 @@ static eOresult_t s_services_callback_afterverify_mais(EOaService* p, eObool_t o
 static eOresult_t s_services_callback_afterverify_strain(EOaService* p, eObool_t operationisok);
 static eOresult_t s_services_callback_afterverify_inertial(EOaService* p, eObool_t operationisok);
 static eOresult_t s_services_callback_afterverify_inertials3(EOaService* p, eObool_t operationisok);
+static eOresult_t s_services_callback_afterverify_temperatures(EOaService* p, eObool_t operationisok);
 static eOresult_t s_services_callback_afterverify_motioncontrol(EOaService* p, eObool_t operationisok);
 static eOresult_t s_eo_services_alert_afterverify_service(eObool_t operationisok, eOmn_serv_category_t category, eOmn_serv_type_t type, eOservice_type_t servtype);
 
@@ -286,6 +286,11 @@ extern eOmn_serv_state_t eo_service_GetState(EOtheServices *p, eOmn_serv_categor
         case eomn_serv_category_inertials3:
         {
             state = eo_inertials3_GetServiceState(eo_inertials3_GetHandle());   
+        } break;
+        
+        case eomn_serv_category_temperatures:
+        {
+            state = eo_temperatures_GetServiceState(eo_temperatures_GetHandle());   
         } break;
         
         case eomn_serv_category_skin:
@@ -624,7 +629,8 @@ static void s_eo_services_initialise(EOtheServices *p)
         eo_motioncontrol_Initialise();    
         eo_skin_Initialise(); 
         eo_inertials2_Initialise(); 
-        eo_inertials3_Initialise();        
+        eo_inertials3_Initialise(); 
+        eo_temperatures_Initialise(); 
     }
     
     {   // C.  can services and discovery.
@@ -719,6 +725,19 @@ static eOresult_t s_services_callback_afterverify_inertials3(EOaService* p, eObo
     }
     
     s_eo_services_alert_afterverify_service(operationisok, eomn_serv_category_inertials3, eomn_serv_AS_inertials3, eo_service_inertials3);
+       
+    return(eores_OK);
+}
+
+static eOresult_t s_services_callback_afterverify_temperatures(EOaService* p, eObool_t operationisok)
+{
+    if(eobool_false == operationisok)
+    {
+        eo_temperatures_SendReport(eo_temperatures_GetHandle());
+        eo_temperatures_Deactivate(eo_temperatures_GetHandle());
+    }
+    
+    s_eo_services_alert_afterverify_service(operationisok, eomn_serv_category_temperatures, eomn_serv_AS_temperatures, eo_service_temperatures);
        
     return(eores_OK);
 }
@@ -837,6 +856,19 @@ static eOresult_t s_eo_services_process_verifyactivate(EOtheServices *p, eOmn_se
             }
             eo_inertials3_Verify(eo_inertials3_GetHandle(), config, s_services_callback_afterverify_inertials3, eobool_true);            
         } break; 
+        
+        
+        case eomn_serv_category_temperatures:
+        {
+            if(eobool_true == uselocalconfig)
+            {
+                config = NULL;
+                
+                errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_temperatures_using_onboard_config);
+                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errorDescriptor);                    
+            }
+            eo_temperatures_Verify(eo_temperatures_GetHandle(), config, s_services_callback_afterverify_temperatures, eobool_true);            
+        } break;         
         
         case eomn_serv_category_strain: 
         {
@@ -1080,6 +1112,11 @@ static eOresult_t s_eo_services_process_regsig(EOtheServices *p, eOmn_serv_categ
         {
             res = eo_inertials3_SetRegulars(eo_inertials3_GetHandle(), arrayofid32, &number);
         } break;
+
+        case eomn_serv_category_temperatures:
+        {
+            res = eo_temperatures_SetRegulars(eo_temperatures_GetHandle(), arrayofid32, &number);
+        } break;
         
         default:
         {
@@ -1161,6 +1198,11 @@ static eOresult_t s_eo_services_start(EOtheServices *p, eOmn_serv_category_t cat
         {
             res = eo_inertials3_Start(eo_inertials3_GetHandle());
         } break;        
+
+        case eomn_serv_category_temperatures:
+        {
+            res = eo_temperatures_Start(eo_temperatures_GetHandle());
+        } break; 
         
         default:
         {
@@ -1254,6 +1296,18 @@ static eOresult_t s_eo_services_stop(EOtheServices *p, eOmn_serv_category_t cate
                 eo_inertials3_Deactivate(eo_inertials3_GetHandle());
             }
         } break;
+        
+        
+        case eomn_serv_category_temperatures:
+        {
+            res = eo_temperatures_Stop(eo_temperatures_GetHandle());
+            eo_temperatures_SetRegulars(eo_temperatures_GetHandle(), NULL, numofregulars);
+            p->running[eomn_serv_category_temperatures] = eobool_false;
+            if(eobool_true == and_deactivate)
+            {
+                eo_temperatures_Deactivate(eo_temperatures_GetHandle());
+            }
+        } break;        
 
         case eomn_serv_category_all:
         {
@@ -1303,6 +1357,14 @@ static eOresult_t s_eo_services_stop(EOtheServices *p, eOmn_serv_category_t cate
             if(eobool_true == and_deactivate)
             {            
                 eo_inertials3_Deactivate(eo_inertials3_GetHandle());  
+            } 
+
+            eo_temperatures_Stop(eo_temperatures_GetHandle());
+            eo_temperatures_SetRegulars(eo_temperatures_GetHandle(), NULL, NULL);  
+            p->running[eomn_serv_category_temperatures] = eobool_false;
+            if(eobool_true == and_deactivate)
+            {            
+                eo_temperatures_Deactivate(eo_temperatures_GetHandle());  
             } 
             
             // if i dont use the service command to load the rop, then it is safe to remove all rops anyway.

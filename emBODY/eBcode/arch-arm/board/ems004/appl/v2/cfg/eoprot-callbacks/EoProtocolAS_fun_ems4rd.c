@@ -57,8 +57,7 @@
 #include "EOtheSTRAIN.h"
 #include "EOtheInertials2.h"
 #include "EOtheInertials3.h"
-
-//#include "EOMtheEMSconfigurator.h"
+#include "EOtheTemperatures.h"
 
 #include "EOMtheEMStransceiver.h"
 
@@ -212,6 +211,29 @@ extern void eoprot_fun_UPDT_as_inertial3_cmmnds_enable(const EOnv* nv, const eOr
     {
         eo_inertials3_Start(eo_inertials3_GetHandle());    
         eo_inertials3_Transmission(eo_inertials3_GetHandle(), eobool_true);
+    }
+}
+
+
+extern void eoprot_fun_UPDT_as_temperatures_config(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    eOas_temperature_config_t *cfg = (eOas_temperature_config_t*)rd->data;    
+    eo_temperatures_Config(eo_temperatures_GetHandle(), cfg);    
+}
+
+
+extern void eoprot_fun_UPDT_as_temperatures_cmmnds_enable(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    eOas_temperature_commands_t *cmd = (eOas_temperature_commands_t*)rd->data;  
+
+    if(0 == cmd->enable)
+    {
+        eo_temperatures_Stop(eo_temperatures_GetHandle());    
+    }
+    else
+    {
+        eo_temperatures_Start(eo_temperatures_GetHandle());    
+        eo_temperatures_Transmission(eo_temperatures_GetHandle(), eobool_true);
     }
 }
 
