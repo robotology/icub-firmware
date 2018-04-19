@@ -393,7 +393,7 @@ extern eOresult_t eo_strain_Activate(EOtheSTRAIN *p, const eOmn_serv_configurati
         
         // now... use the servcfg
         eObrd_canproperties_t prop = {0};
-        prop.type = eobrd_cantype_strain;
+        prop.type = servcfg->data.as.strain.boardtype.type;
         prop.location.port = servcfg->data.as.strain.canloc.port;
         prop.location.addr = servcfg->data.as.strain.canloc.addr;
         prop.location.insideindex = eobrd_caninsideindex_none;

@@ -56,8 +56,8 @@
 #include "EOtheMAIS.h"
 #include "EOtheSTRAIN.h"
 #include "EOtheInertials2.h"
-
-//#include "EOMtheEMSconfigurator.h"
+#include "EOtheInertials3.h"
+#include "EOtheTemperatures.h"
 
 #include "EOMtheEMStransceiver.h"
 
@@ -175,20 +175,6 @@ extern void eoprot_fun_UPDT_as_inertial_config(const EOnv* nv, const eOropdescri
 }
 
 
-//extern void eoprot_fun_UPDT_as_inertial_config_datarate(const EOnv* nv, const eOropdescriptor_t* rd)
-//{
-//    uint8_t *datarate = (uint8_t*)rd->data;    
-//    eo_inertials2_ConfigDatarate(eo_inertials2_GetHandle(), datarate);    
-//}
-
-
-//extern void eoprot_fun_UPDT_as_inertial_config_enabled(const EOnv* nv, const eOropdescriptor_t* rd)
-//{
-//    uint64_t *enabled = (uint64_t*)rd->data;    
-//    eo_inertials2_ConfigEnabled(eo_inertials2_GetHandle(), enabled);    
-//}
-
-
 extern void eoprot_fun_UPDT_as_inertial_cmmnds_enable(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOas_inertial_commands_t *cmd = (eOas_inertial_commands_t*)rd->data;  
@@ -201,6 +187,53 @@ extern void eoprot_fun_UPDT_as_inertial_cmmnds_enable(const EOnv* nv, const eOro
     {
         eo_inertials2_Start(eo_inertials2_GetHandle());    
         eo_inertials2_Transmission(eo_inertials2_GetHandle(), eobool_true);
+    }
+}
+
+
+
+extern void eoprot_fun_UPDT_as_inertial3_config(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    eOas_inertial3_config_t *cfg = (eOas_inertial3_config_t*)rd->data;    
+    eo_inertials3_Config(eo_inertials3_GetHandle(), cfg);    
+}
+
+
+extern void eoprot_fun_UPDT_as_inertial3_cmmnds_enable(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    eOas_inertial3_commands_t *cmd = (eOas_inertial3_commands_t*)rd->data;  
+
+    if(0 == cmd->enable)
+    {
+        eo_inertials3_Stop(eo_inertials3_GetHandle());    
+    }
+    else
+    {
+        eo_inertials3_Start(eo_inertials3_GetHandle());    
+        eo_inertials3_Transmission(eo_inertials3_GetHandle(), eobool_true);
+    }
+}
+
+
+extern void eoprot_fun_UPDT_as_temperatures_config(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    eOas_temperature_config_t *cfg = (eOas_temperature_config_t*)rd->data;    
+    eo_temperatures_Config(eo_temperatures_GetHandle(), cfg);    
+}
+
+
+extern void eoprot_fun_UPDT_as_temperatures_cmmnds_enable(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    eOas_temperature_commands_t *cmd = (eOas_temperature_commands_t*)rd->data;  
+
+    if(0 == cmd->enable)
+    {
+        eo_temperatures_Stop(eo_temperatures_GetHandle());    
+    }
+    else
+    {
+        eo_temperatures_Start(eo_temperatures_GetHandle());    
+        eo_temperatures_Transmission(eo_temperatures_GetHandle(), eobool_true);
     }
 }
 

@@ -86,9 +86,9 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         // RESERVED: { 0x36, 0x37 } for possible new IMU commands
         
         // NEW messages used for THERMOMETER sensors (strain2 + mtb4)
-        THERMOMETER_CONFIG_GET = ICUBCANPROTO_POL_AS_CMD__TERMOMETER_CONFIG_GET,
-        THERMOMETER_CONFIG_SET = ICUBCANPROTO_POL_AS_CMD__TERMOMETER_CONFIG_SET,
-        THERMOMETER_TRANSMIT = ICUBCANPROTO_POL_AS_CMD__TERMOMETER_TRANSMIT,        
+        THERMOMETER_CONFIG_GET = ICUBCANPROTO_POL_AS_CMD__THERMOMETER_CONFIG_GET,
+        THERMOMETER_CONFIG_SET = ICUBCANPROTO_POL_AS_CMD__THERMOMETER_CONFIG_SET,
+        THERMOMETER_TRANSMIT = ICUBCANPROTO_POL_AS_CMD__THERMOMETER_TRANSMIT,        
         // RESERVED: { 0x3B, 0x3C } for possible new THERMOMETER commands
         
         // HOLE: [0x3D, ... , 0x4B]. there are 15 free values ...

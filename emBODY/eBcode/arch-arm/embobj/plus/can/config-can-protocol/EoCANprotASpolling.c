@@ -234,6 +234,7 @@ extern eOresult_t eocanprotASpolling_former_POL_AS_CMD__IMU_CONFIG_GET(eOcanprot
 {
     return(eores_OK);
 }
+
 extern eOresult_t eocanprotASpolling_parser_POL_AS_CMD__IMU_CONFIG_GET(eOcanframe_t *frame, eOcanport_t port)
 {
     return(eores_OK);
@@ -241,8 +242,51 @@ extern eOresult_t eocanprotASpolling_parser_POL_AS_CMD__IMU_CONFIG_GET(eOcanfram
 
 extern eOresult_t eocanprotASpolling_former_POL_AS_CMD__IMU_CONFIG_SET(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
+    s_former_POL_AS_prepare_frame(descriptor, frame, 8, ICUBCANPROTO_POL_AS_CMD__IMU_CONFIG_SET);    
+
+    icubCanProto_imu_config_t *cfg = (icubCanProto_imu_config_t*)descriptor->cmd.value;
+    frame->data[1] = cfg->enabledsensors & 0xff; 
+    frame->data[2] = (cfg->enabledsensors >> 8) & 0xff;  
+    frame->data[3] = cfg->fusionmode;
+    frame->data[4] = cfg->ffu[0];
+    frame->data[5] = cfg->ffu[1];
+    frame->data[6] = cfg->ffu[2];
+    frame->data[7] = cfg->ffu[3];    
+    
+    return(eores_OK);    
+}
+
+extern eOresult_t eocanprotASpolling_former_POL_AS_CMD__IMU_TRANSMIT(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
+{
+    s_former_POL_AS_prepare_frame(descriptor, frame, 2, ICUBCANPROTO_POL_AS_CMD__IMU_TRANSMIT);    
+
+    icubCanProto_imu_transmit_t *trs = (icubCanProto_imu_transmit_t*)descriptor->cmd.value;
+    frame->data[1] = trs->period; 
+
     return(eores_OK);
 }
+
+
+extern eOresult_t eocanprotASpolling_former_POL_AS_CMD__THERMOMETER_CONFIG_SET(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
+{
+    s_former_POL_AS_prepare_frame(descriptor, frame, 2, ICUBCANPROTO_POL_AS_CMD__THERMOMETER_CONFIG_SET);    
+
+    icubCanProto_thermo_config_t *tc = (icubCanProto_thermo_config_t*)descriptor->cmd.value;
+    frame->data[1] = tc->sensormask;
+    
+    return(eores_OK);    
+}
+
+extern eOresult_t eocanprotASpolling_former_POL_AS_CMD__THERMOMETER_TRANSMIT(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
+{
+    s_former_POL_AS_prepare_frame(descriptor, frame, 2, ICUBCANPROTO_POL_AS_CMD__THERMOMETER_TRANSMIT);    
+
+    icubCanProto_thermo_transmit_t *tt = (icubCanProto_thermo_transmit_t*)descriptor->cmd.value;
+    frame->data[1] = tt->periodsec;
+    
+    return(eores_OK);
+}
+
 
 
 
@@ -320,35 +364,35 @@ extern eOresult_t eocanprotASpolling_former_POL_SK_CMD__SET_TRIANG_CFG(eOcanprot
 }
 
 
-extern eOresult_t eocanprotASpolling_parser_00(eOcanframe_t *frame, eOcanport_t port)
-{
-    return(eores_OK);
-}
+//extern eOresult_t eocanprotASpolling_parser_00(eOcanframe_t *frame, eOcanport_t port)
+//{
+//    return(eores_OK);
+//}
 
-extern eOresult_t eocanprotASpolling_former_00(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
-{
-    return(eores_OK);
-}
+//extern eOresult_t eocanprotASpolling_former_00(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
+//{
+//    return(eores_OK);
+//}
 
-extern eOresult_t eocanprotASpolling_parser_01(eOcanframe_t *frame, eOcanport_t port)
-{
-    return(eores_OK);
-}
+//extern eOresult_t eocanprotASpolling_parser_01(eOcanframe_t *frame, eOcanport_t port)
+//{
+//    return(eores_OK);
+//}
 
-extern eOresult_t eocanprotASpolling_former_01(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
-{
-    return(eores_OK);
-}
+//extern eOresult_t eocanprotASpolling_former_01(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
+//{
+//    return(eores_OK);
+//}
 
-extern eOresult_t eocanprotASpolling_parser_02(eOcanframe_t *frame, eOcanport_t port)
-{
-    return(eores_OK);
-}
+//extern eOresult_t eocanprotASpolling_parser_02(eOcanframe_t *frame, eOcanport_t port)
+//{
+//    return(eores_OK);
+//}
 
-extern eOresult_t eocanprotASpolling_former_02(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
-{
-    return(eores_OK);
-}
+//extern eOresult_t eocanprotASpolling_former_02(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
+//{
+//    return(eores_OK);
+//}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
@@ -381,7 +425,7 @@ static void* s_eocanprotASpolling_get_entity(eOprotEndpoint_t endpoint, eOprot_e
     loc.addr = EOCANPROT_FRAME_GET_SOURCE(frame);    
     loc.insideindex = eobrd_caninsideindex_none;
     
-    ii = eo_canmap_GetEntityIndexExtraCheck(eo_canmap_GetHandle(), loc, endpoint, entity);
+    ii = eo_canmap_GetEntityIndex(eo_canmap_GetHandle(), loc, endpoint, entity);
     
     if(EOK_uint08dummy == ii)
     {     

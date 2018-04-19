@@ -878,16 +878,16 @@ const eOcanprot_functions_t s_eo_canprot_functions_pollingAnalogSensor[] =
         EO_INIT(.former) NULL,
         EO_INIT(.parser) NULL
     },  
-    {   // 051      
+    {   // 051      ICUBCANPROTO_POL_AS_CMD__IMU_CONFIG_GET      
         EO_INIT(.former) eocanprotASpolling_former_POL_AS_CMD__IMU_CONFIG_GET,
         EO_INIT(.parser) eocanprotASpolling_parser_POL_AS_CMD__IMU_CONFIG_GET
     }, 
-    {   // 052      
+    {   // 052      ICUBCANPROTO_POL_AS_CMD__IMU_CONFIG_SET      
         EO_INIT(.former) eocanprotASpolling_former_POL_AS_CMD__IMU_CONFIG_SET,
         EO_INIT(.parser) NULL
     },  
-    {   // 053
-        EO_INIT(.former) NULL,
+    {   // 053      ICUBCANPROTO_POL_AS_CMD__IMU_TRANSMIT
+        EO_INIT(.former) eocanprotASpolling_former_POL_AS_CMD__IMU_TRANSMIT,
         EO_INIT(.parser) NULL
     }, 
     {   // 054
@@ -898,16 +898,16 @@ const eOcanprot_functions_t s_eo_canprot_functions_pollingAnalogSensor[] =
         EO_INIT(.former) NULL,
         EO_INIT(.parser) NULL
     }, 
-    {   // 056      
+    {   // 056      ICUBCANPROTO_POL_AS_CMD__THERMOMETER_CONFIG_GET     
         EO_INIT(.former) NULL,
         EO_INIT(.parser) NULL
     },  
-    {   // 057
-        EO_INIT(.former) NULL,
+    {   // 057      ICUBCANPROTO_POL_AS_CMD__THERMOMETER_CONFIG_SET
+        EO_INIT(.former) eocanprotASpolling_former_POL_AS_CMD__THERMOMETER_CONFIG_SET,
         EO_INIT(.parser) NULL
     }, 
-    {   // 058
-        EO_INIT(.former) NULL,
+    {   // 058      ICUBCANPROTO_POL_AS_CMD__THERMOMETER_TRANSMIT
+        EO_INIT(.former) eocanprotASpolling_former_POL_AS_CMD__THERMOMETER_TRANSMIT,
         EO_INIT(.parser) NULL
     },  
     {   // 059
@@ -1107,9 +1107,9 @@ const eOcanprot_functions_t s_eo_canprot_functions_periodicAnalogSensor[] =
         EO_INIT(.former) NULL,
         EO_INIT(.parser) eocanprotASperiodic_parser_PER_AS_MSG__HES7TO14
     },
-    {   // 014
+    {   // 014      ICUBCANPROTO_PER_AS_MSG__THERMOMETER_MEASURE
         EO_INIT(.former) NULL,
-        EO_INIT(.parser) NULL
+        EO_INIT(.parser) eocanprotASperiodic_parser_PER_AS_MSG__THERMOMETER_MEASURE
     },
     {   // 015
         EO_INIT(.former) NULL,
@@ -1359,12 +1359,14 @@ static eOresult_t s_eo_canprot_parse0length(eOcanframe_t *frame, eOcanport_t por
         eObrd_canlocation_t bloc = {0}; 
         bloc.port = port;
         bloc.addr = EOCANPROT_FRAME_GET_SOURCE(frame);
-        const eOcanmap_board_extended_t *board = eo_canmap_GetBoard(eo_canmap_GetHandle(), bloc);
-        if(NULL == board)
+        
+        eObrd_cantype_t btype = eo_canmap_GetBoardType(eo_canmap_GetHandle(), bloc);
+        
+        if(eobrd_cantype_unknown == btype)
         {   // board is not in EOtheCANmapping. it may be that we are in (case 666). 
             return(eores_OK);
         }
-        if((eobrd_cantype_strain == board->board.props.type) || (eobrd_cantype_mais == board->board.props.type))
+        if((eobrd_cantype_strain == btype) || (eobrd_cantype_mais == btype))
         {   // we have a ack sent by strain or mais
             return(eores_OK);
         }

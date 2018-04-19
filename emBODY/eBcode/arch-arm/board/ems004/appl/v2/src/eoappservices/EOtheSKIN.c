@@ -1132,7 +1132,7 @@ static eOsk_skin_t* s_eo_skin_get_entity(EOtheSKIN* p, eOcanframe_t *frame, eOca
     loc.addr = EOCANPROT_FRAME_GET_SOURCE(frame);    
     loc.insideindex = eobrd_caninsideindex_none;
     
-    ii = eo_canmap_GetEntityIndexExtraCheck(eo_canmap_GetHandle(), loc, eoprot_endpoint_skin, eoprot_entity_sk_skin);
+    ii = eo_canmap_GetEntityIndex(eo_canmap_GetHandle(), loc, eoprot_endpoint_skin, eoprot_entity_sk_skin);
     
     if(EOK_uint08dummy == ii)
     {  

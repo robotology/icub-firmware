@@ -40,7 +40,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         FORCE_VECTOR = ICUBCANPROTO_PER_AS_MSG__FORCE_VECTOR, 
         TORQUE_VECTOR = ICUBCANPROTO_PER_AS_MSG__TORQUE_VECTOR,                                                      // strain
         // NEW messages:
-        THERMOMETER_MEASURE = ICUBCANPROTO_PER_AS_MSG__TERMOMETER_MEASURE
+        THERMOMETER_MEASURE = ICUBCANPROTO_PER_AS_MSG__THERMOMETER_MEASURE
     };
     
     // NOTES

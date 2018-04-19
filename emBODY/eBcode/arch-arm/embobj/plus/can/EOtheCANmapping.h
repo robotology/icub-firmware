@@ -58,59 +58,21 @@ extern "C" {
  **/  
 typedef struct EOtheCANmapping_hid EOtheCANmapping;
 
-enum 
-{  
-    eocanmap_joints_maxnumberof     = 12, 
-    eocanmap_motors_maxnumberof     = eocanmap_joints_maxnumberof, 
-    eocanmap_strains_maxnumberof    = 1, 
-    eocanmap_maises_maxnumberof     = 1,
-    eocanmap_inertials_maxnumberof  = 1,
-    eocanmap_skins_maxnumberof      = 2
-};
-    
-enum 
-{  
-    eocanmap_joint_index_boards_maxnumberof     = 1,
-    eocanmap_motor_index_boards_maxnumberof     = 1,
-    eocanmap_strain_index_boards_maxnumberof    = 1,
-    eocanmap_mais_index_boards_maxnumberof      = 1,
-    eocanmap_inertial_index_boards_maxnumberof  = 1,
-    eocanmap_skin_index_boards_maxnumberof      = 8     // it tells that we can use up to 8 can boards to represent a single skin index
-};
-
-
-// used only as internal representation for eOcanmap_board_t::indexofentity[] 
+// use these values for eOcanmap_entitydescriptor_t::index (and for other internal use)
 typedef enum 
 {
     entindex00 =  0, entindex01 =  1, entindex02 =  2, entindex03 =  3, entindex04 =  4, 
     entindex05 =  5, entindex06 =  6, entindex07 =  7, entindex08 =  8, entindex09 =  9, 
     entindex10 = 10, entindex11 = 11, entindex12 = 12, entindex13 = 13, entindex14 = 14, 
-    entindexNONE = 255    
+    entindexNONE = 15    
 } eOcanmap_entityindex_t; 
-
-
-/**	@typedef    typedef struct eOcanmap_board_t 
- 	@brief      Contains the definition of a can board with properties and the index of the entity it holds. 
- **/
-typedef struct
-{
-    eObrd_canproperties_t       props;
-    uint8_t                     indexofentity[2];   /**< at most two entities per board. use eObrd_caninsideindex_t for addressing array and use eOcanmap_entityindex_t as its value. */
-} eOcanmap_board_t;             EO_VERIFYsizeof(eOcanmap_board_t, 6) 
-
-
-/**	@typedef    typedef struct eOcanmap_board_extended_t 
- 	@brief      Contains the definition of a can board and also the information detected over can discovery. 
- **/
-typedef struct
-{
-    eOcanmap_board_t            board;
-    eObrd_info_t                detected;
-} eOcanmap_board_extended_t;    EO_VERIFYsizeof(eOcanmap_board_extended_t, 12) 
 
 
 /**	@typedef    typedef struct eOcanmap_entitydescriptor_t 
  	@brief      Contains the description of an entity with a given index mapped onto a can board location
+                Example of if a 1foc offers motion control to joint 3 we have: 
+                .location = { .port = eOcanport1, .addr = 2, .insideindex = eobrd_caninsideindex_first }
+                .index = entindex03 
  **/
 typedef struct
 {
@@ -130,16 +92,6 @@ typedef struct
 
 enum { eocanmap_maxlocations = 32 };
 
-///**	@typedef    typedef struct eOcanmap_arrayof_locations_t 
-// 	@brief      Contains the compact description of all the board locations which have been loaded into EOtheCAN mapping object.
-//                The description is an array of locations. At most there are 28 boards (14 boards per can bus) because addresses 0 
-//                and 15 are not used. We however use 32.
-// **/
-//typedef struct
-//{
-//    eOarray_head_t      head;
-//    eObrd_canlocation_t data[eocanmap_maxlocations];   
-//} eOcanmap_arrayof_locations_t;
     
 // - declaration of extern public variables, ... but better using use _get/_set instead -------------------------------
 
@@ -175,7 +127,6 @@ extern EOtheCANmapping * eo_canmap_GetHandle(void);
 extern eOresult_t eo_canmap_LoadBoards(EOtheCANmapping *p,  EOconstvector *vectorof_boardprops);
 
 
-
 extern eOresult_t eo_canmap_UnloadBoards(EOtheCANmapping *p,  EOconstvector *vectorof_boardprops);
 
 
@@ -194,16 +145,6 @@ extern eOresult_t eo_canmap_ConfigEntity(EOtheCANmapping *p,  eOprotEndpoint_t e
 
 extern eOresult_t eo_canmap_DeconfigEntity(EOtheCANmapping *p,  eOprotEndpoint_t ep, eOprotEntity_t entity, EOconstvector *vectorof_entitydescriptors);
 
-/** @fn         const eOcanmap_board_extended_t * eo_canmap_GetBoard(EOtheCANmapping *p, eObrd_canlocation_t loc)
-    @brief      get a board given its can location, for read only purposes.        
-    @param      p           The handle to the EOtheCANmapping
-    @param      loc         teh can location
-    @return     a pointer to the board, or NULL if no board is found at that location
-**/
-extern const eOcanmap_board_extended_t * eo_canmap_GetBoard(EOtheCANmapping *p, eObrd_canlocation_t loc);
-
-
-extern eObrd_cantype_t eo_canmap_GetBoardType(EOtheCANmapping *p, eObrd_canlocation_t bloc);
 
 
 /** @fn         eOresult_t eo_canmap_BoardSetDetected(EOtheCANmapping *p, eObrd_canlocation_t loc, eObrd_info_t *detected)
@@ -217,29 +158,25 @@ extern eOresult_t eo_canmap_BoardSetDetected(EOtheCANmapping *p, eObrd_canlocati
 
 
 
-/** @fn         eOprotIndex_t eo_canmap_GetEntityIndex(EOtheCANmapping *p, eObrd_canlocation_t loc)
-    @brief      i get the index of the entity on the board on a given location without verifying type of board. 
-                it is teh quick version of eo_canmap_GetEntityIndexExtraCheck()     
+
+/** @fn         eObrd_cantype_t eo_canmap_GetBoardType(EOtheCANmapping *p, eObrd_canlocation_t loc)
+    @brief      i get type of board on a given location.
     @param      p           The handle to the EOtheCANmapping
     @param      loc         the can location
-    @return     the index at the specified location or EOK_uint08dummy if no board is found.
+    @return     the index at the specified location or EOK_uint08dummy if no board is found or of the board type is not coherent with the entity type.
 **/
-extern eOprotIndex_t eo_canmap_GetEntityIndex(EOtheCANmapping *p, eObrd_canlocation_t loc);
+extern eObrd_cantype_t eo_canmap_GetBoardType(EOtheCANmapping *p, eObrd_canlocation_t loc);
 
 
-
-/** @fn         eOprotIndex_t eo_canmap_GetEntityIndexExtraCheck(EOtheCANmapping *p, eObrd_canlocation_t loc, eOprotEndpoint_t ep, eOprotEntity_t entity)
+/** @fn         eOprotIndex_t eo_canmap_GetEntityIndex(EOtheCANmapping *p, eObrd_canlocation_t loc, eOprotEndpoint_t ep, eOprotEntity_t entity)
     @brief      i get the index of the entity on the board on a given location and also verify if the board type is coherent with the specified entity.
-                This function is the safer version of eo_canmap_GetEntityIndex()
-                For example if we want the index of a joint which we believe is in can1, address 14, internalindex 0, but then the found board is a MAIS ...
-                this function returns EOK_uint08dummy, whereas eo_canmap_GetEntityIndex() would return a ... value.      
     @param      p           The handle to the EOtheCANmapping
     @param      loc         the can location
     @param      ep          the endpoint of the entity 
     @param      entity      the entity      
     @return     the index at the specified location or EOK_uint08dummy if no board is found or of the board type is not coherent with the entity type.
 **/
-extern eOprotIndex_t eo_canmap_GetEntityIndexExtraCheck(EOtheCANmapping *p, eObrd_canlocation_t loc, eOprotEndpoint_t ep, eOprotEntity_t entity);
+extern eOprotIndex_t eo_canmap_GetEntityIndex(EOtheCANmapping *p, eObrd_canlocation_t loc, eOprotEndpoint_t ep, eOprotEntity_t entity);
 
 
 

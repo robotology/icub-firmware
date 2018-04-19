@@ -78,13 +78,17 @@ static EOtheEntities s_eo_theentities =
     EO_INIT(.skins          ) {NULL},
     EO_INIT(.strains        ) {NULL},
     EO_INIT(.maises         ) {NULL},
+    EO_INIT(.temperatures   ) {NULL},
     EO_INIT(.inertials      ) {NULL},
+    EO_INIT(.inertials3     ) {NULL},
     EO_INIT(.numofjoints    ) 0,
     EO_INIT(.numofmotors    ) 0,
     EO_INIT(.numofskins     ) 0,
     EO_INIT(.numofstrains   ) 0,
     EO_INIT(.numofmaises    ) 0,
-    EO_INIT(.numofinertials ) 0
+    EO_INIT(.numoftemperatures) 0,
+    EO_INIT(.numofinertials ) 0,
+    EO_INIT(.numofinertials3 ) 0
 };
 
 //static const char s_eobj_ownname[] = "EOtheEntities";
@@ -126,7 +130,9 @@ extern eOresult_t eo_entities_Reset(EOtheEntities *p)
     memset(s_eo_theentities.skins, 0, sizeof(s_eo_theentities.skins));
     memset(s_eo_theentities.strains, 0, sizeof(s_eo_theentities.strains));
     memset(s_eo_theentities.maises, 0, sizeof(s_eo_theentities.maises));
+    memset(s_eo_theentities.temperatures, 0, sizeof(s_eo_theentities.temperatures));
     memset(s_eo_theentities.inertials, 0, sizeof(s_eo_theentities.inertials));
+    memset(s_eo_theentities.inertials3, 0, sizeof(s_eo_theentities.inertials3));
     
     // joints
     max = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
@@ -173,7 +179,16 @@ extern eOresult_t eo_entities_Reset(EOtheEntities *p)
         s_eo_theentities.maises[i] = (eOas_mais_t*) eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_mais, (eOprotIndex_t)i);
     }    
 
-
+    // temperatures
+    max = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_temperature);
+    s_eo_theentities.numoftemperatures = 0;
+    if(max>eoprotwrap_max_temperatures) max = eoprotwrap_max_temperatures;
+    for(i=0; i<max; i++)
+    {
+        s_eo_theentities.temperatures[i] = (eOas_temperature_t*) eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_temperature, (eOprotIndex_t)i);
+    } 
+    
+    
     // inertials
     max = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_inertial);
     s_eo_theentities.numofinertials = 0;
@@ -181,6 +196,15 @@ extern eOresult_t eo_entities_Reset(EOtheEntities *p)
     for(i=0; i<max; i++)
     {
         s_eo_theentities.inertials[i] = (eOas_inertial_t*) eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_inertial, (eOprotIndex_t)i);
+    } 
+
+    // inertials3
+    max = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_inertial3);
+    s_eo_theentities.numofinertials3 = 0;
+    if(max>eoprotwrap_max_inertials3) max = eoprotwrap_max_inertials3;
+    for(i=0; i<max; i++)
+    {
+        s_eo_theentities.inertials3[i] = (eOas_inertial3_t*) eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_inertial3, (eOprotIndex_t)i);
     } 
     
     return(eores_OK);
@@ -338,6 +362,62 @@ extern eOas_mais_status_t * eo_entities_GetMaisStatus(EOtheEntities *p, eOprotIn
 }
 
 
+extern eOresult_t eo_entities_SetNumOfTemperatures(EOtheEntities *p, uint8_t num)
+{
+    if(num > eoprotwrap_max_temperatures)
+    {
+        return(eores_NOK_generic);
+    }
+    
+    s_eo_theentities.numoftemperatures = num;
+    
+    return(eores_OK);   
+}
+
+
+extern uint8_t eo_entities_NumOfTemperatures(EOtheEntities *p)
+{
+    return(s_eo_theentities.numoftemperatures);    
+}
+
+extern eOas_temperature_t * eo_entities_GetTemperature(EOtheEntities *p, eOprotIndex_t id)
+{
+    if(id >= s_eo_theentities.numoftemperatures)
+    {
+        return(NULL);
+    }
+
+    return(s_eo_theentities.temperatures[id]);
+}
+
+extern eOas_temperature_config_t * eo_entities_GetTemperatureConfig(EOtheEntities *p, eOprotIndex_t id)
+{
+    eOas_temperature_config_t *ret = NULL;    
+    eOas_temperature_t *te = eo_entities_GetTemperature(p, id);
+    
+    if(NULL != te)
+    {
+        ret = &(te->config);
+    }
+
+    return(ret);
+}
+
+
+extern eOas_temperature_status_t * eo_entities_GetTemperatureStatus(EOtheEntities *p, eOprotIndex_t id)
+{
+    eOas_temperature_status_t *ret = NULL;    
+    eOas_temperature_t *te = eo_entities_GetTemperature(p, id);
+    
+    if(NULL != te)
+    {
+        ret = &(te->status);
+    }
+
+    return(ret);
+}
+
+
 extern eOresult_t eo_entities_SetNumOfInertials(EOtheEntities *p, uint8_t num)
 {
     if(num > eoprotwrap_max_inertials)
@@ -383,6 +463,61 @@ extern eOas_inertial_status_t * eo_entities_GetInertialStatus(EOtheEntities *p, 
 {
     eOas_inertial_status_t *ret = NULL;    
     eOas_inertial_t *in = eo_entities_GetInertial(p, id);
+    
+    if(NULL != in)
+    {
+        ret = &(in->status);
+    }
+
+    return(ret);
+}
+
+
+extern eOresult_t eo_entities_SetNumOfInertials3(EOtheEntities *p, uint8_t num)
+{
+    if(num > eoprotwrap_max_inertials3)
+    {
+        return(eores_NOK_generic);
+    }
+    
+    s_eo_theentities.numofinertials3 = num;
+    
+    return(eores_OK);   
+}
+
+extern uint8_t eo_entities_NumOfInertials3(EOtheEntities *p)
+{
+    return(s_eo_theentities.numofinertials3);    
+}
+
+extern eOas_inertial3_t * eo_entities_GetInertial3(EOtheEntities *p, eOprotIndex_t id)
+{
+    if(id >= s_eo_theentities.numofinertials3)
+    {
+        return(NULL);
+    }
+
+    return(s_eo_theentities.inertials3[id]);
+}
+
+extern eOas_inertial3_config_t * eo_entities_GetInertial3Config(EOtheEntities *p, eOprotIndex_t id)
+{
+    eOas_inertial3_config_t *ret = NULL;    
+    eOas_inertial3_t *in = eo_entities_GetInertial3(p, id);
+    
+    if(NULL != in)
+    {
+        ret = &(in->config);
+    }
+
+    return(ret);
+}
+
+
+extern eOas_inertial3_status_t * eo_entities_GetInertial3Status(EOtheEntities *p, eOprotIndex_t id)
+{
+    eOas_inertial3_status_t *ret = NULL;    
+    eOas_inertial3_t *in = eo_entities_GetInertial3(p, id);
     
     if(NULL != in)
     {
