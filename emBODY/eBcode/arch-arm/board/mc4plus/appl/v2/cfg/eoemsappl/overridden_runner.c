@@ -28,6 +28,8 @@
 
 #include "EOtheCANservice.h"
 #include "EOtheInertials2.h"
+#include "EOtheInertials3.h"
+#include "EOtheTemperatures.h"
 #include "EOtheCANdiscovery2.h"
 #include "EOtheMotionController.h"
 #include "EOtheSKIN.h"
@@ -148,6 +150,10 @@ extern void eom_emsrunner_hid_userdef_taskTX_activity_afterdatagramtransmission(
     eo_skin_Tick(eo_skin_GetHandle(), prevTXhadRegulars); 
     
     eo_inertials2_Tick(eo_inertials2_GetHandle(), prevTXhadRegulars); 
+    
+    eo_inertials3_Tick(eo_inertials3_GetHandle(), prevTXhadRegulars); 
+    
+    eo_temperatures_Tick(eo_temperatures_GetHandle(), prevTXhadRegulars);
     
     eo_ethmonitor_Tick(eo_ethmonitor_GetHandle());
 
