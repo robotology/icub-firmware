@@ -215,14 +215,14 @@ extern void eoprot_fun_UPDT_as_inertial3_cmmnds_enable(const EOnv* nv, const eOr
 }
 
 
-extern void eoprot_fun_UPDT_as_temperatures_config(const EOnv* nv, const eOropdescriptor_t* rd)
+extern void eoprot_fun_UPDT_as_temperature_config(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOas_temperature_config_t *cfg = (eOas_temperature_config_t*)rd->data;    
     eo_temperatures_Config(eo_temperatures_GetHandle(), cfg);    
 }
 
 
-extern void eoprot_fun_UPDT_as_temperatures_cmmnds_enable(const EOnv* nv, const eOropdescriptor_t* rd)
+extern void eoprot_fun_UPDT_as_temperature_cmmnds_enable(const EOnv* nv, const eOropdescriptor_t* rd)
 {
     eOas_temperature_commands_t *cmd = (eOas_temperature_commands_t*)rd->data;  
 

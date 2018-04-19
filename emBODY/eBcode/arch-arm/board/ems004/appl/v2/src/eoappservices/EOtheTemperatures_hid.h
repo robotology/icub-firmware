@@ -76,6 +76,7 @@ struct EOtheTemperatures_hid
     uint16_t                                not_heardof_target[2];
     uint16_t                                not_heardof_status[2];
     uint32_t                                not_heardof_counter;
+    uint32_t                                not_heardtimeoutmilli;
     eObool_t                                transmissionisactive;
 }; 
 

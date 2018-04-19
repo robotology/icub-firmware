@@ -116,7 +116,7 @@ static void s_eo_temperatures_chip_transmission(EOtheTemperatures *p, eObool_t o
 
 static const eOas_temperature_config_t s_eo_default_temperatureconfig =
 {
-    .datarate                       = 500,
+    .datarate                       = 2,
     .enabled                        = 0
 };
 
@@ -168,6 +168,7 @@ static EOtheTemperatures s_eo_thetemperature =
     .not_heardof_target         = {0},
     .not_heardof_status         = {0},
     .not_heardof_counter        = 0,
+    .not_heardtimeoutmilli      = 0,               
     .transmissionisactive       = eobool_false
 };
 
@@ -873,9 +874,9 @@ extern eOresult_t eo_temperatures_Config(EOtheTemperatures *p, eOas_temperature_
     // then we check enabled mask and datarate
        
     uint8_t originalrate = p->sensorsconfig.datarate;
-    if(p->sensorsconfig.datarate < 20)
+    if(p->sensorsconfig.datarate < 1)
     {
-        p->sensorsconfig.datarate = 20;        
+        p->sensorsconfig.datarate = 1;        
     }
     
     
@@ -1348,6 +1349,7 @@ static void s_eo_temperatures_presenceofcanboards_reset(EOtheTemperatures *p)
     memset(p->not_heardof_target, 0, sizeof(p->not_heardof_target));
     memset(p->not_heardof_status, 0, sizeof(p->not_heardof_status));
     p->not_heardof_counter = 0;
+    p->not_heardtimeoutmilli = 1000;
 }
 
 static void s_eo_temperatures_presenceofcanboards_build(EOtheTemperatures *p)
@@ -1401,7 +1403,7 @@ static void s_eo_temperatures_presenceofcanboards_touch(EOtheTemperatures *p, eO
 
 static void s_eo_temperatures_presenceofcanboards_tick(EOtheTemperatures *p)
 {
-    if((p->not_heardof_counter++) > 1000)
+    if((p->not_heardof_counter++) > p->not_heardtimeoutmilli)
     {        
         if((0 != p->not_heardof_status[0]) || (0 != p->not_heardof_status[1]))
         {
@@ -1422,9 +1424,10 @@ static void s_eo_temperatures_presenceofcanboards_tick(EOtheTemperatures *p)
 
 static void s_eo_temperatures_chip_transmission(EOtheTemperatures *p, eObool_t on, uint8_t periodsec)
 {
-
     icubCanProto_thermo_transmit_t transmit = {0};
     transmit.periodsec = (eobool_true == on) ? (periodsec) : (0);
+    
+    p->not_heardtimeoutmilli = periodsec * 1000 + 5000;
     
     p->sharedcan.command.clas = eocanprot_msgclass_pollingAnalogSensor;
     p->sharedcan.command.type  = ICUBCANPROTO_POL_AS_CMD__THERMOMETER_TRANSMIT;
