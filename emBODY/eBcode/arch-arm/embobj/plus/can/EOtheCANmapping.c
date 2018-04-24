@@ -83,9 +83,9 @@ static void s_eo_canmap_entities_index_add(eOcanmap_board_extended_t * theboard,
 
 static void s_eo_canmap_entities_rem(eOcanmap_board_extended_t * theboard, uint8_t ep, uint8_t en, const eOcanmap_entitydescriptor_t *des);
 
-static eOprotIndex_t s_eo_canmap_entities_index_get(const eOcanmap_board_extended_t * theboard, uint8_t ep, uint8_t entity);
+static eOprotIndex_t s_eo_canmap_entities_index_get(const eOcanmap_board_extended_t * theboard, eObrd_canlocation_t loc, uint8_t ep, uint8_t entity);
 
-static eOprotIndex_t s_eo_canmap_mc_index_get(const eOcanmap_board_extended_t * theboard);
+static eOprotIndex_t s_eo_canmap_mc_index_get(const eOcanmap_board_extended_t * theboard, eObrd_canlocation_t loc);
 static eOprotIndex_t s_eo_canmap_sk_index_get(const eOcanmap_board_extended_t * theboard);
 
 
@@ -175,7 +175,7 @@ static void s_eo_canmap_entities_rem(eOcanmap_board_extended_t * theboard, uint8
 
 }
 
-static eOprotIndex_t s_eo_canmap_mc_index_get(const eOcanmap_board_extended_t * theboard)
+static eOprotIndex_t s_eo_canmap_mc_index_get(const eOcanmap_board_extended_t * theboard, eObrd_canlocation_t loc)
 {
     eOprotIndex_t index = EOK_uint08dummy;
 
@@ -186,11 +186,11 @@ static eOprotIndex_t s_eo_canmap_mc_index_get(const eOcanmap_board_extended_t * 
     else if(theboard->board.props.type == eobrd_cantype_mc4)
     {   // if mc4, index depends on value of loc.insideindex. it can be only first or second. if loc.insideindex is none or even else: nothing is done
                     
-        if(eobrd_caninsideindex_first == theboard->board.props.location.insideindex)
+        if(eobrd_caninsideindex_first == loc.insideindex)
         {
             index = theboard->board.entities2.compactIndicesOf & 0x0F;
         }
-        else if(eobrd_caninsideindex_second == theboard->board.props.location.insideindex)
+        else if(eobrd_caninsideindex_second == loc.insideindex)
         {
             index = (theboard->board.entities2.compactIndicesOf >> 4) & 0x0F;
         }
@@ -217,7 +217,7 @@ static eOprotIndex_t s_eo_canmap_sk_index_get(const eOcanmap_board_extended_t * 
 }
 
 
-static eOprotIndex_t s_eo_canmap_entities_index_get(const eOcanmap_board_extended_t * theboard, uint8_t ep, uint8_t entity)
+static eOprotIndex_t s_eo_canmap_entities_index_get(const eOcanmap_board_extended_t * theboard, eObrd_canlocation_t loc, uint8_t ep, uint8_t entity)
 {
     eOprotIndex_t index = EOK_uint08dummy;
 
@@ -238,7 +238,7 @@ static eOprotIndex_t s_eo_canmap_entities_index_get(const eOcanmap_board_extende
     // 2. yes, we have it. now we retrieve it. all entities have zero index apart those on mc and sk
     if(eoprot_endpoint_motioncontrol == ep)
     {
-        index = s_eo_canmap_mc_index_get(theboard);
+        index = s_eo_canmap_mc_index_get(theboard, loc);
     }
     else if(eoprot_endpoint_skin == ep)
     {
@@ -838,7 +838,7 @@ extern eOprotIndex_t eo_canmap_GetEntityIndex(EOtheCANmapping *p, eObrd_canlocat
     }
     
     
-    index = s_eo_canmap_entities_index_get(theboard, ep, entity);
+    index = s_eo_canmap_entities_index_get(theboard, loc, ep, entity);
     
 
     return(index);

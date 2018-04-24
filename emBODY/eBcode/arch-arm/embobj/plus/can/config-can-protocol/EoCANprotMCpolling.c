@@ -248,27 +248,44 @@ extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__MOTION_DONE(eOcanframe_t
     
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, index, eoprot_tag_mc_joint_status_core_modes_ismotiondone);
     
+    eOerrmanDescriptor_t errdes = {0};
     EOproxy * proxy = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
     eOproxy_params_t *param = eo_proxy_Params_Get(proxy, id32);
     if(NULL == param)
     {
-        eOerrmanDescriptor_t errdes = {0};
         errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
         errdes.sourceaddress    = 0;
         errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_ropdes_notfound);
         errdes.par16            = 0; 
         errdes.par64            = id32; 
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
+                
+        errdes.code            = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_parsingfailure);
+        errdes.par16           = (frame->id & 0x0fff) | ((frame->size & 0x000f) << 12);
+        errdes.par64           = eo_common_canframe_data2u64((eOcanframe_t*)frame);
+        errdes.sourceaddress   = EOCANPROT_FRAME_GET_SOURCE(frame);
+        errdes.sourcedevice    = (eOcanport1 == port) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &errdes);  
+        
         return(eores_OK);
     }  
     
     param->p08_2 ++;
-    
+        
     if(param->p08_1 == param->p08_2)
     {
         eOresult_t res = eo_proxy_ReplyROP_Load(proxy, id32, NULL);  
         eom_emsappl_SendTXRequest(eom_emsappl_GetHandle());       
     }        
+
+#if defined(DEBUG_LOG_PROXY_ACTIVITY)
+    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+    errdes.sourceaddress    = 0;
+    errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_reply_ok);
+    errdes.par16            = (param->p08_2 << 8) | (param->p08_1); 
+    errdes.par64            = id32; 
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &errdes); 
+#endif
     
     return(eores_OK);
 }
@@ -423,22 +440,28 @@ extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_PWM_LIMIT(eOcanframe
         //s_eo_icubCanProto_mb_send_runtime_error_diagnostics(6);
         return(eores_OK);
     }
-    
-    
+        
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, index, eoprot_tag_mc_motor_config_pwmlimit);
    
-
+    eOerrmanDescriptor_t errdes = {0};
     EOproxy * proxy = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
     eOproxy_params_t *param = eo_proxy_Params_Get(proxy, id32);
     if(NULL == param)
     {
-        eOerrmanDescriptor_t errdes = {0};
         errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
         errdes.sourceaddress    = 0;
         errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_ropdes_notfound);
         errdes.par16            = 0; 
         errdes.par64            = id32; 
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
+        
+        errdes.code            = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_parsingfailure);
+        errdes.par16           = (frame->id & 0x0fff) | ((frame->size & 0x000f) << 12);
+        errdes.par64           = eo_common_canframe_data2u64((eOcanframe_t*)frame);
+        errdes.sourceaddress   = EOCANPROT_FRAME_GET_SOURCE(frame);
+        errdes.sourcedevice    = (eOcanport1 == port) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &errdes);  
+        
         return(eores_OK);
     } 
 
@@ -453,7 +476,16 @@ extern eOresult_t eocanprotMCpolling_parser_POL_MC_CMD__GET_PWM_LIMIT(eOcanframe
         eOresult_t res = eo_proxy_ReplyROP_Load(proxy, id32, NULL);  
         eom_emsappl_SendTXRequest(eom_emsappl_GetHandle());        
     }
-          
+
+#if defined(DEBUG_LOG_PROXY_ACTIVITY)
+    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+    errdes.sourceaddress    = 0;
+    errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_reply_ok);
+    errdes.par16            = (param->p08_2 << 8) | (param->p08_1); 
+    errdes.par64            = id32; 
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &errdes);
+#endif
+    
     return(eores_OK);
 }
 
@@ -961,18 +993,25 @@ static eOresult_t s_parser_POL_MC_CMD_getposition(eOcanframe_t *frame, eOcanport
     
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, index, eoprot_tag_mc_joint_config_userlimits);
    
-
+    eOerrmanDescriptor_t errdes = {0};
     EOproxy * proxy = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
     eOproxy_params_t *param = eo_proxy_Params_Get(proxy, id32);
     if(NULL == param)
     {
-        eOerrmanDescriptor_t errdes = {0};
         errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
         errdes.sourceaddress    = 0;
         errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_ropdes_notfound);
         errdes.par16            = 0; 
         errdes.par64            = id32; 
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
+        
+        errdes.code            = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_parsingfailure);
+        errdes.par16           = (frame->id & 0x0fff) | ((frame->size & 0x000f) << 12);
+        errdes.par64           = eo_common_canframe_data2u64((eOcanframe_t*)frame);
+        errdes.sourceaddress   = EOCANPROT_FRAME_GET_SOURCE(frame);
+        errdes.sourcedevice    = (eOcanport1 == port) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &errdes);  
+        
         return(eores_OK);
     } 
 
@@ -1010,7 +1049,16 @@ static eOresult_t s_parser_POL_MC_CMD_getposition(eOcanframe_t *frame, eOcanport
         eOresult_t res = eo_proxy_ReplyROP_Load(proxy, id32, NULL);  
         eom_emsappl_SendTXRequest(eom_emsappl_GetHandle());        
     }
-          
+
+#if defined(DEBUG_LOG_PROXY_ACTIVITY)
+    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+    errdes.sourceaddress    = 0;
+    errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_reply_ok);
+    errdes.par16            = (param->p08_2 << 8) | (param->p08_1); 
+    errdes.par64            = id32; 
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &errdes); 
+#endif
+    
     return(eores_OK);
 }
 
@@ -1058,18 +1106,25 @@ static eOresult_t s_parser_POL_MC_CMD_getpid_etc(eOcanframe_t *frame, eOcanport_
     
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, index, tag);
    
-
+    eOerrmanDescriptor_t errdes = {0};
     EOproxy * proxy = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
     eOproxy_params_t *param = eo_proxy_Params_Get(proxy, id32);
     if(NULL == param)
     {
-        eOerrmanDescriptor_t errdes = {0};
         errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
         errdes.sourceaddress    = 0;
         errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_ropdes_notfound);
         errdes.par16            = 0; 
         errdes.par64            = id32; 
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
+        
+        errdes.code            = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_parsingfailure);
+        errdes.par16           = (frame->id & 0x0fff) | ((frame->size & 0x000f) << 12);
+        errdes.par64           = eo_common_canframe_data2u64((eOcanframe_t*)frame);
+        errdes.sourceaddress   = EOCANPROT_FRAME_GET_SOURCE(frame);
+        errdes.sourcedevice    = (eOcanport1 == port) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &errdes);         
+        
         return(eores_OK);
     } 
     
@@ -1092,9 +1147,7 @@ static eOresult_t s_parser_POL_MC_CMD_getpid_etc(eOcanframe_t *frame, eOcanport_
         pid->stiction_up_val   = *((int16_t*)&frame->data[1]);
         pid->stiction_down_val = *((int16_t*)&frame->data[3]);
     }
-    
-
-    
+       
     param->p08_2 ++;
     
     if(param->p08_1 == param->p08_2)
@@ -1104,7 +1157,16 @@ static eOresult_t s_parser_POL_MC_CMD_getpid_etc(eOcanframe_t *frame, eOcanport_
         eOresult_t res = eo_proxy_ReplyROP_Load(proxy, id32, NULL);  // if NULL it does not copy dat into the nv and uses ram inside the netvar
         eom_emsappl_SendTXRequest(eom_emsappl_GetHandle());        
     }
-       
+
+#if defined(DEBUG_LOG_PROXY_ACTIVITY)
+    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+    errdes.sourceaddress    = 0;
+    errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_reply_ok);
+    errdes.par16            = (param->p08_2 << 8) | (param->p08_1); 
+    errdes.par64            = id32; 
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &errdes); 
+#endif
+    
     return(eores_OK);
 }
 
@@ -1130,18 +1192,25 @@ static eOresult_t s_parser_POL_MC_CMD_getimpedance(eOcanframe_t *frame, eOcanpor
     
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint, index, eoprot_tag_mc_joint_config_impedance);
    
-
+    eOerrmanDescriptor_t errdes = {0};
     EOproxy * proxy = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
     eOproxy_params_t *param = eo_proxy_Params_Get(proxy, id32);
     if(NULL == param)
     {
-        eOerrmanDescriptor_t errdes = {0};
         errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
         errdes.sourceaddress    = 0;
         errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_ropdes_notfound);
         errdes.par16            = 0; 
         errdes.par64            = id32; 
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
+        
+        errdes.code            = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_parsingfailure);
+        errdes.par16           = (frame->id & 0x0fff) | ((frame->size & 0x000f) << 12);
+        errdes.par64           = eo_common_canframe_data2u64((eOcanframe_t*)frame);
+        errdes.sourceaddress   = EOCANPROT_FRAME_GET_SOURCE(frame);
+        errdes.sourcedevice    = (eOcanport1 == port) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &errdes);  
+        
         return(eores_OK);
     } 
 
@@ -1173,8 +1242,16 @@ static eOresult_t s_parser_POL_MC_CMD_getimpedance(eOcanframe_t *frame, eOcanpor
         eOresult_t res = eo_proxy_ReplyROP_Load(proxy, id32, NULL);  
         eom_emsappl_SendTXRequest(eom_emsappl_GetHandle());        
     }
-       
 
+#if defined(DEBUG_LOG_PROXY_ACTIVITY)       
+    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+    errdes.sourceaddress    = 0;
+    errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_reply_ok);
+    errdes.par16            = (param->p08_2 << 8) | (param->p08_1); 
+    errdes.par64            = id32; 
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, NULL, NULL, &errdes); 
+#endif
+    
     return(eores_OK);
 }
 

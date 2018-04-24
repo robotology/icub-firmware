@@ -74,7 +74,7 @@ extern "C" {
 //  <o> major           <0-255> 
 #define EOMTHEEMSAPPLCFG_VERSION_MAJOR          3
 //  <o> minor           <0-255> 
-#define EOMTHEEMSAPPLCFG_VERSION_MINOR          21
+#define EOMTHEEMSAPPLCFG_VERSION_MINOR          22
 
 //  </h>version
 
@@ -84,7 +84,7 @@ extern "C" {
 //  <o> month           <1-12> 
 #define EOMTHEEMSAPPLCFG_BUILDDATE_MONTH        4
 //  <o> day             <1-31> 
-#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          19
+#define EOMTHEEMSAPPLCFG_BUILDDATE_DAY          24
 //  <o> hour            <0-23> 
 #define EOMTHEEMSAPPLCFG_BUILDDATE_HOUR         13
 //  <o> minute          <0-59> 
@@ -607,7 +607,7 @@ extern "C" {
 //  <o> capacity of the reply container                     <0-32>
 //  <i> default: 16
 //  <i> it is the max number of reply information that can be stored
-#define EOMTHEEMSAPPLCFG_PROXY_MAXNUMOFREPLYROPS 16
+#define EOMTHEEMSAPPLCFG_PROXY_MAXNUMOFREPLYROPS 24
 
 //  <o> maximum time a reply can be contained (in ms)       <0-100000>
 //  <i> default: 10. 
