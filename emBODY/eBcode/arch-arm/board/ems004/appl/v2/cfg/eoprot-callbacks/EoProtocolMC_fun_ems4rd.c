@@ -390,7 +390,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_impedance(const EOnv* nv, const eOro
             errdes.par16            = (param->p08_2 << 8) | (param->p08_1); 
             errdes.par64            = rd->id32; 
             eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, NULL, &errdes);            
-#if defined(DEBUG_LOG_PROXY_ACTIVITY)            
+#endif            
             return;
         }     
     }
