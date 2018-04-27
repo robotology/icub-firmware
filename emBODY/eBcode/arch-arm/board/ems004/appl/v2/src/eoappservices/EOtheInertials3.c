@@ -1775,6 +1775,9 @@ static void s_eo_inertials3_imu_configure(EOtheInertials3 *p)
                 location.addr = addr;
                 // and now i fill enabledsensors and i send the message
                 imuconfig.enabledsensors = 0; 
+                //we want alway read the status
+                eo_common_hlfword_bitset(&imuconfig.enabledsensors, icubCanProto_imu_status);
+                
                 for(uint8_t i=0; i<numofsensors; i++)
                 {
                     eOas_inertial3_descriptor_t *des = (eOas_inertial3_descriptor_t*) eo_array_At(p->arrayofsensordescriptors, i);
