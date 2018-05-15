@@ -530,23 +530,34 @@ static void JointSet_manage_trifid_constraint(JointSet* o)
     {
         return;
     }
-            
-    if ( !(rho0<=rho1 && rho0<=rho2 && o->motor[m0].output>=0) 
-      && !(rho0>=rho1 && rho0>=rho2 && o->motor[m0].output<=0))
+    
+    int32_t out0 = o->motor[m0].output;
+    int32_t out1 = o->motor[m1].output;
+    int32_t out2 = o->motor[m2].output;
+    
+    if (o->joint[j0].posPID.Kp < 0.0f)
+    {
+        out0 = -out0;
+        out1 = -out1;
+        out2 = -out2;
+    }
+    
+    if ( !(rho0<=rho1 && rho0<=rho2 && out0>=0) 
+      && !(rho0>=rho1 && rho0>=rho2 && out0<=0))
     {
         o->motor[j0].output = 0;
         Joint_stop(o->joint+j0);
     }
                 
-    if ( !(rho1<=rho2 && rho1<=rho0 && o->motor[m1].output>=0) 
-      && !(rho1>=rho2 && rho1>=rho0 && o->motor[m1].output<=0))
+    if ( !(rho1<=rho2 && rho1<=rho0 && out1>=0) 
+      && !(rho1>=rho2 && rho1>=rho0 && out1<=0))
     {
         o->motor[j1].output = 0;
         Joint_stop(o->joint+j1);
     }
                 
-    if ( !(rho2<=rho0 && rho2<=rho1 && o->motor[m2].output>=0) 
-      && !(rho2>=rho0 && rho2>=rho1 && o->motor[m2].output<=0))
+    if ( !(rho2<=rho0 && rho2<=rho1 && out2>=0) 
+      && !(rho2>=rho0 && rho2>=rho1 && out2<=0))
     {
         o->motor[j2].output = 0;
         Joint_stop(o->joint+j2);
