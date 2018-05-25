@@ -951,7 +951,7 @@ extern eOresult_t eo_temperatures_AcceptCANframe(EOtheTemperatures *p, eOas_temp
     {
         // damn... a loss of can frames
         eOerrmanDescriptor_t des = {0};
-        des.code            = eoerror_code_get(eoerror_category_InertialSensor, eoerror_value_AS_arrayoftemperaturedataoverflow);
+        des.code            = eoerror_code_get(eoerror_category_AnalogSensor, eoerror_value_AS_arrayoftemperaturedataoverflow);
         des.par16           = (frame->id & 0x0fff) | ((frame->size & 0x000f) << 12);
         des.par64           = eo_common_canframe_data2u64((eOcanframe_t*)frame);
         des.sourceaddress   = EOCANPROT_FRAME_GET_SOURCE(frame);
