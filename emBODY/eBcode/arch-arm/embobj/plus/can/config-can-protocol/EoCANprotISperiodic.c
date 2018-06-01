@@ -163,10 +163,10 @@ extern eOresult_t eocanprotINperiodic_parser_PER_IS_MSG__IMU_TRIPLE(eOcanframe_t
         return(eores_OK);
     }
     
-    eOas_inertial3_type_t ciao = eoas_inertial3_canproto_to_imu(frame->data[1]);
-    if(eoas_inertial3_unknown != ciao)
+    eOas_inertial3_type_t type = eoas_inertial3_canproto_to_imu(frame->data[1]);
+    if(eoas_inertial3_unknown != type)
     {
-        eo_inertials3_AcceptCANframe(eo_inertials3_GetHandle(), ciao, frame, port);
+        eo_inertials3_AcceptCANframe(eo_inertials3_GetHandle(), type, frame, port);
     }
     
     return(eores_OK);
