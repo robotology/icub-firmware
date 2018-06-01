@@ -57,8 +57,7 @@
 #include "embot_app_application_theCANtracer.h"
 
 
-
-
+#define _VERIFYsizeof(sname, ssize)    typedef uint8_t GUARD##sname[ ( ssize == sizeof(sname) ) ? (1) : (-1)];
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -74,7 +73,8 @@ struct embot::app::application::theSTRAIN::Impl
     
     // the new amplifier is the PGA308 by Texas Instruments. It has a completly different configuration
     // we use for it the compact form of the can message
-    struct amplifierConfig_t
+    
+    struct amplifierConfig_v00_t
     { 
         embot::app::canprotocol::analog::polling::PGA308cfg1    pga308cfg1;   
         
@@ -84,55 +84,135 @@ struct embot::app::application::theSTRAIN::Impl
             tfc.get(pga308cfg1);
         }
         
+        amplifierConfig_v00_t() { factoryreset(); }
+    }; _VERIFYsizeof(amplifierConfig_v00_t, 6)
+    
+    struct amplifierConfig_t
+    {   // it is _v01_t 
+        embot::app::canprotocol::analog::polling::PGA308cfg1    pga308cfg1; 
+        std::uint8_t                                            ffu[2];        
+        
+        void factoryreset() {
+            embot::hw::PGA308::TransferFunctionConfig tfc;
+            tfc.setDefault();
+            tfc.get(pga308cfg1);
+            ffu[0] = ffu[1] = 0;
+        }
+        
         amplifierConfig_t() { factoryreset(); }
-    };
+        
+        void import(const amplifierConfig_v00_t& v00)
+        {
+            std::memmove(&pga308cfg1, &v00.pga308cfg1, sizeof(pga308cfg1));
+            std::memset(ffu, 0, sizeof(ffu));
+        }
+        
+    }; _VERIFYsizeof(amplifierConfig_t, 8)
     
     
-//    // the old amplifier just had an offset. the 6sg also had two gains.
-//    // MAYBE: we should think to reuse these three values to set the whole pga308cfg1 a simpler way for the sake of canloader 
-//    struct amplifier0Config_t
-//    {   
-//        std::uint16_t       offset;             // the offset generated with the dac  
-//        std::uint16_t       gain[2];            // the gains used by .... 6sg maybe?                
-//    }; 
 
-    
     // the matrix transformation which is done after adc acquisition    
     // tf = M * (adc + tare)
     // then tf can also be corrected with an extra tare which is set in runtime: TF = tf + tare_set_in_runtime
     // the 6 values of TF are those transmitted to the host.
     // in here are also stored fullscale (and gain?) which are queried and used by the remote host to compensate the received TF values
-    struct transformerConfig_t
+    
+    struct transformerConfig_v00_t
     {
         std::uint8_t                dummy;          // just to remove a hole
         std::uint8_t                gain;           // the gain managed with GET_MATRIX_G / SET_MATRIX_G which is NOT USED INSIDE THE MPU        
         std::uint16_t               fullscale[6];   // the fullscale of the measurements: NOT USED INSIDE THE MPU
         embot::dsp::Q15             tare[6];        // in format 1Q15: the stored tare
         embot::dsp::Q15             matrix[6*6];    // in format 1Q15: transformation matrix from the 6 strain-gauge values to the 6 force-torque values        
-    };
+    };  _VERIFYsizeof(transformerConfig_v00_t, 98) 
+    
+    struct transformerConfig_t
+    {
+        std::uint8_t                gain;           // the gain managed with GET_MATRIX_G / SET_MATRIX_G which is NOT USED INSIDE THE MPU   
+        std::uint8_t                ffu[7];
+        std::uint16_t               fullscale[6];   // the fullscale of the measurements: NOT USED INSIDE THE MPU
+        embot::dsp::Q15             tare[6];        // in format 1Q15: the stored tare
+        embot::dsp::Q15             matrix[6*6];    // in format 1Q15: transformation matrix from the 6 strain-gauge values to the 6 force-torque values 
+        
+        void import(const transformerConfig_v00_t& v00)
+        {
+            gain = v00.gain;
+            std::memset(ffu, 0, sizeof(ffu));
+            std::memmove(fullscale, v00.fullscale, sizeof(fullscale));
+            std::memmove(tare, v00.tare, sizeof(tare));
+            std::memmove(matrix, v00.matrix, sizeof(matrix));
+        }
+        
+    };  _VERIFYsizeof(transformerConfig_t, 104) 
+    
     
     
     // the complete configuration for the transformer and the six amplifiers
+    
+    struct setOfConfig_v00_t
+    {
+        transformerConfig_v00_t transformer;            // the config of the transformer from dacs to forcetorque array
+        amplifierConfig_v00_t   amplifiers[6];          // the NEW config of the amplifiers from strain gauge to values given to dacs          
+    };  _VERIFYsizeof(setOfConfig_v00_t, 134)
+    
     struct setOfConfig_t
     {
         transformerConfig_t     transformer;            // the config of the transformer from dacs to forcetorque array
-//        amplifier0Config_t      amplifiers0[6];         // the OLD config of the amplifiers from strain gauge to values given to dacs 
-        amplifierConfig_t       amplifiers[6];          // the NEW config of the amplifiers from strain gauge to values given to dacs          
-    };
+        amplifierConfig_t       amplifiers[6];          // the NEW config of the amplifiers from strain gauge to values given to dacs      
+
+        void import(const setOfConfig_v00_t &v00)
+        {
+            transformer.import(v00.transformer);
+            for(std::uint8_t c=0; c<6; c++)
+            {
+                amplifiers[c].import(v00.amplifiers[c]);
+            }            
+        }
+        
+    };  _VERIFYsizeof(setOfConfig_t, 152)
     
-    static const std::uint32_t validityKey = 0x7777dead;
+
+    static const std::uint32_t validityKey = 0xdead0001;
+    static const std::uint32_t validityKey_v00 = 0x7777dead;
     
     
     
     // it is a holder of config data which is eventally saved to eeprom. 
     // this struct is without methods so that i am sure its sizeof() is the sum of the variables. 
     // this struct it is managed by the StrainConfig class
+    
+    struct strainConfigData_v00_t
+    {   
+        std::uint32_t           key;
+        char                    serial[8];              // the serial number of the strain. it start at offset +4     
+        setOfConfig_v00_t       set[numOfSets];         // the three configurations sets. they start at offset +12
+    };  _VERIFYsizeof(strainConfigData_v00_t, 416)
+    
+    
+    // it is version v01 and with respect to version v00 has a remapping of teh same data into
+    // multiples of 16. plus it has permanentregulationset. 
     struct strainConfigData_t
     {   
         std::uint32_t           key;
-        char                    serial[8];              // the serial number of the strain      
-        setOfConfig_t           set[numOfSets];         // the three configurations sets. so far only one is supported
-    };  
+        char                    serial[8];              // the serial number of the strain  (at offset +4)   
+        std::uint8_t            permanentregulationset; // the set to use at bootstrap (at offset +12)
+        std::uint8_t            ffu[3];                 // a useful hole in the eeprom (at offset +13)
+        setOfConfig_t           set[numOfSets];         // the three configurations sets (at offset +16)
+        
+        void import(const strainConfigData_v00_t &v00)
+        {
+            key = validityKey;
+            std::memmove(serial, v00.serial, sizeof(serial));
+            permanentregulationset = 0;
+            std::memset(ffu, 0, sizeof(ffu));
+            for(std::uint8_t s=0; s<numOfSets; s++)
+            {
+                set[s].import(v00.set[s]);
+            }
+        }
+        
+    };  _VERIFYsizeof(strainConfigData_t, 472)
+
         
     
     // the class which manages the configuration data which is also stored in eeprom
@@ -153,13 +233,34 @@ struct embot::app::application::theSTRAIN::Impl
         embot::dsp::q15::matrix transfQ15tare[numOfSets];
 
         public:
-            
-        
+                    
         // methods
         
         bool isEEPROMsynched()
         {
             return synched;
+        }
+        
+        bool migrate(std::uint32_t fromkey)
+        {
+            if(validityKey == fromkey)
+            {
+                return true;
+            }
+            
+            if(validityKey_v00 != fromkey)
+            {
+                return false;
+            }
+            
+            // ok, ... we do business; strainConfigData_v00_t is smaller than strainConfigData_t
+            strainConfigData_v00_t datav00;
+            std::memmove(&datav00, &data,  sizeof(strainConfigData_v00_t));
+            // now we get prepare data and then... we copy old stuff inside
+            def_values();
+            data.import(datav00);
+           
+            return true;
         }
         
         bool EEPROM_read()
@@ -169,9 +270,14 @@ struct embot::app::application::theSTRAIN::Impl
             synched = true;
             
             if(validityKey != data.key)
-            {   // if it is not valid, then ... set default and impose validity key      
-                def_values();
-                data.key = validityKey;
+            {   // if it is not valid, then 
+                // 1. attempt to migrate.
+                // 2. if operation fails ... set default and impose validity key   
+                if(false == migrate(data.key))
+                {
+                    def_values();                    
+                    data.key = validityKey;
+                }
                 EEPROM_write();
             }
                         
@@ -220,10 +326,24 @@ struct embot::app::application::theSTRAIN::Impl
         {
             return data.serial;
         }
+        
+        void permanentregulationset_set(uint8_t set)
+        {
+            if(set < numOfSets)
+            {
+                data.permanentregulationset = set; 
+                synched = false;                
+            }
+        }
+        
+        uint8_t permanentregulationset_get()
+        {
+            return data.permanentregulationset;
+        }
                         
         void amplifiers_set(std::uint8_t set, std::uint8_t channel, const embot::app::canprotocol::analog::polling::PGA308cfg1 &cfg1)
         {
-            if((channel < 6) && (set < numOfSets))
+            if((channel < numOfChannels) && (set < numOfSets))
             {
                 data.set[set].amplifiers[channel].pga308cfg1 = cfg1;
                 synched = false;
@@ -233,7 +353,7 @@ struct embot::app::application::theSTRAIN::Impl
         bool amplifiers_get(std::uint8_t set, std::uint8_t channel, embot::app::canprotocol::analog::polling::PGA308cfg1 &cfg1)
         {
             bool ret = false;
-            if((channel < 6) && (set < numOfSets))
+            if((channel < numOfChannels) && (set < numOfSets))
             {
                 cfg1 = data.set[set].amplifiers[channel].pga308cfg1;
                 ret = true;
@@ -244,7 +364,7 @@ struct embot::app::application::theSTRAIN::Impl
 
         void amplifiers_reset(std::uint8_t set, std::uint8_t channel)
         {
-            if((channel < 6) && (set < numOfSets))
+            if((channel < numOfChannels) && (set < numOfSets))
             {
                 data.set[set].amplifiers[channel].factoryreset();
                 synched = false;
@@ -308,7 +428,7 @@ struct embot::app::application::theSTRAIN::Impl
         
         void transformer_matrix_set(std::uint8_t set, std::uint8_t r, std::uint8_t c, embot::dsp::Q15 value)
         {   
-            if((set < numOfSets) && (r < 6) && (c < 6))
+            if((set < numOfSets) && (r < numOfChannels) && (c < numOfChannels))
             {
                 transfQ15matrix[set].set(r, c, value);
                 synched = false;
@@ -319,7 +439,7 @@ struct embot::app::application::theSTRAIN::Impl
         { 
             embot::dsp::Q15 v = embot::dsp::q15::zero;
             
-            if((set < numOfSets) && (r < 6) && (c < 6))
+            if((set < numOfSets) && (r < numOfChannels) && (c < numOfChannels))
             {
                 v = transfQ15matrix[set].get(r, c);
             }
@@ -338,7 +458,7 @@ struct embot::app::application::theSTRAIN::Impl
         
         void transformer_tare_set(std::uint8_t set, std::uint8_t channel, embot::dsp::Q15 value)
         { 
-            if((set < numOfSets) && (channel < 6))
+            if((set < numOfSets) && (channel < numOfChannels))
             {
                 transfQ15tare[set].set(channel, 0, value);
                 synched = false;
@@ -348,7 +468,7 @@ struct embot::app::application::theSTRAIN::Impl
         embot::dsp::Q15 transformer_tare_get(std::uint8_t set, std::uint8_t channel)
         {
             embot::dsp::Q15 v = embot::dsp::q15::zero;
-            if((set < numOfSets) && (channel < 6))
+            if((set < numOfSets) && (channel < numOfChannels))
             {
                 v = transfQ15tare[set].get(channel, 0);
             }            
@@ -360,7 +480,8 @@ struct embot::app::application::theSTRAIN::Impl
             clear();
             
             data.key = validityKey;
-            std::snprintf(data.serial, sizeof(data.serial), "SN0000");            
+            std::snprintf(data.serial, sizeof(data.serial), "SN0000");     
+            data.permanentregulationset = 0;
             // and now the set   
             for(int s=0; s<numOfSets; s++)
             {
@@ -371,12 +492,8 @@ struct embot::app::application::theSTRAIN::Impl
                 transformer_matrix_fill_diagonal(s, embot::dsp::q15::posOneNearly);
                 transformer_gain_set(s, 1);
                 
-                for(int chn=0; chn<6; chn++)
+                for(int chn=0; chn<numOfChannels; chn++)
                 {
-//                    // amplifier0
-//                    amplifier0_offset_set(s, chn, 0);
-//                    amplifier0_gains_set(s, chn, 1, 1);
-                    // amplifier
                     amplifiers_reset(s, chn);
                 }
             }
@@ -389,7 +506,7 @@ struct embot::app::application::theSTRAIN::Impl
         
         std::uint16_t transformer_fullscale_get(std::uint8_t set, std::uint8_t channel)
         {
-            if((set < numOfSets) && (channel < 6))
+            if((set < numOfSets) && (channel < numOfChannels))
             {
                 return data.set[set].transformer.fullscale[channel];
             }
@@ -401,7 +518,7 @@ struct embot::app::application::theSTRAIN::Impl
         
         void transformer_fullscale_set(std::uint8_t set, std::uint8_t channel, std::uint16_t value)
         {
-            if((set < numOfSets) && (channel < 6))
+            if((set < numOfSets) && (channel < numOfChannels))
             {
                 data.set[set].transformer.fullscale[channel] = value;
                 synched = false;
@@ -410,53 +527,11 @@ struct embot::app::application::theSTRAIN::Impl
 
         void transformer_fullscale_fill(std::uint8_t set, std::uint16_t value)
         {
-            for(int channel=0; channel<6; channel++)
+            for(int channel=0; channel<numOfChannels; channel++)
             {
                 transformer_fullscale_set(set, channel, value); 
             }
-        }        
-        
-//        void amplifier0_offset_set(std::uint8_t set, std::uint8_t channel, std::uint16_t value)
-//        {
-//            if((set < numOfSets) && (channel < 6))
-//            {
-//                data.set[set].amplifiers0[channel].offset = value;
-//                synched = false;
-//            }
-//        }
-//        
-//        std::uint16_t amplifier0_offset_get(std::uint8_t set, std::uint8_t channel)
-//        {
-//            std::uint16_t value = 0;
-//            if((set < numOfSets) && (channel < 6))
-//            {
-//                value = data.set[set].amplifiers0[channel].offset;                
-//            }
-//            
-//            return value;
-//        }
-//        
-//        void amplifier0_gains_set(std::uint8_t set, std::uint8_t channel, std::uint16_t g0, std::uint16_t g1)
-//        {
-//            if((set < numOfSets) && (channel < 6))
-//            {
-//                data.set[set].amplifiers0[channel].gain[0] = g0;
-//                data.set[set].amplifiers0[channel].gain[1] = g1;
-//                synched = false;
-//            }            
-//        }
-//        
-//        bool amplifier0_gains_get(std::uint8_t set, std::uint8_t channel, std::uint16_t &g0, std::uint16_t &g1)
-//        {
-//            bool ret = false;
-//            if((set < numOfSets) && (channel < 6))
-//            {
-//                g0 = data.set[set].amplifiers0[channel].gain[0];
-//                g0 = data.set[set].amplifiers0[channel].gain[1];
-//                ret =  true;
-//            }  
-//            return ret;            
-//        }
+        }                
         
     };
     
@@ -484,6 +559,8 @@ struct embot::app::application::theSTRAIN::Impl
 
         std::uint8_t adcfailures;
         
+        std::uint8_t set2use;
+        
         
         // methods
         void clear() { 
@@ -498,6 +575,7 @@ struct embot::app::application::theSTRAIN::Impl
             adcsaturation = false;
             adcfailures = 0;
             std::memset(saturationonchannel, static_cast<std::uint8_t>(embot::app::canprotocol::analog::periodic::ADCsaturation::NONE), sizeof(saturationonchannel));
+            set2use = 0;
         }       
         StrainRuntimeData_t() { clear(); }
     };
@@ -528,7 +606,7 @@ struct embot::app::application::theSTRAIN::Impl
 
 
             
-            for(int channel=0; channel<6; channel++)
+            for(int channel=0; channel<numOfChannels; channel++)
             {
                 data.saturationonchannel[channel] = embot::app::canprotocol::analog::periodic::ADCsaturation::NONE;
                 
@@ -554,7 +632,7 @@ struct embot::app::application::theSTRAIN::Impl
         
         void tare_set(std::uint8_t channel, embot::dsp::Q15 value)
         { 
-            if(channel<6)
+            if(channel<numOfChannels)
             {
                 data.tare[channel] = value;
             }
@@ -562,7 +640,7 @@ struct embot::app::application::theSTRAIN::Impl
         
         embot::dsp::Q15 tare_get(std::uint8_t channel)
         {
-            if(channel<6)
+            if(channel<numOfChannels)
             {
                 return data.tare[channel];
             }
@@ -576,13 +654,26 @@ struct embot::app::application::theSTRAIN::Impl
             return true;
         }
         
+        void set2use_set(std::uint8_t set)
+        {
+            if(set < numOfSets)
+            {
+                data.set2use = set;
+            }
+        }
+        
+        std::uint8_t set2use_get()
+        {
+            return data.set2use;
+        }
+        
         StrainRuntimeData()
         {
             clear();
             
             forcetorqueQ15vector.load(6, 1, data.forcetorque);
             currtareQ15vector.load(6, 1, data.tare);
-            adcvalueQ15vector.load(6, 1, data.q15value);
+            adcvalueQ15vector.load(6, 1, data.q15value);            
         }
         
         ~StrainRuntimeData() {}
@@ -639,6 +730,9 @@ struct embot::app::application::theSTRAIN::Impl
     bool start(const embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode mode);
     bool stop();
     
+    bool evalstop(embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode &mode);
+    bool evalrestart(const embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode mode);
+    
     bool tick(std::vector<embot::hw::can::Frame> &replies);
     bool processdata(std::vector<embot::hw::can::Frame> &replies);
     
@@ -668,6 +762,61 @@ struct embot::app::application::theSTRAIN::Impl
         }
         
         mypImpl->adcdataisready = true;                            
+    }
+    
+    bool regulationset2index(const std::uint8_t rs, std::uint8_t &index)
+    {
+        if(static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::StrainRegulationSet::theoneinuse) == rs)
+        {
+            index = runtimedata.set2use_get();
+            return true;
+        }
+        else if(rs <= numOfSets)
+        {
+            index = rs - 1;
+            return true;
+        }
+        
+        return false;        
+    }
+    
+    bool ischannelvalid(const std::uint8_t ch, bool &allchannels)
+    {
+        allchannels = false;
+        if(0x0f == ch)
+        {
+            allchannels = true;
+        }    
+        else if(ch >= numOfChannels)
+        {
+            return false;
+        }
+        return true;        
+    }
+    
+    bool ischannelvalid(const std::uint8_t ch)
+    {
+        if(ch >= numOfChannels)
+        {
+            return false;
+        }
+        return true;        
+    }
+    
+    
+    void amplifiers_applyregulationset(std::uint8_t set2use)
+    {        
+        embot::hw::PGA308::TransferFunctionConfig tfc;    
+        // set-todo: use variable set2use, originally initted w/ eeprom value but possibly changed by can message. 
+        //#warning when changed by can message, remember to set the tfc ...
+        //std::uint8_t set2use = pImpl->runtimedata.set2use_get();
+        for(int c=0; c<numOfChannels; c++)
+        {
+            embot::app::canprotocol::analog::polling::PGA308cfg1 pga308cfg1;
+            configdata.amplifiers_get(set2use, c, pga308cfg1); 
+            tfc.load(pga308cfg1);    
+            embot::hw::PGA308::set(static_cast<embot::hw::PGA308::Amplifier>(c), tfc);                
+        }
     }
                       
 };
@@ -718,6 +867,21 @@ bool embot::app::application::theSTRAIN::Impl::stop()
     ticktimer->stop();
     ticking = false;    
     return true;
+}
+
+bool embot::app::application::theSTRAIN::Impl::evalstop(embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode &mode)
+{
+    mode = runtimedata.data.strainmode;
+    if(true == ticking)
+    {
+        stop();
+    }
+    return true;    
+}
+
+bool embot::app::application::theSTRAIN::Impl::evalrestart(const embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode mode)
+{
+    return start(mode);
 }
 
 
@@ -919,7 +1083,7 @@ bool embot::app::application::theSTRAIN::Impl::acquisition_retrieve()
     // 2. convert adcvalue[] into q15value[]
 
     runtimedata.data.adcfailures = 0;
-    for(int i=0; i<6; i++)
+    for(int i=0; i<numOfChannels; i++)
     {
         if(0xffff == runtimedata.data.adcvalue[i])
         {
@@ -938,8 +1102,8 @@ bool embot::app::application::theSTRAIN::Impl::acquisition_retrieve()
 
 bool embot::app::application::theSTRAIN::Impl::processing()
 {
-    // we work on set 0
-    const std::uint8_t set = 0;
+    // use variable set2use, originally initted w/ eeprom value but possibly changed by can message
+    std::uint8_t set2use = runtimedata.set2use_get();
     
     // in adcvalue[] we performed adc acquisition, in value[] we put the q15 values and we also have checkd vs adc saturation
     
@@ -952,8 +1116,8 @@ bool embot::app::application::theSTRAIN::Impl::processing()
     
     bool q15saturated =  false;
     
-    const embot::dsp::q15::matrix& handleCalibMatrixQ15 = configdata.transformer_matrix_handle(set);     
-    const embot::dsp::q15::matrix& handleCalibTareQ15 = configdata.transformer_tare_handle(set);   
+    const embot::dsp::q15::matrix& handleCalibMatrixQ15 = configdata.transformer_matrix_handle(set2use);     
+    const embot::dsp::q15::matrix& handleCalibTareQ15 = configdata.transformer_tare_handle(set2use);   
         
     embot::dsp::Q15 q15tmpvector[6];
     embot::dsp::q15::matrix tmpQ15vector(6, 1, q15tmpvector);
@@ -1174,6 +1338,9 @@ bool embot::app::application::theSTRAIN::initialise(Config &config)
     pImpl->configdata.EEPROM_read();
     pImpl->runtimedata.clear();
     
+    // i init the set2use as the one stored in eeprom
+    pImpl->runtimedata.set2use_set(pImpl->configdata.permanentregulationset_get());
+    
     // init the hw used to acquire from strain gauges: amplifier PGA308 + adc channels.
 
     // PGA308
@@ -1221,15 +1388,22 @@ bool embot::app::application::theSTRAIN::initialise(Config &config)
     
     
     // now i must apply the values on eeprom pImpl->configdata.EEPROM_read
-    // #warning TODO: apply eeprom values to PGA308 ... all channels.
-    embot::hw::PGA308::TransferFunctionConfig tfc;    
-    for(int i=0; i<6; i++)
-    {
-        embot::app::canprotocol::analog::polling::PGA308cfg1 pga308cfg1;
-        pImpl->configdata.amplifiers_get(0, i, pga308cfg1); 
-        tfc.load(pga308cfg1);    
-        embot::hw::PGA308::set(static_cast<embot::hw::PGA308::Amplifier>(i), tfc);                
-    }
+    
+    std::uint8_t set2use = pImpl->runtimedata.set2use_get();
+    pImpl->amplifiers_applyregulationset(set2use);
+    
+//    // #warning TODO: apply eeprom values to PGA308 ... all channels. 
+//    embot::hw::PGA308::TransferFunctionConfig tfc;    
+//    // set-todo: use variable set2use, originally initted w/ eeprom value but possibly changed by can message. 
+//    #warning when changed by can message, remember to set the tfc ...
+//    std::uint8_t set2use = pImpl->runtimedata.set2use_get();
+//    for(int c=0; c<pImpl->numOfChannels; c++)
+//    {
+//        embot::app::canprotocol::analog::polling::PGA308cfg1 pga308cfg1;
+//        pImpl->configdata.amplifiers_get(set2use, c, pga308cfg1); 
+//        tfc.load(pga308cfg1);    
+//        embot::hw::PGA308::set(static_cast<embot::hw::PGA308::Amplifier>(c), tfc);                
+//    }
         
     
     // ADC
@@ -1285,26 +1459,34 @@ bool embot::app::application::theSTRAIN::get_serial(embot::app::canprotocol::ana
     return true;    
 }
 
-bool embot::app::application::theSTRAIN::get_fullscale(std::uint8_t channel, std::uint16_t &value)
-{    
-    if(channel >= 6 )
+bool embot::app::application::theSTRAIN::get_fullscale(std::uint8_t regulationset, std::uint8_t channel, std::uint16_t &value)
+{  
+    value = 0;
+    
+    uint8_t setindex = 0;
+    if(false == pImpl->regulationset2index(regulationset, setindex))
     {
-        value = 0;
         return false;
     }
-       
-    const std::uint8_t set = 0;
-    value = pImpl->configdata.transformer_fullscale_get(set, channel);
+        
+    if(false == pImpl->ischannelvalid(channel))
+    {   // cannot operate on all channels
+        return false;
+    }
+    
+     
+    value = pImpl->configdata.transformer_fullscale_get(setindex, channel);
 
     return true;    
 }
 
 
 bool embot::app::application::theSTRAIN::get_adc(embot::app::canprotocol::analog::polling::Message_GET_CH_ADC::ReplyInfo &replyinfo)
-{    
-    if(replyinfo.channel >= 6 )
-    {
-        replyinfo.adcvalue = 0;
+{           
+    replyinfo.adcvalue = 0; 
+    
+    if(false == pImpl->ischannelvalid(replyinfo.channel))
+    {   // cannot operate on all channels
         return false;
     }
     
@@ -1346,21 +1528,26 @@ bool embot::app::application::theSTRAIN::get_adc(embot::app::canprotocol::analog
 }
 
 
-bool embot::app::application::theSTRAIN::get_offset(std::uint8_t channel, std::uint16_t &value)
-{    
-    if(channel >= 6 )
+bool embot::app::application::theSTRAIN::get_offset(std::uint8_t regulationset, std::uint8_t channel, std::uint16_t &value)
+{   
+    value = 0; 
+        
+    uint8_t setindex = 0;
+    if(false == pImpl->regulationset2index(regulationset, setindex))
     {
-        value = 0;
         return false;
     }
     
-    const std::uint8_t set = 0;   
-
-    // it was: value = pImpl->configdata.amplifier0_offset_get(set, channel);
     
+    if(false == pImpl->ischannelvalid(channel))
+    {   // cannot operate on all channels
+        return false;
+    }
+    
+
     // it returns the beta   
     embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
-    pImpl->configdata.amplifiers_get(set, channel, cfg1); 
+    pImpl->configdata.amplifiers_get(setindex, channel, cfg1); 
     
     // now i retrieve beta.
     embot::hw::PGA308::TransferFunctionConfig tfc;
@@ -1372,10 +1559,19 @@ bool embot::app::application::theSTRAIN::get_offset(std::uint8_t channel, std::u
 }
 
 bool embot::app::application::theSTRAIN::configure(embot::app::canprotocol::analog::polling::Message_SET_FULL_SCALES::Info &info)
-{       
-    // original strain code saves the value in ram only. it is saved in eeprom only when the message save2eeprom arrives     
-    const std::uint8_t set = 0;
-    pImpl->configdata.transformer_fullscale_set(set, info.channel, info.fullscale);
+{      
+    uint8_t setindex = 0;
+    if(false == pImpl->regulationset2index(info.regulationset, setindex))
+    {
+        return false;
+    }
+    
+    if(false == pImpl->ischannelvalid(info.channel))
+    {   // cannot operate on all channels
+        return false;
+    }
+    
+    pImpl->configdata.transformer_fullscale_set(setindex, info.channel, info.fullscale);
 
     return true;    
 }
@@ -1396,20 +1592,21 @@ bool embot::app::application::theSTRAIN::save2eeprom()
 
 bool embot::app::application::theSTRAIN::configure(embot::app::canprotocol::analog::polling::Message_SET_CH_DAC::Info &info)
 {  
-    if(info.channel >= 6 )
+    uint8_t setindex = 0;
+    if(false == pImpl->regulationset2index(info.regulationset, setindex))
     {
         return false;
-    } 
-   
-    // original strain code saves the value in ram only. it is saved in eeprom only when the message save2eeprom arrives  
-    const std::uint8_t set = 0;    
-        
-    // it was: pImpl->configdata.amplifier0_offset_set(set, info.channel, info.offset);
+    }
     
+    if(false == pImpl->ischannelvalid(info.channel))
+    {   // cannot operate on all channels
+        return false;
+    }
+
     // i assign a beta ....
     
     embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
-    pImpl->configdata.amplifiers_get(set, info.channel, cfg1);
+    pImpl->configdata.amplifiers_get(setindex, info.channel, cfg1);
 
     embot::hw::PGA308::TransferFunctionConfig tfc;
     tfc.load(cfg1);  
@@ -1419,7 +1616,7 @@ bool embot::app::application::theSTRAIN::configure(embot::app::canprotocol::anal
         embot::hw::PGA308::set(static_cast<embot::hw::PGA308::Amplifier>(info.channel), tfc);   
 
         tfc.get(cfg1);
-        pImpl->configdata.amplifiers_set(set, info.channel, cfg1);                
+        pImpl->configdata.amplifiers_set(setindex, info.channel, cfg1);                
     }
             
     return true;    
@@ -1427,14 +1624,21 @@ bool embot::app::application::theSTRAIN::configure(embot::app::canprotocol::anal
 
 
 bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::polling::Message_GET_MATRIX_RC::ReplyInfo &replyinfo)
-{    
-    if((replyinfo.row >= 6) || (replyinfo.col >= 6))
+{ 
+    replyinfo.value = 0;
+    
+    uint8_t setindex = 0;
+    if(false == pImpl->regulationset2index(replyinfo.regulationset, setindex))
     {
-        replyinfo.value = 0;
         return false;
     }
-    const std::uint8_t set = 0;
-    replyinfo.value = static_cast<std::uint16_t>(pImpl->configdata.transformer_matrix_get(set, replyinfo.row, replyinfo.col));
+    
+    if((replyinfo.row >=  pImpl->numOfChannels) || (replyinfo.col >=  pImpl->numOfChannels))
+    {
+        return false;
+    }
+            
+    replyinfo.value = static_cast<std::uint16_t>(pImpl->configdata.transformer_matrix_get(setindex, replyinfo.row, replyinfo.col));
     
     return true;    
 }
@@ -1442,49 +1646,68 @@ bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::po
 
 bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::polling::Message_SET_MATRIX_RC::Info &info)
 {  
-    if((info.row >= 6) || (info.col >= 6))
+    if((info.row >=  pImpl->numOfChannels) || (info.col >=  pImpl->numOfChannels))
     {
         return false;
     }
     
-    // original strain code saves the value in ram only. it is saved in eeprom only when the message save2eeprom arrives  
-    const std::uint8_t set = 0;    
-    pImpl->configdata.transformer_matrix_set(set, info.row, info.col, static_cast<embot::dsp::Q15>(info.value));
+    uint8_t setindex = 0;
+    if(false == pImpl->regulationset2index(info.regulationset, setindex))
+    {
+        return false;
+    }
+    
+    // original strain code saves the value in ram only. it is saved in eeprom only when the message save2eeprom arrives   
+    pImpl->configdata.transformer_matrix_set(setindex, info.row, info.col, static_cast<embot::dsp::Q15>(info.value));
 
     return true;    
 }
 
 
 bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::polling::Message_GET_MATRIX_G::ReplyInfo &replyinfo)
-{        
-    embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance();
+{     
+    uint8_t setindex = 0;
+    if(false == pImpl->regulationset2index(replyinfo.regulationset, setindex))
+    {
+        return false;
+    }   
 
-    const std::uint8_t set = 0;
-    replyinfo.gain =  pImpl->configdata.transformer_gain_get(set);
+    replyinfo.gain =  pImpl->configdata.transformer_gain_get(setindex);
         
     return true;    
 }
 
 
 bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::polling::Message_SET_MATRIX_G::Info &info)
-{  
+{ 
+    uint8_t setindex = 0;
+    if(false == pImpl->regulationset2index(info.regulationset, setindex))
+    {
+        return false;
+    } 
+    
     // original strain code saves the value in ram only. it is saved in eeprom only when the message save2eeprom arrives     
-    const std::uint8_t set = 0;
-    pImpl->configdata.transformer_gain_set(set, info.gain);
+    pImpl->configdata.transformer_gain_set(setindex, info.gain);
 
     return true;    
 }
 
 bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::polling::Message_GET_CALIB_TARE::ReplyInfo &replyinfo)
-{  
-    if(replyinfo.channel >= 6)
+{        
+    replyinfo.value = 0; 
+    
+    uint8_t setindex = 0;
+    if(false == pImpl->regulationset2index(replyinfo.regulationset, setindex))
     {
-        replyinfo.value = 0;
         return false;
     } 
-
-    const std::uint8_t set = 0;
-    replyinfo.value = static_cast<std::uint16_t>(pImpl->configdata.transformer_tare_get(set, replyinfo.channel));
+    
+    if(false == pImpl->ischannelvalid(replyinfo.channel))
+    {   // cannot operate on all channels
+        return false;
+    }
+    
+    replyinfo.value = static_cast<std::uint16_t>(pImpl->configdata.transformer_tare_get(setindex, replyinfo.channel));
 
     return true;    
 }
@@ -1492,38 +1715,47 @@ bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::po
 
 bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::polling::Message_SET_CALIB_TARE::Info &info)
 { 
-    if(info.channel >= 6)
+    uint8_t setindex = 0;
+    if(false == pImpl->regulationset2index(info.regulationset, setindex))
     {
         return false;
-    }     
-
-    // original strain code saves the value in ram only. it is saved in eeprom only when the message save2eeprom arrives
-    const std::uint8_t set = 0;        
+    } 
 
     bool ret = true;
-
     
     switch(info.mode)
     {
         case embot::app::canprotocol::analog::polling::Message_SET_CALIB_TARE::Mode::setchannelwithvalue:
         {
-            pImpl->configdata.transformer_tare_set(set, info.channel, static_cast<embot::dsp::Q15>(info.value));
+            if(false == pImpl->ischannelvalid(info.channel))
+            {   // cannot operate on all channels
+                return false;
+            }
+            pImpl->configdata.transformer_tare_set(setindex, info.channel, static_cast<embot::dsp::Q15>(info.value));
         } break;            
 
         case embot::app::canprotocol::analog::polling::Message_SET_CALIB_TARE::Mode::everychannelreset:
         {
-            pImpl->configdata.transformer_tare_fill(set, embot::dsp::q15::zero);
+            // we dont care about channel: we always operate on all
+            pImpl->configdata.transformer_tare_fill(setindex, embot::dsp::q15::zero);
         } break;
 
         case embot::app::canprotocol::analog::polling::Message_SET_CALIB_TARE::Mode::everychannelnegativeofadc:
-        {                        
+        {
+            // there is no meaning to do that on a regulation set different from the one in use
+            if(static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::StrainRegulationSet::theoneinuse) != info.regulationset)
+            {   
+                return false;
+            }
+                        
             // it acquires once. it also restarts if required.
             pImpl->acquisition_oneshot();
             
-            for(int i=0; i<6; i++)
+            // we dont care about channel: we alwyas operate on all
+            for(int i=0; i<pImpl->numOfChannels; i++)
             {
                 embot::dsp::Q15 value = embot::dsp::q15::U16toQ15(pImpl->runtimedata.data.adcvalue[i]);
-                pImpl->configdata.transformer_tare_set(set, i, embot::dsp::q15::opposite(value));
+                pImpl->configdata.transformer_tare_set(setindex, i, embot::dsp::q15::opposite(value));
             }         
             
         } break;    
@@ -1542,11 +1774,12 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::p
 
 bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::polling::Message_GET_CURR_TARE::ReplyInfo &replyinfo)
 {  
-    if(replyinfo.channel >= 6)
-    {
-        replyinfo.value = 0;
+    replyinfo.value = 0;
+    
+    if(false == pImpl->ischannelvalid(replyinfo.channel))
+    {   // cannot operate on all channels
         return false;
-    }     
+    } 
  
     replyinfo.value =  static_cast<std::uint16_t>(pImpl->runtimedata.tare_get(replyinfo.channel));
     
@@ -1556,28 +1789,29 @@ bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::po
 
 bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::polling::Message_SET_CURR_TARE::Info &info)
 { 
-    if(info.channel >= 6)
-    {
-        return false;
-    }     
- 
-
     bool ret = true;
 
     switch(info.mode)
     {
         case embot::app::canprotocol::analog::polling::Message_SET_CURR_TARE::Mode::setchannelwithvalue:
         {
+            if(false == pImpl->ischannelvalid(info.channel))
+            {   // cannot operate on all channels
+                return false;
+            }
             pImpl->runtimedata.tare_set(info.channel, static_cast<embot::dsp::Q15>(info.value));
         } break;            
 
         case embot::app::canprotocol::analog::polling::Message_SET_CURR_TARE::Mode::everychannelreset:
         {
+            // we dont care about channel: we operate on all
             pImpl->runtimedata.tare_fill(embot::dsp::q15::zero);
         } break;
 
         case embot::app::canprotocol::analog::polling::Message_SET_CURR_TARE::Mode::everychannelnegativeofforcetorque:
         {
+            // we dont care about channel: we operate on all
+            
             // we need to assign the runtimedata.data.tare[] with:  
             // currtare = -tq, where tq = ( M * (adc + calibtare) )
             // after acquisition() + processing we compute runtimedata.data.forcetorque[] to be:
@@ -1595,7 +1829,7 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::p
 
             pImpl->processing();
             
-            for(int i=0; i<6; i++)
+            for(int i=0; i<pImpl->numOfChannels; i++)
             {                
                 pImpl->runtimedata.data.tare[i] = embot::dsp::q15::opposite(pImpl->runtimedata.data.forcetorque[i]); 
             }
@@ -1614,35 +1848,37 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::p
 
 bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::polling::Message_AMPLIFIER_PGA308_CFG1_GET::ReplyInfo &replyinfo)
 {  
-    if(replyinfo.channel >= 6)
+    uint8_t setindex = 0;
+    if(false == pImpl->regulationset2index(replyinfo.regulationset, setindex))
     {
         return false;
     }  
-    
-    if(replyinfo.set >= 3)
-    {   
+
+    if(false == pImpl->ischannelvalid(replyinfo.channel))
+    {   // cannot operate on all channels
         return false;
     }
     
-    pImpl->configdata.amplifiers_get(replyinfo.set, replyinfo.channel, replyinfo.cfg1); 
+    pImpl->configdata.amplifiers_get(setindex, replyinfo.channel, replyinfo.cfg1); 
     return true;    
 }
 
 
 bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::polling::Message_AMPLIFIER_GAINOFFSET_GET::ReplyInfo &replyinfo)
 {  
-    if(replyinfo.channel >= 6)
+    uint8_t setindex = 0;
+    if(false == pImpl->regulationset2index(replyinfo.regulationset, setindex))
     {
         return false;
     }  
-    
-    if(replyinfo.set >= 3)
-    {   
+
+    if(false == pImpl->ischannelvalid(replyinfo.channel))
+    {   // cannot operate on all channels
         return false;
     }
     
     embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
-    pImpl->configdata.amplifiers_get(replyinfo.set, replyinfo.channel, cfg1); 
+    pImpl->configdata.amplifiers_get(setindex, replyinfo.channel, cfg1); 
     
     // now i retrieve alpha and beta
     embot::hw::PGA308::TransferFunctionConfig tfc;
@@ -1658,18 +1894,19 @@ bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::po
 
 bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::polling::Message_AMPLIFIER_RANGE_OF_GAIN_GET::ReplyInfo &replyinfo)
 {  
-    if(replyinfo.channel >= 6)
+    uint8_t setindex = 0;
+    if(false == pImpl->regulationset2index(replyinfo.regulationset, setindex))
     {
         return false;
     }  
     
-    if(replyinfo.set >= 3)
-    {   
+    if(false == pImpl->ischannelvalid(replyinfo.channel))
+    {   // cannot operate on all channels
         return false;
     }
     
     embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
-    pImpl->configdata.amplifiers_get(replyinfo.set, replyinfo.channel, cfg1); 
+    pImpl->configdata.amplifiers_get(setindex, replyinfo.channel, cfg1); 
     
     // now i retrieve limits of alpha.
     embot::hw::PGA308::TransferFunctionConfig tfc;
@@ -1685,18 +1922,19 @@ bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::po
 
 bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::polling::Message_AMPLIFIER_RANGE_OF_OFFSET_GET::ReplyInfo &replyinfo)
 {  
-    if(replyinfo.channel >= 6)
+    uint8_t setindex = 0;
+    if(false == pImpl->regulationset2index(replyinfo.regulationset, setindex))
     {
         return false;
     }  
-    
-    if(replyinfo.set >= 3)
-    {   
+
+    if(false == pImpl->ischannelvalid(replyinfo.channel))
+    {   // cannot operate on all channels
         return false;
     }
     
 //    embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
-//    pImpl->configdata.amplifiers_get(replyinfo.set, replyinfo.channel, cfg1); 
+//    pImpl->configdata.amplifiers_get(setindex, replyinfo.channel, cfg1); 
 //     
 //    // now i retrieve limits of beta.
 //    embot::hw::PGA308::TransferFunctionConfig tfc;
@@ -1710,34 +1948,31 @@ bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::po
 }
 
 
+
 bool  embot::app::application::theSTRAIN::resetamplifier(embot::app::canprotocol::analog::polling::Message_AMPLIFIER_RESET::Info &info)
 { 
+    uint8_t setindex = 0;
+    if(false == pImpl->regulationset2index(info.regulationset, setindex))
+    {
+        return false;
+    } 
+    
     bool allchannels = false;
-    if(0x0f == info.channel)
-    {
-        // it is ok. we do on every channel
-        allchannels = true;
+    if(false == pImpl->ischannelvalid(info.channel, allchannels))
+    {   // we may operate on all channels
+        return false;
     }    
-    else if(info.channel >= 6)
-    {
-        return false;
-    }   
-
-    if(info.set >= 3)
-    {   
-        return false;
-    }
     
     if(true == allchannels)
     {
-        for(std::uint8_t i=0; i<6; i++)
+        for(std::uint8_t i=0; i<pImpl->numOfChannels; i++)
         {
             // i reset amplifier settings to default
-            pImpl->configdata.amplifiers_reset(info.set, i);
+            pImpl->configdata.amplifiers_reset(setindex, i);
             
             // i retrieve the current settings (they are default now).
             embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
-            pImpl->configdata.amplifiers_get(info.set, i, cfg1); 
+            pImpl->configdata.amplifiers_get(setindex, i, cfg1); 
             
             // i apply them to the pga308.
             embot::hw::PGA308::TransferFunctionConfig tfc;
@@ -1749,11 +1984,11 @@ bool  embot::app::application::theSTRAIN::resetamplifier(embot::app::canprotocol
     {
     
         // i reset amplifier settings to default
-        pImpl->configdata.amplifiers_reset(info.set, info.channel);
+        pImpl->configdata.amplifiers_reset(setindex, info.channel);
         
         // i retrieve the current settings (they are default now).
         embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
-        pImpl->configdata.amplifiers_get(info.set, info.channel, cfg1); 
+        pImpl->configdata.amplifiers_get(setindex, info.channel, cfg1); 
         
         // i apply them to the pga308.
         embot::hw::PGA308::TransferFunctionConfig tfc;
@@ -1767,28 +2002,23 @@ bool  embot::app::application::theSTRAIN::resetamplifier(embot::app::canprotocol
 
 bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::polling::Message_AMPLIFIER_PGA308_CFG1_SET::Info &info)
 { 
-    bool allchannels = false;
-    if(0x0f == info.channel)
-    {
-        // it is ok. we do on every channel
-        allchannels = true;
-    }    
-    else if(info.channel >= 6)
+    uint8_t setindex = 0;
+    if(false == pImpl->regulationset2index(info.regulationset, setindex))
     {
         return false;
-    }   
-
-    if(info.set >= 3)
-    {   
-        return false;
-    }
+    } 
     
+    bool allchannels = false;
+    if(false == pImpl->ischannelvalid(info.channel, allchannels))
+    {   // we may operate on all channels
+        return false;
+    }  
     
     if(true == allchannels)
     {
-        for(std::uint8_t i=0; i<6; i++)
+        for(std::uint8_t i=0; i<pImpl->numOfChannels; i++)
         {
-            pImpl->configdata.amplifiers_set(info.set, i, info.cfg1);
+            pImpl->configdata.amplifiers_set(setindex, i, info.cfg1);
             
             embot::hw::PGA308::TransferFunctionConfig tfc;
             tfc.load(info.cfg1);    
@@ -1797,7 +2027,7 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::p
     }
     else
     {    
-        pImpl->configdata.amplifiers_set(info.set, info.channel, info.cfg1);
+        pImpl->configdata.amplifiers_set(setindex, info.channel, info.cfg1);
         
         embot::hw::PGA308::TransferFunctionConfig tfc;
         tfc.load(info.cfg1);    
@@ -1810,24 +2040,32 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::p
 
 bool embot::app::application::theSTRAIN::autocalib(embot::app::canprotocol::analog::polling::Message_AMPLIFIER_OFFSET_AUTOCALIB::Info &info, std::uint8_t &noisychannelmask, std::uint8_t &algorithmOKmask, std::uint8_t &finalmeasureOKmask, std::uint16_t &mae)
 {
-    std::uint8_t channelmask = 0;
-    if(0x0f == info.channel)
-    {
-        // it is ok. we do on every channel
-        channelmask = 0x3f;
+    if(static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::StrainRegulationSet::theoneinuse) != info.regulationset)
+    {   // cannot launch on a regulation set which is not in use
+        mae = 54321;
+        return false;
     }
-    else if(info.channel >= 6)
+    
+    uint8_t setindex = 0;
+    if(false == pImpl->regulationset2index(info.regulationset, setindex))
     {
         return false;
+    } 
+    
+    bool allchannels = false;
+    if(false == pImpl->ischannelvalid(info.channel, allchannels))
+    {   // we may operate on all channels
+        return false;
+    }
+
+    std::uint8_t channelmask = 0;
+    if(true == allchannels)
+    {
+        channelmask = 0x3f;
     }
     else
     {
-        embot::binary::bit::set(channelmask, info.channel); 
-    }
-
-    if(info.set >= 3)
-    {   
-        return false;
+        embot::binary::bit::set(channelmask, info.channel);
     }
     
     noisychannelmask = 0;
@@ -1848,7 +2086,7 @@ bool embot::app::application::theSTRAIN::autocalib(embot::app::canprotocol::anal
     {
         // it acquire once. it also restarts if required.        
         pImpl->acquisition_oneshot();
-        for(std::uint8_t c=0; c<6; c++)
+        for(std::uint8_t c=0; c<pImpl->numOfChannels; c++)
         {
             std::uint16_t tmp = pImpl->runtimedata.data.adcvalue[c] >> 3;
             measure[c] += tmp;
@@ -1864,7 +2102,7 @@ bool embot::app::application::theSTRAIN::autocalib(embot::app::canprotocol::anal
     }
 
     std::uint16_t delta = 0;
-    for(std::uint8_t c=0; c<6; c++)
+    for(std::uint8_t c=0; c<pImpl->numOfChannels; c++)
     {
         if(Nsamples > 0)
         {
@@ -1884,12 +2122,12 @@ bool embot::app::application::theSTRAIN::autocalib(embot::app::canprotocol::anal
     
     algorithmOKmask = 0;
     // perform alignment to target
-    for(std::uint8_t i=0; i<6; i++)
+    for(std::uint8_t i=0; i<pImpl->numOfChannels; i++)
     {
         if(true == embot::binary::bit::check(channelmask, i))
         {
             embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
-            pImpl->configdata.amplifiers_get(0, i, cfg1);
+            pImpl->configdata.amplifiers_get(setindex, i, cfg1);
         
             embot::hw::PGA308::TransferFunctionConfig tfc;
             tfc.load(cfg1);  
@@ -1899,7 +2137,7 @@ bool embot::app::application::theSTRAIN::autocalib(embot::app::canprotocol::anal
             {
                 embot::hw::PGA308::set(static_cast<embot::hw::PGA308::Amplifier>(i), tfc);   
                 tfc.get(cfg1);
-                pImpl->configdata.amplifiers_set(0, i, cfg1); 
+                pImpl->configdata.amplifiers_set(setindex, i, cfg1); 
                 
                 embot::binary::bit::set(algorithmOKmask, i);
             }
@@ -1921,7 +2159,7 @@ bool embot::app::application::theSTRAIN::autocalib(embot::app::canprotocol::anal
     {
         // it acquire once. it also restarts if required.        
         pImpl->acquisition_oneshot();
-        for(std::uint8_t c=0; c<6; c++)
+        for(std::uint8_t c=0; c<pImpl->numOfChannels; c++)
         {
             std::uint16_t tmp = pImpl->runtimedata.data.adcvalue[c] >> 3;
             measure[c] += tmp;
@@ -1936,7 +2174,7 @@ bool embot::app::application::theSTRAIN::autocalib(embot::app::canprotocol::anal
         }
     }
 
-    for(std::uint8_t c=0; c<6; c++)
+    for(std::uint8_t c=0; c<pImpl->numOfChannels; c++)
     {
         if((_max[c] - _min[c]) > (info.tolerance >> 3))
         {
@@ -1982,19 +2220,15 @@ bool embot::app::application::theSTRAIN::autocalib(embot::app::canprotocol::anal
 
 bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::polling::Message_AMPLIFIER_GAINOFFSET_SET::Info &info, float &alpha, float &beta)
 { 
-    bool allchannels = false;
-    if(0x0f == info.channel)
-    {
-        // it is ok. we do on every channel
-        allchannels = true;
-    }    
-    else if(info.channel >= 6)
+    uint8_t setindex = 0;
+    if(false == pImpl->regulationset2index(info.regulationset, setindex))
     {
         return false;
-    }   
-
-    if(info.set >= 3)
-    {   
+    } 
+    
+    bool allchannels = false;
+    if(false == pImpl->ischannelvalid(info.channel, allchannels))
+    {   // we may operate on all channels
         return false;
     }
     
@@ -2002,12 +2236,12 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::p
     
     if(true == allchannels)
     {
-        for(std::uint8_t i=0; i<6; i++)
+        for(std::uint8_t i=0; i<pImpl->numOfChannels; i++)
         {
             if(false == set2default)
             {
                 embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
-                pImpl->configdata.amplifiers_get(info.set, i, cfg1);
+                pImpl->configdata.amplifiers_get(setindex, i, cfg1);
             
                 embot::hw::PGA308::TransferFunctionConfig tfc;
                 tfc.load(cfg1);  
@@ -2026,7 +2260,7 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::p
                 embot::hw::PGA308::set(static_cast<embot::hw::PGA308::Amplifier>(i), tfc);   
 
                 tfc.get(cfg1);
-                pImpl->configdata.amplifiers_set(info.set, i, cfg1);    
+                pImpl->configdata.amplifiers_set(setindex, i, cfg1);    
             } 
             else
             {
@@ -2035,7 +2269,7 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::p
                 embot::hw::PGA308::set(static_cast<embot::hw::PGA308::Amplifier>(i), tfc);
                 embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
                 tfc.get(cfg1);
-                pImpl->configdata.amplifiers_set(info.set, i, cfg1);
+                pImpl->configdata.amplifiers_set(setindex, i, cfg1);
             }    
         }        
     }
@@ -2044,7 +2278,7 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::p
         if(false == set2default)
         {        
             embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
-            pImpl->configdata.amplifiers_get(info.set, info.channel, cfg1);
+            pImpl->configdata.amplifiers_get(setindex, info.channel, cfg1);
         
             embot::hw::PGA308::TransferFunctionConfig tfc;
             tfc.load(cfg1);  
@@ -2063,7 +2297,7 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::p
             embot::hw::PGA308::set(static_cast<embot::hw::PGA308::Amplifier>(info.channel), tfc);   
 
             tfc.get(cfg1);
-            pImpl->configdata.amplifiers_set(info.set, info.channel, cfg1);   
+            pImpl->configdata.amplifiers_set(setindex, info.channel, cfg1);   
         }
         else
         {
@@ -2072,7 +2306,7 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::p
                 embot::hw::PGA308::set(static_cast<embot::hw::PGA308::Amplifier>(info.channel), tfc);
                 embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
                 tfc.get(cfg1);
-                pImpl->configdata.amplifiers_set(info.set, info.channel, cfg1);
+                pImpl->configdata.amplifiers_set(setindex, info.channel, cfg1);
         }    
         
     }
@@ -2081,6 +2315,69 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::p
     return true;    
 }
 
+bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::polling::Message_REGULATIONSET_GET::ReplyInfo &replyinfo)
+{    
+    bool ret = false;
+    
+    if(replyinfo.mode == static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::StrainRegulationSetMode::temporary))
+    {
+        replyinfo.regulationset = pImpl->runtimedata.set2use_get();
+        ret = true;
+    }
+    else if(replyinfo.mode == static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::StrainRegulationSetMode::permanent))
+    {
+        replyinfo.regulationset = pImpl->configdata.permanentregulationset_get();
+        ret = true;
+    }
+        
+    return ret;       
+}
+
+
+bool embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::polling::Message_REGULATIONSET_SET::Info &info)
+{     
+    uint8_t setindex = 0;
+    if(false == pImpl->regulationset2index(info.regulationset, setindex))
+    {
+        return false;
+    } 
+    
+    bool ret = false;
+    
+    // some explanations:
+    // if we change the regulation set in use (::temporary), then we should:
+    // 1. stop acquisition.
+    // 2. change the set number
+    // 3. apply the regulation set to the amplifiers
+    // 4. no need to operate on regulation matrix and offset because at every tick we retrieve the correct one.
+    //    ... aka: function embot::app::application::theSTRAIN::Impl::processing() uses set2use = runtimedata.set2use_get()
+    //    to retrieve handles of handleCalibMatrixQ15 and handleCalibtareQ15
+    // if we just set the ::permanent we dont need to stop acquisition or apply teh regulation set.
+    
+    if(info.mode == static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::StrainRegulationSetMode::temporary))
+    {
+        embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode mode;
+        pImpl->evalstop(mode);
+        
+        pImpl->runtimedata.set2use_set(setindex);
+        
+        // ok: now i must apply the new set to front-end amplifiers
+        std::uint8_t set2use = pImpl->runtimedata.set2use_get();
+        pImpl->amplifiers_applyregulationset(set2use);  
+        
+        pImpl->evalrestart(mode);
+        
+        ret = true;
+    }
+    else if(info.mode == static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::StrainRegulationSetMode::permanent))
+    {
+        pImpl->configdata.permanentregulationset_set(setindex);     
+        ret = true;
+    }
+    
+        
+    return ret;    
+}
 
 
 bool embot::app::application::theSTRAIN::start(const embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode mode)

@@ -80,14 +80,15 @@ namespace embot { namespace app { namespace application {
         bool resetamplifier(embot::app::canprotocol::analog::polling::Message_AMPLIFIER_RESET::Info &info);
         bool set(embot::app::canprotocol::analog::polling::Message_AMPLIFIER_PGA308_CFG1_SET::Info &info);
         bool set(embot::app::canprotocol::analog::polling::Message_AMPLIFIER_GAINOFFSET_SET::Info &info, float &alpha, float &beta);
+        bool set(embot::app::canprotocol::analog::polling::Message_REGULATIONSET_SET::Info &info);
         
         bool save2eeprom();
         
         bool get_serial(embot::app::canprotocol::analog::polling::Message_GET_SERIAL_NO::ReplyInfo &replyinfo);
-        bool get_fullscale(std::uint8_t channel, std::uint16_t &value);
+        bool get_fullscale(std::uint8_t regulationset, std::uint8_t channel, std::uint16_t &value);
         bool get_eepromstatus(bool &saved);
         bool get_adc(embot::app::canprotocol::analog::polling::Message_GET_CH_ADC::ReplyInfo &replyinfo);
-        bool get_offset(std::uint8_t channel, std::uint16_t &value);
+        bool get_offset(std::uint8_t regulationset, std::uint8_t channel, std::uint16_t &value);
         bool get(embot::app::canprotocol::analog::polling::Message_GET_MATRIX_RC::ReplyInfo &replyinfo);
         bool get(embot::app::canprotocol::analog::polling::Message_GET_MATRIX_G::ReplyInfo &replyinfo);
         bool get(embot::app::canprotocol::analog::polling::Message_GET_CALIB_TARE::ReplyInfo &replyinfo);
@@ -95,7 +96,10 @@ namespace embot { namespace app { namespace application {
         bool get(embot::app::canprotocol::analog::polling::Message_AMPLIFIER_PGA308_CFG1_GET::ReplyInfo &replyinfo);
         bool get(embot::app::canprotocol::analog::polling::Message_AMPLIFIER_GAINOFFSET_GET::ReplyInfo &replyinfo);
         bool get(embot::app::canprotocol::analog::polling::Message_AMPLIFIER_RANGE_OF_GAIN_GET::ReplyInfo &replyinfo);
-        bool get(embot::app::canprotocol::analog::polling::Message_AMPLIFIER_RANGE_OF_OFFSET_GET::ReplyInfo &replyinfo);
+        bool get(embot::app::canprotocol::analog::polling::Message_AMPLIFIER_RANGE_OF_OFFSET_GET::ReplyInfo &replyinfo);        
+        bool get(embot::app::canprotocol::analog::polling::Message_REGULATIONSET_GET::ReplyInfo &replyinfo);
+        
+        
         
         bool autocalib(embot::app::canprotocol::analog::polling::Message_AMPLIFIER_OFFSET_AUTOCALIB::Info &info, std::uint8_t &noisychannelmask, std::uint8_t &algorithmOKmask, std::uint8_t &finalmeasureOKmask, std::uint16_t &mae);
         

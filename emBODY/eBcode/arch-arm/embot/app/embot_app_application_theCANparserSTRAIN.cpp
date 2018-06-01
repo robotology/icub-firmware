@@ -97,7 +97,9 @@ struct embot::app::application::theCANparserSTRAIN::Impl
     bool process_set_strain2_amplifier_gainoffset(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);
     bool process_get_strain2_amplifier_gainoffset(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);
     bool process_get_strain2_amplifier_gainlimits(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);
-    bool process_get_strain2_amplifier_offsetlimits(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);    
+    bool process_get_strain2_amplifier_offsetlimits(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);  
+    bool process_set_strain2_regulationset(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);
+    bool process_get_strain2_regulationset(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);    
 };
 
 
@@ -258,7 +260,17 @@ bool embot::app::application::theCANparserSTRAIN::Impl::process(const embot::hw:
             { 
                 txframe = process_get_strain2_amplifier_offsetlimits(frame, replies);
                 recognised = true;                
-            }              
+            }  
+            else if(static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::CMD::REGULATIONSET_GET) == cmd)
+            { 
+                txframe = process_get_strain2_regulationset(frame, replies);
+                recognised = true;                
+            }  
+            else if(static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::CMD::REGULATIONSET_SET) == cmd)
+            { 
+                txframe = process_set_strain2_regulationset(frame, replies);
+                recognised = true;                
+            }             
         } break;
 
         
@@ -400,7 +412,8 @@ bool embot::app::application::theCANparserSTRAIN::Impl::process_get_fullscales(c
     embot::app::application::theSTRAIN &thestrain = embot::app::application::theSTRAIN::getInstance();    
     
     replyinfo.channel = msg.info.channel;
-    thestrain.get_fullscale(msg.info.channel, replyinfo.fullscale);
+    replyinfo.regulationset = msg.info.regulationset;
+    thestrain.get_fullscale(msg.info.regulationset, msg.info.channel, replyinfo.fullscale);
         
     embot::hw::can::Frame frame0;
     if(true == msg.reply(frame0, embot::app::theCANboardInfo::getInstance().cachedCANaddress(), replyinfo))
@@ -503,8 +516,9 @@ bool embot::app::application::theCANparserSTRAIN::Impl::process_get_offset(const
     
     embot::app::application::theSTRAIN &thestrain = embot::app::application::theSTRAIN::getInstance();    
     
+    replyinfo.regulationset = msg.info.regulationset;
     replyinfo.channel = msg.info.channel;
-    thestrain.get_offset(replyinfo.channel, replyinfo.offset);
+    thestrain.get_offset(replyinfo.regulationset, replyinfo.channel, replyinfo.offset);
         
     embot::hw::can::Frame frame0;
     if(true == msg.reply(frame0, embot::app::theCANboardInfo::getInstance().cachedCANaddress(), replyinfo))
@@ -538,6 +552,7 @@ bool embot::app::application::theCANparserSTRAIN::Impl::process_get_matrix_value
     
     embot::app::application::theSTRAIN &thestrain = embot::app::application::theSTRAIN::getInstance();    
     
+    replyinfo.regulationset = msg.info.regulationset;
     replyinfo.row = msg.info.row;
     replyinfo.col = msg.info.col;
     thestrain.get(replyinfo);
@@ -573,6 +588,7 @@ bool embot::app::application::theCANparserSTRAIN::Impl::process_get_matrix_gain(
     
     embot::app::application::theSTRAIN &thestrain = embot::app::application::theSTRAIN::getInstance();    
     
+    replyinfo.regulationset = msg.info.regulationset;
     thestrain.get(replyinfo);
         
     embot::hw::can::Frame frame0;
@@ -607,6 +623,7 @@ bool embot::app::application::theCANparserSTRAIN::Impl::process_get_calib_bias(c
     
     embot::app::application::theSTRAIN &thestrain = embot::app::application::theSTRAIN::getInstance();    
     
+    replyinfo.regulationset = msg.info.regulationset;
     replyinfo.channel = msg.info.channel;
     thestrain.get(replyinfo);
         
@@ -696,7 +713,7 @@ bool embot::app::application::theCANparserSTRAIN::Impl::process_get_strain2_ampl
         for(std::uint8_t i=0; i<6; i++)
         {
             replyinfo.channel = i;
-            replyinfo.set = msg.info.set;
+            replyinfo.regulationset = msg.info.regulationset;
             thestrain.get(replyinfo);
                 
             embot::hw::can::Frame frame0;
@@ -717,7 +734,7 @@ bool embot::app::application::theCANparserSTRAIN::Impl::process_get_strain2_ampl
     {
     
         replyinfo.channel = msg.info.channel;
-        replyinfo.set = msg.info.set;
+        replyinfo.regulationset = msg.info.regulationset;
         thestrain.get(replyinfo);
             
         embot::hw::can::Frame frame0;
@@ -740,7 +757,7 @@ bool embot::app::application::theCANparserSTRAIN::Impl::process_set_strain2_ampl
     embot::app::application::theSTRAIN &thestrain = embot::app::application::theSTRAIN::getInstance();    
     
     embot::app::canprotocol::analog::polling::Message_AMPLIFIER_OFFSET_AUTOCALIB::ReplyInfo replyinfo;
-    replyinfo.set = msg.info.set;
+    replyinfo.regulationset = msg.info.regulationset;
     replyinfo.channel = msg.info.channel;
     
 
@@ -785,7 +802,7 @@ bool embot::app::application::theCANparserSTRAIN::Impl::process_get_strain2_ampl
         for(std::uint8_t i=0; i<6; i++)
         {
             replyinfo.channel = i;
-            replyinfo.set = msg.info.set;
+            replyinfo.regulationset = msg.info.regulationset;
             thestrain.get(replyinfo);
                 
             embot::hw::can::Frame frame0;
@@ -806,7 +823,7 @@ bool embot::app::application::theCANparserSTRAIN::Impl::process_get_strain2_ampl
     {
     
         replyinfo.channel = msg.info.channel;
-        replyinfo.set = msg.info.set;
+        replyinfo.regulationset = msg.info.regulationset;
         thestrain.get(replyinfo);
             
         embot::hw::can::Frame frame0;
@@ -835,7 +852,7 @@ bool embot::app::application::theCANparserSTRAIN::Impl::process_get_strain2_ampl
         for(std::uint8_t i=0; i<6; i++)
         {
             replyinfo.channel = i;
-            replyinfo.set = msg.info.set;
+            replyinfo.regulationset = msg.info.regulationset;
             thestrain.get(replyinfo);
                 
             embot::hw::can::Frame frame0;
@@ -856,7 +873,7 @@ bool embot::app::application::theCANparserSTRAIN::Impl::process_get_strain2_ampl
     {
     
         replyinfo.channel = msg.info.channel;
-        replyinfo.set = msg.info.set;
+        replyinfo.regulationset = msg.info.regulationset;
         thestrain.get(replyinfo);
             
         embot::hw::can::Frame frame0;
@@ -885,7 +902,7 @@ bool embot::app::application::theCANparserSTRAIN::Impl::process_get_strain2_ampl
         for(std::uint8_t i=0; i<6; i++)
         {
             replyinfo.channel = i;
-            replyinfo.set = msg.info.set;
+            replyinfo.regulationset = msg.info.regulationset;
             thestrain.get(replyinfo);
                 
             embot::hw::can::Frame frame0;
@@ -906,7 +923,7 @@ bool embot::app::application::theCANparserSTRAIN::Impl::process_get_strain2_ampl
     {
     
         replyinfo.channel = msg.info.channel;
-        replyinfo.set = msg.info.set;
+        replyinfo.regulationset = msg.info.regulationset;
         thestrain.get(replyinfo);
             
         embot::hw::can::Frame frame0;
@@ -919,6 +936,45 @@ bool embot::app::application::theCANparserSTRAIN::Impl::process_get_strain2_ampl
 
     return false;    
 }
+
+
+bool embot::app::application::theCANparserSTRAIN::Impl::process_get_strain2_regulationset(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
+{
+    embot::app::canprotocol::analog::polling::Message_REGULATIONSET_GET msg;
+    msg.load(frame);
+    
+    embot::app::canprotocol::analog::polling::Message_REGULATIONSET_GET::ReplyInfo replyinfo;
+    
+    embot::app::application::theSTRAIN &thestrain = embot::app::application::theSTRAIN::getInstance();    
+       
+    replyinfo.mode = msg.info.mode;
+    thestrain.get(replyinfo);
+        
+    embot::hw::can::Frame frame0;
+    if(true == msg.reply(frame0, embot::app::theCANboardInfo::getInstance().cachedCANaddress(), replyinfo))
+    {
+        replies.push_back(frame0);
+        return true;
+    } 
+
+    return false;    
+}
+
+
+bool embot::app::application::theCANparserSTRAIN::Impl::process_set_strain2_regulationset(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
+{
+    embot::app::canprotocol::analog::polling::Message_REGULATIONSET_SET msg;
+    msg.load(frame);
+    
+    embot::app::application::theSTRAIN &thestrain = embot::app::application::theSTRAIN::getInstance();    
+    
+    thestrain.set(msg.info);
+                  
+    return msg.reply();        
+}
+
+
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - the class

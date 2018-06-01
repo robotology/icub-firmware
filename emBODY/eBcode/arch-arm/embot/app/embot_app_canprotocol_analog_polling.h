@@ -35,27 +35,27 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
     enum class CMD { 
         none = 0xfe, 
         
-        SET_MATRIX_RC = ICUBCANPROTO_POL_AS_CMD__SET_MATRIX_RC,                           // used by canloader to configure strain
-        SET_CH_DAC = ICUBCANPROTO_POL_AS_CMD__SET_CH_DAC,                              // used by canloader to configure strain. in strain2 it manages beta (see AMPLIFIER_GAINOFFSET_SET)
-        SET_TXMODE = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE,                              // used to start tx of data for mtb or strain
-        SET_CANDATARATE = ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE,                         // used to configure strain or mais tx rate
-        SAVE2EE = ICUBCANPROTO_POL_AS_CMD__SAVE2EE,                                 // used by canloader to configure strain
-        GET_MATRIX_RC = ICUBCANPROTO_POL_AS_CMD__GET_MATRIX_RC,                           // used by canloader to configure strain
-        GET_CH_DAC = ICUBCANPROTO_POL_AS_CMD__GET_CH_DAC,                              // used by canloader to configure strain. in strain2 it manages offset (see AMPLIFIER_GAINOFFSET_GET)
-        GET_CH_ADC = ICUBCANPROTO_POL_AS_CMD__GET_CH_ADC,                              // used by canloader to configure strain. 
+        SET_MATRIX_RC = ICUBCANPROTO_POL_AS_CMD__SET_MATRIX_RC,                 // used by canloader to configure strain
+        SET_CH_DAC = ICUBCANPROTO_POL_AS_CMD__SET_CH_DAC,                       // used by canloader to configure strain. in strain2 it manages beta (see AMPLIFIER_GAINOFFSET_SET)
+        SET_TXMODE = ICUBCANPROTO_POL_AS_CMD__SET_TXMODE,                       // used to start tx of data for mtb or strain
+        SET_CANDATARATE = ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE,             // used to configure strain or mais tx rate
+        SAVE2EE = ICUBCANPROTO_POL_AS_CMD__SAVE2EE,                             // used by canloader to configure strain
+        GET_MATRIX_RC = ICUBCANPROTO_POL_AS_CMD__GET_MATRIX_RC,                 // used by canloader to configure strain
+        GET_CH_DAC = ICUBCANPROTO_POL_AS_CMD__GET_CH_DAC,                       // used by canloader to configure strain. in strain2 it manages offset (see AMPLIFIER_GAINOFFSET_GET)
+        GET_CH_ADC = ICUBCANPROTO_POL_AS_CMD__GET_CH_ADC,                       // used by canloader to configure strain. 
                       
-        SET_MATRIX_G = ICUBCANPROTO_POL_AS_CMD__SET_MATRIX_G,                            // used by canloader to configure strain
-        GET_MATRIX_G = ICUBCANPROTO_POL_AS_CMD__GET_MATRIX_G,                            // used by canloader to configure strain                                                                                                      
-        SET_CALIB_TARE = ICUBCANPROTO_POL_AS_CMD__SET_CALIB_TARE,                          // used by canloader to configure strain
-        GET_CALIB_TARE = ICUBCANPROTO_POL_AS_CMD__GET_CALIB_TARE,                          // used by canloader to configure strain 
-        SET_CURR_TARE = ICUBCANPROTO_POL_AS_CMD__SET_CURR_TARE,                           // used by canloader to configure strain
-        GET_CURR_TARE = ICUBCANPROTO_POL_AS_CMD__GET_CURR_TARE,                           // used by canloader to configure strain           
-        SET_FULL_SCALES = ICUBCANPROTO_POL_AS_CMD__SET_FULL_SCALES,                         // used by canloader to configure strain  
-        GET_FULL_SCALES = ICUBCANPROTO_POL_AS_CMD__GET_FULL_SCALES,                         // used by reader to properly scaled data received by strain 
-        SET_SERIAL_NO = ICUBCANPROTO_POL_AS_CMD__SET_SERIAL_NO,                           // used by canloader to configure strain
-        GET_SERIAL_NO = ICUBCANPROTO_POL_AS_CMD__GET_SERIAL_NO,                           // used by canloader for strain
-        GET_EEPROM_STATUS = ICUBCANPROTO_POL_AS_CMD__GET_EEPROM_STATUS,                       // used by canloader to configure strain
-        GET_FIRMWARE_VERSION = ICUBCANPROTO_POL_AS_CMD__GET_FW_VERSION,                    // basic management.        
+        SET_MATRIX_G = ICUBCANPROTO_POL_AS_CMD__SET_MATRIX_G,                   // used by canloader to configure strain
+        GET_MATRIX_G = ICUBCANPROTO_POL_AS_CMD__GET_MATRIX_G,                   // used by canloader to configure strain                                                                                                      
+        SET_CALIB_TARE = ICUBCANPROTO_POL_AS_CMD__SET_CALIB_TARE,               // used by canloader to configure strain
+        GET_CALIB_TARE = ICUBCANPROTO_POL_AS_CMD__GET_CALIB_TARE,               // used by canloader to configure strain 
+        SET_CURR_TARE = ICUBCANPROTO_POL_AS_CMD__SET_CURR_TARE,                 // used by canloader to configure strain
+        GET_CURR_TARE = ICUBCANPROTO_POL_AS_CMD__GET_CURR_TARE,                 // used by canloader to configure strain           
+        SET_FULL_SCALES = ICUBCANPROTO_POL_AS_CMD__SET_FULL_SCALES,             // used by canloader to configure strain  
+        GET_FULL_SCALES = ICUBCANPROTO_POL_AS_CMD__GET_FULL_SCALES,             // used by reader to properly scaled data received by strain 
+        SET_SERIAL_NO = ICUBCANPROTO_POL_AS_CMD__SET_SERIAL_NO,                 // used by canloader to configure strain
+        GET_SERIAL_NO = ICUBCANPROTO_POL_AS_CMD__GET_SERIAL_NO,                 // used by canloader for strain
+        GET_EEPROM_STATUS = ICUBCANPROTO_POL_AS_CMD__GET_EEPROM_STATUS,         // used by canloader to configure strain
+        GET_FIRMWARE_VERSION = ICUBCANPROTO_POL_AS_CMD__GET_FW_VERSION,         // basic management.        
 
         // NEW messages used for a generic AMPLIFIER with a linear transfer function: Vout = gain * Vin + offset. range of Vout is [0, 64k) 
         // these messages are used by strain2 (but not by strain). 
@@ -91,7 +91,11 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         THERMOMETER_TRANSMIT = ICUBCANPROTO_POL_AS_CMD__THERMOMETER_TRANSMIT,        
         // RESERVED: { 0x3B, 0x3C } for possible new THERMOMETER commands
         
-        // HOLE: [0x3D, ... , 0x4B]. there are 15 free values ...
+        // HOLE: [0x3F, ... , 0x4B]. there are 13 free values ...
+        
+        // NEW messages for strain2 to configure the regulation set to use
+        REGULATIONSET_SET = ICUBCANPROTO_POL_AS_CMD__REGULATIONSET_SET,
+        REGULATIONSET_GET = ICUBCANPROTO_POL_AS_CMD__REGULATIONSET_GET,
         
         // skin messages + legacy acc-gyro messages
         SKIN_OBSOLETE_TACT_SETUP = ICUBCANPROTO_POL_SK_CMD__TACT_SETUP,                  // 0x4C obsolete, but we support it in a basic form
@@ -123,8 +127,22 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
 }}}}} // namespace embot { namespace app { namespace canprotocol { namespace analog { namespace polling {
 
 
+namespace embot { namespace app { namespace canprotocol { namespace analog { namespace polling {
+   
+    // some required types
+    
+    // we keep theoneinuse equal to zero so that we guarantee normal behaviour is case regulationset is zero in can message 
+    enum class StrainRegulationSet { theoneinuse = 0, first = 1, second = 2, third = 3 };
+    
+    enum class StrainRegulationSetMode { temporary = 0,  permanent = 1 };
+    
+    enum class StrainChannel { zero = 0, one = 1, two = 2, three = 3, four = 4, five = 5, all = 0xf };
+    
+    enum class imuFusion { enabled = 1, none = 33 }; // later on we can add the types of fusion we want
 
- 
+}}}}} // namespace embot { namespace app { namespace canprotocol { namespace analog { namespace polling {
+
+
 namespace embot { namespace app { namespace canprotocol { namespace analog { namespace polling {
          
     // the management of commands
@@ -285,9 +303,10 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
             
         struct Info
         { 
-            std::uint8_t    channel;
+            std::uint8_t    regulationset;  // use StrainRegulationSet
+            std::uint8_t    channel;        // use StrainChannel but not StrainChannel::all
             std::uint16_t   fullscale;            
-            Info() : channel(0), fullscale(0) {}
+            Info() : regulationset(static_cast<std::uint8_t>(StrainRegulationSet::theoneinuse)), channel(0), fullscale(0) {}
         };
         
         Info info;
@@ -306,16 +325,18 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         public:
                                     
         struct Info
-        { 
-            std::uint8_t  channel;           
-            Info() : channel(0) {}
+        {
+            std::uint8_t    regulationset;  // use StrainRegulationSet
+            std::uint8_t    channel;        // use StrainChannel but not StrainChannel::all           
+            Info() : regulationset(static_cast<std::uint8_t>(StrainRegulationSet::theoneinuse)), channel(0) {}
         };
         
         struct ReplyInfo
         {
-            std::uint8_t        channel;
-            std::uint16_t       fullscale;
-            ReplyInfo() : channel(0), fullscale(0) {}          
+            std::uint8_t    regulationset;  // use StrainRegulationSet
+            std::uint8_t    channel;        // use StrainChannel but not StrainChannel::all
+            std::uint16_t   fullscale;
+            ReplyInfo() : regulationset(static_cast<std::uint8_t>(StrainRegulationSet::theoneinuse)), channel(0), fullscale(0) {}          
         };        
         
         Info info;
@@ -334,15 +355,17 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
                                     
         struct Info
         { 
-            std::uint8_t  channel;           
-            Info() : channel(0) {}
+            std::uint8_t    regulationset;  // use StrainRegulationSet
+            std::uint8_t    channel;        // use StrainChannel but not StrainChannel::al          
+            Info() : regulationset(static_cast<std::uint8_t>(StrainRegulationSet::theoneinuse)), channel(0) {}
         };
         
         struct ReplyInfo
         {
-            std::uint8_t        channel;
-            std::uint16_t       offset;
-            ReplyInfo() : channel(0), offset(0) {}          
+            std::uint8_t    regulationset;  // use StrainRegulationSet
+            std::uint8_t    channel;        // use StrainChannel but not StrainChannel::all
+            std::uint16_t   offset;
+            ReplyInfo() : regulationset(static_cast<std::uint8_t>(StrainRegulationSet::theoneinuse)), channel(0), offset(0) {}          
         };        
         
         Info info;
@@ -362,9 +385,10 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
             
         struct Info
         { 
-            std::uint8_t        channel;
-            std::uint16_t       offset;         
-            Info() : channel(0), offset(0) {}
+            std::uint8_t    regulationset;  // use StrainRegulationSet
+            std::uint8_t    channel;        // use StrainChannel but not StrainChannel::all
+            std::uint16_t   offset;         
+            Info() : regulationset(static_cast<std::uint8_t>(StrainRegulationSet::theoneinuse)), channel(0), offset(0) {}
         };
         
         Info info;
@@ -385,10 +409,11 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
             
         struct Info
         { 
-            std::uint8_t        row;
-            std::uint8_t        col;
+            std::uint8_t        regulationset;  // use StrainRegulationSet
+            std::uint8_t        row;            // only 0, 1, 2, 3, 4, 5
+            std::uint8_t        col;            // only 0, 1, 2, 3, 4, 5
             std::uint16_t       value;         
-            Info() : row(0), col(0), value(0) {}
+            Info() : regulationset(static_cast<std::uint8_t>(StrainRegulationSet::theoneinuse)), row(0), col(0), value(0) {}
         };
         
         Info info;
@@ -407,9 +432,10 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
                         
             
         struct Info
-        { 
+        {   
+            std::uint8_t        regulationset;  // can be only StrainRegulationSet::theoneinuse (but is not in the can frame)          
             std::uint8_t        gain;       
-            Info() : gain(0) {}
+            Info() : regulationset(static_cast<std::uint8_t>(StrainRegulationSet::theoneinuse)), gain(0) {}
         };
         
         Info info;
@@ -432,9 +458,10 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         struct Info
         { 
             Mode                mode;
-            std::uint8_t        channel;
-            std::uint16_t       value;         
-            Info() : mode(Mode::everychannelreset), channel(0), value(0) {}
+            std::uint8_t        regulationset;  // use StrainRegulationSet
+            std::uint8_t        channel;        // use StrainChannel but not StrainChannel::all
+            std::uint16_t       value;          // 
+            Info() : mode(Mode::everychannelreset), regulationset(static_cast<std::uint8_t>(StrainRegulationSet::theoneinuse)), channel(0), value(0) {}
         };
         
         Info info;
@@ -453,15 +480,17 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
              
         struct Info
         { 
-            std::uint8_t    channel; 
-            Info() : channel(0) {}
+            std::uint8_t    regulationset;      // use StrainRegulationSet
+            std::uint8_t    channel;            // use StrainChannel but not StrainChannel::all 
+            Info() : regulationset(static_cast<std::uint8_t>(StrainRegulationSet::theoneinuse)), channel(0) {}
         };
         
         struct ReplyInfo
         {
-            std::uint8_t        channel;
+            std::uint8_t        regulationset;  // use StrainRegulationSet
+            std::uint8_t        channel;        // use StrainChannel but not StrainChannel::all
             std::uint16_t       value;
-            ReplyInfo() : channel(0), value(0) {}          
+            ReplyInfo() : regulationset(static_cast<std::uint8_t>(StrainRegulationSet::theoneinuse)), channel(0), value(0) {}          
         };         
         
         Info info;
@@ -483,7 +512,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         struct Info
         { 
             Mode                mode;
-            std::uint8_t        channel;
+            std::uint8_t        channel;        // use StrainChannel but not StrainChannel::all
             std::uint16_t       value;         
             Info() : mode(Mode::everychannelreset), channel(0), value(0) {}
         };
@@ -504,7 +533,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
              
         struct Info
         { 
-            std::uint8_t    channel; 
+            std::uint8_t    channel;        // use StrainChannel but not StrainChannel::all
             Info() : channel(0) {}
         };
         
@@ -531,14 +560,14 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
                                     
         struct Info
         { 
-            std::uint8_t    channel;   
+            std::uint8_t    channel;        // use StrainChannel but not StrainChannel::all
             bool            getcalibrated;
             Info() : channel(0), getcalibrated(true) {}
         };
         
         struct ReplyInfo
         {
-            std::uint8_t        channel;
+            std::uint8_t        channel;    // use StrainChannel but not StrainChannel::all
             bool                valueiscalibrated;
             std::uint16_t       adcvalue;
             ReplyInfo() : channel(0), valueiscalibrated(true), adcvalue(0) {}          
@@ -559,18 +588,20 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         public:
                                     
         struct Info
-        { 
-            std::uint8_t    row;   
-            std::uint8_t    col;
-            Info() : row(0), col(0) {}
+        {   
+            std::uint8_t    regulationset;      // use StrainRegulationSet
+            std::uint8_t    row;                // use 0, 1, 2, 3, 4, 5
+            std::uint8_t    col;                // use 0, 1, 2, 3, 4, 5
+            Info() : regulationset(static_cast<std::uint8_t>(StrainRegulationSet::theoneinuse)), row(0), col(0) {}
         };
         
         struct ReplyInfo
         {
-            std::uint8_t        row;
-            std::uint8_t        col;
+            std::uint8_t        regulationset;  // use StrainRegulationSet
+            std::uint8_t        row;            // use 0, 1, 2, 3, 4, 5
+            std::uint8_t        col;            // use 0, 1, 2, 3, 4, 5
             std::uint16_t       value;         
-            ReplyInfo() : row(0), col(0), value(0) {}          
+            ReplyInfo() : regulationset(static_cast<std::uint8_t>(StrainRegulationSet::theoneinuse)), row(0), col(0), value(0) {}          
         };        
         
         Info info;
@@ -588,15 +619,17 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         public:
                                     
         struct Info
-        { 
+        {   
+            std::uint8_t    regulationset;      // can be only StrainRegulationSet::theoneinuse (but is not in the can frame)
             std::uint8_t    nothing;   
-            Info() : nothing(0) {}
+            Info() : regulationset(static_cast<std::uint8_t>(StrainRegulationSet::theoneinuse)), nothing(0) {}
         };
         
         struct ReplyInfo
         {
+            std::uint8_t    regulationset;      // can be only StrainRegulationSet::theoneinuse (but is not in the can frame)
             std::uint8_t    gain;       
-            ReplyInfo() : gain(0) {}          
+            ReplyInfo() : regulationset(static_cast<std::uint8_t>(StrainRegulationSet::theoneinuse)), gain(0) {}          
         };        
         
         Info info;
@@ -705,9 +738,9 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         bool load(const embot::hw::can::Frame &inframe);
             
         bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
-    };      
+    };   
 
-    
+
     class Message_ACC_GYRO_SETUP : public Message
     {
         public:
@@ -770,9 +803,9 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
                          
         struct Info
         {
-            std::uint8_t        set         : 4;
-            std::uint8_t        channel     : 4;    // if 0xf we mean every channel            
-            Info() : set(0), channel(0) {}
+            std::uint8_t        regulationset   : 4;    // use StrainRegulationSet
+            std::uint8_t        channel         : 4;    // use StrainChannel (also StrainChannel::all can be used)            
+            Info() : regulationset(static_cast<std::uint8_t>(StrainRegulationSet::theoneinuse)), channel(0) {}
         };
         
         Info info;
@@ -790,10 +823,10 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
                          
         struct Info
         {
-            std::uint8_t        set         : 4;
-            std::uint8_t        channel     : 4;    // if 0xf we mean every channel            
+            std::uint8_t        regulationset   : 4;    // use StrainRegulationSet
+            std::uint8_t        channel         : 4;    // // use StrainChannel (also StrainChannel::all can be used)            
             PGA308cfg1          cfg1;
-            Info() : set(0), channel(0) {}
+            Info() : regulationset(static_cast<std::uint8_t>(StrainRegulationSet::theoneinuse)), channel(0) {}
         };
         
         Info info;
@@ -813,17 +846,17 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
 
         struct Info
         { 
-            std::uint8_t        set         : 4;
-            std::uint8_t        channel     : 4;    // if 0xf we mean every channel     
-            Info() : set(0), channel(0) {}
+            std::uint8_t        regulationset   : 4;        // use StrainRegulationSet
+            std::uint8_t        channel         : 4;        // use StrainChannel but not StrainChannel::all        
+            Info() : regulationset(static_cast<std::uint8_t>(StrainRegulationSet::theoneinuse)), channel(0) {}
         };
         
         struct ReplyInfo
         {
-            std::uint8_t        set         : 4;
-            std::uint8_t        channel     : 4;            
+            std::uint8_t        regulationset   : 4;        // use StrainRegulationSet
+            std::uint8_t        channel         : 4;        // use StrainChannel but not StrainChannel::all           
             PGA308cfg1          cfg1;
-            ReplyInfo() : set(0), channel(0) {}
+            ReplyInfo() : regulationset(static_cast<std::uint8_t>(StrainRegulationSet::theoneinuse)), channel(0) {}
         };
         
         Info info;
@@ -846,25 +879,25 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
             
         struct Info
         { 
-            std::uint8_t        set         : 4;
-            std::uint8_t        channel     : 4;    // if 0xf we mean every channel
-            Mode                mode;               // it contains the way the autocalib behaves. so far it is only: oneshot
-            std::uint16_t       target;             // in range [0, 64k). half scale if 32k    
-            std::uint16_t       tolerance;          // it must be abs(measure - target) < tolerance
-            std::uint8_t        samples2average;    // it specifies how many adc sample to read for getting the average value. if 0 a default is used.            
-            Info() : set(0), channel(0xf), mode(Mode::oneshot), target(32*1024), tolerance(100), samples2average(0) {}
+            std::uint8_t        regulationset   : 4;    // use ONLY StrainRegulationSet::theoneinuse [because it starts a acqisition procedure] 
+            std::uint8_t        channel         : 4;    // use StrainChannel (also StrainChannel::all can be used)
+            Mode                mode;                   // it contains the way the autocalib behaves. so far it is only: oneshot
+            std::uint16_t       target;                 // in range [0, 64k). half scale if 32k    
+            std::uint16_t       tolerance;              // it must be abs(measure - target) < tolerance
+            std::uint8_t        samples2average;        // it specifies how many adc sample to read for getting the average value. if 0 a default is used.            
+            Info() : regulationset(static_cast<std::uint8_t>(StrainRegulationSet::theoneinuse)), channel(static_cast<std::uint8_t>(StrainChannel::all)), mode(Mode::oneshot), target(32*1024), tolerance(100), samples2average(0) {}
         };
         
         struct ReplyInfo
         {
-            std::uint8_t        set         : 4;
-            std::uint8_t        channel     : 4; 
-            std::uint8_t        noisychannelmask;   // pos i-th is 1 if abs(maxADC-minADC) > tolerance amongst the samples2average acquisitions. bit 7 set to 1 if first measure, bit 6 if final measure           
-            std::uint8_t        algorithmOKmask;    // in pos i-th the boolean result of channel i-th w/ respect to application of algorithm. if it fails, no changes in channel. if ok: changes are applied.          
-            std::uint8_t        finalmeasureOKmask; // in pos i-th the boolean result of channel i-th after autocalib w/ respect to abs(measure - target) < tolerance. 
-            std::uint8_t        ffu;                // for future use
-            std::uint16_t       mae;                // the mean square error for the channel(s) after autocalib = SUM_ch( abs(meas_ch - target) ) / numchannels. if > 64k we saturate.
-            ReplyInfo() : set(0), channel(0xf), noisychannelmask(0), algorithmOKmask(0), finalmeasureOKmask(0), ffu(0), mae(0) {}
+            std::uint8_t        regulationset   : 4;    // use ONLY StrainRegulationSet::theoneinuse
+            std::uint8_t        channel         : 4;    // use StrainChannel (also StrainChannel::all can be used)
+            std::uint8_t        noisychannelmask;       // pos i-th is 1 if abs(maxADC-minADC) > tolerance amongst the samples2average acquisitions. bit 7 set to 1 if first measure, bit 6 if final measure           
+            std::uint8_t        algorithmOKmask;        // in pos i-th the boolean result of channel i-th w/ respect to application of algorithm. if it fails, no changes in channel. if ok: changes are applied.          
+            std::uint8_t        finalmeasureOKmask;     // in pos i-th the boolean result of channel i-th after autocalib w/ respect to abs(measure - target) < tolerance. 
+            std::uint8_t        ffu;                    // for future use
+            std::uint16_t       mae;                    // the mean square error for the channel(s) after autocalib = SUM_ch( abs(meas_ch - target) ) / numchannels. if > 64k we saturate.
+            ReplyInfo() : regulationset(static_cast<std::uint8_t>(StrainRegulationSet::theoneinuse)), channel(static_cast<std::uint8_t>(StrainChannel::all)), noisychannelmask(0), algorithmOKmask(0), finalmeasureOKmask(0), ffu(0), mae(0) {}
         };        
             
         
@@ -885,12 +918,12 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
                          
         struct Info
         {
-            std::uint8_t        set         : 4;
-            std::uint8_t        channel     : 4;    // if 0xf we mean every channel            
-            std::uint8_t        mode;               // if 0: set values with .gain and .offset. if 1: use hw default values
-            std::uint16_t       gain;               // it is the gain, only positive, where each step is a gaintick of 0.01.
-            std::uint16_t       offset;             // it is teh offset and is in range [0, 64k). 
-            Info() : set(0), channel(0), mode(0), gain(1600), offset(32768) {}
+            std::uint8_t        regulationset   : 4;    // use StrainRegulationSet
+            std::uint8_t        channel         : 4;    // use StrainChannel (also StrainChannel::all can be used)            
+            std::uint8_t        mode;                   // if 0: set values with .gain and .offset. if 1: use hw default values
+            std::uint16_t       gain;                   // it is the gain, only positive, where each step is a gaintick of 0.01.
+            std::uint16_t       offset;                 // it is teh offset and is in range [0, 64k). 
+            Info() : regulationset(static_cast<std::uint8_t>(StrainRegulationSet::theoneinuse)), channel(0), mode(0), gain(1600), offset(32768) {}
         };
         
         Info info;
@@ -909,18 +942,18 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
                        
         struct Info
         { 
-            std::uint8_t        set         : 4;
-            std::uint8_t        channel     : 4;    // if 0xf we mean every channel     
-            Info() : set(0), channel(0) {}
+            std::uint8_t        regulationset   : 4;    // use StrainRegulationSet
+            std::uint8_t        channel         : 4;    // use StrainChannel but not StrainChannel::all
+            Info() : regulationset(static_cast<std::uint8_t>(StrainRegulationSet::theoneinuse)), channel(0) {}
         };
         
         struct ReplyInfo
         {
-            std::uint8_t        set         : 4;
-            std::uint8_t        channel     : 4;            
+            std::uint8_t        regulationset   : 4;
+            std::uint8_t        channel         : 4;    // use StrainChannel but not StrainChannel::all           
             std::uint16_t       gain;         
             std::uint16_t       offset;
-            ReplyInfo() : set(0), channel(0), gain(0), offset(0) {}
+            ReplyInfo() : regulationset(static_cast<std::uint8_t>(StrainRegulationSet::theoneinuse)), channel(0), gain(0), offset(0) {}
         };
         
         Info info;
@@ -931,7 +964,59 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         bool load(const embot::hw::can::Frame &inframe);
             
         bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
+    };  
+    
+    class Message_REGULATIONSET_SET : public Message
+    {
+        public:
+         
+        // with this message we command to use a given regulationset (of values only ::one, ::two, ::three) for the specified mode
+        // we can actually use also StrainRegulationSet::theoneinuse. in such a case the effect is to use the one in use as permanent.
+        // to use it as temporary can be done but ther is no meaning in doing that.
+        struct Info
+        {   
+            std::uint8_t        regulationset   : 4;    // use StrainRegulationSet but not StrainRegulationSet::theoneinuse
+            std::uint8_t        mode            : 4;    // use StrainRegulationSetMode::temporary or StrainRegulationSetMode::permanent
+            Info() : regulationset(static_cast<std::uint8_t>(StrainRegulationSet::theoneinuse)), mode(static_cast<std::uint8_t>(StrainRegulationSetMode::temporary)) {}
+        };
+        
+        Info info;
+        
+        Message_REGULATIONSET_SET() {}
+            
+        bool load(const embot::hw::can::Frame &inframe);
+            
+        bool reply();   // none            
     }; 
+
+    
+    class Message_REGULATIONSET_GET : public Message
+    {
+        public:
+                       
+        struct Info
+        {   // with this message we ask which value is the regulation set of kind temporary or permanent        
+            std::uint8_t        mode;       // use StrainRegulationSetMode::temporary or StrainRegulationSetMode::permanent
+            Info() : mode(static_cast<std::uint8_t>(StrainRegulationSetMode::temporary)) {}
+        };
+        
+        struct ReplyInfo
+        {   // with this replye we say the value of the regulation set of the kind asked in previous message (temporary or permanent)
+            std::uint8_t        regulationset   : 4;    // use StrainRegulationSet but not StrainRegulationSet::theoneinuse
+            std::uint8_t        mode            : 4;    // use StrainRegulationSetMode::temporary or StrainRegulationSetMode::permanent
+            ReplyInfo() : regulationset(static_cast<std::uint8_t>(StrainRegulationSet::theoneinuse)), mode(static_cast<std::uint8_t>(StrainRegulationSetMode::temporary)) {}
+        };
+        
+        Info info;
+        
+        
+        Message_REGULATIONSET_GET() {}
+            
+        bool load(const embot::hw::can::Frame &inframe);
+            
+        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
+    };  
+    
     
     class Message_AMPLIFIER_RANGE_OF_GAIN_GET : public Message
     {
@@ -939,18 +1024,18 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
                        
         struct Info
         { 
-            std::uint8_t        set         : 4;
-            std::uint8_t        channel     : 4;    // if 0xf we mean every channel     
-            Info() : set(0), channel(0) {}
+            std::uint8_t        regulationset   : 4;    // use StrainRegulationSet
+            std::uint8_t        channel         : 4;    // use StrainChannel but not StrainChannel::all        
+            Info() : regulationset(static_cast<std::uint8_t>(StrainRegulationSet::theoneinuse)), channel(0) {}
         };
         
         struct ReplyInfo
         {
-            std::uint8_t        set         : 4;
-            std::uint8_t        channel     : 4;
+            std::uint8_t        regulationset   : 4;    // use StrainRegulationSet
+            std::uint8_t        channel         : 4;    // use StrainChannel but not StrainChannel::all
             std::uint16_t       highest;    // in ticks = 0.01            
             std::uint16_t       lowest;     // in ticks = 0.01         
-            ReplyInfo() : set(0), channel(0), highest(0), lowest(0) {}
+            ReplyInfo() : regulationset(static_cast<std::uint8_t>(StrainRegulationSet::theoneinuse)), channel(0), highest(0), lowest(0) {}
         };
         
         Info info;
@@ -970,18 +1055,18 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
                        
         struct Info
         { 
-            std::uint8_t        set         : 4;
-            std::uint8_t        channel     : 4;    // if 0xf we mean every channel     
-            Info() : set(0), channel(0) {}
+            std::uint8_t        regulationset   : 4;    // use StrainRegulationSet
+            std::uint8_t        channel         : 4;    // use StrainChannel but not StrainChannel::all       
+            Info() : regulationset(static_cast<std::uint8_t>(StrainRegulationSet::theoneinuse)), channel(0) {}
         };
         
         struct ReplyInfo
         {
-            std::uint8_t        set         : 4;
-            std::uint8_t        channel     : 4;
+            std::uint8_t        regulationset   : 4;    // use StrainRegulationSet
+            std::uint8_t        channel         : 4;    // use StrainChannel but not StrainChannel::all
             std::uint16_t       highest;    // in value            
             std::uint16_t       lowest;     // in value         
-            ReplyInfo() : set(0), channel(0), highest(0), lowest(0) {}
+            ReplyInfo() : regulationset(static_cast<std::uint8_t>(StrainRegulationSet::theoneinuse)), channel(0), highest(0), lowest(0) {}
         };
         
         Info info;
@@ -996,7 +1081,6 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
 
     
     
-    enum class imuFusion { enabled = 1, none = 33 }; // later on we can add the types of fusion we want
     
     class Message_IMU_CONFIG_SET : public Message
     {
