@@ -861,7 +861,7 @@ extern eOresult_t eo_inertials3_Tick(EOtheInertials3 *p, eObool_t resetstatus)
         uint8_t index = (mems_gyroscope_l3g4200 == sensor) ? (inertials3_mems_gyro) : (inertials3_mems_accel);
         i3data.id = p->frommems2id[index];
         i3data.typeofsensor = (mems_gyroscope_l3g4200 == sensor) ? eoas_inertial3_gyros_ems_st_l3g4200d : eoas_inertial3_accel_ems_st_lis3x;
-        i3data.status = 0; // ok so far
+        i3data.status.general = 0; // ok so far
         i3data.timestamp = memsdata.timestamp / 1000; // nothing so far.
         i3data.x = memsdata.x;
         i3data.y = memsdata.y;
@@ -1064,7 +1064,10 @@ extern eOresult_t eo_inertials3_AcceptCANframe(EOtheInertials3 *p, eOas_inertial
         {
             // case of a canframe with [seq|gyrsta|accsta|magsta|(acquisitiontime32bitusec)]
             data.seq = frame->data[0];
-            data.status = frame->data[1] + frame->data[2] + frame->data[3];          
+            data.status.general = 0;
+            data.status.calib.gyr |= (frame->data[1]& 0x0003); // gyro
+            data.status.calib.acc |= (frame->data[2]& 0x0003); // acc
+            data.status.calib.mag |= (frame->data[3]& 0x0003); // mag
         } break;
         
         default:
