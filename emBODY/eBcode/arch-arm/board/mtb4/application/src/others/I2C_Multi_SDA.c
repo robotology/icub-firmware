@@ -42,9 +42,10 @@
 unsigned int I2Cbit=1; //the duration of a bit 10 is about 28Khz, 1 is about 500KHz
 
 
-#define	MCO_0_on		HAL_GPIO_WritePin(SCK0_GPIO_Port, SCK0_Pin, GPIO_PIN_SET);
+#define	MCO_0_on    HAL_GPIO_WritePin(SCK0_GPIO_Port, SCK0_Pin, GPIO_PIN_SET);
 #define	MCO_0_off   HAL_GPIO_WritePin(SCK0_GPIO_Port, SCK0_Pin, GPIO_PIN_RESET);
 
+#if 0
 #define DO_0on      HAL_GPIO_WritePin(SDA0_GPIO_Port, SDA0_Pin, GPIO_PIN_SET);\
                     HAL_GPIO_WritePin(SDA1_GPIO_Port, SDA1_Pin, GPIO_PIN_SET);\
                     HAL_GPIO_WritePin(SDA2_GPIO_Port, SDA2_Pin, GPIO_PIN_SET);\
@@ -54,24 +55,32 @@ unsigned int I2Cbit=1; //the duration of a bit 10 is about 28Khz, 1 is about 500
                     HAL_GPIO_WritePin(SDA1_GPIO_Port, SDA1_Pin, GPIO_PIN_RESET);\
                     HAL_GPIO_WritePin(SDA2_GPIO_Port, SDA2_Pin, GPIO_PIN_RESET);\
                     HAL_GPIO_WritePin(SDA3_GPIO_Port, SDA3_Pin, GPIO_PIN_RESET);
+#else
+// debugged by marco.accame / andrea.mura
+// it is necessary to change values all in one shot
+#define DO_0on               GPIOA->ODR |= 0x01e0;
+#define DO_0off              GPIOA->ODR &= 0xFe1F;
+#endif
 
+// debugged by marco.accame / andrea.mura
+// corrected pin values
 #define DE_0input   LL_GPIO_SetPinMode(SDA0_GPIO_Port, SDA0_Pin, LL_GPIO_MODE_INPUT);\
-                    LL_GPIO_SetPinMode(SDA1_GPIO_Port, SDA0_Pin, LL_GPIO_MODE_INPUT);\
-                    LL_GPIO_SetPinMode(SDA2_GPIO_Port, SDA0_Pin, LL_GPIO_MODE_INPUT);\
-                    LL_GPIO_SetPinMode(SDA3_GPIO_Port, SDA0_Pin, LL_GPIO_MODE_INPUT);\
+                    LL_GPIO_SetPinMode(SDA1_GPIO_Port, SDA1_Pin, LL_GPIO_MODE_INPUT);\
+                    LL_GPIO_SetPinMode(SDA2_GPIO_Port, SDA2_Pin, LL_GPIO_MODE_INPUT);\
+                    LL_GPIO_SetPinMode(SDA3_GPIO_Port, SDA3_Pin, LL_GPIO_MODE_INPUT);\
                     LL_GPIO_SetPinPull(SDA0_GPIO_Port, SDA0_Pin,LL_GPIO_PULL_NO);\
-                    LL_GPIO_SetPinPull(SDA1_GPIO_Port, SDA0_Pin,LL_GPIO_PULL_NO);\
-                    LL_GPIO_SetPinPull(SDA2_GPIO_Port, SDA0_Pin,LL_GPIO_PULL_NO);\
-                    LL_GPIO_SetPinPull(SDA3_GPIO_Port, SDA0_Pin,LL_GPIO_PULL_NO);
+                    LL_GPIO_SetPinPull(SDA1_GPIO_Port, SDA1_Pin,LL_GPIO_PULL_NO);\
+                    LL_GPIO_SetPinPull(SDA2_GPIO_Port, SDA2_Pin,LL_GPIO_PULL_NO);\
+                    LL_GPIO_SetPinPull(SDA3_GPIO_Port, SDA3_Pin,LL_GPIO_PULL_NO);
 
 #define DE_0output  LL_GPIO_SetPinMode(SDA0_GPIO_Port, SDA0_Pin, LL_GPIO_MODE_OUTPUT);\
-                    LL_GPIO_SetPinMode(SDA1_GPIO_Port, SDA0_Pin, LL_GPIO_MODE_OUTPUT);\
-                    LL_GPIO_SetPinMode(SDA2_GPIO_Port, SDA0_Pin, LL_GPIO_MODE_OUTPUT);\
-                    LL_GPIO_SetPinMode(SDA3_GPIO_Port, SDA0_Pin, LL_GPIO_MODE_OUTPUT);\
+                    LL_GPIO_SetPinMode(SDA1_GPIO_Port, SDA1_Pin, LL_GPIO_MODE_OUTPUT);\
+                    LL_GPIO_SetPinMode(SDA2_GPIO_Port, SDA2_Pin, LL_GPIO_MODE_OUTPUT);\
+                    LL_GPIO_SetPinMode(SDA3_GPIO_Port, SDA3_Pin, LL_GPIO_MODE_OUTPUT);\
                     LL_GPIO_SetPinOutputType(SDA0_GPIO_Port, SDA0_Pin, LL_GPIO_OUTPUT_PUSHPULL);\
-                    LL_GPIO_SetPinOutputType(SDA1_GPIO_Port, SDA0_Pin, LL_GPIO_OUTPUT_PUSHPULL);\
-                    LL_GPIO_SetPinOutputType(SDA2_GPIO_Port, SDA0_Pin, LL_GPIO_OUTPUT_PUSHPULL);\
-                    LL_GPIO_SetPinOutputType(SDA3_GPIO_Port, SDA0_Pin, LL_GPIO_OUTPUT_PUSHPULL);
+                    LL_GPIO_SetPinOutputType(SDA1_GPIO_Port, SDA1_Pin, LL_GPIO_OUTPUT_PUSHPULL);\
+                    LL_GPIO_SetPinOutputType(SDA2_GPIO_Port, SDA2_Pin, LL_GPIO_OUTPUT_PUSHPULL);\
+                    LL_GPIO_SetPinOutputType(SDA3_GPIO_Port, SDA3_Pin, LL_GPIO_OUTPUT_PUSHPULL);
 
 #define MCE_0input  LL_GPIO_SetPinMode(SCK0_GPIO_Port, SCK0_Pin, LL_GPIO_MODE_INPUT);\
                     LL_GPIO_SetPinOutputType(SCK0_GPIO_Port, SCK0_Pin, LL_GPIO_PULL_NO);\
@@ -1038,10 +1047,12 @@ void ReceiveByteI2CMaster(unsigned char Channel, unsigned char ackn) // changed 
 			ReceivedByte[2] <<= 1;      //Rotate data
 			ReceivedByte[3] <<= 1;      //Rotate data
 			MCO_0_on                //Set SCL
-			ReceivedByte[0] |= (uint16_t) ((GPIOA->IDR & (1<<9))>>9);         //Read SDA0 -> data
-			ReceivedByte[1] |= ((GPIOA->IDR &(1<<8))>>8);       //Read SDA1 -> data
-			ReceivedByte[2] |= ((GPIOA->IDR &(1<<7))>>7);       //Read SDA2 -> data
-			ReceivedByte[3] |= ((GPIOA->IDR &(1<<6))>>6);       //Read SDA3 -> data
+            // debugged by marco.accame / andrea.mura
+            // corrected shift value for the pins 5, 6, 7, 8
+			ReceivedByte[0] |= (uint16_t) ((GPIOA->IDR & (1<<8))>>8);         //Read SDA0 -> data
+			ReceivedByte[1] |= ((GPIOA->IDR &(1<<7))>>7);       //Read SDA1 -> data
+			ReceivedByte[2] |= ((GPIOA->IDR &(1<<6))>>6);       //Read SDA2 -> data
+			ReceivedByte[3] |= ((GPIOA->IDR &(1<<5))>>5);       //Read SDA3 -> data
 			Wait(I2Cbit);    //Wait(I2Cbit);
 			MCO_0_off
 			//Reset SCL
