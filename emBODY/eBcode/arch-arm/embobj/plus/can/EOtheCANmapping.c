@@ -1052,8 +1052,8 @@ extern eOresult_t eo_canmap_GetEntityLocation(EOtheCANmapping *p, eOprotID32_t i
                     {   // ok, we have a valid array of boards. let us see the first one ...
                         theboard = theboards[0];
                         if(NULL != theboard)
-                        {   // must verify it is non NULL ... and that it is a skin board
-                            if(eobrd_cantype_mtb == theboard->board.props.type)
+                        {   // must verify it is non NULL ... and that it is a skin board (mtb or mtb4)
+                            if((eobrd_cantype_mtb == theboard->board.props.type) || (eobrd_cantype_mtb4 == theboard->board.props.type))
                             {   // ok, correct board. we retrieve the info
                                 if(NULL != numoflocs)
                                 {

@@ -285,12 +285,12 @@ extern eOresult_t eo_skin_Verify(EOtheSKIN *p, const eOmn_serv_configuration_t *
     eOcandiscovery_target_t trgt = {0};
 
 
-    trgt.info.type = eobrd_cantype_mtb;
-    trgt.info.protocol.major = servcfg->data.sk.skin.version.protocol.major; 
-    trgt.info.protocol.minor = servcfg->data.sk.skin.version.protocol.minor;
-    trgt.info.firmware.major = servcfg->data.sk.skin.version.firmware.major; 
-    trgt.info.firmware.minor = servcfg->data.sk.skin.version.firmware.minor;    
-    trgt.info.firmware.build = servcfg->data.sk.skin.version.firmware.build;    
+    trgt.info.type = servcfg->data.sk.skin.boardinfo.type;
+    trgt.info.protocol.major = servcfg->data.sk.skin.boardinfo.protocol.major; 
+    trgt.info.protocol.minor = servcfg->data.sk.skin.boardinfo.protocol.minor;
+    trgt.info.firmware.major = servcfg->data.sk.skin.boardinfo.firmware.major; 
+    trgt.info.firmware.minor = servcfg->data.sk.skin.boardinfo.firmware.minor;    
+    trgt.info.firmware.build = servcfg->data.sk.skin.boardinfo.firmware.build;    
     
     // now i must do discovery of the patches. all patches can be at most on the two can buses ...
     // moreover, we cannot have more than .... eo_skin_maxnumberofMTBboards boards
@@ -448,12 +448,12 @@ extern eOresult_t eo_skin_Activate(EOtheSKIN *p, const eOmn_serv_configuration_t
         
         // now i must add all the mtb boards. i iterate per patch and then per canbus
         eObrd_canproperties_t prop = {0};
-        prop.type = eobrd_cantype_mtb;
+        prop.type = servcfg->data.sk.skin.boardinfo.type;
         prop.location.port = 0;
         prop.location.addr = 0;
         prop.location.insideindex = eobrd_caninsideindex_none;
-        prop.requiredprotocol.major = servcfg->data.sk.skin.version.protocol.major;
-        prop.requiredprotocol.minor = servcfg->data.sk.skin.version.protocol.minor;
+        prop.requiredprotocol.major = servcfg->data.sk.skin.boardinfo.protocol.major;
+        prop.requiredprotocol.minor = servcfg->data.sk.skin.boardinfo.protocol.minor;
                           
         eOcanmap_entitydescriptor_t des = {0};      
         
@@ -1179,8 +1179,8 @@ static eOresult_t s_eo_skin_onstop_search4mtbs(void *par, EOtheCANdiscovery2* cd
     p->diagnostics.errorDescriptor.sourcedevice       = eo_errman_sourcedevice_localboard;
     p->diagnostics.errorDescriptor.sourceaddress      = 0;
     p->diagnostics.errorDescriptor.par16              = servcfg->data.sk.skin.numofpatches;
-    p->diagnostics.errorDescriptor.par64              = (servcfg->data.sk.skin.version.firmware.minor)      | (servcfg->data.sk.skin.version.firmware.major << 8)  |
-                                                                 (servcfg->data.sk.skin.version.protocol.minor << 16) | (servcfg->data.sk.skin.version.protocol.major << 24) |
+    p->diagnostics.errorDescriptor.par64              = (servcfg->data.sk.skin.boardinfo.firmware.minor)      | (servcfg->data.sk.skin.boardinfo.firmware.major << 8)  |
+                                                                 (servcfg->data.sk.skin.boardinfo.protocol.minor << 16) | (servcfg->data.sk.skin.boardinfo.protocol.major << 24) |
                                                                  ((uint64_t)ptrgt->canmap[eOcanport1] << 32) | ((uint64_t)ptrgt->canmap[eOcanport2] << 48);
    
     EOaction_strg astrg = {0};
