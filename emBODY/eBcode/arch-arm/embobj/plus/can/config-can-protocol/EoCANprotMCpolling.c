@@ -738,9 +738,8 @@ extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_CURRENT_PIDLIMITS(eO
 
 extern eOresult_t eocanprotMCpolling_former_POL_MC_CMD__SET_VELOCITY_PID(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
 {
-    // ... apparently s_former_POL_MC_CMD_setpid uses len 8 and not len 7 and has pid->scale
-    //#warning marco.accame CHECK: see if ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID has len 7 or 8 as some other SET_xxx_PID 
-    s_former_POL_MC_CMD_setpid_7(descriptor, frame, ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID);
+    s_former_POL_MC_prepare_frame(descriptor, frame, 8, ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID);   
+    memcpy(frame->data+1,descriptor->cmd.value,7);
     return(eores_OK);      
 }
 
