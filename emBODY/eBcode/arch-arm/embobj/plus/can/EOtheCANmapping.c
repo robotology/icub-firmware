@@ -73,6 +73,211 @@ static eObool_t s_eocanmap_is_entity_supported(eOprotEndpoint_t ep, eOprotEntity
 
 static uint8_t s_eo_canmap_max_entities(eOprotEndpoint_t ep, eOprotEntity_t entity);
 
+static const eOcanmap_board_extended_t * s_eo_canmap_GetBoardEXT(EOtheCANmapping *p, eObrd_canlocation_t loc);
+
+static void s_eo_canmap_entities_clear(eOcanmap_board_extended_t * theboard);
+
+static eObool_t s_eo_canmap_entities_noneispresent(const eOcanmap_board_extended_t * theboard);
+
+static void s_eo_canmap_entities_index_add(eOcanmap_board_extended_t * theboard, uint8_t ep, uint8_t en, const eOcanmap_entitydescriptor_t *des);
+
+static void s_eo_canmap_entities_rem(eOcanmap_board_extended_t * theboard, uint8_t ep, uint8_t en, const eOcanmap_entitydescriptor_t *des);
+
+static eOprotIndex_t s_eo_canmap_entities_index_get(const eOcanmap_board_extended_t * theboard, eObrd_canlocation_t loc, uint8_t ep, uint8_t entity);
+
+static eOprotIndex_t s_eo_canmap_mc_index_get(const eOcanmap_board_extended_t * theboard, eObrd_canlocation_t loc);
+static eOprotIndex_t s_eo_canmap_sk_index_get(const eOcanmap_board_extended_t * theboard);
+
+
+static eObrd_caninsideindex_t s_eo_canmap_entities_caninsideindex_get(const eOcanmap_board_t *board, const eOprotIndex_t index);
+
+
+static void s_eo_canmap_entities_clear(eOcanmap_board_extended_t * theboard)
+{
+    theboard->board.entities2.bitmapOfPresence = 0;
+    theboard->board.entities2.compactIndicesOf = 0xff;
+}
+
+static eObool_t s_eo_canmap_entities_noneispresent(const eOcanmap_board_extended_t * theboard)
+{
+    return (0 == theboard->board.entities2.bitmapOfPresence) ? (eobool_true) : (eobool_false);
+}
+
+static void s_eo_canmap_entities_index_add(eOcanmap_board_extended_t * theboard, uint8_t ep, uint8_t en, const eOcanmap_entitydescriptor_t *des)
+{
+    uint8_t pos = eocanmap_posOfEPEN(ep, en);
+    
+    if(pos >= eocanmap_entities_maxnumberof)
+    {
+        return;
+    }
+    
+    // 1. set presence of this entity    
+    eo_common_byte_bitset(&theboard->board.entities2.bitmapOfPresence, pos);
+    
+    // 2. store the entity index, but only for mc and sk
+    if((eoprot_endpoint_motioncontrol != ep) && (eoprot_endpoint_skin != ep))
+    {
+        return;
+    }
+    
+    if((eobrd_mc4 == theboard->board.props.type) && (eoprot_endpoint_motioncontrol == ep) && (eobrd_caninsideindex_second == des->location.insideindex))
+    {
+        // we store in second position nibble-1
+        uint8_t val = (des->index << 4) & 0xF0;
+        theboard->board.entities2.compactIndicesOf &= 0x0F; // clear nib-1
+        theboard->board.entities2.compactIndicesOf |= val;  // set nib-1              
+    }
+    else
+    {
+        // all other cases of motioncontrol and for skin: we store in first position nibble-0
+        uint8_t val = des->index & 0x0F;
+        theboard->board.entities2.compactIndicesOf &= 0xF0; // clear nib-0
+        theboard->board.entities2.compactIndicesOf |= val;  // set nib-0      
+    }
+    
+}
+
+static void s_eo_canmap_entities_rem(eOcanmap_board_extended_t * theboard, uint8_t ep, uint8_t en, const eOcanmap_entitydescriptor_t *des)
+{
+
+    uint8_t pos = eocanmap_posOfEPEN(ep, en);
+
+    if(pos >= eocanmap_entities_maxnumberof)
+    {
+        return;
+    }
+    
+    // 1. clr presence of this entity    
+    eo_common_byte_bitclear(&theboard->board.entities2.bitmapOfPresence, pos);
+    
+    // 2. clear the entity index, but only for mc and sk
+    if((eoprot_endpoint_motioncontrol != ep) && (eoprot_endpoint_skin != ep))
+    {
+        return;
+    }
+    
+    if((eobrd_mc4 == theboard->board.props.type) && (eoprot_endpoint_motioncontrol == ep) && (eobrd_caninsideindex_second == des->location.insideindex))
+    {
+        // we store in second position nibble-1
+        uint8_t val = (entindexNONE << 4) & 0xF0;
+        theboard->board.entities2.compactIndicesOf &= 0x0F; // clear nib-1
+        theboard->board.entities2.compactIndicesOf |= val;  // set nib-1              
+    }
+    else
+    {
+        // all other cases of motioncontrol and for skin: we store in first position nibble-0
+        uint8_t val = entindexNONE & 0x0F;
+        theboard->board.entities2.compactIndicesOf &= 0xF0; // clear nib-0
+        theboard->board.entities2.compactIndicesOf |= val;  // set nib-0      
+    }
+
+
+}
+
+static eOprotIndex_t s_eo_canmap_mc_index_get(const eOcanmap_board_extended_t * theboard, eObrd_canlocation_t loc)
+{
+    eOprotIndex_t index = EOK_uint08dummy;
+
+    if(theboard->board.props.type == eobrd_cantype_foc) 
+    {   // if 1foc it is always in nibble-0 
+        index = theboard->board.entities2.compactIndicesOf & 0x0F;
+    }
+    else if(theboard->board.props.type == eobrd_cantype_mc4)
+    {   // if mc4, index depends on value of loc.insideindex. it can be only first or second. if loc.insideindex is none or even else: nothing is done
+                    
+        if(eobrd_caninsideindex_first == loc.insideindex)
+        {
+            index = theboard->board.entities2.compactIndicesOf & 0x0F;
+        }
+        else if(eobrd_caninsideindex_second == loc.insideindex)
+        {
+            index = (theboard->board.entities2.compactIndicesOf >> 4) & 0x0F;
+        }
+    }      
+    
+    if(entindexNONE == index)
+    {  
+        index = EOK_uint08dummy;
+    }
+    return index; 
+}
+
+static eOprotIndex_t s_eo_canmap_sk_index_get(const eOcanmap_board_extended_t * theboard)
+{
+    eOprotIndex_t index = EOK_uint08dummy;
+    
+    index = theboard->board.entities2.compactIndicesOf & 0x0F;    
+
+    if(entindexNONE == index)
+    {   // in case some board.entities.indexof[0] or board.entities.indexof[1] has a entindexNONE value we must be sure to return EOK_uint08dummy
+        index = EOK_uint08dummy;
+    }
+    return index; 
+}
+
+
+static eOprotIndex_t s_eo_canmap_entities_index_get(const eOcanmap_board_extended_t * theboard, eObrd_canlocation_t loc, uint8_t ep, uint8_t entity)
+{
+    eOprotIndex_t index = EOK_uint08dummy;
+
+    // 1. check if we have this entity.
+    
+    uint8_t pos = eocanmap_posOfEPEN(ep, entity);
+    
+    if(pos >= eocanmap_entities_maxnumberof)
+    {
+        return index;
+    }
+     
+    if(eobool_false == eo_common_byte_bitcheck(theboard->board.entities2.bitmapOfPresence, pos))
+    {
+        return index;
+    }
+    
+    // 2. yes, we have it. now we retrieve it. all entities have zero index apart those on mc and sk
+    if(eoprot_endpoint_motioncontrol == ep)
+    {
+        index = s_eo_canmap_mc_index_get(theboard, loc);
+    }
+    else if(eoprot_endpoint_skin == ep)
+    {
+        index = s_eo_canmap_sk_index_get(theboard);
+    }
+    else
+    {   
+        index = 0;
+    }
+    
+    if(entindexNONE == index)
+    {   // in case some board.entities.indexof[0] or board.entities.indexof[1] has a entindexNONE value we must be sure to return EOK_uint08dummy
+        index = EOK_uint08dummy;
+    }
+    
+    return index;    
+}
+
+
+static eObrd_caninsideindex_t s_eo_canmap_entities_caninsideindex_get(const eOcanmap_board_t *board, const eOprotIndex_t index)
+{
+    eObrd_caninsideindex_t inside = eobrd_caninsideindex_none;
+    
+    uint8_t tmp = board->entities2.compactIndicesOf;
+    
+    if(index == (tmp & 0x0F))
+    {
+        inside = eobrd_caninsideindex_first; // for 1foc we could use eobrd_caninsideindex_none, but it is ok even in this way
+    }
+    else if(index == ((tmp >> 4) & 0x0F))
+    {
+        inside = eobrd_caninsideindex_second;
+    } 
+
+    
+    return inside;
+}
+
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -140,8 +345,9 @@ static eOcanmap_board_extended_t ** s_eo_canmap_canmapcfg_boards[2] =
 static eOcanmap_board_extended_t * s_eo_canmap_boards_mc_jomo[eocanmap_joints_maxnumberof] = {NULL};
 static eOcanmap_board_extended_t * s_eo_canmap_boards_as_strain[eocanmap_strains_maxnumberof] = {NULL};
 static eOcanmap_board_extended_t * s_eo_canmap_boards_as_mais[eocanmap_maises_maxnumberof] = {NULL};
-static eOcanmap_board_extended_t * s_eo_canmap_boards_as_extorque[1] = {NULL};
+static eOcanmap_board_extended_t * s_eo_canmap_boards_as_temperature[1] = {NULL};
 static eOcanmap_board_extended_t * s_eo_canmap_boards_as_inertial[eocanmap_inertials_maxnumberof] = {NULL};
+static eOcanmap_board_extended_t * s_eo_canmap_boards_as_inertial3[eocanmap_inertials3_maxnumberof] = {NULL};
 //static eOcanmap_board_extended_t * s_eo_canmap_boards_sk_skin[eocanmap_skins_maxnumberof] = {NULL};
 static eOcanmap_board_extended_t * s_eo_canmap_boards_sk_skin_00[eocanmap_skin_index_boards_maxnumberof] = {NULL};
 static eOcanmap_board_extended_t * s_eo_canmap_boards_sk_skin_01[eocanmap_skin_index_boards_maxnumberof] = {NULL};
@@ -156,8 +362,9 @@ static eOcanmap_board_extended_t ** s_eo_canmap_boards_as[] =
 {   
     s_eo_canmap_boards_as_strain,       // strain
     s_eo_canmap_boards_as_mais,         // mais
-    s_eo_canmap_boards_as_extorque,     // extorque are not managed ...
-    s_eo_canmap_boards_as_inertial      // inertial
+    s_eo_canmap_boards_as_temperature,  // temperature
+    s_eo_canmap_boards_as_inertial,     // inertial
+    s_eo_canmap_boards_as_inertial3     // inertial3
 };
 
 //static eOcanmap_board_extended_t ** s_eo_canmap_boards_sk[] =
@@ -190,9 +397,9 @@ static EOtheCANmapping s_eo_canmap_singleton =
     EO_INIT(.canmapping) NULL,
     EO_INIT(.entitylocation) NULL,
     EO_INIT(.skinlocation) NULL,
-    EO_INIT(.numofskinboardsindex) {0, 0},
+    EO_INIT(.numofskinboardsindex) {0, 0}
 //    EO_INIT(.arrayofboardlocations) {0},
-    EO_INIT(.tobedefined) 0
+
 };
 
 
@@ -230,8 +437,7 @@ extern EOtheCANmapping * eo_canmap_Initialise(const eOcanmap_cfg_t *canmapcfg)
         {
             // i use board.props.type to understand if to load a board.
             s_eo_canmap_boards_ram[i][j].board.props.type = eobrd_cantype_none;
-            // i use board.indexofentity[0,1] to understand if to unload a board 
-            s_eo_canmap_boards_ram[i][j].board.indexofentity[0] = s_eo_canmap_boards_ram[i][j].board.indexofentity[1] = entindexNONE;
+            s_eo_canmap_entities_clear(&s_eo_canmap_boards_ram[i][j]);
         }
     }
     
@@ -272,7 +478,7 @@ extern eOresult_t eo_canmap_LoadBoards(EOtheCANmapping *p,  EOconstvector *vecto
     {   // note: i can use location.port and location.addr safely in addressing memory because their max values are 1 and 15 respectively.
         eObrd_canproperties_t *prop = (eObrd_canproperties_t*)eo_constvector_At(vectorof_boardprops, i);
         eOcanmap_board_extended_t *boardext = &s_eo_canmap_boards_ram[prop->location.port][prop->location.addr];
-        // now that we have a boardext, we must NOT memset it to 0!!! we must keep the existing indexofentity[] values.
+        // now that we have a boardext, we must NOT memset it to 0!!! we must keep the existing entities.indexof[] values.
         // the problem does not apply if this board is used by one service only. BUT if it is used by more than one, THEN ...
         // Example: i call eo_canmap_LoadBoards() for skin service and i load some mtb boards. then i call it again for inertial and i have the same mtb boards.
         // in such a case, i must not load the board again.
@@ -280,11 +486,11 @@ extern eOresult_t eo_canmap_LoadBoards(EOtheCANmapping *p,  EOconstvector *vecto
         if(NULL == s_eo_canmap_singleton.canmapping[prop->location.port][prop->location.addr])
         {   // it means that noboby uses this board yet. i perform a full initialisation
             memcpy(&boardext->board.props, prop, sizeof(eObrd_canproperties_t));
-            boardext->board.indexofentity[0] = boardext->board.indexofentity[1] = entindexNONE;
+            s_eo_canmap_entities_clear(boardext);
             s_eo_canmap_singleton.canmapping[prop->location.port][prop->location.addr] = boardext;
         }
         else
-        {   // it means that someone else already is using the board OR that i have loader them twice. what i can do in here is just to verify if there are problems.
+        {   // it means that someone else already is using the board OR that i have loaded them twice. what i can do in here is just to verify if there are problems.
             eOcanmap_board_extended_t *existing = s_eo_canmap_singleton.canmapping[prop->location.port][prop->location.addr];
             if(existing->board.props.type != prop->type)
             {
@@ -321,32 +527,19 @@ extern eOresult_t eo_canmap_UnloadBoards(EOtheCANmapping *p,  EOconstvector *vec
     for(i=0; i<num; i++)
     {   // note: i can use location.port and location.addr safely in addressing memory because their max values are 1 and 15 respectively.
         
-        // lo posso togliere. devo pero' capire cosa fare nel caso di board che offrono piu' servizi. 
-        // ad esempio: la mtb che offre skin ed inertial.
-        // remove board only if it is not used by any entity, thus if both indexofentity[0] and indexofentity[1] are equal to entindexNONE
-        
-        
+        // remove board only if it is not used by any entity
+                
         eObrd_canproperties_t *prop = (eObrd_canproperties_t*)eo_constvector_At(vectorof_boardprops, i);
         eOcanmap_board_extended_t *boardext = &s_eo_canmap_boards_ram[prop->location.port][prop->location.addr];
-        if((entindexNONE == boardext->board.indexofentity[0]) && (entindexNONE == boardext->board.indexofentity[1])) 
+        if(eobool_true == s_eo_canmap_entities_noneispresent(boardext)) 
         {
             memset(boardext, 0, sizeof(eOcanmap_board_extended_t));
             memset(&boardext->board.props, 0, sizeof(eObrd_canproperties_t));
-            boardext->board.indexofentity[0] = boardext->board.indexofentity[1] = entindexNONE;
+            s_eo_canmap_entities_clear(boardext);
             boardext->board.props.type = eobrd_cantype_none;
             s_eo_canmap_singleton.canmapping[prop->location.port][prop->location.addr] = NULL;
         }
         
-        // vedi come fare per rimuovere questa location dall'array. dovrei cercare questo item, segnarmi l'indice e rimuovere l'item.
-//        if(NULL == s_eo_canmap_singleton.canmapping[prop->location.port][prop->location.addr])
-//        {   // first time we add the location
-//            eo_array_PushBack((EOarray*)&s_eo_canmap_singleton.arrayofboardlocations, &prop->location);
-//        }
-        
-        
-        // lo posso togliere. devo pero' capire cosa fare nel caso di board che offrono piu' servizi. 
-        // ad esempio: la mtb che offre skin ed inertial
-        //s_eo_canmap_singleton.canmapping[prop->location.port][prop->location.addr] = NULL;
     }
      
     return(eores_OK);    
@@ -375,7 +568,7 @@ extern eOresult_t eo_canmap_ConfigEntity(EOtheCANmapping *p,  eOprotEndpoint_t e
     // numofcanlocations is the number of canlocations used to define the entity. for instance: 
     // - for mc4can-based motion control of eb2 with 12 joints we have 12 can locations (3 mc4 boards, each with two 
     //   can addresses, each can address with two indices).
-    // - for skin of board eb2 which as only one entity but uses 7 can boards we have 7 can locations. but we have only ONE index.
+    // - for skin of board eb2 which has only one entity but uses 7 can boards we have 7 can locations. but we have only ONE index.
     uint8_t numofcanlocations = eo_constvector_Size(vectorof_entitydescriptors);
     uint8_t maxnumofentities = s_eo_canmap_max_entities(ep, entity);
     
@@ -396,33 +589,28 @@ extern eOresult_t eo_canmap_ConfigEntity(EOtheCANmapping *p,  eOprotEndpoint_t e
         {
             continue;
         }
-        // it must not be NULL .... but for now i dont check it
-        // now i must do:
-        // 1. set the boardext with the index of the entity.
-        // 2. fill the entity array        
-        if(eoprot_endpoint_motioncontrol == ep)
-        {   // for motion control the board can be 1foc or mc4. 1foc manages 1 joint only and is placed in position 0 of indexofentity[]. mc4 manages two joints which are placed in position 0 and position 1
-            boardext->board.indexofentity[loc->insideindex] = des->index;
-            s_eo_canmap_singleton.entitylocation[ep][eoprot_entity_mc_joint][des->index] = boardext;
-            s_eo_canmap_singleton.entitylocation[ep][eoprot_entity_mc_motor][des->index] = boardext;
-        }   
-        else if(eoprot_endpoint_skin == ep)
-        {   // for skin endpoint the board is a mtb. for entity of type skin we use position 0 of indexofentity[]
-            boardext->board.indexofentity[0] = des->index;  // as described in NOTE-123454321 we use position 0    
+        
+        // 1. add an index
+        s_eo_canmap_entities_index_add(boardext, ep, entity, des);
+        // 2. assign the board
+        // the skin behaves differently, thus i do it first:
+        if(eoprot_endpoint_skin == ep)
+        {   // the entity is located in a distributed way
             uint8_t pos = s_eo_canmap_singleton.numofskinboardsindex[des->index];
             s_eo_canmap_singleton.skinlocation[des->index][pos] = boardext; 
-            s_eo_canmap_singleton.numofskinboardsindex[des->index] ++;            
+            s_eo_canmap_singleton.numofskinboardsindex[des->index] ++;                 
         }
-        else if((eoprot_endpoint_analogsensors == ep) && (eoprot_entity_as_inertial == entity))
-        {   // NOTE-123454321: for analog sensor endpoint and inertial entity the board is a mtb. we use position 1 of indexofentity[] because position 0 is reserved to skin entity managed by the same board
-            boardext->board.indexofentity[1] = des->index; // as described in NOTE-123454321 we use position 1
-            s_eo_canmap_singleton.entitylocation[ep][entity][des->index] = boardext;            
-        }
-        else 
-        {   // all other cases are managed by a board only which manages only one entity. we use position 0 of indexofentity[]
-            boardext->board.indexofentity[0] = des->index;
+        else
+        {   // we have a precise location for the entity
             s_eo_canmap_singleton.entitylocation[ep][entity][des->index] = boardext;
+            
+            if(eoprot_endpoint_motioncontrol == ep)
+            {   // in case of motion control i prefer to add the pair of joint and motor
+                s_eo_canmap_singleton.entitylocation[ep][eoprot_entity_mc_joint][des->index] = boardext;
+                s_eo_canmap_singleton.entitylocation[ep][eoprot_entity_mc_motor][des->index] = boardext;            
+            }
         }
+
     }
     
     return(eores_OK);     
@@ -470,61 +658,40 @@ extern eOresult_t eo_canmap_DeconfigEntity(EOtheCANmapping *p,  eOprotEndpoint_t
         {
             continue;
         }
-        // it must not be NULL .... but for now i dont check it
-        // now i must do:
-        // 1. set the boardext with the index of the entity.
-        // 2. fill the entity array        
-        if(eoprot_endpoint_motioncontrol == ep)
-        {   // for motion control the board can be 1foc or mc4. 1foc manages 1 joint only and is placed in position 0 of indexofentity[]. mc4 manages two joints which are placed in position 0 and position 1
-            boardext->board.indexofentity[loc->insideindex] = entindexNONE;
-            s_eo_canmap_singleton.entitylocation[ep][eoprot_entity_mc_joint][des->index] = NULL;
-            s_eo_canmap_singleton.entitylocation[ep][eoprot_entity_mc_motor][des->index] = NULL;
-        }   
-        else if(eoprot_endpoint_skin == ep)
-        {   // for skin endpoint the board is a mtb. for entity of type skin we use position 0 of indexofentity[]
-            boardext->board.indexofentity[0] = entindexNONE;  // as described in NOTE-123454321 we use position 0    
+        
+        // 1. rem an index
+        s_eo_canmap_entities_rem(boardext, ep, entity, des);
+        // 2. remove the board
+        // the skin behaves differently, thus i do it first:
+        if(eoprot_endpoint_skin == ep)
+        {   // the entity is located in a distributed way
             uint8_t pos = s_eo_canmap_singleton.numofskinboardsindex[des->index];
             s_eo_canmap_singleton.skinlocation[des->index][pos] = NULL; 
-            s_eo_canmap_singleton.numofskinboardsindex[des->index] --;            
+            s_eo_canmap_singleton.numofskinboardsindex[des->index] --;              
         }
-        else if((eoprot_endpoint_analogsensors == ep) && (eoprot_entity_as_inertial == entity))
-        {   // NOTE-123454321: for analog sensor endpoint and inertial entity the board is a mtb. we use position 1 of indexofentity[] because position 0 is reserved to skin entity managed by the same board
-            boardext->board.indexofentity[1] = entindexNONE; // as described in NOTE-123454321 we use position 1
-            s_eo_canmap_singleton.entitylocation[ep][entity][des->index] = NULL;            
-        }
-        else 
-        {   // all other cases are managed by a board only which manages only one entity. we use position 0 of indexofentity[]
-            boardext->board.indexofentity[0] = entindexNONE;
+        else
+        {   // we have a precise location for the entity            
             s_eo_canmap_singleton.entitylocation[ep][entity][des->index] = NULL;
+
+            
+            if(eoprot_endpoint_motioncontrol == ep)
+            {   // in case of motion control i prefer to remove the pair of joint and motor
+                s_eo_canmap_singleton.entitylocation[ep][eoprot_entity_mc_joint][des->index] = NULL;
+                s_eo_canmap_singleton.entitylocation[ep][eoprot_entity_mc_motor][des->index] = NULL;          
+            }
         }
+
+
     }
     
     return(eores_OK);     
 }
 
 
-extern const eOcanmap_board_extended_t * eo_canmap_GetBoard(EOtheCANmapping *p, eObrd_canlocation_t bloc)
-{
-//    eOcanmap_board_extended_t *board = NULL;
-    
-// useless if port is only one bit    
-//    if(loc.port > 1)
-//    {
-//        return(NULL);
-//    } 
-// useless if addr is only four bits    
-//    if(loc.addr > 15)
-//    {
-//        return(NULL);
-//    }
-    
-    return((const eOcanmap_board_extended_t*)s_eo_canmap_singleton.canmapping[bloc.port][bloc.addr]);
-}
 
-
-extern eObrd_cantype_t eo_canmap_GetBoardType(EOtheCANmapping *p, eObrd_canlocation_t bloc)
+extern eObrd_cantype_t eo_canmap_GetBoardType(EOtheCANmapping *p, eObrd_canlocation_t loc)
 {   
-    const eOcanmap_board_extended_t *brd = eo_canmap_GetBoard(p, bloc);
+    const eOcanmap_board_extended_t *brd = s_eo_canmap_GetBoardEXT(p, loc);
     if(NULL == brd)
     {
         return(eobrd_cantype_unknown);
@@ -566,8 +733,10 @@ extern eOresult_t eo_canmap_BoardSetDetected(EOtheCANmapping *p, eObrd_canlocati
     return(eores_OK);
 }
 
-// we dont need the ep and entity to retrieve the index. 
-extern eOprotIndex_t eo_canmap_GetEntityIndex(EOtheCANmapping *p, eObrd_canlocation_t loc)
+#if 0
+// we always use its safer version: eo_canmap_GetEntityIndex()
+// we dont need the ep and entity to retrieve the index... not true anymore since we have skin and inertial on the mtb
+extern eOprotIndex_t eo_canmap_GetEntityIndexQUICKbutNOCHECK(EOtheCANmapping *p, eObrd_canlocation_t loc)
 {
     eOprotIndex_t index = EOK_uint08dummy; // init with this value. it changed only if we find a valid index
     
@@ -585,7 +754,7 @@ extern eOprotIndex_t eo_canmap_GetEntityIndex(EOtheCANmapping *p, eObrd_canlocat
     const eOcanmap_board_extended_t * theboard = s_eo_canmap_singleton.canmapping[loc.port][loc.addr];
     
     if(NULL == theboard)
-    {   // it means that we dont have such a board at the specified location
+    {   // it means that we dont have a board at the specified location
         return(EOK_uint08dummy);
     }
     
@@ -595,27 +764,57 @@ extern eOprotIndex_t eo_canmap_GetEntityIndex(EOtheCANmapping *p, eObrd_canlocat
     
     if(eobrd_caninsideindex_first == loc.insideindex)
     {
-        index = theboard->board.indexofentity[0];
+        index = theboard->board.entities.indexof[0];
     }
     else if(eobrd_caninsideindex_second == loc.insideindex)
     {
-        index = theboard->board.indexofentity[1];
+        index = theboard->board.entities.indexof[1];
     }
     else if(eobrd_caninsideindex_none == loc.insideindex)
     {
-        index = theboard->board.indexofentity[0];
+        index = theboard->board.entities.indexof[0];
     }
         
     if(entindexNONE == index)
-    {   // in case some board.indexofentity[0] or board.indexofentity[1] has a entindexNONE value we must be sure to return EOK_uint08dummy
+    {   // in case some board.entities.indexof[0] or board.entities.indexof[1] has a entindexNONE value we must be sure to return EOK_uint08dummy
         index = EOK_uint08dummy;
     }
     
     return(index);            
 }
+#endif
+
+//// but if we use ep and entity we surely have cross-check  
+//extern eOprotIndex_t eo_canmap_GetEntityIndexNEW(EOtheCANmapping *p, eObrd_canlocation_t loc, eOprotEndpoint_t ep, eOprotEntity_t entity)
+//{
+//    eOprotIndex_t index = EOK_uint08dummy; // init with this value. it changed only if we find a valid index    
+//    const eOcanmap_board_extended_t * theboard = s_eo_canmap_singleton.canmapping[loc.port][loc.addr];
+//    
+//    if(NULL == theboard)
+//    {   // it means that we dont have such a board at the specified location
+//        return(EOK_uint08dummy);
+//    }
+//    
+//    // only motioncontrol / skin returns something not 0.
+//    if(eoprot_endpoint_motioncontrol == ep)
+//    {
+//        index = s_eo_canmap_mc_index_get(theboard);
+//    }
+//    else if(eoprot_endpoint_skin == ep)
+//    {
+//        index = s_eo_canmap_sk_index_get(theboard);
+//    }
+//    else
+//    {
+//        index = 0;
+//    }
+//    
+//    return(index);
+//}
+
 
 // but if we use ep and entity we surely have cross-check  
-extern eOprotIndex_t eo_canmap_GetEntityIndexExtraCheck(EOtheCANmapping *p, eObrd_canlocation_t loc, eOprotEndpoint_t ep, eOprotEntity_t entity)
+extern eOprotIndex_t eo_canmap_GetEntityIndex(EOtheCANmapping *p, eObrd_canlocation_t loc, eOprotEndpoint_t ep, eOprotEntity_t entity)
 {
     eOprotIndex_t index = EOK_uint08dummy; // init with this value. it changed only if we find a valid index
     
@@ -638,93 +837,21 @@ extern eOprotIndex_t eo_canmap_GetEntityIndexExtraCheck(EOtheCANmapping *p, eObr
         return(EOK_uint08dummy);
     }
     
-    // ok, we have a board at that location. is it compatible with endpoint and entity?
-
-    switch(ep)
-    {
-        case eoprot_endpoint_motioncontrol:
-        {   // on can boards there are either joints or motors
-            if((eoprot_entity_mc_joint == entity) || (eoprot_entity_mc_motor == entity))
-            {   // get the jomoindex. it depends upon the board being mc4 or 1foc
-                if(theboard->board.props.type == eobrd_cantype_foc) 
-                {   // if 1foc it is always on board.indexofentity[0], irrespectively of the value of loc.insideindex 
-                    index = theboard->board.indexofentity[0];
-                }
-                else if(theboard->board.props.type == eobrd_cantype_mc4)
-                {   // if mc4, index depends on value of loc.insideindex. it cn be only first or second. if loc.insideindex is none or even else: nothing is done
-                    if(eobrd_caninsideindex_first == loc.insideindex)
-                    {
-                        index = theboard->board.indexofentity[0];
-                    }
-                    else if(eobrd_caninsideindex_second == loc.insideindex)
-                    {
-                        index = theboard->board.indexofentity[1];
-                    }
-                }                
-            }
-            
-        } break;
-        
-        
-        case eoprot_endpoint_analogsensors:
-        {   // strain or mais or inertial
-            if(eoprot_entity_as_strain == entity)
-            {   // the board can be only a strain ... the index is always on board.indexofentity[0]
-                if(theboard->board.props.type == eobrd_cantype_strain) 
-                {
-                    index = theboard->board.indexofentity[0];
-                }
-            }
-            else if(eoprot_entity_as_mais == entity)
-            {   // the board can be only a mais ... the index is always on board.indexofentity[0]
-                if(theboard->board.props.type == eobrd_cantype_mais) 
-                {
-                    index = theboard->board.indexofentity[0];
-                }
-            } 
-            else if(eoprot_entity_as_inertial == entity)
-            {   // the board can be only a skin ... the index is always on board.indexofentity[1] !!!!!! SEE NOTE-123454321 in FUNCTION eo_canmap_ConfigEntity()
-                if(theboard->board.props.type == eobrd_cantype_mtb) 
-                {
-                    index = theboard->board.indexofentity[1]; // as described in NOTE-123454321 we use position 1
-                }
-            } 
-        } break;
- 
-
-        case eoprot_endpoint_skin:
-        {   // only a skin
-            if(eoprot_entity_sk_skin == entity)
-            {   // the board can be only a skin board ... the index is on board.indexofentity[0]
-                if(theboard->board.props.type == eobrd_cantype_mtb) 
-                {
-                    index = theboard->board.indexofentity[0]; // as described in NOTE-123454321 we use position 0
-                }
-            }
-        } break;        
- 
-        
-        case eoprot_endpoint_management:
-        default:
-        {   
-            index = EOK_uint08dummy;
-        } break;
-        
-    }
     
-    if(entindexNONE == index)
-    {   // in case some board.indexofentity[0] or board.indexofentity[1] has a entindexNONE value we must be sure to return EOK_uint08dummy
-        index = EOK_uint08dummy;
-    }
+    index = s_eo_canmap_entities_index_get(theboard, loc, ep, entity);
     
+
     return(index);
 }
+
 
 extern eOresult_t eo_canmap_GetEntityLocation(EOtheCANmapping *p, eOprotID32_t id32, eObrd_canlocation_t *loc, uint8_t *numoflocs, eObrd_cantype_t *boardtype)
 {
     eOprotEndpoint_t ep = eoprot_ID2endpoint(id32);
     eOprotEntity_t entity = eoprot_ID2entity(id32);
     eOprotIndex_t index = eoprot_ID2index(id32);
+    
+    // we fill loc, etc. using what is inside s_eo_canmap_singleton.entitylocation[ep][entity][index]
     
     eOresult_t res = eores_NOK_generic;
     const eOcanmap_board_extended_t *theboard = NULL;
@@ -768,19 +895,9 @@ extern eOresult_t eo_canmap_GetEntityLocation(EOtheCANmapping *p, eOprotID32_t i
                     }
                     loc->port = theboard->board.props.location.port;
                     loc->addr = theboard->board.props.location.addr; 
-                    if(index == theboard->board.indexofentity[0])
-                    {
-                        loc->insideindex = eobrd_caninsideindex_first; // for 1foc we could use eobrd_caninsideindex_none, but it is ok even in this way
-                        res = eores_OK;
-                    }
-                    else if(index == theboard->board.indexofentity[1])
-                    {
-                        loc->insideindex = eobrd_caninsideindex_second;
-                        res = eores_OK;
-                    } 
-                    //else
-                    //{   // the board is correct but none of the inside indices matches the target index. cannot give ok result                        
-                    //}
+                    loc->insideindex = s_eo_canmap_entities_caninsideindex_get(&theboard->board, index);
+                    res = (eobrd_caninsideindex_none != loc->insideindex) ? eores_OK : eores_NOK_generic;
+
                     if(NULL != boardtype)
                     {
                         *boardtype = (eObrd_cantype_t)theboard->board.props.type;
@@ -799,22 +916,17 @@ extern eOresult_t eo_canmap_GetEntityLocation(EOtheCANmapping *p, eOprotID32_t i
                     theboard = s_eo_canmap_singleton.entitylocation[ep][entity][index];
                     if(NULL != theboard)
                     {
-                        if(eobrd_cantype_strain == theboard->board.props.type)
+                        if((eobrd_cantype_strain == theboard->board.props.type) || (eobrd_cantype_strain2 == theboard->board.props.type))
                         {   // ok, correct board. we retrieve the info
                             if(NULL != numoflocs)
                             {
                                 *numoflocs = 1;
                             }
                             loc->port = theboard->board.props.location.port;
-                            loc->addr = theboard->board.props.location.addr;             
-                            if(index == theboard->board.indexofentity[0])
-                            {
-                                loc->insideindex = eobrd_caninsideindex_none; // if it is a strain we dont care about the insideindex
-                                res = eores_OK;
-                            }
-                            //else
-                            //{   // the board is correct but the insideindex0 does not match the target index. cannot give ok result                        
-                            //} 
+                            loc->addr = theboard->board.props.location.addr;    
+                            loc->insideindex = eobrd_caninsideindex_none; // if it is eoprot_endpoint_analogsensors we dont care about the insideindex
+                            res = eores_OK;                            
+
                             if(NULL != boardtype)
                             {
                                 *boardtype = (eObrd_cantype_t)theboard->board.props.type;
@@ -837,15 +949,10 @@ extern eOresult_t eo_canmap_GetEntityLocation(EOtheCANmapping *p, eOprotID32_t i
                                 *numoflocs = 1;
                             }
                             loc->port = theboard->board.props.location.port;
-                            loc->addr = theboard->board.props.location.addr;             
-                            if(index == theboard->board.indexofentity[0])
-                            {
-                                loc->insideindex = eobrd_caninsideindex_none; // if it is a mais we dont care about the inside index
-                                res = eores_OK;
-                            }
-                            //else
-                            //{   // the board is correct but the insideindex0 does not match the target index. cannot give ok result                        
-                            //}  
+                            loc->addr = theboard->board.props.location.addr;    
+                            loc->insideindex = eobrd_caninsideindex_none; // if it is eoprot_endpoint_analogsensors we dont care about the inside index
+                            res = eores_OK;                            
+  
                             if(NULL != boardtype)
                             {
                                 *boardtype = (eObrd_cantype_t)theboard->board.props.type;
@@ -868,15 +975,10 @@ extern eOresult_t eo_canmap_GetEntityLocation(EOtheCANmapping *p, eOprotID32_t i
                                 *numoflocs = 1;
                             }
                             loc->port = theboard->board.props.location.port;
-                            loc->addr = theboard->board.props.location.addr;             
-                            if(index == theboard->board.indexofentity[1]) // as described in NOTE-123454321 we use position 1
-                            {
-                                loc->insideindex = eobrd_caninsideindex_none; // if it is a skin board we dont care about the inside index
-                                res = eores_OK;
-                            }
-                            //else
-                            //{   // the board is correct but the insideindex0 does not match the target index. cannot give ok result                        
-                            //}  
+                            loc->addr = theboard->board.props.location.addr;    
+                            loc->insideindex = eobrd_caninsideindex_none; // if it is eoprot_endpoint_analogsensors we dont care about the inside index
+                            res = eores_OK;                            
+
                             if(NULL != boardtype)
                             {
                                 *boardtype = (eObrd_cantype_t)theboard->board.props.type;
@@ -884,7 +986,59 @@ extern eOresult_t eo_canmap_GetEntityLocation(EOtheCANmapping *p, eOprotID32_t i
                         }
                     }                    
                 }                
-            }             
+            }
+            else if(eoprot_entity_as_inertial3 == entity)
+            {
+                if(index < eocanmap_inertials3_maxnumberof)
+                {
+                    theboard = s_eo_canmap_singleton.entitylocation[ep][entity][index];
+                    if(NULL != theboard)
+                    {
+                        if((eobrd_cantype_mtb4 == theboard->board.props.type) || (eobrd_cantype_strain2 == theboard->board.props.type))
+                        {   // ok, correct board. we retrieve the info
+                            if(NULL != numoflocs)
+                            {
+                                *numoflocs = 1;
+                            }
+                            loc->port = theboard->board.props.location.port;
+                            loc->addr = theboard->board.props.location.addr;    
+                            loc->insideindex = eobrd_caninsideindex_none; // if it is eoprot_endpoint_analogsensors we dont care about the inside index
+                            res = eores_OK;                            
+
+                            if(NULL != boardtype)
+                            {
+                                *boardtype = (eObrd_cantype_t)theboard->board.props.type;
+                            }                            
+                        }
+                    }                    
+                }                
+            }
+            else if(eoprot_entity_as_temperature == entity)
+            {
+                if(index < eocanmap_temperatures_maxnumberof)
+                {
+                    theboard = s_eo_canmap_singleton.entitylocation[ep][entity][index];
+                    if(NULL != theboard)
+                    {
+                        if((eobrd_cantype_mtb4 == theboard->board.props.type) || (eobrd_cantype_strain2 == theboard->board.props.type))
+                        {   // ok, correct board. we retrieve the info
+                            if(NULL != numoflocs)
+                            {
+                                *numoflocs = 1;
+                            }
+                            loc->port = theboard->board.props.location.port;
+                            loc->addr = theboard->board.props.location.addr;    
+                            loc->insideindex = eobrd_caninsideindex_none; // if it is eoprot_endpoint_analogsensors we dont care about the inside index
+                            res = eores_OK;                            
+
+                            if(NULL != boardtype)
+                            {
+                                *boardtype = (eObrd_cantype_t)theboard->board.props.type;
+                            }                            
+                        }
+                    }                    
+                }                
+            }                                    
         } break;  
         
         case eoprot_endpoint_skin:
@@ -892,17 +1046,14 @@ extern eOresult_t eo_canmap_GetEntityLocation(EOtheCANmapping *p, eOprotID32_t i
             if(eoprot_entity_sk_skin == entity)
             {
                 if(index < eocanmap_skins_maxnumberof)
-                {
-                    
+                {                   
                     eOcanmap_board_extended_t ** theboards = (eOcanmap_board_extended_t **)s_eo_canmap_singleton.skinlocation[index];
-                    //const eOcanmap_board_extended_t * const * theboards = eo_canmapcfg_skins_boards[index];
-                    //eOcanmap_board_extended_t ** theboards = (eOcanmap_board_extended_t **)s_eo_canmap_singleton.entitylocation[ep][entity][index];
                     if(NULL != theboards)
                     {   // ok, we have a valid array of boards. let us see the first one ...
                         theboard = theboards[0];
                         if(NULL != theboard)
-                        {   // must verify it is non NULL ... and that it is a skin board
-                            if(eobrd_cantype_mtb == theboard->board.props.type)
+                        {   // must verify it is non NULL ... and that it is a skin board (mtb or mtb4)
+                            if((eobrd_cantype_mtb == theboard->board.props.type) || (eobrd_cantype_mtb4 == theboard->board.props.type))
                             {   // ok, correct board. we retrieve the info
                                 if(NULL != numoflocs)
                                 {
@@ -910,7 +1061,7 @@ extern eOresult_t eo_canmap_GetEntityLocation(EOtheCANmapping *p, eOprotID32_t i
                                 }
                                 loc->port = theboard->board.props.location.port;
                                 loc->addr = theboard->board.props.location.addr; 
-                                loc->insideindex = eobrd_caninsideindex_none; // if it is a skin we dont care about insideindex
+                                loc->insideindex = eobrd_caninsideindex_none; // if it is eoprot_endpoint_skin we dont care about insideindex
                                 res = eores_OK;
                                 if(NULL != boardtype)
                                 {
@@ -1034,7 +1185,7 @@ static eObool_t s_eocanmap_is_entity_supported(eOprotEndpoint_t ep, eOprotEntity
         
         case eoprot_endpoint_analogsensors:
         {
-            if((eoprot_entity_as_strain == entity) || (eoprot_entity_as_mais == entity) || (eoprot_entity_as_inertial == entity))
+            if((eoprot_entity_as_strain == entity) || (eoprot_entity_as_mais == entity) || (eoprot_entity_as_inertial == entity) || (eoprot_entity_as_inertial3 == entity))
             {
                 ret = eobool_true;
             }                         
@@ -1083,6 +1234,14 @@ static uint8_t s_eo_canmap_max_entities(eOprotEndpoint_t ep, eOprotEntity_t enti
             else if(eoprot_entity_as_inertial == entity)
             {
                 max = eocanmap_inertials_maxnumberof;
+            }
+            else if(eoprot_entity_as_inertial3 == entity)
+            {
+                max = eocanmap_inertials3_maxnumberof;
+            }  
+            else if(eoprot_entity_as_temperature == entity)
+            {
+                max = eocanmap_temperatures_maxnumberof;
             }             
         } break;
         
@@ -1102,6 +1261,44 @@ static uint8_t s_eo_canmap_max_entities(eOprotEndpoint_t ep, eOprotEntity_t enti
     
     return(max);
 }
+
+static const eOcanmap_board_extended_t * s_eo_canmap_GetBoardEXT(EOtheCANmapping *p, eObrd_canlocation_t bloc)
+{
+//    eOcanmap_board_extended_t *board = NULL;
+    
+// useless if port is only one bit    
+//    if(loc.port > 1)
+//    {
+//        return(NULL);
+//    } 
+// useless if addr is only four bits    
+//    if(loc.addr > 15)
+//    {
+//        return(NULL);
+//    }
+    
+    return((const eOcanmap_board_extended_t*)s_eo_canmap_singleton.canmapping[bloc.port][bloc.addr]);
+}
+
+
+extern uint8_t eocanmap_posOfEPEN(uint8_t ep, uint8_t en)
+{
+    static const uint8_t pos[4][5] = 
+    {
+        {0xf, 0xf, 0xf, 0xf, 0xf},  // ep->management [none, ...]
+        {0,     1, 0xf, 0xf, 0xf},  // ep->mc [joi, mot, none, ...]
+        {2,     3,   4,   5,   6},  // ep->as [str, mai, tem, ine, ine3]
+        {7,   0xf, 0xf, 0xf, 0xf}   // ep->sk [sk, none]
+    };
+    // the order is joint-motor-strain-mais-temperature-inertial-inertial3-skin
+    if((ep >= 4) || (en >= 5))
+    {
+        return 0x0f;
+    }
+    return pos[ep][en];    
+}
+
+
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
 // --------------------------------------------------------------------------------------------------------------------

@@ -49,18 +49,18 @@ MController* smc = NULL;
 //static void MController_config_encoder_set(MController* o);
 
 
-static void send_debug_message(char *message, uint8_t jid, uint16_t par16, uint64_t par64)
-{
+//static void send_debug_message(char *message, uint8_t jid, uint16_t par16, uint64_t par64)
+//{
 
-    eOerrmanDescriptor_t errdes = {0};
+//    eOerrmanDescriptor_t errdes = {0};
 
-    errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
-    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-    errdes.sourceaddress    = jid;
-    errdes.par16            = par16;
-    errdes.par64            = par64;
-    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, message, NULL, &errdes);
-}
+//    errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
+//    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+//    errdes.sourceaddress    = jid;
+//    errdes.par16            = par16;
+//    errdes.par64            = par64;
+//    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, message, NULL, &errdes);
+//}
 
 
 static char s_trace_string[128] = {0};
@@ -407,6 +407,17 @@ static void update_jointAndMotor_withJointset_constraints(void)
             for(int i=0; i<o->set_dim[s]; i++)
             {
                 int j = o->jos[s][i];
+                //o->joint[j].dead_zone = 400.0f;
+                o->joint[j].not_reversible = TRUE;
+            }
+        }
+        
+        if(o->jointSet[s].special_constraint == eomc_jsetconstraint_trifid)
+        {
+            for(int i=0; i<o->set_dim[s]; i++)
+            {
+                int j = o->jos[s][i];
+                //o->joint[j].dead_zone = 1.0f;
                 o->joint[j].not_reversible = TRUE;
             }
         }

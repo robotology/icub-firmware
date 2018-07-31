@@ -37,8 +37,8 @@ static const embot::common::relTime BlinkSlowPeriod = 5*EOK_reltime100ms;
 
 
 // use build 222 for all the updaterofbootloader
-static const embot::app::canprotocol::versionOfAPPLICATION vAP = {1, 2 , 222};
-static const embot::app::canprotocol::versionOfCANPROTOCOL vCP = {6, 7};
+static const embot::app::canprotocol::versionOfAPPLICATION vAP = {100, 2 , 0};
+static const embot::app::canprotocol::versionOfCANPROTOCOL vCP = {2, 0};
 
 int main(void)
 { 

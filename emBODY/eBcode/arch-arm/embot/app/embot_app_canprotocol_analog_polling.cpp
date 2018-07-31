@@ -95,9 +95,12 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
             (1ULL << static_cast<std::uint8_t>(CMD::IMU_CONFIG_SET))                |
             (1ULL << static_cast<std::uint8_t>(CMD::IMU_TRANSMIT))                  |
                 
-            (1ULL << static_cast<std::uint8_t>(CMD::THERMOMETER_CONFIG_GET))         |
-            (1ULL << static_cast<std::uint8_t>(CMD::THERMOMETER_CONFIG_SET))         |
-            (1ULL << static_cast<std::uint8_t>(CMD::THERMOMETER_TRANSMIT))           ,
+            (1ULL << static_cast<std::uint8_t>(CMD::THERMOMETER_CONFIG_GET))        |
+            (1ULL << static_cast<std::uint8_t>(CMD::THERMOMETER_CONFIG_SET))        |
+            (1ULL << static_cast<std::uint8_t>(CMD::THERMOMETER_TRANSMIT))          | 
+                
+            (1ULL << static_cast<std::uint8_t>(CMD::REGULATIONSET_SET))             |  
+            (1ULL << static_cast<std::uint8_t>(CMD::REGULATIONSET_GET))             ,                  
 
             // bits 64-127
             (1ULL << (static_cast<std::uint8_t>(CMD::SKIN_OBSOLETE_TACT_SETUP)-64)) | 
@@ -325,7 +328,9 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
             return false; 
         }
         
-        info.channel = candata.datainframe[0];
+        info.regulationset = (candata.datainframe[0] & 0xF0) >> 4;
+        info.channel = (candata.datainframe[0] & 0x0F);
+
         // big endian ...
         info.fullscale = (static_cast<std::uint16_t>(candata.datainframe[1]) << 8) | static_cast<std::uint16_t>(candata.datainframe[2]);
       
@@ -347,7 +352,9 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
             return false; 
         }
         
-        info.channel = candata.datainframe[0];
+        info.regulationset = (candata.datainframe[0] & 0xF0) >> 4;
+        info.channel = (candata.datainframe[0] & 0x0F);
+        
         // big endian ...
         info.offset = (static_cast<std::uint16_t>(candata.datainframe[1]) << 8) | static_cast<std::uint16_t>(candata.datainframe[2]);
       
@@ -368,7 +375,8 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
             return false; 
         }
         
-        info.row = candata.datainframe[0];
+        info.regulationset = (candata.datainframe[0] & 0xF0) >> 4;
+        info.row = (candata.datainframe[0] & 0x0F);
         info.col = candata.datainframe[1];
         // big endian ...
         info.value = (static_cast<std::uint16_t>(candata.datainframe[2]) << 8) | static_cast<std::uint16_t>(candata.datainframe[3]);
@@ -423,9 +431,16 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
         if(Mode::setchannelwithvalue == info.mode)
         {
-            info.channel = candata.datainframe[1];
+            info.regulationset = (candata.datainframe[1] & 0xF0) >> 4;
+            info.channel = (candata.datainframe[1] & 0x0F);
             // big endian ...
             info.value = (static_cast<std::uint16_t>(candata.datainframe[2]) << 8) | static_cast<std::uint16_t>(candata.datainframe[3]);
+        }
+        else
+        {   // use the default ones. 
+            info.regulationset = static_cast<std::uint8_t>(StrainRegulationSet::theoneinuse);
+            info.channel = 0;
+            info.value = 0;
         }
         
         return true;         
@@ -446,7 +461,8 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
             return false; 
         }
         
-        info.channel = candata.datainframe[0];
+        info.regulationset = (candata.datainframe[0] & 0xF0) >> 4;
+        info.channel = (candata.datainframe[0] & 0x0F);
 
         return true;
     }  
@@ -454,7 +470,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
     bool Message_GET_CALIB_TARE::reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo)
     {
         std::uint8_t dd[7] = {0};
-        dd[0] = replyinfo.channel;
+        dd[0] = (static_cast<std::uint8_t>(replyinfo.regulationset) << 4) | (replyinfo.channel & 0x0F); 
         dd[1] = (replyinfo.value >> 8) & 0xff;      // important note: the strain uses big endianess ... 
         dd[2] = replyinfo.value & 0xff;             
                     
@@ -561,6 +577,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
             return false; 
         }
         
+        info.regulationset = static_cast<std::uint8_t>(StrainRegulationSet::theoneinuse);
         info.gain = candata.datainframe[0];
       
         return true;         
@@ -627,8 +644,9 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         {
             return false; 
         }
-        
-        info.channel = candata.datainframe[0];
+
+        info.regulationset = (candata.datainframe[0] & 0xF0) >> 4;
+        info.channel = (candata.datainframe[0] & 0x0F);
 
         return true;
     }  
@@ -636,9 +654,9 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
     bool Message_GET_FULL_SCALES::reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo)
     {
         std::uint8_t dd[7] = {0};
-        dd[0] = replyinfo.channel;
+        dd[0] = (static_cast<std::uint8_t>(replyinfo.regulationset) << 4) | (replyinfo.channel & 0x0F); 
         dd[1] = (replyinfo.fullscale >> 8) & 0xff;      // important note: the strain uses big endianess ... 
-        dd[2] = replyinfo.fullscale & 0xff;             // both embobjStrain and teh ems use a wrong conversion ... they both exchange the bytes .... so at teh end the fullscale is correct 
+        dd[2] = replyinfo.fullscale & 0xff;             // both embobjStrain and the ems use a wrong conversion ... they both exchange the bytes .... so at teh end the fullscale is correct 
                     
         std::uint8_t datalen = 3;
         
@@ -658,7 +676,8 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
             return false; 
         }
         
-        info.channel = candata.datainframe[0];
+        info.regulationset = (candata.datainframe[0] & 0xF0) >> 4;
+        info.channel = (candata.datainframe[0] & 0x0F);
 
         return true;
     }  
@@ -666,7 +685,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
     bool Message_GET_CH_DAC::reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo)
     {
         std::uint8_t dd[7] = {0};
-        dd[0] = replyinfo.channel;
+        dd[0] = (static_cast<std::uint8_t>(replyinfo.regulationset) << 4) | (replyinfo.channel & 0x0F); 
         dd[1] = (replyinfo.offset >> 8) & 0xff;      // important note: the strain uses big endianess ... 
         dd[2] = replyinfo.offset & 0xff;                   
         
@@ -688,7 +707,8 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
             return false; 
         }
         
-        info.row = candata.datainframe[0];
+        info.regulationset = (candata.datainframe[0] & 0xF0) >> 4;
+        info.row = (candata.datainframe[0] & 0x0F);
         info.col = candata.datainframe[1];
 
         return true;
@@ -697,7 +717,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
     bool Message_GET_MATRIX_RC::reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo)
     {
         std::uint8_t dd[7] = {0};
-        dd[0] = replyinfo.row;
+        dd[0] = (static_cast<std::uint8_t>(replyinfo.regulationset) << 4) | (replyinfo.row & 0x0F); 
         dd[1] = replyinfo.col;
         dd[2] = (replyinfo.value >> 8) & 0xff;      // important note: the strain uses big endianess ... 
         dd[3] = replyinfo.value & 0xff;                   
@@ -718,6 +738,8 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         {
             return false; 
         }
+        
+        info.regulationset = static_cast<std::uint8_t>(StrainRegulationSet::theoneinuse);
 
         return true;
     }  
@@ -745,7 +767,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
             return false; 
         }
         
-        info.channel =  candata.datainframe[0];
+        info.channel = candata.datainframe[0];
         info.getcalibrated = (0 == candata.datainframe[1]) ? false : true;
 
         return true;
@@ -851,7 +873,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
             return false; 
         }
         
-        info.set = (candata.datainframe[0] & 0xF0) >> 4;
+        info.regulationset = (candata.datainframe[0] & 0xF0) >> 4;
         info.channel = (candata.datainframe[0] & 0x0F);
         
         return true;         
@@ -872,7 +894,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
             return false; 
         }
         
-        info.set = (candata.datainframe[0] & 0xF0) >> 4;
+        info.regulationset = (candata.datainframe[0] & 0xF0) >> 4;
         info.channel = (candata.datainframe[0] & 0x0F);
         
         // little endian
@@ -903,7 +925,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
             return false; 
         }
         
-        info.set = (candata.datainframe[0] & 0xF0) >> 4;
+        info.regulationset = (candata.datainframe[0] & 0xF0) >> 4;
         info.channel = (candata.datainframe[0] & 0x0F);
 
         return true;
@@ -913,7 +935,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
     {
         std::uint8_t dd[7] = {0};
 
-        dd[0] = (static_cast<std::uint8_t>(replyinfo.set) << 4) | (replyinfo.channel & 0x0F);                  
+        dd[0] = (static_cast<std::uint8_t>(replyinfo.regulationset) << 4) | (replyinfo.channel & 0x0F);                  
         dd[1] = (replyinfo.cfg1.GD & 0xff);                  // important note: in here we use little endian order ...
         dd[2] = (replyinfo.cfg1.GD >> 8) & 0xff;  
         dd[3] = (static_cast<std::uint8_t>(replyinfo.cfg1.GI) << 4) | (static_cast<std::uint8_t>(replyinfo.cfg1.S) << 3) | (static_cast<std::uint8_t>(replyinfo.cfg1.GO) & 0x7);
@@ -939,7 +961,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
             return false; 
         }
         
-        info.set = (candata.datainframe[0] & 0xF0) >> 4;
+        info.regulationset = (candata.datainframe[0] & 0xF0) >> 4;
         info.channel = (candata.datainframe[0] & 0x0F);
         info.mode = Mode::oneshot; // it would be candata.datainframe[1]
         info.target = static_cast<std::uint16_t>(candata.datainframe[2]) | (static_cast<std::uint16_t>(candata.datainframe[3]) << 8);
@@ -953,7 +975,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
     {
         std::uint8_t dd[7] = {0};
 
-        dd[0] = (static_cast<std::uint8_t>(replyinfo.set) << 4) | (replyinfo.channel & 0x0F);  
+        dd[0] = (static_cast<std::uint8_t>(replyinfo.regulationset) << 4) | (replyinfo.channel & 0x0F);  
         dd[1] = replyinfo.noisychannelmask;
         dd[2] = replyinfo.algorithmOKmask;        
         dd[3] = replyinfo.finalmeasureOKmask;
@@ -980,7 +1002,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
             return false; 
         }
         
-        info.set = (candata.datainframe[0] & 0xF0) >> 4;
+        info.regulationset = (candata.datainframe[0] & 0xF0) >> 4;
         info.channel = (candata.datainframe[0] & 0x0F);        
         info.mode = candata.datainframe[1];
         // little endian
@@ -1007,7 +1029,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
             return false; 
         }
         
-        info.set = (candata.datainframe[0] & 0xF0) >> 4;
+        info.regulationset = (candata.datainframe[0] & 0xF0) >> 4;
         info.channel = (candata.datainframe[0] & 0x0F);
 
         return true;
@@ -1017,7 +1039,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
     {
         std::uint8_t dd[7] = {0};
 
-        dd[0] = (static_cast<std::uint8_t>(replyinfo.set) << 4) | (replyinfo.channel & 0x0F);                  
+        dd[0] = (static_cast<std::uint8_t>(replyinfo.regulationset) << 4) | (replyinfo.channel & 0x0F);                  
         dd[1] = static_cast<std::uint8_t>(replyinfo.gain & 0xff);               // important note: in here we use little endian order ...
         dd[2] = static_cast<std::uint8_t>((replyinfo.gain >> 8) & 0xff);        // important note: in here we use little endian order ... 
         dd[3] = static_cast<std::uint8_t>(replyinfo.offset & 0xff);             // important note: in here we use little endian order ...
@@ -1029,7 +1051,58 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         frame_set_clascmddestinationdata(outframe, Clas::pollingAnalogSensor, static_cast<std::uint8_t>(CMD::AMPLIFIER_GAINOFFSET_GET), candata.from, dd, datalen);
         frame_set_size(outframe, datalen+1);
         return true;
+    }  
+    
+    
+    
+    bool Message_REGULATIONSET_GET::load(const embot::hw::can::Frame &inframe)
+    {
+        Message::set(inframe); 
+        
+        if(static_cast<std::uint8_t>(CMD::REGULATIONSET_GET) != frame2cmd(inframe))
+        {
+            return false; 
+        }
+        
+        info.mode = (candata.datainframe[0] & 0x0F);
+
+        return true;
+    }  
+
+    bool Message_REGULATIONSET_GET::reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo)
+    {
+        std::uint8_t dd[7] = {0};
+
+        dd[0] = (static_cast<std::uint8_t>(replyinfo.regulationset) << 4) | (replyinfo.mode & 0x0F);                  
+        
+        std::uint8_t datalen = 1;
+        
+        frame_set_sender(outframe, sender);
+        frame_set_clascmddestinationdata(outframe, Clas::pollingAnalogSensor, static_cast<std::uint8_t>(CMD::REGULATIONSET_GET), candata.from, dd, datalen);
+        frame_set_size(outframe, datalen+1);
+        return true;
     }     
+    
+    bool Message_REGULATIONSET_SET::load(const embot::hw::can::Frame &inframe)
+    {
+        Message::set(inframe);  
+        
+        if(static_cast<std::uint8_t>(CMD::REGULATIONSET_SET) != frame2cmd(inframe))
+        {
+            return false; 
+        }
+        
+        info.regulationset = (candata.datainframe[0] & 0xF0) >> 4;
+        info.mode = (candata.datainframe[0] & 0x0F);        
+        
+        return true;         
+    }                    
+        
+    bool Message_REGULATIONSET_SET::reply()
+    {
+        return false;
+    } 
+
 
 
     bool Message_AMPLIFIER_RANGE_OF_GAIN_GET::load(const embot::hw::can::Frame &inframe)
@@ -1041,7 +1114,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
             return false; 
         }
         
-        info.set = (candata.datainframe[0] & 0xF0) >> 4;
+        info.regulationset = (candata.datainframe[0] & 0xF0) >> 4;
         info.channel = (candata.datainframe[0] & 0x0F);
 
         return true;
@@ -1051,7 +1124,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
     {
         std::uint8_t dd[7] = {0};
 
-        dd[0] = (static_cast<std::uint8_t>(replyinfo.set) << 4) | (replyinfo.channel & 0x0F);                  
+        dd[0] = (static_cast<std::uint8_t>(replyinfo.regulationset) << 4) | (replyinfo.channel & 0x0F);                  
         dd[1] = static_cast<std::uint8_t>(replyinfo.lowest & 0xff);                 // important note: in here we use little endian order ...
         dd[2] = static_cast<std::uint8_t>((replyinfo.lowest >> 8) & 0xff);          // important note: in here we use little endian order ... 
         dd[3] = static_cast<std::uint8_t>(replyinfo.highest & 0xff);                // important note: in here we use little endian order ...
@@ -1075,7 +1148,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
             return false; 
         }
         
-        info.set = (candata.datainframe[0] & 0xF0) >> 4;
+        info.regulationset = (candata.datainframe[0] & 0xF0) >> 4;
         info.channel = (candata.datainframe[0] & 0x0F);
 
         return true;
@@ -1085,7 +1158,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
     {
         std::uint8_t dd[7] = {0};
 
-        dd[0] = (static_cast<std::uint8_t>(replyinfo.set) << 4) | (replyinfo.channel & 0x0F);                  
+        dd[0] = (static_cast<std::uint8_t>(replyinfo.regulationset) << 4) | (replyinfo.channel & 0x0F);                  
         dd[1] = static_cast<std::uint8_t>(replyinfo.lowest & 0xff);                 // important note: in here we use little endian order ...
         dd[2] = static_cast<std::uint8_t>((replyinfo.lowest >> 8) & 0xff);          // important note: in here we use little endian order ... 
         dd[3] = static_cast<std::uint8_t>(replyinfo.highest & 0xff);                // important note: in here we use little endian order ...

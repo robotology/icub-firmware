@@ -58,14 +58,14 @@ void tests_tick();
 #else
 #include "embot_hw_si7051.h"
 
-const embot::hw::SI7051::Sensor SI7051sensor = embot::hw::bsp::strain2::termometerSGAUGES;
-const embot::hw::SI7051::Config SI7051config = embot::hw::bsp::strain2::termometerSGAUGESconfig;
+const embot::hw::SI7051::Sensor SI7051sensor = embot::hw::bsp::strain2::thermometerSGAUGES;
+const embot::hw::SI7051::Config SI7051config = embot::hw::bsp::strain2::thermometerSGAUGESconfig;
 
 #endif
 #endif // TEST_ENABLED
 
 
-static const embot::app::canprotocol::versionOfAPPLICATION vAP = {1, 3 , 5};
+static const embot::app::canprotocol::versionOfAPPLICATION vAP = {1, 4 , 0};
 static const embot::app::canprotocol::versionOfCANPROTOCOL vCP = {2, 0};
 
 static void userdeflauncher(void* param);
@@ -437,10 +437,15 @@ void test_tim_init(void)
 static std::int16_t mat1[3*3] = {0};
 static std::int16_t vec1[3*2] = {0};
 static std::int16_t vec2[3*2] = {0};
+static std::int16_t vin[3] = {0};
+static std::int16_t vout[3] = {0};
 
 embot::dsp::q15::matrix ma1;
 embot::dsp::q15::matrix ma2;
 embot::dsp::q15::matrix ma3;
+
+embot::dsp::q15::matrix ve1;
+embot::dsp::q15::matrix ve2;
 #endif // #if defined(TEST_DSP)
 
 void ciao(void *p)
@@ -721,10 +726,40 @@ void tests_tick()
 #endif // #if defined(TEST_HW_ONEWIRE)  
 
 #if defined(TEST_DSP)
+    
+    static int sizE = 3;
+    
+    sizE ++;
+    
+    std::vector<int> ciaO(sizE);
+    
+    ciaO[0] = 1;
+    
+    bool satu = true;
+    embot::dsp::Q15 ciao = embot::dsp::q15::convert(-0.5f, satu);
+    satu = satu;
         
     ma1.load(3, 3, mat1);
-    ma1.diagonal(embot::dsp::q15::negOneHalf);
+    ma1.diagonal(embot::dsp::q15::negOne);
     //ma1.fill(embot::dsp::q15::posOneHalf);
+    ma1.set(0, 0, embot::dsp::q15::posOneHalf+embot::dsp::q15::posOneFourth); 
+    ma1.set(0, 1, embot::dsp::q15::posOneHalf+embot::dsp::q15::posOneFourth); 
+    ma1.set(0, 2, embot::dsp::q15::negOneHalf);
+    
+    ve1.load(3, 1, vin);
+    ve1.set(0, 0, embot::dsp::q15::posOneNearly);
+    ve1.set(1, 0, embot::dsp::q15::posOneNearly);
+    ve1.set(2, 0, embot::dsp::q15::posOneNearly);
+    
+    ve2.load(3, 1, vout);
+    ve2.clear();
+    
+    // now we multiply matrix 3x3 w/ vector 3x1
+    
+    bool sat =  false;
+    embot::dsp::q15::multiply(ma1, ve1, ve2, sat);
+    sat = sat;
+    
 
     ma2.load(3, 2, vec1);
     ma2.fill(embot::dsp::q15::posOneHalf);

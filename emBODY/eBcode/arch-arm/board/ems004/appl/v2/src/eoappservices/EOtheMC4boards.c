@@ -77,7 +77,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 static eObool_t s_eo_mc4boards_foundone(void);
-static void send_diagnostic_debugmessage(eOerrmanErrorType_t type, eOerror_value_DEB_t value, uint8_t jointnum, uint16_t par16, uint64_t par64, const char* info);
+//static void send_diagnostic_debugmessage(eOerrmanErrorType_t type, eOerror_value_DEB_t value, uint8_t jointnum, uint16_t par16, uint64_t par64, const char* info);
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -696,13 +696,13 @@ extern icubCanProto_torque_t eo_mc4boards_Convert_torque_I2S(EOtheMC4boards *p, 
 { 
     float trq_factor = s_eo_themc4boards.convtorque[joint].factor;
     float result = torque*trq_factor;
-    int8_t saturation = 0;
-    if(result>EO_INT16_MAX)
-        saturation = 1;
-    else if(result < -EO_INT16_MAX)
-        saturation = -1;
-    else
-        saturation = 0;
+//    int8_t saturation = 0;
+//    if(result>EO_INT16_MAX)
+//        saturation = 1;
+//    else if(result < -EO_INT16_MAX)
+//        saturation = -1;
+//    else
+//        saturation = 0;
     
     icubCanProto_torque_t ret = EO_CLIP_INT16(result);
 //    if(joint == 0)
@@ -724,17 +724,17 @@ extern eOmeas_torque_t eo_mc4boards_Convert_torque_S2I(EOtheMC4boards *p, uint8_
 }
 
 
-static void send_diagnostic_debugmessage(eOerrmanErrorType_t type, eOerror_value_DEB_t value, uint8_t jointnum, uint16_t par16, uint64_t par64, const char* info)
-{
-    eOerrmanDescriptor_t errdes = {0};
+//static void send_diagnostic_debugmessage(eOerrmanErrorType_t type, eOerror_value_DEB_t value, uint8_t jointnum, uint16_t par16, uint64_t par64, const char* info)
+//{
+//    eOerrmanDescriptor_t errdes = {0};
 
-    errdes.code             = eoerror_code_get(eoerror_category_Debug, value);
-    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-    errdes.sourceaddress    = jointnum;
-    errdes.par16            = par16;
-    errdes.par64            = par64;
-    eo_errman_Error(eo_errman_GetHandle(), type, info, NULL, &errdes);
-}
+//    errdes.code             = eoerror_code_get(eoerror_category_Debug, value);
+//    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+//    errdes.sourceaddress    = jointnum;
+//    errdes.par16            = par16;
+//    errdes.par64            = par64;
+//    eo_errman_Error(eo_errman_GetHandle(), type, info, NULL, &errdes);
+//}
 
 
 // --------------------------------------------------------------------------------------------------------------------

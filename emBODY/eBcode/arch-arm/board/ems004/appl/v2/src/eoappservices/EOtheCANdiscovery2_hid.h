@@ -48,7 +48,7 @@ typedef struct
     eObool_t                    forcestop;
     eObool_t                    searching;
     eObool_t                    tickingenabled;   
-    eObool_t                    fakesearch;
+    uint8_t                     fakesearchmask;
 } eOcandiscovery_searchstatus_t;
 
 
@@ -59,7 +59,8 @@ struct EOtheCANdiscovery2_hid
     EOtimer                         *discoverytimer;    
     uint8_t                         discoverymaxretries;
     eOcandiscovery_searchstatus_t   searchstatus;
-    eOcandiscovery_target_t         target;
+    EOarray                         *arrayoftargets;
+    uint16_t                        canmapofoverlappedtargets[eOcanports_number];
     eOcandiscovery_onstop_t         onstop;
     eOcandiscovery_detection_t      detection;
 }; 

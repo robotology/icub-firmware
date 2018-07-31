@@ -405,7 +405,13 @@ extern eOresult_t eo_canserv_SendCommandToEntity(EOtheCANservice *p, eOcanprot_c
    
     if(eores_OK != eo_canmap_GetEntityLocation(eo_canmap_GetHandle(), id32, &descriptor.loc, NULL, NULL))
     {   // error ...
-//        #warning --> put diagnostics
+        eOerrmanDescriptor_t errdes = {0};
+        errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_genericerror);
+        errdes.par16                = 0x0666;
+        errdes.par64                = id32;        
+        errdes.sourcedevice         = eo_errman_sourcedevice_localboard;
+        errdes.sourceaddress        = 0;                                   
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);    
         return(eores_NOK_generic);
     }
     
@@ -456,7 +462,13 @@ extern eOresult_t eo_canserv_SendCommandToAllBoardsInEntity(EOtheCANservice *p, 
     uint8_t numoflocs = 0;
     if(eores_OK != eo_canmap_GetEntityLocation(eo_canmap_GetHandle(), id32, &descriptor.loc, &numoflocs, NULL))
     {   // error ...
-//        #warning --> put diagnostics
+        eOerrmanDescriptor_t errdes = {0};
+        errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_genericerror);
+        errdes.par16                = 0x0999;
+        errdes.par64                = id32;        
+        errdes.sourcedevice         = eo_errman_sourcedevice_localboard;
+        errdes.sourceaddress        = 0;                                   
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);    
         return(eores_NOK_generic);
     }
     
@@ -734,6 +746,14 @@ static eOresult_t s_eo_canserv_SendCommand(EOtheCANservice *p, eOcanprot_descrip
         return(eores_NOK_generic);
     }
     
+//    eOerrmanDescriptor_t des = {0};
+//    des.code            = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_txfifoputisok);
+//    des.par16           = (frame.id & 0x0fff) | ((frame.size & 0x000f) << 12);
+//
+//    des.sourceaddress   = descriptor->loc.addr;
+//    des.sourcedevice    = (eOcanport1 == descriptor->loc.port) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);;
+//    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, NULL, &des);
+//
     // ok now i can sent the frame over can. what i do depends on the mode.
     return(s_eo_canserv_send_frame_simplemode(p, (eOcanport_t)descriptor->loc.port, &frame));   
 }

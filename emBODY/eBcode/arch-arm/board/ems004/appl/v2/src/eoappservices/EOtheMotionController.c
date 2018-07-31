@@ -150,7 +150,7 @@ static EOtheMotionController s_eo_themotcon =
     {
         EO_INIT(.boardproperties)       NULL,
         EO_INIT(.entitydescriptor)      NULL,
-        EO_INIT(.discoverytarget)       {0},
+        EO_INIT(.discoverytargets)      NULL,
         EO_INIT(.ondiscoverystop)       {0},
         EO_INIT(.command)               {0}, 
     }, 
@@ -204,6 +204,8 @@ extern EOtheMotionController* eo_motioncontrol_Initialise(void)
     
     // up to 12 jomos
     p->sharedcan.entitydescriptor = eo_vector_New(sizeof(eOcanmap_entitydescriptor_t), eo_motcon_maxJOMOs, NULL, NULL, NULL, NULL);
+    
+    p->sharedcan.discoverytargets = eo_array_New(1, sizeof(eOcandiscovery_target_t),  NULL);
     
     p->id32ofregulars = eo_array_New(motioncontrol_maxRegulars, sizeof(uint32_t), NULL);
     
@@ -361,13 +363,13 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
         p->service.activateafterverify = activateafterverify;
 
         // 1. prepare the can discovery for foc boards 
-        memset(&p->sharedcan.discoverytarget, 0, sizeof(p->sharedcan.discoverytarget));
-        p->sharedcan.discoverytarget.info.type = eobrd_cantype_foc;
-        p->sharedcan.discoverytarget.info.protocol.major = p->service.servconfig.data.mc.foc_based.version.protocol.major; 
-        p->sharedcan.discoverytarget.info.protocol.minor = p->service.servconfig.data.mc.foc_based.version.protocol.minor;
-        p->sharedcan.discoverytarget.info.firmware.major = p->service.servconfig.data.mc.foc_based.version.firmware.major; 
-        p->sharedcan.discoverytarget.info.firmware.minor = p->service.servconfig.data.mc.foc_based.version.firmware.minor;   
-        p->sharedcan.discoverytarget.info.firmware.build = p->service.servconfig.data.mc.foc_based.version.firmware.build;   
+        eOcandiscovery_target_t trgt = {0};
+        trgt.info.type = eobrd_cantype_foc;
+        trgt.info.protocol.major = p->service.servconfig.data.mc.foc_based.version.protocol.major; 
+        trgt.info.protocol.minor = p->service.servconfig.data.mc.foc_based.version.protocol.minor;
+        trgt.info.firmware.major = p->service.servconfig.data.mc.foc_based.version.firmware.major; 
+        trgt.info.firmware.minor = p->service.servconfig.data.mc.foc_based.version.firmware.minor;   
+        trgt.info.firmware.build = p->service.servconfig.data.mc.foc_based.version.firmware.build;   
                 
         
         uint8_t numofjomos = eo_constarray_Size(p->ctrlobjs.jomodescriptors);
@@ -375,9 +377,12 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
         for(i=0; i<numofjomos; i++)
         {
             const eOmc_jomo_descriptor_t *jomodes = (eOmc_jomo_descriptor_t*) eo_constarray_At(p->ctrlobjs.jomodescriptors, i);
-            eo_common_hlfword_bitset(&p->sharedcan.discoverytarget.canmap[jomodes->actuator.foc.canloc.port], jomodes->actuator.foc.canloc.addr);         
+            eo_common_hlfword_bitset(&trgt.canmap[jomodes->actuator.foc.canloc.port], jomodes->actuator.foc.canloc.addr);         
         }
-                
+        
+        // force a cleaned discoverytargets before we add the target
+        eo_array_Reset(p->sharedcan.discoverytargets);                
+        eo_array_PushBack(p->sharedcan.discoverytargets, &trgt);
         p->sharedcan.ondiscoverystop.function = s_eo_motioncontrol_onstop_search4focs;
         p->sharedcan.ondiscoverystop.parameter = (void*)&p->service.servconfig;
         
@@ -397,21 +402,24 @@ extern eOresult_t eo_motioncontrol_Verify(EOtheMotionController *p, const eOmn_s
         memmove(&p->ctrlobjs.servconfigmais.data.as.mais, &p->service.servconfig.data.mc.mc4_based.mais, sizeof(eOmn_serv_config_data_as_mais_t)); 
 
         // 2. prepare the can discovery of mc4 boards
-        memset(&p->sharedcan.discoverytarget, 0, sizeof(p->sharedcan.discoverytarget));
-        p->sharedcan.discoverytarget.info.type = eobrd_cantype_mc4;
-        p->sharedcan.discoverytarget.info.protocol.major = p->service.servconfig.data.mc.mc4_based.mc4version.protocol.major; 
-        p->sharedcan.discoverytarget.info.protocol.minor = p->service.servconfig.data.mc.mc4_based.mc4version.protocol.minor;
-        p->sharedcan.discoverytarget.info.firmware.major = p->service.servconfig.data.mc.mc4_based.mc4version.firmware.major; 
-        p->sharedcan.discoverytarget.info.firmware.minor = p->service.servconfig.data.mc.mc4_based.mc4version.firmware.minor; 
-        p->sharedcan.discoverytarget.info.firmware.build = p->service.servconfig.data.mc.mc4_based.mc4version.firmware.build;        
+        eOcandiscovery_target_t trgt = {0};
+        trgt.info.type = eobrd_cantype_mc4;
+        trgt.info.protocol.major = p->service.servconfig.data.mc.mc4_based.mc4version.protocol.major; 
+        trgt.info.protocol.minor = p->service.servconfig.data.mc.mc4_based.mc4version.protocol.minor;
+        trgt.info.firmware.major = p->service.servconfig.data.mc.mc4_based.mc4version.firmware.major; 
+        trgt.info.firmware.minor = p->service.servconfig.data.mc.mc4_based.mc4version.firmware.minor; 
+        trgt.info.firmware.build = p->service.servconfig.data.mc.mc4_based.mc4version.firmware.build;        
         
         uint8_t i = 0;
         for(i=0; i<eo_motcon_maxJOMOs; i++)
         {            
             const eObrd_canlocation_t *canloc = &p->service.servconfig.data.mc.mc4_based.mc4joints[i];
-            eo_common_hlfword_bitset(&p->sharedcan.discoverytarget.canmap[canloc->port], canloc->addr);         
+            eo_common_hlfword_bitset(&trgt.canmap[canloc->port], canloc->addr);         
         }
-                       
+        
+        // force a cleaned discoverytargets before we add the target
+        eo_array_Reset(p->sharedcan.discoverytargets);                
+        eo_array_PushBack(p->sharedcan.discoverytargets, &trgt);                       
         p->sharedcan.ondiscoverystop.function = s_eo_motioncontrol_onstop_search4mc4s;
         p->sharedcan.ondiscoverystop.parameter = (void*)&p->service.servconfig;
              
@@ -509,7 +517,8 @@ extern eOresult_t eo_motioncontrol_Deactivate(EOtheMotionController *p)
         
         // now i reset 
         eo_vector_Clear(p->sharedcan.entitydescriptor);
-        eo_vector_Clear(p->sharedcan.boardproperties);     
+        eo_vector_Clear(p->sharedcan.boardproperties);   
+        eo_array_Reset(p->sharedcan.discoverytargets);        
 
         // proxy deconfig
         s_eo_motioncontrol_proxy_config(p, eobool_false);        
@@ -528,6 +537,7 @@ extern eOresult_t eo_motioncontrol_Deactivate(EOtheMotionController *p)
         // now i reset 
         eo_vector_Clear(p->sharedcan.entitydescriptor);
         eo_vector_Clear(p->sharedcan.boardproperties);
+        eo_array_Reset(p->sharedcan.discoverytargets);
         
         eo_mais_Deactivate(eo_mais_GetHandle());        
         memset(&p->ctrlobjs.servconfigmais, 0, sizeof(p->ctrlobjs.servconfigmais));   
@@ -562,9 +572,7 @@ extern eOresult_t eo_motioncontrol_Deactivate(EOtheMotionController *p)
     
     memset(&p->service.servconfig, 0, sizeof(eOmn_serv_configuration_t));
     p->service.servconfig.type = eo_motcon_mode_NONE;
-    memset(&p->sharedcan.discoverytarget, 0, sizeof(eOcandiscovery_target_t));
-    
-    
+        
     p->service.onverify = NULL;
     p->service.activateafterverify = eobool_false;
     p->sharedcan.ondiscoverystop.function = NULL;
@@ -1328,7 +1336,7 @@ static eOresult_t s_eo_motioncontrol_foc_onendofverify_encoder(EOaService* s, eO
     
     if(eobool_true == operationisok)
     {
-        eo_candiscovery2_Start(eo_candiscovery2_GetHandle(), &p->sharedcan.discoverytarget, &p->sharedcan.ondiscoverystop);        
+        eo_candiscovery2_Start2(eo_candiscovery2_GetHandle(), p->sharedcan.discoverytargets, &p->sharedcan.ondiscoverystop);        
     }    
     else
     {
@@ -1387,7 +1395,7 @@ static eOresult_t s_eo_motioncontrol_onendofverify_mais(EOaService* s, eObool_t 
         // then: start verification of mc4s or encoders
         if(eo_motcon_mode_mc4 == servcfg->type)
         {
-            eo_candiscovery2_Start(eo_candiscovery2_GetHandle(), &p->sharedcan.discoverytarget, &p->sharedcan.ondiscoverystop); 
+            eo_candiscovery2_Start2(eo_candiscovery2_GetHandle(), p->sharedcan.discoverytargets, &p->sharedcan.ondiscoverystop); 
         }
         else // mc4plusmais: verify encoders
         {

@@ -25,6 +25,7 @@
 
 #include "embot_app_canprotocol.h"
 
+#include "iCubCanProto_inertialSensorMessages.h"
 
 namespace embot { namespace app { namespace canprotocol { namespace inertial { namespace periodic {
     
@@ -34,7 +35,9 @@ namespace embot { namespace app { namespace canprotocol { namespace inertial { n
         
         DIGITAL_GYROSCOPE = 0, DIGITAL_ACCELEROMETER = 1,
         // NEW messages:
-        IMU_TRIPLE = 3, IMU_QUATERNION = 4, IMU_STATUS = 5
+        //IMU_TRIPLE = 3, IMU_QUATERNION = 4, IMU_STATUS = 5
+        IMU_TRIPLE = ICUBCANPROTO_PER_IS_MSG__IMU_TRIPLE, IMU_QUATERNION = ICUBCANPROTO_PER_IS_MSG__IMU_QUATERNION, IMU_STATUS = ICUBCANPROTO_PER_IS_MSG__IMU_STATUS
+    
     };
     
     // NOTES

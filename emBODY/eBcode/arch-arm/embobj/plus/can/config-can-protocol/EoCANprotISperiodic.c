@@ -35,6 +35,8 @@
 
 #include "EOtheInertials2.h"
 
+#include "EOtheInertials3.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -73,6 +75,7 @@
 //static void* s_eocanprotISperiodic_get_entity(eOprotEndpoint_t endpoint, eOprot_entity_t entity, eOcanframe_t *frame, eOcanport_t port, uint8_t *index);
 
 
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
@@ -85,6 +88,11 @@
 
 
 EO_weak extern eObool_t eocanprotINperiodic_redefinable_SkipParsingOf_ANY_PERIODIC_INERTIAL_MSG(eOcanframe_t *frame, eOcanport_t port)
+{
+    return(eobool_false);
+}
+
+EO_weak extern eObool_t eocanprotINperiodic_redefinable_SkipParsingOf_ANY_PERIODIC_INERTIAL3_MSG(eOcanframe_t *frame, eOcanport_t port)
 {
     return(eobool_false);
 }
@@ -148,6 +156,46 @@ extern eOresult_t eocanprotINperiodic_parser_PER_IS_MSG__DIGITAL_ACCELEROMETER(e
 //    return(eores_OK);
 }
 
+extern eOresult_t eocanprotINperiodic_parser_PER_IS_MSG__IMU_TRIPLE(eOcanframe_t *frame, eOcanport_t port)
+{
+    if(eobool_true == eocanprotINperiodic_redefinable_SkipParsingOf_ANY_PERIODIC_INERTIAL3_MSG(frame, port))
+    {
+        return(eores_OK);
+    }
+    
+    eOas_inertial3_type_t type = eoas_inertial3_canproto_to_imu(frame->data[1]);
+    if(eoas_inertial3_unknown != type)
+    {
+        eo_inertials3_AcceptCANframe(eo_inertials3_GetHandle(), type, frame, port);
+    }
+    
+    return(eores_OK);
+}
+
+extern eOresult_t eocanprotINperiodic_parser_PER_IS_MSG__IMU_QUATERNION(eOcanframe_t *frame, eOcanport_t port)
+{
+    if(eobool_true == eocanprotINperiodic_redefinable_SkipParsingOf_ANY_PERIODIC_INERTIAL3_MSG(frame, port))
+    {
+        return(eores_OK);
+    }
+    
+    eo_inertials3_AcceptCANframe(eo_inertials3_GetHandle(), eoas_inertial3_imu_qua, frame, port);
+
+    return(eores_OK);
+}
+
+extern eOresult_t eocanprotINperiodic_parser_PER_IS_MSG__IMU_STATUS(eOcanframe_t *frame, eOcanport_t port)
+{
+    if(eobool_true == eocanprotINperiodic_redefinable_SkipParsingOf_ANY_PERIODIC_INERTIAL3_MSG(frame, port))
+    {
+        return(eores_OK);
+    }
+    
+
+    eo_inertials3_AcceptCANframe(eo_inertials3_GetHandle(), eoas_inertial3_imu_status, frame, port);
+
+    return(eores_OK);
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
@@ -170,7 +218,7 @@ extern eOresult_t eocanprotINperiodic_parser_PER_IS_MSG__DIGITAL_ACCELEROMETER(e
 //    loc.addr = EOCANPROT_FRAME_GET_SOURCE(frame);    
 //    loc.insideindex = eobrd_caninsideindex_none;
 //    
-//    ii = eo_canmap_GetEntityIndexExtraCheck(eo_canmap_GetHandle(), loc, endpoint, entity);
+//    ii = eo_canmap_GetEntityIndex(eo_canmap_GetHandle(), loc, endpoint, entity);
 //    if(EOK_uint08dummy == ii)
 //    {     
 //        #warning -> TODO: add diagnostics about not found board as in s_eo_icubCanProto_mb_send_runtime_error_diagnostics()

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 iCub Facility - Istituto Italiano di Tecnologia
+ * Copyright (C) 2018 iCub Facility - Istituto Italiano di Tecnologia
  * Author:  Marco Accame
  * email:   marco.accame@iit.it
  * website: www.robotcub.org
@@ -19,8 +19,8 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef _EOTHEINERTIALS2_HID_H_
-#define _EOTHEINERTIALS2_HID_H_
+#ifndef _EOTHEINERTIALS3_HID_H_
+#define _EOTHEINERTIALS3_HID_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -38,43 +38,46 @@ extern "C" {
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
 
-#include "EOtheInertials2.h"
+#include "EOtheInertials3.h"
 
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
-enum { inertials_maxRegulars = 2 }; // there cannot be more than 1 inertials object, and typically not more than 1 signalled variable.
+enum { inertials3_maxRegulars = 1 }; // there cannot be more than 1 inertials object, and typically not more than 1 signalled variable.
 
-enum { mems_gyro = 0, mems_accel = 1 , mems_numberofthem = 2 };
+enum { inertials3_mems_gyro = 0, inertials3_mems_accel = 1 , inertials3_mems_numberofthem = 2 };
 
-struct EOtheInertials2_hid
+enum { eo_inertials3_fifocapacity = 32 };
+
+
+enum { eo_inertials3_maxsensorsONboard = 4 };
+enum { eo_inertials3_posof_mtb = 0, eo_inertials3_posof_mtb4 = 1, eo_inertials3_posof_strain2 = 2, eo_inertials3_maxTypesOfBoard = 3 };
+
+struct EOtheInertials3_hid
 {
     eOservice_core_t                        service;
     eOservice_diagnostics_t                 diagnostics;
     eOservice_cantools_t                    sharedcan;
-
-    uint8_t                                 numofmtbs;
-    
-    // now the old ones
-    eOas_inertial_config_t                  sensorsconfig;
-    EOvector*                               fifoofinertialdata;    
     
     eObool_t                                configured;
     
-    uint16_t                                canmap_mtb_accel_int[2];
-    uint16_t                                canmap_mtb_accel_ext[2];
-    uint16_t                                canmap_mtb_gyros_ext[2];
-    uint16_t                                canmap_mtb_active[2];
-    uint8_t                                 ethmap_mems_active;
+    uint8_t                                 numofcanboards[eo_inertials3_maxTypesOfBoard];
     
-    uint16_t                                fromcan2id[2][16][3];   // 2 ports, 15 addresses (0->14), 3 kinds on mtb ... use mtb-eoas_inertial_accel_mtb_int
-    uint16_t                                frommems2id[mems_numberofthem];
-    uint8_t                                 memsparam[mems_numberofthem];    
-    eOmems_sensor_cfg_t                     memsconfig[mems_numberofthem];
+    // now the old ones
+    eOas_inertial3_config_t                 sensorsconfig;    
+    uint16_t                                canmap_brd_active[2];
+    uint8_t                                 ethmap_mems_active;
+    uint16_t                                frommems2id[inertials3_mems_numberofthem];
+    uint8_t                                 memsparam[inertials3_mems_numberofthem];    
+    eOmems_sensor_cfg_t                     memsconfig[inertials3_mems_numberofthem];
+    
+    EOvector*                               fifoofinertial3data;    
+
     // the inertial at the end
-    eOas_inertial_t*                        inertial2;  
+    eOas_inertial3_t*                       inertial3;  
     EOarray*                                id32ofregulars;
-    EOarray*                                arrayofsensors;
+    eOas_inertial3_setof_boardinfos_t       setofboardinfos;
+    EOarray*                                arrayofsensordescriptors;
     uint16_t                                not_heardof_target[2];
     uint16_t                                not_heardof_status[2];
     uint32_t                                not_heardof_counter;

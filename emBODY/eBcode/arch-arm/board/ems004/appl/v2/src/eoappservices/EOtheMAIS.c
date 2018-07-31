@@ -123,7 +123,7 @@ static EOtheMAIS s_eo_themais =
     {
         EO_INIT(.boardproperties)       NULL,
         EO_INIT(.entitydescriptor)      NULL,
-        EO_INIT(.discoverytarget)       {0},
+        EO_INIT(.discoverytargets)      NULL,
         EO_INIT(.ondiscoverystop)       {0},
         EO_INIT(.command)               {0}, 
     },   
@@ -160,6 +160,8 @@ extern EOtheMAIS* eo_mais_Initialise(void)
     p->sharedcan.boardproperties = eo_vector_New(sizeof(eObrd_canproperties_t), 1, NULL, NULL, NULL, NULL);
     
     p->sharedcan.entitydescriptor = eo_vector_New(sizeof(eOcanmap_entitydescriptor_t), 1, NULL, NULL, NULL, NULL);
+    
+    p->sharedcan.discoverytargets = eo_array_New(1, sizeof(eOcandiscovery_target_t),  NULL);
     
     p->mais = NULL;
     p->id32ofregulars = eo_array_New(mais_maxRegulars, sizeof(uint32_t), NULL);
@@ -356,20 +358,25 @@ extern eOresult_t eo_mais_Verify(EOtheMAIS *p, const eOmn_serv_configuration_t *
     p->service.onverify = onverify;
     p->service.activateafterverify = activateafterverify;
 
+    eOcandiscovery_target_t trgt = {0};
+     
+    trgt.info.type = eobrd_cantype_mais;
+    trgt.info.protocol.major = servcfg->data.as.mais.version.protocol.major; 
+    trgt.info.protocol.minor = servcfg->data.as.mais.version.protocol.minor;
+    trgt.info.firmware.major = servcfg->data.as.mais.version.firmware.major; 
+    trgt.info.firmware.minor = servcfg->data.as.mais.version.firmware.minor;
+    trgt.info.firmware.build = servcfg->data.as.mais.version.firmware.build;    
+    trgt.canmap[servcfg->data.as.mais.canloc.port] = 0x0001 << servcfg->data.as.mais.canloc.addr; 
 
-    p->sharedcan.discoverytarget.info.type = eobrd_cantype_mais;
-    p->sharedcan.discoverytarget.info.protocol.major = servcfg->data.as.mais.version.protocol.major; 
-    p->sharedcan.discoverytarget.info.protocol.minor = servcfg->data.as.mais.version.protocol.minor;
-    p->sharedcan.discoverytarget.info.firmware.major = servcfg->data.as.mais.version.firmware.major; 
-    p->sharedcan.discoverytarget.info.firmware.minor = servcfg->data.as.mais.version.firmware.minor;
-    p->sharedcan.discoverytarget.info.firmware.build = servcfg->data.as.mais.version.firmware.build;    
-    p->sharedcan.discoverytarget.canmap[servcfg->data.as.mais.canloc.port] = 0x0001 << servcfg->data.as.mais.canloc.addr; 
+    // force a cleaned discoverytargets before we add the target
+    eo_array_Reset(p->sharedcan.discoverytargets);    
+    eo_array_PushBack(p->sharedcan.discoverytargets, &trgt);
     
     p->sharedcan.ondiscoverystop.function = s_eo_mais_onstop_search4mais;
     p->sharedcan.ondiscoverystop.parameter = (void*)servcfg;
         
     // start discovery    
-    eo_candiscovery2_Start(eo_candiscovery2_GetHandle(), &p->sharedcan.discoverytarget, &p->sharedcan.ondiscoverystop);   
+    eo_candiscovery2_Start2(eo_candiscovery2_GetHandle(), p->sharedcan.discoverytargets, &p->sharedcan.ondiscoverystop);   
     
     return(eores_OK);   
 }
@@ -429,6 +436,7 @@ extern eOresult_t eo_mais_Deactivate(EOtheMAIS *p)
     
     eo_vector_Clear(p->sharedcan.boardproperties);
     eo_vector_Clear(p->sharedcan.entitydescriptor);
+    eo_array_Reset(p->sharedcan.discoverytargets);
     
     // make sure the timer is not running
     eo_timer_Stop(p->diagnostics.reportTimer); 

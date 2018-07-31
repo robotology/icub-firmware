@@ -358,12 +358,12 @@ extern void eoprot_fun_UPDT_mc_joint_config_impedance(const EOnv* nv, const eOro
             return;
         }
         else if(eo_ropcode_ask == rd->ropcode)
-        {      
+        { 
+            eOerrmanDescriptor_t errdes = {0};            
             EOproxy * proxy = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
             eOproxy_params_t *param = eo_proxy_Params_Get(proxy, rd->id32);
             if(NULL == param)
             {
-                eOerrmanDescriptor_t errdes = {0};
                 errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
                 errdes.sourceaddress    = 0;
                 errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_forward_callback_fails);
@@ -381,8 +381,16 @@ extern void eoprot_fun_UPDT_mc_joint_config_impedance(const EOnv* nv, const eOro
             
             command.type  = ICUBCANPROTO_POL_MC_CMD__GET_IMPEDANCE_OFFSET;
             command.value = NULL;
-            eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);         
-            
+            eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);       
+
+#if defined(DEBUG_LOG_PROXY_ACTIVITY)
+            errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+            errdes.sourceaddress    = 0;
+            errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_forward_ok);
+            errdes.par16            = (param->p08_2 << 8) | (param->p08_1); 
+            errdes.par64            = rd->id32; 
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, NULL, &errdes);            
+#endif            
             return;
         }     
     }
@@ -429,12 +437,12 @@ extern void eoprot_fun_UPDT_mc_joint_config_userlimits(const EOnv* nv, const eOr
             return;
         }
         else if(eo_ropcode_ask == rd->ropcode)
-        {     
+        {
+            eOerrmanDescriptor_t errdes = {0};            
             EOproxy * proxy = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
             eOproxy_params_t *param = eo_proxy_Params_Get(proxy, rd->id32);
             if(NULL == param)
             {
-                eOerrmanDescriptor_t errdes = {0};
                 errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
                 errdes.sourceaddress    = 0;
                 errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_forward_callback_fails);
@@ -452,10 +460,17 @@ extern void eoprot_fun_UPDT_mc_joint_config_userlimits(const EOnv* nv, const eOr
             
             command.type  = ICUBCANPROTO_POL_MC_CMD__GET_MAX_POSITION;
             command.value = NULL;
-            eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);         
-            
-            return;        
+            eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);    
 
+#if defined(DEBUG_LOG_PROXY_ACTIVITY)
+            errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+            errdes.sourceaddress    = 0;
+            errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_forward_ok);
+            errdes.par16            = (param->p08_2 << 8) | (param->p08_1); 
+            errdes.par64            = rd->id32; 
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, NULL, &errdes);             
+#endif            
+            return;        
         }     
     }
 }
@@ -504,11 +519,11 @@ extern void eoprot_fun_UPDT_mc_joint_status_core_modes_ismotiondone(const EOnv* 
             command.type = ICUBCANPROTO_POL_MC_CMD__MOTION_DONE;
             command.value = NULL; 
         
+            eOerrmanDescriptor_t errdes = {0};
             EOproxy * proxy = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
             eOproxy_params_t *param = eo_proxy_Params_Get(proxy, rd->id32);
             if(NULL == param)
             {
-                eOerrmanDescriptor_t errdes = {0};
                 errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
                 errdes.sourceaddress    = 0;
                 errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_forward_callback_fails);
@@ -520,8 +535,16 @@ extern void eoprot_fun_UPDT_mc_joint_status_core_modes_ismotiondone(const EOnv* 
             param->p08_1 = 1;       // we expect one can frame
             param->p08_2 = 0;       // and we havent received any yet
               
-            eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);        
-                      
+            eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);    
+
+#if defined(DEBUG_LOG_PROXY_ACTIVITY)
+            errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+            errdes.sourceaddress    = 0;
+            errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_forward_ok);
+            errdes.par16            = (param->p08_2 << 8) | (param->p08_1); 
+            errdes.par64            = rd->id32; 
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, NULL, &errdes);             
+#endif                      
             return;
         }
     
@@ -1443,13 +1466,13 @@ extern void eoprot_fun_UPDT_mc_motor_config_pwmlimit(const EOnv* nv, const eOrop
             eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);
         }
         else if(eo_ropcode_ask == rd->ropcode)
-        {      
+        {
+            eOerrmanDescriptor_t errdes = {0};
             EOproxy * proxy = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
             eOproxy_params_t *param = eo_proxy_Params_Get(proxy, rd->id32);
             eOcanprot_command_t command = {0};
             if(NULL == param)
             {
-                eOerrmanDescriptor_t errdes = {0};
                 errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
                 errdes.sourceaddress    = 0;
                 errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_forward_callback_fails);
@@ -1463,7 +1486,16 @@ extern void eoprot_fun_UPDT_mc_motor_config_pwmlimit(const EOnv* nv, const eOrop
                    
             command.type  = ICUBCANPROTO_POL_MC_CMD__GET_PWM_LIMIT;
             command.value = NULL;
-            eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);        
+            eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32); 
+
+#if defined(DEBUG_LOG_PROXY_ACTIVITY)
+            errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+            errdes.sourceaddress    = 0;
+            errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_forward_ok);
+            errdes.par16            = (param->p08_2 << 8) | (param->p08_1); 
+            errdes.par64            = rd->id32; 
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, NULL, &errdes); 
+#endif            
         }     
     }
 
@@ -1599,12 +1631,11 @@ static void s_onpid(const EOnv* nv, const eOropdescriptor_t* rd, pid_type_t type
     // if ask and we have the proxy, we ask to can about two values
     else if(eo_ropcode_ask == rd->ropcode)
     {
-       
+        eOerrmanDescriptor_t errdes = {0};
         EOproxy * proxy = eo_transceiver_GetProxy(eo_boardtransceiver_GetTransceiver(eo_boardtransceiver_GetHandle()));
         eOproxy_params_t *param = eo_proxy_Params_Get(proxy, rd->id32);
         if(NULL == param)
         {
-            eOerrmanDescriptor_t errdes = {0};
             errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
             errdes.sourceaddress    = 0;
             errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_forward_callback_fails);
@@ -1613,7 +1644,7 @@ static void s_onpid(const EOnv* nv, const eOropdescriptor_t* rd, pid_type_t type
             eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);
             return;
         }
-        param->p08_1 = 3;       // we expect two can frames
+        param->p08_1 = 3;       // we expect three can frames
         param->p08_2 = 0;       // and we havent received any yet
 
         command.type  = cmd_get_pid[type]; // ICUBCANPROTO_POL_MC_CMD__GET_POS_PID or ..
@@ -1627,7 +1658,15 @@ static void s_onpid(const EOnv* nv, const eOropdescriptor_t* rd, pid_type_t type
         command.type  = cmd_get_stiction[type]; // ICUBCANPROTO_POL_MC_CMD__GET_POS_STICTION_PARAMS or ..
         command.value = NULL;
         eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32); 
-        
+
+#if defined(DEBUG_LOG_PROXY_ACTIVITY)
+        errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+        errdes.sourceaddress    = 0;
+        errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_proxy_forward_ok);
+        errdes.par16            = (param->p08_2 << 8) | (param->p08_1); 
+        errdes.par64            = rd->id32; 
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, NULL, &errdes);        
+#endif        
         return;
     }
     

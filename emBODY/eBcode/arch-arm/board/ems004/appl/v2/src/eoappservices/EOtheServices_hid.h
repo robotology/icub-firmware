@@ -64,9 +64,9 @@ typedef struct
 
 typedef struct
 {
-    EOvector*                               boardproperties;
-    EOvector*                               entitydescriptor;
-    eOcandiscovery_target_t                 discoverytarget;
+    EOvector*                               boardproperties;    // of eObrd_canproperties_t
+    EOvector*                               entitydescriptor;   // of eOcanmap_entitydescriptor_t
+    EOarray*                                discoverytargets;   // of eOcandiscovery_target_t
     eOcandiscovery_onstop_t                 ondiscoverystop; 
     eOcanprot_command_t                     command;    
 } eOservice_cantools_t; 
@@ -88,7 +88,9 @@ typedef enum
     eo_service_mais         = 2,
     eo_service_skin         = 3,
     eo_service_inertials    = 4,
-    eo_service_none         = 5
+    eo_service_inertials3   = 5,
+    eo_service_temperatures = 6,
+    eo_service_none         = 7
 } eOservice_type_t;
 
 typedef struct
