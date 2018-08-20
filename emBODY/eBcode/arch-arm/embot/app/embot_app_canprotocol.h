@@ -33,7 +33,7 @@ namespace embot { namespace app { namespace canprotocol {
     
     // - useful types 
     
-    enum class Board { mtb = 5, strain = 6, mais = 7, mtb4 = 11, strain2 = 12, none = 254, unknown = 0xff };
+    enum class Board { mtb = 5, strain = 6, mais = 7, mtb4 = 11, strain2 = 12, rfe = 13, none = 254, unknown = 0xff };
     
     enum class Process { bootloader = 0, application = 1, unknown = 0xff };
            
