@@ -86,9 +86,8 @@ void Joint_init(Joint* o)
     o->tcKstiff  = ZERO;
     o->tcKdamp   = ZERO;
     
-    o->scKpos   = ZERO;
-    o->scKvel   = ZERO;
-    o->scKstill = ZERO;
+    //o->scKpos   = ZERO;
+    //o->scKvel   = ZERO;
     
     WatchDog_init(&o->trq_fbk_wdog);
     WatchDog_init(&o->vel_ref_wdog);
@@ -101,18 +100,14 @@ void Joint_init(Joint* o)
     
     Trajectory_init(&o->trajectory, 0, 0, 0);
     
-    PID_init(&o->posPID);
-    PID_init(&o->velPID);
+    PID_init(&o->minjerkPID);
+    PID_init(&o->directPID);
     
     o->control_mode = eomc_controlmode_notConfigured;
     o->interaction_mode = eOmc_interactionmode_stiff;
     
     o->pos_control_active = FALSE;
     o->trq_control_active = FALSE;
-    
-    o->MOTOR_CONTROL_TYPE = PWM_CONTROLLED_MOTOR;
-    
-    o->CAN_DO_TRQ_CTRL = TRUE;
     
     o->pushing_limit = FALSE;
     
@@ -137,13 +132,7 @@ void Joint_reset_calibration_data(Joint* o)
 void Joint_config(Joint* o, uint8_t ID, eOmc_joint_config_t* config)
 {
     o->ID = ID;
-    
-    PID_config(&o->posPID, &config->pidposition);
         
-    o->scKpos   = config->pidposition.kp;
-    o->scKvel   = config->pidposition.kff;
-    o->scKstill = 0.1f*o->scKpos;
-    
     o->pos_min_soft = config->userlimits.min;
     o->pos_max_soft = config->userlimits.max;    
     o->pos_min_hard = config->hardwarelimits.min;
@@ -191,8 +180,8 @@ void Joint_destroy(Joint* o)
 
 void Joint_motion_reset(Joint *o)
 {
-    PID_reset(&o->posPID);
-    PID_reset(&o->velPID);
+    PID_reset(&o->minjerkPID);
+    PID_reset(&o->directPID);
     
     Trajectory_stop(&o->trajectory, o->pos_fbk);
         
@@ -220,11 +209,12 @@ void Joint_update_status_reference(Joint* o)
             break;
         
         case eomc_controlmode_mixed:
-        case eomc_controlmode_velocity_pos:
+        case eomc_ctrlmval_velocity_pos:
             o->eo_joint_ptr->status.target.trgt_velocity = Trajectory_get_target_velocity(&(o->trajectory));
             o->eo_joint_ptr->status.target.trgt_position = Trajectory_get_target_position(&(o->trajectory));
             break;
-        case eomc_controlmode_velocity:
+        case eomc_controlmode_velocity: //
+        case eomc_controlmode_vel_direct:
         case eomc_controlmode_impedance_vel:
             o->eo_joint_ptr->status.target.trgt_velocity = Trajectory_get_target_velocity(&(o->trajectory));
             break;
@@ -237,9 +227,13 @@ void Joint_update_status_reference(Joint* o)
             break;
                 
         case eomc_controlmode_openloop:
-            o->eo_joint_ptr->status.target.trgt_openloop = o->out_ref;
+            o->eo_joint_ptr->status.target.trgt_pwm = o->out_ref;
             break;
 
+        case eomc_controlmode_current:
+            o->eo_joint_ptr->status.target.trgt_current = o->out_ref;
+            break;
+        
         case eomc_controlmode_torque:
             o->eo_joint_ptr->status.target.trgt_torque = o->trq_ref;
             break;
@@ -249,6 +243,21 @@ void Joint_update_status_reference(Joint* o)
     }
 
 }
+
+static void Joint_send_debug_message(char *message, uint8_t jid, uint16_t par16, uint64_t par64)
+{
+
+    eOerrmanDescriptor_t errdes = {0};
+
+    errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
+    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+    errdes.sourceaddress    = jid;
+    errdes.par16            = par16;
+    errdes.par64            = par64;
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, message, NULL, &errdes);
+
+}
+
 BOOL Joint_set_control_mode(Joint* o, eOmc_controlmode_command_t control_mode)
 {
     if (o->control_mode == ((eOmc_controlmode_t)control_mode)) return TRUE;
@@ -273,19 +282,21 @@ BOOL Joint_set_control_mode(Joint* o, eOmc_controlmode_command_t control_mode)
     {
         case eomc_controlmode_cmd_force_idle:
             control_mode = eomc_controlmode_cmd_idle;
+            break;
+        case eomc_controlmode_cmd_velocity_pos:
+            control_mode = eomc_controlmode_cmd_mixed;
+            break;
+        case eomc_controlmode_cmd_velocity:
+        //    control_mode = eomc_controlmode_cmd_vel_direct;
+        //    break;
+        case eomc_controlmode_cmd_vel_direct:
         case eomc_controlmode_cmd_idle:
         case eomc_controlmode_cmd_mixed:
-        case eomc_controlmode_cmd_velocity:
         case eomc_controlmode_cmd_position:
         case eomc_controlmode_cmd_direct:
-            break;
-                
         case eomc_controlmode_cmd_openloop:
-            if (o->MOTOR_CONTROL_TYPE != PWM_CONTROLLED_MOTOR) return FALSE;
-            break;
-
+        case eomc_controlmode_cmd_current:
         case eomc_controlmode_cmd_torque:
-            if (!o->CAN_DO_TRQ_CTRL) return FALSE;
             break;
             
         default:
@@ -293,6 +304,8 @@ BOOL Joint_set_control_mode(Joint* o, eOmc_controlmode_command_t control_mode)
     }
     
     o->control_mode = (eOmc_controlmode_t)control_mode;
+    
+    Joint_send_debug_message("SET CONTROLMODE", o->ID, control_mode, o->control_mode);
     
     Joint_set_inner_control_flags(o);
     
@@ -306,14 +319,6 @@ BOOL Joint_set_control_mode(Joint* o, eOmc_controlmode_command_t control_mode)
 BOOL Joint_set_interaction_mode(Joint* o, eOmc_interactionmode_t interaction_mode)
 {
     if (o->interaction_mode == interaction_mode) return TRUE;
-    
-    if (!o->CAN_DO_TRQ_CTRL)
-    {
-        if (interaction_mode == eOmc_interactionmode_compliant)
-        {
-            return FALSE;
-        }
-    }
     
     o->interaction_mode = interaction_mode;
     
@@ -506,6 +511,7 @@ CTRL_UNITS Joint_do_pwm_control(Joint* o)
     switch (o->control_mode)
     {
         case eomc_controlmode_openloop:
+        case eomc_controlmode_current:
         {
             o->pos_err = o->pos_ref = ZERO;
             o->vel_err = o->vel_ref = ZERO;
@@ -526,12 +532,12 @@ CTRL_UNITS Joint_do_pwm_control(Joint* o)
             {
                 if (o->pos_fbk <= o->pos_min) 
                 {
-                    o->output_lim = PID_do_out(&o->posPID, o->pos_min-o->pos_fbk);
+                    o->output_lim = PID_do_out(pid, o->pos_min-o->pos_fbk);
                     o->pushing_limit = -1;
                 }
                 else if (o->pos_fbk >= o->pos_max)
                 {
-                    o->output_lim = PID_do_out(&o->posPID, o->pos_max-o->pos_fbk);
+                    o->output_lim = PID_do_out(pid, o->pos_max-o->pos_fbk);
                     o->pushing_limit =  1;
                 }
                 else
@@ -546,6 +552,7 @@ CTRL_UNITS Joint_do_pwm_control(Joint* o)
         
             break;
         }
+        case eomc_controlmode_vel_direct:
         case eomc_controlmode_velocity:
         case eomc_controlmode_mixed:
         {
@@ -554,16 +561,10 @@ CTRL_UNITS Joint_do_pwm_control(Joint* o)
                 Trajectory_velocity_stop(&o->trajectory);
             }
         }
-        case eomc_controlmode_position:
         case eomc_controlmode_direct:
+        case eomc_controlmode_position:
         case eomc_controlmode_calib:
         {    
-//            if((eomc_controlmode_calib == o->control_mode) && (!o->calib_type6_data.is_active))
-//            {
-//                o->output = ZERO;
-//                break;
-//            }
-            
             if ((o->running_calibration.type == eomc_calibration_type7_hall_sensor) || 
                ((o->running_calibration.type == eomc_calibration_type6_mais) && 
                 (o->running_calibration.data.type6.is_active == FALSE)))
@@ -573,6 +574,14 @@ CTRL_UNITS Joint_do_pwm_control(Joint* o)
             }
             
             Trajectory_do_step(&o->trajectory, &o->pos_ref, &o->vel_ref, &o->acc_ref);
+            
+            //static int noflood = 0;
+            //if (++noflood > 500)
+            //{
+            //    noflood = 0;
+            //
+            //    Joint_send_debug_message("PWM or CURRENT", o->ID, o->control_mode, (((uint64_t) o->vel_ref) << 32) | ((uint64_t) o->pos_ref));
+            //}
         
             //CTRL_UNITS pos_err_old = o->pos_err;
         
@@ -606,13 +615,13 @@ CTRL_UNITS Joint_do_pwm_control(Joint* o)
                     {
                         o->pos_err -= o->dead_zone;
                         
-                        o->output = PID_do_out(&o->posPID, o->pos_err);
+                        o->output = PID_do_out(pid, o->pos_err);
                     }
                     else if (o->pos_err < -o->dead_zone)
                     {
                         o->pos_err += o->dead_zone;
                         
-                        o->output = PID_do_out(&o->posPID, o->pos_err);
+                        o->output = PID_do_out(pid, o->pos_err);
                     }
                     else
                     {
@@ -620,13 +629,13 @@ CTRL_UNITS Joint_do_pwm_control(Joint* o)
                         
                         if (o->not_reversible)
                         {
-                            PID_reset(&o->posPID);
+                            PID_reset(pid);
                         
                             o->output = 0;
                         }
                         else
                         {
-                            o->output = PID_do_out(&o->posPID, o->pos_err);
+                            o->output = PID_do_out(pid, o->pos_err);
                         }
                     }
                 }
@@ -642,12 +651,12 @@ CTRL_UNITS Joint_do_pwm_control(Joint* o)
                 {
                     if (o->pos_fbk <= o->pos_min) 
                     {
-                        o->output_lim = PID_do_out(&o->posPID, o->pos_min-o->pos_fbk);
+                        o->output_lim = PID_do_out(pid, o->pos_min-o->pos_fbk);
                         o->pushing_limit = -1;
                     }
                     else if (o->pos_fbk >= o->pos_max)
                     {
-                        o->output_lim = PID_do_out(&o->posPID, o->pos_max-o->pos_fbk);
+                        o->output_lim = PID_do_out(pid, o->pos_max-o->pos_fbk);
                         o->pushing_limit =  1;
                     }
                     else
@@ -679,6 +688,8 @@ CTRL_UNITS Joint_do_pwm_control(Joint* o)
 
 CTRL_UNITS Joint_do_vel_control(Joint* o)
 {            
+    PID *pid = (o->control_mode == eomc_controlmode_direct || o->control_mode == eomc_controlmode_vel_direct) ?  &o->directPID : &o->minjerkPID; 
+    
     o->pushing_limit = FALSE;
     
     if (o->control_mode == eomc_controlmode_torque)
@@ -692,12 +703,14 @@ CTRL_UNITS Joint_do_vel_control(Joint* o)
             if (o->pos_fbk <= o->pos_min) 
             {
                 o->pushing_limit = -1;
-                o->vel_ref = o->scKstill * (o->pos_min - o->pos_fbk);        
+                
+                o->vel_ref = 0.1f*pid->Kp*(o->pos_min - o->pos_fbk);                
             }
             else if (o->pos_fbk >= o->pos_max)
             {
                 o->pushing_limit =  1;
-                o->vel_ref = o->scKstill * (o->pos_max - o->pos_fbk);
+                
+                o->vel_ref = 0.1f*pid->Kp*(o->pos_max - o->pos_fbk);
             }
             else
             {
@@ -719,7 +732,9 @@ CTRL_UNITS Joint_do_vel_control(Joint* o)
     switch (o->control_mode)
     {
         case eomc_controlmode_mixed:
-        case eomc_controlmode_velocity:
+        case eomc_ctrlmval_velocity_pos:
+        case eomc_controlmode_velocity: //
+        case eomc_controlmode_vel_direct:
             if (WatchDog_check_expired(&o->vel_ref_wdog))
             {
                 Trajectory_velocity_stop(&o->trajectory);
@@ -752,12 +767,17 @@ CTRL_UNITS Joint_do_vel_control(Joint* o)
         switch (o->control_mode)
         {
             case eomc_controlmode_direct:
-                o->vel_ref = o->scKpos*o->pos_err;
+                o->vel_ref = pid->Kp * o->pos_err;
+                break;
+            
+            case eomc_controlmode_vel_direct:
+                o->pos_err = ZERO;
+                o->vel_ref = pid->Kff * o->vel_ref;
                 break;
             
             case eomc_controlmode_mixed:
             case eomc_controlmode_position:
-          //case eomc_controlmode_velocity: // not RAW
+            case eomc_controlmode_velocity:
                 if (o->vel_ref == ZERO)
                 {
                     if (o->pos_err > o->dead_zone)
@@ -773,17 +793,12 @@ CTRL_UNITS Joint_do_vel_control(Joint* o)
                         o->pos_err = ZERO;
                     }
                     
-                    o->vel_ref = o->scKpos*o->pos_err;
+                    o->vel_ref = pid->Kp*o->pos_err;
                 }
                 else
                 {
-                    o->vel_ref = o->scKvel * o->vel_ref + o->scKpos*o->pos_err;
+                    o->vel_ref = pid->Kff*o->vel_ref + pid->Kp*o->pos_err;
                 }
-                break;
-                
-            case eomc_controlmode_velocity: // RAW
-                o->pos_err = ZERO;
-                o->vel_ref = o->scKvel * o->vel_ref;
                 break;
             
             default:
@@ -801,21 +816,21 @@ CTRL_UNITS Joint_do_vel_control(Joint* o)
             if (o->pos_fbk <= o->pos_min) 
             {
                 o->pushing_limit = -1;
-                o->vel_ref = o->scKstill * (o->pos_min - o->pos_fbk);
+                o->vel_ref = 0.1f*pid->Kp * (o->pos_min - o->pos_fbk);
             }
             else if (o->pos_fbk >= o->pos_max)
             {
                 o->pushing_limit =  1;
-                o->vel_ref = o->scKstill * (o->pos_max - o->pos_fbk);
+                o->vel_ref = 0.1f*pid->Kp * (o->pos_max - o->pos_fbk);
             }
             else
             {
-                o->vel_ref += o->scKpos * (o->pos_err + o->Kadmitt * o->trq_fbk);
+                o->vel_ref += pid->Kp * (o->pos_err + o->Kadmitt * o->trq_fbk);
             }
         }
         else
         {
-            o->vel_ref += o->scKpos * (o->pos_err + o->Kadmitt * o->trq_fbk);
+            o->vel_ref += pid->Kp * (o->pos_err + o->Kadmitt * o->trq_fbk);
         }
                 
         LIMIT(o->vel_ref, o->vel_max);
@@ -907,7 +922,7 @@ static BOOL Joint_set_pos_ref_core(Joint* o, CTRL_UNITS pos_ref, CTRL_UNITS vel_
 
 BOOL Joint_set_pos_ref(Joint* o, CTRL_UNITS pos_ref, CTRL_UNITS vel_ref)
 {
-    if ((o->control_mode != eomc_controlmode_position) && (o->control_mode != eomc_controlmode_mixed))
+    if ((o->control_mode != eomc_controlmode_position) && (o->control_mode != eomc_controlmode_mixed) && (o->control_mode != eomc_ctrlmval_velocity_pos))
     {
         return FALSE;
     }
@@ -915,6 +930,23 @@ BOOL Joint_set_pos_ref(Joint* o, CTRL_UNITS pos_ref, CTRL_UNITS vel_ref)
     if (o->pos_min != o->pos_max) LIMIT2(o->pos_min, pos_ref, o->pos_max);
     
     return(Joint_set_pos_ref_core(o, pos_ref, vel_ref));
+}
+
+BOOL Joint_set_pos_raw(Joint* o, CTRL_UNITS pos_ref)
+{    
+    if (o->control_mode != eomc_controlmode_direct)
+    {
+        return FALSE;
+    }
+    
+    if (o->pos_min != o->pos_max) LIMIT2(o->pos_min, pos_ref, o->pos_max);
+    
+    o->pos_ref = pos_ref;
+    o->vel_ref = ZERO;
+    
+    Trajectory_set_pos_raw(&o->trajectory, pos_ref);
+    
+    return TRUE;  
 }
 
 BOOL Joint_set_pos_ref_in_calibType6(Joint* o, CTRL_UNITS pos_ref, CTRL_UNITS vel_ref)
@@ -942,7 +974,10 @@ BOOL Joint_set_vel_ref(Joint* o, CTRL_UNITS vel_ref, CTRL_UNITS acc_ref)
 {
     WatchDog_rearm(&o->vel_ref_wdog);
     
-    if ((o->control_mode != eomc_controlmode_velocity) && (o->control_mode != eomc_controlmode_mixed))
+    if ((o->control_mode != eomc_controlmode_vel_direct) &&
+        (o->control_mode != eomc_controlmode_velocity) && //
+        (o->control_mode != eomc_controlmode_velocity_pos) &&    
+        (o->control_mode != eomc_controlmode_mixed))
     {
         return FALSE;
     }
@@ -960,33 +995,27 @@ BOOL Joint_set_vel_ref(Joint* o, CTRL_UNITS vel_ref, CTRL_UNITS acc_ref)
         return TRUE;
     }
      
-    if (o->MOTOR_CONTROL_TYPE == VEL_CONTROLLED_MOTOR)
-    {
-        Trajectory_set_vel_raw(&o->trajectory, vel_ref);
-    }
-    else
-    {
-        Trajectory_set_vel_end(&o->trajectory, vel_ref, acc_ref);
-    }
+    Trajectory_set_vel_end(&o->trajectory, vel_ref, acc_ref);
     
     return TRUE;
 }
 
-BOOL Joint_set_pos_raw(Joint* o, CTRL_UNITS pos_ref)
-{    
-    if (o->control_mode != eomc_controlmode_direct)
+BOOL Joint_set_vel_raw(Joint* o, CTRL_UNITS vel_ref)
+{
+    WatchDog_rearm(&o->vel_ref_wdog);
+    
+    if (o->control_mode != eomc_controlmode_vel_direct)
     {
         return FALSE;
     }
     
-    if (o->pos_min != o->pos_max) LIMIT2(o->pos_min, pos_ref, o->pos_max);
+    LIMIT(vel_ref, o->vel_max);
+ 
+    o->vel_ref = vel_ref;
+     
+    Trajectory_set_vel_raw(&o->trajectory, vel_ref);
     
-    o->pos_ref = pos_ref;
-    o->vel_ref = ZERO;
-    
-    Trajectory_set_pos_raw(&o->trajectory, pos_ref);
-    
-    return TRUE;  
+    return TRUE;
 }
 
 BOOL Joint_set_trq_ref(Joint* o, CTRL_UNITS trq_ref)
@@ -1001,15 +1030,29 @@ BOOL Joint_set_trq_ref(Joint* o, CTRL_UNITS trq_ref)
     return TRUE;
 }
 
-BOOL Joint_set_out_ref(Joint* o, CTRL_UNITS out_ref)
+BOOL Joint_set_pwm_ref(Joint* o, CTRL_UNITS pwm_ref)
 {
     if (o->control_mode != eomc_controlmode_openloop)
     {
         return FALSE;
     }
     
-    o->out_ref = out_ref;
+    o->out_ref = pwm_ref;
 
+    return TRUE;
+}
+
+BOOL Joint_set_cur_ref(Joint* o, CTRL_UNITS cur_ref)
+{
+    if (o->control_mode != eomc_controlmode_current)
+    {
+        return FALSE;
+    }
+    
+    o->out_ref = cur_ref;
+
+    //Joint_send_debug_message("current reference",o->ID,0,(uint64_t)cur_ref);
+    
     return TRUE;
 }
 
@@ -1023,8 +1066,10 @@ static void Joint_set_inner_control_flags(Joint* o)
     switch (o->control_mode)
     {
         case eomc_controlmode_position:
-        case eomc_controlmode_velocity:
+        case eomc_controlmode_velocity: //
+        case eomc_controlmode_vel_direct:
         case eomc_controlmode_mixed:
+        case eomc_controlmode_velocity_pos:
         case eomc_controlmode_direct:
             o->pos_control_active = TRUE;
         break;

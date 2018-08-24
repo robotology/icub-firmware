@@ -52,24 +52,33 @@ typedef struct // JointSet
     Motor* motor;
 
     float** Jjm;
-    float** Jmj;
+    float** Jmj; 
+    
+    float** Sjm;
+    float** Smj;
     
     float** Sje;
-    float** Sjm;
     
+    int torque_ctrl_out_type;
+    int olooop_ctrl_out_type;
+    int curent_ctrl_out_type;
+    int postrj_ctrl_out_type;
+    int veltrj_ctrl_out_type;
+    int mixtrj_ctrl_out_type;
+    int posdir_ctrl_out_type;
+    int veldir_ctrl_out_type;
+        
     uint32_t calibration_wait;
     
     AbsEncoder* absEncoder;
  
+    int16_t motor_input_type;
     eOmc_controlmode_t control_mode;
-    uint8_t interaction_mode;
+    eOmc_interactionmode_t interaction_mode;
     
     BOOL pos_control_active;
     BOOL trq_control_active;
-    BOOL CAN_DO_TRQ_CTRL;
     BOOL USE_SPEED_FBK_FROM_MOTORS;
-    
-    uint8_t MOTOR_CONTROL_TYPE;
     
     BOOL is_calibrated;
     
@@ -102,7 +111,7 @@ extern void JointSet_config //
     Joint* joint,
     Motor* motor,
     AbsEncoder *absEncoder,
-    float** Jjm,
+    float** Jjm, float** Jjm_hard,
     float** Jmj,
     float** Sje,
     float** Sjm
@@ -114,14 +123,14 @@ extern void JointSet_do_control(JointSet* o); //
 
 extern void JointSet_do(JointSet* o);
     
-extern BOOL JointSet_set_control_mode(JointSet* o, eOmc_controlmode_command_t control_mode);
+extern BOOL JointSet_set_control_mode(JointSet* o, eOmc_controlmode_command_t control_mode_cmd);
 extern void JointSet_set_interaction_mode(JointSet* o, eOmc_interactionmode_t interaction_mode);
 
 extern void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator);
 
 extern void JointSet_do_pwm_control(JointSet* o);
     
-extern void JointSet_send_debug_message(char *message, uint8_t jid);
+extern void JointSet_send_debug_message(char *message, uint8_t jid, uint16_t par16, uint32_t par64);
 
 #ifdef __cplusplus
 }       // closing brace for extern "C"

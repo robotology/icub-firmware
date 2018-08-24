@@ -34,7 +34,7 @@
 
 /////////////////////////////////////////////////////////
 // Motor
-
+/*
 static void send_debug_message(char *message, uint8_t jid, uint16_t par16, uint64_t par64)
 {
 
@@ -48,7 +48,7 @@ static void send_debug_message(char *message, uint8_t jid, uint16_t par16, uint6
     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, message, NULL, &errdes);
 
 }
-
+*/
 static void Motor_new_state_req(Motor *o, icubCanProto_controlmode_t control_mode)
 {
     o->control_mode_req = control_mode;
@@ -244,8 +244,6 @@ void Motor_config(Motor* o, uint8_t ID, eOmc_motor_config_t* config) //
 {
     // const init
     o->ID                 = ID;
-    //o->HARDWARE_TYPE      = hardware_type;
-    //o->MOTOR_CONTROL_TYPE = motor_control_type;
     o->GEARBOX            = config->gearbox_M2J;
     o->HAS_TEMP_SENSOR    = config->hasTempSensor;
     
@@ -317,6 +315,10 @@ void Motor_config_max_currents(Motor* o, eOmc_current_limits_params_t* current_p
     }
 }
 
+//extern void Motor_config_current_PID(Motor* o, eOmc_PID_t* pid);
+//extern void Motor_config_torque_PID(Motor* o, eOmc_PID_t* pid);
+//extern void Motor_config_speed_PID(Motor* o, eOmc_PID_t* pid);
+
 void Motor_config_current_PID(Motor* o, eOmc_PID_t* pidcurrent)
 {
     if (o->HARDWARE_TYPE == HARDWARE_2FOC)
@@ -325,7 +327,12 @@ void Motor_config_current_PID(Motor* o, eOmc_PID_t* pidcurrent)
     }
 }
 
-void Motor_config_velPID(Motor* o, eOmc_PID_t* pidvelocity)
+void Motor_config_torque_PID(Motor* o, eOmc_PID_t* pid) //
+{
+    PID_config(&o->trqPID, pid);
+}
+
+void Motor_config_speed_PID(Motor* o, eOmc_PID_t* pidvelocity)
 {
     if (o->HARDWARE_TYPE == HARDWARE_2FOC)
     {
@@ -336,11 +343,6 @@ void Motor_config_velPID(Motor* o, eOmc_PID_t* pidvelocity)
 void Motor_destroy(Motor* o) //
 {
     DELETE(o);
-}
-
-void Motor_config_trqPID(Motor* o, eOmc_PID_t* pid) //
-{
-    PID_config(&o->trqPID, pid);
 }
 
 void Motor_config_filter(Motor* o, uint8_t filter) //
@@ -358,7 +360,7 @@ void Motor_calibrate_withOffset(Motor* o, int32_t offset) //
     o->pos_calib_offset = offset;
     o->pos_fbk_old = 0;
     o->not_init = TRUE;
-    Motor_set_run(o);
+    //Motor_set_run(o, PWM_INPUT_MOTOR);
     
     if(o->HARDWARE_TYPE == HARDWARE_MC4p)
     {
@@ -368,7 +370,7 @@ void Motor_calibrate_withOffset(Motor* o, int32_t offset) //
 
 BOOL Motor_calibrate_moving2Hardstop(Motor* o, int32_t pwm, int32_t zero) //
 {
-    Motor_set_run(o);
+    Motor_set_run(o, eomc_ctrl_out_type_pwm);
     Motor_check_faults(o);
     
     if(Motor_is_in_fault(o))
@@ -465,7 +467,7 @@ extern void Motor_do_calibration_hard_stop(Motor* o)
     }
 }
 
-BOOL Motor_set_run(Motor* o) //
+BOOL Motor_set_run(Motor* o, int16_t low_lev_ctrl_type)
 {
     if (o->HARDWARE_TYPE == HARDWARE_2FOC)
     {
@@ -476,28 +478,23 @@ BOOL Motor_set_run(Motor* o) //
     }
     
     icubCanProto_controlmode_t control_mode;
-    char message[150];
     
-    switch (o->MOTOR_CONTROL_TYPE)
+    switch (low_lev_ctrl_type)
     {
-        case PWM_CONTROLLED_MOTOR:
+        case eomc_ctrl_out_type_pwm:
             control_mode = icubCanProto_controlmode_openloop;
             break;
         
-        case VEL_CONTROLLED_MOTOR:
+        case eomc_ctrl_out_type_vel:
             control_mode = icubCanProto_controlmode_speed_voltage;
             break;
 
-        case IQQ_CONTROLLED_MOTOR:
+        case eomc_ctrl_out_type_cur:
             control_mode = icubCanProto_controlmode_current;
             break;
         
         default:
-        {
-            snprintf(message, sizeof(message), "Motor_set_run: unknown control type par16=type par64=hwtype" );
-            send_debug_message(message, o->ID , o->MOTOR_CONTROL_TYPE, o->HARDWARE_TYPE);
             return FALSE;
-        }
     }
     
     if (o->HARDWARE_TYPE == HARDWARE_2FOC)
@@ -515,8 +512,7 @@ BOOL Motor_set_run(Motor* o) //
     }
     else
     {
-         snprintf(message, sizeof(message), "Motor_set_run: unknown hw type. par16=type par64=hwtype" );
-         send_debug_message(message, o->ID , o->MOTOR_CONTROL_TYPE, o->HARDWARE_TYPE);
+        return FALSE;
     }
     
     return TRUE;
