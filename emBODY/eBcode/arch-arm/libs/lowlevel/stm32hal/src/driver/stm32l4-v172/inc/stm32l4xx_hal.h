@@ -44,8 +44,15 @@
  extern "C" {
 #endif
 
+// IIT-EXT
+#if defined(USE_STM32HAL)
+    // path is referred to location of this file
+    #include "../../../config/stm32hal_driver_cfg.h"
+#else
+    #warning you are using a stm32hal file w/ USE_STM32HAL undefined ... are you sure?   
 /* Includes ------------------------------------------------------------------*/
 #include "stm32l4xx_hal_conf.h"
+#endif
 
 /** @addtogroup STM32L4xx_HAL_Driver
   * @{

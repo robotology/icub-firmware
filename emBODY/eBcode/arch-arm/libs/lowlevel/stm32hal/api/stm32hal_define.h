@@ -39,18 +39,19 @@ extern "C" {
     
     @{        
  **/
+
+
+#if !defined(USE_STM32HAL)
+#define USE_STM32HAL
+#endif   
+
+#if !defined(USE_HAL_DRIVER)
+#define USE_HAL_DRIVER
+#endif   
+
     
     
 #if     defined(STM32HAL_BOARD_NUCLEO64)
-
-    #if !defined(USE_STM32HAL)
-    #define USE_STM32HAL
-    #endif
-
-    // use hal
-    #if !defined(USE_HAL_DRIVER)
-    #define USE_HAL_DRIVER
-    #endif
 
     // it has a STM32L476xx mpu
     #if !defined(STM32L476xx)
@@ -69,15 +70,6 @@ extern "C" {
 
 #elif   defined(STM32HAL_BOARD_MTB4)
     
-    #if !defined(USE_STM32HAL)
-    #define USE_STM32HAL
-    #endif
-
-    // use hal
-    #if !defined(USE_HAL_DRIVER)
-    #define USE_HAL_DRIVER
-    #endif
-
     // it has a STM32L443xx mpu
     #if !defined(STM32L443xx)
     #define STM32L443xx
@@ -90,15 +82,6 @@ extern "C" {
 				
 #elif   defined(STM32HAL_BOARD_STRAIN2)
 
-    #if !defined(USE_STM32HAL)
-    #define USE_STM32HAL
-    #endif
-
-    // use hal
-    #if !defined(USE_HAL_DRIVER)
-    #define USE_HAL_DRIVER
-    #endif
-
     // it has a STM32L443xx mpu
     #if !defined(STM32L443xx)
     #define STM32L443xx
@@ -110,7 +93,7 @@ extern "C" {
     #endif  
     
 #else
-        #error STM32HAL: you must define a STM32HAL_BOARD_something
+        #error STM32HAL: you must define a STM32HAL_BOARD_${BRD}
 #endif
 
                 

@@ -105,7 +105,7 @@ extern stm32hal_res_t stm32hal_init(const stm32hal_config_t *cfg)
     }
         
     // defined in the specific board-xxxx section
-    stm32hal_bsp_init();    
+    stm32hal_board_init();    
     
     return stm32hal_res_OK;
 }

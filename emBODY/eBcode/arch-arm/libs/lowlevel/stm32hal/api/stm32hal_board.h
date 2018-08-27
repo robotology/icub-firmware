@@ -18,8 +18,8 @@
 
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#ifndef _STM32HAL_BSP_H_
-#define _STM32HAL_BSP_H_
+#ifndef _STM32HAL_BOARD_H_
+#define _STM32HAL_BOARD_H_
 
 #ifdef __cplusplus
 extern "C" {
@@ -43,27 +43,25 @@ extern "C" {
  
 // called by stm32hal_init() if stm32hal_config_t::initbsp is true
     
-extern void stm32hal_bsp_init(void);    
+extern void stm32hal_board_init(void);    
     
     
 // - public interface: begin  -----------------------------------------------------------------------------------------  
 // it contains whatever cube-mx generates.
 
 
-#if 		defined(STM32HAL_BOARD_NUCLEO64)
+#if     defined(STM32HAL_BOARD_NUCLEO64)
 
-// this is taken from what cube-mx generates 
-#include "../src/board/nucleo64/inc/stm32l4xx_hal_conf_nucleo64.h"
+#include "../src/config/stm32hal_driver_cfg_of_nucleo64.h"
 
 #include "../src/board/nucleo64/inc/gpio.h"
 #include "../src/board/nucleo64/inc/main.h"
 #include "../src/board/nucleo64/inc/usart.h"
 	
 	
-#elif 	defined(STM32HAL_BOARD_MTB4)	
+#elif   defined(STM32HAL_BOARD_MTB4)	
 
-// this is taken from what cube-mx generates 
-#include "../src/board/mtb4/inc/stm32l4xx_hal_conf_mtb4.h"
+#include "../src/config/stm32hal_driver_cfg_of_mtb4.h"
 
 #include "../src/board/mtb4/inc/adc.h"
 #include "../src/board/mtb4/inc/can.h"
@@ -78,10 +76,9 @@ extern void stm32hal_bsp_init(void);
 
 #include "../src/board/mtb4/inc/stm32l4xx_it.h"
 
-#elif 	defined(STM32HAL_BOARD_STRAIN2)	
+#elif   defined(STM32HAL_BOARD_STRAIN2)	
 
-// this is taken from what cube-mx generates 
-#include "../src/board/strain2/inc/stm32l4xx_hal_conf_strain2.h"
+#include "../src/config/stm32hal_driver_cfg_of_strain2.h"
 
 #include "../src/board/strain2/inc/adc.h"
 #include "../src/board/strain2/inc/can.h"
@@ -97,7 +94,7 @@ extern void stm32hal_bsp_init(void);
 #include "../src/board/strain2/inc/stm32l4xx_it.h"
 
 #else
-    #error STM32HAL: you must define a STM32HAL_BOARD_something
+    #error STM32HAL: you must define a STM32HAL_BOARD_${BRD}
 #endif
 
 

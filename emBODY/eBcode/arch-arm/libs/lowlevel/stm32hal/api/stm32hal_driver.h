@@ -36,15 +36,14 @@ extern "C" {
 
 // - public interface  ------------------------------------------------------------------------------------------------
   
-#if     defined(STM32L476xx) || defined(STM32HAL_STM32L4xx)
+#if     defined(STM32HAL_BOARD_NUCLEO64) || defined(STM32HAL_BOARD_MTB4) || defined(STM32HAL_BOARD_STRAIN2)
 
-    #include "../src/stm32l4/inc/stm32l4xx_hal.h"	
+    // we have three boards which all share the same driver type (stm32l4) and version (v 1.7.2)
+    #include "../src/driver/stm32l4-v172/inc/stm32l4xx_hal.h"
 
 #else
-    #error STM32HAL: the MPU is undefined (e.g., STM32L476xx) 
+    #error STM32HAL: the STM32HAL_BOARD_${BRD} is undefined
 #endif
-
-
 
 #ifdef __cplusplus
 }       // closing brace for extern "C"
