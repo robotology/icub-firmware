@@ -335,7 +335,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32L452xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Inc;                                ../Drivers/STM32L4xx_HAL_Driver/Inc;                                ../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy;                                ../Drivers/CMSIS/Device/ST/STM32L4xx/Include;                                ../Drivers/CMSIS/Include;                      ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc;                      ../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc</IncludePath>
+              <IncludePath>../Inc;                                 ../Drivers/STM32L4xx_HAL_Driver/Inc;                                 ../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy;                                 ../Drivers/CMSIS/Device/ST/STM32L4xx/Include;                                 ../Drivers/CMSIS/Include;                       ../Middlewares/ST/STM32_USB_Device_Library/Core/Inc;                       ../Middlewares/ST/STM32_USB_Device_Library/Class/CDC/Inc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -465,6 +465,11 @@
               <FilePath>../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_i2c_ex.c</FilePath>
             </File>
             <File>
+              <FileName>stm32l4xx_hal_rng.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rng.c</FilePath>
+            </File>
+            <File>
               <FileName>stm32l4xx_hal_spi.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_spi.c</FilePath>
@@ -578,6 +583,11 @@
               <FileName>i2c.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Src/i2c.c</FilePath>
+            </File>
+            <File>
+              <FileName>rng.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Src/rng.c</FilePath>
             </File>
             <File>
               <FileName>spi.c</FileName>

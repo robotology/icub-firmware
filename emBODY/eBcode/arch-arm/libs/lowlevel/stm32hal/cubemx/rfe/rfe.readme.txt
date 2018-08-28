@@ -2,4 +2,4 @@ rfe.readme.txt
 
 this code comes from:
 - https://svn.robotology.eu/repos/iCubHardware/trunk/electronics/private/P2016_15_RFE_RobotFaceExpression/SW/RFE_MASTER
-- revision: 13782; date: 22 june 2018; author: amura;, comment: missing 
+- revision: 14419; date: 28 august 2018; author: amura; comment: Added RNG and project rebuilded 

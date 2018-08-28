@@ -33,6 +33,7 @@ rfe_master\stm32l4xx_hal_msp.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_ha
 rfe_master\stm32l4xx_hal_msp.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_i2c_ex.h
 rfe_master\stm32l4xx_hal_msp.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_pwr.h
 rfe_master\stm32l4xx_hal_msp.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_pwr_ex.h
+rfe_master\stm32l4xx_hal_msp.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_rng.h
 rfe_master\stm32l4xx_hal_msp.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_spi.h
 rfe_master\stm32l4xx_hal_msp.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_spi_ex.h
 rfe_master\stm32l4xx_hal_msp.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_tim.h

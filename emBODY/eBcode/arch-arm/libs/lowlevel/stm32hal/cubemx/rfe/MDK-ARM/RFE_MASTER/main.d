@@ -33,6 +33,7 @@ rfe_master\main.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_i2c.h
 rfe_master\main.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_i2c_ex.h
 rfe_master\main.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_pwr.h
 rfe_master\main.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_pwr_ex.h
+rfe_master\main.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_rng.h
 rfe_master\main.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_spi.h
 rfe_master\main.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_spi_ex.h
 rfe_master\main.o: ../Drivers/STM32L4xx_HAL_Driver/Inc/stm32l4xx_hal_tim.h
@@ -44,6 +45,7 @@ rfe_master\main.o: ../Inc/adc.h
 rfe_master\main.o: ../Inc/can.h
 rfe_master\main.o: ../Inc/dma.h
 rfe_master\main.o: ../Inc/i2c.h
+rfe_master\main.o: ../Inc/rng.h
 rfe_master\main.o: ../Inc/spi.h
 rfe_master\main.o: ../Inc/tim.h
 rfe_master\main.o: ../Inc/usb_device.h
