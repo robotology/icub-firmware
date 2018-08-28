@@ -104,7 +104,7 @@ extern void stm32hal_board_init(void);
 #include "../src/board/rfe/inc/i2c.h"
 #include "../src/board/rfe/inc/main.h"
 #include "../src/board/rfe/inc/spi.h"
-//#include "../src/board/rfe/inc/rng.h"
+#include "../src/board/rfe/inc/rng.h"
 #include "../src/board/rfe/inc/tim.h"
 
 #include "../src/board/rfe/inc/stm32l4xx_it.h"

@@ -1369,6 +1369,11 @@
               <FileType>1</FileType>
               <FilePath>..\src\board\rfe\src\tim.c</FilePath>
             </File>
+            <File>
+              <FileName>rng.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\rfe\src\rng.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2945,6 +2950,11 @@
               <FileName>tim.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\board\rfe\src\tim.c</FilePath>
+            </File>
+            <File>
+              <FileName>rng.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\rfe\src\rng.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -4523,6 +4533,11 @@
               <FileType>1</FileType>
               <FilePath>..\src\board\rfe\src\tim.c</FilePath>
             </File>
+            <File>
+              <FileName>rng.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\rfe\src\rng.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -6099,6 +6114,11 @@
               <FileName>tim.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\board\rfe\src\tim.c</FilePath>
+            </File>
+            <File>
+              <FileName>rng.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\rfe\src\rng.c</FilePath>
             </File>
           </Files>
         </Group>

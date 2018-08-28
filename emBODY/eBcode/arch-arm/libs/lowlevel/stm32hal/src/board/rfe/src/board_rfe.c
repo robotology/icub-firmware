@@ -89,7 +89,8 @@ extern void stm32hal_board_init(void)
     /* Initialize all configured peripherals */
     MX_GPIO_Init();
     MX_DMA_Init();
-    // IIT-EXT: we init those in teh relevant .cpp or _init() 
+    MX_RNG_Init();
+    // IIT-EXT: we init those in the relevant .cpp or _init() 
     #if 0
     MX_ADC1_Init();
     MX_CAN1_Init();
@@ -104,9 +105,6 @@ extern void stm32hal_board_init(void)
     MX_TIM6_Init();
     MX_TIM16_Init()
     #endif
-
-    #warning better to add the RNG ....
-    //MX_RNG_Init();
 
  }
 
