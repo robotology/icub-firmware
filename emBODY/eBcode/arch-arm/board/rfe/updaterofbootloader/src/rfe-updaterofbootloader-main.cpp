@@ -36,9 +36,6 @@ static ActivityParam activity_param = {0};
 static const embot::common::relTime BlinkSlowPeriod = 5*EOK_reltime100ms;
 
 
-#if defined(STM32HAL_BOARD_STRAIN2)
-    #warning remove STM32HAL_BOARD_STRAIN2 and use STM32HAL_BOARD_RFE w/ its stm32hal
-#endif
     
 
 // use build 222 for all the updaterofbootloader

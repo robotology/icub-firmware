@@ -335,7 +335,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>--cpp11</MiscControls>
-              <Define>STM32HAL_BOARD_STRAIN2</Define>
+              <Define>USE_STM32HAL STM32HAL_BOARD_RFE</Define>
               <Undefine></Undefine>
               <IncludePath>..\src-plus;..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask;..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\eBcode\arch-arm\embot\common;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\sys;..\..\..\..\..\..\eBcode\arch-arm\embot;..\..\..\..\..\..\eBcode\arch-arm\embot\binary;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib</IncludePath>
             </VariousControls>
@@ -392,14 +392,14 @@
           <GroupName>stm32hal-nucleo</GroupName>
           <Files>
             <File>
-              <FileName>stm32hal.strain2.lib</FileName>
+              <FileName>stm32hal.rfe.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\lib\stm32hal.strain2.lib</FilePath>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\lib\stm32hal.rfe.lib</FilePath>
             </File>
             <File>
-              <FileName>stm32hal.startup.mtb4.s</FileName>
+              <FileName>stm32hal.startup.rfe.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\startup\stm32hal.startup.mtb4.s</FilePath>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\startup\stm32hal.startup.rfe.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -1380,14 +1380,14 @@
           <GroupName>stm32hal-nucleo</GroupName>
           <Files>
             <File>
-              <FileName>stm32hal.strain2.lib</FileName>
+              <FileName>stm32hal.rfe.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\lib\stm32hal.strain2.lib</FilePath>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\lib\stm32hal.rfe.lib</FilePath>
             </File>
             <File>
-              <FileName>stm32hal.startup.mtb4.s</FileName>
+              <FileName>stm32hal.startup.rfe.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\startup\stm32hal.startup.mtb4.s</FilePath>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\startup\stm32hal.startup.rfe.s</FilePath>
             </File>
           </Files>
         </Group>

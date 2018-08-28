@@ -32,15 +32,11 @@
 
 
 
-#if defined(STM32HAL_BOARD_STRAIN2)
-    #warning remove STM32HAL_BOARD_STRAIN2 and use STM32HAL_BOARD_RFE w/ its stm32hal
-#endif
 
-
-#if defined(STM32HAL_BOARD_STRAIN2)
-    #include "embot_hw_bsp_strain2.h"
+#if defined(STM32HAL_BOARD_RFE)
+    #include "embot_hw_bsp_rfe.h"
 #else
-    #error: cannot include embot_hw_bsp_strain2.h
+    #error: cannot include embot_hw_bsp_rfe.h
 #endif
 
 
