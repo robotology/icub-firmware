@@ -99,6 +99,18 @@ namespace embot { namespace hw { namespace led {
             {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}
         }        
     };
+
+    #elif   defined(STM32HAL_BOARD_RFE)
+    
+    static const bspmap_t bspmap = 
+    {
+        0x00000001,
+        GPIO_PIN_RESET, GPIO_PIN_SET,
+        {
+            {LED_BLUE_GPIO_Port, LED_BLUE_Pin}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, 
+            {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}
+        }        
+    };
     
     #else
         #error embot::hw::led::mask and embot::hw::led::gpiomap[] must be filled    

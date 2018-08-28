@@ -80,13 +80,22 @@ namespace embot { namespace hw { namespace sys {
     const std::uint32_t addressOfApplication    = 0x08020000;
     const std::uint32_t maxsizeOfApplication    = 128*1024;
     
+#elif   defined(STM32HAL_BOARD_RFE)
+    
+    const std::uint32_t startOfFLASH            = 0x08000000;
+    const std::uint32_t addressOfBootloader     = 0x08000000;
+    const std::uint32_t maxsizeOfBootloader     = 124*1024;
+    const std::uint32_t addressOfStorage        = 0x0801F000;
+    const std::uint32_t maxsizeOfStorage        = 4*1024;
+    const std::uint32_t addressOfApplication    = 0x08020000;
+    const std::uint32_t maxsizeOfApplication    = 128*1024;
     
 #else
     #error you must define some embot::hw::sys constants   
 #endif
 
  
-#if     defined(STM32HAL_BOARD_NUCLEO64) || defined(STM32HAL_BOARD_MTB4) || defined(STM32HAL_BOARD_STRAIN2)
+#if     defined(STM32HAL_BOARD_NUCLEO64) || defined(STM32HAL_BOARD_MTB4) || defined(STM32HAL_BOARD_STRAIN2) || defined(STM32HAL_BOARD_RFE)
     
 __asm static void ss_hl_sys_asm_xnumARMv7ops(uint32_t numberof) 
 {
@@ -217,9 +226,11 @@ dowaitloop
     static const std::uint32_t maxRANDmask = 0x3ff; // 1023    
     std::uint32_t random()
     {
-        std::uint32_t v = 0;        
+        std::uint32_t v; 
+#if defined(HAL_RNG_MODULE_ENABLED)        
         HAL_StatusTypeDef ret = HAL_RNG_GenerateRandomNumber(&hrng, &v);
-        ret = ret;        
+        ret = ret;
+#endif        
         return v & maxRANDmask;
     }
     

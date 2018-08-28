@@ -163,7 +163,10 @@ namespace embot { namespace hw { namespace BNO055 {
         static const embot::hw::gpio::GPIO gpioRESET(BNO055_RESET_GPIO_Port, BNO055_RESET_Pin);
     #elif   defined(STM32HAL_BOARD_MTB4)
         static const embot::hw::gpio::GPIO gpioBOOT(BNO055_BOOT_GPIO_Port, BNO055_BOOT_Pin);
-        static const embot::hw::gpio::GPIO gpioRESET(BNO055_RESET_GPIO_Port, BNO055_RESET_Pin);          
+        static const embot::hw::gpio::GPIO gpioRESET(BNO055_RESET_GPIO_Port, BNO055_RESET_Pin);  
+    #elif   defined(STM32HAL_BOARD_RFE)
+        static const embot::hw::gpio::GPIO gpioBOOT(BNO055_BOOT_GPIO_Port, BNO055_BOOT_Pin);
+        static const embot::hw::gpio::GPIO gpioRESET(BNO055_RESET_GPIO_Port, BNO055_RESET_Pin);     
     #endif
     
     static PrivateData s_privatedata;

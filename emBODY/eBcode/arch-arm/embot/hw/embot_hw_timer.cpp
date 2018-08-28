@@ -129,6 +129,20 @@ namespace embot { namespace hw { namespace timer {
         255   // Timer::sixteen        
     };
     
+#elif   defined(STM32HAL_BOARD_RFE)    
+    
+    static const std::uint8_t numberofsupported = 1; // cannot be 1 because ...
+    
+    static const bspmap_t bspmap = 
+    {
+        0x00000000
+    };
+    
+    static const std::uint8_t map2compactarray[1] = 
+    { 
+        255 
+    };
+    
 #else
     
     static const std::uint8_t numberofsupported = 1; // cannot be 1 because ...

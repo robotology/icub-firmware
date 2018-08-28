@@ -95,6 +95,17 @@ namespace embot { namespace hw { namespace button {
         }        
     };
     
+    #elif   defined(STM32HAL_BOARD_RFE)
+    
+    static const bspmap_t bspmap = 
+    {
+        0x00000000,
+        GPIO_PIN_RESET,
+        {
+            {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}
+        }        
+    };
+    
     #else
     
     static const bspmap_t bspmap = 

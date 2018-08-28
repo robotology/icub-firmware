@@ -117,8 +117,24 @@ namespace embot { namespace hw { namespace can {
         0x00000001
     };
 
+    #elif   defined(STM32HAL_BOARD_RFE)
+    
+    #define STM32HAL_HAS_CAN1 
+    #define STM32HAL_HAS_CAN_API_Vxxx
+    
+    static const bspmap_t bspmap = 
+    {
+        0x00000001
+    };
+    
     #else
         #error embot::hw::can::bspmask must be filled    
+    #endif
+    
+    
+    
+    #if defined(STM32HAL_HAS_CAN_API_Vxxx)
+        #warning TODO: write the can-handler for the new APIs of STM32
     #endif
       
     // initialised mask       
@@ -164,45 +180,48 @@ namespace embot { namespace hw { namespace can {
     static Config s_config;    
     static std::vector<Frame> *s_Qtx;
     static std::vector<Frame> *s_rxQ;
-    
-    
+
+#if defined(STM32HAL_HAS_CAN_API_Vxxx)
+
+#else    
     //allocate memory for HAL
     static CanTxMsgTypeDef        TxMessage;
     static CanRxMsgTypeDef        RxMessage;
-    
-#if 0 
-// not used anymore: removed to avoid compiler warnings
-    static void s_transmit_noirq(CAN_HandleTypeDef *hcan)
-    {
-        std::uint32_t size = s_Qtx->size();
-        
-        if(0 == size)
-        {
-            if(nullptr != s_config.txqueueempty.callback)
-            {
-                s_config.txqueueempty.callback(s_config.txqueueempty.arg);
-            }
-            return; // resOK;
-        }
-        
-        for(std::uint32_t i=0; i<size; i++)
-        {
-            const Frame& frame = s_Qtx->at(i);
-            hcan->pTxMsg->StdId = frame.id & 0x7FF;
-            hcan->pTxMsg->DLC = frame.size;
-            std::memmove(hcan->pTxMsg->Data, frame.data, sizeof(hcan->pTxMsg->Data));
-            HAL_StatusTypeDef res = HAL_CAN_Transmit(hcan, 1);
-            if((HAL_OK == res) && (nullptr != s_config.ontxframe.callback))
-            {
-                s_config.ontxframe.callback(s_config.ontxframe.arg);
-            }            
-        }
-        
-        s_Qtx->clear();
-                    
-        return; // resOK;
-    }    
 #endif
+
+//#if 0 
+//// not used anymore: removed to avoid compiler warnings
+//    static void s_transmit_noirq(CAN_HandleTypeDef *hcan)
+//    {
+//        std::uint32_t size = s_Qtx->size();
+//        
+//        if(0 == size)
+//        {
+//            if(nullptr != s_config.txqueueempty.callback)
+//            {
+//                s_config.txqueueempty.callback(s_config.txqueueempty.arg);
+//            }
+//            return; // resOK;
+//        }
+//        
+//        for(std::uint32_t i=0; i<size; i++)
+//        {
+//            const Frame& frame = s_Qtx->at(i);
+//            hcan->pTxMsg->StdId = frame.id & 0x7FF;
+//            hcan->pTxMsg->DLC = frame.size;
+//            std::memmove(hcan->pTxMsg->Data, frame.data, sizeof(hcan->pTxMsg->Data));
+//            HAL_StatusTypeDef res = HAL_CAN_Transmit(hcan, 1);
+//            if((HAL_OK == res) && (nullptr != s_config.ontxframe.callback))
+//            {
+//                s_config.ontxframe.callback(s_config.ontxframe.arg);
+//            }            
+//        }
+//        
+//        s_Qtx->clear();
+//                    
+//        return; // resOK;
+//    }    
+//#endif
     
     static void s_transmit(CAN_HandleTypeDef *hcan)
     {
@@ -217,24 +236,30 @@ namespace embot { namespace hw { namespace can {
         
         Frame& frame = s_Qtx->front();
         
+        HAL_StatusTypeDef res = HAL_ERROR;
+
+#if defined(STM32HAL_HAS_CAN_API_Vxxx)
+    
+#else         
         //1) copy frame to hal memory
         hcan->pTxMsg->StdId = frame.id & 0x7FF;
         hcan->pTxMsg->DLC = frame.size;
         memcpy(hcan->pTxMsg->Data, frame.data, frame.size);
-
         
         //2) transmit frame
-        HAL_StatusTypeDef res = HAL_CAN_Transmit_IT(hcan);
+        res = HAL_CAN_Transmit_IT(hcan);
+#endif
+    
         //the only possible return values are HAL_BUSY or HAL_OK
         if(res == HAL_OK)
         {
             //3) if transmission is ok, than I remove the frame from tx queue
-        vector<Frame>::iterator b = s_Qtx->begin();
-        s_Qtx->erase(b);
-        if(nullptr != s_config.ontxframe.callback)
-        {
-            s_config.ontxframe.callback(s_config.ontxframe.arg);
-        }
+            vector<Frame>::iterator b = s_Qtx->begin();
+            s_Qtx->erase(b);
+            if(nullptr != s_config.ontxframe.callback)
+            {
+                s_config.ontxframe.callback(s_config.ontxframe.arg);
+            }
         }
         else
         {
@@ -270,11 +295,14 @@ namespace embot { namespace hw { namespace can {
         }
         
         Frame rxframe;
-        
+
+#if defined(STM32HAL_HAS_CAN_API_Vxxx)
+    
+#else          
         rxframe.id = hcan->pRxMsg->StdId;
         rxframe.size = hcan->pRxMsg->DLC;
         memcpy(rxframe.data, hcan->pRxMsg->Data, rxframe.size);
-        
+#endif        
         
         if(s_rxQ->size() == s_config.rxcapacity)
         {
@@ -312,7 +340,10 @@ namespace embot { namespace hw { namespace can {
         }
         
         s_config = config;
-        
+
+#if defined(STM32HAL_HAS_CAN_API_Vxxx)
+    return resNOK;
+#else          
         //configure txframe like a data frame with standard ID. (we never use ext or remote frames)
         TxMessage.ExtId = 0;
         TxMessage.IDE = CAN_ID_STD;
@@ -320,9 +351,8 @@ namespace embot { namespace hw { namespace can {
         
         //gives memeory to HAL
         hcan1.pTxMsg = &TxMessage;
-        hcan1.pRxMsg = &RxMessage;
+        hcan1.pRxMsg = &RxMessage;    
     
-        
         // init peripheral
         MX_CAN1_Init();
         
@@ -332,9 +362,7 @@ namespace embot { namespace hw { namespace can {
         s_rxQ = new std::vector<Frame>;
         s_Qtx->reserve(config.txcapacity);
         s_rxQ->reserve(config.rxcapacity);
-        
-        
-        
+                  
         /*##-2- Configure the CAN Filter ###########################################*/
         CAN_FilterConfTypeDef sFilterConfig;
         sFilterConfig.FilterNumber = 0;
@@ -351,10 +379,11 @@ namespace embot { namespace hw { namespace can {
         {
         
         }
-        
+    
         embot::binary::bit::set(initialisedmask, port2index(p));
 
         return resOK;
+#endif        
     }
 
     result_t embot::hw::can::enable(Port p)
@@ -364,14 +393,22 @@ namespace embot { namespace hw { namespace can {
             return resNOK;
         }  
 
+        
+#if defined(STM32HAL_HAS_CAN_API_Vxxx)
+        return resNOK;
+#else
         //enable rx interrupt
         __HAL_CAN_DISABLE_IT(&hcan1, CAN_IT_TME); //disable interrupt because driver sents frames only on user's request by func hal_can_transmit
         //__HAL_CAN_ENABLE_IT(&hcan1, CAN_IT_FMP0);
         HAL_StatusTypeDef res = HAL_CAN_Receive_IT(&hcan1, CAN_FIFO0);
+ 
         if(res != HAL_OK)
+        {
             return resNOK;
+        }
         
-        return resOK;           
+        return resOK;       
+#endif       
     }
     
     
@@ -383,11 +420,14 @@ namespace embot { namespace hw { namespace can {
         }  
 
         // do whatever is needed
-        
+#if defined(STM32HAL_HAS_CAN_API_Vxxx)
+        return resNOK;
+#else        
         __HAL_CAN_DISABLE_IT(&hcan1, CAN_IT_FMP0);
         __HAL_CAN_DISABLE_IT(&hcan1, CAN_IT_TME);
         
-        return resOK;           
+    return resOK; 
+#endif                  
     }    
 
     result_t embot::hw::can::put(Port p, const Frame &frame)
@@ -396,6 +436,10 @@ namespace embot { namespace hw { namespace can {
         {
             return resNOK;
         }  
+        
+#if defined(STM32HAL_HAS_CAN_API_Vxxx)
+        return resNOK;
+#else        
         uint8_t tx_is_enabled = __HAL_CAN_IS_ENABLE_IT(&hcan1, CAN_IT_TME);
         
         __HAL_CAN_DISABLE_IT(&hcan1, CAN_IT_TME);
@@ -407,9 +451,12 @@ namespace embot { namespace hw { namespace can {
         
         s_Qtx->push_back(frame);
         if(tx_is_enabled)
+        {
             __HAL_CAN_ENABLE_IT(&hcan1, CAN_IT_TME);
+        }
         
-        return resOK;           
+        return resOK;    
+#endif               
     }   
     
     
@@ -420,14 +467,22 @@ namespace embot { namespace hw { namespace can {
         {
             return 0;
         } 
-
+        
+#if defined(STM32HAL_HAS_CAN_API_Vxxx)
+        return 0;
+#else  
+        
         uint8_t tx_is_enabled = __HAL_CAN_IS_ENABLE_IT(&hcan1, CAN_IT_TME); 
         
         __HAL_CAN_DISABLE_IT(&hcan1, CAN_IT_TME);
         uint8_t size = s_Qtx->size();
         if(tx_is_enabled)
-        __HAL_CAN_ENABLE_IT(&hcan1, CAN_IT_TME);
-        return size;
+        {
+            __HAL_CAN_ENABLE_IT(&hcan1, CAN_IT_TME);
+        }
+                
+        return size;   
+#endif    
     }
     
     std::uint8_t embot::hw::can::inputqueuesize(Port p)
@@ -436,12 +491,16 @@ namespace embot { namespace hw { namespace can {
         {
             return 0;
         }  
-        uint32_t size=0;
-
+        
+#if defined(STM32HAL_HAS_CAN_API_Vxxx)
+        return 0;
+#else 
+        uint32_t size = 0;
         __HAL_CAN_DISABLE_IT(&hcan1, CAN_IT_FMP0);
         size = s_rxQ->size();
         __HAL_CAN_ENABLE_IT(&hcan1, CAN_IT_FMP0);
         return size;
+#endif                
     }
 
     
@@ -474,12 +533,15 @@ namespace embot { namespace hw { namespace can {
             return resNOK;
         } 
         
-        bool empty = true;
-        
+
+#if defined(STM32HAL_HAS_CAN_API_Vxxx)
+        return resNOK;
+#else     
+        bool empty = true;        
         __HAL_CAN_DISABLE_IT(&hcan1, CAN_IT_FMP0);
         empty = s_rxQ->empty();
         __HAL_CAN_ENABLE_IT(&hcan1, CAN_IT_FMP0);
-        
+       
         if(empty)
         {
             remaining = 0;
@@ -491,8 +553,9 @@ namespace embot { namespace hw { namespace can {
         s_rxQ->erase(s_rxQ->begin());
         remaining = s_rxQ->size();
         __HAL_CAN_ENABLE_IT(&hcan1, CAN_IT_FMP0);
-        
-        return resOK;        
+              
+        return resOK;     
+#endif     
     }
 
     
@@ -502,6 +565,10 @@ namespace embot { namespace hw { namespace can {
         {
             return resNOK;
         } 
+
+#if defined(STM32HAL_HAS_CAN_API_Vxxx)
+        return resNOK;
+#else 
         
          /* Configure the CAN Filter for message of class polling sensor */
         CAN_FilterConfTypeDef sFilterConfig;
@@ -584,6 +651,7 @@ namespace embot { namespace hw { namespace can {
         }
         
         return resOK;   
+#endif
     }
     
     
