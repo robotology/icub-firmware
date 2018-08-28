@@ -41,6 +41,11 @@ extern "C" {
     // we have three boards which all share the same driver type (stm32l4) and version (v 1.7.2)
     #include "../src/driver/stm32l4-v172/inc/stm32l4xx_hal.h"
 
+#elif   defined(STM32HAL_BOARD_RFE)
+
+    // we have one board which needs a different version  (v 1.8.3) of the same driver type (stm32l4)
+    #include "../src/driver/stm32l4-v183/inc/stm32l4xx_hal.h"
+
 #else
     #error STM32HAL: the STM32HAL_BOARD_${BRD} is undefined
 #endif

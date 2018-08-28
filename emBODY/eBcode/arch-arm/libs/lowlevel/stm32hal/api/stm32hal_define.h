@@ -58,6 +58,10 @@ extern "C" {
     #define STM32L476xx
     #endif
     
+    #if !defined(STM32L4)
+    #define STM32L4
+    #endif      
+    
     // of type STM32L4    
     #if !defined(STM32HAL_STM32L4xx)
     #define STM32HAL_STM32L4xx
@@ -74,6 +78,10 @@ extern "C" {
     #if !defined(STM32L443xx)
     #define STM32L443xx
     #endif	
+    
+    #if !defined(STM32L4)
+    #define STM32L4
+    #endif  
 
     // of type STM32L4    
     #if !defined(STM32HAL_STM32L4xx)
@@ -86,12 +94,32 @@ extern "C" {
     #if !defined(STM32L443xx)
     #define STM32L443xx
     #endif	
+    
+    #if !defined(STM32L4)
+    #define STM32L4
+    #endif  
 
     // of type STM32L4    
     #if !defined(STM32HAL_STM32L4xx)
     #define STM32HAL_STM32L4xx
     #endif  
-    
+ 
+#elif   defined(STM32HAL_BOARD_RFE)
+
+    // it has a STM32L452xx mpu
+    #if !defined(STM32L452xx)
+    #define STM32L452xx
+    #endif  
+
+    #if !defined(STM32L4)
+    #define STM32L4
+    #endif  
+
+    // of type STM32L4    
+    #if !defined(STM32HAL_STM32L4xx)
+    #define STM32HAL_STM32L4xx
+    #endif  
+
 #else
         #error STM32HAL: you must define a STM32HAL_BOARD_${BRD}
 #endif

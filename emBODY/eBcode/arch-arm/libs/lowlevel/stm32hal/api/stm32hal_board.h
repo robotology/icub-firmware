@@ -93,6 +93,22 @@ extern void stm32hal_board_init(void);
 
 #include "../src/board/strain2/inc/stm32l4xx_it.h"
 
+#elif   defined(STM32HAL_BOARD_RFE) 
+
+#include "../src/config/stm32hal_driver_cfg_of_rfe.h"
+
+#include "../src/board/rfe/inc/adc.h"
+#include "../src/board/rfe/inc/can.h"
+#include "../src/board/rfe/inc/dma.h"
+#include "../src/board/rfe/inc/gpio.h"
+#include "../src/board/rfe/inc/i2c.h"
+#include "../src/board/rfe/inc/main.h"
+#include "../src/board/rfe/inc/spi.h"
+//#include "../src/board/rfe/inc/rng.h"
+#include "../src/board/rfe/inc/tim.h"
+
+#include "../src/board/rfe/inc/stm32l4xx_it.h"
+
 #else
     #error STM32HAL: you must define a STM32HAL_BOARD_${BRD}
 #endif

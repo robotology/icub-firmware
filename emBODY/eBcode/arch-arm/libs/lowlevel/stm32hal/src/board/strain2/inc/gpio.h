@@ -50,6 +50,7 @@
 #if defined(USE_STM32HAL)
     #include "stm32hal.h"
 #else
+#warning you are using a stm32hal file w/ USE_STM32HAL undefined ... are you sure? 
 #include "stm32l4xx_hal.h"
 #endif
 #include "main.h"

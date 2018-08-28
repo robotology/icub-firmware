@@ -60,6 +60,9 @@
  extern "C" {
 #endif /* __cplusplus */
 
+// IIT-EXT
+#include "../../../../api/stm32hal_define.h"
+
 /** @addtogroup Library_configuration_section
   * @{
   */

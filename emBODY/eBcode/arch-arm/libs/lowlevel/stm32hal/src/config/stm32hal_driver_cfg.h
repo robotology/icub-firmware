@@ -29,8 +29,14 @@ extern "C" {
     // we also need some ll includes contained in the driver section
     #include "../src/driver/stm32l4-v172/inc/stm32l4xx_ll_gpio.h"
     
-#else
+#elif   defined(STM32HAL_BOARD_RFE)
     
+    #include "../src/config/stm32hal_driver_cfg_of_rfe.h"   
+    // we also need some ll includes contained in the driver section
+    #include "../src/driver/stm32l4-v183/inc/stm32l4xx_ll_gpio.h"
+    
+#else
+
         #error pls define a STM32HAL_BOARD_${BRD}
     
 #endif
