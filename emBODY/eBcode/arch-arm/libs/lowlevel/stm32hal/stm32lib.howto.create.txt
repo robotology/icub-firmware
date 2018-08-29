@@ -281,12 +281,22 @@ H.  Use the library in a sample application named ${appl} by:
             stm32hal_init(&cfg);
             
     VERY IMPORTANT
-    Ine can implement the 1 ms tick funtions as wanted. There are examples for that.
-    One solution is to use the osal RTOS and the embot object. See code of any ${brd}-bootloader 
-    project for examples.
+    One can implement the 1 ms tick funtions as wanted. 
+    
+    There are examples for that.
+    - in icub-firmware\emBODY\eBcode\arch-arm\board\mtb4\examples\stm32app there is a basic example 
+      which uses the systick and just the stm32hal library
+    - in icub-firmware\emBODY\eBcode\arch-arm\board\mtb4\examples\embotapp there is a basic example
+      which uses the systick and a few number of embot objects
+    - in icub-firmware\emBODY\eBcode\arch-arm\board\mtb4\examples\embotappcan there is a skeleton
+      application for can messaging with the use of teh systeick and embot objects.
+     
+    Another solution, the one used in our projects is to use the osal RTOS and the embot objects.    
+    See code of any ${brd}-bootloader project for examples.
     
     
     
+//  END OF DOCUMENT
     
     
 //  work in progress. mostly garbage.    
