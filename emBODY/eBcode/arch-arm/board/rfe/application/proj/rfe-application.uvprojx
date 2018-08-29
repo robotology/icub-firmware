@@ -1112,7 +1112,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\obj\</OutputDirectory>
-          <OutputName>strain2.zero</OutputName>
+          <OutputName>rfe.zero</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>1</CreateHexFile>
@@ -1398,7 +1398,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>--cpp11</MiscControls>
-              <Define>STM32HAL_BOARD_STRAIN2 APPL_TESTZEROOFFSET TEST_SI_ORIG_NO</Define>
+              <Define>USE_STM32HAL STM32HAL_BOARD_RFE APPL_TESTZEROOFFSET</Define>
               <Undefine></Undefine>
               <IncludePath>..\src-plus;..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask;..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\eBcode\arch-arm\embot\common;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\sys;..\..\..\..\..\..\eBcode\arch-arm\embot;..\src\others;..\..\..\..\..\..\eBcode\arch-arm\embot\tools;..\..\..\..\..\..\eBcode\arch-arm\embot\binary;..\..\..\..\..\..\eBcode\arch-arm\embot\dsp;..\src\bosch-driver;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib</IncludePath>
             </VariousControls>
@@ -1431,7 +1431,7 @@
             <TextAddressRange>0x08000000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile>.\strain2-application0offset.sct</ScatterFile>
+            <ScatterFile>.\rfe-application0offset.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc>--diag_suppress=L6329</Misc>
