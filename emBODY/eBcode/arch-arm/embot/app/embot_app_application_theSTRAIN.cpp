@@ -2320,13 +2320,13 @@ bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::po
     bool ret = false;
     
     if(replyinfo.mode == static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::StrainRegulationSetMode::temporary))
-    {
-        replyinfo.regulationset = pImpl->runtimedata.set2use_get();
+    {   // +1 because allowed values for regulationset are 1, 2, 3 and runtimedata uses 0, 1, 2
+        replyinfo.regulationset = pImpl->runtimedata.set2use_get() + 1; 
         ret = true;
     }
     else if(replyinfo.mode == static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::StrainRegulationSetMode::permanent))
-    {
-        replyinfo.regulationset = pImpl->configdata.permanentregulationset_get();
+    {   // + 1 because allowed values for regulationset are 1, 2, 3 and configdata uses 0, 1, 2
+        replyinfo.regulationset = pImpl->configdata.permanentregulationset_get() + 1;
         ret = true;
     }
         
