@@ -22,6 +22,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "embot_hw_can.h"
+#define USE_HAL_CAN_REGISTER_CALLBACKS 1
 #include "stm32hal.h"
 
 
@@ -412,6 +413,14 @@ result_t can::init(Port p, const Config &config)
     }
 
     #if defined(STM32HAL_HAS_CAN_API_Vxxx)
+    if(HAL_OK != HAL_CAN_RegisterCallback(&hcan1, HAL_CAN_TX_MAILBOX0_COMPLETE_CB_ID, can::callbackOnTXcompletion))
+        return resNOK; //TODO: adding clear of vector
+    if(HAL_OK != HAL_CAN_RegisterCallback(&hcan1, HAL_CAN_TX_MAILBOX1_COMPLETE_CB_ID, can::callbackOnTXcompletion))
+        return resNOK; //TODO: adding clear of vector
+    if(HAL_OK != HAL_CAN_RegisterCallback(&hcan1, HAL_CAN_TX_MAILBOX2_COMPLETE_CB_ID, can::callbackOnTXcompletion))
+        return resNOK; //TODO: adding clear of vector
+    if(HAL_OK != HAL_CAN_RegisterCallback(&hcan1, HAL_CAN_RX_FIFO0_MSG_PENDING_CB_ID, can::callbackOnRXcompletion))
+        return resNOK; //TODO: adding clear of vector
     if(HAL_OK != HAL_CAN_Start(&hcan1))
         return resNOK; //TODO: adding clear of vector
     #endif
@@ -716,26 +725,26 @@ void CAN1_RX0_IRQHandler(void)
 #endif
 
 #if defined(STM32HAL_HAS_CAN_API_Vxxx)
-//with this version of API we can register the callback dinamically, but currently I kept the old style.
-void HAL_CAN_TxMailbox0CompleteCallback(CAN_HandleTypeDef *hcan)
-{
-    embot::hw::can::callbackOnTXcompletion(hcan);
-}
+////with this version of API we can register the callback dinamically, but currently I kept the old style.
+//void HAL_CAN_TxMailbox0CompleteCallback(CAN_HandleTypeDef *hcan)
+//{
+//    embot::hw::can::callbackOnTXcompletion(hcan);
+//}
 
-void HAL_CAN_TxMailbox1CompleteCallback(CAN_HandleTypeDef *hcan)
-{
-    embot::hw::can::callbackOnTXcompletion(hcan);
-}
+//void HAL_CAN_TxMailbox1CompleteCallback(CAN_HandleTypeDef *hcan)
+//{
+//    embot::hw::can::callbackOnTXcompletion(hcan);
+//}
 
-void HAL_CAN_TxMailbox2CompleteCallback(CAN_HandleTypeDef *hcan)
-{
-    embot::hw::can::callbackOnTXcompletion(hcan);
-}
+//void HAL_CAN_TxMailbox2CompleteCallback(CAN_HandleTypeDef *hcan)
+//{
+//    embot::hw::can::callbackOnTXcompletion(hcan);
+//}
 
-void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
-{
-    embot::hw::can::callbackOnRXcompletion(hcan);
-}
+//void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
+//{
+//    embot::hw::can::callbackOnRXcompletion(hcan);
+//}
 #else
 
 // these functions must be re-defined. they are weakly defined in the stm32hal.lib 
