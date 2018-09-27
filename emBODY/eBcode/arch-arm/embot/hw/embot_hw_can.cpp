@@ -36,7 +36,6 @@
 
 using namespace std;
 
-
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
 // --------------------------------------------------------------------------------------------------------------------
@@ -130,12 +129,6 @@ namespace embot { namespace hw { namespace can {
     #else
         #error embot::hw::can::bspmask must be filled    
     #endif
-    
-    
-    
-    #if defined(STM32HAL_HAS_CAN_API_Vxxx)
-        #warning TODO: write the can-handler for the new APIs of STM32
-    #endif
       
     // initialised mask       
     static std::uint32_t initialisedmask = 0;
@@ -182,7 +175,8 @@ namespace embot { namespace hw { namespace can {
     static std::vector<Frame> *s_rxQ;
 
 #if defined(STM32HAL_HAS_CAN_API_Vxxx)
-
+    static CAN_TxHeaderTypeDef TxMessage;
+    static CAN_RxHeaderTypeDef RxMessage;
 #else    
     //allocate memory for HAL
     static CanTxMsgTypeDef        TxMessage;
@@ -239,7 +233,11 @@ namespace embot { namespace hw { namespace can {
         HAL_StatusTypeDef res = HAL_ERROR;
 
 #if defined(STM32HAL_HAS_CAN_API_Vxxx)
-    
+        HAL_CAN_ActivateNotification(&hcan1, CAN_IT_TX_MAILBOX_EMPTY);
+        uint32_t TxMailboxNum; //currently not used!!!
+        TxMessage.StdId = frame.id & 0x7FF;
+        TxMessage.DLC = frame.size;
+        res = HAL_CAN_AddTxMessage(hcan, &TxMessage, frame.data, &TxMailboxNum); //copies frame into mailbox and activates interrupt
 #else         
         //1) copy frame to hal memory
         hcan->pTxMsg->StdId = frame.id & 0x7FF;
@@ -297,7 +295,12 @@ namespace embot { namespace hw { namespace can {
         Frame rxframe;
 
 #if defined(STM32HAL_HAS_CAN_API_Vxxx)
-    
+        HAL_StatusTypeDef res = HAL_CAN_GetRxMessage (hcan, CAN_RX_FIFO0, &RxMessage, rxframe.data);
+        /*
+            if(res!=HAL_OK) dai errore
+         */
+        rxframe.id = RxMessage.StdId;
+        rxframe.size = RxMessage.DLC;
 #else          
         rxframe.id = hcan->pRxMsg->StdId;
         rxframe.size = hcan->pRxMsg->DLC;
@@ -341,18 +344,17 @@ namespace embot { namespace hw { namespace can {
         
         s_config = config;
 
-#if defined(STM32HAL_HAS_CAN_API_Vxxx)
-    return resNOK;
-#else          
         //configure txframe like a data frame with standard ID. (we never use ext or remote frames)
         TxMessage.ExtId = 0;
         TxMessage.IDE = CAN_ID_STD;
         TxMessage.RTR = CAN_RTR_DATA;
-        
+        #if defined(STM32HAL_HAS_CAN_API_Vxxx)
+        // hal doesn't need memory
+        #else
         //gives memeory to HAL
         hcan1.pTxMsg = &TxMessage;
         hcan1.pRxMsg = &RxMessage;    
-    
+        #endif
         // init peripheral
         MX_CAN1_Init();
         
@@ -364,8 +366,12 @@ namespace embot { namespace hw { namespace can {
         s_rxQ->reserve(config.rxcapacity);
                   
         /*##-2- Configure the CAN Filter ###########################################*/
+        #if defined(STM32HAL_HAS_CAN_API_Vxxx)
+        CAN_FilterTypeDef sFilterConfig;
+        #else        
         CAN_FilterConfTypeDef sFilterConfig;
-        sFilterConfig.FilterNumber = 0;
+        #endif
+        
         sFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
         sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
         sFilterConfig.FilterIdHigh = 0x0000;
@@ -374,16 +380,27 @@ namespace embot { namespace hw { namespace can {
         sFilterConfig.FilterMaskIdLow = 0x0000;
         sFilterConfig.FilterFIFOAssignment = 0;
         sFilterConfig.FilterActivation = ENABLE;
+        #if defined(STM32HAL_HAS_CAN_API_Vxxx)
+        sFilterConfig.FilterBank = 0;
+        sFilterConfig.SlaveStartFilterBank = 14;
+        #else
+        sFilterConfig.FilterNumber = 0;
         sFilterConfig.BankNumber = 14;
+        #endif
         if(HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig) != HAL_OK)
         {
         
         }
     
+        #if defined(STM32HAL_HAS_CAN_API_Vxxx)
+        if(HAL_OK != HAL_CAN_Start(&hcan1))
+            return resNOK; //TODO: adding clear of vector
+        #endif
+        
         embot::binary::bit::set(initialisedmask, port2index(p));
 
         return resOK;
-#endif        
+ 
     }
 
     result_t embot::hw::can::enable(Port p)
@@ -393,12 +410,18 @@ namespace embot { namespace hw { namespace can {
             return resNOK;
         }  
 
-        
+       //disable TX interrupt because driver sents frames only on user's request by func hal_can_transmit
 #if defined(STM32HAL_HAS_CAN_API_Vxxx)
-        return resNOK;
+        HAL_StatusTypeDef resTx = HAL_CAN_DeactivateNotification(&hcan1, CAN_IT_TX_MAILBOX_EMPTY);
+        HAL_StatusTypeDef resRx = HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING); 
+        
+        if( (resTx!=HAL_OK) || (resRx!=HAL_OK) )
+            return resNOK;
+        else
+             return resOK;
 #else
         //enable rx interrupt
-        __HAL_CAN_DISABLE_IT(&hcan1, CAN_IT_TME); //disable interrupt because driver sents frames only on user's request by func hal_can_transmit
+        __HAL_CAN_DISABLE_IT(&hcan1, CAN_IT_TME); 
         //__HAL_CAN_ENABLE_IT(&hcan1, CAN_IT_FMP0);
         HAL_StatusTypeDef res = HAL_CAN_Receive_IT(&hcan1, CAN_FIFO0);
  
@@ -421,7 +444,13 @@ namespace embot { namespace hw { namespace can {
 
         // do whatever is needed
 #if defined(STM32HAL_HAS_CAN_API_Vxxx)
-        return resNOK;
+        HAL_StatusTypeDef resTx = HAL_CAN_DeactivateNotification(&hcan1, CAN_IT_TX_MAILBOX_EMPTY);
+        HAL_StatusTypeDef resRx = HAL_CAN_DeactivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
+        if( (resTx!=HAL_OK) || (resRx!=HAL_OK) )
+            return resNOK;
+        else
+             return resOK;
+
 #else        
         __HAL_CAN_DISABLE_IT(&hcan1, CAN_IT_FMP0);
         __HAL_CAN_DISABLE_IT(&hcan1, CAN_IT_TME);
@@ -438,11 +467,13 @@ namespace embot { namespace hw { namespace can {
         }  
         
 #if defined(STM32HAL_HAS_CAN_API_Vxxx)
-        return resNOK;
+        uint8_t tx_is_enabled = __HAL_CAN_IS_ENABLE_IT(&hcan1, CAN_IT_TX_MAILBOX_EMPTY);
+        HAL_CAN_DeactivateNotification(&hcan1, CAN_IT_TX_MAILBOX_EMPTY);
 #else        
         uint8_t tx_is_enabled = __HAL_CAN_IS_ENABLE_IT(&hcan1, CAN_IT_TME);
         
         __HAL_CAN_DISABLE_IT(&hcan1, CAN_IT_TME);
+#endif
         if(s_Qtx->size() == s_config.txcapacity)
         {
             s_Qtx->erase(s_Qtx->begin());
@@ -452,11 +483,14 @@ namespace embot { namespace hw { namespace can {
         s_Qtx->push_back(frame);
         if(tx_is_enabled)
         {
+            #if defined(STM32HAL_HAS_CAN_API_Vxxx)
+                HAL_CAN_ActivateNotification(&hcan1, CAN_IT_TX_MAILBOX_EMPTY);
+            #else        
             __HAL_CAN_ENABLE_IT(&hcan1, CAN_IT_TME);
+            #endif
         }
         
-        return resOK;    
-#endif               
+        return resOK;                 
     }   
     
     
@@ -469,20 +503,25 @@ namespace embot { namespace hw { namespace can {
         } 
         
 #if defined(STM32HAL_HAS_CAN_API_Vxxx)
-        return 0;
-#else  
-        
-        uint8_t tx_is_enabled = __HAL_CAN_IS_ENABLE_IT(&hcan1, CAN_IT_TME); 
+        uint8_t tx_is_enabled = __HAL_CAN_IS_ENABLE_IT(&hcan1, CAN_IT_TX_MAILBOX_EMPTY);
+        HAL_CAN_DeactivateNotification(&hcan1, CAN_IT_TX_MAILBOX_EMPTY);
+#else        
+        uint8_t tx_is_enabled = __HAL_CAN_IS_ENABLE_IT(&hcan1, CAN_IT_TME);
         
         __HAL_CAN_DISABLE_IT(&hcan1, CAN_IT_TME);
+#endif
         uint8_t size = s_Qtx->size();
         if(tx_is_enabled)
         {
+            #if defined(STM32HAL_HAS_CAN_API_Vxxx)
+                HAL_CAN_ActivateNotification(&hcan1, CAN_IT_TX_MAILBOX_EMPTY);
+            #else        
             __HAL_CAN_ENABLE_IT(&hcan1, CAN_IT_TME);
+            #endif
         }
                 
         return size;   
-#endif    
+    
     }
     
     std::uint8_t embot::hw::can::inputqueuesize(Port p)
@@ -490,17 +529,23 @@ namespace embot { namespace hw { namespace can {
         if(false == initialised(p))
         {
             return 0;
-        }  
+        } 
+        
+        uint32_t size = 0;
+#if defined(STM32HAL_HAS_CAN_API_Vxxx)
+        HAL_CAN_DeactivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
+#else 
+        __HAL_CAN_DISABLE_IT(&hcan1, CAN_IT_FMP0);
+#endif        
+        size = s_rxQ->size();
         
 #if defined(STM32HAL_HAS_CAN_API_Vxxx)
-        return 0;
-#else 
-        uint32_t size = 0;
-        __HAL_CAN_DISABLE_IT(&hcan1, CAN_IT_FMP0);
-        size = s_rxQ->size();
+        HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
+#else         
         __HAL_CAN_ENABLE_IT(&hcan1, CAN_IT_FMP0);
+#endif
         return size;
-#endif                
+                
     }
 
     
@@ -533,14 +578,20 @@ namespace embot { namespace hw { namespace can {
             return resNOK;
         } 
         
-
+        bool empty = true;   
 #if defined(STM32HAL_HAS_CAN_API_Vxxx)
-        return resNOK;
-#else     
-        bool empty = true;        
+        HAL_CAN_DeactivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
+#else 
         __HAL_CAN_DISABLE_IT(&hcan1, CAN_IT_FMP0);
+#endif
         empty = s_rxQ->empty();
+        
+#if defined(STM32HAL_HAS_CAN_API_Vxxx)
+        HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
+#else         
         __HAL_CAN_ENABLE_IT(&hcan1, CAN_IT_FMP0);
+#endif
+
        
         if(empty)
         {
@@ -548,14 +599,22 @@ namespace embot { namespace hw { namespace can {
             return resNOK;
         }
         
+#if defined(STM32HAL_HAS_CAN_API_Vxxx)
+        HAL_CAN_DeactivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
+#else 
         __HAL_CAN_DISABLE_IT(&hcan1, CAN_IT_FMP0);
+#endif
         frame = s_rxQ->front();        
         s_rxQ->erase(s_rxQ->begin());
         remaining = s_rxQ->size();
+        
+#if defined(STM32HAL_HAS_CAN_API_Vxxx)
+        HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
+#else         
         __HAL_CAN_ENABLE_IT(&hcan1, CAN_IT_FMP0);
+#endif
               
-        return resOK;     
-#endif     
+        return resOK;         
     }
 
     
@@ -566,13 +625,13 @@ namespace embot { namespace hw { namespace can {
             return resNOK;
         } 
 
-#if defined(STM32HAL_HAS_CAN_API_Vxxx)
-        return resNOK;
-#else 
+        #if defined(STM32HAL_HAS_CAN_API_Vxxx)
+        CAN_FilterTypeDef sFilterConfig;
+        #else        
+        CAN_FilterConfTypeDef sFilterConfig;
+        #endif        
         
          /* Configure the CAN Filter for message of class polling sensor */
-        CAN_FilterConfTypeDef sFilterConfig;
-        sFilterConfig.FilterNumber = 0;
         sFilterConfig.FilterMode = CAN_FILTERMODE_IDLIST;
         sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
         sFilterConfig.FilterIdHigh = (0x200 | address) << 5;
@@ -581,44 +640,69 @@ namespace embot { namespace hw { namespace can {
         sFilterConfig.FilterMaskIdLow = 0x0000;
         sFilterConfig.FilterFIFOAssignment = 0;
         sFilterConfig.FilterActivation = ENABLE;
+        #if defined(STM32HAL_HAS_CAN_API_Vxxx)
+        sFilterConfig.FilterBank = 0;
+        sFilterConfig.SlaveStartFilterBank = 0;
+        #else
+        sFilterConfig.FilterNumber = 0;
         sFilterConfig.BankNumber = 0;
+        #endif
         if(HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig) != HAL_OK)
         {
             return resNOK;
         }
         
-        sFilterConfig.FilterNumber = 1;
+        
         sFilterConfig.FilterIdHigh = 0x20F << 5;
         sFilterConfig.FilterIdLow = 0x0000;
         sFilterConfig.FilterMaskIdHigh = 0x0000;
         sFilterConfig.FilterMaskIdLow = 0x0000;
         sFilterConfig.FilterActivation = ENABLE;
+        #if defined(STM32HAL_HAS_CAN_API_Vxxx)
+        sFilterConfig.FilterBank = 1;
+        sFilterConfig.SlaveStartFilterBank = 0;
+        #else
+        sFilterConfig.FilterNumber = 1;
         sFilterConfig.BankNumber = 0;
+        #endif
         if(HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig) != HAL_OK)
         {
             return resNOK;
         }
         
          /* Configure the CAN Filter for message of class bootloader sensor */
-        sFilterConfig.FilterNumber = 2;
+        
         sFilterConfig.FilterIdHigh = (0x700 | address) << 5;
         sFilterConfig.FilterIdLow = 0x0000;
         sFilterConfig.FilterMaskIdHigh = 0x0000;
         sFilterConfig.FilterMaskIdLow = 0x0000;
         sFilterConfig.FilterActivation = ENABLE;
+        #if defined(STM32HAL_HAS_CAN_API_Vxxx)
+        sFilterConfig.FilterBank = 2;
+        sFilterConfig.SlaveStartFilterBank = 1;
+        #else
+        sFilterConfig.FilterNumber = 2;
         sFilterConfig.BankNumber = 1;
+        #endif
+
         if(HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig) != HAL_OK)
         {
             return resNOK;
         }
         
-        sFilterConfig.FilterNumber = 3;
+        
         sFilterConfig.FilterIdHigh = 0x70F << 5;
         sFilterConfig.FilterIdLow = 0x0000;
         sFilterConfig.FilterMaskIdHigh = 0x0000;
         sFilterConfig.FilterMaskIdLow = 0x0000;
         sFilterConfig.FilterActivation = ENABLE;
+        #if defined(STM32HAL_HAS_CAN_API_Vxxx)
+        sFilterConfig.FilterBank = 3;
+        sFilterConfig.SlaveStartFilterBank = 1;
+        #else
+        sFilterConfig.FilterNumber = 3;
         sFilterConfig.BankNumber = 1;
+        #endif
         if(HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig) != HAL_OK)
         {
             return resNOK;
@@ -626,32 +710,44 @@ namespace embot { namespace hw { namespace can {
 
 
         /* Configure the CAN Filter for message of class bootloader sensor */
-        sFilterConfig.FilterNumber = 4;
         sFilterConfig.FilterIdHigh = (0x000 | address) << 5;
         sFilterConfig.FilterIdLow = 0x0000;
         sFilterConfig.FilterMaskIdHigh = 0x0000;
         sFilterConfig.FilterMaskIdLow = 0x0000;
         sFilterConfig.FilterActivation = ENABLE;
+        #if defined(STM32HAL_HAS_CAN_API_Vxxx)
+        sFilterConfig.FilterBank = 4;
+        sFilterConfig.SlaveStartFilterBank = 2;
+        #else
+        sFilterConfig.FilterNumber = 4;
         sFilterConfig.BankNumber = 2;
+        #endif
+
         if(HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig) != HAL_OK)
         {
             return resNOK;
         }
         
-        sFilterConfig.FilterNumber = 5;
+        
         sFilterConfig.FilterIdHigh = 0x00F << 5;
         sFilterConfig.FilterIdLow = 0x0000;
         sFilterConfig.FilterMaskIdHigh = 0x0000;
         sFilterConfig.FilterMaskIdLow = 0x0000;
         sFilterConfig.FilterActivation = ENABLE;
+        #if defined(STM32HAL_HAS_CAN_API_Vxxx)
+        sFilterConfig.FilterBank = 5;
+        sFilterConfig.SlaveStartFilterBank = 2;
+        #else
+        sFilterConfig.FilterNumber = 5;
         sFilterConfig.BankNumber = 2;
+        #endif
+        
         if(HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig) != HAL_OK)
         {
             return resNOK;
         }
         
         return resOK;   
-#endif
     }
     
     
@@ -674,6 +770,28 @@ void CAN1_RX0_IRQHandler(void)
 
 #endif
 
+#if defined(STM32HAL_HAS_CAN_API_Vxxx)
+//with this version of API we can register the callback dinamically, but currently I kept the old style.
+void HAL_CAN_TxMailbox0CompleteCallback(CAN_HandleTypeDef *hcan)
+{
+    embot::hw::can::callbackOnTXcompletion(hcan);
+}
+
+void HAL_CAN_TxMailbox1CompleteCallback(CAN_HandleTypeDef *hcan)
+{
+    embot::hw::can::callbackOnTXcompletion(hcan);
+}
+
+void HAL_CAN_TxMailbox2CompleteCallback(CAN_HandleTypeDef *hcan)
+{
+    embot::hw::can::callbackOnTXcompletion(hcan);
+}
+
+void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
+{
+    embot::hw::can::callbackOnRXcompletion(hcan);
+}
+#else
 
 // these functions must be re-defined. they are weakly defined in the stm32hal.lib 
 
@@ -691,7 +809,7 @@ void HAL_CAN_ErrorCallback(CAN_HandleTypeDef *hcan)
 {
     embot::hw::can::callbackOnError(hcan);
 }
-
+#endif
 
 #endif //defined(HAL_CAN_MODULE_ENABLED)
 
