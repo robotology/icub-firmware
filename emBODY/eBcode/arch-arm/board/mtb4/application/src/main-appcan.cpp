@@ -34,7 +34,7 @@
 #include "embot_hw_bsp_mtb4.h"
 
 
-static const embot::app::canprotocol::versionOfAPPLICATION vAP = {1, 3 , 0};
+static const embot::app::canprotocol::versionOfAPPLICATION vAP = {1, 4 , 0};
 static const embot::app::canprotocol::versionOfCANPROTOCOL vCP = {2, 0};
 
 static void userdeflauncher(void* param);
