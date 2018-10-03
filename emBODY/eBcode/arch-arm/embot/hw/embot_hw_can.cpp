@@ -23,6 +23,8 @@
 
 #include "embot_hw_can.h"
 #define USE_HAL_CAN_REGISTER_CALLBACKS 1
+//NOTE: please don't remove the previous define of USE_HAL_CAN_REGISTER_CALLBACKS because it define the behaviour of 
+//stm hal lib. This macro must be define before including stm32hal.h file.
 #include "stm32hal.h"
 
 
@@ -118,7 +120,7 @@ namespace embot { namespace hw { namespace can {
     #elif   defined(STM32HAL_BOARD_RFE)
     
     #define STM32HAL_HAS_CAN1 
-    #define STM32HAL_HAS_CAN_API_Vxxx
+    #define STM32HAL_HAS_CAN_API_V183
     
     static const bspmap_t bspmap = 
     {
@@ -136,9 +138,9 @@ namespace embot { namespace hw { namespace can {
     static Config s_config;    
     static std::vector<Frame> *s_Qtx;
     static std::vector<Frame> *s_rxQ;
-    //NOTE: in case of STM32HAL_HAS_CAN_API_Vxxx it is not necessary to allocate ram for HAL.
+    //NOTE: in case of STM32HAL_HAS_CAN_API_V183 it is not necessary to allocate ram for HAL.
     //TxMessage and RxMessage are used only for maintains message header information.
-#if defined(STM32HAL_HAS_CAN_API_Vxxx)
+#if defined(STM32HAL_HAS_CAN_API_V183)
     static CAN_TxHeaderTypeDef TxMessage;
     static CAN_RxHeaderTypeDef RxMessage;
 #else    
@@ -183,7 +185,7 @@ static bool can::supported(Port p)
 
 static void can::interrupt_RX_enable(void)
 {
-    #if defined(STM32HAL_HAS_CAN_API_Vxxx)
+    #if defined(STM32HAL_HAS_CAN_API_V183)
     HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
     #else         
     __HAL_CAN_ENABLE_IT(&hcan1, CAN_IT_FMP0);
@@ -191,7 +193,7 @@ static void can::interrupt_RX_enable(void)
 }
 static void can::interrupt_RX_disable(void)
 {
-    #if defined(STM32HAL_HAS_CAN_API_Vxxx)
+    #if defined(STM32HAL_HAS_CAN_API_V183)
     HAL_CAN_DeactivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
     #else 
     __HAL_CAN_DISABLE_IT(&hcan1, CAN_IT_FMP0);
@@ -199,7 +201,7 @@ static void can::interrupt_RX_disable(void)
 }
 static void can::interrupt_TX_enable(void)
 {
-    #if defined(STM32HAL_HAS_CAN_API_Vxxx)
+    #if defined(STM32HAL_HAS_CAN_API_V183)
     HAL_CAN_ActivateNotification(&hcan1, CAN_IT_TX_MAILBOX_EMPTY);
     #else        
     __HAL_CAN_ENABLE_IT(&hcan1, CAN_IT_TME);
@@ -207,7 +209,7 @@ static void can::interrupt_TX_enable(void)
 }
 static void can::interrupt_TX_disable(void)
 {
-    #if defined(STM32HAL_HAS_CAN_API_Vxxx)  
+    #if defined(STM32HAL_HAS_CAN_API_V183)  
     HAL_CAN_DeactivateNotification(&hcan1, CAN_IT_TX_MAILBOX_EMPTY);
     #else        
     __HAL_CAN_DISABLE_IT(&hcan1, CAN_IT_TME);
@@ -217,7 +219,7 @@ static void can::interrupt_TX_disable(void)
 
 static bool can::interrupt_TX_is_enabled(void)
 {
-    #if defined(STM32HAL_HAS_CAN_API_Vxxx)  
+    #if defined(STM32HAL_HAS_CAN_API_V183)  
     //__HAL_CAN_IS_ENABLE_IT(&hcan1, CAN_IT_TX_MAILBOX_EMPTY);
     return ((hcan1.Instance->IER & (CAN_IT_TX_MAILBOX_EMPTY)) == (CAN_IT_TX_MAILBOX_EMPTY));
     #else        
@@ -251,7 +253,7 @@ static void can::s_transmit(CAN_HandleTypeDef *hcan)
     
     HAL_StatusTypeDef res = HAL_ERROR;
 
-    #if defined(STM32HAL_HAS_CAN_API_Vxxx)
+    #if defined(STM32HAL_HAS_CAN_API_V183)
     HAL_CAN_ActivateNotification(&hcan1, CAN_IT_TX_MAILBOX_EMPTY);
     uint32_t TxMailboxNum;
     TxMessage.StdId = frame.id & 0x7FF;
@@ -314,7 +316,7 @@ void can::callbackOnRXcompletion(CAN_HandleTypeDef* hcan)
     
     Frame rxframe;
 
-#if defined(STM32HAL_HAS_CAN_API_Vxxx)
+#if defined(STM32HAL_HAS_CAN_API_V183)
     HAL_StatusTypeDef res = HAL_CAN_GetRxMessage (hcan, CAN_RX_FIFO0, &RxMessage, rxframe.data);
     /*
         if(res!=HAL_OK) dai errore
@@ -368,7 +370,7 @@ result_t can::init(Port p, const Config &config)
     TxMessage.ExtId = 0;
     TxMessage.IDE = CAN_ID_STD;
     TxMessage.RTR = CAN_RTR_DATA;
-    #if defined(STM32HAL_HAS_CAN_API_Vxxx)
+    #if defined(STM32HAL_HAS_CAN_API_V183)
     // hal doesn't need memory
     #else
     //gives memeory to HAL
@@ -386,7 +388,7 @@ result_t can::init(Port p, const Config &config)
     s_rxQ->reserve(config.rxcapacity);
               
     /*##-2- Configure the CAN Filter ###########################################*/
-    #if defined(STM32HAL_HAS_CAN_API_Vxxx)
+    #if defined(STM32HAL_HAS_CAN_API_V183)
     CAN_FilterTypeDef sFilterConfig;
     #else        
     CAN_FilterConfTypeDef sFilterConfig;
@@ -400,7 +402,7 @@ result_t can::init(Port p, const Config &config)
     sFilterConfig.FilterMaskIdLow = 0x0000;
     sFilterConfig.FilterFIFOAssignment = 0;
     sFilterConfig.FilterActivation = ENABLE;
-    #if defined(STM32HAL_HAS_CAN_API_Vxxx)
+    #if defined(STM32HAL_HAS_CAN_API_V183)
     sFilterConfig.FilterBank = 0;
     sFilterConfig.SlaveStartFilterBank = 14;
     #else
@@ -412,7 +414,7 @@ result_t can::init(Port p, const Config &config)
     
     }
 
-    #if defined(STM32HAL_HAS_CAN_API_Vxxx)
+    #if defined(STM32HAL_HAS_CAN_API_V183)
     if(HAL_OK != HAL_CAN_RegisterCallback(&hcan1, HAL_CAN_TX_MAILBOX0_COMPLETE_CB_ID, can::callbackOnTXcompletion))
         return resNOK; //TODO: adding clear of vector
     if(HAL_OK != HAL_CAN_RegisterCallback(&hcan1, HAL_CAN_TX_MAILBOX1_COMPLETE_CB_ID, can::callbackOnTXcompletion))
@@ -581,7 +583,7 @@ result_t can::setfilters(Port p, std::uint8_t address)
         return resNOK;
     } 
 
-    #if defined(STM32HAL_HAS_CAN_API_Vxxx)
+    #if defined(STM32HAL_HAS_CAN_API_V183)
     CAN_FilterTypeDef sFilterConfig;
     #else        
     CAN_FilterConfTypeDef sFilterConfig;
@@ -596,7 +598,7 @@ result_t can::setfilters(Port p, std::uint8_t address)
     sFilterConfig.FilterMaskIdLow = 0x0000;
     sFilterConfig.FilterFIFOAssignment = 0;
     sFilterConfig.FilterActivation = ENABLE;
-    #if defined(STM32HAL_HAS_CAN_API_Vxxx)
+    #if defined(STM32HAL_HAS_CAN_API_V183)
     sFilterConfig.FilterBank = 0;
     sFilterConfig.SlaveStartFilterBank = 0;
     #else
@@ -614,7 +616,7 @@ result_t can::setfilters(Port p, std::uint8_t address)
     sFilterConfig.FilterMaskIdHigh = 0x0000;
     sFilterConfig.FilterMaskIdLow = 0x0000;
     sFilterConfig.FilterActivation = ENABLE;
-    #if defined(STM32HAL_HAS_CAN_API_Vxxx)
+    #if defined(STM32HAL_HAS_CAN_API_V183)
     sFilterConfig.FilterBank = 1;
     sFilterConfig.SlaveStartFilterBank = 0;
     #else
@@ -633,7 +635,7 @@ result_t can::setfilters(Port p, std::uint8_t address)
     sFilterConfig.FilterMaskIdHigh = 0x0000;
     sFilterConfig.FilterMaskIdLow = 0x0000;
     sFilterConfig.FilterActivation = ENABLE;
-    #if defined(STM32HAL_HAS_CAN_API_Vxxx)
+    #if defined(STM32HAL_HAS_CAN_API_V183)
     sFilterConfig.FilterBank = 2;
     sFilterConfig.SlaveStartFilterBank = 1;
     #else
@@ -652,7 +654,7 @@ result_t can::setfilters(Port p, std::uint8_t address)
     sFilterConfig.FilterMaskIdHigh = 0x0000;
     sFilterConfig.FilterMaskIdLow = 0x0000;
     sFilterConfig.FilterActivation = ENABLE;
-    #if defined(STM32HAL_HAS_CAN_API_Vxxx)
+    #if defined(STM32HAL_HAS_CAN_API_V183)
     sFilterConfig.FilterBank = 3;
     sFilterConfig.SlaveStartFilterBank = 1;
     #else
@@ -671,7 +673,7 @@ result_t can::setfilters(Port p, std::uint8_t address)
     sFilterConfig.FilterMaskIdHigh = 0x0000;
     sFilterConfig.FilterMaskIdLow = 0x0000;
     sFilterConfig.FilterActivation = ENABLE;
-    #if defined(STM32HAL_HAS_CAN_API_Vxxx)
+    #if defined(STM32HAL_HAS_CAN_API_V183)
     sFilterConfig.FilterBank = 4;
     sFilterConfig.SlaveStartFilterBank = 2;
     #else
@@ -690,7 +692,7 @@ result_t can::setfilters(Port p, std::uint8_t address)
     sFilterConfig.FilterMaskIdHigh = 0x0000;
     sFilterConfig.FilterMaskIdLow = 0x0000;
     sFilterConfig.FilterActivation = ENABLE;
-    #if defined(STM32HAL_HAS_CAN_API_Vxxx)
+    #if defined(STM32HAL_HAS_CAN_API_V183)
     sFilterConfig.FilterBank = 5;
     sFilterConfig.SlaveStartFilterBank = 2;
     #else
@@ -724,7 +726,7 @@ void CAN1_RX0_IRQHandler(void)
 
 #endif
 
-#if defined(STM32HAL_HAS_CAN_API_Vxxx)
+#if defined(STM32HAL_HAS_CAN_API_V183)
 ////with this version of API we can register the callback dinamically, but currently I kept the old style.
 //void HAL_CAN_TxMailbox0CompleteCallback(CAN_HandleTypeDef *hcan)
 //{
