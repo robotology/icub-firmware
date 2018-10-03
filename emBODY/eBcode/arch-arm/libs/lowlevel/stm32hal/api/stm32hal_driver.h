@@ -36,12 +36,12 @@ extern "C" {
 
 // - public interface  ------------------------------------------------------------------------------------------------
   
-#if     defined(STM32HAL_BOARD_NUCLEO64) || defined(STM32HAL_BOARD_MTB4) 
+#if     defined(STM32HAL_BOARD_NUCLEO64) 
 
     // we have three boards which all share the same driver type (stm32l4) and version (v 1.7.2)
     #include "../src/driver/stm32l4-v172/inc/stm32l4xx_hal.h"
 
-#elif   defined(STM32HAL_BOARD_RFE) || defined(STM32HAL_BOARD_STRAIN2)
+#elif   defined(STM32HAL_BOARD_RFE) || defined(STM32HAL_BOARD_STRAIN2) || defined(STM32HAL_BOARD_MTB4) 
 
     // we have one board which needs a different version  (v 1.8.3) of the same driver type (stm32l4)
     #include "../src/driver/stm32l4-v183/inc/stm32l4xx_hal.h"

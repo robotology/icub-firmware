@@ -21,7 +21,7 @@ extern "C" {
     
     #include "../src/config/stm32hal_driver_cfg_of_mtb4.h"   
     // we also need some ll includes contained in the driver section
-    #include "../src/driver/stm32l4-v172/inc/stm32l4xx_ll_gpio.h"
+    #include "../src/driver/stm32l4-v183/inc/stm32l4xx_ll_gpio.h"
     
 #elif   defined(STM32HAL_BOARD_STRAIN2)
     
