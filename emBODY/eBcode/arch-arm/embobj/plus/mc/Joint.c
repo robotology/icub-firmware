@@ -718,7 +718,20 @@ CTRL_UNITS Joint_do_vel_control(Joint* o)
           //case eomc_controlmode_velocity: // not RAW
                 if (o->vel_ref == ZERO)
                 {
-                    o->vel_ref = o->scKstill*o->pos_err;
+                    if (o->pos_err > o->dead_zone)
+                    {
+                        o->pos_err -= o->dead_zone;
+                    }
+                    else if (o->pos_err < -o->dead_zone)
+                    {
+                        o->pos_err += o->dead_zone;
+                    }
+                    else
+                    {
+                        o->pos_err = ZERO;
+                    }
+                    
+                    o->vel_ref = o->scKpos*o->pos_err;
                 }
                 else
                 {
