@@ -30,7 +30,7 @@
 
 //#include "embot_hw_timer.h"
 
-
+#include "embot_hw_usb.h"
 
 
 #if defined(STM32HAL_BOARD_RFE)
@@ -153,6 +153,11 @@ static void start_evt_based(void)
     r = embot::hw::can::setfilters(embot::hw::can::Port::one, embot::app::theCANboardInfo::getInstance().getCANaddress());
     r = r;
      
+     embot::hw::usb::Config config;
+     config.rxcapacity = 20;
+     config.onrxmessage.callback = nullptr; //usb_rx_callback;
+     config.onrxmessage.arg = nullptr;
+     embot::hw::usb::init(embot::hw::usb::Port::one, config);
 }
 
 
