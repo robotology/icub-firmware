@@ -2399,7 +2399,7 @@
       <GroupNumber>6</GroupNumber>
       <FileNumber>146</FileNumber>
       <FileType>1</FileType>
-      <tvExp>0</tvExp>
+      <tvExp>1</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
       <PathWithFileName>..\src\board\strain2\src\board_strain2.c</PathWithFileName>
@@ -2519,7 +2519,7 @@
 
   <Group>
     <GroupName>board-rfe</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
