@@ -44,7 +44,7 @@ extern "C" {
 // called by stm32hal_init() if stm32hal_config_t::initbsp is true
     
 extern void stm32hal_board_init(void);    
-    
+extern void SystemClock_Config(void);    
     
 // - public interface: begin  -----------------------------------------------------------------------------------------  
 // it contains whatever cube-mx generates.
