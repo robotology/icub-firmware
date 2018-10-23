@@ -39,7 +39,7 @@
     #error: cannot include embot_hw_bsp_rfe.h
 #endif
 
-
+extern uint32_t usbParser(uint8_t * RecMsg);
 static const embot::app::canprotocol::versionOfAPPLICATION vAP = {1, 0 , 0};
 static const embot::app::canprotocol::versionOfCANPROTOCOL vCP = {2, 0};
 
@@ -82,31 +82,18 @@ static void userdeflauncher(void* param)
 }
 
 
-
-// marco accame on 20 august 2018: 
-// i commented out the imu and temperature stuff and left only the hanfling of bootloader and basic can messages
-// MUST: 
-// 1. think of how to do the application: event based from an hw handler of usb? periodic?
-// 2. add an agent for the robot face expression .. usb communication? 
-// 
-
 static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask evtmsk, void *p);
 static void eventbasedtask_init(embot::sys::Task *t, void *p);
 
 static const embot::common::Event evRXcanframe = 0x00000001 << 0;
-//static const embot::common::Event evSTRAINtick = 0x00000001 << 1;
-///static const embot::common::Event evSTRAINdataready = 0x00000001 << 2;
-//static const embot::common::Event evIMUtick = 0x00000001 << 3;
-//static const embot::common::Event evIMUdataready = 0x00000001 << 4;
-//static const embot::common::Event evTHERMOtick = 0x00000001 << 5;
-//static const embot::common::Event evTHERMOdataready = 0x00000001 << 6;
+static const embot::common::Event evRXusbmessage = 0x00000001 << 1;
 
 static const std::uint8_t maxOUTcanframes = 48;
 
 static embot::sys::EventTask* eventbasedtask = nullptr;
 
 static void alerteventbasedtask(void *arg);
-
+static void alerteventbasedtaskusb(void *arg);
 static std::vector<embot::hw::can::Frame> outframes;
 
 
@@ -123,26 +110,6 @@ static void start_evt_based(void)
     embot::app::application::theCANparserBasic::Config configbasic;
     canparserbasic.initialise(configbasic);  
         
-    // start canparser imu
-//    embot::app::application::theCANparserIMU &canparserimu = embot::app::application::theCANparserIMU::getInstance();
-//    embot::app::application::theCANparserIMU::Config configparserimu;
-//    canparserimu.initialise(configparserimu);      
-
-    // start canparser thermo
-//    embot::app::application::theCANparserTHERMO &canparserthermo = embot::app::application::theCANparserTHERMO::getInstance();
-//    embot::app::application::theCANparserTHERMO::Config configparserthermo;
-//    canparserthermo.initialise(configparserthermo); 
-            
-    // start agent of imu
-//    embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance();
-//    embot::app::application::theIMU::Config configimu(embot::hw::bsp::strain2::imuBOSCH, embot::hw::bsp::strain2::imuBOSCHconfig, evIMUtick, evIMUdataready, eventbasedtask);
-//    theimu.initialise(configimu);     
-    
-    // start agent of thermo
-//    embot::app::application::theTHERMO &thethermo = embot::app::application::theTHERMO::getInstance();
-//    embot::app::application::theTHERMO::Config configthermo(embot::hw::bsp::strain2::thermometerSGAUGES, embot::hw::bsp::strain2::thermometerSGAUGESconfig, evTHERMOtick, evTHERMOdataready, eventbasedtask);
-//    thethermo.initialise(configthermo);         
-
     // finally start can. i keep it as last because i dont want that the isr-handler calls its onrxframe() 
     // before the eventbasedtask is created.
     embot::hw::result_t r = embot::hw::resNOK;
@@ -152,12 +119,7 @@ static void start_evt_based(void)
     r = embot::hw::can::init(embot::hw::can::Port::one, canconfig);
     r = embot::hw::can::setfilters(embot::hw::can::Port::one, embot::app::theCANboardInfo::getInstance().getCANaddress());
     r = r;
-     
-     embot::hw::usb::Config config;
-     config.rxcapacity = 20;
-     config.onrxmessage.callback = nullptr; //usb_rx_callback;
-     config.onrxmessage.arg = nullptr;
-     embot::hw::usb::init(embot::hw::usb::Port::one, config);
+
 }
 
 
@@ -169,6 +131,13 @@ static void alerteventbasedtask(void *arg)
     }
 }
 
+static void alerteventbasedtaskusb(void *arg)
+{
+    if(nullptr != eventbasedtask)
+    {
+        eventbasedtask->setEvent(evRXusbmessage);
+    }
+}
 
 
 
@@ -179,7 +148,14 @@ static void eventbasedtask_init(embot::sys::Task *t, void *p)
     
     outframes.reserve(maxOUTcanframes);
     //#warning --> we should init the objects which holds outframes with maxOUTcanframes ... so that no more than maxOUTcanframes are pushed_back
+    
+    
+     embot::hw::usb::Config config;
+     config.rxcapacity = 20;
+     config.onrxmessage = embot::common::Callback(alerteventbasedtaskusb, nullptr); 
+     embot::hw::usb::init(embot::hw::usb::Port::one, config);
 }
+
     
 
 
@@ -220,31 +196,23 @@ static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask
             }
         }        
     }
-        
     
-//    if(true == embot::binary::mask::check(eventmask, evIMUtick))
-//    {        
-//        embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance();
-//        theimu.tick(outframes);        
-//    }   
     
-//    if(true == embot::binary::mask::check(eventmask, evIMUdataready))
-//    {        
-//        embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance();
-//        theimu.processdata(outframes);        
-//    }
-     
-//    if(true == embot::binary::mask::check(eventmask, evTHERMOtick))
-//    {        
-//        embot::app::application::theTHERMO &thethermo = embot::app::application::theTHERMO::getInstance();
-//        thethermo.tick(outframes);        
-//    }   
+    if(true == embot::binary::mask::check(eventmask, evRXusbmessage))
+    {        
+        embot::hw::usb::Message msg;
+        std::uint8_t remainingINrx = 0;
+        if(embot::hw::resOK == embot::hw::usb::get(embot::hw::usb::Port::one, msg, remainingINrx))
+        {            
+            uint32_t res = usbParser(msg.data);
+            
+            if(remainingINrx > 0)
+            {
+                eventbasedtask->setEvent(evRXusbmessage);                 
+            }
+        }        
+    }        
     
-//    if(true == embot::binary::mask::check(eventmask, evTHERMOdataready))
-//    {        
-//        embot::app::application::theTHERMO &thethermo = embot::app::application::theTHERMO::getInstance();
-//        thethermo.processdata(outframes);        
-//    }
     
     // if we have any packet we transmit them
     std::uint8_t num = outframes.size();

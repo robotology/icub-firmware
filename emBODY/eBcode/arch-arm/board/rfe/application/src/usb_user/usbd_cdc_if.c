@@ -49,7 +49,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "usbd_cdc_if.h"
-//#include "embot_hw_usb.h"
+#include "embot_hw_usb.h"
 
 /* USER CODE BEGIN INCLUDE */
 
@@ -167,10 +167,22 @@ static int8_t CDC_Control_FS(uint8_t cmd, uint8_t* pbuf, uint16_t length);
 static int8_t CDC_Receive_FS(uint8_t* pbuf, uint32_t *Len);
 
 /* USER CODE BEGIN PRIVATE_FUNCTIONS_DECLARATION */
-__weak void USB_receiveMessageUserCallback(uint8_t* Buf, uint32_t *Len)
-{;}
-//void USB_receiveMessageUserCallback(uint8_t* Buf, uint32_t *Len)
-//{embot::hw::usb::callbackOnRXcompletion(Buf, Len);}
+//__weak void USB_receiveMessageUserCallback(uint8_t* Buf, uint32_t *Len)
+//{;}
+void USB_receiveMessageUserCallback(uint8_t* Buf, uint32_t *Len)
+{embot::hw::usb::callbackOnRXcompletion(Buf, Len);}
+
+static bool isProtocolMessage(uint8_t* Buf, uint32_t *Len)
+{
+    if(*Len == 1)
+        return true;
+    if(Buf[0] == 0x7E)
+        return true;
+    return false;
+}
+
+
+
 //extern int somthingtoparser;
 //void usb_rx_callback(void *ptr)
 //{
@@ -317,8 +329,10 @@ static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
 {
   /* USER CODE BEGIN 6 */
 
-  USB_receiveMessageUserCallback(Buf, Len);
-    
+  if(!isProtocolMessage(Buf, Len))
+  {
+      USB_receiveMessageUserCallback(Buf, Len);
+  }
   USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);    
   USBD_CDC_ReceivePacket(&hUsbDeviceFS);
   // This function CDC_Receive_FS is a callback function invoked when data is received - add 3 extra lines of code to copy the data to my own buffer 
