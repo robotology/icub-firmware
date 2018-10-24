@@ -90,6 +90,9 @@ extern void stm32hal_board_init(void)
     MX_GPIO_Init();
     MX_DMA_Init();
     MX_RNG_Init();
+    MX_SPI1_Init();
+    MX_SPI2_Init();
+    MX_TIM6_Init();
     // IIT-EXT: we init those in the relevant .cpp or _init() 
     #if 0
     MX_ADC1_Init();
@@ -98,11 +101,10 @@ extern void stm32hal_board_init(void)
     MX_I2C2_Init();
     MX_I2C3_Init();
     MX_I2C4_Init();
-    MX_SPI1_Init();
-    MX_SPI2_Init();
+    
     MX_TIM2_Init();
     MX_USB_DEVICE_Init();
-    MX_TIM6_Init();
+    
     MX_TIM16_Init()
     #endif
 

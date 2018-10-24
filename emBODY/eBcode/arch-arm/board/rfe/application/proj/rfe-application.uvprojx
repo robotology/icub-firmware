@@ -389,6 +389,16 @@
               <FileType>1</FileType>
               <FilePath>..\src\usb_parser.c</FilePath>
             </File>
+            <File>
+              <FileName>RFE_Expression.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\RFE_Expression.c</FilePath>
+            </File>
+            <File>
+              <FileName>tlc59711.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\tlc59711.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1472,7 +1482,7 @@
               <MiscControls>--cpp11</MiscControls>
               <Define>USE_STM32HAL STM32HAL_BOARD_RFE APPL_TESTZEROOFFSET</Define>
               <Undefine></Undefine>
-              <IncludePath>..\src-plus;..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask;..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\eBcode\arch-arm\embot\common;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\sys;..\..\..\..\..\..\eBcode\arch-arm\embot;..\src\others;..\..\..\..\..\..\eBcode\arch-arm\embot\tools;..\..\..\..\..\..\eBcode\arch-arm\embot\binary;..\..\..\..\..\..\eBcode\arch-arm\embot\dsp;..\src\bosch-driver;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\src\STM32_USB_Device_Library\Class\CDC\Inc;..\src\STM32_USB_Device_Library\Core\Inc;..\src\usb_user;..\..\..\..\libs\lowlevel\stm32hal\src\driver\stm32l4-v183\inc</IncludePath>
+              <IncludePath>..\src-plus;..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask;..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\eBcode\arch-arm\embot\common;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\sys;..\..\..\..\..\..\eBcode\arch-arm\embot;..\src\others;..\..\..\..\..\..\eBcode\arch-arm\embot\tools;..\..\..\..\..\..\eBcode\arch-arm\embot\binary;..\..\..\..\..\..\eBcode\arch-arm\embot\dsp;..\src\bosch-driver;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\src\STM32_USB_Device_Library\Class\CDC\Inc;..\src\STM32_USB_Device_Library\Core\Inc;..\src\usb_user;..\..\..\..\libs\lowlevel\stm32hal\src\driver\stm32l4-v183\inc;..\src;..\..\..\..\libs\lowlevel\stm32hal\src\board\rfe\inc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1525,6 +1535,16 @@
               <FileName>usb_parser.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\usb_parser.c</FilePath>
+            </File>
+            <File>
+              <FileName>RFE_Expression.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\RFE_Expression.c</FilePath>
+            </File>
+            <File>
+              <FileName>tlc59711.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\tlc59711.c</FilePath>
             </File>
           </Files>
         </Group>
