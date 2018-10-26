@@ -399,6 +399,46 @@
               <FileType>1</FileType>
               <FilePath>..\src\tlc59711.c</FilePath>
             </File>
+            <File>
+              <FileName>faceExpressionsDefinitions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\faceExpressionsDefinitions.h</FilePath>
+            </File>
+            <File>
+              <FileName>faceExpressionsGifts.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\faceExpressionsGifts.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>faceExpressionsLowLevelDriver.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\faceExpressionsLowLevelDriver.h</FilePath>
+            </File>
+            <File>
+              <FileName>faceExpressionsModule.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\faceExpressionsModule.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>faceExpressionsModule.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\faceExpressionsModule.h</FilePath>
+            </File>
+            <File>
+              <FileName>faceExpressionsTypes.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\faceExpressionsTypes.h</FilePath>
+            </File>
+            <File>
+              <FileName>faceExpressionsLowLevelDriver.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\faceExpressionsLowLevelDriver.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>faceExpressionsTypes.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\faceExpressionsTypes.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1545,6 +1585,46 @@
               <FileName>tlc59711.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\tlc59711.c</FilePath>
+            </File>
+            <File>
+              <FileName>faceExpressionsDefinitions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\faceExpressionsDefinitions.h</FilePath>
+            </File>
+            <File>
+              <FileName>faceExpressionsGifts.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\faceExpressionsGifts.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>faceExpressionsLowLevelDriver.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\faceExpressionsLowLevelDriver.h</FilePath>
+            </File>
+            <File>
+              <FileName>faceExpressionsModule.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\faceExpressionsModule.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>faceExpressionsModule.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\faceExpressionsModule.h</FilePath>
+            </File>
+            <File>
+              <FileName>faceExpressionsTypes.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\src\faceExpressionsTypes.h</FilePath>
+            </File>
+            <File>
+              <FileName>faceExpressionsLowLevelDriver.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\faceExpressionsLowLevelDriver.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>faceExpressionsTypes.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\faceExpressionsTypes.cpp</FilePath>
             </File>
           </Files>
         </Group>

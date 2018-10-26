@@ -37,6 +37,9 @@
 #include "RFE_gif.h"
 
 
+#include "faceExpressionsModule.h"
+
+
 #if defined(STM32HAL_BOARD_RFE)
     #include "embot_hw_bsp_rfe.h"
 #else
@@ -114,6 +117,8 @@ extern void RFE_Expression(uint32_t *Expression, uint32_t color, uint8_t *RFE_St
 extern void TLC59711_SendDataPacket(uint8_t *Data, uint16_t Datasize);
 extern void TLC59711_BrightnessSet(uint8_t percent);
 
+RfeApp::FaceExpressions faceExpressions;
+
 
 static void start_evt_based(void)
 { 
@@ -174,6 +179,8 @@ static void eventbasedtask_init(embot::sys::Task *t, void *p)
      config.rxcapacity = 20;
      config.onrxmessage = embot::common::Callback(alerteventbasedtaskusb, nullptr); 
      embot::hw::usb::init(embot::hw::usb::Port::one, config);
+    
+    faceExpressions.init();
 }
 
     
@@ -224,25 +231,26 @@ static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask
         std::uint8_t remainingINrx = 0;
         if(embot::hw::resOK == embot::hw::usb::get(embot::hw::usb::Port::one, msg, remainingINrx))
         {            
-            uint32_t res = usbParser(msg.data);
+            faceExpressions.loadNewExpression(msg.data, msg.size);//uint32_t res = usbParser(msg.data);
             
             if(remainingINrx > 0)
             {
                 eventbasedtask->setEvent(evRXusbmessage);                 
             }
             
-            switch(res)
-            {
-                case 1: Expression=FACE1; break;
-                case 2: Expression=FACE2; break;
-                case 3: Expression=FACE3; break;
-                case 4: Expression=FACE4; break;
-                default: Expression=FACE5;
-            };
-            
-            //DisplayExpression(time_period);
-            RFE_Expression(Expression, DontChange, DataStream, RFE_Expression_StreamLength);
-            TLC59711_SendDataPacket(DataStream, RFE_Expression_StreamLength);
+//            switch(res)
+//            {
+//                case 1: Expression=FACE1; break;
+//                case 2: Expression=FACE2; break;
+//                case 3: Expression=FACE3; break;
+//                case 4: Expression=FACE4; break;
+//                default: Expression=FACE5;
+//            };
+//            
+//            //DisplayExpression(time_period);
+//            RFE_Expression(Expression, DontChange, DataStream, RFE_Expression_StreamLength);
+//            TLC59711_SendDataPacket(DataStream, RFE_Expression_StreamLength);
+            faceExpressions.displayExpression();
         }        
     }        
     
