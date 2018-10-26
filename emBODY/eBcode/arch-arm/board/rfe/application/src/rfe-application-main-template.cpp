@@ -104,19 +104,6 @@ static void alerteventbasedtaskusb(void *arg);
 static std::vector<embot::hw::can::Frame> outframes;
 
 //expression
-uint8_t Tx[RFE_Expression_StreamLength] = {0};
-uint8_t *Data_TMP;
-uint32_t color=0;
-uint8_t SPI_NR_MSG=0;
-uint8_t SPI_TX_OK=1;
-//uint8_t *DataStream;
-uint8_t DataStream[RFE_Expression_StreamLength];
-uint32_t *Expression;
-uint8_t BrightnessPercent=90;
-extern void RFE_Expression(uint32_t *Expression, uint32_t color, uint8_t *RFE_Stream, uint16_t size);
-extern void TLC59711_SendDataPacket(uint8_t *Data, uint16_t Datasize);
-extern void TLC59711_BrightnessSet(uint8_t percent);
-
 RfeApp::FaceExpressions faceExpressions;
 
 
@@ -171,10 +158,9 @@ static void eventbasedtask_init(embot::sys::Task *t, void *p)
     outframes.reserve(maxOUTcanframes);
     //#warning --> we should init the objects which holds outframes with maxOUTcanframes ... so that no more than maxOUTcanframes are pushed_back
     
-    HAL_GPIO_WritePin(EN_5V_GPIO_Port, EN_5V_Pin, GPIO_PIN_SET);
-    
-    TLC59711_BrightnessSet(BrightnessPercent);
-    
+    //HAL_GPIO_WritePin(EN_5V_GPIO_Port, EN_5V_Pin, GPIO_PIN_SET);
+    #warning VALE 
+   
      embot::hw::usb::Config config;
      config.rxcapacity = 20;
      config.onrxmessage = embot::common::Callback(alerteventbasedtaskusb, nullptr); 
@@ -231,25 +217,13 @@ static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask
         std::uint8_t remainingINrx = 0;
         if(embot::hw::resOK == embot::hw::usb::get(embot::hw::usb::Port::one, msg, remainingINrx))
         {            
-            faceExpressions.loadNewExpression(msg.data, msg.size);//uint32_t res = usbParser(msg.data);
+            faceExpressions.loadNewExpression(msg.data, msg.size);
             
             if(remainingINrx > 0)
             {
                 eventbasedtask->setEvent(evRXusbmessage);                 
             }
             
-//            switch(res)
-//            {
-//                case 1: Expression=FACE1; break;
-//                case 2: Expression=FACE2; break;
-//                case 3: Expression=FACE3; break;
-//                case 4: Expression=FACE4; break;
-//                default: Expression=FACE5;
-//            };
-//            
-//            //DisplayExpression(time_period);
-//            RFE_Expression(Expression, DontChange, DataStream, RFE_Expression_StreamLength);
-//            TLC59711_SendDataPacket(DataStream, RFE_Expression_StreamLength);
             faceExpressions.displayExpression();
         }        
     }        

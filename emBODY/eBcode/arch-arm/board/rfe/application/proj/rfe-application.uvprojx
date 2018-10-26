@@ -385,59 +385,44 @@
               <FilePath>../src/rfe-application-main-template.cpp</FilePath>
             </File>
             <File>
-              <FileName>usb_parser.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\usb_parser.c</FilePath>
-            </File>
-            <File>
-              <FileName>RFE_Expression.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\RFE_Expression.c</FilePath>
-            </File>
-            <File>
-              <FileName>tlc59711.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\tlc59711.c</FilePath>
-            </File>
-            <File>
               <FileName>faceExpressionsDefinitions.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\faceExpressionsDefinitions.h</FilePath>
+              <FilePath>..\src\faceExpressions\faceExpressionsDefinitions.h</FilePath>
             </File>
             <File>
               <FileName>faceExpressionsGifts.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\faceExpressionsGifts.cpp</FilePath>
+              <FilePath>..\src\faceExpressions\faceExpressionsGifts.cpp</FilePath>
             </File>
             <File>
               <FileName>faceExpressionsLowLevelDriver.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\faceExpressionsLowLevelDriver.h</FilePath>
+              <FilePath>..\src\faceExpressions\faceExpressionsLowLevelDriver.h</FilePath>
             </File>
             <File>
               <FileName>faceExpressionsModule.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\faceExpressionsModule.cpp</FilePath>
+              <FilePath>..\src\faceExpressions\faceExpressionsModule.cpp</FilePath>
             </File>
             <File>
               <FileName>faceExpressionsModule.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\faceExpressionsModule.h</FilePath>
+              <FilePath>..\src\faceExpressions\faceExpressionsModule.h</FilePath>
             </File>
             <File>
               <FileName>faceExpressionsTypes.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\faceExpressionsTypes.h</FilePath>
+              <FilePath>..\src\faceExpressions\faceExpressionsTypes.h</FilePath>
             </File>
             <File>
               <FileName>faceExpressionsLowLevelDriver.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>.\faceExpressionsLowLevelDriver.cpp</FilePath>
+              <FilePath>..\src\faceExpressionsLowLevelDriver.cpp</FilePath>
             </File>
             <File>
               <FileName>faceExpressionsTypes.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>.\faceExpressionsTypes.cpp</FilePath>
+              <FilePath>..\src\faceExpressionsTypes.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1522,7 +1507,7 @@
               <MiscControls>--cpp11</MiscControls>
               <Define>USE_STM32HAL STM32HAL_BOARD_RFE APPL_TESTZEROOFFSET</Define>
               <Undefine></Undefine>
-              <IncludePath>..\src-plus;..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask;..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\eBcode\arch-arm\embot\common;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\sys;..\..\..\..\..\..\eBcode\arch-arm\embot;..\src\others;..\..\..\..\..\..\eBcode\arch-arm\embot\tools;..\..\..\..\..\..\eBcode\arch-arm\embot\binary;..\..\..\..\..\..\eBcode\arch-arm\embot\dsp;..\src\bosch-driver;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\src\STM32_USB_Device_Library\Class\CDC\Inc;..\src\STM32_USB_Device_Library\Core\Inc;..\src\usb_user;..\..\..\..\libs\lowlevel\stm32hal\src\driver\stm32l4-v183\inc;..\src;..\..\..\..\libs\lowlevel\stm32hal\src\board\rfe\inc</IncludePath>
+              <IncludePath>..\src-plus;..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask;..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\eBcode\arch-arm\embot\common;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\sys;..\..\..\..\..\..\eBcode\arch-arm\embot;..\src\others;..\..\..\..\..\..\eBcode\arch-arm\embot\tools;..\..\..\..\..\..\eBcode\arch-arm\embot\binary;..\..\..\..\..\..\eBcode\arch-arm\embot\dsp;..\src\bosch-driver;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\src\STM32_USB_Device_Library\Class\CDC\Inc;..\src\STM32_USB_Device_Library\Core\Inc;..\src\usb_user;..\..\..\..\libs\lowlevel\stm32hal\src\driver\stm32l4-v183\inc;..\src;..\..\..\..\libs\lowlevel\stm32hal\src\board\rfe\inc;..\src\faceExpressions</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1572,59 +1557,44 @@
               <FilePath>../src/rfe-application-main-template.cpp</FilePath>
             </File>
             <File>
-              <FileName>usb_parser.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\usb_parser.c</FilePath>
-            </File>
-            <File>
-              <FileName>RFE_Expression.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\RFE_Expression.c</FilePath>
-            </File>
-            <File>
-              <FileName>tlc59711.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\tlc59711.c</FilePath>
-            </File>
-            <File>
               <FileName>faceExpressionsDefinitions.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\faceExpressionsDefinitions.h</FilePath>
+              <FilePath>..\src\faceExpressions\faceExpressionsDefinitions.h</FilePath>
             </File>
             <File>
               <FileName>faceExpressionsGifts.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\faceExpressionsGifts.cpp</FilePath>
+              <FilePath>..\src\faceExpressions\faceExpressionsGifts.cpp</FilePath>
             </File>
             <File>
               <FileName>faceExpressionsLowLevelDriver.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\faceExpressionsLowLevelDriver.h</FilePath>
+              <FilePath>..\src\faceExpressions\faceExpressionsLowLevelDriver.h</FilePath>
             </File>
             <File>
               <FileName>faceExpressionsModule.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\faceExpressionsModule.cpp</FilePath>
+              <FilePath>..\src\faceExpressions\faceExpressionsModule.cpp</FilePath>
             </File>
             <File>
               <FileName>faceExpressionsModule.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\faceExpressionsModule.h</FilePath>
+              <FilePath>..\src\faceExpressions\faceExpressionsModule.h</FilePath>
             </File>
             <File>
               <FileName>faceExpressionsTypes.h</FileName>
               <FileType>5</FileType>
-              <FilePath>..\src\faceExpressionsTypes.h</FilePath>
+              <FilePath>..\src\faceExpressions\faceExpressionsTypes.h</FilePath>
             </File>
             <File>
               <FileName>faceExpressionsLowLevelDriver.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>.\faceExpressionsLowLevelDriver.cpp</FilePath>
+              <FilePath>..\src\faceExpressionsLowLevelDriver.cpp</FilePath>
             </File>
             <File>
               <FileName>faceExpressionsTypes.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>.\faceExpressionsTypes.cpp</FilePath>
+              <FilePath>..\src\faceExpressionsTypes.cpp</FilePath>
             </File>
           </Files>
         </Group>
