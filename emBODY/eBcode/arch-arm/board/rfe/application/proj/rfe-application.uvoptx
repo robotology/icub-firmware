@@ -916,7 +916,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\faceExpressionsLowLevelDriver.cpp</PathWithFileName>
+      <PathWithFileName>..\src\faceExpressions\faceExpressionsLowLevelDriver.cpp</PathWithFileName>
       <FilenameWithoutPath>faceExpressionsLowLevelDriver.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -928,7 +928,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\faceExpressionsTypes.cpp</PathWithFileName>
+      <PathWithFileName>..\src\faceExpressions\faceExpressionsTypes.cpp</PathWithFileName>
       <FilenameWithoutPath>faceExpressionsTypes.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>

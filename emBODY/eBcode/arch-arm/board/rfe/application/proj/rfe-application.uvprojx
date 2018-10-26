@@ -417,12 +417,12 @@
             <File>
               <FileName>faceExpressionsLowLevelDriver.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\faceExpressionsLowLevelDriver.cpp</FilePath>
+              <FilePath>..\src\faceExpressions\faceExpressionsLowLevelDriver.cpp</FilePath>
             </File>
             <File>
               <FileName>faceExpressionsTypes.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\faceExpressionsTypes.cpp</FilePath>
+              <FilePath>..\src\faceExpressions\faceExpressionsTypes.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1589,12 +1589,12 @@
             <File>
               <FileName>faceExpressionsLowLevelDriver.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\faceExpressionsLowLevelDriver.cpp</FilePath>
+              <FilePath>..\src\faceExpressions\faceExpressionsLowLevelDriver.cpp</FilePath>
             </File>
             <File>
               <FileName>faceExpressionsTypes.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\src\faceExpressionsTypes.cpp</FilePath>
+              <FilePath>..\src\faceExpressions\faceExpressionsTypes.cpp</FilePath>
             </File>
           </Files>
         </Group>

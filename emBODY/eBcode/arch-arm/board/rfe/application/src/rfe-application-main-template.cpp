@@ -1,42 +1,11 @@
-
-
-
-#include "embot_app_canprotocol.h"
-#include "embot_app_theCANboardInfo.h"
-
 #include "embot.h"
-
-#include "embot_common.h"
 #include "embot_binary.h"
-#include "embot_dsp.h"
-
-#include "stm32hal.h" // to see bsp_led_init etc
-#include "embot_hw.h"
-#include "embot_hw_sys.h"
-
-#include "embot_hw_FlashStorage.h"
-#include "embot_sys_theStorage.h"
-
 #include "embot_app_theApplication.h"
 
 #include "embot_app_application_theCANparserBasic.h"
-
-//#include "embot_app_application_theCANparserIMU.h"
-//#include "embot_app_application_theCANparserTHERMO.h"
-
-
-//#include "embot_app_application_theIMU.h"
-//#include "embot_app_application_theTHERMO.h"
-
-//#include "embot_hw_timer.h"
+#include "embot_app_theCANboardInfo.h"
 
 #include "embot_hw_usb.h"
-
-//includes for expression
-#include "RFE_Expression.h"
-#include "RFE_gif.h"
-
-
 #include "faceExpressionsModule.h"
 
 
@@ -158,9 +127,7 @@ static void eventbasedtask_init(embot::sys::Task *t, void *p)
     outframes.reserve(maxOUTcanframes);
     //#warning --> we should init the objects which holds outframes with maxOUTcanframes ... so that no more than maxOUTcanframes are pushed_back
     
-    //HAL_GPIO_WritePin(EN_5V_GPIO_Port, EN_5V_Pin, GPIO_PIN_SET);
-    #warning VALE 
-   
+ 
      embot::hw::usb::Config config;
      config.rxcapacity = 20;
      config.onrxmessage = embot::common::Callback(alerteventbasedtaskusb, nullptr); 

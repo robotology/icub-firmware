@@ -37,14 +37,15 @@ using namespace std;
 
 void FaceExpressionsLLDriver::preparePacket(FacePartExpr_t &facepartexpr)
 {
-    for(uint8_t nr_tlc=0; nr_tlc<5/*TODO*/; nr_tlc++)
+    for(uint8_t nr_tlc=0; nr_tlc<hwConfig.numOf.TLCperPart; nr_tlc++)
     {
         tlcdriver.reset();
-        for(uint8_t nr_led=0; nr_led<4; nr_led++) // single TLC scan (4 LEDs)
+        for(uint8_t nr_led=0; nr_led<hwConfig.numOf.LedsperTLC; nr_led++) // single TLC scan (4 LEDs)
         {                          
             tlcdriver.setColor(nr_led,facepartexpr.expressionMask_ptr[nr_led+4*(nr_tlc)]);
         }
-        volatile uint16_t tlc_start_index = (facepartexpr.tlc_start+5/*num of tlc per part*/-1-nr_tlc)*28/*tlc packet size*/;
+        //since the configuration of led works like as shift register, I need to invert the order of tlc packet: the first becomes the last 
+        volatile uint16_t tlc_start_index = (facepartexpr.tlc_start + hwConfig.numOf.TLCperPart -1 - nr_tlc)* (static_cast<uint8_t>(TLCPacketInfo_t::totalsize));
         tlcdriver.createDataPacket(&globalDataPacket[tlc_start_index]);
         
     }
@@ -60,7 +61,7 @@ TLCDriver::TLCDriver()
 
 void TLCDriver::reset(void)
 {
-    for(uint8_t i=0; i<static_cast<uint8_t>(FaceExpressionLL_numOf::LedsperTLC); i++)
+    for(uint8_t i=0; i<static_cast<uint8_t>(HardwareConfig_numOf_t::ledsperTLC); i++)
         leds[i].reset();
 }
 

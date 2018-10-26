@@ -31,7 +31,12 @@ namespace RfeApp{
     
     enum class FacePart_t {leftEBrow=0, rightEBrow=1, mouth=2, facePartMaxNum=3} ;
     enum class Expression_t {neutral=0, happy=1, sad=2, surprised=3, angry=4, evil=5, shy=6, cunning=7, expressionMaxNum=8} ;
-    enum class FaceExpressionLL_numOf {faceParts=3, TLCperPart=5, LedsperTLC=4, ColorsPerLed=3, BytesPerColor=2} ;
+//    enum class HardwareConfig_numOf_t {faceParts=3, TLCperPart=5, ledsperTLC=4, colorsPerLed=3, bytesPerColor=2} ;
+
+//    enum class TLCPacketInfo_t {headersize=4, totalsize= (static_cast<std::uint8_t>(HardwareConfig_numOf_t::ledsperTLC))*
+//                                                         (static_cast<std::uint8_t>(HardwareConfig_numOf_t::colorsPerLed))*
+//                                                         (static_cast<std::uint8_t>(HardwareConfig_numOf_t::bytesPerColor)) +
+//                                                          (static_cast<std::uint8_t>(headersize))};
     enum /*class*/ LedColor {   dontChange=0x000000, //I removed class in order semplify gift definition even if I lose strong type (see faceExpressionsGifts.cpp) 
                             black  =  0x000000,
                             white  =  0xFFFFFF,
