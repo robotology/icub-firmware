@@ -75,6 +75,36 @@ static std::vector<embot::hw::can::Frame> outframes;
 //expression
 RfeApp::FaceExpressions faceExpressions;
 
+volatile embot::common::Time t_load = 0;
+volatile embot::common::Time t_display = 0;
+volatile embot::common::Time t_total = 0;
+
+struct Average_t
+{
+    embot::common::Time sum;
+    std::uint32_t       count;
+    embot::common::Time avg;
+    float               avg_f;
+    embot::common::Time min;
+    embot::common::Time max;
+    
+    Average_t() : sum(0), count(0), avg(0), avg_f(0.0), min(3000000), max(0){;}
+    void calculate(void){avg=sum/count;avg_f=sum/static_cast<float>(count);}
+    void set(embot::common::Time val)
+    {
+        sum +=val;
+        count++;
+        if(val<min) min=val;
+        if(val>max) max=val;
+    }
+};
+
+Average_t loadAvg;
+Average_t displayAvg;
+Average_t totalAvg;
+
+uint32_t totCount=0;
+
 
 static void start_evt_based(void)
 { 
@@ -183,15 +213,36 @@ static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask
         embot::hw::usb::Message msg;
         std::uint8_t remainingINrx = 0;
         if(embot::hw::resOK == embot::hw::usb::get(embot::hw::usb::Port::one, msg, remainingINrx))
-        {            
+        {   
+            embot::common::Time t1 = embot::sys::timeNow();
             faceExpressions.loadNewExpression(msg.data, msg.size);
+            embot::common::Time t2 = embot::sys::timeNow();
+            faceExpressions.displayExpression();
+            embot::common::Time t3 = embot::sys::timeNow();
+            
+            t_load = t2-t1;
+            t_display = t3-t2;
+            t_total = t3-t1;
+            
+            loadAvg.set(t_load);
+            displayAvg.set(t_display);
+            totalAvg.set(t_total);
+            
+            totCount++;
+            
+            if(totCount==5)
+            {
+                loadAvg.calculate();
+                displayAvg.calculate();
+                totalAvg.calculate();
+                totCount=0;
+            }
             
             if(remainingINrx > 0)
             {
                 eventbasedtask->setEvent(evRXusbmessage);                 
             }
-            
-            faceExpressions.displayExpression();
+
         }        
     }        
     
