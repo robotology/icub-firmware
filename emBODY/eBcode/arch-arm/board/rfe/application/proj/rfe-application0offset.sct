@@ -22,13 +22,13 @@
 
 
 ; flash starts from xx and its size is xxx
-LR_IROM1 0x08000000 0x0001F000  {    ; load region size_region
-  ER_IROM1 0x08000000 0x0001F000  {  ; load address = execution address
+LR_IROM1 0x08000000 0x00020000  {    ; load region size_region
+  ER_IROM1 0x08000000 0x00020000  {  ; load address = execution address
    *.o (RESET, +First)
    *(InRoot$$Sections)
    .ANY (+RO)
   }
-  RW_IRAM1 0x20000020 0xBFE0  {  ; RW data
+  RW_IRAM1 0x20000020 0xFFE0  {  ; RW data
    .ANY (+RW +ZI)
   }
 }  

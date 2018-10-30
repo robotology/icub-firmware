@@ -27,38 +27,67 @@ using namespace std;
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
-//extern const LedColor mouth_happy[5*4]; 
-//extern const LedColor lBrow_happy[5*4];
-//extern const LedColor rBrow_happy[5*4]; 
+#include "faceExpressionsLowLevelDriver.h"
+
+////FACE1
+//const LedColor mouth_happy[5*4] = {green,green,white,green,black,green,white,green,green,white,white,green,green,green,white,green,black,green,white,green};
+//const LedColor lBrow_happy[5*4] = {black,green,black,black,black,green,black,black,black,green,black,black,black,green,black,black,black,green,black,black};
+//const LedColor rBrow_happy[5*4] = {black,green,black,black,black,green,black,black,black,green,black,black,black,green,black,black,black,green,black,black};
 //    
-//    
-//extern const LedColor mouth_sad[5*4];
-//extern const LedColor lBrow_sad[5*4];
-//extern const LedColor rBrow_sad[5*4];
+////FACE2    
+//const LedColor mouth_sad[5*4] = {black, red, red, red, black, red, black, red, red, black, black, red, black, red, red, red, black, red, black, red};
+//const LedColor lBrow_sad[5*4] = {black,black,black,purple,black,black,black,purple,black,black,black,purple,black,black,black,purple,black,black,black,purple};
+//const LedColor rBrow_sad[5*4] = {black,black,black,purple,black,black,black,purple,black,black,black,purple,black,black,black,purple,black,black,black,purple};
 
-//extern const LedColor mouth_neutral[5*4];
-//extern const LedColor lBrow_neutral[5*4];
-//extern const LedColor rBrow_neutral[5*4];
+////FACE3
+//const LedColor mouth_neutral[5*4] =  {black, red, red, red, black, red, black, red, red, black, black, red, black, red, red, red, black, red, black, red};
+//const LedColor lBrow_neutral[5*4] =  {black,black,purple,black,black,black,purple,black,black,black,purple,black,black,black,purple,black,black,black,purple,black};
+//const LedColor rBrow_neutral[5*4] =  {black,black,purple,black,black,black,purple,black,black,black,purple,black,black,black,purple,black,black,black,purple,black};
 
-
-
-//FACE1
-const LedColor mouth_happy[5*4] = {green,green,white,green,black,green,white,green,green,white,white,green,green,green,white,green,black,green,white,green};
-const LedColor lBrow_happy[5*4] = {black,green,black,black,black,green,black,black,black,green,black,black,black,green,black,black,black,green,black,black};
-const LedColor rBrow_happy[5*4] = {black,green,black,black,black,green,black,black,black,green,black,black,black,green,black,black,black,green,black,black};
+//test with colors
+constexpr std::uint32_t numOfLedInApart = (static_cast<std::uint8_t>(HardwareConfig_numOf_t::ledsperTLC))*
+                                          (static_cast<std::uint8_t>(HardwareConfig_numOf_t::TLCperPart));
+//FACE hap green
+const LedColor mouth_happy[numOfLedInApart] = {green,green,white,green,black,green,white,green,green,white,white,green,green,green,white,green,black,green,white,green};
+const LedColor lBrow_happy[numOfLedInApart] = {black,green,black,black,black,green,black,black,black,green,black,black,black,green,black,black,black,green,black,black};
+const LedColor rBrow_happy[numOfLedInApart] = {black,green,black,black,black,green,black,black,black,green,black,black,black,green,black,black,black,green,black,black};
     
-//FACE2    
-const LedColor mouth_sad[5*4] = {black, red, red, red, black, red, black, red, red, black, black, red, black, red, red, red, black, red, black, red};
-const LedColor lBrow_sad[5*4] = {black,black,black,purple,black,black,black,purple,black,black,black,purple,black,black,black,purple,black,black,black,purple};
-const LedColor rBrow_sad[5*4] = {black,black,black,purple,black,black,black,purple,black,black,black,purple,black,black,black,purple,black,black,black,purple};
+    
+//red
+const LedColor mouth_angry[numOfLedInApart] = {red,red,white,red,black,red,white,red,red,white,white,red,red,red,white,red,black,red,white,red};
+const LedColor lBrow_angry[numOfLedInApart] = {black,red,black,black,black,red,black,black,black,red,black,black,black,red,black,black,black,red,black,black};
+const LedColor rBrow_angry[numOfLedInApart] = {black,red,black,black,black,red,black,black,black,red,black,black,black,red,black,black,black,red,black,black};
 
-//FACE3
-const LedColor mouth_neutral[5*4] =  {black, red, red, red, black, red, black, red, red, black, black, red, black, red, red, red, black, red, black, red};
-const LedColor lBrow_neutral[5*4] =  {black,black,purple,black,black,black,purple,black,black,black,purple,black,black,black,purple,black,black,black,purple,black};
-const LedColor rBrow_neutral[5*4] =  {black,black,purple,black,black,black,purple,black,black,black,purple,black,black,black,purple,black,black,black,purple,black};
+//blue
+const LedColor mouth_neutral[numOfLedInApart] = {blue,blue,white,blue,black,blue,white,blue,blue,white,white,blue,blue,blue,white,blue,black,blue,white,blue};
+const LedColor lBrow_neutral[numOfLedInApart] = {black,blue,black,black,black,blue,black,black,black,blue,black,black,black,blue,black,black,black,blue,black,black};
+const LedColor rBrow_neutral[numOfLedInApart] = {black,blue,black,black,black,blue,black,black,black,blue,black,black,black,blue,black,black,black,blue,black,black};
 
+//yellow
+const LedColor mouth_surprised[numOfLedInApart] = {yellow,yellow,white,yellow,black,yellow,white,yellow,yellow,white,white,yellow,yellow,yellow,white,yellow,black,yellow,white,yellow};
+const LedColor lBrow_surprised[numOfLedInApart] = {black,yellow,black,black,black,yellow,black,black,black,yellow,black,black,black,yellow,black,black,black,yellow,black,black};
+const LedColor rBrow_surprised[numOfLedInApart] = {black,yellow,black,black,black,yellow,black,black,black,yellow,black,black,black,yellow,black,black,black,yellow,black,black};
 
+//maroon
+const LedColor mouth_sad[numOfLedInApart] = {maroon,maroon,white,maroon,black,maroon,white,maroon,maroon,white,white,maroon,maroon,maroon,white,maroon,black,maroon,white,maroon};
+const LedColor lBrow_sad[numOfLedInApart] = {black,maroon,black,black,black,maroon,black,black,black,maroon,black,black,black,maroon,black,black,black,maroon,black,black};
+const LedColor rBrow_sad[numOfLedInApart] = {black,maroon,black,black,black,maroon,black,black,black,maroon,black,black,black,maroon,black,black,black,maroon,black,black};
 
+//purple
+const LedColor mouth_evil[numOfLedInApart] = {purple,purple,white,purple,black,purple,white,purple,purple,white,white,purple,purple,purple,white,purple,black,purple,white,purple};
+const LedColor lBrow_evil[numOfLedInApart] = {black,purple,black,black,black,purple,black,black,black,purple,black,black,black,purple,black,black,black,purple,black,black};
+const LedColor rBrow_evil[numOfLedInApart] = {black,purple,black,black,black,purple,black,black,black,purple,black,black,black,purple,black,black,black,purple,black,black};
+
+//navy
+const LedColor mouth_shy[numOfLedInApart] = {navy,navy,white,navy,black,navy,white,navy,navy,white,white,navy,navy,navy,white,navy,black,navy,white,navy};
+const LedColor lBrow_shy[numOfLedInApart] = {black,navy,black,black,black,navy,black,black,black,navy,black,black,black,navy,black,black,black,navy,black,black};
+const LedColor rBrow_shy[numOfLedInApart] = {black,navy,black,black,black,navy,black,black,black,navy,black,black,black,navy,black,black,black,navy,black,black};
+
+//olive
+const LedColor mouth_cunning[numOfLedInApart] = {olive,olive,white,olive,black,olive,white,olive,olive,white,white,olive,olive,olive,white,olive,black,olive,white,olive};
+const LedColor lBrow_cunning[numOfLedInApart] = {black,olive,black,black,black,olive,black,black,black,olive,black,black,black,olive,black,black,black,olive,black,black};
+const LedColor rBrow_cunning[numOfLedInApart] = {black,olive,black,black,black,olive,black,black,black,olive,black,black,black,olive,black,black,black,olive,black,black};
+    
 // --------------------------------------------------------------------------------------------------------------------
 // - all the rest
 // --------------------------------------------------------------------------------------------------------------------
@@ -94,7 +123,7 @@ bool FacePartExpr_t::loadGift(Expression_t expression)
             expressionMask_ptr =  nullptr;
     
     }
-    
+
     if(nullptr == expressionMask_ptr)
         return false;
     else
@@ -116,6 +145,22 @@ static LedColor const * loadMouthGift(Expression_t expression)
         
         case Expression_t::sad:
             return &mouth_sad[0];
+        
+        case Expression_t::surprised:
+            return &mouth_surprised[0];
+        
+        case Expression_t::angry:
+            return &mouth_angry[0];
+        
+        case Expression_t::evil:
+            return &mouth_evil[0];
+
+        case Expression_t::shy:
+            return &mouth_shy[0];
+        
+        case Expression_t::cunning:
+            return &mouth_cunning[0];
+
         default:
             return nullptr;
     
@@ -135,6 +180,22 @@ static LedColor const * loadLBrowGift(Expression_t expression)
         
         case Expression_t::sad:
             return &lBrow_sad[0];
+        
+        case Expression_t::surprised:
+            return &lBrow_surprised[0];
+        
+        case Expression_t::angry:
+            return &lBrow_angry[0];
+        
+        case Expression_t::evil:
+            return &lBrow_evil[0];
+
+        case Expression_t::shy:
+            return &lBrow_shy[0];        
+
+        case Expression_t::cunning:
+            return &lBrow_cunning[0];
+
         default:
             return nullptr;
     
@@ -154,6 +215,22 @@ static LedColor const * loadRBrowGift(Expression_t expression)
         
         case Expression_t::sad:
             return &rBrow_sad[0];
+        
+        case Expression_t::surprised:
+            return &rBrow_surprised[0];
+        
+        case Expression_t::angry:
+            return &rBrow_angry[0];
+        
+        case Expression_t::evil:
+            return &rBrow_evil[0];
+
+        case Expression_t::shy:
+            return &rBrow_shy[0];        
+
+        case Expression_t::cunning:
+            return &rBrow_cunning[0];
+
         default:
             return nullptr;
     

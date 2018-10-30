@@ -103,14 +103,16 @@ static uint32_t getHexVal(uint8_t *recMsg)
     return strtol((char*)recMsg, &end, 16);
 }
 
-
+/*FaceExpressions::parse parses a single command and return true if it recognizes it else false.
+TODO: this function can parses more commands and put the reult in an array of pair (part, expression).
+The code to pare more commands already exists, I need only to pass an array as in-out parametr and manage them outside*/
 bool FaceExpressions::parse(uint8_t *data, uint32_t size, FacePart_t &part, Expression_t &expression)
 { 
     uint8_t i=0;
 //    char resp[80];
     uint32_t emotionId=0;
     static uint32_t count_cmd=0;
-    
+    bool res = false;
     if(size == 0)
         return false;
 
@@ -127,13 +129,14 @@ bool FaceExpressions::parse(uint8_t *data, uint32_t size, FacePart_t &part, Expr
             part=FacePart_t::leftEBrow;
             i=i+3;
             count_cmd++;
+            res = true;
           }
           break;
           case 'I':   //SWITCH ON ALL THE LEDS
           {
             //TODO
             count_cmd++;
-           
+            res = false;
             i=i+1;
           }
           break;
@@ -143,14 +146,17 @@ bool FaceExpressions::parse(uint8_t *data, uint32_t size, FacePart_t &part, Expr
             expression = static_cast<Expression_t>(emotionId);  
             part=FacePart_t::mouth;
             count_cmd++;
+            res = true;
             i=i+3;
           }
           break;
           case 'S':  //eyelids
           {
             //skip because we haven't eyelids
+            res = false;
             count_cmd++;
             i=i+3;
+            
           }
           break;
           case 'R':  //Right EyeBrows
@@ -160,13 +166,14 @@ bool FaceExpressions::parse(uint8_t *data, uint32_t size, FacePart_t &part, Expr
             part=FacePart_t::rightEBrow;
             count_cmd++;
             i=i+3;
+            res = true;
           }
           break;
           case 'Z':   //SWITCH OFF ALL THE LEDS
           {
             // TODO SWITCH ON ALL THE LEDS
              count_cmd++;
-           
+           res = false;
             i=i+1;
           }
           break;
@@ -175,6 +182,7 @@ bool FaceExpressions::parse(uint8_t *data, uint32_t size, FacePart_t &part, Expr
             // TODO SWITCH ON ALL THE LEDS
             count_cmd++;
             i=i+1;
+            res=false;
           }
           break;
           default:
@@ -198,8 +206,7 @@ bool FaceExpressions::parse(uint8_t *data, uint32_t size, FacePart_t &part, Expr
 //    }
 
 
-return true;
+return res;
 
 }
-void FaceExpressions::getFace(void){;} //??utile     
 

@@ -53,7 +53,7 @@ void FaceExpressionsLLDriver::preparePacket(FacePartExpr_t &facepartexpr)
 }
 void FaceExpressionsLLDriver::sendStream(void)
 {
-    HAL_SPI_Transmit_DMA(&hspi1, globalDataPacket, 420/*todo*/);
+    HAL_SPI_Transmit_DMA(&hspi1, globalDataPacket, globalDataPacketSize);
 }
 
 TLCDriver::TLCDriver()
@@ -67,7 +67,8 @@ void TLCDriver::reset(void)
 
 void TLCDriver::setColor(uint8_t ledNum, LedColor c)
 {
-    uint8_t ledNum_rev = 3-ledNum; //I need to revert the order of led. //todo: improve comment and use enum
+    //uint8_t ledNum_rev = 3-ledNum; //I need to revert the order of led. //todo: improve comment and use enum
+    uint8_t ledNum_rev = ledNum;
     uint32_t RED, GREEN, BLUE;
     RED   = ((c & 0xFF0000)>>0x10)*0x101;
     GREEN = ((c & 0x00FF00)>>0x08)*0x101;
@@ -87,32 +88,61 @@ void TLCDriver::createDataPacket(uint8_t *packet)
   packet[ 2] = (brightness4AllLeds.B<<6)  + (brightness4AllLeds.G>>1);
   packet[ 3] = (brightness4AllLeds.G<<7)  + (brightness4AllLeds.R);
   
-  packet[ 4] = leds[3].B>>8;
-  packet[ 5] = leds[3].B;
-  packet[ 6] = leds[3].G>>8;
-  packet[ 7] = leds[3].G;
-  packet[ 8] = leds[3].R>>8;
-  packet[ 9] = leds[3].R;
-  
-  packet[10] = leds[2].B>>8;
-  packet[11] = leds[2].B;
-  packet[12] = leds[2].G>>8;
-  packet[13] = leds[2].G;
-  packet[14] = leds[2].R>>8;
-  packet[15] = leds[2].R;
-  
-  packet[16] = leds[1].B>>8;
-  packet[17] = leds[1].B;
-  packet[18] = leds[1].G>>8;
-  packet[19] = leds[1].G;
-  packet[20] = leds[1].R>>8;
-  packet[21] = leds[1].R;
-  
-  packet[22] = leds[0].B>>8;
-  packet[23] = leds[0].B;
-  packet[24] = leds[0].G>>8;
-  packet[25] = leds[0].G;
-  packet[26] = leds[0].R>>8;
-  packet[27] = leds[0].R;
+//  packet[ 4] = leds[3].B>>8;
+//  packet[ 5] = leds[3].B;
+//  packet[ 6] = leds[3].G>>8;
+//  packet[ 7] = leds[3].G;
+//  packet[ 8] = leds[3].R>>8;
+//  packet[ 9] = leds[3].R;
+//  
+//  packet[10] = leds[2].B>>8;
+//  packet[11] = leds[2].B;
+//  packet[12] = leds[2].G>>8;
+//  packet[13] = leds[2].G;
+//  packet[14] = leds[2].R>>8;
+//  packet[15] = leds[2].R;
+//  
+//  packet[16] = leds[1].B>>8;
+//  packet[17] = leds[1].B;
+//  packet[18] = leds[1].G>>8;
+//  packet[19] = leds[1].G;
+//  packet[20] = leds[1].R>>8;
+//  packet[21] = leds[1].R;
+//  
+//  packet[22] = leds[0].B>>8;
+//  packet[23] = leds[0].B;
+//  packet[24] = leds[0].G>>8;
+//  packet[25] = leds[0].G;
+//  packet[26] = leds[0].R>>8;
+//  packet[27] = leds[0].R;
     
+
+  packet[ 4] = leds[0].B>>8;
+  packet[ 5] = leds[0].B;
+  packet[ 6] = leds[0].G>>8;
+  packet[ 7] = leds[0].G;
+  packet[ 8] = leds[0].R>>8;
+  packet[ 9] = leds[0].R;
+  
+  packet[10] = leds[1].B>>8;
+  packet[11] = leds[1].B;
+  packet[12] = leds[1].G>>8;
+  packet[13] = leds[1].G;
+  packet[14] = leds[1].R>>8;
+  packet[15] = leds[1].R;
+  
+  packet[16] = leds[2].B>>8;
+  packet[17] = leds[2].B;
+  packet[18] = leds[2].G>>8;
+  packet[19] = leds[2].G;
+  packet[20] = leds[2].R>>8;
+  packet[21] = leds[2].R;
+  
+  packet[22] = leds[3].B>>8;
+  packet[23] = leds[3].B;
+  packet[24] = leds[3].G>>8;
+  packet[25] = leds[3].G;
+  packet[26] = leds[3].R>>8;
+  packet[27] = leds[3].R;
+
 }

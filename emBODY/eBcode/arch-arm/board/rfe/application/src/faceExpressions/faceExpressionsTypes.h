@@ -23,20 +23,10 @@
 
 #include <cstdint>
 
-//#define _FaceExpression_numOfFaceParts  3
-//#define _FaceExpression_numOfTLCPerPart 5
-//#define _FaceExpression_numOfLedsPerTLC 3
-//#define _FaceExpression_numOfColorPerLeds  3
 namespace RfeApp{
     
     enum class FacePart_t {leftEBrow=0, rightEBrow=1, mouth=2, facePartMaxNum=3} ;
     enum class Expression_t {neutral=0, happy=1, sad=2, surprised=3, angry=4, evil=5, shy=6, cunning=7, expressionMaxNum=8} ;
-//    enum class HardwareConfig_numOf_t {faceParts=3, TLCperPart=5, ledsperTLC=4, colorsPerLed=3, bytesPerColor=2} ;
-
-//    enum class TLCPacketInfo_t {headersize=4, totalsize= (static_cast<std::uint8_t>(HardwareConfig_numOf_t::ledsperTLC))*
-//                                                         (static_cast<std::uint8_t>(HardwareConfig_numOf_t::colorsPerLed))*
-//                                                         (static_cast<std::uint8_t>(HardwareConfig_numOf_t::bytesPerColor)) +
-//                                                          (static_cast<std::uint8_t>(headersize))};
     enum /*class*/ LedColor {   dontChange=0x000000, //I removed class in order semplify gift definition even if I lose strong type (see faceExpressionsGifts.cpp) 
                             black  =  0x000000,
                             white  =  0xFFFFFF,
@@ -67,16 +57,6 @@ namespace RfeApp{
         FacePartExpr_t(FacePart_t part);
         bool loadGift(Expression_t expression);   
     };
-
-//struct FaceExpressionLL_numOf {// struct o define o le lascio in ll??
-//    const uint8_t numOfFaceParts=3;
-//    const uint8_t numOfTLCperPart=5;
-//    const uint8_t numOfLedsperTLC=4;
-//    const uint8_t numOfColorPerLeds=3; //RGB
-//    const uint8_t numOfBytePerColors=2; //RGB
-//};
-//    const FaceExpressionLL_numOf pippo; 
-
 };
 #endif  // include-guard
 

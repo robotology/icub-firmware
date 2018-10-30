@@ -26,21 +26,26 @@ using namespace RfeApp;
 
 
 
+////FACE1
+//const LedColor mouth_happy[5*4] = {green,green,white,green,black,green,white,green,green,white,white,green,green,green,white,green,black,green,white,green};
+//const LedColor lBrow_happy[5*4] = {black,green,black,black,black,green,black,black,black,green,black,black,black,green,black,black,black,green,black,black};
+//const LedColor rBrow_happy[5*4] = {black,green,black,black,black,green,black,black,black,green,black,black,black,green,black,black,black,green,black,black};
+//    
+////FACE2    
+//const LedColor mouth_sad[5*4] = {black, red, red, red, black, red, black, red, red, black, black, red, black, red, red, red, black, red, black, red};
+//const LedColor lBrow_sad[5*4] = {black,black,black,purple,black,black,black,purple,black,black,black,purple,black,black,black,purple,black,black,black,purple};
+//const LedColor rBrow_sad[5*4] = {black,black,black,purple,black,black,black,purple,black,black,black,purple,black,black,black,purple,black,black,black,purple};
+
+////FACE3
+//const LedColor mouth_neutral[5*4] =  {black, red, red, red, black, red, black, red, red, black, black, red, black, red, red, red, black, red, black, red};
+//const LedColor lBrow_neutral[5*4] =  {black,black,purple,black,black,black,purple,black,black,black,purple,black,black,black,purple,black,black,black,purple,black};
+//const LedColor rBrow_neutral[5*4] =  {black,black,purple,black,black,black,purple,black,black,black,purple,black,black,black,purple,black,black,black,purple,black};
+
+//test with colors
+    
 //FACE1
 const LedColor mouth_happy[5*4] = {green,green,white,green,black,green,white,green,green,white,white,green,green,green,white,green,black,green,white,green};
 const LedColor lBrow_happy[5*4] = {black,green,black,black,black,green,black,black,black,green,black,black,black,green,black,black,black,green,black,black};
 const LedColor rBrow_happy[5*4] = {black,green,black,black,black,green,black,black,black,green,black,black,black,green,black,black,black,green,black,black};
     
-//FACE2    
-const LedColor mouth_sad[5*4] = {black, red, red, red, black, red, black, red, red, black, black, red, black, red, red, red, black, red, black, red};
-const LedColor lBrow_sad[5*4] = {black,black,black,purple,black,black,black,purple,black,black,black,purple,black,black,black,purple,black,black,black,purple};
-const LedColor rBrow_sad[5*4] = {black,black,black,purple,black,black,black,purple,black,black,black,purple,black,black,black,purple,black,black,black,purple};
-
-//FACE3
-const LedColor mouth_neutral[5*4] =  {black, red, red, red, black, red, black, red, red, black, black, red, black, red, red, red, black, red, black, red};
-const LedColor lBrow_neutral[5*4] =  {black,black,purple,black,black,black,purple,black,black,black,purple,black,black,black,purple,black,black,black,purple,black};
-const LedColor rBrow_neutral[5*4] =  {black,black,purple,black,black,black,purple,black,black,black,purple,black,black,black,purple,black,black,black,purple,black};
-
-        
-
     

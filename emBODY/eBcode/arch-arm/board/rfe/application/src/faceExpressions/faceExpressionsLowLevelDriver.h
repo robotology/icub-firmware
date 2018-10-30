@@ -96,8 +96,6 @@ public:
     private:
     Led_t leds[static_cast<std::uint32_t>(HardwareConfig_numOf_t::ledsperTLC)];
     BrightnessLed_t brightness4AllLeds;
-
-    
 };
 
 
@@ -143,12 +141,12 @@ private:
     
     
     const HardwareConfig_t hwConfig;
-    
+    static constexpr std::uint32_t globalDataPacketSize = (static_cast<std::uint8_t>(HardwareConfig_numOf_t::faceParts))*
+                                                   (static_cast<std::uint8_t>(HardwareConfig_numOf_t::TLCperPart))*
+                                                   (static_cast<std::uint8_t>(TLCPacketInfo_t::totalsize));
     /*The global data size is equal to sum of all tlcpacket for all tlc for all parts.
     It is not possible to send only a part of data.*/
-    std::uint8_t globalDataPacket[ (static_cast<std::uint8_t>(HardwareConfig_numOf_t::faceParts))*
-                                   (static_cast<std::uint8_t>(HardwareConfig_numOf_t::TLCperPart))*
-                                   (static_cast<std::uint8_t>(TLCPacketInfo_t::totalsize))];
+    std::uint8_t globalDataPacket[ globalDataPacketSize ];
 
     TLCDriver    tlcdriver;
 };

@@ -96,11 +96,7 @@
 /* It's up to user to redefine and/or remove those define */
 #define APP_RX_DATA_SIZE  2048
 #define APP_TX_DATA_SIZE  2048
-//#define APP_RX_DATA_SIZE  4
-//#define APP_TX_DATA_SIZE  4
-uint8_t received_data[10]; 
-uint32_t received_data_size; 
-uint32_t receive_total = 0;
+
 
 /* USER CODE END PRIVATE_DEFINES */
 
@@ -335,16 +331,6 @@ static int8_t CDC_Receive_FS(uint8_t* Buf, uint32_t *Len)
   }
   USBD_CDC_SetRxBuffer(&hUsbDeviceFS, &Buf[0]);    
   USBD_CDC_ReceivePacket(&hUsbDeviceFS);
-  // This function CDC_Receive_FS is a callback function invoked when data is received - add 3 extra lines of code to copy the data to my own buffer 
-  char *someother_char = "a";
-  received_data_size = *Len; 
-  memcpy(received_data, Buf, received_data_size); 
-  receive_total += received_data_size;
-  
-  //if(strcmp((char*)received_data, someother_char) == 0){
-  if(*received_data == 'a'){
-    CDC_Transmit_FS(received_data, received_data_size);
-  }
   
   return (USBD_OK);
   /* USER CODE END 6 */
