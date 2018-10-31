@@ -22,15 +22,18 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "embot_hw_can.h"
-#define USE_HAL_CAN_REGISTER_CALLBACKS 1
-//NOTE: please don't remove the previous define of USE_HAL_CAN_REGISTER_CALLBACKS because it define the behaviour of 
-//stm hal lib. This macro must be define before including stm32hal.h file.
-#include "stm32hal.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
+
+//    #if !defined(USE_HAL_CAN_REGISTER_CALLBACKS)
+//    #define USE_HAL_CAN_REGISTER_CALLBACKS 1
+//    #endif 
+////NOTE: please don't remove the previous define of USE_HAL_CAN_REGISTER_CALLBACKS because it define the behaviour of 
+////stm hal lib. This macro must be define before including stm32hal.h file.
+#include "stm32hal.h"
 
 #include "embot_binary.h"
 

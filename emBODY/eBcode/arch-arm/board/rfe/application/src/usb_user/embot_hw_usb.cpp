@@ -22,18 +22,22 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "embot_hw_usb.h"
-#include "embot_binary.h"
-
-#include "usbd_def.h"
-#include "stm32l4xx_hal_pcd.h"
-
-#include "usbd_cdc_if.h" //per la funzione di trasmissione
-#include "usb_device.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
+
+#include "embot_binary.h"
+#include "stm32hal.h"
+//#include "stm32l4xx_hal_pcd.h"
+
+#include "usbd_def.h"
+
+#include "usbd_cdc_if.h" //per la funzione di trasmissione
+#include "usb_device.h"
+
+
 #include <cstring>
 #include <vector>
 

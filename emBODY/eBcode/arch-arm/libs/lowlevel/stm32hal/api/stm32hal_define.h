@@ -119,6 +119,11 @@ extern "C" {
     #if !defined(STM32HAL_STM32L4xx)
     #define STM32HAL_STM32L4xx
     #endif  
+    
+    // other important macros
+    #if !defined(USE_HAL_CAN_REGISTER_CALLBACKS)
+    #define USE_HAL_CAN_REGISTER_CALLBACKS 1
+    #endif  
 
 #else
         #error STM32HAL: you must define a STM32HAL_BOARD_${BRD}

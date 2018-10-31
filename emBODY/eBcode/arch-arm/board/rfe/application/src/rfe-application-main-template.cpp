@@ -8,6 +8,9 @@
 #include "embot_hw_usb.h"
 #include "faceExpressionsModule.h"
 
+#include "EOtheLEDpulser.h"
+#include "embot_hw_led.h"
+
 
 #if defined(STM32HAL_BOARD_RFE)
     #include "embot_hw_bsp_rfe.h"
@@ -53,6 +56,18 @@ static void userdeflauncher(void* param)
 {
     embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance();
     canbrdinfo.synch(vAP, vCP);
+    
+    // manage the led blinking
+    uint32_t period = 1*EOK_reltime1sec;    
+ 
+    eOledpulser_cfg_t ledconfig = {0};    
+    ledconfig.led_enable_mask   = (1 << eo_ledpulser_led_zero);
+    ledconfig.led_init          = reinterpret_cast<eOint8_fp_uint8_cvoidp_t>(embot::hw::led::init_legacy);
+    ledconfig.led_on            = reinterpret_cast<eOint8_fp_uint8_t>(embot::hw::led::on); 
+    ledconfig.led_off           = reinterpret_cast<eOint8_fp_uint8_t>(embot::hw::led::off);
+    ledconfig.led_toggle        = reinterpret_cast<eOint8_fp_uint8_t>(embot::hw::led::toggle);    
+    eo_ledpulser_Initialise(&ledconfig);    
+    eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_zero, period, 0);  
         
     start_evt_based();      
 }

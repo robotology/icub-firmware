@@ -22,13 +22,13 @@
 
 
 ; flash starts from xx and its size is xxx
-LR_IROM1 0x08020000 0x00020000  {    ; load region size_region
+LR_IROM1 0x08020000 0x00020000  {    ; load region size_region  ; marco.accame: we have more than 128kb, but so fare they are enough.
   ER_IROM1 0x08020000 0x00020000  {  ; load address = execution address
    *.o (RESET, +First)
    *(InRoot$$Sections)
    .ANY (+RO)
   }
-  RW_IRAM1 0x20000020 0xFFE0  {  ; RW data
+  RW_IRAM1 0x20000020 0x1FFE0  {  ; RW data ; marco.accame: we use only the first bank of 128kb w/out the first 32 bytes
    .ANY (+RW +ZI)
   }
 }  

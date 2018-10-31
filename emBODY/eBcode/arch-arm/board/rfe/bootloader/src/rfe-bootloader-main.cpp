@@ -1,6 +1,7 @@
 
 
 #include "EOtheLEDpulser.h"
+#include "embot_hw_led.h"
 
 #include "embot_app_theCANboardInfo.h"
 
@@ -13,6 +14,7 @@
 #include "embot_i2h.h"
 #include "embot_hw.h"
 
+
 #include "embot_hw_FlashStorage.h"
 #include "embot_sys_theStorage.h"
 
@@ -20,10 +22,6 @@
 #include "embot_app_bootloader_theCANparser.h"
 
 #include "embot_app_canprotocol.h"
-
-#if defined(STM32HAL_BOARD_STRAIN2)
-    #warning remove STM32HAL_BOARD_STRAIN2 and use STM32HAL_BOARD_RFE w/ its stm32hal
-#endif
 
 
 struct ActivityParam
@@ -105,24 +103,25 @@ static std::vector<embot::hw::can::Frame> outframes;
 static void bl_activity(void* param)
 {
     // manage the led blinking
-//    ActivityParam* pp = (ActivityParam*) param;    
-//    uint32_t period = 0;    
-//    if(nullptr != pp)
-//    {
-//        period = pp->blinkingperiod;
-//    }    
-//    eOledpulser_cfg_t ledconfig = {0};    
-//    ledconfig.led_enable_mask   = (1 << eo_ledpulser_led_zero);
-//    ledconfig.led_init          = reinterpret_cast<eOint8_fp_uint8_cvoidp_t>(embot::hw::led::init_legacy);
-//    ledconfig.led_on            = reinterpret_cast<eOint8_fp_uint8_t>(embot::hw::led::on); 
-//    ledconfig.led_off           = reinterpret_cast<eOint8_fp_uint8_t>(embot::hw::led::off);
-//    ledconfig.led_toggle        = reinterpret_cast<eOint8_fp_uint8_t>(embot::hw::led::toggle);    
-//    eo_ledpulser_Initialise(&ledconfig);    
-//    eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_zero, period, 0);  
+    ActivityParam* pp = (ActivityParam*) param;    
+    uint32_t period = 0;    
+    if(nullptr != pp)
+    {
+        period = pp->blinkingperiod;
+    }    
+    eOledpulser_cfg_t ledconfig = {0};    
+    ledconfig.led_enable_mask   = (1 << eo_ledpulser_led_zero);
+    ledconfig.led_init          = reinterpret_cast<eOint8_fp_uint8_cvoidp_t>(embot::hw::led::init_legacy);
+    ledconfig.led_on            = reinterpret_cast<eOint8_fp_uint8_t>(embot::hw::led::on); 
+    ledconfig.led_off           = reinterpret_cast<eOint8_fp_uint8_t>(embot::hw::led::off);
+    ledconfig.led_toggle        = reinterpret_cast<eOint8_fp_uint8_t>(embot::hw::led::toggle);    
+    eo_ledpulser_Initialise(&ledconfig);    
+    eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_zero, period, 0);  
 
     // manage the basic canboardinfo
     embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance();    
     canbrdinfo.synch(embot::app::canprotocol::Board::rfe, vBL, defADDRESS, defaultInfo32);
+
     
   
     // start task waiting for can messages. 

@@ -28,7 +28,7 @@ extern "C" {
 //   <o> heap size         <0x0-0xFFFFFFFF:8>
 //   <i> define how much heap you want.
 #ifndef STM32HAL_STG_HEAPSIZE
-    #define STM32HAL_STG_HEAPSIZE      0x00008000
+    #define STM32HAL_STG_HEAPSIZE      0x00010000
 #endif
 
 // </h>SYS module
