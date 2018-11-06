@@ -41,7 +41,11 @@
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
 // --------------------------------------------------------------------------------------------------------------------
 
+#if __ARMCOMPILER_VERSION > 6000000
+static volatile std::uint32_t s_nzi_ram[NZI_SIZE/4]         __attribute__((section(".ARM.__at_0x20000000")));
+#else
 static volatile std::uint32_t s_nzi_ram[NZI_SIZE/4]       __attribute__((at(NZI_START)));
+#endif
 
 
 // in s_nzi_ram[0]: nziramSignature or whateever ... only nziramSignature validated a command otherwise it is none

@@ -19,7 +19,11 @@
 #endif
 
 extern uint32_t usbParser(uint8_t * RecMsg);
+#if __ARMCOMPILER_VERSION < 6000000
 static const embot::app::canprotocol::versionOfAPPLICATION vAP = {1, 0 , 0};
+#else
+static const embot::app::canprotocol::versionOfAPPLICATION vAP = {1, 0 , 66};
+#endif
 static const embot::app::canprotocol::versionOfCANPROTOCOL vCP = {2, 0};
 
 static void userdeflauncher(void* param);
@@ -58,7 +62,7 @@ static void userdeflauncher(void* param)
     canbrdinfo.synch(vAP, vCP);
     
     // manage the led blinking
-    uint32_t period = 1*EOK_reltime1sec;    
+    uint32_t period = 2*EOK_reltime1sec;    
  
     eOledpulser_cfg_t ledconfig = {0};    
     ledconfig.led_enable_mask   = (1 << eo_ledpulser_led_zero);

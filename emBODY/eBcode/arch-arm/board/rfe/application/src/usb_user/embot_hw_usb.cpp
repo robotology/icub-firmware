@@ -124,7 +124,6 @@ namespace embot { namespace hw { namespace usb {
 
 //////////////////// private function  //////////////////
 static std::uint8_t port2index(Port port);
-static bool supported(Port p);
 static void interrupt_RX_enable(void);
 static void interrupt_RX_disable(void);
 //void callbackOnRXcompletion(uint8_t* Buf, uint32_t *Len);
@@ -143,14 +142,6 @@ static std::uint8_t usb::port2index(Port port)
     return static_cast<uint8_t>(port);
 }
         
-static bool usb::supported(Port p)
-{
-    if((Port::none == p) || (Port::maxnumberof == p))
-    {
-        return false;
-    }
-    return bit::check(bspmap.mask, port2index(p));
-}
 
 static void usb::interrupt_RX_enable(void)
 {
@@ -159,6 +150,15 @@ static void usb::interrupt_RX_enable(void)
 static void usb::interrupt_RX_disable(void)
 {
    __HAL_PCD_DISABLE(hpcd);       
+}
+
+bool usb::supported(Port p)
+{
+    if((Port::none == p) || (Port::maxnumberof == p))
+    {
+        return false;
+    }
+    return bit::check(bspmap.mask, port2index(p));
 }
 
 bool usb::initialised(Port p)
@@ -338,8 +338,11 @@ result_t usb::get(usb::Port p, usb::Message &msg, std::uint8_t &remaining)
 //    embot::hw::usb::callbackOnRXcompletion(Buf, Len);
 //}
 
-
-
+extern "C" {
+// it must be linked with a c file.
+void USB_receiveMessageUserCallback(uint8_t* Buf, uint32_t *Len)
+{embot::hw::usb::callbackOnRXcompletion(Buf, Len);}
+}
 
 #endif //defined(HAL_USB_MODULE_ENABLED)
 

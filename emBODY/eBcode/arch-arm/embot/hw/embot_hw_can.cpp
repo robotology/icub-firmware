@@ -154,7 +154,6 @@ namespace embot { namespace hw { namespace can {
 
 //////////////////// private function  //////////////////
 static std::uint8_t port2index(Port port);
-static bool supported(Port p);
 static void s_transmit(CAN_HandleTypeDef *hcan);
 static void interrupt_RX_enable(void);
 static void interrupt_RX_disable(void);
@@ -177,15 +176,6 @@ static std::uint8_t can::port2index(Port port)
     return static_cast<uint8_t>(port);
 }
         
-static bool can::supported(Port p)
-{
-    if((Port::none == p) || (Port::maxnumberof == p))
-    {
-        return false;
-    }
-    return bit::check(bspmap.mask, port2index(p));
-}
-
 static void can::interrupt_RX_enable(void)
 {
     #if defined(STM32HAL_HAS_CAN_API_V183)
@@ -231,6 +221,15 @@ static bool can::interrupt_TX_is_enabled(void)
     #endif
 }
 
+
+bool can::supported(Port p)
+{
+    if((Port::none == p) || (Port::maxnumberof == p))
+    {
+        return false;
+    }
+    return bit::check(bspmap.mask, port2index(p));
+}
 
 bool can::initialised(Port p)
 {

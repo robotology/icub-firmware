@@ -1,4 +1,4 @@
-#! armcc -E
+;#! armcc -E
 ; the above must be on teh first line of teh scatter file ...
 
 ; Copyright (C) 2011 Department of Robotics Brain and Cognitive Sciences - Istituto Italiano di Tecnologia

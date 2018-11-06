@@ -49,7 +49,12 @@ extern "C" {
 #define USE_HAL_DRIVER
 #endif   
 
-    
+
+// c++-11 makes obsolete keyword volatile. 
+// i have two options: (a) use  -Wno-deprecated-register (b) remove it to avoid armclang complains.
+//#if __ARMCOMPILER_VERSION > 6000000
+//    #define register 
+//#endif
     
 #if     defined(STM32HAL_BOARD_NUCLEO64)
 

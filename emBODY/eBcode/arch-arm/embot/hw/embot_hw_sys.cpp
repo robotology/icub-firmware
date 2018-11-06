@@ -1,7 +1,8 @@
+
 /*
  * Copyright (C) 2017 iCub Facility - Istituto Italiano di Tecnologia
- * Author:  Valentina Gaggero
- * email:   valentina.gaggero@iit.it
+ * Author:  Marco Accame
+ * email:   marco.accame@iit.it
  * website: www.robotcub.org
  * Permission is granted to copy, distribute, and/or modify this program
  * under the terms of the GNU General Public License, version 2 or any
@@ -15,7 +16,6 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
  * Public License for more details
 */
-
 
 // --------------------------------------------------------------------------------------------------------------------
 // - public interface
@@ -96,7 +96,22 @@ namespace embot { namespace hw { namespace sys {
 
  
 #if     defined(STM32HAL_BOARD_NUCLEO64) || defined(STM32HAL_BOARD_MTB4) || defined(STM32HAL_BOARD_STRAIN2) || defined(STM32HAL_BOARD_RFE)
-    
+
+#if __ARMCOMPILER_VERSION > 6000000
+static int ss_hl_sys_asm_xnumARMv7ops(uint32_t i)
+{
+  int res = 0;
+  __asm 
+  (
+    "DOWAITLOOP:                            \t\n"
+    "SUBS %[input_i], %[input_i], #1        \t\n"
+    "BNE DOWAITLOOP                         \t\n"
+    : [result] "=&r" (res)
+    : [input_i] "r" (i)
+  );
+  return 0;
+}
+#else
 __asm static void ss_hl_sys_asm_xnumARMv7ops(uint32_t numberof) 
 {
    align
@@ -106,6 +121,7 @@ dowaitloop
    bx lr 
    align    
 }
+#endif
 
     static void ss_bsp_delay(uint64_t t)
     {   

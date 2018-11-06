@@ -315,14 +315,14 @@ namespace embot { namespace hw { namespace timer {
         {   // e.g., for tim15: use HAL_TIM_OnePulse_Init() and dont use HAL_TIM_Base_Init().
             if (HAL_TIM_OnePulse_Init(stm32data->phandletimx, TIM_OPMODE_REPETITIVE) != HAL_OK)
             {
-                _Error_Handler(__FILE__, __LINE__);
+                _Error_Handler(NULL, __LINE__);
             }
         } 
         else
         {   // normal case            
             if (HAL_TIM_Base_Init(stm32data->phandletimx) != HAL_OK)
             {
-                _Error_Handler(__FILE__, __LINE__);
+                _Error_Handler(NULL, __LINE__);
             }
         }
 
@@ -332,7 +332,7 @@ namespace embot { namespace hw { namespace timer {
             sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
             if (HAL_TIMEx_MasterConfigSynchronization(stm32data->phandletimx, &sMasterConfig) != HAL_OK)
             {
-                _Error_Handler(__FILE__, __LINE__);
+                _Error_Handler(NULL, __LINE__);
             }
         }
 
@@ -360,14 +360,14 @@ namespace embot { namespace hw { namespace timer {
 //        
 //        if (HAL_TIM_Base_Init(&htim6) != HAL_OK)
 //        {
-//            _Error_Handler(__FILE__, __LINE__);
+//            _Error_Handler(NULL, __LINE__);
 //        }
 
 //        sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
 //        sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
 //        if (HAL_TIMEx_MasterConfigSynchronization(&htim6, &sMasterConfig) != HAL_OK)
 //        {
-//            _Error_Handler(__FILE__, __LINE__);
+//            _Error_Handler(NULL, __LINE__);
 //        }
 
 //    }  
@@ -393,14 +393,14 @@ namespace embot { namespace hw { namespace timer {
 
 //        if (HAL_TIM_Base_Init(&htim7) != HAL_OK)
 //        {
-//            _Error_Handler(__FILE__, __LINE__);
+//            _Error_Handler(NULL, __LINE__);
 //        }
 
 //        sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
 //        sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
 //        if (HAL_TIMEx_MasterConfigSynchronization(&htim7, &sMasterConfig) != HAL_OK)
 //        {
-//            _Error_Handler(__FILE__, __LINE__);
+//            _Error_Handler(NULL, __LINE__);
 //        }
 
 //    }

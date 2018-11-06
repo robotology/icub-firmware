@@ -1,4 +1,7 @@
 
+
+#if __ARMCOMPILER_VERSION < 6000000
+
 /*-----------------------------------------------------------------------------
  * Name:    retarget_io.c
  * Purpose: Retarget I/O
@@ -33,7 +36,7 @@
    ---------------------------------------------------------------------------*/
    
    
-   #warning i need it if .... i use vector<> etc ... boh
+   #warning i need it if .... i use vector<> etc of the rogue vague library... boh
    
 //#define RETARGET_SYS
 #define RTE_Compiler_IO_STDERR
@@ -598,3 +601,4 @@ extern int stderr_putchar (int ch)
  
 #endif  /* __MICROLIB */
 
+#endif // #if __ARMCOMPILER_VERSION < 6000000
