@@ -22,7 +22,7 @@ extern uint32_t usbParser(uint8_t * RecMsg);
 #if __ARMCOMPILER_VERSION < 6000000
 static const embot::app::canprotocol::versionOfAPPLICATION vAP = {1, 0 , 0};
 #else
-static const embot::app::canprotocol::versionOfAPPLICATION vAP = {1, 0 , 66};
+static const embot::app::canprotocol::versionOfAPPLICATION vAP = {1, 0 , 0};
 #endif
 static const embot::app::canprotocol::versionOfCANPROTOCOL vCP = {2, 0};
 
