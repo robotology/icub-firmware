@@ -44,49 +44,122 @@ using namespace std;
 //const LedColor lBrow_neutral[5*4] =  {black,black,purple,black,black,black,purple,black,black,black,purple,black,black,black,purple,black,black,black,purple,black};
 //const LedColor rBrow_neutral[5*4] =  {black,black,purple,black,black,black,purple,black,black,black,purple,black,black,black,purple,black,black,black,purple,black};
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //test with colors
 constexpr std::uint32_t numOfLedInApart = (static_cast<std::uint8_t>(HardwareConfig_numOf_t::ledsperTLC))*
                                           (static_cast<std::uint8_t>(HardwareConfig_numOf_t::TLCperPart));
+
+
+//const LedColor mouth__[numOfLedInApart] = {DL01,DL02,DL03,DL04,DL05,DL06,DL07,DL08,DL09,DL10,DL11,DL12,DL13,DL14,DL15,DL16,DL17,DL18,DL19,DL20};
+//const LedColor lBrow__[numOfLedInApart] = {DL01,DL02,DL03,DL04,DL05,DL06,DL07,DL08,DL09,DL10,DL11,DL12,DL13,DL14,DL15,DL16,DL17,DL18,DL19,DL20};
+//const LedColor rBrow__[numOfLedInApart] = {DL01,DL02,DL03,DL04,DL05,DL06,DL07,DL08,DL09,DL10,DL11,DL12,DL13,DL14,DL15,DL16,DL17,DL18,DL19,DL20};
+
+//eyebrwos
+const LedColor eyebrow_1[numOfLedInApart] = {navy,black,black,black,navy,black,black,black,navy,black,black,black,navy,black,black,black,navy,black,black,black};
+const LedColor eyebrow_2[numOfLedInApart] = {black,navy,black,black,black,navy,black,black,black,navy,black,black,black,navy,black,black,black,navy,black,black};
+const LedColor eyebrow_3[numOfLedInApart] = {black,black,navy,black,black,black,navy,black,black,black,navy,black,black,black,navy,black,black,black,navy,black};
+const LedColor eyebrow_4[numOfLedInApart] = {black,black,black,navy,black,black,black,navy,black,black,black,navy,black,black,black,navy,black,black,black,navy};
+
+    
+const LedColor mouth_happy[numOfLedInApart] = {navy,black,navy,black,black,black,navy,black,black,navy,navy,black,navy,black,navy,black,black,black,navy,black};
+//const LedColor lBrow_happy[numOfLedInApart] = {black,black,navy,black,black,black,navy,black,black,black,navy,black,black,black,navy,black,black,black,navy,black};
+//const LedColor rBrow_happy[numOfLedInApart] = {black,black,navy,black,black,black,navy,black,black,black,navy,black,black,black,navy,black,black,black,navy,black};
+const LedColor *lBrow_happy = eyebrow_2;
+const LedColor *rBrow_happy = eyebrow_2;
+
+    
+    
+const LedColor mouth_sad[numOfLedInApart] = {black,black,black,black,navy,navy,navy,black,black,navy,navy,black,black,black,black,black,navy,navy,navy,black};
+//const LedColor lBrow_sad[numOfLedInApart] = {black,black,navy,black,black,black,navy,black,black,black,navy,black,black,black,navy,black,black,black,navy,black};
+//const LedColor rBrow_sad[numOfLedInApart] = {black,black,navy,black,black,black,navy,black,black,black,navy,black,black,black,navy,black,black,black,navy,black};
+const LedColor *lBrow_sad = eyebrow_3;
+const LedColor *rBrow_sad = eyebrow_3;   
+
+    
+
+
+//const LedColor mouth_surprised[numOfLedInApart] = {black,navy,navy,navy,black,navy,white,navy,navy,white,white,navy,black,navy,navy,navy,black,navy,black,navy};
+const LedColor mouth_surprised[numOfLedInApart] = {black,navy,navy,navy,black,navy,black,navy,navy,black,black,navy,black,navy,navy,navy,black,navy,black,navy};
+const LedColor *lBrow_surprised = eyebrow_1;
+const LedColor *rBrow_surprised = eyebrow_1;
+
+    
+const LedColor mouth_angry[numOfLedInApart] = {black,black,black,black,navy,navy,navy,black,black,navy,navy,black,black,black,black,black,navy,navy,navy,black};
+const LedColor *lBrow_angry = eyebrow_4;
+const LedColor *rBrow_angry = eyebrow_4;
+
+const LedColor mouth_neutral[numOfLedInApart] = {black,black,black,black,black,black,navy,black,black,navy,navy,black,black,black,black,black,black,black,navy,black};
+const LedColor *lBrow_neutral = eyebrow_2;
+const LedColor *rBrow_neutral = eyebrow_2;
+
+const LedColor *mouth_evil = mouth_happy;
+const LedColor *lBrow_evil = eyebrow_4;
+const LedColor *rBrow_evil = eyebrow_4;
+
+    
+const LedColor *mouth_cunning = mouth_sad;
+const LedColor *lBrow_cunning = eyebrow_2;
+const LedColor *rBrow_cunning = eyebrow_4;
+    
+const LedColor *mouth_shy = mouth_sad;
+const LedColor *lBrow_shy = eyebrow_2;
+const LedColor *rBrow_shy = eyebrow_2;
+
 //FACE hap green
-const LedColor mouth_happy[numOfLedInApart] = {green,green,white,green,black,green,white,green,green,white,white,green,green,green,white,green,black,green,white,green};
-const LedColor lBrow_happy[numOfLedInApart] = {black,green,black,black,black,green,black,black,black,green,black,black,black,green,black,black,black,green,black,black};
-const LedColor rBrow_happy[numOfLedInApart] = {black,green,black,black,black,green,black,black,black,green,black,black,black,green,black,black,black,green,black,black};
+    
+//const LedColor mouth_happy[numOfLedInApart] = {green,green,white,green,black,green,white,green,green,white,white,green,green,green,white,green,black,green,white,green};
+//const LedColor lBrow_happy[numOfLedInApart] = {black,green,black,black,black,green,black,black,black,green,black,black,black,green,black,black,black,green,black,black};
+//const LedColor rBrow_happy[numOfLedInApart] = {black,green,black,black,black,green,black,black,black,green,black,black,black,green,black,black,black,green,black,black};
     
     
-//red
-const LedColor mouth_angry[numOfLedInApart] = {red,red,white,red,black,red,white,red,red,white,white,red,red,red,white,red,black,red,white,red};
-const LedColor lBrow_angry[numOfLedInApart] = {black,red,black,black,black,red,black,black,black,red,black,black,black,red,black,black,black,red,black,black};
-const LedColor rBrow_angry[numOfLedInApart] = {black,red,black,black,black,red,black,black,black,red,black,black,black,red,black,black,black,red,black,black};
+////red
+//const LedColor mouth_angry[numOfLedInApart] = {red,red,white,red,black,red,white,red,red,white,white,red,red,red,white,red,black,red,white,red};
+//const LedColor lBrow_angry[numOfLedInApart] = {black,red,black,black,black,red,black,black,black,red,black,black,black,red,black,black,black,red,black,black};
+//const LedColor rBrow_angry[numOfLedInApart] = {black,red,black,black,black,red,black,black,black,red,black,black,black,red,black,black,black,red,black,black};
 
-//blue
-const LedColor mouth_neutral[numOfLedInApart] = {blue,blue,white,blue,black,blue,white,blue,blue,white,white,blue,blue,blue,white,blue,black,blue,white,blue};
-const LedColor lBrow_neutral[numOfLedInApart] = {black,blue,black,black,black,blue,black,black,black,blue,black,black,black,blue,black,black,black,blue,black,black};
-const LedColor rBrow_neutral[numOfLedInApart] = {black,blue,black,black,black,blue,black,black,black,blue,black,black,black,blue,black,black,black,blue,black,black};
+////blue
+//const LedColor mouth_neutral[numOfLedInApart] = {blue,blue,white,blue,black,blue,white,blue,blue,white,white,blue,blue,blue,white,blue,black,blue,white,blue};
+//const LedColor lBrow_neutral[numOfLedInApart] = {black,blue,black,black,black,blue,black,black,black,blue,black,black,black,blue,black,black,black,blue,black,black};
+//const LedColor rBrow_neutral[numOfLedInApart] = {black,blue,black,black,black,blue,black,black,black,blue,black,black,black,blue,black,black,black,blue,black,black};
 
-//yellow
-const LedColor mouth_surprised[numOfLedInApart] = {yellow,yellow,white,yellow,black,yellow,white,yellow,yellow,white,white,yellow,yellow,yellow,white,yellow,black,yellow,white,yellow};
-const LedColor lBrow_surprised[numOfLedInApart] = {black,yellow,black,black,black,yellow,black,black,black,yellow,black,black,black,yellow,black,black,black,yellow,black,black};
-const LedColor rBrow_surprised[numOfLedInApart] = {black,yellow,black,black,black,yellow,black,black,black,yellow,black,black,black,yellow,black,black,black,yellow,black,black};
+////yellow
+//const LedColor mouth_surprised[numOfLedInApart] = {yellow,yellow,white,yellow,black,yellow,white,yellow,yellow,white,white,yellow,yellow,yellow,white,yellow,black,yellow,white,yellow};
+//const LedColor lBrow_surprised[numOfLedInApart] = {black,yellow,black,black,black,yellow,black,black,black,yellow,black,black,black,yellow,black,black,black,yellow,black,black};
+//const LedColor rBrow_surprised[numOfLedInApart] = {black,yellow,black,black,black,yellow,black,black,black,yellow,black,black,black,yellow,black,black,black,yellow,black,black};
 
-//maroon
-const LedColor mouth_sad[numOfLedInApart] = {maroon,maroon,white,maroon,black,maroon,white,maroon,maroon,white,white,maroon,maroon,maroon,white,maroon,black,maroon,white,maroon};
-const LedColor lBrow_sad[numOfLedInApart] = {black,maroon,black,black,black,maroon,black,black,black,maroon,black,black,black,maroon,black,black,black,maroon,black,black};
-const LedColor rBrow_sad[numOfLedInApart] = {black,maroon,black,black,black,maroon,black,black,black,maroon,black,black,black,maroon,black,black,black,maroon,black,black};
+////maroon
+//const LedColor mouth_sad[numOfLedInApart] = {maroon,maroon,white,maroon,black,maroon,white,maroon,maroon,white,white,maroon,maroon,maroon,white,maroon,black,maroon,white,maroon};
+//const LedColor lBrow_sad[numOfLedInApart] = {black,maroon,black,black,black,maroon,black,black,black,maroon,black,black,black,maroon,black,black,black,maroon,black,black};
+//const LedColor rBrow_sad[numOfLedInApart] = {black,maroon,black,black,black,maroon,black,black,black,maroon,black,black,black,maroon,black,black,black,maroon,black,black};
 
-//purple
-const LedColor mouth_evil[numOfLedInApart] = {purple,purple,white,purple,black,purple,white,purple,purple,white,white,purple,purple,purple,white,purple,black,purple,white,purple};
-const LedColor lBrow_evil[numOfLedInApart] = {black,purple,black,black,black,purple,black,black,black,purple,black,black,black,purple,black,black,black,purple,black,black};
-const LedColor rBrow_evil[numOfLedInApart] = {black,purple,black,black,black,purple,black,black,black,purple,black,black,black,purple,black,black,black,purple,black,black};
+////purple
+//const LedColor mouth_evil[numOfLedInApart] = {purple,purple,white,purple,black,purple,white,purple,purple,white,white,purple,purple,purple,white,purple,black,purple,white,purple};
+//const LedColor lBrow_evil[numOfLedInApart] = {black,purple,black,black,black,purple,black,black,black,purple,black,black,black,purple,black,black,black,purple,black,black};
+//const LedColor rBrow_evil[numOfLedInApart] = {black,purple,black,black,black,purple,black,black,black,purple,black,black,black,purple,black,black,black,purple,black,black};
 
-//navy
-const LedColor mouth_shy[numOfLedInApart] = {navy,navy,white,navy,black,navy,white,navy,navy,white,white,navy,navy,navy,white,navy,black,navy,white,navy};
-const LedColor lBrow_shy[numOfLedInApart] = {black,navy,black,black,black,navy,black,black,black,navy,black,black,black,navy,black,black,black,navy,black,black};
-const LedColor rBrow_shy[numOfLedInApart] = {black,navy,black,black,black,navy,black,black,black,navy,black,black,black,navy,black,black,black,navy,black,black};
+////navy
+//const LedColor mouth_shy[numOfLedInApart] = {navy,navy,white,navy,black,navy,white,navy,navy,white,white,navy,navy,navy,white,navy,black,navy,white,navy};
+//const LedColor lBrow_shy[numOfLedInApart] = {black,navy,black,black,black,navy,black,black,black,navy,black,black,black,navy,black,black,black,navy,black,black};
+//const LedColor rBrow_shy[numOfLedInApart] = {black,navy,black,black,black,navy,black,black,black,navy,black,black,black,navy,black,black,black,navy,black,black};
 
-//olive
-const LedColor mouth_cunning[numOfLedInApart] = {olive,olive,white,olive,black,olive,white,olive,olive,white,white,olive,olive,olive,white,olive,black,olive,white,olive};
-const LedColor lBrow_cunning[numOfLedInApart] = {black,olive,black,black,black,olive,black,black,black,olive,black,black,black,olive,black,black,black,olive,black,black};
-const LedColor rBrow_cunning[numOfLedInApart] = {black,olive,black,black,black,olive,black,black,black,olive,black,black,black,olive,black,black,black,olive,black,black};
+////olive
+//const LedColor mouth_cunning[numOfLedInApart] = {olive,olive,white,olive,black,olive,white,olive,olive,white,white,olive,olive,olive,white,olive,black,olive,white,olive};
+//const LedColor lBrow_cunning[numOfLedInApart] = {black,olive,black,black,black,olive,black,black,black,olive,black,black,black,olive,black,black,black,olive,black,black};
+//const LedColor rBrow_cunning[numOfLedInApart] = {black,olive,black,black,black,olive,black,black,black,olive,black,black,black,olive,black,black,black,olive,black,black};
     
 // --------------------------------------------------------------------------------------------------------------------
 // - all the rest
