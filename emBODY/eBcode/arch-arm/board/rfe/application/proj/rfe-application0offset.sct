@@ -23,7 +23,7 @@
 
 
 ; flash starts from xx and its size is xxx
-LR_IROM1 0x08000000 0x0001F000  {    ; load region size_region ; marco.accame: we use only the first 126kb. in [126k, 128k) we may have eeprom
+LR_IROM1 0x08000000 0x0001F000  {    ; load region size_region ; marco.accame: we use only the first 124kb. in [124k, 128k) we may have eeprom
   ER_IROM1 0x08000000 0x0001F000  {  ; load address = execution address
    *.o (RESET, +First)
    *(InRoot$$Sections)
