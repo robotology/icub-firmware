@@ -780,6 +780,11 @@ struct embot::app::application::theSTRAIN::Impl
         return false;        
     }
     
+    std::uint8_t indexofregsetinuse()
+    {
+        return runtimedata.set2use_get();
+    }
+    
     bool ischannelvalid(const std::uint8_t ch, bool &allchannels)
     {
         allchannels = false;
@@ -794,30 +799,146 @@ struct embot::app::application::theSTRAIN::Impl
         return true;        
     }
     
-    bool ischannelvalid(const std::uint8_t ch)
-    {
-        if(ch >= numOfChannels)
+//    bool ischannelvalid(const std::uint8_t ch)
+//    {
+//        if(ch >= numOfChannels)
+//        {
+//            return false;
+//        }
+//        return true;        
+//    }
+    
+          
+    
+    void amplifiers_reset(const std::uint8_t setindex, const embot::app::canprotocol::analog::polling::StrainChannel ch)
+    {    
+        std::uint8_t first = 0;
+        std::uint8_t nextlast = numOfChannels;
+        
+        if(ch != embot::app::canprotocol::analog::polling::StrainChannel::all)
         {
-            return false;
+            first = static_cast<std::uint8_t>(ch);
+            nextlast = first + 1;
         }
-        return true;        
+        
+        for(std::uint8_t i=first; i<nextlast; i++)
+        {
+            // i reset amplifier settings to default
+            configdata.amplifiers_reset(setindex, i);               
+        }
     }
     
     
-    void amplifiers_applyregulationset(std::uint8_t set2use)
-    {        
-        embot::hw::PGA308::TransferFunctionConfig tfc;    
-        // set-todo: use variable set2use, originally initted w/ eeprom value but possibly changed by can message. 
-        //#warning when changed by can message, remember to set the tfc ...
-        //std::uint8_t set2use = pImpl->runtimedata.set2use_get();
-        for(int c=0; c<numOfChannels; c++)
+    void amplifiers_set(const std::uint8_t setindex, const embot::app::canprotocol::analog::polling::StrainChannel ch, const embot::app::canprotocol::analog::polling::PGA308cfg1 &cfg1)
+    {    
+        std::uint8_t first = 0;
+        std::uint8_t nextlast = numOfChannels;
+        
+        if(ch != embot::app::canprotocol::analog::polling::StrainChannel::all)
         {
-            embot::app::canprotocol::analog::polling::PGA308cfg1 pga308cfg1;
-            configdata.amplifiers_get(set2use, c, pga308cfg1); 
-            tfc.load(pga308cfg1);    
-            embot::hw::PGA308::set(static_cast<embot::hw::PGA308::Amplifier>(c), tfc);                
+            first = static_cast<std::uint8_t>(ch);
+            nextlast = first + 1;
+        }
+        
+        for(std::uint8_t i=first; i<nextlast; i++)
+        {
+            // i set amplifier
+            configdata.amplifiers_set(setindex, i, cfg1);               
         }
     }
+    
+    
+    
+    bool amplifiers_alfabeta_reset(const std::uint8_t setindex, const embot::app::canprotocol::analog::polling::StrainChannel ch, float &a, float &b)
+    {    
+        std::uint8_t first = 0;
+        std::uint8_t nextlast = numOfChannels;
+        
+        if(ch != embot::app::canprotocol::analog::polling::StrainChannel::all)
+        {
+            first = static_cast<std::uint8_t>(ch);
+            nextlast = first + 1;
+        }
+        
+        for(std::uint8_t i=first; i<nextlast; i++)
+        {
+            embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
+            embot::hw::PGA308::TransferFunctionConfig tfc;
+            // modify the tsf
+            tfc.setDefault();                
+            // retrieve the resulting alpha and beta for filling the reply
+            a = tfc.alpha();
+            b = tfc.beta();                
+            // retrieve the new cfg1 and apply it to the specified regulation set
+            tfc.get(cfg1);
+            configdata.amplifiers_set(setindex, i, cfg1);         
+        }
+        
+        return true;
+    }
+    
+    bool amplifiers_alfabeta_set(const std::uint8_t setindex, const embot::app::canprotocol::analog::polling::StrainChannel ch, const float alpha, const float beta, float &a, float &b)
+    {    
+        std::uint8_t first = 0;
+        std::uint8_t nextlast = numOfChannels;
+        
+        if(ch != embot::app::canprotocol::analog::polling::StrainChannel::all)
+        {
+            first = static_cast<std::uint8_t>(ch);
+            nextlast = first + 1;
+        }
+        
+        for(std::uint8_t i=first; i<nextlast; i++)
+        {
+            embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
+            embot::hw::PGA308::TransferFunctionConfig tfc;
+            
+            // retrieve current cfg1 and associated transform function
+            configdata.amplifiers_get(setindex, i, cfg1);
+            tfc.load(cfg1);  
+            
+            // modify the tsf
+            if(false == tfc.setalpha(alpha)) 
+            {
+                return false;
+            }
+            if(false == tfc.setbeta(beta))
+            {
+                return false;
+            }
+            
+            // retrieve the resulting alpha and beta for filling the reply
+            a = tfc.alpha();
+            b = tfc.beta();
+
+            // retrieve the new cfg1 and apply it to the specified regulation set
+            tfc.get(cfg1);
+            configdata.amplifiers_set(setindex, i, cfg1);               
+        }
+        
+        return true;
+    }
+    
+    void amplifiers_applyregulationsetochipPGA308(const std::uint8_t setindex, const embot::app::canprotocol::analog::polling::StrainChannel ch)
+    {    
+        std::uint8_t first = 0;
+        std::uint8_t nextlast = numOfChannels;
+        
+        if(ch != embot::app::canprotocol::analog::polling::StrainChannel::all)
+        {
+            first = static_cast<std::uint8_t>(ch);
+            nextlast = first + 1;
+        }
+        
+        for(std::uint8_t i=first; i<nextlast; i++)
+        {
+            embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
+            configdata.amplifiers_get(setindex, i, cfg1); 
+            embot::hw::PGA308::TransferFunctionConfig tfc;
+            tfc.load(cfg1);    
+            embot::hw::PGA308::set(static_cast<embot::hw::PGA308::Amplifier>(i), tfc);                
+        }
+    }  
                       
 };
 
@@ -1390,7 +1511,7 @@ bool embot::app::application::theSTRAIN::initialise(Config &config)
     // now i must apply the values on eeprom pImpl->configdata.EEPROM_read
     
     std::uint8_t set2use = pImpl->runtimedata.set2use_get();
-    pImpl->amplifiers_applyregulationset(set2use);
+    pImpl->amplifiers_applyregulationsetochipPGA308(set2use, embot::app::canprotocol::analog::polling::StrainChannel::all);
     
 //    // #warning TODO: apply eeprom values to PGA308 ... all channels. 
 //    embot::hw::PGA308::TransferFunctionConfig tfc;    
@@ -1469,8 +1590,15 @@ bool embot::app::application::theSTRAIN::get_fullscale(std::uint8_t regulationse
         return false;
     }
         
-    if(false == pImpl->ischannelvalid(channel))
-    {   // cannot operate on all channels
+    bool allchannels = false;
+    if(false == pImpl->ischannelvalid(channel, allchannels))
+    {   
+        return false;
+    }  
+
+    
+    if(allchannels)
+    {   // we cannot operate on all channels
         return false;
     }
     
@@ -1485,10 +1613,17 @@ bool embot::app::application::theSTRAIN::get_adc(embot::app::canprotocol::analog
 {           
     replyinfo.adcvalue = 0; 
     
-    if(false == pImpl->ischannelvalid(replyinfo.channel))
-    {   // cannot operate on all channels
+    bool allchannels = false;
+    if(false == pImpl->ischannelvalid(replyinfo.channel, allchannels))
+    {   
+        return false;
+    }  
+    
+    if(allchannels)
+    {   // we cannot operate on all channels
         return false;
     }
+    
     
     // it acquire once. it also restarts if required.
     pImpl->acquisition_oneshot();
@@ -1538,12 +1673,16 @@ bool embot::app::application::theSTRAIN::get_offset(std::uint8_t regulationset, 
         return false;
     }
     
+    bool allchannels = false;
+    if(false == pImpl->ischannelvalid(channel, allchannels))
+    {   
+        return false;
+    }  
     
-    if(false == pImpl->ischannelvalid(channel))
-    {   // cannot operate on all channels
+    if(allchannels)
+    {   // we cannot operate on all channels
         return false;
     }
-    
 
     // it returns the beta   
     embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
@@ -1566,8 +1705,14 @@ bool embot::app::application::theSTRAIN::configure(embot::app::canprotocol::anal
         return false;
     }
     
-    if(false == pImpl->ischannelvalid(info.channel))
-    {   // cannot operate on all channels
+    bool allchannels = false;
+    if(false == pImpl->ischannelvalid(info.channel, allchannels))
+    {   
+        return false;
+    }  
+    
+    if(allchannels)
+    {   // we cannot operate on all channels
         return false;
     }
     
@@ -1598,8 +1743,14 @@ bool embot::app::application::theSTRAIN::configure(embot::app::canprotocol::anal
         return false;
     }
     
-    if(false == pImpl->ischannelvalid(info.channel))
-    {   // cannot operate on all channels
+    bool allchannels = false;
+    if(false == pImpl->ischannelvalid(info.channel, allchannels))
+    {   
+        return false;
+    }  
+    
+    if(allchannels)
+    {   // we cannot operate on all channels
         return false;
     }
 
@@ -1613,10 +1764,15 @@ bool embot::app::application::theSTRAIN::configure(embot::app::canprotocol::anal
 
     if(true == tfc.setbeta(static_cast<float>(info.offset)/8.f))
     {
-        embot::hw::PGA308::set(static_cast<embot::hw::PGA308::Amplifier>(info.channel), tfc);   
-
         tfc.get(cfg1);
-        pImpl->configdata.amplifiers_set(setindex, info.channel, cfg1);                
+        pImpl->configdata.amplifiers_set(setindex, info.channel, cfg1);   
+        
+        // i apply settings to the pga308. but only if the setindex is the one in use...
+        if(setindex == pImpl->indexofregsetinuse()) 
+        {            
+            embot::hw::PGA308::set(static_cast<embot::hw::PGA308::Amplifier>(info.channel), tfc);   
+        }
+        
     }
             
     return true;    
@@ -1702,8 +1858,14 @@ bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::po
         return false;
     } 
     
-    if(false == pImpl->ischannelvalid(replyinfo.channel))
-    {   // cannot operate on all channels
+    bool allchannels = false;
+    if(false == pImpl->ischannelvalid(replyinfo.channel, allchannels))
+    {   
+        return false;
+    }  
+    
+    if(allchannels)
+    {   // we cannot operate on all channels
         return false;
     }
     
@@ -1727,10 +1889,17 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::p
     {
         case embot::app::canprotocol::analog::polling::Message_SET_CALIB_TARE::Mode::setchannelwithvalue:
         {
-            if(false == pImpl->ischannelvalid(info.channel))
-            {   // cannot operate on all channels
+            bool allchannels = false;
+            if(false == pImpl->ischannelvalid(info.channel, allchannels))
+            {   
+                return false;
+            }  
+            
+            if(allchannels)
+            {   // we cannot operate on all channels
                 return false;
             }
+            
             pImpl->configdata.transformer_tare_set(setindex, info.channel, static_cast<embot::dsp::Q15>(info.value));
         } break;            
 
@@ -1776,10 +1945,16 @@ bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::po
 {  
     replyinfo.value = 0;
     
-    if(false == pImpl->ischannelvalid(replyinfo.channel))
-    {   // cannot operate on all channels
+    bool allchannels = false;
+    if(false == pImpl->ischannelvalid(replyinfo.channel, allchannels))
+    {   
         return false;
-    } 
+    }  
+    
+    if(allchannels)
+    {   // we cannot operate on all channels
+        return false;
+    }
  
     replyinfo.value =  static_cast<std::uint16_t>(pImpl->runtimedata.tare_get(replyinfo.channel));
     
@@ -1795,8 +1970,14 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::p
     {
         case embot::app::canprotocol::analog::polling::Message_SET_CURR_TARE::Mode::setchannelwithvalue:
         {
-            if(false == pImpl->ischannelvalid(info.channel))
-            {   // cannot operate on all channels
+            bool allchannels = false;
+            if(false == pImpl->ischannelvalid(info.channel, allchannels))
+            {   
+                return false;
+            }  
+            
+            if(allchannels)
+            {   // we cannot operate on all channels
                 return false;
             }
             pImpl->runtimedata.tare_set(info.channel, static_cast<embot::dsp::Q15>(info.value));
@@ -1854,8 +2035,14 @@ bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::po
         return false;
     }  
 
-    if(false == pImpl->ischannelvalid(replyinfo.channel))
-    {   // cannot operate on all channels
+    bool allchannels = false;
+    if(false == pImpl->ischannelvalid(replyinfo.channel, allchannels))
+    {   
+        return false;
+    }  
+    
+    if(allchannels)
+    {   // we cannot operate on all channels
         return false;
     }
     
@@ -1872,8 +2059,14 @@ bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::po
         return false;
     }  
 
-    if(false == pImpl->ischannelvalid(replyinfo.channel))
-    {   // cannot operate on all channels
+    bool allchannels = false;
+    if(false == pImpl->ischannelvalid(replyinfo.channel, allchannels))
+    {   
+        return false;
+    }  
+    
+    if(allchannels)
+    {   // we cannot operate on all channels
         return false;
     }
     
@@ -1900,8 +2093,14 @@ bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::po
         return false;
     }  
     
-    if(false == pImpl->ischannelvalid(replyinfo.channel))
-    {   // cannot operate on all channels
+    bool allchannels = false;
+    if(false == pImpl->ischannelvalid(replyinfo.channel, allchannels))
+    {   
+        return false;
+    }  
+    
+    if(allchannels)
+    {   // we cannot operate on all channels
         return false;
     }
     
@@ -1928,8 +2127,14 @@ bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::po
         return false;
     }  
 
-    if(false == pImpl->ischannelvalid(replyinfo.channel))
-    {   // cannot operate on all channels
+    bool allchannels = false;
+    if(false == pImpl->ischannelvalid(replyinfo.channel, allchannels))
+    {   
+        return false;
+    }  
+    
+    if(allchannels)
+    {   // we cannot operate on all channels
         return false;
     }
     
@@ -1959,43 +2164,27 @@ bool  embot::app::application::theSTRAIN::resetamplifier(embot::app::canprotocol
     
     bool allchannels = false;
     if(false == pImpl->ischannelvalid(info.channel, allchannels))
-    {   // we may operate on all channels
+    {   
         return false;
-    }    
+    }  
+
     
-    if(true == allchannels)
-    {
-        for(std::uint8_t i=0; i<pImpl->numOfChannels; i++)
-        {
-            // i reset amplifier settings to default
-            pImpl->configdata.amplifiers_reset(setindex, i);
-            
-            // i retrieve the current settings (they are default now).
-            embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
-            pImpl->configdata.amplifiers_get(setindex, i, cfg1); 
-            
-            // i apply them to the pga308.
-            embot::hw::PGA308::TransferFunctionConfig tfc;
-            tfc.load(cfg1);    
-            embot::hw::PGA308::set(static_cast<embot::hw::PGA308::Amplifier>(i), tfc);
-        }        
+    if(allchannels)
+    {   // we may operate on all channels
+        //return false;
     }
-    else
-    {
     
-        // i reset amplifier settings to default
-        pImpl->configdata.amplifiers_reset(setindex, info.channel);
-        
-        // i retrieve the current settings (they are default now).
-        embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
-        pImpl->configdata.amplifiers_get(setindex, info.channel, cfg1); 
-        
-        // i apply them to the pga308.
-        embot::hw::PGA308::TransferFunctionConfig tfc;
-        tfc.load(cfg1);    
-        embot::hw::PGA308::set(static_cast<embot::hw::PGA308::Amplifier>(info.channel), tfc);
-        
-    }
+    // it may be zero, one, ..., five, all
+    embot::app::canprotocol::analog::polling::StrainChannel targetStrainChannel = static_cast<embot::app::canprotocol::analog::polling::StrainChannel>(info.channel);
+   
+    // reset amplifier(s) to default
+    pImpl->amplifiers_reset(setindex, targetStrainChannel);    
+   
+    // apply settings also to the target pga308. but only if the setindex is the one in use...
+    if(setindex == pImpl->indexofregsetinuse())
+    {
+        pImpl->amplifiers_applyregulationsetochipPGA308(setindex, targetStrainChannel);    
+    }  
 
     return true;    
 }
@@ -2013,27 +2202,19 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::p
     {   // we may operate on all channels
         return false;
     }  
+
+    // it may be zero, one, ..., five, all
+    embot::app::canprotocol::analog::polling::StrainChannel targetStrainChannel = static_cast<embot::app::canprotocol::analog::polling::StrainChannel>(info.channel);
+
+    // set amplifier(s)
+    pImpl->amplifiers_set(setindex, targetStrainChannel, info.cfg1);    
     
-    if(true == allchannels)
+    // apply settings also to the target pga308. but only if the setindex is the one in use...
+    if(setindex == pImpl->indexofregsetinuse())
     {
-        for(std::uint8_t i=0; i<pImpl->numOfChannels; i++)
-        {
-            pImpl->configdata.amplifiers_set(setindex, i, info.cfg1);
-            
-            embot::hw::PGA308::TransferFunctionConfig tfc;
-            tfc.load(info.cfg1);    
-            embot::hw::PGA308::set(static_cast<embot::hw::PGA308::Amplifier>(i), tfc);
-        }        
-    }
-    else
-    {    
-        pImpl->configdata.amplifiers_set(setindex, info.channel, info.cfg1);
-        
-        embot::hw::PGA308::TransferFunctionConfig tfc;
-        tfc.load(info.cfg1);    
-        embot::hw::PGA308::set(static_cast<embot::hw::PGA308::Amplifier>(info.channel), tfc);
-    }
-   
+        pImpl->amplifiers_applyregulationsetochipPGA308(setindex, targetStrainChannel);    
+    }  
+    
     return true;    
 }
 
@@ -2231,89 +2412,43 @@ bool  embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::p
     {   // we may operate on all channels
         return false;
     }
+
+    // it may be zero, one, ..., five, all
+    embot::app::canprotocol::analog::polling::StrainChannel targetStrainChannel = static_cast<embot::app::canprotocol::analog::polling::StrainChannel>(info.channel);
     
     bool set2default = (1 == info.mode) ? true : false;
     
-    if(true == allchannels)
-    {
-        for(std::uint8_t i=0; i<pImpl->numOfChannels; i++)
-        {
-            if(false == set2default)
-            {
-                embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
-                pImpl->configdata.amplifiers_get(setindex, i, cfg1);
-            
-                embot::hw::PGA308::TransferFunctionConfig tfc;
-                tfc.load(cfg1);  
-                if(false == tfc.setalpha(static_cast<float>(info.gain)/100.f))  // info.gain has 0.01 ticks
-                {
-                    return false;
-                }
-                if(false == tfc.setbeta(static_cast<float>(info.offset)/8.f))   // info.offset is in range [0, 64k) and here we need range [0, 8k)
-                {
-                    return false;
-                }
-                
-                alpha = tfc.alpha();
-                beta = tfc.beta();
-                
-                embot::hw::PGA308::set(static_cast<embot::hw::PGA308::Amplifier>(i), tfc);   
-
-                tfc.get(cfg1);
-                pImpl->configdata.amplifiers_set(setindex, i, cfg1);    
-            } 
-            else
-            {
-                embot::hw::PGA308::TransferFunctionConfig tfc;
-                tfc.setDefault();
-                embot::hw::PGA308::set(static_cast<embot::hw::PGA308::Amplifier>(i), tfc);
-                embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
-                tfc.get(cfg1);
-                pImpl->configdata.amplifiers_set(setindex, i, cfg1);
-            }    
-        }        
+    float a = 0;
+    float b = 0;    
+    
+    bool ret = true;
+    
+    if(true == set2default)
+    { 
+        ret = pImpl->amplifiers_alfabeta_reset(setindex, targetStrainChannel, a, b);        
     }
     else
     {
-        if(false == set2default)
-        {        
-            embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
-            pImpl->configdata.amplifiers_get(setindex, info.channel, cfg1);
-        
-            embot::hw::PGA308::TransferFunctionConfig tfc;
-            tfc.load(cfg1);  
-            if(false == tfc.setalpha(static_cast<float>(info.gain)/100.f))  // info.gain has 0.01 ticks
-            {
-                return false;
-            }
-            if(false == tfc.setbeta(static_cast<float>(info.offset)/8.f))   // info.offset is in range [0, 64k) and here we need range [0, 8k)
-            {
-                return false;
-            }
-            
-            alpha = tfc.alpha();
-            beta = tfc.beta();
-            
-            embot::hw::PGA308::set(static_cast<embot::hw::PGA308::Amplifier>(info.channel), tfc);   
-
-            tfc.get(cfg1);
-            pImpl->configdata.amplifiers_set(setindex, info.channel, cfg1);   
-        }
-        else
-        {
-                embot::hw::PGA308::TransferFunctionConfig tfc;
-                tfc.setDefault();
-                embot::hw::PGA308::set(static_cast<embot::hw::PGA308::Amplifier>(info.channel), tfc);
-                embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
-                tfc.get(cfg1);
-                pImpl->configdata.amplifiers_set(setindex, info.channel, cfg1);
-        }    
-        
+        float alpha = static_cast<float>(info.gain)/100.f;  // info.gain has 0.01 ticks
+        float beta = static_cast<float>(info.offset)/8.f;   // info.offset is in range [0, 64k) and here we need range [0, 8k)
+        ret = pImpl->amplifiers_alfabeta_set(setindex, targetStrainChannel, alpha, beta, a, b);        
     }
-  
-   
+    
+    if(false == ret)
+    {
+        return false;
+    }
+      
+    // apply settings also to the target pga308. but only if the setindex is the one in use...
+    if(setindex == pImpl->indexofregsetinuse())
+    {
+        pImpl->amplifiers_applyregulationsetochipPGA308(setindex, targetStrainChannel);    
+    }  
+    
     return true;    
 }
+
+
 
 bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::polling::Message_REGULATIONSET_GET::ReplyInfo &replyinfo)
 {    
@@ -2363,7 +2498,7 @@ bool embot::app::application::theSTRAIN::set(embot::app::canprotocol::analog::po
         
         // ok: now i must apply the new set to front-end amplifiers
         std::uint8_t set2use = pImpl->runtimedata.set2use_get();
-        pImpl->amplifiers_applyregulationset(set2use);  
+        pImpl->amplifiers_applyregulationsetochipPGA308(set2use, embot::app::canprotocol::analog::polling::StrainChannel::all);
         
         pImpl->evalrestart(mode);
         
