@@ -60,6 +60,24 @@
 #define _VERIFYsizeof(sname, ssize)    typedef uint8_t GUARD##sname[ ( ssize == sizeof(sname) ) ? (1) : (-1)];
 
 
+// debug macros ... enable them only for debug
+#undef DEBUG_enabled                       //  #define OR #undef
+
+#if defined(DEBUG_enabled)
+
+    // enables / disables the trace to the host of adc acquisition failures
+    #undef DEBUG_adc_tracefailure               //  #define OR #undef
+
+    // enables / disables the computation of acquisition timings from adc start to tx of FT messages
+    #define DEBUG_acquisition_computetiming                 //  #define OR #undef
+
+    #if defined(DEBUG_acquisition_computetiming)
+        // enables / disables the transmission to the host of the acquisition timing
+        #define DEBUG_acquisition_computetiming_andtraceit  //  #define OR #undef
+    #endif
+
+#endif // #if defined(DEBUG_enabled)
+
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
 // --------------------------------------------------------------------------------------------------------------------
@@ -688,7 +706,23 @@ struct embot::app::application::theSTRAIN::Impl
 
    
       
+#if defined(DEBUG_acquisition_computetiming) 
     embot::common::Time debugtime;
+    embot::common::Time timestartADC;
+    embot::common::relTime durationofADC;
+    embot::common::relTime durationof00;
+    embot::common::relTime durationof01;
+    embot::common::relTime durationof02;
+    embot::common::relTime durationof03;
+    embot::common::relTime durationof04;
+    embot::common::relTime durationof05;
+    embot::common::relTime durationof06;
+    embot::common::relTime durationof07;
+    embot::common::relTime durationofDSP;
+    embot::common::relTime durationofALL;
+    std::uint32_t acquisitioncounter;
+#endif // #if defined(DEBUG_acquisition_computetiming) 
+
     Config config;
            
     bool ticking;
@@ -760,7 +794,12 @@ struct embot::app::application::theSTRAIN::Impl
         {
             mypImpl->config.totask->setEvent(mypImpl->config.datareadyevent);
         }
-        
+
+#if defined(DEBUG_acquisition_computetiming)         
+        mypImpl->debugtime = embot::sys::timeNow();
+        mypImpl->durationof00 = mypImpl->debugtime - mypImpl->timestartADC;
+#endif
+    
         mypImpl->adcdataisready = true;                            
     }
     
@@ -977,6 +1016,9 @@ bool embot::app::application::theSTRAIN::Impl::start(const embot::app::canprotoc
     
     ticktimer->start(runtimedata.data.txperiod, embot::sys::Timer::Type::forever, action);
     ticking = true;    
+#if defined(DEBUG_acquisition_computetiming) 
+    acquisitioncounter = 0;
+#endif
     return true;
 }
 
@@ -1131,7 +1173,12 @@ bool embot::app::application::theSTRAIN::Impl::fill(const bool calibrated, embot
 bool embot::app::application::theSTRAIN::Impl::acquisition_start()
 {
     runtimedata.data.adcfailures = 0;
-    
+
+#if defined(DEBUG_acquisition_computetiming) 
+    acquisitioncounter ++;
+    timestartADC = embot::sys::timeNow();
+#endif
+
     std::memset(runtimedata.data.dmabuffer, 0xff, sizeof(runtimedata.data.dmabuffer));    
     adcdataisready = false;
     embot::hw::adc::start(embot::hw::adc::Port::one);    
@@ -1282,21 +1329,29 @@ bool embot::app::application::theSTRAIN::Impl::processdata(std::vector<embot::hw
     {
         return false;
     }
-    
-//    embot::common::Time start = debugtime;
-//    debugtime = embot::sys::timeNow() - start;
-        
+
+#if defined(DEBUG_acquisition_computetiming)        
+    debugtime = embot::sys::timeNow();
+    durationof01 = debugtime - timestartADC;
+#endif
+
     // retreve acquired adc values
     acquisition_retrieve();
-    
-//    debugtime = embot::sys::timeNow() - start;
-    
+
+#if defined(DEBUG_acquisition_computetiming) 
+    debugtime = embot::sys::timeNow();
+    durationof02 = debugtime - timestartADC;
+#endif
+ 
     // processing of acquired data
     processing();
-    
-//    debugtime = embot::sys::timeNow() - start;    
 
-#if 0    
+#if defined(DEBUG_acquisition_computetiming)    
+    debugtime = embot::sys::timeNow();
+    durationof03 = debugtime - timestartADC;
+#endif
+
+#if defined(DEBUG_adc_tracefailure) 
     if(0 != runtimedata.data.adcfailures)
     {
         char ss[8] = {0};
@@ -1317,7 +1372,7 @@ bool embot::app::application::theSTRAIN::Impl::processdata(std::vector<embot::hw
         
         count++;        
     }
-#endif
+#endif // if defined(DEBUG_adc_tracefailure)
     
     embot::hw::can::Frame frame;  
     
@@ -1397,9 +1452,35 @@ bool embot::app::application::theSTRAIN::Impl::processdata(std::vector<embot::hw
         
     }
     
+
+#if defined(DEBUG_acquisition_computetiming)
+
+    debugtime = embot::sys::timeNow();
+    durationof04 = debugtime - timestartADC;
+
+    #if defined(DEBUG_acquisition_computetiming_andtraceit)    
+ 
+    // and now i fill the frame with the times ...
     
-//    debugtime = embot::sys::timeNow() - start; 
-       
+    embot::app::canprotocol::analog::periodic::Message_USERDEF::Info infoU;
+    embot::app::canprotocol::analog::periodic::Message_USERDEF msgU;
+    infoU.canaddress = embot::app::theCANboardInfo::getInstance().cachedCANaddress();
+    infoU.data[0] = (durationof00 >> 4) & 0xff; 
+    infoU.data[1] = (durationof01 >> 4) & 0xff;  
+    infoU.data[2] = (durationof02 >> 4) & 0xff; 
+    infoU.data[3] = (durationof03 >> 4) & 0xff; 
+    infoU.data[4] = (durationof04 >> 4) & 0xff; 
+    infoU.data[5] = 0;
+    infoU.data[6] = durationof04 & 0xff; 
+    infoU.data[7] = (durationof04 & 0xff00) >> 8; 
+    msgU.load(infoU);
+    msgU.get(frame);
+    replies.push_back(frame);
+    
+    #endif // #if defined(DEBUG_acquisition_computetiming_andtraceit) 
+
+#endif  // #if defined(DEBUG_acquisition_computetiming) 
+
     return true;        
     
 }
@@ -1467,7 +1548,7 @@ bool embot::app::application::theSTRAIN::initialise(Config &config)
     // PGA308
     
     embot::hw::PGA308::Config pga308cfg;
-        
+    
     // common settings
     pga308cfg.powerongpio = embot::hw::gpio::GPIO(EN_2V8_GPIO_Port, EN_2V8_Pin);
     pga308cfg.poweronstate = embot::hw::gpio::State::SET;
@@ -1477,7 +1558,7 @@ bool embot::app::application::theSTRAIN::initialise(Config &config)
     
     // from embot::hw::PGA308::one to embot::hw::PGA308::six
     
-    // embot::hw::PGA308::zero
+    // embot::hw::PGA308::one
     pga308cfg.onewirechannel = embot::hw::onewire::Channel::one;
     pga308cfg.onewireconfig.gpio = embot::hw::gpio::GPIO(W_STRAIN1_GPIO_Port, W_STRAIN1_Pin);
     embot::hw::PGA308::init(embot::hw::PGA308::Amplifier::one, pga308cfg);
@@ -1575,7 +1656,7 @@ bool embot::app::application::theSTRAIN::configure(embot::app::canprotocol::anal
 bool embot::app::application::theSTRAIN::get_serial(embot::app::canprotocol::analog::polling::Message_GET_SERIAL_NO::ReplyInfo &replyinfo)
 {  
     // original strain code gets the value from ram, even if the ram and the eeprom are not synched
-    std::snprintf(replyinfo.serial, sizeof(replyinfo.serial), pImpl->configdata.serial_get());
+    std::snprintf(replyinfo.serial, sizeof(replyinfo.serial), "%s", pImpl->configdata.serial_get());
    
     return true;    
 }
