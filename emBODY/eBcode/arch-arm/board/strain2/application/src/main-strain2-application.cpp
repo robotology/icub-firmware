@@ -65,6 +65,7 @@ void tests_tick();
 #include "embot_hw_pga308.h"
 #include "embot_hw_adc.h"
 
+#include "EOtheLEDpulser.h"
 
 #include "embot_hw_bsp_strain2.h"
 
@@ -82,7 +83,7 @@ const embot::hw::SI7051::Config SI7051config = embot::hw::bsp::strain2::thermome
 #endif // TEST_ENABLED
 
 
-static const embot::app::canprotocol::versionOfAPPLICATION vAP = {1, 4 , 2};
+static const embot::app::canprotocol::versionOfAPPLICATION vAP = {1, 4 , 3};
 static const embot::app::canprotocol::versionOfCANPROTOCOL vCP = {2, 0};
 
 static void userdeflauncher(void* param);
@@ -119,7 +120,7 @@ static void userdeflauncher(void* param)
 {
     embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance();
     canbrdinfo.synch(vAP, vCP);
-        
+            
     start_evt_based();      
 }
 
@@ -148,10 +149,37 @@ static std::vector<embot::hw::can::Frame> outframes;
 
 static void start_evt_based(void)
 { 
+    
+//    embot::hw::led::init(embot::hw::led::LED::one);    
+//    embot::hw::led::on(embot::hw::led::LED::one); 
+//    embot::hw::led::off(embot::hw::led::LED::one);     
+//    for(;;)
+//    {
+//        embot::hw::sys::delay(1000*embot::common::time1millisec);
+//        embot::hw::led::toggle(embot::hw::led::LED::one);         
+//    }
+    
+#if 1    
+    eOledpulser_cfg_t ledconfig = {0};    
+    ledconfig.led_enable_mask   = (1 << eo_ledpulser_led_zero);
+    ledconfig.led_init          = reinterpret_cast<eOint8_fp_uint8_cvoidp_t>(embot::hw::led::init_legacy);
+    ledconfig.led_on            = reinterpret_cast<eOint8_fp_uint8_t>(embot::hw::led::on); 
+    ledconfig.led_off           = reinterpret_cast<eOint8_fp_uint8_t>(embot::hw::led::off);
+    ledconfig.led_toggle        = reinterpret_cast<eOint8_fp_uint8_t>(embot::hw::led::toggle);    
+    eo_ledpulser_Initialise(&ledconfig);    
+    eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_zero, embot::common::time1second, 0);  
+#endif
+       
     // start task waiting for can messages. 
     eventbasedtask = new embot::sys::EventTask;  
     const embot::common::relTime waitEventTimeout = 50*1000; //50*1000; //5*1000*1000;    
     eventbasedtask->init(eventbasedtask_init, eventbasedtask_onevent, 4*1024, 200, waitEventTimeout, nullptr, nullptr);    
+    
+    
+#if defined(TEST_ENABLED)
+    tests_launcher_init();
+    return;
+#endif // #if defined(TEST_ENABLED)      
         
     // start canparser basic
     embot::app::application::theCANparserBasic &canparserbasic = embot::app::application::theCANparserBasic::getInstance();
@@ -197,10 +225,13 @@ static void start_evt_based(void)
     r = embot::hw::can::init(embot::hw::can::Port::one, canconfig);
     r = embot::hw::can::setfilters(embot::hw::can::Port::one, embot::app::theCANboardInfo::getInstance().getCANaddress());
     r = r;
-    
-#if defined(TEST_ENABLED)
-    tests_launcher_init();
-#endif // #if defined(TEST_ENABLED)    
+
+#if 0  
+    // it starts the tx immediately  
+    embot::hw::sys::delay(10000);
+    thestrain.configure(20*1000);
+    thestrain.start(embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode::txUncalibrated);
+#endif 
 }
 
 
@@ -227,7 +258,7 @@ static void eventbasedtask_init(embot::sys::Task *t, void *p)
 
 
 static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask eventmask, void *p)
-{     
+{   
     if(0 == eventmask)
     {   // timeout ... 
 #if defined(TEST_ENABLED)        
