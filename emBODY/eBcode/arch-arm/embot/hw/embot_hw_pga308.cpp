@@ -214,7 +214,7 @@ namespace embot { namespace hw { namespace PGA308 {
         if(config.poweronstate != embot::hw::gpio::get(config.powerongpio))
         {
             embot::hw::gpio::set(config.powerongpio, config.poweronstate); 
-            embot::hw::sys::delay(25*1000);
+            embot::hw::sys::delay(25*embot::common::time1millisec);
         }
                 
         
