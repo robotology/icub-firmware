@@ -2,8 +2,6 @@
   ******************************************************************************
   * @file    stm32l4xx_ll_opamp.c
   * @author  MCD Application Team
-  * @version V1.7.0
-  * @date    17-February-2017
   * @brief   OPAMP LL module driver
   ******************************************************************************
   * @attention
@@ -123,10 +121,10 @@
 ErrorStatus LL_OPAMP_DeInit(OPAMP_TypeDef* OPAMPx)
 {
   ErrorStatus status = SUCCESS;
-  
+
   /* Check the parameters */
   assert_param(IS_OPAMP_ALL_INSTANCE(OPAMPx));
-  
+
   LL_OPAMP_WriteReg(OPAMPx, CSR, 0x00000000U);
 
   return status;
@@ -155,7 +153,7 @@ ErrorStatus LL_OPAMP_Init(OPAMP_TypeDef *OPAMPx, LL_OPAMP_InitTypeDef *OPAMP_Ini
   assert_param(IS_LL_OPAMP_POWER_MODE(OPAMP_InitStruct->PowerMode));
   assert_param(IS_LL_OPAMP_FUNCTIONAL_MODE(OPAMP_InitStruct->FunctionalMode));
   assert_param(IS_LL_OPAMP_INPUT_NONINVERTING(OPAMPx, OPAMP_InitStruct->InputNonInverting));
-  
+
   /* Note: OPAMP inverting input can be used with OPAMP in mode standalone    */
   /*       or PGA with external capacitors for filtering circuit.             */
   /*       Otherwise (OPAMP in mode follower), OPAMP inverting input is       */
@@ -164,7 +162,7 @@ ErrorStatus LL_OPAMP_Init(OPAMP_TypeDef *OPAMPx, LL_OPAMP_InitTypeDef *OPAMP_Ini
   {
     assert_param(IS_LL_OPAMP_INPUT_INVERTING(OPAMPx, OPAMP_InitStruct->InputInverting));
   }
-  
+
   /* Configuration of OPAMP instance :                                        */
   /*  - PowerMode                                                             */
   /*  - Functional mode                                                       */
@@ -201,7 +199,7 @@ ErrorStatus LL_OPAMP_Init(OPAMP_TypeDef *OPAMPx, LL_OPAMP_InitTypeDef *OPAMP_Ini
                | LL_OPAMP_INPUT_INVERT_CONNECT_NO
               );
   }
-  
+
   return SUCCESS;
 }
 

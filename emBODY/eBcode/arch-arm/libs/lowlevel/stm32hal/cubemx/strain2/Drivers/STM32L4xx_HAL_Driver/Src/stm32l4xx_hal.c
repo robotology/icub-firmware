@@ -2,8 +2,6 @@
   ******************************************************************************
   * @file    stm32l4xx_hal.c
   * @author  MCD Application Team
-  * @version V1.7.0
-  * @date    17-February-2017
   * @brief   HAL module driver.
   *          This is the common part of the HAL initialization
   *
@@ -67,19 +65,19 @@
 /* Private typedef -----------------------------------------------------------*/
 /* Private define ------------------------------------------------------------*/
 /**
- * @brief STM32L4xx HAL Driver version number V1.7.0
+ * @brief STM32L4xx HAL Driver version number
    */
-#define __STM32L4xx_HAL_VERSION_MAIN   (0x01) /*!< [31:24] main version */
-#define __STM32L4xx_HAL_VERSION_SUB1   (0x07) /*!< [23:16] sub1 version */
-#define __STM32L4xx_HAL_VERSION_SUB2   (0x00) /*!< [15:8]  sub2 version */
-#define __STM32L4xx_HAL_VERSION_RC     (0x00) /*!< [7:0]  release candidate */
-#define __STM32L4xx_HAL_VERSION         ((__STM32L4xx_HAL_VERSION_MAIN << 24)\
-                                        |(__STM32L4xx_HAL_VERSION_SUB1 << 16)\
-                                        |(__STM32L4xx_HAL_VERSION_SUB2 << 8 )\
-                                        |(__STM32L4xx_HAL_VERSION_RC))
+#define STM32L4XX_HAL_VERSION_MAIN   (0x01U) /*!< [31:24] main version */
+#define STM32L4XX_HAL_VERSION_SUB1   (0x09U) /*!< [23:16] sub1 version */
+#define STM32L4XX_HAL_VERSION_SUB2   (0x00U) /*!< [15:8]  sub2 version */
+#define STM32L4XX_HAL_VERSION_RC     (0x00U) /*!< [7:0]  release candidate */
+#define STM32L4XX_HAL_VERSION        ((STM32L4XX_HAL_VERSION_MAIN  << 24U)\
+                                      |(STM32L4XX_HAL_VERSION_SUB1 << 16U)\
+                                      |(STM32L4XX_HAL_VERSION_SUB2 << 8U)\
+                                      |(STM32L4XX_HAL_VERSION_RC))
 
 #if defined(VREFBUF)
-#define VREFBUF_TIMEOUT_VALUE     (uint32_t)10   /* 10 ms (to be confirmed) */
+#define VREFBUF_TIMEOUT_VALUE     10U   /* 10 ms (to be confirmed) */
 #endif /* VREFBUF */
 
 /* ------------ SYSCFG registers bit address in the alias region ------------ */
@@ -87,20 +85,29 @@
 /* ---  MEMRMP Register ---*/
 /* Alias word address of FB_MODE bit */
 #define MEMRMP_OFFSET             SYSCFG_OFFSET
-#define FB_MODE_BitNumber         ((uint8_t)0x8)
-#define FB_MODE_BB                (PERIPH_BB_BASE + (MEMRMP_OFFSET * 32) + (FB_MODE_BitNumber * 4))
+#define FB_MODE_BitNumber         8U
+#define FB_MODE_BB                (PERIPH_BB_BASE + (MEMRMP_OFFSET * 32U) + (FB_MODE_BitNumber * 4U))
 
 /* --- SCSR Register ---*/
 /* Alias word address of SRAM2ER bit */
-#define SCSR_OFFSET              (SYSCFG_OFFSET + 0x18)
-#define BRER_BitNumber           ((uint8_t)0x0)
-#define SCSR_SRAM2ER_BB          (PERIPH_BB_BASE + (SCSR_OFFSET * 32) + (BRER_BitNumber * 4))
+#define SCSR_OFFSET               (SYSCFG_OFFSET + 0x18U)
+#define BRER_BitNumber            0U
+#define SCSR_SRAM2ER_BB           (PERIPH_BB_BASE + (SCSR_OFFSET * 32U) + (BRER_BitNumber * 4U))
 
 /* Private macro -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
-__IO uint32_t uwTick;
-
 /* Private function prototypes -----------------------------------------------*/
+
+/* Exported variables --------------------------------------------------------*/
+
+/** @defgroup HAL_Exported_Variables HAL Exported Variables
+  * @{
+  */
+__IO uint32_t uwTick;
+/**
+  * @}
+  */
+
 /* Exported functions --------------------------------------------------------*/
 
 /** @defgroup HAL_Exported_Functions HAL Exported Functions
@@ -141,23 +148,25 @@ __IO uint32_t uwTick;
 
 /**
   * @brief  Configure the Flash prefetch, the Instruction and Data caches,
-  *         the time base source, NVIC and any required global low level hardware 
-  *         by calling the HAL_MspInit() callback function to be optionally defined in user file 
+  *         the time base source, NVIC and any required global low level hardware
+  *         by calling the HAL_MspInit() callback function to be optionally defined in user file
   *         stm32l4xx_hal_msp.c.
   *
-  * @note   HAL_Init() function is called at the beginning of program after reset and before 
+  * @note   HAL_Init() function is called at the beginning of program after reset and before
   *         the clock configuration.
-  *             
+  *
   * @note   In the default implementation the System Timer (Systick) is used as source of time base.
   *         The Systick configuration is based on MSI clock, as MSI is the clock
   *         used after a system Reset and the NVIC configuration is set to Priority group 4.
-  *         Once done, time base tick starts incrementing: the tick variable counter is incremented 
+  *         Once done, time base tick starts incrementing: the tick variable counter is incremented
   *         each 1ms in the SysTick_Handler() interrupt handler.
   *
   * @retval HAL status
   */
 HAL_StatusTypeDef HAL_Init(void)
 {
+  HAL_StatusTypeDef  status = HAL_OK;
+
   /* Configure Flash prefetch, Instruction cache, Data cache */
   /* Default configuration at reset is:                      */
   /* - Prefetch disabled                                     */
@@ -179,13 +188,18 @@ HAL_StatusTypeDef HAL_Init(void)
   HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
 
   /* Use SysTick as time base source and configure 1ms tick (default clock after Reset is MSI) */
-  HAL_InitTick(TICK_INT_PRIORITY);
-
-  /* Init the low level hardware */
-  HAL_MspInit();
+  if (HAL_InitTick(TICK_INT_PRIORITY) != HAL_OK)
+  {
+    status = HAL_ERROR;
+  }
+  else
+  {
+    /* Init the low level hardware */
+    HAL_MspInit();
+  }
 
   /* Return function status */
-  return HAL_OK;
+  return status;
 }
 
 /**
@@ -253,19 +267,26 @@ __weak void HAL_MspDeInit(void)
   *       than the peripheral interrupt. Otherwise the caller ISR process will be blocked.
   *       The function is declared as __weak  to be overwritten  in case of other
   *       implementation  in user file.
-  * @param TickPriority: Tick interrupt priority.
+  * @param TickPriority  Tick interrupt priority.
   * @retval HAL status
   */
 __weak HAL_StatusTypeDef HAL_InitTick(uint32_t TickPriority)
 {
-  /*Configure the SysTick to have interrupt in 1ms time basis*/
-  HAL_SYSTICK_Config(SystemCoreClock/1000);
+  HAL_StatusTypeDef  status = HAL_OK;
 
-  /*Configure the SysTick IRQ priority */
-  HAL_NVIC_SetPriority(SysTick_IRQn, TickPriority ,0);
+  /*Configure the SysTick to have interrupt in 1ms time basis*/
+  if (HAL_SYSTICK_Config(SystemCoreClock/1000UL) != 0U)
+  {
+    status = HAL_ERROR;
+  }
+  else
+  {
+    /*Configure the SysTick IRQ priority */
+    HAL_NVIC_SetPriority(SysTick_IRQn, TickPriority, 0);
+  }
 
   /* Return function status */
-  return HAL_OK;
+  return status;
 }
 
 /**
@@ -318,14 +339,14 @@ __weak uint32_t HAL_GetTick(void)
 }
 
 /**
-  * @brief This function provides minimum delay (in milliseconds) based 
-  *        on variable incremented. 
+  * @brief This function provides minimum delay (in milliseconds) based
+  *        on variable incremented.
   * @note In the default implementation , SysTick timer is the source of time base.
   *       It is used to generate interrupts at regular time intervals where uwTick
   *       is incremented.
   * @note This function is declared as __weak to be overwritten in case of other
   *       implementations in user file.
-  * @param Delay: specifies the delay time length, in milliseconds.
+  * @param Delay  specifies the delay time length, in milliseconds.
   * @retval None
   */
 __weak void HAL_Delay(uint32_t Delay)
@@ -337,7 +358,7 @@ __weak void HAL_Delay(uint32_t Delay)
   if (wait < HAL_MAX_DELAY)
   {
     wait++;
-  } 
+  }
 
   while((HAL_GetTick() - tickstart) < wait)
   {
@@ -382,7 +403,7 @@ __weak void HAL_ResumeTick(void)
   */
 uint32_t HAL_GetHalVersion(void)
 {
- return __STM32L4xx_HAL_VERSION;
+  return STM32L4XX_HAL_VERSION;
 }
 
 /**
@@ -391,7 +412,7 @@ uint32_t HAL_GetHalVersion(void)
   */
 uint32_t HAL_GetREVID(void)
 {
-   return((DBGMCU->IDCODE & DBGMCU_IDCODE_REV_ID) >> 16);
+  return((DBGMCU->IDCODE & DBGMCU_IDCODE_REV_ID) >> 16);
 }
 
 /**
@@ -400,7 +421,34 @@ uint32_t HAL_GetREVID(void)
   */
 uint32_t HAL_GetDEVID(void)
 {
-   return(DBGMCU->IDCODE & DBGMCU_IDCODE_DEV_ID);
+  return(DBGMCU->IDCODE & DBGMCU_IDCODE_DEV_ID);
+}
+
+/**
+  * @brief  Return the first word of the unique device identifier (UID based on 96 bits)
+  * @retval Device identifier
+  */
+uint32_t HAL_GetUIDw0(void)
+{
+  return(READ_REG(*((uint32_t *)UID_BASE)));
+}
+
+/**
+  * @brief  Return the second word of the unique device identifier (UID based on 96 bits)
+  * @retval Device identifier
+  */
+uint32_t HAL_GetUIDw1(void)
+{
+  return(READ_REG(*((uint32_t *)(UID_BASE + 4U))));
+}
+
+/**
+  * @brief  Return the third word of the unique device identifier (UID based on 96 bits)
+  * @retval Device identifier
+  */
+uint32_t HAL_GetUIDw2(void)
+{
+  return(READ_REG(*((uint32_t *)(UID_BASE + 8U))));
 }
 
 /**
@@ -511,7 +559,7 @@ void HAL_SYSCFG_SRAM2Erase(void)
   SYSCFG->SKR = 0xCA;
   SYSCFG->SKR = 0x53;
   /* Starts a hardware SRAM2 erase operation*/
-  *(__IO uint32_t *) SCSR_SRAM2ER_BB = (uint8_t)0x00000001;
+  *(__IO uint32_t *) SCSR_SRAM2ER_BB = 0x00000001UL;
 }
 
 /**
@@ -526,7 +574,7 @@ void HAL_SYSCFG_SRAM2Erase(void)
   */
 void HAL_SYSCFG_EnableMemorySwappingBank(void)
 {
-  *(__IO uint32_t *)FB_MODE_BB = (uint32_t)ENABLE;
+  *(__IO uint32_t *)FB_MODE_BB = 0x00000000UL;
 }
 
 /**
@@ -542,17 +590,17 @@ void HAL_SYSCFG_EnableMemorySwappingBank(void)
 void HAL_SYSCFG_DisableMemorySwappingBank(void)
 {
 
-  *(__IO uint32_t *)FB_MODE_BB = (uint32_t)DISABLE;
+  *(__IO uint32_t *)FB_MODE_BB = 0x00000000UL;
 }
 
 #if defined(VREFBUF)
 /**
   * @brief Configure the internal voltage reference buffer voltage scale.
-  * @param  VoltageScaling: specifies the output voltage to achieve
+  * @param VoltageScaling  specifies the output voltage to achieve
   *          This parameter can be one of the following values:
-  *            @arg SYSCFG_VREFBUF_VOLTAGE_SCALE0: VREF_OUT1 around 2.048 V. 
+  *            @arg SYSCFG_VREFBUF_VOLTAGE_SCALE0: VREF_OUT1 around 2.048 V.
   *                                                This requires VDDA equal to or higher than 2.4 V.
-  *            @arg SYSCFG_VREFBUF_VOLTAGE_SCALE1: VREF_OUT1 around 2.5 V. 
+  *            @arg SYSCFG_VREFBUF_VOLTAGE_SCALE1: VREF_OUT2 around 2.5 V.
   *                                                This requires VDDA equal to or higher than 2.8 V.
   * @retval None
   */
@@ -560,13 +608,13 @@ void HAL_SYSCFG_VREFBUF_VoltageScalingConfig(uint32_t VoltageScaling)
 {
   /* Check the parameters */
   assert_param(IS_SYSCFG_VREFBUF_VOLTAGE_SCALE(VoltageScaling));
-  
+
   MODIFY_REG(VREFBUF->CSR, VREFBUF_CSR_VRS, VoltageScaling);
 }
 
 /**
   * @brief Configure the internal voltage reference buffer high impedance mode.
-  * @param  Mode: specifies the high impedance mode
+  * @param Mode  specifies the high impedance mode
   *          This parameter can be one of the following values:
   *            @arg SYSCFG_VREFBUF_HIGH_IMPEDANCE_DISABLE: VREF+ pin is internally connect to VREFINT output.
   *            @arg SYSCFG_VREFBUF_HIGH_IMPEDANCE_ENABLE: VREF+ pin is high impedance.
@@ -576,7 +624,7 @@ void HAL_SYSCFG_VREFBUF_HighImpedanceConfig(uint32_t Mode)
 {
   /* Check the parameters */
   assert_param(IS_SYSCFG_VREFBUF_HIGH_IMPEDANCE(Mode));
-  
+
   MODIFY_REG(VREFBUF->CSR, VREFBUF_CSR_HIZ, Mode);
 }
 
@@ -588,7 +636,7 @@ void HAL_SYSCFG_VREFBUF_TrimmingConfig(uint32_t TrimmingValue)
 {
   /* Check the parameters */
   assert_param(IS_SYSCFG_VREFBUF_TRIMMING(TrimmingValue));
-  
+
   MODIFY_REG(VREFBUF->CCR, VREFBUF_CCR_TRIM, TrimmingValue);
 }
 
@@ -598,22 +646,22 @@ void HAL_SYSCFG_VREFBUF_TrimmingConfig(uint32_t TrimmingValue)
   */
 HAL_StatusTypeDef HAL_SYSCFG_EnableVREFBUF(void)
 {
-  uint32_t  tickstart = 0;
-  
+  uint32_t  tickstart;
+
   SET_BIT(VREFBUF->CSR, VREFBUF_CSR_ENVR);
-  
+
   /* Get Start Tick*/
   tickstart = HAL_GetTick();
 
   /* Wait for VRR bit  */
-  while(READ_BIT(VREFBUF->CSR, VREFBUF_CSR_VRR) == RESET)
+  while(READ_BIT(VREFBUF->CSR, VREFBUF_CSR_VRR) == 0U)
   {
     if((HAL_GetTick() - tickstart) > VREFBUF_TIMEOUT_VALUE)
     {
       return HAL_TIMEOUT;
     }
   }
-  
+
   return HAL_OK;
 }
 

@@ -2,8 +2,6 @@
   ******************************************************************************
   * @file    stm32l4xx_hal_spi_ex.h
   * @author  MCD Application Team
-  * @version V1.7.0
-  * @date    17-February-2017
   * @brief   Header file of SPI HAL Extended module.
   ******************************************************************************
   * @attention
@@ -36,8 +34,8 @@
   */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __STM32L4xx_HAL_SPI_EX_H
-#define __STM32L4xx_HAL_SPI_EX_H
+#ifndef STM32L4xx_HAL_SPI_EX_H
+#define STM32L4xx_HAL_SPI_EX_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -88,6 +86,6 @@ HAL_StatusTypeDef HAL_SPIEx_FlushRxFifo(SPI_HandleTypeDef *hspi);
 }
 #endif
 
-#endif /* __STM32L4xx_HAL_SPI_EX_H */
+#endif /* STM32L4xx_HAL_SPI_EX_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

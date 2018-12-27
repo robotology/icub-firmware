@@ -4,8 +4,13 @@
   * Description        : This file provides code for the configuration
   *                      of the I2C instances.
   ******************************************************************************
+  ** This notice applies to any and all portions of this file
+  * that are not between comment pairs USER CODE BEGIN and
+  * USER CODE END. Other portions of this file, whether 
+  * inserted by the user or by software development tools
+  * are owned by their respective copyright owners.
   *
-  * COPYRIGHT(c) 2017 STMicroelectronics
+  * COPYRIGHT(c) 2018 STMicroelectronics
   *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted provided that the following conditions are met:
@@ -35,9 +40,6 @@
 /* Includes ------------------------------------------------------------------*/
 #include "i2c.h"
 
-#include "gpio.h"
-#include "dma.h"
-
 /* USER CODE BEGIN 0 */
 
 /* USER CODE END 0 */
@@ -66,16 +68,14 @@ void MX_I2C1_Init(void)
   {
     Error_Handler();
   }
-
-    /**Configure Analogue filter 
-    */
+  /**Configure Analogue filter 
+  */
   if (HAL_I2CEx_ConfigAnalogFilter(&hi2c1, I2C_ANALOGFILTER_ENABLE) != HAL_OK)
   {
     Error_Handler();
   }
-
-    /**Configure Digital filter 
-    */
+  /**Configure Digital filter 
+  */
   if (HAL_I2CEx_ConfigDigitalFilter(&hi2c1, 0) != HAL_OK)
   {
     Error_Handler();
@@ -99,16 +99,14 @@ void MX_I2C2_Init(void)
   {
     Error_Handler();
   }
-
-    /**Configure Analogue filter 
-    */
+  /**Configure Analogue filter 
+  */
   if (HAL_I2CEx_ConfigAnalogFilter(&hi2c2, I2C_ANALOGFILTER_ENABLE) != HAL_OK)
   {
     Error_Handler();
   }
-
-    /**Configure Digital filter 
-    */
+  /**Configure Digital filter 
+  */
   if (HAL_I2CEx_ConfigDigitalFilter(&hi2c2, 0) != HAL_OK)
   {
     Error_Handler();
@@ -119,13 +117,14 @@ void MX_I2C2_Init(void)
 void HAL_I2C_MspInit(I2C_HandleTypeDef* i2cHandle)
 {
 
-  GPIO_InitTypeDef GPIO_InitStruct;
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
   if(i2cHandle->Instance==I2C1)
   {
   /* USER CODE BEGIN I2C1_MspInit 0 */
 
   /* USER CODE END I2C1_MspInit 0 */
   
+    __HAL_RCC_GPIOB_CLK_ENABLE();
     /**I2C1 GPIO Configuration    
     PB7     ------> I2C1_SDA
     PB6     ------> I2C1_SCL 
@@ -137,11 +136,11 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef* i2cHandle)
     GPIO_InitStruct.Alternate = GPIO_AF4_I2C1;
     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-    /* Peripheral clock enable */
+    /* I2C1 clock enable */
     __HAL_RCC_I2C1_CLK_ENABLE();
-
-    /* Peripheral DMA init*/
   
+    /* I2C1 DMA Init */
+    /* I2C1_TX Init */
     hdma_i2c1_tx.Instance = DMA1_Channel6;
     hdma_i2c1_tx.Init.Request = DMA_REQUEST_3;
     hdma_i2c1_tx.Init.Direction = DMA_MEMORY_TO_PERIPH;
@@ -158,6 +157,7 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef* i2cHandle)
 
     __HAL_LINKDMA(i2cHandle,hdmatx,hdma_i2c1_tx);
 
+    /* I2C1_RX Init */
     hdma_i2c1_rx.Instance = DMA1_Channel7;
     hdma_i2c1_rx.Init.Request = DMA_REQUEST_3;
     hdma_i2c1_rx.Init.Direction = DMA_PERIPH_TO_MEMORY;
@@ -174,7 +174,7 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef* i2cHandle)
 
     __HAL_LINKDMA(i2cHandle,hdmarx,hdma_i2c1_rx);
 
-    /* Peripheral interrupt init */
+    /* I2C1 interrupt Init */
     HAL_NVIC_SetPriority(I2C1_EV_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(I2C1_EV_IRQn);
     HAL_NVIC_SetPriority(I2C1_ER_IRQn, 0, 0);
@@ -189,6 +189,7 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef* i2cHandle)
 
   /* USER CODE END I2C2_MspInit 0 */
   
+    __HAL_RCC_GPIOB_CLK_ENABLE();
     /**I2C2 GPIO Configuration    
     PB14     ------> I2C2_SDA
     PB10     ------> I2C2_SCL 
@@ -200,11 +201,11 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef* i2cHandle)
     GPIO_InitStruct.Alternate = GPIO_AF4_I2C2;
     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-    /* Peripheral clock enable */
+    /* I2C2 clock enable */
     __HAL_RCC_I2C2_CLK_ENABLE();
-
-    /* Peripheral DMA init*/
   
+    /* I2C2 DMA Init */
+    /* I2C2_TX Init */
     hdma_i2c2_tx.Instance = DMA1_Channel4;
     hdma_i2c2_tx.Init.Request = DMA_REQUEST_3;
     hdma_i2c2_tx.Init.Direction = DMA_MEMORY_TO_PERIPH;
@@ -221,6 +222,7 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef* i2cHandle)
 
     __HAL_LINKDMA(i2cHandle,hdmatx,hdma_i2c2_tx);
 
+    /* I2C2_RX Init */
     hdma_i2c2_rx.Instance = DMA1_Channel5;
     hdma_i2c2_rx.Init.Request = DMA_REQUEST_3;
     hdma_i2c2_rx.Init.Direction = DMA_PERIPH_TO_MEMORY;
@@ -237,7 +239,7 @@ void HAL_I2C_MspInit(I2C_HandleTypeDef* i2cHandle)
 
     __HAL_LINKDMA(i2cHandle,hdmarx,hdma_i2c2_rx);
 
-    /* Peripheral interrupt init */
+    /* I2C2 interrupt Init */
     HAL_NVIC_SetPriority(I2C2_EV_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(I2C2_EV_IRQn);
     HAL_NVIC_SetPriority(I2C2_ER_IRQn, 0, 0);
@@ -265,15 +267,13 @@ void HAL_I2C_MspDeInit(I2C_HandleTypeDef* i2cHandle)
     */
     HAL_GPIO_DeInit(GPIOB, GPIO_PIN_7|GPIO_PIN_6);
 
-    /* Peripheral DMA DeInit*/
+    /* I2C1 DMA DeInit */
     HAL_DMA_DeInit(i2cHandle->hdmatx);
     HAL_DMA_DeInit(i2cHandle->hdmarx);
 
-    /* Peripheral interrupt Deinit*/
+    /* I2C1 interrupt Deinit */
     HAL_NVIC_DisableIRQ(I2C1_EV_IRQn);
-
     HAL_NVIC_DisableIRQ(I2C1_ER_IRQn);
-
   /* USER CODE BEGIN I2C1_MspDeInit 1 */
 
   /* USER CODE END I2C1_MspDeInit 1 */
@@ -292,15 +292,13 @@ void HAL_I2C_MspDeInit(I2C_HandleTypeDef* i2cHandle)
     */
     HAL_GPIO_DeInit(GPIOB, GPIO_PIN_14|GPIO_PIN_10);
 
-    /* Peripheral DMA DeInit*/
+    /* I2C2 DMA DeInit */
     HAL_DMA_DeInit(i2cHandle->hdmatx);
     HAL_DMA_DeInit(i2cHandle->hdmarx);
 
-    /* Peripheral interrupt Deinit*/
+    /* I2C2 interrupt Deinit */
     HAL_NVIC_DisableIRQ(I2C2_EV_IRQn);
-
     HAL_NVIC_DisableIRQ(I2C2_ER_IRQn);
-
   /* USER CODE BEGIN I2C2_MspDeInit 1 */
 
   /* USER CODE END I2C2_MspDeInit 1 */
@@ -310,13 +308,5 @@ void HAL_I2C_MspDeInit(I2C_HandleTypeDef* i2cHandle)
 /* USER CODE BEGIN 1 */
 
 /* USER CODE END 1 */
-
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

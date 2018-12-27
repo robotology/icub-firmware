@@ -2,8 +2,6 @@
   ******************************************************************************
   * @file    stm32l4xx_hal_iwdg.c
   * @author  MCD Application Team
-  * @version V1.7.0
-  * @date    17-February-2017
   * @brief   IWDG HAL module driver.
   *          This file provides firmware functions to manage the following 
   *          functionalities of the Independent Watchdog (IWDG) peripheral:
@@ -199,8 +197,8 @@ HAL_StatusTypeDef HAL_IWDG_Init(IWDG_HandleTypeDef *hiwdg)
   /* Check pending flag, if previous update not done, return timeout */
   tickstart = HAL_GetTick();
 
-   /* Wait for register to be updated */
-  while(hiwdg->Instance->SR != RESET)
+  /* Wait for register to be updated */
+  while (hiwdg->Instance->SR != 0x00u)
   {
     if((HAL_GetTick() - tickstart ) > HAL_IWDG_DEFAULT_TIMEOUT)
     {

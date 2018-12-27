@@ -4,8 +4,13 @@
   * Description        : This file provides code for the configuration
   *                      of the ADC instances.
   ******************************************************************************
+  ** This notice applies to any and all portions of this file
+  * that are not between comment pairs USER CODE BEGIN and
+  * USER CODE END. Other portions of this file, whether 
+  * inserted by the user or by software development tools
+  * are owned by their respective copyright owners.
   *
-  * COPYRIGHT(c) 2017 STMicroelectronics
+  * COPYRIGHT(c) 2018 STMicroelectronics
   *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted provided that the following conditions are met:
@@ -35,9 +40,6 @@
 /* Includes ------------------------------------------------------------------*/
 #include "adc.h"
 
-#include "gpio.h"
-#include "dma.h"
-
 /* USER CODE BEGIN 0 */
 
 /* USER CODE END 0 */
@@ -48,10 +50,10 @@ DMA_HandleTypeDef hdma_adc1;
 /* ADC1 init function */
 void MX_ADC1_Init(void)
 {
-  ADC_ChannelConfTypeDef sConfig;
+  ADC_ChannelConfTypeDef sConfig = {0};
 
-    /**Common config 
-    */
+  /**Common config 
+  */
   hadc1.Instance = ADC1;
   hadc1.Init.ClockPrescaler = ADC_CLOCK_ASYNC_DIV2;
   hadc1.Init.Resolution = ADC_RESOLUTION_12B;
@@ -62,7 +64,6 @@ void MX_ADC1_Init(void)
   hadc1.Init.ContinuousConvMode = ENABLE;
   hadc1.Init.NbrOfConversion = 6;
   hadc1.Init.DiscontinuousConvMode = DISABLE;
-  hadc1.Init.NbrOfDiscConversion = 1;
   hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
   hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
   hadc1.Init.DMAContinuousRequests = ENABLE;
@@ -76,11 +77,10 @@ void MX_ADC1_Init(void)
   {
     Error_Handler();
   }
-
-    /**Configure Regular Channel 
-    */
+  /**Configure Regular Channel 
+  */
   sConfig.Channel = ADC_CHANNEL_1;
-  sConfig.Rank = 1;
+  sConfig.Rank = ADC_REGULAR_RANK_1;
   sConfig.SamplingTime = ADC_SAMPLETIME_2CYCLES_5;
   sConfig.SingleDiff = ADC_SINGLE_ENDED;
   sConfig.OffsetNumber = ADC_OFFSET_NONE;
@@ -89,48 +89,43 @@ void MX_ADC1_Init(void)
   {
     Error_Handler();
   }
-
-    /**Configure Regular Channel 
-    */
+  /**Configure Regular Channel 
+  */
   sConfig.Channel = ADC_CHANNEL_2;
-  sConfig.Rank = 2;
+  sConfig.Rank = ADC_REGULAR_RANK_2;
   sConfig.SamplingTime = ADC_SAMPLETIME_6CYCLES_5;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
   {
     Error_Handler();
   }
-
-    /**Configure Regular Channel 
-    */
+  /**Configure Regular Channel 
+  */
   sConfig.Channel = ADC_CHANNEL_3;
-  sConfig.Rank = 3;
+  sConfig.Rank = ADC_REGULAR_RANK_3;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
   {
     Error_Handler();
   }
-
-    /**Configure Regular Channel 
-    */
+  /**Configure Regular Channel 
+  */
   sConfig.Channel = ADC_CHANNEL_4;
-  sConfig.Rank = 4;
+  sConfig.Rank = ADC_REGULAR_RANK_4;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
   {
     Error_Handler();
   }
-
-    /**Configure Regular Channel 
-    */
+  /**Configure Regular Channel 
+  */
   sConfig.Channel = ADC_CHANNEL_5;
-  sConfig.Rank = 5;
+  sConfig.Rank = ADC_REGULAR_RANK_5;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
   {
     Error_Handler();
   }
-
-    /**Configure Regular Channel 
-    */
+  /**Configure Regular Channel 
+  */
   sConfig.Channel = ADC_CHANNEL_6;
-  sConfig.Rank = 6;
+  sConfig.Rank = ADC_REGULAR_RANK_6;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
   {
     Error_Handler();
@@ -141,15 +136,17 @@ void MX_ADC1_Init(void)
 void HAL_ADC_MspInit(ADC_HandleTypeDef* adcHandle)
 {
 
-  GPIO_InitTypeDef GPIO_InitStruct;
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
   if(adcHandle->Instance==ADC1)
   {
   /* USER CODE BEGIN ADC1_MspInit 0 */
 
   /* USER CODE END ADC1_MspInit 0 */
-    /* Peripheral clock enable */
+    /* ADC1 clock enable */
     __HAL_RCC_ADC_CLK_ENABLE();
   
+    __HAL_RCC_GPIOC_CLK_ENABLE();
+    __HAL_RCC_GPIOA_CLK_ENABLE();
     /**ADC1 GPIO Configuration    
     PC1     ------> ADC1_IN2
     PC0     ------> ADC1_IN1
@@ -168,8 +165,8 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* adcHandle)
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-    /* Peripheral DMA init*/
-  
+    /* ADC1 DMA Init */
+    /* ADC1 Init */
     hdma_adc1.Instance = DMA1_Channel1;
     hdma_adc1.Init.Request = DMA_REQUEST_0;
     hdma_adc1.Init.Direction = DMA_PERIPH_TO_MEMORY;
@@ -186,7 +183,7 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* adcHandle)
 
     __HAL_LINKDMA(adcHandle,DMA_Handle,hdma_adc1);
 
-    /* Peripheral interrupt init */
+    /* ADC1 interrupt Init */
     HAL_NVIC_SetPriority(ADC1_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(ADC1_IRQn);
   /* USER CODE BEGIN ADC1_MspInit 1 */
@@ -218,28 +215,19 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* adcHandle)
 
     HAL_GPIO_DeInit(GPIOA, STRAIN5_Pin|STRAIN6_Pin);
 
-    /* Peripheral DMA DeInit*/
+    /* ADC1 DMA DeInit */
     HAL_DMA_DeInit(adcHandle->DMA_Handle);
 
-    /* Peripheral interrupt Deinit*/
+    /* ADC1 interrupt Deinit */
     HAL_NVIC_DisableIRQ(ADC1_IRQn);
-
-  }
   /* USER CODE BEGIN ADC1_MspDeInit 1 */
 
   /* USER CODE END ADC1_MspDeInit 1 */
+  }
 } 
 
 /* USER CODE BEGIN 1 */
 
 /* USER CODE END 1 */
-
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

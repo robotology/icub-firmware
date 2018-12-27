@@ -2,8 +2,6 @@
   ******************************************************************************
   * @file    stm32l4xx_ll_exti.h
   * @author  MCD Application Team
-  * @version V1.7.0
-  * @date    17-February-2017
   * @brief   Header file of EXTI LL module.
   ******************************************************************************
   * @attention
@@ -187,6 +185,9 @@ typedef struct
 #if defined(EXTI_IMR2_IM39)
 #define LL_EXTI_LINE_39                EXTI_IMR2_IM39          /*!< Extended line 39 */
 #endif
+#if defined(EXTI_IMR2_IM40)
+#define LL_EXTI_LINE_40                EXTI_IMR2_IM40          /*!< Extended line 40 */
+#endif
 #define LL_EXTI_LINE_ALL_32_63         EXTI_IMR2_IM            /*!< All Extended line not reserved*/
 
 
@@ -199,6 +200,8 @@ typedef struct
 /**
   * @}
   */
+
+
 #if defined(USE_FULL_LL_DRIVER)
 
 /** @defgroup EXTI_LL_EC_MODE Mode
@@ -329,13 +332,15 @@ __STATIC_INLINE void LL_EXTI_EnableIT_0_31(uint32_t ExtiLine)
   * @param  ExtiLine This parameter can be one of the following values:
   *         @arg @ref LL_EXTI_LINE_32
   *         @arg @ref LL_EXTI_LINE_33
-  *         @arg @ref LL_EXTI_LINE_34
+  *         @arg @ref LL_EXTI_LINE_34(*)
   *         @arg @ref LL_EXTI_LINE_35
   *         @arg @ref LL_EXTI_LINE_36
   *         @arg @ref LL_EXTI_LINE_37
   *         @arg @ref LL_EXTI_LINE_38
-  *         @arg @ref LL_EXTI_LINE_39
+  *         @arg @ref LL_EXTI_LINE_39(*)
+  *         @arg @ref LL_EXTI_LINE_40(*)
   *         @arg @ref LL_EXTI_LINE_ALL_32_63
+  * @note   (*): Available in some devices
   * @retval None
   */
 __STATIC_INLINE void LL_EXTI_EnableIT_32_63(uint32_t ExtiLine)
@@ -400,13 +405,15 @@ __STATIC_INLINE void LL_EXTI_DisableIT_0_31(uint32_t ExtiLine)
   * @param  ExtiLine This parameter can be one of the following values:
   *         @arg @ref LL_EXTI_LINE_32
   *         @arg @ref LL_EXTI_LINE_33
-  *         @arg @ref LL_EXTI_LINE_34
+  *         @arg @ref LL_EXTI_LINE_34(*)
   *         @arg @ref LL_EXTI_LINE_35
   *         @arg @ref LL_EXTI_LINE_36
   *         @arg @ref LL_EXTI_LINE_37
   *         @arg @ref LL_EXTI_LINE_38
-  *         @arg @ref LL_EXTI_LINE_39
+  *         @arg @ref LL_EXTI_LINE_39(*)
+  *         @arg @ref LL_EXTI_LINE_40(*)
   *         @arg @ref LL_EXTI_LINE_ALL_32_63
+  * @note   (*): Available in some devices
   * @retval None
   */
 __STATIC_INLINE void LL_EXTI_DisableIT_32_63(uint32_t ExtiLine)
@@ -459,7 +466,7 @@ __STATIC_INLINE void LL_EXTI_DisableIT_32_63(uint32_t ExtiLine)
   */
 __STATIC_INLINE uint32_t LL_EXTI_IsEnabledIT_0_31(uint32_t ExtiLine)
 {
-  return (READ_BIT(EXTI->IMR1, ExtiLine) == (ExtiLine));
+  return ((READ_BIT(EXTI->IMR1, ExtiLine) == (ExtiLine)) ? 1UL : 0UL);
 }
 
 /**
@@ -471,18 +478,20 @@ __STATIC_INLINE uint32_t LL_EXTI_IsEnabledIT_0_31(uint32_t ExtiLine)
   * @param  ExtiLine This parameter can be one of the following values:
   *         @arg @ref LL_EXTI_LINE_32
   *         @arg @ref LL_EXTI_LINE_33
-  *         @arg @ref LL_EXTI_LINE_34
+  *         @arg @ref LL_EXTI_LINE_34(*)
   *         @arg @ref LL_EXTI_LINE_35
   *         @arg @ref LL_EXTI_LINE_36
   *         @arg @ref LL_EXTI_LINE_37
   *         @arg @ref LL_EXTI_LINE_38
-  *         @arg @ref LL_EXTI_LINE_39
+  *         @arg @ref LL_EXTI_LINE_39(*)
+  *         @arg @ref LL_EXTI_LINE_40(*)
   *         @arg @ref LL_EXTI_LINE_ALL_32_63
+  * @note   (*): Available in some devices
   * @retval State of bit (1 or 0).
   */
 __STATIC_INLINE uint32_t LL_EXTI_IsEnabledIT_32_63(uint32_t ExtiLine)
 {
-  return (READ_BIT(EXTI->IMR2, ExtiLine) == (ExtiLine));
+  return ((READ_BIT(EXTI->IMR2, ExtiLine) == (ExtiLine)) ? 1UL : 0UL);
 }
 
 /**
@@ -545,13 +554,15 @@ __STATIC_INLINE void LL_EXTI_EnableEvent_0_31(uint32_t ExtiLine)
   * @param  ExtiLine This parameter can be a combination of the following values:
   *         @arg @ref LL_EXTI_LINE_32
   *         @arg @ref LL_EXTI_LINE_33
-  *         @arg @ref LL_EXTI_LINE_34
+  *         @arg @ref LL_EXTI_LINE_34(*)
   *         @arg @ref LL_EXTI_LINE_35
   *         @arg @ref LL_EXTI_LINE_36
   *         @arg @ref LL_EXTI_LINE_37
   *         @arg @ref LL_EXTI_LINE_38
-  *         @arg @ref LL_EXTI_LINE_39
+  *         @arg @ref LL_EXTI_LINE_39(*)
+  *         @arg @ref LL_EXTI_LINE_40(*)
   *         @arg @ref LL_EXTI_LINE_ALL_32_63
+  * @note   (*): Available in some devices
   * @retval None
   */
 __STATIC_INLINE void LL_EXTI_EnableEvent_32_63(uint32_t ExtiLine)
@@ -610,13 +621,15 @@ __STATIC_INLINE void LL_EXTI_DisableEvent_0_31(uint32_t ExtiLine)
   * @param  ExtiLine This parameter can be a combination of the following values:
   *         @arg @ref LL_EXTI_LINE_32
   *         @arg @ref LL_EXTI_LINE_33
-  *         @arg @ref LL_EXTI_LINE_34
+  *         @arg @ref LL_EXTI_LINE_34(*)
   *         @arg @ref LL_EXTI_LINE_35
   *         @arg @ref LL_EXTI_LINE_36
   *         @arg @ref LL_EXTI_LINE_37
   *         @arg @ref LL_EXTI_LINE_38
-  *         @arg @ref LL_EXTI_LINE_39
+  *         @arg @ref LL_EXTI_LINE_39(*)
+  *         @arg @ref LL_EXTI_LINE_40(*)
   *         @arg @ref LL_EXTI_LINE_ALL_32_63
+  * @note   (*): Available in some devices
   * @retval None
   */
 __STATIC_INLINE void LL_EXTI_DisableEvent_32_63(uint32_t ExtiLine)
@@ -666,7 +679,7 @@ __STATIC_INLINE void LL_EXTI_DisableEvent_32_63(uint32_t ExtiLine)
   */
 __STATIC_INLINE uint32_t LL_EXTI_IsEnabledEvent_0_31(uint32_t ExtiLine)
 {
-  return (READ_BIT(EXTI->EMR1, ExtiLine) == (ExtiLine));
+  return ((READ_BIT(EXTI->EMR1, ExtiLine) == (ExtiLine)) ? 1UL : 0UL);
 
 }
 
@@ -676,18 +689,20 @@ __STATIC_INLINE uint32_t LL_EXTI_IsEnabledEvent_0_31(uint32_t ExtiLine)
   * @param  ExtiLine This parameter can be a combination of the following values:
   *         @arg @ref LL_EXTI_LINE_32
   *         @arg @ref LL_EXTI_LINE_33
-  *         @arg @ref LL_EXTI_LINE_34
+  *         @arg @ref LL_EXTI_LINE_34(*)
   *         @arg @ref LL_EXTI_LINE_35
   *         @arg @ref LL_EXTI_LINE_36
   *         @arg @ref LL_EXTI_LINE_37
   *         @arg @ref LL_EXTI_LINE_38
-  *         @arg @ref LL_EXTI_LINE_39
+  *         @arg @ref LL_EXTI_LINE_39(*)
+  *         @arg @ref LL_EXTI_LINE_40(*)
   *         @arg @ref LL_EXTI_LINE_ALL_32_63
+  * @note   (*): Available in some devices
   * @retval State of bit (1 or 0).
   */
 __STATIC_INLINE uint32_t LL_EXTI_IsEnabledEvent_32_63(uint32_t ExtiLine)
 {
-  return (READ_BIT(EXTI->EMR2, ExtiLine) == (ExtiLine));
+  return ((READ_BIT(EXTI->EMR2, ExtiLine) == (ExtiLine)) ? 1UL : 0UL);
 }
 
 /**
@@ -865,7 +880,7 @@ __STATIC_INLINE void LL_EXTI_DisableRisingTrig_32_63(uint32_t ExtiLine)
   */
 __STATIC_INLINE uint32_t LL_EXTI_IsEnabledRisingTrig_0_31(uint32_t ExtiLine)
 {
-  return (READ_BIT(EXTI->RTSR1, ExtiLine) == (ExtiLine));
+  return ((READ_BIT(EXTI->RTSR1, ExtiLine) == (ExtiLine)) ? 1UL : 0UL);
 }
 
 /**
@@ -880,7 +895,7 @@ __STATIC_INLINE uint32_t LL_EXTI_IsEnabledRisingTrig_0_31(uint32_t ExtiLine)
   */
 __STATIC_INLINE uint32_t LL_EXTI_IsEnabledRisingTrig_32_63(uint32_t ExtiLine)
 {
-  return (READ_BIT(EXTI->RTSR2, ExtiLine) == (ExtiLine));
+  return ((READ_BIT(EXTI->RTSR2, ExtiLine) == (ExtiLine)) ? 1UL : 0UL);
 }
 
 /**
@@ -1055,7 +1070,7 @@ __STATIC_INLINE void LL_EXTI_DisableFallingTrig_32_63(uint32_t ExtiLine)
   */
 __STATIC_INLINE uint32_t LL_EXTI_IsEnabledFallingTrig_0_31(uint32_t ExtiLine)
 {
-  return (READ_BIT(EXTI->FTSR1, ExtiLine) == (ExtiLine));
+  return ((READ_BIT(EXTI->FTSR1, ExtiLine) == (ExtiLine)) ? 1UL : 0UL);
 }
 
 /**
@@ -1070,7 +1085,7 @@ __STATIC_INLINE uint32_t LL_EXTI_IsEnabledFallingTrig_0_31(uint32_t ExtiLine)
   */
 __STATIC_INLINE uint32_t LL_EXTI_IsEnabledFallingTrig_32_63(uint32_t ExtiLine)
 {
-  return (READ_BIT(EXTI->FTSR2, ExtiLine) == (ExtiLine));
+  return ((READ_BIT(EXTI->FTSR2, ExtiLine) == (ExtiLine)) ? 1UL : 0UL);
 }
 
 /**
@@ -1187,7 +1202,7 @@ __STATIC_INLINE void LL_EXTI_GenerateSWI_32_63(uint32_t ExtiLine)
   */
 __STATIC_INLINE uint32_t LL_EXTI_IsActiveFlag_0_31(uint32_t ExtiLine)
 {
-  return (READ_BIT(EXTI->PR1, ExtiLine) == (ExtiLine));
+  return ((READ_BIT(EXTI->PR1, ExtiLine) == (ExtiLine)) ? 1UL : 0UL);
 }
 
 /**
@@ -1204,7 +1219,7 @@ __STATIC_INLINE uint32_t LL_EXTI_IsActiveFlag_0_31(uint32_t ExtiLine)
   */
 __STATIC_INLINE uint32_t LL_EXTI_IsActiveFlag_32_63(uint32_t ExtiLine)
 {
-  return (READ_BIT(EXTI->PR2, ExtiLine) == (ExtiLine));
+  return ((READ_BIT(EXTI->PR2, ExtiLine) == (ExtiLine)) ? 1UL : 0UL);
 }
 
 /**
@@ -1245,7 +1260,6 @@ __STATIC_INLINE uint32_t LL_EXTI_ReadFlag_0_31(uint32_t ExtiLine)
 {
   return (uint32_t)(READ_BIT(EXTI->PR1, ExtiLine));
 }
-
 
 /**
   * @brief  Read ExtLine Combination Flag for  Lines in range 32 to 63
@@ -1319,6 +1333,7 @@ __STATIC_INLINE void LL_EXTI_ClearFlag_32_63(uint32_t ExtiLine)
 {
   WRITE_REG(EXTI->PR2, ExtiLine);
 }
+
 
 /**
   * @}

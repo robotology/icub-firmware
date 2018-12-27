@@ -2,8 +2,6 @@
   ******************************************************************************
   * @file    stm32l4xx_ll_i2c.c
   * @author  MCD Application Team
-  * @version V1.7.0
-  * @date    17-February-2017
   * @brief   I2C LL module driver.
   ******************************************************************************
   * @attention
@@ -102,7 +100,7 @@
   *          - SUCCESS: I2C registers are de-initialized
   *          - ERROR: I2C registers are not de-initialized
   */
-uint32_t LL_I2C_DeInit(I2C_TypeDef *I2Cx)
+ErrorStatus LL_I2C_DeInit(I2C_TypeDef *I2Cx)
 {
   ErrorStatus status = SUCCESS;
 
@@ -162,7 +160,7 @@ uint32_t LL_I2C_DeInit(I2C_TypeDef *I2Cx)
   *          - SUCCESS: I2C registers are initialized
   *          - ERROR: Not applicable
   */
-uint32_t LL_I2C_Init(I2C_TypeDef *I2Cx, LL_I2C_InitTypeDef *I2C_InitStruct)
+ErrorStatus LL_I2C_Init(I2C_TypeDef *I2Cx, LL_I2C_InitTypeDef *I2C_InitStruct)
 {
   /* Check the I2C Instance I2Cx */
   assert_param(IS_I2C_ALL_INSTANCE(I2Cx));
@@ -204,7 +202,10 @@ uint32_t LL_I2C_Init(I2C_TypeDef *I2Cx, LL_I2C_InitTypeDef *I2C_InitStruct)
   LL_I2C_SetOwnAddress1(I2Cx, I2C_InitStruct->OwnAddress1, I2C_InitStruct->OwnAddrSize);
 
   /* OwnAdress1 == 0 is reserved for General Call address */
-  if (I2C_InitStruct->OwnAddress1 != 0U) LL_I2C_EnableOwnAddress1(I2Cx);
+  if (I2C_InitStruct->OwnAddress1 != 0U)
+  {
+    LL_I2C_EnableOwnAddress1(I2Cx);
+  }
 
   /*---------------------------- I2Cx MODE Configuration -----------------------
   * Configure I2Cx peripheral mode with parameter :
