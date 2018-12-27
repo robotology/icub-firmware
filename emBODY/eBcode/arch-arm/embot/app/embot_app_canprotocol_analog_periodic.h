@@ -35,6 +35,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
     enum class CMD { 
         none = 0xfe, 
         
+        USERDEF = 0, 
         UNCALIBFORCE_VECTOR_DEBUGMODE = ICUBCANPROTO_PER_AS_MSG__UNCALIBFORCE_VECTOR_DEBUGMODE, 
         UNCALIBTORQUE_VECTOR_DEBUGMODE = ICUBCANPROTO_PER_AS_MSG__UNCALIBTORQUE_VECTOR_DEBUGMODE,                    // strain 
         FORCE_VECTOR = ICUBCANPROTO_PER_AS_MSG__FORCE_VECTOR, 
@@ -203,6 +204,25 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         bool get(embot::hw::can::Frame &outframe);        
     };    
         
+    class Message_USERDEF : public Message
+    {
+        public:
+            
+        struct Info
+        { 
+            std::uint8_t                canaddress;
+            std::uint8_t                data[8];
+            Info() : canaddress(0) { std::memset(data, 0, sizeof(data)); }
+        };
+        
+        Info info;
+        
+        Message_USERDEF() {}
+            
+        bool load(const Info& inf);
+            
+        bool get(embot::hw::can::Frame &outframe);        
+    };    
     
 }}}}} // namespace embot { namespace app { namespace canprotocol { namespace analog { namespace periodic {    
 
