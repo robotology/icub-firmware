@@ -202,14 +202,20 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  
+ 
+#if 1
+    #warning marco.accame on 27dec18 has uncommented every user-defined can code as it doesnt compile. read commennts in here for more details    
+    // marco.accame on 27dec18: sic.. it doesnt compile because of chanhge of can api.
+    // i uncomment it, as i dont need to make it work    
+#else
   /*##-2- Start the Reception process and enable reception interrupt #########*/
   if (HAL_CAN_Receive_IT(&hcan1, CAN_FIFO0) != HAL_OK)
   {
     /* Reception Error */
     Error_Handler();
   }
-  
+#endif
+
   PGA308_init();
   //PGA308_DefaultConfig();
   
@@ -443,6 +449,11 @@ void PGA_StableRegister(uint16_t REGISTER){
 // CAN messages management
 // -----------------------------------------------------------------------------------------------------------------------------
 void CANBUS(void){
+#if 1
+    #warning marco.accame on 27dec18 has uncommented every user-defined can code as it doesnt compile. read commennts in here for more details    
+    // marco.accame on 27dec18: sic.. it doesnt compile because of chanhge of can api.
+    // i uncomment it, as i dont need to make it work    
+#else
 	switch(can_message){
     case 0x00:  
     {
@@ -531,6 +542,7 @@ void CANBUS(void){
     }
     break;
   }
+#endif  
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------

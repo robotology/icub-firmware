@@ -6,6 +6,16 @@
 *  <andrea.mura@iit.it>                             *
 ****************************************************/
 
+#if 1
+
+    #warning marco.accame on 27dec18 has uncommented every user-defined can function as they dont compile. read commennts in here for more details
+    
+    // marco.accame on 27dec18: sic.. it doesnt compile because of chanhge of can api.
+    // i uncomment it, as i dont need to make it work
+    
+    void CAN_Config(void){}
+                  
+#else
 
 #include "stm32l4xx_hal.h"
 #include "can.h"
@@ -19,6 +29,7 @@ extern uint8_t REG_OK;
 extern uint8_t REGISTER;
 extern uint8_t CHANNEL;
 extern uint8_t PGA308_StartCalib;
+
 
 // -----------------------------------------------------------------------------------------------------------------------------
 // CAN configuration
@@ -137,3 +148,8 @@ void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan)
     //Error_Handler();
   }
 }
+
+           
+#endif
+
+
