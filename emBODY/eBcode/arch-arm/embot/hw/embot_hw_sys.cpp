@@ -35,7 +35,7 @@
 using namespace std;
 
 #include "embot_hw_bsp.h"
-
+#include "embot_hw_lowlevel.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -95,34 +95,6 @@ namespace embot { namespace hw { namespace sys {
 #endif
 
  
-#if     defined(STM32HAL_BOARD_NUCLEO64) || defined(STM32HAL_BOARD_MTB4) || defined(STM32HAL_BOARD_STRAIN2) || defined(STM32HAL_BOARD_RFE)
-
-#if __ARMCOMPILER_VERSION > 6000000
-static int ss_hl_sys_asm_xnumARMv7ops(uint32_t i)
-{
-  int res = 0;
-  __asm 
-  (
-    "DOWAITLOOP:                            \t\n"
-    "SUBS %[input_i], %[input_i], #1        \t\n"
-    "BNE DOWAITLOOP                         \t\n"
-    : [result] "=&r" (res)
-    : [input_i] "r" (i)
-  );
-  return 0;
-}
-#else
-__asm static void ss_hl_sys_asm_xnumARMv7ops(uint32_t numberof) 
-{
-   align
-dowaitloop
-   subs r0,r0,#1
-   bne dowaitloop
-   bx lr 
-   align    
-}
-#endif
-
     static void ss_bsp_delay(uint64_t t)
     {   
         static uint64_t s_hl_sys_numofops1sec = 0;
@@ -156,10 +128,9 @@ dowaitloop
         {
             return;
         }
-        ss_hl_sys_asm_xnumARMv7ops((uint32_t)num);
+        embot::hw::lowlevel::asmEXECcycles(static_cast<uint32_t>(num));
     }
     
-#endif
     
     std::uint32_t clock(CLOCK clk)
     {
