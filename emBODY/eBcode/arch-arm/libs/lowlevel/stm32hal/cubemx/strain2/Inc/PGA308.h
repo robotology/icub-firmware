@@ -14,13 +14,13 @@
 #define LOW   0
 #define HIGH  1
 
-#define ZDAC  0x00
-#define GDAC  0x01
-#define CFG0  0x02
-#define CFG1  0x03
-#define CFG2  0x04
-#define CHKS  0x05
-#define SFTC  0x07
+#define RAM_ZDAC  0x00
+#define RAM_GDAC  0x01
+#define RAM_CFG0  0x02
+#define RAM_CFG1  0x03
+#define RAM_CFG2  0x04
+#define RAM_CHKS  0x05
+#define RAM_SFTC  0x07
 
 #define ONEW_WR			0x00
 #define ONEW_RD			0x01
@@ -55,17 +55,19 @@
 #define W_STRAIN5_output	LL_GPIO_SetPinMode(W_STRAIN5_GPIO_Port, W_STRAIN5_Pin, LL_GPIO_MODE_OUTPUT);		LL_GPIO_SetPinOutputType(W_STRAIN5_GPIO_Port, W_STRAIN5_Pin, LL_GPIO_OUTPUT_OPENDRAIN);
 #define W_STRAIN6_output	LL_GPIO_SetPinMode(W_STRAIN6_GPIO_Port, W_STRAIN6_Pin, LL_GPIO_MODE_OUTPUT);		LL_GPIO_SetPinOutputType(W_STRAIN6_GPIO_Port, W_STRAIN6_Pin, LL_GPIO_OUTPUT_OPENDRAIN);
 
+#define STRAIN2_CHANNELS 6
 #define PGA308_DimBufferTX 4
-extern uint8_t PGA308_BufferTx[PGA308_DimBufferTX];
 
 void PGA308_init(void);
-void PGA308_OneWireWrite(uint8_t CHANNEL, uint8_t REGISTER, uint16_t VALUE);
-void PGA308_OneWireRead(uint8_t CHANNEL, uint8_t REGISTER);
+void PGA308_DefaultConfig(void);
+void PGA308_WriteRegister(uint8_t CHANNEL, uint8_t REGISTER, uint16_t VALUE);
+void PGA308_ReadRegister(uint8_t CHANNEL, uint8_t REGISTER);
 void PGA308_OneWire(uint16_t GPIO, uint8_t IO);
 void PGA308_BitValue(uint8_t channel, uint8_t value);
 
-#define nr_adc_sample (uint16_t) 400 // number of samples for the average measure
-extern uint16_t adc_values[6];           // contains all ADC channels conversion
+#define nr_adc_sample (uint16_t) 400      // number of samples for the average measure
+#define nr_PGA308_register (uint8_t) 6    // number of PGA308 registers
+extern uint16_t adc_values[6];            // contains all ADC channels conversion
 extern uint16_t adc_sample;
 
 typedef struct 
@@ -90,5 +92,20 @@ typedef struct
 	uint32_t STRAIN6[nr_adc_sample];
 }fifo;
 extern fifo adc_samples;
+
+typedef struct 
+{
+  uint16_t SFTC;
+  uint16_t ZDAC;
+  uint16_t GDAC;
+  uint16_t CFG0;
+  uint16_t CFG1;
+  uint16_t CFG2;
+  uint16_t CFG0_GO;
+  uint16_t CFG0_MUX;
+  uint16_t CFG0_GI;
+  uint16_t CFG0_OS;
+}PGA308_Register;
+extern PGA308_Register PGA308[STRAIN2_CHANNELS+1];    // PGA308[0] is used for default configuration
 
 #endif

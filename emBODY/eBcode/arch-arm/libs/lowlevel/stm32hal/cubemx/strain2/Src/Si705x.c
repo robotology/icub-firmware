@@ -31,31 +31,28 @@
 #include "stm32l4xx_ll_gpio.h"
 
 const uint8_t Si705x_I2C_ADDRESS=0x80;    // left shifted device address 0x40 
+//uint8_t MEASURE_CMD=0xF3;
 uint8_t MEASURE_CMD=0xE3;
 
-uint8_t Si705x_I2C_TxBuffer[1] = {0};
-uint8_t Si705x_I2C_RxBuffer[2] = {0};
+uint8_t Si705x_I2C1_TxBuffer[1] = {0};
+uint8_t Si705x_I2C1_RxBuffer[2] = {0};
+uint8_t Si705x_I2C2_TxBuffer[1] = {0};
+uint8_t Si705x_I2C2_RxBuffer[2] = {0};
 
 void Si705x_init(uint8_t TS){
-	if(TS==1){
-		HAL_GPIO_WritePin(POWER_TSENSOR2_GPIO_Port, POWER_TSENSOR2_Pin, GPIO_PIN_SET);			// switch off temperature sensor 2
-		HAL_GPIO_WritePin(POWER_TSENSOR1_GPIO_Port, POWER_TSENSOR1_Pin, GPIO_PIN_SET);      // switch on temperature sensor 1
-	}
-	else if (TS==2){
-		HAL_GPIO_WritePin(POWER_TSENSOR1_GPIO_Port, POWER_TSENSOR1_Pin, GPIO_PIN_RESET);    // switch off temperature sensor 1
-		HAL_GPIO_WritePin(POWER_TSENSOR2_GPIO_Port, POWER_TSENSOR2_Pin, GPIO_PIN_SET);      // switch on temperature sensor 2
-	}
+	
 }
 
 void Si705x_deinit(void){
-  HAL_GPIO_WritePin(POWER_TSENSOR1_GPIO_Port, POWER_TSENSOR1_Pin, GPIO_PIN_RESET);      // switch off temperature sensor 1
-	HAL_GPIO_WritePin(POWER_TSENSOR2_GPIO_Port, POWER_TSENSOR2_Pin, GPIO_PIN_RESET);      // switch off temperature sensor 2
+
 }
 
 void Si705x_ReadTemperature(uint8_t TS){
 	Si705x_init(TS);
-  Si705x_I2C_TxBuffer[0]=MEASURE_CMD;
-  HAL_I2C_Master_Transmit_DMA(&hi2c1, (uint16_t)Si705x_I2C_ADDRESS, (uint8_t*)Si705x_I2C_TxBuffer, sizeof(Si705x_I2C_TxBuffer));
+  Si705x_I2C1_TxBuffer[0]=MEASURE_CMD;
+  Si705x_I2C2_TxBuffer[0]=MEASURE_CMD;
+  HAL_I2C_Master_Transmit_DMA(&hi2c1, (uint16_t)Si705x_I2C_ADDRESS, (uint8_t*)Si705x_I2C1_TxBuffer, sizeof(Si705x_I2C1_TxBuffer));
+  HAL_I2C_Master_Transmit_DMA(&hi2c2, (uint16_t)Si705x_I2C_ADDRESS, (uint8_t*)Si705x_I2C2_TxBuffer, sizeof(Si705x_I2C2_TxBuffer));
 }
 
 

@@ -29,8 +29,9 @@ and the PGA308 be lost for any reason. The timeout period is set to approximatel
 uint8_t PGA308_InitByte = 0x55;
 uint8_t PGA308_BufferTx[PGA308_DimBufferTX] = {0};
 GPIO_InitTypeDef GPIO_InitStruct;
-
 extern uint8_t PGA308_channel;
+
+PGA308_Register PGA308[STRAIN2_CHANNELS+1];
 
 adc_measure_t adc_measure = {0};  // initialize all adc values to 0
 adc_measure_t mean = {0};         // initialize all average values to 0
@@ -38,8 +39,7 @@ uint16_t adc_values[6];           // contains all ADC channels conversion
 
 uint16_t adc_sample = 0;
 fifo adc_samples = {0};
-
-
+volatile uint8_t PGA308_StartComm;
 
 // -----------------------------------------------------------------------------------------------------------------------------
 // Initialize the PGA308
@@ -53,7 +53,48 @@ void PGA308_init(void){
 	W_STRAIN6_output;		W_STRAIN6_HIGH;
 	HAL_GPIO_WritePin(EN_2V8_GPIO_Port, EN_2V8_Pin, GPIO_PIN_SET);
     
-    HAL_Delay(25);      // da rimuovere
+  HAL_Delay(25);      // da rimuovere
+}
+
+// -----------------------------------------------------------------------------------------------------------------------------
+// Write the default configuration in the PGA308
+// -----------------------------------------------------------------------------------------------------------------------------
+void PGA308_DefaultConfig(void){
+  uint8_t channel;
+  
+  PGA308[0].CFG0_GO  = 0x06;
+  PGA308[0].CFG0_MUX = 0x01;
+  PGA308[0].CFG0_GI  = 0x04;
+  PGA308[0].CFG0_OS  = 0x00;
+  
+  PGA308[0].SFTC = 0x0050;
+  PGA308[0].ZDAC = 0x4000;
+  PGA308[0].GDAC = 0x4000;
+  PGA308[0].CFG0 = (PGA308[0].CFG0_GO<<13) + (PGA308[0].CFG0_MUX<<12) + (PGA308[0].CFG0_GI<<8) + (PGA308[0].CFG0_OS);
+  PGA308[0].CFG1 = 0x0000;
+  PGA308[0].CFG2 = 0x0400;
+  
+  for(channel=1; channel<=6; channel++){
+    PGA308[channel].SFTC = PGA308[0].SFTC;
+    PGA308[channel].ZDAC = PGA308[0].ZDAC;
+    PGA308[channel].GDAC = PGA308[0].GDAC;
+    PGA308[channel].CFG0 = PGA308[0].CFG0;
+    PGA308[channel].CFG1 = PGA308[0].CFG1;
+    PGA308[channel].CFG2 = PGA308[0].CFG2;
+    
+    PGA308_WriteRegister(channel, RAM_SFTC, PGA308[0].SFTC);      // SFTC Register - Software Lock Mode  (datasheet page 72)
+    while(PGA308_StartComm);
+    PGA308_WriteRegister(channel, RAM_ZDAC, PGA308[0].ZDAC);      //
+    while(PGA308_StartComm);
+    PGA308_WriteRegister(channel, RAM_GDAC, PGA308[0].GDAC);      //
+    while(PGA308_StartComm);
+    PGA308_WriteRegister(channel, RAM_CFG0, PGA308[0].CFG0);      // 
+    while(PGA308_StartComm);
+    PGA308_WriteRegister(channel, RAM_CFG1, PGA308[0].CFG1);      //
+    while(PGA308_StartComm);
+    PGA308_WriteRegister(channel, RAM_CFG2, PGA308[0].CFG2);      //
+    while(PGA308_StartComm);
+  }
 }
 
 // -----------------------------------------------------------------------------------------------------------------------------
@@ -86,7 +127,8 @@ void PGA308_OneWire(uint16_t GPIO, uint8_t IO){				// da passare W_STRAINx_Pin
 // -----------------------------------------------------------------------------------------------------------------------------
 // Configure the GPIO for One-Wire communication
 // -----------------------------------------------------------------------------------------------------------------------------
-void PGA308_OneWireWrite(uint8_t CHANNEL, uint8_t REGISTER, uint16_t VALUE){
+void PGA308_WriteRegister(uint8_t CHANNEL, uint8_t REGISTER, uint16_t VALUE){
+  PGA308_StartComm=1;
   PGA308_channel=CHANNEL;
 	PGA308_BufferTx[0]=PGA308_InitByte;
 	PGA308_BufferTx[1]=REGISTER & 0x0F;       // RAM Write command byte
@@ -96,9 +138,13 @@ void PGA308_OneWireWrite(uint8_t CHANNEL, uint8_t REGISTER, uint16_t VALUE){
 	HAL_TIM_Base_Start_IT(&htim6);    // 100us	
 }
 
-void PGA308_OneWireRead(uint8_t CHANNEL, uint8_t REGISTER){
-	PGA308_BufferTx[0]=PGA308_InitByte;
-	PGA308_BufferTx[1]=REGISTER & 0x0F;       // RAM Write command byte
+void PGA308_ReadRegister(uint8_t CHANNEL, uint8_t REGISTER){
+  PGA308_StartComm=1;
+  PGA308_channel=CHANNEL;
+  PGA308_BufferTx[0]=PGA308_InitByte;
+	PGA308_BufferTx[1]=(REGISTER & 0x0F) | 0x80;       // RAM Read command byte
+  PGA308_BufferTx[2]=0x00;
+  PGA308_BufferTx[3]=0x00;
 	
 	HAL_TIM_Base_Start_IT(&htim7);    // 100us	
 }

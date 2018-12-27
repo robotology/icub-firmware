@@ -12,7 +12,8 @@
 #define Si705x_H
 
 extern const uint8_t Si705x_I2C_ADDRESS;
-extern uint8_t Si705x_I2C_RxBuffer[2];
+extern uint8_t Si705x_I2C1_RxBuffer[2];
+extern uint8_t Si705x_I2C2_RxBuffer[2];
 
 void Si705x_init(uint8_t TS);
 void Si705x_deinit(void);

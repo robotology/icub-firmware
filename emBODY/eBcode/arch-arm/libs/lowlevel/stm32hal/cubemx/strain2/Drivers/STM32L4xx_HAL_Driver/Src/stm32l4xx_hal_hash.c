@@ -2,8 +2,8 @@
   ******************************************************************************
   * @file    stm32l4xx_hal_hash.c
   * @author  MCD Application Team
-  * @version V1.7.2
-  * @date    16-June-2017
+  * @version V1.7.0
+  * @date    17-February-2017
   * @brief   HASH HAL module driver.
   *          This file provides firmware functions to manage the following 
   *          functionalities of the HASH peripheral:
@@ -182,14 +182,6 @@
   * @}
   */
    
-/** @defgroup HASH_DMA_Suspension_Words_Limit HASH DMA suspension words limit 
-  * @{
-  */ 
-#define HASH_DMA_SUSPENSION_WORDS_LIMIT             20   /*!< Number of words below which DMA suspension is aborted */
-/**
-  * @}
-  */  
-   
 /**
   * @}
   */
@@ -277,11 +269,10 @@ HAL_StatusTypeDef HAL_HASH_Init(HASH_HandleTypeDef *hhash)
     /* Change the HASH state */
   hhash->State = HAL_HASH_STATE_BUSY;
 
-  /* Reset HashInCount, HashITCounter, HashBuffSize and NbWordsAlreadyPushed */
+  /* Reset HashInCount, HashITCounter and HashBuffSize */
   hhash->HashInCount = 0;
   hhash->HashBuffSize = 0;
   hhash->HashITCounter = 0;
-  hhash->NbWordsAlreadyPushed = 0;
   /* Reset digest calculation bridle (MDMAT bit control) */
   hhash->DigestCalculationDisable = RESET;
   /* Set phase to READY */
@@ -1083,7 +1074,6 @@ HAL_StatusTypeDef HAL_HASH_DMAFeed_ProcessSuspend(HASH_HandleTypeDef *hhash)
 {
   uint32_t tmp_remaining_DMATransferSize_inWords = 0x0;
   uint32_t tmp_initial_DMATransferSize_inWords = 0x0;
-  uint32_t tmp_words_already_pushed = 0x0;  
   
   if (hhash->State == HAL_HASH_STATE_READY)
   {
@@ -1091,53 +1081,25 @@ HAL_StatusTypeDef HAL_HASH_DMAFeed_ProcessSuspend(HASH_HandleTypeDef *hhash)
   }
   else
   {  
-  
-   /* Make sure there is enough time to suspend the processing */
-    tmp_remaining_DMATransferSize_inWords = hhash->hdmain->Instance->CNDTR;
-    if (tmp_remaining_DMATransferSize_inWords <= HASH_DMA_SUSPENSION_WORDS_LIMIT)
-    {
-      /* No suspension attempted since almost to the end of the transferred data. */
-      /* Best option for user code is to wrap up low priority message hashing     */
-      return HAL_ERROR; 
-    }
-
-    /* Wait for DMAS to be reset */
-    if (HASH_WaitOnFlagUntilTimeout(hhash, HASH_FLAG_BUSY, SET, HASH_TIMEOUTVALUE) != HAL_OK)
-    {
-       return HAL_TIMEOUT;
-    }
-        
-    if (__HAL_HASH_GET_FLAG(HASH_FLAG_DCIS) != RESET)
-    {
-      return HAL_ERROR;
-    }
-        
-    /* Wait for DMAS to be set */
-    if (HASH_WaitOnFlagUntilTimeout(hhash, HASH_FLAG_BUSY, RESET, HASH_TIMEOUTVALUE) != HAL_OK)
-    {
-       return HAL_TIMEOUT;
-    }    
-    
-    /* Disable DMA channel */
-    HAL_DMA_Abort(hhash->hdmain);    
+    /* Set State as suspended (it may be required to update it if suspension failed).
+       The context saving operations must be carried out to be able to resume later on. */   
+    hhash->State = HAL_HASH_STATE_SUSPENDED;
     
     /* Clear DMAE bit */
     CLEAR_BIT(HASH->CR,HASH_CR_DMAE);
     
-    if (HASH_WaitOnFlagUntilTimeout(hhash, HASH_FLAG_BUSY, SET, HASH_TIMEOUTVALUE) != HAL_OK)
+    /* Wait for DMAS to be reset */
+    if (HASH_WaitOnFlagUntilTimeout(hhash, HASH_FLAG_DMAS, SET, HASH_TIMEOUTVALUE) != HAL_OK)
     {
       return HAL_TIMEOUT;
     }
-       
-    if (__HAL_HASH_GET_FLAG(HASH_FLAG_DCIS) != RESET)
-    {
-      return HAL_ERROR;
-    }        
+    
+    /* Disable DMA channel */
+    HAL_DMA_Abort(hhash->hdmain);
     
     /* At this point, DMA interface is disabled and no transfer is on-going */
     /* Retrieve from the DMA handle how many words remain to be written */
-    tmp_remaining_DMATransferSize_inWords = hhash->hdmain->Instance->CNDTR;
-
+    tmp_remaining_DMATransferSize_inWords = hhash->hdmain->Instance->CNDTR; 
     if (tmp_remaining_DMATransferSize_inWords == 0)
     {
       /* All the DMA transfer is actually done. Suspension occurred at the very end 
@@ -1149,34 +1111,26 @@ HAL_StatusTypeDef HAL_HASH_DMAFeed_ProcessSuspend(HASH_HandleTypeDef *hhash)
            priority block processing (HASH case)
          - re-attempt a new suspension (HMAC case)  
          */       
+      hhash->State  = HAL_HASH_STATE_READY;
       return HAL_ERROR;
     }
     else
     {
+   
+      if (HASH_WaitOnFlagUntilTimeout(hhash, HASH_FLAG_BUSY, SET, HASH_TIMEOUTVALUE) != HAL_OK)
+      {
+        return HAL_TIMEOUT;
+      }
+
   
       /* Compute how many words were supposed to be transferred by DMA */
       tmp_initial_DMATransferSize_inWords = (hhash->HashInCount%4 ?  (hhash->HashInCount+3)/4: hhash->HashInCount/4);
-      
-      /* If discrepancy between the number of words reported by DMA IP and the numbers of words entered as reported
-        by HASH IP, correct it */
-      /* tmp_words_already_pushed reflects the number of words that were already pushed before
-         the start of DMA transfer (multi-buffer processing case) */
-      tmp_words_already_pushed = hhash->NbWordsAlreadyPushed;
-      if ((tmp_words_already_pushed + tmp_initial_DMATransferSize_inWords - tmp_remaining_DMATransferSize_inWords) %16  != HASH_NBW_PUSHED())
-      {
-        tmp_remaining_DMATransferSize_inWords--; /* one less word to be transferred again */ 
-      }
-     
       /* Accordingly, update the input pointer that points at the next word to be transferred to the IP by DMA */
       hhash->pHashInBuffPtr +=  4 * (tmp_initial_DMATransferSize_inWords - tmp_remaining_DMATransferSize_inWords) ;
-      
       /* And store in HashInCount the remaining size to transfer (in bytes) */
-      hhash->HashInCount = 4 * tmp_remaining_DMATransferSize_inWords;      
+      hhash->HashInCount = 4 * tmp_remaining_DMATransferSize_inWords;
   
     }
-  
-    /* Set State as suspended */   
-    hhash->State = HAL_HASH_STATE_SUSPENDED;    
   
     return HAL_OK;
   
@@ -1256,9 +1210,7 @@ static void HASH_DMAXferCplt(DMA_HandleTypeDef *hdma)
       /* In case of suspension request, save the new starting parameters */
       hhash->HashInCount = hhash->HashBuffSize;         /* Initial DMA transfer size (in bytes) */
       hhash->pHashInBuffPtr  = hhash->pHashMsgBuffPtr ; /* DMA transfer start address           */
-
-      hhash->NbWordsAlreadyPushed = 0;                  /* Reset number of words already pushed */
-            
+      
       /* Check whether or not digest calculation must be disabled (in case of multi-buffer HMAC processing) */ 
       if (hhash->DigestCalculationDisable != RESET)
       {
@@ -1288,10 +1240,8 @@ static void HASH_DMAXferCplt(DMA_HandleTypeDef *hdma)
         buffersize = hhash->Init.KeySize;             /* DMA transfer size (in bytes) */
         hhash->Phase = HAL_HASH_PHASE_HMAC_STEP_3;    /* Move phase from Step 2 to Step 3 */
         /* In case of suspension request, save the new starting parameters */
-        hhash->HashInCount = hhash->Init.KeySize;     /* Initial size for second DMA transfer (input data) */
-        hhash->pHashInBuffPtr  = hhash->Init.pKey ;   /* address passed to DMA, now entering data message */  
-        
-        hhash->NbWordsAlreadyPushed = 0;              /* Reset number of words already pushed */
+        hhash->HashInCount = hhash->Init.KeySize;         /* Initial size for second DMA transfer (input data) */
+        hhash->pHashInBuffPtr  = hhash->Init.pKey ; /* address passed to DMA, now entering data message */  
       }
     }
     /* Configure the Number of valid bits in last word of the message */
@@ -2294,16 +2244,12 @@ HAL_StatusTypeDef HASH_Start_DMA(HASH_HandleTypeDef *hhash, uint8_t *pInBuffer, 
          processing was suspended */  
       inputaddr = (uint32_t)hhash->pHashInBuffPtr;  /* DMA transfer start address   */  
       inputSize = hhash->HashInCount;               /* DMA transfer size (in bytes) */
-      
     }
       
     /* Set the HASH DMA transfert complete callback */
     hhash->hdmain->XferCpltCallback = HASH_DMAXferCplt;
     /* Set the DMA error callback */
     hhash->hdmain->XferErrorCallback = HASH_DMAError;
-
-    /* Store number of words already pushed to manage proper DMA processing suspension */
-    hhash->NbWordsAlreadyPushed = HASH_NBW_PUSHED(); 
     
     /* Enable the DMA In DMA Stream */
     HAL_DMA_Start_IT(hhash->hdmain, inputaddr, (uint32_t)&HASH->DIN, (inputSize%4 ? (inputSize+3)/4:inputSize/4));
@@ -2681,9 +2627,6 @@ HAL_StatusTypeDef HMAC_Start_DMA(HASH_HandleTypeDef *hhash, uint8_t *pInBuffer, 
     hhash->hdmain->XferCpltCallback = HASH_DMAXferCplt;
     /* Set the DMA error callback */
     hhash->hdmain->XferErrorCallback = HASH_DMAError;
-    
-    /* Store number of words already pushed to manage proper DMA processing suspension */
-    hhash->NbWordsAlreadyPushed = HASH_NBW_PUSHED(); 
     
     /* Enable the DMA In DMA Stream */
     HAL_DMA_Start_IT(hhash->hdmain, inputaddr, (uint32_t)&HASH->DIN, (inputSize%4 ? (inputSize+3)/4:inputSize/4));

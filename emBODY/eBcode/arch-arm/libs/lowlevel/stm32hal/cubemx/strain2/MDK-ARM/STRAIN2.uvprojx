@@ -47,7 +47,7 @@
             <NotGenerated>0</NotGenerated>
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
-          <OutputDirectory>.\STRAIN2\</OutputDirectory>
+          <OutputDirectory>STRAIN2\</OutputDirectory>
           <OutputName>STRAIN2</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
@@ -335,7 +335,7 @@
               <MiscControls>--C99</MiscControls>
               <Define>USE_HAL_DRIVER,STM32L443xx</Define>
               <Undefine></Undefine>
-              <IncludePath>../Inc;                        ../Drivers/STM32L4xx_HAL_Driver/Inc;                        ../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy;                        ../Drivers/CMSIS/Device/ST/STM32L4xx/Include;                        ../Drivers/CMSIS/Include</IncludePath>
+              <IncludePath>../Inc;                                 ../Drivers/STM32L4xx_HAL_Driver/Inc;                                 ../Drivers/STM32L4xx_HAL_Driver/Inc/Legacy;                                 ../Drivers/CMSIS/Device/ST/STM32L4xx/Include;                                 ../Drivers/CMSIS/Include</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -435,19 +435,9 @@
               <FilePath>../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_can.c</FilePath>
             </File>
             <File>
-              <FileName>stm32l4xx_hal_rtc_ex.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rtc_ex.c</FilePath>
-            </File>
-            <File>
               <FileName>stm32l4xx_hal_flash.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_flash.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32l4xx_hal_rtc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rtc.c</FilePath>
             </File>
             <File>
               <FileName>stm32l4xx_hal_flash_ramfunc.c</FileName>
@@ -499,11 +489,6 @@
               <FileType>1</FileType>
               <FilePath>../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rcc_ex.c</FilePath>
             </File>
-            <File>
-              <FileName>stm32l4xx_hal_rng.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../Drivers/STM32L4xx_HAL_Driver/Src/stm32l4xx_hal_rng.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -520,14 +505,14 @@
           <GroupName>Application/User</GroupName>
           <Files>
             <File>
+              <FileName>adc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>../Src/adc.c</FilePath>
+            </File>
+            <File>
               <FileName>can.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Src/can.c</FilePath>
-            </File>
-            <File>
-              <FileName>rtc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../Src/rtc.c</FilePath>
             </File>
             <File>
               <FileName>gpio.c</FileName>
@@ -538,11 +523,6 @@
               <FileName>stm32l4xx_hal_msp.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Src/stm32l4xx_hal_msp.c</FilePath>
-            </File>
-            <File>
-              <FileName>adc.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../Src/adc.c</FilePath>
             </File>
             <File>
               <FileName>usart.c</FileName>
@@ -593,11 +573,6 @@
               <FileName>PGA308.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Src\PGA308.c</FilePath>
-            </File>
-            <File>
-              <FileName>rng.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>../Src/rng.c</FilePath>
             </File>
           </Files>
         </Group>
