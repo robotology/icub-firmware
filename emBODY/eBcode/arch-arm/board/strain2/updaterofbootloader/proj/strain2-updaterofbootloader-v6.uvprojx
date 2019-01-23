@@ -7,7 +7,7 @@
 
   <Targets>
     <Target>
-      <TargetName>strain2-updtbtl-v6-ulpro</TargetName>
+      <TargetName>strain2-updtbtl-ulpro-v190</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <pCCUsed>6100001::V6.10.1::.\ARMCLANG</pCCUsed>
@@ -16,7 +16,7 @@
         <TargetCommonOption>
           <Device>STM32L433RCIx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32L4xx_DFP.2.0.0</PackID>
+          <PackID>Keil.STM32L4xx_DFP.2.2.0</PackID>
           <PackURL>http://www.keil.com/pack</PackURL>
           <Cpu>IRAM(0x20000000,0x00010000) IROM(0x08000000,0x00040000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -49,7 +49,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\obj\</OutputDirectory>
-          <OutputName>strain2_v6_ubootloader</OutputName>
+          <OutputName>strain2_ub_v190</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>1</CreateHexFile>
@@ -82,7 +82,7 @@
           <AfterMake>
             <RunUserProg1>1</RunUserProg1>
             <RunUserProg2>0</RunUserProg2>
-            <UserProg1Name>cmd.exe /C copy .\Obj\strain2_v6_ubootloader.hex ..\bin\strain2.v6.updaterofbootloader.hex</UserProg1Name>
+            <UserProg1Name>cmd.exe /C copy .\Obj\strain2_ub_v190.hex ..\bin\strain2.updaterofbootloader.v190.hex</UserProg1Name>
             <UserProg2Name></UserProg2Name>
             <UserProg1Dos16Mode>0</UserProg1Dos16Mode>
             <UserProg2Dos16Mode>0</UserProg2Dos16Mode>
@@ -336,7 +336,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register</MiscControls>
-              <Define>STM32HAL_BOARD_STRAIN2</Define>
+              <Define>USE_STM32HAL STM32HAL_BOARD_STRAIN2 STM32HAL_DRIVER_V190 STRAIN2_APP_AT_64K</Define>
               <Undefine></Undefine>
               <IncludePath>..\src-plus;..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask;..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\eBcode\arch-arm\embot\common;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\sys;..\..\..\..\..\..\eBcode\arch-arm\embot;..\..\..\..\..\..\eBcode\arch-arm\embot\binary;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib</IncludePath>
             </VariousControls>
@@ -369,7 +369,7 @@
             <TextAddressRange>0x08000000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile>.\strain2-application-v6.sct</ScatterFile>
+            <ScatterFile>.\strain2-application-64k-v6.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc>--diag_suppress=L6329</Misc>
@@ -393,9 +393,9 @@
           <GroupName>stm32hal-nucleo</GroupName>
           <Files>
             <File>
-              <FileName>stm32hal.strain2.lib</FileName>
+              <FileName>stm32hal.strain2.v190.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\lib\stm32hal.strain2.lib</FilePath>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\lib\stm32hal.strain2.v190.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -403,14 +403,9 @@
           <GroupName>stm32hal-config</GroupName>
           <Files>
             <File>
-              <FileName>stm32hal_stg.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\cfg\stm32hal_stg.h</FilePath>
-            </File>
-            <File>
-              <FileName>stm32hal.startup.strain2.v6.s</FileName>
+              <FileName>stm32hal.startup.strain2.v190.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\cfg\stm32hal.startup.strain2.v6.s</FilePath>
+              <FilePath>..\cfg\stm32hal.startup.strain2.v190.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -656,6 +651,57 @@
               <FileName>slim_retarget_io.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\slim_retarget_io.c</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds>
+                  <Cads>
+                    <interw>2</interw>
+                    <Optim>0</Optim>
+                    <oTime>2</oTime>
+                    <SplitLS>2</SplitLS>
+                    <OneElfS>2</OneElfS>
+                    <Strict>2</Strict>
+                    <EnumInt>2</EnumInt>
+                    <PlainCh>2</PlainCh>
+                    <Ropi>2</Ropi>
+                    <Rwpi>2</Rwpi>
+                    <wLevel>0</wLevel>
+                    <uThumb>2</uThumb>
+                    <uSurpInc>2</uSurpInc>
+                    <uC99>2</uC99>
+                    <uGnu>2</uGnu>
+                    <useXO>2</useXO>
+                    <v6Lang>0</v6Lang>
+                    <v6LangP>0</v6LangP>
+                    <vShortEn>2</vShortEn>
+                    <vShortWch>2</vShortWch>
+                    <v6Lto>2</v6Lto>
+                    <v6WtE>2</v6WtE>
+                    <v6Rtti>2</v6Rtti>
+                    <VariousControls>
+                      <MiscControls></MiscControls>
+                      <Define></Define>
+                      <Undefine></Undefine>
+                      <IncludePath></IncludePath>
+                    </VariousControls>
+                  </Cads>
+                </FileArmAds>
+              </FileOption>
             </File>
             <File>
               <FileName>embot_app_canprotocol.cpp</FileName>
@@ -854,7 +900,7 @@
         <TargetCommonOption>
           <Device>STM32L433RCIx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32L4xx_DFP.2.0.0</PackID>
+          <PackID>Keil.STM32L4xx_DFP.2.2.0</PackID>
           <PackURL>http://www.keil.com/pack</PackURL>
           <Cpu>IRAM(0x20000000,0x00010000) IROM(0x08000000,0x00040000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -1231,9 +1277,9 @@
           <GroupName>stm32hal-nucleo</GroupName>
           <Files>
             <File>
-              <FileName>stm32hal.strain2.lib</FileName>
+              <FileName>stm32hal.strain2.v190.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\lib\stm32hal.strain2.lib</FilePath>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\lib\stm32hal.strain2.v190.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -1241,14 +1287,9 @@
           <GroupName>stm32hal-config</GroupName>
           <Files>
             <File>
-              <FileName>stm32hal_stg.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\cfg\stm32hal_stg.h</FilePath>
-            </File>
-            <File>
-              <FileName>stm32hal.startup.strain2.v6.s</FileName>
+              <FileName>stm32hal.startup.strain2.v190.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\cfg\stm32hal.startup.strain2.v6.s</FilePath>
+              <FilePath>..\cfg\stm32hal.startup.strain2.v190.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -1847,7 +1888,7 @@
         <package name="CMSIS" schemaVersion="1.3" url="http://www.keil.com/pack/" vendor="ARM" version="5.4.0"/>
         <targetInfos>
           <targetInfo excluded="1" name="strain2-updtbtl-0offset" versionMatchMode=""/>
-          <targetInfo excluded="1" name="strain2-updtbtl-v6-ulpro" versionMatchMode=""/>
+          <targetInfo excluded="1" name="strain2-updtbtl-ulpro-v190" versionMatchMode=""/>
         </targetInfos>
       </component>
     </components>

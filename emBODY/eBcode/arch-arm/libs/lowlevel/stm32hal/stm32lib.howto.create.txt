@@ -11,13 +11,13 @@ The CUBE-MX project must generate a MDK project which uses the STM32 HAL library
 1.1 Used terminology
 
 Let's give now some terms: the board is named ${brd}, it mounts a mpu named ${mpu} of the family 
-${mpufamily} and the STM32 HAL library has version ${stmlibversion}. The MDK project has a device
+${mpufamily} and the STM32 HAL library has a driver version ${stmdriverversion}. The MDK project has a device
 named ${MDKDEVICE}.
 
 As an example, for board RFE we have: ${brd} = rfe, ${BRD} = RFE, ${MPU} = STM32L452xx, 
 ${MDKDEVICE} = STM32L452CEUx, 
-${MPUFAMILY} = STM32L4xx, ${mpufamily} = stm32l4xx, ${mpufamilyshort} = stm32l4, 
-${stmlibversion} = v1.8.3. The 
+${MPUFAMILY} = STM32L4xx, ${mpufamily} = stm32l4xx, ${mpufamilyshort} = stm32l4, ${MPUFAMILYSHORT} = STM32L4
+${stmdriverversion} = v183, ${STMDRIVERVERSION} = V183
 
 1.2 The steps
 
@@ -33,21 +33,27 @@ D.  Adapt the SOURCE section. It is formed of the following parts.
     -   The BOARD part keeps those parts of code which CUBE-MX generates for the initialization of pins and peripherals
         of the MPU. We keep this part MOSTLY UNCHANGED.
     -   The CONFIG part contains code with macros and #include and some functions which glues all together. 
-E.  Create a project which compiles all teh code to generate a library whcih will be put inside the lib folder.
+E.  Create a project which compiles all the code to generate a library which will be put inside the lib folder.
 F.  Write down the ${MPU} name to use in the MDK project of a new application which links the library
 G.  Provide a suitable startput file to be used in the MDK project.
 H.  Use the library in a sample application named ${appl} by:
     -   generation a project for the given ${MPU},
-    -   add to it the stm32hal.${brd}.lib, the stm32hal.startup.${brd}.s file, a copy of 
+    -   add to it the stm32hal.${brd}.${stmdriverversion}.lib, the stm32hal.startup.${brd}.${stmdriverversion}.s file, a copy of 
         stm32hal_stg_template.h in ./cfg/stm32hal_stg_${appl}.h which is required to define 
         the heap and stack sizes, 
     -   defining macro STM32HAL_BOARD_${BRD}, 
+    -   defining macro STM32HAL_DRIVER_${STMDRIVERVERSION}
     -   adding in the C include paths the stm32hal/api folder to see the library funtions,
     -   adding the ./cfg folder to the path of the asm include paths,
     -   etc. 
 
 
-2.  The steps in details
+2.  The steps in details for the first creation of the library
+
+    In here, there are steps to follow if there is not yet any support for the board in the stm32lib.
+    
+    If you want to update the existing stm32lib for a board which has a new driver or add a new stm32lib for the
+    same board but with a further driver, see next sections.    
     
 2.1 CUBE-MX project
 
@@ -56,7 +62,7 @@ H.  Use the library in a sample application named ${appl} by:
     in the project group named Drivers/${MPUFAMILY}_HAL_Driver.
     
     For instance, the board RFE has ${MPU} = STM32L452xx and ${MPUFAMILY} = STM32L4xx.
-
+    
     
 2.2 Board MACRO
 
@@ -71,9 +77,11 @@ H.  Use the library in a sample application named ${appl} by:
 
     a.  Edit file stm32hal_define.h to generate the following macros if STM32HAL_BOARD_${BRD} is defined:
             #define ${MPU}
-            #define STM32HAL_${MPUFAMILY}
+            #define ${MPUFAMILYSHORT}
+            #define STM32HAL_${MPUFAMILYSHORT}
+
             
-        The first macro is needed by the STM32 HAL to shape its code. The second macro is not used so far.
+        The first two macros are needed by the STM32 driver to shape its code. The third macro is available for the users of the library.
       
         For instance, for board RFE we have added:
 
@@ -84,39 +92,87 @@ H.  Use the library in a sample application named ${appl} by:
         +       #define STM32L452xx
         +       #endif  
         +
-        +       // of type STM32L4    
-        +       #if !defined(STM32HAL_STM32L4xx)
-        +       #define STM32HAL_STM32L4xx
-        +       #endif      
+        +       // of family STM32L4
+        +       #if !defined(STM32L4)
+        +       #define STM32L4
+        +       #endif
+        +
+        +       // of family STM32L4 but in STM32HAL_ format   
+        +       #if !defined(STM32HAL_STM32L4)
+        +       #define STM32HAL_STM32L4
+        +       #endif     
+        + 
         +   
             #else
                     #error STM32HAL: you must define a STM32HAL_BOARD_${BRD}
             #endif
 
-    b.  Edit file stm32hal_driver.h to include the API of the correct HAL driver library provided by ST Microelectronics.
-        The inclusion must be conditioned to STM32HAL_BOARD_${BRD} being defined. 
-        The file to be included is:
-            #include "../src/driver/${drivername}/inc/${mpufamily}_hal.h"   
-        Details will be clear after reading the DRIVER section.
-      
+    b.  Edit file stm32hal_driver.h to define the proper macros and to include the API of the correct HAL driver 
+        library provided by ST Microelectronics.
+        
+        The definition of the macros must be conditioned to STM32HAL_BOARD_${BRD} being defined.
+        The macros are: STM32HAL_DRIVER_${STMDRIVERVERSION} and STM32HAL_DRIVER_VERSION
+        
         For instance, for board RFE we have added:
-
+        
         +   #elif   defined(STM32HAL_BOARD_RFE)
         +
-        +       #include "../src/driver/stm32l4-v183/inc/stm32l4xx_hal.h" 
-        +   
+        +   // only one possible driver
+        +   #if !defined(STM32HAL_DRIVER_V183)
+        +       #define STM32HAL_DRIVER_V183
+        +   #endif
+        +   #define STM32HAL_DRIVER_VERSION 183
+        +
             #else
-                    #error STM32HAL: the STM32HAL_BOARD_${BRD} is undefined
-            #endif
-    
-    c.  Edit file stm32hal_board.h to include the API specific to the board support package of ${brd} as generated by CUBE-MX 
-        The inclusion must be conditioned to STM32HAL_BOARD_${BRD} being defined.
+                #error STM32HAL: the STM32HAL_BOARD_${BRD} is undefined
+            #endif        
+
+        It is possible now to define extra macros which are required / possible only with specific versions
+        of the driver. 
+        
+        For instance, since version v183 the CAN API has changed, hence we specify proper macros 
+        required by the STM32 driver of this version or newer with:
+
+        #if (STM32HAL_DRIVER_VERSION >= 183)
+            // there is a new api for can
+            #if !defined(USE_HAL_CAN_REGISTER_CALLBACKS)
+            #define USE_HAL_CAN_REGISTER_CALLBACKS 1
+            #endif  
+        #endif        
+
+        
+        We can use macro STM32HAL_DRIVER_VERSION also to shape the user-defined code (see 
+        embot_hw_can.cpp for an example).
+        
+        Only at the end we include the entry point of the stm32 driver we use.
+        
+        See following:
+        
+        #if     defined(STM32HAL_DRIVER_V172)    
+            #include "../src/driver/stm32l4-v172/inc/stm32l4xx_hal.h"       
+        #elif   defined(STM32HAL_DRIVER_V183)        
+            #include "../src/driver/stm32l4-v183/inc/stm32l4xx_hal.h"
+        #elif   defined(STM32HAL_DRIVER_V190)        
+            #include "../src/driver/stm32l4-v190/inc/stm32l4xx_hal.h"
+        #else
+            #error STM32HAL: the STM32HAL_DRIVER_${VER} is not managed
+        #endif
+
+        Details will be clear after reading the DRIVER section.
+          
+    c.  Edit file stm32hal_board.h to include the API specific to the board support package of ${brd} as generated by CUBE-MX for the
+        specific driver it has used.
+        
+        The inclusion must be conditioned to STM32HAL_BOARD_${BRD} being defined but also to the value of STM32HAL_DRIVER_VERSION.
+        
+        In this mode we can produce a library specific to a given board and with multiple versions of the driver.
+        
         
         The following files will be included:
         
-        #include "../src/board/${brd}/inc/stm32hal_driver_cfg_of_${brd}.h"
-        #include "../src/board/${brd}/inc/main.h"
-        #include "../src/board/${brd}/inc/${everyperipheral}.h" 
+        #include "../src/board/${brd}/${stmdriverversion}/inc/stm32hal_driver_cfg_of_${brd}.h"
+        #include "../src/board/${brd}/${stmdriverversion}/inc/main.h"
+        #include "../src/board/${brd}/${stmdriverversion}/inc/${everyperipheral}.h" 
         
         where ${everyperipheral} can be adc, can, dma, i2c, rng, tim, etc.
 
@@ -127,22 +183,25 @@ H.  Use the library in a sample application named ${appl} by:
 
     Create and populate the stm32hal/src/driver/${drivername} folder. 
     
-    In here we shall copy the HAL driver library provided by ST Microelectronics which CUBE-MX put inside the MDK project.
+    In here we shall copy the HAL driver provided by ST Microelectronics which CUBE-MX put inside the MDK project.
     We also add some config files which allow to shape the code of the library for the particular ${MPU} and ${BRD} pair.
     
-    We typically use one specific library for each board, but it is possible also that two boards can share the same library.
-    For instance, the strain2 and mtb4 share the same library under the folder driver/stm32l4-v1.7.2, but the rfe board uses a 
-    different library only for itself under driver/stm32l4-v1.8.3.
-    The library is specific of a given ${mpufamily} and is typically updated every six months. All our three boards are of teh same
+    We typically use one specific driver for each board, but it is possible that two boards can share the same driver or
+    also that one board can use two different drivers (maybe one to support a legacy application and one to support new features).
+    
+    For instance, the strain2 and mtb4 share the same library under the folder driver/stm32l4-v172, but the rfe board uses a 
+    different library only for itself under driver/stm32l4-v183. Also, the strain2 can use either driver/stm32l4-v172 or driver/stm32l4-v190
+    The library is specific of a given ${mpufamily} and is typically updated every six months. All our three boards are of the same
     ${mpufamily} and we could make all of them use only one library: the latest version. But that would require testing huge quantities of
     software at each new release of ST Microelectronics.
     
-    To avoid continuous update and tests we have decided to allow multiple drivers: one for each new board.
+    To avoid continuous update and tests we have decided to allow multiple drivers.
     
-    Even if it is possible to use any name for ${drivername} it is stongly advised to use: ${drivername} = ${mpufamilyshort}-${stmlibversion}
+    Even if it is possible to use any name for ${drivername} it is strongly advised to use: ${drivername} = ${mpufamilyshort}-${stmdriverversion}
     
-    For the case of strain2 and mtb4 we use the same library and we have: ${drivername} = ${mpufamilyshort}-${stmlibversion} = stm32l4-v1.7.2
-    For the case of board rfe we have a new version of the library hence we have: ${drivername} = ${mpufamilyshort}-${stmlibversion} = stm32l4-v1.8.3
+    For the case of strain2 and mtb4 we use the same library and we have: ${drivername} = ${mpufamilyshort}-${stmdriverversion} = stm32l4-v172
+    For the case of board rfe we have a new version of the library hence we have: ${drivername} = ${mpufamilyshort}-${stmdriverversion} = stm32l4-v183
+    For the strain2 we also have a stm32l4-v190. 
 
     Here are the instructions.
     
@@ -159,7 +218,7 @@ H.  Use the library in a sample application named ${appl} by:
     - in ${drivername}/inc put: all files in stm32hal\cubemx\${brd}\Drivers\CMSIS/Device/ST/${MPUFAMILY}/Include
     
     Now you must edit the file ${mpufamily}_hal.h and include file stm32hal_driver_cfg.h instead of ${mpufamily}_hal_conf.h
-    For the case of board RFE:
+    For the case of board RFE (but it is the same for any board):
     
     +   // IIT-EXT
     +   #if defined(USE_STM32HAL)
@@ -179,22 +238,32 @@ H.  Use the library in a sample application named ${appl} by:
     
     This code will propagate all the proper macros to this file, so that the correct .h files are included.
     
+    VERY IMPORTANT: change the name of all files *_template.c files in the ${drivername}/src into removed.*_template.c
+    and ... DONT compile them into the library. 
+    
+    For instance, the file stm32l4xx_hal_msp_template MUST not be included. its code is already in stm32l4xx_hal_msp.c...
+    the uvproject generated by cube-mx does not compile it it.
+    
  
 
 2.5 CONFIG section
 
-    - Add in file src/config/stm32hal_driver_cfg.h a section for STM32HAL_BOARD_${BRD} which includes the file stm32hal_driver_cfg_of_${brd}.h 
-    - Edit the file stm32hal_driver_cfg_of_${brd}.h following instructions on the inside of a template file.
+    - Add in file src/config/stm32hal_driver_cfg.h a section for STM32HAL_BOARD_${BRD} and STM32HAL_DRIVER_VERSION
+      which includes the file stm32hal_driver_cfg_of_${brd}_${stmdriverversion}.h 
+    - Edit the file stm32hal_driver_cfg_of_${brd}_${stmdriverversion}.h following instructions on the inside of a template file.
 
     
 2.6 BOARD section
 
     Look at the section Application/User in the MDK project. 
-    Put all the .c files into folder stm32hal/src/board/${brd}/src and the relecant .h files into stm32hal/src/board/${brd}/inc
-    remove the files you dont need for the .lib (e.g., the main.c file and others which are application specific).
+    Put all the .c files into folder stm32hal/src/board/${brd}/${stmdriverversion}/src and the relevant .h files 
+    into stm32hal/src/board/${brd}/${stmdriverversion}/inc
+    Remove the files you dont need for the .lib (e.g., the main.c file and others which are application specific).
     
     do following changes:
-    -   in .h file use #include "stm32hal.h" instead of #include "${mpufamily}_hal.h"
+    -   in .h files use #include "stm32hal.h" instead of what ST uses to see the driver, which could be #include "${mpufamily}_hal.h"
+        In older versions of the code generator, this inclusion was in every .h file, hence the change was:   
+        
         +   // IIT-EXT
         +   #if defined(USE_STM32HAL)
         +       #include "stm32hal.h"
@@ -202,15 +271,25 @@ H.  Use the library in a sample application named ${appl} by:
             #include "stm32l4xx_hal.h"
         +   #endif
         +   #include "main.h"   
+        
+        Since end of 2018, the code generator includes only main.h, hence the change is to be done in main.h with:
 
+        +   // IIT-EXT
+        +   #if defined(USE_STM32HAL)
+        +       #include "stm32hal.h"
+        +   #else
+            #include "stm32l4xx_hal.h"
+        +   #endif
+        
     -   remove the file ${mpufamily}_hal_conf.h   
+        rename it into: removed.${mpufamily}_hal_conf.h
 
-    -   in .c files: nothing so far. but maybe change the #include clauses to use standard apis
+    -   in .c files: nothing so far.
     
-    -   add a file board_${brd}.c which contains:
+    -   add a file board_${brd}_${stmdriverversion}.c which contains:
         -   in function stm32hal_board_init() all the code which is inside the function main() {}
         -   the function SystemClock_Config() but without HAL_SYSTICK_Config() ......... !
-        -   funtion _Error_Handler().
+        -   the function _Error_Handler() or Error_Handler() as it is called with latest versions of cube-mx
         
     
 
@@ -218,62 +297,58 @@ H.  Use the library in a sample application named ${appl} by:
 2.7 PROJECT section
     
     make a new target .... with the following properties:
+    -   name:               ${brd}-${stmdriverversion}
+        the name of the target helps to understand the board and teh driver version. there may be two or more targets for a given board. 
     -   Device:             ${MDKDEVICE}
-    -   C/C++ define:       USE_STM32HAL STM32HAL_BOARD_${BRD} ${MPU}
-    -   C/C++ includes:     ..\api;..\src\driver\${drivername}\inc;..\src\board\${brd}\inc
-    Et cetera.
-    You must produce a stm32hal.${brd}.lib ... 
+    -   C/C++ define:       USE_STM32HAL STM32HAL_BOARD_${BRD} STM32HAL_DRIVER_${STMDRIVERVERSION}
+    -   C/C++ includes:     ..\api;..\src\driver\${drivername}\inc;..\src\board\${brd}\${stmdriverversion}\inc
+    -   C/C++ optimization  -Os balanced
+    -   C/C++ language      C++14 & C99
+    
+    make two new sections:
+    -   driver-${mpufamilyshort}-${stmdriverversion}
+        add in it all the files in folder stm32hal/src/driver/${drivername}/src WHICH ARE in the original MDK project.
+        VERY IMPORTANT: if you add more files, then it may be that you do something wrong.  For instance, the driver src folder contains
+        some *_template.c files which MUST NOT be compiled.
+    -   board-${brd}-${stmdriverversion}
+        add in it all the files in folder stm32hal/src/board/${brd}/${stmdriverversion}/src which are not tagged removed.*
+    ETC.
+    You must produce a stm32hal.${brd}.${stmdriverversion}.lib target ... stm32hal.strain2.v190.lib
     
 
     
     
 2.8 STARTUP file
 
-    Get the startup .s file used by teh mdk project, rename it into stm32hal.startup.${brd}.s and put it into
-    folder stm32hal/startup. 
+    Get the startup .s file used by the mdk project, rename it into stm32hal.startup.${brd}.${stmdriverversion}.template.s and
+    put it into folder stm32hal/startup. 
     
-    Then change it so that it can contain inclusion of stm32_stg.h to specify the amount of heap and stack as 
-    in the following:
+    This file will have default values of Stack_Size and Heap_Size.
     
-        ; in case of error from assembler, you surely forgot --cpreproc in menu asm-options/misc-controls
-        ; or may also to include it into asm path in menu asm-options/include-paths
-        #include "stm32hal_stg.h"
-        
-        Stack_Size      EQU     STM32HAL_STG_STACKSIZE
-                        AREA    STACK, NOINIT, READWRITE, ALIGN=3
-        Stack_Mem       SPACE   Stack_Size 
-
-        Heap_Size       EQU     STM32HAL_STG_HEAPSIZE
-                        AREA    HEAP, NOINIT, READWRITE, ALIGN=3
-        __heap_base
-        Heap_Mem        SPACE   Heap_Size        
-    
-    And remove the previous definition of Stack_Size and Heap_Size
-    
+      
     
 3.  The result
 
     At the end of the process we shall have:
-    - a library named stm32hal.${brd}.lib, 
+    - a library named stm32hal/lib/stm32hal.${brd}.${stmdriverversion}.lib (e.g., stm32hal.strain2.v190.lib)
     - a unique point of inclusion with file stm32hal/api/stm32hal.h
-    - a startup file stm32hal.startup.${brd}.s
+    - a startup template file in stm32hal/stratup/stm32hal.startup.${brd}.${stmdriverversion}.template.s (e.g., stm32hal.startup.strain2.v190.template.s)
     
     
 4. The use of the library
 
     build a MDK project with options:
     -   Device:             ${MDKDEVICE}
-    -   C/C++ define:       USE_STM32HAL STM32HAL_BOARD_${BRD}
+    -   C/C++ define:       USE_STM32HAL STM32HAL_BOARD_${BRD} STM32HAL_DRIVER_${STMDRIVERVERSION}
     -   C/C++ includes:     location of stm32hal.h; ... whatever else    
-    -   ASM include:        location of a private stm32hal_stg.h
-    -   ASM misc controls:  --cpreproc
+    -   ASM misc controls:  none (to have compatibilty with compiler armclang)
     -   etc
     
     add:
-    -   the library stm32hal.${brd}.lib,
-    -   a private stm32hal_stg.h
-    -   the file stm32hal.startup.${brd}.s (which must be readonly!)
-    -   a file with main() {} which eventaully calls:
+    -   the library stm32hal.${brd}.${stmdriverversion}.lib,
+    -   a copy of the relevant file stm32hal.startup.${brd}.${stmdriverversion}.template.s properly renamed, 
+        where YOU SHALL ADJUST heap and stack sizes.
+    -   a file with main() {} which eventually calls:
             stm32hal_config_t cfg = {0};
             cfg.tick1ms_init = config.stm32hal.init1millitick;  // it inits the tick
             cfg.tick1ms_get = config.stm32hal.get1millitick;    // it gets the tick
@@ -294,102 +369,30 @@ H.  Use the library in a sample application named ${appl} by:
     Another solution, the one used in our projects is to use the osal RTOS and the embot objects.    
     See code of any ${brd}-bootloader project for examples.
     
+ 
+
+5.  The steps in details for updating the library with a new version of the STM32 driver
+
+    The frequency with which STM updates its driver is about every six months, hence it may be required to use a new driver for a given board.
     
+    The update can be easily done by running cube-mx project on a given board, checking any newer driver and generating a new mdk project with it.
+    
+    At this point, one can simply follow back section 2 and apply the relevant changes to the old library of the board.
+    
+    However, another possibility is to create a new alternative library for the board. The advantage is that the old library still exists.
+    
+    To do that, ... simply follow back section 2 and create all new folders etc as if it were a new library.
+    
+    
+    
+    
+6.  Important changes across versions of the stm32 driver
+
+    In version 183:
+    -   the CAN API has changed ... now there is a new mode ()
+    -   t
+ 
     
 //  END OF DOCUMENT
     
     
-//  work in progress. mostly garbage.    
-
-
-// OK, RIMUOVI FINO AD ASDF 
-//    Then, you must add a ${drivername}/cfg/stm32hal_driver_cfg.h which contains specific macros and values used to shape the code of the HAL driver
-//    to behave for a specific board. This file will point to stm32hal/src/board/${brd}/inc/stm32hal_driver_cfg_of_${brd}.h 
-    
-    To complete the work we must now edit the file ${drivername}/inc/${mpufamily}_hal.h to include the file ${drivername}/cfg/stm32hal_driver_cfg.h 
-    instead of the standard file ${mpufamily}_hal_conf.h
-    
-    For the case of board RFE we have changed the code of file stm32l4xx_hal.h in this way:
-    +   // IIT-EXT
-    +   #if defined(USE_STM32HAL)
-    +       // add a hook towards board specific stuff as created by cubemx
-    +       #include "../cfg/stm32hal_driver_cfg.h"
-    +   #else
-    +       #warning you are using a stm32hal file w/ USE_STM32HAL undefined ... are you sure?   
-        /* Includes ------------------------------------------------------------------*/
-        #include "stm32l4xx_hal_conf.h"
-    +   #endif
-    
-    And the file stm32hal_driver_cfg.h contains this code;
-    
-        #include "stm32hal_define.h"
-        #if defined(STM32HAL_BOARD_RFE)            
-            // path is referred to stm32hal/api
-            #include "../src/board/rfe/inc/stm32hal_driver_cfg_of_rfe.h"                        
-        #else            
-                #error pls define the correct BOARD            
-        #endif
-
-    The content of stm32hal_driver_cfg_of_rfe.h will be described in a later section
-   
-
-   
-    In these two folder you must copy UNCHANGED the files which mdk-cubemx puts inside groups: Drivers\${MPUFAMILY}_HAL_Driver (or similar) and in Drivers\CMSIS.
-    in particular:   
-    inside ${drivername}/inc put: 
-        - all files inside stm32hal\cubemx\${brd}\Drivers\${MPUFAMILY}_HAL_Driver\Inc 
-        - some files from stm32hal\cubemx\[$brd}\Drivers\CMSIS: all those in /Include, all those in /Device/ST/${MPUFAMILY}/Include 
-        
-    inside ${drivername}/src put what mdk-cubemx uses in its Drivers sections.
-        - stm32hal\cubemx\${brd}\Drivers/${MPUFAMILY}_HAL_Driver\Src
-        - the file it has in Drivers/CMSIS which is specific of the mpu family. For instance, from stm32hal\cubemx\${brd}\Drivers\CMSIS: system_${mpufamily}.c [system_stm32l4xx.c] 
-
-    Now add a customisation hook for the stm32/src/driver 
-
-    -   add a new file stm32hal/src/driver/${drivername}/inc/${mpufamily}_hal_conf.h 
-        it must include under the macro STM32HAL_BOARD_${BRD} the file:  "../src/board/${brd}/inc/${mpufamily}_hal_conf_${brd}.h" [stm32l4xx_hal_conf_rfe.h]
-
-// ASDF
-    
-    
-        
-x.  works on the code specific for this board which must be put into the stm32/src/board/${brd} folder
-
-    there are several files which must be added in here. their content is taken by files generated by cubemx.
-    
-    -   file board/${brd}/inc/${mpufamily}_hal_conf_${brd}.h [stm32l4xx_hal_conf_rfe.h]
-        rename the template file board/template/mpufamily_hal_conf_brd.h into it. 
-        then get the file ${mpufamily}_hal_conf.h [stm32l4xx_hal_conf.h] as generated by cubemx and put it inside our ${mpufamily}_hal_conf_${brd}.h [stm32l4xx_hal_conf_rfe.h]
-        you must follow instructions inside the mpufamily_hal_conf_brd.h file to change the original code of ${mpufamily}_hal_conf.h
-        in particular we must adjust the include path considering that this file starts at stm32/api ...
-        
-    -   all files generated by cubemx for a specific peripheral. for instance: gpio.[c, h], tim.[c, h] etc.
-        copy the .c files into board/${brd}/src and the .h files into board/${brd}/inc  
-        change them ... in this way:
-        - the .h files must include stm32hal.h, in a way similar to:
-            // IIT-EXT     
-            #if defined(USE_STM32HAL)
-                #include "stm32hal.h"
-            #else
-            #include "stm32l4xx_hal.h"
-            #endif
-        - the .c files dont need to be changed ...
-      
-x.  prepare the stm32hal/api folder.
-
-    -   stm32hal_define.h
-        -   add a new STM32HAL_BOARD_xxx section by copying from an existing one and then modify it.
-        -   open the mdk project generated by cubemx (called mdk-cubemx).
-        -   in c++ tab get the macros and put them inside the board section
-            [USE_HAL_DRIVER,STM32L452xx] 
-        -   add in this section any other macro you may use. 
-    
-    -   stm32hal_driver.h
-        -  decide which stm32zzxx_hal.h file from stm32hal/src/.... to include. 
-           explanation: in here it comes the code which cubemx copies into the mdk proejct.
-           [Drivers\STM32L4xx_HAL_Driver]
-           
-    -   stm32hal_bsp.h
-        -   add a new STM32HAL_BOARD_xxx section and add:
-            -   whatever .h files are in mdk-cubemx 
-            explain better

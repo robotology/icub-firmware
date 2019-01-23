@@ -88,7 +88,7 @@
  extern "C" {
 #endif
 
-#include "../src/board/nucleo64/inc/main.h" 
+#include "../src/board/nucleo64/v172/inc/main.h" 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
 

@@ -38,6 +38,8 @@ namespace embot { namespace hw { namespace sys {
     extern const std::uint32_t maxsizeOfStorage;
     extern const std::uint32_t addressOfApplication;
     extern const std::uint32_t maxsizeOfApplication;
+    extern const std::uint32_t addressOfApplicationStorage;
+    extern const std::uint32_t maxsizeOfApplicationStorage;
     
     std::uint32_t clock(CLOCK clk);
     

@@ -123,8 +123,7 @@ namespace embot { namespace hw { namespace can {
     #elif   defined(STM32HAL_BOARD_RFE)
     
     #define STM32HAL_HAS_CAN1 
-    #define STM32HAL_HAS_CAN_API_V183
-    
+
     static const bspmap_t bspmap = 
     {
         0x00000001
@@ -132,6 +131,14 @@ namespace embot { namespace hw { namespace can {
     
     #else
         #error embot::hw::can::bspmask must be filled    
+    #endif
+
+    #if (STM32HAL_DRIVER_VERSION >= 183)
+        #define STM32HAL_HAS_CAN_API_V183
+        #warning using can api v183
+    #else
+        #undef STM32HAL_HAS_CAN_API_V183
+        #warning using can api pre-v183
     #endif
     
     //////////////////// static variables definitions //////////////////

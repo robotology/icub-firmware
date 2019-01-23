@@ -16,7 +16,7 @@
         <TargetCommonOption>
           <Device>STM32L433RCIx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32L4xx_DFP.2.0.0</PackID>
+          <PackID>Keil.STM32L4xx_DFP.2.2.0</PackID>
           <PackURL>http://www.keil.com/pack</PackURL>
           <Cpu>IRAM(0x20000000,0x00010000) IROM(0x08000000,0x00040000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -184,6 +184,7 @@
             <hadXRAM>0</hadXRAM>
             <uocXRam>0</uocXRam>
             <RvdsVP>2</RvdsVP>
+            <RvdsMve>0</RvdsMve>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -918,6 +919,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_lowlevel.cpp</FileName>
+              <FileType>9</FileType>
+              <FilePath>..\..\..\..\embot\hw\embot_hw_lowlevel.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1004,7 +1010,7 @@
         <TargetCommonOption>
           <Device>STM32L433RCIx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32L4xx_DFP.2.0.0</PackID>
+          <PackID>Keil.STM32L4xx_DFP.2.2.0</PackID>
           <PackURL>http://www.keil.com/pack</PackURL>
           <Cpu>IRAM(0x20000000,0x00010000) IROM(0x08000000,0x00040000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -1172,6 +1178,7 @@
             <hadXRAM>0</hadXRAM>
             <uocXRam>0</uocXRam>
             <RvdsVP>2</RvdsVP>
+            <RvdsMve>0</RvdsMve>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -1905,6 +1912,11 @@
               <FileName>embot_hw.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_lowlevel.cpp</FileName>
+              <FileType>9</FileType>
+              <FilePath>..\..\..\..\embot\hw\embot_hw_lowlevel.cpp</FilePath>
             </File>
           </Files>
         </Group>

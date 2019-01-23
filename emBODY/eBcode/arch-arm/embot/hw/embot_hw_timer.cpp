@@ -289,7 +289,10 @@ namespace embot { namespace hw { namespace timer {
 
     }        
 
-         
+#if (STM32HAL_DRIVER_VERSION >= 183)    
+    #warning look at the differences with the timer config. 
+    // so far only TIM6 is guaranteed to work. also ... the callbacks now are embedded in stm32 ... 
+#endif    
         
     void mx_timx_init(Timer t, std::uint32_t time)
     {
@@ -309,20 +312,30 @@ namespace embot { namespace hw { namespace timer {
         stm32data->phandletimx->Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
         stm32data->phandletimx->Init.RepetitionCounter = 0;
         stm32data->phandletimx->Init.Period = pars.period-1;
-
+        #if (STM32HAL_DRIVER_VERSION >= 183)
+        stm32data->phandletimx->Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+        #endif
         
         if(true == stm32data->isonepulse)
         {   // e.g., for tim15: use HAL_TIM_OnePulse_Init() and dont use HAL_TIM_Base_Init().
             if (HAL_TIM_OnePulse_Init(stm32data->phandletimx, TIM_OPMODE_REPETITIVE) != HAL_OK)
             {
+                #if (STM32HAL_DRIVER_VERSION >= 190)
+                Error_Handler();
+                #else
                 _Error_Handler(NULL, __LINE__);
+                #endif
             }
         } 
         else
         {   // normal case            
             if (HAL_TIM_Base_Init(stm32data->phandletimx) != HAL_OK)
             {
+                #if (STM32HAL_DRIVER_VERSION >= 190)
+                Error_Handler();
+                #else
                 _Error_Handler(NULL, __LINE__);
+                #endif
             }
         }
 
@@ -332,7 +345,11 @@ namespace embot { namespace hw { namespace timer {
             sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
             if (HAL_TIMEx_MasterConfigSynchronization(stm32data->phandletimx, &sMasterConfig) != HAL_OK)
             {
+                #if (STM32HAL_DRIVER_VERSION >= 190)
+                Error_Handler();
+                #else
                 _Error_Handler(NULL, __LINE__);
+                #endif
             }
         }
 

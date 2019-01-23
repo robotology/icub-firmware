@@ -88,7 +88,7 @@
  extern "C" {
 #endif
 
-#include "../src/board/mtb4/inc/main.h" 
+#include "../src/board/mtb4/v172/inc/main.h" 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
 

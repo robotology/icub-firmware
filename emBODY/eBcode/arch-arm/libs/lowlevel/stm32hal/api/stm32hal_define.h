@@ -55,6 +55,7 @@ extern "C" {
 //#if __ARMCOMPILER_VERSION > 6000000
 //    #define register 
 //#endif
+// i choose the -Wno-deprecated-register solution
     
 #if     defined(STM32HAL_BOARD_NUCLEO64)
 
@@ -63,13 +64,14 @@ extern "C" {
     #define STM32L476xx
     #endif
     
+    // of family STM32L4
     #if !defined(STM32L4)
     #define STM32L4
-    #endif      
-    
-    // of type STM32L4    
-    #if !defined(STM32HAL_STM32L4xx)
-    #define STM32HAL_STM32L4xx
+    #endif  
+
+    // of family STM32L4 but in STM32HAL_ format   
+    #if !defined(STM32HAL_STM32L4)
+    #define STM32HAL_STM32L4
     #endif
     
 //    #if !defined(ARM_MATH_CM4)
@@ -84,14 +86,16 @@ extern "C" {
     #define STM32L443xx
     #endif	
     
+    // of family STM32L4
     #if !defined(STM32L4)
     #define STM32L4
     #endif  
 
-    // of type STM32L4    
-    #if !defined(STM32HAL_STM32L4xx)
-    #define STM32HAL_STM32L4xx
+    // of family STM32L4 but in STM32HAL_ format    
+    #if !defined(STM32HAL_STM32L4)
+    #define STM32HAL_STM32L4
     #endif    
+    
 				
 #elif   defined(STM32HAL_BOARD_STRAIN2)
 
@@ -100,14 +104,16 @@ extern "C" {
     #define STM32L443xx
     #endif	
     
+    // of family STM32L4
     #if !defined(STM32L4)
     #define STM32L4
     #endif  
 
-    // of type STM32L4    
-    #if !defined(STM32HAL_STM32L4xx)
-    #define STM32HAL_STM32L4xx
+    // of family STM32L4 but in STM32HAL_ format
+    #if !defined(STM32HAL_STM32L4)
+    #define STM32HAL_STM32L4
     #endif  
+    
  
 #elif   defined(STM32HAL_BOARD_RFE)
 
@@ -116,20 +122,16 @@ extern "C" {
     #define STM32L452xx
     #endif  
 
+    // of family STM32L4
     #if !defined(STM32L4)
     #define STM32L4
     #endif  
 
-    // of type STM32L4    
-    #if !defined(STM32HAL_STM32L4xx)
-    #define STM32HAL_STM32L4xx
+    // of family STM32L4 but in STM32HAL_ format  
+    #if !defined(STM32HAL_STM32L4)
+    #define STM32HAL_STM32L4
     #endif  
     
-    // other important macros
-    #if !defined(USE_HAL_CAN_REGISTER_CALLBACKS)
-    #define USE_HAL_CAN_REGISTER_CALLBACKS 1
-    #endif  
-
 #else
         #error STM32HAL: you must define a STM32HAL_BOARD_${BRD}
 #endif

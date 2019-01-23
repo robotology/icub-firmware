@@ -22,8 +22,10 @@
 
 
 ; flash starts from xx and its size is xxx
-LR_IROM1 0x08000000 0x00014000  {    ; load region size_region
-  ER_IROM1 0x08000000 0x00014000  {  ; load address = execution address
+; 80k is: LR_IROM1 0x08000000 0x00014000  {    ; load region size_region
+; however it was 124K: LR_IROM1 0x08000000 0x0001F000  {    ; load region size_region
+LR_IROM1 0x08000000 0x00013000  {    ; load region size_region
+  ER_IROM1 0x08000000 0x000130000  {  ; load address = execution address
    *.o (RESET, +First)
    *(InRoot$$Sections)
    .ANY (+RO)

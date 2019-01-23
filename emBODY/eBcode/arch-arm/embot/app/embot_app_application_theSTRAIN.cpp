@@ -54,6 +54,7 @@
 #include "embot_app_canprotocol.h"
 
 #include "embot_app_theCANboardInfo.h"
+#include "embot_app_theStorage.h"
 #include "embot_app_application_theCANtracer.h"
 
 
@@ -283,8 +284,13 @@ struct embot::app::application::theSTRAIN::Impl
         
         bool EEPROM_read()
         {
+#if defined(STRAIN2_APP_AT_64K)            
             embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance();
             canbrdinfo.userdataread(0, sizeof(data), &data);
+#else            
+            embot::app::theStorage &storage = embot::app::theStorage::getInstance();
+            storage.read(0, sizeof(data), &data);
+#endif            
             synched = true;
             
             if(validityKey != data.key)
@@ -305,8 +311,13 @@ struct embot::app::application::theSTRAIN::Impl
         bool EEPROM_write()
         {
             data.key = validityKey;
+#if defined(STRAIN2_APP_AT_64K)            
             embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance(); 
             canbrdinfo.userdatawrite(0, sizeof(data), &data);
+#else            
+            embot::app::theStorage &storage = embot::app::theStorage::getInstance();
+            storage.write(0, sizeof(data), &data);
+#endif            
             synched = true;
             return synched;
         }
@@ -321,6 +332,11 @@ struct embot::app::application::theSTRAIN::Impl
         
         StrainConfigData()
         {
+#if defined(STRAIN2_APP_AT_64K)
+#else            
+            embot::app::theStorage &storage = embot::app::theStorage::getInstance(); 
+            storage.init(embot::hw::sys::addressOfApplicationStorage, 1024);
+#endif            
             clear();
             
             for(int s=0; s<numOfSets; s++)
@@ -744,9 +760,9 @@ struct embot::app::application::theSTRAIN::Impl
     {
 
 //        defaultAmplifConfig.factoryreset();     
-
+#if defined(DEBUG_acquisition_computetiming) 
         debugtime = 0;
-        
+#endif        
         ticking = false;  
 
         ticktimer = new embot::sys::Timer;   
@@ -1491,9 +1507,9 @@ bool embot::app::application::theSTRAIN::Impl::tick(std::vector<embot::hw::can::
     {
         return false;
     }
-    
+#if defined(DEBUG_acquisition_computetiming)     
     debugtime = embot::sys::timeNow();
-        
+#endif        
     // start adc acquisition
     acquisition_start();
              

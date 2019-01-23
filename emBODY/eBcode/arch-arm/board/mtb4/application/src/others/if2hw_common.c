@@ -24,8 +24,6 @@
 #include "stdlib.h"
 
 
-
-
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -92,7 +90,34 @@ extern void if2hw_common_delay(uint64_t usec)
 // - definition of static functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-__asm static void dd_hl_sys_asm_xnumARMv7ops(uint32_t numberof) 
+//__asm static void dd_hl_sys_asm_xnumARMv7ops(uint32_t numberof) 
+//{
+//   align
+//dowaitloop
+//   subs r0,r0,#1
+//   bne dowaitloop
+//   bx lr 
+//   align    
+//}
+
+#warning solve the delay issue in mtb4 c file (no optimization) ... i could move the lowlevel into a c file ...
+
+#if __ARMCOMPILER_VERSION > 6000000
+int _execOperations(uint32_t i)
+{
+  int res = 0;
+  __asm 
+  (
+    "DOWAITLOOP:                            \t\n"
+    "SUBS %[input_i], %[input_i], #1        \t\n"
+    "BNE DOWAITLOOP                         \t\n"
+    : [result] "=&r" (res)
+    : [input_i] "r" (i)
+  );
+  return 0;
+}
+#else
+__asm void _execOperations(uint32_t numberof) 
 {
    align
 dowaitloop
@@ -101,6 +126,7 @@ dowaitloop
    bx lr 
    align    
 }
+#endif
 
 static void dd_bsp_delay(uint64_t t)
 {   
@@ -135,7 +161,7 @@ static void dd_bsp_delay(uint64_t t)
     {
         return;
     }
-    dd_hl_sys_asm_xnumARMv7ops((uint32_t)num);
+    _execOperations((uint32_t)num);
 }
 
 

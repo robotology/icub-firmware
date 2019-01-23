@@ -89,7 +89,7 @@
  extern "C" {
 #endif
 
-#include "../src/board/strain2/inc/main.h" 
+#include "../src/board/strain2/v172/inc/main.h" 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
 

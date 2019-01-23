@@ -87,7 +87,7 @@
  extern "C" {
 #endif
 
-#include "../src/board/rfe/inc/main.h" 
+#include "../src/board/rfe/v183/inc/main.h" 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
 

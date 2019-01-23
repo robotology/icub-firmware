@@ -16,7 +16,7 @@
         <TargetCommonOption>
           <Device>STM32L452CEUx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32L4xx_DFP.2.0.0</PackID>
+          <PackID>Keil.STM32L4xx_DFP.2.2.0</PackID>
           <PackURL>http://www.keil.com/pack</PackURL>
           <Cpu>IRAM(0x20000000,0x00020000) IRAM2(0x10000000,0x00008000) IROM(0x08000000,0x00080000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -1090,6 +1090,11 @@
               <FileType>8</FileType>
               <FilePath>..\src\usb_user\embot_hw_usb.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_lowlevel.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\hw\embot_hw_lowlevel.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1187,7 +1192,7 @@
             <File>
               <FileName>stm32l4xx_hal_msp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\libs\lowlevel\stm32hal\src\board\rfe\src\stm32l4xx_hal_msp.c</FilePath>
+              <FilePath>..\..\..\..\libs\lowlevel\stm32hal\src\board\rfe\v183\src\stm32l4xx_hal_msp.c</FilePath>
             </File>
             <File>
               <FileName>stm32l4xx_hal_pcd.c</FileName>
@@ -1379,7 +1384,7 @@
         <TargetCommonOption>
           <Device>STM32L452CEUx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32L4xx_DFP.2.0.0</PackID>
+          <PackID>Keil.STM32L4xx_DFP.2.2.0</PackID>
           <PackURL>http://www.keil.com/pack</PackURL>
           <Cpu>IRAM(0x20000000,0x00028000) IROM(0x08000000,0x00080000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -2453,6 +2458,11 @@
               <FileType>8</FileType>
               <FilePath>..\src\usb_user\embot_hw_usb.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_lowlevel.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\hw\embot_hw_lowlevel.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2550,7 +2560,7 @@
             <File>
               <FileName>stm32l4xx_hal_msp.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\..\..\..\libs\lowlevel\stm32hal\src\board\rfe\src\stm32l4xx_hal_msp.c</FilePath>
+              <FilePath>..\..\..\..\libs\lowlevel\stm32hal\src\board\rfe\v183\src\stm32l4xx_hal_msp.c</FilePath>
             </File>
             <File>
               <FileName>stm32l4xx_hal_pcd.c</FileName>
