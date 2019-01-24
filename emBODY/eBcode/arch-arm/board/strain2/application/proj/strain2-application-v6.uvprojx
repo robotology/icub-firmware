@@ -438,59 +438,9 @@
               <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOaction.c</FilePath>
             </File>
             <File>
-              <FileName>EOarray.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOarray.c</FilePath>
-            </File>
-            <File>
               <FileName>EoCommon.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EoCommon.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOconstarray.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOconstarray.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOconstvector.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOconstvector.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOdeque.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOdeque.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOfifo.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOfifo.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOfifoByte.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOfifoByte.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOfifoWord.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOfifoWord.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOlist.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOlist.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOpacket.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOpacket.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOsm.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOsm.c</FilePath>
             </File>
             <File>
               <FileName>EOtheErrorManager.c</FileName>
@@ -511,16 +461,6 @@
               <FileName>EOtimer.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOtimer.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOumlsm.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOumlsm.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOvector.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOvector.c</FilePath>
             </File>
             <File>
               <FileName>EOVmutex.c</FileName>
@@ -1411,59 +1351,9 @@
               <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOaction.c</FilePath>
             </File>
             <File>
-              <FileName>EOarray.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOarray.c</FilePath>
-            </File>
-            <File>
               <FileName>EoCommon.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EoCommon.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOconstarray.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOconstarray.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOconstvector.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOconstvector.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOdeque.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOdeque.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOfifo.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOfifo.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOfifoByte.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOfifoByte.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOfifoWord.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOfifoWord.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOlist.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOlist.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOpacket.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOpacket.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOsm.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOsm.c</FilePath>
             </File>
             <File>
               <FileName>EOtheErrorManager.c</FileName>
@@ -1484,16 +1374,6 @@
               <FileName>EOtimer.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOtimer.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOumlsm.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOumlsm.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOvector.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOvector.c</FilePath>
             </File>
             <File>
               <FileName>EOVmutex.c</FileName>
