@@ -59,12 +59,12 @@ extern void stm32hal_board_init(void);
         #include "../src/board/nucleo64/v172/inc/gpio.h"
         #include "../src/board/nucleo64//v172/inc/main.h"
         #include "../src/board/nucleo64/v172/inc/usart.h"
-	
+
     #else
         #error unsupported driver version for nucleo64
     #endif
-	
-#elif   defined(STM32HAL_BOARD_MTB4)	
+    
+#elif   defined(STM32HAL_BOARD_MTB4)
 
     // one version only: v172
     #if (STM32HAL_DRIVER_VERSION == 172)
@@ -83,6 +83,23 @@ extern void stm32hal_board_init(void);
 
 
         #include "../src/board/mtb4/v172/inc/stm32l4xx_it.h"
+        
+    #elif(STM32HAL_DRIVER_VERSION == 190)
+
+        #include "../src/config/stm32hal_driver_cfg_of_mtb4_v190.h"
+
+        #include "../src/board/mtb4/v190/inc/adc.h"
+        #include "../src/board/mtb4/v190/inc/can.h"
+        #include "../src/board/mtb4/v190/inc/dma.h"
+        #include "../src/board/mtb4/v190/inc/gpio.h"
+        #include "../src/board/mtb4/v190/inc/i2c.h"
+        #include "../src/board/mtb4/v190/inc/rng.h"
+        #include "../src/board/mtb4/v190/inc/main.h"
+        #include "../src/board/mtb4/v190/inc/tim.h"
+        #include "../src/board/mtb4/v190/inc/usart.h"
+
+        #include "../src/board/mtb4/v190/inc/stm32l4xx_it.h"
+
 
     #else
         #error unsupported driver version for mtb4

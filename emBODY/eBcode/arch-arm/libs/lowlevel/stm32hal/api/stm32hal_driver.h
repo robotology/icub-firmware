@@ -36,13 +36,24 @@ extern "C" {
 
 // - public interface  ------------------------------------------------------------------------------------------------
   
-#if     defined(STM32HAL_BOARD_NUCLEO64) || defined(STM32HAL_BOARD_MTB4) 
+#if     defined(STM32HAL_BOARD_NUCLEO64)
 
     // only one possible driver
     #if !defined(STM32HAL_DRIVER_V172)
         #define STM32HAL_DRIVER_V172
     #endif
     #define STM32HAL_DRIVER_VERSION 172
+    
+#elif   defined(STM32HAL_BOARD_MTB4)
+// two possible drivers. default is the 190 ...
+    #if     defined(STM32HAL_DRIVER_V172)    
+        #define STM32HAL_DRIVER_VERSION 172  
+    #else   
+        #if !defined(STM32HAL_DRIVER_V190)
+            #define STM32HAL_DRIVER_V190
+        #endif        
+        #define STM32HAL_DRIVER_VERSION 190   
+    #endif
     
 #elif   defined(STM32HAL_BOARD_STRAIN2)
 
