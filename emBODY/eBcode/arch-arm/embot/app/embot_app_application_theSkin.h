@@ -22,28 +22,22 @@
 #define _EMBOT_APP_APPLICATION_THESKIN_H_
 
 #include "embot_common.h"
-
 #include "embot_hw.h"
-
 #include "embot_sys.h"
 
 #include "embot_app_canprotocol.h"
 #include "embot_app_canprotocol_analog_polling.h"
 #include "embot_app_canprotocol_analog_periodic.h"
 #include "embot_app_canprotocol_skin_periodic.h"
-
 #include <vector>
+#include <memory>
 
 namespace embot { namespace app { namespace application {
            
     class theSkin
     {
     public:
-        static theSkin& getInstance()
-        {
-            static theSkin* p = new theSkin();
-            return *p;
-        }
+        static theSkin& getInstance();
         
         
     public:
@@ -68,17 +62,11 @@ namespace embot { namespace app { namespace application {
 
     private:
         theSkin(); 
-
-    public:
-        // remove copy constructors and copy assignment operators
-        theSkin(const theSkin&) = delete;
-        theSkin(theSkin&) = delete;
-        void operator=(const theSkin&) = delete;
-        void operator=(theSkin&) = delete;
+        ~theSkin(); 
 
     private:    
         struct Impl;
-        Impl *pImpl;        
+        std::unique_ptr<Impl> pImpl;        
     };       
 
 

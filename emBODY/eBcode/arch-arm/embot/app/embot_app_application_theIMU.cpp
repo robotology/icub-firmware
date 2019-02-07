@@ -97,7 +97,7 @@ struct embot::app::application::theIMU::Impl
         embot::common::relTime duration;
         embot::common::Time timeofstart;
         bool dataisready;
-        embot::hw::BNO055::Data data;
+        embot::hw::bno055::Data data;
         imuAcquisition() { reset(); } 
         void reset()
         {
@@ -461,7 +461,7 @@ bool embot::app::application::theIMU::Impl::acquisition_start()
 {
     imuacquisition.onstart();
     embot::common::Callback cbk(alertdataisready, this);
-    embot::hw::BNO055::acquisition(config.sensor, embot::hw::BNO055::Set::FULL, imuacquisition.data, cbk); 
+    embot::hw::bno055::acquisition(config.sensor, embot::hw::bno055::Set::FULL, imuacquisition.data, cbk); 
     return true;
 }
 
@@ -510,8 +510,8 @@ bool embot::app::application::theIMU::initialise(Config &config)
     
     pImpl->action.load(embot::sys::EventToTask(pImpl->config.tickevent, pImpl->config.totask));
    
-    embot::hw::BNO055::init(pImpl->config.sensor, pImpl->config.sensorconfig); 
-    embot::hw::BNO055::set(pImpl->config.sensor, embot::hw::BNO055::Mode::NDOF, 5*embot::common::time1millisec);
+    embot::hw::bno055::init(pImpl->config.sensor, pImpl->config.sensorconfig); 
+    embot::hw::bno055::set(pImpl->config.sensor, embot::hw::bno055::Mode::NDOF, 5*embot::common::time1millisec);
      
     return true;
 }

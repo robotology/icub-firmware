@@ -81,6 +81,7 @@ namespace embot { namespace sys {
             void *param;                // the optional param passed to startup() and onevent()
   
             Config() { stacksize = 256; priority = Priority::minimum; timeout = embot::common::timeWaitForever; startup = nullptr; onevent = nullptr; param = nullptr; }
+            Config(std::uint16_t st, Priority pr, common::relTime ti, Task::fpStartup fpst, Task::fpOnEvent fpon, void* pa) : stacksize(st), priority(pr), timeout(ti), startup(fpst), onevent(fpon), param(pa) {}
             bool isvalid() const
             { 
                 if((nullptr == onevent) || (0 == stacksize) || (false == priority.isvalid())) { return false; }  

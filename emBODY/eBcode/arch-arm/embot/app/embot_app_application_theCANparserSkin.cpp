@@ -210,12 +210,21 @@ bool embot::app::application::theCANparserSkin::Impl::process_set_txmode(const e
 
 
 
-embot::app::application::theCANparserSkin::theCANparserSkin()
-: pImpl(new Impl)
-{       
-
+embot::app::application::theCANparserSkin& embot::app::application::theCANparserSkin::getInstance()
+{
+    static theCANparserSkin* p = new theCANparserSkin();
+    return *p;
 }
 
+embot::app::application::theCANparserSkin::theCANparserSkin()
+//    : pImpl(new Impl)
+{
+    pImpl = std::make_unique<Impl>();
+
+}  
+
+    
+embot::app::application::theCANparserSkin::~theCANparserSkin() { }
    
         
 bool embot::app::application::theCANparserSkin::initialise(Config &config)

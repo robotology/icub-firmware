@@ -30,11 +30,8 @@
 #include "embot_hw_i2c.h"
 
     
-namespace embot { namespace hw { namespace BNO055 {
-         
-    enum class Sensor { one = 0, none = 32, maxnumberof = 1 };
-    
-        
+namespace embot { namespace hw { namespace bno055 {
+                 
     struct Config
     {  
         embot::hw::i2c::Descriptor      i2cdes;        
@@ -55,7 +52,7 @@ namespace embot { namespace hw { namespace BNO055 {
      
     enum class Register 
     { 
-        CHIP_ID         = 0x00, // 7 bytes RO with many info. see embot::hw::BNO055::Info 
+        CHIP_ID         = 0x00, // 7 bytes RO with many info. see embot::hw::bno055::Info 
         PAGE_ID         = 0x07, // 1 byte RW. it changes page. unfortunately there are no registers defined for page 1
         DATASET_START   = 0x08, // how many as we want: acc + mag + gyr + eul + qua + lia + grv + temp + calibstat + stresult (total = 47 bytes).
         ACC_DATA        = 0x08, // 6 bytes RO
@@ -163,56 +160,56 @@ namespace embot { namespace hw { namespace BNO055 {
     
     
     
-    bool supported(Sensor s);
+    bool supported(BNO055 s);
     
-    bool initialised(Sensor s);
+    bool initialised(BNO055 s);
     
     // the init() starts the chip, prepares i2c, pings it. if all ok it returns resOK.
     // the working mode is however Mode::CONFIG
-    result_t init(Sensor s, const Config &config);
+    result_t init(BNO055 s, const Config &config);
     
     // after that init() returns resOK we can check if it is alive. we can specify a timeout
-    bool isalive(Sensor s, embot::common::relTime timeout = 3*embot::common::time1millisec);
+    bool isalive(BNO055 s, embot::common::relTime timeout = 3*embot::common::time1millisec);
     
     // we can get info
-    result_t get(Sensor s, Info &info, embot::common::relTime timeout = 3*embot::common::time1millisec);
+    result_t get(BNO055 s, Info &info, embot::common::relTime timeout = 3*embot::common::time1millisec);
     
     // we can now set a working mode. we can specify a timeout
-    result_t set(Sensor s, Mode m, embot::common::relTime timeout = 3*embot::common::time1millisec);
+    result_t set(BNO055 s, Mode m, embot::common::relTime timeout = 3*embot::common::time1millisec);
     
     // we must check that nobody is using the sensor, maybe in non-blocking mode some time earlier
-    bool isacquiring(Sensor s);
+    bool isacquiring(BNO055 s);
     
     // we check isacquiring() but also if any other device is using i2c bus
-    bool canacquire(Sensor s);
+    bool canacquire(BNO055 s);
     
     // we start acquisition of a set.
     // if returns resOK, we know that acquisition is over if it is called oncompletion() or when operationdone() is true;
-    result_t acquisition(Sensor s, Set set, const embot::common::Callback &oncompletion = embot::common::Callback(nullptr, nullptr));
+    result_t acquisition(BNO055 s, Set set, const embot::common::Callback &oncompletion = embot::common::Callback(nullptr, nullptr));
     
-    result_t acquisition(Sensor s, Set set, Data &data, const embot::common::Callback &oncompletion = embot::common::Callback(nullptr, nullptr));
+    result_t acquisition(BNO055 s, Set set, Data &data, const embot::common::Callback &oncompletion = embot::common::Callback(nullptr, nullptr));
     
     // it tells if a previous operation (acquisition, read, write) is over
-    bool operationdone(Sensor s);
+    bool operationdone(BNO055 s);
     
     // ok, now we can read data previously acquired
-    result_t read(Sensor s, Data &data);
+    result_t read(BNO055 s, Data &data);
     
     // here are some write() and read() funtions which operate directly on a single register reg 
     
     
     // we write a single byte into a register.
     // blocking or non-blocking mode. we check end of oepration either with operationdone() or with the execution of oncompletion().      
-    result_t write(Sensor s, embot::hw::BNO055::Register reg, std::uint8_t value, const embot::common::relTime timeout);
-    result_t write(Sensor s, embot::hw::BNO055::Register reg, std::uint8_t value, const embot::common::Callback &oncompletion = embot::common::Callback(nullptr, nullptr));
+    result_t write(BNO055 s, embot::hw::bno055::Register reg, std::uint8_t value, const embot::common::relTime timeout);
+    result_t write(BNO055 s, embot::hw::bno055::Register reg, std::uint8_t value, const embot::common::Callback &oncompletion = embot::common::Callback(nullptr, nullptr));
 
     // we read from register reg, for data.size positions and we place results into data.pointer (which MUST point to at least data.size bytes)
     // blocking or non-blocking mode. we check end of oepration either with operationdone() or with the execution of oncompletion().  
-    result_t read(Sensor s, embot::hw::BNO055::Register reg, embot::common::Data &data, const embot::common::relTime timeout);
-    result_t read(Sensor s, embot::hw::BNO055::Register reg, embot::common::Data &data, const embot::common::Callback &oncompletion = embot::common::Callback(nullptr, nullptr));
+    result_t read(BNO055 s, embot::hw::bno055::Register reg, embot::common::Data &data, const embot::common::relTime timeout);
+    result_t read(BNO055 s, embot::hw::bno055::Register reg, embot::common::Data &data, const embot::common::Callback &oncompletion = embot::common::Callback(nullptr, nullptr));
 
  
-}}} // namespace embot { namespace hw { namespace BNO055 {
+}}} // namespace embot { namespace hw { namespace bno055 {
     
 
 

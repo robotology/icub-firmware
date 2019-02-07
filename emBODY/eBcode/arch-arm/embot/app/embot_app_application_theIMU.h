@@ -47,17 +47,17 @@ namespace embot { namespace app { namespace application {
     public:
         struct Config
         {
-            embot::hw::BNO055::Sensor   sensor;
-            embot::hw::BNO055::Config   sensorconfig;
+            embot::hw::BNO055           sensor;
+            embot::hw::bno055::Config   sensorconfig;
             embot::common::Event        tickevent;
             embot::common::Event        datareadyevent;
             embot::sys::Task*           totask;
             Config() :  
-                sensor(embot::hw::BNO055::Sensor::one), 
-                sensorconfig(embot::hw::BNO055::Config(embot::hw::i2c::Descriptor(embot::hw::I2C::two, 400000))), 
+                sensor(embot::hw::BNO055::one), 
+                sensorconfig(embot::hw::bno055::Config(embot::hw::i2c::Descriptor(embot::hw::I2C::two, 400000))), 
                 tickevent(0), datareadyevent(0), totask(nullptr) 
                 {}
-            Config(embot::hw::BNO055::Sensor _s, const embot::hw::BNO055::Config& _sc, embot::common::Event _te, embot::common::Event _de, embot::sys::Task* _ts) :     
+            Config(embot::hw::BNO055 _s, const embot::hw::bno055::Config& _sc, embot::common::Event _te, embot::common::Event _de, embot::sys::Task* _ts) :     
                 sensor(_s),
                 sensorconfig(_sc),
                 tickevent(_te), 

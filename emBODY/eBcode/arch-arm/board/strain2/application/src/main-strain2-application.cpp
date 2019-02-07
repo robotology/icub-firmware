@@ -114,7 +114,7 @@ int main(void)
 static void start_evt_based(void);
 
 static void userdeflauncher(void* param)
-{
+{     
     embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance();
     canbrdinfo.synch(vAP, vCP);
             
@@ -124,7 +124,6 @@ static void userdeflauncher(void* param)
 static void userdefonfatal(void *param)
 {
 }
-
 
 
 static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask evtmsk, void *p);
@@ -153,13 +152,11 @@ static void start_evt_based(void)
     embot::app::theLEDmanager &theleds = embot::app::theLEDmanager::getInstance();     
     theleds.init(allleds);    
     theleds.get(embot::hw::LED::one).pulse(embot::common::time1second); 
-
-       
+    
     // start task waiting for can messages. 
     eventbasedtask = new embot::sys::EventTask;  
     const embot::common::relTime waitEventTimeout = 50*1000; //50*1000; //5*1000*1000;    
-    //eventbasedtask->init(eventbasedtask_init, eventbasedtask_onevent, 4*1024, 200, waitEventTimeout, nullptr, nullptr);
-    
+   
     embot::sys::EventTask::Config configEV;
     
     configEV.startup = eventbasedtask_init;

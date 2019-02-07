@@ -46,8 +46,8 @@ namespace embot { namespace hw { namespace bsp { namespace strain2 {
 //    const embot::hw::si7051::Config thermometerCASEconfig = embot::hw::si7051::Config(descrI2Ctwo);   
     
     
-    const embot::hw::BNO055::Sensor imuBOSCH = embot::hw::BNO055::Sensor::one;
-    const embot::hw::BNO055::Config imuBOSCHconfig = embot::hw::BNO055::Config(descrI2Ctwo);   
+    const embot::hw::BNO055 imuBOSCH = embot::hw::BNO055::one;
+    const embot::hw::bno055::Config imuBOSCHconfig = embot::hw::bno055::Config(descrI2Ctwo);   
     
 //    const embot::hw::PGA308::Config configOfSGamps[6] = 
 //    {

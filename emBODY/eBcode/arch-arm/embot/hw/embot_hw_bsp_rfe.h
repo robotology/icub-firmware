@@ -34,7 +34,7 @@
 namespace embot { namespace hw { namespace bsp { namespace rfe {
     
 
-    const embot::hw::led::LED ledBLUE = embot::hw::led::LED::one;
+    const embot::hw::LED ledBLUE = embot::hw::LED::one;
     
 //    const embot::hw::i2c::Descriptor descrI2Cone = embot::hw::i2c::Descriptor(embot::hw::i2c::Bus::one, 400000);
 //    const embot::hw::i2c::Descriptor descrI2Ctwo = embot::hw::i2c::Descriptor(embot::hw::i2c::Bus::two, 400000);

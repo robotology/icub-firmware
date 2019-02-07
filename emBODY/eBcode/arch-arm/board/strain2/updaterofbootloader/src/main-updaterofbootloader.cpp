@@ -77,7 +77,6 @@ static void bl_activity(void* param)
         period = pp->blinkingperiod;
     }    
 
-
     static const std::initializer_list<embot::hw::LED> allleds = {embot::hw::LED::one};  
     embot::app::theLEDmanager &theleds = embot::app::theLEDmanager::getInstance();     
     theleds.init(allleds);    
@@ -89,7 +88,7 @@ static void bl_activity(void* param)
         
   
     // start task waiting for can messages.   
-    const embot::common::relTime waitEventTimeout = 50*1000;    
+    const embot::common::relTime waitEventTimeout = 50*embot::common::time1millisec;    
     embot::sys::EventTask::Config configEV;    
     configEV.startup = eventbasedtask_init;
     configEV.onevent = eventbasedtask_onevent;

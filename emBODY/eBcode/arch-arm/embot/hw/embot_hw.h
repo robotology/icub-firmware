@@ -57,9 +57,11 @@ namespace embot { namespace hw {
                                       ten = 9, eleven = 10, twelve = 11, thirteen = 12, fourteen = 13, fifteen = 14, sixteen = 15, 
                                       none = 31, maxnumberof = 16 }; 
 
-    enum class I2C { one = 0, two = 1, none = 31, maxnumberof = 2 };                                      
+    enum class I2C { one = 0, two = 1, none = 31, maxnumberof = 2 };     
+
+    enum class BNO055 { one = 0, none = 31, maxnumberof = 1 };    
     
-    
+   
     struct GPIO
     {   // it is descripted by a pair{port, pin}. 
         void*           port;

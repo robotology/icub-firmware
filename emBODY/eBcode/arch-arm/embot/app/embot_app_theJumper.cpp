@@ -85,7 +85,7 @@ struct embot::app::theJumper::Impl
 // - all the rest
 // --------------------------------------------------------------------------------------------------------------------
 
-#warning TODO: see why the class does not use the customised new()
+#warning TODO: see why the class does not call the customised new()
 void * embot::app::theJumper::operator new(std::size_t size) throw(std::bad_alloc)
 {
     static std::uint64_t s_data_jumper[(sizeof(embot::app::theJumper)+7)/8] = {0};

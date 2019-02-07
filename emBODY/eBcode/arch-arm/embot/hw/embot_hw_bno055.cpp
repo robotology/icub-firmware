@@ -22,7 +22,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "embot_hw_bno055.h"
-#include "stm32hal.h"
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -31,14 +31,14 @@
 
 #include <cstring>
 #include <vector>
-
-using namespace std;
-
+#include "stm32hal.h"
 #include "embot_binary.h"
 #include "embot_hw_sys.h"
 #include "embot_hw_gpio.h"
 
+using namespace std;
 
+using namespace embot::hw;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -54,23 +54,23 @@ using namespace std;
 #if     !defined(EMBOT_BNO055_ENABLED)
 
 
-namespace embot { namespace hw { namespace BNO055 {
+namespace embot { namespace hw { namespace bno055 {
 
-    bool supported(Sensor s)                                                                        { return false; }
-    bool initialised(Sensor s)                                                                      { return false; }
-    result_t init(Sensor s, const Config &config)                                                   { return resNOK; }
-    bool isalive(Sensor s, embot::common::relTime timeout)                                          { return false; }
-    result_t get(Sensor s, Info &info, embot::common::relTime timeout)                              { return resNOK; }
-    result_t set(Sensor s, Mode m, embot::common::relTime timeout)                                  { return resNOK; }
-    bool isacquiring(Sensor s)                                                                      { return false; }
-    bool canacquire(Sensor s)                                                                       { return false; }
-    result_t acquisition(Sensor s, Set set, const embot::common::Callback &oncompletion)            { return resNOK; }
-    bool operationdone(Sensor s)                                                                    { return false; }
-    result_t read(Sensor s, Data &data)                                                             { return resNOK; }
-    result_t write(Sensor s, embot::hw::BNO055::Register reg, std::uint8_t value, const embot::common::relTime timeout){ return resNOK; }
-    result_t write(Sensor s, embot::hw::BNO055::Register reg, std::uint8_t value, const embot::common::Callback &oncompletion){ return resNOK; }
-    result_t read(Sensor s, embot::hw::BNO055::Register reg, embot::common::Data &data, const embot::common::relTime timeout){ return resNOK; }
-    result_t read(Sensor s, embot::hw::BNO055::Register reg, embot::common::Data &data, const embot::common::Callback &oncompletion){ return resNOK; }
+    bool supported(BNO055 s)                                                                        { return false; }
+    bool initialised(BNO055 s)                                                                      { return false; }
+    result_t init(BNO055 s, const Config &config)                                                   { return resNOK; }
+    bool isalive(BNO055 s, embot::common::relTime timeout)                                          { return false; }
+    result_t get(BNO055 s, Info &info, embot::common::relTime timeout)                              { return resNOK; }
+    result_t set(BNO055 s, Mode m, embot::common::relTime timeout)                                  { return resNOK; }
+    bool isacquiring(BNO055 s)                                                                      { return false; }
+    bool canacquire(BNO055 s)                                                                       { return false; }
+    result_t acquisition(BNO055 s, Set set, const embot::common::Callback &oncompletion)            { return resNOK; }
+    bool operationdone(BNO055 s)                                                                    { return false; }
+    result_t read(BNO055 s, Data &data)                                                             { return resNOK; }
+    result_t write(BNO055 s, embot::hw::bno055::Register reg, std::uint8_t value, const embot::common::relTime timeout){ return resNOK; }
+    result_t write(BNO055 s, embot::hw::bno055::Register reg, std::uint8_t value, const embot::common::Callback &oncompletion){ return resNOK; }
+    result_t read(BNO055 s, embot::hw::bno055::Register reg, embot::common::Data &data, const embot::common::relTime timeout){ return resNOK; }
+    result_t read(BNO055 s, embot::hw::bno055::Register reg, embot::common::Data &data, const embot::common::Callback &oncompletion){ return resNOK; }
     
 }}} // namespace embot { namespace hw { namespace BNO055 {
 
@@ -78,7 +78,7 @@ namespace embot { namespace hw { namespace BNO055 {
 #elif   defined(EMBOT_BNO055_ENABLED)
 
 
-namespace embot { namespace hw { namespace BNO055 {
+namespace embot { namespace hw { namespace bno055 {
         
     struct bspmap_t
     {
@@ -106,23 +106,23 @@ namespace embot { namespace hw { namespace BNO055 {
     // initialised mask       
     static std::uint32_t initialisedmask = 0;
     
-    std::uint8_t sensor2index(Sensor s)
+    std::uint8_t sensor2index(BNO055 s)
     {   // use it only after verification of supported() ...
         return static_cast<uint8_t>(s);
     }
         
-    bool supported(Sensor s)
+    bool supported(BNO055 s)
     {
-        if((Sensor::none == s) || (Sensor::maxnumberof == s))
+        if((BNO055::none == s) || (BNO055::maxnumberof == s))
         {
             return false;
         }
         return embot::binary::bit::check(bspmap.mask, sensor2index(s));
     }
     
-    bool initialised(Sensor s)
+    bool initialised(BNO055 s)
     {
-        if(Sensor::none == s)
+        if(BNO055::none == s)
         {
             return false;
         }
@@ -149,8 +149,8 @@ namespace embot { namespace hw { namespace BNO055 {
     
     struct PrivateData
     {    
-        Config config[static_cast<unsigned int>(Sensor::maxnumberof)];        
-        Acquisition acquisition[static_cast<unsigned int>(Sensor::maxnumberof)];
+        Config config[static_cast<unsigned int>(BNO055::maxnumberof)];        
+        Acquisition acquisition[static_cast<unsigned int>(BNO055::maxnumberof)];
         PrivateData() { }
     };
     
@@ -162,8 +162,8 @@ namespace embot { namespace hw { namespace BNO055 {
         static const embot::hw::GPIO gpioBOOT(BNO055_BOOT_GPIO_Port, BNO055_BOOT_Pin);
         static const embot::hw::GPIO gpioRESET(BNO055_RESET_GPIO_Port, BNO055_RESET_Pin);
     #elif   defined(STM32HAL_BOARD_MTB4)
-        static const embot::hw:::GPIO gpioBOOT(BNO055_BOOT_GPIO_Port, BNO055_BOOT_Pin);
-        static const embot::hw:::GPIO gpioRESET(BNO055_RESET_GPIO_Port, BNO055_RESET_Pin);  
+        static const embot::hw::GPIO gpioBOOT(BNO055_BOOT_GPIO_Port, BNO055_BOOT_Pin);
+        static const embot::hw::GPIO gpioRESET(BNO055_RESET_GPIO_Port, BNO055_RESET_Pin);  
     #elif   defined(STM32HAL_BOARD_RFE)
         static const embot::hw:::GPIO gpioBOOT(BNO055_BOOT_GPIO_Port, BNO055_BOOT_Pin);
         static const embot::hw:::GPIO gpioRESET(BNO055_RESET_GPIO_Port, BNO055_RESET_Pin);     
@@ -172,12 +172,12 @@ namespace embot { namespace hw { namespace BNO055 {
     static PrivateData s_privatedata;
      
     static void s_powerON(embot::common::relTime waittime);    
-    static result_t s_programregister(Sensor s, std::uint8_t reg, std::uint8_t val, embot::common::relTime timeout);    
-    static result_t s_writeregister(Sensor s, std::uint8_t reg, std::uint8_t val, const embot::common::Callback &oncompletion);
+    static result_t s_programregister(BNO055 s, std::uint8_t reg, std::uint8_t val, embot::common::relTime timeout);    
+    static result_t s_writeregister(BNO055 s, std::uint8_t reg, std::uint8_t val, const embot::common::Callback &oncompletion);
     static void s_sharedCBK(void *p);
     
             
-    result_t init(Sensor s, const Config &config)
+    result_t init(BNO055 s, const Config &config)
     {
         if(false == supported(s))
         {
@@ -212,7 +212,7 @@ namespace embot { namespace hw { namespace BNO055 {
 
 
 
-    bool isalive(Sensor s, embot::common::relTime timeout)
+    bool isalive(BNO055 s, embot::common::relTime timeout)
     {
         if(false == initialised(s))
         {
@@ -224,15 +224,15 @@ namespace embot { namespace hw { namespace BNO055 {
 
 
     
-    result_t get(Sensor s, Info &info, embot::common::relTime timeout)
+    result_t get(BNO055 s, Info &info, embot::common::relTime timeout)
     {
         embot::common::Data data(&info, sizeof(info));
-        result_t r = read(s, embot::hw::BNO055::Register::CHIP_ID, data, timeout);  
+        result_t r = read(s, embot::hw::bno055::Register::CHIP_ID, data, timeout);  
         return r;        
     }
     
     
-    result_t set(Sensor s, Mode m, embot::common::relTime timeout)
+    result_t set(BNO055 s, Mode m, embot::common::relTime timeout)
     { 
         if(false == initialised(s))
         {
@@ -248,7 +248,7 @@ namespace embot { namespace hw { namespace BNO055 {
     } 
 
 
-    bool isacquiring(Sensor s)
+    bool isacquiring(BNO055 s)
     {
         if(false == initialised(s))
         {
@@ -260,7 +260,7 @@ namespace embot { namespace hw { namespace BNO055 {
     }    
     
         
-    bool canacquire(Sensor s)
+    bool canacquire(BNO055 s)
     {
         if(false == initialised(s))
         {
@@ -279,7 +279,7 @@ namespace embot { namespace hw { namespace BNO055 {
     
     
     
-    result_t acquisition(Sensor s, Set set, const embot::common::Callback &oncompletion)
+    result_t acquisition(BNO055 s, Set set, const embot::common::Callback &oncompletion)
     {        
         if(false == canacquire(s))
         {
@@ -301,7 +301,7 @@ namespace embot { namespace hw { namespace BNO055 {
     
 
     
-    result_t acquisition(Sensor s, Set set, Data &data, const embot::common::Callback &oncompletion)
+    result_t acquisition(BNO055 s, Set set, Data &data, const embot::common::Callback &oncompletion)
     {        
         if(false == canacquire(s))
         {
@@ -322,7 +322,7 @@ namespace embot { namespace hw { namespace BNO055 {
     } 
     
     
-    bool operationdone(Sensor s)
+    bool operationdone(BNO055 s)
     {
         if(false == initialised(s))
         {
@@ -333,7 +333,7 @@ namespace embot { namespace hw { namespace BNO055 {
     } 
 
     
-    result_t read(Sensor s, Data &data)
+    result_t read(BNO055 s, Data &data)
     { 
         if(false == initialised(s))
         {
@@ -352,7 +352,7 @@ namespace embot { namespace hw { namespace BNO055 {
     } 
 
 
-    result_t write(Sensor s, embot::hw::BNO055::Register reg, std::uint8_t value, const embot::common::relTime timeout)
+    result_t write(BNO055 s, embot::hw::bno055::Register reg, std::uint8_t value, const embot::common::relTime timeout)
     {
         if(false == initialised(s))
         {
@@ -379,7 +379,7 @@ namespace embot { namespace hw { namespace BNO055 {
     }
 
     
-    result_t write(Sensor s, embot::hw::BNO055::Register reg, std::uint8_t value, const embot::common::Callback &oncompletion)
+    result_t write(BNO055 s, embot::hw::bno055::Register reg, std::uint8_t value, const embot::common::Callback &oncompletion)
     {
         if(false == initialised(s))
         {
@@ -404,7 +404,7 @@ namespace embot { namespace hw { namespace BNO055 {
        
 
         
-    result_t read(Sensor s, embot::hw::BNO055::Register reg, embot::common::Data &data, const embot::common::relTime timeout)
+    result_t read(BNO055 s, embot::hw::bno055::Register reg, embot::common::Data &data, const embot::common::relTime timeout)
     {
         if(false == initialised(s))
         {
@@ -437,7 +437,7 @@ namespace embot { namespace hw { namespace BNO055 {
     }
 
     
-    result_t read(Sensor s, embot::hw::BNO055::Register reg, embot::common::Data &data, const embot::common::Callback &oncompletion)
+    result_t read(BNO055 s, embot::hw::bno055::Register reg, embot::common::Data &data, const embot::common::Callback &oncompletion)
     {
         if(false == initialised(s))
         {
@@ -482,7 +482,7 @@ namespace embot { namespace hw { namespace BNO055 {
         embot::hw::sys::delay(waittime);         
     }
     
-//    static result_t s_programregister_safe(Sensor s, std::uint8_t reg, std::uint8_t val, embot::common::relTime timeout)
+//    static result_t s_programregister_safe(BNO055 s, std::uint8_t reg, std::uint8_t val, embot::common::relTime timeout)
 //    {
 //        std::uint8_t index = sensor2index(s);   
 //        embot::common::Data data(&val, 1);        
@@ -491,7 +491,7 @@ namespace embot { namespace hw { namespace BNO055 {
 //    }
 
     
-    static result_t s_programregister(Sensor s, std::uint8_t reg, std::uint8_t val, embot::common::relTime timeout)
+    static result_t s_programregister(BNO055 s, std::uint8_t reg, std::uint8_t val, embot::common::relTime timeout)
     {
         std::uint8_t index = sensor2index(s);   
         s_privatedata.acquisition[index].startwrite(val);        
@@ -501,7 +501,7 @@ namespace embot { namespace hw { namespace BNO055 {
     }
     
     
-    static result_t s_writeregister(Sensor s, std::uint8_t reg, std::uint8_t val, const embot::common::Callback &oncompletion)
+    static result_t s_writeregister(BNO055 s, std::uint8_t reg, std::uint8_t val, const embot::common::Callback &oncompletion)
     {
         std::uint8_t index = sensor2index(s);   
         s_privatedata.acquisition[index].startwrite(val, oncompletion);   

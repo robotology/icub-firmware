@@ -291,6 +291,22 @@ namespace embot { namespace hw { namespace bsp { namespace i2c {
               
 }}}} // namespace embot { namespace hw { namespace bsp {  namespace i2c {
 
+
+namespace embot { namespace hw { namespace bsp { namespace bno055 {
+        
+    struct MAP
+    {
+        std::uint32_t mask;       
+    public:     
+        bool supported(embot::hw::BNO055 h) const;
+        bool isvalid(embot::hw::BNO055 h) const;        
+        static std::uint8_t toindex(embot::hw::BNO055 h);      
+    }; 
+        
+    const MAP * const getMAP();
+              
+}}}} // namespace embot { namespace hw { namespace bsp {  namespace bno055 {
+
 #endif  // include-guard
 
 

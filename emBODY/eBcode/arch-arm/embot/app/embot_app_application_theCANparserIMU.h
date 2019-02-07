@@ -24,9 +24,8 @@
 #include "embot_common.h"
 #include "embot_hw_can.h"
 #include "embot_sys.h"
-
-
 #include <vector>
+#include <memory>
 
 namespace embot { namespace app { namespace application {
            

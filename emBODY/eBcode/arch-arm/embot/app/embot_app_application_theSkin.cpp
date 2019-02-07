@@ -235,7 +235,9 @@ bool embot::app::application::theSkin::Impl::start()
     tr.start();
 #endif
     
-    ticktimer->start(boardconfig.txperiod, embot::sys::Timer::Type::forever, action);
+    embot::sys::Timer::Config cfg(boardconfig.txperiod, action, embot::sys::Timer::Mode::forever);
+    ticktimer->start(cfg);
+
     ticking = true;    
     return true;
 }
@@ -470,22 +472,28 @@ bool embot::app::application::theSkin::Impl::tick(std::vector<embot::hw::can::Fr
 // --------------------------------------------------------------------------------------------------------------------
 
 
-
-embot::app::application::theSkin::theSkin()
-: pImpl(new Impl)
-{       
-
+embot::app::application::theSkin& embot::app::application::theSkin::getInstance()
+{
+    static theSkin* p = new theSkin();
+    return *p;
 }
 
+embot::app::application::theSkin::theSkin()
+//    : pImpl(new Impl)
+{
+    pImpl = std::make_unique<Impl>();
+}  
+
+    
+embot::app::application::theSkin::~theSkin() { }
    
         
 bool embot::app::application::theSkin::initialise(Config &config)
 {
     pImpl->config = config;
     
-    pImpl->action.set(embot::sys::Action::EventToTask(pImpl->config.tickevent, pImpl->config.totask));
-
-    
+    pImpl->action.load(embot::sys::EventToTask(pImpl->config.tickevent, pImpl->config.totask));
+        
     pImpl->triangles.activemask = 0xffff;
     
     ad7147_init(pImpl->triangles.rawvalues, pImpl->triangles.capoffsets);

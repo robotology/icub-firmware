@@ -39,7 +39,7 @@
 struct embot::sys::theStorage::Impl
 {    
     bool initted;
-    embot::i2h::Storage *storage;
+    embot::common::Storage *storage;
     
     Impl() 
     {              
@@ -61,7 +61,7 @@ embot::sys::theStorage::theStorage()
 }
 
 
-bool embot::sys::theStorage::init(embot::i2h::Storage *storage)
+bool embot::sys::theStorage::init(embot::common::Storage *storage)
 {   
     if(nullptr != storage)
     {

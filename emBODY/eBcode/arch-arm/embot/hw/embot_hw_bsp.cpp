@@ -531,32 +531,52 @@ namespace embot { namespace hw { namespace bsp { namespace flash {
     // const support maps
     #if     defined(STM32HAL_BOARD_NUCLEO64) 
 
-    static const MAP theMAP = 
-    {
-        0x00000000
-    };
+        static const MAP theMAP = 
+        {
+            .mask = mask::pos2mask<uint32_t>(FLASH::whole) | mask::pos2mask<uint32_t>(FLASH::bootloader) | mask::pos2mask<uint32_t>(FLASH::application) |
+                    mask::pos2mask<uint32_t>(FLASH::sharedstorage) | mask::pos2mask<uint32_t>(FLASH::applicationstorage),
+            .partitions = { 
+                {0x08000000, 1024*1024, 2*1024},         // whole
+                {0x08000000, (124)*1024, 2*1024},       // bootloader
+                {0x08020000, (128)*1024, 2*1024},       // application           
+                {0x0801F000, (4)*1024,   4*1024},       // sharedstorage: on top of bootloader
+                {0x0801F000, (4)*1024,   4*1024},       // applicationstorage: on top of bootloader
+            }
+        };
    
     #elif   defined(STM32HAL_BOARD_MTB4)
-    
-    static const MAP theMAP = 
-    {
-        0x00000001
-    };
+           
+        static const MAP theMAP = 
+        {
+            .mask = mask::pos2mask<uint32_t>(FLASH::whole) | mask::pos2mask<uint32_t>(FLASH::bootloader) | mask::pos2mask<uint32_t>(FLASH::application) |
+                    mask::pos2mask<uint32_t>(FLASH::sharedstorage) | mask::pos2mask<uint32_t>(FLASH::applicationstorage),
+            .partitions = { 
+                {0x08000000, 256*1024, 2*1024},         // whole
+                {0x08000000, (124)*1024, 2*1024},       // bootloader
+                {0x08020000, (128)*1024, 2*1024},       // application           
+                {0x0801F000, (4)*1024,   4*1024},       // sharedstorage: on top of bootloader
+                {0x0801F000, (4)*1024,   4*1024},       // applicationstorage: on top of bootloader
+            }
+        };
 
     #elif   defined(STM32HAL_BOARD_STRAIN2)
     
-        #if !defined(STRAIN2_APP_AT_64K)
-        // actually at 80k
-//        const std::uint32_t startOfFLASH            = 0x08000000;
-//        const std::uint32_t addressOfBootloader     = 0x08000000;
-//        const std::uint32_t maxsizeOfBootloader     = 76*1024;
-//        const std::uint32_t addressOfStorage        = startOfFLASH+maxsizeOfBootloader; //0x08013000;
-//        const std::uint32_t maxsizeOfStorage        = 4*1024;
-//        const std::uint32_t addressOfApplication    = startOfFLASH+maxsizeOfBootloader+maxsizeOfStorage; //0x08014000;
-//        const std::uint32_t maxsizeOfApplication    = 172*1024;   
-//        const std::uint32_t addressOfApplicationStorage = addressOfApplication+maxsizeOfApplication;
-//        const std::uint32_t maxsizeOfApplicationStorage = 4*1024;
-        
+        #if defined(STRAIN2_APP_AT_128K)
+         // at 128k
+        static const MAP theMAP = 
+        {
+            .mask = mask::pos2mask<uint32_t>(FLASH::whole) | mask::pos2mask<uint32_t>(FLASH::bootloader) | mask::pos2mask<uint32_t>(FLASH::application) |
+                    mask::pos2mask<uint32_t>(FLASH::sharedstorage) | mask::pos2mask<uint32_t>(FLASH::applicationstorage),
+            .partitions = { 
+                {0x08000000, 256*1024, 2*1024},         // whole
+                {0x08000000, (124)*1024, 2*1024},       // bootloader
+                {0x08020000, (128)*1024, 2*1024},       // application           
+                {0x0801F000, (4)*1024,   4*1024},       // sharedstorage: on top of bootloader
+                {0x0801F000, (4)*1024,   4*1024},       // applicationstorage: on top of bootloader
+            }
+        };      
+        #else 
+        // at 80k
         static const MAP theMAP = 
         {
             .mask = mask::pos2mask<uint32_t>(FLASH::whole) | mask::pos2mask<uint32_t>(FLASH::bootloader) | mask::pos2mask<uint32_t>(FLASH::application) |
@@ -569,28 +589,23 @@ namespace embot { namespace hw { namespace bsp { namespace flash {
                 {0x0803F000, 4*1024,   2*1024},         // applicationstorage: on top of applciation
             }
         };
-        #else 
-        // at 128k
-        static const MAP theMAP = 
-        {
-            0b1111,
-            {
-                {0x08000000, 256*1024, 2*1024},         // whole
-                {0x08000000, 124*1024, 2*1024},         // bootloader
-                {0x08020000, 128*1024, 2*1024},         // application           
-                {0x0801F000, 4*1024,   2*1024},         // sharedstorage
-                {0x0801F000, 4*1024,   2*1024},         // applicationstorage: the same as shared
-            }
-        };
         #endif
         
 
     #elif   defined(STM32HAL_BOARD_RFE)
     
-    static const MAP theMAP = 
-    {
-        .mask = 0
-    };
+        static const MAP theMAP = 
+        {
+            .mask = mask::pos2mask<uint32_t>(FLASH::whole) | mask::pos2mask<uint32_t>(FLASH::bootloader) | mask::pos2mask<uint32_t>(FLASH::application) |
+                    mask::pos2mask<uint32_t>(FLASH::sharedstorage) | mask::pos2mask<uint32_t>(FLASH::applicationstorage),
+            .partitions = { 
+                {0x08000000, 256*1024, 2*1024},         // whole
+                {0x08000000, (124)*1024, 2*1024},       // bootloader
+                {0x08020000, (128)*1024, 2*1024},       // application           
+                {0x0801F000, (4)*1024,   4*1024},       // sharedstorage: on top of bootloader
+                {0x0801F000, (4)*1024,   4*1024},       // applicationstorage: on top of bootloader
+            }
+        };
 
     #else
         #error embot::hw::bsp::flash::theMAP must be defined    
@@ -1189,7 +1204,7 @@ namespace embot { namespace hw { namespace bsp { namespace i2c {
     static const MAP theMAP = 
     {
         .mask = 0,
-        .props = { nullptr, nullptr }
+        .stm32props = { nullptr, nullptr }
     };
     
     void MAP::init(embot::hw::I2C h) const {}
@@ -1204,6 +1219,9 @@ namespace embot { namespace hw { namespace bsp { namespace i2c {
 }}}} // namespace embot { namespace hw { namespace bsp {  namespace i2c {
 
 // ---------------------------------- IRQhandlers --------------------------------------------------------------------------
+
+
+#if defined(STM32HAL_BOARD_MTB4) | defined(STM32HAL_BOARD_STRAIN2)
 
     /**
 * @brief This function handles I2C1 event interrupt.
@@ -1335,7 +1353,67 @@ void I2C2_ER_IRQHandler(void)
   /* USER CODE END I2C2_ER_IRQn 1 */
 }
 
+#endif
+
 #endif // defined(HAL_I2C_MODULE_ENABLED)
+
+
+
+
+namespace embot { namespace hw { namespace bsp { namespace bno055 {
+           
+    static_assert(static_cast<std::uint32_t>(embot::hw::BNO055::none) < 8*sizeof(MAP::mask), "BNO055::none must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(static_cast<std::uint32_t>(embot::hw::BNO055::maxnumberof) < 8*sizeof(MAP::mask), "BNO055::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(static_cast<std::uint32_t>(embot::hw::BNO055::maxnumberof) < static_cast<std::uint32_t>(embot::hw::BNO055::none), "BNO055::maxnumberof must be higher that BNO055::none, so that we can optimise code");
+
+    
+    bool MAP::supported(embot::hw::BNO055 h) const 
+    { 
+        return embot::binary::bit::check(mask, toindex(h)); 
+    }
+    
+
+    bool MAP::isvalid(embot::hw::BNO055 h) const
+    {
+        if(supported(h))
+        {   
+            return true;
+        }
+        return false;        
+    }
+    
+    std::uint8_t MAP::toindex(embot::hw::BNO055 h) 
+    { 
+        return static_cast<uint8_t>(h); 
+    }
+    
+    
+    // and now the maps
+
+    // const support maps
+
+    #if defined(STM32HAL_BOARD_STRAIN2) || defined(STM32HAL_BOARD_MTB4)
+        
+    static const MAP theMAP = 
+    {
+        .mask = mask::pos2mask<uint32_t>(BNO055::one)
+    };
+
+    #else
+    
+    static const MAP theMAP = 
+    {
+        .mask = 0
+    };
+
+    #endif
+    
+    const MAP * const getMAP()
+    {
+        return &theMAP;
+    }
+              
+}}}} // namespace embot { namespace hw { namespace bsp {  namespace bno055 {
 
 
 

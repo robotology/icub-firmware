@@ -50,65 +50,6 @@ using namespace std;
 namespace embot { namespace hw { namespace sys {
     
     
-//#if     defined(STM32HAL_BOARD_NUCLEO64)
-//    
-//    const std::uint32_t startOfFLASH            = 0x08000000;
-//    const std::uint32_t addressOfBootloader     = 0x08000000;
-//    const std::uint32_t maxsizeOfBootloader     = 124*1024;
-//    const std::uint32_t addressOfStorage        = 0x0801F000;
-//    const std::uint32_t maxsizeOfStorage        = 4*1024;
-//    const std::uint32_t addressOfApplication    = 0x08020000;
-//    const std::uint32_t maxsizeOfApplication    = 128*1024;
-//    
-//#elif   defined(STM32HAL_BOARD_MTB4)
-//    
-//    const std::uint32_t startOfFLASH            = 0x08000000;
-//    const std::uint32_t addressOfBootloader     = 0x08000000;
-//    const std::uint32_t maxsizeOfBootloader     = 124*1024;
-//    const std::uint32_t addressOfStorage        = 0x0801F000;
-//    const std::uint32_t maxsizeOfStorage        = 4*1024;
-//    const std::uint32_t addressOfApplication    = 0x08020000;
-//    const std::uint32_t maxsizeOfApplication    = 128*1024;
-
-//#elif   defined(STM32HAL_BOARD_STRAIN2)
-//    
-//    #if !defined(STRAIN2_APP_AT_64K)
-//    const std::uint32_t startOfFLASH            = 0x08000000;
-//    const std::uint32_t addressOfBootloader     = 0x08000000;
-//    const std::uint32_t maxsizeOfBootloader     = 76*1024;
-//    const std::uint32_t addressOfStorage        = startOfFLASH+maxsizeOfBootloader; //0x08013000;
-//    const std::uint32_t maxsizeOfStorage        = 4*1024;
-//    const std::uint32_t addressOfApplication    = startOfFLASH+maxsizeOfBootloader+maxsizeOfStorage; //0x08014000;
-//    const std::uint32_t maxsizeOfApplication    = 172*1024;   
-//    const std::uint32_t addressOfApplicationStorage = addressOfApplication+maxsizeOfApplication;
-//    const std::uint32_t maxsizeOfApplicationStorage = 4*1024;
-//    #else   
-//    const std::uint32_t startOfFLASH            = 0x08000000;
-//    const std::uint32_t addressOfBootloader     = 0x08000000;
-//    const std::uint32_t maxsizeOfBootloader     = 124*1024;
-//    const std::uint32_t addressOfStorage        = 0x0801F000;
-//    const std::uint32_t maxsizeOfStorage        = 4*1024;
-//    const std::uint32_t addressOfApplication    = 0x08020000;
-//    const std::uint32_t maxsizeOfApplication    = 128*1024;
-//    const std::uint32_t addressOfApplicationStorage = addressOfStorage;
-//    const std::uint32_t maxsizeOfApplicationStorage = 4*1024;
-//    #endif
-//    
-//#elif   defined(STM32HAL_BOARD_RFE)
-//    
-//    const std::uint32_t startOfFLASH            = 0x08000000;
-//    const std::uint32_t addressOfBootloader     = 0x08000000;
-//    const std::uint32_t maxsizeOfBootloader     = 124*1024;
-//    const std::uint32_t addressOfStorage        = 0x0801F000;
-//    const std::uint32_t maxsizeOfStorage        = 4*1024;
-//    const std::uint32_t addressOfApplication    = 0x08020000;
-//    const std::uint32_t maxsizeOfApplication    = 128*1024;
-//    
-//#else
-//    #error you must define some embot::hw::sys constants   
-//#endif
-
- 
     static void ss_bsp_delay(uint64_t t)
     {   
         static uint64_t s_hl_sys_numofops1sec = 0;

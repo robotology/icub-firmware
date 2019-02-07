@@ -336,7 +336,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register</MiscControls>
-              <Define>USE_STM32HAL STM32HAL_BOARD_STRAIN2 STM32HAL_DRIVER_V190 notSTRAIN2_APP_AT_64K</Define>
+              <Define>USE_STM32HAL STM32HAL_BOARD_STRAIN2 STM32HAL_DRIVER_V190 not_STRAIN2_APP_AT_128K</Define>
               <Undefine></Undefine>
               <IncludePath>..\src-plus;..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\eBcode\arch-arm\embot\common;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\sys;..\..\..\..\..\..\eBcode\arch-arm\embot;..\..\..\..\..\..\eBcode\arch-arm\embot\binary;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib</IncludePath>
             </VariousControls>
@@ -369,7 +369,7 @@
             <TextAddressRange>0x08000000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile>.\strain2-application-64k-v6.sct</ScatterFile>
+            <ScatterFile>.\strain2-application-v6.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc>--diag_suppress=L6329</Misc>
@@ -558,6 +558,16 @@
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw.cpp</FilePath>
             </File>
             <File>
+              <FileName>embot_hw_timer.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\hw\embot_hw_timer.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>embot-hw-lowlevel</GroupName>
+          <Files>
+            <File>
               <FileName>embot_hw_lowlevel.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\embot\hw\embot_hw_lowlevel.cpp</FilePath>
@@ -612,11 +622,6 @@
                   </Cads>
                 </FileArmAds>
               </FileOption>
-            </File>
-            <File>
-              <FileName>embot_hw_timer.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\embot\hw\embot_hw_timer.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1246,14 +1251,19 @@
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_hw_lowlevel.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\embot\hw\embot_hw_lowlevel.cpp</FilePath>
-            </File>
-            <File>
               <FileName>embot_hw_timer.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\embot\hw\embot_hw_timer.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>embot-hw-lowlevel</GroupName>
+          <Files>
+            <File>
+              <FileName>embot_hw_lowlevel.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\hw\embot_hw_lowlevel.cpp</FilePath>
             </File>
           </Files>
         </Group>

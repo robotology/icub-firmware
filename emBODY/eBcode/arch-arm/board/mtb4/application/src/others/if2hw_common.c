@@ -100,7 +100,6 @@ extern void if2hw_common_delay(uint64_t usec)
 //   align    
 //}
 
-#warning solve the delay issue in mtb4 c file (no optimization) ... i could move the lowlevel into a c file ...
 
 #if __ARMCOMPILER_VERSION > 6000000
 int _execOperations(uint32_t i)

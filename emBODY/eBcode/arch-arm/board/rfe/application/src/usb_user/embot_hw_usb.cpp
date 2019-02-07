@@ -122,12 +122,12 @@ namespace embot { namespace hw { namespace usb {
     
     PCD_HandleTypeDef *hpcd = (PCD_HandleTypeDef *)hUsbDeviceFS.pData;
 
-//////////////////// private function  //////////////////
-static std::uint8_t port2index(Port port);
-static void interrupt_RX_enable(void);
-static void interrupt_RX_disable(void);
-//void callbackOnRXcompletion(uint8_t* Buf, uint32_t *Len);
-static void s_transmit(Message &msg);
+    //////////////////// private function  //////////////////
+    static std::uint8_t port2index(Port port);
+    static void interrupt_RX_enable(void);
+    static void interrupt_RX_disable(void);
+    //void callbackOnRXcompletion(uint8_t* Buf, uint32_t *Len);
+    static void s_transmit(Message &msg);
 
 
 }}};
@@ -168,7 +168,6 @@ bool usb::initialised(Port p)
         return false;
     }
     return bit::check(initialisedmask, port2index(p));
-
 }    
 
 static void usb::s_transmit(usb::Message &msg)
@@ -201,10 +200,7 @@ void usb::callbackOnRXcompletion(uint8_t* Buf, uint32_t *Len)
     }
     s_rxQ->push_back(rxmsg);
     
-    if(nullptr != s_config.onrxmessage.callback)
-    {
-        s_config.onrxmessage.callback(s_config.onrxmessage.arg);
-    }
+    s_config.onrxmessage.execute();
     
 }
 
