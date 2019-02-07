@@ -214,12 +214,21 @@ bool embot::app::application::theCANparserIMU::Impl::process_imu_transmit(const 
 
 
 
-embot::app::application::theCANparserIMU::theCANparserIMU()
-: pImpl(new Impl)
-{       
-
+embot::app::application::theCANparserIMU& embot::app::application::theCANparserIMU::getInstance()
+{
+    static theCANparserIMU* p = new theCANparserIMU();
+    return *p;
 }
 
+embot::app::application::theCANparserIMU::theCANparserIMU()
+//    : pImpl(new Impl)
+{
+    pImpl = std::make_unique<Impl>();
+
+}  
+
+    
+embot::app::application::theCANparserIMU::~theCANparserIMU() { }
    
         
 bool embot::app::application::theCANparserIMU::initialise(Config &config)

@@ -22,8 +22,8 @@
 #define _EMBOT_APP_THESTORAGE_H_
 
 #include "embot_common.h"
-
 #include "embot_sys.h"
+#include <memory>
 
 
 namespace embot { namespace app {
@@ -32,11 +32,7 @@ namespace embot { namespace app {
     class theStorage
     {
     public:
-        static theStorage& getInstance()
-        {
-            static theStorage* p = new theStorage();
-            return *p;
-        }
+        static theStorage& getInstance();
                 
     public:
     
@@ -54,17 +50,11 @@ namespace embot { namespace app {
         
     private:
         theStorage(); 
+        ~theStorage(); 
   
-    public:
-        // remove copy constructors and copy assignment operators
-        theStorage(const theStorage&) = delete;
-        theStorage(theStorage&) = delete;
-        void operator=(const theStorage&) = delete;
-        void operator=(theStorage&) = delete;
-
     private:    
         struct Impl;
-        Impl *pImpl;        
+        std::unique_ptr<Impl> pImpl;      
     };       
 
 

@@ -28,10 +28,6 @@
 
 namespace embot { namespace hw { namespace timer {
  
-    
-    enum class Timer { one = 0, two = 1, three = 2, four = 3, five = 4, six = 5, seven = 6, eigth = 7, nine = 8, 
-                       ten = 9, eleven = 10, twelve = 11, thirteen = 12, fourteen = 13, fifteen = 14, sixteen = 15, 
-                       none = 32, maxnumberof = 16};  
 
     enum class Mode { oneshot = 0, periodic = 1};    
     
@@ -44,19 +40,22 @@ namespace embot { namespace hw { namespace timer {
     };
     
     
-    bool supported(Timer t);
+    bool supported(embot::hw::TIMER t);
     
-    bool initialised(Timer t);
+    bool initialised(embot::hw::TIMER t);
     
-    result_t init(Timer t, const Config &config);
+    result_t init(embot::hw::TIMER t, const Config &config);
     
-    result_t configure(Timer t, const Config &config);
+    result_t configure(embot::hw::TIMER t, const Config &config);
     
-    bool isrunning(Timer t);
+    bool isrunning(embot::hw::TIMER t);
     
-    result_t start(Timer t);
+    result_t start(embot::hw::TIMER t);
     
-    result_t stop(Timer t);
+    result_t stop(embot::hw::TIMER t);
+    
+    // for use of the IRQhandler only 
+    void execute(embot::hw::TIMER t);
  
 }}} // namespace embot { namespace hw { namespace timer { 
 

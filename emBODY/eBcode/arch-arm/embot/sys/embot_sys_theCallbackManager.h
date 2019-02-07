@@ -22,19 +22,16 @@
 #define _EMBOT_SYS_THECALLBACKMANAGER_H_
 
 #include "embot_common.h"
-
 #include "embot_sys.h"
+#include "embot_sys_Task.h"
+#include <memory>
 
 namespace embot { namespace sys {
         
     class theCallbackManager
     {
     public:
-        static theCallbackManager& getInstance()
-        {
-            static theCallbackManager* p = new theCallbackManager();
-            return *p;
-        }
+        static theCallbackManager& getInstance();
         
     public:
         struct Config
@@ -45,23 +42,19 @@ namespace embot { namespace sys {
             Config() : priority(230), stacksize(1024), capacityofhandler(8) {}
         }; 
         
-        bool init(Config &config);
         
-        bool start();    
+        bool start(const Config &config);    
+        bool started() const;    
+        
+        embot::sys::Task * task() const;
 
     private:
         theCallbackManager();  
-
-    public:
-        // remove copy constructors and copy assignment operators
-        theCallbackManager(const theCallbackManager&) = delete;
-        theCallbackManager(theCallbackManager&) = delete;
-        void operator=(const theCallbackManager&) = delete;
-        void operator=(theCallbackManager&) = delete;
-
+        ~theCallbackManager(); // i dont want a fool can delete it
+    
     private:    
         struct Impl;
-        Impl *pImpl;        
+        std::unique_ptr<Impl> pImpl;      
     };  
 
 }} // namespace embot { namespace sys {

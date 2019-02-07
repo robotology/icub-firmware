@@ -22,24 +22,17 @@
 #define _EMBOT_APP_APPLICATION_THECANPARSERSTRAIN_H_
 
 #include "embot_common.h"
-
 #include "embot_hw_can.h"
-
 #include "embot_sys.h"
-
-
 #include <vector>
+#include <memory>
 
 namespace embot { namespace app { namespace application {
            
     class theCANparserSTRAIN
     {
     public:
-        static theCANparserSTRAIN& getInstance()
-        {
-            static theCANparserSTRAIN* p = new theCANparserSTRAIN();
-            return *p;
-        }
+        static theCANparserSTRAIN& getInstance();
         
         
     public:
@@ -57,17 +50,12 @@ namespace embot { namespace app { namespace application {
 
     private:
         theCANparserSTRAIN(); 
+        ~theCANparserSTRAIN();
 
-    public:
-        // remove copy constructors and copy assignment operators
-        theCANparserSTRAIN(const theCANparserSTRAIN&) = delete;
-        theCANparserSTRAIN(theCANparserSTRAIN&) = delete;
-        void operator=(const theCANparserSTRAIN&) = delete;
-        void operator=(theCANparserSTRAIN&) = delete;
 
     private:    
         struct Impl;
-        Impl *pImpl;        
+        std::unique_ptr<Impl> pImpl;    
     };       
 
 

@@ -29,50 +29,49 @@
 #include "embot_hw_i2c.h"
 
     
-namespace embot { namespace hw { namespace SI7051 {
+namespace embot { namespace hw { namespace si7051 {
          
-    enum class Sensor { one = 0, two = 1, none = 32, maxnumberof = 2 };
         
     struct Config
     {   // each sensor uses a separate channel of i2c communication and the same i2c address (sic)
         embot::hw::i2c::Descriptor      i2cdes;        
-        Config(embot::hw::i2c::Bus b, std::uint32_t s) : i2cdes(b, s) {}        
-        Config() : i2cdes(embot::hw::i2c::Bus::one, 400000) {}
+        Config(embot::hw::I2C b, std::uint32_t s) : i2cdes(b, s) {}        
+        Config() : i2cdes(embot::hw::I2C::one, 400000) {}
         Config(const embot::hw::i2c::Descriptor &des) : i2cdes(des) {}
     };
     
     
     using Temperature = std::int16_t; // in 0.1 Celsius Degrees
             
-    bool supported(Sensor s);
+    bool supported(embot::hw::SI7051 s);
     
-    bool initialised(Sensor s);
+    bool initialised(embot::hw::SI7051 s);
     
-    result_t init(Sensor s, const Config &config);
+    result_t init(embot::hw::SI7051 s, const Config &config);
         
     
     // after that init() returns resOK we can check if it is alive. we can specify a timeout
-    bool isalive(Sensor s, embot::common::relTime timeout = 3*embot::common::time1millisec);
+    bool isalive(embot::hw::SI7051 s, embot::common::relTime timeout = 3*embot::common::time1millisec);
     
     // we must check that nobody is using the sensor, maybe in non-blocking mode some time earlier
-    bool isacquiring(Sensor s);
+    bool isacquiring(embot::hw::SI7051 s);
     
     // we check isacquiring() but also if any other device is using i2c bus
-    bool canacquire(Sensor s);    
+    bool canacquire(embot::hw::SI7051 s);    
     
     
     // we start acquisition of temperature.
     // if returns resOK, we know that acquisition is over if it is called oncompletion() or when operationdone() is true;
-    result_t acquisition(Sensor s, const embot::common::Callback &oncompletion = embot::common::Callback(nullptr, nullptr));
+    result_t acquisition(embot::hw::SI7051 s, const embot::common::Callback &oncompletion = embot::common::Callback(nullptr, nullptr));
 
     // it tells if a previous operation of acquisition is over
-    bool operationdone(Sensor s);
+    bool operationdone(embot::hw::SI7051 s);
     
     // ok, now we can read temperature previously acquired
-    result_t read(Sensor s, Temperature &temp);   
+    result_t read(embot::hw::SI7051 s, Temperature &temp);   
 
  
-}}} // namespace embot { namespace hw { namespace SI7051 {
+}}} // namespace embot { namespace hw { namespace si7051 {
     
 
 

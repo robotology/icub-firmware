@@ -22,25 +22,17 @@
 #define _EMBOT_APP_APPLICATION_THECANPARSERTHERMO_H_
 
 #include "embot_common.h"
-
 #include "embot_hw_can.h"
-
 #include "embot_sys.h"
-
-
 #include <vector>
+#include <memory>
 
 namespace embot { namespace app { namespace application {
            
     class theCANparserTHERMO
     {
     public:
-        static theCANparserTHERMO& getInstance()
-        {
-            static theCANparserTHERMO* p = new theCANparserTHERMO();
-            return *p;
-        }
-        
+        static theCANparserTHERMO& getInstance();
         
     public:
         struct Config
@@ -57,17 +49,12 @@ namespace embot { namespace app { namespace application {
 
     private:
         theCANparserTHERMO(); 
+        ~theCANparserTHERMO();
 
-    public:
-        // remove copy constructors and copy assignment operators
-        theCANparserTHERMO(const theCANparserTHERMO&) = delete;
-        theCANparserTHERMO(theCANparserTHERMO&) = delete;
-        void operator=(const theCANparserTHERMO&) = delete;
-        void operator=(theCANparserTHERMO&) = delete;
 
     private:    
         struct Impl;
-        Impl *pImpl;        
+        std::unique_ptr<Impl> pImpl;        
     };       
 
 

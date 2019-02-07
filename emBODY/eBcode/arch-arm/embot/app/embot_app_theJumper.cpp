@@ -21,7 +21,7 @@
 // - public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "embot_sys_theJumper.h"
+#include "embot_app_theJumper.h"
 
 #include "embot_hw.h"
 #include "embot_hw_sys.h"
@@ -55,11 +55,10 @@ static const std::uint32_t nziramSignature = 0x12345678;
 
 // in s_nzi_ram[2]: a parameter. address where to jump if Command::jump in s_nzi_ram[1]
 
-struct embot::sys::theJumper::Impl
+struct embot::app::theJumper::Impl
 {       
     bool initted;
-//    Config config;
-    
+
     
     Impl() 
     {              
@@ -68,14 +67,12 @@ struct embot::sys::theJumper::Impl
     
     void reset(void) 
     {
-        initted = false;
-//        config.restart = nullptr;
-//        config.jump2 = nullptr;        
+        initted = false;      
     }
     
     void *operator new(std::size_t size) throw(std::bad_alloc)
     {
-        static std::uint64_t s_data_impl[(sizeof(embot::sys::theJumper::Impl)+7)/8] = {0};
+        static std::uint64_t s_data_impl[(sizeof(embot::app::theJumper::Impl)+7)/8] = {0};
         return s_data_impl;
     }
     
@@ -88,38 +85,43 @@ struct embot::sys::theJumper::Impl
 // - all the rest
 // --------------------------------------------------------------------------------------------------------------------
 
-
-void * embot::sys::theJumper::operator new(std::size_t size) throw(std::bad_alloc)
+#warning TODO: see why the class does not use the customised new()
+void * embot::app::theJumper::operator new(std::size_t size) throw(std::bad_alloc)
 {
-    static std::uint64_t s_data_jumper[(sizeof(embot::sys::theJumper)+7)/8] = {0};
+    static std::uint64_t s_data_jumper[(sizeof(embot::app::theJumper)+7)/8] = {0};
     return s_data_jumper;
 }
 
-embot::sys::theJumper::theJumper()
+
+//embot::app::theJumper& embot::app::theJumper::getInstance()
+//{
+//    static theJumper* p = new theJumper();
+//    return *p;
+//}
+//
+//embot::app::theJumper::theJumper()
+//    : pImpl(new Impl)
+//{
+//    // pImpl = std::make_unique<Impl>(); i want to be sure we use our new()
+//    pImpl->initted = true;
+//}  
+//
+//embot::app::theJumper::~theJumper() { }
+
+
+embot::app::theJumper::theJumper()
 : pImpl(new Impl)
 {   
     pImpl->initted = true;
 }
+    
 
 
-//bool embot::sys::theJumper::init(Config &config)
-//{   
 
-//    pImpl->config = config;
-//    
-//    pImpl->initted = true;
-//    return true;    
-//}
-
-
-embot::sys::theJumper::Command embot::sys::theJumper::get(std::uint32_t& param)
+embot::app::theJumper::Command embot::app::theJumper::get(std::uint32_t& param)
 { 
     Command cmd = Command::none;
     
-//    if(false == pImpl->initted)
-//    {
-//        return cmd;
-//    }
     
     if(nziramSignature != s_nzi_ram[0])
     {
@@ -146,7 +148,7 @@ embot::sys::theJumper::Command embot::sys::theJumper::get(std::uint32_t& param)
     return cmd;
 }
 
-bool embot::sys::theJumper::set(Command command, std::uint32_t param)
+bool embot::app::theJumper::set(Command command, std::uint32_t param)
 {     
 //    if(false == pImpl->initted)
 //    {
@@ -164,7 +166,7 @@ bool embot::sys::theJumper::set(Command command, std::uint32_t param)
 }
 
         
-//bool embot::sys::theJumper::eval(std::uint32_t &address, bool jumpnow)
+//bool embot::app::theJumper::eval(std::uint32_t &address, bool jumpnow)
 //{
 //    if(false == pImpl->initted)
 //    {
@@ -192,7 +194,7 @@ bool embot::sys::theJumper::set(Command command, std::uint32_t param)
 //};
         
         
-bool embot::sys::theJumper::jump(std::uint32_t address)
+bool embot::app::theJumper::jump(std::uint32_t address)
 {
 //    if(false == pImpl->initted)
 //    {
@@ -212,7 +214,7 @@ bool embot::sys::theJumper::jump(std::uint32_t address)
 }      
   
 
-//bool embot::sys::theJumper::set(std::uint32_t address)
+//bool embot::app::theJumper::set(std::uint32_t address)
 //{
 //    if(false == pImpl->initted)
 //    {
@@ -238,7 +240,7 @@ bool embot::sys::theJumper::jump(std::uint32_t address)
 //}   
 
         
-bool embot::sys::theJumper::restart()
+bool embot::app::theJumper::restart()
 {       
 //    if(false == pImpl->initted)
 //    {

@@ -22,8 +22,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "embot_hw_pga308.h"
-#include "stm32hal.h"
-
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
@@ -35,9 +33,10 @@
 using namespace std;
 
 #include "embot_binary.h"
-
+#include "stm32hal.h"
 #include "embot_sys.h"
-
+#include "embot_hw.h"
+#include "embot_hw_bsp.h"
 #include "embot_hw_sys.h"
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -56,71 +55,40 @@ using namespace std;
 
 
 
-namespace embot { namespace hw { namespace PGA308 {
+namespace embot { namespace hw { namespace pga308 {
 
-    bool supported(Amplifier a)                                                                         { return false; }
-    bool initialised(Amplifier a)                                                                       { return false; }
-    result_t init(Amplifier a, const Config &config)                                                    { return resNOK; }
+    bool supported(PGA308 a)                                                                         { return false; }
+    bool initialised(PGA308 a)                                                                       { return false; }
+    result_t init(PGA308 a, const Config &config)                                                    { return resNOK; }
     
     
-    result_t result_t set(Amplifier a, const TransferFunctionConfig &tfconfig)                          { return resNOK; }
-    result_t set(Amplifier a, const TransferFunctionConfig::Parameter par, const std::uint16_t value)   { return resNOK; }   
-    result_t get(Amplifier a, TransferFunctionConfig &tfconfig)                                         { return resNOK; }
+    result_t result_t set(PGA308 a, const TransferFunctionConfig &tfconfig)                          { return resNOK; }
+    result_t set(PGA308 a, const TransferFunctionConfig::Parameter par, const std::uint16_t value)   { return resNOK; }   
+    result_t get(PGA308 a, TransferFunctionConfig &tfconfig)                                         { return resNOK; }
     
-    result_t set(Amplifier a, const RegisterAddress address, const std::uint16_t value)                 { return resNOK; }
-    result_t get(Amplifier a, const RegisterAddress address, std::uint16_t &value)                      { return false; }
+    result_t set(PGA308 a, const RegisterAddress address, const std::uint16_t value)                 { return resNOK; }
+    result_t get(PGA308 a, const RegisterAddress address, std::uint16_t &value)                      { return false; }
 
-}}} // namespace embot { namespace hw { namespace PGA308 {
+}}} // namespace embot { namespace hw { namespace pga308 {
 
 #elif   defined(EMBOT_PGA308_ENABLED)
 
 
-namespace embot { namespace hw { namespace PGA308 {
+namespace embot { namespace hw { namespace pga308 {
         
-    struct bspmap_t
-    {
-        std::uint32_t       mask;
-    };
-    
-    // const support maps
-    #if     defined(STM32HAL_BOARD_STRAIN2)    
-    
-    static const bspmap_t bspmap = 
-    {
-        0x0000003F  // means... 6 amplifiers
-    };
-   
-    #else
-        static const bspmap_t bspmap = 
-        {
-            0x00000000
-        };
-    #endif
       
     // initialised mask       
     static std::uint32_t initialisedmask = 0;
-    
-    std::uint8_t amplifier2index(Amplifier a)
-    {   // use it only after verification of supported() ...
-        return static_cast<uint8_t>(a);
-    }
+   
         
-    bool supported(Amplifier a)
+    bool supported(PGA308 a)
     {
-        if((Amplifier::none == a) || (Amplifier::maxnumberof == a))
-        {
-            return false;
-        }
-        return embot::binary::bit::check(bspmap.mask, amplifier2index(a));
+        return embot::hw::bsp::pga308::getMAP()->supported(a);
     }
     
-    bool initialised(Amplifier a)
+    bool initialised(PGA308 a)
     {
-        if(Amplifier::none == a)
-        {
-            return false;
-        }
-        return embot::binary::bit::check(initialisedmask, amplifier2index(a));
+        return embot::binary::bit::check(initialisedmask, embot::hw::bsp::pga308::MAP::toindex(a));
     }    
 
     
@@ -137,23 +105,23 @@ namespace embot { namespace hw { namespace PGA308 {
 
     struct PrivateData
     {    
-        Config config[static_cast<unsigned int>(Amplifier::maxnumberof)];        
-        TransferFunctionConfig  transfunctconfig[static_cast<unsigned int>(Amplifier::maxnumberof)];        
-        Registers registers[static_cast<unsigned int>(Amplifier::maxnumberof)];        
+        Config config[static_cast<unsigned int>(PGA308::maxnumberof)];        
+        TransferFunctionConfig  transfunctconfig[static_cast<unsigned int>(PGA308::maxnumberof)];        
+        Registers registers[static_cast<unsigned int>(PGA308::maxnumberof)];        
         PrivateData() { }
     };
     
     static PrivateData s_privatedata;
     
 
-    result_t setdefault(Amplifier a)
+    result_t setdefault(PGA308 a)
     {        
         if(false == initialised(a))
         {
             return resNOK;
         } 
 
-        std::uint8_t index = amplifier2index(a);       
+        std::uint8_t index = embot::hw::bsp::pga308::MAP::toindex(a);       
         
         // ora ... devo trasmettere vari registri
         
@@ -180,7 +148,7 @@ namespace embot { namespace hw { namespace PGA308 {
         return resOK;
     }        
    
-    result_t init(Amplifier a, const Config &config)
+    result_t init(PGA308 a, const Config &config)
     {
         if(false == supported(a))
         {
@@ -192,7 +160,7 @@ namespace embot { namespace hw { namespace PGA308 {
             return resOK;
         }
         
-        s_privatedata.config[amplifier2index(a)] = config;
+        s_privatedata.config[embot::hw::bsp::pga308::MAP::toindex(a)] = config;
                         
         // init onewire. i dont check vs correct config apart from correct gpio
         if(false == config.onewireconfig.gpio.isvalid())
@@ -219,7 +187,7 @@ namespace embot { namespace hw { namespace PGA308 {
                 
         
         // must set it to initialsied in order to use setdefault
-        embot::binary::bit::set(initialisedmask, amplifier2index(a));
+        embot::binary::bit::set(initialisedmask, embot::hw::bsp::pga308::MAP::toindex(a));
         
         //embot::common::Time start = embot::sys::timeNow();
         // load the default settings of pga308. i use the         
@@ -234,14 +202,14 @@ namespace embot { namespace hw { namespace PGA308 {
     }
     
     
-    result_t set(Amplifier a, const TransferFunctionConfig &tfconfig)
+    result_t set(PGA308 a, const TransferFunctionConfig &tfconfig)
     {        
         if(false == initialised(a))
         {
             return resNOK;
         } 
 
-        std::uint8_t index = amplifier2index(a);        
+        std::uint8_t index = embot::hw::bsp::pga308::MAP::toindex(a);        
         
         // set the registers related to the transfer function. 
         tfconfig.obtain(s_privatedata.registers[index].CFG0, s_privatedata.registers[index].ZDAC, s_privatedata.registers[index].GDAC);
@@ -253,19 +221,19 @@ namespace embot { namespace hw { namespace PGA308 {
 
                 
         // dovrei rileggere e verificare se e' ok. poi assegno: 
-        s_privatedata.transfunctconfig[amplifier2index(a)] = tfconfig;
+        s_privatedata.transfunctconfig[embot::hw::bsp::pga308::MAP::toindex(a)] = tfconfig;
         
         return resOK;        
     }
     
-    result_t set(Amplifier a, const TransferFunctionConfig::Parameter par, const std::uint16_t value)
+    result_t set(PGA308 a, const TransferFunctionConfig::Parameter par, const std::uint16_t value)
     {
         if(false == initialised(a))
         {
             return resNOK;
         } 
 
-        std::uint8_t index = amplifier2index(a);
+        std::uint8_t index = embot::hw::bsp::pga308::MAP::toindex(a);
         
         result_t r = resOK;
         
@@ -345,14 +313,14 @@ namespace embot { namespace hw { namespace PGA308 {
     }
 
             
-    result_t set(Amplifier a, const RegisterAddress address, const std::uint16_t value)
+    result_t set(PGA308 a, const RegisterAddress address, const std::uint16_t value)
     {        
         if(false == initialised(a))
         {
             return resNOK;
         } 
 
-        std::uint8_t index = amplifier2index(a);        
+        std::uint8_t index = embot::hw::bsp::pga308::MAP::toindex(a);        
                 
         // ora ... devo trasmettere il valore        
         embot::hw::onewire::write(s_privatedata.config[index].onewirechannel, static_cast<std::uint8_t>(address), value);
@@ -402,14 +370,14 @@ namespace embot { namespace hw { namespace PGA308 {
     }    
     
     
-    result_t get(Amplifier a, const RegisterAddress address, std::uint16_t &value)
+    result_t get(PGA308 a, const RegisterAddress address, std::uint16_t &value)
     {
         if(false == initialised(a))
         {
             return resNOK;
         } 
 
-        std::uint8_t index = amplifier2index(a);     
+        std::uint8_t index = embot::hw::bsp::pga308::MAP::toindex(a);     
         result_t r = resOK;
          
         switch(address)

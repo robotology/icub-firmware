@@ -38,7 +38,7 @@ namespace embot { namespace hw { namespace can {
         Frame() : id(0), size(0) { std::uint64_t *d = reinterpret_cast<std::uint64_t*>(data); *d = 0; filler[0] = filler[1] = filler[2] = 0; }
     };
     
-    enum class Port { one = 0, two = 1, none = 32, maxnumberof = 2};
+//    enum class Port { one = 0, two = 1, none = 32, maxnumberof = 2};
     
     struct Config
     {
@@ -50,27 +50,27 @@ namespace embot { namespace hw { namespace can {
         Config() : txcapacity(8), rxcapacity(8), ontxframe(nullptr, nullptr), txqueueempty(nullptr, nullptr), onrxframe(nullptr, nullptr) {}
     };
     
-    bool supported(Port p);
+    bool supported(embot::hw::CAN p);
     
-    bool initialised(Port p);
+    bool initialised(embot::hw::CAN p);
     
-    result_t init(Port p, const Config &config);
+    result_t init(embot::hw::CAN p, const Config &config);
     
-    result_t enable(Port p);
+    result_t enable(embot::hw::CAN p);
     
-    result_t disable(Port p);
+    result_t disable(embot::hw::CAN p);
     
-    result_t put(Port p, const Frame &frame);
+    result_t put(embot::hw::CAN p, const Frame &frame);
     
-    std::uint8_t outputqueuesize(Port p);
+    std::uint8_t outputqueuesize(embot::hw::CAN p);
     
-    result_t transmit(Port p);
+    result_t transmit(embot::hw::CAN p);
     
-    std::uint8_t inputqueuesize(Port p);
+    std::uint8_t inputqueuesize(embot::hw::CAN p);
     
-    result_t get(Port p, Frame &frame, std::uint8_t &remaining);
+    result_t get(embot::hw::CAN p, Frame &frame, std::uint8_t &remaining);
     
-    result_t setfilters(Port p, std::uint8_t address);
+    result_t setfilters(embot::hw::CAN p, std::uint8_t address);
     
     
     

@@ -29,7 +29,6 @@
 
 namespace embot { namespace hw { namespace button {
     
-    enum class BTN { one = 0, two = 1, three = 2, four = 3, five = 4, six = 5, seven = 6, eight = 7, none = 32, maxnumberof = 8 };
 
     bool supported(BTN btn);
     

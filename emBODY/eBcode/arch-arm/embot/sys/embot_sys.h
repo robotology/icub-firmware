@@ -32,7 +32,17 @@ namespace embot { namespace sys {
                  
     class Task;      
     Task* taskRunning();
-
+    
+    struct Operation 
+    {
+        common::Callback    activity;       // the performed activity
+        std::uint16_t       stacksize;      // the amount of used stack
+        Operation() : activity(nullptr, nullptr), stacksize(512) {}
+        Operation(const common::Callback &a, const std::uint16_t s) : activity(a), stacksize(s) {}    
+        void clear() { activity.clear(); stacksize = 512; }
+        bool isvalid() const { if((false == activity.isvalid()) || (0 == stacksize)) { return false; } else { return true; } }
+    };    
+    
 }} // namespace embot { namespace sys {
 
 

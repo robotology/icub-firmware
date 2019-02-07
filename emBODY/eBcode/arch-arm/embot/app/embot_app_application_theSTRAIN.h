@@ -22,36 +22,26 @@
 #define _EMBOT_APP_APPLICATION_THESTRAIN_H_
 
 #include "embot_common.h"
-
 #include "embot_hw.h"
-
 #include "embot_sys.h"
-
 #include "embot_app_canprotocol.h"
 #include "embot_app_canprotocol_analog_periodic.h"
 #include "embot_app_canprotocol_analog_polling.h"
-
 #include "embot_hw_pga308.h"
-
-
 #include <vector>
+#include <memory>
 
 namespace embot { namespace app { namespace application {
            
     class theSTRAIN
     {
     public:
-        static theSTRAIN& getInstance()
-        {
-            static theSTRAIN* p = new theSTRAIN();
-            return *p;
-        }
+        static theSTRAIN& getInstance();
         
         
     public:
         struct Config
         {
-//            embot::hw::PGA308::Config   pgaconfig[6];   
             embot::common::Event        tickevent;
             embot::common::Event        datareadyevent;
             embot::sys::Task*           totask;
@@ -59,11 +49,6 @@ namespace embot { namespace app { namespace application {
             Config(embot::common::Event _te, embot::common::Event _de, embot::sys::Task* _ts) : 
                 tickevent(_te), datareadyevent(_de), totask(_ts) 
             { }                
-//            Config(const embot::hw::PGA308::Config * _pc, embot::common::Event _te, embot::common::Event _de, embot::sys::Task* _ts) : 
-//                tickevent(_te), datareadyevent(_de), totask(_ts) 
-//            { 
-//                if(nullptr != _pc)  std::memmove(pgaconfig, _pc, sizeof(pgaconfig)); 
-//            }
         }; 
         
         
@@ -110,17 +95,12 @@ namespace embot { namespace app { namespace application {
 
     private:
         theSTRAIN(); 
+        ~theSTRAIN(); 
 
-    public:
-        // remove copy constructors and copy assignment operators
-        theSTRAIN(const theSTRAIN&) = delete;
-        theSTRAIN(theSTRAIN&) = delete;
-        void operator=(const theSTRAIN&) = delete;
-        void operator=(theSTRAIN&) = delete;
 
     private:    
         struct Impl;
-        Impl *pImpl;        
+        std::unique_ptr<Impl> pImpl;         
     };       
 
 

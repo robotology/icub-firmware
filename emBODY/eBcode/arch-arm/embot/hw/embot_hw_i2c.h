@@ -31,7 +31,6 @@
 
 namespace embot { namespace hw { namespace i2c {
     
-    enum class Bus { one = 0, two = 1, none = 32, maxnumberof = 2 };
     
     struct Config
     {   
@@ -42,45 +41,45 @@ namespace embot { namespace hw { namespace i2c {
     
     struct Descriptor
     {
-        Bus     bus;
+        embot::hw::I2C     bus;
         Config  config;
-        Descriptor() : bus(Bus::none), config(400000) {}
-        Descriptor(Bus b, std::uint32_t s) : bus(b), config(s) {}
+        Descriptor() : bus(embot::hw::I2C::none), config(400000) {}
+        Descriptor(embot::hw::I2C b, std::uint32_t s) : bus(b), config(s) {}
     };
     
     
-    bool supported(Bus b);
+    bool supported(embot::hw::I2C b);
     
-    bool initialised(Bus b);
+    bool initialised(embot::hw::I2C b);
     
-    result_t init(Bus b, const Config &config);
+    result_t init(embot::hw::I2C b, const Config &config);
     
     // if a transaction is ongoing the bus cannot be used.
-    bool isbusy(Bus b);
+    bool isbusy(embot::hw::I2C b);
     // we also have a version w/ timeout. use it carefully!
-    bool isbusy(Bus b, embot::common::relTime timeout, embot::common::relTime &remaining);
+    bool isbusy(embot::hw::I2C b, embot::common::relTime timeout, embot::common::relTime &remaining);
     
     // check is the device is present.
     // it internally calls isbusy(timeout, remaining)
-    bool ping(Bus b, std::uint8_t adr, embot::common::relTime timeout = 3*embot::common::time1millisec);
+    bool ping(embot::hw::I2C b, std::uint8_t adr, embot::common::relTime timeout = 3*embot::common::time1millisec);
         
     // not blocking read. we read from register reg a total of destination.size bytes
     // at the end of transaction, data is copied into destination.pointer and oncompletion.callback() is called (if non nullptr). 
-    result_t read(Bus b, std::uint8_t adr, std::uint8_t reg, embot::common::Data &destination, const embot::common::Callback &oncompletion);
+    result_t read(embot::hw::I2C b, std::uint8_t adr, std::uint8_t reg, embot::common::Data &destination, const embot::common::Callback &oncompletion);
     
     // blocking read. we read from register reg a total of destination.size bytes and we wait until a timeout. 
     // if result is resOK, destination.pointer contains the data; if resNOKtimeout, the timeout expired. if resNOK the operation was not even started
     // the functions internally waits until not busy for the timeout ... however, please check isbusy() outside. 
-    result_t read(Bus b, std::uint8_t adr, std::uint8_t reg, embot::common::Data &destination, embot::common::relTime timeout);
+    result_t read(embot::hw::I2C b, std::uint8_t adr, std::uint8_t reg, embot::common::Data &destination, embot::common::relTime timeout);
         
     // not blocking write. we write in register reg the content.size byte pointed by content.pointer.
     // when the write is done, the function oncompletion.callback() is called to alert the user.
-    result_t write(Bus b, std::uint8_t adr, std::uint8_t reg, const embot::common::Data &content, const embot::common::Callback &oncompletion = embot::common::Callback(nullptr, nullptr));
+    result_t write(embot::hw::I2C b, std::uint8_t adr, std::uint8_t reg, const embot::common::Data &content, const embot::common::Callback &oncompletion = embot::common::Callback(nullptr, nullptr));
     
     // blocking write. we write in register reg thethe content.size byte pointed by content.pointer and we wait until a timeout.
     // if result is resOK, the operation is successful. if resNOKtimeout, the timeout expired. if resNOK the operation was not even started
     // the functions internally waits until not busy for the timeout ... however, please check isbusy() outside.
-    result_t write(Bus b, std::uint8_t adr, std::uint8_t reg, const embot::common::Data &content, embot::common::relTime timeout);    
+    result_t write(embot::hw::I2C b, std::uint8_t adr, std::uint8_t reg, const embot::common::Data &content, embot::common::relTime timeout);    
 
 }}} // namespace embot { namespace hw { namespace i2c {
     

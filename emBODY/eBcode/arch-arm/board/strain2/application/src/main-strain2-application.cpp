@@ -31,7 +31,7 @@ void tests_launcher_init();
 void tests_tick();
 #endif // #if defined(TEST_ENABLED)
 
-//#include "EOtheLEDpulser.h"
+#include "embot_app_theLEDmanager.h"
 #include "embot_app_canprotocol.h"
 #include "embot_app_theCANboardInfo.h"
 
@@ -65,7 +65,6 @@ void tests_tick();
 #include "embot_hw_pga308.h"
 #include "embot_hw_adc.h"
 
-#include "EOtheLEDpulser.h"
 
 #include "embot_hw_bsp_strain2.h"
 
@@ -88,24 +87,22 @@ static const embot::app::canprotocol::versionOfCANPROTOCOL vCP = {2, 0};
 
 static void userdeflauncher(void* param);
 static void userdefonidle(void* param);
+static void userdefonfatal(void* param);
 
-static const embot::common::Callback atsysteminit(userdeflauncher, nullptr);
 
-static const embot::common::Callback onidle(userdefonidle, nullptr);
-
-static const embot::app::theApplication::StackSizes stacksizes =  { 2048, 512 };
-
-static const embot::app::theApplication::UserDefOperations operations = { atsysteminit, onidle, {nullptr, nullptr} };
+static const embot::sys::Operation oninit = { embot::common::Callback(userdeflauncher, nullptr), 2048 };
+static const embot::sys::Operation onidle = { embot::common::Callback(userdefonidle, nullptr), 512 };
+static const embot::sys::Operation onfatal = { embot::common::Callback(userdefonfatal, nullptr), 64 };
 
 #if defined(APPL_TESTZEROOFFSET)
-static const std::uint32_t address = embot::hw::sys::addressOfBootloader;
+static const std::uint32_t address = eembot::hw::flash::getpartition(embot::hw::FLASH::bootloader).address;
 #else
-static const std::uint32_t address = embot::hw::sys::addressOfApplication;
+static const std::uint32_t address = embot::hw::flash::getpartition(embot::hw::FLASH::application).address;
 #endif
 
 int main(void)
 { 
-    embot::app::theApplication::Config config(embot::common::time1millisec, stacksizes, operations, address);
+    embot::app::theApplication::Config config(embot::common::time1millisec, oninit, onidle, onfatal, address);
     embot::app::theApplication &appl = embot::app::theApplication::getInstance();    
     
     appl.execute(config);  
@@ -122,6 +119,10 @@ static void userdeflauncher(void* param)
     canbrdinfo.synch(vAP, vCP);
             
     start_evt_based();      
+}
+
+static void userdefonfatal(void *param)
+{
 }
 
 
@@ -146,34 +147,28 @@ static void alerteventbasedtask(void *arg);
 static std::vector<embot::hw::can::Frame> outframes;
 
 
-
 static void start_evt_based(void)
-{ 
-    
-//    embot::hw::led::init(embot::hw::led::LED::one);    
-//    embot::hw::led::on(embot::hw::led::LED::one); 
-//    embot::hw::led::off(embot::hw::led::LED::one);     
-//    for(;;)
-//    {
-//        embot::hw::sys::delay(1000*embot::common::time1millisec);
-//        embot::hw::led::toggle(embot::hw::led::LED::one);         
-//    }
-    
-#if 1    
-    eOledpulser_cfg_t ledconfig = {0};    
-    ledconfig.led_enable_mask   = (1 << eo_ledpulser_led_zero);
-    ledconfig.led_init          = reinterpret_cast<eOint8_fp_uint8_cvoidp_t>(embot::hw::led::init_legacy);
-    ledconfig.led_on            = reinterpret_cast<eOint8_fp_uint8_t>(embot::hw::led::on); 
-    ledconfig.led_off           = reinterpret_cast<eOint8_fp_uint8_t>(embot::hw::led::off);
-    ledconfig.led_toggle        = reinterpret_cast<eOint8_fp_uint8_t>(embot::hw::led::toggle);    
-    eo_ledpulser_Initialise(&ledconfig);    
-    eo_ledpulser_Start(eo_ledpulser_GetHandle(), eo_ledpulser_led_zero, embot::common::time1second, 0);  
-#endif
+{    
+    static const std::initializer_list<embot::hw::LED> allleds = {embot::hw::LED::one};  
+    embot::app::theLEDmanager &theleds = embot::app::theLEDmanager::getInstance();     
+    theleds.init(allleds);    
+    theleds.get(embot::hw::LED::one).pulse(embot::common::time1second); 
+
        
     // start task waiting for can messages. 
     eventbasedtask = new embot::sys::EventTask;  
     const embot::common::relTime waitEventTimeout = 50*1000; //50*1000; //5*1000*1000;    
-    eventbasedtask->init(eventbasedtask_init, eventbasedtask_onevent, 4*1024, 200, waitEventTimeout, nullptr, nullptr);    
+    //eventbasedtask->init(eventbasedtask_init, eventbasedtask_onevent, 4*1024, 200, waitEventTimeout, nullptr, nullptr);
+    
+    embot::sys::EventTask::Config configEV;
+    
+    configEV.startup = eventbasedtask_init;
+    configEV.onevent = eventbasedtask_onevent;
+    configEV.param = nullptr;
+    configEV.stacksize = 4*1024;
+    configEV.priority = 200;
+    configEV.timeout = waitEventTimeout;
+    eventbasedtask->start(configEV);
     
     
 #if defined(TEST_ENABLED)
@@ -222,8 +217,8 @@ static void start_evt_based(void)
     embot::hw::can::Config canconfig; // default is tx/rxcapacity=8
     canconfig.txcapacity = maxOUTcanframes;
     canconfig.onrxframe = embot::common::Callback(alerteventbasedtask, nullptr); 
-    r = embot::hw::can::init(embot::hw::can::Port::one, canconfig);
-    r = embot::hw::can::setfilters(embot::hw::can::Port::one, embot::app::theCANboardInfo::getInstance().getCANaddress());
+    r = embot::hw::can::init(embot::hw::CAN::one, canconfig);
+    r = embot::hw::can::setfilters(embot::hw::CAN::one, embot::app::theCANboardInfo::getInstance().getCANaddress());
     r = r;
 
 #if 0  
@@ -248,7 +243,7 @@ static void alerteventbasedtask(void *arg)
 
 static void eventbasedtask_init(embot::sys::Task *t, void *p)
 {
-    embot::hw::result_t r = embot::hw::can::enable(embot::hw::can::Port::one);  
+    embot::hw::result_t r = embot::hw::can::enable(embot::hw::CAN::one);  
     r = r;     
     
     outframes.reserve(maxOUTcanframes);
@@ -275,7 +270,7 @@ static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask
     {        
         embot::hw::can::Frame frame;
         std::uint8_t remainingINrx = 0;
-        if(embot::hw::resOK == embot::hw::can::get(embot::hw::can::Port::one, frame, remainingINrx))
+        if(embot::hw::resOK == embot::hw::can::get(embot::hw::CAN::one, frame, remainingINrx))
         {            
             embot::app::application::theCANparserBasic &canparserbasic = embot::app::application::theCANparserBasic::getInstance();
             embot::app::application::theCANparserSTRAIN &canparserstrain = embot::app::application::theCANparserSTRAIN::getInstance();
@@ -345,10 +340,10 @@ static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask
     {
         for(std::uint8_t i=0; i<num; i++)
         {
-            embot::hw::can::put(embot::hw::can::Port::one, outframes[i]);                                       
+            embot::hw::can::put(embot::hw::CAN::one, outframes[i]);                                       
         }
 
-        embot::hw::can::transmit(embot::hw::can::Port::one);  
+        embot::hw::can::transmit(embot::hw::CAN::one);  
     } 
  
 }

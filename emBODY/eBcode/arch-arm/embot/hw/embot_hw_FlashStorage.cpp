@@ -29,10 +29,10 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include <cstring>
-
-
 #include "stm32hal.h" 
 
+
+#include "embot_hw_flash.h" 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -47,14 +47,14 @@ struct embot::hw::FlashStorage::Impl
     uint32_t pagesize;
     bool bufferisexternal;
     
-    Impl(std::uint32_t _pagestart = embot::hw::sys::addressOfStorage, std::uint32_t _pagesize = 1024, std::uint64_t * _buffer = nullptr) 
+    Impl(std::uint32_t _pagestart, std::uint32_t _pagesize, std::uint64_t * _buffer = nullptr) 
     {
-        pagestart = _pagestart; // dont do any control ... just > embot::hw::sys::startOfFLASH
-        if(pagestart < embot::hw::sys::startOfFLASH)
+        pagestart = _pagestart; 
+        if(false == embot::hw::flash::isaddressvalid(pagestart))
         {
-             pagestart = embot::hw::sys::addressOfStorage;
+             pagestart = embot::hw::flash::getpartition(embot::hw::FLASH::sharedstorage).address;
         }
-        pagenumber = (pagestart - embot::hw::sys::startOfFLASH) / 2048; 
+        pagenumber = (pagestart - embot::hw::flash::getpartition(embot::hw::FLASH::whole).address) / 2048; 
         
         pagesize = _pagesize;
         if(pagesize > 2048)

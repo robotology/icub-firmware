@@ -34,16 +34,16 @@
 namespace embot { namespace hw { namespace bsp { namespace strain2 {
     
 
-    const embot::hw::led::LED ledBLUE = embot::hw::led::LED::one;
+    const embot::hw::LED ledBLUE = embot::hw::LED::one;
     
-    const embot::hw::i2c::Descriptor descrI2Cone = embot::hw::i2c::Descriptor(embot::hw::i2c::Bus::one, 400000);
-    const embot::hw::i2c::Descriptor descrI2Ctwo = embot::hw::i2c::Descriptor(embot::hw::i2c::Bus::two, 400000);
+    const embot::hw::i2c::Descriptor descrI2Cone = embot::hw::i2c::Descriptor(embot::hw::I2C::one, 400000);
+    const embot::hw::i2c::Descriptor descrI2Ctwo = embot::hw::i2c::Descriptor(embot::hw::I2C::two, 400000);
     
-    const embot::hw::SI7051::Sensor thermometerSGAUGES = embot::hw::SI7051::Sensor::one;
-    const embot::hw::SI7051::Config thermometerSGAUGESconfig = embot::hw::SI7051::Config(descrI2Cone);
+    const embot::hw::SI7051 thermometerSGAUGES = embot::hw::SI7051::one;
+    const embot::hw::si7051::Config thermometerSGAUGESconfig = embot::hw::si7051::Config(descrI2Cone);
         
-//    const embot::hw::SI7051::Sensor thermometerCASE = embot::hw::SI7051::Sensor::two;
-//    const embot::hw::SI7051::Config thermometerCASEconfig = embot::hw::SI7051::Config(descrI2Ctwo);   
+//    const embot::hw::SI7051 thermometerCASE = embot::hw::SI7051::two;
+//    const embot::hw::si7051::Config thermometerCASEconfig = embot::hw::si7051::Config(descrI2Ctwo);   
     
     
     const embot::hw::BNO055::Sensor imuBOSCH = embot::hw::BNO055::Sensor::one;

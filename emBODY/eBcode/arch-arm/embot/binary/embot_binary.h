@@ -109,9 +109,14 @@ namespace embot { namespace binary { namespace mask {
             return true;
         }
         return false;
-    }    
+    }   
+     
+    template<typename M, typename T>
+    constexpr M pos2mask(const T t)
+    {
+        return (1 << static_cast<M>(t));
+    } 
     
-   
 } } } // namespace embot { namespace binary { namespace mask
 
 

@@ -22,11 +22,8 @@
 #define _EMBOT_APP_THEBOOTLOADER_H_
 
 #include "embot_common.h"
-
 #include "embot_sys.h"
-
-#include "embot_sys_theJumper.h"
-
+#include "embot_app_theJumper.h"
 #include <new>
 
 namespace embot { namespace app {
@@ -49,12 +46,10 @@ namespace embot { namespace app {
             embot::common::Callback             userdeflauncher;
             embot::common::relTime              countdown;    
             Config() : userdeflauncher(nullptr, nullptr), countdown(5*embot::common::time1second) {}
-            Config(embot::common::fpCallback _userdeflauncher, void* _param, embot::common::relTime _countdown = 5*embot::common::time1second) :  userdeflauncher(_userdeflauncher, _param), countdown(_countdown) {}
+            Config(embot::common::fpCaller _userdeflauncher, void* _param, embot::common::relTime _countdown = 5*embot::common::time1second) :  userdeflauncher(_userdeflauncher, _param), countdown(_countdown) {}
         }; 
         
-        //enum class Command { none = 0, jump = 1, stay = 2};
-        
-        embot::sys::theJumper::Command getcommand(std::uint32_t &parameter);         
+        embot::app::theJumper::Command getcommand(std::uint32_t &parameter);         
         bool jump(std::uint32_t address); // it just jumps to address returned by getcommand(). it must be used only if embot::hw was not initialised, hence before ::execute()...
         
         // this function never returns ....

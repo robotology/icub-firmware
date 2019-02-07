@@ -10,7 +10,8 @@
       <TargetName>strain2-v6-ulpro-v190</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6100001::V6.10.1::.\ARMCLANG</pCCUsed>
+      <pArmCC>6110000::V6.11::.\ARMCLANG</pArmCC>
+      <pCCUsed>6110000::V6.11::.\ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -312,7 +313,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>2</Optim>
+            <Optim>6</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -336,9 +337,9 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register</MiscControls>
-              <Define>USE_STM32HAL STM32HAL_BOARD_STRAIN2 STM32HAL_DRIVER_V190 STRAIN2_APP_AT_64K</Define>
+              <Define>USE_STM32HAL STM32HAL_BOARD_STRAIN2 STM32HAL_DRIVER_V190 not_STRAIN2_APP_AT_64K</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask;..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\eBcode\arch-arm\embot\common;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\sys;..\..\..\..\..\..\eBcode\arch-arm\embot;..\..\..\..\embot\binary;..\..\..\..\embot\dsp;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib</IncludePath>
+              <IncludePath>..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask-;..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core-;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\eBcode\arch-arm\embot\common;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\sys;..\..\..\..\..\..\eBcode\arch-arm\embot;..\..\..\..\embot\binary;..\..\..\..\embot\dsp;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -369,7 +370,7 @@
             <TextAddressRange>0x08000000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile>.\strain2-application-64k-v6.sct</ScatterFile>
+            <ScatterFile>.\strain2-application-v6.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc>--diag_suppress=L6329</Misc>
@@ -417,100 +418,10 @@
               <FileType>4</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\lib\osal.cm4.dbg.lib</FilePath>
             </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>eventviewer</GroupName>
-          <Files>
             <File>
               <FileName>eventviewer.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\src\eventviewer.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>embobj-shared</GroupName>
-          <Files>
-            <File>
-              <FileName>EOaction.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOaction.c</FilePath>
-            </File>
-            <File>
-              <FileName>EoCommon.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EoCommon.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOtheErrorManager.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOtheErrorManager.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOtheLEDpulser.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOtheLEDpulser.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOtheMemoryPool.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOtheMemoryPool.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOtimer.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOtimer.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOVmutex.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOVmutex.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOVtask.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOVtask.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOVtheCallbackManager.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOVtheCallbackManager.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOVtheSystem.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOVtheSystem.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOVtheTimerManager.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOVtheTimerManager.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>embobj-mee</GroupName>
-          <Files>
-            <File>
-              <FileName>EOMtheTimerManager.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask\EOMtheTimerManager.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOMtheCallbackManager.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask\EOMtheCallbackManager.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOMtask.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask\EOMtask.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOMmutex.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask\EOMmutex.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -521,11 +432,6 @@
               <FileName>embot_common.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\common\embot_common.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_i2h.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\i2h\embot_i2h.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_sys.cpp</FileName>
@@ -543,19 +449,14 @@
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\embot_sys_theCallbackManager.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_sys_theJumper.cpp</FileName>
+              <FileName>embot_app_theJumper.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\embot_sys_theJumper.cpp</FilePath>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_theJumper.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_sys_theScheduler.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\embot_sys_theScheduler.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_sys_theStorage.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\embot_sys_theStorage.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_sys_theTimerManager.cpp</FileName>
@@ -566,11 +467,6 @@
               <FileName>embot_sys_Timer.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\embot_sys_Timer.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>slim_retarget_io.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\slim_retarget_io.c</FilePath>
             </File>
             <File>
               <FileName>embot_tools.cpp</FileName>
@@ -586,6 +482,16 @@
               <FileName>embot_dsp.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\dsp\embot_dsp.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_theLEDmanager.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\app\embot_app_theLEDmanager.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_sys_Action.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\sys\embot_sys_Action.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1330,100 +1236,10 @@
               <FileType>4</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\lib\osal.cm4.dbg.lib</FilePath>
             </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>eventviewer</GroupName>
-          <Files>
             <File>
               <FileName>eventviewer.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\src\eventviewer.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>embobj-shared</GroupName>
-          <Files>
-            <File>
-              <FileName>EOaction.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOaction.c</FilePath>
-            </File>
-            <File>
-              <FileName>EoCommon.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EoCommon.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOtheErrorManager.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOtheErrorManager.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOtheLEDpulser.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOtheLEDpulser.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOtheMemoryPool.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOtheMemoryPool.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOtimer.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOtimer.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOVmutex.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOVmutex.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOVtask.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOVtask.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOVtheCallbackManager.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOVtheCallbackManager.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOVtheSystem.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOVtheSystem.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOVtheTimerManager.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOVtheTimerManager.c</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>embobj-mee</GroupName>
-          <Files>
-            <File>
-              <FileName>EOMtheTimerManager.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask\EOMtheTimerManager.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOMtheCallbackManager.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask\EOMtheCallbackManager.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOMtask.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask\EOMtask.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOMmutex.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask\EOMmutex.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1434,11 +1250,6 @@
               <FileName>embot_common.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\common\embot_common.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_i2h.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\i2h\embot_i2h.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_sys.cpp</FileName>
@@ -1456,19 +1267,14 @@
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\embot_sys_theCallbackManager.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_sys_theJumper.cpp</FileName>
+              <FileName>embot_app_theJumper.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\embot_sys_theJumper.cpp</FilePath>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_theJumper.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_sys_theScheduler.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\embot_sys_theScheduler.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_sys_theStorage.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\embot_sys_theStorage.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_sys_theTimerManager.cpp</FileName>
@@ -1479,11 +1285,6 @@
               <FileName>embot_sys_Timer.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\embot_sys_Timer.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>slim_retarget_io.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\slim_retarget_io.c</FilePath>
             </File>
             <File>
               <FileName>embot_tools.cpp</FileName>
@@ -1499,6 +1300,16 @@
               <FileName>embot_dsp.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\dsp\embot_dsp.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_theLEDmanager.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\app\embot_app_theLEDmanager.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_sys_Action.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\sys\embot_sys_Action.cpp</FilePath>
             </File>
           </Files>
         </Group>

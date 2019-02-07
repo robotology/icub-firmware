@@ -22,13 +22,13 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "embot_hw_button.h"
-#include "stm32hal.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
+#include "stm32hal.h"
 #include "embot_hw_gpio.h"
 #include "embot_hw_bsp.h"
 
@@ -50,103 +50,28 @@ using namespace std;
 // - all the rest
 // --------------------------------------------------------------------------------------------------------------------
   
+using namespace embot::hw;
 
 namespace embot { namespace hw { namespace button {
-    
-    struct bspmap_t
-    {
-        std::uint32_t           mask;
-        GPIO_PinState           pressed;
-        embot::hw::gpio::GPIO   gpio[static_cast<uint8_t>(BTN::maxnumberof)];
-    };
-
-    // const support maps
-    #if     defined(STM32HAL_BOARD_NUCLEO64)  
-
-    static const bspmap_t bspmap = 
-    {
-        0x00000001,
-        GPIO_PIN_RESET,
-        {
-            {B1_GPIO_Port, B1_Pin},
-            {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}
-        }        
-    };    
-
-    #elif   defined(STM32HAL_BOARD_MTB4)
-    
-    static const bspmap_t bspmap = 
-    {
-        0x00000000,
-        GPIO_PIN_RESET,
-        {
-            {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}
-        }        
-    };
-
-    #elif   defined(STM32HAL_BOARD_STRAIN2)
-    
-    static const bspmap_t bspmap = 
-    {
-        0x00000000,
-        GPIO_PIN_RESET,
-        {
-            {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}
-        }        
-    };
-    
-    #elif   defined(STM32HAL_BOARD_RFE)
-    
-    static const bspmap_t bspmap = 
-    {
-        0x00000000,
-        GPIO_PIN_RESET,
-        {
-            {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}
-        }        
-    };
-    
-    #else
-    
-    static const bspmap_t bspmap = 
-    {
-        0x00000000,
-        {
-            {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}
-        }        
-    }; 
-    
-    #endif
-      
-    // initialised mask
-        
+          
+    // initialised mask        
     static std::uint32_t initialisedmask = 0;
     
-    std::uint8_t btn2index(BTN btn)
-    {   // use it only after verification of supported() ...
-        return static_cast<uint8_t>(btn);
+    GPIO_PinState convert(embot::hw::gpio::State s)
+    {
+        return (s == embot::hw::gpio::State::RESET) ? (GPIO_PIN_RESET) : (GPIO_PIN_SET);
     }
-        
+    
     bool supported(BTN btn)
     {
-        if((BTN::none == btn) || (BTN::maxnumberof == btn))
-        {
-            return false;
-        }
-        return embot::binary::bit::check(bspmap.mask, btn2index(btn));
+        return embot::hw::bsp::button::getMAP()->supported(btn);
     }
     
     bool initialised(BTN btn)
     {
-        if(BTN::none == btn)
-        {
-            return false;
-        }
-        return embot::binary::bit::check(initialisedmask, btn2index(btn));
+        return embot::binary::bit::check(initialisedmask, embot::hw::bsp::button::MAP::toindex(btn));
     }
         
-    
-
     result_t init(BTN btn)
     {
         if(!supported(btn))
@@ -166,7 +91,7 @@ namespace embot { namespace hw { namespace button {
             return resNOK;
         }
                 
-        embot::binary::bit::set(initialisedmask, btn2index(btn));
+        embot::binary::bit::set(initialisedmask, embot::hw::bsp::button::MAP::toindex(btn));
                 
         return resOK;        
     }
@@ -180,10 +105,10 @@ namespace embot { namespace hw { namespace button {
         {
             return false;
         }  
-        const embot::hw::gpio::GPIO *gpio = &bspmap.gpio[btn2index(btn)];       
+        const embot::hw::GPIO *gpio = embot::hw::bsp::button::getMAP()->getgpio(btn);       
         
         GPIO_PinState b1state = HAL_GPIO_ReadPin(static_cast<GPIO_TypeDef*>(gpio->port), static_cast<uint16_t>(gpio->pin));    
-        return (bspmap.pressed == b1state) ? (true) : (false);         
+        return (convert(embot::hw::bsp::button::getMAP()->pressed) == b1state) ? (true) : (false);         
     }
     
     

@@ -28,7 +28,7 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "EOMtheCallbackManager.h"
+#include "embot_sys_Task.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -37,12 +37,12 @@
 
 struct embot::sys::theCallbackManager::Impl
 {    
-    bool started;
-    Config config;
+    Config config;    
+    embot::sys::CallbackTask *task;
     
     Impl() 
     {              
-        started = false;
+        task = nullptr;
         config.capacityofhandler = 8;
         config.priority = 230;
         config.stacksize = 1024;
@@ -55,44 +55,52 @@ struct embot::sys::theCallbackManager::Impl
 // --------------------------------------------------------------------------------------------------------------------
 
 
-embot::sys::theCallbackManager::theCallbackManager()
-: pImpl(new Impl)
-{   
-
+embot::sys::theCallbackManager& embot::sys::theCallbackManager::getInstance()
+{
+    static theCallbackManager* p = new theCallbackManager();
+    return *p;
 }
 
+embot::sys::theCallbackManager::theCallbackManager()
+//    : pImpl(new Impl)
+{
+    pImpl = std::make_unique<Impl>();
+}  
 
-bool embot::sys::theCallbackManager::init(Config &config)
-{   
-    if(true == pImpl->started)
+    
+embot::sys::theCallbackManager::~theCallbackManager() { }
+
+
+bool embot::sys::theCallbackManager::start(const Config &config)
+{       
+    if(true == started())
     {
         return false;
     }
-        
+    
     pImpl->config = config;
+        
+    pImpl->task = new embot::sys::CallbackTask;
+    
+    embot::sys::CallbackTask::Config cfg;
+    cfg.priority = pImpl->config.priority;
+    cfg.stacksize = pImpl->config.stacksize;
+    cfg.queuesize = pImpl->config.capacityofhandler;
+    cfg.timeout = embot::common::timeWaitForever;
+    cfg.startup = nullptr;
+    
+    pImpl->task->start(cfg);
     
     return true;    
 }
+bool embot::sys::theCallbackManager::started() const
+{
+    return (nullptr == pImpl->task) ? false : true;
+}
 
-
-bool embot::sys::theCallbackManager::start()
-{       
-    if(true == pImpl->started)
-    {
-        return false;
-    }
-    
-    pImpl->started = true;
-    
-    eOmcallbackman_cfg_t cfg = {0};
-    cfg.queuesize = pImpl->config.capacityofhandler;
-    cfg.priority = pImpl->config.priority;
-    cfg.stacksize = pImpl->config.stacksize;
-    
-    eom_callbackman_Initialise(&cfg);
-    
-    return true;
-    
+embot::sys::Task * embot::sys::theCallbackManager::task() const
+{
+    return pImpl->task;
 }
     
 

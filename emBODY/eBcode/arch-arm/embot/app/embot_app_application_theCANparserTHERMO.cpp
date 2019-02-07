@@ -197,14 +197,21 @@ bool embot::app::application::theCANparserTHERMO::Impl::process_thermo_transmit(
 // --------------------------------------------------------------------------------------------------------------------
 
 
-
-embot::app::application::theCANparserTHERMO::theCANparserTHERMO()
-: pImpl(new Impl)
-{       
-
+embot::app::application::theCANparserTHERMO& embot::app::application::theCANparserTHERMO::getInstance()
+{
+    static theCANparserTHERMO* p = new theCANparserTHERMO();
+    return *p;
 }
 
-   
+embot::app::application::theCANparserTHERMO::theCANparserTHERMO()
+//    : pImpl(new Impl)
+{
+    pImpl = std::make_unique<Impl>();
+
+}  
+
+    
+embot::app::application::theCANparserTHERMO::~theCANparserTHERMO() { }
         
 bool embot::app::application::theCANparserTHERMO::initialise(Config &config)
 {

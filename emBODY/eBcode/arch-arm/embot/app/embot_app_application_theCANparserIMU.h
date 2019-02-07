@@ -22,9 +22,7 @@
 #define _EMBOT_APP_APPLICATION_THECANPARSERIMU_H_
 
 #include "embot_common.h"
-
 #include "embot_hw_can.h"
-
 #include "embot_sys.h"
 
 
@@ -35,13 +33,8 @@ namespace embot { namespace app { namespace application {
     class theCANparserIMU
     {
     public:
-        static theCANparserIMU& getInstance()
-        {
-            static theCANparserIMU* p = new theCANparserIMU();
-            return *p;
-        }
-        
-        
+        static theCANparserIMU& getInstance();
+               
     public:
         struct Config
         {
@@ -57,17 +50,11 @@ namespace embot { namespace app { namespace application {
 
     private:
         theCANparserIMU(); 
-
-    public:
-        // remove copy constructors and copy assignment operators
-        theCANparserIMU(const theCANparserIMU&) = delete;
-        theCANparserIMU(theCANparserIMU&) = delete;
-        void operator=(const theCANparserIMU&) = delete;
-        void operator=(theCANparserIMU&) = delete;
+        ~theCANparserIMU();
 
     private:    
         struct Impl;
-        Impl *pImpl;        
+        std::unique_ptr<Impl> pImpl;         
     };       
 
 

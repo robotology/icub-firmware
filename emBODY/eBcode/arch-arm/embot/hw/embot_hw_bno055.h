@@ -38,8 +38,8 @@ namespace embot { namespace hw { namespace BNO055 {
     struct Config
     {  
         embot::hw::i2c::Descriptor      i2cdes;        
-        Config(embot::hw::i2c::Bus b, std::uint32_t s) : i2cdes(b, s) {}        
-        Config() : i2cdes(embot::hw::i2c::Bus::one, 400000) {}
+        Config(embot::hw::I2C b, std::uint32_t s) : i2cdes(b, s) {}        
+        Config() : i2cdes(embot::hw::I2C::one, 400000) {}
         Config(const embot::hw::i2c::Descriptor &des) : i2cdes(des) {}
     };
     

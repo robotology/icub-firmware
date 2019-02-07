@@ -23,20 +23,16 @@
 #define _EMBOT_HW_FLASH_STORAGE_H_
 
 #include "embot_common.h"
-#include "embot_i2h.h"
 #include "embot_hw.h"
 #include "embot_hw_sys.h"
 
 namespace embot { namespace hw {
     
-    class FlashStorage : public embot::i2h::Storage
+    class FlashStorage : public embot::common::Storage 
     {
     public:
-        // for ease of life, we keep the address fixed. however, we could use it as a parameter. 
-        //static const std::uint32_t PageStart = 0x0801F800; // @126k, page #63
-        //static const std::uint32_t PageSize = 1024;
         
-        FlashStorage(std::uint32_t pagestart = embot::hw::sys::addressOfStorage, std::uint32_t pagesize = 1024, std::uint64_t *buffer = nullptr);
+        FlashStorage(std::uint32_t pagestart, std::uint32_t pagesize, std::uint64_t *buffer = nullptr);
         ~FlashStorage();
         
         virtual bool isInitted();

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 iCub Facility - Istituto Italiano di Tecnologia
+ * Copyright (C) 2019 iCub Facility - Istituto Italiano di Tecnologia
  * Author:  Marco Accame
  * email:   marco.accame@iit.it
  * website: www.robotcub.org
@@ -24,33 +24,184 @@
 #include "embot_sys_Timer.h"
 
 
-
-
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "EOtimer.h"
-#include "EOVtheCallbackManager.h"
 
 #include "embot_sys_Task.h"
-
+#include "embot_sys_theTimerManager.h"
+#include "osal.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
 // --------------------------------------------------------------------------------------------------------------------
 
-    
-struct embot::sys::Timer::Impl
-{
-    EOtimer *tmr;
-    Impl() 
+
+
+namespace embot { namespace sys { namespace timertools {
+        
+    struct osalTMR 
     {
-        tmr = eo_timer_New();
+        Timer               *owner;
+        osal_timer_t        *osaltimer;
+        Timer::Config       tconfig;         
+        Timer::Status       sta;             
+        std::uint32_t       maxshots;
+        std::uint32_t       count;        
+        bool                canexecuteaction; 
+        bool onemoretime;                 
+        
+        osalTMR(Timer *own)   
+        {
+            owner = own;
+            reset(Timer::Status::idle);
+            osaltimer = osal_timer_new();
+        }
+        
+        ~osalTMR()   
+        {
+            stop();
+            // do reverse deallocation and cleaning
+            osal_timer_delete(osaltimer);
+            osaltimer = nullptr;
+            reset(Timer::Status::idle);              
+            canexecuteaction = false;  
+            owner = nullptr;            
+        }
+        
+        void reset(Timer::Status st)
+        {
+            tconfig.clear();
+            sta = st;
+            canexecuteaction = false;
+            onemoretime = false;
+            tconfig.onexpiry.clear();
+        }
+        
+        Timer::Status getstatus()
+        {
+            return sta;
+        }
+        
+//        Timer::Mode getmode()
+//        {
+//            return mod;
+//        }
+        
+        bool start(const Timer::Config &config)
+        {            
+            // config must be valid 
+            if(false == config.isvalid())
+            {
+                return false;
+            }
+                                                    
+            bool ret = false;
+            
+            // 1. lock the timer manager
+            
+            // 2. start it only if it is not counting
+            if(Timer::Status::counting != getstatus())
+            {
+                tconfig = config;
+                
+                // 1. copy the onexp and disable it. it will be enabled only at expiry of the countdown so that it can be executed
+                
+                canexecuteaction = false;
+                                
+                osal_timer_timing_t timing { 
+                    .startat = OSAL_abstimeNONE, 
+                    .count = tconfig.countdown, 
+                    .mode = ( (Timer::Mode::oneshot == tconfig.mode) ? (osal_tmrmodeONESHOT) : (osal_tmrmodeFOREVER) )
+                };
+                osal_timer_onexpiry_t onexpi {.cbk = OnExpiryCbk, .par = this };
+
+                osal_result_t r = osal_timer_start(osaltimer, &timing, &onexpi, osal_callerAUTOdetect);                
+                
+                if(osal_res_OK == r)
+                {
+                    sta = Timer::Status::counting;
+                    count = 0;
+                    maxshots = ( (Timer::Mode::someshots == tconfig.mode) ? (tconfig.numofshots) : (0) );
+                    onemoretime = false;
+                    ret = true;
+                }
+                else
+                {
+                    sta  = Timer::Status::idle;
+                    onemoretime =  false;
+                    ret = false;
+                }
+
+            }
+            
+            // 5. unlock the timer manager
+        
+            return ret;
+        }  
+
+        // it is executed by osal inside the systick, hence ... keep it lean
+        static void OnExpiryCbk(osal_timer_t *osaltmr, void *par) 
+        {
+            osalTMR *otm = reinterpret_cast<osalTMR*>(par);
+            otm->canexecuteaction = true;
+            embot::sys::theTimerManager &tm = embot::sys::theTimerManager::getInstance();
+            if(true == tm.started())
+            {
+                tm.onexpiry(*otm->owner);
+            }
+            else
+            {
+                otm->owner->execute();
+            }
+            if(otm->tconfig.mode == Timer::Mode::someshots)
+            {
+                otm->count ++;
+                if(otm->count >= otm->maxshots)
+                {
+                    otm->onemoretime = true;
+                    otm->stop();
+                }
+            }
+            
+        }  
+
+
+        bool stop()
+        {
+            if(Timer::Status::counting == getstatus())
+            {                                
+                // stop the osal timer. operation is null safe.
+                osal_timer_stop(osaltimer, osal_callerAUTOdetect);
+            }
+          
+            if(false == onemoretime)
+            {
+                reset(Timer::Status::idle);   
+                canexecuteaction = false;   
+            }
+            
+            return true;            
+        }
+        
+    }; 
+        
+    
+}}} // namespace embot { namespace sys {
+
+     
+struct embot::sys::Timer::Impl
+{          
+    embot::sys::timertools::osalTMR *tmr;
+    
+    Impl(Timer *own) 
+    {
+        tmr = new embot::sys::timertools::osalTMR(own);
     }
     ~Impl()
     {
-        eo_timer_Delete(tmr);
+        delete tmr;
     }
 };
 
@@ -62,8 +213,8 @@ struct embot::sys::Timer::Impl
 
 
 embot::sys::Timer::Timer()
-: pImpl(new Impl)
-{   
+: pImpl(new Impl(this))
+{ 
 
 }
 
@@ -72,67 +223,55 @@ embot::sys::Timer::~Timer()
     delete pImpl;
 }
 
-
-bool embot::sys::Timer::start(common::relTime countdown, Type type, Action &onexpiry)
+bool embot::sys::Timer::start(const Config &config)
 {
-    EOaction_strg strg = {0};
-    EOaction* action = (EOaction*)&strg;
-    EOVtaskDerived *totask = NULL;
-    
-    switch(onexpiry.type)
-    {
-        case Action::Type::event2task:
-        {            
-            if(NULL != onexpiry.evt.task)
-            {
-                totask = (EOVtaskDerived*) onexpiry.evt.task->getEOMtask();
-            }
-            eo_action_SetEvent(action, onexpiry.evt.event, totask);
-        } break;
-        case Action::Type::message2task:
-        {
-            if(NULL != onexpiry.msg.task)
-            {
-                totask = (EOVtaskDerived*) onexpiry.msg.task->getEOMtask();
-            }
-            eo_action_SetMessage(action, onexpiry.msg.message, totask);
-        } break;
-        
-        case Action::Type::executecallback:
-        {
-            totask = eov_callbackman_GetTask(eov_callbackman_GetHandle());
-            eo_action_SetCallback(action, onexpiry.cbk.callback.callback, onexpiry.cbk.callback.arg, totask);
-        } break;  
-        
-        default:
-        {
-            eo_action_Clear(action);
-        } break;
-    } 
-    
-    eOresult_t r = eo_timer_Start(pImpl->tmr, eok_abstimeNOW, countdown, static_cast<eOtimerMode_t>(type), action);    
-    return (eores_OK == r) ? true : false;
+    return pImpl->tmr->start(config);
 }
-
 
 bool embot::sys::Timer::stop()
 {
-    eOresult_t r = eo_timer_Stop(pImpl->tmr);    
-    return (eores_OK == r) ? true : false;
+    return pImpl->tmr->stop();
 }
 
-
-embot::sys::Timer::Status embot::sys::Timer::getStatus()
+embot::sys::Timer::Status embot::sys::Timer::getStatus() const
 {
-    eOtimerStatus_t st = eo_timer_GetStatus(pImpl->tmr);    
-    return static_cast<Timer::Status>(st);   
+    return pImpl->tmr->getstatus();   
 }
 
+//embot::sys::Timer::Mode embot::sys::Timer::getMode() const
+//{
+//    return pImpl->tmr->getmode();  
+//}
 
-embot::sys::Timer::Type embot::sys::Timer::getType()
+//embot::common::relTime embot::sys::Timer::getCountdown() const
+//{
+//    return pImpl->tmr->period;
+//}
+
+//const embot::sys::Action& embot::sys::Timer::getAction() const
+//{
+//    return pImpl->tmr->tconfig.onexpiry;
+//}
+
+const embot::sys::Timer::Config& embot::sys::Timer::getConfig() const
 {
-    eOtimerMode_t mode = eo_timer_GetMode(pImpl->tmr);    
-    return static_cast<Timer::Type>(mode);   
+    return pImpl->tmr->tconfig;
+}
+
+bool embot::sys::Timer::execute()
+{
+    bool canexecute = pImpl->tmr->canexecuteaction;
+    if(true == canexecute)
+    {
+        pImpl->tmr->tconfig.onexpiry.execute();  
+        pImpl->tmr->canexecuteaction = false;   
+        if(true == pImpl->tmr->onemoretime)
+        {
+            pImpl->tmr->onemoretime = false;
+            pImpl->tmr->reset(Timer::Status::idle);   
+        }
+    }
+    return canexecute;
 }
 
 

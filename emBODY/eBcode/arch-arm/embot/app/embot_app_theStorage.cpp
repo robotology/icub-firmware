@@ -70,11 +70,21 @@ struct embot::app::theStorage::Impl
 
 
 
-embot::app::theStorage::theStorage()
-: pImpl(new Impl)
-{       
 
+embot::app::theStorage& embot::app::theStorage::getInstance()
+{
+    static theStorage* p = new theStorage();
+    return *p;
 }
+
+embot::app::theStorage::theStorage()
+//    : pImpl(new Impl)
+{
+    pImpl = std::make_unique<Impl>();
+}  
+
+    
+embot::app::theStorage::~theStorage() { }
 
 
 bool embot::app::theStorage::init(const std::uint32_t address, const std::uint32_t size)

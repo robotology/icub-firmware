@@ -29,7 +29,7 @@ namespace embot { namespace common {
 
 
     using fpWorker      = void (*)(void);
-    using fpCallback    = void (*)(void *);
+    using fpCaller      = void (*)(void *);
     using fpGetU32      = std::uint32_t (*)(void);
     using fpGetU64      = std::uint64_t (*)(void);
     using fpParU32      = void (*)(std::uint32_t);
@@ -38,15 +38,16 @@ namespace embot { namespace common {
     
     struct Callback
     {
-        fpCallback  callback;
+        fpCaller    call;
         void*       arg;
-        Callback() : callback(nullptr), arg(nullptr) {}
-        Callback(fpCallback _cbk, void *_arg) : callback(_cbk), arg(_arg) {}
-        void load(fpCallback _cbk, void *_arg) { callback = _cbk; arg = _arg; }
-        void clear() { callback = nullptr; arg = nullptr; }
-        bool isvalid() const { if(nullptr != callback){ return true; } else { return false; } } 
-        void execute() { if(true == isvalid()) { callback(arg); } }
+        Callback() : call(nullptr), arg(nullptr) {}
+        Callback(fpCaller _c, void *_a) : call(_c), arg(_a) {}
+        void load(fpCaller _c, void *_a) { call = _c; arg = _a; }
+        void clear() { call = nullptr; arg = nullptr; }
+        bool isvalid() const { if(nullptr != call){ return true; } else { return false; } } 
+        void execute() { if(true == isvalid()) { call(arg); } }
     };
+
     
     struct Data
     {
@@ -112,7 +113,29 @@ namespace embot { namespace common {
     
     using Event = std::uint32_t;
     using EventMask = std::uint32_t;
-    using Message = std::uint32_t;
+    using Message = void *;
+    
+    template<typename T>
+    constexpr std::uint32_t enumtoindex(const T t)
+    {
+        return static_cast<std::uint32_t>(t);
+    } 
+    
+    class Storage
+    {
+    public:
+        virtual bool isInitted() = 0;
+        virtual bool isAddressValid(std::uint32_t address) = 0;
+        virtual std::uint32_t getBaseAddress() = 0;
+        virtual std::uint32_t getSize() = 0;   
+        virtual bool fullerase() = 0;  
+        virtual bool erase(std::uint32_t address, std::uint32_t size) = 0;        
+        virtual bool read(std::uint32_t address, std::uint32_t size, void *data) = 0;
+        virtual bool write(std::uint32_t address, std::uint32_t size, const void *data) = 0;   
+
+        virtual ~Storage() {};    
+    }; 
+    
             
 } } // namespace embot { namespace common {
 

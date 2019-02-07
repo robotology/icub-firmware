@@ -43,7 +43,7 @@
 #include "embot_hw_can.h"
 #include "embot_hw_pga308.h"
 #include "embot_hw_adc.h"
-
+#include "embot_hw_flash.h"
 
 #include "embot_hw_sys.h"
 
@@ -90,7 +90,7 @@ struct embot::app::application::theSTRAIN::Impl
     static const std::uint8_t numOfChannels = 6;
     static const std::uint8_t numOfSets = 3;
     
-    // the new amplifier is the PGA308 by Texas Instruments. It has a completly different configuration
+    // the new amplifier is the pga308 by Texas Instruments. It has a completly different configuration
     // we use for it the compact form of the can message
     
     struct amplifierConfig_v00_t
@@ -98,7 +98,7 @@ struct embot::app::application::theSTRAIN::Impl
         embot::app::canprotocol::analog::polling::PGA308cfg1    pga308cfg1;   
         
         void factoryreset() {
-            embot::hw::PGA308::TransferFunctionConfig tfc;
+            embot::hw::pga308::TransferFunctionConfig tfc;
             tfc.setDefault();
             tfc.get(pga308cfg1);
         }
@@ -112,7 +112,7 @@ struct embot::app::application::theSTRAIN::Impl
         std::uint8_t                                            ffu[2];        
         
         void factoryreset() {
-            embot::hw::PGA308::TransferFunctionConfig tfc;
+            embot::hw::pga308::TransferFunctionConfig tfc;
             tfc.setDefault();
             tfc.get(pga308cfg1);
             ffu[0] = ffu[1] = 0;
@@ -335,7 +335,7 @@ struct embot::app::application::theSTRAIN::Impl
 #if defined(STRAIN2_APP_AT_64K)
 #else            
             embot::app::theStorage &storage = embot::app::theStorage::getInstance(); 
-            storage.init(embot::hw::sys::addressOfApplicationStorage, 1024);
+            storage.init(embot::hw::flash::getpartition(embot::hw::FLASH::applicationstorage).address, 1024);
 #endif            
             clear();
             
@@ -918,7 +918,7 @@ struct embot::app::application::theSTRAIN::Impl
         for(std::uint8_t i=first; i<nextlast; i++)
         {
             embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
-            embot::hw::PGA308::TransferFunctionConfig tfc;
+            embot::hw::pga308::TransferFunctionConfig tfc;
             // modify the tsf
             tfc.setDefault();                
             // retrieve the resulting alpha and beta for filling the reply
@@ -946,7 +946,7 @@ struct embot::app::application::theSTRAIN::Impl
         for(std::uint8_t i=first; i<nextlast; i++)
         {
             embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
-            embot::hw::PGA308::TransferFunctionConfig tfc;
+            embot::hw::pga308::TransferFunctionConfig tfc;
             
             // retrieve current cfg1 and associated transform function
             configdata.amplifiers_get(setindex, i, cfg1);
@@ -989,9 +989,9 @@ struct embot::app::application::theSTRAIN::Impl
         {
             embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
             configdata.amplifiers_get(setindex, i, cfg1); 
-            embot::hw::PGA308::TransferFunctionConfig tfc;
+            embot::hw::pga308::TransferFunctionConfig tfc;
             tfc.load(cfg1);    
-            embot::hw::PGA308::set(static_cast<embot::hw::PGA308::Amplifier>(i), tfc);                
+            embot::hw::pga308::set(static_cast<embot::hw::PGA308>(i), tfc);                
         }
     }  
                       
@@ -1030,7 +1030,9 @@ bool embot::app::application::theSTRAIN::Impl::start(const embot::app::canprotoc
         return true;        
     }
     
-    ticktimer->start(runtimedata.data.txperiod, embot::sys::Timer::Type::forever, action);
+    embot::sys::Timer::Config cfg(runtimedata.data.txperiod, action, embot::sys::Timer::Mode::forever);
+    ticktimer->start(cfg);
+    
     ticking = true;    
 #if defined(DEBUG_acquisition_computetiming) 
     acquisitioncounter = 0;
@@ -1197,7 +1199,7 @@ bool embot::app::application::theSTRAIN::Impl::acquisition_start()
 
     std::memset(runtimedata.data.dmabuffer, 0xff, sizeof(runtimedata.data.dmabuffer));    
     adcdataisready = false;
-    embot::hw::adc::start(embot::hw::adc::Port::one);    
+    embot::hw::adc::start(embot::hw::ADC::one);    
     return true;
 }
 
@@ -1522,12 +1524,21 @@ bool embot::app::application::theSTRAIN::Impl::tick(std::vector<embot::hw::can::
 // --------------------------------------------------------------------------------------------------------------------
 
 
+embot::app::application::theSTRAIN& embot::app::application::theSTRAIN::getInstance()
+{
+    static theSTRAIN* p = new theSTRAIN();
+    return *p;
+}
 
 embot::app::application::theSTRAIN::theSTRAIN()
-: pImpl(new Impl)
-{       
+//    : pImpl(new Impl)
+{
+    pImpl = std::make_unique<Impl>();
+}  
 
-}
+    
+embot::app::application::theSTRAIN::~theSTRAIN() { }
+
 
 //static void dmaiscomplete(void *p)
 //{
@@ -1543,14 +1554,14 @@ embot::app::application::theSTRAIN::theSTRAIN()
 //    
 //    pImpl->config.totask->setEvent(pImpl->config.datareadyevent);
 //    
-//    //embot::hw::adc::get(embot::hw::adc::Port::one, items);
+//    //embot::hw::adc::get(embot::hw::adc::ADC::one, items);
 //}
          
 bool embot::app::application::theSTRAIN::initialise(Config &config)
 {
     pImpl->config = config;
     
-    pImpl->action.set(embot::sys::Action::EventToTask(pImpl->config.tickevent, pImpl->config.totask));
+    pImpl->action.load(embot::sys::EventToTask(pImpl->config.tickevent, pImpl->config.totask));
 
     // read from eeprom and make sure it is coherent data (first ever time we init eeprom)
     pImpl->configdata.EEPROM_read();
@@ -1559,50 +1570,50 @@ bool embot::app::application::theSTRAIN::initialise(Config &config)
     // i init the set2use as the one stored in eeprom
     pImpl->runtimedata.set2use_set(pImpl->configdata.permanentregulationset_get());
     
-    // init the hw used to acquire from strain gauges: amplifier PGA308 + adc channels.
+    // init the hw used to acquire from strain gauges: amplifier pga308 + adc channels.
 
-    // PGA308
+    // pga308
     
-    embot::hw::PGA308::Config pga308cfg;
+    embot::hw::pga308::Config pga308cfg;
     
     // common settings
-    pga308cfg.powerongpio = embot::hw::gpio::GPIO(EN_2V8_GPIO_Port, EN_2V8_Pin);
+    pga308cfg.powerongpio = embot::hw::GPIO(EN_2V8_GPIO_Port, EN_2V8_Pin);
     pga308cfg.poweronstate = embot::hw::gpio::State::SET;
     pga308cfg.onewireconfig.rate = embot::hw::onewire::Rate::tenKbps;
     pga308cfg.onewireconfig.usepreamble = true;
     pga308cfg.onewireconfig.preamble = 0x55;
     
-    // from embot::hw::PGA308::one to embot::hw::PGA308::six
+    // from embot::hw::pga308::one to embot::hw::pga308::six
     
     // embot::hw::PGA308::one
-    pga308cfg.onewirechannel = embot::hw::onewire::Channel::one;
-    pga308cfg.onewireconfig.gpio = embot::hw::gpio::GPIO(W_STRAIN1_GPIO_Port, W_STRAIN1_Pin);
-    embot::hw::PGA308::init(embot::hw::PGA308::Amplifier::one, pga308cfg);
+    pga308cfg.onewirechannel = embot::hw::ONEWIRE::one;
+    pga308cfg.onewireconfig.gpio = embot::hw::GPIO(W_STRAIN1_GPIO_Port, W_STRAIN1_Pin);
+    embot::hw::pga308::init(embot::hw::PGA308::one, pga308cfg);
     
     // embot::hw::PGA308::two
-    pga308cfg.onewirechannel = embot::hw::onewire::Channel::two;
-    pga308cfg.onewireconfig.gpio = embot::hw::gpio::GPIO(W_STRAIN2_GPIO_Port, W_STRAIN2_Pin);
-    embot::hw::PGA308::init(embot::hw::PGA308::Amplifier::two, pga308cfg);
+    pga308cfg.onewirechannel = embot::hw::ONEWIRE::two;
+    pga308cfg.onewireconfig.gpio = embot::hw::GPIO(W_STRAIN2_GPIO_Port, W_STRAIN2_Pin);
+    embot::hw::pga308::init(embot::hw::PGA308::two, pga308cfg);
     
     // embot::hw::PGA308::three
-    pga308cfg.onewirechannel = embot::hw::onewire::Channel::three;
-    pga308cfg.onewireconfig.gpio = embot::hw::gpio::GPIO(W_STRAIN3_GPIO_Port, W_STRAIN3_Pin);
-    embot::hw::PGA308::init(embot::hw::PGA308::Amplifier::three, pga308cfg);
+    pga308cfg.onewirechannel = embot::hw::ONEWIRE::three;
+    pga308cfg.onewireconfig.gpio = embot::hw::GPIO(W_STRAIN3_GPIO_Port, W_STRAIN3_Pin);
+    embot::hw::pga308::init(embot::hw::PGA308::three, pga308cfg);
         
     // embot::hw::PGA308::four
-    pga308cfg.onewirechannel = embot::hw::onewire::Channel::four;
-    pga308cfg.onewireconfig.gpio = embot::hw::gpio::GPIO(W_STRAIN4_GPIO_Port, W_STRAIN4_Pin);
-    embot::hw::PGA308::init(embot::hw::PGA308::Amplifier::four, pga308cfg);    
+    pga308cfg.onewirechannel = embot::hw::ONEWIRE::four;
+    pga308cfg.onewireconfig.gpio = embot::hw::GPIO(W_STRAIN4_GPIO_Port, W_STRAIN4_Pin);
+    embot::hw::pga308::init(embot::hw::PGA308::four, pga308cfg);    
     
     // embot::hw::PGA308::five
-    pga308cfg.onewirechannel = embot::hw::onewire::Channel::five;
-    pga308cfg.onewireconfig.gpio = embot::hw::gpio::GPIO(W_STRAIN5_GPIO_Port, W_STRAIN5_Pin);
-    embot::hw::PGA308::init(embot::hw::PGA308::Amplifier::five, pga308cfg);     
+    pga308cfg.onewirechannel = embot::hw::ONEWIRE::five;
+    pga308cfg.onewireconfig.gpio = embot::hw::GPIO(W_STRAIN5_GPIO_Port, W_STRAIN5_Pin);
+    embot::hw::pga308::init(embot::hw::PGA308::five, pga308cfg);     
 
     // embot::hw::PGA308::six
-    pga308cfg.onewirechannel = embot::hw::onewire::Channel::six;
-    pga308cfg.onewireconfig.gpio = embot::hw::gpio::GPIO(W_STRAIN6_GPIO_Port, W_STRAIN6_Pin);
-    embot::hw::PGA308::init(embot::hw::PGA308::Amplifier::six, pga308cfg);   
+    pga308cfg.onewirechannel = embot::hw::ONEWIRE::six;
+    pga308cfg.onewireconfig.gpio = embot::hw::GPIO(W_STRAIN6_GPIO_Port, W_STRAIN6_Pin);
+    embot::hw::pga308::init(embot::hw::PGA308::six, pga308cfg);   
     
     
     // now i must apply the values on eeprom pImpl->configdata.EEPROM_read
@@ -1610,8 +1621,8 @@ bool embot::app::application::theSTRAIN::initialise(Config &config)
     std::uint8_t set2use = pImpl->runtimedata.set2use_get();
     pImpl->amplifiers_applyregulationsetochipPGA308(set2use, embot::app::canprotocol::analog::polling::StrainChannel::all);
     
-//    // #warning TODO: apply eeprom values to PGA308 ... all channels. 
-//    embot::hw::PGA308::TransferFunctionConfig tfc;    
+//    // #warning TODO: apply eeprom values to pga308 ... all channels. 
+//    embot::hw::pga308::TransferFunctionConfig tfc;    
 //    // set-todo: use variable set2use, originally initted w/ eeprom value but possibly changed by can message. 
 //    #warning when changed by can message, remember to set the tfc ...
 //    std::uint8_t set2use = pImpl->runtimedata.set2use_get();
@@ -1620,7 +1631,7 @@ bool embot::app::application::theSTRAIN::initialise(Config &config)
 //        embot::app::canprotocol::analog::polling::PGA308cfg1 pga308cfg1;
 //        pImpl->configdata.amplifiers_get(set2use, c, pga308cfg1); 
 //        tfc.load(pga308cfg1);    
-//        embot::hw::PGA308::set(static_cast<embot::hw::PGA308::Amplifier>(c), tfc);                
+//        embot::hw::pga308::set(static_cast<embot::hw::PGA308>(c), tfc);                
 //    }
         
     
@@ -1635,12 +1646,11 @@ bool embot::app::application::theSTRAIN::initialise(Config &config)
     embot::hw::adc::Config adcConf;
     adcConf.numberofitems = 6;
     adcConf.destination = pImpl->runtimedata.data.dmabuffer;
-    adcConf.oncompletion.callback = pImpl->alertdataisready;
-    adcConf.oncompletion.arg = pImpl;
-    embot::hw::adc::init(embot::hw::adc::Port::one, adcConf);
+    adcConf.oncompletion = { pImpl->alertdataisready, pImpl.get() };
+    embot::hw::adc::init(embot::hw::ADC::one, adcConf);
     pImpl->adcdataisready = false;
     
-    embot::app::application::theCANtracer &tracer = embot::app::application::theCANtracer::getInstance();
+    embot::app::theCANtracer &tracer = embot::app::theCANtracer::getInstance();
      
     return true;
 }
@@ -1786,7 +1796,7 @@ bool embot::app::application::theSTRAIN::get_offset(std::uint8_t regulationset, 
     pImpl->configdata.amplifiers_get(setindex, channel, cfg1); 
     
     // now i retrieve beta.
-    embot::hw::PGA308::TransferFunctionConfig tfc;
+    embot::hw::pga308::TransferFunctionConfig tfc;
     tfc.load(cfg1);  
     float beta = tfc.beta() * 8;            // move from [0, 8k) into [0, 64k)
     value = static_cast<std::uint16_t>(std::floor(beta));
@@ -1856,7 +1866,7 @@ bool embot::app::application::theSTRAIN::configure(embot::app::canprotocol::anal
     embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
     pImpl->configdata.amplifiers_get(setindex, info.channel, cfg1);
 
-    embot::hw::PGA308::TransferFunctionConfig tfc;
+    embot::hw::pga308::TransferFunctionConfig tfc;
     tfc.load(cfg1);  
 
     if(true == tfc.setbeta(static_cast<float>(info.offset)/8.f))
@@ -1867,7 +1877,7 @@ bool embot::app::application::theSTRAIN::configure(embot::app::canprotocol::anal
         // i apply settings to the pga308. but only if the setindex is the one in use...
         if(setindex == pImpl->indexofregsetinuse()) 
         {            
-            embot::hw::PGA308::set(static_cast<embot::hw::PGA308::Amplifier>(info.channel), tfc);   
+            embot::hw::pga308::set(static_cast<embot::hw::PGA308>(info.channel), tfc);   
         }
         
     }
@@ -2171,7 +2181,7 @@ bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::po
     pImpl->configdata.amplifiers_get(setindex, replyinfo.channel, cfg1); 
     
     // now i retrieve alpha and beta
-    embot::hw::PGA308::TransferFunctionConfig tfc;
+    embot::hw::pga308::TransferFunctionConfig tfc;
     tfc.load(cfg1);  
     float alpha = tfc.alpha() * 100.0f;     // represent in 0.01 ticks
     float beta = tfc.beta() * 8;            // move from [0, 8k) into [0, 64k)
@@ -2205,7 +2215,7 @@ bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::po
     pImpl->configdata.amplifiers_get(setindex, replyinfo.channel, cfg1); 
     
     // now i retrieve limits of alpha.
-    embot::hw::PGA308::TransferFunctionConfig tfc;
+    embot::hw::pga308::TransferFunctionConfig tfc;
     tfc.load(cfg1);  
     float low = tfc.alpha(0) * 100.0f;     
     float high = tfc.alpha(64*1024-1) * 100.f;  
@@ -2239,7 +2249,7 @@ bool embot::app::application::theSTRAIN::get(embot::app::canprotocol::analog::po
 //    pImpl->configdata.amplifiers_get(setindex, replyinfo.channel, cfg1); 
 //     
 //    // now i retrieve limits of beta.
-//    embot::hw::PGA308::TransferFunctionConfig tfc;
+//    embot::hw::pga308::TransferFunctionConfig tfc;
 //    tfc.load(cfg1);  
 //    float low = tfc.alpha(0) * 100.0f;     
 //    float high = tfc.alpha(64*1024-1) * 100.f;  
@@ -2407,13 +2417,13 @@ bool embot::app::application::theSTRAIN::autocalib(embot::app::canprotocol::anal
             embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
             pImpl->configdata.amplifiers_get(setindex, i, cfg1);
         
-            embot::hw::PGA308::TransferFunctionConfig tfc;
+            embot::hw::pga308::TransferFunctionConfig tfc;
             tfc.load(cfg1);  
             std::uint8_t Y = 0;
             std::uint16_t Z = 0;
             if(true == tfc.alignVOUT(static_cast<std::uint16_t>(measure[i]), (info.target >> 3), Y, Z))
             {
-                embot::hw::PGA308::set(static_cast<embot::hw::PGA308::Amplifier>(i), tfc);   
+                embot::hw::pga308::set(static_cast<embot::hw::PGA308>(i), tfc);   
                 tfc.get(cfg1);
                 pImpl->configdata.amplifiers_set(setindex, i, cfg1); 
                 

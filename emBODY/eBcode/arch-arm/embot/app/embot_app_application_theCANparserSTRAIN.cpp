@@ -982,12 +982,21 @@ bool embot::app::application::theCANparserSTRAIN::Impl::process_set_strain2_regu
 
 
 
-embot::app::application::theCANparserSTRAIN::theCANparserSTRAIN()
-: pImpl(new Impl)
-{       
-
+embot::app::application::theCANparserSTRAIN& embot::app::application::theCANparserSTRAIN::getInstance()
+{
+    static theCANparserSTRAIN* p = new theCANparserSTRAIN();
+    return *p;
 }
 
+embot::app::application::theCANparserSTRAIN::theCANparserSTRAIN()
+//    : pImpl(new Impl)
+{
+    pImpl = std::make_unique<Impl>();
+
+}  
+
+    
+embot::app::application::theCANparserSTRAIN::~theCANparserSTRAIN() { }
    
         
 bool embot::app::application::theCANparserSTRAIN::initialise(Config &config)

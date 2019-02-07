@@ -28,17 +28,16 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-//    #if !defined(USE_HAL_CAN_REGISTER_CALLBACKS)
-//    #define USE_HAL_CAN_REGISTER_CALLBACKS 1
-//    #endif 
-////NOTE: please don't remove the previous define of USE_HAL_CAN_REGISTER_CALLBACKS because it define the behaviour of 
-////stm hal lib. This macro must be define before including stm32hal.h file.
+
 #include "stm32hal.h"
 
 #include "embot_binary.h"
 
+#include "embot_hw_bsp.h"
+
 #include <cstring>
 #include <vector>
+
 
 using namespace std;
 
@@ -58,25 +57,25 @@ using namespace std;
 
 namespace embot { namespace hw { namespace can {
 
-    bool supported(Port p) { return false; }
+    bool supported(embot::hw::CAN p) { return false; }
     
-    bool initialised(Port p) { return false; }
+    bool initialised(embot::hw::CAN p) { return false; }
     
-    result_t init(Port p, const Config &config) { return resNOK; }
+    result_t init(embot::hw::CAN p, const Config &config) { return resNOK; }
     
-    result_t enable(Port p)  { return resNOK; }
+    result_t enable(embot::hw::CAN p)  { return resNOK; }
     
-    result_t disable(Port p)  { return resNOK; }
+    result_t disable(embot::hw::CAN p)  { return resNOK; }
     
-    result_t put(Port p, const Frame &frame)  { return resNOK; }
+    result_t put(embot::hw::CAN p, const Frame &frame)  { return resNOK; }
     
-    std::uint8_t outputqueuesize(Port p)  { return 0; }
+    std::uint8_t outputqueuesize(embot::hw::CAN p)  { return 0; }
     
-    result_t transmit(Port p)  { return resNOK; }
+    result_t transmit(embot::hw::CAN p)  { return resNOK; }
     
-    std::uint8_t inputqueuesize(Port p)  { return 0; }
+    std::uint8_t inputqueuesize(embot::hw::CAN p)  { return 0; }
     
-    result_t get(Port p, Frame &frame, std::uint8_t &remaining)  { return resNOK; }    
+    result_t get(embot::hw::CAN p, Frame &frame, std::uint8_t &remaining)  { return resNOK; }    
     
 }}} // namespace embot { namespace hw { namespace can {
 
@@ -85,54 +84,6 @@ namespace embot { namespace hw { namespace can {
 namespace embot { namespace hw { namespace can {
     
     
-    struct bspmap_t
-    {
-        std::uint32_t       mask;
-    };
-    
-    // const support maps
-    #if     defined(STM32HAL_BOARD_NUCLEO64) 
-
-    #define STM32HAL_HAS_CAN1 
-    
-    // yes ... if STM32HAL_BOARD_NUCLEO64 is defined we are never in here because HAL_CAN_MODULE_ENABLED is not defined ... but it is just a reminder
-    static const bspmap_t bspmap = 
-    {
-        0x00000000
-    };
-   
-
-    #elif   defined(STM32HAL_BOARD_MTB4)
-    
-    #define STM32HAL_HAS_CAN1 
-    
-    static const bspmap_t bspmap = 
-    {
-        0x00000001
-    };
-
-    #elif   defined(STM32HAL_BOARD_STRAIN2)
-    
-    #define STM32HAL_HAS_CAN1 
-    
-    static const bspmap_t bspmap = 
-    {
-        0x00000001
-    };
-
-    #elif   defined(STM32HAL_BOARD_RFE)
-    
-    #define STM32HAL_HAS_CAN1 
-
-    static const bspmap_t bspmap = 
-    {
-        0x00000001
-    };
-    
-    #else
-        #error embot::hw::can::bspmask must be filled    
-    #endif
-
     #if (STM32HAL_DRIVER_VERSION >= 183)
         #define STM32HAL_HAS_CAN_API_V183
         #warning using can api v183
@@ -141,78 +92,77 @@ namespace embot { namespace hw { namespace can {
         #warning using can api pre-v183
     #endif
     
-    //////////////////// static variables definitions //////////////////
       
     // initialised mask       
     static std::uint32_t initialisedmask = 0;
-    static Config s_config;    
-    static std::vector<Frame> *s_Qtx;
-    static std::vector<Frame> *s_rxQ;
-    //NOTE: in case of STM32HAL_HAS_CAN_API_V183 it is not necessary to allocate ram for HAL.
-    //TxMessage and RxMessage are used only for maintains message header information.
-#if defined(STM32HAL_HAS_CAN_API_V183)
-    static CAN_TxHeaderTypeDef TxMessage;
-    static CAN_RxHeaderTypeDef RxMessage;
-#else    
-    //allocate memory for HAL
-    static CanTxMsgTypeDef        TxMessage;
-    static CanRxMsgTypeDef        RxMessage;
-#endif
+        
+    struct CANdata
+    {
+        Config config; // so far only one. however, it should be an array
+        CAN_HandleTypeDef *handle;
+        std::vector<Frame> *Qtx;
+        std::vector<Frame> *rxQ;
+        #if defined(STM32HAL_HAS_CAN_API_V183)
+        CAN_TxHeaderTypeDef TxMessage;
+        CAN_RxHeaderTypeDef RxMessage;
+        #else    
+        //allocate memory for HAL
+        CanTxMsgTypeDef        TxMessage;
+        CanRxMsgTypeDef        RxMessage;
+        #endif        
+    };
+    
 
-//////////////////// private function  //////////////////
-static std::uint8_t port2index(Port port);
-static void s_transmit(CAN_HandleTypeDef *hcan);
-static void interrupt_RX_enable(void);
-static void interrupt_RX_disable(void);
-static void interrupt_TX_enable(void);
-static void interrupt_TX_disable(void);
-static bool interrupt_TX_is_enabled(void);
-void callbackOnTXcompletion(CAN_HandleTypeDef* hcan);
-void callbackOnRXcompletion(CAN_HandleTypeDef* hcan);
-void callbackOnError(CAN_HandleTypeDef* hcan);
+    CANdata candata;
+        
+
+    //////////////////// private function  //////////////////
+    static void s_transmit(CAN_HandleTypeDef *hcan);
+    static void interrupt_RX_enable(void);
+    static void interrupt_RX_disable(void);
+    static void interrupt_TX_enable(void);
+    static void interrupt_TX_disable(void);
+    static bool interrupt_TX_is_enabled(void);
+    void callbackOnTXcompletion(CAN_HandleTypeDef* hcan);
+    void callbackOnRXcompletion(CAN_HandleTypeDef* hcan);
+    void callbackOnError(CAN_HandleTypeDef* hcan);
 
 }}};
 
 
 using namespace embot::hw;
 using namespace embot::binary; //to use bit::
-
-
-static std::uint8_t can::port2index(Port port)
-{   // use it only after verification of supported() ...
-    return static_cast<uint8_t>(port);
-}
         
 static void can::interrupt_RX_enable(void)
 {
     #if defined(STM32HAL_HAS_CAN_API_V183)
-    HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
+    HAL_CAN_ActivateNotification(candata.handle, CAN_IT_RX_FIFO0_MSG_PENDING);
     #else         
-    __HAL_CAN_ENABLE_IT(&hcan1, CAN_IT_FMP0);
+    __HAL_CAN_ENABLE_IT(candata.handle, CAN_IT_FMP0);
     #endif
 }
 static void can::interrupt_RX_disable(void)
 {
     #if defined(STM32HAL_HAS_CAN_API_V183)
-    HAL_CAN_DeactivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
+    HAL_CAN_DeactivateNotification(candata.handle, CAN_IT_RX_FIFO0_MSG_PENDING);
     #else 
-    __HAL_CAN_DISABLE_IT(&hcan1, CAN_IT_FMP0);
+    __HAL_CAN_DISABLE_IT(candata.handle, CAN_IT_FMP0);
     #endif        
 }
 static void can::interrupt_TX_enable(void)
 {
     #if defined(STM32HAL_HAS_CAN_API_V183)
-    HAL_CAN_ActivateNotification(&hcan1, CAN_IT_TX_MAILBOX_EMPTY);
+    HAL_CAN_ActivateNotification(candata.handle, CAN_IT_TX_MAILBOX_EMPTY);
     #else        
-    __HAL_CAN_ENABLE_IT(&hcan1, CAN_IT_TME);
+    __HAL_CAN_ENABLE_IT(candata.handle, CAN_IT_TME);
     #endif
 }
 static void can::interrupt_TX_disable(void)
 {
     #if defined(STM32HAL_HAS_CAN_API_V183)  
-    HAL_CAN_DeactivateNotification(&hcan1, CAN_IT_TX_MAILBOX_EMPTY);
+    HAL_CAN_DeactivateNotification(candata.handle, CAN_IT_TX_MAILBOX_EMPTY);
     #else        
-    __HAL_CAN_DISABLE_IT(&hcan1, CAN_IT_TME);
+    __HAL_CAN_DISABLE_IT(candata.handle, CAN_IT_TME);
     #endif
 }
 
@@ -220,54 +170,44 @@ static void can::interrupt_TX_disable(void)
 static bool can::interrupt_TX_is_enabled(void)
 {
     #if defined(STM32HAL_HAS_CAN_API_V183)  
-    //__HAL_CAN_IS_ENABLE_IT(&hcan1, CAN_IT_TX_MAILBOX_EMPTY);
-    return ((hcan1.Instance->IER & (CAN_IT_TX_MAILBOX_EMPTY)) == (CAN_IT_TX_MAILBOX_EMPTY));
+    //__HAL_CAN_IS_ENABLE_IT(candata.handle, CAN_IT_TX_MAILBOX_EMPTY);
+    return ((candata.handle->Instance->IER & (CAN_IT_TX_MAILBOX_EMPTY)) == (CAN_IT_TX_MAILBOX_EMPTY));
     #else        
-    //__HAL_CAN_IS_ENABLE_IT(&hcan1, CAN_IT_TME);
-    return ((hcan1.Instance->IER & (CAN_IT_TME)) == (CAN_IT_TME));
+    //__HAL_CAN_IS_ENABLE_IT(candata.handle, CAN_IT_TME);
+    return ((candata.handle->Instance->IER & (CAN_IT_TME)) == (CAN_IT_TME));
     #endif
 }
 
 
-bool can::supported(Port p)
+bool can::supported(embot::hw::CAN p)
 {
-    if((Port::none == p) || (Port::maxnumberof == p))
-    {
-        return false;
-    }
-    return bit::check(bspmap.mask, port2index(p));
+    return embot::hw::bsp::can::getMAP()->supported(p);
 }
 
-bool can::initialised(Port p)
+bool can::initialised(embot::hw::CAN p)
 {
-    if(Port::none == p)
-    {
-        return false;
-    }
-    return bit::check(initialisedmask, port2index(p));
+    return embot::binary::bit::check(initialisedmask, embot::hw::bsp::can::MAP::toindex(p));
 }    
 
 static void can::s_transmit(CAN_HandleTypeDef *hcan)
 {
-    if(0 == s_Qtx->size())
+    if(0 == candata.Qtx->size())
     {
-        if(nullptr != s_config.txqueueempty.callback)
-        {
-            s_config.txqueueempty.callback(s_config.txqueueempty.arg);
-        }
+        // the execution of the callback is protected
+        candata.config.txqueueempty.execute();
         return; // resOK;
     }
     
-    Frame& frame = s_Qtx->front();
+    Frame& frame = candata.Qtx->front();
     
     HAL_StatusTypeDef res = HAL_ERROR;
 
     #if defined(STM32HAL_HAS_CAN_API_V183)
-    HAL_CAN_ActivateNotification(&hcan1, CAN_IT_TX_MAILBOX_EMPTY);
+    HAL_CAN_ActivateNotification(candata.handle, CAN_IT_TX_MAILBOX_EMPTY);
     uint32_t TxMailboxNum;
-    TxMessage.StdId = frame.id & 0x7FF;
-    TxMessage.DLC = frame.size;
-    res = HAL_CAN_AddTxMessage(hcan, &TxMessage, frame.data, &TxMailboxNum); //copies frame into mailbox and enable interrupt
+    candata.TxMessage.StdId = frame.id & 0x7FF;
+    candata.TxMessage.DLC = frame.size;
+    res = HAL_CAN_AddTxMessage(hcan, &candata.TxMessage, frame.data, &TxMailboxNum); //copies frame into mailbox and enable interrupt
     //currently I don't take care of the number of tx mail box used (TxMailboxNum)
     #else         
     //1) copy frame to hal memory
@@ -283,12 +223,10 @@ static void can::s_transmit(CAN_HandleTypeDef *hcan)
     if(res == HAL_OK)
     {
         //3) if transmission is ok, than I remove the frame from tx queue
-        vector<Frame>::iterator b = s_Qtx->begin();
-        s_Qtx->erase(b);
-        if(nullptr != s_config.ontxframe.callback)
-        {
-            s_config.ontxframe.callback(s_config.ontxframe.arg);
-        }
+        vector<Frame>::iterator b = candata.Qtx->begin();
+        candata.Qtx->erase(b);
+        // the execution of the callback is protected
+        candata.config.ontxframe.execute();
     }
     else
     {
@@ -303,9 +241,8 @@ static void can::s_transmit(CAN_HandleTypeDef *hcan)
 void can::callbackOnTXcompletion(CAN_HandleTypeDef* hcan)
 {
     //this function is called inside IRQ handler of stm32hal, so hcan could be can1 or can2.
-    //therefore i need to check that the interrupt is on the peritherical I already initted.
-    
-    if( (hcan == (&hcan1)) && initialised(Port::one) )
+    //therefore i need to check that the interrupt is on the peritherical I already initted.    
+    if( (hcan == (candata.handle)) && initialised(embot::hw::CAN::one) )
     {
         s_transmit(hcan);
     }
@@ -315,10 +252,10 @@ void can::callbackOnTXcompletion(CAN_HandleTypeDef* hcan)
 void can::callbackOnRXcompletion(CAN_HandleTypeDef* hcan)
 {
     //to make better
-    if(hcan != (&hcan1))
+    if(hcan != (candata.handle))
         return;
     
-    if(false == initialised(Port::one))
+    if(false == initialised(embot::hw::CAN::one))
     {
         return;
     }
@@ -326,29 +263,27 @@ void can::callbackOnRXcompletion(CAN_HandleTypeDef* hcan)
     Frame rxframe;
 
 #if defined(STM32HAL_HAS_CAN_API_V183)
-    HAL_StatusTypeDef res = HAL_CAN_GetRxMessage (hcan, CAN_RX_FIFO0, &RxMessage, rxframe.data);
+    HAL_StatusTypeDef res = HAL_CAN_GetRxMessage (hcan, CAN_RX_FIFO0, &candata.RxMessage, rxframe.data);
     /*
         if(res!=HAL_OK) dai errore
      */
-    rxframe.id = RxMessage.StdId;
-    rxframe.size = RxMessage.DLC;
+    rxframe.id = candata.RxMessage.StdId;
+    rxframe.size = candata.RxMessage.DLC;
 #else          
     rxframe.id = hcan->pRxMsg->StdId;
     rxframe.size = hcan->pRxMsg->DLC;
     memcpy(rxframe.data, hcan->pRxMsg->Data, rxframe.size);
 #endif        
     
-    if(s_rxQ->size() == s_config.rxcapacity)
+    if(candata.rxQ->size() == candata.config.rxcapacity)
     {
         //remove the oldest frame
-        s_rxQ->erase(s_rxQ->begin());
+        candata.rxQ->erase(candata.rxQ->begin());
     }
-    s_rxQ->push_back(rxframe);
+    candata.rxQ->push_back(rxframe);
     
-    if(nullptr != s_config.onrxframe.callback)
-    {
-        s_config.onrxframe.callback(s_config.onrxframe.arg);
-    }
+    // the execution of a callback is protected
+    candata.config.onrxframe.execute();
     
 }
     
@@ -361,7 +296,7 @@ void can::callbackOnError(CAN_HandleTypeDef* hcan)
 
 
     
-result_t can::init(Port p, const Config &config)
+result_t can::init(embot::hw::CAN p, const Config &config)
 {
     if(false == supported(p))
     {
@@ -373,28 +308,31 @@ result_t can::init(Port p, const Config &config)
         return resOK;
     }
     
-    s_config = config;
+    candata.config = config;
+    candata.handle = reinterpret_cast<CAN_HandleTypeDef*>(embot::hw::bsp::can::getMAP()->getprops(p)->handle);
 
     //configure txframe like a data frame with standard ID. (we never use ext or remote frames)
-    TxMessage.ExtId = 0;
-    TxMessage.IDE = CAN_ID_STD;
-    TxMessage.RTR = CAN_RTR_DATA;
+    candata.TxMessage.ExtId = 0;
+    candata.TxMessage.IDE = CAN_ID_STD;
+    candata.TxMessage.RTR = CAN_RTR_DATA;
     #if defined(STM32HAL_HAS_CAN_API_V183)
     // hal doesn't need memory
     #else
     //gives memeory to HAL
-    hcan1.pTxMsg = &TxMessage;
-    hcan1.pRxMsg = &RxMessage;    
+    candata.handle->pTxMsg = &candata.TxMessage;
+    candata.handle->pRxMsg = &candata.RxMessage;    
     #endif
+    
     // init peripheral
-    MX_CAN1_Init();
+    //MX_CAN1_Init();
+    embot::hw::bsp::can::getMAP()->init(p);
     
     // do whatever else is required .... for instance... init the buffers.
     
-    s_Qtx = new std::vector<Frame>;
-    s_rxQ = new std::vector<Frame>;
-    s_Qtx->reserve(config.txcapacity);
-    s_rxQ->reserve(config.rxcapacity);
+    candata.Qtx = new std::vector<Frame>;
+    candata.rxQ = new std::vector<Frame>;
+    candata.Qtx->reserve(config.txcapacity);
+    candata.rxQ->reserve(config.rxcapacity);
               
     /*##-2- Configure the CAN Filter ###########################################*/
     #if defined(STM32HAL_HAS_CAN_API_V183)
@@ -418,31 +356,31 @@ result_t can::init(Port p, const Config &config)
     sFilterConfig.FilterNumber = 0;
     sFilterConfig.BankNumber = 14;
     #endif
-    if(HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig) != HAL_OK)
+    if(HAL_CAN_ConfigFilter(candata.handle, &sFilterConfig) != HAL_OK)
     {
     
     }
 
     #if defined(STM32HAL_HAS_CAN_API_V183)
-    if(HAL_OK != HAL_CAN_RegisterCallback(&hcan1, HAL_CAN_TX_MAILBOX0_COMPLETE_CB_ID, can::callbackOnTXcompletion))
+    if(HAL_OK != HAL_CAN_RegisterCallback(candata.handle, HAL_CAN_TX_MAILBOX0_COMPLETE_CB_ID, can::callbackOnTXcompletion))
         return resNOK; //TODO: adding clear of vector
-    if(HAL_OK != HAL_CAN_RegisterCallback(&hcan1, HAL_CAN_TX_MAILBOX1_COMPLETE_CB_ID, can::callbackOnTXcompletion))
+    if(HAL_OK != HAL_CAN_RegisterCallback(candata.handle, HAL_CAN_TX_MAILBOX1_COMPLETE_CB_ID, can::callbackOnTXcompletion))
         return resNOK; //TODO: adding clear of vector
-    if(HAL_OK != HAL_CAN_RegisterCallback(&hcan1, HAL_CAN_TX_MAILBOX2_COMPLETE_CB_ID, can::callbackOnTXcompletion))
+    if(HAL_OK != HAL_CAN_RegisterCallback(candata.handle, HAL_CAN_TX_MAILBOX2_COMPLETE_CB_ID, can::callbackOnTXcompletion))
         return resNOK; //TODO: adding clear of vector
-    if(HAL_OK != HAL_CAN_RegisterCallback(&hcan1, HAL_CAN_RX_FIFO0_MSG_PENDING_CB_ID, can::callbackOnRXcompletion))
+    if(HAL_OK != HAL_CAN_RegisterCallback(candata.handle, HAL_CAN_RX_FIFO0_MSG_PENDING_CB_ID, can::callbackOnRXcompletion))
         return resNOK; //TODO: adding clear of vector
-    if(HAL_OK != HAL_CAN_Start(&hcan1))
+    if(HAL_OK != HAL_CAN_Start(candata.handle))
         return resNOK; //TODO: adding clear of vector
     #endif
     
-    embot::binary::bit::set(initialisedmask, port2index(p));
+    embot::binary::bit::set(initialisedmask, embot::hw::bsp::can::MAP::toindex(p));
 
     return resOK;
 
 }
 
-result_t can::enable(Port p)
+result_t can::enable(embot::hw::CAN p)
 {
     if(false == initialised(p))
     {
@@ -455,7 +393,7 @@ result_t can::enable(Port p)
 }
 
 
-result_t can::disable(Port p)
+result_t can::disable(embot::hw::CAN p)
 {
     if(false == initialised(p))
     {
@@ -467,7 +405,7 @@ result_t can::disable(Port p)
     return resOK;                  
 }    
 
-result_t can::put(Port p, const Frame &frame)
+result_t can::put(embot::hw::CAN p, const Frame &frame)
 {
     if(false == initialised(p))
     {
@@ -476,12 +414,12 @@ result_t can::put(Port p, const Frame &frame)
     
     uint8_t tx_is_enabled = can::interrupt_TX_is_enabled();
     can::interrupt_TX_disable();
-    if(s_Qtx->size() == s_config.txcapacity)
+    if(candata.Qtx->size() == candata.config.txcapacity)
     {
-        s_Qtx->erase(s_Qtx->begin());
+        candata.Qtx->erase(candata.Qtx->begin());
     }
     
-    s_Qtx->push_back(frame);
+    candata.Qtx->push_back(frame);
     
     if(tx_is_enabled)
     {
@@ -493,7 +431,7 @@ result_t can::put(Port p, const Frame &frame)
 
 
 
-std::uint8_t can::outputqueuesize(Port p)
+std::uint8_t can::outputqueuesize(embot::hw::CAN p)
 {
     if(false == initialised(p))
     {
@@ -502,7 +440,7 @@ std::uint8_t can::outputqueuesize(Port p)
     
     uint8_t tx_is_enabled = can::interrupt_TX_is_enabled();
     can::interrupt_TX_disable();
-    uint8_t size = s_Qtx->size();
+    uint8_t size = candata.Qtx->size();
     if(tx_is_enabled)
     {
         can::interrupt_TX_enable();
@@ -512,7 +450,7 @@ std::uint8_t can::outputqueuesize(Port p)
 
 }
 
-std::uint8_t can::inputqueuesize(Port p)
+std::uint8_t can::inputqueuesize(embot::hw::CAN p)
 {
     if(false == initialised(p))
     {
@@ -523,7 +461,7 @@ std::uint8_t can::inputqueuesize(Port p)
     
     can::interrupt_RX_disable();       
     
-    size = s_rxQ->size();
+    size = candata.rxQ->size();
     
     can::interrupt_RX_enable();
 
@@ -533,16 +471,16 @@ std::uint8_t can::inputqueuesize(Port p)
 
 
 
-result_t can::transmit(Port p)
+result_t can::transmit(embot::hw::CAN p)
 {
     if(false == initialised(p))
     {
         return resNOK;
     } 
 
-    if(Port::one == p)
+    if(embot::hw::CAN::one == p)
     {
-        can::s_transmit(&hcan1);
+        can::s_transmit(candata.handle);
         return resOK;
     }
     else
@@ -553,7 +491,7 @@ result_t can::transmit(Port p)
 
 
 
-result_t can::get(Port p, Frame &frame, std::uint8_t &remaining)
+result_t can::get(embot::hw::CAN p, Frame &frame, std::uint8_t &remaining)
 {
     if(false == initialised(p))
     {
@@ -563,7 +501,7 @@ result_t can::get(Port p, Frame &frame, std::uint8_t &remaining)
     bool empty = true;
     can::interrupt_RX_disable();
     
-    empty = s_rxQ->empty();
+    empty = candata.rxQ->empty();
     
     can::interrupt_RX_enable();
    
@@ -575,9 +513,9 @@ result_t can::get(Port p, Frame &frame, std::uint8_t &remaining)
     
    can::interrupt_RX_disable();
     
-    frame = s_rxQ->front();        
-    s_rxQ->erase(s_rxQ->begin());
-    remaining = s_rxQ->size();
+    frame = candata.rxQ->front();        
+    candata.rxQ->erase(candata.rxQ->begin());
+    remaining = candata.rxQ->size();
     
     can::interrupt_RX_enable();
           
@@ -585,9 +523,9 @@ result_t can::get(Port p, Frame &frame, std::uint8_t &remaining)
 }
 
 
-result_t can::setfilters(Port p, std::uint8_t address)
+result_t can::setfilters(embot::hw::CAN p, std::uint8_t address)
 {
-    if(false ==  supported(p))
+    if(false == supported(p))
     {
         return resNOK;
     } 
@@ -614,7 +552,7 @@ result_t can::setfilters(Port p, std::uint8_t address)
     sFilterConfig.FilterNumber = 0;
     sFilterConfig.BankNumber = 0;
     #endif
-    if(HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig) != HAL_OK)
+    if(HAL_CAN_ConfigFilter(candata.handle, &sFilterConfig) != HAL_OK)
     {
         return resNOK;
     }
@@ -632,7 +570,7 @@ result_t can::setfilters(Port p, std::uint8_t address)
     sFilterConfig.FilterNumber = 1;
     sFilterConfig.BankNumber = 0;
     #endif
-    if(HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig) != HAL_OK)
+    if(HAL_CAN_ConfigFilter(candata.handle, &sFilterConfig) != HAL_OK)
     {
         return resNOK;
     }
@@ -652,7 +590,7 @@ result_t can::setfilters(Port p, std::uint8_t address)
     sFilterConfig.BankNumber = 1;
     #endif
 
-    if(HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig) != HAL_OK)
+    if(HAL_CAN_ConfigFilter(candata.handle, &sFilterConfig) != HAL_OK)
     {
         return resNOK;
     }
@@ -670,7 +608,7 @@ result_t can::setfilters(Port p, std::uint8_t address)
     sFilterConfig.FilterNumber = 3;
     sFilterConfig.BankNumber = 1;
     #endif
-    if(HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig) != HAL_OK)
+    if(HAL_CAN_ConfigFilter(candata.handle, &sFilterConfig) != HAL_OK)
     {
         return resNOK;
     }
@@ -690,7 +628,7 @@ result_t can::setfilters(Port p, std::uint8_t address)
     sFilterConfig.BankNumber = 2;
     #endif
 
-    if(HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig) != HAL_OK)
+    if(HAL_CAN_ConfigFilter(candata.handle, &sFilterConfig) != HAL_OK)
     {
         return resNOK;
     }
@@ -709,7 +647,7 @@ result_t can::setfilters(Port p, std::uint8_t address)
     sFilterConfig.BankNumber = 2;
     #endif
     
-    if(HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig) != HAL_OK)
+    if(HAL_CAN_ConfigFilter(candata.handle, &sFilterConfig) != HAL_OK)
     {
         return resNOK;
     }
@@ -721,19 +659,8 @@ result_t can::setfilters(Port p, std::uint8_t address)
 
 // - stm32hal.lib needs some handlers being compiled in here: IRQ handlers and callbacks.
 
-#if defined(STM32HAL_HAS_CAN1)
+// IRQ handlers are in hw bsp file
 
-void CAN1_TX_IRQHandler(void)
-{
-    HAL_CAN_IRQHandler(&hcan1);
-}
-
-void CAN1_RX0_IRQHandler(void)
-{
-    HAL_CAN_IRQHandler(&hcan1);
-}
-
-#endif
 
 #if defined(STM32HAL_HAS_CAN_API_V183)
 ////with this version of API we can register the callback dinamically, but currently I kept the old style.

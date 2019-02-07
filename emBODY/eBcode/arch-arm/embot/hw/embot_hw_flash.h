@@ -23,14 +23,22 @@
 #define _EMBOT_HW_FLASH_H_
 
 #include "embot_common.h"
-
+#include "embot_hw.h"
 
 namespace embot { namespace hw { namespace flash {
-      
-    extern const std::uint32_t startOfFLASH;
-    extern const std::uint32_t sizeOfFLASH;
-    extern const std::uint32_t sizeOfPAGE;
-    extern const std::uint32_t maxNumOfPAGEs;
+    
+    struct Partition
+    {
+        std::uint32_t   address;
+        std::uint32_t   maxsize; 
+        std::uint32_t   pagesize; 
+        bool isvalid() const { if((0 == address) || (0 == maxsize) || (0 == pagesize)) { return false; } else { return true; } }
+    }; 
+    
+   
+    const Partition& getpartition(embot::hw::FLASH fl);
+    
+    // the following functions use embot::hw::FLASH::whole
     
     bool isaddressvalid(std::uint32_t address);    
     std::uint32_t address2page(std::uint32_t address); // returns [0, maxNumOfPAGEs). if address not valid, it returns maxNumOfPAGEs.

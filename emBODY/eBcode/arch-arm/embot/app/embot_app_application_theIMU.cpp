@@ -191,14 +191,16 @@ bool embot::app::application::theIMU::Impl::start()
 { 
     if(true == legacymode)
     {
-        ticktimer->start(canlegacyconfig.accgyroinfo.txperiod, embot::sys::Timer::Type::forever, action);
+        embot::sys::Timer::Config cfg(canlegacyconfig.accgyroinfo.txperiod, action, embot::sys::Timer::Mode::forever);
+        ticktimer->start(cfg);
         ticking = true;    
         return true;
     }
     else
     {
         canrevisitedconfig.counter = 0;
-        ticktimer->start(canrevisitedconfig.txperiod, embot::sys::Timer::Type::forever, action);
+        embot::sys::Timer::Config cfg(canrevisitedconfig.txperiod, action, embot::sys::Timer::Mode::forever);
+        ticktimer->start(cfg);
         ticking = true;    
         return true;        
     }
@@ -486,18 +488,27 @@ bool embot::app::application::theIMU::Impl::acquisition_processing()
 
 
 
-embot::app::application::theIMU::theIMU()
-: pImpl(new Impl)
-{       
-
+embot::app::application::theIMU& embot::app::application::theIMU::getInstance()
+{
+    static theIMU* p = new theIMU();
+    return *p;
 }
+
+embot::app::application::theIMU::theIMU()
+//    : pImpl(new Impl)
+{
+    pImpl = std::make_unique<Impl>();
+}  
+
+    
+embot::app::application::theIMU::~theIMU() { }
 
          
 bool embot::app::application::theIMU::initialise(Config &config)
 {
     pImpl->config = config;
     
-    pImpl->action.set(embot::sys::Action::EventToTask(pImpl->config.tickevent, pImpl->config.totask));
+    pImpl->action.load(embot::sys::EventToTask(pImpl->config.tickevent, pImpl->config.totask));
    
     embot::hw::BNO055::init(pImpl->config.sensor, pImpl->config.sensorconfig); 
     embot::hw::BNO055::set(pImpl->config.sensor, embot::hw::BNO055::Mode::NDOF, 5*embot::common::time1millisec);

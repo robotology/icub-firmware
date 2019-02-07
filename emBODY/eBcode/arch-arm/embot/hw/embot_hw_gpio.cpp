@@ -34,6 +34,7 @@
 
 using namespace std;
 
+#include "embot_hw_bsp.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -49,12 +50,12 @@ namespace embot { namespace hw { namespace gpio {
 
 #if     !defined(HAL_GPIO_MODULE_ENABLED)
 
-    result_t configure(const GPIO &g, Mode m)      { return resNOK; }      
-    result_t set(const GPIO &g, State s)        { return resNOK; }
+    result_t configure(const embot::hw::GPIO &g, Mode m)      { return resNOK; }      
+    result_t set(const embot::hw::GPIO &g, State s)        { return resNOK; }
     
 #else    
    
-    result_t configure(const GPIO &g, Mode m)
+    result_t configure(const embot::hw::GPIO &g, Mode m)
     {
         // caveat: HAL_GPIO_* use u16, and all macros are u16, whereas LL_GPIO_* use u32 
         if(m == Mode::OUTPUTopendrain)
@@ -70,9 +71,9 @@ namespace embot { namespace hw { namespace gpio {
         return resOK;
     }  
     
-    result_t set(const GPIO &g, State s)
+    result_t set(const embot::hw::GPIO &g, State s)
     {
-        if(false == g.isvalid())
+        if(false == embot::hw::bsp::gpio::getMAP()->isvalid(g))
         {
             return resNOK;
         }
@@ -80,9 +81,9 @@ namespace embot { namespace hw { namespace gpio {
         return resOK;        
     }
     
-    State get(const GPIO &g)
+    State get(const embot::hw::GPIO &g)
     {
-        if(false == g.isvalid())
+        if(false == embot::hw::bsp::gpio::getMAP()->isvalid(g))
         {
             return State::RESET;
         }

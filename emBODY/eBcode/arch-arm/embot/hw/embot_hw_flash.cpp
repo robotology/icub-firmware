@@ -22,15 +22,15 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "embot_hw_flash.h"
-#include "stm32hal.h"
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-#include <cstring>
-#include <vector>
+#include "stm32hal.h"
+#include "embot_hw_bsp.h"
 
 using namespace std;
 
@@ -47,43 +47,49 @@ using namespace std;
 
 
 namespace embot { namespace hw { namespace flash {
-      
     
-#if     defined(STM32HAL_BOARD_NUCLEO64)
+    const Partition& getpartition(embot::hw::FLASH fl)
+    {
+        return embot::hw::bsp::flash::getMAP()->getpartition(fl);         
+    }
+        
     
-    const std::uint32_t startOfFLASH            = 0x08000000;
-    const std::uint32_t sizeOfFLASH             = 1024*1024;
-    const std::uint32_t sizeOfPAGE              = 2*1024;
-    const std::uint32_t maxNumOfPAGEs           = 512; 
-    
-#elif   defined(STM32HAL_BOARD_MTB4)
+//#if     defined(STM32HAL_BOARD_NUCLEO64)
+//    
+//    const std::uint32_t startOfFLASH            = 0x08000000;
+//    const std::uint32_t sizeOfFLASH             = 1024*1024;
+//    const std::uint32_t sizeOfPAGE              = 2*1024;
+//    const std::uint32_t maxNumOfPAGEs           = 512; 
+//    
+//#elif   defined(STM32HAL_BOARD_MTB4)
 
-    const std::uint32_t startOfFLASH            = 0x08000000;
-    const std::uint32_t sizeOfFLASH             = 256*1024;
-    const std::uint32_t sizeOfPAGE              = 2*1024;
-    const std::uint32_t maxNumOfPAGEs           = 128;    
-    
-#elif   defined(STM32HAL_BOARD_STRAIN2)
+//    const std::uint32_t startOfFLASH            = 0x08000000;
+//    const std::uint32_t sizeOfFLASH             = 256*1024;
+//    const std::uint32_t sizeOfPAGE              = 2*1024;
+//    const std::uint32_t maxNumOfPAGEs           = 128;    
+//    
+//#elif   defined(STM32HAL_BOARD_STRAIN2)
 
-    const std::uint32_t startOfFLASH            = 0x08000000;
-    const std::uint32_t sizeOfFLASH             = 256*1024;
-    const std::uint32_t sizeOfPAGE              = 2*1024;
-    const std::uint32_t maxNumOfPAGEs           = 128;     
+//    const std::uint32_t startOfFLASH            = 0x08000000;
+//    const std::uint32_t sizeOfFLASH             = 256*1024;
+//    const std::uint32_t sizeOfPAGE              = 2*1024;
+//    const std::uint32_t maxNumOfPAGEs           = 128;     
 
-#elif   defined(STM32HAL_BOARD_RFE)
+//#elif   defined(STM32HAL_BOARD_RFE)
 
-    const std::uint32_t startOfFLASH            = 0x08000000;
-    const std::uint32_t sizeOfFLASH             = 256*1024;
-    const std::uint32_t sizeOfPAGE              = 2*1024;
-    const std::uint32_t maxNumOfPAGEs           = 128;     
+//    const std::uint32_t startOfFLASH            = 0x08000000;
+//    const std::uint32_t sizeOfFLASH             = 256*1024;
+//    const std::uint32_t sizeOfPAGE              = 2*1024;
+//    const std::uint32_t maxNumOfPAGEs           = 128;     
 
-#else
-    #error embot::hw::flash::startOfFLASH etc must be defined 
-#endif    
+//#else
+//    #error embot::hw::flash::startOfFLASH etc must be defined 
+//#endif    
     
     bool isaddressvalid(std::uint32_t address)
     {
-        if((address >= startOfFLASH) && (address < (startOfFLASH+sizeOfFLASH)))
+        const embot::hw::flash::Partition &part = embot::hw::flash::getpartition(embot::hw::FLASH::whole);
+        if((address >= part.address) && (address < (part.address+part.maxsize)))
         {
             return true;
         }
@@ -92,17 +98,22 @@ namespace embot { namespace hw { namespace flash {
     
     std::uint32_t address2page(std::uint32_t address)
     {
+        const embot::hw::flash::Partition &part = embot::hw::flash::getpartition(embot::hw::FLASH::whole);
+            
         if(false == isaddressvalid(address))
         {
+            const std::uint32_t maxNumOfPAGEs = part.maxsize/part.pagesize;
             return maxNumOfPAGEs;
         }
         
-        return ((address - startOfFLASH) % sizeOfPAGE);
+        return ((address - part.address) % part.pagesize);
     }
 
     
     bool erase(std::uint32_t page)
     {
+        const embot::hw::flash::Partition &part = embot::hw::flash::getpartition(embot::hw::FLASH::whole);
+        const std::uint32_t maxNumOfPAGEs = part.maxsize/part.pagesize;
         if(page >= maxNumOfPAGEs)
         {
             return false;
@@ -192,11 +203,12 @@ namespace embot { namespace hw { namespace flash {
             return false;
         }
 
+        const embot::hw::flash::Partition part = embot::hw::flash::getpartition(embot::hw::FLASH::whole);
         
         HAL_FLASH_Unlock();
     
         uint32_t tmpadr = address;
-        uint32_t n64bitwords = sizeOfPAGE / 8;
+        uint32_t n64bitwords = part.maxsize / 8;
         const uint64_t *buffer = reinterpret_cast<const std::uint64_t*>(data);
         for(uint32_t i=0; i<n64bitwords; i++)
         {

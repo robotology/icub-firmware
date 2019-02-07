@@ -31,19 +31,17 @@
 
 #include "embot_app_canprotocol_analog_polling.h"
 
-namespace embot { namespace hw { namespace PGA308 {
+namespace embot { namespace hw { namespace pga308 {
      
-    
-    enum class Amplifier { one = 0, two = 1, three = 2, four = 3, five = 4, six = 5, none = 32, all = 33, maxnumberof = 6};
         
     struct Config
     {   // each amplifier uses a separate channel of onewire communication
-        embot::hw::gpio::GPIO           powerongpio; 
-        embot::hw::gpio::State          poweronstate; 
-        embot::hw::onewire::Channel     onewirechannel;
-        embot::hw::onewire::Config      onewireconfig;          
-        Config() : powerongpio(nullptr, 0), poweronstate(embot::hw::gpio::State::SET), onewirechannel(embot::hw::onewire::Channel::one) {}
-        Config(const embot::hw::gpio::GPIO &_pon, const embot::hw::gpio::State _ps, const embot::hw::onewire::Channel _owch, const embot::hw::onewire::Config &_owco)
+        embot::hw::GPIO             powerongpio; 
+        embot::hw::gpio::State      poweronstate; 
+        embot::hw::ONEWIRE          onewirechannel;
+        embot::hw::onewire::Config  onewireconfig;          
+        Config() : powerongpio(nullptr, 0), poweronstate(embot::hw::gpio::State::SET), onewirechannel(embot::hw::ONEWIRE::one) {}
+        Config(const embot::hw::GPIO &_pon, const embot::hw::gpio::State _ps, const embot::hw::ONEWIRE _owch, const embot::hw::onewire::Config &_owco)
         {
             powerongpio = _pon;
             poweronstate = _ps;
@@ -488,34 +486,34 @@ namespace embot { namespace hw { namespace PGA308 {
     
     
     
-    bool supported(Amplifier a);
+    bool supported(PGA308 a);
     
-    bool initialised(Amplifier a);
+    bool initialised(PGA308 a);
     
     // inits onewire, set default value of registers 
-    result_t init(Amplifier a, const Config &config);
+    result_t init(PGA308 a, const Config &config);
     
     // sets default again
-    result_t setdefault(Amplifier a);
+    result_t setdefault(PGA308 a);
 
     // loads a transfer function (maybe obtained over can bus from the canloader)   
-    result_t set(Amplifier a, const TransferFunctionConfig &tfconfig);
+    result_t set(PGA308 a, const TransferFunctionConfig &tfconfig);
     
     // loads only one parameter of the transfer function. the selection of the proper register and formation of value is done inetrnally
-    result_t set(Amplifier a, const TransferFunctionConfig::Parameter par, const std::uint16_t value);
+    result_t set(PGA308 a, const TransferFunctionConfig::Parameter par, const std::uint16_t value);
     
     // retrieve the used transfer function (maybe to be sent over can bus to teh canloader)
-    result_t get(Amplifier a, TransferFunctionConfig &tfconfig);
+    result_t get(PGA308 a, TransferFunctionConfig &tfconfig);
     
     // sets the register inside the amplifier. for value use GDACregister.value or similar 
-    result_t set(Amplifier a, const RegisterAddress address, const std::uint16_t value);
+    result_t set(PGA308 a, const RegisterAddress address, const std::uint16_t value);
     
     // retrieves the value of the specified register ... or rather, its buffered value ..
-    result_t get(Amplifier a, const RegisterAddress address, std::uint16_t &value);
+    result_t get(PGA308 a, const RegisterAddress address, std::uint16_t &value);
 
     
  
-}}} // namespace embot { namespace hw { namespace PGA308 {
+}}} // namespace embot { namespace hw { namespace pga308 {
     
 
 

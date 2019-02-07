@@ -33,7 +33,7 @@ namespace embot { namespace hw {
     {
     public:
         
-        FlashBurner(std::uint32_t start = embot::hw::sys::addressOfApplication, std::uint32_t size = embot::hw::sys::maxsizeOfApplication, std::uint32_t buffersize = 2048, std::uint64_t *buffer = nullptr);
+        FlashBurner(std::uint32_t start, std::uint32_t size, std::uint32_t buffersize = 2048, std::uint64_t *buffer = nullptr);
         ~FlashBurner();
      
         // it adds inside a buffer the specified data. the object will write according to internal rules.

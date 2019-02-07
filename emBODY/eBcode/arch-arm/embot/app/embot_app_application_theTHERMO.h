@@ -22,46 +22,37 @@
 #define _EMBOT_APP_APPLICATION_THETHERMO_H_
 
 #include "embot_common.h"
-
 #include "embot_hw.h"
-
 #include "embot_sys.h"
-
 #include "embot_app_canprotocol.h"
 #include "embot_app_canprotocol_analog_polling.h"
 #include "embot_app_canprotocol_analog_periodic.h"
-
 #include "embot_hw_si7051.h"
-
-
 #include <vector>
+#include <memory>
 
 namespace embot { namespace app { namespace application {
            
     class theTHERMO
     {
     public:
-        static theTHERMO& getInstance()
-        {
-            static theTHERMO* p = new theTHERMO();
-            return *p;
-        }
+        static theTHERMO& getInstance();
         
         
     public:
         struct Config
         {
-            embot::hw::SI7051::Sensor   sensor;
-            embot::hw::SI7051::Config   sensorconfig;            
+            embot::hw::SI7051           sensor;
+            embot::hw::si7051::Config   sensorconfig;            
             embot::common::Event        tickevent;
             embot::common::Event        datareadyevent;
             embot::sys::Task*           totask;
             Config() :  
-                sensor(embot::hw::SI7051::Sensor::one), 
-                sensorconfig(embot::hw::SI7051::Config(embot::hw::i2c::Descriptor(embot::hw::i2c::Bus::one, 400000))),  
+                sensor(embot::hw::SI7051::one), 
+                sensorconfig(embot::hw::si7051::Config(embot::hw::i2c::Descriptor(embot::hw::I2C::one, 400000))),  
                 tickevent(0), datareadyevent(0), totask(nullptr) 
                 {}
-            Config(embot::hw::SI7051::Sensor _s, const embot::hw::SI7051::Config& _sc, embot::common::Event _te, embot::common::Event _de, embot::sys::Task* _ts) : 
+            Config(embot::hw::SI7051 _s, const embot::hw::si7051::Config& _sc, embot::common::Event _te, embot::common::Event _de, embot::sys::Task* _ts) : 
                 sensor(_s),
                 sensorconfig(_sc),
                 tickevent(_te), 
@@ -85,17 +76,12 @@ namespace embot { namespace app { namespace application {
 
     private:
         theTHERMO(); 
+        ~theTHERMO(); 
 
-    public:
-        // remove copy constructors and copy assignment operators
-        theTHERMO(const theTHERMO&) = delete;
-        theTHERMO(theTHERMO&) = delete;
-        void operator=(const theTHERMO&) = delete;
-        void operator=(theTHERMO&) = delete;
 
     private:    
         struct Impl;
-        Impl *pImpl;        
+        std::unique_ptr<Impl> pImpl;    
     };       
 
 

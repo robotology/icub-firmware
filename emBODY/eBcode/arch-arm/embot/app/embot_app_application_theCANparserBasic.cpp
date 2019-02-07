@@ -35,11 +35,9 @@
 
 #include <new>
 
-#include "embot_sys_theJumper.h"
-#include "embot_sys_Timer.h"
-
 #include "embot_hw.h"
 #include "embot_hw_sys.h"
+#include "embot_hw_can.h"
 #include "embot_app_canprotocol.h"
 #include "embot_app_canprotocol_bootloader.h"
 #include "embot_app_canprotocol_motor_periodic.h"
@@ -48,7 +46,7 @@
 #include "embot_app_canprotocol_analog_polling.h"
 
 #include "embot_app_theCANboardInfo.h"
-
+#include "embot_app_theJumper.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -133,7 +131,7 @@ struct embot::app::application::theCANparserBasic::Impl
         
         if(canaddress != target)
         {
-            if(embot::hw::resOK != embot::hw::can::setfilters(embot::hw::can::Port::one, target))
+            if(embot::hw::resOK != embot::hw::can::setfilters(embot::hw::CAN::one, target))
             {
                 return false;
             }
@@ -391,12 +389,22 @@ bool embot::app::application::theCANparserBasic::Impl::process_bl_setcanaddress(
 
 
 
-embot::app::application::theCANparserBasic::theCANparserBasic()
-: pImpl(new Impl)
-{       
-    embot::sys::theJumper& thejumper = embot::sys::theJumper::getInstance();
+
+embot::app::application::theCANparserBasic& embot::app::application::theCANparserBasic::getInstance()
+{
+    static theCANparserBasic* p = new theCANparserBasic();
+    return *p;
 }
 
+embot::app::application::theCANparserBasic::theCANparserBasic()
+//    : pImpl(new Impl)
+{
+    pImpl = std::make_unique<Impl>();
+    embot::app::theJumper& thejumper = embot::app::theJumper::getInstance();
+}  
+
+    
+embot::app::application::theCANparserBasic::~theCANparserBasic() { }
    
         
 bool embot::app::application::theCANparserBasic::initialise(Config &config)

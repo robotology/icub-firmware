@@ -18,19 +18,17 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef _EMBOT_SYS_THEJUMPER_H_
-#define _EMBOT_SYS_THEJUMPER_H_
+#ifndef _EMBOT_APP_THEJUMPER_H_
+#define _EMBOT_APP_THEJUMPER_H_
 
 #include "embot_common.h"
-
 #include "embot_sys.h"
-
 #include <new>
+#include <memory>
 
-namespace embot { namespace sys {
+namespace embot { namespace app {
     
-    
-    
+        
     class theJumper
     {
     public:
@@ -43,17 +41,7 @@ namespace embot { namespace sys {
     public:
         
         enum class Command { none = 0, jump = 1, stay = 2};
-        
-//        struct Config
-//        {
-//            embot::common::fpWorker             restart;
-//            embot::common::fp_bool_par_uint32   jump2;    
-//            Config() : restart(nullptr), jump2(nullptr) {}
-//            Config(embot::common::fpWorker _restart, embot::common::fp_bool_par_uint32 _jump2) : restart(_restart), jump2(_jump2) {}
-//        }; 
-//        
-//        bool init(Config &config);        
-        
+                      
         bool set(Command command, std::uint32_t param);
         Command get(std::uint32_t& param);
         bool jump(std::uint32_t address);   
@@ -78,7 +66,7 @@ namespace embot { namespace sys {
     };       
 
 
-}} // namespace embot { namespace sys {
+}} // namespace embot { namespace app {
 
 
 #endif  // include-guard

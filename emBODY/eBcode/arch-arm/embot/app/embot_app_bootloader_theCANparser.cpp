@@ -32,13 +32,9 @@
 #include "embot.h"
 #include "embot_common.h"
 #include "embot_binary.h"
-
 #include <new>
-
-#include "embot_sys_theJumper.h"
-#include "embot_sys_Timer.h"
-
 #include "embot_hw.h"
+#include "embot_hw_flash.h"
 #include "embot_app_canprotocol.h"
 #include "embot_app_canprotocol_bootloader.h"
 #include "embot_app_canprotocol_motor_polling.h"
@@ -47,7 +43,7 @@
 #include "embot_app_theBootloader.h"
 #include "embot_hw_FlashBurner.h"
 #include "embot_app_theCANboardInfo.h"
-
+#include "embot_app_theJumper.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -162,7 +158,7 @@ struct embot::app::bootloader::theCANparser::Impl
         
         if(canaddress != target)
         {
-            if(embot::hw::resOK != embot::hw::can::setfilters(embot::hw::can::Port::one, target))
+            if(embot::hw::resOK != embot::hw::can::setfilters(embot::hw::CAN::one, target))
             {
                 return false;
             }
@@ -564,13 +560,23 @@ bool embot::app::bootloader::theCANparser::Impl::process_bl_setcanaddress(const 
 
 
 
-embot::app::bootloader::theCANparser::theCANparser()
-: pImpl(new Impl)
-{       
-    embot::sys::theJumper& thejumper = embot::sys::theJumper::getInstance();
+
+embot::app::bootloader::theCANparser& embot::app::bootloader::theCANparser::getInstance()
+{
+    static theCANparser* p = new theCANparser();
+    return *p;
 }
 
-   
+embot::app::bootloader::theCANparser::theCANparser()
+//    : pImpl(new Impl)
+{
+    pImpl = std::make_unique<Impl>();
+    embot::app::theJumper& thejumper = embot::app::theJumper::getInstance();
+}  
+
+    
+embot::app::bootloader::theCANparser::~theCANparser() { }
+
         
 bool embot::app::bootloader::theCANparser::initialise(Config &config)
 {
@@ -593,18 +599,18 @@ bool embot::app::bootloader::theCANparser::initialise(Config &config)
            
     if(nullptr == pImpl->flashburner)
     {
-        std::uint32_t flashstart = embot::hw::sys::addressOfApplication;
-        std::uint32_t flashsize = embot::hw::sys::maxsizeOfApplication;
+        std::uint32_t flashstart = embot::hw::flash::getpartition(embot::hw::FLASH::application).address;
+        std::uint32_t flashsize = embot::hw::flash::getpartition(embot::hw::FLASH::application).maxsize;
 
         if(embot::app::canprotocol::Process::application == pImpl->config.owner)
         {
-            flashstart = embot::hw::sys::addressOfBootloader;
-            flashsize = embot::hw::sys::maxsizeOfBootloader;            
+            flashstart = embot::hw::flash::getpartition(embot::hw::FLASH::bootloader).address;
+            flashsize = embot::hw::flash::getpartition(embot::hw::FLASH::bootloader).maxsize;            
         }
         else
         {
-            flashstart = embot::hw::sys::addressOfApplication;
-            flashsize = embot::hw::sys::maxsizeOfApplication;            
+            flashstart = embot::hw::flash::getpartition(embot::hw::FLASH::application).address;
+            flashsize = embot::hw::flash::getpartition(embot::hw::FLASH::application).maxsize;            
         }
         
         pImpl->flashburner = new embot::hw::FlashBurner(flashstart, flashsize);

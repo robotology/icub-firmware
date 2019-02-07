@@ -22,64 +22,51 @@
 #define _EMBOT_SYS_THESCHEDULER_H_
 
 #include "embot_common.h"
-
 #include "embot_sys.h"
+#include <memory>
 
 namespace embot { namespace sys {
 
     class theScheduler
     {
     public:
-        static theScheduler& getInstance()
-        {
-            static theScheduler* p = new theScheduler();
-            return *p;
-        }
+        static theScheduler& getInstance();
         
     public:
+                
+        struct Timing
+        {
+            std::uint32_t       clockfrequency;     // it must be equal to the cpu speed expressed in hz: use embot::hw::sys::clock(embot::hw::sys::CLOCK::syscore)
+            common::relTime     ticktime;           // the resolution of the scheduler
+            Timing() : clockfrequency(168000000), ticktime(embot::common::time1millisec) {}
+            Timing(std::uint32_t c, common::relTime t = embot::common::time1millisec) : clockfrequency(c), ticktime(t) {}
+            void clear() { clockfrequency = 168000000; ticktime = embot::common::time1millisec; }
+            bool isvalid() const { if((0 == clockfrequency) || (0 == ticktime)) { return false; } else { return true; } }
+        };
+        
         struct Config
         {
-            std::uint32_t       clockfrequency;
-            common::relTime     ticktime;
-            common::fpWorker    launcher;
-            std::uint16_t       launcherstacksize;
-            common::fpWorker    onidle;
-            std::uint16_t       onidlestacksize;
-            common::fpWorker    onfatalerror;     
-            Config() 
-            {
-                clockfrequency = 168000000; ticktime = 1000; 
-                launcher = nullptr; launcherstacksize = 1024; 
-                onidle = nullptr; onidlestacksize = 512;
-                onfatalerror = nullptr;
-            }
-            void setTiming(std::uint32_t _clockfrequency, common::relTime _ticktime = 1000) { clockfrequency = _clockfrequency; ticktime = _ticktime; }
-            void setLauncher(common::fpWorker _launcher, std::uint16_t _launcherstacksize = 1024) { launcher = _launcher; launcherstacksize = _launcherstacksize; }
-            void setOnIdle(common::fpWorker _onidle, std::uint16_t _onidlestacksize = 512) { onidle = _onidle; onidlestacksize = _onidlestacksize; }
-            void setOnFatal(common::fpWorker _onfatalerror) { onfatalerror = _onfatalerror; }
+            Timing timing;
+            embot::sys::Operation oninit;
+            embot::sys::Operation onidle;
+            embot::sys::Operation onfatal;   // you may not specify it ...  
+            Config() {}
+            Config(const Timing &tim, const Operation &ini, const Operation &idl, const Operation &fat) : timing(tim), oninit(ini), onidle(idl), onfatal(fat) {}
+            bool isvalid() const { if((false == timing.isvalid()) || (false == oninit.isvalid()) || (false == onidle.isvalid())) { return false; } else { return true; } }
+            void clear() { timing.clear(); oninit.clear(); onidle.clear(); onfatal.clear(); }
         }; 
         
-        bool init(Config &config);  // can be called many times but not after start(). if so, it does nothing
         
-        void start();    // it does not return ... unless the scheduler is already started
+        bool start(const Config &config);    // it does not return ... unless the config is not valid
+        bool started() const;
         
-        bool isStarted();
-        
-//        common::relTime getTick();
-
     private:
         theScheduler();  
-
-    public:
-        // remove copy constructors and copy assignment operators 
-        theScheduler(const theScheduler&) = delete;
-        theScheduler(theScheduler&) = delete;
-        void operator=(const theScheduler&) = delete;
-        void operator=(theScheduler&) = delete;
+        ~theScheduler(); // i dont want a fool can delete it
 
     private:    
         struct Impl;
-        Impl *pImpl;        
+        std::unique_ptr<Impl> pImpl;   
     };   
 
 }} // namespace embot { namespace sys {

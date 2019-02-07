@@ -18,32 +18,25 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef _EMBOT_APP_APPLICATION_THECANTRACER_H_
-#define _EMBOT_APP_APPLICATION_THECANTRACER_H_
+#ifndef _EMBOT_APP_THECANTRACER_H_
+#define _EMBOT_APP_THECANTRACER_H_
 
 #include "embot_common.h"
-
 #include "embot_hw.h"
-
 #include "embot_sys.h"
-
 #include "embot_app_canprotocol.h"
+#include <memory>
 
 
 #include <vector>
 #include <string>
 
-namespace embot { namespace app { namespace application {
+namespace embot { namespace app {
            
     class theCANtracer
     {
     public:
-        static theCANtracer& getInstance()
-        {
-            static theCANtracer* p = new theCANtracer();
-            return *p;
-        }
-        
+        static theCANtracer& getInstance();        
         
     public:
         struct Config
@@ -62,21 +55,15 @@ namespace embot { namespace app { namespace application {
 
     private:
         theCANtracer(); 
-
-    public:
-        // remove copy constructors and copy assignment operators
-        theCANtracer(const theCANtracer&) = delete;
-        theCANtracer(theCANtracer&) = delete;
-        void operator=(const theCANtracer&) = delete;
-        void operator=(theCANtracer&) = delete;
+        ~theCANtracer();
 
     private:    
         struct Impl;
-        Impl *pImpl;        
+        std::unique_ptr<Impl> pImpl;        
     };       
 
 
-}}} // namespace embot { namespace app { namespace application
+}} // namespace embot { namespace app { 
 
 
 #endif  // include-guard

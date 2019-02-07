@@ -137,7 +137,7 @@ namespace embot { namespace hw { namespace BNO055 {
         embot::common::Data data;
         embot::common::Callback userdefCBK;  
         Acquisition() { clear(); }
-        void clear() { data.load(buffer, 0); done = false; ongoing = false; std::memset(buffer, 0, sizeof(buffer)); userdefCBK.callback = nullptr; userdefCBK.arg = nullptr; }         
+        void clear() { data.load(buffer, 0); done = false; ongoing = false; std::memset(buffer, 0, sizeof(buffer)); userdefCBK.clear(); }         
         void startread(std::uint8_t size, const embot::common::Callback &cbk) { clear(); data.size = size; userdefCBK = cbk; ongoing = true; }
         void startread(std::uint8_t size) { clear(); data.size = size; ongoing = true; }
         void startread(embot::common::Data &da, const embot::common::Callback &cbk) { clear(); data = da; userdefCBK = cbk; ongoing = true; }
@@ -159,19 +159,18 @@ namespace embot { namespace hw { namespace BNO055 {
     static const std::uint8_t i2caddress = 0x52;
 
     #if     defined(STM32HAL_BOARD_STRAIN2)
-        static const embot::hw::gpio::GPIO gpioBOOT(BNO055_BOOT_GPIO_Port, BNO055_BOOT_Pin);
-        static const embot::hw::gpio::GPIO gpioRESET(BNO055_RESET_GPIO_Port, BNO055_RESET_Pin);
+        static const embot::hw::GPIO gpioBOOT(BNO055_BOOT_GPIO_Port, BNO055_BOOT_Pin);
+        static const embot::hw::GPIO gpioRESET(BNO055_RESET_GPIO_Port, BNO055_RESET_Pin);
     #elif   defined(STM32HAL_BOARD_MTB4)
-        static const embot::hw::gpio::GPIO gpioBOOT(BNO055_BOOT_GPIO_Port, BNO055_BOOT_Pin);
-        static const embot::hw::gpio::GPIO gpioRESET(BNO055_RESET_GPIO_Port, BNO055_RESET_Pin);  
+        static const embot::hw:::GPIO gpioBOOT(BNO055_BOOT_GPIO_Port, BNO055_BOOT_Pin);
+        static const embot::hw:::GPIO gpioRESET(BNO055_RESET_GPIO_Port, BNO055_RESET_Pin);  
     #elif   defined(STM32HAL_BOARD_RFE)
-        static const embot::hw::gpio::GPIO gpioBOOT(BNO055_BOOT_GPIO_Port, BNO055_BOOT_Pin);
-        static const embot::hw::gpio::GPIO gpioRESET(BNO055_RESET_GPIO_Port, BNO055_RESET_Pin);     
+        static const embot::hw:::GPIO gpioBOOT(BNO055_BOOT_GPIO_Port, BNO055_BOOT_Pin);
+        static const embot::hw:::GPIO gpioRESET(BNO055_RESET_GPIO_Port, BNO055_RESET_Pin);     
     #endif
     
     static PrivateData s_privatedata;
-    
-//    static void s_powerOFF(void);    
+     
     static void s_powerON(embot::common::relTime waittime);    
     static result_t s_programregister(Sensor s, std::uint8_t reg, std::uint8_t val, embot::common::relTime timeout);    
     static result_t s_writeregister(Sensor s, std::uint8_t reg, std::uint8_t val, const embot::common::Callback &oncompletion);
