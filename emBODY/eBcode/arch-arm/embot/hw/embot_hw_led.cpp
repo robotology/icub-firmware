@@ -64,12 +64,12 @@ namespace embot { namespace hw { namespace led {
     
     bool supported(LED led)
     {
-        return embot::hw::bsp::led::getMAP()->supported(led);
+        return embot::hw::bsp::led::getBSP().supported(led);
     }
     
     bool initialised(LED led)
     {
-        return embot::binary::bit::check(initialisedmask, embot::hw::bsp::led::MAP::toindex(led));
+        return embot::binary::bit::check(initialisedmask, embot::common::tointegral(led));
     }
             
     result_t init(LED led)
@@ -84,14 +84,19 @@ namespace embot { namespace hw { namespace led {
             return resOK;
         }
         
-        // every led initalisation is done in the bsp ...
+        // typically every led initalisation is done in the bsp, but ...
+        // init peripheral
+        embot::hw::bsp::led::getBSP().init(led);
+                
         
         if(!embot::hw::bsp::initialised())
         {   // requires embot::hw::bsp::init()
             return resNOK;
         }
-                
-        embot::binary::bit::set(initialisedmask, embot::hw::bsp::led::MAP::toindex(led));
+        
+
+       
+        embot::binary::bit::set(initialisedmask, embot::common::tointegral(led));
         
         // we just switch it off        
         embot::hw::led::off(led);
@@ -107,8 +112,9 @@ namespace embot { namespace hw { namespace led {
         {
             return resNOK;
         }  
-        const embot::hw::GPIO *gpio = embot::hw::bsp::led::getMAP()->getgpio(led);      
-        HAL_GPIO_WritePin(static_cast<GPIO_TypeDef*>(gpio->port), static_cast<uint16_t>(gpio->pin), convert(embot::hw::bsp::led::getMAP()->on));
+        const embot::hw::GPIO *gpio = &embot::hw::bsp::led::getBSP().getPROP(led)->gpio;      
+        //HAL_GPIO_WritePin(static_cast<GPIO_TypeDef*>(gpio->port), static_cast<uint16_t>(gpio->pin), convert(embot::hw::bsp::led::getBSP().getPROP(led)->on));
+        embot::hw::gpio::set(*gpio, embot::hw::bsp::led::getBSP().getPROP(led)->on);  
         return resOK;        
     }
     
@@ -118,8 +124,9 @@ namespace embot { namespace hw { namespace led {
         {
             return resNOK;
         }  
-        const embot::hw::GPIO *gpio = embot::hw::bsp::led::getMAP()->getgpio(led);       
-        HAL_GPIO_WritePin(static_cast<GPIO_TypeDef*>(gpio->port), static_cast<uint16_t>(gpio->pin), convert(embot::hw::bsp::led::getMAP()->off));
+        const embot::hw::GPIO *gpio = &embot::hw::bsp::led::getBSP().getPROP(led)->gpio;       
+        //HAL_GPIO_WritePin(static_cast<GPIO_TypeDef*>(gpio->port), static_cast<uint16_t>(gpio->pin), convert(embot::hw::bsp::led::getBSP().getPROP(led)->off));
+        embot::hw::gpio::set(*gpio, embot::hw::bsp::led::getBSP().getPROP(led)->off);  
         return resOK;          
     }
     
@@ -129,8 +136,9 @@ namespace embot { namespace hw { namespace led {
         {
             return resNOK;
         }  
-        const embot::hw::GPIO *gpio = embot::hw::bsp::led::getMAP()->getgpio(led);       
-        HAL_GPIO_TogglePin(static_cast<GPIO_TypeDef*>(gpio->port), static_cast<uint16_t>(gpio->pin));
+        const embot::hw::GPIO *gpio = &embot::hw::bsp::led::getBSP().getPROP(led)->gpio;       
+        //HAL_GPIO_TogglePin(static_cast<GPIO_TypeDef*>(gpio->port), static_cast<uint16_t>(gpio->pin));
+        embot::hw::gpio::toggle(*gpio);  
         return resOK;          
     }
     

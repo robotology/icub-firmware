@@ -47,7 +47,7 @@ namespace embot { namespace hw { namespace onewire {
         Rate                        rate;               // the rate of the modulation
         bool                        usepreamble;        // if true we use it
         std::uint8_t                preamble;           // the preamble to be sent before reg and value.
-        Config() : gpio(nullptr, 0), rate(Rate::tenKbps), usepreamble(true), preamble(0x55) {}
+        Config() : gpio(embot::hw::GPIO::PORT::none, embot::hw::GPIO::PIN::none), rate(Rate::tenKbps), usepreamble(true), preamble(0x55) {}
         Config(const embot::hw::GPIO &_g, Rate _r) 
         {
             gpio = _g;

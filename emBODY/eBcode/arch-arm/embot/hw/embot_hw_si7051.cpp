@@ -76,12 +76,12 @@ namespace embot { namespace hw { namespace si7051 {
     
     bool supported(SI7051 a)
     {
-        return embot::hw::bsp::si7051::getMAP()->supported(a);
+        return embot::hw::bsp::si7051::getBSP().supported(a);
     }
     
     bool initialised(SI7051 a)
     {
-        return embot::binary::bit::check(initialisedmask, embot::hw::bsp::si7051::MAP::toindex(a));
+        return embot::binary::bit::check(initialisedmask, embot::common::tointegral(a));
     }    
       
 
@@ -96,14 +96,15 @@ namespace embot { namespace hw { namespace si7051 {
     };
     
     struct PrivateData
-    {    
-        Config config[static_cast<unsigned int>(SI7051::maxnumberof)];        
-        Acquisition acquisition[static_cast<unsigned int>(SI7051::maxnumberof)];
+    {
+        std::uint8_t i2caddress[embot::common::tointegral(SI7051::maxnumberof)];   
+        Config config[embot::common::tointegral(SI7051::maxnumberof)];        
+        Acquisition acquisition[embot::common::tointegral(SI7051::maxnumberof)];
         PrivateData() { }
     };
     
     
-    static const std::uint8_t i2caddress = 0x80;
+    //static const std::uint8_t i2caddress = 0x80;
     static const std::uint8_t registerTemperatureRead = 0xE3;
     
     static PrivateData s_privatedata;
@@ -136,20 +137,23 @@ namespace embot { namespace hw { namespace si7051 {
             return resOK;
         }
         
-        std::uint8_t index = embot::hw::bsp::si7051::MAP::toindex(s);
+        // init peripheral
+        embot::hw::bsp::si7051::getBSP().init(s);
+        
+        std::uint8_t index = embot::common::tointegral(s);
                 
         // init i2c ..
         embot::hw::i2c::init(config.i2cdes.bus, config.i2cdes.config);
-        
-        if(false == embot::hw::i2c::ping(config.i2cdes.bus, i2caddress))
+        if(false == embot::hw::i2c::ping(config.i2cdes.bus, embot::hw::bsp::si7051::getBSP().getPROP(s)->i2caddress))
         {
             return resNOK;
         }
         
+        s_privatedata.i2caddress[index] = embot::hw::bsp::si7051::getBSP().getPROP(s)->i2caddress;
         s_privatedata.config[index] = config;
         s_privatedata.acquisition[index].clear();
         
-        embot::binary::bit::set(initialisedmask, embot::hw::bsp::si7051::MAP::toindex(s));
+        embot::binary::bit::set(initialisedmask, embot::common::tointegral(s));
                 
         return resOK;
     }
@@ -162,7 +166,7 @@ namespace embot { namespace hw { namespace si7051 {
             return false;
         } 
 
-        std::uint8_t index = embot::hw::bsp::si7051::MAP::toindex(s);        
+        std::uint8_t index = embot::common::tointegral(s);        
         return s_privatedata.acquisition[index].ongoing;     
     }
     
@@ -174,7 +178,7 @@ namespace embot { namespace hw { namespace si7051 {
             return false;
         } 
 
-        std::uint8_t index = embot::hw::bsp::si7051::MAP::toindex(s);  
+        std::uint8_t index = embot::common::tointegral(s);  
         
         if(true == s_privatedata.acquisition[index].ongoing)
         {
@@ -191,7 +195,7 @@ namespace embot { namespace hw { namespace si7051 {
             return resNOK;
         }
         
-        std::uint8_t index = embot::hw::bsp::si7051::MAP::toindex(s);
+        std::uint8_t index = embot::common::tointegral(s);
                 
         s_privatedata.acquisition[index].clear();
         s_privatedata.acquisition[index].ongoing = true;
@@ -201,7 +205,7 @@ namespace embot { namespace hw { namespace si7051 {
         // ok, now i trigger i2c.
         embot::common::Callback cbk(sharedCBK, &s_privatedata.acquisition[index]);
         embot::common::Data data = embot::common::Data(&s_privatedata.acquisition[index].rxdata[0], 2);
-        embot::hw::i2c::read(s_privatedata.config[index].i2cdes.bus, i2caddress, registerTemperatureRead, data, cbk);
+        embot::hw::i2c::read(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], registerTemperatureRead, data, cbk);
                 
         return resOK;
     }
@@ -212,8 +216,8 @@ namespace embot { namespace hw { namespace si7051 {
         {
             return false;
         } 
-        std::uint8_t index = embot::hw::bsp::si7051::MAP::toindex(s);
-        return embot::hw::i2c::ping(s_privatedata.config[index].i2cdes.bus, i2caddress, timeout);  
+        std::uint8_t index = embot::common::tointegral(s);
+        return embot::hw::i2c::ping(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], timeout);  
     }
 
     
@@ -224,7 +228,7 @@ namespace embot { namespace hw { namespace si7051 {
             return false;
         } 
 
-        return s_privatedata.acquisition[embot::hw::bsp::si7051::MAP::toindex(s)].done;        
+        return s_privatedata.acquisition[embot::common::tointegral(s)].done;        
     } 
     
     
@@ -240,7 +244,7 @@ namespace embot { namespace hw { namespace si7051 {
             return resNOK;
         }
         
-        std::uint8_t index = embot::hw::bsp::si7051::MAP::toindex(s);
+        std::uint8_t index = embot::common::tointegral(s);
         temp = s_privatedata.acquisition[index].temp;
   
         return resOK;        

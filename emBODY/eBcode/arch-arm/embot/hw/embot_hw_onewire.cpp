@@ -86,12 +86,12 @@ namespace embot { namespace hw { namespace onewire {
     
     bool supported(ONEWIRE c)
     {
-        return embot::hw::bsp::onewire::getMAP()->supported(c);
+        return embot::hw::bsp::onewire::getBSP().supported(c);
     }
     
     bool initialised(ONEWIRE c)
     {
-        return embot::binary::bit::check(initialisedmask, embot::hw::bsp::onewire::MAP::toindex(c));
+        return embot::binary::bit::check(initialisedmask, embot::common::tointegral(c));
     }    
     
     
@@ -146,7 +146,7 @@ namespace embot { namespace hw { namespace onewire {
            
             embot::hw::timer::stop(s_privatedata.tickingTimer);            
             s_privatedata.transaction_isrunning = false;     
-            s_privatedata.activegpio = {nullptr, 0};    
+            s_privatedata.activegpio = {embot::hw::GPIO::PORT::none, embot::hw::GPIO::PIN::none};    
             s_privatedata.activechannel = embot::hw::ONEWIRE::none;           
         }
       
@@ -165,7 +165,10 @@ namespace embot { namespace hw { namespace onewire {
             return resOK;
         }
         
-        s_privatedata.config[embot::hw::bsp::onewire::MAP::toindex(c)] = config;
+        embot::hw::bsp::onewire::getBSP().init(c);        
+        
+        s_privatedata.config[embot::common::tointegral(c)] = config;
+        
                         
         // init peripherals: gpio and timer TIM6
         // gpio init is globally initted by stm32hal_bsp_init() because it hold all gpio peripherals
@@ -180,14 +183,18 @@ namespace embot { namespace hw { namespace onewire {
             cc.time = embot::common::time1millisec / static_cast<std::uint32_t>(config.rate);
             cc.mode = embot::hw::timer::Mode::periodic;
             cc.onexpiry = { callbackOnTick, nullptr };
-            embot::hw::timer::init(s_privatedata.tickingTimer, cc);
+            result_t r = embot::hw::timer::init(s_privatedata.tickingTimer, cc);
+            if(resOK != r)
+            {
+                return resNOK;
+            }
             s_privatedata.tickingTimerIsInitted = true;
             s_privatedata.transaction_isrunning = false;
             s_privatedata.activechannel = embot::hw::ONEWIRE::none;
         }
         
         
-        embot::binary::bit::set(initialisedmask, embot::hw::bsp::onewire::MAP::toindex(c));
+        embot::binary::bit::set(initialisedmask, embot::common::tointegral(c));
 
         return resOK;
     }
@@ -250,7 +257,7 @@ bit pos 20  21  22  23  24  25  26  27  28  29  30  31  32  33  34  35  36  37  
 
         // prepare the buffer, start the tim. wait until we are done. impose a timeout of ... however
                         
-        if(true == s_privatedata.config[embot::hw::bsp::onewire::MAP::toindex(c)].usepreamble)
+        if(true == s_privatedata.config[embot::common::tointegral(c)].usepreamble)
         {  
 
             std::uint64_t msk64 = 0; 
@@ -296,7 +303,7 @@ bit pos 20  21  22  23  24  25  26  27  28  29  30  31  32  33  34  35  36  37  
             s_privatedata.bitindex = 0;
             s_privatedata.bitsnumber = 40;    
 
-            s_privatedata.activegpio = s_privatedata.config[embot::hw::bsp::onewire::MAP::toindex(c)].gpio;    
+            s_privatedata.activegpio = s_privatedata.config[embot::common::tointegral(c)].gpio;    
             s_privatedata.activechannel = c;             
 
             s_privatedata.transaction_isrunning = true;
@@ -324,7 +331,7 @@ bit pos 20  21  22  23  24  25  26  27  28  29  30  31  32  33  34  35  36  37  
                 // stop timer, set bit high
                 embot::hw::timer::stop(s_privatedata.tickingTimer);
                 embot::hw::gpio::set(s_privatedata.activegpio, embot::hw::gpio::State::SET);
-                s_privatedata.activegpio = {nullptr, 0};
+                s_privatedata.activegpio = {embot::hw::GPIO::PORT::none, embot::hw::GPIO::PIN::none};
 
                 s_privatedata.bitsnumber = 0;
                 s_privatedata.bitindex = 0;

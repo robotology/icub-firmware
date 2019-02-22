@@ -42,28 +42,11 @@ namespace embot { namespace hw { namespace bsp { namespace strain2 {
     const embot::hw::SI7051 thermometerSGAUGES = embot::hw::SI7051::one;
     const embot::hw::si7051::Config thermometerSGAUGESconfig = embot::hw::si7051::Config(descrI2Cone);
         
-//    const embot::hw::SI7051 thermometerCASE = embot::hw::SI7051::two;
-//    const embot::hw::si7051::Config thermometerCASEconfig = embot::hw::si7051::Config(descrI2Ctwo);   
     
     
     const embot::hw::BNO055 imuBOSCH = embot::hw::BNO055::one;
     const embot::hw::bno055::Config imuBOSCHconfig = embot::hw::bno055::Config(descrI2Ctwo);   
     
-//    const embot::hw::PGA308::Config configOfSGamps[6] = 
-//    {
-//        embot::hw::PGA308::Config(  embot::hw::gpio::GPIO(EN_2V8_GPIO_Port, EN_2V8_Pin), embot::hw::gpio::State::SET, 
-//                                    embot::hw::onewire::Channel::one, embot::hw::onewire::Config(embot::hw::gpio::GPIO(W_STRAIN1_GPIO_Port, W_STRAIN1_Pin), embot::hw::onewire::Rate::tenKbps)),
-//        embot::hw::PGA308::Config(  embot::hw::gpio::GPIO(EN_2V8_GPIO_Port, EN_2V8_Pin), embot::hw::gpio::State::SET, 
-//                                    embot::hw::onewire::Channel::two, embot::hw::onewire::Config(embot::hw::gpio::GPIO(W_STRAIN2_GPIO_Port, W_STRAIN2_Pin), embot::hw::onewire::Rate::tenKbps)),
-//        embot::hw::PGA308::Config(  embot::hw::gpio::GPIO(EN_2V8_GPIO_Port, EN_2V8_Pin), embot::hw::gpio::State::SET, 
-//                                    embot::hw::onewire::Channel::three, embot::hw::onewire::Config(embot::hw::gpio::GPIO(W_STRAIN3_GPIO_Port, W_STRAIN3_Pin), embot::hw::onewire::Rate::tenKbps)),
-//        embot::hw::PGA308::Config(  embot::hw::gpio::GPIO(EN_2V8_GPIO_Port, EN_2V8_Pin), embot::hw::gpio::State::SET, 
-//                                    embot::hw::onewire::Channel::four, embot::hw::onewire::Config(embot::hw::gpio::GPIO(W_STRAIN4_GPIO_Port, W_STRAIN4_Pin), embot::hw::onewire::Rate::tenKbps)),
-//        embot::hw::PGA308::Config(  embot::hw::gpio::GPIO(EN_2V8_GPIO_Port, EN_2V8_Pin), embot::hw::gpio::State::SET, 
-//                                    embot::hw::onewire::Channel::five, embot::hw::onewire::Config(embot::hw::gpio::GPIO(W_STRAIN5_GPIO_Port, W_STRAIN5_Pin), embot::hw::onewire::Rate::tenKbps)),
-//        embot::hw::PGA308::Config(  embot::hw::gpio::GPIO(EN_2V8_GPIO_Port, EN_2V8_Pin), embot::hw::gpio::State::SET, 
-//                                    embot::hw::onewire::Channel::six, embot::hw::onewire::Config(embot::hw::gpio::GPIO(W_STRAIN6_GPIO_Port, W_STRAIN2_Pin), embot::hw::onewire::Rate::tenKbps))                                    
-//    };
         
       
 }}}} // namespace embot { namespace hw { namespace bsp { namespace strain2 {

@@ -86,12 +86,12 @@ namespace embot { namespace hw { namespace adc {
 
     bool supported(ADC p)
     {
-        return embot::hw::bsp::adc::getMAP()->supported(p);
+        return embot::hw::bsp::adc::getBSP().supported(p);
     }
     
     bool initialised(ADC p)
     {
-        return embot::binary::bit::check(initialisedmask, embot::hw::bsp::adc::MAP::toindex(p));
+        return embot::binary::bit::check(initialisedmask, embot::common::tointegral(p));
     }    
 
     
@@ -144,15 +144,14 @@ namespace embot { namespace hw { namespace adc {
             return resOK;
         }
         
+        // init peripherals: adc1 and dma1
+        embot::hw::bsp::adc::getBSP().init(p);     
+        
         adcdata.config = config;
         adcdata.adc_isrunning = false;
-        adcdata.handle = reinterpret_cast<ADC_HandleTypeDef*>(embot::hw::bsp::adc::getMAP()->getprops(p)->handle);
-                        
-        // init peripherals: adc1 and dma1
-        embot::hw::bsp::adc::getMAP()->init(p);        
-
-        
-        embot::binary::bit::set(initialisedmask, embot::hw::bsp::adc::MAP::toindex(p));
+        adcdata.handle = embot::hw::bsp::adc::getBSP().getPROP(p)->handle;
+                                
+        embot::binary::bit::set(initialisedmask, embot::common::tointegral(p));
 
         return resOK;
     }

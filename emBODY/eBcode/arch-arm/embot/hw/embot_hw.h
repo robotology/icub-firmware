@@ -24,18 +24,19 @@
 
 #include "embot_common.h"
 
+#include "stm32hal.h"
+
 
 namespace embot { namespace hw {
     
-    enum class result_t { OK = 0, NOK = -1, NOKtimeout = -2 };
+    enum class result_t : std::int8_t { OK = 0, NOK = -1, NOKtimeout = -2 };
     
     const result_t resOK            = result_t::OK;
     const result_t resNOK           = result_t::NOK;
     const result_t resNOKtimeout    = result_t::NOKtimeout;
     
     
-    
-    enum class CLOCK { syscore = 0, pclk1 = 1, pclk2 = 2, none = 31, maxnumberof = 3 };
+    enum class CLOCK : std::uint8_t { syscore = 0, pclk1 = 1, pclk2 = 2, none = 31, maxnumberof = 3 };
     
     enum class LED : std::uint8_t { one = 0, two = 1, three = 2, four = 3, five = 4, six = 5, seven = 6, eight = 7, none = 31, maxnumberof = 8 };
             
@@ -47,29 +48,33 @@ namespace embot { namespace hw {
     
     enum class PGA308 : std::uint8_t { one = 0, two = 1, three = 2, four = 3, five = 4, six = 5, none = 31, maxnumberof = 6 };
     
-    enum class SI7051 { one = 0, two = 1, none = 31, maxnumberof = 2 };
+    enum class SI7051 : std::uint8_t { one = 0, two = 1, none = 31, maxnumberof = 2 };
     
     enum class ADC : std::uint8_t { one = 0, none = 31, maxnumberof = 1};
     
     enum class ONEWIRE : std::uint8_t { one = 0, two = 1, three = 2, four = 3, five = 4, six = 5, none = 31, maxnumberof = 6 };
     
-    enum class TIMER : std::uint8_t { one = 0, two = 1, three = 2, four = 3, five = 4, six = 5, seven = 6, eigth = 7, nine = 8, 
+    enum class TIMER : std::uint8_t { one = 0, two = 1, three = 2, four = 3, five = 4, six = 5, seven = 6, eight = 7, nine = 8, 
                                       ten = 9, eleven = 10, twelve = 11, thirteen = 12, fourteen = 13, fifteen = 14, sixteen = 15, 
                                       none = 31, maxnumberof = 16 }; 
 
-    enum class I2C { one = 0, two = 1, none = 31, maxnumberof = 2 };     
+    enum class I2C : std::uint8_t { one = 0, two = 1, none = 31, maxnumberof = 2 };     
 
-    enum class BNO055 { one = 0, none = 31, maxnumberof = 1 };    
+    enum class BNO055 : std::uint8_t { one = 0, none = 31, maxnumberof = 1 };    
     
-   
+    
     struct GPIO
-    {   // it is descripted by a pair{port, pin}. 
-        void*           port;
-        std::uint16_t   pin;
+    { 
+        enum class PORT : std::uint8_t { A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6, H = 7, none = 31, maxnumberof = 8 };   
+        enum class PIN : std::uint8_t { zero = 0, one = 1, two = 2, three = 3, four = 4, five = 5, six = 6, seven = 7, eight = 8, nine = 9, 
+                                        ten = 10, eleven = 11, twelve = 12, thirteen = 13, fourteen = 14, fifteen = 15, none = 31, maxnumberof = 16 };
+            
+        PORT    port;
+        PIN     pin;
         
-        GPIO(void *po, std::uint32_t pi) : port(po), pin(pi) {}
-        GPIO() : port(nullptr), pin(0) {}            
-        bool isvalid() const { if((nullptr == port) || (0 == pin)) { return false; } else { return true; } }       
+        constexpr GPIO(PORT po, PIN pi) : port(po), pin(pi) {}
+        constexpr GPIO() : port(PORT::none), pin(PIN::none) {}            
+        constexpr bool isvalid() const { return (PORT::none == port) ? false : true; }       
     };
     
 }} // namespace embot { namespace hw {

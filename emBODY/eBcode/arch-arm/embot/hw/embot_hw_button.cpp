@@ -64,12 +64,12 @@ namespace embot { namespace hw { namespace button {
     
     bool supported(BTN btn)
     {
-        return embot::hw::bsp::button::getMAP()->supported(btn);
+        return embot::hw::bsp::button::getBSP().supported(btn);
     }
     
     bool initialised(BTN btn)
     {
-        return embot::binary::bit::check(initialisedmask, embot::hw::bsp::button::MAP::toindex(btn));
+        return embot::binary::bit::check(initialisedmask,embot::common::tointegral(btn));
     }
         
     result_t init(BTN btn)
@@ -84,14 +84,18 @@ namespace embot { namespace hw { namespace button {
             return resOK;
         }
         
-        // every button initalisation is done in the bsp ...
-        
+        // every button initalisation is done in the bsp, but ... 
+        embot::hw::bsp::button::getBSP().init(btn);        
+       
         if(!embot::hw::bsp::initialised())
         {   // requires embot::hw::bsp::init()
             return resNOK;
         }
-                
-        embot::binary::bit::set(initialisedmask, embot::hw::bsp::button::MAP::toindex(btn));
+        
+
+             
+        
+        embot::binary::bit::set(initialisedmask, embot::common::tointegral(btn));
                 
         return resOK;        
     }
@@ -105,10 +109,12 @@ namespace embot { namespace hw { namespace button {
         {
             return false;
         }  
-        const embot::hw::GPIO *gpio = embot::hw::bsp::button::getMAP()->getgpio(btn);       
+        const embot::hw::GPIO gpio = embot::hw::bsp::button::getBSP().getPROP(btn)->gpio;       
         
-        GPIO_PinState b1state = HAL_GPIO_ReadPin(static_cast<GPIO_TypeDef*>(gpio->port), static_cast<uint16_t>(gpio->pin));    
-        return (convert(embot::hw::bsp::button::getMAP()->pressed) == b1state) ? (true) : (false);         
+        embot::hw::gpio::State s = embot::hw::gpio::get(gpio);
+        //GPIO_PinState b1state = HAL_GPIO_ReadPin(static_cast<GPIO_TypeDef*>(gpio.port), static_cast<uint16_t>(gpio.pin));    
+        //return (convert(embot::hw::bsp::button::getBSP().getPROP(btn)->pressed) == b1state) ? (true) : (false);
+        return (embot::hw::bsp::button::getBSP().getPROP(btn)->pressed == s) ? (true) : (false);        
     }
     
     

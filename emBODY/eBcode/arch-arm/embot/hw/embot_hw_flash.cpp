@@ -50,7 +50,7 @@ namespace embot { namespace hw { namespace flash {
     
     const Partition& getpartition(embot::hw::FLASH fl)
     {
-        return embot::hw::bsp::flash::getMAP()->getpartition(fl);         
+        return embot::hw::bsp::flash::getBSP().getPROP(fl)->partition;         
     }
         
     

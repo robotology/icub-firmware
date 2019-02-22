@@ -82,12 +82,13 @@ namespace embot { namespace hw { namespace timer {
     
     bool supported(TIMER t)
     {
-        return embot::hw::bsp::timer::getMAP()->supported(t);
+        return embot::hw::bsp::timer::getBSP().supported(t);
     }
     
     bool initialised(TIMER t)
     {
-        return embot::binary::bit::check(initialisedmask, embot::hw::bsp::timer::MAP::toindex(t));
+        return embot::binary::bit::check(initialisedmask, embot::common::tointegral(t));
+        //return embot::binary::bit::check(initialisedmask, static_cast<std::uint8_t>(t));
     }    
     
     // stm32 specific support
@@ -99,7 +100,7 @@ namespace embot { namespace hw { namespace timer {
         
     
     // retrieves the values to be put inside the stm32 register
-    void compute(TIMER t, const embot::hw::bsp::timer::STM32PROPS *stm32data, const embot::common::relTime time, stm32_tim_registervalues &pars, embot::common::relTime &effectivetime)
+    void compute(TIMER t, const embot::hw::bsp::timer::PROP *stm32data, const embot::common::relTime time, stm32_tim_registervalues &pars, embot::common::relTime &effectivetime)
     {        
         // for some timers referencespeed could also be HAL_RCC_GetSysClockFreq() or HAL_RCC_GetPCLK1Freq() or HAL_RCC_GetPCLK2Freq()
         // i embed teh choice into that into embot::hw::sys::clock()
@@ -167,17 +168,16 @@ namespace embot { namespace hw { namespace timer {
         std::uint32_t effectivetime = 0;
         stm32_tim_registervalues pars =  {0};
         
-        const embot::hw::bsp::timer::STM32PROPS * stm32props = embot::hw::bsp::timer::getMAP()->getprops(t);
-        TIM_HandleTypeDef* phandletimx = reinterpret_cast<TIM_HandleTypeDef*>(stm32props->handle);
-        
-        //const stm32_tim_mapping *stm32data = &s_stm32_tim_mapping[timer2indexofcompactarray(t)];
+        const embot::hw::bsp::timer::PROP * stm32props = embot::hw::bsp::timer::getBSP().getPROP(t);
+        TIM_HandleTypeDef* phandletimx = stm32props->handle;
+
         
         compute(t, stm32props, time, pars, effectivetime);
         
         
         TIM_MasterConfigTypeDef sMasterConfig;
         
-        phandletimx->Instance = reinterpret_cast<TIM_TypeDef*>(stm32props->TIMx);
+        phandletimx->Instance = stm32props->TIMx;
         phandletimx->Init.Prescaler = pars.prescaler-1;
         phandletimx->Init.CounterMode = TIM_COUNTERMODE_DOWN;
         phandletimx->Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
@@ -237,11 +237,12 @@ namespace embot { namespace hw { namespace timer {
     
     struct propsOFalltimers
     {
-        TIMERprop prop[static_cast<std::uint8_t>(embot::hw::TIMER::maxnumberof)];
+        TIMERprop prop[embot::common::tointegral(embot::hw::TIMER::maxnumberof)];
         
         TIMERprop & get(TIMER t)
         {
-            return prop[embot::hw::bsp::timer::MAP::toindex(t)];
+            return prop[embot::common::tointegral(t)];
+            //return prop[static_cast<std::uint8_t>(t)];
         }        
     };
 
@@ -277,16 +278,18 @@ namespace embot { namespace hw { namespace timer {
         {
             return resOK;
         }
+        
+        // init peripheral... actually it is done inside general bsp
+        embot::hw::bsp::timer::getBSP().init(t);
              
         TIMERprop &prop = s_properties.get(t);        
         prop.isrunning = false;
         prop.config = config;
         
-        embot::binary::bit::set(initialisedmask, embot::hw::bsp::timer::MAP::toindex(t));
+        // VERY IMPORTANT: keep it in here before configure...
+        embot::binary::bit::set(initialisedmask, embot::common::tointegral(t));
         
-        configure(t, config);    
-
-        return resOK;
+        return configure(t, config);    
     }
 
     
@@ -341,7 +344,7 @@ namespace embot { namespace hw { namespace timer {
         prop.isrunning = true;
      
         // ok: the timer starts.
-        const embot::hw::bsp::timer::STM32PROPS * stm32props = embot::hw::bsp::timer::getMAP()->getprops(t);
+        const embot::hw::bsp::timer::PROP * stm32props = embot::hw::bsp::timer::getBSP().getPROP(t);
         TIM_HandleTypeDef* phandletimx = reinterpret_cast<TIM_HandleTypeDef*>(stm32props->handle);
         HAL_TIM_Base_Start_IT(phandletimx);
   
@@ -359,9 +362,8 @@ namespace embot { namespace hw { namespace timer {
         
             
         // stop it anyway
-        const embot::hw::bsp::timer::STM32PROPS * stm32props = embot::hw::bsp::timer::getMAP()->getprops(t);
-        TIM_HandleTypeDef* phandletimx = reinterpret_cast<TIM_HandleTypeDef*>(stm32props->handle);
-        HAL_TIM_Base_Stop_IT(phandletimx);
+        const embot::hw::bsp::timer::PROP * stm32props = embot::hw::bsp::timer::getBSP().getPROP(t);
+        HAL_TIM_Base_Stop_IT(stm32props->handle);
         
         TIMERprop &prop = s_properties.get(t);
         prop.isrunning = false;

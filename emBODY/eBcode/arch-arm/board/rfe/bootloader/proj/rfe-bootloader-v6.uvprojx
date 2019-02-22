@@ -618,6 +618,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\embot\hw\embot_hw_timer.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_gpio.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\hw\embot_hw_gpio.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

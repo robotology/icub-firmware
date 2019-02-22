@@ -79,12 +79,12 @@ namespace embot { namespace hw { namespace i2c {
     
     bool supported(embot::hw::I2C p)
     {
-        return embot::hw::bsp::i2c::getMAP()->supported(p);
+        return embot::hw::bsp::i2c::getBSP().supported(p);
     }
 
     bool initialised(embot::hw::I2C p)
     {
-        return embot::binary::bit::check(initialisedmask, embot::hw::bsp::i2c::MAP::toindex(p));
+        return embot::binary::bit::check(initialisedmask, embot::common::tointegral(p));
     }    
  
      
@@ -102,9 +102,9 @@ namespace embot { namespace hw { namespace i2c {
     
     struct PrivateData
     {    
-        Config config[static_cast<unsigned int>(I2C::maxnumberof)];  
-        Transaction  transaction[static_cast<unsigned int>(I2C::maxnumberof)]; 
-        I2C_HandleTypeDef* handles[static_cast<unsigned int>(I2C::maxnumberof)];  
+        Config config[embot::common::tointegral(I2C::maxnumberof)];  
+        Transaction  transaction[embot::common::tointegral(I2C::maxnumberof)]; 
+        I2C_HandleTypeDef* handles[embot::common::tointegral(I2C::maxnumberof)];  
         //DMA_HandleTypeDef* handlesdmatx[static_cast<unsigned int>(I2C::maxnumberof)];   
         //DMA_HandleTypeDef* handlesdmarx[static_cast<unsigned int>(I2C::maxnumberof)];         
         PrivateData() { }
@@ -127,18 +127,20 @@ namespace embot { namespace hw { namespace i2c {
         if(true == initialised(b))
         {
             return resOK;
-        }
+        }        
         
-        std::uint8_t index = embot::hw::bsp::i2c::MAP::toindex(b);
+        embot::hw::bsp::i2c::getBSP().init(b);
+        
+        std::uint8_t index = embot::common::tointegral(b);
         s_privatedata.config[index] = config;
-        s_privatedata.handles[index] = reinterpret_cast<I2C_HandleTypeDef*>(embot::hw::bsp::i2c::getMAP()->getprops(b)->handle);
-        //s_privatedata.handlesdmatx[index] = reinterpret_cast<DMA_HandleTypeDef*>(embot::hw::bsp::i2c::getMAP()->getprops(b)->handledmatx);
-        //s_privatedata.handlesdmarx[index] = reinterpret_cast<DMA_HandleTypeDef*>(embot::hw::bsp::i2c::getMAP()->getprops(b)->handledmarx);
+        s_privatedata.handles[index] = embot::hw::bsp::i2c::getBSP().getPROP(b)->handle;
+        //s_privatedata.handlesdmatx[index] = embot::hw::bsp::i2c::getBSP().getPROP(b)->handledmatx);
+        //s_privatedata.handlesdmarx[index] = embot::hw::bsp::i2c::getBSP().getPROP(b)->handledmarx);
         
         
-        embot::hw::bsp::i2c::getMAP()->init(b);
+
         
-        embot::binary::bit::set(initialisedmask, embot::hw::bsp::i2c::MAP::toindex(b));
+        embot::binary::bit::set(initialisedmask, embot::common::tointegral(b));
                 
         return resOK;
     }
@@ -157,7 +159,7 @@ namespace embot { namespace hw { namespace i2c {
             return false;
         }
         
-        std::uint8_t index = embot::hw::bsp::i2c::MAP::toindex(b);
+        std::uint8_t index = embot::common::tointegral(b);
         
         s_privatedata.transaction[index].ongoing = true;
                 
@@ -274,7 +276,7 @@ namespace embot { namespace hw { namespace i2c {
             return false;
         } 
 
-        return s_privatedata.transaction[embot::hw::bsp::i2c::MAP::toindex(b)].ongoing;     
+        return s_privatedata.transaction[embot::common::tointegral(b)].ongoing;     
     }
 
     
@@ -288,7 +290,7 @@ namespace embot { namespace hw { namespace i2c {
         if(0 == timeout)
         {
             remaining = timeout;
-            return s_privatedata.transaction[embot::hw::bsp::i2c::MAP::toindex(b)].ongoing;   
+            return s_privatedata.transaction[embot::common::tointegral(b)].ongoing;   
         }
        
         
@@ -305,7 +307,7 @@ namespace embot { namespace hw { namespace i2c {
                 res = true;
                 break;
             }
-            else if(false == s_privatedata.transaction[embot::hw::bsp::i2c::MAP::toindex(b)].ongoing)
+            else if(false == s_privatedata.transaction[embot::common::tointegral(b)].ongoing)
             {
                 remaining = static_cast<embot::common::relTime>(rem);
                 res = false;   
@@ -350,7 +352,7 @@ namespace embot { namespace hw { namespace i2c {
     
     static result_t s_write(I2C b, std::uint8_t adr, std::uint8_t reg, const embot::common::Data &content, const embot::common::Callback &oncompletion)
     {   
-        std::uint8_t index = embot::hw::bsp::i2c::MAP::toindex(b);        
+        std::uint8_t index = embot::common::tointegral(b);        
         s_privatedata.transaction[index].adr = adr;
         s_privatedata.transaction[index].oncompletion = oncompletion;
         s_privatedata.transaction[index].ongoing = true;
@@ -366,7 +368,7 @@ namespace embot { namespace hw { namespace i2c {
     
     static result_t s_read(I2C b, std::uint8_t adr, std::uint8_t reg, embot::common::Data &destination, const embot::common::Callback &oncompletion)
     {
-        std::uint8_t index = embot::hw::bsp::i2c::MAP::toindex(b);        
+        std::uint8_t index = embot::common::tointegral(b);        
         s_privatedata.transaction[index].adr = adr;
         s_privatedata.transaction[index].oncompletion = oncompletion;
         s_privatedata.transaction[index].ongoing = true;

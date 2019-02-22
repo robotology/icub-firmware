@@ -24,6 +24,7 @@
 
 #include <cstdint>
 #include <cstring>
+#include <type_traits>
 
 namespace embot { namespace common {
 
@@ -115,11 +116,12 @@ namespace embot { namespace common {
     using EventMask = std::uint32_t;
     using Message = void *;
     
-    template<typename T>
-    constexpr std::uint32_t enumtoindex(const T t)
+    
+    template <typename T>
+    constexpr typename std::underlying_type<T>::type tointegral(T value) 
     {
-        return static_cast<std::uint32_t>(t);
-    } 
+        return static_cast<typename std::underlying_type<T>::type>(value);
+    }
     
     class Storage
     {

@@ -75,20 +75,18 @@ namespace embot { namespace hw { namespace pga308 {
 
 
 namespace embot { namespace hw { namespace pga308 {
-        
-      
+             
     // initialised mask       
     static std::uint32_t initialisedmask = 0;
-   
-        
+           
     bool supported(PGA308 a)
     {
-        return embot::hw::bsp::pga308::getMAP()->supported(a);
+        return embot::hw::bsp::pga308::getBSP().supported(a);
     }
     
     bool initialised(PGA308 a)
     {
-        return embot::binary::bit::check(initialisedmask, embot::hw::bsp::pga308::MAP::toindex(a));
+        return embot::binary::bit::check(initialisedmask, embot::common::tointegral(a));
     }    
 
     
@@ -121,7 +119,7 @@ namespace embot { namespace hw { namespace pga308 {
             return resNOK;
         } 
 
-        std::uint8_t index = embot::hw::bsp::pga308::MAP::toindex(a);       
+        std::uint8_t index = embot::common::tointegral(a);       
         
         // ora ... devo trasmettere vari registri
         
@@ -160,7 +158,10 @@ namespace embot { namespace hw { namespace pga308 {
             return resOK;
         }
         
-        s_privatedata.config[embot::hw::bsp::pga308::MAP::toindex(a)] = config;
+        // init chip
+        embot::hw::bsp::pga308::getBSP().init(a);     
+        
+        s_privatedata.config[embot::common::tointegral(a)] = config;
                         
         // init onewire. i dont check vs correct config apart from correct gpio
         if(false == config.onewireconfig.gpio.isvalid())
@@ -173,9 +174,14 @@ namespace embot { namespace hw { namespace pga308 {
             return resNOK;
         }
         
+
+        
         
         // init onewire ..
-        embot::hw::onewire::init(config.onewirechannel, config.onewireconfig);
+        if(resOK != embot::hw::onewire::init(config.onewirechannel, config.onewireconfig))
+        {
+            return resNOK; 
+        }
         
         
         // power on: dont do it if another amplifier has alredy done it.
@@ -186,8 +192,8 @@ namespace embot { namespace hw { namespace pga308 {
         }
                 
         
-        // must set it to initialsied in order to use setdefault
-        embot::binary::bit::set(initialisedmask, embot::hw::bsp::pga308::MAP::toindex(a));
+        // must set it to initialised in order to use setdefault
+        embot::binary::bit::set(initialisedmask, embot::common::tointegral(a));
         
         //embot::common::Time start = embot::sys::timeNow();
         // load the default settings of pga308. i use the         
@@ -209,7 +215,7 @@ namespace embot { namespace hw { namespace pga308 {
             return resNOK;
         } 
 
-        std::uint8_t index = embot::hw::bsp::pga308::MAP::toindex(a);        
+        std::uint8_t index = embot::common::tointegral(a);        
         
         // set the registers related to the transfer function. 
         tfconfig.obtain(s_privatedata.registers[index].CFG0, s_privatedata.registers[index].ZDAC, s_privatedata.registers[index].GDAC);
@@ -221,7 +227,7 @@ namespace embot { namespace hw { namespace pga308 {
 
                 
         // dovrei rileggere e verificare se e' ok. poi assegno: 
-        s_privatedata.transfunctconfig[embot::hw::bsp::pga308::MAP::toindex(a)] = tfconfig;
+        s_privatedata.transfunctconfig[embot::common::tointegral(a)] = tfconfig;
         
         return resOK;        
     }
@@ -233,7 +239,7 @@ namespace embot { namespace hw { namespace pga308 {
             return resNOK;
         } 
 
-        std::uint8_t index = embot::hw::bsp::pga308::MAP::toindex(a);
+        std::uint8_t index = embot::common::tointegral(a);
         
         result_t r = resOK;
         
@@ -320,7 +326,7 @@ namespace embot { namespace hw { namespace pga308 {
             return resNOK;
         } 
 
-        std::uint8_t index = embot::hw::bsp::pga308::MAP::toindex(a);        
+        std::uint8_t index = embot::common::tointegral(a);        
                 
         // ora ... devo trasmettere il valore        
         embot::hw::onewire::write(s_privatedata.config[index].onewirechannel, static_cast<std::uint8_t>(address), value);
@@ -377,7 +383,7 @@ namespace embot { namespace hw { namespace pga308 {
             return resNOK;
         } 
 
-        std::uint8_t index = embot::hw::bsp::pga308::MAP::toindex(a);     
+        std::uint8_t index = embot::common::tointegral(a);     
         result_t r = resOK;
          
         switch(address)

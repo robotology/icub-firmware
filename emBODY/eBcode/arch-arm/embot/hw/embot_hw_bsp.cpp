@@ -31,6 +31,7 @@
 #include "stm32hal.h"
 #include <cstring>
 #include <vector>
+#include <array>
 
 #include "embot_binary.h"
 
@@ -40,7 +41,6 @@ using namespace embot::binary;
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
 // --------------------------------------------------------------------------------------------------------------------
-
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -103,29 +103,24 @@ namespace embot { namespace hw { namespace bsp {
 
 namespace embot { namespace hw { namespace bsp { namespace gpio {
         
-    bool MAP::supported(const embot::hw::GPIO &h) const 
-    { 
-        return isvalid(h);
-    }
+    // sadly we cannot use constepr because of the reinterpret_cast<> inside GPIOA etc.
+    static const BSP thebsp {        
+        // supportmask2d
+        {{
+            0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff 
+        }},            
+        // ports
+        {{
+            GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, nullptr, nullptr, nullptr
+        }}
+    };
     
-    
-    bool MAP::isvalid(const embot::hw::GPIO &h) const 
-    { 
-        if((nullptr == h.port) || (0 == h.pin)) 
-        { 
-            return false; 
-        } 
-        else 
-        {
-            return true;
-        }
-    }
-    
-    static const MAP theMAP = { 0 };
-    
-    const MAP * const getMAP()
+    void BSP::init(embot::hw::GPIO h) const {}
+        
+        
+    const BSP& getBSP() 
     {
-        return &theMAP;
+        return thebsp;
     }
               
 }}}} // namespace embot { namespace hw { namespace bsp {  namespace gpio {
@@ -133,100 +128,82 @@ namespace embot { namespace hw { namespace bsp { namespace gpio {
 
 namespace embot { namespace hw { namespace bsp { namespace led {
            
-    static_assert(static_cast<std::uint32_t>(embot::hw::LED::none) < 8*sizeof(MAP::mask), "LED::none must be less than 32 to be able to address a std::uint32_t mask");
-    static_assert(static_cast<std::uint32_t>(embot::hw::LED::maxnumberof) < 8*sizeof(MAP::mask), "LED::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
-    static_assert(static_cast<std::uint32_t>(embot::hw::LED::maxnumberof) < static_cast<std::uint32_t>(embot::hw::LED::none), "LED::maxnumberof must be higher that LED::none, so that we can optimise code");
+    static_assert(embot::common::tointegral(embot::hw::LED::none) < 8*sizeof(SUPP::supportedmask), "LED::none must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::common::tointegral(embot::hw::LED::maxnumberof) < 8*sizeof(SUPP::supportedmask), "LED::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::common::tointegral(embot::hw::LED::maxnumberof) < embot::common::tointegral(embot::hw::LED::none), "LED::maxnumberof must be higher that LED::none, so that we can optimise code");
 
     
-    bool MAP::supported(embot::hw::LED h) const 
-    { 
-        return embot::binary::bit::check(mask, toindex(h)); 
-    }
-    
-    const embot::hw::GPIO * MAP::getgpio(embot::hw::LED h) const
-    {
-        return &gpio[toindex(h)];
-    }
-    
-    bool MAP::isvalid(embot::hw::LED h) const
-    {
-        if(supported(h))
-        {   // i am sure that getgpio() returns something inside gpio[]...
-            return embot::hw::bsp::gpio::getMAP()->isvalid(*getgpio(h));
-        }
-        return false;        
-    }
-    
-    std::uint8_t MAP::toindex(embot::hw::LED h) 
-    { 
-        return static_cast<uint8_t>(h); 
-    }
-    
-    
-    // and now the maps
-
     #if     defined(STM32HAL_BOARD_NUCLEO64)    
+           
+    constexpr PROP led1p = { .on = embot::hw::gpio::State::SET, .off = embot::hw::gpio::State::RESET, .gpio = {LD2_GPIO_Port, LD2_Pin}  };  
         
-    static const MAP theMAP = 
-    {
-        .mask = mask::pos2mask<uint32_t>(LED::one),
-        .on   = embot::hw::gpio::State::SET, 
-        .off  = embot::hw::gpio::State::RESET,
-        .gpio = {   
-            {LD2_GPIO_Port, LD2_Pin}, 
-            {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}
-        }        
+    constexpr BSP thebsp {        
+        // maskofsupported
+        mask::pos2mask<uint32_t>(LED::one),        
+        // properties
+        {{
+            &led1p, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr            
+        }}        
     };
+    
+    void BSP::init(embot::hw::LED h) const {}
    
 
     #elif   defined(STM32HAL_BOARD_MTB4)
     
-        static const MAP theMAP = 
-        {
-            .mask = mask::pos2mask<uint32_t>(LED::one) | mask::pos2mask<uint32_t>(LED::two),
-            .on   = embot::hw::gpio::State::RESET, 
-            .off  = embot::hw::gpio::State::SET,
-            .gpio = {   
-                {LED_RED_GPIO_Port, LED_RED_Pin}, 
-                {LED_BLUE_GPIO_Port, LED_BLUE_Pin},
-                {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, 
-            }        
-        };
+    constexpr PROP led1p = { .on = embot::hw::gpio::State::RESET, .off = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::nine}  };  
+    constexpr PROP led2p = { .on = embot::hw::gpio::State::RESET, .off = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::eight}  };
+        
+    constexpr BSP thebsp {        
+        // maskofsupported
+        mask::pos2mask<uint32_t>(LED::one) | mask::pos2mask<uint32_t>(LED::two),        
+        // properties
+        {{
+            &led1p, &led2p, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr            
+        }}        
+    };
+    
+    void BSP::init(embot::hw::LED h) const {}
     
     
     #elif   defined(STM32HAL_BOARD_STRAIN2)
     
-    static const MAP theMAP = 
-    {        
-        .mask = mask::pos2mask<uint32_t>(LED::one),
-        .on   = embot::hw::gpio::State::RESET, 
-        .off  = embot::hw::gpio::State::SET,
-        .gpio = {   
-            {LED_GPIO_Port, LED_Pin}, 
-            {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}
-        }        
+    constexpr PROP led1p = { .on = embot::hw::gpio::State::RESET, .off = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::B, embot::hw::GPIO::PIN::eleven}  };  
+        
+    constexpr BSP thebsp {        
+        // maskofsupported
+        mask::pos2mask<uint32_t>(LED::one),        
+        // properties
+        {{
+            &led1p, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr            
+        }}        
     };
+    
+    void BSP::init(embot::hw::LED h) const {}    
+    
     
     #elif   defined(STM32HAL_BOARD_RFE)
-    
-    static const MAP theMAP = 
-    {
-        .mask = mask::pos2mask<uint32_t>(LED::one),
-        .on   = embot::hw::gpio::State::RESET, 
-        .off  = embot::hw::gpio::State::SET,
-        .gpio = {   
-            {LED_BLUE_GPIO_Port, LED_BLUE_Pin}, 
-            {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}, {nullptr, 0}
-        }        
+       
+    constexpr PROP led1p = { .on = embot::hw::gpio::State::RESET, .off = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::B, embot::hw::GPIO::PIN::zero}  };  
+        
+    constexpr BSP thebsp {        
+        // maskofsupported
+        mask::pos2mask<uint32_t>(LED::one),        
+        // properties
+        {{
+            &led1p, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr            
+        }}        
     };
+    
+    void BSP::init(embot::hw::LED h) const {}   
     
     #else
         #error embot::hw::bsp::led::theMAP must be defined    
     #endif
     
-    const MAP * const getMAP()
+    const BSP& getBSP() 
     {
-        return &theMAP;
+        return thebsp;
     }
               
 }}}} // namespace embot { namespace hw { namespace bsp {  namespace led {
@@ -234,118 +211,49 @@ namespace embot { namespace hw { namespace bsp { namespace led {
 
 namespace embot { namespace hw { namespace bsp { namespace button {
            
-    static_assert(static_cast<std::uint32_t>(embot::hw::BTN::none) < 8*sizeof(MAP::mask), "BTN::none must be less than 32 to be able to address a std::uint32_t mask");
-    static_assert(static_cast<std::uint32_t>(embot::hw::BTN::maxnumberof) < 8*sizeof(MAP::mask), "BTN::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
-    static_assert(static_cast<std::uint32_t>(embot::hw::BTN::maxnumberof) < static_cast<std::uint32_t>(embot::hw::BTN::none), "BTN::maxnumberof must be higher that BTN::none, so that we can optimise code");
+    static_assert(embot::common::tointegral(embot::hw::BTN::none) < 8*sizeof(SUPP::supportedmask), "BTN::none must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::common::tointegral(embot::hw::BTN::maxnumberof) < 8*sizeof(SUPP::supportedmask), "BTN::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::common::tointegral(embot::hw::BTN::maxnumberof) < embot::common::tointegral(embot::hw::BTN::none), "BTN::maxnumberof must be higher that BTN::none, so that we can optimise code");
 
-    
-    bool MAP::supported(embot::hw::BTN h) const 
-    { 
-        return embot::binary::bit::check(mask, toindex(h)); 
-    }
-    
-    const embot::hw::GPIO * MAP::getgpio(embot::hw::BTN h) const
-    {
-        return &gpio[toindex(h)];
-    }
-    
-    bool MAP::isvalid(embot::hw::BTN h) const
-    {
-        if(supported(h))
-        {   // i am sure that getgpio() returns something inside gpio[]...
-            return embot::hw::bsp::gpio::getMAP()->isvalid(*getgpio(h));
-        }
-        return false;        
-    }
-    
-    std::uint8_t MAP::toindex(embot::hw::BTN h) 
-    { 
-        return static_cast<uint8_t>(h); 
-    }
-    
-    
-    // and now the maps
 
     #if     defined(STM32HAL_BOARD_NUCLEO64)    
         
-    static const MAP theMAP = 
-    {
-        .mask = mask::pos2mask<uint32_t>(BTN::one),
-        .pressed = embot::hw::gpio::State::RESET,
-        .gpio = {
-            {B1_GPIO_Port, B1_Pin},
-            {nullptr, 0},
-            {nullptr, 0},
-            {nullptr, 0},
-            {nullptr, 0},
-            {nullptr, 0},
-            {nullptr, 0},
-            {nullptr, 0}
-        } 
+    constexpr PROP btn1p = { .pressed = embot::hw::gpio::State::RESET, .gpio = {B1_GPIO_Port, B1_Pin}  };  
+        
+    constexpr BSP thebsp {        
+        // maskofsupported
+        mask::pos2mask<uint32_t>(BTN::one),        
+        // properties
+        {{
+            &btn1p            
+        }}        
     };
-   
+    
+    void BSP::init(embot::hw::BTN h) const {}
+        
 
     #elif   defined(STM32HAL_BOARD_MTB4)
     
-    static const MAP theMAP = 
-    {
-        .mask = 0,
-        .pressed = embot::hw::gpio::State::RESET,
-        .gpio = {
-            {nullptr, 0},
-            {nullptr, 0},
-            {nullptr, 0},
-            {nullptr, 0},
-            {nullptr, 0},
-            {nullptr, 0},
-            {nullptr, 0},
-            {nullptr, 0}
-        }       
-    };
+    constexpr BSP thebsp {};
+    void BSP::init(embot::hw::BTN h) const {}
     
     #elif   defined(STM32HAL_BOARD_STRAIN2)
     
-    static const MAP theMAP = 
-    {
-        .mask = 0,
-        .pressed = embot::hw::gpio::State::RESET,
-        .gpio = {
-            {nullptr, 0},
-            {nullptr, 0},
-            {nullptr, 0},
-            {nullptr, 0},
-            {nullptr, 0},
-            {nullptr, 0},
-            {nullptr, 0},
-            {nullptr, 0}
-        }        
-    };
+    constexpr BSP thebsp {};
+    void BSP::init(embot::hw::BTN h) const {}
     
     #elif   defined(STM32HAL_BOARD_RFE)
     
-    static const MAP theMAP = 
-    {
-        .mask = 0,
-        .pressed = embot::hw::gpio::State::RESET,
-        .gpio = {
-            {nullptr, 0},
-            {nullptr, 0},
-            {nullptr, 0},
-            {nullptr, 0},
-            {nullptr, 0},
-            {nullptr, 0},
-            {nullptr, 0},
-            {nullptr, 0}
-        }      
-    };
+    constexpr BSP thebsp {};
+    void BSP::init(embot::hw::BTN h) const {}
     
     #else
         #error embot::hw::bsp::button::theMAP must be defined    
     #endif
     
-    const MAP * const getMAP()
+    const BSP& getBSP() 
     {
-        return &theMAP;
+        return thebsp;
     }
               
 }}}} // namespace embot { namespace hw { namespace bsp {  namespace button {
@@ -356,118 +264,86 @@ namespace embot { namespace hw { namespace bsp { namespace button {
 
 namespace embot { namespace hw { namespace bsp { namespace can {
            
-    static_assert(static_cast<std::uint32_t>(embot::hw::CAN::none) < 8*sizeof(MAP::mask), "CAN::none must be less than 32 to be able to address a std::uint32_t mask");
-    static_assert(static_cast<std::uint32_t>(embot::hw::CAN::maxnumberof) < 8*sizeof(MAP::mask), "CAN::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
-    static_assert(static_cast<std::uint32_t>(embot::hw::CAN::maxnumberof) < static_cast<std::uint32_t>(embot::hw::CAN::none), "CAN::maxnumberof must be higher that CAN::none, so that we can optimise code");
+    static_assert(embot::common::tointegral(embot::hw::CAN::none) < 8*sizeof(SUPP::supportedmask), "CAN::none must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::common::tointegral(embot::hw::CAN::maxnumberof) < 8*sizeof(SUPP::supportedmask), "CAN::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::common::tointegral(embot::hw::CAN::maxnumberof) < embot::common::tointegral(embot::hw::CAN::none), "CAN::maxnumberof must be higher that CAN::none, so that we can optimise code");
 
     
-    bool MAP::supported(embot::hw::CAN h) const 
-    { 
-        return embot::binary::bit::check(mask, toindex(h)); 
-    }
-    
-
-    bool MAP::isvalid(embot::hw::CAN h) const
-    {
-        if(supported(h))
-        {   
-            return true;
-        }
-        return false;        
-    }
-    
-    std::uint8_t MAP::toindex(embot::hw::CAN h) 
-    { 
-        return static_cast<uint8_t>(h); 
-    }
-    
-    const STM32PROPS * const MAP::getprops(embot::hw::CAN h) const
-    {
-        if(false == supported(h))
-        {
-            return nullptr;
-        }
-        return stm32props[toindex(h)];        
-    }
-    
-    
-    // and now the maps
-
-    // const support maps
     #if     defined(STM32HAL_BOARD_NUCLEO64) 
 
-    static const MAP theMAP = 
-    {
-        .mask = 0,
-        .stm32props = { nullptr }
-    };
-    
-    void MAP::init(embot::hw::CAN h) const {}
+    constexpr BSP thebsp {};    
+    void BSP::init(embot::hw::CAN h) const {}
    
     #elif   defined(STM32HAL_BOARD_MTB4)
     
-    static const STM32PROPS can1p = { .handle = &hcan1 };    
-    
-    static const MAP theMAP = 
-    {
-        .mask = mask::pos2mask<uint32_t>(CAN::one),
-        .stm32props = { &can1p }
+    constexpr PROP can1p = { .handle = &hcan1 };  
+        
+    constexpr BSP thebsp {        
+        // maskofsupported
+        mask::pos2mask<uint32_t>(CAN::one),        
+        // properties
+        {{
+            &can1p            
+        }}        
     };
     
-
-    void MAP::init(embot::hw::CAN h) const
+    void BSP::init(embot::hw::CAN h) const 
     {
         if(h == CAN::one)
         {            
             MX_CAN1_Init();
-        }         
-    } 
+        }        
+    }
 
     #elif   defined(STM32HAL_BOARD_STRAIN2)
     
-    static const STM32PROPS can1p = { .handle = &hcan1 };    
-    
-    static const MAP theMAP = 
-    {
-        .mask = mask::pos2mask<uint32_t>(CAN::one),
-        .stm32props = { &can1p }
+    constexpr PROP can1p = { .handle = &hcan1 };  
+        
+    constexpr BSP thebsp {        
+        // maskofsupported
+        mask::pos2mask<uint32_t>(CAN::one),        
+        // properties
+        {{
+            &can1p            
+        }}        
     };
     
-
-    void MAP::init(embot::hw::CAN h) const
+    void BSP::init(embot::hw::CAN h) const 
     {
         if(h == CAN::one)
         {            
             MX_CAN1_Init();
-        }         
-    }    
-
+        }        
+    }
+    
     #elif   defined(STM32HAL_BOARD_RFE)
     
-    static const STM32PROPS can1p = { .handle = &hcan1 };    
-    
-    static const MAP theMAP = 
-    {
-        .mask = mask::pos2mask<uint32_t>(CAN::one),
-        .stm32props = { &can1p }
+    constexpr PROP can1p = { .handle = &hcan1 };  
+        
+    constexpr BSP thebsp {        
+        // maskofsupported
+        mask::pos2mask<uint32_t>(CAN::one),        
+        // properties
+        {{
+            &can1p            
+        }}        
     };
     
-
-    void MAP::init(embot::hw::CAN h) const
+    void BSP::init(embot::hw::CAN h) const 
     {
         if(h == CAN::one)
         {            
             MX_CAN1_Init();
-        }         
-    } 
+        }        
+    }
 
     #else
-        #error embot::hw::bsp::can::theMAP must be defined    
+        #error embot::hw::bsp::can::thebsp must be defined    
     #endif
     
-    const MAP * const getMAP()
+    const BSP& getBSP() 
     {
-        return &theMAP;
+        return thebsp;
     }
               
 }}}} // namespace embot { namespace hw { namespace bsp {  namespace can {
@@ -491,129 +367,83 @@ void CAN1_RX0_IRQHandler(void)
 
 namespace embot { namespace hw { namespace bsp { namespace flash {
  
-    static_assert(static_cast<std::uint32_t>(embot::hw::FLASH::none) < 8*sizeof(MAP::mask), "FLASH::none must be less than 32 to be able to address a std::uint32_t mask");
-    static_assert(static_cast<std::uint32_t>(embot::hw::FLASH::maxnumberof) < 8*sizeof(MAP::mask), "FLASH::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
-    static_assert(static_cast<std::uint32_t>(embot::hw::FLASH::maxnumberof) < static_cast<std::uint32_t>(embot::hw::FLASH::none), "FLASH::maxnumberof must be higher that FLASH::none, so that we can optimise code");
+    static_assert(embot::common::tointegral(embot::hw::FLASH::none) < 8*sizeof(SUPP::supportedmask), "FLASH::none must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::common::tointegral(embot::hw::FLASH::maxnumberof) < 8*sizeof(SUPP::supportedmask), "FLASH::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::common::tointegral(embot::hw::FLASH::maxnumberof) < embot::common::tointegral(embot::hw::FLASH::none), "FLASH::maxnumberof must be higher that FLASH::none, so that we can optimise code");
 
-    
-    bool MAP::supported(embot::hw::FLASH h) const 
-    { 
-        return embot::binary::bit::check(mask, toindex(h)); 
-    }
-    
-
-    bool MAP::isvalid(embot::hw::FLASH h) const
-    {
-        if(supported(h))
-        {   
-            return true;
-        }
-        return false;        
-    }
-    
-    std::uint8_t MAP::toindex(embot::hw::FLASH h) 
-    { 
-        return static_cast<uint8_t>(h); 
-    }
-    
-    const embot::hw::flash::Partition& MAP::getpartition(embot::hw::FLASH h) const
-    {
-        if(false == supported(h))
-        {
-            static const embot::hw::flash::Partition dummy { 0, 0, 0};  
-            return dummy;
-        }
-        
-        return partitions[toindex(h)];        
-    }
-    
     
     // const support maps
     #if     defined(STM32HAL_BOARD_NUCLEO64) 
 
-        static const MAP theMAP = 
-        {
-            .mask = mask::pos2mask<uint32_t>(FLASH::whole) | mask::pos2mask<uint32_t>(FLASH::bootloader) | mask::pos2mask<uint32_t>(FLASH::application) |
-                    mask::pos2mask<uint32_t>(FLASH::sharedstorage) | mask::pos2mask<uint32_t>(FLASH::applicationstorage),
-            .partitions = { 
-                {0x08000000, 1024*1024, 2*1024},         // whole
-                {0x08000000, (124)*1024, 2*1024},       // bootloader
-                {0x08020000, (128)*1024, 2*1024},       // application           
-                {0x0801F000, (4)*1024,   4*1024},       // sharedstorage: on top of bootloader
-                {0x0801F000, (4)*1024,   4*1024},       // applicationstorage: on top of bootloader
-            }
-        };
+        // any: application @ 128k but ... applicationstorage on top
+        constexpr PROP whole                {{0x08000000,               256*1024,           2*1024}}; 
+        constexpr PROP bootloader           {{0x08000000,               (124)*1024,         2*1024}};   // bootloader
+        constexpr PROP sharedstorage        {{0x08000000+(124*1024),    (4)*1024,           2*1024}};   // sharedstorage: 4k on top of bootloader
+        constexpr PROP application          {{0x08000000+(128*1024),    (124)*1024,         2*1024}};   // application @ 128k
+        constexpr PROP applicationstorage   {{0x08000000+(252*1024),    (4)*1024,           2*1024}};   // applicationstorage: 4k on top of application
    
     #elif   defined(STM32HAL_BOARD_MTB4)
            
-        static const MAP theMAP = 
-        {
-            .mask = mask::pos2mask<uint32_t>(FLASH::whole) | mask::pos2mask<uint32_t>(FLASH::bootloader) | mask::pos2mask<uint32_t>(FLASH::application) |
-                    mask::pos2mask<uint32_t>(FLASH::sharedstorage) | mask::pos2mask<uint32_t>(FLASH::applicationstorage),
-            .partitions = { 
-                {0x08000000, 256*1024, 2*1024},         // whole
-                {0x08000000, (124)*1024, 2*1024},       // bootloader
-                {0x08020000, (128)*1024, 2*1024},       // application           
-                {0x0801F000, (4)*1024,   4*1024},       // sharedstorage: on top of bootloader
-                {0x0801F000, (4)*1024,   4*1024},       // applicationstorage: on top of bootloader
-            }
-        };
+        // any: application @ 128k but ... applicationstorage on top
+        constexpr PROP whole                {{0x08000000,               256*1024,           2*1024}}; 
+        constexpr PROP bootloader           {{0x08000000,               (124)*1024,         2*1024}};   // bootloader
+        constexpr PROP sharedstorage        {{0x08000000+(124*1024),    (4)*1024,           2*1024}};   // sharedstorage: 4k on top of bootloader
+        constexpr PROP application          {{0x08000000+(128*1024),    (124)*1024,         2*1024}};   // application @ 128k
+        constexpr PROP applicationstorage   {{0x08000000+(252*1024),    (4)*1024,           2*1024}};   // applicationstorage: 4k on top of application
+
 
     #elif   defined(STM32HAL_BOARD_STRAIN2)
     
         #if defined(STRAIN2_APP_AT_128K)
-         // at 128k
-        static const MAP theMAP = 
-        {
-            .mask = mask::pos2mask<uint32_t>(FLASH::whole) | mask::pos2mask<uint32_t>(FLASH::bootloader) | mask::pos2mask<uint32_t>(FLASH::application) |
-                    mask::pos2mask<uint32_t>(FLASH::sharedstorage) | mask::pos2mask<uint32_t>(FLASH::applicationstorage),
-            .partitions = { 
-                {0x08000000, 256*1024, 2*1024},         // whole
-                {0x08000000, (124)*1024, 2*1024},       // bootloader
-                {0x08020000, (128)*1024, 2*1024},       // application           
-                {0x0801F000, (4)*1024,   4*1024},       // sharedstorage: on top of bootloader
-                {0x0801F000, (4)*1024,   4*1024},       // applicationstorage: on top of bootloader
-            }
-        };      
+        
+        // strain legacy: application @ 128k and application storage together with sharedstorage
+        constexpr PROP whole                {{0x08000000,               256*1024,           2*1024}}; 
+        constexpr PROP bootloader           {{0x08000000,               (124)*1024,         2*1024}};   // bootloader
+        constexpr PROP sharedstorage        {{0x08000000+(124*1024),    (4)*1024,           2*1024}};   // sharedstorage: on top of bootloader
+        constexpr PROP applicationstorage   {{0x08000000+(124*1024),    (4)*1024,           2*1024}};   // applicationstorage: together with sharedstorage
+        constexpr PROP application          {{0x08000000+(128*1024),    (128)*1024,         2*1024}};   // application @ 128k
+        
         #else 
-        // at 80k
-        static const MAP theMAP = 
-        {
-            .mask = mask::pos2mask<uint32_t>(FLASH::whole) | mask::pos2mask<uint32_t>(FLASH::bootloader) | mask::pos2mask<uint32_t>(FLASH::application) |
-                    mask::pos2mask<uint32_t>(FLASH::sharedstorage) | mask::pos2mask<uint32_t>(FLASH::applicationstorage),
-            .partitions = { 
-                {0x08000000, 256*1024, 2*1024},         // whole
-                {0x08000000, (80-2)*1024, 2*1024},      // bootloader
-                {0x08014000, (256-80-4)*1024, 2*1024},  // application           
-                {0x08013800, 2*1024,   2*1024},         // sharedstorage: on top of bootloader
-                {0x0803F000, 4*1024,   2*1024},         // applicationstorage: on top of applciation
-            }
-        };
+        
+        // strain2: application @ 080k
+        constexpr PROP whole                {{0x08000000,               256*1024,           2*1024}}; 
+        constexpr PROP bootloader           {{0x08000000,               (78)*1024,          2*1024}};   // bootloader
+        constexpr PROP sharedstorage        {{0x08000000+(78*1024),     (2)*1024,           2*1024}};   // sharedstorage: on top of bootloader
+        constexpr PROP application          {{0x08000000+(80*1024),     (172)*1024,         2*1024}};   // application @ 080k
+        constexpr PROP applicationstorage   {{0x08000000+(252*1024),    (4)*1024,           2*1024}};   // applicationstorage: on top of application    
+        
         #endif
         
 
     #elif   defined(STM32HAL_BOARD_RFE)
     
-        static const MAP theMAP = 
-        {
-            .mask = mask::pos2mask<uint32_t>(FLASH::whole) | mask::pos2mask<uint32_t>(FLASH::bootloader) | mask::pos2mask<uint32_t>(FLASH::application) |
-                    mask::pos2mask<uint32_t>(FLASH::sharedstorage) | mask::pos2mask<uint32_t>(FLASH::applicationstorage),
-            .partitions = { 
-                {0x08000000, 256*1024, 2*1024},         // whole
-                {0x08000000, (124)*1024, 2*1024},       // bootloader
-                {0x08020000, (128)*1024, 2*1024},       // application           
-                {0x0801F000, (4)*1024,   4*1024},       // sharedstorage: on top of bootloader
-                {0x0801F000, (4)*1024,   4*1024},       // applicationstorage: on top of bootloader
-            }
-        };
+        // any: application @ 128k but ... applicationstorage on top
+        constexpr PROP whole                {{0x08000000,               256*1024,           2*1024}}; 
+        constexpr PROP bootloader           {{0x08000000,               (124)*1024,         2*1024}};   // bootloader
+        constexpr PROP sharedstorage        {{0x08000000+(124*1024),    (4)*1024,           2*1024}};   // sharedstorage: 4k on top of bootloader
+        constexpr PROP application          {{0x08000000+(128*1024),    (124)*1024,         2*1024}};   // application @ 128k
+        constexpr PROP applicationstorage   {{0x08000000+(252*1024),    (4)*1024,           2*1024}};   // applicationstorage: 4k on top of application
 
     #else
-        #error embot::hw::bsp::flash::theMAP must be defined    
-    #endif    
+        #error embot::hw::bsp::flash::thebsp must be defined    
+    #endif   
+
+
+    constexpr BSP thebsp {        
+        // maskofsupported
+        mask::pos2mask<uint32_t>(FLASH::whole) | mask::pos2mask<uint32_t>(FLASH::bootloader) | mask::pos2mask<uint32_t>(FLASH::application) |
+        mask::pos2mask<uint32_t>(FLASH::sharedstorage) | mask::pos2mask<uint32_t>(FLASH::applicationstorage),        
+        // properties
+        {{
+            &whole, &bootloader, &application, &sharedstorage, &applicationstorage            
+        }}        
+    };
     
-    const MAP * const getMAP()
+    void BSP::init(embot::hw::FLASH h) const {}
+    
+    const BSP& getBSP() 
     {
-        return &theMAP;
+        return thebsp;
     }
               
 }}}} // namespace embot { namespace hw { namespace bsp {  namespace flash {
@@ -622,56 +452,37 @@ namespace embot { namespace hw { namespace bsp { namespace flash {
 
 namespace embot { namespace hw { namespace bsp { namespace pga308 {
            
-    static_assert(static_cast<std::uint32_t>(embot::hw::PGA308::none) < 8*sizeof(MAP::mask), "PGA308::none must be less than 32 to be able to address a std::uint32_t mask");
-    static_assert(static_cast<std::uint32_t>(embot::hw::PGA308::maxnumberof) < 8*sizeof(MAP::mask), "PGA308::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
-    static_assert(static_cast<std::uint32_t>(embot::hw::PGA308::maxnumberof) < static_cast<std::uint32_t>(embot::hw::PGA308::none), "PGA308::maxnumberof must be higher that PGA308::none, so that we can optimise code");
+    static_assert(embot::common::tointegral(embot::hw::PGA308::none) < 8*sizeof(SUPP::supportedmask), "PGA308::none must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::common::tointegral(embot::hw::PGA308::maxnumberof) < 8*sizeof(SUPP::supportedmask), "PGA308::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::common::tointegral(embot::hw::PGA308::maxnumberof) < embot::common::tointegral(embot::hw::PGA308::none), "PGA308::maxnumberof must be higher that PGA308::none, so that we can optimise code");
 
-    
-    bool MAP::supported(embot::hw::PGA308 h) const 
-    { 
-        return embot::binary::bit::check(mask, toindex(h)); 
-    }
-    
-
-    bool MAP::isvalid(embot::hw::PGA308 h) const
-    {
-        if(supported(h))
-        {   
-            return true;
-        }
-        return false;        
-    }
-    
-    std::uint8_t MAP::toindex(embot::hw::PGA308 h) 
-    { 
-        return static_cast<uint8_t>(h); 
-    }
-    
-    
-    // and now the maps
-
-    // const support maps
 
     #if defined(STM32HAL_BOARD_STRAIN2)
-        
-    static const MAP theMAP = 
-    {
-        .mask = mask::pos2mask<uint32_t>(PGA308::one) | mask::pos2mask<uint32_t>(PGA308::two) | mask::pos2mask<uint32_t>(PGA308::three) |
-                mask::pos2mask<uint32_t>(PGA308::four) | mask::pos2mask<uint32_t>(PGA308::five) | mask::pos2mask<uint32_t>(PGA308::six)
+    
+    constexpr PROP prop { .poweron = {embot::hw::GPIO::PORT::B, embot::hw::GPIO::PIN::fifteen} }; // EN_2V8_GPIO_Port, EN_2V8_Pin
+
+    constexpr BSP thebsp {        
+        // maskofsupported
+        mask::pos2mask<uint32_t>(PGA308::one) | mask::pos2mask<uint32_t>(PGA308::two) | mask::pos2mask<uint32_t>(PGA308::three) |
+        mask::pos2mask<uint32_t>(PGA308::four) | mask::pos2mask<uint32_t>(PGA308::five) | mask::pos2mask<uint32_t>(PGA308::six),        
+        // properties
+        {{
+            &prop, &prop, &prop, &prop, &prop, &prop            
+        }}        
     };
 
+    void BSP::init(embot::hw::PGA308 h) const {}
+        
     #else
     
-    static const MAP theMAP = 
-    {
-        .mask = 0
-    };
+    constexpr BSP thebsp { };
+    void BSP::init(embot::hw::PGA308 h) const {}
 
     #endif
     
-    const MAP * const getMAP()
+    const BSP& getBSP() 
     {
-        return &theMAP;
+        return thebsp;
     }
               
 }}}} // namespace embot { namespace hw { namespace bsp {  namespace pga308 {
@@ -680,55 +491,36 @@ namespace embot { namespace hw { namespace bsp { namespace pga308 {
 
 namespace embot { namespace hw { namespace bsp { namespace si7051 {
            
-    static_assert(static_cast<std::uint32_t>(embot::hw::SI7051::none) < 8*sizeof(MAP::mask), "SI7051::none must be less than 32 to be able to address a std::uint32_t mask");
-    static_assert(static_cast<std::uint32_t>(embot::hw::SI7051::maxnumberof) < 8*sizeof(MAP::mask), "SI7051::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
-    static_assert(static_cast<std::uint32_t>(embot::hw::SI7051::maxnumberof) < static_cast<std::uint32_t>(embot::hw::SI7051::none), "SI7051::maxnumberof must be higher that SI7051::none, so that we can optimise code");
+    static_assert(embot::common::tointegral(embot::hw::SI7051::none) < 8*sizeof(SUPP::supportedmask), "SI7051::none must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::common::tointegral(embot::hw::SI7051::maxnumberof) < 8*sizeof(SUPP::supportedmask), "SI7051::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::common::tointegral(embot::hw::SI7051::maxnumberof) < embot::common::tointegral(embot::hw::SI7051::none), "SI7051::maxnumberof must be higher that SI7051::none, so that we can optimise code");
 
-    
-    bool MAP::supported(embot::hw::SI7051 h) const 
-    { 
-        return embot::binary::bit::check(mask, toindex(h)); 
-    }
-    
-
-    bool MAP::isvalid(embot::hw::SI7051 h) const
-    {
-        if(supported(h))
-        {   
-            return true;
-        }
-        return false;        
-    }
-    
-    std::uint8_t MAP::toindex(embot::hw::SI7051 h) 
-    { 
-        return static_cast<uint8_t>(h); 
-    }
-    
-    
-    // and now the maps
-
-    // const support maps
 
     #if defined(STM32HAL_BOARD_STRAIN2) || defined(STM32HAL_BOARD_MTB4)
         
-    static const MAP theMAP = 
-    {
-        .mask = mask::pos2mask<uint32_t>(SI7051::one) | mask::pos2mask<uint32_t>(SI7051::two)
+    constexpr PROP prop01 { .i2caddress = 0x80 }; 
+
+    constexpr BSP thebsp {        
+        // maskofsupported
+        mask::pos2mask<uint32_t>(SI7051::one),        
+        // properties
+        {{
+            &prop01             
+        }}        
     };
+
+    void BSP::init(embot::hw::SI7051 h) const {}
 
     #else
     
-    static const MAP theMAP = 
-    {
-        .mask = 0
-    };
+    constexpr BSP thebsp { };
+    void BSP::init(embot::hw::SI7051 h) const {}
 
     #endif
     
-    const MAP * const getMAP()
+    const BSP& getBSP() 
     {
-        return &theMAP;
+        return thebsp;
     }
               
 }}}} // namespace embot { namespace hw { namespace bsp {  namespace si7051 {
@@ -736,58 +528,45 @@ namespace embot { namespace hw { namespace bsp { namespace si7051 {
 
 namespace embot { namespace hw { namespace bsp { namespace onewire {
            
-    static_assert(static_cast<std::uint32_t>(embot::hw::ONEWIRE::none) < 8*sizeof(MAP::mask), "ONEWIRE::none must be less than 32 to be able to address a std::uint32_t mask");
-    static_assert(static_cast<std::uint32_t>(embot::hw::ONEWIRE::maxnumberof) < 8*sizeof(MAP::mask), "ONEWIRE::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
-    static_assert(static_cast<std::uint32_t>(embot::hw::ONEWIRE::maxnumberof) < static_cast<std::uint32_t>(embot::hw::ONEWIRE::none), "ONEWIRE::maxnumberof must be higher that ONEWIRE::none, so that we can optimise code");
+    static_assert(embot::common::tointegral(embot::hw::ONEWIRE::none) < 8*sizeof(SUPP::supportedmask), "ONEWIRE::none must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::common::tointegral(embot::hw::ONEWIRE::maxnumberof) < 8*sizeof(SUPP::supportedmask), "ONEWIRE::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::common::tointegral(embot::hw::ONEWIRE::maxnumberof) < embot::common::tointegral(embot::hw::ONEWIRE::none), "ONEWIRE::maxnumberof must be higher that ONEWIRE::none, so that we can optimise code");
 
     
-    bool MAP::supported(embot::hw::ONEWIRE h) const 
-    { 
-        return embot::binary::bit::check(mask, toindex(h)); 
-    }
-    
-
-    bool MAP::isvalid(embot::hw::ONEWIRE h) const
-    {
-        if(supported(h))
-        {   
-            return true;
-        }
-        return false;        
-    }
-    
-    std::uint8_t MAP::toindex(embot::hw::ONEWIRE h) 
-    { 
-        return static_cast<uint8_t>(h); 
-    }
-    
-    
-    // and now the maps
-
-    // const support maps
 
     #if defined(STM32HAL_BOARD_STRAIN2)
-        
-    static const MAP theMAP = 
-    {
-        .mask = mask::pos2mask<uint32_t>(ONEWIRE::one) | mask::pos2mask<uint32_t>(ONEWIRE::two) | mask::pos2mask<uint32_t>(ONEWIRE::three) |
-                mask::pos2mask<uint32_t>(ONEWIRE::four) | mask::pos2mask<uint32_t>(ONEWIRE::five) | mask::pos2mask<uint32_t>(ONEWIRE::six)
+    
+    constexpr PROP onewi1 { .gpio = { embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::four} };  // W_STRAIN1_GPIO_Port, W_STRAIN1_Pin
+    constexpr PROP onewi2 { .gpio = { embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::five} };  // W_STRAIN2_GPIO_Port, W_STRAIN2_Pin
+    constexpr PROP onewi3 { .gpio = { embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::six} };   // W_STRAIN3_GPIO_Port, W_STRAIN3_Pin
+    constexpr PROP onewi4 { .gpio = { embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::seven} }; // W_STRAIN4_GPIO_Port, W_STRAIN4_Pin
+    constexpr PROP onewi5 { .gpio = { embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::eight} }; // W_STRAIN5_GPIO_Port, W_STRAIN5_Pin
+    constexpr PROP onewi6 { .gpio = { embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::nine} };  // W_STRAIN6_GPIO_Port, W_STRAIN6_Pin
+    
+    constexpr BSP thebsp {        
+        // maskofsupported
+        mask::pos2mask<uint32_t>(ONEWIRE::one) | mask::pos2mask<uint32_t>(ONEWIRE::two) | mask::pos2mask<uint32_t>(ONEWIRE::three) |
+        mask::pos2mask<uint32_t>(ONEWIRE::four) | mask::pos2mask<uint32_t>(ONEWIRE::five) | mask::pos2mask<uint32_t>(ONEWIRE::six),       
+        // properties
+        {{
+            &onewi1, &onewi2, &onewi3, &onewi4, &onewi5, &onewi6
+        }}        
     };
 
+    void BSP::init(embot::hw::ONEWIRE h) const {}
+                
     #else
     
-    static const MAP theMAP = 
-    {
-        .mask = 0
-    };
+    constexpr BSP thebsp { };
+    void BSP::init(embot::hw::ONEWIRE h) const {}
 
     #endif
     
-    const MAP * const getMAP()
+    const BSP& getBSP() 
     {
-        return &theMAP;
+        return thebsp;
     }
-              
+    
 }}}} // namespace embot { namespace hw { namespace bsp {  namespace onewire {
 
 
@@ -796,79 +575,42 @@ namespace embot { namespace hw { namespace bsp { namespace onewire {
 
 namespace embot { namespace hw { namespace bsp { namespace adc {
            
-    static_assert(static_cast<std::uint32_t>(embot::hw::ADC::none) < 8*sizeof(MAP::mask), "ADC::none must be less than 32 to be able to address a std::uint32_t mask");
-    static_assert(static_cast<std::uint32_t>(embot::hw::ADC::maxnumberof) < 8*sizeof(MAP::mask), "ADC::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
-    static_assert(static_cast<std::uint32_t>(embot::hw::ADC::maxnumberof) < static_cast<std::uint32_t>(embot::hw::ADC::none), "ADC::maxnumberof must be higher that ADC::none, so that we can optimise code");
+    static_assert(embot::common::tointegral(embot::hw::ADC::none) < 8*sizeof(SUPP::supportedmask), "ADC::none must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::common::tointegral(embot::hw::ADC::maxnumberof) < 8*sizeof(SUPP::supportedmask), "ADC::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::common::tointegral(embot::hw::ADC::maxnumberof) < embot::common::tointegral(embot::hw::ADC::none), "ADC::maxnumberof must be higher that ADC::none, so that we can optimise code");
 
     
-    bool MAP::supported(embot::hw::ADC h) const 
-    { 
-        return embot::binary::bit::check(mask, toindex(h)); 
-    }
-    
-
-    bool MAP::isvalid(embot::hw::ADC h) const
-    {
-        if(supported(h))
-        {   
-            return true;
-        }
-        return false;        
-    }
-    
-    std::uint8_t MAP::toindex(embot::hw::ADC h) 
-    { 
-        return static_cast<uint8_t>(h); 
-    }
-    
-    const STM32PROPS * const MAP::getprops(embot::hw::ADC h) const
-    {
-        if(false == supported(h))
-        {
-            return nullptr;
-        }
-        return stm32props[toindex(h)];        
-    }
-    
-    
-    // and now the maps
-
-    // const support maps
-
     #if defined(STM32HAL_BOARD_STRAIN2)
     
-    static const STM32PROPS adc1p = { .handle = &hadc1 };
-           
-        
-    static const MAP theMAP = 
-    {
-        .mask = mask::pos2mask<uint32_t>(ADC::one),
-        .stm32props = { &adc1p }
-    };
+    constexpr PROP adc1p { .handle = &hadc1 }; 
     
-    void MAP::init(embot::hw::ADC h) const
+    constexpr BSP thebsp {        
+        // maskofsupported
+        mask::pos2mask<uint32_t>(ADC::one),        
+        // properties
+        {{
+            &adc1p             
+        }}        
+    };
+
+    void BSP::init(embot::hw::ADC h) const
     {
         // init peripherals: adc1 and dma1
         MX_ADC1_Init();
         // dma is globally initted by stm32hal_bsp_init() because it holds all dma peripherals
-        //MX_DMA_Init();         
+        //MX_DMA_Init();     
     }
-
+    
     #else
     
-    static const MAP theMAP = 
-    {
-        .mask = 0,
-        .stm32props = { nullptr }
-    };
-    
-    void MAP::init(embot::hw::ADC h) const {}
+    constexpr BSP thebsp { };    
+    void BSP::init(embot::hw::ADC h) const {}
 
     #endif
     
-    const MAP * const getMAP()
+    const BSP& getBSP() 
     {
-        return &theMAP;
+        return thebsp;
     }
               
 }}}} // namespace embot { namespace hw { namespace bsp {  namespace adc {
@@ -895,105 +637,67 @@ void DMA1_Channel1_IRQHandler(void)
 #if defined(HAL_TIM_MODULE_ENABLED)
 
 namespace embot { namespace hw { namespace bsp { namespace timer {
-           
-    static_assert(static_cast<std::uint32_t>(embot::hw::TIMER::none) < 8*sizeof(MAP::mask), "TIMER::none must be less than 32 to be able to address a std::uint32_t mask");
-    static_assert(static_cast<std::uint32_t>(embot::hw::TIMER::maxnumberof) < 8*sizeof(MAP::mask), "TIMER::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
-    static_assert(static_cast<std::uint32_t>(embot::hw::TIMER::maxnumberof) < static_cast<std::uint32_t>(embot::hw::TIMER::none), "TIMER::maxnumberof must be higher that CAN::none, so that we can optimise code");
+               
+    static_assert(embot::common::tointegral(embot::hw::TIMER::none) < 8*sizeof(SUPP::supportedmask), "TIMER::none must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::common::tointegral(embot::hw::TIMER::maxnumberof) < 8*sizeof(SUPP::supportedmask), "TIMER::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::common::tointegral(embot::hw::TIMER::maxnumberof) < embot::common::tointegral(embot::hw::TIMER::none), "TIMER::maxnumberof must be higher that CAN::none, so that we can optimise code");
 
     
-    bool MAP::supported(embot::hw::TIMER h) const 
-    { 
-        return embot::binary::bit::check(mask, toindex(h)); 
-    }
-    
-
-    bool MAP::isvalid(embot::hw::TIMER h) const
-    {
-        if(supported(h))
-        {   
-            return true;
-        }
-        return false;        
-    }
-    
-    std::uint8_t MAP::toindex(embot::hw::TIMER h) 
-    { 
-        return static_cast<uint8_t>(h); 
-    }
-    
-    const STM32PROPS * const MAP::getprops(embot::hw::TIMER h) const
-    {
-        if(false == supported(h))
-        {
-            return nullptr;
-        }
-        return stm32props[toindex(h)];        
-    }
-    
-    
-    // and now the maps
-
-    // const support maps
     #if     defined(STM32HAL_BOARD_NUCLEO64) 
 
-    static const MAP theMAP = 
-    {
-        .mask       = 0,
-        .stm32props = { 
-            nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,     // from 1 to 8
-            nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr      // from 9 to 16   
-        }    
-    };
+    constexpr BSP thebsp { };    
+    void BSP::init(embot::hw::TIMER h) const {}
    
     #elif   defined(STM32HAL_BOARD_MTB4)
+       
+    // sadly we cannot use constepr because of the reinterpret_cast<> inside TIM6 etc.
+    static const PROP tim06p = { .TIMx = TIM6,  .handle = &htim6,  .clock = embot::hw::CLOCK::syscore, .isonepulse = false, .mastermode = true };   
     
-    static const STM32PROPS tim06p = { .TIMx = TIM6,  .handle = &htim6,  .clock = embot::hw::CLOCK::syscore, .isonepulse = false, .mastermode = true };
-           
-    static const MAP theMAP = 
-    {
-        .mask       = mask::pos2mask<uint32_t>(TIMER::six),
-        .stm32props = { 
+    constexpr BSP thebsp {        
+        // maskofsupported
+        mask::pos2mask<uint32_t>(TIMER::six),        
+        // properties
+        {{
             nullptr, nullptr, nullptr, nullptr, nullptr, &tim06p, nullptr, nullptr,     // from 1 to 8
-            nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr      // from 9 to 16  
-        }            
+            nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr      // from 9 to 16            
+        }}        
     };
-
-    #elif   defined(STM32HAL_BOARD_STRAIN2)
     
+    void BSP::init(embot::hw::TIMER h) const {}
 
-    static const STM32PROPS tim06p = { .TIMx = TIM6,  .handle = &htim6,  .clock = embot::hw::CLOCK::syscore, .isonepulse = false, .mastermode = true };
-    static const STM32PROPS tim07p = { .TIMx = TIM7,  .handle = &htim7,  .clock = embot::hw::CLOCK::syscore, .isonepulse = false, .mastermode = true };
-    static const STM32PROPS tim15p = { .TIMx = TIM15, .handle = &htim15, .clock = embot::hw::CLOCK::syscore, .isonepulse = true,  .mastermode = false };
-    static const STM32PROPS tim16p = { .TIMx = TIM16, .handle = &htim16, .clock = embot::hw::CLOCK::syscore, .isonepulse = false, .mastermode = false };
-           
-    static const MAP theMAP = 
-    {
-        .mask       = mask::pos2mask<uint32_t>(TIMER::six) | mask::pos2mask<uint32_t>(TIMER::seven) | 
-                      mask::pos2mask<uint32_t>(TIMER::fifteen) | mask::pos2mask<uint32_t>(TIMER::sixteen),
-        .stm32props = {
+    #elif   defined(STM32HAL_BOARD_STRAIN2)    
+
+    // sadly we cannot use constepr because of the reinterpret_cast<> inside TIM6 etc.
+    static const PROP tim06p = { .TIMx = TIM6,  .handle = &htim6,  .clock = embot::hw::CLOCK::syscore, .isonepulse = false, .mastermode = true };
+    static const PROP tim07p = { .TIMx = TIM7,  .handle = &htim7,  .clock = embot::hw::CLOCK::syscore, .isonepulse = false, .mastermode = true };
+    static const PROP tim15p = { .TIMx = TIM15, .handle = &htim15, .clock = embot::hw::CLOCK::syscore, .isonepulse = true,  .mastermode = false };
+    static const PROP tim16p = { .TIMx = TIM16, .handle = &htim16, .clock = embot::hw::CLOCK::syscore, .isonepulse = false, .mastermode = false };  
+        
+    constexpr BSP thebsp {        
+        // maskofsupported
+        mask::pos2mask<uint32_t>(TIMER::six) | mask::pos2mask<uint32_t>(TIMER::seven) | 
+        mask::pos2mask<uint32_t>(TIMER::fifteen) | mask::pos2mask<uint32_t>(TIMER::sixteen),        
+        // properties
+        {{
             nullptr, nullptr, nullptr, nullptr, nullptr, &tim06p, &tim07p, nullptr,     // from 1 to 8
-            nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, &tim15p, &tim16p      // from 9 to 16 
-        }           
+            nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, &tim15p, &tim16p      // from 9 to 16             
+        }}        
     };
+    
+    void BSP::init(embot::hw::TIMER h) const {}
 
     #elif   defined(STM32HAL_BOARD_RFE)
     
-    static const MAP theMAP = 
-    {
-        .mask       = 0,
-        .stm32props = { 
-            nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr,     // from 1 to 8
-            nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr      // from 9 to 16   
-        }         
-    };
+    constexpr BSP thebsp { };
+    void BSP::init(embot::hw::TIMER h) const {} 
 
     #else
-        #error embot::hw::bsp::timer::theMAP must be defined    
+        #error embot::hw::bsp::timer::thebsp must be defined    
     #endif
     
-    const MAP * const getMAP()
+    const BSP& getBSP() 
     {
-        return &theMAP;
+        return thebsp;
     }
               
 }}}} // namespace embot { namespace hw { namespace bsp {  namespace timer {
@@ -1115,79 +819,26 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 namespace embot { namespace hw { namespace bsp { namespace i2c {
            
-    static_assert(static_cast<std::uint32_t>(embot::hw::I2C::none) < 8*sizeof(MAP::mask), "I2C::none must be less than 32 to be able to address a std::uint32_t mask");
-    static_assert(static_cast<std::uint32_t>(embot::hw::I2C::maxnumberof) < 8*sizeof(MAP::mask), "I2C::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
-    static_assert(static_cast<std::uint32_t>(embot::hw::I2C::maxnumberof) < static_cast<std::uint32_t>(embot::hw::I2C::none), "I2C::maxnumberof must be higher that I2C::none, so that we can optimise code");
+    static_assert(embot::common::tointegral(embot::hw::I2C::none) < 8*sizeof(SUPP::supportedmask), "I2C::none must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::common::tointegral(embot::hw::I2C::maxnumberof) < 8*sizeof(SUPP::supportedmask), "I2C::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::common::tointegral(embot::hw::I2C::maxnumberof) < embot::common::tointegral(embot::hw::I2C::none), "I2C::maxnumberof must be higher that I2C::none, so that we can optimise code");
 
     
-    bool MAP::supported(embot::hw::I2C h) const 
-    { 
-        return embot::binary::bit::check(mask, toindex(h)); 
-    }
-    
-
-    bool MAP::isvalid(embot::hw::I2C h) const
-    {
-        if(supported(h))
-        {   
-            return true;
-        }
-        return false;        
-    }
-    
-    std::uint8_t MAP::toindex(embot::hw::I2C h) 
-    { 
-        return static_cast<uint8_t>(h); 
-    }
-    
-    const STM32PROPS * const MAP::getprops(embot::hw::I2C h) const
-    {
-        if(false == supported(h))
-        {
-            return nullptr;
-        }
-        return stm32props[toindex(h)];        
-    }
-    
-    
-    // and now the maps
-
-    // const support maps
     #if defined(STM32HAL_BOARD_MTB4)
     
-    static const STM32PROPS i2c1p = { .handle = &hi2c1, .handledmatx = &hdma_i2c1_tx, .handledmarx = &hdma_i2c1_rx };
-    static const STM32PROPS i2c2p = { .handle = &hi2c2, .handledmatx = &hdma_i2c2_tx, .handledmarx = &hdma_i2c2_rx };
-        
-    static const MAP theMAP = 
-    {
-        .mask = mask::pos2mask<uint32_t>(I2C::one) | mask::pos2mask<uint32_t>(I2C::two),
-        .stm32props = { &i2c1p, &i2c2p }       
+    constexpr PROP i2c1p { .handle = &hi2c1 }; //, .handledmatx = &hdma_i2c1_tx, .handledmarx = &hdma_i2c1_rx };
+    constexpr PROP i2c2p { .handle = &hi2c2 }; //, .handledmatx = &hdma_i2c2_tx, .handledmarx = &hdma_i2c2_rx };
+                
+    constexpr BSP thebsp {        
+        // maskofsupported
+        mask::pos2mask<uint32_t>(I2C::one) | mask::pos2mask<uint32_t>(I2C::two),        
+        // properties
+        {{
+            &i2c1p, &i2c2p             
+        }}        
     };
     
-    void MAP::init(embot::hw::I2C h) const
-    {
-        if(h == I2C::one)
-        {            
-            MX_I2C1_Init();
-        }
-        else if(h == I2C::two)
-        {
-            MX_I2C2_Init();
-        }         
-    }
-    
-    #elif   defined(STM32HAL_BOARD_STRAIN2)
-         
-    static const STM32PROPS i2c1p = { .handle = &hi2c1, .handledmatx = &hdma_i2c1_tx, .handledmarx = &hdma_i2c1_rx };
-    static const STM32PROPS i2c2p = { .handle = &hi2c2, .handledmatx = &hdma_i2c2_tx, .handledmarx = &hdma_i2c2_rx };
-        
-    static const MAP theMAP = 
-    {
-        .mask = mask::pos2mask<uint32_t>(I2C::one) | mask::pos2mask<uint32_t>(I2C::two),
-        .stm32props = { &i2c1p, &i2c2p }       
-    };
-    
-    void MAP::init(embot::hw::I2C h) const
+    void BSP::init(embot::hw::I2C h) const
     {
         if(h == I2C::one)
         {            
@@ -1199,21 +850,42 @@ namespace embot { namespace hw { namespace bsp { namespace i2c {
         }         
     }
 
-    #else 
-    
-    static const MAP theMAP = 
+    #elif   defined(STM32HAL_BOARD_STRAIN2)
+     
+    constexpr PROP i2c1p { .handle = &hi2c1 }; //, .handledmatx = &hdma_i2c1_tx, .handledmarx = &hdma_i2c1_rx };
+    constexpr PROP i2c2p { .handle = &hi2c2 }; //, .handledmatx = &hdma_i2c2_tx, .handledmarx = &hdma_i2c2_rx };
+        
+    constexpr BSP thebsp {        
+        // maskofsupported
+        mask::pos2mask<uint32_t>(I2C::one) | mask::pos2mask<uint32_t>(I2C::two),        
+        // properties
+        {{
+            &i2c1p, &i2c2p             
+        }}        
+    }; 
+
+    void BSP::init(embot::hw::I2C h) const
     {
-        .mask = 0,
-        .stm32props = { nullptr, nullptr }
-    };
+        if(h == I2C::one)
+        {            
+            MX_I2C1_Init();
+        }
+        else if(h == I2C::two)
+        {
+            MX_I2C2_Init();
+        }         
+    }
     
-    void MAP::init(embot::hw::I2C h) const {}
+    #else 
+       
+    constexpr BSP thebsp { };    
+    void BSP::init(embot::hw::I2C h) const {}
     
     #endif
     
-    const MAP * const getMAP()
+    const BSP& getBSP() 
     {
-        return &theMAP;
+        return thebsp;
     }
               
 }}}} // namespace embot { namespace hw { namespace bsp {  namespace i2c {
@@ -1362,55 +1034,37 @@ void I2C2_ER_IRQHandler(void)
 
 namespace embot { namespace hw { namespace bsp { namespace bno055 {
            
-    static_assert(static_cast<std::uint32_t>(embot::hw::BNO055::none) < 8*sizeof(MAP::mask), "BNO055::none must be less than 32 to be able to address a std::uint32_t mask");
-    static_assert(static_cast<std::uint32_t>(embot::hw::BNO055::maxnumberof) < 8*sizeof(MAP::mask), "BNO055::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
-    static_assert(static_cast<std::uint32_t>(embot::hw::BNO055::maxnumberof) < static_cast<std::uint32_t>(embot::hw::BNO055::none), "BNO055::maxnumberof must be higher that BNO055::none, so that we can optimise code");
+    static_assert(embot::common::tointegral(embot::hw::BNO055::none) < 8*sizeof(SUPP::supportedmask), "BNO055::none must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::common::tointegral(embot::hw::BNO055::maxnumberof) < 8*sizeof(SUPP::supportedmask), "BNO055::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::common::tointegral(embot::hw::BNO055::maxnumberof) < embot::common::tointegral(embot::hw::BNO055::none), "BNO055::maxnumberof must be higher that BNO055::none, so that we can optimise code");
 
     
-    bool MAP::supported(embot::hw::BNO055 h) const 
-    { 
-        return embot::binary::bit::check(mask, toindex(h)); 
-    }
-    
-
-    bool MAP::isvalid(embot::hw::BNO055 h) const
-    {
-        if(supported(h))
-        {   
-            return true;
-        }
-        return false;        
-    }
-    
-    std::uint8_t MAP::toindex(embot::hw::BNO055 h) 
-    { 
-        return static_cast<uint8_t>(h); 
-    }
-    
-    
-    // and now the maps
-
-    // const support maps
-
     #if defined(STM32HAL_BOARD_STRAIN2) || defined(STM32HAL_BOARD_MTB4)
-        
-    static const MAP theMAP = 
-    {
-        .mask = mask::pos2mask<uint32_t>(BNO055::one)
+    
+    // .boot = { BNO055_BOOT_GPIO_Port, BNO055_BOOT_Pin }, .reset = { BNO055_RESET_GPIO_Port, BNO055_RESET_Pin } 
+    constexpr PROP prop01 { .i2caddress = 0x52, .boot = { embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::thirteen }, .reset = { embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::twelve } }; 
+
+    constexpr BSP thebsp {        
+        // maskofsupported
+        mask::pos2mask<uint32_t>(BNO055::one),        
+        // properties
+        {{
+            &prop01             
+        }}        
     };
 
+    void BSP::init(embot::hw::BNO055 h) const {}
+        
     #else
     
-    static const MAP theMAP = 
-    {
-        .mask = 0
-    };
-
+    constexpr BSP thebsp { };
+    void BSP::init(embot::hw::BNO055 h) const {}
+        
     #endif
     
-    const MAP * const getMAP()
+    const BSP& getBSP() 
     {
-        return &theMAP;
+        return thebsp;
     }
               
 }}}} // namespace embot { namespace hw { namespace bsp {  namespace bno055 {

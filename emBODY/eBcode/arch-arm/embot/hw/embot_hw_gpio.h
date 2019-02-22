@@ -34,11 +34,28 @@ namespace embot { namespace hw { namespace gpio {
     
     enum class Mode : std::uint8_t { OUTPUTopendrain = 0, OUTPUTpushpull = 1 };
     
+
+    struct Config
+    {
+        Mode    mode;
+        Config() : mode(Mode::OUTPUTopendrain) {}
+    };
+    
+    bool supported(const embot::hw::GPIO &g);
+    
+    bool initialised(const embot::hw::GPIO g);
+    
+    result_t init(embot::hw::GPIO &g, const Config &config);
+    
     result_t configure(const embot::hw::GPIO &g, Mode m);
     
     result_t set(const embot::hw::GPIO &g, State s);
     
+    result_t toggle(const embot::hw::GPIO &g);
+    
     State get(const embot::hw::GPIO &g);
+    
+    
        
 }}} // namespace embot { namespace hw { namespace gpio 
 

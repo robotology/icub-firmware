@@ -40,7 +40,7 @@ namespace embot { namespace hw { namespace pga308 {
         embot::hw::gpio::State      poweronstate; 
         embot::hw::ONEWIRE          onewirechannel;
         embot::hw::onewire::Config  onewireconfig;          
-        Config() : powerongpio(nullptr, 0), poweronstate(embot::hw::gpio::State::SET), onewirechannel(embot::hw::ONEWIRE::one) {}
+        Config() : powerongpio(embot::hw::GPIO::PORT::none, embot::hw::GPIO::PIN::none), poweronstate(embot::hw::gpio::State::SET), onewirechannel(embot::hw::ONEWIRE::one) {}
         Config(const embot::hw::GPIO &_pon, const embot::hw::gpio::State _ps, const embot::hw::ONEWIRE _owch, const embot::hw::onewire::Config &_owco)
         {
             powerongpio = _pon;

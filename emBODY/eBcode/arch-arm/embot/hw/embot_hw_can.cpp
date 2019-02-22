@@ -179,12 +179,12 @@ static bool can::interrupt_TX_is_enabled(void)
 
 bool can::supported(embot::hw::CAN p)
 {
-    return embot::hw::bsp::can::getMAP()->supported(p);
+    return embot::hw::bsp::can::getBSP().supported(p);
 }
 
 bool can::initialised(embot::hw::CAN p)
 {
-    return embot::binary::bit::check(initialisedmask, embot::hw::bsp::can::MAP::toindex(p));
+    return embot::binary::bit::check(initialisedmask, embot::common::tointegral(p));
 }    
 
 static void can::s_transmit(CAN_HandleTypeDef *hcan)
@@ -304,10 +304,13 @@ result_t can::init(embot::hw::CAN p, const Config &config)
     if(true == initialised(p))
     {
         return resOK;
-    }
+    }    
+    
+    // init peripheral
+    embot::hw::bsp::can::getBSP().init(p);
     
     candata.config = config;
-    candata.handle = reinterpret_cast<CAN_HandleTypeDef*>(embot::hw::bsp::can::getMAP()->getprops(p)->handle);
+    candata.handle = embot::hw::bsp::can::getBSP().getPROP(p)->handle;
 
     //configure txframe like a data frame with standard ID. (we never use ext or remote frames)
     candata.TxMessage.ExtId = 0;
@@ -321,9 +324,6 @@ result_t can::init(embot::hw::CAN p, const Config &config)
     candata.handle->pRxMsg = &candata.RxMessage;    
     #endif
     
-    // init peripheral
-    //MX_CAN1_Init();
-    embot::hw::bsp::can::getMAP()->init(p);
     
     // do whatever else is required .... for instance... init the buffers.
     
@@ -372,7 +372,7 @@ result_t can::init(embot::hw::CAN p, const Config &config)
         return resNOK; //TODO: adding clear of vector
     #endif
     
-    embot::binary::bit::set(initialisedmask, embot::hw::bsp::can::MAP::toindex(p));
+    embot::binary::bit::set(initialisedmask, embot::common::tointegral(p));
 
     return resOK;
 

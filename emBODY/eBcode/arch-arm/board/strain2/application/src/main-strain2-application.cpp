@@ -16,6 +16,7 @@
  * Public License for more details
 */
 
+
 #undef TEST_ENABLED
 
 #undef TEST_HW_PGA308
@@ -147,7 +148,8 @@ static std::vector<embot::hw::can::Frame> outframes;
 
 
 static void start_evt_based(void)
-{    
+{   
+    
     static const std::initializer_list<embot::hw::LED> allleds = {embot::hw::LED::one};  
     embot::app::theLEDmanager &theleds = embot::app::theLEDmanager::getInstance();     
     theleds.init(allleds);    
@@ -543,7 +545,7 @@ void tests_launcher_init()
     embot::hw::PGA308::Config pga308cfg;
         
     // common settings
-    pga308cfg.powerongpio = embot::hw::gpio::GPIO(EN_2V8_GPIO_Port, EN_2V8_Pin);
+    pga308cfg.powerongpio = embot::hw::stm32GPIO(EN_2V8_GPIO_Port, EN_2V8_Pin);
     pga308cfg.poweronstate = embot::hw::gpio::State::SET;
     pga308cfg.onewireconfig.rate = embot::hw::onewire::Rate::tenKbps;
     pga308cfg.onewireconfig.usepreamble =  true;
@@ -553,32 +555,32 @@ void tests_launcher_init()
     
     // embot::hw::PGA308::zero
     pga308cfg.onewirechannel = embot::hw::onewire::Channel::one;
-    pga308cfg.onewireconfig.gpio = embot::hw::gpio::GPIO(W_STRAIN1_GPIO_Port, W_STRAIN1_Pin);
+    pga308cfg.onewireconfig.gpio = embot::hw::stm32GPIO(W_STRAIN1_GPIO_Port, W_STRAIN1_Pin);
     embot::hw::PGA308::init(embot::hw::PGA308::Amplifier::one, pga308cfg);
     
     // embot::hw::PGA308::two
     pga308cfg.onewirechannel = embot::hw::onewire::Channel::two;
-    pga308cfg.onewireconfig.gpio = embot::hw::gpio::GPIO(W_STRAIN2_GPIO_Port, W_STRAIN2_Pin);
+    pga308cfg.onewireconfig.gpio = embot::hw::stm32GPIO(W_STRAIN2_GPIO_Port, W_STRAIN2_Pin);
     embot::hw::PGA308::init(embot::hw::PGA308::Amplifier::two, pga308cfg);
     
     // embot::hw::PGA308::three
     pga308cfg.onewirechannel = embot::hw::onewire::Channel::three;
-    pga308cfg.onewireconfig.gpio = embot::hw::gpio::GPIO(W_STRAIN3_GPIO_Port, W_STRAIN3_Pin);
+    pga308cfg.onewireconfig.gpio = embot::hw::stm32GPIO(W_STRAIN3_GPIO_Port, W_STRAIN3_Pin);
     embot::hw::PGA308::init(embot::hw::PGA308::Amplifier::three, pga308cfg);
         
     // embot::hw::PGA308::four
     pga308cfg.onewirechannel = embot::hw::onewire::Channel::four;
-    pga308cfg.onewireconfig.gpio = embot::hw::gpio::GPIO(W_STRAIN4_GPIO_Port, W_STRAIN4_Pin);
+    pga308cfg.onewireconfig.gpio = embot::hw::stm32GPIO(W_STRAIN4_GPIO_Port, W_STRAIN4_Pin);
     embot::hw::PGA308::init(embot::hw::PGA308::Amplifier::four, pga308cfg);    
     
     // embot::hw::PGA308::five
     pga308cfg.onewirechannel = embot::hw::onewire::Channel::five;
-    pga308cfg.onewireconfig.gpio = embot::hw::gpio::GPIO(W_STRAIN5_GPIO_Port, W_STRAIN5_Pin);
+    pga308cfg.onewireconfig.gpio = embot::hw::stm32GPIO(W_STRAIN5_GPIO_Port, W_STRAIN5_Pin);
     embot::hw::PGA308::init(embot::hw::PGA308::Amplifier::five, pga308cfg);     
 
     // embot::hw::PGA308::six
     pga308cfg.onewirechannel = embot::hw::onewire::Channel::six;
-    pga308cfg.onewireconfig.gpio = embot::hw::gpio::GPIO(W_STRAIN6_GPIO_Port, W_STRAIN6_Pin);
+    pga308cfg.onewireconfig.gpio = embot::hw::stm32GPIO(W_STRAIN6_GPIO_Port, W_STRAIN6_Pin);
     embot::hw::PGA308::init(embot::hw::PGA308::Amplifier::six, pga308cfg);   
     
 #endif    
