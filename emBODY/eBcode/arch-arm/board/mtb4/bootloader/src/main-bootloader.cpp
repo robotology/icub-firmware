@@ -75,9 +75,6 @@ int main(void)
         } break;          
     }
 
-    // manage the basic canboardinfo
-//    embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance();    
-//    canbrdinfo.synch(embot::app::canprotocol::Board::mtb, vBL, 1);
     
     bootloader.execute(config);
     
@@ -118,7 +115,7 @@ static void bl_activity(void* param)
 
     // manage the basic canboardinfo
     embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance();    
-    canbrdinfo.synch(embot::app::canprotocol::Board::strain2, vBL, defADDRESS, defaultInfo32);
+    canbrdinfo.synch(embot::app::canprotocol::Board::mtb4, vBL, defADDRESS, defaultInfo32);
     
   
     // start task waiting for can messages. 

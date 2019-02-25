@@ -73,10 +73,6 @@ int main(void)
             activity_param.blinkingperiod = BlinkMadlyPeriod;
         } break;          
     }
-
-    // manage the basic canboardinfo
-//    embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance();    
-//    canbrdinfo.synch(embot::app::canprotocol::Board::mtb, vBL, 1);
     
     bootloader.execute(config);
     
