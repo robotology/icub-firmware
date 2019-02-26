@@ -24,6 +24,7 @@
 
 #include "embot_common.h"
 #include "embot_hw.h"
+#include "embot_binary.h"
 #include "embot_hw_gpio.h"
 #include "embot_hw_button.h"
 #include "embot_hw_can.h"
