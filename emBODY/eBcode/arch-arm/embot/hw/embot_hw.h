@@ -58,7 +58,7 @@ namespace embot { namespace hw {
                                       ten = 9, eleven = 10, twelve = 11, thirteen = 12, fourteen = 13, fifteen = 14, sixteen = 15, 
                                       none = 31, maxnumberof = 16 }; 
 
-    enum class I2C : std::uint8_t { one = 0, two = 1, none = 31, maxnumberof = 2 };     
+    enum class I2C : std::uint8_t { one = 0, two = 1, three = 2, none = 31, maxnumberof = 3 };     
 
     enum class BNO055 : std::uint8_t { one = 0, none = 31, maxnumberof = 1 };    
     
