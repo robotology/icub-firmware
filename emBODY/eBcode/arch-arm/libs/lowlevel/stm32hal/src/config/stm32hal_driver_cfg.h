@@ -51,6 +51,17 @@ extern "C" {
     // we also need some ll includes contained in the driver section
     #include "../src/driver/stm32l4-v183/inc/stm32l4xx_ll_gpio.h"
     
+    
+#elif   defined(STM32HAL_BOARD_PSC)
+    
+    #if     (STM32HAL_DRIVER_VERSION == 190)
+        #include "../src/config/stm32hal_driver_cfg_of_psc_v190.h"   
+        // we also need some ll includes contained in the driver section
+        //#include "../src/driver/stm32l4-v190/inc/stm32l4xx_ll_gpio.h"
+    #else
+        #error unknown driver version
+    #endif
+    
 #else
 
         #error pls define a STM32HAL_BOARD_${BRD}

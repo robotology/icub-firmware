@@ -1,0 +1,54 @@
+/*
+ * Copyright (C) 2018 iCub Facility - Istituto Italiano di Tecnologia
+ * Author:  Marco Accame
+ * email:   marco.accame@iit.it
+ * website: www.robotcub.org
+ * Permission is granted to copy, distribute, and/or modify this program
+ * under the terms of the GNU General Public License, version 2 or any
+ * later version published by the Free Software Foundation.
+ *
+ * A copy of the license can be found at
+ * http://www.robotcub.org/icub/license/gpl.txt
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details
+*/
+
+// - include guard ----------------------------------------------------------------------------------------------------
+
+#ifndef _STM32HAL_DRIVER_CFG_OF_BRD_VXXX_H_
+#define _STM32HAL_DRIVER_CFG_OF_BRD_VXXX_H_
+
+
+#if !defined(USE_STM32HAL)
+    #error USE_STM32HAL must be defined
+#endif
+
+
+#if !defined(STM32HAL_BOARD_BRD)
+    #error STM32HAL_BOARD_BRD must be defined
+#endif
+
+
+//  TODO: 
+//  change macros _STM32HAL_DRIVER_CFG_OF_BRD_VXXX_H_ and STM32HAL_BOARD_BRD in the correct ones
+//  add the file stm32l4xx_hal_conf.h which cubemx has generated in here.
+//  only things:
+//  1. change the prefix folder of include of main.h (if present)
+//     considering stm32hal/api as the starting point.
+//     so for instance: #include "../src/board/${brd}/inc/main.h"  
+//  2. change the prefix folder of include files of the driver by
+//     considering stm32hal/api as the starting point.
+//     so, for instance: ../src/driver/${drivername}/inc/stm32l4xx_hal_rcc.h
+
+
+// insert between here and include-guard
+
+
+
+
+#endif  // include-guard of _STM32HAL_DRIVER_CFG_OF_BRD_VXX_H_
+
+

@@ -78,7 +78,6 @@ extern "C" {
 //    #define ARM_MATH_CM4
 //    #endif
       
-
 #elif   defined(STM32HAL_BOARD_MTB4)
     
     // it has a STM32L443xx mpu
@@ -95,8 +94,7 @@ extern "C" {
     #if !defined(STM32HAL_STM32L4)
     #define STM32HAL_STM32L4
     #endif    
-    
-				
+    				
 #elif   defined(STM32HAL_BOARD_STRAIN2)
 
     // it has a STM32L443xx mpu
@@ -113,8 +111,7 @@ extern "C" {
     #if !defined(STM32HAL_STM32L4)
     #define STM32HAL_STM32L4
     #endif  
-    
- 
+     
 #elif   defined(STM32HAL_BOARD_RFE)
 
     // it has a STM32L452xx mpu
@@ -132,6 +129,23 @@ extern "C" {
     #define STM32HAL_STM32L4
     #endif  
     
+#elif   defined(STM32HAL_BOARD_PSC)
+
+    // it has a STM32L431xx mpu
+    #if !defined(STM32L431xx)
+    #define STM32L431xx
+    #endif	
+    
+    // of family STM32L4
+    #if !defined(STM32L4)
+    #define STM32L4
+    #endif  
+
+    // of family STM32L4 but in STM32HAL_ format
+    #if !defined(STM32HAL_STM32L4)
+    #define STM32HAL_STM32L4
+    #endif 
+       
 #else
         #error STM32HAL: you must define a STM32HAL_BOARD_${BRD}
 #endif

@@ -144,6 +144,29 @@ extern void stm32hal_board_init(void);
         #error unsupported driver version for strain2
     #endif
 
+
+#elif   defined(STM32HAL_BOARD_PSC)	
+
+// one case only: v190
+    #if (STM32HAL_DRIVER_VERSION == 190)
+
+        #include "../src/config/stm32hal_driver_cfg_of_psc_v190.h"
+        
+        #include "../src/board/psc/v190/inc/main.h"
+
+        #include "../src/board/psc/v190/inc/can.h"
+        #include "../src/board/psc/v190/inc/dma.h"
+        #include "../src/board/psc/v190/inc/gpio.h"
+        #include "../src/board/psc/v190/inc/i2c.h"        
+        #include "../src/board/psc/v190/inc/rng.h"
+        #include "../src/board/psc/v190/inc/tim.h"
+
+        #include "../src/board/psc/v190/inc/stm32l4xx_it.h"
+
+    #else
+        #error unsupported driver version for psc
+    #endif
+    
 #elif   defined(STM32HAL_BOARD_RFE) 
 
     // one case only: v183
