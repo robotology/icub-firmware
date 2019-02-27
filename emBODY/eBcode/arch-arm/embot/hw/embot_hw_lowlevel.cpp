@@ -46,7 +46,7 @@ using namespace std;
 
 namespace embot { namespace hw { namespace lowlevel {
     
-#if     defined(STM32HAL_BOARD_NUCLEO64) || defined(STM32HAL_BOARD_MTB4) || defined(STM32HAL_BOARD_STRAIN2) || defined(STM32HAL_BOARD_RFE)
+#if     defined(STM32HAL_BOARD_NUCLEO64) || defined(STM32HAL_BOARD_MTB4) || defined(STM32HAL_BOARD_STRAIN2) || defined(STM32HAL_BOARD_RFE) || defined(STM32HAL_BOARD_PSC)
 
 #if __ARMCOMPILER_VERSION > 6000000
 int _execOperations(uint32_t i)
@@ -75,7 +75,7 @@ dowaitloop
 #endif
 
 #else 
-    #error you must define a _execassemblyoperations() function
+    #error you must define a _execOperations() function
 #endif
 
     void asmEXECcycles(std::uint32_t numcycles)

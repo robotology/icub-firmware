@@ -422,7 +422,6 @@ namespace embot { namespace hw { namespace bsp { namespace flash {
     static_assert(embot::common::tointegral(embot::hw::FLASH::maxnumberof) < embot::common::tointegral(embot::hw::FLASH::none), "FLASH::maxnumberof must be higher that FLASH::none, so that we can optimise code");
 
     
-    // const support maps
     #if     defined(STM32HAL_BOARD_NUCLEO64) 
 
         // any: application @ 128k but ... applicationstorage on top
