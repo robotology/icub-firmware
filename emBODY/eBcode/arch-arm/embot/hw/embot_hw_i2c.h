@@ -35,16 +35,16 @@ namespace embot { namespace hw { namespace i2c {
     struct Config
     {   
         std::uint32_t   speed; 
-        Config(std::uint32_t s) : speed(s) {}        
-        Config() : speed(400000) {}
+        constexpr Config(std::uint32_t s) : speed(s) {}        
+        constexpr Config() : speed(400000) {}
     };
     
     struct Descriptor
     {
         embot::hw::I2C     bus;
         Config  config;
-        Descriptor() : bus(embot::hw::I2C::none), config(400000) {}
-        Descriptor(embot::hw::I2C b, std::uint32_t s) : bus(b), config(s) {}
+        constexpr Descriptor() : bus(embot::hw::I2C::none), config(400000) {}
+        constexpr Descriptor(embot::hw::I2C b, std::uint32_t s) : bus(b), config(s) {}
     };
     
     

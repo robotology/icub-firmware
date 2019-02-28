@@ -64,6 +64,8 @@ void tests_tick();
 
 #include "embot_app_application_theCANparserBasic.h"
 
+#include "embot_app_application_thePOSreader.h"
+
 
 
 
@@ -111,13 +113,29 @@ static void userdefonfatal(void *param)
 static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask evtmsk, void *p);
 static void eventbasedtask_init(embot::sys::Task *t, void *p);
 
-static const embot::common::Event evRXcanframe = 0x00000001 << 0;
-static const embot::common::Event evCHIP01tick = 0x00000001 << 1;
-static const embot::common::Event evCHIP01dataready = 0x00000001 << 2;
-static const embot::common::Event evCHIP02tick = 0x00000001 << 3;
-static const embot::common::Event evCHIP02dataready = 0x00000001 << 4;
 
-static const std::uint8_t maxOUTcanframes = 32;
+constexpr embot::common::Event evRXcanframe = 0x00000001 << 0;
+constexpr embot::common::Event evPOS0Xacquire = 0x00000001 << 1;
+constexpr embot::common::Event evPOS01dataready = 0x00000001 << 2;
+constexpr embot::common::Event evPOS02dataready = 0x00000001 << 3;
+
+constexpr std::uint8_t maxOUTcanframes = 32;
+
+constexpr std::array<embot::app::application::thePOSreader::Sensor, embot::app::application::thePOSreader::numberofpositions> POSsensors = 
+{{
+    {
+        embot::hw::SI7051::one,
+        { embot::hw::I2C::one, 400000 }        
+    },
+    {
+        embot::hw::SI7051::one,
+        { embot::hw::I2C::one, 400000 }   
+    }   
+}};
+
+constexpr embot::app::application::thePOSreader::Events POSevents = { evPOS0Xacquire, {{ evPOS01dataready, evPOS02dataready }} };
+
+
 
 static embot::sys::EventTask* eventbasedtask = nullptr;
 
@@ -167,11 +185,11 @@ static void start_evt_based(void)
 //    canparserstrain.initialise(configparserstrain);  
     
     
-    // start agent of psc
-    #warning TODO: agent of psc
-//    embot::app::application::theSTRAIN &thestrain = embot::app::application::theSTRAIN::getInstance();
-//    embot::app::application::theSTRAIN::Config configstrain(evSTRAINtick, evSTRAINdataready, eventbasedtask);
-//    thestrain.initialise(configstrain); 
+    // start agent of POSreader
+
+    embot::app::application::thePOSreader &thepos = embot::app::application::thePOSreader::getInstance();
+    embot::app::application::thePOSreader::Config configpos { eventbasedtask, POSsensors, POSevents };
+    thepos.initialise(configpos); 
         
 
 
@@ -184,7 +202,9 @@ static void start_evt_based(void)
     r = embot::hw::can::init(embot::hw::CAN::one, canconfig);
     r = embot::hw::can::setfilters(embot::hw::CAN::one, embot::app::theCANboardInfo::getInstance().getCANaddress());
     r = r;
-
+    
+    
+    thepos.start(embot::common::time1second);
 }
 
 
@@ -247,29 +267,35 @@ static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask
     }
     
     
-    if(true == embot::binary::mask::check(eventmask, evCHIP01tick))
+    if(true == embot::binary::mask::check(eventmask, evPOS0Xacquire))
     {        
-//        embot::app::application::theSTRAIN &thestrain = embot::app::application::theSTRAIN::getInstance();
-//        thestrain.tick(outframes);        
+        embot::app::application::thePOSreader &thepos = embot::app::application::thePOSreader::getInstance();
+        thepos.process(evPOS0Xacquire, outframes);        
     }
+    
+    if(true == embot::binary::mask::check(eventmask, evPOS01dataready))
+    {        
+        embot::app::application::thePOSreader &thepos = embot::app::application::thePOSreader::getInstance();
+        thepos.process(evPOS01dataready, outframes);        
+    }
+    
+    if(true == embot::binary::mask::check(eventmask, evPOS02dataready))
+    {        
+        embot::app::application::thePOSreader &thepos = embot::app::application::thePOSreader::getInstance();
+        thepos.process(evPOS02dataready, outframes);        
+    }    
             
-    if(true == embot::binary::mask::check(eventmask, evCHIP01dataready))
-    {        
-//        embot::app::application::theSTRAIN &thestrain = embot::app::application::theSTRAIN::getInstance();
-//        thestrain.processdata(outframes);        
-    }
     
-    
-    // if we have any packet we transmit them
+//    // if we have any packet we transmit them
     std::uint8_t num = outframes.size();
     if(num > 0)
     {
-        for(std::uint8_t i=0; i<num; i++)
-        {
-            embot::hw::can::put(embot::hw::CAN::one, outframes[i]);                                       
-        }
+//        for(std::uint8_t i=0; i<num; i++)
+//        {
+//            embot::hw::can::put(embot::hw::CAN::one, outframes[i]);                                       
+//        }
 
-        embot::hw::can::transmit(embot::hw::CAN::one);  
+//        embot::hw::can::transmit(embot::hw::CAN::one);  
     } 
  
 }
