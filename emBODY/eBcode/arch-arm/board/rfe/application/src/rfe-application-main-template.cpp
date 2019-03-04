@@ -18,7 +18,7 @@
 
 extern uint32_t usbParser(uint8_t * RecMsg);
 
-static const embot::app::canprotocol::versionOfAPPLICATION vAP = {1, 0 , 0};
+static const embot::app::canprotocol::versionOfAPPLICATION vAP = {1, 0 , 1};
 static const embot::app::canprotocol::versionOfCANPROTOCOL vCP = {2, 0};
 
 static void userdeflauncher(void* param);
@@ -31,7 +31,7 @@ static const embot::sys::Operation onidle = { embot::common::Callback(userdefoni
 static const embot::sys::Operation onfatal = { embot::common::Callback(userdefonfatal, nullptr), 64 };
 
 #if defined(APPL_TESTZEROOFFSET)
-static const std::uint32_t address = eembot::hw::flash::getpartition(embot::hw::FLASH::bootloader).address;
+static const std::uint32_t address = embot::hw::flash::getpartition(embot::hw::FLASH::bootloader).address;
 #else
 static const std::uint32_t address = embot::hw::flash::getpartition(embot::hw::FLASH::application).address;
 #endif
