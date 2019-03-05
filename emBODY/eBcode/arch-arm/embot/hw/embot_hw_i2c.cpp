@@ -61,8 +61,8 @@ namespace embot { namespace hw { namespace i2c {
     bool initialised(I2C b)                                                                         { return false; }
     result_t init(I2C b, const Config &config)                                                      { return resNOK; }
     
-    bool ping(I2C b, std::uint8_t adr, std::uint8_t retries, embot::common::relTime timeout)        { return false; }       
-    result_t read(I2C b, std::uint8_t adr, std::uint8_t reg, embot::common::Data &destination, embot::common::Callback oncompletion) { return resNOK; }
+    bool ping(I2C b, ADR adr, std::uint8_t retries, embot::common::relTime timeout)        { return false; }       
+    result_t read(I2C b, ADR adr, REG reg, embot::common::Data &destination, embot::common::Callback oncompletion) { return resNOK; }
     bool isbusy(I2C b)                                                                              { return false; }
 
 }}} // namespace embot { namespace hw { namespace i2c {
@@ -91,12 +91,17 @@ namespace embot { namespace hw { namespace i2c {
     struct Transaction
     {
         volatile bool ongoing;
-        std::uint8_t adr;
+        static constexpr uint8_t txbuffercapacity = 16;
+        ADR addr;
         embot::common::Data recdata;
-        std::uint8_t txbuffer[4];
+        std::uint8_t txbuffer[txbuffercapacity];
         std::uint8_t txbuffersize;
         embot::common::Callback oncompletion;
-        void clear() { ongoing = false; adr = 0; recdata.clear(); oncompletion.clear(); std::memset(txbuffer, 0, sizeof(txbuffer)); txbuffersize = 0;}         
+        void clear() { ongoing = false; addr = 0; recdata.clear(); oncompletion.clear(); std::memset(txbuffer, 0, sizeof(txbuffer)); txbuffersize = 0;} 
+//        bool loadtx(const embot::common::Data &txdata) 
+//        { 
+//            if(txdata.size >= txbuffercapacity) { return false; } 
+//            
     };
     
     
@@ -112,8 +117,8 @@ namespace embot { namespace hw { namespace i2c {
     
     static PrivateData s_privatedata;
     
-    static result_t s_read(I2C b, std::uint8_t adr, std::uint8_t reg, embot::common::Data &destination, const embot::common::Callback &oncompletion = embot::common::Callback(nullptr, nullptr));
-    static result_t s_write(I2C b, std::uint8_t adr, std::uint8_t reg, const embot::common::Data &content, const embot::common::Callback &oncompletion = embot::common::Callback(nullptr, nullptr));
+    static result_t s_read(I2C b, ADR adr, REG reg, embot::common::Data &destination, const embot::common::Callback &oncompletion = embot::common::Callback(nullptr, nullptr));
+    static result_t s_write(I2C b, ADR adr, REG reg, const embot::common::Data &content, const embot::common::Callback &oncompletion = embot::common::Callback(nullptr, nullptr));
     static result_t s_wait(I2C b, embot::common::relTime timeout);
     
 
@@ -146,7 +151,7 @@ namespace embot { namespace hw { namespace i2c {
     }
     
     
-    bool ping(I2C b, std::uint8_t adr, embot::common::relTime timeout)
+    bool ping(I2C b, ADR adr, embot::common::relTime timeout)
     {
         if(false == initialised(b))
         {
@@ -171,7 +176,7 @@ namespace embot { namespace hw { namespace i2c {
     }
 
     
-    result_t read(I2C b, std::uint8_t adr, std::uint8_t reg, embot::common::Data &destination, const embot::common::Callback &oncompletion)
+    result_t read(I2C b, ADR adr, REG reg, embot::common::Data &destination, const embot::common::Callback &oncompletion)
     {
         if(false == initialised(b))
         {
@@ -191,7 +196,7 @@ namespace embot { namespace hw { namespace i2c {
         return s_read(b, adr, reg, destination, oncompletion);
     }
     
-    result_t read(I2C b, std::uint8_t adr, std::uint8_t reg, embot::common::Data &destination, embot::common::relTime timeout)
+    result_t read(I2C b, ADR adr, REG reg, embot::common::Data &destination, embot::common::relTime timeout)
     {
         if(false == initialised(b))
         {
@@ -219,7 +224,7 @@ namespace embot { namespace hw { namespace i2c {
     }
     
 
-    result_t write(I2C b, std::uint8_t adr, std::uint8_t reg, const embot::common::Data &content, const embot::common::Callback &oncompletion)
+    result_t write(I2C b, ADR adr, REG reg, const embot::common::Data &content, const embot::common::Callback &oncompletion)
     {
         if(false == initialised(b))
         {
@@ -240,7 +245,7 @@ namespace embot { namespace hw { namespace i2c {
     }    
 
 
-    result_t write(I2C b, std::uint8_t adr, std::uint8_t reg, const embot::common::Data &content, embot::common::relTime timeout)
+    result_t write(I2C b, ADR adr, REG reg, const embot::common::Data &content, embot::common::relTime timeout)
     {
         if(false == initialised(b))
         {
@@ -350,35 +355,82 @@ namespace embot { namespace hw { namespace i2c {
     
        
     
-    static result_t s_write(I2C b, std::uint8_t adr, std::uint8_t reg, const embot::common::Data &content, const embot::common::Callback &oncompletion)
+    static result_t s_write(I2C b, ADR adr, REG reg, const embot::common::Data &content, const embot::common::Callback &oncompletion)
     {   
         std::uint8_t index = embot::common::tointegral(b);        
-        s_privatedata.transaction[index].adr = adr;
+        s_privatedata.transaction[index].addr = adr;
         s_privatedata.transaction[index].oncompletion = oncompletion;
         s_privatedata.transaction[index].ongoing = true;
-        s_privatedata.transaction[index].recdata.clear();
-        s_privatedata.transaction[index].txbuffer[0] = reg;
-        std::memmove(&s_privatedata.transaction[index].txbuffer[1], content.pointer, content.size);
-        s_privatedata.transaction[index].txbuffersize = content.size + 1;
+        s_privatedata.transaction[index].recdata.clear(); // invalide recdata, so that HAL_I2C_MasterTxCpltCallback() knows it is a write operation.
+        
+        if(regNONE == reg)
+        {
+            // i need to transmit the pattern [data] because the slave already knows into which register to put data. and does not expect a [reg] byte.
+            if(content.size > Transaction::txbuffercapacity)
+            {
+                return resNOK;
+            }
+            std::memmove(&s_privatedata.transaction[index].txbuffer[0], content.pointer, content.size);
+            s_privatedata.transaction[index].txbuffersize = content.size;            
+        }
+        else
+        {
+            // i need to transmit the pattern [reg][data] because the slave must know into which register to put data.
+            if(content.size >= Transaction::txbuffercapacity)
+            {
+                return resNOK;
+            }
+            s_privatedata.transaction[index].txbuffer[0] = reg;
+            std::memmove(&s_privatedata.transaction[index].txbuffer[1], content.pointer, content.size);
+            s_privatedata.transaction[index].txbuffersize = content.size + 1;
+        }
         
         HAL_StatusTypeDef r = HAL_I2C_Master_Transmit_DMA(s_privatedata.handles[index], adr, static_cast<std::uint8_t*>(s_privatedata.transaction[index].txbuffer), s_privatedata.transaction[index].txbuffersize);        
                 
         return (HAL_OK == r) ? resOK : resNOK;
     }    
     
-    static result_t s_read(I2C b, std::uint8_t adr, std::uint8_t reg, embot::common::Data &destination, const embot::common::Callback &oncompletion)
+    static result_t s_read(I2C b, ADR adr, REG reg, embot::common::Data &destination, const embot::common::Callback &oncompletion)
     {
-        std::uint8_t index = embot::common::tointegral(b);        
-        s_privatedata.transaction[index].adr = adr;
+        result_t res = resNOK;
+        
+        std::uint8_t index = embot::common::tointegral(b);
+        s_privatedata.transaction[index].addr = adr;
         s_privatedata.transaction[index].oncompletion = oncompletion;
         s_privatedata.transaction[index].ongoing = true;
         s_privatedata.transaction[index].recdata = destination;  
-        // register address is 1 byte long ...
-        s_privatedata.transaction[index].txbuffer[0] = reg;
-        s_privatedata.transaction[index].txbuffersize = 1;
-        HAL_StatusTypeDef r = HAL_I2C_Master_Transmit_DMA(s_privatedata.handles[index], adr, static_cast<std::uint8_t*>(s_privatedata.transaction[index].txbuffer), s_privatedata.transaction[index].txbuffersize);        
         
-        return (HAL_OK == r) ? resOK : resNOK;
+        if(reg == regNONE)
+        {
+            // it is a single-stage operation: read<values>
+            // i dont need to ask whcih register to read from because the slave already knows what to send.
+            // i do the read<> request with HAL_I2C_Master_Receive_DMA(recdata).
+            // the completion of reading operation is signalled by the call of HAL_I2C_MasterRxCpltCallback(). 
+            // at this stage recdata will contain the received data.            
+            I2C_HandleTypeDef* hi2cx = embot::hw::i2c::s_privatedata.handles[index];
+            HAL_I2C_Master_Receive_DMA( hi2cx, 
+                                        embot::hw::i2c::s_privatedata.transaction[index].addr, 
+                                        static_cast<std::uint8_t*>(embot::hw::i2c::s_privatedata.transaction[index].recdata.pointer),  
+                                        static_cast<std::uint16_t>(embot::hw::i2c::s_privatedata.transaction[index].recdata.size)
+                                    );            
+        }
+        else
+        {
+            // it is a two-stage operation: write<reg>, read<values>
+            // i must at first tx the value of the register i want to read from. i use HAL_I2C_Master_Transmit_DMA().
+            // the call of HAL_I2C_MasterTxCpltCallback() signals the end of teh fist stage and ... if recdata.isvalid() then ...
+            // i perform the read<> request with HAL_I2C_Master_Receive_DMA(recdata).
+            // the completion of reading operation is signalled by the call of HAL_I2C_MasterRxCpltCallback(). 
+            // at this stage recdata will contain the received data.
+                    
+            // so far we only manage addresses which are 1 byte long ...
+            s_privatedata.transaction[index].txbuffer[0] = reg;
+            s_privatedata.transaction[index].txbuffersize = 1;
+            HAL_StatusTypeDef r = HAL_I2C_Master_Transmit_DMA(s_privatedata.handles[index], adr, static_cast<std::uint8_t*>(s_privatedata.transaction[index].txbuffer), s_privatedata.transaction[index].txbuffersize);        
+            res = (HAL_OK == r) ? resOK : resNOK;
+        }
+
+        return res;
     }
      
 }}} // namespace embot { namespace hw { namespace i2c {
@@ -397,6 +449,10 @@ void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *I2cHandle)
     {
         index = 1;
     }
+    else if(I2cHandle->Instance == I2C3)
+    {
+        index = 2;
+    }
     else
     {
         return;
@@ -414,7 +470,7 @@ void HAL_I2C_MasterTxCpltCallback(I2C_HandleTypeDef *I2cHandle)
         I2C_HandleTypeDef* hi2cx = embot::hw::i2c::s_privatedata.handles[index];
         //I2C_HandleTypeDef *hi2cx = (0 == index) ? (&hi2c1) : (&hi2c2);
         HAL_I2C_Master_Receive_DMA( hi2cx, 
-                                    embot::hw::i2c::s_privatedata.transaction[index].adr, 
+                                    embot::hw::i2c::s_privatedata.transaction[index].addr, 
                                     static_cast<std::uint8_t*>(embot::hw::i2c::s_privatedata.transaction[index].recdata.pointer),  
                                     static_cast<std::uint16_t>(embot::hw::i2c::s_privatedata.transaction[index].recdata.size)
                                     );
@@ -433,6 +489,10 @@ void HAL_I2C_MasterRxCpltCallback(I2C_HandleTypeDef *I2cHandle)
     else if(I2cHandle->Instance == I2C2)
     {
        index = 1;
+    }
+    else if(I2cHandle->Instance == I2C3)
+    {
+        index = 2;
     }
     else
     {
