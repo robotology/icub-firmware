@@ -17,17 +17,17 @@
 */
 
 
-#undef TEST_ENABLED
+#define TEST_ENABLED
 
 #if     defined(TEST_ENABLED)
 
 #undef TEST_HW_TIM
-#undef TEST_HW_SI7051
+#define TEST_HW_TLV493D
 
 #else
 
 #undef TEST_HW_TIM
-#undef TEST_HW_SI7051
+#undef TEST_HW_TLV493D
 
 #endif // TEST_ENABLED
 
@@ -36,6 +36,20 @@
 #if     defined(TEST_ENABLED)
 void tests_launcher_init();
 void tests_tick();
+
+#if defined(TEST_HW_TLV493D)
+
+#include "embot_hw_tlv493d.h"
+
+//const embot::hw::TLV493D tlv = embot::hw::TLV493D::one;
+//const embot::hw::I2C tlvi2c = embot::hw::I2C::one;
+
+const embot::hw::TLV493D tlv = embot::hw::TLV493D::two;
+const embot::hw::I2C tlvi2c = embot::hw::I2C::three;
+embot::hw::tlv493d::Config tlvconfig { tlvi2c, 400000 };
+
+#endif
+
 #endif  // #if defined(TEST_ENABLED)
 
 
@@ -124,11 +138,11 @@ constexpr std::uint8_t maxOUTcanframes = 32;
 constexpr std::array<embot::app::application::thePOSreader::Sensor, embot::app::application::thePOSreader::numberofpositions> POSsensors = 
 {{
     {
-        embot::hw::SI7051::one,
+        embot::hw::TLV493D::one,
         { embot::hw::I2C::one, 400000 }        
     },
     {
-        embot::hw::SI7051::one,
+        embot::hw::TLV493D::one,
         { embot::hw::I2C::one, 400000 }   
     }   
 }};
@@ -399,8 +413,11 @@ void test_tim_init(void)
 void tests_launcher_init()
 {
     
-#if defined(TEST_HW_SI7051)       
-    embot::hw::SI7051::init(SI7051sensor, SI7051config);       
+#if defined(TEST_HW_TLV493D)       
+//    embot::hw::tlv493d::Config tlvconfig { embot::hw::I2C::one, 400000 };
+//    embot::hw::tlv493d::init(embot::hw::TLV493D::one, tlvconfig);    
+
+    embot::hw::tlv493d::init(tlv, tlvconfig);       
 #endif
     
      
@@ -410,9 +427,40 @@ void tests_launcher_init()
 
 }
 
+#if defined(TEST_HW_TLV493D) 
+void counter(void *p)
+{
+    static int count = 0;    
+    count++;
+}
+#endif
+
 
 void tests_tick() 
 {
+    
+    
+#if defined(TEST_HW_TLV493D)
+    embot::hw::tlv493d::Position vv = 0;    
+    embot::hw::tlv493d::Position pp = 0;
+    embot::common::Callback cbk(counter, nullptr);
+    
+    embot::hw::tlv493d::acquisition(tlv, cbk);  
+    
+    for(;;)
+    {
+        if(true == embot::hw::tlv493d::operationdone(tlv))
+        {
+            break;
+        }
+    }
+    
+    embot::hw::tlv493d::read(tlv, pp);   
+    vv = pp;
+    vv = vv + 1;
+       
+#endif
+    
     
     
 #if defined(TEST_HW_SI7051)
