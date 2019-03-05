@@ -27,8 +27,7 @@
 #include "embot_app_canprotocol.h"
 #include "embot_app_canprotocol_analog_polling.h"
 #include "embot_app_canprotocol_analog_periodic.h"
-#include "embot_hw_si7051.h"
-#include <vector>
+#include "embot_hw_tlv493d.h"
 #include <array>
 #include <memory>
 
@@ -43,10 +42,10 @@ namespace embot { namespace app { namespace application {
         
         struct Sensor
         {
-            embot::hw::SI7051           id;
-            embot::hw::si7051::Config   config; 
-            constexpr Sensor() : id(embot::hw::SI7051::none), config(embot::hw::I2C::none, 0) {}
-            constexpr Sensor(embot::hw::SI7051 i, const embot::hw::si7051::Config& c) : id(i), config(c) {}
+            embot::hw::TLV493D           id;
+            embot::hw::tlv493d::Config   config; 
+            constexpr Sensor() : id(embot::hw::TLV493D::none), config(embot::hw::I2C::none, 0) {}
+            constexpr Sensor(embot::hw::TLV493D i, const embot::hw::tlv493d::Config& c) : id(i), config(c) {}
             // mettere altro costruttore etc
             constexpr bool isvalid() const { return true; }
         };
