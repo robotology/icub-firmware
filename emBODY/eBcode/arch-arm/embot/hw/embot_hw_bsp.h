@@ -397,6 +397,30 @@ namespace embot { namespace hw { namespace bsp { namespace bno055 {
               
 }}}} // namespace embot { namespace hw { namespace bsp {  namespace bno055 {
 
+
+namespace embot { namespace hw { namespace bsp { namespace tlv493d {
+       
+    struct PROP
+    {   
+        embot::hw::I2C i2cbus;
+        std::uint8_t i2caddress;        
+    };
+    
+    struct BSP : public embot::hw::bsp::SUPP
+    {
+        constexpr static std::uint8_t maxnumberof = embot::common::tointegral(embot::hw::TLV493D::maxnumberof);
+        constexpr BSP(std::uint32_t msk, std::array<const PROP*, maxnumberof> pro) : SUPP(msk), properties(pro) {} 
+        constexpr BSP() : SUPP(0), properties({0}) {}
+            
+        std::array<const PROP*, maxnumberof> properties;    
+        constexpr const PROP * getPROP(embot::hw::TLV493D h) const { return supported(h) ? properties[embot::common::tointegral(h)] : nullptr; }
+        void init(embot::hw::TLV493D h) const;
+    };
+    
+    const BSP& getBSP();
+              
+}}}} // namespace embot { namespace hw { namespace bsp {  namespace tlv493d {
+
 #endif  // include-guard
 
 

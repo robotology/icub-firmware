@@ -41,6 +41,7 @@
 #include "embot_hw_timer.h"
 #include "embot_hw_adc.h"
 #include "embot_hw_si7051.h"
+#include "embot_hw_tlv493d.h"
 
 #include "embot_binary.h"
 
@@ -1293,6 +1294,43 @@ namespace embot { namespace hw { namespace bsp { namespace bno055 {
 }}}} // namespace embot { namespace hw { namespace bsp {  namespace bno055 {
 
 
+
+namespace embot { namespace hw { namespace bsp { namespace tlv493d {
+           
+    static_assert(embot::common::tointegral(embot::hw::TLV493D::none) < 8*sizeof(SUPP::supportedmask), "TLV493D::none must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::common::tointegral(embot::hw::TLV493D::maxnumberof) < 8*sizeof(SUPP::supportedmask), "TLV493D::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::common::tointegral(embot::hw::TLV493D::maxnumberof) < embot::common::tointegral(embot::hw::TLV493D::none), "TLV493D::maxnumberof must be higher that TLV493D::none, so that we can optimise code");
+
+
+    #if defined(STM32HAL_BOARD_PSC)
+        
+    constexpr PROP prop01 { .i2cbus = embot::hw::I2C::one, .i2caddress = 0x3E }; 
+    constexpr PROP prop02 { .i2cbus = embot::hw::I2C::three, .i2caddress = 0x3E }; 
+
+    constexpr BSP thebsp {        
+        // maskofsupported
+        mask::pos2mask<uint32_t>(TLV493D::one) | mask::pos2mask<uint32_t>(TLV493D::two),        
+        // properties
+        {{
+            &prop01, &prop02
+        }}        
+    };
+
+    void BSP::init(embot::hw::TLV493D h) const {}
+
+    #else
+    
+    constexpr BSP thebsp { };
+    void BSP::init(embot::hw::TLV493D h) const {}
+
+    #endif
+    
+    const BSP& getBSP() 
+    {
+        return thebsp;
+    }
+              
+}}}} // namespace embot { namespace hw { namespace bsp {  namespace tlv493d {
 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
