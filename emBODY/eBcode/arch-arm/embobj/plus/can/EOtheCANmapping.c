@@ -994,7 +994,7 @@ extern eOresult_t eo_canmap_GetEntityLocation(EOtheCANmapping *p, eOprotID32_t i
                     theboard = s_eo_canmap_singleton.entitylocation[ep][entity][index];
                     if(NULL != theboard)
                     {
-                        if((eobrd_cantype_mtb4 == theboard->board.props.type) || (eobrd_cantype_strain2 == theboard->board.props.type))
+                        if((eobrd_cantype_mtb4 == theboard->board.props.type) || (eobrd_cantype_strain2 == theboard->board.props.type) || (eobrd_cantype_rfe == theboard->board.props.type))
                         {   // ok, correct board. we retrieve the info
                             if(NULL != numoflocs)
                             {

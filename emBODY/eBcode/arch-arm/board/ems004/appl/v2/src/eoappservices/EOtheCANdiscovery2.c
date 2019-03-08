@@ -904,6 +904,9 @@ static eOresult_t s_eo_candiscovery2_getFWversion(uint8_t boardtype, eObrd_canlo
         case eobrd_cantype_mtb:
         case eobrd_cantype_strain2:
         case eobrd_cantype_mtb4:
+        case eobrd_cantype_rfe:
+        case eobrd_cantype_psc:
+        case eobrd_cantype_sg3:
         {
             found = eobool_true;
             command.clas = eocanprot_msgclass_pollingAnalogSensor;

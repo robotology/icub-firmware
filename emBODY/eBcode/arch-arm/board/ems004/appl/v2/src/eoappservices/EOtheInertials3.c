@@ -1789,7 +1789,7 @@ static void s_eo_inertials3_imu_configure(EOtheInertials3 *p)
                         if((des->on.any.place == eobrd_place_can) && (des->on.can.port == port) && (des->on.can.addr == addr))
                         {
                             // ok, i have the board. i must enable the sensors 
-                            icubCanProto_imu_sensor_t ps = eoas_inertial3_imu_to_canproto(des->typeofsensor);
+                            icubCanProto_imu_sensor_t ps = eoas_inertial3_imu_to_canproto((eOas_inertial3_type_t)des->typeofsensor);
                             if(icubCanProto_imu_none != ps)
                             {
                                 eo_common_hlfword_bitset(&imuconfig.enabledsensors, ps);
