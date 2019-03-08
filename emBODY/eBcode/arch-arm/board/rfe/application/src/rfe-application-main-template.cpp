@@ -15,10 +15,13 @@
 
 #include "embot_hw_bsp_rfe.h"
 
+#include "embot_app_application_theCANparserIMU.h"
+#include "embot_app_application_theIMU.h"
+
 
 extern uint32_t usbParser(uint8_t * RecMsg);
 
-static const embot::app::canprotocol::versionOfAPPLICATION vAP = {1, 0 , 1};
+static const embot::app::canprotocol::versionOfAPPLICATION vAP = {1, 1 , 0};
 static const embot::app::canprotocol::versionOfCANPROTOCOL vCP = {2, 0};
 
 static void userdeflauncher(void* param);
@@ -68,6 +71,9 @@ static void eventbasedtask_init(embot::sys::Task *t, void *p);
 
 static const embot::common::Event evRXcanframe = 0x00000001 << 0;
 static const embot::common::Event evRXusbmessage = 0x00000001 << 1;
+
+static const embot::common::Event evIMUtick = 0x00000001 << 3;
+static const embot::common::Event evIMUdataready = 0x00000001 << 4;
 
 static const std::uint8_t maxOUTcanframes = 48;
 
@@ -138,6 +144,17 @@ static void start_evt_based(void)
     embot::app::application::theCANparserBasic::Config configbasic;
     canparserbasic.initialise(configbasic);  
         
+    // start canparser imu
+    embot::app::application::theCANparserIMU &canparserimu = embot::app::application::theCANparserIMU::getInstance();
+    embot::app::application::theCANparserIMU::Config configparserimu;
+    canparserimu.initialise(configparserimu);      
+
+        
+    // start agent of imu
+    embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance();
+    embot::app::application::theIMU::Config configimu(embot::hw::bsp::rfe::imuBOSCH, embot::hw::bsp::rfe::imuBOSCHconfig, evIMUtick, evIMUdataready, eventbasedtask);
+    theimu.initialise(configimu);            
+        
     // finally start can. i keep it as last because i dont want that the isr-handler calls its onrxframe() 
     // before the eventbasedtask is created.
     embot::hw::result_t r = embot::hw::resNOK;
@@ -207,15 +224,14 @@ static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask
         if(embot::hw::resOK == embot::hw::can::get(embot::hw::CAN::one, frame, remainingINrx))
         {            
             embot::app::application::theCANparserBasic &canparserbasic = embot::app::application::theCANparserBasic::getInstance();            
-//            embot::app::application::theCANparserIMU &canparserimu = embot::app::application::theCANparserIMU::getInstance();
-//            embot::app::application::theCANparserTHERMO &canparserthermo = embot::app::application::theCANparserTHERMO::getInstance();
+            embot::app::application::theCANparserIMU &canparserimu = embot::app::application::theCANparserIMU::getInstance();
             // process w/ the basic parser, if not recognised call the parse specific of the board
             if(true == canparserbasic.process(frame, outframes))
             {                   
             }
-//            else if(true == canparserimu.process(frame, outframes))
-//            {               
-//            }
+            else if(true == canparserimu.process(frame, outframes))
+            {               
+            }
 //            else if(true == canparserthermo.process(frame, outframes))
 //            {               
 //            }
@@ -266,6 +282,18 @@ static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask
         }        
     }        
     
+    if(true == embot::binary::mask::check(eventmask, evIMUtick))
+    {        
+        embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance();
+        theimu.tick(outframes);        
+    }   
+    
+    if(true == embot::binary::mask::check(eventmask, evIMUdataready))
+    {        
+        embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance();
+        theimu.processdata(outframes);        
+    }
+
     
     // if we have any packet we transmit them
     std::uint8_t num = outframes.size();

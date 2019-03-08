@@ -984,6 +984,35 @@ namespace embot { namespace hw { namespace bsp { namespace i2c {
         }         
     }
     
+    #elif   defined(STM32HAL_BOARD_RFE)
+    
+    constexpr PROP i2c1p { .handle = &hi2c1 }; //, .handledmatx = &hdma_i2c1_tx, .handledmarx = &hdma_i2c1_rx };
+    //constexpr PROP i2c2p { .handle = &hi2c2 }; //, .handledmatx = &hdma_i2c2_tx, .handledmarx = &hdma_i2c2_rx };
+        
+    constexpr BSP thebsp {        
+        // maskofsupported
+        //mask::pos2mask<uint32_t>(I2C::one) | mask::pos2mask<uint32_t>(I2C::two),   
+        mask::pos2mask<uint32_t>(I2C::one),         
+        // properties
+        {{
+//            &i2c1p, &i2c2p, nullptr             
+            &i2c1p, nullptr, nullptr
+        }}        
+    }; 
+
+    void BSP::init(embot::hw::I2C h) const
+    {
+        if(h == I2C::one)
+        {            
+            MX_I2C1_Init();
+        }
+//        else if(h == I2C::two)
+//        {
+//            MX_I2C2_Init();
+//        }         
+    }
+        
+    
     #else 
        
     constexpr BSP thebsp { };    
@@ -1001,7 +1030,7 @@ namespace embot { namespace hw { namespace bsp { namespace i2c {
 // ---------------------------------- IRQhandlers --------------------------------------------------------------------------
 
 
-#if defined(STM32HAL_BOARD_MTB4) | defined(STM32HAL_BOARD_STRAIN2)
+#if defined(STM32HAL_BOARD_MTB4) | defined(STM32HAL_BOARD_STRAIN2) | defined(STM32HAL_BOARD_RFE)
 
     /**
 * @brief This function handles I2C1 event interrupt.
@@ -1267,6 +1296,23 @@ namespace embot { namespace hw { namespace bsp { namespace bno055 {
     
     // .boot = { BNO055_BOOT_GPIO_Port, BNO055_BOOT_Pin }, .reset = { BNO055_RESET_GPIO_Port, BNO055_RESET_Pin } 
     constexpr PROP prop01 { .i2caddress = 0x52, .boot = { embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::thirteen }, .reset = { embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::twelve } }; 
+
+    constexpr BSP thebsp {        
+        // maskofsupported
+        mask::pos2mask<uint32_t>(BNO055::one),        
+        // properties
+        {{
+            &prop01             
+        }}        
+    };
+
+    void BSP::init(embot::hw::BNO055 h) const {}
+    
+    #elif defined(STM32HAL_BOARD_RFE)
+    
+    
+    // .boot = { BNO055_BOOT_GPIO_Port, BNO055_BOOT_Pin }, .reset = { BNO055_RESET_GPIO_Port, BNO055_RESET_Pin } 
+    constexpr PROP prop01 { .i2caddress = 0x50, .boot = { embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::fourteen }, .reset = { embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::fifteen } }; 
 
     constexpr BSP thebsp {        
         // maskofsupported
