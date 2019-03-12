@@ -1418,7 +1418,7 @@ static uint32_t s_eo_read_mais_for_port(EOappEncReader *p, uint8_t port)
     }                 
     else if(eobrd_portmais_littlefingers == port)
     {
-        tmp = (uint8_t*)eo_array_At(array, 11);
+        tmp = (uint8_t*)eo_array_At(array, 14);
         value1 = (NULL == tmp) ? (0) : (*tmp);
         tmp = (uint8_t*)eo_array_At(array, 12);
         value2 = (NULL == tmp) ? (0) : (*tmp);
