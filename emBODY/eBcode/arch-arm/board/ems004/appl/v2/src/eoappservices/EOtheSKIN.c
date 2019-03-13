@@ -791,6 +791,7 @@ extern eOresult_t eo_skin_SetMode(EOtheSKIN *p, uint8_t patchindex, eOsk_sigmode
     return(eores_OK);
 }
 
+#undef SEND_BOARDCONFIG_TO_WHOLEPATCH
 
 extern eOresult_t eo_skin_SetBoardsConfig(EOtheSKIN *p, uint8_t patchindex, eOsk_cmd_boardsCfg_t *brdcfg)
 {
@@ -825,11 +826,40 @@ extern eOresult_t eo_skin_SetBoardsConfig(EOtheSKIN *p, uint8_t patchindex, eOsk
     p->sharedcan.command.clas = eocanprot_msgclass_pollingSkin;    
     p->sharedcan.command.type  = ICUBCANPROTO_POL_SK_CMD__SET_BRD_CFG;
     p->sharedcan.command.value = &canProto_skcfg; 
-//    #error --> change so that we send the command to all boards of given address .... if they are in patch....
-        
-    // and now we send the p->sharedcan.command to all the skin boards
+
+#if defined(SEND_BOARDCONFIG_TO_WHOLEPATCH)    
+    // we send the p->sharedcan.command to all the skin boards of the patch
     eo_canserv_SendCommandToAllBoardsInEntity(eo_canserv_GetHandle(), &p->sharedcan.command, id32); 
-    
+#else 
+    // we send the p->sharedcan.command only to the boards in range [brdcfg->addrstart, brdcfg->addrend]
+    // ok, but of which canbus?    
+    // trick to retrieve the canbus as eOsk_cmd_boardsCfg_t does not contain the port but only the addresses:
+    // the function eo_canmap_GetEntityLocation() puts in location.addr the address of the first board of the entity (the patch).
+    // as a patch is entirely inside a single canbus we retain the location.port value and change location.addr
+    eObrd_canlocation_t location = {0};
+    eo_canmap_GetEntityLocation(eo_canmap_GetHandle(), id32, &location, NULL, NULL);
+    // now i iterate over the addresses. but they must be in [1, 14]
+    uint8_t first = brdcfg->addrstart & 0x0f;
+    uint8_t last = brdcfg->addrend & 0x0f;
+    if(0 == first)
+    {
+        first = 1;
+    }
+    if(15 == last)
+    {
+        last = 14;
+    }
+    if(last >= first)
+    {
+        for(uint8_t i=first; i<=last; i++)
+        {
+            location.addr = i;
+            eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), &p->sharedcan.command, location);
+        }
+    }
+
+#endif
+
     return(eores_OK);          
 }
 
@@ -872,13 +902,13 @@ extern eOresult_t eo_skin_SetTrianglesConfig(EOtheSKIN *p, uint8_t patchindex, e
     p->sharedcan.command.type  = ICUBCANPROTO_POL_SK_CMD__SET_TRIANG_CFG;
     p->sharedcan.command.value = &canProto_trgscfg; 
     
+    // trick to retrieve the canbus as eOsk_cmd_trianglesCfg_t does not contain the port but only the address.
+    // the function eo_canmap_GetEntityLocation() puts in location.addr the address of the first board of the entity (the patch).
     eObrd_canlocation_t location = {0};
     eo_canmap_GetEntityLocation(eo_canmap_GetHandle(), id32, &location, NULL, NULL);
-    // the function eo_canmap_GetEntityLocation() puts in location.addr the address of the first board of the entity (the patch).
-    // we call eo_canmap_GetEntityLocation() to retrieve the canbus (port1 or port2) and insideindex.
     // then, as we already have the address in trgcfg->boardaddr, we copy it in location.addr.
-    // if eOsk_cmd_trianglesCfg_t contained also port, we would not need to do that.... 
-    location.addr = trgcfg->boardaddr;
+    location.addr = trgcfg->boardaddr & 0x0f;
+    // and finally we send the message to the board specified in eOsk_cmd_trianglesCfg_t::boardaddr 
     eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), &p->sharedcan.command, location);    
    
     return(eores_OK);          
