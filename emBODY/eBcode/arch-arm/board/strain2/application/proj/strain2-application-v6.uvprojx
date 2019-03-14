@@ -388,11 +388,6 @@
               <FileType>8</FileType>
               <FilePath>../src/main-strain2-application.cpp</FilePath>
             </File>
-            <File>
-              <FileName>test-modern-cpp.h</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\src\test-modern-cpp.h</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -1210,11 +1205,6 @@
               <FileName>main-strain2-application.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>../src/main-strain2-application.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>test-modern-cpp.h</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\src\test-modern-cpp.h</FilePath>
             </File>
           </Files>
         </Group>

@@ -83,7 +83,7 @@ const embot::hw::SI7051::Config SI7051config = embot::hw::bsp::strain2::thermome
 #endif // TEST_ENABLED
 
 
-static const embot::app::canprotocol::versionOfAPPLICATION vAP = {1, 5 , 4};
+static const embot::app::canprotocol::versionOfAPPLICATION vAP = {2, 0, 1};
 static const embot::app::canprotocol::versionOfCANPROTOCOL vCP = {2, 0};
 
 static void userdeflauncher(void* param);
