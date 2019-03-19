@@ -24,16 +24,14 @@
 #include "embot_common.h"
 #include "embot_hw.h"
 #include "embot_sys.h"
-#include "embot_app_canprotocol.h"
-#include "embot_app_canprotocol_analog_periodic.h"
-#include "embot_app_canprotocol_analog_polling.h"
+#include "embot_app_application_theCANparserSTRAIN.h"
 #include "embot_hw_pga308.h"
 #include <vector>
 #include <memory>
 
 namespace embot { namespace app { namespace application {
            
-    class theSTRAIN
+    class theSTRAIN : public CANagentSTRAIN
     {
     public:
         static theSTRAIN& getInstance();
@@ -52,46 +50,48 @@ namespace embot { namespace app { namespace application {
         }; 
         
         
-        bool initialise(Config &config);   
-
-        bool configure(embot::common::Time txperiod);        
-        bool configure(embot::app::canprotocol::analog::polling::Message_SET_SERIAL_NO::Info &info);
-        bool configure(embot::app::canprotocol::analog::polling::Message_SET_FULL_SCALES::Info &info);
-        bool configure(embot::app::canprotocol::analog::polling::Message_SET_CH_DAC::Info &info);
-        bool set(embot::app::canprotocol::analog::polling::Message_SET_MATRIX_RC::Info &info);
-        bool set(embot::app::canprotocol::analog::polling::Message_SET_MATRIX_G::Info &info);
-        bool set(embot::app::canprotocol::analog::polling::Message_SET_CALIB_TARE::Info &info);
-        bool set(embot::app::canprotocol::analog::polling::Message_SET_CURR_TARE::Info &info);
-        bool resetamplifier(embot::app::canprotocol::analog::polling::Message_AMPLIFIER_RESET::Info &info);
-        bool set(embot::app::canprotocol::analog::polling::Message_AMPLIFIER_PGA308_CFG1_SET::Info &info);
-        bool set(embot::app::canprotocol::analog::polling::Message_AMPLIFIER_GAINOFFSET_SET::Info &info, float &alpha, float &beta);
-        bool set(embot::app::canprotocol::analog::polling::Message_REGULATIONSET_SET::Info &info);
+        bool initialise(Config &config);          
         
-        bool save2eeprom();
-        
-        bool get_serial(embot::app::canprotocol::analog::polling::Message_GET_SERIAL_NO::ReplyInfo &replyinfo);
-        bool get_fullscale(std::uint8_t regulationset, std::uint8_t channel, std::uint16_t &value);
-        bool get_eepromstatus(bool &saved);
-        bool get_adc(embot::app::canprotocol::analog::polling::Message_GET_CH_ADC::ReplyInfo &replyinfo);
-        bool get_offset(std::uint8_t regulationset, std::uint8_t channel, std::uint16_t &value);
-        bool get(embot::app::canprotocol::analog::polling::Message_GET_MATRIX_RC::ReplyInfo &replyinfo);
-        bool get(embot::app::canprotocol::analog::polling::Message_GET_MATRIX_G::ReplyInfo &replyinfo);
-        bool get(embot::app::canprotocol::analog::polling::Message_GET_CALIB_TARE::ReplyInfo &replyinfo);
-        bool get(embot::app::canprotocol::analog::polling::Message_GET_CURR_TARE::ReplyInfo &replyinfo);
-        bool get(embot::app::canprotocol::analog::polling::Message_AMPLIFIER_PGA308_CFG1_GET::ReplyInfo &replyinfo);
-        bool get(embot::app::canprotocol::analog::polling::Message_AMPLIFIER_GAINOFFSET_GET::ReplyInfo &replyinfo);
-        bool get(embot::app::canprotocol::analog::polling::Message_AMPLIFIER_RANGE_OF_GAIN_GET::ReplyInfo &replyinfo);
-        bool get(embot::app::canprotocol::analog::polling::Message_AMPLIFIER_RANGE_OF_OFFSET_GET::ReplyInfo &replyinfo);        
-        bool get(embot::app::canprotocol::analog::polling::Message_REGULATIONSET_GET::ReplyInfo &replyinfo);
-        
-        
-        
-        bool autocalib(embot::app::canprotocol::analog::polling::Message_AMPLIFIER_OFFSET_AUTOCALIB::Info &info, std::uint8_t &noisychannelmask, std::uint8_t &algorithmOKmask, std::uint8_t &finalmeasureOKmask, std::uint16_t &mae);
+        bool autocalib(const embot::app::canprotocol::analog::polling::Message_AMPLIFIER_OFFSET_AUTOCALIB::Info &info, std::uint8_t &noisychannelmask, std::uint8_t &algorithmOKmask, std::uint8_t &finalmeasureOKmask, std::uint16_t &mae);
         
         bool start(const embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode mode);
         bool stop();        
         bool tick(std::vector<embot::hw::can::Frame> &replies);
         bool processdata(std::vector<embot::hw::can::Frame> &replies);
+        
+        
+        // interface to CANagentSTRAIN
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_SET_TXMODE::Info &info);
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_SET_SERIAL_NO::Info &info);  
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_SET_CANDATARATE::Info &info); 
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_SET_FULL_SCALES::Info &info); 
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_SAVE2EE::Info &info); 
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_SET_CH_DAC::Info &info); 
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_SET_MATRIX_RC::Info &info); 
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_SET_MATRIX_G::Info &info); 
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_SET_CALIB_TARE::Info &info); 
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_SET_CURR_TARE::Info &info); 
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_AMPLIFIER_RESET::Info &info); 
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_AMPLIFIER_PGA308_CFG1_SET::Info &info); 
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_AMPLIFIER_OFFSET_AUTOCALIB::Info &info, embot::app::canprotocol::analog::polling::Message_AMPLIFIER_OFFSET_AUTOCALIB::ReplyInfo &replyinfo); 
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_AMPLIFIER_GAINOFFSET_SET::Info &info); 
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_REGULATIONSET_SET::Info &info); 
+  
+        virtual bool get(const embot::app::canprotocol::analog::polling::Message_GET_SERIAL_NO::Info &info, embot::app::canprotocol::analog::polling::Message_GET_SERIAL_NO::ReplyInfo &replyinfo);
+        virtual bool get(const embot::app::canprotocol::analog::polling::Message_GET_FULL_SCALES::Info &info, embot::app::canprotocol::analog::polling::Message_GET_FULL_SCALES::ReplyInfo &replyinfo);
+        virtual bool get(const embot::app::canprotocol::analog::polling::Message_GET_EEPROM_STATUS::Info &info, embot::app::canprotocol::analog::polling::Message_GET_EEPROM_STATUS::ReplyInfo &replyinfo);
+        virtual bool get(const embot::app::canprotocol::analog::polling::Message_GET_CH_ADC::Info &info, embot::app::canprotocol::analog::polling::Message_GET_CH_ADC::ReplyInfo &replyinfo);
+        virtual bool get(const embot::app::canprotocol::analog::polling::Message_GET_CH_DAC::Info &info, embot::app::canprotocol::analog::polling::Message_GET_CH_DAC::ReplyInfo &replyinfo);
+        virtual bool get(const embot::app::canprotocol::analog::polling::Message_GET_MATRIX_RC::Info &info, embot::app::canprotocol::analog::polling::Message_GET_MATRIX_RC::ReplyInfo &replyinfo);
+        virtual bool get(const embot::app::canprotocol::analog::polling::Message_GET_MATRIX_G::Info &info, embot::app::canprotocol::analog::polling::Message_GET_MATRIX_G::ReplyInfo &replyinfo);
+        virtual bool get(const embot::app::canprotocol::analog::polling::Message_GET_CALIB_TARE::Info &info, embot::app::canprotocol::analog::polling::Message_GET_CALIB_TARE::ReplyInfo &replyinfo);
+        virtual bool get(const embot::app::canprotocol::analog::polling::Message_GET_CURR_TARE::Info &info, embot::app::canprotocol::analog::polling::Message_GET_CURR_TARE::ReplyInfo &replyinfo);
+        virtual bool get(const embot::app::canprotocol::analog::polling::Message_AMPLIFIER_PGA308_CFG1_GET::Info &info, embot::app::canprotocol::analog::polling::Message_AMPLIFIER_PGA308_CFG1_GET::ReplyInfo &replyinfo);
+        virtual bool get(const embot::app::canprotocol::analog::polling::Message_AMPLIFIER_GAINOFFSET_GET::Info &info, embot::app::canprotocol::analog::polling::Message_AMPLIFIER_GAINOFFSET_GET::ReplyInfo &replyinfo);
+        virtual bool get(const embot::app::canprotocol::analog::polling::Message_AMPLIFIER_RANGE_OF_GAIN_GET::Info &info, embot::app::canprotocol::analog::polling::Message_AMPLIFIER_RANGE_OF_GAIN_GET::ReplyInfo &replyinfo);
+        virtual bool get(const embot::app::canprotocol::analog::polling::Message_AMPLIFIER_RANGE_OF_OFFSET_GET::Info &info, embot::app::canprotocol::analog::polling::Message_AMPLIFIER_RANGE_OF_OFFSET_GET::ReplyInfo &replyinfo);
+        virtual bool get(const embot::app::canprotocol::analog::polling::Message_REGULATIONSET_GET::Info &info, embot::app::canprotocol::analog::polling::Message_REGULATIONSET_GET::ReplyInfo &replyinfo);
+
 
     private:
         theSTRAIN(); 

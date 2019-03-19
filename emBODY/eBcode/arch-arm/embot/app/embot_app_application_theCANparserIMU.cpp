@@ -30,17 +30,10 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "embot.h"
-
 #include <new>
-
 #include "embot_hw.h"
-#include "embot_app_canprotocol.h"
-#include "embot_app_canprotocol_analog_polling.h"
-#include "embot_app_canprotocol_analog_periodic.h"
-
 #include "embot_app_theCANboardInfo.h"
 
-#include "embot_app_application_theIMU.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -49,7 +42,23 @@
 
 
 struct embot::app::application::theCANparserIMU::Impl
-{    
+{   
+
+    class dummyCANagentIMU : public CANagentIMU 
+    {
+    public:
+        dummyCANagentIMU() {}
+        virtual ~dummyCANagentIMU() {}
+            
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_ACC_GYRO_SETUP::Info &info) { return true; }
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_IMU_CONFIG_SET::Info &info) { return true; }  
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_IMU_TRANSMIT::Info &info) { return true; } 
+    
+        virtual bool get(const embot::app::canprotocol::analog::polling::Message_IMU_CONFIG_GET::Info &info, embot::app::canprotocol::analog::polling::Message_IMU_CONFIG_GET::ReplyInfo &replyinfo) { return true; }                
+    };
+    
+    dummyCANagentIMU dummyagent;
+    
     Config config;
         
     bool txframe;
@@ -63,7 +72,8 @@ struct embot::app::application::theCANparserIMU::Impl
     
 
     Impl() 
-    {   
+    { 
+        config.agent = &dummyagent;        
         recognised = false;        
         txframe = false;
         cls = embot::app::canprotocol::Clas::none;
@@ -145,9 +155,7 @@ bool embot::app::application::theCANparserIMU::Impl::process_set_accgyrosetup(co
 {
     embot::app::canprotocol::analog::polling::Message_ACC_GYRO_SETUP msg;
     msg.load(frame);
-      
-    embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance();    
-    theimu.configure(msg.info);
+    config.agent->set(msg.info);
     
     return msg.reply();        
 }
@@ -156,9 +164,7 @@ bool embot::app::application::theCANparserIMU::Impl::process_set_imu_config(cons
 {
     embot::app::canprotocol::analog::polling::Message_IMU_CONFIG_SET msg;
     msg.load(frame);
-      
-    embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance();    
-    theimu.configure(msg.info);
+    config.agent->set(msg.info);
     
     return msg.reply();        
 }
@@ -166,13 +172,9 @@ bool embot::app::application::theCANparserIMU::Impl::process_set_imu_config(cons
 bool embot::app::application::theCANparserIMU::Impl::process_get_imu_config(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
 {
     embot::app::canprotocol::analog::polling::Message_IMU_CONFIG_GET msg;
-    msg.load(frame);
-    
-    embot::app::canprotocol::analog::polling::Message_IMU_CONFIG_GET::ReplyInfo replyinfo;
-      
-    embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance(); 
-    
-    theimu.get(replyinfo);
+    msg.load(frame);    
+    embot::app::canprotocol::analog::polling::Message_IMU_CONFIG_GET::ReplyInfo replyinfo;      
+    config.agent->get(msg.info, replyinfo);
 
     embot::hw::can::Frame frame0;
     if(true == msg.reply(frame0, embot::app::theCANboardInfo::getInstance().cachedCANaddress(), replyinfo))
@@ -188,20 +190,9 @@ bool embot::app::application::theCANparserIMU::Impl::process_get_imu_config(cons
 bool embot::app::application::theCANparserIMU::Impl::process_imu_transmit(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
 {
     embot::app::canprotocol::analog::polling::Message_IMU_TRANSMIT msg;
-    msg.load(frame);
+    msg.load(frame);    
+    config.agent->set(msg.info);
       
-    embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance(); 
-    
-    if((true == msg.info.transmit) && (msg.info.txperiod > 0))
-    {
-        theimu.start(msg.info.txperiod);
-    }
-    else
-    {
-        theimu.stop();        
-    }
-    
-    
     return msg.reply();        
 }
 
@@ -231,8 +222,13 @@ embot::app::application::theCANparserIMU::theCANparserIMU()
 embot::app::application::theCANparserIMU::~theCANparserIMU() { }
    
         
-bool embot::app::application::theCANparserIMU::initialise(Config &config)
+bool embot::app::application::theCANparserIMU::initialise(const Config &config)
 {
+    if(!config.isvalid())
+    {
+        return false;
+    }
+    
     pImpl->config = config;
         
     return true;

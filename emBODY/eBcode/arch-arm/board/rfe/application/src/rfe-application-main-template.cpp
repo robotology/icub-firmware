@@ -143,17 +143,18 @@ static void start_evt_based(void)
     embot::app::application::theCANparserBasic &canparserbasic = embot::app::application::theCANparserBasic::getInstance();
     embot::app::application::theCANparserBasic::Config configbasic;
     canparserbasic.initialise(configbasic);  
-        
-    // start canparser imu
-    embot::app::application::theCANparserIMU &canparserimu = embot::app::application::theCANparserIMU::getInstance();
-    embot::app::application::theCANparserIMU::Config configparserimu;
-    canparserimu.initialise(configparserimu);      
-
-        
+    
     // start agent of imu
     embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance();
     embot::app::application::theIMU::Config configimu(embot::hw::bsp::rfe::imuBOSCH, embot::hw::bsp::rfe::imuBOSCHconfig, evIMUtick, evIMUdataready, eventbasedtask);
-    theimu.initialise(configimu);            
+    theimu.initialise(configimu);    
+        
+    // start canparser imu and its agent
+    embot::app::application::theCANparserIMU &canparserimu = embot::app::application::theCANparserIMU::getInstance();
+    embot::app::application::theCANparserIMU::Config configparserimu { &theimu };
+    canparserimu.initialise(configparserimu);      
+
+               
         
     // finally start can. i keep it as last because i dont want that the isr-handler calls its onrxframe() 
     // before the eventbasedtask is created.

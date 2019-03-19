@@ -24,22 +24,22 @@
 #include "embot_common.h"
 #include "embot_hw.h"
 #include "embot_sys.h"
-#include "embot_app_canprotocol.h"
-#include "embot_app_canprotocol_analog_polling.h"
-#include "embot_app_canprotocol_analog_periodic.h"
 #include "embot_hw_si7051.h"
 #include <vector>
 #include <memory>
 
+#include "embot_app_application_theCANparserTHERMO.h"
+
 namespace embot { namespace app { namespace application {
            
-    class theTHERMO
+    class theTHERMO : public CANagentTHERMO
     {
     public:
+
         static theTHERMO& getInstance();
-        
-        
+                
     public:
+        
         struct Config
         {
             embot::hw::SI7051           sensor;
@@ -66,13 +66,19 @@ namespace embot { namespace app { namespace application {
 
         bool start();  
         
-        bool configure(embot::app::canprotocol::analog::polling::Message_THERMOMETER_CONFIG_SET::Info &info);
-        bool get(embot::app::canprotocol::analog::polling::Message_THERMOMETER_CONFIG_GET::ReplyInfo &info);
+        //bool configure(embot::app::canprotocol::analog::polling::Message_THERMOMETER_CONFIG_SET::Info &info);
+        //bool get(embot::app::canprotocol::analog::polling::Message_THERMOMETER_CONFIG_GET::ReplyInfo &info);
         bool start(embot::common::relTime period);
  
         bool stop();        
         bool tick(std::vector<embot::hw::can::Frame> &replies);        
         bool processdata(std::vector<embot::hw::can::Frame> &replies);
+        
+        // interface to CANagentTHERMO
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_THERMOMETER_CONFIG_SET::Info &info);
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_THERMOMETER_TRANSMIT::Info &info);
+        
+        virtual bool get(const embot::app::canprotocol::analog::polling::Message_THERMOMETER_CONFIG_GET::Info &info, embot::app::canprotocol::analog::polling::Message_THERMOMETER_CONFIG_GET::ReplyInfo &replyinfo);            
 
     private:
         theTHERMO(); 

@@ -40,9 +40,6 @@
 
 #include "embot_app_theCANboardInfo.h"
 
-#include "embot_app_application_theTHERMO.h"
-
-
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -50,7 +47,20 @@
 
 
 struct embot::app::application::theCANparserTHERMO::Impl
-{    
+{  
+    class dummyCANagentTHERMO : public CANagentTHERMO 
+    {
+    public:
+        dummyCANagentTHERMO() {}
+        virtual ~dummyCANagentTHERMO() {}
+            
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_THERMOMETER_CONFIG_SET::Info &info) { return true; }
+        virtual bool get(const embot::app::canprotocol::analog::polling::Message_THERMOMETER_CONFIG_GET::Info &info, embot::app::canprotocol::analog::polling::Message_THERMOMETER_CONFIG_GET::ReplyInfo &replyinfo) { return true; }    
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_THERMOMETER_TRANSMIT::Info &info) { return true; }        
+    };
+    
+    dummyCANagentTHERMO dummyagent;
+    
     Config config;
         
     bool txframe;
@@ -64,7 +74,9 @@ struct embot::app::application::theCANparserTHERMO::Impl
     
 
     Impl() 
-    {   
+    {  
+        config.agent = &dummyagent; 
+        
         recognised = false;        
         txframe = false;
         cls = embot::app::canprotocol::Clas::none;
@@ -140,8 +152,7 @@ bool embot::app::application::theCANparserTHERMO::Impl::process_set_thermo_confi
     embot::app::canprotocol::analog::polling::Message_THERMOMETER_CONFIG_SET msg;
     msg.load(frame);
       
-    embot::app::application::theTHERMO &theimu = embot::app::application::theTHERMO::getInstance();    
-    theimu.configure(msg.info);
+    config.agent->set(msg.info);
     
     return msg.reply();        
 }
@@ -154,9 +165,7 @@ bool embot::app::application::theCANparserTHERMO::Impl::process_get_thermo_confi
     
     embot::app::canprotocol::analog::polling::Message_THERMOMETER_CONFIG_GET::ReplyInfo replyinfo;
       
-    embot::app::application::theTHERMO &theimu = embot::app::application::theTHERMO::getInstance(); 
-    
-    theimu.get(replyinfo);
+    config.agent->get(msg.info, replyinfo);
 
     embot::hw::can::Frame frame0;
     if(true == msg.reply(frame0, embot::app::theCANboardInfo::getInstance().cachedCANaddress(), replyinfo))
@@ -173,18 +182,8 @@ bool embot::app::application::theCANparserTHERMO::Impl::process_thermo_transmit(
 {
     embot::app::canprotocol::analog::polling::Message_THERMOMETER_TRANSMIT msg;
     msg.load(frame);
-      
-    embot::app::application::theTHERMO &theimu = embot::app::application::theTHERMO::getInstance(); 
     
-    if((true == msg.info.transmit) && (msg.info.txperiod > 0))
-    {
-        theimu.start(msg.info.txperiod);
-    }
-    else
-    {
-        theimu.stop();        
-    }
-    
+    config.agent->set(msg.info);
     
     return msg.reply();        
 }
@@ -213,8 +212,13 @@ embot::app::application::theCANparserTHERMO::theCANparserTHERMO()
     
 embot::app::application::theCANparserTHERMO::~theCANparserTHERMO() { }
         
-bool embot::app::application::theCANparserTHERMO::initialise(Config &config)
+bool embot::app::application::theCANparserTHERMO::initialise(const Config &config)
 {
+    if(!config.isvalid())
+    {
+        return false;
+    }
+    
     pImpl->config = config;
         
     return true;

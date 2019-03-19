@@ -155,8 +155,6 @@ struct embot::app::application::theIMU::Impl
     bool tick(std::vector<embot::hw::can::Frame> &replies);
     bool processdata(std::vector<embot::hw::can::Frame> &replies);
     
-//    bool configure(embot::app::canprotocol::analog::polling::Message_ACC_GYRO_SETUP::Info &ag);
-    
     
     bool fill(embot::app::canprotocol::inertial::periodic::Message_DIGITAL_ACCELEROMETER::Info &info);
     bool fill(embot::app::canprotocol::inertial::periodic::Message_DIGITAL_GYROSCOPE::Info &info);
@@ -517,7 +515,14 @@ bool embot::app::application::theIMU::initialise(Config &config)
 }
 
 
-bool embot::app::application::theIMU::configure(embot::app::canprotocol::analog::polling::Message_ACC_GYRO_SETUP::Info &ag)
+
+bool embot::app::application::theIMU::start()
+{    
+    return pImpl->start();
+}
+
+
+bool embot::app::application::theIMU::set(const embot::app::canprotocol::analog::polling::Message_ACC_GYRO_SETUP::Info &info)
 {
     // if ticking: stop it
     if(true == pImpl->ticking)
@@ -529,7 +534,7 @@ bool embot::app::application::theIMU::configure(embot::app::canprotocol::analog:
     pImpl->legacymode = true;
     
     // copy new configuration
-    pImpl->canlegacyconfig.accgyroinfo = ag;
+    pImpl->canlegacyconfig.accgyroinfo = info;
     
     // get some settings from it.    
 //    static const std::uint8_t accelmask =   static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::Message_ACC_GYRO_SETUP::InertialType::analogaccelerometer) |
@@ -554,13 +559,7 @@ bool embot::app::application::theIMU::configure(embot::app::canprotocol::analog:
     return true;    
 }
 
-
-bool embot::app::application::theIMU::start()
-{    
-    return pImpl->start();
-}
-
-bool embot::app::application::theIMU::configure(embot::app::canprotocol::analog::polling::Message_IMU_CONFIG_SET::Info &info)
+bool embot::app::application::theIMU::set(const embot::app::canprotocol::analog::polling::Message_IMU_CONFIG_SET::Info &info)
 {
     // if ticking: stop it
     if(true == pImpl->ticking)
@@ -577,12 +576,28 @@ bool embot::app::application::theIMU::configure(embot::app::canprotocol::analog:
     return true;    
 }
 
-bool embot::app::application::theIMU::get(embot::app::canprotocol::analog::polling::Message_IMU_CONFIG_GET::ReplyInfo &info)
+
+bool embot::app::application::theIMU::set(const embot::app::canprotocol::analog::polling::Message_IMU_TRANSMIT::Info &info)
+{
+    if((true == info.transmit) && (info.txperiod > 0))
+    {
+        start(info.txperiod);
+    }
+    else
+    {
+        stop();        
+    }
+    
+    return true;    
+}
+
+
+bool embot::app::application::theIMU::get(const embot::app::canprotocol::analog::polling::Message_IMU_CONFIG_GET::Info &info, embot::app::canprotocol::analog::polling::Message_IMU_CONFIG_GET::ReplyInfo &replyinfo)
 {    
     // copy configuration
-    info.sensormask = pImpl->canrevisitedconfig.imuinfo.sensormask;
-    info.fusion = pImpl->canrevisitedconfig.imuinfo.fusion;
-    info.ffu_ranges_measureunits = pImpl->canrevisitedconfig.imuinfo.ffu_ranges_measureunits;    
+    replyinfo.sensormask = pImpl->canrevisitedconfig.imuinfo.sensormask;
+    replyinfo.fusion = pImpl->canrevisitedconfig.imuinfo.fusion;
+    replyinfo.ffu_ranges_measureunits = pImpl->canrevisitedconfig.imuinfo.ffu_ranges_measureunits;    
 
     return true;    
 }

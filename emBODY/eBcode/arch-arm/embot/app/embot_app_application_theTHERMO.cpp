@@ -163,6 +163,10 @@ bool embot::app::application::theTHERMO::Impl::start()
 { 
     canconfig.counter = 0;
     embot::sys::Timer::Config cfg(canconfig.txperiod, action, embot::sys::Timer::Mode::forever);
+    if(true == ticking)
+    {
+        stop();
+    }
     ticktimer->start(cfg);
     ticking = true;    
     return true;            
@@ -293,7 +297,7 @@ bool embot::app::application::theTHERMO::start()
     return pImpl->start();
 }
 
-bool embot::app::application::theTHERMO::configure(embot::app::canprotocol::analog::polling::Message_THERMOMETER_CONFIG_SET::Info &info)
+bool embot::app::application::theTHERMO::set(const embot::app::canprotocol::analog::polling::Message_THERMOMETER_CONFIG_SET::Info &info)
 {
     // if ticking: stop it
     if(true == pImpl->ticking)
@@ -307,13 +311,28 @@ bool embot::app::application::theTHERMO::configure(embot::app::canprotocol::anal
     return true;    
 }
 
-bool embot::app::application::theTHERMO::get(embot::app::canprotocol::analog::polling::Message_THERMOMETER_CONFIG_GET::ReplyInfo &info)
+bool embot::app::application::theTHERMO::get(const embot::app::canprotocol::analog::polling::Message_THERMOMETER_CONFIG_GET::Info &info, embot::app::canprotocol::analog::polling::Message_THERMOMETER_CONFIG_GET::ReplyInfo &replyinfo)
 {    
     // copy configuration
-    info.sensormask = pImpl->canconfig.info.sensormask;
+    replyinfo.sensormask = pImpl->canconfig.info.sensormask;
  
     return true;    
 }
+
+bool embot::app::application::theTHERMO::set(const embot::app::canprotocol::analog::polling::Message_THERMOMETER_TRANSMIT::Info &info)
+{
+    if((true == info.transmit) && (info.txperiod > 0))
+    {
+        start(info.txperiod);
+    }
+    else
+    {
+        stop();        
+    }
+    
+    return true;  
+}
+
 
 bool embot::app::application::theTHERMO::start(embot::common::relTime period)
 {      

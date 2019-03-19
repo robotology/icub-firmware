@@ -78,6 +78,8 @@ embot::hw::tlv493d::Config tlvconfig { tlvi2c, 400000 };
 
 #include "embot_app_application_theCANparserBasic.h"
 
+#include "embot_app_application_theCANparserPOS.h"
+
 #include "embot_app_application_thePOSreader.h"
 
 
@@ -191,20 +193,17 @@ static void start_evt_based(void)
     embot::app::application::theCANparserBasic &canparserbasic = embot::app::application::theCANparserBasic::getInstance();
     embot::app::application::theCANparserBasic::Config configbasic;
     canparserbasic.initialise(configbasic);  
-    
-    // start canparser psc
-    #warning TODO: caparser of psc
-//    embot::app::application::theCANparserSTRAIN &canparserstrain = embot::app::application::theCANparserSTRAIN::getInstance();
-//    embot::app::application::theCANparserSTRAIN::Config configparserstrain;
-//    canparserstrain.initialise(configparserstrain);  
-    
+       
     
     // start agent of POSreader
-
     embot::app::application::thePOSreader &thepos = embot::app::application::thePOSreader::getInstance();
     embot::app::application::thePOSreader::Config configpos { eventbasedtask, POSsensors, POSevents };
     thepos.initialise(configpos); 
-        
+    
+    // start parser of POS and link it to its agent: thePOSreader
+    embot::app::application::theCANparserPOS &canparserpos = embot::app::application::theCANparserPOS::getInstance();
+    embot::app::application::theCANparserPOS::Config configparserpos { &thepos };
+    canparserpos.initialise(configparserpos);        
 
 
     // finally start can. i keep it as last because i dont want that the isr-handler calls its onrxframe() 
@@ -262,15 +261,15 @@ static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask
         if(embot::hw::resOK == embot::hw::can::get(embot::hw::CAN::one, frame, remainingINrx))
         {            
             embot::app::application::theCANparserBasic &canparserbasic = embot::app::application::theCANparserBasic::getInstance();
-//            embot::app::application::theCANparserSTRAIN &canparserstrain = embot::app::application::theCANparserSTRAIN::getInstance();
+            embot::app::application::theCANparserPOS &canparserpos = embot::app::application::theCANparserPOS::getInstance();
 
             // process w/ the basic parser, if not recognised call the parse specific of the board
             if(true == canparserbasic.process(frame, outframes))
             {                   
             }
-//            else if(true == canparserpsc.process(frame, outframes))
-//            {               
-//            }
+            else if(true == canparserpos.process(frame, outframes))
+            {               
+            }
 
             
             if(remainingINrx > 0)

@@ -49,7 +49,7 @@ static const embot::sys::Operation onidle = { embot::common::Callback(userdefoni
 static const embot::sys::Operation onfatal = { embot::common::Callback(userdefonfatal, nullptr), 64 };
 
 #if defined(APPL_TESTZEROOFFSET)
-static const std::uint32_t address = eembot::hw::flash::getpartition(embot::hw::FLASH::bootloader).address;
+static const std::uint32_t address = embot::hw::flash::getpartition(embot::hw::FLASH::bootloader).address;
 #else
 static const std::uint32_t address = embot::hw::flash::getpartition(embot::hw::FLASH::application).address;
 #endif
@@ -121,37 +121,39 @@ static void start_evt_based(void)
     embot::app::application::theCANparserBasic::Config configparserbasic;
     canparserbasic.initialise(configparserbasic);  
     
-    // start canparser skin
-    embot::app::application::theCANparserSkin &canparserskin = embot::app::application::theCANparserSkin::getInstance();
-    embot::app::application::theCANparserSkin::Config configparserskin;
-    canparserskin.initialise(configparserskin);  
-    
-    // start canparser imu
-    embot::app::application::theCANparserIMU &canparserimu = embot::app::application::theCANparserIMU::getInstance();
-    embot::app::application::theCANparserIMU::Config configparserimu;
-    canparserimu.initialise(configparserimu);    
-
-    // start canparser thermo
-    embot::app::application::theCANparserTHERMO &canparserthermo = embot::app::application::theCANparserTHERMO::getInstance();
-    embot::app::application::theCANparserTHERMO::Config configparserthermo;
-    canparserthermo.initialise(configparserthermo);     
-    
+          
     // start agent of skin 
     embot::app::application::theSkin &theskin = embot::app::application::theSkin::getInstance();
     embot::app::application::theSkin::Config configskin;
     configskin.tickevent = evSKINprocess;
     configskin.totask = eventbasedtask;
     theskin.initialise(configskin);   
-
+    
+    // start canparser skin and link it to its agent
+    embot::app::application::theCANparserSkin &canparserskin = embot::app::application::theCANparserSkin::getInstance();
+    embot::app::application::theCANparserSkin::Config configparserskin { &theskin };
+    canparserskin.initialise(configparserskin);  
+    
     // start agent of imu
     embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance();
     embot::app::application::theIMU::Config configimu(embot::hw::bsp::mtb4::imuBOSCH, embot::hw::bsp::mtb4::imuBOSCHconfig, evIMUtick, evIMUdataready, eventbasedtask);
-    theimu.initialise(configimu);   
+    theimu.initialise(configimu);
 
+    // start canparser imu and link it to its agent
+    embot::app::application::theCANparserIMU &canparserimu = embot::app::application::theCANparserIMU::getInstance();
+    embot::app::application::theCANparserIMU::Config configparserimu { &theimu };
+    canparserimu.initialise(configparserimu);   
+    
     // start agent of thermo
     embot::app::application::theTHERMO &thethermo = embot::app::application::theTHERMO::getInstance();
     embot::app::application::theTHERMO::Config configthermo(embot::hw::bsp::mtb4::thermometer, embot::hw::bsp::mtb4::thermometerconfig, evTHERMOtick, evTHERMOdataready, eventbasedtask);
-    thethermo.initialise(configthermo);         
+    thethermo.initialise(configthermo);  
+
+    // start canparser thermo and link it to its agent
+    embot::app::application::theCANparserTHERMO &canparserthermo = embot::app::application::theCANparserTHERMO::getInstance();
+    embot::app::application::theCANparserTHERMO::Config configparserthermo { &thethermo };
+    canparserthermo.initialise(configparserthermo);     
+       
     
     // finally start can. i keep it as last because i dont want that the isr-handler calls its onrxframe() 
     // before the eventbasedtask is created.

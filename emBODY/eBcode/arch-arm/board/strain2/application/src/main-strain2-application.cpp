@@ -180,35 +180,36 @@ static void start_evt_based(void)
     embot::app::application::theCANparserBasic::Config configbasic;
     canparserbasic.initialise(configbasic);  
     
-    // start canparser strain
-    embot::app::application::theCANparserSTRAIN &canparserstrain = embot::app::application::theCANparserSTRAIN::getInstance();
-    embot::app::application::theCANparserSTRAIN::Config configparserstrain;
-    canparserstrain.initialise(configparserstrain);  
-    
-    // start canparser imu
-    embot::app::application::theCANparserIMU &canparserimu = embot::app::application::theCANparserIMU::getInstance();
-    embot::app::application::theCANparserIMU::Config configparserimu;
-    canparserimu.initialise(configparserimu);      
-
-    // start canparser thermo
-    embot::app::application::theCANparserTHERMO &canparserthermo = embot::app::application::theCANparserTHERMO::getInstance();
-    embot::app::application::theCANparserTHERMO::Config configparserthermo;
-    canparserthermo.initialise(configparserthermo); 
     
     // start agent of strain
     embot::app::application::theSTRAIN &thestrain = embot::app::application::theSTRAIN::getInstance();
     embot::app::application::theSTRAIN::Config configstrain(evSTRAINtick, evSTRAINdataready, eventbasedtask);
     thestrain.initialise(configstrain); 
-        
+    
+    // start canparser strain and link it to its agent
+    embot::app::application::theCANparserSTRAIN &canparserstrain = embot::app::application::theCANparserSTRAIN::getInstance();
+    embot::app::application::theCANparserSTRAIN::Config configparserstrain { &thestrain };
+    canparserstrain.initialise(configparserstrain);  
+                   
     // start agent of imu
     embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance();
     embot::app::application::theIMU::Config configimu(embot::hw::bsp::strain2::imuBOSCH, embot::hw::bsp::strain2::imuBOSCHconfig, evIMUtick, evIMUdataready, eventbasedtask);
-    theimu.initialise(configimu);     
+    theimu.initialise(configimu);
+
+    // start canparser imu and link it to its agent
+    embot::app::application::theCANparserIMU &canparserimu = embot::app::application::theCANparserIMU::getInstance();
+    embot::app::application::theCANparserIMU::Config configparserimu { &theimu };
+    canparserimu.initialise(configparserimu);   
     
     // start agent of thermo
     embot::app::application::theTHERMO &thethermo = embot::app::application::theTHERMO::getInstance();
     embot::app::application::theTHERMO::Config configthermo(embot::hw::bsp::strain2::thermometerSGAUGES, embot::hw::bsp::strain2::thermometerSGAUGESconfig, evTHERMOtick, evTHERMOdataready, eventbasedtask);
-    thethermo.initialise(configthermo);         
+    thethermo.initialise(configthermo);  
+
+    // start canparser thermo and link it to its agent
+    embot::app::application::theCANparserTHERMO &canparserthermo = embot::app::application::theCANparserTHERMO::getInstance();
+    embot::app::application::theCANparserTHERMO::Config configparserthermo { &thethermo };
+    canparserthermo.initialise(configparserthermo); 
 
     // finally start can. i keep it as last because i dont want that the isr-handler calls its onrxframe() 
     // before the eventbasedtask is created.
