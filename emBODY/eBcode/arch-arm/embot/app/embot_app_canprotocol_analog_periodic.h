@@ -41,7 +41,8 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         FORCE_VECTOR = ICUBCANPROTO_PER_AS_MSG__FORCE_VECTOR, 
         TORQUE_VECTOR = ICUBCANPROTO_PER_AS_MSG__TORQUE_VECTOR,                                                      // strain
         // NEW messages:
-        THERMOMETER_MEASURE = ICUBCANPROTO_PER_AS_MSG__THERMOMETER_MEASURE
+        THERMOMETER_MEASURE = ICUBCANPROTO_PER_AS_MSG__THERMOMETER_MEASURE,
+        POS = ICUBCANPROTO_PER_AS_MSG__POS
     };
     
     // NOTES
@@ -222,7 +223,43 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         bool load(const Info& inf);
             
         bool get(embot::hw::can::Frame &outframe);        
+    };  
+
+
+    class Message_POS : public Message
+    {
+        public:
+            
+        enum class Type : uint8_t { raw = 0, angleCdec = 1, angleCcen = 2 };
+            
+        enum class Format : uint8_t { U08 = 0, I08 = 1, U16 = 2, I16 = 3, U32 = 4, I32 = 5 };
+        
+        struct Descriptor
+        {
+            Type            type;               // tells if it is an angle, a linera position etc. use an enum class
+            Format          format;             // tells a format
+            std::uint8_t    indexoffirst : 4;   // the index of the first value stored inside data[]   
+            std::uint8_t    numberof : 4;       // the number of values stored inside data[]      
+            Descriptor() : type(Type::raw), format(Format::U08), indexoffirst(0), numberof(6) {}            
+        };  // it must be stored in 16 bits
+            
+        struct Info
+        { 
+            std::uint8_t                canaddress;
+            Descriptor                  descriptor;
+            std::uint8_t                data[6];
+            Info() : canaddress(0) { std::memset(data, 0, sizeof(data)); }
+        };
+        
+        Info info;
+        
+        Message_POS() {}
+            
+        bool load(const Info& inf);
+            
+        bool get(embot::hw::can::Frame &outframe);        
     };    
+        
     
 }}}}} // namespace embot { namespace app { namespace canprotocol { namespace analog { namespace periodic {    
 

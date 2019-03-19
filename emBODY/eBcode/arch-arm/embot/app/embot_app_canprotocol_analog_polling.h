@@ -90,20 +90,24 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         THERMOMETER_CONFIG_SET = ICUBCANPROTO_POL_AS_CMD__THERMOMETER_CONFIG_SET,
         THERMOMETER_TRANSMIT = ICUBCANPROTO_POL_AS_CMD__THERMOMETER_TRANSMIT,        
         // RESERVED: { 0x3B, 0x3C } for possible new THERMOMETER commands
-        
-        // HOLE: [0x3F, ... , 0x4B]. there are 13 free values ...
-        
+                
         // NEW messages for strain2 to configure the regulation set to use
         REGULATIONSET_SET = ICUBCANPROTO_POL_AS_CMD__REGULATIONSET_SET,
         REGULATIONSET_GET = ICUBCANPROTO_POL_AS_CMD__REGULATIONSET_GET,
         
+        // HOLE: [0x3F, ... , 0x4B]. there are 13 free values ...
+        
         // skin messages + legacy acc-gyro messages
-        SKIN_OBSOLETE_TACT_SETUP = ICUBCANPROTO_POL_SK_CMD__TACT_SETUP,                  // 0x4C obsolete, but we support it in a basic form
-        SKIN_SET_BRD_CFG = ICUBCANPROTO_POL_SK_CMD__SET_BRD_CFG,                          // 0x4D used to configure the skin data in mtb + its tx rate
-        ACC_GYRO_SETUP = ICUBCANPROTO_POL_SK_CMD__ACC_GYRO_SETUP,                            // 0x4F used to configure the inertial data in mtb + its tx rate
-        SKIN_SET_TRIANG_CFG = ICUBCANPROTO_POL_SK_CMD__SET_TRIANG_CFG                        // 0x50 used to configure the skin data in mtb
+        SKIN_OBSOLETE_TACT_SETUP = ICUBCANPROTO_POL_SK_CMD__TACT_SETUP,                     // 0x4C obsolete, but we support it in a basic form
+        SKIN_SET_BRD_CFG = ICUBCANPROTO_POL_SK_CMD__SET_BRD_CFG,                            // 0x4D used to configure the skin data in mtb + its tx rate
+        ACC_GYRO_SETUP = ICUBCANPROTO_POL_SK_CMD__ACC_GYRO_SETUP,                           // 0x4F used to configure the inertial data in mtb + its tx rate
+        SKIN_SET_TRIANG_CFG = ICUBCANPROTO_POL_SK_CMD__SET_TRIANG_CFG,                      // 0x50 used to configure the skin data in mtb
 
-        // HOLE: [0x51, ... , 0xFD]. there are 173 free values.
+        POS_CONFIG_GET = 0x51,
+        POS_CONFIG_SET = 0x52,
+        POS_TRANSMIT = 0x53,
+        
+        // HOLE: [0x54, ... , 0xFD]. there are 170 free values.
     };
     
     
@@ -1231,7 +1235,75 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         bool load(const embot::hw::can::Frame &inframe);
             
         bool reply();   // none        
-    };        
+    };    
+
+
+    class Message_POS_CONFIG_SET : public Message
+    {
+        public:
+            
+                                    
+        struct Info
+        {
+            std::uint8_t tbd;       
+            Info() : tbd(0){}
+        };
+        
+        Info info;
+        
+        Message_POS_CONFIG_SET() {}
+            
+        bool load(const embot::hw::can::Frame &inframe);
+            
+        bool reply();   // none
+            
+    }; 
+
+    class Message_POS_CONFIG_GET : public Message
+    {
+        public:
+                                    
+        struct Info
+        { 
+            std::uint8_t nothing;           
+            Info() : nothing(0) {}
+        };
+        
+        struct ReplyInfo
+        {
+            std::uint8_t tbd;       
+            ReplyInfo() : tbd(0) {}        
+        };        
+        
+        Info info;
+        
+        Message_POS_CONFIG_GET() {}
+            
+        bool load(const embot::hw::can::Frame &inframe);
+            
+        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
+    };  
+    
+    class Message_POS_TRANSMIT : public Message
+    {
+        public:
+        
+        // format is data[0] = milliseconds                        
+        struct Info
+        {
+            bool transmit;
+            embot::common::relTime  txperiod;   // if 0, dont transmit. else use usec value.         
+            Info() : transmit(false), txperiod(0) {}
+        };
+        
+        Info info;
+        
+        Message_POS_TRANSMIT() {}
+            
+        bool load(const embot::hw::can::Frame &inframe);
+            
+        bool reply();   // none        
+    };            
     
 }}}}} // namespace embot { namespace app { namespace canprotocol { namespace analog { namespace polling {
     
