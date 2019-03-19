@@ -21,6 +21,9 @@
 #ifndef _EMBOT_APP_APPLICATION_THEPOSREADER_H_
 #define _EMBOT_APP_APPLICATION_THEPOSREADER_H_
 
+
+#include "embot_app_application_theCANparserPOS.h"
+
 #include "embot_common.h"
 #include "embot_hw.h"
 #include "embot_sys.h"
@@ -33,7 +36,7 @@
 
 namespace embot { namespace app { namespace application {
            
-    class thePOSreader
+    class thePOSreader : public CANagentPOS
     {
     public:
         static thePOSreader& getInstance();
@@ -79,8 +82,11 @@ namespace embot { namespace app { namespace application {
         bool process(embot::common::Event evt, std::vector<embot::hw::can::Frame> &replies);
         
         
-//        bool set(embot::app::canprotocol::analog::polling::Message_THERMOMETER_CONFIG_SET::Info &info);
-//        bool get(embot::app::canprotocol::analog::polling::Message_THERMOMETER_CONFIG_GET::ReplyInfo &info);
+        // interface to CANagentPOS
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_POS_CONFIG_SET::Info &info);
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_POS_TRANSMIT::Info &info);
+        virtual bool get(const embot::app::canprotocol::analog::polling::Message_POS_CONFIG_GET::Info &info, embot::app::canprotocol::analog::polling::Message_POS_CONFIG_GET::ReplyInfo &replyinfo);
+        
       
 //        bool tick(std::vector<embot::hw::can::Frame> &replies);        
 //        bool processdata(std::vector<embot::hw::can::Frame> &replies);

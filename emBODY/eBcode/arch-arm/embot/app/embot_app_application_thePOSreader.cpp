@@ -328,27 +328,44 @@ bool embot::app::application::thePOSreader::initialise(const Config &config)
 
 
 
-//bool embot::app::application::thePOSreader::configure(embot::app::canprotocol::analog::polling::Message_THERMOMETER_CONFIG_SET::Info &info)
-//{
-//    // if ticking: stop it
-//    if(true == pImpl->ticking)
-//    {
-//        stop();
-//    }
-//    
-//    // copy new configuration
+bool embot::app::application::thePOSreader::set(const embot::app::canprotocol::analog::polling::Message_POS_CONFIG_SET::Info &info)
+{
+    // if ticking: stop it
+    if(true == pImpl->ticking)
+    {
+        stop();
+    }
+    
+    // copy new configuration
 //    pImpl->canconfig.info = info;
-//    
-//    return true;    
-//}
+    
+    return true;    
+}
 
-//bool embot::app::application::thePOSreader::get(embot::app::canprotocol::analog::polling::Message_THERMOMETER_CONFIG_GET::ReplyInfo &info)
-//{    
-//    // copy configuration
-//    info.sensormask = pImpl->canconfig.info.sensormask;
-// 
-//    return true;    
-//}
+bool embot::app::application::thePOSreader::get(const embot::app::canprotocol::analog::polling::Message_POS_CONFIG_GET::Info &info, embot::app::canprotocol::analog::polling::Message_POS_CONFIG_GET::ReplyInfo &replyinfo)
+{    
+    // copy configuration
+//    replyinfo.sensormask = pImpl->canconfig.info.sensormask;
+ 
+    return true;    
+}
+
+
+bool embot::app::application::thePOSreader::set(const embot::app::canprotocol::analog::polling::Message_POS_TRANSMIT::Info &info)
+{
+    if((true == info.transmit) && (info.txperiod > 0))
+    {
+        start(info.txperiod);
+    }
+    else
+    {
+        stop();        
+    }
+    
+    return true;    
+}
+
+
 
 bool embot::app::application::thePOSreader::start(embot::common::relTime period)
 {   
