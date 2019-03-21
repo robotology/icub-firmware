@@ -1235,6 +1235,52 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         bool load(const embot::hw::can::Frame &inframe);
             
         bool reply();   // none        
+    };  
+
+
+    using deciDeg = std::int16_t;
+    
+    float deciDeg_export(const deciDeg d); 
+    deciDeg deciDeg_import(const float f);
+    
+    struct deciDegPOSdescriptor
+    {   // it assumes to have raw values in range [0, 360] exressed as int16_t in deci-degrees. it returns deci-degrees in open range positive and negative
+        // this struct can be transmitted in 3 bytes. from lsb: [rotation: 2 bits, invertdirection: 1 bit, label : 4 bits], zero: two bytes in little endian
+        // the bytes [0x01, 0x00, 0x00] tells ... no rotation, no inversion of direction, label 1, no zero. 
+        enum class ROT : uint8_t { none = 0, plus180 = 1, plus090 = 2, minus090 = 3 };
+        enum class LABEL : uint8_t { zero = 0, one = 1, two = 2, three = 3, four = 4, five = 5, six = 6, seven = 7, eight = 8, 
+                                     nine = 9, ten = 10, eleven = 11, twelve = 12, thirteen = 13, fourteeen = 14, fifteen = 15 };
+        ROT         rotation;         
+        bool        invertdirection;
+        LABEL       label;              // the label to use when transmitting in streaming the value of POS
+        deciDeg     zero;               // the zero to be applied to the value
+        deciDegPOSdescriptor() { reset(); }
+        void reset() { rotation = ROT::none; invertdirection = false;  label = LABEL::zero; zero = 0; }
+        void load(const uint8_t *bytes)
+        { 
+            rotation = static_cast<ROT>((bytes[0] >> 6) & 0b11);
+            invertdirection = embot::binary::bit::check(bytes[0], 5);
+            label = static_cast<LABEL>(bytes[0] & 0b1111);
+            zero = bytes[1] | bytes[2];
+        }
+        void fill(uint8_t *bytes) const 
+        {
+            if(nullptr != bytes)
+            {
+                bytes[0] = 0;
+                bytes[0] = static_cast<uint8_t>(rotation) << 6 | ((invertdirection & 0b1) << 5) | (static_cast<uint8_t>(label) & 0b1111);
+                bytes[1] = (zero >> 8);
+                bytes[2] = zero & 0xff;                
+            }            
+        }
+        static const deciDeg rotationmap[4]; // = {0, 1800, 900, -900};
+        deciDeg rotateclip(deciDeg v) const { return ( (v+rotationmap[static_cast<uint8_t>(rotation)]) % 3600 ); }
+        deciDeg transform(const deciDeg raw) const
+        {
+            deciDeg z = rotateclip(raw) - rotateclip(zero);
+            return (invertdirection) ? (-z) : (+z);
+        }
+        uint8_t getlabel() const { return static_cast<uint8_t>(label); } 
     };    
 
 
@@ -1242,12 +1288,45 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
     {
         public:
             
-                                    
         struct Info
-        {
-            std::uint8_t tbd;       
-            Info() : tbd(0){}
+        {   // it is dedicated to the case of the psc where we have two values to configure and they are expressed in deciDeg
+            uint8_t                 tbd;    // it holds a descriptor of ... presence maybe of it is for future choice of the content
+            deciDegPOSdescriptor    descriptor[2]; 
+            Info() : tbd(0) {}            
         };
+            
+//        // val is a number in range [tbd                            
+//        struct Info
+//        {
+//            posDescriptor   descriptor; 
+//            bool            applyphaseshift180; // use true only if the original measure passes through 0 in its movement. if true sensor = (val + 180) mod 360
+//            bool            revertdirection;    // use true only if you want invert direction of a movement. finalvalue = - measure                                       
+//            uint8_t         zero[4];            // if = 0 there is no offset, otherwise the measure is measure = (sensor-zero)
+//            Info() : applyphaseshift180(false), revertdirection(false) { std::memset(zero, 0, sizeof(zero)); }
+//            void reset() { descriptor.reset(); applyphaseshift180 = revertdirection = false; std::memset(zero, 0, sizeof(zero)); }
+//            void loadzero(float angle)
+//            { 
+//                if((descriptor.type == posType::angleDdec) && (descriptor.format == posFormat::I16))
+//                {
+//                    int16_t v = angle * 10.0;
+//                    zero[0] = v & 0xff; 
+//                    zero[1] = (v >> 8) & 0xff;
+//                }
+//            }
+//            float getzerofloat()
+//            {             
+//                return static_cast<float>(getzeroI16Ddec()) / 10;                   
+//            }
+//            int16_t getzeroI16Ddec()
+//            {
+//                int16_t iv = 0;
+//                if((descriptor.type == posType::angleDdec) && (descriptor.format == posFormat::I16))
+//                {
+//                    iv = zero[0] | (zero[1] << 8);
+//                }
+//                return iv;
+//            }
+//        };
         
         Info info;
         
@@ -1264,16 +1343,32 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         public:
                                     
         struct Info
-        { 
-            std::uint8_t nothing;           
-            Info() : nothing(0) {}
+        {   // it is dedicated to the case of the psc where we have two values to configure and they are expressed in deciDeg
+            uint8_t                 tbd;    // it holds a descriptor of ... presence maybe of it is for future choice of the content
+            Info() : tbd(0) {}            
         };
         
         struct ReplyInfo
-        {
-            std::uint8_t tbd;       
-            ReplyInfo() : tbd(0) {}        
-        };        
+        {   // it is dedicated to the case of the psc where we have two values to configure and they are expressed in deciDeg
+            uint8_t                 tbd;    // it hold a descriptor of ... presence maybe of it is for future choice of the content
+            deciDegPOSdescriptor    descriptor[2]; 
+            ReplyInfo() : tbd(0) {}            
+        };
+        
+//        struct Info
+//        { 
+//            posDescriptor   descriptor;           
+//            Info() {}
+//        };
+//                
+//        struct ReplyInfo
+//        {
+//            posDescriptor   descriptor; 
+//            bool            applyphaseshift180; // use true only if the original measure passes through 0 in its movement. if true sensor = (val + 180) mod 360
+//            bool            revertdirection;    // use true only if you want invert direction of a movement. finalvalue = - measure                                       
+//            uint8_t         zero[4];            // if = 0 there is no offset, otherwise the measure is measure = (sensor-zero)
+//            ReplyInfo() : applyphaseshift180(false), revertdirection(false) { std::memset(zero, 0, sizeof(zero)); }     
+//        };        
         
         Info info;
         

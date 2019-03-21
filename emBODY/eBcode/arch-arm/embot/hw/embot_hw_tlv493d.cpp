@@ -209,15 +209,17 @@ namespace embot { namespace hw { namespace tlv493d {
     static void sharedCBK(void *p)
     {
         Acquisition *acq = reinterpret_cast<Acquisition*>(p);    
+        
+        //std::int16_t tempval = acq->registermap.getT();
+        //bool isava = acq->registermap.isvalid();               
+        
+        std::int16_t Xv = acq->registermap.getX();
+        std::int16_t Yv = acq->registermap.getY();
+        //constexpr double todeg = 57.29577957855;  
+        constexpr double tocentdeg = 5729.577957855;
+        double an12atan2 = atan2(Yv, Xv) * tocentdeg + 18000.0;
 
-        #warning TODO: fix transformation         
-        
-        std::int16_t tempval = acq->registermap.getT();
-        bool isava = acq->registermap.isvalid();
-               
-        std::int32_t res = tempval;
-        
-        acq->position = static_cast<std::int16_t>(res);
+        acq->position = static_cast<Position>(an12atan2);
         acq->ongoing = false;
         acq->done = true;
         
@@ -353,6 +355,10 @@ namespace embot { namespace hw { namespace tlv493d {
         std::uint8_t index = embot::common::tointegral(h);
         position = s_privatedata.acquisition[index].position;
         
+        return resOK;  
+        
+#if 0   // tests        
+        
         constexpr double todeg = 57.29577957855;    
         
 
@@ -433,7 +439,8 @@ namespace embot { namespace hw { namespace tlv493d {
         an12atan2 = atan2(Yv, Xv) * todeg;
         
   
-        return resOK;        
+        return resOK;  
+#endif // tests        
     }
     
     

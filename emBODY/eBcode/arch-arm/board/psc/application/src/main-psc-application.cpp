@@ -17,7 +17,7 @@
 */
 
 
-#define TEST_ENABLED
+#undef TEST_ENABLED
 
 #if     defined(TEST_ENABLED)
 
@@ -144,8 +144,8 @@ constexpr std::array<embot::app::application::thePOSreader::Sensor, embot::app::
         { embot::hw::I2C::one, 400000 }        
     },
     {
-        embot::hw::TLV493D::one,
-        { embot::hw::I2C::one, 400000 }   
+        embot::hw::TLV493D::two,
+        { embot::hw::I2C::three, 400000 }   
     }   
 }};
 
@@ -303,12 +303,12 @@ static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask
     std::uint8_t num = outframes.size();
     if(num > 0)
     {
-//        for(std::uint8_t i=0; i<num; i++)
-//        {
-//            embot::hw::can::put(embot::hw::CAN::one, outframes[i]);                                       
-//        }
+        for(std::uint8_t i=0; i<num; i++)
+        {
+            embot::hw::can::put(embot::hw::CAN::one, outframes[i]);                                       
+        }
 
-//        embot::hw::can::transmit(embot::hw::CAN::one);  
+        embot::hw::can::transmit(embot::hw::CAN::one);  
     } 
  
 }

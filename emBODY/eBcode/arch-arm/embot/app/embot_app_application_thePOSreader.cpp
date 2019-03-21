@@ -50,7 +50,7 @@
 #include "embot_common.h"
 
 
-#include "embot_hw_si7051.h"
+#include "embot_hw_tlv493d.h"
 
 
 
@@ -62,6 +62,38 @@
     
 struct embot::app::application::thePOSreader::Impl
 { 
+    
+    // we have numberofpositions = 2 sensors, hence we have 2 config
+    
+//    struct canConfig
+//    {
+//        embot::common::relTime txperiod;
+//        std::array<embot::app::canprotocol::analog::polling::Message_POS_CONFIG_SET::Info, numberofpositions> info;
+//        canConfig() { reset(); }
+//        void reset()
+//        {
+//            txperiod = 100*embot::common::time1millisec;
+//            for(auto &a : info)
+//            {
+//                a.reset();
+//            }
+//        }
+//    };
+    
+    struct canConfig
+    {
+        std::array<embot::app::canprotocol::analog::polling::deciDegPOSdescriptor, numberofpositions> descriptor;
+        canConfig() { reset(); }
+        void reset()
+        {
+            for(auto &a : descriptor)
+            {
+                a.reset();
+            }
+        }
+    };
+    
+
  
 #if 0 
     struct canConfig
@@ -114,24 +146,37 @@ struct embot::app::application::thePOSreader::Impl
            
     bool ticking;
     std::uint8_t acquisitionmask;
+    std::uint8_t sensorstoacquiremask;
         
     embot::sys::Timer *ticktimer;
     embot::sys::Action action;
     common::relTime txperiod;
 
-//    tempAcquisition tempacquisition;
-//    canConfig canconfig;
+    canConfig canconfig;
+    
+    std::array<embot::hw::tlv493d::Position, numberofpositions> positions;
     
    
     Impl() 
     {   
         ticking = false;  
         acquisitionmask = 0;
+        sensorstoacquiremask = 0;
         txperiod = 10*embot::common::time1millisec;
 
-        ticktimer = new embot::sys::Timer;                   
+        ticktimer = new embot::sys::Timer;      
 
-//        tempacquisition.reset();
+        canconfig.reset(); 
+        positions[0] = positions[1] = 0;    
+        
+        canconfig.descriptor[1].invertdirection = true;
+        canconfig.descriptor[1].rotation = embot::app::canprotocol::analog::polling::deciDegPOSdescriptor::ROT::plus180;
+        canconfig.descriptor[1].label = embot::app::canprotocol::analog::polling::deciDegPOSdescriptor::LABEL::one;
+        canconfig.descriptor[1].zero = embot::app::canprotocol::analog::polling::deciDeg_import(348.0);
+
+//        canconfig.info[1].applyphaseshift180 = true;
+//        canconfig.info[1].revertdirection = true;
+//        canconfig.info[1].loadzero(348.0);
     }
     
    
@@ -223,7 +268,7 @@ bool embot::app::application::thePOSreader::Impl::process(embot::common::Event e
     }
     
     // devo ora recuperare 
-    if(true == embot::binary::mask::check(acquisitionmask, static_cast<std::uint8_t>(0b11)))
+    if(true == embot::binary::mask::check(acquisitionmask, sensorstoacquiremask))
     {
         acquisition_transmit(replies);
     }
@@ -244,19 +289,125 @@ bool embot::app::application::thePOSreader::Impl::acquisition_transmit(std::vect
     embot::hw::can::Frame frame;   
      
         
-    embot::app::canprotocol::analog::periodic::Message_THERMOMETER_MEASURE msg;
-    embot::app::canprotocol::analog::periodic::Message_THERMOMETER_MEASURE::Info info;  
+    embot::app::canprotocol::analog::periodic::Message_POS msg;
+    embot::app::canprotocol::analog::periodic::Message_POS::Info info;  
 
     
     info.canaddress = embot::app::theCANboardInfo::getInstance().cachedCANaddress();   
-    info.mask = 0x01;
-    info.temp0 = 666; //tempacquisition.temperature;        
+//    info.descriptor = canconfig.info[0].descriptor;
+    
+#if 0   
+    #warning TBD: we now write dummy bytes, but we must write positions[0] and positions[1] properly scaled
+    static volatile int32_t pp = 0;
+    static volatile int32_t pn = 0;
+    static volatile int32_t pp180p = 0;
+    static volatile int32_t pp180n = 0;
+    static volatile int32_t pn180p = 0;
+    static volatile int32_t pn180n = 0;
+    
+    static volatile int32_t pp180pC = 0;
+    static volatile int32_t pn180nC = 0;
+
+    pp = 0 + positions[1];
+    pp = pp % 36000;
+    pp /= 100;
+    
+    pn = 0 - positions[1];
+    pn = pn % 36000;
+    pn /= 100;
+    
+    pp180p = 18000 + positions[1];
+    pp180p = pp180p % 36000;
+    pp180p /= 100;
+    
+    pp180n = -18000 + positions[1];
+    pp180n = pp180n % 36000;
+    pp180n /= 100;
+    
+       
+    pn180p = 18000 - positions[1];
+    pn180p = pn180p % 36000;
+    pn180p /= 100;    
+        
+    pn180n = - 18000 - positions[1];
+    pn180n = pn180n % 36000;
+    pn180n /= 100;  
+    
+    constexpr int pn180nZERO = -168;
+    pn180nC = pn180n - pn180nZERO;
+    
+    constexpr int pp180pZERO = +168;
+    pp180pC = pp180p - pp180pZERO;
+    
+    constexpr int zero = 193; // 167;    
+    static volatile int32_t value0 = 0;
+    value0 = ((positions[1]/100) + 180) % 360;
+    value0 = value0 - zero;
+    value0 = -value0;
+
+    constexpr int zeroraw = 348;    
+    static volatile int32_t value1 = 0;
+    value1 = ((positions[1]/100) + 180) % 360;
+    value1 = value1 - ((zeroraw+180)%360);
+    value1 = -value1;
+#endif
+
+
+    int16_t p0 = canconfig.descriptor[0].transform(positions[0]/10);
+    int16_t p1 = canconfig.descriptor[1].transform(positions[1]/10);
+    
+    static volatile int16_t v1 = 0;
+    v1 = p1;
+    
+//    int16_t zero0 = canconfig.info[0].getzeroI16Ddec();
+//    int16_t zero1 = canconfig.info[1].getzeroI16Ddec();
+//    
+//    if(canconfig.info[0].applyphaseshift180)
+//    {
+//        p0 = (p0+1800)%3600;
+//        p0 = p0 - ((zero0+1800)%3600);
+//    }
+//    else
+//    {
+//        p0 = p0 - zero0;
+//    }
+//    
+//    if(canconfig.info[0].revertdirection)
+//    {
+//        p0 = -p0;
+//    }
+//    
+//    if(canconfig.info[1].applyphaseshift180)
+//    {
+//        p1 = (p1+1800)%3600;
+//        p1 = p1 - ((zero1+1800)%3600);
+//    }
+//    else
+//    {
+//        p1 = p1 - zero0;
+//    }
+//    
+//    if(canconfig.info[1].revertdirection)
+//    {
+//        p1 = -p1;
+//    }
+    info.descriptor.type = embot::app::canprotocol::analog::posType::angleDeciDeg;
+    info.descriptor.indexoffirst = static_cast<uint8_t>(canconfig.descriptor[0].label);
+    info.descriptor.numberof = 2;
+    
+    info.data[0] = p0 & 0xff;         
+    info.data[1] = (p0 >> 8) & 0xff;
+    info.data[2] = p1 & 0xff;
+    info.data[3] = (p1 >> 8) & 0xff;
+    info.data[4] = 0;
+    info.data[5] = 0;
     
     msg.load(info);
     msg.get(frame);
     replies.push_back(frame);        
 
     acquisitionmask = 0;
+    sensorstoacquiremask = 0;
              
     return true;           
 }
@@ -264,23 +415,26 @@ bool embot::app::application::thePOSreader::Impl::acquisition_transmit(std::vect
 
 bool embot::app::application::thePOSreader::Impl::acquisition_start()
 {
-    // entrambi
+
     acquisitionmask =  0;
-//    tempacquisition.onstart();
-//    embot::common::Callback cbk(alertdataisready00, this);
-//    embot::hw::si7051::acquisition(config.sensor, cbk);
+        
+    embot::common::Callback cbk00(alertdataisready00, this);
+    embot::hw::tlv493d::acquisition(config.sensors[0].id, cbk00);
+    embot::binary::bit::set(sensorstoacquiremask, 0);
+
+    embot::common::Callback cbk01(alertdataisready01, this);
+    embot::hw::tlv493d::acquisition(config.sensors[1].id, cbk01);
+    embot::binary::bit::set(sensorstoacquiremask, 1);
     
-    
-    alertdataisready00(this);
-    alertdataisready01(this);
-    
+
     return true;
 }
 
 
 bool embot::app::application::thePOSreader::Impl::acquisition_retrieve(std::uint8_t n)
 {
-//    embot::hw::si7051::read(config.sensor, tempacquisition.temperature);           
+    embot::hw::tlv493d::read(config.sensors[n].id, positions[n]);
+    
     return true;
 }
 
@@ -320,50 +474,12 @@ bool embot::app::application::thePOSreader::initialise(const Config &config)
     
     pImpl->action.load(embot::sys::EventToTask(pImpl->config.events.acquire, pImpl->config.owner));
   
-//    embot::hw::si7051::init(pImpl->config.sensor, pImpl->config.sensorconfig); 
+    embot::hw::tlv493d::init(pImpl->config.sensors[0].id, pImpl->config.sensors[0].config); 
+    embot::hw::tlv493d::init(pImpl->config.sensors[1].id, pImpl->config.sensors[1].config);
      
     return true;
 }
 
-
-
-
-bool embot::app::application::thePOSreader::set(const embot::app::canprotocol::analog::polling::Message_POS_CONFIG_SET::Info &info)
-{
-    // if ticking: stop it
-    if(true == pImpl->ticking)
-    {
-        stop();
-    }
-    
-    // copy new configuration
-//    pImpl->canconfig.info = info;
-    
-    return true;    
-}
-
-bool embot::app::application::thePOSreader::get(const embot::app::canprotocol::analog::polling::Message_POS_CONFIG_GET::Info &info, embot::app::canprotocol::analog::polling::Message_POS_CONFIG_GET::ReplyInfo &replyinfo)
-{    
-    // copy configuration
-//    replyinfo.sensormask = pImpl->canconfig.info.sensormask;
- 
-    return true;    
-}
-
-
-bool embot::app::application::thePOSreader::set(const embot::app::canprotocol::analog::polling::Message_POS_TRANSMIT::Info &info)
-{
-    if((true == info.transmit) && (info.txperiod > 0))
-    {
-        start(info.txperiod);
-    }
-    else
-    {
-        stop();        
-    }
-    
-    return true;    
-}
 
 
 
@@ -394,6 +510,50 @@ bool embot::app::application::thePOSreader::processdata(std::vector<embot::hw::c
     return pImpl->processdata(replies);
 }
 #endif
+
+
+// interface to CANagentPOS
+
+bool embot::app::application::thePOSreader::set(const embot::app::canprotocol::analog::polling::Message_POS_CONFIG_SET::Info &info)
+{
+    // if ticking: stop it
+    if(true == pImpl->ticking)
+    {
+        stop();
+    }
+    
+    pImpl->canconfig.descriptor[0] = info.descriptor[0];
+    pImpl->canconfig.descriptor[1] = info.descriptor[1];
+    
+    return true;    
+}
+
+bool embot::app::application::thePOSreader::get(const embot::app::canprotocol::analog::polling::Message_POS_CONFIG_GET::Info &info, embot::app::canprotocol::analog::polling::Message_POS_CONFIG_GET::ReplyInfo &replyinfo)
+{    
+
+    replyinfo.tbd = info.tbd;
+    replyinfo.descriptor[0] = pImpl->canconfig.descriptor[0];
+    replyinfo.descriptor[1] = pImpl->canconfig.descriptor[1];
+    
+    return true;    
+}
+
+
+bool embot::app::application::thePOSreader::set(const embot::app::canprotocol::analog::polling::Message_POS_TRANSMIT::Info &info)
+{
+    if((true == info.transmit) && (info.txperiod > 0))
+    {
+        start(info.txperiod);
+    }
+    else
+    {
+        stop();        
+    }
+    
+    return true;    
+}
+
+
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

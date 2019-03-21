@@ -258,6 +258,61 @@ namespace embot { namespace app { namespace canprotocol { namespace shared {
 namespace embot { namespace app { namespace canprotocol { namespace analog {
 
     enum class imuSensor { acc = 0, mag = 1, gyr = 2, eul = 3, qua = 4, lia = 5, grv = 6, status = 15, none = 16 };
+    
+    
+    
+    enum class posType : uint8_t { angleDeciDeg = 0, unknown = 15 };               
+    struct posDES
+    {
+        posType         type;               // tells if it is an angle, a linear position etc. use an enum class
+        std::uint8_t    indexoffirst : 4;   // the index of the first value stored inside data[]   
+        std::uint8_t    numberof : 4;       // the number of values stored inside data[]      
+        posDES() : type(posType::angleDeciDeg), indexoffirst(0), numberof(2) {} 
+        void reset() { type = posType::angleDeciDeg; indexoffirst = 0; numberof = 2; }
+        bool isvalid() const { if((type == posType::angleDeciDeg) && (numberof>0)) { return true; } else { return false; } }        
+    };  // it must be stored in 16 bits
+    
+//    enum class posType : uint8_t { angleDdec = 0, angleD = 1,  angleDcen = 2, raw = 14, unknown = 15 };            
+//    enum class posFormat : uint8_t { I16 = 0, U08 = 1, I08 = 2, U16 = 3, U32 = 4, I32 = 5, unknown = 15 };        
+//    struct posDescriptor
+//    {
+//        posType         type;               // tells if it is an angle, a linear position etc. use an enum class
+//        posFormat       format;             // tells a format
+//        std::uint8_t    indexoffirst : 4;   // the index of the first value stored inside data[]   
+//        std::uint8_t    numberof : 4;       // the number of values stored inside data[]      
+//        posDescriptor() : type(posType::angleDdec), format(posFormat::I16), indexoffirst(0), numberof(2) {} 
+//        void reset() { type = posType::angleDdec; format = posFormat::I16; indexoffirst = 0; numberof = 2; }
+//        bool isvalid() const { if((type == posType::angleDdec) && (format == posFormat::I16) && (numberof>0)) { return true; } else { return false; } }
+//        
+//    };  // it must be stored in 16 bits
+    
+    
+//    enum class posTYPE : uint8_t { angleDegDec = 0 , angleDecCen = 1, unknown = 15 };
+//    struct posDESC
+//    {
+//        posTYPE type;
+//        posDESC() : type(posTYPE::angleDegDec) {}
+//        float tofloat(void *data) const 
+//        { 
+//            float r = 0; 
+//            if((type == posTYPE::angleDegDec) && (data != nullptr)) { int16_t *v = reinterpret_cast<int16_t*>(data); r = *v; r/=10; }
+//            return r;
+//        }
+//        void todata(const float v, void* data) const 
+//        {
+//            if((type == posTYPE::angleDegDec) && (data != nullptr))
+//            {
+//                uint8_t *b = reinterpret_cast<uint8_t*>(data);
+//                int16_t vv = v * 10.0;
+//                b[0] = vv & 0xff;
+//                b[1] = vv >> 8;
+//            }
+//        }
+//        uint8_t getsize() const { if((type == posTYPE::angleDegDec)) { return 2; } else { return 0; } }
+//    };
+    
+    
+    
 
 }}}} // namespace embot { namespace app { namespace canprotocol { namespace analog {
 

@@ -301,7 +301,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
     bool Message_POS::get(embot::hw::can::Frame &outframe)
     {
         std::uint8_t data08[8] = {0};
-        data08[0] = (static_cast<uint8_t>(info.descriptor.type) << 4) | static_cast<uint8_t>(info.descriptor.format);
+        data08[0] = static_cast<uint8_t>(info.descriptor.type);
         data08[1] = (info.descriptor.indexoffirst << 4) | (info.descriptor.numberof);
         std::memmove(&data08[2], info.data, sizeof(info.data));
 

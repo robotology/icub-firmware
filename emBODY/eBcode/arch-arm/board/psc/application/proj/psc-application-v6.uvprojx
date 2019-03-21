@@ -589,11 +589,6 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_application_theCANparserBasic.cpp</FilePath>
             </File>
-            <File>
-              <FileName>embot_app_application_theCANparserPOS.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\embot\app\embot_app_application_theCANparserPOS.cpp</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -613,6 +608,11 @@
               <FileName>embot_app_application_theCANtracer.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_application_theCANtracer.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_application_theCANparserPOS.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\app\embot_app_application_theCANparserPOS.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_app_theStorage.cpp</FileName>
@@ -1408,11 +1408,6 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_application_theCANparserBasic.cpp</FilePath>
             </File>
-            <File>
-              <FileName>embot_app_application_theCANparserPOS.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\embot\app\embot_app_application_theCANparserPOS.cpp</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -1432,6 +1427,11 @@
               <FileName>embot_app_application_theCANtracer.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_application_theCANtracer.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_app_application_theCANparserPOS.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\app\embot_app_application_theCANparserPOS.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_app_theStorage.cpp</FileName>

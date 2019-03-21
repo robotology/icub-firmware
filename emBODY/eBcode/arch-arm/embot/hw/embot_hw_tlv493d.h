@@ -41,7 +41,7 @@ namespace embot { namespace hw { namespace tlv493d {
     };
     
     
-    using Position = std::int16_t; // the measurement units is: TBD
+    using Position = std::int32_t; // the measurement units is: 0.01 degrees
             
     bool supported(embot::hw::TLV493D h);
     

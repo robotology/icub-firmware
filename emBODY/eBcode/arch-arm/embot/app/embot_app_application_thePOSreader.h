@@ -81,17 +81,15 @@ namespace embot { namespace app { namespace application {
         
         bool process(embot::common::Event evt, std::vector<embot::hw::can::Frame> &replies);
         
+//        bool tick(std::vector<embot::hw::can::Frame> &replies);        
+//        bool processdata(std::vector<embot::hw::can::Frame> &replies);    
+
         
         // interface to CANagentPOS
         virtual bool set(const embot::app::canprotocol::analog::polling::Message_POS_CONFIG_SET::Info &info);
         virtual bool set(const embot::app::canprotocol::analog::polling::Message_POS_TRANSMIT::Info &info);
         virtual bool get(const embot::app::canprotocol::analog::polling::Message_POS_CONFIG_GET::Info &info, embot::app::canprotocol::analog::polling::Message_POS_CONFIG_GET::ReplyInfo &replyinfo);
         
-      
-//        bool tick(std::vector<embot::hw::can::Frame> &replies);        
-//        bool processdata(std::vector<embot::hw::can::Frame> &replies);
-        
-
 
     private:
         thePOSreader(); 
