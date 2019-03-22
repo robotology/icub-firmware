@@ -52,7 +52,7 @@ embot::hw::tlv493d::Config tlvconfig { tlvi2c, 400000 };
 
 #endif  // #if defined(TEST_ENABLED)
 
-
+//#define DEBUG_TX_AT_START
 
 
 #include "embot_app_theLEDmanager.h"
@@ -85,7 +85,7 @@ embot::hw::tlv493d::Config tlvconfig { tlvi2c, 400000 };
 
 
 
-static const embot::app::canprotocol::versionOfAPPLICATION vAP = {6, 6, 6};
+static const embot::app::canprotocol::versionOfAPPLICATION vAP = {1, 0, 1};
 static const embot::app::canprotocol::versionOfCANPROTOCOL vCP = {2, 0};
 
 static void userdeflauncher(void* param);
@@ -170,7 +170,7 @@ static void start_evt_based(void)
     
     // start task waiting for can messages. 
     eventbasedtask = new embot::sys::EventTask;  
-    const embot::common::relTime waitEventTimeout = 50*1000; //50*1000; //5*1000*1000;    
+    const embot::common::relTime waitEventTimeout = 50*embot::common::time1millisec; //50*1000; //5*1000*1000;    
    
     embot::sys::EventTask::Config configEV;
     
@@ -216,8 +216,9 @@ static void start_evt_based(void)
     r = embot::hw::can::setfilters(embot::hw::CAN::one, embot::app::theCANboardInfo::getInstance().getCANaddress());
     r = r;
     
-    
+#if defined(DEBUG_TX_AT_START)    
     thepos.start(embot::common::time1second);
+#endif
 }
 
 

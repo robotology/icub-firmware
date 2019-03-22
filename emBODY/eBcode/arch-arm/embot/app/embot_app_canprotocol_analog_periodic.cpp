@@ -302,7 +302,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
     {
         std::uint8_t data08[8] = {0};
         data08[0] = static_cast<uint8_t>(info.descriptor.type);
-        data08[1] = (info.descriptor.indexoffirst << 4) | (info.descriptor.numberof);
+        data08[1] = (static_cast<uint8_t>(info.descriptor.startlabel) << 4) | (info.descriptor.labelsnumberof);
         std::memmove(&data08[2], info.data, sizeof(info.data));
 
         std::uint8_t size = 8;

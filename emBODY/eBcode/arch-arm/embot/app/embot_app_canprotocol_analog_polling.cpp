@@ -44,7 +44,12 @@
 // - all the rest
 // --------------------------------------------------------------------------------------------------------------------
 
-
+namespace embot { namespace app { namespace canprotocol { namespace analog {
+    
+    float deciDeg_export(const deciDeg d) { return static_cast<float>(d) * 0.1f; } 
+    deciDeg deciDeg_import(const float f) { return static_cast<deciDeg>(f*10.0f); } 
+    
+}}}}
 
 namespace embot { namespace app { namespace canprotocol { namespace analog { namespace polling {
 
@@ -1325,8 +1330,6 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         return false;
     } 
 
-    float deciDeg_export(const deciDeg d) { return static_cast<float>(d) * 0.1f; } 
-    deciDeg deciDeg_import(const float f) { return static_cast<deciDeg>(f*10.0f); } 
 
     const deciDeg deciDegPOSdescriptor::rotationmap[4] = {0, 1800, 900, -900};    
 
@@ -1339,24 +1342,12 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         {
             return false; 
         }
-        
-        
+                
         uint8_t t = 0;
         info.tbd = candata.datainframe[0];
         info.descriptor[0].load(&candata.datainframe[1]);
         info.descriptor[1].load(&candata.datainframe[4]);
-        
-//        uint8_t t = 0;
-//        t = (candata.datainframe[0] >> 4) & 0xF;
-//        info.descriptor.type = (t<static_cast<uint8_t>(posType::unknown)) ? (static_cast<posType>(t)) : (posType::unknown);
-//        t = (candata.datainframe[0]) & 0xF;
-//        info.descriptor.format = (t<static_cast<uint8_t>(posFormat::unknown)) ? (static_cast<posFormat>(t)) : (posFormat::unknown);
-//        info.descriptor.indexoffirst = (candata.datainframe[1] >> 4) & 0xF;
-//        info.descriptor.numberof = (candata.datainframe[1]) & 0xF;
-//        info.applyphaseshift180 = embot::binary::bit::check(candata.datainframe[2], 0);
-//        info.revertdirection = embot::binary::bit::check(candata.datainframe[2], 1);
-//        memcpy(info.zero, &candata.datainframe[3], sizeof(info.zero));
-         
+                 
         return true;         
     }                    
         
@@ -1375,6 +1366,8 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
             return false; 
         }
         
+        info.tbd = candata.datainframe[0];
+        
         return true;
     }  
 
@@ -1384,7 +1377,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
         dd[0] = replyinfo.tbd;
         replyinfo.descriptor[0].fill(&dd[1]);
-        replyinfo.descriptor[0].fill(&dd[4]);
+        replyinfo.descriptor[1].fill(&dd[4]);
 
         std::uint8_t datalen = 7;
         
