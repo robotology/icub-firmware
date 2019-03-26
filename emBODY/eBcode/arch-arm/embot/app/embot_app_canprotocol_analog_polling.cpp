@@ -1344,7 +1344,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         }
                 
         uint8_t t = 0;
-        info.tbd = candata.datainframe[0];
+        info.type = (candata.datainframe[0] == static_cast<uint8_t>(posTYPE::angleDeciDeg)) ? (posTYPE::angleDeciDeg) : (posTYPE::unknown);
         info.descriptor[0].load(&candata.datainframe[1]);
         info.descriptor[1].load(&candata.datainframe[4]);
                  
@@ -1366,7 +1366,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
             return false; 
         }
         
-        info.tbd = candata.datainframe[0];
+        info.type = (candata.datainframe[0] == static_cast<uint8_t>(posTYPE::angleDeciDeg)) ? (posTYPE::angleDeciDeg) : (posTYPE::unknown);
         
         return true;
     }  
@@ -1375,7 +1375,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
     {
         std::uint8_t dd[7] = {0};
         
-        dd[0] = replyinfo.tbd;
+        dd[0] = static_cast<uint8_t>(replyinfo.type);
         replyinfo.descriptor[0].fill(&dd[1]);
         replyinfo.descriptor[1].fill(&dd[4]);
 

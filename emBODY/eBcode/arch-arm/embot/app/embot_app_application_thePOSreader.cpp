@@ -107,6 +107,9 @@ struct embot::app::application::thePOSreader::Impl
         ticktimer = new embot::sys::Timer;      
 
         canconfig.reset(); 
+        canconfig.descriptor[0].label = embot::app::canprotocol::analog::posLABEL::zero;
+        canconfig.descriptor[1].label = embot::app::canprotocol::analog::posLABEL::one;
+        
         positions[0] = positions[1] = 0;  
         decidegvalues[0] = decidegvalues[1] = decidegvalues[2] = 0;        
 
@@ -228,18 +231,31 @@ bool embot::app::application::thePOSreader::Impl::acquisition_transmit(std::vect
         
     // we are ready to transmit    
     embot::hw::can::Frame frame;   
-     
-    decidegvalues[0] = canconfig.descriptor[0].transform(positions[0]/10);
-    decidegvalues[1] = canconfig.descriptor[1].transform(positions[1]/10);
-    static volatile int16_t v1 = 0;
-    v1 = decidegvalues[1];
-    
-        
+                 
     embot::app::canprotocol::analog::periodic::Message_POS msg;
     embot::app::canprotocol::analog::periodic::Message_POS::Info info;  
     
     info.canaddress = embot::app::theCANboardInfo::getInstance().cachedCANaddress();   
-    info.loadDeciDeg(canconfig.descriptor[0].label, 2, decidegvalues);
+    if((true == canconfig.descriptor[0].enabled) && (true == canconfig.descriptor[1].enabled))
+    {   // we transmit two
+        decidegvalues[0] = canconfig.descriptor[0].transform(positions[0]/10);
+        decidegvalues[1] = canconfig.descriptor[1].transform(positions[1]/10);
+        info.loadDeciDeg(canconfig.descriptor[0].label, 2, decidegvalues);
+    }
+    else if((true == canconfig.descriptor[0].enabled))
+    {   // we transmit only the first
+        decidegvalues[0] = canconfig.descriptor[0].transform(positions[0]/10);
+        info.loadDeciDeg(canconfig.descriptor[0].label, 1, decidegvalues);
+    }
+    else if((true == canconfig.descriptor[1].enabled))
+    {   // we transmit only the second
+        decidegvalues[0] = canconfig.descriptor[1].transform(positions[1]/10);
+        info.loadDeciDeg(canconfig.descriptor[1].label, 1, decidegvalues);
+    }
+    else
+    {   // we transmit none
+        
+    }
     
     msg.load(info);
     msg.get(frame);
@@ -353,8 +369,11 @@ bool embot::app::application::thePOSreader::set(const embot::app::canprotocol::a
         stop();
     }
     
-    pImpl->canconfig.descriptor[0] = info.descriptor[0];
-    pImpl->canconfig.descriptor[1] = info.descriptor[1];
+    if(info.type == embot::app::canprotocol::analog::posTYPE::angleDeciDeg)
+    {
+        pImpl->canconfig.descriptor[0] = info.descriptor[0];
+        pImpl->canconfig.descriptor[1] = info.descriptor[1];
+    }
     
     return true;    
 }
@@ -362,9 +381,12 @@ bool embot::app::application::thePOSreader::set(const embot::app::canprotocol::a
 bool embot::app::application::thePOSreader::get(const embot::app::canprotocol::analog::polling::Message_POS_CONFIG_GET::Info &info, embot::app::canprotocol::analog::polling::Message_POS_CONFIG_GET::ReplyInfo &replyinfo)
 {    
 
-    replyinfo.tbd = info.tbd;
-    replyinfo.descriptor[0] = pImpl->canconfig.descriptor[0];
-    replyinfo.descriptor[1] = pImpl->canconfig.descriptor[1];
+    replyinfo.type = info.type;
+    if(info.type == embot::app::canprotocol::analog::posTYPE::angleDeciDeg)
+    {
+        replyinfo.descriptor[0] = pImpl->canconfig.descriptor[0];
+        replyinfo.descriptor[1] = pImpl->canconfig.descriptor[1];
+    }
     
     return true;    
 }

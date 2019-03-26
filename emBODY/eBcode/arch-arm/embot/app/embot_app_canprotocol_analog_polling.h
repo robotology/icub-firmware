@@ -1244,16 +1244,18 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         // this struct can be transmitted in 3 bytes. from lsb: [rotation: 2 bits, invertdirection: 1 bit, label : 4 bits], zero: two bytes in little endian
         // the bytes [0x01, 0x00, 0x00] tells ... no rotation, no inversion of direction, label 1, no zero. 
         enum class ROT : uint8_t { none = 0, plus180 = 1, plus090 = 2, minus090 = 3 };
-        ROT         rotation;         
+        bool        enabled;            // it must be true if teh sensor is to be considered.      
         bool        invertdirection;
+        ROT         rotation;   
         posLABEL    label;              // the label to use when transmitting in streaming the value of POS
         deciDeg     zero;               // the zero to be applied to the value
         deciDegPOSdescriptor() { reset(); }
-        void reset() { rotation = ROT::none; invertdirection = false;  label = posLABEL::zero; zero = 0; }
+        void reset() { enabled =  true; rotation = ROT::none; invertdirection = false;  label = posLABEL::zero; zero = 0; }
         void load(const uint8_t *bytes)
         { 
-            rotation = static_cast<ROT>((bytes[0] >> 6) & 0b11);
-            invertdirection = embot::binary::bit::check(bytes[0], 5);
+            enabled = embot::binary::bit::check(bytes[0], 7);
+            invertdirection = embot::binary::bit::check(bytes[0], 6);
+            rotation = static_cast<ROT>((bytes[0] >> 4) & 0b0011);           
             label = static_cast<posLABEL>(bytes[0] & 0b1111);
             zero = static_cast<uint16_t>(bytes[1]) | (static_cast<uint16_t>(bytes[2]) << 8);
         }
@@ -1262,7 +1264,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
             if(nullptr != bytes)
             {
                 bytes[0] = 0;
-                bytes[0] = static_cast<uint8_t>(rotation) << 6 | ((invertdirection & 0b1) << 5) | (static_cast<uint8_t>(label) & 0b1111);
+                bytes[0] = ((enabled & 0b1) << 7) | ((invertdirection & 0b1) << 6) | ((static_cast<uint8_t>(rotation) & 0b11) << 4) | (static_cast<uint8_t>(label) & 0b1111);
                 bytes[1] = zero & 0xff;
                 bytes[2] = (zero >> 8);                
             }            
@@ -1284,9 +1286,9 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
             
         struct Info
         {   // for now it is dedicated to the case of the psc where we have two values to configure and they are expressed in deciDeg
-            uint8_t                 tbd;    // it holds a descriptor of ... presence maybe of it is for future choice of the content
+            posTYPE                 type;    // it contains the type of the sensors. 
             deciDegPOSdescriptor    descriptor[2]; 
-            Info() : tbd(0) {}            
+            Info() : type(posTYPE::angleDeciDeg) {}            
         };
             
         
@@ -1306,15 +1308,15 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
                                     
         struct Info
         {   // it is dedicated to the case of the psc where we have two values to configure and they are expressed in deciDeg
-            uint8_t                 tbd;    // it holds a descriptor of ... presence maybe of it is for future choice of the content
-            Info() : tbd(0) {}            
+            posTYPE                 type;    // it holds a descriptor of ... presence maybe of it is for future choice of the content
+            Info() : type(posTYPE::angleDeciDeg) {}            
         };
         
         struct ReplyInfo
         {   // it is dedicated to the case of the psc where we have two values to configure and they are expressed in deciDeg
-            uint8_t                 tbd;    // it hold a descriptor of ... presence maybe of it is for future choice of the content
+            posTYPE                 type;    // it hold a descriptor of ... presence maybe of it is for future choice of the content
             deciDegPOSdescriptor    descriptor[2]; 
-            ReplyInfo() : tbd(0) {}            
+            ReplyInfo() : type(posTYPE::angleDeciDeg) {}            
         };
             
         

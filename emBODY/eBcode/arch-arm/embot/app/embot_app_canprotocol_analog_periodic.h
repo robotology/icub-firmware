@@ -249,8 +249,8 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
                 descriptor.startlabel = startl;
                 descriptor.labelsnumberof = n;
                 deciDeg *d = reinterpret_cast<deciDeg*>(data);
-                for(auto &v : values) { *d++ = v; }
-                //for(uint8_t i=0; i<n; i++) { d[i] = values[i]; }
+                //for(auto &v : values) { *d++ = v; }
+                for(uint8_t i=0; i<n; i++) { d[i] = values[i]; }
             }
         };
         
