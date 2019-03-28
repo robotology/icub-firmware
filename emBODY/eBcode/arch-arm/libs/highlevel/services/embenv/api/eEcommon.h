@@ -417,10 +417,7 @@ typedef struct
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-extern inline const eEentity_t * ee_common_moduleinfo_to_entity(const eEmoduleInfo_t *mi)
-{ 
-    return((const eEentity_t*)&(mi->info.entity)); 
-}
+extern const eEentity_t * ee_common_moduleinfo_to_entity(const eEmoduleInfo_t *mi);
 
 extern const char* ee_common_get_month_string(eEdate_t date);
 

@@ -16,7 +16,7 @@
  * Public License for more details
 */
 
-/* @file       eom_emsappl_main.c
+/* @file       eom_emsappl_main.cpp
 	@brief      This file keeps the main of an application on ems using the embobj
 	@author     marco.accame@iit.it
     @date       05/21/2012
@@ -41,16 +41,11 @@
 #include "EOMtheEMSappl.h"
 
 
-
 #include "EOtheLEDpulser.h"
+
 
 #include "EoError.h"
 #include "EOtheErrorManager.h"
-
-
-
-#include "EOtheCANmapping.h"
-
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of external variables 
@@ -93,7 +88,6 @@
 static void s_eom_emsappl_main_init(void);
 
 
-
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
@@ -107,6 +101,7 @@ static void s_eom_emsappl_main_init(void);
 
 int main(void)
 {
+
     EOMtheEMSapplCfg* emscfg = eom_emsapplcfg_Initialise();
 
     eom_sys_Initialise( &emscfg->wsyscfg.msyscfg, 
@@ -115,9 +110,8 @@ int main(void)
                         &emscfg->wsyscfg.tmrmancfg, 
                         &emscfg->wsyscfg.cbkmancfg 
                       );  
-    
+  
     eom_sys_Start(eom_sys_GetHandle(), s_eom_emsappl_main_init);
-
 }
 
 
@@ -184,8 +178,6 @@ extern void eom_emstransceiver_callback_incaseoferror_invalidframe(EOreceiver *r
 
     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdesinvframe);
 }
-
-
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
@@ -204,14 +196,7 @@ extern void eom_emstransceiver_callback_incaseoferror_invalidframe(EOreceiver *r
  **/
 
 static void s_eom_emsappl_main_init(void)
-{  
-    char str[96];
-    snprintf(str, sizeof(str), "just started the user-defined function s_eom_emsappl_main_init()");
-    eo_errman_Trace(eo_errman_GetHandle(), str, "eom_sys_Start()");  
-
-    snprintf(str, sizeof(str), "s_eom_emsappl_main_init() is about to init EOtheLEDpulser + EOMtheEMSappl");
-    eo_errman_Trace(eo_errman_GetHandle(), str, "eom_sys_Start()");     
-    
+{      
     // init leds via the EOtheLEDpulser object
     eOledpulser_cfg_t ledpulsercfg =  
     {
@@ -224,14 +209,20 @@ static void s_eom_emsappl_main_init(void)
 
     eo_ledpulser_Initialise(&ledpulsercfg);
     
-    
     // init the ems application
     EOMtheEMSapplCfg* emscfg = eom_emsapplcfg_GetHandle();    
     eom_emsappl_Initialise(&emscfg->applcfg);
-
-
-    snprintf(str, sizeof(str), "quitting the user-defined function s_eom_emsappl_main_init()");
-    eo_errman_Trace(eo_errman_GetHandle(), str, "eom_sys_Start()");  
+      
+    // set the led reserved for link
+    if(eores_OK == eom_ipnet_ResolveIP(eom_ipnet_GetHandle(), emscfg->applcfg.hostipv4addr, 5*EOK_reltime100ms))
+    {
+        // set led0 to ON
+       eo_ledpulser_On(eo_ledpulser_GetHandle(), eo_ledpulser_led_zero);
+    }
+    else
+    {
+        eo_ledpulser_Off(eo_ledpulser_GetHandle(), eo_ledpulser_led_zero);
+    }
 }
 
 

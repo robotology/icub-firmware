@@ -145,13 +145,14 @@ static void s_shalbase_ipc_ram_initialise(void);
 typedef uint8_t verify_size_t[(SHALBASE_RAMSIZE > sizeof(baseIPCdataStorage_t)) ? (1) : (-1)];
 
 #if (__ARMCC_VERSION > 6000000)
-#error ::: change for compiler arm v6 [placing data at a particular ram address]
-// something like: 
-// static volatile baseIPCdataStorage_t s_shalbase_IPCdataStored       __attribute__((section(".ARM.__at_0x2001ffc0")));
-#endif
-
+// this variable is placed in NZI section. it is used for ipc
+static volatile baseIPCdataStorage_t s_shalbase_IPCdataStored         __attribute__((section(".ARM.__at_0x2001FFC0")));
+#else
 // this variable is placed in NZI section. it is used for ipc
 static volatile baseIPCdataStorage_t s_shalbase_IPCdataStored       __attribute__((at(SHALBASE_RAMADDR)));
+#endif
+
+
 
 
 // - module info ------------------------------------------------------------------------------------------------------

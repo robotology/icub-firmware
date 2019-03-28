@@ -101,16 +101,13 @@
 // - definition (and initialisation) of extern variables, but better using _get(), _set() 
 // --------------------------------------------------------------------------------------------------------------------
 
-//extern EOVtheEMSapplCfgBody theapplbodyconfig;
 
 #if (__ARMCC_VERSION > 6000000)
-#error ::: change for compiler arm v6 [placing data at a particular rom address]
-// something like: 
-// const eEmoduleExtendedInfo_t eom_emsapplcfg_modinfo_extended    __attribute__((section(".ARM.__at_0x08020200"))) = 
+const eEmoduleExtendedInfo_t eom_emsapplcfg_modinfo_extended    __attribute__((section(".ARM.__at_0x08020200"))) = 
+#else
+const eEmoduleExtendedInfo_t eom_emsapplcfg_modinfo_extended    __attribute__((at(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
 #endif
 
-
-const eEmoduleExtendedInfo_t eom_emsapplcfg_modinfo_extended    __attribute__((at(EENV_MEMMAP_EAPPLICATION_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
 
 {
     EO_INIT(.moduleinfo) 

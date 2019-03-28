@@ -364,7 +364,7 @@ void JointSet_do(JointSet* o)
 
 BOOL JointSet_set_control_mode(JointSet* o, eOmc_controlmode_command_t control_mode)
 {
-    if (control_mode == o->control_mode) return TRUE;
+    if (((eOmc_controlmode_t)control_mode) == o->control_mode) return TRUE;
     
     if (o->control_mode == eomc_controlmode_calib) return FALSE;
     

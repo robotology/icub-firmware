@@ -83,6 +83,11 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 
+extern const eEentity_t * ee_common_moduleinfo_to_entity(const eEmoduleInfo_t *mi)
+{ 
+    return((const eEentity_t*)&(mi->info.entity)); 
+}
+
 extern eEresult_t ee_common_ipnetwork_clr(eEipnetwork_t* ntw, uint64_t uniqueid)
 {
     const uint8_t ip3 = EECOMMON_ipaddr_def3;

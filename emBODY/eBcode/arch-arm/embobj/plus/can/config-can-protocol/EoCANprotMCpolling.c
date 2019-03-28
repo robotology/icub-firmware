@@ -97,7 +97,8 @@ static void s_former_POL_MC_prepare_frame(eOcanprot_descriptor_t *descriptor, eO
 static void s_former_POL_MC_CMD_setpid(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame, uint8_t type);
 static void s_former_POL_MC_CMD_setpid_limits(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame, uint8_t type);
 
-static void s_former_POL_MC_CMD_setpid_7(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame, uint8_t type);
+// marco.accame on 27mar19: s_former_POL_MC_CMD_setpid_7() is not used, hence i removed it to avoid compiler's warning
+//static void s_former_POL_MC_CMD_setpid_7(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame, uint8_t type);
 static void s_former_POL_MC_CMD_setpid_limits_7(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame, uint8_t type);
 
 static eOresult_t s_parser_POL_MC_CMD_getposition(eOcanframe_t *frame, eOcanport_t port, uint8_t type);
@@ -951,16 +952,16 @@ static void s_former_POL_MC_CMD_setpid_limits(eOcanprot_descriptor_t *descriptor
     *((int16_t*)(&frame->data[5])) = (int16_t) pid->limitonintegral;
 }
 
-
-static void s_former_POL_MC_CMD_setpid_7(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame, uint8_t type)
-{
-    eOmc_PID_t *pid = (eOmc_PID_t*) descriptor->cmd.value;    
-    s_former_POL_MC_prepare_frame(descriptor, frame, 7, type);    
-    // now i prepare data[1] -> data[6]  
-    *((int16_t*)(&frame->data[1])) = (int16_t) pid->kp;
-    *((int16_t*)(&frame->data[3])) = (int16_t) pid->ki;
-    *((int16_t*)(&frame->data[5])) = (int16_t) pid->kd;
-}
+// marco.accame on 27mar19: s_former_POL_MC_CMD_setpid_7() not used, hence i removed it to avoid compiler's warning
+//static void s_former_POL_MC_CMD_setpid_7(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame, uint8_t type)
+//{
+//    eOmc_PID_t *pid = (eOmc_PID_t*) descriptor->cmd.value;    
+//    s_former_POL_MC_prepare_frame(descriptor, frame, 7, type);    
+//    // now i prepare data[1] -> data[6]  
+//    *((int16_t*)(&frame->data[1])) = (int16_t) pid->kp;
+//    *((int16_t*)(&frame->data[3])) = (int16_t) pid->ki;
+//    *((int16_t*)(&frame->data[5])) = (int16_t) pid->kd;
+//}
 
 static void s_former_POL_MC_CMD_setpid_limits_7(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame, uint8_t type)
 {

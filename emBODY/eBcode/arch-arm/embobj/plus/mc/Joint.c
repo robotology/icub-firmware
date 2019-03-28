@@ -249,7 +249,7 @@ void Joint_update_status_reference(Joint* o)
 }
 BOOL Joint_set_control_mode(Joint* o, eOmc_controlmode_command_t control_mode)
 {
-    if (o->control_mode == control_mode) return TRUE;
+    if (o->control_mode == ((eOmc_controlmode_t)control_mode)) return TRUE;
     
     if (o->control_mode == eomc_controlmode_notConfigured) return FALSE;
         
