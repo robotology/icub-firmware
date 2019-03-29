@@ -190,6 +190,27 @@ extern void stm32hal_board_init(void);
         #error unsupported driver version for rfe
     #endif
 
+#elif   defined(STM32HAL_BOARD_SG3) 
+
+    // one case only: v190
+    #if (STM32HAL_DRIVER_VERSION == 190)
+
+        #include "../src/config/stm32hal_driver_cfg_of_sg3_v190.h"
+
+        #include "../src/board/sg3/v190/inc/adc.h"
+        #include "../src/board/sg3/v190/inc/can.h"
+        #include "../src/board/sg3/v190/inc/dma.h"
+        #include "../src/board/sg3/v190/inc/gpio.h"
+        #include "../src/board/sg3/v190/inc/i2c.h"
+        #include "../src/board/sg3/v190/inc/main.h"
+        #include "../src/board/sg3/v190/inc/tim.h"
+
+        #include "../src/board/sg3/v190/inc/stm32l4xx_it.h"
+
+    #else
+        #error unsupported driver version for sg3
+    #endif
+
 #else
     #error STM32HAL: you must define a STM32HAL_BOARD_${BRD}
 #endif

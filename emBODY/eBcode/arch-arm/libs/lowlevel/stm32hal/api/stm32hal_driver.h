@@ -84,6 +84,15 @@ extern "C" {
     #endif
     #define STM32HAL_DRIVER_VERSION 190
       
+#elif   defined(STM32HAL_BOARD_SG3)
+
+    // only one possible driver
+    #if !defined(STM32HAL_DRIVER_V190)
+        #define STM32HAL_DRIVER_V190
+    #endif
+    #define STM32HAL_DRIVER_VERSION 190
+      
+
 #else
     #error STM32HAL: the STM32HAL_BOARD_${BRD} is undefined
 #endif
