@@ -46,7 +46,7 @@ using namespace std;
 
 namespace embot { namespace hw { namespace lowlevel {
     
-#if     defined(STM32HAL_BOARD_NUCLEO64) || defined(STM32HAL_BOARD_MTB4) || defined(STM32HAL_BOARD_STRAIN2) || defined(STM32HAL_BOARD_RFE) || defined(STM32HAL_BOARD_PSC)
+#if     defined(STM32HAL_BOARD_NUCLEO64) || defined(STM32HAL_BOARD_MTB4) || defined(STM32HAL_BOARD_STRAIN2) || defined(STM32HAL_BOARD_RFE) || defined(STM32HAL_BOARD_PSC) || defined(STM32HAL_BOARD_SG3)
 
 #if __ARMCOMPILER_VERSION > 6000000
 int _execOperations(uint32_t i)

@@ -222,6 +222,21 @@ namespace embot { namespace hw { namespace bsp { namespace led {
     
     void BSP::init(embot::hw::LED h) const {} 
     
+    #elif   defined(STM32HAL_BOARD_SG3)
+       
+    constexpr PROP led1p = { .on = embot::hw::gpio::State::RESET, .off = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::B, embot::hw::GPIO::PIN::seven}  };  
+        
+    constexpr BSP thebsp {        
+        // maskofsupported
+        mask::pos2mask<uint32_t>(LED::one),        
+        // properties
+        {{
+            &led1p, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr            
+        }}        
+    };
+    
+    void BSP::init(embot::hw::LED h) const {} 
+    
     #else
         #error embot::hw::bsp::led::theMAP must be defined    
     #endif
@@ -273,6 +288,11 @@ namespace embot { namespace hw { namespace bsp { namespace button {
     void BSP::init(embot::hw::BTN h) const {}
     
     #elif   defined(STM32HAL_BOARD_PSC)
+    
+    constexpr BSP thebsp {};
+    void BSP::init(embot::hw::BTN h) const {}
+
+    #elif   defined(STM32HAL_BOARD_SG3)
     
     constexpr BSP thebsp {};
     void BSP::init(embot::hw::BTN h) const {}
@@ -388,6 +408,27 @@ namespace embot { namespace hw { namespace bsp { namespace can {
         }        
     }
     
+    #elif   defined(STM32HAL_BOARD_SG3)
+    
+    constexpr PROP can1p = { .handle = &hcan1 };  
+        
+    constexpr BSP thebsp {        
+        // maskofsupported
+        mask::pos2mask<uint32_t>(CAN::one),        
+        // properties
+        {{
+            &can1p            
+        }}        
+    };
+    
+    void BSP::init(embot::hw::CAN h) const 
+    {
+        if(h == CAN::one)
+        {            
+            MX_CAN1_Init();
+        }        
+    }
+    
     #else
         #error embot::hw::bsp::can::thebsp must be defined    
     #endif
@@ -475,6 +516,15 @@ namespace embot { namespace hw { namespace bsp { namespace flash {
         constexpr PROP applicationstorage   {{0x08000000+(252*1024),    (4)*1024,           2*1024}};   // applicationstorage: 4k on top of application
 
     #elif   defined(STM32HAL_BOARD_PSC)
+           
+        // psc: application @ 080k
+        constexpr PROP whole                {{0x08000000,               256*1024,           2*1024}}; 
+        constexpr PROP bootloader           {{0x08000000,               (78)*1024,          2*1024}};   // bootloader
+        constexpr PROP sharedstorage        {{0x08000000+(78*1024),     (2)*1024,           2*1024}};   // sharedstorage: on top of bootloader
+        constexpr PROP application          {{0x08000000+(80*1024),     (172)*1024,         2*1024}};   // application @ 080k
+        constexpr PROP applicationstorage   {{0x08000000+(252*1024),    (4)*1024,           2*1024}};   // applicationstorage: on top of application            
+       
+   #elif   defined(STM32HAL_BOARD_SG3)
            
         // psc: application @ 080k
         constexpr PROP whole                {{0x08000000,               256*1024,           2*1024}}; 
@@ -660,6 +710,27 @@ namespace embot { namespace hw { namespace bsp { namespace adc {
         //MX_DMA_Init();     
     }
     
+    #elif defined(STM32HAL_BOARD_SG3)
+    
+    constexpr PROP adc1p { .handle = &hadc1 }; 
+    
+    constexpr BSP thebsp {        
+        // maskofsupported
+        mask::pos2mask<uint32_t>(ADC::one),        
+        // properties
+        {{
+            &adc1p             
+        }}        
+    };
+
+    void BSP::init(embot::hw::ADC h) const
+    {
+        // init peripherals: adc1 and dma1
+        MX_ADC1_Init();
+        // dma is globally initted by stm32hal_bsp_init() because it holds all dma peripherals
+        //MX_DMA_Init();     
+    }
+    
     #else
     
     constexpr BSP thebsp { };    
@@ -768,7 +839,25 @@ namespace embot { namespace hw { namespace bsp { namespace timer {
     };
     
     void BSP::init(embot::hw::TIMER h) const {}
+
+    #elif   defined(STM32HAL_BOARD_SG3)    
+
+    // sadly we cannot use constepr because of the reinterpret_cast<> inside TIM6 etc.
+    static const PROP tim06p = { .TIMx = TIM6,  .handle = &htim6,  .clock = embot::hw::CLOCK::syscore, .isonepulse = false, .mastermode = true };
+    static const PROP tim07p = { .TIMx = TIM7,  .handle = &htim7,  .clock = embot::hw::CLOCK::syscore, .isonepulse = false, .mastermode = true };
+        
+    constexpr BSP thebsp {        
+        // maskofsupported
+        mask::pos2mask<uint32_t>(TIMER::six) | mask::pos2mask<uint32_t>(TIMER::seven),        
+        // properties
+        {{
+            nullptr, nullptr, nullptr, nullptr, nullptr, &tim06p, &tim07p, nullptr,     // from 1 to 8
+            nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr      // from 9 to 16             
+        }}        
+    };
     
+    void BSP::init(embot::hw::TIMER h) const {}
+
     #else
         #error embot::hw::bsp::timer::thebsp must be defined    
     #endif
@@ -959,6 +1048,32 @@ namespace embot { namespace hw { namespace bsp { namespace i2c {
     
     
     #elif   defined(STM32HAL_BOARD_PSC)
+     
+    constexpr PROP i2c1p { .handle = &hi2c1 }; //, .handledmatx = &hdma_i2c1_tx, .handledmarx = &hdma_i2c1_rx };
+    constexpr PROP i2c3p { .handle = &hi2c3 }; //, .handledmatx = &hdma_i2c3_tx, .handledmarx = &hdma_i2c3_rx };
+        
+    constexpr BSP thebsp {        
+        // maskofsupported
+        mask::pos2mask<uint32_t>(I2C::one) | mask::pos2mask<uint32_t>(I2C::three),        
+        // properties
+        {{
+            &i2c1p, nullptr, &i2c3p             
+        }}        
+    }; 
+
+    void BSP::init(embot::hw::I2C h) const
+    {
+        if(h == I2C::one)
+        {            
+            MX_I2C1_Init();
+        }
+        else if(h == I2C::three)
+        {
+            MX_I2C3_Init();
+        }         
+    }
+    
+    #elif   defined(STM32HAL_BOARD_SG3)
      
     constexpr PROP i2c1p { .handle = &hi2c1 }; //, .handledmatx = &hdma_i2c1_tx, .handledmarx = &hdma_i2c1_rx };
     constexpr PROP i2c3p { .handle = &hi2c3 }; //, .handledmatx = &hdma_i2c3_tx, .handledmarx = &hdma_i2c3_rx };
@@ -1277,6 +1392,148 @@ void DMA1_Channel7_IRQHandler(void)
   /* USER CODE END DMA1_Channel7_IRQn 1 */
 }
 
+#elif defined(STM32HAL_BOARD_SG3)
+/**
+  * @brief This function handles DMA1 channel1 global interrupt.
+  */
+void DMA1_Channel1_IRQHandler(void)
+{
+  /* USER CODE BEGIN DMA1_Channel1_IRQn 0 */
+
+  /* USER CODE END DMA1_Channel1_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_adc1);
+  /* USER CODE BEGIN DMA1_Channel1_IRQn 1 */
+
+  /* USER CODE END DMA1_Channel1_IRQn 1 */
+}
+
+/**
+  * @brief This function handles DMA1 channel2 global interrupt.
+  */
+void DMA1_Channel2_IRQHandler(void)
+{
+  /* USER CODE BEGIN DMA1_Channel2_IRQn 0 */
+
+  /* USER CODE END DMA1_Channel2_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_i2c3_tx);
+  /* USER CODE BEGIN DMA1_Channel2_IRQn 1 */
+
+  /* USER CODE END DMA1_Channel2_IRQn 1 */
+}
+
+/**
+  * @brief This function handles DMA1 channel3 global interrupt.
+  */
+void DMA1_Channel3_IRQHandler(void)
+{
+  /* USER CODE BEGIN DMA1_Channel3_IRQn 0 */
+
+  /* USER CODE END DMA1_Channel3_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_i2c3_rx);
+  /* USER CODE BEGIN DMA1_Channel3_IRQn 1 */
+
+  /* USER CODE END DMA1_Channel3_IRQn 1 */
+}
+
+/**
+  * @brief This function handles DMA1 channel6 global interrupt.
+  */
+void DMA1_Channel6_IRQHandler(void)
+{
+  /* USER CODE BEGIN DMA1_Channel6_IRQn 0 */
+
+  /* USER CODE END DMA1_Channel6_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_i2c1_tx);
+  /* USER CODE BEGIN DMA1_Channel6_IRQn 1 */
+
+  /* USER CODE END DMA1_Channel6_IRQn 1 */
+}
+
+/**
+  * @brief This function handles DMA1 channel7 global interrupt.
+  */
+void DMA1_Channel7_IRQHandler(void)
+{
+  /* USER CODE BEGIN DMA1_Channel7_IRQn 0 */
+
+  /* USER CODE END DMA1_Channel7_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_i2c1_rx);
+  /* USER CODE BEGIN DMA1_Channel7_IRQn 1 */
+
+  /* USER CODE END DMA1_Channel7_IRQn 1 */
+}
+
+/**
+  * @brief This function handles ADC1 global interrupt.
+  */
+void ADC1_IRQHandler(void)
+{
+  /* USER CODE BEGIN ADC1_IRQn 0 */
+
+  /* USER CODE END ADC1_IRQn 0 */
+  HAL_ADC_IRQHandler(&hadc1);
+  /* USER CODE BEGIN ADC1_IRQn 1 */
+
+  /* USER CODE END ADC1_IRQn 1 */
+}
+
+/**
+  * @brief This function handles I2C1 event interrupt.
+  */
+void I2C1_EV_IRQHandler(void)
+{
+  /* USER CODE BEGIN I2C1_EV_IRQn 0 */
+
+  /* USER CODE END I2C1_EV_IRQn 0 */
+  HAL_I2C_EV_IRQHandler(&hi2c1);
+  /* USER CODE BEGIN I2C1_EV_IRQn 1 */
+
+  /* USER CODE END I2C1_EV_IRQn 1 */
+}
+
+/**
+  * @brief This function handles I2C1 error interrupt.
+  */
+void I2C1_ER_IRQHandler(void)
+{
+  /* USER CODE BEGIN I2C1_ER_IRQn 0 */
+
+  /* USER CODE END I2C1_ER_IRQn 0 */
+  HAL_I2C_ER_IRQHandler(&hi2c1);
+  /* USER CODE BEGIN I2C1_ER_IRQn 1 */
+
+  /* USER CODE END I2C1_ER_IRQn 1 */
+}
+
+
+
+/**
+  * @brief This function handles I2C3 event interrupt.
+  */
+void I2C3_EV_IRQHandler(void)
+{
+  /* USER CODE BEGIN I2C3_EV_IRQn 0 */
+
+  /* USER CODE END I2C3_EV_IRQn 0 */
+  HAL_I2C_EV_IRQHandler(&hi2c3);
+  /* USER CODE BEGIN I2C3_EV_IRQn 1 */
+
+  /* USER CODE END I2C3_EV_IRQn 1 */
+}
+
+/**
+  * @brief This function handles I2C3 error interrupt.
+  */
+void I2C3_ER_IRQHandler(void)
+{
+  /* USER CODE BEGIN I2C3_ER_IRQn 0 */
+
+  /* USER CODE END I2C3_ER_IRQn 0 */
+  HAL_I2C_ER_IRQHandler(&hi2c3);
+  /* USER CODE BEGIN I2C3_ER_IRQn 1 */
+
+  /* USER CODE END I2C3_ER_IRQn 1 */
+}
 
 #endif
 
