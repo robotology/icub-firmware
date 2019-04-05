@@ -34,7 +34,7 @@
 
 /////////////////////////////////////////////////////////
 // Motor
-/*
+
 static void send_debug_message(char *message, uint8_t jid, uint16_t par16, uint64_t par64)
 {
 
@@ -48,7 +48,7 @@ static void send_debug_message(char *message, uint8_t jid, uint16_t par16, uint6
     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, message, NULL, &errdes);
 
 }
-*/
+
 static void Motor_new_state_req(Motor *o, icubCanProto_controlmode_t control_mode)
 {
     o->control_mode_req = control_mode;
@@ -73,15 +73,43 @@ static void Motor_config_current_PID_2FOC(Motor* o, eOmc_PID_t* pidcurrent)
 {
     int8_t KpKiKdKs[7];
     
-    ((int16_t*)KpKiKdKs)[0] = pidcurrent->kp;    //Kp
-    ((int16_t*)KpKiKdKs)[1] = pidcurrent->ki;    //Ki
-    ((int16_t*)KpKiKdKs)[2] = pidcurrent->kd;    //Kd (unused in 2FOC)
-               KpKiKdKs [6] = pidcurrent->scale; // shift
+    float32_t ks = 1.0f/(float32_t)(1<<pidcurrent->scale);
+    float32_t kp = ks*pidcurrent->kp;
+    float32_t ki = ks*pidcurrent->ki;
+    float32_t kd = ks*pidcurrent->kd;
     
-    //((int16_t*)KpKiKdKs)[0] =  8; //Kp
-    //((int16_t*)KpKiKdKs)[1] =  2; //Ki
-    //((int16_t*)KpKiKdKs)[2] =  0; //Kd (unused in 2FOC)
-    //           KpKiKdKs [6] = 10; // shift
+    if (kp<0.0f || ki<0.0f || kd<0.0f) return;
+    
+    float32_t   max = kp;
+    if (ki>max) max = ki;
+    if (kd>max) max = kd;
+    
+    int16_t Kp = 0;
+    int16_t Ki = 0;
+    int16_t Kd = 0;
+    uint8_t Ks = 0;
+    
+    for (int exponent = 0; exponent < 16; ++exponent)
+    {
+        float32_t power = (float32_t)(1<<exponent);
+        
+        if (max < power)
+        {
+            Kp = (int16_t)(kp*32768.0f/power);
+            Ki = (int16_t)(ki*32768.0f/power);
+            Kd = (int16_t)(kd*32768.0f/power);
+            Ks = 15-exponent;
+            
+            break;
+        }    
+    }
+    
+    ((int16_t*)KpKiKdKs)[0] = Kp;
+    ((int16_t*)KpKiKdKs)[1] = Ki;
+    ((int16_t*)KpKiKdKs)[2] = Kd; //(unused in 2FOC)
+               KpKiKdKs [6] = Ks; // shift
+    
+    send_debug_message("CURRENT PID", o->ID, Ks, (((uint64_t)Kp)<<32) | Ki);
     
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, o->ID, 0);
     
@@ -96,16 +124,44 @@ static void Motor_config_velocity_PID_2FOC(Motor* o, eOmc_PID_t* pidvelocity)
 {
     int8_t KpKiKdKs[7];
     
-    ((int16_t*)KpKiKdKs)[0] = pidvelocity->kp;    //Kp
-    ((int16_t*)KpKiKdKs)[1] = pidvelocity->ki;    //Ki
-    ((int16_t*)KpKiKdKs)[2] = pidvelocity->kd;    //Kd (unused in 2FOC)
-               KpKiKdKs [6] = pidvelocity->scale; // shift
+    float32_t ks = 1.0f/(float32_t)(1<<pidvelocity->scale);
+    float32_t kp = ks*pidvelocity->kp;
+    float32_t ki = ks*pidvelocity->ki;
+    float32_t kd = ks*pidvelocity->kd;
+    
+    if (kp<0.0f || ki<0.0f || kd<0.0f) return;
+    
+    float32_t   max = kp;
+    if (ki>max) max = ki;
+    if (kd>max) max = kd;
+    
+    int16_t Kp = 0;
+    int16_t Ki = 0;
+    int16_t Kd = 0;
+    uint8_t Ks = 0;
+    
+    for (int exponent = 0; exponent < 16; ++exponent)
+    {
+        float32_t power = (float32_t)(1<<exponent);
         
-    //((int16_t*)KpKiKdKs)[0] =  0x0C; //Kp
-    //((int16_t*)KpKiKdKs)[1] =  0x10; //Ki
-    //((int16_t*)KpKiKdKs)[2] =  0x00; //Kd (unused in 2FOC)
-    //           KpKiKdKs [6] =  0x0A; // shift
+        if (max < power)
+        {
+            Kp = (int16_t)(kp*32768.0f/power);
+            Ki = (int16_t)(ki*32768.0f/power);
+            Kd = (int16_t)(kd*32768.0f/power);
+            Ks = 15-exponent;
+            
+            break;
+        }    
+    }
+    
+    ((int16_t*)KpKiKdKs)[0] = Kp;
+    ((int16_t*)KpKiKdKs)[1] = Ki;
+    ((int16_t*)KpKiKdKs)[2] = Kd; //(unused in 2FOC)
+               KpKiKdKs [6] = Ks; // shift
         
+    send_debug_message("VELOCITY PID", o->ID, Ks, (((uint64_t)Kp)<<32) | Ki);
+    
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, o->ID, 0);
     
     eOcanprot_command_t cmdPid;
@@ -130,20 +186,6 @@ static void Motor_config_max_currents_2FOC(Motor* o, eOmc_current_limits_params_
 
 static void Motor_config_2FOC(Motor* o, eOmc_motor_config_t* config)
 {   
-    int8_t KpKiKdKs[7];
-    
-    ((int16_t*)KpKiKdKs)[0] = config->pidcurrent.kp;    //Kp
-    ((int16_t*)KpKiKdKs)[1] = config->pidcurrent.ki;    //Ki
-    ((int16_t*)KpKiKdKs)[2] = config->pidcurrent.kd;    //Kd (unused in 2FOC)
-               KpKiKdKs [6] = config->pidcurrent.scale; // shift
-    
-    //((int16_t*)KpKiKdKs)[0] =  8; //Kp
-    //((int16_t*)KpKiKdKs)[1] =  2; //Ki
-    //((int16_t*)KpKiKdKs)[2] =  0; //Kd (unused in 2FOC)
-    //           KpKiKdKs [6] = 10; // shift
-    
-    //uint32_t max_current = config->currentLimits.peakCurrent;
-    
     #define HAS_QE         0x0001
     #define HAS_HALL       0x0002
     #define HAS_TSENS      0x0004
@@ -169,16 +211,12 @@ static void Motor_config_2FOC(Motor* o, eOmc_motor_config_t* config)
 
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, o->ID, 0);
     
-    eOcanprot_command_t cmdPid;
-    cmdPid.clas = eocanprot_msgclass_pollingMotorControl;
-    cmdPid.type = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID;
-    cmdPid.value = KpKiKdKs;
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdPid, id32);
+    Motor_config_current_PID_2FOC(o, &(config->pidcurrent));
+    Motor_config_velocity_PID_2FOC(o, &(config->pidspeed));
         
     eOcanprot_command_t cmdMaxCurrent;
     cmdMaxCurrent.clas = eocanprot_msgclass_pollingMotorControl;
     cmdMaxCurrent.type = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT;
-    //cmdMaxCurrent.value = &max_current;
     cmdMaxCurrent.value = &(config->currentLimits);
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdMaxCurrent, id32);
 
