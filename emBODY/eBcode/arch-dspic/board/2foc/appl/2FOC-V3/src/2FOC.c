@@ -194,9 +194,9 @@ static const int PWM_MAX = (8*LOOPINTCY)/20; // = 80%
 volatile int gMaxCurrent = 0;
 volatile long sI2Tlimit = 0;
 
-volatile int  IKp =  8;
-volatile int  IKi =  2;
-volatile char IKs = 10;
+volatile int  IKp = 0; //8;
+volatile int  IKi = 0; //2;
+volatile char IKs = 0; //10;
 volatile long IIntLimit = 0;//800L*1024L;
 
 volatile int  SKp = 0x0C;
@@ -587,8 +587,14 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
 
     if (MotorConfig.has_hall)
     {
-        static const char dhes2sector[] = {0,6,2,1,4,5,3};
-        //static const char dhes2sector[] = {0,2,6,1,4,3,5}; // R1 upper arm
+#ifdef R1_UPPER_ARM
+        static const char dhes2sector[] = {0,2,6,1,4,3,5}; // R1 upper arm
+#elif defined(MECAPION)
+        static const char dhes2sector[] = {0,6,4,5,2,1,3}; // r1
+#else
+        static const char dhes2sector[] = {0,6,2,1,4,5,3}; // icub
+#endif
+
         sector = dhes2sector[DHESRead()];
     }
     else
@@ -790,9 +796,20 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
                 }
                 else
                 {
+#ifdef R1_UPPER_ARM
+                    if (speed_error || CtrlReferences.WRef)
+                    {
+#endif
                     VqRef += __builtin_mulss(speed_error-speed_error_old,SKp) + __builtin_mulss(speed_error + speed_error_old,SKi);
 
                     if (VqRef > SIntLimit) VqRef = SIntLimit; else if (VqRef < -SIntLimit) VqRef = -SIntLimit;
+#ifdef R1_UPPER_ARM
+                    }
+                    else
+                    {
+                        VqRef = 0;
+                    }
+#endif
 
                     IqRef = 0;
                 }
