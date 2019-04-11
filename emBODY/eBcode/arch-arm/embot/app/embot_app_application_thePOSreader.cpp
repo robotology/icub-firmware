@@ -86,6 +86,7 @@ struct embot::app::application::thePOSreader::Impl
     bool ticking;
     std::uint8_t acquisitionmask;
     std::uint8_t sensorstoacquiremask;
+    uint8_t sensorspresencemask;
         
     embot::sys::Timer *ticktimer;
     embot::sys::Action action;
@@ -102,6 +103,7 @@ struct embot::app::application::thePOSreader::Impl
         ticking = false;  
         acquisitionmask = 0;
         sensorstoacquiremask = 0;
+        sensorspresencemask = 0;
         txperiod = 10*embot::common::time1millisec;
 
         ticktimer = new embot::sys::Timer;      
@@ -224,7 +226,7 @@ bool embot::app::application::thePOSreader::Impl::process(embot::common::Event e
 bool embot::app::application::thePOSreader::Impl::acquisition_transmit(std::vector<embot::hw::can::Frame> &replies)
 {   
         
-    if(false == embot::binary::mask::check(acquisitionmask, static_cast<std::uint8_t>(0b11)))
+    if(false == embot::binary::mask::check(acquisitionmask, sensorspresencemask))
     {
         return false;
     }
@@ -272,14 +274,23 @@ bool embot::app::application::thePOSreader::Impl::acquisition_start()
 {
 
     acquisitionmask =  0;
-        
-    embot::common::Callback cbk00(alertdataisready00, this);
-    embot::hw::tlv493d::acquisition(config.sensors[0].id, cbk00);
-    embot::binary::bit::set(sensorstoacquiremask, 0);
+    
+    positions[0] = +123400;
+    positions[1] = +123400;
+    
+    if(embot::binary::bit::check(sensorspresencemask, 0))
+    {        
+        embot::common::Callback cbk00(alertdataisready00, this);
+        embot::hw::tlv493d::acquisition(config.sensors[0].id, cbk00);
+        embot::binary::bit::set(sensorstoacquiremask, 0);
+    }
 
-    embot::common::Callback cbk01(alertdataisready01, this);
-    embot::hw::tlv493d::acquisition(config.sensors[1].id, cbk01);
-    embot::binary::bit::set(sensorstoacquiremask, 1);
+    if(embot::binary::bit::check(sensorspresencemask, 1))
+    {
+        embot::common::Callback cbk01(alertdataisready01, this);
+        embot::hw::tlv493d::acquisition(config.sensors[1].id, cbk01);
+        embot::binary::bit::set(sensorstoacquiremask, 1);
+    }
     
 
     return true;
@@ -329,8 +340,15 @@ bool embot::app::application::thePOSreader::initialise(const Config &config)
     
     pImpl->action.load(embot::sys::EventToTask(pImpl->config.events.acquire, pImpl->config.owner));
   
-    embot::hw::tlv493d::init(pImpl->config.sensors[0].id, pImpl->config.sensors[0].config); 
-    embot::hw::tlv493d::init(pImpl->config.sensors[1].id, pImpl->config.sensors[1].config);
+    if(embot::hw::resOK == embot::hw::tlv493d::init(pImpl->config.sensors[0].id, pImpl->config.sensors[0].config))
+    {
+        embot::binary::bit::set(pImpl->sensorspresencemask, static_cast<uint8_t>(pImpl->config.sensors[0].id));
+    }  
+    
+    if(embot::hw::resOK == embot::hw::tlv493d::init(pImpl->config.sensors[1].id, pImpl->config.sensors[1].config))
+    {
+        embot::binary::bit::set(pImpl->sensorspresencemask, static_cast<uint8_t>(pImpl->config.sensors[0].id));
+    }
      
     return true;
 }
