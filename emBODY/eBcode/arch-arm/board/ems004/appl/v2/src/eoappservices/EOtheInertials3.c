@@ -238,7 +238,8 @@ extern EOtheInertials3* eo_inertials3_Initialise(void)
     
     p->diagnostics.reportTimer = eo_timer_New();
     p->diagnostics.errorType = eo_errortype_error;
-    p->diagnostics.errorDescriptor.sourceaddress = eo_errman_sourcedevice_localboard;
+    p->diagnostics.errorDescriptor.sourceaddress = 0;
+    p->diagnostics.errorDescriptor.sourcedevice = eo_errman_sourcedevice_localboard;
     p->diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_inertials3_not_verified_yet);  
     
     p->service.initted = eobool_true;    

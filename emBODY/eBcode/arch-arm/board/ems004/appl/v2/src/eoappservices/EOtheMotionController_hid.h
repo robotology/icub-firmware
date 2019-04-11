@@ -36,6 +36,7 @@ extern "C" {
 #include "EOtheEncoderReader.h"
 
 #include "EOtheMAIS.h"
+#include "EOthePSC.h"
 #include "EOtheMC4boards.h"
 #include "EOtheVirtualStrain.h"
 #include "hal_motor.h"
@@ -63,13 +64,17 @@ typedef struct
     eOmn_serv_configuration_t               servconfigmais;
     EOtheMAIS*                              themais;     
     
+    // for mc2plus-psc
+    eOmn_serv_configuration_t               servconfigpsc;
+    EOthePSC*                               thepsc;     
+    
     // for everything apart mc4can
     EOconstarray*                           jomodescriptors; // points to service.servconfig.data.mc.xxx_based.arrayofjomodescriptors, where xxx is: foc, mc4plus, mc4plusmais
     MController*                            thecontroller;
     EOtheEncoderReader*                     theencoderreader;   
         
     
-    // for mc4plus and mc4plus-mais only
+    // for mc4plus, mc2plus, mc4plus-mais, mc2pluspsc
     int16_t                                 pwmvalue[hal_motors_number];    // at most i can manage 4 motors
     hal_motor_t                             pwmport[hal_motors_number];
     hal_dma_current_t                       currents[hal_motors_number];    // in ma

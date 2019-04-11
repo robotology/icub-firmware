@@ -45,7 +45,8 @@ enum
     eoprotwrap_max_maises       = 1,
     eoprotwrap_max_temperatures = 1,
     eoprotwrap_max_inertials    = 1,
-    eoprotwrap_max_inertials3   = 1
+    eoprotwrap_max_inertials3   = 1,
+    eoprotwrap_max_pscs         = 1
 };
 
 struct EOtheEntities_hid
@@ -59,6 +60,7 @@ struct EOtheEntities_hid
     eOas_temperature_t* temperatures[eoprotwrap_max_temperatures];
     eOas_inertial_t* inertials[eoprotwrap_max_inertials];
     eOas_inertial3_t* inertials3[eoprotwrap_max_inertials3];
+    eOas_psc_t*     pscs[eoprotwrap_max_pscs];
     uint8_t         numofjoints;
     uint8_t         numofmotors;
     uint8_t         numofskins;
@@ -67,6 +69,7 @@ struct EOtheEntities_hid
     uint8_t         numoftemperatures;
     uint8_t         numofinertials;
     uint8_t         numofinertials3;
+    uint8_t         numofpscs;
 }; 
 
 

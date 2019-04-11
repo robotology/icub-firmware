@@ -38,6 +38,7 @@
 #include "EOtheInertials2.h"
 #include "EOtheInertials3.h"
 #include "EOtheTemperatures.h"
+#include "EOthePSC.h"
 
 #include "EOtheETHmonitor.h"
 
@@ -123,6 +124,7 @@ static eOresult_t s_services_callback_afterverify_strain(EOaService* p, eObool_t
 static eOresult_t s_services_callback_afterverify_inertial(EOaService* p, eObool_t operationisok);
 static eOresult_t s_services_callback_afterverify_inertials3(EOaService* p, eObool_t operationisok);
 static eOresult_t s_services_callback_afterverify_temperatures(EOaService* p, eObool_t operationisok);
+static eOresult_t s_services_callback_afterverify_psc(EOaService* p, eObool_t operationisok);
 static eOresult_t s_services_callback_afterverify_motioncontrol(EOaService* p, eObool_t operationisok);
 static eOresult_t s_eo_services_alert_afterverify_service(eObool_t operationisok, eOmn_serv_category_t category, eOmn_serv_type_t type, eOservice_type_t servtype);
 
@@ -152,32 +154,6 @@ static EOtheServices s_eo_theservices =
 static const char s_eobj_ownname[] = "EOtheServices";
 
 
-
-//static const eOprot_EPcfg_t s_eo_theservices_theEPcfgsOthersMAX[] =
-//{  
-//    {           
-//        EO_INIT(.endpoint)          eoprot_endpoint_motioncontrol,
-//        EO_INIT(.numberofentities)  {12, 12, 1, 0, 0, 0, 0}     
-//    },     
-//    {        
-//        EO_INIT(.endpoint)          eoprot_endpoint_analogsensors,
-//        EO_INIT(.numberofentities)  {1, 1, 1, 1, 1, 0, 0}        
-//    },
-//    {        
-//        EO_INIT(.endpoint)          eoprot_endpoint_skin,
-//        EO_INIT(.numberofentities)  {2, 0, 0, 0, 0, 0, 0}        
-//    }     
-//};
-// 
-//static const EOconstvector s_eo_theservices_vectorof_EPcfg_max = 
-//{
-//    EO_INIT(.capacity )     sizeof(s_eo_theservices_theEPcfgsOthersMAX)/sizeof(eOprot_EPcfg_t),
-//    EO_INIT(.size)          sizeof(s_eo_theservices_theEPcfgsOthersMAX)/sizeof(eOprot_EPcfg_t),
-//    EO_INIT(.item_size)     sizeof(eOprot_EPcfg_t),
-//    EO_INIT(.dummy)         0,
-//    EO_INIT(.stored_items)  (void*)s_eo_theservices_theEPcfgsOthersMAX,
-//    EO_INIT(.functions)     NULL   
-//};
 
 static const EOconstvector s_eo_theservices_vectorof_EPcfg_max = 
 {
@@ -292,6 +268,11 @@ extern eOmn_serv_state_t eo_service_GetState(EOtheServices *p, eOmn_serv_categor
         {
             state = eo_temperatures_GetServiceState(eo_temperatures_GetHandle());   
         } break;
+ 
+        case eomn_serv_category_psc:
+        {
+            state = eo_psc_GetServiceState(eo_psc_GetHandle());   
+        } break;
         
         case eomn_serv_category_skin:
         {
@@ -389,10 +370,7 @@ extern void eoprot_fun_INIT_mn_service_wholeitem(const EOnv* nv)
     // we init the stateofservice with eomn_serv_state_notsupported. 
     // the _Initialise() funtion of mais, strain etc (if called) will change it to eomn_serv_state_idle
     // then, those object will move the state according to what happens
-    memset(&mnservice->status.stateofservice, eomn_serv_state_notsupported, sizeof(mnservice->status.stateofservice));    
-    
-    memset(&mnservice->status.filler, 3, sizeof(mnservice->status.filler));
- 
+    memset(&mnservice->status.stateofservice, eomn_serv_state_notsupported, sizeof(mnservice->status.stateofservice));         
     mnservice->status.commandresult.operation = eomn_serv_operation_none;
 }
 
@@ -631,6 +609,7 @@ static void s_eo_services_initialise(EOtheServices *p)
         eo_inertials2_Initialise(); 
         eo_inertials3_Initialise(); 
         eo_temperatures_Initialise(); 
+        eo_psc_Initialise();
     }
     
     {   // C.  can services and discovery.
@@ -742,6 +721,18 @@ static eOresult_t s_services_callback_afterverify_temperatures(EOaService* p, eO
     return(eores_OK);
 }
 
+static eOresult_t s_services_callback_afterverify_psc(EOaService* p, eObool_t operationisok)
+{
+    if(eobool_false == operationisok)
+    {
+        eo_psc_SendReport(eo_psc_GetHandle());
+        eo_psc_Deactivate(eo_psc_GetHandle());
+    }
+    
+    s_eo_services_alert_afterverify_service(operationisok, eomn_serv_category_psc, eomn_serv_AS_psc, eo_service_psc);
+       
+    return(eores_OK);
+}
 
 static eOresult_t s_services_callback_afterverify_mais(EOaService* p, eObool_t operationisok)
 {   
@@ -819,7 +810,6 @@ static eOresult_t s_eo_services_process_verifyactivate(EOtheServices *p, eOmn_se
             
             if(eobool_true == uselocalconfig)
             {
-                //config = eoboardconfig_code2motion_serv_configuration(s_eo_theservices.board);
                 config = NULL;
                 
                 errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_mc_using_onboard_config);
@@ -834,7 +824,6 @@ static eOresult_t s_eo_services_process_verifyactivate(EOtheServices *p, eOmn_se
         {
             if(eobool_true == uselocalconfig)
             {
-                //config = eoboardconfig_code2inertials_serv_configuration(s_eo_theservices.board);
                 config = NULL;
                 
                 errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_inertials_using_onboard_config);
@@ -848,7 +837,6 @@ static eOresult_t s_eo_services_process_verifyactivate(EOtheServices *p, eOmn_se
         {
             if(eobool_true == uselocalconfig)
             {
-                //config = eoboardconfig_code2inertials3_serv_configuration(s_eo_theservices.board);
                 config = NULL;
                 
                 errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_inertials3_using_onboard_config);
@@ -868,13 +856,25 @@ static eOresult_t s_eo_services_process_verifyactivate(EOtheServices *p, eOmn_se
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errorDescriptor);                    
             }
             eo_temperatures_Verify(eo_temperatures_GetHandle(), config, s_services_callback_afterverify_temperatures, eobool_true);            
+        } break;  
+
+        
+        case eomn_serv_category_psc:
+        {
+            if(eobool_true == uselocalconfig)
+            {
+                config = NULL;
+                
+                errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_psc_using_onboard_config);
+                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errorDescriptor);                    
+            }
+            eo_psc_Verify(eo_psc_GetHandle(), config, s_services_callback_afterverify_psc, eobool_true);            
         } break;         
         
         case eomn_serv_category_strain: 
         {
             if(eobool_true == uselocalconfig)  
             {
-                //config = eoboardconfig_code2strain_serv_configuration(s_eo_theservices.board);
                 config = NULL;
                 
                 errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_strain_using_onboard_config);
@@ -887,7 +887,6 @@ static eOresult_t s_eo_services_process_verifyactivate(EOtheServices *p, eOmn_se
         {
             if(eobool_true == uselocalconfig)  
             {
-                //config = eoboardconfig_code2mais_serv_configuration(s_eo_theservices.board);
                 config = NULL;
                 
                 errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_mais_using_onboard_config);
@@ -900,7 +899,6 @@ static eOresult_t s_eo_services_process_verifyactivate(EOtheServices *p, eOmn_se
         {
             if(eobool_true == uselocalconfig)  
             {
-                //config = eoboardconfig_code2skin_serv_configuration(s_eo_theservices.board);
                 config = NULL;
                 
                 errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_skin_using_onboard_config);
@@ -1118,6 +1116,11 @@ static eOresult_t s_eo_services_process_regsig(EOtheServices *p, eOmn_serv_categ
             res = eo_temperatures_SetRegulars(eo_temperatures_GetHandle(), arrayofid32, &number);
         } break;
         
+        case eomn_serv_category_psc:
+        {
+            res = eo_psc_SetRegulars(eo_psc_GetHandle(), arrayofid32, &number);
+        } break;
+        
         default:
         {
             res = eores_NOK_generic;
@@ -1202,6 +1205,11 @@ static eOresult_t s_eo_services_start(EOtheServices *p, eOmn_serv_category_t cat
         case eomn_serv_category_temperatures:
         {
             res = eo_temperatures_Start(eo_temperatures_GetHandle());
+        } break; 
+
+        case eomn_serv_category_psc:
+        {
+            res = eo_psc_Start(eo_psc_GetHandle());
         } break; 
         
         default:
@@ -1296,8 +1304,7 @@ static eOresult_t s_eo_services_stop(EOtheServices *p, eOmn_serv_category_t cate
                 eo_inertials3_Deactivate(eo_inertials3_GetHandle());
             }
         } break;
-        
-        
+                
         case eomn_serv_category_temperatures:
         {
             res = eo_temperatures_Stop(eo_temperatures_GetHandle());
@@ -1306,6 +1313,17 @@ static eOresult_t s_eo_services_stop(EOtheServices *p, eOmn_serv_category_t cate
             if(eobool_true == and_deactivate)
             {
                 eo_temperatures_Deactivate(eo_temperatures_GetHandle());
+            }
+        } break;  
+
+        case eomn_serv_category_psc:
+        {
+            res = eo_psc_Stop(eo_psc_GetHandle());
+            eo_psc_SetRegulars(eo_psc_GetHandle(), NULL, numofregulars);
+            p->running[eomn_serv_category_psc] = eobool_false;
+            if(eobool_true == and_deactivate)
+            {
+                eo_psc_Deactivate(eo_psc_GetHandle());
             }
         } break;        
 
@@ -1365,6 +1383,14 @@ static eOresult_t s_eo_services_stop(EOtheServices *p, eOmn_serv_category_t cate
             if(eobool_true == and_deactivate)
             {            
                 eo_temperatures_Deactivate(eo_temperatures_GetHandle());  
+            } 
+            
+            eo_psc_Stop(eo_psc_GetHandle());
+            eo_psc_SetRegulars(eo_psc_GetHandle(), NULL, NULL);  
+            p->running[eomn_serv_category_psc] = eobool_false;
+            if(eobool_true == and_deactivate)
+            {            
+                eo_psc_Deactivate(eo_psc_GetHandle());  
             } 
             
             // if i dont use the service command to load the rop, then it is safe to remove all rops anyway.

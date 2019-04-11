@@ -58,6 +58,7 @@
 #include "EOtheInertials2.h"
 #include "EOtheInertials3.h"
 #include "EOtheTemperatures.h"
+#include "EOthePSC.h"
 
 #include "EOMtheEMStransceiver.h"
 
@@ -234,6 +235,29 @@ extern void eoprot_fun_UPDT_as_temperature_cmmnds_enable(const EOnv* nv, const e
     {
         eo_temperatures_Start(eo_temperatures_GetHandle());    
         eo_temperatures_Transmission(eo_temperatures_GetHandle(), eobool_true);
+    }
+}
+
+
+extern void eoprot_fun_UPDT_as_psc_config(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    eOas_psc_config_t *cfg = (eOas_psc_config_t*)rd->data;    
+    eo_psc_Config(eo_psc_GetHandle(), cfg);    
+}
+
+
+extern void eoprot_fun_UPDT_as_psc_cmmnds_enable(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    eOas_psc_commands_t *cmd = (eOas_psc_commands_t*)rd->data;  
+
+    if(0 == cmd->enable)
+    {
+        eo_psc_Stop(eo_psc_GetHandle());    
+    }
+    else
+    {
+        eo_psc_Start(eo_psc_GetHandle());    
+        eo_psc_Transmission(eo_psc_GetHandle(), eobool_true);
     }
 }
 

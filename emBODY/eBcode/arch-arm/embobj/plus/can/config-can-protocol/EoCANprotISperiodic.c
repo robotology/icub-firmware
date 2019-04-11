@@ -20,6 +20,7 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
+#include "EOVtheSystem.h"
 
 #include "stdlib.h"
 #include "EoCommon.h"
@@ -156,12 +157,68 @@ extern eOresult_t eocanprotINperiodic_parser_PER_IS_MSG__DIGITAL_ACCELEROMETER(e
 //    return(eores_OK);
 }
 
+//typedef struct
+//{
+//    uint8_t index;
+//    uint64_t data[16];      
+//    uint64_t delta[16];
+//    uint64_t pr;
+//} pipe_t;
+
+//void pipe_add(pipe_t *p, uint64_t v)
+//{
+//    //static uint64_t pr = 0;
+//    p->data[p->index] = v;   
+//    p->delta[p->index] = v - p->pr;
+//    p->pr = v;
+//    
+//    p->index++;
+//    p->index = p->index % 16;    
+//}
+
+//static pipe_t pipe = {0, {0}, {0}, {0}};
+
+//static pipe_t timepipe = {0, {0}, {0}, {0}};
+
+//void debugPprint(eOcanframe_t *frame)
+//{
+//    static uint32_t prevnozerodataindex = 0;
+//    static uint32_t nozerodataindex = 0;
+//    static uint32_t index = 0;
+//    
+//    
+//    uint64_t msnow = eov_sys_LifeTimeGet(eov_sys_GetHandle());
+//    
+//    pipe_add(&timepipe, msnow/1000);
+//    
+//    if(frame->id == 0x513)
+//    {
+//        uint8_t seq = frame->data[0];
+//        int16_t x = (int16_t)(frame->data[2]) | (int16_t)(frame->data[3]) << 8;
+//        int16_t y = (int16_t)(frame->data[4]) | (int16_t)(frame->data[5]) << 8;
+//        int16_t z = (int16_t)(frame->data[6]) | (int16_t)(frame->data[7]) << 8;
+//        if(x != 0)
+//        {
+//            prevnozerodataindex = nozerodataindex;
+//            nozerodataindex = index; 
+
+//            prevnozerodataindex = prevnozerodataindex;
+//            
+//            pipe_add(&pipe, index);            
+//        }
+//        
+//        index ++;                       
+//    }        
+//}
+
 extern eOresult_t eocanprotINperiodic_parser_PER_IS_MSG__IMU_TRIPLE(eOcanframe_t *frame, eOcanport_t port)
 {
     if(eobool_true == eocanprotINperiodic_redefinable_SkipParsingOf_ANY_PERIODIC_INERTIAL3_MSG(frame, port))
     {
         return(eores_OK);
     }
+    
+//    debugPprint(frame);
     
     eOas_inertial3_type_t type = eoas_inertial3_canproto_to_imu(frame->data[1]);
     if(eoas_inertial3_unknown != type)

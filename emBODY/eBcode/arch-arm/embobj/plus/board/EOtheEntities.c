@@ -81,6 +81,7 @@ static EOtheEntities s_eo_theentities =
     EO_INIT(.temperatures   ) {NULL},
     EO_INIT(.inertials      ) {NULL},
     EO_INIT(.inertials3     ) {NULL},
+    EO_INIT(.pscs           ) {NULL},
     EO_INIT(.numofjoints    ) 0,
     EO_INIT(.numofmotors    ) 0,
     EO_INIT(.numofskins     ) 0,
@@ -88,7 +89,8 @@ static EOtheEntities s_eo_theentities =
     EO_INIT(.numofmaises    ) 0,
     EO_INIT(.numoftemperatures) 0,
     EO_INIT(.numofinertials ) 0,
-    EO_INIT(.numofinertials3 ) 0
+    EO_INIT(.numofinertials3 ) 0,
+    EO_INIT(.numofpscs ) 0.
 };
 
 //static const char s_eobj_ownname[] = "EOtheEntities";
@@ -133,6 +135,7 @@ extern eOresult_t eo_entities_Reset(EOtheEntities *p)
     memset(s_eo_theentities.temperatures, 0, sizeof(s_eo_theentities.temperatures));
     memset(s_eo_theentities.inertials, 0, sizeof(s_eo_theentities.inertials));
     memset(s_eo_theentities.inertials3, 0, sizeof(s_eo_theentities.inertials3));
+    memset(s_eo_theentities.pscs, 0, sizeof(s_eo_theentities.pscs));
     
     // joints
     max = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_motioncontrol, eoprot_entity_mc_joint);
@@ -205,6 +208,15 @@ extern eOresult_t eo_entities_Reset(EOtheEntities *p)
     for(i=0; i<max; i++)
     {
         s_eo_theentities.inertials3[i] = (eOas_inertial3_t*) eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_inertial3, (eOprotIndex_t)i);
+    } 
+
+
+    max = eoprot_entity_numberof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_psc);
+    s_eo_theentities.numofinertials3 = 0;
+    if(max>eoprotwrap_max_pscs) max = eoprotwrap_max_pscs;
+    for(i=0; i<max; i++)
+    {
+        s_eo_theentities.pscs[i] = (eOas_psc_t*) eoprot_entity_ramof_get(eoprot_board_localboard, eoprot_endpoint_analogsensors, eoprot_entity_as_psc, (eOprotIndex_t)i);
     } 
     
     return(eores_OK);
@@ -525,6 +537,35 @@ extern eOas_inertial3_status_t * eo_entities_GetInertial3Status(EOtheEntities *p
     }
 
     return(ret);
+}
+
+
+
+extern eOresult_t eo_entities_SetNumOfPSCs(EOtheEntities *p, uint8_t num)
+{
+    if(num > eoprotwrap_max_pscs)
+    {
+        return(eores_NOK_generic);
+    }
+    
+    s_eo_theentities.numofpscs = num;
+    
+    return(eores_OK);   
+}
+
+extern uint8_t eo_entities_NumOfPSCs(EOtheEntities *p)
+{
+    return(s_eo_theentities.numofpscs);    
+}
+
+extern eOas_psc_t * eo_entities_GetPSC(EOtheEntities *p, eOprotIndex_t id)
+{
+    if(id >= s_eo_theentities.numofpscs)
+    {
+        return(NULL);
+    }
+
+    return(s_eo_theentities.pscs[id]);
 }
 
 

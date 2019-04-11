@@ -130,6 +130,7 @@ extern eOresult_t eo_canmap_LoadBoards(EOtheCANmapping *p,  EOconstvector *vecto
 extern eOresult_t eo_canmap_UnloadBoards(EOtheCANmapping *p,  EOconstvector *vectorof_boardprops);
 
 
+
 /** @fn         eOresult_t eo_canmap_ConfigEntity(EOtheCANmapping *p,  eOprotEndpoint_t ep, eOprotEntity_t entity, EOconstvector *vectorof_entitydescriptors)
     @brief      After the boards are loaded, it configures an entity so that it is mapped into the boards. The function can be called only once with a vector containing 
                 all the descriptors for the entity or it can be called multiple times to load some descriptors at a time. 
@@ -155,8 +156,6 @@ extern eOresult_t eo_canmap_DeconfigEntity(EOtheCANmapping *p,  eOprotEndpoint_t
     @return     eores_OK if successfull.
 **/
 extern eOresult_t eo_canmap_BoardSetDetected(EOtheCANmapping *p, eObrd_canlocation_t loc, eObrd_info_t *detected);
-
-
 
 
 /** @fn         eObrd_cantype_t eo_canmap_GetBoardType(EOtheCANmapping *p, eObrd_canlocation_t loc)
@@ -192,6 +191,11 @@ extern eOprotIndex_t eo_canmap_GetEntityIndex(EOtheCANmapping *p, eObrd_canlocat
 **/
 extern eOresult_t eo_canmap_GetEntityLocation(EOtheCANmapping *p, eOprotID32_t id32, eObrd_canlocation_t *loc, uint8_t *numoflocs, eObrd_cantype_t *boardtype);
 
+// the array is of eObrd_canlocation_t items
+extern eOresult_t eo_canmap_GetEntityArrayOfLocations(EOtheCANmapping *p, eOprotID32_t id32, EOarray *arrayoflocs, eObrd_cantype_t *boardtype);
+
+
+extern eObool_t eocanmap_BRDisCompatible(eObrd_cantype_t brd, eOprotEndpoint_t ep, eOprotEntity_t en);
 
 
 // it returns a eOcanmap_arrayof_locations_t*
