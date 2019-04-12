@@ -21,7 +21,7 @@
 
 extern uint32_t usbParser(uint8_t * RecMsg);
 
-static const embot::app::canprotocol::versionOfAPPLICATION vAP = {1, 1 , 0};
+static const embot::app::canprotocol::versionOfAPPLICATION vAP = {1, 1 , 1};
 static const embot::app::canprotocol::versionOfCANPROTOCOL vCP = {2, 0};
 
 static void userdeflauncher(void* param);
