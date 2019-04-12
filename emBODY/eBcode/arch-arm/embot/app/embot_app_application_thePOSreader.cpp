@@ -94,6 +94,8 @@ struct embot::app::application::thePOSreader::Impl
 
     canConfig canconfig;
     
+    static constexpr embot::hw::tlv493d::Position valueOfPositionCHIPnotinitted = 2000*100;         // which will results in 2000 degrees or 20000 decidegrees
+    static constexpr embot::hw::tlv493d::Position valueOfPositionACQUISITIONnotvalid = 1000*100;    // which will results in 1000 degrees or 10000 decidegrees
     std::array<embot::hw::tlv493d::Position, numberofpositions> positions;
     std::array<embot::app::canprotocol::analog::deciDeg, 3> decidegvalues;
     
@@ -131,6 +133,14 @@ struct embot::app::application::thePOSreader::Impl
 
     }
     
+    bool isvalid(const embot::hw::tlv493d::Position &po) const
+    {
+        if((po == valueOfPositionCHIPnotinitted) || (po == valueOfPositionACQUISITIONnotvalid))
+        {
+            return false;
+        }
+        return true;        
+    }
    
     bool start();
     bool stop();    
@@ -240,18 +250,46 @@ bool embot::app::application::thePOSreader::Impl::acquisition_transmit(std::vect
     info.canaddress = embot::app::theCANboardInfo::getInstance().cachedCANaddress();   
     if((true == canconfig.descriptor[0].enabled) && (true == canconfig.descriptor[1].enabled))
     {   // we transmit two
-        decidegvalues[0] = canconfig.descriptor[0].transform(positions[0]/10);
-        decidegvalues[1] = canconfig.descriptor[1].transform(positions[1]/10);
+        if(isvalid(positions[0]))
+        {
+            decidegvalues[0] = canconfig.descriptor[0].transform(positions[0]/10);
+        }
+        else
+        {
+            decidegvalues[0] = positions[0]/10;
+        }
+        if(isvalid(positions[1]))
+        {
+            decidegvalues[1] = canconfig.descriptor[1].transform(positions[1]/10);
+        }
+        else
+        {
+            decidegvalues[1] = positions[1]/10;
+        }
         info.loadDeciDeg(canconfig.descriptor[0].label, 2, decidegvalues);
     }
     else if((true == canconfig.descriptor[0].enabled))
     {   // we transmit only the first
-        decidegvalues[0] = canconfig.descriptor[0].transform(positions[0]/10);
+        if(isvalid(positions[0]))
+        {
+            decidegvalues[0] = canconfig.descriptor[0].transform(positions[0]/10);
+        }
+        else
+        {
+            decidegvalues[0] = positions[0]/10;
+        }
         info.loadDeciDeg(canconfig.descriptor[0].label, 1, decidegvalues);
     }
     else if((true == canconfig.descriptor[1].enabled))
     {   // we transmit only the second
-        decidegvalues[0] = canconfig.descriptor[1].transform(positions[1]/10);
+        if(isvalid(positions[1]))
+        {
+            decidegvalues[0] = canconfig.descriptor[1].transform(positions[1]/10);
+        }
+        else
+        {
+            decidegvalues[0] = positions[1]/10;
+        }
         info.loadDeciDeg(canconfig.descriptor[1].label, 1, decidegvalues);
     }
     else
@@ -272,12 +310,18 @@ bool embot::app::application::thePOSreader::Impl::acquisition_transmit(std::vect
 
 bool embot::app::application::thePOSreader::Impl::acquisition_start()
 {
-
-    acquisitionmask =  0;
+    acquisitionmask =  0;   
+    sensorstoacquiremask = 0;
     
-    positions[0] = +123400;
-    positions[1] = +123400;
-    
+    if(0 == sensorspresencemask)
+    {
+        // if we dont have any sensor because the initi has failed, then we must transmit the failure anyway
+        // hence, we emit a alertdataisready00
+        alertdataisready00(this);        
+        return true;
+    }
+      
+    // else, we start acquisition from the sensors which are available
     if(embot::binary::bit::check(sensorspresencemask, 0))
     {        
         embot::common::Callback cbk00(alertdataisready00, this);
@@ -291,15 +335,17 @@ bool embot::app::application::thePOSreader::Impl::acquisition_start()
         embot::hw::tlv493d::acquisition(config.sensors[1].id, cbk01);
         embot::binary::bit::set(sensorstoacquiremask, 1);
     }
-    
-
+       
     return true;
 }
 
 
 bool embot::app::application::thePOSreader::Impl::acquisition_retrieve(std::uint8_t n)
 {
-    embot::hw::tlv493d::read(config.sensors[n].id, positions[n]);
+    if(embot::hw::resOK != embot::hw::tlv493d::read(config.sensors[n].id, positions[n]))
+    {
+        positions[n] = valueOfPositionACQUISITIONnotvalid;
+    }
     
     return true;
 }
@@ -339,6 +385,8 @@ bool embot::app::application::thePOSreader::initialise(const Config &config)
     pImpl->config = config;
     
     pImpl->action.load(embot::sys::EventToTask(pImpl->config.events.acquire, pImpl->config.owner));
+    
+    pImpl->positions[0] = pImpl->positions[1] = pImpl->valueOfPositionCHIPnotinitted;
   
     if(embot::hw::resOK == embot::hw::tlv493d::init(pImpl->config.sensors[0].id, pImpl->config.sensors[0].config))
     {
