@@ -85,7 +85,7 @@ embot::hw::tlv493d::Config tlvconfig { tlvi2c, 400000 };
 
 
 
-static const embot::app::canprotocol::versionOfAPPLICATION vAP = {1, 1, 1};
+static const embot::app::canprotocol::versionOfAPPLICATION vAP = {1, 1, 2};
 static const embot::app::canprotocol::versionOfCANPROTOCOL vCP = {2, 0};
 
 static void userdeflauncher(void* param);
@@ -161,7 +161,7 @@ static std::vector<embot::hw::can::Frame> outframes;
 
 
 static void start_evt_based(void)
-{   
+{       
     
     static const std::initializer_list<embot::hw::LED> allleds = {embot::hw::LED::one};  
     embot::app::theLEDmanager &theleds = embot::app::theLEDmanager::getInstance();     
@@ -171,7 +171,7 @@ static void start_evt_based(void)
     // start task waiting for can messages. 
     eventbasedtask = new embot::sys::EventTask;  
     const embot::common::relTime waitEventTimeout = 50*embot::common::time1millisec; //50*1000; //5*1000*1000;    
-   
+            
     embot::sys::EventTask::Config configEV;
     
     configEV.startup = eventbasedtask_init;

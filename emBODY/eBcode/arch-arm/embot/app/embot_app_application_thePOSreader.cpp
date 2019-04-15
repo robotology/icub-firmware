@@ -49,10 +49,10 @@
 
 #include "embot_common.h"
 
-
+#include "embot_hw_sys.h"
 #include "embot_hw_tlv493d.h"
 
-
+#include "embot_app_theLEDmanager.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -387,16 +387,41 @@ bool embot::app::application::thePOSreader::initialise(const Config &config)
     pImpl->action.load(embot::sys::EventToTask(pImpl->config.events.acquire, pImpl->config.owner));
     
     pImpl->positions[0] = pImpl->positions[1] = pImpl->valueOfPositionCHIPnotinitted;
-  
+    
+    embot::hw::sys::delay(50*embot::common::time1millisec);
+      
     if(embot::hw::resOK == embot::hw::tlv493d::init(pImpl->config.sensors[0].id, pImpl->config.sensors[0].config))
     {
         embot::binary::bit::set(pImpl->sensorspresencemask, static_cast<uint8_t>(pImpl->config.sensors[0].id));
     }  
+
+    
+    embot::hw::sys::delay(50*embot::common::time1millisec);
     
     if(embot::hw::resOK == embot::hw::tlv493d::init(pImpl->config.sensors[1].id, pImpl->config.sensors[1].config))
     {
         embot::binary::bit::set(pImpl->sensorspresencemask, static_cast<uint8_t>(pImpl->config.sensors[1].id));
     }
+    
+    
+    if(false == embot::binary::mask::check(pImpl->sensorspresencemask, static_cast<uint8_t>(0b11)))
+    {
+        
+        uint64_t waveform = (static_cast<uint64_t>(0b1010101010) << 40);
+        
+        if(true == embot::binary::bit::check(pImpl->sensorspresencemask, 0))
+        {
+            waveform |= (static_cast<uint64_t>(0b1000000000) << 20);
+        }
+        else if(true == embot::binary::bit::check(pImpl->sensorspresencemask, 1))
+        {
+            waveform |= (static_cast<uint64_t>(0b1010000000) << 20);
+        }
+
+        embot::app::theLEDmanager &theleds = embot::app::theLEDmanager::getInstance();
+        theleds.get(embot::hw::LED::one).pulse(embot::app::LEDwave(100*embot::common::time1millisec, waveform, 50));             
+    }
+
      
     return true;
 }
