@@ -71,7 +71,22 @@ namespace embot { namespace binary { namespace bit {
     constexpr std::uint8_t count(const T value)
     {
         return countUsize(static_cast<std::uint64_t>(value), sizeof(value));
-    }        
+    }  
+
+
+    template<typename T>
+    constexpr std::int8_t posofmostsignificant(const T value)
+    {
+        int8_t p = 8*sizeof(value)-1;
+        for(; p>0; p--)
+        {
+            if(check(value, p))
+            {
+                break;
+            }
+        }
+        return p;
+    }      
        
 } } } // namespace embot { namespace binary { namespace bit
 
