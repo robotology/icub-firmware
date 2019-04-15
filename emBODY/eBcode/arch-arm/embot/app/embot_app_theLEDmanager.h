@@ -31,6 +31,20 @@
 namespace embot { namespace app {
     
     //using namespace embot::hw::led;
+    
+    
+    struct LEDwave
+    {
+        embot::common::relTime  ticktime;   // if 0, it stops
+        std::uint64_t           tickmask;
+        std::uint8_t            length;
+        LEDwave() : ticktime(100*embot::common::time1millisec), tickmask(0b1000000000), length(10) {} // 100 ms on, 900 ms off
+        LEDwave(embot::common::relTime t, std::uint64_t m, std::uint8_t l) : ticktime(t), tickmask(m), length(l) 
+        { 
+            if(length > 64) { length = 64; } 
+        }
+    };
+    
 
     // safe but does not copy        
     class LEDhandle 
@@ -43,6 +57,8 @@ namespace embot { namespace app {
         virtual void off() = 0;
         virtual void toggle() = 0; 
         virtual void pulse(embot::common::relTime period, std::uint32_t times = 0) = 0;
+        virtual void pulse(const LEDwave &wave, std::uint32_t times = 0) = 0;
+        virtual void stop() = 0; 
         
     protected:
         virtual ~LEDhandle() {};    // cannot delete from interface but only from derived object

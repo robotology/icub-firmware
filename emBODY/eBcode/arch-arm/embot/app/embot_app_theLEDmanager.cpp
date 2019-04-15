@@ -182,6 +182,8 @@ namespace embot { namespace app {
         embot::hw::gpio::State stateON;
         embot::hw::gpio::State stateOFF;
         embot::sys::Timer *tmr;
+        uint8_t _wavecount;    
+        LEDwave _thewave;
     public:
         
         aSlimPulsableLED(LED l = LED::none, const embot::hw::GPIO *g = nullptr, 
@@ -224,7 +226,7 @@ namespace embot { namespace app {
             embot::hw::gpio::toggle(*gpio);
         }   
 
-        static void onexpiry(void *p)
+        static void onexpirypulse(void *p)
         {
             aSlimPulsableLED * l = reinterpret_cast<aSlimPulsableLED*>(p);
             l->toggle();            
@@ -240,14 +242,76 @@ namespace embot { namespace app {
             if(0 == period)
             {
                 tmr->stop();
+                off();
             }
             else
             {
+                tmr->stop();
+                off();
                 embot::sys::Timer::Mode mode = (0 == times) ? (embot::sys::Timer::Mode::forever) : (embot::sys::Timer::Mode::someshots);
-                embot::sys::Action act(embot::sys::CallbackToTask(onexpiry, this, embot::sys::theCallbackManager::getInstance().task()));
+                embot::sys::Action act(embot::sys::CallbackToTask(onexpirypulse, this, embot::sys::theCallbackManager::getInstance().task()));
                 embot::sys::Timer::Config cfg(period/2, act, mode, times);
                 tmr->start(cfg);
             }
+        }
+        
+        virtual void stop()
+        {
+            if(nullptr != tmr)
+            {
+                tmr->stop();
+                off();
+            }
+        }
+        
+
+        static void onexpirywave(void *p)
+        {
+            aSlimPulsableLED * l = reinterpret_cast<aSlimPulsableLED*>(p);
+            if(true == embot::binary::bit::check(l->_thewave.tickmask, l->_thewave.length - l->_wavecount))
+            {
+                l->on();
+            }
+            else
+            {
+                l->off();
+            }
+            l->_wavecount++;
+            l->_wavecount %= l->_thewave.length;
+        }
+                
+        virtual void pulse(const LEDwave &wave, std::uint32_t times)
+        {
+            if(nullptr == tmr)
+            {
+                tmr = new embot::sys::Timer;
+            }
+            
+            if(0 == wave.ticktime)
+            {
+                tmr->stop();
+                off();
+            }
+            else
+            {
+                tmr->stop();
+                off();
+                _thewave = wave;
+                if(_thewave.length > 64)
+                {
+                    _thewave.length = 64;
+                }
+                if(_thewave.length == 0)
+                {
+                    _thewave.length = 1;
+                }
+                _wavecount = 0;
+                embot::sys::Timer::Mode mode = (0 == times) ? (embot::sys::Timer::Mode::forever) : (embot::sys::Timer::Mode::someshots);
+                embot::sys::Action act(embot::sys::CallbackToTask(onexpirywave, this, embot::sys::theCallbackManager::getInstance().task()));
+                embot::sys::Timer::Config cfg(_thewave.ticktime, act, mode, times*_thewave.length);
+                tmr->start(cfg);
+            }            
+            
         }
         
     };    
@@ -276,7 +340,9 @@ namespace embot { namespace app {
         virtual void on() {}        
         virtual void off() {}        
         virtual void toggle() {}  
-        virtual void pulse(embot::common::relTime period, std::uint32_t times) {}          
+        virtual void pulse(embot::common::relTime period, std::uint32_t times) {}  
+        virtual void pulse(const LEDwave &wave, std::uint32_t times) {}
+        virtual void stop() {}
     };
     
 }}
