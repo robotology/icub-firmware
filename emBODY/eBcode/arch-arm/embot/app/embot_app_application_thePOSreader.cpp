@@ -395,7 +395,7 @@ bool embot::app::application::thePOSreader::initialise(const Config &config)
     
     if(embot::hw::resOK == embot::hw::tlv493d::init(pImpl->config.sensors[1].id, pImpl->config.sensors[1].config))
     {
-        embot::binary::bit::set(pImpl->sensorspresencemask, static_cast<uint8_t>(pImpl->config.sensors[0].id));
+        embot::binary::bit::set(pImpl->sensorspresencemask, static_cast<uint8_t>(pImpl->config.sensors[1].id));
     }
      
     return true;
