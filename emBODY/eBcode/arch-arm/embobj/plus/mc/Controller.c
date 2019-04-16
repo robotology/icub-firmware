@@ -542,6 +542,13 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
             o->actuation_type = HARDWARE_MC4p;
             jomoCouplingInfo = &(brd_cfg->data.mc.mc4plus_based.jomocoupling);
             break;
+        case eomn_serv_MC_mc2pluspsc:
+            carray = eo_constarray_Load((EOarray*)&brd_cfg->data.mc.mc2pluspsc.arrayofjomodescriptors);
+            o->nSets = o->nEncods = o->nJoints = brd_cfg->data.mc.mc2pluspsc.arrayofjomodescriptors.head.size;
+            #warning @Ale, please check if the actuation type is correct 
+            o->actuation_type = HARDWARE_MC4p; 
+            jomoCouplingInfo = &(brd_cfg->data.mc.mc2pluspsc.jomocoupling);            
+            break;
         
         default:
             return;
