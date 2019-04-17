@@ -1074,6 +1074,8 @@ extern eOresult_t eo_motioncontrol_AddRegulars(EOtheMotionController *p, eOmn_se
 
 extern eOresult_t eo_motioncontrol_Tick(EOtheMotionController *p)
 {   
+    static uint32_t adc_values[4]={0,0,0,0}; //debug puporse. to be remove
+    
     if(NULL == p)
     {
         return(eores_NOK_nullpointer);
@@ -1110,6 +1112,39 @@ extern eOresult_t eo_motioncontrol_Tick(EOtheMotionController *p)
         }
         p->ctrlobjs.voltage = (int16_t)hal_adc_get_supplyVoltage_mV();
         eo_currents_watchdog_Tick(eo_currents_watchdog_GetHandle(), p->ctrlobjs.voltage, p->ctrlobjs.currents);
+    }
+    
+    if(eo_motcon_mode_mc2pluspsc == p->service.servconfig.type)
+    {
+        //read swich
+        for(uint8_t i=0; i<p->numofjomos; i++)
+        {
+            bool hardStopReached=true;
+            uint32_t val = hal_adc_get_hall_sensor_analog_input_mV(i);
+            adc_values[i] = val;
+            if(hal_NA32 != val)
+            {
+                //from schematics: if I read values near zero, means the motor reached the hard stop
+             if(val <1000)
+             {
+                hardStopReached=true;
+             }
+             else if(val >=4000)
+             {
+                 hardStopReached=false;
+             }
+             else
+                 ; ///verify if I get values between 1000 and 4000
+                  
+            }
+            else
+            {
+                //error occured while reading the swich
+            }
+            #warning @ALE: could you implement the function to know if the motor has reached the hard stop 
+             //MC_setswich(i, hardStopReached);   
+        }
+        
     }
     
     // 1) read positions from both joint and motor encoders and update motor controller engine.
