@@ -66,6 +66,9 @@ namespace embot { namespace hw { namespace i2c {
     // check is the device is present.
     // it internally calls isbusy(timeout, remaining)
     bool ping(embot::hw::I2C b, ADR adr, embot::common::relTime timeout = 3*embot::common::time1millisec);
+    
+    // raw not blocking transmission.
+    result_t transmit(embot::hw::I2C b, ADR adr, const embot::common::Data &content, embot::common::relTime timeout = 3*embot::common::time1millisec);
         
     // not blocking read. we read from register reg a total of destination.size bytes
     // at the end of transaction, data is copied into destination.pointer and oncompletion.callback() is called (if non nullptr). 
