@@ -1119,30 +1119,10 @@ extern eOresult_t eo_motioncontrol_Tick(EOtheMotionController *p)
         //read swich
         for(uint8_t i=0; i<p->numofjomos; i++)
         {
-            bool hardStopReached=true;
-            uint32_t val = hal_adc_get_hall_sensor_analog_input_mV(i);
-            adc_values[i] = val;
-            if(hal_NA32 != val)
-            {
-                //from schematics: if I read values near zero, means the motor reached the hard stop
-             if(val <1000)
-             {
-                hardStopReached=true;
-             }
-             else if(val >=4000)
-             {
-                 hardStopReached=false;
-             }
-             else
-                 ; ///verify if I get values between 1000 and 4000
-                  
-            }
-            else
-            {
-                //error occured while reading the swich
-            }
-            #warning @ALE: could you implement the function to know if the motor has reached the hard stop 
-             //MC_setswich(i, hardStopReached);   
+            uint32_t switch_val = hal_adc_get_hall_sensor_analog_input_mV(i);
+            #warning @ALE: could you implement the followimg function that read the value of switch?
+             //if switch_val< 1000 than hard stop reached, if switch_val> 4000 that hard stop is not reached, ...in between we could use the last value....(hysteresis)
+             //MC_setswich(i, switch_val);               
         }
         
     }
