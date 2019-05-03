@@ -145,7 +145,7 @@ namespace embot { namespace hw { namespace bsp { namespace led {
     
     #if     defined(STM32HAL_BOARD_NUCLEO64)    
            
-    constexpr PROP led1p = { .on = embot::hw::gpio::State::SET, .off = embot::hw::gpio::State::RESET, .gpio = {LD2_GPIO_Port, LD2_Pin}  };  
+    constexpr PROP led1p = { .on = embot::hw::gpio::State::SET, .off = embot::hw::gpio::State::RESET, .gpio = {embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::five}  };  
         
     constexpr BSP thebsp {        
         // maskofsupported
@@ -258,7 +258,7 @@ namespace embot { namespace hw { namespace bsp { namespace button {
 
     #if     defined(STM32HAL_BOARD_NUCLEO64)    
         
-    constexpr PROP btn1p = { .pressed = embot::hw::gpio::State::RESET, .gpio = {B1_GPIO_Port, B1_Pin}  };  
+    constexpr PROP btn1p = { .pressed = embot::hw::gpio::State::RESET, .gpio = {embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::thirteen}  };  
         
     constexpr BSP thebsp {        
         // maskofsupported

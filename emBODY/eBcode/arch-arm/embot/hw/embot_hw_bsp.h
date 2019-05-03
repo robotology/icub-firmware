@@ -181,10 +181,10 @@ namespace embot { namespace hw { namespace bsp { namespace button {
                     
 }}}} // namespace embot { namespace hw { namespace bsp {  namespace button {
 
-
+#if defined(HAL_CAN_MODULE_ENABLED) 
 namespace embot { namespace hw { namespace bsp { namespace can {
     
-    
+   
     struct PROP
     { 
         CAN_HandleTypeDef* handle;   
@@ -205,6 +205,7 @@ namespace embot { namespace hw { namespace bsp { namespace can {
    
               
 }}}} // namespace embot { namespace hw { namespace bsp {  namespace can {
+#endif
 
 
 namespace embot { namespace hw { namespace bsp { namespace flash {
@@ -300,6 +301,7 @@ namespace embot { namespace hw { namespace bsp { namespace onewire {
 }}}} // namespace embot { namespace hw { namespace bsp {  namespace onewire {
 
 
+#if   defined(HAL_ADC_MODULE_ENABLED)
 namespace embot { namespace hw { namespace bsp { namespace adc {
         
     struct PROP
@@ -321,8 +323,10 @@ namespace embot { namespace hw { namespace bsp { namespace adc {
     const BSP& getBSP();
               
 }}}} // namespace embot { namespace hw { namespace bsp {  namespace adc {
+#endif
 
 
+#if defined(HAL_TIM_MODULE_ENABLED)
 namespace embot { namespace hw { namespace bsp { namespace timer {
     
     struct PROP
@@ -348,7 +352,10 @@ namespace embot { namespace hw { namespace bsp { namespace timer {
     const BSP& getBSP();
                   
 }}}} // namespace embot { namespace hw { namespace bsp {  namespace timer {
+#endif
 
+
+#if defined(HAL_I2C_MODULE_ENABLED)
 namespace embot { namespace hw { namespace bsp { namespace i2c {
     
     
@@ -371,6 +378,7 @@ namespace embot { namespace hw { namespace bsp { namespace i2c {
     const BSP& getBSP();
                   
 }}}} // namespace embot { namespace hw { namespace bsp {  namespace i2c {
+#endif
 
 
 namespace embot { namespace hw { namespace bsp { namespace bno055 {
