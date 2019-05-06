@@ -894,6 +894,11 @@ static void JointSet_do_wait_calibration(JointSet* o)
             o->is_calibrated = JointSet_do_wait_calibration_12(o);
             break;
             
+        case eomc_calibration_type13_cer_hands_2:
+            o->is_calibrated = JointSet_do_wait_calibration_13(o);
+            break;
+            
+        
         case eomc_calibration_typeMixed:
             o->is_calibrated = JointSet_do_wait_calibration_mixed(o);
             break;
@@ -1238,13 +1243,19 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
         {
             AbsEncoder* enc = o->absEncoder + 4*e;
             
-            int32_t rawValueAtZeroPos[4];
+            //int32_t rawValueAtZeroPos[4];
             
-            rawValueAtZeroPos[0] = calibrator->params.type13.rawValueAtZeroPos0;
-            rawValueAtZeroPos[1] = calibrator->params.type13.rawValueAtZeroPos1;
-            rawValueAtZeroPos[2] = calibrator->params.type13.rawValueAtZeroPos2;
-            rawValueAtZeroPos[3] = calibrator->params.type13.rawValueAtZeroPos3;
+            //rawValueAtZeroPos[0] = calibrator->params.type13.rawValueAtZeroPos0;
+            //rawValueAtZeroPos[1] = calibrator->params.type13.rawValueAtZeroPos1;
+            //rawValueAtZeroPos[2] = calibrator->params.type13.rawValueAtZeroPos2;
+            //rawValueAtZeroPos[3] = calibrator->params.type13.rawValueAtZeroPos3;
             
+            AbsEncoder_calibrate_absolute(enc  , calibrator->params.type13.rawValueAtZeroPos0, enc[0].mul*32767);
+            AbsEncoder_calibrate_absolute(enc+1, calibrator->params.type13.rawValueAtZeroPos1, enc[1].mul*32767);
+            AbsEncoder_calibrate_absolute(enc+2, calibrator->params.type13.rawValueAtZeroPos2, enc[2].mul*32767);
+            AbsEncoder_calibrate_absolute(enc+3, calibrator->params.type13.rawValueAtZeroPos3, enc[3].mul*32767);
+            
+            /*
             for (int k=0; k<4; ++k)
             {
                 int32_t offset;
@@ -1279,6 +1290,7 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
                 ////debug code ended
                 AbsEncoder_calibrate_absolute(o->absEncoder+4*e+k, offset, zero);
             }
+            */
             
             JointSet_do_odometry(o);
             
