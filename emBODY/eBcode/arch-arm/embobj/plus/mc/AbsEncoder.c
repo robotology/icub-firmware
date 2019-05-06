@@ -131,6 +131,7 @@ void s_AbsEncoder_set_spikes_limis(AbsEncoder* o)
         }break; 
 
         case(eomc_enc_amo):
+        case(eomc_enc_psc):
         {
             
             int32_t toleranceIDeg = o->toleranceCfg * 65535 /360 ;
@@ -343,6 +344,7 @@ static void AbsEncoder_position_init(AbsEncoder* o, uint16_t position)
     {
         case eomc_enc_aea:
         case eomc_enc_amo:
+        case eomc_enc_psc:
             AbsEncoder_position_init_aea(o, position);
             break;
         

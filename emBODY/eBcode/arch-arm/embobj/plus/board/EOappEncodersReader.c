@@ -1489,11 +1489,24 @@ static eObool_t s_eo_read_psc_for_port(EOappEncReader *p, eObrd_portpsc_t port, 
     }
     else if(eobrd_portpsc_finger1 == port) //thumb
     {
-        valueInfo->value[0] = s_eo_appEncReader_psc_rescale2icubdegrees(p, array->data[0].value);
-        valueInfo->value[1] = s_eo_appEncReader_psc_rescale2icubdegrees(p, array->data[1].value);
+        valueInfo->value[0] = s_eo_appEncReader_psc_rescale2icubdegrees(p, array->data[4].value);
+        valueInfo->value[1] = s_eo_appEncReader_psc_rescale2icubdegrees(p, array->data[5].value);
+        valueInfo->value[2] = 0;
+        valueInfo->value[3] = 0;
         valueInfo->composedof=2;
         ret=eobool_true;
     }
+    
+//    static uint32_t noflood = 0;
+//    static char str[128] = {0};
+//    if (++noflood > 100)
+//    {   
+//        noflood = 0;
+//        
+//        snprintf(str, sizeof(str), "values are: %d", array->data[0].value);
+//                    
+//        eo_errman_Trace(eo_errman_GetHandle(), str, NULL);
+//    }
     return ret;
 }
 

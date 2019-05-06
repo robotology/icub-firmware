@@ -18,6 +18,8 @@
 
 #include "Joint.h"
 
+#include "hal_adc.h"
+
 #include "EOtheCANprotocol.h"
 
 #include "EOtheErrorManager.h"
@@ -455,6 +457,27 @@ BOOL Joint_manage_cable_constraint(Joint* o)
     }
     
     return FALSE;
+}
+
+BOOL Joint_manage_R1_finger_tension_constraint(Joint* o)
+{
+    static BOOL loose_cable[4]={FALSE,FALSE,FALSE,FALSE};
+
+    //if switch_val< 1000 than hard stop reached, if switch_val> 4000 that hard stop is not reached, 
+    //...in between we could use the last value....(hysteresis)
+    
+    uint32_t switch_val = hal_adc_get_hall_sensor_analog_input_mV(o->ID);
+    
+    if (switch_val < 1500) 
+    {
+        loose_cable[o->ID] = TRUE;
+    }
+    else if (switch_val > 3500)
+    {        
+        loose_cable[o->ID] = FALSE;
+    }    
+    //        open intention
+    return ((o->pos_err < ZERO) && loose_cable[o->ID]);
 }
 
 CTRL_UNITS Joint_do_pwm_control(Joint* o)

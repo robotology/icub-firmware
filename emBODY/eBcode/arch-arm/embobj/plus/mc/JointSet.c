@@ -512,6 +512,17 @@ static void JointSet_manage_cable_constraint(JointSet* o)
     }
 }
 
+static void JointSet_manage_R1_finger_tension_constraint(JointSet* o)
+{
+    for (int k=0; k<*(o->pN); ++k)
+    {
+        if (Joint_manage_R1_finger_tension_constraint(o->joint+o->joints_of_set[k]))
+        {
+            o->motor[o->motors_of_set[k]].output = 0; 
+        }
+    }
+}
+
 static void JointSet_manage_trifid_constraint(JointSet* o)
 {
     int j0 = o->joints_of_set[0];
@@ -703,6 +714,10 @@ void JointSet_do_pwm_control(JointSet* o)
         case eomc_jsetconstraint_cerhand:
             JointSet_manage_cable_constraint(o);
             break;
+        
+        case eomc_jsetconstraint_cerhand2:
+            JointSet_manage_R1_finger_tension_constraint(o);
+            break;
 
         default:
             break;
@@ -749,6 +764,14 @@ static void JointSet_do_vel_control(JointSet* o)
             JointSet_manage_trifid_constraint(o);
             break;
         
+        case eomc_jsetconstraint_cerhand:
+            JointSet_manage_cable_constraint(o);
+            break;
+        
+        case eomc_jsetconstraint_cerhand2:
+            JointSet_manage_R1_finger_tension_constraint(o);
+            break;
+
         default:
             break;
     }
@@ -1209,6 +1232,58 @@ void JointSet_calibrate(JointSet* o, uint8_t e, eOmc_calibrator_t *calibrator)
             o->calibration_in_progress = (eOmc_calibration_type_t)calibrator->type;
 
             break;
+        }
+        
+        case eomc_calibration_type13_cer_hands_2:
+        {
+            AbsEncoder* enc = o->absEncoder + 4*e;
+            
+            int32_t rawValueAtZeroPos[4];
+            
+            rawValueAtZeroPos[0] = calibrator->params.type13.rawValueAtZeroPos0;
+            rawValueAtZeroPos[1] = calibrator->params.type13.rawValueAtZeroPos1;
+            rawValueAtZeroPos[2] = calibrator->params.type13.rawValueAtZeroPos2;
+            rawValueAtZeroPos[3] = calibrator->params.type13.rawValueAtZeroPos3;
+            
+            for (int k=0; k<4; ++k)
+            {
+                int32_t offset;
+                int32_t zero;
+                
+                //eOmc_joint_config_t *jointcfg = eo_entities_GetJointConfig(eo_entities_GetHandle(), e);
+                //1) Take absolute value of calibation parametr
+                int32_t abs_raw = (rawValueAtZeroPos[k] > 0) ? rawValueAtZeroPos[k] : -rawValueAtZeroPos[k];
+                // 1.1) update abs_raw with gearbox_E2J
+                //abs_raw = abs_raw * jointcfg->gearbox_E2J;
+                // 2) calculate offset
+                if(abs_raw >= TICKS_PER_HALF_REVOLUTION)
+                    offset = abs_raw - TICKS_PER_HALF_REVOLUTION;
+                else
+                    offset = abs_raw + TICKS_PER_HALF_REVOLUTION;
+            
+                // 3) find out sign of zero
+            
+                //if(jointcfg->jntEncoderResolution > 0)
+                    zero = TICKS_PER_HALF_REVOLUTION;// / jointcfg->gearbox_E2J;
+                //else
+                //    zero = -TICKS_PER_HALF_REVOLUTION;// / jointcfg->gearbox_E2J;
+            
+                //zero+=calibrator->params.type12.calibrationDelta;  //this parameter should contain only the delta
+                // 4) call calibration function
+            
+                ////debug code
+                char info[80];
+                snprintf(info, sizeof(info), "CALIB 13 j(%d)[%d]: offset=%d zero=%d ", e, k, offset, zero);
+                JointSet_send_debug_message(info, e);
+                
+                ////debug code ended
+                AbsEncoder_calibrate_absolute(o->absEncoder+4*e+k, offset, zero);
+            }
+            
+            JointSet_do_odometry(o);
+            
+            Motor_calibrate_withOffset(o->motor+e, 0);
+            o->calibration_in_progress = (eOmc_calibration_type_t)calibrator->type;
         }
         
         default:

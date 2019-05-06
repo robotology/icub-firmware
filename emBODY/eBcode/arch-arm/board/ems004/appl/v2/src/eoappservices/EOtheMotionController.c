@@ -1114,6 +1114,7 @@ extern eOresult_t eo_motioncontrol_Tick(EOtheMotionController *p)
         eo_currents_watchdog_Tick(eo_currents_watchdog_GetHandle(), p->ctrlobjs.voltage, p->ctrlobjs.currents);
     }
     
+    /*
     if(eo_motcon_mode_mc2pluspsc == p->service.servconfig.type)
     {
         //read swich
@@ -1126,6 +1127,7 @@ extern eOresult_t eo_motioncontrol_Tick(EOtheMotionController *p)
         }
         
     }
+    */
     
     // 1) read positions from both joint and motor encoders and update motor controller engine.
     s_eo_motioncontrol_updatedPositionsFromEncoders(p);

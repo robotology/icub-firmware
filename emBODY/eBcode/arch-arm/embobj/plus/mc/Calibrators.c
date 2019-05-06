@@ -664,3 +664,18 @@ BOOL JointSet_do_wait_calibration_12(JointSet* o)
     return calibrated;
 }
 
+BOOL JointSet_do_wait_calibration_13(JointSet* o)
+{
+    BOOL calibrated = TRUE;
+    
+    for (int ms=0; ms<*(o->pN); ++ms)
+    {
+        if (!Motor_is_calibrated(o->motor+o->motors_of_set[ms])) 
+        {
+            calibrated = FALSE;
+        }
+    }
+    
+    return calibrated;
+}
+
