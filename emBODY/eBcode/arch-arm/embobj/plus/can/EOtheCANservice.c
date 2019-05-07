@@ -488,7 +488,7 @@ extern eOresult_t eo_canserv_SendCommandToAllBoardsInEntity2(EOtheCANservice *p,
     {
         return(eores_NOK_nullpointer);
     }
-    const uint8_t maxboardsinentity = 16;
+    //const uint8_t maxboardsinentity = 16;
     // now i find the locations of the entity using an array of eObrd_canlocation_t
     uint8_t mem4arrayoflocs[sizeof(eOarray_head_t) + 16*sizeof(eObrd_canlocation_t)] = {0}; // 20 bytes
     EOarray *arrayoflocs = eo_array_New(16, sizeof(eObrd_canlocation_t), mem4arrayoflocs);
