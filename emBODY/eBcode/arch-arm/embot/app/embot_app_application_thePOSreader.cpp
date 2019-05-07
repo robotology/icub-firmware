@@ -49,10 +49,10 @@
 
 #include "embot_common.h"
 
-
+#include "embot_hw_sys.h"
 #include "embot_hw_tlv493d.h"
 
-
+#include "embot_app_theLEDmanager.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -86,6 +86,7 @@ struct embot::app::application::thePOSreader::Impl
     bool ticking;
     std::uint8_t acquisitionmask;
     std::uint8_t sensorstoacquiremask;
+    uint8_t sensorspresencemask;
         
     embot::sys::Timer *ticktimer;
     embot::sys::Action action;
@@ -93,6 +94,8 @@ struct embot::app::application::thePOSreader::Impl
 
     canConfig canconfig;
     
+    static constexpr embot::hw::tlv493d::Position valueOfPositionCHIPnotinitted = 2000*100;         // which will results in 2000 degrees or 20000 decidegrees
+    static constexpr embot::hw::tlv493d::Position valueOfPositionACQUISITIONnotvalid = 1000*100;    // which will results in 1000 degrees or 10000 decidegrees
     std::array<embot::hw::tlv493d::Position, numberofpositions> positions;
     std::array<embot::app::canprotocol::analog::deciDeg, 3> decidegvalues;
     
@@ -102,6 +105,7 @@ struct embot::app::application::thePOSreader::Impl
         ticking = false;  
         acquisitionmask = 0;
         sensorstoacquiremask = 0;
+        sensorspresencemask = 0;
         txperiod = 10*embot::common::time1millisec;
 
         ticktimer = new embot::sys::Timer;      
@@ -129,6 +133,14 @@ struct embot::app::application::thePOSreader::Impl
 
     }
     
+    bool isvalid(const embot::hw::tlv493d::Position &po) const
+    {
+        if((po == valueOfPositionCHIPnotinitted) || (po == valueOfPositionACQUISITIONnotvalid))
+        {
+            return false;
+        }
+        return true;        
+    }
    
     bool start();
     bool stop();    
@@ -224,7 +236,7 @@ bool embot::app::application::thePOSreader::Impl::process(embot::common::Event e
 bool embot::app::application::thePOSreader::Impl::acquisition_transmit(std::vector<embot::hw::can::Frame> &replies)
 {   
         
-    if(false == embot::binary::mask::check(acquisitionmask, static_cast<std::uint8_t>(0b11)))
+    if(false == embot::binary::mask::check(acquisitionmask, sensorspresencemask))
     {
         return false;
     }
@@ -238,18 +250,46 @@ bool embot::app::application::thePOSreader::Impl::acquisition_transmit(std::vect
     info.canaddress = embot::app::theCANboardInfo::getInstance().cachedCANaddress();   
     if((true == canconfig.descriptor[0].enabled) && (true == canconfig.descriptor[1].enabled))
     {   // we transmit two
-        decidegvalues[0] = canconfig.descriptor[0].transform(positions[0]/10);
-        decidegvalues[1] = canconfig.descriptor[1].transform(positions[1]/10);
+        if(isvalid(positions[0]))
+        {
+            decidegvalues[0] = canconfig.descriptor[0].transform(positions[0]/10);
+        }
+        else
+        {
+            decidegvalues[0] = positions[0]/10;
+        }
+        if(isvalid(positions[1]))
+        {
+            decidegvalues[1] = canconfig.descriptor[1].transform(positions[1]/10);
+        }
+        else
+        {
+            decidegvalues[1] = positions[1]/10;
+        }
         info.loadDeciDeg(canconfig.descriptor[0].label, 2, decidegvalues);
     }
     else if((true == canconfig.descriptor[0].enabled))
     {   // we transmit only the first
-        decidegvalues[0] = canconfig.descriptor[0].transform(positions[0]/10);
+        if(isvalid(positions[0]))
+        {
+            decidegvalues[0] = canconfig.descriptor[0].transform(positions[0]/10);
+        }
+        else
+        {
+            decidegvalues[0] = positions[0]/10;
+        }
         info.loadDeciDeg(canconfig.descriptor[0].label, 1, decidegvalues);
     }
     else if((true == canconfig.descriptor[1].enabled))
     {   // we transmit only the second
-        decidegvalues[0] = canconfig.descriptor[1].transform(positions[1]/10);
+        if(isvalid(positions[1]))
+        {
+            decidegvalues[0] = canconfig.descriptor[1].transform(positions[1]/10);
+        }
+        else
+        {
+            decidegvalues[0] = positions[1]/10;
+        }
         info.loadDeciDeg(canconfig.descriptor[1].label, 1, decidegvalues);
     }
     else
@@ -270,25 +310,42 @@ bool embot::app::application::thePOSreader::Impl::acquisition_transmit(std::vect
 
 bool embot::app::application::thePOSreader::Impl::acquisition_start()
 {
-
-    acquisitionmask =  0;
-        
-    embot::common::Callback cbk00(alertdataisready00, this);
-    embot::hw::tlv493d::acquisition(config.sensors[0].id, cbk00);
-    embot::binary::bit::set(sensorstoacquiremask, 0);
-
-    embot::common::Callback cbk01(alertdataisready01, this);
-    embot::hw::tlv493d::acquisition(config.sensors[1].id, cbk01);
-    embot::binary::bit::set(sensorstoacquiremask, 1);
+    acquisitionmask =  0;   
+    sensorstoacquiremask = 0;
     
+    if(0 == sensorspresencemask)
+    {
+        // if we dont have any sensor because the initi has failed, then we must transmit the failure anyway
+        // hence, we emit a alertdataisready00
+        alertdataisready00(this);        
+        return true;
+    }
+      
+    // else, we start acquisition from the sensors which are available
+    if(embot::binary::bit::check(sensorspresencemask, 0))
+    {        
+        embot::common::Callback cbk00(alertdataisready00, this);
+        embot::hw::tlv493d::acquisition(config.sensors[0].id, cbk00);
+        embot::binary::bit::set(sensorstoacquiremask, 0);
+    }
 
+    if(embot::binary::bit::check(sensorspresencemask, 1))
+    {
+        embot::common::Callback cbk01(alertdataisready01, this);
+        embot::hw::tlv493d::acquisition(config.sensors[1].id, cbk01);
+        embot::binary::bit::set(sensorstoacquiremask, 1);
+    }
+       
     return true;
 }
 
 
 bool embot::app::application::thePOSreader::Impl::acquisition_retrieve(std::uint8_t n)
 {
-    embot::hw::tlv493d::read(config.sensors[n].id, positions[n]);
+    if(embot::hw::resOK != embot::hw::tlv493d::read(config.sensors[n].id, positions[n]))
+    {
+        positions[n] = valueOfPositionACQUISITIONnotvalid;
+    }
     
     return true;
 }
@@ -328,9 +385,45 @@ bool embot::app::application::thePOSreader::initialise(const Config &config)
     pImpl->config = config;
     
     pImpl->action.load(embot::sys::EventToTask(pImpl->config.events.acquire, pImpl->config.owner));
-  
-    embot::hw::tlv493d::init(pImpl->config.sensors[0].id, pImpl->config.sensors[0].config); 
-    embot::hw::tlv493d::init(pImpl->config.sensors[1].id, pImpl->config.sensors[1].config);
+    
+    pImpl->positions[0] = pImpl->positions[1] = pImpl->valueOfPositionCHIPnotinitted;
+    
+    embot::hw::sys::delay(50*embot::common::time1millisec);
+      
+    if(embot::hw::resOK == embot::hw::tlv493d::init(pImpl->config.sensors[0].id, pImpl->config.sensors[0].config))
+    {
+        embot::binary::bit::set(pImpl->sensorspresencemask, static_cast<uint8_t>(pImpl->config.sensors[0].id));
+    }  
+
+    
+    embot::hw::sys::delay(50*embot::common::time1millisec);
+    
+    if(embot::hw::resOK == embot::hw::tlv493d::init(pImpl->config.sensors[1].id, pImpl->config.sensors[1].config))
+    {
+        embot::binary::bit::set(pImpl->sensorspresencemask, static_cast<uint8_t>(pImpl->config.sensors[1].id));
+    }
+    
+    
+    // pImpl->sensorspresencemask = 2;
+    
+    if(false == embot::binary::mask::check(pImpl->sensorspresencemask, static_cast<uint8_t>(0b11)))
+    {
+        
+        embot::app::LEDwaveT<64> ledwave(100*embot::common::time1millisec, 50, std::bitset<64>(0b0101010101));
+        
+        if(true == embot::binary::bit::check(pImpl->sensorspresencemask, 0))
+        {
+            ledwave.load(20, std::bitset<64>(0b0001), 4); 
+        }
+        else if(true == embot::binary::bit::check(pImpl->sensorspresencemask, 1))
+        {
+            ledwave.load(20, std::bitset<64>(0b0101), 4);
+        }
+        
+        embot::app::theLEDmanager &theleds = embot::app::theLEDmanager::getInstance();
+        theleds.get(embot::hw::LED::one).wave(&ledwave);  
+    }
+
      
     return true;
 }

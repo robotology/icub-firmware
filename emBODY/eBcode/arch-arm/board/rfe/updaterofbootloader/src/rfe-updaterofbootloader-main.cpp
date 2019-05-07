@@ -36,7 +36,7 @@ static ActivityParam activity_param = { .blinkingperiod = BlinkSlowPeriod };
 
    
 // use build 222 for all the updaterofbootloader
-static const embot::app::canprotocol::versionOfAPPLICATION vAP = {100, 2 , 0};
+static const embot::app::canprotocol::versionOfAPPLICATION vAP = {1, 100 , 1};
 static const embot::app::canprotocol::versionOfCANPROTOCOL vCP = {2, 0};
 
 int main(void)

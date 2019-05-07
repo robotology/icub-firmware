@@ -19,68 +19,64 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef _EOTHEENTITIES_HID_H_
-#define _EOTHEENTITIES_HID_H_
+#ifndef _EOTHEPSC_HID_H_
+#define _EOTHEPSC_HID_H_
+
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 // - external dependencies --------------------------------------------------------------------------------------------
-// empty-section
+
+#include "EoCommon.h"
+#include "EoProtocol.h"
+#include "EOtheServices_hid.h"
+#include "EOwatchdog.h"
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
 
-#include "EOtheEntities.h"
+#include "EOthePSC.h"
 
 
 // - definition of the hidden struct implementing the object ----------------------------------------------------------
 
-enum 
-{  
-    eoprotwrap_max_joints       = 12, 
-    eoprotwrap_max_motors       = 12, 
-    eoprotwrap_max_skins        = 2,
-    eoprotwrap_max_strains      = 1,
-    eoprotwrap_max_maises       = 1,
-    eoprotwrap_max_temperatures = 1,
-    eoprotwrap_max_inertials    = 1,
-    eoprotwrap_max_inertials3   = 1,
-    eoprotwrap_max_pscs         = 1
-};
+enum { psc_maxRegulars = 1 }; // there cannot be more than 1 psc, and typically not more than 1 signalled variable.
 
-struct EOtheEntities_hid
+struct EOthePSC_hid
 {
-    eObool_t        initted;
-    eOmc_joint_t*   joints[eoprotwrap_max_joints];
-    eOmc_motor_t*   motors[eoprotwrap_max_motors];
-    eOsk_skin_t*    skins[eoprotwrap_max_skins];
-    eOas_strain_t*  strains[eoprotwrap_max_strains];
-    eOas_mais_t*    maises[eoprotwrap_max_maises];
-    eOas_temperature_t* temperatures[eoprotwrap_max_temperatures];
-    eOas_inertial_t* inertials[eoprotwrap_max_inertials];
-    eOas_inertial3_t* inertials3[eoprotwrap_max_inertials3];
-    eOas_psc_t*     pscs[eoprotwrap_max_pscs];
-    uint8_t         numofjoints;
-    uint8_t         numofmotors;
-    uint8_t         numofskins;
-    uint8_t         numofstrains;
-    uint8_t         numofmaises;
-    uint8_t         numoftemperatures;
-    uint8_t         numofinertials;
-    uint8_t         numofinertials3;
-    uint8_t         numofpscs;
+    eOservice_core_t                        service;
+    eOservice_diagnostics_t                 diagnostics;
+    eOservice_cantools_t                    sharedcan;
+    
+    eObool_t                                configured;
+    
+    eOas_psc_config_t                       pscconfig;
+    
+    eOprotID32_t                            id32;  
+    eOas_psc_t*                             psc;
+    EOarray*                                id32ofregulars;
+    uint8_t                                 numberofowners;
+    
+    
+    uint16_t                                not_heardof_target[2];
+    uint16_t                                not_heardof_status[2];
+    uint32_t                                not_heardof_counter;
+    uint32_t                                not_heardof_checkrate;
+    eObool_t                                transmissionisactive;
+    eObool_t                                isalive;
 }; 
 
 
 // - declaration of extern hidden functions ---------------------------------------------------------------------------
 // empty section
 
+
 #ifdef __cplusplus
 }       // closing brace for extern "C"
-#endif
-
-#endif  // include guard
+#endif 
+ 
+#endif  // include-guard
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

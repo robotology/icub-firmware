@@ -998,66 +998,38 @@ const eOcanprot_functions_t s_eo_canprot_functions_pollingAnalogSensor[] =
         EO_INIT(.former) eocanprotASpolling_former_POL_SK_CMD__SET_TRIANG_CFG,
         EO_INIT(.parser) NULL
     }, 
-    {   // 081      
+    {   // 081      ICUBCANPROTO_POL_AS_CMD__POS_CONFIG_GET      
+        EO_INIT(.former) eocanprotASpolling_former_POL_AS_CMD__POS_CONFIG_GET,
+        EO_INIT(.parser) eocanprotASpolling_parser_POL_AS_CMD__POS_CONFIG_GET
+    }, 
+    {   // 082      ICUBCANPROTO_POL_AS_CMD__POS_CONFIG_SET      
+        EO_INIT(.former) eocanprotASpolling_former_POL_AS_CMD__POS_CONFIG_SET,
+        EO_INIT(.parser) NULL
+    },  
+    {   // 083      ICUBCANPROTO_POL_AS_CMD__POS_TRANSMIT
+        EO_INIT(.former) eocanprotASpolling_former_POL_AS_CMD__POS_TRANSMIT,
+        EO_INIT(.parser) NULL
+    },     
+    {   // 084      
         EO_INIT(.former) NULL,
         EO_INIT(.parser) NULL
     }
-};  EO_VERIFYsizeof(s_eo_canprot_functions_pollingAnalogSensor, (82)*sizeof(eOcanprot_functions_t))
+};  EO_VERIFYsizeof(s_eo_canprot_functions_pollingAnalogSensor, (85)*sizeof(eOcanprot_functions_t))
 
 
-
-//const eOcanprot_functions_t s_eo_canprot_functions_pollingAnalogSensor[] =
-//{
-//    {   // 000 - > ICUBCANPROTO_POL_AS_CMD__SET_TXMODE = 0x07
-//        EO_INIT(.former) eocanprotASpolling_former_00,
-//        EO_INIT(.parser) eocanprotASpolling_parser_00
-//    },
-//    {   // 001 -> ICUBCANPROTO_POL_AS_CMD__SET_CANDATARATE = 0x08
-//        EO_INIT(.former) eocanprotASpolling_former_01,
-//        EO_INIT(.parser) eocanprotASpolling_parser_01
-//    },
-//    {   // 002 -> ICUBCANPROTO_POL_AS_CMD__SET_RESOLUTION = 0x10
-//        EO_INIT(.former) eocanprotASpolling_former_02,
-//        EO_INIT(.parser) eocanprotASpolling_parser_02
-//    },
-//    {   // 003 -> ICUBCANPROTO_POL_AS_CMD__GET_FULL_SCALES = 0x18
-//        EO_INIT(.former) eocanprotASpolling_former_02,
-//        EO_INIT(.parser) eocanprotASpolling_parser_02        
-//    },
-//    {   // 004 -> ICUBCANPROTO_POL_SK_CMD__TACT_SETUP = 0x4c
-//        EO_INIT(.former) eocanprotASpolling_former_02,
-//        EO_INIT(.parser) eocanprotASpolling_parser_02        
-//    }, 
-//    {   // 005 -> ICUBCANPROTO_POL_SK_CMD__SET_BRD_CFG = 0x4d
-//        EO_INIT(.former) eocanprotASpolling_former_02,
-//        EO_INIT(.parser) eocanprotASpolling_parser_02        
-//    }, 
-//    {   // 006 -> ICUBCANPROTO_POL_SK_CMD__TACT_SETUP2 = 0x4e
-//        EO_INIT(.former) eocanprotASpolling_former_02,
-//        EO_INIT(.parser) eocanprotASpolling_parser_02        
-//    }, 
-//    {   // 007 -> ICUBCANPROTO_POL_SK_CMD__ACC_GYRO_SETUP = 0x4f
-//        EO_INIT(.former) eocanprotASpolling_former_02,
-//        EO_INIT(.parser) eocanprotASpolling_parser_02        
-//    },   
-//    {   // 008 -> ICUBCANPROTO_POL_SK_CMD__SET_TRIANG_CFG = 0x50
-//        EO_INIT(.former) eocanprotASpolling_former_02,
-//        EO_INIT(.parser) eocanprotASpolling_parser_02        
-//    }     
-//};  EO_VERIFYsizeof(s_eo_canprot_functions_pollingAnalogSensor, ((9))*sizeof(eOcanprot_functions_t))
 
 static const uint8_t s_eo_canprot_functions_pollingAnalogSensor_maxnumber = sizeof(s_eo_canprot_functions_pollingAnalogSensor) / sizeof(eOcanprot_functions_t);
 
 
 const eOcanprot_functions_t s_eo_canprot_functions_periodicAnalogSensor[] =
 {
-    {   // 000      ICUBCANPROTO_PER_AS_MSG__DIGITAL_GYROSCOPE
+    {   // 000      ICUBCANPROTO_PER_AS_MSG__USERDEF
         EO_INIT(.former) NULL,
-        EO_INIT(.parser) eocanprotASperiodic_parser_PER_AS_MSG__DIGITAL_GYROSCOPE
+        EO_INIT(.parser) eocanprotASperiodic_parser_PER_AS_MSG__USERDEF
     },
-    {   // 001      ICUBCANPROTO_PER_AS_MSG__DIGITAL_ACCELEROMETER
+    {   // 001      ICUBCANPROTO_PER_AS_MSG__POS
         EO_INIT(.former) NULL,
-        EO_INIT(.parser) eocanprotASperiodic_parser_PER_AS_MSG__DIGITAL_ACCELEROMETER
+        EO_INIT(.parser) eocanprotASperiodic_parser_PER_AS_MSG__POS
     }, 
     {   // 002
         EO_INIT(.former) NULL,

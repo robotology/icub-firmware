@@ -204,7 +204,9 @@ namespace embot { namespace hw { namespace tlv493d {
     static PrivateData s_privatedata;
 
         
-    result_t s_sensorinit(TLV493D h); 
+    result_t s_sensor_reset(TLV493D h);
+    
+    result_t s_sensor_init(TLV493D h); 
     
     static void sharedCBK(void *p)
     {
@@ -245,19 +247,17 @@ namespace embot { namespace hw { namespace tlv493d {
                 
         // init i2c ..
         embot::hw::i2c::init(config.i2cdes.bus, config.i2cdes.config);
-        if(false == embot::hw::i2c::ping(config.i2cdes.bus, embot::hw::bsp::tlv493d::getBSP().getPROP(h)->i2caddress))
-        {
-            return resNOK;
-        }
-        
-
-        
+           
+        // load config etc
         s_privatedata.i2caddress[index] = embot::hw::bsp::tlv493d::getBSP().getPROP(h)->i2caddress;
         s_privatedata.config[index] = config;
         s_privatedata.acquisition[index].clear();
-        
+                        
         // sensor init
-        s_sensorinit(h);  
+        if(resOK != s_sensor_init(h))
+        {
+            return resNOK;
+        }            
         
         embot::binary::bit::set(initialisedmask, embot::common::tointegral(h));
                 
@@ -444,22 +444,26 @@ namespace embot { namespace hw { namespace tlv493d {
     }
     
     
-    result_t s_sensorinit(TLV493D h)
+    result_t s_sensor_init(TLV493D h)
     {
         std::uint8_t index = embot::common::tointegral(h);
         
-        // see: Figure 9 Sequence for power-up and sensor initialization for single use (pag 15 of user manaul of chip)
-        
-        // 1. I2C send reset (see also pag ...)
         std::uint8_t txdata[1] = {0};
-        txdata[0] = 0;
         embot::common::Data data = embot::common::Data(txdata, 1);
-        volatile result_t r = embot::hw::i2c::write(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], embot::hw::i2c::regNONE, data, embot::common::time1second);
-        r = r;
+        volatile result_t r = resOK;
         
-        // wait a bit
-        embot::hw::sys::delay(10*embot::common::time1millisec);
+        // see: Figure 9 Sequence for power-up and sensor initialization for single use (pag 15 of user manual of chip)
         
+         
+        // 1. reset the chip and wait for some time         
+        s_sensor_reset(h);
+           
+        // 1.a make sure the chip has a good address in the bus         
+        if(false == embot::hw::i2c::ping(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index]))
+        {
+            return resNOK;
+        }
+                       
         // 2. read the registers
         data.load(s_privatedata.acquisition[index].registermap.readmemory, s_privatedata.acquisition[index].registermap.readsize); 
         r = embot::hw::i2c::read(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], embot::hw::i2c::regNONE, data, embot::common::time1second);
@@ -473,6 +477,24 @@ namespace embot { namespace hw { namespace tlv493d {
         // wait a bit
         embot::hw::sys::delay(10*embot::common::time1millisec);
         
+        return resOK;        
+    }
+    
+    result_t s_sensor_reset(TLV493D h)
+    {
+        std::uint8_t index = embot::common::tointegral(h);
+        
+        // see: Figure 15 Reset frame 0x00 with address setting (pag 21 of user manual of chip)
+        // we transmit 0x00 on the bus and wait for some time (at least 14usec)
+        // we do that by transmitting to address 0x00 a total of 0 bytes.
+        
+        embot::common::Data dummy;
+        dummy.clear();
+        volatile result_t r1 = embot::hw::i2c::transmit(s_privatedata.config[index].i2cdes.bus, 0x00, dummy, 3*embot::common::time1millisec);        
+        r1 = r1;
+        // extra 3 ms.
+        embot::hw::sys::delay(3*embot::common::time1millisec);
+
         return resOK;        
     }
     

@@ -897,6 +897,11 @@
               <FileType>1</FileType>
               <FilePath>..\src\eoappservices\EOtheTemperatures.c</FilePath>
             </File>
+            <File>
+              <FileName>EOthePSC.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\eoappservices\EOthePSC.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2226,6 +2231,11 @@
               <FileName>EOtheTemperatures.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\eoappservices\EOtheTemperatures.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOthePSC.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\eoappservices\EOthePSC.c</FilePath>
             </File>
           </Files>
         </Group>

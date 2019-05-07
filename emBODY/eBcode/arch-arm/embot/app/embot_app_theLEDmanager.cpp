@@ -182,6 +182,8 @@ namespace embot { namespace app {
         embot::hw::gpio::State stateON;
         embot::hw::gpio::State stateOFF;
         embot::sys::Timer *tmr;
+        LEDwave *_ledw;
+        uint64_t _memory[4];
     public:
         
         aSlimPulsableLED(LED l = LED::none, const embot::hw::GPIO *g = nullptr, 
@@ -191,7 +193,9 @@ namespace embot { namespace app {
         {
             // assume led is ok.
             // i defer creation of the timer.
-            tmr = nullptr;            
+            tmr = nullptr;   
+            _ledw = nullptr;
+            std::memset(_memory, 0xff, sizeof(_memory));
         };
             
         ~aSlimPulsableLED() {};
@@ -224,7 +228,7 @@ namespace embot { namespace app {
             embot::hw::gpio::toggle(*gpio);
         }   
 
-        static void onexpiry(void *p)
+        static void onexpirypulse(void *p)
         {
             aSlimPulsableLED * l = reinterpret_cast<aSlimPulsableLED*>(p);
             l->toggle();            
@@ -240,15 +244,75 @@ namespace embot { namespace app {
             if(0 == period)
             {
                 tmr->stop();
+                off();
             }
             else
             {
+                tmr->stop();
+                off();
                 embot::sys::Timer::Mode mode = (0 == times) ? (embot::sys::Timer::Mode::forever) : (embot::sys::Timer::Mode::someshots);
-                embot::sys::Action act(embot::sys::CallbackToTask(onexpiry, this, embot::sys::theCallbackManager::getInstance().task()));
+                embot::sys::Action act(embot::sys::CallbackToTask(onexpirypulse, this, embot::sys::theCallbackManager::getInstance().task()));
                 embot::sys::Timer::Config cfg(period/2, act, mode, times);
                 tmr->start(cfg);
             }
         }
+
+        
+        virtual void stop()
+        {
+            if(nullptr != tmr)
+            {
+                tmr->stop();
+                off();
+            }
+            
+            if(nullptr != _ledw)
+            {
+                _ledw->~LEDwave();
+                _ledw = nullptr;
+                std::memset(_memory, 0xff, sizeof(_memory));
+            }
+        }
+        
+                        
+        static void onexpirywave(void *p)
+        {
+            aSlimPulsableLED * l = reinterpret_cast<aSlimPulsableLED*>(p);
+            bool ledon = l->_ledw->tick();
+            
+            if(ledon)
+            {
+                l->on();
+            }
+            else
+            {
+                l->off();
+            }
+        }
+        
+        virtual void wave(const LEDwave *lw, std::uint32_t times = 0)
+        {
+            if(nullptr == tmr)
+            {
+                tmr = new embot::sys::Timer;
+            }
+            
+            if(0 == lw->frequency())
+            {
+                stop();
+            }
+            else
+            {
+                stop();
+                _ledw = lw->duplicate(_memory, sizeof(_memory));
+                embot::sys::Timer::Mode mode = (0 == times) ? (embot::sys::Timer::Mode::forever) : (embot::sys::Timer::Mode::someshots);
+                embot::sys::Action act(embot::sys::CallbackToTask(onexpirywave, this, embot::sys::theCallbackManager::getInstance().task()));
+                embot::sys::Timer::Config cfg(_ledw->frequency(), act, mode, times*_ledw->length());
+                tmr->start(cfg);
+            }              
+            
+        }
+        
         
     };    
     
@@ -276,7 +340,9 @@ namespace embot { namespace app {
         virtual void on() {}        
         virtual void off() {}        
         virtual void toggle() {}  
-        virtual void pulse(embot::common::relTime period, std::uint32_t times) {}          
+        virtual void pulse(embot::common::relTime period, std::uint32_t times) {}  
+        virtual void stop() {}
+        virtual void wave(const LEDwave *lw, std::uint32_t times = 0) {}
     };
     
 }}
@@ -447,6 +513,7 @@ namespace embot { namespace app {
 //    {
 //        return pImpl->lednone;
 //    }
+
 
 }} // namespace embot { namespace app {
 

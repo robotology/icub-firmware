@@ -36,7 +36,7 @@
 #include "embot_app_theLEDmanager.h"
 
 
-static const embot::app::canprotocol::versionOfAPPLICATION vAP = {1, 3 , 0};
+static const embot::app::canprotocol::versionOfAPPLICATION vAP = {1, 3 , 1};
 static const embot::app::canprotocol::versionOfCANPROTOCOL vCP = {2, 0};
 
 static void userdeflauncher(void* param);
@@ -71,9 +71,9 @@ static void userdeflauncher(void* param)
 {        
     embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance();
     canbrdinfo.synch(vAP, vCP);
+
     
-    
-    start_evt_based();
+    start_evt_based();      
       
 }
 
@@ -105,11 +105,11 @@ static std::vector<embot::hw::can::Frame> outframes;
 
 static void start_evt_based(void)
 {    
-    static const std::initializer_list<embot::hw::LED> allleds = {embot::hw::LED::one};  
+    static const std::initializer_list<embot::hw::LED> allleds = {embot::hw::LED::one, embot::hw::LED::two};  
     embot::app::theLEDmanager &theleds = embot::app::theLEDmanager::getInstance();     
     theleds.init(allleds);    
     theleds.get(embot::hw::LED::one).pulse(embot::common::time1second); 
-        
+              
     // start task waiting for can messages. 
     eventbasedtask = new embot::sys::EventTask;  
     const embot::common::relTime waitEventTimeout = 50*1000; //50*1000; //5*1000*1000;       
@@ -164,7 +164,7 @@ static void start_evt_based(void)
     r = embot::hw::can::init(embot::hw::CAN::one, canconfig);   
     r = embot::hw::can::setfilters(embot::hw::CAN::one, embot::app::theCANboardInfo::getInstance().getCANaddress());
     r = r;
-   
+       
 }
 
 
@@ -195,8 +195,8 @@ static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask
     }
     
     // we clear the frames to be trasmitted
-    outframes.clear();      
-    
+    outframes.clear();  
+
     
     if(true == embot::binary::mask::check(eventmask, evRXcanframe))
     {        

@@ -322,7 +322,21 @@ namespace embot { namespace hw { namespace i2c {
         }
         
         return res;        
-    }    
+    }   
+
+//    result_t clear(embot::hw::I2C b)
+//    {
+//        if(false == initialised(b))
+//        {
+//            return resNOK;
+//        } 
+//        
+//        std::uint8_t index = embot::common::tointegral(b);
+//        
+//        embot::hw::i2c::s_privatedata.transaction[index].clear();
+//        
+//        return resOK;
+//    }    
     
     void ontransactionterminated(std::uint8_t index)
     {
@@ -353,7 +367,29 @@ namespace embot { namespace hw { namespace i2c {
         return res;
     }   
     
+    
+    result_t transmit(embot::hw::I2C b, ADR adr, const embot::common::Data &content, embot::common::relTime timeout)
+    {
+        if(false == initialised(b))
+        {
+            return resNOK;
+        } 
+                
+        if(true == isbusy(b))
+        {
+            return resNOK;
+        }
+        
+        std::uint8_t index = embot::common::tointegral(b);     
+        
+        embot::hw::i2c::s_privatedata.transaction[index].ongoing = true; 
        
+        volatile HAL_StatusTypeDef r = HAL_I2C_Master_Transmit(s_privatedata.handles[index], static_cast<uint16_t>(adr), reinterpret_cast<uint8_t*>(content.pointer), static_cast<uint16_t>(content.size), timeout/1000);        
+        
+        embot::hw::i2c::s_privatedata.transaction[index].ongoing = false;
+        
+        return (HAL_OK == r) ? resOK : resNOK;
+    }
     
     static result_t s_write(I2C b, ADR adr, REG reg, const embot::common::Data &content, const embot::common::Callback &oncompletion)
     {   
@@ -403,16 +439,17 @@ namespace embot { namespace hw { namespace i2c {
         if(reg == regNONE)
         {
             // it is a single-stage operation: read<values>
-            // i dont need to ask whcih register to read from because the slave already knows what to send.
+            // i dont need to ask which register to read from because the slave already knows what to send.
             // i do the read<> request with HAL_I2C_Master_Receive_DMA(recdata).
             // the completion of reading operation is signalled by the call of HAL_I2C_MasterRxCpltCallback(). 
             // at this stage recdata will contain the received data.            
             I2C_HandleTypeDef* hi2cx = embot::hw::i2c::s_privatedata.handles[index];
-            HAL_I2C_Master_Receive_DMA( hi2cx, 
+            HAL_StatusTypeDef r = HAL_I2C_Master_Receive_DMA( hi2cx, 
                                         embot::hw::i2c::s_privatedata.transaction[index].addr, 
                                         static_cast<std::uint8_t*>(embot::hw::i2c::s_privatedata.transaction[index].recdata.pointer),  
                                         static_cast<std::uint16_t>(embot::hw::i2c::s_privatedata.transaction[index].recdata.size)
-                                    );            
+                                    );  
+            res = (HAL_OK == r) ? resOK : resNOK;                                        
         }
         else
         {

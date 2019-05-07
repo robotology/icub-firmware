@@ -122,20 +122,13 @@ extern uint8_t eo_canserv_NumberOfFramesInRXqueue(EOtheCANservice *p, eOcanport_
 extern eOresult_t eo_canserv_Parse(EOtheCANservice *p, eOcanport_t canport, uint8_t maxnumofcanframes, uint8_t *numofreadcanframes); 
 
 
-// must specify all the entries in eOcanprot_descriptor_t
 extern eOresult_t eo_canserv_SendCommandToLocation(EOtheCANservice *p, eOcanprot_command_t *command, eObrd_canlocation_t loc);
 
-/** @fn         extern eOresult_t eo_canserv_Parse(EOtheCANservice *p, eOcanframe_t *frame, eOcanport_t port) 
-    @brief      It parses a can frame and executes associated actions. 
-    @param      p               The singleton
-    @param      frame           The input can frame.
-    @param      port            The can port
-    @return     eores_OK if the parsing is successful, eores_NOK_nullpointer in case of NULL parameters, eores_NOK_generic if the frame is not recognised.  
- **/
-// of eOcanprot_descriptor_t we need fill only ...clas, type, and value
 extern eOresult_t eo_canserv_SendCommandToEntity(EOtheCANservice *p, eOcanprot_command_t *command, eOprotID32_t id32); 
 
 extern eOresult_t eo_canserv_SendCommandToAllBoardsInEntity(EOtheCANservice *p, eOcanprot_command_t *command, eOprotID32_t id32);
+
+extern eOresult_t eo_canserv_SendCommandToAllBoardsInEntity2(EOtheCANservice *p, eOcanprot_command_t *command, eOprotID32_t id32);
 
 
 extern eOresult_t eo_canserv_TXstartAll(EOtheCANservice *p, uint8_t *sizeofTXqueueCAN1, uint8_t *sizeofTXqueueCAN2);

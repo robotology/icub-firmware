@@ -110,7 +110,7 @@ namespace embot { namespace hw { namespace bsp {
 }}} // namespace embot { namespace hw { namespace bsp {
 
 
-
+    
 namespace embot { namespace hw { namespace bsp { namespace gpio {
         
     // sadly we cannot use constepr because of the reinterpret_cast<> inside GPIOA etc.
@@ -145,7 +145,7 @@ namespace embot { namespace hw { namespace bsp { namespace led {
     
     #if     defined(STM32HAL_BOARD_NUCLEO64)    
            
-    constexpr PROP led1p = { .on = embot::hw::gpio::State::SET, .off = embot::hw::gpio::State::RESET, .gpio = {LD2_GPIO_Port, LD2_Pin}  };  
+    constexpr PROP led1p = { .on = embot::hw::gpio::State::SET, .off = embot::hw::gpio::State::RESET, .gpio = {embot::hw::GPIO::PORT::A, embot::hw::GPIO::PIN::five}  };  
         
     constexpr BSP thebsp {        
         // maskofsupported
@@ -258,7 +258,7 @@ namespace embot { namespace hw { namespace bsp { namespace button {
 
     #if     defined(STM32HAL_BOARD_NUCLEO64)    
         
-    constexpr PROP btn1p = { .pressed = embot::hw::gpio::State::RESET, .gpio = {B1_GPIO_Port, B1_Pin}  };  
+    constexpr PROP btn1p = { .pressed = embot::hw::gpio::State::RESET, .gpio = {embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::thirteen}  };  
         
     constexpr BSP thebsp {        
         // maskofsupported
@@ -516,13 +516,25 @@ namespace embot { namespace hw { namespace bsp { namespace flash {
         constexpr PROP applicationstorage   {{0x08000000+(252*1024),    (4)*1024,           2*1024}};   // applicationstorage: 4k on top of application
 
     #elif   defined(STM32HAL_BOARD_PSC)
+    
+        #if defined(EMBOT_APPL_ZEROOFFSET)
+        
+        constexpr PROP whole                {{0x08000000,               256*1024,           2*1024}}; 
+        constexpr PROP bootloader           {{0x08000000,               (78)*1024,          2*1024}};   // bootloader; we dont use it
+        constexpr PROP sharedstorage        {{0x08000000+(250*1024),    (2)*1024,           2*1024}};   // sharedstorage: on top of a 2K-smaller application
+        constexpr PROP application          {{0x08000000,               (250)*1024,         2*1024}};   // application @ 000k, 250k big
+        constexpr PROP applicationstorage   {{0x08000000+(252*1024),    (4)*1024,           2*1024}};   // applicationstorage: on top of application  
+        
+        #else
            
         // psc: application @ 080k
         constexpr PROP whole                {{0x08000000,               256*1024,           2*1024}}; 
         constexpr PROP bootloader           {{0x08000000,               (78)*1024,          2*1024}};   // bootloader
         constexpr PROP sharedstorage        {{0x08000000+(78*1024),     (2)*1024,           2*1024}};   // sharedstorage: on top of bootloader
         constexpr PROP application          {{0x08000000+(80*1024),     (172)*1024,         2*1024}};   // application @ 080k
-        constexpr PROP applicationstorage   {{0x08000000+(252*1024),    (4)*1024,           2*1024}};   // applicationstorage: on top of application            
+        constexpr PROP applicationstorage   {{0x08000000+(252*1024),    (4)*1024,           2*1024}};   // applicationstorage: on top of application   
+        
+        #endif        
        
    #elif   defined(STM32HAL_BOARD_SG3)
            

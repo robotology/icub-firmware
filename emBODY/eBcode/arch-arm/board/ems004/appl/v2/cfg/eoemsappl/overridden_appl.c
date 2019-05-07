@@ -46,6 +46,7 @@
 #include "EOtheInertials2.h"
 #include "EOtheInertials3.h"
 #include "EOtheTemperatures.h"
+#include "EOthePSC.h"
 #include "EOtheETHmonitor.h"
 #include "EOVtheCallbackManager.h"
 
@@ -205,6 +206,10 @@ extern void eom_emsappl_hid_userdef_on_exit_RUN(EOMtheEMSappl* p)
     // temperatures
     eo_temperatures_Stop(eo_temperatures_GetHandle());    
     eo_temperatures_Deactivate(eo_temperatures_GetHandle());    
+    
+    // psc
+    eo_psc_Stop(eo_psc_GetHandle());
+    eo_psc_Deactivate(eo_psc_GetHandle());
 }
 
 extern void eom_emsappl_hid_userdef_on_entry_ERR(EOMtheEMSappl* p)
@@ -252,6 +257,10 @@ extern void eom_emsappl_hid_userdef_on_entry_ERR(EOMtheEMSappl* p)
     // temperatures
     eo_temperatures_Stop(eo_temperatures_GetHandle());    
     eo_temperatures_Deactivate(eo_temperatures_GetHandle()); 
+    
+    // psc
+    eo_psc_Stop(eo_psc_GetHandle());
+    eo_psc_Deactivate(eo_psc_GetHandle());
 }
 
 
