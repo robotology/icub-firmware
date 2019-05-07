@@ -33,7 +33,10 @@
 #include "EOtheCANdiscovery2.h"
 #include "EOtheMotionController.h"
 #include "EOtheSKIN.h"
+#include "EOtheMais.h"
+#include "EOthePSC.h"
 #include "EOtheETHmonitor.h"
+#include "EOtheSTRAIN.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -117,6 +120,8 @@ extern void eom_emsrunner_hid_userdef_taskDO_activity(EOMtheEMSrunner *p)
     // so far we tick only the motion control.
     eo_motioncontrol_Tick(eo_motioncontrol_GetHandle());
     
+	eo_mais_Tick(eo_mais_GetHandle());
+	eo_psc_Tick(eo_psc_GetHandle());
     // however, we could also tick others ....
     // TODO: see if i can move all the _Tick() in the do phase.
     
