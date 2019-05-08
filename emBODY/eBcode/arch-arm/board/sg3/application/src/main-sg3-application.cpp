@@ -53,11 +53,9 @@ static const embot::sys::Operation oninit = { embot::common::Callback(userdeflau
 static const embot::sys::Operation onidle = { embot::common::Callback(userdefonidle, nullptr), 512 };
 static const embot::sys::Operation onfatal = { embot::common::Callback(userdefonfatal, nullptr), 64 };
 
-#if defined(APPL_TESTZEROOFFSET)
-static const std::uint32_t address = embot::hw::flash::getpartition(embot::hw::FLASH::bootloader).address;
-#else
+
 static const std::uint32_t address = embot::hw::flash::getpartition(embot::hw::FLASH::application).address;
-#endif
+
 
 int main(void)
 { 

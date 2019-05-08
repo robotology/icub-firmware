@@ -37,15 +37,18 @@ static const embot::common::relTime BlinkSlowPeriod = 500*embot::common::time1mi
 static ActivityParam activity_param = { .blinkingperiod = BlinkSlowPeriod };
 
 // use build 222 for all the updaterofbootloader
-static const embot::app::canprotocol::versionOfAPPLICATION vAP = {1, 100 , 1};
+static const embot::app::canprotocol::versionOfAPPLICATION vAP = {1, 3 , 222};
 static const embot::app::canprotocol::versionOfCANPROTOCOL vCP = {2, 0};
+
+static const std::uint32_t address = embot::hw::flash::getpartition(embot::hw::FLASH::application).address;
+static const std::uint32_t vectorlocation = address - embot::hw::flash::getpartition(embot::hw::FLASH::whole).address;
 
 int main(void)
 { 
-#if defined(APPL_TESTZEROOFFSET)
-#else    
-    embot::hw::sys::relocatevectortable(embot::hw::flash::getpartition(embot::hw::FLASH::application).address);
-#endif
+    if(0 != vectorlocation)
+    {        
+        embot::hw::sys::relocatevectortable(vectorlocation);
+    }
     
     embot::app::theBootloader & bootloader = embot::app::theBootloader::getInstance();
            

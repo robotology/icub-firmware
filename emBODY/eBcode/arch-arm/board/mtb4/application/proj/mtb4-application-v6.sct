@@ -25,8 +25,8 @@
 ; 128k is: LR_IROM1 0x08020000 0x00020000  {    ; load region size_region
 ; if we want to start at 80k, with size 256-80-4 and have a hole of 4k on top ... LR_IROM1 0x08014000 0x0002B000  {    ; load region size_region
 ;LR_IROM1 0x08014000 0x0002B000  {    ; load region size_region
-LR_IROM1 0x08020000 0x00020000  {    ; load region size_region
-  ER_IROM1 0x08020000 0x00020000  {  ; load address = execution address
+LR_IROM1 0x08020000 0x0001F000  {    ; load region size_region
+  ER_IROM1 0x08020000 0x0001F000  {  ; load address = execution address
    *.o (RESET, +First)
    *(InRoot$$Sections)
    .ANY (+RO)

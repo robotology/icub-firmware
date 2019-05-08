@@ -463,11 +463,27 @@ namespace embot { namespace hw { namespace bsp { namespace flash {
     static_assert(embot::common::tointegral(embot::hw::FLASH::maxnumberof) < 8*sizeof(SUPP::supportedmask), "FLASH::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
     static_assert(embot::common::tointegral(embot::hw::FLASH::maxnumberof) < embot::common::tointegral(embot::hw::FLASH::none), "FLASH::maxnumberof must be higher that FLASH::none, so that we can optimise code");
 
+    #if defined(EMBOT_APPL_ZEROOFFSET)
     
-    #if     defined(STM32HAL_BOARD_NUCLEO64) 
+        // used for special debug. in this case we use the whole 256k of flash even if there is more
+        #if defined(STM32HAL_BOARD_MTB4) || defined(STM32HAL_BOARD_STRAIN2) || defined(STM32HAL_BOARD_RFE) || defined(STM32HAL_BOARD_PSC) || defined(STM32HAL_BOARD_SG3)
+    
+            #warning CAVEAT: EMBOT_APPL_ZEROOFFSET is defined. use a proper scatter file to place the application in the correct place
+
+            constexpr PROP whole                {{0x08000000,               (256)*1024,         2*1024}}; 
+            constexpr PROP bootloader           {{0x08000000,               (250)*1024,         2*1024}};   // bootloader; we dont use it ... but ok, give it same space as appl
+            constexpr PROP sharedstorage        {{0x08000000+(250*1024),    (2)*1024,           2*1024}};   // sharedstorage: on top of a 2K-smaller application
+            constexpr PROP application          {{0x08000000,               (250)*1024,         2*1024}};   // application @ 000k, 250k big
+            constexpr PROP applicationstorage   {{0x08000000+(252*1024),    (4)*1024,           2*1024}};   // applicationstorage: on top of application    
+        
+        #else
+            #error this board does not support macro EMBOT_APPL_ZEROOFFSET yet
+        #endif
+    
+    #elif   defined(STM32HAL_BOARD_NUCLEO64) 
 
         // any: application @ 128k but ... applicationstorage on top
-        constexpr PROP whole                {{0x08000000,               256*1024,           2*1024}}; 
+        constexpr PROP whole                {{0x08000000,               (256)*1024,         2*1024}}; 
         constexpr PROP bootloader           {{0x08000000,               (124)*1024,         2*1024}};   // bootloader
         constexpr PROP sharedstorage        {{0x08000000+(124*1024),    (4)*1024,           2*1024}};   // sharedstorage: 4k on top of bootloader
         constexpr PROP application          {{0x08000000+(128*1024),    (124)*1024,         2*1024}};   // application @ 128k
@@ -476,7 +492,7 @@ namespace embot { namespace hw { namespace bsp { namespace flash {
     #elif   defined(STM32HAL_BOARD_MTB4)
            
         // any: application @ 128k but ... applicationstorage on top
-        constexpr PROP whole                {{0x08000000,               256*1024,           2*1024}}; 
+        constexpr PROP whole                {{0x08000000,               (256)*1024,         2*1024}}; 
         constexpr PROP bootloader           {{0x08000000,               (124)*1024,         2*1024}};   // bootloader
         constexpr PROP sharedstorage        {{0x08000000+(124*1024),    (4)*1024,           2*1024}};   // sharedstorage: 4k on top of bootloader
         constexpr PROP application          {{0x08000000+(128*1024),    (124)*1024,         2*1024}};   // application @ 128k
@@ -488,7 +504,7 @@ namespace embot { namespace hw { namespace bsp { namespace flash {
         #if defined(STRAIN2_APP_AT_128K)
         
         // strain legacy: application @ 128k and application storage together with sharedstorage
-        constexpr PROP whole                {{0x08000000,               256*1024,           2*1024}}; 
+        constexpr PROP whole                {{0x08000000,               (256)*1024,         2*1024}}; 
         constexpr PROP bootloader           {{0x08000000,               (124)*1024,         2*1024}};   // bootloader
         constexpr PROP sharedstorage        {{0x08000000+(124*1024),    (4)*1024,           2*1024}};   // sharedstorage: on top of bootloader
         constexpr PROP applicationstorage   {{0x08000000+(124*1024),    (4)*1024,           2*1024}};   // applicationstorage: together with sharedstorage
@@ -497,7 +513,7 @@ namespace embot { namespace hw { namespace bsp { namespace flash {
         #else 
         
         // strain2: application @ 080k
-        constexpr PROP whole                {{0x08000000,               256*1024,           2*1024}}; 
+        constexpr PROP whole                {{0x08000000,               (256)*1024,         2*1024}}; 
         constexpr PROP bootloader           {{0x08000000,               (78)*1024,          2*1024}};   // bootloader
         constexpr PROP sharedstorage        {{0x08000000+(78*1024),     (2)*1024,           2*1024}};   // sharedstorage: on top of bootloader
         constexpr PROP application          {{0x08000000+(80*1024),     (172)*1024,         2*1024}};   // application @ 080k
@@ -507,39 +523,27 @@ namespace embot { namespace hw { namespace bsp { namespace flash {
         
 
     #elif   defined(STM32HAL_BOARD_RFE)
-    
+            
         // any: application @ 128k but ... applicationstorage on top
-        constexpr PROP whole                {{0x08000000,               256*1024,           2*1024}}; 
+        constexpr PROP whole                {{0x08000000,               (256)*1024,         2*1024}}; 
         constexpr PROP bootloader           {{0x08000000,               (124)*1024,         2*1024}};   // bootloader
         constexpr PROP sharedstorage        {{0x08000000+(124*1024),    (4)*1024,           2*1024}};   // sharedstorage: 4k on top of bootloader
         constexpr PROP application          {{0x08000000+(128*1024),    (124)*1024,         2*1024}};   // application @ 128k
         constexpr PROP applicationstorage   {{0x08000000+(252*1024),    (4)*1024,           2*1024}};   // applicationstorage: 4k on top of application
-
+            
     #elif   defined(STM32HAL_BOARD_PSC)
-    
-        #if defined(EMBOT_APPL_ZEROOFFSET)
-        
-        constexpr PROP whole                {{0x08000000,               256*1024,           2*1024}}; 
-        constexpr PROP bootloader           {{0x08000000,               (78)*1024,          2*1024}};   // bootloader; we dont use it
-        constexpr PROP sharedstorage        {{0x08000000+(250*1024),    (2)*1024,           2*1024}};   // sharedstorage: on top of a 2K-smaller application
-        constexpr PROP application          {{0x08000000,               (250)*1024,         2*1024}};   // application @ 000k, 250k big
-        constexpr PROP applicationstorage   {{0x08000000+(252*1024),    (4)*1024,           2*1024}};   // applicationstorage: on top of application  
-        
-        #else
-           
+               
         // psc: application @ 080k
-        constexpr PROP whole                {{0x08000000,               256*1024,           2*1024}}; 
+        constexpr PROP whole                {{0x08000000,               (256)*1024,         2*1024}}; 
         constexpr PROP bootloader           {{0x08000000,               (78)*1024,          2*1024}};   // bootloader
         constexpr PROP sharedstorage        {{0x08000000+(78*1024),     (2)*1024,           2*1024}};   // sharedstorage: on top of bootloader
         constexpr PROP application          {{0x08000000+(80*1024),     (172)*1024,         2*1024}};   // application @ 080k
         constexpr PROP applicationstorage   {{0x08000000+(252*1024),    (4)*1024,           2*1024}};   // applicationstorage: on top of application   
-        
-        #endif        
-       
+                  
    #elif   defined(STM32HAL_BOARD_SG3)
            
         // psc: application @ 080k
-        constexpr PROP whole                {{0x08000000,               256*1024,           2*1024}}; 
+        constexpr PROP whole                {{0x08000000,               (256)*1024,         2*1024}}; 
         constexpr PROP bootloader           {{0x08000000,               (78)*1024,          2*1024}};   // bootloader
         constexpr PROP sharedstorage        {{0x08000000+(78*1024),     (2)*1024,           2*1024}};   // sharedstorage: on top of bootloader
         constexpr PROP application          {{0x08000000+(80*1024),     (172)*1024,         2*1024}};   // application @ 080k

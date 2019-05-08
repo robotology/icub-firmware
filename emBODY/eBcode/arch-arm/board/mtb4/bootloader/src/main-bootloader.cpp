@@ -38,7 +38,7 @@ static const embot::common::relTime BlinkFastPeriod = 200*embot::common::time1mi
 static const embot::common::relTime BlinkSlowPeriod = 500*embot::common::time1millisec;
 static const embot::common::relTime BlinkMadlyPeriod = 50*embot::common::time1millisec;
 
-static const embot::app::canprotocol::versionOfBOOTLOADER vBL = {1, 2};
+static const embot::app::canprotocol::versionOfBOOTLOADER vBL = {1, 3};
 static const std::uint8_t defADDRESS = 13;
 static const char defaultInfo32[] = {"I am a c++11 mtb4"};
 

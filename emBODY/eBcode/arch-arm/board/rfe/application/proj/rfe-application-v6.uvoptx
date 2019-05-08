@@ -230,7 +230,7 @@
   </Target>
 
   <Target>
-    <TargetName>rfe-v6-0offset-stlink</TargetName>
+    <TargetName>rfe-0offset-stlink</TargetName>
     <ToolsetNumber>0x4</ToolsetNumber>
     <ToolsetName>ARM-ADS</ToolsetName>
     <TargetOption>

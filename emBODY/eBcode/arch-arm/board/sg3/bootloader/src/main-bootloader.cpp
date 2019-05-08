@@ -37,7 +37,7 @@ static const embot::common::relTime BlinkMadlyPeriod = 50*embot::common::time1mi
 
 static ActivityParam activity_param = { .blinkingperiod = BlinkFastPeriod };
 
-static const embot::app::canprotocol::versionOfBOOTLOADER vBL = {1, 0};
+static const embot::app::canprotocol::versionOfBOOTLOADER vBL = {1, 1};
 static const std::uint8_t defADDRESS = 1;
 static const char defaultInfo32[] = {"I am a sg3"};
 

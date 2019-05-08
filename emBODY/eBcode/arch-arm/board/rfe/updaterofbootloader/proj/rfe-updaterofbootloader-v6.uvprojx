@@ -718,7 +718,7 @@
       <TargetName>rfe-v6-0offset-stlink</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6100001::V6.10.1::.\ARMCLANG</pCCUsed>
+      <pCCUsed>6120000::V6.12::.\ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -1020,7 +1020,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>2</Optim>
+            <Optim>6</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -1044,7 +1044,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register</MiscControls>
-              <Define>USE_STM32HAL STM32HAL_BOARD_RFE APPL_TESTZEROOFFSET</Define>
+              <Define>USE_STM32HAL STM32HAL_BOARD_RFE STM32HAL_DRIVER_V183 APPL_TESTZEROOFFSET</Define>
               <Undefine></Undefine>
               <IncludePath>..\src-plus;..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask;..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\eBcode\arch-arm\embot\common;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\sys;..\..\..\..\..\..\eBcode\arch-arm\embot;..\src\others;..\..\..\..\..\..\eBcode\arch-arm\embot\tools;..\..\..\..\..\..\eBcode\arch-arm\embot\binary;..\..\..\..\..\..\eBcode\arch-arm\embot\dsp;..\src\bosch-driver;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\src\STM32_USB_Device_Library\Class\CDC\Inc;..\src\STM32_USB_Device_Library\Core\Inc;..\src\usb_user;..\..\..\..\libs\lowlevel\stm32hal\src\driver\stm32l4-v183\inc-nonsiusa;..\src;..\..\..\..\libs\lowlevel\stm32hal\src\board\rfe\inc-nonisusa;..\src\faceExpressions</IncludePath>
             </VariousControls>

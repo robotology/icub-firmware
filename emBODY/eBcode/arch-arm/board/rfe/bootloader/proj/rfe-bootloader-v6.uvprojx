@@ -563,6 +563,21 @@
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_led.cpp</FilePath>
             </File>
             <File>
+              <FileName>embot_hw_timer.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\hw\embot_hw_timer.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_gpio.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\hw\embot_hw_gpio.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>embot-hw-lowlevel</GroupName>
+          <Files>
+            <File>
               <FileName>embot_hw_lowlevel.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\embot\hw\embot_hw_lowlevel.cpp</FilePath>
@@ -617,16 +632,6 @@
                   </Cads>
                 </FileArmAds>
               </FileOption>
-            </File>
-            <File>
-              <FileName>embot_hw_timer.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\embot\hw\embot_hw_timer.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_hw_gpio.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\embot\hw\embot_hw_gpio.cpp</FilePath>
             </File>
           </Files>
         </Group>

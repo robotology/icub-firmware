@@ -83,7 +83,7 @@ const embot::hw::SI7051::Config SI7051config = embot::hw::bsp::strain2::thermome
 #endif // TEST_ENABLED
 
 
-static const embot::app::canprotocol::versionOfAPPLICATION vAP = {2, 0, 2};
+static const embot::app::canprotocol::versionOfAPPLICATION vAP = {2, 0, 3};
 static const embot::app::canprotocol::versionOfCANPROTOCOL vCP = {2, 0};
 
 static void userdeflauncher(void* param);
@@ -95,11 +95,7 @@ static const embot::sys::Operation oninit = { embot::common::Callback(userdeflau
 static const embot::sys::Operation onidle = { embot::common::Callback(userdefonidle, nullptr), 512 };
 static const embot::sys::Operation onfatal = { embot::common::Callback(userdefonfatal, nullptr), 64 };
 
-#if defined(APPL_TESTZEROOFFSET)
-static const std::uint32_t address = eembot::hw::flash::getpartition(embot::hw::FLASH::bootloader).address;
-#else
 static const std::uint32_t address = embot::hw::flash::getpartition(embot::hw::FLASH::application).address;
-#endif
 
 int main(void)
 { 
