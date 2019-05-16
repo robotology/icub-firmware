@@ -117,10 +117,10 @@ namespace embot { namespace common {
     using Message = void *;
     
     
-    template <typename T>
-    constexpr typename std::underlying_type<T>::type tointegral(T value) 
+    template<typename E>         // C++14 [Meyers, pag. 73]
+    constexpr auto tointegral(E enumerator) noexcept 
     {
-        return static_cast<typename std::underlying_type<T>::type>(value);
+        return static_cast<std::underlying_type_t<E>>(enumerator);
     }
     
     class Storage
