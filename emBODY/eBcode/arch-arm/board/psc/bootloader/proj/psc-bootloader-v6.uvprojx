@@ -335,7 +335,7 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls>-Wno-pragma-pack -Wno-deprecated-register</MiscControls>
+              <MiscControls>-Wno-pragma-pack -Wno-deprecated-register -std=c++17</MiscControls>
               <Define>USE_STM32HAL STM32HAL_BOARD_PSC STM32HAL_DRIVER_V190</Define>
               <Undefine></Undefine>
               <IncludePath>..\src-plus;..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask;..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\eBcode\arch-arm\embot\common;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\sys;..\..\..\..\..\..\eBcode\arch-arm\embot;..\..\..\..\..\..\eBcode\arch-arm\embot\binary;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib</IncludePath>
@@ -419,7 +419,7 @@
             </File>
             <File>
               <FileName>eventviewer.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\..\libs\midware\eventviewer\src\eventviewer.c</FilePath>
             </File>
           </Files>
