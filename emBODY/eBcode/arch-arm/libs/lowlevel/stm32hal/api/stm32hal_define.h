@@ -39,8 +39,8 @@ extern "C" {
     
     @{        
  **/
-
-
+    
+    
 #if !defined(USE_STM32HAL)
 #define USE_STM32HAL
 #endif   
@@ -50,12 +50,17 @@ extern "C" {
 #endif   
 
 
-// c++-11 makes obsolete keyword volatile. 
+// c++-11 makes deprecated keyword volatile. c++-17 makes it not valid anymore
 // i have two options: (a) use  -Wno-deprecated-register (b) remove it to avoid armclang complains.
 //#if __ARMCOMPILER_VERSION > 6000000
 //    #define register 
 //#endif
-// i choose the -Wno-deprecated-register solution
+// i choose the -Wno-deprecated-register solution in projects to avoid interference w/ stm32 lib. but with c++17 i must remove it
+
+#if (__cplusplus >= 201703L)
+    //#warning c++-17 features enabled: disabling keyword register in stm32hal
+    #define register 
+#endif
     
 #if     defined(STM32HAL_BOARD_NUCLEO64)
 
