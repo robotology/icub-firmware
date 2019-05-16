@@ -61,7 +61,7 @@ struct embot::app::theBootloader::Impl
     }
     
     
-    void *operator new(std::size_t size) throw(std::bad_alloc)
+    void *operator new(std::size_t size) noexcept(false)
     {
         static std::uint64_t s_data_impl[(sizeof(embot::app::theBootloader::Impl)+7)/8] = {0};
         return s_data_impl;
@@ -85,7 +85,7 @@ struct embot::app::theBootloader::Impl
 // --------------------------------------------------------------------------------------------------------------------
 
 
-void * embot::app::theBootloader::operator new(std::size_t size) throw(std::bad_alloc)
+void * embot::app::theBootloader::operator new(std::size_t size) noexcept(false)
 {
     static std::uint64_t s_data_jumper[(sizeof(embot::app::theBootloader)+7)/8] = {0};
     return s_data_jumper;

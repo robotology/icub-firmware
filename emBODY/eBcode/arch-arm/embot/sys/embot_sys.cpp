@@ -119,8 +119,8 @@ extern "C" void osal_ext_free(void* m)
 //    osal_base_memory_del(mem);
 //}
 
-// does it work?
-void* operator new(std::size_t size) throw(std::bad_alloc)
+// and here is what i need with armclang and -std=c++17
+void* operator new(std::size_t size) noexcept(false)
 {
     void* ptr = osal_base_memory_new(size);
     return ptr;
