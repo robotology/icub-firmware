@@ -495,6 +495,11 @@ static void get_jomo_coupling_info(const eOmc_4jomo_coupling_t *jomoCouplingInfo
         o->jointSet[s].special_limit = jsetcfg[s].constraints.param1;
         //NOTE: jsetcfg[s].constraints.param2 is not used currently. It is reserved for future use
         
+        
+#ifdef R1_HAND_MKII
+        o->jointSet[s].special_constraint = eomc_jsetconstraint_cerhand2;
+        o->jointSet[s].special_limit = 500;
+#endif
     }   
         
         
@@ -549,8 +554,7 @@ void MController_config_board(const eOmn_serv_configuration_t* brd_cfg)
             break;
         case eomn_serv_MC_mc2pluspsc:
             carray = eo_constarray_Load((EOarray*)&brd_cfg->data.mc.mc2pluspsc.arrayofjomodescriptors);
-            o->nSets = o->nEncods = o->nJoints = brd_cfg->data.mc.mc2pluspsc.arrayofjomodescriptors.head.size;
-            #warning @Ale, please check if the actuation type is correct 
+            o->nSets = o->nEncods = o->nJoints = brd_cfg->data.mc.mc2pluspsc.arrayofjomodescriptors.head.size; 
             o->actuation_type = HARDWARE_MC4p; 
             jomoCouplingInfo = &(brd_cfg->data.mc.mc2pluspsc.jomocoupling);            
             break;

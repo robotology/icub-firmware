@@ -466,8 +466,8 @@ BOOL Joint_manage_R1_finger_tension_constraint(Joint* o)
     //if switch_val< 1000 than hard stop reached, if switch_val> 4000 that hard stop is not reached, 
     //...in between we could use the last value....(hysteresis)
     
-    uint32_t switch_val = hal_adc_get_hall_sensor_analog_input_mV(o->ID);
-    
+    uint32_t switch_val = hal_adc_get_hall_sensor_analog_input_mV(1 - o->ID);
+            
     if (switch_val < 1500) 
     {
         loose_cable[o->ID] = TRUE;
@@ -475,8 +475,27 @@ BOOL Joint_manage_R1_finger_tension_constraint(Joint* o)
     else if (switch_val > 3500)
     {        
         loose_cable[o->ID] = FALSE;
-    }    
-    //        open intention
+    } 
+    
+    // open intention    
+    
+//    static int noflood[] = {0, 250};
+//    
+//    if (++noflood[o->ID]> 500)
+//    {
+//        noflood[o->ID] = 0;
+//        
+//        eOerrmanDescriptor_t errdes = {0};
+
+//        errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
+//        errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+//        errdes.sourceaddress    = o->ID;
+//        errdes.par16            = switch_val;
+//        errdes.par64            = 0;
+//        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, "FINECORSA", NULL, &errdes);
+//    }
+    
+    //return FALSE;
     return ((o->pos_err < ZERO) && loose_cable[o->ID]);
 }
 
