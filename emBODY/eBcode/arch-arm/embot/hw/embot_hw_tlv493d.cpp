@@ -49,6 +49,7 @@ using namespace embot::hw;
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
 // --------------------------------------------------------------------------------------------------------------------
 
+#if 0
     volatile int16_t Tv = 0;
     volatile int16_t Xv = 0;
     volatile int16_t Yv = 0;
@@ -69,6 +70,8 @@ using namespace embot::hw;
     volatile int32_t angle8 = 0; 
     
     volatile uint32_t power = 0;
+
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - all the rest
@@ -215,11 +218,11 @@ namespace embot { namespace hw { namespace tlv493d {
         //std::int16_t tempval = acq->registermap.getT();
         //bool isava = acq->registermap.isvalid();               
         
-        std::int16_t Xv = acq->registermap.getX();
-        std::int16_t Yv = acq->registermap.getY();
+        volatile std::int16_t Xv = acq->registermap.getX();
+        volatile std::int16_t Yv = acq->registermap.getY();
         //constexpr double todeg = 57.29577957855;  
         constexpr double tocentdeg = 5729.577957855;
-        double an12atan2 = atan2(Yv, Xv) * tocentdeg + 18000.0;
+        volatile double an12atan2 = atan2(Yv, Xv) * tocentdeg + 18000.0;
 
         acq->position = static_cast<Position>(an12atan2);
         acq->ongoing = false;
