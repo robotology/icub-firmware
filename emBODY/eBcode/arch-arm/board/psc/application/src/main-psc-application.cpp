@@ -82,10 +82,12 @@ embot::hw::tlv493d::Config tlvconfig { tlvi2c, 400000 };
 
 #include "embot_app_application_thePOSreader.h"
 
+#include "embot_app_application_theCANparserSkin.h"
+#include "embot_app_application_theSkin.h"
 
 
 
-static const embot::app::canprotocol::versionOfAPPLICATION vAP = {1, 1, 4};
+static const embot::app::canprotocol::versionOfAPPLICATION vAP = {1, 2, 0};
 static const embot::app::canprotocol::versionOfCANPROTOCOL vCP = {2, 0};
 
 static void userdeflauncher(void* param);
@@ -134,8 +136,9 @@ constexpr embot::common::Event evRXcanframe = 0x00000001 << 0;
 constexpr embot::common::Event evPOS0Xacquire = 0x00000001 << 1;
 constexpr embot::common::Event evPOS01dataready = 0x00000001 << 2;
 constexpr embot::common::Event evPOS02dataready = 0x00000001 << 3;
+static const embot::common::Event evSKINprocess = 0x00000001 << 4;
 
-constexpr std::uint8_t maxOUTcanframes = 32;
+constexpr std::uint8_t maxOUTcanframes = 48;
 
 constexpr std::array<embot::app::application::thePOSreader::Sensor, embot::app::application::thePOSreader::numberofpositions> POSsensors = 
 {{
@@ -177,7 +180,7 @@ static void start_evt_based(void)
     configEV.startup = eventbasedtask_init;
     configEV.onevent = eventbasedtask_onevent;
     configEV.param = nullptr;
-    configEV.stacksize = 4*1024;
+    configEV.stacksize = 5*1024;
     configEV.priority = 200;
     configEV.timeout = waitEventTimeout;
     eventbasedtask->start(configEV);
@@ -203,7 +206,19 @@ static void start_evt_based(void)
     // start parser of POS and link it to its agent: thePOSreader
     embot::app::application::theCANparserPOS &canparserpos = embot::app::application::theCANparserPOS::getInstance();
     embot::app::application::theCANparserPOS::Config configparserpos { &thepos };
-    canparserpos.initialise(configparserpos);        
+    canparserpos.initialise(configparserpos);    
+
+    // start agent of skin 
+    embot::app::application::theSkin &theskin = embot::app::application::theSkin::getInstance();
+    embot::app::application::theSkin::Config configskin;
+    configskin.tickevent = evSKINprocess;
+    configskin.totask = eventbasedtask;
+    theskin.initialise(configskin);   
+    
+    // start canparser skin and link it to its agent
+    embot::app::application::theCANparserSkin &canparserskin = embot::app::application::theCANparserSkin::getInstance();
+    embot::app::application::theCANparserSkin::Config configparserskin { &theskin };
+    canparserskin.initialise(configparserskin);      
 
 
     // finally start can. i keep it as last because i dont want that the isr-handler calls its onrxframe() 
@@ -263,6 +278,7 @@ static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask
         {            
             embot::app::application::theCANparserBasic &canparserbasic = embot::app::application::theCANparserBasic::getInstance();
             embot::app::application::theCANparserPOS &canparserpos = embot::app::application::theCANparserPOS::getInstance();
+            embot::app::application::theCANparserSkin &canparserskin = embot::app::application::theCANparserSkin::getInstance();
 
             // process w/ the basic parser, if not recognised call the parse specific of the board
             if(true == canparserbasic.process(frame, outframes))
@@ -271,7 +287,9 @@ static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask
             else if(true == canparserpos.process(frame, outframes))
             {               
             }
-
+            else if(true == canparserskin.process(frame, outframes))
+            {               
+            }
             
             if(remainingINrx > 0)
             {
@@ -299,6 +317,11 @@ static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask
         thepos.process(evPOS02dataready, outframes);        
     }    
             
+    if(true == embot::binary::mask::check(eventmask, evSKINprocess))
+    {
+        embot::app::application::theSkin &theskin = embot::app::application::theSkin::getInstance();
+        theskin.tick(outframes);        
+    }  
     
 //    // if we have any packet we transmit them
     std::uint8_t num = outframes.size();
