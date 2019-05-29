@@ -36,7 +36,7 @@
 #include "embot_app_theLEDmanager.h"
 
 
-static const embot::app::canprotocol::versionOfAPPLICATION vAP = {1, 3 , 2};
+static const embot::app::canprotocol::versionOfAPPLICATION vAP = {1, 3 , 3};
 static const embot::app::canprotocol::versionOfCANPROTOCOL vCP = {2, 0};
 
 static void userdeflauncher(void* param);
@@ -111,7 +111,7 @@ static void start_evt_based(void)
     // start task waiting for can messages. 
     eventbasedtask = new embot::sys::EventTask;  
     const embot::common::relTime waitEventTimeout = 50*1000; //50*1000; //5*1000*1000;       
-    embot::sys::EventTask::Config configEV(4*1024, 200, waitEventTimeout, eventbasedtask_init, eventbasedtask_onevent, nullptr);
+    embot::sys::EventTask::Config configEV(5*1024, 200, waitEventTimeout, eventbasedtask_init, eventbasedtask_onevent, nullptr);
     eventbasedtask->start(configEV);
         
     // start canparser basic

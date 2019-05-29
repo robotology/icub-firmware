@@ -429,7 +429,7 @@
             </File>
             <File>
               <FileName>eventviewer.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\src\eventviewer.c</FilePath>
             </File>
           </Files>
@@ -674,22 +674,22 @@
           <Files>
             <File>
               <FileName>AD7147.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\src\others\AD7147.c</FilePath>
             </File>
             <File>
               <FileName>I2C_Multi_SDA.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\src\others\I2C_Multi_SDA.c</FilePath>
             </File>
             <File>
               <FileName>AD7147_Configuration.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\src\others\AD7147_Configuration.c</FilePath>
             </File>
             <File>
               <FileName>if2hw_common.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\src\others\if2hw_common.c</FilePath>
               <FileOption>
                 <CommonProperty>
@@ -1322,7 +1322,7 @@
             </File>
             <File>
               <FileName>eventviewer.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\src\eventviewer.c</FilePath>
             </File>
           </Files>
@@ -1567,22 +1567,22 @@
           <Files>
             <File>
               <FileName>AD7147.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\src\others\AD7147.c</FilePath>
             </File>
             <File>
               <FileName>I2C_Multi_SDA.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\src\others\I2C_Multi_SDA.c</FilePath>
             </File>
             <File>
               <FileName>AD7147_Configuration.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\src\others\AD7147_Configuration.c</FilePath>
             </File>
             <File>
               <FileName>if2hw_common.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\src\others\if2hw_common.c</FilePath>
             </File>
           </Files>
@@ -2051,7 +2051,7 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls>-Wno-pragma-pack -Wno-deprecated-register</MiscControls>
+              <MiscControls>-Wno-pragma-pack -Wno-deprecated-register -std=c++17</MiscControls>
               <Define>USE_STM32HAL STM32HAL_BOARD_MTB4 STM32HAL_DRIVER_V190</Define>
               <Undefine></Undefine>
               <IncludePath>..\src-plus;..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask;..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\eBcode\arch-arm\embot\common;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\sys;..\..\..\..\..\..\eBcode\arch-arm\embot;..\src\others;..\..\..\..\..\..\eBcode\arch-arm\embot\binary;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib</IncludePath>
@@ -2164,7 +2164,7 @@
             </File>
             <File>
               <FileName>eventviewer.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\src\eventviewer.c</FilePath>
             </File>
           </Files>
@@ -2409,22 +2409,22 @@
           <Files>
             <File>
               <FileName>AD7147.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\src\others\AD7147.c</FilePath>
             </File>
             <File>
               <FileName>I2C_Multi_SDA.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\src\others\I2C_Multi_SDA.c</FilePath>
             </File>
             <File>
               <FileName>AD7147_Configuration.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\src\others\AD7147_Configuration.c</FilePath>
             </File>
             <File>
               <FileName>if2hw_common.c</FileName>
-              <FileType>1</FileType>
+              <FileType>8</FileType>
               <FilePath>..\src\others\if2hw_common.c</FilePath>
               <FileOption>
                 <CommonProperty>
