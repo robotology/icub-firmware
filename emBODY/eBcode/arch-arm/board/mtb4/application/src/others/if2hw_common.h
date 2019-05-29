@@ -70,9 +70,9 @@ typedef uint16_t if2hw_data_i2cmultisda_t;
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
 
-extern void if2hw_common_delay(uint64_t usec);
+//extern void if2hw_common_delay(uint64_t usec);
 
- 
+
 
 #ifdef __cplusplus
 }       // closing brace for extern "C"

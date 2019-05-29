@@ -36,7 +36,9 @@ typedef enum
 	sda5 = 5,
 	sda6 = 6,
 	sda7 = 7,
-}i2c_sda_num_t;
+} i2c_sda_num_t;
+
+enum SDAch_t { SDAch0 = 0, SDAch1 = 1, SDAch2 = 2, SDAch3 = 3, SDAall = 255 };
 
 
 #define i2c_sda_num_max 8
@@ -50,11 +52,18 @@ void I2C_Multi_SDA_deInit(unsigned char Channel);
 //Local functions
 //===============
 //High level functions
+unsigned char WriteViaI2C_onSdaX2( i2c_sda_num_t sdaNum, 
+                                    unsigned char DeviceAddress, 
+                                    const unsigned int RegisterStartAddress,
+                                    const unsigned char NumberOfRegistersToWrite, 
+                                    if2hw_data_i2cmultisda_t *DataBuffer, 
+                                    const unsigned int OffsetInBuffer);
+
 unsigned char WriteViaI2C(unsigned char Channel, unsigned char DeviceAddress, const unsigned int RegisterStartAddress, const unsigned char NumberOfRegistersToWrite, 
                           if2hw_data_i2cmultisda_t *DataBuffer, const unsigned int OffsetInBuffer);
 extern unsigned char WriteByteViaI2C(unsigned char Channel, unsigned char DeviceAddress, const unsigned char RegisterStartAddress, unsigned char DataBuffer);
-unsigned char WriteByteI2C_onSdaX(unsigned char Channel, i2c_sda_num_t sdaNum, unsigned char DeviceAddress, const unsigned int RegisterStartAddress, const unsigned char NumberOfRegistersToWrite, 
-                                  if2hw_data_i2cmultisda_t *DataBuffer, const unsigned int OffsetInBuffer);
+//unsigned char WriteByteI2C_onSdaX(unsigned char Channel, i2c_sda_num_t sdaNum, unsigned char DeviceAddress, const unsigned int RegisterStartAddress, const unsigned char NumberOfRegistersToWrite, 
+//                                  if2hw_data_i2cmultisda_t *DataBuffer, const unsigned int OffsetInBuffer);
 unsigned char WriteViaI2C_onSdaX(unsigned char Channel, i2c_sda_num_t sdaNum, unsigned char DeviceAddress, const unsigned int RegisterStartAddress, const unsigned char NumberOfRegistersToWrite, 
                                  if2hw_data_i2cmultisda_t *DataBuffer, const unsigned int OffsetInBuffer);
 unsigned char ReadBurstViaI2C(unsigned char Channel, unsigned char SDAnum, unsigned char DeviceAddress, const unsigned int RegisterStartAddress, const unsigned char NumberOfRegistersToRead, 
