@@ -429,6 +429,30 @@ namespace embot { namespace hw { namespace bsp { namespace tlv493d {
               
 }}}} // namespace embot { namespace hw { namespace bsp {  namespace tlv493d {
 
+
+namespace embot { namespace hw { namespace bsp { namespace multisda {
+    
+    struct PROP
+    {
+        constexpr static std::uint8_t numberof = 4;
+        embot::hw::bsp::gpio::PROP clk;
+        std::array<const embot::hw::bsp::gpio::PROP, numberof> sda;
+        constexpr PROP() = default;
+        constexpr PROP(const embot::hw::bsp::gpio::PROP &c, const std::array<const embot::hw::bsp::gpio::PROP, PROP::numberof> &s) :clk(c), sda(s) {}
+    };
+    
+    struct BSP
+    {
+        constexpr BSP(const embot::hw::bsp::gpio::PROP &c, const std::array<const embot::hw::bsp::gpio::PROP, PROP::numberof> &s) : prop(c, s) {}
+        constexpr BSP() : prop({}, {}) {}            
+          
+        PROP prop;
+    };
+    
+    const BSP& getBSP();
+              
+}}}} // namespace embot { namespace hw { namespace bsp {  namespace multisda {
+
 #endif  // include-guard
 
 

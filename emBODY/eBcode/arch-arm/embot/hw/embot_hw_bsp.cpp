@@ -1652,5 +1652,41 @@ namespace embot { namespace hw { namespace bsp { namespace tlv493d {
 }}}} // namespace embot { namespace hw { namespace bsp {  namespace tlv493d {
 
 
+namespace embot { namespace hw { namespace bsp { namespace multisda {
+  
+    #if     defined(STM32HAL_BOARD_PSC)
+
+    static const BSP thebsp { 
+        // clk = 
+        { I2C_CLK_GPIO_Port, I2C_CLK_Pin },
+        // sda
+        {{  
+            { I2C_SDA0_GPIO_Port, I2C_SDA0_Pin }, { I2C_SDA1_GPIO_Port, I2C_SDA1_Pin }, { I2C_SDA2_GPIO_Port, I2C_SDA2_Pin }, { I2C_SDA3_GPIO_Port, I2C_SDA3_Pin }            
+        }}
+    };
+    
+    #elif   defined(STM32HAL_BOARD_MTB4)
+
+    static const BSP thebsp { 
+        // clk = 
+        { SCK0_GPIO_Port, SCK0_Pin },
+        // sda
+        {{  
+            { SDA0_GPIO_Port, SDA0_Pin }, { SDA1_GPIO_Port, SDA1_Pin }, { SDA2_GPIO_Port, SDA2_Pin }, { SDA3_GPIO_Port, SDA3_Pin }            
+        }}
+    };
+    
+    #else
+        constexpr BSP thebsp { };
+    #endif
+ 
+    const BSP& getBSP() 
+    {
+        return thebsp;
+    }
+    
+}}}} // namespace embot { namespace hw { namespace bsp {  namespace multisda {
+
+
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 
