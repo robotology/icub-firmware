@@ -37,8 +37,8 @@ static const embot::common::relTime BlinkMadlyPeriod = 50*embot::common::time1mi
 
 static ActivityParam activity_param = { .blinkingperiod = BlinkFastPeriod };
 
-static const embot::app::canprotocol::versionOfBOOTLOADER vBL = {1, 1};
-static const std::uint8_t defADDRESS = 1;
+static const embot::app::canprotocol::versionOfBOOTLOADER vBL = {1, 2};
+static const std::uint8_t defADDRESS = 13;
 static const char defaultInfo32[] = {"I am a sg3"};
 
 int main(void)
@@ -115,7 +115,7 @@ static void bl_activity(void* param)
 
     // manage the basic canboardinfo
     embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance();    
-    canbrdinfo.synch(embot::app::canprotocol::Board::psc, vBL, defADDRESS, defaultInfo32);
+    canbrdinfo.synch(embot::app::canprotocol::Board::sg3, vBL, defADDRESS, defaultInfo32);
     
   
     // start task waiting for can messages.  
