@@ -22,26 +22,18 @@
 #define _EMBOT_APP_APPLICATION_THECANPARSERBASIC_H_
 
 #include "embot_common.h"
-
 #include "embot_hw_can.h"
-
 #include "embot_sys.h"
-
-
 #include <vector>
+#include <memory>
 
 namespace embot { namespace app { namespace application {
            
     class theCANparserBasic
     {
     public:
-        static theCANparserBasic& getInstance()
-        {
-            static theCANparserBasic* p = new theCANparserBasic();
-            return *p;
-        }
-        
-        
+        static theCANparserBasic& getInstance();
+                
     public:
         struct Config
         {
@@ -56,18 +48,12 @@ namespace embot { namespace app { namespace application {
         bool process(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);
 
     private:
-        theCANparserBasic(); 
-
-    public:
-        // remove copy constructors and copy assignment operators
-        theCANparserBasic(const theCANparserBasic&) = delete;
-        theCANparserBasic(theCANparserBasic&) = delete;
-        void operator=(const theCANparserBasic&) = delete;
-        void operator=(theCANparserBasic&) = delete;
+        theCANparserBasic();
+        ~theCANparserBasic();    
 
     private:    
         struct Impl;
-        Impl *pImpl;        
+        std::unique_ptr<Impl> pImpl;         
     };       
 
 

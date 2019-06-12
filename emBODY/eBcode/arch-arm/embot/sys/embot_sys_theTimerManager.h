@@ -22,21 +22,16 @@
 #define _EMBOT_SYS_THETIMERMANAGER_H_
 
 #include "embot_common.h"
-
 #include "embot_sys.h"
+#include "embot_sys_Timer.h"
+#include <memory>
 
 namespace embot { namespace sys {
-    
-    
-    
+            
     class theTimerManager
     {
     public:
-        static theTimerManager& getInstance()
-        {
-            static theTimerManager* p = new theTimerManager();
-            return *p;
-        }
+        static theTimerManager& getInstance();
         
     public:
         struct Config
@@ -47,23 +42,22 @@ namespace embot { namespace sys {
             Config() : priority(240), stacksize(1024), capacityofhandler(8) {}
         }; 
         
-        bool init(Config &config);
+        bool start(const Config &config);   
+
+        // this funtion is called by the timer. if false the expiration of the timer is processed internally and not w/ onexpiry()
+        bool started() const;        
         
-        bool start();    
+        // this funtion is called only by the timer. if called by someone else it returns false
+        // because the action of the timer is enabled only by internals of the timer itself.
+        bool onexpiry(const Timer &timer);
 
     private:
         theTimerManager();  
-
-    public:
-        // remove copy constructors and copy assignment operators
-        theTimerManager(const theTimerManager&) = delete;
-        theTimerManager(theTimerManager&) = delete;
-        void operator=(const theTimerManager&) = delete;
-        void operator=(theTimerManager&) = delete;
+        ~theTimerManager(); // i dont want a fool can delete it
 
     private:    
         struct Impl;
-        Impl *pImpl;        
+        std::unique_ptr<Impl> pImpl;       
     };       
 
 

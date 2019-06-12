@@ -23,25 +23,26 @@
 
 #include "embot_app_theApplication.h"
 
-#include "embot.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
+#include "embot_sys_theScheduler.h"
+#include "embot_sys_theTimerManager.h"
+#include "embot_sys_theCallbackManager.h"
+
 #include "embot_hw.h"
 #include "embot_hw_sys.h"
 #include "embot_hw_bsp.h"
+#include "embot_hw_flash.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
 // --------------------------------------------------------------------------------------------------------------------
 
 
-//void onIdle(void)
-//{
-//}
 
 struct embot::app::theApplication::Impl
 {    
@@ -52,9 +53,9 @@ struct embot::app::theApplication::Impl
 
     }
             
-    static void onidle(void);    
-    static void onfatal(void);    
-    static void osalstarter(void);
+    static void onidle(void *p);    
+    static void onfatal(void *p);    
+    static void osalstarter(void *p);
 };
 
 
@@ -66,21 +67,36 @@ struct embot::app::theApplication::Impl
 
 
 
-embot::app::theApplication::theApplication()
-: pImpl(new Impl)
+
+embot::app::theApplication& embot::app::theApplication::getInstance()
 {
-       
+    static theApplication* p = new theApplication();
+    return *p;
 }
 
-        
-void embot::app::theApplication::execute(Config &config)
+embot::app::theApplication::theApplication()
+//    : pImpl(new Impl)
 {
+    pImpl = std::make_unique<Impl>();
+}  
+
+    
+embot::app::theApplication::~theApplication() { }
+
+        
+bool embot::app::theApplication::execute(const Config &config)
+{
+    if(false == config.isvalid())
+    {
+        return false;
+    }
+    
     pImpl->config = config;
     
     // now we init the hw, we start the scheduler, we start a countdown with sys restart at the end ... we exec the activity ...
-    if(pImpl->config.addressofapplication > embot::hw::sys::startOfFLASH)
+    if(pImpl->config.addressofapplication > embot::hw::flash::getpartition(embot::hw::FLASH::whole).address)
     {
-        std::uint32_t vectorlocation = pImpl->config.addressofapplication - embot::hw::sys::startOfFLASH;
+        std::uint32_t vectorlocation = pImpl->config.addressofapplication - embot::hw::flash::getpartition(embot::hw::FLASH::whole).address;
         if(0 != vectorlocation)
         {
             embot::hw::sys::relocatevectortable(vectorlocation);
@@ -91,64 +107,48 @@ void embot::app::theApplication::execute(Config &config)
     embot::hw::bsp::Config cc(stm32c, embot::sys::timeNow);
     embot::hw::bsp::init(cc);
     
+    embot::sys::theScheduler::Config cfg;
+    cfg.timing = embot::sys::theScheduler::Timing(embot::hw::sys::clock(embot::hw::CLOCK::syscore),  pImpl->config.ticktime);
+    cfg.oninit = embot::sys::Operation(embot::common::Callback(embot::app::theApplication::Impl::osalstarter, nullptr), pImpl->config.init.stacksize);
+    cfg.onidle = embot::sys::Operation(embot::common::Callback(embot::app::theApplication::Impl::onidle, nullptr), pImpl->config.idle.stacksize);
+    cfg.onfatal = embot::sys::Operation(embot::common::Callback(embot::app::theApplication::Impl::onfatal, nullptr), pImpl->config.fatal.stacksize);
     
     embot::sys::theScheduler &thescheduler = embot::sys::theScheduler::getInstance();
-    embot::sys::theScheduler::Config cfg;
-    cfg.launcher = embot::app::theApplication::Impl::osalstarter;
-    cfg.launcherstacksize = pImpl->config.stacksizes.tasksysteminit;
-    cfg.onidle = embot::app::theApplication::Impl::onidle;
-    cfg.onidlestacksize = pImpl->config.stacksizes.taskonidle;
-    cfg.onfatalerror = embot::app::theApplication::Impl::onfatal;
-    cfg.clockfrequency = embot::hw::sys::clock(embot::hw::sys::CLOCK::syscore);
-    cfg.ticktime = config.osaltickperiod;
+    thescheduler.start(cfg);    
     
-    thescheduler.init(cfg);
-    thescheduler.start();    
-
     for(;;);
+    
+    return true;
 }
   
 
 
-void embot::app::theApplication::Impl::onidle(void)
+void embot::app::theApplication::Impl::onidle(void *p)
 {
     embot::app::theApplication &handle = embot::app::theApplication::getInstance();
-    if(nullptr != handle.pImpl->config.operations.onidle.callback)
-    {
-        handle.pImpl->config.operations.onidle.callback(handle.pImpl->config.operations.onidle.arg);
-    }    
+    handle.pImpl->config.idle.activity.execute(); 
 }
 
-void embot::app::theApplication::Impl::onfatal(void)
+void embot::app::theApplication::Impl::onfatal(void *p)
 {
     embot::app::theApplication &handle = embot::app::theApplication::getInstance();
-    if(nullptr != handle.pImpl->config.operations.onfatalerror.callback)
-    {
-        handle.pImpl->config.operations.onfatalerror.callback(handle.pImpl->config.operations.onfatalerror.arg);
-    }     
+    handle.pImpl->config.fatal.activity.execute();  
 }
 
 
-void embot::app::theApplication::Impl::osalstarter(void)
+void embot::app::theApplication::Impl::osalstarter(void *p)
 {
     embot::app::theApplication &handle = embot::app::theApplication::getInstance();
     
     embot::sys::theTimerManager& tmrman = embot::sys::theTimerManager::getInstance();
-
     embot::sys::theTimerManager::Config tmrmanconfig;
-
-    tmrman.init(tmrmanconfig);
-    tmrman.start();
+    tmrman.start(tmrmanconfig);
     
     embot::sys::theCallbackManager& cbkman = embot::sys::theCallbackManager::getInstance();
-    cbkman.start();    
+    embot::sys::theCallbackManager::Config cbkmanconfig;
+    cbkman.start(cbkmanconfig);  
     
-
-    if(nullptr != handle.pImpl->config.operations.atsysteminit.callback)
-    {
-        handle.pImpl->config.operations.atsysteminit.callback(handle.pImpl->config.operations.atsysteminit.arg);
-    }
-      
+    handle.pImpl->config.init.activity.execute();      
 }
 
 

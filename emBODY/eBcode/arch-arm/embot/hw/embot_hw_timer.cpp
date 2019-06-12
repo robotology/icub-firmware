@@ -22,15 +22,16 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "embot_hw_timer.h"
-#include "stm32hal.h"
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-
+#include "stm32hal.h"
 #include "embot_hw_sys.h"
+#include "embot_hw_bsp.h"
 
 #include <cstring>
 #include <vector>
@@ -49,22 +50,23 @@ using namespace std;
 // - all the rest
 // --------------------------------------------------------------------------------------------------------------------
 
-#if     !defined(HAL_TIM_MODULE_ENABLED)
+using namespace embot::hw;
 
+    
+#if     !defined(HAL_TIM_MODULE_ENABLED)
 
 namespace embot { namespace hw { namespace timer {
     
-    bool supported(Timer t)                                                                  { return false; }
-    bool initialised(Timer t)                                                                { return false; }
-    result_t init(Timer t, const Config &config)                                             { return resNOK; }
-    bool isrunning(Timer t)                                                                  { return false; }
-    result_t start(Timer t, const Mode &mode)                                                { return resNOK; }
-    result_t stop(Timer t)                                                                   { return resNOK; }
+    bool supported(embot::hw::TIMER t)                                                                  { return false; }
+    bool initialised(embot::hw::TIMER t)                                                                { return false; }
+    result_t init(embot::hw::TIMER t, const Config &config)                                             { return resNOK; }
+    bool isrunning(embot::hw::TIMER t)                                                                  { return false; }
+    result_t start(embot::hw::TIMER t, const Mode &mode)                                                { return resNOK; }
+    result_t stop(embot::hw::TIMER t)                                                                   { return resNOK; }
     
 }}} // namespace embot { namespace hw { namespace timer {
 
 #else
-
 
 // there are two parts: 
 // 1. the cpp driver under namespace embot::hw::onewire
@@ -74,114 +76,20 @@ namespace embot { namespace hw { namespace timer {
  
 namespace embot { namespace hw { namespace timer {
         
-    struct bspmap_t
-    {
-        std::uint32_t       mask;
-    };
-    
-    // const support maps
-#if     defined(STM32HAL_BOARD_STRAIN2)   
-
-    #define STM32HAL_HAS_TIM6
-    #define STM32HAL_HAS_TIM7
-    #define STM32HAL_HAS_TIM15
-    #define STM32HAL_HAS_TIM16
-    
-    static const std::uint8_t numberofsupported = 4;
-    
-    static const bspmap_t bspmap = 
-    {
-        (1 << static_cast<std::uint32_t>(Timer::six))       | (1 << static_cast<std::uint32_t>(Timer::seven)) | 
-        (1 << static_cast<std::uint32_t>(Timer::fifteen))   | (1 << static_cast<std::uint32_t>(Timer::sixteen))
-    };
-
-    static const std::uint8_t map2compactarray[static_cast<unsigned int>(Timer::maxnumberof)] = 
-    {   // each pos keeps either 255 or a valid index to the set of valid timers without holes 
-        255, 255, 255, 255, 255,
-        0,  // Timer::six
-        1,  // Timer::seven
-        255, 255, 255, 255, 255, 255, 255, 
-        2,  // Timer::fifteen 
-        3   // Timer::sixteen        
-    };
-
-#elif   defined(STM32HAL_BOARD_MTB4)    
-    
-    #define STM32HAL_HAS_TIM6
-    #undef STM32HAL_HAS_TIM7
-    #undef STM32HAL_HAS_TIM15
-    #undef STM32HAL_HAS_TIM16    
-    
-    static const std::uint8_t numberofsupported = 1;
-    
-    static const bspmap_t bspmap = 
-    {
-        (1 << static_cast<std::uint32_t>(Timer::six))
-    };
-
-    static const std::uint8_t map2compactarray[static_cast<unsigned int>(Timer::maxnumberof)] = 
-    {   // each pos keeps either 255 or a valid index to the set of valid timers without holes 
-        255, 255, 255, 255, 255,
-        0,  // Timer::six
-        255,  // Timer::seven
-        255, 255, 255, 255, 255, 255, 255, 
-        255,  // Timer::fifteen 
-        255   // Timer::sixteen        
-    };
-    
-#else
-    
-    static const std::uint8_t numberofsupported = 1; // cannot be 1 because ...
-    
-    static const bspmap_t bspmap = 
-    {
-        0x00000000
-    };
-    
-    static const std::uint8_t map2compactarray[1] = 
-    { 
-        255 
-    };
-    
-#endif
       
     // initialised mask: one variable for all the timers      
     static std::uint32_t initialisedmask = 0;
     
-    std::uint8_t timer2index(Timer t)
-    {   // use it only after verification of supported() ...
-        return static_cast<uint8_t>(t);
-    }
-        
-    bool supported(Timer t)
+    bool supported(TIMER t)
     {
-        if((Timer::none == t) || (Timer::maxnumberof == t))
-        {
-            return false;
-        }
-        return embot::binary::bit::check(bspmap.mask, timer2index(t));
+        return embot::hw::bsp::timer::getBSP().supported(t);
     }
     
-    bool initialised(Timer t)
+    bool initialised(TIMER t)
     {
-        if(Timer::none == t)
-        {
-            return false;
-        }
-        return embot::binary::bit::check(initialisedmask, timer2index(t));
-    } 
-
-    
-    std::uint8_t timer2indexofcompactarray(Timer t)
-    {
-        if(false == supported(t))
-        {
-            return 255;
-        }
-        
-        return map2compactarray[timer2index(t)];        
-    }
-
+        return embot::binary::bit::check(initialisedmask, embot::common::tointegral(t));
+        //return embot::binary::bit::check(initialisedmask, static_cast<std::uint8_t>(t));
+    }    
     
     // stm32 specific support
     struct stm32_tim_registervalues
@@ -190,34 +98,9 @@ namespace embot { namespace hw { namespace timer {
         std::uint16_t   period;        
     };
         
-    struct stm32_tim_mapping
-    {
-        embot::hw::sys::CLOCK   clock;        
-        TIM_TypeDef*            TIMx;
-        TIM_HandleTypeDef*      phandletimx;
-        bool                    isonepulse;
-        bool                    mastermode;
-    };
-
-#if     defined(STM32HAL_BOARD_STRAIN2)    
-    static const stm32_tim_mapping s_stm32_tim_mapping[numberofsupported] = 
-    { 
-        { embot::hw::sys::CLOCK::syscore, TIM6,  &htim6,  false, true }, 
-        { embot::hw::sys::CLOCK::syscore, TIM7,  &htim7,  false, true },
-        { embot::hw::sys::CLOCK::syscore, TIM15, &htim15, true,  false },
-        { embot::hw::sys::CLOCK::syscore, TIM16, &htim16, false, false }        
-    }; 
-#elif   defined(STM32HAL_BOARD_MTB4)    
-    static const stm32_tim_mapping s_stm32_tim_mapping[numberofsupported] = 
-    { 
-        { embot::hw::sys::CLOCK::syscore, TIM6,  &htim6,  false, true }       
-    };     
-#else
-    static const stm32_tim_mapping s_stm32_tim_mapping[1] = { {embot::hw::sys::CLOCK::none, nullptr, nullptr } };
-#endif 
     
     // retrieves the values to be put inside the stm32 register
-    void compute(Timer t, const stm32_tim_mapping *stm32data, const embot::common::relTime time, stm32_tim_registervalues &pars, embot::common::relTime &effectivetime)
+    void compute(TIMER t, const embot::hw::bsp::timer::PROP *stm32data, const embot::common::relTime time, stm32_tim_registervalues &pars, embot::common::relTime &effectivetime)
     {        
         // for some timers referencespeed could also be HAL_RCC_GetSysClockFreq() or HAL_RCC_GetPCLK1Freq() or HAL_RCC_GetPCLK2Freq()
         // i embed teh choice into that into embot::hw::sys::clock()
@@ -275,155 +158,116 @@ namespace embot { namespace hw { namespace timer {
 
     }        
 
-         
+#if (STM32HAL_DRIVER_VERSION >= 183)    
+    #warning look at the differences with the timer config. 
+    // so far only TIM6 is guaranteed to work. also ... the callbacks now are embedded in stm32 ... 
+#endif    
         
-    void mx_timx_init(Timer t, std::uint32_t time)
+    void mx_timx_init(TIMER t, std::uint32_t time)
     {
         std::uint32_t effectivetime = 0;
         stm32_tim_registervalues pars =  {0};
         
-        const stm32_tim_mapping *stm32data = &s_stm32_tim_mapping[timer2indexofcompactarray(t)];
+        const embot::hw::bsp::timer::PROP * stm32props = embot::hw::bsp::timer::getBSP().getPROP(t);
+        TIM_HandleTypeDef* phandletimx = stm32props->handle;
+
         
-        compute(t, stm32data, time, pars, effectivetime);
+        compute(t, stm32props, time, pars, effectivetime);
         
         
         TIM_MasterConfigTypeDef sMasterConfig;
         
-        stm32data->phandletimx->Instance = stm32data->TIMx;
-        stm32data->phandletimx->Init.Prescaler = pars.prescaler-1;
-        stm32data->phandletimx->Init.CounterMode = TIM_COUNTERMODE_DOWN;
-        stm32data->phandletimx->Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-        stm32data->phandletimx->Init.RepetitionCounter = 0;
-        stm32data->phandletimx->Init.Period = pars.period-1;
-
+        phandletimx->Instance = stm32props->TIMx;
+        phandletimx->Init.Prescaler = pars.prescaler-1;
+        phandletimx->Init.CounterMode = TIM_COUNTERMODE_DOWN;
+        phandletimx->Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+        phandletimx->Init.RepetitionCounter = 0;
+        phandletimx->Init.Period = pars.period-1;
+        #if (STM32HAL_DRIVER_VERSION >= 183)
+        phandletimx->Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+        #endif
         
-        if(true == stm32data->isonepulse)
+        if(true == stm32props->isonepulse)
         {   // e.g., for tim15: use HAL_TIM_OnePulse_Init() and dont use HAL_TIM_Base_Init().
-            if (HAL_TIM_OnePulse_Init(stm32data->phandletimx, TIM_OPMODE_REPETITIVE) != HAL_OK)
+            if (HAL_TIM_OnePulse_Init(phandletimx, TIM_OPMODE_REPETITIVE) != HAL_OK)
             {
-                _Error_Handler(__FILE__, __LINE__);
+                #if (STM32HAL_DRIVER_VERSION >= 190)
+                Error_Handler();
+                #else
+                _Error_Handler(NULL, __LINE__);
+                #endif
             }
         } 
         else
         {   // normal case            
-            if (HAL_TIM_Base_Init(stm32data->phandletimx) != HAL_OK)
+            if (HAL_TIM_Base_Init(phandletimx) != HAL_OK)
             {
-                _Error_Handler(__FILE__, __LINE__);
+                #if (STM32HAL_DRIVER_VERSION >= 190)
+                Error_Handler();
+                #else
+                _Error_Handler(NULL, __LINE__);
+                #endif
             }
         }
 
-        if(true == stm32data->mastermode)
+        if(true == stm32props->mastermode)
         {
             sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
             sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
-            if (HAL_TIMEx_MasterConfigSynchronization(stm32data->phandletimx, &sMasterConfig) != HAL_OK)
+            if (HAL_TIMEx_MasterConfigSynchronization(phandletimx, &sMasterConfig) != HAL_OK)
             {
-                _Error_Handler(__FILE__, __LINE__);
+                #if (STM32HAL_DRIVER_VERSION >= 190)
+                Error_Handler();
+                #else
+                _Error_Handler(NULL, __LINE__);
+                #endif
             }
         }
 
     }   
 
-    
-//#if     defined(STM32HAL_BOARD_STRAIN2)  
-//     
-//    // this is a modified version from the one generated by cube-mx which ... was wrong because did not use the -1 in prescaler and period
-//    void mx_tim6_init(Timer t, TIM_HandleTypeDef *htim, std::uint32_t time)
-//    {   
-//        std::uint32_t effectivetime = 0;
-//        stm32_tim_registervalues pars =  {0};
-//        
-//        compute(t, time, pars, effectivetime);
-//        
-//        TIM_MasterConfigTypeDef sMasterConfig;
-
-//        htim6.Instance = TIM6;
-//        htim6.Init.Prescaler = pars.prescaler-1;
-//        htim6.Init.CounterMode = TIM_COUNTERMODE_DOWN;
-//        htim6.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-//        htim6.Init.RepetitionCounter = 0;
-//        htim6.Init.Period = pars.period-1;
-//        
-//        if (HAL_TIM_Base_Init(&htim6) != HAL_OK)
-//        {
-//            _Error_Handler(__FILE__, __LINE__);
-//        }
-
-//        sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
-//        sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
-//        if (HAL_TIMEx_MasterConfigSynchronization(&htim6, &sMasterConfig) != HAL_OK)
-//        {
-//            _Error_Handler(__FILE__, __LINE__);
-//        }
-
-//    }  
-
-//    // need: TIMx, htimx
-
-//    void mx_tim7_init(Timer t, TIM_HandleTypeDef *htim, std::uint32_t time)
-//    {
-//        std::uint32_t effectivetime = 0;
-//        stm32_tim_registervalues pars =  {0};
-//        
-//        compute(t, time, pars, effectivetime);
-//        
-//        TIM_MasterConfigTypeDef sMasterConfig;
-//        
-//        htim7.Instance = TIM7;
-//        htim7.Init.Prescaler = pars.prescaler-1;
-//        htim7.Init.CounterMode = TIM_COUNTERMODE_DOWN;
-//        htim7.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-//        htim7.Init.RepetitionCounter = 0;
-//        htim7.Init.Period = pars.period-1;
-
-
-//        if (HAL_TIM_Base_Init(&htim7) != HAL_OK)
-//        {
-//            _Error_Handler(__FILE__, __LINE__);
-//        }
-
-//        sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
-//        sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
-//        if (HAL_TIMEx_MasterConfigSynchronization(&htim7, &sMasterConfig) != HAL_OK)
-//        {
-//            _Error_Handler(__FILE__, __LINE__);
-//        }
-
-//    }
-//     
-//      
-//     
-//#endif    
            
 
 
-    struct PrivateData
+    struct TIMERprop
     {        
         bool                isrunning;
         Config              config;
     };
     
-    static PrivateData s_privatedata[numberofsupported]; 
-         
-    void callbackOnTick(Timer t)
+    struct propsOFalltimers
     {
-        // the timer callback executes this code. now we do actions depending on what is inside s_privatedata. 
+        TIMERprop prop[embot::common::tointegral(embot::hw::TIMER::maxnumberof)];
         
-        std::uint8_t compindex = timer2indexofcompactarray(t);
-       
-        if(nullptr != s_privatedata[compindex].config.onexpiry.callback)
+        TIMERprop & get(TIMER t)
         {
-            s_privatedata[compindex].config.onexpiry.callback(s_privatedata[compindex].config.onexpiry.arg);
+            return prop[embot::common::tointegral(t)];
+            //return prop[static_cast<std::uint8_t>(t)];
+        }        
+    };
+
+    static propsOFalltimers s_properties;
+
+         
+    void execute(TIMER t)
+    {
+        // the timer callback executes this code. now we do actions depending on what is inside s_privatedata.         
+        if(false == initialised(t))
+        {
+            return;
         }
+        
+        TIMERprop &prop = s_properties.get(t);
+        
+        prop.config.onexpiry.execute();
        
-        if(Mode::oneshot == s_privatedata[compindex].config.mode)
+        if(Mode::oneshot == prop.config.mode)
         {
             stop(t);
         }
-
     }    
     
-    result_t init(Timer t, const Config &config)
+    result_t init(TIMER t, const Config &config)
     {
         if(false == supported(t))
         {
@@ -435,20 +279,21 @@ namespace embot { namespace hw { namespace timer {
             return resOK;
         }
         
-        std::uint8_t compindex = timer2indexofcompactarray(t);
-          
-        s_privatedata[compindex].isrunning = false;
-        s_privatedata[compindex].config = config;
+        // init peripheral... actually it is done inside general bsp
+        embot::hw::bsp::timer::getBSP().init(t);
+             
+        TIMERprop &prop = s_properties.get(t);        
+        prop.isrunning = false;
+        prop.config = config;
         
-        embot::binary::bit::set(initialisedmask, timer2index(t));
+        // VERY IMPORTANT: keep it in here before configure...
+        embot::binary::bit::set(initialisedmask, embot::common::tointegral(t));
         
-        configure(t, config);    
-
-        return resOK;
+        return configure(t, config);    
     }
 
     
-    result_t configure(Timer t, const Config &config)
+    result_t configure(TIMER t, const Config &config)
     {
         if(false == initialised(t))
         {
@@ -460,68 +305,68 @@ namespace embot { namespace hw { namespace timer {
             stop(t);
         }
         
-        std::uint8_t compindex = timer2indexofcompactarray(t);
-        
-        s_privatedata[compindex].config = config;
+        TIMERprop &prop = s_properties.get(t); 
+        prop.config = config;
         mx_timx_init(t, config.time);      
-        s_privatedata[compindex].isrunning = false;
+        prop.isrunning = false;
         
         return resOK;        
     }
         
 
-    bool isrunning(Timer t)
+    bool isrunning(TIMER t)
     { 
         if(false == initialised(t))
         {
             return false;
         }
         
-        std::uint8_t compindex = timer2indexofcompactarray(t);
-        
-        return s_privatedata[compindex].isrunning;
+        TIMERprop &prop = s_properties.get(t); 
+        return prop.isrunning;
     }
  
  
-    result_t start(Timer t)
+    result_t start(TIMER t)
     {
         if(false == initialised(t))
         {
             return resNOK;
         }
         
-        std::uint8_t compindex = timer2indexofcompactarray(t);
+
+        TIMERprop &prop = s_properties.get(t); 
         
-        if(true == s_privatedata[compindex].isrunning)
+        if(true == prop.isrunning)
         {
             stop(t);
         }
         
-        s_privatedata[compindex].isrunning = true;
+        prop.isrunning = true;
      
         // ok: the timer starts.
-        const stm32_tim_mapping *stm32data = &s_stm32_tim_mapping[compindex];
-        HAL_TIM_Base_Start_IT(stm32data->phandletimx);
+        const embot::hw::bsp::timer::PROP * stm32props = embot::hw::bsp::timer::getBSP().getPROP(t);
+        TIM_HandleTypeDef* phandletimx = reinterpret_cast<TIM_HandleTypeDef*>(stm32props->handle);
+        HAL_TIM_Base_Start_IT(phandletimx);
   
         return resOK;
         
     } 
     
 
-    result_t stop(Timer t)
+    result_t stop(TIMER t)
     {
         if(false == initialised(t))
         {
             return resNOK;
         }
         
-        std::uint8_t compindex = timer2indexofcompactarray(t);
-     
+            
         // stop it anyway
-        const stm32_tim_mapping *stm32data = &s_stm32_tim_mapping[compindex];
-        HAL_TIM_Base_Stop_IT(stm32data->phandletimx);
+        const embot::hw::bsp::timer::PROP * stm32props = embot::hw::bsp::timer::getBSP().getPROP(t);
+        HAL_TIM_Base_Stop_IT(stm32props->handle);
         
-        s_privatedata[compindex].isrunning = false;
+        TIMERprop &prop = s_properties.get(t);
+        prop.isrunning = false;
                 
         return resOK;              
     }
@@ -533,111 +378,8 @@ namespace embot { namespace hw { namespace timer {
 // - stm32hal.lib needs some handlers being compiled in here: IRQ handlers and callbacks.
 
 
-#define USE_QUICKER_MODE
 
-#if defined(USE_QUICKER_MODE)
-
-// in here it is implemented in the way the good old hal2 was doing: the handler directly manages the callback
-// instead the stm hal make a lot of calls before actually calling the callback code, hence it is slower.
-
-void manageInterrupt(embot::hw::timer::Timer t, TIM_HandleTypeDef *htim)
-{
-    if(__HAL_TIM_GET_FLAG(htim, TIM_FLAG_UPDATE) != RESET)
-    {
-        if(__HAL_TIM_GET_IT_SOURCE(htim, TIM_IT_UPDATE) !=RESET)
-        {
-            __HAL_TIM_CLEAR_IT(htim, TIM_IT_UPDATE);
-            embot::hw::timer::callbackOnTick(t);
-        }
-    }   
-} 
-
-
-
-#if defined(STM32HAL_HAS_TIM6)
-void TIM6_DAC_IRQHandler(void)
-{
-    manageInterrupt(embot::hw::timer::Timer::six, &htim6);
-}
-#endif
-
-#if defined(STM32HAL_HAS_TIM7)
-void TIM7_IRQHandler(void)
-{
-    manageInterrupt(embot::hw::timer::Timer::seven, &htim7);    
-}
-#endif
-
-#if defined(STM32HAL_HAS_TIM15)
-void TIM1_BRK_TIM15_IRQHandler(void)
-{
-    manageInterrupt(embot::hw::timer::Timer::fifteen, &htim15);
-}
-#endif
-
-#if defined(STM32HAL_HAS_TIM16)
-void TIM1_UP_TIM16_IRQHandler(void)
-{
-    manageInterrupt(embot::hw::timer::Timer::sixteen, &htim16);
-}
-#endif
-
-#else
-
-#if defined(STM32HAL_HAS_TIM6)
-void TIM6_DAC_IRQHandler(void)
-{
-    HAL_TIM_IRQHandler(&htim6);
-}
-#endif
-
-#if defined(STM32HAL_HAS_TIM7)
-void TIM7_IRQHandler(void)
-{
-    HAL_TIM_IRQHandler(&htim7);
-}
-#endif
-
-#if defined(STM32HAL_HAS_TIM15)
-void TIM1_BRK_TIM15_IRQHandler(void)
-{
-    HAL_TIM_IRQHandler(&htim15);
-}
-#endif
-
-#if defined(STM32HAL_HAS_TIM16)
-void TIM1_UP_TIM16_IRQHandler(void)
-{
-   HAL_TIM_IRQHandler(&htim16);
-}
-#endif
-
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-{
-    if(TIM6 == htim->Instance)
-    { 
-        embot::hw::timer::callbackOnTick(embot::hw::timer::Timer::six); 
-    }
-    else if(TIM7 == htim->Instance)
-    { 
-        embot::hw::timer::callbackOnTick(embot::hw::timer::Timer::seven); 
-    } 
-    else if(TIM15 == htim->Instance)
-    { 
-        embot::hw::timer::callbackOnTick(embot::hw::timer::Timer::fifteen); 
-    }
-    else if(TIM16 == htim->Instance)
-    { 
-        embot::hw::timer::callbackOnTick(embot::hw::timer::Timer::sixteen); 
-    }     
-}
-
-#endif
-
-
-
-
-#endif 
+#endif // defined(HAL_TIM_MODULE_ENABLED)
 
 
     

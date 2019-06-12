@@ -27,7 +27,7 @@
 
 #include "iCubCanProto_analogSensorMessages.h"
 
-
+#include <array>
 
 namespace embot { namespace app { namespace canprotocol { namespace analog { namespace periodic {
         
@@ -35,12 +35,14 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
     enum class CMD { 
         none = 0xfe, 
         
+        USERDEF = 0, 
         UNCALIBFORCE_VECTOR_DEBUGMODE = ICUBCANPROTO_PER_AS_MSG__UNCALIBFORCE_VECTOR_DEBUGMODE, 
         UNCALIBTORQUE_VECTOR_DEBUGMODE = ICUBCANPROTO_PER_AS_MSG__UNCALIBTORQUE_VECTOR_DEBUGMODE,                    // strain 
         FORCE_VECTOR = ICUBCANPROTO_PER_AS_MSG__FORCE_VECTOR, 
         TORQUE_VECTOR = ICUBCANPROTO_PER_AS_MSG__TORQUE_VECTOR,                                                      // strain
         // NEW messages:
-        THERMOMETER_MEASURE = ICUBCANPROTO_PER_AS_MSG__THERMOMETER_MEASURE
+        THERMOMETER_MEASURE = ICUBCANPROTO_PER_AS_MSG__THERMOMETER_MEASURE,
+        POS = ICUBCANPROTO_PER_AS_MSG__POS
     };
     
     // NOTES
@@ -197,6 +199,64 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         Info info;
         
         Message_THERMOMETER_MEASURE() {}
+            
+        bool load(const Info& inf);
+            
+        bool get(embot::hw::can::Frame &outframe);        
+    };    
+        
+    class Message_USERDEF : public Message
+    {
+        public:
+            
+        struct Info
+        { 
+            std::uint8_t                canaddress;
+            std::uint8_t                data[8];
+            Info() : canaddress(0) { std::memset(data, 0, sizeof(data)); }
+        };
+        
+        Info info;
+        
+        Message_USERDEF() {}
+            
+        bool load(const Info& inf);
+            
+        bool get(embot::hw::can::Frame &outframe);        
+    };  
+
+
+    class Message_POS : public Message
+    {
+        public:
+                        
+        struct Info
+        {   // this message transports positions. 
+            // the type of positions (e.g., angles in deci-degree, ...) and which ones of them (e.g., 2 starting from tag 0) 
+            // are described by posDES descriptor.
+            // their values are inside data[], which is formatted according to the content of descriptor.
+            // for instance, if descriptor.type is posTYPE::angleDeciDeg, descriptor.firsttag is zero, and descriptor.numberoftags = 2 ...
+            // inside data we have two value of type deciDeg, of two bytes each, placed in little-endian and the first value has tag = zero,
+            // and the second has the consecutive tag which is ... one.            
+            std::uint8_t                canaddress;
+            posDES                      descriptor;
+            std::uint8_t                data[6];
+            Info() : canaddress(0) { std::memset(data, 0, sizeof(data)); }
+            // at most three deciDeg in data[6]
+            void loadDeciDeg(const posLABEL startl, const uint8_t n, const std::array<deciDeg, 3> &values) 
+            {
+                descriptor.type = posTYPE::angleDeciDeg;
+                descriptor.startlabel = startl;
+                descriptor.labelsnumberof = n;
+                deciDeg *d = reinterpret_cast<deciDeg*>(data);
+                //for(auto &v : values) { *d++ = v; }
+                for(uint8_t i=0; i<n; i++) { d[i] = values[i]; }
+            }
+        };
+        
+        Info info;
+        
+        Message_POS() {}
             
         bool load(const Info& inf);
             

@@ -22,16 +22,12 @@
 #define _EMBOT_APP_BOOTLOADER_THECANPARSER_H_
 
 #include "embot_common.h"
-
 #include "embot_hw.h"
 #include "embot_hw_sys.h"
 #include "embot_hw_can.h"
-
 #include "embot_sys.h"
-
 #include "embot_app_canprotocol.h"
-
-
+#include <memory>
 #include <vector>
 
 namespace embot { namespace app { namespace bootloader {
@@ -39,11 +35,7 @@ namespace embot { namespace app { namespace bootloader {
     class theCANparser
     {
     public:
-        static theCANparser& getInstance()
-        {
-            static theCANparser* p = new theCANparser();
-            return *p;
-        }
+        static theCANparser& getInstance();
         
         
     public:
@@ -68,17 +60,12 @@ namespace embot { namespace app { namespace bootloader {
 
     private:
         theCANparser(); 
+        ~theCANparser();
 
-    public:
-        // remove copy constructors and copy assignment operators
-        theCANparser(const theCANparser&) = delete;
-        theCANparser(theCANparser&) = delete;
-        void operator=(const theCANparser&) = delete;
-        void operator=(theCANparser&) = delete;
 
     private:    
         struct Impl;
-        Impl *pImpl;        
+        std::unique_ptr<Impl> pImpl;         
     };       
 
 

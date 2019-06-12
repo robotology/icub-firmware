@@ -90,20 +90,24 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         THERMOMETER_CONFIG_SET = ICUBCANPROTO_POL_AS_CMD__THERMOMETER_CONFIG_SET,
         THERMOMETER_TRANSMIT = ICUBCANPROTO_POL_AS_CMD__THERMOMETER_TRANSMIT,        
         // RESERVED: { 0x3B, 0x3C } for possible new THERMOMETER commands
-        
-        // HOLE: [0x3F, ... , 0x4B]. there are 13 free values ...
-        
+                
         // NEW messages for strain2 to configure the regulation set to use
         REGULATIONSET_SET = ICUBCANPROTO_POL_AS_CMD__REGULATIONSET_SET,
         REGULATIONSET_GET = ICUBCANPROTO_POL_AS_CMD__REGULATIONSET_GET,
         
+        // HOLE: [0x3F, ... , 0x4B]. there are 13 free values ...
+        
         // skin messages + legacy acc-gyro messages
-        SKIN_OBSOLETE_TACT_SETUP = ICUBCANPROTO_POL_SK_CMD__TACT_SETUP,                  // 0x4C obsolete, but we support it in a basic form
-        SKIN_SET_BRD_CFG = ICUBCANPROTO_POL_SK_CMD__SET_BRD_CFG,                          // 0x4D used to configure the skin data in mtb + its tx rate
-        ACC_GYRO_SETUP = ICUBCANPROTO_POL_SK_CMD__ACC_GYRO_SETUP,                            // 0x4F used to configure the inertial data in mtb + its tx rate
-        SKIN_SET_TRIANG_CFG = ICUBCANPROTO_POL_SK_CMD__SET_TRIANG_CFG                        // 0x50 used to configure the skin data in mtb
+        SKIN_OBSOLETE_TACT_SETUP = ICUBCANPROTO_POL_SK_CMD__TACT_SETUP,                     // 0x4C obsolete, but we support it in a basic form
+        SKIN_SET_BRD_CFG = ICUBCANPROTO_POL_SK_CMD__SET_BRD_CFG,                            // 0x4D used to configure the skin data in mtb + its tx rate
+        ACC_GYRO_SETUP = ICUBCANPROTO_POL_SK_CMD__ACC_GYRO_SETUP,                           // 0x4F used to configure the inertial data in mtb + its tx rate
+        SKIN_SET_TRIANG_CFG = ICUBCANPROTO_POL_SK_CMD__SET_TRIANG_CFG,                      // 0x50 used to configure the skin data in mtb
 
-        // HOLE: [0x51, ... , 0xFD]. there are 173 free values.
+        POS_CONFIG_GET = 0x51,
+        POS_CONFIG_SET = 0x52,
+        POS_TRANSMIT = 0x53,
+        
+        // HOLE: [0x54, ... , 0xFD]. there are 170 free values.
     };
     
     
@@ -1231,7 +1235,120 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         bool load(const embot::hw::can::Frame &inframe);
             
         bool reply();   // none        
-    };        
+    };  
+
+
+    
+    struct deciDegPOSdescriptor
+    {   // it assumes to have raw angle values in range [0, 360] expressed as int16_t in deci-degrees. it returns deci-degrees in open range positive and negative
+        // this struct can be transmitted in 3 bytes. from lsb: [rotation: 2 bits, invertdirection: 1 bit, label : 4 bits], zero: two bytes in little endian
+        // the bytes [0x01, 0x00, 0x00] tells ... no rotation, no inversion of direction, label 1, no zero. 
+        enum class ROT : uint8_t { none = 0, plus180 = 1, plus090 = 2, minus090 = 3 };
+        bool        enabled;            // it must be true if teh sensor is to be considered.      
+        bool        invertdirection;
+        ROT         rotation;   
+        posLABEL    label;              // the label to use when transmitting in streaming the value of POS
+        deciDeg     zero;               // the zero to be applied to the value
+        deciDegPOSdescriptor() { reset(); }
+        void reset() { enabled =  true; rotation = ROT::none; invertdirection = false;  label = posLABEL::zero; zero = 0; }
+        void load(const uint8_t *bytes)
+        { 
+            enabled = embot::binary::bit::check(bytes[0], 7);
+            invertdirection = embot::binary::bit::check(bytes[0], 6);
+            rotation = static_cast<ROT>((bytes[0] >> 4) & 0b0011);           
+            label = static_cast<posLABEL>(bytes[0] & 0b1111);
+            zero = static_cast<uint16_t>(bytes[1]) | (static_cast<uint16_t>(bytes[2]) << 8);
+        }
+        void fill(uint8_t *bytes) const 
+        {
+            if(nullptr != bytes)
+            {
+                bytes[0] = 0;
+                bytes[0] = ((enabled & 0b1) << 7) | ((invertdirection & 0b1) << 6) | ((static_cast<uint8_t>(rotation) & 0b11) << 4) | (static_cast<uint8_t>(label) & 0b1111);
+                bytes[1] = zero & 0xff;
+                bytes[2] = (zero >> 8);                
+            }            
+        }
+        static const deciDeg rotationmap[4]; // = {0, 1800, 900, -900};
+        deciDeg rotateclip(deciDeg v) const { return ( (v+rotationmap[static_cast<uint8_t>(rotation)]) % 3600 ); }
+        deciDeg transform(const deciDeg raw) const
+        {
+            deciDeg z = rotateclip(raw) - rotateclip(zero);
+            return (invertdirection) ? (-z) : (+z);
+        }
+        //uint8_t getlabel() const { return static_cast<uint8_t>(label); } 
+    };    
+
+
+    class Message_POS_CONFIG_SET : public Message
+    {
+        public:
+            
+        struct Info
+        {   // for now it is dedicated to the case of the psc where we have two values to configure and they are expressed in deciDeg
+            posTYPE                 type;    // it contains the type of the sensors. 
+            deciDegPOSdescriptor    descriptor[2]; 
+            Info() : type(posTYPE::angleDeciDeg) {}            
+        };
+            
+        
+        Info info;
+        
+        Message_POS_CONFIG_SET() {}
+            
+        bool load(const embot::hw::can::Frame &inframe);
+            
+        bool reply();   // none
+            
+    }; 
+
+    class Message_POS_CONFIG_GET : public Message
+    {
+        public:
+                                    
+        struct Info
+        {   // it is dedicated to the case of the psc where we have two values to configure and they are expressed in deciDeg
+            posTYPE                 type;    // it holds a descriptor of ... presence maybe of it is for future choice of the content
+            Info() : type(posTYPE::angleDeciDeg) {}            
+        };
+        
+        struct ReplyInfo
+        {   // it is dedicated to the case of the psc where we have two values to configure and they are expressed in deciDeg
+            posTYPE                 type;    // it hold a descriptor of ... presence maybe of it is for future choice of the content
+            deciDegPOSdescriptor    descriptor[2]; 
+            ReplyInfo() : type(posTYPE::angleDeciDeg) {}            
+        };
+            
+        
+        Info info;
+        
+        Message_POS_CONFIG_GET() {}
+            
+        bool load(const embot::hw::can::Frame &inframe);
+            
+        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
+    };  
+    
+    class Message_POS_TRANSMIT : public Message
+    {
+        public:
+        
+        // format is data[0] = milliseconds                        
+        struct Info
+        {
+            bool transmit;
+            embot::common::relTime  txperiod;   // if 0, dont transmit. else use usec value.         
+            Info() : transmit(false), txperiod(0) {}
+        };
+        
+        Info info;
+        
+        Message_POS_TRANSMIT() {}
+            
+        bool load(const embot::hw::can::Frame &inframe);
+            
+        bool reply();   // none        
+    };            
     
 }}}}} // namespace embot { namespace app { namespace canprotocol { namespace analog { namespace polling {
     

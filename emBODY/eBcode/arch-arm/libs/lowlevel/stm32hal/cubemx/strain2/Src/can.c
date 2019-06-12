@@ -10,7 +10,7 @@
   * inserted by the user or by software development tools
   * are owned by their respective copyright owners.
   *
-  * COPYRIGHT(c) 2017 STMicroelectronics
+  * COPYRIGHT(c) 2018 STMicroelectronics
   *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted provided that the following conditions are met:
@@ -40,8 +40,6 @@
 /* Includes ------------------------------------------------------------------*/
 #include "can.h"
 
-#include "gpio.h"
-
 /* USER CODE BEGIN 0 */
 
 /* USER CODE END 0 */
@@ -55,18 +53,18 @@ void MX_CAN1_Init(void)
   hcan1.Instance = CAN1;
   hcan1.Init.Prescaler = 2;
   hcan1.Init.Mode = CAN_MODE_NORMAL;
-  hcan1.Init.SJW = CAN_SJW_1TQ;
-  hcan1.Init.BS1 = CAN_BS1_2TQ;
-  hcan1.Init.BS2 = CAN_BS2_5TQ;
-  hcan1.Init.TTCM = DISABLE;
-  hcan1.Init.ABOM = ENABLE;
-  hcan1.Init.AWUM = DISABLE;
-  hcan1.Init.NART = DISABLE;
-  hcan1.Init.RFLM = DISABLE;
-  hcan1.Init.TXFP = DISABLE;
+  hcan1.Init.SyncJumpWidth = CAN_SJW_1TQ;
+  hcan1.Init.TimeSeg1 = CAN_BS1_2TQ;
+  hcan1.Init.TimeSeg2 = CAN_BS2_5TQ;
+  hcan1.Init.TimeTriggeredMode = DISABLE;
+  hcan1.Init.AutoBusOff = ENABLE;
+  hcan1.Init.AutoWakeUp = DISABLE;
+  hcan1.Init.AutoRetransmission = DISABLE;
+  hcan1.Init.ReceiveFifoLocked = DISABLE;
+  hcan1.Init.TransmitFifoPriority = DISABLE;
   if (HAL_CAN_Init(&hcan1) != HAL_OK)
   {
-    _Error_Handler(__FILE__, __LINE__);
+    Error_Handler();
   }
 
 }
@@ -74,7 +72,7 @@ void MX_CAN1_Init(void)
 void HAL_CAN_MspInit(CAN_HandleTypeDef* canHandle)
 {
 
-  GPIO_InitTypeDef GPIO_InitStruct;
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
   if(canHandle->Instance==CAN1)
   {
   /* USER CODE BEGIN CAN1_MspInit 0 */
@@ -83,6 +81,7 @@ void HAL_CAN_MspInit(CAN_HandleTypeDef* canHandle)
     /* CAN1 clock enable */
     __HAL_RCC_CAN1_CLK_ENABLE();
   
+    __HAL_RCC_GPIOB_CLK_ENABLE();
     /**CAN1 GPIO Configuration    
     PB9     ------> CAN1_TX
     PB8     ------> CAN1_RX 
@@ -134,13 +133,5 @@ void HAL_CAN_MspDeInit(CAN_HandleTypeDef* canHandle)
 /* USER CODE BEGIN 1 */
 
 /* USER CODE END 1 */
-
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

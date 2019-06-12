@@ -155,7 +155,7 @@ struct embot::app::application::theSkin::Impl
     
     bool tick(std::vector<embot::hw::can::Frame> &replies);
     
-    bool configtriangles(embot::app::canprotocol::analog::polling::Message_SKIN_SET_TRIANG_CFG::Info &trgcfg);
+    bool configtriangles(const embot::app::canprotocol::analog::polling::Message_SKIN_SET_TRIANG_CFG::Info &trgcfg);
     
     bool calibrate();
     
@@ -166,7 +166,7 @@ struct embot::app::application::theSkin::Impl
 };
 
 
-bool embot::app::application::theSkin::Impl::configtriangles(embot::app::canprotocol::analog::polling::Message_SKIN_SET_TRIANG_CFG::Info &trgcfg)
+bool embot::app::application::theSkin::Impl::configtriangles(const embot::app::canprotocol::analog::polling::Message_SKIN_SET_TRIANG_CFG::Info &trgcfg)
 {    
     triangleconfigcommand = trgcfg;
     
@@ -235,7 +235,9 @@ bool embot::app::application::theSkin::Impl::start()
     tr.start();
 #endif
     
-    ticktimer->start(boardconfig.txperiod, embot::sys::Timer::Type::forever, action);
+    embot::sys::Timer::Config cfg(boardconfig.txperiod, action, embot::sys::Timer::Mode::forever);
+    ticktimer->start(cfg);
+
     ticking = true;    
     return true;
 }
@@ -470,22 +472,28 @@ bool embot::app::application::theSkin::Impl::tick(std::vector<embot::hw::can::Fr
 // --------------------------------------------------------------------------------------------------------------------
 
 
-
-embot::app::application::theSkin::theSkin()
-: pImpl(new Impl)
-{       
-
+embot::app::application::theSkin& embot::app::application::theSkin::getInstance()
+{
+    static theSkin* p = new theSkin();
+    return *p;
 }
 
+embot::app::application::theSkin::theSkin()
+//    : pImpl(new Impl)
+{
+    pImpl = std::make_unique<Impl>();
+}  
+
+    
+embot::app::application::theSkin::~theSkin() { }
    
         
 bool embot::app::application::theSkin::initialise(Config &config)
 {
     pImpl->config = config;
     
-    pImpl->action.set(embot::sys::Action::EventToTask(pImpl->config.tickevent, pImpl->config.totask));
-
-    
+    pImpl->action.load(embot::sys::EventToTask(pImpl->config.tickevent, pImpl->config.totask));
+        
     pImpl->triangles.activemask = 0xffff;
     
     ad7147_init(pImpl->triangles.rawvalues, pImpl->triangles.capoffsets);
@@ -497,9 +505,95 @@ bool embot::app::application::theSkin::initialise(Config &config)
 }
   
 
-bool embot::app::application::theSkin::configure(embot::app::canprotocol::analog::polling::Message_SKIN_SET_BRD_CFG::Info &brdcfg)
+//bool embot::app::application::theSkin::configure(embot::app::canprotocol::analog::polling::Message_SKIN_SET_BRD_CFG::Info &brdcfg)
+//{
+//    pImpl->boardconfig = brdcfg;
+//    
+//    // as in application of mtb3:
+//    // 1. disable all triangles.
+//    // 2. get the noload.
+//    // 3. get the txperiod
+//    // 4. get type of board ...
+//    // 5. dont stop tx if any ... ? boh. maybe better stop and restart with new value
+//    
+//    // ? should i?
+//    pImpl->triangles.activemask = 0;
+//            
+//    if(true == pImpl->ticking)
+//    {
+//        // stop and start with new period, as mtb3 does.
+//        stop();
+//        start();
+//    }
+//  
+//    return true;    
+//}
+
+
+
+//bool embot::app::application::theSkin::configure(embot::app::canprotocol::analog::polling::Message_SKIN_SET_TRIANG_CFG::Info &trgcfg)
+//{ 
+//    return pImpl->configtriangles(trgcfg);
+//}
+
+//bool embot::app::application::theSkin::configure(embot::app::canprotocol::analog::polling::Message_SKIN_OBSOLETE_TACT_SETUP::Info &tactsetup)
+//{    
+//    if(true == pImpl->ticking)
+//    {
+//        // stop
+//        stop();
+//    }
+//    
+//    pImpl->setdefault();
+//    
+//    pImpl->boardconfig.txperiod = tactsetup.txperiod;
+//    
+//    
+//    for(std::uint8_t i=0; i<trgNumberOf; i++)
+//    {                       
+//        // we process cdcoffset even if we have enabled == false ... as the old mtb3 application does
+
+//        if(pImpl->triangles.config[i].cdcoffset != tactsetup.cdcOffset)
+//        {
+//            pImpl->triangles.config[i].cdcoffset = tactsetup.cdcOffset;
+//            ad7147_set_cdcoffset(i, pImpl->triangles.config[i].cdcoffset); 
+//        }
+//    }
+//         
+//    pImpl->calibrate();    
+//    
+//    // config board w/ default values.
+//    // config all triangles w/ default values.
+//    // set calib with cdcfoffset
+//    // start tx at 40 ms.
+//    
+//    start();
+//    
+//    return true;    
+//}
+
+
+bool embot::app::application::theSkin::start()
+{    
+    return pImpl->start();
+}
+
+
+bool embot::app::application::theSkin::stop()
+{    
+    return pImpl->stop();
+}
+
+bool embot::app::application::theSkin::tick(std::vector<embot::hw::can::Frame> &replies)
+{   
+    return pImpl->tick(replies);
+}
+
+
+// interface to CANagentSKIN
+bool embot::app::application::theSkin::set(const embot::app::canprotocol::analog::polling::Message_SKIN_SET_BRD_CFG::Info &info)
 {
-    pImpl->boardconfig = brdcfg;
+    pImpl->boardconfig = info;
     
     // as in application of mtb3:
     // 1. disable all triangles.
@@ -522,14 +616,29 @@ bool embot::app::application::theSkin::configure(embot::app::canprotocol::analog
 }
 
 
-
-bool embot::app::application::theSkin::configure(embot::app::canprotocol::analog::polling::Message_SKIN_SET_TRIANG_CFG::Info &trgcfg)
-{ 
-    return pImpl->configtriangles(trgcfg);
+bool embot::app::application::theSkin::set(const embot::app::canprotocol::analog::polling::Message_SKIN_SET_TRIANG_CFG::Info &info)
+{
+    return pImpl->configtriangles(info);
 }
 
-bool embot::app::application::theSkin::configure(embot::app::canprotocol::analog::polling::Message_SKIN_OBSOLETE_TACT_SETUP::Info &tactsetup)
-{    
+  
+bool embot::app::application::theSkin::set(const embot::app::canprotocol::analog::polling::Message_SET_TXMODE::Info &info)
+{
+    if(true == info.transmit)
+    {
+        start();        
+    }
+    else
+    {
+        stop();     
+    }
+                  
+    return true;
+}
+
+ 
+bool embot::app::application::theSkin::set(const embot::app::canprotocol::analog::polling::Message_SKIN_OBSOLETE_TACT_SETUP::Info &info)
+{
     if(true == pImpl->ticking)
     {
         // stop
@@ -538,16 +647,16 @@ bool embot::app::application::theSkin::configure(embot::app::canprotocol::analog
     
     pImpl->setdefault();
     
-    pImpl->boardconfig.txperiod = tactsetup.txperiod;
+    pImpl->boardconfig.txperiod = info.txperiod;
     
     
     for(std::uint8_t i=0; i<trgNumberOf; i++)
     {                       
         // we process cdcoffset even if we have enabled == false ... as the old mtb3 application does
 
-        if(pImpl->triangles.config[i].cdcoffset != tactsetup.cdcOffset)
+        if(pImpl->triangles.config[i].cdcoffset != info.cdcOffset)
         {
-            pImpl->triangles.config[i].cdcoffset = tactsetup.cdcOffset;
+            pImpl->triangles.config[i].cdcoffset = info.cdcOffset;
             ad7147_set_cdcoffset(i, pImpl->triangles.config[i].cdcoffset); 
         }
     }
@@ -565,21 +674,6 @@ bool embot::app::application::theSkin::configure(embot::app::canprotocol::analog
 }
 
 
-bool embot::app::application::theSkin::start()
-{    
-    return pImpl->start();
-}
-
-
-bool embot::app::application::theSkin::stop()
-{    
-    return pImpl->stop();
-}
-
-bool embot::app::application::theSkin::tick(std::vector<embot::hw::can::Frame> &replies)
-{   
-    return pImpl->tick(replies);
-}
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

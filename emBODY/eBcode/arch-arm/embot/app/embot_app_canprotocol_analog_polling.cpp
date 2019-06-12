@@ -44,7 +44,12 @@
 // - all the rest
 // --------------------------------------------------------------------------------------------------------------------
 
-
+namespace embot { namespace app { namespace canprotocol { namespace analog {
+    
+    float deciDeg_export(const deciDeg d) { return static_cast<float>(d) * 0.1f; } 
+    deciDeg deciDeg_import(const float f) { return static_cast<deciDeg>(f*10.0f); } 
+    
+}}}}
 
 namespace embot { namespace app { namespace canprotocol { namespace analog { namespace polling {
 
@@ -106,7 +111,11 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
             (1ULL << (static_cast<std::uint8_t>(CMD::SKIN_OBSOLETE_TACT_SETUP)-64)) | 
             (1ULL << (static_cast<std::uint8_t>(CMD::SKIN_SET_BRD_CFG)-64))         | 
             (1ULL << (static_cast<std::uint8_t>(CMD::ACC_GYRO_SETUP)-64))           |
-            (1ULL << (static_cast<std::uint8_t>(CMD::SKIN_SET_TRIANG_CFG)-64))      ,
+            (1ULL << (static_cast<std::uint8_t>(CMD::SKIN_SET_TRIANG_CFG)-64))      |      
+            (1ULL << (static_cast<std::uint8_t>(CMD::POS_CONFIG_GET)-64))           |
+            (1ULL << (static_cast<std::uint8_t>(CMD::POS_CONFIG_SET)-64))           |
+            (1ULL << (static_cast<std::uint8_t>(CMD::POS_TRANSMIT)-64))             ,     
+
             // bits 128-191    
             0, 
             // bits 191-255
@@ -1319,8 +1328,85 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
     bool Message_THERMOMETER_TRANSMIT::reply()
     {
         return false;
+    } 
+
+
+    const deciDeg deciDegPOSdescriptor::rotationmap[4] = {0, 1800, 900, -900};    
+
+    
+    bool Message_POS_CONFIG_SET::load(const embot::hw::can::Frame &inframe)
+    {
+        Message::set(inframe);  
+        
+        if(static_cast<std::uint8_t>(CMD::POS_CONFIG_SET) != frame2cmd(inframe))
+        {
+            return false; 
+        }
+                
+        uint8_t t = 0;
+        info.type = (candata.datainframe[0] == static_cast<uint8_t>(posTYPE::angleDeciDeg)) ? (posTYPE::angleDeciDeg) : (posTYPE::unknown);
+        info.descriptor[0].load(&candata.datainframe[1]);
+        info.descriptor[1].load(&candata.datainframe[4]);
+                 
+        return true;         
+    }                    
+        
+    bool Message_POS_CONFIG_SET::reply()
+    {
+        return false;
     }   
 
+
+    bool Message_POS_CONFIG_GET::load(const embot::hw::can::Frame &inframe)
+    {
+        Message::set(inframe); 
+        
+        if(static_cast<std::uint8_t>(CMD::POS_CONFIG_GET) != frame2cmd(inframe))
+        {
+            return false; 
+        }
+        
+        info.type = (candata.datainframe[0] == static_cast<uint8_t>(posTYPE::angleDeciDeg)) ? (posTYPE::angleDeciDeg) : (posTYPE::unknown);
+        
+        return true;
+    }  
+
+    bool Message_POS_CONFIG_GET::reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo)
+    {
+        std::uint8_t dd[7] = {0};
+        
+        dd[0] = static_cast<uint8_t>(replyinfo.type);
+        replyinfo.descriptor[0].fill(&dd[1]);
+        replyinfo.descriptor[1].fill(&dd[4]);
+
+        std::uint8_t datalen = 7;
+        
+        frame_set_sender(outframe, sender);
+        frame_set_clascmddestinationdata(outframe, Clas::pollingAnalogSensor, static_cast<std::uint8_t>(CMD::POS_CONFIG_GET), candata.from, dd, datalen);
+        frame_set_size(outframe, datalen+1);
+        return true;
+    }
+
+
+    bool Message_POS_TRANSMIT::load(const embot::hw::can::Frame &inframe)
+    {
+        Message::set(inframe);  
+        
+        if(static_cast<std::uint8_t>(CMD::POS_TRANSMIT) != frame2cmd(inframe))
+        {
+            return false; 
+        }
+        
+        // just one byte.
+        info.transmit = (0 == candata.datainframe[0]) ? false : true;
+        info.txperiod = embot::common::time1millisec * static_cast<embot::common::relTime>(candata.datainframe[0]);
+        return true;         
+    }                    
+        
+    bool Message_POS_TRANSMIT::reply()
+    {
+        return false;
+    }       
     
 }}}}} // namespace embot { namespace app { namespace canprotocol { namespace analog { namespace polling {
     

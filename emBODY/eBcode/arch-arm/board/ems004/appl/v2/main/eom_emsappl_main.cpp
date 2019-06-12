@@ -51,8 +51,6 @@
 
 #include "EOtheCANmapping.h"
 
-//#include <limits>
-
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of external variables 
@@ -75,7 +73,6 @@
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
 
-#define TEST_CPP11
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -120,6 +117,7 @@ int main(void)
                       );  
     
     eom_sys_Start(eom_sys_GetHandle(), s_eom_emsappl_main_init);
+
 }
 
 
@@ -192,102 +190,8 @@ extern void eom_emstransceiver_callback_incaseoferror_invalidframe(EOreceiver *r
 // - definition of extern hidden functions 
 // --------------------------------------------------------------------------------------------------------------------
 
-#if defined(TEST_CPP11)
-
-#include <new>
-
-#include "EOtimer.h"
-
-#include "EOVtheCallbackManager.h"
-
-namespace embot {
-     typedef uint32_t relTime; // expressed in usec
-     enum class timeValue { microsec = 1, millisec = 1000, second = 1000000 };
-namespace sys {
-        
-class Timer
-{
-public:
-    
-    enum class Mode { oneshot = 0, forever = 1 };
-
-    enum class Status { idle = 0, running = 1, oneshotcompleted = 2 };
-    
-    Timer();
-    ~Timer();
-    bool start(eOreltime_t countdown, Mode mode, EOaction *action); 
-    bool stop(); 
-    
-    Status getStatus();
-
-private:
-    
-    struct Impl;
-    Impl *pImpl;    
-};
-
-}
-}
-
-void ciao(void*p)
-{
-    static uint8_t dd = 0;
-    
-    dd++;
-    dd = dd;
-}
 
 
-namespace embot {   
-namespace sys {
-    
-struct Timer::Impl
-{
-    EOtimer *tmr;
-    Impl() 
-    {
-        tmr = eo_timer_New();
-    }
-    ~Impl()
-    {
-        eo_timer_Delete(tmr);
-    }
-};
-
-Timer::Timer()
-: pImpl(new Impl)
-{   
-
-}
-
-Timer::~Timer()
-{   
-    delete pImpl;
-}
-
-
-bool Timer::start(relTime countdown, Mode mode, EOaction *action)
-{
-    eOresult_t r = eo_timer_Start(pImpl->tmr, eok_abstimeNOW, countdown, static_cast<eOtimerMode_t>(mode), action);    
-    return (eores_OK == r) ? true : false;
-}
-
-bool Timer::stop()
-{
-    eOresult_t r = eo_timer_Stop(pImpl->tmr);    
-    return (eores_OK == r) ? true : false;
-}
-
-Timer::Status Timer::getStatus()
-{
-    eOtimerStatus_t st = eo_timer_GetStatus(pImpl->tmr);    
-    return static_cast<Timer::Status>(st);   
-}
-
-}
-}
-
-#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of static functions 
@@ -320,17 +224,6 @@ static void s_eom_emsappl_main_init(void)
 
     eo_ledpulser_Initialise(&ledpulsercfg);
 
-#if defined(TEST_CPP11)    
-    
-    EOaction_strg strg;
-    EOaction *act = (EOaction*)&strg;
-    eo_action_SetCallback(act, ciao, NULL, eov_callbackman_GetTask(eov_callbackman_GetHandle()));  
-    
-    embot::sys::Timer *tmr = new embot::sys::Timer;
-    const embot::relTime countdown = 1000*1000;
-    tmr->start(countdown, embot::sys::Timer::Mode::forever, act);
-    
-#endif    
     
     // init the ems application
     EOMtheEMSapplCfg* emscfg = eom_emsapplcfg_GetHandle();    

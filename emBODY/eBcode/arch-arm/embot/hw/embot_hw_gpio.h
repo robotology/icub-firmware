@@ -29,27 +29,33 @@
 
 namespace embot { namespace hw { namespace gpio {
     
-    struct GPIO
-    {   // generic gpio descriptor: every micro has a port and a pin. 
-        void*           port;
-        std::uint16_t   pin;
-        
-        void load(void *po, std::uint32_t pi) { port = po; pin = pi; } 
-        GPIO(void *po, std::uint32_t pi) { load(po, pi); }
-        GPIO() { load(nullptr, 0); }
-        bool isvalid() const { if((nullptr == port) || (0 == pin)) { return false; } return true; }       
+    
+    enum class State : std::uint8_t { RESET = 0, SET = 1 };
+    
+    enum class Mode : std::uint8_t { OUTPUTopendrain = 0, OUTPUTpushpull = 1 };
+    
+
+    struct Config
+    {
+        Mode    mode;
+        Config() : mode(Mode::OUTPUTopendrain) {}
     };
     
+    bool supported(const embot::hw::GPIO &g);
     
-    enum class State { RESET = 0, SET = 1 };
+    bool initialised(const embot::hw::GPIO g);
     
-    enum class Mode { OUTPUTopendrain = 0, OUTPUTpushpull = 1 };
+    result_t init(embot::hw::GPIO &g, const Config &config);
     
-    result_t configure(const GPIO &g, Mode m);
+    result_t configure(const embot::hw::GPIO &g, Mode m);
     
-    result_t set(const GPIO &g, State s);
+    result_t set(const embot::hw::GPIO &g, State s);
     
-    State get(const GPIO &g);
+    result_t toggle(const embot::hw::GPIO &g);
+    
+    State get(const embot::hw::GPIO &g);
+    
+    
        
 }}} // namespace embot { namespace hw { namespace gpio 
 

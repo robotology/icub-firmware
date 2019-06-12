@@ -18,17 +18,19 @@ echo. %SVN%
 echo. %URL%
 echo. ++ Done setting variables.
 echo.
-echo == Updating source from SVN
-echo. -- Running update...
-"%SVN%\TortoiseProc.exe" /command:checkout /path:"%SOURCE%" /url:"%URL%" /closeonend:1
-echo. ++ Done.
+echo == You must manually copy from folder \\storage05.icub.iit.local\repository\software\ipal-extra into ipal-extra 
+echo == Hit any key to exit
+pause
+:: echo. -- Running update...
+:: "%SVN%\TortoiseProc.exe" /command:checkout /path:"%SOURCE%" /url:"%URL%" /closeonend:1
+:: echo. ++ Done.
 
 
-echo. -- setting it RO...
+::echo. -- setting it RO...
 
-attrib +R "%SOURCE%"/*.*
+:: attrib +R "%SOURCE%"/*.*
 
-echo. -- Cleaning up...
+:: echo. -- Cleaning up...
 set SOURCE=
 set SVN=
 echo. ++ Done.

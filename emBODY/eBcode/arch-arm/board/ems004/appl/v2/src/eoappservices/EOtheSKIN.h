@@ -56,6 +56,8 @@ typedef struct EOtheSKIN_hid EOtheSKIN;
 //typedef eOresult_t (*eOskin_onendofoperation_fun_t) (EOtheSKIN* p, eObool_t operationisok);
 
 enum { eo_skin_maxnumberofMTBboards = 15 }; // even if they can be up to 28 (the number of allowed can IDs on the two buses).
+
+enum { eo_skin_maxumberofMTBboardsInEntity = 8 };
    
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------
 // empty-section

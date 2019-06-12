@@ -29,12 +29,9 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include <cstring>
-
-//#if defined(USE_STM32HAL)
 #include "stm32hal.h" 
-//#else
-//#include "stm32l4xx_hal.h" 
-//#endif
+#include "embot_hw_bsp.h"
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -74,7 +71,7 @@ struct embot::hw::FlashBurner::Impl
     
     static uint32_t address2page(std::uint32_t address)
     {
-        return (address - embot::hw::sys::startOfFLASH) / PAGEsize;
+        return (address - embot::hw::flash::getpartition(embot::hw::FLASH::whole).address) / PAGEsize;
     }
     
     static uint32_t page2address(std::uint32_t page)
@@ -144,12 +141,12 @@ struct embot::hw::FlashBurner::Impl
     }
     
     
-    Impl(std::uint32_t _start = embot::hw::sys::addressOfApplication, std::uint32_t _size = embot::hw::sys::maxsizeOfApplication, std::uint32_t _buffersize = 2048, std::uint64_t * _buffer = nullptr) 
+    Impl(std::uint32_t _start, std::uint32_t _size, std::uint32_t _buffersize = 2048, std::uint64_t * _buffer = nullptr) 
     {
         start = _start; // dont do any control ... just > embot::hw::sys::startOfFLASH
-        if(start < embot::hw::sys::startOfFLASH)
+        if(start < embot::hw::flash::getpartition(embot::hw::FLASH::whole).address) // embot::hw::sys::startOfFLASH
         {
-             start = embot::hw::sys::addressOfApplication;
+             start = embot::hw::flash::getpartition(embot::hw::FLASH::application).address; //embot::hw::sys::addressOfApplication;
         }
         
         size = _size;

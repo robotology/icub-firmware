@@ -363,36 +363,56 @@ extern eOresult_t eocanprotASpolling_former_POL_SK_CMD__SET_TRIANG_CFG(eOcanprot
     return(eores_OK);
 }
 
+extern eOresult_t eocanprotASpolling_former_POL_AS_CMD__POS_CONFIG_GET(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
+{
+    //#warning see if we have anything to set ... maybe we dont ask and it does not tell
+    return(eores_OK);
+}
 
-//extern eOresult_t eocanprotASpolling_parser_00(eOcanframe_t *frame, eOcanport_t port)
-//{
-//    return(eores_OK);
-//}
+extern eOresult_t eocanprotASpolling_parser_POL_AS_CMD__POS_CONFIG_GET(eOcanframe_t *frame, eOcanport_t port)
+{
+    //#warning see if we have anything to retrieve ... maybe it does not tell because we dont ask
+    return(eores_OK);
+}
 
-//extern eOresult_t eocanprotASpolling_former_00(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
-//{
-//    return(eores_OK);
-//}
+extern eOresult_t eocanprotASpolling_former_POL_AS_CMD__POS_CONFIG_SET(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
+{
+    s_former_POL_AS_prepare_frame(descriptor, frame, 8, ICUBCANPROTO_POL_AS_CMD__POS_CONFIG_SET);    
 
-//extern eOresult_t eocanprotASpolling_parser_01(eOcanframe_t *frame, eOcanport_t port)
-//{
-//    return(eores_OK);
-//}
+    icubCanProto_POS_CONFIG_t *cfg = (icubCanProto_POS_CONFIG_t*)descriptor->cmd.value;
+    frame->data[1] = cfg->type & 0xff; 
+    if(icubCanProto_pos_decideg == cfg->type)
+    {
+        frame->data[1] = icubCanProto_pos_decideg;
+        // we have settings for two sensors ...
+        frame->data[2] = (cfg->setting.decideg[0].enabled << 7) | (cfg->setting.decideg[0].invertdirection << 6) | (cfg->setting.decideg[0].rotation << 4) | (cfg->setting.decideg[0].label & 0x0f);
+        frame->data[3] = (cfg->setting.decideg[0].zero & 0x00ff);           // lsb of zero
+        frame->data[4] = (cfg->setting.decideg[0].zero & 0xff00) >> 8;      // msb of zero
+        
+        frame->data[5] = (cfg->setting.decideg[1].enabled << 7) | (cfg->setting.decideg[1].invertdirection << 6) | (cfg->setting.decideg[1].rotation << 4) | (cfg->setting.decideg[1].label & 0x0f);
+        frame->data[6] = (cfg->setting.decideg[1].zero & 0x00ff);           // lsb of zero
+        frame->data[7] = (cfg->setting.decideg[1].zero & 0xff00) >> 8;      // msb of zero             
+    }
+    else
+    {
+        frame->data[1] = icubCanProto_pos_unkwown;
+        memmove(&frame->data[2], cfg->setting.unknown, sizeof(cfg->setting.unknown));        
+    }
+      
+    return(eores_OK);    
+}
 
-//extern eOresult_t eocanprotASpolling_former_01(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
-//{
-//    return(eores_OK);
-//}
+extern eOresult_t eocanprotASpolling_former_POL_AS_CMD__POS_TRANSMIT(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
+{
+    s_former_POL_AS_prepare_frame(descriptor, frame, 2, ICUBCANPROTO_POL_AS_CMD__POS_TRANSMIT);    
 
-//extern eOresult_t eocanprotASpolling_parser_02(eOcanframe_t *frame, eOcanport_t port)
-//{
-//    return(eores_OK);
-//}
+    icubCanProto_POS_TRANSMIT_t *trs = (icubCanProto_POS_TRANSMIT_t*)descriptor->cmd.value;
+    frame->data[1] = trs->rate; 
 
-//extern eOresult_t eocanprotASpolling_former_02(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame)
-//{
-//    return(eores_OK);
-//}
+    return(eores_OK);
+}
+
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern hidden functions 

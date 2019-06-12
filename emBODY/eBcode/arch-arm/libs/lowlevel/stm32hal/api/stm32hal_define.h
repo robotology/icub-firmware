@@ -41,76 +41,135 @@ extern "C" {
  **/
     
     
+#if !defined(USE_STM32HAL)
+#define USE_STM32HAL
+#endif   
+
+#if !defined(USE_HAL_DRIVER)
+#define USE_HAL_DRIVER
+#endif   
+
+
+// c++-11 makes deprecated keyword volatile. c++-17 makes it not valid anymore
+// i have two options: (a) use  -Wno-deprecated-register (b) remove it to avoid armclang complains.
+//#if __ARMCOMPILER_VERSION > 6000000
+//    #define register 
+//#endif
+// i choose the -Wno-deprecated-register solution in projects to avoid interference w/ stm32 lib. but with c++17 i must remove it
+
+#if (__cplusplus >= 201703L)
+    //#warning c++-17 features enabled: disabling keyword register in stm32hal
+    #define register 
+#endif
+    
 #if     defined(STM32HAL_BOARD_NUCLEO64)
-
-    #if !defined(USE_STM32HAL)
-    #define USE_STM32HAL
-    #endif
-
-    // use hal
-    #if !defined(USE_HAL_DRIVER)
-    #define USE_HAL_DRIVER
-    #endif
 
     // it has a STM32L476xx mpu
     #if !defined(STM32L476xx)
     #define STM32L476xx
     #endif
     
-    // of type STM32L4    
-    #if !defined(STM32HAL_STM32L4xx)
-    #define STM32HAL_STM32L4xx
+    // of family STM32L4
+    #if !defined(STM32L4)
+    #define STM32L4
+    #endif  
+
+    // of family STM32L4 but in STM32HAL_ format   
+    #if !defined(STM32HAL_STM32L4)
+    #define STM32HAL_STM32L4
     #endif
     
 //    #if !defined(ARM_MATH_CM4)
 //    #define ARM_MATH_CM4
 //    #endif
       
-
 #elif   defined(STM32HAL_BOARD_MTB4)
     
-    #if !defined(USE_STM32HAL)
-    #define USE_STM32HAL
-    #endif
-
-    // use hal
-    #if !defined(USE_HAL_DRIVER)
-    #define USE_HAL_DRIVER
-    #endif
-
     // it has a STM32L443xx mpu
     #if !defined(STM32L443xx)
     #define STM32L443xx
     #endif	
+    
+    // of family STM32L4
+    #if !defined(STM32L4)
+    #define STM32L4
+    #endif  
 
-    // of type STM32L4    
-    #if !defined(STM32HAL_STM32L4xx)
-    #define STM32HAL_STM32L4xx
+    // of family STM32L4 but in STM32HAL_ format    
+    #if !defined(STM32HAL_STM32L4)
+    #define STM32HAL_STM32L4
     #endif    
-				
+    				
 #elif   defined(STM32HAL_BOARD_STRAIN2)
 
-    #if !defined(USE_STM32HAL)
-    #define USE_STM32HAL
-    #endif
-
-    // use hal
-    #if !defined(USE_HAL_DRIVER)
-    #define USE_HAL_DRIVER
-    #endif
-
     // it has a STM32L443xx mpu
     #if !defined(STM32L443xx)
     #define STM32L443xx
     #endif	
+    
+    // of family STM32L4
+    #if !defined(STM32L4)
+    #define STM32L4
+    #endif  
 
-    // of type STM32L4    
-    #if !defined(STM32HAL_STM32L4xx)
-    #define STM32HAL_STM32L4xx
+    // of family STM32L4 but in STM32HAL_ format
+    #if !defined(STM32HAL_STM32L4)
+    #define STM32HAL_STM32L4
+    #endif  
+     
+#elif   defined(STM32HAL_BOARD_RFE)
+
+    // it has a STM32L452xx mpu
+    #if !defined(STM32L452xx)
+    #define STM32L452xx
+    #endif  
+
+    // of family STM32L4
+    #if !defined(STM32L4)
+    #define STM32L4
+    #endif  
+
+    // of family STM32L4 but in STM32HAL_ format  
+    #if !defined(STM32HAL_STM32L4)
+    #define STM32HAL_STM32L4
     #endif  
     
+#elif   defined(STM32HAL_BOARD_PSC)
+
+    // it has a STM32L431xx mpu
+    #if !defined(STM32L431xx)
+    #define STM32L431xx
+    #endif	
+    
+    // of family STM32L4
+    #if !defined(STM32L4)
+    #define STM32L4
+    #endif  
+
+    // of family STM32L4 but in STM32HAL_ format
+    #if !defined(STM32HAL_STM32L4)
+    #define STM32HAL_STM32L4
+    #endif 
+       
+#elif   defined(STM32HAL_BOARD_SG3)
+
+    // it has a STM32L431xx mpu
+    #if !defined(STM32L431xx)
+    #define STM32L431xx
+    #endif  
+
+    // of family STM32L4
+    #if !defined(STM32L4)
+    #define STM32L4
+    #endif  
+
+    // of family STM32L4 but in STM32HAL_ format  
+    #if !defined(STM32HAL_STM32L4)
+    #define STM32HAL_STM32L4
+    #endif  
+
 #else
-        #error STM32HAL: you must define a STM32HAL_BOARD_something
+        #error STM32HAL: you must define a STM32HAL_BOARD_${BRD}
 #endif
 
                 

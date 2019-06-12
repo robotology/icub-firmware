@@ -1,7 +1,8 @@
+
 /*
  * Copyright (C) 2017 iCub Facility - Istituto Italiano di Tecnologia
- * Author:  Valentina Gaggero
- * email:   valentina.gaggero@iit.it
+ * Author:  Marco Accame
+ * email:   marco.accame@iit.it
  * website: www.robotcub.org
  * Permission is granted to copy, distribute, and/or modify this program
  * under the terms of the GNU General Public License, version 2 or any
@@ -15,7 +16,6 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
  * Public License for more details
 */
-
 
 // --------------------------------------------------------------------------------------------------------------------
 // - public interface
@@ -35,7 +35,7 @@
 using namespace std;
 
 #include "embot_hw_bsp.h"
-
+#include "embot_hw_lowlevel.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -50,54 +50,6 @@ using namespace std;
 namespace embot { namespace hw { namespace sys {
     
     
-#if     defined(STM32HAL_BOARD_NUCLEO64)
-    
-    const std::uint32_t startOfFLASH            = 0x08000000;
-    const std::uint32_t addressOfBootloader     = 0x08000000;
-    const std::uint32_t maxsizeOfBootloader     = 124*1024;
-    const std::uint32_t addressOfStorage        = 0x0801F000;
-    const std::uint32_t maxsizeOfStorage        = 4*1024;
-    const std::uint32_t addressOfApplication    = 0x08020000;
-    const std::uint32_t maxsizeOfApplication    = 128*1024;
-    
-#elif   defined(STM32HAL_BOARD_MTB4)
-    
-    const std::uint32_t startOfFLASH            = 0x08000000;
-    const std::uint32_t addressOfBootloader     = 0x08000000;
-    const std::uint32_t maxsizeOfBootloader     = 124*1024;
-    const std::uint32_t addressOfStorage        = 0x0801F000;
-    const std::uint32_t maxsizeOfStorage        = 4*1024;
-    const std::uint32_t addressOfApplication    = 0x08020000;
-    const std::uint32_t maxsizeOfApplication    = 128*1024;
-
-#elif   defined(STM32HAL_BOARD_STRAIN2)
-    
-    const std::uint32_t startOfFLASH            = 0x08000000;
-    const std::uint32_t addressOfBootloader     = 0x08000000;
-    const std::uint32_t maxsizeOfBootloader     = 124*1024;
-    const std::uint32_t addressOfStorage        = 0x0801F000;
-    const std::uint32_t maxsizeOfStorage        = 4*1024;
-    const std::uint32_t addressOfApplication    = 0x08020000;
-    const std::uint32_t maxsizeOfApplication    = 128*1024;
-    
-    
-#else
-    #error you must define some embot::hw::sys constants   
-#endif
-
- 
-#if     defined(STM32HAL_BOARD_NUCLEO64) || defined(STM32HAL_BOARD_MTB4) || defined(STM32HAL_BOARD_STRAIN2)
-    
-__asm static void ss_hl_sys_asm_xnumARMv7ops(uint32_t numberof) 
-{
-   align
-dowaitloop
-   subs r0,r0,#1
-   bne dowaitloop
-   bx lr 
-   align    
-}
-
     static void ss_bsp_delay(uint64_t t)
     {   
         static uint64_t s_hl_sys_numofops1sec = 0;
@@ -131,28 +83,27 @@ dowaitloop
         {
             return;
         }
-        ss_hl_sys_asm_xnumARMv7ops((uint32_t)num);
+        embot::hw::lowlevel::asmEXECcycles(static_cast<uint32_t>(num));
     }
     
-#endif
     
-    std::uint32_t clock(CLOCK clk)
+    std::uint32_t clock(embot::hw::CLOCK clk)
     {
         std::uint32_t value = 0;
         switch(clk)
         {
-            case embot::hw::sys::CLOCK::pclk1:
+            case embot::hw::CLOCK::pclk1:
             {
                 value = HAL_RCC_GetPCLK1Freq();
             } break;
             
-            case embot::hw::sys::CLOCK::pclk2:
+            case embot::hw::CLOCK::pclk2:
             {
                 value = HAL_RCC_GetPCLK2Freq();
             } break;
             
             default:
-            case embot::hw::sys::CLOCK::syscore:
+            case embot::hw::CLOCK::syscore:
             {
                 value = HAL_RCC_GetHCLKFreq();
             } break;            
@@ -217,9 +168,11 @@ dowaitloop
     static const std::uint32_t maxRANDmask = 0x3ff; // 1023    
     std::uint32_t random()
     {
-        std::uint32_t v = 0;        
+        std::uint32_t v; 
+#if defined(HAL_RNG_MODULE_ENABLED)        
         HAL_StatusTypeDef ret = HAL_RNG_GenerateRandomNumber(&hrng, &v);
-        ret = ret;        
+        ret = ret;
+#endif        
         return v & maxRANDmask;
     }
     

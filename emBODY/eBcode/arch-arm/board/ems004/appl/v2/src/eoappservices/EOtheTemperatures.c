@@ -281,7 +281,7 @@ extern eOresult_t eo_temperatures_SendReport(EOtheTemperatures *p)
 
 extern eOresult_t eo_temperatures_Verify(EOtheTemperatures *p, const eOmn_serv_configuration_t * servcfg, eOservice_onendofoperation_fun_t onverify, eObool_t activateafterverify)
 {
-    eOresult_t res = eores_NOK_generic;
+    //eOresult_t res = eores_NOK_generic;
     
     if((NULL == p) || (NULL == servcfg))
     {
@@ -542,7 +542,7 @@ extern eOresult_t eo_temperatures_Activate(EOtheTemperatures *p, const eOmn_serv
 
     
             
-    #warning TODO: save memory be avoiding the duplication of p->service.servconfig into arrayofsensordescriptors and setofboardinfos
+    //#warning TODO: save memory be avoiding the duplication of p->service.servconfig into arrayofsensordescriptors and setofboardinfos
             
     // now i get all the sensors info from ...
     memcpy(&p->setofboardinfos, &servcfg->data.as.temperature.setofboardinfos, sizeof(eOas_temperature_setof_boardinfos_t));
@@ -1330,7 +1330,7 @@ static eObool_t s_eo_temperatures_get_id(eObrd_canlocation_t loc, eOas_temperatu
     // HENCE: the original idea of sending up an id = the order of the arrayofsensordescriptors as sent by pc104 is not feasible.
     // for now i just send up 8 bits with two nibbles [canx, addr] and i build the map inside the pc104.
     
-    #warning TODO: if we save some ram by removing the double arrayofsensordescriptors, then we may add a map of 128 bytes.
+    //#warning TODO: if we save some ram by removing the double arrayofsensordescriptors, then we may add a map of 128 bytes.
 
     *id = (loc.port << 4) | loc.addr;
     

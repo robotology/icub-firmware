@@ -138,6 +138,7 @@ static EOtheSKIN s_eo_theskin =
 
 static const char s_eobj_ownname[] = "EOtheSKIN";
 
+//static char s_trace_string[64] = {0};
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
@@ -295,18 +296,23 @@ extern eOresult_t eo_skin_Verify(EOtheSKIN *p, const eOmn_serv_configuration_t *
     // now i must do discovery of the patches. all patches can be at most on the two can buses ...
     // moreover, we cannot have more than .... eo_skin_maxnumberofMTBboards boards
 
+    uint8_t numofboardsentity[2] = {0};
     trgt.canmap[eOcanport1] = trgt.canmap[eOcanport2] = 0x0000;
     uint8_t i=0;
     for(i=0; i<servcfg->data.sk.skin.numofpatches; i++)
     {
         trgt.canmap[eOcanport1] |= servcfg->data.sk.skin.canmapskin[i][eOcanport1];
         trgt.canmap[eOcanport2] |= servcfg->data.sk.skin.canmapskin[i][eOcanport2];
+        
+        numofboardsentity[i] = eo_common_hlfword_bitsetcount(servcfg->data.sk.skin.canmapskin[i][eOcanport1]) +
+                               eo_common_hlfword_bitsetcount(servcfg->data.sk.skin.canmapskin[i][eOcanport2]);
     }
     
     uint8_t numofboards = eo_common_hlfword_bitsetcount(trgt.canmap[eOcanport1]) +
                           eo_common_hlfword_bitsetcount(trgt.canmap[eOcanport2]);
     
-    if(numofboards > eo_skin_maxnumberofMTBboards)
+    
+    if((numofboards > eo_skin_maxnumberofMTBboards) || (numofboardsentity[0] > eo_skin_maxumberofMTBboardsInEntity) || (numofboardsentity[1] > eo_skin_maxumberofMTBboardsInEntity))
     {        
         p->diagnostics.errorDescriptor.sourcedevice       = eo_errman_sourcedevice_localboard;
         p->diagnostics.errorDescriptor.sourceaddress      = 0;
@@ -548,7 +554,6 @@ extern eOresult_t eo_skin_SetRegulars(EOtheSKIN *p, eOmn_serv_arrayof_id32_t* ar
     return(eo_service_hid_SetRegulars(p->id32ofregulars, arrayofid32, s_eo_skin_isID32relevant, numberofthem));
 }
 
-
 extern eOresult_t eo_skin_Stop(EOtheSKIN *p)
 {
     if(NULL == p)
@@ -716,7 +721,7 @@ extern eOresult_t eo_skin_SetMode(EOtheSKIN *p, uint8_t patchindex, eOsk_sigmode
             icubCanProto_as_sigmode_t sigmode2use = icubCanProto_as_sigmode_dontsignal;
             p->sharedcan.command.value = &sigmode2use;
             // and now we send the command to all the skin boards
-            eo_canserv_SendCommandToAllBoardsInEntity(eo_canserv_GetHandle(), &p->sharedcan.command, id32);
+            eo_canserv_SendCommandToAllBoardsInEntity2(eo_canserv_GetHandle(), &p->sharedcan.command, id32);
             // and we set this patch as not tx
             p->patchisrunning[patchindex] = eobool_false;
             
@@ -727,7 +732,7 @@ extern eOresult_t eo_skin_SetMode(EOtheSKIN *p, uint8_t patchindex, eOsk_sigmode
             icubCanProto_as_sigmode_t sigmode2use = icubCanProto_as_sigmode_signal;
             p->sharedcan.command.value = &sigmode2use;
             // and now we send the command to all the skin boards
-            eo_canserv_SendCommandToAllBoardsInEntity(eo_canserv_GetHandle(), &p->sharedcan.command, id32);
+            eo_canserv_SendCommandToAllBoardsInEntity2(eo_canserv_GetHandle(), &p->sharedcan.command, id32);
             // and we set this patch as tx
             p->patchisrunning[patchindex] = eobool_true;
 
@@ -740,7 +745,7 @@ extern eOresult_t eo_skin_SetMode(EOtheSKIN *p, uint8_t patchindex, eOsk_sigmode
             p->sharedcan.command.type  = ICUBCANPROTO_POL_SK_CMD__TACT_SETUP;
             p->sharedcan.command.value = NULL;     
             // and now we send the command to all the skin boards
-            eo_canserv_SendCommandToAllBoardsInEntity(eo_canserv_GetHandle(), &p->sharedcan.command, id32);
+            eo_canserv_SendCommandToAllBoardsInEntity2(eo_canserv_GetHandle(), &p->sharedcan.command, id32);
             // and we set this patch as tx
             p->patchisrunning[patchindex] = eobool_true;
                        
@@ -786,7 +791,6 @@ extern eOresult_t eo_skin_SetMode(EOtheSKIN *p, uint8_t patchindex, eOsk_sigmode
         {
         } break;
     }        
-
     
     return(eores_OK);
 }
@@ -825,13 +829,41 @@ extern eOresult_t eo_skin_SetBoardsConfig(EOtheSKIN *p, uint8_t patchindex, eOsk
     p->sharedcan.command.clas = eocanprot_msgclass_pollingSkin;    
     p->sharedcan.command.type  = ICUBCANPROTO_POL_SK_CMD__SET_BRD_CFG;
     p->sharedcan.command.value = &canProto_skcfg; 
-//    #error --> change so that we send the command to all boards of given address .... if they are in patch....
-        
-    // and now we send the p->sharedcan.command to all the skin boards
-    eo_canserv_SendCommandToAllBoardsInEntity(eo_canserv_GetHandle(), &p->sharedcan.command, id32); 
     
+    
+    // for this command we send to the whole entity if .... the candestination[] is = { 0xffff, 0xffff }
+    // otherwise we send only to those which are not zero and not f or 0 address.
+    if((0xffff == brdcfg->candestination[0]) && (0xffff == brdcfg->candestination[1]))
+    {
+        //snprintf(s_trace_string, sizeof(s_trace_string), "brdcfg: eo_canserv_SendCommandToAllBoardsInEntity2()");    
+        //eo_errman_Trace(eo_errman_GetHandle(), s_trace_string, "pippo");
+        eo_canserv_SendCommandToAllBoardsInEntity2(eo_canserv_GetHandle(), &p->sharedcan.command, id32);
+    }
+    else
+    {
+        eObrd_canlocation_t loc = {0};
+        loc.insideindex = eobrd_caninsideindex_none;
+        
+        for(uint8_t i=0; i<2; i++)
+        {
+            for(uint8_t j=1; j<15; j++)
+            {
+                if(eobool_true == eo_common_hlfword_bitcheck(brdcfg->candestination[i], j))
+                {
+                    loc.port = i;
+                    loc.addr = j;
+                    //snprintf(s_trace_string, sizeof(s_trace_string), "brdcfg: eo_canserv_SendCommandToLocation(CAN%d:%d)", i+1, j);    
+                    //eo_errman_Trace(eo_errman_GetHandle(), s_trace_string, "pippo");
+                    eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), &p->sharedcan.command, loc);  
+                }                    
+            }
+            
+        }                
+    }
+
     return(eores_OK);          
 }
+
 
 
 extern eOresult_t eo_skin_SetTrianglesConfig(EOtheSKIN *p, uint8_t patchindex, eOsk_cmd_trianglesCfg_t *trgcfg)
@@ -869,18 +901,41 @@ extern eOresult_t eo_skin_SetTrianglesConfig(EOtheSKIN *p, uint8_t patchindex, e
     
     
     p->sharedcan.command.clas = eocanprot_msgclass_pollingSkin;    
-    p->sharedcan.command.type  = ICUBCANPROTO_POL_SK_CMD__SET_TRIANG_CFG;
+    p->sharedcan.command.type = ICUBCANPROTO_POL_SK_CMD__SET_TRIANG_CFG;
     p->sharedcan.command.value = &canProto_trgscfg; 
     
-    eObrd_canlocation_t location = {0};
-    eo_canmap_GetEntityLocation(eo_canmap_GetHandle(), id32, &location, NULL, NULL);
-    // the function eo_canmap_GetEntityLocation() puts in location.addr the address of the first board of the entity (the patch).
-    // we call eo_canmap_GetEntityLocation() to retrieve the canbus (port1 or port2) and insideindex.
-    // then, as we already have the address in trgcfg->boardaddr, we copy it in location.addr.
-    // if eOsk_cmd_trianglesCfg_t contained also port, we would not need to do that.... 
-    location.addr = trgcfg->boardaddr;
-    eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), &p->sharedcan.command, location);    
-   
+    
+    // for this command we send to the whole entity if .... the candestination[] is = { 0xffff, 0xffff }
+    // otherwise we send only to those which are not zero and not f or 0 address.
+    if((0xffff == trgcfg->candestination[0]) && (0xffff == trgcfg->candestination[1]))
+    {
+        //snprintf(s_trace_string, sizeof(s_trace_string), "trgcfg: eo_canserv_SendCommandToAllBoardsInEntity2()");    
+        //eo_errman_Trace(eo_errman_GetHandle(), s_trace_string, "pippo");
+        
+        eo_canserv_SendCommandToAllBoardsInEntity2(eo_canserv_GetHandle(), &p->sharedcan.command, id32);
+    }
+    else
+    {
+        eObrd_canlocation_t loc = {0};
+        loc.insideindex = eobrd_caninsideindex_none;
+        
+        for(uint8_t i=0; i<2; i++)
+        {
+            for(uint8_t j=1; j<15; j++)
+            {
+                if(eobool_true == eo_common_hlfword_bitcheck(trgcfg->candestination[i], j))
+                {
+                    loc.port = i;
+                    loc.addr = j;
+                    //snprintf(s_trace_string, sizeof(s_trace_string), "trgcfg: eo_canserv_SendCommandToLocation(CAN%d:%d)", i+1, j);    
+                    //eo_errman_Trace(eo_errman_GetHandle(), s_trace_string, "pippo");
+                    eo_canserv_SendCommandToLocation(eo_canserv_GetHandle(), &p->sharedcan.command, loc);  
+                }                    
+            }
+            
+        }                
+    }    
+       
     return(eores_OK);          
 }
 
@@ -1092,7 +1147,7 @@ static eOresult_t s_eo_skin_TXstop(EOtheSKIN *p)
         // the simplification we use is that they all are on the same CAN bus and all have consecutive addresses.
         // we send the same p->sharedcan.command to all of them
         eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_skin, eoprot_entity_sk_skin, i, 0);
-        eo_canserv_SendCommandToAllBoardsInEntity(eo_canserv_GetHandle(), &p->sharedcan.command, id32);    
+        eo_canserv_SendCommandToAllBoardsInEntity2(eo_canserv_GetHandle(), &p->sharedcan.command, id32);    
         
         p->patchisrunning[i] = eobool_false;
     }

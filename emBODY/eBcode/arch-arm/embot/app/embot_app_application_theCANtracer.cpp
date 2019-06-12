@@ -47,7 +47,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-struct embot::app::application::theCANtracer::Impl
+struct embot::app::theCANtracer::Impl
 {    
     Config config;
         
@@ -72,15 +72,24 @@ struct embot::app::application::theCANtracer::Impl
 
 
 
-embot::app::application::theCANtracer::theCANtracer()
-: pImpl(new Impl)
-{       
-
+embot::app::theCANtracer& embot::app::theCANtracer::getInstance()
+{
+    static theCANtracer* p = new theCANtracer();
+    return *p;
 }
+
+embot::app::theCANtracer::theCANtracer()
+//    : pImpl(new Impl)
+{
+    pImpl = std::make_unique<Impl>();
+}  
+
+    
+embot::app::theCANtracer::~theCANtracer() { }
 
    
         
-bool embot::app::application::theCANtracer::initialise(Config &config)
+bool embot::app::theCANtracer::initialise(Config &config)
 {
     pImpl->config = config;    
     return true;
@@ -88,14 +97,14 @@ bool embot::app::application::theCANtracer::initialise(Config &config)
   
 
 
-embot::common::Time embot::app::application::theCANtracer::start()
+embot::common::Time embot::app::theCANtracer::start()
 {  
     pImpl->starttime = embot::sys::timeNow();     
     return pImpl->starttime;    
 }
 
 
-embot::common::relTime embot::app::application::theCANtracer::stop(const std::string &prefix, std::vector<embot::hw::can::Frame> &frames, embot::common::Time started)
+embot::common::relTime embot::app::theCANtracer::stop(const std::string &prefix, std::vector<embot::hw::can::Frame> &frames, embot::common::Time started)
 { 
     embot::common::Time tt = embot::sys::timeNow();
     
@@ -118,7 +127,7 @@ embot::common::relTime embot::app::application::theCANtracer::stop(const std::st
 }
 
 
-bool embot::app::application::theCANtracer::print(const std::string &text, std::vector<embot::hw::can::Frame> &frames)
+bool embot::app::theCANtracer::print(const std::string &text, std::vector<embot::hw::can::Frame> &frames)
 { 
     embot::app::canprotocol::motor::periodic::Message_PRINT msg;
     embot::app::canprotocol::motor::periodic::Message_PRINT::Info info;

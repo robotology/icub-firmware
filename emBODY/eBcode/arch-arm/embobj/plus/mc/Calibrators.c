@@ -236,6 +236,8 @@ static eOresult_t JointSet_do_wait_calibration_6_singleJoint(JointSet *o, int in
 static eOresult_t JointSet_do_wait_calibration_7_singleJoint(Joint *j, Motor* m, AbsEncoder* e, BOOL* calibrationCompleted)
 {
     
+    eOresult_t ret = eores_OK;
+    
     /* When i'm here i sure that:
        - state = calibtype7_st_jntEncResComputed
     */
@@ -281,8 +283,14 @@ static eOresult_t JointSet_do_wait_calibration_7_singleJoint(Joint *j, Motor* m,
         {
             *calibrationCompleted = TRUE;
         }break;
+        
+        default:
+        {
+            ret = eores_NOK_generic;
+        } break;
     }
-    return(eores_OK);
+    
+    return(ret);
 }
 
 BOOL JointSet_do_wait_calibration_mixed(JointSet* o)
@@ -642,6 +650,21 @@ BOOL JointSet_do_wait_calibration_11(JointSet* o)
 }
 
 BOOL JointSet_do_wait_calibration_12(JointSet* o)
+{
+    BOOL calibrated = TRUE;
+    
+    for (int ms=0; ms<*(o->pN); ++ms)
+    {
+        if (!Motor_is_calibrated(o->motor+o->motors_of_set[ms])) 
+        {
+            calibrated = FALSE;
+        }
+    }
+    
+    return calibrated;
+}
+
+BOOL JointSet_do_wait_calibration_13(JointSet* o)
 {
     BOOL calibrated = TRUE;
     

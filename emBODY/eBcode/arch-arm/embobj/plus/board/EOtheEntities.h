@@ -110,6 +110,12 @@ extern eOas_strain_t * eo_entities_GetStrain(EOtheEntities *p, eOprotIndex_t id)
 extern eOas_strain_config_t * eo_entities_GetStrainConfig(EOtheEntities *p, eOprotIndex_t id);
 extern eOas_strain_status_t * eo_entities_GetStrainStatus(EOtheEntities *p, eOprotIndex_t id);
 
+extern eOresult_t eo_entities_SetNumOfPSCs(EOtheEntities *p, uint8_t num);
+extern uint8_t eo_entities_NumOfPSCs(EOtheEntities *p);
+extern eOas_psc_t * eo_entities_GetPSC(EOtheEntities *p, eOprotIndex_t id);
+//extern eOas_inertial3_config_t * eo_entities_GetPSCConfig(EOtheEntities *p, eOprotIndex_t id);
+//extern eOas_inertial3_status_t * eo_entities_GetPSCStatus(EOtheEntities *p, eOprotIndex_t id);
+
 extern eOresult_t eo_entities_SetNumOfSkins(EOtheEntities *p, uint8_t num);
 extern uint8_t eo_entities_NumOfSkins(EOtheEntities *p);
 extern eOsk_skin_t * eo_entities_GetSkin(EOtheEntities *p, eOprotIndex_t id);

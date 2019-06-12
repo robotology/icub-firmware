@@ -215,6 +215,7 @@ extern void Joint_set_limits(Joint* o, CTRL_UNITS pos_min, CTRL_UNITS pos_max);
 extern void Joint_set_hardware_limit(Joint* o);
 
 extern BOOL Joint_manage_cable_constraint(Joint* o);
+extern BOOL Joint_manage_R1_finger_tension_constraint(Joint* o);
 
 extern CTRL_UNITS Joint_do_pwm_control(Joint* o);
 extern CTRL_UNITS Joint_do_vel_control(Joint* o);

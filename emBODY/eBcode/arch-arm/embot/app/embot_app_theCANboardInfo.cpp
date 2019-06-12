@@ -23,9 +23,7 @@
 
 #include "embot_app_theCANboardInfo.h"
 
-#include "embot.h"
 
-#include <cstring>
 
 
 
@@ -33,10 +31,12 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
+#include "embot.h"
+#include <cstring>
 #include "embot_hw_FlashStorage.h"
-#include "embot_sys_theStorage.h"
 #include "embot_hw.h"
 #include "embot_hw_sys.h"
+#include "embot_hw_bsp.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -48,13 +48,16 @@ struct embot::app::theCANboardInfo::Impl
 {
     std::uint8_t cachedcanaddress;    
     embot::hw::FlashStorage *flashstorage;
-    const std::uint32_t userdataaddress = embot::hw::sys::addressOfStorage + 1024 - embot::app::theCANboardInfo::sizeOfUserSpace;
+    std::uint32_t userdataaddress;
+    std::uint32_t addressofsharedstorage;
     std::uint64_t buffer[1024/sizeof(std::uint64_t)];
     Impl() 
-    {              
-        flashstorage = new embot::hw::FlashStorage(embot::hw::sys::addressOfStorage, 1024, buffer); 
-        embot::sys::theStorage &thestrg = embot::sys::theStorage::getInstance();
-        thestrg.init(flashstorage); 
+    {  
+        addressofsharedstorage = embot::hw::flash::getpartition(embot::hw::FLASH::sharedstorage).address;      
+        userdataaddress = addressofsharedstorage + 1024 - embot::app::theCANboardInfo::sizeOfUserSpace;        
+        flashstorage = new embot::hw::FlashStorage(addressofsharedstorage, 1024, buffer); 
+//        embot::sys::theStorage &thestrg = embot::sys::theStorage::getInstance();
+//        thestrg.init(flashstorage); 
         cachedcanaddress = 255;        
     }
 };
@@ -68,12 +71,20 @@ struct embot::app::theCANboardInfo::Impl
 
 
 
-embot::app::theCANboardInfo::theCANboardInfo()
-: pImpl(new Impl)
-{       
-
+embot::app::theCANboardInfo& embot::app::theCANboardInfo::getInstance()
+{
+    static theCANboardInfo* p = new theCANboardInfo();
+    return *p;
 }
 
+embot::app::theCANboardInfo::theCANboardInfo()
+//    : pImpl(new Impl)
+{
+    pImpl = std::make_unique<Impl>();
+}  
+
+    
+embot::app::theCANboardInfo::~theCANboardInfo() { }
 
 
 bool embot::app::theCANboardInfo::erase()
@@ -169,13 +180,13 @@ bool embot::app::theCANboardInfo::synch(embot::app::canprotocol::versionOfAPPLIC
 
 bool embot::app::theCANboardInfo::get(StoredInfo &info)
 {
-    return pImpl->flashstorage->read(embot::hw::sys::addressOfStorage, sizeof(StoredInfo), &info);
+    return pImpl->flashstorage->read(pImpl->addressofsharedstorage, sizeof(StoredInfo), &info);
 }
 
 
 bool embot::app::theCANboardInfo::set(const StoredInfo &info)
 {
-    bool r = pImpl->flashstorage->write(embot::hw::sys::addressOfStorage, sizeof(StoredInfo), &info);
+    bool r = pImpl->flashstorage->write(pImpl->addressofsharedstorage, sizeof(StoredInfo), &info);
     if(true == r)
     {
         pImpl->cachedcanaddress = info.canaddress;

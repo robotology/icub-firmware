@@ -85,7 +85,7 @@ struct embot::app::application::theTHERMO::Impl
         embot::common::relTime duration;
         embot::common::Time timeofstart;
         bool dataisready;
-        embot::hw::SI7051::Temperature temperature;
+        embot::hw::si7051::Temperature temperature;
         tempAcquisition() { reset(); } 
         void reset()
         {
@@ -162,10 +162,14 @@ struct embot::app::application::theTHERMO::Impl
 bool embot::app::application::theTHERMO::Impl::start()
 { 
     canconfig.counter = 0;
-    ticktimer->start(canconfig.txperiod, embot::sys::Timer::Type::forever, action);
+    embot::sys::Timer::Config cfg(canconfig.txperiod, action, embot::sys::Timer::Mode::forever);
+    if(true == ticking)
+    {
+        stop();
+    }
+    ticktimer->start(cfg);
     ticking = true;    
-    return true;        
-    
+    return true;            
 }
 
 
@@ -235,14 +239,14 @@ bool embot::app::application::theTHERMO::Impl::acquisition_start()
 {
     tempacquisition.onstart();
     embot::common::Callback cbk(alertdataisready, this);
-    embot::hw::SI7051::acquisition(config.sensor, cbk);
+    embot::hw::si7051::acquisition(config.sensor, cbk);
     return true;
 }
 
 
 bool embot::app::application::theTHERMO::Impl::acquisition_retrieve()
 {
-    embot::hw::SI7051::read(config.sensor, tempacquisition.temperature);           
+    embot::hw::si7051::read(config.sensor, tempacquisition.temperature);           
     return true;
 }
 
@@ -259,20 +263,29 @@ bool embot::app::application::theTHERMO::Impl::acquisition_processing()
 
 
 
-embot::app::application::theTHERMO::theTHERMO()
-: pImpl(new Impl)
-{       
-
+embot::app::application::theTHERMO& embot::app::application::theTHERMO::getInstance()
+{
+    static theTHERMO* p = new theTHERMO();
+    return *p;
 }
+
+embot::app::application::theTHERMO::theTHERMO()
+//    : pImpl(new Impl)
+{
+    pImpl = std::make_unique<Impl>();
+}  
+
+    
+embot::app::application::theTHERMO::~theTHERMO() { }
 
          
 bool embot::app::application::theTHERMO::initialise(Config &config)
 {
     pImpl->config = config;
     
-    pImpl->action.set(embot::sys::Action::EventToTask(pImpl->config.tickevent, pImpl->config.totask));
+    pImpl->action.load(embot::sys::EventToTask(pImpl->config.tickevent, pImpl->config.totask));
   
-    embot::hw::SI7051::init(pImpl->config.sensor, pImpl->config.sensorconfig); 
+    embot::hw::si7051::init(pImpl->config.sensor, pImpl->config.sensorconfig); 
      
     return true;
 }
@@ -284,7 +297,7 @@ bool embot::app::application::theTHERMO::start()
     return pImpl->start();
 }
 
-bool embot::app::application::theTHERMO::configure(embot::app::canprotocol::analog::polling::Message_THERMOMETER_CONFIG_SET::Info &info)
+bool embot::app::application::theTHERMO::set(const embot::app::canprotocol::analog::polling::Message_THERMOMETER_CONFIG_SET::Info &info)
 {
     // if ticking: stop it
     if(true == pImpl->ticking)
@@ -298,13 +311,28 @@ bool embot::app::application::theTHERMO::configure(embot::app::canprotocol::anal
     return true;    
 }
 
-bool embot::app::application::theTHERMO::get(embot::app::canprotocol::analog::polling::Message_THERMOMETER_CONFIG_GET::ReplyInfo &info)
+bool embot::app::application::theTHERMO::get(const embot::app::canprotocol::analog::polling::Message_THERMOMETER_CONFIG_GET::Info &info, embot::app::canprotocol::analog::polling::Message_THERMOMETER_CONFIG_GET::ReplyInfo &replyinfo)
 {    
     // copy configuration
-    info.sensormask = pImpl->canconfig.info.sensormask;
+    replyinfo.sensormask = pImpl->canconfig.info.sensormask;
  
     return true;    
 }
+
+bool embot::app::application::theTHERMO::set(const embot::app::canprotocol::analog::polling::Message_THERMOMETER_TRANSMIT::Info &info)
+{
+    if((true == info.transmit) && (info.txperiod > 0))
+    {
+        start(info.txperiod);
+    }
+    else
+    {
+        stop();        
+    }
+    
+    return true;  
+}
+
 
 bool embot::app::application::theTHERMO::start(embot::common::relTime period)
 {      

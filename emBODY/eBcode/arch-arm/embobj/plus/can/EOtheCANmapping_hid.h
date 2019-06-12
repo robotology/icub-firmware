@@ -57,6 +57,7 @@ enum
     eocanmap_temperatures_maxnumberof   = 1,
     eocanmap_inertials_maxnumberof      = 1,
     eocanmap_inertials3_maxnumberof     = 1,
+    eocanmap_pscs_maxnumberof           = 1,
     eocanmap_skins_maxnumberof          = 2     // we may have up to 2 skins on an eth board
 };
 
@@ -65,30 +66,34 @@ enum
 // maximum number of boards used to represent a single entity of the same type and same index
 enum 
 {  
-    eocanmap_joint_index_boards_maxnumberof         = 1,    // we can use up to 1 can board (1foc or mc4) to represent a single joint index 
-    eocanmap_motor_index_boards_maxnumberof         = 1,
-    eocanmap_strain_index_boards_maxnumberof        = 1,    // we can use up to 1 can board (strain or strain2) to represent a single strain index
-    eocanmap_mais_index_boards_maxnumberof          = 1,
-    eocanmap_temperature_index_boards_maxnumberof   = 1,
-    eocanmap_inertial_index_boards_maxnumberof      = 1,
-    eocanmap_inertial3_index_boards_maxnumberof     = 1,
-    eocanmap_skin_index_boards_maxnumberof          = 8     // we can use up to 8 can mtb boards to represent a single sk-skin index
+    eocanmap_joint_boards_maxnumberof         = 1,    // we can use up to 1 can board (1foc or mc4) to represent a single joint index 
+    eocanmap_motor_boards_maxnumberof         = 1,
+    eocanmap_strain_boards_maxnumberof        = 1,    // we can use up to 1 can board (strain or strain2) to represent a single strain index
+    eocanmap_mais_boards_maxnumberof          = 1,
+    eocanmap_temperature_boards_maxnumberof   = 1,
+    eocanmap_inertial_boards_maxnumberof      = 1,
+    eocanmap_inertial3_boards_maxnumberof     = 1,
+    eocanmap_psc_boards_maxnumberof           = 3,    // we use exactly three psc boards to have the 6 values of the psc entity
+    eocanmap_skin_boards_maxnumberof          = 8     // we can use up to 8 can mtb/mtb4 boards to represent a single sk-skin index. we can increase this at cost of some ram
 };
 
 
+enum { eocanmap_entities_maxnumberof = 9 };
 
-enum { eocanmap_entities_maxnumberof = 8 };
+extern uint8_t eocanmap_posOfEPEN(eOprotEndpoint_t ep, eOprotEntity_t en);
 
-extern uint8_t eocanmap_posOfEPEN(uint8_t ep, uint8_t en);
+extern uint8_t eocanmap_maxINDEX(eOprotEndpoint_t ep, eOprotEntity_t en); // eocanmap_joints_maxnumberof etc....
+
+extern uint8_t eocanmap_maxBOARDnumber(eOprotEndpoint_t ep, eOprotEntity_t en); // eocanmap_joint_boards_maxnumberof etc....
 
 typedef struct
 {
-    uint8_t  bitmapOfPresence;      // it holds info about presence of a given endpoint-entity .... use eocanmap_posOfEPEN(ep, en) for bit position
-    //uint8_t  indicesOfMC4;          // index for joint-motor for the case of mc4can. in nibble 0 we have the index if internalindex is 0. in nibble 1 the case of internalindex 1.
-    //uint16_t dummy;
-    //uint32_t indicesOf;             // it holds the index of an entity stored in a nibble .... use eocanmap_posOfEPEN(ep, en) for nibble position. for mc the case of mc4can is managed differently 
-    uint8_t  compactIndicesOf;  // it holds the index of MC and SK in compact form ... nibble 0 contains either SK or MC. if mc4can: nibble 1 contains internalindex1
-} eOcanmap_entities2_t;     EO_VERIFYsizeof(eOcanmap_entities2_t, 2)
+    uint16_t bitmapOfPresence;      // it holds in its bits the info about presence of a given endpoint-entity .... use eocanmap_posOfEPEN(ep, en) for bit position
+    uint8_t  dummy;
+    uint8_t  compactIndicesOf;      // it holds the index of MC and SK in compact form ... nibble 0 contains either SK or MC. if mc4can: nibble 1 contains internalindex1
+                                    // marco.accame on 02apr2019: we multiplex sk with mc information because a can board cannot do both. in case there will be a board 
+                                    // with more entities with more than one index ... use the dummy byte  
+} eOcanmap_entities2_t; EO_VERIFYsizeof(eOcanmap_entities2_t, 4)
 
 
 /**	@typedef    typedef struct eOcanmap_board_t 
@@ -98,7 +103,7 @@ typedef struct
 {
     eObrd_canproperties_t       props;
     eOcanmap_entities2_t        entities2;
-} eOcanmap_board_t;             EO_VERIFYsizeof(eOcanmap_board_t, 6) 
+} eOcanmap_board_t;             EO_VERIFYsizeof(eOcanmap_board_t, 8) 
 
 
 /**	@typedef    typedef struct eOcanmap_board_extended_t 
@@ -108,8 +113,7 @@ typedef struct
 {
     eOcanmap_board_t            board;
     eObrd_info_t                detected;
-} eOcanmap_board_extended_t;    EO_VERIFYsizeof(eOcanmap_board_extended_t, 12) 
-
+} eOcanmap_board_extended_t;    EO_VERIFYsizeof(eOcanmap_board_extended_t, 14) 
 
 
 
@@ -120,10 +124,17 @@ struct EOtheCANmapping_hid
 {
 	eOcanmap_cfg_t                  config;
     eOcanmap_board_extended_t***    canmapping;         // [can][adr] -> pointer to 
-    eOcanmap_board_extended_t****   entitylocation;     // [ep][ent][index]-> pointer to
-    eOcanmap_board_extended_t***    skinlocation;       // [index]-> array[] of up to 8 pointers to 
-    uint8_t                         numofskinboardsindex[eocanmap_skins_maxnumberof];
+//    eOcanmap_board_extended_t****   entitylocation;     // [ep][ent][index]-> pointer to
+//    eOcanmap_board_extended_t***    skinlocation;       // [index]-> array[] of up to eocanmap_skin_boards_maxnumberof = 8 pointers to 
+//    eOcanmap_board_extended_t***    psclocation;        // [index]-> array[] of up to eocanmap_psc_boards_maxnumberof = 3 pointers to
+//    uint8_t                         numofskinboardsindex[eocanmap_skins_maxnumberof];
+//    uint8_t                         numofpscboardsindex[eocanmap_pscs_maxnumberof];
 //    eOcanmap_arrayof_locations_t    arrayofboardlocations;
+    
+//    eOcanmap_board_extended_t****   entitylocation2board;    // [posEPEN][index][brdindex] -> pointer to a eOcanmap_board_extended_t, where posEPEN comes from eocanmap_posOfEPEN()
+//    uint8_t**                       entitylocation2size;     // [posEPEN][index] -> number of boards inside entitylocation2board[posEPEN][index]  
+
+    EOarray**                       arrayOfBRDEXTptr[eocanmap_entities_maxnumberof];  // [posEPEN][index] -> eoarray * which holds a variable number of possible pointers to board.     
 };
 
 

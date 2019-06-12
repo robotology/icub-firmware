@@ -1,0 +1,517 @@
+/*
+ * Copyright (C) 2019 iCub Facility - Istituto Italiano di Tecnologia
+ * Author:  Marco Accame
+ * email:   marco.accame@iit.it
+ * website: www.robotcub.org
+ * Permission is granted to copy, distribute, and/or modify this program
+ * under the terms of the GNU General Public License, version 2 or any
+ * later version published by the Free Software Foundation.
+ *
+ * A copy of the license can be found at
+ * http://www.robotcub.org/icub/license/gpl.txt
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details
+*/
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - public interface
+// --------------------------------------------------------------------------------------------------------------------
+
+#include "embot_hw_tlv493d.h"
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - external dependencies
+// --------------------------------------------------------------------------------------------------------------------
+
+#include <cstring>
+#include <vector>
+#include "stm32hal.h"
+#include "embot_hw_bsp.h"
+
+using namespace std;
+
+#include "embot_binary.h"
+#include "embot_hw_sys.h"
+
+#include <math.h>
+
+#define PII 3.14159265
+
+
+using namespace embot::hw;
+
+// --------------------------------------------------------------------------------------------------------------------
+// - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
+// --------------------------------------------------------------------------------------------------------------------
+
+#if 0
+    volatile int16_t Tv = 0;
+    volatile int16_t Xv = 0;
+    volatile int16_t Yv = 0;
+    volatile int16_t Zv = 0;
+    volatile bool Vv = false;    
+    
+    volatile double AN12 = 0;
+    volatile double AN10 = 0;
+    volatile double AN08 = 0;
+    
+    volatile int8_t X8 = 0;
+    volatile int8_t Y8 = 0;
+    volatile double AN8 = 0;
+    
+    volatile int32_t angle12 = 0; 
+    volatile int32_t angle10 = 0; 
+    volatile int32_t angle08 = 0; 
+    volatile int32_t angle8 = 0; 
+    
+    volatile uint32_t power = 0;
+
+#endif
+
+// --------------------------------------------------------------------------------------------------------------------
+// - all the rest
+// --------------------------------------------------------------------------------------------------------------------
+
+#define EMBOT_TLV493D_ENABLED
+
+#if     !defined(EMBOT_TLV493D_ENABLED)
+
+
+namespace embot { namespace hw { namespace tlv493d {
+
+    bool supported(TLV493D h)                                                                        { return false; }
+    bool initialised(TLV493D h)                                                                      { return false; }
+    result_t init(TLV493D h, const Config &config)                                                   { return resNOK; }
+    
+    result_t get(TLV493D h, Position &temp)                                                       { return resNOK; }
+
+}}} // namespace embot { namespace hw { namespace TLV493D {
+
+
+#elif   defined(EMBOT_TLV493D_ENABLED)
+
+
+namespace embot { namespace hw { namespace tlv493d {
+              
+    // initialised mask       
+    static std::uint32_t initialisedmask = 0;
+    
+    bool supported(TLV493D h)
+    {
+        return embot::hw::bsp::tlv493d::getBSP().supported(h);
+    }
+    
+    bool initialised(TLV493D h)
+    {
+        return embot::binary::bit::check(initialisedmask, embot::common::tointegral(h));
+    }    
+    
+    
+    struct RegisterMap
+    {
+        static constexpr std::uint8_t readsize = 10;
+        static constexpr std::uint8_t writesize = 4;
+        std::uint8_t readmemory[readsize];
+        std::uint8_t writememory[writesize];
+        bool isvalid() const 
+        {
+            if((0b00000000 != (readmemory[3] & 0b00000011))) { return false; }  // CH must  be 00 else a conversion is ongoing
+            if((0b00110000 != (readmemory[5] & 0b01110000))) { return false; }     // T+FF+PD (pos 4, 5, 6) must be 011 else ...         
+            return true;
+        }
+        constexpr std::uint16_t getXU() const { return static_cast<std::uint16_t>( (static_cast<std::uint16_t>(readmemory[0]) << 4) | static_cast<std::uint16_t>(readmemory[4]>>4) ); }  
+        constexpr std::uint16_t getYU() const { return static_cast<std::int16_t>( (static_cast<std::uint16_t>(readmemory[1]) << 4) | static_cast<std::uint16_t>(readmemory[4]&0x0F) ); }             
+        constexpr std::uint16_t getZU() const { return static_cast<std::uint16_t>( (static_cast<std::uint16_t>(readmemory[2]) << 4) | static_cast<std::uint16_t>(readmemory[5]&0x0F) ); }
+        constexpr std::uint16_t getTU() const { return static_cast<std::uint16_t>( (static_cast<std::uint16_t>(readmemory[3]&0xF0) << 4) | static_cast<std::uint16_t>(readmemory[6]) ); }
+        static constexpr std::int16_t toi16(std::uint16_t u) { return ( (0==(u&0x0800)) ? u : ((0x07ff&u)-2048) ); } 
+        constexpr std::int16_t getX() const { return toi16(getXU()); }
+        constexpr std::int16_t getY() const { return toi16(getYU()); }
+        constexpr std::int16_t getZ() const { return toi16(getZU()); }
+        
+        constexpr std::int16_t getT() const { return toi16(getTU())-340; }
+        
+        constexpr std::uint8_t getInitialWRITE0() const { return 0; }
+        constexpr std::uint8_t getInitialWRITE1() const { return readmemory[7] & 0x18; }
+        constexpr std::uint8_t getInitialWRITE2() const { return readmemory[8]; }
+        constexpr std::uint8_t getInitialWRITE3() const { return readmemory[9] & 0x1f; }
+// ok     void setWRITE(uint8_t paritybit = 0b1, uint8_t i2caddr = 0b00, uint8_t intena = 0b0, uint8_t fastena = 0b1, uint8_t lowena = 0b0, 
+//                      uint8_t tempena = 0b0, uint8_t lpperiod = 0b0, uint8_t parena = 0b0)
+        struct config_t
+        {
+            uint32_t    paritybit   : 1;
+            uint32_t    i2caddr     : 2;
+            uint32_t    intena      : 1; 
+            uint32_t    fastena     : 1;
+            uint32_t    lowena      : 1;
+            uint32_t    tempena     : 1;
+            uint32_t    lpperiod    : 1;
+            uint32_t    parena      : 1;
+            constexpr config_t(uint8_t _paritybit, uint8_t _i2caddr, uint8_t _intena, uint8_t _fastena, uint8_t _lowena, 
+                uint8_t _tempena, uint8_t _lpperiod, uint8_t _parena) :
+                paritybit(_paritybit), i2caddr(_i2caddr), intena(_intena), fastena(_fastena), lowena(_lowena), tempena(_tempena), lpperiod(_lpperiod), parena(_parena)
+            {
+            }
+            constexpr config_t() :
+                paritybit(0b1), i2caddr(0b00), intena(0b0), fastena(0b1), lowena(0b0), tempena(0b0), lpperiod(0b0), parena(0b0)
+            {
+            }
+        };
+       
+
+        void setWRITE(const config_t &cfg)
+        {
+            writememory[0] = getInitialWRITE0();
+            writememory[1] = getInitialWRITE1() | ((cfg.paritybit&0b1) << 7) | ((cfg.i2caddr&0b11) << 5) | ((cfg.intena&0b1) << 2) | ((cfg.fastena&0b1) << 1) | ((cfg.lowena&0b1));
+            writememory[2] = getInitialWRITE2();
+            writememory[3] = getInitialWRITE3() | ((cfg.tempena&0b1) << 7) | ((cfg.lpperiod&0b1) << 6) | ((cfg.parena&0b1) << 5);
+        }          
+
+        std::int8_t getX08() const { return ( (readmemory[0] & 0x7f) - (128*(readmemory[0]>>7)) ); }  
+        std::int8_t getY08() const { return ( (readmemory[1] & 0x7f) - (128*(readmemory[1]>>7)) ); }
+        
+    };
+    
+    static constexpr RegisterMap::config_t defconfig { };
+    
+      
+
+    struct Acquisition
+    {
+        static constexpr std::uint8_t rxdatasize = 8;
+        volatile bool done;
+        volatile bool ongoing;
+        Position position;
+        RegisterMap registermap;;
+        embot::common::Callback userdefCBK;  
+        void clear() { done = false; ongoing = false; position = 0; std::memset(registermap.readmemory, 0, sizeof(registermap.readmemory)); userdefCBK.clear(); }         
+    };
+    
+    
+    struct PrivateData
+    {
+        std::uint8_t i2caddress[embot::common::tointegral(TLV493D::maxnumberof)];   
+        Config config[embot::common::tointegral(TLV493D::maxnumberof)];        
+        Acquisition acquisition[embot::common::tointegral(TLV493D::maxnumberof)];
+        PrivateData() { }
+    };
+    
+
+    // this device works with no register addressing.
+    static const embot::hw::i2c::REG registerToRead = embot::hw::i2c::regNONE;
+    
+    static PrivateData s_privatedata;
+
+        
+    result_t s_sensor_reset(TLV493D h);
+    
+    result_t s_sensor_init(TLV493D h); 
+    
+    static void sharedCBK(void *p)
+    {
+        Acquisition *acq = reinterpret_cast<Acquisition*>(p);    
+        
+        //std::int16_t tempval = acq->registermap.getT();
+        //bool isava = acq->registermap.isvalid();               
+        
+        volatile std::int16_t Xv = acq->registermap.getX();
+        volatile std::int16_t Yv = acq->registermap.getY();
+        //constexpr double todeg = 57.29577957855;  
+        constexpr double tocentdeg = 5729.577957855;
+        volatile double an12atan2 = atan2(Yv, Xv) * tocentdeg + 18000.0;
+
+        acq->position = static_cast<Position>(an12atan2);
+        acq->ongoing = false;
+        acq->done = true;
+        
+        acq->userdefCBK.execute();
+    }
+              
+    result_t init(TLV493D h, const Config &config)
+    {
+        if(false == supported(h))
+        {
+            return resNOK;
+        }
+        
+        if(true == initialised(h))
+        {
+            return resOK;
+        }
+        
+        // init peripheral
+        embot::hw::bsp::tlv493d::getBSP().init(h);
+        
+        std::uint8_t index = embot::common::tointegral(h);
+                
+        // init i2c ..
+        embot::hw::i2c::init(config.i2cdes.bus, config.i2cdes.config);
+           
+        // load config etc
+        s_privatedata.i2caddress[index] = embot::hw::bsp::tlv493d::getBSP().getPROP(h)->i2caddress;
+        s_privatedata.config[index] = config;
+        s_privatedata.acquisition[index].clear();
+                        
+        // sensor init
+        if(resOK != s_sensor_init(h))
+        {
+            return resNOK;
+        }            
+        
+        embot::binary::bit::set(initialisedmask, embot::common::tointegral(h));
+                
+        return resOK;
+    }
+
+    
+    bool isacquiring(TLV493D h)
+    {
+        if(false == initialised(h))
+        {
+            return false;
+        } 
+
+        std::uint8_t index = embot::common::tointegral(h);        
+        return s_privatedata.acquisition[index].ongoing;     
+    }
+    
+    
+    bool canacquire(TLV493D h)
+    {
+        if(false == initialised(h))
+        {
+            return false;
+        } 
+
+        std::uint8_t index = embot::common::tointegral(h);  
+        
+        if(true == s_privatedata.acquisition[index].ongoing)
+        {
+            return false;
+        }
+        
+        return !embot::hw::i2c::isbusy(s_privatedata.config[index].i2cdes.bus);             
+    }    
+    
+    result_t acquisition(TLV493D h, const embot::common::Callback &oncompletion)
+    {
+        if(false == canacquire(h))
+        {
+            return resNOK;
+        }
+        
+        std::uint8_t index = embot::common::tointegral(h);
+                
+        s_privatedata.acquisition[index].clear();
+        s_privatedata.acquisition[index].ongoing = true;
+        s_privatedata.acquisition[index].done = false;
+        s_privatedata.acquisition[index].userdefCBK = oncompletion;
+        
+        // ok, now i trigger i2c.
+        embot::common::Callback cbk(sharedCBK, &s_privatedata.acquisition[index]);
+        embot::common::Data data = embot::common::Data(&s_privatedata.acquisition[index].registermap.readmemory[0], sizeof(s_privatedata.acquisition[index].registermap.readmemory));
+        embot::hw::i2c::read(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], embot::hw::i2c::regNONE, data, cbk);
+                
+        return resOK;
+    }
+    
+    bool isalive(TLV493D h, embot::common::relTime timeout)
+    {
+        if(false == initialised(h))
+        {
+            return false;
+        } 
+        std::uint8_t index = embot::common::tointegral(h);
+        return embot::hw::i2c::ping(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], timeout);  
+    }
+
+    
+    bool operationdone(TLV493D h)
+    {
+        if(false == initialised(h))
+        {
+            return false;
+        } 
+
+        return s_privatedata.acquisition[embot::common::tointegral(h)].done;        
+    } 
+    
+    
+
+    
+    result_t read(TLV493D h, Position &position)
+    {
+        if(false == initialised(h))
+        {
+            return resNOK;
+        } 
+
+        if(false == operationdone(h))
+        {
+            return resNOK;
+        }
+        
+        std::uint8_t index = embot::common::tointegral(h);
+        position = s_privatedata.acquisition[index].position;
+        
+        return resOK;  
+        
+#if 0   // tests        
+        
+        constexpr double todeg = 57.29577957855;    
+        
+
+        
+        
+        Vv = s_privatedata.acquisition[index].registermap.isvalid();
+        Tv = s_privatedata.acquisition[index].registermap.getT();
+        Xv = s_privatedata.acquisition[index].registermap.getX();
+        Yv = s_privatedata.acquisition[index].registermap.getY();
+        Zv = s_privatedata.acquisition[index].registermap.getZ();
+        
+        
+//        static volatile int16_t XMAX = -20000;
+//        static volatile int16_t XMIN = +20000;
+//        static volatile int16_t YMAX = -20000;
+//        static volatile int16_t YMIN = +20000;
+//        if(XMAX < Xv) XMAX = Xv;
+//        if(YMAX < Yv) YMAX = Yv;
+//        if(XMIN > Xv) XMIN = Xv;
+//        if(YMIN > Xv) YMIN = Xv;
+//        
+//        static volatile double Xscale = 1;
+//        Xscale = (XMAX-XMIN)/2.0;
+//        static volatile double Yscale = 1;
+//        Yscale = (YMAX-YMIN)/2.0;
+//        static volatile double Y = 1;
+//        Y = Yv / Yscale;
+//        static volatile double X = 1;
+//        X = Xv / Xscale;
+//        
+//        
+//        
+//        static volatile double ratio = 0;        
+//        ratio = (X != 0) ? (Y/X) : 0;
+//        static volatile double ANC = 0;
+//        ANC = atan(ratio) * todeg;
+        
+        
+        AN12 = atan(static_cast<double>(Yv)/static_cast<double>(Xv)) * todeg;
+
+        
+        int16_t y10 = Yv/4;
+        int16_t x10 = Xv/4;
+        AN10 = atan(static_cast<double>(y10)/static_cast<double>(x10)) * todeg;
+
+
+        int16_t y08 = Yv/16;
+        int16_t x08 = Xv/16;
+        AN08 = atan(static_cast<double>(y08)/static_cast<double>(x08)) * todeg;
+        
+        
+        X8 = s_privatedata.acquisition[index].registermap.getX08();
+        Y8 = s_privatedata.acquisition[index].registermap.getY08();
+        if(0 == X8)
+        {
+            if(0 == Y8)
+            {   
+                AN8 = AN8; // previous value ...
+            }
+            else
+            {
+                AN8 = (Y8>0) ? (+90.0) : (-90.0);
+            }
+        }
+        else
+        {
+            AN8 = atan(static_cast<double>(Y8)/static_cast<double>(X8)) * todeg;
+        }
+        
+        angle12 = floor(100*AN12);
+        angle10 = floor(100*AN10);
+        angle8 = floor(100*AN8);
+        angle08 = floor(100*AN08);
+        
+        power = Xv*Xv + Yv*Yv;
+        
+        static volatile double an12atan2 = 0; 
+        an12atan2 = atan2(Yv, Xv) * todeg;
+        
+  
+        return resOK;  
+#endif // tests        
+    }
+    
+    
+    result_t s_sensor_init(TLV493D h)
+    {
+        std::uint8_t index = embot::common::tointegral(h);
+        
+        std::uint8_t txdata[1] = {0};
+        embot::common::Data data = embot::common::Data(txdata, 1);
+        volatile result_t r = resOK;
+        
+        // see: Figure 9 Sequence for power-up and sensor initialization for single use (pag 15 of user manual of chip)
+        
+         
+        // 1. reset the chip and wait for some time         
+        s_sensor_reset(h);
+           
+        // 1.a make sure the chip has a good address in the bus         
+        if(false == embot::hw::i2c::ping(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index]))
+        {
+            return resNOK;
+        }
+                       
+        // 2. read the registers
+        data.load(s_privatedata.acquisition[index].registermap.readmemory, s_privatedata.acquisition[index].registermap.readsize); 
+        r = embot::hw::i2c::read(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], embot::hw::i2c::regNONE, data, embot::common::time1second);
+        r = r;
+        
+        // 3. impose a mode.
+        s_privatedata.acquisition[index].registermap.setWRITE({}); // defconfig
+        data.load(s_privatedata.acquisition[index].registermap.writememory, s_privatedata.acquisition[index].registermap.writesize); 
+        r = embot::hw::i2c::write(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], embot::hw::i2c::regNONE, data, embot::common::time1second);
+        
+        // wait a bit
+        embot::hw::sys::delay(10*embot::common::time1millisec);
+        
+        return resOK;        
+    }
+    
+    result_t s_sensor_reset(TLV493D h)
+    {
+        std::uint8_t index = embot::common::tointegral(h);
+        
+        // see: Figure 15 Reset frame 0x00 with address setting (pag 21 of user manual of chip)
+        // we transmit 0x00 on the bus and wait for some time (at least 14usec)
+        // we do that by transmitting to address 0x00 a total of 0 bytes.
+        
+        embot::common::Data dummy;
+        dummy.clear();
+        volatile result_t r1 = embot::hw::i2c::transmit(s_privatedata.config[index].i2cdes.bus, 0x00, dummy, 3*embot::common::time1millisec);        
+        r1 = r1;
+        // extra 3 ms.
+        embot::hw::sys::delay(3*embot::common::time1millisec);
+
+        return resOK;        
+    }
+    
+ 
+}}} // namespace embot { namespace hw { namespace tlv493d {
+
+
+
+#endif //defined(EMBOT_TLV493D_ENABLED)
+
+
+    
+
+
+
+// - end-of-file (leave a blank line after)----------------------------------------------------------------------------
+

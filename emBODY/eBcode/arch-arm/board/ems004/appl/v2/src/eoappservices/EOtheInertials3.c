@@ -238,7 +238,8 @@ extern EOtheInertials3* eo_inertials3_Initialise(void)
     
     p->diagnostics.reportTimer = eo_timer_New();
     p->diagnostics.errorType = eo_errortype_error;
-    p->diagnostics.errorDescriptor.sourceaddress = eo_errman_sourcedevice_localboard;
+    p->diagnostics.errorDescriptor.sourceaddress = 0;
+    p->diagnostics.errorDescriptor.sourcedevice = eo_errman_sourcedevice_localboard;
     p->diagnostics.errorDescriptor.code = eoerror_code_get(eoerror_category_Config, eoerror_value_CFG_inertials3_not_verified_yet);  
     
     p->service.initted = eobool_true;    
@@ -572,7 +573,7 @@ extern eOresult_t eo_inertials3_Activate(EOtheInertials3 *p, const eOmn_serv_con
 
     
             
-    #warning TODO: save memory be avoiding the duplication of p->service.servconfig into arrayofsensordescriptors and setofboardinfos
+    //#warning TODO: save memory be avoiding the duplication of p->service.servconfig into arrayofsensordescriptors and setofboardinfos
             
     // now i get all the sensors info from ...
     memcpy(&p->setofboardinfos, &servcfg->data.as.inertial3.setofboardinfos, sizeof(eOas_inertial3_setof_boardinfos_t));
@@ -1273,10 +1274,10 @@ static eOresult_t s_eo_inertials3_TXstart(EOtheInertials3 *p)
     }                        
  
     
-    #warning create the can message for inertials3 config and place it in another place ...         
+    //#warning create the can message for inertials3 config and place it in another place ...         
     s_eo_inertials3_imu_configure(p);
 
-    #warning create the can message for inertials3 tx start and place it in here ...     
+    //#warning create the can message for inertials3 tx start and place it in here ...     
     s_eo_inertials3_imu_transmission(p, eobool_true, p->sensorsconfig.datarate);
     
     
@@ -1294,13 +1295,13 @@ static eOresult_t s_eo_inertials3_TXstop(EOtheInertials3 *p)
         return(eores_OK);
     }     
 
-    #warning create the inetrials3 can message
+    //#warning create the inetrials3 can message
     
     // stop the imus
     s_eo_inertials3_imu_transmission(p, eobool_false, p->sensorsconfig.datarate);
     
     // stop mtbs
-    #warning TODO: s_eo_inertials3_mtb_transmission();
+    //#warning TODO: s_eo_inertials3_mtb_transmission();
     
     // stop the mems
     eo_mems_Stop(eo_mems_GetHandle());
@@ -1592,7 +1593,7 @@ static eObool_t s_eo_inertials3_get_id(eObrd_canlocation_t loc, eOas_inertial3_t
     // HENCE: the original idea of sending up an id = the order of the arrayofsensordescriptors as sent by pc104 is not feasible.
     // for now i just send up 8 bits with two nibbles [canx, addr] and i build the map inside the pc104.
     
-    #warning TODO: if we save some ram by removing the double arrayofsensordescriptors, then we may add a map of 128 bytes.
+//    #warning TODO: if we save some ram by removing the double arrayofsensordescriptors, then we may add a map of 128 bytes.
 
     *id = (loc.port << 4) | loc.addr;
     
@@ -1789,7 +1790,7 @@ static void s_eo_inertials3_imu_configure(EOtheInertials3 *p)
                         if((des->on.any.place == eobrd_place_can) && (des->on.can.port == port) && (des->on.can.addr == addr))
                         {
                             // ok, i have the board. i must enable the sensors 
-                            icubCanProto_imu_sensor_t ps = eoas_inertial3_imu_to_canproto(des->typeofsensor);
+                            icubCanProto_imu_sensor_t ps = eoas_inertial3_imu_to_canproto((eOas_inertial3_type_t)des->typeofsensor);
                             if(icubCanProto_imu_none != ps)
                             {
                                 eo_common_hlfword_bitset(&imuconfig.enabledsensors, ps);

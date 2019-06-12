@@ -35,14 +35,14 @@ namespace embot { namespace hw { namespace bsp { namespace mtb4 {
 
 //    const embot::hw::led::LED ledBLUE = embot::hw::led::LED::one;
     
-    const embot::hw::i2c::Descriptor descrI2Cone = embot::hw::i2c::Descriptor(embot::hw::i2c::Bus::one, 400000);
-    const embot::hw::i2c::Descriptor descrI2Ctwo = embot::hw::i2c::Descriptor(embot::hw::i2c::Bus::two, 400000);
+    const embot::hw::i2c::Descriptor descrI2Cone = embot::hw::i2c::Descriptor(embot::hw::I2C::one, 400000);
+    const embot::hw::i2c::Descriptor descrI2Ctwo = embot::hw::i2c::Descriptor(embot::hw::I2C::two, 400000);
     
-    const embot::hw::SI7051::Sensor thermometer = embot::hw::SI7051::Sensor::one;
-    const embot::hw::SI7051::Config thermometerconfig = embot::hw::SI7051::Config(descrI2Cone);
+    const embot::hw::SI7051 thermometer = embot::hw::SI7051::one;
+    const embot::hw::si7051::Config thermometerconfig = embot::hw::si7051::Config(descrI2Cone);
    
-    const embot::hw::BNO055::Sensor imuBOSCH = embot::hw::BNO055::Sensor::one;
-    const embot::hw::BNO055::Config imuBOSCHconfig = embot::hw::BNO055::Config(descrI2Ctwo);   
+    const embot::hw::BNO055 imuBOSCH = embot::hw::BNO055::one;
+    const embot::hw::bno055::Config imuBOSCHconfig = embot::hw::bno055::Config(descrI2Ctwo);   
         
       
 }}}} // namespace embot { namespace hw { namespace bsp { namespace mtb4 {

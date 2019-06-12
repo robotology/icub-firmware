@@ -450,8 +450,9 @@ void ConfigAD7147_onSdaX(unsigned char Channel, unsigned char setNum, unsigned c
 	ConfigBuffer[5]=50;
 	ConfigBuffer[6]=100;
 	ConfigBuffer[7]=100;
-	WriteViaI2C_onSdaX(Channel,sdaNum,AD7147_ADD[indexInSet],STAGE0_CONNECTION, 8, ConfigBuffer, 0);	//Stage 0 connection registers - Start address in RAM 0x80
-	
+	//WriteViaI2C_onSdaX2(Channel,sdaNum,AD7147_ADD[indexInSet],STAGE0_CONNECTION, 8, ConfigBuffer, 0);	//Stage 0 connection registers - Start address in RAM 0x80
+	WriteViaI2C_onSdaX2(sdaNum,AD7147_ADD[indexInSet],STAGE0_CONNECTION, 8, ConfigBuffer, 0);	
+    
 	//=============================================
 	//= Stage 1 - CIN1 Single-Ended(+) =
 	//=============================================
@@ -463,8 +464,9 @@ void ConfigAD7147_onSdaX(unsigned char Channel, unsigned char setNum, unsigned c
 	ConfigBuffer[5]=50;
 	ConfigBuffer[6]=100;
 	ConfigBuffer[7]=100;
-	WriteViaI2C_onSdaX(Channel,sdaNum,AD7147_ADD[indexInSet],STAGE1_CONNECTION, 8, ConfigBuffer, 0);	//Stage 1 connection registers - Start address in RAM 0x88
-	
+	//WriteViaI2C_onSdaX2(Channel,sdaNum,AD7147_ADD[indexInSet],STAGE1_CONNECTION, 8, ConfigBuffer, 0);	//Stage 1 connection registers - Start address in RAM 0x88
+	WriteViaI2C_onSdaX2(sdaNum,AD7147_ADD[indexInSet],STAGE1_CONNECTION, 8, ConfigBuffer, 0);
+    
 	//=============================================
 	//= Stage 2 - CIN2 Single-Ended(+) =
 	//=============================================
@@ -476,8 +478,9 @@ void ConfigAD7147_onSdaX(unsigned char Channel, unsigned char setNum, unsigned c
 	ConfigBuffer[5]=50;
 	ConfigBuffer[6]=100;
 	ConfigBuffer[7]=100;
-	WriteViaI2C_onSdaX(Channel,sdaNum,AD7147_ADD[indexInSet],STAGE2_CONNECTION, 8, ConfigBuffer, 0);	//Stage 2 connection registers - Start address in RAM 0x90
-	
+	//WriteViaI2C_onSdaX2(Channel,sdaNum,AD7147_ADD[indexInSet],STAGE2_CONNECTION, 8, ConfigBuffer, 0);	//Stage 2 connection registers - Start address in RAM 0x90
+	WriteViaI2C_onSdaX2(sdaNum,AD7147_ADD[indexInSet],STAGE2_CONNECTION, 8, ConfigBuffer, 0);
+    
 	//=============================================
 	//= Stage 3 - CIN3 Single-Ended(+) =
 	//=============================================
@@ -489,8 +492,9 @@ void ConfigAD7147_onSdaX(unsigned char Channel, unsigned char setNum, unsigned c
 	ConfigBuffer[5]=50;
 	ConfigBuffer[6]=100;
 	ConfigBuffer[7]=100;
-	WriteViaI2C_onSdaX(Channel,sdaNum,AD7147_ADD[indexInSet],STAGE3_CONNECTION, 8, ConfigBuffer, 0);	//Stage 3 connection registers - Start address in RAM 0x98
-	
+	//WriteViaI2C_onSdaX2(Channel,sdaNum,AD7147_ADD[indexInSet],STAGE3_CONNECTION, 8, ConfigBuffer, 0);	//Stage 3 connection registers - Start address in RAM 0x98
+	WriteViaI2C_onSdaX2(sdaNum,AD7147_ADD[indexInSet],STAGE3_CONNECTION, 8, ConfigBuffer, 0);
+    
 	//=============================================
 	//= Stage 4 - CIN4 Single-Ended(+) =
 	//=============================================
@@ -502,8 +506,9 @@ void ConfigAD7147_onSdaX(unsigned char Channel, unsigned char setNum, unsigned c
 	ConfigBuffer[5]=50;
 	ConfigBuffer[6]=100;
 	ConfigBuffer[7]=100;
-	WriteViaI2C_onSdaX(Channel,sdaNum,AD7147_ADD[indexInSet],STAGE4_CONNECTION, 8, ConfigBuffer, 0);	//Stage 4 connection registers - Start address in RAM 0xA0
-	
+	//WriteViaI2C_onSdaX2(Channel,sdaNum,AD7147_ADD[indexInSet],STAGE4_CONNECTION, 8, ConfigBuffer, 0);	//Stage 4 connection registers - Start address in RAM 0xA0
+	WriteViaI2C_onSdaX2(sdaNum,AD7147_ADD[indexInSet],STAGE4_CONNECTION, 8, ConfigBuffer, 0);
+    
 	//=============================================
 	//= Stage 5 - CIN5 Single-Ended(+) =
 	//=============================================
@@ -515,8 +520,9 @@ void ConfigAD7147_onSdaX(unsigned char Channel, unsigned char setNum, unsigned c
 	ConfigBuffer[5]=50;
 	ConfigBuffer[6]=100;
 	ConfigBuffer[7]=100;
-	WriteViaI2C_onSdaX(Channel,sdaNum,AD7147_ADD[indexInSet],STAGE5_CONNECTION, 8, ConfigBuffer, 0);	//Stage 5 connection registers - Start address in RAM 0xA8
-	
+	//WriteViaI2C_onSdaX2(Channel,sdaNum,AD7147_ADD[indexInSet],STAGE5_CONNECTION, 8, ConfigBuffer, 0);	//Stage 5 connection registers - Start address in RAM 0xA8
+	WriteViaI2C_onSdaX2(sdaNum,AD7147_ADD[indexInSet],STAGE5_CONNECTION, 8, ConfigBuffer, 0);
+    
 	//=============================================
 	//= Stage 6 - CIN6 Single-Ended(+) =
 	//=============================================
@@ -528,8 +534,9 @@ void ConfigAD7147_onSdaX(unsigned char Channel, unsigned char setNum, unsigned c
 	ConfigBuffer[5]=50;
 	ConfigBuffer[6]=100;
 	ConfigBuffer[7]=100;
-	WriteViaI2C_onSdaX(Channel,sdaNum,AD7147_ADD[indexInSet],STAGE6_CONNECTION, 8, ConfigBuffer, 0);	//Stage 6 connection registers - Start address in RAM 0xB0
-	
+	//WriteViaI2C_onSdaX2(Channel,sdaNum,AD7147_ADD[indexInSet],STAGE6_CONNECTION, 8, ConfigBuffer, 0);	//Stage 6 connection registers - Start address in RAM 0xB0
+	WriteViaI2C_onSdaX2(sdaNum,AD7147_ADD[indexInSet],STAGE6_CONNECTION, 8, ConfigBuffer, 0);
+    
 	//=============================================
 	//= Stage 7 - CIN7 Single-Ended(+) =
 	//=============================================
@@ -541,8 +548,9 @@ void ConfigAD7147_onSdaX(unsigned char Channel, unsigned char setNum, unsigned c
 	ConfigBuffer[5]=50;
 	ConfigBuffer[6]=100;
 	ConfigBuffer[7]=100;
-	WriteViaI2C_onSdaX(Channel,sdaNum,AD7147_ADD[indexInSet],STAGE7_CONNECTION, 8, ConfigBuffer, 0);	//Stage 7 connection registers - Start address in RAM 0xB8
-	
+	//WriteViaI2C_onSdaX2(Channel,sdaNum,AD7147_ADD[indexInSet],STAGE7_CONNECTION, 8, ConfigBuffer, 0);	//Stage 7 connection registers - Start address in RAM 0xB8
+	WriteViaI2C_onSdaX2(sdaNum,AD7147_ADD[indexInSet],STAGE7_CONNECTION, 8, ConfigBuffer, 0);
+    
 	//=============================================
 	//= Stage 8 - CIN8 Single-Ended(+) =
 	//=============================================
@@ -554,8 +562,9 @@ void ConfigAD7147_onSdaX(unsigned char Channel, unsigned char setNum, unsigned c
 	ConfigBuffer[5]=50;
 	ConfigBuffer[6]=100;
 	ConfigBuffer[7]=100;
-	WriteViaI2C_onSdaX(Channel,sdaNum,AD7147_ADD[indexInSet],STAGE8_CONNECTION, 8, ConfigBuffer, 0);	//Stage 8 connection registers - Start address in RAM 0xC0
-	
+	//WriteViaI2C_onSdaX2(Channel,sdaNum,AD7147_ADD[indexInSet],STAGE8_CONNECTION, 8, ConfigBuffer, 0);	//Stage 8 connection registers - Start address in RAM 0xC0
+	WriteViaI2C_onSdaX2(sdaNum,AD7147_ADD[indexInSet],STAGE8_CONNECTION, 8, ConfigBuffer, 0);
+    
 	//=============================================
 	//= Stage 9 - CIN9 Single-Ended(+) =
 	//=============================================
@@ -567,8 +576,9 @@ void ConfigAD7147_onSdaX(unsigned char Channel, unsigned char setNum, unsigned c
 	ConfigBuffer[5]=50;
 	ConfigBuffer[6]=100;
 	ConfigBuffer[7]=100;
-	WriteViaI2C_onSdaX(Channel,sdaNum,AD7147_ADD[indexInSet],STAGE9_CONNECTION, 8, ConfigBuffer, 0);	//Stage 9 connection registers - Start address in RAM 0xC8
-	
+	//WriteViaI2C_onSdaX2(Channel,sdaNum,AD7147_ADD[indexInSet],STAGE9_CONNECTION, 8, ConfigBuffer, 0);	//Stage 9 connection registers - Start address in RAM 0xC8
+	WriteViaI2C_onSdaX2(sdaNum,AD7147_ADD[indexInSet],STAGE9_CONNECTION, 8, ConfigBuffer, 0);	
+    
 	//=============================================
 	//= Stage 10 - CIN10 Single-Ended(+) =
 	//=============================================
@@ -580,8 +590,9 @@ void ConfigAD7147_onSdaX(unsigned char Channel, unsigned char setNum, unsigned c
 	ConfigBuffer[5]=50;
 	ConfigBuffer[6]=100;
 	ConfigBuffer[7]=100;
-	WriteViaI2C_onSdaX(Channel,sdaNum,AD7147_ADD[indexInSet],STAGE10_CONNECTION, 8, ConfigBuffer, 0);//Stage 10 connection registers - Start address in RAM 0xD0
-	
+	//WriteViaI2C_onSdaX2(Channel,sdaNum,AD7147_ADD[indexInSet],STAGE10_CONNECTION, 8, ConfigBuffer, 0);//Stage 10 connection registers - Start address in RAM 0xD0
+	WriteViaI2C_onSdaX2(sdaNum,AD7147_ADD[indexInSet],STAGE10_CONNECTION, 8, ConfigBuffer, 0);
+    
 	//=============================================
 	//= Stage 11 - CIN11 Single-Ended(+) =
 	//=============================================
@@ -593,8 +604,9 @@ void ConfigAD7147_onSdaX(unsigned char Channel, unsigned char setNum, unsigned c
 	ConfigBuffer[5]=50;
 	ConfigBuffer[6]=100;
 	ConfigBuffer[7]=100;
-	WriteViaI2C_onSdaX(Channel,sdaNum,AD7147_ADD[indexInSet],STAGE11_CONNECTION, 8, ConfigBuffer, 0);//Stage 11 connection registers - Start address in RAM 0xD8
-	
+	//WriteViaI2C_onSdaX2(Channel,sdaNum,AD7147_ADD[indexInSet],STAGE11_CONNECTION, 8, ConfigBuffer, 0);//Stage 11 connection registers - Start address in RAM 0xD8
+	WriteViaI2C_onSdaX2(sdaNum,AD7147_ADD[indexInSet],STAGE11_CONNECTION, 8, ConfigBuffer, 0);
+    
 	//=============================================
 	//= Configure 1st register bank
 	//=============================================
@@ -617,10 +629,12 @@ void ConfigAD7147_onSdaX(unsigned char Channel, unsigned char setNum, unsigned c
 	ConfigBuffer[STAGE_HIGH_LIMIT_INT]=0x0000;
 	ConfigBuffer[STAGE_COMPLETE_LIMIT_INT]=0xfff;//0x0FFF;
 //	WriteViaI2C(Channel,AD7147_ADD[indexInSet],AMB_COMP_CTRL0, 9, ConfigBuffer, AMB_COMP_CTRL0);
-	WriteViaI2C_onSdaX(Channel,sdaNum,AD7147_ADD[indexInSet],PWR_CONTROL, 11, ConfigBuffer, PWR_CONTROL);
+	//WriteViaI2C_onSdaX2(Channel,sdaNum,AD7147_ADD[indexInSet],PWR_CONTROL, 11, ConfigBuffer, PWR_CONTROL);
+    WriteViaI2C_onSdaX2(sdaNum,AD7147_ADD[indexInSet],PWR_CONTROL, 11, ConfigBuffer, PWR_CONTROL);
 	// Run data path for all sequences
 	ConfigBuffer[STAGE_CAL_EN]=0x0FFF;//0x0FFF;
-	WriteViaI2C_onSdaX(Channel,sdaNum,AD7147_ADD[indexInSet],STAGE_CAL_EN, 1, ConfigBuffer, STAGE_CAL_EN);
+	//WriteViaI2C_onSdaX2(Channel,sdaNum,AD7147_ADD[indexInSet],STAGE_CAL_EN, 1, ConfigBuffer, STAGE_CAL_EN);
+    WriteViaI2C_onSdaX2(sdaNum,AD7147_ADD[indexInSet],STAGE_CAL_EN, 1, ConfigBuffer, STAGE_CAL_EN);
 }
 
 

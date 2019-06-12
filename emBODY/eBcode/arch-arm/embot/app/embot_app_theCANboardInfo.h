@@ -22,10 +22,9 @@
 #define _EMBOT_APP_THECANBOARDINFO_H_
 
 #include "embot_common.h"
-
 #include "embot_sys.h"
-
 #include "embot_app_canprotocol.h"
+#include <memory>
 
 
 namespace embot { namespace app {
@@ -34,11 +33,7 @@ namespace embot { namespace app {
     class theCANboardInfo
     {
     public:
-        static theCANboardInfo& getInstance()
-        {
-            static theCANboardInfo* p = new theCANboardInfo();
-            return *p;
-        }
+        static theCANboardInfo& getInstance();
                 
     public:
     
@@ -87,17 +82,11 @@ namespace embot { namespace app {
         
     private:
         theCANboardInfo(); 
+        ~theCANboardInfo(); 
   
-    public:
-        // remove copy constructors and copy assignment operators
-        theCANboardInfo(const theCANboardInfo&) = delete;
-        theCANboardInfo(theCANboardInfo&) = delete;
-        void operator=(const theCANboardInfo&) = delete;
-        void operator=(theCANboardInfo&) = delete;
-
     private:    
         struct Impl;
-        Impl *pImpl;        
+        std::unique_ptr<Impl> pImpl;       
     };       
 
 

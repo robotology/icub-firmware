@@ -33,15 +33,42 @@ namespace embot { namespace sys {
     {
     public:
         
-        enum class Type { oneshot = 0, forever = 1 };
-        enum class Status { idle = 0, counting = 1, oneshotcompleted = 2 };        
+        enum class Status { idle = 0, counting = 1 }; 
         
+        enum class Mode { oneshot = 0, someshots = 1, forever = 2 };        
+        struct Config
+        {
+            common::relTime countdown;      // time to count before execute the action
+            sys::Action     onexpiry;       // the action executed at expiry of the countdown
+            Mode            mode;           // the mode. we allow one shot, infinite shots or a limited number
+            std::uint32_t   numofshots;     // in case of limited number this number tells how many. not zero....
+            // static const std::uint32_t oneshot = 1;
+            // static const std::uint32_t infiniteshots = 0;
+            Config(common::relTime c, const sys::Action &a, Mode m = Mode::oneshot, std::uint32_t n = 0) : countdown(c), onexpiry(a), mode(m), numofshots(n) {} 
+            Config() {} 
+            void clear() { countdown = 0;  onexpiry.clear(); mode = Mode::oneshot; numofshots = 0;}
+            bool isvalid() const 
+            { 
+                if((0 == countdown) || (false == onexpiry.isvalid()) || ((Mode::someshots == mode) && (0 == numofshots))) 
+                { 
+                    return false; 
+                }
+                else 
+                { 
+                    return true; 
+                }  
+            }
+        };
+      
         Timer();
         ~Timer();
-        bool start(common::relTime countdown, Type type, sys::Action &onexpiry); 
-        bool stop();         
-        Status getStatus();        
-        Type getType();
+        bool start(const Config &config); 
+        bool stop();  
+        bool execute(); // to be called by the TimerManager only. if a brave user calls it ... it does nothing because ... black magic woman      
+        
+        Status getStatus() const;              
+        const Config& getConfig() const;
+                
 
     private:        
         struct Impl;

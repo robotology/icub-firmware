@@ -109,6 +109,7 @@ static void s_eo_appEncReader_configure_NONSPI_encoders(EOappEncReader *p);
 
 static uint32_t s_eo_appEncReader_rescale2icubdegrees(uint32_t val_raw, uint8_t jomo, eOmc_position_t pos);
 static uint32_t s_eo_appEncReader_mais_rescale2icubdegrees(EOappEncReader* p, uint32_t val_raw, uint8_t jomo);
+static uint32_t s_eo_appEncReader_psc_rescale2icubdegrees(EOappEncReader* p, int16_t val_raw);
 static uint32_t s_eo_appEncReader_hallAdc_rescale2icubdegrees(EOappEncReader* p, uint32_t val_raw, uint8_t jomo);
 
 static hal_spiencoder_stream_t s_eo_appEncReader_get_spi_stream(EOappEncReader* p, uint8_t port);
@@ -122,6 +123,8 @@ static void s_eo_appEncReader_anotherSPIread(void* arg);
 static void s_eo_appEncReader_stopSPIread(void* arg);
 
 static uint32_t s_eo_read_mais_for_port(EOappEncReader *p, uint8_t port);
+
+static eObool_t s_eo_read_psc_for_port(EOappEncReader *p, eObrd_portpsc_t port, eOencoderreader_valueInfo_t *valueInfo);
 
 static hal_spiencoder_type_t s_eo_appEncReader_map_encodertype_to_halspiencodertype(eOmc_encoder_t encodertype);
 
@@ -358,7 +361,7 @@ extern eOresult_t eo_appEncReader_StartRead(EOappEncReader *p)
 {
     // i can start reading at most two spi encoders which are mapped into different streams
     // in case we did not have any chained spi encoders, it woul be enough to set two bits now (one for stream0 and one for stream1),
-    // to make the last ISR of each stream reset it at end of teh chain of encoder acquistion.
+    // to make the last ISR of each stream reset it at end of the chain of encoder acquistion.
     // in this mode, the check of eo_appEncReader_isReady() is easy: we just compare a mask to zero.
     // with the use of chained spi encoders, everything goes to which encoders we use. to make it quick, i use a dedicated mask of 8 bits.
     
@@ -689,7 +692,19 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
                     errorparam = val & 0xffff;                    
                 }                           
                
+            } break;   
+            
+            case eomc_enc_psc:
+            {
+                eObool_t ret = s_eo_read_psc_for_port(p, (eObrd_portpsc_t)prop.descriptor->port, prop.valueinfo); 
+  
+                if(eobool_false == ret)
+                {   // the port is not correct for a PSC.
+                    prop.valueinfo->errortype = encreader_err_PSC_GENERIC;              
+                }                           
+               
             } break;    
+
 
             
             default:
@@ -725,6 +740,7 @@ extern eOresult_t eo_appEncReader_GetValue(EOappEncReader *p, uint8_t jomo, eOen
                 case encreader_err_QENC_GENERIC:
                 case encreader_err_ABSANALOG_GENERIC:
                 case encreader_err_MAIS_GENERIC:
+                case encreader_err_PSC_GENERIC:
                 case encreader_err_AMO_GENERIC:
                 case encreader_err_SPICHAINOF2_GENERIC:
                 case encreader_err_SPICHAINOF3_GENERIC:
@@ -1257,6 +1273,17 @@ static uint32_t s_eo_appEncReader_mais_rescale2icubdegrees(EOappEncReader* p, ui
     return(retval);
 }
 
+
+static uint32_t s_eo_appEncReader_psc_rescale2icubdegrees(EOappEncReader* p, int16_t val_raw)
+{
+    #warning currently we don't use the encoder factor for psc
+    //currently the user can't configure the conversion factor of psc.
+    //The psc boards send dec degree value in int16
+    
+    return EOMEAS_DEG2IDG(((float)(val_raw))/10);
+}
+
+
 static uint32_t s_eo_appEncReader_hallAdc_rescale2icubdegrees(EOappEncReader* p, uint32_t val_raw, uint8_t jomo)
 {
     uint32_t retval = val_raw;
@@ -1432,6 +1459,55 @@ static uint32_t s_eo_read_mais_for_port(EOappEncReader *p, uint8_t port)
     }    
     
     return(val_raw);
+}
+
+// it returns hal_NA32 if ... port is not valid. it returns 0 if we dont have values from the PSC
+static eObool_t s_eo_read_psc_for_port(EOappEncReader *p, eObrd_portpsc_t port, eOencoderreader_valueInfo_t *valueInfo)
+{
+    eObool_t ret=eobool_false;
+
+    // get the psc status and then read its values
+    eOas_psc_t *psc = eo_entities_GetPSC(eo_entities_GetHandle(), 0); 
+    if(NULL == psc)
+    {   // it is possible to have NULL if we call the encoder-reader before we have called eo_mais_Activate(). theus, the motion-controller must verify and activate MAIS before the encoders.
+        return(ret);
+    }
+    
+    eOas_psc_arrayof_data_t* array = &psc->status.arrayofdata;
+    
+    if(array->head.size != eOas_psc_data_maxnumber)
+        return(ret); //VALE: are you sure that if no readings the array is empty??
+    
+    if(eobrd_portpsc_finger0 == port)
+    {
+        valueInfo->value[0] = s_eo_appEncReader_psc_rescale2icubdegrees(p, array->data[0].value);
+        valueInfo->value[1] = s_eo_appEncReader_psc_rescale2icubdegrees(p, array->data[1].value);
+        valueInfo->value[2] = s_eo_appEncReader_psc_rescale2icubdegrees(p, array->data[2].value);
+        valueInfo->value[3] = s_eo_appEncReader_psc_rescale2icubdegrees(p, array->data[3].value);
+        valueInfo->composedof=4;
+        ret=eobool_true;
+    }
+    else if(eobrd_portpsc_finger1 == port) //thumb
+    {
+        valueInfo->value[0] = s_eo_appEncReader_psc_rescale2icubdegrees(p, array->data[4].value);
+        valueInfo->value[1] = s_eo_appEncReader_psc_rescale2icubdegrees(p, array->data[5].value);
+        valueInfo->value[2] = 0;
+        valueInfo->value[3] = 0;
+        valueInfo->composedof=2;
+        ret=eobool_true;
+    }
+    
+//    static uint32_t noflood = 0;
+//    static char str[128] = {0};
+//    if (++noflood > 100)
+//    {   
+//        noflood = 0;
+//        
+//        snprintf(str, sizeof(str), "values are: %d", array->data[0].value);
+//                    
+//        eo_errman_Trace(eo_errman_GetHandle(), str, NULL);
+//    }
+    return ret;
 }
 
 

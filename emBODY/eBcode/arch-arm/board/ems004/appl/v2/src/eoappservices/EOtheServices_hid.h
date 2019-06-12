@@ -90,7 +90,8 @@ typedef enum
     eo_service_inertials    = 4,
     eo_service_inertials3   = 5,
     eo_service_temperatures = 6,
-    eo_service_none         = 7
+    eo_service_psc          = 7,
+    eo_service_none         = 8
 } eOservice_type_t;
 
 typedef struct

@@ -21,53 +21,58 @@
 #ifndef _EMBOT_APP_APPLICATION_THECANPARSERIMU_H_
 #define _EMBOT_APP_APPLICATION_THECANPARSERIMU_H_
 
-#include "embot_common.h"
-
-#include "embot_hw_can.h"
-
-#include "embot_sys.h"
-
-
 #include <vector>
+#include <memory>
+#include "embot_common.h"
+#include "embot_hw_can.h"
+#include "embot_app_canprotocol.h"
+#include "embot_app_canprotocol_analog_polling.h"
+#include "embot_app_canprotocol_analog_periodic.h"
 
 namespace embot { namespace app { namespace application {
+    
+    class CANagentIMU
+    {
+    public:
+        // interface
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_ACC_GYRO_SETUP::Info &info) = 0;
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_IMU_CONFIG_SET::Info &info) = 0;  
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_IMU_TRANSMIT::Info &info) = 0; 
+    
+        virtual bool get(const embot::app::canprotocol::analog::polling::Message_IMU_CONFIG_GET::Info &info, embot::app::canprotocol::analog::polling::Message_IMU_CONFIG_GET::ReplyInfo &replyinfo) = 0;
+       
+    public:
+        virtual ~CANagentIMU() {};         
+    };
            
     class theCANparserIMU
     {
     public:
-        static theCANparserIMU& getInstance()
-        {
-            static theCANparserIMU* p = new theCANparserIMU();
-            return *p;
-        }
-        
-        
+        static theCANparserIMU& getInstance();
+               
     public:
+        
         struct Config
         {
-            std::uint32_t   dummy;
-            Config() : dummy(0) {}
+            CANagentIMU*    agent;
+            Config() : agent(nullptr) {}
+            Config(CANagentIMU* a) : agent(a) {}
+            bool isvalid() const { return (nullptr == agent) ? false : true; }
         }; 
         
         
-        bool initialise(Config &config); 
+        bool initialise(const Config &config); 
         
         // returns true if the canframe has been recognised. if so, any reply is sent if replies.size() > 0
         bool process(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);
 
     private:
         theCANparserIMU(); 
-
-    public:
-        // remove copy constructors and copy assignment operators
-        theCANparserIMU(const theCANparserIMU&) = delete;
-        theCANparserIMU(theCANparserIMU&) = delete;
-        void operator=(const theCANparserIMU&) = delete;
-        void operator=(theCANparserIMU&) = delete;
+        ~theCANparserIMU();
 
     private:    
         struct Impl;
-        Impl *pImpl;        
+        std::unique_ptr<Impl> pImpl;         
     };       
 
 

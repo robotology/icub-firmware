@@ -2,8 +2,6 @@
   ******************************************************************************
   * @file    stm32l4xx_ll_usart.h
   * @author  MCD Application Team
-  * @version V1.7.2
-  * @date    16-June-2017
   * @brief   Header file of USART LL module.
   ******************************************************************************
   * @attention
@@ -36,8 +34,8 @@
   */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __STM32L4xx_LL_USART_H
-#define __STM32L4xx_LL_USART_H
+#ifndef STM32L4xx_LL_USART_H
+#define STM32L4xx_LL_USART_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -58,6 +56,30 @@ extern "C" {
 
 /* Private types -------------------------------------------------------------*/
 /* Private variables ---------------------------------------------------------*/
+#if defined(USART_PRESC_PRESCALER)
+/** @defgroup USART_LL_Private_Variables USART Private Variables
+  * @{
+  */
+/* Array used to get the USART prescaler division decimal values versus @ref USART_LL_EC_PRESCALER values */
+static const uint16_t USART_PRESCALER_TAB[] =
+{
+  (uint16_t)1,
+  (uint16_t)2,
+  (uint16_t)4,
+  (uint16_t)6,
+  (uint16_t)8,
+  (uint16_t)10,
+  (uint16_t)12,
+  (uint16_t)16,
+  (uint16_t)32,
+  (uint16_t)64,
+  (uint16_t)128,
+  (uint16_t)256
+};
+/**
+  * @}
+  */
+#endif
 
 /* Private constants ---------------------------------------------------------*/
 /** @defgroup USART_LL_Private_Constants USART Private Constants
@@ -88,6 +110,13 @@ extern "C" {
   */
 typedef struct
 {
+#if defined(USART_PRESC_PRESCALER)
+  uint32_t PrescalerValue;            /*!< Specifies the Prescaler to compute the communication baud rate.
+                                           This parameter can be a value of @ref USART_LL_EC_PRESCALER.
+
+                                           This feature can be modified afterwards using unitary function @ref LL_USART_SetPrescaler().*/
+#endif
+
   uint32_t BaudRate;                  /*!< This field defines expected Usart communication baud rate.
 
                                            This feature can be modified afterwards using unitary function @ref LL_USART_SetBaudRate().*/
@@ -173,9 +202,12 @@ typedef struct
   */
 #define LL_USART_ICR_PECF                       USART_ICR_PECF                /*!< Parity error flag */
 #define LL_USART_ICR_FECF                       USART_ICR_FECF                /*!< Framing error flag */
-#define LL_USART_ICR_NCF                        USART_ICR_NCF                 /*!< Noise detected flag */
+#define LL_USART_ICR_NECF                       USART_ICR_NECF                /*!< Noise error detected flag */
 #define LL_USART_ICR_ORECF                      USART_ICR_ORECF               /*!< Overrun error flag */
 #define LL_USART_ICR_IDLECF                     USART_ICR_IDLECF              /*!< Idle line detected flag */
+#if defined(USART_CR1_FIFOEN)
+#define LL_USART_ICR_TXFECF                     USART_ICR_TXFECF              /*!< TX FIFO Empty Clear flag */
+#endif
 #define LL_USART_ICR_TCCF                       USART_ICR_TCCF                /*!< Transmission complete flag */
 #if defined(USART_TCBGT_SUPPORT)
 #define LL_USART_ICR_TCBGTCF                    USART_ICR_TCBGTCF             /*!< Transmission completed before guard time flag */
@@ -184,6 +216,9 @@ typedef struct
 #define LL_USART_ICR_CTSCF                      USART_ICR_CTSCF               /*!< CTS flag */
 #define LL_USART_ICR_RTOCF                      USART_ICR_RTOCF               /*!< Receiver timeout flag */
 #define LL_USART_ICR_EOBCF                      USART_ICR_EOBCF               /*!< End of block flag */
+#if defined(USART_CR2_SLVEN)
+#define LL_USART_ICR_UDRCF                      USART_ICR_UDRCF               /*!< SPI Slave Underrun Clear flag */
+#endif
 #define LL_USART_ICR_CMCF                       USART_ICR_CMCF                /*!< Character match flag */
 #define LL_USART_ICR_WUCF                       USART_ICR_WUCF                /*!< Wakeup from Stop mode flag */
 /**
@@ -199,14 +234,25 @@ typedef struct
 #define LL_USART_ISR_NE                         USART_ISR_NE                  /*!< Noise detected flag */
 #define LL_USART_ISR_ORE                        USART_ISR_ORE                 /*!< Overrun error flag */
 #define LL_USART_ISR_IDLE                       USART_ISR_IDLE                /*!< Idle line detected flag */
+#if defined(USART_CR1_FIFOEN)
+#define LL_USART_ISR_RXNE_RXFNE                 USART_ISR_RXNE_RXFNE          /*!< Read data register or RX FIFO not empty flag */
+#else
 #define LL_USART_ISR_RXNE                       USART_ISR_RXNE                /*!< Read data register not empty flag */
+#endif
 #define LL_USART_ISR_TC                         USART_ISR_TC                  /*!< Transmission complete flag */
+#if defined(USART_CR1_FIFOEN)
+#define LL_USART_ISR_TXE_TXFNF                  USART_ISR_TXE_TXFNF           /*!< Transmit data register empty or TX FIFO Not Full flag*/
+#else
 #define LL_USART_ISR_TXE                        USART_ISR_TXE                 /*!< Transmit data register empty flag */
+#endif
 #define LL_USART_ISR_LBDF                       USART_ISR_LBDF                /*!< LIN break detection flag */
 #define LL_USART_ISR_CTSIF                      USART_ISR_CTSIF               /*!< CTS interrupt flag */
 #define LL_USART_ISR_CTS                        USART_ISR_CTS                 /*!< CTS flag */
 #define LL_USART_ISR_RTOF                       USART_ISR_RTOF                /*!< Receiver timeout flag */
 #define LL_USART_ISR_EOBF                       USART_ISR_EOBF                /*!< End of block flag */
+#if defined(USART_CR2_SLVEN)
+#define LL_USART_ISR_UDR                        USART_ISR_UDR                 /*!< SPI Slave underrun error flag */
+#endif
 #define LL_USART_ISR_ABRE                       USART_ISR_ABRE                /*!< Auto baud rate error flag */
 #define LL_USART_ISR_ABRF                       USART_ISR_ABRF                /*!< Auto baud rate flag */
 #define LL_USART_ISR_BUSY                       USART_ISR_BUSY                /*!< Busy flag */
@@ -216,8 +262,16 @@ typedef struct
 #define LL_USART_ISR_WUF                        USART_ISR_WUF                 /*!< Wakeup from Stop mode flag */
 #define LL_USART_ISR_TEACK                      USART_ISR_TEACK               /*!< Transmit enable acknowledge flag */
 #define LL_USART_ISR_REACK                      USART_ISR_REACK               /*!< Receive enable acknowledge flag */
+#if defined(USART_CR1_FIFOEN)
+#define LL_USART_ISR_TXFE                       USART_ISR_TXFE                /*!< TX FIFO empty flag */
+#define LL_USART_ISR_RXFF                       USART_ISR_RXFF                /*!< RX FIFO full flag */
+#endif
 #if defined(USART_TCBGT_SUPPORT)
 #define LL_USART_ISR_TCBGT                      USART_ISR_TCBGT               /*!< Transmission complete before guard time completion flag */
+#endif
+#if defined(USART_CR1_FIFOEN)
+#define LL_USART_ISR_RXFT                       USART_ISR_RXFT                /*!< RX FIFO threshold flag */
+#define LL_USART_ISR_TXFT                       USART_ISR_TXFT                /*!< TX FIFO threshold flag */
 #endif
 /**
   * @}
@@ -228,23 +282,56 @@ typedef struct
   * @{
   */
 #define LL_USART_CR1_IDLEIE                     USART_CR1_IDLEIE              /*!< IDLE interrupt enable */
+#if defined(USART_CR1_FIFOEN)
+#define LL_USART_CR1_RXNEIE_RXFNEIE             USART_CR1_RXNEIE_RXFNEIE      /*!< Read data register and RXFIFO not empty interrupt enable */
+#else
 #define LL_USART_CR1_RXNEIE                     USART_CR1_RXNEIE              /*!< Read data register not empty interrupt enable */
+#endif
 #define LL_USART_CR1_TCIE                       USART_CR1_TCIE                /*!< Transmission complete interrupt enable */
+#if defined(USART_CR1_FIFOEN)
+#define LL_USART_CR1_TXEIE_TXFNFIE              USART_CR1_TXEIE_TXFNFIE       /*!< Transmit data register empty and TX FIFO not full interrupt enable */
+#else
 #define LL_USART_CR1_TXEIE                      USART_CR1_TXEIE               /*!< Transmit data register empty interrupt enable */
+#endif
 #define LL_USART_CR1_PEIE                       USART_CR1_PEIE                /*!< Parity error */
 #define LL_USART_CR1_CMIE                       USART_CR1_CMIE                /*!< Character match interrupt enable */
 #define LL_USART_CR1_RTOIE                      USART_CR1_RTOIE               /*!< Receiver timeout interrupt enable */
 #define LL_USART_CR1_EOBIE                      USART_CR1_EOBIE               /*!< End of Block interrupt enable */
+#if defined(USART_CR1_FIFOEN)
+#define LL_USART_CR1_TXFEIE                     USART_CR1_TXFEIE              /*!< TX FIFO empty interrupt enable */
+#define LL_USART_CR1_RXFFIE                     USART_CR1_RXFFIE              /*!< RX FIFO full interrupt enable */
+#endif
 #define LL_USART_CR2_LBDIE                      USART_CR2_LBDIE               /*!< LIN break detection interrupt enable */
 #define LL_USART_CR3_EIE                        USART_CR3_EIE                 /*!< Error interrupt enable */
 #define LL_USART_CR3_CTSIE                      USART_CR3_CTSIE               /*!< CTS interrupt enable */
 #define LL_USART_CR3_WUFIE                      USART_CR3_WUFIE               /*!< Wakeup from Stop mode interrupt enable */
+#if defined(USART_CR1_FIFOEN)
+#define LL_USART_CR3_TXFTIE                     USART_CR3_TXFTIE              /*!< TX FIFO threshold interrupt enable */
+#endif
 #if defined(USART_TCBGT_SUPPORT)
 #define LL_USART_CR3_TCBGTIE                    USART_CR3_TCBGTIE             /*!< Transmission complete before guard time interrupt enable */
+#endif
+#if defined(USART_CR1_FIFOEN)
+#define LL_USART_CR3_RXFTIE                     USART_CR3_RXFTIE              /*!< RX FIFO threshold interrupt enable */
 #endif
 /**
   * @}
   */
+
+#if defined(USART_CR1_FIFOEN)
+/** @defgroup USART_LL_EC_FIFOTHRESHOLD FIFO Threshold
+  * @{
+  */
+#define LL_USART_FIFOTHRESHOLD_1_8              0x00000000U /*!< FIFO reaches 1/8 of its depth */
+#define LL_USART_FIFOTHRESHOLD_1_4              0x00000001U /*!< FIFO reaches 1/4 of its depth */
+#define LL_USART_FIFOTHRESHOLD_1_2              0x00000002U /*!< FIFO reaches 1/2 of its depth */
+#define LL_USART_FIFOTHRESHOLD_3_4              0x00000003U /*!< FIFO reaches 3/4 of its depth */
+#define LL_USART_FIFOTHRESHOLD_7_8              0x00000004U /*!< FIFO reaches 7/8 of its depth */
+#define LL_USART_FIFOTHRESHOLD_8_8              0x00000005U /*!< FIFO becomes empty for TX and full for RX */
+/**
+  * @}
+  */
+#endif
 
 /** @defgroup USART_LL_EC_DIRECTION Communication Direction
   * @{
@@ -333,6 +420,27 @@ typedef struct
 /**
   * @}
   */
+
+#if defined(USART_PRESC_PRESCALER)
+/** @defgroup USART_LL_EC_PRESCALER Clock Source Prescaler
+  * @{
+  */
+#define LL_USART_PRESCALER_DIV1                 0x00000000U                                                                   /*!< Input clock not devided   */
+#define LL_USART_PRESCALER_DIV2                 (USART_PRESC_PRESCALER_0)                                                     /*!< Input clock devided by 2  */
+#define LL_USART_PRESCALER_DIV4                 (USART_PRESC_PRESCALER_1)                                                     /*!< Input clock devided by 4  */
+#define LL_USART_PRESCALER_DIV6                 (USART_PRESC_PRESCALER_1 | USART_PRESC_PRESCALER_0)                           /*!< Input clock devided by 6  */
+#define LL_USART_PRESCALER_DIV8                 (USART_PRESC_PRESCALER_2)                                                     /*!< Input clock devided by 8  */
+#define LL_USART_PRESCALER_DIV10                (USART_PRESC_PRESCALER_2 | USART_PRESC_PRESCALER_0)                           /*!< Input clock devided by 10 */
+#define LL_USART_PRESCALER_DIV12                (USART_PRESC_PRESCALER_2 | USART_PRESC_PRESCALER_1)                           /*!< Input clock devided by 12 */
+#define LL_USART_PRESCALER_DIV16                (USART_PRESC_PRESCALER_2 | USART_PRESC_PRESCALER_1 | USART_PRESC_PRESCALER_0) /*!< Input clock devided by 16 */
+#define LL_USART_PRESCALER_DIV32                (USART_PRESC_PRESCALER_3)                                                     /*!< Input clock devided by 32 */
+#define LL_USART_PRESCALER_DIV64                (USART_PRESC_PRESCALER_3 | USART_PRESC_PRESCALER_0)                           /*!< Input clock devided by 64 */
+#define LL_USART_PRESCALER_DIV128               (USART_PRESC_PRESCALER_3 | USART_PRESC_PRESCALER_1)                           /*!< Input clock devided by 128 */
+#define LL_USART_PRESCALER_DIV256               (USART_PRESC_PRESCALER_3 | USART_PRESC_PRESCALER_1 | USART_PRESC_PRESCALER_0) /*!< Input clock devided by 256 */
+/**
+  * @}
+  */
+#endif
 
 /** @defgroup USART_LL_EC_STOPBITS Stop Bits
   * @{
@@ -508,19 +616,57 @@ typedef struct
   * @brief  Compute USARTDIV value according to Peripheral Clock and
   *         expected Baud Rate in 8 bits sampling mode (32 bits value of USARTDIV is returned)
   * @param  __PERIPHCLK__ Peripheral Clock frequency used for USART instance
+  @if USART_PRESC_PRESCALER
+  * @param  __PRESCALER__ This parameter can be one of the following values:
+  *         @arg @ref LL_USART_PRESCALER_DIV1
+  *         @arg @ref LL_USART_PRESCALER_DIV2
+  *         @arg @ref LL_USART_PRESCALER_DIV4
+  *         @arg @ref LL_USART_PRESCALER_DIV6
+  *         @arg @ref LL_USART_PRESCALER_DIV8
+  *         @arg @ref LL_USART_PRESCALER_DIV10
+  *         @arg @ref LL_USART_PRESCALER_DIV12
+  *         @arg @ref LL_USART_PRESCALER_DIV16
+  *         @arg @ref LL_USART_PRESCALER_DIV32
+  *         @arg @ref LL_USART_PRESCALER_DIV64
+  *         @arg @ref LL_USART_PRESCALER_DIV128
+  *         @arg @ref LL_USART_PRESCALER_DIV256
+  @endif
   * @param  __BAUDRATE__ Baud rate value to achieve
   * @retval USARTDIV value to be used for BRR register filling in OverSampling_8 case
   */
-#define __LL_USART_DIV_SAMPLING8(__PERIPHCLK__, __BAUDRATE__) ((((__PERIPHCLK__)*2) + ((__BAUDRATE__)/2))/(__BAUDRATE__))
+#if defined(USART_PRESC_PRESCALER)
+#define __LL_USART_DIV_SAMPLING8(__PERIPHCLK__, __PRESCALER__, __BAUDRATE__) (((((__PERIPHCLK__)/(uint32_t)(USART_PRESCALER_TAB[(__PRESCALER__)]))*2U) + ((__BAUDRATE__)/2U))/(__BAUDRATE__))
+#else
+#define __LL_USART_DIV_SAMPLING8(__PERIPHCLK__, __BAUDRATE__) ((((__PERIPHCLK__)*2U) + ((__BAUDRATE__)/2U))/(__BAUDRATE__))
+#endif
 
 /**
   * @brief  Compute USARTDIV value according to Peripheral Clock and
   *         expected Baud Rate in 16 bits sampling mode (32 bits value of USARTDIV is returned)
   * @param  __PERIPHCLK__ Peripheral Clock frequency used for USART instance
+  @if USART_PRESC_PRESCALER
+  * @param  __PRESCALER__ This parameter can be one of the following values:
+  *         @arg @ref LL_USART_PRESCALER_DIV1
+  *         @arg @ref LL_USART_PRESCALER_DIV2
+  *         @arg @ref LL_USART_PRESCALER_DIV4
+  *         @arg @ref LL_USART_PRESCALER_DIV6
+  *         @arg @ref LL_USART_PRESCALER_DIV8
+  *         @arg @ref LL_USART_PRESCALER_DIV10
+  *         @arg @ref LL_USART_PRESCALER_DIV12
+  *         @arg @ref LL_USART_PRESCALER_DIV16
+  *         @arg @ref LL_USART_PRESCALER_DIV32
+  *         @arg @ref LL_USART_PRESCALER_DIV64
+  *         @arg @ref LL_USART_PRESCALER_DIV128
+  *         @arg @ref LL_USART_PRESCALER_DIV256
+  @endif
   * @param  __BAUDRATE__ Baud rate value to achieve
   * @retval USARTDIV value to be used for BRR register filling in OverSampling_16 case
   */
-#define __LL_USART_DIV_SAMPLING16(__PERIPHCLK__, __BAUDRATE__) (((__PERIPHCLK__) + ((__BAUDRATE__)/2))/(__BAUDRATE__))
+#if defined(USART_PRESC_PRESCALER)
+#define __LL_USART_DIV_SAMPLING16(__PERIPHCLK__, __PRESCALER__, __BAUDRATE__) ((((__PERIPHCLK__)/(uint32_t)(USART_PRESCALER_TAB[(__PRESCALER__)])) + ((__BAUDRATE__)/2U))/(__BAUDRATE__))
+#else
+#define __LL_USART_DIV_SAMPLING16(__PERIPHCLK__, __BAUDRATE__) (((__PERIPHCLK__) + ((__BAUDRATE__)/2U))/(__BAUDRATE__))
+#endif
 
 /**
   * @}
@@ -573,8 +719,155 @@ __STATIC_INLINE void LL_USART_Disable(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsEnabled(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->CR1, USART_CR1_UE) == (USART_CR1_UE));
+  return ((READ_BIT(USARTx->CR1, USART_CR1_UE) == (USART_CR1_UE)) ? 1UL : 0UL);
 }
+
+#if defined(USART_CR1_FIFOEN)
+/**
+  * @brief  FIFO Mode Enable
+  * @note   Macro @ref IS_UART_FIFO_INSTANCE(USARTx) can be used to check whether or not
+  *         FIFO mode feature is supported by the USARTx instance.
+  * @rmtoll CR1          FIFOEN        LL_USART_EnableFIFO
+  * @param  USARTx USART Instance
+  * @retval None
+  */
+__STATIC_INLINE void LL_USART_EnableFIFO(USART_TypeDef *USARTx)
+{
+  SET_BIT(USARTx->CR1, USART_CR1_FIFOEN);
+}
+
+/**
+  * @brief  FIFO Mode Disable
+  * @note   Macro @ref IS_UART_FIFO_INSTANCE(USARTx) can be used to check whether or not
+  *         FIFO mode feature is supported by the USARTx instance.
+  * @rmtoll CR1          FIFOEN        LL_USART_DisableFIFO
+  * @param  USARTx USART Instance
+  * @retval None
+  */
+__STATIC_INLINE void LL_USART_DisableFIFO(USART_TypeDef *USARTx)
+{
+  CLEAR_BIT(USARTx->CR1, USART_CR1_FIFOEN);
+}
+
+/**
+  * @brief  Indicate if FIFO Mode is enabled
+  * @note   Macro @ref IS_UART_FIFO_INSTANCE(USARTx) can be used to check whether or not
+  *         FIFO mode feature is supported by the USARTx instance.
+  * @rmtoll CR1          FIFOEN        LL_USART_IsEnabledFIFO
+  * @param  USARTx USART Instance
+  * @retval State of bit (1 or 0).
+  */
+__STATIC_INLINE uint32_t LL_USART_IsEnabledFIFO(USART_TypeDef *USARTx)
+{
+  return ((READ_BIT(USARTx->CR1, USART_CR1_FIFOEN) == (USART_CR1_FIFOEN)) ? 1UL : 0UL);
+}
+
+/**
+  * @brief  Configure TX FIFO Threshold
+  * @note   Macro @ref IS_UART_FIFO_INSTANCE(USARTx) can be used to check whether or not
+  *         FIFO mode feature is supported by the USARTx instance.
+  * @rmtoll CR3          TXFTCFG       LL_USART_SetTXFIFOThreshold
+  * @param  USARTx USART Instance
+  * @param  Threshold This parameter can be one of the following values:
+  *         @arg @ref LL_USART_FIFOTHRESHOLD_1_8
+  *         @arg @ref LL_USART_FIFOTHRESHOLD_1_4
+  *         @arg @ref LL_USART_FIFOTHRESHOLD_1_2
+  *         @arg @ref LL_USART_FIFOTHRESHOLD_3_4
+  *         @arg @ref LL_USART_FIFOTHRESHOLD_7_8
+  *         @arg @ref LL_USART_FIFOTHRESHOLD_8_8
+  * @retval None
+  */
+__STATIC_INLINE void LL_USART_SetTXFIFOThreshold(USART_TypeDef *USARTx, uint32_t Threshold)
+{
+  MODIFY_REG(USARTx->CR3, USART_CR3_TXFTCFG, Threshold << USART_CR3_TXFTCFG_Pos);
+}
+
+/**
+  * @brief  Return TX FIFO Threshold Configuration
+  * @note   Macro @ref IS_UART_FIFO_INSTANCE(USARTx) can be used to check whether or not
+  *         FIFO mode feature is supported by the USARTx instance.
+  * @rmtoll CR3          TXFTCFG       LL_USART_GetTXFIFOThreshold
+  * @param  USARTx USART Instance
+  * @retval Returned value can be one of the following values:
+  *         @arg @ref LL_USART_FIFOTHRESHOLD_1_8
+  *         @arg @ref LL_USART_FIFOTHRESHOLD_1_4
+  *         @arg @ref LL_USART_FIFOTHRESHOLD_1_2
+  *         @arg @ref LL_USART_FIFOTHRESHOLD_3_4
+  *         @arg @ref LL_USART_FIFOTHRESHOLD_7_8
+  *         @arg @ref LL_USART_FIFOTHRESHOLD_8_8
+  */
+__STATIC_INLINE uint32_t LL_USART_GetTXFIFOThreshold(USART_TypeDef *USARTx)
+{
+  return (uint32_t)(READ_BIT(USARTx->CR3, USART_CR3_TXFTCFG) >> USART_CR3_TXFTCFG_Pos);
+}
+
+/**
+  * @brief  Configure RX FIFO Threshold
+  * @note   Macro @ref IS_UART_FIFO_INSTANCE(USARTx) can be used to check whether or not
+  *         FIFO mode feature is supported by the USARTx instance.
+  * @rmtoll CR3          RXFTCFG       LL_USART_SetRXFIFOThreshold
+  * @param  USARTx USART Instance
+  * @param  Threshold This parameter can be one of the following values:
+  *         @arg @ref LL_USART_FIFOTHRESHOLD_1_8
+  *         @arg @ref LL_USART_FIFOTHRESHOLD_1_4
+  *         @arg @ref LL_USART_FIFOTHRESHOLD_1_2
+  *         @arg @ref LL_USART_FIFOTHRESHOLD_3_4
+  *         @arg @ref LL_USART_FIFOTHRESHOLD_7_8
+  *         @arg @ref LL_USART_FIFOTHRESHOLD_8_8
+  * @retval None
+  */
+__STATIC_INLINE void LL_USART_SetRXFIFOThreshold(USART_TypeDef *USARTx, uint32_t Threshold)
+{
+  MODIFY_REG(USARTx->CR3, USART_CR3_RXFTCFG, Threshold << USART_CR3_RXFTCFG_Pos);
+}
+
+/**
+  * @brief  Return RX FIFO Threshold Configuration
+  * @note   Macro @ref IS_UART_FIFO_INSTANCE(USARTx) can be used to check whether or not
+  *         FIFO mode feature is supported by the USARTx instance.
+  * @rmtoll CR3          RXFTCFG       LL_USART_GetRXFIFOThreshold
+  * @param  USARTx USART Instance
+  * @retval Returned value can be one of the following values:
+  *         @arg @ref LL_USART_FIFOTHRESHOLD_1_8
+  *         @arg @ref LL_USART_FIFOTHRESHOLD_1_4
+  *         @arg @ref LL_USART_FIFOTHRESHOLD_1_2
+  *         @arg @ref LL_USART_FIFOTHRESHOLD_3_4
+  *         @arg @ref LL_USART_FIFOTHRESHOLD_7_8
+  *         @arg @ref LL_USART_FIFOTHRESHOLD_8_8
+  */
+__STATIC_INLINE uint32_t LL_USART_GetRXFIFOThreshold(USART_TypeDef *USARTx)
+{
+  return (uint32_t)(READ_BIT(USARTx->CR3, USART_CR3_RXFTCFG) >> USART_CR3_RXFTCFG_Pos);
+}
+
+/**
+  * @brief  Configure TX and RX FIFOs Threshold
+  * @note   Macro @ref IS_UART_FIFO_INSTANCE(USARTx) can be used to check whether or not
+  *         FIFO mode feature is supported by the USARTx instance.
+  * @rmtoll CR3          TXFTCFG       LL_USART_ConfigFIFOsThreshold\n
+  *         CR3          RXFTCFG       LL_USART_ConfigFIFOsThreshold
+  * @param  USARTx USART Instance
+  * @param  TXThreshold This parameter can be one of the following values:
+  *         @arg @ref LL_USART_FIFOTHRESHOLD_1_8
+  *         @arg @ref LL_USART_FIFOTHRESHOLD_1_4
+  *         @arg @ref LL_USART_FIFOTHRESHOLD_1_2
+  *         @arg @ref LL_USART_FIFOTHRESHOLD_3_4
+  *         @arg @ref LL_USART_FIFOTHRESHOLD_7_8
+  *         @arg @ref LL_USART_FIFOTHRESHOLD_8_8
+  * @param  RXThreshold This parameter can be one of the following values:
+  *         @arg @ref LL_USART_FIFOTHRESHOLD_1_8
+  *         @arg @ref LL_USART_FIFOTHRESHOLD_1_4
+  *         @arg @ref LL_USART_FIFOTHRESHOLD_1_2
+  *         @arg @ref LL_USART_FIFOTHRESHOLD_3_4
+  *         @arg @ref LL_USART_FIFOTHRESHOLD_7_8
+  *         @arg @ref LL_USART_FIFOTHRESHOLD_8_8
+  * @retval None
+  */
+__STATIC_INLINE void LL_USART_ConfigFIFOsThreshold(USART_TypeDef *USARTx, uint32_t TXThreshold, uint32_t RXThreshold)
+{
+  MODIFY_REG(USARTx->CR3, USART_CR3_TXFTCFG | USART_CR3_RXFTCFG, (TXThreshold << USART_CR3_TXFTCFG_Pos) | (RXThreshold << USART_CR3_RXFTCFG_Pos));
+}
+#endif
 
 /**
   * @brief  USART enabled in STOP Mode.
@@ -615,9 +908,46 @@ __STATIC_INLINE void LL_USART_DisableInStopMode(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsEnabledInStopMode(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->CR1, USART_CR1_UESM) == (USART_CR1_UESM));
+  return ((READ_BIT(USARTx->CR1, USART_CR1_UESM) == (USART_CR1_UESM)) ? 1UL : 0UL);
 }
 
+#if defined(USART_CR3_UCESM)
+/**
+  * @brief  USART Clock enabled in STOP Mode
+  * @note   When this function is called, USART Clock is enabled while in STOP mode
+  * @rmtoll CR3          UCESM         LL_USART_EnableClockInStopMode
+  * @param  USARTx USART Instance
+  * @retval None
+  */
+__STATIC_INLINE void LL_USART_EnableClockInStopMode(USART_TypeDef *USARTx)
+{
+  SET_BIT(USARTx->CR3, USART_CR3_UCESM);
+}
+
+/**
+  * @brief  USART clock disabled in STOP Mode
+  * @note   When this function is called, USART Clock is disabled while in STOP mode
+  * @rmtoll CR3          UCESM         LL_USART_DisableClockInStopMode
+  * @param  USARTx USART Instance
+  * @retval None
+  */
+__STATIC_INLINE void LL_USART_DisableClockInStopMode(USART_TypeDef *USARTx)
+{
+  CLEAR_BIT(USARTx->CR3, USART_CR3_UCESM);
+}
+
+/**
+  * @brief  Indicate if USART clock is enabled in STOP Mode
+  * @rmtoll CR3          UCESM         LL_USART_IsClockEnabledInStopMode
+  * @param  USARTx USART Instance
+  * @retval State of bit (1 or 0).
+  */
+__STATIC_INLINE uint32_t LL_USART_IsClockEnabledInStopMode(USART_TypeDef *USARTx)
+{
+  return (READ_BIT(USARTx->CR3, USART_CR3_UCESM) == (USART_CR3_UCESM));
+}
+
+#endif /* USART_CR3_UCESM */
 /**
   * @brief  Receiver Enable (Receiver is enabled and begins searching for a start bit)
   * @rmtoll CR1          RE            LL_USART_EnableDirectionRx
@@ -818,7 +1148,7 @@ __STATIC_INLINE void LL_USART_DisableMuteMode(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsEnabledMuteMode(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->CR1, USART_CR1_MME) == (USART_CR1_MME));
+  return ((READ_BIT(USARTx->CR1, USART_CR1_MME) == (USART_CR1_MME)) ? 1UL : 0UL);
 }
 
 /**
@@ -970,6 +1300,59 @@ __STATIC_INLINE void LL_USART_ConfigClock(USART_TypeDef *USARTx, uint32_t Phase,
   MODIFY_REG(USARTx->CR2, USART_CR2_CPHA | USART_CR2_CPOL | USART_CR2_LBCL, Phase | Polarity | LBCPOutput);
 }
 
+#if defined(USART_PRESC_PRESCALER)
+/**
+  * @brief  Configure Clock source prescaler for baudrate generator and oversampling
+  * @note   Macro @ref IS_UART_FIFO_INSTANCE(USARTx) can be used to check whether or not
+  *         FIFO mode feature is supported by the USARTx instance.
+  * @rmtoll PRESC        PRESCALER     LL_USART_SetPrescaler
+  * @param  USARTx USART Instance
+  * @param  PrescalerValue This parameter can be one of the following values:
+  *         @arg @ref LL_USART_PRESCALER_DIV1
+  *         @arg @ref LL_USART_PRESCALER_DIV2
+  *         @arg @ref LL_USART_PRESCALER_DIV4
+  *         @arg @ref LL_USART_PRESCALER_DIV6
+  *         @arg @ref LL_USART_PRESCALER_DIV8
+  *         @arg @ref LL_USART_PRESCALER_DIV10
+  *         @arg @ref LL_USART_PRESCALER_DIV12
+  *         @arg @ref LL_USART_PRESCALER_DIV16
+  *         @arg @ref LL_USART_PRESCALER_DIV32
+  *         @arg @ref LL_USART_PRESCALER_DIV64
+  *         @arg @ref LL_USART_PRESCALER_DIV128
+  *         @arg @ref LL_USART_PRESCALER_DIV256
+  * @retval None
+  */
+__STATIC_INLINE void LL_USART_SetPrescaler(USART_TypeDef *USARTx, uint32_t PrescalerValue)
+{
+  MODIFY_REG(USARTx->PRESC, USART_PRESC_PRESCALER, (uint16_t)PrescalerValue);
+}
+
+/**
+  * @brief  Retrieve the Clock source prescaler for baudrate generator and oversampling
+  * @note   Macro @ref IS_UART_FIFO_INSTANCE(USARTx) can be used to check whether or not
+  *         FIFO mode feature is supported by the USARTx instance.
+  * @rmtoll PRESC        PRESCALER     LL_USART_GetPrescaler
+  * @param  USARTx USART Instance
+  * @retval Returned value can be one of the following values:
+  *         @arg @ref LL_USART_PRESCALER_DIV1
+  *         @arg @ref LL_USART_PRESCALER_DIV2
+  *         @arg @ref LL_USART_PRESCALER_DIV4
+  *         @arg @ref LL_USART_PRESCALER_DIV6
+  *         @arg @ref LL_USART_PRESCALER_DIV8
+  *         @arg @ref LL_USART_PRESCALER_DIV10
+  *         @arg @ref LL_USART_PRESCALER_DIV12
+  *         @arg @ref LL_USART_PRESCALER_DIV16
+  *         @arg @ref LL_USART_PRESCALER_DIV32
+  *         @arg @ref LL_USART_PRESCALER_DIV64
+  *         @arg @ref LL_USART_PRESCALER_DIV128
+  *         @arg @ref LL_USART_PRESCALER_DIV256
+  */
+__STATIC_INLINE uint32_t LL_USART_GetPrescaler(USART_TypeDef *USARTx)
+{
+  return (uint32_t)(READ_BIT(USARTx->PRESC, USART_PRESC_PRESCALER));
+}
+#endif
+
 /**
   * @brief  Enable Clock output on SCLK pin
   * @note   Macro @ref IS_USART_INSTANCE(USARTx) can be used to check whether or not
@@ -1006,7 +1389,7 @@ __STATIC_INLINE void LL_USART_DisableSCLKOutput(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsEnabledSCLKOutput(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->CR2, USART_CR2_CLKEN) == (USART_CR2_CLKEN));
+  return ((READ_BIT(USARTx->CR2, USART_CR2_CLKEN) == (USART_CR2_CLKEN)) ? 1UL : 0UL);
 }
 
 /**
@@ -1251,7 +1634,7 @@ __STATIC_INLINE void LL_USART_DisableAutoBaudRate(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsEnabledAutoBaud(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->CR2, USART_CR2_ABREN) == (USART_CR2_ABREN));
+  return ((READ_BIT(USARTx->CR2, USART_CR2_ABREN) == (USART_CR2_ABREN)) ? 1UL : 0UL);
 }
 
 /**
@@ -1319,7 +1702,7 @@ __STATIC_INLINE void LL_USART_DisableRxTimeout(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsEnabledRxTimeout(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->CR2, USART_CR2_RTOEN) == (USART_CR2_RTOEN));
+  return ((READ_BIT(USARTx->CR2, USART_CR2_RTOEN) == (USART_CR2_RTOEN)) ? 1UL : 0UL);
 }
 
 /**
@@ -1498,7 +1881,7 @@ __STATIC_INLINE void LL_USART_DisableOneBitSamp(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsEnabledOneBitSamp(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->CR3, USART_CR3_ONEBIT) == (USART_CR3_ONEBIT));
+  return ((READ_BIT(USARTx->CR3, USART_CR3_ONEBIT) == (USART_CR3_ONEBIT)) ? 1UL : 0UL);
 }
 
 /**
@@ -1531,7 +1914,7 @@ __STATIC_INLINE void LL_USART_DisableOverrunDetect(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsEnabledOverrunDetect(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->CR3, USART_CR3_OVRDIS) != USART_CR3_OVRDIS);
+  return ((READ_BIT(USARTx->CR3, USART_CR3_OVRDIS) != USART_CR3_OVRDIS) ? 1UL : 0UL);
 }
 
 /**
@@ -1577,28 +1960,56 @@ __STATIC_INLINE uint32_t LL_USART_GetWKUPType(USART_TypeDef *USARTx)
   * @rmtoll BRR          BRR           LL_USART_SetBaudRate
   * @param  USARTx USART Instance
   * @param  PeriphClk Peripheral Clock
+  @if USART_PRESC_PRESCALER
+  * @param  PrescalerValue This parameter can be one of the following values:
+  *         @arg @ref LL_USART_PRESCALER_DIV1
+  *         @arg @ref LL_USART_PRESCALER_DIV2
+  *         @arg @ref LL_USART_PRESCALER_DIV4
+  *         @arg @ref LL_USART_PRESCALER_DIV6
+  *         @arg @ref LL_USART_PRESCALER_DIV8
+  *         @arg @ref LL_USART_PRESCALER_DIV10
+  *         @arg @ref LL_USART_PRESCALER_DIV12
+  *         @arg @ref LL_USART_PRESCALER_DIV16
+  *         @arg @ref LL_USART_PRESCALER_DIV32
+  *         @arg @ref LL_USART_PRESCALER_DIV64
+  *         @arg @ref LL_USART_PRESCALER_DIV128
+  *         @arg @ref LL_USART_PRESCALER_DIV256
+  @endif
   * @param  OverSampling This parameter can be one of the following values:
   *         @arg @ref LL_USART_OVERSAMPLING_16
   *         @arg @ref LL_USART_OVERSAMPLING_8
   * @param  BaudRate Baud Rate
   * @retval None
   */
+#if defined(USART_PRESC_PRESCALER)
+__STATIC_INLINE void LL_USART_SetBaudRate(USART_TypeDef *USARTx, uint32_t PeriphClk, uint32_t PrescalerValue, uint32_t OverSampling,
+                                          uint32_t BaudRate)
+#else
 __STATIC_INLINE void LL_USART_SetBaudRate(USART_TypeDef *USARTx, uint32_t PeriphClk, uint32_t OverSampling,
                                           uint32_t BaudRate)
+#endif
 {
-  register uint32_t usartdiv = 0x0U;
-  register uint32_t brrtemp = 0x0U;
+  register uint32_t usartdiv;
+  register uint32_t brrtemp;
 
   if (OverSampling == LL_USART_OVERSAMPLING_8)
   {
+#if defined(USART_PRESC_PRESCALER)
+    usartdiv = (uint16_t)(__LL_USART_DIV_SAMPLING8(PeriphClk, (uint16_t)PrescalerValue, BaudRate));
+#else
     usartdiv = (uint16_t)(__LL_USART_DIV_SAMPLING8(PeriphClk, BaudRate));
+#endif
     brrtemp = usartdiv & 0xFFF0U;
     brrtemp |= (uint16_t)((usartdiv & (uint16_t)0x000FU) >> 1U);
     USARTx->BRR = brrtemp;
   }
   else
   {
+#if defined(USART_PRESC_PRESCALER)
+    USARTx->BRR = (uint16_t)(__LL_USART_DIV_SAMPLING16(PeriphClk, (uint16_t)PrescalerValue, BaudRate));
+#else
     USARTx->BRR = (uint16_t)(__LL_USART_DIV_SAMPLING16(PeriphClk, BaudRate));
+#endif
   }
 }
 
@@ -1610,31 +2021,65 @@ __STATIC_INLINE void LL_USART_SetBaudRate(USART_TypeDef *USARTx, uint32_t Periph
   * @rmtoll BRR          BRR           LL_USART_GetBaudRate
   * @param  USARTx USART Instance
   * @param  PeriphClk Peripheral Clock
+  @if USART_PRESC_PRESCALER
+  * @param  PrescalerValue This parameter can be one of the following values:
+  *         @arg @ref LL_USART_PRESCALER_DIV1
+  *         @arg @ref LL_USART_PRESCALER_DIV2
+  *         @arg @ref LL_USART_PRESCALER_DIV4
+  *         @arg @ref LL_USART_PRESCALER_DIV6
+  *         @arg @ref LL_USART_PRESCALER_DIV8
+  *         @arg @ref LL_USART_PRESCALER_DIV10
+  *         @arg @ref LL_USART_PRESCALER_DIV12
+  *         @arg @ref LL_USART_PRESCALER_DIV16
+  *         @arg @ref LL_USART_PRESCALER_DIV32
+  *         @arg @ref LL_USART_PRESCALER_DIV64
+  *         @arg @ref LL_USART_PRESCALER_DIV128
+  *         @arg @ref LL_USART_PRESCALER_DIV256
+  @endif
   * @param  OverSampling This parameter can be one of the following values:
   *         @arg @ref LL_USART_OVERSAMPLING_16
   *         @arg @ref LL_USART_OVERSAMPLING_8
   * @retval Baud Rate
   */
+#if defined(USART_PRESC_PRESCALER)
+__STATIC_INLINE uint32_t LL_USART_GetBaudRate(USART_TypeDef *USARTx, uint32_t PeriphClk, uint32_t PrescalerValue, uint32_t OverSampling)
+#else
 __STATIC_INLINE uint32_t LL_USART_GetBaudRate(USART_TypeDef *USARTx, uint32_t PeriphClk, uint32_t OverSampling)
+#endif
 {
-  register uint32_t usartdiv = 0x0U;
+  register uint32_t usartdiv;
   register uint32_t brrresult = 0x0U;
+#if defined(USART_PRESC_PRESCALER)
+  register uint32_t periphclkpresc = (uint32_t)(PeriphClk / (uint32_t)(USART_PRESCALER_TAB[(uint16_t)PrescalerValue]));
+#endif
 
   usartdiv = USARTx->BRR;
 
-  if (OverSampling == LL_USART_OVERSAMPLING_8)
+  if(usartdiv == 0U)
   {
-    if ((usartdiv & 0xFFF7U) != 0U)
+    /* Do not perform a division by 0 */
+  }
+  else if (OverSampling == LL_USART_OVERSAMPLING_8)
+  {
+    usartdiv = (uint16_t)((usartdiv & 0xFFF0U) | ((usartdiv & 0x0007U) << 1U)) ;
+    if(usartdiv != 0U)
     {
-      usartdiv = (uint16_t)((usartdiv & 0xFFF0U) | ((usartdiv & 0x0007U) << 1U)) ;
+#if defined(USART_PRESC_PRESCALER)
+      brrresult = (periphclkpresc * 2U) / usartdiv;
+#else
       brrresult = (PeriphClk * 2U) / usartdiv;
+#endif
     }
   }
   else
   {
     if ((usartdiv & 0xFFFFU) != 0U)
     {
+#if defined(USART_PRESC_PRESCALER)
+      brrresult = periphclkpresc / usartdiv;
+#else
       brrresult = PeriphClk / usartdiv;
+#endif
     }
   }
   return (brrresult);
@@ -1730,7 +2175,7 @@ __STATIC_INLINE void LL_USART_DisableIrda(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsEnabledIrda(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->CR3, USART_CR3_IREN) == (USART_CR3_IREN));
+  return ((READ_BIT(USARTx->CR3, USART_CR3_IREN) == (USART_CR3_IREN)) ? 1UL : 0UL);
 }
 
 /**
@@ -1776,7 +2221,7 @@ __STATIC_INLINE uint32_t LL_USART_GetIrdaPowerMode(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE void LL_USART_SetIrdaPrescaler(USART_TypeDef *USARTx, uint32_t PrescalerValue)
 {
-  MODIFY_REG(USARTx->GTPR, USART_GTPR_PSC, PrescalerValue);
+  MODIFY_REG(USARTx->GTPR, USART_GTPR_PSC, (uint16_t)PrescalerValue);
 }
 
 /**
@@ -1837,7 +2282,7 @@ __STATIC_INLINE void LL_USART_DisableSmartcardNACK(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsEnabledSmartcardNACK(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->CR3, USART_CR3_NACK) == (USART_CR3_NACK));
+  return ((READ_BIT(USARTx->CR3, USART_CR3_NACK) == (USART_CR3_NACK)) ? 1UL : 0UL);
 }
 
 /**
@@ -1876,7 +2321,7 @@ __STATIC_INLINE void LL_USART_DisableSmartcard(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsEnabledSmartcard(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->CR3, USART_CR3_SCEN) == (USART_CR3_SCEN));
+  return ((READ_BIT(USARTx->CR3, USART_CR3_SCEN) == (USART_CR3_SCEN)) ? 1UL : 0UL);
 }
 
 /**
@@ -1923,7 +2368,7 @@ __STATIC_INLINE uint32_t LL_USART_GetSmartcardAutoRetryCount(USART_TypeDef *USAR
   */
 __STATIC_INLINE void LL_USART_SetSmartcardPrescaler(USART_TypeDef *USARTx, uint32_t PrescalerValue)
 {
-  MODIFY_REG(USARTx->GTPR, USART_GTPR_PSC, PrescalerValue);
+  MODIFY_REG(USARTx->GTPR, USART_GTPR_PSC, (uint16_t)PrescalerValue);
 }
 
 /**
@@ -2013,12 +2458,102 @@ __STATIC_INLINE void LL_USART_DisableHalfDuplex(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsEnabledHalfDuplex(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->CR3, USART_CR3_HDSEL) == (USART_CR3_HDSEL));
+  return ((READ_BIT(USARTx->CR3, USART_CR3_HDSEL) == (USART_CR3_HDSEL)) ? 1UL : 0UL);
 }
 
 /**
   * @}
   */
+
+#if defined(USART_CR2_SLVEN)
+/** @defgroup USART_LL_EF_Configuration_SPI_SLAVE Configuration functions related to SPI Slave feature
+  * @{
+  */
+/**
+  * @brief  Enable SPI Synchronous Slave mode
+  * @note   Macro @ref IS_UART_SPI_SLAVE_INSTANCE(USARTx) can be used to check whether or not
+  *         SPI Slave mode feature is supported by the USARTx instance.
+  * @rmtoll CR2          SLVEN         LL_USART_EnableSPISlave
+  * @param  USARTx USART Instance
+  * @retval None
+  */
+__STATIC_INLINE void LL_USART_EnableSPISlave(USART_TypeDef *USARTx)
+{
+  SET_BIT(USARTx->CR2, USART_CR2_SLVEN);
+}
+
+/**
+  * @brief  Disable SPI Synchronous Slave mode
+  * @note   Macro @ref IS_UART_SPI_SLAVE_INSTANCE(USARTx) can be used to check whether or not
+  *         SPI Slave mode feature is supported by the USARTx instance.
+  * @rmtoll CR2          SLVEN         LL_USART_DisableSPISlave
+  * @param  USARTx USART Instance
+  * @retval None
+  */
+__STATIC_INLINE void LL_USART_DisableSPISlave(USART_TypeDef *USARTx)
+{
+  CLEAR_BIT(USARTx->CR2, USART_CR2_SLVEN);
+}
+
+/**
+  * @brief  Indicate if  SPI Synchronous Slave mode is enabled
+  * @note   Macro @ref IS_UART_SPI_SLAVE_INSTANCE(USARTx) can be used to check whether or not
+  *         SPI Slave mode feature is supported by the USARTx instance.
+  * @rmtoll CR2          SLVEN         LL_USART_IsEnabledSPISlave
+  * @param  USARTx USART Instance
+  * @retval State of bit (1 or 0).
+  */
+__STATIC_INLINE uint32_t LL_USART_IsEnabledSPISlave(USART_TypeDef *USARTx)
+{
+  return ((READ_BIT(USARTx->CR2, USART_CR2_SLVEN) == (USART_CR2_SLVEN)) ? 1UL : 0UL);
+}
+
+/**
+  * @brief  Enable SPI Slave Selection using NSS input pin
+  * @note   Macro @ref IS_UART_SPI_SLAVE_INSTANCE(USARTx) can be used to check whether or not
+  *         SPI Slave mode feature is supported by the USARTx instance.
+  * @note   SPI Slave Selection depends on NSS input pin
+  *         (The slave is selected when NSS is low and deselected when NSS is high).
+  * @rmtoll CR2          DIS_NSS       LL_USART_EnableSPISlaveSelect
+  * @param  USARTx USART Instance
+  * @retval None
+  */
+__STATIC_INLINE void LL_USART_EnableSPISlaveSelect(USART_TypeDef *USARTx)
+{
+  CLEAR_BIT(USARTx->CR2, USART_CR2_DIS_NSS);
+}
+
+/**
+  * @brief  Disable SPI Slave Selection using NSS input pin
+  * @note   Macro @ref IS_UART_SPI_SLAVE_INSTANCE(USARTx) can be used to check whether or not
+  *         SPI Slave mode feature is supported by the USARTx instance.
+  * @note   SPI Slave will be always selected and NSS input pin will be ignored.
+  * @rmtoll CR2          DIS_NSS       LL_USART_DisableSPISlaveSelect
+  * @param  USARTx USART Instance
+  * @retval None
+  */
+__STATIC_INLINE void LL_USART_DisableSPISlaveSelect(USART_TypeDef *USARTx)
+{
+  SET_BIT(USARTx->CR2, USART_CR2_DIS_NSS);
+}
+
+/**
+  * @brief  Indicate if  SPI Slave Selection depends on NSS input pin
+  * @note   Macro @ref IS_UART_SPI_SLAVE_INSTANCE(USARTx) can be used to check whether or not
+  *         SPI Slave mode feature is supported by the USARTx instance.
+  * @rmtoll CR2          DIS_NSS       LL_USART_IsEnabledSPISlaveSelect
+  * @param  USARTx USART Instance
+  * @retval State of bit (1 or 0).
+  */
+__STATIC_INLINE uint32_t LL_USART_IsEnabledSPISlaveSelect(USART_TypeDef *USARTx)
+{
+  return ((READ_BIT(USARTx->CR2, USART_CR2_DIS_NSS) != (USART_CR2_DIS_NSS)) ? 1UL : 0UL);
+}
+
+/**
+  * @}
+  */
+#endif
 
 /** @defgroup USART_LL_EF_Configuration_LIN Configuration functions related to LIN feature
   * @{
@@ -2091,7 +2626,7 @@ __STATIC_INLINE void LL_USART_DisableLIN(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsEnabledLIN(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->CR2, USART_CR2_LINEN) == (USART_CR2_LINEN));
+  return ((READ_BIT(USARTx->CR2, USART_CR2_LINEN) == (USART_CR2_LINEN)) ? 1UL : 0UL);
 }
 
 /**
@@ -2192,7 +2727,7 @@ __STATIC_INLINE void LL_USART_DisableDEMode(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsEnabledDEMode(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->CR3, USART_CR3_DEM) == (USART_CR3_DEM));
+  return ((READ_BIT(USARTx->CR3, USART_CR3_DEM) == (USART_CR3_DEM)) ? 1UL : 0UL);
 }
 
 /**
@@ -2519,7 +3054,7 @@ __STATIC_INLINE void LL_USART_ConfigMultiProcessMode(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsActiveFlag_PE(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->ISR, USART_ISR_PE) == (USART_ISR_PE));
+  return ((READ_BIT(USARTx->ISR, USART_ISR_PE) == (USART_ISR_PE)) ? 1UL : 0UL);
 }
 
 /**
@@ -2530,18 +3065,18 @@ __STATIC_INLINE uint32_t LL_USART_IsActiveFlag_PE(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsActiveFlag_FE(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->ISR, USART_ISR_FE) == (USART_ISR_FE));
+  return ((READ_BIT(USARTx->ISR, USART_ISR_FE) == (USART_ISR_FE)) ? 1UL : 0UL);
 }
 
 /**
   * @brief  Check if the USART Noise error detected Flag is set or not
-  * @rmtoll ISR          NF            LL_USART_IsActiveFlag_NE
+  * @rmtoll ISR          NE            LL_USART_IsActiveFlag_NE
   * @param  USARTx USART Instance
   * @retval State of bit (1 or 0).
   */
 __STATIC_INLINE uint32_t LL_USART_IsActiveFlag_NE(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->ISR, USART_ISR_NE) == (USART_ISR_NE));
+  return ((READ_BIT(USARTx->ISR, USART_ISR_NE) == (USART_ISR_NE)) ? 1UL : 0UL);
 }
 
 /**
@@ -2552,7 +3087,7 @@ __STATIC_INLINE uint32_t LL_USART_IsActiveFlag_NE(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsActiveFlag_ORE(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->ISR, USART_ISR_ORE) == (USART_ISR_ORE));
+  return ((READ_BIT(USARTx->ISR, USART_ISR_ORE) == (USART_ISR_ORE)) ? 1UL : 0UL);
 }
 
 /**
@@ -2563,8 +3098,26 @@ __STATIC_INLINE uint32_t LL_USART_IsActiveFlag_ORE(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsActiveFlag_IDLE(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->ISR, USART_ISR_IDLE) == (USART_ISR_IDLE));
+  return ((READ_BIT(USARTx->ISR, USART_ISR_IDLE) == (USART_ISR_IDLE)) ? 1UL : 0UL);
 }
+
+#if defined(USART_CR1_FIFOEN)
+/* Legacy define */
+#define LL_USART_IsActiveFlag_RXNE  LL_USART_IsActiveFlag_RXNE_RXFNE
+
+/**
+  * @brief  Check if the USART Read Data Register or USART RX FIFO Not Empty Flag is set or not
+  * @note   Macro @ref IS_UART_FIFO_INSTANCE(USARTx) can be used to check whether or not
+  *         FIFO mode feature is supported by the USARTx instance.
+  * @rmtoll ISR          RXNE_RXFNE    LL_USART_IsActiveFlag_RXNE_RXFNE
+  * @param  USARTx USART Instance
+  * @retval State of bit (1 or 0).
+  */
+__STATIC_INLINE uint32_t LL_USART_IsActiveFlag_RXNE_RXFNE(USART_TypeDef *USARTx)
+{
+  return ((READ_BIT(USARTx->ISR, USART_ISR_RXNE_RXFNE) == (USART_ISR_RXNE_RXFNE)) ? 1UL : 0UL);
+}
+#else
 
 /**
   * @brief  Check if the USART Read Data Register Not Empty Flag is set or not
@@ -2574,8 +3127,9 @@ __STATIC_INLINE uint32_t LL_USART_IsActiveFlag_IDLE(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsActiveFlag_RXNE(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->ISR, USART_ISR_RXNE) == (USART_ISR_RXNE));
+  return ((READ_BIT(USARTx->ISR, USART_ISR_RXNE) == (USART_ISR_RXNE)) ? 1UL : 0UL);
 }
+#endif
 
 /**
   * @brief  Check if the USART Transmission Complete Flag is set or not
@@ -2585,8 +3139,26 @@ __STATIC_INLINE uint32_t LL_USART_IsActiveFlag_RXNE(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsActiveFlag_TC(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->ISR, USART_ISR_TC) == (USART_ISR_TC));
+  return ((READ_BIT(USARTx->ISR, USART_ISR_TC) == (USART_ISR_TC)) ? 1UL : 0UL);
 }
+
+#if defined(USART_CR1_FIFOEN)
+/* Legacy define */
+#define LL_USART_IsActiveFlag_TXE  LL_USART_IsActiveFlag_TXE_TXFNF
+
+/**
+  * @brief  Check if the USART Transmit Data Register Empty or USART TX FIFO Not Full Flag is set or not
+  * @note   Macro @ref IS_UART_FIFO_INSTANCE(USARTx) can be used to check whether or not
+  *         FIFO mode feature is supported by the USARTx instance.
+  * @rmtoll ISR          TXE_TXFNF     LL_USART_IsActiveFlag_TXE_TXFNF
+  * @param  USARTx USART Instance
+  * @retval State of bit (1 or 0).
+  */
+__STATIC_INLINE uint32_t LL_USART_IsActiveFlag_TXE_TXFNF(USART_TypeDef *USARTx)
+{
+  return ((READ_BIT(USARTx->ISR, USART_ISR_TXE_TXFNF) == (USART_ISR_TXE_TXFNF)) ? 1UL : 0UL);
+}
+#else
 
 /**
   * @brief  Check if the USART Transmit Data Register Empty Flag is set or not
@@ -2596,8 +3168,9 @@ __STATIC_INLINE uint32_t LL_USART_IsActiveFlag_TC(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsActiveFlag_TXE(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->ISR, USART_ISR_TXE) == (USART_ISR_TXE));
+  return ((READ_BIT(USARTx->ISR, USART_ISR_TXE) == (USART_ISR_TXE)) ? 1UL : 0UL);
 }
+#endif
 
 /**
   * @brief  Check if the USART LIN Break Detection Flag is set or not
@@ -2609,7 +3182,7 @@ __STATIC_INLINE uint32_t LL_USART_IsActiveFlag_TXE(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsActiveFlag_LBD(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->ISR, USART_ISR_LBDF) == (USART_ISR_LBDF));
+  return ((READ_BIT(USARTx->ISR, USART_ISR_LBDF) == (USART_ISR_LBDF)) ? 1UL : 0UL);
 }
 
 /**
@@ -2622,7 +3195,7 @@ __STATIC_INLINE uint32_t LL_USART_IsActiveFlag_LBD(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsActiveFlag_nCTS(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->ISR, USART_ISR_CTSIF) == (USART_ISR_CTSIF));
+  return ((READ_BIT(USARTx->ISR, USART_ISR_CTSIF) == (USART_ISR_CTSIF)) ? 1UL : 0UL);
 }
 
 /**
@@ -2635,7 +3208,7 @@ __STATIC_INLINE uint32_t LL_USART_IsActiveFlag_nCTS(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsActiveFlag_CTS(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->ISR, USART_ISR_CTS) == (USART_ISR_CTS));
+  return ((READ_BIT(USARTx->ISR, USART_ISR_CTS) == (USART_ISR_CTS)) ? 1UL : 0UL);
 }
 
 /**
@@ -2646,7 +3219,7 @@ __STATIC_INLINE uint32_t LL_USART_IsActiveFlag_CTS(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsActiveFlag_RTO(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->ISR, USART_ISR_RTOF) == (USART_ISR_RTOF));
+  return ((READ_BIT(USARTx->ISR, USART_ISR_RTOF) == (USART_ISR_RTOF)) ? 1UL : 0UL);
 }
 
 /**
@@ -2659,9 +3232,24 @@ __STATIC_INLINE uint32_t LL_USART_IsActiveFlag_RTO(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsActiveFlag_EOB(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->ISR, USART_ISR_EOBF) == (USART_ISR_EOBF));
+  return ((READ_BIT(USARTx->ISR, USART_ISR_EOBF) == (USART_ISR_EOBF)) ? 1UL : 0UL);
 }
 
+#if defined(USART_CR2_SLVEN)
+/**
+  * @brief  Check if the SPI Slave Underrun error flag is set or not
+  * @note   Macro @ref IS_UART_SPI_SLAVE_INSTANCE(USARTx) can be used to check whether or not
+  *         SPI Slave mode feature is supported by the USARTx instance.
+  * @rmtoll ISR          UDR           LL_USART_IsActiveFlag_UDR
+  * @param  USARTx USART Instance
+  * @retval State of bit (1 or 0).
+  */
+__STATIC_INLINE uint32_t LL_USART_IsActiveFlag_UDR(USART_TypeDef *USARTx)
+{
+  return ((READ_BIT(USARTx->ISR, USART_ISR_UDR) == (USART_ISR_UDR)) ? 1UL : 0UL);
+}
+
+#endif
 /**
   * @brief  Check if the USART Auto-Baud Rate Error Flag is set or not
   * @note   Macro @ref IS_USART_AUTOBAUDRATE_DETECTION_INSTANCE(USARTx) can be used to check whether or not
@@ -2672,7 +3260,7 @@ __STATIC_INLINE uint32_t LL_USART_IsActiveFlag_EOB(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsActiveFlag_ABRE(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->ISR, USART_ISR_ABRE) == (USART_ISR_ABRE));
+  return ((READ_BIT(USARTx->ISR, USART_ISR_ABRE) == (USART_ISR_ABRE)) ? 1UL : 0UL);
 }
 
 /**
@@ -2685,7 +3273,7 @@ __STATIC_INLINE uint32_t LL_USART_IsActiveFlag_ABRE(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsActiveFlag_ABR(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->ISR, USART_ISR_ABRF) == (USART_ISR_ABRF));
+  return ((READ_BIT(USARTx->ISR, USART_ISR_ABRF) == (USART_ISR_ABRF)) ? 1UL : 0UL);
 }
 
 /**
@@ -2696,7 +3284,7 @@ __STATIC_INLINE uint32_t LL_USART_IsActiveFlag_ABR(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsActiveFlag_BUSY(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->ISR, USART_ISR_BUSY) == (USART_ISR_BUSY));
+  return ((READ_BIT(USARTx->ISR, USART_ISR_BUSY) == (USART_ISR_BUSY)) ? 1UL : 0UL);
 }
 
 /**
@@ -2707,7 +3295,7 @@ __STATIC_INLINE uint32_t LL_USART_IsActiveFlag_BUSY(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsActiveFlag_CM(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->ISR, USART_ISR_CMF) == (USART_ISR_CMF));
+  return ((READ_BIT(USARTx->ISR, USART_ISR_CMF) == (USART_ISR_CMF)) ? 1UL : 0UL);
 }
 
 /**
@@ -2718,7 +3306,7 @@ __STATIC_INLINE uint32_t LL_USART_IsActiveFlag_CM(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsActiveFlag_SBK(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->ISR, USART_ISR_SBKF) == (USART_ISR_SBKF));
+  return ((READ_BIT(USARTx->ISR, USART_ISR_SBKF) == (USART_ISR_SBKF)) ? 1UL : 0UL);
 }
 
 /**
@@ -2729,7 +3317,7 @@ __STATIC_INLINE uint32_t LL_USART_IsActiveFlag_SBK(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsActiveFlag_RWU(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->ISR, USART_ISR_RWU) == (USART_ISR_RWU));
+  return ((READ_BIT(USARTx->ISR, USART_ISR_RWU) == (USART_ISR_RWU)) ? 1UL : 0UL);
 }
 
 /**
@@ -2742,7 +3330,7 @@ __STATIC_INLINE uint32_t LL_USART_IsActiveFlag_RWU(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsActiveFlag_WKUP(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->ISR, USART_ISR_WUF) == (USART_ISR_WUF));
+  return ((READ_BIT(USARTx->ISR, USART_ISR_WUF) == (USART_ISR_WUF)) ? 1UL : 0UL);
 }
 
 /**
@@ -2753,7 +3341,7 @@ __STATIC_INLINE uint32_t LL_USART_IsActiveFlag_WKUP(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsActiveFlag_TEACK(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->ISR, USART_ISR_TEACK) == (USART_ISR_TEACK));
+  return ((READ_BIT(USARTx->ISR, USART_ISR_TEACK) == (USART_ISR_TEACK)) ? 1UL : 0UL);
 }
 
 /**
@@ -2764,8 +3352,36 @@ __STATIC_INLINE uint32_t LL_USART_IsActiveFlag_TEACK(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsActiveFlag_REACK(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->ISR, USART_ISR_REACK) == (USART_ISR_REACK));
+  return ((READ_BIT(USARTx->ISR, USART_ISR_REACK) == (USART_ISR_REACK)) ? 1UL : 0UL);
 }
+
+#if defined(USART_CR1_FIFOEN)
+/**
+  * @brief  Check if the USART TX FIFO Empty Flag is set or not
+  * @note   Macro @ref IS_UART_FIFO_INSTANCE(USARTx) can be used to check whether or not
+  *         FIFO mode feature is supported by the USARTx instance.
+  * @rmtoll ISR          TXFE          LL_USART_IsActiveFlag_TXFE
+  * @param  USARTx USART Instance
+  * @retval State of bit (1 or 0).
+  */
+__STATIC_INLINE uint32_t LL_USART_IsActiveFlag_TXFE(USART_TypeDef *USARTx)
+{
+  return ((READ_BIT(USARTx->ISR, USART_ISR_TXFE) == (USART_ISR_TXFE)) ? 1UL : 0UL);
+}
+
+/**
+  * @brief  Check if the USART RX FIFO Full Flag is set or not
+  * @note   Macro @ref IS_UART_FIFO_INSTANCE(USARTx) can be used to check whether or not
+  *         FIFO mode feature is supported by the USARTx instance.
+  * @rmtoll ISR          RXFF          LL_USART_IsActiveFlag_RXFF
+  * @param  USARTx USART Instance
+  * @retval State of bit (1 or 0).
+  */
+__STATIC_INLINE uint32_t LL_USART_IsActiveFlag_RXFF(USART_TypeDef *USARTx)
+{
+  return ((READ_BIT(USARTx->ISR, USART_ISR_RXFF) == (USART_ISR_RXFF)) ? 1UL : 0UL);
+}
+#endif
 
 #if defined(USART_TCBGT_SUPPORT)
 /* Function available only on devices supporting Transmit Complete before Guard Time feature */
@@ -2777,7 +3393,35 @@ __STATIC_INLINE uint32_t LL_USART_IsActiveFlag_REACK(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsActiveFlag_TCBGT(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->ISR, USART_ISR_TCBGT) == (USART_ISR_TCBGT));
+  return ((READ_BIT(USARTx->ISR, USART_ISR_TCBGT) == (USART_ISR_TCBGT)) ? 1UL : 0UL);
+}
+#endif
+
+#if defined(USART_CR1_FIFOEN)
+/**
+  * @brief  Check if the USART TX FIFO Threshold Flag is set or not
+  * @note   Macro @ref IS_UART_FIFO_INSTANCE(USARTx) can be used to check whether or not
+  *         FIFO mode feature is supported by the USARTx instance.
+  * @rmtoll ISR          TXFT          LL_USART_IsActiveFlag_TXFT
+  * @param  USARTx USART Instance
+  * @retval State of bit (1 or 0).
+  */
+__STATIC_INLINE uint32_t LL_USART_IsActiveFlag_TXFT(USART_TypeDef *USARTx)
+{
+  return ((READ_BIT(USARTx->ISR, USART_ISR_TXFT) == (USART_ISR_TXFT)) ? 1UL : 0UL);
+}
+
+/**
+  * @brief  Check if the USART RX FIFO Threshold Flag is set or not
+  * @note   Macro @ref IS_UART_FIFO_INSTANCE(USARTx) can be used to check whether or not
+  *         FIFO mode feature is supported by the USARTx instance.
+  * @rmtoll ISR          RXFT          LL_USART_IsActiveFlag_RXFT
+  * @param  USARTx USART Instance
+  * @retval State of bit (1 or 0).
+  */
+__STATIC_INLINE uint32_t LL_USART_IsActiveFlag_RXFT(USART_TypeDef *USARTx)
+{
+  return ((READ_BIT(USARTx->ISR, USART_ISR_RXFT) == (USART_ISR_RXFT)) ? 1UL : 0UL);
 }
 #endif
 
@@ -2804,14 +3448,14 @@ __STATIC_INLINE void LL_USART_ClearFlag_FE(USART_TypeDef *USARTx)
 }
 
 /**
-  * @brief  Clear Noise detected Flag
-  * @rmtoll ICR          NCF           LL_USART_ClearFlag_NE
+  * @brief  Clear Noise Error detected Flag
+  * @rmtoll ICR          NECF           LL_USART_ClearFlag_NE
   * @param  USARTx USART Instance
   * @retval None
   */
 __STATIC_INLINE void LL_USART_ClearFlag_NE(USART_TypeDef *USARTx)
 {
-  WRITE_REG(USARTx->ICR, USART_ICR_NCF);
+  WRITE_REG(USARTx->ICR, USART_ICR_NECF);
 }
 
 /**
@@ -2835,6 +3479,21 @@ __STATIC_INLINE void LL_USART_ClearFlag_IDLE(USART_TypeDef *USARTx)
 {
   WRITE_REG(USARTx->ICR, USART_ICR_IDLECF);
 }
+
+#if defined(USART_CR1_FIFOEN)
+/**
+  * @brief  Clear TX FIFO Empty Flag
+  * @note   Macro @ref IS_UART_FIFO_INSTANCE(USARTx) can be used to check whether or not
+  *         FIFO mode feature is supported by the USARTx instance.
+  * @rmtoll ICR          TXFECF        LL_USART_ClearFlag_TXFE
+  * @param  USARTx USART Instance
+  * @retval None
+  */
+__STATIC_INLINE void LL_USART_ClearFlag_TXFE(USART_TypeDef *USARTx)
+{
+  WRITE_REG(USARTx->ICR, USART_ICR_TXFECF);
+}
+#endif
 
 /**
   * @brief  Clear Transmission Complete Flag
@@ -2911,6 +3570,21 @@ __STATIC_INLINE void LL_USART_ClearFlag_EOB(USART_TypeDef *USARTx)
   WRITE_REG(USARTx->ICR, USART_ICR_EOBCF);
 }
 
+#if defined(USART_CR2_SLVEN)
+/**
+  * @brief  Clear SPI Slave Underrun Flag
+  * @note   Macro @ref IS_UART_SPI_SLAVE_INSTANCE(USARTx) can be used to check whether or not
+  *         SPI Slave mode feature is supported by the USARTx instance.
+  * @rmtoll ICR          UDRCF         LL_USART_ClearFlag_UDR
+  * @param  USARTx USART Instance
+  * @retval None
+  */
+__STATIC_INLINE void LL_USART_ClearFlag_UDR(USART_TypeDef *USARTx)
+{
+  WRITE_REG(USARTx->ICR, USART_ICR_UDRCF);
+}
+
+#endif
 /**
   * @brief  Clear Character Match Flag
   * @rmtoll ICR          CMCF          LL_USART_ClearFlag_CM
@@ -2954,6 +3628,24 @@ __STATIC_INLINE void LL_USART_EnableIT_IDLE(USART_TypeDef *USARTx)
   SET_BIT(USARTx->CR1, USART_CR1_IDLEIE);
 }
 
+#if defined(USART_CR1_FIFOEN)
+/* Legacy define */
+#define LL_USART_EnableIT_RXNE  LL_USART_EnableIT_RXNE_RXFNE
+
+/**
+  * @brief  Enable RX Not Empty and RX FIFO Not Empty Interrupt
+  * @note   Macro @ref IS_UART_FIFO_INSTANCE(USARTx) can be used to check whether or not
+  *         FIFO mode feature is supported by the USARTx instance.
+  * @rmtoll CR1        RXNEIE_RXFNEIE  LL_USART_EnableIT_RXNE_RXFNE
+  * @param  USARTx USART Instance
+  * @retval None
+  */
+__STATIC_INLINE void LL_USART_EnableIT_RXNE_RXFNE(USART_TypeDef *USARTx)
+{
+  SET_BIT(USARTx->CR1, USART_CR1_RXNEIE_RXFNEIE);
+}
+#else
+
 /**
   * @brief  Enable RX Not Empty Interrupt
   * @rmtoll CR1          RXNEIE        LL_USART_EnableIT_RXNE
@@ -2964,6 +3656,7 @@ __STATIC_INLINE void LL_USART_EnableIT_RXNE(USART_TypeDef *USARTx)
 {
   SET_BIT(USARTx->CR1, USART_CR1_RXNEIE);
 }
+#endif
 
 /**
   * @brief  Enable Transmission Complete Interrupt
@@ -2976,6 +3669,24 @@ __STATIC_INLINE void LL_USART_EnableIT_TC(USART_TypeDef *USARTx)
   SET_BIT(USARTx->CR1, USART_CR1_TCIE);
 }
 
+#if defined(USART_CR1_FIFOEN)
+/* Legacy define */
+#define LL_USART_EnableIT_TXE  LL_USART_EnableIT_TXE_TXFNF
+
+/**
+  * @brief  Enable TX Empty and TX FIFO Not Full Interrupt
+  * @note   Macro @ref IS_UART_FIFO_INSTANCE(USARTx) can be used to check whether or not
+  *         FIFO mode feature is supported by the USARTx instance.
+  * @rmtoll CR1         TXEIE_TXFNFIE  LL_USART_EnableIT_TXE_TXFNF
+  * @param  USARTx USART Instance
+  * @retval None
+  */
+__STATIC_INLINE void LL_USART_EnableIT_TXE_TXFNF(USART_TypeDef *USARTx)
+{
+  SET_BIT(USARTx->CR1, USART_CR1_TXEIE_TXFNFIE);
+}
+#else
+
 /**
   * @brief  Enable TX Empty Interrupt
   * @rmtoll CR1          TXEIE         LL_USART_EnableIT_TXE
@@ -2986,6 +3697,7 @@ __STATIC_INLINE void LL_USART_EnableIT_TXE(USART_TypeDef *USARTx)
 {
   SET_BIT(USARTx->CR1, USART_CR1_TXEIE);
 }
+#endif
 
 /**
   * @brief  Enable Parity Error Interrupt
@@ -3032,6 +3744,32 @@ __STATIC_INLINE void LL_USART_EnableIT_EOB(USART_TypeDef *USARTx)
 {
   SET_BIT(USARTx->CR1, USART_CR1_EOBIE);
 }
+
+#if defined(USART_CR1_FIFOEN)
+/**
+  * @brief  Enable TX FIFO Empty Interrupt
+  * @note   Macro @ref IS_UART_FIFO_INSTANCE(USARTx) can be used to check whether or not
+  *         FIFO mode feature is supported by the USARTx instance.
+  * @rmtoll CR1          TXFEIE        LL_USART_EnableIT_TXFE
+  * @param  USARTx USART Instance
+  * @retval None
+  */
+__STATIC_INLINE void LL_USART_EnableIT_TXFE(USART_TypeDef *USARTx)
+{
+  SET_BIT(USARTx->CR1, USART_CR1_TXFEIE);
+}
+
+/**
+  * @brief  Enable RX FIFO Full Interrupt
+  * @rmtoll CR1          RXFFIE        LL_USART_EnableIT_RXFF
+  * @param  USARTx USART Instance
+  * @retval None
+  */
+__STATIC_INLINE void LL_USART_EnableIT_RXFF(USART_TypeDef *USARTx)
+{
+  SET_BIT(USARTx->CR1, USART_CR1_RXFFIE);
+}
+#endif
 
 /**
   * @brief  Enable LIN Break Detection Interrupt
@@ -3087,6 +3825,21 @@ __STATIC_INLINE void LL_USART_EnableIT_WKUP(USART_TypeDef *USARTx)
   SET_BIT(USARTx->CR3, USART_CR3_WUFIE);
 }
 
+#if defined(USART_CR1_FIFOEN)
+/**
+  * @brief  Enable TX FIFO Threshold Interrupt
+  * @note   Macro @ref IS_UART_FIFO_INSTANCE(USARTx) can be used to check whether or not
+  *         FIFO mode feature is supported by the USARTx instance.
+  * @rmtoll CR3          TXFTIE        LL_USART_EnableIT_TXFT
+  * @param  USARTx USART Instance
+  * @retval None
+  */
+__STATIC_INLINE void LL_USART_EnableIT_TXFT(USART_TypeDef *USARTx)
+{
+  SET_BIT(USARTx->CR3, USART_CR3_TXFTIE);
+}
+#endif
+
 #if defined(USART_TCBGT_SUPPORT)
 /* Function available only on devices supporting Transmit Complete before Guard Time feature */
 /**
@@ -3103,6 +3856,21 @@ __STATIC_INLINE void LL_USART_EnableIT_TCBGT(USART_TypeDef *USARTx)
 }
 #endif
 
+#if defined(USART_CR1_FIFOEN)
+/**
+  * @brief  Enable RX FIFO Threshold Interrupt
+  * @note   Macro @ref IS_UART_FIFO_INSTANCE(USARTx) can be used to check whether or not
+  *         FIFO mode feature is supported by the USARTx instance.
+  * @rmtoll CR3          RXFTIE        LL_USART_EnableIT_RXFT
+  * @param  USARTx USART Instance
+  * @retval None
+  */
+__STATIC_INLINE void LL_USART_EnableIT_RXFT(USART_TypeDef *USARTx)
+{
+  SET_BIT(USARTx->CR3, USART_CR3_RXFTIE);
+}
+#endif
+
 /**
   * @brief  Disable IDLE Interrupt
   * @rmtoll CR1          IDLEIE        LL_USART_DisableIT_IDLE
@@ -3114,6 +3882,24 @@ __STATIC_INLINE void LL_USART_DisableIT_IDLE(USART_TypeDef *USARTx)
   CLEAR_BIT(USARTx->CR1, USART_CR1_IDLEIE);
 }
 
+#if defined(USART_CR1_FIFOEN)
+/* Legacy define */
+#define LL_USART_DisableIT_RXNE  LL_USART_DisableIT_RXNE_RXFNE
+
+/**
+  * @brief  Disable RX Not Empty and RX FIFO Not Empty Interrupt
+  * @note   Macro @ref IS_UART_FIFO_INSTANCE(USARTx) can be used to check whether or not
+  *         FIFO mode feature is supported by the USARTx instance.
+  * @rmtoll CR1        RXNEIE_RXFNEIE  LL_USART_DisableIT_RXNE_RXFNE
+  * @param  USARTx USART Instance
+  * @retval None
+  */
+__STATIC_INLINE void LL_USART_DisableIT_RXNE_RXFNE(USART_TypeDef *USARTx)
+{
+  CLEAR_BIT(USARTx->CR1, USART_CR1_RXNEIE_RXFNEIE);
+}
+#else
+
 /**
   * @brief  Disable RX Not Empty Interrupt
   * @rmtoll CR1          RXNEIE        LL_USART_DisableIT_RXNE
@@ -3124,6 +3910,7 @@ __STATIC_INLINE void LL_USART_DisableIT_RXNE(USART_TypeDef *USARTx)
 {
   CLEAR_BIT(USARTx->CR1, USART_CR1_RXNEIE);
 }
+#endif
 
 /**
   * @brief  Disable Transmission Complete Interrupt
@@ -3136,6 +3923,24 @@ __STATIC_INLINE void LL_USART_DisableIT_TC(USART_TypeDef *USARTx)
   CLEAR_BIT(USARTx->CR1, USART_CR1_TCIE);
 }
 
+#if defined(USART_CR1_FIFOEN)
+/* Legacy define */
+#define LL_USART_DisableIT_TXE  LL_USART_DisableIT_TXE_TXFNF
+
+/**
+  * @brief  Disable TX Empty and TX FIFO Not Full Interrupt
+  * @note   Macro @ref IS_UART_FIFO_INSTANCE(USARTx) can be used to check whether or not
+  *         FIFO mode feature is supported by the USARTx instance.
+  * @rmtoll CR1        TXEIE_TXFNFIE  LL_USART_DisableIT_TXE_TXFNF
+  * @param  USARTx USART Instance
+  * @retval None
+  */
+__STATIC_INLINE void LL_USART_DisableIT_TXE_TXFNF(USART_TypeDef *USARTx)
+{
+  CLEAR_BIT(USARTx->CR1, USART_CR1_TXEIE_TXFNFIE);
+}
+#else
+
 /**
   * @brief  Disable TX Empty Interrupt
   * @rmtoll CR1          TXEIE         LL_USART_DisableIT_TXE
@@ -3146,6 +3951,7 @@ __STATIC_INLINE void LL_USART_DisableIT_TXE(USART_TypeDef *USARTx)
 {
   CLEAR_BIT(USARTx->CR1, USART_CR1_TXEIE);
 }
+#endif
 
 /**
   * @brief  Disable Parity Error Interrupt
@@ -3192,6 +3998,34 @@ __STATIC_INLINE void LL_USART_DisableIT_EOB(USART_TypeDef *USARTx)
 {
   CLEAR_BIT(USARTx->CR1, USART_CR1_EOBIE);
 }
+
+#if defined(USART_CR1_FIFOEN)
+/**
+  * @brief  Disable TX FIFO Empty Interrupt
+  * @note   Macro @ref IS_UART_FIFO_INSTANCE(USARTx) can be used to check whether or not
+  *         FIFO mode feature is supported by the USARTx instance.
+  * @rmtoll CR1          TXFEIE        LL_USART_DisableIT_TXFE
+  * @param  USARTx USART Instance
+  * @retval None
+  */
+__STATIC_INLINE void LL_USART_DisableIT_TXFE(USART_TypeDef *USARTx)
+{
+  CLEAR_BIT(USARTx->CR1, USART_CR1_TXFEIE);
+}
+
+/**
+  * @brief  Disable RX FIFO Full Interrupt
+  * @note   Macro @ref IS_UART_FIFO_INSTANCE(USARTx) can be used to check whether or not
+  *         FIFO mode feature is supported by the USARTx instance.
+  * @rmtoll CR1          RXFFIE        LL_USART_DisableIT_RXFF
+  * @param  USARTx USART Instance
+  * @retval None
+  */
+__STATIC_INLINE void LL_USART_DisableIT_RXFF(USART_TypeDef *USARTx)
+{
+  CLEAR_BIT(USARTx->CR1, USART_CR1_RXFFIE);
+}
+#endif
 
 /**
   * @brief  Disable LIN Break Detection Interrupt
@@ -3247,6 +4081,21 @@ __STATIC_INLINE void LL_USART_DisableIT_WKUP(USART_TypeDef *USARTx)
   CLEAR_BIT(USARTx->CR3, USART_CR3_WUFIE);
 }
 
+#if defined(USART_CR1_FIFOEN)
+/**
+  * @brief  Disable TX FIFO Threshold Interrupt
+  * @note   Macro @ref IS_UART_FIFO_INSTANCE(USARTx) can be used to check whether or not
+  *         FIFO mode feature is supported by the USARTx instance.
+  * @rmtoll CR3          TXFTIE        LL_USART_DisableIT_TXFT
+  * @param  USARTx USART Instance
+  * @retval None
+  */
+__STATIC_INLINE void LL_USART_DisableIT_TXFT(USART_TypeDef *USARTx)
+{
+  CLEAR_BIT(USARTx->CR3, USART_CR3_TXFTIE);
+}
+#endif
+
 #if defined(USART_TCBGT_SUPPORT)
 /* Function available only on devices supporting Transmit Complete before Guard Time feature */
 /**
@@ -3263,6 +4112,21 @@ __STATIC_INLINE void LL_USART_DisableIT_TCBGT(USART_TypeDef *USARTx)
 }
 #endif
 
+#if defined(USART_CR1_FIFOEN)
+/**
+  * @brief  Disable RX FIFO Threshold Interrupt
+  * @note   Macro @ref IS_UART_FIFO_INSTANCE(USARTx) can be used to check whether or not
+  *         FIFO mode feature is supported by the USARTx instance.
+  * @rmtoll CR3          RXFTIE        LL_USART_DisableIT_RXFT
+  * @param  USARTx USART Instance
+  * @retval None
+  */
+__STATIC_INLINE void LL_USART_DisableIT_RXFT(USART_TypeDef *USARTx)
+{
+  CLEAR_BIT(USARTx->CR3, USART_CR3_RXFTIE);
+}
+#endif
+
 /**
   * @brief  Check if the USART IDLE Interrupt  source is enabled or disabled.
   * @rmtoll CR1          IDLEIE        LL_USART_IsEnabledIT_IDLE
@@ -3271,8 +4135,26 @@ __STATIC_INLINE void LL_USART_DisableIT_TCBGT(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsEnabledIT_IDLE(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->CR1, USART_CR1_IDLEIE) == (USART_CR1_IDLEIE));
+  return ((READ_BIT(USARTx->CR1, USART_CR1_IDLEIE) == (USART_CR1_IDLEIE)) ? 1UL : 0UL);
 }
+
+#if defined(USART_CR1_FIFOEN)
+/* Legacy define */
+#define LL_USART_IsEnabledIT_RXNE  LL_USART_IsEnabledIT_RXNE_RXFNE
+
+/**
+  * @brief  Check if the USART RX Not Empty and USART RX FIFO Not Empty Interrupt is enabled or disabled.
+  * @note   Macro @ref IS_UART_FIFO_INSTANCE(USARTx) can be used to check whether or not
+  *         FIFO mode feature is supported by the USARTx instance.
+  * @rmtoll CR1        RXNEIE_RXFNEIE  LL_USART_IsEnabledIT_RXNE_RXFNE
+  * @param  USARTx USART Instance
+  * @retval State of bit (1 or 0).
+  */
+__STATIC_INLINE uint32_t LL_USART_IsEnabledIT_RXNE_RXFNE(USART_TypeDef *USARTx)
+{
+  return ((READ_BIT(USARTx->CR1, USART_CR1_RXNEIE_RXFNEIE) == (USART_CR1_RXNEIE_RXFNEIE)) ? 1UL : 0UL);
+}
+#else
 
 /**
   * @brief  Check if the USART RX Not Empty Interrupt is enabled or disabled.
@@ -3282,8 +4164,9 @@ __STATIC_INLINE uint32_t LL_USART_IsEnabledIT_IDLE(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsEnabledIT_RXNE(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->CR1, USART_CR1_RXNEIE) == (USART_CR1_RXNEIE));
+  return ((READ_BIT(USARTx->CR1, USART_CR1_RXNEIE) == (USART_CR1_RXNEIE)) ? 1U : 0U);
 }
+#endif
 
 /**
   * @brief  Check if the USART Transmission Complete Interrupt is enabled or disabled.
@@ -3293,8 +4176,26 @@ __STATIC_INLINE uint32_t LL_USART_IsEnabledIT_RXNE(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsEnabledIT_TC(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->CR1, USART_CR1_TCIE) == (USART_CR1_TCIE));
+  return ((READ_BIT(USARTx->CR1, USART_CR1_TCIE) == (USART_CR1_TCIE)) ? 1UL : 0UL);
 }
+
+#if defined(USART_CR1_FIFOEN)
+/* Legacy define */
+#define LL_USART_IsEnabledIT_TXE  LL_USART_IsEnabledIT_TXE_TXFNF
+
+/**
+  * @brief  Check if the USART TX Empty and USART TX FIFO Not Full Interrupt is enabled or disabled
+  * @note   Macro @ref IS_UART_FIFO_INSTANCE(USARTx) can be used to check whether or not
+  *         FIFO mode feature is supported by the USARTx instance.
+  * @rmtoll CR1         TXEIE_TXFNFIE  LL_USART_IsEnabledIT_TXE_TXFNF
+  * @param  USARTx USART Instance
+  * @retval State of bit (1 or 0).
+  */
+__STATIC_INLINE uint32_t LL_USART_IsEnabledIT_TXE_TXFNF(USART_TypeDef *USARTx)
+{
+  return ((READ_BIT(USARTx->CR1, USART_CR1_TXEIE_TXFNFIE) == (USART_CR1_TXEIE_TXFNFIE)) ? 1UL : 0UL);
+}
+#else
 
 /**
   * @brief  Check if the USART TX Empty Interrupt is enabled or disabled.
@@ -3304,8 +4205,9 @@ __STATIC_INLINE uint32_t LL_USART_IsEnabledIT_TC(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsEnabledIT_TXE(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->CR1, USART_CR1_TXEIE) == (USART_CR1_TXEIE));
+  return ((READ_BIT(USARTx->CR1, USART_CR1_TXEIE) == (USART_CR1_TXEIE)) ? 1U : 0U);
 }
+#endif
 
 /**
   * @brief  Check if the USART Parity Error Interrupt is enabled or disabled.
@@ -3315,7 +4217,7 @@ __STATIC_INLINE uint32_t LL_USART_IsEnabledIT_TXE(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsEnabledIT_PE(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->CR1, USART_CR1_PEIE) == (USART_CR1_PEIE));
+  return ((READ_BIT(USARTx->CR1, USART_CR1_PEIE) == (USART_CR1_PEIE)) ? 1UL : 0UL);
 }
 
 /**
@@ -3326,7 +4228,7 @@ __STATIC_INLINE uint32_t LL_USART_IsEnabledIT_PE(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsEnabledIT_CM(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->CR1, USART_CR1_CMIE) == (USART_CR1_CMIE));
+  return ((READ_BIT(USARTx->CR1, USART_CR1_CMIE) == (USART_CR1_CMIE)) ? 1UL : 0UL);
 }
 
 /**
@@ -3337,7 +4239,7 @@ __STATIC_INLINE uint32_t LL_USART_IsEnabledIT_CM(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsEnabledIT_RTO(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->CR1, USART_CR1_RTOIE) == (USART_CR1_RTOIE));
+  return ((READ_BIT(USARTx->CR1, USART_CR1_RTOIE) == (USART_CR1_RTOIE)) ? 1UL : 0UL);
 }
 
 /**
@@ -3350,8 +4252,36 @@ __STATIC_INLINE uint32_t LL_USART_IsEnabledIT_RTO(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsEnabledIT_EOB(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->CR1, USART_CR1_EOBIE) == (USART_CR1_EOBIE));
+  return ((READ_BIT(USARTx->CR1, USART_CR1_EOBIE) == (USART_CR1_EOBIE)) ? 1UL : 0UL);
 }
+
+#if defined(USART_CR1_FIFOEN)
+/**
+  * @brief  Check if the USART TX FIFO Empty Interrupt is enabled or disabled
+  * @note   Macro @ref IS_UART_FIFO_INSTANCE(USARTx) can be used to check whether or not
+  *         FIFO mode feature is supported by the USARTx instance.
+  * @rmtoll CR1          TXFEIE        LL_USART_IsEnabledIT_TXFE
+  * @param  USARTx USART Instance
+  * @retval State of bit (1 or 0).
+  */
+__STATIC_INLINE uint32_t LL_USART_IsEnabledIT_TXFE(USART_TypeDef *USARTx)
+{
+  return ((READ_BIT(USARTx->CR1, USART_CR1_TXFEIE) == (USART_CR1_TXFEIE)) ? 1UL : 0UL);
+}
+
+/**
+  * @brief  Check if the USART RX FIFO Full Interrupt is enabled or disabled
+  * @note   Macro @ref IS_UART_FIFO_INSTANCE(USARTx) can be used to check whether or not
+  *         FIFO mode feature is supported by the USARTx instance.
+  * @rmtoll CR1          RXFFIE        LL_USART_IsEnabledIT_RXFF
+  * @param  USARTx USART Instance
+  * @retval State of bit (1 or 0).
+  */
+__STATIC_INLINE uint32_t LL_USART_IsEnabledIT_RXFF(USART_TypeDef *USARTx)
+{
+  return ((READ_BIT(USARTx->CR1, USART_CR1_RXFFIE) == (USART_CR1_RXFFIE)) ? 1UL : 0UL);
+}
+#endif
 
 /**
   * @brief  Check if the USART LIN Break Detection Interrupt is enabled or disabled.
@@ -3363,7 +4293,7 @@ __STATIC_INLINE uint32_t LL_USART_IsEnabledIT_EOB(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsEnabledIT_LBD(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->CR2, USART_CR2_LBDIE) == (USART_CR2_LBDIE));
+  return ((READ_BIT(USARTx->CR2, USART_CR2_LBDIE) == (USART_CR2_LBDIE)) ? 1UL : 0UL);
 }
 
 /**
@@ -3374,7 +4304,7 @@ __STATIC_INLINE uint32_t LL_USART_IsEnabledIT_LBD(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsEnabledIT_ERROR(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->CR3, USART_CR3_EIE) == (USART_CR3_EIE));
+  return ((READ_BIT(USARTx->CR3, USART_CR3_EIE) == (USART_CR3_EIE)) ? 1UL : 0UL);
 }
 
 /**
@@ -3387,7 +4317,7 @@ __STATIC_INLINE uint32_t LL_USART_IsEnabledIT_ERROR(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsEnabledIT_CTS(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->CR3, USART_CR3_CTSIE) == (USART_CR3_CTSIE));
+  return ((READ_BIT(USARTx->CR3, USART_CR3_CTSIE) == (USART_CR3_CTSIE)) ? 1UL : 0UL);
 }
 
 /**
@@ -3400,8 +4330,23 @@ __STATIC_INLINE uint32_t LL_USART_IsEnabledIT_CTS(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsEnabledIT_WKUP(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->CR3, USART_CR3_WUFIE) == (USART_CR3_WUFIE));
+  return ((READ_BIT(USARTx->CR3, USART_CR3_WUFIE) == (USART_CR3_WUFIE)) ? 1UL : 0UL);
 }
+
+#if defined(USART_CR1_FIFOEN)
+/**
+  * @brief  Check if USART TX FIFO Threshold Interrupt is enabled or disabled
+  * @note   Macro @ref IS_UART_FIFO_INSTANCE(USARTx) can be used to check whether or not
+  *         FIFO mode feature is supported by the USARTx instance.
+  * @rmtoll CR3          TXFTIE        LL_USART_IsEnabledIT_TXFT
+  * @param  USARTx USART Instance
+  * @retval State of bit (1 or 0).
+  */
+__STATIC_INLINE uint32_t LL_USART_IsEnabledIT_TXFT(USART_TypeDef *USARTx)
+{
+  return ((READ_BIT(USARTx->CR3, USART_CR3_TXFTIE) == (USART_CR3_TXFTIE)) ? 1UL : 0UL);
+}
+#endif
 
 #if defined(USART_TCBGT_SUPPORT)
 /* Function available only on devices supporting Transmit Complete before Guard Time feature */
@@ -3415,7 +4360,22 @@ __STATIC_INLINE uint32_t LL_USART_IsEnabledIT_WKUP(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsEnabledIT_TCBGT(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->CR3, USART_CR3_TCBGTIE) == (USART_CR3_TCBGTIE));
+  return ((READ_BIT(USARTx->CR3, USART_CR3_TCBGTIE) == (USART_CR3_TCBGTIE)) ? 1UL : 0UL);
+}
+#endif
+
+#if defined(USART_CR1_FIFOEN)
+/**
+  * @brief  Check if USART RX FIFO Threshold Interrupt is enabled or disabled
+  * @note   Macro @ref IS_UART_FIFO_INSTANCE(USARTx) can be used to check whether or not
+  *         FIFO mode feature is supported by the USARTx instance.
+  * @rmtoll CR3          RXFTIE        LL_USART_IsEnabledIT_RXFT
+  * @param  USARTx USART Instance
+  * @retval State of bit (1 or 0).
+  */
+__STATIC_INLINE uint32_t LL_USART_IsEnabledIT_RXFT(USART_TypeDef *USARTx)
+{
+  return ((READ_BIT(USARTx->CR3, USART_CR3_RXFTIE) == (USART_CR3_RXFTIE)) ? 1UL : 0UL);
 }
 #endif
 
@@ -3457,7 +4417,7 @@ __STATIC_INLINE void LL_USART_DisableDMAReq_RX(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsEnabledDMAReq_RX(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->CR3, USART_CR3_DMAR) == (USART_CR3_DMAR));
+  return ((READ_BIT(USARTx->CR3, USART_CR3_DMAR) == (USART_CR3_DMAR)) ? 1UL : 0UL);
 }
 
 /**
@@ -3490,7 +4450,7 @@ __STATIC_INLINE void LL_USART_DisableDMAReq_TX(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsEnabledDMAReq_TX(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->CR3, USART_CR3_DMAT) == (USART_CR3_DMAT));
+  return ((READ_BIT(USARTx->CR3, USART_CR3_DMAT) == (USART_CR3_DMAT)) ? 1UL : 0UL);
 }
 
 /**
@@ -3523,7 +4483,7 @@ __STATIC_INLINE void LL_USART_DisableDMADeactOnRxErr(USART_TypeDef *USARTx)
   */
 __STATIC_INLINE uint32_t LL_USART_IsEnabledDMADeactOnRxErr(USART_TypeDef *USARTx)
 {
-  return (READ_BIT(USARTx->CR3, USART_CR3_DDRE) == (USART_CR3_DDRE));
+  return ((READ_BIT(USARTx->CR3, USART_CR3_DDRE) == (USART_CR3_DDRE)) ? 1UL : 0UL);
 }
 
 /**
@@ -3538,17 +4498,17 @@ __STATIC_INLINE uint32_t LL_USART_IsEnabledDMADeactOnRxErr(USART_TypeDef *USARTx
   */
 __STATIC_INLINE uint32_t LL_USART_DMA_GetRegAddr(USART_TypeDef *USARTx, uint32_t Direction)
 {
-  register uint32_t data_reg_addr = 0U;
+  register uint32_t data_reg_addr;
 
   if (Direction == LL_USART_DMA_REG_DATA_TRANSMIT)
   {
     /* return address of TDR register */
-    data_reg_addr = (uint32_t) &(USARTx->TDR);
+    data_reg_addr = (uint32_t) & (USARTx->TDR);
   }
   else
   {
     /* return address of RDR register */
-    data_reg_addr = (uint32_t) &(USARTx->RDR);
+    data_reg_addr = (uint32_t) & (USARTx->RDR);
   }
 
   return data_reg_addr;
@@ -3605,7 +4565,7 @@ __STATIC_INLINE void LL_USART_TransmitData8(USART_TypeDef *USARTx, uint8_t Value
   */
 __STATIC_INLINE void LL_USART_TransmitData9(USART_TypeDef *USARTx, uint16_t Value)
 {
-  USARTx->TDR = Value & 0x1FFU;
+  USARTx->TDR = Value & 0x1FFUL;
 }
 
 /**
@@ -3652,7 +4612,15 @@ __STATIC_INLINE void LL_USART_RequestEnterMuteMode(USART_TypeDef *USARTx)
 }
 
 /**
+  @if USART_CR1_FIFOEN
+  * @brief  Request a Receive Data and FIFO flush
+  * @note   Macro @ref IS_UART_FIFO_INSTANCE(USARTx) can be used to check whether or not
+  *         FIFO mode feature is supported by the USARTx instance.
+  * @note   Allows to discard the received data without reading them, and avoid an overrun
+  *         condition.
+  @else
   * @brief  Request a Receive Data flush
+  @endif
   * @rmtoll RQR          RXFRQ         LL_USART_RequestRxDataFlush
   * @param  USARTx USART Instance
   * @retval None
@@ -3663,9 +4631,13 @@ __STATIC_INLINE void LL_USART_RequestRxDataFlush(USART_TypeDef *USARTx)
 }
 
 /**
+  @if USART_CR1_FIFOEN
+  * @brief  Request a Transmit data and FIFO flush
+  * @note   Macro @ref IS_UART_FIFO_INSTANCE(USARTx) can be used to check whether or not
+  *         FIFO mode feature is supported by the USARTx instance.
+  @else
   * @brief  Request a Transmit data flush
-  * @note   Macro @ref IS_SMARTCARD_INSTANCE(USARTx) can be used to check whether or not
-  *         Smartcard feature is supported by the USARTx instance.
+  @endif
   * @rmtoll RQR          TXFRQ         LL_USART_RequestTxDataFlush
   * @param  USARTx USART Instance
   * @retval None
@@ -3711,6 +4683,6 @@ void        LL_USART_ClockStructInit(LL_USART_ClockInitTypeDef *USART_ClockInitS
 }
 #endif
 
-#endif /* __STM32L4xx_LL_USART_H */
+#endif /* STM32L4xx_LL_USART_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

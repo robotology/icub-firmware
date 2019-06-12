@@ -22,53 +22,59 @@
 #define _EMBOT_APP_APPLICATION_THECANPARSERSKIN_H_
 
 #include "embot_common.h"
-
 #include "embot_hw.h"
 #include "embot_hw_can.h"
-
 #include "embot_sys.h"
-
-
+#include "embot_app_canprotocol.h"
+#include "embot_app_canprotocol_analog_polling.h"
+#include "embot_app_canprotocol_analog_periodic.h"
 #include <vector>
+#include <memory>
 
 namespace embot { namespace app { namespace application {
+    
+    class CANagentSKIN
+    {
+    public:
+        // interface
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_SKIN_SET_BRD_CFG::Info &info) = 0;
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_SKIN_SET_TRIANG_CFG::Info &info) = 0;  
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_SET_TXMODE::Info &info) = 0; 
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_SKIN_OBSOLETE_TACT_SETUP::Info &info) = 0;
+       
+    public:
+        virtual ~CANagentSKIN() {};         
+    };
            
     class theCANparserSkin
     {
     public:
-        static theCANparserSkin& getInstance()
-        {
-            static theCANparserSkin* p = new theCANparserSkin();
-            return *p;
-        }
+        static theCANparserSkin& getInstance();
         
         
     public:
+        
         struct Config
         {
-            std::uint32_t   dummy;
-            Config() : dummy(0) {}
+            CANagentSKIN*    agent;
+            Config() : agent(nullptr) {}
+            Config(CANagentSKIN* a) : agent(a) {}
+            bool isvalid() const { return (nullptr == agent) ? false : true; }
         }; 
         
         
-        bool initialise(Config &config); 
+        bool initialise(const Config &config); 
         
         // returns true if the canframe has been recognised. if so, any reply is sent if replies.size() > 0
         bool process(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);
 
     private:
         theCANparserSkin(); 
-
-    public:
-        // remove copy constructors and copy assignment operators
-        theCANparserSkin(const theCANparserSkin&) = delete;
-        theCANparserSkin(theCANparserSkin&) = delete;
-        void operator=(const theCANparserSkin&) = delete;
-        void operator=(theCANparserSkin&) = delete;
+        ~theCANparserSkin(); 
 
     private:    
         struct Impl;
-        Impl *pImpl;        
+        std::unique_ptr<Impl> pImpl;     
     };       
 
 

@@ -22,7 +22,6 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "embot_hw_si7051.h"
-#include "stm32hal.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -31,6 +30,8 @@
 
 #include <cstring>
 #include <vector>
+#include "stm32hal.h"
+#include "embot_hw_bsp.h"
 
 using namespace std;
 
@@ -38,6 +39,7 @@ using namespace std;
 #include "embot_hw_sys.h"
 
 
+using namespace embot::hw;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -53,13 +55,13 @@ using namespace std;
 #if     !defined(EMBOT_SI7051_ENABLED)
 
 
-namespace embot { namespace hw { namespace SI7051 {
+namespace embot { namespace hw { namespace si7051 {
 
-    bool supported(Sensor s)                                                                        { return false; }
-    bool initialised(Sensor s)                                                                      { return false; }
-    result_t init(Sensor s, const Config &config)                                                   { return resNOK; }
+    bool supported(SI7051 s)                                                                        { return false; }
+    bool initialised(SI7051 s)                                                                      { return false; }
+    result_t init(SI7051 s, const Config &config)                                                   { return resNOK; }
     
-    result_t get(Sensor s, Temperature &temp)                                                       { return resNOK; }
+    result_t get(SI7051 s, Temperature &temp)                                                       { return resNOK; }
 
 }}} // namespace embot { namespace hw { namespace SI7051 {
 
@@ -67,56 +69,21 @@ namespace embot { namespace hw { namespace SI7051 {
 #elif   defined(EMBOT_SI7051_ENABLED)
 
 
-namespace embot { namespace hw { namespace SI7051 {
-        
-    struct bspmap_t
-    {
-        std::uint32_t       mask;
-    };
-    
-    // const support maps
-    #if     defined(STM32HAL_BOARD_STRAIN2)        
-    static const bspmap_t bspmap = 
-    {
-        0x00000003  // means... 2 sensors
-    };  
-    #elif   defined(STM32HAL_BOARD_MTB4)        
-    static const bspmap_t bspmap = 
-    {
-        0x00000003  // means... 2 sensors
-    };     
-    #else
-    static const bspmap_t bspmap = 
-    {
-        0x00000000
-    };
-    #endif
-      
+namespace embot { namespace hw { namespace si7051 {
+              
     // initialised mask       
     static std::uint32_t initialisedmask = 0;
     
-    std::uint8_t sensor2index(Sensor s)
-    {   // use it only after verification of supported() ...
-        return static_cast<uint8_t>(s);
-    }
-        
-    bool supported(Sensor s)
+    bool supported(SI7051 a)
     {
-        if((Sensor::none == s) || (Sensor::maxnumberof == s))
-        {
-            return false;
-        }
-        return embot::binary::bit::check(bspmap.mask, sensor2index(s));
+        return embot::hw::bsp::si7051::getBSP().supported(a);
     }
     
-    bool initialised(Sensor s)
+    bool initialised(SI7051 a)
     {
-        if(Sensor::none == s)
-        {
-            return false;
-        }
-        return embot::binary::bit::check(initialisedmask, sensor2index(s));
+        return embot::binary::bit::check(initialisedmask, embot::common::tointegral(a));
     }    
+      
 
     struct Acquisition
     {
@@ -125,18 +92,19 @@ namespace embot { namespace hw { namespace SI7051 {
         Temperature temp;
         std::uint8_t rxdata[2];
         embot::common::Callback userdefCBK;  
-        void clear() { done = false; ongoing = false; temp = 0; rxdata[0] = rxdata[1] = 0; userdefCBK.callback = nullptr; userdefCBK.arg = nullptr; }         
+        void clear() { done = false; ongoing = false; temp = 0; rxdata[0] = rxdata[1] = 0; userdefCBK.clear(); }         
     };
     
     struct PrivateData
-    {    
-        Config config[static_cast<unsigned int>(Sensor::maxnumberof)];        
-        Acquisition acquisition[static_cast<unsigned int>(Sensor::maxnumberof)];
+    {
+        std::uint8_t i2caddress[embot::common::tointegral(SI7051::maxnumberof)];   
+        Config config[embot::common::tointegral(SI7051::maxnumberof)];        
+        Acquisition acquisition[embot::common::tointegral(SI7051::maxnumberof)];
         PrivateData() { }
     };
     
     
-    static const std::uint8_t i2caddress = 0x80;
+    //static const std::uint8_t i2caddress = 0x80;
     static const std::uint8_t registerTemperatureRead = 0xE3;
     
     static PrivateData s_privatedata;
@@ -154,13 +122,10 @@ namespace embot { namespace hw { namespace SI7051 {
         acq->ongoing = false;
         acq->done = true;
         
-        if(nullptr != acq->userdefCBK.callback)
-        {
-            acq->userdefCBK.callback(acq->userdefCBK.arg);
-        }
+        acq->userdefCBK.execute();
     }
               
-    result_t init(Sensor s, const Config &config)
+    result_t init(SI7051 s, const Config &config)
     {
         if(false == supported(s))
         {
@@ -172,45 +137,48 @@ namespace embot { namespace hw { namespace SI7051 {
             return resOK;
         }
         
-        std::uint8_t index = sensor2index(s);
+        // init peripheral
+        embot::hw::bsp::si7051::getBSP().init(s);
+        
+        std::uint8_t index = embot::common::tointegral(s);
                 
         // init i2c ..
         embot::hw::i2c::init(config.i2cdes.bus, config.i2cdes.config);
-        
-        if(false == embot::hw::i2c::ping(config.i2cdes.bus, i2caddress))
+        if(false == embot::hw::i2c::ping(config.i2cdes.bus, embot::hw::bsp::si7051::getBSP().getPROP(s)->i2caddress))
         {
             return resNOK;
         }
         
+        s_privatedata.i2caddress[index] = embot::hw::bsp::si7051::getBSP().getPROP(s)->i2caddress;
         s_privatedata.config[index] = config;
         s_privatedata.acquisition[index].clear();
         
-        embot::binary::bit::set(initialisedmask, sensor2index(s));
+        embot::binary::bit::set(initialisedmask, embot::common::tointegral(s));
                 
         return resOK;
     }
 
     
-    bool isacquiring(Sensor s)
+    bool isacquiring(SI7051 s)
     {
         if(false == initialised(s))
         {
             return false;
         } 
 
-        std::uint8_t index = sensor2index(s);        
+        std::uint8_t index = embot::common::tointegral(s);        
         return s_privatedata.acquisition[index].ongoing;     
     }
     
     
-    bool canacquire(Sensor s)
+    bool canacquire(SI7051 s)
     {
         if(false == initialised(s))
         {
             return false;
         } 
 
-        std::uint8_t index = sensor2index(s);  
+        std::uint8_t index = embot::common::tointegral(s);  
         
         if(true == s_privatedata.acquisition[index].ongoing)
         {
@@ -220,14 +188,14 @@ namespace embot { namespace hw { namespace SI7051 {
         return !embot::hw::i2c::isbusy(s_privatedata.config[index].i2cdes.bus);             
     }    
     
-    result_t acquisition(Sensor s, const embot::common::Callback &oncompletion)
+    result_t acquisition(SI7051 s, const embot::common::Callback &oncompletion)
     {
         if(false == canacquire(s))
         {
             return resNOK;
         }
         
-        std::uint8_t index = sensor2index(s);
+        std::uint8_t index = embot::common::tointegral(s);
                 
         s_privatedata.acquisition[index].clear();
         s_privatedata.acquisition[index].ongoing = true;
@@ -237,34 +205,34 @@ namespace embot { namespace hw { namespace SI7051 {
         // ok, now i trigger i2c.
         embot::common::Callback cbk(sharedCBK, &s_privatedata.acquisition[index]);
         embot::common::Data data = embot::common::Data(&s_privatedata.acquisition[index].rxdata[0], 2);
-        embot::hw::i2c::read(s_privatedata.config[index].i2cdes.bus, i2caddress, registerTemperatureRead, data, cbk);
+        embot::hw::i2c::read(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], registerTemperatureRead, data, cbk);
                 
         return resOK;
     }
     
-    bool isalive(Sensor s, embot::common::relTime timeout)
+    bool isalive(SI7051 s, embot::common::relTime timeout)
     {
         if(false == initialised(s))
         {
             return false;
         } 
-        std::uint8_t index = sensor2index(s);
-        return embot::hw::i2c::ping(s_privatedata.config[index].i2cdes.bus, i2caddress, timeout);  
+        std::uint8_t index = embot::common::tointegral(s);
+        return embot::hw::i2c::ping(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], timeout);  
     }
 
     
-    bool operationdone(Sensor s)
+    bool operationdone(SI7051 s)
     {
         if(false == initialised(s))
         {
             return false;
         } 
 
-        return s_privatedata.acquisition[sensor2index(s)].done;        
+        return s_privatedata.acquisition[embot::common::tointegral(s)].done;        
     } 
     
     
-    result_t read(Sensor s, Temperature &temp)
+    result_t read(SI7051 s, Temperature &temp)
     {
         if(false == initialised(s))
         {
@@ -276,16 +244,14 @@ namespace embot { namespace hw { namespace SI7051 {
             return resNOK;
         }
         
-        std::uint8_t index = sensor2index(s);
+        std::uint8_t index = embot::common::tointegral(s);
         temp = s_privatedata.acquisition[index].temp;
   
         return resOK;        
     }
     
-    
-
  
-}}} // namespace embot { namespace hw { namespace SI7051 {
+}}} // namespace embot { namespace hw { namespace si7051 {
 
 
 

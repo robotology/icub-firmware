@@ -29,17 +29,18 @@
 
 namespace embot { namespace hw { namespace sys {
     
-    enum class CLOCK { syscore = 0, pclk1 = 1, pclk2 = 2, none = 32, maxnumberof = 3 };
-      
-    extern const std::uint32_t startOfFLASH;
-    extern const std::uint32_t addressOfBootloader;
-    extern const std::uint32_t maxsizeOfBootloader;
-    extern const std::uint32_t addressOfStorage;
-    extern const std::uint32_t maxsizeOfStorage;
-    extern const std::uint32_t addressOfApplication;
-    extern const std::uint32_t maxsizeOfApplication;
-    
-    std::uint32_t clock(CLOCK clk);
+        
+//    extern const std::uint32_t startOfFLASH;
+//    extern const std::uint32_t addressOfBootloader;
+//    extern const std::uint32_t maxsizeOfBootloader;
+//    extern const std::uint32_t addressOfStorage;
+//    extern const std::uint32_t maxsizeOfStorage;
+//    extern const std::uint32_t addressOfApplication;
+//    extern const std::uint32_t maxsizeOfApplication;
+//    extern const std::uint32_t addressOfApplicationStorage;
+//    extern const std::uint32_t maxsizeOfApplicationStorage;
+        
+    std::uint32_t clock(embot::hw::CLOCK clk);
     
     void reset();
     

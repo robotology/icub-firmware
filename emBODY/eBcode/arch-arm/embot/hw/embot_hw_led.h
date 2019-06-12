@@ -28,28 +28,16 @@
 
 
 namespace embot { namespace hw { namespace led {
-    
-    // the namespace ::led can be used as template for development of simple hw features.
-    // follow these rules:
-    //
-    // 1. if more that one entity is [may be] available, define an enum with always: none and maxnumberof
-    // 2. expose a bool returning supported() function
-    // 3. expose a bool returning initialised() funtion
-    // 4. expose a result_t returning init() function
-    // 5. design the needed functions. they shall return embot::hw::result_t (0 is ok, negative is bad).
-    
-    enum class LED { one = 0, two = 1, three = 2, four = 3, five = 4, six = 5, seven = 6, eight = 7, none = 32, maxnumberof = 8 };
+        
+//    enum class LED : std::uint8_t { one = 0, two = 1, three = 2, four = 3, five = 4, six = 5, seven = 6, eight = 7, none = 31, maxnumberof = 8 };
 
-    bool supported(LED led);
-    
-    bool initialised(LED led);
+    bool supported(embot::hw::LED led);    
+    bool initialised(embot::hw::LED led);
         
-    result_t init(LED led);
-    result_t on(LED led);
-    result_t off(LED led);
-    result_t toggle(LED led);
-        
-    result_t init_legacy(LED led, const void *par);
+    result_t init(embot::hw::LED led);
+    result_t on(embot::hw::LED led);
+    result_t off(embot::hw::LED led);
+    result_t toggle(embot::hw::LED led);        
        
 }}} // namespace embot { namespace hw { namespace led 
 

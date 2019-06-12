@@ -33,7 +33,7 @@ namespace embot { namespace app { namespace canprotocol {
     
     // - useful types 
     
-    enum class Board { mtb = 5, strain = 6, mais = 7, mtb4 = 11, strain2 = 12, none = 254, unknown = 0xff };
+    enum class Board { mtb = 5, strain = 6, mais = 7, mtb4 = 11, strain2 = 12, rfe = 13, sg3 = 14, psc = 15, mtb4w = 16, none = 254, unknown = 0xff };
     
     enum class Process { bootloader = 0, application = 1, unknown = 0xff };
            
@@ -258,6 +258,29 @@ namespace embot { namespace app { namespace canprotocol { namespace shared {
 namespace embot { namespace app { namespace canprotocol { namespace analog {
 
     enum class imuSensor { acc = 0, mag = 1, gyr = 2, eul = 3, qua = 4, lia = 5, grv = 6, status = 15, none = 16 };
+    
+       
+    enum class posTYPE : uint8_t { angleDeciDeg = 0, unknown = 255 };   
+    
+    enum class posLABEL : uint8_t { zero = 0, one = 1, two = 2, three = 3, four = 4, five = 5, six = 6, seven = 7, eight = 8, 
+                                    nine = 9, ten = 10, eleven = 11, twelve = 12, thirteen = 13, fourteen = 14, fifteen = 15 };
+    
+    struct posDES
+    {
+        posTYPE         type;               // tells if it is an angle, a linear position etc. use an enum class
+        posLABEL        startlabel;         // the label of the first value stored inside data[]   
+        std::uint8_t    labelsnumberof : 4; // the number of values stored inside data[]. they must have consecutive labels      
+        posDES() : type(posTYPE::angleDeciDeg), startlabel(posLABEL::zero), labelsnumberof(2) {} 
+        void reset() { type = posTYPE::angleDeciDeg; startlabel = posLABEL::zero; labelsnumberof = 2; }
+        bool isvalid() const { if((type == posTYPE::angleDeciDeg) && (labelsnumberof>0)) { return true; } else { return false; } }        
+        };  // it must be stored in 16 bits: 8 bits for type, 4 bits for startlable, 4 bits for labelsnumberof
+    
+    using deciDeg = std::int16_t;
+    
+    float deciDeg_export(const deciDeg d); 
+    deciDeg deciDeg_import(const float f);
+    
+    
 
 }}}} // namespace embot { namespace app { namespace canprotocol { namespace analog {
 

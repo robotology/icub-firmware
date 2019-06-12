@@ -21,53 +21,86 @@
 #ifndef _EMBOT_APP_APPLICATION_THECANPARSERSTRAIN_H_
 #define _EMBOT_APP_APPLICATION_THECANPARSERSTRAIN_H_
 
-#include "embot_common.h"
-
-#include "embot_hw_can.h"
-
-#include "embot_sys.h"
-
-
 #include <vector>
+#include <memory>
+#include "embot_common.h"
+#include "embot_hw_can.h"
+#include "embot_app_canprotocol.h"
+#include "embot_app_canprotocol_analog_polling.h"
+#include "embot_app_canprotocol_analog_periodic.h"
+
 
 namespace embot { namespace app { namespace application {
+    
+    class CANagentSTRAIN
+    {
+    public:
+        // interface
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_SET_TXMODE::Info &info) = 0;
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_SET_SERIAL_NO::Info &info) = 0;  
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_SET_CANDATARATE::Info &info) = 0; 
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_SET_FULL_SCALES::Info &info) = 0; 
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_SAVE2EE::Info &info) = 0; 
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_SET_CH_DAC::Info &info) = 0; 
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_SET_MATRIX_RC::Info &info) = 0; 
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_SET_MATRIX_G::Info &info) = 0; 
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_SET_CALIB_TARE::Info &info) = 0; 
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_SET_CURR_TARE::Info &info) = 0; 
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_AMPLIFIER_RESET::Info &info) = 0; 
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_AMPLIFIER_PGA308_CFG1_SET::Info &info) = 0; 
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_AMPLIFIER_OFFSET_AUTOCALIB::Info &info, embot::app::canprotocol::analog::polling::Message_AMPLIFIER_OFFSET_AUTOCALIB::ReplyInfo &replyinfo) = 0; 
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_AMPLIFIER_GAINOFFSET_SET::Info &info) = 0; 
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_REGULATIONSET_SET::Info &info) = 0; 
+  
+        virtual bool get(const embot::app::canprotocol::analog::polling::Message_GET_SERIAL_NO::Info &info, embot::app::canprotocol::analog::polling::Message_GET_SERIAL_NO::ReplyInfo &replyinfo) = 0;
+        virtual bool get(const embot::app::canprotocol::analog::polling::Message_GET_FULL_SCALES::Info &info, embot::app::canprotocol::analog::polling::Message_GET_FULL_SCALES::ReplyInfo &replyinfo) = 0;
+        virtual bool get(const embot::app::canprotocol::analog::polling::Message_GET_EEPROM_STATUS::Info &info, embot::app::canprotocol::analog::polling::Message_GET_EEPROM_STATUS::ReplyInfo &replyinfo) = 0;
+        virtual bool get(const embot::app::canprotocol::analog::polling::Message_GET_CH_ADC::Info &info, embot::app::canprotocol::analog::polling::Message_GET_CH_ADC::ReplyInfo &replyinfo) = 0;
+        virtual bool get(const embot::app::canprotocol::analog::polling::Message_GET_CH_DAC::Info &info, embot::app::canprotocol::analog::polling::Message_GET_CH_DAC::ReplyInfo &replyinfo) = 0;
+        virtual bool get(const embot::app::canprotocol::analog::polling::Message_GET_MATRIX_RC::Info &info, embot::app::canprotocol::analog::polling::Message_GET_MATRIX_RC::ReplyInfo &replyinfo) = 0;
+        virtual bool get(const embot::app::canprotocol::analog::polling::Message_GET_MATRIX_G::Info &info, embot::app::canprotocol::analog::polling::Message_GET_MATRIX_G::ReplyInfo &replyinfo) = 0;
+        virtual bool get(const embot::app::canprotocol::analog::polling::Message_GET_CALIB_TARE::Info &info, embot::app::canprotocol::analog::polling::Message_GET_CALIB_TARE::ReplyInfo &replyinfo) = 0;
+        virtual bool get(const embot::app::canprotocol::analog::polling::Message_GET_CURR_TARE::Info &info, embot::app::canprotocol::analog::polling::Message_GET_CURR_TARE::ReplyInfo &replyinfo) = 0;
+        virtual bool get(const embot::app::canprotocol::analog::polling::Message_AMPLIFIER_PGA308_CFG1_GET::Info &info, embot::app::canprotocol::analog::polling::Message_AMPLIFIER_PGA308_CFG1_GET::ReplyInfo &replyinfo) = 0;
+        virtual bool get(const embot::app::canprotocol::analog::polling::Message_AMPLIFIER_GAINOFFSET_GET::Info &info, embot::app::canprotocol::analog::polling::Message_AMPLIFIER_GAINOFFSET_GET::ReplyInfo &replyinfo) = 0;
+        virtual bool get(const embot::app::canprotocol::analog::polling::Message_AMPLIFIER_RANGE_OF_GAIN_GET::Info &info, embot::app::canprotocol::analog::polling::Message_AMPLIFIER_RANGE_OF_GAIN_GET::ReplyInfo &replyinfo) = 0;
+        virtual bool get(const embot::app::canprotocol::analog::polling::Message_AMPLIFIER_RANGE_OF_OFFSET_GET::Info &info, embot::app::canprotocol::analog::polling::Message_AMPLIFIER_RANGE_OF_OFFSET_GET::ReplyInfo &replyinfo) = 0;
+        virtual bool get(const embot::app::canprotocol::analog::polling::Message_REGULATIONSET_GET::Info &info, embot::app::canprotocol::analog::polling::Message_REGULATIONSET_GET::ReplyInfo &replyinfo) = 0;
+       
+    public:
+        virtual ~CANagentSTRAIN() {};         
+    };
            
     class theCANparserSTRAIN
     {
     public:
-        static theCANparserSTRAIN& getInstance()
-        {
-            static theCANparserSTRAIN* p = new theCANparserSTRAIN();
-            return *p;
-        }
+        static theCANparserSTRAIN& getInstance();
         
         
     public:
+
         struct Config
         {
-            std::uint32_t   dummy;
-            Config() : dummy(0) {}
+            CANagentSTRAIN*    agent;
+            Config() : agent(nullptr) {}
+            Config(CANagentSTRAIN* a) : agent(a) {}
+            bool isvalid() const { return (nullptr == agent) ? false : true; }
         }; 
         
         
-        bool initialise(Config &config); 
+        bool initialise(const Config &config); 
         
         // returns true if the canframe has been recognised. if so, any reply is sent if replies.size() > 0
         bool process(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);
 
     private:
         theCANparserSTRAIN(); 
+        ~theCANparserSTRAIN();
 
-    public:
-        // remove copy constructors and copy assignment operators
-        theCANparserSTRAIN(const theCANparserSTRAIN&) = delete;
-        theCANparserSTRAIN(theCANparserSTRAIN&) = delete;
-        void operator=(const theCANparserSTRAIN&) = delete;
-        void operator=(theCANparserSTRAIN&) = delete;
 
     private:    
         struct Impl;
-        Impl *pImpl;        
+        std::unique_ptr<Impl> pImpl;    
     };       
 
 

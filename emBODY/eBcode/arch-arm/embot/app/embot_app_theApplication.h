@@ -22,11 +22,8 @@
 #define _EMBOT_APP_THEAPPLICATION_H_
 
 #include "embot_common.h"
-
 #include "embot_sys.h"
-#include "embot_hw.h"
-#include "embot_hw_sys.h"
-
+#include <memory>
 
 
 namespace embot { namespace app {
@@ -35,67 +32,41 @@ namespace embot { namespace app {
     class theApplication
     {
     public:
-        static theApplication& getInstance()
-        {
-            static theApplication* p = new theApplication();
-            return *p;
-        }
+        static theApplication& getInstance();
                
     public:
-        
-        struct StackSizes
-        {   
-            std::uint16_t       tasksysteminit;
-            std::uint16_t       taskonidle; 
-            StackSizes() : tasksysteminit(2048), taskonidle(512) {}  
-            StackSizes(std::uint16_t sys, std::uint16_t idl) : tasksysteminit(sys), taskonidle(idl) {}                 
-        };
-        
-        struct UserDefOperations
-        {   
-            embot::common::Callback     atsysteminit;
-            embot::common::Callback     onidle; 
-            embot::common::Callback     onfatalerror;
-            UserDefOperations() : atsysteminit(nullptr, nullptr), onidle(nullptr, nullptr), onfatalerror(nullptr, nullptr) {}
-            UserDefOperations(const embot::common::Callback &atsys, const embot::common::Callback &onid, const embot::common::Callback &onerr) : 
-                        atsysteminit(atsys), onidle(onid), onfatalerror(onerr) 
-                        {}                   
-        };
-        
+                        
         struct Config
         {            
-            embot::common::relTime              osaltickperiod;
-            StackSizes                          stacksizes;
-            UserDefOperations                   operations;
-            std::uint32_t                       addressofapplication;
+            embot::common::relTime  ticktime;
+            embot::sys::Operation   init;
+            embot::sys::Operation   idle;
+            embot::sys::Operation   fatal;
+            std::uint32_t           addressofapplication;
             Config() :
-                        osaltickperiod(embot::common::time1millisec),
+                        ticktime(embot::common::time1millisec),
                         // for structs we rely on their default ctor
-                        addressofapplication(embot::hw::sys::addressOfApplication)
+                        addressofapplication(0)
                         {}
-            Config(embot::common::relTime _osaltickperiod, const StackSizes &_stacksizes, const UserDefOperations &_operations, std::uint32_t address = embot::hw::sys::addressOfApplication) :
-                        osaltickperiod(_osaltickperiod), 
-                        stacksizes(_stacksizes), 
-                        operations(_operations),
-                        addressofapplication(address)            
+            Config(embot::common::relTime _t, const embot::sys::Operation &_ini, const embot::sys::Operation &_idl, const embot::sys::Operation &_fat, std::uint32_t _addr) :
+                        ticktime(_t), 
+                        init(_ini), 
+                        idle(_idl),
+                        fatal(_fat),
+                        addressofapplication(_addr)            
                         {}
+            bool isvalid() const { if((false == init.isvalid()) || (false == idle.isvalid()) || (false == fatal.isvalid()) || (0 == ticktime) || (0 == addressofapplication)) { return false; } else { return true; } } 
         }; 
                       
-        void execute(Config &config); // it never returns ..
+        bool execute(const Config &config); // it never returns ..
         
     private:
         theApplication(); 
- 
-    public:
-        // remove copy constructors and copy assignment operators
-        theApplication(const theApplication&) = delete;
-        theApplication(theApplication&) = delete;
-        void operator=(const theApplication&) = delete;
-        void operator=(theApplication&) = delete;
+        ~theApplication();
 
     private:    
         struct Impl;
-        Impl *pImpl;        
+        std::unique_ptr<Impl> pImpl;         
     };       
 
 

@@ -34,13 +34,10 @@
 #include <new>
 
 #include "embot_hw.h"
-#include "embot_app_canprotocol.h"
-#include "embot_app_canprotocol_analog_polling.h"
-#include "embot_app_canprotocol_analog_periodic.h"
 
 #include "embot_app_theCANboardInfo.h"
 
-#include "embot_app_application_theSkin.h"
+//#include "embot_app_application_theSkin.h"
 
 
 
@@ -50,7 +47,21 @@
 
 
 struct embot::app::application::theCANparserSkin::Impl
-{    
+{   
+    class dummyCANagentSKIN : public CANagentSKIN 
+    {
+    public:
+        dummyCANagentSKIN() {}
+        virtual ~dummyCANagentSKIN() {}
+            
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_SKIN_SET_BRD_CFG::Info &info)  {  return true; }
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_SKIN_SET_TRIANG_CFG::Info &info)  {  return true; }  
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_SET_TXMODE::Info &info)  {  return true; } 
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_SKIN_OBSOLETE_TACT_SETUP::Info &info)  {  return true; }            
+    };
+    
+    dummyCANagentSKIN dummyagent;
+    
     Config config;
         
     bool txframe;
@@ -63,7 +74,8 @@ struct embot::app::application::theCANparserSkin::Impl
     
 
     Impl() 
-    {   
+    {  
+        config.agent = &dummyagent;             
         recognised = false;        
         txframe = false;
         cls = embot::app::canprotocol::Clas::none;
@@ -149,8 +161,9 @@ bool embot::app::application::theCANparserSkin::Impl::process_set_brdcfg(const e
     embot::app::canprotocol::analog::polling::Message_SKIN_SET_BRD_CFG msg;
     msg.load(frame);
       
-    embot::app::application::theSkin &theskin = embot::app::application::theSkin::getInstance();    
-    theskin.configure(msg.info);
+//    embot::app::application::theSkin &theskin = embot::app::application::theSkin::getInstance();    
+//    theskin.configure(msg.info);
+    config.agent->set(msg.info);
             
     return msg.reply();        
 }
@@ -160,8 +173,9 @@ bool embot::app::application::theCANparserSkin::Impl::process_set_obsolete_tacts
     embot::app::canprotocol::analog::polling::Message_SKIN_OBSOLETE_TACT_SETUP msg;
     msg.load(frame);
       
-    embot::app::application::theSkin &theskin = embot::app::application::theSkin::getInstance();    
-    theskin.configure(msg.info);
+//    embot::app::application::theSkin &theskin = embot::app::application::theSkin::getInstance();    
+//    theskin.configure(msg.info);
+    config.agent->set(msg.info);
             
     return msg.reply();        
 }
@@ -173,8 +187,9 @@ bool embot::app::application::theCANparserSkin::Impl::process_set_trgcfg(const e
     embot::app::canprotocol::analog::polling::Message_SKIN_SET_TRIANG_CFG msg;
     msg.load(frame);
       
-    embot::app::application::theSkin &theskin = embot::app::application::theSkin::getInstance();    
-    theskin.configure(msg.info);
+//    embot::app::application::theSkin &theskin = embot::app::application::theSkin::getInstance();    
+//    theskin.configure(msg.info);
+    config.agent->set(msg.info);
     
     return msg.reply();        
 }
@@ -186,16 +201,17 @@ bool embot::app::application::theCANparserSkin::Impl::process_set_txmode(const e
     embot::app::canprotocol::analog::polling::Message_SET_TXMODE msg(embot::app::canprotocol::Board::mtb4);
     msg.load(frame);
     
-    embot::app::application::theSkin &theskin = embot::app::application::theSkin::getInstance();    
-    
-    if(true == msg.info.transmit)
-    {
-        theskin.start();        
-    }
-    else
-    {
-        theskin.stop();     
-    }
+//    embot::app::application::theSkin &theskin = embot::app::application::theSkin::getInstance();    
+//   
+//    if(true == msg.info.transmit)
+//    {
+//        theskin.start();        
+//    }
+//    else
+//    {
+//        theskin.stop();     
+//    }
+    config.agent->set(msg.info);
                   
     return msg.reply();        
 }
@@ -210,16 +226,30 @@ bool embot::app::application::theCANparserSkin::Impl::process_set_txmode(const e
 
 
 
-embot::app::application::theCANparserSkin::theCANparserSkin()
-: pImpl(new Impl)
-{       
-
+embot::app::application::theCANparserSkin& embot::app::application::theCANparserSkin::getInstance()
+{
+    static theCANparserSkin* p = new theCANparserSkin();
+    return *p;
 }
 
+embot::app::application::theCANparserSkin::theCANparserSkin()
+//    : pImpl(new Impl)
+{
+    pImpl = std::make_unique<Impl>();
+
+}  
+
+    
+embot::app::application::theCANparserSkin::~theCANparserSkin() { }
    
         
-bool embot::app::application::theCANparserSkin::initialise(Config &config)
+bool embot::app::application::theCANparserSkin::initialise(const Config &config)
 {
+    if(!config.isvalid())
+    {
+        return false;
+    }
+    
     pImpl->config = config;
         
     return true;

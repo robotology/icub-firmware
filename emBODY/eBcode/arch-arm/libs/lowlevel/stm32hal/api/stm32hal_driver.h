@@ -36,15 +36,89 @@ extern "C" {
 
 // - public interface  ------------------------------------------------------------------------------------------------
   
-#if     defined(STM32L476xx) || defined(STM32HAL_STM32L4xx)
+#if     defined(STM32HAL_BOARD_NUCLEO64)
 
-    #include "../src/stm32l4/inc/stm32l4xx_hal.h"	
+    // only one possible driver
+    #if !defined(STM32HAL_DRIVER_V172)
+        #define STM32HAL_DRIVER_V172
+    #endif
+    #define STM32HAL_DRIVER_VERSION 172
+    
+#elif   defined(STM32HAL_BOARD_MTB4)
+
+// two possible drivers. default is the 190 ...
+    #if     defined(STM32HAL_DRIVER_V172)    
+        #define STM32HAL_DRIVER_VERSION 172  
+    #else   
+        #if !defined(STM32HAL_DRIVER_V190)
+            #define STM32HAL_DRIVER_V190
+        #endif        
+        #define STM32HAL_DRIVER_VERSION 190   
+    #endif
+    
+#elif   defined(STM32HAL_BOARD_STRAIN2)
+
+    // two possible drivers. default is the 190 ...
+    #if     defined(STM32HAL_DRIVER_V172)    
+        #define STM32HAL_DRIVER_VERSION 172  
+    #else   
+        #if !defined(STM32HAL_DRIVER_V190)
+            #define STM32HAL_DRIVER_V190
+        #endif        
+        #define STM32HAL_DRIVER_VERSION 190   
+    #endif
+    
+#elif   defined(STM32HAL_BOARD_RFE)
+
+    // only one possible driver
+    #if !defined(STM32HAL_DRIVER_V183)
+        #define STM32HAL_DRIVER_V183
+    #endif
+    #define STM32HAL_DRIVER_VERSION 183
+    
+#elif   defined(STM32HAL_BOARD_PSC)
+
+    // only one possible driver
+    #if !defined(STM32HAL_DRIVER_V190)
+        #define STM32HAL_DRIVER_V190
+    #endif
+    #define STM32HAL_DRIVER_VERSION 190
+      
+#elif   defined(STM32HAL_BOARD_SG3)
+
+    // only one possible driver
+    #if !defined(STM32HAL_DRIVER_V190)
+        #define STM32HAL_DRIVER_V190
+    #endif
+    #define STM32HAL_DRIVER_VERSION 190
+      
 
 #else
-    #error STM32HAL: the MPU is undefined (e.g., STM32L476xx) 
+    #error STM32HAL: the STM32HAL_BOARD_${BRD} is undefined
 #endif
 
 
+// now extra code-shaping macros which depend on the driver version
+
+#if (STM32HAL_DRIVER_VERSION >= 183)
+    // there is a new api for can
+    #if !defined(USE_HAL_CAN_REGISTER_CALLBACKS)
+    #define USE_HAL_CAN_REGISTER_CALLBACKS 1
+    #endif  
+#endif
+
+
+// and only now ... include the .h which must see the code-shaping macros
+
+#if     defined(STM32HAL_DRIVER_V172)    
+    #include "../src/driver/stm32l4-v172/inc/stm32l4xx_hal.h"       
+#elif   defined(STM32HAL_DRIVER_V183)        
+    #include "../src/driver/stm32l4-v183/inc/stm32l4xx_hal.h"
+#elif   defined(STM32HAL_DRIVER_V190)        
+    #include "../src/driver/stm32l4-v190/inc/stm32l4xx_hal.h"
+#else
+    #error STM32HAL: the STM32HAL_DRIVER_${VER} is not managed
+#endif
 
 #ifdef __cplusplus
 }       // closing brace for extern "C"

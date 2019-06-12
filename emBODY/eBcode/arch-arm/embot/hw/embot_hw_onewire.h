@@ -38,18 +38,17 @@ namespace embot { namespace hw { namespace onewire {
     // but we should use six timers (dont tell me that one hw timer is enough if every channel use the same rate!), make write() read()
     // methods not bloking but with a callback at end of transaction, etc....    
     
-    enum class Channel { one = 0, two = 1, three = 2, four = 3, five = 4, six = 5, none = 32, all = 33, maxnumberof = 6};    
     
     enum class Rate { tenKbps = 10, twentyKbps = 20, fortyKbps = 40, fiftyKbps = 50, onehundredKbps = 100 };
     
     struct Config
     {
-        embot::hw::gpio::GPIO       gpio;               // the one which is to be modulated 
+        embot::hw::GPIO             gpio;               // the one which is to be modulated 
         Rate                        rate;               // the rate of the modulation
         bool                        usepreamble;        // if true we use it
         std::uint8_t                preamble;           // the preamble to be sent before reg and value.
-        Config() : gpio(nullptr, 0), rate(Rate::tenKbps), usepreamble(true), preamble(0x55) {}
-        Config(const embot::hw::gpio::GPIO &_g, Rate _r) 
+        Config() : gpio(embot::hw::GPIO::PORT::none, embot::hw::GPIO::PIN::none), rate(Rate::tenKbps), usepreamble(true), preamble(0x55) {}
+        Config(const embot::hw::GPIO &_g, Rate _r) 
         {
             gpio = _g;
             rate = _r;
@@ -58,15 +57,15 @@ namespace embot { namespace hw { namespace onewire {
         }
     };
     
-    bool supported(Channel c);
+    bool supported(embot::hw::ONEWIRE c);
     
-    bool initialised(Channel c);
+    bool initialised(embot::hw::ONEWIRE c);
     
-    result_t init(Channel c, const Config &config);
+    result_t init(embot::hw::ONEWIRE c, const Config &config);
     
-    bool isrunning(Channel c);
+    bool isrunning(embot::hw::ONEWIRE c);
     
-    result_t write(Channel c, std::uint8_t reg, std::uint16_t value, embot::common::relTime timeout = embot::common::timeWaitForever);
+    result_t write(embot::hw::ONEWIRE c, std::uint8_t reg, std::uint16_t value, embot::common::relTime timeout = embot::common::timeWaitForever);
  
 }}} // namespace embot { namespace hw { namespace onewire { 
 

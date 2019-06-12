@@ -54,7 +54,7 @@ namespace embot { namespace binary { namespace bit {
     
     // it returns true if the pos-th bit of value is 1
     template<typename T>
-    bool check(const T value, std::uint8_t pos)
+    constexpr bool check(const T value, std::uint8_t pos)
     {
         if(value & (static_cast<T>(1)<<pos))
         {
@@ -68,10 +68,25 @@ namespace embot { namespace binary { namespace bit {
 
     // it tells how many 1 bits there are value
     template<typename T>
-    std::uint8_t count(const T value)
+    constexpr std::uint8_t count(const T value)
     {
         return countUsize(static_cast<std::uint64_t>(value), sizeof(value));
-    }        
+    }  
+
+
+    template<typename T>
+    constexpr std::int8_t posofmostsignificant(const T value)
+    {
+        int8_t p = 8*sizeof(value)-1;
+        for(; p>0; p--)
+        {
+            if(check(value, p))
+            {
+                break;
+            }
+        }
+        return p;
+    }      
        
 } } } // namespace embot { namespace binary { namespace bit
 
@@ -102,16 +117,21 @@ namespace embot { namespace binary { namespace mask {
     
     // it returns true if the bits in value which are selected by msk are all 1.
     template<typename T>
-    bool check(const T value, const T msk)
+    constexpr bool check(const T value, const T msk)
     {
         if(msk == (value & msk))
         {
             return true;
         }
         return false;
-    }    
+    }   
+     
+    template<typename M, typename T>
+    constexpr M pos2mask(const T t)
+    {
+        return (1 << static_cast<M>(t));
+    } 
     
-   
 } } } // namespace embot { namespace binary { namespace mask
 
 
@@ -150,7 +170,7 @@ namespace embot { namespace binary { namespace nibble {
     
     // it returns true if nib is equal to the pos-th nibble of value
     template<typename T>
-    bool check(const T value, const NIBBLE nib, std::uint8_t pos)
+    constexpr bool check(const T value, const NIBBLE nib, std::uint8_t pos)
     {
         return embot::binary::mask::check(value, static_cast<T>(nib & 0xf)<<(4*pos));
     } 
@@ -192,7 +212,7 @@ namespace embot { namespace binary { namespace pair {
     
     // it returns true if pa is equal to the pos-th pair of value
     template<typename T>
-    bool check(const T value, const PAIR pa, std::uint8_t pos)
+    constexpr bool check(const T value, const PAIR pa, std::uint8_t pos)
     {
         return embot::binary::mask::check(value, static_cast<T>(pa & 0x3)<<(2*pos));
     } 

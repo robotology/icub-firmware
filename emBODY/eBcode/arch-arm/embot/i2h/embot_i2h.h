@@ -37,7 +37,9 @@ namespace embot { namespace i2h {
         virtual bool fullerase() = 0;  
         virtual bool erase(std::uint32_t address, std::uint32_t size) = 0;        
         virtual bool read(std::uint32_t address, std::uint32_t size, void *data) = 0;
-        virtual bool write(std::uint32_t address, std::uint32_t size, const void *data) = 0;           
+        virtual bool write(std::uint32_t address, std::uint32_t size, const void *data) = 0;   
+
+        virtual ~Storage() {};    
     }; 
     
     // or ... if we prefer to (or can only) use C language for hw access [i doubt that the stm hal compiles in c++11] we use this 

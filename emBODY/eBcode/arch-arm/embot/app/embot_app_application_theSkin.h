@@ -22,28 +22,18 @@
 #define _EMBOT_APP_APPLICATION_THESKIN_H_
 
 #include "embot_common.h"
-
 #include "embot_hw.h"
-
 #include "embot_sys.h"
-
-#include "embot_app_canprotocol.h"
-#include "embot_app_canprotocol_analog_polling.h"
-#include "embot_app_canprotocol_analog_periodic.h"
-#include "embot_app_canprotocol_skin_periodic.h"
-
+#include "embot_app_application_theCANparserSkin.h"
 #include <vector>
+#include <memory>
 
 namespace embot { namespace app { namespace application {
            
-    class theSkin
+    class theSkin : public CANagentSKIN
     {
     public:
-        static theSkin& getInstance()
-        {
-            static theSkin* p = new theSkin();
-            return *p;
-        }
+        static theSkin& getInstance();
         
         
     public:
@@ -57,28 +47,27 @@ namespace embot { namespace app { namespace application {
         
         bool initialise(Config &config);   
 
-        bool configure(embot::app::canprotocol::analog::polling::Message_SKIN_SET_BRD_CFG::Info &brdcfg);
-        bool configure(embot::app::canprotocol::analog::polling::Message_SKIN_SET_TRIANG_CFG::Info &trgcfg);
-        
-        bool configure(embot::app::canprotocol::analog::polling::Message_SKIN_OBSOLETE_TACT_SETUP::Info &tactsetup);
+//        bool configure(embot::app::canprotocol::analog::polling::Message_SKIN_SET_BRD_CFG::Info &brdcfg);
+//        bool configure(embot::app::canprotocol::analog::polling::Message_SKIN_SET_TRIANG_CFG::Info &trgcfg);        
+//        bool configure(embot::app::canprotocol::analog::polling::Message_SKIN_OBSOLETE_TACT_SETUP::Info &tactsetup);
         
         bool start();
         bool stop();        
         bool tick(std::vector<embot::hw::can::Frame> &replies);
+        
+        // interface to CANagentSKIN
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_SKIN_SET_BRD_CFG::Info &info);
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_SKIN_SET_TRIANG_CFG::Info &info);  
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_SET_TXMODE::Info &info); 
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_SKIN_OBSOLETE_TACT_SETUP::Info &info);
 
     private:
         theSkin(); 
-
-    public:
-        // remove copy constructors and copy assignment operators
-        theSkin(const theSkin&) = delete;
-        theSkin(theSkin&) = delete;
-        void operator=(const theSkin&) = delete;
-        void operator=(theSkin&) = delete;
+        ~theSkin(); 
 
     private:    
         struct Impl;
-        Impl *pImpl;        
+        std::unique_ptr<Impl> pImpl;        
     };       
 
 

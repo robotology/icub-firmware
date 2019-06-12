@@ -28,7 +28,7 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "EOMtheTimerManager.h"
+//#include "EOMtheTimerManager.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -37,15 +37,25 @@
 
 struct embot::sys::theTimerManager::Impl
 {    
-    bool started;
-    Config config;
+    Config config;    
+    embot::sys::MessageTask *task;
     
     Impl() 
     {              
-        started = false;
-        config.capacityofhandler =8;
+        task = nullptr;
+        config.capacityofhandler = 8;
         config.priority = 240;
         config.stacksize = 1024;
+    }
+    
+    static void processtimer(Task *t, common::Message m, void *o)
+    {
+        if(0 != m)
+        {
+            embot::sys::Timer *tmr = reinterpret_cast<embot::sys::Timer*>(m);
+            tmr->execute();            
+        }
+            
     }
 };
 
@@ -55,46 +65,61 @@ struct embot::sys::theTimerManager::Impl
 // --------------------------------------------------------------------------------------------------------------------
 
 
+embot::sys::theTimerManager& embot::sys::theTimerManager::getInstance()
+{
+    static theTimerManager* p = new theTimerManager();
+    return *p;
+}
+
 embot::sys::theTimerManager::theTimerManager()
-: pImpl(new Impl)
-{   
+//    : pImpl(new Impl)
+{
+    pImpl = std::make_unique<Impl>();
+}  
 
-}
-
-
-bool embot::sys::theTimerManager::init(Config &config)
-{   
-    if(true == pImpl->started)
-    {
-        return false;
-    }
-        
-    pImpl->config = config;
     
-    return true;    
-}
+embot::sys::theTimerManager::~theTimerManager() { }
 
 
-bool embot::sys::theTimerManager::start()
+bool embot::sys::theTimerManager::start(const Config &config)
 {       
-    if(true == pImpl->started)
+    if(true == started())
     {
         return false;
     }
     
-    pImpl->started = true;
+    pImpl->task = new embot::sys::MessageTask;
     
-    eOmtimerman_cfg_t cfg = {0};
-    cfg.messagequeuesize = pImpl->config.capacityofhandler;
+    embot::sys::MessageTask::Config cfg;
     cfg.priority = pImpl->config.priority;
     cfg.stacksize = pImpl->config.stacksize;
+    cfg.messagequeuesize = pImpl->config.capacityofhandler;
+    cfg.timeout = embot::common::timeWaitForever;
+    cfg.startup = nullptr;
+    cfg.onmessage = pImpl->processtimer;
+    cfg.param = this;
     
-    eom_timerman_Initialise(&cfg);
+    pImpl->task->start(cfg);
     
     return true;
     
 }
 
+bool embot::sys::theTimerManager::started() const
+{
+    return (nullptr == pImpl->task) ? false : true;
+}
+
+bool embot::sys::theTimerManager::onexpiry(const Timer &timer)
+{
+    if(nullptr == pImpl->task)
+    {
+        return false;
+    }
+    
+    pImpl->task->setMessage(reinterpret_cast<embot::common::Message>(const_cast<Timer*>(&timer)), embot::common::timeWaitNone);
+    return true;
+}
     
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------

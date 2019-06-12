@@ -28,197 +28,128 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "EOMtask.h"
-
 #include "osal.h"
 
+
+// - class EventTask
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
 // --------------------------------------------------------------------------------------------------------------------
 
-struct embot::sys::Task::Impl0
+struct embot::sys::EventTask::Impl
 {    
-    Task *taskParent;    
-    EOMtask *eomtask0;
-    void *param;
-    Task::fpStartup startupFP0;
-    Task::fpOnEvent oneventFP0; 
-    Task::fpOnMessage onmessageFP0; 
-    Task::fpPeriodicActivity periodicFP0;
-    common::Time timeOfLatestTrigger;
+    EventTask * taskParent;
+    osal_task_t *osaltask;
 
+    Config config;
     
-    Impl0() 
+    osal_task_properties_t osaltaskproperties;
+    
+    Impl(EventTask *parent) 
     {
-        taskParent = nullptr;
-        eomtask0 = eom_task_New1();
-        param = nullptr;    
-        startupFP0 = nullptr;
-        oneventFP0 = nullptr; 
-        onmessageFP0 = nullptr;  
-        periodicFP0 = nullptr;
-        timeOfLatestTrigger = 0;      
+        taskParent = parent;
+        osaltask = nullptr;
+        
+        config.startup = nullptr;
+        config.onevent = dummyOnEvent; // i prefer assigning a dummy value in here. just in case. because to speed things up i dont check pImpl->onevent inside osal_eventdriven_loop()
+        config.param = nullptr;
+        config.stacksize = 64;
+        config.priority = Priority::minimum;
+        config.timeout = embot::common::timeWaitForever;
+        
+        // to be used in osal_task_new1(). only priority and stacksize will change
+        osaltaskproperties.function = osal_eventdriven_loop;
+        osaltaskproperties.param = taskParent;
+        osaltaskproperties.priority = config.priority.value;
+        osaltaskproperties.stacksize = config.stacksize;
+  
     }
     
-    ~Impl0()
+    ~Impl()
     {
-        eom_task_Delete(eomtask0);
+        if(nullptr != osaltask)
+        {
+            osal_task_delete(osaltask);
+            osaltask = nullptr;
+        }
     }
     
-    static void startup0(EOMtask *tsk, std::uint32_t zero)
+    static void dummyOnEvent(Task *t, common::EventMask m, void *p) {}
+    
+    static void osal_eventdriven_loop(void *p) 
     {
-        Task * t =  static_cast<Task*> (eom_task_GetExternalData(tsk));
-        if(nullptr == t)
+        EventTask *t = reinterpret_cast<EventTask*>(p);
+        const osal_reltime_t tout = static_cast<osal_reltime_t>(t->pImpl->config.timeout); // they are the same uint32_t type expressed in usec
+        const Task::fpStartup startup = t->pImpl->config.startup;
+        const Task::fpOnEvent onevent = t->pImpl->config.onevent;
+        void * param = t->pImpl->config.param;
+
+        // exec the startup
+        if(nullptr != startup)
         {
-            return;
+            startup(t, param);
         }
+
         
-        t->pImpl0->timeOfLatestTrigger = timeNow();
-        
-        if(nullptr != t->pImpl0->startupFP0)
+        // start the forever loop
+        for(;;)
         {
-            t->pImpl0->startupFP0(t, t->pImpl0->param); 
-        }  
+            onevent(t, osal_eventflag_getany(tout), param);
+        }        
     }
     
-    static void eventrun0(EOMtask *tsk, std::uint32_t evtmsgper)
-    {
-        Task * t =  static_cast<Task*> (eom_task_GetExternalData(tsk));
-        if(nullptr == t)
-        {
-            return;
-        }
-        
-        t->pImpl0->timeOfLatestTrigger = timeNow();
-        
-        if(nullptr != t->pImpl0->oneventFP0)
-        {
-            t->pImpl0->oneventFP0(t, static_cast<embot::common::EventMask>(evtmsgper), t->pImpl0->param); 
-        }    
-    }  
-
-    static void messagerun0(EOMtask *tsk, std::uint32_t evtmsgper)
-    {
-        Task * t =  static_cast<Task*> (eom_task_GetExternalData(tsk));
-        if(nullptr == t)
-        {
-            return;
-        }
-        
-        t->pImpl0->timeOfLatestTrigger = timeNow();
-        
-        if(nullptr != t->pImpl0->onmessageFP0)
-        {
-            t->pImpl0->onmessageFP0(t, static_cast<embot::common::Message>(evtmsgper), t->pImpl0->param); 
-        }    
-    }    
-
-    static void periodicrun0(EOMtask *tsk, std::uint32_t evtmsgper)
-    {
-        Task * t =  static_cast<Task*> (eom_task_GetExternalData(tsk));
-        if(nullptr == t)
-        {
-            return;
-        }
-        
-        t->pImpl0->timeOfLatestTrigger = timeNow();
-        
-        if(nullptr != t->pImpl0->periodicFP0)
-        {
-            t->pImpl0->periodicFP0(t, t->pImpl0->param); 
-        }    
-    }       
 };
-
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - all the rest
 // --------------------------------------------------------------------------------------------------------------------
 
-//namespace embot { namespace sys {
-
-// - class Task
-
-embot::sys::Task::Task()
-: pImpl0(new Impl0)
-{   
-    pImpl0->taskParent = nullptr;
-}
-
-
-embot::sys::Task::~Task()
-{   
-    delete pImpl0;
-}
-
-
-embot::common::Time embot::sys::Task::timeOfTrigger()
-{
-    return pImpl0->timeOfLatestTrigger;
-}
-
-
-void * embot::sys::Task::getEOMtask()
-{
-    return pImpl0->eomtask0;
-}
-
-void embot::sys::registerNameOfTask(void *p)
-{
-    eom_task_Start(reinterpret_cast<EOMtask*>(p));    
-}
-
-
-// - class EventTask
-
 
 embot::sys::EventTask::EventTask()
-{
-    pImpl0->taskParent = this;    
-}
-
-
-embot::sys::EventTask::EventTask(Task::fpStartup startup, Task::fpOnEvent onevent, std::uint32_t stacksize, Priority priority, common::relTime timeout, void *param, Task::fpNameOfTask nameoftask)
-{
-    pImpl0->taskParent = this;    
-    init(startup, onevent, stacksize, priority, timeout, param, nameoftask);  
+: pImpl(new Impl(this))
+{   
+    
 }
 
 
 embot::sys::EventTask::~EventTask()
-{
+{   
+    delete pImpl;
 }
 
 
-embot::sys::Task::Type embot::sys::EventTask::getType()
+embot::sys::Task::Type embot::sys::EventTask::getType() const 
 {
     return Type::eventTrigger;
 }
 
 
-embot::sys::Task::Priority embot::sys::EventTask::getPriority()
-{
-    std::uint8_t prio = 0;
-    eom_task_PriorityGet(pImpl0->eomtask0, &prio);
-    
-    return prio;
+embot::sys::Task::Priority embot::sys::EventTask::getPriority() const
+{   
+    return pImpl->osaltaskproperties.priority;
 }
 
 
-bool embot::sys::EventTask::setPriority(Task::Priority &priority)
-{    
-    eom_task_PrioritySet(pImpl0->eomtask0, priority);
+bool embot::sys::EventTask::setPriority(Task::Priority priority)
+{
+    if(false == priority.isvalid())
+    {
+        return false;
+    }
     
-    return true;
+    pImpl->config.priority = pImpl->osaltaskproperties.priority = priority.value;
+
+    osal_result_t r = osal_task_priority_set(pImpl->osaltask, pImpl->osaltaskproperties.priority);
+    return (osal_res_OK == r) ? (true) : (false);
 }
 
   
 bool embot::sys::EventTask::setEvent(embot::common::Event event)
 {
-    eom_task_SetEvent(pImpl0->eomtask0, event);
-    return true;
+    osal_result_t r = osal_eventflag_set(static_cast<osal_eventflag_t>(event), pImpl->osaltask, osal_callerAUTOdetect);
+    return (osal_res_OK == r) ? (true) : (false);
 }  
 
 
@@ -227,79 +158,165 @@ bool embot::sys::EventTask::setMessage(embot::common::Message message, common::r
     return false;
 }
 
-
-bool embot::sys::EventTask::init(Task::fpStartup startup, Task::fpOnEvent onevent, std::uint32_t stacksize, Priority priority, common::relTime timeout, void *param, Task::fpNameOfTask nameoftask)
+bool embot::sys::EventTask::setCallback(const common::Callback &callback, common::relTime timeout)
 {
-    pImpl0->startupFP0 = startup;
-    pImpl0->oneventFP0 = onevent;
-    pImpl0->param = param;
-    eom_task_Init1(pImpl0->eomtask0, 
-                    eom_mtask_EventDriven, 
-                    static_cast<uint8_t>(priority), 
-                    static_cast<uint16_t>(stacksize),
-                    static_cast<void (*) (EOMtask*, uint32_t)>(pImpl0->startup0),
-                    static_cast<void (*) (EOMtask*, uint32_t)>(pImpl0->eventrun0),
-                    static_cast<uint32_t>(0), 
-                    static_cast<eOreltime_t>(timeout),
-                    static_cast<void*>(this), 
-                    static_cast<void (*) (void*)>(nameoftask),
-                    static_cast<const char *>(NULL)
-                   );
+    return false;
+}
+
+
+bool embot::sys::EventTask::start(const Config &cfg)
+{    
+    if(false == cfg.isvalid())
+    {
+        return false;
+    }
+    
+    pImpl->config = cfg;
+    
+    pImpl->config.stacksize = (pImpl->config.stacksize+7)/8;
+    pImpl->config.stacksize *= 8;
+    
+    pImpl->osaltaskproperties.function = pImpl->osal_eventdriven_loop;
+    pImpl->osaltaskproperties.param = this;        
+    pImpl->osaltaskproperties.priority = pImpl->config.priority.value;
+    pImpl->osaltaskproperties.stacksize = pImpl->config.stacksize;    
+        
+    pImpl->osaltask = osal_task_new1(&pImpl->osaltaskproperties);
+    // by the following i add a reference of this task to the osal object. it is used in embot::sys::taskRunning() 
+    osal_task_extdata_set(pImpl->osaltask, this);
     
     return true;    
 }
 
 
-
-//int EventTask::getPP()
-//{   // just a test. you can remove it.    
-//    return getPriority();
-//}
-
-
-
-
 // - class MessageTask
 
+// --------------------------------------------------------------------------------------------------------------------
+// - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
+// --------------------------------------------------------------------------------------------------------------------
+
+struct embot::sys::MessageTask::Impl
+{    
+    MessageTask * taskParent;
+    osal_task_t *osaltask;    
+    osal_messagequeue_t *osalmessagequeue;
+    
+    Config config;
+    
+    osal_task_properties_t osaltaskproperties;
+    
+    Impl(MessageTask *parent) 
+    {
+        taskParent = parent;
+        osaltask = nullptr;
+        osalmessagequeue = nullptr;
+
+        config.startup = nullptr;
+        config.onmessage = dummyOnMessage; // i prefer assigning a dummy value in here. just in case. because to speed things up i dont check pImpl->onevent inside osal_messagedriven_loop()
+        config.param = nullptr;
+        config.stacksize = 64;
+        config.priority = Priority::minimum;
+        config.timeout = embot::common::timeWaitForever;
+        config.messagequeuesize = 2;
+        
+        // to be used in osal_task_new1(). only priority and stacksize will change
+        osaltaskproperties.function = osal_messagedriven_loop;
+        osaltaskproperties.param = taskParent;
+        osaltaskproperties.priority = config.priority.value;
+        osaltaskproperties.stacksize = config.stacksize;
+  
+    }
+    
+    ~Impl()
+    {
+        if(nullptr != osaltask)
+        {
+            osal_task_delete(osaltask);
+            osaltask = nullptr;
+        }
+        
+        if(nullptr != osalmessagequeue)
+        {
+            osal_messagequeue_delete(osalmessagequeue);
+            osalmessagequeue = nullptr;
+        }
+    }
+    
+    static void dummyOnMessage(Task *t, common::Message m, void *p) {}
+    
+    static void osal_messagedriven_loop(void *p) 
+    {
+        MessageTask *t = reinterpret_cast<MessageTask*>(p);
+        const osal_reltime_t tout = static_cast<osal_reltime_t>(t->pImpl->config.timeout); // they are the same uint32_t type expressed in usec
+        const Task::fpStartup startup = t->pImpl->config.startup;
+        const Task::fpOnMessage onmessage = t->pImpl->config.onmessage;
+        void * param = t->pImpl->config.param;
+        osal_messagequeue_t *mq = t->pImpl->osalmessagequeue;
+       
+
+        // exec the startup
+        if(nullptr != startup)
+        {
+            startup(t, param);
+        }
+
+        
+        // start the forever loop
+        for(;;)
+        {
+            // osal_messagequeue_getquick() returns a osal_message_t which is a uint32_t* which may hold a simple integer of a pointer to larger data
+            // the use depends on situations ...
+            common::Message msg = reinterpret_cast<common::Message>(osal_messagequeue_getquick(mq, tout, osal_callerAUTOdetect));
+            onmessage(t, msg, param);
+        }        
+    }
+    
+};
+
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - all the rest
+// --------------------------------------------------------------------------------------------------------------------
 
 embot::sys::MessageTask::MessageTask()
-{
-    pImpl0->taskParent = this;    
-}
-
-
-embot::sys::MessageTask::MessageTask(Task::fpStartup startup, Task::fpOnMessage onmessage, std::uint32_t stacksize, Priority priority, std::uint8_t messagequeuecapacity, common::relTime timeout, void *param, Task::fpNameOfTask nameoftask)
-{
-    pImpl0->taskParent = this;     
-    init(startup, onmessage, stacksize, priority, messagequeuecapacity, timeout, param, nameoftask); 
+: pImpl(new Impl(this))
+{   
+    
 }
 
 
 embot::sys::MessageTask::~MessageTask()
-{
+{   
+    delete pImpl;
 }
 
 
-embot::sys::Task::Type embot::sys::MessageTask::getType()
+embot::sys::Task::Type embot::sys::MessageTask::getType() const
 {
     return Type::messageTrigger;
 }
 
 
-embot::sys::Task::Priority embot::sys::MessageTask::getPriority()
+embot::sys::Task::Priority embot::sys::MessageTask::getPriority() const
+{   
+    return pImpl->osaltaskproperties.priority;
+}
+
+
+bool embot::sys::MessageTask::setPriority(Task::Priority priority)
 {
-    std::uint8_t prio = 0;
-    eom_task_PriorityGet(pImpl0->eomtask0, &prio);    
-    return prio;
+    if(false == priority.isvalid())
+    {
+        return false;
+    }
+    
+    pImpl->config.priority = pImpl->osaltaskproperties.priority = priority.value;
+
+    osal_result_t r = osal_task_priority_set(pImpl->osaltask, pImpl->osaltaskproperties.priority);
+    return (osal_res_OK == r) ? (true) : (false);
 }
 
-
-bool embot::sys::MessageTask::setPriority(Task::Priority &priority)
-{    
-    eom_task_PrioritySet(pImpl0->eomtask0, priority);    
-    return true;
-}
-  
   
 bool embot::sys::MessageTask::setEvent(embot::common::Event event)
 {
@@ -309,75 +326,369 @@ bool embot::sys::MessageTask::setEvent(embot::common::Event event)
 
 bool embot::sys::MessageTask::setMessage(embot::common::Message message, common::relTime timeout)
 {
-    eom_task_SendMessage(pImpl0->eomtask0, message, timeout);
-    return true;
+    osal_result_t r = osal_messagequeue_put(pImpl->osalmessagequeue, reinterpret_cast<osal_message_t>(message), static_cast<osal_reltime_t>(timeout), osal_callerAUTOdetect);
+    return (osal_res_OK == r) ? (true) : (false);
+}
+
+bool embot::sys::MessageTask::setCallback(const common::Callback &callback, common::relTime timeout)
+{
+    return false;
 }
 
 
-bool embot::sys::MessageTask::init(Task::fpStartup startup, Task::fpOnMessage onmessage, std::uint32_t stacksize, Priority priority, std::uint8_t messagequeuecapacity, common::relTime timeout, void *param, Task::fpNameOfTask nameoftask)
-{
-    pImpl0->startupFP0 = startup;
-    pImpl0->onmessageFP0 = onmessage;
-    pImpl0->param = param;
-    //eom_task_Init1(pImpl0->eomtask0, eom_mtask_MessageDriven, priority, stacksize, pImpl0->startup0, pImpl0->messagerun0, messagequeuecapacity, timeout, this, NULL, NULL);        
-    eom_task_Init1(pImpl0->eomtask0, 
-                    eom_mtask_MessageDriven, 
-                    static_cast<uint8_t>(priority), 
-                    static_cast<uint16_t>(stacksize),
-                    static_cast<void (*) (EOMtask*, uint32_t)>(pImpl0->startup0),
-                    static_cast<void (*) (EOMtask*, uint32_t)>(pImpl0->messagerun0),
-                    static_cast<uint32_t>(messagequeuecapacity), 
-                    static_cast<eOreltime_t>(timeout),
-                    static_cast<void*>(this), 
-                    static_cast<void (*) (void*)>(nameoftask),
-                    static_cast<const char *>(NULL)
-                   );
+bool embot::sys::MessageTask::start(const Config &cfg)
+{    
+    if(false == cfg.isvalid())
+    {
+        return false;
+    }
+    
+    pImpl->config = cfg;
+    
+    pImpl->config.stacksize = (pImpl->config.stacksize+7)/8;
+    pImpl->config.stacksize *= 8;
+    
+    pImpl->osalmessagequeue = osal_messagequeue_new(pImpl->config.messagequeuesize); 
+    
+    pImpl->osaltaskproperties.function = pImpl->osal_messagedriven_loop;
+    pImpl->osaltaskproperties.param = this;        
+    pImpl->osaltaskproperties.priority = pImpl->config.priority.value;
+    pImpl->osaltaskproperties.stacksize = pImpl->config.stacksize;  
+       
+    pImpl->osaltask = osal_task_new1(&pImpl->osaltaskproperties);
+    // by the following i add a reference of this task to the osal object. it is used in embot::sys::taskRunning() 
+    osal_task_extdata_set(pImpl->osaltask, this);
     
     return true;    
 }
 
 
+// - class CallbackTask
 
-// - class PeriodicTask
+// --------------------------------------------------------------------------------------------------------------------
+// - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
+// --------------------------------------------------------------------------------------------------------------------
 
-embot::sys::PeriodicTask::PeriodicTask()
-{
-    pImpl0->taskParent = this;    
+struct embot::sys::CallbackTask::Impl
+{    
+    CallbackTask * taskParent;
+    osal_task_t *osaltask;    
+    osal_messagequeue_t *osalfunctionqueue;
+    osal_messagequeue_t *osalargumentqueue;
+
+    Config config;
+    
+    osal_task_properties_t osaltaskproperties;
+    
+    Impl(CallbackTask *parent) 
+    {
+        taskParent = parent;
+        osaltask = nullptr;
+        osalfunctionqueue = nullptr;
+        osalargumentqueue = nullptr;
+        
+        config.startup = nullptr;
+        config.aftercallback = dummyAfter; // i prefer assigning a dummy value in here. just in case. because to speed things up i dont check pImpl->onevent inside osal_messagedriven_loop()
+        config.param = nullptr;
+        config.stacksize = 64;
+        config.priority = Priority::minimum;
+        config.timeout = embot::common::timeWaitForever;
+        config.queuesize = 2;
+        
+        // to be used in osal_task_new1(). only priority and stacksize will change
+        osaltaskproperties.function = osal_callbackdriven_loop;
+        osaltaskproperties.param = taskParent;
+        osaltaskproperties.priority = config.priority.value;
+        osaltaskproperties.stacksize = config.stacksize;
+  
+    }
+    
+    ~Impl()
+    {
+        if(nullptr != osaltask)
+        {
+            osal_task_delete(osaltask);
+            osaltask = nullptr;
+        }
+        
+        if(nullptr != osalfunctionqueue)
+        {
+            osal_messagequeue_delete(osalfunctionqueue);
+            osalfunctionqueue = nullptr;
+        }
+        
+        if(nullptr != osalargumentqueue)
+        {
+            osal_messagequeue_delete(osalargumentqueue);
+            osalargumentqueue = nullptr;
+        }
+    }
+    
+    static void dummyAfter(Task *t, common::Callback &m, void *p) {}
+    
+    static void osal_callbackdriven_loop(void *p) 
+    {
+        CallbackTask *t = reinterpret_cast<CallbackTask*>(p);
+        const osal_reltime_t tout = static_cast<osal_reltime_t>(t->pImpl->config.timeout); // they are the same uint32_t type expressed in usec
+        const Task::fpStartup startup = t->pImpl->config.startup;
+        const Task::fpAfterCallback after = (nullptr != t->pImpl->config.aftercallback) ? (t->pImpl->config.aftercallback) : (dummyAfter);
+        void * param = t->pImpl->config.param;
+        osal_messagequeue_t *fQ = t->pImpl->osalfunctionqueue;
+        osal_messagequeue_t *aQ = t->pImpl->osalargumentqueue;
+        
+        embot::common::Callback cbk;;
+       
+
+        // exec the startup
+        if(nullptr != startup)
+        {
+            startup(t, param);
+        }
+        
+        // start the forever loop
+        for(;;)
+        {
+            // osal_messagequeue_getquick() returns a osal_message_t which is a uint32_t* which may hold a simple integer of a pointer to larger data
+            // the order is importnt in here.... dont exchange the following two lines .....
+            cbk.arg = reinterpret_cast<void*>(osal_messagequeue_getquick(aQ, tout, osal_callerAUTOdetect)); 
+            cbk.call = reinterpret_cast<embot::common::fpCaller>(osal_messagequeue_getquick(fQ, tout, osal_callerAUTOdetect));
+            // it executes only if it is valid 
+            cbk.execute();
+            after(t, cbk, param);
+        }   
+
+    }
+    
+};
+
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - all the rest
+// --------------------------------------------------------------------------------------------------------------------
+
+
+embot::sys::CallbackTask::CallbackTask()
+: pImpl(new Impl(this))
+{   
+    
 }
 
 
-embot::sys::PeriodicTask::PeriodicTask(Task::fpStartup startup, Task::fpPeriodicActivity periodicactivity, std::uint32_t stacksize, Priority priority, common::relTime period, void *param, Task::fpNameOfTask nameoftask)
+embot::sys::CallbackTask::~CallbackTask()
+{   
+    delete pImpl;
+}
+
+
+embot::sys::Task::Type embot::sys::CallbackTask::getType() const
 {
-    pImpl0->taskParent = this;     
-    init(startup, periodicactivity, stacksize, priority, period, param, nameoftask); 
+    return Type::callbackTrigger;
+}
+
+
+embot::sys::Task::Priority embot::sys::CallbackTask::getPriority() const
+{   
+    return pImpl->osaltaskproperties.priority;
+}
+
+
+bool embot::sys::CallbackTask::setPriority(Task::Priority priority)
+{
+    if(false == priority.isvalid())
+    {
+        return false;
+    }
+    
+    pImpl->config.priority = pImpl->osaltaskproperties.priority = priority.value;
+
+    osal_result_t r = osal_task_priority_set(pImpl->osaltask, pImpl->osaltaskproperties.priority);
+    return (osal_res_OK == r) ? (true) : (false);
+}
+
+  
+bool embot::sys::CallbackTask::setEvent(embot::common::Event event)
+{
+    return false;
+}  
+
+
+bool embot::sys::CallbackTask::setMessage(embot::common::Message message, common::relTime timeout)
+{
+    return false;
+}
+
+bool embot::sys::CallbackTask::setCallback(const embot::common::Callback &callback, common::relTime timeout)
+{
+    if(false == callback.isvalid())
+    {
+        return false;
+    }
+    
+    osal_result_t res = osal_res_NOK_generic;
+
+    res = osal_messagequeue_put(pImpl->osalargumentqueue, reinterpret_cast<osal_message_t>(callback.arg), timeout, osal_callerAUTOdetect);
+    if(osal_res_OK != res)
+    {
+        return false;
+    }
+    
+    res = osal_messagequeue_put(pImpl->osalfunctionqueue, reinterpret_cast<osal_message_t>(callback.call), timeout, osal_callerAUTOdetect);
+    if(osal_res_OK != res)
+    {
+        return false;
+    }
+ 
+    return true;
+}
+
+
+
+bool embot::sys::CallbackTask::start(const Config &cfg)
+{    
+    if(false == cfg.isvalid())
+    {
+        return false;
+    }
+    
+    pImpl->config = cfg;    
+    
+    pImpl->config.stacksize = (pImpl->config.stacksize+7)/8;
+    pImpl->config.stacksize *= 8;
+    
+    pImpl->osalargumentqueue = osal_messagequeue_new(pImpl->config.queuesize); 
+    pImpl->osalfunctionqueue = osal_messagequeue_new(pImpl->config.queuesize); 
+    
+    pImpl->osaltaskproperties.function = pImpl->osal_callbackdriven_loop;
+    pImpl->osaltaskproperties.param = this;        
+    pImpl->osaltaskproperties.priority = pImpl->config.priority.value;
+    pImpl->osaltaskproperties.stacksize = pImpl->config.stacksize;  
+       
+    pImpl->osaltask = osal_task_new1(&pImpl->osaltaskproperties);
+    // by the following i add a reference of this task to the osal object. it is used in embot::sys::taskRunning() 
+    osal_task_extdata_set(pImpl->osaltask, this);
+    
+    return true;    
+}
+
+
+// - class PeriodicTask
+
+// --------------------------------------------------------------------------------------------------------------------
+// - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
+// --------------------------------------------------------------------------------------------------------------------
+
+struct embot::sys::PeriodicTask::Impl
+{    
+    PeriodicTask * taskParent;
+    osal_task_t *osaltask;    
+
+    Config config;
+    
+    osal_task_properties_t osaltaskproperties;
+    
+    Impl(PeriodicTask *parent) 
+    {
+        taskParent = parent;
+        osaltask = nullptr;
+
+        config.startup = nullptr;
+        config.activity = dummyActivity; // i prefer assigning a dummy value in here. just in case. because to speed things up i dont check pImpl->onevent inside osal_messagedriven_loop()
+        config.param = nullptr;
+        config.stacksize = 64;
+        config.priority = Priority::minimum;
+        config.period = embot::common::time1second;
+        
+        // to be used in osal_task_new1(). only priority and stacksize will change
+        osaltaskproperties.function = osal_periodic_loop;
+        osaltaskproperties.param = taskParent;
+        osaltaskproperties.priority = config.priority.value;
+        osaltaskproperties.stacksize = config.stacksize;
+  
+    }
+    
+    ~Impl()
+    {
+        if(nullptr != osaltask)
+        {
+            osal_task_delete(osaltask);
+            osaltask = nullptr;
+        }        
+    }
+    
+    static void dummyActivity(Task *t, void *p) {}
+    
+    static void osal_periodic_loop(void *p) 
+    {
+        PeriodicTask *t = reinterpret_cast<PeriodicTask*>(p);
+        const osal_reltime_t period = static_cast<osal_reltime_t>(t->pImpl->config.period); // they are the same uint32_t type expressed in usec
+        const Task::fpStartup startup = t->pImpl->config.startup;
+        const Task::fpActivity activity = t->pImpl->config.activity;
+        void * param = t->pImpl->config.param;
+       
+
+        // exec the startup
+        if(nullptr != startup)
+        {
+            startup(t, param);
+        }
+
+        osal_task_period_set(period);
+        
+        // start the forever loop
+        for(;;)
+        {
+            osal_task_period_wait();
+            activity(t, param);
+        }        
+    }
+    
+};
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - all the rest
+// --------------------------------------------------------------------------------------------------------------------
+
+
+embot::sys::PeriodicTask::PeriodicTask()
+: pImpl(new Impl(this))
+{   
+    
 }
 
 
 embot::sys::PeriodicTask::~PeriodicTask()
-{
+{   
+    delete pImpl;
 }
 
 
-embot::sys::Task::Type embot::sys::PeriodicTask::getType()
+embot::sys::Task::Type embot::sys::PeriodicTask::getType() const
 {
     return Type::periodicTrigger;
 }
 
 
-embot::sys::Task::Priority embot::sys::PeriodicTask::getPriority()
+embot::sys::Task::Priority embot::sys::PeriodicTask::getPriority() const
+{   
+    return pImpl->osaltaskproperties.priority;
+}
+
+
+bool embot::sys::PeriodicTask::setPriority(Task::Priority priority)
 {
-    std::uint8_t prio = 0;
-    eom_task_PriorityGet(pImpl0->eomtask0, &prio);    
-    return prio;
+    if(false == priority.isvalid())
+    {
+        return false;
+    }
+    
+    pImpl->config.priority = pImpl->osaltaskproperties.priority = priority.value;
+
+    osal_result_t r = osal_task_priority_set(pImpl->osaltask, pImpl->osaltaskproperties.priority);
+    return (osal_res_OK == r) ? (true) : (false);
 }
 
-
-bool embot::sys::PeriodicTask::setPriority(Task::Priority &priority)
-{    
-    eom_task_PrioritySet(pImpl0->eomtask0, priority);    
-    return true;
-}
-  
   
 bool embot::sys::PeriodicTask::setEvent(embot::common::Event event)
 {
@@ -390,31 +701,39 @@ bool embot::sys::PeriodicTask::setMessage(embot::common::Message message, common
     return false;
 }
 
-
-bool embot::sys::PeriodicTask::init(Task::fpStartup startup, Task::fpPeriodicActivity periodicactivity, std::uint32_t stacksize, Priority priority, common::relTime period, void *param, Task::fpNameOfTask nameoftask)
+bool embot::sys::PeriodicTask::setCallback(const common::Callback &callback, common::relTime timeout)
 {
-    pImpl0->startupFP0 = startup;
-    pImpl0->periodicFP0 = periodicactivity;
-    pImpl0->param = param;
-    //eom_task_Init1(pImpl0->eomtask0, eom_mtask_Periodic, priority, stacksize, pImpl0->startup0, pImpl0->periodicrun0, 0, period, this, NULL, NULL);        
-    eom_task_Init1(pImpl0->eomtask0, 
-                    eom_mtask_Periodic, 
-                    static_cast<uint8_t>(priority), 
-                    static_cast<uint16_t>(stacksize),
-                    static_cast<void (*) (EOMtask*, uint32_t)>(pImpl0->startup0),
-                    static_cast<void (*) (EOMtask*, uint32_t)>(pImpl0->periodicrun0),
-                    static_cast<uint32_t>(0), 
-                    static_cast<eOreltime_t>(period),
-                    static_cast<void*>(this), 
-                    static_cast<void (*) (void*)>(nameoftask),
-                    static_cast<const char *>(NULL)
-                   );
+    return false;
+}
+
+
+bool embot::sys::PeriodicTask::start(const Config &cfg)
+{    
+    if(false == cfg.isvalid())
+    {
+        return false;
+    }
+    
+    pImpl->config = cfg;
+    
+    pImpl->config.stacksize = (pImpl->config.stacksize+7)/8;
+    pImpl->config.stacksize *= 8;
+    
+    
+    pImpl->osaltaskproperties.function = pImpl->osal_periodic_loop;
+    pImpl->osaltaskproperties.param = this;        
+    pImpl->osaltaskproperties.priority = pImpl->config.priority.value;
+    pImpl->osaltaskproperties.stacksize = pImpl->config.stacksize;  
+       
+    pImpl->osaltask = osal_task_new1(&pImpl->osaltaskproperties);
+    // by the following i add a reference of this task to the osal object. it is used in embot::sys::taskRunning() 
+    osal_task_extdata_set(pImpl->osaltask, this);
     
     return true;    
 }
 
-//}} // namespace embot { namespace sys {
-    
+
+
     
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

@@ -101,15 +101,13 @@ extern eOresult_t eocanprotASpolling_former_POL_SK_CMD__ACC_GYRO_SETUP(eOcanprot
 
 extern eOresult_t eocanprotASpolling_former_POL_SK_CMD__SET_TRIANG_CFG(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame);
 
+extern eOresult_t eocanprotASpolling_former_POL_AS_CMD__POS_CONFIG_GET(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame);
+extern eOresult_t eocanprotASpolling_parser_POL_AS_CMD__POS_CONFIG_GET(eOcanframe_t *frame, eOcanport_t port);
 
-//extern eOresult_t eocanprotASpolling_parser_00(eOcanframe_t *frame, eOcanport_t port);
-//extern eOresult_t eocanprotASpolling_former_00(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame);
+extern eOresult_t eocanprotASpolling_former_POL_AS_CMD__POS_CONFIG_SET(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame);
 
-//extern eOresult_t eocanprotASpolling_parser_01(eOcanframe_t *frame, eOcanport_t port);
-//extern eOresult_t eocanprotASpolling_former_01(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame);
+extern eOresult_t eocanprotASpolling_former_POL_AS_CMD__POS_TRANSMIT(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame);
 
-//extern eOresult_t eocanprotASpolling_parser_02(eOcanframe_t *frame, eOcanport_t port);
-//extern eOresult_t eocanprotASpolling_former_02(eOcanprot_descriptor_t *descriptor, eOcanframe_t *frame);
 
 
 // - analog sensors: periodic
@@ -117,9 +115,9 @@ extern eOresult_t eocanprotASpolling_former_POL_SK_CMD__SET_TRIANG_CFG(eOcanprot
 // weakly defined
 extern eObool_t eocanprotASperiodic_redefinable_SkipParsingOf_ANY_PERIODIC_THERMOMETER_MSG(eOcanframe_t *frame, eOcanport_t port);
 
-extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__DIGITAL_GYROSCOPE(eOcanframe_t *frame, eOcanport_t port);
+extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__USERDEF(eOcanframe_t *frame, eOcanport_t port);
 
-extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__DIGITAL_ACCELEROMETER(eOcanframe_t *frame, eOcanport_t port);
+extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__POS(eOcanframe_t *frame, eOcanport_t port);
 
 
 extern eOresult_t eocanprotASperiodic_parser_PER_AS_MSG__UNCALIBFORCE_VECTOR_DEBUGMODE(eOcanframe_t *frame, eOcanport_t port);

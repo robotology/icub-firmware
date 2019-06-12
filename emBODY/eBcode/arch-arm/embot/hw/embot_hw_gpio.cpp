@@ -34,6 +34,7 @@
 
 using namespace std;
 
+#include "embot_hw_bsp.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -45,50 +46,120 @@ using namespace std;
 // - all the rest
 // --------------------------------------------------------------------------------------------------------------------
 
+
+using namespace embot::hw;
+
 namespace embot { namespace hw { namespace gpio {
 
 #if     !defined(HAL_GPIO_MODULE_ENABLED)
 
-    result_t configure(const GPIO &g, Mode m)      { return resNOK; }      
-    result_t set(const GPIO &g, State s)        { return resNOK; }
+    result_t configure(const embot::hw::stm32GPIO &g, Mode m)      { return resNOK; }      
+    result_t set(const embot::hw::stm32GPIO &g, State s)        { return resNOK; }
     
 #else    
+    
+    
+    result_t configure(const embot::hw::bsp::gpio::PROP &g, Mode m);    
+    result_t set(const embot::hw::bsp::gpio::PROP &g, State s);
+    result_t toggle(const embot::hw::bsp::gpio::PROP &g);    
+    State get(const embot::hw::bsp::gpio::PROP &g);
+    
+    
+    // initialised mask. there must be one for each of PORT::maxnumberof     
+    //static std::array<std::uint16_t, embot::common::tointegral(PORT::maxnumberof)> initialised2dmask = {0};
+    
+
+    bool supported(GPIO &g)
+    {
+        return embot::hw::bsp::gpio::getBSP().supported(g);
+    }
+    
+    bool initialised(GPIO &g)
+    {
+        return true; 
+    }   
+
+
+    result_t init(embot::hw::GPIO &g, const Config &config)
+    {
+        return resOK;
+    }  
+
+
+    result_t configure(const embot::hw::GPIO &g, Mode m)
+    {        
+        embot::hw::bsp::gpio::PROP gg = embot::hw::bsp::gpio::getBSP().getPROP(g);    
+        if(!gg.isvalid())
+        {
+            return resNOK;
+        }            
+        configure(gg, m);
+        return resOK;
+    }  
+    
+    result_t set(const embot::hw::GPIO &g, State s)
+    {
+        embot::hw::bsp::gpio::PROP gg = embot::hw::bsp::gpio::getBSP().getPROP(g);
+        if(!gg.isvalid())
+        {
+            return resNOK;
+        }  
+        set(gg, s);
+        return resOK;        
+    }
+    
+    result_t toggle(const embot::hw::GPIO &g)
+    {
+        embot::hw::bsp::gpio::PROP gg = embot::hw::bsp::gpio::getBSP().getPROP(g);
+        if(!gg.isvalid())
+        {
+            return resNOK;
+        }  
+        toggle(gg);
+        return resOK;        
+    }
+    
+    State get(const embot::hw::GPIO &g)
+    {
+        embot::hw::bsp::gpio::PROP gg = embot::hw::bsp::gpio::getBSP().getPROP(g);
+        if(!gg.isvalid())
+        {
+            return State::RESET;
+        }          
+        return get(gg);        
+    }    
    
-    result_t configure(const GPIO &g, Mode m)
+    result_t configure(const embot::hw::bsp::gpio::PROP &g, Mode m)
     {
         // caveat: HAL_GPIO_* use u16, and all macros are u16, whereas LL_GPIO_* use u32 
         if(m == Mode::OUTPUTopendrain)
         {
-            LL_GPIO_SetPinMode(static_cast<GPIO_TypeDef *>(g.port), static_cast<std::uint32_t>(g.pin), LL_GPIO_MODE_OUTPUT);		
-            LL_GPIO_SetPinOutputType(static_cast<GPIO_TypeDef *>(g.port), static_cast<std::uint32_t>(g.pin), LL_GPIO_OUTPUT_OPENDRAIN);
+            LL_GPIO_SetPinMode(g.stmport, static_cast<std::uint32_t>(g.stmpin), LL_GPIO_MODE_OUTPUT);		
+            LL_GPIO_SetPinOutputType(g.stmport, static_cast<std::uint32_t>(g.stmpin), LL_GPIO_OUTPUT_OPENDRAIN);
         }
         else if(m == Mode::OUTPUTpushpull)
         {
-            LL_GPIO_SetPinMode(static_cast<GPIO_TypeDef *>(g.port), static_cast<std::uint32_t>(g.pin), LL_GPIO_MODE_OUTPUT);		
-            LL_GPIO_SetPinOutputType(static_cast<GPIO_TypeDef *>(g.port), static_cast<std::uint32_t>(g.pin), LL_GPIO_OUTPUT_PUSHPULL);            
+            LL_GPIO_SetPinMode(g.stmport, static_cast<std::uint32_t>(g.stmpin), LL_GPIO_MODE_OUTPUT);		
+            LL_GPIO_SetPinOutputType(g.stmport, static_cast<std::uint32_t>(g.stmpin), LL_GPIO_OUTPUT_PUSHPULL);            
         }
         return resOK;
     }  
     
-    result_t set(const GPIO &g, State s)
+    result_t set(const embot::hw::bsp::gpio::PROP &g, State s)
     {
-        if(false == g.isvalid())
-        {
-            return resNOK;
-        }
-        HAL_GPIO_WritePin(static_cast<GPIO_TypeDef *>(g.port), g.pin, static_cast<GPIO_PinState>(s));    
+        HAL_GPIO_WritePin(g.stmport, g.stmpin, static_cast<GPIO_PinState>(s));    
         return resOK;        
     }
     
-    State get(const GPIO &g)
+    result_t toggle(const embot::hw::bsp::gpio::PROP &g)
     {
-        if(false == g.isvalid())
-        {
-            return State::RESET;
-        }
-
-        GPIO_PinState s = HAL_GPIO_ReadPin(static_cast<GPIO_TypeDef *>(g.port), g.pin);    
-        
+        HAL_GPIO_TogglePin(g.stmport, g.stmpin);    
+        return resOK;        
+    }
+    
+    State get(const embot::hw::bsp::gpio::PROP &g)
+    {
+        GPIO_PinState s = HAL_GPIO_ReadPin(g.stmport, g.stmpin);            
         return static_cast<State>(s);        
     }
     

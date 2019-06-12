@@ -22,46 +22,34 @@
 #define _EMBOT_APP_APPLICATION_THEIMU_H_
 
 #include "embot_common.h"
-
 #include "embot_hw.h"
-
-#include "embot_sys.h"
-
-#include "embot_app_canprotocol.h"
-#include "embot_app_canprotocol_analog_polling.h"
-#include "embot_app_canprotocol_analog_periodic.h"
-
+#include "embot_sys_task.h"
+#include "embot_app_application_theCANparserIMU.h"
 #include "embot_hw_bno055.h"
-
-
 #include <vector>
 
 namespace embot { namespace app { namespace application {
            
-    class theIMU
+    class theIMU : public CANagentIMU
     {
     public:
-        static theIMU& getInstance()
-        {
-            static theIMU* p = new theIMU();
-            return *p;
-        }
+        static theIMU& getInstance();
         
         
     public:
         struct Config
         {
-            embot::hw::BNO055::Sensor   sensor;
-            embot::hw::BNO055::Config   sensorconfig;
+            embot::hw::BNO055           sensor;
+            embot::hw::bno055::Config   sensorconfig;
             embot::common::Event        tickevent;
             embot::common::Event        datareadyevent;
             embot::sys::Task*           totask;
             Config() :  
-                sensor(embot::hw::BNO055::Sensor::one), 
-                sensorconfig(embot::hw::BNO055::Config(embot::hw::i2c::Descriptor(embot::hw::i2c::Bus::two, 400000))), 
+                sensor(embot::hw::BNO055::one), 
+                sensorconfig(embot::hw::bno055::Config(embot::hw::i2c::Descriptor(embot::hw::I2C::two, 400000))), 
                 tickevent(0), datareadyevent(0), totask(nullptr) 
                 {}
-            Config(embot::hw::BNO055::Sensor _s, const embot::hw::BNO055::Config& _sc, embot::common::Event _te, embot::common::Event _de, embot::sys::Task* _ts) :     
+            Config(embot::hw::BNO055 _s, const embot::hw::bno055::Config& _sc, embot::common::Event _te, embot::common::Event _de, embot::sys::Task* _ts) :     
                 sensor(_s),
                 sensorconfig(_sc),
                 tickevent(_te), 
@@ -73,30 +61,28 @@ namespace embot { namespace app { namespace application {
         
         bool initialise(Config &config);   
 
-        bool configure(embot::app::canprotocol::analog::polling::Message_ACC_GYRO_SETUP::Info &cfg);
-        bool start();  
-        
-        bool configure(embot::app::canprotocol::analog::polling::Message_IMU_CONFIG_SET::Info &info);
-        bool get(embot::app::canprotocol::analog::polling::Message_IMU_CONFIG_GET::ReplyInfo &info);
+        bool start();          
         bool start(embot::common::relTime period);
  
         bool stop();        
         bool tick(std::vector<embot::hw::can::Frame> &replies);        
         bool processdata(std::vector<embot::hw::can::Frame> &replies);
+        
+        // interface to CANagentIMU
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_ACC_GYRO_SETUP::Info &info);
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_IMU_CONFIG_SET::Info &info);       
+        virtual bool set(const embot::app::canprotocol::analog::polling::Message_IMU_TRANSMIT::Info &info);  
+        
+        virtual bool get(const embot::app::canprotocol::analog::polling::Message_IMU_CONFIG_GET::Info &info, embot::app::canprotocol::analog::polling::Message_IMU_CONFIG_GET::ReplyInfo &replyinfo);    
+        
 
     private:
         theIMU(); 
-
-    public:
-        // remove copy constructors and copy assignment operators
-        theIMU(const theIMU&) = delete;
-        theIMU(theIMU&) = delete;
-        void operator=(const theIMU&) = delete;
-        void operator=(theIMU&) = delete;
+        ~theIMU(); 
 
     private:    
         struct Impl;
-        Impl *pImpl;        
+        std::unique_ptr<Impl> pImpl;        
     };       
 
 

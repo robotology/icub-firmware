@@ -127,11 +127,11 @@ extern void eom_emstransceiver_callback_incaseoferror_in_sequencenumberReceived(
     static int64_t delta = 0;
     static eOerrmanDescriptor_t errdes = 
     {
-        .code           = EOERRORCODE(eoerror_category_System, eoerror_value_SYS_transceiver_rxseqnumber_error),
-        .sourcedevice   = eo_errman_sourcedevice_localboard,
-        .sourceaddress  = 0,
-        .par16          = 0,
-        .par64          = 0
+        EO_INIT(.code)          EOERRORCODE(eoerror_category_System, eoerror_value_SYS_transceiver_rxseqnumber_error),
+        EO_INIT(.sourcedevice)  eo_errman_sourcedevice_localboard,
+        EO_INIT(.sourceaddress) 0,
+        EO_INIT(.par16)         0,
+        EO_INIT(.par64)         0
     };
     
     const eOreceiver_seqnum_error_t *err = eo_receiver_GetSequenceNumberError(receiver); 
@@ -160,8 +160,8 @@ extern void eom_emstransceiver_callback_incaseoferror_in_sequencenumberReceived(
     else
     {    
         delta = err->rec_seqnum - err->exp_seqnum;
-        if(delta > INT16_MAX)       delta = INT16_MAX;  //32767
-        else if(delta < INT16_MIN)  delta = INT16_MIN;  //-32768;
+        if(delta > EO_INT16_MAX)       delta = EO_INT16_MAX;  //32767
+        else if(delta < EO_INT16_MIN)  delta = EO_INT16_MIN;  //-32768;
         
         errdes.code             = EOERRORCODE(eoerror_category_System, eoerror_value_SYS_transceiver_rxseqnumber_error);
         errdes.par16            = (int16_t)delta; 
@@ -175,11 +175,11 @@ extern void eom_emstransceiver_callback_incaseoferror_invalidframe(EOreceiver *r
 {  
     static eOerrmanDescriptor_t errdesinvframe = 
     {
-        .code           = EOERRORCODE(eoerror_category_System, eoerror_value_SYS_transceiver_rxinvalidframe_error),
-        .sourcedevice   = eo_errman_sourcedevice_localboard,
-        .sourceaddress  = 0,
-        .par16          = 0,
-        .par64          = 0
+        EO_INIT(.code)          EOERRORCODE(eoerror_category_System, eoerror_value_SYS_transceiver_rxinvalidframe_error),
+        EO_INIT(.sourcedevice)  eo_errman_sourcedevice_localboard,
+        EO_INIT(.sourceaddress) 0,
+        EO_INIT(.par16)         0,
+        EO_INIT(.par64)         0
     };
 
     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdesinvframe);
@@ -215,11 +215,11 @@ static void s_eom_emsappl_main_init(void)
     // init leds via the EOtheLEDpulser object
     eOledpulser_cfg_t ledpulsercfg =  
     {
-        .led_enable_mask    = (1 << eo_ledpulser_led_zero | 1 << eo_ledpulser_led_one | 1 << eo_ledpulser_led_two | 1 << eo_ledpulser_led_three | 1 << eo_ledpulser_led_four | 1 << eo_ledpulser_led_five),
-        .led_init           = (eOint8_fp_uint8_cvoidp_t) hal_led_init,
-        .led_on             = (eOint8_fp_uint8_t) hal_led_on,
-        .led_off            = (eOint8_fp_uint8_t) hal_led_off,
-        .led_toggle         = (eOint8_fp_uint8_t) hal_led_toggle
+        EO_INIT(.led_enable_mask)   (1 << eo_ledpulser_led_zero | 1 << eo_ledpulser_led_one | 1 << eo_ledpulser_led_two | 1 << eo_ledpulser_led_three | 1 << eo_ledpulser_led_four | 1 << eo_ledpulser_led_five),
+        EO_INIT(.led_init)          (eOint8_fp_uint8_cvoidp_t) hal_led_init,
+        EO_INIT(.led_on)            (eOint8_fp_uint8_t) hal_led_on,
+        EO_INIT(.led_off)           (eOint8_fp_uint8_t) hal_led_off,
+        EO_INIT(.led_toggle)        (eOint8_fp_uint8_t) hal_led_toggle
     };
 
     eo_ledpulser_Initialise(&ledpulsercfg);

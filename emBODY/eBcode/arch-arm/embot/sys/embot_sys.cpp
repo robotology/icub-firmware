@@ -30,7 +30,6 @@
 
 #include "osal.h"
 #include "stdlib.h"
-#include "EOMtask.h"
 
 #include <new>
 
@@ -69,12 +68,10 @@ namespace embot { namespace sys {
 
         if(nullptr == p)
         {
-            return(NULL);
+            return(nullptr);
         }
 
-        EOMtask *eomtask = static_cast<EOMtask*> (osal_task_extdata_get(p));    
-
-        return static_cast<Task*>(eom_task_GetExternalData(eomtask));        
+        return reinterpret_cast<Task*>(osal_task_extdata_get(p));       
     }
 
 }} // namespace embot { namespace sys {
@@ -106,23 +103,38 @@ extern "C" void osal_ext_free(void* m)
 // - override of new / delete etc w/ osal funtions
 // --------------------------------------------------------------------------------------------------------------------
 
+// here is what was ok in compiler v5 and c++98. but tht also worked for c++14 and complier armclang
+//void *operator new(std::size_t size) throw(std::bad_alloc)
+//{
+//    void* ptr = osal_base_memory_new(size);
+//    return ptr;
+//}
+//void* operator new(std::size_t size, const std::nothrow_t& nothrow_value) throw()
+//{
+//    void* ptr = osal_base_memory_new(size);
+//    return ptr;    
+//}
+//void operator delete(void* mem) throw ()
+//{
+//    osal_base_memory_del(mem);
+//}
 
-void *operator new(std::size_t size) throw(std::bad_alloc)
+// and here is what i need with armclang and -std=c++17
+void* operator new(std::size_t size) noexcept(false)
 {
     void* ptr = osal_base_memory_new(size);
     return ptr;
 }
 
-void* operator new(std::size_t size, const std::nothrow_t& nothrow_value) throw()
+void* operator new (std::size_t size, const std::nothrow_t& nothrow_value) noexcept
 {
     void* ptr = osal_base_memory_new(size);
     return ptr;    
 }
 
-
-void operator delete(void* mem) throw ()
+void operator delete (void* ptr) noexcept
 {
-    osal_base_memory_del(mem);
+    osal_base_memory_del(ptr);
 }
 
     

@@ -241,7 +241,7 @@ extern eOresult_t eo_canserv_TXstart(EOtheCANservice *p, eOcanport_t port, uint8
 
 
 extern eOresult_t eo_canserv_TXwaituntildone(EOtheCANservice *p, eOcanport_t port, uint32_t timeout)
-{ //3*osal_reltime1ms
+{ 
     if(NULL == p)
     {
         return(eores_NOK_nullpointer);
@@ -392,7 +392,7 @@ extern eOresult_t eo_canserv_SendCommandToLocation(EOtheCANservice *p, eOcanprot
     return(s_eo_canserv_SendCommand(p, &descriptor));
 }
 
-//#warning ---> it is ok for all but for skin .......
+//#warning ---> it is ok for all but for skin and psc .......
 extern eOresult_t eo_canserv_SendCommandToEntity(EOtheCANservice *p, eOcanprot_command_t *command, eOprotID32_t id32)
 {
     if((NULL == p) || (NULL == command))
@@ -426,38 +426,20 @@ extern eOresult_t eo_canserv_SendCommandToEntity(EOtheCANservice *p, eOcanprot_c
     descriptor.cmd.type = command->type;
     descriptor.cmd.value = command->value;
     
-    return(s_eo_canserv_SendCommand(p, &descriptor));
-    
-//    // here is the frame
-//    eOcanframe_t frame = {0};
-//    
-//    if(eores_OK != eo_canprot_Form(eo_canprot_GetHandle(), command, &frame))
-//    {   // error ...
-//        eOerrmanDescriptor_t errdes = {0};
-//        errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_formingfailure);
-//        errdes.par16                = (command->msgclass << 8) | (command->msgtype);
-//        errdes.par64                = 0;
-//        errdes.sourcedevice         = (eOcanport1 == port) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
-//        errdes.sourceaddress        = command->address;           
-//        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);               
-//        return(eores_NOK_generic);
-//    }
-//    
-//    // ok now i can sent the frame over can. what i do depends on the mode.
-//    return(s_eo_canserv_send_frame_simplemode(p, port, &frame));
+    return(s_eo_canserv_SendCommand(p, &descriptor));    
 }
 
 
+//#if 0
+// marco.accame on 2 april 2019: this function works only with can boards which are on the same can bus and have consecutive addresses
 extern eOresult_t eo_canserv_SendCommandToAllBoardsInEntity(EOtheCANservice *p, eOcanprot_command_t *command, eOprotID32_t id32)
 {
-//    eOerrmanDescriptor_t errdes = {0};
-
     if((NULL == p) || (NULL == command))
     {
         return(eores_NOK_nullpointer);
     }
 
-// now i find the location of the entity using descriptor.loc
+    // now i find the location of the entity using descriptor.loc
     eOcanprot_descriptor_t descriptor = {0};
     uint8_t numoflocs = 0;
     if(eores_OK != eo_canmap_GetEntityLocation(eo_canmap_GetHandle(), id32, &descriptor.loc, &numoflocs, NULL))
@@ -479,7 +461,6 @@ extern eOresult_t eo_canserv_SendCommandToAllBoardsInEntity(EOtheCANservice *p, 
     
     
     // now i complete the descriptor
-    //eOcanport_t port = (eOcanport_t)descriptor.loc.port; 
     descriptor.cmd.clas = command->clas;
     descriptor.cmd.type = command->type;
     descriptor.cmd.value = command->value;
@@ -487,29 +468,7 @@ extern eOresult_t eo_canserv_SendCommandToAllBoardsInEntity(EOtheCANservice *p, 
     uint8_t i=0;
     eOresult_t res = eores_OK;
     for(i=0; i<numoflocs; i++)
-    {    
-//        // here is the frame
-//        eOcanframe_t frame = {0};
-//        
-//        if(eores_OK != eo_canprot_Form(eo_canprot_GetHandle(), command, &frame))
-//        {   // error ...
-//            eOerrmanDescriptor_t errdes = {0};
-//            errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_formingfailure);
-//            errdes.par16                = (command->msgclass << 8) | (command->msgtype);
-//            errdes.par64                = 0;
-//            errdes.sourcedevice         = (eOcanport1 == port) ? (eo_errman_sourcedevice_canbus1) : (eo_errman_sourcedevice_canbus2);
-//            errdes.sourceaddress        = command->address;           
-//            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);               
-//            return(eores_NOK_generic);
-//        }
-//        
-//        // ok now i can sent the frame over can. what i do depends on the mode.
-//        eOresult_t r = s_eo_canserv_send_frame_simplemode(p, port, &frame);
-//        if(eores_OK != r)
-//        {
-//            res = r;
-//        }
-        
+    {            
         eOresult_t r = s_eo_canserv_SendCommand(p, &descriptor);
         if(eores_OK != r)
         {
@@ -522,6 +481,60 @@ extern eOresult_t eo_canserv_SendCommandToAllBoardsInEntity(EOtheCANservice *p, 
     
     return(res);
 }
+//#else
+extern eOresult_t eo_canserv_SendCommandToAllBoardsInEntity2(EOtheCANservice *p, eOcanprot_command_t *command, eOprotID32_t id32)
+{
+    if((NULL == p) || (NULL == command))
+    {
+        return(eores_NOK_nullpointer);
+    }
+    //const uint8_t maxboardsinentity = 16;
+    // now i find the locations of the entity using an array of eObrd_canlocation_t
+    uint8_t mem4arrayoflocs[sizeof(eOarray_head_t) + 16*sizeof(eObrd_canlocation_t)] = {0}; // 20 bytes
+    EOarray *arrayoflocs = eo_array_New(16, sizeof(eObrd_canlocation_t), mem4arrayoflocs);
+    
+    
+    if(eores_OK != eo_canmap_GetEntityArrayOfLocations(eo_canmap_GetHandle(), id32, arrayoflocs, NULL))
+    {   // error ...
+        eOerrmanDescriptor_t errdes = {0};
+        errdes.code                 = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_canservices_genericerror);
+        errdes.par16                = 0x0999;
+        errdes.par64                = id32;        
+        errdes.sourcedevice         = eo_errman_sourcedevice_localboard;
+        errdes.sourceaddress        = 0;                                   
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, NULL, &errdes);    
+        return(eores_NOK_generic);
+    }
+    
+    
+    // here is the descriptor. the loc will be assigned in the loop
+    eOcanprot_descriptor_t descriptor = {0};
+    
+    descriptor.cmd.clas = command->clas;
+    descriptor.cmd.type = command->type;
+    descriptor.cmd.value = command->value;
+        
+    uint8_t i=0;
+    eOresult_t res = eores_OK;
+    uint8_t numoflocs = eo_array_Size(arrayoflocs);
+    
+    for(i=0; i<numoflocs; i++)
+    {
+        eObrd_canlocation_t *lo = (eObrd_canlocation_t*) eo_array_At(arrayoflocs, i);
+        if(eobool_true == p->isactive[lo->port])
+        {
+            descriptor.loc = *lo;        
+            eOresult_t r = s_eo_canserv_SendCommand(p, &descriptor);
+            if(eores_OK != r)
+            {
+                res = r;
+            }
+        }
+    }
+    
+    return(res);
+}
+//#endif
 
 
 // --------------------------------------------------------------------------------------------------------------------

@@ -48,7 +48,7 @@ namespace embot { namespace binary { namespace bit {
     
 
     // see http://stackoverflow.com/questions/109023/how-to-count-the-number-of-set-bits-in-a-32-bit-integer
-    static const std::uint8_t s_eocommon_oneBitsInU8[256] = 
+    constexpr std::uint8_t s_eocommon_oneBitsInU8[256] = 
     {
     //  0  1  2  3  4  5  6  7  8  9  A  B  C  D  E  F (<- n)
     //  =====================================================
@@ -71,22 +71,22 @@ namespace embot { namespace binary { namespace bit {
         4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8  // Fn (+4)
     };
 
-    std::uint8_t countU08(const std::uint8_t value)
+    constexpr std::uint8_t countU08(const std::uint8_t value)
     {
         return(s_eocommon_oneBitsInU8[value & 0xff]);
     }
     
-    std::uint8_t countU16(const std::uint16_t value)
+    constexpr std::uint8_t countU16(const std::uint16_t value)
     {
         return(countU08(value&0xff)+countU08((value>>8)&0xff));
     }
     
-    std::uint8_t countU32(const std::uint32_t value)
+    constexpr std::uint8_t countU32(const std::uint32_t value)
     {
         return(countU16(value&0xffff) + countU16((value>>16)&0xffff));
     }
     
-    std::uint8_t countU64(const std::uint64_t value)
+    constexpr std::uint8_t countU64(const std::uint64_t value)
     {
         return(countU32(value&0xffffffff) + countU32((value>>32)&0xffffffff));
     }
@@ -102,7 +102,7 @@ namespace embot { namespace binary { namespace bit {
         {
             return countU16(static_cast<std::uint16_t>(value));
         }
-        else if(4 ==size)
+        else if(4 == size)
         {
             return countU32(static_cast<std::uint32_t>(value));
         }

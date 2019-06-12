@@ -25,71 +25,71 @@
 
 #include "embot_sys.h"
 
+#include "embot_sys_Task.h"
+
+
 namespace embot { namespace sys {
     
-        
+    struct EventToTask
+    {
+        common::Event       event;
+        Task*               task;  
+        EventToTask(common::Event e, Task* t) : event(e), task(t) {}  
+        EventToTask() : event(0), task(nullptr) {}
+        bool isvalid() const;
+        bool execute();
+    };
+    
+    struct MessageToTask
+    {
+        common::Message     message;
+        Task*               task;
+        MessageToTask(common::Message m, Task* t) : message(m), task(t) {}   
+        MessageToTask() : message(0), task(nullptr) {}   
+        bool isvalid() const;
+        bool execute(common::relTime timeout = common::timeWaitForever);
+    };
+    
+    struct CallbackToTask
+    {
+        common::Callback    callback;
+        Task*               task;       
+        CallbackToTask(common::fpCaller c, void *a, Task *t) : callback(c, a), task(t) {}  
+        CallbackToTask(common::Callback cbk, Task *t) : callback(cbk), task(t) {}                
+        CallbackToTask() : callback(nullptr, nullptr), task(nullptr) {}   
+        bool isvalid() const;
+        bool execute(common::relTime timeout = common::timeWaitForever);
+    };  
+            
+
     struct Action
     {
-        enum class Type { none = 0, event2task = 1, message2task = 2, executecallback = 3 };
-        
-        struct EventToTask
-        {
-            common::Event       event;
-            Task*               task;  
-            EventToTask(common::Event e, Task* t) : event(e), task(t) {}  
-            EventToTask() : event(0), task(nullptr) {}                 
-        };
-        
-        struct MessageToTask
-        {
-            common::Message     message;
-            Task*               task;
-            MessageToTask(common::Message m, Task* t) : message(m), task(t) {}   
-            MessageToTask() : message(0), task(nullptr) {}                  
-        };
-        
-        struct ExecuteCallback
-        {
-            common::Callback    callback;
-            Task*               task; 
-            ExecuteCallback(common::fpCallback c, void *a, Task *t) : callback(c, a), task(t) {}  
-            ExecuteCallback(common::Callback cbk, Task *t) : callback(cbk), task(t) {}                
-            ExecuteCallback() : callback(nullptr, nullptr), task(nullptr) {}               
-        };  
-        
-        Type            type;
+        enum class Type { none = 0, event2task = 1, message2task = 2, callback2task = 3 };
+               
+        Type type;
         union
         {
             EventToTask     evt;
             MessageToTask   msg;
-            ExecuteCallback cbk;
+            CallbackToTask  cbk;
         };
-        
-        
+               
         Action(){ clear(); } 
-        Action(const ExecuteCallback &c) { set(c); }
-        Action(const MessageToTask &m) { set(m); }
-        Action(const EventToTask &e) { set(e); }
+        Action(const CallbackToTask &c) { load(c); }
+        Action(const MessageToTask &m) { load(m); }
+        Action(const EventToTask &e) { load(e); }
         
         void clear() { type = Type::none; }
         
-        void set(const EventToTask &e)
-        {
-            type = Type::event2task;
-            evt = e;           
-        }
+        void load(const EventToTask &e);
         
-        void set(const MessageToTask &m)
-        {
-            type = Type::message2task;
-            msg = m;           
-        }
+        void load(const MessageToTask &m);
         
-        void set(const ExecuteCallback &c)
-        {
-            type = Type::executecallback;
-            cbk = c;           
-        }
+        void load(const CallbackToTask &c);
+               
+        bool isvalid() const;
+        
+        bool execute(common::relTime timeout = common::timeWaitForever);
     };
     
 }} // namespace embot { namespace sys {

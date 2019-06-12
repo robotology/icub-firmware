@@ -18,6 +18,8 @@
 
 #include "Joint.h"
 
+#include "hal_adc.h"
+
 #include "EOtheCANprotocol.h"
 
 #include "EOtheErrorManager.h"
@@ -249,7 +251,7 @@ void Joint_update_status_reference(Joint* o)
 }
 BOOL Joint_set_control_mode(Joint* o, eOmc_controlmode_command_t control_mode)
 {
-    if (o->control_mode == control_mode) return TRUE;
+    if (o->control_mode == ((eOmc_controlmode_t)control_mode)) return TRUE;
     
     if (o->control_mode == eomc_controlmode_notConfigured) return FALSE;
         
@@ -455,6 +457,46 @@ BOOL Joint_manage_cable_constraint(Joint* o)
     }
     
     return FALSE;
+}
+
+BOOL Joint_manage_R1_finger_tension_constraint(Joint* o)
+{
+    static BOOL loose_cable[4]={FALSE,FALSE,FALSE,FALSE};
+
+    //if switch_val< 1000 than hard stop reached, if switch_val> 4000 that hard stop is not reached, 
+    //...in between we could use the last value....(hysteresis)
+    
+    uint32_t switch_val = hal_adc_get_hall_sensor_analog_input_mV(1 - o->ID);
+            
+    if (switch_val < 1500) 
+    {
+        loose_cable[o->ID] = TRUE;
+    }
+    else if (switch_val > 3500)
+    {        
+        loose_cable[o->ID] = FALSE;
+    } 
+    
+    // open intention    
+    
+//    static int noflood[] = {0, 250};
+//    
+//    if (++noflood[o->ID]> 500)
+//    {
+//        noflood[o->ID] = 0;
+//        
+//        eOerrmanDescriptor_t errdes = {0};
+
+//        errdes.code             = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
+//        errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+//        errdes.sourceaddress    = o->ID;
+//        errdes.par16            = switch_val;
+//        errdes.par64            = 0;
+//        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_debug, "FINECORSA", NULL, &errdes);
+//    }
+    
+    //return FALSE;
+    return ((o->pos_err < ZERO) && loose_cable[o->ID]);
 }
 
 CTRL_UNITS Joint_do_pwm_control(Joint* o)
@@ -718,7 +760,20 @@ CTRL_UNITS Joint_do_vel_control(Joint* o)
           //case eomc_controlmode_velocity: // not RAW
                 if (o->vel_ref == ZERO)
                 {
-                    o->vel_ref = o->scKstill*o->pos_err;
+                    if (o->pos_err > o->dead_zone)
+                    {
+                        o->pos_err -= o->dead_zone;
+                    }
+                    else if (o->pos_err < -o->dead_zone)
+                    {
+                        o->pos_err += o->dead_zone;
+                    }
+                    else
+                    {
+                        o->pos_err = ZERO;
+                    }
+                    
+                    o->vel_ref = o->scKpos*o->pos_err;
                 }
                 else
                 {

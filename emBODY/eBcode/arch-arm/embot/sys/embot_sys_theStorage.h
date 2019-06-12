@@ -22,10 +22,7 @@
 #define _EMBOT_SYS_THESTORAGE_H_
 
 #include "embot_common.h"
-
 #include "embot_sys.h"
-
-#include "embot_i2h.h"
 
 namespace embot { namespace sys {
     
@@ -42,7 +39,7 @@ namespace embot { namespace sys {
         
     public:
       
-        bool init(embot::i2h::Storage *storage);
+        bool init(embot::common::Storage *storage);
         
         bool isInitted();
         bool isAddressValid(std::uint32_t address);
