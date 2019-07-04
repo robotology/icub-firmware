@@ -408,14 +408,9 @@
           <GroupName>stm32hal-config</GroupName>
           <Files>
             <File>
-              <FileName>stm32hal_stg.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\cfg\stm32hal_stg.h</FilePath>
-            </File>
-            <File>
-              <FileName>stm32hal.startup.mtb4.v172.s</FileName>
+              <FileName>stm32hal.startup.mtb4.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\cfg\stm32hal.startup.mtb4.v172.s</FilePath>
+              <FilePath>..\cfg\stm32hal.startup.mtb4.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -1301,14 +1296,9 @@
           <GroupName>stm32hal-config</GroupName>
           <Files>
             <File>
-              <FileName>stm32hal_stg.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\cfg\stm32hal_stg.h</FilePath>
-            </File>
-            <File>
-              <FileName>stm32hal.startup.mtb4.v172.s</FileName>
+              <FileName>stm32hal.startup.mtb4.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\cfg\stm32hal.startup.mtb4.v172.s</FilePath>
+              <FilePath>..\cfg\stm32hal.startup.mtb4.s</FilePath>
             </File>
           </Files>
         </Group>
@@ -1726,6 +1716,7 @@
       <TargetName>mtb4-ulpro-v190</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
+      <pArmCC>6120000::V6.12::.\ARMCLANG</pArmCC>
       <pCCUsed>6120000::V6.12::.\ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
@@ -2143,14 +2134,9 @@
           <GroupName>stm32hal-config</GroupName>
           <Files>
             <File>
-              <FileName>stm32hal_stg.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\cfg\stm32hal_stg.h</FilePath>
-            </File>
-            <File>
-              <FileName>stm32hal.startup.mtb4.v172.s</FileName>
+              <FileName>stm32hal.startup.mtb4.s</FileName>
               <FileType>2</FileType>
-              <FilePath>..\cfg\stm32hal.startup.mtb4.v172.s</FilePath>
+              <FilePath>..\cfg\stm32hal.startup.mtb4.s</FilePath>
             </File>
           </Files>
         </Group>

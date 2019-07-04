@@ -36,7 +36,7 @@
 #include "embot_app_theLEDmanager.h"
 
 
-static const embot::app::canprotocol::versionOfAPPLICATION vAP = {1, 3 , 3};
+static const embot::app::canprotocol::versionOfAPPLICATION vAP = {1, 4 , 0};
 static const embot::app::canprotocol::versionOfCANPROTOCOL vCP = {2, 0};
 
 static void userdeflauncher(void* param);

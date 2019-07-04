@@ -42,6 +42,7 @@
 #include "embot_hw_adc.h"
 #include "embot_hw_si7051.h"
 #include "embot_hw_tlv493d.h"
+#include "embot_hw_sys.h"
 
 #include "embot_binary.h"
 
@@ -621,8 +622,10 @@ namespace embot { namespace hw { namespace bsp { namespace si7051 {
     static_assert(embot::common::tointegral(embot::hw::SI7051::maxnumberof) < embot::common::tointegral(embot::hw::SI7051::none), "SI7051::maxnumberof must be higher that SI7051::none, so that we can optimise code");
 
 
-    #if defined(STM32HAL_BOARD_STRAIN2) || defined(STM32HAL_BOARD_MTB4)
+    #if defined(STM32HAL_BOARD_STRAIN2)
         
+    // actually the strain2 has another chip mounted, which is in the same i2c bus as the bno.
+    // for now we don't support it
     constexpr PROP prop01 { .i2caddress = 0x80 }; 
 
     constexpr BSP thebsp {        
@@ -634,8 +637,29 @@ namespace embot { namespace hw { namespace bsp { namespace si7051 {
         }}        
     };
 
-    void BSP::init(embot::hw::SI7051 h) const {}
+    void BSP::init(embot::hw::SI7051 h) const { }
 
+    #elif defined(STM32HAL_BOARD_MTB4)
+        
+    // the mtb4 has only one si7051 chip
+    constexpr PROP prop01 { .i2caddress = 0x80 }; 
+
+    constexpr BSP thebsp {        
+        // maskofsupported
+        mask::pos2mask<uint32_t>(SI7051::one),        
+        // properties
+        {{
+            &prop01             
+        }}        
+    };
+
+    void BSP::init(embot::hw::SI7051 h) const 
+    {
+    	// the mtb4 board has a pin for power up of the chip SI7051::one 
+        HAL_GPIO_WritePin(POWER_TSENSOR1_GPIO_Port, POWER_TSENSOR1_Pin, GPIO_PIN_SET);
+        embot::hw::sys::delay(25*embot::common::time1millisec);
+    }
+    
     #else
     
     constexpr BSP thebsp { };
