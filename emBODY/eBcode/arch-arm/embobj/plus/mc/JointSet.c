@@ -368,7 +368,7 @@ void JointSet_do(JointSet* o)
 
 static int control_output_type(JointSet* o, int16_t control_mode)
 {
-    if (((eOmc_controlmode_t)control_mode) == o->control_mode) return TRUE;
+    if (control_mode == eomc_controlmode_cmd_force_idle) return eomc_ctrl_out_type_off;
     
     if (control_mode == eomc_controlmode_cmd_idle) return eomc_ctrl_out_type_off;
     

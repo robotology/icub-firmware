@@ -504,8 +504,10 @@ BOOL Joint_manage_R1_finger_tension_constraint(Joint* o)
     return ((o->pos_err < ZERO) && loose_cable[o->ID]);
 }
 
-CTRL_UNITS Joint_do_pwm_control(Joint* o)
-{
+CTRL_UNITS Joint_do_pwm_or_current_control(Joint* o)
+{    
+    PID *pid = (o->control_mode == eomc_controlmode_direct || o->control_mode == eomc_controlmode_vel_direct) ?  &o->directPID : &o->minjerkPID; 
+    
     o->pushing_limit = FALSE;
     
     switch (o->control_mode)

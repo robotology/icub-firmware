@@ -312,9 +312,11 @@ static void debug_printsMatrix4X6(float **m)
 
 static void copyMatrix4X4(float **dst, const eOmc_4x4_matrix_t src)
 {
-    for(uint8_t r=0; r<MAX_JOINTS_PER_BOARD; r++)
+    int N = MAX_JOINTS_PER_BOARD <= 4 ? MAX_JOINTS_PER_BOARD : 4;
+    
+    for(uint8_t r=0; r<N; r++)
     {
-        for(uint8_t c=0; c<MAX_JOINTS_PER_BOARD; c++)
+        for(uint8_t c=0; c<N; c++)
         {
             dst[r][c] = eo_common_Q17_14_to_float(src[r][c]);
         }
@@ -324,9 +326,12 @@ static void copyMatrix4X4(float **dst, const eOmc_4x4_matrix_t src)
 
 static void copyMatrix4X6(float **dst, const eOmc_4x6_matrix_t src)
 {
-    for(uint8_t r=0; r<MAX_JOINTS_PER_BOARD; r++)
+    int R = MAX_JOINTS_PER_BOARD <= 4 ? MAX_JOINTS_PER_BOARD : 4;
+    int C = MAX_ENCODS_PER_BOARD <= 6 ? MAX_ENCODS_PER_BOARD : 6;
+        
+    for(uint8_t r=0; r<R; r++)
     {
-        for(uint8_t c=0; c<6; c++)
+        for(uint8_t c=0; c<C; c++)
         {
             dst[r][c] = eo_common_Q17_14_to_float(src[r][c]);
         }
