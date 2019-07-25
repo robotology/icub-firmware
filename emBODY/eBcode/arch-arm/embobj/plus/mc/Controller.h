@@ -60,8 +60,10 @@ typedef struct //MController
     float **Jjm;
     float **Jmj;
     
-    float **Sje;
     float **Sjm;
+    float **Smj;
+    
+    float **Sje;
     
     uint8_t part_type;
     uint8_t actuation_type;
@@ -109,19 +111,26 @@ extern void MController_update_motor_pos_fbk(int m, int32_t position_raw);
 extern void MController_update_motor_current_fbk(int m, int16_t current);
 extern void MController_config_motor_friction(int m, eOmc_motor_params_t* friction); //
 extern void MController_config_joint_impedance(int j, eOmc_impedance_t* impedance); //
-extern void MController_config_pos_pid(int j, eOmc_PID_t *pid_conf); //
-extern void MController_config_vel_pid(int j, eOmc_PID_t *pid_conf); //
-extern void MController_config_trq_pid(int m, eOmc_PID_t *pid_conf); //
+
+extern void MController_config_minjerk_pid(int j, eOmc_PID_t *pid_conf); //
+extern void MController_config_direct_pid(int j, eOmc_PID_t *pid_conf); //
+
+extern void MController_motor_config_current_PID(int m, eOmc_PID_t* pid);
+extern void MController_motor_config_torque_PID(int m, eOmc_PID_t *pid);
+extern void MController_motor_config_speed_PID(int m, eOmc_PID_t *pid);
+
 extern void MController_config_joint_pos_limits(int j, int32_t pos_min, int32_t pos_max);
 extern void MController_config_joint_vel_ref_timeout(int j, int32_t timeout_ms);
-extern void MController_motor_config_current_PID(int m, eOmc_PID_t* pidcurrent);
 extern void MController_motor_config_max_currents(int m, eOmc_current_limits_params_t* current_params);
 
 extern BOOL MController_set_joint_pos_ref(int j, CTRL_UNITS pos_ref, CTRL_UNITS vel_ref);
 extern BOOL MController_set_joint_vel_ref(int j, CTRL_UNITS vel_ref, CTRL_UNITS acc_ref);
 extern BOOL MController_set_joint_pos_raw(int j, CTRL_UNITS pos_ref);
+extern BOOL MController_set_joint_vel_raw(int j, CTRL_UNITS vel_ref);
 extern BOOL MController_set_joint_trq_ref(int j, CTRL_UNITS trq_ref);
-extern BOOL MController_set_joint_out_ref(int j, CTRL_UNITS out_ref);
+extern BOOL MController_set_joint_pwm_ref(int j, CTRL_UNITS pwm_ref);
+extern BOOL MController_set_joint_cur_ref(int j, CTRL_UNITS cur_ref);
+
 extern void MController_stop_joint(int j);
 extern void MController_config_motor_gearbox_M2J(int m, float32_t gearbox_M2J);
 extern void MController_config_motor_encoder(int m, int32_t resolution);

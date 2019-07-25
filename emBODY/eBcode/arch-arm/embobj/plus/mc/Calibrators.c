@@ -112,7 +112,7 @@ static eOresult_t JointSet_do_wait_calibration_6_singleJoint(JointSet *o, int in
                 jCalib6Data_ptr->is_active = FALSE;
                 char info[80];
                 sprintf(info,"calib 6:outLim: cp%d mx%.1f mn%.1f",curr_pos, j_ptr->pos_max, j_ptr->pos_min);
-                JointSet_send_debug_message(info, j_ptr->ID);
+                JointSet_send_debug_message(info, j_ptr->ID, 0, 0);
 
                 return(eores_NOK_generic);
             }
@@ -123,7 +123,8 @@ static eOresult_t JointSet_do_wait_calibration_6_singleJoint(JointSet *o, int in
                 int j = o->joints_of_set[k];
                 Motor_motion_reset(o->motor+ m);
                 Joint_motion_reset(o->joint+ j);
-                Motor_set_run(o->motor+ m); //clear ext fault bit if it is not pressed
+                //Motor_set_run(o->motor+ m, PWM_INPUT_MOTOR); 
+                Motor_set_run(o->motor+ m, eomc_ctrl_out_type_pwm); //clear ext fault bit if it is not pressed
             }
         
             if(j_ptr->control_mode == eomc_controlmode_hwFault)
@@ -147,7 +148,7 @@ static eOresult_t JointSet_do_wait_calibration_6_singleJoint(JointSet *o, int in
             {
                 char info[50];
                 snprintf(info, 50,"error in Joint_set_pos_ref_in_calibType6");
-                JointSet_send_debug_message(info, j_ptr->ID);
+                JointSet_send_debug_message(info, j_ptr->ID, 0, 0);
                 //restore rotor limits
                 m_ptr->pos_min = j_ptr->running_calibration.data.type6.rotorposmin;
                 m_ptr->pos_max = j_ptr->running_calibration.data.type6.rotorposmax;
@@ -263,7 +264,7 @@ static eOresult_t JointSet_do_wait_calibration_7_singleJoint(Joint *j, Motor* m,
                 //// debug code
                 char info[80];
                 snprintf(info, sizeof(info), "calib7:outLim: cp%d mx%.1f mn%.1f",curr_pos, j->pos_max, j->pos_min);
-                JointSet_send_debug_message(info, j->ID);
+                JointSet_send_debug_message(info, j->ID, 0, 0);
                 ////debug code ended
 
                 return(eores_NOK_generic);

@@ -175,15 +175,15 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
         
         // 1) send pid position 
         command.type  = ICUBCANPROTO_POL_MC_CMD__SET_POS_PID;
-        command.value = &cfg->pidposition;
+        command.value = &cfg->pidtrajectory;
         eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);    
         
         command.type  = ICUBCANPROTO_POL_MC_CMD__SET_POS_PIDLIMITS;
-        command.value = &cfg->pidposition;
+        command.value = &cfg->pidtrajectory;
         eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32); 
         
         command.type  = ICUBCANPROTO_POL_MC_CMD__SET_POS_STICTION_PARAMS;
-        command.value = &cfg->pidposition;
+        command.value = &cfg->pidtrajectory;
         eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32); 
 
 
@@ -198,7 +198,7 @@ extern void eoprot_fun_UPDT_mc_joint_config(const EOnv* nv, const eOropdescripto
         eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32);     
         
         command.type  = ICUBCANPROTO_POL_MC_CMD__SET_TORQUE_STICTION_PARAMS;
-        command.value = &cfg->pidposition;
+        command.value = &cfg->pidtrajectory;
         eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, rd->id32); 
 
         
@@ -255,7 +255,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_pidposition(const EOnv* nv, const eO
     
     if((eo_motcon_mode_foc == mcmode) || (eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode))
     {
-        MController_config_pos_pid(jxx, pid);
+        MController_config_minjerk_pid(jxx, pid);
     }
     else if(eo_motcon_mode_mc4 == mcmode)
     {
@@ -273,7 +273,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_pidvelocity(const EOnv* nv, const eO
     
     if((eo_motcon_mode_foc == mcmode) || (eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode))
     {
-        MController_config_vel_pid(jxx, pid);
+        //MController_config_direct_pid(jxx, pid);
     }
     else if(eo_motcon_mode_mc4 == mcmode)
     {
@@ -292,7 +292,7 @@ extern void eoprot_fun_UPDT_mc_joint_config_pidtorque(const EOnv* nv, const eOro
     
     if((eo_motcon_mode_foc == mcmode) || (eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode) || (eo_motcon_mode_mc2pluspsc == mcmode))
     {
-        MController_config_trq_pid(jxx, pid);
+        MController_motor_config_torque_PID(jxx, pid);
     }
     else if(eo_motcon_mode_mc4 == mcmode)
     {
@@ -587,6 +587,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
             case eomc_setpoint_velocity:
             {
                 MController_set_joint_vel_ref(jxx, setpoint->to.velocity.value, setpoint->to.velocity.withacceleration);
+                //MController_set_joint_vel_raw(jxx, setpoint->to.velocity.value);
             } break;
 
             case eomc_setpoint_torque:
@@ -596,9 +597,14 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
 
             case eomc_setpoint_openloop:
             {
-                MController_set_joint_out_ref(jxx, setpoint->to.openloop.value);
+                MController_set_joint_pwm_ref(jxx, setpoint->to.openloop.value);
             } break;
 
+            case eomc_setpoint_current:
+            {
+                MController_set_joint_cur_ref(jxx, setpoint->to.current.value);
+            } break;
+            
             default:
             {
                 
@@ -735,7 +741,7 @@ extern void eoprot_fun_UPDT_mc_joint_cmmnds_setpoint(const EOnv* nv, const eOrop
                 command.type  = ICUBCANPROTO_POL_MC_CMD__SET_OPENLOOP_PARAMS; 
                 command.value =  &setpoint_openloop;   
 
-                 joint->status.target.trgt_openloop = setpoint->to.openloop.value;
+                 joint->status.target.trgt_pwm = setpoint->to.openloop.value;
             } break;
 
             case eomc_setpoint_positionraw:
@@ -1397,6 +1403,31 @@ extern void eoprot_fun_UPDT_mc_motor_config_pidcurrent(const EOnv* nv, const eOr
 
 }
 
+// f-marker-begin
+extern void eoprot_fun_UPDT_mc_motor_config_pidspeed(const EOnv* nv, const eOropdescriptor_t* rd)
+{
+    eOmotioncontroller_mode_t mcmode = s_motorcontrol_getmode();
+    
+    if(eo_motcon_mode_foc == mcmode)
+    {
+        eOmc_PID_t *pid = (eOmc_PID_t*)rd->data;
+        eOprotIndex_t mxx = eoprot_ID2index(rd->id32);
+
+        MController_motor_config_speed_PID(mxx, pid);
+
+        return;
+    }
+    else if((eo_motcon_mode_mc4plus == mcmode) || (eo_motcon_mode_mc4plusmais == mcmode))
+    {
+        // TODOALE
+        return;
+    }
+    else if(eo_motcon_mode_mc4 == mcmode)
+    {    
+        return;
+    }    
+
+}
 
 // f-marker-begin
 extern void eoprot_fun_UPDT_mc_motor_config_currentlimits(const EOnv* nv, const eOropdescriptor_t* rd)
@@ -1574,6 +1605,7 @@ static eOresult_t s_translate_eOmcControlMode2icubCanProtoControlMode(eOmc_contr
             *icubcanProto_controlmode = icubCanProto_controlmode_forceIdle;
         } break;
         case eomc_controlmode_cmd_mixed:
+        case eomc_controlmode_cmd_velocity_pos:
         {
             *icubcanProto_controlmode = icubCanProto_controlmode_mixed;
         } break;

@@ -151,13 +151,6 @@ typedef struct //Motor
     // HARDWARE_MC4p        2
     uint8_t HARDWARE_TYPE;
 
-    // UNKNOWN              0
-    // PWM_CONTROLLED_MOTOR 1
-    // VEL_CONTROLLED_MOTOR 2
-    // IQQ_CONTROLLED_MOTOR 3
-    // POS_CONTROLLED_MOTOR 4
-    uint8_t MOTOR_CONTROL_TYPE;
-
     CTRL_UNITS GEARBOX;
 
     BOOL HAS_TEMP_SENSOR;
@@ -238,10 +231,10 @@ extern void Motor_destroy(Motor* o); //
 
 extern void Motor_config_encoder(Motor* o, int32_t resolution);
 extern void Motor_config_max_currents(Motor* o, eOmc_current_limits_params_t* current_params);
-extern void Motor_config_current_PID(Motor* o, eOmc_PID_t* pidcurrent);
 
-extern void Motor_config_trqPID(Motor* o, eOmc_PID_t* pid); //
-extern void Motor_config_velPID(Motor* o, eOmc_PID_t *pid); //
+extern void Motor_config_current_PID(Motor* o, eOmc_PID_t* pid);
+extern void Motor_config_torque_PID(Motor* o, eOmc_PID_t* pid);
+extern void Motor_config_speed_PID(Motor* o, eOmc_PID_t* pid);
 
 extern void Motor_config_filter(Motor* o, uint8_t filter); //
 extern void Motor_config_friction(Motor* o, float Bemf, float Ktau); //
@@ -249,7 +242,7 @@ extern void Motor_calibrate_withOffset(Motor* o, int32_t offset); //
 extern BOOL Motor_calibrate_moving2Hardstop(Motor* o, int32_t pwm, int32_t zero); //
 extern void Motor_uncalibrate(Motor* o);
 
-extern BOOL Motor_set_run(Motor* o); //
+extern BOOL Motor_set_run(Motor* o, int16_t low_lev_ctrl_type); //
 extern void Motor_set_idle(Motor* o); //
 extern void Motor_force_idle(Motor* o); //
 

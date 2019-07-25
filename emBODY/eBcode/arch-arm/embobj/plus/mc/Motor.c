@@ -73,15 +73,43 @@ static void Motor_config_current_PID_2FOC(Motor* o, eOmc_PID_t* pidcurrent)
 {
     int8_t KpKiKdKs[7];
     
-    ((int16_t*)KpKiKdKs)[0] = pidcurrent->kp;    //Kp
-    ((int16_t*)KpKiKdKs)[1] = pidcurrent->ki;    //Ki
-    ((int16_t*)KpKiKdKs)[2] = pidcurrent->kd;    //Kd (unused in 2FOC)
-               KpKiKdKs [6] = pidcurrent->scale; // shift
+    float32_t ks = 1.0f/(float32_t)(1<<pidcurrent->scale);
+    float32_t kp = ks*pidcurrent->kp;
+    float32_t ki = ks*pidcurrent->ki;
+    float32_t kd = ks*pidcurrent->kd;
     
-    //((int16_t*)KpKiKdKs)[0] =  8; //Kp
-    //((int16_t*)KpKiKdKs)[1] =  2; //Ki
-    //((int16_t*)KpKiKdKs)[2] =  0; //Kd (unused in 2FOC)
-    //           KpKiKdKs [6] = 10; // shift
+    if (kp<0.0f || ki<0.0f || kd<0.0f) return;
+    
+    float32_t   max = kp;
+    if (ki>max) max = ki;
+    if (kd>max) max = kd;
+    
+    int16_t Kp = 0;
+    int16_t Ki = 0;
+    int16_t Kd = 0;
+    uint8_t Ks = 0;
+    
+    for (int exponent = 0; exponent < 16; ++exponent)
+    {
+        float32_t power = (float32_t)(1<<exponent);
+        
+        if (max < power)
+        {
+            Kp = (int16_t)(kp*32768.0f/power);
+            Ki = (int16_t)(ki*32768.0f/power);
+            Kd = (int16_t)(kd*32768.0f/power);
+            Ks = 15-exponent;
+            
+            break;
+        }    
+    }
+    
+    ((int16_t*)KpKiKdKs)[0] = Kp;
+    ((int16_t*)KpKiKdKs)[1] = Ki;
+    ((int16_t*)KpKiKdKs)[2] = Kd; //(unused in 2FOC)
+               KpKiKdKs [6] = Ks; // shift
+    
+    send_debug_message("CURRENT PID", o->ID, Ks, (((uint64_t)Kp)<<32) | Ki);
     
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, o->ID, 0);
     
@@ -96,16 +124,44 @@ static void Motor_config_velocity_PID_2FOC(Motor* o, eOmc_PID_t* pidvelocity)
 {
     int8_t KpKiKdKs[7];
     
-    ((int16_t*)KpKiKdKs)[0] = pidvelocity->kp;    //Kp
-    ((int16_t*)KpKiKdKs)[1] = pidvelocity->ki;    //Ki
-    ((int16_t*)KpKiKdKs)[2] = pidvelocity->kd;    //Kd (unused in 2FOC)
-               KpKiKdKs [6] = pidvelocity->scale; // shift
+    float32_t ks = 1.0f/(float32_t)(1<<pidvelocity->scale);
+    float32_t kp = ks*pidvelocity->kp;
+    float32_t ki = ks*pidvelocity->ki;
+    float32_t kd = ks*pidvelocity->kd;
+    
+    if (kp<0.0f || ki<0.0f || kd<0.0f) return;
+    
+    float32_t   max = kp;
+    if (ki>max) max = ki;
+    if (kd>max) max = kd;
+    
+    int16_t Kp = 0;
+    int16_t Ki = 0;
+    int16_t Kd = 0;
+    uint8_t Ks = 0;
+    
+    for (int exponent = 0; exponent < 16; ++exponent)
+    {
+        float32_t power = (float32_t)(1<<exponent);
         
-    //((int16_t*)KpKiKdKs)[0] =  0x0C; //Kp
-    //((int16_t*)KpKiKdKs)[1] =  0x10; //Ki
-    //((int16_t*)KpKiKdKs)[2] =  0x00; //Kd (unused in 2FOC)
-    //           KpKiKdKs [6] =  0x0A; // shift
+        if (max < power)
+        {
+            Kp = (int16_t)(kp*32768.0f/power);
+            Ki = (int16_t)(ki*32768.0f/power);
+            Kd = (int16_t)(kd*32768.0f/power);
+            Ks = 15-exponent;
+            
+            break;
+        }    
+    }
+    
+    ((int16_t*)KpKiKdKs)[0] = Kp;
+    ((int16_t*)KpKiKdKs)[1] = Ki;
+    ((int16_t*)KpKiKdKs)[2] = Kd; //(unused in 2FOC)
+               KpKiKdKs [6] = Ks; // shift
         
+    send_debug_message("VELOCITY PID", o->ID, Ks, (((uint64_t)Kp)<<32) | Ki);
+    
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, o->ID, 0);
     
     eOcanprot_command_t cmdPid;
@@ -130,20 +186,6 @@ static void Motor_config_max_currents_2FOC(Motor* o, eOmc_current_limits_params_
 
 static void Motor_config_2FOC(Motor* o, eOmc_motor_config_t* config)
 {   
-    int8_t KpKiKdKs[7];
-    
-    ((int16_t*)KpKiKdKs)[0] = config->pidcurrent.kp;    //Kp
-    ((int16_t*)KpKiKdKs)[1] = config->pidcurrent.ki;    //Ki
-    ((int16_t*)KpKiKdKs)[2] = config->pidcurrent.kd;    //Kd (unused in 2FOC)
-               KpKiKdKs [6] = config->pidcurrent.scale; // shift
-    
-    //((int16_t*)KpKiKdKs)[0] =  8; //Kp
-    //((int16_t*)KpKiKdKs)[1] =  2; //Ki
-    //((int16_t*)KpKiKdKs)[2] =  0; //Kd (unused in 2FOC)
-    //           KpKiKdKs [6] = 10; // shift
-    
-    //uint32_t max_current = config->currentLimits.peakCurrent;
-    
     #define HAS_QE         0x0001
     #define HAS_HALL       0x0002
     #define HAS_TSENS      0x0004
@@ -169,16 +211,12 @@ static void Motor_config_2FOC(Motor* o, eOmc_motor_config_t* config)
 
     eOprotID32_t id32 = eoprot_ID_get(eoprot_endpoint_motioncontrol, eoprot_entity_mc_motor, o->ID, 0);
     
-    eOcanprot_command_t cmdPid;
-    cmdPid.clas = eocanprot_msgclass_pollingMotorControl;
-    cmdPid.type = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID;
-    cmdPid.value = KpKiKdKs;
-    eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdPid, id32);
+    Motor_config_current_PID_2FOC(o, &(config->pidcurrent));
+    Motor_config_velocity_PID_2FOC(o, &(config->pidspeed));
         
     eOcanprot_command_t cmdMaxCurrent;
     cmdMaxCurrent.clas = eocanprot_msgclass_pollingMotorControl;
     cmdMaxCurrent.type = ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_LIMIT;
-    //cmdMaxCurrent.value = &max_current;
     cmdMaxCurrent.value = &(config->currentLimits);
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &cmdMaxCurrent, id32);
 
@@ -244,8 +282,6 @@ void Motor_config(Motor* o, uint8_t ID, eOmc_motor_config_t* config) //
 {
     // const init
     o->ID                 = ID;
-    //o->HARDWARE_TYPE      = hardware_type;
-    //o->MOTOR_CONTROL_TYPE = motor_control_type;
     o->GEARBOX            = config->gearbox_M2J;
     o->HAS_TEMP_SENSOR    = config->hasTempSensor;
     
@@ -317,6 +353,10 @@ void Motor_config_max_currents(Motor* o, eOmc_current_limits_params_t* current_p
     }
 }
 
+//extern void Motor_config_current_PID(Motor* o, eOmc_PID_t* pid);
+//extern void Motor_config_torque_PID(Motor* o, eOmc_PID_t* pid);
+//extern void Motor_config_speed_PID(Motor* o, eOmc_PID_t* pid);
+
 void Motor_config_current_PID(Motor* o, eOmc_PID_t* pidcurrent)
 {
     if (o->HARDWARE_TYPE == HARDWARE_2FOC)
@@ -325,7 +365,12 @@ void Motor_config_current_PID(Motor* o, eOmc_PID_t* pidcurrent)
     }
 }
 
-void Motor_config_velPID(Motor* o, eOmc_PID_t* pidvelocity)
+void Motor_config_torque_PID(Motor* o, eOmc_PID_t* pid) //
+{
+    PID_config(&o->trqPID, pid);
+}
+
+void Motor_config_speed_PID(Motor* o, eOmc_PID_t* pidvelocity)
 {
     if (o->HARDWARE_TYPE == HARDWARE_2FOC)
     {
@@ -336,11 +381,6 @@ void Motor_config_velPID(Motor* o, eOmc_PID_t* pidvelocity)
 void Motor_destroy(Motor* o) //
 {
     DELETE(o);
-}
-
-void Motor_config_trqPID(Motor* o, eOmc_PID_t* pid) //
-{
-    PID_config(&o->trqPID, pid);
 }
 
 void Motor_config_filter(Motor* o, uint8_t filter) //
@@ -358,7 +398,7 @@ void Motor_calibrate_withOffset(Motor* o, int32_t offset) //
     o->pos_calib_offset = offset;
     o->pos_fbk_old = 0;
     o->not_init = TRUE;
-    Motor_set_run(o);
+    //Motor_set_run(o, PWM_INPUT_MOTOR);
     
     if(o->HARDWARE_TYPE == HARDWARE_MC4p)
     {
@@ -368,7 +408,7 @@ void Motor_calibrate_withOffset(Motor* o, int32_t offset) //
 
 BOOL Motor_calibrate_moving2Hardstop(Motor* o, int32_t pwm, int32_t zero) //
 {
-    Motor_set_run(o);
+    Motor_set_run(o, eomc_ctrl_out_type_pwm);
     Motor_check_faults(o);
     
     if(Motor_is_in_fault(o))
@@ -465,7 +505,7 @@ extern void Motor_do_calibration_hard_stop(Motor* o)
     }
 }
 
-BOOL Motor_set_run(Motor* o) //
+BOOL Motor_set_run(Motor* o, int16_t low_lev_ctrl_type)
 {
     if (o->HARDWARE_TYPE == HARDWARE_2FOC)
     {
@@ -476,28 +516,23 @@ BOOL Motor_set_run(Motor* o) //
     }
     
     icubCanProto_controlmode_t control_mode;
-    char message[150];
     
-    switch (o->MOTOR_CONTROL_TYPE)
+    switch (low_lev_ctrl_type)
     {
-        case PWM_CONTROLLED_MOTOR:
+        case eomc_ctrl_out_type_pwm:
             control_mode = icubCanProto_controlmode_openloop;
             break;
         
-        case VEL_CONTROLLED_MOTOR:
+        case eomc_ctrl_out_type_vel:
             control_mode = icubCanProto_controlmode_speed_voltage;
             break;
 
-        case IQQ_CONTROLLED_MOTOR:
+        case eomc_ctrl_out_type_cur:
             control_mode = icubCanProto_controlmode_current;
             break;
         
         default:
-        {
-            snprintf(message, sizeof(message), "Motor_set_run: unknown control type par16=type par64=hwtype" );
-            send_debug_message(message, o->ID , o->MOTOR_CONTROL_TYPE, o->HARDWARE_TYPE);
             return FALSE;
-        }
     }
     
     if (o->HARDWARE_TYPE == HARDWARE_2FOC)
@@ -515,8 +550,7 @@ BOOL Motor_set_run(Motor* o) //
     }
     else
     {
-         snprintf(message, sizeof(message), "Motor_set_run: unknown hw type. par16=type par64=hwtype" );
-         send_debug_message(message, o->ID , o->MOTOR_CONTROL_TYPE, o->HARDWARE_TYPE);
+        return FALSE;
     }
     
     return TRUE;

@@ -589,7 +589,7 @@ static eOresult_t s_eocanprotMCperiodic_convert_icubCanProtoControlMode2eOmcCont
         
         case icubCanProto_controlmode_velocity:
         {
-            *eomc_controlmode = eomc_controlmode_velocity;
+            *eomc_controlmode = eomc_controlmode_velocity; //
         } break;
         
         case icubCanProto_controlmode_torque:

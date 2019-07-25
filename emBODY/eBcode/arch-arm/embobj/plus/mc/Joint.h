@@ -107,8 +107,11 @@ typedef struct // Joint
 {
     uint8_t ID;
     
-    PID posPID;
-    PID velPID;
+    //PID posPID;
+    //PID velPID;
+    
+    PID minjerkPID;
+    PID directPID;
     
     CTRL_UNITS dead_zone;
     
@@ -152,9 +155,8 @@ typedef struct // Joint
     CTRL_UNITS tcKstiff;
     CTRL_UNITS tcKdamp;
     
-    CTRL_UNITS scKpos;
-    CTRL_UNITS scKvel;
-    CTRL_UNITS scKstill;
+    //CTRL_UNITS scKpos;
+    //CTRL_UNITS scKvel;
     
     CTRL_UNITS Kadmitt;
     
@@ -166,13 +168,10 @@ typedef struct // Joint
     eOmc_controlmode_t     control_mode;
     eOmc_interactionmode_t interaction_mode;
     
-    uint8_t MOTOR_CONTROL_TYPE;
-    
     int8_t pushing_limit;
     
     BOOL pos_control_active;
     BOOL trq_control_active;
-    BOOL CAN_DO_TRQ_CTRL;
     
     BOOL not_reversible;
     CableConstraintData cable_constr;
@@ -217,7 +216,7 @@ extern void Joint_set_hardware_limit(Joint* o);
 extern BOOL Joint_manage_cable_constraint(Joint* o);
 extern BOOL Joint_manage_R1_finger_tension_constraint(Joint* o);
 
-extern CTRL_UNITS Joint_do_pwm_control(Joint* o);
+extern CTRL_UNITS Joint_do_pwm_or_current_control(Joint* o);
 extern CTRL_UNITS Joint_do_vel_control(Joint* o);
 
 extern BOOL Joint_set_control_mode(Joint* o, eOmc_controlmode_command_t control_mode);
@@ -233,8 +232,10 @@ extern BOOL Joint_get_pid_state(Joint* o, eOmc_joint_status_ofpid_t* pid_state);
 extern BOOL Joint_set_pos_ref(Joint* o, CTRL_UNITS pos_ref, CTRL_UNITS vel_ref);
 extern BOOL Joint_set_vel_ref(Joint* o, CTRL_UNITS vel_ref, CTRL_UNITS acc_ref);
 extern BOOL Joint_set_pos_raw(Joint* o, CTRL_UNITS pos_ref);
+extern BOOL Joint_set_vel_raw(Joint* o, CTRL_UNITS vel_ref);
 extern BOOL Joint_set_trq_ref(Joint* o, CTRL_UNITS trq_ref);
-extern BOOL Joint_set_out_ref(Joint* o, CTRL_UNITS out_ref);
+extern BOOL Joint_set_pwm_ref(Joint* o, CTRL_UNITS pwm_ref);
+extern BOOL Joint_set_cur_ref(Joint* o, CTRL_UNITS cur_ref);
 extern void Joint_stop(Joint* o);
 
 extern BOOL Joint_set_pos_ref_in_calibType6(Joint* o, CTRL_UNITS pos_ref, CTRL_UNITS vel_ref);

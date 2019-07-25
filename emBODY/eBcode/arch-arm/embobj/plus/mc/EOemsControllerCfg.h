@@ -40,10 +40,11 @@ extern "C" {
 #define HARDWARE_2FOC        1
 #define HARDWARE_MC4p        2
 
-#define PWM_CONTROLLED_MOTOR 1
-#define VEL_CONTROLLED_MOTOR 2
-#define IQQ_CONTROLLED_MOTOR 3
-#define POS_CONTROLLED_MOTOR 4
+//#define NOT_AVAIL_MOTOR 0
+//#define PWM_INPUT_MOTOR 1
+//#define VEL_INPUT_MOTOR 2
+//#define TRQ_INPUT_MOTOR 3
+//#define POS_INPUT_MOTOR 4
 
 ///////#warning in v3 fare in modo che NON venga definito USE_2FOC_FAST_ENCODER 
 
