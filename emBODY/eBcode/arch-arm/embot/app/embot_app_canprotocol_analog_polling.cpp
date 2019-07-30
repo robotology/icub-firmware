@@ -242,6 +242,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
         switch(candata.datainframe[0])
         {
+                        
             case static_cast<std::uint8_t>(SkinType::withTemperatureCompensation):
             {
                 info.skintype = SkinType::withTemperatureCompensation;
@@ -261,7 +262,12 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
             {
                 info.skintype = SkinType::testmodeRAW;
             } break;
-            
+ 
+            case static_cast<std::uint8_t>(SkinType::withTemperatureCompensationV2):
+            {
+                info.skintype = SkinType::withTemperatureCompensationV2;
+            } break;
+                       
             default:
             {
                 info.skintype = SkinType::none;

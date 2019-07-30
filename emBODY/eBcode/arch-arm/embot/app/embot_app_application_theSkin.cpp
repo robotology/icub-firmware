@@ -91,6 +91,7 @@ struct Triangles
     TriangleCfg         config[trgNumberOf];
     static const std::uint8_t GAIN[dotNumberOf];
     static const std::uint8_t GAIN_PALM[dotNumberOf];
+    static const std::uint8_t GAIN_V2[dotNumberOf];
     if2hw_data_ad7147_t capoffsets[trgNumberOf][dotNumberOf];
     if2hw_data_ad7147_t rawvalues[trgNumberOf][dotNumberOf];
     TriangleErr         errors[trgNumberOf];
@@ -104,7 +105,7 @@ struct Triangles
 
 const std::uint8_t Triangles::GAIN[dotNumberOf] = {70 ,96, 83, 38, 38, 70, 0, 45, 77, 164, 0, 77}; // these gains are moltiplied by 128 with respect to matlab
 const std::uint8_t Triangles::GAIN_PALM[dotNumberOf] = {0 ,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}; // these gains are moltiplied by 128 with respect to matlab
-
+const std::uint8_t Triangles::GAIN_V2[dotNumberOf] = {58 , 91, 39, 23, 35, 90, 0, 38, 68, 115, 0, 86}; // from simeone.dussoni on 30jul19
 
 
 //    static const std::uint8_t GAIN[12] = {70 ,96, 83, 38, 38, 70, 0, 45, 77, 164, 0, 77}; // these gains are moltiplied by 128 with respect to matlab
@@ -250,9 +251,11 @@ bool embot::app::application::theSkin::Impl::stop()
     return true;
 }
 
+
 int embot::app::application::theSkin::Impl::computedrift(std::uint8_t trg, std::uint8_t dot)
 {
     std::uint8_t gain = 0; 
+    std::uint8_t posTemp = 6; 
     if2hw_data_ad7147_t Tpad_base = 0;
     if2hw_data_ad7147_t Tpad = 0;
     
@@ -261,26 +264,27 @@ int embot::app::application::theSkin::Impl::computedrift(std::uint8_t trg, std::
     switch(boardconfig.skintype)
     {        
         case embot::app::canprotocol::analog::polling::Message_SKIN_SET_BRD_CFG::SkinType::withTemperatureCompensation:
-        {
-            gain = triangles.GAIN[dot];  
-            Tpad_base = triangles.capoffsets[trg][6]; // in original mtb3 code there is ADCRESULT_S6 which is defined as 6
-            Tpad = triangles.rawvalues[trg][6];
-                
-            if(Tpad > Tpad_base)
-            {
-                drift = ( ( (Tpad - Tpad_base) >> 2) * gain ) >> 5;
-            }
-            else
-            {
-                drift = -( ( (Tpad_base - Tpad) >> 2) * gain ) >> 5;
-            }     
-        } break;
-        
         case embot::app::canprotocol::analog::polling::Message_SKIN_SET_BRD_CFG::SkinType::palmFingerTip:
+        case embot::app::canprotocol::analog::polling::Message_SKIN_SET_BRD_CFG::SkinType::withTemperatureCompensationV2:
         {
-            gain = triangles.GAIN_PALM[dot];  // in original mtb3 code GAIN_PALM[] is ... all zero, hence drift is ZERO! 
-            Tpad_base = triangles.capoffsets[trg][11]; // in original mtb3 code there is ADCRESULT_S11 which is defined as 11
-            Tpad = triangles.rawvalues[trg][11];
+            if(embot::app::canprotocol::analog::polling::Message_SKIN_SET_BRD_CFG::SkinType::withTemperatureCompensation == boardconfig.skintype)
+            {
+                gain = triangles.GAIN[dot];  
+                posTemp = 6;
+            }
+            else if(embot::app::canprotocol::analog::polling::Message_SKIN_SET_BRD_CFG::SkinType::palmFingerTip == boardconfig.skintype)
+            {
+                gain = triangles.GAIN_PALM[dot];
+                posTemp = 11;
+            }
+            else
+            {
+                gain = triangles.GAIN_V2[dot];
+                posTemp = 6;
+            }
+                        
+            Tpad_base = triangles.capoffsets[trg][posTemp]; // in original mtb3 code there is ADCRESULT_S6 which is defined as 6
+            Tpad = triangles.rawvalues[trg][posTemp];
                 
             if(Tpad > Tpad_base)
             {
@@ -291,6 +295,7 @@ int embot::app::application::theSkin::Impl::computedrift(std::uint8_t trg, std::
                 drift = -( ( (Tpad_base - Tpad) >> 2) * gain ) >> 5;
             }     
         } break;
+                        
         
         default:
         case embot::app::canprotocol::analog::polling::Message_SKIN_SET_BRD_CFG::SkinType::testmodeRAW:

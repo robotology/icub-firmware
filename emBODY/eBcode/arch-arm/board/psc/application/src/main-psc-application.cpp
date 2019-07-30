@@ -87,7 +87,7 @@ embot::hw::tlv493d::Config tlvconfig { tlvi2c, 400000 };
 
 
 
-static const embot::app::canprotocol::versionOfAPPLICATION vAP = {1, 2, 0};
+static const embot::app::canprotocol::versionOfAPPLICATION vAP = {1, 2, 1};
 static const embot::app::canprotocol::versionOfCANPROTOCOL vCP = {2, 0};
 
 static void userdeflauncher(void* param);

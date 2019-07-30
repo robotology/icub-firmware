@@ -233,7 +233,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
     {
         public:
             
-        enum class SkinType { withTemperatureCompensation = 0, palmFingerTip = 1, withoutTempCompensation = 2, testmodeRAW = 7, none = 254 };
+        enum class SkinType { withTemperatureCompensation = 0, palmFingerTip = 1, withoutTempCompensation = 2, testmodeRAW = 7, withTemperatureCompensationV2 = 8, none = 254 };
                         
         struct Info
         { 
