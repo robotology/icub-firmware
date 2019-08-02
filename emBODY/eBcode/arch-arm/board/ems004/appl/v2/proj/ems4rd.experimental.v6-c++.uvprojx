@@ -10,13 +10,13 @@
       <TargetName>ems4rd</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6110000::V6.11::.\ARMCLANG</pCCUsed>
+      <pCCUsed>6120000::V6.12::.\ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32F407IG</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F4xx_DFP.2.12.0</PackID>
+          <PackID>Keil.STM32F4xx_DFP.2.13.0</PackID>
           <PackURL>http://www.keil.com/pack</PackURL>
           <Cpu>IRAM(0x20000000-0x2001FFFF) IRAM2(0x10000000-0x1000FFFF) IROM(0x8000000-0x80FFFFF) CLOCK(25000000) CPUTYPE("Cortex-M4") FPU2</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -891,6 +891,11 @@
               <FileName>EOtheTemperatures.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\eoappservices\EOtheTemperatures.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOthePSC.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\eoappservices\EOthePSC.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2229,6 +2234,11 @@
               <FileName>EOtheTemperatures.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\eoappservices\EOtheTemperatures.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOthePSC.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\eoappservices\EOthePSC.c</FilePath>
             </File>
           </Files>
         </Group>
