@@ -30,7 +30,7 @@ void pwmInit(short pwm_50_duty_cycle, short pwm_deadtime, short pwm_max)
     // Note: The PWM period setting register is set to LoopInTcy/2 but since it counts up and
     // then down => the interrupt flag is set to 1 at zero => actual
     // interrupt period is LoopInTcy
-    PTPER = PWM_50_DUTY_CYCLE; // Setup PWM period to Loop Time defined in parms.h
+    PTPER = PWM_50_DUTY_CYCLE-1; // Setup PWM period to Loop Time defined in parms.h
     PWMCON1 = 0x0077; // Enable PWM 1,2,3 pairs (L+H) for complementary mode
     DTCON1 = (0x00 | (PWM_DEADTIME)); // Dead time. Prescaler 0
     DTCON2 = 0;
@@ -44,8 +44,10 @@ void pwmInit(short pwm_50_duty_cycle, short pwm_deadtime, short pwm_max)
     // SEVTCMP: Special Event Compare Count Register
     // Phase of ADC capture set relative to PWM cycle: when arrive to PTPER offset and counting down
     // to avoid ripple on the current measurement
-    SEVTCMP = 0;
-    SEVTCMPbits.SEVTDIR = 1;
+    P1SECMP = 0;
+    P1SECMPbits.SEVTDIR = 1; // when PWM time base is counting down
+    P1SECMPbits.SEVTCMP = 0; // at the end of countdown
+    PWM1CON2bits.SEVOPS = 0b0000; // Output Postscale value to 1:1    
 }
 
 volatile unsigned char PWM_ovcurr_fault = 0;

@@ -76,7 +76,7 @@
 // I2T parameters for FILTER implementation
 #define UDEF_I2T_LIMIT 90 // %
 
-#define PWMFREQUENCY  20000
+#define PWMFREQUENCY  40000
 
 // Deadtime in seconds (range 1.6 us to 25 ns)
 // DHES accept a greater zero cross distortion in order to keep lower temperature
