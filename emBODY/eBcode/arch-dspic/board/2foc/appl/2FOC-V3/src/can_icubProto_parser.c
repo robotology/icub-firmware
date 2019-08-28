@@ -257,16 +257,14 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
 
         if (rxlen==8)
         {
-            //int  kp=((int)rxpayload->b[1])|(((int)rxpayload->b[2])<<8);
-            //int  ki=((int)rxpayload->b[3])|(((int)rxpayload->b[4])<<8);
-            //char ks=rxpayload->b[7];
+            int  kp=((int)rxpayload->b[1])|(((int)rxpayload->b[2])<<8);
+            int  ki=((int)rxpayload->b[3])|(((int)rxpayload->b[4])<<8);
+            char ks=rxpayload->b[7];
 
-            //setIPid(kp,ki,ks);
+            setIPid(kp,ki,ks);
 
-            setIPid(*(int*)(&rxpayload->b[1]),*(int*)(&rxpayload->b[3]),rxpayload->b[7]);
-
-        return 1;
-    }
+            return 1;
+        }
         else if (rxlen==6)
         {
             static float fkp = 0.0f;
@@ -285,7 +283,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             int exponent = 0;
             
             for (exponent = 0; exponent < 16; ++exponent)
-    {
+            {
                 float power = (float)(1<<exponent);
         
                 if (max < power)
@@ -308,13 +306,11 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
 
         if (rxlen==8)
         {
-            //int  kp=((int)rxpayload->b[1])|(((int)rxpayload->b[2])<<8);
-            //int  ki=((int)rxpayload->b[3])|(((int)rxpayload->b[4])<<8);
-            //char ks=rxpayload->b[7];
+            int  kp=((int)rxpayload->b[1])|(((int)rxpayload->b[2])<<8);
+            int  ki=((int)rxpayload->b[3])|(((int)rxpayload->b[4])<<8);
+            char ks=rxpayload->b[7];
 
-            //setSPid(kp,ki,ks);
-            
-            setSPid(*(int*)(&rxpayload->b[1]),*(int*)(&rxpayload->b[3]),rxpayload->b[7]);
+            setSPid(kp,ki,ks);
             
             return 1;
         }
@@ -342,8 +338,8 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
                 if (max < power)
                 {
                     setSPid((int)(fkp*32768.0f/power),(int)(fki*32768.0f/power),15-exponent);
-
-        return 1;
+                    
+                    return 1;
                 }
             }
             
