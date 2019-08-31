@@ -102,9 +102,9 @@ enable_retry:
     PDC1 = PDC2 = PDC3 = PWM_50_DUTY_CYCLE; // IDLE to 50% PWM
     PTCONbits.PTEN = 1; // Enable PWM generation
 
-    // clear fault flag before start fault mechanism
-    IFS3bits.FLTA1IF = 0;
-    IEC3bits.FLTA1IE = 1;
+#ifndef RELENTLESS
+    OverCurrentFaultIntEnable();
+#endif
 
     FLTACON = 7; // fault enabled
 

@@ -58,7 +58,7 @@ typedef struct {
 //void ClarkePark(void);  // Calculate qId,qIq from qCos,qSin,qIa,qIb
 //void InvPark(void);     // Calculate qValpha, qVbeta from qSin,qCos,qVd,qVq
 
-extern tParkParm ParkParm;
+extern volatile tParkParm ParkParm;
 #endif
 
 

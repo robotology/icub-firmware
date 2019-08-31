@@ -10,6 +10,7 @@
 
 extern void DHESInit();
 extern unsigned char DHESRead();
+extern char DHESSector();
 extern long DHESPosition();
 extern int DHESVelocity();
 

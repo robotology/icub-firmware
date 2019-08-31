@@ -148,7 +148,7 @@ volatile long gQEPosition = 0;
 volatile int  gQEVelocity = 0;
 volatile tMeasCurrParm MeasCurrParm;
 volatile tCtrlReferences CtrlReferences;
-tParkParm ParkParm;
+volatile tParkParm ParkParm;
 
 /////////////////////////////////////////////////
 
@@ -196,12 +196,14 @@ volatile long sI2Tlimit = 0;
 
 volatile int  IKp = 0; //8;
 volatile int  IKi = 0; //2;
+volatile int  IKo = 0; //0;
 volatile char IKs = 0; //10;
 volatile long IIntLimit = 0;//800L*1024L;
 
 volatile int  SKp = 0x0C;
 volatile int  SKi = 0x10;
 volatile char SKs = 0x0A;
+volatile int  SKo = 512;
 volatile long SIntLimit = 0;//800L*1024L;
 
 /////////////////////////////////////////
@@ -220,6 +222,7 @@ void setIPid(int kp, int ki, char shift)
     IKp = kp;
     IKi = ki/2;
     IKs = shift;
+    if (IKs>0) IKo = 1<<(IKs-1); else IKo = 0;
     IIntLimit = ((long)PWM_MAX)<<shift;
 }
 
@@ -228,6 +231,7 @@ void setSPid(int kp, int ki, char shift)
     SKp = kp;
     SKi = ki/2;
     SKs = shift;
+    if (SKs>0) SKo = 1<<(SKs-1); else SKo = 0;
     SIntLimit = ((long)PWM_MAX)<<shift;
 }
 
@@ -265,31 +269,6 @@ void ResetSetpointWatchdog()
     WriteTimer5(0);
     IFS1bits.T5IF = 0;
 }
-
-        ///////////////////////////
-        /*
-        static int qe_watchdog = 0;
-        if (delta)
-        {
-            QEisOk = 1;
-            qe_watchdog = 0;
-        }
-        else if (!MotorConfig.has_hall)
-        {
-            if ((I2Tdata.IQMeasured > Ipeak/2) || (I2Tdata.IQMeasured < -Ipeak/2))
-            {
-                if (++qe_watchdog > 10000)
-                {
-                    // QE is broken
-                    qe_watchdog = 0;
-                    gEncoderError.stuck = TRUE;
-                    SysError.EncoderFault = TRUE;
-                    FaultConditionsHandler();
-                }
-            }
-        }
-        */
-        ///////////////////////////
 
 BOOL updateOdometry()
 {
@@ -346,7 +325,84 @@ volatile int dataD = 0;
     
 extern volatile BOOL newencdata;
 
-int alignRotor(volatile int* IqRef)
+int alignRotorHES(volatile int* IqRef)
+{
+    if (!sAlignInProgress) return 0;
+
+    static int encoder_fake = 0;
+    
+    static int IqRef_fake = 0;
+    
+    static BOOL moved = FALSE;
+    
+    if (abs((int)POSCNT) > 32) moved = TRUE;
+    
+    const int ENCODER_1_5_REV = (3*QE_ELETTR_DEG_PER_REV())/2;
+    
+    if (sAlignInProgress < 3)
+    {       
+        if (QEready())
+        {
+            if (!moved)
+            {
+                // phase is broken
+                *IqRef = IqRef_fake = 0;
+                QE_RISE_ERROR(phase_broken);
+                sAlignInProgress = 0;
+            }
+            
+            sAlignInProgress = 0;
+            gEncoderError.uncalibrated = 0;
+            QEcountErrorClear();
+        }
+    }
+    
+    if (sAlignInProgress == 1)
+    {
+        static int timer = 0;
+        
+        if (IqRef_fake < Inom/2)
+        {
+            ++IqRef_fake;
+        }
+        else if (encoder_fake < ENCODER_1_5_REV)
+        {
+            if (++timer > 200) { timer = 0; ++encoder_fake; }
+        }
+        else
+        {
+            sAlignInProgress = 2;
+        }
+    }
+    
+    if (sAlignInProgress == 2)
+    {
+        static int timer = 0;
+        
+        if (encoder_fake > -ENCODER_1_5_REV)
+        {
+            if (++timer > 200) { timer = 0; --encoder_fake; }
+        }
+        else
+        {
+            // Index is broken
+            *IqRef = IqRef_fake = 0;
+            QE_RISE_ERROR(index_broken);
+            sAlignInProgress = 0;
+        }
+    }
+    
+    *IqRef = IqRef_fake;
+    
+    int encoder = encoder_fake;
+    
+    while (encoder >= 360) encoder -= 360;
+    while (encoder <    0) encoder += 360;
+    
+    return encoder;
+}
+
+int alignRotorIndex(volatile int* IqRef)
 {
     if (MotorConfig.has_hall) return 0;
     
@@ -532,20 +588,22 @@ int alignRotor(volatile int* IqRef)
 extern volatile int dataC;
 extern volatile int dataD;
 
+volatile int angle_feedback = 0;
+volatile int sectr_feedback = 0;
+
+volatile short Ia = 0, Ib = 0, Ic = 0;
+volatile short Va = 0, Vb = 0, Vc = 0;
+
 void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
 {
     int Vq = 0;
 
     static const int cos_table[] = {32767,32763,32748,32723,32688,32643,32588,32523,32449,32364,32270,32165,32051,31928,31794,31651,31498,31336,31164,30982,30791,30591,30381,30163,29935,29697,29451,29196,28932,28659,28377};
     static const int sin_table[] = {    0,  330,  660,  990, 1319, 1648, 1977, 2305, 2632, 2959, 3285, 3609, 3933, 4255, 4576, 4896, 5214, 5531, 5846, 6159, 6470, 6779, 7087, 7392, 7694, 7995, 8293, 8588, 8881, 9171, 9459};
-
-    static int *ppwmH = NULL, *ppwmL = NULL, *ppwm0 = NULL;
-    static int Va = 0, Vb = 0, Vc = 0;
     
-    static short *iH,*iL,*i0;
-
-    static BOOL starting = TRUE;
-
+    volatile static short *iH, *iL, *i0;
+    volatile static short *ppwmH, *ppwmL, *ppwm0;
+    
     // setting CORCON in this way rather than using CORCONbits is
     // slightly more efficient (because CORCONbits is volatile and
     // optimizer cannot collapse multiple bit operations)
@@ -554,190 +612,135 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
     // read and compensate ADC offset by MeasCurrParm.Offseta, Offsetb, Offsetc
     // scale currents by MeasCurrParm.qKa, qKb, qKc
     // Calculate ParkParm.qIa, qIb, qIc
-    MeasAndCompIaIcCalculateIb();
-
+    //MeasAndCompIaIcCalculateIb();
+    
+    ParkParm.qIa = (int)((__builtin_mulss(MeasCurrParm.Offseta-ADCBuffer[0],MeasCurrParm.qKa)+8192L)>>14); 
+    ParkParm.qIc = (int)((__builtin_mulss(MeasCurrParm.Offsetc-ADCBuffer[1],MeasCurrParm.qKc)+8192L)>>14);
+    
     ParkParm.qIb = -ParkParm.qIa-ParkParm.qIc;
+    
+    // qIx = 64 is equal to 50 mA current here
+    // since we have 10 bits resolution, left aligned, with LSB = 50 mA
+    
+    // gain = 64/49.03
+    
+    static short Ia_old = 0, Ib_old = 0, Ic_old = 0;
+    
+    Ia = (ParkParm.qIa + Ia_old)/3;
+    Ib = (ParkParm.qIb + Ib_old)/3;
+    Ic = (ParkParm.qIc + Ic_old)/3;
+    
+    // gain = (64/49.03) * (2/3)
+    
+    Ia_old = ParkParm.qIa;
+    Ib_old = ParkParm.qIb;
+    Ic_old = ParkParm.qIc;
 
-    ParkParm.qIa /= 3;
-    ParkParm.qIb /= 3;
-    ParkParm.qIc /= 3;
-
+    //if (Ia>=0) Ia=(Ia+3)/6; else Ia=(Ia-3)/6;
+    //if (Ib>=0) Ib=(Ib+3)/6; else Ib=(Ib-3)/6;
+    //if (Ic>=0) Ic=(Ic+3)/6; else Ic=(Ic-3)/6;
+    
+    if (MotorConfig.has_hall && MotorConfig.has_qe)
+    {
+        static int hall_sector_old = 0;
+                
+        int hall_sector = DHESSector();
+        
+        sectr_feedback = hall_sector;
+        
+        if (hall_sector != hall_sector_old)
+        {
+            if (hall_sector_old == 6 && hall_sector == 1)
+            {
+                QEsignalZeroCrossing(1);
+            }
+            else if (hall_sector_old == 1 && hall_sector == 6)
+            {
+                QEsignalZeroCrossing(0);
+            }
+            
+            hall_sector_old = hall_sector;
+        }
+    }
+    
     int enc = 0;
-    static int enc_start_sec = 0;
-    BOOL has_speed_sample = FALSE;
-
+    
     if (MotorConfig.has_qe)
     {
         // overwrite encoders during alignment
         if (sAlignInProgress)
         {
-            enc = alignRotor(&IqRef);
+            if (MotorConfig.has_hall)
+            {
+                enc = alignRotorHES(&IqRef);
+            }
+            else if (MotorConfig.has_index)
+            {
+                enc = alignRotorIndex(&IqRef);
+            }
         }
         else
-        {
+        {            
             enc = QEgetElettrDeg();
         }
     }
+    else if (MotorConfig.has_hall)
+    {
+        enc = 60*(DHESSector()-1);
+    }
+    else // no HALL, no encoders, just test
+    {
+        static int t = 0;
+        static int senc = 0;
 
-    has_speed_sample = updateOdometry();
+        if (++t > 2000)
+        {
+            t = 0;
+            ++senc;
+            if (senc > 359) senc = 0;
+        }
+        
+        enc = senc;
+    }
+    
+    BOOL has_speed_sample = updateOdometry();
 
     // enc is in [0 - 360) range here
 
-    char sector = 0;
-
-    if (MotorConfig.has_hall)
-    {
-#ifdef R1_UPPER_ARM
-        static const char dhes2sector[] = {0,2,6,1,4,3,5}; // R1 upper arm
-#elif defined(MECAPION)
-        static const char dhes2sector[] = {0,6,4,5,2,1,3}; // r1
-#else
-        static const char dhes2sector[] = {0,6,2,1,4,5,3}; // icub
-#endif
-
-        sector = dhes2sector[DHESRead()];
-    }
-    else
-    {
-        sector = 1 + enc/60;
-    }
+    angle_feedback = enc;
+    
+    char sector = 1 + enc/60;
 
     static char sector_stored = 0;
-    static char sector_stored_old = 0;
 
     if (sector_stored != sector)
-    {
-        if (MotorConfig.has_speed_qe)
-        {
-            unsigned int poscnt = QEgetRaw();
-            static unsigned int poscnt_old = 0x7FFF;
-            
-            if (!sAlignInProgress)
-            {
-                if (poscnt_old == poscnt)
-                {
-                    if (sector_stored_old != sector)
-                    {
-                        gEncoderError.phase_broken = TRUE;
-                        SysError.EncoderFault = TRUE;
-                        FaultConditionsHandler();
-                    }
-                }
-                else
-                {
-                    poscnt_old = poscnt;
-                }
-            }
-        }
-
-        if (MotorConfig.has_qe)
-        {
-            if (MotorConfig.has_hall)
-            {
-                unsigned int poscnt = QEgetRaw();
-                static unsigned int poscnt_old = 0x7FFF;
-                if (poscnt_old == poscnt)
-                {
-                    if (sector_stored_old != sector)
-                    {
-                        gEncoderError.phase_broken = TRUE;
-                        SysError.EncoderFault = TRUE;
-                        FaultConditionsHandler();
-                    }
-                }
-                else
-                {
-                    poscnt_old = poscnt;
-                }
-
-                if (sector==1 && sector_stored==6) // positive
-                {
-                    enc_start_sec = enc+30;
-                    if (enc_start_sec >=360) enc_start_sec -=360;
-                }
-                else if (sector==6 && sector_stored==1) // negative
-                {
-                    enc_start_sec = enc-30;
-                    if (enc_start_sec <   0) enc_start_sec +=360;
-                }
-                else if (sector>sector_stored)
-                { // positive rotation
-                    enc_start_sec = enc+30;
-                    if (enc_start_sec >=360) enc_start_sec -=360;
-                }
-                else
-                { // negative rotation
-                    enc_start_sec = enc-30;
-                    if (enc_start_sec <   0) enc_start_sec +=360;
-                }
-            }
-        }
-
-        sector_stored_old = sector_stored;
+    {                
         sector_stored = sector;
         
-        #define HI(Ix,Vx) iH = &(ParkParm.Ix); ppwmH = &Vx;
-        #define LO(Ix,Vx) iL = &(ParkParm.Ix); ppwmL = &Vx;
-        #define NE(Ix,Vx) i0 = &(ParkParm.Ix); ppwm0 = &Vx;
+        #define HI(Ix,Vx) iH = &Ix; ppwmH = &Vx;
+        #define LO(Ix,Vx) iL = &Ix; ppwmL = &Vx;
+        #define NE(Ix,Vx) i0 = &Ix; ppwm0 = &Vx;
         
         switch (sector) // original
         {
-            case 1: HI(qIa,Va) LO(qIb,Vb) NE(qIc,Vc) break; // 1 0 1   5 -> 1
-            case 2: HI(qIa,Va) LO(qIc,Vc) NE(qIb,Vb) break; // 1 0 0   4 -> 2
-            case 3: HI(qIb,Vb) LO(qIc,Vc) NE(qIa,Va) break; // 1 1 0   6 -> 3
-            case 4: HI(qIb,Vb) LO(qIa,Va) NE(qIc,Vc) break; // 0 1 0   2 -> 4
-            case 5: HI(qIc,Vc) LO(qIa,Va) NE(qIb,Vb) break; // 0 1 1   3 -> 5
-            case 6: HI(qIc,Vc) LO(qIb,Vb) NE(qIa,Va) break; // 0 0 1   1 -> 6
+            case 1: HI(Ia,Va) LO(Ib,Vb) NE(Ic,Vc) break; // 1 0 1   5 -> 1
+            case 2: HI(Ia,Va) LO(Ic,Vc) NE(Ib,Vb) break; // 1 0 0   4 -> 2
+            case 3: HI(Ib,Vb) LO(Ic,Vc) NE(Ia,Va) break; // 1 1 0   6 -> 3
+            case 4: HI(Ib,Vb) LO(Ia,Va) NE(Ic,Vc) break; // 0 1 0   2 -> 4
+            case 5: HI(Ic,Vc) LO(Ia,Va) NE(Ib,Vb) break; // 0 1 1   3 -> 5
+            case 6: HI(Ic,Vc) LO(Ib,Vb) NE(Ia,Va) break; // 0 0 1   1 -> 6
         }
-         
-        /*
-        switch (sector) // R1 right wheel
-        {
-            case 1: HI(qIc,Vc) LO(qIa,Va) NE(qIb,Vb) break; // 0 1 1   3 -> 5
-            case 2: HI(qIc,Vc) LO(qIb,Vb) NE(qIa,Va) break; // 0 0 1   1 -> 6
-            case 3: HI(qIa,Va) LO(qIb,Vb) NE(qIc,Vc) break; // 1 0 1   5 -> 1
-            case 4: HI(qIa,Va) LO(qIc,Vc) NE(qIb,Vb) break; // 1 0 0   4 -> 2
-            case 5: HI(qIb,Vb) LO(qIc,Vc) NE(qIa,Va) break; // 1 1 0   6 -> 3
-            case 6: HI(qIb,Vb) LO(qIa,Va) NE(qIc,Vc) break; // 0 1 0   2 -> 4
-        }
-           
-        switch (sector) // R1 left wheel
-        {
-            case 1: HI(qIb,Vb) LO(qIc,Vc) NE(qIa,Va) break; // 1 1 0   6 -> 3
-            case 2: HI(qIb,Vb) LO(qIa,Va) NE(qIc,Vc) break; // 0 1 0   2 -> 4
-            case 3: HI(qIc,Vc) LO(qIa,Va) NE(qIb,Vb) break; // 0 1 1   3 -> 5
-            case 4: HI(qIc,Vc) LO(qIb,Vb) NE(qIa,Va) break; // 0 0 1   1 -> 6
-            case 5: HI(qIa,Va) LO(qIb,Vb) NE(qIc,Vc) break; // 1 0 1   5 -> 1
-            case 6: HI(qIa,Va) LO(qIc,Vc) NE(qIb,Vb) break; // 1 0 0   4 -> 2
-        }
-        */
     }
 
     BOOL negative_sec = sector%2;
 
-    int delta = 0;
-
-    if (MotorConfig.has_hall)
-    {
-        if (MotorConfig.has_qe)
-        {
-            delta = enc - enc_start_sec;
-
-            if (delta >= 180) delta -= 360; else if (delta < -180) delta += 360;
-
-            if (delta>30) delta=30; else if (delta<-30) delta=-30;
-        }
-    }
-    else
-    {
-        delta = (enc%60)-30;
-    }
-
-    // back compatibility
-    //delta = 0;
+    int delta = (enc%60)-30;
 
     int sinT,cosT;
 
+    if (delta> 30) delta =  30;
+    if (delta<-30) delta = -30;
+    
     if (delta<0)
     {
         cosT =  cos_table[-delta];
@@ -748,25 +751,29 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
         cosT =  cos_table[ delta];
         sinT =  sin_table[ delta];
     }
-
+    
     if (negative_sec)
     {
-        I2Tdata.IQMeasured = /* sqrt3/2 */  (int)(__builtin_mulss((*iH-*iL),cosT)>>15)-3*(int)(__builtin_mulss(   *i0   ,sinT)>>15);
-        I2Tdata.IDMeasured = /* 3/2 */     -(int)(__builtin_mulss(   *i0   ,cosT)>>15)-  (int)(__builtin_mulss((*iH-*iL),sinT)>>15);
+        // gain = (64/49.03) * (2/3) * (2/sqrt3) = 1.0048 OK!
+        
+        I2Tdata.IQMeasured = /* sqrt3/2 */  (int)((__builtin_mulss(*iH-*iL,cosT)-__builtin_mulss( *i0*3 ,sinT)+16384L)>>15);
+        I2Tdata.IDMeasured = /* 3/2 */     -(int)((__builtin_mulss(  *i0  ,cosT)+__builtin_mulss(*iH-*iL,sinT)+16384L)>>15);
+        
+        //I2Tdata.IQMeasured = /* sqrt3/2 */  (int)(__builtin_mulss((*iH-*iL),cosT)>>15)-3*(int)(__builtin_mulss(   *i0   ,sinT)>>15);
+        //I2Tdata.IDMeasured = /* 3/2 */     -(int)(__builtin_mulss(   *i0   ,cosT)>>15)-  (int)(__builtin_mulss((*iH-*iL),sinT)>>15);
     }
     else
     {
-        I2Tdata.IQMeasured = /* sqrt3/2 */  (int)(__builtin_mulss((*iH-*iL),cosT)>>15)+3*(int)(__builtin_mulss(  *i0    ,sinT)>>15);
-        I2Tdata.IDMeasured = /* 3/2 */      (int)(__builtin_mulss(   *i0   ,cosT)>>15)-  (int)(__builtin_mulss((*iH-*iL),sinT)>>15);
+        I2Tdata.IQMeasured = /* sqrt3/2 */  (int)((__builtin_mulss(*iH-*iL,cosT)+__builtin_mulss( *i0*3 ,sinT)+16384L)>>15);
+        I2Tdata.IDMeasured = /* 3/2 */      (int)((__builtin_mulss(  *i0  ,cosT)-__builtin_mulss(*iH-*iL,sinT)+16384L)>>15);
+        
+        //I2Tdata.IQMeasured = /* sqrt3/2 */  (int)(__builtin_mulss((*iH-*iL),cosT)>>15)+3*(int)(__builtin_mulss(   *i0   ,sinT)>>15);
+        //I2Tdata.IDMeasured = /* 3/2 */      (int)(__builtin_mulss(   *i0   ,cosT)>>15)-  (int)(__builtin_mulss((*iH-*iL),sinT)>>15);
     }
-
-    //dataC = I2Tdata.IQMeasured;
-    //dataD = gQEVelocity ? __builtin_divsd(((long)dataC)<<16, gQEVelocity) : 0;
     
     if (!sAlignInProgress)
     {
-        if (gControlMode == icubCanProto_controlmode_speed_current
-         || gControlMode == icubCanProto_controlmode_speed_voltage)
+        if (gControlMode == icubCanProto_controlmode_speed_voltage || gControlMode == icubCanProto_controlmode_speed_current)
         {
             if (has_speed_sample)
             {
@@ -778,6 +785,8 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
 
                     if (Is > Ipeak) Is = Ipeak; else if (Is < -Ipeak) Is = -Ipeak;
 
+                    static BOOL starting = TRUE;
+                    
                     if (starting)
                     {
                         if (Is > 0)
@@ -800,9 +809,9 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
                     if (speed_error || CtrlReferences.WRef)
                     {
 #endif
-                    VqRef += __builtin_mulss(speed_error-speed_error_old,SKp) + __builtin_mulss(speed_error + speed_error_old,SKi);
-
-                    if (VqRef > SIntLimit) VqRef = SIntLimit; else if (VqRef < -SIntLimit) VqRef = -SIntLimit;
+                        VqRef += __builtin_mulss(speed_error-speed_error_old,SKp) + __builtin_mulss(speed_error + speed_error_old,SKi);
+                        
+                        if (VqRef > SIntLimit) VqRef = SIntLimit; else if (VqRef < -SIntLimit) VqRef = -SIntLimit;
 #ifdef R1_UPPER_ARM
                     }
                     else
@@ -810,7 +819,7 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
                         VqRef = 0;
                     }
 #endif
-
+                    
                     IqRef = 0;
                 }
 
@@ -843,9 +852,7 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
     Vq = 0;
 
     // current closed loop
-    if (gControlMode == icubCanProto_controlmode_speed_current 
-     || gControlMode == icubCanProto_controlmode_current
-     || sAlignInProgress)
+    if (gControlMode == icubCanProto_controlmode_current || gControlMode == icubCanProto_controlmode_speed_current || sAlignInProgress)
     {
         int iQerror = IqRef-I2Tdata.IQMeasured;
 
@@ -855,7 +862,7 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
 
         if (VqA > IIntLimit) VqA = IIntLimit; else if (VqA < -IIntLimit) VqA = -IIntLimit;
 
-        Vq = (int)(VqA>>IKs);
+        Vq = (int)((VqA+IKo)>>IKs);
 
         // alternative formulation with ff term
         //VqA += __builtin_mulss(iQerror+iQerror_old,Ki);
@@ -866,6 +873,16 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
     }
     else // current open loop
     {
+#ifdef RELENTLESS
+        if ((I2Tdata.IQMeasured > Iovr) || (I2Tdata.IQMeasured < -Iovr))
+        {
+            SysError.OverCurrentFailure = 1;
+            // call fault handler
+            FaultConditionsHandler();
+
+            return;
+        }   
+#else
         if (I2Tdata.IQMeasured > Ipeak)
         {
             limit =  1;
@@ -894,17 +911,18 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
                 if (VqL <= 0) { VqL = 0; limit = 0; iQerror_old = 0; }
             }
 
-            Vq = (int)((VqRef+VqL)>>IKs);
+            Vq = (int)((VqRef+VqL+IKo)>>IKs);
         }
         else
+#endif // RELENTLESS
         {
             if (gControlMode == icubCanProto_controlmode_openloop)
             {
-                Vq = (int)(VqRef>>IKs);
+                Vq = (int)((VqRef+IKo)>>IKs);
             }
             else // if (gControlMode == icubCanProto_controlmode_speed_voltage)
             {
-                Vq = (int)(VqRef>>SKs);
+                Vq = (int)((VqRef+SKo)>>SKs);
             }
         }
     }
@@ -916,12 +934,12 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
     int iDerror = -I2Tdata.IDMeasured;
 
     VdA += __builtin_mulss(iDerror-iDerror_old,IKp) + __builtin_mulss(iDerror+iDerror_old,IKi);
-
+    
     iDerror_old = iDerror;
 
     if (VdA > IIntLimit) VdA = IIntLimit; else if (VdA < -IIntLimit) VdA = -IIntLimit;
-
-    int Vd = (int)(VdA>>IKs);
+  
+    int Vd = (int)((VdA+IKo)>>IKs);
     //
     ////////////////////////////////////////////////////////////////////////////
 
@@ -966,9 +984,12 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
     
     ////////////////////////////////////////////////////////////////////////////
     // inv transform and PWM drive
-    int V1 = (int)(__builtin_mulss(Vq,cosT)>>15)-3*(int)(__builtin_mulss(Vd,sinT)>>15);
-    int V2 = (int)(__builtin_mulss(Vq,sinT)>>15)+  (int)(__builtin_mulss(Vd,cosT)>>15);
-
+    //int V1 = (int)(__builtin_mulss(Vq,cosT)>>15)-3*(int)(__builtin_mulss(Vd,sinT)>>15);
+    //int V2 = (int)(__builtin_mulss(Vq,sinT)>>15)+  (int)(__builtin_mulss(Vd,cosT)>>15);
+    
+    int V1 = (int)((__builtin_mulss(Vq,cosT)-__builtin_mulss(Vd*3,sinT)+16384L)>>15);
+    int V2 = (int)((__builtin_mulss(Vq,sinT)+__builtin_mulss(Vd  ,cosT)+16384L)>>15);
+    
     if (negative_sec) V2=-V2;
 
     *ppwmH =  V1-V2;
@@ -1028,11 +1049,28 @@ void DisableAuxServiceTimer()
 void DriveInit()
 // Perform drive SW/HW init
 {
-    pwmInit(LOOPINTCY/2, DDEADTIME, (8*LOOPINTCY)/20 /*pwm max = 80%*/);
+    int pwm_max = (8*LOOPINTCY)/20; // 80%
+    int pwm3_00 = pwm_max/25;
+    
+    pwmInit(LOOPINTCY/2, DDEADTIME, pwm_max);
 
+    pwmON();
+    
+    pwmZero();
+    
     // setup and perform ADC offset calibration in MeasCurrParm.Offseta and Offsetb
     ADCDoOffsetCalibration();
+    
+    pwmOut(pwm3_00,-2*pwm3_00,pwm3_00);
+    
+    int d;
+    
+    for (d=0; d<5000; ++d) __delay32(4000); // 500 ms
+    
+    ADCDoGainCalibration();
 
+    pwmOFF();
+    
     // Enable DMA interrupt, arm DMA for transfer
     ADCConfigPWMandDMAMode();
 
@@ -1088,7 +1126,9 @@ void EnableDrive()
     ADCInterruptAndDMAEnable();
 
     // enable the overcurrent interrupt
+#ifndef RELENTLESS
     OverCurrentFaultIntEnable();
+#endif
 
     // I2T will run on behalf of 2FOC loop. Stop running it in behalf of Timer 3
 
@@ -1185,7 +1225,7 @@ int main(void)
     {
         if (!gCanProtocolCompatible) continue;
 
-        if (!(MotorConfig.has_qe || MotorConfig.has_hall)) continue;
+        if (!MotorConfig.configured) continue;
 
         if (!Ipeak) continue;
 
@@ -1206,25 +1246,25 @@ int main(void)
         IEC3bits.QEI1IE = 0;
     }
 
-    sAlignInProgress = 0;
-    gEncoderError.uncalibrated = 0;
-
+    if (MotorConfig.has_qe)
+    {
+        sAlignInProgress = 1;
+        gEncoderError.uncalibrated = 1;
+    }
+    else
+    {
+        sAlignInProgress = 0;
+        gEncoderError.uncalibrated = 0;
+    }
+    
     if (MotorConfig.has_hall)
     {
         MotorConfig.has_tsens = FALSE;
         DHESInit(65536UL/(6*gEncoderConfig.numPoles));
     }
-    else
-    {
-        if (MotorConfig.has_tsens) SetupPorts_I2C();
+        
+    if (MotorConfig.has_tsens) SetupPorts_I2C();
     
-        if (MotorConfig.has_qe)
-        {
-            sAlignInProgress = 1;
-            gEncoderError.uncalibrated = 1;
-        }
-    }
-
     setSPid(SKp, SKi, SKs);
 
     Timer3Enable(); // EnableAuxServiceTimer();

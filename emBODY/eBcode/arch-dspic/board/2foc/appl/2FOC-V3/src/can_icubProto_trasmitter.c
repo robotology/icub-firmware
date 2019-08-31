@@ -25,6 +25,7 @@
 #include "faults.h"
 #include "2FOC.h"
 #include "qep.h"
+#include "park.h"
 
 //CAN_PERIOD_PHASE is used to be sure that all foc don't send status msg in the same time
 //#define CAN_PERIOD_PHASE (canprototransmitter_bid)*2
@@ -59,6 +60,15 @@ extern volatile int dataD;
 
 extern volatile tMotorConfig MotorConfig;
 
+//volatile unsigned char HALL = 0xFF;
+
+extern volatile int angle_feedback;
+extern volatile int sectr_feedback;
+extern volatile short Ia,Ib,Ic;
+extern volatile short Va,Vb,Vc;
+
+extern volatile int storeIa, storeIc, storeVd;
+
 extern void CanIcubProtoTrasmitterSendPeriodicData(void)
 {
     static tCanData payload; // = {{0}};
@@ -69,6 +79,11 @@ extern void CanIcubProtoTrasmitterSendPeriodicData(void)
     payload.w[2] = gQEPosition & 0xFFFF;
     payload.w[3] = gQEPosition >> 16;
 
+    //payload.w[0] = I2Tdata.IQMeasured;
+    //payload.w[1] = Ia;
+    //payload.w[2] = Ib;
+    //payload.w[3] = Ic;
+    
     msgid = CAN_ICUBPROTO_STDID_MAKE_TX(ICUBCANPROTO_CLASS_PERIODIC_MOTORCONTROL, canprototransmitter_bid, ICUBCANPROTO_PER_MC_MSG__2FOC);
 
     ECANSend(msgid, 8, &payload);
@@ -81,6 +96,8 @@ extern void CanIcubProtoTrasmitterSendPeriodicData(void)
 
     payload.w[1] = (VqRef>>5);
 
+    //payload.w[1] = HALL;
+    
     //payload.b[2] = 0;
     //payload.b[3] = 0;
 

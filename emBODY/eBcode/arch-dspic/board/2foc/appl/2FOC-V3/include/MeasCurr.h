@@ -41,10 +41,10 @@ typedef struct {
     SFRAC16   Offseta;
 
     SFRAC16   qKb;        // Q15 
-    SFRAC16   Offsetbc;
+    SFRAC16   Offsetc;
 
     SFRAC16   qKc;        // Q15
-    } tMeasCurrParm;
+} tMeasCurrParm;
 
 void MeasAndCompIaIcCalculateIb();
 void MeasAndCompIaIb();

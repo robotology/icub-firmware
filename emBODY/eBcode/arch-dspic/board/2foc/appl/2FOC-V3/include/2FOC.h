@@ -45,8 +45,11 @@ typedef union
         unsigned has_hall:1;
         unsigned has_tsens:1;
         unsigned has_index:1;
+        
         unsigned has_speed_qe:1;
         unsigned verbose:1;
+        unsigned unused:1;
+        unsigned configured:1;
     };
 
     unsigned int bitmask;
