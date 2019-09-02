@@ -26,28 +26,25 @@
 #include "embot_hw.h"
 
 
-
 namespace embot { namespace hw { namespace can {
     
     struct Frame            
     {
-        std::uint32_t       id;
-        std::uint8_t        size;
-        std::uint8_t        filler[3];
-        std::uint8_t        data[8];  
-        Frame() : id(0), size(0) { std::uint64_t *d = reinterpret_cast<std::uint64_t*>(data); *d = 0; filler[0] = filler[1] = filler[2] = 0; }
+        std::uint32_t       id          {0};
+        std::uint8_t        size        {0};
+        std::uint8_t        filler[3]   {0};
+        std::uint8_t        data[8]     {0};  
+        Frame() = default;
     };
-    
-//    enum class Port { one = 0, two = 1, none = 32, maxnumberof = 2};
-    
+        
     struct Config
     {
-        std::uint8_t                txcapacity;
-        std::uint8_t                rxcapacity;
-        embot::common::Callback     ontxframe; 
-        embot::common::Callback     txqueueempty; 
-        embot::common::Callback     onrxframe;
-        Config() : txcapacity(8), rxcapacity(8), ontxframe(nullptr, nullptr), txqueueempty(nullptr, nullptr), onrxframe(nullptr, nullptr) {}
+        std::uint8_t                txcapacity      {8};
+        std::uint8_t                rxcapacity      {8};
+        embot::common::Callback     ontxframe       {nullptr, nullptr}; 
+        embot::common::Callback     txqueueempty    {nullptr, nullptr}; 
+        embot::common::Callback     onrxframe       {nullptr, nullptr};
+        Config() = default;
     };
     
     bool supported(embot::hw::CAN p);
@@ -71,9 +68,7 @@ namespace embot { namespace hw { namespace can {
     result_t get(embot::hw::CAN p, Frame &frame, std::uint8_t &remaining);
     
     result_t setfilters(embot::hw::CAN p, std::uint8_t address);
-    
-    
-    
+           
 }}} // namespace embot { namespace hw { namespace can {
 
 

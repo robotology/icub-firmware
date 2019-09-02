@@ -26,22 +26,28 @@
 
 namespace embot { namespace sys {
 
-    common::Time timeNow();
-    common::relTime tickPeriod();    
-    std::uint32_t millisecondsNow();
-                 
-    class Task;      
-    Task* taskRunning();
+    // tells time in us since bootstrap
+    common::Time now();
+        
+    enum class Priority : std::uint8_t {
+        schedIdle = 0, schedInit = 255,                         // reserved to the scheduler
+        minimum = 2,  maximum = 251,                            // allowed ranges         
+        low010 = 10, low011 = 11, low012 = 12,               
+        medium100 = 100, medium101 = 101, medium102 = 102, medium103 = 103, medium104 = 104,                
+        high200 = 200, high201 = 201, high203 = 203, high204 = 204,        
+        system220 = 220, system230 = 230, system240 = 240, system250 = 250,
+        systemMIN = system220, systemMAX = system250        
+    };
     
-    struct Operation 
+    
+    constexpr bool isSystem(Priority prio)
     {
-        common::Callback    activity;       // the performed activity
-        std::uint16_t       stacksize;      // the amount of used stack
-        Operation() : activity(nullptr, nullptr), stacksize(512) {}
-        Operation(const common::Callback &a, const std::uint16_t s) : activity(a), stacksize(s) {}    
-        void clear() { activity.clear(); stacksize = 512; }
-        bool isvalid() const { if((false == activity.isvalid()) || (0 == stacksize)) { return false; } else { return true; } }
-    };    
+        std::uint8_t v = embot::common::tointegral(prio);
+        return ((v >= embot::common::tointegral(Priority::systemMIN)) && (v <= embot::common::tointegral(Priority::systemMAX))) ? true : false;       
+    }        
+
+     
+
     
 }} // namespace embot { namespace sys {
 

@@ -39,19 +39,19 @@ namespace embot { namespace app { namespace canprotocol {
            
     struct versionOfBOOTLOADER
     {
-        std::uint8_t    major;
-        std::uint8_t    minor;
-        versionOfBOOTLOADER() : major(0), minor(0) {}
-        versionOfBOOTLOADER(std::uint8_t ma, std::uint8_t mi) : major(ma), minor(mi) {}
+        std::uint8_t    major {0};
+        std::uint8_t    minor {0};
+        versionOfBOOTLOADER() = default;
+        constexpr versionOfBOOTLOADER(std::uint8_t ma, std::uint8_t mi) : major(ma), minor(mi) {}
     };
     
     struct versionOfAPPLICATION
     {
-        std::uint8_t    major;
-        std::uint8_t    minor;
-        std::uint8_t    build;
-        versionOfAPPLICATION() : major(0), minor(0), build(0) {}
-        versionOfAPPLICATION(std::uint8_t ma, std::uint8_t mi, std::uint8_t bu) : major(ma), minor(mi), build(bu) {}
+        std::uint8_t    major {0};
+        std::uint8_t    minor {0};
+        std::uint8_t    build {0};
+        versionOfAPPLICATION() = default;
+        constexpr versionOfAPPLICATION(std::uint8_t ma, std::uint8_t mi, std::uint8_t bu) : major(ma), minor(mi), build(bu) {}
     };    
     
     struct versionOfFIRMWARE
@@ -65,10 +65,10 @@ namespace embot { namespace app { namespace canprotocol {
     
     struct versionOfCANPROTOCOL
     {
-        std::uint8_t    major;
-        std::uint8_t    minor;
-        versionOfCANPROTOCOL() : major(0), minor(0) {}
-        versionOfCANPROTOCOL(std::uint8_t ma, std::uint8_t mi) : major(ma), minor(mi) {}
+        std::uint8_t    major {0};
+        std::uint8_t    minor {0};
+        versionOfCANPROTOCOL() = default;
+        constexpr versionOfCANPROTOCOL(std::uint8_t ma, std::uint8_t mi) : major(ma), minor(mi) {}
     };    
     
     

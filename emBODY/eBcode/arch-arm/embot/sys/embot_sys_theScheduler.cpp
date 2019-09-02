@@ -41,9 +41,11 @@
 struct embot::sys::theScheduler::Impl
 { 
 
-    Config config;    
+    Config config {};    
     osal_cfg_t osalConfig; 
-    bool started;
+    bool started {false};
+    int latesterrorcode {0};
+    const char * latesterrorstring {nullptr};
 
     void set_osal_default_config(osal_cfg_t &cfg)
     {
@@ -61,66 +63,87 @@ struct embot::sys::theScheduler::Impl
         cfg.roundrobintick = 0;
         cfg.tasknum = 0;
         // etc.
-        cfg.extfn.usr_on_fatal_error = osalOnFatalError;
+        cfg.extfn.usr_on_fatal_error = osalOnError;
         cfg.extfn.usr_on_idle = osalIdleTask;
     }
-    
-    
-    
+            
     static void osalIdleTask(void)
     {
-        embot::sys::theScheduler &thesystem = embot::sys::theScheduler::getInstance();        
+        embot::sys::theScheduler &thesystem = embot::sys::theScheduler::getInstance(); 
+        IdleTask &theidletask = embot::sys::IdleTask::getInstance();
+        const Task::fpStartup startup = thesystem.pImpl->config.behaviour.idleconfig.startup;
+        const Task::fpOnIdle onidle = thesystem.pImpl->config.behaviour.idleconfig.onidle;
+        void * param = thesystem.pImpl->config.behaviour.idleconfig.param;
+       
+        // make sure the idletask is linked to the rtos
+        theidletask.synch();
+
+        // exec the startup
+        if(nullptr != startup)
+        {
+            startup(&theidletask, param);
+        }
         
+        // start the forever loop
         for(;;)
         {
-            thesystem.pImpl->config.onidle.activity.execute();
-        }
-    } 
+            if(nullptr != onidle)
+            {
+                onidle(&theidletask, param);
+            }
+        }        
+    }
+        
     
-    static void osalOnFatalError(void* task, osal_fatalerror_t errorcode, const char * errormsg)
+    static void osalOnError(void* task, osal_fatalerror_t errorcode, const char * errormsg)
     {
-        embot::sys::theScheduler &thesystem = embot::sys::theScheduler::getInstance();        
-
-        thesystem.pImpl->config.onfatal.activity.execute();
-            
-        // we stop in here
-        for(;;);  
+        embot::sys::theScheduler &thesystem = embot::sys::theScheduler::getInstance();   
+        thesystem.pImpl->latesterrorcode = static_cast<int>(errorcode);
+        thesystem.pImpl->latesterrorstring = errormsg;        
+        thesystem.pImpl->config.behaviour.onOSerror.execute();            
+        // we dont stop in here
+        // for(;;);  
     }
 
                      
     static void osalLauncher(void) 
-    {    
-        embot::sys::theScheduler &thesystem = embot::sys::theScheduler::getInstance();
-        thesystem.pImpl->config.oninit.activity.execute();        
+    {
+        embot::sys::InitTask &inittask = embot::sys::InitTask::getInstance();
+        inittask.synch();
+        
+        embot::sys::theScheduler &thesystem = embot::sys::theScheduler::getInstance();                
+        if(nullptr != thesystem.pImpl->config.behaviour.initconfig.startup)
+        {
+            thesystem.pImpl->config.behaviour.initconfig.startup(&inittask, thesystem.pImpl->config.behaviour.initconfig.param);
+        }        
     }
+    
 
-    bool start(const Config &cfg)
+    [[noreturn]] void start(const Config &cfg)
     {
         if(false == cfg.isvalid())
         {
-            return false;
-        }  
+            for(;;);
+        }
+        
         // init part
         
         config = cfg;
         
         osalConfig.cpufreq = config.timing.clockfrequency;
         osalConfig.tick = config.timing.ticktime;            
-        osalConfig.launcherstacksize = config.oninit.stacksize;        
-        osalConfig.idlestacksize = config.onidle.stacksize;
+        osalConfig.launcherstacksize = config.behaviour.initconfig.stacksize;        
+        osalConfig.idlestacksize = config.behaviour.idleconfig.stacksize;
                         
-        //osalFatalErrorCallback = config.onfatalerror;
-
-        // start part
-        
+        // start part        
         osalInit();
             
         // 1. init rtos in standard way:
     
         started = true;
         osal_system_start(osalLauncher);  
-
-        return false;        
+        
+        for(;;);
     }
     
     void osalInit(void)
@@ -134,14 +157,12 @@ struct embot::sys::theScheduler::Impl
         {
             ram08data = (uint64_t*)(uint64_t*)osal_base_memory_new(ram08size);
         }
-        osal_base_initialise(&osalConfig, ram08data);    
-              
+        osal_base_initialise(&osalConfig, ram08data);                 
     }
     
     Impl() 
     {        
         set_osal_default_config(osalConfig);  
-        config.clear();
         started = false;  
     }
 };
@@ -159,7 +180,6 @@ embot::sys::theScheduler& embot::sys::theScheduler::getInstance()
 }
 
 embot::sys::theScheduler::theScheduler()
-//    : pImpl(new Impl)
 {
     pImpl = std::make_unique<Impl>();
 }  
@@ -168,13 +188,13 @@ embot::sys::theScheduler::theScheduler()
 embot::sys::theScheduler::~theScheduler() { }
 
 
-bool embot::sys::theScheduler::start(const Config &config)
+[[noreturn]] void embot::sys::theScheduler::start(const Config &config)
 {  
     if(true == started())
     {
-        return false;
+        for(;;);
     }
-    return pImpl->start(config);
+    pImpl->start(config);
 }
 
 bool embot::sys::theScheduler::started() const
@@ -182,11 +202,34 @@ bool embot::sys::theScheduler::started() const
     return pImpl->started;
 }
 
+embot::common::relTime  embot::sys::theScheduler::ticktime() const
+{
+    return pImpl->config.timing.ticktime;
+}
 
-//bool embot::sys::theScheduler::isStarted()
-//{
-//    return pImpl->started;
-//}
+embot::sys::Task * embot::sys::theScheduler::scheduledtask() const
+{
+    if(false == pImpl->started)
+    {
+        return nullptr;
+    }
+    
+    osal_task_t *p = osal_task_get(osal_callerAUTOdetect);
+
+    if(nullptr == p)
+    {
+        return(nullptr);
+    }
+
+    return reinterpret_cast<Task*>(osal_task_extdata_get(p));         
+}
+
+const char * embot::sys::theScheduler::getOSerror(int &errorcode) const
+{ 
+    errorcode = pImpl->latesterrorcode;
+    return pImpl->latesterrorstring; 
+}
+
 
 //embot::common::relTime embot::sys::theScheduler::getTick()
 //{

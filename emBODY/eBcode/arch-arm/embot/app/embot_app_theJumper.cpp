@@ -57,9 +57,8 @@ static const std::uint32_t nziramSignature = 0x12345678;
 
 struct embot::app::theJumper::Impl
 {       
-    bool initted;
-    
-    
+    bool initted {false};
+        
     Impl() 
     {              
         reset();
@@ -70,11 +69,11 @@ struct embot::app::theJumper::Impl
         initted = false;        
     }
     
-    void *operator new(std::size_t size) noexcept(false)
-    {
-        static std::uint64_t s_data_impl[(sizeof(embot::app::theJumper::Impl)+7)/8] = {0};
-        return s_data_impl;
-    }
+//    void *operator new(std::size_t size) noexcept(false)
+//    {
+//        static std::uint64_t s_data_impl[(sizeof(embot::app::theJumper::Impl)+7)/8] = {0};
+//        return s_data_impl;
+//    }
     
 };
 
@@ -86,43 +85,55 @@ struct embot::app::theJumper::Impl
 // --------------------------------------------------------------------------------------------------------------------
 
 
-void * embot::app::theJumper::operator new(std::size_t size) noexcept(false)
-{
-    static std::uint64_t s_data_jumper[(sizeof(embot::app::theJumper)+7)/8] = {0};
-    return s_data_jumper;
-}
-
-
-//embot::app::theJumper& embot::app::theJumper::getInstance()
+//void * embot::app::theJumper::operator new(std::size_t size) noexcept(false)
 //{
-//    static theJumper* p = new theJumper();
-//    return *p;
+//    static std::uint64_t s_data_jumper[(sizeof(embot::app::theJumper)+7)/8] = {0};
+//    return s_data_jumper;
 //}
-//
-//embot::app::theJumper::theJumper()
-//    : pImpl(new Impl)
-//{
-//    // pImpl = std::make_unique<Impl>(); i want to be sure we use our new()
-//    pImpl->initted = true;
-//}  
-//
-//embot::app::theJumper::~theJumper() { }
 
+
+////embot::app::theJumper& embot::app::theJumper::getInstance()
+////{
+////    static theJumper* p = new theJumper();
+////    return *p;
+////}
+////
+////embot::app::theJumper::theJumper()
+////    : pImpl(new Impl)
+////{
+////    // pImpl = std::make_unique<Impl>(); i want to be sure we use our new()
+////    pImpl->initted = true;
+////}  
+////
+////embot::app::theJumper::~theJumper() { }
+
+
+//embot::app::theJumper::theJumper()
+//: pImpl(new Impl)
+//{   
+//    pImpl->initted = true;
+//}
+//    
+
+embot::app::theJumper& embot::app::theJumper::getInstance()
+{
+    static theJumper* p = new theJumper();
+    return *p;
+}
 
 embot::app::theJumper::theJumper()
-: pImpl(new Impl)
-{   
-    pImpl->initted = true;
-}
-    
+{
+    pImpl = std::make_unique<Impl>();
+}  
 
+    
+embot::app::theJumper::~theJumper() { }
 
 
 embot::app::theJumper::Command embot::app::theJumper::get(std::uint32_t& param)
 { 
     Command cmd = Command::none;
-    
-    
+        
     if(nziramSignature != s_nzi_ram[0])
     {
         cmd = Command::none;

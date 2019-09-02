@@ -10,7 +10,7 @@
 
 #include "stm32hal.h" // to see bsp_led_init etc
 
-#include "embot_i2h.h"
+
 #include "embot_hw.h"
 #include "embot_hw_can.h"
 #include "embot_hw_led.h"
@@ -100,7 +100,7 @@ static void bl_activity(void* param)
     configEV.onevent = eventbasedtask_onevent;
     configEV.param = nullptr;
     configEV.stacksize = 4*1024;
-    configEV.priority = 200;
+    configEV.priority = embot::sys::Priority::high200;
     configEV.timeout = waitEventTimeout;
     
     eventbasedtask = new embot::sys::EventTask;

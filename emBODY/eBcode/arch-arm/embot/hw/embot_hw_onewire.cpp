@@ -317,7 +317,7 @@ bit pos 20  21  22  23  24  25  26  27  28  29  30  31  32  33  34  35  36  37  
         embot::hw::timer::start(s_privatedata.tickingTimer);
         
         
-        embot::common::Time start = embot::sys::timeNow();
+        embot::common::Time start = embot::sys::now();
         result_t res = resOK;
         for(;;)
         {
@@ -325,7 +325,7 @@ bit pos 20  21  22  23  24  25  26  27  28  29  30  31  32  33  34  35  36  37  
             {
                 break;
             }
-            if((embot::common::timeWaitForever != timeout) && ((embot::sys::timeNow() - start) > timeout))
+            if((embot::common::timeWaitForever != timeout) && ((embot::sys::now() - start) > timeout))
             {
                 res = resNOK;
                 // stop timer, set bit high

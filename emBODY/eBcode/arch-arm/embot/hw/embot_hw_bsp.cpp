@@ -63,7 +63,12 @@ using namespace embot::binary;
 namespace embot { namespace hw { namespace bsp {
     
     static bool initted = false; 
-        
+    
+    bool initialised()
+    {
+        return initted;
+    }   
+    
     static embot::common::fpGetU64 s_timenow = nullptr;
     
     static embot::common::Time s_timenowstm32hal()
@@ -71,9 +76,10 @@ namespace embot { namespace hw { namespace bsp {
         return static_cast<embot::common::Time>(embot::common::time1millisec)*HAL_GetTick();
     }
 
-    bool initialised()
+
+    uint32_t get1millitick()
     {
-        return initted;
+        return s_timenow() / 1000;        
     }
 
     result_t init(const Config &config)
@@ -83,29 +89,29 @@ namespace embot { namespace hw { namespace bsp {
             return resOK;
         }
         
-        // put whatwever is required for ...        
-        stm32hal_config_t cfg = {0};
-        cfg.tick1ms_init = config.stm32hal.init1millitick;
-        cfg.tick1ms_get = config.stm32hal.get1millitick;
-        
-        stm32hal_init(&cfg);
-        
-        s_timenow = config.get1microtime;
+        s_timenow = config.get1microtime;        
         
         if(nullptr == s_timenow)
         {
             s_timenow = s_timenowstm32hal;
         }
         
+        // put whatwever is required for ...        
+        stm32hal_config_t cfg = {0};
+        cfg.tick1ms_init = nullptr;
+        cfg.tick1ms_get = get1millitick;
+        
+        stm32hal_init(&cfg);
+        
         initted = true;
         return resOK;
     }
     
     
-    embot::common::Time now()
-    {
-        return s_timenow();
-    }
+//    embot::common::Time now()
+//    {
+//        return s_timenow();
+//    }
     
 
 }}} // namespace embot { namespace hw { namespace bsp {

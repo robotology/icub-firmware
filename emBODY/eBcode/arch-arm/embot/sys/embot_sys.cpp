@@ -46,33 +46,33 @@
 
 namespace embot { namespace sys {
     
-    common::Time timeNow()
+    common::Time now()
     {
         return osal_system_abstime_get();
     }
     
-    std::uint32_t millisecondsNow()
-    {
-        osal_abstime_t t = osal_system_ticks_abstime_get() / 1000; // now t is expressed in millisec
-        return static_cast<std::uint32_t>(t);        
-    }
+//    std::uint32_t millisecondsNow()
+//    {
+//        osal_abstime_t t = osal_system_ticks_abstime_get() / 1000; // now t is expressed in millisec
+//        return static_cast<std::uint32_t>(t);        
+//    }
     
-    common::relTime tickPeriod()
-    {
-        return osal_info_get_tick();
-    }
+//    common::relTime tick()
+//    {
+//        return osal_info_get_tick();
+//    }
         
-    Task* taskRunning()
-    {
-        osal_task_t *p = osal_task_get(osal_callerAUTOdetect);
+//    Task* taskRunning()
+//    {
+//        osal_task_t *p = osal_task_get(osal_callerAUTOdetect);
 
-        if(nullptr == p)
-        {
-            return(nullptr);
-        }
+//        if(nullptr == p)
+//        {
+//            return(nullptr);
+//        }
 
-        return reinterpret_cast<Task*>(osal_task_extdata_get(p));       
-    }
+//        return reinterpret_cast<Task*>(osal_task_extdata_get(p));       
+//    }
 
 }} // namespace embot { namespace sys {
 

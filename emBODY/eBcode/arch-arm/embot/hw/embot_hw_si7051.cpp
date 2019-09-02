@@ -204,7 +204,7 @@ namespace embot { namespace hw { namespace si7051 {
         
         // ok, now i trigger i2c.
         embot::common::Callback cbk(sharedCBK, &s_privatedata.acquisition[index]);
-        embot::common::Data data = embot::common::Data(&s_privatedata.acquisition[index].rxdata[0], 2);
+        embot::utils::Data data = embot::utils::Data(&s_privatedata.acquisition[index].rxdata[0], 2);
         embot::hw::i2c::read(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], registerTemperatureRead, data, cbk);
                 
         return resOK;
