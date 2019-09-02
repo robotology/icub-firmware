@@ -1,216 +1,166 @@
+
 /*
- * Copyright (C) 2019 iCub Facility - Istituto Italiano di Tecnologia
- * Author:  valentina Gaggero
+ * Copyright (C) 2019 iCub Tech - Istituto Italiano di Tecnologia
+ * Author:  Valentina Gaggero
  * email:   valentina.gaggero@iit.it
- * website: www.robotcub.org
- * Permission is granted to copy, distribute, and/or modify this program
- * under the terms of the GNU General Public License, version 2 or any
- * later version published by the Free Software Foundation.
- *
- * A copy of the license can be found at
- * http://www.robotcub.org/icub/license/gpl.txt
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details
+ * Author:  Marco Accame
+ * email:   marco.accame@iit.it
 */
 
-#include "embot_app_theLEDmanager.h"
-#include "embot_app_canprotocol.h"
-#include "embot_app_theCANboardInfo.h"
 
-#include "embot.h"
+#include "embot_code_application_evntskcan.h"
 
-#include "embot_common.h"
-#include "embot_binary.h"
-#include "embot_dsp.h"
+// --------------------------------------------------------------------------------------------------------------------
+// config start
 
-#include "stm32hal.h" 
-#include "embot_hw_bsp.h"
-#include "embot_hw.h"
-#include "embot_hw_flash.h"
-#include "embot_hw_sys.h"
+constexpr embot::app::theCANboardInfo::applicationInfo applInfo 
+{ 
+    embot::app::canprotocol::versionOfAPPLICATION {0, 0, 4},    
+    embot::app::canprotocol::versionOfCANPROTOCOL {2, 0}    
+};
 
-#include "embot_hw_FlashStorage.h"
-#include "embot_sys_theStorage.h"
+constexpr std::uint16_t taskIDLEstacksize = 512;
+constexpr std::uint16_t taskINITstacksize = 2048;
+constexpr std::uint16_t taskEVNTstacksize = 4096;
+constexpr std::uint8_t maxINPcanframes = 16;
+constexpr std::uint8_t maxOUTcanframes = 48;
+constexpr embot::common::relTime taskEVNTtimeout = 50*embot::common::time1millisec;
 
-#include "embot_app_theApplication.h"
+static void *paramINIT = nullptr;
+static void *paramIDLE = nullptr;
+static void *paramERR = nullptr;
+static void *paramEVNT = nullptr;
 
-#include "embot_app_application_theCANparserBasic.h"
+constexpr embot::sys::theTimerManager::Config tmcfg {};
+constexpr embot::sys::theCallbackManager::Config cmcfg {};
+    
+    
+static const embot::code::application::core::sysConfig syscfg { taskINITstacksize, paramINIT, taskIDLEstacksize, paramIDLE, paramERR, tmcfg, cmcfg};
+
+static const embot::code::application::evntskcan::evtConfig evtcfg { taskEVNTstacksize, paramEVNT, taskEVNTtimeout};
+
+static const embot::code::application::evntskcan::canConfig cancfg { maxINPcanframes, maxOUTcanframes };
+
+// config end
+// --------------------------------------------------------------------------------------------------------------------
 
 
-
-static const embot::app::canprotocol::versionOfAPPLICATION vAP = {0, 0, 2};
-static const embot::app::canprotocol::versionOfCANPROTOCOL vCP = {2, 0};
-
-static void userdeflauncher(void* param);
-static void userdefonidle(void* param);
-static void userdefonfatal(void* param);
-
-
-static const embot::sys::Operation oninit = { embot::common::Callback(userdeflauncher, nullptr), 2048 };
-static const embot::sys::Operation onidle = { embot::common::Callback(userdefonidle, nullptr), 512 };
-static const embot::sys::Operation onfatal = { embot::common::Callback(userdefonfatal, nullptr), 64 };
+class mySYS final : public embot::code::application::evntskcan::SYSTEMevtcan
+{
+public:
+    mySYS(const embot::code::application::core::sysConfig &cfg) 
+        : SYSTEMevtcan(cfg) {}
+        
+    void userdefOnIdle(embot::sys::Task *t, void* idleparam) const override;
+    void userdefonOSerror(void *errparam) const override;
+    void userdefInit_Extra(embot::sys::EventTask* evtsk, void *initparam) const override;
+};
 
 
-static const std::uint32_t address = embot::hw::flash::getpartition(embot::hw::FLASH::application).address;
+class myEVT final : public embot::code::application::evntskcan::EVNTSKcan
+{
+public:
+    myEVT(const embot::code::application::evntskcan::evtConfig& ecfg, const embot::code::application::evntskcan::canConfig& ccfg, const embot::app::theCANboardInfo::applicationInfo& a) 
+        : EVNTSKcan(ecfg, ccfg, a) {}
+        
+    void userdefStartup(embot::sys::Task *t, void *param) const override;
+    void userdefOnTimeout(embot::sys::Task *t, embot::common::EventMask eventmask, void *param) const override;
+    void userdefOnEventRXcanframe(embot::sys::Task *t, embot::common::EventMask eventmask, void *param, const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &outframes) const override;
+    void userdefOnEventANYother(embot::sys::Task *t, embot::common::EventMask eventmask, void *param, std::vector<embot::hw::can::Frame> &outframes) const override;                   
+};
 
+
+static const mySYS mysys { syscfg };
+static const myEVT myevt { evtcfg, cancfg, applInfo };
+constexpr embot::code::application::evntskcan::CFG cfg{ &mysys, &myevt };
+
+// --------------------------------------------------------------------------------------------------------------------
 
 int main(void)
 { 
-    embot::app::theApplication::Config config(embot::common::time1millisec, oninit, onidle, onfatal, address);
-    embot::app::theApplication &appl = embot::app::theApplication::getInstance();    
-    
-    appl.execute(config);  
-        
+    embot::code::application::evntskcan::run(cfg);
     for(;;);    
 }
 
 
-static void start_evt_based(void);
+// - here is the tailoring of the board: strain2, mtb4, psc, etc.
 
-static void userdeflauncher(void* param)
-{     
-    embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance();
-    canbrdinfo.synch(vAP, vCP);
-            
-    start_evt_based();      
-}
 
-static void userdefonfatal(void *param)
+#include "embot_sys_theScheduler.h"
+#include "embot_app_theLEDmanager.h"
+#include "embot_app_application_theCANparserBasic.h"
+
+void mySYS::userdefOnIdle(embot::sys::Task *t, void* idleparam) const
 {
+    static int a = 0;
+    a++;        
+}
+
+void mySYS::userdefonOSerror(void *errparam) const
+{
+    static int code = 0;
+    embot::sys::theScheduler::getInstance().getOSerror(code);
+    for(;;);    
 }
 
 
-static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask evtmsk, void *p);
-static void eventbasedtask_init(embot::sys::Task *t, void *p);
-
-
-constexpr embot::common::Event evRXcanframe = 0x00000001 << 0;
-
-constexpr std::uint8_t maxOUTcanframes = 32;
-
-
-static embot::sys::EventTask* eventbasedtask = nullptr;
-
-static void alerteventbasedtask(void *arg);
-
-static std::vector<embot::hw::can::Frame> outframes;
-
-
-static void start_evt_based(void)
-{   
+void mySYS::userdefInit_Extra(embot::sys::EventTask* evtsk, void *initparam) const
+{
+    // inside the init task: put the init of many things ...  
     
+    // led manager
     static const std::initializer_list<embot::hw::LED> allleds = {embot::hw::LED::one};  
     embot::app::theLEDmanager &theleds = embot::app::theLEDmanager::getInstance();     
     theleds.init(allleds);    
-    theleds.get(embot::hw::LED::one).pulse(embot::common::time1second); 
-    
-    // start task waiting for can messages. 
-    eventbasedtask = new embot::sys::EventTask;  
-    const embot::common::relTime waitEventTimeout = 50*embot::common::time1millisec; //50*1000; //5*1000*1000;    
-   
-    embot::sys::EventTask::Config configEV;
-    
-    configEV.startup = eventbasedtask_init;
-    configEV.onevent = eventbasedtask_onevent;
-    configEV.param = nullptr;
-    configEV.stacksize = 4*1024;
-    configEV.priority = 200;
-    configEV.timeout = waitEventTimeout;
-    eventbasedtask->start(configEV);
-    
-       
-    // start canparser basic
-    embot::app::application::theCANparserBasic &canparserbasic = embot::app::application::theCANparserBasic::getInstance();
-    embot::app::application::theCANparserBasic::Config configbasic;
-    canparserbasic.initialise(configbasic);  
-       
+    theleds.get(embot::hw::LED::one).pulse(embot::common::time1second);    
 
-    // finally start can. i keep it as last because i dont want that the isr-handler calls its onrxframe() 
-    // before the eventbasedtask is created.
-    embot::hw::result_t r = embot::hw::resNOK;
-    embot::hw::can::Config canconfig; // default is tx/rxcapacity=8
-    canconfig.txcapacity = maxOUTcanframes;
-    canconfig.onrxframe = embot::common::Callback(alerteventbasedtask, nullptr); 
-    r = embot::hw::can::init(embot::hw::CAN::one, canconfig);
-    r = embot::hw::can::setfilters(embot::hw::CAN::one, embot::app::theCANboardInfo::getInstance().getCANaddress());
-    r = r;
-    
+    // init of can basic paser
+    embot::app::application::theCANparserBasic::getInstance().initialise({});    
+
+    // ...
 }
 
-
-static void alerteventbasedtask(void *arg)
+void myEVT::userdefStartup(embot::sys::Task *t, void *param) const
 {
-    if(nullptr != eventbasedtask)
-    {
-        eventbasedtask->setEvent(evRXcanframe);
-    }
+    // inside startup of evnt task: put the init of many things ... 
+
+    // ...
 }
 
 
+void myEVT::userdefOnTimeout(embot::sys::Task *t, embot::common::EventMask eventmask, void *param) const
+{
+    static uint32_t cnt = 0;
+    cnt++;    
+}
 
 
-static void eventbasedtask_init(embot::sys::Task *t, void *p)
+void myEVT::userdefOnEventRXcanframe(embot::sys::Task *t, embot::common::EventMask eventmask, void *param, const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &outframes) const
 {    
-    outframes.reserve(maxOUTcanframes);
-    embot::hw::result_t r = embot::hw::can::enable(embot::hw::CAN::one);  
-    r = r;     
+    // process w/ the basic parser, if not recognised call the parse specific of the board
+    if(true == embot::app::application::theCANparserBasic::getInstance().process(frame, outframes))
+    {                   
+    }
+//    else if(true == otherparser.process(frame, outframes))
+//    {
+//    }
+    // ...
 }
-    
 
+void myEVT::userdefOnEventANYother(embot::sys::Task *t, embot::common::EventMask eventmask, void *param, std::vector<embot::hw::can::Frame> &outframes) const
+{
+    constexpr embot::common::Event evXXX = 0x00000001 << 31;
 
-static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask eventmask, void *p)
-{   
- 
-    // we clear the frames to be trasmitted
-    outframes.clear();      
-        
-    if(true == embot::binary::mask::check(eventmask, evRXcanframe))
+    if(true == embot::binary::mask::check(eventmask, evXXX))
     {        
-        embot::hw::can::Frame frame;
-        std::uint8_t remainingINrx = 0;
-        if(embot::hw::resOK == embot::hw::can::get(embot::hw::CAN::one, frame, remainingINrx))
-        {            
-            embot::app::application::theCANparserBasic &canparserbasic = embot::app::application::theCANparserBasic::getInstance();
-
-            // process w/ the basic parser, if not recognised call the parse specific of the board
-            if(true == canparserbasic.process(frame, outframes))
-            {                   
-            }
-            
-            if(remainingINrx > 0)
-            {
-                eventbasedtask->setEvent(evRXcanframe);                 
-            }
-        }        
+        // do things      
     }
     
-               
-    
-//    // if we have any packet we transmit them
-    std::uint8_t num = outframes.size();
-    if(num > 0)
-    {
-        for(std::uint8_t i=0; i<num; i++)
-        {
-            embot::hw::can::put(embot::hw::CAN::one, outframes[i]);                                       
-        }
-
-        embot::hw::can::transmit(embot::hw::CAN::one);  
-    } 
- 
+    // ...    
 }
-
-static void userdefonidle(void* param)
-{
-    static std::uint32_t cnt = 0;
-    
-    cnt++;
-}
+   
+// - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 
 
-///
 
 
