@@ -136,7 +136,8 @@ _FICD(ICS_PGD3 & JTAGEN_OFF); // & COE_ON ); //BKBUG_OFF
 //#define CALIBRATION
 
 #define BOARD_CAN_ADDR_DEFAULT 0xE
-#define VOLT_REF_SHIFT 5
+#define VOLT_REF_SHIFT 5 // for a PWM resolution of 1000
+#define PWM_50_DUTY_CYC (LOOPINTCY/2)
 
 #define isDriveEnabled() bDriveEnabled
 
@@ -189,7 +190,7 @@ volatile int iQerror_old = 0;
 volatile int iDerror_old = 0;
 volatile char limit = 0;
 
-static const int PWM_MAX = (8*LOOPINTCY)/20; // = 80%
+static const int PWM_MAX = 8*PWM_50_DUTY_CYC/10; // = 80%
 
 volatile int gMaxCurrent = 0;
 volatile long sI2Tlimit = 0;
@@ -977,6 +978,11 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
             FaultConditionsHandler();
         }
     }
+    
+    // Re-scale Vq, Vd with respect to the PWM resolution and fullscale.
+    Vq = Vq/(1000/PWM_50_DUTY_CYC);
+    Vd = Vd/(1000/PWM_50_DUTY_CYC);
+    
     //
     ////////////////////////////////////////////////////////////////////////////
 
@@ -1049,16 +1055,15 @@ void DisableAuxServiceTimer()
 void DriveInit()
 // Perform drive SW/HW init
 {
-    int pwm_max = (8*LOOPINTCY)/20; // 80%
-    int pwm3_00 = pwm_max/25;
+    pwmInit(PWM_50_DUTY_CYC, DDEADTIME, PWM_MAX /*pwm max = 80%*/);
     
-    pwmInit(LOOPINTCY/2, DDEADTIME, pwm_max);
-
     pwmON();
     
     pwmZero();
     
-    // setup and perform ADC offset calibration in MeasCurrParm.Offseta and Offsetb
+    int pwm3_00 = PWM_MAX/25;
+
+        // setup and perform ADC offset calibration in MeasCurrParm.Offseta and Offsetb
     ADCDoOffsetCalibration();
     
     pwmOut(pwm3_00,-2*pwm3_00,pwm3_00);
