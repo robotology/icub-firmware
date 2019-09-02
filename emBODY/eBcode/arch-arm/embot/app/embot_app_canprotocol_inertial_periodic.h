@@ -22,6 +22,7 @@
 #define _EMBOT_APP_CANPROTOCOL_INERTIAL_PERIODIC_H_
 
 #include "embot_common.h"
+#include "embot_utils.h"
 
 #include "embot_app_canprotocol.h"
 
@@ -111,8 +112,8 @@ namespace embot { namespace app { namespace canprotocol { namespace inertial { n
             std::uint8_t                                canaddress;
             std::uint8_t                                seqnumber;
             embot::app::canprotocol::analog::imuSensor  sensor;
-            embot::common::Triple<std::int16_t>         value;
-            Info() : canaddress(0), seqnumber(0), sensor(embot::app::canprotocol::analog::imuSensor::none) { value.reset(); }
+            embot::utils::Triple<std::int16_t>          value;
+            Info() : canaddress(0), seqnumber(0), sensor(embot::app::canprotocol::analog::imuSensor::none) { value.clear(); }
         };
         
         Info info;
@@ -133,8 +134,8 @@ namespace embot { namespace app { namespace canprotocol { namespace inertial { n
         struct Info
         {
             std::uint8_t                            canaddress;
-            embot::common::Quadruple<std::int16_t>  value;
-            Info() : canaddress(0) { value.reset(); }
+            embot::utils::Quadruple<std::int16_t>   value;
+            Info() : canaddress(0) { value.clear(); }
         };
         
         Info info;

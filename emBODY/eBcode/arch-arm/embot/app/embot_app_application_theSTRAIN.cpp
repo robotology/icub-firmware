@@ -36,6 +36,7 @@
 
 #include "embot.h"
 #include "embot_common.h"
+#include "embot_utils.h"
 #include "embot_binary.h"
 #include "embot_dsp.h"
 
@@ -584,8 +585,8 @@ struct embot::app::application::theSTRAIN::Impl
         embot::dsp::Q15     forcetorque[6];
         
         // the calibrated values for torque and force. they are raw values, not in dsp::Q15 format
-        embot::common::Triple<std::uint16_t>    torque;
-        embot::common::Triple<std::uint16_t>    force;
+        embot::utils::Triple<std::uint16_t>    torque;
+        embot::utils::Triple<std::uint16_t>    force;
         
         embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode strainmode;
         
@@ -604,8 +605,8 @@ struct embot::app::application::theSTRAIN::Impl
             std::memset(dmabuffer, 0, sizeof(dmabuffer));
             std::memset(adcvalue, 0, sizeof(adcvalue));
             std::memset(forcetorque, 0, sizeof(forcetorque));
-            force.reset();
-            torque.reset();
+            force.clear();
+            torque.clear();
             strainmode = embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode::none;
             adcsaturation = false;
             adcfailures = 0;
@@ -813,7 +814,7 @@ struct embot::app::application::theSTRAIN::Impl
         }
 
 #if defined(DEBUG_acquisition_computetiming)         
-        mypImpl->debugtime = embot::sys::timeNow();
+        mypImpl->debugtime = embot::sys::now();
         mypImpl->durationof00 = mypImpl->debugtime - mypImpl->timestartADC;
 #endif
     
@@ -1195,7 +1196,7 @@ bool embot::app::application::theSTRAIN::Impl::acquisition_start()
 
 #if defined(DEBUG_acquisition_computetiming) 
     acquisitioncounter ++;
-    timestartADC = embot::sys::timeNow();
+    timestartADC = embot::sys::now();
 #endif
 
     std::memset(runtimedata.data.dmabuffer, 0xff, sizeof(runtimedata.data.dmabuffer));    
@@ -1206,7 +1207,7 @@ bool embot::app::application::theSTRAIN::Impl::acquisition_start()
 
 bool embot::app::application::theSTRAIN::Impl::acquisition_waituntilcompletion(embot::common::relTime timeout)
 {
-    embot::common::Time now = embot::sys::timeNow();
+    embot::common::Time now = embot::sys::now();
     embot::common::Time endtime = now + timeout;
     
 //    embot::common::Time start = now;
@@ -1222,7 +1223,7 @@ bool embot::app::application::theSTRAIN::Impl::acquisition_waituntilcompletion(e
         {
             break;
         }
-        now = embot::sys::timeNow();
+        now = embot::sys::now();
         if(now > endtime)
         {
            ret = false;
@@ -1350,7 +1351,7 @@ bool embot::app::application::theSTRAIN::Impl::processdata(std::vector<embot::hw
     }
 
 #if defined(DEBUG_acquisition_computetiming)        
-    debugtime = embot::sys::timeNow();
+    debugtime = embot::sys::now();
     durationof01 = debugtime - timestartADC;
 #endif
 
@@ -1358,7 +1359,7 @@ bool embot::app::application::theSTRAIN::Impl::processdata(std::vector<embot::hw
     acquisition_retrieve();
 
 #if defined(DEBUG_acquisition_computetiming) 
-    debugtime = embot::sys::timeNow();
+    debugtime = embot::sys::now();
     durationof02 = debugtime - timestartADC;
 #endif
  
@@ -1366,7 +1367,7 @@ bool embot::app::application::theSTRAIN::Impl::processdata(std::vector<embot::hw
     processing();
 
 #if defined(DEBUG_acquisition_computetiming)    
-    debugtime = embot::sys::timeNow();
+    debugtime = embot::sys::now();
     durationof03 = debugtime - timestartADC;
 #endif
 
@@ -1474,7 +1475,7 @@ bool embot::app::application::theSTRAIN::Impl::processdata(std::vector<embot::hw
 
 #if defined(DEBUG_acquisition_computetiming)
 
-    debugtime = embot::sys::timeNow();
+    debugtime = embot::sys::now();
     durationof04 = debugtime - timestartADC;
 
     #if defined(DEBUG_acquisition_computetiming_andtraceit)    
@@ -1511,7 +1512,7 @@ bool embot::app::application::theSTRAIN::Impl::tick(std::vector<embot::hw::can::
         return false;
     }
 #if defined(DEBUG_acquisition_computetiming)     
-    debugtime = embot::sys::timeNow();
+    debugtime = embot::sys::now();
 #endif        
     // start adc acquisition
     acquisition_start();
@@ -1839,6 +1840,18 @@ bool embot::app::application::theSTRAIN::autocalib(const embot::app::canprotocol
 }
 
 
+bool embot::app::application::theSTRAIN::setTXperiod(embot::common::relTime txperiod)
+{
+    // if ticking: stop it
+    if(true == pImpl->ticking)
+    {
+        stop();
+    }
+    
+    pImpl->runtimedata.data.txperiod = txperiod;
+
+    return true;       
+}
 
 bool embot::app::application::theSTRAIN::start(const embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode mode)
 {    

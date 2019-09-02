@@ -32,11 +32,7 @@ namespace embot { namespace app {
     class theJumper
     {
     public:
-        static theJumper& getInstance()
-        {
-            static theJumper* p = new theJumper();
-            return *p;
-        }
+        static theJumper& getInstance();
         
     public:
         
@@ -51,18 +47,11 @@ namespace embot { namespace app {
 
     private:
         theJumper(); 
-        void *operator new(std::size_t size) noexcept(false);  
-
-    public:
-        // remove copy constructors and copy assignment operators
-        theJumper(const theJumper&) = delete;
-        theJumper(theJumper&) = delete;
-        void operator=(const theJumper&) = delete;
-        void operator=(theJumper&) = delete;
+        ~theJumper();
 
     private:    
         struct Impl;
-        Impl *pImpl;        
+        std::unique_ptr<Impl> pImpl;       
     };       
 
 

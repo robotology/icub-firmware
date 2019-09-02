@@ -41,14 +41,14 @@ namespace embot { namespace app {
     public:
         struct Config
         {
-            std::uint8_t        canaddress;
-            Config() : canaddress(1) {}
+            std::uint8_t canaddress {1};
+            Config() = default;
+            Config(std::uint8_t ca) : canaddress(ca) {}
         }; 
         
         
-        bool initialise(Config &config);   
-
-        
+        bool initialise(const Config &config);   
+       
         embot::common::Time start();
         embot::common::relTime stop(const std::string &prefix, std::vector<embot::hw::can::Frame> &frames, embot::common::Time started = 0);    
         bool print(const std::string &text, std::vector<embot::hw::can::Frame> &frames);        

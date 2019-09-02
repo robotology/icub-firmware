@@ -27,9 +27,7 @@
 #include <new>
 
 namespace embot { namespace app {
-    
-    
-    
+      
     class theBootloader
     {
     public:
@@ -38,25 +36,33 @@ namespace embot { namespace app {
             static theBootloader* p = new theBootloader();
             return *p;
         }
-        
-        
+               
     public:
+        
         struct Config
         {
-            embot::common::Callback             userdeflauncher;
-            embot::common::relTime              countdown;    
-            Config() : userdeflauncher(nullptr, nullptr), countdown(5*embot::common::time1second) {}
-            Config(embot::common::fpCaller _userdeflauncher, void* _param, embot::common::relTime _countdown = 5*embot::common::time1second) :  userdeflauncher(_userdeflauncher, _param), countdown(_countdown) {}
+            embot::common::Callback userdeflauncher {nullptr, nullptr};
+            embot::common::relTime  countdown {5*embot::common::time1second};    
+            Config() = default;
+            Config(const embot::common::Callback &_launcher, embot::common::relTime _countdown = 5*embot::common::time1second) : userdeflauncher(_launcher), countdown(_countdown) {}
         }; 
         
-        embot::app::theJumper::Command getcommand(std::uint32_t &parameter);         
-        bool jump(std::uint32_t address); // it just jumps to address returned by getcommand(). it must be used only if embot::hw was not initialised, hence before ::execute()...
+        enum class evalRes : uint8_t { jumpaftercountdown = 0, stayforever = 1, jumpfailed = 2, unexected = 3 }; 
         
-        // this function never returns ....
+        // this function checks what to do. it may return one of evalRes values or ... just execute a jump in its internals
+        evalRes eval();
+                
+        // this function just executes the application and never returns ....
         // it inits embot::hw, the osal, it starts countdown timer and executes a user-defined task ... if countdown timer is not stopped 
         // its expiry callback calls the same code inside restart2application() 
-        void execute(Config &config); 
+        [[noreturn]] void execute(Config &config);         
         
+        // its get any command issued before reset by either the application or the bootloader itself.
+        embot::app::theJumper::Command getcommand(std::uint32_t &parameter);
+        
+        // it just jumps to address returned by getcommand(). it must be used only if embot::hw was not initialised, hence before ::execute()...
+        bool jump(std::uint32_t address); 
+                
         // it can be used by a user-defined task started by execute() to stop the countdown, and stay in the process forever or until ... call of restart2application();
         bool stopcountdown(); 
         

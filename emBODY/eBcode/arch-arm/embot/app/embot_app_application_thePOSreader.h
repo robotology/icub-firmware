@@ -27,6 +27,7 @@
 #include "embot_common.h"
 #include "embot_hw.h"
 #include "embot_sys.h"
+#include "embot_sys_Task.h"
 #include "embot_app_canprotocol.h"
 #include "embot_app_canprotocol_analog_polling.h"
 #include "embot_app_canprotocol_analog_periodic.h"

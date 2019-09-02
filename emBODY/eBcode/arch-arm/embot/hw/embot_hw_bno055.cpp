@@ -70,8 +70,8 @@ namespace embot { namespace hw { namespace bno055 {
     result_t read(BNO055 s, Data &data)                                                             { return resNOK; }
     result_t write(BNO055 s, embot::hw::bno055::Register reg, std::uint8_t value, const embot::common::relTime timeout){ return resNOK; }
     result_t write(BNO055 s, embot::hw::bno055::Register reg, std::uint8_t value, const embot::common::Callback &oncompletion){ return resNOK; }
-    result_t read(BNO055 s, embot::hw::bno055::Register reg, embot::common::Data &data, const embot::common::relTime timeout){ return resNOK; }
-    result_t read(BNO055 s, embot::hw::bno055::Register reg, embot::common::Data &data, const embot::common::Callback &oncompletion){ return resNOK; }
+    result_t read(BNO055 s, embot::hw::bno055::Register reg, embot::utils::Data &data, const embot::common::relTime timeout){ return resNOK; }
+    result_t read(BNO055 s, embot::hw::bno055::Register reg, embot::utils::Data &data, const embot::common::Callback &oncompletion){ return resNOK; }
     
 }}} // namespace embot { namespace hw { namespace BNO055 {
 
@@ -99,14 +99,14 @@ namespace embot { namespace hw { namespace bno055 {
         volatile bool done;
         volatile bool ongoing;
         std::uint8_t buffer[48];
-        embot::common::Data data;
+        embot::utils::Data data;
         embot::common::Callback userdefCBK;  
         Acquisition() { clear(); }
         void clear() { data.load(buffer, 0); done = false; ongoing = false; std::memset(buffer, 0, sizeof(buffer)); userdefCBK.clear(); }         
         void startread(std::uint8_t size, const embot::common::Callback &cbk) { clear(); data.size = size; userdefCBK = cbk; ongoing = true; }
         void startread(std::uint8_t size) { clear(); data.size = size; ongoing = true; }
-        void startread(embot::common::Data &da, const embot::common::Callback &cbk) { clear(); data = da; userdefCBK = cbk; ongoing = true; }
-        void startread(embot::common::Data &da) { clear(); data = da; ongoing = true; }
+        void startread(embot::utils::Data &da, const embot::common::Callback &cbk) { clear(); data = da; userdefCBK = cbk; ongoing = true; }
+        void startread(embot::utils::Data &da) { clear(); data = da; ongoing = true; }
         void startwrite(std::uint8_t val) { clear(); buffer[0] = val; data.size = 1; ongoing = true; }
         void startwrite(std::uint8_t val, const embot::common::Callback &cbk) { clear(); buffer[0] = val; data.size = 1; userdefCBK = cbk; ongoing = true; }
         void stop() { ongoing = false; done = true; userdefCBK.execute(); }
@@ -197,7 +197,7 @@ namespace embot { namespace hw { namespace bno055 {
     
     result_t get(BNO055 s, Info &info, embot::common::relTime timeout)
     {
-        embot::common::Data data(&info, sizeof(info));
+        embot::utils::Data data(&info, sizeof(info));
         result_t r = read(s, embot::hw::bno055::Register::CHIP_ID, data, timeout);  
         return r;        
     }
@@ -283,7 +283,7 @@ namespace embot { namespace hw { namespace bno055 {
         
         const std::uint8_t nbytes = static_cast<std::uint8_t>(set);        
         // ok, start a read of nbytes only (not all sizeof(data)) which will go into data
-        embot::common::Data da(&data, nbytes);
+        embot::utils::Data da(&data, nbytes);
                 
         s_privatedata.acquisition[index].startread(da, oncompletion); 
                        
@@ -375,7 +375,7 @@ namespace embot { namespace hw { namespace bno055 {
        
 
         
-    result_t read(BNO055 s, embot::hw::bno055::Register reg, embot::common::Data &data, const embot::common::relTime timeout)
+    result_t read(BNO055 s, embot::hw::bno055::Register reg, embot::utils::Data &data, const embot::common::relTime timeout)
     {
         if(false == initialised(s))
         {
@@ -408,7 +408,7 @@ namespace embot { namespace hw { namespace bno055 {
     }
 
     
-    result_t read(BNO055 s, embot::hw::bno055::Register reg, embot::common::Data &data, const embot::common::Callback &oncompletion)
+    result_t read(BNO055 s, embot::hw::bno055::Register reg, embot::utils::Data &data, const embot::common::Callback &oncompletion)
     {
         if(false == initialised(s))
         {
@@ -456,7 +456,7 @@ namespace embot { namespace hw { namespace bno055 {
 //    static result_t s_programregister_safe(BNO055 s, std::uint8_t reg, std::uint8_t val, embot::common::relTime timeout)
 //    {
 //        std::uint8_t index = embot::common::tointegral(s);   
-//        embot::common::Data data(&val, 1);        
+//        embot::utils::Data data(&val, 1);        
 //        result_t r = embot::hw::i2c::write(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], reg, data, timeout);                
 //        return r;
 //    }

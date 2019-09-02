@@ -36,10 +36,16 @@ namespace embot { namespace sys {
     public:
         struct Config
         {
-            std::uint8_t        priority;
-            std::uint16_t       stacksize;
-            std::uint16_t       capacityofhandler;          
-            Config() : priority(230), stacksize(1024), capacityofhandler(8) {}
+            embot::sys::Priority    priority {embot::sys::Priority::system230};
+            std::uint16_t           stacksize {1024};
+            std::uint16_t           capacityofhandler {8};          
+            Config() = default;
+            constexpr Config(std::uint16_t ss, std::uint16_t cap, embot::sys::Priority prio = embot::sys::Priority::system230)
+                : stacksize(ss), capacityofhandler(cap), priority(prio) {}
+            bool isvalid() const
+            {
+                return ((0 == stacksize) || (0 == capacityofhandler) || (false == embot::sys::isSystem(priority))) ? false : true;
+            }
         }; 
         
         

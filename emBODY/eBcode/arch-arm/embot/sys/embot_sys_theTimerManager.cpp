@@ -28,7 +28,6 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-//#include "EOMtheTimerManager.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -37,15 +36,11 @@
 
 struct embot::sys::theTimerManager::Impl
 {    
-    Config config;    
-    embot::sys::MessageTask *task;
+    Config config {};    
+    embot::sys::MessageTask *task {nullptr};
     
     Impl() 
     {              
-        task = nullptr;
-        config.capacityofhandler = 8;
-        config.priority = 240;
-        config.stacksize = 1024;
     }
     
     static void processtimer(Task *t, common::Message m, void *o)
@@ -72,7 +67,6 @@ embot::sys::theTimerManager& embot::sys::theTimerManager::getInstance()
 }
 
 embot::sys::theTimerManager::theTimerManager()
-//    : pImpl(new Impl)
 {
     pImpl = std::make_unique<Impl>();
 }  

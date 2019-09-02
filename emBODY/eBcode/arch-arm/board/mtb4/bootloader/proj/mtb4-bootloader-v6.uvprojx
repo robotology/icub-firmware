@@ -387,6 +387,11 @@
               <FileType>8</FileType>
               <FilePath>../src/main-bootloader.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_code_bootloader.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\code\embot_code_bootloader.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -495,11 +500,6 @@
               <FileName>embot_sys_theScheduler.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\embot_sys_theScheduler.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_sys_theStorage.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\embot_sys_theStorage.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_sys_theTimerManager.cpp</FileName>
@@ -1050,7 +1050,7 @@
             <uGnu>0</uGnu>
             <useXO>0</useXO>
             <v6Lang>3</v6Lang>
-            <v6LangP>6</v6LangP>
+            <v6LangP>8</v6LangP>
             <vShortEn>1</vShortEn>
             <vShortWch>1</vShortWch>
             <v6Lto>0</v6Lto>
@@ -1060,7 +1060,7 @@
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register</MiscControls>
               <Define>USE_STM32HAL STM32HAL_BOARD_MTB4 STM32HAL_DRIVER_V190</Define>
               <Undefine></Undefine>
-              <IncludePath>..\src-plus;..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\eBcode\arch-arm\embot\common;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\sys;..\..\..\..\..\..\eBcode\arch-arm\embot;..\..\..\..\..\..\eBcode\arch-arm\embot\binary;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib</IncludePath>
+              <IncludePath>..\src-plus;..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\eBcode\arch-arm\embot\common;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\sys;..\..\..\..\..\..\eBcode\arch-arm\embot;..\..\..\..\..\..\eBcode\arch-arm\embot\binary;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\embot\code</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1108,6 +1108,11 @@
               <FileName>main-bootloader.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>../src/main-bootloader.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_code_bootloader.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\code\embot_code_bootloader.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1217,11 +1222,6 @@
               <FileName>embot_sys_theScheduler.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\embot_sys_theScheduler.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_sys_theStorage.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\embot_sys_theStorage.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_sys_theTimerManager.cpp</FileName>

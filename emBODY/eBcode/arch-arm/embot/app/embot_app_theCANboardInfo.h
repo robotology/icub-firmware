@@ -28,8 +28,7 @@
 
 
 namespace embot { namespace app {
-    
-       
+           
     class theCANboardInfo
     {
     public:
@@ -55,11 +54,36 @@ namespace embot { namespace app {
             std::uint8_t        tobefilled[3];  // to make the size of struct ... multiple of 8.
         }; 
         
+        struct bootloaderInfo
+        {
+            embot::app::canprotocol::Board board {embot::app::canprotocol::Board::none};
+            embot::app::canprotocol::versionOfBOOTLOADER version {0, 0};
+            std::uint8_t adr {1};
+            const char * definfo32 {nullptr};
+            
+            bootloaderInfo() = default;
+            constexpr bootloaderInfo(embot::app::canprotocol::Board b, const embot::app::canprotocol::versionOfBOOTLOADER &v, std::uint8_t a, const char *i) 
+                        : board(b), version(v), adr(a), definfo32(i) {}             
+        };
+        
+        
+        struct applicationInfo
+        {
+            embot::app::canprotocol::versionOfAPPLICATION version {0, 0, 0};
+            embot::app::canprotocol::versionOfCANPROTOCOL protocol {0, 0};
+
+            applicationInfo() = default;
+            constexpr applicationInfo(const embot::app::canprotocol::versionOfAPPLICATION &v, const embot::app::canprotocol::versionOfCANPROTOCOL &p) 
+                        : version(v), protocol(p) {}             
+        };        
+        
         
         bool erase();
         
+        bool synch(const bootloaderInfo &info);
         bool synch(embot::app::canprotocol::Board type, embot::app::canprotocol::versionOfBOOTLOADER version, std::uint8_t adr, const char *defInfo32);
         
+        bool synch(const applicationInfo &info);
         bool synch(embot::app::canprotocol::versionOfAPPLICATION application, embot::app::canprotocol::versionOfCANPROTOCOL protocol);
         
         bool get(StoredInfo &info);

@@ -96,7 +96,7 @@ struct embot::app::application::theTHERMO::Impl
         } 
         void onstart()
         {
-            timeofstart = embot::sys::timeNow(); 
+            timeofstart = embot::sys::now(); 
             duration = 0;            
             dataisready = false;
             temperature = 0;
@@ -104,7 +104,7 @@ struct embot::app::application::theTHERMO::Impl
         void onstop()
         {
             dataisready = true;  
-            duration = embot::sys::timeNow() - timeofstart;    
+            duration = embot::sys::now() - timeofstart;    
         }
     };
     

@@ -37,12 +37,12 @@ namespace embot { namespace app { namespace application {
     public:
         struct Config
         {
-            std::uint32_t   dummy;
-            Config() : dummy(0) {}
+            std::uint32_t dummy {0};            
+            Config() =  default;
         }; 
         
         
-        bool initialise(Config &config); 
+        bool initialise(const Config &config); 
         
         // returns true if the canframe has been recognised. if so, any reply is sent if replies.size() > 0
         bool process(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);

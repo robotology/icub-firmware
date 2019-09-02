@@ -23,6 +23,7 @@
 #define _EMBOT_HW_I2C_H_
 
 #include "embot_common.h"
+#include "embot_utils.h"
 #include "embot_hw.h"
 
 
@@ -68,25 +69,25 @@ namespace embot { namespace hw { namespace i2c {
     bool ping(embot::hw::I2C b, ADR adr, embot::common::relTime timeout = 3*embot::common::time1millisec);
     
     // raw not blocking transmission.
-    result_t transmit(embot::hw::I2C b, ADR adr, const embot::common::Data &content, embot::common::relTime timeout = 3*embot::common::time1millisec);
+    result_t transmit(embot::hw::I2C b, ADR adr, const embot::utils::Data &content, embot::common::relTime timeout = 3*embot::common::time1millisec);
         
     // not blocking read. we read from register reg a total of destination.size bytes
     // at the end of transaction, data is copied into destination.pointer and oncompletion.callback() is called (if non nullptr). 
-    result_t read(embot::hw::I2C b, ADR adr, REG reg, embot::common::Data &destination, const embot::common::Callback &oncompletion);
+    result_t read(embot::hw::I2C b, ADR adr, REG reg, embot::utils::Data &destination, const embot::common::Callback &oncompletion);
     
     // blocking read. we read from register reg a total of destination.size bytes and we wait until a timeout. 
     // if result is resOK, destination.pointer contains the data; if resNOKtimeout, the timeout expired. if resNOK the operation was not even started
     // the functions internally waits until not busy for the timeout ... however, please check isbusy() outside. 
-    result_t read(embot::hw::I2C b, ADR adr, REG reg, embot::common::Data &destination, embot::common::relTime timeout);
+    result_t read(embot::hw::I2C b, ADR adr, REG reg, embot::utils::Data &destination, embot::common::relTime timeout);
         
     // not blocking write. we write in register reg the content.size byte pointed by content.pointer.
     // when the write is done, the function oncompletion.callback() is called to alert the user.
-    result_t write(embot::hw::I2C b, ADR adr, REG reg, const embot::common::Data &content, const embot::common::Callback &oncompletion = embot::common::Callback(nullptr, nullptr));
+    result_t write(embot::hw::I2C b, ADR adr, REG reg, const embot::utils::Data &content, const embot::common::Callback &oncompletion = embot::common::Callback(nullptr, nullptr));
     
     // blocking write. we write in register reg thethe content.size byte pointed by content.pointer and we wait until a timeout.
     // if result is resOK, the operation is successful. if resNOKtimeout, the timeout expired. if resNOK the operation was not even started
     // the functions internally waits until not busy for the timeout ... however, please check isbusy() outside.
-    result_t write(embot::hw::I2C b, ADR adr, REG reg, const embot::common::Data &content, embot::common::relTime timeout);    
+    result_t write(embot::hw::I2C b, ADR adr, REG reg, const embot::utils::Data &content, embot::common::relTime timeout);    
 
 }}} // namespace embot { namespace hw { namespace i2c {
     

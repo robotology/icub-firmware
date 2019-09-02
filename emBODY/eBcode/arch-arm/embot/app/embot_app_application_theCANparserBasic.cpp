@@ -407,7 +407,7 @@ embot::app::application::theCANparserBasic::theCANparserBasic()
 embot::app::application::theCANparserBasic::~theCANparserBasic() { }
    
         
-bool embot::app::application::theCANparserBasic::initialise(Config &config)
+bool embot::app::application::theCANparserBasic::initialise(const Config &config)
 {
     pImpl->config = config;
 

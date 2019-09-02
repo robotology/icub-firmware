@@ -328,7 +328,7 @@
             <uGnu>0</uGnu>
             <useXO>0</useXO>
             <v6Lang>3</v6Lang>
-            <v6LangP>6</v6LangP>
+            <v6LangP>8</v6LangP>
             <vShortEn>1</vShortEn>
             <vShortWch>1</vShortWch>
             <v6Lto>1</v6Lto>
@@ -338,7 +338,7 @@
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register</MiscControls>
               <Define>USE_STM32HAL STM32HAL_BOARD_SG3 STM32HAL_DRIVER_V190</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask-;..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core-;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\eBcode\arch-arm\embot\common;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\sys;..\..\..\..\..\..\eBcode\arch-arm\embot;..\..\..\..\embot\binary;..\..\..\..\embot\dsp;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib</IncludePath>
+              <IncludePath>..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask-;..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core-;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\eBcode\arch-arm\embot\common;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\sys;..\..\..\..\..\..\eBcode\arch-arm\embot;..\..\..\..\embot\binary;..\..\..\..\embot\dsp;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\embot\code</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -386,6 +386,16 @@
               <FileName>main-sg3-application.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\src\main-sg3-application.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_code_application_core.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\code\embot_code_application_core.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_code_application_evntskcan.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\code\embot_code_application_evntskcan.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1134,6 +1144,16 @@
               <FileName>main-sg3-application.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\src\main-sg3-application.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_code_application_core.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\code\embot_code_application_core.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_code_application_evntskcan.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\code\embot_code_application_evntskcan.cpp</FilePath>
             </File>
           </Files>
         </Group>

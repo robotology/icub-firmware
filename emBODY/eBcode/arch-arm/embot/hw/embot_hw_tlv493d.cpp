@@ -32,6 +32,7 @@
 #include <vector>
 #include "stm32hal.h"
 #include "embot_hw_bsp.h"
+#include "embot_utils.h"
 
 using namespace std;
 
@@ -313,7 +314,7 @@ namespace embot { namespace hw { namespace tlv493d {
         
         // ok, now i trigger i2c.
         embot::common::Callback cbk(sharedCBK, &s_privatedata.acquisition[index]);
-        embot::common::Data data = embot::common::Data(&s_privatedata.acquisition[index].registermap.readmemory[0], sizeof(s_privatedata.acquisition[index].registermap.readmemory));
+        embot::utils::Data data = embot::utils::Data(&s_privatedata.acquisition[index].registermap.readmemory[0], sizeof(s_privatedata.acquisition[index].registermap.readmemory));
         embot::hw::i2c::read(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], embot::hw::i2c::regNONE, data, cbk);
                 
         return resOK;
@@ -452,7 +453,7 @@ namespace embot { namespace hw { namespace tlv493d {
         std::uint8_t index = embot::common::tointegral(h);
         
         std::uint8_t txdata[1] = {0};
-        embot::common::Data data = embot::common::Data(txdata, 1);
+        embot::utils::Data data = embot::utils::Data(txdata, 1);
         volatile result_t r = resOK;
         
         // see: Figure 9 Sequence for power-up and sensor initialization for single use (pag 15 of user manual of chip)
@@ -491,7 +492,7 @@ namespace embot { namespace hw { namespace tlv493d {
         // we transmit 0x00 on the bus and wait for some time (at least 14usec)
         // we do that by transmitting to address 0x00 a total of 0 bytes.
         
-        embot::common::Data dummy;
+        embot::utils::Data dummy;
         dummy.clear();
         volatile result_t r1 = embot::hw::i2c::transmit(s_privatedata.config[index].i2cdes.bus, 0x00, dummy, 3*embot::common::time1millisec);        
         r1 = r1;

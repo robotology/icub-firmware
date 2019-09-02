@@ -28,7 +28,6 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "embot_sys_Task.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -37,16 +36,10 @@
 
 struct embot::sys::theCallbackManager::Impl
 {    
-    Config config;    
-    embot::sys::CallbackTask *task;
+    Config config {};    
+    embot::sys::CallbackTask *task {nullptr};
     
-    Impl() 
-    {              
-        task = nullptr;
-        config.capacityofhandler = 8;
-        config.priority = 230;
-        config.stacksize = 1024;
-    }
+    Impl() = default;
 };
 
 
@@ -62,7 +55,6 @@ embot::sys::theCallbackManager& embot::sys::theCallbackManager::getInstance()
 }
 
 embot::sys::theCallbackManager::theCallbackManager()
-//    : pImpl(new Impl)
 {
     pImpl = std::make_unique<Impl>();
 }  
@@ -82,7 +74,7 @@ bool embot::sys::theCallbackManager::start(const Config &config)
         
     pImpl->task = new embot::sys::CallbackTask;
     
-    embot::sys::CallbackTask::Config cfg;
+    embot::sys::CallbackTask::Config cfg {};
     cfg.priority = pImpl->config.priority;
     cfg.stacksize = pImpl->config.stacksize;
     cfg.queuesize = pImpl->config.capacityofhandler;
@@ -93,6 +85,7 @@ bool embot::sys::theCallbackManager::start(const Config &config)
     
     return true;    
 }
+
 bool embot::sys::theCallbackManager::started() const
 {
     return (nullptr == pImpl->task) ? false : true;
