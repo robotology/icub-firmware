@@ -23,12 +23,20 @@
 
 #include "embot_common.h"
 #include "embot_sys.h"
+#include "embot_sys_theScheduler.h"
+#include "embot_sys_task.h"
 #include <memory>
 
 
 namespace embot { namespace app {
        
-    
+    // the method theApplication::execute() does the following:
+    // 1. relocates the application at Config::addressofapplication FLASH address
+    // 2. calls embot::hw::bsp::init() if Config::initbsp is true 
+    // 3. starts the scheduler with Config::ticktime and with Config::behaviour
+    // the scheduler does not return, hence nor theApplication::execute()
+
+
     class theApplication
     {
     public:
@@ -38,27 +46,17 @@ namespace embot { namespace app {
                         
         struct Config
         {            
-            embot::common::relTime  ticktime;
-            embot::sys::Operation   init;
-            embot::sys::Operation   idle;
-            embot::sys::Operation   fatal;
-            std::uint32_t           addressofapplication;
-            Config() :
-                        ticktime(embot::common::time1millisec),
-                        // for structs we rely on their default ctor
-                        addressofapplication(0)
-                        {}
-            Config(embot::common::relTime _t, const embot::sys::Operation &_ini, const embot::sys::Operation &_idl, const embot::sys::Operation &_fat, std::uint32_t _addr) :
-                        ticktime(_t), 
-                        init(_ini), 
-                        idle(_idl),
-                        fatal(_fat),
-                        addressofapplication(_addr)            
-                        {}
-            bool isvalid() const { if((false == init.isvalid()) || (false == idle.isvalid()) || (false == fatal.isvalid()) || (0 == ticktime) || (0 == addressofapplication)) { return false; } else { return true; } } 
+            std::uint32_t                       addressofapplication {0};
+            bool                                initbsp {true};
+            embot::common::relTime              ticktime {0};
+            embot::sys::theScheduler::Behaviour behaviour {};
+
+            Config() = default;
+            Config(std::uint32_t _addr, bool _bsp, embot::common::relTime _tic, const embot::sys::theScheduler::Behaviour &_beh) : addressofapplication(_addr), initbsp(_bsp), ticktime(_tic), behaviour(_beh) {}                
+            bool isvalid() const { if((false == behaviour.isvalid()) || (0 == ticktime) || (0 == addressofapplication)) { return false; } else { return true; } } 
         }; 
-                      
-        bool execute(const Config &config); // it never returns ..
+        
+        [[noreturn]] void execute(const Config &config); 
         
     private:
         theApplication(); 

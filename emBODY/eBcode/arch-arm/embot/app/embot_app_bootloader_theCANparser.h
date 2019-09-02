@@ -41,8 +41,9 @@ namespace embot { namespace app { namespace bootloader {
     public:
         struct Config
         {
-            embot::app::canprotocol::Process owner;
-            Config() : owner(embot::app::canprotocol::Process::bootloader) {}
+            embot::app::canprotocol::Process owner {embot::app::canprotocol::Process::bootloader};
+            Config() = default;
+            Config(embot::app::canprotocol::Process pr) : owner (pr) {}
         }; 
         
         enum class Event { rxcanframe = 0};

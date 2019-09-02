@@ -38,21 +38,14 @@
 #include "stm32hal.h"
 
 namespace embot { namespace hw { namespace bsp {
-        
-    struct stm32halConfig
-    {   // what the the stm32 hal requires to operate it internals. if nullptr, the stm32hal uses fake implemention.
-        embot::common::fpWorker     init1millitick;    
-        embot::common::fpGetU32     get1millitick;  
-        stm32halConfig() : init1millitick(nullptr), get1millitick(nullptr) {}  
-        stm32halConfig(embot::common::fpWorker ini, embot::common::fpGetU32 get) : init1millitick(ini), get1millitick(get) {}             
-    };
-    
+            
     struct Config
     {
-        stm32halConfig              stm32hal; 
-        embot::common::fpGetU64     get1microtime;  // in usec. it is used as extra precision
-        Config() : get1microtime(nullptr) {}
-        Config(const stm32halConfig &_stm32, embot::common::fpGetU64 _tmicro) : stm32hal(_stm32), get1microtime(_tmicro) {}
+        embot::common::fpGetU64 get1microtime {nullptr};  
+        
+        Config() = default;
+        Config(embot::common::fpGetU64 _tmicro) : get1microtime(_tmicro) {}
+        bool isvalid() const { if(nullptr != get1microtime) { return true; } else { return false; } }
     }; 
     
         
@@ -60,8 +53,9 @@ namespace embot { namespace hw { namespace bsp {
     
     result_t init(const Config &config);
     
-    // it returns time in microseconds. the precision is usec or ms and depends on how the bsp was configured
-    embot::common::Time now();
+    // it returns time in microseconds as configured by Config::get1microtime()
+    // it is an alternative to embot::sys::now() if ne doe not want to use the embot::sys part
+    // embot::common::Time now();
               
 }}} // namespace embot { namespace hw { namespace bsp {
 

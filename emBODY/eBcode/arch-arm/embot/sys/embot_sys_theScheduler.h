@@ -23,9 +23,19 @@
 
 #include "embot_common.h"
 #include "embot_sys.h"
+#include "embot_sys_task.h"
 #include <memory>
 
 namespace embot { namespace sys {
+    
+    // the method theScheduler::start(cfg) does the following:
+    // if already started or if the cfg is not valid: it stays in a forever loop otherwise:
+    // 1. starts the OS with cfg.timing.ticktime, sets the idle task as specified by cfg.behaviour.idleconfig
+    // 2. executes at maximum priority the init task as specified by cfg.behaviour.initconfig
+    // after the function cfg.behaviour.initconfig.startup(cfg.behaviour.initconfig.param) returns, the init task
+    // is deleted and the OS schedules any task started inside startup() or the idle task, depending on their
+    // priority and ready/blocked status. the OS executte the ready task w/ highest priority.    
+    // the method theScheduler::start(cfg) does does not return
 
     class theScheduler
     {
@@ -33,36 +43,53 @@ namespace embot { namespace sys {
         static theScheduler& getInstance();
         
     public:
-                
+                            
         struct Timing
         {
-            std::uint32_t       clockfrequency;     // it must be equal to the cpu speed expressed in hz: use embot::hw::sys::clock(embot::hw::sys::CLOCK::syscore)
-            common::relTime     ticktime;           // the resolution of the scheduler
-            Timing() : clockfrequency(168000000), ticktime(embot::common::time1millisec) {}
+            std::uint32_t clockfrequency {10000000};                        // it must be equal to the cpu speed expressed in hz: use embot::hw::sys::clock(embot::hw::sys::CLOCK::syscore)
+            embot::common::relTime ticktime {embot::common::time1millisec}; // the resolution of the scheduler
+            
+            Timing() = default;
             Timing(std::uint32_t c, common::relTime t = embot::common::time1millisec) : clockfrequency(c), ticktime(t) {}
-            void clear() { clockfrequency = 168000000; ticktime = embot::common::time1millisec; }
+            void clear() { clockfrequency = 10000000; ticktime = embot::common::time1millisec; }
             bool isvalid() const { if((0 == clockfrequency) || (0 == ticktime)) { return false; } else { return true; } }
+        };
+        
+        struct Behaviour
+        {
+            embot::sys::InitTask::Config initconfig {};
+            embot::sys::IdleTask::Config idleconfig {};
+            embot::common::Callback onOSerror {};
+            
+            Behaviour() = default;
+            Behaviour(const embot::sys::InitTask::Config &ini, const embot::sys::IdleTask::Config &idl, const embot::common::Callback &err) : initconfig(ini), idleconfig(idl), onOSerror(err) {}            
+            bool isvalid() const { if((false == initconfig.isvalid()) || (false == idleconfig.isvalid())) { return false; } else { return true; } }
         };
         
         struct Config
         {
-            Timing timing;
-            embot::sys::Operation oninit;
-            embot::sys::Operation onidle;
-            embot::sys::Operation onfatal;   // you may not specify it ...  
-            Config() {}
-            Config(const Timing &tim, const Operation &ini, const Operation &idl, const Operation &fat) : timing(tim), oninit(ini), onidle(idl), onfatal(fat) {}
-            bool isvalid() const { if((false == timing.isvalid()) || (false == oninit.isvalid()) || (false == onidle.isvalid())) { return false; } else { return true; } }
-            void clear() { timing.clear(); oninit.clear(); onidle.clear(); onfatal.clear(); }
+            Timing timing {};
+            Behaviour behaviour {};  
+            
+            Config() = default;
+            Config(const Timing &tim, const Behaviour &beh) : timing(tim), behaviour(beh) {}
+            bool isvalid() const { if((false == timing.isvalid()) || (false == behaviour.isvalid())) { return false; } else { return true; } }
         }; 
         
         
-        bool start(const Config &config);    // it does not return ... unless the config is not valid
+        [[noreturn]] void start(const Config &config);  
+        
         bool started() const;
+        
+        embot::common::relTime ticktime() const;
+        
+        Task * scheduledtask() const;    
+
+        const char * getOSerror(int &errorcode) const;
         
     private:
         theScheduler();  
-        ~theScheduler(); // i dont want a fool can delete it
+        ~theScheduler(); 
 
     private:    
         struct Impl;

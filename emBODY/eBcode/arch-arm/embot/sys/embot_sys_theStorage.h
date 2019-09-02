@@ -39,7 +39,7 @@ namespace embot { namespace sys {
         
     public:
       
-        bool init(embot::common::Storage *storage);
+        bool init(embot::utils::Storage *storage);
         
         bool isInitted();
         bool isAddressValid(std::uint32_t address);

@@ -89,7 +89,7 @@ embot::app::theCANtracer::~theCANtracer() { }
 
    
         
-bool embot::app::theCANtracer::initialise(Config &config)
+bool embot::app::theCANtracer::initialise(const Config &config)
 {
     pImpl->config = config;    
     return true;
@@ -99,14 +99,14 @@ bool embot::app::theCANtracer::initialise(Config &config)
 
 embot::common::Time embot::app::theCANtracer::start()
 {  
-    pImpl->starttime = embot::sys::timeNow();     
+    pImpl->starttime = embot::sys::now();     
     return pImpl->starttime;    
 }
 
 
 embot::common::relTime embot::app::theCANtracer::stop(const std::string &prefix, std::vector<embot::hw::can::Frame> &frames, embot::common::Time started)
 { 
-    embot::common::Time tt = embot::sys::timeNow();
+    embot::common::Time tt = embot::sys::now();
     
     if(0 == started)
     {

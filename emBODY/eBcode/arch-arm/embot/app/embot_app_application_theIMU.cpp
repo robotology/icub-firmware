@@ -104,19 +104,19 @@ struct embot::app::application::theIMU::Impl
             duration = 0;
             timeofstart = 0;
             dataisready = false;
-            data.reset();
+            data.clear();
         } 
         void onstart()
         {
-            timeofstart = embot::sys::timeNow(); 
+            timeofstart = embot::sys::now(); 
             duration = 0;            
             dataisready = false;
-            data.reset();
+            data.clear();
         }
         void onstop()
         {
             dataisready = true;  
-            duration = embot::sys::timeNow() - timeofstart;    
+            duration = embot::sys::now() - timeofstart;    
         }
     };
     
@@ -259,7 +259,7 @@ bool embot::app::application::theIMU::Impl::fill(embot::app::canprotocol::inerti
         
         default:
         {
-            info.value.reset();            
+            info.value.clear();            
         } break;        
         
     }

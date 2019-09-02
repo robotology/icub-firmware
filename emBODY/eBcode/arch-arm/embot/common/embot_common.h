@@ -26,95 +26,23 @@
 #include <cstring>
 #include <type_traits>
 
+
 namespace embot { namespace common {
-
-
-    using fpWorker      = void (*)(void);
-    using fpCaller      = void (*)(void *);
+    
     using fpGetU32      = std::uint32_t (*)(void);
     using fpGetU64      = std::uint64_t (*)(void);
     using fpParU32      = void (*)(std::uint32_t);
     using fpBoolParU32  = bool (*)(std::uint32_t);
     using fpI08ParU32   = std::int8_t (*)(std::uint32_t);
-    
-    struct Callback
-    {
-        fpCaller    call;
-        void*       arg;
-        Callback() : call(nullptr), arg(nullptr) {}
-        Callback(fpCaller _c, void *_a) : call(_c), arg(_a) {}
-        void load(fpCaller _c, void *_a) { call = _c; arg = _a; }
-        void clear() { call = nullptr; arg = nullptr; }
-        bool isvalid() const { if(nullptr != call){ return true; } else { return false; } } 
-        void execute() { if(true == isvalid()) { call(arg); } }
-    };
+    using fpWorker      = void (*)(void);
+    using fpCaller      = void (*)(void *);
+           
+    using Time          = std::uint64_t;    // expressed in usec. keeps absolute time since bootstrap.   
+    using relTime       = std::uint32_t;    // expressed in usec. it is used for relative time. 0 means: 0 usec from ...
 
-    
-    struct Data
-    {
-        void * pointer;
-        std::uint32_t size;
-        
-        Data() : pointer(nullptr), size(0) {}
-        Data(void *p, std::uint32_t s) : pointer(p), size(s) {}
-            
-        void load(void *p, std::uint32_t s) { pointer = p; size = s; }
-        void clear() { pointer = nullptr; size = 0; }
-        bool isvalid() const { if((nullptr != pointer) && (0 != size)){ return true; } else { return false; } } 
-        
-        std::uint8_t  * getU08() { return reinterpret_cast<std::uint8_t*>(pointer); }  
-        std::uint16_t * getU16() { return reinterpret_cast<std::uint16_t*>(pointer); } 
-        std::uint32_t * getU32() { return reinterpret_cast<std::uint32_t*>(pointer); } 
-        std::uint64_t * getU64() { return reinterpret_cast<std::uint64_t*>(pointer); } 
-        
-        std::uint8_t  U08(std::uint32_t i) { return getU08()[i]; }      
-        std::uint16_t U16(std::uint32_t i) { return getU16()[i]; }
-        std::uint32_t U32(std::uint32_t i) { return getU32()[i]; }        
-        std::uint64_t U64(std::uint32_t i) { return getU64()[i]; }
-        
-        void * get(std::uint32_t offset = 0) { std::uint8_t *d = getU08(); return &d[offset]; }        
-    };
-    
-
-    template<typename T>
-    struct Triple
-    {   // unluckily arm does not fully support c++11, hence the std::tuple<> is missing
-        T   x;
-        T   y;
-        T   z;
-        Triple() { reset(); }
-        Triple(T _x, T _y, T _z) { set(_x, _y, _z); }
-        void set(T _x, T _y, T _z) { x = _x; y = _y; z = _z; }  
-        void reset() { x = 0; y = 0; z = 0; }
-        void load(void *littleendianmemory) { T *p = reinterpret_cast<T*>(littleendianmemory); x = p[0]; y = p[1]; z = p[2]; }
-    }; 
-
-    template<typename T>
-    struct Quadruple
-    {   // unluckily arm does not fully support c++11, hence the std::tuple<> is missing
-        T   w;
-        T   x;
-        T   y;
-        T   z;
-        Quadruple() { reset(); }
-        Quadruple(T _w, T _x, T _y, T _z) { set(_w, _x, _y, _z); }
-        void set(T _w, T _x, T _y, T _z) { w = _w; x = _x; y = _y; z = _z; }  
-        void reset() { w = 0; x = 0; y = 0; z = 0; }
-        void load(void *littleendianmemory) { T *p = reinterpret_cast<T*>(littleendianmemory); w = p[0]; x = p[1]; y = p[2]; z = p[3]; }
-    };     
-    
-    using Time          = std::uint64_t;    // expressed in usec.  expresses absolute time    
-    using relTime       = std::uint32_t;    // expressed in usec. it is used to express relative time. 0 means: 0 usec from ...
-    
-    const relTime timeWaitNone      = 0;
-    const relTime time1microsec     = 1;    
-    const relTime time1millisec     = 1000;
-    const relTime time1second       = 1000000;
-    const relTime timeWaitForever   = 0xffffffff;
-    
-    using Event = std::uint32_t;
-    using EventMask = std::uint32_t;
-    using Message = void *;
+    using Event         = std::uint32_t;
+    using EventMask     = std::uint32_t;
+    using Message       = void *;
     
     
     template<typename E>         // C++14 [Meyers, pag. 73]
@@ -122,23 +50,27 @@ namespace embot { namespace common {
     {
         return static_cast<std::underlying_type_t<E>>(enumerator);
     }
-    
-    class Storage
+         
+    struct Callback
     {
-    public:
-        virtual bool isInitted() = 0;
-        virtual bool isAddressValid(std::uint32_t address) = 0;
-        virtual std::uint32_t getBaseAddress() = 0;
-        virtual std::uint32_t getSize() = 0;   
-        virtual bool fullerase() = 0;  
-        virtual bool erase(std::uint32_t address, std::uint32_t size) = 0;        
-        virtual bool read(std::uint32_t address, std::uint32_t size, void *data) = 0;
-        virtual bool write(std::uint32_t address, std::uint32_t size, const void *data) = 0;   
+        fpCaller call {nullptr};
+        void * arg {nullptr};
+        
+        Callback() = default;
+        constexpr Callback(fpCaller _c, void *_a) : call(_c), arg(_a) {}
+        void load(fpCaller _c, void *_a) { call = _c; arg = _a; }
+        void clear() { call = nullptr; arg = nullptr; }
+        bool isvalid() const { if(nullptr != call) { return true; } else { return false; } } 
+        void execute() const { if(true == isvalid()) { call(arg); } }
+    };
 
-        virtual ~Storage() {};    
-    }; 
     
-            
+    constexpr relTime timeWaitNone      = 0;
+    constexpr relTime time1microsec     = 1;    
+    constexpr relTime time1millisec     = 1000;
+    constexpr relTime time1second       = 1000000;
+    constexpr relTime timeWaitForever   = 0xffffffff;
+                
 } } // namespace embot { namespace common {
 
 

@@ -23,6 +23,7 @@
 #define _EMBOT_HW_BNO055_H_
 
 #include "embot_common.h"
+#include "embot_utils.h"
 #include "embot_binary.h"
 #include "embot_hw.h"
 
@@ -112,26 +113,26 @@ namespace embot { namespace hw { namespace bno055 {
     
     struct Data
     {   // it holds the Set::FULL lot
-        embot::common::Triple<std::int16_t>     acc;    // acc.z = 9.8 means: horizontally placed 
-        embot::common::Triple<std::int16_t>     mag;
-        embot::common::Triple<std::int16_t>     gyr;
-        embot::common::Triple<std::int16_t>     eul;    // eul.x = 0 means: directed towards NORTH
-        embot::common::Quadruple<std::int16_t>  qua;
-        embot::common::Triple<std::int16_t>     lia;
-        embot::common::Triple<std::int16_t>     grv;
+        embot::utils::Triple<std::int16_t>     acc;    // acc.z = 9.8 means: horizontally placed 
+        embot::utils::Triple<std::int16_t>     mag;
+        embot::utils::Triple<std::int16_t>     gyr;
+        embot::utils::Triple<std::int16_t>     eul;    // eul.x = 0 means: directed towards NORTH
+        embot::utils::Quadruple<std::int16_t>  qua;
+        embot::utils::Triple<std::int16_t>     lia;
+        embot::utils::Triple<std::int16_t>     grv;
         std::uint8_t                            temperature;
         std::uint8_t                            calibstatus;
         std::uint8_t                            systemstatus;  
         Data() { temperature = 0; calibstatus = 0; systemstatus = 0; }
-        void reset() 
+        void clear() 
         {
-            acc.reset();
-            mag.reset();
-            gyr.reset();
-            eul.reset();
-            qua.reset();
-            lia.reset();
-            grv.reset();
+            acc.clear();
+            mag.clear();
+            gyr.clear();
+            eul.clear();
+            qua.clear();
+            lia.clear();
+            grv.clear();
             temperature = 0;
             calibstatus = 0;
             systemstatus = 0;
@@ -144,13 +145,13 @@ namespace embot { namespace hw { namespace bno055 {
             lia.load(&m[32]); grv.load(&m[38]);
             temperature = m[44]; calibstatus = m[45]; systemstatus = m[46];
         }
-        void getACC(embot::common::Triple<float> &a) const { a.x = accRES * acc.x; a.y = accRES * acc.y; a.z = accRES * acc.z; }
-        void getMAG(embot::common::Triple<float> &a) const { a.x = magRES * mag.x; a.y = magRES * mag.y; a.z = magRES * mag.z; }
-        void getGYR(embot::common::Triple<float> &a) const { a.x = gyrRES * gyr.x; a.y = gyrRES * gyr.y; a.z = gyrRES * gyr.z; }            
-        void getEUL(embot::common::Triple<float> &a) const { a.x = eulRES * eul.x; a.y = eulRES * eul.y; a.z = eulRES * eul.z; }
-        void getQUA(embot::common::Quadruple<float> &a) const { a.w = quaRES * qua.w; a.x = quaRES * qua.x; a.y = quaRES * qua.y; a.z = quaRES * qua.z; }
-        void getLIA(embot::common::Triple<float> &a) const { a.x = liaRES * lia.x; a.y = liaRES * lia.y; a.z = liaRES * lia.z; }
-        void getGRV(embot::common::Triple<float> &a) const { a.x = grvRES * grv.x; a.y = grvRES * grv.y; a.z = grvRES * grv.z; }
+        void getACC(embot::utils::Triple<float> &a) const { a.x = accRES * acc.x; a.y = accRES * acc.y; a.z = accRES * acc.z; }
+        void getMAG(embot::utils::Triple<float> &a) const { a.x = magRES * mag.x; a.y = magRES * mag.y; a.z = magRES * mag.z; }
+        void getGYR(embot::utils::Triple<float> &a) const { a.x = gyrRES * gyr.x; a.y = gyrRES * gyr.y; a.z = gyrRES * gyr.z; }            
+        void getEUL(embot::utils::Triple<float> &a) const { a.x = eulRES * eul.x; a.y = eulRES * eul.y; a.z = eulRES * eul.z; }
+        void getQUA(embot::utils::Quadruple<float> &a) const { a.w = quaRES * qua.w; a.x = quaRES * qua.x; a.y = quaRES * qua.y; a.z = quaRES * qua.z; }
+        void getLIA(embot::utils::Triple<float> &a) const { a.x = liaRES * lia.x; a.y = liaRES * lia.y; a.z = liaRES * lia.z; }
+        void getGRV(embot::utils::Triple<float> &a) const { a.x = grvRES * grv.x; a.y = grvRES * grv.y; a.z = grvRES * grv.z; }
         void getTemperature(float &a) const { a = tmpRES * temperature; }
         std::uint8_t calibrationOfACC() const { return(embot::binary::pair::get(calibstatus, 1)); } // 3 is ok, 1 is not calibrated
         std::uint8_t calibrationOfGYR() const { return(embot::binary::pair::get(calibstatus, 2)); } // 3 is ok, 1 is not calibrated
@@ -205,8 +206,8 @@ namespace embot { namespace hw { namespace bno055 {
 
     // we read from register reg, for data.size positions and we place results into data.pointer (which MUST point to at least data.size bytes)
     // blocking or non-blocking mode. we check end of oepration either with operationdone() or with the execution of oncompletion().  
-    result_t read(BNO055 s, embot::hw::bno055::Register reg, embot::common::Data &data, const embot::common::relTime timeout);
-    result_t read(BNO055 s, embot::hw::bno055::Register reg, embot::common::Data &data, const embot::common::Callback &oncompletion = embot::common::Callback(nullptr, nullptr));
+    result_t read(BNO055 s, embot::hw::bno055::Register reg, embot::utils::Data &data, const embot::common::relTime timeout);
+    result_t read(BNO055 s, embot::hw::bno055::Register reg, embot::utils::Data &data, const embot::common::Callback &oncompletion = embot::common::Callback(nullptr, nullptr));
 
  
 }}} // namespace embot { namespace hw { namespace bno055 {

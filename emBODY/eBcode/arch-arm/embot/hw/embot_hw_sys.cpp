@@ -22,12 +22,13 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "embot_hw_sys.h"
-#include "stm32hal.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
+
+#include "stm32hal.h"
 
 #include <cstring>
 #include <vector>
@@ -36,6 +37,8 @@ using namespace std;
 
 #include "embot_hw_bsp.h"
 #include "embot_hw_lowlevel.h"
+
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -50,7 +53,7 @@ using namespace std;
 namespace embot { namespace hw { namespace sys {
     
     
-    static void ss_bsp_delay(uint64_t t)
+    static void ss_delay(uint64_t t)
     {   
         static uint64_t s_hl_sys_numofops1sec = 0;
         static uint32_t s_hl_sys_used_systemcoreclock = 0;
@@ -155,23 +158,25 @@ namespace embot { namespace hw { namespace sys {
         SCB->VTOR = FLASH_BASE | (offset & (uint32_t)0x1FFFFF80);        
     }
 
-    embot::common::Time now()
-    {
-        return embot::hw::bsp::now();        
-    }
+//    embot::common::Time now()
+//    {
+//        return embot::hw::bsp::now();        
+//    }
 
     void delay(embot::common::relTime t)
     {   
-        ss_bsp_delay(t);
+        ss_delay(t);
     }
       
-    static const std::uint32_t maxRANDmask = 0x3ff; // 1023    
+    constexpr std::uint32_t maxRANDmask = 0x3ff; // 1023    
     std::uint32_t random()
     {
-        std::uint32_t v; 
-#if defined(HAL_RNG_MODULE_ENABLED)        
-        HAL_StatusTypeDef ret = HAL_RNG_GenerateRandomNumber(&hrng, &v);
-        ret = ret;
+#if defined(HAL_RNG_MODULE_ENABLED)   
+        std::uint32_t v = 0;        
+        HAL_RNG_GenerateRandomNumber(&hrng, &v);
+#else
+        std::uint32_t v; // not initialised on purpose. it gets the value on the stack
+        // marco.accame: i dont remember why i dont use srand() and rand() ...
 #endif        
         return v & maxRANDmask;
     }

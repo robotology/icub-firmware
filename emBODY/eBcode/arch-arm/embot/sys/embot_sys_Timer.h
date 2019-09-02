@@ -35,17 +35,17 @@ namespace embot { namespace sys {
         
         enum class Status { idle = 0, counting = 1 }; 
         
-        enum class Mode { oneshot = 0, someshots = 1, forever = 2 };        
+        enum class Mode { oneshot = 0, someshots = 1, forever = 2 }; 
+        
         struct Config
         {
-            common::relTime countdown;      // time to count before execute the action
-            sys::Action     onexpiry;       // the action executed at expiry of the countdown
-            Mode            mode;           // the mode. we allow one shot, infinite shots or a limited number
-            std::uint32_t   numofshots;     // in case of limited number this number tells how many. not zero....
-            // static const std::uint32_t oneshot = 1;
-            // static const std::uint32_t infiniteshots = 0;
+            common::relTime countdown {0};          // time to count before execute the action
+            sys::Action     onexpiry {};            // the action executed at expiry of the countdown
+            Mode            mode {Mode::oneshot};   // the mode. we allow one shot, infinite shots or a limited number
+            std::uint32_t   numofshots {0};         // in case of limited number this number tells how many. not zero....
+
+            Config() = default;
             Config(common::relTime c, const sys::Action &a, Mode m = Mode::oneshot, std::uint32_t n = 0) : countdown(c), onexpiry(a), mode(m), numofshots(n) {} 
-            Config() {} 
             void clear() { countdown = 0;  onexpiry.clear(); mode = Mode::oneshot; numofshots = 0;}
             bool isvalid() const 
             { 

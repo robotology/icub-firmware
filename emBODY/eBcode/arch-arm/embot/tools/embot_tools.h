@@ -40,10 +40,10 @@ namespace embot { namespace tools {
         
         struct Config
         {   // there are nsteps() intervals each containing .step values which fill the range [.min, ... , .max)
-            std::uint64_t               min;        // the start value of first interval.
-            std::uint64_t               max;        // the upper limit of all possible values (which is actually max-1).
-            std::uint32_t               step;       // the width of the interval 
-            Config() : min(0), max(0), step(0) {}
+            std::uint64_t min {0};        // the start value of first interval.
+            std::uint64_t max {0};        // the upper limit of all possible values (which is actually max-1).
+            std::uint32_t step {0};       // the width of the interval 
+            Config() = default;
             Config(std::uint64_t mi, std::uint64_t ma, std::uint32_t st) : min(mi), max(ma), step(st) {}
             std::uint64_t range() const { return max - min; }
             std::uint32_t nsteps() const { return ( (range() + step - 1) / step); }
@@ -52,10 +52,10 @@ namespace embot { namespace tools {
         
         struct Values
         {
-            std::uint64_t               total;          // cumulative number = below + sum(inside) + beyond
-            std::uint64_t               below;          // number of occurrences in ( -INF, config.min )
-            std::uint64_t               beyond;         // number of occurrenced in [ inside.size() * config.step, +INF )
-            std::vector<std::uint64_t>  inside;         // inside[i] contains the number of occurrences in [ config.min + i*config.step, config.min + (i+1)*config.step )  
+            std::uint64_t               total {0};          // cumulative number = below + sum(inside) + beyond
+            std::uint64_t               below {0};          // number of occurrences in ( -INF, config.min )
+            std::uint64_t               beyond {0};         // number of occurrenced in [ inside.size() * config.step, +INF )
+            std::vector<std::uint64_t>  inside;             // inside[i] contains the number of occurrences in [ config.min + i*config.step, config.min + (i+1)*config.step )  
         };
             
         
@@ -97,17 +97,16 @@ namespace embot { namespace tools {
         
         struct Config
         {   
-            std::uint64_t                       period;                     // the period under test.
-            std::uint64_t                       alertvalue;                 // it is the value beyond which we produce an alert string. it must be > period.  
-            std::uint64_t                       reportinterval;             // if not zero, it keeps the value in usec between two reports
-            embot::tools::Histogram::Config     histoconfig;                // if is valid(), then we produce an histogram  
-            Config() : period(0), alertvalue(0), reportinterval(0) {}
+            std::uint64_t                       period {0};                     // the period under test.
+            std::uint64_t                       alertvalue {0};                 // it is the value beyond which we produce an alert string. it must be > period.  
+            std::uint64_t                       reportinterval {0};             // if not zero, it keeps the value in usec between two reports
+            embot::tools::Histogram::Config     histoconfig {};                 // if is valid(), then we produce an histogram  
+            Config() = default;
             Config(std::uint64_t pe, std::uint64_t al, std::uint64_t ri, const embot::tools::Histogram::Config &hi) 
                 : period(pe), alertvalue(al), reportinterval(ri), histoconfig(hi) {}
             bool isvalid() const { return ((0 == period) || (period >= alertvalue)) ? false : true; }
         };
         
-
         
         PeriodValidator();
         ~PeriodValidator();

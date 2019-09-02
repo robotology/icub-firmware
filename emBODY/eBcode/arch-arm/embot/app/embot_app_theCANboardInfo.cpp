@@ -93,6 +93,11 @@ bool embot::app::theCANboardInfo::erase()
 }
    
  
+bool embot::app::theCANboardInfo::synch(const bootloaderInfo &info)
+{
+    return synch(info.board, info.version, info.adr, info.definfo32);
+}
+
 bool embot::app::theCANboardInfo::synch(embot::app::canprotocol::Board type, embot::app::canprotocol::versionOfBOOTLOADER version, std::uint8_t adr, const char *defInfo32)
 {
     bool ret = false;
@@ -135,6 +140,10 @@ bool embot::app::theCANboardInfo::synch(embot::app::canprotocol::Board type, emb
     return ret;
 }
 
+bool embot::app::theCANboardInfo::synch(const applicationInfo &info)
+{
+    return synch(info.version, info.protocol);
+}
 
 bool embot::app::theCANboardInfo::synch(embot::app::canprotocol::versionOfAPPLICATION application, embot::app::canprotocol::versionOfCANPROTOCOL protocol)
 {

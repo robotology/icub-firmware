@@ -16,6 +16,7 @@
  * Public License for more details
 */
 
+#if 0
 
 // --------------------------------------------------------------------------------------------------------------------
 // - public interface
@@ -165,7 +166,8 @@ bool cifStorage::write(std::uint32_t address, std::uint32_t size, const void *da
 
  
 }} // namespace embot { namespace i2h {
-    
+   
+#endif
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

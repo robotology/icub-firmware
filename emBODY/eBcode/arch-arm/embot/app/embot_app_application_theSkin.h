@@ -24,6 +24,7 @@
 #include "embot_common.h"
 #include "embot_hw.h"
 #include "embot_sys.h"
+#include "embot_sys_Task.h"
 #include "embot_app_application_theCANparserSkin.h"
 #include <vector>
 #include <memory>

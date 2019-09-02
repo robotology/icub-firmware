@@ -57,8 +57,8 @@ namespace embot { namespace app { namespace application {
         
         struct Config
         {
-            CANagentPOS*    agent;
-            Config() : agent(nullptr) {}
+            CANagentPOS* agent {nullptr};
+            Config() = default;
             Config(CANagentPOS* a) : agent(a) {}
             bool isvalid() { return (nullptr == agent) ? false : true; }
         }; 
