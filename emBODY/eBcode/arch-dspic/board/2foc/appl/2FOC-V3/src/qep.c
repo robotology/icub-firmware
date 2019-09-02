@@ -15,7 +15,7 @@ BOOL QE_USE_INDEX = FALSE;
 volatile BOOL qe_ready = FALSE;
 volatile BOOL qe_moved = FALSE;
 
-void QEinit(int resolution, int motor_num_poles,char use_index)
+void QEinit(int resolution, int motor_num_poles, char use_index)
 {
     // init the quadrature encoder peripheral
     // Configure QEI pins as digital inputs
@@ -61,7 +61,8 @@ void QEinit(int resolution, int motor_num_poles,char use_index)
     // main CK = 40Mhz. Filter CK = 10 Mhz
     // Filter accept edge if it persist over 3 CK
     // cycles. So max QEP pin freq is about 3.3Mhz
-    DFLTCONbits.QECK = 2;
+    //DFLTCONbits.QECK = 2;
+    DFLTCONbits.QECK = 3;
 
     DFLTCONbits.IMV = 3;
 
@@ -79,7 +80,14 @@ void QEinit(int resolution, int motor_num_poles,char use_index)
     // Reset position counter.
     IFS3bits.QEI1IF = 0;
     POSCNT = 0;
-
+    MAXCNT = 0xFFFF;
+    // Index pulse does not reset position counter
+    QEICONbits.POSRES = 0;
+    QEICONbits.QEIM = 6;
+            
+    IEC3bits.QEI1IE = QE_USE_INDEX ? 1 : 0;
+    
+    /*
     if (QE_USE_INDEX)
     {
         MAXCNT = 0xFFFF;
@@ -97,6 +105,7 @@ void QEinit(int resolution, int motor_num_poles,char use_index)
         QEICONbits.QEIM = 7;
         IEC3bits.QEI1IE = 0;
     }
+    */
 }
 
 inline unsigned int QEgetRaw() __attribute__((always_inline));
@@ -167,6 +176,55 @@ inline int QEgetPos()
     return __builtin_divsd(((long)poscnt)<<16,QE_RESOLUTION);
 }
 
+void QEsignalZeroCrossing(int UPDN)
+{
+    static int UPDN_old = -1;  
+    
+    int poscnt = (int)POSCNT;
+    
+    if (qe_ready)
+    {
+        if ((poscnt<-QE_ERR_THR || poscnt>QE_ERR_THR) && 
+            (poscnt<QE_RESOLUTION-QE_ERR_THR || poscnt>QE_RESOLUTION+QE_ERR_THR) && 
+            (poscnt<-QE_RESOLUTION-QE_ERR_THR || poscnt>-QE_RESOLUTION+QE_ERR_THR))
+        {
+            //gEncoderError.dirty = TRUE;
+            //SysError.EncoderFault = TRUE;
+            //FaultConditionsHandler();
+        }
+    }
+    
+    dataA = gEncoderConfig.offset;
+    dataB = POSCNT;
+            
+    newencdata = TRUE;
+    
+    POSCNT = UPDN ? 0 : 0xFFFF;
+    
+    qe_ready = TRUE;
+    
+    if (!qe_moved && (UPDN_old == UPDN))
+    {
+        gEncoderError.phase_broken = TRUE;
+        SysError.EncoderFault = TRUE;
+        FaultConditionsHandler();
+    }
+    
+    UPDN_old = UPDN;
+    poscnt_old = (int)POSCNT;
+    qe_moved = FALSE;
+}
+
+// QE zero crossing interrupt manager
+void __attribute__((__interrupt__,no_auto_psv)) _QEI1Interrupt(void)
+{
+    QEsignalZeroCrossing(QEICONbits.UPDN);
+    
+    // clear interrupt flag
+    IFS3bits.QEI1IF = 0;
+}
+
+/*
 // QE zero crossing interrupt manager
 void __attribute__((__interrupt__,no_auto_psv)) _QEI1Interrupt(void)
 {
@@ -209,3 +267,4 @@ void __attribute__((__interrupt__,no_auto_psv)) _QEI1Interrupt(void)
     // clear interrupt flag
     IFS3bits.QEI1IF = 0;
 }
+*/

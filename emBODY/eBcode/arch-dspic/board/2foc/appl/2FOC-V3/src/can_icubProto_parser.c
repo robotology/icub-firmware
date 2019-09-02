@@ -199,26 +199,32 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
         if (!gCanProtocolCompatible) return 0;
 
         MotorConfig.bitmask = rxpayload->b[1];
-
+        MotorConfig.configured = TRUE;
+        
         gEncoderConfig.resolution = rxpayload->w[1];
-        gEncoderConfig.offset     = rxpayload->w[2];
+        gEncoderConfig.tolerance  = (rxlen == 8) ? rxpayload->b[7] : 36;
         gEncoderConfig.numPoles   = rxpayload->b[6]/2;
+        gEncoderConfig.full_calibration = FALSE;
 
-        if (gEncoderConfig.offset == -1)
+        if (MotorConfig.has_hall)
         {
-            MotorConfig.verbose = TRUE;
-            gEncoderConfig.full_calibration = TRUE;
-            gEncoderConfig.offset = 0;
+            gEncoderConfig.offset = 330;
+            MotorConfig.has_index = FALSE;
         }
-        else
+        else if (MotorConfig.has_qe)
         {
-            gEncoderConfig.full_calibration = FALSE;
+            MotorConfig.has_speed_qe = FALSE;
+            
+            gEncoderConfig.offset = rxpayload->w[2];
+        
+            if (MotorConfig.has_index && gEncoderConfig.offset == -1)
+            {
+                gEncoderConfig.full_calibration = TRUE;
+                gEncoderConfig.offset = 0;
+                MotorConfig.verbose = TRUE;
+            }
         }
         
-        gEncoderConfig.tolerance = (rxlen == 8) ? rxpayload->b[7] : 36;
-        
-        if (MotorConfig.has_qe) MotorConfig.has_speed_qe = FALSE;
-
         return 1;
     }
 
@@ -254,24 +260,24 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
     if (cmd == ICUBCANPROTO_POL_MC_CMD__SET_CURRENT_PID)
     {
         if (!gCanProtocolCompatible) return 0;
-
+        
         if (rxlen==8)
         {
-            //int  kp=((int)rxpayload->b[1])|(((int)rxpayload->b[2])<<8);
-            //int  ki=((int)rxpayload->b[3])|(((int)rxpayload->b[4])<<8);
-            //char ks=rxpayload->b[7];
+            int  kp=((int)rxpayload->b[1])|(((int)rxpayload->b[2])<<8);
+            int  ki=((int)rxpayload->b[3])|(((int)rxpayload->b[4])<<8);
+            char ks=rxpayload->b[7];
 
-            //setIPid(kp,ki,ks);
+            setIPid(kp,ki,ks);
 
-            setIPid(*(int*)(&rxpayload->b[1]),*(int*)(&rxpayload->b[3]),rxpayload->b[7]);
-
-        return 1;
-    }
+            //setIPid(*(int*)(&rxpayload->b[1]),*(int*)(&rxpayload->b[3]),rxpayload->b[7]);
+            
+            return 1;
+        }
         else if (rxlen==6)
         {
             static float fkp = 0.0f;
             static float fki = 0.0f;
-
+            
             switch (rxpayload->b[1])
             {
                 case 1: fkp = *(float*)&rxpayload->b[2]; break;
@@ -285,7 +291,7 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             int exponent = 0;
             
             for (exponent = 0; exponent < 16; ++exponent)
-    {
+            {
                 float power = (float)(1<<exponent);
         
                 if (max < power)
@@ -305,16 +311,16 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
     if (cmd == ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID)
     {
         if (!gCanProtocolCompatible) return 0;
-
+                
         if (rxlen==8)
         {
-            //int  kp=((int)rxpayload->b[1])|(((int)rxpayload->b[2])<<8);
-            //int  ki=((int)rxpayload->b[3])|(((int)rxpayload->b[4])<<8);
-            //char ks=rxpayload->b[7];
+            int  kp=((int)rxpayload->b[1])|(((int)rxpayload->b[2])<<8);
+            int  ki=((int)rxpayload->b[3])|(((int)rxpayload->b[4])<<8);
+            char ks=rxpayload->b[7];
 
-            //setSPid(kp,ki,ks);
+            setSPid(kp,ki,ks);
             
-            setSPid(*(int*)(&rxpayload->b[1]),*(int*)(&rxpayload->b[3]),rxpayload->b[7]);
+            //setSPid(*(int*)(&rxpayload->b[1]),*(int*)(&rxpayload->b[3]),rxpayload->b[7]);
             
             return 1;
         }
@@ -342,8 +348,8 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
                 if (max < power)
                 {
                     setSPid((int)(fkp*32768.0f/power),(int)(fki*32768.0f/power),15-exponent);
-
-        return 1;
+                    
+                    return 1;
                 }
             }
             

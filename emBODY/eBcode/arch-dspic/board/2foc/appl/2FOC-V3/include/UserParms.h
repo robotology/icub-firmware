@@ -17,7 +17,13 @@
 
 //#define UDEF_CURRENT_MAX 4000 // 4 A
 #define UDEF_SPEED_MAX  32767
+#ifndef RELENTLESS
 #define UDEF_PWM_MAX    25600 // 800*32 = 80%
+#else
+#define UDEF_PWM_MAX    25600 // 800*32 = 80%
+#endif
+
+#define HALL_ERROR_MAX_CNT 1000
 
 //
 // Quadrature (incremental) Encoders parameters
@@ -122,7 +128,7 @@
 #define CAN_CMD_ALWAYS_ACCEPT
 
 // Oscillator Parameters
-#define PLLIN              10000000  // External Crystal or Clock Frequency (Hz)
+#define PLLIN          10000000  // External Crystal or Clock Frequency (Hz)
 #define DESIREDMIPS	   40000000  // Enter desired MIPS
 
 // number of elements in the list of possible contents of periodic message

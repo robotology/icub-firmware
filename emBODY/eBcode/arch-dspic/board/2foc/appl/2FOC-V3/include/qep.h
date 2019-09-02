@@ -37,11 +37,16 @@ extern volatile BOOL qe_ready;
 extern volatile int QE_RESOLUTION;
 #define QEready() qe_ready
 
+// MECAPION
+//#define QEgetRaw() (POSCNT<<5)
+//#define QEgetElettrDeg() ((int)(__builtin_muluu(POSCNT,360)>>11))
+
 extern void QEinit(int qe_resolution,int motor_num_poles,char use_index);
 extern unsigned int QEgetRaw();
 extern int QEcountError();
 extern void QEcountErrorClear();
 extern int QEgetElettrDeg();
 extern int QEgetPos();
+extern void QEsignalZeroCrossing(int UPDN);
 
 #endif

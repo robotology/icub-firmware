@@ -1,0 +1,11 @@
+# Build products
+**/build*/
+**/debug/
+**/dist/
+
+# System hidden files
+.DS_Store
+
+# Linux temp files
+*~
+
