@@ -269,8 +269,6 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
 
             setIPid(kp,ki,ks);
 
-            //setIPid(*(int*)(&rxpayload->b[1]),*(int*)(&rxpayload->b[3]),rxpayload->b[7]);
-            
             return 1;
         }
         else if (rxlen==6)
@@ -319,8 +317,6 @@ static int s_canIcubProtoParser_parse_pollingMsg(tCanData *rxpayload, unsigned c
             char ks=rxpayload->b[7];
 
             setSPid(kp,ki,ks);
-            
-            //setSPid(*(int*)(&rxpayload->b[1]),*(int*)(&rxpayload->b[3]),rxpayload->b[7]);
             
             return 1;
         }

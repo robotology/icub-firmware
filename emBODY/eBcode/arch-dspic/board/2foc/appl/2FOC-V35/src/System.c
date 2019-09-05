@@ -299,9 +299,9 @@ void SetupHWParameters(void)
     //
 
     // Current scaling constants: Determined by hardware design
-    //MeasCurrParm.qKa = DQKA;
-    //MeasCurrParm.qKb = DQKB;
-    //MeasCurrParm.qKc = DQKC;
+    MeasCurrParm.qKa = 0x4000; //DQKA;
+    MeasCurrParm.qKb = 0x4000; //DQKB;
+    MeasCurrParm.qKc = 0x4000; //DQKC;
 
     //
     // ADC - VDC-Link Measure
