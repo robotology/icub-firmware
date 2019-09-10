@@ -1055,18 +1055,19 @@ void DisableAuxServiceTimer()
 void DriveInit()
 // Perform drive SW/HW init
 {
+    // Setup PWM 0% offset, PWM max and the trigger to ADC capture (Special Event Compare Count Register)
     pwmInit(PWM_50_DUTY_CYC, DDEADTIME, PWM_MAX /*pwm max = 80%*/);
     
-    pwmON();
-    
-    pwmZero();
-    
-    int pwm3_00 = PWM_MAX/25;
+    pwmOFF();
 
-        // setup and perform ADC offset calibration in MeasCurrParm.Offseta and Offsetb
+    // setup and perform ADC offset calibration in MeasCurrParm.Offseta and Offsetb
     ADCDoOffsetCalibration();
-    
-    pwmOut(pwm3_00,-2*pwm3_00,pwm3_00);
+
+    pwmON();
+
+    int pwm3_00 = PWM_MAX / 25;
+
+    pwmOut(pwm3_00, -2*pwm3_00, pwm3_00);
     
     int d;
     
