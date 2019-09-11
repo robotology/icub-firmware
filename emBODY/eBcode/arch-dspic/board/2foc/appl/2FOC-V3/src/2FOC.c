@@ -149,7 +149,7 @@ volatile long gQEPosition = 0;
 volatile int  gQEVelocity = 0;
 volatile tMeasCurrParm MeasCurrParm;
 volatile tCtrlReferences CtrlReferences;
-tParkParm ParkParm;
+volatile tParkParm ParkParm;
 
 /////////////////////////////////////////////////
 
@@ -1034,11 +1034,28 @@ void DisableAuxServiceTimer()
 void DriveInit()
 // Perform drive SW/HW init
 {
+    // Setup PWM 0% offset, PWM max and the trigger to ADC capture (Special Event Compare Count Register)
     pwmInit(PWM_50_DUTY_CYC, DDEADTIME, PWM_MAX /*pwm max = 80%*/);
+    
+    pwmOFF();
 
     // setup and perform ADC offset calibration in MeasCurrParm.Offseta and Offsetb
     ADCDoOffsetCalibration();
 
+    pwmON();
+
+    int pwm3_00 = PWM_MAX / 25;
+
+    pwmOut(pwm3_00, -2*pwm3_00, pwm3_00);
+    
+    int d;
+    
+    for (d=0; d<5000; ++d) __delay32(4000); // 500 ms
+    
+    ADCDoGainCalibration();
+
+    pwmOFF();
+    
     // Enable DMA interrupt, arm DMA for transfer
     ADCConfigPWMandDMAMode();
 

@@ -85,7 +85,7 @@ unsigned int ADCVDCLinkTo100mV(int vdc)
     return tmp;
 }
 
-int ADCCalibrate(void)
+int ADCCalibrateOffset(void)
 // Calculate mean value of ADC_CAL_N_SAMPLES samples for iA, iB and Vdc and store in
 // MeasCurrParm.Offseta, Offsetb 
 // DMA AND ADC isr are not enabled here!
@@ -93,18 +93,20 @@ int ADCCalibrate(void)
 // torque set point is 0; the value can be adjusted looking at the 3 phase ia, ib, and ic
 // and centering all values around 0
 {
-    int i,TOT;
+    long ADCOffs1 = 0;
+    long ADCOffs2 = 0;
     long ADCVdcZero = 0;
-    long ADCOffs1 = 0, ADCOffs2 = 0;
   
     // Put an 'accettable' value in case of error in the calibration process
-    MeasCurrParm.Offseta = 0x0;
-    MeasCurrParm.Offsetbc = 0x0;
+    MeasCurrParm.Offseta = 0x200;
+    MeasCurrParm.Offsetc = 0x200;
 
     // Turn on ADC module
     AD1CON1bits.ADON = 1;
  	
-    for (i=0; i<ADC_CAL_N_SAMPLES; ++i)
+    int n;
+    
+    for (n=0; n<ADC_CAL_N_SAMPLES; ++n)
     {
         // samples AN0
         AD1CHS0bits.CH0SA = 0;
@@ -118,13 +120,13 @@ int ADCCalibrate(void)
         // convert!
         AD1CON1bits.SAMP = 0;
 
-        // init time out timer
-        TOT=0;
+        int timeout = 0;
+
         // poll for end of conversion
         while(!AD1CON1bits.DONE)
         {
             // Avoids polling lock
-            if (ADC_CAL_TIMEOUT == ++TOT)
+            if (ADC_CAL_TIMEOUT == ++timeout)
             {
                 // offset correction error signaling
       
@@ -147,21 +149,20 @@ int ADCCalibrate(void)
         // convert!
         AD1CON1bits.SAMP = 0;
 
-        // init time out timer
-        TOT=0;
+        timeout = 0;
 
         // poll for end of conversion
         while (!AD1CON1bits.DONE)
         {
             // Avoids polling lock
-            if (ADC_CAL_TIMEOUT == ++TOT)
+            if (ADC_CAL_TIMEOUT == ++timeout)
             {
                 // offset correction error signaling
    
                 return -1;
             }
         }
-        // accumuulate values
+        // accumulate values
         ADCOffs2 += (int)ADC1BUF0;
 	
         // Samples AN2 (Vdc)
@@ -178,13 +179,13 @@ int ADCCalibrate(void)
         AD1CON1bits.SAMP = 0;
         // don't mind about int generated
 
-        // init time out timer
-        TOT=0;
+        timeout = 0;
+
         // poll for end of conversion
         while (!AD1CON1bits.DONE)
         {
             // Avoids polling lock
-            if (ADC_CAL_TIMEOUT == ++TOT)
+            if (ADC_CAL_TIMEOUT == ++timeout)
             {
                 // offset correction error signaling
    
@@ -202,19 +203,148 @@ int ADCCalibrate(void)
     }
 
     // divide for number of samples in order to get mean
-    ADCOffs1 /= ADC_CAL_N_SAMPLES;
-    ADCOffs2 /= ADC_CAL_N_SAMPLES;
+    
+    ADCOffs1   += ADCOffs1>=0   ? ADC_CAL_N_SAMPLES/2 : -ADC_CAL_N_SAMPLES/2;
+    ADCOffs1   /= ADC_CAL_N_SAMPLES;
+    
+    ADCOffs2   += ADCOffs2>=0   ? ADC_CAL_N_SAMPLES/2 : -ADC_CAL_N_SAMPLES/2;
+    ADCOffs2   /= ADC_CAL_N_SAMPLES;
+    
+    ADCVdcZero += ADCVdcZero>=0 ? ADC_CAL_N_SAMPLES/2 : -ADC_CAL_N_SAMPLES/2;
     ADCVdcZero /= ADC_CAL_N_SAMPLES;
-
+    
     // associate the calculated offset
     MeasCurrParm.Offseta = ADCOffs1;
-    MeasCurrParm.Offsetbc = ADCOffs2;
+    MeasCurrParm.Offsetc = ADCOffs2;
 
-    // TODO: mettere a posto la correzione dell'offset
-    //   e quindi togliere questi bypass!
-    //MeasCurrParm.Offseta = 0x200;
-    //MeasCurrParm.Offsetbc = 0x200;
+    // Turn off ADC module
+    AD1CON1bits.ADON = 0;
 
+    return 0;
+}
+
+volatile int storeIa,storeIc;
+
+int ADCCalibrateGain(void)
+// Calculate mean value of ADC_CAL_N_SAMPLES samples for iA, iB and Vdc and store in
+// MeasCurrParm.Offseta, Offsetb 
+// DMA AND ADC isr are not enabled here!
+// An error in estimation of current offset results in a cogging torque when 
+// torque set point is 0; the value can be adjusted looking at the 3 phase ia, ib, and ic
+// and centering all values around 0
+{
+    long Ia = 0;
+    long Ic = 0;
+    
+    // Turn on ADC module
+    AD1CON1bits.ADON = 1;
+ 	
+    int n;
+    
+    for (n=0; n<ADC_CAL_N_SAMPLES; ++n)
+    {
+        // samples AN0
+        AD1CHS0bits.CH0SA = 0;
+        AD1CON1bits.DONE = 0;
+        // amplifiers holding
+        AD1CON1bits.SAMP = 1;
+
+        // TODO: TRIM ME (eventually:)
+        __delay32(100);
+
+        // convert!
+        AD1CON1bits.SAMP = 0;
+
+        int timeout = 0;
+
+        // poll for end of conversion
+        while(!AD1CON1bits.DONE)
+        {
+            // Avoids polling lock
+            if (ADC_CAL_TIMEOUT == ++timeout)
+            {
+                // offset correction error signaling
+      
+                return -1;
+            }
+        }
+        // accumulate values
+        Ia += (int)ADC1BUF0;
+
+        // Samples AN1
+        AD1CHS0bits.CH0SA = 1;
+		
+        AD1CON1bits.DONE = 0;
+        // amplifiers holding
+        AD1CON1bits.SAMP = 1;
+
+        // TODO TRIM ME
+        __delay32(100);
+
+        // convert!
+        AD1CON1bits.SAMP = 0;
+
+        timeout = 0;
+
+        // poll for end of conversion
+        while (!AD1CON1bits.DONE)
+        {
+            // Avoids polling lock
+            if (ADC_CAL_TIMEOUT == ++timeout)
+            {
+                // offset correction error signaling
+   
+                return -1;
+            }
+        }
+        // accumulate values
+        Ic += (int)ADC1BUF0;
+    }
+
+    // divide for number of samples in order to get mean
+
+    Ia += Ia>=0 ? ADC_CAL_N_SAMPLES/2 : -ADC_CAL_N_SAMPLES/2; 
+    Ia = MeasCurrParm.Offseta - Ia/ADC_CAL_N_SAMPLES;
+    
+    Ic += Ic>=0 ? ADC_CAL_N_SAMPLES/2 : -ADC_CAL_N_SAMPLES/2;
+    Ic = MeasCurrParm.Offsetc - Ic/ADC_CAL_N_SAMPLES;
+    
+    storeIa = Ia;
+    storeIc = Ic;
+    
+    if (Ia < 0) Ia = -Ia;
+    if (Ic < 0) Ic = -Ic;
+    
+    int Il = Ia<Ic ? Ia : Ic;
+    int Ih = Ia>Ic ? Ia : Ic;
+
+    int Kh = 0x4001;
+    int Kl; 
+    long diff_old = 0x7FFFFFFFUL;
+    
+    while (1)
+    {
+        Kl = __builtin_divsd(0x10000000L,--Kh);
+        
+        long diff = __builtin_mulss(Kh,Ih) - __builtin_mulss(Kl,Il);
+        
+        if (diff < 0) diff = -diff;
+        
+        if (diff <= diff_old)
+        {
+            diff_old = diff;
+        }
+        else
+        {
+            Kl = __builtin_divsd(0x10000000UL,++Kh);
+            
+            break;
+        }
+    }    
+    
+    MeasCurrParm.qKa = Ia<Ic ? Kl : Kh; 
+    MeasCurrParm.qKc = Ic<Ia ? Kl : Kh;
+    
     // Turn off ADC module
     AD1CON1bits.ADON = 0;
 
@@ -363,7 +493,60 @@ void ADCDoOffsetCalibration(void)
 
     while (1)
     {
-	ret = ADCCalibrate();
+        ret = ADCCalibrateOffset();
+
+        if (ret == -1)
+        {
+           /* AD is not working properly.
+            * loop forever if fatal error
+            * condition
+            */
+            SysError.ADCCalFailure = 1;
+            LED_status.RedBlinkRate=BLINKRATE_STILL;
+
+            while(1);
+
+        }
+        else if (ret == -2)
+        {
+           /* VDCLink is too low.
+            * enlight red led, then
+            * wait forever for VDClink to
+            * raise
+            */
+            SysError.ADCCalFailure = 1;
+	 	
+            LED_status.RedBlinkRate=BLINKRATE_STILL;
+            // break;
+		
+            continue;
+        }
+		 
+     	LED_status.RedBlinkRate = led;
+ 	 
+        return;
+    }
+}
+
+void ADCDoGainCalibration(void)
+{
+    int i;
+    int ret;
+    int led;
+    // Configure ADC registers for calibration without PWM sync and DMA
+
+    // Execute calibration and store values
+  
+    for (i=0; i<10000; ++i) // delay  1s
+    {
+        __delay32(4000);   //delay 100us
+    }
+
+    led = LED_status.RedBlinkRate;
+
+    while (1)
+    {
+        ret = ADCCalibrateGain();
 
         if (ret == -1)
         {

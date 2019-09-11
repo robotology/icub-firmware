@@ -122,7 +122,7 @@
 #define CAN_CMD_ALWAYS_ACCEPT
 
 // Oscillator Parameters
-#define PLLIN              10000000  // External Crystal or Clock Frequency (Hz)
+#define PLLIN          10000000  // External Crystal or Clock Frequency (Hz)
 #define DESIREDMIPS	   40000000  // Enter desired MIPS
 
 // number of elements in the list of possible contents of periodic message

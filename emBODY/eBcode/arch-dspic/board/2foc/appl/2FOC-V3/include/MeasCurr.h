@@ -36,15 +36,13 @@
 
 #include "UserTypes.h"
 
-typedef struct {
-    SFRAC16   qKa;        // Q15 
+typedef struct {     // SFRAC16 is Q15
+    SFRAC16   qKa;
     SFRAC16   Offseta;
-
-    SFRAC16   qKb;        // Q15 
-    SFRAC16   Offsetbc;
-
-    SFRAC16   qKc;        // Q15
-    } tMeasCurrParm;
+    SFRAC16   qKb;
+    SFRAC16   qKc;
+    SFRAC16   Offsetc;
+} tMeasCurrParm;
 
 void MeasAndCompIaIcCalculateIb();
 void MeasAndCompIaIb();
