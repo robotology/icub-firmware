@@ -29,5 +29,6 @@ void ADCDoGainCalibration();
 void ADCConfigPWMandDMAMode();
 void ADCInterruptAndDMAEnable();
 void ADCInterruptAndDMADisable();
+void measureAverageCurrentOnSinglePhase(int terminal,int measDuration,int* offset);
 
 #endif

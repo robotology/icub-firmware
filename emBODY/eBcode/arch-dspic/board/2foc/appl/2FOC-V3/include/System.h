@@ -9,6 +9,7 @@
 #include "MeasCurr.h"
 #include "Status.h"
 #include <string.h>
+#include <libpic30.h> /*__delay32 */
 
 typedef struct
 {
@@ -61,6 +62,12 @@ typedef union
 
 #define DDEADTIME (unsigned int)(DEADTIMESEC*DFCY) // Dead time in dTcys
 #define LOOPINTCY       (DESIREDMIPS/PWMFREQUENCY)
+
+// Timer delay in ms and us
+#define __delay_ms(d) \
+  { __delay32( (unsigned long) (((unsigned long long) d)*(FCY)/1000ULL)); }
+#define __delay_us(d) \
+  { __delay32( (unsigned long) (((unsigned long long) d)*(FCY)/1000000ULL)); }
 
 // return state of external fault pin
 #define EXTERNAL_FAULT_PRESSED()  (PORTA & 0x08)

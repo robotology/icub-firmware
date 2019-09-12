@@ -15,4 +15,10 @@ typedef unsigned char BOOL;
 #define UP     1
 #define DOWN   0
 
+typedef enum
+{
+    pwmPinOFF = 0,
+    pwmPinON  = 1
+} pwmPinOnOff_t;
+
 #endif

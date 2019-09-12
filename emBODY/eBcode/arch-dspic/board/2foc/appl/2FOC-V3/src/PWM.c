@@ -168,6 +168,60 @@ void pwmOFF(void)
     PWM_first_enable = 1;
 }
 
+char pwmCtrlActivePins(pwmPinOnOff_t out1, pwmPinOnOff_t out2, pwmPinOnOff_t out3)
+{
+    // Make sure PWM has been enabled
+    if (!PTCONbits.PTEN) {
+        pwmON();
+        PDC1 = PDC2 = PDC3 = PWM_50_DUTY_CYCLE; // IDLE to 50% PWM
+    }
+
+enable_retry:
+
+    PWM_ovcurr_fault = 0;
+
+    // Output overrides via the P1OVDCON register are synchronized to the PWM
+    // time base by setting the OSYNC bit.
+    PWM1CON2bits.OSYNC = 1;
+
+    // PWM I/O pin controlled by PWM Generator, or SW override
+    P1OVDCONbits.POVD3H = out3;
+    P1OVDCONbits.POVD3L = out3;
+    P1OVDCONbits.POVD2H = out2;
+    P1OVDCONbits.POVD2L = out2;
+    P1OVDCONbits.POVD1H = out1;
+    P1OVDCONbits.POVD1L = out1;
+
+    // In case of SW override, drive to inactive state the respective pin.
+    P1OVDCONbits.POUT3H = 0;
+    P1OVDCONbits.POUT3L = 0;
+    P1OVDCONbits.POUT2H = 0;
+    P1OVDCONbits.POUT2L = 0;
+    P1OVDCONbits.POUT1H = 0;
+    P1OVDCONbits.POUT1L = 0;
+    
+    if (PWM_ovcurr_fault) goto on_overcurrent;
+
+    PWM_first_enable = 0;
+
+    // Reconfiguration is complete
+    return 1;
+
+on_overcurrent:
+
+    PWM_first_enable = 0;
+
+    if (PWM_retry_enable)
+    {
+        __delay32(1000);
+        goto enable_retry;
+    }
+
+    SysError.OverCurrentFailure = 1;
+    
+    return 0;
+}
+
 void pwmZero(void)
 {
     PDC1 = PDC2 = PDC3 = PWM_50_DUTY_CYCLE;

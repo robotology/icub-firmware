@@ -580,3 +580,9 @@ void ADCDoGainCalibration(void)
         return;
     }
 }
+
+void measureAverageCurrentOnSinglePhase(int terminal,int measDuration,int* offset)
+{
+    ;
+}
+
