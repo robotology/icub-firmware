@@ -1148,6 +1148,54 @@ void DisableDrive()
 
 // drive functions are controlled according to DS402 standard (when possible)
 
+static BOOL Test_PWM_offsets(void)
+// PWM offsets test
+{
+    // Turn on PWM and set PWM = 0% for all terminals
+    pwmON();
+
+    // Measure average current on terminals A & C
+    int offsetA, offsetC; // in mA
+    //measureAverageCurrentOnSinglePhase(1,1000,&offsetA); // read phase A for 1s
+    //measureAverageCurrentOnSinglePhase(3,1000,&offsetC); // read phase C for 1s
+
+    // Log the offsets
+    I2Tdata.IQMeasured = offsetA;
+    CanIcubProtoTrasmitterSendPeriodicData();
+    I2Tdata.IQMeasured = offsetC;
+    CanIcubProtoTrasmitterSendPeriodicData();
+
+    // Check that offsets are null
+    //if () {}
+    return TRUE;
+}
+
+static BOOL DriveSelfTest(void)
+// Perform drive HW selftest
+{
+    BOOL testOk = TRUE;
+
+    // Check silicon revion
+    //SiliconRevionTest();
+
+    // Selftest EMUROM
+    //EepromTest();
+
+    // Selftest EMUROM
+    //EncoderSelfTest();
+
+    // Test ADC offsets & Gains
+    testOk &= Test_HES_ADC_offsetsNgains();
+
+    // Test PWM offsets
+    testOk &= Test_PWM_offsets();
+
+    // TODO: vedere se possibile verificare l'oscillatore e la verifica di porte di IO
+    
+    return testOk;
+}
+
+
 int main(void)
 {
     volatile extern unsigned char gCanProtocolCompatible;
@@ -1436,165 +1484,4 @@ int main(void)
 
     }
 #endif
-
-BOOL DriveSelfTest()
-// Perform drive HW selftest
-{
-    testOk = TRUE;
-
-    // Check silicon revion
-    //SiliconRevionTest();
-
-    // Selftest EMUROM
-    //EepromTest();
-
-    // Selftest EMUROM
-    //EncoderSelfTest();
-
-    // Test ADC offsets & Gains
-    testOk &&= HES_ADC_offsetsNgainsTest();
-
-    // Test PWM offsets
-    testOk &&= PWM_offsetsTest();
-
-    // TODO: vedere se possibile verificare l'oscillatore e la verifica di porte di IO
-    
-    return testOk;
-}
-
-
-//void updateGulp(void)
-//{
-    //if (!gulp_update_request) return;
-
-    //Gulp.W[0] = POSCNT;//gulp_mec;
-    //Gulp.W[1] = gulp_enc;//gQEVelocity; //gQEVelocity;//gTemperature; //encoder_error;
-    //Gulp.W[2] = gulp_sector;//gTemperature;//overf_cnt; // gQEPosition & 0xFFFF;
-    //Gulp.W[3] = I2Tdata.IQMeasured;//i2cERRORS;    // gQEPosition>>16;
-
-    //Gulp.W[0] = I2Tdata.IQMeasured;
-    //Gulp.W[1] = gQEVelocity;
-    //Gulp.W[2] = gQEPosition & 0xFFFF;
-    //Gulp.W[3] = gQEPosition >> 16;
-
-    //Gulp.W[0] = *gulpadr1;
-    //Gulp.W[1] = *gulpadr2;
-    //Gulp.W[2] = *gulpadr3;
-    //Gulp.W[3] = *gulpadr4;
-
-    // unlock the main loop, so it will read values just updated
-    //gulp_update_request = 0;
-
-    // read VDC link raw value;
-    //VDCLink = ADCGetVDCLink();
-//}
-
-    /*
-void SiliconRevionTest()
-// checks for proper silicon revision
-{
-    unsigned int devrev;
-
-    // read silicon chip revision
-    _memcpy_p2d16(&devrev, 0xff0002, sizeof (devrev));
-
-    if (devrev != 0x3003)
-    {
-
-        // TODO: trigger fault really ?
-
-        SysError.SiliconRevisionFault = 1;
-    }
-}
-*/
-
-/*
-void EncoderSelfTest()
-// encoder selftest (when possible)
-{
-    // TODO: giustappunto.
-
-}
-*/
-
-BOOL HES_ADC_offsetsNgainsTest()
-// HES/ADC offsets and gains tests. These tests are not sensitive to the PWM offsets.
-{
-    /* Check the HES/ADC offsets.
-     * Turn off the PWM on all the phases and check the average current on terminals A & C is null. */
-
-    // Turn off the PWM generation
-    pwmOFF();
-    
-    // Measure
-    int offsetA, offsetC; // in mA
-    measureAverageCurrentOnSinglePhase(1,1000,&offsetA); // read phase A for 1s
-    measureAverageCurrentOnSinglePhase(3,1000,&offsetC); // read phase C for 1s
-
-    // Log
-    I2Tdata.IQMeasured = offsetA;
-    extern void CanIcubProtoTrasmitterSendPeriodicData(void);
-    I2Tdata.IQMeasured = offsetC;
-    extern void CanIcubProtoTrasmitterSendPeriodicData(void);
-
-    // Check that offsets are null
-    if (offsetA>TOL_ADC_OFFSET || offsetC>TOL_ADC_OFFSET)
-    {
-        SysError.ADCCalFailure = TRUE;
-        return 0;
-    }
-
-    /* Check the HES/ADC gains.
-     * Set PWM terminal B to off, A and C to on. Set PWM C to 0% and drive a sine on PWM A.
-     * Check that Ia = -Ic. */
-
-    // Turn on the PWM generation on terminals A and C
-    pwmON();
-    if (!pwmCtrlActivePins(pwmPinON, pwmPinOFF, pwmPinON)) {
-        SysError.ADCCalFailure = TRUE;
-        return 0;
-    }
-
-    // Enable drive in HES_ADC_test mode for a fixed period (2s), while logging Ia+Ic.
-    EnableDrive();
-    __delay_ms(2000);
-    DisableDrive();
-
-    // Get the test results: mean(Ia+Ib), std(Ia+Ib).
-    __delay_ms(1000);
-    I2Tdata.IQMeasured = ADCtestParm.diffActPhaseCurrMean;
-    extern void CanIcubProtoTrasmitterSendPeriodicData(void);
-    __delay_ms(1000);
-    I2Tdata.IQMeasured = ADCtestParm.diffActPhaseCurrSTD;
-    extern void CanIcubProtoTrasmitterSendPeriodicData(void);
-     
-    // Check if Ia+Ic is below the tolerance
-    if (ADCtestParm.diffActPhaseCurrMean > TOL_DIFF_CURR_DUE_TO_ADC_GAIN) {
-        SysError.ADCCalFailure = TRUE;
-        return 0;
-    }
-    
-    return 1;
-}
-
-BOOL PWM_offsetsTest()
-// PWM offsets test
-{
-    // Turn on PWM and set PWM = 0% for all terminals
-    pwmON();
-
-    // Measure average current on terminals A & C
-    int offsetA, offsetC; // in mA
-    measureAverageCurrentOnSinglePhase(1,1000,&offsetA); // read phase A for 1s
-    measureAverageCurrentOnSinglePhase(3,1000,&offsetC); // read phase C for 1s
-
-    // Log the offsets
-    I2Tdata.IQMeasured = offsetA;
-    extern void CanIcubProtoTrasmitterSendPeriodicData(void);
-    I2Tdata.IQMeasured = offsetC;
-    extern void CanIcubProtoTrasmitterSendPeriodicData(void);
-
-    // Check that offsets are null
-    //if () {}
-}
 

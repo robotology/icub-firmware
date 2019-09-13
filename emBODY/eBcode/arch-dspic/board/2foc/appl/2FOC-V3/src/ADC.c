@@ -9,7 +9,9 @@
 #include <libpic30.h> /*__delay32 */
 
 #include "ADC.h"
+#include "can_icubProto_trasmitter.h"
 #include "Faults.h"
+#include "PWM.h"
 
 #define ADC_VDCLINK_ALLEGRO_MIN_THRESHOLD 120
 
@@ -581,8 +583,71 @@ void ADCDoGainCalibration(void)
     }
 }
 
-void measureAverageCurrentOnSinglePhase(int terminal,int measDuration,int* offset)
+BOOL Test_HES_ADC_offsetsNgains(void)
+// HES/ADC offsets and gains tests. These tests are not sensitive to the PWM offsets.
 {
-    ;
+    /* Check the HES/ADC offsets.
+     * Turn off the PWM on all the phases and check the average current on terminals A & C is null. */
+
+    // Turn off the PWM generation
+    pwmOFF();
+    
+    // Measure
+    int offsetA, offsetC; // in mA
+    MeasureAverageCurrentOnSinglePhase(1,1000,&offsetA); // read phase A for 1s
+    MeasureAverageCurrentOnSinglePhase(3,1000,&offsetC); // read phase C for 1s
+
+    // Log
+    I2Tdata.IQMeasured = offsetA;
+    CanIcubProtoTrasmitterSendPeriodicData();
+    I2Tdata.IQMeasured = offsetC;
+    CanIcubProtoTrasmitterSendPeriodicData();
+
+    // Check that offsets are null
+    if (offsetA>TOL_ADC_OFFSET || offsetC>TOL_ADC_OFFSET)
+    {
+        SysError.ADCCalFailure = TRUE;
+        return 0;
+    }
+
+    /* Check the HES/ADC gains.
+     * Set PWM terminal B to off, A and C to on. Set PWM C to 0% and drive a sine on PWM A.
+     * Check that Ia = -Ic. */
+
+    // Turn on the PWM generation on terminals A and C
+    pwmON();
+    if (!pwmCtrlActivePins(pwmPinON, pwmPinOFF, pwmPinON)) {
+        SysError.ADCCalFailure = TRUE;
+        return 0;
+    }
+
+    // Enable drive in HES_ADC_test mode for a fixed period (2s), while logging Ia+Ic.
+    EnableDrive();
+    __delay_ms(2000);
+    DisableDrive();
+
+    // Get the test results: mean(Ia+Ib), std(Ia+Ib).
+    __delay_ms(1000);
+    I2Tdata.IQMeasured = ADCtestParm.diffActPhaseCurrMean;
+    CanIcubProtoTrasmitterSendPeriodicData();
+    __delay_ms(1000);
+    I2Tdata.IQMeasured = ADCtestParm.diffActPhaseCurrSTD;
+    CanIcubProtoTrasmitterSendPeriodicData();
+     
+    // Check if Ia+Ic is below the tolerance
+    if (ADCtestParm.diffActPhaseCurrMean > TOL_DIFF_CURR_DUE_TO_ADC_GAIN) {
+        SysError.ADCCalFailure = TRUE;
+        return 0;
+    }
+    
+    return 1;
+}
+
+void MeasureAverageCurrentOnSinglePhase(int terminal, int measDuration, int* offset) {
+    // Configure ADC registers for calibration check without PWM sync and DMA
+    ADCConfigureRegistersForCalibration();
+    __delay_us(100);
+
+
 }
 

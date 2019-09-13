@@ -19,16 +19,17 @@ extern SFRAC16 ADCBuffer[4];
 
 extern volatile tMeasCurrParm MeasCurrParm;
 
-int ADCGetVDCLink();
+int ADCGetVDCLink(void);
 // read dclink voltage in [100mV] units
 unsigned int ADCVDCLinkTo100mV(int vdc);
-// pewrform offset calibration
-void ADCDoOffsetCalibration();
-void ADCDoGainCalibration();
+// perform offset calibration
+void ADCDoOffsetCalibration(void);
+void ADCDoGainCalibration(void);
+BOOL Test_HES_ADC_offsetsNgains(void);
 // setup ADC for PWM sync and DMA
-void ADCConfigPWMandDMAMode();
-void ADCInterruptAndDMAEnable();
-void ADCInterruptAndDMADisable();
-void measureAverageCurrentOnSinglePhase(int terminal,int measDuration,int* offset);
+void ADCConfigPWMandDMAMode(void);
+void ADCInterruptAndDMAEnable(void);
+void ADCInterruptAndDMADisable(void);
+void MeasureAverageCurrentOnSinglePhase(int terminal,int measDuration,int* offset);
 
 #endif
