@@ -28,7 +28,11 @@
  
 #include <stdint.h>
 #include <stddef.h>
+#if defined(CMSISOS2_ICUB_CHANGES)
+#include "../../Include/cmsis_os2.h"
+#else
 #include "cmsis_os2.h"
+#endif
  
 #ifdef  __cplusplus
 extern "C"
@@ -461,9 +465,12 @@ typedef struct {
   osMessageQueueAttr_t        *timer_mq_attr;   ///< Timer Message Queue Attributes
   uint32_t                     timer_mq_mcnt;   ///< Timer Message Queue maximum Messages
 } osRtxConfig_t;
- 
+
+#if defined(CMSISOS2_ICUB_CHANGES)
+extern osRtxConfig_t osRtxConfig;               ///< OS Configuration
+#else
 extern const osRtxConfig_t osRtxConfig;         ///< OS Configuration
- 
+#endif 
  
 #ifdef  __cplusplus
 }

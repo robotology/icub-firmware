@@ -1,3 +1,11 @@
+
+#if defined(CMSISOS2_ICUB_CHANGES)
+//    #warning CMSISOS2_ICUB_CHANGES: removed the static system configuration
+    #define CMSISOS2_ICUB_CHANGES_remove_static_system_configuration
+//    #warning CMSISOS2_ICUB_CHANGES: defined macro RTX_NO_MULTITHREAD_CLIB
+    #define RTX_NO_MULTITHREAD_CLIB
+#endif
+
 /*
  * Copyright (c) 2013-2019 Arm Limited. All rights reserved.
  *
@@ -33,6 +41,8 @@
 #endif
 #include "rtx_evr.h"
 
+#if defined(CMSISOS2_ICUB_CHANGES_remove_static_system_configuration)
+#else
 
 // System Configuration
 // ====================
@@ -540,6 +550,8 @@ __attribute__((section(".rodata"))) =
   0U
 #endif
 };
+
+#endif // CMSISOS2_ICUB_CHANGES_remove_static_system_configuration
 
 
 // Non weak reference to library irq module

@@ -1,3 +1,17 @@
+
+#if defined(CMSISOS2_ICUB_CHANGES)
+
+// - include guard ----------------------------------------------------------------------------------------------------
+
+#ifndef RTX_CONFIG_H_
+#define RTX_CONFIG_H_
+
+//#warning CMSISOS2_ICUB_CHANGES: removed the macros for static system configuration
+
+#endif // include guard
+
+#else
+
 /*
  * Copyright (c) 2013-2019 Arm Limited. All rights reserved.
  *
@@ -576,3 +590,5 @@
 //------------- <<< end of configuration section >>> ---------------------------
  
 #endif  // RTX_CONFIG_H_
+
+#endif // #if defined(CMSISOS2_ICUB_CHANGES)
