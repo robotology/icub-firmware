@@ -26,7 +26,7 @@ PID* PID_new(uint8_t n)
     {
         PID_init(&(o[i]));
     }
-    
+
     return o;
 }
 
@@ -38,38 +38,39 @@ void PID_init(PID* o)
 void PID_config(PID* o, eOmc_PID_t* config)
 {
     float rescaler = 1.0f/(float)(1<<config->scale);
-    
+
     o->Ko = config->offset;
     o->Kp = rescaler*config->kp;
     o->Kd = rescaler*config->kd;
     o->Ki = rescaler*config->ki;
-    
+
     o->Kff = rescaler*config->kff;
-    
+
     o->Kbemf = 0.0f;
     o->Ktau  = 0.0f;
-    
+
     o->Dn = 0.0f;
     o->En = 0.0f;
     o->In = 0.0f;
     o->Imax = config->limitonintegral;
-    
+
     o->stiction_up   = rescaler*config->stiction_up_val;
     o->stiction_down = rescaler*config->stiction_down_val;
-  
+    o->ditheringVal  = 1.5f * (o->stiction_up>o->stiction_down ? o->stiction_up : o->stiction_down);
+
     o->out_max = config->limitonoutput;
     o->out_lpf = 0.0f;
     o->out = 0.0f;
-    
-    o->filter = 0; 
-    
+
+    o->filter = 0;
+
     o->Ki *= 0.5f*CTRL_LOOP_PERIOD;
     o->Kd *= CTRL_LOOP_FREQUENCY;
-    
+
     if (o->Kd != 0.0f && o->Kp != 0.0f)
     {
         static const float N=10.f;
-        
+
         o->A = o->Kd / (o->Kd + o->Kp*N);
         o->B = (1.0f - o->A)*o->Kd;
     }
@@ -77,7 +78,7 @@ void PID_config(PID* o, eOmc_PID_t* config)
     {
         o->A = o->B = 0.0f;
     }
-    
+
 }
 
 void PID_config_friction(PID *o, float Kbemf, float Ktau)
@@ -96,7 +97,7 @@ void PID_reset(PID* o)
     o->Dn = 0.0f;
     o->En = 0.0f;
     o->In = 0.0f;
-    
+
     o->out_lpf = 0.0f;
     o->out = 0.0f;
 }
@@ -108,27 +109,27 @@ void PID_get_state(PID* o, float *out, float *err)
 }
 
 float PID_do_out(PID* o, float En)
-{   
+{
     // proportional
     float out = o->Kp*En;
-    
+
     // integral
     o->In += o->Ki*(En + o->En);
     LIMIT(o->In, o->Imax);
     out += o->In;
-    
+
     // derivative
     o->Dn *= o->A;
     o->Dn += o->B*(En - o->En);
     out += o->Dn;
-    
+
     o->En = En;
 
     // offset
     out += o->Ko;
-    
+
     LIMIT(out, o->out_max);
-    
+
     switch (o->filter)
     {
     case 0: o->out_lpf = out;                                                      break;
@@ -138,13 +139,31 @@ float PID_do_out(PID* o, float En)
     case 4: o->out_lpf = 0.9968633318f*o->out_lpf + 0.00156833410f*(o->out + out); break; // 0.5 Hz
     default: o->out_lpf = out; break;
     }
-    
+
     o->out = out;
-    
+
     return o->out_lpf;
 }
 
 float PID_do_friction_comp(PID *o, float vel_fbk, float trq_ref)
 {
-    return o->Ktau*(o->Kbemf*vel_fbk+o->Kff*trq_ref);
+    static float signDithering = trq_ref>0 ? 1 : -1;
+    float viscFriction = o->Kbemf*vel_fbk;
+    float stiction;
+    if (vel_fbk>=MIN_VEL_OBSERVABLE)
+    {
+      stiction = o->stiction_up;
+    }
+    elsif (vel_fbk<=-MIN_VEL_OBSERVABLE)
+    {
+      stiction = o->stiction_down;
+    }
+    else
+    {
+      stiction = signDithering*(o->ditheringVal);
+      signDithering *= -1;
+    }
+
+    float totalFriction = stiction > viscFriction ? stiction : viscFriction;
+    return o->Ktau*(o->Kff*trq_ref + totalFriction);
 }

@@ -28,33 +28,35 @@ extern "C" {
 
 #include "EOemsControllerCfg.h"
 
-typedef struct //PID 
+typedef struct //PID
 {
     float Ko;
     float Kp;
     float Kd;
     float Ki;
-    
+
     float Kff;
     float Kbemf;
     float Ktau;
-    
+
     float Dn;
     float En;
     float In;
     float Imax;
-    
+
     float A,B;
-    
+
     float stiction_up;
     float stiction_down;
-  
+
     float out_max;
     float out_lpf;
     float out;
-    
+
     uint8_t filter;
-} PID; 
+} PID;
+
+#define MIN_VEL_OBSERVABLE 10 /* in degrees/s */
 
 PID* PID_new(uint8_t n);
 extern void PID_init(PID* o);
@@ -71,8 +73,6 @@ extern float PID_do_friction_comp(PID *o, float vel, float Tr);
 
 #ifdef __cplusplus
 }       // closing brace for extern "C"
-#endif 
- 
+#endif
+
 #endif  // include-guard
-
-
