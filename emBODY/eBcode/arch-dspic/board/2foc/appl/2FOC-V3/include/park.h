@@ -52,7 +52,7 @@ typedef struct {
     short   qV1;
     short   qV2;
     short   qV3;
-    } tParkParm;
+} tParkParm;
 
 //void SinCos(void);      // Calculate qSin,qCos from iAngle
 //void ClarkePark(void);  // Calculate qId,qIq from qCos,qSin,qIa,qIb

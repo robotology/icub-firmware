@@ -17,6 +17,8 @@
 
 SFRAC16 ADCBuffer[4] __attribute__((space(dma),aligned(16)));
 
+static BOOL MeasureRawAverageCurrentOnSinglePhase(int channel, int nSamples, int* offset);
+
 void ADCInterruptAndDMAEnable(void)
 // Enable DMA interrupt, arm DMA for transfer
 {
@@ -409,7 +411,7 @@ void ADCConfigPWMandDMAMode()
     // CH1 positive input is AN0, CH2 positive input is AN1, CH3 positive input is AN2
     AD1CHS123bits.CH123SA = 0;
 
-    // DMA configurations for ADC
+    // DMA configurations for ADC (DMAxCON: DMA channel x control register)
     DMA0CON = 0;
     // Configure DMA for Peripheral indirect mode
     DMA0CONbits.AMODE = 2;
@@ -422,10 +424,10 @@ void ADCConfigPWMandDMAMode()
 
     // set DMA source register
     DMA0PAD=(int)&ADC1BUF0;
-    // number of words to transfer
-    // do 4 transfers
+    // number of words to transfer: do 4 transfers
+    // because we configured 4 ADC channels
     DMA0CNT = 3;
-    // attach DMA0 transfer to ADC
+    // attach DMA0 transfer to ADC1
     DMA0REQ = 13;
 
     // set address of dma buffer
@@ -591,11 +593,16 @@ BOOL Test_HES_ADC_offsetsNgains(void)
 
     // Turn off the PWM generation
     pwmOFF();
-    
+    // Configure ADC registers for calibration check without PWM sync and DMA
+    AD1CON1bits.ADON = 0; // Turn off ADC module
+    ADCConfigureRegistersForCalibration();
+    __delay_us(100);
+    AD1CON1bits.ADON = 1; // Turn on ADC module
+
     // Measure
-    int offsetA, offsetC; // in mA
-    MeasureAverageCurrentOnSinglePhase(1,1000,&offsetA); // read phase A for 1s
-    MeasureAverageCurrentOnSinglePhase(3,1000,&offsetC); // read phase C for 1s
+    int offsetA, offsetC; // raw values
+    MeasureRawAverageCurrentOnSinglePhase(inputChannel_TA_AN0,ADC_CAL_N_SAMPLES,&offsetA); // read phase A for 1s
+    MeasureRawAverageCurrentOnSinglePhase(inputChannel_TC_AN1,ADC_CAL_N_SAMPLES,&offsetC); // read phase C for 1s
 
     // Log
     I2Tdata.IQMeasured = offsetA;
@@ -604,6 +611,8 @@ BOOL Test_HES_ADC_offsetsNgains(void)
     CanIcubProtoTrasmitterSendPeriodicData();
 
     // Check that offsets are null
+    offsetA = offsetA<0 ? -offsetA : offsetA;
+    offsetC = offsetC<0 ? -offsetC : offsetC;
     if (offsetA>TOL_ADC_OFFSET || offsetC>TOL_ADC_OFFSET)
     {
         SysError.ADCCalFailure = TRUE;
@@ -615,7 +624,6 @@ BOOL Test_HES_ADC_offsetsNgains(void)
      * Check that Ia = -Ic. */
 
     // Turn on the PWM generation on terminals A and C
-    pwmON();
     if (!pwmCtrlActivePins(pwmPinON, pwmPinOFF, pwmPinON)) {
         SysError.ADCCalFailure = TRUE;
         return 0;
@@ -643,11 +651,28 @@ BOOL Test_HES_ADC_offsetsNgains(void)
     return 1;
 }
 
-void MeasureAverageCurrentOnSinglePhase(int terminal, int measDuration, int* offset) {
-    // Configure ADC registers for calibration check without PWM sync and DMA
-    ADCConfigureRegistersForCalibration();
-    __delay_us(100);
+BOOL MeasureRawAverageCurrentOnSinglePhase(int channel, int nSamples, int* offset) {
+    AD1CHS0bits.CH0SA = channel; // Set sampled channel AN0, AN1 or AN2
+    AD1CON1bits.SAMP = 1; // amplifiers holding
 
+    long cumulADCOff = 0; // cumulated current measurements
 
+    for (int n=0; n<nSamples; ++n)
+    {
+        __delay_ms(5); // Sampling time
+        AD1CON1bits.SAMP = 0; // convert!
+
+        // poll for end of conversion while avoiding polling lock
+        int timeout = 0;
+        while (!AD1CON1bits.DONE || ++timeout < ADC_CAL_TIMEOUT);
+        if (timeout == ADC_CAL_TIMEOUT) return FALSE;
+
+        // accumulate values
+        cumulADCOff += (int)ADC1BUF0;
+    }
+
+    *offset = cumulADCOff/nSamples-ADC_RAW_DEFAULT_OFFSET;
+
+    return TRUE;
 }
 

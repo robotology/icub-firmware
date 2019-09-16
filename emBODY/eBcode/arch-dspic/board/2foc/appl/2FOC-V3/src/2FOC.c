@@ -141,9 +141,6 @@ _FICD(ICS_PGD3 & JTAGEN_OFF); // & COE_ON ); //BKBUG_OFF
 
 #define isDriveEnabled() bDriveEnabled
 
-#define TOL_ADC_OFFSET 200
-#define TOL_DIFF_CURR_DUE_TO_ADC_GAIN 200
-
 volatile tI2T I2Tdata;
 volatile tLED_status LED_status = {0x00};
 tSysStatus SysStatus;

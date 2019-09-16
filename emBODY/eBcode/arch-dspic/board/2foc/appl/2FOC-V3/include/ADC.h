@@ -15,6 +15,20 @@
 // Timeout for polling loops during zero calibration
 #define ADC_CAL_TIMEOUT   1000
 
+// Default ADC offset (center value)
+#define ADC_RAW_DEFAULT_OFFSET 0x4000
+#define ADC_RESOLUTION 10
+#define ADC_WORD_SIZE 16
+// 
+#define TOL_ADC_OFFSET 1<<(ADC_WORD_SIZE-ADC_RESOLUTION)
+#define TOL_DIFF_CURR_DUE_TO_ADC_GAIN 2*TOL_ADC_OFFSET
+
+typedef enum {
+    inputChannel_TA_AN0      = 0,
+    inputChannel_TC_AN1      = 1,
+    inputChannel_VDCLINK_AN2 = 2
+} inputChannel_t;
+
 extern SFRAC16 ADCBuffer[4];
 
 extern volatile tMeasCurrParm MeasCurrParm;
@@ -30,6 +44,5 @@ BOOL Test_HES_ADC_offsetsNgains(void);
 void ADCConfigPWMandDMAMode(void);
 void ADCInterruptAndDMAEnable(void);
 void ADCInterruptAndDMADisable(void);
-void MeasureAverageCurrentOnSinglePhase(int terminal,int measDuration,int* offset);
 
 #endif
