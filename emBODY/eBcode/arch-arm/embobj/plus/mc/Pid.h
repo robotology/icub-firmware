@@ -48,6 +48,7 @@ typedef struct //PID
 
     float stiction_up;
     float stiction_down;
+    float ditheringVal;
 
     float out_max;
     float out_lpf;
