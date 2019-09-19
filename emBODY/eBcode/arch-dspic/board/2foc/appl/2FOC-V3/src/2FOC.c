@@ -207,6 +207,8 @@ volatile long SIntLimit = 0;//800L*1024L;
 
 /////////////////////////////////////////
 
+static void MeasAndCompIaIc(void);
+
 void setMaxCurrent(int nom, int peak, int ovr)
 {
     Inom = nom;
@@ -1125,7 +1127,7 @@ void DisableDrive()
     bDriveEnabled = 0;
 }
 
-void MeasAndCompIaIc(void)
+static void MeasAndCompIaIc(void)
 {
     int i;
     long cumulBuffIa = 0;
@@ -1139,7 +1141,7 @@ void MeasAndCompIaIc(void)
     cumulBuffIc = cumulBuffIc>>3;
 
     ParkParm.qIa = (int)((__builtin_mulss(MeasCurrParm.Offseta-cumulBuffIa,MeasCurrParm.qKa)+8192L)>>14);
-    ParkParm.qIc = (int)((__builtin_mulss(MeasCurrParm.Offsetc-cumulBuffIc,MeasCurrParm.qKc)+8192L)>>14);
+    ParkParm.qIc = (int)((__builtin_mulss(MeasCurrParm.Offsetbc-cumulBuffIc,MeasCurrParm.qKc)+8192L)>>14);
 }
 
 // drive functions are controlled according to DS402 standard (when possible)

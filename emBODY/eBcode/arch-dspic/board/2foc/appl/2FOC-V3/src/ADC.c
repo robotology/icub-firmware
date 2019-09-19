@@ -13,13 +13,7 @@
 
 #define ADC_VDCLINK_ALLEGRO_MIN_THRESHOLD 120
 
-struct
-{
-    SFRAC16 adc1ch0[8];
-    SFRAC16 adc1ch1[8];
-    SFRAC16 adc1ch2[8];
-    SFRAC16 adc1ch3[8];
-} ADCBuffer __attribute__((space(dma),aligned(16)));
+ADCBuffer_t ADCBuffer __attribute__((space(dma),aligned(16)));
 
 void ADCInterruptAndDMAEnable(void)
 // Enable DMA interrupt, arm DMA for transfer
@@ -303,7 +297,7 @@ void ADCConfigPWMandDMAMode()
     DMA0REQ = 13;
 
     // set address of dma buffer
-    DMA0STA = __builtin_dmaoffset(ADCBuffer);
+    DMA0STA = __builtin_dmaoffset(&ADCBuffer);
 }
 
 void ADCConfigureRegistersForCalibration()

@@ -15,6 +15,14 @@
 // Timeout for polling loops during zero calibration
 #define ADC_CAL_TIMEOUT   1000
 
+typedef struct {
+    SFRAC16 adc1ch0[8];
+    SFRAC16 adc1ch1[8];
+    SFRAC16 adc1ch2[8];
+    SFRAC16 adc1ch3[8];
+} ADCBuffer_t;
+extern ADCBuffer_t ADCBuffer;
+
 extern volatile tMeasCurrParm MeasCurrParm;
 
 int ADCGetVDCLink();
