@@ -555,7 +555,7 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
     // read and compensate ADC offset by MeasCurrParm.Offseta, Offsetb, Offsetc
     // scale currents by MeasCurrParm.qKa, qKb, qKc
     // Calculate ParkParm.qIa, qIb, qIc
-    MeasAndCompIaIcCalculateIb();
+    MeasAndCompIaIc();
 
     ParkParm.qIb = -ParkParm.qIa-ParkParm.qIc;
 
@@ -1123,6 +1123,23 @@ void DisableDrive()
     //ZeroRegulators();
 
     bDriveEnabled = 0;
+}
+
+void MeasAndCompIaIc(void)
+{
+    int i;
+    long cumulBuffIa = 0;
+    long cumulBuffIc = 0;
+    for (i=0; i<8; i++)
+    {
+        cumulBuffIa += ADCBuffer.adc1ch1[i];
+        cumulBuffIc += ADCBuffer.adc1ch2[i];
+    }
+    cumulBuffIa = cumulBuffIa>>3;
+    cumulBuffIc = cumulBuffIc>>3;
+
+    ParkParm.qIa = (int)((__builtin_mulss(MeasCurrParm.Offseta-cumulBuffIa,MeasCurrParm.qKa)+8192L)>>14);
+    ParkParm.qIc = (int)((__builtin_mulss(MeasCurrParm.Offsetc-cumulBuffIc,MeasCurrParm.qKc)+8192L)>>14);
 }
 
 // drive functions are controlled according to DS402 standard (when possible)

@@ -13,7 +13,13 @@
 
 #define ADC_VDCLINK_ALLEGRO_MIN_THRESHOLD 120
 
-SFRAC16 ADCBuffer[4] __attribute__((space(dma),aligned(16)));
+struct
+{
+    SFRAC16 adc1ch0[8];
+    SFRAC16 adc1ch1[8];
+    SFRAC16 adc1ch2[8];
+    SFRAC16 adc1ch3[8];
+} ADCBuffer __attribute__((space(dma),aligned(16)));
 
 void ADCInterruptAndDMAEnable(void)
 // Enable DMA interrupt, arm DMA for transfer
@@ -48,7 +54,7 @@ void ADCInterruptAndDMADisable(void)
 SFRAC16 ADCGetVDCLink()
 // This quickly returns VDCLink SFRAC value.
 {
-    return ADCBuffer[2];
+    return ADCBuffer.adc1ch3[0];
 }
 
 unsigned int ADCVDCLinkTo100mV(int vdc)
@@ -261,7 +267,7 @@ void ADCConfigPWMandDMAMode()
     AD1CON1bits.FORM = 3;
 
     // Interrupt after every conversion!
-    AD1CON2bits.SMPI = 0;
+    AD1CON2bits.SMPI = 7;
    
     // One sample per cycle on each ch
     AD1CON4 = 0;
@@ -292,7 +298,7 @@ void ADCConfigPWMandDMAMode()
     DMA0PAD=(int)&ADC1BUF0;
     // number of words to transfer
     // do 4 transfers
-    DMA0CNT = 3;
+    DMA0CNT = 31;
     // attach DMA0 transfer to ADC
     DMA0REQ = 13;
 
