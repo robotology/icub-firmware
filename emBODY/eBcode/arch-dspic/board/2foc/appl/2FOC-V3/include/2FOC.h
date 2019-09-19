@@ -64,18 +64,23 @@ volatile extern int  gQEVelocity;
 
 volatile extern int Ipeak;
 
-extern void DisableDrive(void);
-extern void I2Twatcher(void);
+void DisableDrive(void);
+void I2Twatcher(void);
 
-extern void setIPid(int kp,int ki, char shift);
-extern void setSPid(int kp,int ki, char shift);
-extern void setMaxCurrent(int nom, int peak, int ovr);
-extern void RequestControlMode(char cm);
-extern BOOL updateOdometry();
+void setIPid(int kp,int ki, char shift);
+void setSPid(int kp,int ki, char shift);
+void setMaxCurrent(int nom, int peak, int ovr);
+void RequestControlMode(char cm);
+BOOL updateOdometry();
 
-extern void ZeroControlReferences(void);
+void ZeroControlReferences(void);
+
+void EnableDriveTest(void);
+void DisableDriveTest(void);
 
 volatile extern int gSetpointWatchdog;
+
+
 #define SETPOINT_WATCHDOG_REARM() gSetpointWatchdog = 1000;
 
 #ifdef	__cplusplus

@@ -44,11 +44,6 @@ typedef struct {     // SFRAC16 is Q15
     SFRAC16   Offsetc;
 } tMeasCurrParm;
 
-typedef struct {
-    SFRAC16   diffActPhaseCurrMean;
-    SFRAC16   diffActPhaseCurrSTD;
-} tADCtestParm;
-
 void MeasAndCompIaIcCalculateIb();
 void MeasAndCompIaIb();
 

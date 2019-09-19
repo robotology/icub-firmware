@@ -150,7 +150,6 @@ volatile int  gQEVelocity = 0;
 volatile tMeasCurrParm MeasCurrParm;
 volatile tCtrlReferences CtrlReferences;
 volatile tParkParm ParkParm;
-volatile tADCtestParm ADCtestParm;
 
 /////////////////////////////////////////////////
 
@@ -678,9 +677,9 @@ void __attribute__((__interrupt__, no_auto_psv)) _DMA0Interrupt(void)
         sector_stored_old = sector_stored;
         sector_stored = sector;
         
-        #define HI(Ix,Vx) iH = &(ParkParm.Ix); ppwmH = &Vx;
-        #define LO(Ix,Vx) iL = &(ParkParm.Ix); ppwmL = &Vx;
-        #define NE(Ix,Vx) i0 = &(ParkParm.Ix); ppwm0 = &Vx;
+        #define HI(Ix,Vx) iH = (short*)&(ParkParm.Ix); ppwmH = (int*)&Vx;
+        #define LO(Ix,Vx) iL = (short*)&(ParkParm.Ix); ppwmL = (int*)&Vx;
+        #define NE(Ix,Vx) i0 = (short*)&(ParkParm.Ix); ppwm0 = (int*)&Vx;
         
         switch (sector) // original
         {
@@ -1104,17 +1103,16 @@ void EnableDrive()
 {
     bDriveEnabled = 1;
 
+    // I2T will run on behalf of 2FOC loop. Stop running it in behalf of Timer 3
     Timer3Disable();
 
     pwmZero();
 
     // Arm all the automation (PWM->ADC->DMA->FOC) but don't start yet!
-    ADCInterruptAndDMAEnable();
+    ADCInterruptAndDMAEnable(DMAchannel_DMA0);
 
     // enable the overcurrent interrupt
     OverCurrentFaultIntEnable();
-
-    // I2T will run on behalf of 2FOC loop. Stop running it in behalf of Timer 3
 
     pwmON();
 }
@@ -1129,43 +1127,25 @@ void DisableDrive()
     pwmOFF();
     pwmZero();
 
-    // Disable ADC IRQ and DMA
-    ADCInterruptAndDMADisable();
+    if (isDriveEnabled())
+    {
+        // Disable ADC IRQ and DMA
+        ADCInterruptAndDMADisable(DMAchannel_DMA0);
 
-    // I2T and encoder traking will run in behalf of timer 3 when 2FOC loop is not active
-    Timer3Enable();
+        // I2T and encoder traking will run in behalf of timer 3 when 2FOC loop is not active
+        Timer3Enable();
 
-    // zero torque and speed referemces
-    ZeroControlReferences();
-    // Zero regulators
-    //ZeroRegulators();
+        // zero torque and speed referemces
+        ZeroControlReferences();
 
-    bDriveEnabled = 0;
+        // Zero regulators
+        //ZeroRegulators();
+
+        bDriveEnabled = 0;
+    }
 }
 
 // drive functions are controlled according to DS402 standard (when possible)
-
-static BOOL Test_PWM_offsets(void)
-// PWM offsets test
-{
-    // Turn on PWM and set PWM = 0% for all terminals
-    pwmON();
-
-    // Measure average current on terminals A & C
-    int offsetA, offsetC; // in mA
-    //measureAverageCurrentOnSinglePhase(1,1000,&offsetA); // read phase A for 1s
-    //measureAverageCurrentOnSinglePhase(3,1000,&offsetC); // read phase C for 1s
-
-    // Log the offsets
-    I2Tdata.IQMeasured = offsetA;
-    CanIcubProtoTrasmitterSendPeriodicData();
-    I2Tdata.IQMeasured = offsetC;
-    CanIcubProtoTrasmitterSendPeriodicData();
-
-    // Check that offsets are null
-    //if () {}
-    return TRUE;
-}
 
 static BOOL DriveSelfTest(void)
 // Perform drive HW selftest
@@ -1185,7 +1165,7 @@ static BOOL DriveSelfTest(void)
     testOk &= Test_HES_ADC_offsetsNgains();
 
     // Test PWM offsets
-    testOk &= Test_PWM_offsets();
+    //testOk &= Test_PWM_offsets();
 
     // TODO: vedere se possibile verificare l'oscillatore e la verifica di porte di IO
     
@@ -1319,7 +1299,7 @@ int main(void)
     {
         if (Fault())
         {
-            if (isDriveEnabled()) DisableDrive();
+            DisableDrive();
 
             gControlMode = icubCanProto_controlmode_hwFault;
             LED_status.GreenBlinkRate = BLINKRATE_OFF;
@@ -1329,7 +1309,7 @@ int main(void)
         {
             SysError.ExternalFaultAsserted = 1;
 
-            if (isDriveEnabled()) DisableDrive();
+            DisableDrive();
 
             gControlMode = icubCanProto_controlmode_idle;
             LED_status.GreenBlinkRate=BLINKRATE_NORMAL;

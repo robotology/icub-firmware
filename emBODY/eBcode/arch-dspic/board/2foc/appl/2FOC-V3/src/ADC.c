@@ -12,6 +12,8 @@
 #include "can_icubProto_trasmitter.h"
 #include "Faults.h"
 #include "PWM.h"
+#include "2FOC.h"
+#include "2FOCtest.h"
 
 #define ADC_VDCLINK_ALLEGRO_MIN_THRESHOLD 120
 
@@ -19,34 +21,73 @@ SFRAC16 ADCBuffer[4] __attribute__((space(dma),aligned(16)));
 
 static BOOL MeasureRawAverageCurrentOnSinglePhase(int channel, int nSamples, int* offset);
 
-void ADCInterruptAndDMAEnable(void)
+void ADCInterruptAndDMAEnable(DMAchannel_t DMAchannel)
 // Enable DMA interrupt, arm DMA for transfer
 {
-    //Clear the DMA interrupt flag bit
-    IFS0bits.DMA0IF = 0;
-    //Set the DMA interrupt enable bit
-    IEC0bits.DMA0IE = 1;
     // amplifiers holding
     AD1CON1bits.SAMP = 1;
     // no valid result is present
     AD1CON1bits.DONE = 0;
     // Clear the A/D interrupt flag bit
     IFS0bits.AD1IF = 0;
-    // Turn on DMA
-    DMA0CONbits.CHEN = 1;
+
+    switch (DMAchannel) {
+        case DMAchannel_DMA0:
+            //Clear the DMA interrupt flag bit
+            IFS0bits.DMA0IF = 0;
+            //Set the DMA interrupt enable bit
+            IEC0bits.DMA0IE = 1;
+            // Turn on DMA
+            DMA0CONbits.CHEN = 1;
+            break;
+            
+        case DMAchannel_DMA1:
+            //Clear the DMA interrupt flag bit
+            IFS0bits.DMA1IF = 0;
+            //Set the DMA interrupt enable bit
+            IEC0bits.DMA1IE = 1;
+            // Turn on DMA
+            DMA1CONbits.CHEN = 1;
+            break;
+            
+        default:
+            // Error: Unsupported DMA channel. Return leaving the A/D module off.
+            SysError.ADCCalFailure = 1;
+            LED_status.RedBlinkRate = BLINKRATE_STILL;
+            return;
+    }
+
     // Turn on A/D module
     AD1CON1bits.ADON = 1;
 }
 
-void ADCInterruptAndDMADisable(void)
+void ADCInterruptAndDMADisable(DMAchannel_t DMAchannel)
 // Disable DMA interrupt, disarm DMA
 {
-    // Turn off DMA
-    DMA0CONbits.CHEN = 0;
+    switch (DMAchannel) {
+        case DMAchannel_DMA0:
+            // Turn off DMA
+            DMA0CONbits.CHEN = 0;
+            // reset the DMA interrupt enable bit
+            IEC0bits.DMA0IE = 0;
+            break;
+
+        case DMAchannel_DMA1:
+            // Turn off DMA
+            DMA1CONbits.CHEN = 0;
+            // reset the DMA interrupt enable bit
+            IEC0bits.DMA1IE = 0;
+            break;
+
+        default:
+            // Error: Unsupported DMA channel. Return leaving the A/D module off.
+            SysError.ADCCalFailure = 1;
+            LED_status.RedBlinkRate = BLINKRATE_STILL;
+            return;
+    }
+
     // Turn off A/D module
     AD1CON1bits.ADON = 0;
-    // reset the DMA interrupt enable bit
-    IEC0bits.DMA0IE = 0;
 }
 
 SFRAC16 ADCGetVDCLink()
@@ -419,7 +460,7 @@ void ADCConfigPWMandDMAMode()
     // Continuous, Ping-Pong modes disabled
     DMA0CONbits.MODE = 0;
 
-    // trasfer block unit is a WORD
+    // transfer block unit is a WORD
     DMA0CONbits.SIZE = 0;
 
     // set DMA source register
@@ -432,6 +473,38 @@ void ADCConfigPWMandDMAMode()
 
     // set address of dma buffer
     DMA0STA = __builtin_dmaoffset(ADCBuffer);
+}
+
+void ADCConfigConvAndDMAmodeForSelfTest(triggerType_t trigger)
+// Change ADC registers configuration for calibration test, after PWM and DMA mode 
+// have been activated.
+{
+    // Conversion trigger in PWM or manual mode
+    AD1CON1bits.SSRC = trigger;
+
+    // DMA1 configurations for ADC (DMA1CON: DMA channel 1 control register)
+    DMA1CON = 0;
+
+    // Configure DMA1 for Peripheral indirect mode
+    DMA1CONbits.AMODE = 2;
+
+    // Continuous, Ping-Pong modes disabled
+    DMA1CONbits.MODE = 0;
+
+    // transfer block unit is a WORD
+    DMA1CONbits.SIZE = 0;
+
+    // set DMA1 source register
+    DMA1PAD=(int)&ADC1BUF0;
+    // number of words to transfer: do 4 transfers
+    // because we configured 4 ADC channels
+    DMA1CNT = 3;
+    // attach DMA1 transfer to ADC1, detach DMA0
+    DMA0REQ = 0;
+    DMA1REQ = 13;
+
+    // set address of dma buffer
+    DMA1STA = __builtin_dmaoffset(ADCBuffer);
 }
 
 void ADCConfigureRegistersForCalibration()
@@ -455,7 +528,7 @@ void ADCConfigureRegistersForCalibration()
     // SAMP bit is auto set
     AD1CON1bits.ASAM = 1;
 
-    // sampling in manual mode
+    // Conversion trigger in manual mode
     AD1CON1bits.SSRC = 0;
 
     // Signed fractional (DOUT = sddd dddd dd00 0000)
@@ -591,15 +664,18 @@ BOOL Test_HES_ADC_offsetsNgains(void)
     /* Check the HES/ADC offsets.
      * Turn off the PWM on all the phases and check the average current on terminals A & C is null. */
 
-    // Turn off the PWM generation
-    pwmOFF();
-    // Configure ADC registers for calibration check without PWM sync and DMA
-    AD1CON1bits.ADON = 0; // Turn off ADC module
-    ADCConfigureRegistersForCalibration();
-    __delay_us(100);
-    AD1CON1bits.ADON = 1; // Turn on ADC module
+    // Turn off the PWM generation and disable the automation PWM->ADC->DMA->FOC if required
+    DisableDrive();
 
-    // Measure
+    // Configure ADC & DMA registers for calibration check. Use manual conversion and DMA transfers.
+    ADCConfigConvAndDMAmodeForSelfTest(triggerType_MANUAL);
+    __delay_us(100);
+
+    // Enable drive in test mode for a fixed period (2s), for computing the HES_ADC 
+    // offsets
+    EnableDriveTest();
+    __delay_ms(2000);
+    DisableDriveTest();
     int offsetA, offsetC; // raw values
     MeasureRawAverageCurrentOnSinglePhase(inputChannel_TA_AN0,ADC_CAL_N_SAMPLES,&offsetA); // read phase A for 1s
     MeasureRawAverageCurrentOnSinglePhase(inputChannel_TC_AN1,ADC_CAL_N_SAMPLES,&offsetC); // read phase C for 1s
@@ -629,10 +705,10 @@ BOOL Test_HES_ADC_offsetsNgains(void)
         return 0;
     }
 
-    // Enable drive in HES_ADC_test mode for a fixed period (2s), while logging Ia+Ic.
-    EnableDrive();
+    // Enable drive in HES_ADC_test_offset mode for a fixed period (2s), while logging Ia+Ic.
+    EnableDriveTest();
     __delay_ms(2000);
-    DisableDrive();
+    DisableDriveTest();
 
     // Get the test results: mean(Ia+Ib), std(Ia+Ib).
     __delay_ms(1000);
@@ -657,7 +733,8 @@ BOOL MeasureRawAverageCurrentOnSinglePhase(int channel, int nSamples, int* offse
 
     long cumulADCOff = 0; // cumulated current measurements
 
-    for (int n=0; n<nSamples; ++n)
+    int n;
+    for (n=0; n<nSamples; ++n)
     {
         __delay_ms(5); // Sampling time
         AD1CON1bits.SAMP = 0; // convert!

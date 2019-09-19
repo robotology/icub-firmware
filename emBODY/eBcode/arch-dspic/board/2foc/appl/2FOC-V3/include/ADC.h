@@ -29,6 +29,16 @@ typedef enum {
     inputChannel_VDCLINK_AN2 = 2
 } inputChannel_t;
 
+typedef enum {
+    triggerType_MANUAL = 0,
+    triggerType_PWM = 3
+} triggerType_t;
+
+typedef enum {
+    DMAchannel_DMA0 = 0,
+    DMAchannel_DMA1 = 1
+} DMAchannel_t;
+
 extern SFRAC16 ADCBuffer[4];
 
 extern volatile tMeasCurrParm MeasCurrParm;
@@ -42,7 +52,7 @@ void ADCDoGainCalibration(void);
 BOOL Test_HES_ADC_offsetsNgains(void);
 // setup ADC for PWM sync and DMA
 void ADCConfigPWMandDMAMode(void);
-void ADCInterruptAndDMAEnable(void);
-void ADCInterruptAndDMADisable(void);
+void ADCInterruptAndDMAEnable(DMAchannel_t DMAchannel);
+void ADCInterruptAndDMADisable(DMAchannel_t DMAchannel);
 
 #endif
