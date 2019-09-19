@@ -22,18 +22,26 @@
 
 typedef enum {
     driveTestMode_HES_ADC_OFFSET = 0,
-    driveTestMode_HES_ADC_GAINS = 1            
+    driveTestMode_HES_ADC_GAINS,
+    driveTestMode_NONE
 } driveTestMode_t;
 
 typedef struct {
-    SFRAC16   diffActPhaseCurrMean;
-    SFRAC16   diffActPhaseCurrSTD;
+    long currOffsetA;
+    long currOffsetC;
+    int nSamples;
+    long diffActPhaseCurrMean;
+    long diffActPhaseCurrSTD;
 } ADCtestParm_t;
 
-volatile extern ADCtestParm_t ADCtestParm;
-volatile extern driveTestMode_t driveTestMode;
+typedef struct {
+    driveTestMode_t mode;
+    ADCtestParm_t ADC;
+} driveTestParm_t;
 
-void EnableDriveTest(void);
+volatile extern driveTestParm_t driveTestParams;
+
+void EnableDriveTest(driveTestMode_t testMode);
 void DisableDriveTest(void);
 
 #endif	/* 2FOCTEST_H */

@@ -19,9 +19,11 @@
 #define ADC_RAW_DEFAULT_OFFSET 0x4000
 #define ADC_RESOLUTION 10
 #define ADC_WORD_SIZE 16
-// 
-#define TOL_ADC_OFFSET 1<<(ADC_WORD_SIZE-ADC_RESOLUTION)
-#define TOL_DIFF_CURR_DUE_TO_ADC_GAIN 2*TOL_ADC_OFFSET
+
+//#define TOL_ADC_OFFSET 1<<(ADC_WORD_SIZE-ADC_RESOLUTION)
+//#define TOL_DIFF_CURR_DUE_TO_ADC_GAIN 2*TOL_ADC_OFFSET
+#define TOL_ADC_OFFSET 20 // mA
+#define TOL_DIFF_CURR_DUE_TO_ADC_GAIN ((10*TOL_ADC_OFFSET)^2)
 
 typedef enum {
     inputChannel_TA_AN0      = 0,
@@ -36,7 +38,7 @@ typedef enum {
 
 typedef enum {
     DMAchannel_DMA0 = 0,
-    DMAchannel_DMA1 = 1
+    DMAchannel_DMA3 = 3
 } DMAchannel_t;
 
 extern SFRAC16 ADCBuffer[4];

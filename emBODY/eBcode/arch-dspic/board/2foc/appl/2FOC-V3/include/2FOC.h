@@ -75,9 +75,6 @@ BOOL updateOdometry();
 
 void ZeroControlReferences(void);
 
-void EnableDriveTest(void);
-void DisableDriveTest(void);
-
 volatile extern int gSetpointWatchdog;
 
 

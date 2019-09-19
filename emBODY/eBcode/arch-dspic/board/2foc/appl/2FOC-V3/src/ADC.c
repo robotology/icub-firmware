@@ -41,13 +41,13 @@ void ADCInterruptAndDMAEnable(DMAchannel_t DMAchannel)
             DMA0CONbits.CHEN = 1;
             break;
             
-        case DMAchannel_DMA1:
+        case DMAchannel_DMA3:
             //Clear the DMA interrupt flag bit
-            IFS0bits.DMA1IF = 0;
+            IFS2bits.DMA3IF = 0;
             //Set the DMA interrupt enable bit
-            IEC0bits.DMA1IE = 1;
+            IEC2bits.DMA3IE = 1;
             // Turn on DMA
-            DMA1CONbits.CHEN = 1;
+            DMA3CONbits.CHEN = 1;
             break;
             
         default:
@@ -72,11 +72,11 @@ void ADCInterruptAndDMADisable(DMAchannel_t DMAchannel)
             IEC0bits.DMA0IE = 0;
             break;
 
-        case DMAchannel_DMA1:
+        case DMAchannel_DMA3:
             // Turn off DMA
-            DMA1CONbits.CHEN = 0;
+            DMA3CONbits.CHEN = 0;
             // reset the DMA interrupt enable bit
-            IEC0bits.DMA1IE = 0;
+            IEC2bits.DMA3IE = 0;
             break;
 
         default:
@@ -475,36 +475,35 @@ void ADCConfigPWMandDMAMode()
     DMA0STA = __builtin_dmaoffset(ADCBuffer);
 }
 
-void ADCConfigConvAndDMAmodeForSelfTest(triggerType_t trigger)
+static void ADCConfigConvAndDMAmodeForSelfTest(triggerType_t trigger)
 // Change ADC registers configuration for calibration test, after PWM and DMA mode 
 // have been activated.
 {
     // Conversion trigger in PWM or manual mode
     AD1CON1bits.SSRC = trigger;
 
-    // DMA1 configurations for ADC (DMA1CON: DMA channel 1 control register)
-    DMA1CON = 0;
+    // DMA3 configurations for ADC (DMA3CON: DMA channel 3 control register)
+    DMA3CON = 0;
 
-    // Configure DMA1 for Peripheral indirect mode
-    DMA1CONbits.AMODE = 2;
+    // Configure DMA3 for Peripheral indirect mode
+    DMA3CONbits.AMODE = 2;
 
     // Continuous, Ping-Pong modes disabled
-    DMA1CONbits.MODE = 0;
+    DMA3CONbits.MODE = 0;
 
     // transfer block unit is a WORD
-    DMA1CONbits.SIZE = 0;
+    DMA3CONbits.SIZE = 0;
 
-    // set DMA1 source register
-    DMA1PAD=(int)&ADC1BUF0;
+    // set DMA3 source register
+    DMA3PAD=(int)&ADC1BUF0;
     // number of words to transfer: do 4 transfers
     // because we configured 4 ADC channels
-    DMA1CNT = 3;
-    // attach DMA1 transfer to ADC1, detach DMA0
-    DMA0REQ = 0;
-    DMA1REQ = 13;
+    DMA3CNT = 3;
+    // attach DMA3 transfer to ADC1
+    DMA3REQ = 13;
 
     // set address of dma buffer
-    DMA1STA = __builtin_dmaoffset(ADCBuffer);
+    DMA3STA = __builtin_dmaoffset(ADCBuffer);
 }
 
 void ADCConfigureRegistersForCalibration()
@@ -673,14 +672,13 @@ BOOL Test_HES_ADC_offsetsNgains(void)
 
     // Enable drive in test mode for a fixed period (2s), for computing the HES_ADC 
     // offsets
-    EnableDriveTest();
+    EnableDriveTest(driveTestMode_HES_ADC_OFFSET);
     __delay_ms(2000);
     DisableDriveTest();
-    int offsetA, offsetC; // raw values
-    MeasureRawAverageCurrentOnSinglePhase(inputChannel_TA_AN0,ADC_CAL_N_SAMPLES,&offsetA); // read phase A for 1s
-    MeasureRawAverageCurrentOnSinglePhase(inputChannel_TC_AN1,ADC_CAL_N_SAMPLES,&offsetC); // read phase C for 1s
 
     // Log
+    int offsetA = (int)driveTestParams.ADC.currOffsetA;
+    int offsetC = (int)driveTestParams.ADC.currOffsetC;
     I2Tdata.IQMeasured = offsetA;
     CanIcubProtoTrasmitterSendPeriodicData();
     I2Tdata.IQMeasured = offsetC;
@@ -706,20 +704,20 @@ BOOL Test_HES_ADC_offsetsNgains(void)
     }
 
     // Enable drive in HES_ADC_test_offset mode for a fixed period (2s), while logging Ia+Ic.
-    EnableDriveTest();
+    EnableDriveTest(driveTestMode_HES_ADC_GAINS);
     __delay_ms(2000);
     DisableDriveTest();
 
-    // Get the test results: mean(Ia+Ib), std(Ia+Ib).
-    __delay_ms(1000);
-    I2Tdata.IQMeasured = ADCtestParm.diffActPhaseCurrMean;
+    // Get and log the test results: mean(Ia+Ib), std(Ia+Ib).
+    I2Tdata.IQMeasured = (int)driveTestParams.ADC.diffActPhaseCurrMean;
     CanIcubProtoTrasmitterSendPeriodicData();
     __delay_ms(1000);
-    I2Tdata.IQMeasured = ADCtestParm.diffActPhaseCurrSTD;
+    I2Tdata.IQMeasured = (int)driveTestParams.ADC.diffActPhaseCurrSTD;
     CanIcubProtoTrasmitterSendPeriodicData();
      
     // Check if Ia+Ic is below the tolerance
-    if (ADCtestParm.diffActPhaseCurrMean > TOL_DIFF_CURR_DUE_TO_ADC_GAIN) {
+    if ((driveTestParams.ADC.diffActPhaseCurrMean > TOL_ADC_OFFSET)
+            || (driveTestParams.ADC.diffActPhaseCurrSTD > TOL_DIFF_CURR_DUE_TO_ADC_GAIN)) {
         SysError.ADCCalFailure = TRUE;
         return 0;
     }
@@ -727,29 +725,29 @@ BOOL Test_HES_ADC_offsetsNgains(void)
     return 1;
 }
 
-BOOL MeasureRawAverageCurrentOnSinglePhase(int channel, int nSamples, int* offset) {
-    AD1CHS0bits.CH0SA = channel; // Set sampled channel AN0, AN1 or AN2
-    AD1CON1bits.SAMP = 1; // amplifiers holding
-
-    long cumulADCOff = 0; // cumulated current measurements
-
-    int n;
-    for (n=0; n<nSamples; ++n)
-    {
-        __delay_ms(5); // Sampling time
-        AD1CON1bits.SAMP = 0; // convert!
-
-        // poll for end of conversion while avoiding polling lock
-        int timeout = 0;
-        while (!AD1CON1bits.DONE || ++timeout < ADC_CAL_TIMEOUT);
-        if (timeout == ADC_CAL_TIMEOUT) return FALSE;
-
-        // accumulate values
-        cumulADCOff += (int)ADC1BUF0;
-    }
-
-    *offset = cumulADCOff/nSamples-ADC_RAW_DEFAULT_OFFSET;
-
-    return TRUE;
-}
+//BOOL MeasureRawAverageCurrentOnSinglePhase(int channel, int nSamples, int* offset) {
+//    AD1CHS0bits.CH0SA = channel; // Set sampled channel AN0, AN1 or AN2
+//    AD1CON1bits.SAMP = 1; // amplifiers holding
+//
+//    long cumulADCOff = 0; // cumulated current measurements
+//
+//    int n;
+//    for (n=0; n<nSamples; ++n)
+//    {
+//        __delay_ms(5); // Sampling time
+//        AD1CON1bits.SAMP = 0; // convert!
+//
+//        // poll for end of conversion while avoiding polling lock
+//        int timeout = 0;
+//        while (!AD1CON1bits.DONE || ++timeout < ADC_CAL_TIMEOUT);
+//        if (timeout == ADC_CAL_TIMEOUT) return FALSE;
+//
+//        // accumulate values
+//        cumulADCOff += (int)ADC1BUF0;
+//    }
+//
+//    *offset = cumulADCOff/nSamples-ADC_RAW_DEFAULT_OFFSET;
+//
+//    return TRUE;
+//}
 
