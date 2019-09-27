@@ -148,7 +148,6 @@ float PID_do_out(PID* o, float En)
 float PID_do_friction_comp(PID *o, float vel_fbk, float trq_ref)
 {
     static float signDithering = 1;
-    signDithering = trq_ref>0 ? 1 : -1;
     float viscFriction = o->Kbemf*vel_fbk;
     float stiction;
     if (vel_fbk>=MIN_VEL_OBSERVABLE)
@@ -157,7 +156,7 @@ float PID_do_friction_comp(PID *o, float vel_fbk, float trq_ref)
     }
     else if (vel_fbk<=-MIN_VEL_OBSERVABLE)
     {
-      stiction = o->stiction_down;
+      stiction = -o->stiction_down;
     }
     else
     {
