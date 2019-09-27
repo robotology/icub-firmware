@@ -349,15 +349,12 @@ BOOL Joint_check_faults(Joint* o)
 {
     if (WatchDog_check_expired(&o->trq_fbk_wdog))
     {
-        o->trq_fbk = ZERO;
-        o->trq_ref = ZERO;
+        o->trq_fbk = o->trq_ref;
         o->trq_err = ZERO;
         
         if (o->trq_control_active)
         {
             o->fault_state.bits.torque_sensor_timeout = TRUE;
-            
-            o->control_mode = eomc_controlmode_hwFault;
         }
     }
     
