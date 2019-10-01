@@ -836,7 +836,7 @@ CTRL_UNITS Motor_do_trq_control(Motor* o, CTRL_UNITS trq_ref, CTRL_UNITS trq_fbk
     
     o->trq_err = trq_ref - trq_fbk;
     
-    return PID_do_out(&o->trqPID, o->trq_err) + PID_do_friction_comp(&o->trqPID, o->vel_raw_fbk, o->trq_ref);
+    return PID_do_out(&o->trqPID, o->trq_err) + PID_do_friction_comp(&o->trqPID, o->vel_fbk, o->trq_ref);
 }
 
 void Motor_update_state_fbk(Motor* o, void* state) //
@@ -1034,7 +1034,7 @@ void Motor_update_odometry_fbk_can(Motor* o, CanOdometry2FocMsg* can_msg) //
     
     o->Iqq_fbk = can_msg->current;
     
-    o->vel_raw_fbk = can_msg->velocity*1000;
+    o->vel_raw_fbk = can_msg->velocity*CTRL_LOOP_FREQUENCY_INT;
     o->vel_fbk = o->vel_raw_fbk/o->GEARBOX;
     
     o->pos_raw_fbk = can_msg->position;

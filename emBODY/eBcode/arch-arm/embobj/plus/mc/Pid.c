@@ -54,9 +54,9 @@ void PID_config(PID* o, eOmc_PID_t* config)
     o->In = 0.0f;
     o->Imax = config->limitonintegral;
 
-    o->stiction_up   = rescaler*config->stiction_up_val;
-    o->stiction_down = rescaler*config->stiction_down_val;
-    o->ditheringVal  = 1.5f * (o->stiction_up>o->stiction_down ? o->stiction_up : o->stiction_down);
+    o->stiction_up   = rescaler*STICTION_INPUT_SCALE*config->stiction_up_val;
+    o->stiction_down = rescaler*STICTION_INPUT_SCALE*config->stiction_down_val;
+    o->ditheringVal  = o->Kff*EO_MAX(o->stiction_up,o->stiction_down);
 
     o->out_max = config->limitonoutput;
     o->out_lpf = 0.0f;
@@ -164,6 +164,6 @@ float PID_do_friction_comp(PID *o, float vel_fbk, float trq_ref)
       signDithering *= -1;
     }
 
-    float totalFriction = stiction > viscFriction ? stiction : viscFriction;
-    return o->Ktau*(o->Kff*trq_ref + totalFriction);
+    float totalFriction = (fabs(stiction) > fabs(viscFriction) ? stiction : viscFriction);
+    return o->Ktau*(trq_ref + totalFriction);
 }

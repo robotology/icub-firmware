@@ -58,6 +58,9 @@ typedef struct //PID
 } PID;
 
 #define MIN_VEL_OBSERVABLE 10 /* in degrees/s */
+#define PWM_FULLSCALE 32000
+#define TAU_REF_SCALE 1000000
+#define STICTION_INPUT_SCALE (TAU_REF_SCALE*100/PWM_FULLSCALE)
 
 PID* PID_new(uint8_t n);
 extern void PID_init(PID* o);
