@@ -76,7 +76,7 @@ bool EOMtheEMSDiagnostic::initialise(const Params& cfg)
 
     // create the socket    
     socket_ = eo_socketdtg_New(cfg.inpdatagramnumber_, cfg.inpdatagramsizeof_, (eobool_true == cfg.usemutex_) ? (eom_mutex_New()) : (NULL), 
-                                                               cfg.outdatagramnumber_, cfg.outdatagramsizeof_, (eobool_true == cfg.usemutex_) ? (eom_mutex_New()) : (NULL)
+                                                               cfg.outdatagramnumber_, udpPacketDataSize_, (eobool_true == cfg.usemutex_) ? (eom_mutex_New()) : (NULL)
                                                               );    
     // create the rx packet
     rxpkt_ = eo_packet_New(cfg.inpdatagramsizeof_);
@@ -246,12 +246,10 @@ bool EOMtheEMSDiagnostic::sendDiagnosticMessage(EOMDiagnosticRopMsg& msg)
 
 void EOMtheEMSDiagnostic::transmitTest()
 {
-	EOMDiagnosticRopMsg::Info tmp{65,65,65,65,65,65,65};
-	EOMDiagnosticRopMsg toSend(tmp);
+	EOMDiagnosticRopMsg toSend(EOMDiagnosticRopMsg::Info{1,2,3,4,5,6,0,0,7});
 	sendDiagnosticMessage(toSend);
 	
-	EOMDiagnosticRopMsg::Info tmp1{66,66,66,66,66,66,66};
-	EOMDiagnosticRopMsg toSend1(tmp1);
+	EOMDiagnosticRopMsg toSend1(EOMDiagnosticRopMsg::Info{10,20,30,40,50,60,0,0,70});
 	sendDiagnosticMessage(toSend1);
 	
 	transmitUdpPackage();
@@ -260,7 +258,7 @@ void EOMtheEMSDiagnostic::transmitTest()
 
 bool EOMtheEMSDiagnostic::createUdpPacketData()
 {
-	//TODO manage if too many msg if necessary
+	header_.updateHeader(currentBufferSize_*EOMDiagnosticRopMsg::getSize(),currentBufferSize_,0);
 	
 	createUdpHeader();
 	createUdpBody();
@@ -290,6 +288,8 @@ bool EOMtheEMSDiagnostic::createUdpBody()
 	for(int index=0;index<currentBufferSize_;++index)
 	{
 		currentROPStartAddress=currentROPStartAddress+index*EOMDiagnosticRopMsg::getSize();
+		int tmp=EOMDiagnosticRopMsg::getSize();
+		tmp=sizeof(EOMDiagnosticRopMsg::Info);
 		std::memcpy(udpPacketData_.data()+currentROPStartAddress,txBuffer_[index].data(),EOMDiagnosticRopMsg::getSize());
 	}	
 	return true;	

@@ -36,7 +36,7 @@ class EOMDiagnosticUdpFooter
 		struct Info
 		{
 			uint32_t data_{0};
-		};
+		};EO_VERIFYsizeof(Info, 4)
 		
 		EOMDiagnosticUdpFooter(const Info& data):data_(data){};
 		EOMDiagnosticUdpFooter(){};

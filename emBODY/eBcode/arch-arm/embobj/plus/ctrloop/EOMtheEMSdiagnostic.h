@@ -105,9 +105,8 @@ class EOMtheEMSDiagnostic
 		void transmitTest();
 			
 		//udp packet
-		constexpr static uint16_t getSize(){return (EOMDiagnosticUdpHeader::getSize()+EOMDiagnosticRopMsg::getSize()+EOMDiagnosticUdpFooter::getSize());};
 		EOpacket* txpkt_{nullptr};
-		constexpr static uint16_t	udpPacketDataSize_{52*txBuffersizeSize_};//(EOMDiagnosticUdpHeader::getSize()+EOMDiagnosticRopMsg::getSize()+EOMDiagnosticUdpFooter::getSize())=52};
+		constexpr static uint16_t	udpPacketDataSize_{EOMDiagnosticUdpHeader::getSize()+EOMDiagnosticRopMsg::getSize()*txBuffersizeSize_+EOMDiagnosticUdpFooter::getSize()};
 		EOMDiagnosticUdpHeader header_;
 		EOMDiagnosticUdpFooter footer_;
 		std::array<uint8_t,udpPacketDataSize_>	udpPacketData_;

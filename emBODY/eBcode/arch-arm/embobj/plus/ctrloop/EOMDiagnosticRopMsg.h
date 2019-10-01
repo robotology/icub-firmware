@@ -22,6 +22,9 @@
 
 #include "EoCommon.h"
 
+#include <array>
+
+
 /** 
   @file       EOMDiagnosticRopMsg.h
 	@brief      This header file implements public interface to the EMS diagnostic message.
@@ -34,25 +37,27 @@ class EOMDiagnosticRopMsg
 	public:
 		struct Info
 		{
-			uint16_t code_;
-			uint16_t param1_;
-			uint16_t param2_;
-			uint16_t param3_;
-			uint16_t param4_;
-			uint16_t param5_;
-			uint64_t param6_;
-		};
+			uint16_t code_{0};
+			uint16_t param1_{0};
+			uint16_t param2_{0};
+			uint16_t param3_{0};
+			uint16_t param4_{0};
+			uint16_t param5_{0};
+			uint16_t dummy1_{0};
+			uint16_t dummy2_{0};
+			uint64_t param6_{0};
+		}; EO_VERIFYsizeof(Info, 24)
+		
+		constexpr static uint16_t getSize(){return sizeof(Info);}
 		
 		EOMDiagnosticRopMsg(void* data,uint8_t size);
+		EOMDiagnosticRopMsg(const std::array<uint8_t,sizeof(Info)>& data);
 		EOMDiagnosticRopMsg(const Info& data):data_(data){};
 		EOMDiagnosticRopMsg(){};
 			
 		uint8_t* data() const;	
-		constexpr static uint16_t getSize(){
-			return sizeof(Info);
-		}
+		void rawdump() const;
 
-		
 	private:
 		Info data_;	
 };

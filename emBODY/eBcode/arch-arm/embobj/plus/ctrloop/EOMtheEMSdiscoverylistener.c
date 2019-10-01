@@ -31,9 +31,9 @@
 
 #include "EOMtask.h"
 
-#include "EOMtheIPnet.h"
+	#include "EOMtheIPnet.h"
 
-#include "EOMmutex.h"
+	#include "EOMmutex.h"
 #include "EOaction.h"
 #include "string.h"
 #include "EOMtheEMSdiscoverytransceiver.h"

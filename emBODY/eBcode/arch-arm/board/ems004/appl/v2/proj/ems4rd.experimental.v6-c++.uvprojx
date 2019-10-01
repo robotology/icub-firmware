@@ -823,6 +823,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embobj\plus\ctrloop\EOMDiagnosticRopMsg.h</FilePath>
             </File>
+            <File>
+              <FileName>EOMDiagnosticUdpMsg.h</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embobj\plus\ctrloop\EOMDiagnosticUdpMsg.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2195,6 +2200,11 @@
               <FileName>EOMDiagnosticRopMsg.h</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embobj\plus\ctrloop\EOMDiagnosticRopMsg.h</FilePath>
+            </File>
+            <File>
+              <FileName>EOMDiagnosticUdpMsg.h</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embobj\plus\ctrloop\EOMDiagnosticUdpMsg.h</FilePath>
             </File>
           </Files>
         </Group>
