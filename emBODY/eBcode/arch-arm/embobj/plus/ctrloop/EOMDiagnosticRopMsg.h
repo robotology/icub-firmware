@@ -23,6 +23,8 @@
 #include "EoCommon.h"
 
 #include <array>
+#include <sstream>
+#include <iostream>
 
 
 /** 
@@ -62,6 +64,36 @@ class EOMDiagnosticRopMsg
 		Info data_;	
 };
 
+inline EOMDiagnosticRopMsg::EOMDiagnosticRopMsg(void* data,uint8_t size)
+{
+	if(size>sizeof(Info))
+	{
+		//TODO
+		return;
+	}
+		
+	std::memcpy(&data_,data,sizeof(Info));
+}
+
+inline EOMDiagnosticRopMsg::EOMDiagnosticRopMsg(const std::array<uint8_t,sizeof(Info)>& data)
+{
+	std::memcpy(&data_,data.data(),sizeof(Info));
+}
+
+inline uint8_t* EOMDiagnosticRopMsg::data() const
+{
+	return (uint8_t*)(&data_); 
+}
+
+inline void EOMDiagnosticRopMsg::rawdump() const
+{
+	std::stringstream ss;
+	std::array<uint8_t,getSize()>* tmp;
+	tmp=(std::array<uint8_t,getSize()>*)&data_;
+	
+	std::copy(tmp->begin(),tmp->end(),std::ostream_iterator<int>(ss," "));
+	std::cout<<std::hex<<ss.str()<<std::endl;
+}
 
 #endif  // include-guard
 
