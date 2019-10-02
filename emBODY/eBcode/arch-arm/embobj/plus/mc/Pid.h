@@ -28,9 +28,11 @@ extern "C" {
 
 #include "EOemsControllerCfg.h"
 
+typedef float float_fsticks_per_s_t;
+
 typedef struct //PID
 {
-    float Ko;
+    float Kc;
     float Kp;
     float Kd;
     float Ki;
@@ -49,6 +51,7 @@ typedef struct //PID
     float stiction_up;
     float stiction_down;
     float ditheringVal;
+	  float_fsticks_per_s_t ditheringMotorVel;
 
     float out_max;
     float out_lpf;
@@ -61,6 +64,7 @@ typedef struct //PID
 #define PWM_FULLSCALE 32000
 #define TAU_REF_SCALE 1000000
 #define STICTION_INPUT_SCALE (TAU_REF_SCALE*100/PWM_FULLSCALE)
+#define VEL_FULLSCALE 0x10000
 
 PID* PID_new(uint8_t n);
 extern void PID_init(PID* o);
@@ -72,7 +76,7 @@ extern void PID_reset(PID* o);
 extern void PID_get_state(PID* o, float *out, float *err);
 
 extern float PID_do_out(PID* o, float En);
-extern float PID_do_friction_comp(PID *o, float vel, float Tr);
+extern float PID_do_friction_comp(PID *o, float vel_raw, float vel, float Tr);
 
 
 #ifdef __cplusplus

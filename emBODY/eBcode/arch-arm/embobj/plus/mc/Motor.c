@@ -836,7 +836,7 @@ CTRL_UNITS Motor_do_trq_control(Motor* o, CTRL_UNITS trq_ref, CTRL_UNITS trq_fbk
     
     o->trq_err = trq_ref - trq_fbk;
     
-    return PID_do_out(&o->trqPID, o->trq_err) + PID_do_friction_comp(&o->trqPID, o->vel_fbk, o->trq_ref);
+    return PID_do_out(&o->trqPID, o->trq_err) + PID_do_friction_comp(&o->trqPID, o->vel_raw_fbk, o->vel_fbk, o->trq_ref);
 }
 
 void Motor_update_state_fbk(Motor* o, void* state) //

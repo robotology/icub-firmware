@@ -37,9 +37,9 @@ void PID_init(PID* o)
 
 void PID_config(PID* o, eOmc_PID_t* config)
 {
-    float rescaler = 1.0f/(float)(1<<config->scale);
+    float rescaler = 1.0f;
 
-    o->Ko = config->offset;
+    o->Kc = rescaler*STICTION_INPUT_SCALE*config->offset;
     o->Kp = rescaler*config->kp;
     o->Kd = rescaler*config->kd;
     o->Ki = rescaler*config->ki;
@@ -57,6 +57,7 @@ void PID_config(PID* o, eOmc_PID_t* config)
     o->stiction_up   = rescaler*STICTION_INPUT_SCALE*config->stiction_up_val;
     o->stiction_down = rescaler*STICTION_INPUT_SCALE*config->stiction_down_val;
     o->ditheringVal  = o->Kff*EO_MAX(o->stiction_up,o->stiction_down);
+	  o->ditheringMotorVel  = (float)config->scale*(float)VEL_FULLSCALE/360/100;
 
     o->out_max = config->limitonoutput;
     o->out_lpf = 0.0f;
@@ -125,9 +126,6 @@ float PID_do_out(PID* o, float En)
 
     o->En = En;
 
-    // offset
-    out += o->Ko;
-
     LIMIT(out, o->out_max);
 
     switch (o->filter)
@@ -145,25 +143,32 @@ float PID_do_out(PID* o, float En)
     return o->out_lpf;
 }
 
-float PID_do_friction_comp(PID *o, float vel_fbk, float trq_ref)
+float PID_do_friction_comp(PID *o, float vel_raw_fbk, float vel_fbk, float trq_ref)
 {
     static float signDithering = 1;
-    float viscFriction = o->Kbemf*vel_fbk;
-    float stiction;
-    if (vel_fbk>=MIN_VEL_OBSERVABLE)
+	  float dither,stiction,coulViscFriction;
+    if (vel_fbk>=o->ditheringMotorVel)
     {
+			// positive joint velocity
+			dither = 0.0f;
       stiction = o->stiction_up;
+			coulViscFriction = o->Kc + o->Kbemf*vel_fbk;
     }
-    else if (vel_fbk<=-MIN_VEL_OBSERVABLE)
+    else if (vel_fbk<=-o->ditheringMotorVel)
     {
+			// negative joint velocity
+			dither = 0.0f;
       stiction = -o->stiction_down;
+			coulViscFriction = -o->Kc + o->Kbemf*vel_fbk;
     }
     else
     {
-      stiction = signDithering*(o->ditheringVal);
+			// unobservable joint velocity (Apply Dithering)
+      dither = signDithering*(o->ditheringVal);
       signDithering *= -1;
+			stiction = coulViscFriction = 0.0f;
     }
 
-    float totalFriction = (fabs(stiction) > fabs(viscFriction) ? stiction : viscFriction);
+    float totalFriction = dither + (fabs(stiction) > fabs(coulViscFriction) ? stiction : coulViscFriction);
     return o->Ktau*(trq_ref + totalFriction);
 }
