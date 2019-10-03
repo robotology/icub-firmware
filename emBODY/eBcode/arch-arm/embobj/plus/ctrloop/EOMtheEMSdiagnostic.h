@@ -40,6 +40,7 @@
 #include "EOMDiagnosticUdpFooter.h"
 #include "EOMDiagnosticUdpMsg.h"
 
+
 class EOMtheEMSDiagnostic
 {
     public:

@@ -794,11 +794,6 @@
               </FileOption>
             </File>
             <File>
-              <FileName>EOMtheEMSappl.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSappl.cpp</FilePath>
-            </File>
-            <File>
               <FileName>EOMtheEMSdiagnostic.h</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSdiagnostic.h</FilePath>
@@ -822,6 +817,11 @@
               <FileName>EOMDiagnosticUdpMsg.h</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embot\EOMDiagnosticUdpMsg.h</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMSappl.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSappl.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -2167,11 +2167,6 @@
               <FilePath>..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSdiagnostic.cpp</FilePath>
             </File>
             <File>
-              <FileName>EOMtheEMSappl.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSappl.cpp</FilePath>
-            </File>
-            <File>
               <FileName>EOMtheEMSdiagnostic.h</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSdiagnostic.h</FilePath>
@@ -2195,6 +2190,11 @@
               <FileName>EOMDiagnosticUdpMsg.h</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embot\EOMDiagnosticUdpMsg.h</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMSappl.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSappl.c</FilePath>
             </File>
           </Files>
         </Group>

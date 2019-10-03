@@ -162,34 +162,18 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>55</LineNumber>
+          <LineNumber>110</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134400826</Address>
+          <Address>134549832</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSdiagnostic.cpp</Filename>
+          <Filename>..\main\eom_emsappl_main.cpp</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\ems004\../../../../../embobj/plus/ctrloop/EOMtheEMSdiagnostic.cpp\55</Expression>
-        </Bp>
-        <Bp>
-          <Number>1</Number>
-          <Type>0</Type>
-          <LineNumber>73</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134399484</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSdiagnostic.cpp</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\ems004\../../../../../embobj/plus/ctrloop/EOMtheEMSdiagnostic.cpp\73</Expression>
+          <Expression>\\ems004\../main/eom_emsappl_main.cpp\110</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -2440,18 +2424,6 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSappl.cpp</PathWithFileName>
-      <FilenameWithoutPath>EOMtheEMSappl.cpp</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>10</GroupNumber>
-      <FileNumber>65</FileNumber>
-      <FileType>8</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSdiagnostic.h</PathWithFileName>
       <FilenameWithoutPath>EOMtheEMSdiagnostic.h</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
@@ -2459,7 +2431,7 @@
     </File>
     <File>
       <GroupNumber>10</GroupNumber>
-      <FileNumber>66</FileNumber>
+      <FileNumber>65</FileNumber>
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -2471,7 +2443,7 @@
     </File>
     <File>
       <GroupNumber>10</GroupNumber>
-      <FileNumber>67</FileNumber>
+      <FileNumber>66</FileNumber>
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -2483,7 +2455,7 @@
     </File>
     <File>
       <GroupNumber>10</GroupNumber>
-      <FileNumber>68</FileNumber>
+      <FileNumber>67</FileNumber>
       <FileType>5</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -2495,13 +2467,25 @@
     </File>
     <File>
       <GroupNumber>10</GroupNumber>
-      <FileNumber>69</FileNumber>
+      <FileNumber>68</FileNumber>
       <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embot\EOMDiagnosticUdpMsg.h</PathWithFileName>
       <FilenameWithoutPath>EOMDiagnosticUdpMsg.h</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>10</GroupNumber>
+      <FileNumber>69</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSappl.c</PathWithFileName>
+      <FilenameWithoutPath>EOMtheEMSappl.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

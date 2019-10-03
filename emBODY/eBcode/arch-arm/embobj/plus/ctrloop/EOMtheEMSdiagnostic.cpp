@@ -225,6 +225,7 @@ void EOMtheEMSDiagnostic::transmitTest()
 	
 	transmitUdpPackage();
 <<<<<<< HEAD
+<<<<<<< HEAD
 }
 
 
@@ -455,3 +456,14 @@ eOresult_t EOMtheEMSDiagnostic::connect(eOipv4addr_t remaddr)
 =======
 }
 >>>>>>> new parsing managment
+=======
+}
+extern "C"
+{
+	void initDiagnostic()
+	{
+		EOMtheEMSDiagnostic::Params param;
+		EOMtheEMSDiagnostic::instance().initialise(param);
+	}
+}
+>>>>>>> fix
