@@ -27,12 +27,6 @@
 	@date       01/08/2019
  **/
 
-/** @defgroup eom_theEMSDiagnostic Singleton EOMtheEMSDiagnostic 
-    
-    The .....  
-  
-    @{		
- **/
 
 #include <array>
 
@@ -44,13 +38,11 @@
 #include "EOMDiagnosticRopMsg.h"
 #include "EOMDiagnosticUdpHeader.h"
 #include "EOMDiagnosticUdpFooter.h"
+#include "EOMDiagnosticUdpMsg.h"
 
 class EOMtheEMSDiagnostic
 {
     public:
-	
-		//constexpr static uint8_t	txpktSize_{10};
-		//using DiagnosticMsg=std::array<uint8_t,txpktSize_>;
 		
 		class Params
 		{
@@ -60,7 +52,6 @@ class EOMtheEMSDiagnostic
 			eOsizecntnr_t inpdatagramnumber_{2};
 			eOsizecntnr_t outdatagramnumber_{1};
 			eOsizeitem_t inpdatagramsizeof_{64};
-			eOsizeitem_t outdatagramsizeof_{64};
 			eObool_t usemutex_{eobool_true};   
 		};
 		
@@ -71,25 +62,24 @@ class EOMtheEMSDiagnostic
 			diagnosticEvent_evt_packet_send = 2,
 		};
 
-    static EOMtheEMSDiagnostic& instance();
-    bool initialise(const Params &emsbackdoortransceivercfg);
-		
-		bool sendDiagnosticMessage(void *msg,uint8_t size);
+		static EOMtheEMSDiagnostic& instance();
+		bool initialise(const Params &emsbackdoortransceivercfg);
+			
 		bool sendDiagnosticMessage(EOMDiagnosticRopMsg& msg);
-   	
+		
     private:
 
-    EOMtheEMSDiagnostic();
-    EOMtheEMSDiagnostic(const EOMtheEMSDiagnostic&)=delete;
-    EOMtheEMSDiagnostic(EOMtheEMSDiagnostic&&)=delete;
-    EOMtheEMSDiagnostic& operator=(const EOMtheEMSDiagnostic&)=delete;
-    EOMtheEMSDiagnostic& operator=(EOMtheEMSDiagnostic&)=delete;
+		EOMtheEMSDiagnostic();
+		EOMtheEMSDiagnostic(const EOMtheEMSDiagnostic&)=delete;
+		EOMtheEMSDiagnostic(EOMtheEMSDiagnostic&&)=delete;
+		EOMtheEMSDiagnostic& operator=(const EOMtheEMSDiagnostic&)=delete;
+		EOMtheEMSDiagnostic& operator=(EOMtheEMSDiagnostic&)=delete;
 		
 		eOresult_t connect(eOipv4addr_t remaddr);			
 
 		//task
-    void taskStartup(EOMtask*,unsigned int);
-    void taskRun(EOMtask*,unsigned int);			
+		void taskStartup(EOMtask*,unsigned int);
+		void taskRun(EOMtask*,unsigned int);			
 		uint8_t wakeupTask_{10};
 
 		Params params_;
@@ -97,24 +87,11 @@ class EOMtheEMSDiagnostic
 		EOMtask* task_{nullptr};		
 		EOsocketDatagram* socket_{nullptr};		  
 		EOpacket *rxpkt_{nullptr};
-
-		//buffer
-		constexpr static uint8_t	txBuffersizeSize_{10};
-		std::array<EOMDiagnosticRopMsg,txBuffersizeSize_> txBuffer_;
-		uint8_t currentBufferSize_{0};
-		void transmitTest();
-			
+	
 		//udp packet
 		EOpacket* txpkt_{nullptr};
-		constexpr static uint16_t	udpPacketDataSize_{EOMDiagnosticUdpHeader::getSize()+EOMDiagnosticRopMsg::getSize()*txBuffersizeSize_+EOMDiagnosticUdpFooter::getSize()};
-		EOMDiagnosticUdpHeader header_;
-		EOMDiagnosticUdpFooter footer_;
-		std::array<uint8_t,udpPacketDataSize_>	udpPacketData_;
-		bool createUdpPacketData();
-		bool createUdpHeader();
-		bool createUdpBody();		
-		bool createUdpFooter();
-		
+		EOMDiagnosticUdpMsg udpMsg_;
+
 		//process event
 		void processEventRxPacket();
 		eOresult_t transmitUdpPackage();
@@ -122,12 +99,15 @@ class EOMtheEMSDiagnostic
     
 		bool connected2host_{false};  
 		
-    eOipv4addr_t hostaddress_{EO_COMMON_IPV4ADDR_LOCALHOST};
+		eOipv4addr_t hostaddress_{EO_COMMON_IPV4ADDR_LOCALHOST};
 		const eOipv4addr_t remoteAddr_{EO_COMMON_IPV4ADDR(10,0,1,104)};
-    const eOipv4port_t remotePort_{11000};
+		const eOipv4port_t remotePort_{11000};
 		const eOipv4port_t localPort_{11000};
-					
+
 		static constexpr char s_eobj_ownname[]{"EOMtheEMSdiagnostic"};		
+
+		//debug
+		void transmitTest();
 };
 
 #endif  // include-guard

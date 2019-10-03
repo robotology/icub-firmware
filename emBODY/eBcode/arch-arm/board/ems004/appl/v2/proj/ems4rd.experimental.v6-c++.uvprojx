@@ -820,7 +820,7 @@
             </File>
             <File>
               <FileName>EOMDiagnosticUdpMsg.h</FileName>
-              <FileType>5</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embot\EOMDiagnosticUdpMsg.h</FilePath>
             </File>
           </Files>
@@ -2193,7 +2193,7 @@
             </File>
             <File>
               <FileName>EOMDiagnosticUdpMsg.h</FileName>
-              <FileType>5</FileType>
+              <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embot\EOMDiagnosticUdpMsg.h</FilePath>
             </File>
           </Files>

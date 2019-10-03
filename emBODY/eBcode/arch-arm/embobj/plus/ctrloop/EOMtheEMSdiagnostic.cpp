@@ -56,7 +56,6 @@ extern void tskEMScfg(void *p)
 EOMtheEMSDiagnostic::EOMtheEMSDiagnostic()
 {
 	txpkt_=eo_packet_New(0);	
-	eo_packet_Full_LinkTo(txpkt_, remoteAddr_, remotePort_, udpPacketDataSize_, udpPacketData_.data());
 }
 
 EOMtheEMSDiagnostic& EOMtheEMSDiagnostic::instance()
@@ -76,7 +75,7 @@ bool EOMtheEMSDiagnostic::initialise(const Params& cfg)
 
     // create the socket    
     socket_ = eo_socketdtg_New(cfg.inpdatagramnumber_, cfg.inpdatagramsizeof_, (eobool_true == cfg.usemutex_) ? (eom_mutex_New()) : (NULL), 
-                                                               cfg.outdatagramnumber_, udpPacketDataSize_, (eobool_true == cfg.usemutex_) ? (eom_mutex_New()) : (NULL)
+                                                               cfg.outdatagramnumber_, EOMDiagnosticUdpMsg::getSize(), (eobool_true == cfg.usemutex_) ? (eom_mutex_New()) : (NULL)
                                                               );    
     // create the rx packet
     rxpkt_ = eo_packet_New(cfg.inpdatagramsizeof_);
@@ -165,10 +164,10 @@ bool EOMtheEMSDiagnostic::manageArrivedMessage(EOpacket*)
 
 eOresult_t EOMtheEMSDiagnostic::transmitUdpPackage()
 {
-		if(!currentBufferSize_)
+		if(!udpMsg_.createUdpPacketData())
 			return eores_OK;//nothing to transmit
-		
-		createUdpPacketData();
+
+		eo_packet_Full_LinkTo(txpkt_, remoteAddr_, remotePort_,EOMDiagnosticUdpMsg::getSize(), udpMsg_.udpPacketData_.data());
     
 	  eOresult_t res;
     
@@ -184,9 +183,8 @@ eOresult_t EOMtheEMSDiagnostic::transmitUdpPackage()
     }
     
     res = eo_socketdtg_Put(socket_, txpkt_);
-    
-		currentBufferSize_=0;
-		udpPacketData_.fill(0);
+		
+		udpMsg_.resetMsg();		
     return(res);
 }
 
@@ -211,48 +209,22 @@ eOresult_t EOMtheEMSDiagnostic::connect(eOipv4addr_t remaddr)
     return(eores_OK);   
 }
 
-bool EOMtheEMSDiagnostic::sendDiagnosticMessage(void *msg,uint8_t size)
-{
-	if(size>EOMDiagnosticRopMsg::getSize())
-	{
-		return false;//TODO
-	}
-	
-	if(currentBufferSize_>txBuffersizeSize_)	
-	{
-		return false;//TODO
-	}
-
-	EOMDiagnosticRopMsg tmp(msg,size);
-	
-	//mutex TODO
-	txBuffer_.at(currentBufferSize_)=tmp;
-	currentBufferSize_++;
-	return true;
-}
-
 bool EOMtheEMSDiagnostic::sendDiagnosticMessage(EOMDiagnosticRopMsg& msg)
 {
-	if(currentBufferSize_>txBuffersizeSize_)	//si puo' evitare
-	{
-		return false;//TODO
-	}
-
-	//mutex TODO
-	txBuffer_.at(currentBufferSize_)=msg;
-	currentBufferSize_++;
-	return true;
+	return udpMsg_.addRop(msg);
 }
+
 
 void EOMtheEMSDiagnostic::transmitTest()
 {
 	EOMDiagnosticRopMsg toSend(EOMDiagnosticRopMsg::Info{1,2,3,4,5,6,0,0,7});
-	sendDiagnosticMessage(toSend);
-	
 	EOMDiagnosticRopMsg toSend1(EOMDiagnosticRopMsg::Info{10,20,30,40,50,60,0,0,70});
+
+	sendDiagnosticMessage(toSend);
 	sendDiagnosticMessage(toSend1);
 	
 	transmitUdpPackage();
+<<<<<<< HEAD
 }
 
 
@@ -480,3 +452,6 @@ eOresult_t EOMtheEMSDiagnostic::connect(eOipv4addr_t remaddr)
 
 
 >>>>>>> Add files via upload
+=======
+}
+>>>>>>> new parsing managment
