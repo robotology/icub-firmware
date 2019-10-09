@@ -22,9 +22,9 @@
 #define _EOMTHEEMSDIAGNOSTIC_H_
 
 /** @file       EOMtheEMSDiagnostic.h
-	@brief      This header file implements public interface to the EMS diagnostic singleton.
- 	@author     luca.tricerri@iit.it
-	@date       01/08/2019
+		@brief      This header file implements public interface to the EMS diagnostic singleton.
+		@author     luca.tricerri@iit.it
+		@date       01/08/2019
  **/
 
 
@@ -40,7 +40,6 @@
 #include "EOMDiagnosticUdpFooter.h"
 #include "EOMDiagnosticUdpMsg.h"
 
-
 class EOMtheEMSDiagnostic
 {
     public:
@@ -52,7 +51,6 @@ class EOMtheEMSDiagnostic
 			uint16_t taskstacksize_{2048};  
 			eOsizecntnr_t inpdatagramnumber_{2};
 			eOsizecntnr_t outdatagramnumber_{1};
-			eOsizeitem_t inpdatagramsizeof_{64};
 			eObool_t usemutex_{eobool_true};   
 		};
 		
@@ -64,7 +62,7 @@ class EOMtheEMSDiagnostic
 		};
 
 		static EOMtheEMSDiagnostic& instance();
-		bool initialise(const Params &emsbackdoortransceivercfg);
+		bool initialise(const Params&);
 			
 		bool sendDiagnosticMessage(EOMDiagnosticRopMsg& msg);
 		
@@ -82,16 +80,16 @@ class EOMtheEMSDiagnostic
 		void taskStartup(EOMtask*,unsigned int);
 		void taskRun(EOMtask*,unsigned int);			
 		uint8_t wakeupTask_{10};
-
-		Params params_;
+		EOMtask* task_{nullptr};	
 		
-		EOMtask* task_{nullptr};		
+		Params params_;
+		bool traceIsActive_{true};
 		EOsocketDatagram* socket_{nullptr};		  
-		EOpacket *rxpkt_{nullptr};
 	
 		//udp packet
 		EOpacket* txpkt_{nullptr};
-		EOMDiagnosticUdpMsg udpMsg_;
+		EOpacket *rxpkt_{nullptr};
+		EOMDiagnosticUdpMsg txUdpMsg_;
 
 		//process event
 		void processEventRxPacket();
