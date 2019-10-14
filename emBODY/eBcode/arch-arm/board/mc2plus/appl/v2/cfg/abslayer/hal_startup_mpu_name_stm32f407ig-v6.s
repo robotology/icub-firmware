@@ -74,7 +74,7 @@ __initial_sp
 ;   o  Heap Size (in Bytes) 0x0-0xFFFFFFFF:8
 ; </h>
 
-Heap_Size       EQU     0x00018000
+Heap_Size       EQU     0x0001FFC0
 ;Heap_Size       EQU     HAL_SYS_CFG_HEAPSIZE
                 EXPORT Heap_Size
 
