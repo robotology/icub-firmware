@@ -50,24 +50,23 @@
 
 extern void tskEMScfg(void *p)
 {
-		eom_task_Start((EOMtask*)p);
+    eom_task_Start((EOMtask*)p);
 }
-
 EOMtheEMSDiagnostic::EOMtheEMSDiagnostic()
 {
-		txpkt_=eo_packet_New(0);	
+    txpkt_=eo_packet_New(0);    
 }
 
 EOMtheEMSDiagnostic& EOMtheEMSDiagnostic::instance()
 {
-		static EOMtheEMSDiagnostic instance;
-		return instance;
+    static EOMtheEMSDiagnostic instance;
+    return instance;
 }
 
 bool EOMtheEMSDiagnostic::initialise(const Params& cfg)
 {
-		params_=cfg;
-    
+    params_=cfg;
+        
     if(NULL == eom_ipnet_GetHandle())
     {
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, "eom_emsdiscoverylistener_Initialise(): EOMtheIPnet not started yet", s_eobj_ownname, &eo_errman_DescrRuntimeErrorLocal);
@@ -79,23 +78,24 @@ bool EOMtheEMSDiagnostic::initialise(const Params& cfg)
                                                               );    
     // create the rx packet
     rxpkt_ = eo_packet_New(EOMDiagnosticUdpMsg::getSize());
-     
+
     // create the task
-    task_ = eom_task_New(eom_mtask_EventDriven, 
-													params_.taskpriority_, 
-													params_.taskstacksize_, 
-													[](EOMtask* task ,uint32_t t){
-														EOMtheEMSDiagnostic::instance().taskStartup(task,t);
-													},
-													[](EOMtask* task ,uint32_t t){
-														EOMtheEMSDiagnostic::instance().taskRun(task,t);
-													},  
-													(eOevent_t)0, 
-													wakeupTask_, 
-													NULL, 
-													tskEMScfg,
-													"diagnostic");
-													
+    task_ = eom_task_New(eom_mtask_EventDriven/*eom_mtask_Periodic*/, 
+                        params_.taskpriority_, 
+                        params_.taskstacksize_, 
+                        [](EOMtask* task ,uint32_t t){
+                            EOMtheEMSDiagnostic::instance().taskStartup(task,t);
+                        },
+                        [](EOMtask* task ,uint32_t t){
+                            EOMtheEMSDiagnostic::instance().taskRun(task,t);
+                        }, 
+                        (eOevent_t)0, 
+                        wakeupTask_, 
+                        NULL, 
+                        tskEMScfg,
+                        "diagnostic");
+                                                                                
+                                                    
     return true;                                                
 }
 
@@ -110,113 +110,119 @@ void EOMtheEMSDiagnostic::taskStartup(EOMtask*,unsigned int)
     eo_socketdtg_Open(socket_, localPort_, eo_sktdir_TXRX, eobool_false,NULL, onrx, NULL);   
     
     eo_errman_Trace(eo_errman_GetHandle(), "called _task_startup()", s_eobj_ownname);                            
-
 }
 
 void EOMtheEMSDiagnostic::taskRun(EOMtask*,unsigned int t)
 {
-	// the event that we have received
     eOevent_t evt = (eOevent_t)t;
 
     if(!evt)
-		{
-			transmitUdpPackage();		
-		}
+        {
+            transmitUdpPackage();        
+        }
   
     if(eobool_true == eo_common_event_check(evt, diagnosticConfigEvent_evt_packet_received))
-		{
-			processEventRxPacket();
-		}
+        {
+            processEventRxPacket();
+        }
 
-    if(eobool_true == eo_common_event_check(evt, diagnosticEvent_evt_packet_send))
-		{
-			transmitUdpPackage();
-		}
-				
-		//hal_trace_puts("taskRun end");				
+    if(eobool_true == eo_common_event_check(evt, diagnosticEvent_evt_packet_tobesent))
+        {
+            transmitUdpPackage();
+        }            
 }
 
 void EOMtheEMSDiagnostic::processEventRxPacket()
 {
-	  EOpacket* rxpkt = rxpkt_;
+    EOpacket* rxpkt = rxpkt_;
     eOsizecntnr_t remainingrxpkts = 0;    
-	
-		// 1. get the packet.    
-		if(eores_OK == eo_socketdtg_Get(socket_, rxpkt, eok_reltimeZERO))
-		{	
-			// 2. process the packet 
-			manageArrivedMessage(rxpkt);		
-		}
+    
+    // 1. get the packet.    
+    if(eores_OK == eo_socketdtg_Get(socket_, rxpkt, eok_reltimeZERO))
+    {    
+        // 2. process the packet 
+        manageArrivedMessage(rxpkt);        
+    }
 
-		// 3. if another packet is in the rx fifo, send a new event to process its retrieval again   
-		eo_socketdtg_Received_NumberOf(socket_, &remainingrxpkts);
-		if(remainingrxpkts > 0)
-		{
-				eom_task_SetEvent(task_, diagnosticConfigEvent_evt_packet_received); 
-		} 	
+    // 3. if another packet is in the rx fifo, send a new event to process its retrieval again   
+    eo_socketdtg_Received_NumberOf(socket_, &remainingrxpkts);
+    if(remainingrxpkts > 0)
+    {
+            eom_task_SetEvent(task_, diagnosticConfigEvent_evt_packet_received); 
+    }     
 }
 
 bool EOMtheEMSDiagnostic::manageArrivedMessage(EOpacket* package)
 {
-  uint8_t *data = NULL;
-  uint16_t size = 0;
-	eo_packet_Payload_Get(rxpkt_,&data,&size);
-	EOMDiagnosticUdpMsg msg;
-	msg.parse(data,size);
-	
-	for(uint16_t index=0;index<msg.getCurrentRopNumber();++index)
-	{
-		EOMDiagnosticRopMsg rop;
-		msg.getRop(rop,index);
-		switch(rop.getCode())
-		{
-			case RopCode::empty:
-			break;			
-			case RopCode::startlog:
-				traceIsActive_=true;
-				hal_trace_puts("Start log msg rx from pc104");
-				break;
-			case RopCode::stoplog:
-				traceIsActive_=false;
-				hal_trace_puts("Stop log msg rx from pc104");
-				break;			
-			default:
-				hal_trace_puts("Unknown msg rx from pc104");
-			break;			
-		}
-	}
+    uint8_t *data = NULL;
+    uint16_t size = 0;
+    eo_packet_Payload_Get(rxpkt_,&data,&size);
+    EOMDiagnosticUdpMsg msg;
+    msg.parse(data,size);
 
-	transmitTest();
-	return true;
+    for(uint16_t index=0;index<msg.getCurrentRopNumber();++index)
+    {
+        EOMDiagnosticRopMsg rop;
+        msg.getRop(rop,index);
+        switch(rop.getCode())
+        {
+            case DiagnosticRopCode::empty:
+                break;            
+            case DiagnosticRopCode::startlog:
+                traceIsActive_=true;
+                hal_trace_puts("Start log msg rx from pc104");
+                break;
+            case DiagnosticRopCode::stoplog:
+                traceIsActive_=false;
+                hal_trace_puts("Stop log msg rx from pc104");
+                break;
+            case DiagnosticRopCode::forceflush:
+                forceFlush_=true;
+                hal_trace_puts("Force flush msg rx from pc104");
+                break;                            
+            case DiagnosticRopCode::unforceflush:
+                forceFlush_=false;
+                hal_trace_puts("Unforce flush msg rx from pc104");
+                break;                            
+            default:
+                hal_trace_puts("ERROR - Unknown msg rx from pc104");
+                EOMDiagnosticRopMsg toSend(EOMDiagnosticRopMsg::Info{(uint16_t)DiagnosticRopCode::diag,(uint16_t)DiagnosticRopSeverity::error,5,5,5,5,5,5,5});                            
+                sendDiagnosticMessage(toSend,false);
+                break;            
+        }
+    }
+
+    return true;
 }
 
 eOresult_t EOMtheEMSDiagnostic::transmitUdpPackage()
 {
-	if(!traceIsActive_)
-		return eores_OK;
-	
-		std::array<uint8_t, EOMDiagnosticUdpMsg::getSize()> udpMsg;
-		if(!txUdpMsg_.createUdpPacketData(udpMsg))
-			return eores_OK;//nothing to transmit
+    if(!traceIsActive_)
+        return eores_OK;
+    
+    std::array<uint8_t, EOMDiagnosticUdpMsg::getSize()> udpMsg;
+    if(!txUdpMsg_.createUdpPacketData(udpMsg))
+        return eores_OK;//nothing to transmit
 
-		eo_packet_Full_LinkTo(txpkt_, remoteAddr_, remotePort_,EOMDiagnosticUdpMsg::getSize(), udpMsg.data());
-    
-	  eOresult_t res;
-    
+    eo_packet_Full_LinkTo(txpkt_, remoteAddr_, remotePort_,EOMDiagnosticUdpMsg::getSize(), udpMsg.data());
+
+    eOresult_t res;
+
     eo_packet_Addressing_Set(txpkt_, remoteAddr_, remotePort_);
-    
+
     if((!connected2host_) || (remoteAddr_ != hostaddress_))
     {
         res = connect(remoteAddr_);
         if(eores_OK != res)
         {
+            hal_trace_puts("ERROR - connect");
             return(res);
         }
     }
-    
+
     res = eo_socketdtg_Put(socket_, txpkt_);
-		
-		txUdpMsg_.resetMsg();		
+
+    txUdpMsg_.reset();        
     return(res);
 }
 
@@ -233,6 +239,7 @@ eOresult_t EOMtheEMSDiagnostic::connect(eOipv4addr_t remaddr)
  
         if(eores_OK != res)
         {
+                        hal_trace_puts("ERROR - eom_ipnet_ResolveIP");
             return(res);
         }
         connected2host_ = eobool_true;        
@@ -241,13 +248,36 @@ eOresult_t EOMtheEMSDiagnostic::connect(eOipv4addr_t remaddr)
     return(eores_OK);   
 }
 
-bool EOMtheEMSDiagnostic::sendDiagnosticMessage(EOMDiagnosticRopMsg& msg)
+bool EOMtheEMSDiagnostic::sendDiagnosticMessage(EOMDiagnosticRopMsg& msg,bool flush)
 {
-	return txUdpMsg_.addRop(msg);
+    /*
+    if(ropCode.find(msg.getCode())==ropCode.end())
+    {
+        hal_trace_puts("ERROR - Wrong rop code");
+        EOMDiagnosticRopMsg toSend(EOMDiagnosticRopMsg::Info{(uint16_t)DiagnosticRopCode::diag,(uint16_t)DiagnosticRopSeverity::error,5,5,5,5,5,5,5});                            
+        sendDiagnosticMessage(toSend,false);
+        return false;
+    }
+    
+    if(ropSeverity.find(msg.getSeverity())==ropSeverity.end())
+    {
+        hal_trace_puts("ERROR - Wrong rop severity");
+        return false;
+    }
+    */
+        
+    bool out=txUdpMsg_.addRop(msg);
+    if(flush || forceFlush_)
+    {
+        eom_task_SetEvent(task_, diagnosticEvent_evt_packet_tobesent); 
+    }
+    
+    return out;
 }
 
 void EOMtheEMSDiagnostic::transmitTest()
 {
+<<<<<<< HEAD
 	static uint8_t counter=0;
 	EOMDiagnosticRopMsg toSend(EOMDiagnosticRopMsg::Info{counter,2,3,4,5,6,0,0,7});
 	EOMDiagnosticRopMsg toSend1(EOMDiagnosticRopMsg::Info{counter,20,30,40,50,60,0,0,70});
@@ -490,10 +520,22 @@ eOresult_t EOMtheEMSDiagnostic::connect(eOipv4addr_t remaddr)
 }
 >>>>>>> new parsing managment
 =======
+=======
+    static uint8_t counter=0;
+    EOMDiagnosticRopMsg toSend(EOMDiagnosticRopMsg::Info{counter,2,3,4,5,6,0,0,7});
+    EOMDiagnosticRopMsg toSend1(EOMDiagnosticRopMsg::Info{counter,20,30,40,50,60,0,0,70});
+    ++counter;
+
+    sendDiagnosticMessage(toSend,false);
+    sendDiagnosticMessage(toSend1,false);
+    
+    transmitUdpPackage();
+>>>>>>> Diagnostic fix for parsing
 }
 
 extern "C"
 {
+<<<<<<< HEAD
 	void initDiagnostic()
 	{
 		EOMtheEMSDiagnostic::Params param;
@@ -501,3 +543,11 @@ extern "C"
 	}
 }
 >>>>>>> fix
+=======
+    void initDiagnostic()
+    {
+        EOMtheEMSDiagnostic::Params param;
+        EOMtheEMSDiagnostic::instance().initialise(param);
+    }
+}
+>>>>>>> Diagnostic fix for parsing
