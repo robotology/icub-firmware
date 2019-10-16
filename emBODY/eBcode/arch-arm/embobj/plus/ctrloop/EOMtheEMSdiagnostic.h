@@ -65,6 +65,8 @@ class EOMtheEMSDiagnostic
         bool initialise(const Params&);
             
         bool sendDiagnosticMessage(EOMDiagnosticRopMsg& msg,bool flush);
+        bool sendDiagnosticMessage(EOMDiagnosticRopMsg::Info& info,bool flush);
+        EOMDiagnosticRopMsg& getRopForModify(bool res);
         
     private:
 
@@ -79,7 +81,7 @@ class EOMtheEMSDiagnostic
         //task
         void taskStartup(EOMtask*,unsigned int);
         void taskRun(EOMtask*,unsigned int);            
-        uint32_t wakeupTask_{100*BUFSIZ};
+        static constexpr uint32_t wakeupTask_{100*BUFSIZ};
         EOMtask* task_{nullptr};    
         
         Params params_;
@@ -91,6 +93,8 @@ class EOMtheEMSDiagnostic
         EOpacket* txpkt_{nullptr};
         EOpacket *rxpkt_{nullptr};
         EOMDiagnosticUdpMsg txUdpMsg_;
+        std::array<uint8_t, EOMDiagnosticUdpMsg::getSize()> udpMsgRaw_;
+
 
         //process event
         void processEventRxPacket();

@@ -44,7 +44,7 @@
 #include "EOsocketDatagram.h"
 #include "EOMtask.h"
 
-
+#include "osal.h"
 #include "hal_trace.h"
 
 
@@ -80,7 +80,7 @@ bool EOMtheEMSDiagnostic::initialise(const Params& cfg)
     rxpkt_ = eo_packet_New(EOMDiagnosticUdpMsg::getSize());
 
     // create the task
-    task_ = eom_task_New(eom_mtask_EventDriven/*eom_mtask_Periodic*/, 
+    task_ = eom_task_New(eom_mtask_EventDriven, 
                         params_.taskpriority_, 
                         params_.taskstacksize_, 
                         [](EOMtask* task ,uint32_t t){
@@ -200,12 +200,17 @@ eOresult_t EOMtheEMSDiagnostic::transmitUdpPackage()
     if(!traceIsActive_)
         return eores_OK;
     
-    std::array<uint8_t, EOMDiagnosticUdpMsg::getSize()> udpMsg;
-    if(!txUdpMsg_.createUdpPacketData(udpMsg))
+    //uint64_t start = osal_system_abstime_get();    
+     
+    if(!txUdpMsg_.createUdpPacketData(udpMsgRaw_))
         return eores_OK;//nothing to transmit
 
-    eo_packet_Full_LinkTo(txpkt_, remoteAddr_, remotePort_,EOMDiagnosticUdpMsg::getSize(), udpMsg.data());
+    eo_packet_Full_LinkTo(txpkt_, remoteAddr_, remotePort_,EOMDiagnosticUdpMsg::getSize(), udpMsgRaw_.data());
 
+    //uint64_t end = osal_system_abstime_get();    
+    //hal_trace_puts(std::to_string(end-start).c_str());     
+
+    
     eOresult_t res;
 
     eo_packet_Addressing_Set(txpkt_, remoteAddr_, remotePort_);
@@ -249,23 +254,7 @@ eOresult_t EOMtheEMSDiagnostic::connect(eOipv4addr_t remaddr)
 }
 
 bool EOMtheEMSDiagnostic::sendDiagnosticMessage(EOMDiagnosticRopMsg& msg,bool flush)
-{
-    /*
-    if(ropCode.find(msg.getCode())==ropCode.end())
-    {
-        hal_trace_puts("ERROR - Wrong rop code");
-        EOMDiagnosticRopMsg toSend(EOMDiagnosticRopMsg::Info{(uint16_t)DiagnosticRopCode::diag,(uint16_t)DiagnosticRopSeverity::error,5,5,5,5,5,5,5});                            
-        sendDiagnosticMessage(toSend,false);
-        return false;
-    }
-    
-    if(ropSeverity.find(msg.getSeverity())==ropSeverity.end())
-    {
-        hal_trace_puts("ERROR - Wrong rop severity");
-        return false;
-    }
-    */
-        
+{       
     bool out=txUdpMsg_.addRop(msg);
     if(flush || forceFlush_)
     {
@@ -273,6 +262,22 @@ bool EOMtheEMSDiagnostic::sendDiagnosticMessage(EOMDiagnosticRopMsg& msg,bool fl
     }
     
     return out;
+}
+
+bool EOMtheEMSDiagnostic::sendDiagnosticMessage(EOMDiagnosticRopMsg::Info& info,bool flush)
+{       
+    bool out=txUdpMsg_.addRop(info);
+    if(flush || forceFlush_)
+    {
+        eom_task_SetEvent(task_, diagnosticEvent_evt_packet_tobesent); 
+    }
+    
+    return out;
+}
+
+EOMDiagnosticRopMsg& EOMtheEMSDiagnostic::getRopForModify(bool res)
+{
+    return txUdpMsg_.getRopForModify(res);
 }
 
 void EOMtheEMSDiagnostic::transmitTest()

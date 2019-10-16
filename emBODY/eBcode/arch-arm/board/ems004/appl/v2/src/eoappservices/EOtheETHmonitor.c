@@ -517,8 +517,16 @@ static void s_eo_ethmonitor_process_resultsofquery(void)
                 errdes.par16            = i;
                 errdes.par64            = applstate;
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes); 
-                EOMDiagnosticRopMsg toSend(EOMDiagnosticRopMsg::Info{(uint16_t)DiagnosticRopCode::ethlog,(uint16_t)DiagnosticRopSeverity::info,(uint16_t)DiagnosticRopString::ethup,i,0,0,0,0,0});							
-                EOMtheEMSDiagnostic::instance().sendDiagnosticMessage(toSend,true);
+                
+                auto info=EOMDiagnosticRopMsg::Info{(uint16_t)DiagnosticRopCode::ethlog,(uint16_t)DiagnosticRopSeverity::info,(uint16_t)DiagnosticRopString::ethup,i,0,0,0,0,0};
+                EOMtheEMSDiagnostic::instance().sendDiagnosticMessage(info,false);
+                
+                //Mutex???
+                /*bool res;
+                EOMDiagnosticRopMsg& rop=EOMtheEMSDiagnostic::instance().getRopForModify(res);
+                rop.data_.param_[0]=(uint16_t)DiagnosticRopCode::ethlog;
+                rop.data_.param_[1]=(uint16_t)DiagnosticRopSeverity::info;
+                rop.data_.param_[2]=(uint16_t)DiagnosticRopString::ethup;*/
             }
             
             if((1 == s_eo_theethmonitor.portstatus[i].rxcrc.validvalue) && (s_eo_theethmonitor.portstatus[i].rxcrc.value != 0))
@@ -529,8 +537,16 @@ static void s_eo_ethmonitor_process_resultsofquery(void)
                 errdes.par16            = i;
                 errdes.par64            = applstate | (s_eo_theethmonitor.portstatus[i].rxcrc.value & 0xffffffff);    
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes); 
-                EOMDiagnosticRopMsg toSend(EOMDiagnosticRopMsg::Info{(uint16_t)DiagnosticRopCode::ethlog,(uint16_t)DiagnosticRopSeverity::error,(uint16_t)DiagnosticRopString::ethdown,i,0,0,0,0,0});							
-                EOMtheEMSDiagnostic::instance().sendDiagnosticMessage(toSend,true);							
+                
+                auto info=EOMDiagnosticRopMsg::Info{(uint16_t)DiagnosticRopCode::ethlog,(uint16_t)DiagnosticRopSeverity::error,(uint16_t)DiagnosticRopString::ethdown,i,0,0,0,0,0};
+                EOMtheEMSDiagnostic::instance().sendDiagnosticMessage(info,false);
+                
+                //Mutex???
+                /*bool res;
+                EOMDiagnosticRopMsg& rop=EOMtheEMSDiagnostic::instance().getRopForModify(res);
+                rop.data_.param_[0]=(uint16_t)DiagnosticRopCode::ethlog;
+                rop.data_.param_[1]=(uint16_t)DiagnosticRopSeverity::error;
+                rop.data_.param_[2]=(uint16_t)DiagnosticRopString::ethdown;                */
             }
         }
         else

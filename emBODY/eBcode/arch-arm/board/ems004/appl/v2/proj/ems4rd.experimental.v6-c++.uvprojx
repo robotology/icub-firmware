@@ -767,6 +767,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSdiagnostic.cpp</FilePath>
             </File>
+            <File>
+              <FileName>EOMtheEMSdiagnostic.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSdiagnostic.h</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2134,6 +2139,11 @@
               <FileName>EOMtheEMSdiagnostic.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSdiagnostic.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheEMSdiagnostic.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSdiagnostic.h</FilePath>
             </File>
           </Files>
         </Group>
