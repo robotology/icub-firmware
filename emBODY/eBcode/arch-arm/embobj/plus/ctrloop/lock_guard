@@ -1,0 +1,45 @@
+/*
+ * Copyright (C) 2019 iCub Facility - Istituto Italiano di Tecnologia
+ * Author:  Luca Tricerri
+ * email:   luca.tricerri@iit.it
+ * website: https://github.com/icub-tech-iit
+ * Permission is granted to copy, distribute, and/or modify this program
+ * under the terms of the GNU General Public License, version 2 or any
+ * later version published by the Free Software Foundation.
+ *
+ * A copy of the license can be found at
+ * http://www.robotcub.org/icub/license/gpl.txt
+ *
+ * This program is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ * Public License for more details
+*/
+
+
+// - include guard ----------------------------------------------------------------------------------------------------
+#ifndef _LOCKGUARD_H_
+#define _LOCKGUARD_H_
+
+template <typename T>class lock_guard
+{
+    public:
+        lock_guard(T* mutex):mutex_(mutex)
+        {
+            eov_mutex_Take(mutex_, timeout_);
+        };
+        ~lock_guard()
+        {
+            eov_mutex_Release(mutex_);
+        };
+
+        lock_guard(const lock_guard&) =delete;
+        lock_guard& operator=(const lock_guard&) =delete;
+
+        T* mutex_;
+        uint32_t timeout_{0xFFFFFFFF};
+};
+
+#endif
+
+// - end-of-file (leave a blank line after)----------------------------------------------------------------------------

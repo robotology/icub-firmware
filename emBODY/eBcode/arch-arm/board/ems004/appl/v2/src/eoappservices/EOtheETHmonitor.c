@@ -316,6 +316,9 @@ extern eOresult_t eo_ethmonitor_Start(EOtheETHmonitor *p)
     errdes.par16            = 0;
     errdes.par64            = 0;
     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes); 
+    
+auto info=EOMDiagnosticRopMsg::Info{(uint16_t)DiagnosticRopCode::ethlog,(uint16_t)DiagnosticRopSeverity::info,(uint16_t)DiagnosticRopString::juststarted,0,0,0,0,0,0};
+    EOMtheEMSDiagnostic::instance().sendDiagnosticMessage(info,false);  
         
     return(eores_OK);
 }
@@ -538,7 +541,7 @@ static void s_eo_ethmonitor_process_resultsofquery(void)
                 errdes.par64            = applstate | (s_eo_theethmonitor.portstatus[i].rxcrc.value & 0xffffffff);    
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes); 
                 
-                auto info=EOMDiagnosticRopMsg::Info{(uint16_t)DiagnosticRopCode::ethlog,(uint16_t)DiagnosticRopSeverity::error,(uint16_t)DiagnosticRopString::ethdown,i,0,0,0,0,0};
+                auto info=EOMDiagnosticRopMsg::Info{(uint16_t)DiagnosticRopCode::ethlog,(uint16_t)DiagnosticRopSeverity::error,(uint16_t)DiagnosticRopString::rxcrc,i,0,0,0,0,0};
                 EOMtheEMSDiagnostic::instance().sendDiagnosticMessage(info,false);
                 
                 //Mutex???
@@ -558,7 +561,11 @@ static void s_eo_ethmonitor_process_resultsofquery(void)
                 errdes.sourceaddress    = 0;
                 errdes.par16            = i;
                 errdes.par64            = applstate;
-                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);                
+                eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);   
+
+                auto info=EOMDiagnosticRopMsg::Info{(uint16_t)DiagnosticRopCode::ethlog,(uint16_t)DiagnosticRopSeverity::error,(uint16_t)DiagnosticRopString::ethdown,i,0,0,0,0,0};
+                EOMtheEMSDiagnostic::instance().sendDiagnosticMessage(info,false);
+                                
             }            
         }
     }
@@ -650,6 +657,9 @@ static void s_eo_ethmonitor_send_error_sequencenumber(void)
     errdes.par16            = s_eo_theethmonitor.lastnumberofseqnumbererrors;
     errdes.par64            = s_eo_theethmonitor.lastsequencenumbererror;
     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);
+    
+    auto info=EOMDiagnosticRopMsg::Info{(uint16_t)DiagnosticRopCode::ethlog,(uint16_t)DiagnosticRopSeverity::error,(uint16_t)DiagnosticRopString::txseqnumbermissing,0,0,0,0,0,0};
+    EOMtheEMSDiagnostic::instance().sendDiagnosticMessage(info,false);
     
     s_eo_theethmonitor.lastnumberofseqnumbererrors = 0;
     s_eo_theethmonitor.lastsequencenumbererror = 0;

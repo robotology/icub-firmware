@@ -1,8 +1,8 @@
 /*
- * Copyright (C) 2013 iCub Facility - Istituto Italiano di Tecnologia
+ * Copyright (C) 2019 iCub Facility - Istituto Italiano di Tecnologia
  * Author:  Marco Accame, Luca Tricerri
  * email:   marco.accame@iit.it,luca.tricerri@iit.it
- * website: www.robotcub.org
+ * website:https://github.com/icub-tech-iit
  * Permission is granted to copy, distribute, and/or modify this program
  * under the terms of the GNU General Public License, version 2 or any
  * later version published by the Free Software Foundation.
@@ -34,6 +34,7 @@
 #include "EOpacket.h"
 #include "EOMtask.h"
 #include "EOsocketDatagram.h"
+#include "EOVmutex.h"
 
 #include "EOMDiagnosticRopMsg.h"
 #include "EOMDiagnosticUdpHeader.h"
@@ -94,7 +95,8 @@ class EOMtheEMSDiagnostic
         EOpacket *rxpkt_{nullptr};
         EOMDiagnosticUdpMsg txUdpMsg_;
         std::array<uint8_t, EOMDiagnosticUdpMsg::getSize()> udpMsgRaw_;
-
+        
+        EOVmutexDerived* mutexBody_;
 
         //process event
         void processEventRxPacket();
