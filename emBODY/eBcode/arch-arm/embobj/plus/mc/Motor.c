@@ -390,7 +390,7 @@ void Motor_config_filter(Motor* o, uint8_t filter) //
 
 void Motor_config_friction(Motor* o, float Bemf, float Ktau) //
 {
-    PID_config_friction(&o->trqPID, Bemf, Ktau);
+    PID_config_friction(&o->trqPID, o->GEARBOX, Bemf, Ktau);
 }
 
 void Motor_calibrate_withOffset(Motor* o, int32_t offset) //

@@ -37,28 +37,47 @@ void PID_init(PID* o)
 
 void PID_config(PID* o, eOmc_PID_t* config)
 {
-    float rescaler = 1.0f;
+    float rescaler = 1.0f/(float)(1<<config->scale);
 
-    o->Kc = rescaler*STICTION_INPUT_SCALE*config->offset;
+	  /* All the input values Ktau, Kbemf, stiction_up, stiction_down
+	   * are positive values.
+     * Kc input value is considered the value identified for positive
+	   * joint velocities. It is a priori positive, but could be negative	
+	   * depending on Stribeck effect and the fitting of the friction
+	   * training data used in the identification.
+     * The final Kc and stiction parameters set in the model get the same
+	   * sign as the joint velocity.
+     * The final Ktau set in the model gets the same	sign as the GEARBOX
+	   * ratio. */
+	  
+	  // PID parameters
     o->Kp = rescaler*config->kp;
     o->Kd = rescaler*config->kd;
     o->Ki = rescaler*config->ki;
-
-    o->Kff = rescaler*config->kff;
-
-    o->Kbemf = 0.0f;
-    o->Ktau  = 0.0f;
 
     o->Dn = 0.0f;
     o->En = 0.0f;
     o->In = 0.0f;
     o->Imax = config->limitonintegral;
 
+	  // The Dithering scale
+		o->Kff = 0.0f; // not used here. "Renamed" to Kdith for the dithering.
+    o->Kdith = rescaler*config->kff;
+
+    // Feed-forward parameters
+    o->Kc = rescaler*STICTION_INPUT_SCALE*config->offset;
+    o->Kbemf = 0.0f;
+    o->Ktau  = 0.0f;
+
+	  /* Stiction: input values are absolute. The model parameter then gets the same
+	   * sign as the joint velocity. */
     o->stiction_up   = rescaler*STICTION_INPUT_SCALE*config->stiction_up_val;
     o->stiction_down = rescaler*STICTION_INPUT_SCALE*config->stiction_down_val;
-    o->ditheringVal  = o->Kff*EO_MAX(o->stiction_up,o->stiction_down);
-	  o->ditheringMotorVel  = (float)config->scale*(float)VEL_FULLSCALE/360/100;
+		
+    o->ditheringVal  = o->Kdith*EO_MAX(o->stiction_up,o->stiction_down);
+	  o->ditheringMotorVel  = (float)DITHERING_MOTOR_VEL_DFLT*(float)VEL_FULLSCALE/360;
 
+    // Further PID configuration
     o->out_max = config->limitonoutput;
     o->out_lpf = 0.0f;
     o->out = 0.0f;
@@ -82,10 +101,11 @@ void PID_config(PID* o, eOmc_PID_t* config)
 
 }
 
-void PID_config_friction(PID *o, float Kbemf, float Ktau)
+void PID_config_friction(PID *o, CTRL_UNITS gearbox, float Kbemf, float Ktau)
 {
+	  float signGearbox = gearbox>=0 ? 1 : -1;
     o->Kbemf = Kbemf;
-    o->Ktau  = Ktau;
+    o->Ktau  = Ktau*signGearbox;
 }
 
 void PID_config_filter(PID *o, uint8_t filter)
@@ -145,30 +165,31 @@ float PID_do_out(PID* o, float En)
 
 float PID_do_friction_comp(PID *o, float vel_raw_fbk, float vel_fbk, float trq_ref)
 {
-    static float signDithering = 1;
-	  float dither,stiction,coulViscFriction;
-    if (vel_fbk>=o->ditheringMotorVel)
-    {
-			// positive joint velocity
-			dither = 0.0f;
-      stiction = o->stiction_up;
-			coulViscFriction = o->Kc + o->Kbemf*vel_fbk;
-    }
-    else if (vel_fbk<=-o->ditheringMotorVel)
-    {
-			// negative joint velocity
-			dither = 0.0f;
-      stiction = -o->stiction_down;
-			coulViscFriction = -o->Kc + o->Kbemf*vel_fbk;
-    }
-    else
+    static float signDithering = 1.0f;
+	  volatile float dither,stiction,coulViscFriction,signVel,isPos,isNeg;
+	  
+	  isNeg = signbit(vel_fbk);
+	  isPos = 1-signbit(vel_fbk);
+	  signVel = isPos-isNeg;
+	  
+	  // Stiction
+    stiction = isPos*o->stiction_up - isNeg*o->stiction_down;
+		
+		// Coulomb + Viscous friction
+	  coulViscFriction = o->Kc*signVel + o->Kbemf*vel_fbk;
+		
+		// Dithering
+    if (vel_raw_fbk<=o->ditheringMotorVel || vel_raw_fbk>=-o->ditheringMotorVel)
     {
 			// unobservable joint velocity (Apply Dithering)
       dither = signDithering*(o->ditheringVal);
       signDithering *= -1;
-			stiction = coulViscFriction = 0.0f;
     }
-
+		else
+		{
+			dither = 0.0f;
+		}
+		
     float totalFriction = dither + (fabs(stiction) > fabs(coulViscFriction) ? stiction : coulViscFriction);
     return o->Ktau*(trq_ref + totalFriction);
 }

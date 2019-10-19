@@ -38,6 +38,7 @@ typedef struct //PID
     float Ki;
 
     float Kff;
+    float Kdith;
     float Kbemf;
     float Ktau;
 
@@ -65,11 +66,12 @@ typedef struct //PID
 #define TAU_REF_SCALE 1000000
 #define STICTION_INPUT_SCALE (TAU_REF_SCALE*100/PWM_FULLSCALE)
 #define VEL_FULLSCALE 0x10000
+#define DITHERING_MOTOR_VEL_DFLT 100 /* in motor deg/s */
 
 PID* PID_new(uint8_t n);
 extern void PID_init(PID* o);
 extern void PID_config(PID* o, eOmc_PID_t* config);
-extern void PID_config_friction(PID *o, float Kbemf, float Ktau);
+extern void PID_config_friction(PID *o, CTRL_UNITS gearbox, float Kbemf, float Ktau);
 extern void PID_config_filter(PID *o, uint8_t filter);
 
 extern void PID_reset(PID* o);
