@@ -60,11 +60,9 @@ void PID_config(PID* o, eOmc_PID_t* config)
     o->In = 0.0f;
     o->Imax = config->limitonintegral;
 
-	  // The Dithering scale
-		o->Kff = 0.0f; // not used here. "Renamed" to Kdith for the dithering.
-    o->Kdith = rescaler*config->kff;
-
     // Feed-forward parameters
+		o->Kff = rescaler*config->kff;
+    o->Kdith = 0.0f; // Dithering scale is off for now, until the proper interface is implemented on yarpmotorgui.
     o->Kc = rescaler*STICTION_INPUT_SCALE*config->offset;
     o->Kbemf = 0.0f;
     o->Ktau  = 0.0f;
@@ -191,5 +189,5 @@ float PID_do_friction_comp(PID *o, float vel_raw_fbk, float vel_fbk, float trq_r
 		}
 		
     float totalFriction = dither + (fabs(stiction) > fabs(coulViscFriction) ? stiction : coulViscFriction);
-    return o->Ktau*(trq_ref + totalFriction);
+    return o->Ktau*(o->Kff*trq_ref + totalFriction);
 }
