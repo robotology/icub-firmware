@@ -1034,12 +1034,10 @@ void Motor_update_odometry_fbk_can(Motor* o, CanOdometry2FocMsg* can_msg) //
     
     o->Iqq_fbk = can_msg->current;
     
-  	/* We know that the motor velocities are inverted with respect to the PWM
-     * TO BE FIXED IN THE MOTOR DRIVER. */
-    o->vel_raw_fbk = -can_msg->velocity*CTRL_LOOP_FREQUENCY_INT;
+  	o->vel_raw_fbk = can_msg->velocity*CTRL_LOOP_FREQUENCY_INT;
     o->vel_fbk = o->vel_raw_fbk/o->GEARBOX;
     
-    o->pos_raw_fbk = -can_msg->position;
+    o->pos_raw_fbk = can_msg->position;
     o->pos_fbk = o->pos_raw_fbk/o->GEARBOX - o->pos_calib_offset;
     o->pos_raw_cal_fbk = o->pos_raw_fbk - o->pos_calib_offset*o->GEARBOX;
 }

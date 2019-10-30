@@ -62,9 +62,6 @@ typedef struct //PID
 } PID;
 
 #define MIN_VEL_OBSERVABLE 10 /* in degrees/s */
-#define PWM_FULLSCALE 32000
-#define TAU_REF_SCALE 1000000
-#define STICTION_INPUT_SCALE (TAU_REF_SCALE*100/PWM_FULLSCALE)
 #define VEL_FULLSCALE 0x10000
 #define DITHERING_MOTOR_VEL_DFLT 100 /* in motor deg/s */
 
