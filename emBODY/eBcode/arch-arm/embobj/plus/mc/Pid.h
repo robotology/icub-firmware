@@ -53,6 +53,7 @@ typedef struct //PID
     float stiction_down;
     float ditheringVal;
 	  float_fsticks_per_s_t ditheringMotorVel;
+	  float_fsticks_per_s_t stictionMotorVel;
 
     float out_max;
     float out_lpf;
@@ -63,7 +64,8 @@ typedef struct //PID
 
 #define MIN_VEL_OBSERVABLE 10 /* in degrees/s */
 #define VEL_FULLSCALE 0x10000
-#define DITHERING_MOTOR_VEL_DFLT 100 /* in motor deg/s */
+#define DITHERING_MOTOR_VEL_DFLT 10 /* in motor deg/s */
+#define STICTION_MOTOR_VEL_DFLT 300 /* in motor deg/s */
 
 PID* PID_new(uint8_t n);
 extern void PID_init(PID* o);

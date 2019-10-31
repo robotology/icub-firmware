@@ -72,8 +72,9 @@ void PID_config(PID* o, eOmc_PID_t* config)
     o->stiction_up   = rescaler*config->stiction_up_val;
     o->stiction_down = rescaler*config->stiction_down_val;
 		
-    o->ditheringVal  = o->Kdith*EO_MAX(o->stiction_up,o->stiction_down);
-	  o->ditheringMotorVel  = (float)DITHERING_MOTOR_VEL_DFLT*(float)VEL_FULLSCALE/360;
+    o->ditheringVal = o->Kdith*EO_MAX(o->stiction_up,o->stiction_down);
+	  o->ditheringMotorVel = (float)DITHERING_MOTOR_VEL_DFLT*(float)VEL_FULLSCALE/360;
+	  o->stictionMotorVel  = (float)STICTION_MOTOR_VEL_DFLT*(float)VEL_FULLSCALE/360;
 
     // Further PID configuration
     o->out_max = config->limitonoutput;
@@ -166,18 +167,25 @@ float PID_do_friction_comp(PID *o, float vel_raw_fbk, float vel_fbk, float trq_r
     static float signDithering = 1.0f;
 	  volatile float dither,stiction,coulViscFriction,signVel,isPos,isNeg;
 	  
-	  isNeg = signbit(vel_fbk);
-	  isPos = 1-signbit(vel_fbk);
+	  // Valid velocity for stiction
+    if (fabs(vel_raw_fbk)<=o->stictionMotorVel)
+		{
+			vel_fbk = 0.0f;
+    }
+		
+	  // vel_fbk>0 --> signVel=1;  vel_fbk<0 --> signVel=-1; vel_fbk==0 --> signVel=0;
+	  isNeg = (float)(vel_fbk<0);
+	  isPos = (float)(vel_fbk>0);
 	  signVel = isPos-isNeg;
 	  
-	  // Stiction
-    stiction = isPos*o->stiction_up - isNeg*o->stiction_down;
+		// Stiction
+		stiction = isPos*o->stiction_up - isNeg*o->stiction_down;
 		
 		// Coulomb + Viscous friction
 	  coulViscFriction = o->Kc*signVel + o->Kbemf*vel_fbk;
 		
 		// Dithering
-    if (vel_raw_fbk<=o->ditheringMotorVel || vel_raw_fbk>=-o->ditheringMotorVel)
+    if (fabs(vel_raw_fbk)<=o->ditheringMotorVel)
     {
 			// unobservable joint velocity (Apply Dithering)
       dither = signDithering*(o->ditheringVal);
@@ -188,6 +196,6 @@ float PID_do_friction_comp(PID *o, float vel_raw_fbk, float vel_fbk, float trq_r
 			dither = 0.0f;
 		}
 		
-    float totalFriction = dither + (fabs(stiction) > fabs(coulViscFriction) ? stiction : coulViscFriction);
+    float totalFriction = dither + ((fabs(stiction) > fabs(coulViscFriction) ? stiction : coulViscFriction));
     return o->Ktau*(o->Kff*trq_ref + totalFriction);
 }
