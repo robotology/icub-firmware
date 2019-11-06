@@ -80,9 +80,9 @@ class EOMtheEMSDiagnostic
         eOresult_t connect(eOipv4addr_t remaddr);            
 
         //task
-        void taskStartup(EOMtask*,unsigned int);
-        void taskRun(EOMtask*,unsigned int);            
-        static constexpr uint32_t wakeupTask_{100*BUFSIZ};
+        void taskStartup(EOMtask*,uint32_t);
+        void taskRun(EOMtask*,uint32_t);            
+        const eOreltime_t wakeupTask_{100*eok_reltime1ms};
         EOMtask* task_{nullptr};    
         
         Params params_;

@@ -102,7 +102,7 @@ bool EOMtheEMSDiagnostic::initialise(const Params& cfg)
 }
 
 
-void EOMtheEMSDiagnostic::taskStartup(EOMtask*,unsigned int)
+void EOMtheEMSDiagnostic::taskStartup(EOMtask*,uint32_t t)
 {
     // open the socket
     EOaction_strg astg = {0};
@@ -114,7 +114,7 @@ void EOMtheEMSDiagnostic::taskStartup(EOMtask*,unsigned int)
     eo_errman_Trace(eo_errman_GetHandle(), "called _task_startup()", s_eobj_ownname);                            
 }
 
-void EOMtheEMSDiagnostic::taskRun(EOMtask*,unsigned int t)
+void EOMtheEMSDiagnostic::taskRun(EOMtask*,uint32_t t)
 {
     eOevent_t evt = (eOevent_t)t;
 
@@ -162,7 +162,7 @@ bool EOMtheEMSDiagnostic::manageArrivedMessage(EOpacket* package)
     EOMDiagnosticUdpMsg msg;
     msg.parse(data,size);
 
-    for(uint16_t index=0;index<msg.getCurrentRopNumber();++index)
+   for(uint16_t index=0;index<msg.getCurrentRopNumber();++index)
     {
         EOMDiagnosticRopMsg rop;
         msg.getRop(rop,index);
@@ -185,10 +185,10 @@ bool EOMtheEMSDiagnostic::manageArrivedMessage(EOpacket* package)
             case DiagnosticRopCode::unforceflush:
                 forceFlush_=false;
                 hal_trace_puts("Unforce flush msg rx from pc104");
-                break;                            
+                break;                                        
             default:
                 hal_trace_puts("ERROR - Unknown msg rx from pc104");
-                EOMDiagnosticRopMsg toSend(EOMDiagnosticRopMsg::Info{(uint16_t)DiagnosticRopCode::diag,(uint16_t)DiagnosticRopSeverity::error,(uint16_t)DiagnosticRopString::wrongcommand,5,5,5,5,5,5});                            
+                EOMDiagnosticRopMsg toSend(EOMDiagnosticRopMsg::Info{(uint16_t)DiagnosticRopCode::diag,(uint16_t)DiagnosticRopSeverity::error,(uint16_t)DiagnosticRopString::wrongcommand,2,3,4,5,6,0});                            
                 sendDiagnosticMessage(toSend,false);
                 break;            
         }
@@ -236,6 +236,7 @@ eOresult_t EOMtheEMSDiagnostic::transmitUdpPackage()
         hal_trace_puts("ERROR - Udp msg not sent.");
     else
     {
+        //Cambiare Luca
         lock_guard<EOVmutexDerived> lock(mutexBody_);
         txUdpMsg_.reset();        
     }
@@ -268,6 +269,7 @@ bool EOMtheEMSDiagnostic::sendDiagnosticMessage(EOMDiagnosticRopMsg& msg,bool fl
 {   
     bool out;
     {
+        msg.data_.time_=osal_system_abstime_get();
         lock_guard<EOVmutexDerived> lock(mutexBody_);
         out=txUdpMsg_.addRop(msg);
     }
@@ -284,6 +286,7 @@ bool EOMtheEMSDiagnostic::sendDiagnosticMessage(EOMDiagnosticRopMsg::Info& info,
 {       
     bool out;
     {
+        info.time_=osal_system_abstime_get();
         lock_guard<EOVmutexDerived> lock(mutexBody_);
         out=txUdpMsg_.addRop(info);
     }
@@ -301,6 +304,7 @@ EOMDiagnosticRopMsg& EOMtheEMSDiagnostic::getRopForModify(bool res)
     return txUdpMsg_.getRopForModify(res);
 }
 
+<<<<<<< HEAD
 void EOMtheEMSDiagnostic::transmitTest()
 {
 <<<<<<< HEAD
@@ -559,6 +563,8 @@ eOresult_t EOMtheEMSDiagnostic::connect(eOipv4addr_t remaddr)
 >>>>>>> Diagnostic fix for parsing
 }
 
+=======
+>>>>>>> minor
 extern "C"
 {
 <<<<<<< HEAD
