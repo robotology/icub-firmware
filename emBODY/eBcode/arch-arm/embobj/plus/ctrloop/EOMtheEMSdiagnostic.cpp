@@ -385,8 +385,8 @@ bool EOMtheEMSDiagnostic::send(const embot::eprot::diagnostics::InfoBasic &ib, b
             if(sizeofropframe <= rawcapacity)
             {
                 embot::utils::Data datainropframe { rawdata, rawcapacity};
-                uint16_t size = node->retrieve(datainropframe);   
-                eo_packet_Full_LinkTo(txpkt2_, remoteAddr_, remotePort_, size, datainropframe.getU08ptr());  
+                bool thereisarop = node->retrieve(datainropframe);   
+                eo_packet_Full_LinkTo(txpkt2_, remoteAddr_, remotePort_, sizeofropframe, datainropframe.getU08ptr());  
                 eom_task_SetEvent(task_, diagnosticEvent_evt_packet_tobesent);                
             }
                 
