@@ -53,7 +53,11 @@ extern void tskEMScfg(void *p)
 }
 EOMtheEMSDiagnostic::EOMtheEMSDiagnostic()
 {
-    txpkt_=eo_packet_New(0);    
+    txpkt_=eo_packet_New(0);
+    txpkt2_ = eo_packet_New(0);
+    eo_packet_Size_Set(txpkt2_, 0) 
+    rawcapacity = 513;    
+    rawdata = new uint8_t[rawcapacity];    
 }
 
 EOMtheEMSDiagnostic& EOMtheEMSDiagnostic::instance()
@@ -79,6 +83,11 @@ bool EOMtheEMSDiagnostic::initialise(const Params& cfg)
                                                               );    
     // create the rx packet
     rxpkt_ = eo_packet_New(EOMDiagnosticUdpMsg::getSize());
+    
+    embot::app::DiagnosticsNode::Config config {}; // to be filled properly after
+    node = new embot::app::DiagnosticsNode;
+    node->init(config);
+        
 
     // create the task
     task_ = eom_task_New(eom_mtask_EventDriven, 
@@ -96,7 +105,8 @@ bool EOMtheEMSDiagnostic::initialise(const Params& cfg)
                         tskEMScfg,
                         "diagnostic");
                                                                                 
-                                                    
+    
+                             
     return true;                                                
 }
 
@@ -198,6 +208,54 @@ bool EOMtheEMSDiagnostic::manageArrivedMessage(EOpacket* package)
 
 eOresult_t EOMtheEMSDiagnostic::transmitUdpPackage()
 {
+#if 1
+    if(!traceIsActive_)
+        return eores_OK;
+    
+    //uint64_t start = osal_system_abstime_get();    
+     
+    {
+        lock_guard<EOVmutexDerived> lock(mutexBody_);
+
+        if(0 == eo_packet_Size_Get(txpkt2_))
+        {
+            return eores_OK;//nothing to transmit
+        }
+    }
+//    eo_packet_Full_LinkTo(txpkt_, remoteAddr_, remotePort_,EOMDiagnosticUdpMsg::getSize(), udpMsgRaw_.data());
+
+    //uint64_t end = osal_system_abstime_get();    
+    //hal_trace_puts(std::to_string(end-start).c_str());     
+
+    
+    eOresult_t res;
+
+    eo_packet_Addressing_Set(txpkt2_, remoteAddr_, remotePort_);
+
+    if((!connected2host_) || (remoteAddr_ != hostaddress_))
+    {
+        res = connect(remoteAddr_);
+        if(eores_OK != res)
+        {
+            hal_trace_puts("ERROR - connect");
+            return(res);
+        }
+    }
+
+    res = eo_socketdtg_Put(socket_, txpkt2_);
+    
+    eOresult_t tmp=res;
+    if(res!=eores_OK)
+        hal_trace_puts("ERROR - Udp msg not sent.");
+    else
+    {
+        //Cambiare Luca
+        lock_guard<EOVmutexDerived> lock(mutexBody_);
+        eo_packet_Size_Set(txpkt2_, 0);        
+    }
+    return(res);
+#else
+    
     if(!traceIsActive_)
         return eores_OK;
     
@@ -240,6 +298,7 @@ eOresult_t EOMtheEMSDiagnostic::transmitUdpPackage()
         txUdpMsg_.reset();        
     }
     return(res);
+#endif
 }
 
 eOresult_t EOMtheEMSDiagnostic::connect(eOipv4addr_t remaddr)
@@ -311,3 +370,45 @@ extern "C"
         EOMtheEMSDiagnostic::instance().initialise(param);
     }
 }
+
+bool EOMtheEMSDiagnostic::send(const embot::eprot::diagnostics::InfoBasic &ib, bool flush)
+{   
+    bool ret = true;
+    
+    node->add(ib);
+    
+    if(flush)
+    {
+        size_t sizeofropframe = 0;
+        if(true == node->prepare(sizeofropframe))
+        {
+            if(sizeofropframe <= rawcapacity)
+            {
+                embot::utils::Data datainropframe { rawdata, rawcapacity};
+                uint16_t size = node->retrieve(datainropframe);   
+                eo_packet_Full_LinkTo(txpkt2_, remoteAddr_, remotePort_, size, datainropframe.getU08ptr());  
+                eom_task_SetEvent(task_, diagnosticEvent_evt_packet_tobesent);                
+            }
+                
+
+            //etc.
+        }        
+        
+    }
+    
+
+//    {
+//        msg.data_.time_=osal_system_abstime_get();
+//        lock_guard<EOVmutexDerived> lock(mutexBody_);
+//        out=txUdpMsg_.addRop(msg);
+//    }
+//    
+//    if(flush || forceFlush_)
+//    {
+//        eom_task_SetEvent(task_, diagnosticEvent_evt_packet_tobesent); 
+//    }
+//    
+    return ret;
+}
+
+// eof

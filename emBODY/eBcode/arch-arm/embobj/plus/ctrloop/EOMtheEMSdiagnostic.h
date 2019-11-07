@@ -41,6 +41,10 @@
 #include "EOMDiagnosticUdpFooter.h"
 #include "EOMDiagnosticUdpMsg.h"
 
+#include "embot_eprot_diagnostics.h"
+
+#include "DiagnosticsNode.h" // needed by pimpl
+
 class EOMtheEMSDiagnostic
 {
     public:
@@ -69,6 +73,8 @@ class EOMtheEMSDiagnostic
         bool sendDiagnosticMessage(EOMDiagnosticRopMsg::Info& info,bool flush);
         EOMDiagnosticRopMsg& getRopForModify(bool res);
         
+        bool send(const embot::eprot::diagnostics::InfoBasic &ib, bool flush = true);
+        
     private:
 
         EOMtheEMSDiagnostic();
@@ -96,6 +102,10 @@ class EOMtheEMSDiagnostic
         EOMDiagnosticUdpMsg txUdpMsg_;
         std::array<uint8_t, EOMDiagnosticUdpMsg::getSize()> udpMsgRaw_;
         
+        EOpacket* txpkt2_{nullptr};
+        uint8_t *rawdata {nullptr};
+        uint16_t rawcapacity {513};
+        
         EOVmutexDerived* mutexBody_;
 
         //process event
@@ -114,6 +124,8 @@ class EOMtheEMSDiagnostic
 
         //debug
         void transmitTest();
+        
+        embot::app::DiagnosticsNode * node {nullptr};
 };
 
 #endif  // include-guard

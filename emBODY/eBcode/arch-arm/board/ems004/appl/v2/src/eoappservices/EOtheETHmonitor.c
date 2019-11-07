@@ -38,6 +38,8 @@
 
 #include "EOMtheEMSDiagnostic.h"
 
+#include "DiagnosticsNode.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -136,6 +138,8 @@ static void s_eo_ethmonitor_verifyTXropframe_DUMMY(hl_eth_frame_t* frame);
 
 static void s_eo_ethmonitor_send_error_sequencenumber(void);
 
+static void s_eo_ethmonitor_diag_send(eOerrmanErrorType_t errtype, const eOerrmanDescriptor_t *des);
+static void s_eo_ethmonitor_diag_send2(eOerrmanErrorType_t errtype, const eOerrmanDescriptor_t &errdes);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -520,9 +524,15 @@ static void s_eo_ethmonitor_process_resultsofquery(void)
                 errdes.par16            = i;
                 errdes.par64            = applstate;
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes); 
+
+
+                //s_eo_ethmonitor_diag_send(eo_errortype_error, &errdes);
+                s_eo_ethmonitor_diag_send2(eo_errortype_error, errdes);
                 
-                auto info=EOMDiagnosticRopMsg::Info{(uint16_t)DiagnosticRopCode::ethlog,(uint16_t)DiagnosticRopSeverity::info,(uint16_t)DiagnosticRopString::ethup,eo_errman_sourcedevice_localboard,0,0,0,0,0};
-                EOMtheEMSDiagnostic::instance().sendDiagnosticMessage(info,false);
+//                auto info=EOMDiagnosticRopMsg::Info{(uint16_t)DiagnosticRopCode::ethlog,(uint16_t)DiagnosticRopSeverity::info,(uint16_t)DiagnosticRopString::ethup,eo_errman_sourcedevice_localboard,0,0,0,0,0};
+//                EOMtheEMSDiagnostic::instance().sendDiagnosticMessage(info,false);
+                
+                
                 
                 //Mutex???
                 /*bool res;
@@ -541,8 +551,10 @@ static void s_eo_ethmonitor_process_resultsofquery(void)
                 errdes.par64            = applstate | (s_eo_theethmonitor.portstatus[i].rxcrc.value & 0xffffffff);    
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes); 
                 
-                auto info=EOMDiagnosticRopMsg::Info{(uint16_t)DiagnosticRopCode::ethlog,(uint16_t)DiagnosticRopSeverity::error,(uint16_t)DiagnosticRopString::rxcrc,eo_errman_sourcedevice_localboard,0,0,0,0,0};
-                EOMtheEMSDiagnostic::instance().sendDiagnosticMessage(info,false);
+               
+                
+//                auto info=EOMDiagnosticRopMsg::Info{(uint16_t)DiagnosticRopCode::ethlog,(uint16_t)DiagnosticRopSeverity::error,(uint16_t)DiagnosticRopString::rxcrc,eo_errman_sourcedevice_localboard,0,0,0,0,0};
+//                EOMtheEMSDiagnostic::instance().sendDiagnosticMessage(info,false);
                 
                 //Mutex???
                 /*bool res;
@@ -563,8 +575,8 @@ static void s_eo_ethmonitor_process_resultsofquery(void)
                 errdes.par64            = applstate;
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);   
 
-                auto info=EOMDiagnosticRopMsg::Info{(uint16_t)DiagnosticRopCode::ethlog,(uint16_t)DiagnosticRopSeverity::error,(uint16_t)DiagnosticRopString::ethdown,eo_errman_sourcedevice_localboard,0,0,0,0,0};
-                EOMtheEMSDiagnostic::instance().sendDiagnosticMessage(info,false);
+//                auto info=EOMDiagnosticRopMsg::Info{(uint16_t)DiagnosticRopCode::ethlog,(uint16_t)DiagnosticRopSeverity::error,(uint16_t)DiagnosticRopString::ethdown,eo_errman_sourcedevice_localboard,0,0,0,0,0};
+//                EOMtheEMSDiagnostic::instance().sendDiagnosticMessage(info,false);
                                 
             }            
         }
@@ -658,12 +670,91 @@ static void s_eo_ethmonitor_send_error_sequencenumber(void)
     errdes.par64            = s_eo_theethmonitor.lastsequencenumbererror;
     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);
     
-    auto info=EOMDiagnosticRopMsg::Info{(uint16_t)DiagnosticRopCode::ethlog,(uint16_t)DiagnosticRopSeverity::error,(uint16_t)DiagnosticRopString::txseqnumbermissing,eo_errman_sourcedevice_localboard,0,0,0,0,0};
-    EOMtheEMSDiagnostic::instance().sendDiagnosticMessage(info,false);
+//    auto info=EOMDiagnosticRopMsg::Info{(uint16_t)DiagnosticRopCode::ethlog,(uint16_t)DiagnosticRopSeverity::error,(uint16_t)DiagnosticRopString::txseqnumbermissing,eo_errman_sourcedevice_localboard,0,0,0,0,0};
+//    EOMtheEMSDiagnostic::instance().sendDiagnosticMessage(info,false);
     
     s_eo_theethmonitor.lastnumberofseqnumbererrors = 0;
     s_eo_theethmonitor.lastsequencenumbererror = 0;
 }
+
+
+static void s_eo_ethmonitor_diag_send(eOerrmanErrorType_t errtype, const eOerrmanDescriptor_t *des)
+{
+    // freely inspired from s_eom_emsappl_OnError().
+    if(NULL == des)
+    {
+        return;
+    }
+    
+    eOmn_info_basic_t infobasic = {};
+    
+    infobasic.timestamp = eov_sys_LifeTimeGet(eov_sys_GetHandle());;
+    infobasic.properties.code = des->code;
+    infobasic.properties.flags = 0;
+    EOMN_INFO_PROPERTIES_FLAGS_set_type(infobasic.properties.flags, errtype);
+    EOMN_INFO_PROPERTIES_FLAGS_set_source(infobasic.properties.flags, des->sourcedevice);
+    EOMN_INFO_PROPERTIES_FLAGS_set_address(infobasic.properties.flags, des->sourceaddress);
+    EOMN_INFO_PROPERTIES_FLAGS_set_extraformat(infobasic.properties.flags, eomn_info_extraformat_none);
+    EOMN_INFO_PROPERTIES_FLAGS_set_futureuse(infobasic.properties.flags, 0);    
+    infobasic.properties.par16 = des->par16;
+    infobasic.properties.par64 = des->par64;
+        
+    // we need a mutex   
+    //osal_mutex_take(onerrormutex, osal_reltimeINFINITE);
+        
+    // now do a call to embotIF_diagnode_add2(&infobasic); 
+    // then to embotIF_diagnode_prepare(); 
+    // then to retrieve the udp packet we call embotIF_diagnode_retrieve(udppacket) 
+    // and then we send order to send the udppacket
+    
+        
+    //osal_mutex_release(onerrormutex);
+        
+    
+}
+
+embot::app::DiagnosticsNode * getone()
+{
+    return nullptr;   
+}
+
+static void s_eo_ethmonitor_diag_send2(eOerrmanErrorType_t errtype, const eOerrmanDescriptor_t &errdes)
+{
+
+    if(eo_errortype_trace == errtype)
+    {   // trace is not transmitted
+        return;
+    }
+    embot::eprot::diagnostics::TYP typ = static_cast<embot::eprot::diagnostics::TYP>(errtype-1);
+    embot::eprot::diagnostics::SRC src = static_cast<embot::eprot::diagnostics::SRC>(errdes.sourcedevice);
+    embot::eprot::diagnostics::ADR adr = static_cast<embot::eprot::diagnostics::ADR>(errdes.sourceaddress);
+    embot::eprot::diagnostics::EXT ext = embot::eprot::diagnostics::EXT::none;
+    embot::eprot::diagnostics::FFU ffu = embot::eprot::diagnostics::FFU::none;
+    
+    embot::eprot::diagnostics::InfoBasic ib {
+        eov_sys_LifeTimeGet(eov_sys_GetHandle()),
+        errdes.code,
+        {typ, src, adr, ext, ffu},
+        errdes.par16,
+        errdes.par64,        
+    };
+    
+//    embot::app::DiagnosticsNode * node =  getone();
+//    if(nullptr != node)
+//    {
+//        node->add(ib);
+//        size_t sizeofropframe = 0;
+//        if(true == node->prepare(sizeofropframe))
+//        {
+//            //node->retrieve();
+//            //etc.
+//        }
+//    }
+    
+    EOMtheEMSDiagnostic::instance().send(ib);
+          
+}
+
 
 
 // --------------------------------------------------------------------------------------------------------------------
