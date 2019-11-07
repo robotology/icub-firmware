@@ -510,10 +510,11 @@ static void s_eo_ethmonitor_process_resultsofquery(void)
 //    s_eo_ethmonitor_print_timeoflife("PROCESS");
     
     uint8_t i = 0;
-    
+    eObool_t txone = eobool_false;
+    uint64_t applstate = (eobool_true == eom_emsrunner_IsRunning(eom_emsrunner_GetHandle())) ? (0x3000000000000000) : (0x1000000000000000);    
     for(i=0; i<eOethmonitor_numberofports; i++)
     {
-        uint64_t applstate = (eobool_true == eom_emsrunner_IsRunning(eom_emsrunner_GetHandle())) ? (0x3000000000000000) : (0x1000000000000000);
+
         if(eobool_true == s_eo_theethmonitor.portstatus[i].on)
         {
             if(eobool_false == s_eo_theethmonitor.portstatus[i].previouson)
@@ -524,7 +525,7 @@ static void s_eo_ethmonitor_process_resultsofquery(void)
                 errdes.par16            = i;
                 errdes.par64            = applstate;
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes); 
-
+                txone = eobool_true;
 
                 //s_eo_ethmonitor_diag_send(eo_errortype_error, &errdes);
                 s_eo_ethmonitor_diag_send2(eo_errortype_error, errdes);
@@ -550,7 +551,7 @@ static void s_eo_ethmonitor_process_resultsofquery(void)
                 errdes.par16            = i;
                 errdes.par64            = applstate | (s_eo_theethmonitor.portstatus[i].rxcrc.value & 0xffffffff);    
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes); 
-                
+                txone = eobool_true;
                
                 
 //                auto info=EOMDiagnosticRopMsg::Info{(uint16_t)DiagnosticRopCode::ethlog,(uint16_t)DiagnosticRopSeverity::error,(uint16_t)DiagnosticRopString::rxcrc,eo_errman_sourcedevice_localboard,0,0,0,0,0};
@@ -574,14 +575,27 @@ static void s_eo_ethmonitor_process_resultsofquery(void)
                 errdes.par16            = i;
                 errdes.par64            = applstate;
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);   
-
+                txone = eobool_true;
+                
 //                auto info=EOMDiagnosticRopMsg::Info{(uint16_t)DiagnosticRopCode::ethlog,(uint16_t)DiagnosticRopSeverity::error,(uint16_t)DiagnosticRopString::ethdown,eo_errman_sourcedevice_localboard,0,0,0,0,0};
 //                EOMtheEMSDiagnostic::instance().sendDiagnosticMessage(info,false);
                                 
             }            
         }
     }
-     
+
+    static uint16_t cnt = 0;
+    if(eobool_false == txone)
+    {
+        errdes.code             = eoerror_code_get(eoerror_category_ETHmonitor, eoerror_value_ETHMON_justverified);
+        errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+        errdes.sourceaddress    = 0;
+        errdes.par16            = cnt++;
+        errdes.par64            = applstate;
+        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);   
+        s_eo_ethmonitor_diag_send2(eo_errortype_error, errdes);        
+    }
+    
     s_eo_theethmonitor.newresultsavailable = eobool_false;    
 }
 

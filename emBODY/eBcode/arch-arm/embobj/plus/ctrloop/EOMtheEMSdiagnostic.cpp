@@ -55,7 +55,7 @@ EOMtheEMSDiagnostic::EOMtheEMSDiagnostic()
 {
     txpkt_=eo_packet_New(0);
     txpkt2_ = eo_packet_New(0);
-    eo_packet_Size_Set(txpkt2_, 0) 
+    eo_packet_Size_Set(txpkt2_, 0); 
     rawcapacity = 513;    
     rawdata = new uint8_t[rawcapacity];    
 }
