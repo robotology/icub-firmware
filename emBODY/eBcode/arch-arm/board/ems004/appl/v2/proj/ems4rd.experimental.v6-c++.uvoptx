@@ -158,40 +158,7 @@
           <Name>-UV0153FBE -O14 -S0 -C0 -N00("ARM CoreSight JTAG-DP") -D00(3BA00477) -L00(4) -N01("Unknown JTAG device") -D01(06418041) -L01(5) -TO18 -TC10000000 -TP21 -TDS8007 -TDT0 -TDC1F -TIEFFFFFFFF -TIP8 -FO7 -FD20000000 -FC800 -FN1 -FF0STM32F10x_CL -FS08000000 -FL040000</Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
-      <Breakpoint>
-        <Bp>
-          <Number>0</Number>
-          <Type>0</Type>
-          <LineNumber>508</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134405636</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSdiagnostic.cpp</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\ems004\../../../../../embobj/plus/ctrloop/EOMtheEMSdiagnostic.cpp\508</Expression>
-        </Bp>
-        <Bp>
-          <Number>1</Number>
-          <Type>0</Type>
-          <LineNumber>426</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134401298</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\..\..\..\..\embobj\plus\ctrloop\EOMtheEMSdiagnostic.cpp</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\ems004\../../../../../embobj/plus/ctrloop/EOMtheEMSdiagnostic.cpp\426</Expression>
-        </Bp>
-      </Breakpoint>
+      <Breakpoint/>
       <WatchWindow1>
         <Ww>
           <count>0</count>
@@ -1782,7 +1749,7 @@
 
   <Group>
     <GroupName>eo-core</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -2670,7 +2637,7 @@
 
   <Group>
     <GroupName>appl-services</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -3683,6 +3650,18 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\..\embot\eprot\DiagnosticsHost.cpp</PathWithFileName>
       <FilenameWithoutPath>DiagnosticsHost.cpp</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>21</GroupNumber>
+      <FileNumber>159</FileNumber>
+      <FileType>8</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\embot\cif\embot_cif_diagnostic.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_cif_diagnostic.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

@@ -68,6 +68,8 @@
 #include "EOtheLEDpulser.h"
 
 
+#include "embot_cif_diagnostic.h"
+
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
 // --------------------------------------------------------------------------------------------------------------------
@@ -653,7 +655,8 @@ static void s_eom_emsappl_errormamager_customise(void)
 {
     s_emsappl_singleton.blockingsemaphore = osal_semaphore_new(2, 0);
     s_emsappl_singleton.onerrormutex = osal_mutex_new();
-    eo_errman_SetOnErrorHandler(eo_errman_GetHandle(), s_eom_emsappl_OnError);    
+    //eo_errman_SetOnErrorHandler(eo_errman_GetHandle(), s_eom_emsappl_OnError);    
+    eo_errman_SetOnErrorHandler(eo_errman_GetHandle(), embot_cif_diagnostic_OnError);
 }
 
 EO_static_inline eOsmStatesEMSappl_t s_eom_emsappl_GetCurrentState(EOMtheEMSappl *p)

@@ -21,13 +21,13 @@
 // public interface
 
 #include "EOMtheEMSDiagnostic.h"
-#include "lock_guard"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-
+#include "lock_guard"
 #include "EoCommon.h"
 
 #include "EOtheMemoryPool.h"

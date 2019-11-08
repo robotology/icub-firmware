@@ -528,7 +528,7 @@ static void s_eo_ethmonitor_process_resultsofquery(void)
                 txone = eobool_true;
 
                 //s_eo_ethmonitor_diag_send(eo_errortype_error, &errdes);
-                s_eo_ethmonitor_diag_send2(eo_errortype_error, errdes);
+//                s_eo_ethmonitor_diag_send2(eo_errortype_error, errdes);
                 
 //                auto info=EOMDiagnosticRopMsg::Info{(uint16_t)DiagnosticRopCode::ethlog,(uint16_t)DiagnosticRopSeverity::info,(uint16_t)DiagnosticRopString::ethup,eo_errman_sourcedevice_localboard,0,0,0,0,0};
 //                EOMtheEMSDiagnostic::instance().sendDiagnosticMessage(info,false);
@@ -592,8 +592,8 @@ static void s_eo_ethmonitor_process_resultsofquery(void)
         errdes.sourceaddress    = 0;
         errdes.par16            = cnt++;
         errdes.par64            = applstate;
-        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);   
-        s_eo_ethmonitor_diag_send2(eo_errortype_error, errdes);        
+//        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);   
+//        s_eo_ethmonitor_diag_send2(eo_errortype_error, errdes);        
     }
     
     s_eo_theethmonitor.newresultsavailable = eobool_false;    
