@@ -1438,6 +1438,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\eprot\ROPstream.cpp</FilePath>
             </File>
+            <File>
+              <FileName>DiagnosticsHost.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\eprot\DiagnosticsHost.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2771,6 +2776,11 @@
               <FileName>ROPstream.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\eprot\ROPstream.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>DiagnosticsHost.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\eprot\DiagnosticsHost.cpp</FilePath>
             </File>
           </Files>
         </Group>

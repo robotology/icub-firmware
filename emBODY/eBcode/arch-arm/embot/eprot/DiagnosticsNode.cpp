@@ -126,7 +126,7 @@ struct embot::app::DiagnosticsNode::Impl
         buffer.clear(); // so that it is not valid
         
         
-        constexpr embot::eprot::rop::PLUS plusMODE = embot::eprot::rop::PLUS::signature;
+        constexpr embot::eprot::rop::PLUS plusMODE = embot::eprot::rop::PLUS::none;
         constexpr embot::eprot::rop::SIGN signature = embot::eprot::rop::signatureNone;
         constexpr embot::common::Time time = embot::common::timeNone;
         

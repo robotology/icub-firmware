@@ -92,7 +92,7 @@ namespace embot { namespace eprot { namespace diagnostics {
         // methods
         InfoBasic() = default;
         constexpr InfoBasic(embot::common::Time t, uint32_t c, InfoProperties p, uint16_t p16, uint64_t p64) : timestamp(t), code(c), flags(p), par16(p16), par64(p64) {}
-
+        // constexpr bool load(void *rawmemory) { if(nullptr == rawmemory) { return false; } std::memmove(this, rawmemory, sizeofobject); return true; }
         constexpr static embot::eprot::ID32 id32 = embot::eprot::getID32(embot::eprot::EP::management, embot::eprot::EN::mnInfo, 0, tag_info_basic);
         constexpr static uint16_t sizeofobject = 24;
     };  static_assert(sizeof(InfoBasic) == InfoBasic::sizeofobject, "embot::eprot::diagnostics::InfoBasic has wrong sizeofobject. it must be 24");
