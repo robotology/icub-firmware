@@ -587,13 +587,17 @@ static void s_eo_ethmonitor_process_resultsofquery(void)
     static uint16_t cnt = 0;
     if(eobool_false == txone)
     {
+        static uint8_t cnt = 0;
         errdes.code             = eoerror_code_get(eoerror_category_ETHmonitor, eoerror_value_ETHMON_justverified);
         errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
         errdes.sourceaddress    = 0;
         errdes.par16            = cnt++;
         errdes.par64            = applstate;
-//        eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);   
-//        s_eo_ethmonitor_diag_send2(eo_errortype_error, errdes);        
+        if(0 == (++cnt%10))
+        {
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);   
+//        s_eo_ethmonitor_diag_send2(eo_errortype_error, errdes);   
+        }            
     }
     
     s_eo_theethmonitor.newresultsavailable = eobool_false;    

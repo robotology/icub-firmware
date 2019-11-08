@@ -655,8 +655,8 @@ static void s_eom_emsappl_errormamager_customise(void)
 {
     s_emsappl_singleton.blockingsemaphore = osal_semaphore_new(2, 0);
     s_emsappl_singleton.onerrormutex = osal_mutex_new();
-    //eo_errman_SetOnErrorHandler(eo_errman_GetHandle(), s_eom_emsappl_OnError);    
-    eo_errman_SetOnErrorHandler(eo_errman_GetHandle(), embot_cif_diagnostic_OnError);
+    eo_errman_SetOnErrorHandler(eo_errman_GetHandle(), s_eom_emsappl_OnError);    
+//    eo_errman_SetOnErrorHandler(eo_errman_GetHandle(), embot_cif_diagnostic_OnError);
 }
 
 EO_static_inline eOsmStatesEMSappl_t s_eom_emsappl_GetCurrentState(EOMtheEMSappl *p)
@@ -667,6 +667,12 @@ EO_static_inline eOsmStatesEMSappl_t s_eom_emsappl_GetCurrentState(EOMtheEMSappl
 
 static void s_eom_emsappl_OnError(eOerrmanErrorType_t errtype, const char *info, eOerrmanCaller_t *caller, const eOerrmanDescriptor_t *des)
 {
+    // here is the new one
+    embot_cif_diagnostic_OnError(errtype, info, caller, des);
+    
+    // but also the legacy one
+    
+    
     // i want to protect this function vs concurrent access. for instance it may be called by a timer callback and by teh control loop.
     // i use a mutex but only where it is required. for sure snprintf is reentrant and it uses memory on the stack ....
     const char empty[] = "EO?";
