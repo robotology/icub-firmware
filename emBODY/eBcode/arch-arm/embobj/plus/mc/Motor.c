@@ -237,6 +237,13 @@ static void Motor_set_control_mode_2FOC(uint8_t motor, icubCanProto_controlmode_
     eo_canserv_SendCommandToEntity(eo_canserv_GetHandle(), &command, id32);
 }
 
+static inline int32_t Motor_align_with_motor_orient(Motor* o, int32_t controlSetpoint)
+{
+	  // Correct the PWM parameter in order to match the convention:
+	  // PWM > 0 --> motor torque > 0 at the joint level.
+    return controlSetpoint = controlSetpoint*o->gearbox2jointOrientConv;	
+}
+
 
 // public
 Motor* Motor_new(uint8_t n) //
@@ -256,6 +263,7 @@ void Motor_init(Motor* o) //
     memset(o, 0, sizeof(Motor));
 
     o->GEARBOX = 1;
+	  o->gearbox2jointOrientConv = 1;
     
     o->not_init = TRUE;
     o->not_calibrated = TRUE;
@@ -282,7 +290,8 @@ void Motor_config(Motor* o, uint8_t ID, eOmc_motor_config_t* config) //
 {
     // const init
     o->ID                 = ID;
-    o->GEARBOX            = config->gearbox_M2J;
+    o->GEARBOX            = fabsf(config->gearbox_M2J);
+	  o->gearbox2jointOrientConv = (config->gearbox_M2J>=0 ? 1 : -1);
     o->HAS_TEMP_SENSOR    = config->hasTempSensor;
     
     o->enc_sign = config->rotorEncoderResolution >= 0 ? 1 : -1; 
@@ -390,7 +399,7 @@ void Motor_config_filter(Motor* o, uint8_t filter) //
 
 void Motor_config_friction(Motor* o, float Bemf, float Ktau) //
 {
-    PID_config_friction(&o->trqPID, o->GEARBOX, Bemf, Ktau);
+    PID_config_friction(&o->trqPID, Bemf, Ktau);
 }
 
 void Motor_calibrate_withOffset(Motor* o, int32_t offset) //
@@ -907,6 +916,10 @@ void Motor_actuate(Motor* motor, uint8_t N) //
 
 void Motor_set_pwm_ref(Motor* o, int32_t pwm_ref)
 {
+	  // Correct the PWM parameter in order to match the convention:
+	  // PWM > 0 --> motor torque > 0 at the joint level.
+    pwm_ref = Motor_align_with_motor_orient(o, pwm_ref);
+	
     if (o->pos_min != o->pos_max)
     {        
         if ((o->pos_raw_cal_fbk < o->pos_min) && (pwm_ref < 0))
@@ -946,6 +959,10 @@ void Motor_set_pwm_ref(Motor* o, int32_t pwm_ref)
 
 void Motor_set_Iqq_ref(Motor* o, int32_t Iqq_ref)
 {
+	  // Correct the PWM parameter in order to match the convention:
+	  // PWM > 0 --> motor torque > 0 at the joint level.
+    Iqq_ref = Motor_align_with_motor_orient(o, Iqq_ref);
+
     if (o->pos_min != o->pos_max)
     {        
         if ((o->pos_raw_cal_fbk < o->pos_min) && (Iqq_ref < 0))
@@ -969,6 +986,10 @@ void Motor_set_Iqq_ref(Motor* o, int32_t Iqq_ref)
 
 void Motor_set_vel_ref(Motor* o, int32_t vel_ref)
 {
+	  // Correct the PWM parameter in order to match the convention:
+	  // PWM > 0 --> motor torque > 0 at the joint level.
+    vel_ref = Motor_align_with_motor_orient(o, vel_ref);
+
     if (o->pos_min != o->pos_max)
     {        
         if ((o->pos_raw_cal_fbk < o->pos_min) && (vel_ref < 0))
@@ -1032,12 +1053,12 @@ void Motor_update_odometry_fbk_can(Motor* o, CanOdometry2FocMsg* can_msg) //
 {
     WatchDog_rearm(&o->can_2FOC_alive_wdog);
     
-    o->Iqq_fbk = can_msg->current;
+    o->Iqq_fbk = Motor_align_with_motor_orient(o, can_msg->current);
     
-  	o->vel_raw_fbk = can_msg->velocity*CTRL_LOOP_FREQUENCY_INT;
+  	o->vel_raw_fbk = Motor_align_with_motor_orient(o, can_msg->velocity)*CTRL_LOOP_FREQUENCY_INT;
     o->vel_fbk = o->vel_raw_fbk/o->GEARBOX;
     
-    o->pos_raw_fbk = can_msg->position;
+    o->pos_raw_fbk = Motor_align_with_motor_orient(o, can_msg->position);
     o->pos_fbk = o->pos_raw_fbk/o->GEARBOX - o->pos_calib_offset;
     o->pos_raw_cal_fbk = o->pos_raw_fbk - o->pos_calib_offset*o->GEARBOX;
 }
@@ -1050,7 +1071,7 @@ void Motor_update_pos_fbk(Motor* o, int32_t position_raw)
     //in case of joint controlled by ems+2foc, the motor encoder is connected to 2foc and the 2foc sends motor position to ems by can message. 
     //see Motor_update_odometry_fbk_can function.
 
-    o->pos_raw_fbk = position_raw;
+    o->pos_raw_fbk = Motor_align_with_motor_orient(o, position_raw);
     
     int32_t pos_fbk = o->pos_raw_fbk/o->GEARBOX - o->pos_calib_offset;
       
@@ -1090,7 +1111,8 @@ void Motor_update_current_fbk(Motor* o, int16_t current)
 
 void Motor_config_gearbox_M2J(Motor* o, float32_t gearbox_M2J)
 {
-    o->GEARBOX = gearbox_M2J;
+    o->GEARBOX = fabsf(gearbox_M2J);
+	  o->gearbox2jointOrientConv = (gearbox_M2J>=0 ? 1 : -1);
 }
 
 int16_t Motor_config_pwm_limit(Motor* o, int16_t pwm_limit)

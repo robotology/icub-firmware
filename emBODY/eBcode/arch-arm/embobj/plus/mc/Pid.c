@@ -100,11 +100,10 @@ void PID_config(PID* o, eOmc_PID_t* config)
 
 }
 
-void PID_config_friction(PID *o, CTRL_UNITS gearbox, float Kbemf, float Ktau)
+void PID_config_friction(PID *o, float Kbemf, float Ktau)
 {
-	  float signGearbox = gearbox>=0 ? 1 : -1;
     o->Kbemf = Kbemf;
-    o->Ktau  = Ktau*signGearbox;
+    o->Ktau  = Ktau;
 }
 
 void PID_config_filter(PID *o, uint8_t filter)

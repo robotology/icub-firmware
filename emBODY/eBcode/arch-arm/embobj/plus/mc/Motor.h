@@ -152,6 +152,7 @@ typedef struct //Motor
     uint8_t HARDWARE_TYPE;
 
     CTRL_UNITS GEARBOX;
+	  int32_t gearbox2jointOrientConv;
 
     BOOL HAS_TEMP_SENSOR;
     int16_t temperature_max;
