@@ -500,8 +500,11 @@ bool FaceExpressions::processcommands(uint8_t *data, uint32_t size, bool bigendi
         {            
             case 'E':   // all parts have this expression E {e}
             {
-                tmp = getHexVal(&data[i+1]); 
-                i=i+3; // getHexVal() consumes two bytes
+                uint8_t byte[3] = {0};
+                byte[0] = data[i+1];
+                byte[1] = data[i+2];                
+                tmp = getHexVal(byte);
+                i=i+3; 
                 e = toexpression(tmp);
                 
                 if(Expression_t::none != e)
@@ -515,8 +518,11 @@ bool FaceExpressions::processcommands(uint8_t *data, uint32_t size, bool bigendi
             
             case 'C':   // color: C {c}
             {
-                tmp = getHexVal(&data[i+1]); 
-                i=i+3; // getHexVal() consumes two bytes                                               
+                uint8_t byte[3] = {0};
+                byte[0] = data[i+1];
+                byte[1] = data[i+2];                
+                tmp = getHexVal(byte);
+                i=i+3;                                               
                 c = tocolor(tmp);
                 
                 if(Color::none != c)
@@ -530,8 +536,11 @@ bool FaceExpressions::processcommands(uint8_t *data, uint32_t size, bool bigendi
             
             case 'B':   // brightness: B {b}
             {
-                tmp = getHexVal(&data[i+1]); 
-                i=i+3; // getHexVal() consumes two bytes                                               
+                uint8_t byte[3] = {0};
+                byte[0] = data[i+1];
+                byte[1] = data[i+2];                
+                tmp = getHexVal(byte);
+                i=i+3;                                             
                 b = tobrightness(tmp);
                 
                 if(Brightness::none != b)
@@ -546,8 +555,11 @@ bool FaceExpressions::processcommands(uint8_t *data, uint32_t size, bool bigendi
           
             case 'L':   // expression for Left EyeBrow: L {e}
             {
-                tmp = getHexVal(&data[i+1]); 
-                i=i+3; // getHexVal() consumes two bytes
+                uint8_t byte[3] = {0};
+                byte[0] = data[i+1];
+                byte[1] = data[i+2];                
+                tmp = getHexVal(byte);
+                i=i+3; 
                 e = toexpression(tmp);
                 
                 if(Expression_t::none != e)
@@ -559,8 +571,11 @@ bool FaceExpressions::processcommands(uint8_t *data, uint32_t size, bool bigendi
 
             case 'R':   // expression for right EyeBrow: R {e}
             {
-                tmp = getHexVal(&data[i+1]); 
-                i=i+3; // getHexVal() consumes two bytes
+                uint8_t byte[3] = {0};
+                byte[0] = data[i+1];
+                byte[1] = data[i+2];                
+                tmp = getHexVal(byte);
+                i=i+3; 
                 e = toexpression(tmp);
                 
                 if(Expression_t::none != e)
@@ -572,8 +587,11 @@ bool FaceExpressions::processcommands(uint8_t *data, uint32_t size, bool bigendi
             
             case 'M':   // expression for mouth: M {e}
             {
-                tmp = getHexVal(&data[i+1]); 
-                i=i+3; // getHexVal() consumes two bytes
+                uint8_t byte[3] = {0};
+                byte[0] = data[i+1];
+                byte[1] = data[i+2];                
+                tmp = getHexVal(byte);
+                i=i+3; 
                 e = toexpression(tmp);
                 
                 if(Expression_t::none != e)
