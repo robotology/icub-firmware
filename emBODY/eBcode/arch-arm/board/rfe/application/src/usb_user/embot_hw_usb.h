@@ -29,7 +29,7 @@
 
 namespace embot { namespace hw { namespace usb {
     
-    enum class MessageSize {min=0, max=10} ;
+    enum class MessageSize { min = 0, max = 48 }; // max was 10 ... but we want to be able receiving larger messages, hence 48 is fine
     struct Message            
     {
         std::uint16_t   size;
