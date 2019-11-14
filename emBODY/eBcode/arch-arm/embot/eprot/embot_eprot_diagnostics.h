@@ -76,7 +76,7 @@ namespace embot { namespace eprot { namespace diagnostics {
         constexpr FFU getFFU() const { return static_cast<FFU>((flags>>12)&0xf); }        
                
         constexpr static uint16_t sizeofobject = 2;
-        }; static_assert(sizeof(InfoProperties) == InfoProperties::sizeofobject, "embot::eprot::diagnostics::InfoProperties has wrong sizeofobject. it must be 2");
+    }; static_assert(sizeof(InfoProperties) == InfoProperties::sizeofobject, "embot::eprot::diagnostics::InfoProperties has wrong sizeofobject. it must be 2");
     
     
     struct InfoBasic

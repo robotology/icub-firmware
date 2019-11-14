@@ -34,17 +34,19 @@ struct embot::app::DiagnosticsNode::Impl
     bool initted {false}; 
 
     embot::eprot::ropframe::Former *_ropframeformer {nullptr};
+    // used by _ropframeformer
     uint8_t *ropframedata {nullptr};
     embot::utils::Data buffer {nullptr, 0};
     uint8_t *bufferdata {nullptr};
     size_t buffercapacity {0};
     uint64_t sequencenumber {0};
-    
-    embot::eprot::rop::Stream* _ropstream {nullptr};
-        
+    // used by _ropframeformer
+    embot::eprot::rop::Stream *_ropstream {nullptr};
+   
+    // preformed ropstream for Info & InfoBasic     
+    embot::eprot::rop::Stream *ropstr_info {nullptr};
     embot::eprot::rop::Stream *ropstr_infobasic {nullptr};
     
-
     
     Impl() = default;   
 
@@ -83,6 +85,12 @@ struct embot::app::DiagnosticsNode::Impl
             delete _ropframeformer;
             _ropframeformer = nullptr;
         }
+
+        if(nullptr != ropstr_info)
+        {
+            delete ropstr_info;
+            ropstr_info = nullptr;
+        }       
         
         if(nullptr != ropstr_infobasic)
         {
@@ -130,9 +138,8 @@ struct embot::app::DiagnosticsNode::Impl
         constexpr embot::eprot::rop::SIGN signature = embot::eprot::rop::signatureNone;
         constexpr embot::common::Time time = embot::common::timeNone;
         
-        // also, i need a predefined rop able to host the sig<> of a full embot::eprot::diagnostics::Info w/out signature and time    
-        ropstr_infobasic = new embot::eprot::rop::Stream(embot::eprot::rop::Stream::capacityfor(embot::eprot::rop::OPC::any, embot::eprot::diagnostics::InfoBasic::sizeofobject, plusMODE)); 
-        
+        // also, i need a predefined rop able to host the sig<> of a full embot::eprot::diagnostics::InfoBasic w/out signature and time    
+        ropstr_infobasic = new embot::eprot::rop::Stream(embot::eprot::rop::Stream::capacityfor(embot::eprot::rop::OPC::any, embot::eprot::diagnostics::InfoBasic::sizeofobject, plusMODE));         
         constexpr embot::eprot::rop::Descriptor sig_infobasic {
             embot::eprot::rop::OPC::sig, 
             embot::eprot::diagnostics::InfoBasic::id32, 
@@ -141,6 +148,18 @@ struct embot::app::DiagnosticsNode::Impl
             plusMODE
         };      
         ropstr_infobasic->load(sig_infobasic);
+        
+
+        // also, i need a predefined rop able to host the sig<> of a full embot::eprot::diagnostics::Info w/out signature and time    
+        ropstr_info = new embot::eprot::rop::Stream(embot::eprot::rop::Stream::capacityfor(embot::eprot::rop::OPC::any, embot::eprot::diagnostics::Info::sizeofobject, plusMODE));         
+        constexpr embot::eprot::rop::Descriptor sig_info {
+            embot::eprot::rop::OPC::sig, 
+            embot::eprot::diagnostics::Info::id32, 
+            embot::utils::Data{nullptr, embot::eprot::diagnostics::Info::sizeofobject},
+            signature, time,
+            plusMODE
+        };      
+        ropstr_info->load(sig_info);        
         
         initted = true;
         return true;
@@ -201,6 +220,26 @@ struct embot::app::DiagnosticsNode::Impl
         return _ropframeformer->pushback({strm, ss}, availspace);
     }
 
+    bool add(const embot::eprot::diagnostics::Info &info)
+    {
+        if(!initted)
+        {
+            return false;
+        } 
+        
+        // i need a pre-former rop (or ropstream) where to just add the infobasic stuff
+        embot::utils::Data da{const_cast<embot::eprot::diagnostics::Info*>(&info), embot::eprot::diagnostics::Info::sizeofobject};
+        static uint32_t sig = 0;
+        ropstr_info->update(da, sig++);
+        
+        uint8_t *strm = nullptr;
+        size_t ss = 0;
+        ropstr_info->retrieve(&strm, ss);
+
+        uint16_t availspace = 0;
+        return _ropframeformer->pushback({strm, ss}, availspace);
+    }
+    
     bool prepare(size_t &sizeofropframe)
     {
         if(!initted)

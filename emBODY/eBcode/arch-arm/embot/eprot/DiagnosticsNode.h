@@ -46,8 +46,9 @@ namespace embot { namespace app {
         bool init(const Config &config);
         bool initted() const;
         bool add(const embot::utils::Data &ropstream);
-        bool add(const embot::eprot::rop::Descriptor &ropdes); // WIP: now it does nothing
-        bool add(const embot::eprot::diagnostics::InfoBasic &infobasic); // WIP: now it does nothing
+        bool add(const embot::eprot::rop::Descriptor &ropdes); 
+        bool add(const embot::eprot::diagnostics::InfoBasic &infobasic);
+        bool add(const embot::eprot::diagnostics::Info &info);
         bool prepare(size_t &sizeofropframe); // returns true if anything to retrieve. in sizeofropframe the size of required mem
         bool retrieve(embot::utils::Data &datainropframe); // it copies the ropframe. 
 
