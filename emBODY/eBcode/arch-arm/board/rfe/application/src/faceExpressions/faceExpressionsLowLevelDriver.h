@@ -31,19 +31,19 @@ namespace RfeApp{
     
     /*NOTE: The face is composed by three part: mouth, LeftEyebrown, rightEyebrown. 
             Each part is composed by 5 TLC drivers and each of them pilots 4 leds. */
-    enum class HardwareConfig_numOf_t{
+    enum class HardwareConfig_numOf_t : uint8_t {
                 faceParts=3,      //The face is composed by : mouth, LeftEyebrown, rightEyebrown
                 TLCperPart=5,     //Each face part has 5 TLC drivers.
                 ledsperTLC=4,     //Each TLC pilots 4 leds
                 colorsPerLed=3,   //Each les is RGB (3 colors)
-                bytesPerColor=2}; //Each Color is encode in 2 bytes
+                bytesPerColor=2 }; //Each Color is encode in 2 bytes
 
     /* A TLC packet is composed of heder(4 byte) plus data for describing color of each led.
        So each TLC packet payload is 4(leds) * 3(colors-rgb) *2 (byte) = 24. Therefore each TLC packet is 28=(24+4) bytes. */
-    enum class TLCPacketInfo_t {headersize=4, totalsize= (static_cast<std::uint8_t>(HardwareConfig_numOf_t::ledsperTLC))*
-                                                         (static_cast<std::uint8_t>(HardwareConfig_numOf_t::colorsPerLed))*
-                                                         (static_cast<std::uint8_t>(HardwareConfig_numOf_t::bytesPerColor)) +
-                                                         (static_cast<std::uint8_t>(headersize))};
+    enum class TLCPacketInfo_t : uint8_t { headersize=4, totalsize= (embot::common::tointegral(HardwareConfig_numOf_t::ledsperTLC))*
+                                                         (embot::common::tointegral(HardwareConfig_numOf_t::colorsPerLed))*
+                                                         (embot::common::tointegral(HardwareConfig_numOf_t::bytesPerColor)) +
+                                                         (static_cast<std::uint8_t>(TLCPacketInfo_t::headersize)) };
 }; //end namespace RfeApp
 
 
@@ -65,9 +65,11 @@ private:
     };
 
     const TCL_headerPacket_t tlc_headerPkt; //the header config never change
-    static const std::uint16_t GlobalBrightness_Max = 0x7F; // maximum raw value allowed
-    static const std::uint16_t GlobalBrightness_Default = 114; // it is equalt to 90% of max Brightness
+    static const std::uint8_t GlobalBrightness_Max = 0x7F; // maximum raw value allowed
+    //static const std::uint8_t GlobalBrightness_Default = 114; // it is equalt to 90% of max Brightness
 
+    static const std::uint8_t GlobalBrightness_Default = 127;
+    
 public:
     struct Led_t
     {
@@ -79,23 +81,31 @@ public:
       void reset(void) {B=0; R=0; G=0;};
     };
 
-    struct  BrightnessLed_t
+    struct BrightnessLed_t
     {
-      std::uint8_t R;    // red
-      std::uint8_t G;    // green
-      std::uint8_t B;    // blue
+        std::uint8_t R {tovalueofbrightness(Brightness::high)};    // red
+        std::uint8_t G {tovalueofbrightness(Brightness::high)};    // green
+        std::uint8_t B {tovalueofbrightness(Brightness::high)};    // blue
         
-      BrightnessLed_t():R(GlobalBrightness_Default), G(GlobalBrightness_Default), B(GlobalBrightness_Default){};
+        void set(Brightness b) 
+        {
+            R = G = B = tovalueofbrightness(b);
+        }
+      
+        BrightnessLed_t() = default;
+        
+        //BrightnessLed_t():R(GlobalBrightness_Default), G(GlobalBrightness_Default), B(GlobalBrightness_Default){};
     };
 
     TLCDriver();
     void reset(void);
-    void setColor(std::uint8_t ledNum, LedColor c);
+    void setBrightness(Brightness b) { brightness4AllLeds.set(b); }
+    void setColor(std::uint8_t ledNum, Color c);
     void createDataPacket(std::uint8_t *packet);
 
     private:
     Led_t leds[static_cast<std::uint32_t>(HardwareConfig_numOf_t::ledsperTLC)];
-    BrightnessLed_t brightness4AllLeds;
+    BrightnessLed_t brightness4AllLeds {};
 };
 
 

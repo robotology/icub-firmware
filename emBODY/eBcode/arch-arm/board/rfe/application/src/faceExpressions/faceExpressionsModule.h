@@ -24,6 +24,8 @@
 #include "faceExpressionsTypes.h"
 #include "faceExpressionsLowLevelDriver.h"
 
+#include <array>
+
 namespace RfeApp{
     class FaceExpressions;
 };
@@ -33,16 +35,24 @@ class RfeApp::FaceExpressions
     public:
     
     FaceExpressions();
-    bool init(void); //init hw and default face
+    bool init(Expression_t exp = Expression_t::neutral, Color col = Color::white, Brightness bri = Brightness::medium); //init hw and default face
+    bool initted() const;
     bool loadNewExpression(std::uint8_t *data, std::uint32_t size);
+    bool processcommands(std::uint8_t *data, std::uint32_t size, bool bigendianess = true);
     bool displayExpression(void);
+    bool display(Expression_t exp, Color col);
+    bool display(FacePart_t part, Expression_t exp, Color col, Brightness bri);   
+    bool rotate(uint8_t cnt);    
+    bool display(FacePart_t part, Color col, Brightness bri, uint32_t picture);
+    bool display(FacePart_t part, const PartProps &pp);
+    bool display(Expression_t exp, const std::array<Color, 3> &cols, Brightness bri);
     
 private:
-    FacePartExpr_t leftEBrow_expr;
-    FacePartExpr_t rightEBrow_expr;
-    FacePartExpr_t mouth_expr;
-    FaceExpressionsLLDriver driver;
-    
+    FacePartExpr_t leftEBrow_expr {};
+    FacePartExpr_t rightEBrow_expr {};
+    FacePartExpr_t mouth_expr {};
+    FaceExpressionsLLDriver driver {};
+    bool _initted {false};
     bool parse(std::uint8_t *data, std::uint32_t size, FacePart_t &part, Expression_t &expression);
 };
 
