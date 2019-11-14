@@ -275,11 +275,11 @@ void DMA2_Channel4_IRQHandler(void)
 
   /* USER CODE END DMA2_Channel4_IRQn 1 */
 }
-static uint32_t SPI_TX_OK=0;
-void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
-{
-  SPI_TX_OK++;
-}
+//static uint32_t SPI_TX_OK=0;
+//void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
+//{
+//  SPI_TX_OK++;
+//}
 
 /* USER CODE END 1 */
 
