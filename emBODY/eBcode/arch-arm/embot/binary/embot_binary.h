@@ -24,6 +24,7 @@
 
 #include <cstdint>
 #include <cstring>
+#include <initializer_list>
 
 #include "embot_common.h"
 
@@ -33,21 +34,21 @@ namespace embot { namespace binary { namespace bit {
        
     // it forces 1 into pos-th bit of value
     template<typename T>
-    void set(T &value, std::uint8_t pos)
+    constexpr void set(T &value, std::uint8_t pos)
     {
         value |= (static_cast<T>(1)<<pos);
     }
     
     // it forces 0 into pos-th bit of value
     template<typename T>
-    void clear(T &value, std::uint8_t pos)
+    void constexpr clear(T &value, std::uint8_t pos)
     {
         value &= (~(static_cast<T>(1)<<pos));
     }
     
     // it toggles the pos-th bit of value
     template<typename T>
-    void toggle(T &value, std::uint8_t pos)
+    void constexpr toggle(T &value, std::uint8_t pos)
     {
         value ^= (static_cast<T>(1)<<pos);
     }
@@ -93,33 +94,42 @@ namespace embot { namespace binary { namespace bit {
 
 
 namespace embot { namespace binary { namespace mask {
+    
+    // it creates a mask which as `1` value in positions specified by posofonbits
+    template<typename M, typename T>
+    constexpr M generate(const std::initializer_list<T> &posofonbits)
+    {
+        M mask = 0;
+        for(auto a : posofonbits) embot::binary::bit::set(mask, a);
+        return mask;
+    } 
          
     // it forces to 1 the bits in value which are selected by msk (where msk has bits of value 1). the other bits of value stay unchanged.
     template<typename T>
-    void set(T &value, const T msk)
+    constexpr void set(T &value, const T msk, const uint8_t shift = 0)
     {
-        value |= msk;
+        value |= (msk << shift);
     }
     
     // it forces to 0 the bits in value which are selected by msk (where msk has bits of value 1). the other bits of value stay unchanged.
     template<typename T>
-    void clear(T &value, const T msk)
+    constexpr void clear(T &value, const T msk, const uint8_t shift = 0)
     {
-        value &= (~(msk));
+        value &= (~(msk << shift));
     }
     
     // it toggles the bits in value which are selected by msk (where msk has bits of value 1). the other bits of value stay unchanged.
     template<typename T>
-    void toggle(T &value, const T msk)
+    constexpr void toggle(T &value, const T msk, const uint8_t shift = 0)
     {
-        value ^= (msk);
+        value ^= (msk << shift);
     }
     
     // it returns true if the bits in value which are selected by msk are all 1.
     template<typename T>
-    constexpr bool check(const T value, const T msk)
+    constexpr bool check(const T value, const T msk, const uint8_t shift = 0)
     {
-        if(msk == (value & msk))
+        if(msk == (value & (msk << shift)))
         {
             return true;
         }
@@ -131,6 +141,7 @@ namespace embot { namespace binary { namespace mask {
     {
         return (1 << static_cast<M>(t));
     } 
+      
     
 } } } // namespace embot { namespace binary { namespace mask
 
@@ -142,7 +153,7 @@ namespace embot { namespace binary { namespace nibble {
     
     // it convert any integer into a nibble by getting only its lowest significant 4 bits.
     template<typename T>
-    NIBBLE convert(const T &value)
+    constexpr NIBBLE convert(const T &value)
     {
         return static_cast<NIBBLE>(value) & 0x0f;
     }
@@ -156,14 +167,14 @@ namespace embot { namespace binary { namespace nibble {
     }
     
     template<typename T>
-    NIBBLE get(const T &value, std::uint8_t pos)
+    constexpr NIBBLE get(const T &value, std::uint8_t pos)
     {
         return convert(value >> pos);
     }
 
     // it puts 0x0 into the pos-th nibble of value
     template<typename T>
-    void clear(T &value, std::uint8_t pos)
+    constexpr void clear(T &value, std::uint8_t pos)
     {
         embot::binary::mask::clear(value, static_cast<T>(0xf)<<(4*pos));
     }
@@ -184,14 +195,14 @@ namespace embot { namespace binary { namespace pair {
     
     // it convert any integer into a pair by getting only its lowest significant 2 bits.
     template<typename T>
-    PAIR convert(const T &value)
+    constexpr PAIR convert(const T &value)
     {
         return static_cast<PAIR>(value) & 0x03;
     }
         
     // it assign pa into the pos-th pair of value.
     template<typename T>
-    void assign(T &value, const PAIR pa, std::uint8_t pos)
+    constexpr void assign(T &value, const PAIR pa, std::uint8_t pos)
     {
         embot::binary::mask::clear(value, static_cast<T>(0x3)<<(2*pos));
         embot::binary::mask::set(value, static_cast<T>(pa & 0x3)<<(2*pos));
@@ -205,7 +216,7 @@ namespace embot { namespace binary { namespace pair {
     
     // it puts 0x0 into the pos-th pair of value
     template<typename T>
-    void clear(T &value, std::uint8_t pos)
+    constexpr void clear(T &value, std::uint8_t pos)
     {
         embot::binary::mask::clear(value, static_cast<T>(0x3)<<(2*pos));
     }
