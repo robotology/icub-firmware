@@ -343,6 +343,11 @@ struct embot::app::DiagnosticsNode::Impl
 
         return true;
     }
+    
+    uint16_t getNumberOfROPs() const
+    {
+        return _ropframeformer->getNumberOfROPs();
+    }
 
 };
 
@@ -408,6 +413,10 @@ bool embot::app::DiagnosticsNode::retrieve(embot::utils::Data &datainropframe)
     return pImpl->retrieve(datainropframe);
 }
 
+uint16_t embot::app::DiagnosticsNode::getNumberOfROPs() const
+{
+    return pImpl->getNumberOfROPs();
+}
     
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
