@@ -21,6 +21,9 @@
 // --------------------------------------------------------------------------------------------------------------------
 #include "faceExpressionsLowLevelDriver.h"
 
+#include "embot_common.h"
+#include "embot_sys.h"
+
 using namespace RfeApp;
 using namespace std;
 // --------------------------------------------------------------------------------------------------------------------
@@ -41,20 +44,39 @@ void FaceExpressionsLLDriver::preparePacket(FacePartExpr_t &facepartexpr)
     for(uint8_t nr_tlc=0; nr_tlc<hwConfig.numOf.TLCperPart; nr_tlc++)
     {
         tlcdriver.reset();
+        tlcdriver.setBrightness(facepartexpr.getbrightness());
         for(uint8_t nr_led=0; nr_led<hwConfig.numOf.LedsperTLC; nr_led++) // single TLC scan (4 LEDs)
-        {                          
-            tlcdriver.setColor(nr_led,facepartexpr.expressionMask_ptr[nr_led+4*(nr_tlc)]);
+        {     
+            volatile Color col = facepartexpr.getcolor(nr_tlc, nr_led);
+            col = col;
+            tlcdriver.setColor(nr_led, col);
         }
         //since the configuration of led works like as shift register, I need to invert the order of tlc packet: the first becomes the last 
         volatile uint16_t tlc_start_index = (facepartexpr.tlc_start + hwConfig.numOf.TLCperPart -1 - nr_tlc)* (static_cast<uint8_t>(TLCPacketInfo_t::totalsize));
-        tlcdriver.createDataPacket(&globalDataPacket[tlc_start_index]);
-        
+        tlcdriver.createDataPacket(&globalDataPacket[tlc_start_index]);       
     }
 
 }
+
+static volatile bool ongoing = false;
+
+void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
+{
+    ongoing = false;
+}
+
 void FaceExpressionsLLDriver::sendStream(void)
 {
+    // i wait until ongoing is set false by the HAL_SPI_TxCpltCallback() at the end of spi transmission
+    // in this way, two consecutive transmissions are properly enqueued and the second starts only after the first is over
+    for(;;)
+    {
+       if(false == ongoing) break; 
+    }
+    // i set it to ongoing 
+    ongoing = true;
     HAL_SPI_Transmit_DMA(&hspi1, globalDataPacket, globalDataPacketSize);
+    // ok, i dont need to wait
 }
 
 TLCDriver::TLCDriver()
@@ -66,14 +88,14 @@ void TLCDriver::reset(void)
         leds[i].reset();
 }
 
-void TLCDriver::setColor(uint8_t ledNum, LedColor c)
+void TLCDriver::setColor(uint8_t ledNum, Color c)
 {
     //uint8_t ledNum_rev = 3-ledNum; //I need to revert the order of led. //todo: improve comment and use enum
     uint8_t ledNum_rev = ledNum;
     uint32_t RED, GREEN, BLUE;
-    RED   = ((c & 0xFF0000)>>0x10)*0x101;
-    GREEN = ((c & 0x00FF00)>>0x08)*0x101;
-    BLUE  = ((c & 0x0000FF))*0x101;
+    RED   = ((tovalueofcolor(c) & 0xFF0000)>>0x10)*0x101;
+    GREEN = ((tovalueofcolor(c) & 0x00FF00)>>0x08)*0x101;
+    BLUE  = ((tovalueofcolor(c) & 0x0000FF))*0x101;
 
     leds[ledNum_rev].R = (uint16_t)RED;
     leds[ledNum_rev].G = (uint16_t)GREEN;

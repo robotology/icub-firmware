@@ -10,12 +10,21 @@
 
 #include "embot_code_application_evntskcan.h"
 
+//#define DO_TEST
+
+#if defined(DO_TEST)
+void test(uint32_t cnt);
+constexpr uint32_t numMilli = 1000;
+#else
+constexpr uint32_t numMilli = 50;
+#endif
+
 // --------------------------------------------------------------------------------------------------------------------
 // config start
 
 constexpr embot::app::theCANboardInfo::applicationInfo applInfo 
 { 
-    embot::app::canprotocol::versionOfAPPLICATION {1, 1, 3},    
+    embot::app::canprotocol::versionOfAPPLICATION {1, 1, 5},    
     embot::app::canprotocol::versionOfCANPROTOCOL {2, 0}    
 };
 
@@ -24,7 +33,7 @@ constexpr std::uint16_t taskINITstacksize = 2048;
 constexpr std::uint16_t taskEVNTstacksize = 4096;
 constexpr std::uint8_t maxINPcanframes = 16;
 constexpr std::uint8_t maxOUTcanframes = 48;
-constexpr embot::common::relTime taskEVNTtimeout = 50*embot::common::time1millisec;
+constexpr embot::common::relTime taskEVNTtimeout = numMilli*embot::common::time1millisec;
 
 static void *paramINIT = nullptr;
 static void *paramIDLE = nullptr;
@@ -108,41 +117,41 @@ constexpr embot::common::Event evIMUdataready = 0x00000001 << 4;
 //expression
 RfeApp::FaceExpressions faceExpressions;
 
-volatile embot::common::Time t_load = 0;
-volatile embot::common::Time t_display = 0;
-volatile embot::common::Time t_total = 0;
+//volatile embot::common::Time t_load = 0;
+//volatile embot::common::Time t_display = 0;
+//volatile embot::common::Time t_total = 0;
 
-struct Average_t
-{
-    embot::common::Time sum;
-    std::uint32_t       count;
-    embot::common::Time avg;
-    float               avg_f;
-    embot::common::Time min;
-    embot::common::Time max;
-    
-    Average_t() : sum(0), count(0), avg(0), avg_f(0.0), min(3000000), max(0){;}
-    void calculate(void){avg=sum/count;avg_f=sum/static_cast<float>(count);}
-    void set(embot::common::Time val)
-    {
-        sum +=val;
-        count++;
-        if(val<min) min=val;
-        if(val>max) max=val;
-    }
-};
+//struct Average_t
+//{
+//    embot::common::Time sum;
+//    std::uint32_t       count;
+//    embot::common::Time avg;
+//    float               avg_f;
+//    embot::common::Time min;
+//    embot::common::Time max;
+//    
+//    Average_t() : sum(0), count(0), avg(0), avg_f(0.0), min(3000000), max(0){;}
+//    void calculate(void){avg=sum/count;avg_f=sum/static_cast<float>(count);}
+//    void set(embot::common::Time val)
+//    {
+//        sum +=val;
+//        count++;
+//        if(val<min) min=val;
+//        if(val>max) max=val;
+//    }
+//};
 
-Average_t loadAvg;
-Average_t displayAvg;
-Average_t totalAvg;
+//Average_t loadAvg;
+//Average_t displayAvg;
+//Average_t totalAvg;
 
-uint32_t totCount=0;
+//uint32_t totCount=0;
 
 
 void mySYS::userdefOnIdle(embot::sys::Task *t, void* idleparam) const
 {
     static int a = 0;
-    a++;        
+    a++;   
 }
 
 void mySYS::userdefonOSerror(void *errparam) const
@@ -193,19 +202,25 @@ void myEVT::userdefStartup(embot::sys::Task *t, void *param) const
 {
     // inside startup of evnt task: put the init of many things ... 
 
-     embot::hw::usb::Config config;
-     config.rxcapacity = 20;
-     config.onrxmessage = embot::common::Callback(alerteventbasedtaskusb, t); 
-     embot::hw::usb::init(embot::hw::usb::Port::one, config);
+    embot::hw::usb::Config config;
+    config.rxcapacity = 16;
+    config.onrxmessage = embot::common::Callback(alerteventbasedtaskusb, t); 
+    embot::hw::usb::init(embot::hw::usb::Port::one, config);
     
-     faceExpressions.init();    
+    faceExpressions.init(RfeApp::Expression_t::neutral, RfeApp::Color::white, RfeApp::Brightness::medium);    
 }
+
 
 
 void myEVT::userdefOnTimeout(embot::sys::Task *t, embot::common::EventMask eventmask, void *param) const
 {
     static uint32_t cnt = 0;
-    cnt++;    
+    cnt++; 
+    
+#if defined(DO_TEST)
+    test(cnt);
+#endif  
+
 }
 
 
@@ -229,29 +244,30 @@ void myEVT::userdefOnEventANYother(embot::sys::Task *t, embot::common::EventMask
         std::uint8_t remainingINrx = 0;
         if(embot::hw::resOK == embot::hw::usb::get(embot::hw::usb::Port::one, msg, remainingINrx))
         {   
-            embot::common::Time t1 = embot::sys::now();
-            faceExpressions.loadNewExpression(msg.data, msg.size);
-            embot::common::Time t2 = embot::sys::now();
+//            embot::common::Time t1 = embot::sys::now();
+            //faceExpressions.loadNewExpression(msg.data, msg.size);
+            faceExpressions.processcommands(msg.data, msg.size);
+//            embot::common::Time t2 = embot::sys::now();
             faceExpressions.displayExpression();
-            embot::common::Time t3 = embot::sys::now();
+//            embot::common::Time t3 = embot::sys::now();
             
-            t_load = t2-t1;
-            t_display = t3-t2;
-            t_total = t3-t1;
-            
-            loadAvg.set(t_load);
-            displayAvg.set(t_display);
-            totalAvg.set(t_total);
-            
-            totCount++;
-            
-            if(totCount==5)
-            {
-                loadAvg.calculate();
-                displayAvg.calculate();
-                totalAvg.calculate();
-                totCount=0;
-            }
+//            t_load = t2-t1;
+//            t_display = t3-t2;
+//            t_total = t3-t1;
+//            
+//            loadAvg.set(t_load);
+//            displayAvg.set(t_display);
+//            totalAvg.set(t_total);
+//            
+//            totCount++;
+//            
+//            if(totCount==5)
+//            {
+//                loadAvg.calculate();
+//                displayAvg.calculate();
+//                totalAvg.calculate();
+//                totCount=0;
+//            }
             
             if(remainingINrx > 0)
             {
@@ -276,7 +292,110 @@ void myEVT::userdefOnEventANYother(embot::sys::Task *t, embot::common::EventMask
 
 }
 
+// test area
 
+#if defined(DO_TEST)
+
+static uint8_t bufferZbe[] =  // i use big endianess for words 
+{
+    'Z',
+    // left 
+    '0', '2', // red
+    '0', '4', // high
+    '0', '0', '0', '1', '1', '1', '1', '1', // top line 0x00011111
+    // rigth
+    '0', 'D', // purple
+    '0', '4', // high
+    '0', '0', '0', '1', '1', '1', '1', '1', // top line (be)
+    // mouth    
+    '0', '1', // white
+    '0', '4', // high
+    '0', '0', '0', '4', '5', '6', '4', '5' // happy (be)
+};
+
+
+static uint8_t bufferZle[] =  // i use little endianess for words 
+{
+    'Z',
+    // left 
+    '0', '2', // red
+    '0', '4', // high
+    '1', '1', '1', '1', '0', '1', '0', '0', // top line (le)
+    // rigth
+    '0', 'D', // purple
+    '0', '4', // high
+    '1', '1', '1', '1', '0', '1', '0', '0', // top line (le)
+    // mouth    
+    '0', '1', // white
+    '0', '4', // high
+    '4', '5', '5', '6', '0', '4', '0', '0' // happy (le)
+};
+
+static uint8_t bufferB[] =  // i use ... 
+{
+    'B',
+    '0', '1'
+};
+
+static uint8_t bufferE[] =  // all parte have expression 
+{
+    'E',
+    '0', '2' // sad
+};
+
+static uint8_t bufferECBm[] =  // all parte have expression 
+{
+    'E',    // expression for all
+    '0', '2', // sad
+    ' ', // separator 
+    'C',    // color for all
+    '0', '4', // blue
+    ',', // separator 
+    'B',    // brightness for all
+    '0', '2', // low
+    ' ', // separator 
+    'm',      // mouth multiple 
+    '0', '3', // suprised
+    '0', '2', // red
+    '0', '5', // maximum   
+    ' ', // separator 
+    'l',      // left multiple 
+    '0', '0', // neutral
+    '0', '2', // red
+    '0', '5', // maximum      
+    ' ', // separator 
+    'a',      // all multiple 
+    '0', '0', // neutral
+    '0', '1', // white
+    '0', '5', // max 
+    's', 2, 3, 5    
+    
+};
+
+static uint8_t *buffer = bufferZbe;
+static size_t sizeofbuffer = sizeof(bufferZbe);
+
+void test(uint32_t cnt)
+{
+    //    faceExpressions.rotate(cnt);
+    static volatile uint32_t picture = 0;
+    picture = 0;
+//    embot::binary::bit::set(picture, cnt%20);
+    picture = 0x00032222;
+    //faceExpressions.display(RfeApp::FacePart_t::all, RfeApp::Color::white, RfeApp::Brightness::medium, picture);
+    volatile RfeApp::Brightness br = RfeApp::tobrightness(cnt%RfeApp::brightnessMaxNum);
+   // RfeApp::PartProps pp { RfeApp::Color::purple, br, picture };
+    //faceExpressions.display(RfeApp::FacePart_t::all, pp);
+    
+    //faceExpressions.display(RfeApp::FacePart_t::all, RfeApp::Expression_t::evil, RfeApp::Color::purple, br);
+//    std::array<RfeApp::Color, 3> cols { RfeApp::Color::purple,  RfeApp::Color::purple,  RfeApp::Color::red };
+//    faceExpressions.display(RfeApp::Expression_t::evil, cols, br);
+    
+    faceExpressions.processcommands(buffer, sizeofbuffer, false);
+    faceExpressions.displayExpression();
+}
+
+#endif // #if defined(DO_TEST)
    
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 
