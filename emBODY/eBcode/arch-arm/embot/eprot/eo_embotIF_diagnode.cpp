@@ -122,8 +122,8 @@ extern uint16_t embotIF_diagnode_retrieve(uint8_t *ropframe, uint16_t capacityof
 // enable it w/ macro ENABLE_embotIF_TEST_diagnode_parse defined
 
 #include "DiagnosticsHost.h"
-#include "EoProtocol.h"
-#include "EoProtocolMN.h"
+//#include "EoProtocol.h"
+//#include "EoProtocolMN.h"
 #include "EoError.h"
 #include "hal_trace.h"
 
@@ -148,9 +148,9 @@ namespace DiagHost {
                 return false;
             }
             
-            constexpr embot::eprot::ID32 id32statusbasic = EOPROT_ID_GET(eoprot_endpoint_management, eoprot_entity_mn_info, 0, eoprot_tag_mn_info_status_basic);
+//            constexpr embot::eprot::ID32 id32statusbasic = EOPROT_ID_GET(eoprot_endpoint_management, eoprot_entity_mn_info, 0, eoprot_tag_mn_info_status_basic);
             //eoprot_ID_get(eoprot_endpoint_management, eoprot_entity_mn_info, 0, eoprot_tag_mn_info_status_basic);
-            const embot::eprot::ID32 id32statusfull = EOPROT_ID_GET(eoprot_endpoint_management, eoprot_entity_mn_info, 0, eoprot_tag_mn_info_status);
+//            const embot::eprot::ID32 id32statusfull = EOPROT_ID_GET(eoprot_endpoint_management, eoprot_entity_mn_info, 0, eoprot_tag_mn_info_status);
             //eoprot_ID_get(eoprot_endpoint_management, eoprot_entity_mn_info, 0, eoprot_tag_mn_info_status);
             
             switch(rop.id32)
