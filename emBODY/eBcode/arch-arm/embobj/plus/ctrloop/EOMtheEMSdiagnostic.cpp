@@ -62,19 +62,21 @@ bool EOMtheEMSDiagnostic::initialise(const Params& cfg)
     {
         eo_errman_Error(eo_errman_GetHandle(), eo_errortype_fatal, "eom_emsdiscoverylistener_Initialise(): EOMtheIPnet not started yet", s_eobj_ownname, &eo_errman_DescrRuntimeErrorLocal);
     }
+    
+    // create the socket
+    socket_ = eo_socketdtg_New(cfg.inpdatagramnumber_, rawcapacity_, (eobool_true == cfg.usemutex_) ? (eom_mutex_New()) : (NULL),cfg.outdatagramnumber_, rawcapacity_, (eobool_true == cfg.usemutex_) ? (eom_mutex_New()) : (NULL));
 
     //Mutex init
     mutexNode_=eom_mutex_New();
     mutexUdpPackage_=eom_mutex_New();
            
+    //create the rx/tx packet
+    rxpkt_ = eo_packet_New(rawcapacity_);
     txpkt_ = eo_packet_New(0);
     eo_packet_Size_Set(txpkt_, 0); 
- 
-    rawdata = new uint8_t[rawcapacity_];    
     
     embot::app::DiagnosticsNode::Config config {}; // to be filled properly after
-    node_ = new embot::app::DiagnosticsNode;
-    node_->init(config);    
+    node_.init(config);    
         
     // create the task
     task_ = eom_task_New(eom_mtask_EventDriven, 
@@ -162,7 +164,7 @@ eOresult_t EOMtheEMSDiagnostic::transmitUdpPackage()
     if(!traceIsActive_)
         return eores_OK;//no transmit necessary
     
-    if(node_->getNumberOfROPs()==0)
+    if(node_.getNumberOfROPs()==0)
     {
         return eores_OK;//nothing to transmit
     }
@@ -183,7 +185,7 @@ eOresult_t EOMtheEMSDiagnostic::transmitUdpPackage()
     {
         size_t sizeofropframe = 0;
         lock_guard<EOVmutexDerived> lockNode(mutexNode_);        
-        if(!node_->prepare(sizeofropframe))
+        if(!node_.prepare(sizeofropframe))
         {
             hal_trace_puts("ERROR - prepare ROP");
             return eores_NOK_generic;
@@ -196,10 +198,15 @@ eOresult_t EOMtheEMSDiagnostic::transmitUdpPackage()
         }    
         
         embot::utils::Data datainropframe { rawdata, rawcapacity_};
-        bool thereisarop = node_->retrieve(datainropframe);   
+        bool thereisarop = node_.retrieve(datainropframe);   
         
         lock_guard<EOVmutexDerived> lockUdp(mutexUdpPackage_);                
-        eo_packet_Full_LinkTo(txpkt_, remoteAddr_, remotePort_, sizeofropframe, datainropframe.getU08ptr());                
+        res=eo_packet_Full_LinkTo(txpkt_, remoteAddr_, remotePort_, sizeofropframe, datainropframe.getU08ptr());                
+        if(res!=eores_OK)
+        {
+            hal_trace_puts("ERROR - eo_packet_Full_LinkTo");
+            return eores_NOK_generic;  //TODO something
+        }
         eo_packet_Addressing_Set(txpkt_, remoteAddr_, remotePort_);
         res = eo_socketdtg_Put(socket_, txpkt_);   
         
@@ -237,7 +244,7 @@ bool EOMtheEMSDiagnostic::send(const embot::eprot::diagnostics::InfoBasic &ib, b
 {   
     {
         lock_guard<EOVmutexDerived> lock(mutexNode_);
-        bool res=node_->add(ib);
+        bool res=node_.add(ib);
         if(!res)
         {
             hal_trace_puts("ERROR - ROP not added.");//TODO something

@@ -88,8 +88,8 @@ class EOMtheEMSDiagnostic
         //udp packet
         EOpacket* txpkt_{nullptr};
         EOpacket *rxpkt_{nullptr};
-        uint8_t *rawdata {nullptr};
         static constexpr uint16_t rawcapacity_ {513};
+        uint8_t rawdata[rawcapacity_];
         
         EOVmutexDerived* mutexNode_{nullptr};
         EOVmutexDerived* mutexUdpPackage_{nullptr};
@@ -107,7 +107,7 @@ class EOMtheEMSDiagnostic
 
         static constexpr char s_eobj_ownname[]{"EOMtheEMSdiagnostic"};        
        
-        embot::app::DiagnosticsNode * node_ {nullptr};
+        embot::app::DiagnosticsNode node_;
 };
 
 #endif  // include-guard
