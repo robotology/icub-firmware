@@ -61,7 +61,7 @@ class EOMtheEMSDiagnostic
         static EOMtheEMSDiagnostic& instance();
         bool initialise(const Params&);
                    
-        bool send(const embot::eprot::diagnostics::InfoBasic &ib, bool flush = true);
+        bool send(const embot::eprot::diagnostics::InfoBasic &ib, bool flush);
         
     private:
 

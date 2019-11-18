@@ -766,7 +766,7 @@ static void s_eo_ethmonitor_diag_send2(eOerrmanErrorType_t errtype, const eOerrm
 //        }
 //    }
     
-    EOMtheEMSDiagnostic::instance().send(ib);
+    EOMtheEMSDiagnostic::instance().send(ib,true);
           
 }
 

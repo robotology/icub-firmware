@@ -63,7 +63,7 @@ extern void embot_cif_diagnostic_OnError(eOerrmanErrorType_t errtype, const char
         errdes->par64,        
     };
     
-    EOMtheEMSDiagnostic::instance().send(ib);
+    EOMtheEMSDiagnostic::instance().send(ib,true);
     
     
     if(errtype <= eo_errortype_error)
@@ -75,9 +75,7 @@ extern void embot_cif_diagnostic_OnError(eOerrmanErrorType_t errtype, const char
     
     s_manage_fatal(info, caller, errdes);  
 }
-
-
-
+       
 static void s_manage_trace(const char *info, eOerrmanCaller_t *caller, const eOerrmanDescriptor_t *errdes)
 {
     #warning TODO: manage print of trace on debug port    

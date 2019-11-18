@@ -16,25 +16,15 @@
  * Public License for more details
 */
 
-
-
 // public interface
 
 #include "EOMtheEMSDiagnostic.h"
 
-
-// --------------------------------------------------------------------------------------------------------------------
-// - external dependencies
-// --------------------------------------------------------------------------------------------------------------------
-
 #include "EoCommon.h"
-
 #include "EOtheMemoryPool.h"
 #include "EOtheErrorManager.h"
-
 #include "OPCprotocolManager.h"
 #include "OPCprotocolManager_Cfg.h"
-
 #include "EOaction.h"
 #include "EOMtheIPnet.h"
 #include "EOMmutex.h"
@@ -162,7 +152,7 @@ bool EOMtheEMSDiagnostic::manageArrivedMessage(EOpacket* package)
     uint8_t *data = NULL;
     uint16_t size = 0;
     eo_packet_Payload_Get(rxpkt_,&data,&size);
-    //TODO add RX msg
+    //TODO add RX msg code
 
     return true;
 }
@@ -250,7 +240,7 @@ bool EOMtheEMSDiagnostic::send(const embot::eprot::diagnostics::InfoBasic &ib, b
         bool res=node_->add(ib);
         if(!res)
         {
-            hal_trace_puts("ERROR - ROP not added.");
+            hal_trace_puts("ERROR - ROP not added.");//TODO something
             return false;
         }
     }
