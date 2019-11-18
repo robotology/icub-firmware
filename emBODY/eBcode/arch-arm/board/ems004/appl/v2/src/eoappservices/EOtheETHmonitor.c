@@ -320,10 +320,7 @@ extern eOresult_t eo_ethmonitor_Start(EOtheETHmonitor *p)
     errdes.par16            = 0;
     errdes.par64            = 0;
     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes); 
-    
-auto info=EOMDiagnosticRopMsg::Info{(uint16_t)DiagnosticRopCode::ethlog,(uint16_t)DiagnosticRopSeverity::info,(uint16_t)DiagnosticRopString::juststarted,eo_errman_sourcedevice_localboard,0,0,0,0,0};
-    EOMtheEMSDiagnostic::instance().sendDiagnosticMessage(info,false);  
-        
+           
     return(eores_OK);
 }
 
@@ -595,7 +592,7 @@ static void s_eo_ethmonitor_process_resultsofquery(void)
         errdes.par64            = applstate;
         if(0 == (++cnt%10))
         {
-            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);   
+//            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);   
 //        s_eo_ethmonitor_diag_send2(eo_errortype_error, errdes);   
         }            
     }

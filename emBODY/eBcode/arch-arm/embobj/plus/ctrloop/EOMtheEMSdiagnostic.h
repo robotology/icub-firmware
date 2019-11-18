@@ -26,20 +26,12 @@
         @author     luca.tricerri@iit.it
         @date       01/08/2019
  **/
-
-
-#include <array>
-
+     
 #include "EoCommon.h"
 #include "EOpacket.h"
 #include "EOMtask.h"
 #include "EOsocketDatagram.h"
 #include "EOVmutex.h"
-
-#include "EOMDiagnosticRopMsg.h"
-#include "EOMDiagnosticUdpHeader.h"
-#include "EOMDiagnosticUdpFooter.h"
-#include "EOMDiagnosticUdpMsg.h"
 
 #include "embot_eprot_diagnostics.h"
 
@@ -68,11 +60,7 @@ class EOMtheEMSDiagnostic
 
         static EOMtheEMSDiagnostic& instance();
         bool initialise(const Params&);
-            
-        bool sendDiagnosticMessage(EOMDiagnosticRopMsg& msg,bool flush);
-        bool sendDiagnosticMessage(EOMDiagnosticRopMsg::Info& info,bool flush);
-        EOMDiagnosticRopMsg& getRopForModify(bool res);
-        
+                   
         bool send(const embot::eprot::diagnostics::InfoBasic &ib, bool flush = true);
         
     private:
@@ -93,39 +81,33 @@ class EOMtheEMSDiagnostic
         
         Params params_;
         bool traceIsActive_{true};
-        EOsocketDatagram* socket_{nullptr};    
-        bool forceFlush_{false};      
+        bool forceFlush_{false};//Every ROPS is send without waiting the thread timeout          
+        
+        EOsocketDatagram* socket_{nullptr};       
     
         //udp packet
         EOpacket* txpkt_{nullptr};
         EOpacket *rxpkt_{nullptr};
-        EOMDiagnosticUdpMsg txUdpMsg_;
-        std::array<uint8_t, EOMDiagnosticUdpMsg::getSize()> udpMsgRaw_;
-        
-        EOpacket* txpkt2_{nullptr};
         uint8_t *rawdata {nullptr};
-        uint16_t rawcapacity {513};
+        static constexpr uint16_t rawcapacity_ {513};
         
-        EOVmutexDerived* mutexBody_;
-
+        EOVmutexDerived* mutexNode_{nullptr};
+        EOVmutexDerived* mutexUdpPackage_{nullptr};
+        
         //process event
         void processEventRxPacket();
         eOresult_t transmitUdpPackage();
         bool manageArrivedMessage(EOpacket*);
     
-        bool connected2host_{false};  
-        
+        bool connected2host_{false};     
         eOipv4addr_t hostaddress_{EO_COMMON_IPV4ADDR_LOCALHOST};
         const eOipv4addr_t remoteAddr_{EO_COMMON_IPV4ADDR(10,0,1,104)};
         const eOipv4port_t remotePort_{11000};
         const eOipv4port_t localPort_{11000};
 
         static constexpr char s_eobj_ownname[]{"EOMtheEMSdiagnostic"};        
-
-        //debug
-        void transmitTest();
-        
-        embot::app::DiagnosticsNode * node {nullptr};
+       
+        embot::app::DiagnosticsNode * node_ {nullptr};
 };
 
 #endif  // include-guard
