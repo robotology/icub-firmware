@@ -16,7 +16,8 @@
 
 #include "embot_common.h"
 #include "embot_utils.h"
-#include <stdio.h>
+#include <cstdio>
+
 
 namespace embot { namespace eprot {
 
