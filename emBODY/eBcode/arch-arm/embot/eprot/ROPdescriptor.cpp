@@ -47,7 +47,7 @@ bool embot::eprot::rop::Descriptor::load(embot::utils::Data &stream, uint16_t &c
     Header *rophead = reinterpret_cast<Header*>(stream.pointer);
     
     // now i need to see how big the ropstream is expected to be
-    size_t expectedsize = Stream::capacityfor(rophead->opc, rophead->datasize, rophead->ctrl.getPLUS());
+    size_t expectedsize = Stream::capacityfor(rophead->opc, rophead->datasize, rophead->fmt.getPLUS());
     if((expectedsize > stream.capacity) || (0 != (rophead->datasize % 4))) // it was < ...
     {
         return false;
@@ -62,17 +62,17 @@ bool embot::eprot::rop::Descriptor::load(embot::utils::Data &stream, uint16_t &c
     value.capacity = rophead->datasize;
     value.pointer = (0 == value.capacity) ? nullptr : (stream.getU08ptr() + sizeof(Header));
     uint16_t offset_time = 0;
-    if(rophead->ctrl.isPLUSsignature())
+    if(rophead->fmt.isPLUSsignature())
     {
         offset_time = sizeof(signature);
         std::memmove(&signature, stream.getU08ptr() + sizeof(Header) + rophead->datasize, sizeof(signature));
     }
-    if(rophead->ctrl.isPLUStime())
+    if(rophead->fmt.isPLUStime())
     {
         std::memmove(&time, stream.getU08ptr() + sizeof(Header) + rophead->datasize + offset_time, sizeof(time));
     }  
     
-    rophead->ctrl.extract(plus, rqst, conf);
+    rophead->fmt.extract(plus, rqst, conf);
     
     return true;  
 }

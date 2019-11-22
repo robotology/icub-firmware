@@ -60,7 +60,7 @@ struct embot::eprot::rop::Stream::Impl
     
     void fillheader(Header *header, const embot::eprot::rop::Descriptor &des)
     {        
-        header->ctrl.fill(des.plus, RQST::none, CONF::none);
+        header->fmt.fill(des.plus, RQST::none, CONF::none);
         header->opc = des.opcode;
         header->datasize = (des.value.capacity+3)/4;
         header->datasize *= 4;
@@ -130,13 +130,13 @@ struct embot::eprot::rop::Stream::Impl
             r = true;
         }
     
-        if((ref2header->ctrl.isPLUSsignature()))
+        if((ref2header->fmt.isPLUSsignature()))
         {
             std::memmove(ref2data+ref2header->datasize, &signature, sizeof(signature));
             r = true;
         } 
         
-        if((ref2header->ctrl.isPLUStime()))
+        if((ref2header->fmt.isPLUStime()))
         {
             std::memmove(ref2data+ref2header->datasize+4, &time, sizeof(time));
             r = true;

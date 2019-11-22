@@ -112,8 +112,8 @@ namespace embot { namespace eprot { namespace rop {
     
     struct Header
     {
-        struct CTRL
-        { 
+        struct Format
+        {   // spec document uses CTRL. we use Format, which better describes its role because CTRL is sic... a macro contained inside ttydefaults.h
             constexpr static uint8_t versionzero = 0;
             
             // if i use "uint8_t confinfo : 2{0};" i have a warning: default member initializer for bit-field is a C++2a extension [-Wc++2a-extensions]
@@ -127,9 +127,9 @@ namespace embot { namespace eprot { namespace rop {
             uint8_t version  : 2;// {versionzero}; // it is formed by bits 7 and 6 of the first byte of the ROP. So far it must be versionzero      
             // <- memory layout
                        
-            CTRL() : version(versionzero) { set(PLUS::none); set(RQST::none); set(CONF::none); }
+            Format() : version(versionzero) { set(PLUS::none); set(RQST::none); set(CONF::none); }
             
-            constexpr CTRL(PLUS p, RQST r, CONF c) : confinfo(0), plustime(0), plussign(0), rqsttime(0), rqstconf(0), version(versionzero) { set(p); set(r); set(c); }
+            constexpr Format(PLUS p, RQST r, CONF c) : confinfo(0), plustime(0), plussign(0), rqsttime(0), rqstconf(0), version(versionzero) { set(p); set(r); set(c); }
                             
             constexpr void set(PLUS p) { plustime = hasTIME(p); plussign = hasSIGN(p); }
             constexpr void set(RQST r) { rqsttime = reqTIME(r); rqstconf = reqCONF(r); }
@@ -147,11 +147,11 @@ namespace embot { namespace eprot { namespace rop {
             constexpr void fill(PLUS p = PLUS::none, RQST r = RQST::none, CONF c = CONF::none) { set(p); set(r); set(c); }
             constexpr void extract(PLUS& p, RQST& r, CONF &c) const { p = getPLUS(); r = getRQST(); c = getCONF(); } 
             constexpr static size_t sizeofobject = 1;
-        }; static_assert(sizeof(CTRL) == CTRL::sizeofobject, "embot::eprot::rop::Header::CTRL has wrong size. it must be 1");
+        }; static_assert(sizeof(Format) == Format::sizeofobject, "embot::eprot::rop::Header::Format has wrong size. it must be 1");
                 
 
         // -> memory layout   
-        CTRL        ctrl {};
+        Format      fmt {};
         OPC         opc {OPC::none};
         uint16_t    datasize {0};
         ID32        id32;
@@ -159,7 +159,7 @@ namespace embot { namespace eprot { namespace rop {
         
         
         Header() = default;        
-        constexpr Header(const CTRL &c, OPC o, uint16_t s, ID32 i) : ctrl(c), opc(o), datasize(s), id32(i) {}
+        constexpr Header(const Format &f, OPC o, uint16_t s, ID32 i) : fmt(f), opc(o), datasize(s), id32(i) {}
         
         constexpr static size_t sizeofobject = 8;
     }; static_assert(sizeof(Header) == Header::sizeofobject, "embot::eprot::rop::Header has wrong size. it must be 8");    
