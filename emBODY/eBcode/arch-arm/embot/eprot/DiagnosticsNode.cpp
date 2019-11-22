@@ -401,6 +401,10 @@ bool embot::app::DiagnosticsNode::add(const embot::eprot::diagnostics::InfoBasic
     return pImpl->add(infobasic);    
 }
 
+bool embot::app::DiagnosticsNode::add(const embot::eprot::diagnostics::Info &info)
+{
+    return pImpl->add(info);    
+}
 
 bool embot::app::DiagnosticsNode::prepare(size_t &sizeofropframe)
 {
