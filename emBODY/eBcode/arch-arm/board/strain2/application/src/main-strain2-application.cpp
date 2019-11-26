@@ -13,7 +13,7 @@
 
 constexpr embot::app::theCANboardInfo::applicationInfo applInfo 
 { 
-    embot::app::canprotocol::versionOfAPPLICATION {2, 0, 3},    
+    embot::app::canprotocol::versionOfAPPLICATION {2, 0, 4},    
     embot::app::canprotocol::versionOfCANPROTOCOL {2, 0}    
 };
 
@@ -85,6 +85,7 @@ int main(void)
 
 
 #undef DEBUG_atstartup_tx_FTdata
+#undef ENABLE_IHAVEJUSTSTARTED
 
 #include "embot_hw_bsp_strain2.h"
 
@@ -100,6 +101,8 @@ int main(void)
 #include "embot_app_application_theIMU.h"
 #include "embot_app_application_theTHERMO.h"
 
+#include "embot_app_application_theCANtracer.h"
+
 
 constexpr embot::common::Event evSTRAINtick = 0x00000001 << 1;
 constexpr embot::common::Event evSTRAINdataready = 0x00000001 << 2;
@@ -108,6 +111,11 @@ constexpr embot::common::Event evIMUdataready = 0x00000001 << 4;
 constexpr embot::common::Event evTHERMOtick = 0x00000001 << 5;
 constexpr embot::common::Event evTHERMOdataready = 0x00000001 << 6;
 
+#if defined(ENABLE_IHAVEJUSTSTARTED)
+constexpr embot::common::Event evIHAVEjuststarted = 0x00000001 << 7;
+static void ihavejuststarted_init(embot::sys::EventTask* evtsk);
+static void ihavejuststarted_tick(std::vector<embot::hw::can::Frame> &outframes);
+#endif
 
 void mySYS::userdefOnIdle(embot::sys::Task *t, void* idleparam) const
 {
@@ -166,6 +174,10 @@ void mySYS::userdefInit_Extra(embot::sys::EventTask* evtsk, void *initparam) con
     embot::app::application::theCANparserTHERMO::Config configparserthermo { &thethermo };
     canparserthermo.initialise(configparserthermo);       
         
+#if defined(ENABLE_IHAVEJUSTSTARTED)
+    // init service IHaveJustStarted
+    ihavejuststarted_init(evtsk); 
+#endif       
 }
 
 void myEVT::userdefStartup(embot::sys::Task *t, void *param) const
@@ -242,7 +254,48 @@ void myEVT::userdefOnEventANYother(embot::sys::Task *t, embot::common::EventMask
         embot::app::application::theTHERMO &thethermo = embot::app::application::theTHERMO::getInstance();
         thethermo.processdata(outframes);        
     }  
+
+#if defined(ENABLE_IHAVEJUSTSTARTED)    
+    if(true == embot::binary::mask::check(eventmask, evIHAVEjuststarted))
+    {        
+        ihavejuststarted_tick(outframes);
+    } 
+#endif 
+    
 }
+
+
+#if defined(ENABLE_IHAVEJUSTSTARTED)
+
+constexpr uint32_t ntimes = 5;
+constexpr embot::common::Time deltatime = 3 * embot::common::time1second;
+uint32_t times = 0;
+
+embot::sys::Timer * _tmr {nullptr};
+static void ihavejuststarted_init(embot::sys::EventTask* evtsk)
+{
+    times = 0;
+    _tmr = new embot::sys::Timer;
+    _tmr->start({deltatime, {embot::sys::EventToTask{evIHAVEjuststarted, evtsk}}, embot::sys::Timer::Mode::someshots, ntimes});
+}
+
+//action.load(embot::sys::EventToTask(pImpl->config.tickevent, pImpl->config.totask));
+//evIHAVEjuststarted
+
+static void ihavejuststarted_tick(std::vector<embot::hw::can::Frame> &outframes)
+{
+    char ss[64] = {0};
+    uint64_t tt = embot::sys::now();
+    uint32_t mm = tt /= 1000;
+    uint32_t s = mm/1000;
+    uint32_t m = mm - s*1000;
+    
+    snprintf(ss, sizeof(ss), "i woke up %ds%dm ago", s, m);
+    embot::app::theCANtracer &tracer = embot::app::theCANtracer::getInstance();
+    tracer.print(ss, outframes);        
+}
+
+#endif // #if defined(ENABLE_IHAVEJUSTSTARTED)
 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
