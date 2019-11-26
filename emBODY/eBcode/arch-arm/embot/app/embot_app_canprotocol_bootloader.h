@@ -34,6 +34,7 @@ namespace embot { namespace app { namespace canprotocol { namespace bootloader {
         
         BOARD = 0x00, ADDRESS = 0x01, START = 0x02, DATA = 0x03, END = 0x04, 
         GET_ADDITIONAL_INFO = 0x0C, SET_ADDITIONAL_INFO = 0x0D, 
+        GET_TIMEOFLIFE = 0x0E,      // NEW message
         SETCANADDRESS = 0x32,       // NEW message         
         BROADCAST = 0xff        
     };
@@ -308,6 +309,32 @@ namespace embot { namespace app { namespace canprotocol { namespace bootloader {
         bool reply();   // none
         
     };    
+    
+
+    class Message_GET_TIMEOFLIFE : public Message
+    {
+        public:
+                                    
+        struct Info
+        { 
+            std::uint8_t nothing {0};           
+            Info() = default;
+        };
+        
+        struct ReplyInfo
+        {
+            uint64_t timeoflife {0}; // in usec ordered in little endian, BUT the most significant byte will be dropped...
+            ReplyInfo() = default;        
+        };        
+        
+        Info info;
+        
+        Message_GET_TIMEOFLIFE() {}
+            
+        bool load(const embot::hw::can::Frame &inframe);
+            
+        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
+    };  
     
 }}}} // namespace embot { namespace app { namespace canprotocol { namespace bootloader {
 

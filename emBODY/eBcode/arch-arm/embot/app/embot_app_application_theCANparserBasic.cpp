@@ -150,6 +150,7 @@ struct embot::app::application::theCANparserBasic::Impl
     bool process_bl_getadditionalinfo(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);
     bool process_bl_setadditionalinfo(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);
     bool process_bl_setcanaddress(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);
+    bool process_bl_gettimeoflife(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);
     
     bool process_getfirmwareversion(const embot::app::canprotocol::Clas cl, const std::uint8_t cm, const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);    
     bool process_setid(const embot::app::canprotocol::Clas cl, const std::uint8_t cm, const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);
@@ -210,7 +211,12 @@ bool embot::app::application::theCANparserBasic::Impl::process(const embot::hw::
                 txframe = process_bl_setadditionalinfo(frame, replies);
                 recognised = true;                
             }                     
-             
+            else if(static_cast<std::uint8_t>(embot::app::canprotocol::bootloader::CMD::GET_TIMEOFLIFE) == cmd)
+            {
+                txframe = process_bl_gettimeoflife(frame, replies);
+                recognised = true;                
+            }   
+            
         } break;
         
 
@@ -379,6 +385,24 @@ bool embot::app::application::theCANparserBasic::Impl::process_bl_setcanaddress(
     setcanaddress(msg.info.address, msg.info.randominvalidmask);
             
     return msg.reply();        
+}
+
+bool embot::app::application::theCANparserBasic::Impl::process_bl_gettimeoflife(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
+{
+    embot::app::canprotocol::bootloader::Message_GET_TIMEOFLIFE msg;
+    msg.load(frame);
+        
+    embot::app::canprotocol::bootloader::Message_GET_TIMEOFLIFE::ReplyInfo replyinfo;
+    
+    replyinfo.timeoflife = embot::sys::now();
+   
+    if(true == msg.reply(reply, embot::app::theCANboardInfo::getInstance().cachedCANaddress(), replyinfo))
+    {            
+        replies.push_back(reply);
+        return true;
+    }
+    
+    return false;       
 }
 
 

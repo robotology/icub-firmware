@@ -382,7 +382,34 @@ namespace embot { namespace app { namespace canprotocol { namespace bootloader {
     bool Message_SET_ADDITIONAL_INFO2::reply()
     {
         return false;
-    }        
+    }   
+
+
+    bool Message_GET_TIMEOFLIFE::load(const embot::hw::can::Frame &inframe)
+    {
+        Message::set(inframe); 
+        
+        if(static_cast<std::uint8_t>(CMD::GET_TIMEOFLIFE) != frame2cmd(inframe))
+        {
+            return false; 
+        }
+        
+        return true;
+    }  
+
+    bool Message_GET_TIMEOFLIFE::reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo)
+    {
+        std::uint8_t dd[7] = {0};
+
+        // we just copy 7 bytes of replyinfo int dd
+        std::memmove(dd, &replyinfo.timeoflife, 7);
+        std::uint8_t datalen = 7;
+        
+        frame_set_sender(outframe, sender);
+        frame_set_clascmddestinationdata(outframe, Clas::bootloader, static_cast<std::uint8_t>(CMD::GET_TIMEOFLIFE), candata.from, dd, datalen);
+        frame_set_size(outframe, datalen+1);
+        return true;
+    }    
 
 }}}} // namespace embot { namespace app { namespace canprotocol { namespace bootloader {
 
