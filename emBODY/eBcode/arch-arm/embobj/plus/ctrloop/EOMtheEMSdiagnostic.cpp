@@ -40,10 +40,11 @@
 
 #include "lock_guard"
 
-extern void tskEMScfg(void *p)
+extern void eo_diagnostic(void *p)
 {
     eom_task_Start((EOMtask*)p);
 }
+
 EOMtheEMSDiagnostic::EOMtheEMSDiagnostic()
 {
 }
@@ -91,9 +92,9 @@ bool EOMtheEMSDiagnostic::initialise(const Params& cfg)
                         (eOevent_t)0, 
                         wakeupTask_, 
                         NULL, 
-                        tskEMScfg,
+                        eo_diagnostic,
                         "diagnostic");
-                                                                                                      
+                                                                                                                              
     return true;                                                
 }
 
