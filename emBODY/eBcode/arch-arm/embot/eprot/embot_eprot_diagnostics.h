@@ -27,6 +27,7 @@ namespace embot { namespace eprot { namespace diagnostics {
     constexpr embot::eprot::Tag tag_config_enable = 2;  
     constexpr embot::eprot::Tag tag_info = 3;  
     constexpr embot::eprot::Tag tag_info_basic = 4;  
+    constexpr embot::eprot::Tag tag_infolarge = 5;
     
     
     struct Config
@@ -113,6 +114,23 @@ namespace embot { namespace eprot { namespace diagnostics {
         constexpr static embot::eprot::ID32 id32 = embot::eprot::getID32(embot::eprot::EP::management, embot::eprot::EN::mnInfo, 0, tag_info);
         constexpr static uint16_t sizeofobject = 72;        
     };  static_assert(sizeof(Info) == Info::sizeofobject, "embot::eprot::diagnostics::Info has wrong sizeofobject. it must be 72");
+
+
+    struct InfoLarge
+    {
+        constexpr static uint16_t extrasizeof = 224;
+
+        // -> memory layout
+        InfoBasic basic {};
+        uint8_t extra[extrasizeof] {0};
+        // -> memory layout
+
+        // methods
+        InfoLarge() =  default;
+
+        constexpr static embot::eprot::ID32 id32 = embot::eprot::getID32(embot::eprot::EP::management, embot::eprot::EN::mnInfo, 0, tag_infolarge);
+        constexpr static uint16_t sizeofobject = 248;
+    };  static_assert(sizeof(InfoLarge) == InfoLarge::sizeofobject, "embot::eprot::diagnostics::InfoLarge has wrong sizeofobject. it must be 248");
 
 
 }}} // namespace embot { namespace eprot { namespace diagnostics {

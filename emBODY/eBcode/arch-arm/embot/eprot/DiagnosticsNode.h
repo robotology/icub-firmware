@@ -49,6 +49,7 @@ namespace embot { namespace app {
         bool add(const embot::eprot::rop::Descriptor &ropdes); 
         bool add(const embot::eprot::diagnostics::InfoBasic &infobasic);
         bool add(const embot::eprot::diagnostics::Info &info);
+        bool add(const embot::eprot::diagnostics::InfoLarge &infolarge);
         bool prepare(size_t &sizeofropframe); // returns true if anything to retrieve. in sizeofropframe the size of required mem
         bool retrieve(embot::utils::Data &datainropframe); // it copies the ropframe. 
         uint16_t getNumberOfROPs() const;
