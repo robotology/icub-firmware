@@ -1121,8 +1121,25 @@ static void s_eo_strain_send_diagnostic_on_transmissioninterruption(void)
     descriptor.par64 = 0;
     descriptor.sourcedevice = eo_errman_sourcedevice_localboard;
     descriptor.sourceaddress = 0;
+    descriptor.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag00);
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, "strain timeout0", NULL, &descriptor);
+    
+#if 0
+    descriptor.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, "strain timeout1", NULL, &descriptor);
+    descriptor.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag02);
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, "strain timeout2", NULL, &descriptor);
     descriptor.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag03);
-    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, "strain timeout", NULL, &descriptor);
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, "strain timeout3", NULL, &descriptor);
+    descriptor.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag04);
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, "strain timeout4", NULL, &descriptor);
+    descriptor.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag05);
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, "strain timeout5", NULL, &descriptor);
+    descriptor.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag06);
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, "strain timeout6", NULL, &descriptor);
+    descriptor.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag07);
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, "strain timeout7", NULL, &descriptor);
+#endif
 
 }
 // --------------------------------------------------------------------------------------------------------------------
