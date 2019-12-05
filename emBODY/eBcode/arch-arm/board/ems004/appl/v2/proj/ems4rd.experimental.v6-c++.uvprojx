@@ -859,7 +859,7 @@
             </File>
             <File>
               <FileName>EOtheETHmonitor.c</FileName>
-              <FileType>8</FileType>
+              <FileType>1</FileType>
               <FilePath>..\src\eoappservices\EOtheETHmonitor.c</FilePath>
             </File>
             <File>
@@ -2349,7 +2349,7 @@
             </File>
             <File>
               <FileName>EOtheETHmonitor.c</FileName>
-              <FileType>8</FileType>
+              <FileType>1</FileType>
               <FilePath>..\src\eoappservices\EOtheETHmonitor.c</FilePath>
             </File>
             <File>
