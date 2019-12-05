@@ -21,6 +21,12 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
+// this file should be compiled as a C file ... however, for tests we have needed to turn it into a C++ file
+#ifdef __cplusplus
+    #define USE_CPP
+#endif
+ 
+
 #include "stdlib.h"
 #include "string.h"
 
@@ -36,9 +42,10 @@
 
 #include "EOMtheEMSrunner.h"
 
+#if defined(USE_CPP)
 #include "EOMtheEMSDiagnostic.h"
-
 #include "DiagnosticsNode.h"
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -139,7 +146,7 @@ static void s_eo_ethmonitor_verifyTXropframe_DUMMY(hl_eth_frame_t* frame);
 static void s_eo_ethmonitor_send_error_sequencenumber(void);
 
 static void s_eo_ethmonitor_diag_send(eOerrmanErrorType_t errtype, const eOerrmanDescriptor_t *des);
-static void s_eo_ethmonitor_diag_send2(eOerrmanErrorType_t errtype, const eOerrmanDescriptor_t &errdes);
+static void s_eo_ethmonitor_diag_send2(eOerrmanErrorType_t errtype, const eOerrmanDescriptor_t errdes);
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -728,13 +735,15 @@ static void s_eo_ethmonitor_diag_send(eOerrmanErrorType_t errtype, const eOerrma
     
 }
 
+#if defined(USE_CPP)
+
 embot::app::DiagnosticsNode * getone()
 {
     return nullptr;   
 }
 
-static void s_eo_ethmonitor_diag_send2(eOerrmanErrorType_t errtype, const eOerrmanDescriptor_t &errdes)
-{
+static void s_eo_ethmonitor_diag_send2(eOerrmanErrorType_t errtype, const eOerrmanDescriptor_t errdes)
+{  
 
     if(eo_errortype_trace == errtype)
     {   // trace is not transmitted
@@ -767,10 +776,16 @@ static void s_eo_ethmonitor_diag_send2(eOerrmanErrorType_t errtype, const eOerrm
 //    }
     
     EOMtheEMSDiagnostic::instance().send(ib,true);
-          
+        
 }
 
+#else
 
+static void s_eo_ethmonitor_diag_send2(eOerrmanErrorType_t errtype, const eOerrmanDescriptor_t errdes)
+{
+}
+
+#endif  
 
 // --------------------------------------------------------------------------------------------------------------------
 // - end-of-file (leave a blank line after)
