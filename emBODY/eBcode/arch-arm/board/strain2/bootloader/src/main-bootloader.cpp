@@ -15,7 +15,7 @@ constexpr std::uint8_t defADDRESS = 13;
 constexpr embot::app::theCANboardInfo::bootloaderInfo btlInfo 
 { 
     embot::app::canprotocol::Board::strain2, 
-    embot::app::canprotocol::versionOfBOOTLOADER {2, 3}, 
+    embot::app::canprotocol::versionOfBOOTLOADER {2, 4}, 
     defADDRESS,                                                  
     "I am a strain2" 
 };
