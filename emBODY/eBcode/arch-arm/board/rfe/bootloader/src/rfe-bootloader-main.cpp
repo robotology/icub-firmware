@@ -15,9 +15,9 @@ constexpr std::uint8_t defADDRESS = 1;
 constexpr embot::app::theCANboardInfo::bootloaderInfo btlInfo 
 { 
     embot::app::canprotocol::Board::rfe, 
-    embot::app::canprotocol::versionOfBOOTLOADER {1, 5}, 
+    embot::app::canprotocol::versionOfBOOTLOADER {1, 6}, 
     defADDRESS,                                                  
-    "I am a rfe" 
+    "I am a beautiful rfe" 
 };
 
 // --------------------------------------------------------------------------------------------------------------------
