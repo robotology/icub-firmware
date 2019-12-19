@@ -164,21 +164,24 @@ float PID_do_out(PID* o, float En)
 float PID_do_friction_comp(PID *o, float vel_raw_fbk, float vel_fbk, float trq_ref)
 {
     static float signDithering = 1.0f;
-	  volatile float dither,stiction,coulViscFriction,signVel,isPos,isNeg;
+	  volatile float dither,stiction,coulViscFriction,signVel,velIsPos,velIsNeg,torqIsPos,torqIsNeg;
 	  
 	  // Valid velocity for stiction
-    if (fabs(vel_raw_fbk)<=o->stictionMotorVel)
+    if (fabsf(vel_raw_fbk)<=o->stictionMotorVel)
 		{
 			vel_fbk = 0.0f;
     }
 		
 	  // vel_fbk>0 --> signVel=1;  vel_fbk<0 --> signVel=-1; vel_fbk==0 --> signVel=0;
-	  isNeg = (float)(vel_fbk<0);
-	  isPos = (float)(vel_fbk>0);
-	  signVel = isPos-isNeg;
+	  velIsNeg = (float)(vel_fbk<0);
+	  velIsPos = (float)(vel_fbk>0);
+	  signVel = velIsPos-velIsNeg;
 	  
+	  torqIsNeg = (float)(trq_ref<0);
+	  torqIsPos = (float)(trq_ref>0);
+		
 		// Stiction
-		stiction = isPos*o->stiction_up - isNeg*o->stiction_down;
+		stiction = (velIsPos+!signVel*torqIsPos)*o->stiction_up - (velIsNeg+!signVel*torqIsNeg)*o->stiction_down;
 		
 		// Coulomb + Viscous friction
 	  coulViscFriction = o->Kc*signVel + o->Kbemf*vel_fbk;
@@ -195,6 +198,6 @@ float PID_do_friction_comp(PID *o, float vel_raw_fbk, float vel_fbk, float trq_r
 			dither = 0.0f;
 		}
 		
-    float totalFriction = dither + ((fabs(stiction) > fabs(coulViscFriction) ? stiction : coulViscFriction));
+    float totalFriction = dither + ((fabsf(stiction) > fabsf(coulViscFriction) ? stiction : coulViscFriction));
     return o->Ktau*(o->Kff*trq_ref + totalFriction);
 }
