@@ -24,6 +24,7 @@ extern "C" {
 #endif
 
 #include "EoCommon.h"
+#include <math.h>
 #include "EoMotionControl.h"
 
 #include "EOemsControllerCfg.h"
