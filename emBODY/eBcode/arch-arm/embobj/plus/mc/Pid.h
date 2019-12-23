@@ -54,7 +54,7 @@ typedef struct //PID
     float stiction_down;
     float ditheringVal;
 	  float_fsticks_per_s_t ditheringMotorVel;
-	  float_fsticks_per_s_t stictionMotorVel;
+	  float stictionJointVel;
 
     float out_max;
     float out_lpf;
@@ -66,7 +66,7 @@ typedef struct //PID
 #define MIN_VEL_OBSERVABLE 10 /* in degrees/s */
 #define VEL_FULLSCALE 0x10000
 #define DITHERING_MOTOR_VEL_DFLT 10 /* in motor deg/s */
-#define STICTION_MOTOR_VEL_DFLT 300 /* in motor deg/s */
+#define STICTION_JOINT_VEL_DFLT 2 /* in joint deg/s */
 
 PID* PID_new(uint8_t n);
 extern void PID_init(PID* o);
@@ -78,7 +78,7 @@ extern void PID_reset(PID* o);
 extern void PID_get_state(PID* o, float *out, float *err);
 
 extern float PID_do_out(PID* o, float En);
-extern float PID_do_friction_comp(PID *o, float vel_raw, float vel, float Tr);
+extern float PID_do_friction_comp(PID *o, float vel_raw_fbk, float vel_fbk, float joint_vel_fbk, float trq_ref, float trq_fbk);
 
 
 #ifdef __cplusplus

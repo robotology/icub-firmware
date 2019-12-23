@@ -658,7 +658,8 @@ void JointSet_do_pwm_control(JointSet* o)
             {
                 CTRL_UNITS motor_trq_ref = ZERO;
                 CTRL_UNITS motor_trq_fbk = ZERO;
-            
+                CTRL_UNITS motor_vel_fbk = ZERO;
+							
                 for (int js=0; js<N; ++js)
                 {
                     int j = o->joints_of_set[js];
@@ -667,13 +668,16 @@ void JointSet_do_pwm_control(JointSet* o)
                     // transposed direct Jacobian
                     motor_trq_ref += o->Jjm[j][m]*o->joint[j].trq_ref;
                     motor_trq_fbk += o->Jjm[j][m]*o->joint[j].trq_fbk;
+									  // dtheta = J^{-1} dq
+									  // inverse Jacobian
+									  motor_vel_fbk  += o->Smj[m][j]*o->joint[j].vel_fbk;
                 }
                 
-                motor_pwm_ref = Motor_do_trq_control(o->motor+m, motor_trq_ref, motor_trq_fbk);
+                motor_pwm_ref = Motor_do_trq_control(o->motor+m, motor_trq_ref, motor_trq_fbk, motor_vel_fbk);
             }
             else
             {
-                motor_pwm_ref = Motor_do_trq_control(o->motor+m, o->joint[m].trq_ref, o->joint[m].trq_fbk);
+                motor_pwm_ref = Motor_do_trq_control(o->motor+m, o->joint[m].trq_ref, o->joint[m].trq_fbk, o->joint[m].vel_fbk);
             }
         }
         else
@@ -807,6 +811,7 @@ static void JointSet_do_current_control(JointSet* o)
             {
                 CTRL_UNITS motor_trq_ref = ZERO;
                 CTRL_UNITS motor_trq_fbk = ZERO;
+                CTRL_UNITS motor_vel_fbk = ZERO;
             
                 for (int js=0; js<N; ++js)
                 {
@@ -816,13 +821,16 @@ static void JointSet_do_current_control(JointSet* o)
                     // transposed direct Jacobian
                     motor_trq_ref += o->Jjm[j][m]*o->joint[j].trq_ref;
                     motor_trq_fbk += o->Jjm[j][m]*o->joint[j].trq_fbk;
+									  // dtheta = J^{-1} dq
+									  // inverse Jacobian
+									  motor_vel_fbk  += o->Smj[m][j]*o->joint[j].vel_fbk;
                 }
                 
-                motor_current_ref = Motor_do_trq_control(o->motor+m, motor_trq_ref, motor_trq_fbk);
+                motor_current_ref = Motor_do_trq_control(o->motor+m, motor_trq_ref, motor_trq_fbk, motor_vel_fbk);
             }
             else
             {
-                motor_current_ref = Motor_do_trq_control(o->motor+m, o->joint[m].trq_ref, o->joint[m].trq_fbk);
+                motor_current_ref = Motor_do_trq_control(o->motor+m, o->joint[m].trq_ref, o->joint[m].trq_fbk, o->joint[m].vel_fbk);
             }
         }
         else
