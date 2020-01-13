@@ -51,9 +51,9 @@ void PID_config(PID* o, eOmc_PID_t* config)
 	   * ratio. */
 	  
 	  // PID parameters
-    o->Kp = rescaler*config->kp;
-    o->Kd = rescaler*config->kd;
-    o->Ki = rescaler*config->ki;
+    o->Kp = fabsf(rescaler*config->kp);
+    o->Kd = fabsf(rescaler*config->kd);
+    o->Ki = fabsf(rescaler*config->ki);
 
     o->Dn = 0.0f;
     o->En = 0.0f;
@@ -63,14 +63,14 @@ void PID_config(PID* o, eOmc_PID_t* config)
     // Feed-forward parameters
 		o->Kff = rescaler*config->kff;
     o->Kdith = 0.0f; // Dithering scale is off for now, until the proper interface is implemented on yarpmotorgui.
-    o->Kc = rescaler*config->offset;
+    o->Kc = fabsf(rescaler*config->offset);
     o->Kbemf = 0.0f;
     o->Ktau  = 0.0f;
 
 	  /* Stiction: input values are absolute. The model parameter then gets the same
 	   * sign as the joint velocity. */
-    o->stiction_up   = rescaler*config->stiction_up_val;
-    o->stiction_down = rescaler*config->stiction_down_val;
+    o->stiction_up   = fabsf(rescaler*config->stiction_up_val);
+    o->stiction_down = fabsf(rescaler*config->stiction_down_val);
 		
     o->ditheringVal = o->Kdith*EO_MAX(o->stiction_up,o->stiction_down);
 	  o->ditheringMotorVel = (float)DITHERING_MOTOR_VEL_DFLT*(float)TICKS_PER_REVOLUTION/360;
@@ -102,8 +102,8 @@ void PID_config(PID* o, eOmc_PID_t* config)
 
 void PID_config_friction(PID *o, float Kbemf, float Ktau)
 {
-    o->Kbemf = Kbemf;
-    o->Ktau  = Ktau;
+    o->Kbemf = fabsf(Kbemf);
+    o->Ktau  = fabsf(Ktau);
 }
 
 void PID_config_filter(PID *o, uint8_t filter)
