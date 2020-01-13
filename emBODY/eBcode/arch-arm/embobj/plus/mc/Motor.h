@@ -252,7 +252,7 @@ extern BOOL Motor_is_calibrated(Motor* o); //
 extern BOOL Motor_check_faults(Motor* o); //
 extern void Motor_reset(Motor *o);//
 
-extern CTRL_UNITS Motor_do_trq_control(Motor* o, CTRL_UNITS trq_ref, CTRL_UNITS trq_fbk,  CTRL_UNITS joint_vel_fbk); //
+extern CTRL_UNITS Motor_do_trq_control(Motor* o, CTRL_UNITS trq_ref, CTRL_UNITS trq_fbk,  CTRL_UNITS vel_fbk_from_joint_enc); //
 extern void Motor_update_state_fbk(Motor* o, void* state_msg); //
 extern void Motor_update_odometry_fbk_can(Motor* o, CanOdometry2FocMsg* data); //
 extern void Motor_do_calibration_hard_stop(Motor* o); //

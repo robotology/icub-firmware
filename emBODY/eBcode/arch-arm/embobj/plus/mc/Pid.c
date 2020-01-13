@@ -73,7 +73,7 @@ void PID_config(PID* o, eOmc_PID_t* config)
     o->stiction_down = rescaler*config->stiction_down_val;
 		
     o->ditheringVal = o->Kdith*EO_MAX(o->stiction_up,o->stiction_down);
-	  o->ditheringMotorVel = (float)DITHERING_MOTOR_VEL_DFLT*(float)VEL_FULLSCALE/360;
+	  o->ditheringMotorVel = (float)DITHERING_MOTOR_VEL_DFLT*(float)TICKS_PER_REVOLUTION/360;
 	  o->stictionJointVel  = (float)STICTION_JOINT_VEL_DFLT;
 
     // Further PID configuration
@@ -161,21 +161,21 @@ float PID_do_out(PID* o, float En)
     return o->out_lpf;
 }
 
-float PID_do_friction_comp(PID *o, float vel_raw_fbk, float vel_fbk, float joint_vel_fbk, float trq_ref, float trq_fbk)
+float PID_do_friction_comp(PID *o, float vel_raw_fbk, float vel_fbk, float vel_fbk_from_joint_enc, float trq_ref, float trq_fbk)
 {
     static float signDithering = 1.0f;
 	  volatile float dither,stiction,coulViscFriction,signVel,velIsPos,velIsNeg,torqIsPos,torqIsNeg;
 	  
 	  // Valid velocity for stiction and viscous friction compensation
-    if (fabsf(joint_vel_fbk)<=o->stictionJointVel)
+    if (fabsf(vel_fbk_from_joint_enc)<=o->stictionJointVel)
 		{
-			joint_vel_fbk = 0.0f;
+			vel_fbk_from_joint_enc = 0.0f;
 			vel_fbk = 0.0f;
     }
 		
 	  // vel_fbk>0 --> signVel=1;  vel_fbk<0 --> signVel=-1; vel_fbk==0 --> signVel=0;
-	  velIsNeg = (float)(joint_vel_fbk<0);
-	  velIsPos = (float)(joint_vel_fbk>0);
+	  velIsNeg = (float)(vel_fbk_from_joint_enc<0);
+	  velIsPos = (float)(vel_fbk_from_joint_enc>0);
 	  signVel = velIsPos-velIsNeg;
 	  
 	  torqIsNeg = (float)(trq_ref<0);
@@ -188,7 +188,7 @@ float PID_do_friction_comp(PID *o, float vel_raw_fbk, float vel_fbk, float joint
 	  coulViscFriction = o->Kc*signVel + o->Kbemf*vel_fbk;
 		
 		// Dithering
-    if (fabs(vel_raw_fbk)<=o->ditheringMotorVel)
+    if (fabsf(vel_raw_fbk)<=o->ditheringMotorVel)
     {
 			// unobservable joint velocity (Apply Dithering)
       dither = signDithering*(o->ditheringVal);

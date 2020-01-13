@@ -64,7 +64,6 @@ typedef struct //PID
 } PID;
 
 #define MIN_VEL_OBSERVABLE 10 /* in degrees/s */
-#define VEL_FULLSCALE 0x10000
 #define DITHERING_MOTOR_VEL_DFLT 10 /* in motor deg/s */
 #define STICTION_JOINT_VEL_DFLT 2 /* in joint deg/s */
 
@@ -78,7 +77,7 @@ extern void PID_reset(PID* o);
 extern void PID_get_state(PID* o, float *out, float *err);
 
 extern float PID_do_out(PID* o, float En);
-extern float PID_do_friction_comp(PID *o, float vel_raw_fbk, float vel_fbk, float joint_vel_fbk, float trq_ref, float trq_fbk);
+extern float PID_do_friction_comp(PID *o, float vel_raw_fbk, float vel_fbk, float vel_fbk_from_joint_enc, float trq_ref, float trq_fbk);
 
 
 #ifdef __cplusplus
