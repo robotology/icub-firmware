@@ -167,7 +167,7 @@ float PID_do_friction_comp(PID *o, float vel_raw_fbk, float vel_fbk, float vel_f
 	  volatile float dither,stiction,coulViscFriction,signVel,velIsPos,velIsNeg,torqIsPos,torqIsNeg;
 	  
 	  // Valid velocity for stiction and viscous friction compensation
-    if (fabsf(vel_fbk_from_joint_enc)<=o->stictionJointVel)
+    if (fabsf(vel_fbk_from_joint_enc/100)<=o->stictionJointVel)
 		{
 			vel_fbk_from_joint_enc = 0.0f;
 			vel_fbk = 0.0f;

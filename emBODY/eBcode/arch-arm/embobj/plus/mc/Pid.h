@@ -65,7 +65,7 @@ typedef struct //PID
 
 #define MIN_VEL_OBSERVABLE 10 /* in degrees/s */
 #define DITHERING_MOTOR_VEL_DFLT 10 /* in motor deg/s */
-#define STICTION_JOINT_VEL_DFLT 2 /* in joint deg/s */
+#define STICTION_JOINT_VEL_DFLT 3 /* in joint deg/s */
 
 PID* PID_new(uint8_t n);
 extern void PID_init(PID* o);
