@@ -21,7 +21,7 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; COPYRIGHT(c) 2017 STMicroelectronics</center></h2>
+  * <h2><center>&copy; COPYRIGHT(c) 2016 STMicroelectronics</center></h2>
   *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted provided that the following conditions are met:
@@ -49,8 +49,8 @@
   */
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __STM32L4xx_LL_CORTEX_H
-#define __STM32L4xx_LL_CORTEX_H
+#ifndef STM32L4xx_LL_CORTEX_H
+#define STM32L4xx_LL_CORTEX_H
 
 #ifdef __cplusplus
 extern "C" {
@@ -650,6 +650,6 @@ __STATIC_INLINE void LL_MPU_DisableRegion(uint32_t Region)
 }
 #endif
 
-#endif /* __STM32L4xx_LL_CORTEX_H */
+#endif /* STM32L4xx_LL_CORTEX_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

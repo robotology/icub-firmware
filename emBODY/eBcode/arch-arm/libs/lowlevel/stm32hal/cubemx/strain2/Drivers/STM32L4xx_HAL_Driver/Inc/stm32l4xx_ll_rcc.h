@@ -6,29 +6,13 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; COPYRIGHT(c) 2017 STMicroelectronics</center></h2>
+  * <h2><center>&copy; Copyright (c) 2017 STMicroelectronics.
+  * All rights reserved.</center></h2>
   *
-  * Redistribution and use in source and binary forms, with or without modification,
-  * are permitted provided that the following conditions are met:
-  *   1. Redistributions of source code must retain the above copyright notice,
-  *      this list of conditions and the following disclaimer.
-  *   2. Redistributions in binary form must reproduce the above copyright notice,
-  *      this list of conditions and the following disclaimer in the documentation
-  *      and/or other materials provided with the distribution.
-  *   3. Neither the name of STMicroelectronics nor the names of its contributors
-  *      may be used to endorse or promote products derived from this software
-  *      without specific prior written permission.
-  *
-  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  * This software component is licensed by ST under BSD 3-Clause license,
+  * the "License"; You may not use this file except in compliance with the
+  * License. You may obtain a copy of the License at:
+  *                        opensource.org/licenses/BSD-3-Clause
   *
   ******************************************************************************
   */
@@ -2419,7 +2403,7 @@ __STATIC_INLINE void LL_RCC_LSE_EnablePropagation(void)
   */
 __STATIC_INLINE uint32_t LL_RCC_LSE_IsPropagationEnabled(void)
 {
-  return (READ_BIT(RCC->BDCR, RCC_BDCR_LSESYSDIS) == 0x0);
+  return ((READ_BIT(RCC->BDCR, RCC_BDCR_LSESYSDIS) == 0U) ? 1UL : 0UL);
 }
 #endif /* RCC_BDCR_LSESYSDIS */
 /**
@@ -3528,7 +3512,8 @@ __STATIC_INLINE uint32_t LL_RCC_GetADCClockSource(uint32_t ADCx)
 #if defined(RCC_CCIPR_ADCSEL)
   return (uint32_t)(READ_BIT(RCC->CCIPR, ADCx));
 #else
-  return ((READ_BIT(RCC->AHB2ENR, RCC_AHB2ENR_ADCEN) != RESET) ? LL_RCC_ADC_CLKSOURCE_SYSCLK : LL_RCC_ADC_CLKSOURCE_NONE);
+  (void)ADCx;  /* unused */
+  return ((READ_BIT(RCC->AHB2ENR, RCC_AHB2ENR_ADCEN) != 0U) ? LL_RCC_ADC_CLKSOURCE_SYSCLK : LL_RCC_ADC_CLKSOURCE_NONE);
 #endif /* RCC_CCIPR_ADCSEL */
 }
 
@@ -5378,7 +5363,39 @@ __STATIC_INLINE void LL_RCC_PLLSAI2_DisableDomain_ADC(void)
   */
 #endif /* RCC_PLLSAI2_SUPPORT */
 
+#if defined(OCTOSPI1)
+/** @defgroup RCC_LL_EF_OCTOSPI OCTOSPI
+  * @{
+  */
 
+/**
+  * @brief  Configure OCTOSPI1 DQS delay
+  * @rmtoll DLYCFGR           OCTOSPI1_DLY     LL_RCC_OCTOSPI1_DelayConfig
+  * @param  Delay OCTOSPI1 DQS delay between 0 and 15
+  * @retval None
+  */
+__STATIC_INLINE void LL_RCC_OCTOSPI1_DelayConfig(uint32_t Delay)
+{
+  MODIFY_REG(RCC->DLYCFGR, RCC_DLYCFGR_OCTOSPI1_DLY, Delay);
+}
+
+#if defined(OCTOSPI2)
+/**
+  * @brief  Configure OCTOSPI2 DQS delay
+  * @rmtoll DLYCFGR           OCTOSPI2_DLY     LL_RCC_OCTOSPI2_DelayConfig
+  * @param  Delay OCTOSPI2 DQS delay between 0 and 15
+  * @retval None
+  */
+__STATIC_INLINE void LL_RCC_OCTOSPI2_DelayConfig(uint32_t Delay)
+{
+  MODIFY_REG(RCC->DLYCFGR, RCC_DLYCFGR_OCTOSPI2_DLY, (Delay << RCC_DLYCFGR_OCTOSPI2_DLY_Pos));
+}
+#endif /* OCTOSPI2 */
+
+/**
+  * @}
+  */
+#endif /* OCTOSPI1 */
 
 /** @defgroup RCC_LL_EF_FLAG_Management FLAG Management
   * @{

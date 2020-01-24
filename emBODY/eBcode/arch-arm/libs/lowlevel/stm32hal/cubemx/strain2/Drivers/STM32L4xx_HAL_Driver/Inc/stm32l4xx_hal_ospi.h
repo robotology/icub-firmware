@@ -6,29 +6,13 @@
   ******************************************************************************
   * @attention
   *
-  * <h2><center>&copy; COPYRIGHT(c) 2018 STMicroelectronics</center></h2>
+  * <h2><center>&copy; Copyright (c) 2018 STMicroelectronics.
+  * All rights reserved.</center></h2>
   *
-  * Redistribution and use in source and binary forms, with or without modification,
-  * are permitted provided that the following conditions are met:
-  *   1. Redistributions of source code must retain the above copyright notice,
-  *      this list of conditions and the following disclaimer.
-  *   2. Redistributions in binary form must reproduce the above copyright notice,
-  *      this list of conditions and the following disclaimer in the documentation
-  *      and/or other materials provided with the distribution.
-  *   3. Neither the name of STMicroelectronics nor the names of its contributors
-  *      may be used to endorse or promote products derived from this software
-  *      without specific prior written permission.
-  *
-  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
-  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
-  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  * This software component is licensed by ST under BSD 3-Clause license,
+  * the "License"; You may not use this file except in compliance with the
+  * License. You may obtain a copy of the License at:
+  *                       opensource.org/licenses/BSD-3-Clause
   *
   ******************************************************************************
   */
@@ -64,7 +48,7 @@
   */
 typedef struct
 {
-  uint32_t FifoThreshold;             /* This is the threshold used byt the IP to generate the interrupt
+  uint32_t FifoThreshold;             /* This is the threshold used by the Peripheral to generate the interrupt
                                          indicating that data are available in reception or free place
                                          is available in transmission.
                                          This parameter can be a value between 1 and 32 */
@@ -97,19 +81,28 @@ typedef struct
   uint32_t ChipSelectBoundary;        /* It enables the transaction boundary feature and
                                          defines the boundary of bytes to release the chip select.
                                          This parameter can be a value between 0 and 31 */
+#if   defined (OCTOSPI_DCR4_REFRESH)
+  uint32_t Refresh;                   /* It enables the refresh rate feature. The chip select is released every
+                                         Refresh+1 clock cycles.
+                                         This parameter can be a value between 0 and 0xFFFFFFFF */
+#endif
 }OSPI_InitTypeDef;
 
 /**
   * @brief  HAL OSPI Handle Structure definition
   */
+#if defined (USE_HAL_OSPI_REGISTER_CALLBACKS) && (USE_HAL_OSPI_REGISTER_CALLBACKS == 1U)
 typedef struct __OSPI_HandleTypeDef
+#else
+typedef struct
+#endif
 {
   OCTOSPI_TypeDef            *Instance;     /* OSPI registers base address                      */
   OSPI_InitTypeDef           Init;          /* OSPI initialization parameters                   */
   uint8_t                    *pBuffPtr;     /* Address of the OSPI buffer for transfer          */
   __IO uint32_t              XferSize;      /* Number of data to transfer                       */
   __IO uint32_t              XferCount;     /* Counter of data transferred                      */
-  DMA_HandleTypeDef          *hdma;         /* Handle of the DMA channel used for the transfer  */
+  DMA_HandleTypeDef     *hdma;    /* Handle of the DMA channel used for the transfer  */
   __IO uint32_t              State;         /* Internal state of the OSPI HAL driver            */
   __IO uint32_t              ErrorCode;     /* Error code in case of HAL driver internal error  */
   uint32_t                   Timeout;       /* Timeout used for the OSPI external device access */
@@ -258,6 +251,11 @@ typedef struct
                                       This parameter can be a value of @ref OSPIM_IOPort */
   uint32_t IOHighPort;             /* It indicates which port of the OSPI IO Manager is used for the IO[7:4] pins.
                                       This parameter can be a value of @ref OSPIM_IOPort */
+#if defined (OCTOSPIM_CR_MUXEN)
+  uint32_t Req2AckTime;            /* It indicates the minimum switching duration (in number of clock cycles) expected 
+                                      if some signals are multiplexed in the OSPI IO Manager with the other OSPI.
+                                      This parameter can be a value between 1 and 256 */
+#endif
 }OSPIM_CfgTypeDef;
 
 #if defined (USE_HAL_OSPI_REGISTER_CALLBACKS) && (USE_HAL_OSPI_REGISTER_CALLBACKS == 1U)
@@ -662,7 +660,7 @@ typedef void (*pOSPI_CallbackTypeDef)(OSPI_HandleTypeDef *hospi);
   * @{
   */
 /** @brief Reset OSPI handle state.
-  * @param  __HANDLE__: OSPI handle.
+  * @param  __HANDLE__ OSPI handle.
   * @retval None
   */
 #if defined (USE_HAL_OSPI_REGISTER_CALLBACKS) && (USE_HAL_OSPI_REGISTER_CALLBACKS == 1U)
@@ -676,20 +674,20 @@ typedef void (*pOSPI_CallbackTypeDef)(OSPI_HandleTypeDef *hospi);
 #endif
 
 /** @brief  Enable the OSPI peripheral.
-  * @param  __HANDLE__: specifies the OSPI Handle.
+  * @param  __HANDLE__ specifies the OSPI Handle.
   * @retval None
   */
 #define __HAL_OSPI_ENABLE(__HANDLE__)                       SET_BIT((__HANDLE__)->Instance->CR, OCTOSPI_CR_EN)
 
 /** @brief  Disable the OSPI peripheral.
-  * @param  __HANDLE__: specifies the OSPI Handle.
+  * @param  __HANDLE__ specifies the OSPI Handle.
   * @retval None
   */
 #define __HAL_OSPI_DISABLE(__HANDLE__)                      CLEAR_BIT((__HANDLE__)->Instance->CR, OCTOSPI_CR_EN)
 
 /** @brief  Enable the specified OSPI interrupt.
-  * @param  __HANDLE__: specifies the OSPI Handle.
-  * @param  __INTERRUPT__: specifies the OSPI interrupt source to enable.
+  * @param  __HANDLE__ specifies the OSPI Handle.
+  * @param  __INTERRUPT__ specifies the OSPI interrupt source to enable.
   *          This parameter can be one of the following values:
   *            @arg HAL_OSPI_IT_TO: OSPI Timeout interrupt
   *            @arg HAL_OSPI_IT_SM: OSPI Status match interrupt
@@ -702,8 +700,8 @@ typedef void (*pOSPI_CallbackTypeDef)(OSPI_HandleTypeDef *hospi);
 
 
 /** @brief  Disable the specified OSPI interrupt.
-  * @param  __HANDLE__: specifies the OSPI Handle.
-  * @param  __INTERRUPT__: specifies the OSPI interrupt source to disable.
+  * @param  __HANDLE__ specifies the OSPI Handle.
+  * @param  __INTERRUPT__ specifies the OSPI interrupt source to disable.
   *          This parameter can be one of the following values:
   *            @arg HAL_OSPI_IT_TO: OSPI Timeout interrupt
   *            @arg HAL_OSPI_IT_SM: OSPI Status match interrupt
@@ -715,8 +713,8 @@ typedef void (*pOSPI_CallbackTypeDef)(OSPI_HandleTypeDef *hospi);
 #define __HAL_OSPI_DISABLE_IT(__HANDLE__, __INTERRUPT__)    CLEAR_BIT((__HANDLE__)->Instance->CR, (__INTERRUPT__))
 
 /** @brief  Check whether the specified OSPI interrupt source is enabled or not.
-  * @param  __HANDLE__: specifies the OSPI Handle.
-  * @param  __INTERRUPT__: specifies the OSPI interrupt source to check.
+  * @param  __HANDLE__ specifies the OSPI Handle.
+  * @param  __INTERRUPT__ specifies the OSPI interrupt source to check.
   *          This parameter can be one of the following values:
   *            @arg HAL_OSPI_IT_TO: OSPI Timeout interrupt
   *            @arg HAL_OSPI_IT_SM: OSPI Status match interrupt
@@ -729,8 +727,8 @@ typedef void (*pOSPI_CallbackTypeDef)(OSPI_HandleTypeDef *hospi);
 
 /**
   * @brief  Check whether the selected OSPI flag is set or not.
-  * @param  __HANDLE__: specifies the OSPI Handle.
-  * @param  __FLAG__: specifies the OSPI flag to check.
+  * @param  __HANDLE__ specifies the OSPI Handle.
+  * @param  __FLAG__ specifies the OSPI flag to check.
   *          This parameter can be one of the following values:
   *            @arg HAL_OSPI_FLAG_BUSY: OSPI Busy flag
   *            @arg HAL_OSPI_FLAG_TO:   OSPI Timeout flag
@@ -743,8 +741,8 @@ typedef void (*pOSPI_CallbackTypeDef)(OSPI_HandleTypeDef *hospi);
 #define __HAL_OSPI_GET_FLAG(__HANDLE__, __FLAG__)           ((READ_BIT((__HANDLE__)->Instance->SR, (__FLAG__)) != 0U) ? SET : RESET)
 
 /** @brief  Clears the specified OSPI's flag status.
-  * @param  __HANDLE__: specifies the OSPI Handle.
-  * @param  __FLAG__: specifies the OSPI clear register flag that needs to be set
+  * @param  __HANDLE__ specifies the OSPI Handle.
+  * @param  __FLAG__ specifies the OSPI clear register flag that needs to be set
   *          This parameter can be one of the following values:
   *            @arg HAL_OSPI_FLAG_TO:   OSPI Timeout flag
   *            @arg HAL_OSPI_FLAG_SM:   OSPI Status match flag
@@ -912,8 +910,8 @@ HAL_StatusTypeDef     HAL_OSPIM_Config              (OSPI_HandleTypeDef *hospi, 
                                             ((TYPE) == HAL_OSPI_OPTYPE_READ_CFG)   || \
                                             ((TYPE) == HAL_OSPI_OPTYPE_WRITE_CFG))
 
-#define IS_OSPI_FLASH_ID(FLASH)            (((FLASH) == HAL_OSPI_FLASH_ID_1) || \
-                                            ((FLASH) == HAL_OSPI_FLASH_ID_2))
+#define IS_OSPI_FLASH_ID(FLASHID)          (((FLASHID) == HAL_OSPI_FLASH_ID_1) || \
+                                            ((FLASHID) == HAL_OSPI_FLASH_ID_2))
 
 #define IS_OSPI_INSTRUCTION_MODE(MODE)     (((MODE) == HAL_OSPI_INSTRUCTION_NONE)    || \
                                             ((MODE) == HAL_OSPI_INSTRUCTION_1_LINE)  || \
@@ -1012,6 +1010,10 @@ HAL_StatusTypeDef     HAL_OSPIM_Config              (OSPI_HandleTypeDef *hospi, 
                                             ((PORT) == HAL_OSPIM_IOPORT_1_HIGH) || \
                                             ((PORT) == HAL_OSPIM_IOPORT_2_LOW)  || \
                                             ((PORT) == HAL_OSPIM_IOPORT_2_HIGH))
+
+#if defined (OCTOSPIM_CR_MUXEN)
+#define IS_OSPIM_REQ2ACKTIME(TIME)          ((TIME >= 1) && (TIME <= 256))
+#endif
 /**
   @endcond
   */
