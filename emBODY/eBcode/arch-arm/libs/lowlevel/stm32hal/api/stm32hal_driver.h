@@ -42,30 +42,32 @@ extern "C" {
     #if !defined(STM32HAL_DRIVER_V172)
         #define STM32HAL_DRIVER_V172
     #endif
-    #define STM32HAL_DRIVER_VERSION 172
+    #define STM32HAL_DRIVER_VERSION 0x172
     
 #elif   defined(STM32HAL_BOARD_MTB4)
 
 // two possible drivers. default is the 190 ...
     #if     defined(STM32HAL_DRIVER_V172)    
-        #define STM32HAL_DRIVER_VERSION 172  
+        #define STM32HAL_DRIVER_VERSION 0x172  
     #else   
         #if !defined(STM32HAL_DRIVER_V190)
             #define STM32HAL_DRIVER_V190
         #endif        
-        #define STM32HAL_DRIVER_VERSION 190   
+        #define STM32HAL_DRIVER_VERSION 0x190   
     #endif
     
 #elif   defined(STM32HAL_BOARD_STRAIN2)
 
-    // two possible drivers. default is the 190 ...
+    // three possible drivers. default is the 1B0 ...
     #if     defined(STM32HAL_DRIVER_V172)    
-        #define STM32HAL_DRIVER_VERSION 172  
+        #define STM32HAL_DRIVER_VERSION 0x172  
+    #elif   defined(STM32HAL_DRIVER_V190)
+        #define STM32HAL_DRIVER_VERSION 0x190
     #else   
-        #if !defined(STM32HAL_DRIVER_V190)
-            #define STM32HAL_DRIVER_V190
+        #if !defined(STM32HAL_DRIVER_V1B0)
+            #define STM32HAL_DRIVER_V1B0
         #endif        
-        #define STM32HAL_DRIVER_VERSION 190   
+        #define STM32HAL_DRIVER_VERSION 0x1B0   
     #endif
     
 #elif   defined(STM32HAL_BOARD_RFE)
@@ -74,7 +76,7 @@ extern "C" {
     #if !defined(STM32HAL_DRIVER_V183)
         #define STM32HAL_DRIVER_V183
     #endif
-    #define STM32HAL_DRIVER_VERSION 183
+    #define STM32HAL_DRIVER_VERSION 0x183
     
 #elif   defined(STM32HAL_BOARD_PSC)
 
@@ -82,7 +84,7 @@ extern "C" {
     #if !defined(STM32HAL_DRIVER_V190)
         #define STM32HAL_DRIVER_V190
     #endif
-    #define STM32HAL_DRIVER_VERSION 190
+    #define STM32HAL_DRIVER_VERSION 0x190
       
 #elif   defined(STM32HAL_BOARD_SG3)
 
@@ -90,7 +92,7 @@ extern "C" {
     #if !defined(STM32HAL_DRIVER_V190)
         #define STM32HAL_DRIVER_V190
     #endif
-    #define STM32HAL_DRIVER_VERSION 190
+    #define STM32HAL_DRIVER_VERSION 0x190
       
 
 #else
@@ -100,7 +102,7 @@ extern "C" {
 
 // now extra code-shaping macros which depend on the driver version
 
-#if (STM32HAL_DRIVER_VERSION >= 183)
+#if (STM32HAL_DRIVER_VERSION >= 0x183)
     // there is a new api for can
     #if !defined(USE_HAL_CAN_REGISTER_CALLBACKS)
     #define USE_HAL_CAN_REGISTER_CALLBACKS 1
@@ -116,6 +118,8 @@ extern "C" {
     #include "../src/driver/stm32l4-v183/inc/stm32l4xx_hal.h"
 #elif   defined(STM32HAL_DRIVER_V190)        
     #include "../src/driver/stm32l4-v190/inc/stm32l4xx_hal.h"
+#elif   defined(STM32HAL_DRIVER_V1B0)        
+    #include "../src/driver/stm32l4-v1B0/inc/stm32l4xx_hal.h"
 #else
     #error STM32HAL: the STM32HAL_DRIVER_${VER} is not managed
 #endif

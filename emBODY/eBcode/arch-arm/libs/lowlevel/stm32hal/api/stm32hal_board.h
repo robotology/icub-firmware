@@ -52,7 +52,7 @@ extern void stm32hal_board_init(void);
 #if     defined(STM32HAL_BOARD_NUCLEO64)
 
     // one version only: v172
-    #if (STM32HAL_DRIVER_VERSION == 172)
+    #if (STM32HAL_DRIVER_VERSION == 0x172)
 
         #include "../src/config/stm32hal_driver_cfg_of_nucleo64.h"
 
@@ -67,7 +67,7 @@ extern void stm32hal_board_init(void);
 #elif   defined(STM32HAL_BOARD_MTB4)
 
     // one version only: v172
-    #if (STM32HAL_DRIVER_VERSION == 172)
+    #if (STM32HAL_DRIVER_VERSION == 0x172)
 
         #include "../src/config/stm32hal_driver_cfg_of_mtb4.h"
 
@@ -84,7 +84,7 @@ extern void stm32hal_board_init(void);
 
         #include "../src/board/mtb4/v172/inc/stm32l4xx_it.h"
         
-    #elif(STM32HAL_DRIVER_VERSION == 190)
+    #elif(STM32HAL_DRIVER_VERSION == 0x190)
 
         #include "../src/config/stm32hal_driver_cfg_of_mtb4_v190.h"
 
@@ -107,8 +107,8 @@ extern void stm32hal_board_init(void);
 
 #elif   defined(STM32HAL_BOARD_STRAIN2)	
 
-    // two cases: v172 and v190
-    #if (STM32HAL_DRIVER_VERSION == 172)
+    // three cases: v172, v190, v1B0
+    #if (STM32HAL_DRIVER_VERSION == 0x172)
 
         #include "../src/config/stm32hal_driver_cfg_of_strain2.h"
 
@@ -124,7 +124,7 @@ extern void stm32hal_board_init(void);
 
         #include "../src/board/strain2/v172/inc/stm32l4xx_it.h"
 
-    #elif(STM32HAL_DRIVER_VERSION == 190)
+    #elif(STM32HAL_DRIVER_VERSION == 0x190)
 
         #include "../src/config/stm32hal_driver_cfg_of_strain2_v190.h"
 
@@ -140,6 +140,22 @@ extern void stm32hal_board_init(void);
 
         #include "../src/board/strain2/v190/inc/stm32l4xx_it.h"
 
+    #elif(STM32HAL_DRIVER_VERSION == 0x1B0)
+
+        #include "../src/config/stm32hal_driver_cfg_of_strain2_v1B0.h"
+
+        #include "../src/board/strain2/v1B0/inc/adc.h"
+        #include "../src/board/strain2/v1B0/inc/can.h"
+        #include "../src/board/strain2/v1B0/inc/dma.h"
+        #include "../src/board/strain2/v1B0/inc/gpio.h"
+        #include "../src/board/strain2/v1B0/inc/i2c.h"
+        #include "../src/board/strain2/v1B0/inc/main.h"
+        #include "../src/board/strain2/v1B0/inc/rng.h"
+        #include "../src/board/strain2/v1B0/inc/tim.h"
+        #include "../src/board/strain2/v1B0/inc/usart.h"
+
+        #include "../src/board/strain2/v1B0/inc/stm32l4xx_it.h"
+
     #else
         #error unsupported driver version for strain2
     #endif
@@ -148,7 +164,7 @@ extern void stm32hal_board_init(void);
 #elif   defined(STM32HAL_BOARD_PSC)	
 
 // one case only: v190
-    #if (STM32HAL_DRIVER_VERSION == 190)
+    #if (STM32HAL_DRIVER_VERSION == 0x190)
 
         #include "../src/config/stm32hal_driver_cfg_of_psc_v190.h"
         
@@ -170,7 +186,7 @@ extern void stm32hal_board_init(void);
 #elif   defined(STM32HAL_BOARD_RFE) 
 
     // one case only: v183
-    #if (STM32HAL_DRIVER_VERSION == 183)
+    #if (STM32HAL_DRIVER_VERSION == 0x183)
 
         #include "../src/config/stm32hal_driver_cfg_of_rfe.h"
 
@@ -193,7 +209,7 @@ extern void stm32hal_board_init(void);
 #elif   defined(STM32HAL_BOARD_SG3) 
 
     // one case only: v190
-    #if (STM32HAL_DRIVER_VERSION == 190)
+    #if (STM32HAL_DRIVER_VERSION == 0x190)
 
         #include "../src/config/stm32hal_driver_cfg_of_sg3_v190.h"
 
