@@ -259,7 +259,7 @@ H.  Use the library in a sample application named ${appl} by:
     - Add in file src/config/stm32hal_driver_cfg.h a section for STM32HAL_BOARD_${BRD} and STM32HAL_DRIVER_VERSION
       which includes the file stm32hal_driver_cfg_of_${brd}_${stmdriverversion}.h 
     - Edit the file stm32hal_driver_cfg_of_${brd}_${stmdriverversion}.h following instructions on the inside of 
-      similar file (e.g., stm32hal_driver_cfg_of_strain2_v190.h). basically you must include in it inside the 
+      similar file (e.g., stm32hal_driver_cfg_of_strain2_v190.h). basically you must include in its inside the 
       file stm32l4xx_hal_conf.h which cubemx has generated and placed into its Inc folder.
 
 
