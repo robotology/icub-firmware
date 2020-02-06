@@ -33,7 +33,11 @@ void MX_CAN1_Init(void)
 {
 
   hcan1.Instance = CAN1;
+#if defined(CPU_AT_80MHZ)
+  hcan1.Init.Prescaler = 10;
+#else  
   hcan1.Init.Prescaler = 2;
+#endif
   hcan1.Init.Mode = CAN_MODE_NORMAL;
   hcan1.Init.SyncJumpWidth = CAN_SJW_1TQ;
   hcan1.Init.TimeSeg1 = CAN_BS1_2TQ;
