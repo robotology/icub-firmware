@@ -99,7 +99,7 @@ embot::app::theApplication::~theApplication() { }
     
     if(pImpl->config.initbsp)
     {
-        embot::hw::bsp::Config cc(embot::sys::now);
+        embot::hw::bsp::Config cc(nullptr, embot::sys::now);
         embot::hw::bsp::init(cc);
     }
     

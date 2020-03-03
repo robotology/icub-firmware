@@ -22,6 +22,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "embot_hw_gpio.h"
+#include "embot_hw_bsp_config.h"
 #include "stm32hal.h"
 
 
@@ -35,6 +36,7 @@
 using namespace std;
 
 #include "embot_hw_bsp.h"
+#include "embot_hw_bsp_config.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -49,14 +51,18 @@ using namespace std;
 
 using namespace embot::hw;
 
+#if !defined(HAL_GPIO_MODULE_ENABLED) || !defined(EMBOT_ENABLE_hw_gpio)
+
 namespace embot { namespace hw { namespace gpio {
 
-#if     !defined(HAL_GPIO_MODULE_ENABLED)
-
-    result_t configure(const embot::hw::stm32GPIO &g, Mode m)      { return resNOK; }      
-    result_t set(const embot::hw::stm32GPIO &g, State s)        { return resNOK; }
+    result_t configure(const embot::hw::stm32GPIO &g, Mode m) { return resNOK; }      
+    result_t set(const embot::hw::stm32GPIO &g, State s) { return resNOK; }
     
-#else    
+}}}
+    
+#else  
+
+namespace embot { namespace hw { namespace gpio {
     
     
     result_t configure(const embot::hw::bsp::gpio::PROP &g, Mode m);    
@@ -163,11 +169,10 @@ namespace embot { namespace hw { namespace gpio {
         return static_cast<State>(s);        
     }
     
-#endif
        
 }}} // namespace embot { namespace hw { namespace gpio     
 
-
+#endif // !defined(HAL_GPIO_MODULE_ENABLED) || !defined(EMBOT_ENABLE_hw_gpio)
 
     
 

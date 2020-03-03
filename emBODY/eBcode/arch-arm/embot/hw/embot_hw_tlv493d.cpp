@@ -38,6 +38,7 @@ using namespace std;
 
 #include "embot_binary.h"
 #include "embot_hw_sys.h"
+#include "embot_hw_bsp_config.h"
 
 #include <math.h>
 
@@ -78,24 +79,25 @@ using namespace embot::hw;
 // - all the rest
 // --------------------------------------------------------------------------------------------------------------------
 
-#define EMBOT_TLV493D_ENABLED
 
-#if     !defined(EMBOT_TLV493D_ENABLED)
-
+#if !defined(EMBOT_ENABLE_hw_tlv493d)
 
 namespace embot { namespace hw { namespace tlv493d {
 
-    bool supported(TLV493D h)                                                                        { return false; }
-    bool initialised(TLV493D h)                                                                      { return false; }
-    result_t init(TLV493D h, const Config &config)                                                   { return resNOK; }
-    
-    result_t get(TLV493D h, Position &temp)                                                       { return resNOK; }
+    bool supported(TLV493D h) { return false; }
+    bool initialised(TLV493D h) { return false; }
+    result_t init(TLV493D h, const Config &config) { return resNOK; }    
+    bool isalive(embot::hw::TLV493D h, embot::common::relTime timeout) { return false; }
+    bool isacquiring(embot::hw::TLV493D h) { return false; }
+    bool canacquire(embot::hw::TLV493D h) { return false; }    
+    result_t acquisition(embot::hw::TLV493D h, const embot::common::Callback &oncompletion) { return resNOK; }
+    bool operationdone(embot::hw::TLV493D h) { return false; }
+    result_t read(embot::hw::TLV493D h, Position &temp) { return resNOK; }    
 
 }}} // namespace embot { namespace hw { namespace TLV493D {
 
 
-#elif   defined(EMBOT_TLV493D_ENABLED)
-
+#else
 
 namespace embot { namespace hw { namespace tlv493d {
               

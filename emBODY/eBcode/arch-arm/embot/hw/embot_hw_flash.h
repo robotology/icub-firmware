@@ -26,17 +26,9 @@
 #include "embot_hw.h"
 
 namespace embot { namespace hw { namespace flash {
-    
-    struct Partition
-    {
-        std::uint32_t   address;
-        std::uint32_t   maxsize; 
-        std::uint32_t   pagesize; 
-        bool isvalid() const { if((0 == address) || (0 == maxsize) || (0 == pagesize)) { return false; } else { return true; } }
-    }; 
-    
+        
    
-    const Partition& getpartition(embot::hw::FLASH fl);
+    const embot::hw::Partition& getpartition(embot::hw::FLASH fl);
     
     // the following functions use embot::hw::FLASH::whole
     

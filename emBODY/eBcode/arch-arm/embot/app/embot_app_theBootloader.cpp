@@ -34,6 +34,7 @@
 #include "embot_hw.h"
 #include "embot_hw_sys.h"
 #include "embot_hw_bsp.h"
+#include "embot_hw_flash.h"
 #include "embot.h"
 #include "osal.h"
 
@@ -164,7 +165,7 @@ embot::app::theBootloader::evalRes embot::app::theBootloader::eval()
     pImpl->config = config;
     
     // now we init the hw, we start the scheduler at 1 ms, we start a countdown with sys restart at the end ... we exec the activity ...
-    embot::hw::bsp::Config cc(embot::sys::now);
+    embot::hw::bsp::Config cc(nullptr, embot::sys::now);
     embot::hw::bsp::init(cc);
              
     static const embot::sys::InitTask::Config initconfig { 4*2048, embot::app::theBootloader::Impl::init, nullptr };

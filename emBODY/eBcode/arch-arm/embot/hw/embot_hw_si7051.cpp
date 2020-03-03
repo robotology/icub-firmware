@@ -32,6 +32,7 @@
 #include <vector>
 #include "stm32hal.h"
 #include "embot_hw_bsp.h"
+#include "embot_hw_bsp_config.h"
 
 using namespace std;
 
@@ -50,24 +51,25 @@ using namespace embot::hw;
 // - all the rest
 // --------------------------------------------------------------------------------------------------------------------
 
-#define EMBOT_SI7051_ENABLED
 
-#if     !defined(EMBOT_SI7051_ENABLED)
-
+#if !defined(EMBOT_ENABLE_hw_si7051)
 
 namespace embot { namespace hw { namespace si7051 {
 
     bool supported(SI7051 s)                                                                        { return false; }
     bool initialised(SI7051 s)                                                                      { return false; }
-    result_t init(SI7051 s, const Config &config)                                                   { return resNOK; }
-    
-    result_t get(SI7051 s, Temperature &temp)                                                       { return resNOK; }
+    result_t init(SI7051 s, const Config &config)                                                   { return resNOK; }    
+    bool isalive(embot::hw::SI7051 s, embot::common::relTime timeout)                               { return false; }    
+    bool isacquiring(embot::hw::SI7051 s)                                                           { return false; }    
+    bool canacquire(embot::hw::SI7051 s)                                                            { return false; }        
+    result_t acquisition(embot::hw::SI7051 s, const embot::common::Callback &oncompletion)          { return resNOK; }
+    bool operationdone(embot::hw::SI7051 s)                                                         { return false; }
+    result_t read(embot::hw::SI7051 s, Temperature &temp)                                           { return resNOK; }   
 
 }}} // namespace embot { namespace hw { namespace SI7051 {
 
 
-#elif   defined(EMBOT_SI7051_ENABLED)
-
+#else
 
 namespace embot { namespace hw { namespace si7051 {
               

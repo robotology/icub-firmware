@@ -25,8 +25,11 @@
 
 
 namespace embot { namespace sys {
+        
+    // tells is the sys already started: aka object embot::sys::theScheduler is started, aka the rtos is active.
+    bool started();
 
-    // tells time in us since bootstrap
+    // tells time in us since bootstrap. gives a valid number only if sys already started.
     common::Time now();
         
     enum class Priority : std::uint8_t {
@@ -45,9 +48,6 @@ namespace embot { namespace sys {
         std::uint8_t v = embot::common::tointegral(prio);
         return ((v >= embot::common::tointegral(Priority::systemMIN)) && (v <= embot::common::tointegral(Priority::systemMAX))) ? true : false;       
     }        
-
-     
-
     
 }} // namespace embot { namespace sys {
 

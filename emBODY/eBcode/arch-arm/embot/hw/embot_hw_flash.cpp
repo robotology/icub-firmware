@@ -31,6 +31,7 @@
 
 #include "stm32hal.h"
 #include "embot_hw_bsp.h"
+#include "embot_hw_bsp_config.h"
 
 using namespace std;
 
@@ -56,7 +57,7 @@ namespace embot { namespace hw { namespace flash {
     
     bool isaddressvalid(std::uint32_t address)
     {
-        const embot::hw::flash::Partition &part = embot::hw::flash::getpartition(embot::hw::FLASH::whole);
+        const embot::hw::Partition &part = embot::hw::flash::getpartition(embot::hw::FLASH::whole);
         if((address >= part.address) && (address < (part.address+part.maxsize)))
         {
             return true;
@@ -66,7 +67,7 @@ namespace embot { namespace hw { namespace flash {
     
     std::uint32_t address2page(std::uint32_t address)
     {
-        const embot::hw::flash::Partition &part = embot::hw::flash::getpartition(embot::hw::FLASH::whole);
+        const embot::hw::Partition &part = embot::hw::flash::getpartition(embot::hw::FLASH::whole);
             
         if(false == isaddressvalid(address))
         {
@@ -80,7 +81,7 @@ namespace embot { namespace hw { namespace flash {
     
     bool erase(std::uint32_t page)
     {
-        const embot::hw::flash::Partition &part = embot::hw::flash::getpartition(embot::hw::FLASH::whole);
+        const embot::hw::Partition &part = embot::hw::flash::getpartition(embot::hw::FLASH::whole);
         const std::uint32_t maxNumOfPAGEs = part.maxsize/part.pagesize;
         if(page >= maxNumOfPAGEs)
         {
@@ -171,7 +172,7 @@ namespace embot { namespace hw { namespace flash {
             return false;
         }
 
-        const embot::hw::flash::Partition part = embot::hw::flash::getpartition(embot::hw::FLASH::whole);
+        const embot::hw::Partition part = embot::hw::flash::getpartition(embot::hw::FLASH::whole);
         
         HAL_FLASH_Unlock();
     

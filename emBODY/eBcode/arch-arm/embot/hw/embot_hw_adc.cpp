@@ -34,6 +34,7 @@ using namespace std;
 
 #include "embot_binary.h"
 #include "embot_hw_bsp.h"
+#include "embot_hw_bsp_config.h"
 #include "stm32hal.h"
 
 
@@ -48,9 +49,8 @@ using namespace std;
 // - all the rest
 // --------------------------------------------------------------------------------------------------------------------
 
-#if     !defined(HAL_ADC_MODULE_ENABLED)
 
-
+#if !defined(HAL_ADC_MODULE_ENABLED) || !defined(EMBOT_ENABLE_hw_adc)
 
 // in here we manage the case of no can module being present in stm32hal
 

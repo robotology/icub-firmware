@@ -32,6 +32,7 @@
 #include "stm32hal.h"
 #include "embot_hw_sys.h"
 #include "embot_hw_bsp.h"
+#include "embot_hw_bsp_config.h"
 
 #include <cstring>
 #include <vector>
@@ -53,7 +54,7 @@ using namespace std;
 using namespace embot::hw;
 
     
-#if     !defined(HAL_TIM_MODULE_ENABLED)
+#if !defined(HAL_TIM_MODULE_ENABLED) || !defined(EMBOT_ENABLE_hw_timer)
 
 namespace embot { namespace hw { namespace timer {
     
@@ -68,11 +69,24 @@ namespace embot { namespace hw { namespace timer {
 
 #else
 
+#if defined(STM32HAL_STM32H7)
+#error pls verify embot::hw::timer for STM32H7 
+#endif
+
 // there are two parts: 
 // 1. the cpp driver under namespace embot::hw::onewire
 // 2. the functions which stm library required to be redefined: IRQ handlers and callbacks 
 
 // the implementation uses just a few timers: TIM6 and TIM7 which are compacted in a small array
+
+void hal_error_handler()
+{
+#if defined(STM32HAL_STM32L4) && (STM32HAL_DRIVER_VERSION >= 0x190)
+    Error_Handler();
+#elif defined(STM32HAL_STM32H7)
+    Error_Handler();
+#endif
+}
  
 namespace embot { namespace hw { namespace timer {
         
@@ -158,10 +172,10 @@ namespace embot { namespace hw { namespace timer {
 
     }        
 
-#if (STM32HAL_DRIVER_VERSION >= 183)    
-    #warning look at the differences with the timer config. 
-    // so far only TIM6 is guaranteed to work. also ... the callbacks now are embedded in stm32 ... 
-#endif    
+//#if (STM32HAL_DRIVER_VERSION >= 0x183)    
+//    #warning look at the differences with the timer config. 
+//    // so far only TIM6 is guaranteed to work. also ... the callbacks now are embedded in stm32 ... 
+//#endif    
         
     void mx_timx_init(TIMER t, std::uint32_t time)
     {
@@ -183,30 +197,25 @@ namespace embot { namespace hw { namespace timer {
         phandletimx->Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
         phandletimx->Init.RepetitionCounter = 0;
         phandletimx->Init.Period = pars.period-1;
-        #if (STM32HAL_DRIVER_VERSION >= 183)
+        #if defined(STM32HAL_STM32L4) && (STM32HAL_DRIVER_VERSION >= 0x183)
         phandletimx->Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+        #elif defined(STM32HAL_STM32H7)
+        #error verify it
         #endif
+        
         
         if(true == stm32props->isonepulse)
         {   // e.g., for tim15: use HAL_TIM_OnePulse_Init() and dont use HAL_TIM_Base_Init().
             if (HAL_TIM_OnePulse_Init(phandletimx, TIM_OPMODE_REPETITIVE) != HAL_OK)
             {
-                #if (STM32HAL_DRIVER_VERSION >= 190)
-                Error_Handler();
-                #else
-                _Error_Handler(NULL, __LINE__);
-                #endif
+                hal_error_handler();
             }
         } 
         else
         {   // normal case            
             if (HAL_TIM_Base_Init(phandletimx) != HAL_OK)
             {
-                #if (STM32HAL_DRIVER_VERSION >= 190)
-                Error_Handler();
-                #else
-                _Error_Handler(NULL, __LINE__);
-                #endif
+               hal_error_handler();
             }
         }
 
@@ -216,11 +225,7 @@ namespace embot { namespace hw { namespace timer {
             sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
             if (HAL_TIMEx_MasterConfigSynchronization(phandletimx, &sMasterConfig) != HAL_OK)
             {
-                #if (STM32HAL_DRIVER_VERSION >= 190)
-                Error_Handler();
-                #else
-                _Error_Handler(NULL, __LINE__);
-                #endif
+                hal_error_handler();
             }
         }
 

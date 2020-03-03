@@ -25,7 +25,7 @@
 #include <cstdint>
 #include <cstring>
 #include <type_traits>
-
+#include <string>
 
 namespace embot { namespace common {
     
@@ -70,6 +70,37 @@ namespace embot { namespace common {
     constexpr relTime time1millisec     = 1000;
     constexpr relTime time1second       = 1000000;
     constexpr relTime timeWaitForever   = 0xffffffff;
+    
+    struct Date
+    {   
+        uint32_t    h {0};
+        uint8_t     m {0};
+        uint8_t     s {0};
+        uint16_t    ms {0};
+        uint16_t    us {0};
+        
+        Date() = default;
+        
+        constexpr Date(const common::Time &t) 
+        {
+            uint64_t tmp = t;
+            us = tmp%1000; tmp /= 1000;
+            ms = tmp%1000; tmp /= 1000;
+            s =  tmp%60; tmp /= 60;
+            m =  tmp%60; tmp /= 60;
+            h =  tmp;            
+        }
+        
+        std::string to_string() const
+        {
+            return "H" + std::to_string(h) + ":M" + std::to_string(m) + ":S" + std::to_string(s) + ":m" + std::to_string(ms) + ":u" + std::to_string(us);
+        }
+        
+//        common::Time time() const
+//        {
+//            return static_cast<std::uint64_t>(us) + 1000*static_cast<std::uint64_t>(ms) + 1000*1000*static_cast<std::uint64_t>(s) + 60*1000*1000*static_cast<std::uint64_t>(m) + 60*60*1000*1000*static_cast<std::uint64_t>(h);
+//        }
+    };
                 
 } } // namespace embot { namespace common {
 

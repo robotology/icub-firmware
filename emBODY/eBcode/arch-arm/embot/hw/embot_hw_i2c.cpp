@@ -33,10 +33,10 @@
 
 using namespace std;
 
-#include "embot_sys.h" 
 #include "embot_binary.h"
 #include "embot_hw_sys.h"
 #include "embot_hw_bsp.h"
+#include "embot_hw_bsp_config.h"
 #include "stm32hal.h"
 
 
@@ -53,24 +53,27 @@ using namespace embot::hw;
 // --------------------------------------------------------------------------------------------------------------------
 
 
-#if     !defined(HAL_I2C_MODULE_ENABLED)
-
+#if !defined(HAL_I2C_MODULE_ENABLED) || !defined(EMBOT_ENABLE_hw_i2c)
 
 namespace embot { namespace hw { namespace i2c {
 
     bool supported(I2C b)                                                                           { return false; }
     bool initialised(I2C b)                                                                         { return false; }
     result_t init(I2C b, const Config &config)                                                      { return resNOK; }
+          
+    bool isbusy(embot::hw::I2C b) { return false; }   
+    bool isbusy(embot::hw::I2C b, embot::common::relTime timeout, embot::common::relTime &remaining) { return false; }   
     
-    bool ping(I2C b, ADR adr, std::uint8_t retries, embot::common::relTime timeout)        { return false; }       
-    result_t read(I2C b, ADR adr, REG reg, embot::utils::Data &destination, embot::common::Callback oncompletion) { return resNOK; }
-    bool isbusy(I2C b)                                                                              { return false; }
+    bool ping(embot::hw::I2C b, ADR adr, embot::common::relTime timeout) { return false; }   
+    result_t transmit(embot::hw::I2C b, ADR adr, const embot::utils::Data &content, embot::common::relTime timeout) { return resNOK; }           
+    result_t read(embot::hw::I2C b, ADR adr, REG reg, embot::utils::Data &destination, const embot::common::Callback &oncompletion) { return resNOK; }     
+    result_t read(embot::hw::I2C b, ADR adr, REG reg, embot::utils::Data &destination, embot::common::relTime timeout) { return resNOK; } 
+    result_t write(embot::hw::I2C b, ADR adr, REG reg, const embot::utils::Data &content, const embot::common::Callback &oncompletion) { return resNOK; } 
+    result_t write(embot::hw::I2C b, ADR adr, REG reg, const embot::utils::Data &content, embot::common::relTime timeout) { return resNOK; }         
 
 }}} // namespace embot { namespace hw { namespace i2c {
 
-
-#elif   defined(HAL_I2C_MODULE_ENABLED)
-
+#else
 
 namespace embot { namespace hw { namespace i2c {
         
@@ -300,12 +303,12 @@ namespace embot { namespace hw { namespace i2c {
         }
        
         
-        embot::common::Time deadline = embot::sys::now() + timeout;
+        embot::common::Time deadline = embot::hw::bsp::now() + timeout;
         
         bool res = true;
         for(;;)
         {
-            std::int64_t rem = deadline - embot::sys::now();
+            std::int64_t rem = deadline - embot::hw::bsp::now();
             
             if(rem <= 0)
             {   
@@ -348,7 +351,7 @@ namespace embot { namespace hw { namespace i2c {
     
     static result_t s_wait(I2C b, embot::common::relTime timeout)
     {
-        embot::common::Time start = embot::sys::now();
+        embot::common::Time start = embot::hw::bsp::now();
         
         result_t res = resOK;
         for(;;)
@@ -358,7 +361,7 @@ namespace embot { namespace hw { namespace i2c {
                 break;
             }
             
-            if(embot::sys::now() > (start+timeout))
+            if(embot::hw::bsp::now() > (start+timeout))
             {
                 res = resNOK;
                 break;
