@@ -1254,7 +1254,7 @@ bool embot::app::application::theSTRAIN::Impl::acquisition_oneshot(embot::common
     // we perform a new acquisition in blocking mode
     acquisition_start();    
     bool ret = acquisition_waituntilcompletion(timeout);     
-        acquisition_retrieve();    
+    acquisition_retrieve();    
     
     if((true == itwasticking) && (true == restartifitwasticking))
     {
@@ -1294,6 +1294,36 @@ bool embot::app::application::theSTRAIN::Impl::acquisition_retrieve()
     
     // 3. also check vs saturation
     runtimedata.check_adcsaturation();
+    
+    
+#if defined(DEBUG_adc_traceiszero) 
+    if(0 != runtimedata.data.adciszero)
+    {
+        static bool adcwaszero = false;
+        
+        if(false == adcwaszero)
+        {
+            embot::app::theLEDmanager &theleds = embot::app::theLEDmanager::getInstance();    
+            embot::app::LEDwaveT<64> ledwave(100*embot::common::time1millisec, 30, std::bitset<64>(0b010101));
+            theleds.get(embot::hw::LED::one).wave(&ledwave);              
+        }
+        
+        adcwaszero = true;
+        runtimedata.data.adciszero = 0;
+    }
+    else
+    {
+//        static uint32_t count = 0;
+//        
+//        if(0 == (count % 1000))
+//        {
+//            embot::app::application::theCANtracer &tracer = embot::app::application::theCANtracer::getInstance();
+//            tracer.print("tick", replies);            
+//        }
+//        
+//        count++;        
+    }
+#endif // if defined(DEBUG_adc_tracefailure)
     
     return true;
 }
@@ -1406,34 +1436,34 @@ bool embot::app::application::theSTRAIN::Impl::processdata(std::vector<embot::hw
 #endif // if defined(DEBUG_adc_tracefailure)
 
 
-#if defined(DEBUG_adc_traceiszero) 
-    if(0 != runtimedata.data.adciszero)
-    {
-        static bool adcwaszero = false;
-        
-        if(false == adcwaszero)
-        {
-            embot::app::theLEDmanager &theleds = embot::app::theLEDmanager::getInstance();    
-            embot::app::LEDwaveT<64> ledwave(100*embot::common::time1millisec, 30, std::bitset<64>(0b010101));
-            theleds.get(embot::hw::LED::one).wave(&ledwave);              
-        }
-        
-        adcwaszero = true;
-        runtimedata.data.adciszero = 0;
-    }
-    else
-    {
-//        static uint32_t count = 0;
+//#if defined(DEBUG_adc_traceiszero) 
+//    if(0 != runtimedata.data.adciszero)
+//    {
+//        static bool adcwaszero = false;
 //        
-//        if(0 == (count % 1000))
+//        if(false == adcwaszero)
 //        {
-//            embot::app::application::theCANtracer &tracer = embot::app::application::theCANtracer::getInstance();
-//            tracer.print("tick", replies);            
+//            embot::app::theLEDmanager &theleds = embot::app::theLEDmanager::getInstance();    
+//            embot::app::LEDwaveT<64> ledwave(100*embot::common::time1millisec, 30, std::bitset<64>(0b010101));
+//            theleds.get(embot::hw::LED::one).wave(&ledwave);              
 //        }
 //        
-//        count++;        
-    }
-#endif // if defined(DEBUG_adc_tracefailure)
+//        adcwaszero = true;
+//        runtimedata.data.adciszero = 0;
+//    }
+//    else
+//    {
+////        static uint32_t count = 0;
+////        
+////        if(0 == (count % 1000))
+////        {
+////            embot::app::application::theCANtracer &tracer = embot::app::application::theCANtracer::getInstance();
+////            tracer.print("tick", replies);            
+////        }
+////        
+////        count++;        
+//    }
+//#endif // if defined(DEBUG_adc_tracefailure)
     
  
     
