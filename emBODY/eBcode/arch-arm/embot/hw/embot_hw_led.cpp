@@ -35,6 +35,7 @@
 #include "embot_binary.h"
 #include "embot_hw_gpio.h"
 #include "embot_hw_bsp.h"
+#include "embot_hw_bsp_config.h"
 
 using namespace std;
 
@@ -50,6 +51,15 @@ using namespace std;
 // --------------------------------------------------------------------------------------------------------------------
 
 using namespace embot::hw;
+
+#if !defined(EMBOT_ENABLE_hw_led)
+
+namespace embot { namespace hw { namespace led {
+    
+    #error fill it
+}}}
+
+#else
 
 namespace embot { namespace hw { namespace led {
 
@@ -146,6 +156,7 @@ namespace embot { namespace hw { namespace led {
 }}} // namespace embot { namespace hw { namespace led 
 
 
+#endif //#if defined(EMBOT_ENABLE_hw_led)
 
 
 

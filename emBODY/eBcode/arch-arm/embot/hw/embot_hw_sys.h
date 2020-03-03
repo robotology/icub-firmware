@@ -24,6 +24,7 @@
 
 #include "embot_common.h"
 #include "embot_hw.h"
+#include <string>
 
 
 
@@ -51,9 +52,10 @@ namespace embot { namespace hw { namespace sys {
     
     // prints on the trace port
     int puts(const char* str);
+    int puts(const std::string &str);
     
     // forces the cpu to exec instructions to reach a given delay
-    void delay(embot::common::relTime t);
+    void delay(embot::common::relTime t);    
     
 }}} // namespace embot { namespace hw { namespace sys {
 

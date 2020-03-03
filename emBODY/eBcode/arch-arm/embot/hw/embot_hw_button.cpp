@@ -31,6 +31,7 @@
 #include "stm32hal.h"
 #include "embot_hw_gpio.h"
 #include "embot_hw_bsp.h"
+#include "embot_hw_bsp_config.h"
 
 #include <cstring>
 #include <vector>

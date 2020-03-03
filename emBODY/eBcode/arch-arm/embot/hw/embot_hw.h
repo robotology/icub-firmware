@@ -79,6 +79,15 @@ namespace embot { namespace hw {
         constexpr bool isvalid() const { return (PORT::none == port) ? false : true; }       
     };
     
+    
+    struct Partition
+    {
+        std::uint32_t   address;
+        std::uint32_t   maxsize; 
+        std::uint32_t   pagesize; 
+        bool isvalid() const { if((0 == address) || (0 == maxsize) || (0 == pagesize)) { return false; } else { return true; } }
+    }; 
+    
 }} // namespace embot { namespace hw {
 
 

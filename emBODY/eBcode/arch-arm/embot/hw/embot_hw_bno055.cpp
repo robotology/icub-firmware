@@ -36,6 +36,7 @@
 #include "embot_hw_sys.h"
 #include "embot_hw_gpio.h"
 #include "embot_hw_bsp.h"
+#include "embot_hw_bsp_config.h"
 
 using namespace std;
 
@@ -50,10 +51,7 @@ using namespace embot::hw;
 // - all the rest
 // --------------------------------------------------------------------------------------------------------------------
 
-#define EMBOT_BNO055_ENABLED
-
-#if     !defined(EMBOT_BNO055_ENABLED)
-
+#if !defined(EMBOT_ENABLE_hw_bno055)
 
 namespace embot { namespace hw { namespace bno055 {
 
@@ -76,8 +74,7 @@ namespace embot { namespace hw { namespace bno055 {
 }}} // namespace embot { namespace hw { namespace BNO055 {
 
 
-#elif   defined(EMBOT_BNO055_ENABLED)
-
+#else
 
 namespace embot { namespace hw { namespace bno055 {
         

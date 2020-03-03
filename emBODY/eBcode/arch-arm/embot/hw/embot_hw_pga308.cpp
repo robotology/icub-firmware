@@ -38,6 +38,7 @@ using namespace std;
 #include "embot_hw.h"
 #include "embot_hw_bsp.h"
 #include "embot_hw_sys.h"
+#include "embot_hw_bsp_config.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -49,11 +50,7 @@ using namespace std;
 // - all the rest
 // --------------------------------------------------------------------------------------------------------------------
 
-#define EMBOT_PGA308_ENABLED
-
-#if     !defined(EMBOT_PGA308_ENABLED)
-
-
+#if !defined(EMBOT_ENABLE_hw_pga308)
 
 namespace embot { namespace hw { namespace pga308 {
 
@@ -71,8 +68,7 @@ namespace embot { namespace hw { namespace pga308 {
 
 }}} // namespace embot { namespace hw { namespace pga308 {
 
-#elif   defined(EMBOT_PGA308_ENABLED)
-
+#else
 
 namespace embot { namespace hw { namespace pga308 {
              

@@ -23,16 +23,9 @@
 #define _EMBOT_HW_BSP_H_
 
 #include "embot_common.h"
-#include "embot_hw.h"
 #include "embot_binary.h"
+#include "embot_hw.h"
 #include "embot_hw_gpio.h"
-#include "embot_hw_button.h"
-#include "embot_hw_can.h"
-#include "embot_hw_flash.h"
-#include "embot_hw_pga308.h"
-#include "embot_hw_timer.h"
-#include "embot_hw_adc.h"
-#include "embot_hw_si7051.h"
 #include <array>
 
 #include "stm32hal.h"
@@ -40,11 +33,12 @@
 namespace embot { namespace hw { namespace bsp {
             
     struct Config
-    {
-        embot::common::fpGetU64 get1microtime {nullptr};  
+    {         
+        embot::common::fpWorker initmicrotime {nullptr};  
+        embot::common::fpGetU64 get1microtime {nullptr};         
         
-        Config() = default;
-        Config(embot::common::fpGetU64 _tmicro) : get1microtime(_tmicro) {}
+        constexpr Config() = default;
+        constexpr Config(embot::common::fpWorker _init, embot::common::fpGetU64 _tmicro) : initmicrotime(_init), get1microtime(_tmicro) {}
         bool isvalid() const { if(nullptr != get1microtime) { return true; } else { return false; } }
     }; 
     
@@ -54,17 +48,14 @@ namespace embot { namespace hw { namespace bsp {
     result_t init(const Config &config);
     
     // it returns time in microseconds as configured by Config::get1microtime()
-    // it is an alternative to embot::sys::now() if ne doe not want to use the embot::sys part
-    // embot::common::Time now();
-              
-}}} // namespace embot { namespace hw { namespace bsp {
-
-
-namespace embot { namespace hw { namespace bsp {
+    // it is used inside embot::hw to avoid using embot::sys::now() which requires the osal.
+    embot::common::Time now();
     
+    // it is the base class used to map in rom the peripheral of the mpu and chips 
+    // supported by the bsp 
     struct SUPP
     {
-        std::uint32_t       supportedmask;
+        std::uint32_t  supportedmask;
         
         constexpr SUPP(std::uint32_t m) : supportedmask(m) {}      
             
@@ -73,10 +64,12 @@ namespace embot { namespace hw { namespace bsp {
         {
             return embot::binary::bit::check(supportedmask, embot::common::tointegral(v));
         }        
-    };
-
+    };    
+              
 }}} // namespace embot { namespace hw { namespace bsp {
+
   
+// here is the support for the peripherals of the mpu and attached chips
 
 namespace embot { namespace hw { namespace bsp { namespace gpio {
     
@@ -175,14 +168,21 @@ namespace embot { namespace hw { namespace bsp { namespace button {
                     
 }}}} // namespace embot { namespace hw { namespace bsp {  namespace button {
 
-#if defined(HAL_CAN_MODULE_ENABLED) 
+
 namespace embot { namespace hw { namespace bsp { namespace can {
-    
-   
+
+    #if defined(HAL_CAN_MODULE_ENABLED)
     struct PROP
     { 
         CAN_HandleTypeDef* handle;   
     };
+    #else    
+    struct PROP
+    { 
+        void* handle;   
+    };
+    #endif
+    
     
     struct BSP : public embot::hw::bsp::SUPP
     {
@@ -195,19 +195,16 @@ namespace embot { namespace hw { namespace bsp { namespace can {
         void init(embot::hw::CAN h) const;
     };
     
-    const BSP& getBSP();
-   
+    const BSP& getBSP();   
               
 }}}} // namespace embot { namespace hw { namespace bsp {  namespace can {
-#endif
 
 
 namespace embot { namespace hw { namespace bsp { namespace flash {
-
-
+   
     struct PROP
     { 
-        embot::hw::flash::Partition partition;   
+        embot::hw::Partition partition;   
     };
     
     struct BSP : public embot::hw::bsp::SUPP
@@ -249,6 +246,7 @@ namespace embot { namespace hw { namespace bsp { namespace pga308 {
 }}}} // namespace embot { namespace hw { namespace bsp {  namespace pga308 {
 
 
+
 namespace embot { namespace hw { namespace bsp { namespace si7051 {
        
     struct PROP
@@ -270,6 +268,8 @@ namespace embot { namespace hw { namespace bsp { namespace si7051 {
     const BSP& getBSP();
               
 }}}} // namespace embot { namespace hw { namespace bsp {  namespace si7051 {
+
+
 
 
 namespace embot { namespace hw { namespace bsp { namespace onewire {
@@ -295,13 +295,20 @@ namespace embot { namespace hw { namespace bsp { namespace onewire {
 }}}} // namespace embot { namespace hw { namespace bsp {  namespace onewire {
 
 
-#if   defined(HAL_ADC_MODULE_ENABLED)
+
 namespace embot { namespace hw { namespace bsp { namespace adc {
-        
+
+#if   defined(HAL_ADC_MODULE_ENABLED)    
     struct PROP
     { 
-        ADC_HandleTypeDef*  handle;
+        ADC_HandleTypeDef* handle;
     };
+#else
+    struct PROP
+    { 
+        void* handle;
+    };
+#endif 
     
     struct BSP : public embot::hw::bsp::SUPP
     {
@@ -317,12 +324,13 @@ namespace embot { namespace hw { namespace bsp { namespace adc {
     const BSP& getBSP();
               
 }}}} // namespace embot { namespace hw { namespace bsp {  namespace adc {
-#endif
 
 
-#if defined(HAL_TIM_MODULE_ENABLED)
+
+
 namespace embot { namespace hw { namespace bsp { namespace timer {
-    
+
+#if defined(HAL_TIM_MODULE_ENABLED)    
     struct PROP
     {   
         TIM_TypeDef*        TIMx;
@@ -331,6 +339,16 @@ namespace embot { namespace hw { namespace bsp { namespace timer {
         bool                isonepulse; // others
         bool                mastermode; // others        
     };
+#else
+    struct PROP
+    {   
+        void*               TIMx;
+        void*               handle;  
+        embot::hw::CLOCK    clock;      // the clock used by the timer      
+        bool                isonepulse; // others
+        bool                mastermode; // others        
+    };
+#endif   
     
     struct BSP : public embot::hw::bsp::SUPP
     {
@@ -346,7 +364,7 @@ namespace embot { namespace hw { namespace bsp { namespace timer {
     const BSP& getBSP();
                   
 }}}} // namespace embot { namespace hw { namespace bsp {  namespace timer {
-#endif
+
 
 
 #if defined(HAL_I2C_MODULE_ENABLED)

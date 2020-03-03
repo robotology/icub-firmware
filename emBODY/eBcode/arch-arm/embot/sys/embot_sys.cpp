@@ -46,33 +46,17 @@
 
 namespace embot { namespace sys {
     
-    common::Time now()
-    {
-        return osal_system_abstime_get();
+    bool started()
+    {        
+        return osal_info_status_running == osal_info_get_status();        
     }
     
-//    std::uint32_t millisecondsNow()
-//    {
-//        osal_abstime_t t = osal_system_ticks_abstime_get() / 1000; // now t is expressed in millisec
-//        return static_cast<std::uint32_t>(t);        
-//    }
+    common::Time now()
+    { 
+        static volatile common::Time tt = 0; // if osal is not started i offer a very simple (and inaccurate) implementation.
+        return (osal_info_status_running != osal_info_get_status()) ? (tt++) : osal_system_abstime_get();
+    }
     
-//    common::relTime tick()
-//    {
-//        return osal_info_get_tick();
-//    }
-        
-//    Task* taskRunning()
-//    {
-//        osal_task_t *p = osal_task_get(osal_callerAUTOdetect);
-
-//        if(nullptr == p)
-//        {
-//            return(nullptr);
-//        }
-
-//        return reinterpret_cast<Task*>(osal_task_extdata_get(p));       
-//    }
 
 }} // namespace embot { namespace sys {
 

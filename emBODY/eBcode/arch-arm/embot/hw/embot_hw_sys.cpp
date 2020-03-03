@@ -36,6 +36,7 @@
 using namespace std;
 
 #include "embot_hw_bsp.h"
+#include "embot_hw_bsp_config.h"
 #include "embot_hw_lowlevel.h"
 
 
@@ -51,7 +52,7 @@ using namespace std;
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace embot { namespace hw { namespace sys {
-    
+       
     
     static void ss_delay(uint64_t t)
     {   
@@ -67,10 +68,14 @@ namespace embot { namespace hw { namespace sys {
             //s_hl_sys_numofops1sec = (5*(SystemCoreClock)) / 4; 
             s_hl_sys_used_systemcoreclock = SystemCoreClock;
             s_hl_sys_numofops1sec = SystemCoreClock;
-            
-            // with art technology enabled the flash is seen as fast as the cpu. wow. 
-            s_hl_sys_numofops1sec /= 3;             
 
+            #if defined(STM32H7)
+            // empirically removed ...
+            #elif defined(STM32L4) 
+            s_hl_sys_numofops1sec /= 3;
+            #else
+            #error specify tuning             
+            #endif
 
             // at this point i normalise the variable to keep not the nymber of operations for 1 sec,
             // but for 1024*1024 microsec. by doing so, later on i shift by 20 instead of using a division. 
@@ -189,6 +194,11 @@ namespace embot { namespace hw { namespace sys {
     std::uint32_t maxrandom()
     {
         return maxRANDmask;
+    }
+    
+    int puts(const std::string &str) 
+    {
+        return puts(str.c_str());
     }
     
     int puts(const char* str) 

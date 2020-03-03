@@ -33,6 +33,7 @@
 
 #include "embot_binary.h"
 #include "embot_hw_bsp.h"
+#include "embot_hw_bsp_config.h"
 #include "embot_hw_sys.h"
 #include "osal_task.h"
 
@@ -50,7 +51,7 @@ using namespace std;
 // - all the rest
 // --------------------------------------------------------------------------------------------------------------------
 
-#if     !defined(HAL_CAN_MODULE_ENABLED)
+#if !defined(HAL_CAN_MODULE_ENABLED) || !defined(EMBOT_ENABLE_hw_can)
 
 // in here we manage the case of no can module being present in stm32hal
 
@@ -78,11 +79,11 @@ namespace embot { namespace hw { namespace can {
     
 }}} // namespace embot { namespace hw { namespace can {
 
-#elif   defined(HAL_CAN_MODULE_ENABLED)
+#else
 
 namespace embot { namespace hw { namespace can {
         
-    #if (STM32HAL_DRIVER_VERSION < 183)
+    #if defined(STM32HAL_STM32L4) && (STM32HAL_DRIVER_VERSION < 0x183)
         #define STM32HAL_HAS_CAN_API_PRE_V183
         #warning using can api pre hal driver v183 ... think of updating the stm32hal
         #error UPDATE the application to use a newer version of stm32 lib
