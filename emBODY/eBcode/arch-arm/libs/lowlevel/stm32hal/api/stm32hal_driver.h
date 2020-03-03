@@ -94,35 +94,60 @@ extern "C" {
     #endif
     #define STM32HAL_DRIVER_VERSION 0x190
       
+#elif   defined(STM32HAL_BOARD_NUCLEOH7)
+
+    // only one possible driver
+    #if !defined(STM32HAL_DRIVER_V180)
+        #define STM32HAL_DRIVER_V180
+    #endif
+    #define STM32HAL_DRIVER_VERSION 0x180
 
 #else
     #error STM32HAL: the STM32HAL_BOARD_${BRD} is undefined
 #endif
 
 
-// now extra code-shaping macros which depend on the driver version
-
-#if (STM32HAL_DRIVER_VERSION >= 0x183)
-    // there is a new api for can
-    #if !defined(USE_HAL_CAN_REGISTER_CALLBACKS)
-    #define USE_HAL_CAN_REGISTER_CALLBACKS 1
-    #endif  
+// now extra code-shaping macros which depend on the family and the driver version 
+#if defined(STM32HAL_STM32L4)
+    #if (STM32HAL_DRIVER_VERSION >= 0x183)
+        // there is a new api for can
+        #if !defined(USE_HAL_CAN_REGISTER_CALLBACKS)
+        #define USE_HAL_CAN_REGISTER_CALLBACKS 1
+        #endif  
+    #endif
+#elif defined(STM32HAL_STM32H7)
+    // nothing so far for can on h7
 #endif
+
 
 
 // and only now ... include the .h which must see the code-shaping macros
 
-#if     defined(STM32HAL_DRIVER_V172)    
-    #include "../src/driver/stm32l4-v172/inc/stm32l4xx_hal.h"       
-#elif   defined(STM32HAL_DRIVER_V183)        
-    #include "../src/driver/stm32l4-v183/inc/stm32l4xx_hal.h"
-#elif   defined(STM32HAL_DRIVER_V190)        
-    #include "../src/driver/stm32l4-v190/inc/stm32l4xx_hal.h"
-#elif   defined(STM32HAL_DRIVER_V1B0)        
-    #include "../src/driver/stm32l4-v1B0/inc/stm32l4xx_hal.h"
+#if defined(STM32HAL_STM32L4)
+
+    #if     defined(STM32HAL_DRIVER_V172)    
+        #include "../src/driver/stm32l4-v172/inc/stm32l4xx_hal.h"       
+    #elif   defined(STM32HAL_DRIVER_V183)        
+        #include "../src/driver/stm32l4-v183/inc/stm32l4xx_hal.h"
+    #elif   defined(STM32HAL_DRIVER_V190)        
+        #include "../src/driver/stm32l4-v190/inc/stm32l4xx_hal.h"
+    #elif   defined(STM32HAL_DRIVER_V1B0)        
+        #include "../src/driver/stm32l4-v1B0/inc/stm32l4xx_hal.h"
+    #else
+        #error STM32HAL: the STM32HAL_DRIVER_${VER} is not managed
+    #endif
+
+#elif defined(STM32HAL_STM32H7)
+
+    #if     defined(STM32HAL_DRIVER_V180)    
+        #include "../src/driver/stm32h7-v180/inc/stm32h7xx_hal.h"       
+    #else
+        #error STM32HAL: the STM32HAL_DRIVER_${VER} is not managed
+    #endif
+
 #else
     #error STM32HAL: the STM32HAL_DRIVER_${VER} is not managed
-#endif
+#endif   
 
 #ifdef __cplusplus
 }       // closing brace for extern "C"

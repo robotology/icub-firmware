@@ -168,6 +168,23 @@ extern "C" {
     #define STM32HAL_STM32L4
     #endif  
 
+#elif   defined(STM32HAL_BOARD_NUCLEOH7)
+
+    // it has a STM32H743xx mpu
+    #if !defined(STM32H743xx)
+    #define STM32H743xx
+    #endif  
+
+    // of family STM32H7
+    #if !defined(STM32H7)
+    #define STM32H7
+    #endif  
+
+    // of family STM32H7 but in STM32HAL_ format  
+    #if !defined(STM32HAL_STM32H7)
+    #define STM32HAL_STM32H7
+    #endif  
+
 #else
         #error STM32HAL: you must define a STM32HAL_BOARD_${BRD}
 #endif

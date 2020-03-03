@@ -227,6 +227,26 @@ extern void stm32hal_board_init(void);
         #error unsupported driver version for sg3
     #endif
 
+#elif   defined(STM32HAL_BOARD_NUCLEOH7) 
+
+    // one case only: v180
+    #if (STM32HAL_DRIVER_VERSION == 0x180)
+
+        #include "../src/config/stm32hal_driver_cfg_of_nucleoh7_v180.h"
+
+        #include "../src/board/nucleoh7/v180/inc/dma.h"
+        #include "../src/board/nucleoh7/v180/inc/gpio.h"
+        #include "../src/board/nucleoh7/v180/inc/i2c.h"
+        #include "../src/board/nucleoh7/v180/inc/main.h"
+        #include "../src/board/nucleoh7/v180/inc/usb_otg.h"
+        #include "../src/board/nucleoh7/v180/inc/usart.h"
+
+        #include "../src/board/nucleoh7/v180/inc/stm32h7xx_it.h"
+
+    #else
+        #error unsupported driver version for nucleoh7
+    #endif
+    
 #else
     #error STM32HAL: you must define a STM32HAL_BOARD_${BRD}
 #endif

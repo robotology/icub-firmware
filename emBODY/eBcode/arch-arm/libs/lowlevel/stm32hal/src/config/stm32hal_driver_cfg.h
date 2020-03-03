@@ -76,6 +76,18 @@ extern "C" {
         #error unknown driver version
     #endif
     
+
+#elif   defined(STM32HAL_BOARD_NUCLEOH7)
+    
+    #if (STM32HAL_DRIVER_VERSION == 0x180)
+        #define USE_FULL_LL_DRIVER
+        #include "../src/config/stm32hal_driver_cfg_of_nucleoh7_v180.h"   
+        // we also need some ll includes contained in the driver section
+        #include "../src/driver/stm32h7-v180/inc/stm32h7xx_ll_gpio.h"
+    #else
+        #error unknown driver version
+    #endif
+
 #else
 
         #error pls define a STM32HAL_BOARD_${BRD}
