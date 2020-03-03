@@ -69,11 +69,16 @@ void MX_GPIO_Init(void)
 
   /*Configure GPIO pins : PCPin PCPin PCPin PCPin 
                            PCPin PCPin PCPin PCPin */
-  GPIO_InitStruct.Pin = BNO055_BOOT_Pin|BNO055_RESET_Pin|W_STRAIN6_Pin|W_STRAIN4_Pin 
-                          |W_STRAIN5_Pin|W_STRAIN3_Pin|W_STRAIN1_Pin|W_STRAIN2_Pin;
+  GPIO_InitStruct.Pin = BNO055_BOOT_Pin|BNO055_RESET_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+  
+  GPIO_InitStruct.Pin = W_STRAIN6_Pin|W_STRAIN4_Pin|W_STRAIN5_Pin|W_STRAIN3_Pin|W_STRAIN1_Pin|W_STRAIN2_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_MEDIUM;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PB4 PB3 PB5 PB2 
