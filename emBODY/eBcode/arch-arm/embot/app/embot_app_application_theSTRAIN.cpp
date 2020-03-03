@@ -59,9 +59,12 @@
 #include "embot_app_theStorage.h"
 #include "embot_app_application_theCANtracer.h"
 
+#include "embot_app_theLEDmanager.h"
+
 
 #define _VERIFYsizeof(sname, ssize)    typedef uint8_t GUARD##sname[ ( ssize == sizeof(sname) ) ? (1) : (-1)];
 
+#define DEBUG_adc_traceiszero
 
 // debug macros ... enable them only for debug
 #undef DEBUG_enabled                       //  #define OR #undef
@@ -594,6 +597,7 @@ struct embot::app::application::theSTRAIN::Impl
         embot::app::canprotocol::analog::periodic::ADCsaturation saturationonchannel[6];
 
         std::uint8_t adcfailures;
+        std::uint8_t adciszero;
         
         std::uint8_t set2use;
         
@@ -610,6 +614,7 @@ struct embot::app::application::theSTRAIN::Impl
             strainmode = embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode::none;
             adcsaturation = false;
             adcfailures = 0;
+            adciszero = 0;
             std::memset(saturationonchannel, static_cast<std::uint8_t>(embot::app::canprotocol::analog::periodic::ADCsaturation::NONE), sizeof(saturationonchannel));
             set2use = 0;
         }       
@@ -1193,6 +1198,7 @@ bool embot::app::application::theSTRAIN::Impl::fill(const bool calibrated, embot
 bool embot::app::application::theSTRAIN::Impl::acquisition_start()
 {
     runtimedata.data.adcfailures = 0;
+    runtimedata.data.adciszero = 0;
 
 #if defined(DEBUG_acquisition_computetiming) 
     acquisitioncounter ++;
@@ -1271,11 +1277,16 @@ bool embot::app::application::theSTRAIN::Impl::acquisition_retrieve()
     // 2. convert adcvalue[] into q15value[]
 
     runtimedata.data.adcfailures = 0;
+    runtimedata.data.adciszero = 0;
     for(int i=0; i<numOfChannels; i++)
     {
         if(0xffff == runtimedata.data.adcvalue[i])
         {
             runtimedata.data.adcfailures ++;
+        }
+        if(0 == runtimedata.data.adcvalue[i])
+        {
+            runtimedata.data.adciszero ++;
         }
         runtimedata.data.adcvalue[i] <<= 3; // adc value is 13 bits. we need to scale it to 64k
         runtimedata.data.q15value[i] = embot::dsp::q15::U16toQ15(runtimedata.data.adcvalue[i]);
@@ -1393,6 +1404,38 @@ bool embot::app::application::theSTRAIN::Impl::processdata(std::vector<embot::hw
         count++;        
     }
 #endif // if defined(DEBUG_adc_tracefailure)
+
+
+#if defined(DEBUG_adc_traceiszero) 
+    if(0 != runtimedata.data.adciszero)
+    {
+        static bool adcwaszero = false;
+        
+        if(false == adcwaszero)
+        {
+            embot::app::theLEDmanager &theleds = embot::app::theLEDmanager::getInstance();    
+            embot::app::LEDwaveT<64> ledwave(100*embot::common::time1millisec, 30, std::bitset<64>(0b010101));
+            theleds.get(embot::hw::LED::one).wave(&ledwave);              
+        }
+        
+        adcwaszero = true;
+        runtimedata.data.adciszero = 0;
+    }
+    else
+    {
+//        static uint32_t count = 0;
+//        
+//        if(0 == (count % 1000))
+//        {
+//            embot::app::application::theCANtracer &tracer = embot::app::application::theCANtracer::getInstance();
+//            tracer.print("tick", replies);            
+//        }
+//        
+//        count++;        
+    }
+#endif // if defined(DEBUG_adc_tracefailure)
+    
+ 
     
     embot::hw::can::Frame frame;  
     
