@@ -502,6 +502,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\embot\sys\embot_sys_Action.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_core.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\common\embot_core.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1259,6 +1264,11 @@
               <FileName>embot_sys_Action.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\embot\sys\embot_sys_Action.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_core.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\common\embot_core.cpp</FilePath>
             </File>
           </Files>
         </Group>

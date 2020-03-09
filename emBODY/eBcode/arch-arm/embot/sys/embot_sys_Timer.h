@@ -21,13 +21,13 @@
 #ifndef _EMBOT_SYS_TIMER_H_
 #define _EMBOT_SYS_TIMER_H_
 
-#include "embot_common.h"
+#include "embot_core.h"
 
 #include "embot_sys.h"
 
 #include "embot_sys_Action.h"
 
-namespace embot { namespace sys {
+namespace embot { namespace os {
     
     class Timer
     {
@@ -39,13 +39,13 @@ namespace embot { namespace sys {
         
         struct Config
         {
-            common::relTime countdown {0};          // time to count before execute the action
-            sys::Action     onexpiry {};            // the action executed at expiry of the countdown
+            core::relTime countdown {0};          // time to count before execute the action
+            os::Action      onexpiry {};            // the action executed at expiry of the countdown
             Mode            mode {Mode::oneshot};   // the mode. we allow one shot, infinite shots or a limited number
             std::uint32_t   numofshots {0};         // in case of limited number this number tells how many. not zero....
 
             Config() = default;
-            Config(common::relTime c, const sys::Action &a, Mode m = Mode::oneshot, std::uint32_t n = 0) : countdown(c), onexpiry(a), mode(m), numofshots(n) {} 
+            Config(core::relTime c, const os::Action &a, Mode m = Mode::oneshot, std::uint32_t n = 0) : countdown(c), onexpiry(a), mode(m), numofshots(n) {} 
             void clear() { countdown = 0;  onexpiry.clear(); mode = Mode::oneshot; numofshots = 0;}
             bool isvalid() const 
             { 
@@ -76,7 +76,7 @@ namespace embot { namespace sys {
     };
 
     
-}} // namespace embot { namespace sys {
+}} // namespace embot { namespace os {
 
 
 #endif  // include-guard

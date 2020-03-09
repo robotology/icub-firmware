@@ -31,7 +31,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "embot.h"
-#include "embot_common.h"
+#include "embot_core.h"
 #include "embot_binary.h"
 
 #include <cstring>
@@ -46,7 +46,7 @@
   
     
     
-namespace embot { namespace app { namespace canprotocol { namespace motor { namespace periodic {
+namespace embot { namespace prot { namespace can { namespace motor { namespace periodic {
 
       
     bool supported(std::uint8_t cmd)
@@ -56,14 +56,14 @@ namespace embot { namespace app { namespace canprotocol { namespace motor { name
         
     CMD convert(std::uint8_t cmd)
     {
-        static const std::uint16_t mcpermask16 = (1 << static_cast<std::uint8_t>(CMD::PRINT));
+        constexpr std::uint16_t mcpermask16 = (1 << static_cast<std::uint8_t>(CMD::PRINT));
 
         if(cmd > 15)
         {
             return CMD::none;
         }
 
-        if(true == embot::binary::bit::check(mcpermask16, cmd))
+        if(true == embot::core::binary::bit::check(mcpermask16, cmd))
         {
             return static_cast<CMD>(cmd);          
         }
@@ -96,7 +96,7 @@ namespace embot { namespace app { namespace canprotocol { namespace motor { name
         return nframes;
     }
         
-    bool Message_PRINT::get(embot::hw::can::Frame &outframe)
+    bool Message_PRINT::get(embot::prot::can::Frame &outframe)
     {
         if((0 == nframes) || (framecounter >= nframes))
         {
@@ -125,12 +125,12 @@ namespace embot { namespace app { namespace canprotocol { namespace motor { name
         framecounter ++;
         
         Message::set(info.canaddress, 0xf, Clas::periodicMotorControl, static_cast<std::uint8_t>(CMD::PRINT), data08, 2+charsinframe);
-        std::memmove(&outframe, &canframe, sizeof(embot::hw::can::Frame));
+        std::memmove(&outframe, &canframe, sizeof(embot::prot::can::Frame));
                     
         return true;
     }  
 
-}}}}} // namespace embot { namespace app { namespace canprotocol { namespace motor { namespace periodic {
+}}}}} // namespace embot { namespace prot { namespace can { namespace motor { namespace periodic {
     
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

@@ -82,7 +82,7 @@ namespace embot { namespace hw { namespace pga308 {
     
     bool initialised(PGA308 a)
     {
-        return embot::binary::bit::check(initialisedmask, embot::common::tointegral(a));
+        return embot::core::binary::bit::check(initialisedmask, embot::core::tointegral(a));
     }    
 
     
@@ -115,7 +115,7 @@ namespace embot { namespace hw { namespace pga308 {
             return resNOK;
         } 
 
-        std::uint8_t index = embot::common::tointegral(a);       
+        std::uint8_t index = embot::core::tointegral(a);       
         
         // ora ... devo trasmettere vari registri
         
@@ -157,7 +157,7 @@ namespace embot { namespace hw { namespace pga308 {
         // init chip
         embot::hw::bsp::pga308::getBSP().init(a);     
         
-        s_privatedata.config[embot::common::tointegral(a)] = config;
+        s_privatedata.config[embot::core::tointegral(a)] = config;
                         
         // init onewire. i dont check vs correct config apart from correct gpio
         if(false == config.onewireconfig.gpio.isvalid())
@@ -184,18 +184,18 @@ namespace embot { namespace hw { namespace pga308 {
         if(config.poweronstate != embot::hw::gpio::get(config.powerongpio))
         {
             embot::hw::gpio::set(config.powerongpio, config.poweronstate); 
-            embot::hw::sys::delay(25*embot::common::time1millisec);
+            embot::hw::sys::delay(25*embot::core::time1millisec);
         }
                 
         
         // must set it to initialised in order to use setdefault
-        embot::binary::bit::set(initialisedmask, embot::common::tointegral(a));
+        embot::core::binary::bit::set(initialisedmask, embot::core::tointegral(a));
         
-        //embot::common::Time start = embot::sys::timeNow();
+        //embot::core::Time start = embot::os::timeNow();
         // load the default settings of pga308. i use the         
         setdefault(a);
-        //static volatile embot::common::Time delta = 0;
-        //delta = embot::sys::timeNow() - start;
+        //static volatile embot::core::Time delta = 0;
+        //delta = embot::os::timeNow() - start;
         //delta = delta;
         // some timing ... 
         // - setdefault() takes 24829 usec = ~25ms
@@ -211,7 +211,7 @@ namespace embot { namespace hw { namespace pga308 {
             return resNOK;
         } 
 
-        std::uint8_t index = embot::common::tointegral(a);        
+        std::uint8_t index = embot::core::tointegral(a);  
         
         // set the registers related to the transfer function. 
         tfconfig.obtain(s_privatedata.registers[index].CFG0, s_privatedata.registers[index].ZDAC, s_privatedata.registers[index].GDAC);
@@ -223,7 +223,7 @@ namespace embot { namespace hw { namespace pga308 {
 
                 
         // dovrei rileggere e verificare se e' ok. poi assegno: 
-        s_privatedata.transfunctconfig[embot::common::tointegral(a)] = tfconfig;
+        s_privatedata.transfunctconfig[embot::core::tointegral(a)] = tfconfig;
         
         return resOK;        
     }
@@ -235,7 +235,7 @@ namespace embot { namespace hw { namespace pga308 {
             return resNOK;
         } 
 
-        std::uint8_t index = embot::common::tointegral(a);
+        std::uint8_t index = embot::core::tointegral(a);
         
         result_t r = resOK;
         
@@ -322,7 +322,7 @@ namespace embot { namespace hw { namespace pga308 {
             return resNOK;
         } 
 
-        std::uint8_t index = embot::common::tointegral(a);        
+        std::uint8_t index = embot::core::tointegral(a);        
                 
         // ora ... devo trasmettere il valore        
         embot::hw::onewire::write(s_privatedata.config[index].onewirechannel, static_cast<std::uint8_t>(address), value);
@@ -379,7 +379,7 @@ namespace embot { namespace hw { namespace pga308 {
             return resNOK;
         } 
 
-        std::uint8_t index = embot::common::tointegral(a);     
+        std::uint8_t index = embot::core::tointegral(a);     
         result_t r = resOK;
          
         switch(address)

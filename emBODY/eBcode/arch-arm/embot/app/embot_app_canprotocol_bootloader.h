@@ -21,12 +21,12 @@
 #ifndef _EMBOT_APP_CANPROTOCOL_BOOTLOADER_H_
 #define _EMBOT_APP_CANPROTOCOL_BOOTLOADER_H_
 
-#include "embot_common.h"
+#include "embot_core.h"
 
 #include "embot_app_canprotocol.h"
 
 
-namespace embot { namespace app { namespace canprotocol { namespace bootloader {
+namespace embot { namespace prot { namespace can { namespace bootloader {
     
     // the supported commands    
     enum class CMD { 
@@ -42,7 +42,7 @@ namespace embot { namespace app { namespace canprotocol { namespace bootloader {
     // NOTES
     // - the message canprotocol::bootloader::SETCANADDRESS is added so that we can have a common (improved)
     //   message to change address. the improved feature allow random address assignement which is useful if
-    //   two cna boards happen to have the same id.    
+    //   two can boards happen to have the same id.    
 
     
     // some utilities    
@@ -50,11 +50,11 @@ namespace embot { namespace app { namespace canprotocol { namespace bootloader {
     CMD convert(std::uint8_t cmd);
     std::uint8_t convert(CMD cmd);
     
-}}}} // namespace embot { namespace app { namespace canprotocol { namespace bootloader {    
+}}}} // namespace embot { namespace prot { namespace can { namespace bootloader {    
     
 
 
-namespace embot { namespace app { namespace canprotocol { namespace bootloader {
+namespace embot { namespace prot { namespace can { namespace bootloader {
         
     // the management of commands
     
@@ -80,12 +80,11 @@ namespace embot { namespace app { namespace canprotocol { namespace bootloader {
                     
         Message_BROADCAST(){}
             
-        bool load(const embot::hw::can::Frame &inframe);            
-        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);   // boardtype, etc.
+        bool load(const embot::prot::can::Frame &inframe);            
+        bool reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);   // boardtype, etc.
         
     };
-    
-    
+        
     
     class Message_BOARD : public Message
     {
@@ -101,9 +100,9 @@ namespace embot { namespace app { namespace canprotocol { namespace bootloader {
         
         Message_BOARD(){}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
             
-        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender);   // ack/nack        
+        bool reply(embot::prot::can::Frame &outframe, const std::uint8_t sender);   // ack/nack        
     };
     
     
@@ -122,7 +121,7 @@ namespace embot { namespace app { namespace canprotocol { namespace bootloader {
                     
         Message_ADDRESS(){}
             
-        bool load(const embot::hw::can::Frame &inframe); 
+        bool load(const embot::prot::can::Frame &inframe); 
             
         bool reply();   // none
         
@@ -143,9 +142,9 @@ namespace embot { namespace app { namespace canprotocol { namespace bootloader {
         
         Message_START(){}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
             
-        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const bool ok);   // ack/nack
+        bool reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const bool ok);   // ack/nack
         
     };   
 
@@ -165,9 +164,9 @@ namespace embot { namespace app { namespace canprotocol { namespace bootloader {
                     
         Message_DATA(){}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
             
-        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const bool ok);  //ack but only when te cumulative Info::size reach Message_ADDRESS::Info::datalen
+        bool reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const bool ok);  //ack but only when te cumulative Info::size reach Message_ADDRESS::Info::datalen
         
     }; 
 
@@ -186,9 +185,9 @@ namespace embot { namespace app { namespace canprotocol { namespace bootloader {
         
         Message_END(){}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
             
-        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const bool ok);  //ack/nack
+        bool reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const bool ok);  //ack/nack
         
     };  
     
@@ -213,47 +212,19 @@ namespace embot { namespace app { namespace canprotocol { namespace bootloader {
                 
         Message_GET_ADDITIONAL_INFO() : counter(0) {}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
          
         // we have multiple frames ... best way is to pass a vector which is resized according to the needs.
         // but ... memory allocation, heap, embedded systems ... i prefer to give back a frame at a time.            
         std::uint8_t numberofreplies();
         // i give the frames in order until max number.    
-        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);  
+        bool reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);  
 
         private:
         
         std::uint8_t counter;
         const std::uint8_t nreplies = 8;
     };    
-
-//    class Message_SET_ADDITIONAL_INFO : public Message
-//    {
-//        public:
-//            
-//        struct Info
-//        {
-//            std::uint8_t    offset;     // 0, 4, 8, 16, 20, 24, 28. 255 is a non-valid value 
-//            char            info04[4];  
-//            Info() : offset(255) { }
-//        };
-//        
-//        Info info;
-//        
-//                
-//        Message_SET_ADDITIONAL_INFO() {}
-//            
-//        bool load(const embot::hw::can::Frame &inframe);
-//         
-//        // we need to receive 8 frames to be able to have a complete 32 bytes long info32. we operate in memory-less mode.
-//        // each time we recover only a fraction of info32[].
-//        // we could operate differently, but maybe for later: use of a static char info32[32] array and a static flag08.
-//        // when we received counter = 0, then we reset info32[] and flag08. then we fill the 4 bytes into info32 and set the
-//        // bit of pos counter. when all bits are on, we fill Info::info32[] and set Info::ready = true.
-//            
-//        bool reply(); // none 
-
-//    };  
 
 
     class Message_SET_ADDITIONAL_INFO2 : public Message
@@ -272,7 +243,7 @@ namespace embot { namespace app { namespace canprotocol { namespace bootloader {
                 
         Message_SET_ADDITIONAL_INFO2() {}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
          
         // we need to receive 8 frames to be able to have a complete 32 bytes long info32. we operate in memory-less mode.
         // each time we recover only a fraction of info32[].
@@ -304,7 +275,7 @@ namespace embot { namespace app { namespace canprotocol { namespace bootloader {
         
         Message_SETCANADDRESS(){}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
             
         bool reply();   // none
         
@@ -331,12 +302,12 @@ namespace embot { namespace app { namespace canprotocol { namespace bootloader {
         
         Message_GET_TIMEOFLIFE() {}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
             
-        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
+        bool reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
     };  
     
-}}}} // namespace embot { namespace app { namespace canprotocol { namespace bootloader {
+}}}} // namespace embot { namespace prot { namespace can { namespace bootloader {
 
 
 #endif  // include-guard

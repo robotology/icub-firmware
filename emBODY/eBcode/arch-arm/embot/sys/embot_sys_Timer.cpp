@@ -39,7 +39,7 @@
 
 
 
-namespace embot { namespace sys { namespace timertools {
+namespace embot { namespace os { namespace timertools {
         
     struct osalTMR 
     {
@@ -146,7 +146,7 @@ namespace embot { namespace sys { namespace timertools {
         {
             osalTMR *otm = reinterpret_cast<osalTMR*>(par);
             otm->canexecuteaction = true;
-            embot::sys::theTimerManager &tm = embot::sys::theTimerManager::getInstance();
+            embot::os::theTimerManager &tm = embot::os::theTimerManager::getInstance();
             if(true == tm.started())
             {
                 tm.onexpiry(*otm->owner);
@@ -188,16 +188,16 @@ namespace embot { namespace sys { namespace timertools {
     }; 
         
     
-}}} // namespace embot { namespace sys {
+}}} // namespace embot { namespace os {
 
      
-struct embot::sys::Timer::Impl
+struct embot::os::Timer::Impl
 {          
-    embot::sys::timertools::osalTMR *tmr;
+    embot::os::timertools::osalTMR *tmr;
     
     Impl(Timer *own) 
     {
-        tmr = new embot::sys::timertools::osalTMR(own);
+        tmr = new embot::os::timertools::osalTMR(own);
     }
     ~Impl()
     {
@@ -212,53 +212,53 @@ struct embot::sys::Timer::Impl
 
 
 
-embot::sys::Timer::Timer()
+embot::os::Timer::Timer()
 : pImpl(new Impl(this))
 { 
 
 }
 
-embot::sys::Timer::~Timer()
+embot::os::Timer::~Timer()
 {   
     delete pImpl;
 }
 
-bool embot::sys::Timer::start(const Config &config)
+bool embot::os::Timer::start(const Config &config)
 {
     return pImpl->tmr->start(config);
 }
 
-bool embot::sys::Timer::stop()
+bool embot::os::Timer::stop()
 {
     return pImpl->tmr->stop();
 }
 
-embot::sys::Timer::Status embot::sys::Timer::getStatus() const
+embot::os::Timer::Status embot::os::Timer::getStatus() const
 {
     return pImpl->tmr->getstatus();   
 }
 
-//embot::sys::Timer::Mode embot::sys::Timer::getMode() const
+//embot::os::Timer::Mode embot::os::Timer::getMode() const
 //{
 //    return pImpl->tmr->getmode();  
 //}
 
-//embot::common::relTime embot::sys::Timer::getCountdown() const
+//embot::core::relTime embot::os::Timer::getCountdown() const
 //{
 //    return pImpl->tmr->period;
 //}
 
-//const embot::sys::Action& embot::sys::Timer::getAction() const
+//const embot::os::Action& embot::os::Timer::getAction() const
 //{
 //    return pImpl->tmr->tconfig.onexpiry;
 //}
 
-const embot::sys::Timer::Config& embot::sys::Timer::getConfig() const
+const embot::os::Timer::Config& embot::os::Timer::getConfig() const
 {
     return pImpl->tmr->tconfig;
 }
 
-bool embot::sys::Timer::execute()
+bool embot::os::Timer::execute()
 {
     bool canexecute = pImpl->tmr->canexecuteaction;
     if(true == canexecute)

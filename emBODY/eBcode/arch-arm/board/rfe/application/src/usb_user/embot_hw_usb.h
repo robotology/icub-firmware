@@ -22,7 +22,7 @@
 #ifndef _EMBOT_HW_USB_H_
 #define _EMBOT_HW_USB_H_
 
-#include "embot_common.h"
+#include "embot_core.h"
 #include "embot_hw.h"
 
 
@@ -44,7 +44,7 @@ namespace embot { namespace hw { namespace usb {
     struct Config
     {
         std::uint8_t                rxcapacity;
-        embot::common::Callback     onrxmessage;
+        embot::core::Callback     onrxmessage;
         Config() : rxcapacity(8),  onrxmessage(nullptr, nullptr) {}
     };
     

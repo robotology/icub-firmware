@@ -1,49 +1,36 @@
 
 /*
- * Copyright (C) 2017 iCub Facility - Istituto Italiano di Tecnologia
+ * Copyright (C) 2020 iCub Tech - Istituto Italiano di Tecnologia
  * Author:  Marco Accame
  * email:   marco.accame@iit.it
- * website: www.robotcub.org
- * Permission is granted to copy, distribute, and/or modify this program
- * under the terms of the GNU General Public License, version 2 or any
- * later version published by the Free Software Foundation.
- *
- * A copy of the license can be found at
- * http://www.robotcub.org/icub/license/gpl.txt
- *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
- * Public License for more details
 */
 
 // - include guard ----------------------------------------------------------------------------------------------------
-#error dont include me
-#if 0
-#ifndef _EMBOT_COMMON_H_
-#define _EMBOT_COMMON_H_
+
+#ifndef _EMBOT_CORE_H_
+#define _EMBOT_CORE_H_
+
 
 #include <cstdint>
 #include <cstring>
 #include <type_traits>
 #include <string>
 
-namespace embot { namespace common {
-      
+namespace embot { namespace core {
+    
+    // data structures
+        
     // the time is always expressed in micro-seconds    
     using Time          = std::uint64_t;    // keeps absolute time since bootstrap.   
-    using relTime       = std::uint32_t;    // it is used for relative time. 0 means: 0 usec from ...
+    using relTime       = std::uint32_t;    // keep relative time. 100 means: 100 usec from ...
     
-    // some useful Time / relTime values
+    // some useful Time / relTime constants: use 5*time1millisec rather than 5000
     constexpr relTime timeWaitNone      = 0;
     constexpr relTime time1microsec     = 1;    
     constexpr relTime time1millisec     = 1000;
     constexpr relTime time1second       = 1000000;
     constexpr relTime timeWaitForever   = 0xffffffff;
     
-    // it returns absolute time as configured by one of embot::core::init() or embot::hw::init() or embot::os::init() 
-    embot::core::Time now();  
-
     // it formats Time (or relTime) for print purposes
     struct TimeFormatter
     {   
@@ -56,7 +43,7 @@ namespace embot { namespace common {
         
         TimeFormatter() = default;
         
-        constexpr TimeFormatter(const core::Time &t) 
+        constexpr TimeFormatter(const embot::core::Time &t) 
         {
             uint64_t tmp = t;
             u = tmp%1000; tmp /= 1000;
@@ -67,9 +54,15 @@ namespace embot { namespace common {
             D = tmp;            
         }
         
-        uint64_t to_seconds() const { return S+60*M+3600*H+86400*D; }
+        uint64_t to_seconds() const { return S+60*M+3600*H+86400*D; }        
+        
+        embot::core::Time to_time() const
+        {
+            return static_cast<embot::core::Time>(u) + time1millisec*static_cast<embot::core::Time>(m) + time1second*to_seconds();
+        }        
         
         enum class Mode : std::uint8_t { compact, full };
+        
         std::string to_string(const Mode &mode = Mode::compact) const
         {
             if(Mode::compact == mode)
@@ -80,12 +73,8 @@ namespace embot { namespace common {
             {
                 return "D" + std::to_string(D) + ":H" + std::to_string(H) + ":M" + std::to_string(M) + ":S" + std::to_string(S) + ":m" + std::to_string(m) + ":u" + std::to_string(u); 
             }
-        }
-        
-        core::Time to_time() const
-        {
-            return static_cast<std::uint64_t>(u) + 1000*static_cast<std::uint64_t>(m) + 1000*1000*to_seconds();
-        }
+        }        
+
     };    
         
     
@@ -98,8 +87,6 @@ namespace embot { namespace common {
     using fpWorker      = void (*)(void);
     using fpCaller      = void (*)(void *);
              
-    // some useful data structures   
-
     // it represents a function call with a generic argument
     struct Callback
     {
@@ -140,19 +127,48 @@ namespace embot { namespace common {
 //        void * getVOIDptr(size_t offset = 0) const { if(isvalid() && (offset < size)) { std::uint8_t *d = getU08ptr(); return &d[offset]; } else { return nullptr;} }      
     };      
 
-    // useful functions
-    template<typename E>         // C++14 [Meyers, pag. 73]
+    
+    struct TimeConfig
+    {         
+        embot::core::fpWorker init {nullptr};  
+        embot::core::fpGetU64 get {nullptr};         
+        
+        constexpr TimeConfig() = default;
+        constexpr TimeConfig(embot::core::fpWorker _init, embot::core::fpGetU64 _get) : init(_init), get(_get) {}
+        bool isvalid() const { if(nullptr != get) { return true; } else { return false; } }
+    }; 
+    
+    
+    struct Config
+    {         
+        TimeConfig timeconfig {};         
+        
+        constexpr Config() = default;
+        constexpr Config(const TimeConfig &tc) : timeconfig(tc.init, tc.get) {}
+        bool isvalid() const { return timeconfig.isvalid(); }
+    }; 
+       
+    
+    // functions
+        
+    bool initialised();
+    
+    bool init(const Config &config);
+
+    embot::core::Time now();
+    
+    
+    template<typename E>         // see C++14 [Meyers, pag. 73]
     constexpr auto tointegral(E enumerator) noexcept 
     {
         return static_cast<std::underlying_type_t<E>>(enumerator);
-    }
-
+    }    
     
-}} // namespace embot { namespace common {
+}} // namespace embot { namespace core {
 
 
 
 #endif  // include-guard
-#endif
+
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------

@@ -31,7 +31,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "embot.h"
-#include "embot_common.h"
+#include "embot_core.h"
 #include "embot_binary.h"
 
 #include <cstring>
@@ -45,7 +45,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
     
-namespace embot { namespace app { namespace canprotocol { namespace analog { namespace periodic {
+namespace embot { namespace prot { namespace can { namespace analog { namespace periodic {
     
     
     bool supported(std::uint8_t cmd)
@@ -55,7 +55,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
     CMD convert(std::uint8_t cmd)
     {
-        static const std::uint16_t aspermask16 =    (1 << static_cast<std::uint8_t>(CMD::USERDEF))                          |
+        constexpr std::uint16_t aspermask16 =    (1 << static_cast<std::uint8_t>(CMD::USERDEF))                          |
                                                     (1 << static_cast<std::uint8_t>(CMD::POS))                              |
                                                     (1 << static_cast<std::uint8_t>(CMD::UNCALIBFORCE_VECTOR_DEBUGMODE))    |
                                                     (1 << static_cast<std::uint8_t>(CMD::UNCALIBTORQUE_VECTOR_DEBUGMODE))   |   
@@ -68,7 +68,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
             return CMD::none;
         }
 
-        if(true == embot::binary::bit::check(aspermask16, cmd))
+        if(true == embot::core::binary::bit::check(aspermask16, cmd))
         {
             return static_cast<CMD>(cmd);          
         }
@@ -112,7 +112,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         return true;
     }
         
-    bool Message_UNCALIBFORCE_VECTOR_DEBUGMODE::get(embot::hw::can::Frame &outframe)
+    bool Message_UNCALIBFORCE_VECTOR_DEBUGMODE::get(embot::prot::can::Frame &outframe)
     {
         std::uint8_t data08[8] = {0};
         data08[0] = static_cast<std::uint8_t>((info.x & 0x00ff));
@@ -131,7 +131,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         }
         
         Message::set(info.canaddress, 0xf, Clas::periodicAnalogSensor, static_cast<std::uint8_t>(CMD::UNCALIBFORCE_VECTOR_DEBUGMODE), data08, size);
-        std::memmove(&outframe, &canframe, sizeof(embot::hw::can::Frame));
+        std::memmove(&outframe, &canframe, sizeof(embot::prot::can::Frame));
                     
         return true;
     }  
@@ -146,7 +146,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         return true;
     }
         
-    bool Message_UNCALIBTORQUE_VECTOR_DEBUGMODE::get(embot::hw::can::Frame &outframe)
+    bool Message_UNCALIBTORQUE_VECTOR_DEBUGMODE::get(embot::prot::can::Frame &outframe)
     {
         std::uint8_t data08[8] = {0};
         data08[0] = static_cast<std::uint8_t>((info.x & 0x00ff));
@@ -165,7 +165,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         }
         
         Message::set(info.canaddress, 0xf, Clas::periodicAnalogSensor, static_cast<std::uint8_t>(CMD::UNCALIBTORQUE_VECTOR_DEBUGMODE), data08, size);
-        std::memmove(&outframe, &canframe, sizeof(embot::hw::can::Frame));
+        std::memmove(&outframe, &canframe, sizeof(embot::prot::can::Frame));
                     
         return true;
     }          
@@ -178,7 +178,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         return true;
     }
         
-    bool Message_FORCE_VECTOR::get(embot::hw::can::Frame &outframe)
+    bool Message_FORCE_VECTOR::get(embot::prot::can::Frame &outframe)
     {
         std::uint8_t data08[8] = {0};
         data08[0] = static_cast<std::uint8_t>((info.x & 0x00ff));
@@ -198,7 +198,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
 
         
         Message::set(info.canaddress, 0xf, Clas::periodicAnalogSensor, static_cast<std::uint8_t>(CMD::FORCE_VECTOR), data08, size);
-        std::memmove(&outframe, &canframe, sizeof(embot::hw::can::Frame));
+        std::memmove(&outframe, &canframe, sizeof(embot::prot::can::Frame));
                     
         return true;
     }  
@@ -213,7 +213,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         return true;
     }
         
-    bool Message_TORQUE_VECTOR::get(embot::hw::can::Frame &outframe)
+    bool Message_TORQUE_VECTOR::get(embot::prot::can::Frame &outframe)
     {
         std::uint8_t data08[8] = {0};
         data08[0] = static_cast<std::uint8_t>((info.x & 0x00ff));
@@ -233,7 +233,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
 
         
         Message::set(info.canaddress, 0xf, Clas::periodicAnalogSensor, static_cast<std::uint8_t>(CMD::TORQUE_VECTOR), data08, size);
-        std::memmove(&outframe, &canframe, sizeof(embot::hw::can::Frame));
+        std::memmove(&outframe, &canframe, sizeof(embot::prot::can::Frame));
                     
         return true;
     }  
@@ -246,16 +246,16 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         return true;
     }
         
-    bool Message_THERMOMETER_MEASURE::get(embot::hw::can::Frame &outframe)
+    bool Message_THERMOMETER_MEASURE::get(embot::prot::can::Frame &outframe)
     {
         std::uint8_t data08[8] = {0};
         data08[0] = info.mask & 0x03;
-        if(embot::binary::bit::check(info.mask, 0))
+        if(embot::core::binary::bit::check(info.mask, 0))
         {
             data08[1] = static_cast<std::uint8_t>((info.temp0 & 0x00ff));           // little endian
             data08[2] = static_cast<std::uint8_t>((info.temp0 & 0xff00) >> 8);      // little endian
         }
-        if(embot::binary::bit::check(info.mask, 1))
+        if(embot::core::binary::bit::check(info.mask, 1))
         {
             data08[3] = static_cast<std::uint8_t>((info.temp1 & 0x00ff));           // little endian 
             data08[4] = static_cast<std::uint8_t>((info.temp1 & 0xff00) >> 8);      // little endian
@@ -263,7 +263,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         std::uint8_t size = 5;
                
         Message::set(info.canaddress, 0xf, Clas::periodicAnalogSensor, static_cast<std::uint8_t>(CMD::THERMOMETER_MEASURE), data08, size);
-        std::memmove(&outframe, &canframe, sizeof(embot::hw::can::Frame));
+        std::memmove(&outframe, &canframe, sizeof(embot::prot::can::Frame));
                     
         return true;
     }      
@@ -276,7 +276,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         return true;
     }
         
-    bool Message_USERDEF::get(embot::hw::can::Frame &outframe)
+    bool Message_USERDEF::get(embot::prot::can::Frame &outframe)
     {
         std::uint8_t data08[8] = {0};
         std::memmove(data08, info.data, sizeof(info.data));
@@ -284,7 +284,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         std::uint8_t size = 8;
                
         Message::set(info.canaddress, 0xf, Clas::periodicAnalogSensor, static_cast<std::uint8_t>(CMD::USERDEF), data08, size);
-        std::memmove(&outframe, &canframe, sizeof(embot::hw::can::Frame));
+        std::memmove(&outframe, &canframe, sizeof(embot::prot::can::Frame));
                     
         return true;
     }      
@@ -298,7 +298,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         return true;
     }
         
-    bool Message_POS::get(embot::hw::can::Frame &outframe)
+    bool Message_POS::get(embot::prot::can::Frame &outframe)
     {
         std::uint8_t data08[8] = {0};
         data08[0] = static_cast<uint8_t>(info.descriptor.type);
@@ -308,13 +308,13 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         std::uint8_t size = 8;
                
         Message::set(info.canaddress, 0xf, Clas::periodicAnalogSensor, static_cast<std::uint8_t>(CMD::POS), data08, size);
-        std::memmove(&outframe, &canframe, sizeof(embot::hw::can::Frame));
+        std::memmove(&outframe, &canframe, sizeof(embot::prot::can::Frame));
                     
         return true;
     }      
     
     
-}}}}} // namespace embot { namespace app { namespace canprotocol { namespace analog { namespace periodic {
+}}}}} // namespace embot { namespace prot { namespace can { namespace analog { namespace periodic {
     
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

@@ -21,7 +21,7 @@
 #ifndef _EMBOT_APP_THECANTRACER_H_
 #define _EMBOT_APP_THECANTRACER_H_
 
-#include "embot_common.h"
+#include "embot_core.h"
 #include "embot_hw.h"
 #include "embot_sys.h"
 #include "embot_app_canprotocol.h"
@@ -49,9 +49,9 @@ namespace embot { namespace app {
         
         bool initialise(const Config &config);   
        
-        embot::common::Time start();
-        embot::common::relTime stop(const std::string &prefix, std::vector<embot::hw::can::Frame> &frames, embot::common::Time started = 0);    
-        bool print(const std::string &text, std::vector<embot::hw::can::Frame> &frames);        
+        embot::core::Time start();
+        embot::core::relTime stop(const std::string &prefix, std::vector<embot::prot::can::Frame> &frames, embot::core::Time started = 0);    
+        bool print(const std::string &text, std::vector<embot::prot::can::Frame> &frames);        
 
     private:
         theCANtracer(); 

@@ -21,35 +21,38 @@
 #ifndef _EMBOT_SYS_H_
 #define _EMBOT_SYS_H_
 
-#include "embot_common.h"
+#include "embot_core.h"
+#include "embot_sys_task.h"
 
-
-namespace embot { namespace sys {
+namespace embot { namespace os {
+    
+    struct Config
+    {         
+        embot::core::Time tick {embot::core::time1millisec};                 
+       
+        embot::os::InitThread::Config initconfig {};
+        embot::os::IdleThread::Config idleconfig {};
+        embot::core::Callback onOSerror {};
+            
+        constexpr Config() = default;
+            
+        constexpr Config(embot::core::Time _t, const embot::os::InitThread::Config &ini, const embot::os::IdleThread::Config &idl, const embot::core::Callback &err) 
+           : tick(_t), initconfig(ini), idleconfig(idl), onOSerror(err) {}            
         
-    // tells is the sys already started: aka object embot::sys::theScheduler is started, aka the rtos is active.
+        bool isvalid() const { if((0 == tick) || (false == initconfig.isvalid()) || (false == idleconfig.isvalid())) { return false; } else { return true; } }        
+    }; 
+    
+    bool init(const Config &config);
+    
+    bool initialised();
+                
+    // it starts the scheduler
+    [[noreturn]] void start();
+    
+    // tells if the scheduler has started
     bool started();
-
-    // tells time in us since bootstrap. gives a valid number only if sys already started.
-    common::Time now();
-        
-    enum class Priority : std::uint8_t {
-        schedIdle = 0, schedInit = 255,                         // reserved to the scheduler
-        minimum = 2,  maximum = 251,                            // allowed ranges         
-        low010 = 10, low011 = 11, low012 = 12,               
-        medium100 = 100, medium101 = 101, medium102 = 102, medium103 = 103, medium104 = 104,                
-        high200 = 200, high201 = 201, high203 = 203, high204 = 204,        
-        system220 = 220, system230 = 230, system240 = 240, system250 = 250,
-        systemMIN = system220, systemMAX = system250        
-    };
-    
-    
-    constexpr bool isSystem(Priority prio)
-    {
-        std::uint8_t v = embot::common::tointegral(prio);
-        return ((v >= embot::common::tointegral(Priority::systemMIN)) && (v <= embot::common::tointegral(Priority::systemMAX))) ? true : false;       
-    }        
-    
-}} // namespace embot { namespace sys {
+                   
+}} // namespace embot { namespace os {
 
 
 #endif  // include-guard

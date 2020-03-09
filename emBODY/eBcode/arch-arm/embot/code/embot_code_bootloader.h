@@ -10,7 +10,7 @@
 #ifndef _EMBOT_CODE_BOOTLOADER_H_
 #define _EMBOT_CODE_BOOTLOADER_H_
 
-#include "embot_common.h"
+#include "embot_core.h"
 
 #include "embot_app_theCANboardInfo.h"
 

@@ -21,8 +21,7 @@
 #ifndef _EMBOT_APP_APPLICATION_THEIMU_H_
 #define _EMBOT_APP_APPLICATION_THEIMU_H_
 
-#include "embot_common.h"
-#include "embot_hw.h"
+#include "embot_core.h"
 #include "embot_sys_task.h"
 #include "embot_app_application_theCANparserIMU.h"
 #include "embot_hw_bno055.h"
@@ -41,15 +40,15 @@ namespace embot { namespace app { namespace application {
         {
             embot::hw::BNO055           sensor;
             embot::hw::bno055::Config   sensorconfig;
-            embot::common::Event        tickevent;
-            embot::common::Event        datareadyevent;
-            embot::sys::Task*           totask;
+            embot::os::Event        tickevent;
+            embot::os::Event        datareadyevent;
+            embot::os::Thread*           totask;
             Config() :  
                 sensor(embot::hw::BNO055::one), 
                 sensorconfig(embot::hw::bno055::Config(embot::hw::i2c::Descriptor(embot::hw::I2C::two, 400000))), 
                 tickevent(0), datareadyevent(0), totask(nullptr) 
                 {}
-            Config(embot::hw::BNO055 _s, const embot::hw::bno055::Config& _sc, embot::common::Event _te, embot::common::Event _de, embot::sys::Task* _ts) :     
+            Config(embot::hw::BNO055 _s, const embot::hw::bno055::Config& _sc, embot::os::Event _te, embot::os::Event _de, embot::os::Thread* _ts) :     
                 sensor(_s),
                 sensorconfig(_sc),
                 tickevent(_te), 
@@ -62,18 +61,18 @@ namespace embot { namespace app { namespace application {
         bool initialise(Config &config);   
 
         bool start();          
-        bool start(embot::common::relTime period);
+        bool start(embot::core::relTime period);
  
         bool stop();        
-        bool tick(std::vector<embot::hw::can::Frame> &replies);        
-        bool processdata(std::vector<embot::hw::can::Frame> &replies);
+        bool tick(std::vector<embot::prot::can::Frame> &replies);        
+        bool processdata(std::vector<embot::prot::can::Frame> &replies);
         
         // interface to CANagentIMU
-        virtual bool set(const embot::app::canprotocol::analog::polling::Message_ACC_GYRO_SETUP::Info &info);
-        virtual bool set(const embot::app::canprotocol::analog::polling::Message_IMU_CONFIG_SET::Info &info);       
-        virtual bool set(const embot::app::canprotocol::analog::polling::Message_IMU_TRANSMIT::Info &info);  
+        virtual bool set(const embot::prot::can::analog::polling::Message_ACC_GYRO_SETUP::Info &info);
+        virtual bool set(const embot::prot::can::analog::polling::Message_IMU_CONFIG_SET::Info &info);       
+        virtual bool set(const embot::prot::can::analog::polling::Message_IMU_TRANSMIT::Info &info);  
         
-        virtual bool get(const embot::app::canprotocol::analog::polling::Message_IMU_CONFIG_GET::Info &info, embot::app::canprotocol::analog::polling::Message_IMU_CONFIG_GET::ReplyInfo &replyinfo);    
+        virtual bool get(const embot::prot::can::analog::polling::Message_IMU_CONFIG_GET::Info &info, embot::prot::can::analog::polling::Message_IMU_CONFIG_GET::ReplyInfo &replyinfo);    
         
 
     private:

@@ -23,8 +23,7 @@
 
 #include <vector>
 #include <memory>
-#include "embot_common.h"
-#include "embot_hw_can.h"
+#include "embot_core.h"
 #include "embot_app_canprotocol.h"
 #include "embot_app_canprotocol_analog_polling.h"
 #include "embot_app_canprotocol_analog_periodic.h"
@@ -35,11 +34,11 @@ namespace embot { namespace app { namespace application {
     {
     public:
         // interface
-        virtual bool set(const embot::app::canprotocol::analog::polling::Message_ACC_GYRO_SETUP::Info &info) = 0;
-        virtual bool set(const embot::app::canprotocol::analog::polling::Message_IMU_CONFIG_SET::Info &info) = 0;  
-        virtual bool set(const embot::app::canprotocol::analog::polling::Message_IMU_TRANSMIT::Info &info) = 0; 
+        virtual bool set(const embot::prot::can::analog::polling::Message_ACC_GYRO_SETUP::Info &info) = 0;
+        virtual bool set(const embot::prot::can::analog::polling::Message_IMU_CONFIG_SET::Info &info) = 0;  
+        virtual bool set(const embot::prot::can::analog::polling::Message_IMU_TRANSMIT::Info &info) = 0; 
     
-        virtual bool get(const embot::app::canprotocol::analog::polling::Message_IMU_CONFIG_GET::Info &info, embot::app::canprotocol::analog::polling::Message_IMU_CONFIG_GET::ReplyInfo &replyinfo) = 0;
+        virtual bool get(const embot::prot::can::analog::polling::Message_IMU_CONFIG_GET::Info &info, embot::prot::can::analog::polling::Message_IMU_CONFIG_GET::ReplyInfo &replyinfo) = 0;
        
     public:
         virtual ~CANagentIMU() {};         
@@ -64,7 +63,7 @@ namespace embot { namespace app { namespace application {
         bool initialise(const Config &config); 
         
         // returns true if the canframe has been recognised. if so, any reply is sent if replies.size() > 0
-        bool process(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);
+        bool process(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies);
 
     private:
         theCANparserIMU(); 

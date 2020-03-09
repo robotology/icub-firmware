@@ -31,72 +31,70 @@ void doit(void *p)
     a++;    
 }
 
-constexpr embot::common::EventMask evtTick = 0x01;
+constexpr embot::os::Event evtTick = 0x01;
 
 
-void eventbasedtask_startup(embot::sys::Task *t, void *param)
+void eventbasedtask_startup(embot::os::Thread *t, void *param)
 {
     s_chips_init(); 
     embot::hw::sys::puts("evtask-startup: chips initted" );
     
-    embot::sys::Timer *tmr = new embot::sys::Timer;
+    embot::os::Timer *tmr = new embot::os::Timer;
     
-    embot::sys::Action act(embot::sys::EventToTask(evtTick, t));
-    embot::sys::Timer::Config cfg{embot::common::time1second, act, embot::sys::Timer::Mode::forever, 0};
+    embot::os::Action act(embot::os::EventToThread(evtTick, t));
+    embot::os::Timer::Config cfg{embot::core::time1second, act, embot::os::Timer::Mode::forever, 0};
     tmr->start(cfg);
     embot::hw::sys::puts("evtask-startup: started 1 sec timer which sends evtTick to evtask" );
 }
 
 
 
-void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask eventmask, void *param)
+void eventbasedtask_onevent(embot::os::Thread *t, embot::os::EventMask eventmask, void *param)
 {   
     if(0 == eventmask)
     {   // timeout ...         
         return;
     }
 
-
-    if(true == embot::binary::mask::check(eventmask, evtTick))
+    if(true == embot::core::binary::mask::check(eventmask, evtTick))
     {
-        embot::common::Date d(embot::sys::now());        
-        embot::hw::sys::puts("evtask-onevent: evtTick received @ time = " + d.to_string());     
+        embot::core::TimeFormatter tf(embot::core::now());        
+        embot::hw::sys::puts("evtask-onevent: evtTick received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));     
         s_chips_tick();        
     }
-              
-    
+                 
 }
 
 
-void onIdle(embot::sys::Task *t, void* idleparam)
+void onIdle(embot::os::Thread *t, void* idleparam)
 {
     static uint32_t i = 0;
     i++;
 }
 
-void initSystem(embot::sys::Task *t, void* initparam)
+void initSystem(embot::os::Thread *t, void* initparam)
 {
     
-    embot::sys::theTimerManager::getInstance().start({});     
-    embot::sys::theCallbackManager::getInstance().start({});  
+    embot::os::theTimerManager::getInstance().start({});     
+    embot::os::theCallbackManager::getInstance().start({});  
     
     static const std::initializer_list<embot::hw::LED> allleds = {embot::hw::LED::one};  
     embot::app::theLEDmanager &theleds = embot::app::theLEDmanager::getInstance();     
     theleds.init(allleds);    
-    theleds.get(embot::hw::LED::one).pulse(2*embot::common::time1second); 
+    theleds.get(embot::hw::LED::one).pulse(2*embot::core::time1second); 
        
     
-    embot::sys::EventTask::Config configEV { 
+    embot::os::EventThread::Config configEV { 
         4*1024, 
-        embot::sys::Priority::high200, 
+        embot::os::Priority::high200, 
         eventbasedtask_startup,
         nullptr,
-        50*embot::common::time1millisec,
+        50*embot::core::time1millisec,
         eventbasedtask_onevent
     };
         
     // create the main task 
-    embot::sys::EventTask* tsk = new embot::sys::EventTask;          
+    embot::os::EventThread* tsk = new embot::os::EventThread;          
     // and start it
     tsk->start(configEV);
     
@@ -108,18 +106,23 @@ void initSystem(embot::sys::Task *t, void* initparam)
 
 int main(void)
 { 
-    embot::hw::bsp::Config cc(nullptr, embot::sys::now);
-    embot::hw::bsp::init(cc);
+    // steps:
+    // 1. i init the embot::os
+    // 2 i start the scheduler
     
-    embot::sys::InitTask::Config initcfg = { 1024, initSystem, nullptr };
-    embot::sys::IdleTask::Config idlecfg = { 512, nullptr, nullptr, onIdle };
-    embot::common::Callback onOSerror = { };
+    
+    constexpr embot::os::InitThread::Config initcfg = { 1024, initSystem, nullptr };
+    constexpr embot::os::IdleThread::Config idlecfg = { 512, nullptr, nullptr, onIdle };
+    constexpr embot::core::Callback onOSerror = { };
+    constexpr embot::os::Config osconfig {embot::core::time1millisec, initcfg, idlecfg, onOSerror};
+    
+    // embot::os::init() internally calls embot::hw::bsp::init() which also calls embot::core::init()
+    embot::os::init(osconfig);
+    
+    // now i start the os    
+    embot::os::start();
 
-    embot::sys::theScheduler::Config cfg { embot::sys::theScheduler::Timing(embot::hw::sys::clock(embot::hw::CLOCK::syscore),  embot::common::time1millisec), {initcfg, idlecfg, onOSerror} };    
-    embot::sys::theScheduler &thescheduler = embot::sys::theScheduler::getInstance();
-    thescheduler.start(cfg);    
-       
-    // just because i am paranoid
+    // just because i am paranoid (thescheduler.start() never returns)
     for(;;);    
 }
 
@@ -137,7 +140,7 @@ static void s_chips_tick() {}
 
 static void s_chips_init()
 {
-    constexpr embot::common::relTime timeout = 5*embot::common::time1millisec;
+    constexpr embot::core::relTime timeout = 5*embot::core::time1millisec;
     
     embot::hw::bno055::Config bno055config { embot::hw::i2c::Descriptor { embot::hw::I2C::one, 400000 } };
     embot::hw::bno055::init(embot::hw::BNO055::one, bno055config); 
@@ -156,7 +159,7 @@ static void s_chips_tick()
     
     data.clear();
     
-    embot::utils::Triple<float> a {0, 0, 0};
+    embot::core::utils::Triple<float> a {0, 0, 0};
     
     
     if(embot::hw::result_t::OK == embot::hw::bno055::acquisition(embot::hw::BNO055::one, embot::hw::bno055::Set::AMG))
@@ -172,10 +175,10 @@ static void s_chips_tick()
         char text[32] = {'h', 'E', 'l', 'l', 'o', '!', ' '}; 
         // 'hello! " is transmited in about 600 usec @ 115200 w/ 1 bit stop 
         // (9 bits per char) -> 1/(115200/9) = 0.000078125 sec / byte. For 7 bytes -> 546 usec
-        embot::common::Time t0 = embot::hw::bsp::now();
+        embot::core::Time t0 = embot::core::now();
         //r = HAL_UART_Transmit(&huart3, const_cast<uint8_t*>(reinterpret_cast<const uint8_t*>(txtout.c_str())), std::strlen(txtout.c_str()), 0xFFFF);
         r = HAL_UART_Transmit(&huart3, const_cast<uint8_t*>(reinterpret_cast<const uint8_t*>(text)), std::strlen(text), 0xFFFF);
-        embot::common::relTime delta =  embot::hw::bsp::now() - t0;
+        embot::core::relTime delta =  embot::core::now() - t0;
         embot::hw::sys::puts("uart tx @ 115200 lasted " + std::to_string(delta) + " us"); 
         r = r;
     }
@@ -202,7 +205,7 @@ static void s_chips_init()
     
     if(true == embot::hw::si7051::isalive(embot::hw::SI7051::one))
     {
-        embot::common::Callback cbk { setflag, nullptr};
+        embot::core::Callback cbk { setflag, nullptr};
         temperatureISready =  0;
         embot::hw::si7051::acquisition(embot::hw::SI7051::one, cbk);
         for(;;)

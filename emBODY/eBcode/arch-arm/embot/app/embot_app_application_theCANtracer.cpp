@@ -51,7 +51,7 @@ struct embot::app::theCANtracer::Impl
 {    
     Config config;
         
-    embot::common::Time starttime;
+    embot::core::Time starttime;
     
     
     Impl() 
@@ -97,16 +97,16 @@ bool embot::app::theCANtracer::initialise(const Config &config)
   
 
 
-embot::common::Time embot::app::theCANtracer::start()
+embot::core::Time embot::app::theCANtracer::start()
 {  
-    pImpl->starttime = embot::sys::now();     
+    pImpl->starttime = embot::core::now();     
     return pImpl->starttime;    
 }
 
 
-embot::common::relTime embot::app::theCANtracer::stop(const std::string &prefix, std::vector<embot::hw::can::Frame> &frames, embot::common::Time started)
+embot::core::relTime embot::app::theCANtracer::stop(const std::string &prefix, std::vector<embot::prot::can::Frame> &frames, embot::core::Time started)
 { 
-    embot::common::Time tt = embot::sys::now();
+    embot::core::Time tt = embot::core::now();
     
     if(0 == started)
     {
@@ -115,7 +115,7 @@ embot::common::relTime embot::app::theCANtracer::stop(const std::string &prefix,
     pImpl->starttime = 0;
     
     tt -= started;    
-    embot::common::relTime delta = static_cast<embot::common::relTime>(tt);
+    embot::core::relTime delta = static_cast<embot::core::relTime>(tt);
     
     char strTT[12] = {0};
     std::snprintf(strTT, sizeof(strTT), "%d", delta);    
@@ -127,10 +127,10 @@ embot::common::relTime embot::app::theCANtracer::stop(const std::string &prefix,
 }
 
 
-bool embot::app::theCANtracer::print(const std::string &text, std::vector<embot::hw::can::Frame> &frames)
+bool embot::app::theCANtracer::print(const std::string &text, std::vector<embot::prot::can::Frame> &frames)
 { 
-    embot::app::canprotocol::motor::periodic::Message_PRINT msg;
-    embot::app::canprotocol::motor::periodic::Message_PRINT::Info info;
+    embot::prot::can::motor::periodic::Message_PRINT msg;
+    embot::prot::can::motor::periodic::Message_PRINT::Info info;
 
     info.canaddress = pImpl->config.canaddress;
     std::snprintf(info.text, sizeof(info.text), "%s", text.c_str());
@@ -140,7 +140,7 @@ bool embot::app::theCANtracer::print(const std::string &text, std::vector<embot:
     
     for(int i=0; i<nframes; i++)
     {    
-        embot::hw::can::Frame frame0;
+        embot::prot::can::Frame frame0;
         msg.get(frame0);
         frames.push_back(frame0);
     }

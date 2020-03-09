@@ -31,7 +31,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "embot.h"
-#include "embot_common.h"
+#include "embot_core.h"
 #include "embot_binary.h"
 
 #include <cstring>
@@ -46,7 +46,7 @@
 
 
 
-namespace embot { namespace app { namespace canprotocol { namespace motor { namespace polling {
+namespace embot { namespace prot { namespace can { namespace motor { namespace polling {
 
     bool supported(std::uint8_t cmd)
     {
@@ -69,7 +69,7 @@ namespace embot { namespace app { namespace canprotocol { namespace motor { name
 
         std::uint8_t ind = cmd >> 6;
         std::uint8_t pos = cmd & 0x3f;
-        if(true == embot::binary::bit::check(mcpollmask256[ind], pos))
+        if(true == embot::core::binary::bit::check(mcpollmask256[ind], pos))
         {
             return static_cast<CMD>(cmd);            
         }
@@ -89,7 +89,7 @@ namespace embot { namespace app { namespace canprotocol { namespace motor { name
     
     
     
-}}}}} // namespace embot { namespace app { namespace canprotocol { namespace motor { namespace polling {
+}}}}} // namespace embot { namespace prot { namespace can { namespace motor { namespace polling {
     
     
 

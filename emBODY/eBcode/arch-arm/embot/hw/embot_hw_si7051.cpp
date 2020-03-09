@@ -59,10 +59,10 @@ namespace embot { namespace hw { namespace si7051 {
     bool supported(SI7051 s)                                                                        { return false; }
     bool initialised(SI7051 s)                                                                      { return false; }
     result_t init(SI7051 s, const Config &config)                                                   { return resNOK; }    
-    bool isalive(embot::hw::SI7051 s, embot::common::relTime timeout)                               { return false; }    
+    bool isalive(embot::hw::SI7051 s, embot::core::relTime timeout)                               { return false; }    
     bool isacquiring(embot::hw::SI7051 s)                                                           { return false; }    
     bool canacquire(embot::hw::SI7051 s)                                                            { return false; }        
-    result_t acquisition(embot::hw::SI7051 s, const embot::common::Callback &oncompletion)          { return resNOK; }
+    result_t acquisition(embot::hw::SI7051 s, const embot::core::Callback &oncompletion)          { return resNOK; }
     bool operationdone(embot::hw::SI7051 s)                                                         { return false; }
     result_t read(embot::hw::SI7051 s, Temperature &temp)                                           { return resNOK; }   
 
@@ -83,7 +83,7 @@ namespace embot { namespace hw { namespace si7051 {
     
     bool initialised(SI7051 a)
     {
-        return embot::binary::bit::check(initialisedmask, embot::common::tointegral(a));
+        return embot::core::binary::bit::check(initialisedmask, embot::core::tointegral(a));
     }    
       
 
@@ -93,15 +93,15 @@ namespace embot { namespace hw { namespace si7051 {
         volatile bool ongoing;
         Temperature temp;
         std::uint8_t rxdata[2];
-        embot::common::Callback userdefCBK;  
+        embot::core::Callback userdefCBK;  
         void clear() { done = false; ongoing = false; temp = 0; rxdata[0] = rxdata[1] = 0; userdefCBK.clear(); }         
     };
     
     struct PrivateData
     {
-        std::uint8_t i2caddress[embot::common::tointegral(SI7051::maxnumberof)];   
-        Config config[embot::common::tointegral(SI7051::maxnumberof)];        
-        Acquisition acquisition[embot::common::tointegral(SI7051::maxnumberof)];
+        std::uint8_t i2caddress[embot::core::tointegral(SI7051::maxnumberof)];   
+        Config config[embot::core::tointegral(SI7051::maxnumberof)];        
+        Acquisition acquisition[embot::core::tointegral(SI7051::maxnumberof)];
         PrivateData() { }
     };
     
@@ -142,7 +142,7 @@ namespace embot { namespace hw { namespace si7051 {
         // init peripheral
         embot::hw::bsp::si7051::getBSP().init(s);
         
-        std::uint8_t index = embot::common::tointegral(s);
+        std::uint8_t index = embot::core::tointegral(s);
                 
         // init i2c ..
         embot::hw::i2c::init(config.i2cdes.bus, config.i2cdes.config);
@@ -155,7 +155,7 @@ namespace embot { namespace hw { namespace si7051 {
         s_privatedata.config[index] = config;
         s_privatedata.acquisition[index].clear();
         
-        embot::binary::bit::set(initialisedmask, embot::common::tointegral(s));
+        embot::core::binary::bit::set(initialisedmask, embot::core::tointegral(s));
                 
         return resOK;
     }
@@ -168,7 +168,7 @@ namespace embot { namespace hw { namespace si7051 {
             return false;
         } 
 
-        std::uint8_t index = embot::common::tointegral(s);        
+        std::uint8_t index = embot::core::tointegral(s);        
         return s_privatedata.acquisition[index].ongoing;     
     }
     
@@ -180,7 +180,7 @@ namespace embot { namespace hw { namespace si7051 {
             return false;
         } 
 
-        std::uint8_t index = embot::common::tointegral(s);  
+        std::uint8_t index = embot::core::tointegral(s);  
         
         if(true == s_privatedata.acquisition[index].ongoing)
         {
@@ -190,14 +190,14 @@ namespace embot { namespace hw { namespace si7051 {
         return !embot::hw::i2c::isbusy(s_privatedata.config[index].i2cdes.bus);             
     }    
     
-    result_t acquisition(SI7051 s, const embot::common::Callback &oncompletion)
+    result_t acquisition(SI7051 s, const embot::core::Callback &oncompletion)
     {
         if(false == canacquire(s))
         {
             return resNOK;
         }
         
-        std::uint8_t index = embot::common::tointegral(s);
+        std::uint8_t index = embot::core::tointegral(s);
                 
         s_privatedata.acquisition[index].clear();
         s_privatedata.acquisition[index].ongoing = true;
@@ -205,20 +205,20 @@ namespace embot { namespace hw { namespace si7051 {
         s_privatedata.acquisition[index].userdefCBK = oncompletion;
         
         // ok, now i trigger i2c.
-        embot::common::Callback cbk(sharedCBK, &s_privatedata.acquisition[index]);
-        embot::utils::Data data = embot::utils::Data(&s_privatedata.acquisition[index].rxdata[0], 2);
+        embot::core::Callback cbk(sharedCBK, &s_privatedata.acquisition[index]);
+        embot::core::Data data = embot::core::Data(&s_privatedata.acquisition[index].rxdata[0], 2);
         embot::hw::i2c::read(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], registerTemperatureRead, data, cbk);
                 
         return resOK;
     }
     
-    bool isalive(SI7051 s, embot::common::relTime timeout)
+    bool isalive(SI7051 s, embot::core::relTime timeout)
     {
         if(false == initialised(s))
         {
             return false;
         } 
-        std::uint8_t index = embot::common::tointegral(s);
+        std::uint8_t index = embot::core::tointegral(s);
         return embot::hw::i2c::ping(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], timeout);  
     }
 
@@ -230,7 +230,7 @@ namespace embot { namespace hw { namespace si7051 {
             return false;
         } 
 
-        return s_privatedata.acquisition[embot::common::tointegral(s)].done;        
+        return s_privatedata.acquisition[embot::core::tointegral(s)].done;        
     } 
     
     
@@ -246,7 +246,7 @@ namespace embot { namespace hw { namespace si7051 {
             return resNOK;
         }
         
-        std::uint8_t index = embot::common::tointegral(s);
+        std::uint8_t index = embot::core::tointegral(s);
         temp = s_privatedata.acquisition[index].temp;
   
         return resOK;        

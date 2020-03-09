@@ -21,12 +21,12 @@
 #ifndef _EMBOT_SYS_THETIMERMANAGER_H_
 #define _EMBOT_SYS_THETIMERMANAGER_H_
 
-#include "embot_common.h"
+#include "embot_core.h"
 #include "embot_sys.h"
 #include "embot_sys_Timer.h"
 #include <memory>
 
-namespace embot { namespace sys {
+namespace embot { namespace os {
             
     class theTimerManager
     {
@@ -36,15 +36,15 @@ namespace embot { namespace sys {
     public:
         struct Config
         {
-            embot::sys::Priority    priority {embot::sys::Priority::system240};
+            embot::os::Priority     priority {embot::os::Priority::system240};
             std::uint16_t           stacksize {1024};
             std::uint16_t           capacityofhandler {8};          
             Config() = default;
-            constexpr Config(std::uint16_t ss, std::uint16_t cap, embot::sys::Priority prio = embot::sys::Priority::system240)
+            constexpr Config(std::uint16_t ss, std::uint16_t cap, embot::os::Priority prio = embot::os::Priority::system240)
                 : stacksize(ss), capacityofhandler(cap), priority(prio) {}
             bool isvalid() const
             {
-                return ((0 == stacksize) || (0 == capacityofhandler) || (false == embot::sys::isSystem(priority))) ? false : true;
+                return ((0 == stacksize) || (0 == capacityofhandler) || (false == embot::os::isSystem(priority))) ? false : true;
             }
         }; 
         
@@ -67,7 +67,7 @@ namespace embot { namespace sys {
     };       
 
 
-}} // namespace embot { namespace sys {
+}} // namespace embot { namespace os {
 
 
 #endif  // include-guard

@@ -21,14 +21,14 @@
 #ifndef _EMBOT_APP_CANPROTOCOL_SKIN_H_
 #define _EMBOT_APP_CANPROTOCOL_SKIN_H_
 
-#include "embot_common.h"
+#include "embot_core.h"
 
 #include "embot_app_canprotocol.h"
 
 #include <cstring>
 
 
-namespace embot { namespace app { namespace canprotocol { namespace skin { namespace periodic {
+namespace embot { namespace prot { namespace can { namespace skin { namespace periodic {
     
     // the supported commands    
     enum class CMD { 
@@ -46,12 +46,12 @@ namespace embot { namespace app { namespace canprotocol { namespace skin { names
     CMD convert(std::uint8_t cmd);
     std::uint8_t convert(CMD cmd);
     
-}}}}} // namespace embot { namespace app { namespace canprotocol { namespace skin { namespace periodic { 
+}}}}} // namespace embot { namespace prot { namespace can { namespace skin { namespace periodic { 
 
 
 
   
-namespace embot { namespace app { namespace canprotocol { namespace skin { namespace periodic {
+namespace embot { namespace prot { namespace can { namespace skin { namespace periodic {
                   
     // the management of commands    
     
@@ -78,10 +78,10 @@ namespace embot { namespace app { namespace canprotocol { namespace skin { names
             
         bool load(const Info& inf);
             
-        bool get(embot::hw::can::Frame &outframe0, embot::hw::can::Frame &outframe1);        
+        bool get(embot::prot::can::Frame &outframe0, embot::prot::can::Frame &outframe1);        
     };
     
-}}}}} // namespace embot { namespace app { namespace canprotocol { namespace skin { namespace periodic {    
+}}}}} // namespace embot { namespace prot { namespace can { namespace skin { namespace periodic {    
 
 
 #endif  // include-guard

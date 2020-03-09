@@ -19,18 +19,18 @@
 
 // - include guard ----------------------------------------------------------------------------------------------------
 
-#ifndef _EMBOT_BINARY_H_
-#define _EMBOT_BINARY_H_
+#ifndef _EMBOT_CORE_BINARY_H_
+#define _EMBOT_CORE_BINARY_H_
 
 #include <cstdint>
 #include <cstring>
 #include <initializer_list>
 
-#include "embot_common.h"
+#include "embot_core.h"
 
 
 
-namespace embot { namespace binary { namespace bit {
+namespace embot { namespace core { namespace binary { namespace bit {
        
     // it forces 1 into pos-th bit of value
     template<typename T>
@@ -89,18 +89,18 @@ namespace embot { namespace binary { namespace bit {
         return p;
     }      
        
-} } } // namespace embot { namespace binary { namespace bit
+} } } } // namespace embot { namespace core { namespace binary { namespace bit
 
 
 
-namespace embot { namespace binary { namespace mask {
+namespace embot { namespace core { namespace binary { namespace mask {
     
     // it creates a mask which as `1` value in positions specified by posofonbits
     template<typename M, typename T>
     constexpr M generate(const std::initializer_list<T> &posofonbits)
     {
         M mask = 0;
-        for(auto a : posofonbits) embot::binary::bit::set(mask, a);
+        for(auto a : posofonbits) embot::core::binary::bit::set(mask, a);
         return mask;
     } 
          
@@ -143,11 +143,11 @@ namespace embot { namespace binary { namespace mask {
     } 
       
     
-} } } // namespace embot { namespace binary { namespace mask
+} } } } // namespace embot { namespace core { namespace binary { namespace mask
 
 
 
-namespace embot { namespace binary { namespace nibble {
+namespace embot { namespace core { namespace binary { namespace nibble {
     
     using NIBBLE = std::uint8_t;
     
@@ -162,8 +162,8 @@ namespace embot { namespace binary { namespace nibble {
     template<typename T>
     void assign(T &value, const NIBBLE nib, std::uint8_t pos)
     {
-        embot::binary::mask::clear(value, static_cast<T>(0xf)<<(4*pos));
-        embot::binary::mask::set(value, static_cast<T>(nib & 0xf)<<(4*pos));
+        embot::core::binary::mask::clear(value, static_cast<T>(0xf)<<(4*pos));
+        embot::core::binary::mask::set(value, static_cast<T>(nib & 0xf)<<(4*pos));
     }
     
     template<typename T>
@@ -176,20 +176,20 @@ namespace embot { namespace binary { namespace nibble {
     template<typename T>
     constexpr void clear(T &value, std::uint8_t pos)
     {
-        embot::binary::mask::clear(value, static_cast<T>(0xf)<<(4*pos));
+        embot::core::binary::mask::clear(value, static_cast<T>(0xf)<<(4*pos));
     }
     
     // it returns true if nib is equal to the pos-th nibble of value
     template<typename T>
     constexpr bool check(const T value, const NIBBLE nib, std::uint8_t pos)
     {
-        return embot::binary::mask::check(value, static_cast<T>(nib & 0xf)<<(4*pos));
+        return embot::core::binary::mask::check(value, static_cast<T>(nib & 0xf)<<(4*pos));
     } 
        
-} } } // namespace embot { namespace binary { namespace nibble
+} } } } // namespace embot { namespace core { namespace binary { namespace nibble
 
 
-namespace embot { namespace binary { namespace pair {
+namespace embot { namespace core { namespace binary { namespace pair {
     
     using PAIR = std::uint8_t;
     
@@ -204,8 +204,8 @@ namespace embot { namespace binary { namespace pair {
     template<typename T>
     constexpr void assign(T &value, const PAIR pa, std::uint8_t pos)
     {
-        embot::binary::mask::clear(value, static_cast<T>(0x3)<<(2*pos));
-        embot::binary::mask::set(value, static_cast<T>(pa & 0x3)<<(2*pos));
+        embot::core::binary::mask::clear(value, static_cast<T>(0x3)<<(2*pos));
+        embot::core::binary::mask::set(value, static_cast<T>(pa & 0x3)<<(2*pos));
     }
     
     template<typename T>
@@ -218,17 +218,17 @@ namespace embot { namespace binary { namespace pair {
     template<typename T>
     constexpr void clear(T &value, std::uint8_t pos)
     {
-        embot::binary::mask::clear(value, static_cast<T>(0x3)<<(2*pos));
+        embot::core::binary::mask::clear(value, static_cast<T>(0x3)<<(2*pos));
     }
     
     // it returns true if pa is equal to the pos-th pair of value
     template<typename T>
     constexpr bool check(const T value, const PAIR pa, std::uint8_t pos)
     {
-        return embot::binary::mask::check(value, static_cast<T>(pa & 0x3)<<(2*pos));
+        return embot::core::binary::mask::check(value, static_cast<T>(pa & 0x3)<<(2*pos));
     } 
        
-} } } // namespace embot { namespace binary { namespace pair
+} } } } // namespace embot { namespace core { namespace binary { namespace pair
 
 #endif  // include-guard
 

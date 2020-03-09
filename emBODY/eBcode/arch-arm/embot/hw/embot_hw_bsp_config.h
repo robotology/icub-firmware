@@ -10,7 +10,7 @@
 #ifndef _EMBOT_HW_BSP_CONFIG_H_
 #define _EMBOT_HW_BSP_CONFIG_H_
 
-#include "embot_common.h"
+#include "embot_core.h"
 #include "embot_hw.h"
 #include "embot_hw_bsp.h"
 
@@ -33,7 +33,6 @@
     #define EMBOT_ENABLE_hw_i2c
     #define EMBOT_ENABLE_hw_bno055
     #define EMBOT_ENABLE_hw_multisda
-    #define EMBOT_ENABLE_hw_tlv493d
 
 #elif defined(STM32HAL_BOARD_STRAIN2)
 
@@ -58,7 +57,6 @@
     #define EMBOT_ENABLE_hw_can
     #define EMBOT_ENABLE_hw_flash
     #define EMBOT_ENABLE_hw_timer
-    #define EMBOT_ENABLE_hw_si7051
     #define EMBOT_ENABLE_hw_i2c
     #define EMBOT_ENABLE_hw_bno055
     

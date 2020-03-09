@@ -61,7 +61,7 @@ namespace embot { namespace hw { namespace adc {
     result_t init(ADC p, const Config &config)                                             { return resNOK; }
     result_t configure(ADC p, void *destination, std::uint8_t numberofitems)               { return resNOK; }
     result_t configure(ADC p, Acquisition acquisition)                                     { return resNOK; }
-    result_t configure(ADC p, const embot::common::Callback &oncompletion)                 { return resNOK; }
+    result_t configure(ADC p, const embot::core::Callback &oncompletion)                 { return resNOK; }
     result_t start(ADC p)                                                                  { return resNOK; }
     bool isrunning(ADC p)                                                                  { return false; }
     result_t get(ADC p, void *items)                                                       { return resNOK; }
@@ -91,7 +91,7 @@ namespace embot { namespace hw { namespace adc {
     
     bool initialised(ADC p)
     {
-        return embot::binary::bit::check(initialisedmask, embot::common::tointegral(p));
+        return embot::core::binary::bit::check(initialisedmask, embot::core::tointegral(p));
     }    
 
     
@@ -151,7 +151,7 @@ namespace embot { namespace hw { namespace adc {
         adcdata.adc_isrunning = false;
         adcdata.handle = embot::hw::bsp::adc::getBSP().getPROP(p)->handle;
                                 
-        embot::binary::bit::set(initialisedmask, embot::common::tointegral(p));
+        embot::core::binary::bit::set(initialisedmask, embot::core::tointegral(p));
 
         return resOK;
     }
@@ -185,7 +185,7 @@ namespace embot { namespace hw { namespace adc {
     }
  
     
-    result_t configure(ADC p, const embot::common::Callback &oncompletion)
+    result_t configure(ADC p, const embot::core::Callback &oncompletion)
     {        
         if(false == initialised(p))
         {

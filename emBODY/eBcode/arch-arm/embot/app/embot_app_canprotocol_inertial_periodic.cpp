@@ -31,7 +31,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "embot.h"
-#include "embot_common.h"
+#include "embot_core.h"
 #include "embot_binary.h"
 
 #include <cstring>
@@ -49,7 +49,7 @@
     
     
     
-namespace embot { namespace app { namespace canprotocol { namespace inertial { namespace periodic {
+namespace embot { namespace prot { namespace can { namespace inertial { namespace periodic {
     
     
     bool supported(std::uint8_t cmd)
@@ -59,7 +59,7 @@ namespace embot { namespace app { namespace canprotocol { namespace inertial { n
         
     CMD convert(std::uint8_t cmd)
     {   
-        static const std::uint16_t ispermask16 =    (1 << static_cast<std::uint8_t>(CMD::DIGITAL_GYROSCOPE))        |
+        constexpr std::uint16_t ispermask16 =    (1 << static_cast<std::uint8_t>(CMD::DIGITAL_GYROSCOPE))        |
                                                     (1 << static_cast<std::uint8_t>(CMD::DIGITAL_ACCELEROMETER))    |
                                                     (1 << static_cast<std::uint8_t>(CMD::IMU_TRIPLE))               |
                                                     (1 << static_cast<std::uint8_t>(CMD::IMU_QUATERNION))           |
@@ -70,7 +70,7 @@ namespace embot { namespace app { namespace canprotocol { namespace inertial { n
             return CMD::none;
         }
 
-        if(true == embot::binary::bit::check(ispermask16, cmd))
+        if(true == embot::core::binary::bit::check(ispermask16, cmd))
         {
             return static_cast<CMD>(cmd);          
         }
@@ -92,7 +92,7 @@ namespace embot { namespace app { namespace canprotocol { namespace inertial { n
         return true;
     }
         
-    bool Message_DIGITAL_GYROSCOPE::get(embot::hw::can::Frame &outframe)
+    bool Message_DIGITAL_GYROSCOPE::get(embot::prot::can::Frame &outframe)
     {
         std::uint8_t data08[8] = {0};
         data08[0] = static_cast<std::uint8_t>((info.x & 0x00ff));
@@ -102,7 +102,7 @@ namespace embot { namespace app { namespace canprotocol { namespace inertial { n
         data08[4] = static_cast<std::uint8_t>((info.z & 0x00ff));
         data08[5] = static_cast<std::uint8_t>((info.z & 0xff00) >> 8);            
         Message::set(info.canaddress, 0xf, Clas::periodicInertialSensor, static_cast<std::uint8_t>(CMD::DIGITAL_GYROSCOPE), data08, 6);
-        std::memmove(&outframe, &canframe, sizeof(embot::hw::can::Frame));
+        std::memmove(&outframe, &canframe, sizeof(embot::prot::can::Frame));
                     
         return true;
     }  
@@ -114,7 +114,7 @@ namespace embot { namespace app { namespace canprotocol { namespace inertial { n
         return true;
     }
         
-    bool Message_DIGITAL_ACCELEROMETER::get(embot::hw::can::Frame &outframe)
+    bool Message_DIGITAL_ACCELEROMETER::get(embot::prot::can::Frame &outframe)
     {
         std::uint8_t data08[8] = {0};
         data08[0] = static_cast<std::uint8_t>((info.x & 0x00ff));
@@ -124,7 +124,7 @@ namespace embot { namespace app { namespace canprotocol { namespace inertial { n
         data08[4] = static_cast<std::uint8_t>((info.z & 0x00ff));
         data08[5] = static_cast<std::uint8_t>((info.z & 0xff00) >> 8);            
         Message::set(info.canaddress, 0xf, Clas::periodicInertialSensor, static_cast<std::uint8_t>(CMD::DIGITAL_ACCELEROMETER), data08, 6);
-        std::memmove(&outframe, &canframe, sizeof(embot::hw::can::Frame));
+        std::memmove(&outframe, &canframe, sizeof(embot::prot::can::Frame));
                     
         return true;
     }    
@@ -137,7 +137,7 @@ namespace embot { namespace app { namespace canprotocol { namespace inertial { n
         return true;
     }
         
-    bool Message_IMU_TRIPLE::get(embot::hw::can::Frame &outframe)
+    bool Message_IMU_TRIPLE::get(embot::prot::can::Frame &outframe)
     {
         std::uint8_t data08[8] = {0};
         data08[0] = info.seqnumber;
@@ -149,7 +149,7 @@ namespace embot { namespace app { namespace canprotocol { namespace inertial { n
         data08[6] = static_cast<std::uint8_t>((info.value.z & 0x00ff));
         data08[7] = static_cast<std::uint8_t>((info.value.z & 0xff00) >> 8);          
         Message::set(info.canaddress, 0xf, Clas::periodicInertialSensor, static_cast<std::uint8_t>(CMD::IMU_TRIPLE), data08, 8);
-        std::memmove(&outframe, &canframe, sizeof(embot::hw::can::Frame));
+        std::memmove(&outframe, &canframe, sizeof(embot::prot::can::Frame));
                     
         return true;
     }  
@@ -161,7 +161,7 @@ namespace embot { namespace app { namespace canprotocol { namespace inertial { n
         return true;
     }
         
-    bool Message_IMU_QUATERNION::get(embot::hw::can::Frame &outframe)
+    bool Message_IMU_QUATERNION::get(embot::prot::can::Frame &outframe)
     {
         std::uint8_t data08[8] = {0};
         data08[0] = static_cast<std::uint8_t>((info.value.w & 0x00ff));
@@ -173,7 +173,7 @@ namespace embot { namespace app { namespace canprotocol { namespace inertial { n
         data08[6] = static_cast<std::uint8_t>((info.value.z & 0x00ff));
         data08[7] = static_cast<std::uint8_t>((info.value.z & 0xff00) >> 8);          
         Message::set(info.canaddress, 0xf, Clas::periodicInertialSensor, static_cast<std::uint8_t>(CMD::IMU_QUATERNION), data08, 8);
-        std::memmove(&outframe, &canframe, sizeof(embot::hw::can::Frame));
+        std::memmove(&outframe, &canframe, sizeof(embot::prot::can::Frame));
                     
         return true;
     }
@@ -186,7 +186,7 @@ namespace embot { namespace app { namespace canprotocol { namespace inertial { n
         return true;
     }
         
-    bool Message_IMU_STATUS::get(embot::hw::can::Frame &outframe)
+    bool Message_IMU_STATUS::get(embot::prot::can::Frame &outframe)
     {
         std::uint8_t data08[8] = {0};
         data08[0] = info.seqnumber;
@@ -195,12 +195,12 @@ namespace embot { namespace app { namespace canprotocol { namespace inertial { n
         data08[3] = static_cast<std::uint8_t>(info.magcalib);  
         std::memmove(&data08[4], &info.acquisitiontime, 4);
         Message::set(info.canaddress, 0xf, Clas::periodicInertialSensor, static_cast<std::uint8_t>(CMD::IMU_STATUS), data08, 8);
-        std::memmove(&outframe, &canframe, sizeof(embot::hw::can::Frame));
+        std::memmove(&outframe, &canframe, sizeof(embot::prot::can::Frame));
                     
         return true;
     }         
 
-}}}}} // namespace embot { namespace app { namespace canprotocol { namespace inertial { namespace periodic {
+}}}}} // namespace embot { namespace prot { namespace can { namespace inertial { namespace periodic {
     
     
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------

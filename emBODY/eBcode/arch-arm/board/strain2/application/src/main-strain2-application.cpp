@@ -13,8 +13,8 @@
 
 constexpr embot::app::theCANboardInfo::applicationInfo applInfo 
 { 
-    embot::app::canprotocol::versionOfAPPLICATION {2, 0, 6},    
-    embot::app::canprotocol::versionOfCANPROTOCOL {2, 0}    
+    embot::prot::can::versionOfAPPLICATION {200, 0, 6},    
+    embot::prot::can::versionOfCANPROTOCOL {2, 0}    
 };
 
 constexpr std::uint16_t taskIDLEstacksize = 512;
@@ -22,15 +22,15 @@ constexpr std::uint16_t taskINITstacksize = 2048;
 constexpr std::uint16_t taskEVNTstacksize = 4096;
 constexpr std::uint8_t maxINPcanframes = 16;
 constexpr std::uint8_t maxOUTcanframes = 48;
-constexpr embot::common::relTime taskEVNTtimeout = 50*embot::common::time1millisec;
+constexpr embot::core::relTime taskEVNTtimeout = 50*embot::core::time1millisec;
 
 static void *paramINIT = nullptr;
 static void *paramIDLE = nullptr;
 static void *paramERR = nullptr;
 static void *paramEVNT = nullptr;
 
-constexpr embot::sys::theTimerManager::Config tmcfg {};
-constexpr embot::sys::theCallbackManager::Config cmcfg {};
+constexpr embot::os::theTimerManager::Config tmcfg {};
+constexpr embot::os::theCallbackManager::Config cmcfg {};
     
     
 static const embot::code::application::core::sysConfig syscfg { taskINITstacksize, paramINIT, taskIDLEstacksize, paramIDLE, paramERR, tmcfg, cmcfg};
@@ -49,9 +49,9 @@ public:
     mySYS(const embot::code::application::core::sysConfig &cfg) 
         : SYSTEMevtcan(cfg) {}
         
-    void userdefOnIdle(embot::sys::Task *t, void* idleparam) const override;
+    void userdefOnIdle(embot::os::Thread *t, void* idleparam) const override;
     void userdefonOSerror(void *errparam) const override;
-    void userdefInit_Extra(embot::sys::EventTask* evtsk, void *initparam) const override;
+    void userdefInit_Extra(embot::os::EventThread* evthr, void *initparam) const override;
 };
 
 
@@ -61,10 +61,10 @@ public:
     myEVT(const embot::code::application::evntskcan::evtConfig& ecfg, const embot::code::application::evntskcan::canConfig& ccfg, const embot::app::theCANboardInfo::applicationInfo& a) 
         : EVNTSKcan(ecfg, ccfg, a) {}
         
-    void userdefStartup(embot::sys::Task *t, void *param) const override;
-    void userdefOnTimeout(embot::sys::Task *t, embot::common::EventMask eventmask, void *param) const override;
-    void userdefOnEventRXcanframe(embot::sys::Task *t, embot::common::EventMask eventmask, void *param, const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &outframes) const override;
-    void userdefOnEventANYother(embot::sys::Task *t, embot::common::EventMask eventmask, void *param, std::vector<embot::hw::can::Frame> &outframes) const override;                   
+    void userdefStartup(embot::os::Thread *t, void *param) const override;
+    void userdefOnTimeout(embot::os::Thread *t, embot::os::EventMask eventmask, void *param) const override;
+    void userdefOnEventRXcanframe(embot::os::Thread *t, embot::os::EventMask eventmask, void *param, const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &outframes) const override;
+    void userdefOnEventANYother(embot::os::Thread *t, embot::os::EventMask eventmask, void *param, std::vector<embot::prot::can::Frame> &outframes) const override;                   
 };
 
 
@@ -104,20 +104,20 @@ int main(void)
 #include "embot_app_application_theCANtracer.h"
 
 
-constexpr embot::common::Event evSTRAINtick = 0x00000001 << 1;
-constexpr embot::common::Event evSTRAINdataready = 0x00000001 << 2;
-constexpr embot::common::Event evIMUtick = 0x00000001 << 3;
-constexpr embot::common::Event evIMUdataready = 0x00000001 << 4;
-constexpr embot::common::Event evTHERMOtick = 0x00000001 << 5;
-constexpr embot::common::Event evTHERMOdataready = 0x00000001 << 6;
+constexpr embot::os::Event evSTRAINtick = 0x00000001 << 1;
+constexpr embot::os::Event evSTRAINdataready = 0x00000001 << 2;
+constexpr embot::os::Event evIMUtick = 0x00000001 << 3;
+constexpr embot::os::Event evIMUdataready = 0x00000001 << 4;
+constexpr embot::os::Event evTHERMOtick = 0x00000001 << 5;
+constexpr embot::os::Event evTHERMOdataready = 0x00000001 << 6;
 
 #if defined(ENABLE_IHAVEJUSTSTARTED)
-constexpr embot::common::Event evIHAVEjuststarted = 0x00000001 << 7;
-static void ihavejuststarted_init(embot::sys::EventTask* evtsk);
-static void ihavejuststarted_tick(std::vector<embot::hw::can::Frame> &outframes);
+constexpr embot::os::Event evIHAVEjuststarted = 0x00000001 << 7;
+static void ihavejuststarted_init(embot::os::EventThread* evthr);
+static void ihavejuststarted_tick(std::vector<embot::prot::can::Frame> &outframes);
 #endif
 
-void mySYS::userdefOnIdle(embot::sys::Task *t, void* idleparam) const
+void mySYS::userdefOnIdle(embot::os::Thread *t, void* idleparam) const
 {
     static int a = 0;
     a++;        
@@ -126,12 +126,12 @@ void mySYS::userdefOnIdle(embot::sys::Task *t, void* idleparam) const
 void mySYS::userdefonOSerror(void *errparam) const
 {
     static int code = 0;
-    embot::sys::theScheduler::getInstance().getOSerror(code);
+    embot::os::theScheduler::getInstance().getOSerror(code);
     for(;;);    
 }
 
 
-void mySYS::userdefInit_Extra(embot::sys::EventTask* evtsk, void *initparam) const
+void mySYS::userdefInit_Extra(embot::os::EventThread* evthr, void *initparam) const
 {
     // inside the init task: put the init of many things ...  
     
@@ -139,14 +139,14 @@ void mySYS::userdefInit_Extra(embot::sys::EventTask* evtsk, void *initparam) con
     static const std::initializer_list<embot::hw::LED> allleds = {embot::hw::LED::one};  
     embot::app::theLEDmanager &theleds = embot::app::theLEDmanager::getInstance();     
     theleds.init(allleds);    
-    theleds.get(embot::hw::LED::one).pulse(embot::common::time1second); 
+    theleds.get(embot::hw::LED::one).pulse(embot::core::time1second); 
 
     // init of can basic paser
     embot::app::application::theCANparserBasic::getInstance().initialise({});
         
     // init agent of strain
     embot::app::application::theSTRAIN &thestrain = embot::app::application::theSTRAIN::getInstance();
-    embot::app::application::theSTRAIN::Config configstrain(evSTRAINtick, evSTRAINdataready, evtsk);
+    embot::app::application::theSTRAIN::Config configstrain(evSTRAINtick, evSTRAINdataready, evthr);
     thestrain.initialise(configstrain); 
     
     // init canparser strain and link it to its agent
@@ -156,7 +156,7 @@ void mySYS::userdefInit_Extra(embot::sys::EventTask* evtsk, void *initparam) con
                    
     // init agent of imu
     embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance();
-    embot::app::application::theIMU::Config configimu(embot::hw::bsp::strain2::imuBOSCH, embot::hw::bsp::strain2::imuBOSCHconfig, evIMUtick, evIMUdataready, evtsk);
+    embot::app::application::theIMU::Config configimu(embot::hw::bsp::strain2::imuBOSCH, embot::hw::bsp::strain2::imuBOSCHconfig, evIMUtick, evIMUdataready, evthr);
     theimu.initialise(configimu);
 
     // init canparser imu and link it to its agent
@@ -166,7 +166,7 @@ void mySYS::userdefInit_Extra(embot::sys::EventTask* evtsk, void *initparam) con
     
     // init agent of thermo
     embot::app::application::theTHERMO &thethermo = embot::app::application::theTHERMO::getInstance();
-    embot::app::application::theTHERMO::Config configthermo(embot::hw::bsp::strain2::thermometerSGAUGES, embot::hw::bsp::strain2::thermometerSGAUGESconfig, evTHERMOtick, evTHERMOdataready, evtsk);
+    embot::app::application::theTHERMO::Config configthermo(embot::hw::bsp::strain2::thermometerSGAUGES, embot::hw::bsp::strain2::thermometerSGAUGESconfig, evTHERMOtick, evTHERMOdataready, evthr);
     thethermo.initialise(configthermo);  
 
     // init canparser thermo and link it to its agent
@@ -176,31 +176,31 @@ void mySYS::userdefInit_Extra(embot::sys::EventTask* evtsk, void *initparam) con
         
 #if defined(ENABLE_IHAVEJUSTSTARTED)
     // init service IHaveJustStarted
-    ihavejuststarted_init(evtsk); 
+    ihavejuststarted_init(evthr); 
 #endif       
 }
 
-void myEVT::userdefStartup(embot::sys::Task *t, void *param) const
+void myEVT::userdefStartup(embot::os::Thread *t, void *param) const
 {
     // inside startup of evnt task: put the init of many things ... 
  
     // maybe we start the tx of ft data straight away
 #if defined(DEBUG_atstartup_tx_FTdata)
     embot::app::application::theSTRAIN &thestrain = embot::app::application::theSTRAIN::getInstance();
-    thestrain.setTXperiod(10*embot::common::time1millisec);
-    thestrain.start(embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode::txUncalibrated);
+    thestrain.setTXperiod(10*embot::core::time1millisec);
+    thestrain.start(embot::prot::can::analog::polling::Message_SET_TXMODE::StrainMode::txUncalibrated);
 #endif      
 }
 
 
-void myEVT::userdefOnTimeout(embot::sys::Task *t, embot::common::EventMask eventmask, void *param) const
+void myEVT::userdefOnTimeout(embot::os::Thread *t, embot::os::EventMask eventmask, void *param) const
 {
     static uint32_t cnt = 0;
     cnt++;    
 }
 
 
-void myEVT::userdefOnEventRXcanframe(embot::sys::Task *t, embot::common::EventMask eventmask, void *param, const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &outframes) const
+void myEVT::userdefOnEventRXcanframe(embot::os::Thread *t, embot::os::EventMask eventmask, void *param, const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &outframes) const
 {        
     // process w/ the basic parser. if not recognised call the parsers specific of the board
     if(true == embot::app::application::theCANparserBasic::getInstance().process(frame, outframes))
@@ -217,46 +217,46 @@ void myEVT::userdefOnEventRXcanframe(embot::sys::Task *t, embot::common::EventMa
     }   
 }
 
-void myEVT::userdefOnEventANYother(embot::sys::Task *t, embot::common::EventMask eventmask, void *param, std::vector<embot::hw::can::Frame> &outframes) const
+void myEVT::userdefOnEventANYother(embot::os::Thread *t, embot::os::EventMask eventmask, void *param, std::vector<embot::prot::can::Frame> &outframes) const
 {
-    if(true == embot::binary::mask::check(eventmask, evSTRAINtick))
+    if(true == embot::core::binary::mask::check(eventmask, evSTRAINtick))
     {        
         embot::app::application::theSTRAIN &thestrain = embot::app::application::theSTRAIN::getInstance();
         thestrain.tick(outframes);        
     }
             
-    if(true == embot::binary::mask::check(eventmask, evSTRAINdataready))
+    if(true == embot::core::binary::mask::check(eventmask, evSTRAINdataready))
     {        
         embot::app::application::theSTRAIN &thestrain = embot::app::application::theSTRAIN::getInstance();
         thestrain.processdata(outframes);        
     }
     
-    if(true == embot::binary::mask::check(eventmask, evIMUtick))
+    if(true == embot::core::binary::mask::check(eventmask, evIMUtick))
     {        
         embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance();
         theimu.tick(outframes);        
     }   
     
-    if(true == embot::binary::mask::check(eventmask, evIMUdataready))
+    if(true == embot::core::binary::mask::check(eventmask, evIMUdataready))
     {        
         embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance();
         theimu.processdata(outframes);        
     }
      
-    if(true == embot::binary::mask::check(eventmask, evTHERMOtick))
+    if(true == embot::core::binary::mask::check(eventmask, evTHERMOtick))
     {        
         embot::app::application::theTHERMO &thethermo = embot::app::application::theTHERMO::getInstance();
         thethermo.tick(outframes);        
     }   
     
-    if(true == embot::binary::mask::check(eventmask, evTHERMOdataready))
+    if(true == embot::core::binary::mask::check(eventmask, evTHERMOdataready))
     {        
         embot::app::application::theTHERMO &thethermo = embot::app::application::theTHERMO::getInstance();
         thethermo.processdata(outframes);        
     }  
 
 #if defined(ENABLE_IHAVEJUSTSTARTED)    
-    if(true == embot::binary::mask::check(eventmask, evIHAVEjuststarted))
+    if(true == embot::core::binary::mask::check(eventmask, evIHAVEjuststarted))
     {        
         ihavejuststarted_tick(outframes);
     } 
@@ -268,24 +268,24 @@ void myEVT::userdefOnEventANYother(embot::sys::Task *t, embot::common::EventMask
 #if defined(ENABLE_IHAVEJUSTSTARTED)
 
 constexpr uint32_t ntimes = 5;
-constexpr embot::common::Time deltatime = 3 * embot::common::time1second;
+constexpr embot::core::Time deltatime = 3 * embot::core::time1second;
 uint32_t times = 0;
 
-embot::sys::Timer * _tmr {nullptr};
-static void ihavejuststarted_init(embot::sys::EventTask* evtsk)
+embot::os::Timer * _tmr {nullptr};
+static void ihavejuststarted_init(embot::os::EventThread* evthr)
 {
     times = 0;
-    _tmr = new embot::sys::Timer;
-    _tmr->start({deltatime, {embot::sys::EventToTask{evIHAVEjuststarted, evtsk}}, embot::sys::Timer::Mode::someshots, ntimes});
+    _tmr = new embot::os::Timer;
+    _tmr->start({deltatime, {embot::os::EventToThread{evIHAVEjuststarted, evthr}}, embot::os::Timer::Mode::someshots, ntimes});
 }
 
-//action.load(embot::sys::EventToTask(pImpl->config.tickevent, pImpl->config.totask));
+//action.load(embot::os::EventToThread(pImpl->config.tickevent, pImpl->config.totask));
 //evIHAVEjuststarted
 
-static void ihavejuststarted_tick(std::vector<embot::hw::can::Frame> &outframes)
+static void ihavejuststarted_tick(std::vector<embot::prot::can::Frame> &outframes)
 {
     char ss[64] = {0};
-    uint64_t tt = embot::sys::now();
+    uint64_t tt = embot::core::now();
     uint32_t mm = tt /= 1000;
     uint32_t s = mm/1000;
     uint32_t m = mm - s*1000;

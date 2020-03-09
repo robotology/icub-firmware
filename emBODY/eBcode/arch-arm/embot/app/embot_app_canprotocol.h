@@ -21,17 +21,26 @@
 #ifndef _EMBOT_APP_CANPROTOCOL_H_
 #define _EMBOT_APP_CANPROTOCOL_H_
 
-
-#include "embot_common.h"
-
-#include "embot_hw_can.h"
+#include "embot_core.h"
 
 
-
-
-namespace embot { namespace app { namespace canprotocol {
+namespace embot { namespace prot { namespace can {
     
     // - useful types 
+
+    struct Frame            
+    {
+        std::uint32_t       id          {0};
+        std::uint8_t        size        {0};
+        std::uint8_t        filler[3]   {0};
+        std::uint8_t        data[8]     {0};  
+        Frame() = default;
+        Frame(std::uint32_t i, std::uint8_t s, std::uint8_t *d) : id(i), size(std::max(s, static_cast<std::uint8_t>(8))) 
+        {
+            if(nullptr != d) { std::memmove(data, d, size); }
+        }
+    };
+
     
     enum class Board { mtb = 5, strain = 6, mais = 7, mtb4 = 11, strain2 = 12, rfe = 13, sg3 = 14, psc = 15, mtb4w = 16, none = 254, unknown = 0xff };
     
@@ -79,42 +88,36 @@ namespace embot { namespace app { namespace canprotocol {
                       periodicAnalogSensor = 3, periodicSkin = 4, periodicInertialSensor = 5, bootloader = 7 };
         
     // the commands in each class and the messages which manage their forming / parsing are defined in namespaces ::bootloader, ::motor etc.
-    
-   
-    // utility functions for a received embot::hw::can::Frame
       
-    std::uint8_t frame2sender(const embot::hw::can::Frame &frame);
-    std::uint8_t frame2destination(const embot::hw::can::Frame &frame);
-    bool frameis4board(const embot::hw::can::Frame &frame, const std::uint8_t boardaddress);
+    // utility functions for a received embot::prot::can::Frame
+      
+    std::uint8_t frame2sender(const embot::prot::can::Frame &frame);
+    std::uint8_t frame2destination(const embot::prot::can::Frame &frame);
+    bool frameis4board(const embot::prot::can::Frame &frame, const std::uint8_t boardaddress);
     
     // by these we retrieve the class and the command.
     
-    Clas frame2clas(const embot::hw::can::Frame &frame);
-    std::uint8_t frame2cmd(const embot::hw::can::Frame &frame);
+    Clas frame2clas(const embot::prot::can::Frame &frame);
+    std::uint8_t frame2cmd(const embot::prot::can::Frame &frame);
         
     // by these we get some properties of a frame
    
-    bool frameisbootloader(const embot::hw::can::Frame &frame);
+    bool frameisbootloader(const embot::prot::can::Frame &frame);
     
-    bool frameispolling(const embot::hw::can::Frame &frame);
+    bool frameispolling(const embot::prot::can::Frame &frame);
     
-    bool frameisperiodic(const embot::hw::can::Frame &frame);
+    bool frameisperiodic(const embot::prot::can::Frame &frame);
+          
+    std::uint8_t frame2datasize(const embot::prot::can::Frame &frame);
     
+    std::uint8_t* frame2databuffer(embot::prot::can::Frame &frame);
     
+       
+    bool frame_set_clascmddestinationdata(embot::prot::can::Frame &frame, const Clas cls, const std::uint8_t cmd, const std::uint8_t destination, const void *data, const std::uint8_t size, const std::uint8_t mcindex = 0, bool verify = false);
         
+    bool frame_set_sender(embot::prot::can::Frame &frame, std::uint8_t sender, bool verify = false);
     
-    std::uint8_t frame2datasize(const embot::hw::can::Frame &frame);
-    
-    std::uint8_t* frame2databuffer(embot::hw::can::Frame &frame);
-    
-    
-    
-    
-    bool frame_set_clascmddestinationdata(embot::hw::can::Frame &frame, const Clas cls, const std::uint8_t cmd, const std::uint8_t destination, const void *data, const std::uint8_t size, const std::uint8_t mcindex = 0, bool verify = false);
-        
-    bool frame_set_sender(embot::hw::can::Frame &frame, std::uint8_t sender, bool verify = false);
-    
-    bool frame_set_size(embot::hw::can::Frame &frame, std::uint8_t size, bool verify = false);
+    bool frame_set_size(embot::prot::can::Frame &frame, std::uint8_t size, bool verify = false);
     
 
     
@@ -148,27 +151,27 @@ namespace embot { namespace app { namespace canprotocol {
         
         struct CanData
         {
-            std::uint8_t            from;
-            std::uint8_t            to;
-            Clas                    clas;       
-            std::uint8_t            cmd;       // use they are: ICUBCANPROTO_POL_MC_CMD__SET_VELOCITY_PID, etc.
-            std::uint8_t*           datainframe;
-            std::uint8_t            sizeofdatainframe;  
-            CanData() { reset(); }
+            std::uint8_t            from {0};
+            std::uint8_t            to {0};
+            Clas                    clas {Clas::none} ;       
+            std::uint8_t            cmd {0}; 
+            std::uint8_t*           datainframe {nullptr};
+            std::uint8_t            sizeofdatainframe {0};  
+            CanData() = default;
             void reset() { from = 0; to = 0; clas = Clas::none; cmd = 0; datainframe = nullptr; sizeofdatainframe = 0; } 
         };
 
     public:        
         
-        bool                    valid;
-        CanData                 candata;
-        embot::hw::can::Frame   canframe;
+        bool                    valid {false};
+        CanData                 candata {};
+        embot::prot::can::Frame canframe {};
     
               
-        Message() { clear(); }
+        Message() = default;
            
         // it copies a received frame and it computes other data structure with it. it sets valid = true. after that, if valid == true one can use the public data structures
-        void set(const embot::hw::can::Frame &fr);
+        void set(const embot::prot::can::Frame &fr);
         
         // it clears dat structure and sets valid = false. nobody should use its dta structures
         void clear();
@@ -176,22 +179,21 @@ namespace embot { namespace app { namespace canprotocol {
         // it fills data structures with passed values. it creates a frame. it sets valid = true. after that, if valid == true one can use the frame for tx
         void set(std::uint8_t fr, std::uint8_t t, Clas cl, std::uint8_t cm, const void *dat, std::uint8_t siz);
         
-        bool isvalid();
-                
+        bool isvalid();                
     };
     
     
     
     
-}}} // namespace embot { namespace app { namespace canprotocol {
+}}} // namespace embot { namespace prot { namespace can {
 
 
 
-namespace embot { namespace app { namespace canprotocol { namespace shared {
+namespace embot { namespace prot { namespace can { namespace shared {
  
     class Message_GET_VERSION : public Message
     {
-        public:
+    public:
             
         struct Info
         { 
@@ -212,9 +214,9 @@ namespace embot { namespace app { namespace canprotocol { namespace shared {
                 
         Message_GET_VERSION(Clas cl, std::uint8_t cm) : cls(cl), cmd(cm) {}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
             
-        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);    
+        bool reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);    
             
         protected:
             
@@ -222,8 +224,6 @@ namespace embot { namespace app { namespace canprotocol { namespace shared {
         std::uint8_t    cmd;                 
     }; 
     
-
-
 
     class Message_SET_ID : public Message
     {
@@ -241,7 +241,7 @@ namespace embot { namespace app { namespace canprotocol { namespace shared {
                 
         Message_SET_ID(Clas cl, std::uint8_t cm) : cls(cl), cmd(cm) {}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
             
         bool reply();    
             
@@ -252,10 +252,10 @@ namespace embot { namespace app { namespace canprotocol { namespace shared {
     };   
       
 
-}}}} // namespace embot { namespace app { namespace canprotocol { namespace shared {
+}}}} // namespace embot { namespace prot { namespace can { namespace shared {
 
 
-namespace embot { namespace app { namespace canprotocol { namespace analog {
+namespace embot { namespace prot { namespace can { namespace analog {
 
     enum class imuSensor { acc = 0, mag = 1, gyr = 2, eul = 3, qua = 4, lia = 5, grv = 6, status = 15, none = 16 };
     
@@ -282,7 +282,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog {
     
     
 
-}}}} // namespace embot { namespace app { namespace canprotocol { namespace analog {
+}}}} // namespace embot { namespace prot { namespace can { namespace analog {
 
 #endif  // include-guard
 

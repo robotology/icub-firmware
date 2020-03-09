@@ -56,7 +56,7 @@ struct embot::app::theStorage::Impl
         pagesize = 0;        
         flashstorage = nullptr; 
         std::memset(buffer, 0, sizeof(buffer));
-//        embot::sys::theStorage &thestrg = embot::sys::theStorage::getInstance();
+//        embot::os::theStorage &thestrg = embot::os::theStorage::getInstance();
 //        thestrg.init(flashstorage);    
     }
 };

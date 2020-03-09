@@ -72,7 +72,7 @@ namespace embot { namespace hw { namespace gpio {
     
     
     // initialised mask. there must be one for each of PORT::maxnumberof     
-    //static std::array<std::uint16_t, embot::common::tointegral(PORT::maxnumberof)> initialised2dmask = {0};
+    //static std::array<std::uint16_t, embot::core::tointegral(PORT::maxnumberof)> initialised2dmask = {0};
     
 
     bool supported(GPIO &g)

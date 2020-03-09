@@ -63,7 +63,7 @@ using namespace std;
 //    bool initialised(embot::hw::ONEWIRE c)                                                                         { return false; }
 //    result_t init(embot::hw::ONEWIRE c, const Config &config)                                                      { return resNOK; }
 //    bool isrunning(embot::hw::ONEWIRE c)                                                                           { return false; }
-//    result_t write(embot::hw::ONEWIRE c, std::uint8_t reg, std::uint16_t value, embot::common::relTime timeout)    { return resNOK; }
+//    result_t write(embot::hw::ONEWIRE c, std::uint8_t reg, std::uint16_t value, embot::core::relTime timeout)    { return resNOK; }
 // 
 //}}} // namespace embot { namespace hw { namespace onewire {
 // 
@@ -92,7 +92,7 @@ namespace embot { namespace hw { namespace onewire {
     
     bool initialised(ONEWIRE c)
     {
-        return embot::binary::bit::check(initialisedmask, embot::common::tointegral(c));
+        return embot::core::binary::bit::check(initialisedmask, embot::core::tointegral(c));
     }    
     
     
@@ -132,7 +132,7 @@ namespace embot { namespace hw { namespace onewire {
         if(s_privatedata.bitindex < s_privatedata.bitsnumber)
         {
             // set s_privatedata.bitindex
-            bool high = embot::binary::bit::check(s_privatedata.bits64, s_privatedata.bitindex);
+            bool high = embot::core::binary::bit::check(s_privatedata.bits64, s_privatedata.bitindex);
             embot::hw::gpio::set(s_privatedata.activegpio, (true == high) ? (embot::hw::gpio::State::SET) : (embot::hw::gpio::State::RESET));
             //testbuffer[s_privatedata.bitindex] = high;
             s_privatedata.bitindex++;
@@ -168,7 +168,7 @@ namespace embot { namespace hw { namespace onewire {
         
         embot::hw::bsp::onewire::getBSP().init(c);        
         
-        s_privatedata.config[embot::common::tointegral(c)] = config;
+        s_privatedata.config[embot::core::tointegral(c)] = config;
         
                         
         // init peripherals: gpio and timer TIM6
@@ -181,7 +181,7 @@ namespace embot { namespace hw { namespace onewire {
         if(false == s_privatedata.tickingTimerIsInitted)
         {
             embot::hw::timer::Config cc;
-            cc.time = embot::common::time1millisec / static_cast<std::uint32_t>(config.rate);
+            cc.time = embot::core::time1millisec / static_cast<std::uint32_t>(config.rate);
             cc.mode = embot::hw::timer::Mode::periodic;
             cc.onexpiry = { callbackOnTick, nullptr };
             result_t r = embot::hw::timer::init(s_privatedata.tickingTimer, cc);
@@ -195,7 +195,7 @@ namespace embot { namespace hw { namespace onewire {
         }
         
         
-        embot::binary::bit::set(initialisedmask, embot::common::tointegral(c));
+        embot::core::binary::bit::set(initialisedmask, embot::core::tointegral(c));
 
         return resOK;
     }
@@ -249,7 +249,7 @@ bit pos 20  21  22  23  24  25  26  27  28  29  30  31  32  33  34  35  36  37  
  
     #define USEBITS64PRECOMPUTED
 
-    result_t write(embot::hw::ONEWIRE c, std::uint8_t reg, std::uint16_t value, embot::common::relTime timeout)
+    result_t write(embot::hw::ONEWIRE c, std::uint8_t reg, std::uint16_t value, embot::core::relTime timeout)
     {
         if(false == initialised(c))
         {
@@ -258,7 +258,7 @@ bit pos 20  21  22  23  24  25  26  27  28  29  30  31  32  33  34  35  36  37  
 
         // prepare the buffer, start the tim. wait until we are done. impose a timeout of ... however
                         
-        if(true == s_privatedata.config[embot::common::tointegral(c)].usepreamble)
+        if(true == s_privatedata.config[embot::core::tointegral(c)].usepreamble)
         {  
 
             std::uint64_t msk64 = 0; 
@@ -275,36 +275,36 @@ bit pos 20  21  22  23  24  25  26  27  28  29  30  31  32  33  34  35  36  37  
             // dont do that: they already have zero value
             
             // set stop bits: 9, 19, 29, 39
-            embot::binary::bit::set(s_privatedata.bits64, 9);
-            embot::binary::bit::set(s_privatedata.bits64, 19);
-            embot::binary::bit::set(s_privatedata.bits64, 29);
-            embot::binary::bit::set(s_privatedata.bits64, 39);
+            embot::core::binary::bit::set(s_privatedata.bits64, 9);
+            embot::core::binary::bit::set(s_privatedata.bits64, 19);
+            embot::core::binary::bit::set(s_privatedata.bits64, 29);
+            embot::core::binary::bit::set(s_privatedata.bits64, 39);
             
             // assign 0x55 to bits [1-8]            
             msk64 = static_cast<std::uint64_t>(0x55) << 1;
-            embot::binary::mask::set(s_privatedata.bits64, msk64);
+            embot::core::binary::mask::set(s_privatedata.bits64, msk64);
             
             // so far we have 0x80200802aa (confirmed with the debugger)
 #endif
 
             // assign reg & 0x0f to bits [11-18] 
             msk64 = static_cast<std::uint64_t>(reg & 0x0f) << 11;
-            embot::binary::mask::set(s_privatedata.bits64, msk64);
+            embot::core::binary::mask::set(s_privatedata.bits64, msk64);
             
             // assign value & 0xff to bits [21-28]
             msk64 = static_cast<std::uint64_t>(value & 0xff) << 21;
-            embot::binary::mask::set(s_privatedata.bits64, msk64);
+            embot::core::binary::mask::set(s_privatedata.bits64, msk64);
             
             // assign (value >> 8) & 0xff to bits [31-38]
             msk64 = static_cast<std::uint64_t>((value >> 8) & 0xff) << 31;
-            embot::binary::mask::set(s_privatedata.bits64, msk64);            
+            embot::core::binary::mask::set(s_privatedata.bits64, msk64);            
 
             
 
             s_privatedata.bitindex = 0;
             s_privatedata.bitsnumber = 40;    
 
-            s_privatedata.activegpio = s_privatedata.config[embot::common::tointegral(c)].gpio;    
+            s_privatedata.activegpio = s_privatedata.config[embot::core::tointegral(c)].gpio;    
             s_privatedata.activechannel = c;             
 
             s_privatedata.transaction_isrunning = true;
@@ -318,7 +318,7 @@ bit pos 20  21  22  23  24  25  26  27  28  29  30  31  32  33  34  35  36  37  
         embot::hw::timer::start(s_privatedata.tickingTimer);
         
         
-        embot::common::Time start = embot::sys::now();
+        embot::core::Time start = embot::core::now();
         result_t res = resOK;
         for(;;)
         {
@@ -326,7 +326,7 @@ bit pos 20  21  22  23  24  25  26  27  28  29  30  31  32  33  34  35  36  37  
             {
                 break;
             }
-            if((embot::common::timeWaitForever != timeout) && ((embot::sys::now() - start) > timeout))
+            if((embot::core::timeWaitForever != timeout) && ((embot::core::now() - start) > timeout))
             {
                 res = resNOK;
                 // stop timer, set bit high

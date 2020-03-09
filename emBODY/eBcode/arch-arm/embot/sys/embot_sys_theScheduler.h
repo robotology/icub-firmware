@@ -21,12 +21,12 @@
 #ifndef _EMBOT_SYS_THESCHEDULER_H_
 #define _EMBOT_SYS_THESCHEDULER_H_
 
-#include "embot_common.h"
+#include "embot_core.h"
 #include "embot_sys.h"
 #include "embot_sys_task.h"
 #include <memory>
 
-namespace embot { namespace sys {
+namespace embot { namespace os {
     
     // the method theScheduler::start(cfg) does the following:
     // if already started or if the cfg is not valid: it stays in a forever loop otherwise:
@@ -47,22 +47,22 @@ namespace embot { namespace sys {
         struct Timing
         {
             std::uint32_t clockfrequency {10000000};                        // it must be equal to the cpu speed expressed in hz: use embot::hw::sys::clock(embot::hw::sys::CLOCK::syscore)
-            embot::common::relTime ticktime {embot::common::time1millisec}; // the resolution of the scheduler
+            embot::core::relTime ticktime {embot::core::time1millisec}; // the resolution of the scheduler
             
             Timing() = default;
-            Timing(std::uint32_t c, common::relTime t = embot::common::time1millisec) : clockfrequency(c), ticktime(t) {}
-            void clear() { clockfrequency = 10000000; ticktime = embot::common::time1millisec; }
+            Timing(std::uint32_t c, core::relTime t = embot::core::time1millisec) : clockfrequency(c), ticktime(t) {}
+            void clear() { clockfrequency = 10000000; ticktime = embot::core::time1millisec; }
             bool isvalid() const { if((0 == clockfrequency) || (0 == ticktime)) { return false; } else { return true; } }
         };
         
         struct Behaviour
         {
-            embot::sys::InitTask::Config initconfig {};
-            embot::sys::IdleTask::Config idleconfig {};
-            embot::common::Callback onOSerror {};
+            embot::os::InitThread::Config initconfig {};
+            embot::os::IdleThread::Config idleconfig {};
+            embot::core::Callback onOSerror {};
             
             Behaviour() = default;
-            Behaviour(const embot::sys::InitTask::Config &ini, const embot::sys::IdleTask::Config &idl, const embot::common::Callback &err) : initconfig(ini), idleconfig(idl), onOSerror(err) {}            
+            Behaviour(const embot::os::InitThread::Config &ini, const embot::os::IdleThread::Config &idl, const embot::core::Callback &err) : initconfig(ini), idleconfig(idl), onOSerror(err) {}            
             bool isvalid() const { if((false == initconfig.isvalid()) || (false == idleconfig.isvalid())) { return false; } else { return true; } }
         };
         
@@ -81,9 +81,9 @@ namespace embot { namespace sys {
         
         bool started() const;
         
-        embot::common::relTime ticktime() const;
+        embot::core::relTime ticktime() const;
         
-        Task * scheduledtask() const;    
+        Thread * scheduledtask() const;    
 
         const char * getOSerror(int &errorcode) const;
         
@@ -96,7 +96,7 @@ namespace embot { namespace sys {
         std::unique_ptr<Impl> pImpl;   
     };   
 
-}} // namespace embot { namespace sys {
+}} // namespace embot { namespace os {
 
 
 #endif  // include-guard

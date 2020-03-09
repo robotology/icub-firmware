@@ -59,11 +59,11 @@ static void s_canOnRXframe(void *p);
 static void s_canOnTXqueueEmpty(void *p);
 
 // returns true if we have a can frame to process. false if the timeout has expired
-static bool s_waitForCANframe(embot::common::relTime timeout, embot::common::relTime reactivity);
+static bool s_waitForCANframe(embot::core::relTime timeout, embot::core::relTime reactivity);
 
 static bool s_retrieveCANframes(void);
 
-static bool s_transmitCANframes(embot::common::relTime timeout, embot::common::relTime reactivity);
+static bool s_transmitCANframes(embot::core::relTime timeout, embot::core::relTime reactivity);
 
 
 static void s_tick1msecinit(void);
@@ -81,9 +81,9 @@ static const std::uint8_t canQueueRXcapacity = 4;
 static const embot::hw::led::LED heartbeatLED = embot::hw::led::LED::one;
 static const embot::hw::led::LED canActivityLED = embot::hw::led::LED::two;
 
-static const embot::common::relTime reactivityForCAN = 100*embot::common::time1microsec; 
-static const embot::common::relTime timeoutForCANrx = 500*embot::common::time1millisec; // = 500000 ... but dont use numbers
-static const embot::common::relTime timeoutforCANtx = 10*embot::common::time1millisec; 
+static const embot::core::relTime reactivityForCAN = 100*embot::core::time1microsec; 
+static const embot::core::relTime timeoutForCANrx = 500*embot::core::time1millisec; // = 500000 ... but dont use numbers
+static const embot::core::relTime timeoutforCANtx = 10*embot::core::time1millisec; 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - some variables. 
@@ -122,9 +122,9 @@ int main(void)
     embot::hw::can::Config canconfig;   
     canconfig.txcapacity = canQueueTXcapacity;
     canconfig.rxcapacity = canQueueRXcapacity;
-    canconfig.onrxframe = embot::common::Callback(s_canOnRXframe, nullptr); 
-    canconfig.ontxframe = embot::common::Callback(nullptr, nullptr);
-    canconfig.txqueueempty = embot::common::Callback(s_canOnTXqueueEmpty, nullptr);
+    canconfig.onrxframe = embot::core::Callback(s_canOnRXframe, nullptr); 
+    canconfig.ontxframe = embot::core::Callback(nullptr, nullptr);
+    canconfig.txqueueempty = embot::core::Callback(s_canOnTXqueueEmpty, nullptr);
     
     embot::hw::can::init(embot::hw::can::Port::one, canconfig);    
     
@@ -182,7 +182,7 @@ static void s_canOnTXqueueEmpty(void *p)
     allCANframesHaveGONE = true;
 }
 
-static bool s_waitForCANframe(embot::common::relTime timeout, embot::common::relTime reactivity)
+static bool s_waitForCANframe(embot::core::relTime timeout, embot::core::relTime reactivity)
 {
     // hei: without the rtos we dont have embot::sys::timeNow() ... 
     // and the embot::hw namespace does not have it unless we program the systick
@@ -198,7 +198,7 @@ static bool s_waitForCANframe(embot::common::relTime timeout, embot::common::rel
     }
     
     // else we wait for small pieces of reactivity until we reach timeout or until we have a frame.        
-    for(embot::common::relTime t=0; t<timeout; t += reactivity)
+    for(embot::core::relTime t=0; t<timeout; t += reactivity)
     {   
         if(true == aCANframeIsHere)
         {
@@ -244,7 +244,7 @@ static bool s_retrieveCANframes(void)
 }
 
 
-static bool s_transmitCANframes(embot::common::relTime timeout, embot::common::relTime reactivity)
+static bool s_transmitCANframes(embot::core::relTime timeout, embot::core::relTime reactivity)
 {
     bool ret = false;
     
@@ -260,7 +260,7 @@ static bool s_transmitCANframes(embot::common::relTime timeout, embot::common::r
         }
         
         // else wait until completion     
-        for(embot::common::relTime t=0; t<timeout; t += reactivity)
+        for(embot::core::relTime t=0; t<timeout; t += reactivity)
         {   
             if(true == allCANframesHaveGONE)
             {

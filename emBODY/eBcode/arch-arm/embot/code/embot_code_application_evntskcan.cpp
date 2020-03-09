@@ -19,7 +19,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-#include "embot_common.h"
+#include "embot_core.h"
 #include "embot_sys_task.h"
 #include "embot_hw_can.h"
 #include <vector>
@@ -33,7 +33,7 @@ namespace embot::code::application::evntskcan {
 
     const CFG * extCFG {nullptr};
     
-    embot::sys::EventTask* maintask {nullptr};
+    embot::os::EventThread* maintask {nullptr};
                
 }  // namespace embot::code::application::evntskcan {
 
@@ -58,7 +58,7 @@ namespace embot::code::application::evntskcan {
         for(;;); 
     }
     
-    sys::Task * getEVTtask()
+    embot::os::Thread * getEVTtask()
     {
         return maintask;
     }
@@ -69,9 +69,9 @@ namespace embot::code::application::evntskcan {
 
 namespace embot::code::application::evntskcan {
         
-    embot::sys::EventTask* start_evt_based(void);
-    void can_init(embot::sys::Task *t);
-    void start_usr_services(embot::sys::EventTask* evtsk, void *initparam);
+    embot::os::EventThread* start_evt_based(void);
+    void can_init(embot::os::Thread *t);
+    void start_usr_services(embot::os::EventThread* evthr, void *initparam);
     
     void SYSTEMevtcan::userdefInit(void *initparam) const
     {
@@ -85,9 +85,9 @@ namespace embot::code::application::evntskcan {
         start_usr_services(maintask, initparam);   
     }
 
-    void start_usr_services(embot::sys::EventTask* evtsk, void *initparam)
+    void start_usr_services(embot::os::EventThread* evthr, void *initparam)
     {
-        extCFG->sys->userdefInit_Extra(evtsk, initparam);
+        extCFG->sys->userdefInit_Extra(evthr, initparam);
     }
 
 } // namespace embot::code::application::evntskcan {
@@ -97,16 +97,16 @@ namespace embot::code::application::evntskcan {
 
     void alerteventbasedtask(void *arg)
     {
-        embot::sys::EventTask* evtsk = reinterpret_cast<embot::sys::EventTask*>(arg);
-        if(nullptr != evtsk)
+        embot::os::EventThread* evthr = reinterpret_cast<embot::os::EventThread*>(arg);
+        if(nullptr != evthr)
         {
-            evtsk->setEvent(EVNTSKcan::evRXcanframe);
+            evthr->setEvent(EVNTSKcan::evRXcanframe);
         }
     }
     
-    std::vector<embot::hw::can::Frame> outframes;
+    std::vector<embot::prot::can::Frame> outframes;
 
-    void can_init(embot::sys::Task *t)
+    void can_init(embot::os::Thread *t)
     {
         static bool initted = false;
         if(true == initted)
@@ -118,7 +118,7 @@ namespace embot::code::application::evntskcan {
         embot::hw::can::Config canconfig;   // default is tx/rxcapacity=8
         canconfig.rxcapacity = extCFG->evt->cconfig.rxcapacity;
         canconfig.txcapacity = extCFG->evt->cconfig.txcapacity;
-        canconfig.onrxframe = embot::common::Callback(alerteventbasedtask, t); 
+        canconfig.onrxframe = embot::core::Callback(alerteventbasedtask, t); 
         embot::hw::can::init(embot::hw::CAN::one, canconfig);
         embot::hw::can::setfilters(embot::hw::CAN::one, embot::app::theCANboardInfo::getInstance().getCANaddress()); 
         // pre-allocate output vector of frames
@@ -128,19 +128,19 @@ namespace embot::code::application::evntskcan {
         canbrdinfo.synch(extCFG->evt->applinfo);
     }
 
-    void can_enable(embot::sys::Task *t)
+    void can_enable(embot::os::Thread *t)
     {
         embot::hw::can::enable(embot::hw::CAN::one);
     }
 
-    void eventbasedtask_startup(embot::sys::Task *t, void *param)
+    void eventbasedtask_startup(embot::os::Thread *t, void *param)
     {
         //can_init(t);
         extCFG->evt->userdefStartup(t, param);
         can_enable(t);
     }
 
-    void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask eventmask, void *param)
+    void eventbasedtask_onevent(embot::os::Thread *t, embot::os::EventMask eventmask, void *param)
     {   
         if(0 == eventmask)
         {   // timeout ... 
@@ -151,13 +151,13 @@ namespace embot::code::application::evntskcan {
         // we clear the frames to be trasmitted
         outframes.clear(); 
 
-        if(true == embot::binary::mask::check(eventmask, EVNTSKcan::evRXcanframe))
+        if(true == embot::core::binary::mask::check(eventmask, EVNTSKcan::evRXcanframe))
         {        
-            embot::hw::can::Frame frame;
+            embot::hw::can::Frame hwframe;
             std::uint8_t remainingINrx = 0;
-            if(embot::hw::resOK == embot::hw::can::get(embot::hw::CAN::one, frame, remainingINrx))
+            if(embot::hw::resOK == embot::hw::can::get(embot::hw::CAN::one, hwframe, remainingINrx))
             {            
-                extCFG->evt->userdefOnEventRXcanframe(t, eventmask, param, frame, outframes);               
+                extCFG->evt->userdefOnEventRXcanframe(t, eventmask, param, {hwframe.id, hwframe.size, hwframe.data}, outframes);               
                 
                 if(remainingINrx > 0)
                 {
@@ -174,7 +174,7 @@ namespace embot::code::application::evntskcan {
         {
             for(std::uint8_t i=0; i<num; i++)
             {
-                embot::hw::can::put(embot::hw::CAN::one, outframes[i]);                                       
+                embot::hw::can::put(embot::hw::CAN::one, {outframes[i].id, outframes[i].size, outframes[i].data});                                       
             }
 
             embot::hw::can::transmit(embot::hw::CAN::one);  
@@ -182,11 +182,11 @@ namespace embot::code::application::evntskcan {
 
     }
 
-    embot::sys::EventTask* start_evt_based(void)
+    embot::os::EventThread* start_evt_based(void)
     {                           
-        embot::sys::EventTask::Config configEV { 
+        embot::os::EventThread::Config configEV { 
             extCFG->evt->econfig.stacksize, 
-            embot::sys::Priority::high200, 
+            embot::os::Priority::high200, 
             eventbasedtask_startup,
             extCFG->evt->econfig.param,
             extCFG->evt->econfig.timeout,
@@ -194,7 +194,7 @@ namespace embot::code::application::evntskcan {
         };
         
         // create the main task 
-        embot::sys::EventTask* tsk = new embot::sys::EventTask;          
+        embot::os::EventThread* tsk = new embot::os::EventThread;          
         // and start it
         tsk->start(configEV);
         

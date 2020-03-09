@@ -21,7 +21,7 @@
 #ifndef _EMBOT_APP_APPLICATION_THESKIN_H_
 #define _EMBOT_APP_APPLICATION_THESKIN_H_
 
-#include "embot_common.h"
+#include "embot_core.h"
 #include "embot_hw.h"
 #include "embot_sys.h"
 #include "embot_sys_Task.h"
@@ -40,27 +40,27 @@ namespace embot { namespace app { namespace application {
     public:
         struct Config
         {
-            embot::common::Event    tickevent;
-            embot::sys::Task*       totask;
+            embot::os::Event    tickevent;
+            embot::os::Thread*       totask;
             Config() : tickevent(0), totask(nullptr) {}
         }; 
         
         
         bool initialise(Config &config);   
 
-//        bool configure(embot::app::canprotocol::analog::polling::Message_SKIN_SET_BRD_CFG::Info &brdcfg);
-//        bool configure(embot::app::canprotocol::analog::polling::Message_SKIN_SET_TRIANG_CFG::Info &trgcfg);        
-//        bool configure(embot::app::canprotocol::analog::polling::Message_SKIN_OBSOLETE_TACT_SETUP::Info &tactsetup);
+//        bool configure(embot::prot::can::analog::polling::Message_SKIN_SET_BRD_CFG::Info &brdcfg);
+//        bool configure(embot::prot::can::analog::polling::Message_SKIN_SET_TRIANG_CFG::Info &trgcfg);        
+//        bool configure(embot::prot::can::analog::polling::Message_SKIN_OBSOLETE_TACT_SETUP::Info &tactsetup);
         
         bool start();
         bool stop();        
-        bool tick(std::vector<embot::hw::can::Frame> &replies);
+        bool tick(std::vector<embot::prot::can::Frame> &replies);
         
         // interface to CANagentSKIN
-        virtual bool set(const embot::app::canprotocol::analog::polling::Message_SKIN_SET_BRD_CFG::Info &info);
-        virtual bool set(const embot::app::canprotocol::analog::polling::Message_SKIN_SET_TRIANG_CFG::Info &info);  
-        virtual bool set(const embot::app::canprotocol::analog::polling::Message_SET_TXMODE::Info &info); 
-        virtual bool set(const embot::app::canprotocol::analog::polling::Message_SKIN_OBSOLETE_TACT_SETUP::Info &info);
+        virtual bool set(const embot::prot::can::analog::polling::Message_SKIN_SET_BRD_CFG::Info &info);
+        virtual bool set(const embot::prot::can::analog::polling::Message_SKIN_SET_TRIANG_CFG::Info &info);  
+        virtual bool set(const embot::prot::can::analog::polling::Message_SET_TXMODE::Info &info); 
+        virtual bool set(const embot::prot::can::analog::polling::Message_SKIN_OBSOLETE_TACT_SETUP::Info &info);
 
     private:
         theSkin(); 

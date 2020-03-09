@@ -10,7 +10,7 @@
       <TargetName>strain2-updtbtl-ulpro-v190</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6120000::V6.12::.\ARMCLANG</pCCUsed>
+      <pCCUsed>6130001::V6.13.1::.\ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -511,6 +511,11 @@
               <FileName>embot_app_theLEDmanager.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\embot\app\embot_app_theLEDmanager.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_core.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\common\embot_core.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1209,6 +1214,11 @@
               <FileName>embot_app_theLEDmanager.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\embot\app\embot_app_theLEDmanager.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_core.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\common\embot_core.cpp</FilePath>
             </File>
           </Files>
         </Group>

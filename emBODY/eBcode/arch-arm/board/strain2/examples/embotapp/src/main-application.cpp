@@ -131,7 +131,7 @@ int main(void)
     static uint32_t count = 0;
     static const uint32_t PERIOD = 10;
     
-    led1ON = embot::binary::bit::check(mask32, 0); 
+    led1ON = embot::core::binary::bit::check(mask32, 0); 
 
     
     embot::hw::led::on(embot::hw::led::LED::one);  
@@ -148,10 +148,10 @@ int main(void)
         
         if(PERIOD == ++count)
         {
-            // in here, i want to demonstrate functions of the embot::binary::bit namespace which does bit manipulation of all integer types: 8, 16, 32, 64 bit long
+            // in here, i want to demonstrate functions of the embot::core::binary::bit namespace which does bit manipulation of all integer types: 8, 16, 32, 64 bit long
             count = 0;
-            embot::binary::bit::toggle(mask32, 0);              
-            led1ON = embot::binary::bit::check(mask32, 0);     
+            embot::core::binary::bit::toggle(mask32, 0);              
+            led1ON = embot::core::binary::bit::check(mask32, 0);     
             some_other_demonstrations();
         }
                 

@@ -10,7 +10,7 @@
 #ifndef _EMBOT_CODE_APPLICATION_CORE_H_
 #define _EMBOT_CODE_APPLICATION_CORE_H_
 
-#include "embot_common.h"
+#include "embot_core.h"
 #include "embot_sys_theTimerManager.h"
 #include "embot_sys_theCallbackManager.h"
 
@@ -24,13 +24,13 @@ namespace embot::code::application::core {
         std::uint16_t taskIDLEstacksize {512};
         void *idleparam {nullptr};
         void *errparam {nullptr};
-        embot::sys::theTimerManager::Config tmconfig {};
-        embot::sys::theCallbackManager::Config cmconfig {};
+        embot::os::theTimerManager::Config tmconfig {};
+        embot::os::theCallbackManager::Config cmconfig {};
 
         constexpr sysConfig() = default;
 
         constexpr sysConfig(std::uint16_t ssini, void *pini, std::uint16_t ssidl, void *pidl, void *perr,
-                            const embot::sys::theTimerManager::Config &tmc, const embot::sys::theCallbackManager::Config &cmc) 
+                            const embot::os::theTimerManager::Config &tmc, const embot::os::theCallbackManager::Config &cmc) 
                                 : taskINITstacksize(ssini), initparam(pini), taskIDLEstacksize(ssidl), idleparam(pidl), errparam(perr), tmconfig(tmc), cmconfig(cmc) {}
         
         bool isvalid() const
@@ -49,7 +49,7 @@ namespace embot::code::application::core {
         sysConfig config {};
                          
         virtual void userdefInit(void *initparam) const {}
-        virtual void userdefOnIdle(embot::sys::Task *t, void* idleparam) const {}
+        virtual void userdefOnIdle(embot::os::Thread *t, void* idleparam) const {}
         virtual void userdefonOSerror(void *errparam) const {}
             
         bool isvalid() const { return config.isvalid(); }

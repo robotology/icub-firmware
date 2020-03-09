@@ -35,7 +35,7 @@
 #include "stm32hal.h"
 
 #include "embot.h"
-#include "embot_common.h"
+#include "embot_core.h"
 #include "embot_utils.h"
 #include "embot_binary.h"
 #include "embot_dsp.h"
@@ -100,12 +100,19 @@ struct embot::app::application::theSTRAIN::Impl
     
     struct amplifierConfig_v00_t
     { 
-        embot::app::canprotocol::analog::polling::PGA308cfg1    pga308cfg1;   
+        embot::prot::can::analog::polling::PGA308cfg1 pga308cfg1 {};   
         
         void factoryreset() {
-            embot::hw::pga308::TransferFunctionConfig tfc;
+            embot::hw::pga308::TransferFunctionConfig tfc {};
             tfc.setDefault();
-            tfc.get(pga308cfg1);
+            std::uint16_t       GD;
+            std::uint8_t        GI; 
+            std::uint8_t        S;
+            std::uint8_t        GO; 
+            std::uint8_t        Voffsetcoarse;
+            std::uint16_t       Vzerodac;
+            tfc.get(GD, GI, S, GO, Voffsetcoarse, Vzerodac);
+            pga308cfg1 = {GD, GI, S, GO, Voffsetcoarse, Vzerodac};
         }
         
         amplifierConfig_v00_t() { factoryreset(); }
@@ -113,13 +120,20 @@ struct embot::app::application::theSTRAIN::Impl
     
     struct amplifierConfig_t
     {   // it is _v01_t 
-        embot::app::canprotocol::analog::polling::PGA308cfg1    pga308cfg1; 
-        std::uint8_t                                            ffu[2];        
+        embot::prot::can::analog::polling::PGA308cfg1 pga308cfg1 {}; 
+        std::uint8_t ffu[2] {0};        
         
         void factoryreset() {
-            embot::hw::pga308::TransferFunctionConfig tfc;
+            embot::hw::pga308::TransferFunctionConfig tfc {};
             tfc.setDefault();
-            tfc.get(pga308cfg1);
+            std::uint16_t       GD;
+            std::uint8_t        GI; 
+            std::uint8_t        S;
+            std::uint8_t        GO; 
+            std::uint8_t        Voffsetcoarse;
+            std::uint16_t       Vzerodac;
+            tfc.get(GD, GI, S, GO, Voffsetcoarse, Vzerodac);
+            pga308cfg1 = {GD, GI, S, GO, Voffsetcoarse, Vzerodac};
             ffu[0] = ffu[1] = 0;
         }
         
@@ -380,7 +394,7 @@ struct embot::app::application::theSTRAIN::Impl
             return data.permanentregulationset;
         }
                         
-        void amplifiers_set(std::uint8_t set, std::uint8_t channel, const embot::app::canprotocol::analog::polling::PGA308cfg1 &cfg1)
+        void amplifiers_set(std::uint8_t set, std::uint8_t channel, const embot::prot::can::analog::polling::PGA308cfg1 &cfg1)
         {
             if((channel < numOfChannels) && (set < numOfSets))
             {
@@ -389,7 +403,7 @@ struct embot::app::application::theSTRAIN::Impl
             }
         } 
         
-        bool amplifiers_get(std::uint8_t set, std::uint8_t channel, embot::app::canprotocol::analog::polling::PGA308cfg1 &cfg1)
+        bool amplifiers_get(std::uint8_t set, std::uint8_t channel, embot::prot::can::analog::polling::PGA308cfg1 &cfg1)
         {
             bool ret = false;
             if((channel < numOfChannels) && (set < numOfSets))
@@ -578,7 +592,7 @@ struct embot::app::application::theSTRAIN::Impl
     // it is a holder of volatile data used in runtime. we use the same approach as for config data
     struct StrainRuntimeData_t
     {
-        embot::common::Time         txperiod;
+        embot::core::Time         txperiod;
         
         std::uint16_t               dmabuffer[6]; 
         std::uint16_t               adcvalue[6];        // the values as acquired by the adc... but scaled to full 64k range. original strain had 16-bit adc   
@@ -588,13 +602,13 @@ struct embot::app::application::theSTRAIN::Impl
         embot::dsp::Q15     forcetorque[6];
         
         // the calibrated values for torque and force. they are raw values, not in dsp::Q15 format
-        embot::utils::Triple<std::uint16_t>    torque;
-        embot::utils::Triple<std::uint16_t>    force;
+        embot::core::utils::Triple<std::uint16_t>    torque;
+        embot::core::utils::Triple<std::uint16_t>    force;
         
-        embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode strainmode;
+        embot::prot::can::analog::polling::Message_SET_TXMODE::StrainMode strainmode;
         
         bool adcsaturation;        
-        embot::app::canprotocol::analog::periodic::ADCsaturation saturationonchannel[6];
+        embot::prot::can::analog::periodic::ADCsaturation saturationonchannel[6];
 
         std::uint8_t adcfailures;
         std::uint8_t adciszero;
@@ -611,11 +625,11 @@ struct embot::app::application::theSTRAIN::Impl
             std::memset(forcetorque, 0, sizeof(forcetorque));
             force.clear();
             torque.clear();
-            strainmode = embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode::none;
+            strainmode = embot::prot::can::analog::polling::Message_SET_TXMODE::StrainMode::none;
             adcsaturation = false;
             adcfailures = 0;
             adciszero = 0;
-            std::memset(saturationonchannel, static_cast<std::uint8_t>(embot::app::canprotocol::analog::periodic::ADCsaturation::NONE), sizeof(saturationonchannel));
+            std::memset(saturationonchannel, static_cast<std::uint8_t>(embot::prot::can::analog::periodic::ADCsaturation::NONE), sizeof(saturationonchannel));
             set2use = 0;
         }       
         StrainRuntimeData_t() { clear(); }
@@ -643,22 +657,22 @@ struct embot::app::application::theSTRAIN::Impl
         bool check_adcsaturation()
         {
             data.adcsaturation = false;
-            std::memset(data.saturationonchannel, static_cast<std::uint8_t>(embot::app::canprotocol::analog::periodic::ADCsaturation::NONE), sizeof(data.saturationonchannel));
+            std::memset(data.saturationonchannel, static_cast<std::uint8_t>(embot::prot::can::analog::periodic::ADCsaturation::NONE), sizeof(data.saturationonchannel));
 
 
             
             for(int channel=0; channel<numOfChannels; channel++)
             {
-                data.saturationonchannel[channel] = embot::app::canprotocol::analog::periodic::ADCsaturation::NONE;
+                data.saturationonchannel[channel] = embot::prot::can::analog::periodic::ADCsaturation::NONE;
                 
                 if(data.adcvalue[channel] < ADCsaturationLow)
                 {
-                    data.saturationonchannel[channel] = embot::app::canprotocol::analog::periodic::ADCsaturation::LOW;                    
+                    data.saturationonchannel[channel] = embot::prot::can::analog::periodic::ADCsaturation::LOW;                    
                     data.adcsaturation = true;                
                 }
                 else if(data.adcvalue[channel] > ADCsaturationHigh)
                 {
-                    data.saturationonchannel[channel] = embot::app::canprotocol::analog::periodic::ADCsaturation::HIGH;
+                    data.saturationonchannel[channel] = embot::prot::can::analog::periodic::ADCsaturation::HIGH;
                     data.adcsaturation = true;                 
                 }               
             }
@@ -730,19 +744,19 @@ struct embot::app::application::theSTRAIN::Impl
    
       
 #if defined(DEBUG_acquisition_computetiming) 
-    embot::common::Time debugtime;
-    embot::common::Time timestartADC;
-    embot::common::relTime durationofADC;
-    embot::common::relTime durationof00;
-    embot::common::relTime durationof01;
-    embot::common::relTime durationof02;
-    embot::common::relTime durationof03;
-    embot::common::relTime durationof04;
-    embot::common::relTime durationof05;
-    embot::common::relTime durationof06;
-    embot::common::relTime durationof07;
-    embot::common::relTime durationofDSP;
-    embot::common::relTime durationofALL;
+    embot::core::Time debugtime;
+    embot::core::Time timestartADC;
+    embot::core::relTime durationofADC;
+    embot::core::relTime durationof00;
+    embot::core::relTime durationof01;
+    embot::core::relTime durationof02;
+    embot::core::relTime durationof03;
+    embot::core::relTime durationof04;
+    embot::core::relTime durationof05;
+    embot::core::relTime durationof06;
+    embot::core::relTime durationof07;
+    embot::core::relTime durationofDSP;
+    embot::core::relTime durationofALL;
     std::uint32_t acquisitioncounter;
 #endif // #if defined(DEBUG_acquisition_computetiming) 
 
@@ -752,8 +766,8 @@ struct embot::app::application::theSTRAIN::Impl
     volatile bool adcdataisready;
     
     
-    embot::sys::Timer *ticktimer;
-    embot::sys::Action action;
+    embot::os::Timer *ticktimer;
+    embot::os::Action action;
         
                      
     // i put in here some values proper of the STRAIN. they may be many.... hence better to organise them in a struct later on.
@@ -772,41 +786,41 @@ struct embot::app::application::theSTRAIN::Impl
 #endif        
         ticking = false;  
 
-        ticktimer = new embot::sys::Timer;   
+        ticktimer = new embot::os::Timer;   
 
                 
         configdata.clear();
         runtimedata.clear();
         
-        runtimedata.data.txperiod = 2*embot::common::time1millisec;       
+        runtimedata.data.txperiod = 2*embot::core::time1millisec;       
 
         adcdataisready = false;        
     }
     
    
-    bool start(const embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode mode);
+    bool start(const embot::prot::can::analog::polling::Message_SET_TXMODE::StrainMode mode);
     bool stop();
     
-    bool evalstop(embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode &mode);
-    bool evalrestart(const embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode mode);
+    bool evalstop(embot::prot::can::analog::polling::Message_SET_TXMODE::StrainMode &mode);
+    bool evalrestart(const embot::prot::can::analog::polling::Message_SET_TXMODE::StrainMode mode);
     
-    bool tick(std::vector<embot::hw::can::Frame> &replies);
-    bool processdata(std::vector<embot::hw::can::Frame> &replies);
+    bool tick(std::vector<embot::prot::can::Frame> &replies);
+    bool processdata(std::vector<embot::prot::can::Frame> &replies);
     
     bool configure();
     
     bool acquisition_start();
-    bool acquisition_waituntilcompletion(embot::common::relTime timeout);
+    bool acquisition_waituntilcompletion(embot::core::relTime timeout);
     bool acquisition_retrieve();
     
-    bool acquisition_oneshot(embot::common::relTime timeout = 3*embot::common::time1millisec, bool restartifitwasticking = true);
+    bool acquisition_oneshot(embot::core::relTime timeout = 3*embot::core::time1millisec, bool restartifitwasticking = true);
     
     bool processing();
     
-    bool fill(embot::app::canprotocol::analog::periodic::Message_UNCALIBFORCE_VECTOR_DEBUGMODE::Info &info);
-    bool fill(embot::app::canprotocol::analog::periodic::Message_UNCALIBTORQUE_VECTOR_DEBUGMODE::Info &info);
-    bool fill(const bool calibrated, embot::app::canprotocol::analog::periodic::Message_FORCE_VECTOR::Info &info);
-    bool fill(const bool calibrated, embot::app::canprotocol::analog::periodic::Message_TORQUE_VECTOR::Info &info);
+    bool fill(embot::prot::can::analog::periodic::Message_UNCALIBFORCE_VECTOR_DEBUGMODE::Info &info);
+    bool fill(embot::prot::can::analog::periodic::Message_UNCALIBTORQUE_VECTOR_DEBUGMODE::Info &info);
+    bool fill(const bool calibrated, embot::prot::can::analog::periodic::Message_FORCE_VECTOR::Info &info);
+    bool fill(const bool calibrated, embot::prot::can::analog::periodic::Message_TORQUE_VECTOR::Info &info);
     
     
     static void alertdataisready(void *p)
@@ -819,7 +833,7 @@ struct embot::app::application::theSTRAIN::Impl
         }
 
 #if defined(DEBUG_acquisition_computetiming)         
-        mypImpl->debugtime = embot::sys::now();
+        mypImpl->debugtime = embot::core::now();
         mypImpl->durationof00 = mypImpl->debugtime - mypImpl->timestartADC;
 #endif
     
@@ -828,7 +842,7 @@ struct embot::app::application::theSTRAIN::Impl
     
     bool regulationset2index(const std::uint8_t rs, std::uint8_t &index)
     {
-        if(static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::StrainRegulationSet::theoneinuse) == rs)
+        if(static_cast<std::uint8_t>(embot::prot::can::analog::polling::StrainRegulationSet::theoneinuse) == rs)
         {
             index = runtimedata.set2use_get();
             return true;
@@ -872,12 +886,12 @@ struct embot::app::application::theSTRAIN::Impl
     
           
     
-    void amplifiers_reset(const std::uint8_t setindex, const embot::app::canprotocol::analog::polling::StrainChannel ch)
+    void amplifiers_reset(const std::uint8_t setindex, const embot::prot::can::analog::polling::StrainChannel ch)
     {    
         std::uint8_t first = 0;
         std::uint8_t nextlast = numOfChannels;
         
-        if(ch != embot::app::canprotocol::analog::polling::StrainChannel::all)
+        if(ch != embot::prot::can::analog::polling::StrainChannel::all)
         {
             first = static_cast<std::uint8_t>(ch);
             nextlast = first + 1;
@@ -891,12 +905,12 @@ struct embot::app::application::theSTRAIN::Impl
     }
     
     
-    void amplifiers_set(const std::uint8_t setindex, const embot::app::canprotocol::analog::polling::StrainChannel ch, const embot::app::canprotocol::analog::polling::PGA308cfg1 &cfg1)
+    void amplifiers_set(const std::uint8_t setindex, const embot::prot::can::analog::polling::StrainChannel ch, const embot::prot::can::analog::polling::PGA308cfg1 &cfg1)
     {    
         std::uint8_t first = 0;
         std::uint8_t nextlast = numOfChannels;
         
-        if(ch != embot::app::canprotocol::analog::polling::StrainChannel::all)
+        if(ch != embot::prot::can::analog::polling::StrainChannel::all)
         {
             first = static_cast<std::uint8_t>(ch);
             nextlast = first + 1;
@@ -911,12 +925,12 @@ struct embot::app::application::theSTRAIN::Impl
     
     
     
-    bool amplifiers_alfabeta_reset(const std::uint8_t setindex, const embot::app::canprotocol::analog::polling::StrainChannel ch, float &a, float &b)
+    bool amplifiers_alfabeta_reset(const std::uint8_t setindex, const embot::prot::can::analog::polling::StrainChannel ch, float &a, float &b)
     {    
         std::uint8_t first = 0;
         std::uint8_t nextlast = numOfChannels;
         
-        if(ch != embot::app::canprotocol::analog::polling::StrainChannel::all)
+        if(ch != embot::prot::can::analog::polling::StrainChannel::all)
         {
             first = static_cast<std::uint8_t>(ch);
             nextlast = first + 1;
@@ -924,7 +938,7 @@ struct embot::app::application::theSTRAIN::Impl
         
         for(std::uint8_t i=first; i<nextlast; i++)
         {
-            embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
+            embot::prot::can::analog::polling::PGA308cfg1 cfg1;
             embot::hw::pga308::TransferFunctionConfig tfc;
             // modify the tsf
             tfc.setDefault();                
@@ -932,19 +946,26 @@ struct embot::app::application::theSTRAIN::Impl
             a = tfc.alpha();
             b = tfc.beta();                
             // retrieve the new cfg1 and apply it to the specified regulation set
-            tfc.get(cfg1);
+            std::uint16_t       GD;
+            std::uint8_t        GI; 
+            std::uint8_t        S;
+            std::uint8_t        GO; 
+            std::uint8_t        Voffsetcoarse;
+            std::uint16_t       Vzerodac;
+            tfc.get(GD, GI, S, GO, Voffsetcoarse, Vzerodac);
+            cfg1 = {GD, GI, S, GO, Voffsetcoarse, Vzerodac};
             configdata.amplifiers_set(setindex, i, cfg1);         
         }
         
         return true;
     }
     
-    bool amplifiers_alfabeta_set(const std::uint8_t setindex, const embot::app::canprotocol::analog::polling::StrainChannel ch, const float alpha, const float beta, float &a, float &b)
+    bool amplifiers_alfabeta_set(const std::uint8_t setindex, const embot::prot::can::analog::polling::StrainChannel ch, const float alpha, const float beta, float &a, float &b)
     {    
         std::uint8_t first = 0;
         std::uint8_t nextlast = numOfChannels;
         
-        if(ch != embot::app::canprotocol::analog::polling::StrainChannel::all)
+        if(ch != embot::prot::can::analog::polling::StrainChannel::all)
         {
             first = static_cast<std::uint8_t>(ch);
             nextlast = first + 1;
@@ -952,12 +973,12 @@ struct embot::app::application::theSTRAIN::Impl
         
         for(std::uint8_t i=first; i<nextlast; i++)
         {
-            embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
+            embot::prot::can::analog::polling::PGA308cfg1 cfg1;
             embot::hw::pga308::TransferFunctionConfig tfc;
             
             // retrieve current cfg1 and associated transform function
             configdata.amplifiers_get(setindex, i, cfg1);
-            tfc.load(cfg1);  
+            tfc.load(cfg1.GD, cfg1.GI, cfg1.S, cfg1.GO, cfg1.Voffsetcoarse, cfg1.Vzerodac);  
             
             // modify the tsf
             if(false == tfc.setalpha(alpha)) 
@@ -974,19 +995,26 @@ struct embot::app::application::theSTRAIN::Impl
             b = tfc.beta();
 
             // retrieve the new cfg1 and apply it to the specified regulation set
-            tfc.get(cfg1);
+            std::uint16_t       GD;
+            std::uint8_t        GI; 
+            std::uint8_t        S;
+            std::uint8_t        GO; 
+            std::uint8_t        Voffsetcoarse;
+            std::uint16_t       Vzerodac;
+            tfc.get(GD, GI, S, GO, Voffsetcoarse, Vzerodac);
+            cfg1 = {GD, GI, S, GO, Voffsetcoarse, Vzerodac};
             configdata.amplifiers_set(setindex, i, cfg1);               
         }
         
         return true;
     }
     
-    void amplifiers_applyregulationsetochipPGA308(const std::uint8_t setindex, const embot::app::canprotocol::analog::polling::StrainChannel ch)
+    void amplifiers_applyregulationsetochipPGA308(const std::uint8_t setindex, const embot::prot::can::analog::polling::StrainChannel ch)
     {    
         std::uint8_t first = 0;
         std::uint8_t nextlast = numOfChannels;
         
-        if(ch != embot::app::canprotocol::analog::polling::StrainChannel::all)
+        if(ch != embot::prot::can::analog::polling::StrainChannel::all)
         {
             first = static_cast<std::uint8_t>(ch);
             nextlast = first + 1;
@@ -994,10 +1022,10 @@ struct embot::app::application::theSTRAIN::Impl
         
         for(std::uint8_t i=first; i<nextlast; i++)
         {
-            embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
+            embot::prot::can::analog::polling::PGA308cfg1 cfg1;
             configdata.amplifiers_get(setindex, i, cfg1); 
             embot::hw::pga308::TransferFunctionConfig tfc;
-            tfc.load(cfg1);    
+            tfc.load(cfg1.GD, cfg1.GI, cfg1.S, cfg1.GO, cfg1.Voffsetcoarse, cfg1.Vzerodac);    
             embot::hw::pga308::set(static_cast<embot::hw::PGA308>(i), tfc);                
         }
     }  
@@ -1006,7 +1034,7 @@ struct embot::app::application::theSTRAIN::Impl
 
 
 
-bool embot::app::application::theSTRAIN::Impl::start(const embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode mode)
+bool embot::app::application::theSTRAIN::Impl::start(const embot::prot::can::analog::polling::Message_SET_TXMODE::StrainMode mode)
 {    
     if(true == ticking)
     {
@@ -1019,9 +1047,9 @@ bool embot::app::application::theSTRAIN::Impl::start(const embot::app::canprotoc
             
     switch(runtimedata.data.strainmode)
     {
-        case embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode::txCalibrated:
-        case embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode::txUncalibrated:
-        case embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode::txAll:
+        case embot::prot::can::analog::polling::Message_SET_TXMODE::StrainMode::txCalibrated:
+        case embot::prot::can::analog::polling::Message_SET_TXMODE::StrainMode::txUncalibrated:
+        case embot::prot::can::analog::polling::Message_SET_TXMODE::StrainMode::txAll:
         {
             ticking = true; 
         } break;
@@ -1037,7 +1065,7 @@ bool embot::app::application::theSTRAIN::Impl::start(const embot::app::canprotoc
         return true;        
     }
     
-    embot::sys::Timer::Config cfg(runtimedata.data.txperiod, action, embot::sys::Timer::Mode::forever);
+    embot::os::Timer::Config cfg(runtimedata.data.txperiod, action, embot::os::Timer::Mode::forever);
     ticktimer->start(cfg);
     
     ticking = true;    
@@ -1050,14 +1078,14 @@ bool embot::app::application::theSTRAIN::Impl::start(const embot::app::canprotoc
 
 bool embot::app::application::theSTRAIN::Impl::stop()
 { 
-    runtimedata.data.strainmode = embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode::none;
+    runtimedata.data.strainmode = embot::prot::can::analog::polling::Message_SET_TXMODE::StrainMode::none;
     
     ticktimer->stop();
     ticking = false;    
     return true;
 }
 
-bool embot::app::application::theSTRAIN::Impl::evalstop(embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode &mode)
+bool embot::app::application::theSTRAIN::Impl::evalstop(embot::prot::can::analog::polling::Message_SET_TXMODE::StrainMode &mode)
 {
     mode = runtimedata.data.strainmode;
     if(true == ticking)
@@ -1067,13 +1095,13 @@ bool embot::app::application::theSTRAIN::Impl::evalstop(embot::app::canprotocol:
     return true;    
 }
 
-bool embot::app::application::theSTRAIN::Impl::evalrestart(const embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode mode)
+bool embot::app::application::theSTRAIN::Impl::evalrestart(const embot::prot::can::analog::polling::Message_SET_TXMODE::StrainMode mode)
 {
     return start(mode);
 }
 
 
-bool embot::app::application::theSTRAIN::Impl::fill(embot::app::canprotocol::analog::periodic::Message_UNCALIBFORCE_VECTOR_DEBUGMODE::Info &info)
+bool embot::app::application::theSTRAIN::Impl::fill(embot::prot::can::analog::periodic::Message_UNCALIBFORCE_VECTOR_DEBUGMODE::Info &info)
 {
     bool ret = true;
     
@@ -1099,7 +1127,7 @@ bool embot::app::application::theSTRAIN::Impl::fill(embot::app::canprotocol::ana
 }
 
 
-bool embot::app::application::theSTRAIN::Impl::fill(embot::app::canprotocol::analog::periodic::Message_UNCALIBTORQUE_VECTOR_DEBUGMODE::Info &info)
+bool embot::app::application::theSTRAIN::Impl::fill(embot::prot::can::analog::periodic::Message_UNCALIBTORQUE_VECTOR_DEBUGMODE::Info &info)
 {
     bool ret = true;
 
@@ -1124,7 +1152,7 @@ bool embot::app::application::theSTRAIN::Impl::fill(embot::app::canprotocol::ana
     return ret;    
 }
 
-bool embot::app::application::theSTRAIN::Impl::fill(const bool calibrated, embot::app::canprotocol::analog::periodic::Message_FORCE_VECTOR::Info &info)
+bool embot::app::application::theSTRAIN::Impl::fill(const bool calibrated, embot::prot::can::analog::periodic::Message_FORCE_VECTOR::Info &info)
 {
     bool ret = true;
     
@@ -1160,7 +1188,7 @@ bool embot::app::application::theSTRAIN::Impl::fill(const bool calibrated, embot
 }
 
 
-bool embot::app::application::theSTRAIN::Impl::fill(const bool calibrated, embot::app::canprotocol::analog::periodic::Message_TORQUE_VECTOR::Info &info)
+bool embot::app::application::theSTRAIN::Impl::fill(const bool calibrated, embot::prot::can::analog::periodic::Message_TORQUE_VECTOR::Info &info)
 {
     bool ret = true;
 
@@ -1202,7 +1230,7 @@ bool embot::app::application::theSTRAIN::Impl::acquisition_start()
 
 #if defined(DEBUG_acquisition_computetiming) 
     acquisitioncounter ++;
-    timestartADC = embot::sys::now();
+    timestartADC = embot::core::now();
 #endif
 
     std::memset(runtimedata.data.dmabuffer, 0xff, sizeof(runtimedata.data.dmabuffer));    
@@ -1211,13 +1239,13 @@ bool embot::app::application::theSTRAIN::Impl::acquisition_start()
     return true;
 }
 
-bool embot::app::application::theSTRAIN::Impl::acquisition_waituntilcompletion(embot::common::relTime timeout)
+bool embot::app::application::theSTRAIN::Impl::acquisition_waituntilcompletion(embot::core::relTime timeout)
 {
-    embot::common::Time now = embot::sys::now();
-    embot::common::Time endtime = now + timeout;
+    embot::core::Time now = embot::core::now();
+    embot::core::Time endtime = now + timeout;
     
-//    embot::common::Time start = now;
-//    static embot::common::Time delta = 0;
+//    embot::core::Time start = now;
+//    static embot::core::Time delta = 0;
      // delta is 429 usec
 
     
@@ -1229,7 +1257,7 @@ bool embot::app::application::theSTRAIN::Impl::acquisition_waituntilcompletion(e
         {
             break;
         }
-        now = embot::sys::now();
+        now = embot::core::now();
         if(now > endtime)
         {
            ret = false;
@@ -1243,7 +1271,7 @@ bool embot::app::application::theSTRAIN::Impl::acquisition_waituntilcompletion(e
 }
 
 
-bool embot::app::application::theSTRAIN::Impl::acquisition_oneshot(embot::common::relTime timeout, bool restartifitwasticking)
+bool embot::app::application::theSTRAIN::Impl::acquisition_oneshot(embot::core::relTime timeout, bool restartifitwasticking)
 {    
     bool itwasticking = ticking;    
     
@@ -1304,7 +1332,7 @@ bool embot::app::application::theSTRAIN::Impl::acquisition_retrieve()
         if(false == adcwaszero)
         {
             embot::app::theLEDmanager &theleds = embot::app::theLEDmanager::getInstance();    
-            embot::app::LEDwaveT<64> ledwave(100*embot::common::time1millisec, 30, std::bitset<64>(0b010101));
+            embot::app::LEDwaveT<64> ledwave(100*embot::core::time1millisec, 30, std::bitset<64>(0b010101));
             theleds.get(embot::hw::LED::one).wave(&ledwave);              
         }
         
@@ -1384,7 +1412,7 @@ bool embot::app::application::theSTRAIN::Impl::processing()
 // - from start of adc acquisition until after acquisition_retrieve() inside this function: ~664usec 
 // - from start of adc acquisition until after processing() inside this function, case of calib mode: ~1041usec 
 // - from start of adc acquisition until end of this function, case of calib mode: ~1164usec 
-bool embot::app::application::theSTRAIN::Impl::processdata(std::vector<embot::hw::can::Frame> &replies)
+bool embot::app::application::theSTRAIN::Impl::processdata(std::vector<embot::prot::can::Frame> &replies)
 {   
     if(false == ticking)
     {
@@ -1392,7 +1420,7 @@ bool embot::app::application::theSTRAIN::Impl::processdata(std::vector<embot::hw
     }
 
 #if defined(DEBUG_acquisition_computetiming)        
-    debugtime = embot::sys::now();
+    debugtime = embot::core::now();
     durationof01 = debugtime - timestartADC;
 #endif
 
@@ -1400,7 +1428,7 @@ bool embot::app::application::theSTRAIN::Impl::processdata(std::vector<embot::hw
     acquisition_retrieve();
 
 #if defined(DEBUG_acquisition_computetiming) 
-    debugtime = embot::sys::now();
+    debugtime = embot::core::now();
     durationof02 = debugtime - timestartADC;
 #endif
  
@@ -1408,7 +1436,7 @@ bool embot::app::application::theSTRAIN::Impl::processdata(std::vector<embot::hw
     processing();
 
 #if defined(DEBUG_acquisition_computetiming)    
-    debugtime = embot::sys::now();
+    debugtime = embot::core::now();
     durationof03 = debugtime - timestartADC;
 #endif
 
@@ -1444,7 +1472,7 @@ bool embot::app::application::theSTRAIN::Impl::processdata(std::vector<embot::hw
 //        if(false == adcwaszero)
 //        {
 //            embot::app::theLEDmanager &theleds = embot::app::theLEDmanager::getInstance();    
-//            embot::app::LEDwaveT<64> ledwave(100*embot::common::time1millisec, 30, std::bitset<64>(0b010101));
+//            embot::app::LEDwaveT<64> ledwave(100*embot::core::time1millisec, 30, std::bitset<64>(0b010101));
 //            theleds.get(embot::hw::LED::one).wave(&ledwave);              
 //        }
 //        
@@ -1467,28 +1495,28 @@ bool embot::app::application::theSTRAIN::Impl::processdata(std::vector<embot::hw
     
  
     
-    embot::hw::can::Frame frame;  
+    embot::prot::can::Frame frame;  
     
     switch(runtimedata.data.strainmode)
     {
-        case embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode::txCalibrated:
-        case embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode::txUncalibrated:
+        case embot::prot::can::analog::polling::Message_SET_TXMODE::StrainMode::txCalibrated:
+        case embot::prot::can::analog::polling::Message_SET_TXMODE::StrainMode::txUncalibrated:
         {
-            bool calibrated = (embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode::txCalibrated == runtimedata.data.strainmode) ? true : false;
+            bool calibrated = (embot::prot::can::analog::polling::Message_SET_TXMODE::StrainMode::txCalibrated == runtimedata.data.strainmode) ? true : false;
             // we send up two messages A and B which may contain either calib or uncalib data
-            embot::app::canprotocol::analog::periodic::Message_FORCE_VECTOR::Info forceinfo0A;
+            embot::prot::can::analog::periodic::Message_FORCE_VECTOR::Info forceinfo0A;
             if(true == fill(calibrated, forceinfo0A))
             {
-                embot::app::canprotocol::analog::periodic::Message_FORCE_VECTOR msg;
+                embot::prot::can::analog::periodic::Message_FORCE_VECTOR msg;
                 msg.load(forceinfo0A);
                 msg.get(frame);
                 replies.push_back(frame);
             }            
         
-            embot::app::canprotocol::analog::periodic::Message_TORQUE_VECTOR::Info torqueinfo0B;
+            embot::prot::can::analog::periodic::Message_TORQUE_VECTOR::Info torqueinfo0B;
             if(true == fill(calibrated, torqueinfo0B))
             {
-                embot::app::canprotocol::analog::periodic::Message_TORQUE_VECTOR msg;
+                embot::prot::can::analog::periodic::Message_TORQUE_VECTOR msg;
                 msg.load(torqueinfo0B);
                 msg.get(frame);
                 replies.push_back(frame);
@@ -1496,41 +1524,41 @@ bool embot::app::application::theSTRAIN::Impl::processdata(std::vector<embot::hw
         
         } break;
         
-        case embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode::txAll:
+        case embot::prot::can::analog::polling::Message_SET_TXMODE::StrainMode::txAll:
         {
             // we send up two messages A and B w/ calib data
-            embot::app::canprotocol::analog::periodic::Message_FORCE_VECTOR::Info forceinfo0A;
+            embot::prot::can::analog::periodic::Message_FORCE_VECTOR::Info forceinfo0A;
             if(true == fill(true, forceinfo0A))
             {
-                embot::app::canprotocol::analog::periodic::Message_FORCE_VECTOR msg;
+                embot::prot::can::analog::periodic::Message_FORCE_VECTOR msg;
                 msg.load(forceinfo0A);
                 msg.get(frame);
                 replies.push_back(frame);
             }            
         
-            embot::app::canprotocol::analog::periodic::Message_TORQUE_VECTOR::Info torqueinfo0B;
+            embot::prot::can::analog::periodic::Message_TORQUE_VECTOR::Info torqueinfo0B;
             if(true == fill(true, torqueinfo0B))
             {
-                embot::app::canprotocol::analog::periodic::Message_TORQUE_VECTOR msg;
+                embot::prot::can::analog::periodic::Message_TORQUE_VECTOR msg;
                 msg.load(torqueinfo0B);
                 msg.get(frame);
                 replies.push_back(frame);
             }  
 
             // and we send up two more messages 8 and 9 w/ uncalib data
-            embot::app::canprotocol::analog::periodic::Message_UNCALIBFORCE_VECTOR_DEBUGMODE::Info forceinfo08;
+            embot::prot::can::analog::periodic::Message_UNCALIBFORCE_VECTOR_DEBUGMODE::Info forceinfo08;
             if(true == fill(forceinfo08))
             {
-                embot::app::canprotocol::analog::periodic::Message_UNCALIBFORCE_VECTOR_DEBUGMODE msg;
+                embot::prot::can::analog::periodic::Message_UNCALIBFORCE_VECTOR_DEBUGMODE msg;
                 msg.load(forceinfo08);
                 msg.get(frame);
                 replies.push_back(frame);
             }            
         
-            embot::app::canprotocol::analog::periodic::Message_UNCALIBTORQUE_VECTOR_DEBUGMODE::Info torqueinfo09;
+            embot::prot::can::analog::periodic::Message_UNCALIBTORQUE_VECTOR_DEBUGMODE::Info torqueinfo09;
             if(true == fill(torqueinfo09))
             {
-                embot::app::canprotocol::analog::periodic::Message_UNCALIBTORQUE_VECTOR_DEBUGMODE msg;
+                embot::prot::can::analog::periodic::Message_UNCALIBTORQUE_VECTOR_DEBUGMODE msg;
                 msg.load(torqueinfo09);
                 msg.get(frame);
                 replies.push_back(frame);
@@ -1548,15 +1576,15 @@ bool embot::app::application::theSTRAIN::Impl::processdata(std::vector<embot::hw
 
 #if defined(DEBUG_acquisition_computetiming)
 
-    debugtime = embot::sys::now();
+    debugtime = embot::core::now();
     durationof04 = debugtime - timestartADC;
 
     #if defined(DEBUG_acquisition_computetiming_andtraceit)    
  
     // and now i fill the frame with the times ...
     
-    embot::app::canprotocol::analog::periodic::Message_USERDEF::Info infoU;
-    embot::app::canprotocol::analog::periodic::Message_USERDEF msgU;
+    embot::prot::can::analog::periodic::Message_USERDEF::Info infoU;
+    embot::prot::can::analog::periodic::Message_USERDEF msgU;
     infoU.canaddress = embot::app::theCANboardInfo::getInstance().cachedCANaddress();
     infoU.data[0] = (durationof00 >> 4) & 0xff; 
     infoU.data[1] = (durationof01 >> 4) & 0xff;  
@@ -1578,14 +1606,14 @@ bool embot::app::application::theSTRAIN::Impl::processdata(std::vector<embot::hw
     
 }
 
-bool embot::app::application::theSTRAIN::Impl::tick(std::vector<embot::hw::can::Frame> &replies)
+bool embot::app::application::theSTRAIN::Impl::tick(std::vector<embot::prot::can::Frame> &replies)
 {   
     if(false == ticking)
     {
         return false;
     }
 #if defined(DEBUG_acquisition_computetiming)     
-    debugtime = embot::sys::now();
+    debugtime = embot::core::now();
 #endif        
     // start adc acquisition
     acquisition_start();
@@ -1625,7 +1653,7 @@ embot::app::application::theSTRAIN::~theSTRAIN() { }
 //    
 //    embot::app::application::theSTRAIN::Impl *pImpl = reinterpret_cast<embot::app::application::theSTRAIN::Impl*>(p);
 //    
-//    //embot::sys::Action::EventToTask(pImpl->config.tickevent, pImpl->config.totask
+//    //embot::os::Action::EventToThread(pImpl->config.tickevent, pImpl->config.totask
 //    
 //    pImpl->config.totask->setEvent(pImpl->config.datareadyevent);
 //    
@@ -1636,7 +1664,7 @@ bool embot::app::application::theSTRAIN::initialise(Config &config)
 {
     pImpl->config = config;
     
-    pImpl->action.load(embot::sys::EventToTask(pImpl->config.tickevent, pImpl->config.totask));
+    pImpl->action.load(embot::os::EventToThread(pImpl->config.tickevent, pImpl->config.totask));
 
     // read from eeprom and make sure it is coherent data (first ever time we init eeprom)
     pImpl->configdata.EEPROM_read();
@@ -1694,7 +1722,7 @@ bool embot::app::application::theSTRAIN::initialise(Config &config)
     // now i must apply the values on eeprom pImpl->configdata.EEPROM_read
     
     std::uint8_t set2use = pImpl->runtimedata.set2use_get();
-    pImpl->amplifiers_applyregulationsetochipPGA308(set2use, embot::app::canprotocol::analog::polling::StrainChannel::all);
+    pImpl->amplifiers_applyregulationsetochipPGA308(set2use, embot::prot::can::analog::polling::StrainChannel::all);
     
 //    // #warning TODO: apply eeprom values to pga308 ... all channels. 
 //    embot::hw::pga308::TransferFunctionConfig tfc;    
@@ -1703,9 +1731,9 @@ bool embot::app::application::theSTRAIN::initialise(Config &config)
 //    std::uint8_t set2use = pImpl->runtimedata.set2use_get();
 //    for(int c=0; c<pImpl->numOfChannels; c++)
 //    {
-//        embot::app::canprotocol::analog::polling::PGA308cfg1 pga308cfg1;
+//        embot::prot::can::analog::polling::PGA308cfg1 pga308cfg1;
 //        pImpl->configdata.amplifiers_get(set2use, c, pga308cfg1); 
-//        tfc.load(pga308cfg1);    
+//        tfc.load(cfg1.GD, cfg1.GI, cfg1.S, cfg1.GO, cfg1.Voffsetcoarse, cfg1.Vzerodac);    
 //        embot::hw::pga308::set(static_cast<embot::hw::PGA308>(c), tfc);                
 //    }
         
@@ -1733,9 +1761,9 @@ bool embot::app::application::theSTRAIN::initialise(Config &config)
 
 
 
-bool embot::app::application::theSTRAIN::autocalib(const embot::app::canprotocol::analog::polling::Message_AMPLIFIER_OFFSET_AUTOCALIB::Info &info, std::uint8_t &noisychannelmask, std::uint8_t &algorithmOKmask, std::uint8_t &finalmeasureOKmask, std::uint16_t &mae)
+bool embot::app::application::theSTRAIN::autocalib(const embot::prot::can::analog::polling::Message_AMPLIFIER_OFFSET_AUTOCALIB::Info &info, std::uint8_t &noisychannelmask, std::uint8_t &algorithmOKmask, std::uint8_t &finalmeasureOKmask, std::uint16_t &mae)
 {
-    if(static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::StrainRegulationSet::theoneinuse) != info.regulationset)
+    if(static_cast<std::uint8_t>(embot::prot::can::analog::polling::StrainRegulationSet::theoneinuse) != info.regulationset)
     {   // cannot launch on a regulation set which is not in use
         mae = 54321;
         return false;
@@ -1760,7 +1788,7 @@ bool embot::app::application::theSTRAIN::autocalib(const embot::app::canprotocol
     }
     else
     {
-        embot::binary::bit::set(channelmask, info.channel);
+        embot::core::binary::bit::set(channelmask, info.channel);
     }
     
     noisychannelmask = 0;
@@ -1808,8 +1836,8 @@ bool embot::app::application::theSTRAIN::autocalib(const embot::app::canprotocol
         
         if(delta > (info.tolerance >> 3))
         {
-            embot::binary::bit::set(noisychannelmask, 7);            
-            embot::binary::bit::set(noisychannelmask, c);            
+            embot::core::binary::bit::set(noisychannelmask, 7);            
+            embot::core::binary::bit::set(noisychannelmask, c);            
         }
     }
     
@@ -1819,22 +1847,29 @@ bool embot::app::application::theSTRAIN::autocalib(const embot::app::canprotocol
     // perform alignment to target
     for(std::uint8_t i=0; i<pImpl->numOfChannels; i++)
     {
-        if(true == embot::binary::bit::check(channelmask, i))
+        if(true == embot::core::binary::bit::check(channelmask, i))
         {
-            embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
+            embot::prot::can::analog::polling::PGA308cfg1 cfg1;
             pImpl->configdata.amplifiers_get(setindex, i, cfg1);
         
             embot::hw::pga308::TransferFunctionConfig tfc;
-            tfc.load(cfg1);  
+            tfc.load(cfg1.GD, cfg1.GI, cfg1.S, cfg1.GO, cfg1.Voffsetcoarse, cfg1.Vzerodac);  
             std::uint8_t Y = 0;
             std::uint16_t Z = 0;
             if(true == tfc.alignVOUT(static_cast<std::uint16_t>(measure[i]), (info.target >> 3), Y, Z))
             {
                 embot::hw::pga308::set(static_cast<embot::hw::PGA308>(i), tfc);   
-                tfc.get(cfg1);
+                std::uint16_t       GD;
+                std::uint8_t        GI; 
+                std::uint8_t        S;
+                std::uint8_t        GO; 
+                std::uint8_t        Voffsetcoarse;
+                std::uint16_t       Vzerodac;
+                tfc.get(GD, GI, S, GO, Voffsetcoarse, Vzerodac);
+                cfg1 = {GD, GI, S, GO, Voffsetcoarse, Vzerodac};
                 pImpl->configdata.amplifiers_set(setindex, i, cfg1); 
                 
-                embot::binary::bit::set(algorithmOKmask, i);
+                embot::core::binary::bit::set(algorithmOKmask, i);
             }
             else
             {                                
@@ -1873,14 +1908,14 @@ bool embot::app::application::theSTRAIN::autocalib(const embot::app::canprotocol
     {
         if((_max[c] - _min[c]) > (info.tolerance >> 3))
         {
-            embot::binary::bit::set(noisychannelmask, 6);            
-            embot::binary::bit::set(noisychannelmask, c);            
+            embot::core::binary::bit::set(noisychannelmask, 6);            
+            embot::core::binary::bit::set(noisychannelmask, c);            
         }
         if(Nsamples > 0)
         {
             measure[c] /= Nsamples;
         }
-        if(true == embot::binary::bit::check(channelmask, c))
+        if(true == embot::core::binary::bit::check(channelmask, c))
         {
             num++;
             std::int32_t mm = measure[c] - (info.target >> 3);
@@ -1891,7 +1926,7 @@ bool embot::app::application::theSTRAIN::autocalib(const embot::app::canprotocol
             mae32 += mm;
             if(mm < (info.tolerance >> 3))
             {
-                embot::binary::bit::set(finalmeasureOKmask, c);
+                embot::core::binary::bit::set(finalmeasureOKmask, c);
             }                       
         }       
     }
@@ -1913,7 +1948,7 @@ bool embot::app::application::theSTRAIN::autocalib(const embot::app::canprotocol
 }
 
 
-bool embot::app::application::theSTRAIN::setTXperiod(embot::common::relTime txperiod)
+bool embot::app::application::theSTRAIN::setTXperiod(embot::core::relTime txperiod)
 {
     // if ticking: stop it
     if(true == pImpl->ticking)
@@ -1926,7 +1961,7 @@ bool embot::app::application::theSTRAIN::setTXperiod(embot::common::relTime txpe
     return true;       
 }
 
-bool embot::app::application::theSTRAIN::start(const embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode mode)
+bool embot::app::application::theSTRAIN::start(const embot::prot::can::analog::polling::Message_SET_TXMODE::StrainMode mode)
 {    
     return pImpl->start(mode);
 }
@@ -1938,12 +1973,12 @@ bool embot::app::application::theSTRAIN::stop()
 }
 
 
-bool embot::app::application::theSTRAIN::tick(std::vector<embot::hw::can::Frame> &replies)
+bool embot::app::application::theSTRAIN::tick(std::vector<embot::prot::can::Frame> &replies)
 {   
     return pImpl->tick(replies);
 }
 
-bool embot::app::application::theSTRAIN::processdata(std::vector<embot::hw::can::Frame> &replies)
+bool embot::app::application::theSTRAIN::processdata(std::vector<embot::prot::can::Frame> &replies)
 {   
     return pImpl->processdata(replies);
 }
@@ -1951,7 +1986,7 @@ bool embot::app::application::theSTRAIN::processdata(std::vector<embot::hw::can:
 
 // interface to CANagentSTRAIN
 
-bool embot::app::application::theSTRAIN::set(const embot::app::canprotocol::analog::polling::Message_SET_TXMODE::Info &info)
+bool embot::app::application::theSTRAIN::set(const embot::prot::can::analog::polling::Message_SET_TXMODE::Info &info)
 {
     bool ret = false;
     if(true == info.transmit)
@@ -1966,7 +2001,7 @@ bool embot::app::application::theSTRAIN::set(const embot::app::canprotocol::anal
 }
 
 
-bool embot::app::application::theSTRAIN::set(const embot::app::canprotocol::analog::polling::Message_SET_SERIAL_NO::Info &info)
+bool embot::app::application::theSTRAIN::set(const embot::prot::can::analog::polling::Message_SET_SERIAL_NO::Info &info)
 {
     // original strain code saves the value in ram only. it is saved in eeprom only when the message save2eeprom arrives    
     pImpl->configdata.serial_set(info.serial);
@@ -1974,7 +2009,7 @@ bool embot::app::application::theSTRAIN::set(const embot::app::canprotocol::anal
     return true;       
 }
   
-bool embot::app::application::theSTRAIN::set(const embot::app::canprotocol::analog::polling::Message_SET_CANDATARATE::Info &info)
+bool embot::app::application::theSTRAIN::set(const embot::prot::can::analog::polling::Message_SET_CANDATARATE::Info &info)
 {
     // if ticking: stop it
     if(true == pImpl->ticking)
@@ -1987,7 +2022,7 @@ bool embot::app::application::theSTRAIN::set(const embot::app::canprotocol::anal
     return true;       
 }
   
-bool embot::app::application::theSTRAIN::set(const embot::app::canprotocol::analog::polling::Message_SET_FULL_SCALES::Info &info)
+bool embot::app::application::theSTRAIN::set(const embot::prot::can::analog::polling::Message_SET_FULL_SCALES::Info &info)
 {
     uint8_t setindex = 0;
     if(false == pImpl->regulationset2index(info.regulationset, setindex))
@@ -2011,13 +2046,13 @@ bool embot::app::application::theSTRAIN::set(const embot::app::canprotocol::anal
     return true;        
 }
    
-bool embot::app::application::theSTRAIN::set(const embot::app::canprotocol::analog::polling::Message_SAVE2EE::Info &info)
+bool embot::app::application::theSTRAIN::set(const embot::prot::can::analog::polling::Message_SAVE2EE::Info &info)
 {
     pImpl->configdata.EEPROM_write();
     return true;      
 }
    
-bool embot::app::application::theSTRAIN::set(const embot::app::canprotocol::analog::polling::Message_SET_CH_DAC::Info &info)
+bool embot::app::application::theSTRAIN::set(const embot::prot::can::analog::polling::Message_SET_CH_DAC::Info &info)
 {
     uint8_t setindex = 0;
     if(false == pImpl->regulationset2index(info.regulationset, setindex))
@@ -2038,15 +2073,22 @@ bool embot::app::application::theSTRAIN::set(const embot::app::canprotocol::anal
 
     // i assign a beta ....
     
-    embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
+    embot::prot::can::analog::polling::PGA308cfg1 cfg1;
     pImpl->configdata.amplifiers_get(setindex, info.channel, cfg1);
 
     embot::hw::pga308::TransferFunctionConfig tfc;
-    tfc.load(cfg1);  
+    tfc.load(cfg1.GD, cfg1.GI, cfg1.S, cfg1.GO, cfg1.Voffsetcoarse, cfg1.Vzerodac);  
 
     if(true == tfc.setbeta(static_cast<float>(info.offset)/8.f))
     {
-        tfc.get(cfg1);
+        std::uint16_t       GD;
+        std::uint8_t        GI; 
+        std::uint8_t        S;
+        std::uint8_t        GO; 
+        std::uint8_t        Voffsetcoarse;
+        std::uint16_t       Vzerodac;
+        tfc.get(GD, GI, S, GO, Voffsetcoarse, Vzerodac);
+        cfg1 = {GD, GI, S, GO, Voffsetcoarse, Vzerodac};
         pImpl->configdata.amplifiers_set(setindex, info.channel, cfg1);   
         
         // i apply settings to the pga308. but only if the setindex is the one in use...
@@ -2060,7 +2102,7 @@ bool embot::app::application::theSTRAIN::set(const embot::app::canprotocol::anal
     return true;      
 }
    
-bool embot::app::application::theSTRAIN::set(const embot::app::canprotocol::analog::polling::Message_SET_MATRIX_RC::Info &info)
+bool embot::app::application::theSTRAIN::set(const embot::prot::can::analog::polling::Message_SET_MATRIX_RC::Info &info)
 {
     if((info.row >=  pImpl->numOfChannels) || (info.col >=  pImpl->numOfChannels))
     {
@@ -2079,7 +2121,7 @@ bool embot::app::application::theSTRAIN::set(const embot::app::canprotocol::anal
     return true;       
 }
    
-bool embot::app::application::theSTRAIN::set(const embot::app::canprotocol::analog::polling::Message_SET_MATRIX_G::Info &info)
+bool embot::app::application::theSTRAIN::set(const embot::prot::can::analog::polling::Message_SET_MATRIX_G::Info &info)
 {
     uint8_t setindex = 0;
     if(false == pImpl->regulationset2index(info.regulationset, setindex))
@@ -2093,7 +2135,7 @@ bool embot::app::application::theSTRAIN::set(const embot::app::canprotocol::anal
     return true;       
 }
    
-bool embot::app::application::theSTRAIN::set(const embot::app::canprotocol::analog::polling::Message_SET_CALIB_TARE::Info &info)
+bool embot::app::application::theSTRAIN::set(const embot::prot::can::analog::polling::Message_SET_CALIB_TARE::Info &info)
 {
     uint8_t setindex = 0;
     if(false == pImpl->regulationset2index(info.regulationset, setindex))
@@ -2105,7 +2147,7 @@ bool embot::app::application::theSTRAIN::set(const embot::app::canprotocol::anal
     
     switch(info.mode)
     {
-        case embot::app::canprotocol::analog::polling::Message_SET_CALIB_TARE::Mode::setchannelwithvalue:
+        case embot::prot::can::analog::polling::Message_SET_CALIB_TARE::Mode::setchannelwithvalue:
         {
             bool allchannels = false;
             if(false == pImpl->ischannelvalid(info.channel, allchannels))
@@ -2121,16 +2163,16 @@ bool embot::app::application::theSTRAIN::set(const embot::app::canprotocol::anal
             pImpl->configdata.transformer_tare_set(setindex, info.channel, static_cast<embot::dsp::Q15>(info.value));
         } break;            
 
-        case embot::app::canprotocol::analog::polling::Message_SET_CALIB_TARE::Mode::everychannelreset:
+        case embot::prot::can::analog::polling::Message_SET_CALIB_TARE::Mode::everychannelreset:
         {
             // we dont care about channel: we always operate on all
             pImpl->configdata.transformer_tare_fill(setindex, embot::dsp::q15::zero);
         } break;
 
-        case embot::app::canprotocol::analog::polling::Message_SET_CALIB_TARE::Mode::everychannelnegativeofadc:
+        case embot::prot::can::analog::polling::Message_SET_CALIB_TARE::Mode::everychannelnegativeofadc:
         {
             // there is no meaning to do that on a regulation set different from the one in use
-            if(static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::StrainRegulationSet::theoneinuse) != info.regulationset)
+            if(static_cast<std::uint8_t>(embot::prot::can::analog::polling::StrainRegulationSet::theoneinuse) != info.regulationset)
             {   
                 return false;
             }
@@ -2148,7 +2190,7 @@ bool embot::app::application::theSTRAIN::set(const embot::app::canprotocol::anal
         } break;    
 
         default:
-        case embot::app::canprotocol::analog::polling::Message_SET_CALIB_TARE::Mode::unknown:
+        case embot::prot::can::analog::polling::Message_SET_CALIB_TARE::Mode::unknown:
         {
             ret = false;
         } break;        
@@ -2158,13 +2200,13 @@ bool embot::app::application::theSTRAIN::set(const embot::app::canprotocol::anal
     return ret;       
 }
    
-bool embot::app::application::theSTRAIN::set(const embot::app::canprotocol::analog::polling::Message_SET_CURR_TARE::Info &info)
+bool embot::app::application::theSTRAIN::set(const embot::prot::can::analog::polling::Message_SET_CURR_TARE::Info &info)
 {
     bool ret = true;
 
     switch(info.mode)
     {
-        case embot::app::canprotocol::analog::polling::Message_SET_CURR_TARE::Mode::setchannelwithvalue:
+        case embot::prot::can::analog::polling::Message_SET_CURR_TARE::Mode::setchannelwithvalue:
         {
             bool allchannels = false;
             if(false == pImpl->ischannelvalid(info.channel, allchannels))
@@ -2179,13 +2221,13 @@ bool embot::app::application::theSTRAIN::set(const embot::app::canprotocol::anal
             pImpl->runtimedata.tare_set(info.channel, static_cast<embot::dsp::Q15>(info.value));
         } break;            
 
-        case embot::app::canprotocol::analog::polling::Message_SET_CURR_TARE::Mode::everychannelreset:
+        case embot::prot::can::analog::polling::Message_SET_CURR_TARE::Mode::everychannelreset:
         {
             // we dont care about channel: we operate on all
             pImpl->runtimedata.tare_fill(embot::dsp::q15::zero);
         } break;
 
-        case embot::app::canprotocol::analog::polling::Message_SET_CURR_TARE::Mode::everychannelnegativeofforcetorque:
+        case embot::prot::can::analog::polling::Message_SET_CURR_TARE::Mode::everychannelnegativeofforcetorque:
         {
             // we dont care about channel: we operate on all
             
@@ -2213,7 +2255,7 @@ bool embot::app::application::theSTRAIN::set(const embot::app::canprotocol::anal
         } break;    
 
         default:
-        case embot::app::canprotocol::analog::polling::Message_SET_CURR_TARE::Mode::unknown:
+        case embot::prot::can::analog::polling::Message_SET_CURR_TARE::Mode::unknown:
         {
             ret = false;
         } break;        
@@ -2222,7 +2264,7 @@ bool embot::app::application::theSTRAIN::set(const embot::app::canprotocol::anal
     return ret;        
 }
    
-bool embot::app::application::theSTRAIN::set(const embot::app::canprotocol::analog::polling::Message_AMPLIFIER_RESET::Info &info)
+bool embot::app::application::theSTRAIN::set(const embot::prot::can::analog::polling::Message_AMPLIFIER_RESET::Info &info)
 {
     uint8_t setindex = 0;
     if(false == pImpl->regulationset2index(info.regulationset, setindex))
@@ -2243,7 +2285,7 @@ bool embot::app::application::theSTRAIN::set(const embot::app::canprotocol::anal
     }
     
     // it may be zero, one, ..., five, all
-    embot::app::canprotocol::analog::polling::StrainChannel targetStrainChannel = static_cast<embot::app::canprotocol::analog::polling::StrainChannel>(info.channel);
+    embot::prot::can::analog::polling::StrainChannel targetStrainChannel = static_cast<embot::prot::can::analog::polling::StrainChannel>(info.channel);
    
     // reset amplifier(s) to default
     pImpl->amplifiers_reset(setindex, targetStrainChannel);    
@@ -2257,7 +2299,7 @@ bool embot::app::application::theSTRAIN::set(const embot::app::canprotocol::anal
     return true;        
 }
    
-bool embot::app::application::theSTRAIN::set(const embot::app::canprotocol::analog::polling::Message_AMPLIFIER_PGA308_CFG1_SET::Info &info)
+bool embot::app::application::theSTRAIN::set(const embot::prot::can::analog::polling::Message_AMPLIFIER_PGA308_CFG1_SET::Info &info)
 {
     uint8_t setindex = 0;
     if(false == pImpl->regulationset2index(info.regulationset, setindex))
@@ -2277,7 +2319,7 @@ bool embot::app::application::theSTRAIN::set(const embot::app::canprotocol::anal
     }
 
     // it may be zero, one, ..., five, all
-    embot::app::canprotocol::analog::polling::StrainChannel targetStrainChannel = static_cast<embot::app::canprotocol::analog::polling::StrainChannel>(info.channel);
+    embot::prot::can::analog::polling::StrainChannel targetStrainChannel = static_cast<embot::prot::can::analog::polling::StrainChannel>(info.channel);
 
     // set amplifier(s)
     pImpl->amplifiers_set(setindex, targetStrainChannel, info.cfg1);    
@@ -2291,14 +2333,14 @@ bool embot::app::application::theSTRAIN::set(const embot::app::canprotocol::anal
     return true;        
 }
    
-bool embot::app::application::theSTRAIN::set(const embot::app::canprotocol::analog::polling::Message_AMPLIFIER_OFFSET_AUTOCALIB::Info &info, embot::app::canprotocol::analog::polling::Message_AMPLIFIER_OFFSET_AUTOCALIB::ReplyInfo &replyinfo)
+bool embot::app::application::theSTRAIN::set(const embot::prot::can::analog::polling::Message_AMPLIFIER_OFFSET_AUTOCALIB::Info &info, embot::prot::can::analog::polling::Message_AMPLIFIER_OFFSET_AUTOCALIB::ReplyInfo &replyinfo)
 {
     replyinfo.regulationset = info.regulationset;
     replyinfo.channel = info.channel;
     return autocalib(info, replyinfo.noisychannelmask, replyinfo.algorithmOKmask, replyinfo.finalmeasureOKmask, replyinfo.mae);
 }
    
-bool embot::app::application::theSTRAIN::set(const embot::app::canprotocol::analog::polling::Message_AMPLIFIER_GAINOFFSET_SET::Info &info)
+bool embot::app::application::theSTRAIN::set(const embot::prot::can::analog::polling::Message_AMPLIFIER_GAINOFFSET_SET::Info &info)
 {
     uint8_t setindex = 0;
     if(false == pImpl->regulationset2index(info.regulationset, setindex))
@@ -2313,7 +2355,7 @@ bool embot::app::application::theSTRAIN::set(const embot::app::canprotocol::anal
     }
 
     // it may be zero, one, ..., five, all
-    embot::app::canprotocol::analog::polling::StrainChannel targetStrainChannel = static_cast<embot::app::canprotocol::analog::polling::StrainChannel>(info.channel);
+    embot::prot::can::analog::polling::StrainChannel targetStrainChannel = static_cast<embot::prot::can::analog::polling::StrainChannel>(info.channel);
     
     bool set2default = (1 == info.mode) ? true : false;
     
@@ -2347,7 +2389,7 @@ bool embot::app::application::theSTRAIN::set(const embot::app::canprotocol::anal
     return true;        
 }
    
-bool embot::app::application::theSTRAIN::set(const embot::app::canprotocol::analog::polling::Message_REGULATIONSET_SET::Info &info)
+bool embot::app::application::theSTRAIN::set(const embot::prot::can::analog::polling::Message_REGULATIONSET_SET::Info &info)
 {
     uint8_t setindex = 0;
     if(false == pImpl->regulationset2index(info.regulationset, setindex))
@@ -2367,22 +2409,22 @@ bool embot::app::application::theSTRAIN::set(const embot::app::canprotocol::anal
     //    to retrieve handles of handleCalibMatrixQ15 and handleCalibtareQ15
     // if we just set the ::permanent we dont need to stop acquisition or apply teh regulation set.
     
-    if(info.mode == static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::StrainRegulationSetMode::temporary))
+    if(info.mode == static_cast<std::uint8_t>(embot::prot::can::analog::polling::StrainRegulationSetMode::temporary))
     {
-        embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode mode;
+        embot::prot::can::analog::polling::Message_SET_TXMODE::StrainMode mode;
         pImpl->evalstop(mode);
         
         pImpl->runtimedata.set2use_set(setindex);
         
         // ok: now i must apply the new set to front-end amplifiers
         std::uint8_t set2use = pImpl->runtimedata.set2use_get();
-        pImpl->amplifiers_applyregulationsetochipPGA308(set2use, embot::app::canprotocol::analog::polling::StrainChannel::all);
+        pImpl->amplifiers_applyregulationsetochipPGA308(set2use, embot::prot::can::analog::polling::StrainChannel::all);
         
         pImpl->evalrestart(mode);
         
         ret = true;
     }
-    else if(info.mode == static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::StrainRegulationSetMode::permanent))
+    else if(info.mode == static_cast<std::uint8_t>(embot::prot::can::analog::polling::StrainRegulationSetMode::permanent))
     {
         pImpl->configdata.permanentregulationset_set(setindex);     
         ret = true;
@@ -2393,14 +2435,14 @@ bool embot::app::application::theSTRAIN::set(const embot::app::canprotocol::anal
 }
    
 
-bool embot::app::application::theSTRAIN::get(const embot::app::canprotocol::analog::polling::Message_GET_SERIAL_NO::Info &info, embot::app::canprotocol::analog::polling::Message_GET_SERIAL_NO::ReplyInfo &replyinfo)
+bool embot::app::application::theSTRAIN::get(const embot::prot::can::analog::polling::Message_GET_SERIAL_NO::Info &info, embot::prot::can::analog::polling::Message_GET_SERIAL_NO::ReplyInfo &replyinfo)
 {
     // original strain code gets the value from ram, even if the ram and the eeprom are not synched
     std::snprintf(replyinfo.serial, sizeof(replyinfo.serial), "%s", pImpl->configdata.serial_get());  
     return true;        
 }
   
-bool embot::app::application::theSTRAIN::get(const embot::app::canprotocol::analog::polling::Message_GET_FULL_SCALES::Info &info, embot::app::canprotocol::analog::polling::Message_GET_FULL_SCALES::ReplyInfo &replyinfo)
+bool embot::app::application::theSTRAIN::get(const embot::prot::can::analog::polling::Message_GET_FULL_SCALES::Info &info, embot::prot::can::analog::polling::Message_GET_FULL_SCALES::ReplyInfo &replyinfo)
 {
     replyinfo.channel = info.channel;
     replyinfo.regulationset = info.regulationset;
@@ -2430,13 +2472,13 @@ bool embot::app::application::theSTRAIN::get(const embot::app::canprotocol::anal
     return true;        
 }
   
-bool embot::app::application::theSTRAIN::get(const embot::app::canprotocol::analog::polling::Message_GET_EEPROM_STATUS::Info &info, embot::app::canprotocol::analog::polling::Message_GET_EEPROM_STATUS::ReplyInfo &replyinfo)
+bool embot::app::application::theSTRAIN::get(const embot::prot::can::analog::polling::Message_GET_EEPROM_STATUS::Info &info, embot::prot::can::analog::polling::Message_GET_EEPROM_STATUS::ReplyInfo &replyinfo)
 {    
     replyinfo.saved = pImpl->configdata.isEEPROMsynched();
     return true;        
 }
   
-bool embot::app::application::theSTRAIN::get(const embot::app::canprotocol::analog::polling::Message_GET_CH_ADC::Info &info, embot::app::canprotocol::analog::polling::Message_GET_CH_ADC::ReplyInfo &replyinfo)
+bool embot::app::application::theSTRAIN::get(const embot::prot::can::analog::polling::Message_GET_CH_ADC::Info &info, embot::prot::can::analog::polling::Message_GET_CH_ADC::ReplyInfo &replyinfo)
 {
     replyinfo.channel = info.channel;
     replyinfo.valueiscalibrated = info.getcalibrated;  
@@ -2492,7 +2534,7 @@ bool embot::app::application::theSTRAIN::get(const embot::app::canprotocol::anal
     return true;        
 }
   
-bool embot::app::application::theSTRAIN::get(const embot::app::canprotocol::analog::polling::Message_GET_CH_DAC::Info &info, embot::app::canprotocol::analog::polling::Message_GET_CH_DAC::ReplyInfo &replyinfo)
+bool embot::app::application::theSTRAIN::get(const embot::prot::can::analog::polling::Message_GET_CH_DAC::Info &info, embot::prot::can::analog::polling::Message_GET_CH_DAC::ReplyInfo &replyinfo)
 {
     replyinfo.regulationset = info.regulationset;
     replyinfo.channel = info.channel;    
@@ -2516,12 +2558,12 @@ bool embot::app::application::theSTRAIN::get(const embot::app::canprotocol::anal
     }
 
     // it returns the beta   
-    embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
+    embot::prot::can::analog::polling::PGA308cfg1 cfg1;
     pImpl->configdata.amplifiers_get(setindex, replyinfo.channel, cfg1); 
     
     // now i retrieve beta.
     embot::hw::pga308::TransferFunctionConfig tfc;
-    tfc.load(cfg1);  
+    tfc.load(cfg1.GD, cfg1.GI, cfg1.S, cfg1.GO, cfg1.Voffsetcoarse, cfg1.Vzerodac);  
     float beta = tfc.beta() * 8;            // move from [0, 8k) into [0, 64k)
     replyinfo.offset = static_cast<std::uint16_t>(std::floor(beta));
     
@@ -2529,7 +2571,7 @@ bool embot::app::application::theSTRAIN::get(const embot::app::canprotocol::anal
     
 }
   
-bool embot::app::application::theSTRAIN::get(const embot::app::canprotocol::analog::polling::Message_GET_MATRIX_RC::Info &info, embot::app::canprotocol::analog::polling::Message_GET_MATRIX_RC::ReplyInfo &replyinfo)
+bool embot::app::application::theSTRAIN::get(const embot::prot::can::analog::polling::Message_GET_MATRIX_RC::Info &info, embot::prot::can::analog::polling::Message_GET_MATRIX_RC::ReplyInfo &replyinfo)
 {
     replyinfo.regulationset = info.regulationset;
     replyinfo.row = info.row;
@@ -2553,7 +2595,7 @@ bool embot::app::application::theSTRAIN::get(const embot::app::canprotocol::anal
 }
 
 
-bool embot::app::application::theSTRAIN::get(const embot::app::canprotocol::analog::polling::Message_GET_MATRIX_G::Info &info, embot::app::canprotocol::analog::polling::Message_GET_MATRIX_G::ReplyInfo &replyinfo)
+bool embot::app::application::theSTRAIN::get(const embot::prot::can::analog::polling::Message_GET_MATRIX_G::Info &info, embot::prot::can::analog::polling::Message_GET_MATRIX_G::ReplyInfo &replyinfo)
 {
     replyinfo.regulationset = info.regulationset;
     
@@ -2569,7 +2611,7 @@ bool embot::app::application::theSTRAIN::get(const embot::app::canprotocol::anal
 }
 
 
-bool embot::app::application::theSTRAIN::get(const embot::app::canprotocol::analog::polling::Message_GET_CALIB_TARE::Info &info, embot::app::canprotocol::analog::polling::Message_GET_CALIB_TARE::ReplyInfo &replyinfo)
+bool embot::app::application::theSTRAIN::get(const embot::prot::can::analog::polling::Message_GET_CALIB_TARE::Info &info, embot::prot::can::analog::polling::Message_GET_CALIB_TARE::ReplyInfo &replyinfo)
 {
     replyinfo.regulationset = info.regulationset;
     replyinfo.channel = info.channel;  
@@ -2599,7 +2641,7 @@ bool embot::app::application::theSTRAIN::get(const embot::app::canprotocol::anal
 }
 
 
-bool embot::app::application::theSTRAIN::get(const embot::app::canprotocol::analog::polling::Message_GET_CURR_TARE::Info &info, embot::app::canprotocol::analog::polling::Message_GET_CURR_TARE::ReplyInfo &replyinfo)
+bool embot::app::application::theSTRAIN::get(const embot::prot::can::analog::polling::Message_GET_CURR_TARE::Info &info, embot::prot::can::analog::polling::Message_GET_CURR_TARE::ReplyInfo &replyinfo)
 {
     replyinfo.channel = info.channel;  
     replyinfo.value = 0;
@@ -2621,7 +2663,7 @@ bool embot::app::application::theSTRAIN::get(const embot::app::canprotocol::anal
 }
 
 
-bool embot::app::application::theSTRAIN::get(const embot::app::canprotocol::analog::polling::Message_AMPLIFIER_PGA308_CFG1_GET::Info &info, embot::app::canprotocol::analog::polling::Message_AMPLIFIER_PGA308_CFG1_GET::ReplyInfo &replyinfo)
+bool embot::app::application::theSTRAIN::get(const embot::prot::can::analog::polling::Message_AMPLIFIER_PGA308_CFG1_GET::Info &info, embot::prot::can::analog::polling::Message_AMPLIFIER_PGA308_CFG1_GET::ReplyInfo &replyinfo)
 {
     replyinfo.channel = info.channel;
     replyinfo.regulationset = info.regulationset;
@@ -2648,7 +2690,7 @@ bool embot::app::application::theSTRAIN::get(const embot::app::canprotocol::anal
 }
 
 
-bool embot::app::application::theSTRAIN::get(const embot::app::canprotocol::analog::polling::Message_AMPLIFIER_GAINOFFSET_GET::Info &info, embot::app::canprotocol::analog::polling::Message_AMPLIFIER_GAINOFFSET_GET::ReplyInfo &replyinfo)
+bool embot::app::application::theSTRAIN::get(const embot::prot::can::analog::polling::Message_AMPLIFIER_GAINOFFSET_GET::Info &info, embot::prot::can::analog::polling::Message_AMPLIFIER_GAINOFFSET_GET::ReplyInfo &replyinfo)
 {
     replyinfo.regulationset = info.regulationset;
     replyinfo.channel = info.channel;  
@@ -2670,12 +2712,12 @@ bool embot::app::application::theSTRAIN::get(const embot::app::canprotocol::anal
         return false;
     }
     
-    embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
+    embot::prot::can::analog::polling::PGA308cfg1 cfg1;
     pImpl->configdata.amplifiers_get(setindex, replyinfo.channel, cfg1); 
     
     // now i retrieve alpha and beta
     embot::hw::pga308::TransferFunctionConfig tfc;
-    tfc.load(cfg1);  
+    tfc.load(cfg1.GD, cfg1.GI, cfg1.S, cfg1.GO, cfg1.Voffsetcoarse, cfg1.Vzerodac);  
     float alpha = tfc.alpha() * 100.0f;     // represent in 0.01 ticks
     float beta = tfc.beta() * 8;            // move from [0, 8k) into [0, 64k)
     replyinfo.gain = static_cast<std::uint16_t>(std::floor(alpha));
@@ -2686,7 +2728,7 @@ bool embot::app::application::theSTRAIN::get(const embot::app::canprotocol::anal
 }
 
 
-bool embot::app::application::theSTRAIN::get(const embot::app::canprotocol::analog::polling::Message_AMPLIFIER_RANGE_OF_GAIN_GET::Info &info, embot::app::canprotocol::analog::polling::Message_AMPLIFIER_RANGE_OF_GAIN_GET::ReplyInfo &replyinfo)
+bool embot::app::application::theSTRAIN::get(const embot::prot::can::analog::polling::Message_AMPLIFIER_RANGE_OF_GAIN_GET::Info &info, embot::prot::can::analog::polling::Message_AMPLIFIER_RANGE_OF_GAIN_GET::ReplyInfo &replyinfo)
 {
     replyinfo.regulationset = info.regulationset;
     replyinfo.channel = info.channel;  
@@ -2708,12 +2750,12 @@ bool embot::app::application::theSTRAIN::get(const embot::app::canprotocol::anal
         return false;
     }
     
-    embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
+    embot::prot::can::analog::polling::PGA308cfg1 cfg1;
     pImpl->configdata.amplifiers_get(setindex, replyinfo.channel, cfg1); 
     
     // now i retrieve limits of alpha.
     embot::hw::pga308::TransferFunctionConfig tfc;
-    tfc.load(cfg1);  
+    tfc.load(cfg1.GD, cfg1.GI, cfg1.S, cfg1.GO, cfg1.Voffsetcoarse, cfg1.Vzerodac);  
     float low = tfc.alpha(0) * 100.0f;     
     float high = tfc.alpha(64*1024-1) * 100.f;  
     replyinfo.lowest = static_cast<std::uint16_t>(std::floor(low));
@@ -2724,7 +2766,7 @@ bool embot::app::application::theSTRAIN::get(const embot::app::canprotocol::anal
 }
 
 
-bool embot::app::application::theSTRAIN::get(const embot::app::canprotocol::analog::polling::Message_AMPLIFIER_RANGE_OF_OFFSET_GET::Info &info, embot::app::canprotocol::analog::polling::Message_AMPLIFIER_RANGE_OF_OFFSET_GET::ReplyInfo &replyinfo)
+bool embot::app::application::theSTRAIN::get(const embot::prot::can::analog::polling::Message_AMPLIFIER_RANGE_OF_OFFSET_GET::Info &info, embot::prot::can::analog::polling::Message_AMPLIFIER_RANGE_OF_OFFSET_GET::ReplyInfo &replyinfo)
 {
     replyinfo.regulationset = info.regulationset;
     replyinfo.channel = info.channel; 
@@ -2746,12 +2788,12 @@ bool embot::app::application::theSTRAIN::get(const embot::app::canprotocol::anal
         return false;
     }
     
-//    embot::app::canprotocol::analog::polling::PGA308cfg1 cfg1;
+//    embot::prot::can::analog::polling::PGA308cfg1 cfg1;
 //    pImpl->configdata.amplifiers_get(setindex, replyinfo.channel, cfg1); 
 //     
 //    // now i retrieve limits of beta.
 //    embot::hw::pga308::TransferFunctionConfig tfc;
-//    tfc.load(cfg1);  
+//    tfc.load(cfg1.GD, cfg1.GI, cfg1.S, cfg1.GO, cfg1.Voffsetcoarse, cfg1.Vzerodac);  
 //    float low = tfc.alpha(0) * 100.0f;     
 //    float high = tfc.alpha(64*1024-1) * 100.f;  
     replyinfo.lowest = 0;
@@ -2761,18 +2803,18 @@ bool embot::app::application::theSTRAIN::get(const embot::app::canprotocol::anal
 }
 
 
-bool embot::app::application::theSTRAIN::get(const embot::app::canprotocol::analog::polling::Message_REGULATIONSET_GET::Info &info, embot::app::canprotocol::analog::polling::Message_REGULATIONSET_GET::ReplyInfo &replyinfo)
+bool embot::app::application::theSTRAIN::get(const embot::prot::can::analog::polling::Message_REGULATIONSET_GET::Info &info, embot::prot::can::analog::polling::Message_REGULATIONSET_GET::ReplyInfo &replyinfo)
 {    
     replyinfo.mode = info.mode;
     
     bool ret = false;
     
-    if(replyinfo.mode == static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::StrainRegulationSetMode::temporary))
+    if(replyinfo.mode == static_cast<std::uint8_t>(embot::prot::can::analog::polling::StrainRegulationSetMode::temporary))
     {   // +1 because allowed values for regulationset are 1, 2, 3 and runtimedata uses 0, 1, 2
         replyinfo.regulationset = pImpl->runtimedata.set2use_get() + 1; 
         ret = true;
     }
-    else if(replyinfo.mode == static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::StrainRegulationSetMode::permanent))
+    else if(replyinfo.mode == static_cast<std::uint8_t>(embot::prot::can::analog::polling::StrainRegulationSetMode::permanent))
     {   // + 1 because allowed values for regulationset are 1, 2, 3 and configdata uses 0, 1, 2
         replyinfo.regulationset = pImpl->configdata.permanentregulationset_get() + 1;
         ret = true;

@@ -34,20 +34,20 @@
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
 // --------------------------------------------------------------------------------------------------------------------
 
-struct embot::sys::theTimerManager::Impl
+struct embot::os::theTimerManager::Impl
 {    
     Config config {};    
-    embot::sys::MessageTask *task {nullptr};
+    embot::os::MessageThread *task {nullptr};
     
     Impl() 
     {              
     }
     
-    static void processtimer(Task *t, common::Message m, void *o)
+    static void processtimer(Thread *t, os::Message m, void *o)
     {
         if(0 != m)
         {
-            embot::sys::Timer *tmr = reinterpret_cast<embot::sys::Timer*>(m);
+            embot::os::Timer *tmr = reinterpret_cast<embot::os::Timer*>(m);
             tmr->execute();            
         }
             
@@ -60,35 +60,35 @@ struct embot::sys::theTimerManager::Impl
 // --------------------------------------------------------------------------------------------------------------------
 
 
-embot::sys::theTimerManager& embot::sys::theTimerManager::getInstance()
+embot::os::theTimerManager& embot::os::theTimerManager::getInstance()
 {
     static theTimerManager* p = new theTimerManager();
     return *p;
 }
 
-embot::sys::theTimerManager::theTimerManager()
+embot::os::theTimerManager::theTimerManager()
 {
     pImpl = std::make_unique<Impl>();
 }  
 
     
-embot::sys::theTimerManager::~theTimerManager() { }
+embot::os::theTimerManager::~theTimerManager() { }
 
 
-bool embot::sys::theTimerManager::start(const Config &config)
+bool embot::os::theTimerManager::start(const Config &config)
 {       
     if(true == started())
     {
         return false;
     }
     
-    pImpl->task = new embot::sys::MessageTask;
+    pImpl->task = new embot::os::MessageThread;
     
-    embot::sys::MessageTask::Config cfg;
+    embot::os::MessageThread::Config cfg;
     cfg.priority = pImpl->config.priority;
     cfg.stacksize = pImpl->config.stacksize;
     cfg.messagequeuesize = pImpl->config.capacityofhandler;
-    cfg.timeout = embot::common::timeWaitForever;
+    cfg.timeout = embot::core::timeWaitForever;
     cfg.startup = nullptr;
     cfg.onmessage = pImpl->processtimer;
     cfg.param = this;
@@ -99,19 +99,19 @@ bool embot::sys::theTimerManager::start(const Config &config)
     
 }
 
-bool embot::sys::theTimerManager::started() const
+bool embot::os::theTimerManager::started() const
 {
     return (nullptr == pImpl->task) ? false : true;
 }
 
-bool embot::sys::theTimerManager::onexpiry(const Timer &timer)
+bool embot::os::theTimerManager::onexpiry(const Timer &timer)
 {
     if(nullptr == pImpl->task)
     {
         return false;
     }
     
-    pImpl->task->setMessage(reinterpret_cast<embot::common::Message>(const_cast<Timer*>(&timer)), embot::common::timeWaitNone);
+    pImpl->task->setMessage(reinterpret_cast<embot::os::Message>(const_cast<Timer*>(&timer)), embot::core::timeWaitNone);
     return true;
 }
     

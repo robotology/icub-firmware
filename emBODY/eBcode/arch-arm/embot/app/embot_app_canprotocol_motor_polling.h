@@ -21,7 +21,7 @@
 #ifndef _EMBOT_APP_CANPROTOCOL_MOTOR_H_
 #define _EMBOT_APP_CANPROTOCOL_MOTOR_H_
 
-#include "embot_common.h"
+#include "embot_core.h"
 
 #include "embot_app_canprotocol.h"
 
@@ -29,7 +29,7 @@
 
 
 
-namespace embot { namespace app { namespace canprotocol { namespace motor { namespace polling {
+namespace embot { namespace prot { namespace can { namespace motor { namespace polling {
     
     // the supported commands    
     enum class CMD { 
@@ -55,34 +55,34 @@ namespace embot { namespace app { namespace canprotocol { namespace motor { name
     CMD convert(std::uint8_t cmd);
     std::uint8_t convert(CMD cmd);    
     
-}}}}} // namespace embot { namespace app { namespace canprotocol { namespace motor { namespace polling {
+}}}}} // namespace embot { namespace prot { namespace can { namespace motor { namespace polling {
 
            
 
-namespace embot { namespace app { namespace canprotocol { namespace motor { namespace polling {
+namespace embot { namespace prot { namespace can { namespace motor { namespace polling {
             
     // the management of commands
     
-    class Message_GET_FIRMWARE_VERSION : public embot::app::canprotocol::shared::Message_GET_VERSION
+    class Message_GET_FIRMWARE_VERSION : public embot::prot::can::shared::Message_GET_VERSION
     {
         public:
             
         Message_GET_FIRMWARE_VERSION() : 
-            embot::app::canprotocol::shared::Message_GET_VERSION(Clas::pollingMotorControl, static_cast<std::uint8_t>(CMD::GET_FIRMWARE_VERSION)) {}
+            embot::prot::can::shared::Message_GET_VERSION(Clas::pollingMotorControl, static_cast<std::uint8_t>(CMD::GET_FIRMWARE_VERSION)) {}
        
     }; 
     
-    class Message_SET_BOARD_ID : public embot::app::canprotocol::shared::Message_SET_ID
+    class Message_SET_BOARD_ID : public embot::prot::can::shared::Message_SET_ID
     {
         public:
             
         Message_SET_BOARD_ID() : 
-            embot::app::canprotocol::shared::Message_SET_ID(Clas::pollingMotorControl, static_cast<std::uint8_t>(CMD::SET_BOARD_ID)) {}
+            embot::prot::can::shared::Message_SET_ID(Clas::pollingMotorControl, static_cast<std::uint8_t>(CMD::SET_BOARD_ID)) {}
        
     }; 
 
     
-}}}}} // namespace embot { namespace app { namespace canprotocol { namespace motor { namespace polling {
+}}}}} // namespace embot { namespace prot { namespace can { namespace motor { namespace polling {
     
     
  

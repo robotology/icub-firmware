@@ -29,15 +29,10 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "embot.h"
-
 #include <new>
-
-#include "embot_hw.h"
 #include "embot_app_canprotocol.h"
 #include "embot_app_canprotocol_analog_polling.h"
 #include "embot_app_canprotocol_analog_periodic.h"
-
 #include "embot_app_theCANboardInfo.h"
 
 
@@ -54,9 +49,9 @@ struct embot::app::application::theCANparserTHERMO::Impl
         dummyCANagentTHERMO() {}
         virtual ~dummyCANagentTHERMO() {}
             
-        virtual bool set(const embot::app::canprotocol::analog::polling::Message_THERMOMETER_CONFIG_SET::Info &info) { return true; }
-        virtual bool get(const embot::app::canprotocol::analog::polling::Message_THERMOMETER_CONFIG_GET::Info &info, embot::app::canprotocol::analog::polling::Message_THERMOMETER_CONFIG_GET::ReplyInfo &replyinfo) { return true; }    
-        virtual bool set(const embot::app::canprotocol::analog::polling::Message_THERMOMETER_TRANSMIT::Info &info) { return true; }        
+        virtual bool set(const embot::prot::can::analog::polling::Message_THERMOMETER_CONFIG_SET::Info &info) { return true; }
+        virtual bool get(const embot::prot::can::analog::polling::Message_THERMOMETER_CONFIG_GET::Info &info, embot::prot::can::analog::polling::Message_THERMOMETER_CONFIG_GET::ReplyInfo &replyinfo) { return true; }    
+        virtual bool set(const embot::prot::can::analog::polling::Message_THERMOMETER_TRANSMIT::Info &info) { return true; }        
     };
     
     dummyCANagentTHERMO dummyagent;
@@ -66,11 +61,11 @@ struct embot::app::application::theCANparserTHERMO::Impl
     bool txframe;
     bool recognised;
     
-    embot::app::canprotocol::Clas cls;
+    embot::prot::can::Clas cls;
     std::uint8_t cmd;    
 
         
-    embot::hw::can::Frame reply;
+    embot::prot::can::Frame reply;
     
 
     Impl() 
@@ -79,33 +74,33 @@ struct embot::app::application::theCANparserTHERMO::Impl
         
         recognised = false;        
         txframe = false;
-        cls = embot::app::canprotocol::Clas::none;
+        cls = embot::prot::can::Clas::none;
         cmd = 0;              
     }
     
    
-    bool process(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);
+    bool process(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies);
     
-    bool process_set_thermo_config(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies); 
-    bool process_get_thermo_config(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);    
-    bool process_thermo_transmit(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);    
+    bool process_set_thermo_config(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies); 
+    bool process_get_thermo_config(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies);    
+    bool process_thermo_transmit(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies);    
 };
 
 
-bool embot::app::application::theCANparserTHERMO::Impl::process(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
+bool embot::app::application::theCANparserTHERMO::Impl::process(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies)
 {
     txframe = false;
     recognised = false;
     
-    if(false == embot::app::canprotocol::frameis4board(frame, embot::app::theCANboardInfo::getInstance().cachedCANaddress()))
+    if(false == embot::prot::can::frameis4board(frame, embot::app::theCANboardInfo::getInstance().cachedCANaddress()))
     {
         recognised = false;
         return recognised;
     }
         
     // now get cls and cmd
-    cls = embot::app::canprotocol::frame2clas(frame);
-    cmd = embot::app::canprotocol::frame2cmd(frame);
+    cls = embot::prot::can::frame2clas(frame);
+    cmd = embot::prot::can::frame2cmd(frame);
     
     
     // the basic can handle only some messages ...
@@ -113,19 +108,19 @@ bool embot::app::application::theCANparserTHERMO::Impl::process(const embot::hw:
     switch(cls)
     {
         
-        case embot::app::canprotocol::Clas::pollingAnalogSensor:
+        case embot::prot::can::Clas::pollingAnalogSensor:
         {
-            if(static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::CMD::THERMOMETER_CONFIG_SET) == cmd)
+            if(static_cast<std::uint8_t>(embot::prot::can::analog::polling::CMD::THERMOMETER_CONFIG_SET) == cmd)
             { 
                 txframe = process_set_thermo_config(frame, replies);
                 recognised = true;                
             }
-            else if(static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::CMD::THERMOMETER_CONFIG_GET) == cmd)
+            else if(static_cast<std::uint8_t>(embot::prot::can::analog::polling::CMD::THERMOMETER_CONFIG_GET) == cmd)
             { 
                 txframe = process_get_thermo_config(frame, replies);
                 recognised = true;                
             }
-            else if(static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::CMD::THERMOMETER_TRANSMIT) == cmd)
+            else if(static_cast<std::uint8_t>(embot::prot::can::analog::polling::CMD::THERMOMETER_TRANSMIT) == cmd)
             { 
                 txframe = process_thermo_transmit(frame, replies);
                 recognised = true;                
@@ -147,9 +142,9 @@ bool embot::app::application::theCANparserTHERMO::Impl::process(const embot::hw:
 
 
 
-bool embot::app::application::theCANparserTHERMO::Impl::process_set_thermo_config(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
+bool embot::app::application::theCANparserTHERMO::Impl::process_set_thermo_config(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies)
 {
-    embot::app::canprotocol::analog::polling::Message_THERMOMETER_CONFIG_SET msg;
+    embot::prot::can::analog::polling::Message_THERMOMETER_CONFIG_SET msg;
     msg.load(frame);
       
     config.agent->set(msg.info);
@@ -158,16 +153,16 @@ bool embot::app::application::theCANparserTHERMO::Impl::process_set_thermo_confi
 }
 
 
-bool embot::app::application::theCANparserTHERMO::Impl::process_get_thermo_config(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
+bool embot::app::application::theCANparserTHERMO::Impl::process_get_thermo_config(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies)
 {
-    embot::app::canprotocol::analog::polling::Message_THERMOMETER_CONFIG_GET msg;
+    embot::prot::can::analog::polling::Message_THERMOMETER_CONFIG_GET msg;
     msg.load(frame);
     
-    embot::app::canprotocol::analog::polling::Message_THERMOMETER_CONFIG_GET::ReplyInfo replyinfo;
+    embot::prot::can::analog::polling::Message_THERMOMETER_CONFIG_GET::ReplyInfo replyinfo;
       
     config.agent->get(msg.info, replyinfo);
 
-    embot::hw::can::Frame frame0;
+    embot::prot::can::Frame frame0;
     if(true == msg.reply(frame0, embot::app::theCANboardInfo::getInstance().cachedCANaddress(), replyinfo))
     {
         replies.push_back(frame0);
@@ -178,9 +173,9 @@ bool embot::app::application::theCANparserTHERMO::Impl::process_get_thermo_confi
 }
   
 
-bool embot::app::application::theCANparserTHERMO::Impl::process_thermo_transmit(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
+bool embot::app::application::theCANparserTHERMO::Impl::process_thermo_transmit(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies)
 {
-    embot::app::canprotocol::analog::polling::Message_THERMOMETER_TRANSMIT msg;
+    embot::prot::can::analog::polling::Message_THERMOMETER_TRANSMIT msg;
     msg.load(frame);
     
     config.agent->set(msg.info);
@@ -226,7 +221,7 @@ bool embot::app::application::theCANparserTHERMO::initialise(const Config &confi
   
 
 
-bool embot::app::application::theCANparserTHERMO::process(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
+bool embot::app::application::theCANparserTHERMO::process(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies)
 {    
     return pImpl->process(frame, replies);
 }

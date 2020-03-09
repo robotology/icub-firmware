@@ -21,14 +21,14 @@
 #ifndef _EMBOT_APP_CANPROTOCOL_INERTIAL_PERIODIC_H_
 #define _EMBOT_APP_CANPROTOCOL_INERTIAL_PERIODIC_H_
 
-#include "embot_common.h"
+#include "embot_core.h"
 #include "embot_utils.h"
 
 #include "embot_app_canprotocol.h"
 
 #include "iCubCanProto_inertialSensorMessages.h"
 
-namespace embot { namespace app { namespace canprotocol { namespace inertial { namespace periodic {
+namespace embot { namespace prot { namespace can { namespace inertial { namespace periodic {
     
     // the supported commands    
     enum class CMD { 
@@ -50,10 +50,10 @@ namespace embot { namespace app { namespace canprotocol { namespace inertial { n
     CMD convert(std::uint8_t cmd);
     std::uint8_t convert(CMD cmd);       
     
-}}}}} // namespace embot { namespace app { namespace canprotocol { namespace inertial { namespace periodic {     
+}}}}} // namespace embot { namespace prot { namespace can { namespace inertial { namespace periodic {     
 
   
-namespace embot { namespace app { namespace canprotocol { namespace inertial { namespace periodic {
+namespace embot { namespace prot { namespace can { namespace inertial { namespace periodic {
     
         
     // the management of commands        
@@ -77,7 +77,7 @@ namespace embot { namespace app { namespace canprotocol { namespace inertial { n
             
         bool load(const Info& inf);
             
-        bool get(embot::hw::can::Frame &outframe);        
+        bool get(embot::prot::can::Frame &outframe);        
     };
     
     class Message_DIGITAL_ACCELEROMETER : public Message
@@ -99,7 +99,7 @@ namespace embot { namespace app { namespace canprotocol { namespace inertial { n
             
         bool load(const Info& inf);
             
-        bool get(embot::hw::can::Frame &outframe);        
+        bool get(embot::prot::can::Frame &outframe);        
     }; 
     
     
@@ -111,9 +111,9 @@ namespace embot { namespace app { namespace canprotocol { namespace inertial { n
         {
             std::uint8_t                                canaddress;
             std::uint8_t                                seqnumber;
-            embot::app::canprotocol::analog::imuSensor  sensor;
-            embot::utils::Triple<std::int16_t>          value;
-            Info() : canaddress(0), seqnumber(0), sensor(embot::app::canprotocol::analog::imuSensor::none) { value.clear(); }
+            embot::prot::can::analog::imuSensor  sensor;
+            embot::core::utils::Triple<std::int16_t>          value;
+            Info() : canaddress(0), seqnumber(0), sensor(embot::prot::can::analog::imuSensor::none) { value.clear(); }
         };
         
         Info info;
@@ -122,7 +122,7 @@ namespace embot { namespace app { namespace canprotocol { namespace inertial { n
             
         bool load(const Info& inf);
             
-        bool get(embot::hw::can::Frame &outframe);        
+        bool get(embot::prot::can::Frame &outframe);        
     };
     
     
@@ -134,7 +134,7 @@ namespace embot { namespace app { namespace canprotocol { namespace inertial { n
         struct Info
         {
             std::uint8_t                            canaddress;
-            embot::utils::Quadruple<std::int16_t>   value;
+            embot::core::utils::Quadruple<std::int16_t>   value;
             Info() : canaddress(0) { value.clear(); }
         };
         
@@ -144,7 +144,7 @@ namespace embot { namespace app { namespace canprotocol { namespace inertial { n
             
         bool load(const Info& inf);
             
-        bool get(embot::hw::can::Frame &outframe);        
+        bool get(embot::prot::can::Frame &outframe);        
     };  
     
 
@@ -161,7 +161,7 @@ namespace embot { namespace app { namespace canprotocol { namespace inertial { n
             Calibration                             gyrcalib; 
             Calibration                             acccalib;
             Calibration                             magcalib;
-            embot::common::relTime                  acquisitiontime; 
+            embot::core::relTime                  acquisitiontime; 
             Info() : canaddress(0), seqnumber(0), gyrcalib(Calibration::none), acccalib(Calibration::none), magcalib(Calibration::none), acquisitiontime(0)  { }
         };
         
@@ -171,10 +171,10 @@ namespace embot { namespace app { namespace canprotocol { namespace inertial { n
             
         bool load(const Info& inf);
             
-        bool get(embot::hw::can::Frame &outframe);        
+        bool get(embot::prot::can::Frame &outframe);        
     };      
     
-}}}}} // namespace embot { namespace app { namespace canprotocol { namespace inertial { namespace periodic {    
+}}}}} // namespace embot { namespace prot { namespace can { namespace inertial { namespace periodic {    
 
 
 #endif  // include-guard

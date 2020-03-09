@@ -22,7 +22,7 @@
 #ifndef _EMBOT_HW_GPIO_H_
 #define _EMBOT_HW_GPIO_H_
 
-#include "embot_common.h"
+#include "embot_core.h"
 #include "embot_hw.h"
 
 

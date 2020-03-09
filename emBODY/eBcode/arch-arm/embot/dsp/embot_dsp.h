@@ -22,7 +22,7 @@
 #ifndef _EMBOT_DSP_H_
 #define _EMBOT_DSP_H_
 
-#include "embot_common.h"
+#include "embot_core.h"
 
 namespace embot { namespace dsp {
         

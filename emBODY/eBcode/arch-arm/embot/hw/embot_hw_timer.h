@@ -22,7 +22,7 @@
 #ifndef _EMBOT_HW_TIMER_H_
 #define _EMBOT_HW_TIMER_H_
 
-#include "embot_common.h"
+#include "embot_core.h"
 #include "embot_hw.h"
 
 
@@ -33,10 +33,10 @@ namespace embot { namespace hw { namespace timer {
     
     struct Config
     {
-        embot::common::relTime      time;               
+        embot::core::relTime      time;               
         Mode                        mode;             
-        embot::common::Callback     onexpiry;
-        Config() : time(embot::common::time1millisec), mode(Mode::periodic), onexpiry(nullptr, 0) {}         
+        embot::core::Callback     onexpiry;
+        Config() : time(embot::core::time1millisec), mode(Mode::periodic), onexpiry(nullptr, 0) {}         
     };
     
     

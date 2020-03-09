@@ -21,13 +21,13 @@
 #ifndef _EMBOT_SYS_THESTORAGE_H_
 #define _EMBOT_SYS_THESTORAGE_H_
 
-#include "embot_common.h"
+#include "embot_core.h"
 #include "embot_sys.h"
 
-namespace embot { namespace sys {
-    
-    
-    
+#error dont use me [ i am not a true embot::os ]
+
+namespace embot { namespace os {
+          
     class theStorage
     {
     public:
@@ -39,7 +39,7 @@ namespace embot { namespace sys {
         
     public:
       
-        bool init(embot::utils::Storage *storage);
+    bool init(embot::core::utils::Storage *storage);
         
         bool isInitted();
         bool isAddressValid(std::uint32_t address);
@@ -66,7 +66,7 @@ namespace embot { namespace sys {
     };       
 
 
-}} // namespace embot { namespace sys {
+}} // namespace embot { namespace os {
 
 
 #endif  // include-guard

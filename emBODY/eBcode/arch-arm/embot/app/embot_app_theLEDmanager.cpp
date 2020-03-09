@@ -108,7 +108,7 @@ namespace embot { namespace app {
             }
         }  
 
-        virtual void pulse(embot::common::relTime period, std::uint32_t times) 
+        virtual void pulse(embot::core::relTime period, std::uint32_t times) 
         {
     
         }            
@@ -164,7 +164,7 @@ namespace embot { namespace app {
             HAL_GPIO_TogglePin(static_cast<GPIO_TypeDef*>(gpio->port), static_cast<uint16_t>(gpio->pin));
         }   
 
-        virtual void pulse(embot::common::relTime period, std::uint32_t times) 
+        virtual void pulse(embot::core::relTime period, std::uint32_t times) 
         {
 
         }            
@@ -181,7 +181,7 @@ namespace embot { namespace app {
         const embot::hw::GPIO *gpio;
         embot::hw::gpio::State stateON;
         embot::hw::gpio::State stateOFF;
-        embot::sys::Timer *tmr;
+        embot::os::Timer *tmr;
         LEDwave *_ledw;
         uint64_t _memory[4];
     public:
@@ -234,11 +234,11 @@ namespace embot { namespace app {
             l->toggle();            
         }
         
-        virtual void pulse(embot::common::relTime period, std::uint32_t times) 
+        virtual void pulse(embot::core::relTime period, std::uint32_t times) 
         {            
             if(nullptr == tmr)
             {
-                tmr = new embot::sys::Timer;
+                tmr = new embot::os::Timer;
             }
             
             if(0 == period)
@@ -250,9 +250,9 @@ namespace embot { namespace app {
             {
                 tmr->stop();
                 off();
-                embot::sys::Timer::Mode mode = (0 == times) ? (embot::sys::Timer::Mode::forever) : (embot::sys::Timer::Mode::someshots);
-                embot::sys::Action act(embot::sys::CallbackToTask(onexpirypulse, this, embot::sys::theCallbackManager::getInstance().task()));
-                embot::sys::Timer::Config cfg(period/2, act, mode, times);
+                embot::os::Timer::Mode mode = (0 == times) ? (embot::os::Timer::Mode::forever) : (embot::os::Timer::Mode::someshots);
+                embot::os::Action act(embot::os::CallbackToThread(onexpirypulse, this, embot::os::theCallbackManager::getInstance().task()));
+                embot::os::Timer::Config cfg(period/2, act, mode, times);
                 tmr->start(cfg);
             }
         }
@@ -294,7 +294,7 @@ namespace embot { namespace app {
         {
             if(nullptr == tmr)
             {
-                tmr = new embot::sys::Timer;
+                tmr = new embot::os::Timer;
             }
             
             if(0 == lw->frequency())
@@ -305,9 +305,9 @@ namespace embot { namespace app {
             {
                 stop();
                 _ledw = lw->duplicate(_memory, sizeof(_memory));
-                embot::sys::Timer::Mode mode = (0 == times) ? (embot::sys::Timer::Mode::forever) : (embot::sys::Timer::Mode::someshots);
-                embot::sys::Action act(embot::sys::CallbackToTask(onexpirywave, this, embot::sys::theCallbackManager::getInstance().task()));
-                embot::sys::Timer::Config cfg(_ledw->frequency(), act, mode, times*_ledw->length());
+                embot::os::Timer::Mode mode = (0 == times) ? (embot::os::Timer::Mode::forever) : (embot::os::Timer::Mode::someshots);
+                embot::os::Action act(embot::os::CallbackToThread(onexpirywave, this, embot::os::theCallbackManager::getInstance().task()));
+                embot::os::Timer::Config cfg(_ledw->frequency(), act, mode, times*_ledw->length());
                 tmr->start(cfg);
             }              
             
@@ -340,7 +340,7 @@ namespace embot { namespace app {
         virtual void on() {}        
         virtual void off() {}        
         virtual void toggle() {}  
-        virtual void pulse(embot::common::relTime period, std::uint32_t times) {}  
+        virtual void pulse(embot::core::relTime period, std::uint32_t times) {}  
         virtual void stop() {}
         virtual void wave(const LEDwave *lw, std::uint32_t times = 0) {}
     };
@@ -375,7 +375,7 @@ namespace embot { namespace app {
         
         bool initialised(LED led) const
         {
-            return embot::binary::bit::check(initialisedmask, embot::common::tointegral(led));
+            return embot::core::binary::bit::check(initialisedmask, embot::core::tointegral(led));
         }
            
 
@@ -393,12 +393,12 @@ namespace embot { namespace app {
             
             // every led initalisation is done in the bsp ...
             
-            if(!embot::hw::bsp::initialised())
+            if(!embot::hw::initialised())
             {   // requires embot::hw::bsp::init()
                 return false;
             }
                     
-            embot::binary::bit::set(initialisedmask, embot::common::tointegral(led));
+            embot::core::binary::bit::set(initialisedmask, embot::core::tointegral(led));
             
             // i am sure that thebspmap->getgpio(led) is ok 
 //            aSlimLED a{led, thebspmap->getgpio(led), thebspmap->on, thebspmap->off};
@@ -424,7 +424,7 @@ namespace embot { namespace app {
             if(initialised(led))
             {
                 mapofleds.erase(led);            
-                embot::binary::bit::clear(initialisedmask, embot::common::tointegral(led));
+                embot::core::binary::bit::clear(initialisedmask, embot::core::tointegral(led));
             }
             return true;
         }

@@ -28,15 +28,15 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace embot { namespace sys { 
+namespace embot { namespace os { 
     
-    bool EventToTask::isvalid() const
+    bool EventToThread::isvalid() const
     {
         if((nullptr == task) || (0 == event)) 
         { 
             return false; 
         }
-        else if(Task::Type::eventTrigger != task->getType()) 
+        else if(Thread::Type::eventTrigger != task->getType()) 
         { 
             return false; 
         }
@@ -46,7 +46,7 @@ namespace embot { namespace sys {
         }
     }
 
-    bool EventToTask::execute()
+    bool EventToThread::execute()
     {
         if(false == isvalid())
         {
@@ -56,14 +56,14 @@ namespace embot { namespace sys {
         return true;
     }
     
-    bool MessageToTask::isvalid() const
+    bool MessageToThread::isvalid() const
     {
         if((nullptr == task) || (0 == message)) { return false; }
-        else if(Task::Type::messageTrigger != task->getType()) { return false; }
+        else if(Thread::Type::messageTrigger != task->getType()) { return false; }
         else { return true; }
     } 
     
-    bool MessageToTask::execute(common::relTime timeout)
+    bool MessageToThread::execute(core::relTime timeout)
     {
         if(false == isvalid())
         {
@@ -74,21 +74,21 @@ namespace embot { namespace sys {
     } 
         
 
-    bool CallbackToTask::isvalid() const 
+    bool CallbackToThread::isvalid() const 
     {
         if((false == callback.isvalid())) { return false; }
-        //else if(Task::Type::callbackTrigger != task->getType()) { return false; }
+        //else if(Thread::Type::callbackTrigger != task->getType()) { return false; }
         else { return true; }
     } 
     
     
-    bool CallbackToTask::execute(common::relTime timeout)
+    bool CallbackToThread::execute(core::relTime timeout)
     {
         if(false == isvalid())
         {
             return false;
         }
-        if((nullptr != task) && (embot::sys::Task::Type::callbackTrigger == task->getType()))
+        if((nullptr != task) && (embot::os::Thread::Type::callbackTrigger == task->getType()))
         {
             task->setCallback(callback, timeout);
         }
@@ -99,21 +99,21 @@ namespace embot { namespace sys {
         return true;
     }   
             
-    void Action::load(const EventToTask &e)
+    void Action::load(const EventToThread &e)
     {
-        type = Type::event2task;
+        type = Type::event2thread;
         evt = e;           
     }
         
-    void Action::load(const MessageToTask &m)
+    void Action::load(const MessageToThread &m)
     {
-        type = Type::message2task;
+        type = Type::message2thread;
         msg = m;           
     }
     
-    void Action::load(const CallbackToTask &c)
+    void Action::load(const CallbackToThread &c)
     {
-        type = Type::callback2task;
+        type = Type::callback2thread;
         cbk = c;           
     }
         
@@ -129,17 +129,17 @@ namespace embot { namespace sys {
                 ret = false;
             } break;
             
-            case Type::event2task:
+            case Type::event2thread:
             {
                 ret = evt.isvalid();
             } break;
 
-            case Type::message2task:
+            case Type::message2thread:
             {
                 ret = msg.isvalid();
             } break;
             
-            case Type::callback2task:
+            case Type::callback2thread:
             {
                 ret = cbk.isvalid();
             } break;
@@ -147,7 +147,7 @@ namespace embot { namespace sys {
         return ret;            
     }
         
-    bool Action::execute(common::relTime timeout)
+    bool Action::execute(core::relTime timeout)
     {
         if(false == isvalid())
         {
@@ -162,17 +162,17 @@ namespace embot { namespace sys {
             {
             } break;
             
-            case Type::event2task:
+            case Type::event2thread:
             {
                 ret = evt.execute();
             } break;
 
-            case Type::message2task:
+            case Type::message2thread:
             {
                 ret = msg.execute(timeout);
             } break;
             
-            case Type::callback2task:
+            case Type::callback2thread:
             {
                 ret = cbk.execute(timeout);
             } break;
@@ -180,7 +180,7 @@ namespace embot { namespace sys {
         return ret;
     }
 
-}} // namespace embot { namespace sys {
+}} // namespace embot { namespace os {
  
 
     

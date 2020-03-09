@@ -21,7 +21,7 @@
 #ifndef _EMBOT_APP_CANPROTOCOL_MOTOR_PERIODIC_H_
 #define _EMBOT_APP_CANPROTOCOL_MOTOR_PERIODIC_H_
 
-#include "embot_common.h"
+#include "embot_core.h"
 
 #include "embot_app_canprotocol.h"
 
@@ -29,7 +29,7 @@
 
 
     
-namespace embot { namespace app { namespace canprotocol { namespace motor { namespace periodic {
+namespace embot { namespace prot { namespace can { namespace motor { namespace periodic {
   
     // the supported commands    
     enum class CMD { 
@@ -47,12 +47,12 @@ namespace embot { namespace app { namespace canprotocol { namespace motor { name
     CMD convert(std::uint8_t cmd);
     std::uint8_t convert(CMD cmd);    
        
-}}}}} // namespace embot { namespace app { namespace canprotocol { namespace motor { namespace periodic { 
+}}}}} // namespace embot { namespace prot { namespace can { namespace motor { namespace periodic { 
        
 
   
   
-namespace embot { namespace app { namespace canprotocol { namespace motor { namespace periodic {
+namespace embot { namespace prot { namespace can { namespace motor { namespace periodic {
          
     // the management of commands
     
@@ -73,10 +73,10 @@ namespace embot { namespace app { namespace canprotocol { namespace motor { name
             
         bool load(const Info& inf);
             
-       // bool get(std::vector<embot::hw::can::Frame> &frames); 
+       // bool get(std::vector<embot::prot::can::Frame> &frames); 
             
         std::uint8_t numberofframes();
-        bool get(embot::hw::can::Frame &outframe);  
+        bool get(embot::prot::can::Frame &outframe);  
 
         private:
         
@@ -87,7 +87,7 @@ namespace embot { namespace app { namespace canprotocol { namespace motor { name
     }; 
 
     
-}}}}} // namespace embot { namespace app { namespace canprotocol { namespace motor { namespace periodic {    
+}}}}} // namespace embot { namespace prot { namespace can { namespace motor { namespace periodic {    
 
 
 #endif  // include-guard

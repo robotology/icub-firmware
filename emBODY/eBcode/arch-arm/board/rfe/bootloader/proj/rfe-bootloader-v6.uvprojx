@@ -453,11 +453,6 @@
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_theCANboardInfo.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_i2h.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\i2h\embot_i2h.cpp</FilePath>
-            </File>
-            <File>
               <FileName>embot_sys.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\embot_sys.cpp</FilePath>
@@ -521,6 +516,11 @@
               <FileName>embot_sys_Action.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\embot\sys\embot_sys_Action.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_core.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\common\embot_core.cpp</FilePath>
             </File>
           </Files>
         </Group>

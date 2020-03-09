@@ -26,7 +26,7 @@
 #include <cstring>
 
 
-namespace embot { namespace utils {
+namespace embot { namespace core { namespace utils {
     
     template<typename T>
     struct Triple
@@ -55,34 +55,7 @@ namespace embot { namespace utils {
         void load(void *littleendianmemory) { T *p = reinterpret_cast<T*>(littleendianmemory); if(nullptr != p) { set(p[0], p[1], p[2], p[3]); } }
     };  
 
-    
-    struct Data
-    {    
-        void * pointer {nullptr};
-        size_t size {0};
-        
-        Data() = default;
-        Data(void *p, size_t s) : pointer(p), size(s) {}
-                    
-        void load(void *littleendianmemory, size_t s) { pointer = littleendianmemory; size = s; }
-        void clear() { pointer = nullptr; size = 0; }
-        bool isvalid() const { if((nullptr != pointer) && (0 != size)){ return true; } else { return false; } } 
-      
-        std::uint8_t  * getU08ptr() { return reinterpret_cast<std::uint8_t*>(pointer); }  
-        std::uint16_t * getU16ptr() { return reinterpret_cast<std::uint16_t*>(pointer); } 
-        std::uint32_t * getU32ptr() { return reinterpret_cast<std::uint32_t*>(pointer); } 
-        std::uint64_t * getU64ptr() { return reinterpret_cast<std::uint64_t*>(pointer); } 
-        
-        std::uint8_t  getU08val(size_t pos) { if(isvalid() && (pos < size)) { return getU08ptr()[pos]; } else { return 0; } }      
-        std::uint16_t getU16val(size_t pos) { if(isvalid() && ((2*pos) < size)) { return getU16ptr()[pos]; } else { return 0; } }
-        std::uint32_t getU32val(size_t pos) { if(isvalid() && ((4*pos) < size)) { return getU32ptr()[pos]; } else { return 0; } }       
-        std::uint64_t getU64val(size_t pos) { if(isvalid() && ((8*pos) < size)) { return getU64ptr()[pos]; } else { return 0; } }
-        
-        void * getVOIDptr(size_t offset = 0) { if(isvalid() && (offset < size)) { std::uint8_t *d = getU08ptr(); return &d[offset]; } else { return nullptr;} }      
-    };    
-
-
-    
+       
     class Storage
     {
     public:
@@ -97,8 +70,8 @@ namespace embot { namespace utils {
 
         virtual ~Storage() {};    
     };     
-    
-}}
+   
+}}}
 
 
 

@@ -21,14 +21,14 @@
 // - public interface
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "embot_common.h"
+#include "embot_core.h"
 
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-
+#include "embot_core.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -40,11 +40,15 @@
 // - all the rest
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace embot { namespace common {
-    
-
-    
-}} // namespace embot { namespace common {
+//namespace embot { namespace common {
+//    
+//    
+//    embot::core::Time now()
+//    {
+//        return embot::core::now();
+//    }        
+//    
+//}} // namespace embot { namespace common {
 
 
 

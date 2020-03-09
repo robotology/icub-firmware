@@ -21,7 +21,7 @@
 #ifndef _EMBOT_APP_CANPROTOCOL_ANALOG_POLLING_H_
 #define _EMBOT_APP_CANPROTOCOL_ANALOG_POLLING_H_
 
-#include "embot_common.h"
+#include "embot_core.h"
 #include "embot_binary.h"
 
 #include "embot_app_canprotocol.h"
@@ -29,7 +29,7 @@
 #include "iCubCanProto_analogSensorMessages.h"
 
 
-namespace embot { namespace app { namespace canprotocol { namespace analog { namespace polling {
+namespace embot { namespace prot { namespace can { namespace analog { namespace polling {
         
     // the supported commands    
     enum class CMD { 
@@ -128,10 +128,10 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
     CMD convert(std::uint8_t cmd);
     std::uint8_t convert(CMD cmd);
     
-}}}}} // namespace embot { namespace app { namespace canprotocol { namespace analog { namespace polling {
+}}}}} // namespace embot { namespace prot { namespace can { namespace analog { namespace polling {
 
 
-namespace embot { namespace app { namespace canprotocol { namespace analog { namespace polling {
+namespace embot { namespace prot { namespace can { namespace analog { namespace polling {
    
     // some required types
     
@@ -144,29 +144,29 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
     
     enum class imuFusion { enabled = 1, none = 33 }; // later on we can add the types of fusion we want
 
-}}}}} // namespace embot { namespace app { namespace canprotocol { namespace analog { namespace polling {
+}}}}} //  namespace embot { namespace prot { namespace can { namespace analog { namespace polling {
 
 
-namespace embot { namespace app { namespace canprotocol { namespace analog { namespace polling {
+namespace embot { namespace prot { namespace can { namespace analog { namespace polling {
          
     // the management of commands
     
-    class Message_GET_FIRMWARE_VERSION : public embot::app::canprotocol::shared::Message_GET_VERSION
+    class Message_GET_FIRMWARE_VERSION : public embot::prot::can::shared::Message_GET_VERSION
     {
         public:
             
         Message_GET_FIRMWARE_VERSION() : 
-            embot::app::canprotocol::shared::Message_GET_VERSION(Clas::pollingAnalogSensor, static_cast<std::uint8_t>(CMD::GET_FIRMWARE_VERSION)) {}
+            embot::prot::can::shared::Message_GET_VERSION(Clas::pollingAnalogSensor, static_cast<std::uint8_t>(CMD::GET_FIRMWARE_VERSION)) {}
        
     }; 
     
     
-    class Message_SET_BOARD_ADX : public embot::app::canprotocol::shared::Message_SET_ID
+    class Message_SET_BOARD_ADX : public embot::prot::can::shared::Message_SET_ID
     {
         public:
             
         Message_SET_BOARD_ADX() : 
-            embot::app::canprotocol::shared::Message_SET_ID(Clas::pollingAnalogSensor, static_cast<std::uint8_t>(CMD::SET_BOARD_ADX)) {}
+            embot::prot::can::shared::Message_SET_ID(Clas::pollingAnalogSensor, static_cast<std::uint8_t>(CMD::SET_BOARD_ADX)) {}
        
     };  
 
@@ -192,7 +192,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
         Message_SET_TXMODE(Board brd) : board(brd) {}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
             
         bool reply();   // none
         
@@ -215,15 +215,15 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         struct Info
         { 
             std::uint16_t               cdcOffset;  
-            embot::common::relTime      txperiod;              
-            Info() : cdcOffset(0x2200), txperiod(40*embot::common::time1millisec) {}
+            embot::core::relTime      txperiod;              
+            Info() : cdcOffset(0x2200), txperiod(40*embot::core::time1millisec) {}
         };
         
         Info info;
         
         Message_SKIN_OBSOLETE_TACT_SETUP() {}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
             
         bool reply();   // none
         
@@ -239,15 +239,15 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         { 
             SkinType                    skintype;  
             std::uint8_t                noload; 
-            embot::common::relTime      txperiod;              
-            Info() : skintype(SkinType::none), noload(0), txperiod(50*embot::common::time1millisec) {}
+            embot::core::relTime      txperiod;              
+            Info() : skintype(SkinType::none), noload(0), txperiod(50*embot::core::time1millisec) {}
         };
         
         Info info;
         
         Message_SKIN_SET_BRD_CFG() {}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
             
         bool reply();   // none
         
@@ -271,7 +271,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
         Message_SKIN_SET_TRIANG_CFG() {}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
             
         bool reply();   // none
         
@@ -285,15 +285,15 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
             
         struct Info
         { 
-            embot::common::relTime  txperiod;           
-            Info() : txperiod(10*embot::common::time1millisec) {}
+            embot::core::relTime  txperiod;           
+            Info() : txperiod(10*embot::core::time1millisec) {}
         };
         
         Info info;
         
         Message_SET_CANDATARATE() {}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
             
         bool reply();   // none
             
@@ -317,7 +317,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
         Message_SET_FULL_SCALES() {}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
             
         bool reply();   // none
             
@@ -347,9 +347,9 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
         Message_GET_FULL_SCALES() {}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
             
-        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
+        bool reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
     };  
     
        
@@ -376,9 +376,9 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
         Message_GET_CH_DAC() {}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
             
-        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
+        bool reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
     };  
 
     
@@ -399,7 +399,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
         Message_SET_CH_DAC() {}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
             
         bool reply();   // none
             
@@ -424,7 +424,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
         Message_SET_MATRIX_RC() {}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
             
         bool reply();   // none
             
@@ -446,7 +446,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
         Message_SET_MATRIX_G() {}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
             
         bool reply();   // none
             
@@ -472,7 +472,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
         Message_SET_CALIB_TARE() {}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
             
         bool reply();   // none
             
@@ -501,9 +501,9 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
         Message_GET_CALIB_TARE() {}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
             
-        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);
+        bool reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);
             
     };         
 
@@ -525,7 +525,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
         Message_SET_CURR_TARE() {}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
             
         bool reply();   // none
             
@@ -552,9 +552,9 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
         Message_GET_CURR_TARE() {}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
             
-        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);
+        bool reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);
             
     };      
     
@@ -581,9 +581,9 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
         Message_GET_CH_ADC() {}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
             
-        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
+        bool reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
     };  
     
 
@@ -612,9 +612,9 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
         Message_GET_MATRIX_RC() {}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
             
-        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
+        bool reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
     }; 
 
 
@@ -640,9 +640,9 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
         Message_GET_MATRIX_G() {}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
             
-        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
+        bool reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
     };          
     
     class Message_SAVE2EE : public Message
@@ -665,9 +665,9 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
         Message_SAVE2EE() {}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
             
-        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
+        bool reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
     };  
     
     
@@ -691,9 +691,9 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
         Message_GET_EEPROM_STATUS() {}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
             
-        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
+        bool reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
     };  
 
 
@@ -712,7 +712,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
         Message_SET_SERIAL_NO() {}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
             
         bool reply();   // none
             
@@ -739,9 +739,9 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
         Message_GET_SERIAL_NO() {}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
             
-        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
+        bool reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
     };   
 
 
@@ -764,15 +764,15 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         struct Info
         { 
             std::uint8_t                maskoftypes;  
-            embot::common::relTime      txperiod;              
-            Info() : maskoftypes(0), txperiod(50*embot::common::time1millisec) {}
+            embot::core::relTime      txperiod;              
+            Info() : maskoftypes(0), txperiod(50*embot::core::time1millisec) {}
         };
         
         Info info;
         
         Message_ACC_GYRO_SETUP() {}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
             
         bool reply();   // none
         
@@ -799,6 +799,8 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         std::uint8_t        Voffsetcoarse;
         std::uint16_t       Vzerodac;
         PGA308cfg1() : GD(0), GI(0), S(0), GO(0), Voffsetcoarse(0), Vzerodac(0) {}
+        PGA308cfg1(uint16_t gd, uint8_t gi, uint8_t s, uint8_t go, uint8_t vo, uint16_t vz) : 
+          GD(gd), GI(gi), S(s), GO(go), Voffsetcoarse(vo), Vzerodac(vz) {}
     };  
 
     class Message_AMPLIFIER_RESET : public Message
@@ -816,7 +818,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
         Message_AMPLIFIER_RESET() {}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
             
         bool reply();   // none            
     };     
@@ -837,7 +839,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
         Message_AMPLIFIER_PGA308_CFG1_SET() {}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
             
         bool reply();   // none            
     }; 
@@ -868,9 +870,9 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
         Message_AMPLIFIER_PGA308_CFG1_GET() {}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
             
-        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
+        bool reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
     }; 
     
     
@@ -910,9 +912,9 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
         Message_AMPLIFIER_OFFSET_AUTOCALIB() {}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
             
-        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);          
+        bool reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);          
     }; 
     
     
@@ -934,7 +936,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
         Message_AMPLIFIER_GAINOFFSET_SET() {}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
             
         bool reply();   // none            
     }; 
@@ -965,9 +967,9 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
         Message_AMPLIFIER_GAINOFFSET_GET() {}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
             
-        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
+        bool reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
     };  
     
     class Message_REGULATIONSET_SET : public Message
@@ -988,7 +990,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
         Message_REGULATIONSET_SET() {}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
             
         bool reply();   // none            
     }; 
@@ -1016,9 +1018,9 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
         Message_REGULATIONSET_GET() {}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
             
-        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
+        bool reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
     };  
     
     
@@ -1047,9 +1049,9 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
         Message_AMPLIFIER_RANGE_OF_GAIN_GET() {}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
             
-        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
+        bool reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
     };     
 
     
@@ -1078,9 +1080,9 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
         Message_AMPLIFIER_RANGE_OF_OFFSET_GET() {}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
             
-        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
+        bool reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
     };     
 
     
@@ -1093,18 +1095,18 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
                                     
         struct Info
         {
-            std::uint16_t sensormask;       // combination of ... 0x0001 << embot::app::canprotocol::analog::imuSensor values
+            std::uint16_t sensormask;       // combination of ... 0x0001 << embot::prot::can::analog::imuSensor values
             imuFusion fusion;                  // with an enum we can add later on as many options we want. 
             std::uint32_t ffu_ranges_measureunits;
             Info() : sensormask(0), fusion(imuFusion::none), ffu_ranges_measureunits(0) {}
-            void enable(embot::app::canprotocol::analog::imuSensor s) 
+            void enable(embot::prot::can::analog::imuSensor s) 
             { 
-                if(embot::app::canprotocol::analog::imuSensor::none != s)
-                    embot::binary::bit::set(sensormask, static_cast<std::uint8_t>(s)); 
+                if(embot::prot::can::analog::imuSensor::none != s)
+                    embot::core::binary::bit::set(sensormask, static_cast<std::uint8_t>(s)); 
             }
-            bool enabled(embot::app::canprotocol::analog::imuSensor s)
+            bool enabled(embot::prot::can::analog::imuSensor s)
             {
-                return embot::binary::bit::check(sensormask, static_cast<std::uint8_t>(s));
+                return embot::core::binary::bit::check(sensormask, static_cast<std::uint8_t>(s));
             }
         };
         
@@ -1112,7 +1114,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
         Message_IMU_CONFIG_SET() {}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
             
         bool reply();   // none
             
@@ -1130,7 +1132,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
         struct ReplyInfo
         {
-            std::uint16_t sensormask;       // combination of ... 0x0001 << embot::app::canprotocol::analog::imuSensor values
+            std::uint16_t sensormask;       // combination of ... 0x0001 << embot::prot::can::analog::imuSensor values
             imuFusion fusion;                  // with an enum we can add later on as many options we want. 
             std::uint32_t ffu_ranges_measureunits;
             ReplyInfo() : sensormask(0), fusion(imuFusion::none), ffu_ranges_measureunits(0) {}        
@@ -1140,9 +1142,9 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
         Message_IMU_CONFIG_GET() {}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
             
-        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
+        bool reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
     };  
     
     class Message_IMU_TRANSMIT : public Message
@@ -1154,7 +1156,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         struct Info
         {
             bool transmit;
-            embot::common::relTime  txperiod;   // if 0, dont transmit. else use usec value.         
+            embot::core::relTime  txperiod;   // if 0, dont transmit. else use usec value.         
             Info() : transmit(false), txperiod(0) {}
         };
         
@@ -1162,7 +1164,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
         Message_IMU_TRANSMIT() {}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
             
         bool reply();   // none
         
@@ -1185,7 +1187,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
         Message_THERMOMETER_CONFIG_SET() {}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
             
         bool reply();   // none
             
@@ -1211,9 +1213,9 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
         Message_THERMOMETER_CONFIG_GET() {}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
             
-        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
+        bool reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
     };  
     
     class Message_THERMOMETER_TRANSMIT : public Message
@@ -1224,7 +1226,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         struct Info
         {
             bool transmit;
-            embot::common::relTime  txperiod;   // if 0, dont transmit. else use usec value.         
+            embot::core::relTime  txperiod;   // if 0, dont transmit. else use usec value.         
             Info() : transmit(false), txperiod(0) {}
         };
         
@@ -1232,7 +1234,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
         Message_THERMOMETER_TRANSMIT() {}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
             
         bool reply();   // none        
     };  
@@ -1253,8 +1255,8 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         void reset() { enabled =  true; rotation = ROT::none; invertdirection = false;  label = posLABEL::zero; zero = 0; }
         void load(const uint8_t *bytes)
         { 
-            enabled = embot::binary::bit::check(bytes[0], 7);
-            invertdirection = embot::binary::bit::check(bytes[0], 6);
+            enabled = embot::core::binary::bit::check(bytes[0], 7);
+            invertdirection = embot::core::binary::bit::check(bytes[0], 6);
             rotation = static_cast<ROT>((bytes[0] >> 4) & 0b0011);           
             label = static_cast<posLABEL>(bytes[0] & 0b1111);
             zero = static_cast<uint16_t>(bytes[1]) | (static_cast<uint16_t>(bytes[2]) << 8);
@@ -1296,7 +1298,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
         Message_POS_CONFIG_SET() {}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
             
         bool reply();   // none
             
@@ -1324,9 +1326,9 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
         Message_POS_CONFIG_GET() {}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
             
-        bool reply(embot::hw::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
+        bool reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo);            
     };  
     
     class Message_POS_TRANSMIT : public Message
@@ -1337,7 +1339,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         struct Info
         {
             bool transmit;
-            embot::common::relTime  txperiod;   // if 0, dont transmit. else use usec value.         
+            embot::core::relTime  txperiod;   // if 0, dont transmit. else use usec value.         
             Info() : transmit(false), txperiod(0) {}
         };
         
@@ -1345,12 +1347,12 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
         
         Message_POS_TRANSMIT() {}
             
-        bool load(const embot::hw::can::Frame &inframe);
+        bool load(const embot::prot::can::Frame &inframe);
             
         bool reply();   // none        
     };            
     
-}}}}} // namespace embot { namespace app { namespace canprotocol { namespace analog { namespace polling {
+}}}}} // namespace embot { namespace prot { namespace can { namespace analog { namespace polling {
     
     
 

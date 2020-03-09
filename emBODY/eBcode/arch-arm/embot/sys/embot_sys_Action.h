@@ -21,75 +21,75 @@
 #ifndef _EMBOT_SYS_ACTION_H_
 #define _EMBOT_SYS_ACTION_H_
 
-#include "embot_common.h"
+#include "embot_core.h"
 
 #include "embot_sys.h"
 
 #include "embot_sys_Task.h"
 
 
-namespace embot { namespace sys {
+namespace embot { namespace os {
     
-    struct EventToTask
+    struct EventToThread
     {
-        common::Event event {0};
-        Task* task {nullptr};  
+        os::Event event {0};
+        Thread* task {nullptr};  
         
-        EventToTask() = default;
-        EventToTask(common::Event e, Task* t) : event(e), task(t) {}
+        EventToThread() = default;
+        EventToThread(os::Event e, Thread* t) : event(e), task(t) {}
         bool isvalid() const;
         bool execute();
     };
     
-    struct MessageToTask
+    struct MessageToThread
     {
-        common::Message message {nullptr};
-        Task* task {nullptr};
+        os::Message message {nullptr};
+        Thread* task {nullptr};
         
-        MessageToTask() = default;  
-        MessageToTask(common::Message m, Task* t) : message(m), task(t) {}    
+        MessageToThread() = default;  
+        MessageToThread(os::Message m, Thread* t) : message(m), task(t) {}    
         bool isvalid() const;
-        bool execute(common::relTime timeout = common::timeWaitForever);
+        bool execute(core::relTime timeout = core::timeWaitForever);
     };
     
-    struct CallbackToTask
+    struct CallbackToThread
     {
-        common::Callback callback {nullptr, nullptr};
-        Task* task {nullptr};  
+        core::Callback callback {nullptr, nullptr};
+        Thread* task {nullptr};  
 
-        CallbackToTask() = default;        
-        CallbackToTask(common::fpCaller c, void *a, Task *t) : callback(c, a), task(t) {}  
-        CallbackToTask(common::Callback cbk, Task *t) : callback(cbk), task(t) {}                   
+        CallbackToThread() = default;        
+        CallbackToThread(core::fpCaller c, void *a, Thread *t) : callback(c, a), task(t) {}  
+        CallbackToThread(core::Callback cbk, Thread *t) : callback(cbk), task(t) {}                   
         bool isvalid() const;
-        bool execute(common::relTime timeout = common::timeWaitForever);
+        bool execute(core::relTime timeout = core::timeWaitForever);
     };  
             
 
     struct Action
     {
-        enum class Type { none = 0, event2task = 1, message2task = 2, callback2task = 3 };
+        enum class Type { none = 0, event2thread = 1, message2thread = 2, callback2thread = 3 };
                
         Type type {Type::none};
         union
         {
-            EventToTask     evt;
-            MessageToTask   msg;
-            CallbackToTask  cbk;
+            EventToThread     evt;
+            MessageToThread   msg;
+            CallbackToThread  cbk;
         };
                
         Action() { clear(); } 
-        Action(const CallbackToTask &c) { load(c); }
-        Action(const MessageToTask &m) { load(m); }
-        Action(const EventToTask &e) { load(e); }        
+        Action(const CallbackToThread &c) { load(c); }
+        Action(const MessageToThread &m) { load(m); }
+        Action(const EventToThread &e) { load(e); }        
         void clear() { type = Type::none; }        
-        void load(const EventToTask &e);        
-        void load(const MessageToTask &m);        
-        void load(const CallbackToTask &c);               
+        void load(const EventToThread &e);        
+        void load(const MessageToThread &m);        
+        void load(const CallbackToThread &c);               
         bool isvalid() const;        
-        bool execute(common::relTime timeout = common::timeWaitForever);
+        bool execute(core::relTime timeout = core::timeWaitForever);
     };
     
-}} // namespace embot { namespace sys {
+}} // namespace embot { namespace os {
 
 
 #endif  // include-guard

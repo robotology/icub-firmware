@@ -57,7 +57,7 @@ struct embot::app::theCANboardInfo::Impl
         addressofsharedstorage = embot::hw::flash::getpartition(embot::hw::FLASH::sharedstorage).address;      
         userdataaddress = addressofsharedstorage + 1024 - embot::app::theCANboardInfo::sizeOfUserSpace;        
         flashstorage = new embot::hw::FlashStorage(addressofsharedstorage, 1024, buffer); 
-//        embot::sys::theStorage &thestrg = embot::sys::theStorage::getInstance();
+//        embot::os::theStorage &thestrg = embot::os::theStorage::getInstance();
 //        thestrg.init(flashstorage); 
         cachedcanaddress = 255;        
     }
@@ -99,7 +99,7 @@ bool embot::app::theCANboardInfo::synch(const bootloaderInfo &info)
     return synch(info.board, info.version, info.adr, info.definfo32);
 }
 
-bool embot::app::theCANboardInfo::synch(embot::app::canprotocol::Board type, embot::app::canprotocol::versionOfBOOTLOADER version, std::uint8_t adr, const char *defInfo32)
+bool embot::app::theCANboardInfo::synch(embot::prot::can::Board type, embot::prot::can::versionOfBOOTLOADER version, std::uint8_t adr, const char *defInfo32)
 {
     bool ret = false;
     // at first we read. if what we read is not nice, then we write again
@@ -146,7 +146,7 @@ bool embot::app::theCANboardInfo::synch(const applicationInfo &info)
     return synch(info.version, info.protocol);
 }
 
-bool embot::app::theCANboardInfo::synch(embot::app::canprotocol::versionOfAPPLICATION application, embot::app::canprotocol::versionOfCANPROTOCOL protocol)
+bool embot::app::theCANboardInfo::synch(embot::prot::can::versionOfAPPLICATION application, embot::prot::can::versionOfCANPROTOCOL protocol)
 {
     bool ret = false;
     // at first we read. if what we read is not nice, then we write again
@@ -157,7 +157,7 @@ bool embot::app::theCANboardInfo::synch(embot::app::canprotocol::versionOfAPPLIC
     {
         std::memset(&strd, 0, sizeof(strd));
         strd.key = validityKey;
-        strd.boardtype = static_cast<std::uint8_t>(embot::app::canprotocol::Board::unknown);
+        strd.boardtype = static_cast<std::uint8_t>(embot::prot::can::Board::unknown);
         strd.canaddress = 1;  
         strd.bootloaderVmajor = 0;
         strd.bootloaderVminor = 0;

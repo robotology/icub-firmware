@@ -14,8 +14,8 @@
 constexpr std::uint8_t defADDRESS = 1;
 constexpr embot::app::theCANboardInfo::bootloaderInfo btlInfo 
 { 
-    embot::app::canprotocol::Board::psc, 
-    embot::app::canprotocol::versionOfBOOTLOADER {1, 4}, 
+    embot::prot::can::Board::psc, 
+    embot::prot::can::versionOfBOOTLOADER {1, 4}, 
     defADDRESS,                                                       
     "I am a psc" 
 };

@@ -512,6 +512,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\embot\app\embot_app_theLEDmanager.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_core.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\common\embot_core.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

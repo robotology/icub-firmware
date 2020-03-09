@@ -12,10 +12,10 @@
 
 
 
-
+#include "embot_core.h"
 #include "embot_code_application_core.h"
 #include "embot_sys_Task.h"
-#include "embot_hw_can.h"
+#include "embot_app_canprotocol.h"
 #include "embot_app_theCANboardInfo.h"
 
 namespace embot::code::application::evntskcan {
@@ -29,21 +29,21 @@ namespace embot::code::application::evntskcan {
             : embot::code::application::core::SYSTEM(cfg) {}
             
         void userdefInit(void *initparam) const override final; // qui inizializzo evntsk, can and then                
-        void userdefOnIdle(embot::sys::Task *t, void* idleparam) const override {}
+        void userdefOnIdle(embot::os::Thread *t, void* idleparam) const override {}
         void userdefonOSerror(void *errparam) const override {}
 
-        virtual void userdefInit_Extra(embot::sys::EventTask* evtsk, void *initparam) const {};                  
+        virtual void userdefInit_Extra(embot::os::EventThread* evthr, void *initparam) const {};                  
     };
     
     struct evtConfig
     {
         std::uint16_t stacksize {2048};
         void *param {nullptr};
-        common::relTime timeout {50*common::time1millisec};
+        embot::core::relTime timeout {50*embot::core::time1millisec};
 
         evtConfig() = default;
 
-        constexpr evtConfig(std::uint16_t ss, void *pa, embot::common::relTime t)
+        constexpr evtConfig(std::uint16_t ss, void *pa, embot::core::relTime t)
             : stacksize(ss), param(pa), timeout(t) {} 
 
         bool isvalid() const
@@ -80,12 +80,12 @@ namespace embot::code::application::evntskcan {
         canConfig cconfig {};
         embot::app::theCANboardInfo::applicationInfo applinfo {};
 
-        static constexpr embot::common::Event evRXcanframe { 0x00000001 << 0 };
+        static constexpr embot::os::Event evRXcanframe { 0x00000001 << 0 };
                
-        virtual void userdefStartup(embot::sys::Task *t, void *param) const {}
-        virtual void userdefOnTimeout(embot::sys::Task *t, embot::common::EventMask eventmask, void *param) const {}
-        virtual void userdefOnEventRXcanframe(embot::sys::Task *t, embot::common::EventMask eventmask, void *param, const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &outframes) const {}
-        virtual void userdefOnEventANYother(embot::sys::Task *t, embot::common::EventMask eventmask, void *param, std::vector<embot::hw::can::Frame> &outframes) const {}  
+        virtual void userdefStartup(embot::os::Thread *t, void *param) const {}
+        virtual void userdefOnTimeout(embot::os::Thread *t, embot::os::EventMask eventmask, void *param) const {}
+        virtual void userdefOnEventRXcanframe(embot::os::Thread *t, embot::os::EventMask eventmask, void *param, const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &outframes) const {}
+        virtual void userdefOnEventANYother(embot::os::Thread *t, embot::os::EventMask eventmask, void *param, std::vector<embot::prot::can::Frame> &outframes) const {}  
 
         bool isvalid() const { return econfig.isvalid() && cconfig.isvalid(); }           
     };
@@ -113,7 +113,7 @@ namespace embot::code::application::evntskcan {
     [[noreturn]] void run(const embot::code::application::evntskcan::CFG &cfg);
 
 
-    sys::Task * getEVTtask();
+    embot::os::Thread * getEVTtask();
     
        
 } // namespace embot::code::application::evntskcan {

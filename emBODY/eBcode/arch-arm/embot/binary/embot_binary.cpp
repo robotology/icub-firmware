@@ -24,8 +24,6 @@
 #include "embot_binary.h"
 
 
-
-
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
@@ -44,7 +42,7 @@
 
 
 
-namespace embot { namespace binary { namespace bit {
+namespace embot { namespace core { namespace binary { namespace bit {
     
 
     // see http://stackoverflow.com/questions/109023/how-to-count-the-number-of-set-bits-in-a-32-bit-integer
@@ -115,10 +113,7 @@ namespace embot { namespace binary { namespace bit {
     }
     
    
-} } } // namespace embot { namespace binary { namespace bit
-
-
-
+} } } } // namespace embot { namespace core { namespace binary { namespace bit
 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------

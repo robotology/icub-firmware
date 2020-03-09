@@ -19,7 +19,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 
-#include "embot_common.h"
+#include "embot_core.h"
 #include "embot_sys_task.h"
 #include "embot_app_theApplication.h"
 
@@ -40,9 +40,9 @@ namespace embot::code::application::core {
 
 namespace embot::code::application::core {
 
-    void init(embot::sys::Task *t, void* initparam);
+    void init(embot::os::Thread *t, void* initparam);
     
-    void onidle(embot::sys::Task *t, void* idleparam)
+    void onidle(embot::os::Thread *t, void* idleparam)
     {
         extCFG->sys->userdefOnIdle(t, idleparam);
     }
@@ -67,12 +67,12 @@ namespace embot::code::application::core {
         
         // store params
         extCFG = &cfg;        
-        constexpr embot::sys::Task::fpStartup idlestartup = nullptr;
-        embot::sys::InitTask::Config initcfg = { extCFG->sys->config.taskINITstacksize, init, extCFG->sys->config.initparam };
-        embot::sys::IdleTask::Config idlecfg = { extCFG->sys->config.taskIDLEstacksize, idlestartup, extCFG->sys->config.idleparam, onidle };
-        embot::common::Callback onOSerror = { onerror, extCFG->sys->config.errparam };
+        constexpr embot::os::Thread::fpStartup idlestartup = nullptr;
+        embot::os::InitThread::Config initcfg = { extCFG->sys->config.taskINITstacksize, init, extCFG->sys->config.initparam };
+        embot::os::IdleThread::Config idlecfg = { extCFG->sys->config.taskIDLEstacksize, idlestartup, extCFG->sys->config.idleparam, onidle };
+        embot::core::Callback onOSerror = { onerror, extCFG->sys->config.errparam };
                 
-        embot::app::theApplication::Config config { address, initBSP, embot::common::time1millisec, {initcfg, idlecfg, onOSerror} };
+        embot::app::theApplication::Config config { address, initBSP, embot::core::time1millisec, {initcfg, idlecfg, onOSerror} };
         embot::app::theApplication &appl = embot::app::theApplication::getInstance();    
 
         // it prepares the system to run at a given flash address, it inits the hw::bsp, 
@@ -93,7 +93,7 @@ namespace embot::code::application::core {
    
     void start_sys_services();
 
-    void init(embot::sys::Task *t, void* initparam)
+    void init(embot::os::Thread *t, void* initparam)
     { 
         // start sys services: timer manager & callback manager
         start_sys_services();    
@@ -106,8 +106,8 @@ namespace embot::code::application::core {
         // start them both only if their config is OK
         if((extCFG->sys->config.tmconfig.isvalid()) && (extCFG->sys->config.cmconfig.isvalid()))
         {
-            embot::sys::theTimerManager::getInstance().start(extCFG->sys->config.tmconfig);     
-            embot::sys::theCallbackManager::getInstance().start(extCFG->sys->config.cmconfig);   
+            embot::os::theTimerManager::getInstance().start(extCFG->sys->config.tmconfig);     
+            embot::os::theCallbackManager::getInstance().start(extCFG->sys->config.cmconfig);   
         } 
     }
 

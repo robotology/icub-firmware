@@ -21,7 +21,7 @@
 #ifndef _EMBOT_APP_CANPROTOCOL_ANALOG_PERIODIC_H_
 #define _EMBOT_APP_CANPROTOCOL_ANALOG_PERIODIC_H_
 
-#include "embot_common.h"
+#include "embot_core.h"
 
 #include "embot_app_canprotocol.h"
 
@@ -29,7 +29,7 @@
 
 #include <array>
 
-namespace embot { namespace app { namespace canprotocol { namespace analog { namespace periodic {
+namespace embot { namespace prot { namespace can { namespace analog { namespace periodic {
         
     // the supported commands    
     enum class CMD { 
@@ -59,13 +59,13 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
     CMD convert(std::uint8_t cmd);
     std::uint8_t convert(CMD cmd);
 
-}}}}} // namespace embot { namespace app { namespace canprotocol { namespace analog { namespace periodic {   
+}}}}} // namespace embot { namespace prot { namespace can { namespace analog { namespace periodic {   
  
 
 
    
   
-namespace embot { namespace app { namespace canprotocol { namespace analog { namespace periodic {
+namespace embot { namespace prot { namespace can { namespace analog { namespace periodic {
         
 
     // the management of commands   
@@ -104,7 +104,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
             
         bool load(const Info& inf);
             
-        bool get(embot::hw::can::Frame &outframe);        
+        bool get(embot::prot::can::Frame &outframe);        
     };    
     
     
@@ -129,7 +129,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
             
         bool load(const Info& inf);
             
-        bool get(embot::hw::can::Frame &outframe);        
+        bool get(embot::prot::can::Frame &outframe);        
     };    
 
     
@@ -154,7 +154,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
             
         bool load(const Info& inf);
             
-        bool get(embot::hw::can::Frame &outframe);        
+        bool get(embot::prot::can::Frame &outframe);        
     };    
     
     
@@ -179,7 +179,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
             
         bool load(const Info& inf);
             
-        bool get(embot::hw::can::Frame &outframe);        
+        bool get(embot::prot::can::Frame &outframe);        
     };
 
 
@@ -202,7 +202,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
             
         bool load(const Info& inf);
             
-        bool get(embot::hw::can::Frame &outframe);        
+        bool get(embot::prot::can::Frame &outframe);        
     };    
         
     class Message_USERDEF : public Message
@@ -222,7 +222,7 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
             
         bool load(const Info& inf);
             
-        bool get(embot::hw::can::Frame &outframe);        
+        bool get(embot::prot::can::Frame &outframe);        
     };  
 
 
@@ -260,11 +260,11 @@ namespace embot { namespace app { namespace canprotocol { namespace analog { nam
             
         bool load(const Info& inf);
             
-        bool get(embot::hw::can::Frame &outframe);        
+        bool get(embot::prot::can::Frame &outframe);        
     };    
         
     
-}}}}} // namespace embot { namespace app { namespace canprotocol { namespace analog { namespace periodic {    
+}}}}} // namespace embot { namespace prot { namespace can { namespace analog { namespace periodic {    
 
 
 #endif  // include-guard

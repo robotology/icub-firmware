@@ -21,7 +21,7 @@
 #ifndef _EMBOT_APP_BOOTLOADER_THECANPARSER_H_
 #define _EMBOT_APP_BOOTLOADER_THECANPARSER_H_
 
-#include "embot_common.h"
+#include "embot_core.h"
 #include "embot_hw.h"
 #include "embot_hw_sys.h"
 #include "embot_hw_can.h"
@@ -41,9 +41,9 @@ namespace embot { namespace app { namespace bootloader {
     public:
         struct Config
         {
-            embot::app::canprotocol::Process owner {embot::app::canprotocol::Process::bootloader};
+            embot::prot::can::Process owner {embot::prot::can::Process::bootloader};
             Config() = default;
-            Config(embot::app::canprotocol::Process pr) : owner (pr) {}
+            Config(embot::prot::can::Process pr) : owner (pr) {}
         }; 
         
         enum class Event { rxcanframe = 0};
@@ -56,8 +56,8 @@ namespace embot { namespace app { namespace bootloader {
         // in bootloader there are not multiple replies (as for reply to GET_ADDITIONAL_INFO or CANPRINT).
         // thus we dont need to use a vector ... but if we decide to support multiple replies ... 
         // in any case, if we must transmit we return true
-        //bool process(const embot::hw::can::Frame &frame, vector<embot::hw::can::Frame> &replies);
-        bool process(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);
+        //bool process(const embot::prot::can::Frame &frame, vector<embot::prot::can::Frame> &replies);
+        bool process(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies);
 
     private:
         theCANparser(); 

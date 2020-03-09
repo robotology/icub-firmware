@@ -21,7 +21,7 @@
 #ifndef _EMBOT_H_
 #define _EMBOT_H_
 
-#include "embot_common.h"
+#include "embot_core.h"
 #include "embot_sys.h"
 #include "embot_sys_theScheduler.h"
 #include "embot_sys_Timer.h"

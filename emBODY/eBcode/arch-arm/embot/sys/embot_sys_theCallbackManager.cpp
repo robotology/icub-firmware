@@ -34,10 +34,10 @@
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
 // --------------------------------------------------------------------------------------------------------------------
 
-struct embot::sys::theCallbackManager::Impl
+struct embot::os::theCallbackManager::Impl
 {    
     Config config {};    
-    embot::sys::CallbackTask *task {nullptr};
+    embot::os::CallbackThread *task {nullptr};
     
     Impl() = default;
 };
@@ -48,22 +48,22 @@ struct embot::sys::theCallbackManager::Impl
 // --------------------------------------------------------------------------------------------------------------------
 
 
-embot::sys::theCallbackManager& embot::sys::theCallbackManager::getInstance()
+embot::os::theCallbackManager& embot::os::theCallbackManager::getInstance()
 {
     static theCallbackManager* p = new theCallbackManager();
     return *p;
 }
 
-embot::sys::theCallbackManager::theCallbackManager()
+embot::os::theCallbackManager::theCallbackManager()
 {
     pImpl = std::make_unique<Impl>();
 }  
 
     
-embot::sys::theCallbackManager::~theCallbackManager() { }
+embot::os::theCallbackManager::~theCallbackManager() { }
 
 
-bool embot::sys::theCallbackManager::start(const Config &config)
+bool embot::os::theCallbackManager::start(const Config &config)
 {       
     if(true == started())
     {
@@ -72,13 +72,13 @@ bool embot::sys::theCallbackManager::start(const Config &config)
     
     pImpl->config = config;
         
-    pImpl->task = new embot::sys::CallbackTask;
+    pImpl->task = new embot::os::CallbackThread;
     
-    embot::sys::CallbackTask::Config cfg {};
+    embot::os::CallbackThread::Config cfg {};
     cfg.priority = pImpl->config.priority;
     cfg.stacksize = pImpl->config.stacksize;
     cfg.queuesize = pImpl->config.capacityofhandler;
-    cfg.timeout = embot::common::timeWaitForever;
+    cfg.timeout = embot::core::timeWaitForever;
     cfg.startup = nullptr;
     
     pImpl->task->start(cfg);
@@ -86,12 +86,12 @@ bool embot::sys::theCallbackManager::start(const Config &config)
     return true;    
 }
 
-bool embot::sys::theCallbackManager::started() const
+bool embot::os::theCallbackManager::started() const
 {
     return (nullptr == pImpl->task) ? false : true;
 }
 
-embot::sys::Task * embot::sys::theCallbackManager::task() const
+embot::os::Thread * embot::os::theCallbackManager::task() const
 {
     return pImpl->task;
 }

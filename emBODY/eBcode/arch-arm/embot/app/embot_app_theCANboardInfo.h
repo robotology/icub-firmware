@@ -21,7 +21,7 @@
 #ifndef _EMBOT_APP_THECANBOARDINFO_H_
 #define _EMBOT_APP_THECANBOARDINFO_H_
 
-#include "embot_common.h"
+#include "embot_core.h"
 #include "embot_sys.h"
 #include "embot_app_canprotocol.h"
 #include <memory>
@@ -56,24 +56,24 @@ namespace embot { namespace app {
         
         struct bootloaderInfo
         {
-            embot::app::canprotocol::Board board {embot::app::canprotocol::Board::none};
-            embot::app::canprotocol::versionOfBOOTLOADER version {0, 0};
+            embot::prot::can::Board board {embot::prot::can::Board::none};
+            embot::prot::can::versionOfBOOTLOADER version {0, 0};
             std::uint8_t adr {1};
             const char * definfo32 {nullptr};
             
             bootloaderInfo() = default;
-            constexpr bootloaderInfo(embot::app::canprotocol::Board b, const embot::app::canprotocol::versionOfBOOTLOADER &v, std::uint8_t a, const char *i) 
+            constexpr bootloaderInfo(embot::prot::can::Board b, const embot::prot::can::versionOfBOOTLOADER &v, std::uint8_t a, const char *i) 
                         : board(b), version(v), adr(a), definfo32(i) {}             
         };
         
         
         struct applicationInfo
         {
-            embot::app::canprotocol::versionOfAPPLICATION version {0, 0, 0};
-            embot::app::canprotocol::versionOfCANPROTOCOL protocol {0, 0};
+            embot::prot::can::versionOfAPPLICATION version {0, 0, 0};
+            embot::prot::can::versionOfCANPROTOCOL protocol {0, 0};
 
             applicationInfo() = default;
-            constexpr applicationInfo(const embot::app::canprotocol::versionOfAPPLICATION &v, const embot::app::canprotocol::versionOfCANPROTOCOL &p) 
+            constexpr applicationInfo(const embot::prot::can::versionOfAPPLICATION &v, const embot::prot::can::versionOfCANPROTOCOL &p) 
                         : version(v), protocol(p) {}             
         };        
         
@@ -81,10 +81,10 @@ namespace embot { namespace app {
         bool erase();
         
         bool synch(const bootloaderInfo &info);
-        bool synch(embot::app::canprotocol::Board type, embot::app::canprotocol::versionOfBOOTLOADER version, std::uint8_t adr, const char *defInfo32);
+        bool synch(embot::prot::can::Board type, embot::prot::can::versionOfBOOTLOADER version, std::uint8_t adr, const char *defInfo32);
         
         bool synch(const applicationInfo &info);
-        bool synch(embot::app::canprotocol::versionOfAPPLICATION application, embot::app::canprotocol::versionOfCANPROTOCOL protocol);
+        bool synch(embot::prot::can::versionOfAPPLICATION application, embot::prot::can::versionOfCANPROTOCOL protocol);
         
         bool get(StoredInfo &info);
         bool set(const StoredInfo &info);

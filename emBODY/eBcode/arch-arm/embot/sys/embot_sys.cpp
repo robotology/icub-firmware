@@ -30,6 +30,9 @@
 
 #include "osal.h"
 #include "stdlib.h"
+#include "embot_hw.h"
+#include "embot_hw_sys.h"
+#include "embot_sys_theScheduler.h"
 
 #include <new>
 
@@ -44,21 +47,55 @@
 // - all the rest
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace embot { namespace sys {
+namespace embot { namespace os {
+    
+    static core::Time _now()
+    { 
+        static volatile core::Time tt = 0; // if osal is not started i offer a very simple (and inaccurate) implementation.
+        return (osal_info_status_running != osal_info_get_status()) ? (tt++) : osal_system_abstime_get();
+    }
+    
+    static bool _initted = false;
+    static Config _config {};
+    
+    bool initialised() { return _initted; }
+    
+    bool init(const Config &config)
+    {
+        if(false == config.isvalid())
+        {
+            return false;
+        }
+        
+        _config = config;
+        // must init the hw bsp with now()
+        embot::hw::init({nullptr, _now});
+        _initted = true;
+        return true;        
+    }
     
     bool started()
     {        
         return osal_info_status_running == osal_info_get_status();        
     }
     
-    common::Time now()
-    { 
-        static volatile common::Time tt = 0; // if osal is not started i offer a very simple (and inaccurate) implementation.
-        return (osal_info_status_running != osal_info_get_status()) ? (tt++) : osal_system_abstime_get();
-    }
     
+    [[noreturn]] void start()
+    {
+        if((false == _initted) || (false == _config.isvalid()))
+        {
+            for(;;);
+        }
+        
+        embot::os::theScheduler::Config cfg { embot::os::theScheduler::Timing(embot::hw::sys::clock(embot::hw::CLOCK::syscore),  _config.tick), {_config.initconfig, _config.idleconfig, _config.onOSerror} };    
+        embot::os::theScheduler &thescheduler = embot::os::theScheduler::getInstance();
+        thescheduler.start(cfg);    
+        
+        for(;;); 
+    }
+      
 
-}} // namespace embot { namespace sys {
+}} // namespace embot { namespace os {
 
 
 // --------------------------------------------------------------------------------------------------------------------

@@ -16,6 +16,7 @@
  * Public License for more details
 */
 
+#error dont use me [ i am not a true embot::os ]
 
 // --------------------------------------------------------------------------------------------------------------------
 // - public interface

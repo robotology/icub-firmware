@@ -70,7 +70,7 @@ namespace embot { namespace hw { namespace button {
     
     bool initialised(BTN btn)
     {
-        return embot::binary::bit::check(initialisedmask,embot::common::tointegral(btn));
+        return embot::core::binary::bit::check(initialisedmask,embot::core::tointegral(btn));
     }
         
     result_t init(BTN btn)
@@ -88,7 +88,7 @@ namespace embot { namespace hw { namespace button {
         // every button initalisation is done in the bsp, but ... 
         embot::hw::bsp::button::getBSP().init(btn);        
        
-        if(!embot::hw::bsp::initialised())
+        if(!embot::hw::initialised())
         {   // requires embot::hw::bsp::init()
             return resNOK;
         }
@@ -96,7 +96,7 @@ namespace embot { namespace hw { namespace button {
 
              
         
-        embot::binary::bit::set(initialisedmask, embot::common::tointegral(btn));
+        embot::core::binary::bit::set(initialisedmask, embot::core::tointegral(btn));
                 
         return resOK;        
     }

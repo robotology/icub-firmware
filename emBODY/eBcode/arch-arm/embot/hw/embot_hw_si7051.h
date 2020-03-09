@@ -22,7 +22,7 @@
 #ifndef _EMBOT_HW_SI7051_H_
 #define _EMBOT_HW_SI7051_H_
 
-#include "embot_common.h"
+#include "embot_core.h"
 #include "embot_hw.h"
 
 
@@ -51,7 +51,7 @@ namespace embot { namespace hw { namespace si7051 {
         
     
     // after that init() returns resOK we can check if it is alive. we can specify a timeout
-    bool isalive(embot::hw::SI7051 s, embot::common::relTime timeout = 3*embot::common::time1millisec);
+    bool isalive(embot::hw::SI7051 s, embot::core::relTime timeout = 3*embot::core::time1millisec);
     
     // we must check that nobody is using the sensor, maybe in non-blocking mode some time earlier
     bool isacquiring(embot::hw::SI7051 s);
@@ -62,7 +62,7 @@ namespace embot { namespace hw { namespace si7051 {
     
     // we start acquisition of temperature.
     // if returns resOK, we know that acquisition is over if it is called oncompletion() or when operationdone() is true;
-    result_t acquisition(embot::hw::SI7051 s, const embot::common::Callback &oncompletion = embot::common::Callback(nullptr, nullptr));
+    result_t acquisition(embot::hw::SI7051 s, const embot::core::Callback &oncompletion = embot::core::Callback(nullptr, nullptr));
 
     // it tells if a previous operation of acquisition is over
     bool operationdone(embot::hw::SI7051 s);

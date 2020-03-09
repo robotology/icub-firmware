@@ -22,14 +22,12 @@
 #ifndef _EMBOT_HW_PGA308_H_
 #define _EMBOT_HW_PGA308_H_
 
-#include "embot_common.h"
+#include "embot_core.h"
 #include "embot_binary.h"
 #include "embot_hw.h"
 #include "embot_hw_onewire.h"
 #include "embot_hw_gpio.h"
 #include <cmath>
-
-#include "embot_app_canprotocol_analog_polling.h"
 
 namespace embot { namespace hw { namespace pga308 {
      
@@ -261,25 +259,45 @@ namespace embot { namespace hw { namespace pga308 {
         
         TransferFunctionConfig() : GD(0), GI(0), muxsign(0), GO(0), Vcoarseoffset(0), Vzerodac(0) {}
             
-        void load(const embot::app::canprotocol::analog::polling::PGA308cfg1 &protcfg)
+//        void load(const embot::prot::can::analog::polling::PGA308cfg1 &protcfg)
+//        {
+//            GD = protcfg.GD;
+//            GI = protcfg.GI;
+//            muxsign = protcfg.S;
+//            GO = protcfg.GO;
+//            Vcoarseoffset = protcfg.Voffsetcoarse;
+//            Vzerodac = protcfg.Vzerodac;        
+//        }
+//        
+//        void get(embot::prot::can::analog::polling::PGA308cfg1 &protcfg)
+//        {
+//            protcfg.GD = GD;
+//            protcfg.GI = GI;
+//            protcfg.S = muxsign;
+//            protcfg.GO = GO;
+//            protcfg.Voffsetcoarse = Vcoarseoffset;
+//            protcfg.Vzerodac = Vzerodac;        
+//        }
+            
+        void load(const uint16_t gd, const uint8_t gi, const uint8_t s, const uint8_t go, const uint8_t voc, const uint16_t vzd)
         {
-            GD = protcfg.GD;
-            GI = protcfg.GI;
-            muxsign = protcfg.S;
-            GO = protcfg.GO;
-            Vcoarseoffset = protcfg.Voffsetcoarse;
-            Vzerodac = protcfg.Vzerodac;        
+            GD = gd;
+            GI = gi;
+            muxsign = s;
+            GO = go;
+            Vcoarseoffset = voc;
+            Vzerodac = vzd;        
         }
         
-        void get(embot::app::canprotocol::analog::polling::PGA308cfg1 &protcfg)
+        void get(uint16_t &gd, uint8_t &gi, uint8_t &s, uint8_t &go, uint8_t &voc, uint16_t &vzd)
         {
-            protcfg.GD = GD;
-            protcfg.GI = GI;
-            protcfg.S = muxsign;
-            protcfg.GO = GO;
-            protcfg.Voffsetcoarse = Vcoarseoffset;
-            protcfg.Vzerodac = Vzerodac;        
-        }
+            gd = GD;
+            gi = GI;
+            s = muxsign;
+            go = GO;
+            voc = Vcoarseoffset;
+            vzd = Vzerodac;        
+        }            
         
         void setDefault() 
         {

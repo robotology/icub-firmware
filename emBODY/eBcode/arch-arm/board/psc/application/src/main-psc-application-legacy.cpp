@@ -97,14 +97,14 @@ static void userdefonOSerror(void* param);
 
 static const embot::sys::InitTask::Config initcfg = { 2048, init, nullptr };
 static const embot::sys::IdleTask::Config idlecfg = { 512, nullptr, nullptr, onidle };
-static const embot::common::Callback onOSerror = { userdefonOSerror, nullptr };
+static const embot::core::Callback onOSerror = { userdefonOSerror, nullptr };
 
 static const std::uint32_t address = embot::hw::flash::getpartition(embot::hw::FLASH::application).address;
 constexpr bool initBSP = true;
 
 int main(void)
 { 
-    embot::app::theApplication::Config config { address, initBSP, embot::common::time1millisec, {initcfg, idlecfg, onOSerror} };
+    embot::app::theApplication::Config config { address, initBSP, embot::core::time1millisec, {initcfg, idlecfg, onOSerror} };
     embot::app::theApplication &appl = embot::app::theApplication::getInstance();    
 
     // it prepares the system to run at a given flash address, it inits the hw::bsp, 
@@ -160,15 +160,15 @@ static void start_sys_services()
 }
 
 
-static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask evtmsk, void *p);
+static void eventbasedtask_onevent(embot::sys::Task *t, embot::core::EventMask evtmsk, void *p);
 static void eventbasedtask_init(embot::sys::Task *t, void *p);
 
 
-constexpr embot::common::Event evRXcanframe = 0x00000001 << 0;
-constexpr embot::common::Event evPOS0Xacquire = 0x00000001 << 1;
-constexpr embot::common::Event evPOS01dataready = 0x00000001 << 2;
-constexpr embot::common::Event evPOS02dataready = 0x00000001 << 3;
-static const embot::common::Event evSKINprocess = 0x00000001 << 4;
+constexpr embot::core::Event evRXcanframe = 0x00000001 << 0;
+constexpr embot::core::Event evPOS0Xacquire = 0x00000001 << 1;
+constexpr embot::core::Event evPOS01dataready = 0x00000001 << 2;
+constexpr embot::core::Event evPOS02dataready = 0x00000001 << 3;
+static const embot::core::Event evSKINprocess = 0x00000001 << 4;
 
 constexpr std::uint8_t maxOUTcanframes = 48;
 
@@ -198,7 +198,7 @@ static embot::sys::EventTask* start_evt_based(void)
 {           
     // create the main task 
     embot::sys::EventTask* tsk = new embot::sys::EventTask;  
-    const embot::common::relTime waitEventTimeout = 50*embot::common::time1millisec;   
+    const embot::core::relTime waitEventTimeout = 50*embot::core::time1millisec;   
             
     embot::sys::EventTask::Config configEV;
     
@@ -227,7 +227,7 @@ static void start_usr_services(embot::sys::EventTask* evtsk)
     static const std::initializer_list<embot::hw::LED> allleds = {embot::hw::LED::one};  
     embot::app::theLEDmanager &theleds = embot::app::theLEDmanager::getInstance();     
     theleds.init(allleds);    
-    theleds.get(embot::hw::LED::one).pulse(embot::common::time1second); 
+    theleds.get(embot::hw::LED::one).pulse(embot::core::time1second); 
 
     // start canparser basic
     embot::app::application::theCANparserBasic &canparserbasic = embot::app::application::theCANparserBasic::getInstance();
@@ -260,7 +260,7 @@ static void start_usr_services(embot::sys::EventTask* evtsk)
     // before the eventbasedtask is created.
     embot::hw::can::Config canconfig;   // default is tx/rxcapacity=8
     canconfig.txcapacity = maxOUTcanframes;
-    canconfig.onrxframe = embot::common::Callback(alerteventbasedtask, evtsk); 
+    canconfig.onrxframe = embot::core::Callback(alerteventbasedtask, evtsk); 
     embot::hw::can::init(embot::hw::CAN::one, canconfig);
     embot::hw::can::setfilters(embot::hw::CAN::one, embot::app::theCANboardInfo::getInstance().getCANaddress());
     
@@ -287,7 +287,7 @@ static void eventbasedtask_init(embot::sys::Task *t, void *p)
     
 
 
-static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask eventmask, void *p)
+static void eventbasedtask_onevent(embot::sys::Task *t, embot::core::EventMask eventmask, void *p)
 {   
     if(0 == eventmask)
     {   // timeout ...       
@@ -296,7 +296,7 @@ static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask
     // we clear the frames to be trasmitted
     outframes.clear();      
         
-    if(true == embot::binary::mask::check(eventmask, evRXcanframe))
+    if(true == embot::core::binary::mask::check(eventmask, evRXcanframe))
     {        
         embot::hw::can::Frame frame;
         std::uint8_t remainingINrx = 0;
@@ -325,25 +325,25 @@ static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask
     }
     
     
-    if(true == embot::binary::mask::check(eventmask, evPOS0Xacquire))
+    if(true == embot::core::binary::mask::check(eventmask, evPOS0Xacquire))
     {        
         embot::app::application::thePOSreader &thepos = embot::app::application::thePOSreader::getInstance();
         thepos.process(evPOS0Xacquire, outframes);        
     }
     
-    if(true == embot::binary::mask::check(eventmask, evPOS01dataready))
+    if(true == embot::core::binary::mask::check(eventmask, evPOS01dataready))
     {        
         embot::app::application::thePOSreader &thepos = embot::app::application::thePOSreader::getInstance();
         thepos.process(evPOS01dataready, outframes);        
     }
     
-    if(true == embot::binary::mask::check(eventmask, evPOS02dataready))
+    if(true == embot::core::binary::mask::check(eventmask, evPOS02dataready))
     {        
         embot::app::application::thePOSreader &thepos = embot::app::application::thePOSreader::getInstance();
         thepos.process(evPOS02dataready, outframes);        
     }    
             
-    if(true == embot::binary::mask::check(eventmask, evSKINprocess))
+    if(true == embot::core::binary::mask::check(eventmask, evSKINprocess))
     {
         embot::app::application::theSkin &theskin = embot::app::application::theSkin::getInstance();
         theskin.tick(outframes);        
@@ -425,13 +425,13 @@ void toggleled(void*)
         con.onexpiry.callback = toggleled;
         if(0 == x)
         {
-            con.time = embot::common::time1microsec * 50;
+            con.time = embot::core::time1microsec * 50;
             embot::hw::timer::configure(timer2use, con);
             x = 1;
         }
         else
         {
-            con.time = embot::common::time1microsec * 100;
+            con.time = embot::core::time1microsec * 100;
             embot::hw::timer::configure(timer2use, con);
             x = 0;
         }
@@ -447,7 +447,7 @@ void test_tim_init(void)
     embot::hw::led::off(embot::hw::led::LED::one); 
     
     embot::hw::timer::Config con;
-    con.time = embot::common::time1microsec * 100;
+    con.time = embot::core::time1microsec * 100;
     con.onexpiry.callback = toggleled;
     embot::hw::timer::init(timer2use, con);
     embot::hw::timer::start(timer2use);
@@ -492,7 +492,7 @@ void tests_tick()
 #if defined(TEST_HW_TLV493D)
     embot::hw::tlv493d::Position vv = 0;    
     embot::hw::tlv493d::Position pp = 0;
-    embot::common::Callback cbk(counter, nullptr);
+    embot::core::Callback cbk(counter, nullptr);
     
     embot::hw::tlv493d::acquisition(tlv, cbk);  
     
@@ -514,13 +514,13 @@ void tests_tick()
     
 #if defined(TEST_HW_SI7051)
     
-    embot::common::Time starttime = embot::sys::timeNow();
-    embot::common::Time endtime = starttime;
+    embot::core::Time starttime = embot::sys::timeNow();
+    embot::core::Time endtime = starttime;
       
     embot::hw::SI7051::Temperature temp;    
 
     const int ntimes = 1000;
-    embot::common::Callback cbk(counter, nullptr);
+    embot::core::Callback cbk(counter, nullptr);
     int num = 0;
     for(int i=0; i<ntimes; i++)
     {
@@ -542,7 +542,7 @@ void tests_tick()
 
     endtime = embot::sys::timeNow();
     
-    static embot::common::Time delta = 0;
+    static embot::core::Time delta = 0;
     delta = endtime - starttime;
     delta = delta;
     num = num;

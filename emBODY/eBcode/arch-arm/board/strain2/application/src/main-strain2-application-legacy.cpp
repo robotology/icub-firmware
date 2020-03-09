@@ -97,14 +97,14 @@ static void userdefonOSerror(void* param);
 
 static const embot::sys::InitTask::Config initcfg = { 2048, init, nullptr };
 static const embot::sys::IdleTask::Config idlecfg = { 512, nullptr, nullptr, onidle };
-static const embot::common::Callback onOSerror = { userdefonOSerror, nullptr };
+static const embot::core::Callback onOSerror = { userdefonOSerror, nullptr };
 
 static const std::uint32_t address = embot::hw::flash::getpartition(embot::hw::FLASH::application).address;
 constexpr bool initBSP = true;
 
 int main(void)
 { 
-    embot::app::theApplication::Config config { address, initBSP, embot::common::time1millisec, {initcfg, idlecfg, onOSerror} };
+    embot::app::theApplication::Config config { address, initBSP, embot::core::time1millisec, {initcfg, idlecfg, onOSerror} };
     embot::app::theApplication &appl = embot::app::theApplication::getInstance();    
 
     // it prepares the system to run at a given flash address, it inits the hw::bsp, 
@@ -159,16 +159,16 @@ static void start_sys_services()
 }
 
 
-static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask evtmsk, void *p);
+static void eventbasedtask_onevent(embot::sys::Task *t, embot::core::EventMask evtmsk, void *p);
 static void eventbasedtask_init(embot::sys::Task *t, void *p);
 
-static const embot::common::Event evRXcanframe = 0x00000001 << 0;
-static const embot::common::Event evSTRAINtick = 0x00000001 << 1;
-static const embot::common::Event evSTRAINdataready = 0x00000001 << 2;
-static const embot::common::Event evIMUtick = 0x00000001 << 3;
-static const embot::common::Event evIMUdataready = 0x00000001 << 4;
-static const embot::common::Event evTHERMOtick = 0x00000001 << 5;
-static const embot::common::Event evTHERMOdataready = 0x00000001 << 6;
+static const embot::core::Event evRXcanframe = 0x00000001 << 0;
+static const embot::core::Event evSTRAINtick = 0x00000001 << 1;
+static const embot::core::Event evSTRAINdataready = 0x00000001 << 2;
+static const embot::core::Event evIMUtick = 0x00000001 << 3;
+static const embot::core::Event evIMUdataready = 0x00000001 << 4;
+static const embot::core::Event evTHERMOtick = 0x00000001 << 5;
+static const embot::core::Event evTHERMOdataready = 0x00000001 << 6;
 
 static const std::uint8_t maxOUTcanframes = 48;
 
@@ -183,7 +183,7 @@ static embot::sys::EventTask* start_evt_based(void)
 {           
     // create the main task 
     embot::sys::EventTask* tsk = new embot::sys::EventTask;  
-    const embot::common::relTime waitEventTimeout = 50*embot::common::time1millisec;   
+    const embot::core::relTime waitEventTimeout = 50*embot::core::time1millisec;   
             
     embot::sys::EventTask::Config configEV;
     
@@ -211,7 +211,7 @@ static void start_usr_services(embot::sys::EventTask* evtsk)
     static const std::initializer_list<embot::hw::LED> allleds = {embot::hw::LED::one};  
     embot::app::theLEDmanager &theleds = embot::app::theLEDmanager::getInstance();     
     theleds.init(allleds);    
-    theleds.get(embot::hw::LED::one).pulse(embot::common::time1second); 
+    theleds.get(embot::hw::LED::one).pulse(embot::core::time1second); 
 
     // start canparser basic
     embot::app::application::theCANparserBasic &canparserbasic = embot::app::application::theCANparserBasic::getInstance();
@@ -252,14 +252,14 @@ static void start_usr_services(embot::sys::EventTask* evtsk)
     // before the eventbasedtask is created.
     embot::hw::can::Config canconfig;   // default is tx/rxcapacity=8
     canconfig.txcapacity = maxOUTcanframes;
-    canconfig.onrxframe = embot::common::Callback(alerteventbasedtask, evtsk); 
+    canconfig.onrxframe = embot::core::Callback(alerteventbasedtask, evtsk); 
     embot::hw::can::init(embot::hw::CAN::one, canconfig);
     embot::hw::can::setfilters(embot::hw::CAN::one, embot::app::theCANboardInfo::getInstance().getCANaddress());    
     
 #if 1  
     // it starts the tx of strain immediately  
     //embot::app::application::theSTRAIN &thestrain = embot::app::application::theSTRAIN::getInstance();
-    thestrain.setTXperiod(10*embot::common::time1millisec);
+    thestrain.setTXperiod(10*embot::core::time1millisec);
     thestrain.start(embot::app::canprotocol::analog::polling::Message_SET_TXMODE::StrainMode::txUncalibrated);
 #endif     
 }
@@ -284,7 +284,7 @@ static void eventbasedtask_init(embot::sys::Task *t, void *p)
     
 
 
-static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask eventmask, void *p)
+static void eventbasedtask_onevent(embot::sys::Task *t, embot::core::EventMask eventmask, void *p)
 {   
     if(0 == eventmask)
     {   // timeout ... 
@@ -298,7 +298,7 @@ static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask
     outframes.clear();      
     
     
-    if(true == embot::binary::mask::check(eventmask, evRXcanframe))
+    if(true == embot::core::binary::mask::check(eventmask, evRXcanframe))
     {        
         embot::hw::can::Frame frame;
         std::uint8_t remainingINrx = 0;
@@ -330,37 +330,37 @@ static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask
     }
     
     
-    if(true == embot::binary::mask::check(eventmask, evSTRAINtick))
+    if(true == embot::core::binary::mask::check(eventmask, evSTRAINtick))
     {        
         embot::app::application::theSTRAIN &thestrain = embot::app::application::theSTRAIN::getInstance();
         thestrain.tick(outframes);        
     }
             
-    if(true == embot::binary::mask::check(eventmask, evSTRAINdataready))
+    if(true == embot::core::binary::mask::check(eventmask, evSTRAINdataready))
     {        
         embot::app::application::theSTRAIN &thestrain = embot::app::application::theSTRAIN::getInstance();
         thestrain.processdata(outframes);        
     }
     
-    if(true == embot::binary::mask::check(eventmask, evIMUtick))
+    if(true == embot::core::binary::mask::check(eventmask, evIMUtick))
     {        
         embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance();
         theimu.tick(outframes);        
     }   
     
-    if(true == embot::binary::mask::check(eventmask, evIMUdataready))
+    if(true == embot::core::binary::mask::check(eventmask, evIMUdataready))
     {        
         embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance();
         theimu.processdata(outframes);        
     }
      
-    if(true == embot::binary::mask::check(eventmask, evTHERMOtick))
+    if(true == embot::core::binary::mask::check(eventmask, evTHERMOtick))
     {        
         embot::app::application::theTHERMO &thethermo = embot::app::application::theTHERMO::getInstance();
         thethermo.tick(outframes);        
     }   
     
-    if(true == embot::binary::mask::check(eventmask, evTHERMOdataready))
+    if(true == embot::core::binary::mask::check(eventmask, evTHERMOdataready))
     {        
         embot::app::application::theTHERMO &thethermo = embot::app::application::theTHERMO::getInstance();
         thethermo.processdata(outframes);        
@@ -413,7 +413,7 @@ static bool adcdmadone_isset()
     return true;
 }
 
-static embot::common::Time delta = 0;
+static embot::core::Time delta = 0;
 static std::uint16_t items[6] = {0};
 
 #endif // #if defined(TEST_HW_ADC)
@@ -469,13 +469,13 @@ void toggleled(void*)
         con.onexpiry.callback = toggleled;
         if(0 == x)
         {
-            con.time = embot::common::time1microsec * 50;
+            con.time = embot::core::time1microsec * 50;
             embot::hw::timer::configure(timer2use, con);
             x = 1;
         }
         else
         {
-            con.time = embot::common::time1microsec * 100;
+            con.time = embot::core::time1microsec * 100;
             embot::hw::timer::configure(timer2use, con);
             x = 0;
         }
@@ -491,7 +491,7 @@ void test_tim_init(void)
     embot::hw::led::off(embot::hw::led::LED::one); 
     
     embot::hw::timer::Config con;
-    con.time = embot::common::time1microsec * 100;
+    con.time = embot::core::time1microsec * 100;
     con.onexpiry.callback = toggleled;
     embot::hw::timer::init(timer2use, con);
     embot::hw::timer::start(timer2use);
@@ -532,16 +532,16 @@ void tests_launcher_init()
     embot::utils::Data data(dat08, 8);
     
     embot::hw::BNO055::Info info;
-    embot::hw::BNO055::get(embot::hw::bsp::strain2::imuBOSCH, info, embot::common::time1second);
+    embot::hw::BNO055::get(embot::hw::bsp::strain2::imuBOSCH, info, embot::core::time1second);
     
     bool val = info.isvalid();
     val = val;
     
-    embot::hw::BNO055::read(embot::hw::bsp::strain2::imuBOSCH, embot::hw::BNO055::Register::CHIP_ID, data, embot::common::time1second);
+    embot::hw::BNO055::read(embot::hw::bsp::strain2::imuBOSCH, embot::hw::BNO055::Register::CHIP_ID, data, embot::core::time1second);
     dat08[0] = dat08[0];
 
     std::memset(dat08, 0, sizeof(dat08));
-    embot::common::Callback cbk(ciao, nullptr);
+    embot::core::Callback cbk(ciao, nullptr);
     embot::hw::BNO055::read(embot::hw::bsp::strain2::imuBOSCH, embot::hw::BNO055::Register::CHIP_ID, data, cbk);
     for(;;)
     {
@@ -555,10 +555,10 @@ void tests_launcher_init()
     const embot::hw::BNO055::Mode mode2use = embot::hw::BNO055::Mode::NDOF; // NDOF // AMG // IMU //NDOF_FMC_OFF
     std::memset(dat08, 0, sizeof(dat08));
     
-    embot::hw::BNO055::read(embot::hw::bsp::strain2::imuBOSCH, embot::hw::BNO055::Register::DATASET_START, data, embot::common::time1second);    
-    embot::hw::BNO055::write(embot::hw::bsp::strain2::imuBOSCH, embot::hw::BNO055::Register::OPR_MODE, static_cast<std::uint8_t>(mode2use), embot::common::time1second);
-    embot::hw::BNO055::read(embot::hw::bsp::strain2::imuBOSCH, embot::hw::BNO055::Register::DATASET_START, data, embot::common::time1second);
-    embot::hw::BNO055::read(embot::hw::bsp::strain2::imuBOSCH, embot::hw::BNO055::Register::DATASET_START, data, embot::common::time1second);
+    embot::hw::BNO055::read(embot::hw::bsp::strain2::imuBOSCH, embot::hw::BNO055::Register::DATASET_START, data, embot::core::time1second);    
+    embot::hw::BNO055::write(embot::hw::bsp::strain2::imuBOSCH, embot::hw::BNO055::Register::OPR_MODE, static_cast<std::uint8_t>(mode2use), embot::core::time1second);
+    embot::hw::BNO055::read(embot::hw::bsp::strain2::imuBOSCH, embot::hw::BNO055::Register::DATASET_START, data, embot::core::time1second);
+    embot::hw::BNO055::read(embot::hw::bsp::strain2::imuBOSCH, embot::hw::BNO055::Register::DATASET_START, data, embot::core::time1second);
     
     embot::hw::sys::delay(10*1000);
 #endif
@@ -652,21 +652,21 @@ void tests_tick()
     
 #if defined(TEST_HW_BNO055)
     
-    embot::common::Time starttime = embot::sys::timeNow();
-    embot::common::Time endtime = starttime;
+    embot::core::Time starttime = embot::sys::timeNow();
+    embot::core::Time endtime = starttime;
     
     std::uint8_t value = 0;
     std::uint8_t values[32] = {0};
     embot::utils::Data data;
     const int ntimes = 1000;
-    embot::common::Callback cbk(counter, nullptr);
+    embot::core::Callback cbk(counter, nullptr);
     
 #define MODE_DIRECT
     
     embot::hw::BNO055::Data datafull;
-    embot::common::Triple<float> acc;
-    embot::common::Triple<float> gyr;
-    embot::common::Triple<float> eul;
+    embot::core::Triple<float> acc;
+    embot::core::Triple<float> gyr;
+    embot::core::Triple<float> eul;
     std::uint8_t calibmag = 0;
     std::uint8_t calibacc = 0;
     int num = 0;
@@ -704,7 +704,7 @@ void tests_tick()
 
     endtime = embot::sys::timeNow();
     
-    static embot::common::Time delta = 0;
+    static embot::core::Time delta = 0;
     delta = endtime - starttime;
     delta = delta;
     num = num;   
@@ -717,13 +717,13 @@ void tests_tick()
     
 #if defined(TEST_HW_SI7051)
     
-    embot::common::Time starttime = embot::sys::timeNow();
-    embot::common::Time endtime = starttime;
+    embot::core::Time starttime = embot::sys::timeNow();
+    embot::core::Time endtime = starttime;
       
     embot::hw::SI7051::Temperature temp;    
 
     const int ntimes = 1000;
-    embot::common::Callback cbk(counter, nullptr);
+    embot::core::Callback cbk(counter, nullptr);
     int num = 0;
     for(int i=0; i<ntimes; i++)
     {
@@ -745,7 +745,7 @@ void tests_tick()
 
     endtime = embot::sys::timeNow();
     
-    static embot::common::Time delta = 0;
+    static embot::core::Time delta = 0;
     delta = endtime - starttime;
     delta = delta;
     num = num;
@@ -758,8 +758,8 @@ void tests_tick()
         
     adcdmadone_clr(nullptr);
     
-    embot::common::Time starttime = embot::sys::timeNow();
-    embot::common::Time endtime = starttime;
+    embot::core::Time starttime = embot::sys::timeNow();
+    embot::core::Time endtime = starttime;
     
     embot::hw::adc::start(embot::hw::adc::Port::one);
  

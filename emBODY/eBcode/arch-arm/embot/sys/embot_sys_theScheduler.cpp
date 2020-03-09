@@ -38,7 +38,7 @@
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
 // --------------------------------------------------------------------------------------------------------------------
 
-struct embot::sys::theScheduler::Impl
+struct embot::os::theScheduler::Impl
 { 
 
     Config config {};    
@@ -64,24 +64,24 @@ struct embot::sys::theScheduler::Impl
         cfg.tasknum = 0;
         // etc.
         cfg.extfn.usr_on_fatal_error = osalOnError;
-        cfg.extfn.usr_on_idle = osalIdleTask;
+        cfg.extfn.usr_on_idle = osalIdleThread;
     }
             
-    static void osalIdleTask(void)
+    static void osalIdleThread(void)
     {
-        embot::sys::theScheduler &thesystem = embot::sys::theScheduler::getInstance(); 
-        IdleTask &theidletask = embot::sys::IdleTask::getInstance();
-        const Task::fpStartup startup = thesystem.pImpl->config.behaviour.idleconfig.startup;
-        const Task::fpOnIdle onidle = thesystem.pImpl->config.behaviour.idleconfig.onidle;
+        embot::os::theScheduler &thesystem = embot::os::theScheduler::getInstance(); 
+        IdleThread &theidlethread = embot::os::IdleThread::getInstance();
+        const Thread::fpStartup startup = thesystem.pImpl->config.behaviour.idleconfig.startup;
+        const Thread::fpOnIdle onidle = thesystem.pImpl->config.behaviour.idleconfig.onidle;
         void * param = thesystem.pImpl->config.behaviour.idleconfig.param;
        
         // make sure the idletask is linked to the rtos
-        theidletask.synch();
+        theidlethread.synch();
 
         // exec the startup
         if(nullptr != startup)
         {
-            startup(&theidletask, param);
+            startup(&theidlethread, param);
         }
         
         // start the forever loop
@@ -89,7 +89,7 @@ struct embot::sys::theScheduler::Impl
         {
             if(nullptr != onidle)
             {
-                onidle(&theidletask, param);
+                onidle(&theidlethread, param);
             }
         }        
     }
@@ -97,7 +97,7 @@ struct embot::sys::theScheduler::Impl
     
     static void osalOnError(void* task, osal_fatalerror_t errorcode, const char * errormsg)
     {
-        embot::sys::theScheduler &thesystem = embot::sys::theScheduler::getInstance();   
+        embot::os::theScheduler &thesystem = embot::os::theScheduler::getInstance();   
         thesystem.pImpl->latesterrorcode = static_cast<int>(errorcode);
         thesystem.pImpl->latesterrorstring = errormsg;        
         thesystem.pImpl->config.behaviour.onOSerror.execute();            
@@ -108,10 +108,10 @@ struct embot::sys::theScheduler::Impl
                      
     static void osalLauncher(void) 
     {
-        embot::sys::InitTask &inittask = embot::sys::InitTask::getInstance();
+        embot::os::InitThread &inittask = embot::os::InitThread::getInstance();
         inittask.synch();
         
-        embot::sys::theScheduler &thesystem = embot::sys::theScheduler::getInstance();                
+        embot::os::theScheduler &thesystem = embot::os::theScheduler::getInstance();                
         if(nullptr != thesystem.pImpl->config.behaviour.initconfig.startup)
         {
             thesystem.pImpl->config.behaviour.initconfig.startup(&inittask, thesystem.pImpl->config.behaviour.initconfig.param);
@@ -173,22 +173,22 @@ struct embot::sys::theScheduler::Impl
 
 
 
-embot::sys::theScheduler& embot::sys::theScheduler::getInstance()
+embot::os::theScheduler& embot::os::theScheduler::getInstance()
 {
     static theScheduler* p = new theScheduler();
     return *p;
 }
 
-embot::sys::theScheduler::theScheduler()
+embot::os::theScheduler::theScheduler()
 {
     pImpl = std::make_unique<Impl>();
 }  
 
     
-embot::sys::theScheduler::~theScheduler() { }
+embot::os::theScheduler::~theScheduler() { }
 
 
-[[noreturn]] void embot::sys::theScheduler::start(const Config &config)
+[[noreturn]] void embot::os::theScheduler::start(const Config &config)
 {  
     if(true == started())
     {
@@ -197,17 +197,17 @@ embot::sys::theScheduler::~theScheduler() { }
     pImpl->start(config);
 }
 
-bool embot::sys::theScheduler::started() const
+bool embot::os::theScheduler::started() const
 {   
     return pImpl->started;
 }
 
-embot::common::relTime  embot::sys::theScheduler::ticktime() const
+embot::core::relTime  embot::os::theScheduler::ticktime() const
 {
     return pImpl->config.timing.ticktime;
 }
 
-embot::sys::Task * embot::sys::theScheduler::scheduledtask() const
+embot::os::Thread * embot::os::theScheduler::scheduledtask() const
 {
     if(false == pImpl->started)
     {
@@ -221,17 +221,17 @@ embot::sys::Task * embot::sys::theScheduler::scheduledtask() const
         return(nullptr);
     }
 
-    return reinterpret_cast<Task*>(osal_task_extdata_get(p));         
+    return reinterpret_cast<Thread*>(osal_task_extdata_get(p));         
 }
 
-const char * embot::sys::theScheduler::getOSerror(int &errorcode) const
+const char * embot::os::theScheduler::getOSerror(int &errorcode) const
 { 
     errorcode = pImpl->latesterrorcode;
     return pImpl->latesterrorstring; 
 }
 
 
-//embot::common::relTime embot::sys::theScheduler::getTick()
+//embot::core::relTime embot::os::theScheduler::getTick()
 //{
 //    return pImpl->osalConfig.tick;
 //}

@@ -22,9 +22,27 @@
 #ifndef _EMBOT_HW_H_
 #define _EMBOT_HW_H_
 
-#include "embot_common.h"
-
+#include "embot_core.h"
 #include "stm32hal.h"
+
+
+namespace embot { namespace hw {
+    
+    struct Config
+    {         
+        embot::core::fpWorker initmicrotime {nullptr};  
+        embot::core::fpGetU64 get1microtime {nullptr};         
+        
+        constexpr Config() = default;
+        constexpr Config(embot::core::fpWorker _init, embot::core::fpGetU64 _tmicro) : initmicrotime(_init), get1microtime(_tmicro) {}
+        bool isvalid() const { if(nullptr != get1microtime) { return true; } else { return false; } }
+    }; 
+            
+    bool initialised();
+    
+    // it calls the proper initialisations for stm32hal etc.
+    bool init(const Config &config);       
+}}
 
 
 namespace embot { namespace hw {

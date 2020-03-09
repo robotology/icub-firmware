@@ -62,14 +62,14 @@ namespace embot { namespace hw { namespace i2c {
     result_t init(I2C b, const Config &config)                                                      { return resNOK; }
           
     bool isbusy(embot::hw::I2C b) { return false; }   
-    bool isbusy(embot::hw::I2C b, embot::common::relTime timeout, embot::common::relTime &remaining) { return false; }   
+    bool isbusy(embot::hw::I2C b, embot::core::relTime timeout, embot::core::relTime &remaining) { return false; }   
     
-    bool ping(embot::hw::I2C b, ADR adr, embot::common::relTime timeout) { return false; }   
-    result_t transmit(embot::hw::I2C b, ADR adr, const embot::utils::Data &content, embot::common::relTime timeout) { return resNOK; }           
-    result_t read(embot::hw::I2C b, ADR adr, REG reg, embot::utils::Data &destination, const embot::common::Callback &oncompletion) { return resNOK; }     
-    result_t read(embot::hw::I2C b, ADR adr, REG reg, embot::utils::Data &destination, embot::common::relTime timeout) { return resNOK; } 
-    result_t write(embot::hw::I2C b, ADR adr, REG reg, const embot::utils::Data &content, const embot::common::Callback &oncompletion) { return resNOK; } 
-    result_t write(embot::hw::I2C b, ADR adr, REG reg, const embot::utils::Data &content, embot::common::relTime timeout) { return resNOK; }         
+    bool ping(embot::hw::I2C b, ADR adr, embot::core::relTime timeout) { return false; }   
+    result_t transmit(embot::hw::I2C b, ADR adr, const embot::core::Data &content, embot::core::relTime timeout) { return resNOK; }           
+    result_t read(embot::hw::I2C b, ADR adr, REG reg, embot::core::Data &destination, const embot::core::Callback &oncompletion) { return resNOK; }     
+    result_t read(embot::hw::I2C b, ADR adr, REG reg, embot::core::Data &destination, embot::core::relTime timeout) { return resNOK; } 
+    result_t write(embot::hw::I2C b, ADR adr, REG reg, const embot::core::Data &content, const embot::core::Callback &oncompletion) { return resNOK; } 
+    result_t write(embot::hw::I2C b, ADR adr, REG reg, const embot::core::Data &content, embot::core::relTime timeout) { return resNOK; }         
 
 }}} // namespace embot { namespace hw { namespace i2c {
 
@@ -88,7 +88,7 @@ namespace embot { namespace hw { namespace i2c {
 
     bool initialised(embot::hw::I2C p)
     {
-        return embot::binary::bit::check(initialisedmask, embot::common::tointegral(p));
+        return embot::core::binary::bit::check(initialisedmask, embot::core::tointegral(p));
     }    
  
      
@@ -97,12 +97,12 @@ namespace embot { namespace hw { namespace i2c {
         volatile bool ongoing;
         static constexpr uint8_t txbuffercapacity = 16;
         ADR addr;
-        embot::utils::Data recdata;
+        embot::core::Data recdata;
         std::uint8_t txbuffer[txbuffercapacity];
         std::uint8_t txbuffersize;
-        embot::common::Callback oncompletion;
+        embot::core::Callback oncompletion;
         void clear() { ongoing = false; addr = 0; recdata.clear(); oncompletion.clear(); std::memset(txbuffer, 0, sizeof(txbuffer)); txbuffersize = 0;} 
-//        bool loadtx(const embot::utils::Data &txdata) 
+//        bool loadtx(const embot::core::Data &txdata) 
 //        { 
 //            if(txdata.size >= txbuffercapacity) { return false; } 
 //            
@@ -111,9 +111,9 @@ namespace embot { namespace hw { namespace i2c {
     
     struct PrivateData
     {    
-        Config config[embot::common::tointegral(I2C::maxnumberof)];  
-        Transaction  transaction[embot::common::tointegral(I2C::maxnumberof)]; 
-        I2C_HandleTypeDef* handles[embot::common::tointegral(I2C::maxnumberof)];  
+        Config config[embot::core::tointegral(I2C::maxnumberof)];  
+        Transaction  transaction[embot::core::tointegral(I2C::maxnumberof)]; 
+        I2C_HandleTypeDef* handles[embot::core::tointegral(I2C::maxnumberof)];  
         //DMA_HandleTypeDef* handlesdmatx[static_cast<unsigned int>(I2C::maxnumberof)];   
         //DMA_HandleTypeDef* handlesdmarx[static_cast<unsigned int>(I2C::maxnumberof)];         
         PrivateData() { }
@@ -121,9 +121,9 @@ namespace embot { namespace hw { namespace i2c {
     
     static PrivateData s_privatedata;
     
-    static result_t s_read(I2C b, ADR adr, REG reg, embot::utils::Data &destination, const embot::common::Callback &oncompletion = embot::common::Callback(nullptr, nullptr));
-    static result_t s_write(I2C b, ADR adr, REG reg, const embot::utils::Data &content, const embot::common::Callback &oncompletion = embot::common::Callback(nullptr, nullptr));
-    static result_t s_wait(I2C b, embot::common::relTime timeout);
+    static result_t s_read(I2C b, ADR adr, REG reg, embot::core::Data &destination, const embot::core::Callback &oncompletion = embot::core::Callback(nullptr, nullptr));
+    static result_t s_write(I2C b, ADR adr, REG reg, const embot::core::Data &content, const embot::core::Callback &oncompletion = embot::core::Callback(nullptr, nullptr));
+    static result_t s_wait(I2C b, embot::core::relTime timeout);
     
 
     result_t init(I2C b, const Config &config)
@@ -140,7 +140,7 @@ namespace embot { namespace hw { namespace i2c {
         
         embot::hw::bsp::i2c::getBSP().init(b);
         
-        std::uint8_t index = embot::common::tointegral(b);
+        std::uint8_t index = embot::core::tointegral(b);
         s_privatedata.config[index] = config;
         s_privatedata.handles[index] = embot::hw::bsp::i2c::getBSP().getPROP(b)->handle;
         //s_privatedata.handlesdmatx[index] = embot::hw::bsp::i2c::getBSP().getPROP(b)->handledmatx);
@@ -149,26 +149,26 @@ namespace embot { namespace hw { namespace i2c {
         
 
         
-        embot::binary::bit::set(initialisedmask, embot::common::tointegral(b));
+        embot::core::binary::bit::set(initialisedmask, embot::core::tointegral(b));
                 
         return resOK;
     }
     
     
-    bool ping(I2C b, ADR adr, embot::common::relTime timeout)
+    bool ping(I2C b, ADR adr, embot::core::relTime timeout)
     {
         if(false == initialised(b))
         {
             return false;
         } 
           
-        embot::common::relTime remaining = timeout;
+        embot::core::relTime remaining = timeout;
         if(true == isbusy(b, timeout, remaining))
         {
             return false;
         }
         
-        std::uint8_t index = embot::common::tointegral(b);
+        std::uint8_t index = embot::core::tointegral(b);
         
         s_privatedata.transaction[index].ongoing = true;
                 
@@ -180,7 +180,7 @@ namespace embot { namespace hw { namespace i2c {
     }
 
     
-    result_t read(I2C b, ADR adr, REG reg, embot::utils::Data &destination, const embot::common::Callback &oncompletion)
+    result_t read(I2C b, ADR adr, REG reg, embot::core::Data &destination, const embot::core::Callback &oncompletion)
     {
         if(false == initialised(b))
         {
@@ -200,7 +200,7 @@ namespace embot { namespace hw { namespace i2c {
         return s_read(b, adr, reg, destination, oncompletion);
     }
     
-    result_t read(I2C b, ADR adr, REG reg, embot::utils::Data &destination, embot::common::relTime timeout)
+    result_t read(I2C b, ADR adr, REG reg, embot::core::Data &destination, embot::core::relTime timeout)
     {
         if(false == initialised(b))
         {
@@ -212,7 +212,7 @@ namespace embot { namespace hw { namespace i2c {
             return resNOK;
         }
         
-        embot::common::relTime remaining = timeout;       
+        embot::core::relTime remaining = timeout;       
         if(true == isbusy(b, timeout, remaining))
         {
             return resNOK;
@@ -228,7 +228,7 @@ namespace embot { namespace hw { namespace i2c {
     }
     
 
-    result_t write(I2C b, ADR adr, REG reg, const embot::utils::Data &content, const embot::common::Callback &oncompletion)
+    result_t write(I2C b, ADR adr, REG reg, const embot::core::Data &content, const embot::core::Callback &oncompletion)
     {
         if(false == initialised(b))
         {
@@ -249,7 +249,7 @@ namespace embot { namespace hw { namespace i2c {
     }    
 
 
-    result_t write(I2C b, ADR adr, REG reg, const embot::utils::Data &content, embot::common::relTime timeout)
+    result_t write(I2C b, ADR adr, REG reg, const embot::core::Data &content, embot::core::relTime timeout)
     {
         if(false == initialised(b))
         {
@@ -261,7 +261,7 @@ namespace embot { namespace hw { namespace i2c {
             return resNOK;
         }
         
-        embot::common::relTime remaining = timeout;
+        embot::core::relTime remaining = timeout;
         if(true == isbusy(b, timeout, remaining))
         {
             return resNOK;
@@ -285,11 +285,11 @@ namespace embot { namespace hw { namespace i2c {
             return false;
         } 
 
-        return s_privatedata.transaction[embot::common::tointegral(b)].ongoing;     
+        return s_privatedata.transaction[embot::core::tointegral(b)].ongoing;     
     }
 
     
-    bool isbusy(I2C b, embot::common::relTime timeout, embot::common::relTime &remaining)
+    bool isbusy(I2C b, embot::core::relTime timeout, embot::core::relTime &remaining)
     {
         if(false == initialised(b))
         {
@@ -299,16 +299,16 @@ namespace embot { namespace hw { namespace i2c {
         if(0 == timeout)
         {
             remaining = timeout;
-            return s_privatedata.transaction[embot::common::tointegral(b)].ongoing;   
+            return s_privatedata.transaction[embot::core::tointegral(b)].ongoing;   
         }
        
         
-        embot::common::Time deadline = embot::hw::bsp::now() + timeout;
+        embot::core::Time deadline = embot::core::now() + timeout;
         
         bool res = true;
         for(;;)
         {
-            std::int64_t rem = deadline - embot::hw::bsp::now();
+            std::int64_t rem = deadline - embot::core::now();
             
             if(rem <= 0)
             {   
@@ -316,9 +316,9 @@ namespace embot { namespace hw { namespace i2c {
                 res = true;
                 break;
             }
-            else if(false == s_privatedata.transaction[embot::common::tointegral(b)].ongoing)
+            else if(false == s_privatedata.transaction[embot::core::tointegral(b)].ongoing)
             {
-                remaining = static_cast<embot::common::relTime>(rem);
+                remaining = static_cast<embot::core::relTime>(rem);
                 res = false;   
                 break;                
             }
@@ -335,7 +335,7 @@ namespace embot { namespace hw { namespace i2c {
 //            return resNOK;
 //        } 
 //        
-//        std::uint8_t index = embot::common::tointegral(b);
+//        std::uint8_t index = embot::core::tointegral(b);
 //        
 //        embot::hw::i2c::s_privatedata.transaction[index].clear();
 //        
@@ -349,9 +349,9 @@ namespace embot { namespace hw { namespace i2c {
     }
     
     
-    static result_t s_wait(I2C b, embot::common::relTime timeout)
+    static result_t s_wait(I2C b, embot::core::relTime timeout)
     {
-        embot::common::Time start = embot::hw::bsp::now();
+        embot::core::Time start = embot::core::now();
         
         result_t res = resOK;
         for(;;)
@@ -361,7 +361,7 @@ namespace embot { namespace hw { namespace i2c {
                 break;
             }
             
-            if(embot::hw::bsp::now() > (start+timeout))
+            if(embot::core::now() > (start+timeout))
             {
                 res = resNOK;
                 break;
@@ -372,7 +372,7 @@ namespace embot { namespace hw { namespace i2c {
     }   
     
     
-    result_t transmit(embot::hw::I2C b, ADR adr, const embot::utils::Data &content, embot::common::relTime timeout)
+    result_t transmit(embot::hw::I2C b, ADR adr, const embot::core::Data &content, embot::core::relTime timeout)
     {
         if(false == initialised(b))
         {
@@ -384,7 +384,7 @@ namespace embot { namespace hw { namespace i2c {
             return resNOK;
         }
         
-        std::uint8_t index = embot::common::tointegral(b);     
+        std::uint8_t index = embot::core::tointegral(b);     
         
         embot::hw::i2c::s_privatedata.transaction[index].ongoing = true; 
        
@@ -395,9 +395,9 @@ namespace embot { namespace hw { namespace i2c {
         return (HAL_OK == r) ? resOK : resNOK;
     }
     
-    static result_t s_write(I2C b, ADR adr, REG reg, const embot::utils::Data &content, const embot::common::Callback &oncompletion)
+    static result_t s_write(I2C b, ADR adr, REG reg, const embot::core::Data &content, const embot::core::Callback &oncompletion)
     {   
-        std::uint8_t index = embot::common::tointegral(b);        
+        std::uint8_t index = embot::core::tointegral(b);        
         s_privatedata.transaction[index].addr = adr;
         s_privatedata.transaction[index].oncompletion = oncompletion;
         s_privatedata.transaction[index].ongoing = true;
@@ -430,11 +430,11 @@ namespace embot { namespace hw { namespace i2c {
         return (HAL_OK == r) ? resOK : resNOK;
     }    
     
-    static result_t s_read(I2C b, ADR adr, REG reg, embot::utils::Data &destination, const embot::common::Callback &oncompletion)
+    static result_t s_read(I2C b, ADR adr, REG reg, embot::core::Data &destination, const embot::core::Callback &oncompletion)
     {
         result_t res = resNOK;
         
-        std::uint8_t index = embot::common::tointegral(b);
+        std::uint8_t index = embot::core::tointegral(b);
         s_privatedata.transaction[index].addr = adr;
         s_privatedata.transaction[index].oncompletion = oncompletion;
         s_privatedata.transaction[index].ongoing = true;
