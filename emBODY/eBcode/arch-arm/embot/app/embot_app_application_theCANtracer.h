@@ -22,9 +22,7 @@
 #define _EMBOT_APP_THECANTRACER_H_
 
 #include "embot_core.h"
-#include "embot_hw.h"
-#include "embot_sys.h"
-#include "embot_app_canprotocol.h"
+#include "embot_prot_can.h"
 #include <memory>
 
 

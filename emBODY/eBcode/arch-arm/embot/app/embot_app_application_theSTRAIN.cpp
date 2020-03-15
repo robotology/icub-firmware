@@ -34,10 +34,9 @@
 
 #include "stm32hal.h"
 
-#include "embot.h"
 #include "embot_core.h"
-#include "embot_utils.h"
-#include "embot_binary.h"
+#include "embot_core_utils.h"
+#include "embot_core_binary.h"
 #include "embot_dsp.h"
 
 #include "embot_hw.h"
@@ -50,10 +49,10 @@
 #include "embot_hw_sys.h"
 
 
-#include "embot_sys_Timer.h"
-#include "embot_sys_Action.h"
+#include "embot_os_Timer.h"
+#include "embot_os_Action.h"
 
-#include "embot_app_canprotocol.h"
+#include "embot_prot_can.h"
 
 #include "embot_app_theCANboardInfo.h"
 #include "embot_app_theStorage.h"

@@ -27,7 +27,7 @@
 #include <initializer_list>
 #include <memory>
 
-#include "embot_binary.h"
+#include "embot_core_binary.h"
 
 #include <bitset>
 

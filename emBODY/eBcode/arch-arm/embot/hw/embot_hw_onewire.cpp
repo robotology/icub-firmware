@@ -31,7 +31,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "stm32hal.h"
-#include "embot_sys.h"
+#include "embot_core.h"
 #include "embot_hw_timer.h"
 #include "embot_hw_bsp.h"
 #include "embot_hw_bsp_config.h"
@@ -40,7 +40,7 @@
 
 using namespace std;
 
-#include "embot_binary.h"
+#include "embot_core_binary.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++

@@ -29,9 +29,9 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "embot_sys_theScheduler.h"
-#include "embot_sys_theTimerManager.h"
-#include "embot_sys_theCallbackManager.h"
+#include "embot_os_theScheduler.h"
+#include "embot_os_theTimerManager.h"
+#include "embot_os_theCallbackManager.h"
 
 #include "embot_hw.h"
 #include "embot_hw_sys.h"

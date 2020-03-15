@@ -26,11 +26,11 @@
 
 #include "embot_core.h"
 #include "embot_hw.h"
-#include "embot_sys.h"
-#include "embot_sys_Task.h"
-#include "embot_app_canprotocol.h"
-#include "embot_app_canprotocol_analog_polling.h"
-#include "embot_app_canprotocol_analog_periodic.h"
+#include "embot_os.h"
+#include "embot_os_Thread.h"
+#include "embot_prot_can.h"
+#include "embot_prot_can_analog_polling.h"
+#include "embot_prot_can_analog_periodic.h"
 #include "embot_hw_tlv493d.h"
 #include <array>
 #include <memory>

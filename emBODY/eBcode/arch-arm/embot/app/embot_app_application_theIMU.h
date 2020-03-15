@@ -22,7 +22,7 @@
 #define _EMBOT_APP_APPLICATION_THEIMU_H_
 
 #include "embot_core.h"
-#include "embot_sys_task.h"
+#include "embot_os_Thread.h"
 #include "embot_app_application_theCANparserIMU.h"
 #include "embot_hw_bno055.h"
 #include <vector>
@@ -40,9 +40,9 @@ namespace embot { namespace app { namespace application {
         {
             embot::hw::BNO055           sensor;
             embot::hw::bno055::Config   sensorconfig;
-            embot::os::Event        tickevent;
-            embot::os::Event        datareadyevent;
-            embot::os::Thread*           totask;
+            embot::os::Event            tickevent;
+            embot::os::Event            datareadyevent;
+            embot::os::Thread*          totask;
             Config() :  
                 sensor(embot::hw::BNO055::one), 
                 sensorconfig(embot::hw::bno055::Config(embot::hw::i2c::Descriptor(embot::hw::I2C::two, 400000))), 

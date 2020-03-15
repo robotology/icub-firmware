@@ -32,7 +32,7 @@ using namespace std;
 #include <array>
 #include <type_traits>
 #include <bitset>
-#include "embot_binary.h"
+#include "embot_core_binary.h"
 
 
 constexpr std::uint32_t numOfLedInApart = (static_cast<std::uint8_t>(HardwareConfig_numOf_t::ledsperTLC))*

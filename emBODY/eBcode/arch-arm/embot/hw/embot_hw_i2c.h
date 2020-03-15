@@ -23,7 +23,7 @@
 #define _EMBOT_HW_I2C_H_
 
 #include "embot_core.h"
-#include "embot_utils.h"
+#include "embot_core_utils.h"
 #include "embot_hw.h"
 
 

@@ -28,7 +28,7 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "embot_binary.h"
+#include "embot_core_binary.h"
 #include "stm32hal.h"
 //#include "stm32l4xx_hal_pcd.h"
 

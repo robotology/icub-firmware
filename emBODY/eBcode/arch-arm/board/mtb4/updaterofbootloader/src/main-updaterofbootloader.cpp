@@ -3,23 +3,25 @@
 
 #include "embot_app_theCANboardInfo.h"
 
-#include "embot.h"
 
 #include "embot_core.h"
-#include "embot_binary.h"
+#include "embot_core_binary.h"
 
 #include "stm32hal.h" // to see bsp_led_init etc
 
 #include "embot_hw.h"
 #include "embot_hw_can.h"
 #include "embot_hw_led.h"
+#include "embot_hw_sys.h"
 #include "embot_hw_flash.h"
 #include "embot_hw_FlashStorage.h"
+#include "embot_os.h"
+#include "embot_os_Thread.h"
 
 #include "embot_app_theBootloader.h"
 #include "embot_app_bootloader_theCANparser.h"
 
-#include "embot_app_canprotocol.h"
+#include "embot_prot_can.h"
 
 #include "embot_app_theLEDmanager.h"
 
@@ -64,14 +66,14 @@ int main(void)
 
 
 
-static void eventbasedtask_onevent(embot::os::Thread *t, embot::os::EventMask msk, void *p);
-static void eventbasedtask_init(embot::os::Thread *t, void *p);
+static void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask msk, void *p);
+static void eventbasedthread_init(embot::os::Thread *t, void *p);
 
 static const embot::os::Event evRXcanframe = 0x00000001;
 
-static embot::os::EventThread* eventbasedtask = nullptr;
+static embot::os::EventThread* eventbasedthread = nullptr;
 
-static void alerteventbasedtask(void *arg);
+static void alerteventbasedthread(void *arg);
 
 static std::vector<embot::prot::can::Frame> outframes;
 
@@ -94,18 +96,18 @@ static void bl_activity(void* param)
     canbrdinfo.synch(vAP, vCP);
         
   
-    // start task waiting for can messages.   
+    // start thread waiting for can messages.   
     const embot::core::relTime waitEventTimeout = 50*embot::core::time1millisec;    
     embot::os::EventThread::Config configEV;    
-    configEV.startup = eventbasedtask_init;
-    configEV.onevent = eventbasedtask_onevent;
+    configEV.startup = eventbasedthread_init;
+    configEV.onevent = eventbasedthread_onevent;
     configEV.param = nullptr;
     configEV.stacksize = 4*1024;
     configEV.priority = embot::os::Priority::high200;
     configEV.timeout = waitEventTimeout;
     
-    eventbasedtask = new embot::os::EventThread;
-    eventbasedtask->start(configEV);    
+    eventbasedthread = new embot::os::EventThread;
+    eventbasedthread->start(configEV);    
         
     // start canparser
     embot::app::bootloader::theCANparser &canparser = embot::app::bootloader::theCANparser::getInstance();
@@ -115,27 +117,27 @@ static void bl_activity(void* param)
     canparser.initialise(config);  
 
     // finally start can. i keep it as last because i dont want that the isr-handler calls its onrxframe() 
-    // before the eventbasedtask is created.
+    // before the eventbasedthread is created.
     embot::hw::result_t r = embot::hw::resNOK;
     embot::hw::can::Config canconfig; // default is tx/rxcapacity=8
     canconfig.txcapacity = 12;
-    canconfig.onrxframe = embot::core::Callback(alerteventbasedtask, nullptr); 
+    canconfig.onrxframe = embot::core::Callback(alerteventbasedthread, nullptr); 
     r = embot::hw::can::init(embot::hw::CAN::one, canconfig);
     r = embot::hw::can::setfilters(embot::hw::CAN::one, embot::app::theCANboardInfo::getInstance().getCANaddress());
     r = r;    
 }
 
 
-static void alerteventbasedtask(void *arg)
+static void alerteventbasedthread(void *arg)
 {
-    if(nullptr != eventbasedtask)
+    if(nullptr != eventbasedthread)
     {
-        eventbasedtask->setEvent(evRXcanframe);
+        eventbasedthread->setEvent(evRXcanframe);
     }
 }
 
 
-static void eventbasedtask_init(embot::os::Thread *t, void *p)
+static void eventbasedthread_init(embot::os::Thread *t, void *p)
 {
     embot::hw::result_t r = embot::hw::can::enable(embot::hw::CAN::one);  
     r = r;  
@@ -145,7 +147,7 @@ static void eventbasedtask_init(embot::os::Thread *t, void *p)
     
 
 
-static void eventbasedtask_onevent(embot::os::Thread *t, embot::os::EventMask msk, void *p)
+static void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask msk, void *p)
 {  
     
     if(true == embot::core::binary::mask::check(msk, evRXcanframe))
@@ -170,7 +172,7 @@ static void eventbasedtask_onevent(embot::os::Thread *t, embot::os::EventMask ms
 
             if(remaining > 0)
             {
-                eventbasedtask->setEvent(evRXcanframe);                 
+                eventbasedthread->setEvent(evRXcanframe);                 
             }
         }        
     }

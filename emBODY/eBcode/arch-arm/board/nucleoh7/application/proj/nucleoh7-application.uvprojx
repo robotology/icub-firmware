@@ -413,19 +413,19 @@
           <GroupName>embot-core</GroupName>
           <Files>
             <File>
-              <FileName>embot_common.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\embot\common\embot_common.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_binary.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\embot\binary\embot_binary.cpp</FilePath>
-            </File>
-            <File>
               <FileName>embot_core.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\embot\common\embot_core.cpp</FilePath>
+              <FilePath>..\..\..\..\embot\core\embot_core.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_core_binary.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\core\embot_core_binary.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_core_utils.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\core\embot_core_utils.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -893,7 +893,7 @@
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register</MiscControls>
               <Define>USE_STM32HAL STM32HAL_BOARD_NUCLEOH7 STM32HAL_DRIVER_V180</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\embot\common;..\..\..\..\embot\binary;..\..\..\..\embot\hw;..\..\..\..\libs\lowlevel\stm32hal\api</IncludePath>
+              <IncludePath>..\..\..\..\embot\core;..\..\..\..\embot\hw;..\..\..\..\libs\lowlevel\stm32hal\api</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -968,19 +968,19 @@
           <GroupName>embot-core</GroupName>
           <Files>
             <File>
-              <FileName>embot_common.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\embot\common\embot_common.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_binary.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\embot\binary\embot_binary.cpp</FilePath>
-            </File>
-            <File>
               <FileName>embot_core.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\embot\common\embot_core.cpp</FilePath>
+              <FilePath>..\..\..\..\embot\core\embot_core.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_core_binary.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\core\embot_core_binary.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_core_utils.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\core\embot_core_utils.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1574,19 +1574,19 @@
           <GroupName>embot-core</GroupName>
           <Files>
             <File>
-              <FileName>embot_common.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\embot\common\embot_common.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_binary.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\embot\binary\embot_binary.cpp</FilePath>
-            </File>
-            <File>
               <FileName>embot_core.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\embot\common\embot_core.cpp</FilePath>
+              <FilePath>..\..\..\..\embot\core\embot_core.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_core_binary.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\core\embot_core_binary.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_core_utils.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\core\embot_core_utils.cpp</FilePath>
             </File>
           </Files>
         </Group>

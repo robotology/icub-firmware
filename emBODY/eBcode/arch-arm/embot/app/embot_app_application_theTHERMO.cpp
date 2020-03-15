@@ -29,16 +29,15 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "embot.h"
 #include "embot_core.h"
-#include "embot_binary.h"
+#include "embot_core_binary.h"
 
 #include <new>
-#include "embot_sys_Timer.h"
-#include "embot_sys_Action.h"
+#include "embot_os_Timer.h"
+#include "embot_os_Action.h"
 #include "embot_hw.h"
-#include "embot_app_canprotocol.h"
-#include "embot_app_canprotocol_inertial_periodic.h"
+#include "embot_prot_can.h"
+#include "embot_prot_can_inertial_periodic.h"
 
 #include <cstdio>
 

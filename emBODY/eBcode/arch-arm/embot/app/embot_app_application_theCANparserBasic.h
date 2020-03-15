@@ -22,7 +22,7 @@
 #define _EMBOT_APP_APPLICATION_THECANPARSERBASIC_H_
 
 #include "embot_core.h"
-#include "embot_app_canprotocol.h"
+#include "embot_prot_can.h"
 #include <vector>
 #include <memory>
 

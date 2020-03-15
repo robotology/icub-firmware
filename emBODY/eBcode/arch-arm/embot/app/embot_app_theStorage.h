@@ -22,7 +22,6 @@
 #define _EMBOT_APP_THESTORAGE_H_
 
 #include "embot_core.h"
-#include "embot_sys.h"
 #include <memory>
 
 

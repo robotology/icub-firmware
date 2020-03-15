@@ -32,7 +32,7 @@
 #include <cstring>
 #include <vector>
 #include "stm32hal.h"
-#include "embot_binary.h"
+#include "embot_core_binary.h"
 #include "embot_hw_sys.h"
 #include "embot_hw_gpio.h"
 #include "embot_hw_bsp.h"

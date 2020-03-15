@@ -6,7 +6,7 @@
 */
 
 
-#include "embot_code_bootloader.h"
+#include "embot_app_skeleton_os_bootloader.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // bootloader info
@@ -24,7 +24,7 @@ constexpr embot::app::theCANboardInfo::bootloaderInfo btlInfo
 
 int main(void)
 { 
-    embot::code::bootloader::run(btlInfo);
+    embot::app::skeleton::os::bootloader::run(btlInfo);
     for(;;);    
 }
    

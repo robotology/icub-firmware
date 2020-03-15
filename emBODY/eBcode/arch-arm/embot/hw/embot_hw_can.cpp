@@ -31,7 +31,7 @@
 
 #include "stm32hal.h"
 
-#include "embot_binary.h"
+#include "embot_core_binary.h"
 #include "embot_hw_bsp.h"
 #include "embot_hw_bsp_config.h"
 #include "embot_hw_sys.h"

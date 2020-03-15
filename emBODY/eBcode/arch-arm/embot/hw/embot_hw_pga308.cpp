@@ -32,9 +32,9 @@
 
 using namespace std;
 
-#include "embot_binary.h"
+#include "embot_core_binary.h"
 #include "stm32hal.h"
-#include "embot_sys.h"
+#include "embot_core.h"
 #include "embot_hw.h"
 #include "embot_hw_bsp.h"
 #include "embot_hw_sys.h"

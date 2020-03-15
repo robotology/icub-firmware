@@ -23,7 +23,7 @@
 #define _EMBOT_HW_PGA308_H_
 
 #include "embot_core.h"
-#include "embot_binary.h"
+#include "embot_core_binary.h"
 #include "embot_hw.h"
 #include "embot_hw_onewire.h"
 #include "embot_hw_gpio.h"

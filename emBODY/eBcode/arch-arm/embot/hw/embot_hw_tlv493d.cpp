@@ -32,11 +32,11 @@
 #include <vector>
 #include "stm32hal.h"
 #include "embot_hw_bsp.h"
-#include "embot_utils.h"
+#include "embot_core_utils.h"
 
 using namespace std;
 
-#include "embot_binary.h"
+#include "embot_core_binary.h"
 #include "embot_hw_sys.h"
 #include "embot_hw_bsp_config.h"
 

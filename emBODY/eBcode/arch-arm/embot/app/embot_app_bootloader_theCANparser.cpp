@@ -29,16 +29,16 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "embot.h"
 #include "embot_core.h"
-#include "embot_binary.h"
+#include "embot_core_binary.h"
 #include <new>
 #include "embot_hw.h"
 #include "embot_hw_flash.h"
-#include "embot_app_canprotocol.h"
-#include "embot_app_canprotocol_bootloader.h"
-#include "embot_app_canprotocol_motor_polling.h"
-#include "embot_app_canprotocol_analog_polling.h"
+#include "embot_hw_can.h"
+#include "embot_prot_can.h"
+#include "embot_prot_can_bootloader.h"
+#include "embot_prot_can_motor_polling.h"
+#include "embot_prot_can_analog_polling.h"
 
 #include "embot_app_theBootloader.h"
 #include "embot_hw_FlashBurner.h"

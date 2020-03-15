@@ -541,7 +541,7 @@
 
   <Group>
     <GroupName>stm32hal</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -561,7 +561,7 @@
 
   <Group>
     <GroupName>stm32hal-config</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -592,8 +592,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\embot\common\embot_common.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_common.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\embot\core\embot_core.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_core.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -604,8 +604,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\embot\binary\embot_binary.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_binary.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\embot\core\embot_core_binary.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_core_binary.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -616,8 +616,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\embot\common\embot_core.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_core.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\embot\core\embot_core_utils.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_core_utils.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -625,7 +625,7 @@
 
   <Group>
     <GroupName>embot-hw</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>

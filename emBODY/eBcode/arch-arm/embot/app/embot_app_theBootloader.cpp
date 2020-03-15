@@ -30,13 +30,15 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "embot_app_theJumper.h"
-#include "embot_sys_Timer.h"
+#include "embot_os.h"
+#include "embot_os_Timer.h"
+#include "embot_os_theTimerManager.h"
+#include "embot_os_theCallbackManager.h"
+#include "embot_os_theScheduler.h"
 #include "embot_hw.h"
 #include "embot_hw_sys.h"
 #include "embot_hw_bsp.h"
 #include "embot_hw_flash.h"
-#include "embot.h"
-#include "osal.h"
 
 
 #include <new>

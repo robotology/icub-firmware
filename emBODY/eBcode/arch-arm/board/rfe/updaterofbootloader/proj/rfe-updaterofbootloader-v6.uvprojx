@@ -338,7 +338,7 @@
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register</MiscControls>
               <Define>USE_STM32HAL STM32HAL_BOARD_RFE STM32HAL_DRIVER_V183</Define>
               <Undefine></Undefine>
-              <IncludePath>..\src-plus;..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\eBcode\arch-arm\embot\common;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\sys;..\..\..\..\..\..\eBcode\arch-arm\embot;..\src\others;..\..\..\..\..\..\eBcode\arch-arm\embot\tools;..\..\..\..\..\..\eBcode\arch-arm\embot\binary;..\..\..\..\..\..\eBcode\arch-arm\embot\dsp;..\src\bosch-driver;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\src\STM32_USB_Device_Library\Class\CDC\Inc;..\src\STM32_USB_Device_Library\Core\Inc;..\src\usb_user;..\..\..\..\libs\lowlevel\stm32hal\src\driver\stm32l4-v183\inc-nonsiusa;..\src;..\..\..\..\libs\lowlevel\stm32hal\src\board\rfe\inc-nonisusa;..\src\faceExpressions</IncludePath>
+              <IncludePath>..\src-plus;..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\eBcode\arch-arm\embot\core;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\os;..\..\..\..\..\..\eBcode\arch-arm\embot;..\src\others;..\..\..\..\..\..\eBcode\arch-arm\embot\tools;..\..\..\..\..\..\eBcode\arch-arm\embot\core;..\..\..\..\..\..\eBcode\arch-arm\embot\dsp;..\src\bosch-driver;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\src\STM32_USB_Device_Library\Class\CDC\Inc;..\src\STM32_USB_Device_Library\Core\Inc;..\src\usb_user;..\..\..\..\libs\lowlevel\stm32hal\src\driver\stm32l4-v183\inc-nonsiusa;..\src;..\..\..\..\libs\lowlevel\stm32hal\src\board\rfe\inc-nonisusa;..\src\faceExpressions;..\..\..\..\embot\prot\can;..\..\..\..\embot\app\skeleton</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -428,34 +428,29 @@
           <GroupName>embot</GroupName>
           <Files>
             <File>
-              <FileName>embot_sys_Action.cpp</FileName>
+              <FileName>embot_os_Action.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\embot\sys\embot_sys_Action.cpp</FilePath>
+              <FilePath>..\..\..\..\embot\os\embot_os_Action.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_binary.cpp</FileName>
+              <FileName>embot_core_binary.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\binary\embot_binary.cpp</FilePath>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\core\embot_core_binary.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_common.cpp</FileName>
+              <FileName>embot_os.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\common\embot_common.cpp</FilePath>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\os\embot_os.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_sys.cpp</FileName>
+              <FileName>embot_os_Thread.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\embot_sys.cpp</FilePath>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\os\embot_os_Thread.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_sys_Task.cpp</FileName>
+              <FileName>embot_os_theCallbackManager.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\embot_sys_Task.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_sys_theCallbackManager.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\embot_sys_theCallbackManager.cpp</FilePath>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\os\embot_os_theCallbackManager.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_app_theJumper.cpp</FileName>
@@ -463,19 +458,19 @@
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_theJumper.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_sys_theScheduler.cpp</FileName>
+              <FileName>embot_os_theScheduler.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\embot_sys_theScheduler.cpp</FilePath>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\os\embot_os_theScheduler.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_sys_theTimerManager.cpp</FileName>
+              <FileName>embot_os_theTimerManager.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\embot_sys_theTimerManager.cpp</FilePath>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\os\embot_os_theTimerManager.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_sys_Timer.cpp</FileName>
+              <FileName>embot_os_Timer.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\embot_sys_Timer.cpp</FilePath>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\os\embot_os_Timer.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_tools.cpp</FileName>
@@ -485,7 +480,7 @@
             <File>
               <FileName>embot_core.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\embot\common\embot_core.cpp</FilePath>
+              <FilePath>..\..\..\..\embot\core\embot_core.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -493,14 +488,14 @@
           <GroupName>embot-protocol</GroupName>
           <Files>
             <File>
-              <FileName>embot_app_canprotocol.cpp</FileName>
+              <FileName>embot_prot_can.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_canprotocol.cpp</FilePath>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\prot\can\embot_prot_can.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_app_canprotocol_bootloader.cpp</FileName>
+              <FileName>embot_prot_can_bootloader.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_canprotocol_bootloader.cpp</FilePath>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\prot\can\embot_prot_can_bootloader.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1051,7 +1046,7 @@
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register</MiscControls>
               <Define>USE_STM32HAL STM32HAL_BOARD_RFE STM32HAL_DRIVER_V183 APPL_TESTZEROOFFSET</Define>
               <Undefine></Undefine>
-              <IncludePath>..\src-plus;..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask;..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\eBcode\arch-arm\embot\common;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\sys;..\..\..\..\..\..\eBcode\arch-arm\embot;..\src\others;..\..\..\..\..\..\eBcode\arch-arm\embot\tools;..\..\..\..\..\..\eBcode\arch-arm\embot\binary;..\..\..\..\..\..\eBcode\arch-arm\embot\dsp;..\src\bosch-driver;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\src\STM32_USB_Device_Library\Class\CDC\Inc;..\src\STM32_USB_Device_Library\Core\Inc;..\src\usb_user;..\..\..\..\libs\lowlevel\stm32hal\src\driver\stm32l4-v183\inc-nonsiusa;..\src;..\..\..\..\libs\lowlevel\stm32hal\src\board\rfe\inc-nonisusa;..\src\faceExpressions</IncludePath>
+              <IncludePath>..\src-plus;..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask;..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\eBcode\arch-arm\embot\core;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\os;..\..\..\..\..\..\eBcode\arch-arm\embot;..\src\others;..\..\..\..\..\..\eBcode\arch-arm\embot\tools;..\..\..\..\..\..\eBcode\arch-arm\embot\core;..\..\..\..\..\..\eBcode\arch-arm\embot\dsp;..\src\bosch-driver;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\src\STM32_USB_Device_Library\Class\CDC\Inc;..\src\STM32_USB_Device_Library\Core\Inc;..\src\usb_user;..\..\..\..\libs\lowlevel\stm32hal\src\driver\stm32l4-v183\inc-nonsiusa;..\src;..\..\..\..\libs\lowlevel\stm32hal\src\board\rfe\inc-nonisusa;..\src\faceExpressions</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1141,34 +1136,29 @@
           <GroupName>embot</GroupName>
           <Files>
             <File>
-              <FileName>embot_sys_Action.cpp</FileName>
+              <FileName>embot_os_Action.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\embot\sys\embot_sys_Action.cpp</FilePath>
+              <FilePath>..\..\..\..\embot\os\embot_os_Action.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_binary.cpp</FileName>
+              <FileName>embot_core_binary.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\binary\embot_binary.cpp</FilePath>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\core\embot_core_binary.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_common.cpp</FileName>
+              <FileName>embot_os.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\common\embot_common.cpp</FilePath>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\os\embot_os.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_sys.cpp</FileName>
+              <FileName>embot_os_Thread.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\embot_sys.cpp</FilePath>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\os\embot_os_Thread.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_sys_Task.cpp</FileName>
+              <FileName>embot_os_theCallbackManager.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\embot_sys_Task.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>embot_sys_theCallbackManager.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\embot_sys_theCallbackManager.cpp</FilePath>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\os\embot_os_theCallbackManager.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_app_theJumper.cpp</FileName>
@@ -1176,19 +1166,19 @@
               <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_theJumper.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_sys_theScheduler.cpp</FileName>
+              <FileName>embot_os_theScheduler.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\embot_sys_theScheduler.cpp</FilePath>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\os\embot_os_theScheduler.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_sys_theTimerManager.cpp</FileName>
+              <FileName>embot_os_theTimerManager.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\embot_sys_theTimerManager.cpp</FilePath>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\os\embot_os_theTimerManager.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_sys_Timer.cpp</FileName>
+              <FileName>embot_os_Timer.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\embot_sys_Timer.cpp</FilePath>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\os\embot_os_Timer.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_tools.cpp</FileName>
@@ -1198,7 +1188,7 @@
             <File>
               <FileName>embot_core.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\embot\common\embot_core.cpp</FilePath>
+              <FilePath>..\..\..\..\embot\core\embot_core.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1206,14 +1196,14 @@
           <GroupName>embot-protocol</GroupName>
           <Files>
             <File>
-              <FileName>embot_app_canprotocol.cpp</FileName>
+              <FileName>embot_prot_can.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_canprotocol.cpp</FilePath>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\prot\can\embot_prot_can.cpp</FilePath>
             </File>
             <File>
-              <FileName>embot_app_canprotocol_bootloader.cpp</FileName>
+              <FileName>embot_prot_can_bootloader.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_canprotocol_bootloader.cpp</FilePath>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\prot\can\embot_prot_can_bootloader.cpp</FilePath>
             </File>
           </Files>
         </Group>

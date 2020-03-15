@@ -43,7 +43,7 @@
 #include "embot_hw_tlv493d.h"
 #include "embot_hw_sys.h"
 
-#include "embot_binary.h"
+#include "embot_core_binary.h"
 #include "embot_core.h"
 
 

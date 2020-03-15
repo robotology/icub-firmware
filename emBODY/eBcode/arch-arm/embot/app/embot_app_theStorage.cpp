@@ -23,9 +23,6 @@
 
 #include "embot_app_theStorage.h"
 
-#include "embot.h"
-
-#include <cstring>
 
 
 
@@ -33,10 +30,9 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
+#include <cstring>
 #include "embot_hw_FlashStorage.h"
-//#include "embot_sys_theStorage.h"
 #include "embot_hw.h"
-#include "embot_hw_sys.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -55,9 +51,7 @@ struct embot::app::theStorage::Impl
         pageaddress = 0;        
         pagesize = 0;        
         flashstorage = nullptr; 
-        std::memset(buffer, 0, sizeof(buffer));
-//        embot::os::theStorage &thestrg = embot::os::theStorage::getInstance();
-//        thestrg.init(flashstorage);    
+        std::memset(buffer, 0, sizeof(buffer)); 
     }
 };
 

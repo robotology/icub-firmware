@@ -22,9 +22,9 @@
 #define _EMBOT_APP_THEAPPLICATION_H_
 
 #include "embot_core.h"
-#include "embot_sys.h"
-#include "embot_sys_theScheduler.h"
-#include "embot_sys_task.h"
+#include "embot_os.h"
+#include "embot_os_theScheduler.h"
+#include "embot_os_Thread.h"
 #include <memory>
 
 

@@ -6,7 +6,7 @@
 */
 
 
-#include "embot_code_updaterofbootloader.h"
+#include "embot_app_skeleton_os_updaterofbootloader.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // application info
@@ -21,7 +21,7 @@ constexpr embot::app::theCANboardInfo::applicationInfo appInfo
 
 int main(void)
 { 
-    embot::code::updaterofbootloader::run(appInfo);
+    embot::app::skeleton::os::updaterofbootloader::run(appInfo);
     for(;;);    
 }
    

@@ -22,7 +22,6 @@
 #define _EMBOT_APP_THEBOOTLOADER_H_
 
 #include "embot_core.h"
-#include "embot_sys.h"
 #include "embot_app_theJumper.h"
 #include <new>
 

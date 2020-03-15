@@ -31,7 +31,6 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "embot.h"
 #include <cstring>
 #include "embot_hw_FlashStorage.h"
 #include "embot_hw.h"

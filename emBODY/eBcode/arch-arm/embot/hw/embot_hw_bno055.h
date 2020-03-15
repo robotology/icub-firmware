@@ -23,8 +23,8 @@
 #define _EMBOT_HW_BNO055_H_
 
 #include "embot_core.h"
-#include "embot_utils.h"
-#include "embot_binary.h"
+#include "embot_core_utils.h"
+#include "embot_core_binary.h"
 #include "embot_hw.h"
 
 

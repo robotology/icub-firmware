@@ -23,8 +23,8 @@
 
 #include "embot_core.h"
 #include "embot_hw.h"
-#include "embot_sys.h"
-#include "embot_sys_task.h"
+#include "embot_os.h"
+#include "embot_os_Thread.h"
 #include "embot_hw_si7051.h"
 #include <vector>
 #include <memory>

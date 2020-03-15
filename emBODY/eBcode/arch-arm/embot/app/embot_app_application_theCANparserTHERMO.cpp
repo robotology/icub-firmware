@@ -30,9 +30,9 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include <new>
-#include "embot_app_canprotocol.h"
-#include "embot_app_canprotocol_analog_polling.h"
-#include "embot_app_canprotocol_analog_periodic.h"
+#include "embot_prot_can.h"
+#include "embot_prot_can_analog_polling.h"
+#include "embot_prot_can_analog_periodic.h"
 #include "embot_app_theCANboardInfo.h"
 
 

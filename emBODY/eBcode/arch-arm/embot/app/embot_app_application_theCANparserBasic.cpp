@@ -29,19 +29,19 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "embot_core.h"
-#include "embot_binary.h"
+#include "embot_core_binary.h"
 
 #include <new>
 
-#include "embot_hw.h"
-#include "embot_hw_sys.h"
-#include "embot_hw_can.h"
-#include "embot_app_canprotocol.h"
-#include "embot_app_canprotocol_bootloader.h"
-#include "embot_app_canprotocol_motor_periodic.h"
-#include "embot_app_canprotocol_motor_polling.h"
-#include "embot_app_canprotocol_analog_periodic.h"
-#include "embot_app_canprotocol_analog_polling.h"
+
+#include "embot_hw_sys.h" // to see embot::hw::sys::random() + embot::hw::sys::reset()
+#include "embot_hw_can.h" // to see only embot::hw::can::setfilters
+#include "embot_prot_can.h"
+#include "embot_prot_can_bootloader.h"
+#include "embot_prot_can_motor_periodic.h"
+#include "embot_prot_can_motor_polling.h"
+#include "embot_prot_can_analog_periodic.h"
+#include "embot_prot_can_analog_polling.h"
 
 #include "embot_app_theCANboardInfo.h"
 #include "embot_app_theJumper.h"

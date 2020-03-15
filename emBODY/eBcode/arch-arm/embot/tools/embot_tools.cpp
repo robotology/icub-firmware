@@ -125,28 +125,20 @@ struct embot::tools::Histogram::Impl
 
 struct embot::tools::PeriodValidator::Impl
 { 
-    std::uint64_t previous;
-    std::uint64_t delta;
-    std::uint64_t prevreport;
-    bool enabledReport;
-    bool enabledAlert;
-    bool usehisto;
+    embot::core::Time previous {0};
+    embot::core::Time delta {0};
+    embot::core::Time prevreport {0};
+    bool enabledReport {false};
+    bool enabledAlert {false};
+    bool usehisto {false};
     
-    Config configuration;
+    Config configuration {};
     
-    embot::tools::Histogram histo;
+    embot::tools::Histogram histo {};
 
 
-    Impl() 
-    { 
-        previous = 0;
-        delta = 0; 
-        prevreport = 0; 
-        enabledReport = false;
-        enabledAlert = false;  
-        
-        usehisto = false;             
-    }
+    Impl() = default;
+
     
     bool init(const Config &config)
     {
@@ -170,7 +162,7 @@ struct embot::tools::PeriodValidator::Impl
     
 
    
-    bool tick(std::uint64_t currtime_usec, std::uint64_t &deltatime_usec)
+    bool tick(embot::core::Time currtime_usec, embot::core::Time &deltatime_usec)
     {        
         if(0 == previous)
         {
@@ -228,7 +220,7 @@ struct embot::tools::PeriodValidator::Impl
     }
     
     
-    bool alert(std::uint64_t &deltatime_usec) const
+    bool alert(embot::core::Time &deltatime_usec) const
     {
         deltatime_usec = delta;          
         return enabledAlert;
@@ -417,9 +409,9 @@ bool embot::tools::PeriodValidator::init(const Config &config)
 }
 
 
-bool embot::tools::PeriodValidator::tick(std::uint64_t currtime_usec, std::uint64_t &deltatime_usec)
+bool embot::tools::PeriodValidator::tick(embot::core::Time currtime, embot::core::Time &deltatime)
 {
-    return pImpl->tick(currtime_usec, deltatime_usec);
+    return pImpl->tick(currtime, deltatime);
 }
 
 
@@ -429,9 +421,9 @@ bool embot::tools::PeriodValidator::reset()
 }
 
 
-bool embot::tools::PeriodValidator::alert(std::uint64_t &deltatime_usec) const
+bool embot::tools::PeriodValidator::alert(embot::core::Time &deltatime) const
 {
-    return pImpl->alert(deltatime_usec);
+    return pImpl->alert(deltatime);
 }
 
 bool embot::tools::PeriodValidator::report() const

@@ -31,12 +31,12 @@
 #include "embot_hw.h"
 #include "embot_hw_gpio.h"
 #include "embot_hw_bsp.h"
-#include "embot_binary.h"
-#include "embot_sys_Timer.h"
+#include "embot_core_binary.h"
+#include "embot_os_Timer.h"
 
-#include "embot_sys_theCallbackManager.h"
-#include "embot_sys_Timer.h"
-#include "embot_sys_Action.h"
+#include "embot_os_theCallbackManager.h"
+#include "embot_os_Timer.h"
+#include "embot_os_Action.h"
 
 #include <vector>
 #include <map>

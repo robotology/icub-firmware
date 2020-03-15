@@ -22,11 +22,7 @@
 #define _EMBOT_APP_BOOTLOADER_THECANPARSER_H_
 
 #include "embot_core.h"
-#include "embot_hw.h"
-#include "embot_hw_sys.h"
-#include "embot_hw_can.h"
-#include "embot_sys.h"
-#include "embot_app_canprotocol.h"
+#include "embot_prot_can.h"
 #include <memory>
 #include <vector>
 

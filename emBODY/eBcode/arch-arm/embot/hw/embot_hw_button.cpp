@@ -36,7 +36,7 @@
 #include <cstring>
 #include <vector>
 
-#include "embot_binary.h"
+#include "embot_core_binary.h"
 
 using namespace std;
 
