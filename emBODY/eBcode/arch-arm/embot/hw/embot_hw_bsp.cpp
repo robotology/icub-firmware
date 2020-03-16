@@ -1928,8 +1928,7 @@ namespace embot { namespace hw { namespace bsp { namespace bno055 {
                 
     #elif defined(STM32HAL_BOARD_NUCLEOH7)
     
-    #warning TBD: in BNO055 define the i2c address, poweron pin etc for NUCLEOH7
-    constexpr PROP prop01 { .i2caddress = 0x50, .boot = { embot::hw::GPIO::PORT::none, embot::hw::GPIO::PIN::none }, .reset = { embot::hw::GPIO::PORT::none, embot::hw::GPIO::PIN::none } }; 
+    constexpr PROP prop01 { .i2caddress = 0x52, .boot = { embot::hw::GPIO::PORT::none, embot::hw::GPIO::PIN::none }, .reset = { embot::hw::GPIO::PORT::none, embot::hw::GPIO::PIN::none } }; 
 
     constexpr BSP thebsp {        
         // maskofsupported
