@@ -29,9 +29,7 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "embot.h"
 #include <new>
-#include "embot_hw.h"
 #include "embot_app_theCANboardInfo.h"
 
 
@@ -50,11 +48,11 @@ struct embot::app::application::theCANparserIMU::Impl
         dummyCANagentIMU() {}
         virtual ~dummyCANagentIMU() {}
             
-        virtual bool set(const embot::app::canprotocol::analog::polling::Message_ACC_GYRO_SETUP::Info &info) { return true; }
-        virtual bool set(const embot::app::canprotocol::analog::polling::Message_IMU_CONFIG_SET::Info &info) { return true; }  
-        virtual bool set(const embot::app::canprotocol::analog::polling::Message_IMU_TRANSMIT::Info &info) { return true; } 
+        virtual bool set(const embot::prot::can::analog::polling::Message_ACC_GYRO_SETUP::Info &info) { return true; }
+        virtual bool set(const embot::prot::can::analog::polling::Message_IMU_CONFIG_SET::Info &info) { return true; }  
+        virtual bool set(const embot::prot::can::analog::polling::Message_IMU_TRANSMIT::Info &info) { return true; } 
     
-        virtual bool get(const embot::app::canprotocol::analog::polling::Message_IMU_CONFIG_GET::Info &info, embot::app::canprotocol::analog::polling::Message_IMU_CONFIG_GET::ReplyInfo &replyinfo) { return true; }                
+        virtual bool get(const embot::prot::can::analog::polling::Message_IMU_CONFIG_GET::Info &info, embot::prot::can::analog::polling::Message_IMU_CONFIG_GET::ReplyInfo &replyinfo) { return true; }                
     };
     
     dummyCANagentIMU dummyagent;
@@ -64,11 +62,11 @@ struct embot::app::application::theCANparserIMU::Impl
     bool txframe;
     bool recognised;
     
-    embot::app::canprotocol::Clas cls;
+    embot::prot::can::Clas cls;
     std::uint8_t cmd;    
 
         
-    embot::hw::can::Frame reply;
+    embot::prot::can::Frame reply;
     
 
     Impl() 
@@ -76,34 +74,34 @@ struct embot::app::application::theCANparserIMU::Impl
         config.agent = &dummyagent;        
         recognised = false;        
         txframe = false;
-        cls = embot::app::canprotocol::Clas::none;
+        cls = embot::prot::can::Clas::none;
         cmd = 0;              
     }
     
    
-    bool process(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);
+    bool process(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies);
     
-    bool process_set_accgyrosetup(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);
-    bool process_set_imu_config(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies); 
-    bool process_get_imu_config(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);    
-    bool process_imu_transmit(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);    
+    bool process_set_accgyrosetup(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies);
+    bool process_set_imu_config(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies); 
+    bool process_get_imu_config(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies);    
+    bool process_imu_transmit(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies);    
 };
 
 
-bool embot::app::application::theCANparserIMU::Impl::process(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
+bool embot::app::application::theCANparserIMU::Impl::process(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies)
 {
     txframe = false;
     recognised = false;
     
-    if(false == embot::app::canprotocol::frameis4board(frame, embot::app::theCANboardInfo::getInstance().cachedCANaddress()))
+    if(false == embot::prot::can::frameis4board(frame, embot::app::theCANboardInfo::getInstance().cachedCANaddress()))
     {
         recognised = false;
         return recognised;
     }
         
     // now get cls and cmd
-    cls = embot::app::canprotocol::frame2clas(frame);
-    cmd = embot::app::canprotocol::frame2cmd(frame);
+    cls = embot::prot::can::frame2clas(frame);
+    cmd = embot::prot::can::frame2cmd(frame);
     
     
     // the basic can handle only some messages ...
@@ -111,25 +109,25 @@ bool embot::app::application::theCANparserIMU::Impl::process(const embot::hw::ca
     switch(cls)
     {
         
-        case embot::app::canprotocol::Clas::pollingAnalogSensor:
+        case embot::prot::can::Clas::pollingAnalogSensor:
         {
             // only a few used for the inertials ...
-            if(static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::CMD::ACC_GYRO_SETUP) == cmd)
+            if(static_cast<std::uint8_t>(embot::prot::can::analog::polling::CMD::ACC_GYRO_SETUP) == cmd)
             { 
                 txframe = process_set_accgyrosetup(frame, replies);
                 recognised = true;                
             }
-            else if(static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::CMD::IMU_CONFIG_SET) == cmd)
+            else if(static_cast<std::uint8_t>(embot::prot::can::analog::polling::CMD::IMU_CONFIG_SET) == cmd)
             { 
                 txframe = process_set_imu_config(frame, replies);
                 recognised = true;                
             }
-            else if(static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::CMD::IMU_CONFIG_GET) == cmd)
+            else if(static_cast<std::uint8_t>(embot::prot::can::analog::polling::CMD::IMU_CONFIG_GET) == cmd)
             { 
                 txframe = process_get_imu_config(frame, replies);
                 recognised = true;                
             }
-            else if(static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::CMD::IMU_TRANSMIT) == cmd)
+            else if(static_cast<std::uint8_t>(embot::prot::can::analog::polling::CMD::IMU_TRANSMIT) == cmd)
             { 
                 txframe = process_imu_transmit(frame, replies);
                 recognised = true;                
@@ -151,32 +149,32 @@ bool embot::app::application::theCANparserIMU::Impl::process(const embot::hw::ca
 
 
 
-bool embot::app::application::theCANparserIMU::Impl::process_set_accgyrosetup(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
+bool embot::app::application::theCANparserIMU::Impl::process_set_accgyrosetup(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies)
 {
-    embot::app::canprotocol::analog::polling::Message_ACC_GYRO_SETUP msg;
+    embot::prot::can::analog::polling::Message_ACC_GYRO_SETUP msg;
     msg.load(frame);
     config.agent->set(msg.info);
     
     return msg.reply();        
 }
 
-bool embot::app::application::theCANparserIMU::Impl::process_set_imu_config(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
+bool embot::app::application::theCANparserIMU::Impl::process_set_imu_config(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies)
 {
-    embot::app::canprotocol::analog::polling::Message_IMU_CONFIG_SET msg;
+    embot::prot::can::analog::polling::Message_IMU_CONFIG_SET msg;
     msg.load(frame);
     config.agent->set(msg.info);
     
     return msg.reply();        
 }
 
-bool embot::app::application::theCANparserIMU::Impl::process_get_imu_config(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
+bool embot::app::application::theCANparserIMU::Impl::process_get_imu_config(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies)
 {
-    embot::app::canprotocol::analog::polling::Message_IMU_CONFIG_GET msg;
+    embot::prot::can::analog::polling::Message_IMU_CONFIG_GET msg;
     msg.load(frame);    
-    embot::app::canprotocol::analog::polling::Message_IMU_CONFIG_GET::ReplyInfo replyinfo;      
+    embot::prot::can::analog::polling::Message_IMU_CONFIG_GET::ReplyInfo replyinfo;      
     config.agent->get(msg.info, replyinfo);
 
-    embot::hw::can::Frame frame0;
+    embot::prot::can::Frame frame0;
     if(true == msg.reply(frame0, embot::app::theCANboardInfo::getInstance().cachedCANaddress(), replyinfo))
     {
         replies.push_back(frame0);
@@ -187,9 +185,9 @@ bool embot::app::application::theCANparserIMU::Impl::process_get_imu_config(cons
 }
   
 
-bool embot::app::application::theCANparserIMU::Impl::process_imu_transmit(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
+bool embot::app::application::theCANparserIMU::Impl::process_imu_transmit(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies)
 {
-    embot::app::canprotocol::analog::polling::Message_IMU_TRANSMIT msg;
+    embot::prot::can::analog::polling::Message_IMU_TRANSMIT msg;
     msg.load(frame);    
     config.agent->set(msg.info);
       
@@ -236,7 +234,7 @@ bool embot::app::application::theCANparserIMU::initialise(const Config &config)
   
 
 
-bool embot::app::application::theCANparserIMU::process(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
+bool embot::app::application::theCANparserIMU::process(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies)
 {    
     return pImpl->process(frame, replies);
 }

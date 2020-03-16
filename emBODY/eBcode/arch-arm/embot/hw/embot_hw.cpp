@@ -24,7 +24,6 @@
 #include "embot_hw.h"
 
 
-
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
@@ -33,25 +32,47 @@
 #include <cstring>
 #include <vector>
 
+#include "embot_core.h"
+
 using namespace std;
 
 
-// --------------------------------------------------------------------------------------------------------------------
-// - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
-// --------------------------------------------------------------------------------------------------------------------
-
-
-
-// --------------------------------------------------------------------------------------------------------------------
-// - all the rest
-// --------------------------------------------------------------------------------------------------------------------
-  
-
-
-
-
-
+namespace embot { namespace hw {
     
+    static bool initted = false; 
+    
+    bool initialised()
+    {
+        return initted;
+    }   
+        
+    static uint32_t _get1millitick()
+    {
+        return embot::core::now() / 1000;        
+    }
+
+    bool init(const Config &config)
+    {
+        if(true == embot::hw::initialised())
+        {
+            return true;
+        }
+                
+        // put whatwever is required for ...        
+        stm32hal_config_t cfg = {0};
+        cfg.tick1ms_init = config.initmicrotime;
+        cfg.tick1ms_get = _get1millitick;
+        
+        stm32hal_init(&cfg);
+        
+        embot::core::init({{nullptr, config.get1microtime}});
+        
+        initted = true;
+        return true;
+    }
+       
+}} // namespace embot { namespace hw {
+
 
 
 

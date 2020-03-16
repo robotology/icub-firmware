@@ -22,9 +22,9 @@
 #ifndef _EMBOT_HW_BNO055_H_
 #define _EMBOT_HW_BNO055_H_
 
-#include "embot_common.h"
-#include "embot_utils.h"
-#include "embot_binary.h"
+#include "embot_core.h"
+#include "embot_core_utils.h"
+#include "embot_core_binary.h"
 #include "embot_hw.h"
 
 
@@ -113,13 +113,13 @@ namespace embot { namespace hw { namespace bno055 {
     
     struct Data
     {   // it holds the Set::FULL lot
-        embot::utils::Triple<std::int16_t>     acc;    // acc.z = 9.8 means: horizontally placed 
-        embot::utils::Triple<std::int16_t>     mag;
-        embot::utils::Triple<std::int16_t>     gyr;
-        embot::utils::Triple<std::int16_t>     eul;    // eul.x = 0 means: directed towards NORTH
-        embot::utils::Quadruple<std::int16_t>  qua;
-        embot::utils::Triple<std::int16_t>     lia;
-        embot::utils::Triple<std::int16_t>     grv;
+        embot::core::utils::Triple<std::int16_t>     acc;    // acc.z = 9.8 means: horizontally placed 
+        embot::core::utils::Triple<std::int16_t>     mag;
+        embot::core::utils::Triple<std::int16_t>     gyr;
+        embot::core::utils::Triple<std::int16_t>     eul;    // eul.x = 0 means: directed towards NORTH
+        embot::core::utils::Quadruple<std::int16_t>  qua;
+        embot::core::utils::Triple<std::int16_t>     lia;
+        embot::core::utils::Triple<std::int16_t>     grv;
         std::uint8_t                            temperature;
         std::uint8_t                            calibstatus;
         std::uint8_t                            systemstatus;  
@@ -145,18 +145,18 @@ namespace embot { namespace hw { namespace bno055 {
             lia.load(&m[32]); grv.load(&m[38]);
             temperature = m[44]; calibstatus = m[45]; systemstatus = m[46];
         }
-        void getACC(embot::utils::Triple<float> &a) const { a.x = accRES * acc.x; a.y = accRES * acc.y; a.z = accRES * acc.z; }
-        void getMAG(embot::utils::Triple<float> &a) const { a.x = magRES * mag.x; a.y = magRES * mag.y; a.z = magRES * mag.z; }
-        void getGYR(embot::utils::Triple<float> &a) const { a.x = gyrRES * gyr.x; a.y = gyrRES * gyr.y; a.z = gyrRES * gyr.z; }            
-        void getEUL(embot::utils::Triple<float> &a) const { a.x = eulRES * eul.x; a.y = eulRES * eul.y; a.z = eulRES * eul.z; }
-        void getQUA(embot::utils::Quadruple<float> &a) const { a.w = quaRES * qua.w; a.x = quaRES * qua.x; a.y = quaRES * qua.y; a.z = quaRES * qua.z; }
-        void getLIA(embot::utils::Triple<float> &a) const { a.x = liaRES * lia.x; a.y = liaRES * lia.y; a.z = liaRES * lia.z; }
-        void getGRV(embot::utils::Triple<float> &a) const { a.x = grvRES * grv.x; a.y = grvRES * grv.y; a.z = grvRES * grv.z; }
+        void getACC(embot::core::utils::Triple<float> &a) const { a.x = accRES * acc.x; a.y = accRES * acc.y; a.z = accRES * acc.z; }
+        void getMAG(embot::core::utils::Triple<float> &a) const { a.x = magRES * mag.x; a.y = magRES * mag.y; a.z = magRES * mag.z; }
+        void getGYR(embot::core::utils::Triple<float> &a) const { a.x = gyrRES * gyr.x; a.y = gyrRES * gyr.y; a.z = gyrRES * gyr.z; }            
+        void getEUL(embot::core::utils::Triple<float> &a) const { a.x = eulRES * eul.x; a.y = eulRES * eul.y; a.z = eulRES * eul.z; }
+        void getQUA(embot::core::utils::Quadruple<float> &a) const { a.w = quaRES * qua.w; a.x = quaRES * qua.x; a.y = quaRES * qua.y; a.z = quaRES * qua.z; }
+        void getLIA(embot::core::utils::Triple<float> &a) const { a.x = liaRES * lia.x; a.y = liaRES * lia.y; a.z = liaRES * lia.z; }
+        void getGRV(embot::core::utils::Triple<float> &a) const { a.x = grvRES * grv.x; a.y = grvRES * grv.y; a.z = grvRES * grv.z; }
         void getTemperature(float &a) const { a = tmpRES * temperature; }
-        std::uint8_t calibrationOfACC() const { return(embot::binary::pair::get(calibstatus, 1)); } // 3 is ok, 1 is not calibrated
-        std::uint8_t calibrationOfGYR() const { return(embot::binary::pair::get(calibstatus, 2)); } // 3 is ok, 1 is not calibrated
-        std::uint8_t calibrationOfMAG() const { return(embot::binary::pair::get(calibstatus, 0)); } // 3 is ok, 1 is not calibrated
-        //std::uint8_t calibrationOfSYS() const { return(embot::binary::pair::get(calibstatus, 4)); } // 3 is ok, 1 is not calibrated BUT ALWAYS ZERO
+        std::uint8_t calibrationOfACC() const { return(embot::core::binary::pair::get(calibstatus, 1)); } // 3 is ok, 1 is not calibrated
+        std::uint8_t calibrationOfGYR() const { return(embot::core::binary::pair::get(calibstatus, 2)); } // 3 is ok, 1 is not calibrated
+        std::uint8_t calibrationOfMAG() const { return(embot::core::binary::pair::get(calibstatus, 0)); } // 3 is ok, 1 is not calibrated
+        //std::uint8_t calibrationOfSYS() const { return(embot::core::binary::pair::get(calibstatus, 4)); } // 3 is ok, 1 is not calibrated BUT ALWAYS ZERO
     };        
     
     
@@ -170,13 +170,13 @@ namespace embot { namespace hw { namespace bno055 {
     result_t init(BNO055 s, const Config &config);
     
     // after that init() returns resOK we can check if it is alive. we can specify a timeout
-    bool isalive(BNO055 s, embot::common::relTime timeout = 3*embot::common::time1millisec);
+    bool isalive(BNO055 s, embot::core::relTime timeout = 3*embot::core::time1millisec);
     
     // we can get info
-    result_t get(BNO055 s, Info &info, embot::common::relTime timeout = 3*embot::common::time1millisec);
+    result_t get(BNO055 s, Info &info, embot::core::relTime timeout = 3*embot::core::time1millisec);
     
     // we can now set a working mode. we can specify a timeout
-    result_t set(BNO055 s, Mode m, embot::common::relTime timeout = 3*embot::common::time1millisec);
+    result_t set(BNO055 s, Mode m, embot::core::relTime timeout = 3*embot::core::time1millisec);
     
     // we must check that nobody is using the sensor, maybe in non-blocking mode some time earlier
     bool isacquiring(BNO055 s);
@@ -186,9 +186,9 @@ namespace embot { namespace hw { namespace bno055 {
     
     // we start acquisition of a set.
     // if returns resOK, we know that acquisition is over if it is called oncompletion() or when operationdone() is true;
-    result_t acquisition(BNO055 s, Set set, const embot::common::Callback &oncompletion = embot::common::Callback(nullptr, nullptr));
+    result_t acquisition(BNO055 s, Set set, const embot::core::Callback &oncompletion = embot::core::Callback(nullptr, nullptr));
     
-    result_t acquisition(BNO055 s, Set set, Data &data, const embot::common::Callback &oncompletion = embot::common::Callback(nullptr, nullptr));
+    result_t acquisition(BNO055 s, Set set, Data &data, const embot::core::Callback &oncompletion = embot::core::Callback(nullptr, nullptr));
     
     // it tells if a previous operation (acquisition, read, write) is over
     bool operationdone(BNO055 s);
@@ -201,13 +201,13 @@ namespace embot { namespace hw { namespace bno055 {
     
     // we write a single byte into a register.
     // blocking or non-blocking mode. we check end of oepration either with operationdone() or with the execution of oncompletion().      
-    result_t write(BNO055 s, embot::hw::bno055::Register reg, std::uint8_t value, const embot::common::relTime timeout);
-    result_t write(BNO055 s, embot::hw::bno055::Register reg, std::uint8_t value, const embot::common::Callback &oncompletion = embot::common::Callback(nullptr, nullptr));
+    result_t write(BNO055 s, embot::hw::bno055::Register reg, std::uint8_t value, const embot::core::relTime timeout);
+    result_t write(BNO055 s, embot::hw::bno055::Register reg, std::uint8_t value, const embot::core::Callback &oncompletion = embot::core::Callback(nullptr, nullptr));
 
     // we read from register reg, for data.size positions and we place results into data.pointer (which MUST point to at least data.size bytes)
     // blocking or non-blocking mode. we check end of oepration either with operationdone() or with the execution of oncompletion().  
-    result_t read(BNO055 s, embot::hw::bno055::Register reg, embot::utils::Data &data, const embot::common::relTime timeout);
-    result_t read(BNO055 s, embot::hw::bno055::Register reg, embot::utils::Data &data, const embot::common::Callback &oncompletion = embot::common::Callback(nullptr, nullptr));
+    result_t read(BNO055 s, embot::hw::bno055::Register reg, embot::core::Data &data, const embot::core::relTime timeout);
+    result_t read(BNO055 s, embot::hw::bno055::Register reg, embot::core::Data &data, const embot::core::Callback &oncompletion = embot::core::Callback(nullptr, nullptr));
 
  
 }}} // namespace embot { namespace hw { namespace bno055 {

@@ -28,7 +28,7 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "embot_binary.h"
+#include "embot_core_binary.h"
 #include "stm32hal.h"
 //#include "stm32l4xx_hal_pcd.h"
 
@@ -134,7 +134,7 @@ namespace embot { namespace hw { namespace usb {
 
 
 using namespace embot::hw;
-using namespace embot::binary;
+using namespace embot::core::binary;
 
 
 static std::uint8_t usb::port2index(Port port)
@@ -227,7 +227,7 @@ result_t usb::init(Port p, const Config &config)
     s_rxQ = new std::vector<Message>;
     s_rxQ->reserve(config.rxcapacity);
     
-    embot::binary::bit::set(initialisedmask, port2index(p));
+    embot::core::binary::bit::set(initialisedmask, port2index(p));
 
     return resOK;
 

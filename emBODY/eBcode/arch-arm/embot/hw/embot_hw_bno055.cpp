@@ -32,7 +32,7 @@
 #include <cstring>
 #include <vector>
 #include "stm32hal.h"
-#include "embot_binary.h"
+#include "embot_core_binary.h"
 #include "embot_hw_sys.h"
 #include "embot_hw_gpio.h"
 #include "embot_hw_bsp.h"
@@ -58,18 +58,18 @@ namespace embot { namespace hw { namespace bno055 {
     bool supported(BNO055 s)                                                                        { return false; }
     bool initialised(BNO055 s)                                                                      { return false; }
     result_t init(BNO055 s, const Config &config)                                                   { return resNOK; }
-    bool isalive(BNO055 s, embot::common::relTime timeout)                                          { return false; }
-    result_t get(BNO055 s, Info &info, embot::common::relTime timeout)                              { return resNOK; }
-    result_t set(BNO055 s, Mode m, embot::common::relTime timeout)                                  { return resNOK; }
+    bool isalive(BNO055 s, embot::core::relTime timeout)                                          { return false; }
+    result_t get(BNO055 s, Info &info, embot::core::relTime timeout)                              { return resNOK; }
+    result_t set(BNO055 s, Mode m, embot::core::relTime timeout)                                  { return resNOK; }
     bool isacquiring(BNO055 s)                                                                      { return false; }
     bool canacquire(BNO055 s)                                                                       { return false; }
-    result_t acquisition(BNO055 s, Set set, const embot::common::Callback &oncompletion)            { return resNOK; }
+    result_t acquisition(BNO055 s, Set set, const embot::core::Callback &oncompletion)            { return resNOK; }
     bool operationdone(BNO055 s)                                                                    { return false; }
     result_t read(BNO055 s, Data &data)                                                             { return resNOK; }
-    result_t write(BNO055 s, embot::hw::bno055::Register reg, std::uint8_t value, const embot::common::relTime timeout){ return resNOK; }
-    result_t write(BNO055 s, embot::hw::bno055::Register reg, std::uint8_t value, const embot::common::Callback &oncompletion){ return resNOK; }
-    result_t read(BNO055 s, embot::hw::bno055::Register reg, embot::utils::Data &data, const embot::common::relTime timeout){ return resNOK; }
-    result_t read(BNO055 s, embot::hw::bno055::Register reg, embot::utils::Data &data, const embot::common::Callback &oncompletion){ return resNOK; }
+    result_t write(BNO055 s, embot::hw::bno055::Register reg, std::uint8_t value, const embot::core::relTime timeout){ return resNOK; }
+    result_t write(BNO055 s, embot::hw::bno055::Register reg, std::uint8_t value, const embot::core::Callback &oncompletion){ return resNOK; }
+    result_t read(BNO055 s, embot::hw::bno055::Register reg, embot::core::Data &data, const embot::core::relTime timeout){ return resNOK; }
+    result_t read(BNO055 s, embot::hw::bno055::Register reg, embot::core::Data &data, const embot::core::Callback &oncompletion){ return resNOK; }
     
 }}} // namespace embot { namespace hw { namespace BNO055 {
 
@@ -88,7 +88,7 @@ namespace embot { namespace hw { namespace bno055 {
     
     bool initialised(BNO055 s)
     {
-        return embot::binary::bit::check(initialisedmask, embot::common::tointegral(s));
+        return embot::core::binary::bit::check(initialisedmask, embot::core::tointegral(s));
     }     
 
     struct Acquisition
@@ -96,29 +96,29 @@ namespace embot { namespace hw { namespace bno055 {
         volatile bool done;
         volatile bool ongoing;
         std::uint8_t buffer[48];
-        embot::utils::Data data;
-        embot::common::Callback userdefCBK;  
+        embot::core::Data data;
+        embot::core::Callback userdefCBK;  
         Acquisition() { clear(); }
         void clear() { data.load(buffer, 0); done = false; ongoing = false; std::memset(buffer, 0, sizeof(buffer)); userdefCBK.clear(); }         
-        void startread(std::uint8_t size, const embot::common::Callback &cbk) { clear(); data.size = size; userdefCBK = cbk; ongoing = true; }
+        void startread(std::uint8_t size, const embot::core::Callback &cbk) { clear(); data.size = size; userdefCBK = cbk; ongoing = true; }
         void startread(std::uint8_t size) { clear(); data.size = size; ongoing = true; }
-        void startread(embot::utils::Data &da, const embot::common::Callback &cbk) { clear(); data = da; userdefCBK = cbk; ongoing = true; }
-        void startread(embot::utils::Data &da) { clear(); data = da; ongoing = true; }
+        void startread(embot::core::Data &da, const embot::core::Callback &cbk) { clear(); data = da; userdefCBK = cbk; ongoing = true; }
+        void startread(embot::core::Data &da) { clear(); data = da; ongoing = true; }
         void startwrite(std::uint8_t val) { clear(); buffer[0] = val; data.size = 1; ongoing = true; }
-        void startwrite(std::uint8_t val, const embot::common::Callback &cbk) { clear(); buffer[0] = val; data.size = 1; userdefCBK = cbk; ongoing = true; }
+        void startwrite(std::uint8_t val, const embot::core::Callback &cbk) { clear(); buffer[0] = val; data.size = 1; userdefCBK = cbk; ongoing = true; }
         void stop() { ongoing = false; done = true; userdefCBK.execute(); }
     };
     
     struct PrivateData
     {    
-        std::uint8_t i2caddress[embot::common::tointegral(BNO055::maxnumberof)];
-        Config config[embot::common::tointegral(BNO055::maxnumberof)];        
-        Acquisition acquisition[embot::common::tointegral(BNO055::maxnumberof)];
+        std::uint8_t i2caddress[embot::core::tointegral(BNO055::maxnumberof)];
+        Config config[embot::core::tointegral(BNO055::maxnumberof)];        
+        Acquisition acquisition[embot::core::tointegral(BNO055::maxnumberof)];
         PrivateData() { }
     };
     
     // power-on-reset wait time. 650 ms is enough, datasheet say, before the device can talk over i2c. but much better to be devil-compliant ;-).
-    static const embot::common::relTime PORtime = 666*embot::common::time1millisec;
+    static const embot::core::relTime PORtime = 666*embot::core::time1millisec;
     
 //    static const std::uint8_t i2caddress = 0x52;
 //    #if     defined(STM32HAL_BOARD_STRAIN2)
@@ -134,9 +134,9 @@ namespace embot { namespace hw { namespace bno055 {
     
     static PrivateData s_privatedata;
      
-    static void s_powerON(BNO055 s, embot::common::relTime waittime);    
-    static result_t s_programregister(BNO055 s, std::uint8_t reg, std::uint8_t val, embot::common::relTime timeout);    
-    static result_t s_writeregister(BNO055 s, std::uint8_t reg, std::uint8_t val, const embot::common::Callback &oncompletion);
+    static void s_powerON(BNO055 s, embot::core::relTime waittime);    
+    static result_t s_programregister(BNO055 s, std::uint8_t reg, std::uint8_t val, embot::core::relTime timeout);    
+    static result_t s_writeregister(BNO055 s, std::uint8_t reg, std::uint8_t val, const embot::core::Callback &oncompletion);
     static void s_sharedCBK(void *p);
     
             
@@ -158,13 +158,13 @@ namespace embot { namespace hw { namespace bno055 {
         // power on and wait until the i2c is working. datasheet say: POR time > 650 ms.
         s_powerON(s, PORtime);
         
-        std::uint8_t index = embot::common::tointegral(s);
+        std::uint8_t index = embot::core::tointegral(s);
         
                         
         // init i2c ..
         embot::hw::i2c::init(config.i2cdes.bus, config.i2cdes.config);
         
-        if(false == embot::hw::i2c::ping(config.i2cdes.bus, embot::hw::bsp::bno055::getBSP().getPROP(s)->i2caddress, 3*embot::common::time1millisec))
+        if(false == embot::hw::i2c::ping(config.i2cdes.bus, embot::hw::bsp::bno055::getBSP().getPROP(s)->i2caddress, 3*embot::core::time1millisec))
         {
             return resNOK;
         }
@@ -173,34 +173,34 @@ namespace embot { namespace hw { namespace bno055 {
         s_privatedata.acquisition[index].clear();
         s_privatedata.i2caddress[index] = embot::hw::bsp::bno055::getBSP().getPROP(s)->i2caddress;
         
-        embot::binary::bit::set(initialisedmask, embot::common::tointegral(s));
+        embot::core::binary::bit::set(initialisedmask, embot::core::tointegral(s));
                 
         return resOK;
     }
 
 
 
-    bool isalive(BNO055 s, embot::common::relTime timeout)
+    bool isalive(BNO055 s, embot::core::relTime timeout)
     {
         if(false == initialised(s))
         {
             return false;
         } 
-        std::uint8_t index = embot::common::tointegral(s);
+        std::uint8_t index = embot::core::tointegral(s);
         return embot::hw::i2c::ping(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], timeout);  
     }        
 
 
     
-    result_t get(BNO055 s, Info &info, embot::common::relTime timeout)
+    result_t get(BNO055 s, Info &info, embot::core::relTime timeout)
     {
-        embot::utils::Data data(&info, sizeof(info));
+        embot::core::Data data(&info, sizeof(info));
         result_t r = read(s, embot::hw::bno055::Register::CHIP_ID, data, timeout);  
         return r;        
     }
     
     
-    result_t set(BNO055 s, Mode m, embot::common::relTime timeout)
+    result_t set(BNO055 s, Mode m, embot::core::relTime timeout)
     { 
         if(false == initialised(s))
         {
@@ -223,7 +223,7 @@ namespace embot { namespace hw { namespace bno055 {
             return false;
         } 
 
-        std::uint8_t index = embot::common::tointegral(s);        
+        std::uint8_t index = embot::core::tointegral(s);        
         return s_privatedata.acquisition[index].ongoing;     
     }    
     
@@ -235,7 +235,7 @@ namespace embot { namespace hw { namespace bno055 {
             return false;
         } 
 
-        std::uint8_t index = embot::common::tointegral(s);  
+        std::uint8_t index = embot::core::tointegral(s);  
         
         if(true == s_privatedata.acquisition[index].ongoing)
         {
@@ -247,7 +247,7 @@ namespace embot { namespace hw { namespace bno055 {
     
     
     
-    result_t acquisition(BNO055 s, Set set, const embot::common::Callback &oncompletion)
+    result_t acquisition(BNO055 s, Set set, const embot::core::Callback &oncompletion)
     {        
         if(false == canacquire(s))
         {
@@ -258,34 +258,34 @@ namespace embot { namespace hw { namespace bno055 {
         const std::uint8_t nbytes = static_cast<std::uint8_t>(set);
         const Register reg = Register::DATASET_START;
         
-        std::uint8_t index = embot::common::tointegral(s);
+        std::uint8_t index = embot::core::tointegral(s);
         
         s_privatedata.acquisition[index].startread(nbytes, oncompletion); 
                        
         // now i trigger i2c.
-        embot::common::Callback cbk(s_sharedCBK, &s_privatedata.acquisition[index]);
+        embot::core::Callback cbk(s_sharedCBK, &s_privatedata.acquisition[index]);
         return embot::hw::i2c::read(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], static_cast<std::uint8_t>(reg), s_privatedata.acquisition[index].data, cbk);        
     } 
     
 
     
-    result_t acquisition(BNO055 s, Set set, Data &data, const embot::common::Callback &oncompletion)
+    result_t acquisition(BNO055 s, Set set, Data &data, const embot::core::Callback &oncompletion)
     {        
         if(false == canacquire(s))
         {
             return resNOK;
         }
         
-        std::uint8_t index = embot::common::tointegral(s);
+        std::uint8_t index = embot::core::tointegral(s);
         
         const std::uint8_t nbytes = static_cast<std::uint8_t>(set);        
         // ok, start a read of nbytes only (not all sizeof(data)) which will go into data
-        embot::utils::Data da(&data, nbytes);
+        embot::core::Data da(&data, nbytes);
                 
         s_privatedata.acquisition[index].startread(da, oncompletion); 
                        
         // now i trigger i2c.
-        embot::common::Callback cbk(s_sharedCBK, &s_privatedata.acquisition[index]);
+        embot::core::Callback cbk(s_sharedCBK, &s_privatedata.acquisition[index]);
         return embot::hw::i2c::read(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], static_cast<std::uint8_t>(Register::DATASET_START), s_privatedata.acquisition[index].data, cbk);        
     } 
     
@@ -297,7 +297,7 @@ namespace embot { namespace hw { namespace bno055 {
             return false;
         } 
 
-        return s_privatedata.acquisition[embot::common::tointegral(s)].done;        
+        return s_privatedata.acquisition[embot::core::tointegral(s)].done;        
     } 
 
     
@@ -313,24 +313,24 @@ namespace embot { namespace hw { namespace bno055 {
             return resNOK;
         }
         
-        std::uint8_t index = embot::common::tointegral(s);
+        std::uint8_t index = embot::core::tointegral(s);
         data.load(s_privatedata.acquisition[index].data.pointer);
         
         return resOK;   
     } 
 
 
-    result_t write(BNO055 s, embot::hw::bno055::Register reg, std::uint8_t value, const embot::common::relTime timeout)
+    result_t write(BNO055 s, embot::hw::bno055::Register reg, std::uint8_t value, const embot::core::relTime timeout)
     {
         if(false == initialised(s))
         {
             return resNOK;
         } 
         
-        std::uint8_t index = embot::common::tointegral(s);
+        std::uint8_t index = embot::core::tointegral(s);
         
         // i2c must not be used by another device (eg. termometer or ...).
-        embot::common::relTime remaining = timeout;
+        embot::core::relTime remaining = timeout;
         if(true == embot::hw::i2c::isbusy(s_privatedata.config[index].i2cdes.bus, timeout, remaining))
         {
             return resNOK;
@@ -347,14 +347,14 @@ namespace embot { namespace hw { namespace bno055 {
     }
 
     
-    result_t write(BNO055 s, embot::hw::bno055::Register reg, std::uint8_t value, const embot::common::Callback &oncompletion)
+    result_t write(BNO055 s, embot::hw::bno055::Register reg, std::uint8_t value, const embot::core::Callback &oncompletion)
     {
         if(false == initialised(s))
         {
             return resNOK;
         } 
 
-        std::uint8_t index = embot::common::tointegral(s);
+        std::uint8_t index = embot::core::tointegral(s);
 
         // i2c must not be busy
         if(true == embot::hw::i2c::isbusy(s_privatedata.config[index].i2cdes.bus))
@@ -372,17 +372,17 @@ namespace embot { namespace hw { namespace bno055 {
        
 
         
-    result_t read(BNO055 s, embot::hw::bno055::Register reg, embot::utils::Data &data, const embot::common::relTime timeout)
+    result_t read(BNO055 s, embot::hw::bno055::Register reg, embot::core::Data &data, const embot::core::relTime timeout)
     {
         if(false == initialised(s))
         {
             return resNOK;
         } 
 
-        std::uint8_t index = embot::common::tointegral(s);
+        std::uint8_t index = embot::core::tointegral(s);
         
         // i2c must not be used by another device (eg. termometer or ...).
-        embot::common::relTime remaining = timeout;
+        embot::core::relTime remaining = timeout;
         if(true == embot::hw::i2c::isbusy(s_privatedata.config[index].i2cdes.bus, timeout, remaining))
         {
             return resNOK;
@@ -405,14 +405,14 @@ namespace embot { namespace hw { namespace bno055 {
     }
 
     
-    result_t read(BNO055 s, embot::hw::bno055::Register reg, embot::utils::Data &data, const embot::common::Callback &oncompletion)
+    result_t read(BNO055 s, embot::hw::bno055::Register reg, embot::core::Data &data, const embot::core::Callback &oncompletion)
     {
         if(false == initialised(s))
         {
             return resNOK;
         } 
 
-        std::uint8_t index = embot::common::tointegral(s);
+        std::uint8_t index = embot::core::tointegral(s);
         
         // i2c must not be busy
         if(true == embot::hw::i2c::isbusy(s_privatedata.config[index].i2cdes.bus))
@@ -428,7 +428,7 @@ namespace embot { namespace hw { namespace bno055 {
         s_privatedata.acquisition[index].startread(data, oncompletion); 
                        
         // ok, now i trigger i2c.
-        embot::common::Callback cbk(s_sharedCBK, &s_privatedata.acquisition[index]);
+        embot::core::Callback cbk(s_sharedCBK, &s_privatedata.acquisition[index]);
         embot::hw::i2c::read(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], static_cast<std::uint8_t>(reg), s_privatedata.acquisition[index].data, cbk);
                 
         return resOK;        
@@ -442,7 +442,7 @@ namespace embot { namespace hw { namespace bno055 {
 //        embot::hw::gpio::set(gpioRESET, embot::hw::gpio::State::RESET);        
 //    }
     
-    static void s_powerON(BNO055 s, embot::common::relTime waittime)
+    static void s_powerON(BNO055 s, embot::core::relTime waittime)
     {        
         embot::hw::gpio::set(embot::hw::bsp::bno055::getBSP().getPROP(s)->boot, embot::hw::gpio::State::SET);
         embot::hw::gpio::set(embot::hw::bsp::bno055::getBSP().getPROP(s)->reset, embot::hw::gpio::State::SET);
@@ -450,18 +450,18 @@ namespace embot { namespace hw { namespace bno055 {
         embot::hw::sys::delay(waittime);         
     }
     
-//    static result_t s_programregister_safe(BNO055 s, std::uint8_t reg, std::uint8_t val, embot::common::relTime timeout)
+//    static result_t s_programregister_safe(BNO055 s, std::uint8_t reg, std::uint8_t val, embot::core::relTime timeout)
 //    {
-//        std::uint8_t index = embot::common::tointegral(s);   
-//        embot::utils::Data data(&val, 1);        
+//        std::uint8_t index = embot::core::tointegral(s);   
+//        embot::core::Data data(&val, 1);        
 //        result_t r = embot::hw::i2c::write(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], reg, data, timeout);                
 //        return r;
 //    }
 
     
-    static result_t s_programregister(BNO055 s, std::uint8_t reg, std::uint8_t val, embot::common::relTime timeout)
+    static result_t s_programregister(BNO055 s, std::uint8_t reg, std::uint8_t val, embot::core::relTime timeout)
     {
-        std::uint8_t index = embot::common::tointegral(s);   
+        std::uint8_t index = embot::core::tointegral(s);   
         s_privatedata.acquisition[index].startwrite(val);        
         result_t r = embot::hw::i2c::write(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], reg, s_privatedata.acquisition[index].data, timeout);  
         s_privatedata.acquisition[index].stop();        
@@ -469,11 +469,11 @@ namespace embot { namespace hw { namespace bno055 {
     }
     
     
-    static result_t s_writeregister(BNO055 s, std::uint8_t reg, std::uint8_t val, const embot::common::Callback &oncompletion)
+    static result_t s_writeregister(BNO055 s, std::uint8_t reg, std::uint8_t val, const embot::core::Callback &oncompletion)
     {
-        std::uint8_t index = embot::common::tointegral(s);   
+        std::uint8_t index = embot::core::tointegral(s);   
         s_privatedata.acquisition[index].startwrite(val, oncompletion);   
-        embot::common::Callback cbk(s_sharedCBK, &s_privatedata.acquisition[index]);        
+        embot::core::Callback cbk(s_sharedCBK, &s_privatedata.acquisition[index]);        
         result_t r = embot::hw::i2c::write(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], reg, s_privatedata.acquisition[index].data, cbk);  
       
         return r;

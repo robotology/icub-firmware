@@ -22,9 +22,9 @@
 #ifndef _EMBOT_HW_CAN_H_
 #define _EMBOT_HW_CAN_H_
 
-#include "embot_common.h"
+#include "embot_core.h"
 #include "embot_hw.h"
-
+#include<algorithm>
 
 namespace embot { namespace hw { namespace can {
     
@@ -35,15 +35,19 @@ namespace embot { namespace hw { namespace can {
         std::uint8_t        filler[3]   {0};
         std::uint8_t        data[8]     {0};  
         Frame() = default;
+        Frame(std::uint32_t i, std::uint8_t s, std::uint8_t *d) : id(i), size(std::max(s, static_cast<std::uint8_t>(8))) 
+        {
+            if(nullptr != d) { std::memmove(data, d, size); }
+        }
     };
         
     struct Config
     {
         std::uint8_t                txcapacity      {8};
         std::uint8_t                rxcapacity      {8};
-        embot::common::Callback     ontxframe       {nullptr, nullptr}; 
-        embot::common::Callback     txqueueempty    {nullptr, nullptr}; 
-        embot::common::Callback     onrxframe       {nullptr, nullptr};
+        embot::core::Callback     ontxframe       {nullptr, nullptr}; 
+        embot::core::Callback     txqueueempty    {nullptr, nullptr}; 
+        embot::core::Callback     onrxframe       {nullptr, nullptr};
         Config() = default;
     };
     

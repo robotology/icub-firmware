@@ -22,7 +22,7 @@
 #ifndef _EMBOT_HW_ONEWIRE_H_
 #define _EMBOT_HW_ONEWIRE_H_
 
-#include "embot_common.h"
+#include "embot_core.h"
 #include "embot_hw.h"
 #include "embot_hw_gpio.h"
 
@@ -65,7 +65,7 @@ namespace embot { namespace hw { namespace onewire {
     
     bool isrunning(embot::hw::ONEWIRE c);
     
-    result_t write(embot::hw::ONEWIRE c, std::uint8_t reg, std::uint16_t value, embot::common::relTime timeout = embot::common::timeWaitForever);
+    result_t write(embot::hw::ONEWIRE c, std::uint8_t reg, std::uint16_t value, embot::core::relTime timeout = embot::core::timeWaitForever);
  
 }}} // namespace embot { namespace hw { namespace onewire { 
 

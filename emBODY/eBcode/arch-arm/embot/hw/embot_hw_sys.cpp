@@ -163,12 +163,12 @@ namespace embot { namespace hw { namespace sys {
         SCB->VTOR = FLASH_BASE | (offset & (uint32_t)0x1FFFFF80);        
     }
 
-//    embot::common::Time now()
+//    embot::core::Time now()
 //    {
 //        return embot::hw::bsp::now();        
 //    }
 
-    void delay(embot::common::relTime t)
+    void delay(embot::core::relTime t)
     {   
         ss_delay(t);
     }

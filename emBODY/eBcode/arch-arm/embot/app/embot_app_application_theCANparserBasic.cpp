@@ -24,26 +24,24 @@
 #include "embot_app_application_theCANparserBasic.h"
 
 
-
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "embot.h"
-#include "embot_common.h"
-#include "embot_binary.h"
+#include "embot_core.h"
+#include "embot_core_binary.h"
 
 #include <new>
 
-#include "embot_hw.h"
-#include "embot_hw_sys.h"
-#include "embot_hw_can.h"
-#include "embot_app_canprotocol.h"
-#include "embot_app_canprotocol_bootloader.h"
-#include "embot_app_canprotocol_motor_periodic.h"
-#include "embot_app_canprotocol_motor_polling.h"
-#include "embot_app_canprotocol_analog_periodic.h"
-#include "embot_app_canprotocol_analog_polling.h"
+
+#include "embot_hw_sys.h" // to see embot::hw::sys::random() + embot::hw::sys::reset()
+#include "embot_hw_can.h" // to see only embot::hw::can::setfilters
+#include "embot_prot_can.h"
+#include "embot_prot_can_bootloader.h"
+#include "embot_prot_can_motor_periodic.h"
+#include "embot_prot_can_motor_polling.h"
+#include "embot_prot_can_analog_periodic.h"
+#include "embot_prot_can_analog_polling.h"
 
 #include "embot_app_theCANboardInfo.h"
 #include "embot_app_theJumper.h"
@@ -61,28 +59,28 @@ struct embot::app::application::theCANparserBasic::Impl
     bool txframe;
     bool recognised;
     
-    embot::app::canprotocol::Clas cls;
+    embot::prot::can::Clas cls;
     std::uint8_t cmd;
     
-    embot::app::canprotocol::versionOfCANPROTOCOL canprotocol;
-    embot::app::canprotocol::versionOfFIRMWARE version;
-    embot::app::canprotocol::Board board;
+    embot::prot::can::versionOfCANPROTOCOL canprotocol;
+    embot::prot::can::versionOfFIRMWARE version;
+    embot::prot::can::Board board;
     
 
     
-    embot::hw::can::Frame reply;
+    embot::prot::can::Frame reply;
     
 
     Impl() 
     {   
         recognised = false;        
         txframe = false;
-        cls = embot::app::canprotocol::Clas::none;
+        cls = embot::prot::can::Clas::none;
         cmd = 0;
         
         version.major = version.minor = version.build = 0;
         canprotocol.major = canprotocol.minor = 0;
-        board = embot::app::canprotocol::Board::unknown;               
+        board = embot::prot::can::Board::unknown;               
     }
     
     
@@ -109,7 +107,7 @@ struct embot::app::application::theCANparserBasic::Impl
             {
                 target = (embot::hw::sys::random()-embot::hw::sys::minrandom()) & 0xf;
                
-                if(false == embot::binary::bit::check(mask, target))
+                if(false == embot::core::binary::bit::check(mask, target))
                 {
                     ok = true;
                     break;                    
@@ -143,36 +141,36 @@ struct embot::app::application::theCANparserBasic::Impl
     }
     
     
-    bool process(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);
+    bool process(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies);
     
-    bool process_bl_broadcast_appl(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);  
-    bool process_bl_board_appl(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);    
-    bool process_bl_getadditionalinfo(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);
-    bool process_bl_setadditionalinfo(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);
-    bool process_bl_setcanaddress(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);
-    bool process_bl_gettimeoflife(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);
+    bool process_bl_broadcast_appl(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies);  
+    bool process_bl_board_appl(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies);    
+    bool process_bl_getadditionalinfo(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies);
+    bool process_bl_setadditionalinfo(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies);
+    bool process_bl_setcanaddress(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies);
+    bool process_bl_gettimeoflife(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies);
     
-    bool process_getfirmwareversion(const embot::app::canprotocol::Clas cl, const std::uint8_t cm, const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);    
-    bool process_setid(const embot::app::canprotocol::Clas cl, const std::uint8_t cm, const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);
+    bool process_getfirmwareversion(const embot::prot::can::Clas cl, const std::uint8_t cm, const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies);    
+    bool process_setid(const embot::prot::can::Clas cl, const std::uint8_t cm, const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies);
     
         
 };
 
 
-bool embot::app::application::theCANparserBasic::Impl::process(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
+bool embot::app::application::theCANparserBasic::Impl::process(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies)
 {
     txframe = false;
     recognised = false;
     
-    if(false == embot::app::canprotocol::frameis4board(frame, embot::app::theCANboardInfo::getInstance().cachedCANaddress()))
+    if(false == embot::prot::can::frameis4board(frame, embot::app::theCANboardInfo::getInstance().cachedCANaddress()))
     {
         recognised = false;
         return recognised;
     }
         
     // now get cls and cmd
-    cls = embot::app::canprotocol::frame2clas(frame);
-    cmd = embot::app::canprotocol::frame2cmd(frame);
+    cls = embot::prot::can::frame2clas(frame);
+    cmd = embot::prot::can::frame2cmd(frame);
     
 //    replies.clear(); i dont want to clear because we may have others inside which i dont want to lose
     
@@ -180,38 +178,38 @@ bool embot::app::application::theCANparserBasic::Impl::process(const embot::hw::
     
     switch(cls)
     {
-        case embot::app::canprotocol::Clas::bootloader:
+        case embot::prot::can::Clas::bootloader:
         {
             // only CMD::BROADCAST, CMD::BOARD, CMD::SETCANADDRESS,  CMD::GET_ADDITIONAL_INFO,  CMD::SET_ADDITIONAL_INFO 
 
-            if(static_cast<std::uint8_t>(embot::app::canprotocol::bootloader::CMD::BOARD) == cmd)
+            if(static_cast<std::uint8_t>(embot::prot::can::bootloader::CMD::BOARD) == cmd)
             {
                 txframe = process_bl_board_appl(frame, replies);   
                 recognised = true;
                 // then restart ...
                 embot::hw::sys::reset();
             }
-            else if(static_cast<std::uint8_t>(embot::app::canprotocol::bootloader::CMD::BROADCAST) == cmd)
+            else if(static_cast<std::uint8_t>(embot::prot::can::bootloader::CMD::BROADCAST) == cmd)
             {
                 txframe = process_bl_broadcast_appl(frame, replies);   
                 recognised = true;                
             }
-            else if(static_cast<std::uint8_t>(embot::app::canprotocol::bootloader::CMD::SETCANADDRESS) == cmd)
+            else if(static_cast<std::uint8_t>(embot::prot::can::bootloader::CMD::SETCANADDRESS) == cmd)
             {
                 txframe = process_bl_setcanaddress(frame, replies);  
                 recognised = true;                
             } 
-            else if(static_cast<std::uint8_t>(embot::app::canprotocol::bootloader::CMD::GET_ADDITIONAL_INFO) == cmd)
+            else if(static_cast<std::uint8_t>(embot::prot::can::bootloader::CMD::GET_ADDITIONAL_INFO) == cmd)
             {
                 txframe = process_bl_getadditionalinfo(frame, replies);   
                 recognised = true;                
             } 
-            else if(static_cast<std::uint8_t>(embot::app::canprotocol::bootloader::CMD::SET_ADDITIONAL_INFO) == cmd)
+            else if(static_cast<std::uint8_t>(embot::prot::can::bootloader::CMD::SET_ADDITIONAL_INFO) == cmd)
             {
                 txframe = process_bl_setadditionalinfo(frame, replies);
                 recognised = true;                
             }                     
-            else if(static_cast<std::uint8_t>(embot::app::canprotocol::bootloader::CMD::GET_TIMEOFLIFE) == cmd)
+            else if(static_cast<std::uint8_t>(embot::prot::can::bootloader::CMD::GET_TIMEOFLIFE) == cmd)
             {
                 txframe = process_bl_gettimeoflife(frame, replies);
                 recognised = true;                
@@ -220,15 +218,15 @@ bool embot::app::application::theCANparserBasic::Impl::process(const embot::hw::
         } break;
         
 
-        case embot::app::canprotocol::Clas::pollingAnalogSensor:
+        case embot::prot::can::Clas::pollingAnalogSensor:
         {
-            // only embot::app::canprotocol::analog::polling::CMD::SET_BOARD_ADX, GET_FIRMWARE_VERSION, ??
-            if(static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::CMD::SET_BOARD_ADX) == cmd)
+            // only embot::prot::can::analog::polling::CMD::SET_BOARD_ADX, GET_FIRMWARE_VERSION, ??
+            if(static_cast<std::uint8_t>(embot::prot::can::analog::polling::CMD::SET_BOARD_ADX) == cmd)
             {
                 txframe = process_setid(cls, cmd, frame, replies);
                 recognised = true;
             }
-            else if(static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::CMD::GET_FIRMWARE_VERSION) == cmd)
+            else if(static_cast<std::uint8_t>(embot::prot::can::analog::polling::CMD::GET_FIRMWARE_VERSION) == cmd)
             {
                 txframe = process_getfirmwareversion(cls, cmd, frame, replies);
                 recognised = true;
@@ -236,15 +234,15 @@ bool embot::app::application::theCANparserBasic::Impl::process(const embot::hw::
  
         } break;
 
-        case embot::app::canprotocol::Clas::pollingMotorControl:
+        case embot::prot::can::Clas::pollingMotorControl:
         {
-            // only embot::app::canprotocol::mcpollCMD::SET_BOARD_ID, GET_FIRMWARE_VERSION, ??
-            if(static_cast<std::uint8_t>(embot::app::canprotocol::motor::polling::CMD::SET_BOARD_ID) == cmd)
+            // only embot::prot::can::mcpollCMD::SET_BOARD_ID, GET_FIRMWARE_VERSION, ??
+            if(static_cast<std::uint8_t>(embot::prot::can::motor::polling::CMD::SET_BOARD_ID) == cmd)
             {
                 txframe = process_setid(cls, cmd, frame, replies);
                 recognised = true;
             }
-            else if(static_cast<std::uint8_t>(embot::app::canprotocol::motor::polling::CMD::GET_FIRMWARE_VERSION) == cmd)
+            else if(static_cast<std::uint8_t>(embot::prot::can::motor::polling::CMD::GET_FIRMWARE_VERSION) == cmd)
             {
                 txframe = process_getfirmwareversion(cls, cmd, frame, replies);
                 recognised = true;
@@ -265,18 +263,18 @@ bool embot::app::application::theCANparserBasic::Impl::process(const embot::hw::
 
 
 
-bool embot::app::application::theCANparserBasic::Impl::process_bl_broadcast_appl(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
+bool embot::app::application::theCANparserBasic::Impl::process_bl_broadcast_appl(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies)
 {
-    embot::app::canprotocol::bootloader::Message_BROADCAST msg;
+    embot::prot::can::bootloader::Message_BROADCAST msg;
     msg.load(frame);
     
     embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance();
     embot::app::theCANboardInfo::StoredInfo strd = {0};
     canbrdinfo.get(strd);
     
-    embot::app::canprotocol::bootloader::Message_BROADCAST::ReplyInfo replyinfo;
-    replyinfo.board = static_cast<embot::app::canprotocol::Board>(strd.boardtype);
-    replyinfo.process = embot::app::canprotocol::Process::application;
+    embot::prot::can::bootloader::Message_BROADCAST::ReplyInfo replyinfo;
+    replyinfo.board = static_cast<embot::prot::can::Board>(strd.boardtype);
+    replyinfo.process = embot::prot::can::Process::application;
     replyinfo.firmware.major = strd.applicationVmajor;
     replyinfo.firmware.minor = strd.applicationVminor;
     replyinfo.firmware.build = strd.applicationVbuild;
@@ -291,9 +289,9 @@ bool embot::app::application::theCANparserBasic::Impl::process_bl_broadcast_appl
 }
 
 
-bool embot::app::application::theCANparserBasic::Impl::process_bl_board_appl(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
+bool embot::app::application::theCANparserBasic::Impl::process_bl_board_appl(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies)
 {
-    embot::app::canprotocol::bootloader::Message_BOARD msg;
+    embot::prot::can::bootloader::Message_BOARD msg;
     msg.load(frame);
     
     // i dont get any info... i just must restart. 
@@ -303,16 +301,16 @@ bool embot::app::application::theCANparserBasic::Impl::process_bl_board_appl(con
 }
 
 
-bool embot::app::application::theCANparserBasic::Impl::process_bl_getadditionalinfo(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
+bool embot::app::application::theCANparserBasic::Impl::process_bl_getadditionalinfo(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies)
 {
-    embot::app::canprotocol::bootloader::Message_GET_ADDITIONAL_INFO msg;
+    embot::prot::can::bootloader::Message_GET_ADDITIONAL_INFO msg;
     msg.load(frame);
     
     embot::app::theCANboardInfo &canbrdinfo = embot::app::theCANboardInfo::getInstance();
     embot::app::theCANboardInfo::StoredInfo strd = {0};
     canbrdinfo.get(strd);
     
-    embot::app::canprotocol::bootloader::Message_GET_ADDITIONAL_INFO::ReplyInfo replyinfo;
+    embot::prot::can::bootloader::Message_GET_ADDITIONAL_INFO::ReplyInfo replyinfo;
     std::memmove(replyinfo.info32, strd.info32, sizeof(replyinfo.info32)); 
    
     std::uint8_t nreplies = msg.numberofreplies();
@@ -328,9 +326,9 @@ bool embot::app::application::theCANparserBasic::Impl::process_bl_getadditionali
 }
 
 
-bool embot::app::application::theCANparserBasic::Impl::process_bl_setadditionalinfo(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
+bool embot::app::application::theCANparserBasic::Impl::process_bl_setadditionalinfo(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies)
 {
-    embot::app::canprotocol::bootloader::Message_SET_ADDITIONAL_INFO2 msg;
+    embot::prot::can::bootloader::Message_SET_ADDITIONAL_INFO2 msg;
     msg.load(frame);
     
     if(true == msg.info.valid)
@@ -345,9 +343,9 @@ bool embot::app::application::theCANparserBasic::Impl::process_bl_setadditionali
 }
 
 
-bool embot::app::application::theCANparserBasic::Impl::process_setid(const embot::app::canprotocol::Clas cl, const std::uint8_t cm, const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
+bool embot::app::application::theCANparserBasic::Impl::process_setid(const embot::prot::can::Clas cl, const std::uint8_t cm, const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies)
 {
-    embot::app::canprotocol::shared::Message_SET_ID msg(cl, cm);
+    embot::prot::can::shared::Message_SET_ID msg(cl, cm);
     msg.load(frame);
       
     setcanaddress(msg.info.address, 0x0000);
@@ -355,13 +353,13 @@ bool embot::app::application::theCANparserBasic::Impl::process_setid(const embot
     return msg.reply();        
 }
 
-bool embot::app::application::theCANparserBasic::Impl::process_getfirmwareversion(const embot::app::canprotocol::Clas cl, const std::uint8_t cm, const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
+bool embot::app::application::theCANparserBasic::Impl::process_getfirmwareversion(const embot::prot::can::Clas cl, const std::uint8_t cm, const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies)
 {
     
-    embot::app::canprotocol::shared::Message_GET_VERSION msg(cl, cm);
+    embot::prot::can::shared::Message_GET_VERSION msg(cl, cm);
     msg.load(frame);
       
-    embot::app::canprotocol::shared::Message_GET_VERSION::ReplyInfo replyinfo;
+    embot::prot::can::shared::Message_GET_VERSION::ReplyInfo replyinfo;
     
     replyinfo.board = board;
     replyinfo.firmware = version;
@@ -376,9 +374,9 @@ bool embot::app::application::theCANparserBasic::Impl::process_getfirmwareversio
     return false;
 }
 
-bool embot::app::application::theCANparserBasic::Impl::process_bl_setcanaddress(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
+bool embot::app::application::theCANparserBasic::Impl::process_bl_setcanaddress(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies)
 {
-    embot::app::canprotocol::bootloader::Message_SETCANADDRESS msg;
+    embot::prot::can::bootloader::Message_SETCANADDRESS msg;
     msg.load(frame);
       
     
@@ -387,14 +385,14 @@ bool embot::app::application::theCANparserBasic::Impl::process_bl_setcanaddress(
     return msg.reply();        
 }
 
-bool embot::app::application::theCANparserBasic::Impl::process_bl_gettimeoflife(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
+bool embot::app::application::theCANparserBasic::Impl::process_bl_gettimeoflife(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies)
 {
-    embot::app::canprotocol::bootloader::Message_GET_TIMEOFLIFE msg;
+    embot::prot::can::bootloader::Message_GET_TIMEOFLIFE msg;
     msg.load(frame);
         
-    embot::app::canprotocol::bootloader::Message_GET_TIMEOFLIFE::ReplyInfo replyinfo;
+    embot::prot::can::bootloader::Message_GET_TIMEOFLIFE::ReplyInfo replyinfo;
     
-    replyinfo.timeoflife = embot::sys::now();
+    replyinfo.timeoflife = embot::core::now();
    
     if(true == msg.reply(reply, embot::app::theCANboardInfo::getInstance().cachedCANaddress(), replyinfo))
     {            
@@ -447,7 +445,7 @@ bool embot::app::application::theCANparserBasic::initialise(const Config &config
         pImpl->version.build = storedinfo.applicationVbuild;
         pImpl->canprotocol.major = storedinfo.protocolVmajor;
         pImpl->canprotocol.minor = storedinfo.protocolVminor;
-        pImpl->board = static_cast<embot::app::canprotocol::Board>(storedinfo.boardtype);        
+        pImpl->board = static_cast<embot::prot::can::Board>(storedinfo.boardtype);        
     }
       
     
@@ -456,7 +454,7 @@ bool embot::app::application::theCANparserBasic::initialise(const Config &config
   
 
 
-bool embot::app::application::theCANparserBasic::process(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
+bool embot::app::application::theCANparserBasic::process(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies)
 {    
     return pImpl->process(frame, replies);
 }

@@ -43,82 +43,12 @@
 #include "embot_hw_tlv493d.h"
 #include "embot_hw_sys.h"
 
-#include "embot_binary.h"
+#include "embot_core_binary.h"
+#include "embot_core.h"
+
 
 using namespace std;
-using namespace embot::binary;
-
-
-// --------------------------------------------------------------------------------------------------------------------
-// - all the rest
-// --------------------------------------------------------------------------------------------------------------------
-
-
-
-namespace embot { namespace hw { namespace bsp {
-    
-    static bool initted = false; 
-    
-    bool initialised()
-    {
-        return initted;
-    }   
-    
-    static embot::common::fpGetU64 s_timenow = nullptr;
-    
-    static embot::common::Time s_faketimenow()
-    {
-        static volatile uint64_t tt = 0;
-        return tt++;
-    }
-
-    uint32_t get1millitick()
-    {
-        if(!initted)
-        {
-            return s_faketimenow() / 1000;
-        }
-        return s_timenow() / 1000;        
-    }
-
-    result_t init(const Config &config)
-    {
-        if(true == embot::hw::bsp::initialised())
-        {
-            return resOK;
-        }
-        
-        s_timenow = config.get1microtime;        
-        
-        if(nullptr == s_timenow)
-        {
-            s_timenow = s_faketimenow;
-        }
-        
-        // put whatwever is required for ...        
-        stm32hal_config_t cfg = {0};
-        cfg.tick1ms_init = config.initmicrotime;
-        cfg.tick1ms_get = get1millitick;
-        
-        stm32hal_init(&cfg);
-        
-        initted = true;
-        return resOK;
-    }
-    
-    
-    embot::common::Time now()
-    {
-        if(!initted)
-        {
-            return s_faketimenow();
-        }
-        return s_timenow();
-    }
-    
-
-}}} // namespace embot { namespace hw { namespace bsp {
-
+using namespace embot::core::binary;
 
 // --------------------------------------------------------------------------------------------------------------------
 // - configuration of peripherals and attached chips. it is done board by board
@@ -185,9 +115,9 @@ namespace embot { namespace hw { namespace bsp { namespace gpio {
 
 namespace embot { namespace hw { namespace bsp { namespace led {
            
-    static_assert(embot::common::tointegral(embot::hw::LED::none) < 8*sizeof(SUPP::supportedmask), "LED::none must be less than 32 to be able to address a std::uint32_t mask");
-    static_assert(embot::common::tointegral(embot::hw::LED::maxnumberof) < 8*sizeof(SUPP::supportedmask), "LED::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
-    static_assert(embot::common::tointegral(embot::hw::LED::maxnumberof) < embot::common::tointegral(embot::hw::LED::none), "LED::maxnumberof must be higher that LED::none, so that we can optimise code");
+    static_assert(embot::core::tointegral(embot::hw::LED::none) < 8*sizeof(SUPP::supportedmask), "LED::none must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::core::tointegral(embot::hw::LED::maxnumberof) < 8*sizeof(SUPP::supportedmask), "LED::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::core::tointegral(embot::hw::LED::maxnumberof) < embot::core::tointegral(embot::hw::LED::none), "LED::maxnumberof must be higher that LED::none, so that we can optimise code");
 
 }}}}
 
@@ -338,9 +268,9 @@ namespace embot { namespace hw { namespace bsp { namespace led {
 
 namespace embot { namespace hw { namespace bsp { namespace button {
            
-    static_assert(embot::common::tointegral(embot::hw::BTN::none) < 8*sizeof(SUPP::supportedmask), "BTN::none must be less than 32 to be able to address a std::uint32_t mask");
-    static_assert(embot::common::tointegral(embot::hw::BTN::maxnumberof) < 8*sizeof(SUPP::supportedmask), "BTN::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
-    static_assert(embot::common::tointegral(embot::hw::BTN::maxnumberof) < embot::common::tointegral(embot::hw::BTN::none), "BTN::maxnumberof must be higher that BTN::none, so that we can optimise code");
+    static_assert(embot::core::tointegral(embot::hw::BTN::none) < 8*sizeof(SUPP::supportedmask), "BTN::none must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::core::tointegral(embot::hw::BTN::maxnumberof) < 8*sizeof(SUPP::supportedmask), "BTN::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::core::tointegral(embot::hw::BTN::maxnumberof) < embot::core::tointegral(embot::hw::BTN::none), "BTN::maxnumberof must be higher that BTN::none, so that we can optimise code");
 
 }}}}
 
@@ -439,9 +369,9 @@ namespace embot { namespace hw { namespace bsp { namespace button {
 // - support map: begin of embot::hw::can
 
 namespace embot { namespace hw { namespace bsp { namespace can {
-    static_assert(embot::common::tointegral(embot::hw::CAN::none) < 8*sizeof(SUPP::supportedmask), "CAN::none must be less than 32 to be able to address a std::uint32_t mask");
-    static_assert(embot::common::tointegral(embot::hw::CAN::maxnumberof) < 8*sizeof(SUPP::supportedmask), "CAN::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
-    static_assert(embot::common::tointegral(embot::hw::CAN::maxnumberof) < embot::common::tointegral(embot::hw::CAN::none), "CAN::maxnumberof must be higher that CAN::none, so that we can optimise code");
+    static_assert(embot::core::tointegral(embot::hw::CAN::none) < 8*sizeof(SUPP::supportedmask), "CAN::none must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::core::tointegral(embot::hw::CAN::maxnumberof) < 8*sizeof(SUPP::supportedmask), "CAN::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::core::tointegral(embot::hw::CAN::maxnumberof) < embot::core::tointegral(embot::hw::CAN::none), "CAN::maxnumberof must be higher that CAN::none, so that we can optimise code");
 }}}}
 
 #if   !defined(HAL_CAN_MODULE_ENABLED) || !defined(EMBOT_ENABLE_hw_can)
@@ -605,9 +535,9 @@ void CAN1_RX0_IRQHandler(void)
 
 namespace embot { namespace hw { namespace bsp { namespace flash {
  
-    static_assert(embot::common::tointegral(embot::hw::FLASH::none) < 8*sizeof(SUPP::supportedmask), "FLASH::none must be less than 32 to be able to address a std::uint32_t mask");
-    static_assert(embot::common::tointegral(embot::hw::FLASH::maxnumberof) < 8*sizeof(SUPP::supportedmask), "FLASH::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
-    static_assert(embot::common::tointegral(embot::hw::FLASH::maxnumberof) < embot::common::tointegral(embot::hw::FLASH::none), "FLASH::maxnumberof must be higher that FLASH::none, so that we can optimise code");
+    static_assert(embot::core::tointegral(embot::hw::FLASH::none) < 8*sizeof(SUPP::supportedmask), "FLASH::none must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::core::tointegral(embot::hw::FLASH::maxnumberof) < 8*sizeof(SUPP::supportedmask), "FLASH::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::core::tointegral(embot::hw::FLASH::maxnumberof) < embot::core::tointegral(embot::hw::FLASH::none), "FLASH::maxnumberof must be higher that FLASH::none, so that we can optimise code");
 
 }}}}
 
@@ -750,9 +680,9 @@ namespace embot { namespace hw { namespace bsp { namespace flash {
 
 namespace embot { namespace hw { namespace bsp { namespace pga308 {
            
-    static_assert(embot::common::tointegral(embot::hw::PGA308::none) < 8*sizeof(SUPP::supportedmask), "PGA308::none must be less than 32 to be able to address a std::uint32_t mask");
-    static_assert(embot::common::tointegral(embot::hw::PGA308::maxnumberof) < 8*sizeof(SUPP::supportedmask), "PGA308::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
-    static_assert(embot::common::tointegral(embot::hw::PGA308::maxnumberof) < embot::common::tointegral(embot::hw::PGA308::none), "PGA308::maxnumberof must be higher that PGA308::none, so that we can optimise code");
+    static_assert(embot::core::tointegral(embot::hw::PGA308::none) < 8*sizeof(SUPP::supportedmask), "PGA308::none must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::core::tointegral(embot::hw::PGA308::maxnumberof) < 8*sizeof(SUPP::supportedmask), "PGA308::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::core::tointegral(embot::hw::PGA308::maxnumberof) < embot::core::tointegral(embot::hw::PGA308::none), "PGA308::maxnumberof must be higher that PGA308::none, so that we can optimise code");
 
 }}}}
 
@@ -816,9 +746,9 @@ namespace embot { namespace hw { namespace bsp { namespace pga308 {
 
 namespace embot { namespace hw { namespace bsp { namespace si7051 {
            
-    static_assert(embot::common::tointegral(embot::hw::SI7051::none) < 8*sizeof(SUPP::supportedmask), "SI7051::none must be less than 32 to be able to address a std::uint32_t mask");
-    static_assert(embot::common::tointegral(embot::hw::SI7051::maxnumberof) < 8*sizeof(SUPP::supportedmask), "SI7051::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
-    static_assert(embot::common::tointegral(embot::hw::SI7051::maxnumberof) < embot::common::tointegral(embot::hw::SI7051::none), "SI7051::maxnumberof must be higher that SI7051::none, so that we can optimise code");
+    static_assert(embot::core::tointegral(embot::hw::SI7051::none) < 8*sizeof(SUPP::supportedmask), "SI7051::none must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::core::tointegral(embot::hw::SI7051::maxnumberof) < 8*sizeof(SUPP::supportedmask), "SI7051::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::core::tointegral(embot::hw::SI7051::maxnumberof) < embot::core::tointegral(embot::hw::SI7051::none), "SI7051::maxnumberof must be higher that SI7051::none, so that we can optimise code");
 
 }}}}
 
@@ -875,7 +805,7 @@ namespace embot { namespace hw { namespace bsp { namespace si7051 {
     {
     	// the mtb4 board has a pin for power up of the chip SI7051::one 
         HAL_GPIO_WritePin(POWER_TSENSOR1_GPIO_Port, POWER_TSENSOR1_Pin, GPIO_PIN_SET);
-        embot::hw::sys::delay(25*embot::common::time1millisec);
+        embot::hw::sys::delay(25*embot::core::time1millisec);
     }
     
     #else
@@ -901,9 +831,9 @@ namespace embot { namespace hw { namespace bsp { namespace si7051 {
 
 namespace embot { namespace hw { namespace bsp { namespace onewire {
            
-    static_assert(embot::common::tointegral(embot::hw::ONEWIRE::none) < 8*sizeof(SUPP::supportedmask), "ONEWIRE::none must be less than 32 to be able to address a std::uint32_t mask");
-    static_assert(embot::common::tointegral(embot::hw::ONEWIRE::maxnumberof) < 8*sizeof(SUPP::supportedmask), "ONEWIRE::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
-    static_assert(embot::common::tointegral(embot::hw::ONEWIRE::maxnumberof) < embot::common::tointegral(embot::hw::ONEWIRE::none), "ONEWIRE::maxnumberof must be higher that ONEWIRE::none, so that we can optimise code");
+    static_assert(embot::core::tointegral(embot::hw::ONEWIRE::none) < 8*sizeof(SUPP::supportedmask), "ONEWIRE::none must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::core::tointegral(embot::hw::ONEWIRE::maxnumberof) < 8*sizeof(SUPP::supportedmask), "ONEWIRE::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::core::tointegral(embot::hw::ONEWIRE::maxnumberof) < embot::core::tointegral(embot::hw::ONEWIRE::none), "ONEWIRE::maxnumberof must be higher that ONEWIRE::none, so that we can optimise code");
 
 }}}}
 
@@ -966,9 +896,9 @@ namespace embot { namespace hw { namespace bsp { namespace onewire {
 
 namespace embot { namespace hw { namespace bsp { namespace adc {
            
-    static_assert(embot::common::tointegral(embot::hw::ADC::none) < 8*sizeof(SUPP::supportedmask), "ADC::none must be less than 32 to be able to address a std::uint32_t mask");
-    static_assert(embot::common::tointegral(embot::hw::ADC::maxnumberof) < 8*sizeof(SUPP::supportedmask), "ADC::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
-    static_assert(embot::common::tointegral(embot::hw::ADC::maxnumberof) < embot::common::tointegral(embot::hw::ADC::none), "ADC::maxnumberof must be higher that ADC::none, so that we can optimise code");
+    static_assert(embot::core::tointegral(embot::hw::ADC::none) < 8*sizeof(SUPP::supportedmask), "ADC::none must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::core::tointegral(embot::hw::ADC::maxnumberof) < 8*sizeof(SUPP::supportedmask), "ADC::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::core::tointegral(embot::hw::ADC::maxnumberof) < embot::core::tointegral(embot::hw::ADC::none), "ADC::maxnumberof must be higher that ADC::none, so that we can optimise code");
 
 }}}}
 
@@ -1071,9 +1001,9 @@ void DMA1_Channel1_IRQHandler(void)
 
 namespace embot { namespace hw { namespace bsp { namespace timer {
                
-    static_assert(embot::common::tointegral(embot::hw::TIMER::none) < 8*sizeof(SUPP::supportedmask), "TIMER::none must be less than 32 to be able to address a std::uint32_t mask");
-    static_assert(embot::common::tointegral(embot::hw::TIMER::maxnumberof) < 8*sizeof(SUPP::supportedmask), "TIMER::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
-    static_assert(embot::common::tointegral(embot::hw::TIMER::maxnumberof) < embot::common::tointegral(embot::hw::TIMER::none), "TIMER::maxnumberof must be higher that CAN::none, so that we can optimise code");
+    static_assert(embot::core::tointegral(embot::hw::TIMER::none) < 8*sizeof(SUPP::supportedmask), "TIMER::none must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::core::tointegral(embot::hw::TIMER::maxnumberof) < 8*sizeof(SUPP::supportedmask), "TIMER::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::core::tointegral(embot::hw::TIMER::maxnumberof) < embot::core::tointegral(embot::hw::TIMER::none), "TIMER::maxnumberof must be higher that CAN::none, so that we can optimise code");
 
 }}}}
 
@@ -1314,9 +1244,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 namespace embot { namespace hw { namespace bsp { namespace i2c {
            
-    static_assert(embot::common::tointegral(embot::hw::I2C::none) < 8*sizeof(SUPP::supportedmask), "I2C::none must be less than 32 to be able to address a std::uint32_t mask");
-    static_assert(embot::common::tointegral(embot::hw::I2C::maxnumberof) < 8*sizeof(SUPP::supportedmask), "I2C::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
-    static_assert(embot::common::tointegral(embot::hw::I2C::maxnumberof) < embot::common::tointegral(embot::hw::I2C::none), "I2C::maxnumberof must be higher that I2C::none, so that we can optimise code");
+    static_assert(embot::core::tointegral(embot::hw::I2C::none) < 8*sizeof(SUPP::supportedmask), "I2C::none must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::core::tointegral(embot::hw::I2C::maxnumberof) < 8*sizeof(SUPP::supportedmask), "I2C::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::core::tointegral(embot::hw::I2C::maxnumberof) < embot::core::tointegral(embot::hw::I2C::none), "I2C::maxnumberof must be higher that I2C::none, so that we can optimise code");
 
 }}}}
 
@@ -1941,9 +1871,9 @@ void DMA1_Stream1_IRQHandler(void)
     
 namespace embot { namespace hw { namespace bsp { namespace bno055 {
        
-    static_assert(embot::common::tointegral(embot::hw::BNO055::none) < 8*sizeof(SUPP::supportedmask), "BNO055::none must be less than 32 to be able to address a std::uint32_t mask");
-    static_assert(embot::common::tointegral(embot::hw::BNO055::maxnumberof) < 8*sizeof(SUPP::supportedmask), "BNO055::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
-    static_assert(embot::common::tointegral(embot::hw::BNO055::maxnumberof) < embot::common::tointegral(embot::hw::BNO055::none), "BNO055::maxnumberof must be higher that BNO055::none, so that we can optimise code");
+    static_assert(embot::core::tointegral(embot::hw::BNO055::none) < 8*sizeof(SUPP::supportedmask), "BNO055::none must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::core::tointegral(embot::hw::BNO055::maxnumberof) < 8*sizeof(SUPP::supportedmask), "BNO055::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::core::tointegral(embot::hw::BNO055::maxnumberof) < embot::core::tointegral(embot::hw::BNO055::none), "BNO055::maxnumberof must be higher that BNO055::none, so that we can optimise code");
 
 }}}}
 
@@ -2033,9 +1963,9 @@ namespace embot { namespace hw { namespace bsp { namespace bno055 {
 
 namespace embot { namespace hw { namespace bsp { namespace tlv493d {
            
-    static_assert(embot::common::tointegral(embot::hw::TLV493D::none) < 8*sizeof(SUPP::supportedmask), "TLV493D::none must be less than 32 to be able to address a std::uint32_t mask");
-    static_assert(embot::common::tointegral(embot::hw::TLV493D::maxnumberof) < 8*sizeof(SUPP::supportedmask), "TLV493D::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
-    static_assert(embot::common::tointegral(embot::hw::TLV493D::maxnumberof) < embot::common::tointegral(embot::hw::TLV493D::none), "TLV493D::maxnumberof must be higher that TLV493D::none, so that we can optimise code");
+    static_assert(embot::core::tointegral(embot::hw::TLV493D::none) < 8*sizeof(SUPP::supportedmask), "TLV493D::none must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::core::tointegral(embot::hw::TLV493D::maxnumberof) < 8*sizeof(SUPP::supportedmask), "TLV493D::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::core::tointegral(embot::hw::TLV493D::maxnumberof) < embot::core::tointegral(embot::hw::TLV493D::none), "TLV493D::maxnumberof must be higher that TLV493D::none, so that we can optimise code");
 
 }}}}
 

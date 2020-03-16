@@ -49,9 +49,9 @@ static void userdefonidle(void* param);
 static void userdefonfatal(void* param);
 
 
-static const embot::sys::Operation oninit = { embot::common::Callback(userdeflauncher, nullptr), 2048 };
-static const embot::sys::Operation onidle = { embot::common::Callback(userdefonidle, nullptr), 512 };
-static const embot::sys::Operation onfatal = { embot::common::Callback(userdefonfatal, nullptr), 64 };
+static const embot::sys::Operation oninit = { embot::core::Callback(userdeflauncher, nullptr), 2048 };
+static const embot::sys::Operation onidle = { embot::core::Callback(userdefonidle, nullptr), 512 };
+static const embot::sys::Operation onfatal = { embot::core::Callback(userdefonfatal, nullptr), 64 };
 
 
 static const std::uint32_t address = embot::hw::flash::getpartition(embot::hw::FLASH::application).address;
@@ -59,7 +59,7 @@ static const std::uint32_t address = embot::hw::flash::getpartition(embot::hw::F
 
 int main(void)
 { 
-    embot::app::theApplication::Config config(embot::common::time1millisec, oninit, onidle, onfatal, address);
+    embot::app::theApplication::Config config(embot::core::time1millisec, oninit, onidle, onfatal, address);
     embot::app::theApplication &appl = embot::app::theApplication::getInstance();    
     
     appl.execute(config);  
@@ -83,11 +83,11 @@ static void userdefonfatal(void *param)
 }
 
 
-static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask evtmsk, void *p);
+static void eventbasedtask_onevent(embot::sys::Task *t, embot::core::EventMask evtmsk, void *p);
 static void eventbasedtask_init(embot::sys::Task *t, void *p);
 
 
-constexpr embot::common::Event evRXcanframe = 0x00000001 << 0;
+constexpr embot::core::Event evRXcanframe = 0x00000001 << 0;
 
 constexpr std::uint8_t maxOUTcanframes = 32;
 
@@ -105,11 +105,11 @@ static void start_evt_based(void)
     static const std::initializer_list<embot::hw::LED> allleds = {embot::hw::LED::one};  
     embot::app::theLEDmanager &theleds = embot::app::theLEDmanager::getInstance();     
     theleds.init(allleds);    
-    theleds.get(embot::hw::LED::one).pulse(embot::common::time1second); 
+    theleds.get(embot::hw::LED::one).pulse(embot::core::time1second); 
     
     // start task waiting for can messages. 
     eventbasedtask = new embot::sys::EventTask;  
-    const embot::common::relTime waitEventTimeout = 50*embot::common::time1millisec; //50*1000; //5*1000*1000;    
+    const embot::core::relTime waitEventTimeout = 50*embot::core::time1millisec; //50*1000; //5*1000*1000;    
    
     embot::sys::EventTask::Config configEV;
     
@@ -133,7 +133,7 @@ static void start_evt_based(void)
     embot::hw::result_t r = embot::hw::resNOK;
     embot::hw::can::Config canconfig; // default is tx/rxcapacity=8
     canconfig.txcapacity = maxOUTcanframes;
-    canconfig.onrxframe = embot::common::Callback(alerteventbasedtask, nullptr); 
+    canconfig.onrxframe = embot::core::Callback(alerteventbasedtask, nullptr); 
     r = embot::hw::can::init(embot::hw::CAN::one, canconfig);
     r = embot::hw::can::setfilters(embot::hw::CAN::one, embot::app::theCANboardInfo::getInstance().getCANaddress());
     r = r;
@@ -161,13 +161,13 @@ static void eventbasedtask_init(embot::sys::Task *t, void *p)
     
 
 
-static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::EventMask eventmask, void *p)
+static void eventbasedtask_onevent(embot::sys::Task *t, embot::core::EventMask eventmask, void *p)
 {   
  
     // we clear the frames to be trasmitted
     outframes.clear();      
         
-    if(true == embot::binary::mask::check(eventmask, evRXcanframe))
+    if(true == embot::core::binary::mask::check(eventmask, evRXcanframe))
     {        
         embot::hw::can::Frame frame;
         std::uint8_t remainingINrx = 0;

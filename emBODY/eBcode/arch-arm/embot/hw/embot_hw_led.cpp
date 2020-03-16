@@ -32,7 +32,7 @@
 #include <cstring>
 #include <vector>
 
-#include "embot_binary.h"
+#include "embot_core_binary.h"
 #include "embot_hw_gpio.h"
 #include "embot_hw_bsp.h"
 #include "embot_hw_bsp_config.h"
@@ -79,7 +79,7 @@ namespace embot { namespace hw { namespace led {
     
     bool initialised(LED led)
     {
-        return embot::binary::bit::check(initialisedmask, embot::common::tointegral(led));
+        return embot::core::binary::bit::check(initialisedmask, embot::core::tointegral(led));
     }
             
     result_t init(LED led)
@@ -99,14 +99,14 @@ namespace embot { namespace hw { namespace led {
         embot::hw::bsp::led::getBSP().init(led);
                 
         
-        if(!embot::hw::bsp::initialised())
+        if(!embot::hw::initialised())
         {   // requires embot::hw::bsp::init()
             return resNOK;
         }
         
 
        
-        embot::binary::bit::set(initialisedmask, embot::common::tointegral(led));
+        embot::core::binary::bit::set(initialisedmask, embot::core::tointegral(led));
         
         // we just switch it off        
         embot::hw::led::off(led);

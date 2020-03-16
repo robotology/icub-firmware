@@ -6,7 +6,7 @@
 */
 
 
-#include "embot_code_bootloader.h"
+#include "embot_app_skeleton_os_bootloader.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // bootloader info
@@ -14,8 +14,8 @@
 constexpr std::uint8_t defADDRESS = 1;
 constexpr embot::app::theCANboardInfo::bootloaderInfo btlInfo 
 { 
-    embot::app::canprotocol::Board::psc, 
-    embot::app::canprotocol::versionOfBOOTLOADER {1, 4}, 
+    embot::prot::can::Board::psc, 
+    embot::prot::can::versionOfBOOTLOADER {1, 4}, 
     defADDRESS,                                                       
     "I am a psc" 
 };
@@ -24,7 +24,7 @@ constexpr embot::app::theCANboardInfo::bootloaderInfo btlInfo
 
 int main(void)
 { 
-    embot::code::bootloader::run(btlInfo);
+    embot::app::skeleton::os::bootloader::run(btlInfo);
     for(;;);    
 }
    

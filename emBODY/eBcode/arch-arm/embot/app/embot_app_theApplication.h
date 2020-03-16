@@ -21,10 +21,10 @@
 #ifndef _EMBOT_APP_THEAPPLICATION_H_
 #define _EMBOT_APP_THEAPPLICATION_H_
 
-#include "embot_common.h"
-#include "embot_sys.h"
-#include "embot_sys_theScheduler.h"
-#include "embot_sys_task.h"
+#include "embot_core.h"
+#include "embot_os.h"
+#include "embot_os_theScheduler.h"
+#include "embot_os_Thread.h"
 #include <memory>
 
 
@@ -48,11 +48,11 @@ namespace embot { namespace app {
         {            
             std::uint32_t                       addressofapplication {0};
             bool                                initbsp {true};
-            embot::common::relTime              ticktime {0};
-            embot::sys::theScheduler::Behaviour behaviour {};
+            embot::core::relTime              ticktime {0};
+            embot::os::theScheduler::Behaviour behaviour {};
 
             Config() = default;
-            Config(std::uint32_t _addr, bool _bsp, embot::common::relTime _tic, const embot::sys::theScheduler::Behaviour &_beh) : addressofapplication(_addr), initbsp(_bsp), ticktime(_tic), behaviour(_beh) {}                
+            Config(std::uint32_t _addr, bool _bsp, embot::core::relTime _tic, const embot::os::theScheduler::Behaviour &_beh) : addressofapplication(_addr), initbsp(_bsp), ticktime(_tic), behaviour(_beh) {}                
             bool isvalid() const { if((false == behaviour.isvalid()) || (0 == ticktime) || (0 == addressofapplication)) { return false; } else { return true; } } 
         }; 
         

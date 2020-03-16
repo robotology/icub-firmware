@@ -8,7 +8,7 @@
  * email:   marco.accame@iit.it
 */
 
-#include "embot_code_application_evntskcan.h"
+#include "embot_app_skeleton_os_evthreadcan.h"
 
 //#define DO_TEST
 
@@ -24,70 +24,70 @@ constexpr uint32_t numMilli = 50;
 
 constexpr embot::app::theCANboardInfo::applicationInfo applInfo 
 { 
-    embot::app::canprotocol::versionOfAPPLICATION {1, 1, 6},    
-    embot::app::canprotocol::versionOfCANPROTOCOL {2, 0}    
+    embot::prot::can::versionOfAPPLICATION {1, 1, 6},    
+    embot::prot::can::versionOfCANPROTOCOL {2, 0}    
 };
 
-constexpr std::uint16_t taskIDLEstacksize = 512;
-constexpr std::uint16_t taskINITstacksize = 2048;
-constexpr std::uint16_t taskEVNTstacksize = 4096;
+constexpr std::uint16_t threadIDLEstacksize = 512;
+constexpr std::uint16_t threadINITstacksize = 2048;
+constexpr std::uint16_t threadEVNTstacksize = 4096;
 constexpr std::uint8_t maxINPcanframes = 16;
 constexpr std::uint8_t maxOUTcanframes = 48;
-constexpr embot::common::relTime taskEVNTtimeout = numMilli*embot::common::time1millisec;
+constexpr embot::core::relTime threadEVNTtimeout = numMilli*embot::core::time1millisec;
 
 static void *paramINIT = nullptr;
 static void *paramIDLE = nullptr;
 static void *paramERR = nullptr;
 static void *paramEVNT = nullptr;
 
-constexpr embot::sys::theTimerManager::Config tmcfg {};
-constexpr embot::sys::theCallbackManager::Config cmcfg {};
+constexpr embot::os::theTimerManager::Config tmcfg {};
+constexpr embot::os::theCallbackManager::Config cmcfg {};
     
     
-static const embot::code::application::core::sysConfig syscfg { taskINITstacksize, paramINIT, taskIDLEstacksize, paramIDLE, paramERR, tmcfg, cmcfg};
+static const embot::app::skeleton::os::basic::sysConfig syscfg { threadINITstacksize, paramINIT, threadIDLEstacksize, paramIDLE, paramERR, tmcfg, cmcfg};
 
-static const embot::code::application::evntskcan::evtConfig evtcfg { taskEVNTstacksize, paramEVNT, taskEVNTtimeout};
+static const embot::app::skeleton::os::evthreadcan::evtConfig evtcfg { threadEVNTstacksize, paramEVNT, threadEVNTtimeout};
 
-static const embot::code::application::evntskcan::canConfig cancfg { maxINPcanframes, maxOUTcanframes };
+static const embot::app::skeleton::os::evthreadcan::canConfig cancfg { maxINPcanframes, maxOUTcanframes };
 
 // config end
 // --------------------------------------------------------------------------------------------------------------------
 
 
-class mySYS final : public embot::code::application::evntskcan::SYSTEMevtcan
+class mySYS final : public embot::app::skeleton::os::evthreadcan::SYSTEMevtcan
 {
 public:
-    mySYS(const embot::code::application::core::sysConfig &cfg) 
+    mySYS(const embot::app::skeleton::os::basic::sysConfig &cfg) 
         : SYSTEMevtcan(cfg) {}
         
-    void userdefOnIdle(embot::sys::Task *t, void* idleparam) const override;
+    void userdefOnIdle(embot::os::Thread *t, void* idleparam) const override;
     void userdefonOSerror(void *errparam) const override;
-    void userdefInit_Extra(embot::sys::EventTask* evtsk, void *initparam) const override;
+    void userdefInit_Extra(embot::os::EventThread* evtsk, void *initparam) const override;
 };
 
 
-class myEVT final : public embot::code::application::evntskcan::EVNTSKcan
+class myEVT final : public embot::app::skeleton::os::evthreadcan::evThreadCAN
 {
 public:
-    myEVT(const embot::code::application::evntskcan::evtConfig& ecfg, const embot::code::application::evntskcan::canConfig& ccfg, const embot::app::theCANboardInfo::applicationInfo& a) 
-        : EVNTSKcan(ecfg, ccfg, a) {}
+    myEVT(const embot::app::skeleton::os::evthreadcan::evtConfig& ecfg, const embot::app::skeleton::os::evthreadcan::canConfig& ccfg, const embot::app::theCANboardInfo::applicationInfo& a) 
+        : evThreadCAN(ecfg, ccfg, a) {}
         
-    void userdefStartup(embot::sys::Task *t, void *param) const override;
-    void userdefOnTimeout(embot::sys::Task *t, embot::common::EventMask eventmask, void *param) const override;
-    void userdefOnEventRXcanframe(embot::sys::Task *t, embot::common::EventMask eventmask, void *param, const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &outframes) const override;
-    void userdefOnEventANYother(embot::sys::Task *t, embot::common::EventMask eventmask, void *param, std::vector<embot::hw::can::Frame> &outframes) const override;                   
+    void userdefStartup(embot::os::Thread *t, void *param) const override;
+    void userdefOnTimeout(embot::os::Thread *t, embot::os::EventMask eventmask, void *param) const override;
+    void userdefOnEventRXcanframe(embot::os::Thread *t, embot::os::EventMask eventmask, void *param, const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &outframes) const override;
+    void userdefOnEventANYother(embot::os::Thread *t, embot::os::EventMask eventmask, void *param, std::vector<embot::prot::can::Frame> &outframes) const override;                   
 };
 
 
 static const mySYS mysys { syscfg };
 static const myEVT myevt { evtcfg, cancfg, applInfo };
-constexpr embot::code::application::evntskcan::CFG cfg{ &mysys, &myevt };
+constexpr embot::app::skeleton::os::evthreadcan::CFG cfg{ &mysys, &myevt };
 
 // --------------------------------------------------------------------------------------------------------------------
 
 int main(void)
 { 
-    embot::code::application::evntskcan::run(cfg);
+    embot::app::skeleton::os::evthreadcan::run(cfg);
     for(;;);    
 }
 
@@ -98,7 +98,7 @@ int main(void)
 
 #include "embot_hw_bsp_rfe.h"
 
-#include "embot_sys_theScheduler.h"
+#include "embot_os_theScheduler.h"
 #include "embot_app_theLEDmanager.h"
 #include "embot_app_application_theCANparserBasic.h"
 
@@ -110,29 +110,29 @@ int main(void)
 #include "faceExpressionsModule.h"
 
 
-constexpr embot::common::Event evRXusbmessage = 0x00000001 << 1;
-constexpr embot::common::Event evIMUtick = 0x00000001 << 3;
-constexpr embot::common::Event evIMUdataready = 0x00000001 << 4;
+constexpr embot::os::Event evRXusbmessage = 0x00000001 << 1;
+constexpr embot::os::Event evIMUtick = 0x00000001 << 3;
+constexpr embot::os::Event evIMUdataready = 0x00000001 << 4;
 
 //expression
 RfeApp::FaceExpressions faceExpressions;
 
-//volatile embot::common::Time t_load = 0;
-//volatile embot::common::Time t_display = 0;
-//volatile embot::common::Time t_total = 0;
+//volatile embot::core::Time t_load = 0;
+//volatile embot::core::Time t_display = 0;
+//volatile embot::core::Time t_total = 0;
 
 //struct Average_t
 //{
-//    embot::common::Time sum;
+//    embot::core::Time sum;
 //    std::uint32_t       count;
-//    embot::common::Time avg;
+//    embot::core::Time avg;
 //    float               avg_f;
-//    embot::common::Time min;
-//    embot::common::Time max;
+//    embot::core::Time min;
+//    embot::core::Time max;
 //    
 //    Average_t() : sum(0), count(0), avg(0), avg_f(0.0), min(3000000), max(0){;}
 //    void calculate(void){avg=sum/count;avg_f=sum/static_cast<float>(count);}
-//    void set(embot::common::Time val)
+//    void set(embot::core::Time val)
 //    {
 //        sum +=val;
 //        count++;
@@ -148,7 +148,7 @@ RfeApp::FaceExpressions faceExpressions;
 //uint32_t totCount=0;
 
 
-void mySYS::userdefOnIdle(embot::sys::Task *t, void* idleparam) const
+void mySYS::userdefOnIdle(embot::os::Thread *t, void* idleparam) const
 {
     static int a = 0;
     a++;   
@@ -157,20 +157,20 @@ void mySYS::userdefOnIdle(embot::sys::Task *t, void* idleparam) const
 void mySYS::userdefonOSerror(void *errparam) const
 {
     static int code = 0;
-    embot::sys::theScheduler::getInstance().getOSerror(code);
+    embot::os::theScheduler::getInstance().getOSerror(code);
     for(;;);    
 }
 
 
-void mySYS::userdefInit_Extra(embot::sys::EventTask* evtsk, void *initparam) const
+void mySYS::userdefInit_Extra(embot::os::EventThread* evtsk, void *initparam) const
 {
-    // inside the init task: put the init of many things ...  
+    // inside the init thread: put the init of many things ...  
     
     // led manager
     static const std::initializer_list<embot::hw::LED> allleds = {embot::hw::LED::one};  
     embot::app::theLEDmanager &theleds = embot::app::theLEDmanager::getInstance();     
     theleds.init(allleds);    
-    theleds.get(embot::hw::LED::one).pulse(embot::common::time1second); 
+    theleds.get(embot::hw::LED::one).pulse(embot::core::time1second); 
 
     // init of can basic paser
     embot::app::application::theCANparserBasic::getInstance().initialise({});
@@ -188,9 +188,9 @@ void mySYS::userdefInit_Extra(embot::sys::EventTask* evtsk, void *initparam) con
             
 }
 
-static void alerteventbasedtaskusb(void *arg)
+static void alerteventbasedthreadusb(void *arg)
 {
-    embot::sys::EventTask* evtsk = reinterpret_cast<embot::sys::EventTask*>(arg);
+    embot::os::EventThread* evtsk = reinterpret_cast<embot::os::EventThread*>(arg);
     if(nullptr != evtsk)
     {
         evtsk->setEvent(evRXusbmessage);
@@ -198,13 +198,13 @@ static void alerteventbasedtaskusb(void *arg)
 }
 
 
-void myEVT::userdefStartup(embot::sys::Task *t, void *param) const
+void myEVT::userdefStartup(embot::os::Thread *t, void *param) const
 {
-    // inside startup of evnt task: put the init of many things ... 
+    // inside startup of evnt thread: put the init of many things ... 
 
     embot::hw::usb::Config config;
     config.rxcapacity = 16;
-    config.onrxmessage = embot::common::Callback(alerteventbasedtaskusb, t); 
+    config.onrxmessage = embot::core::Callback(alerteventbasedthreadusb, t); 
     embot::hw::usb::init(embot::hw::usb::Port::one, config);
     
     faceExpressions.init(RfeApp::Expression_t::neutral, RfeApp::Color::white, RfeApp::Brightness::medium);    
@@ -212,7 +212,7 @@ void myEVT::userdefStartup(embot::sys::Task *t, void *param) const
 
 
 
-void myEVT::userdefOnTimeout(embot::sys::Task *t, embot::common::EventMask eventmask, void *param) const
+void myEVT::userdefOnTimeout(embot::os::Thread *t, embot::os::EventMask eventmask, void *param) const
 {
     static uint32_t cnt = 0;
     cnt++; 
@@ -224,7 +224,7 @@ void myEVT::userdefOnTimeout(embot::sys::Task *t, embot::common::EventMask event
 }
 
 
-void myEVT::userdefOnEventRXcanframe(embot::sys::Task *t, embot::common::EventMask eventmask, void *param, const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &outframes) const
+void myEVT::userdefOnEventRXcanframe(embot::os::Thread *t, embot::os::EventMask eventmask, void *param, const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &outframes) const
 {        
     // process w/ the basic parser. if not recognised call the parsers specific of the board
     if(true == embot::app::application::theCANparserBasic::getInstance().process(frame, outframes))
@@ -236,20 +236,20 @@ void myEVT::userdefOnEventRXcanframe(embot::sys::Task *t, embot::common::EventMa
  
 }
 
-void myEVT::userdefOnEventANYother(embot::sys::Task *t, embot::common::EventMask eventmask, void *param, std::vector<embot::hw::can::Frame> &outframes) const
+void myEVT::userdefOnEventANYother(embot::os::Thread *t, embot::os::EventMask eventmask, void *param, std::vector<embot::prot::can::Frame> &outframes) const
 {    
-    if(true == embot::binary::mask::check(eventmask, evRXusbmessage))
+    if(true == embot::core::binary::mask::check(eventmask, evRXusbmessage))
     {        
         embot::hw::usb::Message msg;
         std::uint8_t remainingINrx = 0;
         if(embot::hw::resOK == embot::hw::usb::get(embot::hw::usb::Port::one, msg, remainingINrx))
         {   
-//            embot::common::Time t1 = embot::sys::now();
+//            embot::core::Time t1 = embot::os::now();
             //faceExpressions.loadNewExpression(msg.data, msg.size);
             faceExpressions.processcommands(msg.data, msg.size);
-//            embot::common::Time t2 = embot::sys::now();
+//            embot::core::Time t2 = embot::os::now();
             faceExpressions.displayExpression();
-//            embot::common::Time t3 = embot::sys::now();
+//            embot::core::Time t3 = embot::os::now();
             
 //            t_load = t2-t1;
 //            t_display = t3-t2;
@@ -278,13 +278,13 @@ void myEVT::userdefOnEventANYother(embot::sys::Task *t, embot::common::EventMask
     }
     
     
-    if(true == embot::binary::mask::check(eventmask, evIMUtick))
+    if(true == embot::core::binary::mask::check(eventmask, evIMUtick))
     {        
         embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance();
         theimu.tick(outframes);        
     }   
     
-    if(true == embot::binary::mask::check(eventmask, evIMUdataready))
+    if(true == embot::core::binary::mask::check(eventmask, evIMUdataready))
     {        
         embot::app::application::theIMU &theimu = embot::app::application::theIMU::getInstance();
         theimu.processdata(outframes);        
@@ -380,7 +380,7 @@ void test(uint32_t cnt)
     //    faceExpressions.rotate(cnt);
     static volatile uint32_t picture = 0;
     picture = 0;
-//    embot::binary::bit::set(picture, cnt%20);
+//    embot::core::binary::bit::set(picture, cnt%20);
     picture = 0x00032222;
     //faceExpressions.display(RfeApp::FacePart_t::all, RfeApp::Color::white, RfeApp::Brightness::medium, picture);
     volatile RfeApp::Brightness br = RfeApp::tobrightness(cnt%RfeApp::brightnessMaxNum);

@@ -21,9 +21,8 @@
 #ifndef _EMBOT_APP_APPLICATION_THECANPARSERBASIC_H_
 #define _EMBOT_APP_APPLICATION_THECANPARSERBASIC_H_
 
-#include "embot_common.h"
-#include "embot_hw_can.h"
-#include "embot_sys.h"
+#include "embot_core.h"
+#include "embot_prot_can.h"
 #include <vector>
 #include <memory>
 
@@ -45,7 +44,7 @@ namespace embot { namespace app { namespace application {
         bool initialise(const Config &config); 
         
         // returns true if the canframe has been recognised. if so, any reply is sent if replies.size() > 0
-        bool process(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);
+        bool process(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies);
 
     private:
         theCANparserBasic();

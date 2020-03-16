@@ -39,7 +39,7 @@
 
 using namespace std;
 
-#include "embot_binary.h"
+#include "embot_core_binary.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -101,8 +101,8 @@ namespace embot { namespace hw { namespace timer {
     
     bool initialised(TIMER t)
     {
-        return embot::binary::bit::check(initialisedmask, embot::common::tointegral(t));
-        //return embot::binary::bit::check(initialisedmask, static_cast<std::uint8_t>(t));
+        return embot::core::binary::bit::check(initialisedmask, embot::core::tointegral(t));
+        //return embot::core::binary::bit::check(initialisedmask, static_cast<std::uint8_t>(t));
     }    
     
     // stm32 specific support
@@ -114,7 +114,7 @@ namespace embot { namespace hw { namespace timer {
         
     
     // retrieves the values to be put inside the stm32 register
-    void compute(TIMER t, const embot::hw::bsp::timer::PROP *stm32data, const embot::common::relTime time, stm32_tim_registervalues &pars, embot::common::relTime &effectivetime)
+    void compute(TIMER t, const embot::hw::bsp::timer::PROP *stm32data, const embot::core::relTime time, stm32_tim_registervalues &pars, embot::core::relTime &effectivetime)
     {        
         // for some timers referencespeed could also be HAL_RCC_GetSysClockFreq() or HAL_RCC_GetPCLK1Freq() or HAL_RCC_GetPCLK2Freq()
         // i embed teh choice into that into embot::hw::sys::clock()
@@ -242,11 +242,11 @@ namespace embot { namespace hw { namespace timer {
     
     struct propsOFalltimers
     {
-        TIMERprop prop[embot::common::tointegral(embot::hw::TIMER::maxnumberof)];
+        TIMERprop prop[embot::core::tointegral(embot::hw::TIMER::maxnumberof)];
         
         TIMERprop & get(TIMER t)
         {
-            return prop[embot::common::tointegral(t)];
+            return prop[embot::core::tointegral(t)];
             //return prop[static_cast<std::uint8_t>(t)];
         }        
     };
@@ -292,7 +292,7 @@ namespace embot { namespace hw { namespace timer {
         prop.config = config;
         
         // VERY IMPORTANT: keep it in here before configure...
-        embot::binary::bit::set(initialisedmask, embot::common::tointegral(t));
+        embot::core::binary::bit::set(initialisedmask, embot::core::tointegral(t));
         
         return configure(t, config);    
     }

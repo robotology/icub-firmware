@@ -14,6 +14,7 @@
 
 #else
 
+#include "embot_core.h"
 #include "embot_hw.h"
 #include "embot_hw_bsp.h"
 #include "embot_hw_led.h"
@@ -52,11 +53,11 @@ static const stm32hal_config_t stm32halcfg { stm32hal_tick1msecinit, stm32hal_ti
 #else
 
 // embot hw requires a timebase in units of 1 us from which we can obtain the 1 ms units required by stm32hal.
-// the timebase of 1 us is instead used by embot::hw::bsp::now() 
+// the timebase of 1 us is instead used by embot::core::now() 
 // we can use the timebase that we want. 
 // with the rtos we use a dedicated function such as osal_system_abstime_get() or even better embot::sys::now()
 // in our case w/out rtos we can still use the systick timer which increments a volatile counter.
-// we still tick @ 1 khz and we just apply a 1000 factor. as a result of that embot::hw::bsp::now() will return
+// we still tick @ 1 khz and we just apply a 1000 factor. as a result of that embot::core::now() will return
 // values with 1000 us resolution.
 
 
@@ -74,12 +75,12 @@ static void embot_usectime_init(void)
     HAL_SYSTICK_Config(SystemCoreClock/s_rate);
 }
    
-embot::common::Time embot_usectime_get()
+embot::core::Time embot_usectime_get()
 {
    return s_numof1usecintick * s_tickcount; 
 }
 
-constexpr embot::hw::bsp::Config bspconfig {embot_usectime_init, embot_usectime_get};
+constexpr embot::hw::Config hwconfig {embot_usectime_init, embot_usectime_get};
 
 #endif
 
@@ -128,9 +129,12 @@ int main(void)
     }
     
 #else
+
+
    
-    // init the embot hw bsp. it internally calls stm32hal_init() which calls whatever stm32 HAL requires  
-    embot::hw::bsp::init(bspconfig);
+    // init the embot hw. it internally calls stm32hal_init() which calls whatever stm32 HAL requires . 
+    // it also calls embot::core::init()
+    embot::hw::init(hwconfig);
     
     // init LED::one (which GPIO mapping is specified inside embot::hw::bsp) and play with it
     embot::hw::led::init(embot::hw::LED::one);
@@ -144,37 +148,37 @@ int main(void)
     embot::hw::sys::puts("hello world");
    
     // specify a delay using the units defined in embot::common namespace    
-    embot::common::relTime delay = 500 * embot::common::time1millisec;
+    embot::core::relTime delay = 500 * embot::core::time1millisec;
        
     // prepare timing statistics
-    embot::common::Time t = embot::hw::bsp::now();
-    embot::common::Time prev = t;
-    embot::common::relTime delta = t - prev;
+    embot::core::Time t = embot::core::now();
+    embot::core::Time prev = t;
+    embot::core::relTime delta = t - prev;
         
-    embot::hw::sys::puts("starting led blinking every " + std::to_string(delay / embot::common::time1millisec) + " millisec");
+    embot::hw::sys::puts("starting led blinking every " + std::to_string(delay / embot::core::time1millisec) + " millisec");
     embot::hw::sys::puts("push the user button to print statistics");
     
     s_chips_init();
             
     for(;;)
     {
-        embot::common::Time t0 = embot::hw::bsp::now();
+        embot::core::Time t0 = embot::core::now();
         embot::hw::sys::delay(delay);        
-        embot::common::relTime delta =  embot::hw::bsp::now() - t0;
+        embot::core::relTime delta =  embot::core::now() - t0;
         
         embot::hw::led::toggle(embot::hw::LED::one);
 
         if(true == embot::hw::button::pressed(embot::hw::BTN::one))
         {
-            embot::hw::sys::puts("button pressed: we are at " + std::to_string(embot::hw::bsp::now() / embot::common::time1millisec) + " millisec after startup");
-            embot::hw::sys::puts("the previous call of embot::hw::sys::delay() for " + std::to_string(delay / embot::common::time1millisec) + " ms has lasted: " + std::to_string(delta) + " us");           
+            embot::hw::sys::puts("button pressed: we are at " + std::to_string(embot::core::now() / embot::core::time1millisec) + " millisec after startup");
+            embot::hw::sys::puts("the previous call of embot::hw::sys::delay() for " + std::to_string(delay / embot::core::time1millisec) + " ms has lasted: " + std::to_string(delta) + " us");           
             
 //            delay = delay / 2;           
-//            if(delay < (10 *  embot::common::time1millisec))
+//            if(delay < (10 *  embot::core::time1millisec))
 //            {
-//                delay = embot::common::time1second;
+//                delay = embot::core::time1second;
 //            }
-//            embot::hw::sys::puts("delay is now " + std::to_string(delay / embot::common::time1millisec) + " ms");       
+//            embot::hw::sys::puts("delay is now " + std::to_string(delay / embot::core::time1millisec) + " ms");       
 
             s_chips_tick();
         }        
@@ -201,7 +205,7 @@ static void s_chips_tick() {}
 
 static void s_chips_init()
 {
-    constexpr embot::common::relTime timeout = 5*embot::common::time1millisec;
+    constexpr embot::core::relTime timeout = 5*embot::core::time1millisec;
     
     embot::hw::bno055::Config bno055config { embot::hw::i2c::Descriptor { embot::hw::I2C::one, 400000 } };
     embot::hw::bno055::init(embot::hw::BNO055::one, bno055config); 
@@ -210,14 +214,16 @@ static void s_chips_init()
     constexpr embot::hw::bno055::Mode fusionMode = embot::hw::bno055::Mode::NDOF;
     embot::hw::bno055::set(embot::hw::BNO055::one, nonFusionMode, timeout);   
 }
-    volatile HAL_StatusTypeDef r = HAL_ERROR;
+    
+volatile HAL_StatusTypeDef r = HAL_ERROR;
+
 static void s_chips_tick()
 {
     embot::hw::bno055::Data data;
     
     data.clear();
     
-    embot::utils::Triple<float> a {0, 0, 0};
+    embot::core::utils::Triple<float> a {0, 0, 0};
     
 
     
@@ -234,10 +240,10 @@ static void s_chips_tick()
         char text[32] = {'h', 'E', 'l', 'l', 'o', '!', ' '}; 
         // 'hello! " is transmited in about 600 usec @ 115200 w/ 1 bit stop 
         // (9 bits per char) -> 1/(115200/9) = 0.000078125 sec / byte. For 7 bytes -> 546 usec
-        embot::common::Time t0 = embot::hw::bsp::now();
+        embot::core::Time t0 = embot::core::now();
         //r = HAL_UART_Transmit(&huart3, const_cast<uint8_t*>(reinterpret_cast<const uint8_t*>(txtout.c_str())), std::strlen(txtout.c_str()), 0xFFFF);
         r = HAL_UART_Transmit(&huart3, const_cast<uint8_t*>(reinterpret_cast<const uint8_t*>(text)), std::strlen(text), 0xFFFF);
-        embot::common::relTime delta =  embot::hw::bsp::now() - t0;
+        embot::core::relTime delta =  embot::core::now() - t0;
         embot::hw::sys::puts("uart tx lasted " + std::to_string(delta) + " us (with granularity given by the systick rate)"); 
         r = r;
     }
@@ -264,7 +270,7 @@ static void s_chips_init()
     
     if(true == embot::hw::si7051::isalive(embot::hw::SI7051::one))
     {
-        embot::common::Callback cbk { setflag, nullptr};
+        embot::core::Callback cbk { setflag, nullptr};
         temperatureISready =  0;
         embot::hw::si7051::acquisition(embot::hw::SI7051::one, cbk);
         for(;;)

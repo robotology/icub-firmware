@@ -30,13 +30,15 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "embot_app_theJumper.h"
-#include "embot_sys_Timer.h"
+#include "embot_os.h"
+#include "embot_os_Timer.h"
+#include "embot_os_theTimerManager.h"
+#include "embot_os_theCallbackManager.h"
+#include "embot_os_theScheduler.h"
 #include "embot_hw.h"
 #include "embot_hw_sys.h"
 #include "embot_hw_bsp.h"
 #include "embot_hw_flash.h"
-#include "embot.h"
-#include "osal.h"
 
 
 #include <new>
@@ -51,13 +53,13 @@
 struct embot::app::theBootloader::Impl
 {    
     Config config;
-    embot::sys::Timer *resetTimer;
-    embot::sys::Action action;
+    embot::os::Timer *resetTimer;
+    embot::os::Action action;
     
     Impl() 
     {              
         config.userdeflauncher.clear();
-        config.countdown = 5*embot::common::time1second;   
+        config.countdown = 5*embot::core::time1second;   
         resetTimer = nullptr;   
     }
     
@@ -70,8 +72,8 @@ struct embot::app::theBootloader::Impl
     
     static void restart2application(void *p);
     
-    static void onidle(embot::sys::Task *t, void* param);
-    static void init(embot::sys::Task *t, void* param);
+    static void onidle(embot::os::Thread *t, void* param);
+    static void init(embot::os::Thread *t, void* param);
     static void userdefonOSerror(void *param);
     
     //static void osalstarter(void *p);
@@ -164,19 +166,17 @@ embot::app::theBootloader::evalRes embot::app::theBootloader::eval()
 {
     pImpl->config = config;
     
-    // now we init the hw, we start the scheduler at 1 ms, we start a countdown with sys restart at the end ... we exec the activity ...
-    embot::hw::bsp::Config cc(nullptr, embot::sys::now);
-    embot::hw::bsp::init(cc);
+    embot::os::init({});
              
-    static const embot::sys::InitTask::Config initconfig { 4*2048, embot::app::theBootloader::Impl::init, nullptr };
-    static const embot::sys::IdleTask::Config idleconfig { 512, nullptr, nullptr, embot::app::theBootloader::Impl::onidle };
-    static const embot::common::Callback onOSerror = { embot::app::theBootloader::Impl::userdefonOSerror, nullptr };
+    static const embot::os::InitThread::Config initconfig { 4*2048, embot::app::theBootloader::Impl::init, nullptr };
+    static const embot::os::IdleThread::Config idleconfig { 512, nullptr, nullptr, embot::app::theBootloader::Impl::onidle };
+    static const embot::core::Callback onOSerror = { embot::app::theBootloader::Impl::userdefonOSerror, nullptr };
     
-    embot::sys::theScheduler::Config cfg { 
-            embot::sys::theScheduler::Timing(embot::hw::sys::clock(embot::hw::CLOCK::syscore),  embot::common::time1millisec),  
-            embot::sys::theScheduler::Behaviour { initconfig, idleconfig, onOSerror} 
+    embot::os::theScheduler::Config cfg { 
+            embot::os::theScheduler::Timing(embot::hw::sys::clock(embot::hw::CLOCK::syscore),  embot::core::time1millisec),  
+            embot::os::theScheduler::Behaviour { initconfig, idleconfig, onOSerror} 
     };    
-    embot::sys::theScheduler &thescheduler = embot::sys::theScheduler::getInstance();
+    embot::os::theScheduler &thescheduler = embot::os::theScheduler::getInstance();
     thescheduler.start(cfg);
 
     for(;;);
@@ -193,7 +193,7 @@ bool embot::app::theBootloader::stopcountdown()
 }
   
 
-bool embot::app::theBootloader::startcountdown(embot::common::relTime countdown)
+bool embot::app::theBootloader::startcountdown(embot::core::relTime countdown)
 {    
     pImpl->resetTimer->stop();
     
@@ -203,10 +203,10 @@ bool embot::app::theBootloader::startcountdown(embot::common::relTime countdown)
         return false;
     }
     
-//    embot::sys::Action action(embot::sys::Action::ExecuteCallback(restart2application, nullptr, nullptr));   
-    embot::sys::Timer::Config cfg;
+//    embot::os::Action action(embot::os::Action::ExecuteCallback(restart2application, nullptr, nullptr));   
+    embot::os::Timer::Config cfg;
     cfg.countdown = countdown;
-    cfg.mode = embot::sys::Timer::Mode::oneshot;
+    cfg.mode = embot::os::Timer::Mode::oneshot;
     cfg.onexpiry = pImpl->action;
     pImpl->resetTimer->start(cfg);
     
@@ -223,7 +223,7 @@ void embot::app::theBootloader::Impl::restart2application(void *p)
 }
 
 
-void embot::app::theBootloader::Impl::onidle(embot::sys::Task *t, void* param)
+void embot::app::theBootloader::Impl::onidle(embot::os::Thread *t, void* param)
 {
     
 }
@@ -233,22 +233,22 @@ void embot::app::theBootloader::Impl::userdefonOSerror(void *param)
     
 }
 
-void embot::app::theBootloader::Impl::init(embot::sys::Task *t, void* param)
+void embot::app::theBootloader::Impl::init(embot::os::Thread *t, void* param)
 {
     embot::app::theBootloader &handle2bootloader  = embot::app::theBootloader::getInstance();
     
     // start sys services: timer manager & callback manager
     // start them both w/ default config;
-    embot::sys::theTimerManager::getInstance().start({});     
-    embot::sys::theCallbackManager::getInstance().start({});   
+    embot::os::theTimerManager::getInstance().start({});     
+    embot::os::theCallbackManager::getInstance().start({});   
     
     // start reset timer
-    handle2bootloader.pImpl->resetTimer = new embot::sys::Timer;
-    handle2bootloader.pImpl->action.load(embot::sys::CallbackToTask(embot::common::Callback(restart2application, nullptr), nullptr));
+    handle2bootloader.pImpl->resetTimer = new embot::os::Timer;
+    handle2bootloader.pImpl->action.load(embot::os::CallbackToThread(embot::core::Callback(restart2application, nullptr), nullptr));
         
     if(handle2bootloader.pImpl->config.countdown > 0)
     {
-        embot::sys::Timer::Config cfg(handle2bootloader.pImpl->config.countdown, handle2bootloader.pImpl->action, embot::sys::Timer::Mode::oneshot);
+        embot::os::Timer::Config cfg(handle2bootloader.pImpl->config.countdown, handle2bootloader.pImpl->action, embot::os::Timer::Mode::oneshot);
         handle2bootloader.pImpl->resetTimer->start(cfg);
     }
 
@@ -260,20 +260,20 @@ void embot::app::theBootloader::Impl::init(embot::sys::Task *t, void* param)
 //{
 //    embot::app::theBootloader &handle2bootloader  = embot::app::theBootloader::getInstance();
 //    
-//    embot::sys::theTimerManager& tmrman = embot::sys::theTimerManager::getInstance();
-//    embot::sys::theTimerManager::Config tmrmanconfig;
+//    embot::os::theTimerManager& tmrman = embot::os::theTimerManager::getInstance();
+//    embot::os::theTimerManager::Config tmrmanconfig;
 //    tmrman.start(tmrmanconfig);
 //    
-//    embot::sys::theCallbackManager& cbkman = embot::sys::theCallbackManager::getInstance();
-//    embot::sys::theCallbackManager::Config cbkmanconfig;
+//    embot::os::theCallbackManager& cbkman = embot::os::theCallbackManager::getInstance();
+//    embot::os::theCallbackManager::Config cbkmanconfig;
 //    cbkman.start(cbkmanconfig);    
 //    
-//    handle2bootloader.pImpl->resetTimer = new embot::sys::Timer;
-//    handle2bootloader.pImpl->action.load(embot::sys::CallbackToTask(embot::common::Callback(restart2application, nullptr), nullptr));
+//    handle2bootloader.pImpl->resetTimer = new embot::os::Timer;
+//    handle2bootloader.pImpl->action.load(embot::os::CallbackToTask(embot::core::Callback(restart2application, nullptr), nullptr));
 //        
 //    if(handle2bootloader.pImpl->config.countdown > 0)
 //    {
-//        embot::sys::Timer::Config cfg(handle2bootloader.pImpl->config.countdown, handle2bootloader.pImpl->action, embot::sys::Timer::Mode::oneshot);
+//        embot::os::Timer::Config cfg(handle2bootloader.pImpl->config.countdown, handle2bootloader.pImpl->action, embot::os::Timer::Mode::oneshot);
 //        handle2bootloader.pImpl->resetTimer->start(cfg);
 //    }
 

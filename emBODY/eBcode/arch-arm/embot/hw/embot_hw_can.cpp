@@ -31,7 +31,7 @@
 
 #include "stm32hal.h"
 
-#include "embot_binary.h"
+#include "embot_core_binary.h"
 #include "embot_hw_bsp.h"
 #include "embot_hw_bsp_config.h"
 #include "embot_hw_sys.h"
@@ -104,7 +104,7 @@ namespace embot { namespace hw { namespace can {
     static std::uint32_t initialisedmask = 0;
     
     // it should be an array of them CAN. but so far we only have CAN::one, hence let's do it simple.
-    // std::array<CANdata, embot::common::tointegral(embot::hw::CAN::maxnumberof)> candata_ {};
+    // std::array<CANdata, embot::core::tointegral(embot::hw::CAN::maxnumberof)> candata_ {};
     CANdata candata {};
 
     
@@ -135,7 +135,7 @@ bool can::supported(embot::hw::CAN p)
 
 bool can::initialised(embot::hw::CAN p)
 {
-    return embot::binary::bit::check(initialisedmask, embot::common::tointegral(p));
+    return embot::core::binary::bit::check(initialisedmask, embot::core::tointegral(p));
 } 
    
 result_t can::init(embot::hw::CAN p, const Config &config)
@@ -192,7 +192,7 @@ result_t can::init(embot::hw::CAN p, const Config &config)
     if(HAL_OK != HAL_CAN_Start(candata.handle))
         return resNOK; //TODO: adding clear of vector
     
-    embot::binary::bit::set(initialisedmask, embot::common::tointegral(p));
+    embot::core::binary::bit::set(initialisedmask, embot::core::tointegral(p));
 
     return resOK;
 }

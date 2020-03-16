@@ -24,13 +24,13 @@
 
 #include "embot_app_application_theCANparserPOS.h"
 
-#include "embot_common.h"
+#include "embot_core.h"
 #include "embot_hw.h"
-#include "embot_sys.h"
-#include "embot_sys_Task.h"
-#include "embot_app_canprotocol.h"
-#include "embot_app_canprotocol_analog_polling.h"
-#include "embot_app_canprotocol_analog_periodic.h"
+#include "embot_os.h"
+#include "embot_os_Thread.h"
+#include "embot_prot_can.h"
+#include "embot_prot_can_analog_polling.h"
+#include "embot_prot_can_analog_periodic.h"
 #include "embot_hw_tlv493d.h"
 #include <array>
 #include <memory>
@@ -56,20 +56,20 @@ namespace embot { namespace app { namespace application {
         
         struct Events
         {
-            embot::common::Event                                acquire;
-            std::array<embot::common::Event, numberofpositions> dataready;    
+            embot::os::Event                                acquire;
+            std::array<embot::os::Event, numberofpositions> dataready;    
             constexpr Events() : acquire(0), dataready({0}) {}
-            constexpr Events(embot::common::Event te, const std::array<embot::common::Event, numberofpositions>& re) : acquire(te), dataready(re) {}
+            constexpr Events(embot::os::Event te, const std::array<embot::os::Event, numberofpositions>& re) : acquire(te), dataready(re) {}
             constexpr bool isvalid() const { if(0 == acquire) { return false; } return true; }
         }; 
         
         struct Config
         {  
-            embot::sys::Task*                       owner;
+            embot::os::Thread*                       owner;
             std::array<Sensor, numberofpositions>   sensors;
             Events                                  events;   
             constexpr Config() : owner(nullptr), sensors({}), events({}) {}
-            constexpr Config(embot::sys::Task* ow, const std::array<Sensor, numberofpositions>& s, const Events& e) : owner(ow), sensors(s), events(e) {}             
+            constexpr Config(embot::os::Thread* ow, const std::array<Sensor, numberofpositions>& s, const Events& e) : owner(ow), sensors(s), events(e) {}             
             bool isvalid() const { return events.isvalid(); }
         }; 
         
@@ -77,19 +77,19 @@ namespace embot { namespace app { namespace application {
         bool initialise(const Config &config);   
 
 //        bool start();          
-        bool start(embot::common::relTime period = 0);
+        bool start(embot::core::relTime period = 0);
         bool stop(); 
         
-        bool process(embot::common::Event evt, std::vector<embot::hw::can::Frame> &replies);
+        bool process(embot::os::Event evt, std::vector<embot::prot::can::Frame> &replies);
         
-//        bool tick(std::vector<embot::hw::can::Frame> &replies);        
-//        bool processdata(std::vector<embot::hw::can::Frame> &replies);    
+//        bool tick(std::vector<embot::prot::can::Frame> &replies);        
+//        bool processdata(std::vector<embot::prot::can::Frame> &replies);    
 
         
         // interface to CANagentPOS
-        virtual bool set(const embot::app::canprotocol::analog::polling::Message_POS_CONFIG_SET::Info &info);
-        virtual bool set(const embot::app::canprotocol::analog::polling::Message_POS_TRANSMIT::Info &info);
-        virtual bool get(const embot::app::canprotocol::analog::polling::Message_POS_CONFIG_GET::Info &info, embot::app::canprotocol::analog::polling::Message_POS_CONFIG_GET::ReplyInfo &replyinfo);
+        virtual bool set(const embot::prot::can::analog::polling::Message_POS_CONFIG_SET::Info &info);
+        virtual bool set(const embot::prot::can::analog::polling::Message_POS_TRANSMIT::Info &info);
+        virtual bool get(const embot::prot::can::analog::polling::Message_POS_CONFIG_GET::Info &info, embot::prot::can::analog::polling::Message_POS_CONFIG_GET::ReplyInfo &replyinfo);
         
 
     private:

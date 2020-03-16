@@ -6,22 +6,22 @@
 */
 
 
-#include "embot_code_updaterofbootloader.h"
+#include "embot_app_skeleton_os_updaterofbootloader.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // application info
 
 constexpr embot::app::theCANboardInfo::applicationInfo appInfo 
 { 
-    embot::app::canprotocol::versionOfAPPLICATION {2, 5 , 222}, // keep build = 222 so that we recognise it
-    embot::app::canprotocol::versionOfCANPROTOCOL {2, 0} 
+    embot::prot::can::versionOfAPPLICATION {2, 5 , 222}, // keep build = 222 so that we recognise it
+    embot::prot::can::versionOfCANPROTOCOL {2, 0} 
 };
 
 // --------------------------------------------------------------------------------------------------------------------
 
 int main(void)
 { 
-    embot::code::updaterofbootloader::run(appInfo);
+    embot::app::skeleton::os::updaterofbootloader::run(appInfo);
     for(;;);    
 }
    

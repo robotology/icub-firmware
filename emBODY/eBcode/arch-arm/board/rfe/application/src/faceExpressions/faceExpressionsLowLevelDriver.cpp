@@ -21,8 +21,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 #include "faceExpressionsLowLevelDriver.h"
 
-#include "embot_common.h"
-#include "embot_sys.h"
+#include "embot_core.h"
+#include "embot_os.h"
 
 using namespace RfeApp;
 using namespace std;

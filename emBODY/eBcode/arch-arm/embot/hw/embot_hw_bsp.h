@@ -22,8 +22,8 @@
 #ifndef _EMBOT_HW_BSP_H_
 #define _EMBOT_HW_BSP_H_
 
-#include "embot_common.h"
-#include "embot_binary.h"
+#include "embot_core.h"
+#include "embot_core_binary.h"
 #include "embot_hw.h"
 #include "embot_hw_gpio.h"
 #include <array>
@@ -31,26 +31,7 @@
 #include "stm32hal.h"
 
 namespace embot { namespace hw { namespace bsp {
-            
-    struct Config
-    {         
-        embot::common::fpWorker initmicrotime {nullptr};  
-        embot::common::fpGetU64 get1microtime {nullptr};         
-        
-        constexpr Config() = default;
-        constexpr Config(embot::common::fpWorker _init, embot::common::fpGetU64 _tmicro) : initmicrotime(_init), get1microtime(_tmicro) {}
-        bool isvalid() const { if(nullptr != get1microtime) { return true; } else { return false; } }
-    }; 
-    
-        
-    bool initialised();
-    
-    result_t init(const Config &config);
-    
-    // it returns time in microseconds as configured by Config::get1microtime()
-    // it is used inside embot::hw to avoid using embot::sys::now() which requires the osal.
-    embot::common::Time now();
-    
+                    
     // it is the base class used to map in rom the peripheral of the mpu and chips 
     // supported by the bsp 
     struct SUPP
@@ -62,7 +43,7 @@ namespace embot { namespace hw { namespace bsp {
         template <typename T>
         constexpr bool supported(T v) const
         {
-            return embot::binary::bit::check(supportedmask, embot::common::tointegral(v));
+            return embot::core::binary::bit::check(supportedmask, embot::core::tointegral(v));
         }        
     };    
               
@@ -84,7 +65,7 @@ namespace embot { namespace hw { namespace bsp { namespace gpio {
     
     struct BSP
     {
-        constexpr static std::uint8_t maxnumberofPORTs = embot::common::tointegral(embot::hw::GPIO::PORT::maxnumberof);
+        constexpr static std::uint8_t maxnumberofPORTs = embot::core::tointegral(embot::hw::GPIO::PORT::maxnumberof);
         constexpr BSP(std::array<std::uint16_t, maxnumberofPORTs> msk, std::array<GPIO_TypeDef*, maxnumberofPORTs> po) : supportmask2d(msk), ports(po) {}
         constexpr BSP() : supportmask2d({0}), ports({0}) {}            
           
@@ -93,21 +74,21 @@ namespace embot { namespace hw { namespace bsp { namespace gpio {
 
         constexpr bool supported(embot::hw::GPIO h) const
         { 
-            if(embot::common::tointegral(h.port) >= maxnumberofPORTs) 
+            if(embot::core::tointegral(h.port) >= maxnumberofPORTs) 
             {
                 return false; 
             }
-            if(embot::common::tointegral(h.pin) >= embot::common::tointegral(embot::hw::GPIO::PIN::maxnumberof)) 
+            if(embot::core::tointegral(h.pin) >= embot::core::tointegral(embot::hw::GPIO::PIN::maxnumberof)) 
             {
                 return false; 
             }
-            return embot::binary::bit::check(supportmask2d[embot::common::tointegral(h.port)], embot::common::tointegral(h.pin));
+            return embot::core::binary::bit::check(supportmask2d[embot::core::tointegral(h.port)], embot::core::tointegral(h.pin));
         }
         
         constexpr PROP getPROP(embot::hw::GPIO h) const 
         { 
             PROP p{}; 
-            if(supported(h)) { p.stmport = ports[embot::common::tointegral(h.port)]; p.stmpin = 1 << embot::common::tointegral(h.pin); }
+            if(supported(h)) { p.stmport = ports[embot::core::tointegral(h.port)]; p.stmpin = 1 << embot::core::tointegral(h.pin); }
             return p;
         }
                 
@@ -130,12 +111,12 @@ namespace embot { namespace hw { namespace bsp { namespace led {
     
     struct BSP : public embot::hw::bsp::SUPP
     {
-        constexpr static std::uint8_t maxnumberof = embot::common::tointegral(embot::hw::LED::maxnumberof);
+        constexpr static std::uint8_t maxnumberof = embot::core::tointegral(embot::hw::LED::maxnumberof);
         constexpr BSP(std::uint32_t msk, std::array<const PROP*, maxnumberof> pro) : SUPP(msk), properties(pro) {}
         constexpr BSP() : SUPP(0), properties({0}) {}            
             
         std::array<const PROP*, maxnumberof> properties;    
-        constexpr const PROP * getPROP(embot::hw::LED h) const { return supported(h) ? properties[embot::common::tointegral(h)] : nullptr; }
+        constexpr const PROP * getPROP(embot::hw::LED h) const { return supported(h) ? properties[embot::core::tointegral(h)] : nullptr; }
         void init(embot::hw::LED h) const;
     };
     
@@ -155,12 +136,12 @@ namespace embot { namespace hw { namespace bsp { namespace button {
     
     struct BSP : public embot::hw::bsp::SUPP
     {
-        constexpr static std::uint8_t maxnumberof = embot::common::tointegral(embot::hw::BTN::maxnumberof);
+        constexpr static std::uint8_t maxnumberof = embot::core::tointegral(embot::hw::BTN::maxnumberof);
         constexpr BSP(std::uint32_t msk, std::array<const PROP*, maxnumberof> pro) : SUPP(msk), properties(pro) {}
         constexpr BSP() : SUPP(0), properties({0}) {}            
             
         std::array<const PROP*, maxnumberof> properties;    
-        constexpr const PROP * getPROP(embot::hw::BTN h) const { return supported(h) ? properties[embot::common::tointegral(h)] : nullptr; }
+        constexpr const PROP * getPROP(embot::hw::BTN h) const { return supported(h) ? properties[embot::core::tointegral(h)] : nullptr; }
         void init(embot::hw::BTN h) const;
     };
     
@@ -186,12 +167,12 @@ namespace embot { namespace hw { namespace bsp { namespace can {
     
     struct BSP : public embot::hw::bsp::SUPP
     {
-        constexpr static std::uint8_t maxnumberof = embot::common::tointegral(embot::hw::CAN::maxnumberof);
+        constexpr static std::uint8_t maxnumberof = embot::core::tointegral(embot::hw::CAN::maxnumberof);
         constexpr BSP(std::uint32_t msk, std::array<const PROP*, maxnumberof> pro) : SUPP(msk), properties(pro) {}
         constexpr BSP() : SUPP(0), properties({0}) {}            
             
         std::array<const PROP*, maxnumberof> properties;    
-        constexpr const PROP * getPROP(embot::hw::CAN h) const { return supported(h) ? properties[embot::common::tointegral(h)] : nullptr; }
+        constexpr const PROP * getPROP(embot::hw::CAN h) const { return supported(h) ? properties[embot::core::tointegral(h)] : nullptr; }
         void init(embot::hw::CAN h) const;
     };
     
@@ -209,12 +190,12 @@ namespace embot { namespace hw { namespace bsp { namespace flash {
     
     struct BSP : public embot::hw::bsp::SUPP
     {
-        constexpr static std::uint8_t maxnumberof = embot::common::tointegral(embot::hw::FLASH::maxnumberof);
+        constexpr static std::uint8_t maxnumberof = embot::core::tointegral(embot::hw::FLASH::maxnumberof);
         constexpr BSP(std::uint32_t msk, std::array<const PROP*, maxnumberof> pro) : SUPP(msk), properties(pro) {}
         constexpr BSP() : SUPP(0), properties({0}) {}            
             
         std::array<const PROP*, maxnumberof> properties;    
-        constexpr const PROP * getPROP(embot::hw::FLASH h) const { return supported(h) ? properties[embot::common::tointegral(h)] : nullptr; }
+        constexpr const PROP * getPROP(embot::hw::FLASH h) const { return supported(h) ? properties[embot::core::tointegral(h)] : nullptr; }
         void init(embot::hw::FLASH h) const;
     };
     
@@ -232,12 +213,12 @@ namespace embot { namespace hw { namespace bsp { namespace pga308 {
     
     struct BSP : public embot::hw::bsp::SUPP
     {
-        constexpr static std::uint8_t maxnumberof = embot::common::tointegral(embot::hw::PGA308::maxnumberof);
+        constexpr static std::uint8_t maxnumberof = embot::core::tointegral(embot::hw::PGA308::maxnumberof);
         constexpr BSP(std::uint32_t msk, std::array<const PROP*, maxnumberof> pro) : SUPP(msk), properties(pro) {}
         constexpr BSP() : SUPP(0), properties({0}) {}            
             
         std::array<const PROP*, maxnumberof> properties;    
-        constexpr const PROP * getPROP(embot::hw::PGA308 h) const { return supported(h) ? properties[embot::common::tointegral(h)] : nullptr; }
+        constexpr const PROP * getPROP(embot::hw::PGA308 h) const { return supported(h) ? properties[embot::core::tointegral(h)] : nullptr; }
         void init(embot::hw::PGA308 h) const;
     };
     
@@ -256,12 +237,12 @@ namespace embot { namespace hw { namespace bsp { namespace si7051 {
     
     struct BSP : public embot::hw::bsp::SUPP
     {
-        constexpr static std::uint8_t maxnumberof = embot::common::tointegral(embot::hw::SI7051::maxnumberof);
+        constexpr static std::uint8_t maxnumberof = embot::core::tointegral(embot::hw::SI7051::maxnumberof);
         constexpr BSP(std::uint32_t msk, std::array<const PROP*, maxnumberof> pro) : SUPP(msk), properties(pro) {} 
         constexpr BSP() : SUPP(0), properties({0}) {}
             
         std::array<const PROP*, maxnumberof> properties;    
-        constexpr const PROP * getPROP(embot::hw::SI7051 h) const { return supported(h) ? properties[embot::common::tointegral(h)] : nullptr; }
+        constexpr const PROP * getPROP(embot::hw::SI7051 h) const { return supported(h) ? properties[embot::core::tointegral(h)] : nullptr; }
         void init(embot::hw::SI7051 h) const;
     };
     
@@ -281,12 +262,12 @@ namespace embot { namespace hw { namespace bsp { namespace onewire {
     
     struct BSP : public embot::hw::bsp::SUPP
     {
-        constexpr static std::uint8_t maxnumberof = embot::common::tointegral(embot::hw::ONEWIRE::maxnumberof);
+        constexpr static std::uint8_t maxnumberof = embot::core::tointegral(embot::hw::ONEWIRE::maxnumberof);
         constexpr BSP(std::uint32_t msk, std::array<const PROP*, maxnumberof> pro) : SUPP(msk), properties(pro) {}
         constexpr BSP() : SUPP(0), properties({0}) {}        
             
         std::array<const PROP*, maxnumberof> properties;    
-        constexpr const PROP * getPROP(embot::hw::ONEWIRE h) const { return supported(h) ? properties[embot::common::tointegral(h)] : nullptr; }
+        constexpr const PROP * getPROP(embot::hw::ONEWIRE h) const { return supported(h) ? properties[embot::core::tointegral(h)] : nullptr; }
         void init(embot::hw::ONEWIRE h) const;
     };
     
@@ -312,12 +293,12 @@ namespace embot { namespace hw { namespace bsp { namespace adc {
     
     struct BSP : public embot::hw::bsp::SUPP
     {
-        constexpr static std::uint8_t maxnumberof = embot::common::tointegral(embot::hw::ADC::maxnumberof);
+        constexpr static std::uint8_t maxnumberof = embot::core::tointegral(embot::hw::ADC::maxnumberof);
         constexpr BSP(std::uint32_t msk, std::array<const PROP*, maxnumberof> pro) : SUPP(msk), properties(pro) {} 
         constexpr BSP() : SUPP(0), properties({0}) {}
             
         std::array<const PROP*, maxnumberof> properties;    
-        constexpr const PROP * getPROP(embot::hw::ADC h) const { return supported(h) ? properties[embot::common::tointegral(h)] : nullptr; }
+        constexpr const PROP * getPROP(embot::hw::ADC h) const { return supported(h) ? properties[embot::core::tointegral(h)] : nullptr; }
         void init(embot::hw::ADC h) const;
     };
     
@@ -352,12 +333,12 @@ namespace embot { namespace hw { namespace bsp { namespace timer {
     
     struct BSP : public embot::hw::bsp::SUPP
     {
-        constexpr static std::uint8_t maxnumberof = embot::common::tointegral(embot::hw::TIMER::maxnumberof);
+        constexpr static std::uint8_t maxnumberof = embot::core::tointegral(embot::hw::TIMER::maxnumberof);
         constexpr BSP(std::uint32_t msk, std::array<const PROP*, maxnumberof> pro) : SUPP(msk), properties(pro) {} 
         constexpr BSP() : SUPP(0), properties({0}) {}
             
         std::array<const PROP*, maxnumberof> properties;    
-        constexpr const PROP * getPROP(embot::hw::TIMER h) const { return supported(h) ? properties[embot::common::tointegral(h)] : nullptr; }
+        constexpr const PROP * getPROP(embot::hw::TIMER h) const { return supported(h) ? properties[embot::core::tointegral(h)] : nullptr; }
         void init(embot::hw::TIMER h) const;
     };
     
@@ -378,12 +359,12 @@ namespace embot { namespace hw { namespace bsp { namespace i2c {
     
     struct BSP : public embot::hw::bsp::SUPP
     {
-        constexpr static std::uint8_t maxnumberof = embot::common::tointegral(embot::hw::I2C::maxnumberof);
+        constexpr static std::uint8_t maxnumberof = embot::core::tointegral(embot::hw::I2C::maxnumberof);
         constexpr BSP(std::uint32_t msk, std::array<const PROP*, maxnumberof> pro) : SUPP(msk), properties(pro) {} 
         constexpr BSP() : SUPP(0), properties({0}) {}
             
         std::array<const PROP*, maxnumberof> properties;    
-        constexpr const PROP * getPROP(embot::hw::I2C h) const { return supported(h) ? properties[embot::common::tointegral(h)] : nullptr; }
+        constexpr const PROP * getPROP(embot::hw::I2C h) const { return supported(h) ? properties[embot::core::tointegral(h)] : nullptr; }
         void init(embot::hw::I2C h) const;
     };
     
@@ -404,12 +385,12 @@ namespace embot { namespace hw { namespace bsp { namespace bno055 {
     
     struct BSP : public embot::hw::bsp::SUPP
     {
-        constexpr static std::uint8_t maxnumberof = embot::common::tointegral(embot::hw::BNO055::maxnumberof);
+        constexpr static std::uint8_t maxnumberof = embot::core::tointegral(embot::hw::BNO055::maxnumberof);
         constexpr BSP(std::uint32_t msk, std::array<const PROP*, maxnumberof> pro) : SUPP(msk), properties(pro) {}
         constexpr BSP() : SUPP(0), properties({0}) {}            
             
         std::array<const PROP*, maxnumberof> properties;    
-        constexpr const PROP * getPROP(embot::hw::BNO055 h) const { return supported(h) ? properties[embot::common::tointegral(h)] : nullptr; }
+        constexpr const PROP * getPROP(embot::hw::BNO055 h) const { return supported(h) ? properties[embot::core::tointegral(h)] : nullptr; }
         void init(embot::hw::BNO055 h) const;
     };
     
@@ -428,12 +409,12 @@ namespace embot { namespace hw { namespace bsp { namespace tlv493d {
     
     struct BSP : public embot::hw::bsp::SUPP
     {
-        constexpr static std::uint8_t maxnumberof = embot::common::tointegral(embot::hw::TLV493D::maxnumberof);
+        constexpr static std::uint8_t maxnumberof = embot::core::tointegral(embot::hw::TLV493D::maxnumberof);
         constexpr BSP(std::uint32_t msk, std::array<const PROP*, maxnumberof> pro) : SUPP(msk), properties(pro) {} 
         constexpr BSP() : SUPP(0), properties({0}) {}
             
         std::array<const PROP*, maxnumberof> properties;    
-        constexpr const PROP * getPROP(embot::hw::TLV493D h) const { return supported(h) ? properties[embot::common::tointegral(h)] : nullptr; }
+        constexpr const PROP * getPROP(embot::hw::TLV493D h) const { return supported(h) ? properties[embot::core::tointegral(h)] : nullptr; }
         void init(embot::hw::TLV493D h) const;
     };
     

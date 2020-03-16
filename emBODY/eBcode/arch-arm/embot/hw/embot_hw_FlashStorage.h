@@ -22,14 +22,13 @@
 #ifndef _EMBOT_HW_FLASH_STORAGE_H_
 #define _EMBOT_HW_FLASH_STORAGE_H_
 
-#include "embot_common.h"
-#include "embot_utils.h"
+#include "embot_core.h"
+#include "embot_core_utils.h"
 #include "embot_hw.h"
-#include "embot_hw_sys.h"
 
 namespace embot { namespace hw {
     
-    class FlashStorage : public embot::utils::Storage 
+    class FlashStorage : public embot::core::utils::Storage 
     {
     public:
         

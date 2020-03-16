@@ -129,7 +129,7 @@ int main(void)
     static uint32_t count = 0;
     static const uint32_t PERIOD = 10;
     
-    led1ON = embot::binary::bit::check(mask32, 0); 
+    led1ON = embot::core::binary::bit::check(mask32, 0); 
 
     
     embot::hw::led::on(embot::hw::led::LED::one);  
@@ -146,10 +146,10 @@ int main(void)
         
         if(PERIOD == ++count)
         {
-            // in here, i want to demonstrate functions of the embot::binary::bit namespace which does bit manipulation of all integer types: 8, 16, 32, 64 bit long
+            // in here, i want to demonstrate functions of the embot::core::binary::bit namespace which does bit manipulation of all integer types: 8, 16, 32, 64 bit long
             count = 0;
-            embot::binary::bit::toggle(mask32, 0);              
-            led1ON = embot::binary::bit::check(mask32, 0);     
+            embot::core::binary::bit::toggle(mask32, 0);              
+            led1ON = embot::core::binary::bit::check(mask32, 0);     
             some_other_demonstrations();
         }
                 
@@ -180,10 +180,10 @@ static void some_other_demonstrations(void)
     
     uint8_t numberofonebits = 0;
     
-    numberofonebits = embot::binary::bit::count(themask64);
-    numberofonebits = embot::binary::bit::count(themask32);
-    numberofonebits = embot::binary::bit::count(themask16);
-    numberofonebits = embot::binary::bit::count(themask08);
+    numberofonebits = embot::core::binary::bit::count(themask64);
+    numberofonebits = embot::core::binary::bit::count(themask32);
+    numberofonebits = embot::core::binary::bit::count(themask16);
+    numberofonebits = embot::core::binary::bit::count(themask08);
     numberofonebits = numberofonebits;
     
     
@@ -192,33 +192,33 @@ static void some_other_demonstrations(void)
     
     uint64_t destination = 0;
     bool equal = false;
-    embot::binary::nibble::assign(destination, 0x3, 4);
+    embot::core::binary::nibble::assign(destination, 0x3, 4);
     destination = destination;
     
-    embot::binary::nibble::assign(destination, 0xf, 3);
+    embot::core::binary::nibble::assign(destination, 0xf, 3);
     destination = destination;
         
-    equal = embot::binary::nibble::check(destination, 0x3, 4);
+    equal = embot::core::binary::nibble::check(destination, 0x3, 4);
     equal = equal;
     
-    embot::binary::nibble::assign(destination, 0x0, 4);
+    embot::core::binary::nibble::assign(destination, 0x0, 4);
     destination = destination;    
     
-    equal = embot::binary::nibble::check(destination, 0x3, 4);
+    equal = embot::core::binary::nibble::check(destination, 0x3, 4);
     equal = equal;
 
     // i want to manipulate group of bits: masks of any form
     
     uint64_t msk = 0x010101;
     destination = 0;
-    embot::binary::mask::set(destination, msk);
+    embot::core::binary::mask::set(destination, msk);
     destination = destination;
-    equal = embot::binary::mask::check(destination, msk);
+    equal = embot::core::binary::mask::check(destination, msk);
     equal = equal;
-    embot::binary::mask::toggle(destination, static_cast<uint64_t>(0x111111));
-    embot::binary::mask::toggle(destination, msk);
-    embot::binary::mask::toggle(destination, msk);
-    embot::binary::mask::toggle(destination, msk);
+    embot::core::binary::mask::toggle(destination, static_cast<uint64_t>(0x111111));
+    embot::core::binary::mask::toggle(destination, msk);
+    embot::core::binary::mask::toggle(destination, msk);
+    embot::core::binary::mask::toggle(destination, msk);
     destination = destination;
 
 }

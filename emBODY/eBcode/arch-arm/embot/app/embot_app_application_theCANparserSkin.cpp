@@ -29,16 +29,10 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "embot.h"
 
 #include <new>
 
-#include "embot_hw.h"
-
 #include "embot_app_theCANboardInfo.h"
-
-//#include "embot_app_application_theSkin.h"
-
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -54,10 +48,10 @@ struct embot::app::application::theCANparserSkin::Impl
         dummyCANagentSKIN() {}
         virtual ~dummyCANagentSKIN() {}
             
-        virtual bool set(const embot::app::canprotocol::analog::polling::Message_SKIN_SET_BRD_CFG::Info &info)  {  return true; }
-        virtual bool set(const embot::app::canprotocol::analog::polling::Message_SKIN_SET_TRIANG_CFG::Info &info)  {  return true; }  
-        virtual bool set(const embot::app::canprotocol::analog::polling::Message_SET_TXMODE::Info &info)  {  return true; } 
-        virtual bool set(const embot::app::canprotocol::analog::polling::Message_SKIN_OBSOLETE_TACT_SETUP::Info &info)  {  return true; }            
+        virtual bool set(const embot::prot::can::analog::polling::Message_SKIN_SET_BRD_CFG::Info &info)  {  return true; }
+        virtual bool set(const embot::prot::can::analog::polling::Message_SKIN_SET_TRIANG_CFG::Info &info)  {  return true; }  
+        virtual bool set(const embot::prot::can::analog::polling::Message_SET_TXMODE::Info &info)  {  return true; } 
+        virtual bool set(const embot::prot::can::analog::polling::Message_SKIN_OBSOLETE_TACT_SETUP::Info &info)  {  return true; }            
     };
     
     dummyCANagentSKIN dummyagent;
@@ -67,10 +61,10 @@ struct embot::app::application::theCANparserSkin::Impl
     bool txframe;
     bool recognised;
     
-    embot::app::canprotocol::Clas cls;
+    embot::prot::can::Clas cls;
     std::uint8_t cmd;    
         
-    embot::hw::can::Frame reply;
+    embot::prot::can::Frame reply;
     
 
     Impl() 
@@ -78,35 +72,35 @@ struct embot::app::application::theCANparserSkin::Impl
         config.agent = &dummyagent;             
         recognised = false;        
         txframe = false;
-        cls = embot::app::canprotocol::Clas::none;
+        cls = embot::prot::can::Clas::none;
         cmd = 0;               
     }
     
    
-    bool process(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);
+    bool process(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies);
     
     
-    bool process_set_brdcfg(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);   
-    bool process_set_trgcfg(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);      
-    bool process_set_txmode(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);   
-    bool process_set_obsolete_tactsetup(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies);    
+    bool process_set_brdcfg(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies);   
+    bool process_set_trgcfg(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies);      
+    bool process_set_txmode(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies);   
+    bool process_set_obsolete_tactsetup(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies);    
 };
 
 
-bool embot::app::application::theCANparserSkin::Impl::process(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
+bool embot::app::application::theCANparserSkin::Impl::process(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies)
 {
     txframe = false;
     recognised = false;
     
-    if(false == embot::app::canprotocol::frameis4board(frame, embot::app::theCANboardInfo::getInstance().cachedCANaddress()))
+    if(false == embot::prot::can::frameis4board(frame, embot::app::theCANboardInfo::getInstance().cachedCANaddress()))
     {
         recognised = false;
         return recognised;
     }
         
     // now get cls and cmd
-    cls = embot::app::canprotocol::frame2clas(frame);
-    cmd = embot::app::canprotocol::frame2cmd(frame);
+    cls = embot::prot::can::frame2clas(frame);
+    cmd = embot::prot::can::frame2cmd(frame);
     
     
     // the basic can handle only some messages ...
@@ -114,26 +108,26 @@ bool embot::app::application::theCANparserSkin::Impl::process(const embot::hw::c
     switch(cls)
     {
         
-        case embot::app::canprotocol::Clas::pollingAnalogSensor:
+        case embot::prot::can::Clas::pollingAnalogSensor:
         {
             
-            // only embot::app::canprotocol::analog::polling::CMD::SKIN_SET_BRD_CFG, SKIN_SET_TRIANG_CFG, SET_TXMODE            
-            if(static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::CMD::SKIN_SET_BRD_CFG) == cmd)
+            // only embot::prot::can::analog::polling::CMD::SKIN_SET_BRD_CFG, SKIN_SET_TRIANG_CFG, SET_TXMODE            
+            if(static_cast<std::uint8_t>(embot::prot::can::analog::polling::CMD::SKIN_SET_BRD_CFG) == cmd)
             {
                 txframe = process_set_brdcfg(frame, replies);
                 recognised = true;
             }
-            else if(static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::CMD::SKIN_SET_TRIANG_CFG) == cmd)
+            else if(static_cast<std::uint8_t>(embot::prot::can::analog::polling::CMD::SKIN_SET_TRIANG_CFG) == cmd)
             {
                 txframe = process_set_trgcfg(frame, replies);
                 recognised = true;
             }
-            else if(static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::CMD::SET_TXMODE) == cmd)
+            else if(static_cast<std::uint8_t>(embot::prot::can::analog::polling::CMD::SET_TXMODE) == cmd)
             {
                 txframe = process_set_txmode(frame, replies);
                 recognised = true;
             }
-            else if(static_cast<std::uint8_t>(embot::app::canprotocol::analog::polling::CMD::SKIN_OBSOLETE_TACT_SETUP) == cmd)
+            else if(static_cast<std::uint8_t>(embot::prot::can::analog::polling::CMD::SKIN_OBSOLETE_TACT_SETUP) == cmd)
             {
                 txframe = process_set_obsolete_tactsetup(frame, replies);
                 recognised = true;
@@ -156,9 +150,9 @@ bool embot::app::application::theCANparserSkin::Impl::process(const embot::hw::c
 
 
 
-bool embot::app::application::theCANparserSkin::Impl::process_set_brdcfg(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
+bool embot::app::application::theCANparserSkin::Impl::process_set_brdcfg(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies)
 {
-    embot::app::canprotocol::analog::polling::Message_SKIN_SET_BRD_CFG msg;
+    embot::prot::can::analog::polling::Message_SKIN_SET_BRD_CFG msg;
     msg.load(frame);
       
 //    embot::app::application::theSkin &theskin = embot::app::application::theSkin::getInstance();    
@@ -168,9 +162,9 @@ bool embot::app::application::theCANparserSkin::Impl::process_set_brdcfg(const e
     return msg.reply();        
 }
 
-bool embot::app::application::theCANparserSkin::Impl::process_set_obsolete_tactsetup(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
+bool embot::app::application::theCANparserSkin::Impl::process_set_obsolete_tactsetup(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies)
 {
-    embot::app::canprotocol::analog::polling::Message_SKIN_OBSOLETE_TACT_SETUP msg;
+    embot::prot::can::analog::polling::Message_SKIN_OBSOLETE_TACT_SETUP msg;
     msg.load(frame);
       
 //    embot::app::application::theSkin &theskin = embot::app::application::theSkin::getInstance();    
@@ -182,9 +176,9 @@ bool embot::app::application::theCANparserSkin::Impl::process_set_obsolete_tacts
 
 
 
-bool embot::app::application::theCANparserSkin::Impl::process_set_trgcfg(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
+bool embot::app::application::theCANparserSkin::Impl::process_set_trgcfg(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies)
 {
-    embot::app::canprotocol::analog::polling::Message_SKIN_SET_TRIANG_CFG msg;
+    embot::prot::can::analog::polling::Message_SKIN_SET_TRIANG_CFG msg;
     msg.load(frame);
       
 //    embot::app::application::theSkin &theskin = embot::app::application::theSkin::getInstance();    
@@ -196,9 +190,9 @@ bool embot::app::application::theCANparserSkin::Impl::process_set_trgcfg(const e
 
 
 
-bool embot::app::application::theCANparserSkin::Impl::process_set_txmode(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
+bool embot::app::application::theCANparserSkin::Impl::process_set_txmode(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies)
 {
-    embot::app::canprotocol::analog::polling::Message_SET_TXMODE msg(embot::app::canprotocol::Board::mtb4);
+    embot::prot::can::analog::polling::Message_SET_TXMODE msg(embot::prot::can::Board::mtb4);
     msg.load(frame);
     
 //    embot::app::application::theSkin &theskin = embot::app::application::theSkin::getInstance();    
@@ -257,7 +251,7 @@ bool embot::app::application::theCANparserSkin::initialise(const Config &config)
   
 
 
-bool embot::app::application::theCANparserSkin::process(const embot::hw::can::Frame &frame, std::vector<embot::hw::can::Frame> &replies)
+bool embot::app::application::theCANparserSkin::process(const embot::prot::can::Frame &frame, std::vector<embot::prot::can::Frame> &replies)
 {    
     return pImpl->process(frame, replies);
 }

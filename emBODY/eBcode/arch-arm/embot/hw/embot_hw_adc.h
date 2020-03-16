@@ -22,7 +22,7 @@
 #ifndef _EMBOT_HW_ADC_H_
 #define _EMBOT_HW_ADC_H_
 
-#include "embot_common.h"
+#include "embot_core.h"
 #include "embot_hw.h"
 
 
@@ -43,7 +43,7 @@ namespace embot { namespace hw { namespace adc {
         ItemSize                    itemsize;
         void*                       destination;
         std::uint8_t                numberofitems;
-        embot::common::Callback     oncompletion; 
+        embot::core::Callback     oncompletion; 
         Config() : mode(Mode::dma), acquisition(Acquisition::single), itemsize(ItemSize::U16), destination(nullptr), numberofitems(0), oncompletion(nullptr, nullptr) {}
     };
     
@@ -57,7 +57,7 @@ namespace embot { namespace hw { namespace adc {
     // they all change the initial configuration after the call of init(). if acquisition is running it is stopped.
     result_t configure(embot::hw::ADC p, void *destination, std::uint8_t numberofitems); 
     result_t configure(embot::hw::ADC p, Acquisition acquisition);    
-    result_t configure(embot::hw::ADC p, const embot::common::Callback &oncompletion);
+    result_t configure(embot::hw::ADC p, const embot::core::Callback &oncompletion);
     
     // on strain2 , a single acquisition of the 6 channels takes 560 usec, hence the oncompletion() callback is required.
     result_t start(embot::hw::ADC p);

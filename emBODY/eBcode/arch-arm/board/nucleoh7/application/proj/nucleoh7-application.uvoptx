@@ -332,7 +332,7 @@
       <DebugFlag>
         <trace>0</trace>
         <periodic>0</periodic>
-        <aLwin>1</aLwin>
+        <aLwin>0</aLwin>
         <aCover>0</aCover>
         <aSer1>0</aSer1>
         <aSer2>0</aSer2>
@@ -349,7 +349,7 @@
         <aLa>0</aLa>
         <aPa1>0</aPa1>
         <AscS4>0</AscS4>
-        <aSer4>0</aSer4>
+        <aSer4>1</aSer4>
         <StkLoc>0</StkLoc>
         <TrcWin>0</TrcWin>
         <newCpu>0</newCpu>
@@ -552,8 +552,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\stm32hal\lib\stm32hal.nucleoh7.v180.lib</PathWithFileName>
-      <FilenameWithoutPath>stm32hal.nucleoh7.v180.lib</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.nucleoh7.v180.lib</PathWithFileName>
+      <FilenameWithoutPath>stm32hal.h7.nucleoh7.v180.lib</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -581,7 +581,7 @@
 
   <Group>
     <GroupName>embot-core</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -592,8 +592,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\#rob\icub-firmware\emBODY\eBcode\arch-arm\embot\common\embot_common.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_common.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\embot\core\embot_core.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_core.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -604,8 +604,20 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\#rob\icub-firmware\emBODY\eBcode\arch-arm\embot\binary\embot_binary.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_binary.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\embot\core\embot_core_binary.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_core_binary.cpp</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>4</GroupNumber>
+      <FileNumber>6</FileNumber>
+      <FileType>8</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\embot\core\embot_core_utils.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_core_utils.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -619,25 +631,13 @@
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>5</GroupNumber>
-      <FileNumber>6</FileNumber>
-      <FileType>8</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\#rob\icub-firmware\emBODY\eBcode\arch-arm\embot\hw\embot_hw.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw.cpp</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>5</GroupNumber>
       <FileNumber>7</FileNumber>
       <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\#rob\icub-firmware\emBODY\eBcode\arch-arm\embot\hw\embot_hw_bsp.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw_bsp.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\embot\hw\embot_hw.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -648,8 +648,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\#rob\icub-firmware\emBODY\eBcode\arch-arm\embot\hw\embot_hw_button.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw_button.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\embot\hw\embot_hw_bsp.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_bsp.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -660,7 +660,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\#rob\icub-firmware\emBODY\eBcode\arch-arm\embot\hw\embot_hw_gpio.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\embot\hw\embot_hw_gpio.cpp</PathWithFileName>
       <FilenameWithoutPath>embot_hw_gpio.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -672,8 +672,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\#rob\icub-firmware\emBODY\eBcode\arch-arm\embot\hw\embot_hw_i2c.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw_i2c.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\embot\hw\embot_hw_button.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_button.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -684,8 +684,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\#rob\icub-firmware\emBODY\eBcode\arch-arm\embot\hw\embot_hw_led.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw_led.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\embot\hw\embot_hw_i2c.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_i2c.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -696,7 +696,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\#rob\icub-firmware\emBODY\eBcode\arch-arm\embot\hw\embot_hw_sys.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\embot\hw\embot_hw_sys.cpp</PathWithFileName>
       <FilenameWithoutPath>embot_hw_sys.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -708,8 +708,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\#rob\icub-firmware\emBODY\eBcode\arch-arm\embot\hw\embot_hw_bno055.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw_bno055.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\embot\hw\embot_hw_timer.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_timer.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -720,7 +720,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\#rob\icub-firmware\emBODY\eBcode\arch-arm\embot\hw\embot_hw_lowlevel.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\embot\hw\embot_hw_lowlevel.cpp</PathWithFileName>
       <FilenameWithoutPath>embot_hw_lowlevel.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -732,8 +732,20 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\#rob\icub-firmware\emBODY\eBcode\arch-arm\embot\hw\embot_hw_si7051.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw_si7051.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\embot\hw\embot_hw_led.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_led.cpp</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>5</GroupNumber>
+      <FileNumber>16</FileNumber>
+      <FileType>8</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\embot\hw\embot_hw_bno055.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_bno055.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

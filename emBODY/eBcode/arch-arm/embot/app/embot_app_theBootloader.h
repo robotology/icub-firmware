@@ -21,8 +21,7 @@
 #ifndef _EMBOT_APP_THEBOOTLOADER_H_
 #define _EMBOT_APP_THEBOOTLOADER_H_
 
-#include "embot_common.h"
-#include "embot_sys.h"
+#include "embot_core.h"
 #include "embot_app_theJumper.h"
 #include <new>
 
@@ -41,10 +40,10 @@ namespace embot { namespace app {
         
         struct Config
         {
-            embot::common::Callback userdeflauncher {nullptr, nullptr};
-            embot::common::relTime  countdown {5*embot::common::time1second};    
+            embot::core::Callback userdeflauncher {nullptr, nullptr};
+            embot::core::relTime  countdown {5*embot::core::time1second};    
             Config() = default;
-            Config(const embot::common::Callback &_launcher, embot::common::relTime _countdown = 5*embot::common::time1second) : userdeflauncher(_launcher), countdown(_countdown) {}
+            Config(const embot::core::Callback &_launcher, embot::core::relTime _countdown = 5*embot::core::time1second) : userdeflauncher(_launcher), countdown(_countdown) {}
         }; 
         
         enum class evalRes : uint8_t { jumpaftercountdown = 0, stayforever = 1, jumpfailed = 2, unexected = 3 }; 
@@ -67,7 +66,7 @@ namespace embot { namespace app {
         bool stopcountdown(); 
         
         // we can call it to start (again, maybe after it was stoopped) teh countdown. we can use this with 100 ms timeout so that we can send back an ack to canlaoder and then restart
-        bool startcountdown(embot::common::relTime countdown); 
+        bool startcountdown(embot::core::relTime countdown); 
         
         // it is used to force a jump to the application but passing through a restart of the mpu. 
         // IMPORTANT: you can use this after the ::execute() function is called.

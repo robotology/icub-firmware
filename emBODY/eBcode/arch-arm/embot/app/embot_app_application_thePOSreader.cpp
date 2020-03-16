@@ -29,16 +29,16 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "embot.h"
-#include "embot_common.h"
-#include "embot_binary.h"
+
+#include "embot_core.h"
+#include "embot_core_binary.h"
 
 #include <new>
-#include "embot_sys_Timer.h"
-#include "embot_sys_Action.h"
+#include "embot_os_Timer.h"
+#include "embot_os_Action.h"
 #include "embot_hw.h"
-#include "embot_app_canprotocol.h"
-#include "embot_app_canprotocol_analog_periodic.h"
+#include "embot_prot_can.h"
+#include "embot_prot_can_analog_periodic.h"
 
 #include <cstdio>
 
@@ -47,7 +47,7 @@
 #include "embot_app_application_theCANtracer.h"
 
 
-#include "embot_common.h"
+#include "embot_core.h"
 
 #include "embot_hw_sys.h"
 #include "embot_hw_tlv493d.h"
@@ -67,7 +67,7 @@ struct embot::app::application::thePOSreader::Impl
         
     struct canConfig
     {
-        std::array<embot::app::canprotocol::analog::polling::deciDegPOSdescriptor, numberofpositions> descriptor;
+        std::array<embot::prot::can::analog::polling::deciDegPOSdescriptor, numberofpositions> descriptor;
         canConfig() { reset(); }
         void reset()
         {
@@ -88,16 +88,16 @@ struct embot::app::application::thePOSreader::Impl
     std::uint8_t sensorstoacquiremask;
     uint8_t sensorspresencemask;
         
-    embot::sys::Timer *ticktimer;
-    embot::sys::Action action;
-    common::relTime txperiod;
+    embot::os::Timer *ticktimer;
+    embot::os::Action action;
+    embot::core::relTime txperiod;
 
     canConfig canconfig;
     
     static constexpr embot::hw::tlv493d::Position valueOfPositionCHIPnotinitted = 2000*100;         // which will results in 2000 degrees or 20000 decidegrees
     static constexpr embot::hw::tlv493d::Position valueOfPositionACQUISITIONnotvalid = 1000*100;    // which will results in 1000 degrees or 10000 decidegrees
     std::array<embot::hw::tlv493d::Position, numberofpositions> positions;
-    std::array<embot::app::canprotocol::analog::deciDeg, 3> decidegvalues;
+    std::array<embot::prot::can::analog::deciDeg, 3> decidegvalues;
     
    
     Impl() 
@@ -106,13 +106,13 @@ struct embot::app::application::thePOSreader::Impl
         acquisitionmask = 0;
         sensorstoacquiremask = 0;
         sensorspresencemask = 0;
-        txperiod = 10*embot::common::time1millisec;
+        txperiod = 10*embot::core::time1millisec;
 
-        ticktimer = new embot::sys::Timer;      
+        ticktimer = new embot::os::Timer;      
 
         canconfig.reset(); 
-        canconfig.descriptor[0].label = embot::app::canprotocol::analog::posLABEL::zero;
-        canconfig.descriptor[1].label = embot::app::canprotocol::analog::posLABEL::one;
+        canconfig.descriptor[0].label = embot::prot::can::analog::posLABEL::zero;
+        canconfig.descriptor[1].label = embot::prot::can::analog::posLABEL::one;
         
         positions[0] = positions[1] = 0;  
         decidegvalues[0] = decidegvalues[1] = decidegvalues[2] = 0;        
@@ -120,14 +120,14 @@ struct embot::app::application::thePOSreader::Impl
 #if defined(DEBUG_COMPENSATE_SENSOR)
         
         canconfig.descriptor[0].invertdirection = false;
-        canconfig.descriptor[0].rotation = embot::app::canprotocol::analog::polling::deciDegPOSdescriptor::ROT::none;
-        canconfig.descriptor[0].label = embot::app::canprotocol::analog::posLABEL::zero;
-        canconfig.descriptor[0].zero = embot::app::canprotocol::analog::deciDeg_import(0.0);
+        canconfig.descriptor[0].rotation = embot::prot::can::analog::polling::deciDegPOSdescriptor::ROT::none;
+        canconfig.descriptor[0].label = embot::prot::can::analog::posLABEL::zero;
+        canconfig.descriptor[0].zero = embot::prot::can::analog::deciDeg_import(0.0);
         
         canconfig.descriptor[1].invertdirection = true;
-        canconfig.descriptor[1].rotation = embot::app::canprotocol::analog::polling::deciDegPOSdescriptor::ROT::plus180;
-        canconfig.descriptor[1].label = embot::app::canprotocol::analog::posLABEL::one;
-        canconfig.descriptor[1].zero = embot::app::canprotocol::analog::deciDeg_import(348.0);
+        canconfig.descriptor[1].rotation = embot::prot::can::analog::polling::deciDegPOSdescriptor::ROT::plus180;
+        canconfig.descriptor[1].label = embot::prot::can::analog::posLABEL::one;
+        canconfig.descriptor[1].zero = embot::prot::can::analog::deciDeg_import(348.0);
         
 #endif
 
@@ -144,14 +144,14 @@ struct embot::app::application::thePOSreader::Impl
    
     bool start();
     bool stop();    
-    bool tick(std::vector<embot::hw::can::Frame> &replies);
-    bool process(embot::common::Event evt, std::vector<embot::hw::can::Frame> &replies);
+    bool tick(std::vector<embot::prot::can::Frame> &replies);
+    bool process(embot::os::Event evt, std::vector<embot::prot::can::Frame> &replies);
     
               
     bool acquisition_start();
     bool acquisition_retrieve(std::uint8_t n);
     bool acquisition_processing(std::uint8_t n);
-    bool acquisition_transmit(std::vector<embot::hw::can::Frame> &replies);
+    bool acquisition_transmit(std::vector<embot::prot::can::Frame> &replies);
     
     
     static void alertdataisready00(void *p)
@@ -181,7 +181,7 @@ struct embot::app::application::thePOSreader::Impl
 
 bool embot::app::application::thePOSreader::Impl::start()
 { 
-    embot::sys::Timer::Config cfg(txperiod, action, embot::sys::Timer::Mode::forever);
+    embot::os::Timer::Config cfg(txperiod, action, embot::os::Timer::Mode::forever);
     ticktimer->start(cfg);
     ticking = true;    
     return true;            
@@ -197,7 +197,7 @@ bool embot::app::application::thePOSreader::Impl::stop()
 
 
 
-bool embot::app::application::thePOSreader::Impl::process(embot::common::Event evt, std::vector<embot::hw::can::Frame> &replies)
+bool embot::app::application::thePOSreader::Impl::process(embot::os::Event evt, std::vector<embot::prot::can::Frame> &replies)
 {   
     if(false == ticking)
     {
@@ -224,7 +224,7 @@ bool embot::app::application::thePOSreader::Impl::process(embot::common::Event e
     }
     
  
-    if(true == embot::binary::mask::check(acquisitionmask, sensorstoacquiremask))
+    if(true == embot::core::binary::mask::check(acquisitionmask, sensorstoacquiremask))
     {
         acquisition_transmit(replies);
     }
@@ -233,19 +233,19 @@ bool embot::app::application::thePOSreader::Impl::process(embot::common::Event e
 }
 
 
-bool embot::app::application::thePOSreader::Impl::acquisition_transmit(std::vector<embot::hw::can::Frame> &replies)
+bool embot::app::application::thePOSreader::Impl::acquisition_transmit(std::vector<embot::prot::can::Frame> &replies)
 {   
         
-    if(false == embot::binary::mask::check(acquisitionmask, sensorspresencemask))
+    if(false == embot::core::binary::mask::check(acquisitionmask, sensorspresencemask))
     {
         return false;
     }
         
     // we are ready to transmit    
-    embot::hw::can::Frame frame;   
+    embot::prot::can::Frame frame;   
                  
-    embot::app::canprotocol::analog::periodic::Message_POS msg;
-    embot::app::canprotocol::analog::periodic::Message_POS::Info info;  
+    embot::prot::can::analog::periodic::Message_POS msg;
+    embot::prot::can::analog::periodic::Message_POS::Info info;  
     
     info.canaddress = embot::app::theCANboardInfo::getInstance().cachedCANaddress();   
     if((true == canconfig.descriptor[0].enabled) && (true == canconfig.descriptor[1].enabled))
@@ -322,18 +322,18 @@ bool embot::app::application::thePOSreader::Impl::acquisition_start()
     }
       
     // else, we start acquisition from the sensors which are available
-    if(embot::binary::bit::check(sensorspresencemask, 0))
+    if(embot::core::binary::bit::check(sensorspresencemask, 0))
     {        
-        embot::common::Callback cbk00(alertdataisready00, this);
+        embot::core::Callback cbk00(alertdataisready00, this);
         embot::hw::tlv493d::acquisition(config.sensors[0].id, cbk00);
-        embot::binary::bit::set(sensorstoacquiremask, 0);
+        embot::core::binary::bit::set(sensorstoacquiremask, 0);
     }
 
-    if(embot::binary::bit::check(sensorspresencemask, 1))
+    if(embot::core::binary::bit::check(sensorspresencemask, 1))
     {
-        embot::common::Callback cbk01(alertdataisready01, this);
+        embot::core::Callback cbk01(alertdataisready01, this);
         embot::hw::tlv493d::acquisition(config.sensors[1].id, cbk01);
-        embot::binary::bit::set(sensorstoacquiremask, 1);
+        embot::core::binary::bit::set(sensorstoacquiremask, 1);
     }
        
     return true;
@@ -353,7 +353,7 @@ bool embot::app::application::thePOSreader::Impl::acquisition_retrieve(std::uint
 bool embot::app::application::thePOSreader::Impl::acquisition_processing(std::uint8_t n)
 {
     
-    embot::binary::bit::set(acquisitionmask, n);
+    embot::core::binary::bit::set(acquisitionmask, n);
         
     return true;    
 }
@@ -384,38 +384,38 @@ bool embot::app::application::thePOSreader::initialise(const Config &config)
 {
     pImpl->config = config;
     
-    pImpl->action.load(embot::sys::EventToTask(pImpl->config.events.acquire, pImpl->config.owner));
+    pImpl->action.load(embot::os::EventToThread(pImpl->config.events.acquire, pImpl->config.owner));
     
     pImpl->positions[0] = pImpl->positions[1] = pImpl->valueOfPositionCHIPnotinitted;
     
-    embot::hw::sys::delay(50*embot::common::time1millisec);
+    embot::hw::sys::delay(50*embot::core::time1millisec);
       
     if(embot::hw::resOK == embot::hw::tlv493d::init(pImpl->config.sensors[0].id, pImpl->config.sensors[0].config))
     {
-        embot::binary::bit::set(pImpl->sensorspresencemask, static_cast<uint8_t>(pImpl->config.sensors[0].id));
+        embot::core::binary::bit::set(pImpl->sensorspresencemask, static_cast<uint8_t>(pImpl->config.sensors[0].id));
     }  
 
     
-    embot::hw::sys::delay(50*embot::common::time1millisec);
+    embot::hw::sys::delay(50*embot::core::time1millisec);
     
     if(embot::hw::resOK == embot::hw::tlv493d::init(pImpl->config.sensors[1].id, pImpl->config.sensors[1].config))
     {
-        embot::binary::bit::set(pImpl->sensorspresencemask, static_cast<uint8_t>(pImpl->config.sensors[1].id));
+        embot::core::binary::bit::set(pImpl->sensorspresencemask, static_cast<uint8_t>(pImpl->config.sensors[1].id));
     }
     
     
     // pImpl->sensorspresencemask = 2;
     
-    if(false == embot::binary::mask::check(pImpl->sensorspresencemask, static_cast<uint8_t>(0b11)))
+    if(false == embot::core::binary::mask::check(pImpl->sensorspresencemask, static_cast<uint8_t>(0b11)))
     {
         
-        embot::app::LEDwaveT<64> ledwave(100*embot::common::time1millisec, 50, std::bitset<64>(0b0101010101));
+        embot::app::LEDwaveT<64> ledwave(100*embot::core::time1millisec, 50, std::bitset<64>(0b0101010101));
         
-        if(true == embot::binary::bit::check(pImpl->sensorspresencemask, 0))
+        if(true == embot::core::binary::bit::check(pImpl->sensorspresencemask, 0))
         {
             ledwave.load(20, std::bitset<64>(0b0001), 4); 
         }
-        else if(true == embot::binary::bit::check(pImpl->sensorspresencemask, 1))
+        else if(true == embot::core::binary::bit::check(pImpl->sensorspresencemask, 1))
         {
             ledwave.load(20, std::bitset<64>(0b0101), 4);
         }
@@ -429,7 +429,7 @@ bool embot::app::application::thePOSreader::initialise(const Config &config)
 }
 
 
-bool embot::app::application::thePOSreader::start(embot::common::relTime period)
+bool embot::app::application::thePOSreader::start(embot::core::relTime period)
 {   
     if(0 != period)
     {
@@ -445,7 +445,7 @@ bool embot::app::application::thePOSreader::stop()
 }
 
 
-bool embot::app::application::thePOSreader::process(embot::common::Event evt, std::vector<embot::hw::can::Frame> &replies)
+bool embot::app::application::thePOSreader::process(embot::os::Event evt, std::vector<embot::prot::can::Frame> &replies)
 {   
     return pImpl->process(evt, replies);
 }
@@ -454,7 +454,7 @@ bool embot::app::application::thePOSreader::process(embot::common::Event evt, st
 
 // interface to CANagentPOS
 
-bool embot::app::application::thePOSreader::set(const embot::app::canprotocol::analog::polling::Message_POS_CONFIG_SET::Info &info)
+bool embot::app::application::thePOSreader::set(const embot::prot::can::analog::polling::Message_POS_CONFIG_SET::Info &info)
 {
     // if ticking: stop it
     if(true == pImpl->ticking)
@@ -462,7 +462,7 @@ bool embot::app::application::thePOSreader::set(const embot::app::canprotocol::a
         stop();
     }
     
-    if(info.type == embot::app::canprotocol::analog::posTYPE::angleDeciDeg)
+    if(info.type == embot::prot::can::analog::posTYPE::angleDeciDeg)
     {
         pImpl->canconfig.descriptor[0] = info.descriptor[0];
         pImpl->canconfig.descriptor[1] = info.descriptor[1];
@@ -471,11 +471,11 @@ bool embot::app::application::thePOSreader::set(const embot::app::canprotocol::a
     return true;    
 }
 
-bool embot::app::application::thePOSreader::get(const embot::app::canprotocol::analog::polling::Message_POS_CONFIG_GET::Info &info, embot::app::canprotocol::analog::polling::Message_POS_CONFIG_GET::ReplyInfo &replyinfo)
+bool embot::app::application::thePOSreader::get(const embot::prot::can::analog::polling::Message_POS_CONFIG_GET::Info &info, embot::prot::can::analog::polling::Message_POS_CONFIG_GET::ReplyInfo &replyinfo)
 {    
 
     replyinfo.type = info.type;
-    if(info.type == embot::app::canprotocol::analog::posTYPE::angleDeciDeg)
+    if(info.type == embot::prot::can::analog::posTYPE::angleDeciDeg)
     {
         replyinfo.descriptor[0] = pImpl->canconfig.descriptor[0];
         replyinfo.descriptor[1] = pImpl->canconfig.descriptor[1];
@@ -485,7 +485,7 @@ bool embot::app::application::thePOSreader::get(const embot::app::canprotocol::a
 }
 
 
-bool embot::app::application::thePOSreader::set(const embot::app::canprotocol::analog::polling::Message_POS_TRANSMIT::Info &info)
+bool embot::app::application::thePOSreader::set(const embot::prot::can::analog::polling::Message_POS_TRANSMIT::Info &info)
 {
     if((true == info.transmit) && (info.txperiod > 0))
     {

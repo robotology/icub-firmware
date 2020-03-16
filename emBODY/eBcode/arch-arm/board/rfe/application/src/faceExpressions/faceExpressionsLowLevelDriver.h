@@ -40,9 +40,9 @@ namespace RfeApp{
 
     /* A TLC packet is composed of heder(4 byte) plus data for describing color of each led.
        So each TLC packet payload is 4(leds) * 3(colors-rgb) *2 (byte) = 24. Therefore each TLC packet is 28=(24+4) bytes. */
-    enum class TLCPacketInfo_t : uint8_t { headersize=4, totalsize= (embot::common::tointegral(HardwareConfig_numOf_t::ledsperTLC))*
-                                                         (embot::common::tointegral(HardwareConfig_numOf_t::colorsPerLed))*
-                                                         (embot::common::tointegral(HardwareConfig_numOf_t::bytesPerColor)) +
+    enum class TLCPacketInfo_t : uint8_t { headersize=4, totalsize= (embot::core::tointegral(HardwareConfig_numOf_t::ledsperTLC))*
+                                                         (embot::core::tointegral(HardwareConfig_numOf_t::colorsPerLed))*
+                                                         (embot::core::tointegral(HardwareConfig_numOf_t::bytesPerColor)) +
                                                          (static_cast<std::uint8_t>(TLCPacketInfo_t::headersize)) };
 }; //end namespace RfeApp
 

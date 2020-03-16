@@ -22,7 +22,7 @@
 #ifndef _EMBOT_HW_SYS_H_
 #define _EMBOT_HW_SYS_H_
 
-#include "embot_common.h"
+#include "embot_core.h"
 #include "embot_hw.h"
 #include <string>
 
@@ -55,7 +55,7 @@ namespace embot { namespace hw { namespace sys {
     int puts(const std::string &str);
     
     // forces the cpu to exec instructions to reach a given delay
-    void delay(embot::common::relTime t);    
+    void delay(embot::core::relTime t);    
     
 }}} // namespace embot { namespace hw { namespace sys {
 

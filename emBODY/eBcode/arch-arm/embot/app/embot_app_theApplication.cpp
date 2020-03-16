@@ -29,9 +29,9 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "embot_sys_theScheduler.h"
-#include "embot_sys_theTimerManager.h"
-#include "embot_sys_theCallbackManager.h"
+#include "embot_os_theScheduler.h"
+#include "embot_os_theTimerManager.h"
+#include "embot_os_theCallbackManager.h"
 
 #include "embot_hw.h"
 #include "embot_hw_sys.h"
@@ -96,15 +96,11 @@ embot::app::theApplication::~theApplication() { }
             embot::hw::sys::relocatevectortable(vectorlocation);
         }
     }
+        
+    embot::os::init({});
     
-    if(pImpl->config.initbsp)
-    {
-        embot::hw::bsp::Config cc(nullptr, embot::sys::now);
-        embot::hw::bsp::init(cc);
-    }
-    
-    embot::sys::theScheduler::Config cfg { embot::sys::theScheduler::Timing(embot::hw::sys::clock(embot::hw::CLOCK::syscore),  pImpl->config.ticktime), pImpl->config.behaviour };    
-    embot::sys::theScheduler &thescheduler = embot::sys::theScheduler::getInstance();
+    embot::os::theScheduler::Config cfg { embot::os::theScheduler::Timing(embot::hw::sys::clock(embot::hw::CLOCK::syscore),  pImpl->config.ticktime), pImpl->config.behaviour };    
+    embot::os::theScheduler &thescheduler = embot::os::theScheduler::getInstance();
     thescheduler.start(cfg);    
     
     for(;;);
