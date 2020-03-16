@@ -338,7 +338,7 @@
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register</MiscControls>
               <Define>USE_STM32HAL STM32HAL_BOARD_RFE STM32HAL_DRIVER_V183</Define>
               <Undefine></Undefine>
-              <IncludePath>..\src-plus;..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\eBcode\arch-arm\embot\core;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\os;..\..\..\..\..\..\eBcode\arch-arm\embot;..\src\others;..\..\..\..\..\..\eBcode\arch-arm\embot\tools;..\..\..\..\..\..\eBcode\arch-arm\embot\core;..\..\..\..\..\..\eBcode\arch-arm\embot\dsp;..\src\bosch-driver;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\src\STM32_USB_Device_Library\Class\CDC\Inc;..\src\STM32_USB_Device_Library\Core\Inc;..\src\usb_user;..\..\..\..\libs\lowlevel\stm32hal\src\driver\stm32l4-v183\inc-nonsiusa;..\src;..\..\..\..\libs\lowlevel\stm32hal\src\board\rfe\inc-nonisusa;..\src\faceExpressions;..\..\..\..\embot\prot\can;..\..\..\..\embot\app\skeleton</IncludePath>
+              <IncludePath>..\src-plus;..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\os;..\..\..\..\..\..\eBcode\arch-arm\embot;..\src\others;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\..\eBcode\arch-arm\embot\dsp;..\src\bosch-driver;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\src\STM32_USB_Device_Library\Class\CDC\Inc;..\src\STM32_USB_Device_Library\Core\Inc;..\src\usb_user;..\..\..\..\libs\lowlevel\stm32hal\src\driver\stm32l4-v183\inc-nonsiusa;..\src;..\..\..\..\libs\lowlevel\stm32hal\src\board\rfe\inc-nonisusa;..\src\faceExpressions;..\..\..\..\embot\prot\can;..\..\..\..\embot\app\skeleton</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -435,7 +435,7 @@
             <File>
               <FileName>embot_core_binary.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\core\embot_core_binary.cpp</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core\embot_core_binary.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_os.cpp</FileName>
@@ -475,12 +475,12 @@
             <File>
               <FileName>embot_tools.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\tools\embot_tools.cpp</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools\embot_tools.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_core.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\embot\core\embot_core.cpp</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core\embot_core.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1046,7 +1046,7 @@
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register</MiscControls>
               <Define>USE_STM32HAL STM32HAL_BOARD_RFE STM32HAL_DRIVER_V183 APPL_TESTZEROOFFSET</Define>
               <Undefine></Undefine>
-              <IncludePath>..\src-plus;..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask;..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\eBcode\arch-arm\embot\core;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\os;..\..\..\..\..\..\eBcode\arch-arm\embot;..\src\others;..\..\..\..\..\..\eBcode\arch-arm\embot\tools;..\..\..\..\..\..\eBcode\arch-arm\embot\core;..\..\..\..\..\..\eBcode\arch-arm\embot\dsp;..\src\bosch-driver;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\src\STM32_USB_Device_Library\Class\CDC\Inc;..\src\STM32_USB_Device_Library\Core\Inc;..\src\usb_user;..\..\..\..\libs\lowlevel\stm32hal\src\driver\stm32l4-v183\inc-nonsiusa;..\src;..\..\..\..\libs\lowlevel\stm32hal\src\board\rfe\inc-nonisusa;..\src\faceExpressions</IncludePath>
+              <IncludePath>..\src-plus;..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask;..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\os;..\..\..\..\..\..\eBcode\arch-arm\embot;..\src\others;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\..\eBcode\arch-arm\embot\dsp;..\src\bosch-driver;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\src\STM32_USB_Device_Library\Class\CDC\Inc;..\src\STM32_USB_Device_Library\Core\Inc;..\src\usb_user;..\..\..\..\libs\lowlevel\stm32hal\src\driver\stm32l4-v183\inc-nonsiusa;..\src;..\..\..\..\libs\lowlevel\stm32hal\src\board\rfe\inc-nonisusa;..\src\faceExpressions</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1143,7 +1143,7 @@
             <File>
               <FileName>embot_core_binary.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\core\embot_core_binary.cpp</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core\embot_core_binary.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_os.cpp</FileName>
@@ -1183,12 +1183,12 @@
             <File>
               <FileName>embot_tools.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\embot\tools\embot_tools.cpp</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools\embot_tools.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_core.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\embot\core\embot_core.cpp</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core\embot_core.cpp</FilePath>
             </File>
           </Files>
         </Group>

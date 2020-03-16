@@ -415,17 +415,17 @@
             <File>
               <FileName>embot_core.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\embot\core\embot_core.cpp</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core\embot_core.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_core_binary.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\embot\core\embot_core_binary.cpp</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core\embot_core_binary.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_core_utils.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\embot\core\embot_core_utils.cpp</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core\embot_core_utils.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -965,7 +965,7 @@
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register</MiscControls>
               <Define>USE_STM32HAL STM32HAL_BOARD_NUCLEOH7 STM32HAL_DRIVER_V180</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\embot\core;..\..\..\..\embot\hw;..\..\..\..\embot\os;..\..\..\..\embot\app;..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\libs\highlevel\abslayer\osal\api</IncludePath>
+              <IncludePath>..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\embot\hw;..\..\..\..\embot\os;..\..\..\..\embot\app;..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\libs\highlevel\abslayer\osal\api</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1042,17 +1042,17 @@
             <File>
               <FileName>embot_core.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\embot\core\embot_core.cpp</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core\embot_core.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_core_binary.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\embot\core\embot_core_binary.cpp</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core\embot_core_binary.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_core_utils.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\embot\core\embot_core_utils.cpp</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core\embot_core_utils.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1720,17 +1720,17 @@
             <File>
               <FileName>embot_core.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\embot\core\embot_core.cpp</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core\embot_core.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_core_binary.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\embot\core\embot_core_binary.cpp</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core\embot_core_binary.cpp</FilePath>
             </File>
             <File>
               <FileName>embot_core_utils.cpp</FileName>
               <FileType>8</FileType>
-              <FilePath>..\..\..\..\embot\core\embot_core_utils.cpp</FilePath>
+              <FilePath>..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core\embot_core_utils.cpp</FilePath>
             </File>
           </Files>
         </Group>
