@@ -100,12 +100,12 @@ namespace embot { namespace hw { namespace bno055 {
         embot::core::Callback userdefCBK;  
         Acquisition() { clear(); }
         void clear() { data.load(buffer, 0); done = false; ongoing = false; std::memset(buffer, 0, sizeof(buffer)); userdefCBK.clear(); }         
-        void startread(std::uint8_t size, const embot::core::Callback &cbk) { clear(); data.size = size; userdefCBK = cbk; ongoing = true; }
-        void startread(std::uint8_t size) { clear(); data.size = size; ongoing = true; }
+        void startread(std::uint8_t size, const embot::core::Callback &cbk) { clear(); data.capacity = size; userdefCBK = cbk; ongoing = true; }
+        void startread(std::uint8_t size) { clear(); data.capacity = size; ongoing = true; }
         void startread(embot::core::Data &da, const embot::core::Callback &cbk) { clear(); data = da; userdefCBK = cbk; ongoing = true; }
         void startread(embot::core::Data &da) { clear(); data = da; ongoing = true; }
-        void startwrite(std::uint8_t val) { clear(); buffer[0] = val; data.size = 1; ongoing = true; }
-        void startwrite(std::uint8_t val, const embot::core::Callback &cbk) { clear(); buffer[0] = val; data.size = 1; userdefCBK = cbk; ongoing = true; }
+        void startwrite(std::uint8_t val) { clear(); buffer[0] = val; data.capacity = 1; ongoing = true; }
+        void startwrite(std::uint8_t val, const embot::core::Callback &cbk) { clear(); buffer[0] = val; data.capacity = 1; userdefCBK = cbk; ongoing = true; }
         void stop() { ongoing = false; done = true; userdefCBK.execute(); }
     };
     

@@ -88,7 +88,7 @@ bool embot::os::theTimerManager::start(const Config &config)
     cfg.priority = pImpl->config.priority;
     cfg.stacksize = pImpl->config.stacksize;
     cfg.messagequeuesize = pImpl->config.capacityofhandler;
-    cfg.timeout = embot::core::timeWaitForever;
+    cfg.timeout = embot::core::reltimeWaitForever;
     cfg.startup = nullptr;
     cfg.onmessage = pImpl->processtimer;
     cfg.param = this;
@@ -111,7 +111,7 @@ bool embot::os::theTimerManager::onexpiry(const Timer &timer)
         return false;
     }
     
-    pImpl->task->setMessage(reinterpret_cast<embot::os::Message>(const_cast<Timer*>(&timer)), embot::core::timeWaitNone);
+    pImpl->task->setMessage(reinterpret_cast<embot::os::Message>(const_cast<Timer*>(&timer)), embot::core::reltimeWaitNone);
     return true;
 }
     

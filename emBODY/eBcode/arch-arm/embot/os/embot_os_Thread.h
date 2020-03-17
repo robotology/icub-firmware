@@ -88,8 +88,8 @@ namespace embot { namespace os {
         virtual bool setPriority(Priority priority) = 0;
         
         virtual bool setEvent(os::Event event) = 0;
-        virtual bool setMessage(os::Message message, core::relTime timeout = core::timeWaitForever) = 0;
-        virtual bool setCallback(const core::Callback &callback, core::relTime timeout = core::timeWaitForever) = 0;
+        virtual bool setMessage(os::Message message, core::relTime timeout = core::reltimeWaitForever) = 0;
+        virtual bool setCallback(const core::Callback &callback, core::relTime timeout = core::reltimeWaitForever) = 0;
         
     public:
         virtual ~Thread() {};                        
@@ -117,8 +117,8 @@ namespace embot { namespace os {
         virtual bool setPriority(Priority priority);
         
         virtual bool setEvent(os::Event event);  
-        virtual bool setMessage(os::Message message, core::relTime timeout = core::timeWaitForever);
-        virtual bool setCallback(const core::Callback &callback, core::relTime timeout = core::timeWaitForever);
+        virtual bool setMessage(os::Message message, core::relTime timeout = core::reltimeWaitForever);
+        virtual bool setCallback(const core::Callback &callback, core::relTime timeout = core::reltimeWaitForever);
         
         void synch(); // only the scheduler can call this method
                 
@@ -155,8 +155,8 @@ namespace embot { namespace os {
         virtual bool setPriority(Priority priority);
         
         virtual bool setEvent(os::Event event);  
-        virtual bool setMessage(os::Message message, core::relTime timeout = core::timeWaitForever);
-        virtual bool setCallback(const core::Callback &callback, core::relTime timeout = core::timeWaitForever);
+        virtual bool setMessage(os::Message message, core::relTime timeout = core::reltimeWaitForever);
+        virtual bool setCallback(const core::Callback &callback, core::relTime timeout = core::reltimeWaitForever);
         
         void synch(); // only the scheduler can call this method
         
@@ -177,7 +177,7 @@ namespace embot { namespace os {
         
         struct Config : public Thread::BaseConfig
         {
-            core::relTime timeout {embot::core::timeWaitForever}; // the timeout with which the task waits an event. in case of timeout onevent() is called with event mask = 0.            
+            core::relTime timeout {embot::core::reltimeWaitForever}; // the timeout with which the task waits an event. in case of timeout onevent() is called with event mask = 0.            
             Thread::fpOnEvent onevent {nullptr}; // this function, must not be nullptr, is executed at every event or at expiry of timeout. its second argument is the event mask, its third is param
 
             Config() = default;
@@ -197,8 +197,8 @@ namespace embot { namespace os {
         virtual bool setPriority(Priority priority);
         
         virtual bool setEvent(os::Event event);  
-        virtual bool setMessage(os::Message message, core::relTime timeout = core::timeWaitForever);
-        virtual bool setCallback(const core::Callback &callback, core::relTime timeout = core::timeWaitForever);
+        virtual bool setMessage(os::Message message, core::relTime timeout = core::reltimeWaitForever);
+        virtual bool setCallback(const core::Callback &callback, core::relTime timeout = core::reltimeWaitForever);
         
         
         bool start(const Config &cfg);    
@@ -216,7 +216,7 @@ namespace embot { namespace os {
 
         struct Config : public Thread::BaseConfig
         {
-            core::relTime timeout {embot::core::timeWaitForever}; // the timeout with which the task waits an event. in case of timeout onevent() is called with event mask = 0.            
+            core::relTime timeout {embot::core::reltimeWaitForever}; // the timeout with which the task waits an event. in case of timeout onevent() is called with event mask = 0.            
             std::uint8_t messagequeuesize {4}; // the size of the message queue. if higher the task can accept more messages.
             Thread::fpOnMessage onmessage {nullptr}; // this function, must not be nullptr, is executed at every received message or at expiry of timeout. its second argument is the received message, its third is param
 
@@ -237,8 +237,8 @@ namespace embot { namespace os {
         virtual bool setPriority(Priority priority);
         
         virtual bool setEvent(os::Event event);  
-        virtual bool setMessage(os::Message message, core::relTime timeout = core::timeWaitForever);
-        virtual bool setCallback(const core::Callback &callback, core::relTime timeout = core::timeWaitForever);
+        virtual bool setMessage(os::Message message, core::relTime timeout = core::reltimeWaitForever);
+        virtual bool setCallback(const core::Callback &callback, core::relTime timeout = core::reltimeWaitForever);
         
         
         bool start(const Config &cfg);
@@ -256,7 +256,7 @@ namespace embot { namespace os {
     
         struct Config : public Thread::BaseConfig
         {
-            core::relTime timeout {embot::core::timeWaitForever}; // the timeout with which the task waits for a callback.            
+            core::relTime timeout {embot::core::reltimeWaitForever}; // the timeout with which the task waits for a callback.            
             std::uint8_t queuesize {4};  // the size of the queue of callbacks. if higher the task can accept more callbacks at the same time.
             Thread::fpAfterCallback aftercallback {nullptr}; // this function, if not nullptr is executed after every time a callback is executed. its third argument is param
 
@@ -277,8 +277,8 @@ namespace embot { namespace os {
         virtual bool setPriority(Priority priority);
         
         virtual bool setEvent(os::Event event);  
-        virtual bool setMessage(os::Message message, core::relTime timeout = core::timeWaitForever);        
-        virtual bool setCallback(const core::Callback &callback, core::relTime timeout = core::timeWaitForever);
+        virtual bool setMessage(os::Message message, core::relTime timeout = core::reltimeWaitForever);        
+        virtual bool setCallback(const core::Callback &callback, core::relTime timeout = core::reltimeWaitForever);
         
                 
         bool start(const Config &cfg);
@@ -317,8 +317,8 @@ namespace embot { namespace os {
         virtual bool setPriority(Priority priority);
         
         virtual bool setEvent(os::Event event);  
-        virtual bool setMessage(os::Message message, core::relTime timeout = core::timeWaitForever);
-        virtual bool setCallback(const core::Callback &callback, core::relTime timeout = core::timeWaitForever);
+        virtual bool setMessage(os::Message message, core::relTime timeout = core::reltimeWaitForever);
+        virtual bool setCallback(const core::Callback &callback, core::relTime timeout = core::reltimeWaitForever);
 
     private:        
         struct Impl;

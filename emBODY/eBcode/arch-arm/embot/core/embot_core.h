@@ -20,16 +20,25 @@ namespace embot { namespace core {
     
     // data structures
         
-    // the time is always expressed in micro-seconds    
-    using Time          = std::uint64_t;    // keeps absolute time since bootstrap.   
-    using relTime       = std::uint32_t;    // keep relative time. 100 means: 100 usec from ...
+    // the time is always expressed in micro-seconds
     
-    // some useful Time / relTime constants: use 5*time1millisec rather than 5000
-    constexpr relTime timeWaitNone      = 0;
-    constexpr relTime time1microsec     = 1;    
-    constexpr relTime time1millisec     = 1000;
-    constexpr relTime time1second       = 1000000;
-    constexpr relTime timeWaitForever   = 0xffffffff;
+    // Time keeps absolute time since bootstrap. by using 8-bytes it expresses up to 599 years.
+    using Time          = std::uint64_t;  
+    // relTime keep relative time (timeouts, periods, ect). by using 4-bytes it expresses at least up to 1 hour
+    using relTime       = std::uint32_t;    
+    
+    // some useful Time constants: use 5*time1millisec rather than 5000
+    constexpr Time time1microsec    = 1;    
+    constexpr Time time1millisec    = 1000;
+    constexpr Time time1second      = 1000000;
+    constexpr Time time1minute      = 60*time1second;
+    constexpr Time time1hour        = 60*time1minute;
+    constexpr Time time1day         = 24*time1hour;
+    constexpr Time timeNone         = 0xffffffffffffffff;   // used to express an invalid time
+    
+    // the above, up to time1hour, can be used also as relTime constants. but here are others used by blocking calls.
+    constexpr relTime reltimeWaitNone     = 0;                 // the call does not apply any timeout            
+    constexpr relTime reltimeWaitForever  = 0xffffffff;        // the call has an infinite timeout      
     
     // it formats Time (or relTime) for print purposes
     struct TimeFormatter
@@ -86,6 +95,13 @@ namespace embot { namespace core {
     using fpI08ParU32   = std::int8_t (*)(std::uint32_t);
     using fpWorker      = void (*)(void);
     using fpCaller      = void (*)(void *);
+    
+    // useful converter for enum class
+    template<typename E>         // see C++14 [Meyers, pag. 73]
+    constexpr auto tointegral(E enumerator) noexcept 
+    {
+        return static_cast<std::underlying_type_t<E>>(enumerator);
+    }   
              
     // it represents a function call with a generic argument
     struct Callback
@@ -101,32 +117,35 @@ namespace embot { namespace core {
         void execute() const { if(true == isvalid()) { call(arg); } }
     };
 
-    // it holds generic data in form of a pointer to memory and its size.
+    // it holds generic data plus its capacity
     struct Data
     {    
         void * pointer {nullptr};
-        size_t size {0};
+        size_t capacity {0};
         
         Data() = default;
-        Data(void *p, size_t s) : pointer(p), size(s) {}
+        constexpr Data(void *p, const size_t s) : pointer(p), capacity(s) {}
                     
-        void load(void *littleendianmemory, size_t s) { pointer = littleendianmemory; size = s; }
-        void clear() { pointer = nullptr; size = 0; }
-        bool isvalid() const { if((nullptr != pointer) && (0 != size)){ return true; } else { return false; } } 
+        void load(void *littleendianmemory, const size_t s) { pointer = littleendianmemory; capacity = s; }
+        void clear() { pointer = nullptr; capacity = 0; }
+        bool isvalid() const { if((nullptr != pointer) && (0 != capacity)){ return true; } else { return false; } } 
       
-//        std::uint8_t  * getU08ptr() const { return reinterpret_cast<std::uint8_t*>(pointer); }  
-//        std::uint16_t * getU16ptr() const { return reinterpret_cast<std::uint16_t*>(pointer); } 
-//        std::uint32_t * getU32ptr() const { return reinterpret_cast<std::uint32_t*>(pointer); } 
-//        std::uint64_t * getU64ptr() const { return reinterpret_cast<std::uint64_t*>(pointer); } 
-//        
-//        std::uint8_t  getU08val(size_t pos) const { if(isvalid() && (pos < size)) { return getU08ptr()[pos]; } else { return 0; } }      
-//        std::uint16_t getU16val(size_t pos) const { if(isvalid() && ((2*pos) < size)) { return getU16ptr()[pos]; } else { return 0; } }
-//        std::uint32_t getU32val(size_t pos) const { if(isvalid() && ((4*pos) < size)) { return getU32ptr()[pos]; } else { return 0; } }       
-//        std::uint64_t getU64val(size_t pos) const { if(isvalid() && ((8*pos) < size)) { return getU64ptr()[pos]; } else { return 0; } }
-//        
-//        void * getVOIDptr(size_t offset = 0) const { if(isvalid() && (offset < size)) { std::uint8_t *d = getU08ptr(); return &d[offset]; } else { return nullptr;} }      
-    };      
+        std::uint8_t  * getU08ptr() const { return reinterpret_cast<std::uint8_t*>(pointer); }  
+        std::uint16_t * getU16ptr() const { return reinterpret_cast<std::uint16_t*>(pointer); } 
+        std::uint32_t * getU32ptr() const { return reinterpret_cast<std::uint32_t*>(pointer); } 
+        std::uint64_t * getU64ptr() const { return reinterpret_cast<std::uint64_t*>(pointer); } 
+        
+        std::uint8_t  getU08val(size_t pos) const { if(isvalid() && (pos < capacity)) { return getU08ptr()[pos]; } else { return 0; } }      
+        std::uint16_t getU16val(size_t pos) const { if(isvalid() && ((2*pos) < capacity)) { return getU16ptr()[pos]; } else { return 0; } }
+        std::uint32_t getU32val(size_t pos) const { if(isvalid() && ((4*pos) < capacity)) { return getU32ptr()[pos]; } else { return 0; } }       
+        std::uint64_t getU64val(size_t pos) const { if(isvalid() && ((8*pos) < capacity)) { return getU64ptr()[pos]; } else { return 0; } }
+        
+        void * getVOIDptr(size_t offset = 0) const { if(isvalid() && (offset < capacity)) { std::uint8_t *d = getU08ptr(); return &d[offset]; } else { return nullptr;} }      
+    };    
 
+    
+    // initialization of embot::core
+    // to use embot::core as a standalone, you must call embot::core::init(cfg), where cfg specifies a time base
     
     struct TimeConfig
     {         
@@ -136,8 +155,7 @@ namespace embot { namespace core {
         constexpr TimeConfig() = default;
         constexpr TimeConfig(embot::core::fpWorker _init, embot::core::fpGetU64 _get) : init(_init), get(_get) {}
         bool isvalid() const { if(nullptr != get) { return true; } else { return false; } }
-    }; 
-    
+    };    
     
     struct Config
     {         
@@ -149,20 +167,12 @@ namespace embot { namespace core {
     }; 
        
     
-    // functions
-        
     bool initialised();
     
     bool init(const Config &config);
 
     embot::core::Time now();
-    
-    
-    template<typename E>         // see C++14 [Meyers, pag. 73]
-    constexpr auto tointegral(E enumerator) noexcept 
-    {
-        return static_cast<std::underlying_type_t<E>>(enumerator);
-    }    
+     
     
 }} // namespace embot { namespace core {
 

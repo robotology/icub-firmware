@@ -49,7 +49,7 @@ namespace embot { namespace os {
         MessageToThread() = default;  
         MessageToThread(os::Message m, Thread* t) : message(m), task(t) {}    
         bool isvalid() const;
-        bool execute(core::relTime timeout = core::timeWaitForever);
+        bool execute(core::relTime timeout = core::reltimeWaitForever);
     };
     
     struct CallbackToThread
@@ -61,7 +61,7 @@ namespace embot { namespace os {
         CallbackToThread(core::fpCaller c, void *a, Thread *t) : callback(c, a), task(t) {}  
         CallbackToThread(core::Callback cbk, Thread *t) : callback(cbk), task(t) {}                   
         bool isvalid() const;
-        bool execute(core::relTime timeout = core::timeWaitForever);
+        bool execute(core::relTime timeout = core::reltimeWaitForever);
     };  
             
 
@@ -86,7 +86,7 @@ namespace embot { namespace os {
         void load(const MessageToThread &m);        
         void load(const CallbackToThread &c);               
         bool isvalid() const;        
-        bool execute(core::relTime timeout = core::timeWaitForever);
+        bool execute(core::relTime timeout = core::reltimeWaitForever);
     };
     
 }} // namespace embot { namespace os {

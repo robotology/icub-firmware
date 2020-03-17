@@ -220,7 +220,7 @@ struct embot::os::EventThread::Impl
         config.param = nullptr;
         config.stacksize = 64;
         config.priority = Priority::minimum;
-        config.timeout = embot::core::timeWaitForever;
+        config.timeout = embot::core::reltimeWaitForever;
         
         // to be used in osal_task_new1(). only priority and stacksize will change
         osaltaskproperties.function = osal_eventdriven_loop;
@@ -376,7 +376,7 @@ struct embot::os::MessageThread::Impl
         config.param = nullptr;
         config.stacksize = 64;
         config.priority = Priority::minimum;
-        config.timeout = embot::core::timeWaitForever;
+        config.timeout = embot::core::reltimeWaitForever;
         config.messagequeuesize = 2;
         
         // to be used in osal_task_new1(). only priority and stacksize will change
@@ -548,7 +548,7 @@ struct embot::os::CallbackThread::Impl
         config.param = nullptr;
         config.stacksize = 64;
         config.priority = Priority::minimum;
-        config.timeout = embot::core::timeWaitForever;
+        config.timeout = embot::core::reltimeWaitForever;
         config.queuesize = 2;
         
         // to be used in osal_task_new1(). only priority and stacksize will change

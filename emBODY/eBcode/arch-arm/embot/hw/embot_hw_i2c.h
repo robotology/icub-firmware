@@ -71,7 +71,7 @@ namespace embot { namespace hw { namespace i2c {
     // raw not blocking transmission.
     result_t transmit(embot::hw::I2C b, ADR adr, const embot::core::Data &content, embot::core::relTime timeout = 3*embot::core::time1millisec);
         
-    // not blocking read. we read from register reg a total of destination.size bytes
+    // not blocking read. we read from register reg a total of destination.capacity bytes
     // at the end of transaction, data is copied into destination.pointer and oncompletion.callback() is called (if non nullptr). 
     result_t read(embot::hw::I2C b, ADR adr, REG reg, embot::core::Data &destination, const embot::core::Callback &oncompletion);
     
