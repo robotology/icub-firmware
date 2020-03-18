@@ -65,7 +65,7 @@ namespace embot { namespace hw { namespace onewire {
     
     bool isrunning(embot::hw::ONEWIRE c);
     
-    result_t write(embot::hw::ONEWIRE c, std::uint8_t reg, std::uint16_t value, embot::core::relTime timeout = embot::core::timeWaitForever);
+    result_t write(embot::hw::ONEWIRE c, std::uint8_t reg, std::uint16_t value, embot::core::relTime timeout = embot::core::reltimeWaitForever);
  
 }}} // namespace embot { namespace hw { namespace onewire { 
 

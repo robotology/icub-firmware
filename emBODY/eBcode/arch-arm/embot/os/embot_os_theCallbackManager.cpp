@@ -78,7 +78,7 @@ bool embot::os::theCallbackManager::start(const Config &config)
     cfg.priority = pImpl->config.priority;
     cfg.stacksize = pImpl->config.stacksize;
     cfg.queuesize = pImpl->config.capacityofhandler;
-    cfg.timeout = embot::core::timeWaitForever;
+    cfg.timeout = embot::core::reltimeWaitForever;
     cfg.startup = nullptr;
     
     pImpl->task->start(cfg);

@@ -887,7 +887,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\embot\tools\embot_tools.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools\embot_tools.cpp</PathWithFileName>
       <FilenameWithoutPath>embot_tools.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -899,7 +899,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\embot\core\embot_core_binary.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core\embot_core_binary.cpp</PathWithFileName>
       <FilenameWithoutPath>embot_core_binary.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -923,7 +923,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\embot\core\embot_core.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core\embot_core.cpp</PathWithFileName>
       <FilenameWithoutPath>embot_core.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
