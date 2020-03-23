@@ -67,8 +67,13 @@
 
 #include "EOtheLEDpulser.h"
 
+//#define DIAGNOSTIC2_enabled
 
+
+#if defined(DIAGNOSTIC2_enabled)
+#include "embot_cif_core.h"
 #include "embot_cif_diagnostic.h"
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -111,7 +116,6 @@ const eOemsappl_cfg_t eom_emsappl_DefaultCfg =
 // - declaration of static functions
 // --------------------------------------------------------------------------------------------------------------------
 
-extern void initDiagnostic();
 
 static void s_eom_emsappl_environment_init(void);
 static void s_eom_emsappl_ipnetwork_init(void);
@@ -134,8 +138,9 @@ static void s_eom_emsppl_theemsrunner_init(void);
 
 static void s_eom_emsappl_errormamager_customise(void);
 
+#if !defined(DIAGNOSTIC2_enabled)
 static void s_eom_emsappl_OnError(eOerrmanErrorType_t errtype, const char *info, eOerrmanCaller_t *caller, const eOerrmanDescriptor_t *des);
-
+#endif
 
 EO_static_inline eOsmStatesEMSappl_t s_eom_emsappl_GetCurrentState(EOMtheEMSappl *p);
 
@@ -220,15 +225,14 @@ extern EOMtheEMSappl * eom_emsappl_Initialise(const eOemsappl_cfg_t *emsapplcfg)
     
     // 8. initialise the EOMtheEMSrunner,   
     s_eom_emsppl_theemsrunner_init();
-		
-		initDiagnostic();
-    
+       
         
     // redefine the error manager so that it dispatches errors to the socket ...
     s_eom_emsappl_errormamager_customise(); 
 
     // also, we need to open the socket, so that communication is active.
     s_eom_emsappl_theemssocket_defaultopen();
+    
     
     snprintf(str, sizeof(str), "_Initialise() calls eom_emsappl_hid_userdef_initialise()");
     eo_errman_Trace(eo_errman_GetHandle(), str, s_eobj_ownname);  
@@ -653,10 +657,18 @@ static void s_eom_emsppl_theemsrunner_init(void)
 
 static void s_eom_emsappl_errormamager_customise(void)
 {
+#if !defined(DIAGNOSTIC2_enabled)
     s_emsappl_singleton.blockingsemaphore = osal_semaphore_new(2, 0);
     s_emsappl_singleton.onerrormutex = osal_mutex_new();
-    eo_errman_SetOnErrorHandler(eo_errman_GetHandle(), s_eom_emsappl_OnError);    
-//    eo_errman_SetOnErrorHandler(eo_errman_GetHandle(), embot_cif_diagnostic_OnError);
+    eo_errman_SetOnErrorHandler(eo_errman_GetHandle(), s_eom_emsappl_OnError);
+#else    
+    // init the embot::core and diagnostic
+    static const embot_cif_core_Config ccfg = { .timeinit = NULL, .timeget = osal_system_abstime_get};
+    embot_cif_core_Init(&ccfg);    
+    embot_cif_diagnostic_Init();
+    // this calls the legacy or the new one depending on internal macros 
+    eo_errman_SetOnErrorHandler(eo_errman_GetHandle(), embot_cif_diagnostic_OnError);
+#endif        
 }
 
 EO_static_inline eOsmStatesEMSappl_t s_eom_emsappl_GetCurrentState(EOMtheEMSappl *p)
@@ -664,15 +676,9 @@ EO_static_inline eOsmStatesEMSappl_t s_eom_emsappl_GetCurrentState(EOMtheEMSappl
     return((eOsmStatesEMSappl_t)eo_sm_GetActiveState(p->sm));
 }
 
-
+#if !defined(DIAGNOSTIC2_enabled)
 static void s_eom_emsappl_OnError(eOerrmanErrorType_t errtype, const char *info, eOerrmanCaller_t *caller, const eOerrmanDescriptor_t *des)
 {
-    // here is the new one
-    embot_cif_diagnostic_OnError(errtype, info, caller, des);
-    
-    // but also the legacy one
-    
-    
     // i want to protect this function vs concurrent access. for instance it may be called by a timer callback and by teh control loop.
     // i use a mutex but only where it is required. for sure snprintf is reentrant and it uses memory on the stack ....
     const char empty[] = "EO?";
@@ -727,7 +733,7 @@ static void s_eom_emsappl_OnError(eOerrmanErrorType_t errtype, const char *info,
         }
          
         
-        // i dont care is trace is interrupted ... thus NO MUTEX in here
+        // i dont care if trace is interrupted ... thus NO MUTEX in here
         hal_trace_puts(text);
     }
     
@@ -826,7 +832,9 @@ static void s_eom_emsappl_OnError(eOerrmanErrorType_t errtype, const char *info,
 //    return;
 //#endif    
 }
-
+#else
+// we call another function
+#endif
 
 
 // --------------------------------------------------------------------------------------------------------------------

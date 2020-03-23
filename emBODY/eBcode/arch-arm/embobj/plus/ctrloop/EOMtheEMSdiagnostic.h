@@ -33,9 +33,9 @@
 #include "EOsocketDatagram.h"
 #include "EOVmutex.h"
 
-#include "embot_eprot_diagnostics.h"
+#include "embot_prot_eth_diagnostic.h"
 
-#include "DiagnosticsNode.h" // needed by pimpl
+#include "embot_prot_eth_diagnostic_Node.h" 
 
 class EOMtheEMSDiagnostic
 {
@@ -61,7 +61,8 @@ class EOMtheEMSDiagnostic
         static EOMtheEMSDiagnostic& instance();
         bool initialise(const Params&);
                    
-        bool send(const embot::eprot::diagnostics::InfoBasic &ib, bool flush);
+        bool send(const embot::prot::eth::diagnostic::InfoBasic &ib, bool flush);
+        bool send(const embot::prot::eth::diagnostic::Info &ii, bool flush);
         
     private:
 
@@ -107,7 +108,7 @@ class EOMtheEMSDiagnostic
 
         static constexpr char s_eobj_ownname[]{"EOMtheEMSdiagnostic"};        
        
-        embot::app::DiagnosticsNode node_;
+        embot::prot::eth::diagnostic::Node node_;
 };
 
 #endif  // include-guard

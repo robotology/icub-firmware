@@ -55,7 +55,8 @@ typedef struct
 {
     uint8_t         priority;          
     uint16_t        stacksize;
-    eOreltime_t     period; 
+    eOreltime_t     taskperiod;
+    eOreltime_t     txOKperiod;    
 } eOethmonitor_cfg_t;
    
 // - declaration of extern public variables, ...deprecated: better using use _get/_set instead ------------------------

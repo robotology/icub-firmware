@@ -60,7 +60,12 @@
 // --------------------------------------------------------------------------------------------------------------------
 // - #define with internal scope
 // --------------------------------------------------------------------------------------------------------------------
-// empty-section
+
+//#define DIAGNOSTIC2_test_longbursts
+
+#if defined(DIAGNOSTIC2_test_longbursts)
+    #warning INFO: DIAGNOSTIC2_test_longbursts is enabled to have theSTRAIN send long burst of dignostic messages in case of missing of its board 
+#endif
 
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -1121,10 +1126,12 @@ static void s_eo_strain_send_diagnostic_on_transmissioninterruption(void)
     descriptor.par64 = 0;
     descriptor.sourcedevice = eo_errman_sourcedevice_localboard;
     descriptor.sourceaddress = 0;
-    descriptor.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag00);
-    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, "strain timeout0", NULL, &descriptor);
+    descriptor.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag03);
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, "strain timeout", NULL, &descriptor);
     
-#if 0
+    
+#if defined(DIAGNOSTIC2_test_longbursts)
+    // i send some more messages to test if burst are lost 
     descriptor.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, "strain timeout1", NULL, &descriptor);
     descriptor.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag02);

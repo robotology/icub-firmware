@@ -54,6 +54,7 @@ enum { eOethmonitor_numberofports = 3 };
 
 struct EOtheETHmonitor_hid
 {
+    eOethmonitor_cfg_t          config;
     eObool_t                    initted;
     eObool_t                    enabled;
     eObool_t                    newresultsavailable;
