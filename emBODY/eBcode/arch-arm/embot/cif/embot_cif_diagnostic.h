@@ -6,7 +6,7 @@
 */
 
 // - brief
-//   it implements embobj C interface to the class embot::app::DiagnosticsNode 
+//   it implements embobj C interface to the class embot::prot::eth::diagnostic::Node 
 //
 
 // - include guard ----------------------------------------------------------------------------------------------------
@@ -36,7 +36,9 @@ extern "C" {
 
 
 // - declaration of extern public functions ---------------------------------------------------------------------------
- 
+   
+   
+extern void embot_cif_diagnostic_Init(); 
 
 // of type eOerrman_fp_onerror_t and used by eo_errman_SetOnErrorHandler()
 extern void embot_cif_diagnostic_OnError(eOerrmanErrorType_t errtype, const char *info, eOerrmanCaller_t *caller, const eOerrmanDescriptor_t *errdes);

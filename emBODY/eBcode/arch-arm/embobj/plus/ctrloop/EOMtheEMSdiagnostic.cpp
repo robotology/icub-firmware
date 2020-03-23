@@ -76,7 +76,7 @@ bool EOMtheEMSDiagnostic::initialise(const Params& cfg)
     txpkt_ = eo_packet_New(0);
     eo_packet_Size_Set(txpkt_, 0); 
     
-    embot::app::DiagnosticsNode::Config config {}; // to be filled properly after
+    embot::prot::eth::diagnostic::Node::Config config {}; // to be filled properly after
     node_.init(config);    
         
     // create the task
@@ -198,7 +198,7 @@ eOresult_t EOMtheEMSDiagnostic::transmitUdpPackage()
             return eores_NOK_generic;  //TODO something
         }    
         
-        embot::utils::Data datainropframe { rawdata, rawcapacity_};
+        embot::core::Data datainropframe { rawdata, rawcapacity_};
         bool thereisarop = node_.retrieve(datainropframe);   
         
         lock_guard<EOVmutexDerived> lockUdp(mutexUdpPackage_);                
@@ -241,7 +241,7 @@ eOresult_t EOMtheEMSDiagnostic::connect(eOipv4addr_t remaddr)
 }
 
 
-bool EOMtheEMSDiagnostic::send(const embot::eprot::diagnostics::InfoBasic &ib, bool flush)
+bool EOMtheEMSDiagnostic::send(const embot::prot::eth::diagnostic::InfoBasic &ib, bool flush)
 {   
     {
         lock_guard<EOVmutexDerived> lock(mutexNode_);
@@ -259,14 +259,33 @@ bool EOMtheEMSDiagnostic::send(const embot::eprot::diagnostics::InfoBasic &ib, b
     return true;
 }  
 
-extern "C"
-{
-    void initDiagnostic()
+
+bool EOMtheEMSDiagnostic::send(const embot::prot::eth::diagnostic::Info &ii, bool flush)
+{   
     {
-        EOMtheEMSDiagnostic::Params param;
-        EOMtheEMSDiagnostic::instance().initialise(param);
+        lock_guard<EOVmutexDerived> lock(mutexNode_);
+        bool res=node_.add(ii);
+        if(!res)
+        {
+            hal_trace_puts("ERROR - ROP not added.");//TODO something
+            return false;
+        }
     }
-}
+    if(flush || forceFlush_)
+    {  
+        eom_task_SetEvent(task_, diagnosticEvent_evt_packet_tobesent);          
+    }   
+    return true;
+}  
+
+//extern "C"
+//{
+//    void initDiagnostic()
+//    {
+//        EOMtheEMSDiagnostic::Params param;
+//        EOMtheEMSDiagnostic::instance().initialise(param);
+//    }
+//}
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

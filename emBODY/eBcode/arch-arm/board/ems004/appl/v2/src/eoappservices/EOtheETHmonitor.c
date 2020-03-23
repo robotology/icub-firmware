@@ -21,11 +21,21 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-// this file should be compiled as a C file ... however, for tests we have needed to turn it into a C++ file
-#ifdef __cplusplus
-    #define USE_CPP
-#endif
- 
+
+//#define DIAGNOSTIC2_test_theETHmonitor
+
+#if defined(DIAGNOSTIC2_test_theETHmonitor)
+  // this file should be compiled as a C file ... however, for tests we have needed to turn it into a C++ file
+  #ifdef __cplusplus
+      #define USE_CPP
+  #else
+      #error compile this file as a c++ file    
+  #endif
+#else
+  #ifdef __cplusplus
+      #error dont need to compile this file as a c++ file 
+  #endif
+#endif 
 
 #include "stdlib.h"
 #include "string.h"
@@ -36,15 +46,17 @@
 #include "EOVtheSystem.h"
 #include "hal_trace.h"
 
+#include "osal_system.h"
+
 #include "hl_eth.h"
 
 #include "EOtheSharedHW.h"
 
 #include "EOMtheEMSrunner.h"
 
-#if defined(USE_CPP)
+#if defined(DIAGNOSTIC2_test_theETHmonitor)
 #include "EOMtheEMSDiagnostic.h"
-#include "DiagnosticsNode.h"
+#include "embot_prot_eth_diagnostic_Node.h"
 #endif
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -76,7 +88,8 @@ const eOethmonitor_cfg_t eo_ethmonitor_DefaultCfg =
 {
     EO_INIT(.priority)      10,
     EO_INIT(.stacksize)     1024,
-    EO_INIT(.period)        100*EOK_reltime1ms
+    EO_INIT(.taskperiod)    100*EOK_reltime1ms,
+    EO_INIT(.txOKperiod)    10*EOK_reltime1sec
 };
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -145,8 +158,9 @@ static void s_eo_ethmonitor_verifyTXropframe_DUMMY(hl_eth_frame_t* frame);
 
 static void s_eo_ethmonitor_send_error_sequencenumber(void);
 
-static void s_eo_ethmonitor_diag_send(eOerrmanErrorType_t errtype, const eOerrmanDescriptor_t *des);
+#if defined(DIAGNOSTIC2_test_theETHmonitor)
 static void s_eo_ethmonitor_diag_send2(eOerrmanErrorType_t errtype, const eOerrmanDescriptor_t errdes);
+#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
@@ -154,6 +168,7 @@ static void s_eo_ethmonitor_diag_send2(eOerrmanErrorType_t errtype, const eOerrm
 
 static EOtheETHmonitor s_eo_theethmonitor = 
 {
+    EO_INIT(.config)                    {0},
     EO_INIT(.initted)                   eobool_false,
     EO_INIT(.enabled)                   eobool_false,
     EO_INIT(.newresultsavailable)       eobool_false,
@@ -188,6 +203,8 @@ extern EOtheETHmonitor* eo_ethmonitor_Initialise(const eOethmonitor_cfg_t *cfg)
         cfg = &eo_ethmonitor_DefaultCfg;       
     }
     
+    memmove(&s_eo_theethmonitor.config, cfg, sizeof(eOethmonitor_cfg_t));
+    
     // create all synch data (semaphore, results, etc)
     
     eo_sharedhw_Initialise(NULL);
@@ -198,7 +215,7 @@ extern EOtheETHmonitor* eo_ethmonitor_Initialise(const eOethmonitor_cfg_t *cfg)
     
     s_eo_theethmonitor.taskworker = eom_task_New(   eom_mtask_Periodic, cfg->priority, cfg->stacksize,
                                                     s_eo_ethmonitor_taskworker_startup, s_eo_ethmonitor_taskworker_run,
-                                                    0, cfg->period,
+                                                    0, cfg->taskperiod,
                                                     NULL, 
                                                     eo_ethmonitor,
                                                     "ethmonitor"
@@ -498,6 +515,7 @@ static void s_eo_ethmonitor_query_micrel(void)
     s_eo_theethmonitor.newresultsavailable = eobool_true;    
 }
 
+
 // the control loop / the config task calls _Tick() and then calls this function. the semaphore protects it.
 static void s_eo_ethmonitor_process_resultsofquery(void)
 {
@@ -518,7 +536,6 @@ static void s_eo_ethmonitor_process_resultsofquery(void)
     uint64_t applstate = (eobool_true == eom_emsrunner_IsRunning(eom_emsrunner_GetHandle())) ? (0x3000000000000000) : (0x1000000000000000);    
     for(i=0; i<eOethmonitor_numberofports; i++)
     {
-
         if(eobool_true == s_eo_theethmonitor.portstatus[i].on)
         {
             if(eobool_false == s_eo_theethmonitor.portstatus[i].previouson)
@@ -531,20 +548,9 @@ static void s_eo_ethmonitor_process_resultsofquery(void)
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes); 
                 txone = eobool_true;
 
-                //s_eo_ethmonitor_diag_send(eo_errortype_error, &errdes);
-//                s_eo_ethmonitor_diag_send2(eo_errortype_error, errdes);
-                
-//                auto info=EOMDiagnosticRopMsg::Info{(uint16_t)DiagnosticRopCode::ethlog,(uint16_t)DiagnosticRopSeverity::info,(uint16_t)DiagnosticRopString::ethup,eo_errman_sourcedevice_localboard,0,0,0,0,0};
-//                EOMtheEMSDiagnostic::instance().sendDiagnosticMessage(info,false);
-                
-                
-                
-                //Mutex???
-                /*bool res;
-                EOMDiagnosticRopMsg& rop=EOMtheEMSDiagnostic::instance().getRopForModify(res);
-                rop.data_.param_[0]=(uint16_t)DiagnosticRopCode::ethlog;
-                rop.data_.param_[1]=(uint16_t)DiagnosticRopSeverity::info;
-                rop.data_.param_[2]=(uint16_t)DiagnosticRopString::ethup;*/
+#if defined(DIAGNOSTIC2_test_theETHmonitor)
+                s_eo_ethmonitor_diag_send2(eo_errortype_error, errdes);
+#endif                                            
             }
             
             if((1 == s_eo_theethmonitor.portstatus[i].rxcrc.validvalue) && (s_eo_theethmonitor.portstatus[i].rxcrc.value != 0))
@@ -556,18 +562,7 @@ static void s_eo_ethmonitor_process_resultsofquery(void)
                 errdes.par64            = applstate | (s_eo_theethmonitor.portstatus[i].rxcrc.value & 0xffffffff);    
                 eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes); 
                 txone = eobool_true;
-               
-                
-//                auto info=EOMDiagnosticRopMsg::Info{(uint16_t)DiagnosticRopCode::ethlog,(uint16_t)DiagnosticRopSeverity::error,(uint16_t)DiagnosticRopString::rxcrc,eo_errman_sourcedevice_localboard,0,0,0,0,0};
-//                EOMtheEMSDiagnostic::instance().sendDiagnosticMessage(info,false);
-                
-                //Mutex???
-                /*bool res;
-                EOMDiagnosticRopMsg& rop=EOMtheEMSDiagnostic::instance().getRopForModify(res);
-                rop.data_.param_[0]=(uint16_t)DiagnosticRopCode::ethlog;
-                rop.data_.param_[1]=(uint16_t)DiagnosticRopSeverity::error;
-                rop.data_.param_[2]=(uint16_t)DiagnosticRopString::ethdown;                */
-            }
+           }
         }
         else
         {
@@ -587,21 +582,24 @@ static void s_eo_ethmonitor_process_resultsofquery(void)
             }            
         }
     }
-
-    static uint16_t cnt = 0;
-    if(eobool_false == txone)
+    
+    static uint64_t lasttime = 0;
+    uint64_t nw = osal_system_abstime_get();
+    if((nw - lasttime) >= s_eo_theethmonitor.config.txOKperiod)
     {
-        static uint8_t cnt = 0;
-        errdes.code             = eoerror_code_get(eoerror_category_ETHmonitor, eoerror_value_ETHMON_justverified);
-        errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
-        errdes.sourceaddress    = 0;
-        errdes.par16            = cnt++;
-        errdes.par64            = applstate;
-        if(0 == (++cnt%10))
-        {
-//            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);   
-//        s_eo_ethmonitor_diag_send2(eo_errortype_error, errdes);   
-        }            
+        lasttime = nw;
+        if(eobool_false == txone)
+        {       
+            errdes.code             = eoerror_code_get(eoerror_category_ETHmonitor, eoerror_value_ETHMON_justverified);
+            errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+            errdes.sourceaddress    = 0;
+            errdes.par16            = s_eo_theethmonitor.portstatus[0].on | (s_eo_theethmonitor.portstatus[1].on << 1) | (s_eo_theethmonitor.portstatus[2].on << 2);
+            errdes.par64            = applstate;
+            eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);   
+#if defined(DIAGNOSTIC2_test_theETHmonitor)
+            s_eo_ethmonitor_diag_send2(eo_errortype_error, errdes);
+#endif   
+        }     
     }
     
     s_eo_theethmonitor.newresultsavailable = eobool_false;    
@@ -691,53 +689,15 @@ static void s_eo_ethmonitor_send_error_sequencenumber(void)
     errdes.par16            = s_eo_theethmonitor.lastnumberofseqnumbererrors;
     errdes.par64            = s_eo_theethmonitor.lastsequencenumbererror;
     eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);
-    
-//    auto info=EOMDiagnosticRopMsg::Info{(uint16_t)DiagnosticRopCode::ethlog,(uint16_t)DiagnosticRopSeverity::error,(uint16_t)DiagnosticRopString::txseqnumbermissing,eo_errman_sourcedevice_localboard,0,0,0,0,0};
-//    EOMtheEMSDiagnostic::instance().sendDiagnosticMessage(info,false);
-    
+        
     s_eo_theethmonitor.lastnumberofseqnumbererrors = 0;
     s_eo_theethmonitor.lastsequencenumbererror = 0;
 }
 
+#if defined(DIAGNOSTIC2_test_theETHmonitor)
 
-static void s_eo_ethmonitor_diag_send(eOerrmanErrorType_t errtype, const eOerrmanDescriptor_t *des)
-{
-    // freely inspired from s_eom_emsappl_OnError().
-    if(NULL == des)
-    {
-        return;
-    }
-    
-    eOmn_info_basic_t infobasic = {};
-    
-    infobasic.timestamp = eov_sys_LifeTimeGet(eov_sys_GetHandle());;
-    infobasic.properties.code = des->code;
-    infobasic.properties.flags = 0;
-    EOMN_INFO_PROPERTIES_FLAGS_set_type(infobasic.properties.flags, errtype);
-    EOMN_INFO_PROPERTIES_FLAGS_set_source(infobasic.properties.flags, des->sourcedevice);
-    EOMN_INFO_PROPERTIES_FLAGS_set_address(infobasic.properties.flags, des->sourceaddress);
-    EOMN_INFO_PROPERTIES_FLAGS_set_extraformat(infobasic.properties.flags, eomn_info_extraformat_none);
-    EOMN_INFO_PROPERTIES_FLAGS_set_futureuse(infobasic.properties.flags, 0);    
-    infobasic.properties.par16 = des->par16;
-    infobasic.properties.par64 = des->par64;
-        
-    // we need a mutex   
-    //osal_mutex_take(onerrormutex, osal_reltimeINFINITE);
-        
-    // now do a call to embotIF_diagnode_add2(&infobasic); 
-    // then to embotIF_diagnode_prepare(); 
-    // then to retrieve the udp packet we call embotIF_diagnode_retrieve(udppacket) 
-    // and then we send order to send the udppacket
-    
-        
-    //osal_mutex_release(onerrormutex);
-        
-    
-}
 
-#if defined(USE_CPP)
-
-embot::app::DiagnosticsNode * getone()
+embot::prot::eth::diagnostic::Node * getone()
 {
     return nullptr;   
 }
@@ -749,13 +709,13 @@ static void s_eo_ethmonitor_diag_send2(eOerrmanErrorType_t errtype, const eOerrm
     {   // trace is not transmitted
         return;
     }
-    embot::eprot::diagnostics::TYP typ = static_cast<embot::eprot::diagnostics::TYP>(errtype-1);
-    embot::eprot::diagnostics::SRC src = static_cast<embot::eprot::diagnostics::SRC>(errdes.sourcedevice);
-    embot::eprot::diagnostics::ADR adr = static_cast<embot::eprot::diagnostics::ADR>(errdes.sourceaddress);
-    embot::eprot::diagnostics::EXT ext = embot::eprot::diagnostics::EXT::none;
-    embot::eprot::diagnostics::FFU ffu = embot::eprot::diagnostics::FFU::none;
+    embot::prot::eth::diagnostic::TYP typ = static_cast<embot::prot::eth::diagnostic::TYP>(errtype-1);
+    embot::prot::eth::diagnostic::SRC src = static_cast<embot::prot::eth::diagnostic::SRC>(errdes.sourcedevice);
+    embot::prot::eth::diagnostic::ADR adr = static_cast<embot::prot::eth::diagnostic::ADR>(errdes.sourceaddress);
+    embot::prot::eth::diagnostic::EXT ext = embot::prot::eth::diagnostic::EXT::none;
+    embot::prot::eth::diagnostic::FFU ffu = embot::prot::eth::diagnostic::FFU::none;
     
-    embot::eprot::diagnostics::InfoBasic ib {
+    embot::prot::eth::diagnostic::InfoBasic ib {
         eov_sys_LifeTimeGet(eov_sys_GetHandle()),
         errdes.code,
         {typ, src, adr, ext, ffu},
@@ -763,7 +723,7 @@ static void s_eo_ethmonitor_diag_send2(eOerrmanErrorType_t errtype, const eOerrm
         errdes.par64,        
     };
     
-//    embot::app::DiagnosticsNode * node =  getone();
+//    embot::prot::eth::diagnostic::Node * node =  getone();
 //    if(nullptr != node)
 //    {
 //        node->add(ib);
@@ -777,12 +737,6 @@ static void s_eo_ethmonitor_diag_send2(eOerrmanErrorType_t errtype, const eOerrm
     
     EOMtheEMSDiagnostic::instance().send(ib,true);
         
-}
-
-#else
-
-static void s_eo_ethmonitor_diag_send2(eOerrmanErrorType_t errtype, const eOerrmanDescriptor_t errdes)
-{
 }
 
 #endif  
