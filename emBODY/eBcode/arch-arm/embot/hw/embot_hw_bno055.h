@@ -123,7 +123,7 @@ namespace embot { namespace hw { namespace bno055 {
         std::uint8_t                            temperature;
         std::uint8_t                            calibstatus;
         std::uint8_t                            systemstatus;  
-        Data() { temperature = 0; calibstatus = 0; systemstatus = 0; }
+        Data() { clear(); }
         void clear() 
         {
             acc.clear();
@@ -195,6 +195,9 @@ namespace embot { namespace hw { namespace bno055 {
     
     // ok, now we can read data previously acquired
     result_t read(BNO055 s, Data &data);
+    
+    // and here is acquisition in blocking mode
+    result_t acquisition(BNO055 s, Set set, Data &data, const embot::core::relTime timeout);
     
     // here are some write() and read() funtions which operate directly on a single register reg 
     

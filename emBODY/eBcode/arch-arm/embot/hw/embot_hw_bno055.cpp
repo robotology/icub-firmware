@@ -267,7 +267,7 @@ namespace embot { namespace hw { namespace bno055 {
         return embot::hw::i2c::read(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], static_cast<std::uint8_t>(reg), s_privatedata.acquisition[index].data, cbk);        
     } 
     
-
+    
     
     result_t acquisition(BNO055 s, Set set, Data &data, const embot::core::Callback &oncompletion)
     {        
@@ -289,6 +289,15 @@ namespace embot { namespace hw { namespace bno055 {
         return embot::hw::i2c::read(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], static_cast<std::uint8_t>(Register::DATASET_START), s_privatedata.acquisition[index].data, cbk);        
     } 
     
+
+    result_t acquisition(BNO055 s, Set set, Data &data, const embot::core::relTime timeout)
+    { 
+        const std::uint8_t nbytes = static_cast<std::uint8_t>(set);        
+        // ok, start a read of nbytes only (not all sizeof(data)) which will go into data
+        embot::core::Data da(&data, nbytes);
+        
+        return read(s, Register::DATASET_START, da, timeout);
+    }     
     
     bool operationdone(BNO055 s)
     {
