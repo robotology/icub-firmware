@@ -89,7 +89,7 @@ const eOethmonitor_cfg_t eo_ethmonitor_DefaultCfg =
     EO_INIT(.priority)      10,
     EO_INIT(.stacksize)     1024,
     EO_INIT(.taskperiod)    100*EOK_reltime1ms,
-    EO_INIT(.txOKperiod)    10*EOK_reltime1sec
+    EO_INIT(.txOKperiod)    300*EOK_reltime1sec
 };
 
 // --------------------------------------------------------------------------------------------------------------------
