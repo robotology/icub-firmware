@@ -1,7 +1,7 @@
 [PreviousGenFiles]
-HeaderPath=C:/tmp/strain2/Inc
+HeaderPath=C:/icub-tech/icub-firmware/emBODY/eBcode/arch-arm/libs/lowlevel/stm32hal/cubemx/strain2/Inc
 HeaderFiles=gpio.h;adc.h;can.h;dma.h;i2c.h;rtc.h;tim.h;usart.h;usb.h;stm32l4xx_it.h;stm32l4xx_hal_conf.h;main.h;rng.h;
-SourcePath=C:/tmp/strain2/Src
+SourcePath=C:/icub-tech/icub-firmware/emBODY/eBcode/arch-arm/libs/lowlevel/stm32hal/cubemx/strain2/Src
 SourceFiles=gpio.h;adc.h;can.h;dma.h;i2c.h;rtc.h;tim.h;usart.h;usb.h;stm32l4xx_it.h;stm32l4xx_hal_conf.h;main.h;gpio.c;adc.c;can.c;dma.c;i2c.c;rtc.c;tim.c;usart.c;usb.c;stm32l4xx_it.c;stm32l4xx_hal_msp.c;main.c;rng.c;
 
 [PreviousLibFiles]

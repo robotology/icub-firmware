@@ -142,6 +142,10 @@ extern void stm32hal_board_init(void);
 
     #elif(STM32HAL_DRIVER_VERSION == 0x1B0)
 
+				#if !defined(CPU_AT_80MHZ)
+				#define CPU_AT_80MHZ
+				#endif
+				
         #include "../src/config/stm32hal_driver_cfg_of_strain2_v1B0.h"
 
         #include "../src/board/strain2/v1B0/inc/adc.h"
