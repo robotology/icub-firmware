@@ -89,7 +89,20 @@ static const float RESOLUTION_OF_TORQUE_VALUES =  32768.0;//the toruqe values in
 static const float TORQUE_FACT_EMS2Nm = 1000000.0; //the ems use micro Nm
 
 
-
+static float s_cliptoint32(float v)
+{
+    int64_t r = v;
+    if(r > INT32_MAX)
+    {
+        r = INT32_MAX;
+    }
+    else if(r < INT32_MIN)
+    {
+        r = INT32_MIN;
+    }
+    
+    return r;
+}
 
 static const eOmc4boards_config2_t s_eo_mc4boards_defaultconfig2 =
 {   
@@ -456,7 +469,7 @@ extern eOmeas_position_t eo_mc4boards_Convert_Position_fromCAN(EOtheMC4boards *p
     }
     
     float temp = (((float)pos / s_eo_themc4boards.convencoder[joint].factor) - s_eo_themc4boards.convencoder[joint].offset);
-    temp = EO_CLIP_INT32(temp);
+    temp = s_cliptoint32(temp);
     
     return((eOmeas_position_t)temp);
 }
@@ -470,7 +483,7 @@ extern icubCanProto_position_t eo_mc4boards_Convert_Position_toCAN(EOtheMC4board
     }
     
     float temp = (((float)pos + s_eo_themc4boards.convencoder[joint].offset) * s_eo_themc4boards.convencoder[joint].factor);
-    temp = EO_CLIP_INT32(temp);
+    temp = s_cliptoint32(temp);
     
     return((icubCanProto_position_t)temp); 
 }
@@ -539,7 +552,7 @@ extern eOmeas_velocity_t eo_mc4boards_Convert_Velocity_fromCAN(EOtheMC4boards *p
     temp /= s_eo_themc4boards.convencoder[joint].factor; // now we transform into icubdeg/sec
 
 
-    temp = EO_CLIP_INT32(temp);
+    temp = s_cliptoint32(temp);
     
     return((eOmeas_velocity_t) temp);
 }
@@ -587,7 +600,7 @@ extern eOmeas_acceleration_t eo_mc4boards_Convert_Acceleration_fromCAN(EOtheMC4b
     temp /= (1 << (s_eo_themc4boards.cansettings.estimshifts.estimShiftJointVel + s_eo_themc4boards.cansettings.estimshifts.estimShiftJointAcc)); // now we divide by (1 << estim shift vel + acc)
     temp /= s_eo_themc4boards.convencoder[joint].factor; // now we transform into icubdeg/sec^2
 
-    temp = EO_CLIP_INT32(temp);
+    temp = s_cliptoint32(temp);
     
     return((eOmeas_acceleration_t)temp);
 }
