@@ -21,8 +21,7 @@
 #include "adc.h"
 
 /* USER CODE BEGIN 0 */
-#warning TODO::::::::::::::::::::::::::::::::::::
-#warning TODO: verificare quest nuovo apramertro: NbrOfDiscConversion ...................................................................................................
+
 /* USER CODE END 0 */
 
 ADC_HandleTypeDef hadc1;
