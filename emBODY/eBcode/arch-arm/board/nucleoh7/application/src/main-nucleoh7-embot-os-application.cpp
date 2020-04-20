@@ -39,13 +39,14 @@
 
 
 
-#undef enableTICK_fast
-#define enableTRACE_all
+#define enableTICK_fast
+//#define enableTRACE_all
 #define enableSERIAL
 #undef enableACQUISITION
 
 #if defined(enableSERIAL)
-#define enableSERIAL_string
+//#define enableSERIAL_string
+#define enableSERIAL_binary
 #endif
 
 static void s_chips_init();
@@ -62,7 +63,7 @@ void doit(void *p)
 constexpr embot::os::Event evtTick = 0x01;
 
 #if defined(enableTICK_fast) 
-constexpr embot::core::relTime tickperiod = 10*embot::core::time1millisec;
+constexpr embot::core::relTime tickperiod = 100*embot::core::time1millisec;
 #else
 constexpr embot::core::relTime tickperiod = embot::core::time1second;
 #endif
@@ -120,7 +121,7 @@ void initSystem(embot::os::Thread *t, void* initparam)
        
     
     embot::os::EventThread::Config configEV { 
-        4*1024, 
+        6*1024, 
         embot::os::Priority::high200, 
         eventbasedthread_startup,
         nullptr,
@@ -209,25 +210,28 @@ bool s_get_values(std::tuple<int16_t, int16_t, int16_t> &acc, std::pair<uint32_t
 {
 #if !defined(enableACQUISITION)
     
-    constexpr uint32_t min = 0;
-    constexpr uint32_t max = 16;
+    constexpr int32_t accmin = -30;
+    constexpr int32_t accmax = +270;
     
-    static int16_t accx = min;
-    static int16_t accy = min;
-    static int16_t accz = min;
-    static uint32_t adc1 = min;
-    static uint32_t adc2 = min;    
+    constexpr uint32_t adcmin = 0;
+    constexpr uint32_t adcmax = +300;
+    
+    static int16_t accx = accmin+0;
+    static int16_t accy = accmin+10;
+    static int16_t accz = accmin+20;
+    static uint32_t adc1 = adcmin+0;
+    static uint32_t adc2 = adcmin+10;    
     
     acc = {accx, accy, accz};
     adc = {adc1, adc2};
     
-    // implements a triangular waveform
+    // implements triangular waveforms
     accx++; accy++; accz++; adc1++; adc2++;
-    if(accx >= 1024) accx = min;
-    if(accy >= 1024) accy = min;
-    if(accz >= 1024) accz = min;
-    if(adc1 >= 1024) adc1 = min;
-    if(adc2 >= 1024) adc2 = min;    
+    if(accx >= accmax) accx = accmin;
+    if(accy >= accmax) accy = accmin;
+    if(accz >= accmax) accz = accmin;
+    if(adc1 >= adcmax) adc1 = adcmin;
+    if(adc2 >= adcmax) adc2 = adcmin;    
 
 #else
 
@@ -278,15 +282,76 @@ bool s_print_values(const std::tuple<int16_t, int16_t, int16_t> &acc, const std:
 
     // JUST FOR TEST: this instead prints in hex but only 1 byte (the least significant byte)
     snprintf(text, sizeof(text), "%02x %02x %02x %02x %02x\n", std::get<0>(acc), std::get<1>(acc), std::get<2>(acc), adc.first, adc.second);
+		//snprintf(text, sizeof(text), "%02x\n", std::get<0>(acc));	//LUCA
         
     HAL_UART_Transmit(&huart3, reinterpret_cast<uint8_t*>(text), std::strlen(text), 0xFFFF);
     
 #elif defined(enableSERIAL) && defined(enableSERIAL_binary)   
     
-    #warning TOBEDONE
-    char text[64] = {0};
-    snprintf(text, sizeof(text), "BINARYisTObeDONE\n");        
-    HAL_UART_Transmit(&huart3, reinterpret_cast<uint8_t*>(text), std::strlen(text), 0xFFFF);
+    //snprintf(text, sizeof(text), "%d\n", static_cast<uint8_t>(std::get<0>(acc)));   
+    // writing into text[] in big endian order all values with the same integer 32 bit type.
+    // i use int32_t. 
+    // the acceleration values, which are in int16_t, are first transformed into int32_t
+    // to keep their sign and then copied in big endian order.
+    // the adc values, which have only 24 signisficant bits are just copied in big endian order as they are.
+
+    volatile int32_t tmp = 0;
+    volatile uint8_t pos = 0;
+    // acc.x
+    tmp = std::get<0>(acc);
+    text[pos++] =  (tmp & 0xff000000) >> 24;
+    text[pos++] =  (tmp & 0x00ff0000) >> 16;
+    text[pos++] =  (tmp & 0x0000ff00) >> 8;
+    text[pos++] =  (tmp & 0x000000ff);
+    // acc.y
+    tmp = std::get<1>(acc);
+    text[pos++] =  (tmp & 0xff000000) >> 24;
+    text[pos++] =  (tmp & 0x00ff0000) >> 16;
+    text[pos++] =  (tmp & 0x0000ff00) >> 8;
+    text[pos++] =  (tmp & 0x000000ff);
+    // acc.z
+    tmp = std::get<2>(acc);
+    text[pos++] =  (tmp & 0xff000000) >> 24;
+    text[pos++] =  (tmp & 0x00ff0000) >> 16;
+    text[pos++] =  (tmp & 0x0000ff00) >> 8;
+    text[pos++] =  (tmp & 0x000000ff);
+    // adc.first
+    tmp = adc.first;
+    text[pos++] =  (tmp & 0xff000000) >> 24;
+    text[pos++] =  (tmp & 0x00ff0000) >> 16;
+    text[pos++] =  (tmp & 0x0000ff00) >> 8;
+    text[pos++] =  (tmp & 0x000000ff);
+    // adc.second
+    tmp = adc.second;
+    text[pos++] =  (tmp & 0xff000000) >> 24;
+    text[pos++] =  (tmp & 0x00ff0000) >> 16;
+    text[pos++] =  (tmp & 0x0000ff00) >> 8;
+    text[pos++] =  (tmp & 0x000000ff); 
+    
+    // at the end we add a new line.
+    // the new line in binary value is 0x0A ... do we really need to transmit it? 
+    // if the receiver expects just a fixed number of bytes then the terminator character '\n' is useless
+    // else if it looks for the terminator '\n' to stop the rx, ... there is the possibility that it stops if data contains the byte 0x0A.
+
+// following code detects the presence of a '\n' inside data.
+//    volatile bool found = false;
+//    volatile int index = -1;
+//    for(volatile int i=0; i<20; i++)
+//    {
+//        if(text[i] == '\n')
+//        {
+//            found = true;
+//            index = i;
+//        }
+//    }
+//    found = found;
+//    index = index;
+    
+   	text[pos++] = '\n'; 
+
+    HAL_UART_Transmit(&huart3, reinterpret_cast<uint8_t*>(text), pos, 0xFFFF);
+        
+
     
 #endif
  
