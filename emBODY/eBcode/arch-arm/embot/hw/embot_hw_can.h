@@ -35,7 +35,7 @@ namespace embot { namespace hw { namespace can {
         std::uint8_t        filler[3]   {0};
         std::uint8_t        data[8]     {0};  
         Frame() = default;
-        Frame(std::uint32_t i, std::uint8_t s, std::uint8_t *d) : id(i), size(std::max(s, static_cast<std::uint8_t>(8))) 
+        Frame(std::uint32_t i, std::uint8_t s, std::uint8_t *d) : id(i), size(std::min(s, static_cast<std::uint8_t>(8))) 
         {
             if(nullptr != d) { std::memmove(data, d, size); }
         }
