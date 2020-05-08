@@ -60,7 +60,8 @@ void doit(void *p)
     a++;    
 }
 
-constexpr embot::os::Event evtTick = 0x01;
+constexpr embot::os::Event evtPeriodicTick = 0x01;
+constexpr embot::os::Event evtExtRequest = 0x02;
 
 #if defined(enableTICK_fast) 
 constexpr embot::core::relTime tickperiod = 100*embot::core::time1millisec;
@@ -75,10 +76,10 @@ void eventbasedthread_startup(embot::os::Thread *t, void *param)
     
     embot::os::Timer *tmr = new embot::os::Timer;
     
-    embot::os::Action act(embot::os::EventToThread(evtTick, t));
+    embot::os::Action act(embot::os::EventToThread(evtPeriodicTick, t));
     embot::os::Timer::Config cfg{tickperiod, act, embot::os::Timer::Mode::forever, 0};
     tmr->start(cfg);
-    embot::hw::sys::puts("evthread-startup: started timer which sends evtTick to evthread every us = " + std::to_string(tickperiod));
+    embot::hw::sys::puts("evthread-startup: started timer which sends evtPeriodicTick to evthread every us = " + std::to_string(tickperiod));
 }
 
 
@@ -90,15 +91,23 @@ void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventma
         return;
     }
 
-    if(true == embot::core::binary::mask::check(eventmask, evtTick))
+    if(true == embot::core::binary::mask::check(eventmask, evtPeriodicTick))
     {
 #if defined(enableTRACE_all)        
         embot::core::TimeFormatter tf(embot::core::now());        
-        embot::hw::sys::puts("evthread-onevent: evtTick received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
+        embot::hw::sys::puts("evthread-onevent: evtPeriodicTick received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
 #endif        
         s_chips_tick();        
     }
-                 
+ 
+    if(true == embot::core::binary::mask::check(eventmask, evtExtRequest))
+    {
+#if defined(enableTRACE_all)        
+        embot::core::TimeFormatter tf(embot::core::now());        
+        embot::hw::sys::puts("evthread-onevent: evtPeriodicTick received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
+#endif        
+        s_chips_tick();        
+    }    
 }
 
 
