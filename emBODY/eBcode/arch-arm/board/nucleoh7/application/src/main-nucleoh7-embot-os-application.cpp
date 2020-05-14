@@ -29,7 +29,7 @@
 // if enableSERIAL is defined, it prints in compact binary format
 #undef  enableSERIAL_binary
 // if defined tickperiod is < 10 ms, else it is 1 sec 
-#undef  enableTICK_fast
+//#define  enableTICK_fast
 // if defined, the values are asked to the chips bno055 and the adc, if undefined we tx fake values
 #undef  enableACQUISITION
 // if defined we print values on the trace port
@@ -39,19 +39,26 @@
 
 
 
-#define enableTICK_fast
+//#define enableTICK_fast
 //#define enableTRACE_all
 #define enableSERIAL
-#undef enableACQUISITION
+#define enableACQUISITION
 
 #if defined(enableSERIAL)
-//#define enableSERIAL_string
-#define enableSERIAL_binary
+#define enableSERIAL_string
+//#define enableSERIAL_binary
 #endif
 
 static void s_chips_init();
 static void s_chips_tick();
 
+static void s_imu_start();
+static void s_imu_get();
+
+static void s_adc_start();
+static void s_adc_get();
+
+static void s_transmit();
 
 
 void doit(void *p)
@@ -60,8 +67,12 @@ void doit(void *p)
     a++;    
 }
 
-constexpr embot::os::Event evtPeriodicTick = 0x01;
-constexpr embot::os::Event evtExtRequest = 0x02;
+constexpr embot::os::Event evtPeriodicTick = embot::core::binary::mask::pos2mask<embot::os::Event>(0);
+constexpr embot::os::Event evtIMUdataready = embot::core::binary::mask::pos2mask<embot::os::Event>(1);
+constexpr embot::os::Event evtADCdataready = embot::core::binary::mask::pos2mask<embot::os::Event>(2);
+constexpr embot::os::Event evtDATAtransmit = embot::core::binary::mask::pos2mask<embot::os::Event>(7);
+
+ 
 
 #if defined(enableTICK_fast) 
 constexpr embot::core::relTime tickperiod = 100*embot::core::time1millisec;
@@ -69,17 +80,23 @@ constexpr embot::core::relTime tickperiod = 100*embot::core::time1millisec;
 constexpr embot::core::relTime tickperiod = embot::core::time1second;
 #endif
 
+constexpr embot::core::relTime txperiod = 200*embot::core::time1millisec;
+
 void eventbasedthread_startup(embot::os::Thread *t, void *param)
 {
     s_chips_init(); 
     embot::hw::sys::puts("evthread-startup: chips initted" );
     
-    embot::os::Timer *tmr = new embot::os::Timer;
-    
+    embot::os::Timer *tmr = new embot::os::Timer;   
     embot::os::Action act(embot::os::EventToThread(evtPeriodicTick, t));
     embot::os::Timer::Config cfg{tickperiod, act, embot::os::Timer::Mode::forever, 0};
     tmr->start(cfg);
     embot::hw::sys::puts("evthread-startup: started timer which sends evtPeriodicTick to evthread every us = " + std::to_string(tickperiod));
+    
+    embot::os::Timer *tmrTX = new embot::os::Timer;   
+    embot::os::Action actTX(embot::os::EventToThread(evtDATAtransmit, t));
+    embot::os::Timer::Config cfgTX{txperiod, actTX, embot::os::Timer::Mode::forever, 0};
+    tmrTX->start(cfgTX);
 }
 
 
@@ -97,16 +114,37 @@ void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventma
         embot::core::TimeFormatter tf(embot::core::now());        
         embot::hw::sys::puts("evthread-onevent: evtPeriodicTick received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
 #endif        
-        s_chips_tick();        
+//        s_chips_tick();    
+        s_imu_start();
     }
- 
-    if(true == embot::core::binary::mask::check(eventmask, evtExtRequest))
+    
+    if(true == embot::core::binary::mask::check(eventmask, evtIMUdataready))
     {
 #if defined(enableTRACE_all)        
         embot::core::TimeFormatter tf(embot::core::now());        
         embot::hw::sys::puts("evthread-onevent: evtPeriodicTick received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
 #endif        
-        s_chips_tick();        
+        s_imu_get();
+        s_adc_start();        
+    }
+ 
+    if(true == embot::core::binary::mask::check(eventmask, evtADCdataready))
+    {
+#if defined(enableTRACE_all)        
+        embot::core::TimeFormatter tf(embot::core::now());        
+        embot::hw::sys::puts("evthread-onevent: evtPeriodicTick received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
+#endif        
+        s_adc_get();        
+    }    
+    
+    if(true == embot::core::binary::mask::check(eventmask, evtDATAtransmit))
+    {
+#if defined(enableTRACE_all)        
+        embot::core::TimeFormatter tf(embot::core::now());        
+        embot::hw::sys::puts("evthread-onevent: evtPeriodicTick received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
+#endif        
+        //s_chips_tick(); 
+        s_transmit();
     }    
 }
 
@@ -116,6 +154,8 @@ void onIdle(embot::os::Thread *t, void* idleparam)
     static uint32_t i = 0;
     i++;
 }
+
+embot::os::EventThread* thr {nullptr};
 
 void initSystem(embot::os::Thread *t, void* initparam)
 {
@@ -139,7 +179,7 @@ void initSystem(embot::os::Thread *t, void* initparam)
     };
         
     // create the main thread 
-    embot::os::EventThread* thr = new embot::os::EventThread;          
+    thr = new embot::os::EventThread;          
     // and start it
     thr->start(configEV);
     
@@ -156,7 +196,7 @@ int main(void)
     // 2 i start the scheduler
     
     
-    constexpr embot::os::InitThread::Config initcfg = { 1024, initSystem, nullptr };
+    constexpr embot::os::InitThread::Config initcfg = { 4*1024, initSystem, nullptr };
     constexpr embot::os::IdleThread::Config idlecfg = { 512, nullptr, nullptr, onIdle };
     constexpr embot::core::Callback onOSerror = { };
     constexpr embot::os::Config osconfig {embot::core::time1millisec, initcfg, idlecfg, onOSerror};
@@ -190,12 +230,66 @@ static void s_chips_init()
     embot::hw::bno055::Config bno055config { embot::hw::i2c::Descriptor { embot::hw::I2C::one, 400000 } };
     embot::hw::bno055::init(embot::hw::BNO055::one, bno055config); 
     
-    // constexpr embot::hw::bno055::Mode mode = embot::hw::bno055::Mode::ACCGYRO;
-    constexpr embot::hw::bno055::Mode mode = embot::hw::bno055::Mode::NDOF;
+    constexpr embot::hw::bno055::Mode mode = embot::hw::bno055::Mode::ACCGYRO;
+    //constexpr embot::hw::bno055::Mode mode = embot::hw::bno055::Mode::NDOF;
     embot::hw::bno055::set(embot::hw::BNO055::one, mode, timeout);      
     
 #endif
     
+}
+
+volatile embot::core::Time imu_start {0};
+volatile embot::core::Time imu_stop {0};
+
+std::tuple<int16_t, int16_t, int16_t> acc2transmit {0, 0, 0};
+std::pair<uint32_t, uint32_t> adc2transmit {0, 0};
+
+embot::hw::bno055::Data data {};
+
+void alertimudataisready(void *p)
+{
+    thr->setEvent(evtIMUdataready);
+}
+    
+static void s_imu_start()
+{
+    imu_start = embot::core::now();
+    embot::core::Callback cbk(alertimudataisready, nullptr);
+    embot::hw::bno055::acquisition(embot::hw::BNO055::one, embot::hw::bno055::Set::A, data, cbk);    
+}
+
+static void s_imu_get()
+{
+    imu_stop = embot::core::now();
+    acc2transmit = {data.acc.x, data.acc.y, data.acc.z};    
+}
+
+
+void alertadcdataisready(void *p)
+{
+    thr->setEvent(evtADCdataready);
+}
+
+static void s_adc_start()
+{
+    // nothing so far.
+    // just send the event
+    
+    alertadcdataisready(nullptr);    
+}
+
+static void s_adc_get()
+{
+   // nothing 
+    
+    adc2transmit = {1, 1};
+}
+
+bool s_print_values(const std::tuple<int16_t, int16_t, int16_t> &acc, const std::pair<uint32_t, uint32_t> &adc);
+
+static void s_transmit()
+{
+    s_print_values(acc2transmit, adc2transmit);
 }
 
 volatile HAL_StatusTypeDef r = HAL_ERROR;
@@ -203,16 +297,15 @@ volatile HAL_StatusTypeDef r = HAL_ERROR;
 bool s_get_values(std::tuple<int16_t, int16_t, int16_t> &acc, std::pair<uint32_t, uint32_t> &adc);
 bool s_print_values(const std::tuple<int16_t, int16_t, int16_t> &acc, const std::pair<uint32_t, uint32_t> &adc);
 
+
 static void s_chips_tick()
-{
-    
+{   
     std::tuple<int16_t, int16_t, int16_t> acc {0, 0, 0};
     std::pair<uint32_t, uint32_t> adc {0, 0};
         
     s_get_values(acc, adc);
     
-    s_print_values(acc, adc);
-      
+    s_print_values(acc, adc);      
 }
 
 bool s_get_values(std::tuple<int16_t, int16_t, int16_t> &acc, std::pair<uint32_t, uint32_t> &adc)
@@ -249,8 +342,10 @@ bool s_get_values(std::tuple<int16_t, int16_t, int16_t> &acc, std::pair<uint32_t
     
     // so far only bno055
     #if 1
+    
+    imu_start = embot::core::now();
     embot::hw::bno055::Data data;        
-    if(embot::hw::result_t::OK == embot::hw::bno055::acquisition(embot::hw::BNO055::one, embot::hw::bno055::Set::AMG, data))
+    if(embot::hw::result_t::OK == embot::hw::bno055::acquisition(embot::hw::BNO055::one, embot::hw::bno055::Set::A, data))
     {
         for(;;)
         {
@@ -263,6 +358,7 @@ bool s_get_values(std::tuple<int16_t, int16_t, int16_t> &acc, std::pair<uint32_t
         // ok, we have the values in data        
         acc = {data.acc.x, data.acc.y, data.acc.z};        
     }
+    imu_stop = embot::core::now();
     #else
     // better mode because it gives a timeout BUT to be tested
     embot::hw::bno055::Data data; 
@@ -285,15 +381,33 @@ bool s_print_values(const std::tuple<int16_t, int16_t, int16_t> &acc, const std:
     char text[64] = {0};
     
 #if defined(enableSERIAL) && defined(enableSERIAL_string)
-     
+
+#if 1
+
+    embot::hw::sys::puts(std::string("accame = (") + 
+            std::to_string(std::get<0>(acc)) + " " +
+            std::to_string(std::get<1>(acc)) + " " +
+            std::to_string(std::get<2>(acc)) + 
+            ") in " + embot::core::TimeFormatter(imu_stop - imu_start).to_string()
+    );
+
+#else    
     // this prints in hex the entire range of values
     //snprintf(text, sizeof(text), "%04x %04x %04x %08x %08x\n", std::get<0>(acc), std::get<1>(acc), std::get<2>(acc), adc.first, adc.second);
 
     // JUST FOR TEST: this instead prints in hex but only 1 byte (the least significant byte)
     snprintf(text, sizeof(text), "%02x %02x %02x %02x %02x\n", std::get<0>(acc), std::get<1>(acc), std::get<2>(acc), adc.first, adc.second);
 		//snprintf(text, sizeof(text), "%02x\n", std::get<0>(acc));	//LUCA
+    
+//    snprintf(text, sizeof(text), "0123456789abcdef0123 ");
+//    embot::core::Time t0 = embot::core::now();
         
     HAL_UART_Transmit(&huart3, reinterpret_cast<uint8_t*>(text), std::strlen(text), 0xFFFF);
+    
+//    embot::core::Time t1 = embot::core::now();
+//    embot::hw::sys::puts("tx " + std::to_string( std::strlen(text)) + " in: " + embot::core::TimeFormatter(t1-t0).to_string());
+
+#endif
     
 #elif defined(enableSERIAL) && defined(enableSERIAL_binary)   
     
