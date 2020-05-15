@@ -47,6 +47,8 @@
 
 #include "EOtheServices.h"
 
+#include "EOVtheSystem.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -407,6 +409,39 @@ extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropd
         } break;        
     }
 
+}
+
+extern void eoprot_fun_UPDT_mn_appl_cmmnds_timeset(const EOnv* nv, const eOropdescriptor_t* rd) 
+{
+    eOabstime_t *timeset = (eOabstime_t *)nv->ram;
+    #warning TODO: review eoprot_fun_UPDT_mn_appl_cmmnds_timesetfill()
+    //
+    // first implementation: if the received time is not much different, then i apply it
+    eOabstime_t currtime = eov_sys_LifeTimeGet(eov_sys_GetHandle());
+    int64_t delta = *timeset - currtime;
+    eObool_t apply = eobool_false;
+    if(delta > 0)
+    {
+        // we go in the future. do we go much?
+        if(delta >= eok_reltime1ms)
+        {
+            apply = eobool_true;
+        }        
+    }
+    else
+    {
+        // it is either zero or negative (we go in the past)
+        delta = -delta;
+        if(delta >= eok_reltime1ms)
+        {
+            apply = eobool_true;
+        }        
+    }
+    
+    if(eobool_true == apply)
+    {
+        eov_sys_LifeTimeSet(eov_sys_GetHandle(), *timeset);
+    }
 }
 
 
