@@ -243,6 +243,7 @@ volatile embot::core::Time imu_stop {0};
 
 std::tuple<int16_t, int16_t, int16_t> acc2transmit {0, 0, 0};
 std::pair<uint32_t, uint32_t> adc2transmit {0, 0};
+embot::core::Time imu_acquisitiontime {0};
 
 embot::hw::bno055::Data data {};
 
@@ -261,6 +262,7 @@ static void s_imu_start()
 static void s_imu_get()
 {
     imu_stop = embot::core::now();
+    imu_acquisitiontime = imu_stop - imu_start;
     acc2transmit = {data.acc.x, data.acc.y, data.acc.z};    
 }
 
@@ -384,12 +386,18 @@ bool s_print_values(const std::tuple<int16_t, int16_t, int16_t> &acc, const std:
 
 #if 1
 
-    embot::hw::sys::puts(std::string("accame = (") + 
-            std::to_string(std::get<0>(acc)) + " " +
-            std::to_string(std::get<1>(acc)) + " " +
-            std::to_string(std::get<2>(acc)) + 
-            ") in " + embot::core::TimeFormatter(imu_stop - imu_start).to_string()
-    );
+    if(0 != imu_acquisitiontime)
+    {
+        float ax = 0.01f * std::get<0>(acc);
+        float ay = 0.01f * std::get<1>(acc);
+        float az = 0.01f * std::get<2>(acc);
+        embot::hw::sys::puts(std::string("acceleration [m/s^2] = (") + 
+                std::to_string(ax) + " " +
+                std::to_string(ay) + " " +
+                std::to_string(az) + 
+                ") read in " + embot::core::TimeFormatter(imu_acquisitiontime).to_string()
+        );
+    }
 
 #else    
     // this prints in hex the entire range of values
