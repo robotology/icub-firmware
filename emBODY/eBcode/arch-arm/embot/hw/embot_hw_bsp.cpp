@@ -384,7 +384,7 @@ namespace embot { namespace hw { namespace bsp { namespace button {
     // this button is the blue one on the board
     constexpr PROP btn1p = { .pressed = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::thirteen}, 
                              .pull = embot::hw::gpio::Pull::nopull, .irqn = EXTI15_10_IRQn  };  
-    // this button is attached directly to PB8 w/out any filter. it is pressed when PB8is connected to 3V3
+    // this button is attached directly to PB8 w/out any filter. it is pressed when PB8 is connected to 3V3
     constexpr PROP btn2p = { .pressed = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::B, embot::hw::GPIO::PIN::eight}, 
                              .pull = embot::hw::gpio::Pull::pulldown, .irqn = EXTI9_5_IRQn  };  
  
@@ -2169,6 +2169,65 @@ namespace embot { namespace hw { namespace bsp { namespace multisda {
 #endif // multisda
 
 // - support map: end of embot::hw::multisda
+
+
+// - support map: begin of embot::hw::ads122c04
+
+namespace embot { namespace hw { namespace bsp { namespace ads122c04 {
+           
+    static_assert(embot::core::tointegral(embot::hw::ADS122C04::none) < 8*sizeof(SUPP::supportedmask), "ADS122C04::none must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::core::tointegral(embot::hw::ADS122C04::maxnumberof) < 8*sizeof(SUPP::supportedmask), "ADS122C04::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::core::tointegral(embot::hw::ADS122C04::maxnumberof) < embot::core::tointegral(embot::hw::ADS122C04::none), "ADS122C04::maxnumberof must be higher that ADS122C04::none, so that we can optimise code");
+
+}}}}
+
+#if   !defined(HAL_I2C_MODULE_ENABLED) || !defined(EMBOT_ENABLE_hw_ads122c04)
+
+namespace embot { namespace hw { namespace bsp { namespace ads122c04 {
+    
+    constexpr BSP thebsp { };
+    void BSP::init(embot::hw::ADS122C04 h) const {}    
+    const BSP& getBSP() 
+    {
+        return thebsp;
+    }
+    
+}}}}
+
+#else
+
+namespace embot { namespace hw { namespace bsp { namespace ads122c04 {
+           
+    #if defined(STM32HAL_BOARD_NUCLEOH7)
+        
+    constexpr PROP prop01 { .i2cbus = embot::hw::I2C::one, .i2caddress = 0x3E }; 
+
+    constexpr BSP thebsp {        
+        // maskofsupported
+        mask::pos2mask<uint32_t>(ADS122C04::one),        
+        // properties
+        {{
+            &prop01
+        }}        
+    };
+
+    void BSP::init(embot::hw::ADS122C04 h) const {}
+
+    #else
+        #error embot::hw::bsp::ads122c04::thebsp must be defined    
+    #endif
+    
+    const BSP& getBSP() 
+    {
+        return thebsp;
+    }
+              
+}}}} // namespace embot { namespace hw { namespace bsp {  namespace ads122c04 {
+
+#endif // ads122c04
+
+// - support map: end of embot::hw::ads122c04
+
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 
