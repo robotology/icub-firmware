@@ -175,7 +175,7 @@ namespace embot { namespace hw { namespace onewire {
         // gpio init is globally initted by stm32hal_bsp_init() because it hold all gpio peripherals
         // MX_GPIO_Init();
         // however, we must config it as output and put it high 
-        embot::hw::gpio::configure(config.gpio, embot::hw::gpio::Mode::OUTPUTopendrain);
+        embot::hw::gpio::configure(config.gpio, embot::hw::gpio::Mode::OUTPUTopendrain, embot::hw::gpio::Pull::nopull, embot::hw::gpio::Speed::low);
         embot::hw::gpio::set(config.gpio, embot::hw::gpio::State::SET);
         
         if(false == s_privatedata.tickingTimerIsInitted)

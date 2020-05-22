@@ -56,8 +56,8 @@ namespace embot { namespace hw { namespace bsp { namespace gpio {
     
     struct PROP
     {
-        GPIO_TypeDef* stmport;
-        std::uint16_t stmpin;        
+        GPIO_TypeDef* stmport;  // GPIOA, etc.
+        std::uint16_t stmpin;   // GPIO_PIN_0, GPIO_PIN_1, etc.        
         constexpr PROP() : stmport(nullptr), stmpin(0) {}
         constexpr PROP(GPIO_TypeDef* po, std::uint16_t pi) : stmport(po), stmpin(pi) {}
         constexpr bool isvalid() const { return (nullptr == stmport) ? false : true; }
@@ -91,7 +91,9 @@ namespace embot { namespace hw { namespace bsp { namespace gpio {
             if(supported(h)) { p.stmport = ports[embot::core::tointegral(h.port)]; p.stmpin = 1 << embot::core::tointegral(h.pin); }
             return p;
         }
-                
+        
+        constexpr embot::hw::GPIO getGPIO(const PROP &p) const;
+                        
         void init(embot::hw::GPIO h) const;
     };
     
@@ -130,8 +132,11 @@ namespace embot { namespace hw { namespace bsp { namespace button {
     
     struct PROP
     { 
+        static constexpr int32_t irqNONE {-1000}; 
         embot::hw::gpio::State  pressed;
         embot::hw::GPIO         gpio;
+        embot::hw::gpio::Pull   pull;
+        int32_t                 irqn;
     };
     
     struct BSP : public embot::hw::bsp::SUPP
@@ -143,6 +148,7 @@ namespace embot { namespace hw { namespace bsp { namespace button {
         std::array<const PROP*, maxnumberof> properties;    
         constexpr const PROP * getPROP(embot::hw::BTN h) const { return supported(h) ? properties[embot::core::tointegral(h)] : nullptr; }
         void init(embot::hw::BTN h) const;
+        void onEXTI(const embot::hw::bsp::gpio::PROP &p) const; // it must be called by IRQhandler or its callback with for example {nullptr, GPIO_PIN_5} 
     };
     
     const BSP& getBSP();

@@ -29,14 +29,36 @@
 
 namespace embot { namespace hw { namespace button {
     
+    enum class Mode : uint8_t 
+    { 
+        Polling = 0,                    // the gpio is read directly in order to assess if the button is pressed: you must call pressed()
+        TriggeredOnPress = 1,           // triggered on press of the button with the aid of an IRQHandler 
+        TriggeredOnRelease = 2,         // triggered on release of the button with the aid of an IRQhandler
+        TriggeredOnDebouncedRelease = 3 // same as TriggeredOnRelease but triggered only if a a given time has passed in pressed mode
+    };
+    
+    struct Config
+    {   
+        Mode mode {Mode::Polling};    
+        embot::core::Callback callback {nullptr, nullptr}; // not used for Mode::Polling   
+        embot::core::Time debouncetime {100*embot::core::time1millisec};           
+        constexpr Config() = default;   
+        constexpr Config(Mode mo, const embot::core::Callback &ca, embot::core::Time de) : mode(mo), callback(ca), debouncetime(de) {}         
+    };    
 
     bool supported(BTN btn);
     
     bool initialised(BTN btn);
         
-    result_t init(BTN btn);
+    result_t init(BTN btn, const Config &cfg);
+    
+    const Config & config(BTN btn);
+     
         
     bool pressed(BTN btn);
+    
+    // must put it inside the handler of exti when the pin associated to the button is triggered
+    void onexti(BTN btn);
        
 }}} // namespace embot { namespace hw { namespace button 
 
