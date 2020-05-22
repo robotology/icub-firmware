@@ -28,8 +28,8 @@
 #undef  enableSERIAL_string
 // if enableSERIAL is defined, it prints in compact binary format
 #undef  enableSERIAL_binary
-// if defined tickperiod is < 10 ms, else it is 1 sec 
-//#define  enableTICK_fast
+// if defined acquisitionPeriod is < 10 ms, else it is 1 sec 
+//#define  enableACQUISITION_fast
 // if defined, the values are asked to the chips bno055 and the adc, if undefined we tx fake values
 #undef  enableACQUISITION
 // if defined we print values on the trace port
@@ -39,7 +39,7 @@
 
 
 
-//#define enableTICK_fast
+#define enableACQUISITION_fast
 //#define enableTRACE_all
 #define enableSERIAL
 #define enableACQUISITION
@@ -50,53 +50,61 @@
 #endif
 
 static void s_chips_init();
-static void s_chips_tick();
-
 static void s_imu_start();
 static void s_imu_get();
-
 static void s_adc_start();
 static void s_adc_get();
-
 static void s_transmit();
 
 
-void doit(void *p)
-{
-    static uint32_t a = 0;
-    a++;    
-}
-
-constexpr embot::os::Event evtPeriodicTick = embot::core::binary::mask::pos2mask<embot::os::Event>(0);
-constexpr embot::os::Event evtIMUdataready = embot::core::binary::mask::pos2mask<embot::os::Event>(1);
-constexpr embot::os::Event evtADCdataready = embot::core::binary::mask::pos2mask<embot::os::Event>(2);
-constexpr embot::os::Event evtDATAtransmit = embot::core::binary::mask::pos2mask<embot::os::Event>(7);
+constexpr embot::os::Event evtAcquisition = embot::core::binary::mask::pos2mask<embot::os::Event>(0);
+constexpr embot::os::Event evtEXTRNtrigger = embot::core::binary::mask::pos2mask<embot::os::Event>(1);
+constexpr embot::os::Event evtIMUdataready = embot::core::binary::mask::pos2mask<embot::os::Event>(2);
+constexpr embot::os::Event evtADCdataready = embot::core::binary::mask::pos2mask<embot::os::Event>(3);
+constexpr embot::os::Event evtDATAtransmit = embot::core::binary::mask::pos2mask<embot::os::Event>(4);
 
  
-
-#if defined(enableTICK_fast) 
-constexpr embot::core::relTime tickperiod = 100*embot::core::time1millisec;
+#if defined(enableACQUISITION_fast) 
+constexpr embot::core::relTime acquisitionPeriod = 10*embot::core::time1millisec;
 #else
-constexpr embot::core::relTime tickperiod = embot::core::time1second;
+constexpr embot::core::relTime acquisitionPeriod = embot::core::time1second;
 #endif
 
 constexpr embot::core::relTime txperiod = 200*embot::core::time1millisec;
 
-void eventbasedthread_startup(embot::os::Thread *t, void *param)
+constexpr embot::hw::BTN buttonBLUE = embot::hw::BTN::one;
+constexpr embot::hw::BTN buttonPB8 = embot::hw::BTN::two;
+    
+constexpr embot::hw::BTN buttonTX = buttonBLUE; // but later on: buttonPB8
+
+void txrequest(void *p)
 {
+//    embot::hw::sys::puts(std::string("B @") + embot::core::TimeFormatter(embot::core::now()).to_string());
+    embot::os::Thread *t = reinterpret_cast<embot::os::Thread *>(p);
+    t->setEvent(evtDATAtransmit);
+}
+
+void eventbasedthread_startup(embot::os::Thread *t, void *param)
+{       
+    // init imu + adc
     s_chips_init(); 
-    embot::hw::sys::puts("evthread-startup: chips initted" );
+    
+    // init the ext interrupt button
+    embot::hw::button::init(buttonTX, {embot::hw::button::Mode::TriggeredOnRelease, {txrequest, t}, 0});
+    
+    embot::hw::sys::puts("evthread-startup: chips + exti initted" );
     
     embot::os::Timer *tmr = new embot::os::Timer;   
-    embot::os::Action act(embot::os::EventToThread(evtPeriodicTick, t));
-    embot::os::Timer::Config cfg{tickperiod, act, embot::os::Timer::Mode::forever, 0};
+    embot::os::Action act(embot::os::EventToThread(evtAcquisition, t));
+    embot::os::Timer::Config cfg{acquisitionPeriod, act, embot::os::Timer::Mode::forever, 0};
     tmr->start(cfg);
-    embot::hw::sys::puts("evthread-startup: started timer which sends evtPeriodicTick to evthread every us = " + std::to_string(tickperiod));
     
-    embot::os::Timer *tmrTX = new embot::os::Timer;   
-    embot::os::Action actTX(embot::os::EventToThread(evtDATAtransmit, t));
-    embot::os::Timer::Config cfgTX{txperiod, actTX, embot::os::Timer::Mode::forever, 0};
-    tmrTX->start(cfgTX);
+    embot::hw::sys::puts("evthread-startup: started timer which sends evtAcquisition to evthread every us = " + std::to_string(acquisitionPeriod));
+    
+//    embot::os::Timer *tmrTX = new embot::os::Timer;   
+//    embot::os::Action actTX(embot::os::EventToThread(evtDATAtransmit, t));
+//    embot::os::Timer::Config cfgTX{txperiod, actTX, embot::os::Timer::Mode::forever, 0};
+//    tmrTX->start(cfgTX);
 }
 
 
@@ -108,13 +116,12 @@ void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventma
         return;
     }
 
-    if(true == embot::core::binary::mask::check(eventmask, evtPeriodicTick))
+    if(true == embot::core::binary::mask::check(eventmask, evtAcquisition)) 
     {
 #if defined(enableTRACE_all)        
         embot::core::TimeFormatter tf(embot::core::now());        
-        embot::hw::sys::puts("evthread-onevent: evtPeriodicTick received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
+        embot::hw::sys::puts("evthread-onevent: evtAcquisition received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
 #endif        
-//        s_chips_tick();    
         s_imu_start();
     }
     
@@ -122,7 +129,7 @@ void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventma
     {
 #if defined(enableTRACE_all)        
         embot::core::TimeFormatter tf(embot::core::now());        
-        embot::hw::sys::puts("evthread-onevent: evtPeriodicTick received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
+        embot::hw::sys::puts("evthread-onevent: evtAcquisition received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
 #endif        
         s_imu_get();
         s_adc_start();        
@@ -132,7 +139,7 @@ void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventma
     {
 #if defined(enableTRACE_all)        
         embot::core::TimeFormatter tf(embot::core::now());        
-        embot::hw::sys::puts("evthread-onevent: evtPeriodicTick received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
+        embot::hw::sys::puts("evthread-onevent: evtAcquisition received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
 #endif        
         s_adc_get();        
     }    
@@ -141,9 +148,8 @@ void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventma
     {
 #if defined(enableTRACE_all)        
         embot::core::TimeFormatter tf(embot::core::now());        
-        embot::hw::sys::puts("evthread-onevent: evtPeriodicTick received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
+        embot::hw::sys::puts("evthread-onevent: evtDATAtransmit received @ time = " + tf.to_string());    
 #endif        
-        //s_chips_tick(); 
         s_transmit();
     }    
 }
@@ -181,8 +187,7 @@ void initSystem(embot::os::Thread *t, void* initparam)
     // create the main thread 
     thr = new embot::os::EventThread;          
     // and start it
-    thr->start(configEV);
-    
+    thr->start(configEV);   
 }
 
 
@@ -194,8 +199,7 @@ int main(void)
     // steps:
     // 1. i init the embot::os
     // 2 i start the scheduler
-    
-    
+        
     constexpr embot::os::InitThread::Config initcfg = { 4*1024, initSystem, nullptr };
     constexpr embot::os::IdleThread::Config idlecfg = { 512, nullptr, nullptr, onIdle };
     constexpr embot::core::Callback onOSerror = { };
@@ -294,88 +298,73 @@ static void s_transmit()
     s_print_values(acc2transmit, adc2transmit);
 }
 
-volatile HAL_StatusTypeDef r = HAL_ERROR;
 
-bool s_get_values(std::tuple<int16_t, int16_t, int16_t> &acc, std::pair<uint32_t, uint32_t> &adc);
-bool s_print_values(const std::tuple<int16_t, int16_t, int16_t> &acc, const std::pair<uint32_t, uint32_t> &adc);
+//bool s_get_values(std::tuple<int16_t, int16_t, int16_t> &acc, std::pair<uint32_t, uint32_t> &adc)
+//{
+//#if !defined(enableACQUISITION)
+//    
+//    constexpr int32_t accmin = -30;
+//    constexpr int32_t accmax = +270;
+//    
+//    constexpr uint32_t adcmin = 0;
+//    constexpr uint32_t adcmax = +300;
+//    
+//    static int16_t accx = accmin+0;
+//    static int16_t accy = accmin+10;
+//    static int16_t accz = accmin+20;
+//    static uint32_t adc1 = adcmin+0;
+//    static uint32_t adc2 = adcmin+10;    
+//    
+//    acc = {accx, accy, accz};
+//    adc = {adc1, adc2};
+//    
+//    // implements triangular waveforms
+//    accx++; accy++; accz++; adc1++; adc2++;
+//    if(accx >= accmax) accx = accmin;
+//    if(accy >= accmax) accy = accmin;
+//    if(accz >= accmax) accz = accmin;
+//    if(adc1 >= adcmax) adc1 = adcmin;
+//    if(adc2 >= adcmax) adc2 = adcmin;    
 
+//#else
 
-static void s_chips_tick()
-{   
-    std::tuple<int16_t, int16_t, int16_t> acc {0, 0, 0};
-    std::pair<uint32_t, uint32_t> adc {0, 0};
-        
-    s_get_values(acc, adc);
-    
-    s_print_values(acc, adc);      
-}
+//    acc = {0, 0, 0};
+//    adc = {1, 1};
+//    
+//    // so far only bno055
+//    #if 1
+//    
+//    imu_start = embot::core::now();
+//    embot::hw::bno055::Data data;        
+//    if(embot::hw::result_t::OK == embot::hw::bno055::acquisition(embot::hw::BNO055::one, embot::hw::bno055::Set::A, data))
+//    {
+//        for(;;)
+//        {
+//            if(true == embot::hw::bno055::operationdone(embot::hw::BNO055::one))
+//            {
+//                break;
+//            }
+//        }
+//        
+//        // ok, we have the values in data        
+//        acc = {data.acc.x, data.acc.y, data.acc.z};        
+//    }
+//    imu_stop = embot::core::now();
+//    #else
+//    // better mode because it gives a timeout BUT to be tested
+//    embot::hw::bno055::Data data; 
+//    constexpr embot::core::relTime timeout = 10*embot::core::time1millisec;   
+//    if(embot::hw::result_t::OK == embot::hw::bno055::acquisition(embot::hw::BNO055::one, embot::hw::bno055::Set::AMG, data, timeout))
+//    {      
+//        // ok, we have the values in data        
+//        acc = {data.acc.x, data.acc.y, data.acc.z};        
+//    }        
+//    #endif
 
-bool s_get_values(std::tuple<int16_t, int16_t, int16_t> &acc, std::pair<uint32_t, uint32_t> &adc)
-{
-#if !defined(enableACQUISITION)
-    
-    constexpr int32_t accmin = -30;
-    constexpr int32_t accmax = +270;
-    
-    constexpr uint32_t adcmin = 0;
-    constexpr uint32_t adcmax = +300;
-    
-    static int16_t accx = accmin+0;
-    static int16_t accy = accmin+10;
-    static int16_t accz = accmin+20;
-    static uint32_t adc1 = adcmin+0;
-    static uint32_t adc2 = adcmin+10;    
-    
-    acc = {accx, accy, accz};
-    adc = {adc1, adc2};
-    
-    // implements triangular waveforms
-    accx++; accy++; accz++; adc1++; adc2++;
-    if(accx >= accmax) accx = accmin;
-    if(accy >= accmax) accy = accmin;
-    if(accz >= accmax) accz = accmin;
-    if(adc1 >= adcmax) adc1 = adcmin;
-    if(adc2 >= adcmax) adc2 = adcmin;    
-
-#else
-
-    acc = {0, 0, 0};
-    adc = {1, 1};
-    
-    // so far only bno055
-    #if 1
-    
-    imu_start = embot::core::now();
-    embot::hw::bno055::Data data;        
-    if(embot::hw::result_t::OK == embot::hw::bno055::acquisition(embot::hw::BNO055::one, embot::hw::bno055::Set::A, data))
-    {
-        for(;;)
-        {
-            if(true == embot::hw::bno055::operationdone(embot::hw::BNO055::one))
-            {
-                break;
-            }
-        }
-        
-        // ok, we have the values in data        
-        acc = {data.acc.x, data.acc.y, data.acc.z};        
-    }
-    imu_stop = embot::core::now();
-    #else
-    // better mode because it gives a timeout BUT to be tested
-    embot::hw::bno055::Data data; 
-    constexpr embot::core::relTime timeout = 10*embot::core::time1millisec;   
-    if(embot::hw::result_t::OK == embot::hw::bno055::acquisition(embot::hw::BNO055::one, embot::hw::bno055::Set::AMG, data, timeout))
-    {      
-        // ok, we have the values in data        
-        acc = {data.acc.x, data.acc.y, data.acc.z};        
-    }        
-    #endif
-
-#endif    
-       
-    return true;    
-}
+//#endif    
+//       
+//    return true;    
+//}
 
 
 bool s_print_values(const std::tuple<int16_t, int16_t, int16_t> &acc, const std::pair<uint32_t, uint32_t> &adc)
@@ -481,9 +470,7 @@ bool s_print_values(const std::tuple<int16_t, int16_t, int16_t> &acc, const std:
    	text[pos++] = '\n'; 
 
     HAL_UART_Transmit(&huart3, reinterpret_cast<uint8_t*>(text), pos, 0xFFFF);
-        
-
-    
+            
 #endif
  
 
