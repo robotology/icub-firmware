@@ -303,71 +303,17 @@
           <Name>UL2CM3(-S0 -C0 -P0 ) -FN1 -FC8000 -FD20000000 -FF0STM32H7x_2048 -FL0200000 -FS08000000 -FP0($$Device:STM32H743ZITx$CMSIS\Flash\STM32H7x_2048.FLM)</Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
-      <Breakpoint>
-        <Bp>
-          <Number>0</Number>
-          <Type>0</Type>
-          <LineNumber>184</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134239522</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\..\..\..\embot\hw\embot_hw_button.cpp</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\nucleoh7\../../../../embot/hw/embot_hw_button.cpp\184</Expression>
-        </Bp>
-        <Bp>
-          <Number>1</Number>
-          <Type>0</Type>
-          <LineNumber>742</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134253594</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>C:\ace\#rob\icub-firmware\emBODY\eBcode\arch-arm\libs\midware\oosiit\src\others\oosiit.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\nucleoh7\../../../midware/oosiit/src/others/oosiit.c\742</Expression>
-        </Bp>
-        <Bp>
-          <Number>2</Number>
-          <Type>0</Type>
-          <LineNumber>746</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134253604</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>C:\ace\#rob\icub-firmware\emBODY\eBcode\arch-arm\libs\midware\oosiit\src\others\oosiit.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\nucleoh7\../../../midware/oosiit/src/others/oosiit.c\746</Expression>
-        </Bp>
-      </Breakpoint>
+      <Breakpoint/>
       <WatchWindow1>
         <Ww>
           <count>0</count>
           <WinNumber>1</WinNumber>
-          <ItemText>t0</ItemText>
+          <ItemText>acq</ItemText>
         </Ww>
         <Ww>
           <count>1</count>
           <WinNumber>1</WinNumber>
-          <ItemText>t0</ItemText>
-        </Ww>
-        <Ww>
-          <count>2</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>t1,0x0A</ItemText>
+          <ItemText>v</ItemText>
         </Ww>
       </WatchWindow1>
       <Tracepoint>
@@ -800,8 +746,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\embot\hw\embot_hw_si7051.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw_si7051.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\embot\hw\embot_hw_timer.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_timer.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -812,8 +758,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\embot\hw\embot_hw_timer.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_hw_timer.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\embot\hw\embot_hw_ads122c04.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_ads122c04.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -945,7 +891,7 @@
 
   <Group>
     <GroupName>others</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -958,6 +904,18 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\embot\app\embot_app_theLEDmanager.cpp</PathWithFileName>
       <FilenameWithoutPath>embot_app_theLEDmanager.cpp</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>8</GroupNumber>
+      <FileNumber>29</FileNumber>
+      <FileType>8</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools\embot_tools.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_tools.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

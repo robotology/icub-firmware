@@ -18,6 +18,7 @@
 #include "embot_os_theTimerManager.h"
 #include "embot_os_theCallbackManager.h"
 #include "embot_app_theLEDmanager.h"
+#include "embot_tools.h"
 
 
 // macro definition. we keep some behaviours in the same code.
@@ -45,8 +46,8 @@
 #define enableACQUISITION
 
 #if defined(enableSERIAL)
-#define enableSERIAL_string
-//#define enableSERIAL_binary
+//#define enableSERIAL_string
+#define enableSERIAL_binary
 #endif
 
 static void s_chips_init();
@@ -77,6 +78,8 @@ constexpr embot::hw::BTN buttonPB8 = embot::hw::BTN::two;
     
 constexpr embot::hw::BTN buttonTX = buttonBLUE; // but later on: buttonPB8
 
+embot::tools::Histogram *histoIMU {nullptr};
+//embot::tools::Histogram *histoUSART {nullptr};
 void txrequest(void *p)
 {
 //    embot::hw::sys::puts(std::string("B @") + embot::core::TimeFormatter(embot::core::now()).to_string());
@@ -190,7 +193,7 @@ void initSystem(embot::os::Thread *t, void* initparam)
     thr->start(configEV);   
 }
 
-
+// usart 921600
 
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -218,11 +221,19 @@ int main(void)
 
 
 #include "embot_hw_bno055.h"
+#include "embot_hw_ads122c04.h"
 
 #include <cstring>
 
 static void s_chips_init()
 {
+    
+    histoIMU = new embot::tools::Histogram;
+    histoIMU->init({0, 2500, 100});
+    
+//    histoUSART = new embot::tools::Histogram;
+//    histoUSART->init({0, 500, 50});
+    
 #if !defined(enableACQUISITION)
     
     // nothing. we just simulate the sensors
@@ -230,13 +241,21 @@ static void s_chips_init()
 #else
  
     constexpr embot::core::relTime timeout = 5*embot::core::time1millisec;
+    constexpr uint32_t i2cspeed400k = 400000;
+    constexpr uint32_t i2cspeed1m = 1000000;
     
-    embot::hw::bno055::Config bno055config { embot::hw::i2c::Descriptor { embot::hw::I2C::one, 400000 } };
+    constexpr uint32_t i2cspeed = i2cspeed400k;
+    
+    embot::hw::bno055::Config bno055config { embot::hw::i2c::Descriptor { embot::hw::I2C::one, i2cspeed } };
     embot::hw::bno055::init(embot::hw::BNO055::one, bno055config); 
     
     constexpr embot::hw::bno055::Mode mode = embot::hw::bno055::Mode::ACCGYRO;
     //constexpr embot::hw::bno055::Mode mode = embot::hw::bno055::Mode::NDOF;
-    embot::hw::bno055::set(embot::hw::BNO055::one, mode, timeout);      
+    embot::hw::bno055::set(embot::hw::BNO055::one, mode, timeout);   
+
+
+    embot::hw::ads122c04::Config adsconfig { embot::hw::i2c::Descriptor { embot::hw::I2C::one, i2cspeed } };
+    embot::hw::ads122c04::init(embot::hw::ADS122C04::one, adsconfig);     
     
 #endif
     
@@ -267,7 +286,50 @@ static void s_imu_get()
 {
     imu_stop = embot::core::now();
     imu_acquisitiontime = imu_stop - imu_start;
-    acc2transmit = {data.acc.x, data.acc.y, data.acc.z};    
+    acc2transmit = {data.acc.x, data.acc.y, data.acc.z}; 
+    
+    histoIMU->add(imu_acquisitiontime);
+    static uint32_t cnt = 0;
+    cnt++;
+    if((cnt%1000) == 0)
+    {
+//        embot::hw::sys::puts(std::string("imu read in ") + embot::core::TimeFormatter(imu_acquisitiontime).to_string());
+        char str[256] = {0};
+        const embot::tools::Histogram::Values *v = histoIMU->getvalues();
+        snprintf(str, sizeof(str), "(%d) %f [%f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f %f] %f", 
+                                    v->inside.size(),
+                                    100.0f*v->below/static_cast<float>(v->total),
+                                    100.0f*v->inside[0]/static_cast<float>(v->total),
+                                    100.0f*v->inside[1]/static_cast<float>(v->total),
+                                    100.0f*v->inside[2]/static_cast<float>(v->total),
+                                    100.0f*v->inside[3]/static_cast<float>(v->total),
+                                    100.0f*v->inside[4]/static_cast<float>(v->total),  
+                                    100.0f*v->inside[5]/static_cast<float>(v->total),
+                                    100.0f*v->inside[6]/static_cast<float>(v->total), 
+                                    100.0f*v->inside[7]/static_cast<float>(v->total),     
+                                    100.0f*v->inside[8]/static_cast<float>(v->total), 
+                                    100.0f*v->inside[9]/static_cast<float>(v->total), 
+                                    100.0f*v->inside[10]/static_cast<float>(v->total), 
+                                    100.0f*v->inside[11]/static_cast<float>(v->total),     
+                                    100.0f*v->inside[12]/static_cast<float>(v->total), 
+                                    100.0f*v->inside[13]/static_cast<float>(v->total),   
+                                    100.0f*v->inside[14]/static_cast<float>(v->total), 
+                                    100.0f*v->inside[15]/static_cast<float>(v->total), 
+                                    100.0f*v->inside[16]/static_cast<float>(v->total), 
+                                    100.0f*v->inside[17]/static_cast<float>(v->total),     
+                                    100.0f*v->inside[18]/static_cast<float>(v->total), 
+                                    100.0f*v->inside[19]/static_cast<float>(v->total),   
+                                    100.0f*v->inside[20]/static_cast<float>(v->total), 
+                                    100.0f*v->inside[21]/static_cast<float>(v->total),     
+                                    100.0f*v->inside[22]/static_cast<float>(v->total), 
+                                    100.0f*v->inside[23]/static_cast<float>(v->total), 
+                                    100.0f*v->inside[24]/static_cast<float>(v->total),                                        
+                                    100.0f*v->beyond/static_cast<float>(v->total)
+                                    );
+        embot::hw::sys::puts(std::string("histo IMU -> ") + str);
+                                    
+        histoIMU->reset();
+    }        
 }
 
 
@@ -281,14 +343,17 @@ static void s_adc_start()
     // nothing so far.
     // just send the event
     
-    alertadcdataisready(nullptr);    
+//    alertadcdataisready(nullptr);    
+    
+    embot::core::Callback cbk(alertadcdataisready, nullptr);
+    embot::hw::ads122c04::acquisition(embot::hw::ADS122C04::one, cbk);   
 }
 
 static void s_adc_get()
 {
-   // nothing 
-    
-    adc2transmit = {1, 1};
+    embot::hw::ads122c04::Values v {};
+    embot::hw::ads122c04::read(embot::hw::ADS122C04::one, v); 
+    adc2transmit = {v.v1, v.v2};
 }
 
 bool s_print_values(const std::tuple<int16_t, int16_t, int16_t> &acc, const std::pair<uint32_t, uint32_t> &adc);
@@ -373,7 +438,7 @@ bool s_print_values(const std::tuple<int16_t, int16_t, int16_t> &acc, const std:
     
 #if defined(enableSERIAL) && defined(enableSERIAL_string)
 
-#if 1
+#if 0
 
     if(0 != imu_acquisitiontime)
     {
@@ -390,13 +455,11 @@ bool s_print_values(const std::tuple<int16_t, int16_t, int16_t> &acc, const std:
 
 #else    
     // this prints in hex the entire range of values
-    //snprintf(text, sizeof(text), "%04x %04x %04x %08x %08x\n", std::get<0>(acc), std::get<1>(acc), std::get<2>(acc), adc.first, adc.second);
+    snprintf(text, sizeof(text), "%04x %04x %04x %04x %04x\n", std::get<0>(acc), std::get<1>(acc), std::get<2>(acc), adc.first, adc.second);
 
     // JUST FOR TEST: this instead prints in hex but only 1 byte (the least significant byte)
-    snprintf(text, sizeof(text), "%02x %02x %02x %02x %02x\n", std::get<0>(acc), std::get<1>(acc), std::get<2>(acc), adc.first, adc.second);
-		//snprintf(text, sizeof(text), "%02x\n", std::get<0>(acc));	//LUCA
+    //snprintf(text, sizeof(text), "%02x %02x %02x %02x %02x\n", std::get<0>(acc), std::get<1>(acc), std::get<2>(acc), adc.first, adc.second);
     
-//    snprintf(text, sizeof(text), "0123456789abcdef0123 ");
 //    embot::core::Time t0 = embot::core::now();
         
     HAL_UART_Transmit(&huart3, reinterpret_cast<uint8_t*>(text), std::strlen(text), 0xFFFF);
@@ -468,8 +531,9 @@ bool s_print_values(const std::tuple<int16_t, int16_t, int16_t> &acc, const std:
 //    index = index;
     
    	text[pos++] = '\n'; 
-
+    embot::core::Time t0 = embot::core::now();
     HAL_UART_Transmit(&huart3, reinterpret_cast<uint8_t*>(text), pos, 0xFFFF);
+    embot::hw::sys::puts(embot::core::TimeFormatter(embot::core::now()-t0).to_string());
             
 #endif
  
