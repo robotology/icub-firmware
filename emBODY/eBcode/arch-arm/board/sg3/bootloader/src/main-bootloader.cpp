@@ -15,7 +15,7 @@ constexpr std::uint8_t defADDRESS = 12;
 constexpr embot::app::theCANboardInfo::bootloaderInfo btlInfo 
 { 
     embot::prot::can::Board::sg3, 
-    embot::prot::can::versionOfBOOTLOADER {1, 4}, 
+    embot::prot::can::versionOfBOOTLOADER {1, 5}, 
     defADDRESS,                                                  
     "I am a sg3" 
 };
