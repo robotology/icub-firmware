@@ -166,12 +166,14 @@ extern EOMtheEMStransceiver * eom_emstransceiver_Initialise(const eOemstransceiv
     
     s_eom_emstransceiver_update_diagnosticsinfo();
     
-   
+#if defined(DIAGNOSTIC2_enabled) & !defined(DIAGNOSTIC2_send_to_yarprobotinterface)
+    #warning DIAGNOSTIC2_enabled has disabled the EOtheInfoDispatcher
+#else
     eOinfodispatcher_cfg_t config = {0};
     config.capacity     = 24; // 16 or or eo_sizecntnr_dynamic ....
     config.transmitter  = eo_transceiver_GetTransmitter(eom_emstransceiver_GetTransceiver(eom_emstransceiver_GetHandle()));
     eo_infodispatcher_Initialise(&config);    
-    
+#endif    
     
 //    char str[eomn_info_status_extra_sizeof];
 //    uint8_t *ipaddr = (uint8_t*) &cfg->hostipv4addr;
@@ -207,7 +209,11 @@ extern void eom_emstransceiver_DeInitialise(EOMtheEMStransceiver* p)
         return;
     }
     
+#if defined(DIAGNOSTIC2_enabled) & !defined(DIAGNOSTIC2_send_to_yarprobotinterface)
+    #warning DIAGNOSTIC2_enabled has disabled the EOtheInfoDispatcher
+#else    
     eo_infodispatcher_DeInitialise(eo_infodispatcher_GetHandle());
+#endif
     
     eo_boardtransceiver_DeInitialise(eo_boardtransceiver_GetHandle());
     
@@ -290,10 +296,13 @@ extern eOresult_t eom_emstransceiver_Form(EOMtheEMStransceiver* p, EOpacket** tx
         return(eores_NOK_nullpointer);
     }
 
-    
+#if defined(DIAGNOSTIC2_enabled) & !defined(DIAGNOSTIC2_send_to_yarprobotinterface)
+    #warning DIAGNOSTIC2_enabled has disabled the EOtheInfoDispatcher
+#else    
     // call the info-dispatcher so that it may insert sig<info> rops in occasional ropframe.
     eo_infodispatcher_Send(eo_infodispatcher_GetHandle(), eoinfodispatcher_sendnumber_all, NULL, &remaining);
-       
+#endif
+    
     res = eo_transceiver_outpacket_Prepare(s_emstransceiver_singleton.transceiver, &numofrops, ropsnum);
     if(eores_OK != res)
     {

@@ -79,7 +79,7 @@
 
 #undef USE_ethmonitor_verifyTXropframe
 
-#undef TEST_ETHMON_OK_1SEC
+#define TEST_ETHMON_OK_1SEC
 
 
 // --------------------------------------------------------------------------------------------------------------------

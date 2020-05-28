@@ -36,6 +36,7 @@
 #include "embot_prot_eth_diagnostic.h"
 
 #include "embot_prot_eth_diagnostic_Node.h" 
+#include "embot_prot_eth_diagnostic_Host.h"
 
 class EOMtheEMSDiagnostic
 {
@@ -109,6 +110,9 @@ class EOMtheEMSDiagnostic
         static constexpr char s_eobj_ownname[]{"EOMtheEMSdiagnostic"};        
        
         embot::prot::eth::diagnostic::Node node_;
+#if defined(DIAGNOSTIC2_enabled) & defined(DIAGNOSTIC2_send_to_daemon)        
+        embot::prot::eth::diagnostic::Host host_;
+#endif        
 };
 
 #endif  // include-guard
