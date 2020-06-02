@@ -2200,7 +2200,7 @@ namespace embot { namespace hw { namespace bsp { namespace ads122c04 {
            
     #if defined(STM32HAL_BOARD_NUCLEOH7)
         
-    constexpr PROP prop01 { .i2cbus = embot::hw::I2C::one, .i2caddress = 0x3E }; 
+    constexpr PROP prop01 { .i2cbus = embot::hw::I2C::one, .i2caddress = (0x40<<1) }; 
 
     constexpr BSP thebsp {        
         // maskofsupported
