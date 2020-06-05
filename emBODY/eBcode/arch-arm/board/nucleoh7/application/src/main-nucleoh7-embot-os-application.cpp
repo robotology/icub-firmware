@@ -20,6 +20,9 @@
 #include "embot_app_theLEDmanager.h"
 #include "embot_tools.h"
 
+#include "embot_hw_bno055.h"
+#include "embot_hw_ads122c04.h"
+
 
 // macro definition. we keep some behaviours in the same code.
 
@@ -53,7 +56,7 @@
 static void s_chips_init();
 static void s_imu_start();
 static void s_imu_get();
-static void s_adc_start();
+static void s_adc_start(embot::hw::ads122c04::Channel chn);
 static void s_adc_get();
 static void s_transmit();
 
@@ -61,8 +64,9 @@ static void s_transmit();
 constexpr embot::os::Event evtAcquisition = embot::core::binary::mask::pos2mask<embot::os::Event>(0);
 constexpr embot::os::Event evtEXTRNtrigger = embot::core::binary::mask::pos2mask<embot::os::Event>(1);
 constexpr embot::os::Event evtIMUdataready = embot::core::binary::mask::pos2mask<embot::os::Event>(2);
-constexpr embot::os::Event evtADCdataready = embot::core::binary::mask::pos2mask<embot::os::Event>(3);
-constexpr embot::os::Event evtDATAtransmit = embot::core::binary::mask::pos2mask<embot::os::Event>(4);
+constexpr embot::os::Event evtADCchn1ready = embot::core::binary::mask::pos2mask<embot::os::Event>(3);
+constexpr embot::os::Event evtADCchn2ready = embot::core::binary::mask::pos2mask<embot::os::Event>(4);
+constexpr embot::os::Event evtDATAtransmit = embot::core::binary::mask::pos2mask<embot::os::Event>(5);
 
  
 #if defined(enableACQUISITION_fast) 
@@ -110,6 +114,11 @@ void eventbasedthread_startup(embot::os::Thread *t, void *param)
 //    tmrTX->start(cfgTX);
 }
 
+uint64_t timeadc_start[2] = {0, 0};
+uint64_t timeadc_ready[2] = {0, 0};
+uint64_t timeadc_delta[2] = {0, 0};
+
+uint64_t timeadc_duration_of_acquisition_start[2] = {0, 0};
 
 
 void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventmask, void *param)
@@ -135,15 +144,31 @@ void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventma
         embot::hw::sys::puts("evthread-onevent: evtAcquisition received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
 #endif        
         s_imu_get();
-        s_adc_start();        
+        timeadc_start[0] = embot::core::now();
+        s_adc_start(embot::hw::ads122c04::Channel::one); 
+        timeadc_duration_of_acquisition_start[0] = embot::core::now() - timeadc_start[0];         
     }
- 
-    if(true == embot::core::binary::mask::check(eventmask, evtADCdataready))
+
+    if(true == embot::core::binary::mask::check(eventmask, evtADCchn1ready))
     {
 #if defined(enableTRACE_all)        
         embot::core::TimeFormatter tf(embot::core::now());        
         embot::hw::sys::puts("evthread-onevent: evtAcquisition received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
-#endif        
+#endif      
+        timeadc_start[1] = timeadc_ready[0] = embot::core::now();        
+        s_adc_start(embot::hw::ads122c04::Channel::two);  
+        timeadc_duration_of_acquisition_start[1] = embot::core::now() - timeadc_start[1];
+    }
+    
+    if(true == embot::core::binary::mask::check(eventmask, evtADCchn2ready))
+    {
+#if defined(enableTRACE_all)        
+        embot::core::TimeFormatter tf(embot::core::now());        
+        embot::hw::sys::puts("evthread-onevent: evtAcquisition received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
+#endif 
+        timeadc_ready[1] = embot::core::now();     
+        timeadc_delta[0] = timeadc_ready[0] - timeadc_start[0];     
+        timeadc_delta[1] = timeadc_ready[1] - timeadc_start[1];        
         s_adc_get();        
     }    
     
@@ -220,8 +245,6 @@ int main(void)
 
 
 
-#include "embot_hw_bno055.h"
-#include "embot_hw_ads122c04.h"
 
 #include <cstring>
 
@@ -333,20 +356,20 @@ static void s_imu_get()
 }
 
 
-void alertadcdataisready(void *p)
+void alertadc01isready(void *p)
 {
-    thr->setEvent(evtADCdataready);
+    thr->setEvent(evtADCchn1ready);
 }
 
-static void s_adc_start()
+void alertadc02isready(void *p)
 {
-    // nothing so far.
-    // just send the event
-    
-//    alertadcdataisready(nullptr);    
-    
-    embot::core::Callback cbk(alertadcdataisready, nullptr);
-    embot::hw::ads122c04::acquisition(embot::hw::ADS122C04::one, cbk);   
+    thr->setEvent(evtADCchn2ready);
+}
+
+static void s_adc_start(embot::hw::ads122c04::Channel chn)
+{  
+    embot::core::Callback cbk((embot::hw::ads122c04::Channel::one == chn) ? alertadc01isready : alertadc02isready, nullptr);
+    embot::hw::ads122c04::acquisition(embot::hw::ADS122C04::one, chn, cbk);   
 }
 
 static void s_adc_get()
