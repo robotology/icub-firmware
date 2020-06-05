@@ -39,6 +39,8 @@ namespace embot { namespace hw { namespace ads122c04 {
         void clear() { v1 = v2 = 0; }
     };
     
+    enum class Channel : uint8_t { one = 0, two = 1 };
+    
             
     bool supported(embot::hw::ADS122C04 s);
     
@@ -59,7 +61,7 @@ namespace embot { namespace hw { namespace ads122c04 {
     
     // we start acquisition of temperature.
     // if returns resOK, we know that acquisition is over if it is called oncompletion() or when operationdone() is true;
-    result_t acquisition(embot::hw::ADS122C04 s, const embot::core::Callback &oncompletion = embot::core::Callback(nullptr, nullptr));
+    result_t acquisition(embot::hw::ADS122C04 s, Channel channel, const embot::core::Callback &oncompletion = embot::core::Callback(nullptr, nullptr));
 
     // it tells if a previous operation of acquisition is over
     bool operationdone(embot::hw::ADS122C04 s);
