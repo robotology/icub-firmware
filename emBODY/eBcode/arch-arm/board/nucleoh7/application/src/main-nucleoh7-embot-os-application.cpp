@@ -62,11 +62,11 @@ static void s_transmit();
 
 
 constexpr embot::os::Event evtAcquisition = embot::core::binary::mask::pos2mask<embot::os::Event>(0);
-constexpr embot::os::Event evtEXTRNtrigger = embot::core::binary::mask::pos2mask<embot::os::Event>(1);
-constexpr embot::os::Event evtIMUdataready = embot::core::binary::mask::pos2mask<embot::os::Event>(2);
-constexpr embot::os::Event evtADCchn1ready = embot::core::binary::mask::pos2mask<embot::os::Event>(3);
-constexpr embot::os::Event evtADCchn2ready = embot::core::binary::mask::pos2mask<embot::os::Event>(4);
-constexpr embot::os::Event evtDATAtransmit = embot::core::binary::mask::pos2mask<embot::os::Event>(5);
+constexpr embot::os::Event evtIMUdataready = embot::core::binary::mask::pos2mask<embot::os::Event>(1);
+constexpr embot::os::Event evtADCchn1ready = embot::core::binary::mask::pos2mask<embot::os::Event>(2);
+constexpr embot::os::Event evtADCchn2ready = embot::core::binary::mask::pos2mask<embot::os::Event>(3);
+
+constexpr embot::os::Event evtDATAtransmit = embot::core::binary::mask::pos2mask<embot::os::Event>(4);
 
  
 #if defined(enableACQUISITION_fast) 
@@ -141,7 +141,7 @@ void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventma
     {
 #if defined(enableTRACE_all)        
         embot::core::TimeFormatter tf(embot::core::now());        
-        embot::hw::sys::puts("evthread-onevent: evtAcquisition received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
+        embot::hw::sys::puts("evthread-onevent: evtIMUdataready received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
 #endif        
         s_imu_get();
         timeadc_start[0] = embot::core::now();
@@ -153,7 +153,7 @@ void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventma
     {
 #if defined(enableTRACE_all)        
         embot::core::TimeFormatter tf(embot::core::now());        
-        embot::hw::sys::puts("evthread-onevent: evtAcquisition received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
+        embot::hw::sys::puts("evthread-onevent: evtADCchn1ready received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
 #endif      
         timeadc_start[1] = timeadc_ready[0] = embot::core::now();        
         s_adc_start(embot::hw::ads122c04::Channel::two);  
@@ -164,7 +164,7 @@ void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventma
     {
 #if defined(enableTRACE_all)        
         embot::core::TimeFormatter tf(embot::core::now());        
-        embot::hw::sys::puts("evthread-onevent: evtAcquisition received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
+        embot::hw::sys::puts("evthread-onevent: evtADCchn2ready received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
 #endif 
         timeadc_ready[1] = embot::core::now();     
         timeadc_delta[0] = timeadc_ready[0] - timeadc_start[0];     
@@ -250,12 +250,14 @@ int main(void)
 
 static void s_chips_init()
 {
-    
+
+#if defined(enableTRACE_all)     
     histoIMU = new embot::tools::Histogram;
     histoIMU->init({0, 2500, 100});
     
 //    histoUSART = new embot::tools::Histogram;
 //    histoUSART->init({0, 500, 50});
+#endif
     
 #if !defined(enableACQUISITION)
     
@@ -310,7 +312,8 @@ static void s_imu_get()
     imu_stop = embot::core::now();
     imu_acquisitiontime = imu_stop - imu_start;
     acc2transmit = {data.acc.x, data.acc.y, data.acc.z}; 
-    
+
+#if defined(enableTRACE_all)    
     histoIMU->add(imu_acquisitiontime);
     static uint32_t cnt = 0;
     cnt++;
@@ -352,7 +355,8 @@ static void s_imu_get()
         embot::hw::sys::puts(std::string("histo IMU -> ") + str);
                                     
         histoIMU->reset();
-    }        
+    }  
+#endif        
 }
 
 
@@ -386,6 +390,118 @@ static void s_transmit()
     s_print_values(acc2transmit, adc2transmit);
 }
 
+
+
+bool s_print_values(const std::tuple<int16_t, int16_t, int16_t> &acc, const std::pair<uint32_t, uint32_t> &adc)
+{   
+    char text[64] = {0};
+    
+#if defined(enableSERIAL) && defined(enableSERIAL_string)
+
+#if 0
+    // test for validation of acc
+    if(0 != imu_acquisitiontime)
+    {
+        float ax = 0.01f * std::get<0>(acc);
+        float ay = 0.01f * std::get<1>(acc);
+        float az = 0.01f * std::get<2>(acc);
+        embot::hw::sys::puts(std::string("acceleration [m/s^2] = (") + 
+                std::to_string(ax) + " " +
+                std::to_string(ay) + " " +
+                std::to_string(az) + 
+                ") read in " + embot::core::TimeFormatter(imu_acquisitiontime).to_string()
+        );
+    }
+
+#else    
+    // this prints in hex the entire range of values
+    snprintf(text, sizeof(text), "%04x %04x %04x %04x %04x\n", std::get<0>(acc), std::get<1>(acc), std::get<2>(acc), adc.first, adc.second);        
+    HAL_UART_Transmit(&huart3, reinterpret_cast<uint8_t*>(text), std::strlen(text), 0xFFFF);    
+#endif
+    
+#elif defined(enableSERIAL) && defined(enableSERIAL_binary)   
+    
+    //snprintf(text, sizeof(text), "%d\n", static_cast<uint8_t>(std::get<0>(acc)));   
+    // writing into text[] in big endian order all values with the same integer 32 bit type.
+    // i use int32_t. 
+    // the acceleration values, which are in int16_t, are first transformed into int32_t
+    // to keep their sign and then copied in big endian order.
+    // the adc values, which have only 24 signisficant bits are just copied in big endian order as they are.
+
+    volatile int32_t tmp = 0;
+    volatile uint8_t pos = 0;
+    // acc.x
+    tmp = std::get<0>(acc);
+    text[pos++] =  (tmp & 0xff000000) >> 24;
+    text[pos++] =  (tmp & 0x00ff0000) >> 16;
+    text[pos++] =  (tmp & 0x0000ff00) >> 8;
+    text[pos++] =  (tmp & 0x000000ff);
+    // acc.y
+    tmp = std::get<1>(acc);
+    text[pos++] =  (tmp & 0xff000000) >> 24;
+    text[pos++] =  (tmp & 0x00ff0000) >> 16;
+    text[pos++] =  (tmp & 0x0000ff00) >> 8;
+    text[pos++] =  (tmp & 0x000000ff);
+    // acc.z
+    tmp = std::get<2>(acc);
+    text[pos++] =  (tmp & 0xff000000) >> 24;
+    text[pos++] =  (tmp & 0x00ff0000) >> 16;
+    text[pos++] =  (tmp & 0x0000ff00) >> 8;
+    text[pos++] =  (tmp & 0x000000ff);
+    // adc.first
+    tmp = adc.first;
+    text[pos++] =  (tmp & 0xff000000) >> 24;
+    text[pos++] =  (tmp & 0x00ff0000) >> 16;
+    text[pos++] =  (tmp & 0x0000ff00) >> 8;
+    text[pos++] =  (tmp & 0x000000ff);
+    // adc.second
+    tmp = adc.second;
+    text[pos++] =  (tmp & 0xff000000) >> 24;
+    text[pos++] =  (tmp & 0x00ff0000) >> 16;
+    text[pos++] =  (tmp & 0x0000ff00) >> 8;
+    text[pos++] =  (tmp & 0x000000ff); 
+    
+    // at the end we add a new line.
+    // the new line in binary value is 0x0A ... do we really need to transmit it? 
+    // if the receiver expects just a fixed number of bytes then the terminator character '\n' is useless
+    // else if it looks for the terminator '\n' to stop the rx, ... there is the possibility that it stops if data contains the byte 0x0A.
+
+// following code detects the presence of a '\n' inside data.
+//    volatile bool found = false;
+//    volatile int index = -1;
+//    for(volatile int i=0; i<20; i++)
+//    {
+//        if(text[i] == '\n')
+//        {
+//            found = true;
+//            index = i;
+//        }
+//    }
+//    found = found;
+//    index = index;
+    
+   	text[pos++] = '\n'; 
+    embot::core::Time t0 = embot::core::now();
+    HAL_UART_Transmit(&huart3, reinterpret_cast<uint8_t*>(text), pos, 0xFFFF);
+    
+#if defined(enableTRACE_all)     
+    embot::hw::sys::puts(std::string("USART TX time: ") + embot::core::TimeFormatter(embot::core::now()-t0).to_string());
+#endif
+
+#endif
+ 
+
+#if defined(enableTRACE_all)  
+    std::tuple<float, float, float> a {0.01 * std::get<0>(acc), 0.01 * std::get<1>(acc), 0.01 * std::get<2>(acc)};
+    embot::hw::sys::puts("BNO055: acc = (" + std::to_string(std::get<0>(a)) + ", " + std::to_string(std::get<1>(a)) + ", " + std::to_string(std::get<2>(a)) + ") m/(s*s)" );  
+    embot::hw::sys::puts("ADC: (" + std::to_string(adc.first) + ", " + std::to_string(adc.second) + ")" );      
+#endif    
+    
+    return true;
+}
+
+
+// - oldies
 
 //bool s_get_values(std::tuple<int16_t, int16_t, int16_t> &acc, std::pair<uint32_t, uint32_t> &adc)
 //{
@@ -455,119 +571,6 @@ static void s_transmit()
 //}
 
 
-bool s_print_values(const std::tuple<int16_t, int16_t, int16_t> &acc, const std::pair<uint32_t, uint32_t> &adc)
-{   
-    char text[64] = {0};
-    
-#if defined(enableSERIAL) && defined(enableSERIAL_string)
-
-#if 0
-
-    if(0 != imu_acquisitiontime)
-    {
-        float ax = 0.01f * std::get<0>(acc);
-        float ay = 0.01f * std::get<1>(acc);
-        float az = 0.01f * std::get<2>(acc);
-        embot::hw::sys::puts(std::string("acceleration [m/s^2] = (") + 
-                std::to_string(ax) + " " +
-                std::to_string(ay) + " " +
-                std::to_string(az) + 
-                ") read in " + embot::core::TimeFormatter(imu_acquisitiontime).to_string()
-        );
-    }
-
-#else    
-    // this prints in hex the entire range of values
-    snprintf(text, sizeof(text), "%04x %04x %04x %04x %04x\n", std::get<0>(acc), std::get<1>(acc), std::get<2>(acc), adc.first, adc.second);
-
-    // JUST FOR TEST: this instead prints in hex but only 1 byte (the least significant byte)
-    //snprintf(text, sizeof(text), "%02x %02x %02x %02x %02x\n", std::get<0>(acc), std::get<1>(acc), std::get<2>(acc), adc.first, adc.second);
-    
-//    embot::core::Time t0 = embot::core::now();
-        
-    HAL_UART_Transmit(&huart3, reinterpret_cast<uint8_t*>(text), std::strlen(text), 0xFFFF);
-    
-//    embot::core::Time t1 = embot::core::now();
-//    embot::hw::sys::puts("tx " + std::to_string( std::strlen(text)) + " in: " + embot::core::TimeFormatter(t1-t0).to_string());
-
-#endif
-    
-#elif defined(enableSERIAL) && defined(enableSERIAL_binary)   
-    
-    //snprintf(text, sizeof(text), "%d\n", static_cast<uint8_t>(std::get<0>(acc)));   
-    // writing into text[] in big endian order all values with the same integer 32 bit type.
-    // i use int32_t. 
-    // the acceleration values, which are in int16_t, are first transformed into int32_t
-    // to keep their sign and then copied in big endian order.
-    // the adc values, which have only 24 signisficant bits are just copied in big endian order as they are.
-
-    volatile int32_t tmp = 0;
-    volatile uint8_t pos = 0;
-    // acc.x
-    tmp = std::get<0>(acc);
-    text[pos++] =  (tmp & 0xff000000) >> 24;
-    text[pos++] =  (tmp & 0x00ff0000) >> 16;
-    text[pos++] =  (tmp & 0x0000ff00) >> 8;
-    text[pos++] =  (tmp & 0x000000ff);
-    // acc.y
-    tmp = std::get<1>(acc);
-    text[pos++] =  (tmp & 0xff000000) >> 24;
-    text[pos++] =  (tmp & 0x00ff0000) >> 16;
-    text[pos++] =  (tmp & 0x0000ff00) >> 8;
-    text[pos++] =  (tmp & 0x000000ff);
-    // acc.z
-    tmp = std::get<2>(acc);
-    text[pos++] =  (tmp & 0xff000000) >> 24;
-    text[pos++] =  (tmp & 0x00ff0000) >> 16;
-    text[pos++] =  (tmp & 0x0000ff00) >> 8;
-    text[pos++] =  (tmp & 0x000000ff);
-    // adc.first
-    tmp = adc.first;
-    text[pos++] =  (tmp & 0xff000000) >> 24;
-    text[pos++] =  (tmp & 0x00ff0000) >> 16;
-    text[pos++] =  (tmp & 0x0000ff00) >> 8;
-    text[pos++] =  (tmp & 0x000000ff);
-    // adc.second
-    tmp = adc.second;
-    text[pos++] =  (tmp & 0xff000000) >> 24;
-    text[pos++] =  (tmp & 0x00ff0000) >> 16;
-    text[pos++] =  (tmp & 0x0000ff00) >> 8;
-    text[pos++] =  (tmp & 0x000000ff); 
-    
-    // at the end we add a new line.
-    // the new line in binary value is 0x0A ... do we really need to transmit it? 
-    // if the receiver expects just a fixed number of bytes then the terminator character '\n' is useless
-    // else if it looks for the terminator '\n' to stop the rx, ... there is the possibility that it stops if data contains the byte 0x0A.
-
-// following code detects the presence of a '\n' inside data.
-//    volatile bool found = false;
-//    volatile int index = -1;
-//    for(volatile int i=0; i<20; i++)
-//    {
-//        if(text[i] == '\n')
-//        {
-//            found = true;
-//            index = i;
-//        }
-//    }
-//    found = found;
-//    index = index;
-    
-   	text[pos++] = '\n'; 
-    embot::core::Time t0 = embot::core::now();
-    HAL_UART_Transmit(&huart3, reinterpret_cast<uint8_t*>(text), pos, 0xFFFF);
-    embot::hw::sys::puts(embot::core::TimeFormatter(embot::core::now()-t0).to_string());
-            
-#endif
- 
-
-#if defined(enableTRACE_all)  
-    std::tuple<float, float, float> a {0.01 * std::get<0>(acc), 0.01 * std::get<1>(acc), 0.01 * std::get<2>(acc)};
-    embot::hw::sys::puts("BNO055: acc = (" + std::to_string(std::get<0>(a)) + ", " + std::to_string(std::get<1>(a)) + ", " + std::to_string(std::get<2>(a)) + ") m/(s*s)" );  
-#endif    
-    
-    return true;
-}
 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
