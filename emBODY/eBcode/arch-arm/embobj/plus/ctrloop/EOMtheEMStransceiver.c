@@ -322,7 +322,7 @@ extern eOresult_t eom_emstransceiver_Form(EOMtheEMStransceiver* p, EOpacket** tx
         res = eo_transceiver_outpacket_Get(s_emstransceiver_singleton.transceiver, txpkt);
     }
     
-    // if we have some more dignaostics to transmit, we do a new tx request.
+    // if we have some more diagnostic to transmit, we do a new tx request.
     if(remaining > 0)
     {
         eom_emsappl_SendTXRequest(eom_emsappl_GetHandle());
