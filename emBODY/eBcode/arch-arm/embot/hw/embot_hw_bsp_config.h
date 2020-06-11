@@ -92,15 +92,9 @@
     #define EMBOT_ENABLE_hw_gpio
     #define EMBOT_ENABLE_hw_led
     #define EMBOT_ENABLE_hw_button
-    //#define EMBOT_ENABLE_hw_can
-    //#define EMBOT_ENABLE_hw_flash
-    //#define EMBOT_ENABLE_hw_pga308
-    //#define EMBOT_ENABLE_hw_adc
-    //#define EMBOT_ENABLE_hw_onewire
-    //#define EMBOT_ENABLE_hw_timer
-    //#define EMBOT_ENABLE_hw_si7051
     #define EMBOT_ENABLE_hw_i2c
     #define EMBOT_ENABLE_hw_bno055
+    #define EMBOT_ENABLE_hw_ads122c04
 #else
     #error pls sdefine which peripherals/chips are attached to your board
 #endif

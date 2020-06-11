@@ -23,6 +23,7 @@
 #define _EMBOT_HW_H_
 
 #include "embot_core.h"
+#include "embot_core_binary.h"
 #include "stm32hal.h"
 
 
@@ -82,6 +83,8 @@ namespace embot { namespace hw {
     
     enum class TLV493D : std::uint8_t { one = 0, two = 1, none = 31, maxnumberof = 2 };
     
+    enum class ADS122C04 : std::uint8_t { one, none = 31, maxnumberof = 1 };
+    
     
     struct GPIO
     { 
@@ -109,6 +112,124 @@ namespace embot { namespace hw {
 }} // namespace embot { namespace hw {
 
 
+
+namespace embot { namespace hw {
+    
+    
+    using reg08type = uint8_t;
+    using reg16type = uint8_t;
+    using reg32type = uint32_t;
+    
+    
+    // rTyp is one of regXXtype above, nFld is the number of fields 
+    // for 8-bit register w/ 3 fields use:
+    // REG<reg08type, 3>
+    template<typename rTyp, uint8_t nFld>
+    struct REG
+    {        
+        // a way to describe a field inside the register
+        struct Field
+        {   
+            uint8_t pos {0};    // the first position 
+            rTyp msk {0};          // their 1-mask starting from pos
+            constexpr Field(uint8_t firstpos, uint8_t numofbits) : pos(firstpos), msk(embot::core::binary::mask::ones<rTyp>(numofbits)) {}
+            constexpr Field(uint8_t firstpos, uint8_t dummy, rTyp mask) : pos(firstpos), msk(mask) {}
+            Field() = default;
+        };
+         
+        struct Fields
+        {
+            std::array<Field, nFld> ff;
+            static constexpr Field fnone {0, 0, 0};           
+            constexpr Fields(const std::initializer_list<uint8_t> &sizes)
+            {
+                if(nFld >= sizes.size())
+                {                    
+                    uint8_t p = 0;
+                    uint8_t i = 0;
+                    for(const auto & s : sizes)
+                    {
+                        ff[i] = {p, s};
+                        p += s;
+                        i++;                    
+                    }
+                }                
+            }
+            
+            const Field & get(uint8_t pos) const
+            {
+                return (pos < nFld) ? ff[pos] : fnone;
+            }
+        };
+               
+        bool set(const Field &f, const rTyp &value)
+        {   // it sets one value into memory
+            if(nullptr == memory)
+            {
+                return false;
+            }
+            embot::core::binary::mask::clear(*memory, f.msk, f.pos);
+            (*memory) |= embot::core::binary::mask::place(value, f.msk, f.pos);
+            return true;
+        } 
+        rTyp get(const Field &f) const
+        {   // it gets one value from memory
+            if(nullptr == memory)
+            {
+                return 42;
+            }
+            return embot::core::binary::mask::extract(*memory, f.msk, f.pos);
+        }
+        
+        bool setfield(const uint8_t field, const rTyp &value)
+        {
+            if(field >= nFld)
+            {
+                return false;
+            }
+            return REG::set(pfields->get(field), value);
+        }
+        
+        rTyp getfield(const uint8_t field) 
+        { 
+            return REG::get(pfields->get(field)); 
+        } 
+        
+        // the memory of the register
+        rTyp* memory {nullptr};
+        // the description of its internal
+        const Fields *pfields {nullptr};
+        
+        REG(rTyp *m = nullptr, const Fields *f = nullptr) : memory(m), pfields(f) {};
+    };  
+
+    #if 0
+    //  usage:
+    //  8-bit register w/ 3 fields
+    struct REGexample : public REG<reg08type, 3>
+    {   // [ field3:4 | field2:3 | field:1 ]
+        // put in here the mane of the fields starting from right and using 0, 1, 2, ...
+        enum class FIELD : uint8_t { field1 = 0, fields2 = 1, field2 = 2 }; 
+        // it keeps the number of bits of each of the above fields
+        static constexpr REG::Fields fields {1, 3, 4};  
+        // the constructor accepts external memory
+        REGexample(reg08type *mem = nullptr) : REG<reg08type, 3>(mem, &fields) {}
+        // the address of teh register    
+        static constexpr uint8_t address {0};
+        // a method for assigning external memory         
+        void load(reg08type *mem) { memory = mem; } 
+        // by this method we assign a value to a field         
+        bool set(const FIELD tag, const uint8_t value) { return setfield(embot::core::tointegral(tag), value); }
+        // by this method we get a value from a field
+        reg08type get(const FIELD tag) { return getfield(embot::core::tointegral(tag)); }
+    };
+    #endif
+    
+    
+    
+    
+
+}} // namespace embot { namespace hw {
 
 
 
