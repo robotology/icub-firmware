@@ -102,8 +102,16 @@ extern "C" {
     #endif
     #define STM32HAL_DRIVER_VERSION 0x180
 
+#elif   defined(STM32HAL_BOARD_STM32G4EVAL)
+
+    // only one possible driver
+    #if !defined(STM32HAL_DRIVER_V111)
+        #define STM32HAL_DRIVER_V1111
+    #endif
+    #define STM32HAL_DRIVER_VERSION 0x111
+    
 #else
-    #error STM32HAL: the STM32HAL_BOARD_${BRD} is undefined
+    #error STM32HAL: the STM32HAL_BOARD_${B} is undefined
 #endif
 
 
@@ -117,6 +125,8 @@ extern "C" {
     #endif
 #elif defined(STM32HAL_STM32H7)
     // nothing so far for can on h7
+#elif defined(STM32HAL_STM32G4)
+    // nothing so far for can on g4
 #endif
 
 
@@ -134,7 +144,7 @@ extern "C" {
     #elif   defined(STM32HAL_DRIVER_V1B0)        
         #include "../src/driver/stm32l4-v1B0/inc/stm32l4xx_hal.h"
     #else
-        #error STM32HAL: the STM32HAL_DRIVER_${VER} is not managed
+        #error STM32HAL: the STM32HAL_DRIVER_${V} is not managed
     #endif
 
 #elif defined(STM32HAL_STM32H7)
@@ -142,11 +152,19 @@ extern "C" {
     #if     defined(STM32HAL_DRIVER_V180)    
         #include "../src/driver/stm32h7-v180/inc/stm32h7xx_hal.h"       
     #else
-        #error STM32HAL: the STM32HAL_DRIVER_${VER} is not managed
+        #error STM32HAL: the STM32HAL_DRIVER_${V} is not managed
     #endif
 
+#elif defined(STM32HAL_STM32G4)
+
+    #if     defined(STM32HAL_DRIVER_V111)    
+        #include "../src/driver/stm32g4-v111/inc/stm32g4xx_hal.h"       
+    #else
+        #error STM32HAL: the STM32HAL_DRIVER_${V} is not managed
+    #endif
+    
 #else
-    #error STM32HAL: the STM32HAL_DRIVER_${VER} is not managed
+    #error STM32HAL: the STM32HAL_${SF} is not managed
 #endif   
 
 #ifdef __cplusplus

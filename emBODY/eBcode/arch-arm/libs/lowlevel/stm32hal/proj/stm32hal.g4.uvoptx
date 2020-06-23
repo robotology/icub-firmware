@@ -22,7 +22,7 @@
   </DaveTm>
 
   <Target>
-    <TargetName>pmc-vxxx</TargetName>
+    <TargetName>stm32g4eval-v111</TargetName>
     <ToolsetNumber>0x4</ToolsetNumber>
     <ToolsetName>ARM-ADS</ToolsetName>
     <TargetOption>
@@ -120,7 +120,7 @@
         <SetRegEntry>
           <Number>0</Number>
           <Key>UL2CM3</Key>
-          <Name>UL2CM3(-S0 -C0 -P0 )  -FN1 -FC8000 -FD20000000 -FF0STM32H7x_2048 -FL0200000 -FS08000000 -FP0($$Device:STM32H743ZITx$CMSIS\Flash\STM32H7x_2048.FLM)</Name>
+          <Name>UL2CM3(-S0 -C0 -P0 )  -FN1 -FC1000 -FD20000000 -FF0STM32G4xx_512_Dual -FL080000 -FS08000000 -FP0($$Device:STM32G474QETx$CMSIS\Flash\STM32G4xx_512_Dual.FLM)</Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
       <Breakpoint/>
@@ -197,7 +197,7 @@
   </Group>
 
   <Group>
-    <GroupName>board-pmc</GroupName>
+    <GroupName>board-stm32g4eval</GroupName>
     <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
@@ -209,8 +209,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\board\nucleoh7\v180\src\usb_otg.c</PathWithFileName>
-      <FilenameWithoutPath>usb_otg.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\board\stm32g4eval\v111\src\board_stm32g4eval_v111.c</PathWithFileName>
+      <FilenameWithoutPath>board_stm32g4eval_v111.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -221,8 +221,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\board\nucleoh7\v180\src\usart.c</PathWithFileName>
-      <FilenameWithoutPath>usart.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\board\stm32g4eval\v111\src\adc.c</PathWithFileName>
+      <FilenameWithoutPath>adc.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -233,8 +233,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\board\nucleoh7\v180\src\stm32h7xx_hal_msp.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_msp.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\board\stm32g4eval\v111\src\comp.c</PathWithFileName>
+      <FilenameWithoutPath>comp.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -245,8 +245,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\board\nucleoh7\v180\src\i2c.c</PathWithFileName>
-      <FilenameWithoutPath>i2c.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\board\stm32g4eval\v111\src\dac.c</PathWithFileName>
+      <FilenameWithoutPath>dac.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -257,8 +257,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\board\nucleoh7\v180\src\gpio.c</PathWithFileName>
-      <FilenameWithoutPath>gpio.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\board\stm32g4eval\v111\src\fdcan.c</PathWithFileName>
+      <FilenameWithoutPath>fdcan.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -269,8 +269,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\board\nucleoh7\v180\src\fdcan.c</PathWithFileName>
-      <FilenameWithoutPath>fdcan.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\board\stm32g4eval\v111\src\fmac.c</PathWithFileName>
+      <FilenameWithoutPath>fmac.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -281,8 +281,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\board\nucleoh7\v180\src\eth.c</PathWithFileName>
-      <FilenameWithoutPath>eth.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\board\stm32g4eval\v111\src\fmc.c</PathWithFileName>
+      <FilenameWithoutPath>fmc.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -293,8 +293,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\board\nucleoh7\v180\src\dma.c</PathWithFileName>
-      <FilenameWithoutPath>dma.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\board\stm32g4eval\v111\src\gpio.c</PathWithFileName>
+      <FilenameWithoutPath>gpio.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -305,103 +305,103 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\board\nucleoh7\v180\src\board_nucleoh7_v180.c</PathWithFileName>
-      <FilenameWithoutPath>board_nucleoh7_v180.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\board\stm32g4eval\v111\src\hrtim.c</PathWithFileName>
+      <FilenameWithoutPath>hrtim.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>2</GroupNumber>
+      <FileNumber>11</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\src\board\stm32g4eval\v111\src\i2c.c</PathWithFileName>
+      <FilenameWithoutPath>i2c.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>2</GroupNumber>
+      <FileNumber>12</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\src\board\stm32g4eval\v111\src\rng.c</PathWithFileName>
+      <FilenameWithoutPath>rng.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>2</GroupNumber>
+      <FileNumber>13</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\src\board\stm32g4eval\v111\src\spi.c</PathWithFileName>
+      <FilenameWithoutPath>spi.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>2</GroupNumber>
+      <FileNumber>14</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\src\board\stm32g4eval\v111\src\stm32g4xx_hal_msp.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_msp.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>2</GroupNumber>
+      <FileNumber>15</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\src\board\stm32g4eval\v111\src\tim.c</PathWithFileName>
+      <FilenameWithoutPath>tim.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>2</GroupNumber>
+      <FileNumber>16</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\src\board\stm32g4eval\v111\src\usart.c</PathWithFileName>
+      <FilenameWithoutPath>usart.c</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>2</GroupNumber>
+      <FileNumber>17</FileNumber>
+      <FileType>1</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\src\board\stm32g4eval\v111\src\usb.c</PathWithFileName>
+      <FilenameWithoutPath>usb.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
   </Group>
 
   <Group>
-    <GroupName>driver-stm32g4-vxxx</GroupName>
+    <GroupName>driver-stm32g4-v111</GroupName>
     <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
-    <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>11</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>12</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_adc.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_adc.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>13</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_adc_ex.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_adc_ex.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>14</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_cec.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_cec.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>15</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_comp.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_comp.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>16</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_cortex.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_cortex.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>17</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_crc.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_crc.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
     <File>
       <GroupNumber>3</GroupNumber>
       <FileNumber>18</FileNumber>
@@ -409,8 +409,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_crc_ex.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_crc_ex.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -421,8 +421,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_cryp.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_cryp.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_adc.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_adc.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -433,8 +433,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_cryp_ex.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_cryp_ex.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_adc_ex.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_adc_ex.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -445,8 +445,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_dac.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_dac.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_comp.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_comp.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -457,8 +457,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_dac_ex.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_dac_ex.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_cordic.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_cordic.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -469,8 +469,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_dcmi.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_dcmi.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_cortex.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_cortex.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -481,8 +481,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_dfsdm.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_dfsdm.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_crc.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_crc.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -493,8 +493,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_dfsdm_ex.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_dfsdm_ex.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_crc_ex.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_crc_ex.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -505,8 +505,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_dma.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_dma.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_cryp.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_cryp.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -517,8 +517,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_dma_ex.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_dma_ex.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_cryp_ex.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_cryp_ex.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -529,8 +529,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_dma2d.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_dma2d.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_dac.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_dac.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -541,8 +541,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_dsi.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_dsi.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_dac_ex.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_dac_ex.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -553,8 +553,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_dts.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_dts.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_dma.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_dma.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -565,8 +565,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_eth.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_eth.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_dma_ex.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_dma_ex.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -577,8 +577,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_eth_ex.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_eth_ex.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_exti.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_exti.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -589,8 +589,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_exti.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_exti.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_fdcan.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_fdcan.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -601,8 +601,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_fdcan.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_fdcan.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_flash.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_flash.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -613,8 +613,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_flash.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_flash.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_flash_ex.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_flash_ex.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -625,8 +625,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_flash_ex.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_flash_ex.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_flash_ramfunc.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_flash_ramfunc.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -637,8 +637,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_gfxmmu.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_gfxmmu.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_fmac.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_fmac.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -649,8 +649,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_gpio.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_gpio.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_gpio.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_gpio.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -661,8 +661,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_hash.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_hash.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_hrtim.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_hrtim.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -673,8 +673,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_hash_ex.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_hash_ex.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_i2c.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_i2c.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -685,8 +685,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_hcd.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_hcd.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_i2c_ex.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_i2c_ex.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -697,8 +697,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_hrtim.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_hrtim.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_i2s.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_i2s.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -709,8 +709,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_hsem.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_hsem.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_irda.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_irda.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -721,8 +721,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_i2c.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_i2c.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_iwdg.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_iwdg.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -733,8 +733,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_i2c_ex.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_i2c_ex.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_lptim.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_lptim.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -745,8 +745,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_i2s.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_i2s.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_nand.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_nand.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -757,8 +757,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_i2s_ex.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_i2s_ex.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_nor.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_nor.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -769,8 +769,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_irda.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_irda.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_opamp.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_opamp.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -781,8 +781,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_iwdg.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_iwdg.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_opamp_ex.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_opamp_ex.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -793,8 +793,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_jpeg.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_jpeg.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_pcd.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_pcd.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -805,8 +805,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_lptim.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_lptim.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_pcd_ex.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_pcd_ex.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -817,8 +817,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_ltdc.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_ltdc.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_pwr.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_pwr.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -829,8 +829,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_ltdc_ex.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_ltdc_ex.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_pwr_ex.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_pwr_ex.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -841,8 +841,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_mdios.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_mdios.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_qspi.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_qspi.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -853,8 +853,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_mdma.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_mdma.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_rcc.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_rcc.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -865,8 +865,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_mmc.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_mmc.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_rcc_ex.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_rcc_ex.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -877,8 +877,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_mmc_ex.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_mmc_ex.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_rng.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_rng.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -889,8 +889,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_nand.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_nand.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_rtc.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_rtc.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -901,8 +901,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_nor.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_nor.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_rtc_ex.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_rtc_ex.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -913,8 +913,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_opamp.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_opamp.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_sai.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_sai.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -925,8 +925,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_opamp_ex.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_opamp_ex.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_sai_ex.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_sai_ex.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -937,8 +937,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_ospi.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_ospi.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_smartcard.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_smartcard.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -949,8 +949,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_otfdec.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_otfdec.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_smartcard_ex.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_smartcard_ex.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -961,8 +961,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_pcd.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_pcd.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_smbus.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_smbus.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -973,8 +973,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_pcd_ex.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_pcd_ex.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_spi.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_spi.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -985,8 +985,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_pssi.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_pssi.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_spi_ex.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_spi_ex.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -997,8 +997,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_pwr.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_pwr.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_sram.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_sram.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1009,8 +1009,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_pwr_ex.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_pwr_ex.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_tim.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_tim.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1021,8 +1021,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_qspi.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_qspi.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_tim_ex.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_tim_ex.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1033,8 +1033,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_ramecc.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_ramecc.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_uart.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_uart.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1045,8 +1045,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_rcc.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_rcc.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_uart_ex.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_uart_ex.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1057,8 +1057,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_rcc_ex.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_rcc_ex.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_usart.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_usart.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1069,8 +1069,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_rng.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_rng.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_usart_ex.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_usart_ex.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1081,8 +1081,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_rng_ex.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_rng_ex.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_hal_wwdg.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_hal_wwdg.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1093,8 +1093,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_rtc.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_rtc.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_ll_adc.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_ll_adc.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1105,8 +1105,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_rtc_ex.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_rtc_ex.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_ll_comp.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_ll_comp.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1117,8 +1117,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_sai.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_sai.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_ll_cordic.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_ll_cordic.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1129,8 +1129,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_sai_ex.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_sai_ex.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_ll_crc.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_ll_crc.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1141,8 +1141,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_sd.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_sd.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_ll_crs.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_ll_crs.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1153,8 +1153,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_sd_ex.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_sd_ex.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_ll_dac.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_ll_dac.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1165,8 +1165,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_sdram.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_sdram.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_ll_dma.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_ll_dma.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1177,8 +1177,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_smartcard.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_smartcard.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_ll_exti.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_ll_exti.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1189,8 +1189,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_smartcard_ex.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_smartcard_ex.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_ll_fmac.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_ll_fmac.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1201,8 +1201,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_smbus.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_smbus.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_ll_fmc.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_ll_fmc.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1213,8 +1213,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_spdifrx.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_spdifrx.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_ll_gpio.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_ll_gpio.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1225,8 +1225,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_spi.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_spi.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_ll_hrtim.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_ll_hrtim.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1237,8 +1237,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_spi_ex.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_spi_ex.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_ll_i2c.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_ll_i2c.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1249,8 +1249,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_sram.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_sram.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_ll_lptim.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_ll_lptim.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1261,8 +1261,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_swpmi.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_swpmi.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_ll_lpuart.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_ll_lpuart.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1273,8 +1273,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_tim.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_tim.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_ll_opamp.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_ll_opamp.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1285,8 +1285,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_tim_ex.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_tim_ex.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_ll_pwr.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_ll_pwr.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1297,8 +1297,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_uart.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_uart.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_ll_rcc.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_ll_rcc.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1309,8 +1309,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_uart_ex.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_uart_ex.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_ll_rng.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_ll_rng.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1321,8 +1321,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_usart.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_usart.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_ll_rtc.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_ll_rtc.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1333,8 +1333,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_usart_ex.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_usart_ex.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_ll_spi.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_ll_spi.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1345,8 +1345,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_hal_wwdg.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_hal_wwdg.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_ll_tim.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_ll_tim.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1357,8 +1357,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_ll_adc.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_ll_adc.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_ll_ucpd.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_ll_ucpd.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1369,8 +1369,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_ll_bdma.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_ll_bdma.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_ll_usart.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_ll_usart.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1381,8 +1381,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_ll_comp.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_ll_comp.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_ll_usb.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_ll_usb.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1393,8 +1393,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_ll_crc.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_ll_crc.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\stm32g4xx_ll_utils.c</PathWithFileName>
+      <FilenameWithoutPath>stm32g4xx_ll_utils.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -1405,308 +1405,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_ll_crs.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_ll_crs.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>102</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_ll_dac.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_ll_dac.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>103</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_ll_delayblock.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_ll_delayblock.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>104</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_ll_dma.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_ll_dma.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>105</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_ll_dma2d.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_ll_dma2d.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>106</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_ll_exti.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_ll_exti.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>107</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_ll_fmc.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_ll_fmc.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>108</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_ll_gpio.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_ll_gpio.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>109</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_ll_hrtim.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_ll_hrtim.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>110</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_ll_i2c.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_ll_i2c.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>111</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_ll_lptim.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_ll_lptim.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>112</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_ll_lpuart.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_ll_lpuart.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>113</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_ll_mdma.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_ll_mdma.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>114</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_ll_opamp.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_ll_opamp.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>115</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_ll_pwr.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_ll_pwr.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>116</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_ll_rcc.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_ll_rcc.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>117</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_ll_rng.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_ll_rng.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>118</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_ll_rtc.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_ll_rtc.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>119</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_ll_sdmmc.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_ll_sdmmc.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>120</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_ll_spi.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_ll_spi.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>121</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_ll_swpmi.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_ll_swpmi.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>122</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_ll_tim.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_ll_tim.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>123</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_ll_usart.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_ll_usart.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>124</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_ll_usb.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_ll_usb.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>125</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\stm32h7xx_ll_utils.c</PathWithFileName>
-      <FilenameWithoutPath>stm32h7xx_ll_utils.c</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>126</FileNumber>
-      <FileType>1</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\src\driver\stm32h7-v180\src\system_stm32h7xx.c</PathWithFileName>
-      <FilenameWithoutPath>system_stm32h7xx.c</FilenameWithoutPath>
+      <PathWithFileName>..\src\driver\stm32g4-v111\src\system_stm32g4xx.c</PathWithFileName>
+      <FilenameWithoutPath>system_stm32g4xx.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
