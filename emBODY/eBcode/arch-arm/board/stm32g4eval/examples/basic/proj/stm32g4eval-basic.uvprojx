@@ -339,7 +339,7 @@
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register</MiscControls>
               <Define>USE_STM32HAL STM32HAL_BOARD_NUCLEOH7 STM32HAL_DRIVER_V180</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\libs\lowlevel\stm32hal\api</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -396,12 +396,12 @@
             <File>
               <FileName>stm32hal.h7.nucleoh7.v180.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.nucleoh7.v180.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.nucleoh7.v180.lib</FilePath>
             </File>
             <File>
               <FileName>stm32hal.g4.stm32g4eval.v111.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.g4.stm32g4eval.v111.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.g4.stm32g4eval.v111.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -884,7 +884,7 @@
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register</MiscControls>
               <Define>USE_STM32HAL STM32HAL_BOARD_STM32G4EVAL STM32HAL_DRIVER_V111</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\libs\lowlevel\stm32hal\api</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -941,7 +941,7 @@
             <File>
               <FileName>stm32hal.h7.nucleoh7.v180.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.nucleoh7.v180.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.h7.nucleoh7.v180.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -965,7 +965,7 @@
             <File>
               <FileName>stm32hal.g4.stm32g4eval.v111.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.g4.stm32g4eval.v111.lib</FilePath>
+              <FilePath>..\..\..\..\..\libs\lowlevel\stm32hal\lib\stm32hal.g4.stm32g4eval.v111.lib</FilePath>
             </File>
           </Files>
         </Group>
