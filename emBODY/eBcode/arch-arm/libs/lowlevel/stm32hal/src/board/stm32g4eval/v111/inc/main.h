@@ -33,8 +33,9 @@ extern "C" {
     #include "stm32hal.h"
 #else
 #include "stm32g4xx_hal.h"
-#endif
 #include "stm32g4xx_ll_pwr.h"
+#endif
+
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
