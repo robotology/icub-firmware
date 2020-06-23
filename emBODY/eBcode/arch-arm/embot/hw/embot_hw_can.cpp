@@ -35,7 +35,6 @@
 #include "embot_hw_bsp.h"
 #include "embot_hw_bsp_config.h"
 #include "embot_hw_sys.h"
-#include "osal_task.h"
 
 #include <cstring>
 #include <vector>
