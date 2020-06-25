@@ -83,7 +83,19 @@ namespace embot { namespace hw { namespace bsp { namespace gpio {
 #else
     
 namespace embot { namespace hw { namespace bsp { namespace gpio {
-        
+ 
+    #if defined(STM32HAL_BOARD_STM32G4EVAL)
+    static const BSP thebsp {        
+        // supportmask2d
+        {{
+            0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0x0000 
+        }},            
+        // ports
+        {{
+            GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, GPIOF, GPIOG, nullptr
+        }}
+    };    
+    #else
     // sadly we cannot use constexpr because of the reinterpret_cast<> inside GPIOA etc.
     static const BSP thebsp {        
         // supportmask2d
@@ -95,6 +107,7 @@ namespace embot { namespace hw { namespace bsp { namespace gpio {
             GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, nullptr, nullptr, nullptr
         }}
     };
+    #endif
     
     constexpr embot::hw::GPIO BSP::getGPIO(const PROP &p) const
     {
@@ -286,6 +299,36 @@ namespace embot { namespace hw { namespace bsp { namespace led {
     };
     
     void BSP::init(embot::hw::LED h) const {} 
+       
+    #elif   defined(STM32HAL_BOARD_SG3)
+       
+    constexpr PROP led1p = { .on = embot::hw::gpio::State::RESET, .off = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::B, embot::hw::GPIO::PIN::seven}  };  
+        
+    constexpr BSP thebsp {        
+        // maskofsupported
+        mask::pos2mask<uint32_t>(LED::one),        
+        // properties
+        {{
+            &led1p, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr            
+        }}        
+    };
+    
+    void BSP::init(embot::hw::LED h) const {} 
+    
+    #elif   defined(STM32HAL_BOARD_STM32G4EVAL)
+       
+    constexpr PROP led1p = { .on = embot::hw::gpio::State::SET, .off = embot::hw::gpio::State::RESET, .gpio = {embot::hw::GPIO::PORT::G, embot::hw::GPIO::PIN::nine}  };  
+        
+    constexpr BSP thebsp {        
+        // maskofsupported
+        mask::pos2mask<uint32_t>(LED::one),        
+        // properties
+        {{
+            &led1p, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr            
+        }}        
+    };
+    
+    void BSP::init(embot::hw::LED h) const {} 
     
     #else
         #error embot::hw::bsp::led::thebsp must be defined    
@@ -443,7 +486,11 @@ namespace embot { namespace hw { namespace bsp { namespace button {
         }        
     }
    
+    #elif   defined(STM32HAL_BOARD_STM32G4EVAL)
     
+    constexpr BSP thebsp {};
+    void BSP::init(embot::hw::BTN h) const {}
+    void BSP::onEXTI(const embot::hw::bsp::gpio::PROP &p) const {}    
         
     #else
         #error embot::hw::bsp::button::thebsp must be defined    

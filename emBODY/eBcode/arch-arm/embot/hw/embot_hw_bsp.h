@@ -354,14 +354,21 @@ namespace embot { namespace hw { namespace bsp { namespace timer {
 
 
 
-#if defined(HAL_I2C_MODULE_ENABLED)
+
 namespace embot { namespace hw { namespace bsp { namespace i2c {
-    
-    
+
+#if defined(HAL_I2C_MODULE_ENABLED)    
     struct PROP
-    {   
-        I2C_HandleTypeDef*  handle;  
+    {     
+        I2C_HandleTypeDef* handle;  
     };
+#else
+    struct PROP
+    {     
+        void* handle;  
+    };
+#endif
+    
     
     struct BSP : public embot::hw::bsp::SUPP
     {
@@ -377,7 +384,7 @@ namespace embot { namespace hw { namespace bsp { namespace i2c {
     const BSP& getBSP();
                   
 }}}} // namespace embot { namespace hw { namespace bsp {  namespace i2c {
-#endif
+
 
 
 namespace embot { namespace hw { namespace bsp { namespace bno055 {
