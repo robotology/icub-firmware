@@ -1009,7 +1009,7 @@
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register</MiscControls>
               <Define>USE_STM32HAL STM32HAL_BOARD_STM32G4EVAL STM32HAL_DRIVER_V111</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\tools;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\libs\midware\eventviewer\api</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>

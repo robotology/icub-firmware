@@ -76,30 +76,6 @@ static uint32_t stm32hal_tick1msecget()
     static const uint16_t PinLED = GPIO_PIN_0;
     static void clockEnableLED() {  __HAL_RCC_GPIOB_CLK_ENABLE(); }
     
-//static void led_init()
-//{
-//    // start clock
-//    __HAL_RCC_GPIOB_CLK_ENABLE();
-//    
-//    // configure pb0
-//    GPIO_InitTypeDef GPIO_InitStruct = {0};
-//    GPIO_InitStruct.Pin = GPIO_PIN_0;
-//    GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-//    GPIO_InitStruct.Pull = GPIO_NOPULL;
-//    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-//    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-//    
-//    // switch it on
-//    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_SET); 
-//    
-//    // switch it off
-//    HAL_GPIO_WritePin(GPIOB, GPIO_PIN_0, GPIO_PIN_RESET);    
-//}
-
-//static void led_toggle()
-//{
-//    HAL_GPIO_TogglePin(GPIOB, GPIO_PIN_0);    
-//}
 
 // needed because we have removed that from stm32hal
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) 
