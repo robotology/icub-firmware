@@ -123,7 +123,7 @@ extern void stm32hal_board_init(void)
   MX_SPI4_Init();
   MX_TIM2_Init();
   MX_TIM5_Init();
-  MX_USB_PCD_Init();
+//  MX_USB_PCD_Init();
   
 }
 

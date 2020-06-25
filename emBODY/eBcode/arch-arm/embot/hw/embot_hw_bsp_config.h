@@ -104,6 +104,13 @@
     #define EMBOT_ENABLE_hw_led
     //#define EMBOT_ENABLE_hw_button
     
+#elif   defined(STM32HAL_BOARD_PMC)
+
+    #define EMBOT_ENABLE_hw_gpio
+    #define EMBOT_ENABLE_hw_led
+    //#define EMBOT_ENABLE_hw_button
+    
+    
 #else
     #error pls sdefine which peripherals/chips are attached to your board
 #endif

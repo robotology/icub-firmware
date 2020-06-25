@@ -329,7 +329,22 @@ namespace embot { namespace hw { namespace bsp { namespace led {
     };
     
     void BSP::init(embot::hw::LED h) const {} 
+
+    #elif   defined(STM32HAL_BOARD_PMC)
+       
+    constexpr PROP led1p = { .on = embot::hw::gpio::State::SET, .off = embot::hw::gpio::State::RESET, .gpio = {embot::hw::GPIO::PORT::D, embot::hw::GPIO::PIN::six}  };  
+        
+    constexpr BSP thebsp {        
+        // maskofsupported
+        mask::pos2mask<uint32_t>(LED::one),        
+        // properties
+        {{
+            &led1p, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr            
+        }}        
+    };
     
+    void BSP::init(embot::hw::LED h) const {} 
+        
     #else
         #error embot::hw::bsp::led::thebsp must be defined    
     #endif
