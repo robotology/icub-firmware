@@ -98,6 +98,17 @@ extern "C" {
     #else
         #error unknown driver version
     #endif
+
+#elif   defined(STM32HAL_BOARD_PMC)
+    
+    #if (STM32HAL_DRIVER_VERSION == 0x111)
+        #define USE_FULL_LL_DRIVER
+        #include "../src/config/stm32hal_driver_cfg_of_pmc_v111.h"   
+        // we also need some ll includes contained in the driver section
+        #include "../src/driver/stm32g4-v111/inc/stm32g4xx_ll_gpio.h"
+    #else
+        #error unknown driver version
+    #endif
     
 #else
 

@@ -109,6 +109,14 @@ extern "C" {
         #define STM32HAL_DRIVER_V1111
     #endif
     #define STM32HAL_DRIVER_VERSION 0x111
+
+#elif   defined(STM32HAL_BOARD_PMC)
+
+    // only one possible driver
+    #if !defined(STM32HAL_DRIVER_V111)
+        #define STM32HAL_DRIVER_V1111
+    #endif
+    #define STM32HAL_DRIVER_VERSION 0x111
     
 #else
     #error STM32HAL: the STM32HAL_BOARD_${B} is undefined
