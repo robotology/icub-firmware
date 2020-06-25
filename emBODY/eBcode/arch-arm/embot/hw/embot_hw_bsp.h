@@ -157,18 +157,20 @@ namespace embot { namespace hw { namespace bsp { namespace button {
 
 
 namespace embot { namespace hw { namespace bsp { namespace can {
-
+    
     #if defined(HAL_CAN_MODULE_ENABLED)
-    struct PROP
-    { 
-        CAN_HandleTypeDef* handle;   
-    };
-    #else    
-    struct PROP
-    { 
-        void* handle;   
-    };
+        using CAN_Handle = CAN_HandleTypeDef;    
+    #elif defined(HAL_FDCAN_MODULE_ENABLED)
+        using CAN_Handle = FDCAN_HandleTypeDef;
+    #else
+        using CAN_Handle = void;
     #endif
+    
+    struct PROP
+    { 
+        CAN_Handle* handle;   
+    };
+
     
     
     struct BSP : public embot::hw::bsp::SUPP

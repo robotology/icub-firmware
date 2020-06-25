@@ -117,7 +117,7 @@ extern void stm32hal_board_init(void)
   MX_TIM8_Init();
   MX_USART1_UART_Init();
   MX_USART3_SMARTCARD_Init();
-  MX_USB_PCD_Init();
+//  MX_USB_PCD_Init();
 }
 
 

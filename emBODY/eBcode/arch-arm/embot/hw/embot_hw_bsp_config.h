@@ -103,6 +103,7 @@
     #define EMBOT_ENABLE_hw_gpio
     #define EMBOT_ENABLE_hw_led
     //#define EMBOT_ENABLE_hw_button
+    #define EMBOT_ENABLE_hw_can
     
 #elif   defined(STM32HAL_BOARD_PMC)
 

@@ -50,7 +50,7 @@ using namespace std;
 // - all the rest
 // --------------------------------------------------------------------------------------------------------------------
 
-#if !defined(HAL_CAN_MODULE_ENABLED) || !defined(EMBOT_ENABLE_hw_can)
+#if !defined(EMBOT_ENABLE_hw_can)
 
 // in here we manage the case of no can module being present in stm32hal
 
@@ -80,19 +80,14 @@ namespace embot { namespace hw { namespace can {
 
 #else
 
+
 namespace embot { namespace hw { namespace can {
-        
-    #if defined(STM32HAL_STM32L4) && (STM32HAL_DRIVER_VERSION < 0x183)
-        #define STM32HAL_HAS_CAN_API_PRE_V183
-        #warning using can api pre hal driver v183 ... think of updating the stm32hal
-        #error UPDATE the application to use a newer version of stm32 lib
-    #endif
-         
+                
        
     struct CANdata
     {
         Config config {};
-        CAN_HandleTypeDef *handle {nullptr};
+        embot::hw::bsp::can::CAN_Handle *handle {nullptr};
         std::vector<Frame> *Qtx {nullptr};
         std::vector<Frame> *rxQ {nullptr};
         
@@ -108,12 +103,15 @@ namespace embot { namespace hw { namespace can {
 
     
     // - declaration of helper functions which are not in the API  
-    static void s_tx_start(CAN_HandleTypeDef *hcan);
-    static void s_tx_oneframehasgone(CAN_HandleTypeDef *hcan);
+    static void s_tx_start(embot::hw::bsp::can::CAN_Handle *hcan);
+    static void s_tx_oneframehasgone(embot::hw::bsp::can::CAN_Handle *hcan);   
+    static bool s_registercallbacks(embot::hw::bsp::can::CAN_Handle *hcan);
+    static void s_filters_init(embot::hw::bsp::can::CAN_Handle *hcan);
+    static result_t s_filters_set(embot::hw::bsp::can::CAN_Handle *hcan, std::uint8_t address);
 
-    void callbackOnTXcompletion(CAN_HandleTypeDef* hcan);
-    void callbackOnRXcompletion(CAN_HandleTypeDef* hcan);
-    // void callbackOnError(CAN_HandleTypeDef* hcan); // not used, so far
+    void callbackOnTXcompletion(embot::hw::bsp::can::CAN_Handle* hcan);
+    void callbackOnRXcompletion(embot::hw::bsp::can::CAN_Handle* hcan);
+    // void callbackOnError(embot::hw::bsp::can::CAN_Handle* hcan); // not used, so far
         
     static void RX_IRQenable(void);
     static void RX_IRQdisable(void);
@@ -162,35 +160,15 @@ result_t can::init(embot::hw::CAN p, const Config &config)
     candata.Qtx->reserve(config.txcapacity);
     candata.rxQ->reserve(config.rxcapacity);
               
-    /*##-2- Configure the CAN Filter ###########################################*/
-    CAN_FilterTypeDef sFilterConfig;
-
-    sFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
-    sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
-    sFilterConfig.FilterIdHigh = 0x0000;
-    sFilterConfig.FilterIdLow = 0x0000;
-    sFilterConfig.FilterMaskIdHigh = 0x0000;
-    sFilterConfig.FilterMaskIdLow = 0x0000;
-    sFilterConfig.FilterFIFOAssignment = 0;
-    sFilterConfig.FilterActivation = ENABLE;
-    sFilterConfig.FilterBank = 0;
-    sFilterConfig.SlaveStartFilterBank = 14;
-
-    if(HAL_CAN_ConfigFilter(candata.handle, &sFilterConfig) != HAL_OK)
-    {    
-    }
-
-    if(HAL_OK != HAL_CAN_RegisterCallback(candata.handle, HAL_CAN_TX_MAILBOX0_COMPLETE_CB_ID, can::callbackOnTXcompletion))
-        return resNOK; //TODO: adding clear of vector
-    if(HAL_OK != HAL_CAN_RegisterCallback(candata.handle, HAL_CAN_TX_MAILBOX1_COMPLETE_CB_ID, can::callbackOnTXcompletion))
-        return resNOK; //TODO: adding clear of vector
-    if(HAL_OK != HAL_CAN_RegisterCallback(candata.handle, HAL_CAN_TX_MAILBOX2_COMPLETE_CB_ID, can::callbackOnTXcompletion))
-        return resNOK; //TODO: adding clear of vector
-    if(HAL_OK != HAL_CAN_RegisterCallback(candata.handle, HAL_CAN_RX_FIFO0_MSG_PENDING_CB_ID, can::callbackOnRXcompletion))
-        return resNOK; //TODO: adding clear of vector
-    if(HAL_OK != HAL_CAN_Start(candata.handle))
-        return resNOK; //TODO: adding clear of vector
+    // init the filters
+    s_filters_init(candata.handle);
     
+    // register the callbacks
+    if(false == s_registercallbacks(candata.handle))
+    {
+        return resNOK;
+    }
+        
     embot::core::binary::bit::set(initialisedmask, embot::core::tointegral(p));
 
     return resOK;
@@ -339,8 +317,109 @@ result_t can::setfilters(embot::hw::CAN p, std::uint8_t address)
     {
         return resNOK;
     } 
+    
+    return s_filters_set(candata.handle, address);
+}
+  
+
+// - part which depends strictly on stm32 hal
+
+// we need to manage two cases: one with HAL_CAN_MODULE_ENABLED and one with HAL_FDCAN_MODULE_ENABLED
+
+#if defined(HAL_CAN_MODULE_ENABLED) && defined(STM32HAL_STM32L4) && (STM32HAL_DRIVER_VERSION < 0x183)
+    #define STM32HAL_HAS_CAN_API_PRE_V183
+    #warning using can api pre hal driver v183 ... think of updating the stm32hal
+    #error UPDATE the application to use a newer version of stm32 lib
+#endif
 
 
+// - definition of helper functions which are not in the API
+
+static void can::RX_IRQenable(void)
+{
+#if defined(HAL_CAN_MODULE_ENABLED)
+    HAL_CAN_ActivateNotification(candata.handle, CAN_IT_RX_FIFO0_MSG_PENDING);
+#elif defined(HAL_FDCAN_MODULE_ENABLED)  
+    #warning TODO: ...    
+#endif
+}
+
+
+static void can::RX_IRQdisable(void)
+{
+#if defined(HAL_CAN_MODULE_ENABLED)
+    HAL_CAN_DeactivateNotification(candata.handle, CAN_IT_RX_FIFO0_MSG_PENDING);
+#elif defined(HAL_FDCAN_MODULE_ENABLED)  
+    #warning TODO: ...    
+#endif        
+}
+
+
+static void can::tx_IRQenable()
+{
+#if defined(HAL_CAN_MODULE_ENABLED)
+    HAL_CAN_ActivateNotification(candata.handle, CAN_IT_TX_MAILBOX_EMPTY);
+#elif defined(HAL_FDCAN_MODULE_ENABLED)  
+    #warning TODO: ...    
+#endif
+    
+} 
+
+static bool can::tx_IRQdisable()
+{
+    volatile bool enabled = true;
+#if defined(HAL_CAN_MODULE_ENABLED)
+    enabled = ((candata.handle->Instance->IER & (CAN_IT_TX_MAILBOX_EMPTY)) == (CAN_IT_TX_MAILBOX_EMPTY));
+    HAL_CAN_DeactivateNotification(candata.handle, CAN_IT_TX_MAILBOX_EMPTY);
+#elif defined(HAL_FDCAN_MODULE_ENABLED)  
+    #warning TODO: ...    
+#endif    
+    return enabled;    
+}
+
+static void can::tx_IRQresume(const bool previouslyenabled)
+{
+    if(true == previouslyenabled)
+    {
+#if defined(HAL_CAN_MODULE_ENABLED)        
+        HAL_CAN_ActivateNotification(candata.handle, CAN_IT_TX_MAILBOX_EMPTY);
+#elif defined(HAL_FDCAN_MODULE_ENABLED)  
+    #warning TODO: ...    
+#endif         
+    }
+} 
+
+static void can::s_filters_init(embot::hw::bsp::can::CAN_Handle *hcan)
+{
+#if defined(HAL_CAN_MODULE_ENABLED)
+    
+    CAN_FilterTypeDef sFilterConfig;
+
+    sFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
+    sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
+    sFilterConfig.FilterIdHigh = 0x0000;
+    sFilterConfig.FilterIdLow = 0x0000;
+    sFilterConfig.FilterMaskIdHigh = 0x0000;
+    sFilterConfig.FilterMaskIdLow = 0x0000;
+    sFilterConfig.FilterFIFOAssignment = 0;
+    sFilterConfig.FilterActivation = ENABLE;
+    sFilterConfig.FilterBank = 0;
+    sFilterConfig.SlaveStartFilterBank = 14;
+
+    if(HAL_CAN_ConfigFilter(hcan, &sFilterConfig) != HAL_OK)
+    {    
+    } 
+    
+#elif defined(HAL_FDCAN_MODULE_ENABLED)  
+    #warning TODO: s_filters_init()    
+#endif    
+}
+
+static result_t can::s_filters_set(embot::hw::bsp::can::CAN_Handle *hcan, std::uint8_t address)
+{
+
+#if defined(HAL_CAN_MODULE_ENABLED)
+    
     CAN_FilterTypeDef sFilterConfig;    
     
     /* Configure the CAN Filter for message of class polling sensor */
@@ -355,7 +434,7 @@ result_t can::setfilters(embot::hw::CAN p, std::uint8_t address)
     sFilterConfig.FilterBank = 0;
     sFilterConfig.SlaveStartFilterBank = 0;
 
-    if(HAL_CAN_ConfigFilter(candata.handle, &sFilterConfig) != HAL_OK)
+    if(HAL_CAN_ConfigFilter(hcan, &sFilterConfig) != HAL_OK)
     {
         return resNOK;
     }
@@ -367,7 +446,7 @@ result_t can::setfilters(embot::hw::CAN p, std::uint8_t address)
     sFilterConfig.FilterActivation = ENABLE;
     sFilterConfig.FilterBank = 1;
     sFilterConfig.SlaveStartFilterBank = 0;
-    if(HAL_CAN_ConfigFilter(candata.handle, &sFilterConfig) != HAL_OK)
+    if(HAL_CAN_ConfigFilter(hcan, &sFilterConfig) != HAL_OK)
     {
         return resNOK;
     }
@@ -382,7 +461,7 @@ result_t can::setfilters(embot::hw::CAN p, std::uint8_t address)
     sFilterConfig.FilterBank = 2;
     sFilterConfig.SlaveStartFilterBank = 1;
 
-    if(HAL_CAN_ConfigFilter(candata.handle, &sFilterConfig) != HAL_OK)
+    if(HAL_CAN_ConfigFilter(hcan, &sFilterConfig) != HAL_OK)
     {
         return resNOK;
     }
@@ -394,7 +473,7 @@ result_t can::setfilters(embot::hw::CAN p, std::uint8_t address)
     sFilterConfig.FilterActivation = ENABLE;
     sFilterConfig.FilterBank = 3;
     sFilterConfig.SlaveStartFilterBank = 1;
-    if(HAL_CAN_ConfigFilter(candata.handle, &sFilterConfig) != HAL_OK)
+    if(HAL_CAN_ConfigFilter(hcan, &sFilterConfig) != HAL_OK)
     {
         return resNOK;
     }
@@ -408,7 +487,7 @@ result_t can::setfilters(embot::hw::CAN p, std::uint8_t address)
     sFilterConfig.FilterBank = 4;
     sFilterConfig.SlaveStartFilterBank = 2;
 
-    if(HAL_CAN_ConfigFilter(candata.handle, &sFilterConfig) != HAL_OK)
+    if(HAL_CAN_ConfigFilter(hcan, &sFilterConfig) != HAL_OK)
     {
         return resNOK;
     }
@@ -421,59 +500,52 @@ result_t can::setfilters(embot::hw::CAN p, std::uint8_t address)
     sFilterConfig.FilterBank = 5;
     sFilterConfig.SlaveStartFilterBank = 2;
     
-    if(HAL_CAN_ConfigFilter(candata.handle, &sFilterConfig) != HAL_OK)
+    if(HAL_CAN_ConfigFilter(hcan, &sFilterConfig) != HAL_OK)
     {
         return resNOK;
     }
     
+#elif defined(HAL_FDCAN_MODULE_ENABLED)    
+    #warning FDCAN TODO
+#endif
+    
     return resOK;   
 }
+
+static bool can::s_registercallbacks(embot::hw::bsp::can::CAN_Handle *hcan)
+{  
+
+#if defined(HAL_CAN_MODULE_ENABLED)    
     
+    if(HAL_OK != HAL_CAN_RegisterCallback(hcan, HAL_CAN_TX_MAILBOX0_COMPLETE_CB_ID, can::callbackOnTXcompletion))
+        return false; //TODO: adding clear of vector
+    if(HAL_OK != HAL_CAN_RegisterCallback(hcan, HAL_CAN_TX_MAILBOX1_COMPLETE_CB_ID, can::callbackOnTXcompletion))
+        return false; //TODO: adding clear of vector
+    if(HAL_OK != HAL_CAN_RegisterCallback(hcan, HAL_CAN_TX_MAILBOX2_COMPLETE_CB_ID, can::callbackOnTXcompletion))
+        return false; //TODO: adding clear of vector
+    if(HAL_OK != HAL_CAN_RegisterCallback(hcan, HAL_CAN_RX_FIFO0_MSG_PENDING_CB_ID, can::callbackOnRXcompletion))
+        return false; //TODO: adding clear of vector
+    if(HAL_OK != HAL_CAN_Start(hcan))
+        return false; //TODO: adding clear of vector
 
+#elif defined(HAL_FDCAN_MODULE_ENABLED)   
+    #warning TODO: s_registercallbacks()    
+#endif 
+    
+    return true;
+}    
 
-// - definition of helper functions which are not in the API
-
-static void can::RX_IRQenable(void)
-{
-    HAL_CAN_ActivateNotification(candata.handle, CAN_IT_RX_FIFO0_MSG_PENDING);
-}
-
-
-static void can::RX_IRQdisable(void)
-{
-    HAL_CAN_DeactivateNotification(candata.handle, CAN_IT_RX_FIFO0_MSG_PENDING);      
-}
-
-
-static void can::tx_IRQenable()
-{
-    HAL_CAN_ActivateNotification(candata.handle, CAN_IT_TX_MAILBOX_EMPTY);
-} 
-
-static bool can::tx_IRQdisable()
-{
-    volatile bool enabled = ((candata.handle->Instance->IER & (CAN_IT_TX_MAILBOX_EMPTY)) == (CAN_IT_TX_MAILBOX_EMPTY));
-    HAL_CAN_DeactivateNotification(candata.handle, CAN_IT_TX_MAILBOX_EMPTY);
-    return enabled;    
-}
-
-static void can::tx_IRQresume(const bool previouslyenabled)
-{
-    if(true == previouslyenabled)
-    {
-        HAL_CAN_ActivateNotification(candata.handle, CAN_IT_TX_MAILBOX_EMPTY);
-    }
-} 
-
-static void can::s_tx_start(CAN_HandleTypeDef *hcan)
+static void can::s_tx_start(embot::hw::bsp::can::CAN_Handle *hcan)
 {
     // transmit the first frame inside Qtx and then activate the interrupt (on fifo empty, hence ...) 
+
+#if defined(HAL_CAN_MODULE_ENABLED) 
     
     CAN_TxHeaderTypeDef headertx = {0}; // KEEP IT IN STACK
     headertx.ExtId = 0;
     headertx.IDE = CAN_ID_STD;
     headertx.RTR = CAN_RTR_DATA;    
-
+ 
     // protect Qtx: i disable tx interrupt but i keep info if it was enabled, so that at the end i re-enable it
     volatile bool isTXenabled = tx_IRQdisable();
 
@@ -580,11 +652,17 @@ static void can::s_tx_start(CAN_HandleTypeDef *hcan)
 #endif        
 
     }
+    
+#elif defined(HAL_FDCAN_MODULE_ENABLED)  
+    #warning TODO: ...    
+#endif    
 }
 
 
-static void can::s_tx_oneframehasgone(CAN_HandleTypeDef *hcan)
+static void can::s_tx_oneframehasgone(embot::hw::bsp::can::CAN_Handle *hcan)
 {
+#if defined(HAL_CAN_MODULE_ENABLED)
+    
     // marco.accame: this funtion in here MUST be called only by the CAN IRQ handler.
     // if so, Qtx surely protected vs concurrent action because... the user-space caller 
     // always disables the TX ISR before manipulating Qtx.
@@ -621,11 +699,13 @@ static void can::s_tx_oneframehasgone(CAN_HandleTypeDef *hcan)
         tx_IRQenable(); 
         HAL_CAN_AddTxMessage(hcan, &headertx, frame.data, &TxMailboxNum);  
     }
-             
+#elif defined(HAL_FDCAN_MODULE_ENABLED)  
+    #warning TODO: ...    
+#endif             
 }
 
 
-void can::callbackOnTXcompletion(CAN_HandleTypeDef* hcan)
+void can::callbackOnTXcompletion(embot::hw::bsp::can::CAN_Handle* hcan)
 {
     // this function is called inside IRQ handler of stm32hal, so hcan could be can1 or can2.
     // therefore i need to check that the interrupt is on the peritherical I already initted.    
@@ -636,8 +716,10 @@ void can::callbackOnTXcompletion(CAN_HandleTypeDef* hcan)
 }
  
 
-void can::callbackOnRXcompletion(CAN_HandleTypeDef* hcan)
-{   
+void can::callbackOnRXcompletion(embot::hw::bsp::can::CAN_Handle* hcan)
+{ 
+#if defined(HAL_CAN_MODULE_ENABLED)
+    
     if( (hcan == (candata.handle)) && initialised(embot::hw::CAN::one) )
     {
         // use stack variables
@@ -656,11 +738,14 @@ void can::callbackOnRXcompletion(CAN_HandleTypeDef* hcan)
         
         // and we execute teh callback on rx
         candata.config.onrxframe.execute();                
-    }       
+    } 
+#elif defined(HAL_FDCAN_MODULE_ENABLED)  
+    #warning TODO: ...    
+#endif    
 }
   
 // not used, so far
-//void can::callbackOnError(CAN_HandleTypeDef* hcan)
+//void can::callbackOnError(embot::hw::bsp::can::CAN_Handle* hcan)
 //{
 //    hcan = hcan;
 //    static uint32_t error_count = 0;
@@ -671,7 +756,7 @@ void can::callbackOnRXcompletion(CAN_HandleTypeDef* hcan)
 // - stm32hal.lib needs some handlers being compiled in here: IRQ handlers and callbacks.
 //   nothing is required 
 
-#endif //defined(HAL_CAN_MODULE_ENABLED)
+#endif // EMBOT_ENABLE_hw_can
 
 
     
