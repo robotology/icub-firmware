@@ -2200,7 +2200,22 @@ namespace embot { namespace hw { namespace bsp { namespace tlv493d {
     };
 
     void BSP::init(embot::hw::TLV493D h) const {}
+    
+    #elif defined(STM32HAL_BOARD_NUCLEOH7)
+    
+    constexpr PROP prop01 { .i2cbus = embot::hw::I2C::one, .i2caddress = 0x3E }; 
 
+    constexpr BSP thebsp {        
+        // maskofsupported
+        mask::pos2mask<uint32_t>(TLV493D::one),        
+        // properties
+        {{
+            &prop01
+        }}        
+    };
+    
+    void BSP::init(embot::hw::TLV493D h) const {}
+    
     #else
         #error embot::hw::bsp::tlv493d::thebsp must be defined    
     #endif

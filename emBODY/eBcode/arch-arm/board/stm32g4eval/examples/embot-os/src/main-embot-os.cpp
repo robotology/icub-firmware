@@ -13,6 +13,7 @@
 #include "embot_hw_bsp.h"
 #include "embot_hw_led.h"
 #include "embot_hw_button.h"
+#include "embot_hw_tlv493d.h"
 #include "embot_hw_sys.h"
 
 #include "embot_os_theScheduler.h"
@@ -25,6 +26,7 @@
 
 constexpr embot::os::Event evtTick = embot::core::binary::mask::pos2mask<embot::os::Event>(0);
 constexpr embot::os::Event evtBTNreleased = embot::core::binary::mask::pos2mask<embot::os::Event>(1);
+constexpr embot::os::Event evtRead = embot::core::binary::mask::pos2mask<embot::os::Event>(2);
 
 constexpr embot::core::relTime tickperiod = 1000*embot::core::time1millisec;
 
@@ -53,8 +55,18 @@ void eventbasedthread_startup(embot::os::Thread *t, void *param)
     
     embot::hw::sys::puts("evthread-startup: started timer which sends evtTick to evthread every = " + embot::core::TimeFormatter(tickperiod).to_string());
     
+    // init the tlv493d
+    embot::hw::tlv493d::init(embot::hw::TLV493D::one, {embot::hw::bsp::tlv493d::getBSP().getPROP(embot::hw::TLV493D::one)->i2cbus, 400000});
+    
 }
 
+void alertdataisready00(void *p)
+{
+    embot::os::Thread *t = reinterpret_cast<embot::os::Thread*>(p);    
+    t->setEvent(evtRead);     
+}
+
+embot::hw::tlv493d::Position position = 0;
 
 void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventmask, void *param)
 {   
@@ -68,9 +80,27 @@ void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventma
 #if defined(enableTRACE_all)        
         embot::core::TimeFormatter tf(embot::core::now());        
         embot::hw::sys::puts("evthread-onevent: evtTick received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
-#endif        
+#endif  
 
+        embot::core::Callback cbk00(alertdataisready00, t);
+        embot::hw::tlv493d::acquisition(embot::hw::TLV493D::one, cbk00);        
     }
+    
+    if(true == embot::core::binary::mask::check(eventmask, evtRead)) 
+    {
+#if defined(enableTRACE_all)        
+        embot::core::TimeFormatter tf(embot::core::now());        
+        embot::hw::sys::puts("evthread-onevent: evtRead received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
+#endif  
+
+        if(embot::hw::resOK != embot::hw::tlv493d::read(embot::hw::TLV493D::one, position))
+        {
+            position = 66666;
+        }
+        
+        embot::hw::sys::puts("pos = " + std::to_string(0.01 * position) + "deg");
+        
+    }    
     
     if(true == embot::core::binary::mask::check(eventmask, evtBTNreleased)) 
     {    

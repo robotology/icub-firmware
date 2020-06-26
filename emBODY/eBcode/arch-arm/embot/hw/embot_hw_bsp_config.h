@@ -89,13 +89,19 @@
 
 #elif   defined(STM32HAL_BOARD_NUCLEOH7)
 
+#if defined(STM32HAL_BOARD_NUCLEOH7_BASIC) 
     #define EMBOT_ENABLE_hw_gpio
     #define EMBOT_ENABLE_hw_led
     #define EMBOT_ENABLE_hw_button
-#if !defined(STM32HAL_BOARD_NUCLEOH7_BASIC)    
+    #define EMBOT_ENABLE_hw_i2c
+    #define EMBOT_ENABLE_hw_tlv493d 
+#else    
+    #define EMBOT_ENABLE_hw_gpio
+    #define EMBOT_ENABLE_hw_led
+    #define EMBOT_ENABLE_hw_button
     #define EMBOT_ENABLE_hw_i2c
     #define EMBOT_ENABLE_hw_bno055
-    #define EMBOT_ENABLE_hw_ads122c04
+    #define EMBOT_ENABLE_hw_ads122c04 
 #endif
 
 #elif   defined(STM32HAL_BOARD_STM32G4EVAL)
