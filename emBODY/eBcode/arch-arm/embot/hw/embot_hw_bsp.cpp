@@ -533,7 +533,8 @@ namespace embot { namespace hw { namespace bsp { namespace can {
     static_assert(embot::core::tointegral(embot::hw::CAN::maxnumberof) < embot::core::tointegral(embot::hw::CAN::none), "CAN::maxnumberof must be higher that CAN::none, so that we can optimise code");
 }}}}
 
-#if   !defined(HAL_CAN_MODULE_ENABLED) || !defined(EMBOT_ENABLE_hw_can)
+
+#if   !defined(EMBOT_ENABLE_hw_can)
 
 namespace embot { namespace hw { namespace bsp { namespace can {
     
@@ -659,7 +660,28 @@ namespace embot { namespace hw { namespace bsp { namespace can {
             MX_CAN1_Init();
         }        
     }
+
+    #elif   defined(STM32HAL_BOARD_STM32G4EVAL)
+    
+    constexpr PROP can1p = { .handle = &hfdcan1 };  
         
+    constexpr BSP thebsp {        
+        // maskofsupported
+        mask::pos2mask<uint32_t>(CAN::one),        
+        // properties
+        {{
+            &can1p            
+        }}        
+    };
+    
+    void BSP::init(embot::hw::CAN h) const 
+    {
+        if(h == CAN::one)
+        {            
+            MX_FDCAN1_Init();
+        }        
+    }
+    
     #else
         #error embot::hw::bsp::can::thebsp must be defined    
     #endif
@@ -671,6 +693,8 @@ namespace embot { namespace hw { namespace bsp { namespace can {
               
 }}}} // namespace embot { namespace hw { namespace bsp {  namespace can {
     
+#if defined(HAL_CAN_MODULE_ENABLED)
+
 // irq handlers for can: they are common to every board which has can
 
 void CAN1_TX_IRQHandler(void)
@@ -683,7 +707,24 @@ void CAN1_RX0_IRQHandler(void)
     HAL_CAN_IRQHandler(&hcan1);
 }
 
-#endif // can
+#elif defined(HAL_FDCAN_MODULE_ENABLED)
+
+
+#warning -> fill handlers for fdcan
+        
+void FDCAN1_IT0_IRQHandler(void)
+{
+
+}  
+
+void FDCAN1_IT1_IRQHandler(void)
+{
+
+}   
+
+#endif //
+
+#endif // EMBOT_ENABLE_hw_can
 
 
 // - support map: end of embot::hw::can

@@ -106,6 +106,7 @@ namespace embot { namespace hw { namespace can {
     static void s_tx_start(embot::hw::bsp::can::CAN_Handle *hcan);
     static void s_tx_oneframehasgone(embot::hw::bsp::can::CAN_Handle *hcan);   
     static bool s_registercallbacks(embot::hw::bsp::can::CAN_Handle *hcan);
+    static bool s_startdriver(embot::hw::bsp::can::CAN_Handle *hcan);
     static void s_filters_init(embot::hw::bsp::can::CAN_Handle *hcan);
     static result_t s_filters_set(embot::hw::bsp::can::CAN_Handle *hcan, std::uint8_t address);
 
@@ -168,6 +169,12 @@ result_t can::init(embot::hw::CAN p, const Config &config)
     {
         return resNOK;
     }
+    
+    // start the driver
+    if(false == s_startdriver(candata.handle))
+    {
+        return resNOK;
+    }    
         
     embot::core::binary::bit::set(initialisedmask, embot::core::tointegral(p));
 
@@ -360,7 +367,8 @@ static void can::tx_IRQenable()
 #if defined(HAL_CAN_MODULE_ENABLED)
     HAL_CAN_ActivateNotification(candata.handle, CAN_IT_TX_MAILBOX_EMPTY);
 #elif defined(HAL_FDCAN_MODULE_ENABLED)  
-    #warning TODO: ...    
+    #warning TODO: ... check it
+    HAL_FDCAN_ActivateNotification(candata.handle, FDCAN_IT_TX_FIFO_EMPTY, FDCAN_TX_BUFFER0); // FDCAN_IT_TX_COMPLETE or FDCAN_IT_TX_FIFO_EMPTY?    
 #endif
     
 } 
@@ -384,7 +392,8 @@ static void can::tx_IRQresume(const bool previouslyenabled)
 #if defined(HAL_CAN_MODULE_ENABLED)        
         HAL_CAN_ActivateNotification(candata.handle, CAN_IT_TX_MAILBOX_EMPTY);
 #elif defined(HAL_FDCAN_MODULE_ENABLED)  
-    #warning TODO: ...    
+        #warning TODO: ... check it
+        HAL_FDCAN_ActivateNotification(candata.handle, FDCAN_IT_TX_COMPLETE, FDCAN_TX_BUFFER0); // or FDCAN_IT_TX_FIFO_EMPTY?   
 #endif         
     }
 } 
@@ -524,9 +533,7 @@ static bool can::s_registercallbacks(embot::hw::bsp::can::CAN_Handle *hcan)
     if(HAL_OK != HAL_CAN_RegisterCallback(hcan, HAL_CAN_TX_MAILBOX2_COMPLETE_CB_ID, can::callbackOnTXcompletion))
         return false; //TODO: adding clear of vector
     if(HAL_OK != HAL_CAN_RegisterCallback(hcan, HAL_CAN_RX_FIFO0_MSG_PENDING_CB_ID, can::callbackOnRXcompletion))
-        return false; //TODO: adding clear of vector
-    if(HAL_OK != HAL_CAN_Start(hcan))
-        return false; //TODO: adding clear of vector
+        return false; //TODO: adding clear of vector    
 
 #elif defined(HAL_FDCAN_MODULE_ENABLED)   
     #warning TODO: s_registercallbacks()    
@@ -534,6 +541,26 @@ static bool can::s_registercallbacks(embot::hw::bsp::can::CAN_Handle *hcan)
     
     return true;
 }    
+
+static bool can::s_startdriver(embot::hw::bsp::can::CAN_Handle *hcan)
+{  
+
+#if defined(HAL_CAN_MODULE_ENABLED)    
+        
+    if(HAL_OK != HAL_CAN_Start(hcan))
+        return false; 
+
+#elif defined(HAL_FDCAN_MODULE_ENABLED)   
+
+    if(HAL_OK != HAL_FDCAN_Start(hcan))
+    {
+        return false;
+    }
+    
+#endif 
+    
+    return true;
+}  
 
 static void can::s_tx_start(embot::hw::bsp::can::CAN_Handle *hcan)
 {
