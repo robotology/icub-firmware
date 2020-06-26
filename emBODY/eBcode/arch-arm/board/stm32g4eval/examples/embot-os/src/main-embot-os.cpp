@@ -21,6 +21,7 @@
 #include "embot_app_theLEDmanager.h"
 #include "embot_tools.h"
 
+#define enableTRACE_all
 
 constexpr embot::os::Event evtTick = embot::core::binary::mask::pos2mask<embot::os::Event>(0);
 constexpr embot::os::Event evtBTNreleased = embot::core::binary::mask::pos2mask<embot::os::Event>(1);
@@ -39,6 +40,9 @@ void eventbasedthread_startup(embot::os::Thread *t, void *param)
 {       
     embot::hw::sys::puts("evthread-startup: ..." ); 
     
+    volatile uint32_t c = embot::hw::sys::clock(embot::hw::CLOCK::syscore);
+    c = c;
+    
     embot::os::Timer *tmr = new embot::os::Timer;   
     embot::os::Action act(embot::os::EventToThread(evtTick, t));
     embot::os::Timer::Config cfg{tickperiod, act, embot::os::Timer::Mode::forever, 0};
@@ -48,7 +52,6 @@ void eventbasedthread_startup(embot::os::Thread *t, void *param)
     embot::hw::button::init(buttonBLUE, {embot::hw::button::Mode::TriggeredOnRelease, {btncallback, t}, 0});
     
     embot::hw::sys::puts("evthread-startup: started timer which sends evtTick to evthread every = " + embot::core::TimeFormatter(tickperiod).to_string());
-
     
 }
 

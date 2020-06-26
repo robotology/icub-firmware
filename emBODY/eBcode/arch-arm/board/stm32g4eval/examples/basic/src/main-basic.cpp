@@ -17,6 +17,7 @@ static const stm32hal_config_t systickcfg = { stm32hal_tick1msecinit, stm32hal_t
 // they use STM32 HAL 
 static void led_init();
 static void led_toggle();
+static int itm_puts(const char *str);
 
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -24,12 +25,16 @@ int main(void)
 { 
     stm32hal_init(&systickcfg);
     
+    itm_puts("hello world");
+    
     led_init();
+    itm_puts("led initted");
         
     for(;;)
     {
         HAL_Delay(500);
         led_toggle();
+        itm_puts("led toggled");
     }    
 }
 
@@ -56,6 +61,28 @@ static void stm32hal_tick1msecinit()
 static uint32_t stm32hal_tick1msecget()
 {
     return s_1mstickcount;
+}
+
+int itm_puts(const char* str) 
+{    
+
+    if(nullptr == str)
+    {
+        return(0);
+    }
+
+
+    std::uint32_t ch;
+    int num = 0;
+    while('\0' != (ch = *str))
+    {
+        ITM_SendChar(ch);
+        str++;
+        num++;
+    }
+     
+    ITM_SendChar('\n');
+    return(++num);    
 }
 
 // the led section. we use PB0
