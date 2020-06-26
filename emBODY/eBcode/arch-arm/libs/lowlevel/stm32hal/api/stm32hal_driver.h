@@ -134,7 +134,7 @@ extern "C" {
 #elif defined(STM32HAL_STM32H7)
     // nothing so far for can on h7
 #elif defined(STM32HAL_STM32G4)
-    // nothing so far for can on g4
+    // for definition of USE_HAL_FDCAN_REGISTER_CALLBACKS et al... directly edit file stm32hal_driver_cfg_of_${b}_${v}.h 
 #endif
 
 
@@ -165,7 +165,11 @@ extern "C" {
 
 #elif defined(STM32HAL_STM32G4)
 
-    #if     defined(STM32HAL_DRIVER_V111)    
+    #if     defined(STM32HAL_DRIVER_V111)
+        // pay attention: the definition of various USE_HAL_FDCAN_REGISTER_CALLBACKS etc are inside here
+        // which includes stm32hal_driver_cfg.h and in chain stm32hal_driver_cfg_of_stm32g4eval_v111.h and 
+        // again stm32g4xx_hal_conf.h (see its section Register Callbacks selection)        
+        // st has again changed config strategy because for L4 there is not such a thing.         
         #include "../src/driver/stm32g4-v111/inc/stm32g4xx_hal.h"       
     #else
         #error STM32HAL: the STM32HAL_DRIVER_${V} is not managed
