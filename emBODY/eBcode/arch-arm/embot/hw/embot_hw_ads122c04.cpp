@@ -217,6 +217,7 @@ namespace embot { namespace hw { namespace ads122c04 {
     {
         embot::hw::I2C bus { embot::hw::I2C::one};
         embot::hw::i2c::ADR adr {0};
+        embot::core::relTime conversiontime {1040};
         
         enum class REG : uint8_t { zero = 0, one = 1, two = 2, three = 3 };
         
@@ -324,25 +325,57 @@ namespace embot { namespace hw { namespace ads122c04 {
             return res;
         }
         
-        enum class CFG : uint8_t { basic = 0 };
+        enum class CFG : uint8_t { normal = 0, turbo = 1  };
         result_t sendconfig(CFG cfg, embot::core::relTime timeout = 3*embot::core::time1millisec)
         {
-            result_t res = result_t::NOK;
-            volatile uint8_t v1 = 0;
-            // only CFG::basic so far
-            r1.set(REG1::FIELD::dr, DR_1kSPS);
-            r1.set(REG1::FIELD::cm, CM_SINGLESHOT);
-            v1 = r1.get(REG1::FIELD::dr);
-            res = writeregister(chipADS122C04::REG::one, timeout);
-            
-            return res;
+            switch(cfg)
+            {
+                default:
+                case CFG::normal:
+                {
+                    r1.set(REG1::FIELD::cm, CM_SINGLESHOT);
+                    // normal mode @ 1000 sps
+                    r1.set(REG1::FIELD::mode, 0); 
+                    r1.set(REG1::FIELD::dr, DR_1kSPS);                
+                    conversiontime = 1040; // see datasheet page 28 (8.3.6 Conversion Times)                   
+                } break;
+
+                case CFG::turbo:
+                {
+                    r1.set(REG1::FIELD::cm, CM_SINGLESHOT);
+                    // turbo mode @ 2000 sps
+                    r1.set(REG1::FIELD::mode, 1); 
+                    r1.set(REG1::FIELD::dr, DR_1kSPS);
+                    conversiontime = 520;  // see datasheet page 28 (8.3.6 Conversion Times)                   
+                } break;
+            }
+
+//            volatile uint8_t v1 = 0;
+//            v1 = r1.get(REG1::FIELD::cm);
+//            v1 = r1.get(REG1::FIELD::mode);
+//            v1 = r1.get(REG1::FIELD::dr);
+            return writeregister(chipADS122C04::REG::one, timeout);
         }
         
+        // blocking mode
+        result_t startconversion()
+        {
+            return sendcommand(chipADS122C04::CMD::start); 
+        }
+        
+        // after startconversion() we must wait for some time that the conversion is effectively done
+        embot::core::relTime getConversionTime() const
+        {
+            return conversiontime;
+        }   
+        
         // non blocking mode: at end it puts results inside data and execute the callback
-        result_t startacquisition(embot::core::Data &destination, const embot::core::Callback &oncompletion)
+        result_t retrievevalue(embot::core::Data &destination, const embot::core::Callback &oncompletion)
         {
             return embot::hw::i2c::read(bus, adr, chipADS122C04::RDATA, destination, oncompletion);
         }
+        
+
 
     }; 
 
@@ -393,8 +426,8 @@ namespace embot { namespace hw { namespace ads122c04 {
         // 1. reset
         _ads_chip.sendcommand(chipADS122C04::CMD::reset);
         
-        // 2. basic configuration       
-        res = _ads_chip.sendconfig(chipADS122C04::CFG::basic, 3*embot::core::time1millisec);
+        // 2. send configuration      
+        res = _ads_chip.sendconfig(chipADS122C04::CFG::turbo, 3*embot::core::time1millisec);
        
 //        // 3. sanity check: reading back the config registers.
 //        memset(_ads_chip.memory, 0, sizeof(_ads_chip.memory));
@@ -454,10 +487,13 @@ namespace embot { namespace hw { namespace ads122c04 {
 
         // the following two operations are in blocking mode ... ahi! and take about 200 usec in total.
         // think of a non blocking mode.
-        #warning ADS122: think of a non-blocking acquisition start mode
+        //#warning ADS122: think of a non-blocking acquisition start mode
         res = _ads_chip.setchannel(channel, 3*embot::core::time1millisec); 
-        res = _ads_chip.sendcommand(chipADS122C04::CMD::start); 
-        
+        //embot::hw::sys::delay(50);
+        // start the conversion        
+        res = _ads_chip.startconversion(); 
+        // we must wait for the conversion to be done
+        embot::hw::sys::delay(_ads_chip.getConversionTime()); 
                 
         s_privatedata.acquisition[index].clear();
         s_privatedata.acquisition[index].ongoing = true;
@@ -469,11 +505,10 @@ namespace embot { namespace hw { namespace ads122c04 {
         embot::core::Callback cbk(sharedCBK, &s_privatedata.acquisition[index]);
         cbk.execute();
 #else         
-        // ok, now i trigger acquisition.
+        // ok, now i trigger the reading of the value.
         embot::core::Callback cbk(sharedCBK, &s_privatedata.acquisition[index]);
         embot::core::Data data = embot::core::Data(&s_privatedata.acquisition[index].rxdata[0], sizeof(s_privatedata.acquisition[index].rxdata));
-        //embot::hw::i2c::read(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], chipADS122C04::RDATA, data, cbk);
-        _ads_chip.startacquisition(data, cbk);
+        _ads_chip.retrievevalue(data, cbk);
 #endif                
         return resOK;
     }
