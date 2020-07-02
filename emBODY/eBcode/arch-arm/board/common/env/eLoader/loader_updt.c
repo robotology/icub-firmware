@@ -28,7 +28,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 #include "hal.h"
-#include "hal_switch.h"
+//#include "hal_switch.h"
 #include "hal_eeprom.h"
 #include "hal_led.h"
 
