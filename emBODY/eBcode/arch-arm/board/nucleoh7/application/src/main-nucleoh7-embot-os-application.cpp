@@ -80,7 +80,7 @@ constexpr embot::core::relTime txperiod = 200*embot::core::time1millisec;
 constexpr embot::hw::BTN buttonBLUE = embot::hw::BTN::one;
 constexpr embot::hw::BTN buttonPB8 = embot::hw::BTN::two;
     
-constexpr embot::hw::BTN buttonTX = buttonBLUE; // but later on: buttonPB8
+constexpr embot::hw::BTN buttonTX = buttonPB8; // but later on: buttonPB8 ore buttonBLUE
 
 embot::tools::Histogram *histoIMU {nullptr};
 //embot::tools::Histogram *histoUSART {nullptr};
@@ -420,7 +420,7 @@ bool s_print_values(const std::tuple<int16_t, int16_t, int16_t> &acc, const std:
 #endif
     
 #elif defined(enableSERIAL) && defined(enableSERIAL_binary)   
-    
+
     //snprintf(text, sizeof(text), "%d\n", static_cast<uint8_t>(std::get<0>(acc)));   
     // writing into text[] in big endian order all values with the same integer 32 bit type.
     // i use int32_t. 
@@ -460,7 +460,7 @@ bool s_print_values(const std::tuple<int16_t, int16_t, int16_t> &acc, const std:
     text[pos++] =  (tmp & 0x00ff0000) >> 16;
     text[pos++] =  (tmp & 0x0000ff00) >> 8;
     text[pos++] =  (tmp & 0x000000ff); 
-    
+
     // at the end we add a new line.
     // the new line in binary value is 0x0A ... do we really need to transmit it? 
     // if the receiver expects just a fixed number of bytes then the terminator character '\n' is useless
