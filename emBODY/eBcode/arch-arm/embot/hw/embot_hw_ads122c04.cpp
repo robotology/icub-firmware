@@ -350,12 +350,44 @@ namespace embot { namespace hw { namespace ads122c04 {
                 } break;
             }
 
-//            volatile uint8_t v1 = 0;
-//            v1 = r1.get(REG1::FIELD::cm);
-//            v1 = r1.get(REG1::FIELD::mode);
-//            v1 = r1.get(REG1::FIELD::dr);
             return writeregister(chipADS122C04::REG::one, timeout);
         }
+
+/*
+8.4.3.2 Turbo Mode
+Applications that require higher data rates up to 2 kSPS can operate the device in turbo mode. In this mode, the
+internal modulator runs at a higher frequency of fMOD = fCLK / 4 = 512 kHz. Compared to normal mode, the device
+power consumption increases because the modulator runs at a higher frequency. Running the ADS122C04 in
+turbo mode at a comparable output data rate as in normal mode yields better noise performance. For example,
+the input-referred noise at 90 SPS in turbo mode is lower than the input-referred noise at 90 SPS in normal
+mode.                
+*/
+        enum class SPS : uint8_t { twothousand = 6, onethousandtwohundred = 5, sixhundredsixty = 4, threehundredfifty = 3 };
+        enum class GAIN : uint8_t { one = 0, two = 1, four = 2, eigth = 3, sixteen = 4, thirtytwo = 5, sixtyfour = 6, onehundredtwentyeigth = 7 };
+        result_t configure(SPS sps, GAIN gain, embot::core::relTime timeout = 3*embot::core::time1millisec)
+        {
+            static constexpr embot::core::relTime LUTconversiontimesturbo[] = 
+            {   // as indexed by valure of register DR. see see datasheet page 28 (8.3.6 Conversion Times) and page 41 (8.6.2 Register Descriptions)
+                25010, 11140, 5650, 2900, 1540, 860, 520 
+            };
+            
+            // single shot, always turbo mode
+            r1.set(REG1::FIELD::cm, CM_SINGLESHOT);
+            r1.set(REG1::FIELD::mode, 1);
+            
+            // the values of GAIN and SPS are already the values of the related registers ...
+            r0.set(REG0::FIELD::gain, embot::core::tointegral(gain));
+            r1.set(REG1::FIELD::dr, embot::core::tointegral(sps));
+            conversiontime = LUTconversiontimesturbo[embot::core::tointegral(sps)];
+            
+            // now i write the registers
+            result_t r = writeregister(chipADS122C04::REG::zero, timeout);
+            if(result_t::OK != r)
+            {
+                return r;
+            }
+            return writeregister(chipADS122C04::REG::one, timeout);
+        }  
         
         // blocking mode
         result_t startconversion()
@@ -426,8 +458,8 @@ namespace embot { namespace hw { namespace ads122c04 {
         // 1. reset
         _ads_chip.sendcommand(chipADS122C04::CMD::reset);
         
-        // 2. send configuration      
-        res = _ads_chip.sendconfig(chipADS122C04::CFG::turbo, 3*embot::core::time1millisec);
+        // 2. configure registers                 
+        res = _ads_chip.configure(chipADS122C04::SPS::twothousand, chipADS122C04::GAIN::one, 3*embot::core::time1millisec);
        
 //        // 3. sanity check: reading back the config registers.
 //        memset(_ads_chip.memory, 0, sizeof(_ads_chip.memory));
