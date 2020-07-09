@@ -39,11 +39,17 @@ void btncallback(void *p)
 }
 
 void eventbasedthread_startup(embot::os::Thread *t, void *param)
-{       
-    embot::hw::sys::puts("evthread-startup: ..." ); 
-    
+{          
     volatile uint32_t c = embot::hw::sys::clock(embot::hw::CLOCK::syscore);
     c = c;
+    
+
+    embot::hw::sys::puts("mainthread-startup: initted driver for tlv493d");  
+    // init the tlv493d
+    embot::hw::tlv493d::init(embot::hw::TLV493D::one, {embot::hw::bsp::tlv493d::getBSP().getPROP(embot::hw::TLV493D::one)->i2cbus, 400000});
+            
+    
+    embot::hw::sys::puts("mainthread-startup: started timer which sends evtTick to evthread every = " + embot::core::TimeFormatter(tickperiod).to_string());
     
     embot::os::Timer *tmr = new embot::os::Timer;   
     embot::os::Action act(embot::os::EventToThread(evtTick, t));
@@ -53,10 +59,6 @@ void eventbasedthread_startup(embot::os::Thread *t, void *param)
     // init the ext interrupt button
     embot::hw::button::init(buttonBLUE, {embot::hw::button::Mode::TriggeredOnRelease, {btncallback, t}, 0});
     
-    embot::hw::sys::puts("evthread-startup: started timer which sends evtTick to evthread every = " + embot::core::TimeFormatter(tickperiod).to_string());
-    
-    // init the tlv493d
-    embot::hw::tlv493d::init(embot::hw::TLV493D::one, {embot::hw::bsp::tlv493d::getBSP().getPROP(embot::hw::TLV493D::one)->i2cbus, 400000});
     
 }
 
@@ -79,9 +81,10 @@ void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventma
     {
 #if defined(enableTRACE_all)        
         embot::core::TimeFormatter tf(embot::core::now());        
-        embot::hw::sys::puts("evthread-onevent: evtTick received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
+        embot::hw::sys::puts("mainthread-onevent: evtTick received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
 #endif  
 
+        embot::hw::sys::puts("mainthread-onevent: called a fake reading of chip TLV493D which will be effectvively read when board fap arrives");    
         embot::core::Callback cbk00(alertdataisready00, t);
         embot::hw::tlv493d::acquisition(embot::hw::TLV493D::one, cbk00);        
     }
@@ -121,14 +124,20 @@ embot::os::EventThread* thr {nullptr};
 
 void initSystem(embot::os::Thread *t, void* initparam)
 {
+    embot::hw::sys::puts("this is a demo which shows that this code can run on a dev board and later on the real pmc board");    
+    
+    embot::hw::sys::puts("starting the INIT thread");
+    
+    embot::hw::sys::puts("creating the system services: timer manager + callback manager");
     
     embot::os::theTimerManager::getInstance().start({});     
     embot::os::theCallbackManager::getInstance().start({});  
     
+    embot::hw::sys::puts("creating the LED pulser: it will blink a LED at 1 Hz.");
     static const std::initializer_list<embot::hw::LED> allleds = {embot::hw::LED::one};  
     embot::app::theLEDmanager &theleds = embot::app::theLEDmanager::getInstance();     
     theleds.init(allleds);    
-    theleds.get(embot::hw::LED::one).pulse(2*embot::core::time1second); 
+    theleds.get(embot::hw::LED::one).pulse(1*embot::core::time1second); 
        
     
     embot::os::EventThread::Config configEV { 
@@ -139,11 +148,15 @@ void initSystem(embot::os::Thread *t, void* initparam)
         50*embot::core::time1millisec,
         eventbasedthread_onevent
     };
+    
+    embot::hw::sys::puts("creating the main thread");
         
     // create the main thread 
     thr = new embot::os::EventThread;          
     // and start it
-    thr->start(configEV);   
+    thr->start(configEV); 
+
+    embot::hw::sys::puts("quitting the INIT thread. Normal scheduling starts");    
 }
 
 // usart 921600
