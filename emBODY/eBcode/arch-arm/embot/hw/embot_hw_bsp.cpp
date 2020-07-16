@@ -1635,7 +1635,7 @@ namespace embot { namespace hw { namespace bsp { namespace i2c {
         mask::pos2mask<uint32_t>(I2C::three),         
         // properties
         {{       
-            &i2c3p, nullptr, nullptr
+            nullptr, nullptr, &i2c3p
         }}        
     }; 
 
