@@ -1624,7 +1624,28 @@ namespace embot { namespace hw { namespace bsp { namespace i2c {
             MX_I2C1_Init();
         }        
     }
+
+    #elif   defined(STM32HAL_BOARD_STM32G4EVAL)
     
+    constexpr PROP i2c3p { .handle = &hi2c3 };
+
+        
+    constexpr BSP thebsp {        
+        // maskofsupported   
+        mask::pos2mask<uint32_t>(I2C::three),         
+        // properties
+        {{       
+            &i2c3p, nullptr, nullptr
+        }}        
+    }; 
+
+    void BSP::init(embot::hw::I2C h) const
+    {
+        if(h == I2C::three)
+        {            
+            MX_I2C3_Init();
+        }        
+    }
     #else
         #error embot::hw::bsp::i2c::thebsp must be defined    
     #endif
@@ -2059,6 +2080,29 @@ void DMA1_Stream1_IRQHandler(void)
     HAL_DMA_IRQHandler(&hdma_i2c1_tx);
 }
 
+#elif defined(STM32HAL_BOARD_STM32G4EVAL)
+
+
+void I2C3_EV_IRQHandler(void)
+{
+    HAL_I2C_EV_IRQHandler(&hi2c3);
+}
+
+void I2C3_ER_IRQHandler(void)
+{
+    HAL_I2C_ER_IRQHandler(&hi2c3);
+}
+
+void DMA1_Channel1_IRQHandler(void)
+{
+  HAL_DMA_IRQHandler(&hdma_i2c3_rx);
+}
+
+void DMA1_Channel2_IRQHandler(void)
+{
+  HAL_DMA_IRQHandler(&hdma_i2c3_tx);
+}
+
 #endif // irq handlers
 
 #endif // i2c
@@ -2203,7 +2247,22 @@ namespace embot { namespace hw { namespace bsp { namespace tlv493d {
     
     #elif defined(STM32HAL_BOARD_NUCLEOH7)
     
-    constexpr PROP prop01 { .i2cbus = embot::hw::I2C::one, .i2caddress = 0x3E }; 
+    constexpr PROP prop01 { .i2cbus = embot::hw::I2C::one, .i2caddress = 0xBC }; 
+
+    constexpr BSP thebsp {        
+        // maskofsupported
+        mask::pos2mask<uint32_t>(TLV493D::one),        
+        // properties
+        {{
+            &prop01
+        }}        
+    };
+    
+    void BSP::init(embot::hw::TLV493D h) const {}
+
+    #elif defined(STM32HAL_BOARD_STM32G4EVAL)
+    
+    constexpr PROP prop01 { .i2cbus = embot::hw::I2C::three, .i2caddress = 0xBC }; 
 
     constexpr BSP thebsp {        
         // maskofsupported
