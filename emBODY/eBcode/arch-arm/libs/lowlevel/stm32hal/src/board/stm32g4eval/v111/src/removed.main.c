@@ -23,6 +23,7 @@
 #include "adc.h"
 #include "comp.h"
 #include "dac.h"
+#include "dma.h"
 #include "fdcan.h"
 #include "fmac.h"
 #include "hrtim.h"
@@ -99,6 +100,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_ADC1_Init();
   MX_ADC2_Init();
   MX_COMP6_Init();
@@ -108,7 +110,7 @@ int main(void)
   MX_FMAC_Init();
   MX_FMC_Init();
   MX_HRTIM1_Init();
-  MX_I2C3_SMBUS_Init();
+  MX_I2C3_Init();
   MX_RNG_Init();
   MX_SPI2_Init();
   MX_TIM8_Init();

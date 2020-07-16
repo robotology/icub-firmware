@@ -262,6 +262,7 @@ extern void stm32hal_board_init(void);
         #include "../src/board/stm32g4eval/v111/inc/adc.h"
         #include "../src/board/stm32g4eval/v111/inc/comp.h"
         #include "../src/board/stm32g4eval/v111/inc/dac.h"
+        #include "../src/board/stm32g4eval/v111/inc/dma.h"
         #include "../src/board/stm32g4eval/v111/inc/fdcan.h"
         #include "../src/board/stm32g4eval/v111/inc/fmac.h"
         #include "../src/board/stm32g4eval/v111/inc/fmc.h"

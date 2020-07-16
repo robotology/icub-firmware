@@ -30,13 +30,13 @@
 
 /* USER CODE END Includes */
 
-extern SMBUS_HandleTypeDef hsmbus3;
+extern I2C_HandleTypeDef hi2c3;
 
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */
 
-void MX_I2C3_SMBUS_Init(void);
+void MX_I2C3_Init(void);
 
 /* USER CODE BEGIN Prototypes */
 

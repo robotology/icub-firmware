@@ -954,6 +954,11 @@
                 </FileArmAds>
               </FileOption>
             </File>
+            <File>
+              <FileName>dma.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\stm32g4eval\v111\src\dma.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -2218,6 +2223,11 @@
               <FileName>usb.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\board\stm32g4eval\v111\src\usb.c</FilePath>
+            </File>
+            <File>
+              <FileName>dma.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\board\stm32g4eval\v111\src\dma.c</FilePath>
             </File>
           </Files>
         </Group>
