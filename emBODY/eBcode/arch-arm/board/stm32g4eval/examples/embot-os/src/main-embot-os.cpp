@@ -81,10 +81,11 @@ void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventma
     {
 #if defined(enableTRACE_all)        
         embot::core::TimeFormatter tf(embot::core::now());        
-        embot::hw::sys::puts("mainthread-onevent: evtTick received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
+//        embot::hw::sys::puts("mainthread-onevent: evtTick received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
 #endif  
 
-        embot::hw::sys::puts("mainthread-onevent: called a fake reading of chip TLV493D which will be effectvively read when board fap arrives");    
+        //embot::hw::sys::puts("mainthread-onevent: called a fake reading of chip TLV493D which will be effectvively read when board fap arrives");    
+//        embot::hw::sys::puts("mainthread-onevent: reading chip TLV493D");    
         embot::core::Callback cbk00(alertdataisready00, t);
         embot::hw::tlv493d::acquisition(embot::hw::TLV493D::one, cbk00);        
     }
@@ -93,7 +94,7 @@ void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventma
     {
 #if defined(enableTRACE_all)        
         embot::core::TimeFormatter tf(embot::core::now());        
-        embot::hw::sys::puts("evthread-onevent: evtRead received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
+ //       embot::hw::sys::puts("evthread-onevent: evtRead received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
 #endif  
 
         if(embot::hw::resOK != embot::hw::tlv493d::read(embot::hw::TLV493D::one, position))
@@ -101,7 +102,7 @@ void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventma
             position = 66666;
         }
         
-        embot::hw::sys::puts("pos = " + std::to_string(0.01 * position) + "deg");
+        embot::hw::sys::puts("@ " + tf.to_string() + " -> chip TLV493D pos = "  + std::to_string(0.01 * position) + "deg");
         
     }    
     

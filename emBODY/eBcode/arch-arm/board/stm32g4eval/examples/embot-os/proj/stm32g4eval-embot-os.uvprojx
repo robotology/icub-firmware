@@ -7,7 +7,7 @@
 
   <Targets>
     <Target>
-      <TargetName>stm32g4eval [same mpu as pmc]</TargetName>
+      <TargetName>nucleoh7</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <pCCUsed>6140000::V6.14::ARMCLANG</pCCUsed>
@@ -16,7 +16,7 @@
         <TargetCommonOption>
           <Device>STM32H743ZITx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32H7xx_DFP.2.5.0</PackID>
+          <PackID>Keil.STM32H7xx_DFP.2.5.1</PackID>
           <PackURL>https://www.keil.com/pack/</PackURL>
           <Cpu>IRAM(0x20000000,0x00020000) IRAM2(0x24000000,0x00080000) IROM(0x08000000,0x00100000) IROM2(0x08100000,0x00100000) XRAM(0x30000000,0x00048000) XRAM2(0x38000000,0x00010000) CPUTYPE("Cortex-M7") FPU3(DFPU) CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -313,7 +313,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>6</Optim>
+            <Optim>1</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -687,7 +687,7 @@
       </Groups>
     </Target>
     <Target>
-      <TargetName>stm32g4eval-00</TargetName>
+      <TargetName>stm32g4eval</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <pCCUsed>6140000::V6.14::ARMCLANG</pCCUsed>
@@ -1374,8 +1374,8 @@
       <component Cclass="CMSIS" Cgroup="CORE" Cvendor="ARM" Cversion="5.4.0" condition="ARMv6_7_8-M Device">
         <package name="CMSIS" schemaVersion="1.3" url="http://www.keil.com/pack/" vendor="ARM" version="5.7.0"/>
         <targetInfos>
-          <targetInfo excluded="1" name="stm32g4eval [same mpu as pmc]" versionMatchMode=""/>
-          <targetInfo excluded="1" name="stm32g4eval-00" versionMatchMode=""/>
+          <targetInfo excluded="1" name="nucleoh7" versionMatchMode=""/>
+          <targetInfo excluded="1" name="stm32g4eval" versionMatchMode=""/>
         </targetInfos>
       </component>
     </components>
