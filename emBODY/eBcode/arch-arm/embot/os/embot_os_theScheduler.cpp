@@ -29,7 +29,10 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "osal.h"
+#include "embot_os_Thread.h"
+
+#include "embot_os_rtos.h"
+#include "embot_hw_sys.h"
 
 #include <cstring>
 
@@ -38,36 +41,19 @@
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
 // --------------------------------------------------------------------------------------------------------------------
 
+constexpr bool releaseINITatend {false};
+
+
 struct embot::os::theScheduler::Impl
 { 
-
-    Config config {};    
-    osal_cfg_t osalConfig; 
+    Config config {};     
     bool started {false};
     int latesterrorcode {0};
     const char * latesterrorstring {nullptr};
-
-    void set_osal_default_config(osal_cfg_t &cfg)
-    {
-        std::memset(&cfg, 0, sizeof(osal_cfg_t));
-        
-        cfg.rtostype = osal_rtostype_oosiit;
-        cfg.memorymodel = osal_memmode_dynamic;
-        cfg.prio = 15;
-        cfg.cpufam = osal_cpufam_armcm4;  
-        cfg.cpufreq = 168000000;
-        cfg.tick = 1000;
-        cfg.launcherstacksize = 2048;
-        cfg.idlestacksize = 512;
-        cfg.roundrobin = osal_false;
-        cfg.roundrobintick = 0;
-        cfg.tasknum = 0;
-        // etc.
-        cfg.extfn.usr_on_fatal_error = osalOnError;
-        cfg.extfn.usr_on_idle = osalIdleThread;
-    }
-            
-    static void osalIdleThread(void)
+    
+    embot::os::rtos::scheduler_props_t props {};
+    
+    static void osIdleThread(void)
     {
         embot::os::theScheduler &thesystem = embot::os::theScheduler::getInstance(); 
         IdleThread &theidlethread = embot::os::IdleThread::getInstance();
@@ -84,18 +70,28 @@ struct embot::os::theScheduler::Impl
             startup(&theidlethread, param);
         }
         
+        bool initISreleased {false};
+        
         // start the forever loop
         for(;;)
         {
+            if(true == releaseINITatend)
+            {
+                if(false == initISreleased)
+                {
+                    initISreleased = thesystem.pImpl->releaseInitResources();
+                }
+            }
+            
             if(nullptr != onidle)
             {
                 onidle(&theidlethread, param);
             }
         }        
     }
-        
+            
     
-    static void osalOnError(void* task, osal_fatalerror_t errorcode, const char * errormsg)
+    static void osOnError(void* task, int errorcode, const char * errormsg)
     {
         embot::os::theScheduler &thesystem = embot::os::theScheduler::getInstance();   
         thesystem.pImpl->latesterrorcode = static_cast<int>(errorcode);
@@ -103,19 +99,21 @@ struct embot::os::theScheduler::Impl
         thesystem.pImpl->config.behaviour.onOSerror.execute();            
         // we dont stop in here
         // for(;;);  
-    }
+    }    
 
                      
-    static void osalLauncher(void) 
+    static void launcher(void) 
     {
-        embot::os::InitThread &inittask = embot::os::InitThread::getInstance();
-        inittask.synch();
+        embot::os::InitThread &initthread = embot::os::InitThread::getInstance();
+        initthread.synch();
         
         embot::os::theScheduler &thesystem = embot::os::theScheduler::getInstance();                
         if(nullptr != thesystem.pImpl->config.behaviour.initconfig.startup)
         {
-            thesystem.pImpl->config.behaviour.initconfig.startup(&inittask, thesystem.pImpl->config.behaviour.initconfig.param);
-        }        
+            thesystem.pImpl->config.behaviour.initconfig.startup(&initthread, thesystem.pImpl->config.behaviour.initconfig.param);
+        } 
+
+        initthread.terminate();
     }
     
 
@@ -130,41 +128,40 @@ struct embot::os::theScheduler::Impl
         
         config = cfg;
         
-        osalConfig.cpufreq = config.timing.clockfrequency;
-        osalConfig.tick = config.timing.ticktime;            
-        osalConfig.launcherstacksize = config.behaviour.initconfig.stacksize;        
-        osalConfig.idlestacksize = config.behaviour.idleconfig.stacksize;
-                        
-        // start part        
-        osalInit();
-            
-        // 1. init rtos in standard way:
-    
+        props.prepare(embot::hw::sys::clock(embot::hw::CLOCK::syscore), config.timing.ticktime, 
+                      config.behaviour.initconfig.stacksize, config.behaviour.idleconfig.stacksize, 
+                      osIdleThread, launcher, osOnError);
+                
+        embot::os::rtos::scheduler_init(props);
+              
         started = true;
-        osal_system_start(osalLauncher);  
+
+        //embot::os::rtos::scheduler_start();
+        
+        embot::os::rtos::scheduler_start2();
         
         for(;;);
     }
     
-    void osalInit(void)
-    {
-        std::uint32_t ram08size = 0;
-        uint64_t *ram08data = NULL;
-        
-        osal_base_memory_getsize(&osalConfig, &ram08size);
-        
-        if(0 != ram08size)
-        {
-            ram08data = (uint64_t*)(uint64_t*)osal_base_memory_new(ram08size);
-        }
-        osal_base_initialise(&osalConfig, ram08data);                 
-    }
-    
     Impl() 
     {        
-        set_osal_default_config(osalConfig);  
         started = false;  
     }
+    
+    embot::os::Thread* runningtask()
+    {           
+        return embot::os::rtos::scheduler_getassociated(embot::os::rtos::scheduler_thread_running());
+    }  
+
+    bool releaseInitResources()
+    { 
+        embot::os::InitThread &initthread = embot::os::InitThread::getInstance();   
+        if(false == initthread.isterminated())
+        {
+            return false;
+        }
+        return props.release();
+    }        
 };
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -207,21 +204,14 @@ embot::core::relTime  embot::os::theScheduler::ticktime() const
     return pImpl->config.timing.ticktime;
 }
 
-embot::os::Thread * embot::os::theScheduler::scheduledtask() const
+embot::os::Thread * embot::os::theScheduler::scheduled() const
 {
     if(false == pImpl->started)
     {
         return nullptr;
     }
     
-    osal_task_t *p = osal_task_get(osal_callerAUTOdetect);
-
-    if(nullptr == p)
-    {
-        return(nullptr);
-    }
-
-    return reinterpret_cast<Thread*>(osal_task_extdata_get(p));         
+    return pImpl->runningtask();      
 }
 
 const char * embot::os::theScheduler::getOSerror(int &errorcode) const
@@ -230,11 +220,6 @@ const char * embot::os::theScheduler::getOSerror(int &errorcode) const
     return pImpl->latesterrorstring; 
 }
 
-
-//embot::core::relTime embot::os::theScheduler::getTick()
-//{
-//    return pImpl->osalConfig.tick;
-//}
 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------

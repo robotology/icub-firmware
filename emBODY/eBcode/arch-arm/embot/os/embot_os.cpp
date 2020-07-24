@@ -28,7 +28,8 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "osal.h"
+#include "embot_os_rtos.h"
+
 #include "stdlib.h"
 #include "embot_hw.h"
 #include "embot_hw_sys.h"
@@ -48,13 +49,29 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace embot { namespace os {
-    
+
+    static core::Time _fakenow()
+    {
+        // if kernel is not running wait approximately 1 us then increment 
+        // and return auxiliary tick counter value
+        static volatile core::Time tt = 0;
+        //for(int i = (SystemCoreClock >> 14U); i > 0U; i--) { // that is 1 ms
+        for(int i = (SystemCoreClock >> 4U); i > 0U; i--) {
+            __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP();
+            __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP();
+        }        
+        return ++tt;        
+    }
+   
     static core::Time _now()
     { 
-        static volatile core::Time tt = 0; // if osal is not started i offer a very simple (and inaccurate) implementation.
-        return (osal_info_status_running != osal_info_get_status()) ? (tt++) : osal_system_abstime_get();
+        if(true == started()) 
+        {
+            return embot::os::rtos::scheduler_timeget(); 
+        }        
+        return _fakenow();
     }
-    
+  
     static bool _initted = false;
     static Config _config {};
     
@@ -75,8 +92,8 @@ namespace embot { namespace os {
     }
     
     bool started()
-    {        
-        return osal_info_status_running == osal_info_get_status();        
+    { 
+        return embot::os::rtos::scheduler_isrunning(); 
     }
     
     
@@ -87,7 +104,7 @@ namespace embot { namespace os {
             for(;;);
         }
         
-        embot::os::theScheduler::Config cfg { embot::os::theScheduler::Timing(embot::hw::sys::clock(embot::hw::CLOCK::syscore),  _config.tick), {_config.initconfig, _config.idleconfig, _config.onOSerror} };    
+        embot::os::theScheduler::Config cfg { embot::os::theScheduler::Timing(_config.tick), {_config.initconfig, _config.idleconfig, _config.onOSerror} };    
         embot::os::theScheduler &thescheduler = embot::os::theScheduler::getInstance();
         thescheduler.start(cfg);    
         
@@ -98,67 +115,7 @@ namespace embot { namespace os {
 }} // namespace embot { namespace os {
 
 
-// --------------------------------------------------------------------------------------------------------------------
-// - c code required by osal
-// --------------------------------------------------------------------------------------------------------------------
 
-extern "C" void* osal_ext_calloc(uint32_t s, uint32_t n)
-{
-    void* ret = calloc(s, n);
-    return(ret);
-}
-
-extern "C" void* osal_ext_realloc(void* m, uint32_t s)
-{
-    void* ret = realloc(m, s);
-    return(ret);
-}
-
-extern "C" void osal_ext_free(void* m)
-{
-    free(m);
-}
-
-
-// --------------------------------------------------------------------------------------------------------------------
-// - override of new / delete etc w/ osal funtions
-// --------------------------------------------------------------------------------------------------------------------
-
-// here is what was ok in compiler v5 and c++98. but tht also worked for c++14 and complier armclang
-//void *operator new(std::size_t size) throw(std::bad_alloc)
-//{
-//    void* ptr = osal_base_memory_new(size);
-//    return ptr;
-//}
-//void* operator new(std::size_t size, const std::nothrow_t& nothrow_value) throw()
-//{
-//    void* ptr = osal_base_memory_new(size);
-//    return ptr;    
-//}
-//void operator delete(void* mem) throw ()
-//{
-//    osal_base_memory_del(mem);
-//}
-
-// and here is what i need with armclang and -std=c++17
-void* operator new(std::size_t size) noexcept(false)
-{
-    void* ptr = osal_base_memory_new(size);
-    return ptr;
-}
-
-void* operator new (std::size_t size, const std::nothrow_t& nothrow_value) noexcept
-{
-    void* ptr = osal_base_memory_new(size);
-    return ptr;    
-}
-
-void operator delete (void* ptr) noexcept
-{
-    osal_base_memory_del(ptr);
-}
-
-    
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
 

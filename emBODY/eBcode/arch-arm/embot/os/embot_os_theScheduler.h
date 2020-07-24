@@ -22,8 +22,9 @@
 #define _EMBOT_OS_THESCHEDULER_H_
 
 #include "embot_core.h"
-#include "embot_os.h"
+#include "embot_os_common.h"
 #include "embot_os_Thread.h"
+
 #include <memory>
 
 namespace embot { namespace os {
@@ -46,13 +47,11 @@ namespace embot { namespace os {
                             
         struct Timing
         {
-            std::uint32_t clockfrequency {10000000};                        // it must be equal to the cpu speed expressed in hz: use embot::hw::sys::clock(embot::hw::sys::CLOCK::syscore)
             embot::core::relTime ticktime {embot::core::time1millisec}; // the resolution of the scheduler
             
-            Timing() = default;
-            Timing(std::uint32_t c, core::relTime t = embot::core::time1millisec) : clockfrequency(c), ticktime(t) {}
-            void clear() { clockfrequency = 10000000; ticktime = embot::core::time1millisec; }
-            bool isvalid() const { if((0 == clockfrequency) || (0 == ticktime)) { return false; } else { return true; } }
+            Timing(core::relTime t = embot::core::time1millisec) : ticktime(t) {}
+            void clear() { ticktime = embot::core::time1millisec; }
+            bool isvalid() const { if((0 == ticktime)) { return false; } else { return true; } }
         };
         
         struct Behaviour
@@ -83,7 +82,7 @@ namespace embot { namespace os {
         
         embot::core::relTime ticktime() const;
         
-        Thread * scheduledtask() const;    
+        Thread * scheduled() const;    
 
         const char * getOSerror(int &errorcode) const;
         

@@ -22,31 +22,9 @@
 #define _EMBOT_OS_THREAD_H_
 
 #include "embot_core.h"
+#include "embot_os_common.h"
 #include <memory>
 
-namespace embot { namespace os {
-        
-    using Event         = std::uint32_t;
-    using EventMask     = std::uint32_t;
-    using Message       = void *;
-  
-    enum class Priority : std::uint8_t {
-        schedIdle = 0, schedInit = 255,                         // reserved to the scheduler
-        minimum = 2,  maximum = 251,                            // allowed ranges         
-        low010 = 10, low011 = 11, low012 = 12,               
-        medium100 = 100, medium101 = 101, medium102 = 102, medium103 = 103, medium104 = 104,                
-        high200 = 200, high201 = 201, high203 = 203, high204 = 204,        
-        system220 = 220, system230 = 230, system240 = 240, system250 = 250,
-        systemMIN = system220, systemMAX = system250        
-    };
-        
-    constexpr bool isSystem(Priority prio)
-    {
-        std::uint8_t v = embot::core::tointegral(prio);
-        return ((v >= embot::core::tointegral(Priority::systemMIN)) && (v <= embot::core::tointegral(Priority::systemMAX))) ? true : false;       
-    }        
-    
-}}
 
 namespace embot { namespace os {
             
@@ -71,8 +49,9 @@ namespace embot { namespace os {
             Priority priority {Priority::minimum};  // the priority with which the system executes the task. 
             Thread::fpStartup startup {nullptr};    // this function, if not nullptr, is executed only once at start ot the task. its second argument is param
             void *param {nullptr};                  // the optional param passed to startup() and other functions derived from BaseConfig
+            const char * name {nullptr};
             BaseConfig() = default;
-            constexpr BaseConfig(std::uint16_t st, Priority pr, Thread::fpStartup fpst, void* pa) : stacksize(st), priority(pr), startup(fpst), param(pa) {}
+            constexpr BaseConfig(std::uint16_t st, Priority pr, Thread::fpStartup fpst, void* pa, const char * n = nullptr) : stacksize(st), priority(pr), startup(fpst), param(pa), name(n) {}
             bool isvalid() const 
             {   // startup and param can be nullptr
                 if((0 == stacksize)) { return false; } 
@@ -86,6 +65,8 @@ namespace embot { namespace os {
         virtual Type getType() const = 0;        
         virtual Priority getPriority() const = 0;
         virtual bool setPriority(Priority priority) = 0;
+        virtual const char * getName() const = 0;
+        virtual void run() = 0;
         
         virtual bool setEvent(os::Event event) = 0;
         virtual bool setMessage(os::Message message, core::relTime timeout = core::reltimeWaitForever) = 0;
@@ -115,12 +96,21 @@ namespace embot { namespace os {
         virtual Type getType() const;
         virtual Priority getPriority() const;
         virtual bool setPriority(Priority priority);
+        virtual const char * getName() const;
+        virtual void run();
         
         virtual bool setEvent(os::Event event);  
         virtual bool setMessage(os::Message message, core::relTime timeout = core::reltimeWaitForever);
         virtual bool setCallback(const core::Callback &callback, core::relTime timeout = core::reltimeWaitForever);
         
         void synch(); // only the scheduler can call this method
+        
+        // 
+        void terminate();
+        bool isterminated() const;
+        
+        void releaseresources();
+        bool resourcesarereleased() const;
                 
     private:
         InitThread();    
@@ -153,6 +143,8 @@ namespace embot { namespace os {
         virtual Type getType() const;
         virtual Priority getPriority() const;
         virtual bool setPriority(Priority priority);
+        virtual const char * getName() const;
+        virtual void run();
         
         virtual bool setEvent(os::Event event);  
         virtual bool setMessage(os::Message message, core::relTime timeout = core::reltimeWaitForever);
@@ -181,7 +173,7 @@ namespace embot { namespace os {
             Thread::fpOnEvent onevent {nullptr}; // this function, must not be nullptr, is executed at every event or at expiry of timeout. its second argument is the event mask, its third is param
 
             Config() = default;
-            constexpr Config(std::uint16_t st, Priority pr, Thread::fpStartup fpst, void* pa, core::relTime ti, Thread::fpOnEvent fpon) : BaseConfig(st, pr, fpst, pa), timeout(ti), onevent(fpon) {}            
+            constexpr Config(std::uint16_t st, Priority pr, Thread::fpStartup fpst, void* pa, core::relTime ti, Thread::fpOnEvent fpon, const char * name = nullptr) : BaseConfig(st, pr, fpst, pa, name), timeout(ti), onevent(fpon) {}            
             bool isvalid() const
             {   // onevent cannot be nullptr
                 if((nullptr == onevent)) { return false; }  
@@ -195,13 +187,14 @@ namespace embot { namespace os {
         virtual Type getType() const;
         virtual Priority getPriority() const;
         virtual bool setPriority(Priority priority);
+        virtual const char * getName() const;
         
         virtual bool setEvent(os::Event event);  
         virtual bool setMessage(os::Message message, core::relTime timeout = core::reltimeWaitForever);
         virtual bool setCallback(const core::Callback &callback, core::relTime timeout = core::reltimeWaitForever);
-        
-        
-        bool start(const Config &cfg);    
+                 
+        bool start(const Config &cfg, embot::core::fpCaller eviewername = nullptr);
+        virtual void run();    
 
     private:        
         struct Impl;
@@ -221,7 +214,7 @@ namespace embot { namespace os {
             Thread::fpOnMessage onmessage {nullptr}; // this function, must not be nullptr, is executed at every received message or at expiry of timeout. its second argument is the received message, its third is param
 
             Config() = default;
-            constexpr Config(std::uint16_t st, Priority pr, Thread::fpStartup fpst, void* pa, core::relTime ti, uint8_t qs, Thread::fpOnMessage fpon) : BaseConfig(st, pr, fpst, pa), timeout(ti), messagequeuesize(qs), onmessage(fpon) {}            
+            constexpr Config(std::uint16_t st, Priority pr, Thread::fpStartup fpst, void* pa, core::relTime ti, uint8_t qs, Thread::fpOnMessage fpon, const char * name = nullptr) : BaseConfig(st, pr, fpst, pa, name), timeout(ti), messagequeuesize(qs), onmessage(fpon) {}            
             bool isvalid() const
             {   // onmessage cannot be nullptr, and messagequeuesize cannot be 0
                 if((nullptr == onmessage) || (0 == messagequeuesize)) { return false; } 
@@ -235,13 +228,14 @@ namespace embot { namespace os {
         virtual Type getType() const;
         virtual Priority getPriority() const;
         virtual bool setPriority(Priority priority);
+        virtual const char * getName() const;
         
         virtual bool setEvent(os::Event event);  
         virtual bool setMessage(os::Message message, core::relTime timeout = core::reltimeWaitForever);
         virtual bool setCallback(const core::Callback &callback, core::relTime timeout = core::reltimeWaitForever);
-        
-        
-        bool start(const Config &cfg);
+         
+        bool start(const Config &cfg, embot::core::fpCaller eviewername = nullptr);
+        virtual void run();
     
     private:        
         struct Impl;
@@ -261,7 +255,7 @@ namespace embot { namespace os {
             Thread::fpAfterCallback aftercallback {nullptr}; // this function, if not nullptr is executed after every time a callback is executed. its third argument is param
 
             Config() = default;
-            constexpr Config(std::uint16_t st, Priority pr, Thread::fpStartup fpst, void* pa, core::relTime ti, uint8_t qs, Thread::fpAfterCallback fpaf) : BaseConfig(st, pr, fpst, pa), timeout(ti), queuesize(qs), aftercallback(fpaf) {}            
+            constexpr Config(std::uint16_t st, Priority pr, Thread::fpStartup fpst, void* pa, core::relTime ti, uint8_t qs, Thread::fpAfterCallback fpaf, const char * name = nullptr) : BaseConfig(st, pr, fpst, pa, name), timeout(ti), queuesize(qs), aftercallback(fpaf) {}            
             bool isvalid() const
             {   // queuesize cannot be 0
                 if((0 == queuesize)) { return false; } 
@@ -275,13 +269,15 @@ namespace embot { namespace os {
         virtual Type getType() const;
         virtual Priority getPriority() const;
         virtual bool setPriority(Priority priority);
+        virtual const char * getName() const;
         
         virtual bool setEvent(os::Event event);  
         virtual bool setMessage(os::Message message, core::relTime timeout = core::reltimeWaitForever);        
         virtual bool setCallback(const core::Callback &callback, core::relTime timeout = core::reltimeWaitForever);
         
-                
-        bool start(const Config &cfg);
+
+        bool start(const Config &cfg, embot::core::fpCaller eviewername = nullptr);
+        virtual void run();
     
     private:        
         struct Impl;
@@ -299,7 +295,7 @@ namespace embot { namespace os {
             Thread::fpOnPeriod onperiod {nullptr}; // this function, must not be nullptr, is executed at every period. its second argument is param
 
             Config() = default;
-            constexpr Config(std::uint16_t st, Priority pr, Thread::fpStartup fpst, void* pa, core::relTime ti, Thread::fpOnPeriod fpon) : BaseConfig(st, pr, fpst, pa), period(ti), onperiod(fpon) {}            
+            constexpr Config(std::uint16_t st, Priority pr, Thread::fpStartup fpst, void* pa, core::relTime ti, Thread::fpOnPeriod fpon, const char * name = nullptr) : BaseConfig(st, pr, fpst, pa, name), period(ti), onperiod(fpon) {}            
             bool isvalid() const
             {   // onperiod cannot be nullptr, period cannot be 0
                 if((nullptr == onperiod) || (0 == period)) { return false; }  
@@ -309,12 +305,14 @@ namespace embot { namespace os {
                                     
         PeriodicThread();
         virtual ~PeriodicThread();
-       
-        bool start(const Config &cfg);
+         
+        bool start(const Config &cfg, embot::core::fpCaller eviewername = nullptr);
+        virtual void run();
     
         virtual Type getType() const;
         virtual Priority getPriority() const;
         virtual bool setPriority(Priority priority);
+        virtual const char * getName() const;
         
         virtual bool setEvent(os::Event event);  
         virtual bool setMessage(os::Message message, core::relTime timeout = core::reltimeWaitForever);

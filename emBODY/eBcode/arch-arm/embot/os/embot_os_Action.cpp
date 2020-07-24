@@ -28,6 +28,8 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
+#include "embot_os_Thread.h"
+
 namespace embot { namespace os { 
     
     bool EventToThread::isvalid() const
