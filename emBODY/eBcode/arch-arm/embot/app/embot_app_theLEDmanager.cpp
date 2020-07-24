@@ -251,7 +251,7 @@ namespace embot { namespace app {
                 tmr->stop();
                 off();
                 embot::os::Timer::Mode mode = (0 == times) ? (embot::os::Timer::Mode::forever) : (embot::os::Timer::Mode::someshots);
-                embot::os::Action act(embot::os::CallbackToThread(onexpirypulse, this, embot::os::theCallbackManager::getInstance().task()));
+                embot::os::Action act(embot::os::CallbackToThread(onexpirypulse, this, embot::os::theCallbackManager::getInstance().thread()));
                 embot::os::Timer::Config cfg(period/2, act, mode, times);
                 tmr->start(cfg);
             }
@@ -306,7 +306,7 @@ namespace embot { namespace app {
                 stop();
                 _ledw = lw->duplicate(_memory, sizeof(_memory));
                 embot::os::Timer::Mode mode = (0 == times) ? (embot::os::Timer::Mode::forever) : (embot::os::Timer::Mode::someshots);
-                embot::os::Action act(embot::os::CallbackToThread(onexpirywave, this, embot::os::theCallbackManager::getInstance().task()));
+                embot::os::Action act(embot::os::CallbackToThread(onexpirywave, this, embot::os::theCallbackManager::getInstance().thread()));
                 embot::os::Timer::Config cfg(_ledw->frequency(), act, mode, times*_ledw->length());
                 tmr->start(cfg);
             }              
