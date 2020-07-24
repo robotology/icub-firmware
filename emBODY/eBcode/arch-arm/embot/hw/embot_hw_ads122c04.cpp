@@ -459,7 +459,7 @@ mode.
         _ads_chip.sendcommand(chipADS122C04::CMD::reset);
         
         // 2. configure registers                 
-        res = _ads_chip.configure(chipADS122C04::SPS::twothousand, chipADS122C04::GAIN::one, 3*embot::core::time1millisec);
+        res = _ads_chip.configure(chipADS122C04::SPS::threehundredfifty, chipADS122C04::GAIN::onehundredtwentyeigth, 3*embot::core::time1millisec);
        
 //        // 3. sanity check: reading back the config registers.
 //        memset(_ads_chip.memory, 0, sizeof(_ads_chip.memory));
