@@ -12,7 +12,11 @@
 __NO_RETURN void osRtxIdleThread (void *argument) {
   (void)argument;
 
-  for (;;) {}
+    volatile uint32_t x = 0;
+    for (;;) 
+    {   
+        x++;
+    }
 }
  
 // OS Error Callback function
