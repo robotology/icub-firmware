@@ -40,6 +40,14 @@
 
 #include "lock_guard"
 
+#include "EoProtocolMN.h"
+
+#include "EOVtheSystem.h"
+
+#include "EOtheLEDpulser.h"
+
+#include "EoError.h"
+
 extern void eo_diagnostic(void *p)
 {
     eom_task_Start((EOMtask*)p);
@@ -77,8 +85,10 @@ bool EOMtheEMSDiagnostic::initialise(const Params& cfg)
     eo_packet_Size_Set(txpkt_, 0); 
     
     embot::prot::eth::diagnostic::Node::Config config {}; // to be filled properly after
-    node_.init(config);    
-        
+    node_.init(config); 
+#if defined(DIAGNOSTIC2_enabled) & defined(DIAGNOSTIC2_send_to_daemon)
+    host_.init({});        
+#endif        
     // create the task
     task_ = eom_task_New(eom_mtask_EventDriven, 
                         params_.taskpriority_, 
@@ -150,6 +160,66 @@ void EOMtheEMSDiagnostic::processEventRxPacket()
     }     
 }
 
+#if defined(DIAGNOSTIC2_enabled) & defined(DIAGNOSTIC2_send_to_daemon)
+static bool callback(const embot::prot::eth::IPv4 &ipv4, const embot::prot::eth::rop::Descriptor &rop)
+{
+    if(rop.id32 == embot::prot::eth::getID32(embot::prot::eth::EP::management, embot::prot::eth::EN::mnApp, 0, eoprot_tag_mn_appl_cmmnds_timeset))
+    {
+        uint64_t *timeset = reinterpret_cast<uint64_t*>(rop.value.pointer);
+
+        eOabstime_t currtime = eov_sys_LifeTimeGet(eov_sys_GetHandle());
+        int64_t delta = *timeset - currtime;
+        
+//        char str[96];
+//        uint32_t sec = *timeset/(1000*1000);
+//        uint32_t tmp = *timeset%(1000*1000);
+//        uint32_t msec = tmp / 1000;
+//        uint32_t usec = tmp % 1000;
+//        uint32_t years = sec/3600/24/365;
+//        char str0[64];            
+//        snprintf(str0, sizeof(str0), "s%d m%d u%d", sec, msec, usec);
+//        snprintf(str, sizeof(str), "RQST of time change to %s [or years = %d", str0, years);
+//        eo_errman_Trace(eo_errman_GetHandle(), str, "timeset cbk");  
+//                 
+//        snprintf(str0, sizeof(str0), "synch rqst = %lld", *timeset);
+//        eo_errman_Trace(eo_errman_GetHandle(), str0, "timeset cbk"); 
+        
+        
+        // first implementation: if the received time is not much different, then i apply it
+
+        eObool_t apply = eobool_false;
+        if(delta > 0)
+        {
+            // we go in the future. do we go much?
+            if(delta >= eok_reltime1ms)
+            {
+                apply = eobool_true;
+            }        
+        }
+        else
+        {
+            // it is either zero or negative (we go in the past)
+            delta = -delta;
+            if(delta >= eok_reltime1ms)
+            {
+                apply = eobool_true;
+            }        
+        }
+        
+        if(eobool_true == apply)
+        {
+            eov_sys_LifeTimeSet(eov_sys_GetHandle(), *timeset);
+        }
+        
+            
+        return true;        
+    }
+    
+    return false;
+}
+
+#endif 
+
 bool EOMtheEMSDiagnostic::manageArrivedMessage(EOpacket* package)
 {
     uint8_t *data = NULL;
@@ -157,6 +227,14 @@ bool EOMtheEMSDiagnostic::manageArrivedMessage(EOpacket* package)
     eo_packet_Payload_Get(rxpkt_,&data,&size);
     //TODO add RX msg code
 
+#if defined(DIAGNOSTIC2_enabled) & defined(DIAGNOSTIC2_send_to_daemon)
+    
+    const embot::prot::eth::IPv4 ipv4 {10, 0, 1, 104};
+    embot::core::Data da {data, size};
+    host_.accept(ipv4, da, callback);
+    
+#endif    
+    
     return true;
 }
 

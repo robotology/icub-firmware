@@ -91,7 +91,7 @@ extern void embot_cif_diagnostic_OnError(eOerrmanErrorType_t errtype, const char
     s_manage_dispatch(errtype, info, caller, errdes);
         
     // if fatal we manage it in a particular way
-    if(eo_errortype_error == errtype)
+    if(eo_errortype_fatal == errtype)
     {
         s_manage_fatal(info, caller, errdes);
     }

@@ -79,6 +79,8 @@
 
 #undef USE_ethmonitor_verifyTXropframe
 
+//#define TEST_ETHMON_OK_1SEC
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of extern variables. deprecated: better using _get(), _set() on static variables 
@@ -89,7 +91,11 @@ const eOethmonitor_cfg_t eo_ethmonitor_DefaultCfg =
     EO_INIT(.priority)      10,
     EO_INIT(.stacksize)     1024,
     EO_INIT(.taskperiod)    100*EOK_reltime1ms,
+#if defined(TEST_ETHMON_OK_1SEC)    
+    EO_INIT(.txOKperiod)    1*EOK_reltime1sec
+#else
     EO_INIT(.txOKperiod)    300*EOK_reltime1sec
+#endif    
 };
 
 // --------------------------------------------------------------------------------------------------------------------

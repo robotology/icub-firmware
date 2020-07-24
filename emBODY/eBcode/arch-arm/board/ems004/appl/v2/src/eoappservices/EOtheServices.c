@@ -180,8 +180,16 @@ extern EOtheServices* eo_services_Initialise(eOipv4addr_t ipaddress)
         return(&s_eo_theservices);
     }
     EOtheServices *p = &s_eo_theservices;
-    
+          
     eo_errman_Trace(eo_errman_GetHandle(), "eo_services_Initialise() starts", s_eobj_ownname);  
+    
+    eOerrmanDescriptor_t errdes = {0};
+    errdes.code             = eoerror_code_get(eoerror_category_System, eoerror_value_SYS_bootstrapping);
+    errdes.sourcedevice     = eo_errman_sourcedevice_localboard;
+    errdes.sourceaddress    = 0;
+    errdes.par16            = 0x0000;
+    errdes.par64            = 0;
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes); 
     
     p->initted = eobool_true;
     p->nvset = eom_emstransceiver_GetNVset(eom_emstransceiver_GetHandle()); 
@@ -652,7 +660,7 @@ static void s_eo_services_initialise(EOtheServices *p)
     errdes.sourceaddress    = 0;
     errdes.par16            = 0x0000;
     errdes.par64            = 0;
-    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_error, NULL, s_eobj_ownname, &errdes);     
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, NULL, s_eobj_ownname, &errdes);     
 }
 
 

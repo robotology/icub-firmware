@@ -47,6 +47,8 @@
 
 #include "EOtheServices.h"
 
+#include "EOVtheSystem.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of extern public interface
@@ -407,6 +409,79 @@ extern void eoprot_fun_UPDT_mn_appl_cmmnds_go2state(const EOnv* nv, const eOropd
         } break;        
     }
 
+}
+
+extern void eoprot_fun_UPDT_mn_appl_cmmnds_timeset(const EOnv* nv, const eOropdescriptor_t* rd) 
+{
+    eOabstime_t *timeset = (eOabstime_t *)nv->ram;
+    #warning TODO: review eoprot_fun_UPDT_mn_appl_cmmnds_timesetfill()
+    
+    // first implementation: if the received time is not much different, then i apply it
+    
+    eOabstime_t currtime = eov_sys_LifeTimeGet(eov_sys_GetHandle());
+    int64_t delta = *timeset - currtime;
+    
+    char str[96];
+    uint32_t sec = *timeset/(1000*1000);
+    uint32_t tmp = *timeset%(1000*1000);
+    uint32_t msec = tmp / 1000;
+    uint32_t usec = tmp % 1000;
+    uint32_t years = sec/3600/24/365;
+    char str0[64];            
+    snprintf(str0, sizeof(str0), "s%d m%d u%d", sec, msec, usec);
+    snprintf(str, sizeof(str), "RQST of time change to %s [or years = %d", str0, years);
+    eo_errman_Trace(eo_errman_GetHandle(), str, "timeset callback");  
+    
+    eOerrmanDescriptor_t descriptor = {0};
+    char msg[64] = {0};    
+    
+    descriptor.par16 = 0;
+    descriptor.par64 = currtime;
+    descriptor.sourcedevice = eo_errman_sourcedevice_localboard;
+    descriptor.sourceaddress = 0;
+    descriptor.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag00);
+    snprintf(msg, sizeof(msg), "synch rqst = %lld", *timeset);
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, msg, NULL, &descriptor); 
+    
+    
+    //
+    // first implementation: if the received time is not much different, then i apply it
+
+    eObool_t apply = eobool_false;
+    if(delta > 0)
+    {
+        // we go in the future. do we go much?
+        if(delta >= eok_reltime1ms)
+        {
+            apply = eobool_true;
+        }        
+    }
+    else
+    {
+        // it is either zero or negative (we go in the past)
+        delta = -delta;
+        if(delta >= eok_reltime1ms)
+        {
+            apply = eobool_true;
+        }        
+    }
+    
+    if(eobool_true == apply)
+    {
+        eov_sys_LifeTimeSet(eov_sys_GetHandle(), *timeset);
+    }
+    
+    
+    currtime = eov_sys_LifeTimeGet(eov_sys_GetHandle());
+    
+    descriptor.par16 = apply;
+    descriptor.par64 = currtime;
+    descriptor.sourcedevice = eo_errman_sourcedevice_localboard;
+    descriptor.sourceaddress = 0;
+    descriptor.code = eoerror_code_get(eoerror_category_Debug, eoerror_value_DEB_tag01);
+    snprintf(msg, sizeof(msg), "time = %lld", currtime);
+    eo_errman_Error(eo_errman_GetHandle(), eo_errortype_info, msg, NULL, &descriptor); 
+              
 }
 
 
