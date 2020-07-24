@@ -121,6 +121,10 @@ void osRtxTick_Handler (void) {
 
   OS_Tick_AcknowledgeIRQ();
   osRtxInfo.kernel.tick++;
+    
+#if defined(CMSISOS2_ICUB_CHANGES) 
+  cmsiso2_tick++;
+#endif    
 
   // Process Timers
   if (osRtxInfo.timer.tick != NULL) {

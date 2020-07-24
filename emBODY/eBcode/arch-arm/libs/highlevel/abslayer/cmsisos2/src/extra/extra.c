@@ -55,6 +55,7 @@
 
 #include "rtx_lib.h"
 
+#include "stdlib.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - all the rest
@@ -67,6 +68,28 @@ const cmsisos2_reltime_t cmsisos_reltime1millisec = 1000;
 const cmsisos2_reltime_t cmsisos_reltime1second = 1000000;
 const cmsisos2_reltime_t cmsisos_reltimeforever = 0xffffffff;
 
+volatile uint64_t cmsiso2_tick = 0;
+
+cmsisos2_abstime_t cmsisos2_sys_abstime_milliresolution(void)
+{
+//    uint64_t tick  = (uint64_t)osRtxInfo.kernel.tick;  
+//    volatile uint64_t factor = 1000000/osRtxConfig.tick_freq;     
+//    tick *= factor;
+//    return tick;
+    
+//    volatile uint64_t r = (uint64_t)osRtxInfo.kernel.tick * OS_Tick_GetInterval();
+ 
+    volatile uint64_t r = cmsiso2_tick * OS_Tick_GetInterval();    
+        
+    static uint32_t conversion1 = 0;
+    if(0 == conversion1)
+    {
+      conversion1 = SystemCoreClock / 1000000;
+    }
+  
+    return r/conversion1;
+}
+
   
 
 // was called svcRtxKernelGetSysTimerCount()
@@ -74,7 +97,8 @@ static uint32_t svcRtxKernelGetSysTimerCount_U64 (uint32_t *l, uint32_t *m) {
   uint64_t tick;
   uint64_t count;
 
-  tick  = (uint64_t)osRtxInfo.kernel.tick;
+  //tick  = (uint64_t)osRtxInfo.kernel.tick;
+  tick = cmsiso2_tick;
   count = OS_Tick_GetCount();
   if (OS_Tick_GetOverflow() != 0U) {
     count = OS_Tick_GetCount();
@@ -136,6 +160,67 @@ uint32_t cmsisos2_sys_reltime2tick(cmsisos2_reltime_t t)
     return t/conversion; 
 }
 
+static void * svcRtxCmsisos2_new(size_t size)
+{
+    return calloc(size, 1);
+}
+
+static uint32_t svcRtxCmsisos2_del(void *p)
+{
+    free(p);
+    return 1;
+}
+
+static void * svcRtxCmsisos2_realloc(void *p, size_t newsize)
+{
+    return realloc(p, newsize);
+}
+
+SVC0_1(Cmsisos2_new,  void*, size_t)
+    
+SVC0_2(Cmsisos2_realloc,  void*, void*, size_t)
+
+SVC0_1(Cmsisos2_del, uint32_t, void*)
+
+void * cmsisos2_memory_new(size_t size)
+{
+    void *p = NULL;
+    if(IsIrqMode() || IsIrqMasked()) 
+    {
+        p = svcRtxCmsisos2_new(size);
+    } 
+    else 
+    {
+        p =  __svcCmsisos2_new(size);
+    }
+    return p;
+}
+
+void cmsisos2_memory_delete(void *p)
+{
+    if(IsIrqMode() || IsIrqMasked()) 
+    {
+        svcRtxCmsisos2_del(p);
+    } 
+    else 
+    {
+        __svcCmsisos2_del(p);
+    }
+}
+
+void * cmsisos2_memory_realloc(void *p, size_t size)
+{
+    void *p1 = NULL;
+    if(IsIrqMode() || IsIrqMasked()) 
+    {
+        p1 = svcRtxCmsisos2_realloc(p, size);
+    } 
+    else 
+    {
+        p1 =  __svcCmsisos2_realloc(p, size);
+    }
+    return p;
+}
 
    
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------

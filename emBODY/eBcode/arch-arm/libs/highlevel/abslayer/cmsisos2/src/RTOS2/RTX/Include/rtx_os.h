@@ -345,6 +345,10 @@ typedef struct {
 } osRtxInfo_t;
  
 extern osRtxInfo_t osRtxInfo;           ///< OS Runtime Information
+
+#if defined(CMSISOS2_ICUB_CHANGES)
+extern volatile uint64_t cmsiso2_tick;
+#endif
  
 /// OS Runtime Object Memory Usage structure
 typedef struct {

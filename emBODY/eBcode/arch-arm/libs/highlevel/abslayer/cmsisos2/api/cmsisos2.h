@@ -31,15 +31,20 @@ extern "C"
     typedef uint32_t cmsisos2_reltime_t;    // expressed in us
     
     
+    
     extern const cmsisos2_reltime_t cmsisos_reltimezero;
     extern const cmsisos2_reltime_t cmsisos_reltime1microsec;
     extern const cmsisos2_reltime_t cmsisos_reltime1millisec;
     extern const cmsisos2_reltime_t cmsisos_reltime1second;
     extern const cmsisos2_reltime_t cmsisos_reltimeforever;
 
-
+    cmsisos2_abstime_t cmsisos2_sys_abstime_milliresolution(void);
     cmsisos2_abstime_t cmsisos2_sys_abstime(void);
     uint32_t cmsisos2_sys_reltime2tick(cmsisos2_reltime_t t);
+    
+    void * cmsisos2_memory_new(size_t size);
+    void * cmsisos2_memory_realloc(void *p, size_t size);
+    void cmsisos2_memory_delete(void *p);
 
 
 
