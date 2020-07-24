@@ -1102,11 +1102,6 @@
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\transport\EOtheInfoDispatcher.c</FilePath>
             </File>
-            <File>
-              <FileName>EOtheInfoDispatcher2.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\ctrloop\EOtheInfoDispatcher2.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -2441,11 +2436,6 @@
               <FileName>EOtheInfoDispatcher.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\transport\EOtheInfoDispatcher.c</FilePath>
-            </File>
-            <File>
-              <FileName>EOtheInfoDispatcher2.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\..\..\..\..\embobj\plus\ctrloop\EOtheInfoDispatcher2.c</FilePath>
             </File>
           </Files>
         </Group>
