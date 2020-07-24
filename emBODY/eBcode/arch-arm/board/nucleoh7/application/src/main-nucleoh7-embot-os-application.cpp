@@ -480,7 +480,7 @@ bool s_print_values(const std::tuple<int16_t, int16_t, int16_t> &acc, const std:
 //    found = found;
 //    index = index;
     
-   	text[pos++] = '\n'; 
+//   	text[pos++] = '\n'; 
     embot::core::Time t0 = embot::core::now();
     HAL_UART_Transmit(&huart3, reinterpret_cast<uint8_t*>(text), pos, 0xFFFF);
     
