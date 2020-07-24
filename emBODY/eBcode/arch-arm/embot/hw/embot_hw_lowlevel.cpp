@@ -47,7 +47,7 @@ using namespace std;
 
 namespace embot { namespace hw { namespace lowlevel {
     
-#if defined(STM32HAL_STM32L4) || defined(STM32HAL_STM32H7)
+#if defined(STM32HAL_STM32L4) || defined(STM32HAL_STM32H7) || defined(STM32HAL_STM32G4)
 
 #if __ARMCOMPILER_VERSION > 6000000
 int _execOperations(uint32_t i)

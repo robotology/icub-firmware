@@ -73,6 +73,9 @@ namespace embot { namespace hw { namespace sys {
             // empirically removed ...
             #elif defined(STM32L4) 
             s_hl_sys_numofops1sec /= 3;
+            #elif defined(STM32G4) 
+            s_hl_sys_numofops1sec /= 3;
+            #warning specify tuning must be verified
             #else
             #error specify tuning             
             #endif

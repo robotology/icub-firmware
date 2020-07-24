@@ -1,6 +1,8 @@
 
 HOWTO: create a stm32hal library from a CUBE-MX project. and use it.
 
+This document is superseded by docs/stm32lib.howto.md
+
 
 1.  Introduction
 

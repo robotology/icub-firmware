@@ -157,18 +157,20 @@ namespace embot { namespace hw { namespace bsp { namespace button {
 
 
 namespace embot { namespace hw { namespace bsp { namespace can {
-
+    
     #if defined(HAL_CAN_MODULE_ENABLED)
-    struct PROP
-    { 
-        CAN_HandleTypeDef* handle;   
-    };
-    #else    
-    struct PROP
-    { 
-        void* handle;   
-    };
+        using CAN_Handle = CAN_HandleTypeDef;    
+    #elif defined(HAL_FDCAN_MODULE_ENABLED)
+        using CAN_Handle = FDCAN_HandleTypeDef;
+    #else
+        using CAN_Handle = void;
     #endif
+    
+    struct PROP
+    { 
+        CAN_Handle* handle;   
+    };
+
     
     
     struct BSP : public embot::hw::bsp::SUPP
@@ -354,14 +356,21 @@ namespace embot { namespace hw { namespace bsp { namespace timer {
 
 
 
-#if defined(HAL_I2C_MODULE_ENABLED)
+
 namespace embot { namespace hw { namespace bsp { namespace i2c {
-    
-    
+
+#if defined(HAL_I2C_MODULE_ENABLED)    
     struct PROP
-    {   
-        I2C_HandleTypeDef*  handle;  
+    {     
+        I2C_HandleTypeDef* handle;  
     };
+#else
+    struct PROP
+    {     
+        void* handle;  
+    };
+#endif
+    
     
     struct BSP : public embot::hw::bsp::SUPP
     {
@@ -377,7 +386,7 @@ namespace embot { namespace hw { namespace bsp { namespace i2c {
     const BSP& getBSP();
                   
 }}}} // namespace embot { namespace hw { namespace bsp {  namespace i2c {
-#endif
+
 
 
 namespace embot { namespace hw { namespace bsp { namespace bno055 {

@@ -83,7 +83,19 @@ namespace embot { namespace hw { namespace bsp { namespace gpio {
 #else
     
 namespace embot { namespace hw { namespace bsp { namespace gpio {
-        
+ 
+    #if defined(STM32HAL_BOARD_STM32G4EVAL)
+    static const BSP thebsp {        
+        // supportmask2d
+        {{
+            0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0xffff, 0x0000 
+        }},            
+        // ports
+        {{
+            GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, GPIOF, GPIOG, nullptr
+        }}
+    };    
+    #else
     // sadly we cannot use constexpr because of the reinterpret_cast<> inside GPIOA etc.
     static const BSP thebsp {        
         // supportmask2d
@@ -95,6 +107,7 @@ namespace embot { namespace hw { namespace bsp { namespace gpio {
             GPIOA, GPIOB, GPIOC, GPIOD, GPIOE, nullptr, nullptr, nullptr
         }}
     };
+    #endif
     
     constexpr embot::hw::GPIO BSP::getGPIO(const PROP &p) const
     {
@@ -286,7 +299,52 @@ namespace embot { namespace hw { namespace bsp { namespace led {
     };
     
     void BSP::init(embot::hw::LED h) const {} 
+       
+    #elif   defined(STM32HAL_BOARD_SG3)
+       
+    constexpr PROP led1p = { .on = embot::hw::gpio::State::RESET, .off = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::B, embot::hw::GPIO::PIN::seven}  };  
+        
+    constexpr BSP thebsp {        
+        // maskofsupported
+        mask::pos2mask<uint32_t>(LED::one),        
+        // properties
+        {{
+            &led1p, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr            
+        }}        
+    };
     
+    void BSP::init(embot::hw::LED h) const {} 
+    
+    #elif   defined(STM32HAL_BOARD_STM32G4EVAL)
+       
+    constexpr PROP led1p = { .on = embot::hw::gpio::State::SET, .off = embot::hw::gpio::State::RESET, .gpio = {embot::hw::GPIO::PORT::G, embot::hw::GPIO::PIN::nine}  };  
+        
+    constexpr BSP thebsp {        
+        // maskofsupported
+        mask::pos2mask<uint32_t>(LED::one),        
+        // properties
+        {{
+            &led1p, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr            
+        }}        
+    };
+    
+    void BSP::init(embot::hw::LED h) const {} 
+
+    #elif   defined(STM32HAL_BOARD_PMC)
+       
+    constexpr PROP led1p = { .on = embot::hw::gpio::State::SET, .off = embot::hw::gpio::State::RESET, .gpio = {embot::hw::GPIO::PORT::D, embot::hw::GPIO::PIN::six}  };  
+        
+    constexpr BSP thebsp {        
+        // maskofsupported
+        mask::pos2mask<uint32_t>(LED::one),        
+        // properties
+        {{
+            &led1p, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr            
+        }}        
+    };
+    
+    void BSP::init(embot::hw::LED h) const {} 
+        
     #else
         #error embot::hw::bsp::led::thebsp must be defined    
     #endif
@@ -443,7 +501,11 @@ namespace embot { namespace hw { namespace bsp { namespace button {
         }        
     }
    
+    #elif   defined(STM32HAL_BOARD_STM32G4EVAL)
     
+    constexpr BSP thebsp {};
+    void BSP::init(embot::hw::BTN h) const {}
+    void BSP::onEXTI(const embot::hw::bsp::gpio::PROP &p) const {}    
         
     #else
         #error embot::hw::bsp::button::thebsp must be defined    
@@ -471,7 +533,8 @@ namespace embot { namespace hw { namespace bsp { namespace can {
     static_assert(embot::core::tointegral(embot::hw::CAN::maxnumberof) < embot::core::tointegral(embot::hw::CAN::none), "CAN::maxnumberof must be higher that CAN::none, so that we can optimise code");
 }}}}
 
-#if   !defined(HAL_CAN_MODULE_ENABLED) || !defined(EMBOT_ENABLE_hw_can)
+
+#if   !defined(EMBOT_ENABLE_hw_can)
 
 namespace embot { namespace hw { namespace bsp { namespace can {
     
@@ -597,7 +660,28 @@ namespace embot { namespace hw { namespace bsp { namespace can {
             MX_CAN1_Init();
         }        
     }
+
+    #elif   defined(STM32HAL_BOARD_STM32G4EVAL)
+    
+    constexpr PROP can1p = { .handle = &hfdcan1 };  
         
+    constexpr BSP thebsp {        
+        // maskofsupported
+        mask::pos2mask<uint32_t>(CAN::one),        
+        // properties
+        {{
+            &can1p            
+        }}        
+    };
+    
+    void BSP::init(embot::hw::CAN h) const 
+    {
+        if(h == CAN::one)
+        {            
+            MX_FDCAN1_Init();
+        }        
+    }
+    
     #else
         #error embot::hw::bsp::can::thebsp must be defined    
     #endif
@@ -609,6 +693,8 @@ namespace embot { namespace hw { namespace bsp { namespace can {
               
 }}}} // namespace embot { namespace hw { namespace bsp {  namespace can {
     
+#if defined(HAL_CAN_MODULE_ENABLED)
+
 // irq handlers for can: they are common to every board which has can
 
 void CAN1_TX_IRQHandler(void)
@@ -621,7 +707,24 @@ void CAN1_RX0_IRQHandler(void)
     HAL_CAN_IRQHandler(&hcan1);
 }
 
-#endif // can
+#elif defined(HAL_FDCAN_MODULE_ENABLED)
+
+
+#warning -> fill handlers for fdcan
+        
+void FDCAN1_IT0_IRQHandler(void)
+{
+
+}  
+
+void FDCAN1_IT1_IRQHandler(void)
+{
+
+}   
+
+#endif //
+
+#endif // EMBOT_ENABLE_hw_can
 
 
 // - support map: end of embot::hw::can
@@ -1521,7 +1624,28 @@ namespace embot { namespace hw { namespace bsp { namespace i2c {
             MX_I2C1_Init();
         }        
     }
+
+    #elif   defined(STM32HAL_BOARD_STM32G4EVAL)
     
+    constexpr PROP i2c3p { .handle = &hi2c3 };
+
+        
+    constexpr BSP thebsp {        
+        // maskofsupported   
+        mask::pos2mask<uint32_t>(I2C::three),         
+        // properties
+        {{       
+            nullptr, nullptr, &i2c3p
+        }}        
+    }; 
+
+    void BSP::init(embot::hw::I2C h) const
+    {
+        if(h == I2C::three)
+        {            
+            MX_I2C3_Init();
+        }        
+    }
     #else
         #error embot::hw::bsp::i2c::thebsp must be defined    
     #endif
@@ -1956,6 +2080,29 @@ void DMA1_Stream1_IRQHandler(void)
     HAL_DMA_IRQHandler(&hdma_i2c1_tx);
 }
 
+#elif defined(STM32HAL_BOARD_STM32G4EVAL)
+
+
+void I2C3_EV_IRQHandler(void)
+{
+    HAL_I2C_EV_IRQHandler(&hi2c3);
+}
+
+void I2C3_ER_IRQHandler(void)
+{
+    HAL_I2C_ER_IRQHandler(&hi2c3);
+}
+
+void DMA1_Channel1_IRQHandler(void)
+{
+  HAL_DMA_IRQHandler(&hdma_i2c3_rx);
+}
+
+void DMA1_Channel2_IRQHandler(void)
+{
+  HAL_DMA_IRQHandler(&hdma_i2c3_tx);
+}
+
 #endif // irq handlers
 
 #endif // i2c
@@ -2097,7 +2244,37 @@ namespace embot { namespace hw { namespace bsp { namespace tlv493d {
     };
 
     void BSP::init(embot::hw::TLV493D h) const {}
+    
+    #elif defined(STM32HAL_BOARD_NUCLEOH7)
+    
+    constexpr PROP prop01 { .i2cbus = embot::hw::I2C::one, .i2caddress = 0xBC }; 
 
+    constexpr BSP thebsp {        
+        // maskofsupported
+        mask::pos2mask<uint32_t>(TLV493D::one),        
+        // properties
+        {{
+            &prop01
+        }}        
+    };
+    
+    void BSP::init(embot::hw::TLV493D h) const {}
+
+    #elif defined(STM32HAL_BOARD_STM32G4EVAL)
+    
+    constexpr PROP prop01 { .i2cbus = embot::hw::I2C::three, .i2caddress = 0xBC }; 
+
+    constexpr BSP thebsp {        
+        // maskofsupported
+        mask::pos2mask<uint32_t>(TLV493D::one),        
+        // properties
+        {{
+            &prop01
+        }}        
+    };
+    
+    void BSP::init(embot::hw::TLV493D h) const {}
+    
     #else
         #error embot::hw::bsp::tlv493d::thebsp must be defined    
     #endif
