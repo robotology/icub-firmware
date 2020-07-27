@@ -39,21 +39,27 @@
 
 // #define DIAGNOSTIC2_send_to_yarprobotinterface
 // #define DIAGNOSTIC2_send_to_daemon
+// #define DIAGNOSTIC2_receive_from_daemon
 
 #if !defined(DIAGNOSTIC2_enabled)
     #warning INFO: diagnostic2 is disabled 
 #else
     #warning INFO: diagnostic2 is enabled
-    #if !defined(DIAGNOSTIC2_send_to_yarprobotinterface) && !defined(DIAGNOSTIC2_send_to_daemon)
-        #define DIAGNOSTIC2_send_to_yarprobotinterface
-        #undef DIAGNOSTIC2_send_to_daemon
-    #endif
+
     #if defined(DIAGNOSTIC2_send_to_yarprobotinterface)
         #warning INFO: diagnostic2 sends to yarprobotinterface
     #endif
     #if defined(DIAGNOSTIC2_send_to_daemon)
         #warning INFO: diagnostic2 sends to diagnostic-daemon
     #endif
+    #if defined(DIAGNOSTIC2_receive_from_daemon)
+        #warning INFO: diagnostic2 receives from diagnostic-daemon
+    #endif
+    
+    #if defined(DIAGNOSTIC2_enabled) & defined(DIAGNOSTIC2_send_to_yarprobotinterface) & defined(DIAGNOSTIC2_send_to_daemon) & defined(DIAGNOSTIC2_receive_from_daemon)  
+        #warning CAVEAT: this DIAGNOSTIC2 configuration is too much memory hungry. it may not run. 
+        #error: this DIAGNOSTIC2 configuration is too much memory hungry. it does nor run.
+    #endif 
 #endif
 
 

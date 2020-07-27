@@ -92,6 +92,7 @@ class EOMtheEMSDiagnostic
         EOpacket *rxpkt_{nullptr};
         static constexpr uint16_t rawcapacity_ {513};
         uint8_t rawdata[rawcapacity_];
+        static constexpr uint16_t inputudpmaxsize_ {128};
         
         EOVmutexDerived* mutexNode_{nullptr};
         EOVmutexDerived* mutexUdpPackage_{nullptr};
@@ -108,11 +109,16 @@ class EOMtheEMSDiagnostic
         const eOipv4port_t localPort_{11000};
 
         static constexpr char s_eobj_ownname[]{"EOMtheEMSdiagnostic"};        
-       
+
+ 
+#if defined(DIAGNOSTIC2_enabled) & defined(DIAGNOSTIC2_send_to_daemon)     
         embot::prot::eth::diagnostic::Node node_;
-#if defined(DIAGNOSTIC2_enabled) & defined(DIAGNOSTIC2_send_to_daemon)        
+#endif
+        
+#if defined(DIAGNOSTIC2_enabled) & defined(DIAGNOSTIC2_receive_from_daemon)    
         embot::prot::eth::diagnostic::Host host_;
-#endif        
+#endif
+     
 };
 
 #endif  // include-guard
