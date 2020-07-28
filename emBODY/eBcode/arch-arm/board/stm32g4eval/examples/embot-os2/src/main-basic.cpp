@@ -72,6 +72,7 @@ void eventbasedthread_startup(embot::os::Thread *t, void *param)
 
 embot::os::PeriodicThread *pth {nullptr};
 
+
 void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventmask, void *param)
 {   
     if(0 == eventmask)
@@ -87,10 +88,13 @@ void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventma
         {
             if(nullptr != pth)
             {
+                
+                embot::hw::sys::puts(std::string("the thread ") + t->getName() + " is about to delete thread " + pth->getName());
                 delete pth;
                 pth = nullptr;
             }
-        }            
+        }
+
     }
     
 
@@ -111,20 +115,6 @@ void onIdle(embot::os::Thread *t, void* idleparam)
 
 embot::os::EventThread* thr {nullptr};
 
-//#include "cmsisos2.h" 
-//void wait(embot::core::relTime d)
-//{
-////    embot::core::Time end = d + embot::core::now();
-//    uint64_t end = d + cmsisos2_sys_abstime_milliresolution();
-//    for(;;)
-//    {
-// //       if(embot::core::now() >= end)
-//        if(cmsisos2_sys_abstime_milliresolution() >= end)
-//        {
-//            return;
-//        }
-//    }    
-//}
 
 
 void initSystem(embot::os::Thread *t, void* initparam)
@@ -149,7 +139,7 @@ void initSystem(embot::os::Thread *t, void* initparam)
     theleds.init(allleds);    
     theleds.get(embot::hw::LED::one).pulse(embot::core::time1second); 
     
-    
+#if 0    
 //    for(;;)
 //    {
 //        constexpr embot::core::relTime tick = 10000;
@@ -231,6 +221,11 @@ volatile bool resu {true};
     resu = resu;
 
 //std::uint16_t st, Priority pr, Thread::fpStartup fpst, void* pa, core::relTime ti, Thread::fpOnPeriod fpon
+
+
+#endif
+
+
     embot::os::PeriodicThread::Config pc { 
         1024, 
         embot::os::Priority::medium100, 
@@ -244,13 +239,13 @@ volatile bool resu {true};
             embot::core::TimeFormatter tf(embot::core::now());        
             embot::hw::sys::puts("periodic thread: exec @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full)); 
             
-        }
+        },
+        "testPeriodic00"
     };
 
-pth = new embot::os::PeriodicThread;
-pth->start(pc);
-//delete eth;
-//eth = nullptr;
+    pth = new embot::os::PeriodicThread;
+    pth->start(pc);
+
     
     embot::os::EventThread::Config configEV { 
         6*1024, 
@@ -258,7 +253,8 @@ pth->start(pc);
         eventbasedthread_startup,
         nullptr,
         50*embot::core::time1millisec,
-        eventbasedthread_onevent
+        eventbasedthread_onevent,
+        "mainThreadEvt"
     };
     
     embot::hw::sys::puts("creating the main thread");
