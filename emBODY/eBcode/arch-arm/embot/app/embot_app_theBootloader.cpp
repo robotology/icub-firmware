@@ -173,7 +173,7 @@ embot::app::theBootloader::evalRes embot::app::theBootloader::eval()
     static const embot::core::Callback onOSerror = { embot::app::theBootloader::Impl::userdefonOSerror, nullptr };
     
     embot::os::theScheduler::Config cfg { 
-            embot::os::theScheduler::Timing(embot::hw::sys::clock(embot::hw::CLOCK::syscore),  embot::core::time1millisec),  
+            embot::os::theScheduler::Timing(embot::core::time1millisec),  
             embot::os::theScheduler::Behaviour { initconfig, idleconfig, onOSerror} 
     };    
     embot::os::theScheduler &thescheduler = embot::os::theScheduler::getInstance();

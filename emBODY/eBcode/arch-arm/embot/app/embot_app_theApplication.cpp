@@ -99,7 +99,7 @@ embot::app::theApplication::~theApplication() { }
         
     embot::os::init({});
     
-    embot::os::theScheduler::Config cfg { embot::os::theScheduler::Timing(embot::hw::sys::clock(embot::hw::CLOCK::syscore),  pImpl->config.ticktime), pImpl->config.behaviour };    
+    embot::os::theScheduler::Config cfg { embot::os::theScheduler::Timing(pImpl->config.ticktime), pImpl->config.behaviour };    
     embot::os::theScheduler &thescheduler = embot::os::theScheduler::getInstance();
     thescheduler.start(cfg);    
     
