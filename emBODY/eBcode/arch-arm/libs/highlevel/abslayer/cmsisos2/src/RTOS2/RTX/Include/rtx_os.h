@@ -42,8 +42,8 @@ extern "C"
  
 /// Kernel Information
 #define osRtxVersionAPI      20010003   ///< API version (2.1.3)
-#define osRtxVersionKernel   50050001   ///< Kernel version (5.5.1)
-#define osRtxKernelId     "RTX V5.5.1"  ///< Kernel identification string
+#define osRtxVersionKernel   50050002   ///< Kernel version (5.5.2)
+#define osRtxKernelId     "RTX V5.5.2"  ///< Kernel identification string
  
  
 //  ==== Common definitions ====
@@ -345,7 +345,7 @@ typedef struct {
 } osRtxInfo_t;
  
 extern osRtxInfo_t osRtxInfo;           ///< OS Runtime Information
-
+ 
 #if defined(CMSISOS2_ICUB_CHANGES)
 extern volatile uint64_t cmsiso2_tick;
 #endif
@@ -469,7 +469,7 @@ typedef struct {
   osMessageQueueAttr_t        *timer_mq_attr;   ///< Timer Message Queue Attributes
   uint32_t                     timer_mq_mcnt;   ///< Timer Message Queue maximum Messages
 } osRtxConfig_t;
-
+ 
 #if defined(CMSISOS2_ICUB_CHANGES)
 extern osRtxConfig_t osRtxConfig;               ///< OS Configuration
 #else
