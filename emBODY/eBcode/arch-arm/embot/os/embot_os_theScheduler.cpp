@@ -91,12 +91,19 @@ struct embot::os::theScheduler::Impl
     }
             
     
-    static void osOnError(void* task, int errorcode, const char * errormsg)
+    static void osOnError(embot::os::rtos::thread_t* thread, int errorcode, const char * errormsg)
     {
         embot::os::theScheduler &thesystem = embot::os::theScheduler::getInstance();   
         thesystem.pImpl->latesterrorcode = static_cast<int>(errorcode);
-        thesystem.pImpl->latesterrorstring = errormsg;        
-        thesystem.pImpl->config.behaviour.onOSerror.execute();            
+        thesystem.pImpl->latesterrorstring = errormsg;
+        if(nullptr != thread)
+        {
+            embot::os::Thread *t = embot::os::rtos::scheduler_getassociated(thread);  
+            const char *tname = ((nullptr == t) || (nullptr == t->getName())) ? "none" : t->getName();             
+            embot::hw::sys::puts(std::string("from os::Thread ") + tname + " -> " + errormsg);  
+        }            
+        thesystem.pImpl->config.behaviour.onOSerror.execute();  
+        
         // we dont stop in here
         // for(;;);  
     }    

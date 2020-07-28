@@ -80,6 +80,7 @@ bool embot::os::theCallbackManager::start(const Config &config)
     cfg.queuesize = pImpl->config.capacityofhandler;
     cfg.timeout = embot::core::reltimeWaitForever;
     cfg.startup = nullptr;
+    cfg.name = "tCBKman";
     
     pImpl->thread->start(cfg);
     

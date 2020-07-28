@@ -86,7 +86,7 @@ bool embot::os::InitThread::setPriority(embot::os::Priority priority)
 
 const char * embot::os::InitThread::getName() const
 {
-   return "InitThread"; 
+   return "tINIT"; 
 }
 
   
@@ -194,7 +194,7 @@ bool embot::os::IdleThread::setPriority(embot::os::Priority priority)
 
 const char * embot::os::IdleThread::getName() const
 {
-   return "IdleThread"; 
+   return "tIDLE"; 
 }
   
 bool embot::os::IdleThread::setEvent(embot::os::Event event)

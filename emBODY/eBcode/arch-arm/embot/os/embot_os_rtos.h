@@ -13,7 +13,7 @@
 #include "embot_os.h"
 
 // so far the default is for OSAL
-#if !defined(EMBOT_USE_rtos_cmsisos2)
+#if !defined(EMBOT_USE_rtos_cmsisos2) & !defined(EMBOT_USE_rtos_osal)
     #define EMBOT_USE_rtos_osal
 #endif    
 
@@ -30,7 +30,7 @@ namespace embot { namespace os { namespace rtos {
                 
     struct scheduler_props_t
     {
-        using fpOnOSerror = void (*) (void* thread, int errorcode, const char * errormsg);
+        using fpOnOSerror = void (*) (thread_t* thread, int errorcode, const char * errormsg);
         
         scheduler_props_t(); 
         ~scheduler_props_t();  
