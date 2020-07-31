@@ -609,6 +609,11 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_button.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_can.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_can.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1291,6 +1296,11 @@
               <FileName>embot_hw_button.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_button.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_can.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_can.cpp</FilePath>
             </File>
           </Files>
         </Group>
