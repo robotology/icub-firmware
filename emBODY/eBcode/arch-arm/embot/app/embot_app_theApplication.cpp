@@ -38,7 +38,6 @@
 #include "embot_hw_bsp.h"
 #include "embot_hw_flash.h"
 
-#include "osal.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
