@@ -31,7 +31,9 @@
 
 #include "embot_os_Thread.h"
 #include "embot_os_theTimerManager.h"
-#include "osal.h"
+
+#include "embot_os_rtos.h"
+
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -41,30 +43,30 @@
 
 namespace embot { namespace os { namespace timertools {
         
-    struct osalTMR 
+    struct TMR 
     {
-        Timer               *owner;
-        osal_timer_t        *osaltimer;
-        Timer::Config       tconfig;         
-        Timer::Status       sta;             
-        std::uint32_t       maxshots;
-        std::uint32_t       count;        
-        bool                canexecuteaction; 
-        bool onemoretime;                 
+        Timer *owner {nullptr};
+        embot::os::rtos::timer_t *rtostimer {nullptr};
+        Timer::Config tconfig {};         
+        Timer::Status sta {Timer::Status::idle};             
+        std::uint32_t maxshots {0};
+        std::uint32_t count {0};        
+        bool canexecuteaction {false}; 
+        bool onemoretime {false};                 
         
-        osalTMR(Timer *own)   
+        TMR(Timer *own)   
         {
             owner = own;
             reset(Timer::Status::idle);
-            osaltimer = osal_timer_new();
+            rtostimer = embot::os::rtos::timer_new();
         }
         
-        ~osalTMR()   
+        ~TMR()   
         {
             stop();
             // do reverse deallocation and cleaning
-            osal_timer_delete(osaltimer);
-            osaltimer = nullptr;
+            embot::os::rtos::timer_delete(rtostimer);
+            rtostimer = nullptr;
             reset(Timer::Status::idle);              
             canexecuteaction = false;  
             owner = nullptr;            
@@ -84,10 +86,6 @@ namespace embot { namespace os { namespace timertools {
             return sta;
         }
         
-//        Timer::Mode getmode()
-//        {
-//            return mod;
-//        }
         
         bool start(const Timer::Config &config)
         {            
@@ -98,28 +96,17 @@ namespace embot { namespace os { namespace timertools {
             }
                                                     
             bool ret = false;
-            
-            // 1. lock the timer manager
-            
-            // 2. start it only if it is not counting
+                        
+            // start it only if it is not counting
             if(Timer::Status::counting != getstatus())
             {
                 tconfig = config;
-                
-                // 1. copy the onexp and disable it. it will be enabled only at expiry of the countdown so that it can be executed
-                
-                canexecuteaction = false;
-                                
-                osal_timer_timing_t timing { 
-                    .startat = OSAL_abstimeNONE, 
-                    .count = tconfig.countdown, 
-                    .mode = ( (Timer::Mode::oneshot == tconfig.mode) ? (osal_tmrmodeONESHOT) : (osal_tmrmodeFOREVER) )
-                };
-                osal_timer_onexpiry_t onexpi {.cbk = OnExpiryCbk, .par = this };
+                             
+                canexecuteaction = false;                              
 
-                osal_result_t r = osal_timer_start(osaltimer, &timing, &onexpi, osal_callerAUTOdetect);                
-                
-                if(osal_res_OK == r)
+                embot::os::rtos::timerMode mode = (Timer::Mode::oneshot == tconfig.mode) ? (embot::os::rtos::timerMode::oneshot) : (embot::os::rtos::timerMode::forever);
+                 
+                if(true == embot::os::rtos::timer_start(rtostimer, mode, tconfig.countdown, OnExpiryCbk, this))               
                 {
                     sta = Timer::Status::counting;
                     count = 0;
@@ -133,18 +120,19 @@ namespace embot { namespace os { namespace timertools {
                     onemoretime =  false;
                     ret = false;
                 }
-
             }
-            
-            // 5. unlock the timer manager
-        
+                    
             return ret;
         }  
 
-        // it is executed by osal inside the systick, hence ... keep it lean
-        static void OnExpiryCbk(osal_timer_t *osaltmr, void *par) 
+        // keep it simple. it is executed by osal inside the systick  and by cmsisos2 inside a small thread
+#if defined(EMBOT_USE_rtos_cmsisos2)        
+        static void OnExpiryCbk(void *par) 
+#else
+        static void OnExpiryCbk(embot::os::rtos::timer_t *rtostmr, void *par)
+#endif        
         {
-            osalTMR *otm = reinterpret_cast<osalTMR*>(par);
+            TMR *otm = reinterpret_cast<TMR*>(par);
             otm->canexecuteaction = true;
             embot::os::theTimerManager &tm = embot::os::theTimerManager::getInstance();
             if(true == tm.started())
@@ -163,17 +151,16 @@ namespace embot { namespace os { namespace timertools {
                     otm->onemoretime = true;
                     otm->stop();
                 }
-            }
-            
-        }  
+            }            
+        }          
 
 
         bool stop()
         {
             if(Timer::Status::counting == getstatus())
             {                                
-                // stop the osal timer. operation is null safe.
-                osal_timer_stop(osaltimer, osal_callerAUTOdetect);
+                // stop the rtos timer. operation is null safe.
+                embot::os::rtos::timer_stop(rtostimer);
             }
           
             if(false == onemoretime)
@@ -193,11 +180,11 @@ namespace embot { namespace os { namespace timertools {
      
 struct embot::os::Timer::Impl
 {          
-    embot::os::timertools::osalTMR *tmr;
+    embot::os::timertools::TMR *tmr;
     
     Impl(Timer *own) 
     {
-        tmr = new embot::os::timertools::osalTMR(own);
+        tmr = new embot::os::timertools::TMR(own);
     }
     ~Impl()
     {

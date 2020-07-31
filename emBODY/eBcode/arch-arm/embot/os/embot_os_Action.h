@@ -22,10 +22,7 @@
 #define _EMBOT_OS_ACTION_H_
 
 #include "embot_core.h"
-
-#include "embot_os.h"
-
-#include "embot_os_Thread.h"
+#include "embot_os_common.h"
 
 
 namespace embot { namespace os {

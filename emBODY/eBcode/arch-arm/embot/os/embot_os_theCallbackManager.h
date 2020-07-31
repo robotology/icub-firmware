@@ -22,8 +22,8 @@
 #define _EMBOT_OS_THECALLBACKMANAGER_H_
 
 #include "embot_core.h"
-#include "embot_os.h"
-#include "embot_os_Thread.h"
+#include "embot_os_common.h"
+
 #include <memory>
 
 namespace embot { namespace os {
@@ -52,7 +52,7 @@ namespace embot { namespace os {
         bool start(const Config &config);    
         bool started() const;    
         
-        embot::os::Thread * task() const;
+        embot::os::Thread * thread() const;
 
     private:
         theCallbackManager();  

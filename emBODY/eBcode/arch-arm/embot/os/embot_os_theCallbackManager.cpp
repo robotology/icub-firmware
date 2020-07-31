@@ -28,7 +28,7 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-
+#include "embot_os_Thread.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -37,7 +37,7 @@
 struct embot::os::theCallbackManager::Impl
 {    
     Config config {};    
-    embot::os::CallbackThread *task {nullptr};
+    embot::os::CallbackThread *thread {nullptr};
     
     Impl() = default;
 };
@@ -72,7 +72,7 @@ bool embot::os::theCallbackManager::start(const Config &config)
     
     pImpl->config = config;
         
-    pImpl->task = new embot::os::CallbackThread;
+    pImpl->thread = new embot::os::CallbackThread;
     
     embot::os::CallbackThread::Config cfg {};
     cfg.priority = pImpl->config.priority;
@@ -80,20 +80,21 @@ bool embot::os::theCallbackManager::start(const Config &config)
     cfg.queuesize = pImpl->config.capacityofhandler;
     cfg.timeout = embot::core::reltimeWaitForever;
     cfg.startup = nullptr;
+    cfg.name = "tCBKman";
     
-    pImpl->task->start(cfg);
+    pImpl->thread->start(cfg);
     
     return true;    
 }
 
 bool embot::os::theCallbackManager::started() const
 {
-    return (nullptr == pImpl->task) ? false : true;
+    return (nullptr == pImpl->thread) ? false : true;
 }
 
-embot::os::Thread * embot::os::theCallbackManager::task() const
+embot::os::Thread * embot::os::theCallbackManager::thread() const
 {
-    return pImpl->task;
+    return pImpl->thread;
 }
     
 

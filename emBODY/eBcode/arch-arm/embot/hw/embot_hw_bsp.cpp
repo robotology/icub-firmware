@@ -317,7 +317,7 @@ namespace embot { namespace hw { namespace bsp { namespace led {
     
     #elif   defined(STM32HAL_BOARD_STM32G4EVAL)
        
-    constexpr PROP led1p = { .on = embot::hw::gpio::State::SET, .off = embot::hw::gpio::State::RESET, .gpio = {embot::hw::GPIO::PORT::G, embot::hw::GPIO::PIN::nine}  };  
+    constexpr PROP led1p = { .on = embot::hw::gpio::State::RESET, .off = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::G, embot::hw::GPIO::PIN::nine}  };  
         
     constexpr BSP thebsp {        
         // maskofsupported
@@ -1624,7 +1624,7 @@ namespace embot { namespace hw { namespace bsp { namespace i2c {
             MX_I2C1_Init();
         }        
     }
-
+    
     #elif   defined(STM32HAL_BOARD_STM32G4EVAL)
     
     constexpr PROP i2c3p { .handle = &hi2c3 };

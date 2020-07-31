@@ -54,11 +54,11 @@ using namespace std;
 // in any case: the get time when called by the EXTI Handler DOES not call the svc because osal
 // functions detect the call from an IRQhandler.
 
-#define USE_millisec_resolution
+//#define USE_millisec_resolution
 
-#if defined(USE_millisec_resolution)
-#include "osal_system.h"
-#endif
+//#if defined(USE_millisec_resolution)
+//#include "osal_system.h"
+//#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - all the rest
@@ -181,7 +181,8 @@ namespace embot { namespace hw { namespace button {
     embot::core::Time _timenow()
     {
 #if defined(USE_millisec_resolution)      
-        return osal_system_ticks_abstime_get();
+        //return osal_system_ticks_abstime_get();
+        return embot::core::timenow(embot::core::TimeResolution::milli);
 #else
         return embot::core::now();
 #endif        

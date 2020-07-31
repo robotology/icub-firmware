@@ -92,6 +92,11 @@ static osStatus_t svcRtxKernelInitialize (void) {
   // Initialize osRtxInfo
   memset(&osRtxInfo.kernel, 0, sizeof(osRtxInfo) - offsetof(osRtxInfo_t, kernel));
 
+#if defined(CMSISOS2_ICUB_CHANGES)  
+  cmsiso2_tick = 0;
+#endif
+  
+  
   osRtxInfo.isr_queue.data = osRtxConfig.isr_queue.data;
   osRtxInfo.isr_queue.max  = osRtxConfig.isr_queue.max;
 
@@ -397,6 +402,10 @@ static void svcRtxKernelResume (uint32_t sleep_ticks) {
   }
 
   osRtxInfo.kernel.tick += sleep_ticks;
+  
+#if defined(CMSISOS2_ICUB_CHANGES) 
+  cmsiso2_tick += sleep_ticks;
+#endif 
 
   // Process Thread Delay list
   thread = osRtxInfo.thread.delay_list;

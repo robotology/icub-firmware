@@ -50,6 +50,7 @@ int main(void)
     
     led_toggle();
     
+    osRtxInfo.kernel.state = osRtxKernelInactive;
     osKernelInitialize ();
     osThreadNew(threadmainCBK, NULL, &threadmainPROP);
     osKernelStart();  

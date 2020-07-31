@@ -38,7 +38,6 @@
 #include "embot_hw_bsp.h"
 #include "embot_hw_flash.h"
 
-#include "osal.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
@@ -99,7 +98,7 @@ embot::app::theApplication::~theApplication() { }
         
     embot::os::init({});
     
-    embot::os::theScheduler::Config cfg { embot::os::theScheduler::Timing(embot::hw::sys::clock(embot::hw::CLOCK::syscore),  pImpl->config.ticktime), pImpl->config.behaviour };    
+    embot::os::theScheduler::Config cfg { embot::os::theScheduler::Timing(pImpl->config.ticktime), pImpl->config.behaviour };    
     embot::os::theScheduler &thescheduler = embot::os::theScheduler::getInstance();
     thescheduler.start(cfg);    
     

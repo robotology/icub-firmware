@@ -22,8 +22,9 @@
 #define _EMBOT_OS_THETIMERMANAGER_H_
 
 #include "embot_core.h"
-#include "embot_os.h"
+#include "embot_os_common.h"
 #include "embot_os_Timer.h"
+
 #include <memory>
 
 namespace embot { namespace os {

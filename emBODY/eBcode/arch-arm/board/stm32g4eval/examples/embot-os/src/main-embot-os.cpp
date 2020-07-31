@@ -5,6 +5,7 @@
  * email:   marco.accame@iit.it
 */
 
+#define TEST_EMBOT_OS_OSAL
 
 #include "embot_core.h"
 #include "embot_core_binary.h"
@@ -81,11 +82,10 @@ void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventma
     {
 #if defined(enableTRACE_all)        
         embot::core::TimeFormatter tf(embot::core::now());        
-//        embot::hw::sys::puts("mainthread-onevent: evtTick received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
+        embot::hw::sys::puts("mainthread-onevent: evtTick received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
 #endif  
 
-        //embot::hw::sys::puts("mainthread-onevent: called a fake reading of chip TLV493D which will be effectvively read when board fap arrives");    
-//        embot::hw::sys::puts("mainthread-onevent: reading chip TLV493D");    
+        embot::hw::sys::puts("mainthread-onevent: called a fake reading of chip TLV493D which will be effectvively read when board fap arrives");    
         embot::core::Callback cbk00(alertdataisready00, t);
         embot::hw::tlv493d::acquisition(embot::hw::TLV493D::one, cbk00);        
     }
@@ -94,7 +94,7 @@ void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventma
     {
 #if defined(enableTRACE_all)        
         embot::core::TimeFormatter tf(embot::core::now());        
- //       embot::hw::sys::puts("evthread-onevent: evtRead received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
+        embot::hw::sys::puts("evthread-onevent: evtRead received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
 #endif  
 
         if(embot::hw::resOK != embot::hw::tlv493d::read(embot::hw::TLV493D::one, position))
@@ -102,7 +102,7 @@ void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventma
             position = 66666;
         }
         
-        embot::hw::sys::puts("@ " + tf.to_string() + " -> chip TLV493D pos = "  + std::to_string(0.01 * position) + "deg");
+        embot::hw::sys::puts("pos = " + std::to_string(0.01 * position) + "deg");
         
     }    
     
@@ -156,6 +156,35 @@ void initSystem(embot::os::Thread *t, void* initparam)
     thr = new embot::os::EventThread;          
     // and start it
     thr->start(configEV); 
+    
+#if defined(TEST_EMBOT_OS_OSAL)    
+    
+    embot::os::PeriodicThread::Config pc { 
+        4*1024, 
+        embot::os::Priority::medium100, 
+        [](embot::os::Thread *t, void *param) {
+            static uint64_t zz{0};
+            
+            zz = embot::core::now();  
+            zz = zz;            
+        }, 
+        nullptr,
+        100*embot::core::time1millisec,
+        [](embot::os::Thread *t, void *param) { 
+            static uint64_t xx{0};
+            
+            xx = embot::core::now();
+            
+            embot::core::TimeFormatter tf(embot::core::now());        
+            embot::hw::sys::puts("periodic thread: exec @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full)); 
+            
+        }
+    };
+
+    embot::os::PeriodicThread *pth = new embot::os::PeriodicThread;
+    pth->start(pc);    
+
+#endif
 
     embot::hw::sys::puts("quitting the INIT thread. Normal scheduling starts");    
 }

@@ -37,7 +37,7 @@
 struct embot::os::theTimerManager::Impl
 {    
     Config config {};    
-    embot::os::MessageThread *task {nullptr};
+    embot::os::MessageThread *thread {nullptr};
     
     Impl() 
     {              
@@ -82,9 +82,9 @@ bool embot::os::theTimerManager::start(const Config &config)
         return false;
     }
     
-    pImpl->task = new embot::os::MessageThread;
-    
-    embot::os::MessageThread::Config cfg;
+    pImpl->thread = new embot::os::MessageThread;
+        
+    embot::os::MessageThread::Config cfg {};
     cfg.priority = pImpl->config.priority;
     cfg.stacksize = pImpl->config.stacksize;
     cfg.messagequeuesize = pImpl->config.capacityofhandler;
@@ -92,8 +92,9 @@ bool embot::os::theTimerManager::start(const Config &config)
     cfg.startup = nullptr;
     cfg.onmessage = pImpl->processtimer;
     cfg.param = this;
+    cfg.name = "tTMRman";
     
-    pImpl->task->start(cfg);
+    pImpl->thread->start(cfg);
     
     return true;
     
@@ -101,17 +102,17 @@ bool embot::os::theTimerManager::start(const Config &config)
 
 bool embot::os::theTimerManager::started() const
 {
-    return (nullptr == pImpl->task) ? false : true;
+    return (nullptr == pImpl->thread) ? false : true;
 }
 
 bool embot::os::theTimerManager::onexpiry(const Timer &timer)
 {
-    if(nullptr == pImpl->task)
+    if(nullptr == pImpl->thread)
     {
         return false;
     }
     
-    pImpl->task->setMessage(reinterpret_cast<embot::os::Message>(const_cast<Timer*>(&timer)), embot::core::reltimeWaitNone);
+    pImpl->thread->setMessage(reinterpret_cast<embot::os::Message>(const_cast<Timer*>(&timer)), embot::core::reltimeWaitNone);
     return true;
 }
     
