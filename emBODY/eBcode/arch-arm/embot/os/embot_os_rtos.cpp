@@ -1152,6 +1152,9 @@ uint32_t osRtxErrorNotify (uint32_t code, void *object_id)
             thread = object_id;
         }
         
+//        embot::os::Thread *t = embot::os::rtos::scheduler_getassociated(thread);
+//        const char *name = t->getName();
+//        name = name;       
         
         if(nullptr != i->onerror)
         {
@@ -1162,29 +1165,14 @@ uint32_t osRtxErrorNotify (uint32_t code, void *object_id)
     for(;;);
     
     return 0;
+    
+//// OS Error Codes
+//#define osRtxErrorStackUnderflow        1U  ///< Stack overflow, i.e. stack pointer below its lower memory limit for descending stacks. (thread_id=object_id)
+//#define osRtxErrorISRQueueOverflow      2U  ///< ISR Queue overflow detected when inserting object. (object_id)
+//#define osRtxErrorTimerQueueOverflow    3U  ///< User Timer Callback Queue overflow detected for timer. (timer_id=object_id)
+//#define osRtxErrorClibSpace             4U  ///< Standard C/C++ library libspace not available: increase OS_THREAD_LIBSPACE_NUM. (thread_id=object_id)
+//#define osRtxErrorClibMutex             5U  ///< Standard C/C++ library mutex initialization failed.
 
-//  switch (code) {
-//    case osRtxErrorStackUnderflow:
-//      // Stack overflow detected for thread (thread_id=object_id)
-//      break;
-//    case osRtxErrorISRQueueOverflow:
-//      // ISR Queue overflow detected when inserting object (object_id)
-//      break;
-//    case osRtxErrorTimerQueueOverflow:
-//      // User Timer Callback Queue overflow detected for timer (timer_id=object_id)
-//      break;
-//    case osRtxErrorClibSpace:
-//      // Standard C/C++ library libspace not available: increase OS_THREAD_LIBSPACE_NUM
-//      break;
-//    case osRtxErrorClibMutex:
-//      // Standard C/C++ library mutex initialization failed
-//      break;
-//    default:
-//      // Reserved
-//      break;
-//  }
-//  for (;;) {}
-//return 0U;
 }    
 
 
@@ -1193,22 +1181,152 @@ uint32_t osRtxErrorNotify (uint32_t code, void *object_id)
 
 
 
-// use both or at least one.
-#define USE_STD_C_MULTITHREAD_PROTECTION
-#define USE_HEAP_PROTECTION_FROM_OS
 
+#if defined(EMBOT_USE_rtos_osal)
+    
+    // osal is able to protect heap allocator/disallocator vs multithread use
+    // in two equally effective modes: 
+    // - the arm c libraries multithread support as described by
+    //   https://developer.arm.com/documentation/dui0475/m/the-arm-c-and-c---libraries/multithreaded-support-in-arm-c-libraries?lang=en  
+    // - use of custom heap manager functions (allocator and disallocator) protected by svc calls.
+    //   these functions are: osal_base_memory_new() and osal_base_memory_del()
+    // on eth boards we have used both modes, even if this double protection is somehow redundant. 
+    // on the embot::os can boards we have used only the custom heap manager functions called inside redefined new and delete operators.
+
+    // hence for the embot::os::rtos with osal we keep on using the same strategy. 
+    // it has worked so far and we dont want to change its behaviour.
+    // use macros ....
+    
+    // #define EMBOT_HEAP_redefine_heapoperators
+
+    #define EMBOT_HEAP_PROTECTION_use_OSsupport
+    //#define EMBOT_HEAP_PROTECTION_use_armCmultithreadsupport
+        
+    #if defined(EMBOT_HEAP_PROTECTION_use_OSsupport) & !defined(EMBOT_HEAP_redefine_heapoperators)
+        #define EMBOT_HEAP_redefine_heapoperators
+    #endif  
+
+    #if defined(EMBOT_HEAP_PROTECTION_use_armCmultithreadsupport) & !defined(EMBOT_HEAP_redefine_heapoperators)
+        #define EMBOT_HEAP_redefine_heapoperators
+    #endif
+
+#elif defined(EMBOT_USE_rtos_cmsisos2)
+
+    // cmsisos2 is able to protects heap allocator/disallocator vs multithread use
+    // with the same mechanisms as osal.
+    
+    // the same mechanism of osal ( ... ) does not work on all applications.
+    // for this reason we swithc using only the EMBOT_HEAP_PROTECTION_use_armCmultithreadsupport
+
+    // i have experienced problems with EMBOT_HEAP_PROTECTION_use_OSsupport
+    // when running the application of a strain2 (but on the stm32g4eval it is ok).
+    // hence i prefer to disable EMBOT_HEAP_PROTECTION_use_OSsupport.
+    // and use only EMBOT_HEAP_PROTECTION_use_armCmultithreadsupport.
+    // this latter is also the only mode which RTX V5 use
+    
+
+    //#define EMBOT_HEAP_redefine_heapoperators
+    
+    //#define EMBOT_HEAP_PROTECTION_use_OSsupport
+    #define EMBOT_HEAP_PROTECTION_use_armCmultithreadsupport  
+    
+    
+    #if defined(EMBOT_HEAP_PROTECTION_use_OSsupport) & !defined(EMBOT_HEAP_redefine_heapoperators)
+        #define EMBOT_HEAP_redefine_heapoperators
+    #endif  
+    
+    #if defined(EMBOT_HEAP_PROTECTION_use_armCmultithreadsupport) & !defined(EMBOT_HEAP_redefine_heapoperators)
+        #define EMBOT_HEAP_redefine_heapoperators
+    #endif     
+
+#endif
+
+
+// -- heap protection
+//    in here we redefine new and delete so that they may be thread safe. 
+
+#if defined(EMBOT_HEAP_redefine_heapoperators)
+
+// here is what i need with armclang and -std=c++17
+void* operator new(std::size_t size) noexcept(false)
+{
+#if !defined(EMBOT_HEAP_PROTECTION_use_OSsupport)  
+    void* ptr = calloc(size, 1);
+    if(nullptr == ptr)
+    {
+    #if defined(EMBOT_USE_rtos_cmsisos2)
+        osRtxErrorNotify(666, nullptr);
+    #elif defined(EMBOT_USE_rtos_osal)
+        for(;;);
+    #endif
+    }
+#else    
+#if defined(EMBOT_USE_rtos_cmsisos2)
+    void* ptr = cmsisos2_memory_new(size);
+    if(nullptr == ptr)
+    {
+        osRtxErrorNotify(666, nullptr);
+    }
+#elif defined(EMBOT_USE_rtos_osal)
+    void* ptr = osal_base_memory_new(size);
+#endif
+
+#endif
+    return ptr;
+}
+
+void* operator new (std::size_t size, const std::nothrow_t& nothrow_value) noexcept
+{
+#if !defined(EMBOT_HEAP_PROTECTION_use_OSsupport)  
+    void* ptr = calloc(size, 1);
+    #if defined(EMBOT_USE_rtos_cmsisos2)
+        osRtxErrorNotify(667, nullptr);
+    #elif defined(EMBOT_USE_rtos_osal)
+        for(;;);
+    #endif
+#else   
+#if defined(EMBOT_USE_rtos_cmsisos2)
+    void* ptr = cmsisos2_memory_new(size);
+    if(nullptr == ptr)
+    {
+        osRtxErrorNotify(667, nullptr);
+    }    
+#elif defined(EMBOT_USE_rtos_osal)    
+    void* ptr = osal_base_memory_new(size);
+#endif
+#endif    
+    return ptr;    
+}
+
+void operator delete (void* ptr) noexcept
+{
+    if(nullptr == ptr)
+    {
+        return;
+    }
+#if !defined(EMBOT_HEAP_PROTECTION_use_OSsupport)     
+    free(ptr);
+#else    
+#if defined(EMBOT_USE_rtos_cmsisos2)
+    cmsisos2_memory_delete(ptr);
+#elif defined(EMBOT_USE_rtos_osal)  
+    osal_base_memory_del(ptr);
+#endif
+#endif    
+}
+
+#endif //#if defined(EMBOT_HEAP_PROTECTION_use_OSsupport)
 
 
 // -- C/C++ Standard Library Multithreading Interface
 //    see https://developer.arm.com/documentation/dui0475/m/the-arm-c-and-c---libraries/multithreaded-support-in-arm-c-libraries?lang=en
 
-#if defined(USE_STD_C_MULTITHREAD_PROTECTION)
+#if defined(EMBOT_HEAP_PROTECTION_use_armCmultithreadsupport)
 
 
 #if defined(EMBOT_USE_rtos_osal)
 
     // it is implemneted inside the osal
-
     #include "osal_arch_arm.h"
 
     extern "C" {
@@ -1249,7 +1367,7 @@ uint32_t osRtxErrorNotify (uint32_t code, void *object_id)
     
 #elif defined(EMBOT_USE_rtos_cmsisos2)
     
-    // it in implemented in here.
+    // it is implemented in here.
     // we get it from rtx_lib.c of cmsis os2
 
     // static mutext allocator
@@ -1268,171 +1386,120 @@ uint32_t osRtxErrorNotify (uint32_t code, void *object_id)
         return osMutexNew(mem->attribute());                
     } 
 
-    extern "C"
-    {   
-
+    extern "C" {      
     
-    
-    #if ( !defined(RTX_NO_MULTITHREAD_CLIB) && \
-     ( defined(__CC_ARM) || \
-      (defined(__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050))) && \
-      !defined(__MICROLIB))
+        #if ( !defined(RTX_NO_MULTITHREAD_CLIB) && \
+         ( defined(__CC_ARM) || \
+          (defined(__ARMCC_VERSION) && (__ARMCC_VERSION >= 6010050))) && \
+          !defined(__MICROLIB))
+          
+        #define OS_THREAD_LIBSPACE_NUM 4
+        #define LIBSPACE_SIZE 96
       
-    #define OS_THREAD_LIBSPACE_NUM 4
-    #define LIBSPACE_SIZE 96
-  
-    // Memory for libspace
-    static uint32_t os_libspace[OS_THREAD_LIBSPACE_NUM+1][LIBSPACE_SIZE/4];
+        // Memory for libspace
+        static uint32_t os_libspace[OS_THREAD_LIBSPACE_NUM+1][LIBSPACE_SIZE/4];
 
-    // Thread IDs for libspace
-    static osThreadId_t os_libspace_id[OS_THREAD_LIBSPACE_NUM];
+        // Thread IDs for libspace
+        static osThreadId_t os_libspace_id[OS_THREAD_LIBSPACE_NUM];
 
-    // Check if Kernel has been started
-    static uint32_t os_kernel_is_active (void) {
-      static uint8_t os_kernel_active = 0U;
+        // Check if Kernel has been started
+        static uint32_t os_kernel_is_active (void) {
+          static uint8_t os_kernel_active = 0U;
 
-      if (os_kernel_active == 0U) {
-        if (osKernelGetState() > osKernelReady) {
-          os_kernel_active = 1U;
-        }
-      }
-      return (uint32_t)os_kernel_active;
-    }
-
-    // Provide libspace for current thread
-    __attribute__((used))
-    void *__user_perthread_libspace (void);
-    void *__user_perthread_libspace (void) {
-      osThreadId_t id;
-      uint32_t     n;
-
-      if (os_kernel_is_active() != 0U) {
-        id = osThreadGetId();
-        for (n = 0U; n < (uint32_t)OS_THREAD_LIBSPACE_NUM; n++) {
-          if (os_libspace_id[n] == NULL) {
-            os_libspace_id[n] = id;
+          if (os_kernel_active == 0U) {
+            if (osKernelGetState() > osKernelReady) {
+              os_kernel_active = 1U;
+            }
           }
-          if (os_libspace_id[n] == id) {
-            break;
+          return (uint32_t)os_kernel_active;
+        }
+
+        // Provide libspace for current thread
+        __attribute__((used))
+        void *__user_perthread_libspace (void);
+        void *__user_perthread_libspace (void) {
+          osThreadId_t id;
+          uint32_t     n;
+
+          if (os_kernel_is_active() != 0U) {
+            id = osThreadGetId();
+            for (n = 0U; n < (uint32_t)OS_THREAD_LIBSPACE_NUM; n++) {
+              if (os_libspace_id[n] == NULL) {
+                os_libspace_id[n] = id;
+              }
+              if (os_libspace_id[n] == id) {
+                break;
+              }
+            }
+            if (n == (uint32_t)OS_THREAD_LIBSPACE_NUM) {
+              (void)osRtxErrorNotify(osRtxErrorClibSpace, id);
+            }
+          } else {
+            n = OS_THREAD_LIBSPACE_NUM;
+          }
+
+          //lint -e{9087} "cast between pointers to different object types"
+          return (void *)&os_libspace[n][0];
+        }
+
+        // Mutex identifier
+        typedef void *mutex;
+
+        //lint -save "Function prototypes defined in C library"
+        //lint -e970 "Use of 'int' outside of a typedef"
+        //lint -e818 "Pointer 'm' could be declared as pointing to const"
+
+
+        // Initialize mutex
+        __attribute__((used))
+        int _mutex_initialize(mutex *m);
+        int _mutex_initialize(mutex *m) {
+          volatile int result = 0;
+
+        //  *m = osMutexNew(NULL);
+            *m = mutex_new_static();
+          if (*m != NULL) {
+            result = 1;
+          } else {
+            result = 0;
+            (void)osRtxErrorNotify(osRtxErrorClibMutex, m);
+          }
+          return result;
+        }
+
+        // Acquire mutex
+        __attribute__((used))
+        void _mutex_acquire(mutex *m);
+        void _mutex_acquire(mutex *m) {
+          if (os_kernel_is_active() != 0U) {
+            (void)osMutexAcquire(*m, osWaitForever);
           }
         }
-        if (n == (uint32_t)OS_THREAD_LIBSPACE_NUM) {
-          (void)osRtxErrorNotify(osRtxErrorClibSpace, id);
+
+        // Release mutex
+        __attribute__((used))
+        void _mutex_release(mutex *m);
+        void _mutex_release(mutex *m) {
+          if (os_kernel_is_active() != 0U) {
+            (void)osMutexRelease(*m);
+          }
         }
-      } else {
-        n = OS_THREAD_LIBSPACE_NUM;
-      }
 
-      //lint -e{9087} "cast between pointers to different object types"
-      return (void *)&os_libspace[n][0];
-    }
-
-    // Mutex identifier
-    typedef void *mutex;
-
-    //lint -save "Function prototypes defined in C library"
-    //lint -e970 "Use of 'int' outside of a typedef"
-    //lint -e818 "Pointer 'm' could be declared as pointing to const"
-
-
-    // Initialize mutex
-    __attribute__((used))
-    int _mutex_initialize(mutex *m);
-    int _mutex_initialize(mutex *m) {
-      volatile int result = 0;
-
-    //  *m = osMutexNew(NULL);
-        *m = mutex_new_static();
-      if (*m != NULL) {
-        result = 1;
-      } else {
-        result = 0;
-        (void)osRtxErrorNotify(osRtxErrorClibMutex, m);
-      }
-      return result;
-    }
-
-    // Acquire mutex
-    __attribute__((used))
-    void _mutex_acquire(mutex *m);
-    void _mutex_acquire(mutex *m) {
-      if (os_kernel_is_active() != 0U) {
-        (void)osMutexAcquire(*m, osWaitForever);
-      }
-    }
-
-    // Release mutex
-    __attribute__((used))
-    void _mutex_release(mutex *m);
-    void _mutex_release(mutex *m) {
-      if (os_kernel_is_active() != 0U) {
-        (void)osMutexRelease(*m);
-      }
-    }
-
-    // Free mutex
-    __attribute__((used))
-    void _mutex_free(mutex *m);
-    void _mutex_free(mutex *m) {
-      (void)osMutexDelete(*m);
-    }
-    
-    #endif // #if ( !defined(RTX_NO_MULTITHREAD_CLIB) ...
-    }
+        // Free mutex
+        __attribute__((used))
+        void _mutex_free(mutex *m);
+        void _mutex_free(mutex *m) {
+          (void)osMutexDelete(*m);
+        }
+        
+        #endif // #if ( !defined(RTX_NO_MULTITHREAD_CLIB) ...
+    } //extern "C"
 
 #endif // #elif defined(EMBOT_USE_rtos_cmsisos2)
 
-#endif // #if defined(USE_STD_C_MULTITHREAD_PROTECTION)
+#endif // #if defined(EMBOT_HEAP_PROTECTION_use_armCmultithreadsupport)
 
 
-// -- custom heap protection
-//    in here we redefine new and delete so that they may be thread safe. 
-
-#if defined(USE_HEAP_PROTECTION_FROM_OS)
-
-// here is what i need with armclang and -std=c++17
-void* operator new(std::size_t size) noexcept(false)
-{
-#if defined(EMBOT_USE_rtos_cmsisos2)
-    void* ptr = cmsisos2_memory_new(size);
-    if(nullptr == ptr)
-    {
-        osRtxErrorNotify(666, nullptr);
-    }
-#elif defined(EMBOT_USE_rtos_osal)
-    void* ptr = osal_base_memory_new(size);
-#endif
-    return ptr;
-}
-
-void* operator new (std::size_t size, const std::nothrow_t& nothrow_value) noexcept
-{
-#if defined(EMBOT_USE_rtos_cmsisos2)
-    void* ptr = cmsisos2_memory_new(size);
-    if(nullptr == ptr)
-    {
-        osRtxErrorNotify(667, nullptr);
-    }    
-#elif defined(EMBOT_USE_rtos_osal)    
-    void* ptr = osal_base_memory_new(size);
-#endif    
-    return ptr;    
-}
-
-void operator delete (void* ptr) noexcept
-{
-#if defined(EMBOT_USE_rtos_cmsisos2)
-    if(nullptr == ptr)
-    {
-        return;
-    }
-    cmsisos2_memory_delete(ptr);
-#elif defined(EMBOT_USE_rtos_osal)  
-    osal_base_memory_del(ptr);
-#endif    
-}
-
-#endif //#if defined(USE_HEAP_PROTECTION_FROM_OS)
 
 
 // -- extra configuration for osal
