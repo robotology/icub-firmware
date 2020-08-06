@@ -2482,7 +2482,6 @@ bool embot::app::application::theSTRAIN::get(const embot::prot::can::analog::pol
     replyinfo.channel = info.channel;
     replyinfo.valueiscalibrated = info.getcalibrated;  
     
-    replyinfo.adcvalue = 0; 
     
     bool allchannels = false;
     if(false == pImpl->ischannelvalid(replyinfo.channel, allchannels))
@@ -2491,8 +2490,14 @@ bool embot::app::application::theSTRAIN::get(const embot::prot::can::analog::pol
     }  
     
     if(allchannels)
-    {   // we cannot operate on all channels
-        return false;
+    {   // we can operate on all channels
+        replyinfo.numberofvalues = 6;
+        replyinfo.valueindex = 0; 
+    }
+    else
+    {
+        replyinfo.numberofvalues = 1;
+        replyinfo.valueindex = 0; 
     }
     
     
@@ -2506,28 +2511,55 @@ bool embot::app::application::theSTRAIN::get(const embot::prot::can::analog::pol
         // we call processing() because the calibration is not done inside acquisition_retrieve() 
         pImpl->processing();
         
-        switch(replyinfo.channel)
-        {   
-            // force
-            case 0:     v = pImpl->runtimedata.data.force.x;   break;
-            case 1:     v = pImpl->runtimedata.data.force.y;   break;
-            case 2:     v = pImpl->runtimedata.data.force.z;   break;
-            // torque
-            case 3:     v = pImpl->runtimedata.data.torque.x;    break;
-            case 4:     v = pImpl->runtimedata.data.torque.y;    break;
-            case 5:     v = pImpl->runtimedata.data.torque.z;    break;
-            // impossible ...
-            default:    v = 0;                                  break;
+        if(1 == replyinfo.numberofvalues)
+        {
+            switch(replyinfo.channel)
+            {   
+                // force
+                case 0:     v = pImpl->runtimedata.data.force.x;   break;
+                case 1:     v = pImpl->runtimedata.data.force.y;   break;
+                case 2:     v = pImpl->runtimedata.data.force.z;   break;
+                // torque
+                case 3:     v = pImpl->runtimedata.data.torque.x;    break;
+                case 4:     v = pImpl->runtimedata.data.torque.y;    break;
+                case 5:     v = pImpl->runtimedata.data.torque.z;    break;
+                // impossible ...
+                default:    v = 0;                                  break;
+            }
+            
+            //replyinfo.adcvalue = v;
+            replyinfo.adcvalues[0] = v;
         }
+        else
+        {
+            replyinfo.adcvalues[0] = pImpl->runtimedata.data.force.x;
+            replyinfo.adcvalues[1] = pImpl->runtimedata.data.force.y;
+            replyinfo.adcvalues[2] = pImpl->runtimedata.data.force.z;
+            replyinfo.adcvalues[3] = pImpl->runtimedata.data.torque.x;
+            replyinfo.adcvalues[4] = pImpl->runtimedata.data.torque.y;
+            replyinfo.adcvalues[5] = pImpl->runtimedata.data.torque.z;
+        }
+
 
     }
     else
     {
-       v = pImpl->runtimedata.data.adcvalue[replyinfo.channel]; 
+        if(1 == replyinfo.numberofvalues)
+        {
+            v = pImpl->runtimedata.data.adcvalue[replyinfo.channel]; 
+            //replyinfo.adcvalue = v;
+            replyinfo.adcvalues[0] = v;
+        }
+        else
+        {
+            for(int i=0; i<6; i++)
+            {
+                replyinfo.adcvalues[i] = pImpl->runtimedata.data.adcvalue[i];
+            }
+        }
     }
     
     
-    replyinfo.adcvalue = v;
     
     
     return true;        

@@ -437,13 +437,16 @@ bool embot::app::application::theCANparserSTRAIN::Impl::process_get_ch_adc(const
     config.agent->get(msg.info, replyinfo);
     
     embot::prot::can::Frame frame0;
-    if(true == msg.reply(frame0, embot::app::theCANboardInfo::getInstance().cachedCANaddress(), replyinfo))
+    for(int i=0; i<replyinfo.numberofvalues; i++)
     {
-        replies.push_back(frame0);
-        return true;
-    }        
+        replyinfo.valueindex = i;
+        if(true == msg.reply(frame0, embot::app::theCANboardInfo::getInstance().cachedCANaddress(), replyinfo))
+        {
+            replies.push_back(frame0);           
+        }   
+    }    
 
-    return false;    
+    return true;    
 }
 
 

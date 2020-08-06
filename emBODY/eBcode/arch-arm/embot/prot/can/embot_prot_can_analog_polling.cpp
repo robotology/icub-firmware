@@ -37,7 +37,7 @@
 
 #include "embot_hw.h"
 
-
+#include <algorithm>
 
 // --------------------------------------------------------------------------------------------------------------------
 // - all the rest
@@ -789,11 +789,12 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
 
     bool Message_GET_CH_ADC::reply(embot::prot::can::Frame &outframe, const std::uint8_t sender, const ReplyInfo &replyinfo)
     {
+        uint8_t valueindex = std::min(static_cast<uint8_t>(ReplyInfo::adcvaluesmaxnumber-1), static_cast<uint8_t>(replyinfo.valueindex));
         std::uint8_t dd[7] = {0};
-        dd[0] = replyinfo.channel;
+        dd[0] = (replyinfo.channel != embot::core::tointegral(StrainChannel::all)) ? replyinfo.channel : valueindex;
         dd[1] = (true == replyinfo.valueiscalibrated) ? (1) : (0);
-        dd[2] = (replyinfo.adcvalue >> 8) & 0xff;      // important note: the strain uses big endianess ... 
-        dd[3] = replyinfo.adcvalue & 0xff;             
+        dd[2] = (replyinfo.adcvalues[valueindex] >> 8) & 0xff;      // important note: the strain uses big endianess ... 
+        dd[3] = replyinfo.adcvalues[valueindex] & 0xff;             
 
         
         std::uint8_t datalen = 4;
