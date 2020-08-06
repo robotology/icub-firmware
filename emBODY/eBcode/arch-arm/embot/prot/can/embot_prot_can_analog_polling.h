@@ -564,17 +564,20 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
                                     
         struct Info
         { 
-            std::uint8_t    channel;        // use StrainChannel but not StrainChannel::all
+            std::uint8_t    channel;        // use StrainChannel and also StrainChannel::all
             bool            getcalibrated;
             Info() : channel(0), getcalibrated(true) {}
         };
         
         struct ReplyInfo
         {
-            std::uint8_t        channel;    // use StrainChannel but not StrainChannel::all
-            bool                valueiscalibrated;
-            std::uint16_t       adcvalue;
-            ReplyInfo() : channel(0), valueiscalibrated(true), adcvalue(0) {}          
+            static constexpr uint8_t adcvaluesmaxnumber = 6;
+            std::uint8_t        channel {0};    // use StrainChannel and also StrainChannel::all
+            bool                valueiscalibrated {true};
+            std::uint8_t        valueindex {0};
+            std::uint8_t        numberofvalues {0};
+            std::uint16_t       adcvalues[adcvaluesmaxnumber] {0}; // six because only ft uses it
+            ReplyInfo() : channel(0), valueiscalibrated(true), valueindex(0), numberofvalues(0) { std::memset(adcvalues, 0, sizeof(adcvalues)); }          
         };        
         
         Info info;
