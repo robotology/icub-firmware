@@ -21,6 +21,7 @@
 #include "cmsisos2.h"
 #elif defined(EMBOT_USE_rtos_osal)
 #include "osal.h"
+extern uint32_t SystemCoreClock; // osal needs a cpu speed
 #else
 #error embot::os::rtos -> pls specify an RTOS xxxx to use by definition of EMBOT_USE_rtos_xxxx
 #endif
@@ -383,7 +384,7 @@ namespace embot { namespace os { namespace rtos {
             
         }
                  
-        void prepare(uint32_t cpufreq, embot::core::Time ticktime, uint16_t initstacksize, uint16_t idlestacksize, 
+        void prepare(embot::core::Time ticktime, uint16_t initstacksize, uint16_t idlestacksize, 
                      embot::core::fpWorker onidle, embot::core::fpWorker oninit, fpOnOSerror onerror)
         {
             
@@ -487,7 +488,7 @@ namespace embot { namespace os { namespace rtos {
             _internals.cfg.memorymodel = osal_memmode_dynamic;
             _internals.cfg.prio = 15;
             _internals.cfg.cpufam = osal_cpufam_armcm4;  
-            _internals.cfg.cpufreq = 168000000; // or use embot::hw::sys::clock(embot::hw::CLOCK::syscore)
+            _internals.cfg.cpufreq = 0; 
             _internals.cfg.tick = embot::core::time1millisec;
             _internals.cfg.launcherstacksize = 2048;
             _internals.cfg.idlestacksize = 512;
@@ -499,13 +500,12 @@ namespace embot { namespace os { namespace rtos {
             _internals.cfg.extfn.usr_on_idle = nullptr;    
         }
                 
-        void prepare(uint32_t cpufreq, embot::core::Time ticktime, uint16_t initstacksize, uint16_t idlestacksize, 
+        void prepare(embot::core::Time ticktime, uint16_t initstacksize, uint16_t idlestacksize, 
                  embot::core::fpWorker onidle, embot::core::fpWorker oninit, fpOnOSerror onerror)
         {
         
             reset();
-            
-            _internals.cfg.cpufreq = cpufreq;
+            _internals.cfg.cpufreq = SystemCoreClock;
             _internals.cfg.tick = ticktime;            
             _internals.cfg.launcherstacksize = initstacksize;        
             _internals.cfg.idlestacksize = idlestacksize;  
@@ -539,10 +539,10 @@ namespace embot { namespace os { namespace rtos {
     }
 
     
-    void scheduler_props_t::prepare(uint32_t cpufreq, embot::core::Time ticktime, uint16_t initstacksize, uint16_t idlestacksize, 
+    void scheduler_props_t::prepare(embot::core::Time ticktime, uint16_t initstacksize, uint16_t idlestacksize, 
                  embot::core::fpWorker onidle, embot::core::fpWorker oninit, fpOnOSerror onerror)
     {
-        pImpl->prepare(cpufreq, ticktime, initstacksize, idlestacksize, onidle, oninit, onerror);
+        pImpl->prepare(ticktime, initstacksize, idlestacksize, onidle, oninit, onerror);
     }  
 
     void * scheduler_props_t::getInternals()
@@ -709,15 +709,37 @@ namespace embot { namespace os { namespace rtos {
         return osal_info_status_running == osal_info_get_status(); 
 #endif            
     }
+
+// needs stm32hal.h w/ all its stuff to see the __NOP() ....    
+//    static core::Time _fakenow()
+//    {
+//        // if kernel is not running wait approximately 1 us then increment 
+//        // and return auxiliary tick counter value
+//        static volatile core::Time tt = 0;
+//        //for(int i = (SystemCoreClock >> 14U); i > 0U; i--) { // that is 1 ms
+//        for(int i = (SystemCoreClock >> 4U); i > 0U; i--) {
+//            __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP();
+//            __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP();
+//        }        
+//        return ++tt;        
+//    }
+    
+    static core::Time _fakenow() { return 0; }
     
     embot::core::Time scheduler_timeget()
     {
+        if(!scheduler_isrunning())
+        {
+            return _fakenow();
+        }
+        
 #if defined(EMBOT_USE_rtos_cmsisos2)
-            return cmsisos2_sys_abstime();
+        return cmsisos2_sys_abstime();
 #elif defined(EMBOT_USE_rtos_osal)
-            return osal_system_abstime_get();
-#endif
-    }  
+        return osal_system_abstime_get();
+#endif        
+    } 
+    
     
     thread_t * scheduler_thread_running()
     {
@@ -768,7 +790,24 @@ namespace embot { namespace os { namespace rtos {
         
     }
 
+    void scheduler_lock()
+    {
+#if defined(EMBOT_USE_rtos_cmsisos2)
+        osKernelLock();
+#elif defined(EMBOT_USE_rtos_osal)
+        osal_system_scheduling_suspend();
+#endif          
+    }
     
+
+    void scheduler_unlock()
+    {
+#if defined(EMBOT_USE_rtos_cmsisos2)
+        osKernelUnlock();
+#elif defined(EMBOT_USE_rtos_osal)
+        osal_system_scheduling_restart();
+#endif  
+    }        
     // -- thread section
     
 
@@ -940,6 +979,15 @@ namespace embot { namespace os { namespace rtos {
 #endif    
     }
     
+    uint8_t messagequeue_size(messagequeue_t *mq)
+    {
+#if defined(EMBOT_USE_rtos_cmsisos2)
+        return osMessageQueueGetCount(mq);
+#elif defined(EMBOT_USE_rtos_osal)     
+        return osal_messagequeue_size(reinterpret_cast<osal_messagequeue_t*>(mq), osal_callerAUTOdetect);
+#endif    
+    }
+    
     // -- timer section
     
     
@@ -1097,6 +1145,35 @@ namespace embot { namespace os { namespace rtos {
         osal_semaphore_delete(reinterpret_cast<osal_semaphore_t*>(s));
 #endif         
     }
+    
+    void * memory_new(size_t size)
+    {
+#if defined(EMBOT_USE_rtos_cmsisos2)
+        return cmsisos2_memory_new(size);
+#elif defined(EMBOT_USE_rtos_osal)       
+        return osal_base_memory_new(size);
+#endif  
+    } 
+    
+    void * memory_realloc(void *mem, size_t size)
+    {
+#if defined(EMBOT_USE_rtos_cmsisos2)
+//        return cmsisos2_memory_realloc(mem, size);
+        return realloc(mem, size);
+#elif defined(EMBOT_USE_rtos_osal)       
+        return osal_base_memory_realloc(mem, size);
+#endif 
+    }  
+    
+    void memory_delete(void *mem)
+    {
+#if defined(EMBOT_USE_rtos_cmsisos2)
+ //       cmsisos2_memory_delete(mem);
+        free(mem);
+#elif defined(EMBOT_USE_rtos_osal)       
+        osal_base_memory_del(mem);
+#endif 
+    }        
     
     
 }}} // namespace embot { namespace os { namespace rtos {

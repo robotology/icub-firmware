@@ -11,7 +11,7 @@
 #define _EMBOT_HW_BSP_CONFIG_H_
 
 #include "embot_core.h"
-#include "embot_hw.h"
+#include "embot_hw_types.h"
 #include "embot_hw_bsp.h"
 
 #include "stm32hal.h"

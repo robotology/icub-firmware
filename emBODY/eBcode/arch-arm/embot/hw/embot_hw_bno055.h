@@ -25,7 +25,7 @@
 #include "embot_core.h"
 #include "embot_core_utils.h"
 #include "embot_core_binary.h"
-#include "embot_hw.h"
+#include "embot_hw_types.h"
 
 
 #include "embot_hw_i2c.h"

@@ -35,7 +35,12 @@ namespace embot { namespace os {
     {
         std::uint8_t v = embot::core::tointegral(prio);
         return ((v >= embot::core::tointegral(Priority::systemMIN)) && (v <= embot::core::tointegral(Priority::systemMAX))) ? true : false;       
-    }        
+    }
+
+    constexpr Priority topriority(uint8_t prio)
+    {   // we should check vs the converted value ....
+        return static_cast<Priority>(prio);
+    }
     
 }}
 
