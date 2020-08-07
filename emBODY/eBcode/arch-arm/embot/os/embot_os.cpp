@@ -32,7 +32,6 @@
 
 #include "stdlib.h"
 #include "embot_hw.h"
-#include "embot_hw_sys.h"
 #include "embot_os_theScheduler.h"
 
 #include <new>
@@ -50,26 +49,10 @@
 
 namespace embot { namespace os {
 
-    static core::Time _fakenow()
-    {
-        // if kernel is not running wait approximately 1 us then increment 
-        // and return auxiliary tick counter value
-        static volatile core::Time tt = 0;
-        //for(int i = (SystemCoreClock >> 14U); i > 0U; i--) { // that is 1 ms
-        for(int i = (SystemCoreClock >> 4U); i > 0U; i--) {
-            __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP();
-            __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP();
-        }        
-        return ++tt;        
-    }
    
     static core::Time _now()
-    { 
-        if(true == started()) 
-        {
-            return embot::os::rtos::scheduler_timeget(); 
-        }        
-        return _fakenow();
+    {
+        return embot::os::rtos::scheduler_timeget();
     }
   
     static bool _initted = false;
@@ -79,13 +62,19 @@ namespace embot { namespace os {
     
     bool init(const Config &config)
     {
+        if(true == initialised())
+        {
+            return true;
+        }
+        
         if(false == config.isvalid())
         {
             return false;
         }
         
         _config = config;
-        // must init the hw bsp with now()
+        
+        embot::core::init({{nullptr, _now}});        
         embot::hw::init({nullptr, _now});
         _initted = true;
         return true;        

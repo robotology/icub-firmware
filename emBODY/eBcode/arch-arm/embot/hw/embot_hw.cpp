@@ -57,16 +57,14 @@ namespace embot { namespace hw {
         {
             return true;
         }
-                
-        // put whatwever is required for ...        
-        stm32hal_config_t cfg = {0};
-        cfg.tick1ms_init = config.initmicrotime;
-        cfg.tick1ms_get = _get1millitick;
-        
-        stm32hal_init(&cfg);
         
         embot::core::init({{nullptr, config.get1microtime}});
-        
+                   
+        stm32hal_config_t cfg = {0};
+        cfg.tick1ms_init = config.initmicrotime;
+        cfg.tick1ms_get = _get1millitick;       
+        stm32hal_init(&cfg);
+                      
         initted = true;
         return true;
     }

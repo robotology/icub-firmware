@@ -24,7 +24,7 @@
 
 #include "embot_core.h"
 #include "embot_core_utils.h"
-#include "embot_hw.h"
+#include "embot_hw_types.h"
 
 
 

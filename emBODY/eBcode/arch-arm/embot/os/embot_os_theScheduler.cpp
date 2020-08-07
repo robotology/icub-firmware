@@ -32,7 +32,6 @@
 #include "embot_os_Thread.h"
 
 #include "embot_os_rtos.h"
-#include "embot_hw_sys.h"
 
 #include <cstring>
 
@@ -100,7 +99,7 @@ struct embot::os::theScheduler::Impl
         {
             embot::os::Thread *t = embot::os::rtos::scheduler_getassociated(thread);  
             const char *tname = ((nullptr == t) || (nullptr == t->getName())) ? "none" : t->getName();             
-            embot::hw::sys::puts(std::string("from os::Thread ") + tname + " -> " + errormsg);  
+            // embot::hw::sys::puts(std::string("from os::Thread ") + tname + " -> " + errormsg);  
         }            
         thesystem.pImpl->config.behaviour.onOSerror.execute();  
         
@@ -135,7 +134,7 @@ struct embot::os::theScheduler::Impl
         
         config = cfg;
         
-        props.prepare(embot::hw::sys::clock(embot::hw::CLOCK::syscore), config.timing.ticktime, 
+        props.prepare(config.timing.ticktime, 
                       config.behaviour.initconfig.stacksize, config.behaviour.idleconfig.stacksize, 
                       osIdleThread, launcher, osOnError);
                 

@@ -23,7 +23,7 @@
 #define _EMBOT_HW_CAN_H_
 
 #include "embot_core.h"
-#include "embot_hw.h"
+#include "embot_hw_types.h"
 #include<algorithm>
 
 namespace embot { namespace hw { namespace can {

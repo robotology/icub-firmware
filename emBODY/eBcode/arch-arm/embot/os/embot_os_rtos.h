@@ -35,7 +35,7 @@ namespace embot { namespace os { namespace rtos {
         scheduler_props_t(); 
         ~scheduler_props_t();  
                      
-        void prepare(uint32_t cpufreq, embot::core::Time ticktime, 
+        void prepare(embot::core::Time ticktime, 
                      uint16_t initstacksize, uint16_t idlestacksize, 
                      embot::core::fpWorker onidle, embot::core::fpWorker oninit, fpOnOSerror onerror);
         
@@ -77,7 +77,9 @@ namespace embot { namespace os { namespace rtos {
     void scheduler_deassociate(thread_t *osthread, embot::os::Thread *t);
     // it gets the embot::os::Thread from the rtos thread
     embot::os::Thread * scheduler_getassociated(thread_t *osthread);
-
+    
+    void scheduler_lock();
+    void scheduler_unlock();
     
     // -- thread section
         
@@ -130,6 +132,7 @@ namespace embot { namespace os { namespace rtos {
 
     bool messagequeue_put(messagequeue_t *mq, embot::os::Message message, embot::core::relTime timeout);
 
+    uint8_t messagequeue_size(messagequeue_t *mq);
 
     // -- timer section
     
@@ -163,6 +166,13 @@ namespace embot { namespace os { namespace rtos {
     bool semaphore_acquire(semaphore_t *s, embot::core::relTime timeout);    
     void semaphore_release(semaphore_t *s);   
     void semaphore_delete(semaphore_t *s);
+    
+    
+    // -- memory section
+    
+    void * memory_new(size_t size);    
+    void * memory_realloc(void *mem, size_t size);    
+    void memory_delete(void *mem);    
     
 }}} // namespace embot { namespace os { namespace rtos {
 

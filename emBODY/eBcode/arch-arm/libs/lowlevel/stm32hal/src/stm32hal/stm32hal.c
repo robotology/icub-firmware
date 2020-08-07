@@ -122,7 +122,12 @@ static void s_stm32hal_bps_dummy_tick1msinit(void)
 static uint32_t s_stm32hal_bps_dummy_tick1msget(void)
 {
     static volatile uint64_t cnt = 0;
-    return cnt++ / 1000;
+    // wait approximately 1 us then increment and return auxiliary tick counter value
+    for(int i = (SystemCoreClock >> 14U); i > 0U; i--) { // that is 1 ms
+        __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP();
+        __NOP(); __NOP(); __NOP(); __NOP(); __NOP(); __NOP();
+    }      
+    return ++cnt;
 }
 
 
@@ -166,7 +171,12 @@ uint32_t HAL_GetTick(void)
 //  return uwTick;
     
     // it is never NULL
-    return s_stm32hal_bsp_config.tick1ms_get();
+    uint32_t tick = s_stm32hal_bsp_config.tick1ms_get();
+    if(0 == tick)
+    {
+        tick = s_stm32hal_bps_dummy_tick1msget();
+    }
+    return tick;
 }
 
 
