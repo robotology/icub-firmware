@@ -1,0 +1,431 @@
+<html>
+<body>
+<pre>
+<h1>µVision Build Log</h1>
+<h2>Tool Versions:</h2>
+IDE-Version: µVision V5.16a
+Copyright (C) 2015 ARM Ltd and ARM Germany GmbH. All rights reserved.
+License Information: a b, c, LIC=----
+ 
+Tool Versions:
+Toolchain:       MDK-Lite  Version: 5.16a
+Toolchain Path:  C:\Keil_v5\ARM\ARMCC\Bin
+C Compiler:      Armcc.exe V5.06 (build 20)
+Assembler:       Armasm.exe V5.06 (build 20)
+Linker/Locator:  ArmLink.exe V5.06 (build 20)
+Library Manager: ArmAr.exe V5.06 (build 20)
+Hex Converter:   FromElf.exe V5.06 (build 20)
+CPU DLL:         SARMCM3.DLL V5.16a
+Dialog DLL:      DCM.DLL V1.13.2.0
+Target DLL:      STLink\ST-LINKIII-KEIL_SWO.dll V2.0.17.0
+Dialog DLL:      TCM.DLL V1.14.5.0
+ 
+<h2>Project:</h2>
+D:\iCubHardware\trunk\electronics\private\P2015_06_BAT\SW\BAT\MDK-ARM\BAT.uvprojx
+Project File Date:  11/12/2015
+
+<h2>Output:</h2>
+*** Using Compiler 'V5.06 (build 20)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
+Rebuild target 'BAT Configuration'
+compiling i2c.c...
+compiling dma.c...
+compiling adc.c...
+compiling tim.c...
+compiling usart.c...
+compiling system_stm32f4xx.c...
+assembling startup_stm32f407xx.s...
+compiling gpio.c...
+compiling stm32f4xx_it.c...
+compiling stm32f4xx_hal_msp.c...
+compiling main.c...
+../Src/main.c(909): warning:  #188-D: enumerated type mixed with another type
+    HAL_GPIO_WritePin(
+AN1_LED, toggle_100ms);
+../Src/main.c(994): warning:  #188-D: enumerated type mixed with another type
+    HAL_GPIO_WritePin(
+ED0_BATTERY, ((!(lightup    & 0x01)) || blink));
+../Src/main.c(995): warning:  #188-D: enumerated type mixed with another type
+    HAL_GPIO_WritePin(
+ED1_BATTERY, ((!(lightup>>1 & 0x01)) || blink));
+../Src/main.c(996): warning:  #188-D: enumerated type mixed with another type
+    HAL_GPIO_WritePin(
+ED2_BATTERY, ((!(lightup>>2 & 0x01)) || blink));
+../Src/main.c(997): warning:  #188-D: enumerated type mixed with another type
+    HAL_GPIO_WritePin(
+ED3_BATTERY, ((!(lightup>>3 & 0x01)) || blink));
+../Src/main.c(998): warning:  #188-D: enumerated type mixed with another type
+    HAL_GPIO_WritePin(
+ED4_BATTERY, ((!(lightup>>4 & 0x01)) || blink));
+../Src/main.c: 6 warnings, 0 errors
+compiling spi.c...
+compiling can.c...
+compiling stm32f4xx_hal_uart.c...
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c(261): error:  #136: struct "<unnamed>" has no field "gState"
+    if(huart->gState == HAL_UART_STATE_RESET)
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c(269): error:  #136: struct "<unnamed>" has no field "gState"
+    huart->gState = HAL_UART_STATE_BUSY;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c(288): error:  #136: struct "<unnamed>" has no field "gState"
+    huart->gState= HAL_UART_STATE_READY;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c(289): error:  #136: struct "<unnamed>" has no field "RxState"
+    huart->RxState= HAL_UART_STATE_READY;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c(314): error:  #136: struct "<unnamed>" has no field "gState"
+    if(huart->gState == HAL_UART_STATE_RESET)
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c(322): error:  #136: struct "<unnamed>" has no field "gState"
+    huart->gState = HAL_UART_STATE_BUSY;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c(344): error:  #136: struct "<unnamed>" has no field "gState"
+    huart->gState= HAL_UART_STATE_READY;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c(345): error:  #136: struct "<unnamed>" has no field "RxState"
+    huart->RxState= HAL_UART_STATE_READY;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c(375): error:  #136: struct "<unnamed>" has no field "gState"
+    if(huart->gState == HAL_UART_STATE_RESET)
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c(383): error:  #136: struct "<unnamed>" has no field "gState"
+    huart->gState = HAL_UART_STATE_BUSY;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c(409): error:  #136: struct "<unnamed>" has no field "gState"
+    huart->gState= HAL_UART_STATE_READY;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c(410): error:  #136: struct "<unnamed>" has no field "RxState"
+    huart->RxState= HAL_UART_STATE_READY;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c(442): error:  #136: struct "<unnamed>" has no field "gState"
+    if(huart->gState == HAL_UART_STATE_RESET)
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c(450): error:  #136: struct "<unnamed>" has no field "gState"
+    huart->gState = HAL_UART_STATE_BUSY;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c(478): error:  #136: struct "<unnamed>" has no field "gState"
+    huart->gState= HAL_UART_STATE_READY;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c(479): error:  #136: struct "<unnamed>" has no field "RxState"
+    huart->RxState= HAL_UART_STATE_READY;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c(501): error:  #136: struct "<unnamed>" has no field "gState"
+    huart->gState = HAL_UART_STATE_BUSY;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c(507): error:  #136: struct "<unnamed>" has no field "gState"
+    huart->gState = HAL_UART_STATE_RESET;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c(508): error:  #136: struct "<unnamed>" has no field "RxState"
+    huart->RxState = HAL_UART_STATE_RESET;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c(616): error:  #136: struct "<unnamed>" has no field "gState"
+    if(huart->gState == HAL_UART_STATE_READY) 
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c(627): error:  #136: struct "<unnamed>" has no field "gState"
+      huart->gState = HAL_UART_STATE_BUSY_TX;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c(667): error:  #136: struct "<unnamed>" has no field "gState"
+        huart->gState = HAL_UART_STATE_READY;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c(694): error:  #136: struct "<unnamed>" has no field "RxState"
+    if(huart->RxState == HAL_UART_STATE_READY) 
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c(705): error:  #136: struct "<unnamed>" has no field "RxState"
+      huart->RxState = HAL_UART_STATE_BUSY_RX;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c(752): error:  #136: struct "<unnamed>" has no field "RxState"
+      huart->RxState = HAL_UART_STATE_READY;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c(776): error:  #136: struct "<unnamed>" has no field "gState"
+    if(huart->gState == HAL_UART_STATE_READY)
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c(791): error:  #136: struct "<unnamed>" has no field "gState"
+      huart->gState = HAL_UART_STATE_BUSY_TX;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c(818): error:  #136: struct "<unnamed>" has no field "RxState"
+    if(huart->RxState == HAL_UART_STATE_READY)
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c(833): error:  #136: struct "<unnamed>" has no field "RxState"
+      huart->RxState = HAL_UART_STATE_BUSY_RX;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c(868): error:  #136: struct "<unnamed>" has no field "gState"
+    if(huart->gState == HAL_UART_STATE_READY)
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_uart.c: 0 warnings, 30 errors
+compiling stm32f4xx_hal.c...
+compiling stm32f4xx_hal_adc.c...
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c(289): warning:  #223-D: function "ADC_CLEAR_ERRORCODE" declared implicitly
+      ADC_CLEAR_ERRORCODE(hadc);
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c(300): error:  #20: identifier "HAL_ADC_STATE_ERROR_INTERNAL" is undefined
+    if (
+AL_IS_BIT_CLR(hadc->State, HAL_ADC_STATE_ERROR_INTERNAL))
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c(303): warning:  #223-D: function "ADC_STATE_CLR_SET" declared implicitly
+      ADC_STATE_CLR_SET(hadc->State,
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c(304): error:  #20: identifier "HAL_ADC_STATE_REG_BUSY" is undefined
+                        HAL_ADC_STATE_REG_BUSY | HAL_ADC_STATE_INJ_BUSY,
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c(304): error:  #20: identifier "HAL_ADC_STATE_INJ_BUSY" is undefined
+                        HAL_ADC_STATE_REG_BUSY | HAL_ADC_STATE_INJ_BUSY,
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c(305): error:  #20: identifier "HAL_ADC_STATE_BUSY_INTERNAL" is undefined
+                        HAL_ADC_STATE_BUSY_INTERNAL);
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c(311): warning:  #223-D: function "ADC_CLEAR_ERRORCODE" declared implicitly
+      ADC_CLEAR_ERRORCODE(hadc);
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c(350): error:  #20: identifier "HAL_ADC_STATE_BUSY_INTERNAL" is undefined
+    
+ET_BIT(hadc->State, HAL_ADC_STATE_BUSY_INTERNAL);
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c(364): warning:  #223-D: function "ADC_CLEAR_ERRORCODE" declared implicitly
+      ADC_CLEAR_ERRORCODE(hadc);
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c(471): warning:  #223-D: function "ADC_STATE_CLR_SET" declared implicitly
+      ADC_STATE_CLR_SET(hadc->State,
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c(472): error:  #20: identifier "HAL_ADC_STATE_REG_EOC" is undefined
+                        HAL_ADC_STATE_READY | HAL_ADC_STATE_REG_EOC | HAL_ADC_STATE_REG_OVR,
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c(472): error:  #20: identifier "HAL_ADC_STATE_REG_OVR" is undefined
+                        HAL_ADC_STATE_READY | HAL_ADC_STATE_REG_EOC | HAL_ADC_STATE_REG_OVR,
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c(473): error:  #20: identifier "HAL_ADC_STATE_REG_BUSY" is undefined
+                        HAL_ADC_STATE_REG_BUSY);
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c(479): error:  #20: identifier "HAL_ADC_STATE_INJ_EOC" is undefined
+        ADC_STATE_CLR_SET(hadc->State, HAL_ADC_STATE_INJ_EOC, HAL_ADC_STATE_INJ_BUSY);  
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c(479): error:  #20: identifier "HAL_ADC_STATE_INJ_BUSY" is undefined
+        ADC_STATE_CLR_SET(hadc->State, HAL_ADC_STATE_INJ_EOC, HAL_ADC_STATE_INJ_BUSY);  
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c(483): error:  #20: identifier "HAL_ADC_STATE_INJ_BUSY" is undefined
+      if (
+AL_IS_BIT_SET(hadc->State, HAL_ADC_STATE_INJ_BUSY))
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c(491): warning:  #223-D: function "ADC_CLEAR_ERRORCODE" declared implicitly
+        ADC_CLEAR_ERRORCODE(hadc);
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c(554): warning:  #223-D: function "ADC_STATE_CLR_SET" declared implicitly
+      ADC_STATE_CLR_SET(hadc->State,
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c(555): error:  #20: identifier "HAL_ADC_STATE_REG_BUSY" is undefined
+                        HAL_ADC_STATE_REG_BUSY | HAL_ADC_STATE_INJ_BUSY,
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c(555): error:  #20: identifier "HAL_ADC_STATE_INJ_BUSY" is undefined
+                        HAL_ADC_STATE_REG_BUSY | HAL_ADC_STATE_INJ_BUSY,
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c(595): error:  #20: identifier "HAL_ADC_STATE_ERROR_CONFIG" is undefined
+      
+ET_BIT(hadc->State, HAL_ADC_STATE_ERROR_CONFIG);
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c(629): error:  #20: identifier "HAL_ADC_STATE_REG_EOC" is undefined
+    
+ET_BIT(hadc->State, HAL_ADC_STATE_REG_EOC);
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c(637): warning:  #223-D: function "ADC_IS_SOFTWARE_START_REGULAR" declared implicitly
+    if(ADC_IS_SOFTWARE_START_REGULAR(hadc)                   &&
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c(643): error:  #20: identifier "HAL_ADC_STATE_REG_BUSY" is undefined
+      
+LEAR_BIT(hadc->State, HAL_ADC_STATE_REG_BUSY);   
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c(645): error:  #20: identifier "HAL_ADC_STATE_INJ_BUSY" is undefined
+      if (
+AL_IS_BIT_CLR(hadc->State, HAL_ADC_STATE_INJ_BUSY))
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c(700): error:  #20: identifier "HAL_ADC_STATE_AWD1" is undefined
+      
+ET_BIT(hadc->State, HAL_ADC_STATE_AWD1);
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c(709): error:  #20: identifier "HAL_ADC_STATE_REG_OVR" is undefined
+      
+ET_BIT(hadc->State, HAL_ADC_STATE_REG_OVR);
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c(762): warning:  #223-D: function "ADC_STATE_CLR_SET" declared implicitly
+      ADC_STATE_CLR_SET(hadc->State,
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c(763): error:  #20: identifier "HAL_ADC_STATE_REG_EOC" is undefined
+                        HAL_ADC_STATE_READY | HAL_ADC_STATE_REG_EOC | HAL_ADC_STATE_REG_OVR,
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c(763): error:  #20: identifier "HAL_ADC_STATE_REG_OVR" is undefined
+                        HAL_ADC_STATE_READY | HAL_ADC_STATE_REG_EOC | HAL_ADC_STATE_REG_OVR,
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c(764): error:  #20: identifier "HAL_ADC_STATE_REG_BUSY" is undefined
+                        HAL_ADC_STATE_REG_BUSY);
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c(770): error:  #20: identifier "HAL_ADC_STATE_INJ_EOC" is undefined
+        ADC_STATE_CLR_SET(hadc->State, HAL_ADC_STATE_INJ_EOC, HAL_ADC_STATE_INJ_BUSY);  
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c(770): error:  #20: identifier "HAL_ADC_STATE_INJ_BUSY" is undefined
+        ADC_STATE_CLR_SET(hadc->State, HAL_ADC_STATE_INJ_EOC, HAL_ADC_STATE_INJ_BUSY);  
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c(774): error:  #20: identifier "HAL_ADC_STATE_INJ_BUSY" is undefined
+      if (
+AL_IS_BIT_SET(hadc->State, HAL_ADC_STATE_INJ_BUSY))
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c(782): warning:  #223-D: function "ADC_CLEAR_ERRORCODE" declared implicitly
+        ADC_CLEAR_ERRORCODE(hadc);
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c(850): warning:  #223-D: function "ADC_STATE_CLR_SET" declared implicitly
+      ADC_STATE_CLR_SET(hadc->State,
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c(851): error:  #20: identifier "HAL_ADC_STATE_REG_BUSY" is undefined
+                        HAL_ADC_STATE_REG_BUSY | HAL_ADC_STATE_INJ_BUSY,
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c(851): error:  #20: identifier "HAL_ADC_STATE_INJ_BUSY" is undefined
+                        HAL_ADC_STATE_REG_BUSY | HAL_ADC_STATE_INJ_BUSY,
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c(883): error:  #20: identifier "HAL_ADC_STATE_ERROR_INTERNAL" is undefined
+      if (
+AL_IS_BIT_CLR(hadc->State, HAL_ADC_STATE_ERROR_INTERNAL))
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c(886): error:  #20: identifier "HAL_ADC_STATE_REG_EOC" is undefined
+        
+ET_BIT(hadc->State, HAL_ADC_STATE_REG_EOC); 
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c(895): warning:  #223-D: function "ADC_IS_SOFTWARE_START_REGULAR" declared implicitly
+      if(ADC_IS_SOFTWARE_START_REGULAR(hadc)                   &&
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c(907): error:  #20: identifier "HAL_ADC_STATE_REG_BUSY" is undefined
+        
+LEAR_BIT(hadc->State, HAL_ADC_STATE_REG_BUSY);
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c: 12 warnings, 30 errors
+compiling stm32f4xx_hal_flash_ramfunc.c...
+compiling stm32f4xx_hal_dma.c...
+compiling stm32f4xx_hal_cortex.c...
+compiling stm32f4xx_hal_adc_ex.c...
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c(209): warning:  #223-D: function "ADC_STATE_CLR_SET" declared implicitly
+      ADC_STATE_CLR_SET(hadc->State,
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c(210): error:  #20: identifier "HAL_ADC_STATE_INJ_EOC" is undefined
+                        HAL_ADC_STATE_READY | HAL_ADC_STATE_INJ_EOC,
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c(211): error:  #20: identifier "HAL_ADC_STATE_INJ_BUSY" is undefined
+                        HAL_ADC_STATE_INJ_BUSY);
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c(217): error:  #20: identifier "HAL_ADC_STATE_REG_BUSY" is undefined
+      if (
+AL_IS_BIT_CLR(hadc->State, HAL_ADC_STATE_REG_BUSY))
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c(220): warning:  #223-D: function "ADC_CLEAR_ERRORCODE" declared implicitly
+        ADC_CLEAR_ERRORCODE(hadc);
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c(298): warning:  #223-D: function "ADC_STATE_CLR_SET" declared implicitly
+      ADC_STATE_CLR_SET(hadc->State,
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c(299): error:  #20: identifier "HAL_ADC_STATE_INJ_EOC" is undefined
+                        HAL_ADC_STATE_READY | HAL_ADC_STATE_INJ_EOC,
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c(300): error:  #20: identifier "HAL_ADC_STATE_INJ_BUSY" is undefined
+                        HAL_ADC_STATE_INJ_BUSY);
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c(306): error:  #20: identifier "HAL_ADC_STATE_REG_BUSY" is undefined
+      if (
+AL_IS_BIT_CLR(hadc->State, HAL_ADC_STATE_REG_BUSY))
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c(309): warning:  #223-D: function "ADC_CLEAR_ERRORCODE" declared implicitly
+        ADC_CLEAR_ERRORCODE(hadc);
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c(379): error:  #20: identifier "HAL_ADC_STATE_REG_BUSY" is undefined
+    if(((hadc->State & HAL_ADC_STATE_REG_BUSY) == RESET)  &&
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c(390): warning:  #223-D: function "ADC_STATE_CLR_SET" declared implicitly
+        ADC_STATE_CLR_SET(hadc->State,
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c(391): error:  #20: identifier "HAL_ADC_STATE_INJ_BUSY" is undefined
+                          HAL_ADC_STATE_REG_BUSY | HAL_ADC_STATE_INJ_BUSY,
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c(398): error:  #20: identifier "HAL_ADC_STATE_ERROR_CONFIG" is undefined
+      
+ET_BIT(hadc->State, HAL_ADC_STATE_ERROR_CONFIG);
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c(444): error:  #20: identifier "HAL_ADC_STATE_INJ_EOC" is undefined
+    
+ET_BIT(hadc->State, HAL_ADC_STATE_INJ_EOC);
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c(452): warning:  #223-D: function "ADC_IS_SOFTWARE_START_INJECTED" declared implicitly
+    if(ADC_IS_SOFTWARE_START_INJECTED(hadc)                    &&
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c(456): warning:  #223-D: function "ADC_IS_SOFTWARE_START_REGULAR" declared implicitly
+        (ADC_IS_SOFTWARE_START_REGULAR(hadc)       &&
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c(460): error:  #20: identifier "HAL_ADC_STATE_INJ_BUSY" is undefined
+      
+LEAR_BIT(hadc->State, HAL_ADC_STATE_INJ_BUSY);
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c(462): error:  #20: identifier "HAL_ADC_STATE_REG_BUSY" is undefined
+      if (
+AL_IS_BIT_CLR(hadc->State, HAL_ADC_STATE_REG_BUSY))
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c(500): error:  #20: identifier "HAL_ADC_STATE_REG_BUSY" is undefined
+    if(((hadc->State & HAL_ADC_STATE_REG_BUSY) == RESET)  &&
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c(514): warning:  #223-D: function "ADC_STATE_CLR_SET" declared implicitly
+        ADC_STATE_CLR_SET(hadc->State,
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c(515): error:  #20: identifier "HAL_ADC_STATE_INJ_BUSY" is undefined
+                          HAL_ADC_STATE_REG_BUSY | HAL_ADC_STATE_INJ_BUSY,
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c(522): error:  #20: identifier "HAL_ADC_STATE_ERROR_CONFIG" is undefined
+      
+ET_BIT(hadc->State, HAL_ADC_STATE_ERROR_CONFIG);
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c(631): warning:  #223-D: function "ADC_STATE_CLR_SET" declared implicitly
+      ADC_STATE_CLR_SET(hadc->State,
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c(632): error:  #20: identifier "HAL_ADC_STATE_REG_EOC" is undefined
+                        HAL_ADC_STATE_READY | HAL_ADC_STATE_REG_EOC | HAL_ADC_STATE_REG_OVR,
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c(632): error:  #20: identifier "HAL_ADC_STATE_REG_OVR" is undefined
+                        HAL_ADC_STATE_READY | HAL_ADC_STATE_REG_EOC | HAL_ADC_STATE_REG_OVR,
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c(633): error:  #20: identifier "HAL_ADC_STATE_REG_BUSY" is undefined
+                        HAL_ADC_STATE_REG_BUSY);
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c(639): error:  #20: identifier "HAL_ADC_STATE_INJ_EOC" is undefined
+        ADC_STATE_CLR_SET(hadc->State, HAL_ADC_STATE_INJ_EOC, HAL_ADC_STATE_INJ_BUSY);  
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c(639): error:  #20: identifier "HAL_ADC_STATE_INJ_BUSY" is undefined
+        ADC_STATE_CLR_SET(hadc->State, HAL_ADC_STATE_INJ_EOC, HAL_ADC_STATE_INJ_BUSY);  
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c(643): error:  #20: identifier "HAL_ADC_STATE_INJ_BUSY" is undefined
+      if (
+AL_IS_BIT_SET(hadc->State, HAL_ADC_STATE_INJ_BUSY))
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c(651): warning:  #223-D: function "ADC_CLEAR_ERRORCODE" declared implicitly
+        ADC_CLEAR_ERRORCODE(hadc);
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c(738): warning:  #223-D: function "ADC_STATE_CLR_SET" declared implicitly
+      ADC_STATE_CLR_SET(hadc->State,
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c(739): error:  #20: identifier "HAL_ADC_STATE_REG_BUSY" is undefined
+                        HAL_ADC_STATE_REG_BUSY | HAL_ADC_STATE_INJ_BUSY,
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c(739): error:  #20: identifier "HAL_ADC_STATE_INJ_BUSY" is undefined
+                        HAL_ADC_STATE_REG_BUSY | HAL_ADC_STATE_INJ_BUSY,
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c(987): error:  #20: identifier "HAL_ADC_STATE_ERROR_INTERNAL" is undefined
+    if (
+AL_IS_BIT_CLR(hadc->State, HAL_ADC_STATE_ERROR_INTERNAL | HAL_ADC_STATE_ERROR_DMA))
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c(987): error:  #20: identifier "HAL_ADC_STATE_ERROR_DMA" is undefined
+    if (
+AL_IS_BIT_CLR(hadc->State, HAL_ADC_STATE_ERROR_INTERNAL | HAL_ADC_STATE_ERROR_DMA))
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c(990): error:  #20: identifier "HAL_ADC_STATE_REG_EOC" is undefined
+      
+ET_BIT(hadc->State, HAL_ADC_STATE_REG_EOC);
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c(998): warning:  #223-D: function "ADC_IS_SOFTWARE_START_REGULAR" declared implicitly
+      if(ADC_IS_SOFTWARE_START_REGULAR(hadc)                   &&
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c(1010): error:  #20: identifier "HAL_ADC_STATE_REG_BUSY" is undefined
+        
+LEAR_BIT(hadc->State, HAL_ADC_STATE_REG_BUSY);   
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c(1012): error:  #20: identifier "HAL_ADC_STATE_INJ_BUSY" is undefined
+        if (
+AL_IS_BIT_CLR(hadc->State, HAL_ADC_STATE_INJ_BUSY))
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c(1050): error:  #20: identifier "HAL_ADC_STATE_ERROR_DMA" is undefined
+      hadc->State= HAL_ADC_STATE_ERROR_DMA;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c: 12 warnings, 29 errors
+compiling stm32f4xx_hal_i2c.c...
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c(412): error:  #136: struct "<unnamed>" has no field "PreviousState"
+    hi2c->PreviousState = I2C_STATE_NONE;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c(412): error:  #20: identifier "HAL_I2C_MODE_NONE" is undefined
+    hi2c->PreviousState = 
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c(413): error:  #136: struct "<unnamed>" has no field "Mode"
+    hi2c->Mode = HAL_I2C_MODE_NONE;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c(445): error:  #136: struct "<unnamed>" has no field "PreviousState"
+    hi2c->PreviousState = I2C_STATE_NONE;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c(445): error:  #20: identifier "HAL_I2C_MODE_NONE" is undefined
+    hi2c->PreviousState = 
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c(446): error:  #136: struct "<unnamed>" has no field "Mode"
+    hi2c->Mode = HAL_I2C_MODE_NONE;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c(574): error:  #136: struct "<unnamed>" has no field "Mode"
+      hi2c->Mode = HAL_I2C_MODE_MASTER;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c(574): error:  #20: identifier "HAL_I2C_MODE_MASTER" is undefined
+      hi2c->Mode = HAL_I2C_MODE_MASTER;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c(576): error:  #136: struct "<unnamed>" has no field "XferOptions"
+      hi2c->XferOptions = I2C_NO_OPTION_FRAME;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c(646): error:  #136: struct "<unnamed>" has no field "Mode"
+      hi2c->Mode = HAL_I2C_MODE_NONE;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c(646): error:  #20: identifier "HAL_I2C_MODE_NONE" is undefined
+      hi2c->Mode = HAL_I2C_MODE_NONE;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c(686): error:  #136: struct "<unnamed>" has no field "Mode"
+      hi2c->Mode = HAL_I2C_MODE_MASTER;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c(686): error:  #20: identifier "HAL_I2C_MODE_MASTER" is undefined
+      hi2c->Mode = HAL_I2C_MODE_MASTER;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c(688): error:  #136: struct "<unnamed>" has no field "XferOptions"
+      hi2c->XferOptions = I2C_NO_OPTION_FRAME;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c(853): error:  #136: struct "<unnamed>" has no field "Mode"
+      hi2c->Mode = HAL_I2C_MODE_NONE;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c(853): error:  #20: identifier "HAL_I2C_MODE_NONE" is undefined
+      hi2c->Mode = HAL_I2C_MODE_NONE;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c(897): error:  #136: struct "<unnamed>" has no field "Mode"
+      hi2c->Mode = HAL_I2C_MODE_SLAVE;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c(897): error:  #20: identifier "HAL_I2C_MODE_SLAVE" is undefined
+      hi2c->Mode = HAL_I2C_MODE_SLAVE;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c(899): error:  #136: struct "<unnamed>" has no field "XferOptions"
+      hi2c->XferOptions = I2C_NO_OPTION_FRAME;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c(968): error:  #136: struct "<unnamed>" has no field "Mode"
+      hi2c->Mode = HAL_I2C_MODE_NONE;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c(968): error:  #20: identifier "HAL_I2C_MODE_NONE" is undefined
+      hi2c->Mode = HAL_I2C_MODE_NONE;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c(1012): error:  #136: struct "<unnamed>" has no field "Mode"
+      hi2c->Mode = HAL_I2C_MODE_SLAVE;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c(1012): error:  #20: identifier "HAL_I2C_MODE_SLAVE" is undefined
+      hi2c->Mode = HAL_I2C_MODE_SLAVE;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c(1014): error:  #136: struct "<unnamed>" has no field "XferOptions"
+      hi2c->XferOptions = I2C_NO_OPTION_FRAME;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c(1080): error:  #136: struct "<unnamed>" has no field "Mode"
+      hi2c->Mode = HAL_I2C_MODE_NONE;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c(1080): error:  #20: identifier "HAL_I2C_MODE_NONE" is undefined
+      hi2c->Mode = HAL_I2C_MODE_NONE;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c(1119): error:  #136: struct "<unnamed>" has no field "Mode"
+      hi2c->Mode = HAL_I2C_MODE_MASTER;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c(1119): error:  #20: identifier "HAL_I2C_MODE_MASTER" is undefined
+      hi2c->Mode = HAL_I2C_MODE_MASTER;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c(1125): error:  #136: struct "<unnamed>" has no field "XferOptions"
+      hi2c->XferOptions = I2C_NO_OPTION_FRAME;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c(1209): error:  #136: struct "<unnamed>" has no field "Mode"
+      hi2c->Mode = HAL_I2C_MODE_MASTER;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_i2c.c: 0 warnings, 30 errors
+compiling stm32f4xx_hal_pwr_ex.c...
+compiling stm32f4xx_hal_pwr.c...
+compiling stm32f4xx_hal_rcc_ex.c...
+compiling stm32f4xx_hal_rcc.c...
+compiling stm32f4xx_hal_tim.c...
+compiling stm32f4xx_hal_gpio.c...
+compiling stm32f4xx_hal_flash_ex.c...
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ex.c(233): warning:  #223-D: function "FLASH_FlushCaches" declared implicitly
+      FLASH_FlushCaches();    
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ex.c(1314): error:  #159: declaration is incompatible with previous "FLASH_FlushCaches" (declared at line 233)
+  void FLASH_FlushCaches(void)
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ex.c: 1 warning, 1 error
+compiling stm32f4xx_hal_flash.c...
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash.c(345): warning:  #223-D: function "FLASH_FlushCaches" declared implicitly
+          FLASH_FlushCaches() ;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash.c(357): warning:  #223-D: function "FLASH_FlushCaches" declared implicitly
+          FLASH_FlushCaches() ;
+../Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash.c: 2 warnings, 0 errors
+compiling stm32f4xx_hal_tim_ex.c...
+compiling stm32f4xx_hal_dma_ex.c...
+compiling stm32f4xx_hal_i2c_ex.c...
+compiling stm32f4xx_hal_spi.c...
+compiling stm32f4xx_hal_can.c...
+"BAT Configuration/\.axf" - 120 Error(s), 33 Warning(s).
+
+<h2>Software Packages used:</h2>
+
+Package Vendor: ARM
+                http://www.keil.com/pack/ARM.CMSIS.4.4.0.pack
+                ARM::CMSIS:CORE:4.2.0
+                CMSIS (Cortex Microcontroller Software Interface Standard)
+   * Component: CORE Version: 4.2.0
+
+<h2>Collection of Component include folders:</h2>
+  D:\iCubHardware\trunk\electronics\private\P2015_06_BAT\SW\BAT\MDK-ARM\RTE
+  C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.4.0\CMSIS\Include
+  C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.6.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include
+
+<h2>Collection of Component Files used:</h2>
+
+   * Component: ARM::CMSIS:CORE:4.2.0
+Target not created.
+Build Time Elapsed:  00:00:06
+</pre>
+</body>
+</html>

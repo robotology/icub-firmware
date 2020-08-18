@@ -1,0 +1,14 @@
+--cpu Cortex-M3
+".\startup_stm32f10x_md.o"
+".\system_stm32f10x.o"
+".\hl_fifo.o"
+".\bdc.o"
+".\gpio.o"
+".\can.o"
+".\adc.o"
+".\exti.o"
+".\timer.o"
+--strict --scatter ".\bdc.sct"
+--summary_stderr --info summarysizes --map --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list ".\bdc.map" -o .\bdc.axf

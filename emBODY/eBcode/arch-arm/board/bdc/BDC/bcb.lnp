@@ -1,0 +1,5 @@
+--cpu Cortex-M3 "startup_stm32f10x_md.o" "system_stm32f10x.o" "gpio.o" "bdc.o" "can.o" "adc.o" 
+--strict --scatter "bcb.sct" 
+--summary_stderr --info summarysizes --map --xref --callgraph --symbols 
+--info sizes --info totals --info unused --info veneers 
+ --list ".\bcb.map" -o bcb.axf

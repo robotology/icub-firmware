@@ -1,0 +1,73 @@
+<html>
+<body>
+<pre>
+<h1>µVision Build Log</h1>
+<h2>Tool Versions:</h2>
+IDE-Version: µVision V5.23.0.0
+Copyright (C) 2017 ARM Ltd and ARM Germany GmbH. All rights reserved.
+License Information: Marco Accame, IIT, LIC=Q7GLR-KPIE8-5IM5W-NWWDS-HDEA0-BYKN9
+ 
+Tool Versions:
+Toolchain:       MDK-ARM Professional  Version: 5.23
+Toolchain Path:  C:\Keil_v5\ARM\ARMCC\Bin
+C Compiler:      Armcc.exe V5.06 update 4 (build 422)
+Assembler:       Armasm.exe V5.06 update 4 (build 422)
+Linker/Locator:  ArmLink.exe V5.06 update 4 (build 422)
+Library Manager: ArmAr.exe V5.06 update 4 (build 422)
+Hex Converter:   FromElf.exe V5.06 update 4 (build 422)
+CPU DLL:         SARMCM3.DLL V5.23
+Dialog DLL:      DCM.DLL V1.15.0.0
+Target DLL:      ULP2CM3.DLL V2.207.8.0
+Dialog DLL:      TCM.DLL V1.27.0.0
+ 
+<h2>Project:</h2>
+D:\iCubHardware\electronics\private\P2015_06_BAT\SW\BAT\MDK-ARM\BAT.uvprojx
+Project File Date:  08/30/2018
+
+<h2>Output:</h2>
+*** Using Compiler 'V5.06 update 4 (build 422)', folder: 'C:\Keil_v5\ARM\ARMCC\Bin'
+Build target 'BAT_iCub3'
+compiling main.c...
+../Src/main.c(1197): warning:  #188-D: enumerated type mixed with another type
+    HAL_GPIO_WritePin(
+AN1_LED, toggle_100ms);
+../Src/main.c(1282): warning:  #188-D: enumerated type mixed with another type
+    HAL_GPIO_WritePin(
+ED0_BATTERY, ((!(lightup    & 0x01)) || blink));
+../Src/main.c(1283): warning:  #188-D: enumerated type mixed with another type
+    HAL_GPIO_WritePin(
+ED1_BATTERY, ((!(lightup>>1 & 0x01)) || blink));
+../Src/main.c(1284): warning:  #188-D: enumerated type mixed with another type
+    HAL_GPIO_WritePin(
+ED2_BATTERY, ((!(lightup>>2 & 0x01)) || blink));
+../Src/main.c(1285): warning:  #188-D: enumerated type mixed with another type
+    HAL_GPIO_WritePin(
+ED3_BATTERY, ((!(lightup>>3 & 0x01)) || blink));
+../Src/main.c(1286): warning:  #188-D: enumerated type mixed with another type
+    HAL_GPIO_WritePin(
+ED4_BATTERY, ((!(lightup>>4 & 0x01)) || blink));
+../Src/main.c: 6 warnings, 0 errors
+linking...
+Program Size: Code=18072 RO-data=448 RW-data=176 ZI-data=15272  
+"BAT\BAT.axf" - 0 Error(s), 6 Warning(s).
+
+<h2>Software Packages used:</h2>
+
+Package Vendor: ARM
+                http://www.keil.com/pack/ARM.CMSIS.5.3.0.pack
+                ARM::CMSIS:CORE:5.1.1
+                CMSIS (Cortex Microcontroller Software Interface Standard)
+   * Component: CORE Version: 5.1.1
+
+<h2>Collection of Component include folders:</h2>
+  .\RTE\_BAT_iCub3
+  C:\Keil_v5\ARM\PACK\ARM\CMSIS\5.3.0\CMSIS\Include
+  C:\Keil_v5\ARM\PACK\Keil\STM32F4xx_DFP\2.11.0\Drivers\CMSIS\Device\ST\STM32F4xx\Include
+
+<h2>Collection of Component Files used:</h2>
+
+   * Component: ARM::CMSIS:CORE:5.1.1
+Build Time Elapsed:  00:00:01
+</pre>
+</body>
+</html>
