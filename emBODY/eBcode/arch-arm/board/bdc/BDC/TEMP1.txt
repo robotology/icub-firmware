@@ -1,0 +1,347 @@
+/*----------------------------------------------------------------------------
+ * Name:    bcb.c
+ * Purpose: EXTI usage for STM32
+ * Note(s): 
+ *----------------------------------------------------------------------------
+ * Copyright (c) 2008-2011 Keil - An ARM Company. All rights reserved.
+ *----------------------------------------------------------------------------*/
+
+#include <stdio.h>
+#include "STM32F10x.h"
+
+unsigned int ledExti    = 0;
+int ledDir = 0;
+int ledDir1 = 0;
+int cont=0;
+
+// ----------------------------------------------------------------------------
+// Define
+// ----------------------------------------------------------------------------
+#define PB1							0x0010			// PC4		Pushbutton PB1
+#define CPU_Green				0x0020			// PC5		Led green PB1
+#define CPU_Red					0x0040			// PC6		Led red PB1
+#define PB2							0x0080			// PC7		Pushbutton PB2
+#define MOTORS_Green		0x0100			// PC8		Led green PB2
+#define MOTORS_Red			0x0200			// PC9		Led red PB2
+#define LED_BT					0x2000			// PB13		Led red PB2
+#define CAN_LED					0x0004			// PB2		Led red PB2
+#define SWT							0x0001			// PB0		Switch button SWT
+#define FAN1						0x0100			// PB8		FAN1
+#define FAN2						0x0200			// PB9		FAN2
+
+#define CAN_LED_ON			GPIOB->ODR   &= ~CAN_LED;			// LED ON
+#define CAN_LED_OFF			GPIOB->ODR   |= CAN_LED;			// LED OFF
+
+#define LED_BT_ON				GPIOB->ODR   &= ~LED_BT;			// LED ON
+#define LED_BT_OFF			GPIOB->ODR   |= LED_BT;				// LED OFF
+
+#define PB1_LED_GREEN		GPIOC->ODR   |= CPU_Green;				GPIOC->ODR   &= ~CPU_Red;
+#define PB1_LED_RED			GPIOC->ODR   &= ~CPU_Green;				GPIOC->ODR   |= CPU_Red;
+#define PB1_LED_OFF			GPIOC->ODR   &= ~CPU_Green;				GPIOC->ODR   &= ~CPU_Red;
+
+#define PB2_LED_GREEN		GPIOC->ODR   |= MOTORS_Green;			GPIOC->ODR   &= ~MOTORS_Red;
+#define PB2_LED_RED			GPIOC->ODR   &= ~MOTORS_Green;		GPIOC->ODR   |= MOTORS_Red;
+#define PB2_LED_OFF			GPIOC->ODR   &= ~MOTORS_Green;		GPIOC->ODR   &= ~MOTORS_Red;
+
+#define FAN1_ON					GPIOB->ODR   &= ~FAN1;		// FAN1 ON
+#define FAN1_OFF				GPIOB->ODR   |= FAN1;			// FAN1 OFF
+#define FAN2_ON					GPIOB->ODR   &= ~FAN2;		// FAN1 ON
+#define FAN2_OFF				GPIOB->ODR   |= FAN2;			// FAN1 OFF
+
+
+
+#define DEBOUNCE_CNT		5						// debounce the keys
+
+// ----------------------------------------------------------------------------
+// initialize GPIO Pins
+// ----------------------------------------------------------------------------
+void GPIO_Init (void) {
+	
+	RCC->APB2ENR |=	(RCC_APB2ENR_IOPAEN |           /* Enable GPIOA clock       */
+									 RCC_APB2ENR_IOPBEN |						/* Enable GPIOB clock       */
+									 RCC_APB2ENR_IOPCEN  );         /* Enable GPIOC clock       */
+  
+	/* configure GPIOs used for LEDs */
+	
+	GPIOB->CRH   = 0; 
+	GPIOB->CRL   = 0;
+	GPIOB->ODR   = 0;
+	
+  GPIOB->CRH   |= 0x00300000;		// PB13	LED_BT
+	GPIOB->ODR   |= 0x00002000;		// PB13
+	
+	GPIOB->CRH   |= 0x00000003;		// PB8 FAN1
+	GPIOB->ODR   |= 0x00000100;		// 
+	
+	GPIOB->CRH   |= 0x00000030;		// PB9 FAN2
+	GPIOB->ODR   |= 0x00000200;		// 
+	
+	GPIOB->CRL   |= 0x00000300;		// PB2
+	GPIOB->ODR   |= 0x00000004;		// PB2
+	
+	GPIOB->CRL   |= 0x00000008;		// PB0 is Input with pull-up / pull-down
+	GPIOB->ODR   |= 0x00000001;		// PB0 pull-up
+	
+	
+	
+	
+	GPIOC->CRL	 &= ~0xFFFF0000;	// PC clear
+	GPIOC->CRH	 &= ~0x00000FFF;	// PC clear
+	
+	GPIOC->CRL   |=  0x00080000;	// PC.4 is Input with pull-up / pull-down
+	GPIOC->ODR   |=	 0x00000010;	// PC4 pull-up
+	
+	GPIOC->CRL   |=  0x80000000;	// PC.7 is Input with pull-up / pull-down
+	GPIOC->ODR   |=	 0x00000080;	// PC7 pull-up
+	
+	GPIOC->CRL   |=  0x03300000;
+	GPIOC->ODR   |=	 0x00000060;
+	
+	GPIOC->CRH   |=  0x00000033;
+	GPIOC->ODR   |=	 0x00000003;
+	
+  /* configure GPIOs for PushButtons */
+  
+}
+
+
+// ----------------------------------------------------------------------------
+// External Interrupt initialisation
+// ----------------------------------------------------------------------------
+void EXTI_Init(void) {
+
+    RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;           /* enable clock for AFIO    */
+
+    AFIO->EXTICR[0] &= ~AFIO_EXTICR1_EXTI0;       /* clear used pin           */
+    AFIO->EXTICR[0] |=  AFIO_EXTICR1_EXTI0_PB;    /* set PB.0 to use          */
+
+    EXTI->IMR       |=  EXTI_IMR_MR0;             /* unmask interrupt         */
+    EXTI->EMR       &= ~EXTI_EMR_MR0;             /* no event                 */
+    EXTI->RTSR      &= ~EXTI_RTSR_TR0;            /* no rising edge trigger   */
+    EXTI->FTSR      |=  EXTI_FTSR_TR0;            /* set falling edge trigger */
+
+    NVIC_EnableIRQ(EXTI0_IRQn);                   /* enable IRQ EXTI 0        */
+
+	
+		AFIO->EXTICR[1] &= ~AFIO_EXTICR2_EXTI4;      /* clear used pin           */
+    AFIO->EXTICR[1] |=  AFIO_EXTICR2_EXTI4_PC;   /* set PC.4 to use         */
+
+    EXTI->IMR       |=  EXTI_IMR_MR4;            /* unmask interrupt         */
+    EXTI->EMR       &= ~EXTI_EMR_MR4;            /* unmask event             */
+    EXTI->RTSR      &= ~EXTI_RTSR_TR4;           /* no rising edge trigger   */
+    EXTI->FTSR      |=  EXTI_FTSR_TR4;           /* set falling edge trigger */
+		
+		NVIC_EnableIRQ(EXTI4_IRQn);
+		
+		AFIO->EXTICR[1] &= ~AFIO_EXTICR2_EXTI7;      /* clear used pin           */
+    AFIO->EXTICR[1] |=  AFIO_EXTICR2_EXTI7_PC;   /* set PC.7 to use         */
+
+    EXTI->IMR       |=  EXTI_IMR_MR7;            /* unmask interrupt         */
+    EXTI->EMR       &= ~EXTI_EMR_MR7;            /* unmask event             */
+    EXTI->RTSR      &= ~EXTI_RTSR_TR7;           /* no rising edge trigger   */
+    EXTI->FTSR      |=  EXTI_FTSR_TR7;           /* set falling edge trigger */
+
+		NVIC_EnableIRQ(EXTI9_5_IRQn);
+
+    //AFIO->EXTICR[3] &= ~AFIO_EXTICR4_EXTI13;      /* clear used pin           */
+    //AFIO->EXTICR[3] |=  AFIO_EXTICR4_EXTI13_PC;   /* set PC.13 to use         */
+
+    //EXTI->IMR       |=  EXTI_IMR_MR13;            /* unmask interrupt         */
+    //EXTI->EMR       &= ~EXTI_EMR_MR13;            /* unmask event             */
+    //EXTI->RTSR      &= ~EXTI_RTSR_TR13;           /* no rising edge trigger   */
+    //EXTI->FTSR      |=  EXTI_FTSR_TR13;           /* set falling edge trigger */
+
+    //NVIC_EnableIRQ(EXTI15_10_IRQn);               /* enable IRQ EXTI 10..15   */
+}
+
+
+// ----------------------------------------------------------------------------
+// EXTI0 Interrupt Handler      for WKUP button connected to GPIOB.0
+// ----------------------------------------------------------------------------
+void EXTI0_IRQHandler(void) {
+	//static int count = 0;
+	
+	EXTI->PR |= (1UL << 0);                       /* clear pending interrupt  */
+	
+	//if(count < DEBOUNCE_CNT)	{count++;}
+	//else{
+		//count=0;
+    if ((ledExti ^=1) == 0) {CAN_LED_OFF;}
+		else										{CAN_LED_ON;}
+	//}
+}
+
+
+// ----------------------------------------------------------------------------
+// EXTI4 Interrupt Handler for button connected to GPIOC.4
+// ----------------------------------------------------------------------------
+void EXTI4_IRQHandler(void) {
+	EXTI->PR |= (1UL << 4);			// clear pending interrupt
+	LED_BT_OFF;
+	PB1_LED_GREEN;
+	PB2_LED_GREEN;
+	FAN1_ON;
+	FAN2_OFF;
+}
+
+
+// ----------------------------------------------------------------------------
+// EXTI15..10 Interrupt Handler for button connected to GPIOC.7
+// ----------------------------------------------------------------------------
+void EXTI9_5_IRQHandler(void) {
+	EXTI->PR |= (1UL << 7);			// clear pending interrupt
+	LED_BT_ON;
+	PB1_LED_RED;
+	PB2_LED_RED;
+	FAN1_OFF;
+	FAN2_ON;
+}
+
+
+// ----------------------------------------------------------------------------
+// initialize TIM1
+// ----------------------------------------------------------------------------
+void TIM1_Init (void) {
+
+	RCC->APB2ENR |= RCC_APB2ENR_TIM1EN;		// enable clock for TIM1
+	
+  TIM1->PSC   = (3000)-1;								// set prescaler   = 10KHz
+  TIM1->ARR   = 1000-1;										// set auto-reload
+  TIM1->RCR   =  1-1;									// set repetition counter
+
+  TIM1->DIER = TIM_DIER_UIE;						// Update Interrupt enable
+  NVIC_EnableIRQ(TIM1_UP_IRQn);					// TIM1   Interrupt enable
+
+  TIM1->CR1  |= TIM_CR1_CEN;						// timer enable
+}
+
+// ----------------------------------------------------------------------------
+// initialize TIM2
+// ----------------------------------------------------------------------------
+void TIM2_Init (void) {
+	RCC->APB1ENR |= RCC_APB1ENR_TIM2EN;		// enable clock for TIM2
+
+  TIM2->PSC   = (3000)-1;								// set prescaler   = 10KHz
+  TIM2->ARR   = 6000-1;									// set auto-reload (es: 2000 = 100 ms)
+  TIM2->RCR   =  0;											// set repetition counter
+
+  TIM2->DIER = TIM_DIER_UIE;						// Update Interrupt enable
+  NVIC_EnableIRQ(TIM2_IRQn);						// TIM1   Interrupt enable
+
+  TIM2->CR1  |= TIM_CR1_CEN;						// timer enable
+}
+
+// ----------------------------------------------------------------------------
+// Timer1 Update Interrupt Handler
+// ----------------------------------------------------------------------------
+void TIM1_UP_IRQHandler (void) {
+
+  if (TIM1->SR & (TIM_SR_UIF)) {                  /* UIF set?                 */
+
+    if (ledDir == 0){
+			ledDir=1;
+			LED_BT_OFF;
+			
+		}
+    else{
+			ledDir=0;
+			LED_BT_ON;
+		}
+		
+		SendChar(cont++);
+		
+    TIM1->SR &= ~(TIM_SR_UIF);                    /* clear UIF flag           */
+  }
+}
+
+// ----------------------------------------------------------------------------
+// Timer2 Update Interrupt Handler
+// ----------------------------------------------------------------------------
+void TIM2_IRQHandler (void) {
+
+  if (TIM2->SR & (TIM_SR_UIF)) {                  /* UIF set?                 */
+
+    if (ledDir1 == 0){
+			ledDir1=1;
+			PB1_LED_RED;
+			PB2_LED_RED;
+		}
+    else if (ledDir1 == 1){
+			ledDir1=2;
+			PB1_LED_GREEN;
+			PB2_LED_GREEN;
+		}
+		else if (ledDir1 == 2){
+			ledDir1=0;
+			PB1_LED_OFF;
+			PB2_LED_OFF;
+		}
+		
+		//SendChar(ledDir1);	
+		//SendChar(cont++);	
+		
+    TIM2->SR &= ~(TIM_SR_UIF);                    /* clear UIF flag           */
+  }
+}
+
+
+/*----------------------------------------------------------------------------
+  Initialize UART pins, Baudrate
+ *----------------------------------------------------------------------------*/
+void USART1_Init (void) {
+  int i;
+
+  RCC->APB2ENR |=  (   1UL <<  0);        /* enable clock Alternate Function  */
+  AFIO->MAPR   &= ~(   1UL <<  2);        /* clear USART1 remap               */
+
+  RCC->APB2ENR |=  (   1UL <<  2);        /* enable GPIOA clock               */
+  GPIOA->CRH   &= ~(0xFFUL <<  4);        /* clear PA9, PA10                  */
+  GPIOA->CRH   |=  (0x0BUL <<  4);        /* USART1 Tx (PA9) output push-pull */
+  GPIOA->CRH   |=  (0x04UL <<  8);        /* USART1 Rx (PA10) input floating  */
+
+  RCC->APB2ENR |=  (   1UL << 14);        /* enable USART#1 clock             */
+
+  USART1->BRR   = 0x0208;                 /* 115200 baud @ PCLK2 60MHz        */
+  USART1->CR1   = ((   1UL <<  2) |       /* enable RX                        */
+                   (   1UL <<  3) |       /* enable TX                        */
+                   (   0UL << 12) );      /* 1 start bit, 8 data bits         */
+  USART1->CR2   = 0x0000;                 /* 1 stop bit                       */
+  USART1->CR3   = 0x0000;                 /* no flow control                  */
+  for (i = 0; i < 0x1000; i++) __NOP();   /* avoid unwanted output            */
+
+  USART1->CR1  |= ((   1UL << 13) );      /* enable USART                     */
+}
+
+
+/*----------------------------------------------------------------------------
+  SendChar
+  Write character to Serial Port.
+ *----------------------------------------------------------------------------*/
+int SendChar (int ch)  {
+
+  while (!(USART1->SR & USART_SR_TXE));
+  USART1->DR = (ch & 0x1FF);
+
+  return (ch);
+}
+
+
+
+// ----------------------------------------------------------------------------
+// MAIN function
+// ----------------------------------------------------------------------------
+int main (void) {
+	
+  GPIO_Init ();
+	EXTI_Init();
+  TIM1_Init ();
+	TIM2_Init ();
+	
+	USART1_Init();
+	  
+  while (1) {
+		
+		;	
+		
+  }
+}

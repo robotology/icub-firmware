@@ -1,0 +1,5 @@
+-c --cpu Cortex-M3 -g -O0 --apcs=interwork --c99 
+-I C:\Keil\ARM\RV31\INC 
+-I C:\Keil\ARM\CMSIS\Include 
+-I C:\Keil\ARM\Inc\ST\STM32F10x 
+-DSTM32F10X_MD -DHL_USE_MPU_ARCH_STM32F1 -o "hl_sys.o" --omf_browse "hl_sys.crf" --depend "hl_sys.d" "hl_sys.c"

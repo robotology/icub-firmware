@@ -1,0 +1,314 @@
+ /****************************************************
+ *  BDC board - iCub Facility - 2013                 *
+ *  Main program                                     *
+ *                                                   *
+ *  Written by Andrea Mura                           *
+ *  <andrea.mura@iit.it>                             *
+ ****************************************************/
+
+
+// ----------------------------------------------------------------------------
+// Include files
+// ----------------------------------------------------------------------------
+
+#include <stdio.h>
+#include <stdbool.h>
+#include "STM32F10x.h"
+#include "define.h"
+#include "globals.h"
+#include "gpio.h"
+#include "adc.h"
+#include "can.h"
+#include "exti.h"
+#include "timer.h"
+
+// ----------------------------------------------------------------------------
+// Global variables
+// ----------------------------------------------------------------------------
+int V_VBATT				= 0;
+int V_V12board		= 0;
+int V_V12motor		= 0;
+int I_V12board		= 0;
+int I_V12motor		= 0;
+int I_HSM					= 0;
+int DCDC_status		= 0;
+int DCDC_ctrl			= 0;
+bool HSM_PG				= 0;
+bool HSM_F				= 0;
+
+char timer_100us	= 0;
+char timer_1ms		= 0;
+char timer_10ms		= 0;
+char timer_100ms	= 0;
+
+bool can_led_active	= 0;
+bool toggle					= 0;
+
+// ----------------------------------------------------------------------------
+// Local variables
+// ----------------------------------------------------------------------------
+int *adc_values;						// contains all ADC channels conversion
+int V_VBATT_MAX			= 0;
+int V_VBATT_MIN			= 0;
+int I_V12board_MAX	= 2100;
+int I_V12motor_MAX	= 2100;
+int I_HSM_MAX				= 0;
+
+bool V12board				= 0;		// DCDC board control
+bool V12board_F			= 0;		// fault
+bool V12motor				= 0;		// DCDC motor control
+bool V12motor_F			= 0;		// fault
+bool HSM						= 0;		// HSM control
+bool DCrestart			= 0;
+
+char state_fsm			= START;
+int message=0;
+
+unsigned int ledExti    = 0;
+//int hsm_fault=0;
+//int hsm_pg=0;
+int cont=0;
+int rx=0;
+int prova=0;
+
+int adc_val[6];
+
+// ----------------------------------------------------------------------------
+// Initialize CAN interface
+// ----------------------------------------------------------------------------
+void CAN_init (void) {
+  CAN_setup();																// setup CAN Controller     
+  CAN_wrFilter (0x602, STANDARD_FORMAT);			// Enable reception of PC messages 
+	CAN_wrFilter (0x612, STANDARD_FORMAT);			// Enable reception of BCB messages 
+	
+  // ! COMMENT LINE BELOW TO ENABLE DEVICE TO PARTICIPATE IN CAN NETWORK !    
+  //CAN_testmode(CAN_BTR_SILM | CAN_BTR_LBKM);      // Loopback, Silent Mode (self-test)
+
+  CAN_start ();																// start CAN Controller   
+  CAN_waitReady ();														// wait till tx mbx is empty 
+}
+
+
+
+
+
+
+
+
+
+// ----------------------------------------------------------------------------
+// Finite state machine
+// ----------------------------------------------------------------------------
+void fsm (void) {
+	
+	switch(state_fsm){
+		
+		case START:				// ----------------------------------------------------------- //
+		break;
+		
+		case FAULT:				// ----------------------------------------------------------- //
+		break;
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// ----------------------------------------------------------------------------
+// MAIN function
+// ----------------------------------------------------------------------------
+int main (void) {
+	int i;
+	
+	GPIO_Init();
+	EXTI_Init();
+	ADC_Init();
+	TIM1_Init();
+	
+	//TIM2_Init();
+	//USART2_Init();
+	
+	CAN_init();
+	
+	CAN_TxMsg.id = 0x621;
+  for (i = 0; i < 8; i++) CAN_TxMsg.data[i] = 0x0;
+  CAN_TxMsg.len = 8;
+  CAN_TxMsg.format = STANDARD_FORMAT;
+  CAN_TxMsg.type = DATA_FRAME;
+	  
+  while (1) {
+		if (timer_100us >= 1){	//----------------------------- 100us -----------------------------
+			timer_100us=0;
+			timer_1ms++;
+		}
+		
+		if (timer_1ms >= 10){		//----------------------------- 1ms -----------------------------
+			timer_1ms=0;
+			timer_10ms++;
+			
+			ADC_StartCnv();                      // start A/D conversion 12bit
+			adc_values	= ADC_Conv();
+			ADC_StopCnv();                       // stop A/D conversion
+			
+			V_VBATT			=*adc_values;
+			V_V12board	=*(adc_values+1);
+			V_V12motor	=*(adc_values+2);
+			I_V12board	=*(adc_values+3);
+			I_V12motor	=*(adc_values+4);
+			I_HSM				=*(adc_values+5);
+			
+			if(I_V12board>I_V12board_MAX){
+				EN_V12board_OFF;
+				EN_V12motor_OFF;
+				HSM_EN_OFF;
+				V12board=0;
+				V12motor=0;
+				HSM=0;
+				V12board_F=1;
+			}
+			
+			if(I_V12motor>I_V12motor_MAX){
+				EN_V12motor_OFF;
+				HSM_EN_OFF;
+				V12motor=0;
+				V12motor_F=1;
+			}
+			
+			DCDC_status =	((V12board		& 0x01) << 7)	+
+										((V12board_F	& 0x01)	<< 6)	+
+										((V12motor		& 0x01)	<< 5)	+
+										((V12motor_F	& 0x01)	<< 4)	+
+										((HSM					& 0x01)	<< 3) +
+										((HSM_PG			& 0x01)	<< 2) +
+										((HSM_F				& 0x01) << 1) +
+										((DCrestart		& 0x01) << 0);
+		
+		
+			if (CAN_RxRdy) {							//rx msg on CAN Ctrl
+
+				if (CAN_TxRdy) {
+					
+					switch (CAN_RxMsg.data[0]){									// Control status byte
+					
+					case 0x00:	CAN_TxMsg.id = 0x621;						// Polling
+											CAN_TxMsg.data[0] = 0x80;				// Voltage message
+											CAN_TxMsg.data[1] = DCDC_status;
+											CAN_TxMsg.data[2] = 0;
+											CAN_TxMsg.data[3] = 0;
+											CAN_TxMsg.data[4] = 0;
+											CAN_TxMsg.data[5] = 0;
+											CAN_TxMsg.data[6] = 0;
+											CAN_TxMsg.data[7] = 0;
+											CAN_wrMsg (&CAN_TxMsg);
+											break;
+						
+					case 0x01:	CAN_TxMsg.id = 0x621;						// Polling
+											CAN_TxMsg.data[0] = 0x81;				// Voltage message
+											CAN_TxMsg.data[1] = DCDC_status;
+											CAN_TxMsg.data[2] = ((V_VBATT>> 8) & 0x0F);
+											CAN_TxMsg.data[3] = V_VBATT & 0xFF;
+											CAN_TxMsg.data[4] = ((V_V12board>> 8) & 0x0F);
+											CAN_TxMsg.data[5] = V_V12board & 0xFF;
+											CAN_TxMsg.data[6] = ((V_V12motor>> 8) & 0x0F);
+											CAN_TxMsg.data[7] = V_V12motor & 0xFF;
+											CAN_wrMsg (&CAN_TxMsg);
+											break;
+						
+					case 0x02:	CAN_TxMsg.id = 0x621;
+											CAN_TxMsg.data[0] = 0x82;				// Current message
+											CAN_TxMsg.data[1] = DCDC_status;
+											CAN_TxMsg.data[2] = ((I_V12board>> 8) & 0x0F);
+											CAN_TxMsg.data[3] = I_V12board & 0xFF;
+											CAN_TxMsg.data[4] = ((I_V12motor>> 8) & 0x0F);
+											CAN_TxMsg.data[5] = I_V12motor & 0xFF;
+											CAN_TxMsg.data[6] = ((I_HSM>> 8) & 0x0F);
+											CAN_TxMsg.data[7] = I_HSM & 0xFF;
+											CAN_wrMsg (&CAN_TxMsg);
+											break;
+											
+					default:		CAN_TxMsg.id = 0x621;
+											CAN_TxMsg.data[0] = 0xAA;				// Voltage message
+											CAN_TxMsg.data[1] = CAN_RxMsg.data[0];
+											CAN_TxMsg.data[2] = CAN_RxMsg.data[1];
+											CAN_TxMsg.data[3] = CAN_RxMsg.data[2];
+											CAN_TxMsg.data[4] = CAN_RxMsg.data[3];
+											CAN_TxMsg.data[5] = CAN_RxMsg.data[4];
+											CAN_TxMsg.data[6] = CAN_RxMsg.data[5];
+											CAN_TxMsg.data[7] = CAN_RxMsg.data[6];
+											CAN_wrMsg (&CAN_TxMsg);
+											break;
+					}
+				}
+				
+				DCDC_ctrl = CAN_RxMsg.data[1];
+				
+				DCrestart = DCDC_ctrl & 0x01;
+				
+				if(DCrestart==1 && (V12board_F || V12motor_F || HSM_F)){		// force restart
+					V12board_F=0;
+					V12motor_F=0;
+					HSM_F=0;
+				}
+				
+				if(V12board_F == 0){
+					V12board		= (DCDC_ctrl >> 7) & 0x01;
+					if(V12board)	{EN_V12board_ON;}
+					else					{EN_V12board_OFF;}
+				
+					if(V12motor_F == 0){
+						V12motor	= (DCDC_ctrl >> 5) & 0x01;
+						if(V12motor)	{EN_V12motor_ON;}
+						else					{EN_V12motor_OFF;}
+					}
+					
+					if(HSM_F == 0){
+						HSM			 	= (DCDC_ctrl >> 3) & 0x01;
+						if(HSM)				{HSM_EN_ON;}
+						else					{HSM_EN_OFF;}
+					}
+				}
+				
+				CAN_RxRdy = 0;
+				
+			}
+		}
+		
+		
+		if (timer_10ms >= 10){		//----------------------------- 10ms -----------------------------
+			timer_10ms=0;
+			timer_100ms++;
+		}
+		
+		if (timer_100ms >= 10){		//----------------------------- 100ms -----------------------------
+			timer_100ms=0;
+			
+			if(can_led_active>0){
+				if(toggle == 0){
+					toggle=1;
+					CAN_LED_ON;
+				}
+				else{
+					toggle=0;
+					CAN_LED_OFF;
+				}
+				can_led_active--;
+			}
+			else{
+				toggle=0;
+				CAN_LED_OFF;
+			}
+		}
+		
+	}
+}

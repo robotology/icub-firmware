@@ -1,0 +1,58 @@
+Dependencies for Project 'bdc', Target 'BCB': (DO NOT MODIFY !)
+F (.\startup_stm32f10x_md.s)(0x4F588A1C)(--cpu Cortex-M3 -g --apcs=interwork -I C:\Keil\ARM\RV31\INC -I C:\Keil\ARM\CMSIS\Include -I C:\Keil\ARM\Inc\ST\STM32F10x --list "startup_stm32f10x_md.lst" --xref -o "startup_stm32f10x_md.o" --depend "startup_stm32f10x_md.d")
+F (.\system_stm32f10x.c)(0x5279282F)(-c --cpu Cortex-M3 -g -O0 --apcs=interwork -I C:\Keil\ARM\RV31\INC -I C:\Keil\ARM\CMSIS\Include -I C:\Keil\ARM\Inc\ST\STM32F10x -DSTM32F10X_MD -o "system_stm32f10x.o" --omf_browse "system_stm32f10x.crf" --depend "system_stm32f10x.d")
+I (C:\Keil\ARM\Inc\ST\STM32F10x\stm32f10x.h)(0x4F588B5C)
+I (C:\Keil\ARM\CMSIS\Include\core_cm3.h)(0x50066FD2)
+I (C:\Keil\ARM\ARMCC\bin\..\include\stdint.h)(0x4EB126E4)
+I (C:\Keil\ARM\CMSIS\Include\core_cmInstr.h)(0x5059A2DC)
+I (C:\Keil\ARM\CMSIS\Include\core_cmFunc.h)(0x4FDADAAC)
+I (C:\Keil\ARM\Inc\ST\STM32F10x\system_stm32f10x.h)(0x4F588B5C)
+F (.\gpio.c)(0x527CB862)(-c --cpu Cortex-M3 -g -O0 --apcs=interwork -I C:\Keil\ARM\RV31\INC -I C:\Keil\ARM\CMSIS\Include -I C:\Keil\ARM\Inc\ST\STM32F10x -DSTM32F10X_MD -o "gpio.o" --omf_browse "gpio.crf" --depend "gpio.d")
+I (C:\Keil\ARM\Inc\ST\STM32F10x\stm32f10x.h)(0x4F588B5C)
+I (C:\Keil\ARM\CMSIS\Include\core_cm3.h)(0x50066FD2)
+I (C:\Keil\ARM\ARMCC\bin\..\include\stdint.h)(0x4EB126E4)
+I (C:\Keil\ARM\CMSIS\Include\core_cmInstr.h)(0x5059A2DC)
+I (C:\Keil\ARM\CMSIS\Include\core_cmFunc.h)(0x4FDADAAC)
+I (C:\Keil\ARM\Inc\ST\STM32F10x\system_stm32f10x.h)(0x4F588B5C)
+I (gpio.h)(0x527B757D)
+F (.\bdc.c)(0x5281F5FD)(-c --cpu Cortex-M3 -g -O0 --apcs=interwork -I C:\Keil\ARM\RV31\INC -I C:\Keil\ARM\CMSIS\Include -I C:\Keil\ARM\Inc\ST\STM32F10x -DSTM32F10X_MD -o "bdc.o" --omf_browse "bdc.crf" --depend "bdc.d")
+I (C:\Keil\ARM\ARMCC\bin\..\include\stdio.h)(0x4EB126E6)
+I (C:\Keil\ARM\Inc\ST\STM32F10x\STM32F10x.h)(0x4F588B5C)
+I (C:\Keil\ARM\CMSIS\Include\core_cm3.h)(0x50066FD2)
+I (C:\Keil\ARM\ARMCC\bin\..\include\stdint.h)(0x4EB126E4)
+I (C:\Keil\ARM\CMSIS\Include\core_cmInstr.h)(0x5059A2DC)
+I (C:\Keil\ARM\CMSIS\Include\core_cmFunc.h)(0x4FDADAAC)
+I (C:\Keil\ARM\Inc\ST\STM32F10x\system_stm32f10x.h)(0x4F588B5C)
+I (define.h)(0x5281F638)
+I (gpio.h)(0x527B757D)
+I (usart.h)(0x527CE18D)
+I (adc.h)(0x4F588C5C)
+I (can.h)(0x4F588C5C)
+F (.\usart.c)(0x527D1D1F)(-c --cpu Cortex-M3 -g -O0 --apcs=interwork -I C:\Keil\ARM\RV31\INC -I C:\Keil\ARM\CMSIS\Include -I C:\Keil\ARM\Inc\ST\STM32F10x -DSTM32F10X_MD -o "usart.o" --omf_browse "usart.crf" --depend "usart.d")
+I (C:\Keil\ARM\ARMCC\bin\..\include\string.h)(0x4EB126E6)
+I (C:\Keil\ARM\Inc\ST\STM32F10x\stm32f10x.h)(0x4F588B5C)
+I (C:\Keil\ARM\CMSIS\Include\core_cm3.h)(0x50066FD2)
+I (C:\Keil\ARM\ARMCC\bin\..\include\stdint.h)(0x4EB126E4)
+I (C:\Keil\ARM\CMSIS\Include\core_cmInstr.h)(0x5059A2DC)
+I (C:\Keil\ARM\CMSIS\Include\core_cmFunc.h)(0x4FDADAAC)
+I (C:\Keil\ARM\Inc\ST\STM32F10x\system_stm32f10x.h)(0x4F588B5C)
+I (usart.h)(0x527CE18D)
+F (.\can.c)(0x5280E2FD)(-c --cpu Cortex-M3 -g -O0 --apcs=interwork -I C:\Keil\ARM\RV31\INC -I C:\Keil\ARM\CMSIS\Include -I C:\Keil\ARM\Inc\ST\STM32F10x -DSTM32F10X_MD -o "can.o" --omf_browse "can.crf" --depend "can.d")
+I (C:\Keil\ARM\Inc\ST\STM32F10x\STM32F10x.h)(0x4F588B5C)
+I (C:\Keil\ARM\CMSIS\Include\core_cm3.h)(0x50066FD2)
+I (C:\Keil\ARM\ARMCC\bin\..\include\stdint.h)(0x4EB126E4)
+I (C:\Keil\ARM\CMSIS\Include\core_cmInstr.h)(0x5059A2DC)
+I (C:\Keil\ARM\CMSIS\Include\core_cmFunc.h)(0x4FDADAAC)
+I (C:\Keil\ARM\Inc\ST\STM32F10x\system_stm32f10x.h)(0x4F588B5C)
+I (can.h)(0x4F588C5C)
+F (.\adc.c)(0x5281E8FC)(-c --cpu Cortex-M3 -g -O0 --apcs=interwork -I C:\Keil\ARM\RV31\INC -I C:\Keil\ARM\CMSIS\Include -I C:\Keil\ARM\Inc\ST\STM32F10x -DSTM32F10X_MD -o "adc.o" --omf_browse "adc.crf" --depend "adc.d")
+I (C:\Keil\ARM\Inc\ST\STM32F10x\STM32F10x.h)(0x4F588B5C)
+I (C:\Keil\ARM\CMSIS\Include\core_cm3.h)(0x50066FD2)
+I (C:\Keil\ARM\ARMCC\bin\..\include\stdint.h)(0x4EB126E4)
+I (C:\Keil\ARM\CMSIS\Include\core_cmInstr.h)(0x5059A2DC)
+I (C:\Keil\ARM\CMSIS\Include\core_cmFunc.h)(0x4FDADAAC)
+I (C:\Keil\ARM\Inc\ST\STM32F10x\system_stm32f10x.h)(0x4F588B5C)
+I (adc.h)(0x4F588C5C)
+F (.\Abstract.txt)(0x5267919A)()
+F (.\TEMP.txt)(0x5278E447)()
+F (.\TEMP1.txt)(0x527B4782)()

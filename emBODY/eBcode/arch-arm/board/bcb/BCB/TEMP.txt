@@ -1,0 +1,97 @@
+// ----------------------------------------------------------------------------
+// DCDC power management function
+// ----------------------------------------------------------------------------
+void dcdc_management(void){
+	
+	if(V12board_F==0 && V12motor_F==0 && HSM_F==0){				// if BDC is ok...
+		if(PB1_debounce){
+			PB1_debounce=0;
+			if(V12board){				// if V12board is on
+				V12board=0;				// switch off V12board
+				V12motor=0;				// switch off V12motor
+				HSM=0;						// switch off HSM
+				PB1_LED_RED;
+				PB2_LED_RED;
+			}
+			else{								// else if V12board is off
+				V12board=1;				// switch on V12board
+				PB1_LED_GREEN;
+			}
+		}
+		
+		if(PB2_debounce){
+			PB2_debounce=0;
+			if(V12motor){				// if V12motor is on
+				V12motor=0;				// switch off V12motor
+				HSM=0;						// switch off HSM
+				PB2_LED_RED;
+			}
+			else if(!V12motor && V12board){								// else if V12motor is off and V12board is on
+				V12motor=1;				// switch on V12motor
+				HSM=1;						// switch on HSM
+				PB2_LED_GREEN;
+			}
+		}
+		
+	}
+	else{																									// else if BDC has fault...
+		if(V12board_F==0 && (V12motor_F==1 || HSM_F==1)){
+			if(PB1_debounce){
+				PB1_debounce=0;
+				if(V12board){				// if V12board is on
+					V12board=0;				// switch off V12board
+					PB1_LED_RED;
+				}
+				else{								// else if V12board is off
+					V12board=1;				// switch on V12board
+					PB1_LED_GREEN;
+				}
+			}
+			if(PB2_restart==0){
+				V12motor=0;
+				HSM=0;
+				if(toggle_100ms)	{PB2_LED_RED;}
+				else							{PB2_LED_OFF;}
+			}
+			else if(PB2_restart==1){
+				V12motor=1;
+				HSM=1;
+				PB2_LED_GREEN;
+			}
+		}
+		else if(V12board_F==1){
+			if(PB1_restart==0){
+				V12board=0;
+				V12motor=0;
+				HSM=0;
+				
+				if(V12motor_F==1 || HSM_F==1){
+					if(toggle_100ms)	{PB1_LED_RED;		PB2_LED_RED;}
+					else							{PB1_LED_OFF;		PB2_LED_OFF;}
+				}
+				else{
+					LED_BT_ON;					// §§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§
+					if(toggle_100ms)	{PB1_LED_RED;}// LED_BT_ON;}
+					else							{PB1_LED_OFF;}// LED_BT_OFF;}
+					PB2_LED_RED;				// §§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§§
+					LED_BT_OFF;
+				}
+			}
+			else if(PB1_restart==1){
+				V12board=1;
+				PB1_LED_GREEN;
+			}
+		}
+	}
+	
+	DCDC_ctrl = ((V12board		& 0x01) << 7)	+
+							((V12motor		& 0x01)	<< 5)	+
+							((HSM					& 0x01)	<< 3) +
+							(((PB1_restart || PB2_restart) & 0x01)	<< 0);
+	//PB1_debounce=0;
+	//if(DCrestart){
+		PB1_restart=0;
+		PB2_restart=0;
+	//}
+}
+

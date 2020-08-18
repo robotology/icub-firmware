@@ -1,0 +1,69 @@
+The BCB project is the program for the BCB board (Backpack Control Board)
+
+Microcontroller: ST 'STM32F103R8' 
+
+- Clock Settings
+	- XTAL    =           10.00 MHz
+	- SYSCLK  =           72.00 MHz
+	- HCLK    = SYSCLK  = 72.00 MHz
+
+- Pins
+	- PA0:			BT_CTS (Bluetooth)
+	- PA1:			BT_RTS (Bluetooth)
+	- PA2:			BT_TX (Bluetooth)
+	- PA3:			BT_RX (Bluetooth)
+	- PA4:			SPI_CSB
+	- PA5:			SPI_CK
+	- PA6:			SPI_MISO
+	- PA7:			SPI_MOSI
+	- PA8:	O	D	RESET_BT (Reset Bluetooth module)
+	- PA9:			TX_DSPL (Display)
+	- PA10:			RX_DSPL (Display)
+	- PA11:			CAN_RX
+	- PA12:			CAN_TX
+	- PA13:			SWDIO
+	- PA14:			SWCLK
+	- PA15:			TDI
+	
+	- PB0:	I	D	SWT
+	- PB1:			not used
+	- PB2:	O	D	CAN_LED
+	- PB3:			TRACESWO
+	- PB4:			not used
+	- PB5:			I2C_SMBAL
+	- PB6:			I2C_SCL
+	- PB7:			I2C_SDA
+	- PB8:	O	D	FAN1
+	- PB9:	O	D	FAN2
+	- PB10:			RST_DSPL (Display)
+	- PB11:			not used
+	- PB12:			GPIO2
+	- PB13:	O	D	LED_BT (Bluetooth)
+	- PB14:	O	D	LED1_ETH (Ethernet)
+	- PB15:	O	D	LED2_ETH (Ethernet)
+	
+	- PC0:	I	A	VBATTMON
+	- PC1:			GPIO1
+	- PC2:			not used
+	- PC3:			not used
+	- PC4:	I		CPU (Push button)
+	- PC5:	O		CPU_Green
+	- PC6:	O		CPU_Red
+	- PC7:	I		MOTORS (Push button)
+	- PC8:	O		MOTORS_Green
+	- PC9:	O		MOTORS_RED
+	- PC10:	I		FAULT_REM (Remote fault)
+	- PC11:	I		FAULT
+	- PC12:			FAULT_GPIO
+	- PC13:			JACK
+	- PC14:			not used
+	- PC15:			not used
+	
+	- PD0:			OSCIN
+	- PD1:			not used
+	- PD2:			not used
+	
+	- NRST:			nRESET
+	- BOOT0:		not used
+	
+ 

@@ -1,0 +1,28 @@
+*** Creating Trace Output File 'bdc.tra' Ok.
+### Preparing for ADS-LD.
+### Creating ADS-LD Command Line
+### List of Objects: adding '"startup_stm32f10x_md.o"'
+### List of Objects: adding '"system_stm32f10x.o"'
+### List of Objects: adding '"hl_fifo.o"'
+### List of Objects: adding '"bdc.o"'
+### List of Objects: adding '"gpio.o"'
+### List of Objects: adding '"can.o"'
+### List of Objects: adding '"adc.o"'
+### List of Objects: adding '"exti.o"'
+### List of Objects: adding '"timer.o"'
+### ADS-LD Command completed:
+--cpu Cortex-M3 "startup_stm32f10x_md.o" "system_stm32f10x.o" "hl_fifo.o" "bdc.o" "gpio.o" "can.o" "adc.o" "exti.o" "timer.o" 
+--strict --scatter "bdc.sct" 
+--summary_stderr --info summarysizes --map --xref --callgraph --symbols 
+--info sizes --info totals --info unused --info veneers 
+ --list ".\bdc.map" -o bdc.axf### Preparing Environment (PrepEnvAds)
+### ADS-LD Output File: 'bdc.axf'
+### ADS-LD Command File: 'bdc.lnp'
+### Checking for dirty Components...
+### Creating CmdFile 'bdc.lnp', Handle=0x0000032C
+### Writing '.lnp' file
+### ADS-LD Command file 'bdc.lnp' is ready.
+### ADS-LD: About to start ADS-LD Thread.
+### ADS-LD: executed with 0 errors
+### Updating obj list
+### LDADS_file() completed.
