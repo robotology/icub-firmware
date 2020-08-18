@@ -22,6 +22,13 @@ This repository is structured as follows:
 
   * mtb3 --> "skin - application"
 
-The firmwares obtained compiling the source code contained in this repository using board-specific tools are available at https://github.com/robotology/icub-firmware-build .
+The firmwares obtained compiling the source code contained in this repository using board-specific tools are available at https://github.com/robotology/icub-firmware-build.
+
+## Maintainers
+This repository is maintained by:
+
+| | |
+|:---:|:---:|
+| [<img src="https://github.com/marcoaccame.png" width="40">](https://github.com/marcoaccame) | [@marcoaccame](https://github.com/marcoaccame) |
 
 
