@@ -21,6 +21,8 @@
 // --------------------------------------------------------------------------------------------------------------------
 #include "faceExpressionsLowLevelDriver.h"
 
+#include <algorithm>
+
 #include "embot_core.h"
 #include "embot_os.h"
 
@@ -58,25 +60,110 @@ void FaceExpressionsLLDriver::preparePacket(FacePartExpr_t &facepartexpr)
 
 }
 
-static volatile bool ongoing = false;
 
-void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
+//#define DEBUG_SPI_TX
+
+#if defined DEBUG_SPI_TX
+volatile embot::core::Time durationofSPItx = 0;
+volatile embot::core::Time startsending = 0;
+
+volatile uint32_t counterOfSPIlocks = 0;
+volatile uint32_t counterOfSPIreleases = 0;
+
+volatile uint64_t maxduration = 0;
+volatile uint64_t minduration = 100000000000000000;
+#endif
+
+volatile bool FaceExpressionsLLDriver::spitxISactive = false;
+
+void FaceExpressionsLLDriver::onspitxcompleted()
 {
-    ongoing = false;
+    // unlock the spi tx
+    spitxISactive = false;
 }
 
-void FaceExpressionsLLDriver::sendStream(void)
+// this callback is executed at end of spi transmission.
+// sometimes, however it happened that was not called. 
+void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi)
+{
+    FaceExpressionsLLDriver::onspitxcompleted();
+
+#if defined DEBUG_SPI_TX    
+    durationofSPItx = embot::core::now() - startsending;   
+    counterOfSPIreleases++;
+    maxduration = std::max(maxduration, durationofSPItx);
+    minduration = std::min(minduration, durationofSPItx);
+#endif
+}
+
+volatile uint32_t numberOfTimeouts = 0;
+volatile uint32_t numberOfspiTXfailures = 0;
+volatile int32_t spiTXres = HAL_OK;
+
+
+bool FaceExpressionsLLDriver::sendStream(RfeApp::Error &err, embot::core::relTime timeout)
 {
     // i wait until ongoing is set false by the HAL_SPI_TxCpltCallback() at the end of spi transmission
-    // in this way, two consecutive transmissions are properly enqueued and the second starts only after the first is over
-    for(;;)
+    // in this way, two consecutive transmissions are properly enqueued and the second starts only after 
+    // the first is over
+    // HOWEVER:
+    // 1. i add a timeout to avoid being stuck here forever.
+    // 2. i copy the globalDataPacket into memory dedicated only to the spi tx. with that we avoid
+    //    during the tx of the data (its takes about 1300 usec) the main thread changes the packet
+    //    under transmission.
+    
+    err = RfeApp::Error::none;
+
+    
+    if(true == spitxISactive)
     {
-       if(false == ongoing) break; 
+        // wait until the spi tx is not active anymore but up to a given safe timeout. we cannot hang in here forever
+        constexpr embot::core::relTime safeSPItxtime = 2*embot::core::time1millisec; // actually 1300 usec ...
+        volatile embot::core::Time endofwait =  embot::core::now() + std::max(timeout, safeSPItxtime);
+        for(;;)
+        {
+            if(false == spitxISactive) 
+            {
+                break;
+            }
+                    
+            if(embot::core::now() >= endofwait)
+            {
+                // damn! a timeout.
+                // i unlock the spi tx so that we can go on
+                spitxISactive = false;
+                // but i also mark that there was one timeout
+                err = RfeApp::Error::SPIwasbusy;
+                numberOfTimeouts++;           
+            }       
+        }
+    }   
+    
+    // lock the spi tx
+    spitxISactive = true;
+    // copy the spi frame into dedicated memory
+    std::memmove(spitxData, globalDataPacket, sizeof(spitxData));
+
+#if defined DEBUG_SPI_TX      
+    counterOfSPIlocks++;
+    startsending = embot::core::now();
+#endif
+    
+    // this call is not blocking. it may fail.
+    spiTXres = HAL_SPI_Transmit_DMA(&hspi1, spitxData, sizeof(spitxData));
+    
+    if(HAL_OK != spiTXres)
+    {
+        // the spi tx has failed ... unlock the spi tx.
+        spitxISactive = false;
+        // and mark that there was an error
+        err = RfeApp::Error::SPIfailure;
+        numberOfspiTXfailures++;
+        return false;
     }
-    // i set it to ongoing 
-    ongoing = true;
-    HAL_SPI_Transmit_DMA(&hspi1, globalDataPacket, globalDataPacketSize);
-    // ok, i dont need to wait
+    
+    // ok, no failure.    
+    return true;
 }
 
 TLCDriver::TLCDriver()
@@ -169,3 +256,6 @@ void TLCDriver::createDataPacket(uint8_t *packet)
   packet[27] = leds[3].R;
 
 }
+
+// eof
+

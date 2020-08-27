@@ -29,6 +29,8 @@
 
 namespace RfeApp {
     
+    enum class Error : uint8_t { none = 0, SPIwasbusy = 1, SPIfailure = 2, invalidFacepart = 3 };
+    
     // use consecutive values 
     enum class FacePart_t : uint8_t { leftEBrow = 0, rightEBrow = 1, mouth = 2, last = mouth, all = 254, none = 255 };
     constexpr uint8_t facePartMaxNum = embot::core::tointegral(FacePart_t::last) + 1;

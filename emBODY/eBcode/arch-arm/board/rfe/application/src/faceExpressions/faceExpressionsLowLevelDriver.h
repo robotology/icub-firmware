@@ -113,10 +113,11 @@ public:
 class RfeApp::FaceExpressionsLLDriver
 {
 public:
-    FaceExpressionsLLDriver(){;};
+    FaceExpressionsLLDriver() {}
     void preparePacket(FacePartExpr_t &facepartexpr);
-    void sendStream(void);
+    bool sendStream(RfeApp::Error &err, embot::core::relTime timeout = 3*embot::core::time1millisec);
     
+    static void onspitxcompleted();
     
 private:
 
@@ -157,8 +158,11 @@ private:
     /*The global data size is equal to sum of all tlcpacket for all tlc for all parts.
     It is not possible to send only a part of data.*/
     std::uint8_t globalDataPacket[ globalDataPacketSize ];
+                                                   
+    std::uint8_t spitxData[globalDataPacketSize];   
+    static volatile bool spitxISactive;                                                   
 
-    TLCDriver    tlcdriver;
+    TLCDriver tlcdriver;
 };
 
 

@@ -24,13 +24,13 @@ constexpr uint32_t numMilli = 50;
 
 constexpr embot::app::theCANboardInfo::applicationInfo applInfo 
 { 
-    embot::prot::can::versionOfAPPLICATION {1, 1, 7},    
+    embot::prot::can::versionOfAPPLICATION {1, 2, 0},    
     embot::prot::can::versionOfCANPROTOCOL {2, 0}    
 };
 
 constexpr std::uint16_t threadIDLEstacksize = 512;
 constexpr std::uint16_t threadINITstacksize = 2048;
-constexpr std::uint16_t threadEVNTstacksize = 4096;
+constexpr std::uint16_t threadEVNTstacksize = 4096+1024;
 constexpr std::uint8_t maxINPcanframes = 16;
 constexpr std::uint8_t maxOUTcanframes = 48;
 constexpr embot::core::relTime threadEVNTtimeout = numMilli*embot::core::time1millisec;
@@ -109,6 +109,8 @@ int main(void)
 #include "embot_hw_usb.h"
 #include "faceExpressionsModule.h"
 
+#include "embot_app_application_theCANtracer.h"
+
 
 constexpr embot::os::Event evRXusbmessage = 0x00000001 << 1;
 constexpr embot::os::Event evIMUtick = 0x00000001 << 3;
@@ -185,7 +187,7 @@ void mySYS::userdefInit_Extra(embot::os::EventThread* evtsk, void *initparam) co
     embot::app::application::theCANparserIMU &canparserimu = embot::app::application::theCANparserIMU::getInstance();
     embot::app::application::theCANparserIMU::Config configparserimu { &theimu };
     canparserimu.initialise(configparserimu);   
-            
+    
 }
 
 static void alerteventbasedthreadusb(void *arg)
@@ -237,37 +239,31 @@ void myEVT::userdefOnEventRXcanframe(embot::os::Thread *t, embot::os::EventMask 
 }
 
 void myEVT::userdefOnEventANYother(embot::os::Thread *t, embot::os::EventMask eventmask, void *param, std::vector<embot::prot::can::Frame> &outframes) const
-{    
+{ 
     if(true == embot::core::binary::mask::check(eventmask, evRXusbmessage))
     {        
         embot::hw::usb::Message msg;
         std::uint8_t remainingINrx = 0;
         if(embot::hw::resOK == embot::hw::usb::get(embot::hw::usb::Port::one, msg, remainingINrx))
         {   
-//            embot::core::Time t1 = embot::os::now();
-            //faceExpressions.loadNewExpression(msg.data, msg.size);
             faceExpressions.processcommands(msg.data, msg.size);
-//            embot::core::Time t2 = embot::os::now();
             faceExpressions.displayExpression();
-//            embot::core::Time t3 = embot::os::now();
-            
-//            t_load = t2-t1;
-//            t_display = t3-t2;
-//            t_total = t3-t1;
-//            
-//            loadAvg.set(t_load);
-//            displayAvg.set(t_display);
-//            totalAvg.set(t_total);
-//            
-//            totCount++;
-//            
-//            if(totCount==5)
-//            {
-//                loadAvg.calculate();
-//                displayAvg.calculate();
-//                totalAvg.calculate();
-//                totCount=0;
-//            }
+#undef RFE_SEND_CANPRINT            
+#if defined(RFE_SEND_CANPRINT)                        
+            RfeApp::Error errorvalue = faceExpressions.getError();
+            if(RfeApp::Error::none != errorvalue)
+            {
+                embot::app::theCANtracer &tracer = embot::app::theCANtracer::getInstance();
+                if(RfeApp::Error::SPIwasbusy == errorvalue)
+                {
+                    tracer.print("RFE spi busy", outframes);
+                }
+                else if(RfeApp::Error::SPIfailure == errorvalue)
+                {
+                    tracer.print("RFE spi fail", outframes);
+                }              
+            }
+#endif            
             
             if(remainingINrx > 0)
             {

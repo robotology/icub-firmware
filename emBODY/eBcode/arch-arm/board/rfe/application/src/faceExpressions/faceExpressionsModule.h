@@ -47,7 +47,10 @@ class RfeApp::FaceExpressions
     bool display(FacePart_t part, const PartProps &pp);
     bool display(Expression_t exp, const std::array<Color, 3> &cols, Brightness bri);
     
+    RfeApp::Error getError(bool clear_after_read = true);    
+    
 private:
+    RfeApp::Error _error {RfeApp::Error::none};
     FacePartExpr_t leftEBrow_expr {};
     FacePartExpr_t rightEBrow_expr {};
     FacePartExpr_t mouth_expr {};

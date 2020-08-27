@@ -127,9 +127,7 @@ bool FaceExpressions::display(Expression_t exp, Color col)
     rightEBrow_expr.load(col);
     mouth_expr.load(col); 
     
-    displayExpression();   
-    
-    return true;
+    return displayExpression();   
 }
 
 
@@ -147,9 +145,7 @@ bool FaceExpressions::display(Expression_t exp, const std::array<Color, 3> &cols
     rightEBrow_expr.load(cols[1]);
     mouth_expr.load(cols[2]);      
 
-    displayExpression();   
-    
-    return true;    
+    return displayExpression();       
 }
 
 
@@ -201,9 +197,7 @@ bool FaceExpressions::display(FacePart_t part, Expression_t exp, Color col, Brig
         
     }
        
-    displayExpression();   
-    
-    return true;
+    return displayExpression();   
 }
 
 
@@ -256,15 +250,14 @@ bool FaceExpressions::display(FacePart_t part, Color col, Brightness bri, uint32
         
     }
        
-    displayExpression();   
-    
-    return true;
+    return displayExpression();   
 }
 
 bool FaceExpressions::display(FacePart_t part, const PartProps &pp)
 {   
     if(!pp.isvalid())
     {
+        _error = Error::invalidFacepart;
         return false;
     }
     
@@ -300,9 +293,7 @@ bool FaceExpressions::display(FacePart_t part, const PartProps &pp)
         
     }    
     
-    displayExpression(); 
-    
-    return true; 
+    return displayExpression(); 
 }
 
 
@@ -333,6 +324,8 @@ bool FaceExpressions::loadNewExpression(uint8_t *data, uint32_t size)
 
 bool FaceExpressions::displayExpression(void)
 {
+    bool ret = true;
+    
     bool somethingIsChanged = false;
     
     if(leftEBrow_expr.changed)
@@ -346,14 +339,13 @@ bool FaceExpressions::displayExpression(void)
     
     if(somethingIsChanged)
     {
-        driver.sendStream();
+        ret = driver.sendStream(_error);
         leftEBrow_expr.changed = false;
         rightEBrow_expr.changed = false;
         mouth_expr.changed = false;
     }
     
-
-    return true;
+    return ret;
 }
 
 static uint32_t getHexVal(uint8_t *recMsg)
@@ -681,3 +673,17 @@ bool FaceExpressions::processcommands(uint8_t *data, uint32_t size, bool bigendi
     
     return res;    
 }
+
+
+RfeApp::Error FaceExpressions::getError(bool clear_after_read)
+{
+    Error e = _error;
+    if(true == clear_after_read)
+    {
+        _error = Error::none;
+    }
+    return e;
+}    
+   
+// eof
+
