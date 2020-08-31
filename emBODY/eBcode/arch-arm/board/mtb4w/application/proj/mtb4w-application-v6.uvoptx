@@ -103,7 +103,7 @@
         <bEvRecOn>1</bEvRecOn>
         <bSchkAxf>0</bSchkAxf>
         <bTchkAxf>0</bTchkAxf>
-        <nTsel>1</nTsel>
+        <nTsel>0</nTsel>
         <sDll></sDll>
         <sDllPa></sDllPa>
         <sDlgDll></sDlgDll>
@@ -114,13 +114,13 @@
         <tDlgDll></tDlgDll>
         <tDlgPa></tDlgPa>
         <tIfile>.\eventviewer-stm32-cfg.ini</tIfile>
-        <pMon>BIN\ULP2CM3.DLL</pMon>
+        <pMon>BIN\UL2CM3.DLL</pMon>
       </DebugOpt>
       <TargetDriverDllRegistry>
         <SetRegEntry>
           <Number>0</Number>
           <Key>UL2CM3</Key>
-          <Name>UL2CM3(-S0 -C0 -P0 ) -FN1 -FC1000 -FD20000000 -FF0STM32L4xx_256 -FL040000 -FS08000000 -FP0($$Device:STM32L433RCIx$CMSIS\Flash\STM32L4xx_256.FLM)</Name>
+          <Name>UL2CM3(-S0 -C0 -P0 -FD20000000 -FC1000 -FN1 -FF0STM32L4xx_256 -FS08000000 -FL040000 -FP0($$Device:STM32L443RCTx$CMSIS\Flash\STM32L4xx_256.FLM))</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -335,7 +335,7 @@
         <LExpSel>0</LExpSel>
       </OPTXL>
       <OPTFL>
-        <tvExp>1</tvExp>
+        <tvExp>0</tvExp>
         <tvExpOptDlg>0</tvExpOptDlg>
         <IsCurrentTarget>1</IsCurrentTarget>
       </OPTFL>
@@ -365,7 +365,7 @@
         <bEvRecOn>1</bEvRecOn>
         <bSchkAxf>0</bSchkAxf>
         <bTchkAxf>0</bTchkAxf>
-        <nTsel>1</nTsel>
+        <nTsel>0</nTsel>
         <sDll></sDll>
         <sDllPa></sDllPa>
         <sDlgDll></sDlgDll>
@@ -376,18 +376,18 @@
         <tDlgDll></tDlgDll>
         <tDlgPa></tDlgPa>
         <tIfile>.\eventviewer-stm32-cfg.ini</tIfile>
-        <pMon>BIN\ULP2CM3.DLL</pMon>
+        <pMon>BIN\UL2CM3.DLL</pMon>
       </DebugOpt>
       <TargetDriverDllRegistry>
         <SetRegEntry>
           <Number>0</Number>
           <Key>UL2CM3</Key>
-          <Name>UL2CM3(-S0 -C0 -P0 ) -FN1 -FC1000 -FD20000000 -FF0STM32L4xx_256 -FL040000 -FS08000000 -FP0($$Device:STM32L433RCIx$CMSIS\Flash\STM32L4xx_256.FLM)</Name>
+          <Name>UL2CM3(-S0 -C0 -P0 -FD20000000 -FC1000 -FN1 -FF0STM32L4xx_256 -FS08000000 -FL040000 -FP0($$Device:STM32L433RCTx$CMSIS\Flash\STM32L4xx_256.FLM))</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
           <Key>ULP2CM3</Key>
-          <Name>-UP1445368 -O206 -S8 -C0 -P00 -N00("ARM CoreSight SW-DP") -D00(2BA01477) -L00(0) -TO18 -TC16000000 -TP18 -TDX0 -TDD0 -TDS8000 -TDT0 -TDC1F -TIEFFFFFFFF -TIP8 -FO7 -FD20000000 -FC1000 -FN1 -FF0STM32L4xx_256.FLM -FS08000000 -FL040000 -FP0($$Device:STM32L433RCIx$CMSIS\Flash\STM32L4xx_256.FLM)</Name>
+          <Name>-UP1445368 -O206 -S8 -C0 -P00 -N00("ARM CoreSight SW-DP") -D00(2BA01477) -L00(0) -TO18 -TC16000000 -TP18 -TDX0 -TDD0 -TDS8000 -TDT0 -TDC1F -TIEFFFFFFFF -TIP8 -FO7 -FD20000000 -FC1000 -FN1 -FF0STM32L4xx_256.FLM -FS08000000 -FL040000 -FP0($$Device:STM32L433RCTx$CMSIS\Flash\STM32L4xx_256.FLM)</Name>
         </SetRegEntry>
         <SetRegEntry>
           <Number>0</Number>
@@ -521,7 +521,7 @@
 
   <Group>
     <GroupName>main</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -544,8 +544,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\embot\code\embot_code_application_core.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_code_application_core.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\embot\app\skeleton\embot_app_skeleton_os_basic.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_app_skeleton_os_basic.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -556,8 +556,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\embot\code\embot_code_application_evntskcan.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_code_application_evntskcan.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\embot\app\skeleton\embot_app_skeleton_os_evthreadcan.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_app_skeleton_os_evthreadcan.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -592,18 +592,6 @@
     <File>
       <GroupNumber>3</GroupNumber>
       <FileNumber>5</FileNumber>
-      <FileType>5</FileType>
-      <tvExp>0</tvExp>
-      <tvExpOptDlg>0</tvExpOptDlg>
-      <bDave2>0</bDave2>
-      <PathWithFileName>..\cfg\stm32hal_stg.h</PathWithFileName>
-      <FilenameWithoutPath>stm32hal_stg.h</FilenameWithoutPath>
-      <RteFlg>0</RteFlg>
-      <bShared>0</bShared>
-    </File>
-    <File>
-      <GroupNumber>3</GroupNumber>
-      <FileNumber>6</FileNumber>
       <FileType>2</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -616,14 +604,14 @@
   </Group>
 
   <Group>
-    <GroupName>osal</GroupName>
+    <GroupName>rtos</GroupName>
     <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>4</GroupNumber>
-      <FileNumber>7</FileNumber>
+      <FileNumber>6</FileNumber>
       <FileType>4</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -635,7 +623,7 @@
     </File>
     <File>
       <GroupNumber>4</GroupNumber>
-      <FileNumber>8</FileNumber>
+      <FileNumber>7</FileNumber>
       <FileType>1</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
@@ -655,13 +643,25 @@
     <RteFlg>0</RteFlg>
     <File>
       <GroupNumber>5</GroupNumber>
+      <FileNumber>8</FileNumber>
+      <FileType>8</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core\embot_core.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_core.cpp</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+    <File>
+      <GroupNumber>5</GroupNumber>
       <FileNumber>9</FileNumber>
       <FileType>8</FileType>
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\embot\common\embot_common.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_common.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\embot\os\embot_os.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_os.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -672,8 +672,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\embot_sys.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_sys.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\embot\os\embot_os_Thread.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_os_Thread.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -684,8 +684,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\embot_sys_Task.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_sys_Task.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\embot\os\embot_os_theCallbackManager.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_os_theCallbackManager.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -696,8 +696,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\embot_sys_theCallbackManager.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_sys_theCallbackManager.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\embot\os\embot_os_theScheduler.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_os_theScheduler.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -708,8 +708,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\embot_sys_theScheduler.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_sys_theScheduler.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\embot\os\embot_os_theTimerManager.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_os_theTimerManager.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -720,8 +720,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\embot_sys_theTimerManager.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_sys_theTimerManager.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\embot\os\embot_os_Timer.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_os_Timer.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -732,8 +732,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\embot\sys\embot_sys_Timer.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_sys_Timer.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core\embot_core_binary.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_core_binary.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -744,8 +744,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\embot\binary\embot_binary.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_binary.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\embot\os\embot_os_Action.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_os_Action.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -756,8 +756,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\embot\sys\embot_sys_Action.cpp</PathWithFileName>
-      <FilenameWithoutPath>embot_sys_Action.cpp</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\embot\os\embot_os_rtos.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_os_rtos.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
@@ -776,7 +776,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_canprotocol.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\embot\prot\can\embot_prot_can.cpp</PathWithFileName>
       <FilenameWithoutPath>embot_app_canprotocol.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -788,7 +788,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_canprotocol_analog_periodic.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\embot\prot\can\embot_prot_can_analog_periodic.cpp</PathWithFileName>
       <FilenameWithoutPath>embot_app_canprotocol_analog_periodic.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -800,7 +800,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_canprotocol_analog_polling.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\embot\prot\can\embot_prot_can_analog_polling.cpp</PathWithFileName>
       <FilenameWithoutPath>embot_app_canprotocol_analog_polling.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -812,7 +812,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_canprotocol_bootloader.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\embot\prot\can\embot_prot_can_bootloader.cpp</PathWithFileName>
       <FilenameWithoutPath>embot_app_canprotocol_bootloader.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -824,7 +824,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_canprotocol_inertial_periodic.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\embot\prot\can\embot_prot_can_inertial_periodic.cpp</PathWithFileName>
       <FilenameWithoutPath>embot_app_canprotocol_inertial_periodic.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -836,7 +836,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_canprotocol_motor_periodic.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\embot\prot\can\embot_prot_can_motor_periodic.cpp</PathWithFileName>
       <FilenameWithoutPath>embot_app_canprotocol_motor_periodic.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -848,7 +848,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_canprotocol_motor_polling.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\embot\prot\can\embot_prot_can_motor_polling.cpp</PathWithFileName>
       <FilenameWithoutPath>embot_app_canprotocol_motor_polling.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
@@ -860,7 +860,7 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\embot\app\embot_app_canprotocol_skin_periodic.cpp</PathWithFileName>
+      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\embot\prot\can\embot_prot_can_skin_periodic.cpp</PathWithFileName>
       <FilenameWithoutPath>embot_app_canprotocol_skin_periodic.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>

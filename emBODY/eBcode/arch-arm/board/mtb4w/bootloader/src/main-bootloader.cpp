@@ -7,7 +7,7 @@
 */
 
 
-#include "embot_code_bootloader.h"
+#include "embot_app_skeleton_os_bootloader.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // bootloader info
@@ -15,8 +15,8 @@
 constexpr std::uint8_t defADDRESS = 11;
 constexpr embot::app::theCANboardInfo::bootloaderInfo btlInfo 
 { 
-    embot::app::canprotocol::Board::mtb4w, 
-    embot::app::canprotocol::versionOfBOOTLOADER {1, 2}, 
+    embot::prot::can::Board::mtb4w, 
+    embot::prot::can::versionOfBOOTLOADER {1, 2}, 
     defADDRESS,                                                  
     "I am a mtb4w" 
 };
@@ -25,7 +25,7 @@ constexpr embot::app::theCANboardInfo::bootloaderInfo btlInfo
 
 int main(void)
 { 
-    embot::code::bootloader::run(btlInfo);
+    embot::app::skeleton::os::bootloader::run(btlInfo);
     for(;;);    
 }
    

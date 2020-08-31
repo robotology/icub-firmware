@@ -1,27 +1,25 @@
 
-
-
 #include "embot_app_theCANboardInfo.h"
 
-#include "embot.h"
 
-#include "embot_common.h"
-#include "embot_binary.h"
+#include "embot_core.h"
+#include "embot_core_binary.h"
 
 #include "stm32hal.h" // to see bsp_led_init etc
-
 
 #include "embot_hw.h"
 #include "embot_hw_can.h"
 #include "embot_hw_led.h"
+#include "embot_hw_sys.h"
 #include "embot_hw_flash.h"
 #include "embot_hw_FlashStorage.h"
-#include "embot_sys_theStorage.h"
+#include "embot_os.h"
+#include "embot_os_Thread.h"
 
 #include "embot_app_theBootloader.h"
 #include "embot_app_bootloader_theCANparser.h"
 
-#include "embot_app_canprotocol.h"
+#include "embot_prot_can.h"
 
 #include "embot_app_theLEDmanager.h"
 
@@ -33,25 +31,28 @@ struct ActivityParam
 
 static void bl_activity(void* param);
 
-static const embot::common::relTime BlinkSlowPeriod = 500*embot::common::time1millisec;
+static const embot::core::relTime BlinkSlowPeriod = 500*embot::core::time1millisec;
 static ActivityParam activity_param = { .blinkingperiod = BlinkSlowPeriod };
 
 // use build 222 for all the updaterofbootloader
-static const embot::app::canprotocol::versionOfAPPLICATION vAP = {100, 1 , 0};
-static const embot::app::canprotocol::versionOfCANPROTOCOL vCP = {2, 0};
+static const embot::prot::can::versionOfAPPLICATION vAP = {100, 1 , 222};
+static const embot::prot::can::versionOfCANPROTOCOL vCP = {2, 0};
+
+static const std::uint32_t address = embot::hw::flash::getpartition(embot::hw::FLASH::application).address;
+static const std::uint32_t vectorlocation = address - embot::hw::flash::getpartition(embot::hw::FLASH::whole).address;
 
 int main(void)
 { 
-#if defined(APPL_TESTZEROOFFSET)
-#else    
-    embot::hw::sys::relocatevectortable(embot::hw::flash::getpartition(embot::hw::FLASH::application).address);
-#endif
+    if(0 != vectorlocation)
+    {        
+        embot::hw::sys::relocatevectortable(vectorlocation);
+    }
     
     embot::app::theBootloader & bootloader = embot::app::theBootloader::getInstance();
            
     activity_param.blinkingperiod = BlinkSlowPeriod;     
     embot::app::theBootloader::Config config;
-    config.userdeflauncher = embot::common::Callback(bl_activity, &activity_param);   
+    config.userdeflauncher = embot::core::Callback(bl_activity, &activity_param);   
     config.countdown = 0;
                
     bootloader.execute(config);
@@ -63,16 +64,16 @@ int main(void)
 
 
 
-static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::Event evt, void *p);
-static void eventbasedtask_init(embot::sys::Task *t, void *p);
+static void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask msk, void *p);
+static void eventbasedthread_init(embot::os::Thread *t, void *p);
 
-static const embot::common::Event evRXcanframe = 0x00000001;
+static const embot::os::Event evRXcanframe = 0x00000001;
 
-static embot::sys::EventTask* eventbasedtask = nullptr;
+static embot::os::EventThread* eventbasedthread = nullptr;
 
-static void alerteventbasedtask(void *arg);
+static void alerteventbasedthread(void *arg);
 
-static std::vector<embot::hw::can::Frame> outframes;
+static std::vector<embot::prot::can::Frame> outframes;
 
 static void bl_activity(void* param)
 {
@@ -93,48 +94,48 @@ static void bl_activity(void* param)
     canbrdinfo.synch(vAP, vCP);
         
   
-    // start task waiting for can messages.   
-    const embot::common::relTime waitEventTimeout = 50*embot::common::time1millisec;    
-    embot::sys::EventTask::Config configEV;    
-    configEV.startup = eventbasedtask_init;
-    configEV.onevent = eventbasedtask_onevent;
+    // start thread waiting for can messages.   
+    const embot::core::relTime waitEventTimeout = 50*embot::core::time1millisec;    
+    embot::os::EventThread::Config configEV;    
+    configEV.startup = eventbasedthread_init;
+    configEV.onevent = eventbasedthread_onevent;
     configEV.param = nullptr;
     configEV.stacksize = 4*1024;
-    configEV.priority = embot::sys::Priority::high200;
+    configEV.priority = embot::os::Priority::high200;
     configEV.timeout = waitEventTimeout;
     
-    eventbasedtask = new embot::sys::EventTask;
-    eventbasedtask->start(configEV);    
+    eventbasedthread = new embot::os::EventThread;
+    eventbasedthread->start(configEV);    
         
     // start canparser
     embot::app::bootloader::theCANparser &canparser = embot::app::bootloader::theCANparser::getInstance();
     embot::app::bootloader::theCANparser::Config config;
-    config.owner = embot::app::canprotocol::Process::application;
+    config.owner = embot::prot::can::Process::application;
     
     canparser.initialise(config);  
 
     // finally start can. i keep it as last because i dont want that the isr-handler calls its onrxframe() 
-    // before the eventbasedtask is created.
+    // before the eventbasedthread is created.
     embot::hw::result_t r = embot::hw::resNOK;
     embot::hw::can::Config canconfig; // default is tx/rxcapacity=8
     canconfig.txcapacity = 12;
-    canconfig.onrxframe = embot::common::Callback(alerteventbasedtask, nullptr); 
+    canconfig.onrxframe = embot::core::Callback(alerteventbasedthread, nullptr); 
     r = embot::hw::can::init(embot::hw::CAN::one, canconfig);
     r = embot::hw::can::setfilters(embot::hw::CAN::one, embot::app::theCANboardInfo::getInstance().getCANaddress());
     r = r;    
 }
 
 
-static void alerteventbasedtask(void *arg)
+static void alerteventbasedthread(void *arg)
 {
-    if(nullptr != eventbasedtask)
+    if(nullptr != eventbasedthread)
     {
-        eventbasedtask->setEvent(evRXcanframe);
+        eventbasedthread->setEvent(evRXcanframe);
     }
 }
 
 
-static void eventbasedtask_init(embot::sys::Task *t, void *p)
+static void eventbasedthread_init(embot::os::Thread *t, void *p)
 {
     embot::hw::result_t r = embot::hw::can::enable(embot::hw::CAN::one);  
     r = r;  
@@ -144,10 +145,10 @@ static void eventbasedtask_init(embot::sys::Task *t, void *p)
     
 
 
-static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::Event evt, void *p)
+static void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask msk, void *p)
 {  
     
-    if(true == embot::binary::mask::check(evt, evRXcanframe))
+    if(true == embot::core::binary::mask::check(msk, evRXcanframe))
     {        
         embot::hw::can::Frame frame;
         std::uint8_t remaining = 0;
@@ -155,12 +156,12 @@ static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::Event evt
         {
             outframes.clear();            
             embot::app::bootloader::theCANparser &canparser = embot::app::bootloader::theCANparser::getInstance();
-            if(true == canparser.process(frame, outframes))
+            if(true == canparser.process({frame.id, frame.size, frame.data}, outframes))
             {
                 std::uint8_t num = outframes.size();
                 for(std::uint8_t i=0; i<num; i++)
                 {
-                    embot::hw::can::put(embot::hw::CAN::one, outframes[i]);                                       
+                    embot::hw::can::put(embot::hw::CAN::one, {outframes[i].id, outframes[i].size, outframes[i].data});                                       
                 }
 
                 embot::hw::can::transmit(embot::hw::CAN::one);
@@ -169,7 +170,7 @@ static void eventbasedtask_onevent(embot::sys::Task *t, embot::common::Event evt
 
             if(remaining > 0)
             {
-                eventbasedtask->setEvent(evRXcanframe);                 
+                eventbasedthread->setEvent(evRXcanframe);                 
             }
         }        
     }
