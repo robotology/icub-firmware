@@ -53,7 +53,9 @@ namespace embot { namespace hw {
     
     enum class TLV493D : std::uint8_t { one = 0, two = 1, none = 31, maxnumberof = 2 };
     
-    enum class ADS122C04 : std::uint8_t { one, none = 31, maxnumberof = 1 };
+    enum class ADS122C04 : std::uint8_t { one = 0, none = 31, maxnumberof = 1 };
+    
+    enum class AD7147 : std::uint8_t { one = 0, two = 1, none = 31, maxnumberof = 2 };
     
     
     struct GPIO

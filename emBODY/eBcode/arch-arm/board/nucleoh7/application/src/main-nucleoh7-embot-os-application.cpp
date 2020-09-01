@@ -22,6 +22,9 @@
 
 #include "embot_hw_bno055.h"
 #include "embot_hw_ads122c04.h"
+#include "embot_hw_ad7147.h"
+
+#include <array>
 
 
 // macro definition. we keep some behaviours in the same code.
@@ -120,14 +123,56 @@ uint64_t timeadc_delta[2] = {0, 0};
 
 uint64_t timeadc_duration_of_acquisition_start[2] = {0, 0};
 
+#if 0
+static volatile bool IMUpinged {false};
+static volatile bool SK0pinged {false};
+static volatile bool SK1pinged {false};
+
+static volatile bool BOHpinged {false};
+
+std::array<bool, 128> pinged {false};
+volatile uint32_t cnt {0};
+
+void testi2c()
+{
+    
+    if(cnt >= 128)
+    {
+       cnt = cnt; 
+    }
+    else
+    {
+    // ping the board    
+        pinged[cnt] = embot::hw::i2c::ping(embot::hw::I2C::one, 2*cnt);        
+    }
+    // imu -> 41 (0x29)
+    // sk0 -> 44 (0x2c)
+    // sk1 -> 45 (0x2d)
+    // ads -> 64 (0x40)
+//    IMUpinged = embot::hw::i2c::ping(embot::hw::I2C::one, 0x52);
+//    SK0pinged = embot::hw::i2c::ping(embot::hw::I2C::one, 0x58);
+//    SK1pinged = embot::hw::i2c::ping(embot::hw::I2C::one, 0x5A);
+//    BOHpinged = embot::hw::i2c::ping(embot::hw::I2C::one, 0x6C);
+
+    
+//    IMUpinged = IMUpinged;
+    
+    cnt++;
+}
+
+// 0x58 (con << 1)
+// 0x5A (con << 1)
+#endif
 
 void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventmask, void *param)
-{   
+{ 
+//  testi2c();    
     if(0 == eventmask)
-    {   // timeout ...         
+    {   // timeout ...          
         return;
     }
 
+#if 0
     if(true == embot::core::binary::mask::check(eventmask, evtAcquisition)) 
     {
 #if defined(enableTRACE_all)        
@@ -179,7 +224,9 @@ void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventma
         embot::hw::sys::puts("evthread-onevent: evtDATAtransmit received @ time = " + tf.to_string());    
 #endif        
         s_transmit();
-    }    
+    }
+#endif
+
 }
 
 
@@ -280,7 +327,18 @@ static void s_chips_init()
 
 
     embot::hw::ads122c04::Config adsconfig { embot::hw::i2c::Descriptor { embot::hw::I2C::one, i2cspeed } };
-    embot::hw::ads122c04::init(embot::hw::ADS122C04::one, adsconfig);     
+    embot::hw::ads122c04::init(embot::hw::ADS122C04::one, adsconfig);   
+
+    volatile embot::hw::result_t rr1 = embot::hw::result_t::NOK;
+    volatile embot::hw::result_t rr2 = embot::hw::result_t::NOK;
+    
+    //embot::core::delay(500*embot::core::time1millisec);
+    embot::hw::ad7147::Config skconfig { embot::hw::i2c::Descriptor { embot::hw::I2C::one, i2cspeed } };
+    rr1 = embot::hw::ad7147::init(embot::hw::AD7147::one, skconfig);
+    rr2 = embot::hw::ad7147::init(embot::hw::AD7147::two, skconfig);      
+        
+    rr1 = rr1;
+    rr2 = rr2;
     
 #endif
     
