@@ -35,7 +35,10 @@ namespace embot { namespace hw { namespace i2c {
     using ADR = std::uint8_t;
     using REG = std::uint8_t;
     
-    static const std::uint8_t regNONE = 0xff;
+    using REG16 = std::uint16_t;
+    
+    constexpr REG regNONE = 0xff;
+    constexpr REG16 reg16NONE = 0xffff;
     
     enum class Speed : uint32_t { standard100 = 100000, fast400 = 400000, fastplus1000 = 1000000, high3400 = 3400000 };
         
@@ -81,6 +84,7 @@ namespace embot { namespace hw { namespace i2c {
     // if result is resOK, destination.pointer contains the data; if resNOKtimeout, the timeout expired. if resNOK the operation was not even started
     // the functions internally waits until not busy for the timeout ... however, please check isbusy() outside. 
     result_t read(embot::hw::I2C b, ADR adr, REG reg, embot::core::Data &destination, embot::core::relTime timeout);
+    result_t read16(embot::hw::I2C b, ADR adr, REG16 reg16, embot::core::Data &destination, embot::core::relTime timeout);
         
     // not blocking write to REG. we write in register reg the content.size byte pointed by content.pointer.
     // when the write is done, the function oncompletion.callback() is called to alert the user.
@@ -89,7 +93,8 @@ namespace embot { namespace hw { namespace i2c {
     // blocking write to REG. we write in register reg the content.size byte pointed by content.pointer and we wait until a timeout.
     // if result is resOK, the operation is successful. if resNOKtimeout, the timeout expired. if resNOK the operation was not even started
     // the functions internally waits until not busy for the timeout ... however, please check isbusy() outside.
-    result_t write(embot::hw::I2C b, ADR adr, REG reg, const embot::core::Data &content, embot::core::relTime timeout);    
+    result_t write(embot::hw::I2C b, ADR adr, REG reg, const embot::core::Data &content, embot::core::relTime timeout);  
+    result_t write16(embot::hw::I2C b, ADR adr, REG16 reg16, const embot::core::Data &content, embot::core::relTime timeout);     
 
 }}} // namespace embot { namespace hw { namespace i2c {
     

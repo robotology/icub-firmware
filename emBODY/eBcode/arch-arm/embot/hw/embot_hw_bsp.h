@@ -485,6 +485,31 @@ namespace embot { namespace hw { namespace bsp { namespace ads122c04 {
               
 }}}} // namespace embot { namespace hw { namespace bsp {  namespace ads122c04 {
 
+
+namespace embot { namespace hw { namespace bsp { namespace ad7147 {
+       
+    struct PROP
+    {   
+        embot::hw::I2C i2cbus;
+        std::uint8_t i2caddress;        
+    };
+    
+    struct BSP : public embot::hw::bsp::SUPP
+    {
+        constexpr static std::uint8_t maxnumberof = embot::core::tointegral(embot::hw::AD7147::maxnumberof);
+        constexpr BSP(std::uint32_t msk, std::array<const PROP*, maxnumberof> pro) : SUPP(msk), properties(pro) {} 
+        constexpr BSP() : SUPP(0), properties({0}) {}
+            
+        std::array<const PROP*, maxnumberof> properties;    
+        constexpr const PROP * getPROP(embot::hw::AD7147 h) const { return supported(h) ? properties[embot::core::tointegral(h)] : nullptr; }
+        void init(embot::hw::AD7147 h) const;
+    };
+    
+    const BSP& getBSP();
+              
+}}}} // namespace embot { namespace hw { namespace bsp {  namespace ad7147 {
+
+
 #endif  // include-guard
 
 

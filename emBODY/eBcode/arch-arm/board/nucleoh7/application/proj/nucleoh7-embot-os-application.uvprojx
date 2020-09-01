@@ -313,7 +313,7 @@
           </ArmAdsMisc>
           <Cads>
             <interw>1</interw>
-            <Optim>6</Optim>
+            <Optim>2</Optim>
             <oTime>0</oTime>
             <SplitLS>0</SplitLS>
             <OneElfS>1</OneElfS>
@@ -594,6 +594,11 @@
               <FileName>embot_hw_ads122c04.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\embot\hw\embot_hw_ads122c04.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>embot_hw_ad7147.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\embot\hw\embot_hw_ad7147.cpp</FilePath>
             </File>
           </Files>
         </Group>

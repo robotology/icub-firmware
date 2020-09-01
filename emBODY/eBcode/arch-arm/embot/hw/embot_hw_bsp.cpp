@@ -2403,7 +2403,63 @@ namespace embot { namespace hw { namespace bsp { namespace ads122c04 {
 
 #endif // ads122c04
 
-// - support map: end of embot::hw::ads122c04
+// - support map: begin of embot::hw::ad7147
+
+namespace embot { namespace hw { namespace bsp { namespace ad7147 {
+           
+    static_assert(embot::core::tointegral(embot::hw::AD7147::none) < 8*sizeof(SUPP::supportedmask), "AD7147::none must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::core::tointegral(embot::hw::AD7147::maxnumberof) < 8*sizeof(SUPP::supportedmask), "AD7147::maxnumberof must be less than 32 to be able to address a std::uint32_t mask");
+    static_assert(embot::core::tointegral(embot::hw::AD7147::maxnumberof) < embot::core::tointegral(embot::hw::AD7147::none), "AD7147::maxnumberof must be higher that AD7147::none, so that we can optimise code");
+
+}}}}
+
+#if   !defined(HAL_I2C_MODULE_ENABLED) || !defined(EMBOT_ENABLE_hw_ad7147)
+
+namespace embot { namespace hw { namespace bsp { namespace ad7147 {
+    
+    constexpr BSP thebsp { };
+    void BSP::init(embot::hw::AD7147 h) const {}    
+    const BSP& getBSP() 
+    {
+        return thebsp;
+    }
+    
+}}}}
+
+#else
+
+namespace embot { namespace hw { namespace bsp { namespace ad7147 {
+           
+    #if defined(STM32HAL_BOARD_NUCLEOH7)
+        
+    constexpr PROP prop01 { .i2cbus = embot::hw::I2C::one, .i2caddress = 0x58 }; 
+    constexpr PROP prop02 { .i2cbus = embot::hw::I2C::one, .i2caddress = 0x5A }; 
+
+    constexpr BSP thebsp {        
+        // maskofsupported
+        mask::pos2mask<uint32_t>(AD7147::one) | mask::pos2mask<uint32_t>(AD7147::two),        
+        // properties
+        {{
+            &prop01, &prop02
+        }}        
+    };
+
+    void BSP::init(embot::hw::AD7147 h) const {}
+
+    #else
+        #error embot::hw::bsp::ad7147::thebsp must be defined    
+    #endif
+    
+    const BSP& getBSP() 
+    {
+        return thebsp;
+    }
+              
+}}}} // namespace embot { namespace hw { namespace bsp {  namespace ad7147 {
+
+#endif // ad7147
+
+// - support map: end of embot::hw::ad7147
 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
