@@ -146,7 +146,7 @@ namespace embot { namespace hw { namespace si7051 {
                 
         // init i2c ..
         embot::hw::i2c::init(config.i2cdes.bus, config.i2cdes.config);
-        if(false == embot::hw::i2c::ping(config.i2cdes.bus, embot::hw::bsp::si7051::getBSP().getPROP(s)->i2caddress))
+        if(false == embot::hw::i2c::ping(config.i2cdes.bus, embot::hw::bsp::si7051::getBSP().getPROP(s)->i2caddress, 3*embot::core::time1millisec))
         {
             return resNOK;
         }
