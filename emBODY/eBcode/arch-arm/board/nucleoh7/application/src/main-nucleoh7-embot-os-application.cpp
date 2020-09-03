@@ -172,7 +172,6 @@ void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventma
         return;
     }
 
-#if 0
     if(true == embot::core::binary::mask::check(eventmask, evtAcquisition)) 
     {
 #if defined(enableTRACE_all)        
@@ -225,7 +224,6 @@ void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventma
 #endif        
         s_transmit();
     }
-#endif
 
 }
 
@@ -329,16 +327,16 @@ static void s_chips_init()
     embot::hw::ads122c04::Config adsconfig { embot::hw::i2c::Descriptor { embot::hw::I2C::one, i2cspeed } };
     embot::hw::ads122c04::init(embot::hw::ADS122C04::one, adsconfig);   
 
-    volatile embot::hw::result_t rr1 = embot::hw::result_t::NOK;
-    volatile embot::hw::result_t rr2 = embot::hw::result_t::NOK;
-    
-    //embot::core::delay(500*embot::core::time1millisec);
-    embot::hw::ad7147::Config skconfig { embot::hw::i2c::Descriptor { embot::hw::I2C::one, i2cspeed } };
-    rr1 = embot::hw::ad7147::init(embot::hw::AD7147::one, skconfig);
-    rr2 = embot::hw::ad7147::init(embot::hw::AD7147::two, skconfig);      
-        
-    rr1 = rr1;
-    rr2 = rr2;
+//    volatile embot::hw::result_t rr1 = embot::hw::result_t::NOK;
+//    volatile embot::hw::result_t rr2 = embot::hw::result_t::NOK;
+//    
+//    //embot::core::delay(500*embot::core::time1millisec);
+//    embot::hw::ad7147::Config skconfig { embot::hw::i2c::Descriptor { embot::hw::I2C::one, i2cspeed } };
+//    rr1 = embot::hw::ad7147::init(embot::hw::AD7147::one, skconfig);
+//    rr2 = embot::hw::ad7147::init(embot::hw::AD7147::two, skconfig);      
+//        
+//    rr1 = rr1;
+//    rr2 = rr2;
     
 #endif
     
