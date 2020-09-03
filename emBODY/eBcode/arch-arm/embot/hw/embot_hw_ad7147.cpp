@@ -451,7 +451,7 @@ volatile uint16_t datav {0};
                 
         // init i2c ..
         embot::hw::i2c::init(config.i2cdes.bus, config.i2cdes.config);
-        if(false == embot::hw::i2c::ping(config.i2cdes.bus, embot::hw::bsp::ad7147::getBSP().getPROP(s)->i2caddress))
+        if(false == embot::hw::i2c::ping(config.i2cdes.bus, embot::hw::bsp::ad7147::getBSP().getPROP(s)->i2caddress, 3*embot::core::time1millisec))
         {
             return resNOK;
         }
@@ -463,12 +463,19 @@ volatile uint16_t datav {0};
         
         // ora leggo il Device ID Register in address 0x017
         
-        // devo usae registri a due bytes.
+        // devo usare registri a due bytes.
+        embot::hw::i2c::Reg reg_DeviceID {0x017, embot::hw::i2c::Reg::Size::sixteenbits};
+        embot::hw::i2c::Reg reg_AMB_COMP_CTRL0 {0x002, embot::hw::i2c::Reg::Size::sixteenbits};
+        embot::hw::i2c::Reg reg_AMB_COMP_CTRL1 {0x003, embot::hw::i2c::Reg::Size::sixteenbits};
+        embot::hw::i2c::Reg reg_AMB_COMP_CTRL2 {0x004, embot::hw::i2c::Reg::Size::sixteenbits};
+        
         uint8_t data[2] {0};
         embot::core::Data dest = {data, 2};
         
         // read Device ID Register 0x017
-        embot::hw::i2c::read16(config.i2cdes.bus, s_privatedata.i2caddress[index], 0x017, dest, 10*1000);
+        embot::hw::i2c::read(config.i2cdes.bus, s_privatedata.i2caddress[index], reg_DeviceID, dest, 10*1000);
+        //embot::hw::i2c::read(config.i2cdes.bus, s_privatedata.i2caddress[index], reg_DeviceID, dest, embot::core::Callback{});
+        //embot::core::delay(10*1000);
         
         // ok but in big endian. data[0] contains the msb and data[1] contains the lsb.
         // data[0] = 0x14 dat[1] = 0x71 and the correct value is [14:4] [3:0] -> 0x 147 1
@@ -476,7 +483,7 @@ volatile uint16_t datav {0};
         datav = datav;
         
         // read default value of AMB_COMP_CTRL0 Register 0x002
-        embot::hw::i2c::read16(config.i2cdes.bus, s_privatedata.i2caddress[index], 0x002, dest, 10*1000);
+        embot::hw::i2c::read(config.i2cdes.bus, s_privatedata.i2caddress[index], reg_AMB_COMP_CTRL0, dest, 10*1000);
         datav = data[1] + (static_cast<uint16_t>(data[0]) << 8);
         datav = datav;
         // i read data[0] = 0x0f data[1] = 0xf0
@@ -489,23 +496,24 @@ volatile uint16_t datav {0};
         txdata[1] = 0xa1;   // nibble a is: bits 7:4 FP_PROXIMITY_CNT
                             // nibble 1 is: bits 3:0 FF_SKIP_CNT 
         embot::core::Data content = {txdata, 2};
-        embot::hw::i2c::write16(config.i2cdes.bus, s_privatedata.i2caddress[index], 0x002, content, 10*1000);
+        embot::hw::i2c::write(config.i2cdes.bus, s_privatedata.i2caddress[index], reg_AMB_COMP_CTRL0, content, 10*1000);
+        //embot::hw::i2c::write16(config.i2cdes.bus, s_privatedata.i2caddress[index], 0x002, content, 10*1000);
         
         
         // read back the value of AMB_COMP_CTRL0 Register 0x002
-        embot::hw::i2c::read16(config.i2cdes.bus, s_privatedata.i2caddress[index], 0x002, dest, 10*1000);
+        embot::hw::i2c::read(config.i2cdes.bus, s_privatedata.i2caddress[index], reg_AMB_COMP_CTRL0, dest, 10*1000);
         datav = data[1] + (static_cast<uint16_t>(data[0]) << 8);
         datav = datav;        
 
         // read default value of AMB_COMP_CTRL1 Register 0x003
-        embot::hw::i2c::read16(config.i2cdes.bus, s_privatedata.i2caddress[index], 0x003, dest, 10*1000);
+        embot::hw::i2c::read(config.i2cdes.bus, s_privatedata.i2caddress[index], reg_AMB_COMP_CTRL1, dest, 10*1000);
         datav = data[1] + (static_cast<uint16_t>(data[0]) << 8);
         datav = datav;
         // i read data[0] = 0x01 data[1] = 0x64
         // default values must be from 15->00: 0x 0 1 6 4
      
         // read default value of AMB_COMP_CTRL2 Register 0x004
-        embot::hw::i2c::read16(config.i2cdes.bus, s_privatedata.i2caddress[index], 0x004, dest, 10*1000);
+        embot::hw::i2c::read(config.i2cdes.bus, s_privatedata.i2caddress[index], reg_AMB_COMP_CTRL2, dest, 10*1000);
         datav = data[1] + (static_cast<uint16_t>(data[0]) << 8);
         datav = datav;
         // i read data[0] = 0x01 data[1] = 0x64

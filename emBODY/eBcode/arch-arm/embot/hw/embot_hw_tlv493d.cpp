@@ -205,7 +205,7 @@ namespace embot { namespace hw { namespace tlv493d {
     
 
     // this device works with no register addressing.
-    static const embot::hw::i2c::REG registerToRead = embot::hw::i2c::regNONE;
+    // static const embot::hw::i2c::Reg registerToRead {embot::hw::i2c::Reg::addrNONE, embot::hw::i2c::Reg::Size::eightbits};
     
     static PrivateData s_privatedata;
 
@@ -317,7 +317,8 @@ namespace embot { namespace hw { namespace tlv493d {
         // ok, now i trigger i2c.
         embot::core::Callback cbk(sharedCBK, &s_privatedata.acquisition[index]);
         embot::core::Data data = embot::core::Data(&s_privatedata.acquisition[index].registermap.readmemory[0], sizeof(s_privatedata.acquisition[index].registermap.readmemory));
-        embot::hw::i2c::read(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], embot::hw::i2c::regNONE, data, cbk);
+        //embot::hw::i2c::read(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], registerToRead, data, cbk);
+        embot::hw::i2c::receive(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], data, cbk);
                 
         return resOK;
     }
@@ -465,20 +466,22 @@ namespace embot { namespace hw { namespace tlv493d {
         s_sensor_reset(h);
            
         // 1.a make sure the chip has a good address in the bus         
-        if(false == embot::hw::i2c::ping(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index]))
+        if(false == embot::hw::i2c::ping(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], 3*embot::core::time1millisec))
         {
             return resNOK;
         }
                        
         // 2. read the registers
         data.load(s_privatedata.acquisition[index].registermap.readmemory, s_privatedata.acquisition[index].registermap.readsize); 
-        r = embot::hw::i2c::read(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], embot::hw::i2c::regNONE, data, embot::core::time1second);
+        //r = embot::hw::i2c::read(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], registerToRead, data, embot::core::time1second);
+        r = embot::hw::i2c::receive(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], data, embot::core::time1second);
         r = r;
         
         // 3. impose a mode.
         s_privatedata.acquisition[index].registermap.setWRITE({}); // defconfig
         data.load(s_privatedata.acquisition[index].registermap.writememory, s_privatedata.acquisition[index].registermap.writesize); 
-        r = embot::hw::i2c::write(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], embot::hw::i2c::regNONE, data, embot::core::time1second);
+        //r = embot::hw::i2c::write(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], registerToRead, data, embot::core::time1second);
+        r = embot::hw::i2c::transmit(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], data, embot::core::time1second);
         
         // wait a bit
         embot::hw::sys::delay(10*embot::core::time1millisec);
@@ -496,7 +499,7 @@ namespace embot { namespace hw { namespace tlv493d {
         
         embot::core::Data dummy;
         dummy.clear();
-        volatile result_t r1 = embot::hw::i2c::transmit(s_privatedata.config[index].i2cdes.bus, 0x00, dummy, 3*embot::core::time1millisec);        
+        volatile result_t r1 = embot::hw::i2c::tx(s_privatedata.config[index].i2cdes.bus, 0x00, dummy, 3*embot::core::time1millisec);             
         r1 = r1;
         // extra 3 ms.
         embot::hw::sys::delay(3*embot::core::time1millisec);

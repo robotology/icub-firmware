@@ -253,14 +253,14 @@ namespace embot { namespace hw { namespace ads122c04 {
             uint8_t regWrite[2] = {0};
             regWrite[0] = WREG + (embot::core::tointegral(r)<<2);
             regWrite[1] = memory[embot::core::tointegral(r)];
-            return embot::hw::i2c::transmit(bus, adr, {&regWrite, 2}, timeout);
+            return embot::hw::i2c::tx(bus, adr, {&regWrite, 2}, timeout);
         } 
         
         result_t readregister(REG r, embot::core::relTime timeout = 3*embot::core::time1millisec)
         {
-            embot::hw::i2c::REG reg = RREG + (embot::core::tointegral(r)<<2);
+            uint8_t reg = RREG + (embot::core::tointegral(r)<<2);
             embot::core::Data dest = {&memory[embot::core::tointegral(r)], 1};
-            return embot::hw::i2c::read(bus, adr, reg, dest, timeout);
+            return embot::hw::i2c::read(bus, adr, {reg, embot::hw::i2c::Reg::Size::eightbits}, dest, timeout);
         }  
                 
         result_t readeveryregister(embot::core::relTime timeout = 12*embot::core::time1millisec)
@@ -305,7 +305,7 @@ namespace embot { namespace hw { namespace ads122c04 {
             
             if(255 != command)
             {
-                res = embot::hw::i2c::transmit(bus, adr, {&command, 1}, timeout);
+                res = embot::hw::i2c::tx(bus, adr, {&command, 1}, timeout);
                 if(delay > 0)
                 {
                     embot::hw::sys::delay(delay);  
@@ -438,7 +438,7 @@ mode.
                 
         // init i2c ..
         embot::hw::i2c::init(config.i2cdes.bus, config.i2cdes.config);
-        if(false == embot::hw::i2c::ping(config.i2cdes.bus, embot::hw::bsp::ads122c04::getBSP().getPROP(s)->i2caddress))
+        if(false == embot::hw::i2c::ping(config.i2cdes.bus, embot::hw::bsp::ads122c04::getBSP().getPROP(s)->i2caddress, 3*embot::core::time1millisec))
         {
             return resNOK;
         }
