@@ -113,6 +113,7 @@
     #define EMBOT_ENABLE_hw_can
     #define EMBOT_ENABLE_hw_i2c
     #define EMBOT_ENABLE_hw_tlv493d
+    #define EMBOT_ENABLE_hw_flash
     
 #elif   defined(STM32HAL_BOARD_PMC)
 
