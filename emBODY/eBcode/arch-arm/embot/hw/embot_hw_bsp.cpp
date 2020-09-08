@@ -721,12 +721,12 @@ void CAN1_RX0_IRQHandler(void)
         
 void FDCAN1_IT0_IRQHandler(void)
 {
-
+    HAL_FDCAN_IRQHandler(&hfdcan1);
 }  
 
 void FDCAN1_IT1_IRQHandler(void)
 {
-
+    HAL_FDCAN_IRQHandler(&hfdcan1);
 }   
 
 #endif //
@@ -852,7 +852,26 @@ namespace embot { namespace hw { namespace bsp { namespace flash {
         constexpr PROP applicationstorage   {{0x08000000+(252*1024),    (4)*1024,           2*1024}};   // applicationstorage: on top of application            
        
     #elif   defined(STM32HAL_BOARD_NUCLEOH7)          
-        #error pls define      
+        #error pls define    
+
+   #elif   defined(STM32HAL_BOARD_STM32G4EVAL )
+
+// acemor          
+        // application @ 128k
+        constexpr PROP whole                {{0x08000000,               (512)*1024,         2*1024}}; 
+        constexpr PROP bootloader           {{0x08000000,               (126)*1024,         2*1024}};   // bootloader
+        constexpr PROP sharedstorage        {{0x08000000+(126*1024),    (2)*1024,           2*1024}};   // sharedstorage: on top of bootloader
+        constexpr PROP application          {{0x08000000+(128*1024),    (256+124)*1024,     2*1024}};   // application @ 080k
+        constexpr PROP applicationstorage   {{0x08000000+(508*1024),    (4)*1024,           2*1024}};   // applicationstorage: on top of application            
+ 
+#if 0     
+        constexpr PROP whole                {{0x08000000,               (512)*1024,         2*1024}}; 
+        constexpr PROP bootloader           {{0x08000000+(256+2)*1014,               (128)*1024,          2*1024}};   // bootloader
+        constexpr PROP sharedstorage        {{0x08000000+(256*1024),     (2)*1024,           2*1024}};   // sharedstorage: on top of bootloader
+        constexpr PROP application          {{0x08000000+(0*1024),     (252)*1024,         2*1024}};   // application @ 080k
+        constexpr PROP applicationstorage   {{0x08000000+(252*1024),    (4)*1024,           2*1024}};   // applicationstorage: on top of application            
+#endif
+        
     #else
         #error embot::hw::bsp::flash::thebsp must be defined    
     #endif   
