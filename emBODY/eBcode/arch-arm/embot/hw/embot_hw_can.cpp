@@ -732,6 +732,8 @@ static bool can::s_filters_init(embot::hw::bsp::can::CAN_Handle *hcan)
     
 #elif defined(HAL_FDCAN_MODULE_ENABLED)  
 
+    //return true;
+
     FDCAN_FilterTypeDef sFilterConfig {};     
     sFilterConfig.IdType = FDCAN_STANDARD_ID;
     sFilterConfig.FilterIndex = 0;  
@@ -866,6 +868,8 @@ static result_t can::s_filters_set(embot::hw::bsp::can::CAN_Handle *hcan, std::u
     if i use `Filter for dedicated IDs` i can use three rules with ...
     #endif 
     
+    //return resNOK;
+    
     can::s_filters_set_by_class(hcan, 0, cls_bootloader, 0, address);
     can::s_filters_set_by_class(hcan, 1, cls_as_polling, 0, address); 
     can::s_filters_set_by_class(hcan, 2, cls_mc_polling, 0, address);    
@@ -993,32 +997,42 @@ void can::s_addtxmessagetoqueue(embot::hw::bsp::can::CAN_Handle *hcan, Frame& fr
 {
 
 #if defined(HAL_CAN_MODULE_ENABLED)         
-        // 2. i prepare what stm requires for its tx
-        CAN_TxHeaderTypeDef headertx = {0}; // KEEP IT IN STACK
-        headertx.ExtId = 0;
-        headertx.IDE = CAN_ID_STD;
-        headertx.RTR = CAN_RTR_DATA;    
-        headertx.StdId = frame.id & 0x7FF;
-        headertx.DLC = frame.size;    
-        uint32_t TxMailboxNum {0};                
-        // ok-code
-        HAL_CAN_AddTxMessage(hcan, &headertx, frame.data, &TxMailboxNum);
+    // 2. i prepare what stm requires for its tx
+    CAN_TxHeaderTypeDef headertx = {0}; // KEEP IT IN STACK
+    headertx.ExtId = 0;
+    headertx.IDE = CAN_ID_STD;
+    headertx.RTR = CAN_RTR_DATA;    
+    headertx.StdId = frame.id & 0x7FF;
+    headertx.DLC = frame.size;    
+    uint32_t TxMailboxNum {0};                
+    // ok-code
+    HAL_CAN_AddTxMessage(hcan, &headertx, frame.data, &TxMailboxNum);
 
 #elif defined(HAL_FDCAN_MODULE_ENABLED)  
     
         #warning TODO: test it
+    
+    volatile int32_t rr = 0;
+    
+    static constexpr std::array<uint32_t, 9> lengthsLUT =  
+    {
+        FDCAN_DLC_BYTES_0, FDCAN_DLC_BYTES_1, FDCAN_DLC_BYTES_2, FDCAN_DLC_BYTES_3, 
+        FDCAN_DLC_BYTES_4, FDCAN_DLC_BYTES_5, FDCAN_DLC_BYTES_6, FDCAN_DLC_BYTES_7,
+        FDCAN_DLC_BYTES_8        
+    };
 
-        FDCAN_TxHeaderTypeDef headertx = {0}; // KEEP IT IN STACK
-        headertx.Identifier = frame.id & 0x7FF;
-        headertx.IdType = FDCAN_STANDARD_ID;
-        headertx.TxFrameType = FDCAN_DATA_FRAME;
-        headertx.DataLength = frame.size;
-        headertx.ErrorStateIndicator = FDCAN_ESI_ACTIVE; // or FDCAN_ESI_PASSIVE ???
-        headertx.BitRateSwitch = FDCAN_BRS_OFF;
-        headertx.FDFormat = FDCAN_CLASSIC_CAN;
-        headertx.TxEventFifoControl = FDCAN_NO_TX_EVENTS; // or FDCAN_STORE_TX_EVENTS ??
-        headertx.MessageMarker = 0; //  Specifies the message marker to be copied into Tx Event FIFO ... between 0 and 0xFF
-        HAL_FDCAN_AddMessageToTxFifoQ(hcan, &headertx, frame.data);
+    FDCAN_TxHeaderTypeDef headertx = {0}; // KEEP IT IN STACK
+    headertx.Identifier = frame.id & 0x7FF;
+    headertx.IdType = FDCAN_STANDARD_ID;
+    headertx.TxFrameType = FDCAN_DATA_FRAME;
+    headertx.DataLength = lengthsLUT[frame.size];
+    headertx.ErrorStateIndicator = FDCAN_ESI_ACTIVE; // or FDCAN_ESI_PASSIVE ???
+    headertx.BitRateSwitch = FDCAN_BRS_OFF;
+    headertx.FDFormat = FDCAN_CLASSIC_CAN;
+    headertx.TxEventFifoControl = FDCAN_NO_TX_EVENTS; // or FDCAN_STORE_TX_EVENTS ??
+    headertx.MessageMarker = 0; //  Specifies the message marker to be copied into Tx Event FIFO ... between 0 and 0xFF
+    rr = HAL_FDCAN_AddMessageToTxFifoQ(hcan, &headertx, frame.data);
+    rr = rr;
 #endif 
         
 }
