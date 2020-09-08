@@ -95,7 +95,7 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-
+  #define TEST_FDCAN2
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
@@ -105,7 +105,7 @@ int main(void)
   MX_ADC2_Init();
   MX_COMP6_Init();
   MX_DAC1_Init();
-  MX_FDCAN1_Init();
+  //MX_FDCAN1_Init();
   MX_FDCAN2_Init();
   MX_FMAC_Init();
   MX_FMC_Init();
@@ -119,6 +119,35 @@ int main(void)
   MX_USB_PCD_Init();
   /* USER CODE BEGIN 2 */
 
+#if defined(TEST_FDCAN2)  
+  //HAL_FDCAN_Start(&hfdcan1);
+  HAL_FDCAN_Start(&hfdcan2);
+  
+        volatile int32_t rr = 0;
+        
+        uint32_t testID1 = 0x110;
+        uint32_t testID2 = 0x210;
+        uint32_t testFRAMESIZE = FDCAN_DLC_BYTES_1;
+        uint8_t testFRAMEDATA[] = {1, 2, 3, 4, 5, 6, 7, 8};
+
+        FDCAN_TxHeaderTypeDef headertx = {0}; // KEEP IT IN STACK
+        headertx.Identifier = testID1 & 0x7FF;
+        headertx.IdType = FDCAN_STANDARD_ID;
+        headertx.TxFrameType = FDCAN_DATA_FRAME;
+        headertx.DataLength = testFRAMESIZE;
+        headertx.ErrorStateIndicator = FDCAN_ESI_ACTIVE; // or FDCAN_ESI_PASSIVE ???
+        headertx.BitRateSwitch = FDCAN_BRS_OFF;
+        headertx.FDFormat = FDCAN_CLASSIC_CAN;
+        headertx.TxEventFifoControl = FDCAN_NO_TX_EVENTS; // or FDCAN_STORE_TX_EVENTS ??
+        headertx.MessageMarker = 0; //  Specifies the message marker to be copied into Tx Event FIFO ... between 0 and 0xFF
+        //rr = HAL_FDCAN_AddMessageToTxFifoQ(&hfdcan1, &headertx, testFRAMEDATA);
+        //rr = rr;
+        
+        headertx.Identifier = testID2 & 0x7FF;
+        rr = HAL_FDCAN_AddMessageToTxFifoQ(&hfdcan2, &headertx, testFRAMEDATA);
+        rr = rr;
+#endif
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -126,7 +155,17 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-
+#if defined(TEST_FDCAN2)     
+   // HAL_Delay(1000);
+   // headertx.Identifier = testID1 & 0x7FF;
+    //rr = HAL_FDCAN_AddMessageToTxFifoQ(&hfdcan1, &headertx, testFRAMEDATA);
+   // rr = rr;
+      
+    HAL_Delay(1000);
+    headertx.Identifier = testID2 & 0x7FF;
+    rr = HAL_FDCAN_AddMessageToTxFifoQ(&hfdcan2, &headertx, testFRAMEDATA);
+    rr = rr;
+#endif    
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
