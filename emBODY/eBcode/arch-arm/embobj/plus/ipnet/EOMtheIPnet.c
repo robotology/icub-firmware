@@ -16,6 +16,9 @@
  * Public License for more details
 */
 
+// marco.accame@iit.it on sept 2020: 
+// - substituted osal with embot::os when macro EMBOBJ_USE_EMBOT is defined
+
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
@@ -34,16 +37,20 @@
 #include "EOsocketDatagram_hid.h"
 #include "EOVtask.h"
 #include "EOMmutex.h"
-#include "EOMtask_hid.h"
+#include "EOMtask.h"
 
 #include "EOpacket_hid.h"
 #include "EOsocket_hid.h"
 
+#if !defined(EMBOBJ_USE_EMBOT)
 #include "osal.h"
+#else
+#include "embot_os_rtos.h"
+#endif // #if !defined(EMBOBJ_USE_EMBOT)
+
 #include "ipal.h"
 #include "hal_sys.h"
 
-//#include "EOMmutex_hid.h" 
 
 
 #define ARP_NEWMODE
@@ -299,15 +306,27 @@ extern EOMtheIPnet * eom_ipnet_Initialise(const eOmipnet_cfg_t *ipnetcfg,
 
                                              
     // i get cmd.blockingsemaphore, initted with zero tokens
+#if !defined(EMBOBJ_USE_EMBOT)    
     s_eom_theipnet.cmd.blockingsemaphore = osal_semaphore_new(_MAXTOKENS_SEM_CMD_, 0);
+#else
+    s_eom_theipnet.cmd.blockingsemaphore = embot::os::rtos::semaphore_new(_MAXTOKENS_SEM_CMD_, 0);
+#endif // #if !defined(EMBOBJ_USE_EMBOT)
     eo_errman_Assert(eo_errman_GetHandle(), (NULL != s_eom_theipnet.cmd.blockingsemaphore), "eom_ipnet_Initialise(): osal cant give blockingsemaphore", s_eobj_ownname, &eo_errman_DescrRuntimeErrorLocal);
 
 #if defined(IPNET_HAS_NON_BLOCKING_COMMAND)
+#if !defined(EMBOBJ_USE_EMBOT)
     s_eom_theipnet.cmd.busysemaphore = osal_semaphore_new(_MAXTOKENS_SEM_CMD_, 1);
+#else
+    s_eom_theipnet.cmd.busysemaphore = embot::os::rtos::semaphore_new(_MAXTOKENS_SEM_CMD_, 1);
+#endif // #if !defined(EMBOBJ_USE_EMBOT)
     eo_errman_Assert(eo_errman_GetHandle(), (NULL != s_eom_theipnet.cmd.busysemaphore),  "eom_ipnet_Initialise(): osal cant give busysemaphore", s_eobj_ownname, &eo_errman_DescrRuntimeErrorLocal);
 #endif
-    
+
+#if !defined(EMBOBJ_USE_EMBOT)    
     s_eom_theipnet.cmd.mtxcaller = osal_mutex_new();
+#else    
+    s_eom_theipnet.cmd.mtxcaller = embot::os::rtos::mutex_new();
+#endif // #if !defined(EMBOBJ_USE_EMBOT)  
     eo_errman_Assert(eo_errman_GetHandle(), (NULL != s_eom_theipnet.cmd.mtxcaller), "eom_ipnet_Initialise(): osal cant give mtxcaller", s_eobj_ownname, &eo_errman_DescrRuntimeErrorLocal);
 
     s_eom_theipnet.cmd.stoptmr = eo_timer_New();
@@ -317,7 +336,11 @@ extern EOMtheIPnet * eom_ipnet_Initialise(const eOmipnet_cfg_t *ipnetcfg,
     // i get a messagequeue which will keep addresses of datagramsockets
     if(0 != dtgskcfg->maxdatagramenqueuedintx)
     {
+#if !defined(EMBOBJ_USE_EMBOT)        
         s_eom_theipnet.dgramsocketready2tx = osal_messagequeue_new(dtgskcfg->maxdatagramenqueuedintx);
+#else
+        s_eom_theipnet.dgramsocketready2tx = embot::os::rtos::messagequeue_new(dtgskcfg->maxdatagramenqueuedintx);
+#endif // #if !defined(EMBOBJ_USE_EMBOT)
         eo_errman_Assert(eo_errman_GetHandle(), (NULL != s_eom_theipnet.dgramsocketready2tx), "eom_ipnet_Initialise(): osal cant give a dgramsocketready2tx", s_eobj_ownname, &eo_errman_DescrRuntimeErrorLocal);
     }
     else
@@ -366,7 +389,7 @@ extern EOMtheIPnet * eom_ipnet_Initialise(const eOmipnet_cfg_t *ipnetcfg,
                                           NULL,
                                           eom_ipnetproc, 
                                           "ipnet.proc");
-
+    eom_task_Start(s_eom_theipnet.tskproc);
 #define IPNET_TICK_PERIODIC                                          
 #if defined(IPNET_TICK_PERIODIC) 
     // and task which ticks the timers. it is a periodic task
@@ -376,6 +399,7 @@ extern EOMtheIPnet * eom_ipnet_Initialise(const eOmipnet_cfg_t *ipnetcfg,
                                           NULL, 
                                           eom_ipnettick,
                                           "ipnet.tick");
+    eom_task_Start(s_eom_theipnet.tsktick);
 #else
     // and task which ticks the timers. it is an event based task with timeout. 
     // this solution is  not really periodic, but it can be good enough because we just need to increment some delays for tcp/ip retransmission.
@@ -386,6 +410,7 @@ extern EOMtheIPnet * eom_ipnet_Initialise(const eOmipnet_cfg_t *ipnetcfg,
                                           NULL, 
                                           eom_ipnettick,
                                           "ipnet.tick");
+    eom_task_Start(s_eom_theipnet.tsktick);                                      
 #endif
 
 
@@ -530,15 +555,23 @@ extern eOresult_t eom_ipnet_ResolveIP_TEST(EOMtheIPnet *ip, eOipv4addr_t ipaddr,
 //        hal_trace_puts(str);        
 //    }
     
-    //t0 = osal_system_abstime_get();
+    //t0 = embot::core::now();
     //osal_task_wait(1*1000*1000);
 
 #if defined(TEST_ARP_EVIEW)
     evprev_mark1 = eventviewer_switch_to(ev_mark1);
-#endif    
+#endif
+
+#if !defined(EMBOBJ_USE_EMBOT)
     t0 = osal_system_abstime_get();    
     r = s_eom_ipnet_ARP(ip->ipnet, ipaddr, tout);
     t1 = osal_system_abstime_get();
+#else    
+    t0 = embot::core::now();    
+    r = s_eom_ipnet_ARP(ip->ipnet, ipaddr, tout);
+    t1 = embot::core::now();
+#endif // #if !defined(EMBOBJ_USE_EMBOT)
+    
 #if defined(TEST_ARP_EVIEW)
     eventviewer_switch_to(evprev_mark1);
 #endif    
@@ -722,8 +755,8 @@ static eOresult_t s_eom_ipnet_ARP(EOVtheIPnet *ip, eOipv4addr_t ipaddr, eOreltim
     } 
 
     // - block other possible tasks from sending a command to the ipnet and also to execute this function from here onward
+#if !defined(EMBOBJ_USE_EMBOT)
     osal_mutex_take(s_eom_theipnet.cmd.mtxcaller, osal_reltimeINFINITE);
-
 #if defined(IPNET_HAS_NON_BLOCKING_COMMAND)   
     if(osal_res_OK != osal_semaphore_decrement(s_eom_theipnet.cmd.busysemaphore, osal_reltimeINFINITE))
     {   // the semaphore could not be decremented because someone else before has decremented it: quit
@@ -731,6 +764,17 @@ static eOresult_t s_eom_ipnet_ARP(EOVtheIPnet *ip, eOipv4addr_t ipaddr, eOreltim
         return(eores_NOK_generic);
     }    
 #endif
+#else
+    embot::os::rtos::mutex_take(s_eom_theipnet.cmd.mtxcaller, embot::core::reltimeWaitForever);
+#if defined(IPNET_HAS_NON_BLOCKING_COMMAND)   
+    if(false == embot::os::rtos::semaphore_acquire(s_eom_theipnet.cmd.busysemaphore, embot::core::reltimeWaitForever))
+    {   // the semaphore could not be decremented because someone else before has decremented it: quit
+        embot::os::rtos::mutex_release(s_eom_theipnet.cmd.mtxcaller);
+        return(eores_NOK_generic);
+    }    
+#endif
+#endif // #if !defined(EMBOBJ_USE_EMBOT)  
+
     
     // - build the command to be sent to the proc task
 
@@ -749,7 +793,11 @@ static eOresult_t s_eom_ipnet_ARP(EOVtheIPnet *ip, eOipv4addr_t ipaddr, eOreltim
 
     // - now the calling task is placed in hold until this semaphore is incremented  
     // - by the ipnet task when it has finished executing the command or its time has expired
+#if !defined(EMBOBJ_USE_EMBOT)
     osal_semaphore_decrement(s_eom_theipnet.cmd.blockingsemaphore, osal_reltimeINFINITE);
+#else
+    embot::os::rtos::semaphore_acquire(s_eom_theipnet.cmd.blockingsemaphore, embot::core::reltimeWaitForever);
+#endif // #if !defined(EMBOBJ_USE_EMBOT)
     
 
     // - verify operation success
@@ -763,7 +811,11 @@ static eOresult_t s_eom_ipnet_ARP(EOVtheIPnet *ip, eOipv4addr_t ipaddr, eOreltim
     }
 
     // - enable again another task to send a command to the ipnet
+#if !defined(EMBOBJ_USE_EMBOT)
     osal_mutex_release(s_eom_theipnet.cmd.mtxcaller);
+#else
+    embot::os::rtos::mutex_release(s_eom_theipnet.cmd.mtxcaller);
+#endif // #if !defined(EMBOBJ_USE_EMBOT)
 
     return(res);
 }
@@ -787,16 +839,28 @@ static eOresult_t s_eom_ipnet_non_blocking_ARP(EOVtheIPnet *ip, eOipv4addr_t ipa
     } 
 
     // - block other possible tasks from sending a command to the ipnet and also to execute this function from here onward
+#if !defined(EMBOBJ_USE_EMBOT)
     osal_mutex_take(s_eom_theipnet.cmd.mtxcaller, osal_reltimeINFINITE);
+#else
+    embot::os::rtos::mutex_take(s_eom_theipnet.cmd.mtxcaller, embot::core::reltimeWaitForever);
+#endif // #if !defined(EMBOBJ_USE_EMBOT)
     
     // if in here, then it means that: no other task has asked arping. but the same task may have asked a arp not yet expired
     
     // i understand it by attempting to get the busysemaphore w/ 0 timeout
+#if !defined(EMBOBJ_USE_EMBOT)
     if(osal_res_OK != osal_semaphore_decrement(s_eom_theipnet.cmd.busysemaphore, osal_reltimeZERO))
     {   // the semaphore could not be decremented beacuse someone else before has decremented it: quit
         osal_mutex_release(s_eom_theipnet.cmd.mtxcaller);
         return(eores_NOK_generic);
     }
+#else
+    if(false == embot::os::rtos::semaphore_acquire(s_eom_theipnet.cmd.busysemaphore, 0))
+    {   // the semaphore could not be decremented beacuse someone else before has decremented it: quit
+        embot::os::rtos::mutex_release(s_eom_theipnet.cmd.mtxcaller);
+        return(eores_NOK_generic);
+    }
+#endif // #if !defined(EMBOBJ_USE_EMBOT)    
 //    else
 //    {   // nobody has taken the semaphore, thus we can go on
 //        // in order to respect the same operations as in blocking mode, ... we increment
@@ -822,7 +886,11 @@ static eOresult_t s_eom_ipnet_non_blocking_ARP(EOVtheIPnet *ip, eOipv4addr_t ipa
 #if defined(IPNET_HAS_NON_BLOCKING_COMMAND)    
     // - now the calling task is placed in hold until this semaphore is incremented  
     // - by the ipnet task when it has finished executing the command or its time has expired
+#if !defined(EMBOBJ_USE_EMBOT)
     osal_semaphore_decrement(s_eom_theipnet.cmd.blockingsemaphore, osal_reltimeINFINITE);
+#else
+    embot::os::rtos::semaphore_acquire(s_eom_theipnet.cmd.blockingsemaphore, embot::core::reltimeWaitForever);
+#endif // #if !defined(EMBOBJ_USE_EMBOT)
 
     // - verify operation success
     if(1 == s_eom_theipnet.cmd.result)
@@ -836,7 +904,11 @@ static eOresult_t s_eom_ipnet_non_blocking_ARP(EOVtheIPnet *ip, eOipv4addr_t ipa
 
 #endif    
     // - enable again another task to send a command to the ipnet
+#if !defined(EMBOBJ_USE_EMBOT)
     osal_mutex_release(s_eom_theipnet.cmd.mtxcaller);
+#else
+    embot::os::rtos::mutex_release(s_eom_theipnet.cmd.mtxcaller);
+#endif // #if !defined(EMBOBJ_USE_EMBOT)
 
     return(eores_OK);
 }
@@ -863,14 +935,26 @@ static eOresult_t s_eom_ipnet_AttachSocket(EOVtheIPnet* ip, EOsocketDerived *s)
 
 
     // - block other possible tasks from sending a command to the ipnet and also to execute this function from here onward
+#if !defined(EMBOBJ_USE_EMBOT)
     osal_mutex_take(s_eom_theipnet.cmd.mtxcaller, osal_reltimeINFINITE);
 #if defined(IPNET_HAS_NON_BLOCKING_COMMAND)
     if(osal_res_OK != osal_semaphore_decrement(s_eom_theipnet.cmd.busysemaphore, osal_reltimeINFINITE))
     {   // the semaphore could not be decremented because someone else before has decremented it: quit
         osal_mutex_release(s_eom_theipnet.cmd.mtxcaller);
         return(eores_NOK_generic);
-    }    
+    }
+#endif       
+#else
+    embot::os::rtos::mutex_take(s_eom_theipnet.cmd.mtxcaller, embot::core::reltimeWaitForever);
+#if defined(IPNET_HAS_NON_BLOCKING_COMMAND)
+    if(false == embot::os::rtos::semaphore_acquire(s_eom_theipnet.cmd.busysemaphore, embot::core::reltimeWaitForever))
+    {   // the semaphore could not be decremented because someone else before has decremented it: quit
+        embot::os::rtos::mutex_release(s_eom_theipnet.cmd.mtxcaller);
+        return(eores_NOK_generic);
+    } 
 #endif
+#endif // #if !defined(EMBOBJ_USE_EMBOT)
+
     // - fill the command and also verify if the socket can be attached
     canattach = s_eom_ipnet_attach_rqst_dtgsocket(ip, (EOsocketDatagram*)s);
  
@@ -883,7 +967,11 @@ static eOresult_t s_eom_ipnet_AttachSocket(EOVtheIPnet* ip, EOsocketDerived *s)
 
         // - now the calling task is placed in hold until this semaphore is incremented 
         // - by the ipnet task when it has finished executing the command or its time has expired
+#if !defined(EMBOBJ_USE_EMBOT)
         osal_semaphore_decrement(s_eom_theipnet.cmd.blockingsemaphore, osal_reltimeINFINITE);
+#else
+        embot::os::rtos::semaphore_acquire(s_eom_theipnet.cmd.blockingsemaphore, embot::core::reltimeWaitForever);
+#endif // #if !defined(EMBOBJ_USE_EMBOT)
 
         // verify the success of the operation
         if(1 == s_eom_theipnet.cmd.result)
@@ -898,12 +986,20 @@ static eOresult_t s_eom_ipnet_AttachSocket(EOVtheIPnet* ip, EOsocketDerived *s)
 #if defined(IPNET_HAS_NON_BLOCKING_COMMAND)
     else
     {
+#if !defined(EMBOBJ_USE_EMBOT)        
         osal_semaphore_increment(s_eom_theipnet.cmd.busysemaphore, osal_callerAUTOdetect);
+#else        
+        embot::os::rtos::semaphore_release(s_eom_theipnet.cmd.busysemaphore);
+#endif // #if !defined(EMBOBJ_USE_EMBOT)
     }
 #endif
 
     // - enable again another task to send a command to the ipnet
+#if !defined(EMBOBJ_USE_EMBOT)
     osal_mutex_release(s_eom_theipnet.cmd.mtxcaller);
+#else
+    embot::os::rtos::mutex_release(s_eom_theipnet.cmd.mtxcaller);
+#endif // #if !defined(EMBOBJ_USE_EMBOT)
 
     return(res);    
 }
@@ -930,8 +1026,8 @@ static eOresult_t s_eom_ipnet_DetachSocket(EOVtheIPnet* ip, EOsocketDerived *s)
 
 
     // - block other possible tasks from sending a command to the ipnet and also to execute this function from here onward
+#if !defined(EMBOBJ_USE_EMBOT)
     osal_mutex_take(s_eom_theipnet.cmd.mtxcaller, osal_reltimeINFINITE);
-
 #if defined(IPNET_HAS_NON_BLOCKING_COMMAND)
     if(osal_res_OK != osal_semaphore_decrement(s_eom_theipnet.cmd.busysemaphore, osal_reltimeINFINITE))
     {   // the semaphore could not be decremented because someone else before has decremented it: quit
@@ -939,6 +1035,17 @@ static eOresult_t s_eom_ipnet_DetachSocket(EOVtheIPnet* ip, EOsocketDerived *s)
         return(eores_NOK_generic);
     }  
 #endif        
+#else
+    embot::os::rtos::mutex_take(s_eom_theipnet.cmd.mtxcaller, embot::core::reltimeWaitForever);
+#if defined(IPNET_HAS_NON_BLOCKING_COMMAND)
+    if(false == embot::os::rtos::semaphore_acquire(s_eom_theipnet.cmd.busysemaphore, embot::core::reltimeWaitForever))
+    {   // the semaphore could not be decremented because someone else before has decremented it: quit
+        embot::os::rtos::mutex_release(s_eom_theipnet.cmd.mtxcaller);
+        return(eores_NOK_generic);
+    }  
+#endif
+#endif // #if !defined(EMBOBJ_USE_EMBOT)
+       
     // - fill the command and also verify if the socket can be detached
     candetach = s_eom_ipnet_detach_rqst_dtgsocket(ip, (EOsocketDatagram*)s);
     
@@ -951,7 +1058,11 @@ static eOresult_t s_eom_ipnet_DetachSocket(EOVtheIPnet* ip, EOsocketDerived *s)
 
         // - now the calling task is placed in hold until this semaphore is incremented 
         // - by the ipnet task when it has finished executing the command or its time has expired
+#if !defined(EMBOBJ_USE_EMBOT)
         osal_semaphore_decrement(s_eom_theipnet.cmd.blockingsemaphore, osal_reltimeINFINITE);
+#else
+        embot::os::rtos::semaphore_acquire(s_eom_theipnet.cmd.blockingsemaphore, embot::core::reltimeWaitForever);
+#endif // #if !defined(EMBOBJ_USE_EMBOT)
 
         // verify the success of the operation
         if(1 == s_eom_theipnet.cmd.result)
@@ -967,12 +1078,20 @@ static eOresult_t s_eom_ipnet_DetachSocket(EOVtheIPnet* ip, EOsocketDerived *s)
 #if defined(IPNET_HAS_NON_BLOCKING_COMMAND)  
     else
     {
+#if !defined(EMBOBJ_USE_EMBOT)
         osal_semaphore_increment(s_eom_theipnet.cmd.busysemaphore, osal_callerAUTOdetect);
+#else
+        embot::os::rtos::semaphore_release(s_eom_theipnet.cmd.busysemaphore);
+#endif // #if !defined(EMBOBJ_USE_EMBOT)
     }
 #endif
 
     // - enable again another task to send a command to the ipnet
+#if !defined(EMBOBJ_USE_EMBOT)
     osal_mutex_release(s_eom_theipnet.cmd.mtxcaller);
+#else
+    embot::os::rtos::mutex_release(s_eom_theipnet.cmd.mtxcaller);
+#endif // #if !defined(EMBOBJ_USE_EMBOT)
 
     return(res);    
 }
@@ -1001,7 +1120,11 @@ static eOresult_t s_eom_ipnet_Alert(EOVtheIPnet* ip, void *eobjcaller, eOevent_t
         {
             // caller is a socket object which ... wants to tx a datagram packet. we need to put inside a fifo the reference to the socket
             // contained in eobjcaller
+#if !defined(EMBOBJ_USE_EMBOT)
             if(osal_res_OK == osal_messagequeue_put(s_eom_theipnet.dgramsocketready2tx, (osal_message_t)eobjcaller, osal_reltimeINFINITE, osal_callerTSK))
+#else
+            if(true == embot::os::rtos::messagequeue_put(s_eom_theipnet.dgramsocketready2tx, reinterpret_cast< embot::os::rtos::messagequeue_t*>(eobjcaller), embot::core::reltimeWaitForever))
+#endif // #if !defined(EMBOBJ_USE_EMBOT)
             {
                 // send event
                 eom_task_SetEvent(s_eom_theipnet.tskproc, eov_ipnet_evt_TXdatagram);
@@ -1051,7 +1174,11 @@ static eOresult_t s_eom_ipnet_WaitPacket(EOVtheIPnet* ip, EOsocketDerived *s, eO
     // - the semaphore is incremented by one each time the ipnet received a packet for this particular socket.
     if(NULL != bs->blkgethandle)
     {
+#if !defined(EMBOBJ_USE_EMBOT)
         if(osal_res_OK == osal_semaphore_decrement((osal_semaphore_t*)bs->blkgethandle, tout))
+#else
+        if(true == embot::os::rtos::semaphore_acquire(reinterpret_cast<embot::os::rtos::semaphore_t*>(bs->blkgethandle), tout))
+#endif // #if !defined(EMBOBJ_USE_EMBOT)
         {
             res = eores_OK;
         }
@@ -1105,8 +1232,13 @@ static void e_eom_ipnet_signal_new_frame_is_available(void)
         return;
     }
 
-    //eom_task_isrSetEvent(s_eom_theipnet.tskproc, eov_ipnet_evt_RXethframe);   
-    osal_eventflag_set(eov_ipnet_evt_RXethframe, s_eom_theipnet.tskproc->osaltask, osal_callerAUTOdetect);
+#if !defined(EMBOBJ_USE_EMBOT)
+    // to call in this mode i need also to see EOMtask_hid.h ... and i dont wnat that. hence i substitute w/ eom_task_SetEvent()
+    //osal_eventflag_set(eov_ipnet_evt_RXethframe, s_eom_theipnet.tskproc->osaltask, osal_callerAUTOdetect);
+    eom_task_SetEvent(s_eom_theipnet.tskproc, eov_ipnet_evt_RXethframe);
+#else   
+    eom_task_SetEvent(s_eom_theipnet.tskproc, eov_ipnet_evt_RXethframe);
+#endif // #if !defined(EMBOBJ_USE_EMBOT)
 }
 
 
@@ -1331,7 +1463,11 @@ static void s_eom_ipnet_OnReceptionDatagram(void *arg, ipal_udpsocket_t *skt, ip
     if(eobool_true == dtgskt->socket->block2wait4packet)
     {
         // unblock the reception
+#if !defined(EMBOBJ_USE_EMBOT)
         osal_semaphore_increment((osal_semaphore_t*)dtgskt->socket->blkgethandle, osal_callerTSK);
+#else
+        embot::os::rtos::semaphore_release(reinterpret_cast<embot::os::rtos::semaphore_t*>(dtgskt->socket->blkgethandle));
+#endif // #if !defined(EMBOBJ_USE_EMBOT)
     }
 
   
@@ -1361,7 +1497,12 @@ static void s_eom_ipnet_process_command(void)
                 s_eom_theipnet.cmd.par16b --;
                 s_eom_theipnet.cmd.repeatcmd = 1;
 
+#if !defined(EMBOBJ_USE_EMBOT)
                 s_eom_theipnet.cmd.par64x = osal_system_abstime_get();
+#else
+                s_eom_theipnet.cmd.par64x = embot::core::now();
+#endif // #if !defined(EMBOBJ_USE_EMBOT)
+
 #if defined(TEST_ARP_EVIEW)
                 evprev_ipnetarp = eventviewer_switch_to(ev_ipnetarp);
                 eventviewer_switch_to(evprev_ipnetarp);
@@ -1384,10 +1525,19 @@ static void s_eom_ipnet_process_command(void)
 #if defined(TEST_ARP_EVIEW)
                     eventviewer_switch_to(ev_mark2);
 #endif
-                    osal_semaphore_increment(s_eom_theipnet.cmd.blockingsemaphore, osal_callerTSK);
+
+#if !defined(EMBOBJ_USE_EMBOT)
+                   osal_semaphore_increment(s_eom_theipnet.cmd.blockingsemaphore, osal_callerTSK);
 #if defined(IPNET_HAS_NON_BLOCKING_COMMAND)
                     osal_semaphore_increment(s_eom_theipnet.cmd.busysemaphore, osal_callerAUTOdetect);
-#endif                    
+#endif                      
+#else
+                    embot::os::rtos::semaphore_release(s_eom_theipnet.cmd.blockingsemaphore);
+#if defined(IPNET_HAS_NON_BLOCKING_COMMAND)
+                    embot::os::rtos::semaphore_release(s_eom_theipnet.cmd.busysemaphore);
+#endif       
+#endif // #if !defined(EMBOBJ_USE_EMBOT)
+         
                 }
                 else if(0 != s_eom_theipnet.cmd.tout)
                 {
@@ -1409,10 +1559,19 @@ static void s_eom_ipnet_process_command(void)
 #if defined(TEST_ARP_EVIEW)
                         eventviewer_switch_to(ev_mark2);
 #endif
+
+#if !defined(EMBOBJ_USE_EMBOT)
                         osal_semaphore_increment(s_eom_theipnet.cmd.blockingsemaphore, osal_callerTSK);  
 #if defined(IPNET_HAS_NON_BLOCKING_COMMAND)                        
                         osal_semaphore_increment(s_eom_theipnet.cmd.busysemaphore, osal_callerAUTOdetect); 
-#endif                        
+#endif 
+#else
+                        embot::os::rtos::semaphore_release(s_eom_theipnet.cmd.blockingsemaphore);
+#if defined(IPNET_HAS_NON_BLOCKING_COMMAND)                        
+                         embot::os::rtos::semaphore_release(s_eom_theipnet.cmd.busysemaphore);
+#endif 
+#endif // #if !defined(EMBOBJ_USE_EMBOT)
+                     
                     }
                     else
                     {                    
@@ -1442,10 +1601,19 @@ static void s_eom_ipnet_process_command(void)
             s_eom_ipnet_attach_proc_dtgsocket((EOsocketDatagram*)sdrv);
 
             // increment the semaphore to allow execution of the caller
+#if !defined(EMBOBJ_USE_EMBOT)
             osal_semaphore_increment(s_eom_theipnet.cmd.blockingsemaphore, osal_callerTSK); 
 #if defined(IPNET_HAS_NON_BLOCKING_COMMAND)
             osal_semaphore_increment(s_eom_theipnet.cmd.busysemaphore, osal_callerAUTOdetect);
 #endif
+#else
+            embot::os::rtos::semaphore_release(s_eom_theipnet.cmd.blockingsemaphore);
+#if defined(IPNET_HAS_NON_BLOCKING_COMMAND)
+            embot::os::rtos::semaphore_release(s_eom_theipnet.cmd.busysemaphore);
+#endif
+#endif // #if !defined(EMBOBJ_USE_EMBOT)
+            
+
         } break;
 
         case cmdDetachDTG:
@@ -1476,10 +1644,18 @@ static void s_eom_ipnet_process_command(void)
 
 
             // increment the semaphore to allow execution of the caller
+#if !defined(EMBOBJ_USE_EMBOT) 
             osal_semaphore_increment(s_eom_theipnet.cmd.blockingsemaphore, osal_callerTSK); 
 #if defined(IPNET_HAS_NON_BLOCKING_COMMAND)
             osal_semaphore_increment(s_eom_theipnet.cmd.busysemaphore, osal_callerAUTOdetect);
-#endif                              
+#endif  
+#else
+            embot::os::rtos::semaphore_release(s_eom_theipnet.cmd.blockingsemaphore);
+#if defined(IPNET_HAS_NON_BLOCKING_COMMAND)
+           embot::os::rtos::semaphore_release(s_eom_theipnet.cmd.busysemaphore);
+#endif   
+#endif // #if !defined(EMBOBJ_USE_EMBOT)
+                                       
         } break;
 
 
@@ -1527,10 +1703,18 @@ static void s_eom_ipnet_repeat_command(void)
                         s_eom_theipnet.cmd.tout = 0;
                     }
                     // release the caller
+#if !defined(EMBOBJ_USE_EMBOT)
                     osal_semaphore_increment(s_eom_theipnet.cmd.blockingsemaphore, osal_callerTSK);
 #if defined(IPNET_HAS_NON_BLOCKING_COMMAND)
                     osal_semaphore_increment(s_eom_theipnet.cmd.busysemaphore, osal_callerAUTOdetect);
 #endif
+#else
+                    embot::os::rtos::semaphore_release(s_eom_theipnet.cmd.blockingsemaphore);
+#if defined(IPNET_HAS_NON_BLOCKING_COMMAND)
+                    embot::os::rtos::semaphore_release(s_eom_theipnet.cmd.busysemaphore);
+#endif
+#endif // #if !defined(EMBOBJ_USE_EMBOT)
+                    
                 }
 #else
 
@@ -1540,13 +1724,22 @@ static void s_eom_ipnet_repeat_command(void)
                 }
                 else 
                 {
+#if !defined(EMBOBJ_USE_EMBOT)                    
                     uint64_t now = osal_system_abstime_get();
+#else
+                    uint64_t now = embot::core::now();
+#endif // #if !defined(EMBOBJ_USE_EMBOT)
+
 #if defined(TEST_ARP_PRINT)
                     uint32_t delta = now - s_eom_theipnet.cmd.par64x;
 #endif                    
                     if(now >= (s_eom_theipnet.cmd.par64x+s_eom_theipnet.cmd.par32x-10))
                     {
+#if !defined(EMBOBJ_USE_EMBOT)
                         s_eom_theipnet.cmd.par64x = osal_system_abstime_get();   
+#else
+                        s_eom_theipnet.cmd.par64x = embot::core::now();
+#endif // #if !defined(EMBOBJ_USE_EMBOT)
 #if defined(TEST_ARP_EVIEW)
                         evprev_ipnetarp = eventviewer_switch_to(ev_ipnetarp);
                         eventviewer_switch_to(evprev_ipnetarp);
@@ -1594,10 +1787,18 @@ static void s_eom_ipnet_repeat_command(void)
                     }
                     
                     // release the caller
+#if !defined(EMBOBJ_USE_EMBOT)
                     osal_semaphore_increment(s_eom_theipnet.cmd.blockingsemaphore, osal_callerTSK);
 #if defined(IPNET_HAS_NON_BLOCKING_COMMAND)
                     osal_semaphore_increment(s_eom_theipnet.cmd.busysemaphore, osal_callerAUTOdetect);
 #endif
+#else
+                    embot::os::rtos::semaphore_release(s_eom_theipnet.cmd.blockingsemaphore);
+#if defined(IPNET_HAS_NON_BLOCKING_COMMAND)
+                    embot::os::rtos::semaphore_release(s_eom_theipnet.cmd.busysemaphore);
+#endif
+#endif // #if !defined(EMBOBJ_USE_EMBOT)
+
                 }
 #endif           
 
@@ -1623,10 +1824,19 @@ static void s_eom_ipnet_repeat_command(void)
                     eventviewer_switch_to(ev_mark2);
 #endif
                 // release the caller
+#if !defined(EMBOBJ_USE_EMBOT)
                 osal_semaphore_increment(s_eom_theipnet.cmd.blockingsemaphore, osal_callerTSK); 
 #if defined(IPNET_HAS_NON_BLOCKING_COMMAND)
                 osal_semaphore_increment(s_eom_theipnet.cmd.busysemaphore, osal_callerAUTOdetect);                
 #endif
+#else
+               embot::os::rtos::semaphore_release(s_eom_theipnet.cmd.blockingsemaphore);
+#if defined(IPNET_HAS_NON_BLOCKING_COMMAND)
+                embot::os::rtos::semaphore_release(s_eom_theipnet.cmd.busysemaphore);                
+#endif
+#endif // #if !defined(EMBOBJ_USE_EMBOT)
+                
+
             } 
  
         } break;
@@ -1660,7 +1870,12 @@ static void s_eom_ipnet_process_transmission_datagram(void)
     txpkt = eo_packet_New(bignumber); // bif number depends on the socket.
 #endif
     // get the socket which has something to transmit
+#if !defined(EMBOBJ_USE_EMBOT)
     s = (EOsocketDatagram*) osal_messagequeue_getquick(s_eom_theipnet.dgramsocketready2tx, osal_reltimeINFINITE, osal_callerTSK);
+#else
+    embot::os::Message msg = embot::os::rtos::messagequeue_get(s_eom_theipnet.dgramsocketready2tx, embot::core::reltimeWaitForever);
+    s = reinterpret_cast<EOsocketDatagram*>(msg);
+#endif // #if !defined(EMBOBJ_USE_EMBOT)
 
     if(NULL == s)
     {
@@ -1722,7 +1937,11 @@ static void s_eom_ipnet_process_transmission_datagram(void)
             }
 
             // if message queue is not empty, then sends another tx event because there is another socket which needs transmission
+#if !defined(EMBOBJ_USE_EMBOT)
             if(0 != osal_messagequeue_size(s_eom_theipnet.dgramsocketready2tx, osal_callerTSK))
+#else
+            if(0 != embot::os::rtos::messagequeue_size(s_eom_theipnet.dgramsocketready2tx))
+#endif // #if !defined(EMBOBJ_USE_EMBOT)
             {
                 eom_task_SetEvent(s_eom_theipnet.tskproc, eov_ipnet_evt_TXdatagram);
             } 
@@ -1776,7 +1995,11 @@ static eObool_t s_eom_ipnet_attach_rqst_dtgsocket(EOVtheIPnet *vip, EOsocketData
     {
         eOsizecntnr_t maxtokens;
         eo_fifo_Capacity(dgmskt->dgramfifoinput, &maxtokens, eok_reltimeINFINITE);
+#if !defined(EMBOBJ_USE_EMBOT)        
         dgmskt->socket->blkgethandle = (void*)osal_semaphore_new(maxtokens+1, 0);
+#else        
+        dgmskt->socket->blkgethandle = (void*)embot::os::rtos::semaphore_new(maxtokens+1, 0);
+#endif // #if !defined(EMBOBJ_USE_EMBOT)        
         eo_errman_Assert(eo_errman_GetHandle(), (NULL != dgmskt->socket->blkgethandle), "s_eom_ipnet_attach_rqst_dtgsocket(): blkgethandle is not created by osal", s_eobj_ownname, &eo_errman_DescrRuntimeErrorLocal);
     }    
     

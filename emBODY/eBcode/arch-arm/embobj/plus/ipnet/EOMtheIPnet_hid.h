@@ -30,6 +30,8 @@ extern "C" {
     @date       08/24/2011
 **/
 
+// marco.accame@iit.it on sept 2020:
+// - substituted osal with embot::os when macro EMBOBJ_USE_EMBOT is defined
 
 // - external dependencies --------------------------------------------------------------------------------------------
 
@@ -38,10 +40,14 @@ extern "C" {
 #include "EOMtask.h"
 #include "EOaction.h"
 #include "EOtimer.h"    
-
+#if !defined(EMBOBJ_USE_EMBOT)
 #include "osal.h"
+#else
+#include "embot_os_rtos.h"
+#endif
 #include "ipal.h"
 #include "EOpacket.h"    
+      
 
 // - declaration of extern public interface ---------------------------------------------------------------------------
  
@@ -66,7 +72,11 @@ typedef enum
 
 typedef struct  
 {   // is the command sent to the task tskprocl
-    osal_mutex_t            *mtxcaller;     // mutex used to stop other tasks to use the same command      
+#if !defined(EMBOBJ_USE_EMBOT)    
+    osal_mutex_t            *mtxcaller;     // mutex used to stop other tasks to use the same command 
+#else    
+    embot::os::rtos::mutex_t *mtxcaller;     // mutex used to stop other tasks to use the same command  
+#endif  // !defined(EMBOBJ_USE_EMBOT)  
     EOMtheIPnetCmdCode      opcode;         // the opcode of the command
     uint8_t                 repeatcmd;      // flag used to tell the receiver of the command to process it againg
     uint8_t                 result;         // the result of the command: 1 is OK
@@ -75,10 +85,17 @@ typedef struct
     uint32_t                par32x;         // third parameter
     uint64_t                par64x;         // fourth parameter
     uint32_t                tout;           // the timeout of the command 
+#if !defined(EMBOBJ_USE_EMBOT)
     osal_semaphore_t        *blockingsemaphore;     // used by the caller to block until the end of the command execution.
 #if defined(IPNET_HAS_NON_BLOCKING_COMMAND)
     osal_semaphore_t        *busysemaphore; // used by the caller to verify if another task (or the same task) is using the command
 #endif
+#else
+    embot::os::rtos::semaphore_t *blockingsemaphore;
+#if defined(IPNET_HAS_NON_BLOCKING_COMMAND)
+    embot::os::rtos::semaphore_t *busysemaphore;
+#endif    
+#endif // !defined(EMBOBJ_USE_EMBOT)   
     EOtimer                 *stoptmr;       // used to drop the command after tout microsec even if the executer hasnt finished it
     EOaction                *stopact;       // the action to be done at expiry of the stop timer
 } EOMtheIPnetCommand; 
@@ -100,7 +117,11 @@ struct EOMtheIPnet_hid
     EOMtheIPnetCommand              cmd;                    /*< the command used by other tasks to issue request to the EOMtheIPnet */
     EOpacket                        *rxpacket;              /*< contains the temporary packet received by the network */
     eOreltime_t                     maxwaittime;            /*< a generic wait time */
+#if !defined(EMBOBJ_USE_EMBOT)
     osal_messagequeue_t             *dgramsocketready2tx;   /*< a fifo containing pointers of the datagram sockets which need to tx a packet  */
+#else
+    embot::os::rtos::messagequeue_t *dgramsocketready2tx;   /*< a fifo containing pointers of the datagram sockets which need to tx a packet  */
+#endif
     eObool_t                        taskwakeuponrxframe;    /*< tells to send an evt to tskproc when there is a received eth frame */
     eObool_t                        active;
     ipal_cfg_t                      ipcfg;                  /*< the ipal configuration */
