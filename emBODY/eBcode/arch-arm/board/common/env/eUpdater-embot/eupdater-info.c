@@ -83,12 +83,20 @@ extern const ipal_cfg_t ipal_cfg;
 
 #elif defined(BOARD_ems4) | defined(BOARD_mc4plus) | defined(BOARD_mc2plus)
 
-
+#if defined(USE_ZERO_OFFSET)
+#if __ARMCOMPILER_VERSION > 6000000
+#warning CAVEAT: we map in flash @ 0x08000200 in a non-parametric mode
+const eEmoduleExtendedInfo_t eupdater_modinfo_extended __attribute__((section(".ARM.__at_0x08000200"))) =   
+#else    
+const eEmoduleExtendedInfo_t eupdater_modinfo_extended __attribute__((at(EENV_ROMSTART+EENV_MODULEINFO_OFFSET))) = 
+#endif
+#else
 #if __ARMCOMPILER_VERSION > 6000000
 #warning CAVEAT: we map in flash @ 0x08008200 in a non-parametric mode
 const eEmoduleExtendedInfo_t eupdater_modinfo_extended __attribute__((section(".ARM.__at_0x08008200"))) =   
 #else    
 const eEmoduleExtendedInfo_t eupdater_modinfo_extended __attribute__((at(EENV_MEMMAP_EUPDATER_ROMADDR+EENV_MODULEINFO_OFFSET))) = 
+#endif
 #endif
 {
     .moduleinfo     =
@@ -153,7 +161,11 @@ const eEmoduleExtendedInfo_t eupdater_modinfo_extended __attribute__((at(EENV_ME
 
 const eOmsystem_cfg_t eupdater_syscfg =
 {
+#if defined(USE_ZERO_OFFSET)    
+    .codespaceoffset    = 0,
+#else
     .codespaceoffset    = (EENV_MEMMAP_EUPDATER_ROMADDR-EENV_ROMSTART),
+#endif    
     .halcfg             = &hal_cfg,
     .osalcfg            = NULL,
     .fsalcfg            = NULL
