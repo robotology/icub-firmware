@@ -62,7 +62,11 @@ struct EOMtheSystem_hid
 
     // other stuff
     const hal_cfg_t             *halcfg;
+#if !defined(EMBOBJ_USE_EMBOT)    
     const osal_cfg_t            *osalcfg;
+#else    
+    const void                  *osalcfg;
+#endif    
     const eOmtimerman_cfg_t     *tmrmancfg;
     const eOmcallbackman_cfg_t  *cbkmancfg;
     eOvoid_fp_void_t            user_init_fn;

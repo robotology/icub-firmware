@@ -166,6 +166,10 @@ extern void eom_task_Delete(EOMtask *p);
     @param      p               Pointer to the EOMtask.
  **/
 extern void eom_task_Start(EOMtask *p);
+                                       
+extern EOMtask * eom_task_Wrap(void *rtosthread);
+                                       
+extern void * eom_task_GetRTOSthread(EOMtask *p);
 
 
 /** @fn         extern void* eom_task_GetExternalData(EOMtask *p) 

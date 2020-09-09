@@ -51,8 +51,10 @@ extern "C" {
 #include "EOMtheTimerManager.h"
 #include "EOMtheCallbackManager.h"
 #include "hal.h"
-#include "osal.h"
 
+#if !defined(EMBOBJ_USE_EMBOT)
+#include "osal.h"
+#endif 
 
 
 // - public #define  --------------------------------------------------------------------------------------------------
@@ -70,7 +72,11 @@ typedef struct
 {
     uint32_t                    codespaceoffset;
     const hal_core_cfg_t*       halcfg;
+#if !defined(EMBOBJ_USE_EMBOT)    
     const osal_cfg_t*           osalcfg;
+#else    
+    const void*                 osalcfg;
+#endif    
     const void*                 fsalcfg; // good thing to remove the fsal, as on sourceforge it does not appear yet
 } eOmsystem_cfg_t;
 
