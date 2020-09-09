@@ -207,7 +207,6 @@ extern void eupdater_cangtw_init(void)
     eupdater_task_cangateway = eom_task_New(eom_mtask_EventDriven, 100, 2*1024, s_cangateway_startup, s_cangateway_run,  32, 
                                     eok_reltimeINFINITE, NULL, 
                                     task_cangateway, "cangateway");    
-    eom_task_Start(eupdater_task_cangateway);
     s_status = 1;    
 }
 

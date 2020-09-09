@@ -389,7 +389,7 @@ extern EOMtheIPnet * eom_ipnet_Initialise(const eOmipnet_cfg_t *ipnetcfg,
                                           NULL,
                                           eom_ipnetproc, 
                                           "ipnet.proc");
-    eom_task_Start(s_eom_theipnet.tskproc);
+
 #define IPNET_TICK_PERIODIC                                          
 #if defined(IPNET_TICK_PERIODIC) 
     // and task which ticks the timers. it is a periodic task
@@ -399,7 +399,7 @@ extern EOMtheIPnet * eom_ipnet_Initialise(const eOmipnet_cfg_t *ipnetcfg,
                                           NULL, 
                                           eom_ipnettick,
                                           "ipnet.tick");
-    eom_task_Start(s_eom_theipnet.tsktick);
+
 #else
     // and task which ticks the timers. it is an event based task with timeout. 
     // this solution is  not really periodic, but it can be good enough because we just need to increment some delays for tcp/ip retransmission.
@@ -409,8 +409,8 @@ extern EOMtheIPnet * eom_ipnet_Initialise(const eOmipnet_cfg_t *ipnetcfg,
                                           0, s_eom_theipnet.ipcfg.sys_timetick,
                                           NULL, 
                                           eom_ipnettick,
-                                          "ipnet.tick");
-    eom_task_Start(s_eom_theipnet.tsktick);                                      
+                                          "ipnet.tick");  
+
 #endif
 
 
