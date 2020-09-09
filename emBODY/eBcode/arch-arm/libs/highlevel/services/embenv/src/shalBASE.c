@@ -146,7 +146,11 @@ typedef uint8_t verify_size_t[(SHALBASE_RAMSIZE > sizeof(baseIPCdataStorage_t)) 
 
 #if (__ARMCC_VERSION > 6000000)
 // this variable is placed in NZI section. it is used for ipc
+#if !defined(USE_STM32HAL) 
 static volatile baseIPCdataStorage_t s_shalbase_IPCdataStored         __attribute__((section(".ARM.__at_0x2001FFC0")));
+#else
+static volatile baseIPCdataStorage_t s_shalbase_IPCdataStored         __attribute__((section(".ARM.__at_0x20000000")));
+#endif
 #else
 // this variable is placed in NZI section. it is used for ipc
 static volatile baseIPCdataStorage_t s_shalbase_IPCdataStored       __attribute__((at(SHALBASE_RAMADDR)));
