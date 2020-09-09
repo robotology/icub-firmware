@@ -257,7 +257,6 @@ extern void eupdater_init(void)
     s_task_ethcommand = eom_task_New(eom_mtask_MessageDriven, 101, 2*1024, s_ethcommand_startup, s_ethcommand_run,  16, 
                                     eok_reltimeINFINITE, NULL, 
                                     task_ethcommand, "ethcommand");
-    eom_task_Start(s_task_ethcommand);
     
     // init the services of the updater core. basically parsing of udp packets
     updater_core_init();
