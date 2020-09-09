@@ -118,6 +118,8 @@ static void s_embot_cbk_after(embot::os::Thread *t, embot::core::Callback &cbk, 
 
 static void s_embot_per_run(embot::os::Thread *t, void *par);
 
+static void eom_task_START(EOMtask *p);
+
 // --------------------------------------------------------------------------------------------------------------------
 // - definition (and initialisation) of static variables
 // --------------------------------------------------------------------------------------------------------------------
@@ -221,15 +223,14 @@ extern EOMtask * eom_task_New(eOmtaskType_t type, uint8_t priority, uint16_t sta
                     name);   
         
         s_prepare_base_object(task);
+        eom_task_START(task);
     }
-    
-    
-   
+          
     return(task);
 }
 
 
-extern void eom_task_Start(EOMtask *p) 
+static void eom_task_START(EOMtask *p) 
 {
     if(nullptr == p)
     {
@@ -304,6 +305,11 @@ extern void eom_task_Start(EOMtask *p)
         {
         } break;
     }        
+}
+
+extern void eom_task_Start(EOMtask *p) 
+{
+    
 }
 
 extern EOMtask * eom_task_Wrap(void *rtosthread)
