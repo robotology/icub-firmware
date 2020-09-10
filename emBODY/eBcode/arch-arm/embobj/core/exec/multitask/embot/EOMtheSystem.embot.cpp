@@ -242,7 +242,7 @@ extern EOMtheSystem * eom_sys_Initialise(const eOmsystem_cfg_t *syscfg,
     constexpr embot::core::Callback onOSerror = { };
     constexpr embot::os::Config osconfig {embot::core::time1millisec, initcfg, idlecfg, onOSerror};
     
-    // embot::os::init() internally calls embot::hw::bsp::init() which also calls embot::core::init()
+    // embot::os::init() internally calls embot::hw::init() which also calls embot::core::init()
     embot::os::init(osconfig);
     
     return(&s_eom_system);   
