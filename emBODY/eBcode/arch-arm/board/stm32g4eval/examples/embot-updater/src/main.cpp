@@ -124,7 +124,6 @@ int main(void)
 
     // the system executes eupdater_init() and then schedules the other threads
     eom_sys_Start(eom_sys_GetHandle(), eupdater_init);
-    #warning TODO: verify that the threads start. they may have incorrect priorities.
 }
 
 

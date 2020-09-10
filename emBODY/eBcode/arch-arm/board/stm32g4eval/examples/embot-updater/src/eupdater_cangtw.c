@@ -132,6 +132,8 @@ static uint8_t s_status = 0;
 
 static EOsm*                    s_sm_cangtw                 = NULL;
 
+static const uint8_t s_cangateway_priority = 24; // as in embot::os::Priority::normal24 
+
 
 #if defined(EMBOBJ_USE_EMBOT)
 static embot::os::rtos::semaphore_t *startup_done_semaphore = nullptr;
@@ -204,7 +206,7 @@ extern void eupdater_cangtw_init(void)
 
     
     // init the gtw task
-    eupdater_task_cangateway = eom_task_New(eom_mtask_EventDriven, 100, 2*1024, s_cangateway_startup, s_cangateway_run,  32, 
+    eupdater_task_cangateway = eom_task_New(eom_mtask_EventDriven, s_cangateway_priority, 2*1024, s_cangateway_startup, s_cangateway_run,  32, 
                                     eok_reltimeINFINITE, NULL, 
                                     task_cangateway, "cangateway");    
     s_status = 1;    

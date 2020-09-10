@@ -50,6 +50,7 @@
 #include "EOtheARMenvironment.h"
 #include "EOVtheEnvironment.h"
 
+
 // utils
 #if !defined(_MAINTAINER_APPL_)
 #include "eupdater-info.h"
@@ -64,7 +65,10 @@
 #include "eEsharedServices.h" 
 
 
-
+#include "embot_core.h"
+#include "embot_os.h"
+#include "embot_prot_eth.h"
+#include "embot_app_theLEDmanager.h"
 
 // --------------------------------------------------------------------------------------------------------------------
 // - declaration of external variables 
@@ -147,7 +151,7 @@ static const eOmessage_t        s_message_from_skt_ethcmd   = 0x00000001;
 
 static const eOipv4addr_t hostipaddr = EO_COMMON_IPV4ADDR(10, 0, 1, 104);
 
-
+static const uint8_t s_priority = 25; // as in embot::os::Priority::normal25 
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
@@ -235,28 +239,53 @@ extern void eupdater_init(void)
 #endif
 
     
-    updater_core_trace("MAIN", "starting ::ipnet with IP addr: %d.%d.%d.%d\n\r", ipaddr[0], ipaddr[1], ipaddr[2], ipaddr[3]); 
+    //updater_core_trace("MAIN", "starting ::ipnet with IP addr: %d.%d.%d.%d\n\r", ipaddr[0], ipaddr[1], ipaddr[2], ipaddr[3]); 
+    
+    embot::core::print(std::string("IPnet: @ ") + embot::core::TimeFormatter(embot::core::now()).to_string() + 
+                       " starting with IP addr " + embot::prot::eth::IPv4(ipaddr[0], ipaddr[1], ipaddr[2], ipaddr[3]).to_string()); 
 
     // start the ipnet
-    eom_ipnet_Initialise(&eom_ipnet_DefaultCfg,
+    static const eOmipnet_cfg_t eom_ipnet_Cfg = 
+    { 
+        EO_INIT(.procpriority)              embot::core::tointegral(embot::os::Priority::high44), // default = 220 .. but we must give a different value
+        EO_INIT(.procstacksize)             2*1024, // default = 1024 .. 
+        EO_INIT(.procmaxidletime)           20000, 
+        EO_INIT(.procwakeuponrxframe)       eobool_true, 
+        EO_INIT(.tickpriority)              embot::core::tointegral(embot::os::Priority::high43), // default = 219 .. but we must give a different value
+        EO_INIT(.tickstacksize)             4*1024 // default = 128 .. but that does not allow to run prints or else
+     };
+    
+    //static const eOmipnet_cfg_t *cfg2use = &eom_ipnet_DefaultCfg;
+    static const eOmipnet_cfg_t *cfg2use = &eom_ipnet_Cfg;
+    
+    eom_ipnet_Initialise(cfg2use,
                          ipalcfg, 
                          eomipnet_addr,
                          &eom_ipnet_dtgskt_MyCfg
                          );
     
     // init the leds   
-    hal_led_init(hal_led0, NULL);
-    hal_led_init(hal_led1, NULL);
-    hal_led_init(hal_led2, NULL);
-    hal_led_init(hal_led3, NULL);
-    hal_led_init(hal_led4, NULL);
-    hal_led_init(hal_led5, NULL);   
-       
+//    hal_led_init(hal_led0, NULL);
+//    hal_led_init(hal_led1, NULL);
+//    hal_led_init(hal_led2, NULL);
+//    hal_led_init(hal_led3, NULL);
+//    hal_led_init(hal_led4, NULL);
+//    hal_led_init(hal_led5, NULL);   
+    
+    static const std::initializer_list<embot::hw::LED> allleds = 
+    { 
+        embot::hw::LED::one, embot::hw::LED::two, embot::hw::LED::three, 
+        embot::hw::LED::four, embot::hw::LED::five, embot::hw::LED::six
+    };  
+    embot::app::theLEDmanager &theleds = embot::app::theLEDmanager::getInstance();     
+    theleds.init(allleds);     
+    theleds.get(embot::hw::LED::one).pulse(embot::core::time1second, 0);        
 
     // init and start the eth command task            
-    s_task_ethcommand = eom_task_New(eom_mtask_MessageDriven, 101, 2*1024, s_ethcommand_startup, s_ethcommand_run,  16, 
+    s_task_ethcommand = eom_task_New(eom_mtask_MessageDriven, s_priority, 2*1024, s_ethcommand_startup, s_ethcommand_run,  16, 
                                     eok_reltimeINFINITE, NULL, 
                                     task_ethcommand, "ethcommand");
+    
     
     // init the services of the updater core. basically parsing of udp packets
     updater_core_init();
@@ -392,9 +421,19 @@ extern eObool_t eom_eupdater_main_connectsocket2host(eOipv4addr_t remaddr, EOsoc
     
     if(eobool_true == host_connected)
     {  
-        // hal_led0 signals that the board is connected
-        hal_led_on(hal_led0);
+        // hal_led2 signals that the board is connected
+        hal_led_on(hal_led2);
     }
+    else
+    {
+        // pulse it
+        // hal_led2 is the same as embot::hw::LED::three
+        embot::app::theLEDmanager &theleds = embot::app::theLEDmanager::getInstance();     
+        //theleds.get(embot::hw::LED::three).pulse(200*embot::core::time1millisec, 0);           
+        embot::app::LEDwaveT<64> ledwave(100*embot::core::time1millisec, 30, std::bitset<64>(0b010101));
+        theleds.get(embot::hw::LED::three).wave(&ledwave); 
+    }
+    
 
     return(host_connected);
 }

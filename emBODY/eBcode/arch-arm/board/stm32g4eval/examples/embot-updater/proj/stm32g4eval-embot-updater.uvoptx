@@ -148,7 +148,24 @@
           <Name>(105=-1,-1,-1,-1,0)</Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
-      <Breakpoint/>
+      <Breakpoint>
+        <Bp>
+          <Number>0</Number>
+          <Type>0</Type>
+          <LineNumber>323</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134252520</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>..\..\..\..\..\embobj\core\exec\multitask\embot\EOMtask.embot.cpp</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\g4eval\../../../../../embobj/core/exec/multitask/embot/EOMtask.embot.cpp\323</Expression>
+        </Bp>
+      </Breakpoint>
       <WatchWindow1>
         <Ww>
           <count>0</count>
@@ -174,6 +191,16 @@
           <count>4</count>
           <WinNumber>1</WinNumber>
           <ItemText>ttt</ItemText>
+        </Ww>
+        <Ww>
+          <count>5</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>priority,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>6</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>c,0x0A</ItemText>
         </Ww>
       </WatchWindow1>
       <WatchWindow2>
@@ -214,7 +241,7 @@
         <aLa>0</aLa>
         <aPa1>0</aPa1>
         <AscS4>0</AscS4>
-        <aSer4>0</aSer4>
+        <aSer4>1</aSer4>
         <StkLoc>0</StkLoc>
         <TrcWin>0</TrcWin>
         <newCpu>0</newCpu>
@@ -370,112 +397,17 @@
           <Name>(105=-1,-1,-1,-1,0)</Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
-      <Breakpoint>
-        <Bp>
-          <Number>0</Number>
-          <Type>0</Type>
-          <LineNumber>386</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134279192</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\..\..\..\..\embobj\plus\ipnet\EOMtheIPnet.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\g4eval\../../../../../embobj/plus/ipnet/EOMtheIPnet.c\386</Expression>
-        </Bp>
-        <Bp>
-          <Number>1</Number>
-          <Type>0</Type>
-          <LineNumber>206</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134284536</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\src\eupdater.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\g4eval\../src/eupdater.c\206</Expression>
-        </Bp>
-        <Bp>
-          <Number>2</Number>
-          <Type>0</Type>
-          <LineNumber>1315</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134258026</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\..\..\..\..\embobj\plus\ipnet\EOMtheIPnet.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\g4eval\../../../../../embobj/plus/ipnet/EOMtheIPnet.c\1315</Expression>
-        </Bp>
-        <Bp>
-          <Number>3</Number>
-          <Type>0</Type>
-          <LineNumber>277</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134253720</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\src\eupdater.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\g4eval\../src/eupdater.c\277</Expression>
-        </Bp>
-      </Breakpoint>
+      <Breakpoint/>
       <WatchWindow1>
         <Ww>
           <count>0</count>
           <WinNumber>1</WinNumber>
-          <ItemText>osthread</ItemText>
+          <ItemText>cfg</ItemText>
         </Ww>
         <Ww>
           <count>1</count>
           <WinNumber>1</WinNumber>
-          <ItemText>tmr</ItemText>
-        </Ww>
-        <Ww>
-          <count>2</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>_internals.cfg-&gt;isr_queue,0x10</ItemText>
-        </Ww>
-        <Ww>
-          <count>3</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>errormsg</ItemText>
-        </Ww>
-        <Ww>
-          <count>4</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>errormsg</ItemText>
-        </Ww>
-        <Ww>
-          <count>5</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>errormsg</ItemText>
-        </Ww>
-        <Ww>
-          <count>6</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>pImpl</ItemText>
-        </Ww>
-        <Ww>
-          <count>7</count>
-          <WinNumber>1</WinNumber>
-          <ItemText>largestack</ItemText>
+          <ItemText>i-&gt;props</ItemText>
         </Ww>
       </WatchWindow1>
       <WatchWindow2>
@@ -683,7 +615,7 @@
 
   <Group>
     <GroupName>embot-hw</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -903,7 +835,7 @@
 
   <Group>
     <GroupName>embot-app</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -1343,7 +1275,7 @@
 
   <Group>
     <GroupName>eo-mee-embot</GroupName>
-    <tvExp>0</tvExp>
+    <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
