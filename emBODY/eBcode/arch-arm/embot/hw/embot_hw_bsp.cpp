@@ -318,13 +318,15 @@ namespace embot { namespace hw { namespace bsp { namespace led {
     #elif   defined(STM32HAL_BOARD_STM32G4EVAL)
        
     constexpr PROP led1p = { .on = embot::hw::gpio::State::RESET, .off = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::G, embot::hw::GPIO::PIN::nine}  };  
+    constexpr PROP led3p = { .on = embot::hw::gpio::State::RESET, .off = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::F, embot::hw::GPIO::PIN::eleven}  };  
+
         
     constexpr BSP thebsp {        
         // maskofsupported
-        mask::pos2mask<uint32_t>(LED::one),        
+        mask::pos2mask<uint32_t>(LED::one) | mask::pos2mask<uint32_t>(LED::three),        
         // properties
         {{
-            &led1p, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr            
+            &led1p, nullptr, &led3p, nullptr, nullptr, nullptr, nullptr, nullptr            
         }}        
     };
     
