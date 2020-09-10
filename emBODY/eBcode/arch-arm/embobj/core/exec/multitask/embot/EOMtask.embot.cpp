@@ -84,9 +84,9 @@ struct Config
         timeoutORperiod = _timeoutORperiod;
         extdata = _extdata;
         nameofthetask_fn = _nameofthetask_fn;
-        name = _name;       
+        name = _name;      
    }
-    
+   
 };
 
 struct EOMtask_hid 
@@ -236,6 +236,8 @@ static void eom_task_START(EOMtask *p)
     {
         return;
     }
+    
+    bool res = false;
  
     switch(p->thr->getType())
     {
@@ -244,14 +246,14 @@ static void eom_task_START(EOMtask *p)
             embot::os::EventThread *t = reinterpret_cast<embot::os::EventThread*>(p->thr);
             embot::os::EventThread::Config c { 
                         p->config.stacksize, 
-                        embot::os::topriority(p->config.priority),
+                        embot::os::priority::convert(p->config.priority),
                         s_embot_common_start,
                         p,
                         p->config.timeoutORperiod,
                         s_embot_evt_run,
                         p->config.name              
                     };
-            t->start(c);                   
+            res = t->start(c);                   
         } break;
         
         case embot::os::Thread::Type::messageTrigger:
@@ -259,7 +261,7 @@ static void eom_task_START(EOMtask *p)
             embot::os::MessageThread *t = reinterpret_cast<embot::os::MessageThread*>(p->thr);
             embot::os::MessageThread::Config c {
                         p->config.stacksize, 
-                        embot::os::topriority(p->config.priority),
+                        embot::os::priority::convert(p->config.priority),
                         s_embot_common_start,
                         p,
                         p->config.timeoutORperiod,
@@ -267,7 +269,7 @@ static void eom_task_START(EOMtask *p)
                         s_embot_msg_run,
                         p->config.name              
                     };
-            t->start(c);                   
+            res = t->start(c);                   
         } break; 
 
         case embot::os::Thread::Type::callbackTrigger:
@@ -275,7 +277,7 @@ static void eom_task_START(EOMtask *p)
             embot::os::CallbackThread *t = reinterpret_cast<embot::os::CallbackThread*>(p->thr);
             embot::os::CallbackThread::Config c {
                         p->config.stacksize, 
-                        embot::os::topriority(p->config.priority),
+                        embot::os::priority::convert(p->config.priority),
                         s_embot_common_start,
                         p,
                         p->config.timeoutORperiod, 
@@ -283,7 +285,7 @@ static void eom_task_START(EOMtask *p)
                         s_embot_cbk_after,
                         p->config.name              
                     };
-            t->start(c);                   
+            res = t->start(c);                   
         } break;   
 
         case embot::os::Thread::Type::periodicTrigger:
@@ -291,20 +293,26 @@ static void eom_task_START(EOMtask *p)
             embot::os::PeriodicThread *t = reinterpret_cast<embot::os::PeriodicThread*>(p->thr);
             embot::os::PeriodicThread::Config c {
                         p->config.stacksize, 
-                        embot::os::topriority(p->config.priority),
+                        embot::os::priority::convert(p->config.priority),
                         s_embot_common_start,
                         p,
                         p->config.timeoutORperiod, 
                         s_embot_per_run,
                         p->config.name              
                     };
-            t->start(c);                   
+            res = t->start(c);                   
         } break;   
         
         default: 
         {
         } break;
-    }        
+    } 
+
+    if(false == res)
+    {
+        embot::core::print("eom_task_START(): invalid embot::os::EventThread::Config");
+        for(;;);
+    }    
 }
 
 extern void eom_task_Start(EOMtask *p) 
@@ -431,7 +439,7 @@ extern eOresult_t eom_task_PrioritySet(EOMtask *p, uint8_t prio)
 
     p->config.priority = prio;
 
-    return (true == p->thr->setPriority(embot::os::topriority(prio))) ? eores_OK : eores_NOK_generic;
+    return (true == p->thr->setPriority(embot::os::priority::convert(prio))) ? eores_OK : eores_NOK_generic;
 }
 
 
