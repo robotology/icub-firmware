@@ -45,7 +45,9 @@
 #if !defined(EMBOBJ_USE_EMBOT)
 #include "osal.h"
 #else
+#include "embot_core.h"
 #include "embot_os_rtos.h"
+//#define USE_EMBOT_PRINT
 #endif // #if !defined(EMBOBJ_USE_EMBOT)
 
 #include "ipal.h"
@@ -1244,7 +1246,10 @@ static void e_eom_ipnet_signal_new_frame_is_available(void)
 
 static void s_eom_ipnet_tsktick_startup(EOMtask *rt, uint32_t n)
 {// to allow the call of any code here inside, you must increase the stack size of this task.
-    // eo_errman_Trace(eo_errman_GetHandle(), "called _tsktick_startup()", s_eobj_ownname);
+//    eo_errman_Trace(eo_errman_GetHandle(), "called s_eom_ipnet_tsktick_startup()", s_eobj_ownname);
+#if defined(EMBOBJ_USE_EMBOT) & defined(USE_EMBOT_PRINT) 
+    embot::core::print("IPnet: tick startup @ "+ embot::core::TimeFormatter(embot::core::now()).to_string());
+#endif
 }
 
 static void s_eom_ipnet_tsktick_forever(EOMtask *rt, uint32_t n)
@@ -1254,6 +1259,10 @@ static void s_eom_ipnet_tsktick_forever(EOMtask *rt, uint32_t n)
 //    {
 //        return;
 //    }
+
+#if defined(EMBOBJ_USE_EMBOT) & defined(USE_EMBOT_PRINT)    
+    embot::core::print("IPnet: ticked @ "+ embot::core::TimeFormatter(embot::core::now()).to_string());
+#endif
     
     ipal_sys_timetick_increment();
 }
@@ -1297,7 +1306,10 @@ static void s_eom_ipnet_tskproc_startup(EOMtask *rt, uint32_t n)
     s_eom_ipnet_ipal_start();
 #endif
     
-    eo_errman_Trace(eo_errman_GetHandle(), "called _tskproc_startup()", s_eobj_ownname);
+#if defined(EMBOBJ_USE_EMBOT) & defined(USE_EMBOT_PRINT)    
+    embot::core::print("IPnet: proc startup @ "+ embot::core::TimeFormatter(embot::core::now()).to_string());
+#endif
+    //eo_errman_Trace(eo_errman_GetHandle(), "called _tskproc_startup()", s_eobj_ownname);
 }
 
 /*  @brief      the body of tsktproc.
@@ -1318,11 +1330,16 @@ static void s_eom_ipnet_tskproc_forever(EOMtask *rt, uint32_t evtmsk)
         {    
             force_transmission_when_reactivated = 1;
         }
-        
+#if defined(EMBOBJ_USE_EMBOT) & defined(USE_EMBOT_PRINT)    
+        embot::core::print("IPnet: proc called but inactive @ "+ embot::core::TimeFormatter(embot::core::now()).to_string());
+#endif        
         return;
     }
 
-        
+#if defined(EMBOBJ_USE_EMBOT) & defined(USE_EMBOT_PRINT)    
+    embot::core::print("IPnet: proc ip stack @ "+ embot::core::TimeFormatter(embot::core::now()).to_string());
+#endif
+    
     // - (a) process the tcp/ip stack.
     
     ipal_sys_process_communication();
