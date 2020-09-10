@@ -55,6 +55,7 @@ namespace embot { namespace os {
             bool isvalid() const 
             {   // startup and param can be nullptr
                 if((0 == stacksize)) { return false; } 
+                else if(false == embot::os::priority::isvalid(priority)) { return false; }
                 else { return true; }
             }
         };    
