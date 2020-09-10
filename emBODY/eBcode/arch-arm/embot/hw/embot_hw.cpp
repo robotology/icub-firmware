@@ -34,6 +34,8 @@
 
 #include "embot_core.h"
 
+#include "embot_hw_sys.h"
+
 using namespace std;
 
 
@@ -58,7 +60,7 @@ namespace embot { namespace hw {
             return true;
         }
         
-        embot::core::init({{nullptr, config.get1microtime}});
+        embot::core::init({{nullptr, config.get1microtime}, {embot::hw::sys::puts}});
                    
         stm32hal_config_t cfg = {0};
         cfg.tick1ms_init = config.initmicrotime;

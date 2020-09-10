@@ -186,7 +186,7 @@ namespace embot::app::skeleton::os::evthreadcan {
     {                           
         embot::os::EventThread::Config configEV { 
             extCFG->evt->econfig.stacksize, 
-            embot::os::Priority::high200, 
+            embot::os::Priority::high40, 
             eventbasedthread_startup,
             extCFG->evt->econfig.param,
             extCFG->evt->econfig.timeout,

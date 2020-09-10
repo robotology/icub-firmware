@@ -73,9 +73,11 @@ namespace embot { namespace os {
         }
         
         _config = config;
-        
-        embot::core::init({{nullptr, _now}});        
+            
+        // we put hw::init() before because in its inside it also call embot::core::init() 
+        // with a pointer to embot::hw::sys::puts() so that embot::core::print() can work       
         embot::hw::init({nullptr, _now});
+        //embot::core::init({{nullptr, _now}}); // we dont need it
         _initted = true;
         return true;        
     }

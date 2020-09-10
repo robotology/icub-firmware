@@ -36,15 +36,15 @@ namespace embot { namespace os {
     public:
         struct Config
         {
-            embot::os::Priority     priority {embot::os::Priority::system230};
+            embot::os::Priority     priority {embot::os::Priority::system49};
             std::uint16_t           stacksize {1024};
             std::uint16_t           capacityofhandler {8};          
             Config() = default;
-            constexpr Config(std::uint16_t ss, std::uint16_t cap, embot::os::Priority prio = embot::os::Priority::system230)
+            constexpr Config(std::uint16_t ss, std::uint16_t cap, embot::os::Priority prio = embot::os::Priority::system49)
                 : stacksize(ss), capacityofhandler(cap), priority(prio) {}
             bool isvalid() const
             {
-                return ((0 == stacksize) || (0 == capacityofhandler) || (false == embot::os::isSystem(priority))) ? false : true;
+                return ((0 == stacksize) || (0 == capacityofhandler) || (false == embot::os::priority::isSystem(priority))) ? false : true;
             }
         }; 
         
