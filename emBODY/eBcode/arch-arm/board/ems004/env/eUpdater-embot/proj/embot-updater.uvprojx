@@ -805,6 +805,16 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>embot::hw::sys::puts</GroupName>
+          <Files>
+            <File>
+              <FileName>embot_hw_sys_puts.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\common\env\eUpdater-embot\embotfake\embot_hw_sys_puts.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
           <GroupOption>
             <CommonProperty>
@@ -1673,6 +1683,16 @@
               <FileName>stm32hal_fake.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\common\env\eUpdater-embot\stm32halfake\stm32hal_fake.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>embot::hw::sys::puts</GroupName>
+          <Files>
+            <File>
+              <FileName>embot_hw_sys_puts.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\common\env\eUpdater-embot\embotfake\embot_hw_sys_puts.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -2549,6 +2569,16 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>embot::hw::sys::puts</GroupName>
+          <Files>
+            <File>
+              <FileName>embot_hw_sys_puts.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\common\env\eUpdater-embot\embotfake\embot_hw_sys_puts.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>::CMSIS</GroupName>
           <GroupOption>
             <CommonProperty>
@@ -3417,6 +3447,16 @@
               <FileName>stm32hal_fake.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\..\common\env\eUpdater-embot\stm32halfake\stm32hal_fake.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>embot::hw::sys::puts</GroupName>
+          <Files>
+            <File>
+              <FileName>embot_hw_sys_puts.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\common\env\eUpdater-embot\embotfake\embot_hw_sys_puts.cpp</FilePath>
             </File>
           </Files>
         </Group>
