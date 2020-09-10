@@ -12,9 +12,11 @@
 // for implementation
 
 #include "embot_hw.h"
+#include "embot_hw_led.h"
 #include "embot_hw_sys.h"
 #include "embot_hw_can.h"
 #include "embot_hw_flash.h"
+
 
 // eth
 
@@ -41,25 +43,41 @@ extern hal_result_t hal_eth_sendframe(hal_eth_frame_t *frame)
 
 // led
 
+embot::hw::LED s_hal_to_embothw(hal_led_t id)
+{
+    embot::hw::LED l {embot::hw::LED::none};
+    uint8_t index = static_cast<uint8_t>(id);
+    if(index < embot::core::tointegral(embot::hw::LED::maxnumberof))
+    {
+        l = static_cast<embot::hw::LED>(index);
+    }
+    
+    return l;   
+}
+
 extern hal_result_t hal_led_init(hal_led_t id, const hal_led_cfg_t *cfg)
 {
-    return hal_res_OK;
+    embot::hw::result_t r = embot::hw::led::init(s_hal_to_embothw(id));
+    return (embot::hw::resOK == r) ? hal_res_OK : hal_res_NOK_generic;
 }
 
 extern hal_result_t hal_led_on(hal_led_t id)
 {
-    return hal_res_OK;
+    embot::hw::result_t r = embot::hw::led::on(s_hal_to_embothw(id));
+    return (embot::hw::resOK == r) ? hal_res_OK : hal_res_NOK_generic;
 }
 
 extern hal_result_t hal_led_off(hal_led_t id)
 {
-    return hal_res_OK;
+    embot::hw::result_t r = embot::hw::led::off(s_hal_to_embothw(id));
+    return (embot::hw::resOK == r) ? hal_res_OK : hal_res_NOK_generic;
 }
 
 
 extern hal_result_t hal_led_toggle(hal_led_t id)
 {
-    return hal_res_OK;
+    embot::hw::result_t r = embot::hw::led::toggle(s_hal_to_embothw(id));
+    return (embot::hw::resOK == r) ? hal_res_OK : hal_res_NOK_generic;
 }
 
 // sys
