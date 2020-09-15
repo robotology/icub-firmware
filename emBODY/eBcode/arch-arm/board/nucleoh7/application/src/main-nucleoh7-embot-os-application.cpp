@@ -61,6 +61,10 @@ static void s_imu_start();
 static void s_imu_get();
 static void s_adc_start(embot::hw::ads122c04::Channel chn);
 static void s_adc_get();
+
+static void s_cdc_start(embot::hw::AD7147 cdc);
+static void s_cdc_get(embot::hw::AD7147 cdc);
+
 static void s_transmit();
 
 
@@ -69,7 +73,12 @@ constexpr embot::os::Event evtIMUdataready = embot::core::binary::mask::pos2mask
 constexpr embot::os::Event evtADCchn1ready = embot::core::binary::mask::pos2mask<embot::os::Event>(2);
 constexpr embot::os::Event evtADCchn2ready = embot::core::binary::mask::pos2mask<embot::os::Event>(3);
 
-constexpr embot::os::Event evtDATAtransmit = embot::core::binary::mask::pos2mask<embot::os::Event>(4);
+constexpr embot::os::Event evtCDC1acquire = embot::core::binary::mask::pos2mask<embot::os::Event>(4);
+constexpr embot::os::Event evtCDC1ready = embot::core::binary::mask::pos2mask<embot::os::Event>(5);
+constexpr embot::os::Event evtCDC2acquire = embot::core::binary::mask::pos2mask<embot::os::Event>(6);
+constexpr embot::os::Event evtCDC2ready = embot::core::binary::mask::pos2mask<embot::os::Event>(7);
+
+constexpr embot::os::Event evtDATAtransmit = embot::core::binary::mask::pos2mask<embot::os::Event>(15);
 
  
 #if defined(enableACQUISITION_fast) 
@@ -213,8 +222,28 @@ void eventbasedthread_onevent(embot::os::Thread *t, embot::os::EventMask eventma
         timeadc_ready[1] = embot::core::now();     
         timeadc_delta[0] = timeadc_ready[0] - timeadc_start[0];     
         timeadc_delta[1] = timeadc_ready[1] - timeadc_start[1];        
-        s_adc_get();        
-    }    
+        s_adc_get(); 
+        s_cdc_start(embot::hw::AD7147::one);        
+    }  
+
+    if(true == embot::core::binary::mask::check(eventmask, evtCDC1ready))
+    {
+#if defined(enableTRACE_all)        
+        embot::core::TimeFormatter tf(embot::core::now());        
+        embot::hw::sys::puts("evthread-onevent: evtCDC1ready received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
+#endif  
+        s_cdc_get(embot::hw::AD7147::one);        
+        s_cdc_start(embot::hw::AD7147::two);        
+    }      
+
+    if(true == embot::core::binary::mask::check(eventmask, evtCDC2ready))
+    {
+#if defined(enableTRACE_all)        
+        embot::core::TimeFormatter tf(embot::core::now());        
+        embot::hw::sys::puts("evthread-onevent: evtCDC2ready received @ time = " + tf.to_string(embot::core::TimeFormatter::Mode::full));    
+#endif      
+        s_cdc_get(embot::hw::AD7147::two);        
+    }
     
     if(true == embot::core::binary::mask::check(eventmask, evtDATAtransmit))
     {
@@ -250,7 +279,7 @@ void initSystem(embot::os::Thread *t, void* initparam)
     
     embot::os::EventThread::Config configEV { 
         6*1024, 
-        embot::os::Priority::high200, 
+        embot::os::Priority::high40, 
         eventbasedthread_startup,
         nullptr,
         50*embot::core::time1millisec,
@@ -327,16 +356,16 @@ static void s_chips_init()
     embot::hw::ads122c04::Config adsconfig { embot::hw::i2c::Descriptor { embot::hw::I2C::one, i2cspeed } };
     embot::hw::ads122c04::init(embot::hw::ADS122C04::one, adsconfig);   
 
-//    volatile embot::hw::result_t rr1 = embot::hw::result_t::NOK;
-//    volatile embot::hw::result_t rr2 = embot::hw::result_t::NOK;
+    volatile embot::hw::result_t rr1 = embot::hw::result_t::NOK;
+    volatile embot::hw::result_t rr2 = embot::hw::result_t::NOK;
 //    
 //    //embot::core::delay(500*embot::core::time1millisec);
-//    embot::hw::ad7147::Config skconfig { embot::hw::i2c::Descriptor { embot::hw::I2C::one, i2cspeed } };
-//    rr1 = embot::hw::ad7147::init(embot::hw::AD7147::one, skconfig);
-//    rr2 = embot::hw::ad7147::init(embot::hw::AD7147::two, skconfig);      
+    embot::hw::ad7147::Config skconfig { embot::hw::i2c::Descriptor { embot::hw::I2C::one, i2cspeed } };
+    rr1 = embot::hw::ad7147::init(embot::hw::AD7147::one, skconfig);
+    rr2 = embot::hw::ad7147::init(embot::hw::AD7147::two, skconfig);      
 //        
-//    rr1 = rr1;
-//    rr2 = rr2;
+    rr1 = rr1;
+    rr2 = rr2;
     
 #endif
     
@@ -347,6 +376,8 @@ volatile embot::core::Time imu_stop {0};
 
 std::tuple<int16_t, int16_t, int16_t> acc2transmit {0, 0, 0};
 std::pair<uint32_t, uint32_t> adc2transmit {0, 0};
+std::array<uint16_t, 24> cdc2transmit = {0};
+
 embot::core::Time imu_acquisitiontime {0};
 
 embot::hw::bno055::Data data {};
@@ -439,6 +470,59 @@ static void s_adc_get()
     adc2transmit = {v.v1, v.v2};
 }
 
+void alertCDC1isready(void *p)
+{
+    thr->setEvent(evtCDC1ready);
+}
+
+void alertCDC2isready(void *p)
+{
+    thr->setEvent(evtCDC2ready);
+}
+
+static void s_cdc_start(embot::hw::AD7147 cdc)
+{
+    embot::core::Callback cbk((embot::hw::AD7147::one == cdc) ? alertCDC1isready : alertCDC2isready, nullptr); 
+    
+    
+    // in here i should call the start of acquisition and pass the cbk so that at the end of it it can be called
+    // however now i call it directly
+    cbk.execute();
+    
+}
+
+static void s_cdc_get(embot::hw::AD7147 cdc)
+{
+    uint16_t values[12] = {0};
+    // in here i should read the 12 values directly from the device 
+    // but for i di fake acquisition
+    
+    // fake retrieval
+    static uint16_t offset = 0;
+    for(int i=0; i<12; i++)
+    {
+        values[i] = offset + i;
+    }
+    
+    offset += 16;
+    
+    if(embot::hw::AD7147::one == cdc)
+    {
+        for(int i=0; i<12; i++)
+        {
+            cdc2transmit[i+0] = values[i];
+        }
+    }
+    else
+    {
+        for(int i=0; i<12; i++)
+        {
+            cdc2transmit[i+12] = values[i];
+        }        
+    }
+    
+}
+
 bool s_print_values(const std::tuple<int16_t, int16_t, int16_t> &acc, const std::pair<uint32_t, uint32_t> &adc);
 
 static void s_transmit()
@@ -450,7 +534,7 @@ static void s_transmit()
 
 bool s_print_values(const std::tuple<int16_t, int16_t, int16_t> &acc, const std::pair<uint32_t, uint32_t> &adc)
 {   
-    char text[64] = {0};
+    char text[128] = {0};
     
 #if defined(enableSERIAL) && defined(enableSERIAL_string)
 
@@ -516,6 +600,21 @@ bool s_print_values(const std::tuple<int16_t, int16_t, int16_t> &acc, const std:
     text[pos++] =  (tmp & 0x00ff0000) >> 16;
     text[pos++] =  (tmp & 0x0000ff00) >> 8;
     text[pos++] =  (tmp & 0x000000ff); 
+    
+    // so far we have used 20 bytes.
+    
+    // cdc -> 24 values, each with 2 bytes .... but we use four -> total = 96 bytes
+    
+    for(int i=0; i<cdc2transmit.size(); i++)
+    {
+        tmp = cdc2transmit[i];
+        text[pos++] =  (tmp & 0xff000000) >> 24;
+        text[pos++] =  (tmp & 0x00ff0000) >> 16;
+        text[pos++] =  (tmp & 0x0000ff00) >> 8;
+        text[pos++] =  (tmp & 0x000000ff); 
+    }
+    // total bytes = 20 + 96 = 116
+    // it takes about S0:m1:u327 to transmit the 116 bytes 
 
     // at the end we add a new line.
     // the new line in binary value is 0x0A ... do we really need to transmit it? 
@@ -540,9 +639,9 @@ bool s_print_values(const std::tuple<int16_t, int16_t, int16_t> &acc, const std:
     embot::core::Time t0 = embot::core::now();
     HAL_UART_Transmit(&huart3, reinterpret_cast<uint8_t*>(text), pos, 0xFFFF);
     
-#if defined(enableTRACE_all)     
+//#if defined(enableTRACE_all)     
     embot::hw::sys::puts(std::string("USART TX time: ") + embot::core::TimeFormatter(embot::core::now()-t0).to_string());
-#endif
+//#endif
 
 #endif
  

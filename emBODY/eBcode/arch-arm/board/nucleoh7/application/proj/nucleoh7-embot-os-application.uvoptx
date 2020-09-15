@@ -152,66 +152,50 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
-          <LineNumber>498</LineNumber>
+          <LineNumber>639</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>135282734</Address>
+          <Address>135282590</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\..\..\..\embot\hw\embot_hw_ad7147.cpp</Filename>
+          <Filename>../src/main-nucleoh7-embot-os-application.cpp</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\nucleoh7\../../../../embot/hw/embot_hw_ad7147.cpp\498</Expression>
+          <Expression>\\nucleoh7\../src/main-nucleoh7-embot-os-application.cpp\639</Expression>
         </Bp>
         <Bp>
           <Number>1</Number>
           <Type>0</Type>
-          <LineNumber>496</LineNumber>
+          <LineNumber>639</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>135282698</Address>
+          <Address>135282598</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\..\..\..\embot\hw\embot_hw_ad7147.cpp</Filename>
+          <Filename>../src/main-nucleoh7-embot-os-application.cpp</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\nucleoh7\../../../../embot/hw/embot_hw_ad7147.cpp\496</Expression>
+          <Expression>\\nucleoh7\../src/main-nucleoh7-embot-os-application.cpp\639</Expression>
         </Bp>
         <Bp>
           <Number>2</Number>
           <Type>0</Type>
-          <LineNumber>492</LineNumber>
+          <LineNumber>639</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>135282680</Address>
+          <Address>135282604</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\..\..\..\embot\hw\embot_hw_ad7147.cpp</Filename>
+          <Filename>../src/main-nucleoh7-embot-os-application.cpp</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\nucleoh7\../../../../embot/hw/embot_hw_ad7147.cpp\492</Expression>
-        </Bp>
-        <Bp>
-          <Number>3</Number>
-          <Type>0</Type>
-          <LineNumber>622</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>135273230</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\..\..\..\embot\hw\embot_hw_i2c.cpp</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\nucleoh7\../../../../embot/hw/embot_hw_i2c.cpp\622</Expression>
+          <Expression>\\nucleoh7\../src/main-nucleoh7-embot-os-application.cpp\639</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -235,12 +219,39 @@
           <WinNumber>1</WinNumber>
           <ItemText>s_privatedata</ItemText>
         </Ww>
+        <Ww>
+          <count>4</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>pos,0x0A</ItemText>
+        </Ww>
+        <Ww>
+          <count>5</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>text</ItemText>
+        </Ww>
+        <Ww>
+          <count>6</count>
+          <WinNumber>1</WinNumber>
+          <ItemText>cdc2transmit</ItemText>
+        </Ww>
       </WatchWindow1>
+      <WatchWindow2>
+        <Ww>
+          <count>0</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>values</ItemText>
+        </Ww>
+        <Ww>
+          <count>1</count>
+          <WinNumber>2</WinNumber>
+          <ItemText>cdc2transmit</ItemText>
+        </Ww>
+      </WatchWindow2>
       <MemoryWindow1>
         <Mm>
           <WinNumber>1</WinNumber>
           <SubType>0</SubType>
-          <ItemText>content.pointer</ItemText>
+          <ItemText>values</ItemText>
           <AccSizeX>0</AccSizeX>
         </Mm>
       </MemoryWindow1>
@@ -250,7 +261,7 @@
       <DebugFlag>
         <trace>0</trace>
         <periodic>0</periodic>
-        <aLwin>1</aLwin>
+        <aLwin>0</aLwin>
         <aCover>0</aCover>
         <aSer1>0</aSer1>
         <aSer2>0</aSer2>
@@ -298,7 +309,7 @@
 
   <Group>
     <GroupName>main</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -414,7 +425,7 @@
 
   <Group>
     <GroupName>embot-hw</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
@@ -702,7 +713,7 @@
 
   <Group>
     <GroupName>others</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>
