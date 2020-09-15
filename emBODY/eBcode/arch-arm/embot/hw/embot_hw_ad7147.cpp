@@ -460,7 +460,8 @@ volatile uint16_t datav {0};
         s_privatedata.i2caddress[index] = embot::hw::bsp::ad7147::getBSP().getPROP(s)->i2caddress;
         s_privatedata.config[index] = config;
         s_privatedata.acquisition[index].clear();
-        
+
+#if defined(TEST_RW)        
         // ora leggo il Device ID Register in address 0x017
         
         // devo usare registri a due bytes.
@@ -540,7 +541,8 @@ volatile uint16_t datav {0};
 
 #endif // WIP
      
-   
+#endif // #if defined(TEST_RW) 
+
         embot::core::binary::bit::set(initialisedmask, embot::core::tointegral(s));
                 
         return resOK;
@@ -673,7 +675,7 @@ volatile uint16_t datav {0};
 
 
 
-#endif //defined(EMBOT_AD7147_ENABLED)
+#endif //defined(EMBOT_ENABLE_hw_ad7147)
 
 
     
