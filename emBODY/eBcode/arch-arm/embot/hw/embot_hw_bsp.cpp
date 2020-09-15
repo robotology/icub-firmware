@@ -690,6 +690,43 @@ namespace embot { namespace hw { namespace bsp { namespace can {
             MX_FDCAN2_Init();
         }
     }
+
+    #elif   defined(STM32HAL_BOARD_PMC)
+    
+    // it has HAL_FDCAN_MODULE_ENABLED
+    
+    constexpr PROP can1p = { .handle = &hfdcan1 }; 
+//    constexpr PROP can2p = { .handle = &hfdcan2 };    
+        
+    constexpr BSP thebsp {        
+        // maskofsupported
+        mask::pos2mask<uint32_t>(CAN::one),        
+        // properties
+        {{
+            &can1p           
+        }}        
+    };
+    
+//    constexpr BSP thebsp {        
+//        // maskofsupported
+//        mask::pos2mask<uint32_t>(CAN::one) | mask::pos2mask<uint32_t>(CAN::two),        
+//        // properties
+//        {{
+//            &can1p, &can2p           
+//        }}        
+//    };
+    
+    void BSP::init(embot::hw::CAN h) const 
+    {
+        if(h == CAN::one)
+        {            
+            MX_FDCAN1_Init();
+        }
+//        else if(h == CAN::two)
+//        {            
+//            MX_FDCAN2_Init();
+//        }
+    }
     
     #else
         #error embot::hw::bsp::can::thebsp must be defined    
@@ -856,14 +893,14 @@ namespace embot { namespace hw { namespace bsp { namespace flash {
     #elif   defined(STM32HAL_BOARD_NUCLEOH7)          
         #error pls define    
 
-   #elif   defined(STM32HAL_BOARD_STM32G4EVAL )
+   #elif   defined(STM32HAL_BOARD_STM32G4EVAL)
 
 // acemor          
         // application @ 128k
         constexpr PROP whole                {{0x08000000,               (512)*1024,         2*1024}}; 
         constexpr PROP bootloader           {{0x08000000,               (126)*1024,         2*1024}};   // bootloader
         constexpr PROP sharedstorage        {{0x08000000+(126*1024),    (2)*1024,           2*1024}};   // sharedstorage: on top of bootloader
-        constexpr PROP application          {{0x08000000+(128*1024),    (256+124)*1024,     2*1024}};   // application @ 080k
+        constexpr PROP application          {{0x08000000+(128*1024),    (256+124)*1024,     2*1024}};   // application @ 128k
         constexpr PROP applicationstorage   {{0x08000000+(508*1024),    (4)*1024,           2*1024}};   // applicationstorage: on top of application            
  
 #if 0     
@@ -873,7 +910,25 @@ namespace embot { namespace hw { namespace bsp { namespace flash {
         constexpr PROP application          {{0x08000000+(0*1024),     (252)*1024,         2*1024}};   // application @ 080k
         constexpr PROP applicationstorage   {{0x08000000+(252*1024),    (4)*1024,           2*1024}};   // applicationstorage: on top of application            
 #endif
-        
+
+
+   #elif   defined(STM32HAL_BOARD_PMC)
+
+// acemor          
+        // application @ 128k
+        constexpr PROP whole                {{0x08000000,               (512)*1024,         2*1024}}; 
+        constexpr PROP bootloader           {{0x08000000,               (126)*1024,         2*1024}};   // bootloader
+        constexpr PROP sharedstorage        {{0x08000000+(126*1024),    (2)*1024,           2*1024}};   // sharedstorage: on top of bootloader
+        constexpr PROP application          {{0x08000000+(128*1024),    (256+124)*1024,     2*1024}};   // application @ 128k
+        constexpr PROP applicationstorage   {{0x08000000+(508*1024),    (4)*1024,           2*1024}};   // applicationstorage: on top of application            
+ 
+#if 0     
+        constexpr PROP whole                {{0x08000000,               (512)*1024,         2*1024}}; 
+        constexpr PROP bootloader           {{0x08000000+(256+2)*1014,               (128)*1024,          2*1024}};   // bootloader
+        constexpr PROP sharedstorage        {{0x08000000+(256*1024),     (2)*1024,           2*1024}};   // sharedstorage: on top of bootloader
+        constexpr PROP application          {{0x08000000+(0*1024),     (252)*1024,         2*1024}};   // application @ 080k
+        constexpr PROP applicationstorage   {{0x08000000+(252*1024),    (4)*1024,           2*1024}};   // applicationstorage: on top of application            
+#endif
     #else
         #error embot::hw::bsp::flash::thebsp must be defined    
     #endif   
