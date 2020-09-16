@@ -121,6 +121,8 @@
     #define EMBOT_ENABLE_hw_gpio
     #define EMBOT_ENABLE_hw_led
     #define EMBOT_ENABLE_hw_can
+    #define EMBOT_ENABLE_hw_i2c
+    #define EMBOT_ENABLE_hw_tlv493d
     //#define EMBOT_ENABLE_hw_button
     
     

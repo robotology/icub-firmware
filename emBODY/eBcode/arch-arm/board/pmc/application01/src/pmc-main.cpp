@@ -83,15 +83,29 @@ int main(void)
 
 // - here is the tailoring of the board.
 
+#define enableTRACE_all
+
 
 #include "embot_os_theScheduler.h"
 #include "embot_app_theLEDmanager.h"
 #include "embot_app_application_theCANparserBasic.h"
-
-
 #include "embot_app_application_theCANtracer.h"
 
+#include "embot_hw_tlv493d.h"
+#include "embot_hw_bsp.h"
 
+constexpr embot::os::Event evtTick = embot::core::binary::mask::pos2mask<embot::os::Event>(0);
+constexpr embot::core::relTime tickperiod = 2000*embot::core::time1millisec;
+
+constexpr embot::os::Event evtReadFAP = embot::core::binary::mask::pos2mask<embot::os::Event>(1);
+embot::hw::tlv493d::Position positionFAP = 0;
+
+
+void alertFAPdataisready(void *p)
+{
+    embot::os::Thread *t = reinterpret_cast<embot::os::Thread*>(p);    
+    t->setEvent(evtReadFAP);     
+}
 
 
 void mySYS::userdefOnIdle(embot::os::Thread *t, void* idleparam) const
@@ -113,9 +127,9 @@ void mySYS::userdefInit_Extra(embot::os::EventThread* evthr, void *initparam) co
     // inside the init thread: put the init of many things ...  
     
     // led manager
-    static const std::initializer_list<embot::hw::LED> allleds = {embot::hw::LED::one};  
+    static const std::initializer_list<embot::hw::LED> alltheleds = {embot::hw::LED::one};  
     embot::app::theLEDmanager &theleds = embot::app::theLEDmanager::getInstance();     
-    theleds.init(allleds);    
+    theleds.init(alltheleds);    
     theleds.get(embot::hw::LED::one).pulse(embot::core::time1second); 
 
     // init of can basic paser
@@ -133,12 +147,22 @@ void mySYS::userdefInit_Extra(embot::os::EventThread* evthr, void *initparam) co
 //    embot::app::application::theCANparserIMU::Config configparserimu { &theimu };
 //    canparserimu.initialise(configparserimu);   
           
-              
+    
 }
 
 void myEVT::userdefStartup(embot::os::Thread *t, void *param) const
 {
     // inside startup of evnt thread: put the init of many things ... 
+    
+    // init the fap
+    
+    embot::hw::tlv493d::init(embot::hw::TLV493D::one, {embot::hw::bsp::tlv493d::getBSP().getPROP(embot::hw::TLV493D::one)->i2cbus, 400000});
+    
+    // start a timer which sends an event which forces an acquisition from the FAP  
+    embot::os::Timer *tmr = new embot::os::Timer;   
+    embot::os::Action act(embot::os::EventToThread(evtTick, t));
+    embot::os::Timer::Config cfg{tickperiod, act, embot::os::Timer::Mode::forever, 0};
+    tmr->start(cfg);     
  
     // maybe we start the tx of ft data straight away
 #if defined(DEBUG_atstartup_tx_FTdata)
@@ -170,6 +194,38 @@ void myEVT::userdefOnEventRXcanframe(embot::os::Thread *t, embot::os::EventMask 
 
 void myEVT::userdefOnEventANYother(embot::os::Thread *t, embot::os::EventMask eventmask, void *param, std::vector<embot::prot::can::Frame> &outframes) const
 {
+    
+    static embot::core::Time startOfFAPacquisition = 0;
+    
+    if(true == embot::core::binary::mask::check(eventmask, evtTick)) 
+    {
+        startOfFAPacquisition = embot::core::now();
+#if defined(enableTRACE_all)        
+        embot::core::TimeFormatter tf(startOfFAPacquisition);        
+        embot::core::print("userdefOnEventANYother() -> evtTick received @ time = " + tf.to_string());    
+#endif  
+
+        embot::core::print("::userdefOnEventANYother() -> called a reading of chip TLV493D on fap board");    
+        embot::core::Callback cbk00(alertFAPdataisready, t);
+        embot::hw::tlv493d::acquisition(embot::hw::TLV493D::one, cbk00);        
+    }
+    
+    if(true == embot::core::binary::mask::check(eventmask, evtReadFAP)) 
+    {
+        embot::core::Time tnow = embot::core::now();
+#if defined(enableTRACE_all)        
+        embot::core::TimeFormatter tf(tnow);        
+        embot::core::print("userdefOnEventANYother() -> evtReadFAP received @ time = " + tf.to_string() + 
+                           " acquisition time = " + embot::core::TimeFormatter(tnow-startOfFAPacquisition).to_string());    
+#endif  
+
+        if(embot::hw::resOK != embot::hw::tlv493d::read(embot::hw::TLV493D::one, positionFAP))
+        {
+            positionFAP = 66666;
+        }
+        
+        embot::core::print("FAP pos = " + std::to_string(0.01 * positionFAP) + "deg");        
+    }      
     
 //    if(true == embot::core::binary::mask::check(eventmask, evIMUtick))
 //    {        

@@ -1729,6 +1729,29 @@ namespace embot { namespace hw { namespace bsp { namespace i2c {
             MX_I2C3_Init();
         }        
     }
+    
+    #elif   defined(STM32HAL_BOARD_PMC)
+    
+    constexpr PROP i2c3p { .handle = &hi2c3 };
+
+        
+    constexpr BSP thebsp {        
+        // maskofsupported   
+        mask::pos2mask<uint32_t>(I2C::three),         
+        // properties
+        {{       
+            nullptr, nullptr, &i2c3p
+        }}        
+    }; 
+
+    void BSP::init(embot::hw::I2C h) const
+    {
+        if(h == I2C::three)
+        {            
+            MX_I2C3_Init();
+        }        
+    }
+    
     #else
         #error embot::hw::bsp::i2c::thebsp must be defined    
     #endif
@@ -2357,7 +2380,22 @@ namespace embot { namespace hw { namespace bsp { namespace tlv493d {
     };
     
     void BSP::init(embot::hw::TLV493D h) const {}
+
+    #elif defined(STM32HAL_BOARD_PMC)
     
+    constexpr PROP prop01 { .i2cbus = embot::hw::I2C::three, .i2caddress = 0xBC }; 
+
+    constexpr BSP thebsp {        
+        // maskofsupported
+        mask::pos2mask<uint32_t>(TLV493D::one),        
+        // properties
+        {{
+            &prop01
+        }}        
+    };
+    
+    void BSP::init(embot::hw::TLV493D h) const {}
+        
     #else
         #error embot::hw::bsp::tlv493d::thebsp must be defined    
     #endif
