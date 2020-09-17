@@ -66,6 +66,8 @@ namespace embot { namespace hw {
         cfg.tick1ms_init = config.initmicrotime;
         cfg.tick1ms_get = _get1millitick;       
         stm32hal_init(&cfg);
+        
+        embot::hw::bsp::init();
                       
         initted = true;
         return true;

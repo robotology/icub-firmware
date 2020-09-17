@@ -60,7 +60,7 @@ namespace embot { namespace hw {
     
     struct GPIO
     { 
-        enum class PORT : std::uint8_t { A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6, H = 7, none = 31, maxnumberof = 8 };   
+        enum class PORT : std::uint8_t { A = 0, B = 1, C = 2, D = 3, E = 4, F = 5, G = 6, H = 7, I = 8, J = 9, K = 10, none = 31, maxnumberof = 11 };   
         enum class PIN : std::uint8_t { zero = 0, one = 1, two = 2, three = 3, four = 4, five = 5, six = 6, seven = 7, eight = 8, nine = 9, 
                                         ten = 10, eleven = 11, twelve = 12, thirteen = 13, fourteen = 14, fifteen = 15, none = 31, maxnumberof = 16 };
             
