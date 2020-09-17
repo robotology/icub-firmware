@@ -109,6 +109,17 @@ extern "C" {
     #else
         #error unknown driver version
     #endif
+
+#elif   defined(STM32HAL_BOARD_STM32H745DISCO)
+    
+    #if (STM32HAL_DRIVER_VERSION == 0x190)
+        #define USE_FULL_LL_DRIVER
+        #include "../src/config/stm32hal_driver_cfg_of_stm32h745disco_v190.h"   
+        // we also need some ll includes contained in the driver section
+        #include "../src/driver/stm32h7-v190/inc/stm32h7xx_ll_gpio.h"
+    #else
+        #error unknown driver version
+    #endif
     
 #else
 

@@ -312,6 +312,24 @@ extern void stm32hal_board_init(void);
     #else
         #error unsupported driver version for pmc
     #endif
+
+
+#elif   defined(STM32HAL_BOARD_STM32H745DISCO) 
+
+    // one case only: v190
+    #if (STM32HAL_DRIVER_VERSION == 0x190)
+
+        #include "../src/config/stm32hal_driver_cfg_of_stm32h745disco_v190.h"
+
+        #include "../src/board/stm32h745disco/v190/inc/gpio.h"
+        #include "../src/board/stm32h745disco/v190/inc/main.h"
+
+        #include "../src/board/stm32h745disco/v190/inc/stm32h7xx_it.h"
+
+    #else
+        #error unsupported driver version for stm32h745disco
+    #endif
+
     
 #else
     #error STM32HAL: you must define a STM32HAL_BOARD_${B}
