@@ -89,7 +89,8 @@ int itm_puts(const char* str)
 
 #if defined(STM32HAL_BOARD_STM32H745DISCO)
     
-    // led1 is on PJ2, led 2 is on PI13
+    // user button is on PC13
+    // led1 green is on PJ2, led2 red is on PI13
 //    static GPIO_TypeDef * GPIOLED = GPIOJ;
 //    static const uint16_t PinLED = GPIO_PIN_2;
 //    static void clockEnableLED() {  __HAL_RCC_GPIOJ_CLK_ENABLE(); }

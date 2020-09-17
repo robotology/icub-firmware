@@ -391,12 +391,16 @@ namespace embot { namespace app {
                 return true;
             }
             
-            // every led initalisation is done in the bsp ...
+            // the GPIOs of all the LEDs may have been initialised by the cube-mx code
+            // called by stm32hal_init() inside embot::hw::init() but ... maybe not. 
+            // better to init the LED anyway
             
             if(!embot::hw::initialised())
             {   // requires embot::hw::bsp::init()
                 return false;
-            }
+            }   
+            
+            embot::hw::led::init(led);
                     
             embot::core::binary::bit::set(initialisedmask, embot::core::tointegral(led));
             

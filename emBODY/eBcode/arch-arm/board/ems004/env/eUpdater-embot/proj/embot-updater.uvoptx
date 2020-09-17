@@ -1884,7 +1884,7 @@
   </Group>
 
   <Group>
-    <GroupName>embot::hw::sys::puts</GroupName>
+    <GroupName>embot::hw::sys</GroupName>
     <tvExp>1</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
@@ -1898,6 +1898,26 @@
       <bDave2>0</bDave2>
       <PathWithFileName>..\..\..\..\common\env\eUpdater-embot\embotfake\embot_hw_sys_puts.cpp</PathWithFileName>
       <FilenameWithoutPath>embot_hw_sys_puts.cpp</FilenameWithoutPath>
+      <RteFlg>0</RteFlg>
+      <bShared>0</bShared>
+    </File>
+  </Group>
+
+  <Group>
+    <GroupName>embot::hw:bsp</GroupName>
+    <tvExp>1</tvExp>
+    <tvExpOptDlg>0</tvExpOptDlg>
+    <cbSel>0</cbSel>
+    <RteFlg>0</RteFlg>
+    <File>
+      <GroupNumber>15</GroupNumber>
+      <FileNumber>70</FileNumber>
+      <FileType>8</FileType>
+      <tvExp>0</tvExp>
+      <tvExpOptDlg>0</tvExpOptDlg>
+      <bDave2>0</bDave2>
+      <PathWithFileName>..\..\..\..\common\env\eUpdater-embot\embotfake\embot_hw_bsp_init.cpp</PathWithFileName>
+      <FilenameWithoutPath>embot_hw_bsp_init.cpp</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

@@ -116,7 +116,8 @@ namespace embot { namespace hw { namespace sys {
             default:
             case embot::hw::CLOCK::syscore:
             {
-                value = HAL_RCC_GetHCLKFreq();
+                //value = HAL_RCC_GetHCLKFreq(); it has a bug for H7 ??
+                value = SystemCoreClock;
             } break;            
         }   
         return value;

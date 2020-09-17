@@ -805,12 +805,22 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>embot::hw::sys::puts</GroupName>
+          <GroupName>embot::hw::sys</GroupName>
           <Files>
             <File>
               <FileName>embot_hw_sys_puts.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\common\env\eUpdater-embot\embotfake\embot_hw_sys_puts.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>embot::hw:bsp</GroupName>
+          <Files>
+            <File>
+              <FileName>embot_hw_bsp_init.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\common\env\eUpdater-embot\embotfake\embot_hw_bsp_init.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1687,12 +1697,22 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>embot::hw::sys::puts</GroupName>
+          <GroupName>embot::hw::sys</GroupName>
           <Files>
             <File>
               <FileName>embot_hw_sys_puts.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\common\env\eUpdater-embot\embotfake\embot_hw_sys_puts.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>embot::hw:bsp</GroupName>
+          <Files>
+            <File>
+              <FileName>embot_hw_bsp_init.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\common\env\eUpdater-embot\embotfake\embot_hw_bsp_init.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -2569,12 +2589,22 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>embot::hw::sys::puts</GroupName>
+          <GroupName>embot::hw::sys</GroupName>
           <Files>
             <File>
               <FileName>embot_hw_sys_puts.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\common\env\eUpdater-embot\embotfake\embot_hw_sys_puts.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>embot::hw:bsp</GroupName>
+          <Files>
+            <File>
+              <FileName>embot_hw_bsp_init.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\common\env\eUpdater-embot\embotfake\embot_hw_bsp_init.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -3451,12 +3481,22 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>embot::hw::sys::puts</GroupName>
+          <GroupName>embot::hw::sys</GroupName>
           <Files>
             <File>
               <FileName>embot_hw_sys_puts.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\common\env\eUpdater-embot\embotfake\embot_hw_sys_puts.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>embot::hw:bsp</GroupName>
+          <Files>
+            <File>
+              <FileName>embot_hw_bsp_init.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\common\env\eUpdater-embot\embotfake\embot_hw_bsp_init.cpp</FilePath>
             </File>
           </Files>
         </Group>

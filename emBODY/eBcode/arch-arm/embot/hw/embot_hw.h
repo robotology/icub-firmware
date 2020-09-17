@@ -43,7 +43,34 @@ namespace embot { namespace hw {
     bool init(const Config &config);       
 }}
 
+//namespace embot { namespace hw { 
+//    
+//    // this funtion is called inside embot::hw::init() just after stm32hal_init()
+//    // it can be empty. in such a case, the settings executed by stm32hal_init() remain.
+//    // but also it can be filled with whatever required to complete or override what stm32hal_init() did.
+//    // for example you can use it to change the clock tree without changing the stm32hal library   
+//    // the file embot_hw.cpp does not contain the implementation of such a function. 
+//    // you should put it for instance inside the bsp files.
+//    
+//    // marco.accame: and yes, in case you are wondering the name of this function is from a bike brand. 
+//    // i just hope they read this comment and deliver me an S-Works Epic Hardtail ;-).
+//    
+//    void specialize();
+//    
+//}}
 
+namespace embot { namespace hw { namespace bsp {
+    
+    // this funtion is called inside embot::hw::init() just after stm32hal_init()
+    // it can be empty. in such a case, the settings executed by stm32hal_init() remain.
+    // but also it can be filled with whatever required to complete or override what stm32hal_init() did.
+    // for example you can use it to change the clock tree without changing the stm32hal library   
+    // the file embot_hw.cpp does not contain the implementation of such a function. 
+    // you should put it inside the bsp files.
+       
+    void init();
+    
+}}}
 
 
 #endif  // include-guard
