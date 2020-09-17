@@ -228,7 +228,7 @@ volatile bool resu {true};
 
     embot::os::PeriodicThread::Config pc { 
         1024, 
-        embot::os::Priority::medium100, 
+        embot::os::Priority::normal24, 
         nullptr, nullptr,
         100*embot::core::time1millisec,
         [](embot::os::Thread *t, void *param) { 
@@ -249,7 +249,7 @@ volatile bool resu {true};
     
     embot::os::EventThread::Config configEV { 
         6*1024, 
-        embot::os::Priority::high200, 
+        embot::os::Priority::high40, 
         eventbasedthread_startup,
         nullptr,
         50*embot::core::time1millisec,

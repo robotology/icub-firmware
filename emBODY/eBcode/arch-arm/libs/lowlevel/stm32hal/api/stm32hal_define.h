@@ -219,6 +219,23 @@ extern "C" {
     #define STM32HAL_STM32G4
     #endif  
 
+#elif   defined(STM32HAL_BOARD_STM32H745DISCO)
+
+    // it has a STM32H745xx mpu
+    #if !defined(STM32H745xx)
+    #define STM32H745xx
+    #endif  
+
+    // of family STM32H7
+    #if !defined(STM32H7)
+    #define STM32H7
+    #endif  
+
+    // of family STM32H7 but in STM32HAL_ format  
+    #if !defined(STM32HAL_STM32H7)
+    #define STM32HAL_STM32H7
+    #endif  
+    
 #else
         #error STM32HAL: you must define a STM32HAL_BOARD_${BRD}
 #endif
