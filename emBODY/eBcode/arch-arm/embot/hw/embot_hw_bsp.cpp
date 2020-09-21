@@ -1121,10 +1121,10 @@ void CAN1_RX0_IRQHandler(void)
             HAL_FDCAN_IRQHandler(&hfdcan1);
         }  
         
-        void FDCAN2_IT0_IRQHandler(void)
-        {
-            HAL_FDCAN_IRQHandler(&hfdcan2);
-        }      
+//        void FDCAN2_IT0_IRQHandler(void)
+//        {
+//            HAL_FDCAN_IRQHandler(&hfdcan2);
+//        }      
 
     #endif
         
