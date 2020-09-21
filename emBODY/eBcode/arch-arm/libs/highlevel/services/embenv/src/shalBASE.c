@@ -149,7 +149,14 @@ typedef uint8_t verify_size_t[(SHALBASE_RAMSIZE > sizeof(baseIPCdataStorage_t)) 
 #if !defined(USE_STM32HAL) 
 static volatile baseIPCdataStorage_t s_shalbase_IPCdataStored         __attribute__((section(".ARM.__at_0x2001FFC0")));
 #else
+#if defined(STM32HAL_BOARD_STM32H745DISCO)
+static volatile baseIPCdataStorage_t s_shalbase_IPCdataStored         __attribute__((section(".ARM.__at_0x24000000")));
+#elif defined(STM32HAL_BOARD_STM32G4EVAL)
 static volatile baseIPCdataStorage_t s_shalbase_IPCdataStored         __attribute__((section(".ARM.__at_0x20000000")));
+#else
+#error specify location of ram start
+#endif
+
 #endif
 #else
 // this variable is placed in NZI section. it is used for ipc

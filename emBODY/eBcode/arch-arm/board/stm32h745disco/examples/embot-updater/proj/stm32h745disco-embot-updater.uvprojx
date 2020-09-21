@@ -7,7 +7,7 @@
 
   <Targets>
     <Target>
-      <TargetName>demo-embot-cmsisos2</TargetName>
+      <TargetName>ethdemo-cmsisos2</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <pCCUsed>6140000::V6.14::ARMCLANG</pCCUsed>
@@ -49,7 +49,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\obj\</OutputDirectory>
-          <OutputName>g4eval</OutputName>
+          <OutputName>h7eth</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>1</CreateHexFile>
@@ -138,7 +138,7 @@
           </Flash1>
           <bUseTDR>1</bUseTDR>
           <Flash2>BIN\UL2CM3.DLL</Flash2>
-          <Flash3>"" ()</Flash3>
+          <Flash3></Flash3>
           <Flash4></Flash4>
           <pFcarmOut></pFcarmOut>
           <pFcarmGrp></pFcarmGrp>
@@ -336,10 +336,10 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls>-Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_cmsisos2 </MiscControls>
-              <Define>USE_STM32HAL STM32HAL_BOARD_STM32H745DISCO STM32HAL_DRIVER_V190</Define>
+              <MiscControls>-Wno-pragma-pack -Wno-deprecated-register -DBOARD_ems4 -DEMBOT_USE_rtos_cmsisos2</MiscControls>
+              <Define>USE_ZERO_OFFSET EMBOBJ_USE_EMBOT USE_STM32HAL STM32HAL_BOARD_STM32H745DISCO STM32HAL_DRIVER_V190</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\cmsisos2\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\embot\app</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\cmsisos2\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\embobj\plus\ipnet;..\..\..\..\..\embobj\plus\embenv;..\src\emb-env;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\prot\eth</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -370,7 +370,7 @@
             <TextAddressRange>0x08000000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile>.\nucleoh7-application0offset.sct</ScatterFile>
+            <ScatterFile>.\stm32h745disco-application0offset.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc>--diag_suppress=L6329</Misc>
@@ -382,13 +382,6 @@
       <Groups>
         <Group>
           <GroupName>main</GroupName>
-          <Files>
-            <File>
-              <FileName>main-basic.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>../src/main-basic.cpp</FilePath>
-            </File>
-          </Files>
         </Group>
         <Group>
           <GroupName>stm32hal</GroupName>
@@ -614,6 +607,62 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_can.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_flash.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_flash.cpp</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds>
+                  <Cads>
+                    <interw>2</interw>
+                    <Optim>0</Optim>
+                    <oTime>2</oTime>
+                    <SplitLS>2</SplitLS>
+                    <OneElfS>2</OneElfS>
+                    <Strict>2</Strict>
+                    <EnumInt>2</EnumInt>
+                    <PlainCh>2</PlainCh>
+                    <Ropi>2</Ropi>
+                    <Rwpi>2</Rwpi>
+                    <wLevel>0</wLevel>
+                    <uThumb>2</uThumb>
+                    <uSurpInc>2</uSurpInc>
+                    <uC99>2</uC99>
+                    <uGnu>2</uGnu>
+                    <useXO>2</useXO>
+                    <v6Lang>0</v6Lang>
+                    <v6LangP>0</v6LangP>
+                    <vShortEn>2</vShortEn>
+                    <vShortWch>2</vShortWch>
+                    <v6Lto>2</v6Lto>
+                    <v6WtE>2</v6WtE>
+                    <v6Rtti>2</v6Rtti>
+                    <VariousControls>
+                      <MiscControls></MiscControls>
+                      <Define></Define>
+                      <Undefine></Undefine>
+                      <IncludePath></IncludePath>
+                    </VariousControls>
+                  </Cads>
+                </FileArmAds>
+              </FileOption>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -668,6 +717,301 @@
               <FileName>embot_app_theLEDmanager.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\app\embot_app_theLEDmanager.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>abslayer</GroupName>
+          <Files>
+            <File>
+              <FileName>ipal.base.medium.cm4.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\ipal\lib\ipal.base.medium.cm4.lib</FilePath>
+            </File>
+            <File>
+              <FileName>ipal_cfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\ipal_cfg.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>updater-app</GroupName>
+          <Files>
+            <File>
+              <FileName>main.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>../src/main.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>eupdater.c</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\eupdater.c</FilePath>
+            </File>
+            <File>
+              <FileName>eupdater_parser.c</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\eupdater_parser.c</FilePath>
+            </File>
+            <File>
+              <FileName>eupdater_cangtw.c</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\eupdater_cangtw.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_sm_cangtw.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\eOcfg_sm_cangtw.c</FilePath>
+            </File>
+            <File>
+              <FileName>eupdater-info.c</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\eupdater-info.c</FilePath>
+            </File>
+            <File>
+              <FileName>updater-core.c</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\updater-core.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoUpdaterProtocol.c</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub\EoUpdaterProtocol.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>eo-core</GroupName>
+          <Files>
+            <File>
+              <FileName>EOaction.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOaction.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOarray.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOarray.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoCommon.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EoCommon.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOconstarray.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOconstarray.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOconstvector.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOconstvector.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOdeque.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOdeque.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOfifo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOfifo.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOfifoByte.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOfifoByte.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOfifoWord.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOfifoWord.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOlist.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOlist.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOpacket.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOpacket.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOsm.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOsm.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOtheErrorManager.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOtheErrorManager.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOtheLEDpulser.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOtheLEDpulser.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOtheMemoryPool.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOtheMemoryPool.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOtimer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOtimer.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOumlsm.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOumlsm.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOvector.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOvector.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOVmutex.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOVmutex.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOVtask.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOVtask.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOVtheCallbackManager.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOVtheCallbackManager.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOVtheSystem.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOVtheSystem.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOVtheTimerManager.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOVtheTimerManager.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>eo-mee-embot</GroupName>
+          <Files>
+            <File>
+              <FileName>EOMmutex.embot.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embobj\core\exec\multitask\embot\EOMmutex.embot.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtask.embot.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embobj\core\exec\multitask\embot\EOMtask.embot.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheCallbackManager.embot.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embobj\core\exec\multitask\embot\EOMtheCallbackManager.embot.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheSystem.embot.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embobj\core\exec\multitask\embot\EOMtheSystem.embot.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheTimerManager.embot.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embobj\core\exec\multitask\embot\EOMtheTimerManager.embot.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>eo-ipnet</GroupName>
+          <Files>
+            <File>
+              <FileName>EOMtheIPnet.c</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embobj\plus\ipnet\EOMtheIPnet.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOsocket.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\embobj\plus\ipnet\EOsocket.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOsocketDatagram.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\embobj\plus\ipnet\EOsocketDatagram.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOVtheIPnet.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\embobj\plus\ipnet\EOVtheIPnet.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>eo-arm-env</GroupName>
+          <Files>
+            <File>
+              <FileName>EOtheARMenvironment.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\embobj\plus\embenv\EOtheARMenvironment.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOVtheEnvironment.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\embobj\plus\embenv\EOVtheEnvironment.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>arm-services-embenv</GroupName>
+          <Files>
+            <File>
+              <FileName>eEcommon.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\libs\highlevel\services\embenv\src\eEcommon.c</FilePath>
+            </File>
+            <File>
+              <FileName>eEsharedServices.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\libs\highlevel\services\embenv\src\eEsharedServices.c</FilePath>
+            </File>
+            <File>
+              <FileName>shalBASE.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\libs\highlevel\services\embenv\src\shalBASE.c</FilePath>
+            </File>
+            <File>
+              <FileName>shalINFO.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\libs\highlevel\services\embenv\src\shalINFO.c</FilePath>
+            </File>
+            <File>
+              <FileName>shalPART.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\libs\highlevel\services\embenv\src\shalPART.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>hal-fake</GroupName>
+          <Files>
+            <File>
+              <FileName>halfake.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\hal-fake\halfake.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>hal_core_cfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\hal_core_cfg.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -746,7 +1090,7 @@
       </Groups>
     </Target>
     <Target>
-      <TargetName>demo-embot-osal</TargetName>
+      <TargetName>ethdemo-osal</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <pCCUsed>6140000::V6.14::ARMCLANG</pCCUsed>
@@ -788,7 +1132,7 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\obj\</OutputDirectory>
-          <OutputName>h7disco</OutputName>
+          <OutputName>h7eth</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>1</CreateHexFile>
@@ -877,7 +1221,7 @@
           </Flash1>
           <bUseTDR>1</bUseTDR>
           <Flash2>BIN\UL2CM3.DLL</Flash2>
-          <Flash3>"" ()</Flash3>
+          <Flash3></Flash3>
           <Flash4></Flash4>
           <pFcarmOut></pFcarmOut>
           <pFcarmGrp></pFcarmGrp>
@@ -949,7 +1293,7 @@
             <Ra1Chk>0</Ra1Chk>
             <Ra2Chk>0</Ra2Chk>
             <Ra3Chk>0</Ra3Chk>
-            <Im1Chk>1</Im1Chk>
+            <Im1Chk>0</Im1Chk>
             <Im2Chk>1</Im2Chk>
             <OnChipMemories>
               <Ocm1>
@@ -1075,10 +1419,10 @@
             <v6WtE>0</v6WtE>
             <v6Rtti>0</v6Rtti>
             <VariousControls>
-              <MiscControls>-Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_osal </MiscControls>
-              <Define>USE_STM32HAL STM32HAL_BOARD_STM32H745DISCO STM32HAL_DRIVER_V190</Define>
+              <MiscControls>-Wno-pragma-pack -Wno-deprecated-register -DBOARD_ems4 -DEMBOT_USE_rtos_osal </MiscControls>
+              <Define>USE_ZERO_OFFSET EMBOBJ_USE_EMBOT USE_STM32HAL STM32HAL_BOARD_STM32H745DISCO STM32HAL_DRIVER_V190</Define>
               <Undefine></Undefine>
-              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api</IncludePath>
+              <IncludePath>..\..\..\..\..\libs\lowlevel\stm32hal\api;..\..\..\..\..\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\embot\hw;..\..\..\..\..\embot\os;..\..\..\..\..\embot\app;..\..\..\..\..\embot\app;..\..\..\..\..\libs\midware\eventviewer\api;..\..\..\..\..\libs\highlevel\abslayer\ipal\api;..\..\..\..\..\libs\highlevel\abslayer\hal2\api;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\embobj\core\exec\multitask;..\..\..\..\..\libs\highlevel\services\embenv\api;..\..\..\..\..\embobj\plus\ipnet;..\..\..\..\..\embobj\plus\embenv;..\src\emb-env;..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub;..\..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\..\..\..\..\..\icub-firmware-shared\embot\prot\eth</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -1109,7 +1453,7 @@
             <TextAddressRange>0x08000000</TextAddressRange>
             <DataAddressRange>0x20000000</DataAddressRange>
             <pXoBase></pXoBase>
-            <ScatterFile>..\..\embot-updater\proj\stm32h745disco-application0offset.sct</ScatterFile>
+            <ScatterFile>.\stm32h745disco-application0offset.sct</ScatterFile>
             <IncludeLibs></IncludeLibs>
             <IncludeLibsPath></IncludeLibsPath>
             <Misc>--diag_suppress=L6329</Misc>
@@ -1121,13 +1465,6 @@
       <Groups>
         <Group>
           <GroupName>main</GroupName>
-          <Files>
-            <File>
-              <FileName>main-basic.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>../src/main-basic.cpp</FilePath>
-            </File>
-          </Files>
         </Group>
         <Group>
           <GroupName>stm32hal</GroupName>
@@ -1302,6 +1639,62 @@
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw_can.cpp</FilePath>
             </File>
+            <File>
+              <FileName>embot_hw_flash.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embot\hw\embot_hw_flash.cpp</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds>
+                  <Cads>
+                    <interw>2</interw>
+                    <Optim>0</Optim>
+                    <oTime>2</oTime>
+                    <SplitLS>2</SplitLS>
+                    <OneElfS>2</OneElfS>
+                    <Strict>2</Strict>
+                    <EnumInt>2</EnumInt>
+                    <PlainCh>2</PlainCh>
+                    <Ropi>2</Ropi>
+                    <Rwpi>2</Rwpi>
+                    <wLevel>0</wLevel>
+                    <uThumb>2</uThumb>
+                    <uSurpInc>2</uSurpInc>
+                    <uC99>2</uC99>
+                    <uGnu>2</uGnu>
+                    <useXO>2</useXO>
+                    <v6Lang>0</v6Lang>
+                    <v6LangP>0</v6LangP>
+                    <vShortEn>2</vShortEn>
+                    <vShortWch>2</vShortWch>
+                    <v6Lto>2</v6Lto>
+                    <v6WtE>2</v6WtE>
+                    <v6Rtti>2</v6Rtti>
+                    <VariousControls>
+                      <MiscControls></MiscControls>
+                      <Define></Define>
+                      <Undefine></Undefine>
+                      <IncludePath></IncludePath>
+                    </VariousControls>
+                  </Cads>
+                </FileArmAds>
+              </FileOption>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1356,6 +1749,301 @@
               <FileName>embot_app_theLEDmanager.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\app\embot_app_theLEDmanager.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>abslayer</GroupName>
+          <Files>
+            <File>
+              <FileName>ipal.base.medium.cm4.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\..\..\..\libs\highlevel\abslayer\ipal\lib\ipal.base.medium.cm4.lib</FilePath>
+            </File>
+            <File>
+              <FileName>ipal_cfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\ipal_cfg.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>updater-app</GroupName>
+          <Files>
+            <File>
+              <FileName>main.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>../src/main.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>eupdater.c</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\eupdater.c</FilePath>
+            </File>
+            <File>
+              <FileName>eupdater_parser.c</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\eupdater_parser.c</FilePath>
+            </File>
+            <File>
+              <FileName>eupdater_cangtw.c</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\eupdater_cangtw.c</FilePath>
+            </File>
+            <File>
+              <FileName>eOcfg_sm_cangtw.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\eOcfg_sm_cangtw.c</FilePath>
+            </File>
+            <File>
+              <FileName>eupdater-info.c</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\eupdater-info.c</FilePath>
+            </File>
+            <File>
+              <FileName>updater-core.c</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\updater-core.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoUpdaterProtocol.c</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\plus\comm-v2\icub\EoUpdaterProtocol.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>eo-core</GroupName>
+          <Files>
+            <File>
+              <FileName>EOaction.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOaction.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOarray.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOarray.c</FilePath>
+            </File>
+            <File>
+              <FileName>EoCommon.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EoCommon.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOconstarray.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOconstarray.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOconstvector.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOconstvector.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOdeque.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOdeque.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOfifo.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOfifo.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOfifoByte.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOfifoByte.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOfifoWord.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOfifoWord.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOlist.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOlist.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOpacket.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOpacket.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOsm.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOsm.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOtheErrorManager.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOtheErrorManager.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOtheLEDpulser.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOtheLEDpulser.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOtheMemoryPool.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOtheMemoryPool.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOtimer.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOtimer.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOumlsm.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOumlsm.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOvector.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOvector.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOVmutex.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOVmutex.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOVtask.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOVtask.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOVtheCallbackManager.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOVtheCallbackManager.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOVtheSystem.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOVtheSystem.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOVtheTimerManager.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core\EOVtheTimerManager.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>eo-mee-embot</GroupName>
+          <Files>
+            <File>
+              <FileName>EOMmutex.embot.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embobj\core\exec\multitask\embot\EOMmutex.embot.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtask.embot.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embobj\core\exec\multitask\embot\EOMtask.embot.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheCallbackManager.embot.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embobj\core\exec\multitask\embot\EOMtheCallbackManager.embot.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheSystem.embot.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embobj\core\exec\multitask\embot\EOMtheSystem.embot.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>EOMtheTimerManager.embot.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embobj\core\exec\multitask\embot\EOMtheTimerManager.embot.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>eo-ipnet</GroupName>
+          <Files>
+            <File>
+              <FileName>EOMtheIPnet.c</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\..\..\..\..\embobj\plus\ipnet\EOMtheIPnet.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOsocket.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\embobj\plus\ipnet\EOsocket.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOsocketDatagram.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\embobj\plus\ipnet\EOsocketDatagram.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOVtheIPnet.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\embobj\plus\ipnet\EOVtheIPnet.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>eo-arm-env</GroupName>
+          <Files>
+            <File>
+              <FileName>EOtheARMenvironment.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\embobj\plus\embenv\EOtheARMenvironment.c</FilePath>
+            </File>
+            <File>
+              <FileName>EOVtheEnvironment.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\embobj\plus\embenv\EOVtheEnvironment.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>arm-services-embenv</GroupName>
+          <Files>
+            <File>
+              <FileName>eEcommon.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\libs\highlevel\services\embenv\src\eEcommon.c</FilePath>
+            </File>
+            <File>
+              <FileName>eEsharedServices.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\libs\highlevel\services\embenv\src\eEsharedServices.c</FilePath>
+            </File>
+            <File>
+              <FileName>shalBASE.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\libs\highlevel\services\embenv\src\shalBASE.c</FilePath>
+            </File>
+            <File>
+              <FileName>shalINFO.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\libs\highlevel\services\embenv\src\shalINFO.c</FilePath>
+            </File>
+            <File>
+              <FileName>shalPART.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\..\..\..\..\libs\highlevel\services\embenv\src\shalPART.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>hal-fake</GroupName>
+          <Files>
+            <File>
+              <FileName>halfake.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>..\src\hal-fake\halfake.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>hal_core_cfg.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\cfg\hal_core_cfg.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1441,8 +2129,8 @@
       <component Cclass="CMSIS" Cgroup="CORE" Cvendor="ARM" Cversion="5.4.0" condition="ARMv6_7_8-M Device">
         <package name="CMSIS" schemaVersion="1.3" url="http://www.keil.com/pack/" vendor="ARM" version="5.7.0"/>
         <targetInfos>
-          <targetInfo excluded="1" name="demo-embot-cmsisos2" versionMatchMode=""/>
-          <targetInfo excluded="1" name="demo-embot-osal" versionMatchMode=""/>
+          <targetInfo excluded="1" name="ethdemo-cmsisos2" versionMatchMode=""/>
+          <targetInfo excluded="1" name="ethdemo-osal" versionMatchMode=""/>
         </targetInfos>
       </component>
     </components>
