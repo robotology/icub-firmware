@@ -30,9 +30,9 @@
 
 /* USER CODE END 1 */
 
-/** Configure pins as 
-        * Analog 
-        * Input 
+/** Configure pins as
+        * Analog
+        * Input
         * Output
         * EVENT_OUT
         * EXTI
@@ -51,7 +51,7 @@ void MX_GPIO_Init(void)
   __HAL_RCC_GPIOF_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOD, LED1_Pin|CAN1_STDBY_Pin|LED2_Pin|CAN1_SHDN_Pin 
+  HAL_GPIO_WritePin(GPIOD, LED1_Pin|CAN1_STDBY_Pin|LED2_Pin|CAN1_SHDN_Pin
                           |LED5_Pin|LED4_Pin|LED3_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
@@ -63,11 +63,11 @@ void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(VPPEN_GPIO_Port, VPPEN_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : PEPin PEPin PEPin PEPin 
-                           PEPin PEPin PEPin PEPin 
+  /*Configure GPIO pins : PEPin PEPin PEPin PEPin
+                           PEPin PEPin PEPin PEPin
                            PEPin */
-  GPIO_InitStruct.Pin = J9_27_Pin|J9_28_Pin|J9_26_Pin|J9_24_Pin 
-                          |J9_29_Pin|J9_25_Pin|J9_23_Pin|J9_30_Pin 
+  GPIO_InitStruct.Pin = J9_27_Pin|J9_28_Pin|J9_26_Pin|J9_24_Pin
+                          |J9_29_Pin|J9_25_Pin|J9_23_Pin|J9_30_Pin
                           |TP11_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
@@ -79,18 +79,18 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PDPin PDPin PDPin PDPin 
+  /*Configure GPIO pins : PDPin PDPin PDPin PDPin
                            PDPin PDPin PDPin */
-  GPIO_InitStruct.Pin = LED1_Pin|CAN1_STDBY_Pin|LED2_Pin|CAN1_SHDN_Pin 
+  GPIO_InitStruct.Pin = LED1_Pin|CAN1_STDBY_Pin|LED2_Pin|CAN1_SHDN_Pin
                           |LED5_Pin|LED4_Pin|LED3_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
   HAL_GPIO_Init(GPIOD, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PBPin PBPin PBPin PBPin 
+  /*Configure GPIO pins : PBPin PBPin PBPin PBPin
                            PBPin PBPin */
-  GPIO_InitStruct.Pin = TP8_Pin|J9_20_Pin|J9_19_Pin|J9_22_Pin 
+  GPIO_InitStruct.Pin = TP8_Pin|J9_20_Pin|J9_19_Pin|J9_22_Pin
                           |J9_21_Pin|TP9_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
   GPIO_InitStruct.Pull = GPIO_NOPULL;

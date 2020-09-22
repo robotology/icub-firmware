@@ -49,23 +49,11 @@ void MX_USB_PCD_Init(void)
 void HAL_PCD_MspInit(PCD_HandleTypeDef* pcdHandle)
 {
 
-  GPIO_InitTypeDef GPIO_InitStruct = {0};
   if(pcdHandle->Instance==USB)
   {
   /* USER CODE BEGIN USB_MspInit 0 */
 
   /* USER CODE END USB_MspInit 0 */
-  
-    __HAL_RCC_GPIOA_CLK_ENABLE();
-    /**USB GPIO Configuration    
-    PA12     ------> USB_DP
-    PA11     ------> USB_DM 
-    */
-    GPIO_InitStruct.Pin = USB_DP_Pin|USB_DM_Pin;
-    GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
-    GPIO_InitStruct.Pull = GPIO_NOPULL;
-    HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
     /* USB clock enable */
     __HAL_RCC_USB_CLK_ENABLE();
   /* USER CODE BEGIN USB_MspInit 1 */
@@ -84,18 +72,11 @@ void HAL_PCD_MspDeInit(PCD_HandleTypeDef* pcdHandle)
   /* USER CODE END USB_MspDeInit 0 */
     /* Peripheral clock disable */
     __HAL_RCC_USB_CLK_DISABLE();
-  
-    /**USB GPIO Configuration    
-    PA12     ------> USB_DP
-    PA11     ------> USB_DM 
-    */
-    HAL_GPIO_DeInit(GPIOA, USB_DP_Pin|USB_DM_Pin);
-
   /* USER CODE BEGIN USB_MspDeInit 1 */
 
   /* USER CODE END USB_MspDeInit 1 */
   }
-} 
+}
 
 /* USER CODE BEGIN 1 */
 
