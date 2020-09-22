@@ -46,7 +46,7 @@ extern "C" {
     
 #elif   defined(STM32HAL_BOARD_MTB4)
 
-// two possible drivers. default is the 190 ...
+    // two possible drivers. default is the 190 ...
     #if     defined(STM32HAL_DRIVER_V172)    
         #define STM32HAL_DRIVER_VERSION 0x172  
     #else   
@@ -104,19 +104,27 @@ extern "C" {
 
 #elif   defined(STM32HAL_BOARD_STM32G4EVAL)
 
-    // only one possible driver
-    #if !defined(STM32HAL_DRIVER_V111)
-        #define STM32HAL_DRIVER_V1111
+    // two possible drivers: v111 and v120. default is the 120 ...
+    #if     defined(STM32HAL_DRIVER_V111)    
+        #define STM32HAL_DRIVER_VERSION 0x111  
+    #else   
+        #if !defined(STM32HAL_DRIVER_V120)
+            #define STM32HAL_DRIVER_V120
+        #endif        
+        #define STM32HAL_DRIVER_VERSION 0x120   
     #endif
-    #define STM32HAL_DRIVER_VERSION 0x111
 
 #elif   defined(STM32HAL_BOARD_PMC)
 
-    // only one possible driver
-    #if !defined(STM32HAL_DRIVER_V111)
-        #define STM32HAL_DRIVER_V1111
+    // two possible drivers: v111 and v120. default is the 120 ...
+    #if     defined(STM32HAL_DRIVER_V111)    
+        #define STM32HAL_DRIVER_VERSION 0x111  
+    #else   
+        #if !defined(STM32HAL_DRIVER_V120)
+            #define STM32HAL_DRIVER_V120
+        #endif        
+        #define STM32HAL_DRIVER_VERSION 0x120   
     #endif
-    #define STM32HAL_DRIVER_VERSION 0x111
 
 #elif   defined(STM32HAL_BOARD_STM32H745DISCO)
 
@@ -181,7 +189,13 @@ extern "C" {
         // which includes stm32hal_driver_cfg.h and in chain stm32hal_driver_cfg_of_stm32g4eval_v111.h and 
         // again stm32g4xx_hal_conf.h (see its section Register Callbacks selection)        
         // st has again changed config strategy because for L4 there is not such a thing.         
-        #include "../src/driver/stm32g4-v111/inc/stm32g4xx_hal.h"       
+        #include "../src/driver/stm32g4-v111/inc/stm32g4xx_hal.h" 
+    #elif   defined(STM32HAL_DRIVER_V120)
+        // pay attention: the definition of various USE_HAL_FDCAN_REGISTER_CALLBACKS etc are inside here
+        // which includes stm32hal_driver_cfg.h and in chain stm32hal_driver_cfg_of_stm32g4eval_v120.h and 
+        // again stm32g4xx_hal_conf.h (see its section Register Callbacks selection)        
+        // st has again changed config strategy because for L4 there is not such a thing.         
+        #include "../src/driver/stm32g4-v120/inc/stm32g4xx_hal.h"        
     #else
         #error STM32HAL: the STM32HAL_DRIVER_${V} is not managed
     #endif

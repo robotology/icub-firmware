@@ -337,7 +337,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register</MiscControls>
-              <Define>USE_STM32HAL STM32HAL_BOARD_STM32G4EVAL STM32HAL_DRIVER_V111</Define>
+              <Define>USE_STM32HAL STM32HAL_BOARD_STM32G4EVAL STM32HAL_DRIVER_V120</Define>
               <Undefine></Undefine>
               <IncludePath>..\src-plus;..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\osal\api;..\..\..\..\..\..\eBcode\arch-arm\libs\midware\eventviewer\api;..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask;..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\os;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\embot\app\skeleton;..\..\..\..\embot\prot\can</IncludePath>
             </VariousControls>
@@ -399,9 +399,9 @@
           <GroupName>stm32hal</GroupName>
           <Files>
             <File>
-              <FileName>stm32hal.g4.stm32g4eval.v111.lib</FileName>
+              <FileName>stm32hal.g4.stm32g4eval.v120.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\lib\stm32hal.g4.stm32g4eval.v111.lib</FilePath>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\lib\stm32hal.g4.stm32g4eval.v120.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -1065,7 +1065,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>-Wno-pragma-pack -Wno-deprecated-register -DEMBOT_USE_rtos_cmsisos2</MiscControls>
-              <Define>USE_STM32HAL STM32HAL_BOARD_STM32G4EVAL STM32HAL_DRIVER_V111</Define>
+              <Define>USE_STM32HAL STM32HAL_BOARD_STM32G4EVAL STM32HAL_DRIVER_V120</Define>
               <Undefine></Undefine>
               <IncludePath>..\src-plus;..\..\..\..\..\..\eBcode\arch-arm\libs\highlevel\abslayer\cmsisos2\api;..\..\..\..\..\..\eBcode\arch-arm\embobj\core\exec\multitask;..\..\..\..\..\..\..\..\icub-firmware-shared\eth\embobj\core\core;..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\api;..\..\..\..\..\..\..\..\icub-firmware-shared\embot\core;..\..\..\..\..\..\eBcode\arch-arm\embot\app;..\..\..\..\..\..\eBcode\arch-arm\embot\i2h;..\..\..\..\..\..\eBcode\arch-arm\embot\hw;..\..\..\..\..\..\eBcode\arch-arm\embot\os;..\..\..\..\..\..\..\..\icub-firmware-shared\can\canProtocolLib;..\..\..\..\embot\app\skeleton;..\..\..\..\embot\prot\can</IncludePath>
             </VariousControls>
@@ -1127,9 +1127,9 @@
           <GroupName>stm32hal</GroupName>
           <Files>
             <File>
-              <FileName>stm32hal.g4.stm32g4eval.v111.lib</FileName>
+              <FileName>stm32hal.g4.stm32g4eval.v120.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\lib\stm32hal.g4.stm32g4eval.v111.lib</FilePath>
+              <FilePath>..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\lib\stm32hal.g4.stm32g4eval.v120.lib</FilePath>
             </File>
           </Files>
         </Group>

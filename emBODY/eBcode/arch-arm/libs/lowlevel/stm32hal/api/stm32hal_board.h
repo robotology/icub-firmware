@@ -253,7 +253,7 @@ extern void stm32hal_board_init(void);
 
 #elif   defined(STM32HAL_BOARD_STM32G4EVAL) 
 
-    // one case only: v111
+    // two cases: v111 and v120
     #if (STM32HAL_DRIVER_VERSION == 0x111)
 
         #include "../src/config/stm32hal_driver_cfg_of_stm32g4eval_v111.h"
@@ -277,14 +277,35 @@ extern void stm32hal_board_init(void);
         
         #include "../src/board/stm32g4eval/v111/inc/stm32g4xx_it.h"
         
+    #elif (STM32HAL_DRIVER_VERSION == 0x120)
 
+        #include "../src/config/stm32hal_driver_cfg_of_stm32g4eval_v120.h"
+
+        #include "../src/board/stm32g4eval/v120/inc/main.h"
+        #include "../src/board/stm32g4eval/v120/inc/adc.h"
+        #include "../src/board/stm32g4eval/v120/inc/comp.h"
+        #include "../src/board/stm32g4eval/v120/inc/dac.h"
+        #include "../src/board/stm32g4eval/v120/inc/dma.h"
+        #include "../src/board/stm32g4eval/v120/inc/fdcan.h"
+        #include "../src/board/stm32g4eval/v120/inc/fmac.h"
+        #include "../src/board/stm32g4eval/v120/inc/fmc.h"
+        #include "../src/board/stm32g4eval/v120/inc/gpio.h"
+        #include "../src/board/stm32g4eval/v120/inc/hrtim.h"
+        #include "../src/board/stm32g4eval/v120/inc/i2c.h"
+        #include "../src/board/stm32g4eval/v120/inc/rng.h"
+        #include "../src/board/stm32g4eval/v120/inc/spi.h"
+        #include "../src/board/stm32g4eval/v120/inc/tim.h"
+        #include "../src/board/stm32g4eval/v120/inc/usart.h"
+        #include "../src/board/stm32g4eval/v120/inc/usb.h"
+        
+        #include "../src/board/stm32g4eval/v120/inc/stm32g4xx_it.h"
     #else
         #error unsupported driver version for stm32g4eval
     #endif
 
 #elif   defined(STM32HAL_BOARD_PMC) 
 
-    // one case only: v111
+    // two cases: v111 and v120
     #if (STM32HAL_DRIVER_VERSION == 0x111)
 
         #include "../src/config/stm32hal_driver_cfg_of_pmc_v111.h"
@@ -306,7 +327,29 @@ extern void stm32hal_board_init(void);
         //#include "../src/board/pmc/v111/inc/usart.h"
         #include "../src/board/pmc/v111/inc/usb.h"
         
-        //#include "../src/board/pmc/v111/inc/stm32g4xx_it.h"
+        //#include "../src/board/pmc/v120/inc/stm32g4xx_it.h"    
+    #elif (STM32HAL_DRIVER_VERSION == 0x120)
+
+        #include "../src/config/stm32hal_driver_cfg_of_pmc_v120.h"
+
+        #include "../src/board/pmc/v120/inc/main.h"
+        #include "../src/board/pmc/v120/inc/adc.h"
+        #include "../src/board/pmc/v120/inc/comp.h"
+        #include "../src/board/pmc/v120/inc/cordic.h"
+        #include "../src/board/pmc/v120/inc/crc.h"
+        #include "../src/board/pmc/v120/inc/dma.h"
+        #include "../src/board/pmc/v120/inc/fdcan.h"
+        #include "../src/board/pmc/v120/inc/fmac.h"
+        #include "../src/board/pmc/v120/inc/gpio.h"
+        #include "../src/board/pmc/v120/inc/i2c.h"
+        #include "../src/board/pmc/v120/inc/rng.h"
+        #include "../src/board/pmc/v120/inc/rtc.h"
+        #include "../src/board/pmc/v120/inc/spi.h"
+        #include "../src/board/pmc/v120/inc/tim.h"
+        //#include "../src/board/pmc/v120/inc/usart.h"
+        #include "../src/board/pmc/v120/inc/usb.h"
+        
+        //#include "../src/board/pmc/v120/inc/stm32g4xx_it.h"
         
 
     #else
