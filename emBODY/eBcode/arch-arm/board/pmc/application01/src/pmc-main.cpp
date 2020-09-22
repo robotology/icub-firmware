@@ -156,6 +156,10 @@ void myEVT::userdefStartup(embot::os::Thread *t, void *param) const
     
     // init the fap
     
+    embot::core::print("userdefStartup(): called");
+    
+    embot::core::print("userdefStartup(): start a timer which sends an event which forces an acquisition from the FAP");
+    
     embot::hw::tlv493d::init(embot::hw::TLV493D::one, {embot::hw::bsp::tlv493d::getBSP().getPROP(embot::hw::TLV493D::one)->i2cbus, 400000});
     
     // start a timer which sends an event which forces an acquisition from the FAP  

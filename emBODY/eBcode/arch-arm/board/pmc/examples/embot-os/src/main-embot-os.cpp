@@ -100,7 +100,7 @@ void initSystem(embot::os::Thread *t, void* initparam)
     
     embot::os::EventThread::Config configEV { 
         6*1024, 
-        embot::os::Priority::high200, 
+        embot::os::Priority::high40, 
         eventbasedthread_startup,
         nullptr,
         50*embot::core::time1millisec,

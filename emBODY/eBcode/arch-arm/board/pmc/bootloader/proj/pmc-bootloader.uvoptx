@@ -536,8 +536,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\lib\stm32hal.g4.pmc.v111.lib</PathWithFileName>
-      <FilenameWithoutPath>stm32hal.g4.pmc.v111.lib</FilenameWithoutPath>
+      <PathWithFileName>..\..\..\..\..\..\eBcode\arch-arm\libs\lowlevel\stm32hal\lib\stm32hal.g4.pmc.v120.lib</PathWithFileName>
+      <FilenameWithoutPath>stm32hal.g4.pmc.v120.lib</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>
