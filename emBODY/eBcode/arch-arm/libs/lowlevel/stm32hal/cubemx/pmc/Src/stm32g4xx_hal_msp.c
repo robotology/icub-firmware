@@ -2,7 +2,7 @@
 /**
   ******************************************************************************
   * File Name          : stm32g4xx_hal_msp.c
-  * Description        : This file provides code for the MSP Initialization 
+  * Description        : This file provides code for the MSP Initialization
   *                      and de-Initialization codes.
   ******************************************************************************
   * @attention
@@ -32,7 +32,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN Define */
- 
+
 /* USER CODE END Define */
 
 /* Private macro -------------------------------------------------------------*/
@@ -71,19 +71,21 @@ void HAL_MspInit(void)
   __HAL_RCC_PWR_CLK_ENABLE();
 
   /* System interrupt init*/
+  /* PendSV_IRQn interrupt configuration */
+  HAL_NVIC_SetPriority(PendSV_IRQn, 15, 0);
 
-  /** Configure the internal voltage reference buffer voltage scale 
+  /** Configure the internal voltage reference buffer voltage scale
   */
   HAL_SYSCFG_VREFBUF_VoltageScalingConfig(SYSCFG_VREFBUF_VOLTAGE_SCALE0);
-  /** Enable the Internal Voltage Reference buffer 
+  /** Enable the Internal Voltage Reference buffer
   */
   HAL_SYSCFG_EnableVREFBUF();
-  /** Configure the internal voltage reference buffer high impedance mode 
+  /** Configure the internal voltage reference buffer high impedance mode
   */
   HAL_SYSCFG_VREFBUF_HighImpedanceConfig(SYSCFG_VREFBUF_HIGH_IMPEDANCE_DISABLE);
-  /** Disable the internal Pull-Up in Dead Battery pins of UCPD peripheral 
+  /** Disable the internal Pull-Up in Dead Battery pins of UCPD peripheral
   */
-  LL_PWR_DisableDeadBatteryPD();
+  HAL_PWREx_DisableUCPDDeadBattery();
 
   /* USER CODE BEGIN MspInit 1 */
 

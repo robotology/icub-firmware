@@ -89,12 +89,12 @@ void HAL_COMP_MspInit(COMP_HandleTypeDef* compHandle)
   /* USER CODE BEGIN COMP1_MspInit 0 */
 
   /* USER CODE END COMP1_MspInit 0 */
-  
+
     __HAL_RCC_GPIOA_CLK_ENABLE();
     __HAL_RCC_GPIOB_CLK_ENABLE();
-    /**COMP1 GPIO Configuration    
+    /**COMP1 GPIO Configuration
     PA0     ------> COMP1_INM
-    PB1     ------> COMP1_INP 
+    PB1     ------> COMP1_INP
     */
     GPIO_InitStruct.Pin = MOT1_CMPN_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
@@ -107,7 +107,7 @@ void HAL_COMP_MspInit(COMP_HandleTypeDef* compHandle)
     HAL_GPIO_Init(MOT1_CMPP_GPIO_Port, &GPIO_InitStruct);
 
     /* COMP1 interrupt Init */
-    HAL_NVIC_SetPriority(COMP1_2_3_IRQn, 0, 0);
+    HAL_NVIC_SetPriority(COMP1_2_3_IRQn, 5, 0);
     HAL_NVIC_EnableIRQ(COMP1_2_3_IRQn);
   /* USER CODE BEGIN COMP1_MspInit 1 */
 
@@ -118,11 +118,11 @@ void HAL_COMP_MspInit(COMP_HandleTypeDef* compHandle)
   /* USER CODE BEGIN COMP2_MspInit 0 */
 
   /* USER CODE END COMP2_MspInit 0 */
-  
+
     __HAL_RCC_GPIOA_CLK_ENABLE();
-    /**COMP2 GPIO Configuration    
+    /**COMP2 GPIO Configuration
     PA2     ------> COMP2_INM
-    PA7     ------> COMP2_INP 
+    PA7     ------> COMP2_INP
     */
     GPIO_InitStruct.Pin = MOT2_CMPN_Pin|MOT2_CMPP_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
@@ -130,7 +130,7 @@ void HAL_COMP_MspInit(COMP_HandleTypeDef* compHandle)
     HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
     /* COMP2 interrupt Init */
-    HAL_NVIC_SetPriority(COMP1_2_3_IRQn, 0, 0);
+    HAL_NVIC_SetPriority(COMP1_2_3_IRQn, 5, 0);
     HAL_NVIC_EnableIRQ(COMP1_2_3_IRQn);
   /* USER CODE BEGIN COMP2_MspInit 1 */
 
@@ -141,11 +141,11 @@ void HAL_COMP_MspInit(COMP_HandleTypeDef* compHandle)
   /* USER CODE BEGIN COMP3_MspInit 0 */
 
   /* USER CODE END COMP3_MspInit 0 */
-  
+
     __HAL_RCC_GPIOC_CLK_ENABLE();
-    /**COMP3 GPIO Configuration    
+    /**COMP3 GPIO Configuration
     PC0     ------> COMP3_INM
-    PC1     ------> COMP3_INP 
+    PC1     ------> COMP3_INP
     */
     GPIO_InitStruct.Pin = MOT3_CMPN_Pin|MOT3_CMPP_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
@@ -153,7 +153,7 @@ void HAL_COMP_MspInit(COMP_HandleTypeDef* compHandle)
     HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
     /* COMP3 interrupt Init */
-    HAL_NVIC_SetPriority(COMP1_2_3_IRQn, 0, 0);
+    HAL_NVIC_SetPriority(COMP1_2_3_IRQn, 5, 0);
     HAL_NVIC_EnableIRQ(COMP1_2_3_IRQn);
   /* USER CODE BEGIN COMP3_MspInit 1 */
 
@@ -169,10 +169,10 @@ void HAL_COMP_MspDeInit(COMP_HandleTypeDef* compHandle)
   /* USER CODE BEGIN COMP1_MspDeInit 0 */
 
   /* USER CODE END COMP1_MspDeInit 0 */
-  
-    /**COMP1 GPIO Configuration    
+
+    /**COMP1 GPIO Configuration
     PA0     ------> COMP1_INM
-    PB1     ------> COMP1_INP 
+    PB1     ------> COMP1_INP
     */
     HAL_GPIO_DeInit(MOT1_CMPN_GPIO_Port, MOT1_CMPN_Pin);
 
@@ -196,10 +196,10 @@ void HAL_COMP_MspDeInit(COMP_HandleTypeDef* compHandle)
   /* USER CODE BEGIN COMP2_MspDeInit 0 */
 
   /* USER CODE END COMP2_MspDeInit 0 */
-  
-    /**COMP2 GPIO Configuration    
+
+    /**COMP2 GPIO Configuration
     PA2     ------> COMP2_INM
-    PA7     ------> COMP2_INP 
+    PA7     ------> COMP2_INP
     */
     HAL_GPIO_DeInit(GPIOA, MOT2_CMPN_Pin|MOT2_CMPP_Pin);
 
@@ -221,10 +221,10 @@ void HAL_COMP_MspDeInit(COMP_HandleTypeDef* compHandle)
   /* USER CODE BEGIN COMP3_MspDeInit 0 */
 
   /* USER CODE END COMP3_MspDeInit 0 */
-  
-    /**COMP3 GPIO Configuration    
+
+    /**COMP3 GPIO Configuration
     PC0     ------> COMP3_INM
-    PC1     ------> COMP3_INP 
+    PC1     ------> COMP3_INP
     */
     HAL_GPIO_DeInit(GPIOC, MOT3_CMPN_Pin|MOT3_CMPP_Pin);
 
@@ -241,7 +241,7 @@ void HAL_COMP_MspDeInit(COMP_HandleTypeDef* compHandle)
 
   /* USER CODE END COMP3_MspDeInit 1 */
   }
-} 
+}
 
 /* USER CODE BEGIN 1 */
 

@@ -68,7 +68,7 @@ void HAL_CORDIC_MspDeInit(CORDIC_HandleTypeDef* cordicHandle)
 
   /* USER CODE END CORDIC_MspDeInit 1 */
   }
-} 
+}
 
 /* USER CODE BEGIN 1 */
 
