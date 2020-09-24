@@ -99,7 +99,7 @@ struct embot::os::theScheduler::Impl
         {
             embot::os::Thread *t = embot::os::rtos::scheduler_getassociated(thread);  
             const char *tname = ((nullptr == t) || (nullptr == t->getName())) ? "none" : t->getName();             
-            // embot::hw::sys::puts(std::string("from os::Thread ") + tname + " -> " + errormsg);  
+            embot::core::print(std::string("from os::Thread ") + tname + " -> " + errormsg);  
         }            
         thesystem.pImpl->config.behaviour.onOSerror.execute();  
         

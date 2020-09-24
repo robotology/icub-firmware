@@ -22,6 +22,7 @@
 #elif defined(EMBOT_USE_rtos_osal)
 #include "osal.h"
 extern uint32_t SystemCoreClock; // osal needs a cpu speed
+#define EMBOT_USE_rtos_osal_map_of_threads
 #else
 #error embot::os::rtos -> pls specify an RTOS xxxx to use by definition of EMBOT_USE_rtos_xxxx
 #endif
@@ -754,7 +755,7 @@ namespace embot { namespace os { namespace rtos {
     
     void scheduler_associate(thread_t *osthread, embot::os::Thread *t)
     {
-#if defined(EMBOT_USE_rtos_cmsisos2)
+#if defined(EMBOT_USE_rtos_cmsisos2) || (defined(EMBOT_USE_rtos_osal) && defined(EMBOT_USE_rtos_osal_map_of_threads))
     mapofthreads.insert(std::pair<thread_t*, embot::os::Thread*>(osthread, t));        
 #elif defined(EMBOT_USE_rtos_osal)        
         osal_task_extdata_set(reinterpret_cast<osal_task_t*>(osthread), t); 
@@ -763,7 +764,7 @@ namespace embot { namespace os { namespace rtos {
     
     void scheduler_deassociate(thread_t *osthread, embot::os::Thread *t)
     {
-#if defined(EMBOT_USE_rtos_cmsisos2)
+#if defined(EMBOT_USE_rtos_cmsisos2) || (defined(EMBOT_USE_rtos_osal) && defined(EMBOT_USE_rtos_osal_map_of_threads))
     mapofthreads.erase(osthread);        
 #elif defined(EMBOT_USE_rtos_osal)        
         osal_task_extdata_set(reinterpret_cast<osal_task_t*>(osthread), t); 
@@ -777,7 +778,7 @@ namespace embot { namespace os { namespace rtos {
             return nullptr;
         }
         
-#if defined(EMBOT_USE_rtos_cmsisos2)
+#if defined(EMBOT_USE_rtos_cmsisos2) || (defined(EMBOT_USE_rtos_osal) && defined(EMBOT_USE_rtos_osal_map_of_threads))
         auto a = mapofthreads.find(osthread);
         if(a == mapofthreads.end())
         {
@@ -1210,7 +1211,7 @@ uint32_t osRtxErrorNotify (uint32_t code, void *object_id)
     static const char * message[] = 
     {
         "unknown",
-        "os2: stack overflow in ...",
+        "os2: stack undeflow in ...",
         "os2: isr queue overflow in ...",
         "os2: tmr queue overflow",
         "os2: libspace not available",
@@ -1227,12 +1228,14 @@ uint32_t osRtxErrorNotify (uint32_t code, void *object_id)
         if(osRtxErrorStackUnderflow == code)
         {
             thread = object_id;
+            embot::os::Thread *t = embot::os::rtos::scheduler_getassociated(thread);
+            const char *name = t->getName();
+            if(nullptr != name)
+            {
+                embot::core::print(std::string(errstr) + " " + name); 
+            }
         }
-        
-//        embot::os::Thread *t = embot::os::rtos::scheduler_getassociated(thread);
-//        const char *name = t->getName();
-//        name = name;       
-        
+                      
         if(nullptr != i->onerror)
         {
             i->onerror(thread, code, errstr);
@@ -1582,6 +1585,33 @@ void operator delete (void* ptr) noexcept
 // -- extra configuration for osal
 
 #if defined(EMBOT_USE_rtos_osal)
+
+
+
+struct osal_init_pre_main_t
+{
+    osal_init_pre_main_t() 
+    {
+        osal_set_errorhandler(on_fatal);
+    }
+    
+    static void on_fatal(void* task, osal_fatalerror_t errorcode, const char * errormsg)
+    {
+        volatile uint32_t t {0};
+        
+        embot::core::print("osal_init_pre_main_t::on_fatal() -> " + errormsg);
+        
+        for(;;)
+        {
+            t++;
+        }    
+    }
+    
+};
+
+// we cannot guarantee that this variable is initted as the first one.
+// BUT it is initted before call of main(). hence osal_init_pre_main_t::on_fatal() is active at main() and before any override 
+static osal_init_pre_main_t osal_init_pre_main {};
 
     #if 0
     the osal approach.
