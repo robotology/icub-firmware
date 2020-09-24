@@ -503,10 +503,14 @@ extern uint32_t oosiit_sys_timeofnextevent(void)
     {   // inside isr
         return(0);
     } 
-    else
+    else if(1 == s_oosiit_started)
     {   // call svc
         __svc_oosiit_sys_timeofnextevent(&tt);
     }
+    else
+    {   // not within an isr. os not started   
+        return(0);
+    } 
     
     return(tt);    
 }
@@ -517,10 +521,14 @@ extern oosiit_result_t oosiit_sys_suspend(uint32_t *timeofnextevent)
     {   // inside isr
         return(oosiit_res_NOK);
     } 
-    else
+    else if(1 == s_oosiit_started)
     {   // call svc
         __svc_oosiit_sys_suspend(timeofnextevent);
     }
+    else
+    {   // not within an isr. os not started   
+        return(oosiit_res_NOK);
+    } 
     
     return(oosiit_res_OK);
 }
@@ -532,10 +540,14 @@ extern oosiit_result_t oosiit_sys_resume(uint32_t timeofsuspension)
     {   // inside isr
         return(oosiit_res_NOK);
     } 
-    else
+    else if(1 == s_oosiit_started)
     {   // call svc
         __svc_oosiit_sys_resume(timeofsuspension);
     }
+    else
+    {   // not within an isr. os not started   
+        return(oosiit_res_NOK);
+    } 
     
     return(oosiit_res_OK);
 }
@@ -577,14 +589,18 @@ extern oosiit_tskptr_t oosiit_tsk_create(oosiit_task_properties_t* tskprop)
     {
         return(NULL);
     }
-    else
+    else if(1 == s_oosiit_started)
     {   // call svc
         osiit_hid_tsk_create_other_args_t others;
         others.stacksize = tskprop->stacksize;
         others.priority = tskprop->priority;
         others.extdata = tskprop->extdata;
         return(__svc_oosiit_tsk_create(tskprop->function, tskprop->param, tskprop->stackdata, &others));
-    }   
+    }
+    else
+    {   // not within an isr. os not started
+        return(NULL);
+    }        
 }
 
 
@@ -599,10 +615,14 @@ extern oosiit_result_t oosiit_tsk_delete(oosiit_tskptr_t tp)
     {   // inside isr
         return(oosiit_res_NOK);
     } 
-    else
+    else if(1 == s_oosiit_started)
     {   // call svc
         return(__svc_oosiit_tsk_delete(tp));
-    } 
+    }
+    else
+    {   // not within an isr. os not started
+        return(oosiit_res_NOK);
+    }    
 }
 
 extern oosiit_tskptr_t oosiit_tsk_self(void)
@@ -611,10 +631,14 @@ extern oosiit_tskptr_t oosiit_tsk_self(void)
     {   // inside isr
         return(isr_oosiit_tsk_self());
     } 
-    else
+    else if(1 == s_oosiit_started)
     {   // call svc
         return(__svc_oosiit_tsk_self());
-    } 
+    }
+    else
+    {
+        return(NULL);
+    }    
 }
 
 extern oosiit_result_t oosiit_tsk_setprio(oosiit_tskptr_t tp, uint8_t tskpriority)
@@ -629,10 +653,14 @@ extern oosiit_result_t oosiit_tsk_setprio(oosiit_tskptr_t tp, uint8_t tskpriorit
         //return(isr_oosiit_tsk_prio(tp, tskpriority));
         return(oosiit_res_NOK);
     } 
-    else
+    else if(1 == s_oosiit_started)
     {   // call svc
         return(__svc_oosiit_tsk_setprio(tp, tskpriority));
-    }   
+    }
+    else
+    {
+        return(oosiit_res_NOK);
+    }    
 }
 
 extern oosiit_result_t oosiit_tsk_pass(void)
@@ -642,10 +670,14 @@ extern oosiit_result_t oosiit_tsk_pass(void)
         //return(isr_oosiit_tsk_pass());
         return(oosiit_res_NOK);
     } 
-    else
+    else if(1 == s_oosiit_started)
     {   // call svc
         return(__svc_oosiit_tsk_pass());
-    }   
+    }
+    else
+    {
+        return(oosiit_res_NOK);
+    }    
 }
 
 extern void* oosiit_tsk_get_perthread_libspace(oosiit_tskptr_t tp)
@@ -659,10 +691,14 @@ extern void* oosiit_tsk_get_perthread_libspace(oosiit_tskptr_t tp)
     {   // inside isr
         return(rt_iit_tsk_perthread_libspace_get(tp));
     } 
-    else
+    else if(1 == s_oosiit_started)
     {   // call svc
         return(__svc_oosiit_tsk_get_perthread_libspace(tp));
-    }     
+    }
+    else
+    {
+        return(rt_iit_tsk_perthread_libspace_get(tp));
+    }    
 }
 
 extern oosiit_result_t oosiit_tsk_set_extdata(oosiit_tskptr_t tp, void* extdata)
@@ -676,10 +712,14 @@ extern oosiit_result_t oosiit_tsk_set_extdata(oosiit_tskptr_t tp, void* extdata)
     {   // inside isr
         return(isr_oosiit_tsk_set_extdata(tp, extdata));
     } 
-    else
+    else if(1 == s_oosiit_started)
     {   // call svc
         return(__svc_oosiit_tsk_set_extdata(tp, extdata));
-    }       
+    }
+    else
+    {   // not within an isr. os not started   
+        return(isr_oosiit_tsk_set_extdata(tp, extdata));
+    }    
 }
 
 
@@ -694,10 +734,14 @@ extern void* oosiit_tsk_get_extdata(oosiit_tskptr_t tp)
     {   // inside isr
         return(isr_oosiit_tsk_get_extdata(tp));
     } 
-    else
+    else if(1 == s_oosiit_started)
     {   // call svc
         return(__svc_oosiit_tsk_get_extdata(tp));
-    }        
+    }  
+    else
+    {   // not within an isr. os not started   
+        return(isr_oosiit_tsk_get_extdata(tp));
+    }      
 }
 
 extern uint8_t oosiit_tsk_get_id(oosiit_tskptr_t tp)
@@ -726,10 +770,14 @@ extern oosiit_result_t oosiit_time_set(uint64_t target)
         //return(isr_oosiit_tsk_pass());
         return(oosiit_res_NOK);
     } 
-    else
+    else if(1 == s_oosiit_started)
     {   // call svc
         return(__svc_oosiit_time_set(target&0xffffffff, (target>>32)&0xffffffff));
-    }   
+    } 
+    else
+    {   // not within an isr. os not started   
+        return(oosiit_res_NOK);
+    }  
 }
 
 
@@ -741,7 +789,7 @@ extern uint64_t oosiit_time_get(void)
     {   // inside isr
         return(oosiit_time);
     } 
-    else
+    else if(1 == s_oosiit_started)
     {   // call svc
         uint32_t low = 0;
         uint32_t high = 0;
@@ -751,7 +799,11 @@ extern uint64_t oosiit_time_get(void)
         res <<= 32;
         res += low;
         return(res);
-    }   
+    }
+    else
+    {   // not within an isr. os not started
+        return(oosiit_time);
+    }    
 }
 
 
@@ -765,7 +817,7 @@ extern uint64_t oosiit_microtime_get(void)
     {   // inside isr
         s_oosiit_microtime_get(&low, &high);
     } 
-    else
+    else if(1 == s_oosiit_started)
     {   // call svc
         __svc_oosiit_microtime_get(&low, &high);
     }  
@@ -786,7 +838,7 @@ extern uint64_t oosiit_nanotime_get(void)
     {   // inside isr
         s_oosiit_nanotime_get(&low, &high);
     } 
-    else
+    else if(1 == s_oosiit_started)
     {   // call svc
         __svc_oosiit_nanotime_get(&low, &high);
     }  
@@ -847,7 +899,7 @@ extern void oosiit_dly_wait(uint32_t delay)
     {   // inside isr
         return;
     } 
-    else
+    else if(1 == s_oosiit_started)
     {   // call svc
         __svc_oosiit_dly_wait(delay);
     }
@@ -859,7 +911,7 @@ extern void oosiit_itv_set(uint32_t period)
     {   // inside isr
         return;
     } 
-    else
+    else if(1 == s_oosiit_started)
     {   // call svc
         __svc_oosiit_itv_set(period);
     }
@@ -871,7 +923,7 @@ extern void oosiit_itv_wait(void)
     {   // inside isr
         return;
     } 
-    else
+    else if(1 == s_oosiit_started)
     {   // call svc
         __svc_oosiit_itv_wait();
     }
@@ -892,9 +944,13 @@ extern oosiit_objptr_t oosiit_mbx_create(uint16_t numofmessages)
     {   // inside isr
         return(NULL);
     } 
-    else
+    else if(1 == s_oosiit_started)
     {   // call svc
          return(__svc_oosiit_mbx_create(numofmessages));
+    }
+    else
+    {   // not within an isr. os not started
+        return(svc_oosiit_mbx_create(numofmessages));
     }
 }
 
@@ -909,10 +965,14 @@ extern oosiit_result_t oosiit_mbx_delete(oosiit_objptr_t mailbox)
     {   // inside isr
         return(oosiit_res_NOK);
     } 
-    else
+    else if(1 == s_oosiit_started)
     {   // call svc
          return(__svc_oosiit_mbx_delete(mailbox));
-    }         
+    } 
+    else
+    {
+        return(svc_oosiit_mbx_delete(mailbox));
+    }     
 }
 
 extern oosiit_result_t oosiit_mbx_retrieve(oosiit_objptr_t mailbox, void** message, uint32_t timeout)
@@ -931,9 +991,13 @@ extern oosiit_result_t oosiit_mbx_retrieve(oosiit_objptr_t mailbox, void** messa
     {   // inside isr
         return(isr_oosiit_mbx_retrieve(mailbox, message));
     } 
-    else
+    else if(1 == s_oosiit_started)
     {   // call svc
          return(__svc_oosiit_mbx_retrieve(mailbox, message, timeout));
+    }
+    else
+    {
+        return(oosiit_res_NOK);
     }
 }
 
@@ -955,9 +1019,13 @@ extern oosiit_result_t oosiit_mbx_send(oosiit_objptr_t mailbox, void* message, u
         isr_oosiit_mbx_send(mailbox, message);
         return(oosiit_res_OK);
     } 
-    else
+    else if(1 == s_oosiit_started)
     {   // call svc
          return(__svc_oosiit_mbx_send(mailbox, message, timeout));
+    }
+    else
+    {
+        return(oosiit_res_NOK);
     }
 }
 
@@ -972,9 +1040,13 @@ extern uint16_t oosiit_mbx_available(oosiit_objptr_t mailbox)
     {   // inside isr
         return(isr_oosiit_mbx_available(mailbox));
     } 
-    else
+    else if(1 == s_oosiit_started)
     {   // call svc
          return(__svc_oosiit_mbx_available(mailbox));
+    }
+    else
+    {
+        return(0);
     }
 }
 
@@ -989,9 +1061,13 @@ extern uint16_t oosiit_mbx_used(oosiit_objptr_t mailbox)
     {   // inside isr
         return(isr_oosiit_mbx_used(mailbox));
     } 
-    else
+    else if(1 == s_oosiit_started)
     {   // call svc
          return(__svc_oosiit_mbx_used(mailbox));
+    }
+    else
+    {
+        return(0);
     }
 }
 
@@ -1010,9 +1086,13 @@ extern oosiit_result_t oosiit_evt_set(uint32_t flags, oosiit_tskptr_t tp)
     {   // inside isr
         return(isr_oosiit_evt_set(flags, tp));
     } 
-    else
+    else if(1 == s_oosiit_started)
     {   // call svc
         return(__svc_oosiit_evt_set(flags, tp));
+    }
+    else
+    {
+        return(oosiit_res_NOK);
     }
 }
 
@@ -1022,9 +1102,13 @@ extern oosiit_result_t oosiit_evt_wait(uint32_t waitflags,  uint32_t timeout, oo
     {   // inside isr
         return(oosiit_res_NOK);
     } 
-    else
+    else if(1 == s_oosiit_started)
     {   // call svc
          return(__svc_oosiit_evt_wait(waitflags, timeout, waitmode));
+    }
+    else
+    {
+        return(oosiit_res_NOK);
     }
 }
 
@@ -1034,9 +1118,13 @@ extern uint32_t oosiit_evt_get(void)
     {   // inside isr
         return(0);
     } 
-    else
+    else if(1 == s_oosiit_started)
     {   // call svc
          return(__svc_oosiit_evt_get());
+    }
+    else
+    {
+        return(0);
     }
 }
 
@@ -1051,9 +1139,13 @@ extern oosiit_result_t oosiit_evt_clr(uint32_t flags)
     {   // inside isr
         return(oosiit_res_NOK);
     } 
-    else
+    else if(1 == s_oosiit_started)
     {   // call svc
          return(__svc_oosiit_evt_clr(flags));
+    }
+    else
+    {
+        return(oosiit_res_NOK);
     }
 }
 
@@ -1072,9 +1164,13 @@ extern oosiit_objptr_t oosiit_sem_create(uint8_t maxtokens, uint8_t ntokens)
     {   // inside isr
         return(NULL);
     } 
-    else
+    else if(1 == s_oosiit_started)
     {   // call svc
          return(__svc_oosiit_sem_create(maxtokens, ntokens));
+    }
+    else
+    {   // not within an isr. os not started   
+        return(svc_oosiit_sem_create(maxtokens, ntokens));
     }
 }
 
@@ -1089,9 +1185,13 @@ extern oosiit_result_t oosiit_sem_set(oosiit_objptr_t sem, uint8_t ntokens)
     {   // inside isr
         return(oosiit_res_NOK);
     } 
-    else
+    else if(1 == s_oosiit_started)
     {   // call svc
          return(__svc_oosiit_sem_set(sem, ntokens));
+    }
+    else
+    {
+        return(oosiit_res_NOK);
     }
 }
 
@@ -1106,9 +1206,13 @@ extern oosiit_result_t oosiit_sem_send(oosiit_objptr_t sem)
     {   // inside isr
         return(isr_oosiit_sem_send(sem));
     } 
-    else
+    else if(1 == s_oosiit_started)
     {   // call svc
          return(__svc_oosiit_sem_send(sem));
+    }
+    else
+    {
+        return(oosiit_res_NOK);
     }
 }
 
@@ -1123,9 +1227,13 @@ extern oosiit_result_t oosiit_sem_wait(oosiit_objptr_t sem, uint32_t timeout)
     {   // inside isr
         return(oosiit_res_NOK);
     } 
-    else
+    else if(1 == s_oosiit_started)
     {   // call svc
          return(__svc_oosiit_sem_wait(sem, timeout));
+    }
+    else
+    {
+        return(oosiit_res_NOK);
     }
 }
 
@@ -1140,9 +1248,13 @@ extern oosiit_result_t oosiit_sem_delete(oosiit_objptr_t sem)
     {   // inside isr
         return(oosiit_res_NOK);
     } 
-    else
+    else if(1 == s_oosiit_started)
     {   // call svc
          return(__svc_oosiit_sem_delete(sem));
+    } 
+    else
+    {
+        return(svc_oosiit_sem_delete(sem));
     }    
 }
 
@@ -1155,9 +1267,13 @@ extern oosiit_objptr_t oosiit_mut_create(void)
     {   // inside isr
         return(NULL);
     } 
-    else
+    else if(1 == s_oosiit_started)
     {   // call svc
          return(__svc_oosiit_mut_create());
+    }
+    else
+    {   // not within an isr. os not started   
+        return(svc_oosiit_mut_create());
     }
 }
 
@@ -1172,10 +1288,14 @@ extern oosiit_result_t oosiit_mut_wait(oosiit_objptr_t mutex, uint32_t timeout)
     {   // inside isr
         return(oosiit_res_NOK);
     } 
-    else
+    else if(1 == s_oosiit_started)
     {   // call svc
          return(__svc_oosiit_mut_wait(mutex, timeout));
     }
+    else
+    {
+        return(oosiit_res_NOK);
+    }    
 }
 
 extern oosiit_result_t oosiit_mut_release(oosiit_objptr_t mutex)
@@ -1189,10 +1309,14 @@ extern oosiit_result_t oosiit_mut_release(oosiit_objptr_t mutex)
     {   // inside isr
         return(oosiit_res_NOK);
     } 
-    else
+    else if(1 == s_oosiit_started)
     {   // call svc
          return(__svc_oosiit_mut_release(mutex));
     }
+    else
+    {
+        return(oosiit_res_NOK);
+    }    
 }
 
 extern oosiit_result_t oosiit_mut_delete(oosiit_objptr_t mutex)
@@ -1206,9 +1330,13 @@ extern oosiit_result_t oosiit_mut_delete(oosiit_objptr_t mutex)
     {   // inside isr
         return(oosiit_res_NOK);
     } 
-    else
+    else if(1 == s_oosiit_started)
     {   // call svc
          return(__svc_oosiit_mut_delete(mutex));
+    }
+    else
+    {
+        return(svc_oosiit_mut_delete(mutex));
     }    
 }
 
@@ -1221,10 +1349,14 @@ extern oosiit_objptr_t oosiit_advtmr_new(void)
     {   // inside isr
         return(NULL);
     } 
-    else
+    else if(1 == s_oosiit_started)
     {   // call svc
          return(__svc_oosiit_advtmr_new());
     }
+    else
+    {   // not within an isr. os not started   
+        return(svc_oosiit_advtmr_new());
+    }    
 }
 
 extern oosiit_result_t oosiit_advtmr_start(oosiit_objptr_t timer, oosiit_advtmr_timing_t *timing, oosiit_advtmr_action_t *action)
@@ -1243,9 +1375,13 @@ extern oosiit_result_t oosiit_advtmr_start(oosiit_objptr_t timer, oosiit_advtmr_
     {   // inside isr
         return(isr_oosiit_advtmr_start(timer, timing, action));
     } 
-    else
+    else if(1 == s_oosiit_started)
     {   // call svc
          return(__svc_oosiit_advtmr_start(timer, timing, action));
+    }
+    else
+    {   // not within an isr. os not started   
+        return(oosiit_res_NOK);
     }
 }
 
@@ -1260,9 +1396,13 @@ extern oosiit_result_t oosiit_advtmr_stop(oosiit_objptr_t timer)
     {   // inside isr
         return(isr_oosiit_advtmr_stop(timer));
     } 
-    else
+    else if(1 == s_oosiit_started)
     {   // call svc
          return(__svc_oosiit_advtmr_stop(timer));
+    }
+    else
+    {   // not within an isr. os not started   
+        return(oosiit_res_NOK);
     }
 }
 
@@ -1296,10 +1436,14 @@ extern oosiit_result_t oosiit_advtmr_delete(oosiit_objptr_t timer)
     {   // inside isr
         return(isr_oosiit_advtmr_delete(timer));
     } 
-    else
+    else if(1 == s_oosiit_started)
     {   // call svc
          return(__svc_oosiit_advtmr_delete(timer));
     }
+    else
+    {
+        return(svc_oosiit_advtmr_delete(timer));
+    }    
 }
 
 // --------------------------------------------------------------------------------------------------------------------

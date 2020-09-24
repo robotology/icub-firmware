@@ -258,6 +258,8 @@ typedef struct
 } osal_extfn_cfg_t;
 
 
+
+
 /** @typedef    typedef struct osal_cfg_t
     @brief      osal_cfg_t keeps the configuration of OSAL. This type should be used to instantiate one constant
                 variable, possibly using osal_cfg.[h, c] files.
@@ -345,6 +347,9 @@ extern void* osal_ext_realloc(void* m, uint32_t s);
                 osal_base_memory_del()
  **/ 
 extern void osal_ext_free(void* m);
+
+
+extern void osal_set_errorhandler( void(*on_fatal_error)(void* task, osal_fatalerror_t errorcode, const char * errormsg));
 
 
 /** @fn         extern uint32_t osal_base_memory_getsize(const osal_cfg_t *cfg, uint32_t *size08aligned)

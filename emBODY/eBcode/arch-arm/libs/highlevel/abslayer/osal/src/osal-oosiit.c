@@ -162,11 +162,18 @@ static const osal_cpufamily_t s_osal_cpufam =
 // mutex used to guarantee atomic access at user space in the osal layer
 static osal_mutex_t *s_osal_mutex_api_protection = NULL;
 
-// configuration of osiit
-static oosiit_cfg_t s_osal_oosiit_cfg = {0};
+// configuration of osiit. the default is w/ oosiit_memmode_dynamic 
+static oosiit_cfg_t s_osal_oosiit_cfg = 
+{
+    .memorymode = oosiit_memmode_dynamic
+};
 
-// configuration of osal  
-static osal_cfg_t  s_osal_osal_cfg;
+// configuration of osal. the default is w/ osal_memmode_dynamic and osal_rtostype_oosiit
+static osal_cfg_t  s_osal_osal_cfg = 
+{
+    .rtostype = osal_rtostype_oosiit,
+    .memorymodel = osal_memmode_dynamic    
+};
 
 // stack for launcher task
 static uint64_t *s_osal_stacklauncher_data = NULL;
@@ -207,6 +214,11 @@ static uint8_t s_osal_arch_arm_armc99_sysmutex_number = 0;
 // --------------------------------------------------------------------------------------------------------------------
 // - definition of extern public functions
 // --------------------------------------------------------------------------------------------------------------------
+
+extern void osal_set_errorhandler( void(*on_fatal_error)(void* task, osal_fatalerror_t errorcode, const char * errormsg))
+{
+    s_osal_osal_cfg.extfn.usr_on_fatal_error = on_fatal_error;
+}
 
 
 extern uint32_t osal_base_memory_getsize(const osal_cfg_t *cfg, uint32_t *size08aligned)
