@@ -186,12 +186,16 @@ void * cmsisos2_memory_new(size_t size)
 {
     void *p = NULL;
     if(IsIrqMode() || IsIrqMasked()) 
-    {
+    {   // inside isr
         p = svcRtxCmsisos2_new(size);
     } 
-    else 
-    {
-        p =  __svcCmsisos2_new(size);
+    else if(osRtxKernelRunning == osRtxInfo.kernel.state)
+    {   // not within an isr. os running
+        p = __svcCmsisos2_new(size);
+    }
+    else
+    {   // not within an isr. os not started or not scheduling  
+        p = svcRtxCmsisos2_new(size);
     }
     return p;
 }
@@ -199,12 +203,16 @@ void * cmsisos2_memory_new(size_t size)
 void cmsisos2_memory_delete(void *p)
 {
     if(IsIrqMode() || IsIrqMasked()) 
-    {
+    {   // inside isr
         svcRtxCmsisos2_del(p);
     } 
-    else 
-    {
+    else if(osRtxKernelRunning == osRtxInfo.kernel.state) 
+    {   // not within an isr. os running
         __svcCmsisos2_del(p);
+    }
+    else
+    {   // not within an isr. os not started or not scheduling   
+        svcRtxCmsisos2_del(p);
     }
 }
 
@@ -212,12 +220,16 @@ void * cmsisos2_memory_realloc(void *p, size_t size)
 {
     void *p1 = NULL;
     if(IsIrqMode() || IsIrqMasked()) 
-    {
+    {   // inside isr
         p1 = svcRtxCmsisos2_realloc(p, size);
     } 
-    else 
-    {
-        p1 =  __svcCmsisos2_realloc(p, size);
+    else if(osRtxKernelRunning == osRtxInfo.kernel.state) 
+    {   // not within an isr. os running
+        p1 = __svcCmsisos2_realloc(p, size);
+    }
+    else
+    {   // not within an isr. os not started or not scheduling   
+        p1 = svcRtxCmsisos2_realloc(p, size);
     }
     return p;
 }
