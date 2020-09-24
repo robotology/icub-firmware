@@ -46,7 +46,7 @@ struct embot::app::PZdriver::Impl
         _config = config;
         // ...
         
-        _config.pzlut->get(0, _somevalues); 
+        //_config.pzlut->get(0, _somevalues); 
         
         return true;
     } 

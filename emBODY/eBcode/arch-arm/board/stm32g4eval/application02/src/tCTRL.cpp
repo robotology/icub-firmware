@@ -61,7 +61,7 @@ struct embot::app::ctrl::tCTRL::Impl
         
          embot::os::EventThread::Config configEV { 
             6*1024, 
-            embot::os::Priority::high44, 
+            embot::os::Priority::high47, 
             ctrl_startup,
             this,
             50*embot::core::time1millisec,
@@ -90,11 +90,11 @@ struct embot::app::ctrl::tCTRL::Impl
         
         impl->pzd = new embot::app::PZdriver;
         impl->pzd->init({});
-        impl->pzd->start();
+        impl->pzd->start();         
     }
     
     static void ctrl_onevent(embot::os::Thread *t, embot::os::EventMask eventmask, void *param)
-    {   
+    {  
         if(0 == eventmask)
         {   // timeout ...         
             return;
@@ -139,7 +139,7 @@ struct embot::app::ctrl::tCTRL::Impl
             
     void apply_results()
     {
-        pzd->set(_setpoint);
+ //       pzd->set(_setpoint);
     }
         
 };

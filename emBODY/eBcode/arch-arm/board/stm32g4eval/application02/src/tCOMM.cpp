@@ -13,20 +13,25 @@
 #include "embot_hw_can.h"
 
 namespace embot { namespace app { namespace ctrl {
+    
     embot::os::rtos::mutex_t *_mtxOf_frames2tx {nullptr};
     std::vector<embot::prot::can::Frame> _frames2tx {};
+        
+    void init() 
+    {
+        _mtxOf_frames2tx = embot::os::rtos::mutex_new();
+        _frames2tx.reserve(20);
+    }
+        
 }}}    
  
 
-void embot::app::ctrl::tCOMM::init()
-{
-    _frames2tx.reserve(20);
-    _mtxOf_frames2tx = embot::os::rtos::mutex_new();
-}
 
 
 void embot::app::ctrl::tCOMM::userdefStartup(embot::os::Thread *t, void *param) const
 {
+    
+    embot::app::ctrl::init();
     
     // init of can basic paser
     embot::app::application::theCANparserBasic::getInstance().initialise({});

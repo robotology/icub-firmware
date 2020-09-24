@@ -34,7 +34,7 @@ namespace embot { namespace app { namespace ctrl {
     {
     public:
         tCOMM(const embot::app::skeleton::os::evthreadcan::evtConfig& ecfg, const embot::app::skeleton::os::evthreadcan::canConfig& ccfg, const embot::app::theCANboardInfo::applicationInfo& a) 
-            : evThreadCAN(ecfg, ccfg, a) { init(); }
+            : evThreadCAN(ecfg, ccfg, a) { }
             
         // these are called by the comm thread
         void userdefStartup(embot::os::Thread *t, void *param) const override;
@@ -49,7 +49,7 @@ namespace embot { namespace app { namespace ctrl {
         bool trasmit();
         
     private:
-         void init();         
+    
     };   
 
     // we get the thread with
