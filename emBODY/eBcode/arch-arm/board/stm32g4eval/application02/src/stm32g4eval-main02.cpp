@@ -22,6 +22,7 @@ constexpr embot::app::theCANboardInfo::applicationInfo applInfo
 constexpr std::uint16_t threadIDLEstacksize = 2048;
 constexpr std::uint16_t threadINITstacksize = 2048;
 constexpr std::uint16_t threadCOMMstacksize = 4096;
+constexpr embot::core::relTime osTick = 1000*embot::core::time1microsec; 
 constexpr std::uint8_t maxINPcanframes = 16;
 constexpr std::uint8_t maxOUTcanframes = 48;
 constexpr embot::core::relTime threadCOMMtimeout = 50*embot::core::time1millisec;
@@ -35,7 +36,7 @@ constexpr embot::os::theTimerManager::Config tmcfg {};
 constexpr embot::os::theCallbackManager::Config cmcfg {};
     
     
-static const embot::app::skeleton::os::basic::sysConfig syscfg { threadINITstacksize, paramINIT, threadIDLEstacksize, paramIDLE, paramERR, tmcfg, cmcfg};
+static const embot::app::skeleton::os::basic::sysConfig syscfg { threadINITstacksize, paramINIT, threadIDLEstacksize, paramIDLE, paramERR, tmcfg, cmcfg, osTick};
 
 static const embot::app::skeleton::os::evthreadcan::evtConfig COMMthreadConfig { threadCOMMstacksize, paramCOMM, threadCOMMtimeout};
 
@@ -142,7 +143,7 @@ void mySYS::userdefInit_Extra(embot::os::EventThread* evthr, void *initparam) co
     t_snsr->start({});
  
     t_ctrl = new embot::app::ctrl::tCTRL;    
-    t_ctrl->start({});        
+    t_ctrl->start({0, 1000*embot::core::time1microsec});        
     
                    
 //    // init agent of imu

@@ -35,7 +35,7 @@ namespace embot { namespace app { namespace ctrl {
             embot::core::relTime period {1000*embot::core::time1microsec};
 
             constexpr Config() = default;
-            constexpr Config(uint32_t t) : tbd(t) {} 
+            constexpr Config(uint32_t t, embot::core::relTime p) : tbd(t), period(p) {} 
             void clear() { tbd = 0;}
             bool isvalid() const 
             { 
