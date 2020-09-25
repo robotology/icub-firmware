@@ -26,16 +26,21 @@ namespace embot::app::skeleton::os::basic {
         void *errparam {nullptr};
         embot::os::theTimerManager::Config tmconfig {};
         embot::os::theCallbackManager::Config cmconfig {};
+        embot::core::relTime tick {embot::core::time1millisec};
 
         constexpr sysConfig() = default;
 
         constexpr sysConfig(std::uint16_t ssini, void *pini, std::uint16_t ssidl, void *pidl, void *perr,
-                            const embot::os::theTimerManager::Config &tmc, const embot::os::theCallbackManager::Config &cmc) 
-                                : threadINITstacksize(ssini), initparam(pini), threadIDLEstacksize(ssidl), idleparam(pidl), errparam(perr), tmconfig(tmc), cmconfig(cmc) {}
+                            const embot::os::theTimerManager::Config &tmc, const embot::os::theCallbackManager::Config &cmc,
+                            const embot::core::relTime _tk = embot::core::time1millisec) 
+                                : threadINITstacksize(ssini), initparam(pini), threadIDLEstacksize(ssidl), idleparam(pidl), errparam(perr), 
+                                  tmconfig(tmc), cmconfig(cmc),
+                                  tick(_tk) 
+                            {}
         
         bool isvalid() const
         {   // if any of tmconfig or cmconfig is not valid: the SYSTEMxfg is OK, but both services dont start
-            return ((0 == threadINITstacksize) || (0 == threadIDLEstacksize)) ? false : true;
+            return ((0 == threadINITstacksize) || (0 == threadIDLEstacksize) || (0 == tick)) ? false : true;
         }
     };
        

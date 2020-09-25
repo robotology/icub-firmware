@@ -72,7 +72,7 @@ namespace embot::app::skeleton::os::basic {
         embot::os::IdleThread::Config idlecfg = { extCFG->sys->config.threadIDLEstacksize, idlestartup, extCFG->sys->config.idleparam, onidle };
         embot::core::Callback onOSerror = { onerror, extCFG->sys->config.errparam };
                 
-        embot::app::theApplication::Config config { address, initBSP, embot::core::time1millisec, {initcfg, idlecfg, onOSerror} };
+        embot::app::theApplication::Config config { address, initBSP, extCFG->sys->config.tick, {initcfg, idlecfg, onOSerror} };
         embot::app::theApplication &appl = embot::app::theApplication::getInstance();    
 
         // it prepares the system to run at a given flash address, it inits the hw::bsp, 
