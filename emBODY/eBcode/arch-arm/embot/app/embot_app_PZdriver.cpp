@@ -46,7 +46,7 @@ struct embot::app::PZdriver::Impl
         _config = config;
         // ...
         
-        //_config.pzlut->get(0, _somevalues); 
+        _config.pzlut->get(0, _somevalues); 
         
         return true;
     } 
@@ -54,6 +54,9 @@ struct embot::app::PZdriver::Impl
     bool start()
     {
         // ...
+        
+        // the hw driver gets _somevalues ...
+        // and uses them ???
         
         return true;
     } 
@@ -68,7 +71,8 @@ struct embot::app::PZdriver::Impl
     bool set(const setpoint_t &value)
     {
         // ...
-        
+        _config.pzlut->get(value, _somevalues);
+        // at this point, the hw driver gets the new _somevalues and use them ???
         return true;
     }     
 };

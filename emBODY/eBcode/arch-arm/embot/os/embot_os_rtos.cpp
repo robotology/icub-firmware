@@ -1599,7 +1599,7 @@ struct osal_init_pre_main_t
     {
         volatile uint32_t t {0};
         
-        embot::core::print("osal_init_pre_main_t::on_fatal() -> " + errormsg);
+        embot::core::print("osal_init_pre_main_t::on_fatal() -> " + std::string(errormsg));
         
         for(;;)
         {

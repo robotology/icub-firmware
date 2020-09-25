@@ -13,6 +13,13 @@
 
 #include "embot_core.h"
 
+namespace embot { namespace hw {
+    
+    enum class PZM : uint8_t { one = 0, two = 1, three = 2, none = 31, maxnumberof = 3 };
+
+}}
+
+// TODO: move to embot::hw::pzm (piezo motor)
 
 namespace embot { namespace app {
     
@@ -31,16 +38,17 @@ namespace embot { namespace app {
     class PZdriver
     {
     public:
-    
-        using setpoint_t = uint32_t;
         
+        
+    
+        using setpoint_t = uint32_t;        
        
         struct Config
         {
-            uint32_t tbd {0};
+            embot::hw::PZM motor { embot::hw::PZM::none};     // the driver asks to embot::hw::bsp the required resources
             PZlut *pzlut {nullptr};            
             constexpr Config() = default;
-            constexpr Config(uint32_t t, PZlut *p) : tbd(t), pzlut(p) {}
+            constexpr Config(embot::hw::PZM m, PZlut *p) : motor(m), pzlut(p) {}
         };
       
         PZdriver();
@@ -85,7 +93,7 @@ namespace embot { namespace app {
                 // TO BE TESTED...........
                 uint32_t a = (numberofvalues-p);
                 std::memmove(arrayof4values, &thevalues[p], a*sizeof(uint32_t));
-                std::memmove(&arrayof4values[a], &thevalues[p+a], (4-a)*sizeof(uint32_t));               
+                std::memmove(&arrayof4values[a], &thevalues[0], (4-a)*sizeof(uint32_t));               
             }
             
             return true;
