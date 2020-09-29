@@ -54,13 +54,14 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
         
     CMD convert(std::uint8_t cmd)
     {
-        constexpr std::uint16_t aspermask16 =    (1 << static_cast<std::uint8_t>(CMD::USERDEF))                          |
+        constexpr std::uint16_t aspermask16 =       (1 << static_cast<std::uint8_t>(CMD::USERDEF))                          |
                                                     (1 << static_cast<std::uint8_t>(CMD::POS))                              |
                                                     (1 << static_cast<std::uint8_t>(CMD::UNCALIBFORCE_VECTOR_DEBUGMODE))    |
                                                     (1 << static_cast<std::uint8_t>(CMD::UNCALIBTORQUE_VECTOR_DEBUGMODE))   |   
                                                     (1 << static_cast<std::uint8_t>(CMD::FORCE_VECTOR))                     |
                                                     (1 << static_cast<std::uint8_t>(CMD::TORQUE_VECTOR))                    |
-                                                    (1 << static_cast<std::uint8_t>(CMD::THERMOMETER_MEASURE));
+                                                    (1 << static_cast<std::uint8_t>(CMD::THERMOMETER_MEASURE))              |
+                                                    (1 << static_cast<std::uint8_t>(CMD::SKINWASEDA_MEASURE))               ;
 
         if(cmd > 15)
         {
@@ -307,6 +308,24 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
         std::uint8_t size = 8;
                
         Message::set(info.canaddress, 0xf, Clas::periodicAnalogSensor, static_cast<std::uint8_t>(CMD::POS), data08, size);
+        std::memmove(&outframe, &canframe, sizeof(embot::prot::can::Frame));
+                    
+        return true;
+    } 
+
+
+    bool Message_SKINWASEDA_MEASURE::load(const Info& inf)
+    {
+        info = inf;
+      
+        return true;
+    }
+        
+    bool Message_SKINWASEDA_MEASURE::get(embot::prot::can::Frame &outframe)
+    {
+        std::uint8_t size = 8;
+              
+        Message::set(info.canaddress, 0xf, Clas::periodicAnalogSensor, static_cast<std::uint8_t>(CMD::SKINWASEDA_MEASURE), info.data, size);
         std::memmove(&outframe, &canframe, sizeof(embot::prot::can::Frame));
                     
         return true;

@@ -12,7 +12,6 @@
  * Modified:
  *
  ******************************************************************************/
-
 /* Define to prevent recursive inclusion -------------------------------------*/
 #ifndef __i2c_SSI_H
 #define __i2c_SSI_H
@@ -20,26 +19,18 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-    
-    
-#include "if2hw_common.h"    
 
-    
-    
+
 typedef enum
 {
-    sda0 = 0,
-    sda1 = 1,
-    sda2 = 2,
-    sda3 = 3,
-	sda4 = 4,
-	sda5 = 5,
-	sda6 = 6,
-	sda7 = 7,
+  sda0 = 0,
+  sda1 = 1,
+  sda2 = 2,
+  sda3 = 3,
 }i2c_sda_num_t;
 
 
-#define i2c_sda_num_max 8
+#define i2c_sda_num_max 4
 #define CH0     0
 #define CH1     1
 
@@ -50,20 +41,29 @@ void I2C_Multi_SDA_deInit(unsigned char Channel);
 //Local functions
 //===============
 //High level functions
-unsigned char WriteViaI2C(unsigned char Channel, unsigned char DeviceAddress, const unsigned int RegisterStartAddress, const unsigned char NumberOfRegistersToWrite, 
-                          if2hw_data_i2cmultisda_t *DataBuffer, const unsigned int OffsetInBuffer);
+unsigned char WriteViaI2C(unsigned char Channel, unsigned char DeviceAddress, const unsigned int RegisterStartAddress, const unsigned char NumberOfRegistersToWrite, unsigned int *DataBuffer, const unsigned int OffsetInBuffer);
 extern unsigned char WriteByteViaI2C(unsigned char Channel, unsigned char DeviceAddress, const unsigned char RegisterStartAddress, unsigned char DataBuffer);
-unsigned char WriteByteI2C_onSdaX(unsigned char Channel, i2c_sda_num_t sdaNum, unsigned char DeviceAddress, const unsigned int RegisterStartAddress, const unsigned char NumberOfRegistersToWrite, 
-                                  if2hw_data_i2cmultisda_t *DataBuffer, const unsigned int OffsetInBuffer);
-unsigned char WriteViaI2C_onSdaX(unsigned char Channel, i2c_sda_num_t sdaNum, unsigned char DeviceAddress, const unsigned int RegisterStartAddress, const unsigned char NumberOfRegistersToWrite, 
-                                 if2hw_data_i2cmultisda_t *DataBuffer, const unsigned int OffsetInBuffer);
-unsigned char ReadBurstViaI2C(unsigned char Channel, unsigned char SDAnum, unsigned char DeviceAddress, const unsigned int RegisterStartAddress, const unsigned char NumberOfRegistersToRead, 
-                              if2hw_data_i2cmultisda_t *DataBuffer);
-extern unsigned char ReadViaI2C(unsigned char Channel,unsigned char DeviceAddress, const unsigned int RegisterStartAddress, const unsigned char NumberOfRegistersToRead, 
-                                if2hw_data_i2cmultisda_t *DataBuffer1, if2hw_data_i2cmultisda_t *DataBuffer2, if2hw_data_i2cmultisda_t *DataBuffer3, if2hw_data_i2cmultisda_t *DataBuffer4, 
-                                const unsigned int OffsetInBuffer);
+unsigned char WriteByteI2C_onSdaX(unsigned char Channel, i2c_sda_num_t sdaNum, unsigned char DeviceAddress, const unsigned int RegisterStartAddress, const unsigned char NumberOfRegistersToWrite, unsigned int *DataBuffer, const unsigned int OffsetInBuffer);
+unsigned char WriteViaI2C_onSdaX(unsigned char Channel, i2c_sda_num_t sdaNum, unsigned char DeviceAddress, const unsigned int RegisterStartAddress, const unsigned char NumberOfRegistersToWrite, unsigned int *DataBuffer, const unsigned int OffsetInBuffer);
+unsigned char ReadBurstViaI2C(unsigned char Channel, unsigned char SDAnum, unsigned char DeviceAddress, const unsigned int RegisterStartAddress, const unsigned char NumberOfRegistersToRead, unsigned int *DataBuffer);
+extern unsigned char ReadViaI2C(unsigned char Channel,unsigned char DeviceAddress, const unsigned int RegisterStartAddress, const unsigned char NumberOfRegistersToRead, unsigned int *DataBuffer1, unsigned int *DataBuffer2, unsigned int *DataBuffer3, unsigned int *DataBuffer4, const unsigned int OffsetInBuffer);
 unsigned char ReadByteViaI2C(unsigned char Channel, unsigned char SDAnum, unsigned char DeviceAddress, const unsigned char RegisterAddress, unsigned char *DataBuffer );
 unsigned char ReadByteViaI2C_onSdaX(unsigned char Channel, i2c_sda_num_t sdaNum, unsigned char DeviceAddress, const unsigned char RegisterAddress, unsigned char *DataBuffer );
+
+extern void SendSingleCommand_I2C_SkinWaseda(unsigned char DeviceAddress, 
+                                             unsigned char Byte_To_Send, 
+                                             unsigned int *Receive_Buffer_SDA0,
+                                             unsigned int *Receive_Buffer_SDA1, 
+                                             unsigned int *Receive_Buffer_SDA2,
+                                             unsigned int *Receive_Buffer_SDA3,
+                                             unsigned int *Receive_Buffer_SDA4,
+                                             const unsigned char Receive_Buffer_Length);
+                                                   
+extern void SendFourCommands_I2C_SkinWaseda(unsigned char DeviceAddress, 
+                                            unsigned char Byte_To_Send0, 
+                                            unsigned char Byte_To_Send1, 
+                                            unsigned char Byte_To_Send2, 
+                                            unsigned char Byte_To_Send3);
 
 //Low level functions
 void Wait(unsigned int cycles);
@@ -82,5 +82,4 @@ unsigned char SendByteI2CMaster_onSdaX(unsigned char Channel, i2c_sda_num_t sdaN
 #ifdef __cplusplus
 }       // closing brace for extern "C"
 #endif 
-
 #endif

@@ -42,7 +42,9 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
         TORQUE_VECTOR = ICUBCANPROTO_PER_AS_MSG__TORQUE_VECTOR,                                                      // strain
         // NEW messages:
         THERMOMETER_MEASURE = ICUBCANPROTO_PER_AS_MSG__THERMOMETER_MEASURE,
-        POS = ICUBCANPROTO_PER_AS_MSG__POS
+        POS = ICUBCANPROTO_PER_AS_MSG__POS,
+        
+        SKINWASEDA_MEASURE = 0xF
     };
     
     // NOTES
@@ -261,7 +263,28 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
         bool load(const Info& inf);
             
         bool get(embot::prot::can::Frame &outframe);        
-    };    
+    };   
+
+
+    class Message_SKINWASEDA_MEASURE : public Message
+    {
+        public:
+            
+        struct Info
+        { 
+            std::uint8_t                canaddress;
+            std::uint8_t                data[8];
+            Info() : canaddress(0) { std::memset(data, 0, sizeof(data)); }
+        };
+        
+        Info info;
+        
+        Message_SKINWASEDA_MEASURE() {}
+            
+        bool load(const Info& inf);
+            
+        bool get(embot::prot::can::Frame &outframe);        
+    };     
         
     
 }}}}} // namespace embot { namespace prot { namespace can { namespace analog { namespace periodic {    

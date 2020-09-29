@@ -13,23 +13,23 @@
  *
  ******************************************************************************/
 
-// acemor
-#include "if2hw_common.h"
-
-
 //---------------------------------
 //Function prototypes
 //---------------------------------
+//#include "main.h"
+////#include "stm32l4xx_hal.h"
+////#include "stm32l4xx_ll_gpio.h"
 
+
+//#include "D:/ICubCodeRepo-WasedaVersionMarco/icub-firmware/emBODY/eBcode/arch-arm/libs/lowlevel/stm32hal/src/board/mtb4/v190/inc/main.h"
+//#include "../src/driver/stm32l4-v190/inc/stm32l4xx_hal.h"
+//#include "../src/driver/stm32l4-v190/inc/stm32l4xx_ll_gpio.h"
+////\src\board\mtb4\v190\inc
+
+#include "stm32hal.h"
+
+//#include "D:/ICubCodeRepo-WasedaVersionMarco/icub-firmware/emBODY/eBcode/arch-arm/board/mtb4w/application/src/others/I2C_Multi_SDA.h"
 #include "I2C_Multi_SDA.h"
-
-
-////#include "main.h"
-//#include "stm32l4xx_hal.h"
-//#include "stm32l4xx_ll_gpio.h"
-//#include "I2C_Multi_SDA.h"
-////#include "stm32l4xx.h"
-////#include "stm32l443xx.h"
 
 
 //---------------------------------
@@ -39,48 +39,63 @@
 #define I2C_RD		0x01
 #define	ACK			0
 #define	NACK		1
-unsigned int I2Cbit=1; //the duration of a bit 10 is about 28Khz, 1 is about 500KHz
+const unsigned int I2Cbit=1; //For MTB4 and the current configuration: the duration of a bit 10 is about 56Khz, 5 is about 75KHz, 1 is about 102KHz.
+                             //We think we optimization done on the code gets rid of the wait function altogether. 
 
 
+//Extra SDA for Waseda! SDA4 = Port C Pin 0, free pin available in connector
+#define SDA4_Pin GPIO_PIN_0
+#define SDA4_GPIO_Port GPIOC
+
+ 
 #define	MCO_0_on    HAL_GPIO_WritePin(SCK0_GPIO_Port, SCK0_Pin, GPIO_PIN_SET);
 #define	MCO_0_off   HAL_GPIO_WritePin(SCK0_GPIO_Port, SCK0_Pin, GPIO_PIN_RESET);
 
-#if 0
+
 #define DO_0on      HAL_GPIO_WritePin(SDA0_GPIO_Port, SDA0_Pin, GPIO_PIN_SET);\
                     HAL_GPIO_WritePin(SDA1_GPIO_Port, SDA1_Pin, GPIO_PIN_SET);\
                     HAL_GPIO_WritePin(SDA2_GPIO_Port, SDA2_Pin, GPIO_PIN_SET);\
-                    HAL_GPIO_WritePin(SDA3_GPIO_Port, SDA3_Pin, GPIO_PIN_SET);
+                    HAL_GPIO_WritePin(SDA3_GPIO_Port, SDA3_Pin, GPIO_PIN_SET);\
+                    HAL_GPIO_WritePin(SDA4_GPIO_Port, SDA4_Pin, GPIO_PIN_SET);
 
 #define DO_0off     HAL_GPIO_WritePin(SDA0_GPIO_Port, SDA0_Pin, GPIO_PIN_RESET);\
                     HAL_GPIO_WritePin(SDA1_GPIO_Port, SDA1_Pin, GPIO_PIN_RESET);\
                     HAL_GPIO_WritePin(SDA2_GPIO_Port, SDA2_Pin, GPIO_PIN_RESET);\
-                    HAL_GPIO_WritePin(SDA3_GPIO_Port, SDA3_Pin, GPIO_PIN_RESET);
-#else
+                    HAL_GPIO_WritePin(SDA3_GPIO_Port, SDA3_Pin, GPIO_PIN_RESET);\
+                    HAL_GPIO_WritePin(SDA4_GPIO_Port, SDA4_Pin, GPIO_PIN_RESET);
+//#else
 // debugged by marco.accame / andrea.mura
 // it is necessary to change values all in one shot
-#define DO_0on               GPIOA->ODR |= 0x01e0;
-#define DO_0off              GPIOA->ODR &= 0xFe1F;
-#endif
+//#define DO_0on               GPIOA->ODR |= 0x01e0;
+//#define DO_0off              GPIOA->ODR &= 0xFe1F;
+//#endif
 
 // debugged by marco.accame / andrea.mura
 // corrected pin values
-#define DE_0input   LL_GPIO_SetPinMode(SDA0_GPIO_Port, SDA0_Pin, LL_GPIO_MODE_INPUT);\
+#define DE_0input   DO_0on;\
+                    LL_GPIO_SetPinMode(SDA0_GPIO_Port, SDA0_Pin, LL_GPIO_MODE_INPUT);\
                     LL_GPIO_SetPinMode(SDA1_GPIO_Port, SDA1_Pin, LL_GPIO_MODE_INPUT);\
                     LL_GPIO_SetPinMode(SDA2_GPIO_Port, SDA2_Pin, LL_GPIO_MODE_INPUT);\
                     LL_GPIO_SetPinMode(SDA3_GPIO_Port, SDA3_Pin, LL_GPIO_MODE_INPUT);\
+                    LL_GPIO_SetPinMode(SDA4_GPIO_Port, SDA4_Pin, LL_GPIO_MODE_INPUT);\
                     LL_GPIO_SetPinPull(SDA0_GPIO_Port, SDA0_Pin,LL_GPIO_PULL_NO);\
                     LL_GPIO_SetPinPull(SDA1_GPIO_Port, SDA1_Pin,LL_GPIO_PULL_NO);\
                     LL_GPIO_SetPinPull(SDA2_GPIO_Port, SDA2_Pin,LL_GPIO_PULL_NO);\
-                    LL_GPIO_SetPinPull(SDA3_GPIO_Port, SDA3_Pin,LL_GPIO_PULL_NO);
+                    LL_GPIO_SetPinPull(SDA3_GPIO_Port, SDA3_Pin,LL_GPIO_PULL_NO);\
+                    LL_GPIO_SetPinPull(SDA4_GPIO_Port, SDA4_Pin, LL_GPIO_PULL_UP);   //Last one is special one, it needs to use the internal PULL UP from microcontroller!
+                    //ALexis NEW SDA - Add Code here &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
 #define DE_0output  LL_GPIO_SetPinMode(SDA0_GPIO_Port, SDA0_Pin, LL_GPIO_MODE_OUTPUT);\
                     LL_GPIO_SetPinMode(SDA1_GPIO_Port, SDA1_Pin, LL_GPIO_MODE_OUTPUT);\
                     LL_GPIO_SetPinMode(SDA2_GPIO_Port, SDA2_Pin, LL_GPIO_MODE_OUTPUT);\
                     LL_GPIO_SetPinMode(SDA3_GPIO_Port, SDA3_Pin, LL_GPIO_MODE_OUTPUT);\
+                    LL_GPIO_SetPinMode(SDA4_GPIO_Port, SDA4_Pin, LL_GPIO_MODE_OUTPUT);\
                     LL_GPIO_SetPinOutputType(SDA0_GPIO_Port, SDA0_Pin, LL_GPIO_OUTPUT_PUSHPULL);\
                     LL_GPIO_SetPinOutputType(SDA1_GPIO_Port, SDA1_Pin, LL_GPIO_OUTPUT_PUSHPULL);\
                     LL_GPIO_SetPinOutputType(SDA2_GPIO_Port, SDA2_Pin, LL_GPIO_OUTPUT_PUSHPULL);\
-                    LL_GPIO_SetPinOutputType(SDA3_GPIO_Port, SDA3_Pin, LL_GPIO_OUTPUT_PUSHPULL);
+                    LL_GPIO_SetPinOutputType(SDA3_GPIO_Port, SDA3_Pin, LL_GPIO_OUTPUT_PUSHPULL);\
+                    LL_GPIO_SetPinOutputType(SDA4_GPIO_Port, SDA4_Pin, LL_GPIO_OUTPUT_PUSHPULL);
+                    //ALexis NEW SDA - Add Code here &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
 #define MCE_0input  LL_GPIO_SetPinMode(SCK0_GPIO_Port, SCK0_Pin, LL_GPIO_MODE_INPUT);\
                     LL_GPIO_SetPinOutputType(SCK0_GPIO_Port, SCK0_Pin, LL_GPIO_PULL_NO);\
@@ -102,13 +117,18 @@ unsigned int I2Cbit=1; //the duration of a bit 10 is about 28Khz, 1 is about 500
 
 
 static unsigned char ReceivedByte[4] = { 0, 0, 0, 0 };
+static unsigned char ReceivedByteFiveSDA[5] = { 0, 0, 0, 0, 0 };
+//ALexis NEW SDA - Add Code here &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&
 
 void Wait(unsigned int cycles) {
 
-    // marco.accame: you may uses if2hw_common_delay(cycles);
+    //Ideally we would like the wait funtion to be handled by a more precise delay. Ask MARCO.
+    //embot::common::relTime waitEventTimeout = 50*1000; //50*1000; //5*1000*1000;  
+    //embot::hw::sys::delay(waittime);     
+    
 	while (cycles>0)
 	{
-		cycles--;
+		cycles--;        
 	//HAL_GPIO_TogglePin(GPIOA,GPIO_PIN_5);
 	//	GPIOA->ODR ^= GPIO_PIN_5; //da aggiungere se si ottimizza
 	}
@@ -196,9 +216,8 @@ unsigned char WriteByteViaI2C(unsigned char Channel,
 //--------------------------------------------------------------------------------
 unsigned char WriteViaI2C(unsigned char Channel, unsigned char DeviceAddress,
 		const unsigned int RegisterStartAddress,
-		const unsigned char NumberOfRegistersToWrite, 
-        if2hw_data_i2cmultisda_t *DataBuffer, const unsigned int OffsetInBuffer) {
-            
+		const unsigned char NumberOfRegistersToWrite, unsigned int *DataBuffer,
+		const unsigned int OffsetInBuffer) {
 	unsigned int DataToWrite;
 	unsigned char LowByteAddress, HighByteAddress;
 	unsigned char LowByteData, HighByteData;
@@ -263,9 +282,8 @@ unsigned char WriteViaI2C(unsigned char Channel, unsigned char DeviceAddress,
 //--------------------------------------------------------------------------------
 unsigned char WriteViaI2C_onSdaX(unsigned char Channel, i2c_sda_num_t sdaNum,
 		unsigned char DeviceAddress, const unsigned int RegisterStartAddress,
-		const unsigned char NumberOfRegistersToWrite, 
-        if2hw_data_i2cmultisda_t *DataBuffer, const unsigned int OffsetInBuffer) {
-            
+		const unsigned char NumberOfRegistersToWrite, unsigned int *DataBuffer,
+		const unsigned int OffsetInBuffer) {
 	unsigned int DataToWrite;
 	unsigned char LowByteAddress, HighByteAddress;
 	unsigned char LowByteData, HighByteData;
@@ -324,13 +342,11 @@ unsigned char WriteViaI2C_onSdaX(unsigned char Channel, i2c_sda_num_t sdaNum,
 
 unsigned char WriteByteI2C_onSdaX(unsigned char Channel, i2c_sda_num_t sdaNum,
         unsigned char DeviceAddress, const unsigned int RegisterStartAddress,
-        const unsigned char NumberOfRegistersToWrite, 
-        if2hw_data_i2cmultisda_t *DataBuffer, const unsigned int OffsetInBuffer) {
-            
+        const unsigned char NumberOfRegistersToWrite, unsigned int *DataBuffer,
+        const unsigned int OffsetInBuffer) {
     unsigned int DataToWrite;
-//    unsigned char LowByteAddress, HighByteAddress;
-    unsigned char LowByteData;
-//    unsigned char HighByteData;
+    unsigned char LowByteAddress, HighByteAddress;
+    unsigned char LowByteData, HighByteData;
     unsigned char r, AcknError;
     unsigned char DeviceAddressHeader;
 
@@ -440,12 +456,15 @@ unsigned char ReadByteViaI2C(unsigned char Channel, unsigned char SDAnum,
 //back. The function returns "1" if successfull otherwise "0". If an error occurs,
 //Then the stop condition is sent.
 //--------------------------------------------------------------------------------
-unsigned char ReadViaI2C(unsigned char Channel, unsigned char DeviceAddress,
-		const unsigned int RegisterStartAddress,
-		const unsigned char NumberOfRegistersToRead, 
-        if2hw_data_i2cmultisda_t *DataBuffer1, if2hw_data_i2cmultisda_t *DataBuffer2, 
-        if2hw_data_i2cmultisda_t *DataBuffer3, if2hw_data_i2cmultisda_t *DataBuffer4, 
-        const unsigned int OffsetInBuffer) {
+unsigned char ReadViaI2C(unsigned char Channel, 
+                         unsigned char DeviceAddress,
+                         const unsigned int RegisterStartAddress,
+                         const unsigned char NumberOfRegistersToRead, 
+                         unsigned int *DataBuffer1,
+                         unsigned int *DataBuffer2, 
+                         unsigned int *DataBuffer3,
+                         unsigned int *DataBuffer4, 
+                         const unsigned int OffsetInBuffer) {
             
 	unsigned char LowByteAddress, HighByteAddress;
 	unsigned char LowByteData[4], HighByteData[4];
@@ -582,6 +601,140 @@ unsigned char ReadViaI2C(unsigned char Channel, unsigned char DeviceAddress,
 	return (AcknError);
 }
 
+
+
+
+// function for Skin Waseda -- All comments and code from ALexis. March 2019 @ IIT.
+
+
+
+//Sends out 1 byte at a time! Reads only 1 at a time
+void SendSingleCommand_I2C_SkinWaseda(unsigned char DeviceAddress, 
+                                      unsigned char Byte_To_Send,
+                                      unsigned int *receive_Buffer_SDA0,
+                                      unsigned int *receive_Buffer_SDA1, 
+                                      unsigned int *receive_Buffer_SDA2,
+                                      unsigned int *receive_Buffer_SDA3,
+                                      unsigned int *receive_Buffer_SDA4,
+                                      const unsigned char Receive_Buffer_Length)
+{
+    //Add the write bit to the device address
+     unsigned char DeviceAddressHeader = DeviceAddress << 1 | I2C_WR;
+    
+    // I2C writing start 
+    InitialiseI2CMaster(CH0);
+    StartI2CMaster(CH0);
+    
+    //Send device address with WRITE command
+    SendByteI2CMaster(CH0, DeviceAddressHeader);
+   
+    //Perform write
+    SendByteI2CMaster(CH0, Byte_To_Send); //SEND 1 byte
+
+    //send the repeated start - Why? I don't know
+    StartI2CMaster(CH0);
+            
+    //Start reading byte
+    //Send device address again changing the Rd/Wr bit
+    DeviceAddressHeader = DeviceAddress << 1 | I2C_RD;
+    SendByteI2CMaster(CH0, DeviceAddressHeader);
+
+    if (Receive_Buffer_Length == 1) 
+    {
+        //Do only one-byte read sending the NACK
+        //Reading all SDAs at the same time
+        ReceiveByteI2CMaster(CH0, NACK);
+        //Fill the Receive_Buffer pointers
+        receive_Buffer_SDA0[0] = ReceivedByteFiveSDA[0];
+        receive_Buffer_SDA1[0] = ReceivedByteFiveSDA[1];
+        receive_Buffer_SDA2[0] = ReceivedByteFiveSDA[2];
+        receive_Buffer_SDA3[0] = ReceivedByteFiveSDA[3];
+        receive_Buffer_SDA4[0] = ReceivedByteFiveSDA[4];
+
+    } 
+    else 
+    {
+        //Read all Receive_Buffer_Length but the last one. Send ACK for all, Send NACK for last
+        for (unsigned char r = 0; r < (Receive_Buffer_Length - 1); r++) 
+        {
+            ReceiveByteI2CMaster(CH0, ACK);
+            //Fill the Receive_Buffer pointers
+            receive_Buffer_SDA0[r] = ReceivedByteFiveSDA[0];
+            receive_Buffer_SDA1[r] = ReceivedByteFiveSDA[1];
+            receive_Buffer_SDA2[r] = ReceivedByteFiveSDA[2];
+            receive_Buffer_SDA3[r] = ReceivedByteFiveSDA[3];
+            receive_Buffer_SDA4[r] = ReceivedByteFiveSDA[4];
+        }
+        
+        //Do only one-byte read sending the NACK
+        //Reading all SDAs at the same time
+        ReceiveByteI2CMaster(CH0, NACK);
+        //Fill the Receive_Buffer pointers. LAST ONE
+        receive_Buffer_SDA0[Receive_Buffer_Length - 1] = ReceivedByteFiveSDA[0];
+        receive_Buffer_SDA1[Receive_Buffer_Length - 1] = ReceivedByteFiveSDA[1];
+        receive_Buffer_SDA2[Receive_Buffer_Length - 1] = ReceivedByteFiveSDA[2];
+        receive_Buffer_SDA3[Receive_Buffer_Length - 1] = ReceivedByteFiveSDA[3];
+        receive_Buffer_SDA4[Receive_Buffer_Length - 1] = ReceivedByteFiveSDA[4];
+    }
+    
+    //Stop
+    StopI2CMaster(CH0);
+}
+
+//Sends out 4 byte commands! Reads only 1 at a time at the end (not sure if necessary)
+void SendFourCommands_I2C_SkinWaseda(unsigned char DeviceAddress, 
+                                     unsigned char Byte_To_Send0, 
+                                     unsigned char Byte_To_Send1, 
+                                     unsigned char Byte_To_Send2, 
+                                     unsigned char Byte_To_Send3)
+{
+    //Add the write bit to the device address
+    unsigned char DeviceAddressHeader = DeviceAddress << 1 | I2C_WR;
+
+    // I2C writing start 
+    InitialiseI2CMaster(CH0);
+    StartI2CMaster(CH0);
+    
+    //Send device address
+    SendByteI2CMaster(CH0, DeviceAddressHeader);
+
+    //Perform block write to send command address
+    SendByteI2CMaster(CH0, Byte_To_Send0); 
+    SendByteI2CMaster(CH0, Byte_To_Send1); 
+    SendByteI2CMaster(CH0, Byte_To_Send2);
+    SendByteI2CMaster(CH0, Byte_To_Send3); 
+
+    //send the repeated start
+    StartI2CMaster(CH0);
+
+    //Do we need to read again here??? The 4-Command method doesn't expect any outcome. It is just for configuration.
+    //Start reading byte
+    //Send device address again changing the Rd/Wr bit
+    DeviceAddressHeader = DeviceAddress << 1 | I2C_RD;
+    SendByteI2CMaster(CH0, DeviceAddressHeader);
+
+    //Do only one-byte read sending the NACK
+    //Reading all SDAs at the same time
+    ReceiveByteI2CMaster(CH0, NACK);
+    
+//   //Read nothing in return. This is a setup function only.
+//   //Fill the Receive_Buffer pointers
+//   receive_Buffer_SDA0[0] = ReceivedByte[0];
+//   receive_Buffer_SDA1[0] = ReceivedByte[1];
+//   receive_Buffer_SDA2[0] = ReceivedByte[2];
+//   receive_Buffer_SDA3[0] = ReceivedByte[3];
+
+    //Stop
+    StopI2CMaster(CH0);         
+}
+
+
+
+
+
+
+
+
 /********************************************************************************************************/
 /*** Low level functions, do not change anything below this line, however check the valid clock level ***/
 /********************************************************************************************************/
@@ -594,8 +747,7 @@ unsigned char ReadViaI2C(unsigned char Channel, unsigned char DeviceAddress,
 //--------------------------------------------------------------------------------
 unsigned char ReadBurstViaI2C(unsigned char Channel, unsigned char SDAnum,
 		unsigned char DeviceAddress, const unsigned int RegisterStartAddress,
-		const unsigned char NumberOfRegistersToRead, if2hw_data_i2cmultisda_t *DataBuffer) {
-            
+		const unsigned char NumberOfRegistersToRead, unsigned int *DataBuffer) {
 	unsigned char ByteAddress;
 	unsigned char LowByteData, HighByteData;
 	unsigned char r, AcknError;
@@ -692,11 +844,11 @@ unsigned char ReadBurstViaI2C(unsigned char Channel, unsigned char SDAnum,
 void InitialiseI2CMaster(unsigned char Channel) {
 	switch (Channel) {
 	case CH0: {
-	//	MCE_0output
+		MCE_0output
 	}
 		break;
 	case CH1: {
-	//	MCE_1output;
+		//MCE_1output;
 	}
 		break;
 	}
@@ -731,35 +883,23 @@ void StartI2CMaster(unsigned char Channel) {
 void SetSdaReg(i2c_sda_num_t sdaNum, unsigned char input) {
 	switch (sdaNum) {
 	case sda0: {
-		CLEAR_BIT(GPIOA->OTYPER, (GPIO_MODE_INPUT<<9)); //SDA0 as input
+		//CLEAR_BIT(GPIOA->OTYPER, (GPIO_MODE_INPUT<<9)); //I2C_SDA0 as input
+    LL_GPIO_SetPinMode(SDA0_GPIO_Port, SDA0_Pin, LL_GPIO_MODE_INPUT);
 	}
 		break;
 	case sda1: {
-		CLEAR_BIT(GPIOA->OTYPER, (GPIO_MODE_INPUT<<8)); //SDA1 as input
+		//CLEAR_BIT(GPIOA->OTYPER, (GPIO_MODE_INPUT<<8)); //SDA1 as input
+    LL_GPIO_SetPinMode(SDA1_GPIO_Port, SDA1_Pin, LL_GPIO_MODE_INPUT);
 	}
 		break;
 	case sda2: {
-		CLEAR_BIT(GPIOA->OTYPER, (GPIO_MODE_INPUT<<7)); //SDA2 as input
+		//CLEAR_BIT(GPIOA->OTYPER, (GPIO_MODE_INPUT<<7)); //SDA2 as input
+    LL_GPIO_SetPinMode(SDA2_GPIO_Port, SDA2_Pin, LL_GPIO_MODE_INPUT);
 	}
 		break;
 	case sda3: {
-		CLEAR_BIT(GPIOA->OTYPER, (GPIO_MODE_INPUT<<6)); //SDA3 as input
-	}
-		break;
-	case sda4: {
-		CLEAR_BIT(GPIOA->OTYPER, (GPIO_MODE_INPUT<<4)); //SDA4 as input
-	}
-		break;
-	case sda5: {
-		CLEAR_BIT(GPIOA->OTYPER, (GPIO_MODE_INPUT<<3)); //SDA5 as input
-	}
-		break;
-	case sda6: {
-		CLEAR_BIT(GPIOA->OTYPER, (GPIO_MODE_INPUT<<2)); //SDA6 as input
-	}
-		break;
-	case sda7: {
-		CLEAR_BIT(GPIOA->OTYPER, (GPIO_MODE_INPUT<<1)); //SDA7 as input
+		//CLEAR_BIT(GPIOA->OTYPER, (GPIO_MODE_INPUT<<6)); //SDA3 as input
+    LL_GPIO_SetPinMode(SDA3_GPIO_Port, SDA3_Pin, LL_GPIO_MODE_INPUT);
 	}
 		break;
 	};
@@ -770,58 +910,38 @@ void SetValReg(i2c_sda_num_t sdaNum, unsigned char val) {
 	switch (sdaNum) {
 	case sda0: {
 		if (val == 0)
-			CLEAR_BIT(GPIOA->ODR, (1 << 9)); //SDA0
+			//CLEAR_BIT(GPIOA->ODR, (1 << 9)); //I2C_SDA0
+      HAL_GPIO_WritePin(SDA0_GPIO_Port, SDA0_Pin, GPIO_PIN_RESET);
 		else
-			SET_BIT(GPIOA->ODR, (1 << 9)); //SDA0
+			//SET_BIT(GPIOA->ODR, (1 << 9)); //I2C_SDA0
+      HAL_GPIO_WritePin(SDA0_GPIO_Port, SDA0_Pin, GPIO_PIN_SET);
 	}
 		break;
 	case sda1: {
 		if (val == 0)
-			CLEAR_BIT(GPIOA->ODR, (1 << 8)); //SDA1
+			//CLEAR_BIT(GPIOA->ODR, (1 << 8)); //SDA1
+      HAL_GPIO_WritePin(SDA1_GPIO_Port, SDA1_Pin, GPIO_PIN_RESET);
 		else
-			SET_BIT(GPIOA->ODR, (1 << 8)); //SDA1
+			//SET_BIT(GPIOA->ODR, (1 << 8)); //SDA1
+      HAL_GPIO_WritePin(SDA1_GPIO_Port, SDA1_Pin, GPIO_PIN_SET);
 	}
 		break;
 	case sda2: {
 		if (val == 0)
-			CLEAR_BIT(GPIOA->ODR, (1 << 7)); //SDA2
+			//CLEAR_BIT(GPIOA->ODR, (1 << 7)); //SDA2
+      HAL_GPIO_WritePin(SDA2_GPIO_Port, SDA2_Pin, GPIO_PIN_RESET);
 		else
-			SET_BIT(GPIOA->ODR, (1 << 7)); //SDA2
+			//SET_BIT(GPIOA->ODR, (1 << 7)); //SDA2
+      HAL_GPIO_WritePin(SDA2_GPIO_Port, SDA2_Pin, GPIO_PIN_SET);
 	}
 		break;
 	case sda3: {
 		if (val == 0)
-			CLEAR_BIT(GPIOA->ODR, (1 << 6)); //SDA3
+			//CLEAR_BIT(GPIOA->ODR, (1 << 6)); //SDA3
+      HAL_GPIO_WritePin(SDA3_GPIO_Port, SDA3_Pin, GPIO_PIN_RESET);
 		else
-			SET_BIT(GPIOA->ODR, (1 << 6)); //SDA3
-	}
-		break;
-	case sda4: {
-		if (val == 0)
-			CLEAR_BIT(GPIOA->ODR, (1 << 4)); //SDA4
-		else
-			SET_BIT(GPIOA->ODR, (1 << 4)); //SDA4
-	}
-		break;
-	case sda5: {
-		if (val == 0)
-			CLEAR_BIT(GPIOA->ODR, (1 << 3)); //SDA5
-		else
-			SET_BIT(GPIOA->ODR, (1 << 3)); //SDA5
-	}
-		break;
-	case sda6: {
-		if (val == 0)
-			CLEAR_BIT(GPIOA->ODR, (1 << 2)); //SDA6
-		else
-			SET_BIT(GPIOA->ODR, (1 << 2)); //SDA6
-	}
-		break;
-	case sda7: {
-		if (val == 0)
-			CLEAR_BIT(GPIOA->ODR, (1 << 1)); //SDA7
-		else
-			SET_BIT(GPIOA->ODR, (1 << 1)); //SDA7
+			//SET_BIT(GPIOA->ODR, (1 << 6)); //SDA3
+      HAL_GPIO_WritePin(SDA3_GPIO_Port, SDA3_Pin, GPIO_PIN_SET);
 	}
 		break;
 	};
@@ -1042,17 +1162,32 @@ void ReceiveByteI2CMaster(unsigned char Channel, unsigned char ackn) // changed 
 		//Reset SCL
 		for (i = 8; i > 0; i--) {
 			Wait(I2Cbit);    //Wait(I2Cbit);
-			ReceivedByte[0] <<= 1;      //Rotate data
-			ReceivedByte[1] <<= 1;      //Rotate data
-			ReceivedByte[2] <<= 1;      //Rotate data
-			ReceivedByte[3] <<= 1;      //Rotate data
+			ReceivedByteFiveSDA[0] <<= 1;      //Rotate data
+			ReceivedByteFiveSDA[1] <<= 1;      //Rotate data
+			ReceivedByteFiveSDA[2] <<= 1;      //Rotate data
+			ReceivedByteFiveSDA[3] <<= 1;      //Rotate data
+            ReceivedByteFiveSDA[4] <<= 1;      //Rotate data
 			MCO_0_on                //Set SCL
+            
+            //Original code from Andrea Mura debugging file (different processor?)
+////			ReceivedByte[0] |= (uint16_t) ((GPIOA->IDR & (1<<9))>>9);         //Read I2C_SDA0 -> data
+////			ReceivedByte[1] |= ((GPIOA->IDR &(1<<8))>>8);       //Read SDA1 -> data
+////			ReceivedByte[2] |= ((GPIOA->IDR &(1<<7))>>7);       //Read SDA2 -> data
+////			ReceivedByte[3] |= ((GPIOA->IDR &(1<<6))>>6);       //Read SDA3 -> data
+//			ReceivedByte[0] |= HAL_GPIO_ReadPin(SDA0_GPIO_Port, SDA0_Pin);  //Read I2C_SDA0 -> data
+//			ReceivedByte[1] |= HAL_GPIO_ReadPin(SDA1_GPIO_Port, SDA1_Pin);  //Read I2C_SDA1 -> data
+//			ReceivedByte[2] |= HAL_GPIO_ReadPin(SDA2_GPIO_Port, SDA2_Pin);  //Read I2C_SDA2 -> data
+//			ReceivedByte[3] |= HAL_GPIO_ReadPin(SDA3_GPIO_Port, SDA3_Pin);  //Read I2C_SDA3 -> data
+            
+            //Code that I got from Marco Accame
             // debugged by marco.accame / andrea.mura
             // corrected shift value for the pins 5, 6, 7, 8
-			ReceivedByte[0] |= (uint16_t) ((GPIOA->IDR & (1<<8))>>8);         //Read SDA0 -> data
-			ReceivedByte[1] |= ((GPIOA->IDR &(1<<7))>>7);       //Read SDA1 -> data
-			ReceivedByte[2] |= ((GPIOA->IDR &(1<<6))>>6);       //Read SDA2 -> data
-			ReceivedByte[3] |= ((GPIOA->IDR &(1<<5))>>5);       //Read SDA3 -> data
+			ReceivedByteFiveSDA[0] |= (uint16_t) ((GPIOA->IDR & (1<<8))>>8);         //Read SDA0 -> data
+			ReceivedByteFiveSDA[1] |= ((GPIOA->IDR &(1<<7))>>7);       //Read SDA1 -> data
+			ReceivedByteFiveSDA[2] |= ((GPIOA->IDR &(1<<6))>>6);       //Read SDA2 -> data
+			ReceivedByteFiveSDA[3] |= ((GPIOA->IDR &(1<<5))>>5);       //Read SDA3 -> data
+            ReceivedByteFiveSDA[4] |= ((GPIOC->IDR &(1<<0))>>0);       //Read SDA4 -> data
+            
 			Wait(I2Cbit);    //Wait(I2Cbit);
 			MCO_0_off
 			//Reset SCL

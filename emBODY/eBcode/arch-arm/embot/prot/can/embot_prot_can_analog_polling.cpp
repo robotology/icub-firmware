@@ -1412,6 +1412,48 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
     bool Message_POS_TRANSMIT::reply()
     {
         return false;
+    }   
+
+    
+    
+    bool Message_SKINWASEDA_CONFIG_SET::load(const embot::prot::can::Frame &inframe)
+    {
+        Message::set(inframe);  
+        
+        if(static_cast<std::uint8_t>(CMD::SKINWASEDA_CONFIG_SET) != frame2cmd(inframe))
+        {
+            return false; 
+        }
+        
+        // little endian
+        info.sensormask = candata.datainframe[0];
+
+        return true;         
+    }                    
+        
+    bool Message_SKINWASEDA_CONFIG_SET::reply()
+    {
+        return false;
+    }   
+		
+    bool Message_SKINWASEDA_TRANSMIT::load(const embot::prot::can::Frame &inframe)
+    {
+        Message::set(inframe);  
+        
+        if(static_cast<std::uint8_t>(CMD::SKINWASEDA_TRANSMIT) != frame2cmd(inframe))
+        {
+            return false; 
+        }
+        
+        // just one byte.
+        info.transmit = (0 == candata.datainframe[0]) ? false : true;
+        info.txperiod = embot::core::time1second * static_cast<embot::core::relTime>(candata.datainframe[0]);
+        return true;         
+    }                    
+        
+    bool Message_SKINWASEDA_TRANSMIT::reply()
+    {
+        return false;
     }       
     
 }}}}} // namespace embot { namespace prot { namespace can { namespace analog { namespace polling {

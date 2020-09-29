@@ -108,6 +108,13 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
         POS_TRANSMIT = 0x53,
         
         // HOLE: [0x54, ... , 0xFD]. there are 170 free values.
+        
+        // SKIN WASEDA: unfortunately it uses commands already used by other services because ... it was not merged into robotology at the right moment
+        // as we cannot change iCub's protocol at this stage, if we want waseda to cohexist with iCub we should fix the waseda application layer and 
+        // use SKINWASEDA_CONFIG_SET = 0x53 and SKINWASEDA_TRANSMIT = 0x54
+        SKINWASEDA_CONFIG_SET = 0x51, // ICUBCANPROTO_POL_AS_CMD__SKINWASEDA_CONFIG_SET, 		 // 0x51 used to configure the skin data in mtb
+        SKINWASEDA_TRANSMIT = 0x52 // ICUBCANPROTO_POL_AS_CMD__SKINWASEDA_TRANSMIT        	 // 0x52 used to configure the skin data in mtb
+      
     };
     
     
@@ -1353,7 +1360,49 @@ namespace embot { namespace prot { namespace can { namespace analog { namespace 
         bool load(const embot::prot::can::Frame &inframe);
             
         bool reply();   // none        
-    };            
+    };     
+
+
+    class Message_SKINWASEDA_CONFIG_SET : public Message
+    {
+        public:
+                                
+        struct Info
+        {
+            std::uint8_t sensormask;       // none or at most two ... 
+            Info() : sensormask(0){}
+        };
+        
+        Info info;
+        
+        Message_SKINWASEDA_CONFIG_SET() {}
+            
+        bool load(const embot::prot::can::Frame &inframe);
+            
+        bool reply();   // none
+            
+    }; 
+    
+    class Message_SKINWASEDA_TRANSMIT : public Message
+    {
+        public:
+        
+        // format is data[0] = seconds                        
+        struct Info
+        {
+            bool transmit;
+            embot::core::relTime  txperiod;   // if 0, dont transmit. else use usec value.         
+            Info() : transmit(false), txperiod(0) {}
+        };
+        
+        Info info;
+        
+        Message_SKINWASEDA_TRANSMIT() {}
+            
+        bool load(const embot::prot::can::Frame &inframe);
+            
+        bool reply();   // none        
+    };    		    
     
 }}}}} // namespace embot { namespace prot { namespace can { namespace analog { namespace polling {
     
