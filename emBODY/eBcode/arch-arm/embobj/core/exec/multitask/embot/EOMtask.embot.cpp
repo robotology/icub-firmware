@@ -253,7 +253,7 @@ static void eom_task_START(EOMtask *p)
                         s_embot_evt_run,
                         p->config.name              
                     };
-            res = t->start(c);                   
+            res = t->start(c, p->config.nameofthetask_fn);                   
         } break;
         
         case embot::os::Thread::Type::messageTrigger:
@@ -269,7 +269,7 @@ static void eom_task_START(EOMtask *p)
                         s_embot_msg_run,
                         p->config.name              
                     };
-            res = t->start(c);                   
+            res = t->start(c, p->config.nameofthetask_fn);                   
         } break; 
 
         case embot::os::Thread::Type::callbackTrigger:
@@ -285,7 +285,7 @@ static void eom_task_START(EOMtask *p)
                         s_embot_cbk_after,
                         p->config.name              
                     };
-            res = t->start(c);                   
+            res = t->start(c, p->config.nameofthetask_fn);                   
         } break;   
 
         case embot::os::Thread::Type::periodicTrigger:
@@ -300,7 +300,7 @@ static void eom_task_START(EOMtask *p)
                         s_embot_per_run,
                         p->config.name              
                     };
-            res = t->start(c);                   
+            res = t->start(c, p->config.nameofthetask_fn);                   
         } break;   
         
         default: 
@@ -317,7 +317,13 @@ static void eom_task_START(EOMtask *p)
 
 extern void eom_task_Start(EOMtask *p) 
 {
+    if(nullptr == p)
+    {
+        return;
+    }
     
+    embot::os::Thread *t = reinterpret_cast<embot::os::Thread*>(p);
+    t->run();                    
 }
 
 extern EOMtask * eom_task_Wrap(void *rtosthread)

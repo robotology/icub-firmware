@@ -75,6 +75,8 @@ embot::os::theTimerManager::theTimerManager()
 embot::os::theTimerManager::~theTimerManager() { }
 
 
+void tTMRman(void* p) { reinterpret_cast<embot::os::Thread*>(p)->run(); }
+
 bool embot::os::theTimerManager::start(const Config &config)
 {       
     if(true == started())
@@ -94,7 +96,7 @@ bool embot::os::theTimerManager::start(const Config &config)
     cfg.param = this;
     cfg.name = "tTMRman";
     
-    pImpl->thread->start(cfg);
+    pImpl->thread->start(cfg, tTMRman);
     
     return true;
     

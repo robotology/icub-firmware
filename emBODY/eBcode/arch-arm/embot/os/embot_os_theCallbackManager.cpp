@@ -62,6 +62,7 @@ embot::os::theCallbackManager::theCallbackManager()
     
 embot::os::theCallbackManager::~theCallbackManager() { }
 
+void tCBKman(void* p) { reinterpret_cast<embot::os::Thread*>(p)->run(); }
 
 bool embot::os::theCallbackManager::start(const Config &config)
 {       
@@ -82,7 +83,7 @@ bool embot::os::theCallbackManager::start(const Config &config)
     cfg.startup = nullptr;
     cfg.name = "tCBKman";
     
-    pImpl->thread->start(cfg);
+    pImpl->thread->start(cfg, tCBKman);
     
     return true;    
 }
