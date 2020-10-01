@@ -15,11 +15,12 @@
 
 
 namespace embot { namespace os {
-        
-    using Event         = std::uint32_t;
-    using EventMask     = std::uint32_t;
-    using Message       = void *;
-    class Thread;
+                               
+    using Event = std::uint32_t;        
+    using EventMask = std::uint32_t;    
+    using Message = void *;             
+    using Value = uint32_t;             
+    class Thread;    
   
     // this enum class uses the same values as osPriority_t: {0, 1, 8 -> 55}
     enum class Priority : std::uint8_t {

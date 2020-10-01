@@ -48,6 +48,18 @@ namespace embot { namespace os {
         bool isvalid() const;
         bool execute(core::relTime timeout = core::reltimeWaitForever);
     };
+
+    
+    struct ValueToThread
+    {
+        os::Value value {0};
+        Thread* task {nullptr};
+        
+        ValueToThread() = default;  
+        ValueToThread(os::Value v, Thread* t) : value(v), task(t) {}    
+        bool isvalid() const;
+        bool execute(core::relTime timeout = core::reltimeWaitForever);
+    };    
     
     struct CallbackToThread
     {
@@ -64,23 +76,26 @@ namespace embot { namespace os {
 
     struct Action
     {
-        enum class Type { none = 0, event2thread = 1, message2thread = 2, callback2thread = 3 };
+        enum class Type { none = 0, event2thread = 1, message2thread = 2, callback2thread = 3, value2thread = 4 };
                
         Type type {Type::none};
         union
         {
             EventToThread     evt;
             MessageToThread   msg;
+            ValueToThread     val;
             CallbackToThread  cbk;
         };
                
         Action() { clear(); } 
         Action(const CallbackToThread &c) { load(c); }
         Action(const MessageToThread &m) { load(m); }
+        Action(const ValueToThread &v) { load(v); }
         Action(const EventToThread &e) { load(e); }        
         void clear() { type = Type::none; }        
         void load(const EventToThread &e);        
-        void load(const MessageToThread &m);        
+        void load(const MessageToThread &m); 
+        void load(const ValueToThread &v);        
         void load(const CallbackToThread &c);               
         bool isvalid() const;        
         bool execute(core::relTime timeout = core::reltimeWaitForever);

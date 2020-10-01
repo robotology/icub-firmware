@@ -101,6 +101,11 @@ bool embot::os::InitThread::setMessage(embot::os::Message message, core::relTime
     return false;
 }
 
+bool embot::os::InitThread::setValue(embot::os::Value value, core::relTime timeout)
+{
+    return false;
+}
+
 bool embot::os::InitThread::setCallback(const core::Callback &callback, core::relTime timeout)
 {
     return false;
@@ -204,6 +209,11 @@ bool embot::os::IdleThread::setEvent(embot::os::Event event)
 
 
 bool embot::os::IdleThread::setMessage(embot::os::Message message, core::relTime timeout)
+{
+    return false;
+}
+
+bool embot::os::IdleThread::setValue(embot::os::Value value, core::relTime timeout)
 {
     return false;
 }
@@ -333,12 +343,15 @@ bool embot::os::EventThread::setMessage(embot::os::Message message, core::relTim
     return false;
 }
 
-bool embot::os::EventThread::setCallback(const core::Callback &callback, core::relTime timeout)
+bool embot::os::EventThread::setValue(embot::os::Value value, core::relTime timeout)
 {
     return false;
 }
 
-
+bool embot::os::EventThread::setCallback(const core::Callback &callback, core::relTime timeout)
+{
+    return false;
+}
 
 bool embot::os::EventThread::start(const Config &cfg, embot::core::fpCaller eviewername)
 {    
@@ -485,10 +498,14 @@ bool embot::os::MessageThread::setEvent(embot::os::Event event)
     return false;
 }  
 
-
 bool embot::os::MessageThread::setMessage(embot::os::Message message, core::relTime timeout)
 {
     return embot::os::rtos::messagequeue_put(pImpl->osmessagequeue, message, timeout);
+}
+
+bool embot::os::MessageThread::setValue(embot::os::Value value, core::relTime timeout)
+{
+    return false;
 }
 
 bool embot::os::MessageThread::setCallback(const core::Callback &callback, core::relTime timeout)
@@ -528,6 +545,172 @@ void embot::os::MessageThread::run()
 {
     pImpl->os_messagedriven_loop(this);
 }
+
+
+
+// - class ValueThread
+
+// --------------------------------------------------------------------------------------------------------------------
+// - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
+// --------------------------------------------------------------------------------------------------------------------
+
+struct embot::os::ValueThread::Impl
+{    
+    ValueThread * parentThread {nullptr};
+    embot::os::rtos::thread_t *rtosthread {nullptr};    
+    embot::os::rtos::messagequeue_t *osmessagequeue {nullptr};    
+    Config config {64, Priority::minimum, nullptr, nullptr, embot::core::reltimeWaitForever, 2, dummyOnValue, "valThread"};
+    embot::os::rtos::thread_props_t rtosthreadproperties {};
+    
+    Impl(ValueThread *parent) 
+    {
+        parentThread = parent;
+        rtosthread = nullptr;
+        osmessagequeue = nullptr;
+    }
+    
+    ~Impl()
+    {
+        if(nullptr != rtosthread)
+        {
+            embot::os::rtos::scheduler_deassociate(rtosthread, parentThread);
+            embot::os::rtos::thread_delete(rtosthread);     
+            rtosthread = nullptr;
+        }
+        
+        if(nullptr != osmessagequeue)
+        {
+            embot::os::rtos::messagequeue_delete(osmessagequeue);
+            osmessagequeue = nullptr;
+        }
+    }
+    
+    static void dummyOnValue(Thread *t, os::Value v, void *p) {}
+           
+    static void os_valuedriven_loop(void *p) 
+    {
+        ValueThread *t = reinterpret_cast<ValueThread*>(p);
+        const embot::core::relTime tout = t->pImpl->config.timeout; 
+        const Thread::fpStartup startup = t->pImpl->config.startup;
+        const Thread::fpOnValue onvalue = t->pImpl->config.onvalue;
+        void * param = t->pImpl->config.param;
+        embot::os::rtos::messagequeue_t *mq = t->pImpl->osmessagequeue;
+       
+
+        // exec the startup
+        if(nullptr != startup)
+        {
+            startup(t, param);
+        }
+
+        
+        // start the forever loop
+        for(;;)
+        {
+            os::Message msg = embot::os::rtos::messagequeue_get(mq, tout);
+            onvalue(t, reinterpret_cast<os::Value>(msg), param);
+        }        
+    }
+    
+};
+
+
+
+// --------------------------------------------------------------------------------------------------------------------
+// - all the rest
+// --------------------------------------------------------------------------------------------------------------------
+
+embot::os::ValueThread::ValueThread()
+: pImpl(new Impl(this))
+{   
+    
+}
+
+
+embot::os::ValueThread::~ValueThread()
+{   
+    delete pImpl;
+}
+
+
+embot::os::Thread::Type embot::os::ValueThread::getType() const
+{
+    return Type::valueTrigger;
+}
+
+
+embot::os::Priority embot::os::ValueThread::getPriority() const
+{   
+    return pImpl->config.priority;
+}
+
+
+bool embot::os::ValueThread::setPriority(embot::os::Priority priority)
+{   
+    pImpl->config.priority = priority;
+    pImpl->rtosthreadproperties.setprio(embot::core::tointegral(priority));
+
+    return embot::os::rtos::thread_setpriority(pImpl->rtosthread, priority);
+}
+
+const char * embot::os::ValueThread::getName() const
+{
+    return (pImpl->config.name != nullptr) ? pImpl->config.name : "ValueThread"; 
+}
+  
+bool embot::os::ValueThread::setEvent(embot::os::Event event)
+{
+    return false;
+}  
+
+bool embot::os::ValueThread::setMessage(embot::os::Message message, core::relTime timeout)
+{
+    return false;
+}
+
+bool embot::os::ValueThread::setValue(embot::os::Value value, core::relTime timeout)
+{
+    return embot::os::rtos::messagequeue_put(pImpl->osmessagequeue, reinterpret_cast<embot::os::Message>(value), timeout);
+}
+
+bool embot::os::ValueThread::setCallback(const core::Callback &callback, core::relTime timeout)
+{
+    return false;
+}
+
+
+bool embot::os::ValueThread::start(const Config &cfg, embot::core::fpCaller eviewername)
+{    
+    if(false == cfg.isvalid())
+    {
+        return false;
+    }
+    
+    pImpl->config = cfg;
+    
+    pImpl->config.stacksize = (pImpl->config.stacksize+7)/8;
+    pImpl->config.stacksize *= 8;
+    
+    pImpl->osmessagequeue = embot::os::rtos::messagequeue_new(pImpl->config.messagequeuesize); 
+    
+    pImpl->rtosthreadproperties.prepare((nullptr != eviewername) ? eviewername : pImpl->os_valuedriven_loop, 
+                                        this, 
+                                        embot::core::tointegral(pImpl->config.priority), 
+                                        pImpl->config.stacksize);
+       
+    pImpl->rtosthread = embot::os::rtos::thread_new(pImpl->rtosthreadproperties);
+    
+    embot::os::rtos::scheduler_associate(pImpl->rtosthread, this);
+    
+    return true;    
+}
+
+
+void embot::os::ValueThread::run()
+{
+    pImpl->os_valuedriven_loop(this);
+}
+
 
 // - class CallbackThread
 
@@ -679,6 +862,11 @@ bool embot::os::CallbackThread::setMessage(embot::os::Message message, core::rel
     return false;
 }
 
+bool embot::os::CallbackThread::setValue(embot::os::Value value, core::relTime timeout)
+{
+    return false;
+}
+
 bool embot::os::CallbackThread::setCallback(const embot::core::Callback &callback, core::relTime timeout)
 {
     if(false == callback.isvalid())
@@ -693,8 +881,6 @@ bool embot::os::CallbackThread::setCallback(const embot::core::Callback &callbac
     
     return false;
 }
-
-
 
 bool embot::os::CallbackThread::start(const Config &cfg, embot::core::fpCaller eviewername)
 {    
@@ -849,6 +1035,10 @@ bool embot::os::PeriodicThread::setCallback(const core::Callback &callback, core
     return false;
 }
 
+bool embot::os::PeriodicThread::setValue(embot::os::Value value, core::relTime timeout)
+{
+    return false;
+}
 
 bool embot::os::PeriodicThread::start(const Config &cfg, embot::core::fpCaller eviewername)
 {    

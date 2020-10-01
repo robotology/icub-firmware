@@ -34,12 +34,13 @@ namespace embot { namespace os {
         
         // types used by all derived Thread classes
     
-        enum class Type : std::uint8_t { undefined = 0, eventTrigger = 1, messageTrigger = 3, callbackTrigger = 4, periodicTrigger = 5, Init = 100, Idle = 101 };
+        enum class Type : std::uint8_t { undefined = 0, eventTrigger = 1, messageTrigger = 3, callbackTrigger = 4, periodicTrigger = 5, valueTrigger = 6, Init = 100, Idle = 101 };
                                 
         using fpStartup = void (*)(Thread *, void *);
         using fpOnIdle = void (*)(Thread *, void *);
         using fpOnEvent = void (*)(Thread *, os::EventMask, void *);
         using fpOnMessage = void (*)(Thread *, os::Message, void *);
+        using fpOnValue = void (*)(Thread *, os::Value, void *);
         using fpOnPeriod = void (*)(Thread *, void *);
         using fpAfterCallback = void (*)(Thread *, core::Callback &, void *);
         
@@ -71,6 +72,7 @@ namespace embot { namespace os {
         
         virtual bool setEvent(os::Event event) = 0;
         virtual bool setMessage(os::Message message, core::relTime timeout = core::reltimeWaitForever) = 0;
+        virtual bool setValue(os::Value value, core::relTime timeout = core::reltimeWaitForever) = 0;
         virtual bool setCallback(const core::Callback &callback, core::relTime timeout = core::reltimeWaitForever) = 0;
         
     public:
@@ -102,6 +104,7 @@ namespace embot { namespace os {
         
         virtual bool setEvent(os::Event event);  
         virtual bool setMessage(os::Message message, core::relTime timeout = core::reltimeWaitForever);
+        virtual bool setValue(os::Value value, core::relTime timeout = core::reltimeWaitForever);
         virtual bool setCallback(const core::Callback &callback, core::relTime timeout = core::reltimeWaitForever);
         
         void synch(); // only the scheduler can call this method
@@ -149,6 +152,7 @@ namespace embot { namespace os {
         
         virtual bool setEvent(os::Event event);  
         virtual bool setMessage(os::Message message, core::relTime timeout = core::reltimeWaitForever);
+        virtual bool setValue(os::Value value, core::relTime timeout = core::reltimeWaitForever);
         virtual bool setCallback(const core::Callback &callback, core::relTime timeout = core::reltimeWaitForever);
         
         void synch(); // only the scheduler can call this method
@@ -192,6 +196,7 @@ namespace embot { namespace os {
         
         virtual bool setEvent(os::Event event);  
         virtual bool setMessage(os::Message message, core::relTime timeout = core::reltimeWaitForever);
+        virtual bool setValue(os::Value value, core::relTime timeout = core::reltimeWaitForever);
         virtual bool setCallback(const core::Callback &callback, core::relTime timeout = core::reltimeWaitForever);
                  
         bool start(const Config &cfg, embot::core::fpCaller eviewername = nullptr);
@@ -202,8 +207,7 @@ namespace embot { namespace os {
         Impl *pImpl;           
     };
     
-    
-    // vedere come gestire il caso di messaggio = 0 e di timeout. ad esempio possiamo invalidare il messaggio 0. oppure ... 
+     
     class MessageThread: public Thread
     {
     public:  
@@ -233,15 +237,58 @@ namespace embot { namespace os {
         
         virtual bool setEvent(os::Event event);  
         virtual bool setMessage(os::Message message, core::relTime timeout = core::reltimeWaitForever);
+        virtual bool setValue(os::Value value, core::relTime timeout = core::reltimeWaitForever);
         virtual bool setCallback(const core::Callback &callback, core::relTime timeout = core::reltimeWaitForever);
          
         bool start(const Config &cfg, embot::core::fpCaller eviewername = nullptr);
         virtual void run();
+        
     
     private:        
         struct Impl;
         Impl *pImpl;           
     };
+    
+    
+    class ValueThread: public Thread
+    {
+    public:  
+
+        struct Config : public Thread::BaseConfig
+        {
+            core::relTime timeout {embot::core::reltimeWaitForever}; // the timeout with which the task waits an event. in case of timeout onevent() is called with event mask = 0.            
+            std::uint8_t messagequeuesize {4}; // the size of the message queue. if higher the task can accept more messages.
+            Thread::fpOnValue onvalue {nullptr}; // this function, must not be nullptr, is executed at every received value or at expiry of timeout. its second argument is the received message, its third is param
+
+            Config() = default;
+            constexpr Config(std::uint16_t st, Priority pr, Thread::fpStartup fpst, void* pa, core::relTime ti, uint8_t qs, Thread::fpOnValue fpon, const char * name = nullptr) : BaseConfig(st, pr, fpst, pa, name), timeout(ti), messagequeuesize(qs), onvalue(fpon) {}            
+            bool isvalid() const
+            {   // onvalue cannot be nullptr, and messagequeuesize cannot be 0
+                if((nullptr == onvalue) || (0 == messagequeuesize)) { return false; } 
+                else { return BaseConfig::isvalid(); }
+            }
+        };    
+                            
+        ValueThread();
+        virtual ~ValueThread();
+          
+        virtual Type getType() const;
+        virtual Priority getPriority() const;
+        virtual bool setPriority(Priority priority);
+        virtual const char * getName() const;
+        
+        virtual bool setEvent(os::Event event);  
+        virtual bool setMessage(os::Message message, core::relTime timeout = core::reltimeWaitForever);
+        virtual bool setValue(os::Value value, core::relTime timeout = core::reltimeWaitForever);
+        virtual bool setCallback(const core::Callback &callback, core::relTime timeout = core::reltimeWaitForever);
+         
+        bool start(const Config &cfg, embot::core::fpCaller eviewername = nullptr);
+        virtual void run();
+            
+    private:        
+        struct Impl;
+        Impl *pImpl;           
+    };    
  
     
     class CallbackThread: public Thread
@@ -273,7 +320,8 @@ namespace embot { namespace os {
         virtual const char * getName() const;
         
         virtual bool setEvent(os::Event event);  
-        virtual bool setMessage(os::Message message, core::relTime timeout = core::reltimeWaitForever);        
+        virtual bool setMessage(os::Message message, core::relTime timeout = core::reltimeWaitForever); 
+        virtual bool setValue(os::Value value, core::relTime timeout = core::reltimeWaitForever);    
         virtual bool setCallback(const core::Callback &callback, core::relTime timeout = core::reltimeWaitForever);
         
 
@@ -317,6 +365,7 @@ namespace embot { namespace os {
         
         virtual bool setEvent(os::Event event);  
         virtual bool setMessage(os::Message message, core::relTime timeout = core::reltimeWaitForever);
+        virtual bool setValue(os::Value value, core::relTime timeout = core::reltimeWaitForever);
         virtual bool setCallback(const core::Callback &callback, core::relTime timeout = core::reltimeWaitForever);
 
     private:        

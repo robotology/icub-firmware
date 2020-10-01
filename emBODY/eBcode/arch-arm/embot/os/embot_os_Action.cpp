@@ -60,7 +60,7 @@ namespace embot { namespace os {
     
     bool MessageToThread::isvalid() const
     {
-        if((nullptr == task) || (0 == message)) { return false; }
+        if((nullptr == task) || (nullptr == message)) { return false; }
         else if(Thread::Type::messageTrigger != task->getType()) { return false; }
         else { return true; }
     } 
@@ -75,7 +75,23 @@ namespace embot { namespace os {
         return true;
     } 
         
-
+    bool ValueToThread::isvalid() const
+    {
+        if((nullptr == task) || (0 == value)) { return false; }
+        else if(Thread::Type::valueTrigger != task->getType()) { return false; }
+        else { return true; }
+    } 
+    
+    bool ValueToThread::execute(core::relTime timeout)
+    {
+        if(false == isvalid())
+        {
+            return false;
+        }
+        task->setValue(value, timeout);
+        return true;
+    } 
+    
     bool CallbackToThread::isvalid() const 
     {
         if((false == callback.isvalid())) { return false; }
@@ -113,6 +129,12 @@ namespace embot { namespace os {
         msg = m;           
     }
     
+    void Action::load(const ValueToThread &v)
+    {
+        type = Type::value2thread;
+        val = v;           
+    }
+
     void Action::load(const CallbackToThread &c)
     {
         type = Type::callback2thread;
@@ -139,6 +161,11 @@ namespace embot { namespace os {
             case Type::message2thread:
             {
                 ret = msg.isvalid();
+            } break;
+
+            case Type::value2thread:
+            {
+                ret = val.isvalid();
             } break;
             
             case Type::callback2thread:
@@ -172,6 +199,11 @@ namespace embot { namespace os {
             case Type::message2thread:
             {
                 ret = msg.execute(timeout);
+            } break;
+
+            case Type::value2thread:
+            {
+                ret = val.execute(timeout);
             } break;
             
             case Type::callback2thread:
