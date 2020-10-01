@@ -93,19 +93,16 @@ namespace embot { namespace hw { namespace led {
         {   // dont need to re-init
             return resOK;
         }
-        
-        // typically every led initalisation is done in the bsp, but ...
-        // init peripheral
-        embot::hw::bsp::led::getBSP().init(led);
-                
-        
+                               
         if(!embot::hw::initialised())
         {   // requires embot::hw::bsp::init()
             return resNOK;
         }
         
-
+        // we do specific init of the peripheral
+        embot::hw::bsp::led::getBSP().init(led);
        
+        
         embot::core::binary::bit::set(initialisedmask, embot::core::tointegral(led));
         
         // we just switch it off        

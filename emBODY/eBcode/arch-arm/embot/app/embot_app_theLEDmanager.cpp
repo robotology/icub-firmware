@@ -27,10 +27,8 @@
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "stm32hal.h"
 #include "embot_hw.h"
-#include "embot_hw_gpio.h"
-#include "embot_hw_bsp.h"
+#include "embot_hw_led.h"
 #include "embot_core_binary.h"
 #include "embot_os_Timer.h"
 
@@ -45,17 +43,18 @@
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
 // --------------------------------------------------------------------------------------------------------------------
 
+
 namespace embot { namespace app {
     
     using namespace embot::hw;
+
+#if 0   
     
     GPIO_PinState convert(embot::hw::gpio::State s)
     {
         return (s == embot::hw::gpio::State::RESET) ? (GPIO_PIN_RESET) : (GPIO_PIN_SET);
     }
     
-    
-#if 0
     // correct but we use another one
     class aLED : public LEDhandle
     {
@@ -177,19 +176,13 @@ namespace embot { namespace app {
     class aSlimPulsableLED : public LEDhandle
     {
     public:
-        LED led;
-        const embot::hw::GPIO *gpio;
-        embot::hw::gpio::State stateON;
-        embot::hw::gpio::State stateOFF;
-        embot::os::Timer *tmr;
-        LEDwave *_ledw;
-        uint64_t _memory[4];
+        LED led {LED::none};
+        embot::os::Timer *tmr {nullptr};
+        LEDwave *_ledw {nullptr};
+        uint64_t _memory[4] {0xff, 0xff, 0xff, 0xff};
     public:
         
-        aSlimPulsableLED(LED l = LED::none, const embot::hw::GPIO *g = nullptr, 
-                        embot::hw::gpio::State ON = embot::hw::gpio::State::SET, 
-                        embot::hw::gpio::State OFF = embot::hw::gpio::State::RESET) 
-                        : led(l), gpio(g), stateON(ON), stateOFF(OFF)
+        aSlimPulsableLED(LED l = LED::none) : led(l)
         {
             // assume led is ok.
             // i defer creation of the timer.
@@ -202,7 +195,7 @@ namespace embot { namespace app {
             
         virtual bool supported() const
         {   // assume it is ok but i give correct result anyway
-            return embot::hw::bsp::led::getBSP().supported(led);
+            return embot::hw::led::supported(led);
         }
         
         virtual LED id() const
@@ -211,21 +204,18 @@ namespace embot { namespace app {
         }
         
         virtual void on() 
-        {   // assume it is ok, hence gpio is not null
-            //HAL_GPIO_WritePin(static_cast<GPIO_TypeDef*>(gpio->port), static_cast<uint16_t>(gpio->pin), stateON);
-            embot::hw::gpio::set(*gpio, stateON);
+        {   
+            embot::hw::led::on(led);
         }
         
         virtual void off() 
-        {   // assume it is ok, hence gpio is not null
-            //HAL_GPIO_WritePin(static_cast<GPIO_TypeDef*>(gpio->port), static_cast<uint16_t>(gpio->pin), stateOFF);
-            embot::hw::gpio::set(*gpio, stateOFF);
+        {   
+            embot::hw::led::off(led);
         }
         
         virtual void toggle() 
-        {   // assume it is ok, hence gpio is not null
-            //HAL_GPIO_TogglePin(static_cast<GPIO_TypeDef*>(gpio->port), static_cast<uint16_t>(gpio->pin));
-            embot::hw::gpio::toggle(*gpio);
+        {   
+            embot::hw::led::toggle(led);
         }   
 
         static void onexpirypulse(void *p)
@@ -381,7 +371,7 @@ namespace embot { namespace app {
 
         bool init(LED led)
         {
-            if(!embot::hw::bsp::led::getBSP().supported(led))
+            if(!embot::hw::led::supported(led))
             {
                 return false;
             }  
@@ -403,13 +393,8 @@ namespace embot { namespace app {
             embot::hw::led::init(led);
                     
             embot::core::binary::bit::set(initialisedmask, embot::core::tointegral(led));
-            
-            // i am sure that thebspmap->getgpio(led) is ok 
-//            aSlimLED a{led, thebspmap->getgpio(led), thebspmap->on, thebspmap->off};
-//            a.off();            
-//            mapofleds.insert(std::pair<LED, aSlimLED>(led, a));
-            
-            aSlimPulsableLED a{led, &embot::hw::bsp::led::getBSP().getPROP(led)->gpio, embot::hw::bsp::led::getBSP().getPROP(led)->on, embot::hw::bsp::led::getBSP().getPROP(led)->off};
+                        
+            aSlimPulsableLED a{led};
             a.off();            
             mapofleds.insert(std::pair<LED, aSlimPulsableLED>(led, a));
                        
