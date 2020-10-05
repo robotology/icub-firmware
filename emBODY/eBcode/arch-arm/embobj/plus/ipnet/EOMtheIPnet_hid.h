@@ -134,9 +134,9 @@ struct EOMtheIPnet_hid
 
 // name of the tasks as it is shown in uvision
 
-void eom_ipnettick(void *p);
+void tIPNETproc(void *p);
 
-void eom_ipnetproc(void *p);
+void tIPNETtick(void *p);
 
 #ifdef __cplusplus
 }       // closing brace for extern "C"

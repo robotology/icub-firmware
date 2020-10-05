@@ -389,7 +389,7 @@ extern EOMtheIPnet * eom_ipnet_Initialise(const eOmipnet_cfg_t *ipnetcfg,
                                           s_eom_ipnet_tskproc_startup, s_eom_ipnet_tskproc_forever,
                                           0, ipnetcfg->procmaxidletime,
                                           NULL,
-                                          eom_ipnetproc, 
+                                          tIPNETproc, 
                                           "ipnet.proc");
 
 #define IPNET_TICK_PERIODIC                                          
@@ -399,7 +399,7 @@ extern EOMtheIPnet * eom_ipnet_Initialise(const eOmipnet_cfg_t *ipnetcfg,
                                           s_eom_ipnet_tsktick_startup, s_eom_ipnet_tsktick_forever,
                                           0, s_eom_theipnet.ipcfg.sys_timetick,
                                           NULL, 
-                                          eom_ipnettick,
+                                          tIPNETtick,
                                           "ipnet.tick");
 
 #else
@@ -410,7 +410,7 @@ extern EOMtheIPnet * eom_ipnet_Initialise(const eOmipnet_cfg_t *ipnetcfg,
                                           s_eom_ipnet_tsktick_startup, s_eom_ipnet_tsktick_forever,
                                           0, s_eom_theipnet.ipcfg.sys_timetick,
                                           NULL, 
-                                          eom_ipnettick,
+                                          tIPNETtick,
                                           "ipnet.tick");  
 
 #endif
@@ -1209,13 +1209,13 @@ static eOresult_t s_eom_ipnet_WaitPacket(EOVtheIPnet* ip, EOsocketDerived *s, eO
 
 
 // name of the task as it is shown in uvision
-void eom_ipnetproc(void *p)
+void tIPNETproc(void *p)
 {
     eom_task_Start((EOMtask*)p);
 }
 
 // name of the task as it is shown in uvision
-void eom_ipnettick(void *p)
+void tIPNETtick(void *p)
 {
      eom_task_Start((EOMtask*)p);
 }
