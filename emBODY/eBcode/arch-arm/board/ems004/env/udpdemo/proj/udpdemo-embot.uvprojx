@@ -447,7 +447,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>abslayer</GroupName>
+          <GroupName>abstraction-layer</GroupName>
           <Files>
             <File>
               <FileName>eventviewer.c</FileName>
@@ -496,7 +496,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>cfg</GroupName>
+          <GroupName>abstraction-layer-config</GroupName>
           <Files>
             <File>
               <FileName>hal_startup_mpu_name_stm32f407ig.s</FileName>
@@ -517,6 +517,16 @@
               <FileName>hal_core_cfg.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\cfg\hal_core_cfg.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>stm32hal [implemented w/ hal2]</GroupName>
+          <Files>
+            <File>
+              <FileName>stm32hal_hal2.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\stm32hal_hal2.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -763,7 +773,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>eo-mee-embot</GroupName>
+          <GroupName>eom-embot::os</GroupName>
           <Files>
             <File>
               <FileName>EOMmutex.embot.cpp</FileName>
@@ -925,16 +935,6 @@
               <FileName>embot_hw.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw.cpp</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>stm32hal [implemented w/ hal2]</GroupName>
-          <Files>
-            <File>
-              <FileName>stm32hal_hal2.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\stm32hal_hal2.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1463,7 +1463,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>abslayer</GroupName>
+          <GroupName>abstraction-layer</GroupName>
           <Files>
             <File>
               <FileName>eventviewer.c</FileName>
@@ -1512,7 +1512,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>cfg</GroupName>
+          <GroupName>abstraction-layer-config</GroupName>
           <Files>
             <File>
               <FileName>hal_startup_mpu_name_stm32f407ig.s</FileName>
@@ -1533,6 +1533,16 @@
               <FileName>hal_core_cfg.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\cfg\hal_core_cfg.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>stm32hal [implemented w/ hal2]</GroupName>
+          <Files>
+            <File>
+              <FileName>stm32hal_hal2.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\src\stm32hal_hal2.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -1677,7 +1687,7 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>eo-mee-embot</GroupName>
+          <GroupName>eom-embot::os</GroupName>
           <Files>
             <File>
               <FileName>EOMmutex.embot.cpp</FileName>
@@ -1839,16 +1849,6 @@
               <FileName>embot_hw.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>..\..\..\..\..\embot\hw\embot_hw.cpp</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>stm32hal [implemented w/ hal2]</GroupName>
-          <Files>
-            <File>
-              <FileName>stm32hal_hal2.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\stm32hal_hal2.c</FilePath>
             </File>
           </Files>
         </Group>

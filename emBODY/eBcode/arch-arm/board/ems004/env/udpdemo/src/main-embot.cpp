@@ -4,19 +4,24 @@
  * email:   marco.accame@iit.it
 */
 
+/*
+ This project offers the services of EOsocketDatagram in a minimal way.
+ We use one instance of EOsocketDatagram to listen to port 3333. We print on the 
+ trace port any UDP frame receied from a host and we send back a reply to it. 
 
-#if defined(EMBOT_USE_rtos_cmsisos2)
+ The project uses the trace port but also signalling LEDs and the uVision timing diagram.
+ 
+ It uses the embot::os environment because we want to be able to run it on modern boards 
+ where we use the stm32hal + embot paradigm.
 
-#warning CAVEAT: this project does not run if EMBOT_USE_rtos_cmsisos2 is defined
-
-#endif
+ For further info read `doc/the udpdemo project.md`
+ 
+*/
 
 // --------------------------------------------------------------------------------------------------------------------
 // - external dependencies
 // --------------------------------------------------------------------------------------------------------------------
 
-#include "embot_core.h"
-#include "embot_hw.h"
 #include "embot_os.h"
 
 
@@ -37,13 +42,13 @@ int main(void)
     constexpr embot::core::Callback onOSerror = { };
     constexpr embot::os::Config osconfig {embot::core::time1millisec, initcfg, idlecfg, onOSerror};
     
-    // embot::os::init() internally calls embot::hw::bsp::init() which also calls embot::core::init()
+    // embot::os::init() internally calls embot::hw::init() which also calls embot::core::init()
     embot::os::init(osconfig);
     
     // now i start the os    
     embot::os::start();
 
-    // just because i am paranoid (thescheduler.start() never returns)
+    // just because i am paranoid (embot::os::start() never returns)
     for(;;);    
 }
 
