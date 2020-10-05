@@ -17,7 +17,7 @@ constexpr embot::app::theCANboardInfo::applicationInfo applInfo
     embot::prot::can::versionOfCANPROTOCOL {2, 0}    
 };
 
-constexpr std::uint16_t threadIDLEstacksize = 1*512;
+constexpr std::uint16_t threadIDLEstacksize = 2048;
 constexpr std::uint16_t threadINITstacksize = 2048;
 constexpr std::uint16_t threadEVNTstacksize = 4096;
 constexpr std::uint8_t maxINPcanframes = 16;
@@ -93,6 +93,7 @@ int main(void)
 
 #include "embot_hw_tlv493d.h"
 #include "embot_hw_bsp.h"
+#include "embot_hw_gpio.h"
 
 constexpr embot::os::Event evtTick = embot::core::binary::mask::pos2mask<embot::os::Event>(0);
 constexpr embot::core::relTime tickperiod = 2000*embot::core::time1millisec;
@@ -121,17 +122,62 @@ void mySYS::userdefonOSerror(void *errparam) const
     for(;;);    
 }
 
+constexpr embot::hw::GPIO VPPEN {embot::hw::GPIO::PORT::C, embot::hw::GPIO::PIN::four};
+bool VPPENon {true};
+void VPPEenable(bool enable)
+{
+    embot::hw::gpio::set(VPPEN, (true == enable) ? embot::hw::gpio::State::SET : embot::hw::gpio::State::RESET); 
+}
+
+constexpr embot::hw::GPIO MAGVCC2 {embot::hw::GPIO::PORT::E, embot::hw::GPIO::PIN::eleven};
+
+void IndexAdductionEnable(bool enable)
+{
+    embot::hw::gpio::set(MAGVCC2, (true == enable) ? embot::hw::gpio::State::SET : embot::hw::gpio::State::RESET); 
+}
+
+
+void toggleVPPEN(void *p)
+{    
+    if(true == VPPENon)
+    {
+        VPPENon = false;
+        VPPEenable(false);
+        embot::hw::led::off(embot::hw::LED::seven);        
+    }
+    else
+    {
+        VPPENon = true;
+        VPPEenable(true);
+        embot::hw::led::on(embot::hw::LED::seven);
+    }
+    
+}
 
 void mySYS::userdefInit_Extra(embot::os::EventThread* evthr, void *initparam) const
 {
     // inside the init thread: put the init of many things ...  
     
     // led manager
-    static const std::initializer_list<embot::hw::LED> alltheleds = {embot::hw::LED::one};  
+    static const std::initializer_list<embot::hw::LED> alltheleds = { 
+        embot::hw::LED::one, embot::hw::LED::two, embot::hw::LED::three, embot::hw::LED::four, 
+        embot::hw::LED::five, embot::hw::LED::six, embot::hw::LED::seven
+    };  
     embot::app::theLEDmanager &theleds = embot::app::theLEDmanager::getInstance();     
-    theleds.init(alltheleds);    
+    theleds.init(alltheleds);   
+    
     theleds.get(embot::hw::LED::one).pulse(embot::core::time1second); 
+//    theleds.get(embot::hw::LED::two).on(); 
+//    theleds.get(embot::hw::LED::three).on(); 
+//    theleds.get(embot::hw::LED::four).on();
+//    theleds.get(embot::hw::LED::five).pulse(2*embot::core::time1second);  
+//          
+//    embot::app::LEDwaveT<64> ledwave(100*embot::core::time1millisec, 30, std::bitset<64>(0b000001));
+//    theleds.get(embot::hw::LED::six).wave(&ledwave);     
 
+//    theleds.get(embot::hw::LED::seven).pulse(3*embot::core::time1second);    
+
+    
     // init of can basic paser
     embot::app::application::theCANparserBasic::getInstance().initialise({});
         
@@ -146,9 +192,33 @@ void mySYS::userdefInit_Extra(embot::os::EventThread* evthr, void *initparam) co
 //    embot::app::application::theCANparserIMU &canparserimu = embot::app::application::theCANparserIMU::getInstance();
 //    embot::app::application::theCANparserIMU::Config configparserimu { &theimu };
 //    canparserimu.initialise(configparserimu);   
+        
+    
+    // pc4 (VPPEN)
+    // init pc4 as output  (already configured) 
+    // start a timer which toggles pc4.
+        
+        
+//    embot::hw::led::off(embot::hw::LED::seven);
+//    VPPEenable(false);
+//    VPPENon = false;       
+//        
+//    embot::os::Timer *tmrVPPEN = new embot::os::Timer;   
+//    embot::os::Action actVPPEN(embot::os::CallbackToThread(embot::core::Callback{toggleVPPEN, nullptr}, nullptr));
+//    embot::os::Timer::Config cfg{10*embot::core::time1second, actVPPEN, embot::os::Timer::Mode::forever, 0};
+//    tmrVPPEN->start(cfg);      
+
+// pe11 MAGVCC2 high 
+
+    IndexAdductionEnable(false);
+    embot::core::delay(1000*1000);
+
+    
           
     
 }
+
+constexpr embot::hw::TLV493D magencIndexAdduction = embot::hw::TLV493D::four;
 
 void myEVT::userdefStartup(embot::os::Thread *t, void *param) const
 {
@@ -160,7 +230,7 @@ void myEVT::userdefStartup(embot::os::Thread *t, void *param) const
     
     embot::core::print("userdefStartup(): start a timer which sends an event which forces an acquisition from the FAP");
     
-    embot::hw::tlv493d::init(embot::hw::TLV493D::one, {embot::hw::bsp::tlv493d::getBSP().getPROP(embot::hw::TLV493D::one)->i2cbus, 400000});
+    embot::hw::tlv493d::init(magencIndexAdduction, {{embot::hw::bsp::tlv493d::getBSP().getPROP(magencIndexAdduction)->i2cbus, embot::hw::i2c::Speed::standard100}});
     
     // start a timer which sends an event which forces an acquisition from the FAP  
     embot::os::Timer *tmr = new embot::os::Timer;   
@@ -211,7 +281,7 @@ void myEVT::userdefOnEventANYother(embot::os::Thread *t, embot::os::EventMask ev
 
         embot::core::print("::userdefOnEventANYother() -> called a reading of chip TLV493D on fap board");    
         embot::core::Callback cbk00(alertFAPdataisready, t);
-        embot::hw::tlv493d::acquisition(embot::hw::TLV493D::one, cbk00);        
+        embot::hw::tlv493d::acquisition(magencIndexAdduction, cbk00);        
     }
     
     if(true == embot::core::binary::mask::check(eventmask, evtReadFAP)) 
@@ -223,7 +293,7 @@ void myEVT::userdefOnEventANYother(embot::os::Thread *t, embot::os::EventMask ev
                            " acquisition time = " + embot::core::TimeFormatter(tnow-startOfFAPacquisition).to_string());    
 #endif  
 
-        if(embot::hw::resOK != embot::hw::tlv493d::read(embot::hw::TLV493D::one, positionFAP))
+        if(embot::hw::resOK != embot::hw::tlv493d::read(magencIndexAdduction, positionFAP))
         {
             positionFAP = 66666;
         }

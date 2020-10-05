@@ -33,7 +33,7 @@
 namespace embot { namespace hw { namespace i2c {
     
     // speeds so far are those
-    enum class Speed : uint32_t { standard100 = 100000, fast400 = 400000, fastplus1000 = 1000000, high3400 = 3400000 };
+    enum class Speed : uint32_t { standard100 = 100000, fast400 = 400000, fastplus1000 = 1000000, high3400 = 3400000, none = 0 };
     
     // address is always expressed by <= 8 bits
     using ADR = std::uint8_t;
@@ -62,9 +62,11 @@ namespace embot { namespace hw { namespace i2c {
     struct Descriptor
     {
         embot::hw::I2C bus {embot::hw::I2C::none};
-        Config config {Speed::fast400};
+        Config config {Speed::none};
         constexpr Descriptor() = default;
         constexpr Descriptor(embot::hw::I2C b, std::uint32_t s) : bus(b), config(s) {}
+        constexpr Descriptor(embot::hw::I2C b, Speed s) : bus(b), config(s) {} 
+        constexpr bool isvalid() const { return (embot::hw::I2C::none != bus) && (0 != config.speed); }              
     };
 
     

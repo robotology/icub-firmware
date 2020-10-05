@@ -483,14 +483,21 @@ namespace embot { namespace hw { namespace bsp { namespace led {
 
     #elif   defined(STM32HAL_BOARD_PMC)
        
-    constexpr PROP led1p = { .on = embot::hw::gpio::State::SET, .off = embot::hw::gpio::State::RESET, .gpio = {embot::hw::GPIO::PORT::D, embot::hw::GPIO::PIN::six}  };  
+    constexpr PROP led1p = { .on = embot::hw::gpio::State::RESET, .off = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::D, embot::hw::GPIO::PIN::six}  };
+    constexpr PROP led2p = { .on = embot::hw::gpio::State::RESET, .off = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::D, embot::hw::GPIO::PIN::seven}  };
+    constexpr PROP led3p = { .on = embot::hw::gpio::State::RESET, .off = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::D, embot::hw::GPIO::PIN::eight}  };  
+    constexpr PROP led4p = { .on = embot::hw::gpio::State::RESET, .off = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::D, embot::hw::GPIO::PIN::nine}  }; 
+    constexpr PROP led5p = { .on = embot::hw::gpio::State::RESET, .off = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::D, embot::hw::GPIO::PIN::ten}  }; 
+    constexpr PROP led6p = { .on = embot::hw::gpio::State::RESET, .off = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::E, embot::hw::GPIO::PIN::eight}  }; 
+    constexpr PROP led7p = { .on = embot::hw::gpio::State::RESET, .off = embot::hw::gpio::State::SET, .gpio = {embot::hw::GPIO::PORT::E, embot::hw::GPIO::PIN::nine}  };        
         
     constexpr BSP thebsp {        
         // maskofsupported
-        mask::pos2mask<uint32_t>(LED::one),        
+        mask::pos2mask<uint32_t>(LED::one) | mask::pos2mask<uint32_t>(LED::two) | mask::pos2mask<uint32_t>(LED::three) | mask::pos2mask<uint32_t>(LED::four) |
+        mask::pos2mask<uint32_t>(LED::five) | mask::pos2mask<uint32_t>(LED::six) | mask::pos2mask<uint32_t>(LED::seven),        
         // properties
         {{
-            &led1p, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr            
+            &led1p, &led2p, &led3p, &led4p, &led5p, &led6p, &led7p, nullptr            
         }}        
     };
     
@@ -2124,23 +2131,38 @@ namespace embot { namespace hw { namespace bsp { namespace i2c {
     
     #elif   defined(STM32HAL_BOARD_PMC)
     
+    constexpr PROP i2c1p { .handle = &hi2c1 };
+    constexpr PROP i2c2p { .handle = &hi2c2 };
     constexpr PROP i2c3p { .handle = &hi2c3 };
+    constexpr PROP i2c4p { .handle = &hi2c4 };
 
         
     constexpr BSP thebsp {        
         // maskofsupported   
-        mask::pos2mask<uint32_t>(I2C::three),         
+        mask::pos2mask<uint32_t>(I2C::one) | mask::pos2mask<uint32_t>(I2C::two) | mask::pos2mask<uint32_t>(I2C::three) | mask::pos2mask<uint32_t>(I2C::four),         
         // properties
         {{       
-            nullptr, nullptr, &i2c3p
+            &i2c1p, &i2c2p, &i2c3p, &i2c4p
         }}        
     }; 
 
     void BSP::init(embot::hw::I2C h) const
     {
-        if(h == I2C::three)
+        if(h == I2C::one)
+        {            
+            MX_I2C1_Init();
+        } 
+        else if(h == I2C::two)
+        {            
+            MX_I2C2_Init();
+        } 
+        else if(h == I2C::three)
         {            
             MX_I2C3_Init();
+        } 
+        else if(h == I2C::four)
+        {            
+            MX_I2C4_Init();
         }        
     }
     
@@ -2601,6 +2623,90 @@ void DMA1_Channel2_IRQHandler(void)
   HAL_DMA_IRQHandler(&hdma_i2c3_tx);
 }
 
+#elif defined(STM32HAL_BOARD_PMC)
+
+void I2C1_EV_IRQHandler(void)
+{
+    HAL_I2C_EV_IRQHandler(&hi2c1);
+}
+
+void I2C1_ER_IRQHandler(void)
+{
+    HAL_I2C_ER_IRQHandler(&hi2c1);
+}
+
+void I2C2_EV_IRQHandler(void)
+{
+    HAL_I2C_EV_IRQHandler(&hi2c2);
+}
+
+void I2C2_ER_IRQHandler(void)
+{
+    HAL_I2C_ER_IRQHandler(&hi2c2);
+}
+
+void I2C3_EV_IRQHandler(void)
+{
+    HAL_I2C_EV_IRQHandler(&hi2c3);
+}
+
+void I2C3_ER_IRQHandler(void)
+{
+    HAL_I2C_ER_IRQHandler(&hi2c3);
+}
+
+void I2C4_EV_IRQHandler(void)
+{
+    HAL_I2C_EV_IRQHandler(&hi2c4);
+}
+
+void I2C4_ER_IRQHandler(void)
+{
+    HAL_I2C_ER_IRQHandler(&hi2c4);
+}
+
+
+void DMA1_Channel4_IRQHandler(void)
+{
+  HAL_DMA_IRQHandler(&hdma_i2c1_rx);
+}
+
+void DMA1_Channel5_IRQHandler(void)
+{
+  HAL_DMA_IRQHandler(&hdma_i2c1_tx);
+}
+
+void DMA1_Channel6_IRQHandler(void)
+{
+  HAL_DMA_IRQHandler(&hdma_i2c2_rx);
+}
+
+void DMA1_Channel7_IRQHandler(void)
+{
+  HAL_DMA_IRQHandler(&hdma_i2c2_tx);
+}
+
+void DMA1_Channel8_IRQHandler(void)
+{
+  HAL_DMA_IRQHandler(&hdma_i2c3_rx);
+}
+
+void DMA2_Channel1_IRQHandler(void)
+{
+  HAL_DMA_IRQHandler(&hdma_i2c3_tx);
+}
+
+void DMA2_Channel2_IRQHandler(void)
+{
+  HAL_DMA_IRQHandler(&hdma_i2c4_rx);
+}
+
+void DMA2_Channel3_IRQHandler(void)
+{
+  HAL_DMA_IRQHandler(&hdma_i2c4_tx);
+}
+
+
 #endif // irq handlers
 
 #endif // i2c
@@ -2776,13 +2882,14 @@ namespace embot { namespace hw { namespace bsp { namespace tlv493d {
     #elif defined(STM32HAL_BOARD_PMC)
     
     constexpr PROP prop01 { .i2cbus = embot::hw::I2C::three, .i2caddress = 0xBC }; 
+    constexpr PROP prop04 { .i2cbus = embot::hw::I2C::two, .i2caddress = 0xBC }; 
 
     constexpr BSP thebsp {        
         // maskofsupported
-        mask::pos2mask<uint32_t>(TLV493D::one),        
+        mask::pos2mask<uint32_t>(TLV493D::one) | mask::pos2mask<uint32_t>(TLV493D::four),        
         // properties
         {{
-            &prop01
+            &prop01, nullptr, nullptr, &prop04, nullptr, nullptr
         }}        
     };
     
