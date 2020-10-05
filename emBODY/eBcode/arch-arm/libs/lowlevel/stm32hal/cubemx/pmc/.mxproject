@@ -7,8 +7,8 @@ HeaderPath=..\Drivers\STM32G4xx_HAL_Driver\Inc;..\Drivers\STM32G4xx_HAL_Driver\I
 CDefines=USE_HAL_DRIVER;STM32G474xx;USE_HAL_DRIVER;USE_HAL_DRIVER;
 
 [PreviousGenFiles]
-HeaderPath=C:/tmp/pmc/Inc
+HeaderPath=C:/ace/z/pmc/Inc
 HeaderFiles=gpio.h;adc.h;comp.h;cordic.h;crc.h;dma.h;fdcan.h;fmac.h;i2c.h;rng.h;rtc.h;spi.h;tim.h;usb.h;stm32g4xx_it.h;stm32g4xx_hal_conf.h;main.h;
-SourcePath=C:/tmp/pmc/Src
+SourcePath=C:/ace/z/pmc/Src
 SourceFiles=gpio.c;adc.c;comp.c;cordic.c;crc.c;dma.c;fdcan.c;fmac.c;i2c.c;rng.c;rtc.c;spi.c;tim.c;usb.c;stm32g4xx_it.c;stm32g4xx_hal_msp.c;main.c;
 
