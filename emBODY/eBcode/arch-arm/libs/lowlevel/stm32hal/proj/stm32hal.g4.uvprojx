@@ -1258,11 +1258,6 @@
               <FilePath>..\src\board\pmc\v120\src\stm32g4xx_hal_msp.c</FilePath>
             </File>
             <File>
-              <FileName>stm32g4xx_it.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\board\pmc\v120\src\stm32g4xx_it.c</FilePath>
-            </File>
-            <File>
               <FileName>tim.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\board\pmc\v120\src\tim.c</FilePath>
@@ -3394,11 +3389,6 @@
               <FileName>stm32g4xx_hal_msp.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\board\pmc\v120\src\stm32g4xx_hal_msp.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32g4xx_it.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\board\pmc\v120\src\stm32g4xx_it.c</FilePath>
             </File>
             <File>
               <FileName>tim.c</FileName>
@@ -5603,11 +5593,6 @@
               <FilePath>..\src\board\pmc\v120\src\stm32g4xx_hal_msp.c</FilePath>
             </File>
             <File>
-              <FileName>stm32g4xx_it.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\board\pmc\v120\src\stm32g4xx_it.c</FilePath>
-            </File>
-            <File>
               <FileName>tim.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\board\pmc\v120\src\tim.c</FilePath>
@@ -7808,11 +7793,6 @@
               <FileName>stm32g4xx_hal_msp.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\src\board\pmc\v120\src\stm32g4xx_hal_msp.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32g4xx_it.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\src\board\pmc\v120\src\stm32g4xx_it.c</FilePath>
             </File>
             <File>
               <FileName>tim.c</FileName>
