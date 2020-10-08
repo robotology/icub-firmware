@@ -52,13 +52,19 @@ void MX_GPIO_Init(void)
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOD, LED1_Pin|CAN1_STDBY_Pin|LED2_Pin|CAN1_SHDN_Pin
-                          |LED5_Pin|LED4_Pin|LED3_Pin, GPIO_PIN_RESET);
+                          |LED3_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOE, LED6_Pin|LED7_Pin|MAGVCC2_Pin|MAGVCC1_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOD, LED5_Pin|LED4_Pin, GPIO_PIN_SET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOE, LED6_Pin|LED7_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(DAC_SYNCEN_GPIO_Port, DAC_SYNCEN_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOE, MAGVCC2_Pin|MAGVCC1_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(VPPEN_GPIO_Port, VPPEN_Pin, GPIO_PIN_RESET);
