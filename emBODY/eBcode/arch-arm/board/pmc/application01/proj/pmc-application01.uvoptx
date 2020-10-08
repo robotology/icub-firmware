@@ -157,9 +157,41 @@
         <Bp>
           <Number>0</Number>
           <Type>0</Type>
+          <LineNumber>86</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134405990</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>C:\ace\#rob\icub-firmware\emBODY\eBcode\arch-arm\libs\lowlevel\stm32hal\src\board\pmc\v120\src\board_pmc_v120.c</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\pmc\../src/board/pmc/v120/src/board_pmc_v120.c\86</Expression>
+        </Bp>
+        <Bp>
+          <Number>1</Number>
+          <Type>0</Type>
+          <LineNumber>68</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134384418</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw.cpp</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\pmc\../../../../../../eBcode/arch-arm/embot/hw/embot_hw.cpp\68</Expression>
+        </Bp>
+        <Bp>
+          <Number>2</Number>
+          <Type>0</Type>
           <LineNumber>469</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134390994</Address>
+          <Address>134398332</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -171,36 +203,20 @@
           <Expression>\\pmc\../../../../embot/hw/embot_hw_tlv493d.cpp\469</Expression>
         </Bp>
         <Bp>
-          <Number>1</Number>
+          <Number>3</Number>
           <Type>0</Type>
-          <LineNumber>471</LineNumber>
+          <LineNumber>79</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134391024</Address>
+          <Address>134405986</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
           <SizeOfObject>0</SizeOfObject>
           <BreakByAccess>0</BreakByAccess>
           <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\..\..\..\embot\hw\embot_hw_tlv493d.cpp</Filename>
+          <Filename>C:\ace\#rob\icub-firmware\emBODY\eBcode\arch-arm\libs\lowlevel\stm32hal\src\board\pmc\v120\src\board_pmc_v120.c</Filename>
           <ExecCommand></ExecCommand>
-          <Expression>\\pmc\../../../../embot/hw/embot_hw_tlv493d.cpp\471</Expression>
-        </Bp>
-        <Bp>
-          <Number>2</Number>
-          <Type>0</Type>
-          <LineNumber>475</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134391030</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\..\..\..\embot\hw\embot_hw_tlv493d.cpp</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\pmc\../../../../embot/hw/embot_hw_tlv493d.cpp\475</Expression>
+          <Expression>\\pmc\../src/board/pmc/v120/src/board_pmc_v120.c\79</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -653,7 +669,7 @@
 
   <Group>
     <GroupName>embot</GroupName>
-    <tvExp>1</tvExp>
+    <tvExp>0</tvExp>
     <tvExpOptDlg>0</tvExpOptDlg>
     <cbSel>0</cbSel>
     <RteFlg>0</RteFlg>

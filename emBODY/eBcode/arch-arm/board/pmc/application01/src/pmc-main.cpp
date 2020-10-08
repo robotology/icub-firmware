@@ -199,21 +199,21 @@ void mySYS::userdefInit_Extra(embot::os::EventThread* evthr, void *initparam) co
     // start a timer which toggles pc4.
         
         
-//    embot::hw::led::off(embot::hw::LED::seven);
-//    VPPEenable(false);
-//    VPPENon = false;       
-//        
-//    embot::os::Timer *tmrVPPEN = new embot::os::Timer;   
-//    embot::os::Action actVPPEN(embot::os::CallbackToThread(embot::core::Callback{toggleVPPEN, nullptr}, nullptr));
-//    embot::os::Timer::Config cfg{10*embot::core::time1second, actVPPEN, embot::os::Timer::Mode::forever, 0};
-//    tmrVPPEN->start(cfg);      
+    embot::hw::led::off(embot::hw::LED::seven);
+    VPPEenable(false);
+    VPPENon = false;       
+        
+    embot::os::Timer *tmrVPPEN = new embot::os::Timer;   
+    embot::os::Action actVPPEN(embot::os::CallbackToThread(embot::core::Callback{toggleVPPEN, nullptr}, nullptr));
+    embot::os::Timer::Config cfg{10*embot::core::time1second, actVPPEN, embot::os::Timer::Mode::forever, 0};
+    tmrVPPEN->start(cfg);      
 
 // pe11 MAGVCC2 high 
 
-    IndexAdductionEnable(false);
-    embot::core::delay(1000*1000);
+//    IndexAdductionEnable(false);
+//    embot::core::delay(1000*1000);
 
-    
+//    
           
     
 }
@@ -232,11 +232,11 @@ void myEVT::userdefStartup(embot::os::Thread *t, void *param) const
     
     embot::hw::tlv493d::init(magencIndexAdduction, {{embot::hw::bsp::tlv493d::getBSP().getPROP(magencIndexAdduction)->i2cbus, embot::hw::i2c::Speed::standard100}});
     
-    // start a timer which sends an event which forces an acquisition from the FAP  
-    embot::os::Timer *tmr = new embot::os::Timer;   
-    embot::os::Action act(embot::os::EventToThread(evtTick, t));
-    embot::os::Timer::Config cfg{tickperiod, act, embot::os::Timer::Mode::forever, 0};
-    tmr->start(cfg);     
+//    // start a timer which sends an event which forces an acquisition from the FAP  
+//    embot::os::Timer *tmr = new embot::os::Timer;   
+//    embot::os::Action act(embot::os::EventToThread(evtTick, t));
+//    embot::os::Timer::Config cfg{tickperiod, act, embot::os::Timer::Mode::forever, 0};
+//    tmr->start(cfg);     
  
     // maybe we start the tx of ft data straight away
 #if defined(DEBUG_atstartup_tx_FTdata)
