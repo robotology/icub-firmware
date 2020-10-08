@@ -99,15 +99,29 @@ We retrieve only 6 bytes for the acceleration. If we count just for them without
 
 So what? I believe that this is due to the I2C stretching which the BNO055 does when its data is not ready. 
 
-We have observed this I2C stretching phenomenon when we were reading the full 47 bytes from this chip and we measured with the oscilloscope a strong variation of the acquisition time, if I remember correctly ranging from 4 to 7 milliseconds. 
+We have observed this I2C stretching phenomenon when we were reading the full 47 bytes from this chip and we measured with the oscilloscope a strong variation of the acquisition time, if I remember correctly ranging from 5 to 9 milliseconds. See following issue for more details: https://github.com/robotology/icub-main/issues/595 and the following images coming from that issue.
+
+
+
+![](res/imu-short.png)
+
+![](res/imu-long.png)
+
+
+
+**Figure**. A short and long acquisition of the full status of the BNO055 over I2C @ 400 KHz. We can clearly see the clock stretching (`SCL` is in yellow) done by the BNO055.
+
+
 
 Even the traces reported in here show high variability in acquisition time for the IMU which ranges from 687 to 1919 usec: `S0:m1:u919`, `S0:m1:u907`, `S0:m1:u899`, `S0:m0:u687`, `S0:m1:u489`.
 
-And in here is the PDF of the acquisition time. It most probable duration is around 1800 usec.
+And in here is the PDF of the acquisition time. Its most probable duration is around 1800 usec.
 
-| <img src="res/pdf-acquisition-time-imu.jpg" style="zoom: 150%;" /> |
-| :----------------------------------------------------------: |
-| **Figure**. PDF of the acquit ion time for the acceleration only on the BNO055 over I2C @ 400 KHz |
+
+
+![](res/pdf-acquisition-time-imu.jpg)
+
+**Figure**. PDF of the acquisition time for the acceleration only on the BNO055 over I2C @ 400 KHz
 
 
 
