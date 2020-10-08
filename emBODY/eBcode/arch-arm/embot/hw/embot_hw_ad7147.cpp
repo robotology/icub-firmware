@@ -1,8 +1,8 @@
 
 /*
  * Copyright (C) 2020 iCub Tech - Istituto Italiano di Tecnologia
- * Author:  Marco Accame, Andrea Mura
- * email:   marco.accame@iit.it, andrea.mura@iit.it
+ * Author:  Marco Accame
+ * email:   marco.accame@iit.it
 */
 
 
@@ -35,17 +35,7 @@ using namespace embot::hw;
 // - pimpl: private implementation (see scott meyers: item 22 of effective modern c++, item 31 of effective c++
 // --------------------------------------------------------------------------------------------------------------------
 
-#define ad7147_WIPmode
 
-#if defined(ad7147_WIPmode)
-#warning WIP: ad7147_WIPmode is still defined 
-#endif
-
-//#define ad7147_FAKEmode
-
-#if defined(ad7147_FAKEmode)
-#warning WIP: ad7147_FAKEmode is still defined 
-#endif
 
 // --------------------------------------------------------------------------------------------------------------------
 // - all the rest
@@ -64,7 +54,7 @@ namespace embot { namespace hw { namespace ad7147 {
     bool canacquire(embot::hw::AD7147 s)                                                             { return false; }        
     result_t acquisition(embot::hw::AD7147 s, const embot::core::Callback &oncompletion)             { return resNOK; }
     bool operationdone(embot::hw::AD7147 s)                                                          { return false; }
-    result_t read(embot::hw::AD7147 s, Value &temp)                                                  { return resNOK; }   
+    result_t read(embot::hw::AD7147 s, Values &values)                                                  { return resNOK; }   
 
 }}} // namespace embot { namespace hw { namespace AD7147 {
 
@@ -89,14 +79,13 @@ namespace embot { namespace hw { namespace ad7147 {
 
     struct Acquisition
     {
-        static constexpr uint8_t sizeofdata = 3; // 24 bits, one sample
+        static constexpr uint8_t sizeofdata = 24; // 12 samples of 2 bytes each
         volatile bool done {false};
         volatile bool ongoing {false};
-        //Channel channel {Channel::one};
-        Value value {};
+        Values values {};
         std::uint8_t rxdata[sizeofdata] {0};
         embot::core::Callback userdefCBK {};  
-        void clear() { done = false; ongoing = false; /*channel = Channel::one;*/ memset(rxdata, 0, sizeof(rxdata)); userdefCBK.clear(); }        
+        void clear() { done = false; ongoing = false; memset(rxdata, 0, sizeof(rxdata)); userdefCBK.clear(); }        
         Acquisition() = default;        
     };
     
@@ -108,326 +97,270 @@ namespace embot { namespace hw { namespace ad7147 {
         PrivateData() = default;
     };
     
-    
-    
+       
     static PrivateData s_privatedata;
     
     static void sharedCBK(void *p)
     {
         Acquisition *acq = reinterpret_cast<Acquisition*>(p);        
-        
-#if defined(ad7147_FAKEmode)        
-        static volatile uint32_t tmp = 0;
-        tmp++;
-        acq->value = tmp;
-#else
-              
-        uint32_t tmp = (static_cast<uint32_t>(acq->rxdata[0]) << 16) + (static_cast<uint32_t>(acq->rxdata[1]) << 8) + static_cast<uint32_t>(acq->rxdata[2]);
-
-    #if defined(ad7147_WIPmode)
-    #else        
-        if(Channel::one == acq->channel)
+                      
+        for(int i=0; i<acq->values.size(); i++)
         {
-            acq->value = tmp;
+            acq->values[i] = (static_cast<uint16_t>(acq->rxdata[2*i]) << 8) + static_cast<uint16_t>(acq->rxdata[2*i+1]);
         }
-        else if(Channel::two == acq->channel)
-        {
-            acq->values.v2 = tmp;
-        }
-    #endif // WIP
-       
-#endif        
+             
         acq->ongoing = false;
         acq->done = true;
                
         acq->userdefCBK.execute();
     }
-
-#if defined(ad7147_WIPmode)
-#else    
-    // build the registers of the ADS upon embot::hw::REG<>
-
-    struct REG0 : public REG<reg08type, 3>
-    {   // [ mux:4 | gain:3 | bypass:1 ]
-        enum class FIELD : uint8_t { bypass = 0, gain = 1, mux = 2 };
-        static constexpr REG::Fields fields {1, 3, 4};
-        REG0(reg08type *mem = nullptr) : REG<reg08type, 3>(mem, &fields) {}
-            
-        static constexpr uint8_t address {0};            
-        void load(reg08type *mem) { memory = mem; }                
-        bool set(const FIELD tag, const uint8_t value) { return setfield(embot::core::tointegral(tag), value); }
-        reg08type get(const FIELD tag) { return getfield(embot::core::tointegral(tag)); }
-    };    
     
-    struct REG1 : public REG<reg08type, 5>
-    {   // [ dr:3 | mode:1 | cm:1 | vref:2 | ts:1 ]
-        enum class FIELD : uint8_t { ts = 0, vref = 1, cm = 2, mode = 3, dr = 4 };
-        static constexpr REG::Fields fields {1, 2, 1, 1, 3};
-        REG1(reg08type *mem = nullptr) : REG<reg08type, 5>(mem, &fields) {}
-            
-        static constexpr uint8_t address {1};            
-        void load(reg08type *mem) { memory = mem; }                
-        bool set(const FIELD tag, const uint8_t value) { return setfield(embot::core::tointegral(tag), value); }
-        reg08type get(const FIELD tag) { return getfield(embot::core::tointegral(tag)); }
-    };    
-           
-    struct REG2 : public REG<reg08type, 5>
-    {   // [ drdy:1 | dcnt:1 | crc:2 | bcs:1 | idad:3 ]
-        enum class FIELD : uint8_t { idad = 0, bcs = 1, crc = 2, dcnt = 3, drdy = 4 };
-        static constexpr REG::Fields fields {3, 1, 2, 1, 1};
-        REG2(reg08type *mem = nullptr) : REG<reg08type, 5>(mem, &fields) {}
-            
-        static constexpr uint8_t address {2};            
-        void load(reg08type *mem) { memory = mem; }                
-        bool set(const FIELD tag, const uint8_t value) { return setfield(embot::core::tointegral(tag), value); }
-        reg08type get(const FIELD tag) { return getfield(embot::core::tointegral(tag)); }
-    };      
-   
-    struct REG3 : public REG<reg08type, 3>
-    {   // [ i1mux:3 | i2mux:3 | unused:2 ]
-        enum class FIELD : uint8_t { unused = 0, i2mux = 3, i1mux = 3 };
-        static constexpr REG::Fields fields {2, 3, 3};
-        REG3(reg08type *mem = nullptr) : REG<reg08type, 3>(mem, &fields) {}
-            
-        static constexpr uint8_t address {3};            
-        void load(reg08type *mem) { memory = mem; }                
-        bool set(const FIELD tag, const uint8_t value) { return setfield(embot::core::tointegral(tag), value); }
-        reg08type get(const FIELD tag) { return getfield(embot::core::tointegral(tag)); }
-    }; 
     
-//#define AD7147_RESET         0x06
-//#define AD7147_START         0x08
-//#define AD7147_POWERDOWN     0x02
-//#define AD7147_RDATA         0x10
-//#define AD7147_RREG          0x20
-//#define AD7147_WREG          0x40
-//#define AD7147_REGISTER0     0
-//#define AD7147_REGISTER1     1
-//#define AD7147_REGISTER2     2
-//#define AD7147_REGISTER3     3
+//        embot::hw::i2c::Reg reg_DeviceID {0x017, embot::hw::i2c::Reg::Size::sixteenbits};
+//        embot::hw::i2c::Reg reg_AMB_COMP_CTRL0 {0x002, embot::hw::i2c::Reg::Size::sixteenbits};
+//        embot::hw::i2c::Reg reg_AMB_COMP_CTRL1 {0x003, embot::hw::i2c::Reg::Size::sixteenbits};
+//        embot::hw::i2c::Reg reg_AMB_COMP_CTRL2 {0x004, embot::hw::i2c::Reg::Size::sixteenbits};
+//        
+//        embot::hw::i2c::Reg reg_STAGE0_CONNECTION {0x080, embot::hw::i2c::Reg::Size::sixteenbits};
+//        embot::hw::i2c::Reg reg_STAGE1_CONNECTION {0x088, embot::hw::i2c::Reg::Size::sixteenbits};
+//        embot::hw::i2c::Reg reg_STAGE2_CONNECTION {0x090, embot::hw::i2c::Reg::Size::sixteenbits};
+//        embot::hw::i2c::Reg reg_STAGE3_CONNECTION {0x098, embot::hw::i2c::Reg::Size::sixteenbits};
+//        embot::hw::i2c::Reg reg_STAGE4_CONNECTION {0x0A0, embot::hw::i2c::Reg::Size::sixteenbits};
+//        embot::hw::i2c::Reg reg_STAGE5_CONNECTION {0x0A8, embot::hw::i2c::Reg::Size::sixteenbits};
+//        embot::hw::i2c::Reg reg_STAGE6_CONNECTION {0x0B0, embot::hw::i2c::Reg::Size::sixteenbits};
+//        embot::hw::i2c::Reg reg_STAGE7_CONNECTION {0x0B8, embot::hw::i2c::Reg::Size::sixteenbits};
+//        embot::hw::i2c::Reg reg_STAGE8_CONNECTION {0x0C0, embot::hw::i2c::Reg::Size::sixteenbits};
+//        embot::hw::i2c::Reg reg_STAGE9_CONNECTION {0x0C8, embot::hw::i2c::Reg::Size::sixteenbits};
+//        embot::hw::i2c::Reg reg_STAGE10_CONNECTION {0x0D0, embot::hw::i2c::Reg::Size::sixteenbits};
+//        embot::hw::i2c::Reg reg_STAGE11_CONNECTION {0x0D8, embot::hw::i2c::Reg::Size::sixteenbits};
+//        embot::hw::i2c::Reg reg_PWR_CONTROL {0x000, embot::hw::i2c::Reg::Size::sixteenbits};
+//        embot::hw::i2c::Reg reg_STAGE_CAL_EN {0x001, embot::hw::i2c::Reg::Size::sixteenbits};    
 
-// REGISTER0
-//#define AD7147_CHANNEL1          0x00        // MUX[3:0] = 0000 : AINP = AIN0, AINN = AIN1
-//#define AD7147_CHANNEL2          0x06        // MUX[3:0] = 0110 : AINP = AIN2, AINN = AIN3
-//#define AD7147_GAINx1            0x00        // GAIN[2:0]
-//#define AD7147_PGA_BYPASS_EN     0x00        // PGA enabled (default)
-//#define AD7147_PGA_BYPASS_DIS    0x01        // PGA disabled and bypassed
 
-// REGISTER1
-//#define AD7147_DR_1kSPS          0x06        // DR[2:0]
-//#define AD7147_NORMAL            0x00        // 0 : Normal mode (256-kHz modulator clock, default)
-//#define AD7147_TURBO             0x01        // 1 : Turbo mode (512-kHz modulator clock)
-//#define AD7147_SINGLESHOT        0x00        // Single-shot conversion mode
-//#define AD7147_CM                0x01        // Continuous conversion mode
+    struct regContent
+    {    
+        embot::hw::i2c::Reg reg {0, embot::hw::i2c::Reg::Size::sixteenbits};
+        uint16_t val {0};
+        
+        constexpr regContent(uint16_t a, uint16_t v) : reg({a, embot::hw::i2c::Reg::Size::sixteenbits}), val((v>>8) | ((v&0x00ff)<<8)) {} 
+        uint16_t getvalue() const
+        {
+            return (val>>8) | ((val&0x00ff)<<8);
+        }  
 
-    
-    // use a struct to model the behaviour of the ADS
-    
-    struct chipAD7147
+        void* getcontent() const
+        {
+            return const_cast<uint16_t*>(&val);
+        }     
+    };
+
+    enum class sendmode { sendonly, pluscheck, onlycheck };
+    bool send(embot::hw::I2C bus, std::uint8_t i2caddress, const regContent &rc, sendmode mode, embot::core::relTime timeout = 20*embot::core::time1millisec)
     {
-        embot::hw::I2C bus { embot::hw::I2C::one};
-        embot::hw::i2c::ADR adr {0};
-        embot::core::relTime conversiontime {1040};
+        bool ret = true;
+        embot::hw::i2c::Reg reg2use {rc.reg};
+        static volatile int errors {0};
         
-        enum class REG : uint8_t { zero = 0, one = 1, two = 2, three = 3 };
-        
-        enum class CMD : uint8_t { reset = 0x06, start = 0x08, powerdown = 0x02, none = 0xff };
-        
-        static constexpr std::uint8_t RDATA = 0x10;
-        static constexpr std::uint8_t RREG  = 0x20;
-        static constexpr std::uint8_t WREG  = 0x40;
-        static constexpr std::uint8_t CHANNEL1 = 0x00;
-        static constexpr std::uint8_t CHANNEL2 = 0x06;
-        static constexpr std::uint8_t DR_1kSPS = 0x06;
-        static constexpr std::uint8_t CM_SINGLESHOT = 0x00;
-        
-        // direct access to registers w/ set() / get()
-        REG0 r0 {&memory[0]};
-        REG1 r1 {&memory[1]};
-        REG2 r2 {&memory[2]};
-        REG3 r3 {&memory[3]};
-        
-        
-        uint8_t memory[4] {0};  
-        
-        chipAD7147() = default; 
-
-        void setaddress(embot::hw::I2C b, embot::hw::i2c::ADR a)
+        for(int i=0; i<3; i++)
         {
-            bus = b;
-            adr = a;            
-        }
-        
-        result_t writeregister(REG r, embot::core::relTime timeout = 3*embot::core::time1millisec)
-        {
-            uint8_t regWrite[2] = {0};
-            regWrite[0] = WREG + (embot::core::tointegral(r)<<2);
-            regWrite[1] = memory[embot::core::tointegral(r)];
-            return embot::hw::i2c::transmit(bus, adr, {&regWrite, 2}, timeout);
-        } 
-        
-        result_t readregister(REG r, embot::core::relTime timeout = 3*embot::core::time1millisec)
-        {
-            embot::hw::i2c::REG reg = RREG + (embot::core::tointegral(r)<<2);
-            embot::core::Data dest = {&memory[embot::core::tointegral(r)], 1};
-            return embot::hw::i2c::read(bus, adr, reg, dest, timeout);
-        }  
-                
-        result_t readeveryregister(embot::core::relTime timeout = 12*embot::core::time1millisec)
-        {
-            result_t res = readregister(REG::zero, timeout/4);
-            
-            if(result_t::OK == res)
-                res = readregister(REG::one, timeout/4);
-            if(result_t::OK == res)
-                res = readregister(REG::two, timeout/4);
-            if(result_t::OK == res)
-                res = readregister(REG::three, timeout/4);
-            
-            return res;
-        } 
-
-        result_t sendcommand(CMD cmd, embot::core::relTime timeout = 3*embot::core::time1millisec)
-        {
-            volatile result_t res = result_t::NOK;     
-            volatile uint8_t v1 = 0;        
-            // 1. reset
-            uint8_t command {embot::core::tointegral(CMD::none)}; 
-            embot::core::relTime delay = 0;
-            switch(cmd)
+                    
+            if((sendmode::sendonly == mode) || (sendmode::pluscheck == mode))
             {
-                case CMD::reset:
-                {
-                    delay = embot::core::time1millisec;
-                    command = embot::core::tointegral(CMD::reset);
-                } break;
-                
-                case CMD::start:
-                {
-                    delay = 0;
-                    command = embot::core::tointegral(CMD::start);
-                } break;
-                            
-                default:
-                {                    
-                } break;
-            }
-            
-            if(255 != command)
+                embot::core::Data content {rc.getcontent(), 2};
+                embot::hw::i2c::write(bus, i2caddress, reg2use, content, timeout); 
+            } 
+
+            if((sendmode::onlycheck == mode) || (sendmode::pluscheck == mode))
             {
-                res = embot::hw::i2c::transmit(bus, adr, {&command, 1}, timeout);
-                if(delay > 0)
+                uint8_t val[2] {0};
+                uint16_t readvalue {0};
+                volatile uint16_t targetvalue = rc.getvalue();
+                embot::core::Data content_read_back {val, 2};
+                embot::hw::i2c::read(bus,i2caddress, reg2use, content_read_back, timeout);
+                readvalue = val[1] + (static_cast<uint16_t>(val[0]) << 8);
+                if(readvalue != targetvalue)
                 {
-                    embot::hw::sys::delay(delay);  
+                    ret = false;
+                    errors ++;
                 }
-            }            
-
-            return res;                        
-        }
-        
-        result_t setchannel(Channel chn, embot::core::relTime timeout = 3*embot::core::time1millisec)
-        {
-            result_t res = result_t::NOK;
-            volatile uint8_t v1 = 0;
-            r0.set(REG0::FIELD::mux, (Channel::one == chn) ? CHANNEL1 : CHANNEL2);
-            v1 = r0.get(REG0::FIELD::mux);
-            res = writeregister(chipAD7147::REG::zero, timeout);                
-            return res;
-        }
-        
-        enum class CFG : uint8_t { normal = 0, turbo = 1  };
-        result_t sendconfig(CFG cfg, embot::core::relTime timeout = 3*embot::core::time1millisec)
-        {
-            switch(cfg)
-            {
-                default:
-                case CFG::normal:
-                {
-                    r1.set(REG1::FIELD::cm, CM_SINGLESHOT);
-                    // normal mode @ 1000 sps
-                    r1.set(REG1::FIELD::mode, 0); 
-                    r1.set(REG1::FIELD::dr, DR_1kSPS);                
-                    conversiontime = 1040; // see datasheet page 28 (8.3.6 Conversion Times)                   
-                } break;
-
-                case CFG::turbo:
-                {
-                    r1.set(REG1::FIELD::cm, CM_SINGLESHOT);
-                    // turbo mode @ 2000 sps
-                    r1.set(REG1::FIELD::mode, 1); 
-                    r1.set(REG1::FIELD::dr, DR_1kSPS);
-                    conversiontime = 520;  // see datasheet page 28 (8.3.6 Conversion Times)                   
-                } break;
             }
-
-            return writeregister(chipAD7147::REG::one, timeout);
-        }
-
-/*
-8.4.3.2 Turbo Mode
-Applications that require higher data rates up to 2 kSPS can operate the device in turbo mode. In this mode, the
-internal modulator runs at a higher frequency of fMOD = fCLK / 4 = 512 kHz. Compared to normal mode, the device
-power consumption increases because the modulator runs at a higher frequency. Running the AD7147 in
-turbo mode at a comparable output data rate as in normal mode yields better noise performance. For example,
-the input-referred noise at 90 SPS in turbo mode is lower than the input-referred noise at 90 SPS in normal
-mode.                
-*/
-        enum class SPS : uint8_t { twothousand = 6, onethousandtwohundred = 5, sixhundredsixty = 4, threehundredfifty = 3 };
-        enum class GAIN : uint8_t { one = 0, two = 1, four = 2, eigth = 3, sixteen = 4, thirtytwo = 5, sixtyfour = 6, onehundredtwentyeigth = 7 };
-        result_t configure(SPS sps, GAIN gain, embot::core::relTime timeout = 3*embot::core::time1millisec)
-        {
-            static constexpr embot::core::relTime LUTconversiontimesturbo[] = 
-            {   // as indexed by valure of register DR. see see datasheet page 28 (8.3.6 Conversion Times) and page 41 (8.6.2 Register Descriptions)
-                25010, 11140, 5650, 2900, 1540, 860, 520 
-            };
             
-            // single shot, always turbo mode
-            r1.set(REG1::FIELD::cm, CM_SINGLESHOT);
-            r1.set(REG1::FIELD::mode, 1);
-            
-            // the values of GAIN and SPS are already the values of the related registers ...
-            r0.set(REG0::FIELD::gain, embot::core::tointegral(gain));
-            r1.set(REG1::FIELD::dr, embot::core::tointegral(sps));
-            conversiontime = LUTconversiontimesturbo[embot::core::tointegral(sps)];
-            
-            // now i write the registers
-            result_t r = writeregister(chipAD7147::REG::zero, timeout);
-            if(result_t::OK != r)
+            if(true == ret)
             {
-                return r;
+                break;
             }
-            return writeregister(chipAD7147::REG::one, timeout);
-        }  
-        
-        // blocking mode
-        result_t startconversion()
-        {
-            return sendcommand(chipAD7147::CMD::start); 
         }
         
-        // after startconversion() we must wait for some time that the conversion is effectively done
-        embot::core::relTime getConversionTime() const
+        if(true != ret)
         {
-            return conversiontime;
+            errors = errors;
+        }
+
+        return ret;    
+    }
+
+    void send(embot::hw::I2C bus, std::uint8_t i2caddress, std::vector<regContent> &tx, sendmode mode,  embot::core::relTime timeout = 20*embot::core::time1millisec)
+    {
+        for(int i=0; i<tx.size(); i++)
+        {
+            send(bus, i2caddress, tx[i], mode, timeout);        
+        }
+        
+    }
+
+    void sendstage(embot::hw::I2C bus, std::uint8_t i2caddress, const std::array<regContent, 8> &ar, sendmode mode,  embot::core::relTime timeout = 20*embot::core::time1millisec)
+    {
+        for(int i=0; i<ar.size(); i++)
+        {
+            send(bus, i2caddress, ar[i], mode, timeout);        
         }   
-        
-        // non blocking mode: at end it puts results inside data and execute the callback
-        result_t retrievevalue(embot::core::Data &destination, const embot::core::Callback &oncompletion)
-        {
-            return embot::hw::i2c::read(bus, adr, chipAD7147::RDATA, destination, oncompletion);
-        }
-        
+    }
+    
+    
+    
+    constexpr std::array<regContent, 8> st0 
+    {
+        regContent{0x080, 0xFFFE},
+        regContent{0x081, 0x1FFF},
+        regContent{0x082, 0x2200},
+        regContent{0x083, 0x2626},
+        regContent{0x084, 50},
+        regContent{0x085, 50},
+        regContent{0x086, 100},
+        regContent{0x087, 100}      
+    };
 
+    constexpr std::array<regContent, 8> st1 
+    {
+        regContent{0x088, 0xFFFB},
+        regContent{0x089, 0x1FFF},
+        regContent{0x08a, 0x2200},
+        regContent{0x08b, 0x2626},
+        regContent{0x08c, 50},
+        regContent{0x08d, 50},
+        regContent{0x08e, 100},
+        regContent{0x08f, 100}      
+    };
 
-    }; 
+    constexpr std::array<regContent, 8> st2 
+    {
+        regContent{0x090, 0xFFEF},
+        regContent{0x091, 0x1FFF},
+        regContent{0x092, 0x2200},
+        regContent{0x093, 0x2626},
+        regContent{0x094, 50},
+        regContent{0x095, 50},
+        regContent{0x096, 100},
+        regContent{0x097, 100}       
+    };  
 
+    constexpr std::array<regContent, 8> st3 
+    {
+        regContent{0x098, 0xFFBF},
+        regContent{0x099, 0x1FFF},
+        regContent{0x09a, 0x2200},
+        regContent{0x09b, 0x2626},
+        regContent{0x09c, 50},
+        regContent{0x09d, 50},
+        regContent{0x09e, 100},
+        regContent{0x09f, 100}      
+    };
+    
+    constexpr std::array<regContent, 8> st4 
+    {
+        regContent{0x0A0, 0xFEFF},
+        regContent{0x0A1, 0x1FFF},
+        regContent{0x0A2, 0x2200},
+        regContent{0x0A3, 0x2626},
+        regContent{0x0A4, 50},
+        regContent{0x0A5, 50},
+        regContent{0x0A6, 100},
+        regContent{0x0A7, 100}      
+    };
+    
+    constexpr std::array<regContent, 8> st5 
+    {
+        regContent{0x0A8, 0xFBFF},
+        regContent{0x0A9, 0x1FFF},
+        regContent{0x0Aa, 0x2200},
+        regContent{0x0Ab, 0x2626},
+        regContent{0x0Ac, 50},
+        regContent{0x0Ad, 50},
+        regContent{0x0Ae, 100},
+        regContent{0x0Af, 100}   
+    };
+    
+    constexpr std::array<regContent, 8> st6 
+    {
+        regContent{0x0B0, 0xEFFF},
+        regContent{0x0B1, 0x1FFF},
+        regContent{0x0B2, 0x2200},
+        regContent{0x0B3, 0x2626},
+        regContent{0x0B4, 50},
+        regContent{0x0B5, 50},
+        regContent{0x0B6, 100},
+        regContent{0x0B7, 100}      
+    };
+    
+    constexpr std::array<regContent, 8> st7 
+    {
+        regContent{0x0B8, 0xFFFF},
+        regContent{0x0B9, 0x1FFE},
+        regContent{0x0Ba, 0x2200},
+        regContent{0x0Bb, 0x2626},
+        regContent{0x0Bc, 50},
+        regContent{0x0Bd, 50},
+        regContent{0x0Be, 100},
+        regContent{0x0Bf, 100}   
+    };    
 
-    // in future, if multiple chips are required: do it a array and put it into s_privatedata;
-    chipAD7147 _ads_chip;
-
-#endif //WIP   
-
-volatile uint16_t datav {0};
+    constexpr std::array<regContent, 8> st8 
+    {   
+        regContent{0x0C0, 0xFFFF},
+        regContent{0x0C1, 0x1FFB},
+        regContent{0x0C2, 0x2200},
+        regContent{0x0C3, 0x2626},
+        regContent{0x0C4, 50},
+        regContent{0x0C5, 50},
+        regContent{0x0C6, 100},
+        regContent{0x0C7, 100}      
+    };
+    
+    constexpr std::array<regContent, 8> st9 
+    {
+        regContent{0x0C8, 0xFFFF},
+        regContent{0x0C9, 0x1FEF},
+        regContent{0x0Ca, 0x2200},
+        regContent{0x0Cb, 0x2626},
+        regContent{0x0Cc, 50},
+        regContent{0x0Cd, 50},
+        regContent{0x0Ce, 100},
+        regContent{0x0Cf, 100}   
+    };  
+    
+    constexpr std::array<regContent, 8> st10 
+    {   
+        regContent{0x0D0, 0xFFFF},
+        regContent{0x0D1, 0x1FBF},
+        regContent{0x0D2, 0x2200},
+        regContent{0x0D3, 0x2626},
+        regContent{0x0D4, 50},
+        regContent{0x0D5, 50},
+        regContent{0x0D6, 100},
+        regContent{0x0D7, 100}      
+    };
+    
+    constexpr std::array<regContent, 8> st11 
+    {
+        regContent{0x0D8, 0xFFFF},
+        regContent{0x0D9, 0x1EFF},
+        regContent{0x0Da, 0x2200},
+        regContent{0x0Db, 0x2626},
+        regContent{0x0Dc, 50},
+        regContent{0x0Dd, 50},
+        regContent{0x0De, 100},
+        regContent{0x0Df, 100}   
+    };     
               
     result_t init(AD7147 s, const Config &config)
     {
@@ -445,21 +378,133 @@ volatile uint16_t datav {0};
         embot::hw::bsp::ad7147::getBSP().init(s);
         
         std::uint8_t index = embot::core::tointegral(s);
-        
-#if defined(ad7147_FAKEmode)
-#else        
-                
+               
         // init i2c ..
         embot::hw::i2c::init(config.i2cdes.bus, config.i2cdes.config);
         if(false == embot::hw::i2c::ping(config.i2cdes.bus, embot::hw::bsp::ad7147::getBSP().getPROP(s)->i2caddress, 3*embot::core::time1millisec))
         {
             return resNOK;
         }
-                       
-#endif        
+                            
         s_privatedata.i2caddress[index] = embot::hw::bsp::ad7147::getBSP().getPROP(s)->i2caddress;
         s_privatedata.config[index] = config;
         s_privatedata.acquisition[index].clear();
+        
+        
+        uint16_t convalue[2] = {0x2200, 0x2200};
+        
+
+           
+
+//        // check the device id
+//        if(!send(config.i2cdes.bus, s_privatedata.i2caddress[index], regContent{0x017, 0x1471}, sendmode::onlycheck))
+//        {
+//            return resNOK;
+//        }
+    
+//    // just for test  
+//    // AMB_COMP_CTRL0
+//    if(!send(config.i2cdes.bus, s_privatedata.i2caddress[index], regContent{0x002, 0x0ff0}, sendmode::onlycheck))
+//    {
+//        for(;;);
+//    }
+//    
+//    // AMB_COMP_CTRL1
+//    if(!send(config.i2cdes.bus, s_privatedata.i2caddress[index], regContent{0x003, 0x0164}, sendmode::onlycheck))
+//    {
+//        for(;;);
+//    }
+//    
+//    // AMB_COMP_CTRL2
+//    if(!send(config.i2cdes.bus, s_privatedata.i2caddress[index], regContent{0x004, 0xffff}, sendmode::onlycheck))
+//    {
+//        for(;;);
+//    }
+    
+    // configure the 12 stages
+    sendstage(config.i2cdes.bus, s_privatedata.i2caddress[index], st0, sendmode::pluscheck);
+    sendstage(config.i2cdes.bus, s_privatedata.i2caddress[index], st1, sendmode::pluscheck);
+    sendstage(config.i2cdes.bus, s_privatedata.i2caddress[index], st2, sendmode::pluscheck);
+    sendstage(config.i2cdes.bus, s_privatedata.i2caddress[index], st3, sendmode::pluscheck);
+    sendstage(config.i2cdes.bus, s_privatedata.i2caddress[index], st4, sendmode::pluscheck);
+    sendstage(config.i2cdes.bus, s_privatedata.i2caddress[index], st5, sendmode::pluscheck);
+    sendstage(config.i2cdes.bus, s_privatedata.i2caddress[index], st6, sendmode::pluscheck);
+    sendstage(config.i2cdes.bus, s_privatedata.i2caddress[index], st7, sendmode::pluscheck);
+    sendstage(config.i2cdes.bus, s_privatedata.i2caddress[index], st8, sendmode::pluscheck);
+    sendstage(config.i2cdes.bus, s_privatedata.i2caddress[index], st9, sendmode::pluscheck);
+    sendstage(config.i2cdes.bus, s_privatedata.i2caddress[index], st10, sendmode::pluscheck);
+    sendstage(config.i2cdes.bus, s_privatedata.i2caddress[index], st11, sendmode::pluscheck);
+    
+
+    // configure the PWR_CONTROL
+    constexpr uint16_t pw_control_val = 0x00B0; // 0000000010110000
+    send(config.i2cdes.bus, s_privatedata.i2caddress[index], regContent{0x000, pw_control_val}, sendmode::pluscheck);
+    // configure the AMB_COMP_CTRL0
+    send(config.i2cdes.bus, s_privatedata.i2caddress[index], regContent{0x002, 0x0000}, sendmode::pluscheck);
+    // configure the AMB_COMP_CTRL1
+    send(config.i2cdes.bus, s_privatedata.i2caddress[index], regContent{0x003, 0x0000}, sendmode::pluscheck);
+    // configure the AMB_COMP_CTRL2
+    send(config.i2cdes.bus, s_privatedata.i2caddress[index], regContent{0x004, 0x0000}, sendmode::pluscheck);
+    // configure STAGE_LOW_INT_ENABLE
+    send(config.i2cdes.bus, s_privatedata.i2caddress[index], regContent{0x005, 0x0000}, sendmode::pluscheck);
+    // configure STAGE_HIGH_INT_ENABLE 
+    send(config.i2cdes.bus, s_privatedata.i2caddress[index], regContent{0x006, 0x0000}, sendmode::pluscheck);
+    // configure STAGE_COMPLETE_INT_ENABLE 
+    send(config.i2cdes.bus, s_privatedata.i2caddress[index], regContent{0x007, 0x0400}, sendmode::pluscheck);
+// the following three *_STATUS register are read only and should not be written !!!!!!!!!!!!!
+//    // configure STAGE_LOW_INT_STATUS 
+//    send(config.i2cdes.bus, s_privatedata.i2caddress[index], regContent{0x008, 0x0000}, sendmode::pluscheck);
+//    // configure STAGE_HIGH_INT_STATUS 
+//    send(config.i2cdes.bus, s_privatedata.i2caddress[index], regContent{0x009, 0x0000}, sendmode::pluscheck);
+//    // configure STAGE_COMPLETE_INT_STATUS 
+//    send(config.i2cdes.bus, s_privatedata.i2caddress[index], regContent{0x00a, 0x0fff}, sendmode::pluscheck);
+    
+    // and now, finally: STAGE_CAL_EN
+    send(config.i2cdes.bus, s_privatedata.i2caddress[index], regContent{0x001, 0x0fff}, sendmode::pluscheck);
+    
+       
+#if 0
+    // just a reding text. to make it work we need some extra code
+    // now i read values
+    
+        volatile uint32_t count = 0;
+    
+        
+    
+        volatile bool readit = false;
+
+        embot::hw::i2c::Reg reg_CDC_RESULT_S0 {0x00B, embot::hw::i2c::Reg::Size::sixteenbits};
+        
+        
+        embot::core::Time s0 {0};
+        volatile embot::core::Time delta {0};
+        
+        embot::core::Data dest = {readings, 24};
+        
+        std::array<uint16_t, 12> values = {0};
+        
+        for(;;)
+        {
+            done = false;
+            count = 0;
+            s0 = embot::core::now();
+            std::memset(readings, 0xff, sizeof(readings));
+            embot::hw::i2c::read(config.i2cdes.bus, s_privatedata.i2caddress[index], reg_CDC_RESULT_S0, dest, embot::core::Callback{finished, nullptr});
+            while(!done)
+            {
+                count++;
+            }
+            delta = embot::core::now() - s0;
+            
+            for(int i=0; i<values.size(); i++)
+            {
+                values[i] = (static_cast<uint16_t>(readings[2*i]) << 8) + static_cast<uint16_t>(readings[2*i+1]);
+            }
+            count++;
+        }
+
+#endif
+
 
 #if defined(TEST_RW)        
         // ora leggo il Device ID Register in address 0x017
@@ -520,8 +565,7 @@ volatile uint16_t datav {0};
         // i read data[0] = 0x01 data[1] = 0x64
         // default values must be from 15->00: 0x f f f f        
 
-#if defined(ad7147_WIPmode)
-#else    
+   
         // we need to perform chip initialization
         
         _ads_chip.setaddress(config.i2cdes.bus, embot::hw::bsp::ad7147::getBSP().getPROP(s)->i2caddress);
@@ -539,7 +583,6 @@ volatile uint16_t datav {0};
 //        volatile uint8_t v1 = _ads_chip.r1.get(REG1::FIELD::dr);
 //        v1 = v1;   
 
-#endif // WIP
      
 #endif // #if defined(TEST_RW) 
 
@@ -573,12 +616,8 @@ volatile uint16_t datav {0};
         if(true == s_privatedata.acquisition[index].ongoing)
         {
             return false;
-        }
-#if defined(ad7147_FAKEmode)
-        return true;
-#else         
-        return !embot::hw::i2c::isbusy(s_privatedata.config[index].i2cdes.bus);  
-#endif        
+        }      
+        return !embot::hw::i2c::isbusy(s_privatedata.config[index].i2cdes.bus);         
     }    
     
     result_t acquisition(AD7147 s, const embot::core::Callback &oncompletion)
@@ -590,39 +629,21 @@ volatile uint16_t datav {0};
         
         std::uint8_t index = embot::core::tointegral(s);  
         
-        // set channel
-        volatile result_t res = result_t::NOK;
 
-#if defined(ad7147_WIPmode)
-#else 
-        // the following two operations are in blocking mode ... ahi! and take about 200 usec in total.
-        // think of a non blocking mode.
-        //#warning ADS122: think of a non-blocking acquisition start mode
-        res = _ads_chip.setchannel(channel, 3*embot::core::time1millisec); 
-        //embot::hw::sys::delay(50);
-        // start the conversion        
-        res = _ads_chip.startconversion(); 
-        // we must wait for the conversion to be done
-        embot::hw::sys::delay(_ads_chip.getConversionTime()); 
-#endif // WIP   
+        volatile result_t res = result_t::NOK;
+ 
                
         s_privatedata.acquisition[index].clear();
         s_privatedata.acquisition[index].ongoing = true;
         s_privatedata.acquisition[index].done = false;
-//        s_privatedata.acquisition[index].channel = channel;
         s_privatedata.acquisition[index].userdefCBK = oncompletion;
-      
-
-#if defined(ad7147_FAKEmode)
-        embot::core::Callback cbk(sharedCBK, &s_privatedata.acquisition[index]);
-        cbk.execute();
-#else         
+           
         // ok, now i trigger the reading of the value.
         embot::core::Callback cbk(sharedCBK, &s_privatedata.acquisition[index]);
         embot::core::Data data = embot::core::Data(&s_privatedata.acquisition[index].rxdata[0], sizeof(s_privatedata.acquisition[index].rxdata));
-//        _ads_chip.retrievevalue(data, cbk);
-#endif                
-        return resOK;
+        
+        constexpr embot::hw::i2c::Reg reg_CDC_RESULT_S0 {0x00B, embot::hw::i2c::Reg::Size::sixteenbits};
+        return embot::hw::i2c::read(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], reg_CDC_RESULT_S0, data, cbk);                     
     }
     
     bool isalive(AD7147 s, embot::core::relTime timeout)
@@ -631,12 +652,9 @@ volatile uint16_t datav {0};
         {
             return false;
         } 
-#if defined(ad7147_FAKEmode)
-        return true;
-#else 
+
         std::uint8_t index = embot::core::tointegral(s);
         return embot::hw::i2c::ping(s_privatedata.config[index].i2cdes.bus, s_privatedata.i2caddress[index], timeout);  
-#endif
     }
 
     
@@ -651,7 +669,7 @@ volatile uint16_t datav {0};
     } 
     
     
-    result_t read(AD7147 s, Value &val)
+    result_t read(AD7147 s, Values &values)
     {
         if(false == initialised(s))
         {
@@ -664,9 +682,8 @@ volatile uint16_t datav {0};
         }
         
         std::uint8_t index = embot::core::tointegral(s);
-        val = s_privatedata.acquisition[index].value;
-        //val = s_privatedata.acquisition[index].values.v2;
-  
+        values = s_privatedata.acquisition[index].values;
+        
         return resOK;        
     }
     

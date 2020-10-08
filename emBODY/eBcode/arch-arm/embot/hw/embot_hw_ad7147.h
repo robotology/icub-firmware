@@ -29,7 +29,7 @@ namespace embot { namespace hw { namespace ad7147 {
     };
     
     
-    using Value = std::uint32_t; 
+    using Values = std::array<std::uint16_t, 12>; 
     
     
     bool supported(embot::hw::AD7147 s);
@@ -56,8 +56,8 @@ namespace embot { namespace hw { namespace ad7147 {
     // it tells if a previous operation of acquisition is over
     bool operationdone(embot::hw::AD7147 s);
     
-    // ok, now we can read temperature previously acquired
-    result_t read(embot::hw::AD7147 s, Value &value);   
+    // ok, now we can read the values previously acquired
+    result_t read(embot::hw::AD7147 s, Values &values);   
 
  
 }}} // namespace embot { namespace hw { namespace ad7147 {
