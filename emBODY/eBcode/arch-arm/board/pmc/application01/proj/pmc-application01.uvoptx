@@ -153,72 +153,7 @@
           <Name></Name>
         </SetRegEntry>
       </TargetDriverDllRegistry>
-      <Breakpoint>
-        <Bp>
-          <Number>0</Number>
-          <Type>0</Type>
-          <LineNumber>86</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134405990</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>C:\ace\#rob\icub-firmware\emBODY\eBcode\arch-arm\libs\lowlevel\stm32hal\src\board\pmc\v120\src\board_pmc_v120.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\pmc\../src/board/pmc/v120/src/board_pmc_v120.c\86</Expression>
-        </Bp>
-        <Bp>
-          <Number>1</Number>
-          <Type>0</Type>
-          <LineNumber>68</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134384418</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw.cpp</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\pmc\../../../../../../eBcode/arch-arm/embot/hw/embot_hw.cpp\68</Expression>
-        </Bp>
-        <Bp>
-          <Number>2</Number>
-          <Type>0</Type>
-          <LineNumber>469</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134398332</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>..\..\..\..\embot\hw\embot_hw_tlv493d.cpp</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\pmc\../../../../embot/hw/embot_hw_tlv493d.cpp\469</Expression>
-        </Bp>
-        <Bp>
-          <Number>3</Number>
-          <Type>0</Type>
-          <LineNumber>79</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>134405986</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>1</BreakIfRCount>
-          <Filename>C:\ace\#rob\icub-firmware\emBODY\eBcode\arch-arm\libs\lowlevel\stm32hal\src\board\pmc\v120\src\board_pmc_v120.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression>\\pmc\../src/board/pmc/v120/src/board_pmc_v120.c\79</Expression>
-        </Bp>
-      </Breakpoint>
+      <Breakpoint/>
       <WatchWindow1>
         <Ww>
           <count>0</count>

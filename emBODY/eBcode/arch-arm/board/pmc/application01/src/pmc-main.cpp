@@ -172,8 +172,8 @@ void mySYS::userdefInit_Extra(embot::os::EventThread* evthr, void *initparam) co
 //    theleds.get(embot::hw::LED::four).on();
 //    theleds.get(embot::hw::LED::five).pulse(2*embot::core::time1second);  
 //          
-//    embot::app::LEDwaveT<64> ledwave(100*embot::core::time1millisec, 30, std::bitset<64>(0b000001));
-//    theleds.get(embot::hw::LED::six).wave(&ledwave);     
+    embot::app::LEDwaveT<64> ledwave(100*embot::core::time1millisec, 30, std::bitset<64>(0b000001));
+    theleds.get(embot::hw::LED::six).wave(&ledwave);     
 
 //    theleds.get(embot::hw::LED::seven).pulse(3*embot::core::time1second);    
 
@@ -206,7 +206,7 @@ void mySYS::userdefInit_Extra(embot::os::EventThread* evthr, void *initparam) co
     embot::os::Timer *tmrVPPEN = new embot::os::Timer;   
     embot::os::Action actVPPEN(embot::os::CallbackToThread(embot::core::Callback{toggleVPPEN, nullptr}, nullptr));
     embot::os::Timer::Config cfg{10*embot::core::time1second, actVPPEN, embot::os::Timer::Mode::forever, 0};
-    tmrVPPEN->start(cfg);      
+//    tmrVPPEN->start(cfg);      
 
 // pe11 MAGVCC2 high 
 
@@ -230,20 +230,20 @@ void myEVT::userdefStartup(embot::os::Thread *t, void *param) const
     
     embot::core::print("userdefStartup(): start a timer which sends an event which forces an acquisition from the FAP");
     
-    embot::hw::tlv493d::init(magencIndexAdduction, {{embot::hw::bsp::tlv493d::getBSP().getPROP(magencIndexAdduction)->i2cbus, embot::hw::i2c::Speed::standard100}});
+//    embot::hw::tlv493d::init(magencIndexAdduction, {{embot::hw::bsp::tlv493d::getBSP().getPROP(magencIndexAdduction)->i2cbus, embot::hw::i2c::Speed::standard100}});
     
-//    // start a timer which sends an event which forces an acquisition from the FAP  
-//    embot::os::Timer *tmr = new embot::os::Timer;   
-//    embot::os::Action act(embot::os::EventToThread(evtTick, t));
-//    embot::os::Timer::Config cfg{tickperiod, act, embot::os::Timer::Mode::forever, 0};
-//    tmr->start(cfg);     
+    // start a timer which sends an event which forces an acquisition from the FAP  
+    embot::os::Timer *tmr = new embot::os::Timer;   
+    embot::os::Action act(embot::os::EventToThread(evtTick, t));
+    embot::os::Timer::Config cfg{tickperiod, act, embot::os::Timer::Mode::forever, 0};
+    tmr->start(cfg);     
  
     // maybe we start the tx of ft data straight away
-#if defined(DEBUG_atstartup_tx_FTdata)
-    embot::app::application::theSTRAIN &thestrain = embot::app::application::theSTRAIN::getInstance();
-    thestrain.setTXperiod(10*embot::core::time1millisec);
-    thestrain.start(embot::prot::can::analog::polling::Message_SET_TXMODE::StrainMode::txUncalibrated);
-#endif      
+//#if defined(DEBUG_atstartup_tx_FTdata)
+//    embot::app::application::theSTRAIN &thestrain = embot::app::application::theSTRAIN::getInstance();
+//    thestrain.setTXperiod(10*embot::core::time1millisec);
+//    thestrain.start(embot::prot::can::analog::polling::Message_SET_TXMODE::StrainMode::txUncalibrated);
+//#endif      
 }
 
 
@@ -279,9 +279,9 @@ void myEVT::userdefOnEventANYother(embot::os::Thread *t, embot::os::EventMask ev
         embot::core::print("userdefOnEventANYother() -> evtTick received @ time = " + tf.to_string());    
 #endif  
 
-        embot::core::print("::userdefOnEventANYother() -> called a reading of chip TLV493D on fap board");    
-        embot::core::Callback cbk00(alertFAPdataisready, t);
-        embot::hw::tlv493d::acquisition(magencIndexAdduction, cbk00);        
+//        embot::core::print("::userdefOnEventANYother() -> called a reading of chip TLV493D on fap board");    
+//        embot::core::Callback cbk00(alertFAPdataisready, t);
+//        embot::hw::tlv493d::acquisition(magencIndexAdduction, cbk00);        
     }
     
     if(true == embot::core::binary::mask::check(eventmask, evtReadFAP)) 

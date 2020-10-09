@@ -159,7 +159,7 @@
           <Type>0</Type>
           <LineNumber>26</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134258296</Address>
+          <Address>134259240</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -169,6 +169,22 @@
           <Filename>../src/main-bootloader.cpp</Filename>
           <ExecCommand></ExecCommand>
           <Expression>\\pmc_bootloader\../src/main-bootloader.cpp\26</Expression>
+        </Bp>
+        <Bp>
+          <Number>1</Number>
+          <Type>0</Type>
+          <LineNumber>146</LineNumber>
+          <EnabledFlag>1</EnabledFlag>
+          <Address>134252028</Address>
+          <ByteObject>0</ByteObject>
+          <HtxType>0</HtxType>
+          <ManyObjects>0</ManyObjects>
+          <SizeOfObject>0</SizeOfObject>
+          <BreakByAccess>0</BreakByAccess>
+          <BreakIfRCount>1</BreakIfRCount>
+          <Filename>..\..\..\..\..\..\eBcode\arch-arm\embot\hw\embot_hw_sys.cpp</Filename>
+          <ExecCommand></ExecCommand>
+          <Expression>\\pmc_bootloader\../../../../embot/app/skeleton/embot_app_skeleton_os_bootloader.cpp\146</Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>
@@ -210,7 +226,7 @@
       <DebugFlag>
         <trace>0</trace>
         <periodic>1</periodic>
-        <aLwin>1</aLwin>
+        <aLwin>0</aLwin>
         <aCover>0</aCover>
         <aSer1>0</aSer1>
         <aSer2>0</aSer2>
