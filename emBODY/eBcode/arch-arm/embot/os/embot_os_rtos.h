@@ -114,6 +114,9 @@ namespace embot { namespace os { namespace rtos {
 
     void thread_period_wait(thread_t *osthread, embot::core::relTime period);  
     
+    void thread_sleep(thread_t *osthread, embot::core::relTime delay);
+       
+    
     
     // -- event section
     

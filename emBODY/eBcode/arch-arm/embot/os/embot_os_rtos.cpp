@@ -894,6 +894,17 @@ namespace embot { namespace os { namespace rtos {
         osal_task_period_wait();
 #endif        
     }
+
+    void thread_sleep(thread_t *osthread, embot::core::relTime delay)
+    {
+#if defined(EMBOT_USE_rtos_cmsisos2)
+        osDelay(cmsisos2_sys_reltime2tick(timeout));            
+#elif defined(EMBOT_USE_rtos_osal)      
+        osal_task_wait(static_cast<osal_reltime_t>(delay));
+#endif        
+    }    
+
+        
     
     // -- event section
     
