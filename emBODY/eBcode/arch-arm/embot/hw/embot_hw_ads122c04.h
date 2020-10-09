@@ -57,16 +57,20 @@ namespace embot { namespace hw { namespace ads122c04 {
     
     // we check isacquiring() but also if any other device is using i2c bus
     bool canacquire(embot::hw::ADS122C04 s);    
+ 
+    result_t commute(embot::hw::ADS122C04 s, Channel channel, const embot::core::Callback &oncompletion = embot::core::Callback(nullptr, nullptr));
+    embot::core::relTime conversiontime(embot::hw::ADS122C04 s);
     
+    result_t acquire(embot::hw::ADS122C04 s, Channel channel, const embot::core::Callback &oncompletion = embot::core::Callback(nullptr, nullptr));
     
-    // we start acquisition of temperature.
+    // we start acquisition of adc.
     // if returns resOK, we know that acquisition is over if it is called oncompletion() or when operationdone() is true;
     result_t acquisition(embot::hw::ADS122C04 s, Channel channel, const embot::core::Callback &oncompletion = embot::core::Callback(nullptr, nullptr));
 
     // it tells if a previous operation of acquisition is over
     bool operationdone(embot::hw::ADS122C04 s);
     
-    // ok, now we can read temperature previously acquired
+    // ok, now we can read adc previously acquired
     result_t read(embot::hw::ADS122C04 s, Values &values);   
 
  

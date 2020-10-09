@@ -503,7 +503,67 @@ mode.
 #else         
         return !embot::hw::i2c::isbusy(s_privatedata.config[index].i2cdes.bus);  
 #endif        
-    }    
+    }  
+
+
+    result_t commute(embot::hw::ADS122C04 s, Channel channel, const embot::core::Callback &oncompletion)
+    {
+        if(false == canacquire(s))
+        {
+            return resNOK;
+        }
+        
+        std::uint8_t index = embot::core::tointegral(s);  
+        
+        // set channel
+        volatile result_t res = result_t::NOK;
+
+        // the following two operations are in blocking mode ... ahi! and take about 200 usec in total.
+        // think of a non blocking mode.
+        //#warning ADS122: think of a non-blocking acquisition start mode
+        res = _ads_chip.setchannel(channel, 3*embot::core::time1millisec); 
+        //embot::hw::sys::delay(50);
+        // start the conversion        
+        res = _ads_chip.startconversion(); 
+        
+        // now we return. however we call the callback
+        oncompletion.execute();
+            
+        return resOK;                
+    }
+    
+    embot::core::relTime conversiontime(embot::hw::ADS122C04 s)
+    {
+        if(false == initialised(s))
+        {
+            return 0;
+        } 
+        return _ads_chip.getConversionTime();
+    }
+    
+      
+    result_t acquire(embot::hw::ADS122C04 s, Channel channel, const embot::core::Callback &oncompletion)
+    {
+        if(false == canacquire(s))
+        {
+            return resNOK;
+        }
+        
+        std::uint8_t index = embot::core::tointegral(s);  
+                        
+        s_privatedata.acquisition[index].clear();
+        s_privatedata.acquisition[index].ongoing = true;
+        s_privatedata.acquisition[index].done = false;
+        s_privatedata.acquisition[index].channel = channel;
+        s_privatedata.acquisition[index].userdefCBK = oncompletion;
+        
+        // ok, now i trigger the reading of the value.
+        embot::core::Callback cbk(sharedCBK, &s_privatedata.acquisition[index]);
+        embot::core::Data data = embot::core::Data(&s_privatedata.acquisition[index].rxdata[0], sizeof(s_privatedata.acquisition[index].rxdata));
+        _ads_chip.retrievevalue(data, cbk);
+               
+        return resOK;
+    }        
     
     result_t acquisition(ADS122C04 s, Channel channel, const embot::core::Callback &oncompletion)
     {
