@@ -191,5 +191,72 @@ We could also read at 200 Hz, if needed. However, to do so it is required to do 
 
 
 
+## Appendix
+
+
+
+With a different acquisition chain with the following order we obtain confirmation of the above timings.
+
+
+
+```
+evthread-onevent: evtAcquisitionStart received @ time = D0:H0:M0:S3:m883:u545
+evthread-onevent: evtADC1start received after S0:m0:u222 @ S3:m883:u767
+evthread-onevent: evtADC1retrieve received after S0:m0:u667 @ S3:m884:u212
+evthread-onevent: evtADC2commute received after S0:m0:u923 @ S3:m884:u468
+evthread-onevent: evtIMUstart received after S0:m1:u410 @ S3:m884:u955
+evthread-onevent: evtIMUretrieve received after S0:m3:u554 @ S3:m887:u99
+evthread-onevent: evtCDC1start received after S0:m3:u807 @ S3:m887:u352
+evthread-onevent: evtADC2ready received after S0:m4:u102 @ S3:m887:u647
+evthread-onevent: evtCDC1retrieve received after S0:m4:u851 @ S3:m888:u396
+evthread-onevent: evtADC2start received after S0:m5:u120 @ S3:m888:u665
+evthread-onevent: evtADC2retrieve received after S0:m5:u562 @ S3:m889:u107
+evthread-onevent: evtADC1commute received after S0:m5:u818 @ S3:m889:u363
+evthread-onevent: evtCDC2start received after S0:m6:u304 @ S3:m889:u849
+evthread-onevent: evtCDC2retrieve received after S0:m7:u317 @ S3:m890:u862
+evthread-onevent: evtADC1ready received after S0:m9:u0 @ S3:m892:u545
+```
+
+**Figure**. Order of acquisition inside the 10 ms time slot. The times `after ` are relative to the `evtAcquisitionStart`.
+
+
+
+```
+BNO055: acc = (0.100000, -1.290000, 9.330000) m/(s*s)in S0:m1:u445
+ADS122C04: (8388607, 8388607) in (S0:m3:u4+S0:m0:u210, S0:m3:u273+S0:m0:u215)
+P02->P13 = (0 0 0 0 0 0 0 0 0 0 0 0 )in S0:m0:u779
+P14->P24 = (0 0 0 0 0 0 0 0 0 0 0 9984 )in S0:m0:u779
+             
+BNO055: acc = (0.090000, -1.320000, 9.330000) m/(s*s)in S0:m1:u324
+ADS122C04: (8388607, 8388607) in (S0:m3:u137+S0:m0:u210, S0:m3:u390+S0:m0:u211)
+P02->P13 = (0 0 0 0 0 0 0 0 0 0 0 0 )in S0:m0:u779
+P14->P24 = (0 0 0 0 0 0 0 0 0 0 0 9984 )in S0:m0:u780
+
+BNO055: acc = (-0.080000, -0.360000, 9.390000) m/(s*s)in S0:m0:u464
+ADS122C04: (8388607, 8388607) in (S0:m2:u991+S0:m0:u210, S0:m3:u491+S0:m0:u212)
+P02->P13 = (696 5068 0 0 15779 20750 18717 0 4560 24996 24073 11412 )in S0:m0:u779
+P14->P24 = (20697 26146 27274 3076 26092 27466 0 19780 1120 0 0 10805 )in S0:m0:u779
+     
+BNO055: acc = (-0.080000, -0.340000, 9.420000) m/(s*s)in S0:m1:u940
+ADS122C04: (8388607, 8388607) in (S0:m2:u974+S0:m0:u210, S0:m3:u276+S0:m0:u247)
+P02->P13 = (0 300 0 0 12141 22394 22747 0 18501 29003 26898 32209 )in S0:m0:u785
+P14->P24 = (18858 23602 24502 23598 24226 25351 16981 20310 7017 0 18097 10836 )in S0:m0:u780
+ 
+BNO055: acc = (0.090000, -1.290000, 9.340000) m/(s*s)in S0:m1:u921
+ADS122C04: (8388607, 8388607) in (S0:m3:u3+S0:m0:u210, S0:m3:u508+S0:m0:u210)
+P02->P13 = (0 0 0 0 0 0 0 0 0 0 0 0 )in S0:m0:u779
+P14->P24 = (0 0 0 0 0 0 0 0 0 0 0 9985 )in S0:m0:u779
+```
+
+**Figure**. Acquisition times with the new sequence. 
+
+
+
+The ADC reports the time spent in waiting for the channel stabilization plus the real retrieval time after the channel is stable. The two phases (stabilization and retrieval) are now split. 
+
+The first phase starts with the call `embot::hw::ads122c04::commute()` and stops with the expiry of a timer with timeout equal to `embot::hw::ads122c04::conversiontime()` started just after the return of the above function.  The time count is started before `embot::hw::ads122c04::commute()` and stopped when the event sent by the timer is received inside `tMAIN`.
+
+The second phase starts with the call `embot::hw::ads122c04::acquire()`  and stops just after `embot::hw::ads122c04::read()`.
+
 
 
