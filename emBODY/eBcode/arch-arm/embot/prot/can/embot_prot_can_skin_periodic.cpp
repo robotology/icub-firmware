@@ -74,7 +74,7 @@ namespace embot { namespace prot { namespace can { namespace skin { namespace pe
       
         return true;
     }
-        
+
     bool Message_TRG::get(embot::prot::can::Frame &outframe0, embot::prot::can::Frame &outframe1)
     {
         std::uint8_t data08[8] = {0};
@@ -99,8 +99,12 @@ namespace embot { namespace prot { namespace can { namespace skin { namespace pe
         }            
         data08[6] = static_cast<std::uint8_t>((info.outofrangemaskofthe12s & 0x0ff0) >> 4);
         data08[7] = static_cast<std::uint8_t>((info.outofrangemaskofthe12s & 0x000f) << 4) | (errorflags & 0x0f);
-        
+
+#if defined(CUSTOMIZATION_MTB4_FOR_TLR)
+        Message::set(info.canaddress, 0xf, Clas::periodicForFutureUse, info.trianglenum, data08, 8);
+#else        
         Message::set(info.canaddress, 0xf, Clas::periodicSkin, info.trianglenum, data08, 8);
+#endif        
         std::memmove(&outframe1, &canframe, sizeof(embot::prot::can::Frame));
         
         return true;

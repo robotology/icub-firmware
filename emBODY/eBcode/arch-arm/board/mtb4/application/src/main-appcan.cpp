@@ -13,9 +13,14 @@
 // config start
 
 constexpr embot::app::theCANboardInfo::applicationInfo applInfo 
-{ 
+{
+#if defined(CUSTOMIZATION_MTB4_FOR_TLR) 
+    embot::prot::can::versionOfAPPLICATION {20, 4, 5},    
+    embot::prot::can::versionOfCANPROTOCOL {20, 0} 
+#else    
     embot::prot::can::versionOfAPPLICATION {1, 4, 5},    
-    embot::prot::can::versionOfCANPROTOCOL {2, 0}    
+    embot::prot::can::versionOfCANPROTOCOL {2, 0} 
+#endif    
 };
 
 constexpr std::uint16_t threadIDLEstacksize = 512;
@@ -237,6 +242,18 @@ void myEVT::userdefOnEventANYother(embot::os::Thread *t, embot::os::EventMask ev
         thethermo.processdata(outframes);        
     }
 }
+
+
+// - customizations
+// - in here commenst about customizations
+#if defined(CUSTOMIZATION_MTB4_FOR_TLR)
+    #warning CUSTOMIZATION_MTB4_FOR_TLR is active: see what changes it takes
+    // the TLR customization changes the IDs of the CAN frames emitted periodically to broadcast the 12 values of the skin taxel so that:
+    // - the first frame has unchanged ID formed by the following three nibbles [cls | adr | trg] 
+    //   with cls = 4 = embot::protocol::can::Cls::periodicSkin, adr = address of transmitting mtb4 board, trg = number of the triangle.
+    // - the second frame has an ID different from standard protocol because the value of cls is now = 6 = embot::protocol::can::Cls::periodicForFutureUse
+    // it also has a embot::prot::can::versionOfCANPROTOCOL {20, 0} 
+#endif
 
 
 // - end-of-file (leave a blank line after)----------------------------------------------------------------------------
